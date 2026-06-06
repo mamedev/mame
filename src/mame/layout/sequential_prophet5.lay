@@ -323,7 +323,7 @@ copyright-holders:m1macrophage
 		<text string="2" align="1"><bounds x="2" y="24" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
 		<text string="3" align="1"><bounds x="5" y="12" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
 		<text string="4" align="1"><bounds x="13" y="3" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
-		<text string="5" align="0"><bounds x="25" y="0" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
+		<text string="5" align="0"><bounds x="24" y="0" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
 		<text string="6" align="2"><bounds x="35" y="3" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
 		<text string="7" align="2"><bounds x="43" y="12" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
 		<text string="8" align="2"><bounds x="46" y="24" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
@@ -337,7 +337,7 @@ copyright-holders:m1macrophage
 		<text string="3" align="1"><bounds x="2" y="24" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
 		<text string="2" align="1"><bounds x="5" y="12" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
 		<text string="1" align="1"><bounds x="13" y="3" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
-		<text string="0" align="0"><bounds x="25" y="0" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
+		<text string="0" align="0"><bounds x="24" y="0" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
 		<text string="1" align="2"><bounds x="35" y="3" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
 		<text string="2" align="2"><bounds x="43" y="12" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
 		<text string="3" align="2"><bounds x="46" y="24" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
@@ -553,7 +553,7 @@ copyright-holders:m1macrophage
 		<element ref="panel"><bounds x="14" y="14" width="1372" height="268"/></element>
 		<element ref="line"><bounds x="283" y="42" width="2" height="224"/></element>
 
-		<collection name="script warning">
+		<collection name="warnings">
 			<element ref="script_warning" id="warning"><bounds x="300" y="324" width="800" height="18"/></element>
 		</collection>
 

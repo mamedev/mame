@@ -1162,7 +1162,7 @@ void tecmo_state::rygar(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tecmo);
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024).set_endianness(ENDIANNESS_BIG);
 
-	TECMO_SPRITE(config, m_sprgen, 0, m_palette, gfx_tecmo_spr);
+	TECMO_SPRITE(config, m_sprgen, m_palette, gfx_tecmo_spr);
 	m_sprgen->set_pri_callback(FUNC(tecmo_state::pri_cb));
 
 	// sound hardware

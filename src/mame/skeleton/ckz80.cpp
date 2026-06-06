@@ -204,7 +204,7 @@ void ckz80_state::ckz80(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ckz80_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
 
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 	m_terminal->set_keyboard_callback(FUNC(ckz80_state::kbd_put));
 	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
 	FLOPPY_CONNECTOR(config, "fdc:0", ckz80_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);

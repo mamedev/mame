@@ -18,7 +18,7 @@
 #include "machine/i8251.h"
 #include "mb62h195.h"
 #include "mb63h149.h"
-#include "mb87013.h"
+#include "machine/mb87013.h"
 #include "machine/nvram.h"
 #include "machine/rescap.h"
 #include "machine/upd7001.h"

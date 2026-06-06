@@ -202,7 +202,7 @@ void ts802_state::ts802(machine_config &config)
 	m_maincpu->busack_cb().set("dma", FUNC(z80dma_device::bai_w));
 
 	/* Devices */
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 	m_terminal->set_keyboard_callback(FUNC(ts802_state::kbd_put));
 
 	z80dma_device& dma(Z80DMA(config, "dma", 16_MHz_XTAL / 4));

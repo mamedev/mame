@@ -29,9 +29,12 @@ public:
 	virtual void exit() override { }
 
 	// output_module
-
-	virtual void notify(const char *outname, int32_t value) override { osd_printf_info("%s = %d\n", ((outname==nullptr) ? "none" : outname), value); }
-
+	virtual void notify(const output_item &item, std::int32_t seconds, std::int64_t attoseconds) override
+	{ osd_printf_info("%s = %d\n", item.qualified_name(), item.value()); }
+	virtual void pause() override
+	{ osd_printf_info("pause = 1\n"); }
+	virtual void resume() override
+	{ osd_printf_info("pause = 0\n"); }
 };
 
 } // anonymous namespace

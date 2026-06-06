@@ -63,7 +63,7 @@ void unianapc_state::unianapc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &unianapc_state::unianapc_map);
 	m_maincpu->set_disable();
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 

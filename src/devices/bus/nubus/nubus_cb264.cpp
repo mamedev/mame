@@ -33,6 +33,8 @@
 #include "emupal.h"
 #include "screen.h"
 
+#include "endianness.h"
+
 #include <algorithm>
 
 #define VERBOSE (0)

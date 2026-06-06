@@ -222,7 +222,7 @@ void elf2_state::elf2(machine_config &config)
 	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
 
 	/* devices */
-	MM74C923(config, m_kb, 0);
+	MM74C923(config, m_kb);
 	m_kb->set_cap_osc(CAP_U(0.15));
 	m_kb->set_cap_debounce(CAP_U(1));
 	m_kb->da_wr_callback().set(FUNC(elf2_state::da_w));

@@ -32,6 +32,8 @@
 #include "sound/ymopn.h"
 #include "sound/ymz280b.h"
 
+#include "endianness.h"
+
 #define LOG_BANK        (1U << 1)
 #define LOG_DMA         (1U << 2)
 #define LOG_MCU         (1U << 3)
@@ -110,10 +112,10 @@ void zn_state::zn_base(machine_config &config)
 
 	SPEAKER(config, m_speaker, 2).front();
 
-	AT28C16(config, m_at28c16, 0);
+	AT28C16(config, m_at28c16);
 
 	auto &sio0(*m_maincpu->subdevice<psxsio0_device>("sio0"));
-	ZNMCU(config, m_znmcu, 0);
+	ZNMCU(config, m_znmcu);
 	sio0.sck_handler().append(m_znmcu, FUNC(znmcu_device::sck));
 	m_znmcu->dsr().set(sio0, FUNC(psxsio0_device::write_dsr));
 	m_znmcu->txd().set(FUNC(zn_state::znmcu_dataout));
@@ -127,7 +129,7 @@ void zn_state::zn_base(machine_config &config)
 template<unsigned N>
 void zn_state::cat702(machine_config &config)
 {
-	CAT702(config, m_cat702[N], 0);
+	CAT702(config, m_cat702[N]);
 	m_cat702[N]->dataout_handler().set(FUNC(zn_state::cat702_dataout<N>));
 	auto &sio0(*m_maincpu->subdevice<psxsio0_device>("sio0"));
 	sio0.sck_handler().append(m_cat702[N], FUNC(cat702_device::write_clock));
@@ -921,7 +923,7 @@ public:
 
 		MB3773(config, m_mb3773);
 
-		TC0140SYT(config, m_tc0140syt, 0);
+		TC0140SYT(config, m_tc0140syt);
 		m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 		m_tc0140syt->reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 	}
@@ -2181,7 +2183,7 @@ public:
 
 		ADDRESS_MAP_BANK(config, m_bankmap).set_map(&nbajamex_state::bank_map).set_options(ENDIANNESS_LITTLE, 32, 24, 0x800000);
 
-		ACCLAIM_RAX(config, m_rax, 0);
+		ACCLAIM_RAX(config, m_rax);
 		m_rax->add_route(0, m_speaker, 1.0, 0);
 		m_rax->add_route(1, m_speaker, 1.0, 1);
 	}

@@ -13,7 +13,7 @@
 class sis7018_audio_device : public pci_device
 {
 public:
-	sis7018_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sis7018_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	static constexpr feature_type unemulated_features() { return feature::SOUND; }
 

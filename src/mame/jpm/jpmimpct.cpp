@@ -96,7 +96,6 @@ Thanks to Tony Friery and JPeMU for I/O routines and documentation.
 #include "emu.h"
 #include "jpmimpct.h"
 
-#include "awpvid.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
@@ -245,11 +244,6 @@ void jpmimpct_video_state::machine_reset()
 
 void jpmimpct_state::machine_start()
 {
-	m_digits.resolve();
-	m_lamp_output.resolve();
-	m_pwrled.resolve();
-	m_statled.resolve();
-
 	save_item(NAME(m_optic_pattern));
 	save_item(NAME(m_payen));
 	save_item(NAME(m_hopinhibit));
@@ -385,25 +379,25 @@ void jpmimpct_state::reels_0123_w(offs_t offset, uint16_t data, uint16_t mem_mas
 	if (m_reel[0])
 	{
 		m_reel[0]->update((data >> 0) & 0x0f);
-		awp_draw_reel(machine(),"reel1", *m_reel[0]);
+		m_reel[0]->draw();
 	}
 
 	if (m_reel[1])
 	{
 		m_reel[1]->update((data >> 4)& 0x0f);
-		awp_draw_reel(machine(),"reel2", *m_reel[1]);
+		m_reel[1]->draw();
 	}
 
 	if (m_reel[2])
 	{
 		m_reel[2]->update((data >> 8)& 0x0f);
-		awp_draw_reel(machine(),"reel3", *m_reel[2]);
+		m_reel[2]->draw();
 	}
 
 	if (m_reel[3])
 	{
 		m_reel[3]->update((data >> 12)& 0x0f);
-		awp_draw_reel(machine(),"reel4", *m_reel[3]);
+		m_reel[3]->draw();
 	}
 }
 
@@ -412,12 +406,12 @@ void jpmimpct_state::reels_45_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	if (m_reel[4])
 	{
 		m_reel[4]->update((data >> 0)& 0x0f);
-		awp_draw_reel(machine(),"reel5", *m_reel[4]);
+		m_reel[4]->draw();
 	}
 	if (m_reel[5])
 	{
 		m_reel[5]->update((data >> 4)& 0x0f);
-		awp_draw_reel(machine(),"reel6", *m_reel[5]);
+		m_reel[5]->draw();
 	}
 }
 
@@ -1325,11 +1319,11 @@ void jpmimpct_state::base(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	METERS(config, m_meters, 0).set_number(5);
+	METERS(config, m_meters).set_number(5);
 
 	// TODO: only add this to the sets that need it connected
 	m_duart->a_tx_cb().set(m_datalogger, FUNC(bacta_datalogger_device::write_txd));
-	BACTA_DATALOGGER(config, m_datalogger, 0);
+	BACTA_DATALOGGER(config, m_datalogger);
 	m_datalogger->rxd_handler().set(m_duart, FUNC(mc68681_device::rx_a_w));
 }
 

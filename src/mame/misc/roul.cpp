@@ -87,10 +87,9 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void roul(machine_config &config);
+	void roul(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override ATTR_COLD;
 
 private:

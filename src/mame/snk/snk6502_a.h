@@ -17,7 +17,7 @@
 class snk6502_sound_device : public device_t, public device_sound_interface
 {
 public:
-	snk6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	snk6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	int music0_playing();
 
@@ -79,7 +79,7 @@ private:
 class vanguard_sound_device : public device_t
 {
 public:
-	vanguard_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vanguard_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void sound_w(offs_t offset, uint8_t data);
 	void speech_w(uint8_t data);
@@ -146,7 +146,7 @@ protected:
 class sasuke_sound_device : public device_t
 {
 public:
-	sasuke_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sasuke_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void sound_w(offs_t offset, uint8_t data);
 

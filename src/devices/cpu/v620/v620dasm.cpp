@@ -10,7 +10,9 @@
 #include "v620dasm.h"
 
 #include <array>
+#include <bit>
 #include <unordered_map>
+
 
 v620_disassembler::v620_disassembler()
 	: util::disasm_interface()
@@ -115,6 +117,7 @@ static const char *const s_jxif_ext_ops[7][3] =
 	{ "JS3N", "JS3NM", "XS3NM" }    // sense switch 3 not set (00x406)
 };
 
+// FIXME: avoid statics that require dynamic allocation
 static const std::unordered_map<u8, const char *> s_fpp_map =
 {
 	{ 0001, "FDV" },
@@ -155,7 +158,7 @@ offs_t v620_disassembler::dasm_jxif(std::ostream &stream, u16 inst, u16 dest, of
 	const u16 cond = BIT(inst, 0, 9);
 	if ((cond & (cond - 1)) == 0)
 	{
-		const char *op = s_jxif_ops[32 - count_leading_zeros_32(cond)][BIT(inst, 9, 2) - 1];
+		const char *op = s_jxif_ops[std::bit_width(cond)][BIT(inst, 9, 2) - 1];
 		if (BIT(dest, 15))
 			util::stream_format(stream, "%-8s", std::string(op) + "*");
 		else
@@ -184,7 +187,7 @@ offs_t v620f_disassembler::dasm_jxif(std::ostream &stream, u16 inst, u16 dest, o
 	const u16 cond = BIT(inst, 0, 9);
 	if (cond == 0007 || (cond >= 0016 && (((cond - 6) & (cond - 7)) == 0)))
 	{
-		const char *op = s_jxif_ext_ops[32 - 3 - count_leading_zeros_32(cond)][BIT(inst, 9, 2) - 1];
+		const char *op = s_jxif_ext_ops[std::bit_width(cond) - 3][BIT(inst, 9, 2) - 1];
 		if (BIT(dest, 15))
 			util::stream_format(stream, "%-8s", std::string(op) + "*");
 		else

@@ -671,9 +671,9 @@ void punchout_state::spnchout(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_IO, &punchout_state::spnchout_io_map);
 
-	RP5C01(config, m_rtc, 0); // OSCIN -> Vcc
+	RP5C01(config, m_rtc); // OSCIN -> Vcc
 	m_rtc->remove_battery();
-	RP5H01(config, m_rp5h01, 0);
+	RP5H01(config, m_rp5h01);
 
 	MCFG_MACHINE_RESET_OVERRIDE(punchout_state, spnchout)
 }

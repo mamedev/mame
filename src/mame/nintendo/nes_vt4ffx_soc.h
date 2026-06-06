@@ -48,8 +48,8 @@ private:
 
 	std::vector<u8> m_6000_ram;
 
-	u8 m_bank6000 = 0;
-	u8 m_bank6000_enable = 0;
+	u8 m_bank6000;
+	u8 m_bank6000_enable;
 
 	u8 m_413x_port_direction;
 	u8 m_413x_port_data;

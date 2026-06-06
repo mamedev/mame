@@ -622,7 +622,7 @@ void goldngam_state::swisspkr(machine_config &config)
 {
 	base(config);
 
-	ACIA6850(config, "acia", 0).irq_handler().set_inputline("maincpu", M68K_IRQ_4);
+	ACIA6850(config, "acia").irq_handler().set_inputline("maincpu", M68K_IRQ_4);
 	AY8912(config, "aysnd", MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 

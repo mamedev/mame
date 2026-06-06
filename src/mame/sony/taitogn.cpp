@@ -424,7 +424,7 @@ protected:
 		cat702<0>(config);
 		cat702<1>(config);
 
-		RF5C296(config, m_rf5c296, 0).set_pccard(m_pccard);
+		RF5C296(config, m_rf5c296).set_pccard(m_pccard);
 
 		PCCARD_SLOT(config, m_pccard, slot_ataflash, nullptr);
 
@@ -735,14 +735,6 @@ public:
 	}
 
 protected:
-	virtual void device_resolve_objects() override ATTR_COLD
-	{
-		taitogn_state::device_resolve_objects();
-
-		m_lamp.resolve();
-		m_start.resolve();
-	}
-
 	virtual void driver_start() override ATTR_COLD
 	{
 		taitogn_state::driver_start();

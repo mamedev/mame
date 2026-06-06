@@ -205,8 +205,10 @@ protected:
 		save_pointer(NAME(m_paletteram_flytiger), 0x1000);
 	}
 
-	DECLARE_MACHINE_START(cpu_z80)
+	virtual void machine_start() override ATTR_COLD
 	{
+		dooyong_state::machine_start();
+
 		m_mainbank->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
 	}
 
@@ -1503,8 +1505,6 @@ void dooyong_z80_ym2203_state::lastday(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL/4);  /* 4MHz verified for Last Day / D-day */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dooyong_z80_ym2203_state::lastday_sound_map);
 
-	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
-
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
@@ -1539,8 +1539,6 @@ void dooyong_z80_ym2203_state::gulfstrm(machine_config &config)
 
 	Z80(config, m_audiocpu, 8000000);  /* ??? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dooyong_z80_ym2203_state::lastday_sound_map);
-
-	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -1577,8 +1575,6 @@ void dooyong_z80_ym2203_state::pollux(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL/4);  /* 4Mhz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dooyong_z80_ym2203_state::pollux_sound_map);
 
-	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
-
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
@@ -1613,8 +1609,6 @@ void dooyong_z80_state::bluehawk(machine_config &config)
 
 	Z80(config, m_audiocpu, 4000000);  /* ??? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dooyong_z80_state::bluehawk_sound_map);
-
-	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -1660,8 +1654,6 @@ void dooyong_z80_state::flytiger(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL/4);  /* 4Mhz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dooyong_z80_state::bluehawk_sound_map);
 
-	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)
-
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
@@ -1697,8 +1689,6 @@ void dooyong_z80_state::primella(machine_config &config)
 
 	Z80(config, m_audiocpu, 16_MHz_XTAL/4);   /* 4MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dooyong_z80_state::bluehawk_sound_map);
-
-	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

@@ -16,7 +16,7 @@ class duart_base_device;
 class duart_channel : public device_t, public device_serial_interface
 {
 public:
-	duart_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	duart_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;

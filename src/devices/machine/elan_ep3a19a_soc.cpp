@@ -95,7 +95,7 @@ void elan_ep3a19a_soc_device::device_add_mconfig(machine_config &config)
 {
 	PALETTE(config, m_palette).set_entries(256);
 
-	ELAN_EU3A05_GPIO(config, m_gpio, 0);
+	ELAN_EU3A05_GPIO(config, m_gpio);
 	m_gpio->read_callback<0>().set(FUNC(elan_ep3a19a_soc_device::port_r<0>));
 	m_gpio->write_callback<0>().set(FUNC(elan_ep3a19a_soc_device::port_w<0>));
 	m_gpio->read_callback<1>().set(FUNC(elan_ep3a19a_soc_device::port_r<1>));
@@ -103,11 +103,11 @@ void elan_ep3a19a_soc_device::device_add_mconfig(machine_config &config)
 	m_gpio->read_callback<2>().set(FUNC(elan_ep3a19a_soc_device::port_r<2>));
 	m_gpio->write_callback<2>().set(FUNC(elan_ep3a19a_soc_device::port_w<2>));
 
-	ELAN_EP3A19A_SYS(config, m_sys, 0);
+	ELAN_EP3A19A_SYS(config, m_sys);
 	m_sys->set_cpu(DEVICE_SELF);
 	m_sys->bank_change_callback().set(FUNC(elan_ep3a19a_soc_device::bank_change));
 
-	ELAN_EP3A19A_VID(config, m_vid, 0);
+	ELAN_EP3A19A_VID(config, m_vid);
 	m_vid->set_cpu(DEVICE_SELF);
 	m_vid->set_palette(m_palette);
 	m_vid->set_entries(256);

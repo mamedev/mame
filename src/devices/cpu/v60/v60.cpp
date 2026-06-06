@@ -77,6 +77,9 @@ Package: 132-pin PGA, 200-pin QFP
 #include "v60.h"
 #include "v60d.h"
 
+#include "corefloat.h"
+
+
 DEFINE_DEVICE_TYPE(V60, v60_device, "v60", "NEC V60")
 DEFINE_DEVICE_TYPE(V70, v70_device, "v70", "NEC V70")
 

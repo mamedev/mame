@@ -332,7 +332,7 @@ void es8906_state::es8906(machine_config &config)
 
 	SPEAKER(config, "speaker").front_center();
 
-	ES8712(config, "essnd", 0);
+	ES8712(config, "essnd");
 
 	SN76489A(config, "sn1", 20_MHz_XTAL / 10).add_route(ALL_OUTPUTS, "speaker", 0.50); // TODO: divider not verified
 

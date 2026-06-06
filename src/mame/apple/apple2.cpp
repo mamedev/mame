@@ -777,7 +777,7 @@ void apple2_state::apple2_common(machine_config &config)
 	m_kbd->reset_callback().set(FUNC(apple2_state::keyb_reset_w));
 
 	/* slot devices */
-	A2BUS(config, m_a2bus, 0);
+	A2BUS(config, m_a2bus);
 	m_a2bus->set_space(m_maincpu, AS_PROGRAM);
 	m_a2bus->irq_w().set(FUNC(apple2_state::a2bus_irq_w));
 	m_a2bus->nmi_w().set(FUNC(apple2_state::a2bus_nmi_w));
@@ -1004,6 +1004,9 @@ ROM_START(craft2p)
 	ROM_LOAD ( "unitron_en.d0", 0x1000, 0x1000, CRC(24d73c7b) SHA1(d17a15868dc875c67061c95ec53a6b2699d3a425))
 	ROM_LOAD ( "unitron.e0"   , 0x2000, 0x1000, CRC(0d494efd) SHA1(a2fd1223a3ca0cfee24a6afe66ea3c4c144dd98e))
 	ROM_LOAD ( "craftii-roms-f0-f7.bin", 0x3000, 0x1000, CRC(3f9dea08) SHA1(0e23bc884b8108675267d30b85b770066bdd94c9) )
+
+	ROM_REGION(0x800, "keyboard", 0)
+	ROM_LOAD( "keyboard.bin", 0x000, 0x800, NO_DUMP ) // unknown HW, but probably MCU-based since BASIC macros are provided
 ROM_END
 
 ROM_START(uniap2pt)
@@ -1229,8 +1232,7 @@ COMP( 1982, ace100,   apple2, 0,      apple2p,  apple2, apple2_state, empty_init
 COMP( 1982, ace1000,  apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Franklin Computer",   "Franklin ACE 1000", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, uniap2en, apple2, 0,      uniap2,   apple2, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II (in English)", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, uniap2pt, apple2, 0,      uniap2,   apple2, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II (in Brazilian Portuguese)", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, craft2p,  apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Craft",               "Craft II+", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-// reverse font direction + wider character cell -\/
+COMP( 1982, craft2p,  apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Microcraft Microcomputadores", "Craft ][+", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // inverse/flashing text doesn't look OK
 COMP( 1984, ivelultr, apple2, 0,      ivelultr, apple2, apple2_state, empty_init, "Ivasim",              "Ivel Ultra", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, prav8m,   apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Pravetz",             "Pravetz 8M", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, space84,  apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "ComputerTechnik/IBS", "Space 84",   MACHINE_SUPPORTS_SAVE )

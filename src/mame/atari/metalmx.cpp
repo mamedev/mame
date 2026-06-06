@@ -763,7 +763,7 @@ void metalmx_state::metalmx(machine_config &config)
 	SPEAKER(config, "speaker", 4).front().headrest_left(2).headrest_right(3);
 	//SPEAKER(config, "subwoofer").lfe(); Not implemented, Quad Amp PCB output;
 
-	ATARI_CAGE(config, m_cage, 0);
+	ATARI_CAGE(config, m_cage);
 	m_cage->set_speedup(0); // TODO: speedup address
 	m_cage->irq_handler().set(FUNC(metalmx_state::cage_irq_callback));
 	m_cage->add_route(0, "speaker", 1.0, 1); // Foward Right

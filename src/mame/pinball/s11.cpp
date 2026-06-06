@@ -389,8 +389,6 @@ u8 s11_state::sound_r()
 void s11_state::machine_start()
 {
 	genpin_class::machine_start();
-	m_io_outputs.resolve();
-	m_digits.resolve();
 
 	save_item(NAME(m_sound_data));
 	save_item(NAME(m_diag));
@@ -514,7 +512,7 @@ void s11_state::s11(machine_config &config)
 	FILTER_BIQUAD(config, m_cvsd_filter2).opamp_mfb_lowpass_setup(RES_K(27), RES_K(15), RES_K(27), CAP_P(4700), CAP_P(1200));
 	FILTER_BIQUAD(config, m_cvsd_filter).opamp_mfb_lowpass_setup(RES_K(43), RES_K(36), RES_K(180), CAP_P(1800), CAP_P(180));
 	m_cvsd_filter->add_route(ALL_OUTPUTS, m_cvsd_filter2, 1.0);
-	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, m_cvsd_filter, 1.0);
+	HC55516(config, m_hc55516).add_route(ALL_OUTPUTS, m_cvsd_filter, 1.0);
 
 	PIA6821(config, m_pias);
 	m_pias->readpa_handler().set(FUNC(s11_state::sound_r));

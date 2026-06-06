@@ -388,7 +388,7 @@ void galspnbl_state::galspnbl(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galspnbl);
 	PALETTE(config, m_palette, FUNC(galspnbl_state::palette)).set_format(palette_device::xBGR_444, 1024 + 32768);
 
-	TECMO_SPRITE(config, m_sprgen, 0, m_palette, gfx_galspnbl_spr);
+	TECMO_SPRITE(config, m_sprgen, m_palette, gfx_galspnbl_spr);
 	m_sprgen->set_bootleg(true);
 
 	// sound hardware

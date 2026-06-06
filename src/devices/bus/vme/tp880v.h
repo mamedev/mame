@@ -18,6 +18,8 @@
 #include "bus/vme/vme.h"
 #include "bus/rs232/rs232.h"
 
+#include "endianness.h"
+
 class vme_tp880v_card_device
 	: public device_t
 	, public device_vme_card_interface
@@ -49,7 +51,7 @@ private:
 	required_device_array<rs232_port_device, 2> m_serial;
 
 	required_shared_ptr<u32> m_ram;
-	util::endian_cast<u32, u16, util::endianness::big> m_ram_68k;
+	util::endian_cast<u32, u16, std::endian::big> m_ram_68k;
 };
 
 DECLARE_DEVICE_TYPE(VME_TP880V, vme_tp880v_card_device)

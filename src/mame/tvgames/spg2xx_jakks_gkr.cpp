@@ -455,13 +455,13 @@ void jakks_gkr_state::jakks_gkr(machine_config &config)
 	m_maincpu->portc_in().set_ioport("P3");
 	m_maincpu->portc_out().set(FUNC(jakks_gkr_state::gkr_portc_w));
 
-	JAKKS_GAMEKEY_SLOT(config, m_cart, 0, jakks_gamekey, nullptr);
+	JAKKS_GAMEKEY_SLOT(config, m_cart, jakks_gamekey, nullptr);
 }
 
 void jakks_gkr_state::jakks_gkr_i2c(machine_config &config)
 {
 	jakks_gkr(config);
-	I2C_24C16(config, m_i2cmem, 0); // ?
+	I2C_24C16(config, m_i2cmem); // ?
 }
 
 

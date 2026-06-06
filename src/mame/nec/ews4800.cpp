@@ -151,7 +151,7 @@ void ews4800_state::ews4800_310(machine_config &config)
 	m_scsi->set_busmd(ncr53c94_device::busmd_t::BUSMD_1);
 
 	// ethernet
-	AM7990(config, m_net);
+	AM7990(config, m_net, 10'000'000); // clock is a guess
 	//m_net->intr_out()
 	m_net->dma_in().set(FUNC(ews4800_state::lance_r));
 	m_net->dma_out().set(FUNC(ews4800_state::lance_w));

@@ -67,7 +67,7 @@ class f3853_device : public device_t
 {
 public:
 	// construction/destruction
-	f3853_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	f3853_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto int_req_callback() { return m_int_req_callback.bind(); }
 	auto pri_out_callback() { return m_pri_out_callback.bind(); }
@@ -119,7 +119,7 @@ protected:
 class f3851_device : public f3853_device
 {
 public:
-	f3851_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	f3851_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// interrupt vector is a mask option on 3851 and 3856
 	void set_int_vector(u16 vector) { m_int_vector = vector; }
@@ -143,7 +143,7 @@ protected:
 class f3856_device : public f3851_device
 {
 public:
-	f3856_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	f3856_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
@@ -165,13 +165,13 @@ protected:
 class f38t56_device : public f3856_device
 {
 public:
-	f38t56_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	f38t56_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(F3853, f3853_device)
 DECLARE_DEVICE_TYPE(F3851, f3851_device)
 DECLARE_DEVICE_TYPE(F3856, f3856_device)

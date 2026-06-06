@@ -404,7 +404,7 @@ void cybiko_state::cybikov1_base(machine_config &config)
 
 void cybiko_state::cybikov1_flash(machine_config &config)
 {
-	AT45DB041(config, m_flash1, 0);
+	AT45DB041(config, m_flash1);
 	m_flash1->so_callback().set(m_maincpu, FUNC(h8_device::sci_rx_w<1>));
 }
 

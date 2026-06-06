@@ -14,6 +14,8 @@
 
 #include "screen.h"
 
+#include <numbers>
+
 
 #define LOG 0
 #define FIFO_LOG 0
@@ -825,8 +827,8 @@ void hd63484_device::draw_ellipse(int16_t cx, int16_t cy, double dx, double dy, 
 	double inc = 1.0 / (std::max(dx, dy) * 100);
 	for (double angol = s_angol; fabs(angol - e_angol) >= inc*2; angol += inc * (c ? -1 : +1))
 	{
-		if (angol > DEGREE_TO_RADIAN(360))    angol -= DEGREE_TO_RADIAN(360);
-		if (angol < DEGREE_TO_RADIAN(0))      angol += DEGREE_TO_RADIAN(360);
+		if (angol > 2.0 * std::numbers::pi) angol -= 2.0 * std::numbers::pi;
+		if (angol < 0.0)                    angol += 2.0 * std::numbers::pi;
 
 		double px = cos(angol) * dx;
 		double py = sin(angol) * dy;
@@ -1364,8 +1366,8 @@ void hd63484_device::command_arc_exec()
 	double r = sqrt(pow((double)(xc - m_cpx), 2) + pow((double)(yc - m_cpy), 2));
 	double s_angol = atan2((double)(m_cpy - yc), (double)(m_cpx - xc));
 	double e_angol = atan2((double)(ye - yc), (double)(xe - xc));
-	if (s_angol < 0)    s_angol += DEGREE_TO_RADIAN(360);
-	if (e_angol < 0)    e_angol += DEGREE_TO_RADIAN(360);
+	if (s_angol < 0)    s_angol += 2.0 * std::numbers::pi;
+	if (e_angol < 0)    e_angol += 2.0 * std::numbers::pi;
 
 	draw_ellipse(xc, yc, r, r, s_angol, e_angol, BIT(m_cr, 8));
 
@@ -1395,8 +1397,8 @@ void hd63484_device::command_earc_exec()
 	double dy = sqrt((double)b);
 	double s_angol = atan2((double)(m_cpy - yc) / dy, (double)(m_cpx - xc) / dx);
 	double e_angol = atan2((double)(ye - yc) / dy, (double)(xe - xc) / dx);
-	if (s_angol < 0)    s_angol += DEGREE_TO_RADIAN(360);
-	if (e_angol < 0)    e_angol += DEGREE_TO_RADIAN(360);
+	if (s_angol < 0)    s_angol += 2.0 * std::numbers::pi;
+	if (e_angol < 0)    e_angol += 2.0 * std::numbers::pi;
 
 	draw_ellipse(xc, yc, r * dx, r * dy, s_angol, e_angol, BIT(m_cr, 8));
 
@@ -1681,7 +1683,7 @@ void hd63484_device::process_fifo()
 			{
 				if (CMD_LOG)    logerror("HD63484 '%s': CRCL (%d, %d, %d, %d) %d\n", tag(), BIT(m_cr, 8), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, m_pr[0]);
 				uint16_t r = m_pr[0] & 0x1fff;
-				draw_ellipse(m_cpx, m_cpy, r, r, DEGREE_TO_RADIAN(0), DEGREE_TO_RADIAN(360), BIT(m_cr, 8));
+				draw_ellipse(m_cpx, m_cpy, r, r, 0.0, 2.0 * std::numbers::pi, BIT(m_cr, 8));
 				command_end_seq();
 			}
 			break;
@@ -1692,7 +1694,7 @@ void hd63484_device::process_fifo()
 				if (CMD_LOG)    logerror("HD63484 '%s': ELPS (%d, %d, %d, %d) %d, %d, %d\n", tag(), BIT(m_cr, 8), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, m_pr[0], m_pr[1], m_pr[2]);
 				double dx = (double)m_pr[3];
 				double dy = sqrt(pow(dx, 2) / ((double)m_pr[0] / m_pr[1]));
-				draw_ellipse(m_cpx, m_cpy, dx, dy, DEGREE_TO_RADIAN(0), DEGREE_TO_RADIAN(360), BIT(m_cr, 8));
+				draw_ellipse(m_cpx, m_cpy, dx, dy, 0.0, 2.0 * std::numbers::pi, BIT(m_cr, 8));
 				command_end_seq();
 			}
 			break;

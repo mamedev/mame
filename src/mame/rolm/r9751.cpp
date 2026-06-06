@@ -976,12 +976,12 @@ void r9751_state::r9751(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(1000));
 
 	/* i/o hardware */
-	SMIOC(config, m_smioc, 0);
+	SMIOC(config, m_smioc);
 	m_smioc->m68k_r_callback().set(FUNC(r9751_state::smioc_dma_r));
 	m_smioc->m68k_w_callback().set(FUNC(r9751_state::smioc_dma_w));
 
 	/* disk hardware */
-	PDC(config, m_pdc, 0);
+	PDC(config, m_pdc);
 	m_pdc->m68k_r_callback().set(FUNC(r9751_state::pdc_dma_r));
 	m_pdc->m68k_w_callback().set(FUNC(r9751_state::pdc_dma_w));
 

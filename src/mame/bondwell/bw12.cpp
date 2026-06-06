@@ -569,7 +569,7 @@ void bw12_state::common(machine_config &config)
 	m_pit->set_clk<2>(XTAL(1'843'200));
 	m_pit->out_handler<2>().set(m_pia, FUNC(pia6821_device::pa4_w));
 
-	AY3600(config, m_kbc, 0);
+	AY3600(config, m_kbc);
 	m_kbc->x0().set_ioport("X0");
 	m_kbc->x1().set_ioport("X1");
 	m_kbc->x2().set_ioport("X2");

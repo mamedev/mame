@@ -134,7 +134,7 @@ void vme_tp881v_card_device::device_add_mconfig(machine_config &config)
 	Z8036(config, m_cio[6], 4'000'000); // Z0803606VSC
 	Z8036(config, m_cio[7], 4'000'000); // Z0803606VSC
 
-	M48T02(config, m_rtc, 0);
+	M48T02(config, m_rtc);
 
 	auto &scsi0(NSCSI_BUS(config, "scsi0"));
 	NSCSI_CONNECTOR(config, "scsi0:0", scsi_devices, nullptr, false);
@@ -292,7 +292,7 @@ void vme_tp881v_card_device::device_add_mconfig(machine_config &config)
 		});
 	m_gcs[1]->pc_rd_cb().set(m_eeprom, FUNC(nmc9306_device::do_r));
 
-	NMC9306(config, m_eeprom, 0);
+	NMC9306(config, m_eeprom);
 }
 
 void vme_tp881v_card_device::cpu_mem(address_map &map)

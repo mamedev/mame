@@ -50,7 +50,6 @@ public:
 	template <int Mask> int starspnr_payout_r();
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(refresh_tick);
@@ -114,12 +113,6 @@ TIMER_CALLBACK_MEMBER(acefruit_state::refresh_tick)
 	const int next_vpos = ((vpos / 8) + 1) * 8;
 
 	m_refresh_timer->adjust(m_screen->time_until_pos(next_vpos));
-}
-
-void acefruit_state::machine_start()
-{
-	m_lamps.resolve();
-	m_solenoids.resolve();
 }
 
 void acefruit_state::video_start()

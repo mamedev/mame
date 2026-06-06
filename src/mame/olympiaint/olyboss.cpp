@@ -441,7 +441,7 @@ void olyboss_state::olybossd(machine_config &config)
 
 	/* devices */
 
-	AM9519(config, m_uic, 0);
+	AM9519(config, m_uic);
 	m_uic->out_int_callback().set_inputline("maincpu", 0);
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
@@ -472,7 +472,7 @@ void olyboss_state::olybossd(machine_config &config)
 	m_ppi->out_pc_callback().set(FUNC(olyboss_state::ppic_w));
 
 	/* keyboard */
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(olyboss_state::keyboard_put));
 }
 
@@ -508,7 +508,7 @@ void olyboss_state::bossb85(machine_config &config)
 
 	/* devices */
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
@@ -535,7 +535,7 @@ void olyboss_state::bossb85(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 
 	/* keyboard */
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(olyboss_state::keyboard85_put));
 }
 

@@ -151,10 +151,10 @@ ioport_constructor dual_clock_base::device_input_ports() const
 
 void dual_clock_base::device_add_mconfig(machine_config &config)
 {
-	CLOCK(config, m_clock_1, 0);
+	CLOCK(config, m_clock_1);
 	m_clock_1->signal_handler().set(FUNC(dual_clock_base::clk_w));
 
-	CLOCK(config, m_clock_2, 0);
+	CLOCK(config, m_clock_2);
 	m_clock_2->signal_handler().set(FUNC(dual_clock_base::clk2_w));
 }
 

@@ -38,6 +38,8 @@ horizontal/vertical sync pulse.
 #include "speaker.h"
 #include "tilemap.h"
 
+#include <bit>
+
 
 namespace {
 
@@ -133,7 +135,7 @@ void subhuntr_state::txtram_w(offs_t offset, u8 data)
 
 u8 subhuntr_state::intack_r()
 {
-	unsigned const source = count_leading_zeros_32(m_intreqs) - 24;
+	unsigned const source = std::countl_zero(m_intreqs);
 	u8 const vector = ((m_intreq_cnf->read() & 0x01) ? 0x91 : 0x11) | (source << 1);
 	switch (source)
 	{

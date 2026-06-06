@@ -12,6 +12,8 @@
 #include "debug/debugcon.h"
 #include "debugger.h"
 
+#include "corefloat.h"
+
 #include <locale>
 #include <fstream>
 

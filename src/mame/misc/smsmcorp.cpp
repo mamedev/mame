@@ -237,8 +237,13 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void sureshot(machine_config &config);
-	void sms(machine_config &config);
+	void sureshot(machine_config &config) ATTR_COLD;
+	void sms(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void bankswitch_w(uint8_t data);
@@ -256,10 +261,6 @@ private:
 	void sms_map(address_map &map) ATTR_COLD;
 	void sub_map(address_map &map) ATTR_COLD;
 	void sureshot_map(address_map &map) ATTR_COLD;
-
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
 
 	uint8_t m_communication_port[4]{};
 	uint8_t m_communication_port_status = 0;
@@ -533,7 +534,6 @@ void smsmfg_state::sub_map(address_map &map)
 
 void smsmfg_state::machine_start()
 {
-	m_lamps.resolve();
 	membank("bank1")->configure_entries(0, 16, memregion("questions")->base(), 0x4000);
 
 	save_item(NAME(m_communication_port_status));
@@ -542,7 +542,6 @@ void smsmfg_state::machine_start()
 
 MACHINE_START_MEMBER(smsmfg_state,sureshot)
 {
-	m_lamps.resolve();
 	save_item(NAME(m_communication_port_status));
 	save_item(NAME(m_communication_port));
 }

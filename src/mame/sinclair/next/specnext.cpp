@@ -1429,11 +1429,12 @@ attotime specnext_state::copper_until_pos_r(u16 pos)
 	}
 	else
 	{
-		if (BIT(pos, 15))  // MOVE
+		const u16 ula_min_hactive = m_video_timings.int_h;
+		if (BIT(pos, 15))  // WAIT
 		{
 			u16 vtarget = cvc_to_vpos(vcount);
-			u16 htarget = ((hcount/* + 12*/) + m_video_timings.min_hactive + m_video_timings.max_hc) %  m_video_timings.max_hc;
-			if (htarget < (m_video_timings.min_hactive))
+			u16 htarget = ((hcount + 12 + ula_min_hactive + m_video_timings.max_hc) %  m_video_timings.max_hc);
+			if (htarget < (ula_min_hactive))
 				vtarget = (vtarget + 1) % m_screen->height();
 			htarget <<= 1;
 			const u16 vpos = m_screen->vpos();
@@ -1451,7 +1452,7 @@ attotime specnext_state::copper_until_pos_r(u16 pos)
 		{
 			assert(!vcount && !hcount);
 			LOGCOPPER("[%s] FRAME (0, 0)\n", m_copper->tag());
-			return m_screen->time_until_pos(cvc_to_vpos(0), m_video_timings.min_hactive << 1);
+			return m_screen->time_until_pos(cvc_to_vpos(0), ula_min_hactive << 1);
 		}
 	}
 }
@@ -2413,9 +2414,11 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		nr_6c_tm_default_attr_w(nr_wr_dat);
 		break;
 	case 0x6e:
+		m_screen->update_now();
 		nr_6e_tilemap_base_w(BIT(nr_wr_dat, 7), BIT(nr_wr_dat, 0, 6));
 		break;
 	case 0x6f:
+		m_screen->update_now();
 		nr_6f_tilemap_tiles_w(BIT(nr_wr_dat, 7), BIT(nr_wr_dat, 0, 6));
 		break;
 	case 0x70:
@@ -2693,7 +2696,7 @@ TIMER_CALLBACK_MEMBER(specnext_state::irq_off)
 
 TIMER_CALLBACK_MEMBER(specnext_state::irq_on)
 {
-	LOGINTVVV("<Frame IRQ>\n");
+	LOGINTVVV("<ULA/Frame IRQ>\n");
 	m_im2_ula->irq_w(ASSERT_LINE);
 	if (m_nr_c0_int_mode_pulse_0_im2_1 == 0)
 		m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
@@ -2830,6 +2833,7 @@ u8 specnext_state::do_m1(offs_t offset)
 	m_divmmc->automap_nmi_delayed_on_w(0);
 
 	m_divmmc->cpu_m1_n_w(1);
+	m_divmmc->cpu_mreq_n_w(1);
 	m_divmmc->clock_w();
 	bank_update(0, 2);
 
@@ -3050,10 +3054,10 @@ void specnext_state::map_io(address_map &map)
 	}));
 
 	map(0x2001, 0x2001).mirror(0x0ffc).lr8(NAME([]() {
-		return /*m_nr_d8_io_trap_fdc_en ? ... :*/ 0x00;
+		return /*m_nr_d8_io_trap_fdc_en ? ... :*/ 0xff;
 	}));
 	map(0x3001, 0x3001).mirror(0x0ffc).lrw8(NAME([]() {
-		return /*m_nr_d8_io_trap_fdc_en ? ... :*/ 0x00;
+		return /*m_nr_d8_io_trap_fdc_en ? ... :*/ 0xff;
 	}), NAME([this](u8 data) {
 		if (m_nr_d8_io_trap_fdc_en)
 		{
@@ -4086,11 +4090,11 @@ void specnext_state::tbblue(machine_config &config)
 	MIDI_PORT(config, "mdthru", midiout_slot, "midiout");
 	MIDI_PORT(config, m_midi_out, midiout_slot, "midiout");
 
-	SPI_SDCARD(config, m_sdcards[0], 0);
+	SPI_SDCARD(config, m_sdcards[0]);
 	m_sdcards[0]->set_prefer_sdhc();
 	m_sdcards[0]->spi_miso_callback().set(FUNC(specnext_state::spi_miso_w));
 
-	SPI_SDCARD(config, m_sdcards[1], 0);
+	SPI_SDCARD(config, m_sdcards[1]);
 	m_sdcards[1]->set_prefer_sdhc();
 	m_sdcards[1]->spi_miso_callback().set(FUNC(specnext_state::spi_miso_w));
 
@@ -4112,11 +4116,11 @@ void specnext_state::tbblue(machine_config &config)
 			.add_route(2, "speakers", 0.50, 1);
 	}
 
-	SPECNEXT_MULTIFACE(config, m_mf, 0);
-	SPECNEXT_DIVMMC(config, m_divmmc, 0);
+	SPECNEXT_MULTIFACE(config, m_mf);
+	SPECNEXT_DIVMMC(config, m_divmmc);
 
-	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
-	ZXBUS_SLOT(config, "zxbus:1", 0, zxbus, zxbus_cards, nullptr);
+	zxbus_device &zxbus(ZXBUS(config, "zxbus"));
+	ZXBUS_SLOT(config, "zxbus:1", 28_MHz_XTAL / 8, zxbus, zxbus_cards, nullptr);
 
 	m_screen->set_raw(28_MHz_XTAL / 2, 456 << 1, 312,  { 0, (359 << 1) | 1, 0, 287 });
 	m_screen->set_screen_update(FUNC(specnext_state::screen_update));
@@ -4126,14 +4130,14 @@ void specnext_state::tbblue(machine_config &config)
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_tbblue);
 	SPECTRUM_ULA_UNCONTENDED(config.replace(), m_ula);
 
-	SCREEN_ULA_NEXT (config, m_ula_scr, 0).set_palette(m_palette->device().tag(), 0x000, 0x100);
-	SPECNEXT_LORES  (config, m_lores,   0).set_palette(m_palette->device().tag(), 0x000, 0x100);
-	SPECNEXT_TILES  (config, m_tiles,   0).set_palette(m_palette->device().tag(), 0x200, 0x300);
-	SPECNEXT_LAYER2 (config, m_layer2,  0).set_palette(m_palette->device().tag(), 0x400, 0x500);
+	SCREEN_ULA_NEXT (config, m_ula_scr).set_palette(m_palette->device().tag(), 0x000, 0x100);
+	SPECNEXT_LORES  (config, m_lores).set_palette(m_palette->device().tag(), 0x000, 0x100);
+	SPECNEXT_TILES  (config, m_tiles).set_palette(m_palette->device().tag(), 0x200, 0x300);
+	SPECNEXT_LAYER2 (config, m_layer2).set_palette(m_palette->device().tag(), 0x400, 0x500);
 
 	// drawgfx doesn't allow to mask palette access and in case of 256-color sprite does use offset, the index overflow palette boundries.
 	// We are duplicating palletes to imitate mask on palette index which required by sprites device.
-	SPECNEXT_SPRITES(config, m_sprites, 0).set_palette(m_palette->device().tag(), 0x600, 0x800);
+	SPECNEXT_SPRITES(config, m_sprites).set_palette(m_palette->device().tag(), 0x600, 0x800);
 
 	SPECNEXT_COPPER(config, m_copper, 28_MHz_XTAL);
 	m_copper->out_nextreg_cb().set([this](offs_t offset, u8 data) { m_next_regs.write_byte(offset, data); });

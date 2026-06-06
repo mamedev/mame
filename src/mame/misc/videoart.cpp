@@ -62,7 +62,7 @@ public:
 		m_led(*this, "led")
 	{ }
 
-	void videoart(machine_config &config);
+	void videoart(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -112,8 +112,6 @@ private:
 
 void videoart_state::machine_start()
 {
-	m_led.resolve();
-
 	// register for savestates
 	save_item(NAME(m_porta));
 	save_item(NAME(m_portb));

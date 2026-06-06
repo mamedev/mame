@@ -385,8 +385,8 @@ DEFINE_DEVICE_TYPE(SCC8523L,       scc8523l_device, "scc8523l",       "Zilog Z85
 //-------------------------------------------------
 void z80scc_device::device_add_mconfig(machine_config &config)
 {
-	Z80SCC_CHANNEL(config, CHANA_TAG, 0);
-	Z80SCC_CHANNEL(config, CHANB_TAG, 0);
+	Z80SCC_CHANNEL(config, CHANA_TAG);
+	Z80SCC_CHANNEL(config, CHANB_TAG);
 }
 
 

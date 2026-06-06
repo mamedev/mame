@@ -85,12 +85,9 @@ public:
 		m_exp_lamp(*this, "EXP_LAMP")
 	{ }
 
-	void m79amb(machine_config &config);
+	void m79amb(machine_config &config) ATTR_COLD;
 
-	void init_m79amb();
-
-protected:
-	void machine_start() override ATTR_COLD;
+	void init_m79amb() ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -142,12 +139,6 @@ void m79amb_state::_8003_w(uint8_t data)
 	m_discrete->write(M79AMB_TANK_TRUCK_JEEP_EN, data & 0x08);
 	m_discrete->write(M79AMB_WHISTLE_B_EN, data & 0x10);
 	m_discrete->write(M79AMB_WHISTLE_A_EN, data & 0x20);
-}
-
-void m79amb_state::machine_start()
-{
-	m_self_test.resolve();
-	m_exp_lamp.resolve();
 }
 
 void m79amb_state::videoram_w(offs_t offset, uint8_t data)

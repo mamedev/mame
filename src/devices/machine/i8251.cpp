@@ -12,13 +12,15 @@
 
     TODO:
     - BRKDET: if, in Async mode, 16 low RxD bits in succession are clocked
-	  in, the SYNDET pin & status must go high. It will go low upon a
+      in, the SYNDET pin & status must go high. It will go low upon a
       status read, same as what happens with sync.
 
 *********************************************************************/
 
 #include "emu.h"
 #include "i8251.h"
+
+#include <bit>
 
 #define LOG_STAT    (1U << 1)
 #define LOG_COM     (1U << 2)
@@ -216,7 +218,7 @@ void i8251_device::sync1_rxc()
 	{
 		// bit 5: 0 = odd parity, 1 = even parity.
 		// Total 1-bits (data + received parity + parity_type) must be odd for a correct frame.
-		if (((population_count_32(m_sync1) + m_rxd + BIT(m_mode_byte, 5)) & 1) == 0)
+		if (((std::popcount(m_sync1) + m_rxd + BIT(m_mode_byte, 5)) & 1) == 0)
 			m_status |= I8251_STATUS_PARITY_ERROR;
 		// and then continue on as if everything was ok
 	}
@@ -289,7 +291,7 @@ void i8251_device::sync2_rxc()
 	{
 		// bit 5: 0 = odd parity, 1 = even parity.
 		// Total 1-bits (data + received parity + parity_type) must be odd for a correct frame.
-		if (((population_count_32(m_sync1) + m_rxd + BIT(m_mode_byte, 5)) & 1) == 0)
+		if (((std::popcount(m_sync1) + m_rxd + BIT(m_mode_byte, 5)) & 1) == 0)
 			m_status |= I8251_STATUS_PARITY_ERROR;
 		// and then continue on as if everything was ok
 	}

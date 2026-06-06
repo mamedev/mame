@@ -64,6 +64,8 @@ To Do:
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 // configurable logging
 #define LOG_MCU     (1U << 1)
 #define LOG_BLITTER (1U << 2)
@@ -133,9 +135,6 @@ public:
 	void ramdac_config(machine_config &config) ATTR_COLD;
 	void steaser(machine_config &config) ATTR_COLD;
 	void texasrls(machine_config &config) ATTR_COLD;
-
-protected:
-	virtual void machine_start() override { m_leds.resolve(); }
 
 private:
 	void blit_copy_w(uint16_t data);
@@ -1796,7 +1795,7 @@ void blitz68k_state::ramdac_map(address_map &map)
 void blitz68k_state::ramdac_config(machine_config &config)
 {
 	PALETTE(config, m_palette).set_entries(0x100);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &blitz68k_state::ramdac_map);
 }
 

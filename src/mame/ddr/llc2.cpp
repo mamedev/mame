@@ -284,7 +284,7 @@ void llc2_state::llc2(machine_config &config)
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	K7659_KEYBOARD(config, K7659_KEYBOARD_TAG, 0);
+	K7659_KEYBOARD(config, K7659_KEYBOARD_TAG);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");

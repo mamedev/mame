@@ -725,15 +725,15 @@ void galaxia_state::galaxia(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxia);
 	PALETTE(config, m_palette, FUNC(galaxia_state::palette), 0x18 + 0x40 + 1);
 
-	S2636(config, m_s2636[0], 0);
+	S2636(config, m_s2636[0]);
 	m_s2636[0]->set_offsets(3, -26);
 	m_s2636[0]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	S2636(config, m_s2636[1], 0);
+	S2636(config, m_s2636[1]);
 	m_s2636[1]->set_offsets(3, -26);
 	m_s2636[1]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	S2636(config, m_s2636[2], 0);
+	S2636(config, m_s2636[2]);
 	m_s2636[2]->set_offsets(3, -26);
 	m_s2636[2]->add_route(ALL_OUTPUTS, "mono", 0.25);
 

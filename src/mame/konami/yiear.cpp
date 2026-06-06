@@ -507,7 +507,7 @@ void yiear_state::yiear(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	TRACKFLD_AUDIO(config, m_audio, 0, finder_base::DUMMY_TAG, m_vlm);
+	TRACKFLD_AUDIO(config, m_audio, finder_base::DUMMY_TAG, m_vlm);
 
 	SN76489A(config, m_sn, 18.432_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 1.0); // clock verified on PCB
 

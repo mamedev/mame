@@ -141,7 +141,7 @@ void decodmd_type2_device::device_add_mconfig(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	TIMER(config, "firq_timer", 0).configure_periodic(FUNC(decodmd_type2_device::dmd_firq), attotime::from_hz(80));
+	TIMER(config, "firq_timer").configure_periodic(FUNC(decodmd_type2_device::dmd_firq), attotime::from_hz(80));
 
 	MC6845(config, m_mc6845, XTAL(8'000'000) / 8);  // TODO: confirm clock speed
 	m_mc6845->set_screen(nullptr);

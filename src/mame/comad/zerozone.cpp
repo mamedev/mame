@@ -9,7 +9,7 @@
 
     CPU 1 : 68000, uses irq 1
 
-	memory map :
+    memory map :
 
     0x000000 - 0x01ffff : ROM
     0x080000 - 0x08000f : input ports and dipswitches

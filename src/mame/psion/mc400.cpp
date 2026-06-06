@@ -39,7 +39,8 @@ public:
 		, m_nvram(*this, "nvram")
 		, m_palette(*this, "palette")
 		, m_keyboard(*this, "COL%u", 0U)
-		, m_speaker(*this, "speaker")
+		, m_buzzer(*this, "buzzer")
+		, m_mic(*this, "mic")
 		, m_ssd(*this, "ssd%u", 1U)
 		, m_exp(*this, "exp%u", 1U)
 		, m_penup_timer(nullptr)
@@ -65,7 +66,8 @@ private:
 	required_device<nvram_device> m_nvram;
 	required_device<palette_device> m_palette;
 	required_ioport_array<10> m_keyboard;
-	required_device<speaker_sound_device> m_speaker;
+	required_device<speaker_sound_device> m_buzzer;
+	required_device<microphone_device> m_mic;
 	required_device_array<psion_ssd_device, 4> m_ssd;
 	required_device_array<psion_module_slot_device, 2> m_exp;
 
@@ -323,8 +325,8 @@ void psionmc_state::psionmc(machine_config &config)
 	m_asic2->int_cb().set(m_asic1, FUNC(psion_asic1_device::eint3_w));
 	m_asic2->nmi_cb().set(m_asic1, FUNC(psion_asic1_device::enmi_w));
 	m_asic2->cbusy_cb().set_inputline(m_maincpu, INPUT_LINE_TEST);
-	m_asic2->buz_cb().set(m_speaker, FUNC(speaker_sound_device::level_w));
-	m_asic2->buzvol_cb().set([this](int state) { m_speaker->set_output_gain(ALL_OUTPUTS, state ? 1.0 : 0.25); });
+	m_asic2->buz_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
+	m_asic2->buzvol_cb().set([this](int state) { m_buzzer->set_output_gain(ALL_OUTPUTS, state ? 1.0 : 0.25); });
 	m_asic2->dr_cb().set([this](int state) { m_dr = state; });
 	m_asic2->col_cb().set([this](uint8_t data) { return m_keyboard[data]->read(); });
 	m_asic2->data_r<0>().set(m_asic3, FUNC(psion_asic3_device::data_r));        // Power supply (ASIC3)
@@ -352,8 +354,13 @@ void psionmc_state::psionmc(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(psionmc_state::palette_init), 2);
 
+	//I29C48(config, "codec").add_route(ALL_OUTPUTS, "mono", 1.00); // TODO: 29C48
+
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00); // Piezo buzzer
+	SPEAKER_SOUND(config, m_buzzer).add_route(ALL_OUTPUTS, "mono", 1.00); // Piezo buzzer
+
+	MICROPHONE(config, m_mic, 1).front_center();
+	//m_mic->add_route(0, "codec", 1.0);
 
 	PSION_SSD(config, m_ssd[0]);
 	m_ssd[0]->door_cb().set(m_asic2, FUNC(psion_asic2_device::dnmi_w));

@@ -507,7 +507,7 @@ void husky_state::husky(machine_config &config)
 	/* Devices */
 	MM58174(config, "rtc", 32.768_kHz_XTAL); // MM58174A
 
-	nsc810_device &iotimer(NSC810(config, "iotimer", 0, 2_MHz_XTAL / 2, 2_MHz_XTAL / 2));
+	nsc810_device &iotimer(NSC810(config, "iotimer", 2_MHz_XTAL / 2, 2_MHz_XTAL / 2));
 	iotimer.portA_read_callback().set(FUNC(husky_state::porta_r));
 	iotimer.portA_write_callback().set(FUNC(husky_state::porta_w));
 	iotimer.portB_read_callback().set(FUNC(husky_state::portb_r));

@@ -102,8 +102,6 @@ private:
 
 void miconkit_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_select));
 }
 
@@ -290,7 +288,7 @@ void miconkit_state::micon2(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
+	BEEP(config, m_beeper).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 void miconkit_state::smiconk(machine_config &config)

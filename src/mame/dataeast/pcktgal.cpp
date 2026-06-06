@@ -390,7 +390,7 @@ void pcktgal_state::pcktgal(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_pcktgal);
 	PALETTE(config, m_palette, FUNC(pcktgal_state::palette), 512);
 
-	DECO_BAC06(config, m_tilegen, 0);
+	DECO_BAC06(config, m_tilegen);
 	m_tilegen->set_gfx_region_wide(0, 0, 0);
 	m_tilegen->set_gfxdecode_tag(m_gfxdecode);
 

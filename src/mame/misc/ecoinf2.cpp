@@ -12,8 +12,6 @@
 
 #include "emu.h"
 
-#include "awpvid.h" // drawing reels
-
 #include "cpu/z180/z180.h"
 #include "machine/i8255.h"
 #include "machine/steppers.h" // stepper motor
@@ -40,7 +38,7 @@ public:
 	{
 	}
 
-	void ecoinf2_oxo(machine_config &config);
+	void ecoinf2_oxo(machine_config &config) ATTR_COLD;
 
 private:
 	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
@@ -179,8 +177,8 @@ private:
 		m_reels[0]->update( data    &0x0f);
 		m_reels[1]->update((data>>4)&0x0f);
 
-		awp_draw_reel(machine(),"reel1", *m_reels[0]);
-		awp_draw_reel(machine(),"reel2", *m_reels[1]);
+		m_reels[0]->draw();
+		m_reels[1]->draw();
 	}
 
 	void ppi8255_ic23_write_b_reel23(uint8_t data)
@@ -188,8 +186,8 @@ private:
 		m_reels[2]->update( data    &0x0f);
 		m_reels[3]->update((data>>4)&0x0f);
 
-		awp_draw_reel(machine(),"reel3", *m_reels[2]);
-		awp_draw_reel(machine(),"reel4", *m_reels[3]);
+		m_reels[2]->draw();
+		m_reels[3]->draw();
 	}
 
 	uint8_t ppi8255_ic23_read_c_key()
@@ -197,13 +195,6 @@ private:
 		int data = m_optic_pattern;
 		data |= m_key->read();
 		return data;
-	}
-
-	virtual void machine_start() override
-	{
-		m_lamp_outputs.resolve();
-		m_led_outputs.resolve();
-		m_coinlamp_outputs.resolve();
 	}
 
 	void oxo_memmap(address_map &map) ATTR_COLD;
@@ -547,10 +538,10 @@ void ecoinf2_state::ecoinf2_oxo(machine_config &config)
 	REEL(config, m_reels[3], ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
 	m_reels[3]->optic_handler().set(FUNC(ecoinf2_state::reel_optic_cb<3>));
 
-	METERS(config, m_meters, 0);
+	METERS(config, m_meters);
 	m_meters->set_number(8);
 
-//  I8255(config, "ic25_dips", 0);
+//  I8255(config, "ic25_dips");
 }
 
 

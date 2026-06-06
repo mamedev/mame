@@ -886,13 +886,6 @@ void cps2_state::cps2_render_sprites(screen_device &screen, bitmap_ind16 &bitmap
 	const int xoffs = 64 - m_output[CPS2_OBJ_XOFFS];
 	const int yoffs = 16 - m_output[CPS2_OBJ_YOFFS];
 
-#ifdef MAME_DEBUG
-	if (machine().input().code_pressed(KEYCODE_Z) && machine().input().code_pressed(KEYCODE_R))
-	{
-		return;
-	}
-#endif
-
 	for (int i = m_cps2_last_sprite_offset; i >= 0; i -= 4)
 	{
 		int x = base[i + 0];
@@ -1408,11 +1401,11 @@ static INPUT_PORTS_START( cps2_4p4b )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_VOLUME_UP )
 
-	// Machine configuration for dev hardware with DIPs
+	// Machine configuration for dev hardware with DIP switches
 	PORT_START( "HW_TYPE" )
 	PORT_CONFNAME( 0x01, 0x00, "Hardware" )
 	PORT_CONFSETTING(    0x00, "Production" )
-	PORT_CONFSETTING(    0x01, "Development (Enable Debug DIPs)" )
+	PORT_CONFSETTING(    0x01, "Development (with debug DIP switches)" )
 
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, "1-1" ) PORT_DIPLOCATION("SW1:1") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
@@ -1785,7 +1778,7 @@ void cps2_state::cps2comm(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps2_state::cps2_comm_map);
 
-	CAPCOM_CPS2_COMM(config, m_comm, 0U);
+	CAPCOM_CPS2_COMM(config, m_comm);
 }
 
 

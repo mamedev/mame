@@ -13558,7 +13558,7 @@ Black screen, keeps accessing [VDP] with an illegal D3=0xffffffff, eventually cr
 	</software>
 
 	<software name="bioevil_d1" cloneof="bioevil">
-		<description>Bio Evil (demo 1.0)</description>
+		<description>Bio Evil (demo v1.0)</description>
 		<year>2017</year>
 		<publisher>PSCD Games</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -16812,12 +16812,17 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<year>2019</year>
 		<publisher>Second Dimension</publisher>
 		<notes><![CDATA[
-The game freezes when loading the first level
+Puts garbage to [VDP] ports $8 and $a (where the HV counter lies)
+Requires two start button presses to start a game, neither [VDP] cores shows 1/2 Players prompt
+Saving is testable by creating a new game, get to the point of start moving in stage 1 then soft reset
 ]]></notes>
-		<info name="version" value="demo 20191028" />
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_fram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="The Curse of Illmoore Bay (World).bin" size="4194304" crc="c71afaad" sha1="8d70e751e7e76539faed06839eb9b2a5fdf2b6e8"/>
+			</dataarea>
+			<!-- TODO: size unconfirmed (game access up to 4096 only) -->
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -16827,12 +16832,15 @@ The game freezes when loading the first level
 		<year>2019</year>
 		<publisher>Second Dimension</publisher>
 		<notes><![CDATA[
-The game freezes when loading the first level
+(same as parent)
 ]]></notes>
-		<info name="version" value="demo 20191028" />
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_fram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4189440">
 				<rom name="The Curse of Illmoore Bay (World) (Digital).bin" size="4189440" crc="7ad106c0" sha1="ee7bcd2189bd35fb65ee3fbfbc7e45a7cafdee73"/>
+			</dataarea>
+			<!-- TODO: size unconfirmed (game access up to 4096 only) -->
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>

@@ -75,7 +75,6 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(ficha);
 
 protected:
-
 	u8 m_digit = 0U;
 	void mr_common();
 	void ms_common();
@@ -96,16 +95,18 @@ public:
 		, m_monotone(*this, "monotone")
 	{ }
 
-	void ltd3(machine_config &config);
+	void ltd3(machine_config &config) ATTR_COLD;
 
-	void init_0() { m_game = 0; }
-	void init_1() { m_game = 1; }
-	void init_2() { m_game = 2; }
-	void init_3() { m_game = 3; }
+	void init_0() ATTR_COLD { m_game = 0; }
+	void init_1() ATTR_COLD { m_game = 1; }
+	void init_2() ATTR_COLD { m_game = 2; }
+	void init_3() ATTR_COLD { m_game = 3; }
 
-private:
+protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
+
+private:
 	u8 ram_r(offs_t);
 	void ram_w(offs_t, u8);
 	u8 sw_r(offs_t offset);
@@ -128,11 +129,13 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	void ltd4(machine_config &config);
+	void ltd4(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
+
+private:
 	void ltd4_map(address_map &map) ATTR_COLD;
 	u8 port1_r();
 	void port1_w(u8 data);
@@ -490,8 +493,6 @@ void ltd_state::ms_common()
 {
 	genpin_class::machine_start();
 
-	m_digits.resolve();
-	m_io_outputs.resolve();
 	save_item(NAME(m_digit));
 }
 
@@ -561,7 +562,7 @@ void ltd3_state::ltd3(machine_config &config)
 	genpin_audio(config);
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-	CLOCK(config, m_monotone, 0);
+	CLOCK(config, m_monotone);
 	m_monotone->signal_handler().set("snd", FUNC(input_merger_device::in_w<0>));
 	AY8910(config, "ay0", XTAL(3'579'545)/2).add_route(ALL_OUTPUTS, "mono", 0.75); /* guess */
 	AY8910(config, "ay1", XTAL(3'579'545)/2).add_route(ALL_OUTPUTS, "mono", 0.75); /* guess */

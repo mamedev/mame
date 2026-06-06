@@ -324,7 +324,7 @@ public:
 	void set_scroll_pos_y_callback(scroll_pos_delegate &&handler);
 
 	// resolve tags, if any
-	void resolve_tags();
+	void resolve_tags(device_t &device);
 
 private:
 	using bounds_vector = emu::render::detail::bounds_vector;
@@ -370,10 +370,10 @@ private:
 	scroll_size_delegate    m_get_scroll_size_y;    // resolved vertical scroll window size function
 	scroll_pos_delegate     m_get_scroll_pos_x;     // resolved horizontal scroll position function
 	scroll_pos_delegate     m_get_scroll_pos_y;     // resolved vertical scroll position function
-	output_finder<>         m_output;               // associated output
-	output_finder<>         m_animoutput;           // associated output for animation if different
-	output_finder<>         m_scrollxoutput;        // associated output for horizontal scroll position
-	output_finder<>         m_scrollyoutput;        // associated output for vertical scroll position
+	output_proxy            m_output;               // associated output
+	output_proxy            m_animoutput;           // associated output for animation if different
+	output_proxy            m_scrollxoutput;        // associated output for horizontal scroll position
+	output_proxy            m_scrollyoutput;        // associated output for vertical scroll position
 	ioport_port *           m_animinput_port;       // input port used for animation
 	ioport_port *           m_scrollxinput_port;    // input port used for horizontal scrolling
 	ioport_port *           m_scrollyinput_port;    // input port used for vertical scrolling
@@ -413,11 +413,11 @@ private:
 	std::string const       m_scrollxinput_tag;     // tag of input port for horizontal scroll position
 	std::string const       m_scrollyinput_tag;     // tag of input port for vertical scroll position
 	bounds_vector const     m_rawbounds;            // raw (original) bounds of the item
-	bool const              m_have_output;          // whether we actually have an output
+	std::string const       m_output_name;          // configured output name
+	std::string const       m_animoutput_name;      // configured output name for animation
+	std::string const       m_scrollxoutput_name;   // configured output name for horizontal scroll
+	std::string const       m_scrollyoutput_name;   // configured output name for vertical scroll
 	bool const              m_input_raw;            // get raw data from input port
-	bool const              m_have_animoutput;      // whether we actually have an output for animation
-	bool const              m_have_scrollxoutput;   // whether we actually have an output for horizontal scroll
-	bool const              m_have_scrollyoutput;   // whether we actually have an output for vertical scroll
 	bool const              m_has_clickthrough;     // whether clickthrough was explicitly configured
 };
 
@@ -549,7 +549,7 @@ public:
 	void preload();
 
 	// resolve tags, if any
-	void resolve_tags();
+	void resolve_tags(device_t &device);
 
 	// pointer input
 	void pointer_updated(osd::ui_event_handler::pointer type, u16 ptrid, u16 device, float x, float y, u32 buttons, u32 pressed, u32 released, s16 clicks)

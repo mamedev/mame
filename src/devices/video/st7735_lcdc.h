@@ -6,13 +6,16 @@
 
 #pragma once
 
+#include <memory>
+
+
 DECLARE_DEVICE_TYPE(ST7735, st7735_lcdc_device)
 
 class st7735_lcdc_device : public device_t
 {
 public:
 	// construction/destruction
-	st7735_lcdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	st7735_lcdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void lcdc_command_w(u8 data);
 	u8 lcdc_data_r();
@@ -25,7 +28,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	u8 m_displaybuffer[256 * 256 * 2];
+	std::unique_ptr<u8 []> m_displaybuffer;
 	u16 m_posx, m_posy;
 	u16 m_posminx, m_posmaxx;
 	u16 m_posminy, m_posmaxy;

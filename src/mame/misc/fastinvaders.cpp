@@ -640,7 +640,7 @@ void fastinvaders_state::fastinvaders(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(fastinvaders_state::scanline_timer), "screen", 0, 1);
 
-	PIC8259(config, m_pic8259, 0);
+	PIC8259(config, m_pic8259);
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
 	I8257(config, m_dma8257, 6144100);

@@ -31,9 +31,9 @@ protected:
 	{
 		SPEAKER(config, "out", 2).front();
 
-		SPEAKER_SOUND(config, m_left_speaker, 0).add_route(ALL_OUTPUTS, "out", 0.50, 0);
+		SPEAKER_SOUND(config, m_left_speaker).add_route(ALL_OUTPUTS, "out", 0.50, 0);
 
-		SPEAKER_SOUND(config, m_right_speaker, 0).add_route(ALL_OUTPUTS, "out", 0.50, 1);
+		SPEAKER_SOUND(config, m_right_speaker).add_route(ALL_OUTPUTS, "out", 0.50, 1);
 	}
 
 	virtual void device_start() override
@@ -78,7 +78,7 @@ protected:
 	{
 		SPEAKER(config, "mono").front_center();
 
-		SPEAKER_SOUND(config, m_speaker, 0).add_route(ALL_OUTPUTS, "mono", 0.50);
+		SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 	}
 
 	virtual void device_start() override

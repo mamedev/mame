@@ -33,11 +33,6 @@ he191_3425_device::he191_3425_device(const machine_config &mconfig, const char *
 {
 }
 
-void he191_3425_device::device_resolve_objects()
-{
-	m_leds.resolve();
-}
-
 void he191_3425_device::device_start()
 {
 	m_leds[0] = 1; // L1: Power

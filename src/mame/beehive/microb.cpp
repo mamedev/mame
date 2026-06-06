@@ -349,7 +349,7 @@ void microb_state::microb(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 1000).add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	I8251(config, m_usart[0], 0);
+	I8251(config, m_usart[0]);
 	m_usart[0]->txd_handler().set(m_rs232[0], FUNC(rs232_port_device::write_txd));
 	m_usart[0]->dtr_handler().set(m_rs232[0], FUNC(rs232_port_device::write_dtr));
 	m_usart[0]->rts_handler().set(m_rs232[0], FUNC(rs232_port_device::write_rts));
@@ -361,7 +361,7 @@ void microb_state::microb(machine_config &config)
 	m_rs232[0]->dsr_handler().set(m_usart[0], FUNC(i8251_device::write_dsr));
 	m_rs232[0]->cts_handler().set(m_usart[0], FUNC(i8251_device::write_cts));
 
-	I8251(config, m_usart[1], 0);
+	I8251(config, m_usart[1]);
 	m_usart[1]->txd_handler().set(m_rs232[1], FUNC(rs232_port_device::write_txd));
 	m_usart[1]->dtr_handler().set(m_rs232[1], FUNC(rs232_port_device::write_dtr));
 	m_usart[1]->rts_handler().set(m_rs232[1], FUNC(rs232_port_device::write_rts));

@@ -1195,7 +1195,7 @@ void redline_state::redline(machine_config &config)
 	m_master->set_addrmap(AS_IO, &redline_state::master_redline_map_io);
 
 	/* sound hardware */
-	REDLINE_80186(config, m_sound, 0).set_master_cpu_tag(m_master);
+	REDLINE_80186(config, m_sound).set_master_cpu_tag(m_master);
 }
 
 
@@ -1236,7 +1236,7 @@ void ataxx_state::ataxx(machine_config &config)
 	ataxx_video(config);
 
 	/* sound hardware */
-	ATAXX_80186(config, m_sound, 0).set_master_cpu_tag(m_master);
+	ATAXX_80186(config, m_sound).set_master_cpu_tag(m_master);
 }
 
 

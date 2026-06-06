@@ -1247,7 +1247,7 @@ void macpdm_state::macpdm(machine_config &config)
 	m_ram->set_default_size("8M");
 	m_ram->set_extra_options("12M,24M,72M,264M");
 
-	nubus_device &nubus(NUBUS(config, "nubus", 0));
+	nubus_device &nubus(NUBUS(config, "nubus"));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.out_irqc_callback().set(FUNC(macpdm_state::slot0_irq_w));
 	nubus.out_irqd_callback().set(FUNC(macpdm_state::slot1_irq_w));

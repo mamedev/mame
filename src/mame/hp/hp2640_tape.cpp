@@ -225,7 +225,7 @@ void hp2640_tape_device::device_add_mconfig(machine_config &config)
 	for (unsigned i = 0; i < 2; i++) {
 		auto& finder = m_drives[ i ];
 
-		HP_DC100_TAPE(config , finder , 0);
+		HP_DC100_TAPE(config , finder);
 		// Acceleration: 2000 in/s^2
 		finder->set_acceleration(ACCELERATION);
 		// Slow speed: 10 ips, Fast speed: 60 ips

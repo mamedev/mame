@@ -172,7 +172,7 @@ void sgi_gr1_device::device_add_mconfig(machine_config &config)
 	m_ge->re_r().set(m_re, FUNC(sgi_re2_device::reg_r));
 	m_ge->re_w().set(m_re, FUNC(sgi_re2_device::reg_w));
 
-	SGI_RE2(config, m_re, 0);
+	SGI_RE2(config, m_re);
 	m_re->out_rdy().set(m_ge, FUNC(sgi_ge5_device::re_rdy_w));
 	m_re->out_drq().set(m_ge, FUNC(sgi_ge5_device::re_drq_w));
 

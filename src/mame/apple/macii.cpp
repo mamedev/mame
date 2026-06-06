@@ -983,7 +983,7 @@ void macii_state::macii(machine_config &config)
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd").set_filter("MC68020");
 	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68020");
 
-	nubus_device &nubus(NUBUS(config, "nubus", 0));
+	nubus_device &nubus(NUBUS(config, "nubus"));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.out_irq9_callback().set(FUNC(macii_state::nubus_irq_w<9>));
 	nubus.out_irqa_callback().set(FUNC(macii_state::nubus_irq_w<0xa>));
@@ -1117,7 +1117,7 @@ void macii_state::macse30(machine_config &config)
 	config.device_remove("nbb");
 	config.device_remove("nubus");
 
-	se30_pds_bus_device &se30bus(MACSE30_PDS_BUS(config, "pds", 0));
+	se30_pds_bus_device &se30bus(MACSE30_PDS_BUS(config, "pds"));
 	se30bus.set_space(m_maincpu, AS_PROGRAM);
 	se30bus.set_bus_mode(nubus_device::nubus_mode_t::SE30);
 	se30bus.set_screen_tag("screen");

@@ -236,8 +236,6 @@ void kaypro84_state::rtc_w(u8 data)
 ************************************************************/
 void kaypro_state::machine_start()
 {
-	m_leds.resolve();
-
 	save_pointer(NAME(m_vram), 0x1000);
 	save_pointer(NAME(m_ram),  0x4000);
 

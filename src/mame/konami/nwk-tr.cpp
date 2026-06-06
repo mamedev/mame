@@ -455,9 +455,6 @@ void nwktr_state::soundtimer_ack_w(uint16_t data)
 
 void nwktr_state::machine_start()
 {
-	m_pcb_digit.resolve();
-	m_wheel_motor.resolve();
-
 	// set conservative DRC options
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
@@ -653,13 +650,13 @@ void nwktr_state::nwktr(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(9000));
 
-	M48T58(config, "m48t58", 0);
+	M48T58(config, "m48t58");
 
-	ADC12138(config, m_adc12138, 0);
+	ADC12138(config, m_adc12138);
 	m_adc12138->set_ipt_convert_callback(FUNC(nwktr_state::adc12138_input_callback));
 
-	K033906(config, "k033906_1", 0, m_voodoo[0]);
-	K033906(config, "k033906_2", 0, m_voodoo[1]);
+	K033906(config, "k033906_1", m_voodoo[0]);
+	K033906(config, "k033906_2", m_voodoo[1]);
 
 	// video hardware
 	VOODOO_1(config, m_voodoo[0], 50_MHz_XTAL);
@@ -688,10 +685,10 @@ void nwktr_state::nwktr(machine_config &config)
 	PALETTE(config, m_palette[0]).set_format(4, raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>, 65536 / 4);
 	PALETTE(config, m_palette[1]).set_format(4, raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>, 65536 / 4);
 
-	K001604(config, m_k001604[0], 0);
+	K001604(config, m_k001604[0]);
 	m_k001604[0]->set_palette(m_palette[0]);
 
-	K001604(config, m_k001604[1], 0);
+	K001604(config, m_k001604[1]);
 	m_k001604[1]->set_palette(m_palette[1]);
 
 	SPEAKER(config, "speaker", 2).front();
@@ -703,7 +700,7 @@ void nwktr_state::nwktr(machine_config &config)
 	rfsnd.add_route(0, "speaker", 1.0, 0);
 	rfsnd.add_route(1, "speaker", 1.0, 1);
 
-	KONPPC(config, m_konppc, 0);
+	KONPPC(config, m_konppc);
 	m_konppc->set_dsp_tag(0, m_dsp[0]);
 	m_konppc->set_dsp_tag(1, m_dsp[1]);
 	m_konppc->set_k033906_tag(0, "k033906_1");
@@ -715,9 +712,9 @@ void nwktr_state::nwktr(machine_config &config)
 	m_konppc->set_num_boards(2);
 	m_konppc->set_cgboard_type(konppc_device::CGBOARD_TYPE_NWKTR);
 
-	KONAMI_GN676A_LAN(config, m_gn676_lan, 0);
+	KONAMI_GN676A_LAN(config, m_gn676_lan);
 
-	KONPPC_JVS_HOST(config, m_jvs_host, 0);
+	KONPPC_JVS_HOST(config, m_jvs_host);
 	m_jvs_host->output_callback().set([this](uint8_t c) { m_maincpu->ppc4xx_spu_receive_byte(c); });
 }
 

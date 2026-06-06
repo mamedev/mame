@@ -132,8 +132,6 @@ void igs_m027xa_state::machine_reset()
 
 void igs_m027xa_state::machine_start()
 {
-	m_out_lamps.resolve();
-
 	if (m_okibank[1])
 	{
 		u8 *const samples = memregion("oki")->base();
@@ -674,7 +672,7 @@ void igs_m027xa_state::base(machine_config &config)
 	m_ppi->out_pb_callback().set(FUNC(igs_m027xa_state::output_w));
 	m_ppi->out_pc_callback().set(FUNC(igs_m027xa_state::lamps_w));
 
-	IGS017_IGS031(config, m_igs017_igs031, 0);
+	IGS017_IGS031(config, m_igs017_igs031);
 	m_igs017_igs031->set_text_reverse_bits(true);
 	m_igs017_igs031->in_pa_callback().set(NAME((&igs_m027xa_state::dsw_r)));
 	m_igs017_igs031->in_pb_callback().set_ioport("TEST0");

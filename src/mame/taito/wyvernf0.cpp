@@ -41,7 +41,9 @@ TODO:
 #include "sound/ay8910.h"
 #include "sound/msm5232.h"
 #include "sound/dac.h"
+
 #include "emupal.h"
+#include "input.h" // for video debug keys
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"

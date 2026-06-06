@@ -149,24 +149,23 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void findout(machine_config &config);
-	void suprpokr(machine_config &config);
-	void gselect(machine_config &config);
-	void amuse1(machine_config &config);
-	void gepoker(machine_config &config);
-	void jokpokera(machine_config &config);
-	void quizvid(machine_config &config);
-	void getrivia(machine_config &config);
-	void amuse(machine_config &config);
-	void sprtauth(machine_config &config);
+	void findout(machine_config &config) ATTR_COLD;
+	void suprpokr(machine_config &config) ATTR_COLD;
+	void gselect(machine_config &config) ATTR_COLD;
+	void amuse1(machine_config &config) ATTR_COLD;
+	void gepoker(machine_config &config) ATTR_COLD;
+	void jokpokera(machine_config &config) ATTR_COLD;
+	void quizvid(machine_config &config) ATTR_COLD;
+	void getrivia(machine_config &config) ATTR_COLD;
+	void amuse(machine_config &config) ATTR_COLD;
+	void sprtauth(machine_config &config) ATTR_COLD;
 
-	void init_setbank();
-	void init_bank2k();
-	void init_bank8k();
-	void init_geimulti();
+	void init_setbank() ATTR_COLD;
+	void init_bank2k() ATTR_COLD;
+	void init_bank8k() ATTR_COLD;
+	void init_geimulti() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override ATTR_COLD;
 
 private:

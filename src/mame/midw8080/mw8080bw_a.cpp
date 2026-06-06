@@ -1317,8 +1317,6 @@ ioport_constructor desertgu_audio_device::device_input_ports() const
 
 void desertgu_audio_device::device_start()
 {
-	m_recoil.resolve();
-
 	m_p2 = 0U;
 
 	save_item(NAME(m_p2));
@@ -1672,9 +1670,6 @@ void gmissile_audio_device::device_add_mconfig(machine_config &config)
 
 void gmissile_audio_device::device_start()
 {
-	m_l_exp.resolve();
-	m_r_exp.resolve();
-
 	m_p1 = 0U;
 
 	save_item(NAME(m_p1));
@@ -3096,9 +3091,6 @@ void spcenctr_audio_device::device_add_mconfig(machine_config &config)
 
 void spcenctr_audio_device::device_start()
 {
-	m_lamp.resolve();
-	m_strobe.resolve();
-
 	m_strobe_timer = timer_alloc(FUNC(spcenctr_audio_device::strobe_callback), this);
 
 	m_strobe_enable = 0U;
@@ -3188,8 +3180,6 @@ void phantom2_audio_device::device_add_mconfig(machine_config &config)
 
 void phantom2_audio_device::device_start()
 {
-	m_exp.resolve();
-
 	m_p1 = 0U;
 	m_p2 = 0U;
 

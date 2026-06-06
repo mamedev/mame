@@ -1125,15 +1125,15 @@ void bonzeadv_state::bonzeadv(machine_config &config)
 	screen.screen_vblank().set(FUNC(bonzeadv_state::screen_vblank));
 	screen.set_palette("tc0110pcr");
 
-	PC090OJ(config, m_pc090oj, 0);
+	PC090OJ(config, m_pc090oj);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_palette("tc0110pcr");
 	m_pc090oj->set_colpri_callback(FUNC(bonzeadv_state::fixed_colpri_cb));
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_palette("tc0110pcr");
 
-	tc0110pcr_device &tc0110pcr(TC0110PCR(config, "tc0110pcr", 0));
+	tc0110pcr_device &tc0110pcr(TC0110PCR(config, "tc0110pcr"));
 	tc0110pcr.set_shift(0);
 	tc0110pcr.set_color_callback(FUNC(bonzeadv_state::color_xbgr555));
 
@@ -1146,7 +1146,7 @@ void bonzeadv_state::bonzeadv(machine_config &config)
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	tc0140syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -1163,7 +1163,7 @@ void msm_state::asuka(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc", 0));
+	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc"));
 	tc0220ioc.read_0_callback().set_ioport("DSWA");
 	tc0220ioc.read_1_callback().set_ioport("DSWB");
 	tc0220ioc.read_2_callback().set_ioport("IN0");
@@ -1181,16 +1181,16 @@ void msm_state::asuka(machine_config &config)
 	screen.screen_vblank().set(FUNC(msm_state::screen_vblank));
 	screen.set_palette("tc0110pcr");
 
-	PC090OJ(config, m_pc090oj, 0);
+	PC090OJ(config, m_pc090oj);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_usebuffer(true);
 	m_pc090oj->set_palette("tc0110pcr");
 	m_pc090oj->set_colpri_callback(FUNC(msm_state::variable_colpri_cb));
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_palette("tc0110pcr");
 
-	tc0110pcr_device &tc0110pcr(TC0110PCR(config, "tc0110pcr", 0));
+	tc0110pcr_device &tc0110pcr(TC0110PCR(config, "tc0110pcr"));
 	tc0110pcr.set_shift(0);
 	tc0110pcr.set_color_callback(FUNC(msm_state::color_xbgr555));
 
@@ -1208,10 +1208,10 @@ void msm_state::asuka(machine_config &config)
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);      // 8 kHz
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	LS157(config, m_adpcm_select, 0);
+	LS157(config, m_adpcm_select);
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -1232,7 +1232,7 @@ void cadash_state::cadash(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc", 0));
+	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc"));
 	tc0220ioc.read_0_callback().set_ioport("DSWA");
 	tc0220ioc.read_1_callback().set_ioport("DSWB");
 	tc0220ioc.read_2_callback().set_ioport("IN0");
@@ -1250,17 +1250,17 @@ void cadash_state::cadash(machine_config &config)
 	screen.screen_vblank().set(FUNC(cadash_state::screen_vblank));
 	screen.set_palette("tc0110pcr");
 
-	PC090OJ(config, m_pc090oj, 0);
+	PC090OJ(config, m_pc090oj);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_usebuffer(true);
 	m_pc090oj->set_palette("tc0110pcr");
 	m_pc090oj->set_colpri_callback(FUNC(cadash_state::fixed_colpri_cb));
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_palette("tc0110pcr");
 
-	tc0110pcr_device &tc0110pcr(TC0110PCR(config, "tc0110pcr", 0));
+	tc0110pcr_device &tc0110pcr(TC0110PCR(config, "tc0110pcr"));
 	tc0110pcr.set_shift(0);
 	tc0110pcr.set_color_callback(FUNC(cadash_state::color_xbgr444));
 
@@ -1273,7 +1273,7 @@ void cadash_state::cadash(machine_config &config)
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -1290,7 +1290,7 @@ void msm_state::mofflott(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc", 0));
+	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc"));
 	tc0220ioc.read_0_callback().set_ioport("DSWA");
 	tc0220ioc.read_1_callback().set_ioport("DSWB");
 	tc0220ioc.read_2_callback().set_ioport("IN0");
@@ -1308,16 +1308,16 @@ void msm_state::mofflott(machine_config &config)
 	screen.screen_vblank().set(FUNC(msm_state::screen_vblank));
 	screen.set_palette("tc0110pcr");
 
-	PC090OJ(config, m_pc090oj, 0);
+	PC090OJ(config, m_pc090oj);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_palette("tc0110pcr");
 	m_pc090oj->set_colpri_callback(FUNC(msm_state::variable_colpri_cb));
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_palette("tc0110pcr");
 
-	tc0110pcr_device &tc0110pcr(TC0110PCR(config, "tc0110pcr", 0));
+	tc0110pcr_device &tc0110pcr(TC0110PCR(config, "tc0110pcr"));
 	tc0110pcr.set_shift(0);
 	tc0110pcr.set_color_callback(FUNC(msm_state::color_xbgr555));
 
@@ -1335,10 +1335,10 @@ void msm_state::mofflott(machine_config &config)
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);      // 8 kHz
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	LS157(config, m_adpcm_select, 0);
+	LS157(config, m_adpcm_select);
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -1355,7 +1355,7 @@ void base_state::eto(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc", 0));
+	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc"));
 	tc0220ioc.read_0_callback().set_ioport("DSWA");
 	tc0220ioc.read_1_callback().set_ioport("DSWB");
 	tc0220ioc.read_2_callback().set_ioport("IN0");
@@ -1373,16 +1373,16 @@ void base_state::eto(machine_config &config)
 	screen.screen_vblank().set(FUNC(base_state::screen_vblank));
 	screen.set_palette("tc0110pcr");
 
-	PC090OJ(config, m_pc090oj, 0);
+	PC090OJ(config, m_pc090oj);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_palette("tc0110pcr");
 	m_pc090oj->set_colpri_callback(FUNC(base_state::variable_colpri_cb));
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_palette("tc0110pcr");
 
-	tc0110pcr_device &tc0110pcr(TC0110PCR(config, "tc0110pcr", 0));
+	tc0110pcr_device &tc0110pcr(TC0110PCR(config, "tc0110pcr"));
 	tc0110pcr.set_shift(0);
 	tc0110pcr.set_color_callback(FUNC(base_state::color_xbgr555));
 
@@ -1395,7 +1395,7 @@ void base_state::eto(machine_config &config)
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }

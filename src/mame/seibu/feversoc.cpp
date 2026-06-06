@@ -116,9 +116,6 @@ public:
 
 	void feversoc(machine_config &config) ATTR_COLD;
 
-protected:
-	virtual void machine_start() override ATTR_COLD;
-
 private:
 	uint16_t spriteram_r(offs_t offset);
 	void spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -282,11 +279,6 @@ void feversoc_state::irq_ack_w(uint16_t data)
 	m_maincpu->set_input_line(8, CLEAR_LINE);
 }
 
-void feversoc_state::machine_start()
-{
-	m_lamps.resolve();
-}
-
 void feversoc_state::feversoc(machine_config &config)
 {
 	constexpr XTAL MASTER_CLOCK = XTAL(28'636'363);
@@ -307,7 +299,7 @@ void feversoc_state::feversoc(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x1000);
 
-	SEI25X_RISE1X(config, m_spritegen, 0, m_palette, gfx_feversoc);
+	SEI25X_RISE1X(config, m_spritegen, m_palette, gfx_feversoc);
 	m_spritegen->set_screen("screen");
 	m_spritegen->set_pix_raw_shift(6);
 	m_spritegen->set_pri_raw_shift(14);

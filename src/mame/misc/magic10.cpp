@@ -231,8 +231,6 @@ public:
 	void init_soccer10() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD { m_lamps.resolve(); }
-
 	required_device<ticket_dispenser_device> m_ticket;
 	required_device<ticket_dispenser_device> m_hopper;
 

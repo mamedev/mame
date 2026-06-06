@@ -460,7 +460,7 @@ void uchroma68_state::uchroma68(machine_config &config)
 	m_pia->readpa_handler().set(FUNC(uchroma68_state::pia_pa_r));
 	m_pia->readpb_handler().set(FUNC(uchroma68_state::pia_pb_r));
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set([this] (bool state) { m_cass_txbit = state; });
 
 	CLOCK(config, m_acia_tx_clock, 4800);
@@ -468,7 +468,7 @@ void uchroma68_state::uchroma68(machine_config &config)
 
 	TIMER(config, "kansas_r").configure_periodic(FUNC(uchroma68_state::kansas_r), attotime::from_hz(40000));
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(uchroma68_state::kbd_put));
 }
 

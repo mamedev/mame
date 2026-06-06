@@ -186,7 +186,6 @@ public:
 	void init_biohzdmb() ATTR_COLD;
 	template <uint32_t Prot_addr> void init_conny_bit6() ATTR_COLD;
 	template <uint32_t Prot_addr> void init_conny_bit7() ATTR_COLD;
-	template <uint32_t Prot_addr> void init_bushack() ATTR_COLD;
 	void init_sonic2mb() ATTR_COLD;
 	void init_twinktmb() ATTR_COLD;
 
@@ -1607,17 +1606,6 @@ void md_boot_state::init_conny_bit7()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(Prot_addr, Prot_addr + 1, read16smo_delegate(*this, NAME([] () { return 0x80; })));
 }
 
-template <uint32_t Prot_addr>
-void md_boot_state::init_bushack()
-{
-	init_conny_bit7<Prot_addr>();
-
-	// FIXME: The game dislikes megadriv_68k_check_z80_bus(), always expecting bit 8 to be 0.
-	// Hacked to boot for now, not enough for contrambc anyway (where z80 is cutoff all the time).
-	// cfr. teradrive handling.
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa11100, 0xa11101, read16s_delegate(*this, NAME([this] (offs_t offset, uint16_t mem_mask) { return megadriv_68k_check_z80_bus(offset, mem_mask) & 0xfeff; })));
-}
-
 /*************************************
  *
  *  ROM definition(s)
@@ -1877,9 +1865,9 @@ GAME( 1994, barek2ch,  0,        md_bootleg,  barek2ch,  md_boot_state,         
 GAME( 1995, biohzdmb,  0,        megadrvb,    biohzdmb,  md_boot_state,         init_biohzdmb, ROT0, "bootleg / Sega",   "Bio-Hazard Battle (scrambled bootleg of Mega Drive version)",                                              0 )
 
 // Conny bootlegs with Mega Drive bootleg chipset marked TA-04, TA-05 and TA-06. 1 DIP switch bank.
-GAME( 1995, contrambc, 0,        conny,      conny,    md_conny_state,         init_bushack<0x860000>,    ROT0, "bootleg (Conny / Chuangyi)",    "Contra (Conny bootleg of Mega Drive version)",                                                    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // doesn't seem to like megadriv_68k_check_z80_bus(), crashes after title, doesn't read start button even if credits are in.
-GAME( 1995, sidepmbc,  0,        conny,      sidepmbc, md_conny_state,         init_conny_bit7<0x8a0000>, ROT0, "bootleg (Conny)",     "Side Pocket (Conny bootleg of Mega Drive version)",                                               MACHINE_NOT_WORKING ) // buggy when pressing start with no credit (verify), test me
-GAME( 1995, 3in1mbc,   0,        conny3in1,  conny3in1,md_conny_3in1_state,    init_conny_bit7<0x880000>, ROT0, "bootleg (Conny)",     "Gunstar Heroes / Snake Rattle n' Roll / Joe & Mac (Conny bootleg of Mega Drive versions)",        MACHINE_NOT_WORKING ) // pressing buttons during attract bankswitch between games. Gunstar Heroes crashes doing so during title screen anim (with irq 4 enabled, verify), credits aren't preserved when switching from/to Joe & Mac (verify)
-GAME( 1995, barek3mbc, 0,        conny,      conny,    md_conny_state,         init_conny_bit6<0x820000>, ROT0, "bootleg (Conny)",     "Bare Knuckle III (Conny bootleg of Mega Drive version)",                                          MACHINE_NOT_WORKING ) // test me
-GAME( 1996, mickeycmb, 0,        conny,      conny,    md_conny_state,         init_bushack<0x8c0000>,    ROT0, "bootleg (Conny)",     "The Great Hongyun Shu 1996 (Conny bootleg of Mega Drive version)",                                MACHINE_NOT_WORKING ) // test me
+GAME( 1995, contrambc, 0,        conny,      conny,    md_conny_state,         init_conny_bit6<0x860000>, ROT0, "bootleg (Conny / Chuangyi)", "Contra (Conny bootleg of Mega Drive version)", 0 ) // has shuffled levels compared to retail, can game softlock on continue screen (bad coding likely, verify)
+GAME( 1995, sidepmbc,  0,        conny,      sidepmbc, md_conny_state,         init_conny_bit7<0x8a0000>, ROT0, "bootleg (Conny)",            "Side Pocket (Conny bootleg of Mega Drive version)", 0 ) // buggy when pressing start with no credit (verify)
+GAME( 1995, 3in1mbc,   0,        conny3in1,  conny3in1,md_conny_3in1_state,    init_conny_bit7<0x880000>, ROT0, "bootleg (Conny)",            "Gunstar Heroes / Snake Rattle n' Roll / Joe & Mac (Conny bootleg of Mega Drive versions)", 0 ) // pressing buttons during attract bankswitch between games. Gunstar Heroes crashes doing so during title screen anim (with irq 4 enabled, verify), credits aren't preserved when switching from/to Joe & Mac (verify)
+GAME( 1995, barek3mbc, 0,        conny,      conny,    md_conny_state,         init_conny_bit6<0x820000>, ROT0, "bootleg (Conny)",            "Bare Knuckle III (Conny bootleg of Mega Drive version)", 0 )
+GAME( 1996, mickeycmb, 0,        conny,      conny,    md_conny_state,         init_conny_bit7<0x8c0000>, ROT0, "bootleg (Conny)",            "The Great Hongyun Shu 1996 (Conny bootleg of Mega Drive version)", 0 )
 // Samurai Spirits and Kuhga PCBs have also been seen

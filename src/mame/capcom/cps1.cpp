@@ -3896,20 +3896,13 @@ GFXDECODE_END
 *
 ********************************************************************/
 
-MACHINE_START_MEMBER(cps_state,common)
-{
-	m_led_cboard.resolve();
-}
-
 MACHINE_START_MEMBER(cps_state,cps1)
 {
-	MACHINE_START_CALL_MEMBER(common);
 	m_audiobank->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 MACHINE_START_MEMBER(cps_state,qsound)
 {
-	MACHINE_START_CALL_MEMBER(common);
 	m_audiobank->configure_entries(0, 6, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
@@ -3925,7 +3918,7 @@ void cps_state::cps1_10MHz(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(3'579'545));  /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cps_state::sub_map);
 
-	MCFG_MACHINE_START_OVERRIDE(cps_state,cps1)
+	MCFG_MACHINE_START_OVERRIDE(cps_state, cps1)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3987,7 +3980,7 @@ void cps_state::ganbare(machine_config &config)
 	m_maincpu->remove_vblank_int();
 	TIMER(config, "scantimer").configure_scanline(FUNC(cps_state::raster_scanline), "screen", 0, 1);
 
-	M48T35(config, m_m48t35, 0);
+	M48T35(config, m_m48t35);
 }
 
 void cps_state::qsound(machine_config &config)

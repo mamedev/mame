@@ -1,0 +1,156 @@
+<?xml version="1.0"?>
+<!--
+license: CC0-1.0
+copyright-holders: Angelo Salese
+
+Country Club Classic layout
+
+-->
+<mamelayout version="2">
+	<element name="temp_color">
+		<rect>
+			<color red="0.0" green="0.05" blue="0.0"/>
+		</rect>
+	</element>
+
+	<element name="ledmatrixdot">
+		<rect>
+			<color red="0" green="0" blue="0" />
+			<bounds left="-0.05" top="-0.05" right="1.05" bottom="1.05" />
+		</rect>
+		<disk>
+			<color state="0" red="0.125" green="0.125" blue="0.125" />
+			<color state="1" red="0.125" green="1.0" blue="0.125" />
+			<color state="2" red="1.0" green="0.125" blue="0.125" />
+			<color state="3" red="1.0" green="1.0" blue="0.125" />
+		</disk>
+	</element>
+
+	<group name="led_player1">
+		<repeat count="10">
+			<param name="s" start="0" increment="8" />
+			<param name="x" start="0" increment="1" />
+			<repeat count="8">
+				<param name="n" start="~s~" increment="1" />
+				<param name="y" start="0" increment="1" />
+				<element name="ledmatrix~n~" ref="ledmatrixdot" state="0">
+					<bounds x="~x~" y="~y~" width="1" height="1" />
+					<color red="1.0" green="1.0" blue="1.0" />
+				</element>
+			</repeat>
+		</repeat>
+	</group>
+
+	<group name="led_player2">
+		<repeat count="10">
+			<param name="s" start="200" increment="8" />
+			<param name="x" start="0" increment="1" />
+			<repeat count="8">
+				<param name="n" start="~s~" increment="1" />
+				<param name="y" start="0" increment="1" />
+				<element name="ledmatrix~n~" ref="ledmatrixdot" state="0">
+					<bounds x="~x~" y="~y~" width="1" height="1" />
+					<color red="1.0" green="1.0" blue="1.0" />
+				</element>
+			</repeat>
+		</repeat>
+	</group>
+
+	<group name="led_player3">
+		<repeat count="10">
+			<param name="s" start="80" increment="8" />
+			<param name="x" start="0" increment="1" />
+			<repeat count="8">
+				<param name="n" start="~s~" increment="1" />
+				<param name="y" start="0" increment="1" />
+				<element name="ledmatrix~n~" ref="ledmatrixdot" state="0">
+					<bounds x="~x~" y="~y~" width="1" height="1" />
+					<color red="1.0" green="1.0" blue="1.0" />
+				</element>
+			</repeat>
+		</repeat>
+	</group>
+
+	<group name="led_player4">
+		<repeat count="10">
+			<param name="s" start="280" increment="8" />
+			<param name="x" start="0" increment="1" />
+			<repeat count="8">
+				<param name="n" start="~s~" increment="1" />
+				<param name="y" start="0" increment="1" />
+				<element name="ledmatrix~n~" ref="ledmatrixdot" state="0">
+					<bounds x="~x~" y="~y~" width="1" height="1" />
+					<color red="1.0" green="1.0" blue="1.0" />
+				</element>
+			</repeat>
+		</repeat>
+	</group>
+
+	<group name="led_holenum">
+		<repeat count="5">
+			<param name="s" start="160" increment="8" />
+			<param name="y" start="0" increment="1" />
+			<repeat count="8">
+				<param name="n" start="~s~" increment="1" />
+				<param name="x" start="7" increment="-1" />
+				<element name="ledmatrix~n~" ref="ledmatrixdot" state="0">
+					<bounds x="~x~" y="~y~" width="1" height="1" />
+					<color red="1.0" green="1.0" blue="1.0" />
+				</element>
+			</repeat>
+		</repeat>
+	</group>
+
+	<group name="led_par">
+		<repeat count="5">
+			<param name="s" start="360" increment="8" />
+			<param name="y" start="0" increment="1" />
+			<repeat count="8">
+				<param name="n" start="~s~" increment="1" />
+				<param name="x" start="7" increment="-1" />
+				<element name="ledmatrix~n~" ref="ledmatrixdot" state="0">
+					<bounds x="~x~" y="~y~" width="1" height="1" />
+					<color red="1.0" green="1.0" blue="1.0" />
+				</element>
+			</repeat>
+		</repeat>
+	</group>
+
+	<view name="Wall Layout">
+		<element ref="temp_color">
+			<bounds x="0" y="0" width="594" height="300"/>
+		</element>
+
+		<group ref="led_player1">
+			<bounds x="56" y="47" width="32" height="28" />
+		</group>
+
+		<group ref="led_player2">
+			<bounds x="124" y="47" width="32" height="28" />
+		</group>
+
+		<group ref="led_player3">
+			<bounds x="56" y="84" width="32" height="28" />
+		</group>
+
+		<group ref="led_player4">
+			<bounds x="124" y="84" width="32" height="28" />
+		</group>
+
+		<group ref="led_holenum">
+			<bounds x="56" y="126" width="26" height="17" />
+		</group>
+
+		<group ref="led_par">
+			<bounds x="124" y="126" width="26" height="17" />
+		</group>
+
+		<screen index="0">
+			<bounds x="32" y="211" width="128" height="64" />
+		</screen>
+
+		<screen index="1">
+			<bounds x="434" y="211" width="128" height="64" />
+		</screen>
+	</view>
+</mamelayout>

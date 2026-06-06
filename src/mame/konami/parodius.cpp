@@ -384,7 +384,7 @@ void parodius_state::parodius(machine_config &config)
 	m_k053245->set_palette("palette");
 	m_k053245->set_sprite_callback(FUNC(parodius_state::sprite_callback));
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();

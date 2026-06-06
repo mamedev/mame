@@ -19,7 +19,7 @@ public:
 	void set_readonly(bool is_readonly) { m_is_readonly = is_readonly; }
 
 	// construction/destruction
-	bitbanger_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bitbanger_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device_image_interface implementation
 	virtual std::pair<std::error_condition, std::string> call_load() override;

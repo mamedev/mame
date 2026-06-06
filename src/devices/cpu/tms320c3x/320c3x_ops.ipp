@@ -387,26 +387,23 @@ void tms320c3x_device::int2float(tmsreg &srcdst)
 		man = 0x80000000;
 		exp = -128;
 	}
-
-	// check for -1 here because count_leading_ones will infinite loop
-	else if (man == (uint32_t)-1)
+	else if (man == uint32_t(int32_t(-1)))
 	{
+		// handle -1 here because the shift count would be out of range
 		man = 0;
 		exp = -1;
 	}
-
-	// positive values; count leading zeros and shift
-	else if ((int32_t)man > 0)
+	else if (int32_t(man) > 0)
 	{
-		cnt = count_leading_zeros_32(man);
+		// positive values; count leading zeros and shift
+		cnt = std::countl_zero(man);
 		man <<= cnt;
 		exp = 31 - cnt;
 	}
-
-	// negative values; count leading ones and shift
 	else
 	{
-		cnt = count_leading_ones_32(man);
+		// negative values; count leading ones and shift
+		cnt = std::countl_one(man);
 		man <<= cnt;
 		exp = 31 - cnt;
 	}
@@ -571,32 +568,30 @@ void tms320c3x_device::addf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 	// add
 	man = m1 + m2;
 
-	// if the mantissa is zero, set the exponent appropriately
 	if (man == 0 || exp == -128)
 	{
+		// if the mantissa is zero, set the exponent appropriately
 		exp = -128;
 		man = 0x80000000;
 	}
-
-	// if the mantissa is >= 2.0 or < -2.0, normalize
 	else if (man >= int64_t(0x100000000U) || man < int64_t(0xffffffff00000000U))
 	{
+		// if the mantissa is >= 2.0 or < -2.0, normalize
 		man >>= 1;
 		exp++;
 	}
-
-	// if the mantissa is < 1.0 and > -1.0, normalize
 	else if (man < int64_t(0x80000000U) && man >= int64_t(0xffffffff80000000U))
 	{
+		// if the mantissa is < 1.0 and > -1.0, normalize
 		if (man > 0)
 		{
-			cnt = count_leading_zeros_32((uint32_t)man);
+			cnt = std::countl_zero(uint32_t(man));
 			man <<= cnt;
 			exp -= cnt;
 		}
 		else
 		{
-			cnt = count_leading_ones_32((uint32_t)man);
+			cnt = std::countl_one(uint32_t(man));
 			man <<= cnt;
 			exp -= cnt;
 		}
@@ -703,13 +698,13 @@ void tms320c3x_device::subf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 	{
 		if (man > 0)
 		{
-			cnt = count_leading_zeros_32((uint32_t)man);
+			cnt = std::countl_zero(uint32_t(man));
 			man <<= cnt;
 			exp -= cnt;
 		}
 		else
 		{
-			cnt = count_leading_ones_32((uint32_t)man);
+			cnt = std::countl_one(uint32_t(man));
 			man <<= cnt;
 			exp -= cnt;
 		}
@@ -852,13 +847,13 @@ void tms320c3x_device::norm(tmsreg &dst, tmsreg &src)
 		int cnt;
 		if (man > 0)
 		{
-			cnt = count_leading_zeros_32((uint32_t)man);
+			cnt = std::countl_zero(uint32_t(man));
 			man <<= cnt;
 			exp -= cnt;
 		}
 		else
 		{
-			cnt = count_leading_ones_32((uint32_t)man);
+			cnt = std::countl_one(uint32_t(man));
 			man <<= cnt;
 			exp -= cnt;
 		}

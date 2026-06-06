@@ -110,9 +110,10 @@ protected:
 	{
 	}
 
-	void common_config(machine_config &config);
-	void common_init();
+	void common_config(machine_config &config) ATTR_COLD;
+	void common_init() ATTR_COLD;
 
+protected:
 	// driver_device overrides
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -151,7 +152,6 @@ protected:
 
 	emu_timer *m_buserror = nullptr;
 
-private:
 	u8 m_nmr = 0; // nonvolatile memory register
 	u16 m_per = 0; // parity error register
 	u8 m_scr = 0; // system control register
@@ -180,8 +180,8 @@ public:
 	{
 	}
 
-	void tek6130(machine_config &config);
-	void init() { tekigw_state_base::common_init(); }
+	void tek6130(machine_config &config) ATTR_COLD;
+	void init() ATTR_COLD { tekigw_state_base::common_init(); }
 
 protected:
 	// driver_device overrides
@@ -234,8 +234,8 @@ public:
 	{
 	}
 
-	void tek4132(machine_config &config);
-	void init() { tekigw_state_base::common_init(); }
+	void tek4132(machine_config &config) ATTR_COLD;
+	void init() ATTR_COLD { tekigw_state_base::common_init(); }
 
 protected:
 	// driver_device overrides
@@ -301,8 +301,6 @@ void tek6100_state::machine_reset()
 
 void tekigw_state_base::common_init()
 {
-	m_led.resolve();
-
 	m_lan->space(0).install_ram(0, m_ram->mask(), m_ram->pointer());
 }
 
@@ -871,7 +869,7 @@ void tek6100_state::tek6130(machine_config &config)
 	// TODO: graphics board disabled for now
 	if (false)
 	{
-		NS32016(config, m_dpu_cpu, 0); // 8'000'000);
+		NS32016(config, m_dpu_cpu, 0 /* 8'000'000*/);
 		m_dpu_cpu->set_addrmap(0, &tek6100_state::dpu_cpu_map<0>);
 
 		ns32081_device &dpu_fpu(NS32081(config, "dpu_fpu", 8'000'000));
@@ -880,7 +878,7 @@ void tek6100_state::tek6130(machine_config &config)
 		ns32202_device &dpu_icu(NS32202(config, "dpu_icu", 20'000));
 		dpu_icu.out_int().set_inputline(m_dpu_cpu, INPUT_LINE_IRQ0).invert();
 
-		i8744_device &dpu_mcu(I8744(config, "dpu_mcu", 0)); // 10'000'000)); // 8744H-10
+		i8744_device &dpu_mcu(I8744(config, "dpu_mcu", 0 /* 10'000'000 */)); // 8744H-10
 		(void)dpu_mcu;
 
 		mc6845_device &dpu_crtc(SY6845E(config, "dpu_crtc", 25.2_MHz_XTAL)); // SYP6845EA

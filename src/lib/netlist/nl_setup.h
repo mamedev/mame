@@ -36,7 +36,7 @@
 	setup.register_dip_alias_arr(#pin1 ", " #__VA_ARGS__);
 
 // to be used to reference new library truth table devices
-#define NET_REGISTER_DEV(type, name, ...)				       \
+#define NET_REGISTER_DEV(type, name, ...)                      \
 	setup.register_dev(#type, #name __VA_OPT__(, {PSTRINGIFY_VA(__VA_ARGS__)}));
 
 #define NET_CONNECT(name, input, output)                                       \

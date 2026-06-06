@@ -134,12 +134,6 @@ private:
 
 void mc600_state::machine_start()
 {
-	m_caps_lock.resolve();
-	m_num_lock.resolve();
-	m_scroll_lock.resolve();
-	m_low_battery.resolve();
-	m_standby.resolve();
-
 	m_rambank->configure_entries(0, 2, m_ram->pointer() + 0x80000, 0x20000);
 	m_rambank->set_entry(0);
 

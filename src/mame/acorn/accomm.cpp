@@ -143,9 +143,6 @@ void accomm_state::machine_reset()
 
 void accomm_state::machine_start()
 {
-	m_shiftlock_led.resolve();
-	m_capslock_led.resolve();
-
 	m_ula->set_ram(m_vram);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x000000, 0xffffff, "cpu_clock_tap",
@@ -205,7 +202,7 @@ void accomm_state::ram_w(offs_t offset, uint8_t data)
 
 uint8_t accomm_state::via_pb_r()
 {
-	return 0xfe | (m_rtc->sda_r() & m_cct->read_sda());
+	return 0xfe | (m_rtc->sda_r() & m_dtmf->sda_r() & m_cct->read_sda());
 }
 
 void accomm_state::via_pb_w(uint8_t data)
@@ -214,6 +211,9 @@ void accomm_state::via_pb_w(uint8_t data)
 
 	m_rtc->sda_w(BIT(data, 1));
 	m_rtc->scl_w(BIT(data, 2));
+
+	m_dtmf->sda_w(BIT(data, 1));
+	m_dtmf->scl_w(BIT(data, 2));
 
 	m_cct->write_sda(BIT(data, 1));
 	m_cct->write_scl(BIT(data, 2));
@@ -473,7 +473,7 @@ void accomm_state::accomm(machine_config &config)
 	rs423.dcd_handler().set(m_scn2641, FUNC(scn2641_device::dcd_w));
 	rs423.cts_handler().set(m_scn2641, FUNC(scn2641_device::cts_w));
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("modem", FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set("modem", FUNC(rs232_port_device::write_rts));
 	m_acia->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
@@ -493,7 +493,7 @@ void accomm_state::accomm(machine_config &config)
 	m_adlc->out_txd_cb().set("econet", FUNC(econet_device::host_data_w));
 	m_adlc->out_irq_cb().set_inputline(m_maincpu, G65816_LINE_NMI);
 
-	econet_device &econet(ECONET(config, "econet", 0));
+	econet_device &econet(ECONET(config, "econet"));
 	econet.clk_wr_callback().set(m_adlc, FUNC(mc6854_device::txc_w));
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
 	econet.data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));

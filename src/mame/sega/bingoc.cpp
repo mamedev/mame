@@ -203,7 +203,7 @@ void bingoc_state::bingoc(machine_config &config)
 	I8251(config, "uart7", 4000000); // unknown
 	I8251(config, "uart8", 4000000); // unknown
 
-	SEGA_315_5338A(config, "io", 0); // ?
+	SEGA_315_5338A(config, "io"); // ?
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

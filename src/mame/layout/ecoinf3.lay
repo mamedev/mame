@@ -844,29 +844,29 @@ license:CC0-1.0
 		</element>
 	</repeat>
 
-	<element name="sreel1" ref="SteppersReel1" state="0">
+	<element name="reel1:scroll" ref="SteppersReel1" state="0">
 		<bounds x="17" y="300" width="32" height="32"/>
 	</element>
-	<element name="sreel2" ref="SteppersReel2" state="0">
+	<element name="reel2:scroll" ref="SteppersReel2" state="0">
 		<bounds x="50" y="300" width="32" height="32"/>
 	</element>
-	<element name="sreel3" ref="SteppersReel3" state="0">
+	<element name="reel3:scroll" ref="SteppersReel3" state="0">
 		<bounds x="83" y="300" width="32" height="32"/>
 	</element>
-	<element name="sreel4" ref="SteppersReel4" state="0">
+	<element name="reel4:scroll" ref="SteppersReel4" state="0">
 		<bounds x="149" y="290" width="16" height="16"/>
 	</element>
 
-	<element name="reel1" ref="Steppers" state="0">
+	<element name="reel1:pos" ref="Steppers" state="0">
 		<bounds x="20" y="330" width="5" height="2"/>
 	</element>
-	<element name="reel2" ref="Steppers" state="0">
+	<element name="reel2:pos" ref="Steppers" state="0">
 		<bounds x="52" y="330" width="5" height="2"/>
 	</element>
-	<element name="reel3" ref="Steppers" state="0">
+	<element name="reel3:pos" ref="Steppers" state="0">
 		<bounds x="85" y="330" width="5" height="2"/>
 	</element>
-	<element name="reel4" ref="Steppers" state="0">
+	<element name="reel4:pos" ref="Steppers" state="0">
 		<bounds x="151" y="304" width="5" height="2"/>
 	</element>
 

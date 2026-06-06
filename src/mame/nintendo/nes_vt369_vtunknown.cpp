@@ -533,9 +533,9 @@ void vt36x_gtct885_state::gtct885_prot_w(u8 data)
 	// so 0x20, 0x10, and 0x08 are outputs
 	// some kind of serial device
 
-	m_protection->write_data((data & 0x20) ? true : false);
-	m_protection->write_enable((data & 0x10) ? true : false);
-	m_protection->write_clock((data & 0x08) ? true : false);
+	m_protection->write_data(BIT(data, 5));
+	m_protection->write_enable(BIT(data, 4));
+	m_protection->write_clock(BIT(data, 3));
 }
 
 u8 vt36x_gtct885_state::gtct885_prot_r()
@@ -548,9 +548,9 @@ u8 vt36x_gtct885_state::gtct885_prot_r()
 void vt4ffx_goretrop_state::goretrop_prot_w(u8 data)
 {
 	// direction is set to 0x0e before writing here
-	m_protection->write_data((data & 0x08) ? true : false);
-	m_protection->write_enable((data & 0x04) ? true : false);
-	m_protection->write_clock((data & 0x02) ? false : true);
+	m_protection->write_data(BIT(data, 3));
+	m_protection->write_enable(BIT(data, 2));
+	m_protection->write_clock(BIT(~data, 1));
 }
 
 u8 vt4ffx_goretrop_state::goretrop_prot_r()
@@ -576,8 +576,8 @@ void vt36x_tetrtin_state::lxcap_prot_w(u8 data)
 
 	*/
 
-	m_protection->write_data((data & 0x02) ? true : false);
-	m_protection->write_clock((data & 0x01) ? true : false);
+	m_protection->write_data(BIT(data, 1));
+	m_protection->write_clock(BIT(data, 0));
 }
 
 u8 vt36x_tetrtin_state::lxcap_prot_r()
@@ -590,8 +590,8 @@ u8 vt36x_tetrtin_state::lxcap_prot_r()
 
 void vt36x_tetrtin_state::pixel_prot_w(u8 data)
 {
-	m_protection->write_data((data & 0x10) ? true : false);
-	m_protection->write_clock((data & 0x20) ? true : false);
+	m_protection->write_data(BIT(data, 4));
+	m_protection->write_clock(BIT(data, 5));
 }
 
 u8 vt36x_tetrtin_state::pixel_prot_r()
@@ -612,14 +612,14 @@ void vt36x_tetrtin_state::nesvt270_prot_w(u8 data)
 
 void vt36x_otrail_state::otrail_seeprom_w(u8 data)
 {
-	m_i2cmem->write_scl((data & 0x04) ? true : false);
-	m_i2cmem->write_sda((data & 0x08) ? true : false);
+	m_i2cmem->write_scl(BIT(data, 2));
+	m_i2cmem->write_sda(BIT(data, 3));
 }
 
 void vt36x_otrail_state::otrail_sound_w(u8 data)
 {
 	// is this really a DAC?
-	// 
+	//
 	// it might be an another chip playing samples from an internal ROM
 	// as there are longer sound clips and only short bursts of writes that
 	// look more like commands
@@ -758,7 +758,7 @@ void vt36x_gtct885_state::vt36x_8mb_gtct885(machine_config &config)
 	m_soc->io_4153_read_callback().set(FUNC(vt36x_gtct885_state::gtct885_prot_r));
 	m_soc->io_4152_write_callback().set(FUNC(vt36x_gtct885_state::gtct885_prot_w));
 
-	VT_MENU_PROTECTION(config, m_protection, 0);
+	VT_MENU_PROTECTION(config, m_protection);
 }
 
 void vt36x_gtct885_state::vt36x_altswap_2mb_36pcase(machine_config &config)
@@ -768,7 +768,10 @@ void vt36x_gtct885_state::vt36x_altswap_2mb_36pcase(machine_config &config)
 	m_soc->io_4153_read_callback().set(FUNC(vt36x_gtct885_state::gtct885_prot_r));
 	m_soc->io_4152_write_callback().set(FUNC(vt36x_gtct885_state::gtct885_prot_w));
 
-	VT_MENU_PROTECTION(config, m_protection, 0);
+	m_soc->enable_36pcase_gpio();
+	VT_MENU_PROTECTION(config, m_protection);
+	m_protection->set_read_start_byte(1);
+	m_protection->enable_36pcase_late_protocol();
 }
 
 void vt4ffx_goretrop_state::vt4ffx_32mb_goretrop(machine_config &config)
@@ -777,7 +780,7 @@ void vt4ffx_goretrop_state::vt4ffx_32mb_goretrop(machine_config &config)
 	m_soc->io_4139_read_callback().set(FUNC(vt4ffx_goretrop_state::goretrop_prot_r));
 	m_soc->io_4139_write_callback().set(FUNC(vt4ffx_goretrop_state::goretrop_prot_w));
 
-	VT_MENU_PROTECTION(config, m_protection, 0);
+	VT_MENU_PROTECTION(config, m_protection);
 }
 
 void vt4ffx_goretrop_state::vt4ffx_1mb_rbbrite(machine_config &config)
@@ -797,7 +800,7 @@ void vt4ffx_state::vt4ffx_h12p1000(machine_config &config)
 void vt36x_tetrtin_state::vt36x_1mb_tetrtin(machine_config &config)
 {
 	vt36x_1mb(config);
-	VT_MENU_PROTECTION_LXCAP(config, m_protection, 0);
+	VT_MENU_PROTECTION_LXCAP(config, m_protection);
 
 	m_soc->io_4153_read_callback().set(FUNC(vt36x_tetrtin_state::lxcap_prot_r));
 	m_soc->io_4152_write_callback().set(FUNC(vt36x_tetrtin_state::lxcap_prot_w));
@@ -806,7 +809,7 @@ void vt36x_tetrtin_state::vt36x_1mb_tetrtin(machine_config &config)
 void vt36x_tetrtin_state::vt36x_8mb_lxcap(machine_config &config)
 {
 	vt36x_8mb(config);
-	VT_MENU_PROTECTION_LXCAP(config, m_protection, 0);
+	VT_MENU_PROTECTION_LXCAP(config, m_protection);
 
 	m_soc->io_4153_read_callback().set(FUNC(vt36x_tetrtin_state::lxcap_prot_r));
 	m_soc->io_4152_write_callback().set(FUNC(vt36x_tetrtin_state::lxcap_prot_w));
@@ -815,7 +818,7 @@ void vt36x_tetrtin_state::vt36x_8mb_lxcap(machine_config &config)
 void vt36x_tetrtin_state::vt36x_8mb_pixel(machine_config &config)
 {
 	vt36x_8mb(config);
-	VT_MENU_PROTECTION_LXCAP(config, m_protection, 0);
+	VT_MENU_PROTECTION_LXCAP(config, m_protection);
 
 	m_soc->io_414b_read_callback().set(FUNC(vt36x_tetrtin_state::pixel_prot_r));
 	m_soc->io_414a_write_callback().set(FUNC(vt36x_tetrtin_state::pixel_prot_w));
@@ -824,7 +827,7 @@ void vt36x_tetrtin_state::vt36x_8mb_pixel(machine_config &config)
 void vt36x_tetrtin_state::vt36x_16mb_nesvt270(machine_config &config)
 {
 	vt36x_16mb(config);
-	VT_MENU_PROTECTION_LXCAP(config, m_protection, 0); // might not be this device
+	VT_MENU_PROTECTION_LXCAP(config, m_protection); // might not be this device
 
 	m_soc->io_414b_read_callback().set(FUNC(vt36x_tetrtin_state::nesvt270_prot_r));
 	m_soc->io_414b_write_callback().set(FUNC(vt36x_tetrtin_state::nesvt270_prot_w));
@@ -834,9 +837,9 @@ void vt36x_tetrtin_state::vt36x_16mb_nesvt270(machine_config &config)
 void vt36x_otrail_state::vt36x_1mb_otrail(machine_config &config)
 {
 	vt36x_1mb(config);
-	VT_MENU_PROTECTION_LXCAP(config, m_protection, 0);
+	VT_MENU_PROTECTION_LXCAP(config, m_protection);
 
-	I2C_24C04(config, "i2cmem", 0);
+	I2C_24C04(config, "i2cmem");
 
 	SPEAKER(config, "internal").front_center();
 
@@ -923,6 +926,10 @@ ROM_START( 240in1ar )
 	ROM_LOAD( "mw-106-2g.u3", 0x00000, 0x8000000, CRC(c46d2ca9) SHA1(0fff7d3461ff620c5b5e43f54f9e7badd089b951) )
 ROM_END
 
+ROM_START( urban240 )
+	ROM_REGION( 0x8000000, "mainrom", 0 )
+	ROM_LOAD( "urban240.u3", 0x00000, 0x8000000, CRC(73d03f0d) SHA1(a1615dba39e9114ace7a8ad68f46195da655bf35) )
+ROM_END
 
 ROM_START( rtvgc300 )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
@@ -1179,8 +1186,10 @@ ROM_START( 36pcase )
 	ROM_REGION( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "25q16.ic3", 0x00000, 0x200000, CRC(a8edb73e) SHA1(1028656530e411607ffa3b63788b42e41bf971d7) )
 
+	VT3XX_INTERNAL_NO_SWAP // verified for this set
+
 	ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection (put at 0xe01 in RAM) (checks for something before this)
-	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
+	ROM_LOAD( "serial-rom.bin", 0x00000, 0x100, CRC(877fb90b) SHA1(f8aa2512460244b03fb2f3c013f063c836adf1bd) )
 ROM_END
 
 
@@ -1310,7 +1319,7 @@ ROM_START( lxcap )
 
 	//ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection
 	// This table is just (0x100 - offset) & 0xff with a nibble swap applied at the end
-	// 
+	//
 	// The chip here (which is accessed in a different way to gtct885 etc.) might not
 	// be fetching data from a table, but doing a calculation
 	//
@@ -1502,11 +1511,11 @@ ROM_START( goretrop )
 	ROM_LOAD( "goretroportable.bin", 0x00000, 0x2000000, CRC(e7279dd3) SHA1(5f096ce22e46f112c2cc6588cb1c527f4f0430b5) )
 
 	ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection (copied to 0x701 - 0x7ff)
-	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
-	ROM_FILL( 0x000, 0x100, 0x60) // wants actual code here, just RTS opcodes don't work
-	// jumps to 072b
-	// jumps to 072f after putting a value in a
-	// jumps to 0743 after putting a value in x
+	// This is a hacked version of the data from gtct885, as the 'jump from ROM' offsets seem to match, but the
+	// code needs to be at a different address, and some of the ports read/written by the code are different too
+	//
+	// This is functional enough to get the menu running, but the real data still needs extracting.
+	ROM_LOAD( "protection.bin", 0x00000, 0x100, BAD_DUMP CRC(3cd42234) SHA1(3a4afc890d894b4256960150b2729fd5f93555a0) )
 ROM_END
 
 ROM_START( goretropa )
@@ -1514,7 +1523,8 @@ ROM_START( goretropa )
 	ROM_LOAD( "goretro.bin", 0x00000, 0x2000000, CRC(e2c579cc) SHA1(b5cb8883d1f0b238fc9966ac635583dd5c66bcfe) )
 
 	ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection (copied to 0x701 - 0x7ff)
-	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
+	// see note in goretrop set
+	ROM_LOAD( "protection.bin", 0x00000, 0x100, BAD_DUMP CRC(3cd42234) SHA1(3a4afc890d894b4256960150b2729fd5f93555a0) )
 ROM_END
 
 ROM_START( goretropu13 )
@@ -1522,7 +1532,8 @@ ROM_START( goretropu13 )
 	ROM_LOAD( "goretroportable250p_v13.bin", 0x00000, 0x2000000, CRC(b2a94173) SHA1(e64989f4b0a29820b0dce5e0ca91abb8f247c269) )
 
 	ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection (copied to 0x701 - 0x7ff)
-	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
+	// see note in goretrop set
+	ROM_LOAD( "protection.bin", 0x00000, 0x100, BAD_DUMP CRC(3cd42234) SHA1(3a4afc890d894b4256960150b2729fd5f93555a0) )
 ROM_END
 
 ROM_START( goretropu12 )
@@ -1530,7 +1541,8 @@ ROM_START( goretropu12 )
 	ROM_LOAD( "goretroportable250p_v12.bin", 0x00000, 0x2000000, CRC(fda93863) SHA1(75e48ac27e5520953676894747d6d06307cdc1af) )
 
 	ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection (copied to 0x701 - 0x7ff)
-	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
+	// see note in goretrop set
+	ROM_LOAD( "protection.bin", 0x00000, 0x100, BAD_DUMP CRC(3cd42234) SHA1(3a4afc890d894b4256960150b2729fd5f93555a0) )
 ROM_END
 
 ROM_START( s10fake )
@@ -1817,20 +1829,22 @@ CONS( 201?, dgun2572, 0,  0,  vt36x_32mb, vt369, vt36x_state, init_dgun2572, "dr
 
 // NOT SPI roms, altswap sets code starts with '6a'
 
-CONS( 201?, red5mam,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "Red5", "Mini Arcade Machine (Red5, 'Xtra Game')", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+CONS( 201?, red5mam,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "Red5", "Mini Arcade Machine (Red5, 'Xtra Game')", MACHINE_NOT_WORKING )
 
-CONS( 2016, dgun2593,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+CONS( 2016, dgun2593,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING )
+
+CONS( 201?, urban240,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "Urban Outfitters", "Mini Arcade Machine 240-in-1 (translucent case)", MACHINE_NOT_WORKING )
 
 CONS( 200?, gcs2mgp,   0,  0,  vt36x_altswap_16mb, vt369_rot, vt36x_state, empty_init, "Jungle's Soft", "Mini Game Player 48-in-1",  MACHINE_NOT_WORKING | ROT270 )
 
 // Not the same as the other 240-in-1 machine from Thumbs Up below (tup240) This one makes greater use of newer VT features with most games having sampled music, not APU sound.
 // Several of the games contained in here are buggy / broken on real hardware (see https://www.youtube.com/watch?v=-mgGNaDQ1HE )
-CONS( 201?, 240in1ar,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "Thumbs Up", "Mini Arcade Machine (Thumbs Up, 240IN1ARC)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+CONS( 201?, 240in1ar,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "Thumbs Up", "Mini Arcade Machine (Thumbs Up, 240IN1ARC)", MACHINE_NOT_WORKING )
 // portable fan + famiclone combo handheld, very similar to 240in1ar
 CONS( 2020, nubsupmf,   0,      0,  vt36x_altswap_4mb, vt369, vt36x_state, empty_init, "<unknown>", "NubSup Mini Game Fan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // protected both with accesses involving 41e7 / 41eb / 414f (probably more IO ports, to get 2 bytes in RAM) and the serial devices to get ~0x100 bytes of code
-CONS( 202?, 36pcase,    0,      0,  vt36x_altswap_2mb_36pcase, vt369, vt36x_gtct885_state, empty_init, "<unknown>", "36-in-1 Classic Games phone case", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 202?, 36pcase,    0,      0,  vt36x_altswap_2mb_36pcase, vt369, vt36x_gtct885_state, empty_init, "<unknown>", "36-in-1 Classic Games phone case", MACHINE_IMPERFECT_GRAPHICS )
 
 
 /*****************************************************************************

@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!--
+license: CC0-1.0
+copyright-holders: Angelo Salese
+
+Taito La Cucaracha layout
+
+-->
+<mamelayout version="2">
+	<element name="ledmatrixdot" defstate="3">
+		<rect>
+			<color red="0" green="0" blue="0" />
+			<bounds left="-0.05" top="-0.05" right="1.05" bottom="1.05" />
+		</rect>
+
+		<!-- LEDs may really be orange with red bezel clamping -->
+		<!-- pink shade on refs likely down to camera artifacts -->
+		<disk state="0"><color red="1.00" green="0.20" blue="0.52" /></disk>
+		<disk state="1"><color red="0.80" green="0.04" blue="0.30" /></disk>
+		<disk state="2"><color red="0.48" green="0.02" blue="0.15" /></disk>
+		<disk state="3"><color red="0.12" green="0.02" blue="0.04" /></disk>
+	</element>
+
+	<group name="led_player1">
+		<repeat count="16">
+			<param name="s" start="0" increment="64" />
+			<param name="y" start="0" increment="1" />
+			<repeat count="64">
+				<param name="n" start="~s~" increment="1" />
+				<param name="x" start="0" increment="1" />
+				<element name="ledmatrix~n~" ref="ledmatrixdot" state="3">
+					<bounds x="~x~" y="~y~" width="1" height="1" />
+					<color red="1.0" green="0.1" blue="0.15" />
+				</element>
+			</repeat>
+		</repeat>
+	</group>
+
+	<view name="Cabinet">
+		<group ref="led_player1">
+			<bounds x="0" y="0" width="64" height="16" />
+		</group>
+	</view>
+</mamelayout>

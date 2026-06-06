@@ -83,7 +83,8 @@
  TODO:
  * Communication for games that support linked mode
  * IGS025 protection for Chess Challenge II
- * Emulate necessary peripherals for Extra Draw (might not belong here)
+ * Extra Draw and Xingyun Xiaochou hang cause of IRQ problems
+ * Emulate necessary peripherals for Extra Draw
  * I/O for remaining games
  * tshs101 has IGS3590 + NT3570F instead of Oki
 */
@@ -98,6 +99,7 @@
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "machine/timekpr.h"
 #include "machine/timer.h"
 
 #include "sound/okim6295.h"
@@ -168,6 +170,7 @@ public:
 	void extradrw(machine_config &config) ATTR_COLD;
 	void chessc2(machine_config &config) ATTR_COLD;
 	void tshs101(machine_config &config) ATTR_COLD;
+	void xyxcxysj(machine_config &config) ATTR_COLD;
 
 	void init_sdwx() ATTR_COLD;
 	void init_lhzb4() ATTR_COLD;
@@ -204,6 +207,7 @@ public:
 	void init_mgfx() ATTR_COLD;
 	void init_tarzan2() ATTR_COLD;
 	void init_magtree() ATTR_COLD;
+	void init_xyxcxysj() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -272,14 +276,13 @@ private:
 	void tripslot_map(address_map &map) ATTR_COLD;
 	void ccly_map(address_map &map) ATTR_COLD;
 	void tshs101_map(address_map &map) ATTR_COLD;
+	void xyxcxysj_map(address_map &map) ATTR_COLD;
 
 	void oki_128k_map(address_map &map) ATTR_COLD;
 };
 
 void igs_m027_state::machine_start()
 {
-	m_out_lamps.resolve();
-
 	std::fill(std::begin(m_xor_table), std::end(m_xor_table), 0);
 	std::fill(std::begin(m_io_select), std::end(m_io_select), 0xff);
 	m_first_start = true;
@@ -376,6 +379,13 @@ void igs_m027_state::ccly_map(address_map &map)
 	m027_1ppi_map<true>(map);
 
 	map(0x3800'c000, 0x3800'c003).umask32(0x0000'00ff).w(FUNC(igs_m027_state::ccly_okibank_w));
+}
+
+void igs_m027_state::xyxcxysj_map(address_map &map)
+{
+	m027_1ppi_map<true>(map);
+
+	map(0x4800'0000, 0x4800'1fff).rw("rtc", FUNC(ds1643_device::read), FUNC(ds1643_device::write)); // M48T18?
 }
 
 void igs_m027_state::tshs101_map(address_map &map)
@@ -2549,7 +2559,7 @@ void igs_m027_state::m027_noppi(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs_m027_state::interrupt), "screen", 0, 1);
 
-	IGS017_IGS031(config, m_igs017_igs031, 0);
+	IGS017_IGS031(config, m_igs017_igs031);
 	m_igs017_igs031->set_text_reverse_bits(true);
 	m_igs017_igs031->in_pa_callback().set(NAME((&igs_m027_state::dsw_r<1, 0, 0>)));
 	m_igs017_igs031->in_pb_callback().set_ioport("PORTB");
@@ -2870,6 +2880,14 @@ void igs_m027_state::chessc2(machine_config &config)
 	m_maincpu->in_port().set_ioport("PLAYER");
 }
 
+void igs_m027_state::xyxcxysj(machine_config &config)
+{
+	m027_1ppi<true>(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::xyxcxysj_map);
+
+	DS1643(config, "rtc"); // should be fully compatible with M48T18
+}
 
 /***************************************************************************
 
@@ -4522,6 +4540,29 @@ ROM_START( tswxp ) // IGS PCB-0489-17-FM-1. 2 banks of 8 switches (1 unpopulated
 	ROM_LOAD( "u4", 0x000000, 0x200000, CRC(2e392e51) SHA1(5ff901f8ab877674f3b68e38497babc0a7369a85) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
+// 幸运小丑 / 幸运手机 (Xìngyùn Xiǎochǒu / Xìngyùn Shǒujī).
+// At first boot the following password is required to initialize RTC NVRAM: 312746545908452995882136421362
+ROM_START( xyxcxysj ) // IGS PCB-0417-01-GF. 3 banks of 8 switches. 1 PPI. ST M48T18-100PC1 RTC / NVRAM.
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal rom of IGS027A ARM based MCU
+	ROM_LOAD( "u5_027a.u20", 0x0000, 0x4000, CRC(06bf82c2) SHA1(d9e0fc4a472f8934279f022deec47d27c04b1519) )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v-233cn.u19", 0x00000, 0x80000, CRC(d805a388) SHA1(aa0aa0227e6762c9de10943cf4ac898479512039) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "text.u13", 0x00000, 0x80000, CRC(881ff61a) SHA1(6b4a31c7e0fc57392d2495a540d271b662e4b649) ) // 1xxxxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "cg.u23", 0x000000, 0x200000, CRC(9431f1d5) SHA1(c090933a6f377bc18722aff10df2b76a634a6d0e) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "sp.u3", 0x00000, 0x80000, CRC(cb62e464) SHA1(6191fd40e58cb22e88395fa794a7b9540432436c) )
+
+	ROM_REGION( 0x2000, "rtc", 0 ) // pre-initialized
+	ROM_LOAD( "m48t18.u30", 0x0000, 0x2000, CRC(9c84a94a) SHA1(ff2cff054f8d635babebb06fc961b2268b687619) )
+ROM_END
+
 
 void igs_m027_state::pgm_create_dummy_internal_arm_region()
 {
@@ -4820,6 +4861,14 @@ void igs_m027_state::init_magtree()
 	pgm_create_dummy_internal_arm_region();
 }
 
+void igs_m027_state::init_xyxcxysj()
+{
+	mgzz_decrypt(machine());
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+	m_igs017_igs031->set_text_reverse_bits(true);
+}
+
 } // anonymous namespace
 
 
@@ -4872,8 +4921,9 @@ GAME(  2000, tshs,          0,        zhongguo,     tshs,          igs_m027_stat
 GAME(  2000, tshs101,       tshs,     tshs101,      tshs101,       igs_m027_state, init_slqz3,    ROT0, "IGS", "Tiansheng Haoshou (V101CN)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // unemulated sound chips
 GAME(  2006, tswxp,         0,        tct2p,        tswxp,         igs_m027_state, init_tswxp,    ROT0, "IGS", "Taishan Wuxian Jiaqiang Ban (V101CN)", 0 )
 GAME(  2000, mgfx,          0,        mgzz,         mgfx,          igs_m027_state, init_mgfx,     ROT0, "IGS", "Manguan Fuxing (V104T)", 0 )
+GAME(  2004, xyxcxysj,      0,        xyxcxysj,     base,          igs_m027_state, init_xyxcxysj, ROT0, "IGS", "Xingyun Xiaochou / Xingyun Shouji (V233CN)", MACHINE_NOT_WORKING ) // IRQ problems
 // this has a 2nd 8255
-GAME(  2001, extradrw,      0,        extradrw,     base,          igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )
+GAME(  2001, extradrw,      0,        extradrw,     base,          igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING ) // IRQ problems
 // these have an IGS025 protection device instead of the 8255
 GAME(  2002, chessc2,       0,        chessc2,      gonefsh,       igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II (ver. 1445A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME(  2002, gonefsh2,      0,        chessc2,      gonefsh,       igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2 (ver. 1445A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

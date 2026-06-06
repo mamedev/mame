@@ -18,8 +18,13 @@ public:
 	{
 		m_maincpu.set_tag(std::forward<T>(cpu_tag));
 	}
+	template <typename T>
+	isbc_208_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: isbc_208_device(mconfig, tag, owner, 0, std::forward<T>(cpu_tag))
+	{
+	}
 
-	isbc_208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isbc_208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void map(address_map &map) ATTR_COLD;
 	uint8_t stat_r(offs_t offset);

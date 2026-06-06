@@ -7,7 +7,6 @@
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
-#include "machine/generalplus_gpl951xx_soc.h"
 #include "machine/generalplus_gpl1625x_soc.h"
 
 #include "screen.h"
@@ -18,7 +17,7 @@
 class gcm394_game_state : public driver_device, public device_memory_interface
 {
 public:
-	gcm394_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+	gcm394_game_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		device_memory_interface(mconfig, *this),
 		m_maincpu(*this, "maincpu"),
@@ -30,22 +29,21 @@ public:
 	}
 
 	void base(machine_config &config) ATTR_COLD;
-	void base_alt_irq(machine_config &config) ATTR_COLD;
 
 	void cs_map_base(address_map &map) ATTR_COLD;
 
-	virtual uint16_t cs0_r(offs_t offset);
-	virtual void cs0_w(offs_t offset, uint16_t data);
-	virtual uint16_t cs1_r(offs_t offset);
-	virtual void cs1_w(offs_t offset, uint16_t data);
-	virtual uint16_t cs2_r(offs_t offset);
-	virtual void cs2_w(offs_t offset, uint16_t data);
-	virtual uint16_t cs3_r(offs_t offset);
-	virtual void cs3_w(offs_t offset, uint16_t data);
-	virtual uint16_t cs4_r(offs_t offset);
-	virtual void cs4_w(offs_t offset, uint16_t data);
+	virtual u16 cs0_r(offs_t offset);
+	virtual void cs0_w(offs_t offset, u16 data);
+	virtual u16 cs1_r(offs_t offset);
+	virtual void cs1_w(offs_t offset, u16 data);
+	virtual u16 cs2_r(offs_t offset);
+	virtual void cs2_w(offs_t offset, u16 data);
+	virtual u16 cs3_r(offs_t offset);
+	virtual void cs3_w(offs_t offset, u16 data);
+	virtual u16 cs4_r(offs_t offset);
+	virtual void cs4_w(offs_t offset, u16 data);
 
-	void cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4);
+	void cs_callback(u16 cs0, u16 cs1, u16 cs2, u16 cs3, u16 cs4);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -53,13 +51,13 @@ protected:
 
 	virtual space_config_vector memory_space_config() const override ATTR_COLD;
 
-	virtual uint16_t porta_r();
-	virtual uint16_t portb_r();
-	virtual uint16_t portc_r();
-	virtual void porta_w(uint16_t data);
+	virtual u16 porta_r();
+	virtual u16 portb_r();
+	virtual u16 portc_r();
+	virtual void porta_w(u16 data);
 
-	virtual uint16_t read_external_space(offs_t offset) { return m_memory.read_word(offset); }
-	virtual void write_external_space(offs_t offset, uint16_t data) { m_memory.write_word(offset, data); }
+	virtual u16 read_external_space(offs_t offset) { return m_memory.read_word(offset); }
+	virtual void write_external_space(offs_t offset, u16 data) { m_memory.write_word(offset, data); }
 
 	memory_access<32, 1, -1, ENDIANNESS_BIG>::specific m_memory;
 
@@ -68,7 +66,7 @@ protected:
 
 	required_ioport_array<3> m_io;
 
-	optional_region_ptr<uint16_t> m_romregion;
+	optional_region_ptr<u16> m_romregion;
 
 	const address_space_config m_full_mem_config;
 };

@@ -70,7 +70,7 @@ image_manager::image_manager(running_machine &machine)
 				result = image.load(startup_image);
 
 				// failing that, try creating it (if appropriate)
-				if (result.first == std::errc::no_such_file_or_directory && image.support_command_line_image_creation())
+				if (result.first && image.support_command_line_image_creation())
 				{
 					osd_printf_verbose("%s: attempting to create media image %s\n", image.device().tag(), startup_image);
 					result = image.create(startup_image);

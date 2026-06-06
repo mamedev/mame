@@ -1871,7 +1871,7 @@ void spg2xx_game_senspeed_state::senspeed(machine_config &config)
 	    02B 1
 	    A7J4565E
 	*/
-	I2C_24C01(config, "i2cmem", 0); // saves 0x80 bytes, but loading fails?
+	I2C_24C01(config, "i2cmem"); // saves 0x80 bytes, but loading fails?
 }
 
 
@@ -2033,7 +2033,7 @@ void spg2xx_game_tmntmutm_state::tmntmutm(machine_config &config)
 	m_maincpu->guny_in().set(FUNC(spg2xx_game_tmntmutm_state::guny_r));
 	m_maincpu->gunx_in().set(FUNC(spg2xx_game_tmntmutm_state::gunx_r));
 
-	I2C_24C08(config, "i2cmem", 0);
+	I2C_24C08(config, "i2cmem");
 }
 
 uint16_t spg2xx_game_albkickb_state::portb_r(offs_t offset, uint16_t mem_mask)
@@ -2165,7 +2165,7 @@ void spg2xx_game_swclone_state::swclone(machine_config &config)
 	m_maincpu->guny_in().set(FUNC(spg2xx_game_swclone_state::base_guny_r));
 	m_maincpu->gunx_in().set(FUNC(spg2xx_game_swclone_state::base_gunx_r));
 
-	I2C_24C08(config, "i2cmem", 0);
+	I2C_24C08(config, "i2cmem");
 }
 
 
@@ -2224,7 +2224,7 @@ void spg2xx_game_dreamlss_state::dreamlss(machine_config &config)
 	m_maincpu->portb_out().set(FUNC(spg2xx_game_dreamlss_state::portb_w));
 	m_maincpu->portc_out().set(FUNC(spg2xx_game_dreamlss_state::portc_w));
 
-	I2C_24C08(config, "i2cmem", 0);
+	I2C_24C08(config, "i2cmem");
 }
 
 uint16_t spg2xx_game_lpetshop_state::porta_r()
@@ -2259,7 +2259,7 @@ void spg2xx_game_lpetshop_state::lpetshop(machine_config &config)
 	m_maincpu->portb_out().set(FUNC(spg2xx_game_lpetshop_state::portb_w));
 	m_maincpu->portc_out().set(FUNC(spg2xx_game_lpetshop_state::portc_w));
 
-	I2C_24C08(config, "i2cmem", 0);
+	I2C_24C08(config, "i2cmem");
 }
 
 
@@ -2558,7 +2558,7 @@ void spg2xx_game_prail_state::prail(machine_config &config)
 	m_maincpu->portb_out().set(FUNC(spg2xx_game_prail_state::prail_portb_w));
 
 	// TODO: this is not currently hooked up, it's used to store the unlock states for the gallery
-	I2C_24C02(config, "i2cmem", 0); // ATMLH13402C (24C02 compatible)
+	I2C_24C02(config, "i2cmem"); // ATMLH13402C (24C02 compatible)
 }
 
 
@@ -2636,7 +2636,7 @@ void epo_tetr_game_state::epo_tetr(machine_config& config)
 {
 	spg2xx(config);
 
-	I2C_24C02(config, "i2cmem", 0); // S24CS02A
+	I2C_24C02(config, "i2cmem"); // S24CS02A
 
 	m_maincpu->portb_in().set(FUNC(epo_tetr_game_state::epo_tetr_r));
 	m_maincpu->portb_out().set(FUNC(epo_tetr_game_state::epo_tetr_portb_w));

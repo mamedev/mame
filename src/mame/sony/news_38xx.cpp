@@ -285,7 +285,6 @@ protected:
 
 void news_38xx_state::machine_start()
 {
-	m_led.resolve();
 	m_cpu->space(AS_PROGRAM).specific(m_memory_access);
 	m_timer = timer_alloc(FUNC(news_38xx_state::timer), this);
 	m_net_ram = std::make_unique<u16[]>(8192);
@@ -851,8 +850,8 @@ void news_38xx_state::reset_cpu_registers()
 void news_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add("cdrom", NSCSI_CDROM);
-	device.option_add("tape", NSCSI_TAPE);
+	device.option_add("cdrom", NSCSI_CDROM_NEWS);
+	device.option_add("tape", NSCSI_TAPE_NEWS);
 }
 
 void news_38xx_state::common(machine_config &config)
@@ -875,10 +874,10 @@ void news_38xx_state::common(machine_config &config)
 
 	RTC62421(config, m_rtc, 32.768_kHz_XTAL);
 
-	DMAC_0266(config, m_dma[0], 0);
+	DMAC_0266(config, m_dma[0]);
 	m_dma[0]->set_bus(m_iop, 0);
 
-	DMAC_0266(config, m_dma[1], 0);
+	DMAC_0266(config, m_dma[1]);
 	m_dma[1]->set_bus(m_iop, 0);
 
 	SCC85C30(config, m_scc, 4.9152_MHz_XTAL);

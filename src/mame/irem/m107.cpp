@@ -1207,7 +1207,7 @@ void m107_state::firebarr(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &m107_state::sound_map);
 	m_soundcpu->set_decryption_table(rtypeleo_decryption_table);
 
-	PIC8259(config, m_upd71059c, 0);
+	PIC8259(config, m_upd71059c);
 	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(m107_state::scanline_interrupt), "screen", 0, 1);

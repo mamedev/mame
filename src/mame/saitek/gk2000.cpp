@@ -144,6 +144,8 @@ H8/3214 A20 MCU is used in:
 #include "screen.h"
 #include "speaker.h"
 
+#include <bit>
+
 // internal artwork
 #include "saitek_centurion.lh"
 #include "saitek_cougar.lh"
@@ -217,8 +219,6 @@ private:
 
 void gk2000_state::machine_start()
 {
-	m_out_lcd.resolve();
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_lcd_segs));
@@ -229,7 +229,7 @@ INPUT_CHANGED_MEMBER(gk2000_state::gk2000a_change_cpu_freq)
 {
 	// only 20MHz and 14MHz versions are known to exist, but the software supports others
 	static const int xm[9] = { 8, 20, 24, 28, 32, -1, -1, -1, 14 }; // XTAL in MHz (-1 is invalid)
-	int mhz = xm[(count_leading_zeros_32(bitswap<8>(newval,0,1,2,3,4,5,6,7)) - 24) % 9];
+	int mhz = xm[std::countl_zero(u8(bitswap<8>(newval,0,1,2,3,4,5,6,7)))];
 
 	if (mhz > 0)
 		m_maincpu->set_unscaled_clock(mhz * 1'000'000);
@@ -278,7 +278,7 @@ void gk2000_state::update_lcd()
 	for (int i = 0; i < 2; i++)
 	{
 		// LCD common is analog (voltage level)
-		const u8 com = population_count_32(m_lcd_com >> (i * 2) & 3);
+		const u8 com = std::popcount(m_lcd_com >> (i * 2) & 3U);
 		const u32 data = (com == 0) ? m_lcd_segs : (com == 2) ? ~m_lcd_segs : 0;
 		m_lcd_pwm->write_row(i, data);
 	}

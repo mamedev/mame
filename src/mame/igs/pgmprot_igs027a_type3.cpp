@@ -47,6 +47,8 @@
 #include "pgm.h"
 #include "pgmprot_igs027a_type3.h"
 
+#include "endianness.h"
+
 #define LOG_PROT    (1U << 1)
 #define LOG_ALL     (LOG_PROT)
 

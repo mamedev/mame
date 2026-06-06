@@ -153,6 +153,8 @@
 #include "speaker.h"
 #include "screen.h"
 
+#include "endianness.h"
+
 #include "beena.lh"
 #include "tvochken.lh"
 
@@ -1789,7 +1791,7 @@ public:
 
 	void sega_beena(machine_config &config);
 
-	virtual DECLARE_CROSSHAIR_MAPPER_MEMBER(pen_y_mapper);
+	virtual float pen_y_mapper(float linear_value);
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -2019,7 +2021,7 @@ void sega_beena_state::update_sensors(offs_t offset)
 	}
 }
 
-CROSSHAIR_MAPPER_MEMBER(sega_beena_state::pen_y_mapper)
+float sega_beena_state::pen_y_mapper(float linear_value)
 {
 	// TODO: Either remove or adapt for Storyware layout
 	return linear_value;

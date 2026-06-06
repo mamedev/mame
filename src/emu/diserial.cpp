@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "diserial.h"
 
+#include <bit>
+
 #define LOG_SETUP  (1U << 1)
 #define LOG_TX     (1U << 2)
 #define LOG_RX     (1U << 3)
@@ -335,12 +337,12 @@ void device_serial_interface::receive_register_extract()
 	switch (m_df_parity)
 	{
 	case PARITY_ODD:
-		if (parity_received == BIT(population_count_32(data), 0))
+		if (parity_received == BIT(std::popcount(data), 0))
 			m_rcv_parity_error = true;
 		break;
 
 	case PARITY_EVEN:
-		if (parity_received != BIT(population_count_32(data), 0))
+		if (parity_received != BIT(std::popcount(data), 0))
 			m_rcv_parity_error = true;
 		break;
 
@@ -412,10 +414,10 @@ void device_serial_interface::transmit_register_setup(u8 data_byte)
 			// get parity
 			// if parity[0] = 0, data has even parity - i.e. there is an even number of one bits in the data
 			// if parity[0] = 1, data has odd parity - i.e. there is an odd number of one bits in the data
-			parity = BIT(population_count_32(data_byte), 0) ^ 1;
+			parity = BIT(std::popcount(data_byte), 0) ^ 1;
 			break;
 		case PARITY_EVEN:
-			parity = BIT(population_count_32(data_byte), 0);
+			parity = BIT(std::popcount(data_byte), 0);
 			break;
 		case PARITY_MARK:
 			parity = 1;

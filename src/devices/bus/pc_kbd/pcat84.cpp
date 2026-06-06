@@ -371,8 +371,6 @@ void ibm_pc_at_84_keyboard_device::device_start()
 {
 	set_pc_kbdc_device();
 
-	m_leds.resolve();
-
 	// state saving
 	save_item(NAME(m_db));
 	save_item(NAME(m_cnt));
@@ -387,7 +385,6 @@ void ibm_pc_at_84_keyboard_device::device_start()
 
 void ibm_pc_at_84_keyboard_device::device_reset()
 {
-	m_maincpu->reset();
 }
 
 

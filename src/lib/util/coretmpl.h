@@ -333,7 +333,7 @@ using osd::s64;
 template <typename CharT, typename Traits = std::char_traits<CharT> >
 struct transparent_string_equal
 {
-	using is_transparent = std::true_type;
+	using is_transparent = void;
 
 	template <typename AllocA, typename AllocB>
 	bool operator()(std::basic_string<CharT, Traits, AllocA> const &a, std::basic_string<CharT, Traits, AllocB> const &b) const
@@ -368,7 +368,7 @@ struct transparent_string_equal
 template <typename CharT, typename Traits = std::char_traits<CharT> >
 struct transparent_string_less
 {
-	using is_transparent = std::true_type;
+	using is_transparent = void;
 
 	template <typename AllocA, typename AllocB>
 	bool operator()(std::basic_string<CharT, Traits, AllocA> const &a, std::basic_string<CharT, Traits, AllocB> const &b) const
@@ -403,7 +403,7 @@ struct transparent_string_less
 template <typename CharT, typename Traits = std::char_traits<CharT> >
 struct transparent_string_hash : protected std::hash<std::basic_string_view<CharT, Traits> >
 {
-	using is_transparent = std::true_type;
+	using is_transparent = void;
 
 	using std::hash<std::basic_string_view<CharT, Traits> >::operator();
 
@@ -571,19 +571,16 @@ template <typename T, typename U> using equivalent_array_t = typename equivalent
 #define EQUIVALENT_ARRAY(a, T) util::equivalent_array_t<T, std::remove_reference_t<decltype(a)> >
 
 
-template <typename E>
-using enable_enum_t = typename std::enable_if_t<std::is_enum<E>::value, typename std::underlying_type_t<E> >;
-
 // template function which takes a strongly typed enumerator and returns its value as a compile-time constant
 template <typename E>
-constexpr enable_enum_t<E> underlying_value(E e) noexcept
+constexpr std::underlying_type_t<E> underlying_value(E e) noexcept requires std::is_enum_v<E>
 {
 	return static_cast<typename std::underlying_type_t<E> >(e);
 }
 
 // template function which takes an integral value and returns its representation as enumerator (even strongly typed)
 template <typename E , typename T>
-constexpr typename std::enable_if_t<std::is_enum<E>::value && std::is_integral<T>::value, E> enum_value(T value) noexcept
+constexpr E enum_value(T value) noexcept requires (std::is_enum_v<E> && std::is_integral_v<T>)
 {
 	return static_cast<E>(value);
 }
@@ -700,7 +697,7 @@ constexpr std::make_signed_t<T> sext(T value, U width) noexcept
 
 // constexpr absolute value of an integer
 template <typename T>
-constexpr std::enable_if_t<std::is_signed<T>::value, T> iabs(T v) noexcept
+constexpr T iabs(T v) noexcept requires std::is_signed_v<T>
 {
 	return (v < T(0)) ? -v : v;
 }

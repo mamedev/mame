@@ -1260,6 +1260,7 @@ Note: on screen copyright is (c)1998 Coinmaster.
 
 #include "diserial.h"
 #include "emupal.h"
+#include "input.h" // for video debug keys
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
@@ -1294,52 +1295,52 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	void madshark(machine_config &config);
-	void madsharkbl(machine_config &config);
-	void jjsquawb(machine_config &config);
-	void oisipuzl(machine_config &config);
-	void zingzipbl(machine_config &config);
-	void eightfrc(machine_config &config);
-	void gundhara(machine_config &config);
-	void triplfun(machine_config &config);
-	void blandiap(machine_config &config);
-	void wits(machine_config &config);
-	void msgundam(machine_config &config);
-	void msgundamb(machine_config &config);
-	void extdwnhl(machine_config &config);
-	void zingzip(machine_config &config);
-	void wiggie(machine_config &config);
-	void umanclub(machine_config &config);
-	void daioh(machine_config &config);
-	void atehate(machine_config &config);
-	void blockcarb(machine_config &config);
-	void wrofaero(machine_config &config);
-	void blockcar(machine_config &config);
-	void drgnunit(machine_config &config);
-	void stg(machine_config &config);
-	void qzkklogy(machine_config &config);
-	void orbs(machine_config &config);
-	void daiohp(machine_config &config);
-	void krzybowl(machine_config &config);
-	void qzkklgy2(machine_config &config);
-	void kamenrid(machine_config &config);
-	void superbar(machine_config &config);
-	void jjsquawk(machine_config &config);
-	void blandia(machine_config &config);
-	void utoukond(machine_config &config);
-	void rezon(machine_config &config);
+	void madshark(machine_config &config) ATTR_COLD;
+	void madsharkbl(machine_config &config) ATTR_COLD;
+	void jjsquawb(machine_config &config) ATTR_COLD;
+	void oisipuzl(machine_config &config) ATTR_COLD;
+	void zingzipbl(machine_config &config) ATTR_COLD;
+	void eightfrc(machine_config &config) ATTR_COLD;
+	void gundhara(machine_config &config) ATTR_COLD;
+	void triplfun(machine_config &config) ATTR_COLD;
+	void blandiap(machine_config &config) ATTR_COLD;
+	void wits(machine_config &config) ATTR_COLD;
+	void msgundam(machine_config &config) ATTR_COLD;
+	void msgundamb(machine_config &config) ATTR_COLD;
+	void extdwnhl(machine_config &config) ATTR_COLD;
+	void zingzip(machine_config &config) ATTR_COLD;
+	void wiggie(machine_config &config) ATTR_COLD;
+	void umanclub(machine_config &config) ATTR_COLD;
+	void daioh(machine_config &config) ATTR_COLD;
+	void atehate(machine_config &config) ATTR_COLD;
+	void blockcarb(machine_config &config) ATTR_COLD;
+	void wrofaero(machine_config &config) ATTR_COLD;
+	void blockcar(machine_config &config) ATTR_COLD;
+	void drgnunit(machine_config &config) ATTR_COLD;
+	void stg(machine_config &config) ATTR_COLD;
+	void qzkklogy(machine_config &config) ATTR_COLD;
+	void orbs(machine_config &config) ATTR_COLD;
+	void daiohp(machine_config &config) ATTR_COLD;
+	void krzybowl(machine_config &config) ATTR_COLD;
+	void qzkklgy2(machine_config &config) ATTR_COLD;
+	void kamenrid(machine_config &config) ATTR_COLD;
+	void superbar(machine_config &config) ATTR_COLD;
+	void jjsquawk(machine_config &config) ATTR_COLD;
+	void blandia(machine_config &config) ATTR_COLD;
+	void utoukond(machine_config &config) ATTR_COLD;
+	void rezon(machine_config &config) ATTR_COLD;
 
-	void init_wiggie();
-	void init_bankx1();
-	void init_madsharkbl();
+	void init_wiggie() ATTR_COLD;
+	void init_bankx1() ATTR_COLD;
+	void init_madsharkbl() ATTR_COLD;
 
-	void palette_init_RRRRRGGGGGBBBBB_proms(palette_device &palette) const;
+protected:
+	void palette_init_RRRRRGGGGGBBBBB_proms(palette_device &palette) const ATTR_COLD;
 
 	X1_001_SPRITE_GFXBANK_CB_MEMBER(setac_gfxbank_callback);
 
 	u32 screen_update_seta_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-protected:
 	void set_tilemaps_flip(int val) { m_tilemaps_flip = val; }
 
 	virtual void video_start() override ATTR_COLD;
@@ -1439,8 +1440,8 @@ public:
 		seta_state(mconfig, type, tag)
 	{ }
 
-	void thunderl(machine_config &config);
-	void thunderlbl(machine_config &config);
+	void thunderl(machine_config &config) ATTR_COLD;
+	void thunderlbl(machine_config &config) ATTR_COLD;
 
 protected:
 	u16 thunderl_protection_r();
@@ -1465,7 +1466,7 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
-	void magspeed(machine_config &config);
+	void magspeed(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -1488,7 +1489,7 @@ public:
 		m_coins(*this, "COINS")
 	{ }
 
-	void keroppi(machine_config &config);
+	void keroppi(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -1520,11 +1521,8 @@ public:
 		m_gun_recoil(*this, "Player%u_Gun_Recoil", 1U)
 	{ }
 
-	void zombraid(machine_config &config);
-	void init_zombraid();
-
-protected:
-	virtual void machine_start() override ATTR_COLD;
+	void zombraid(machine_config &config) ATTR_COLD;
+	void init_zombraid() ATTR_COLD;
 
 private:
 	double adc_cb(u8 input);
@@ -1550,8 +1548,8 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
-	void setaroul(machine_config &config);
-	void setaroulm(machine_config &config);
+	void setaroul(machine_config &config) ATTR_COLD;
+	void setaroulm(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
 	ioport_value coin_sensors_r();
@@ -1560,7 +1558,6 @@ public:
 	void screen_vblank(int state);
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
@@ -1642,33 +1639,24 @@ private:
 	required_device<ds2430a_device> m_eeprom;
 };
 
-class jockeyc_state : public seta_state
+class jockeyc_state_base : public seta_state
 {
-public:
-	jockeyc_state(const machine_config &mconfig, device_type type, const char *tag) :
+protected:
+	jockeyc_state_base(const machine_config &mconfig, device_type type, const char *tag) :
 		seta_state(mconfig, type, tag),
 		m_rtc(*this, "rtc"),
 		m_hopper1(*this, "hopper1"), m_hopper2(*this, "hopper2"),
-		m_inttoote_700000(*this, "inttoote_700000"),
 		m_key1(*this, "KEY1.%u", 0), m_key2(*this, "KEY2.%u", 0),
 		m_dsw1(*this, "DSW1"),
 		m_dsw2_3(*this, "DSW2_3"),
-		m_cabinet(*this, "CABINET"),
-		m_p1x(*this, "P1X"),
-		m_p1y(*this, "P1Y"),
-		m_out_cancel(*this, "cancel%u", 1U),
-		m_out_payout(*this, "payout%u", 1U),
-		m_out_start(*this, "start%u", 1U),
-		m_out_help(*this, "help"),
-		m_out_itstart(*this, "start")
+		m_cabinet(*this, "CABINET")
 	{ }
 
-	void inttoote(machine_config &config);
-	void jockeyc(machine_config &config);
+protected:
+	virtual void machine_start() override ATTR_COLD;
 
-	void init_inttoote();
+	void jockeyc_base(machine_config &config) ATTR_COLD;
 
-private:
 	void rtc_w(u16 data);
 	u16 rtc_r(offs_t offset);
 
@@ -1676,44 +1664,77 @@ private:
 	u16 comm_r();
 
 	u16 mux_r();
+
+	void update_hoppers();
+	void show_outputs();
+
+	u16 m_mux = 0;
+	u16 m_out = 0;
+
+private:
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+
+	required_device<upd4992_device> m_rtc;  // ! Actually D4911C !
+	required_device<ticket_dispenser_device> m_hopper1, m_hopper2; // the 2nd hopper is optional
+
+	required_ioport_array<5> m_key1, m_key2;
+	required_ioport m_dsw1, m_dsw2_3;
+	optional_ioport m_cabinet;
+};
+
+class jockeyc_state : public jockeyc_state_base
+{
+public:
+	jockeyc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		jockeyc_state_base(mconfig, type, tag),
+		m_p1x(*this, "P1X"),
+		m_p1y(*this, "P1Y"),
+		m_out_cancel(*this, "cancel%u", 1U),
+		m_out_payout(*this, "payout%u", 1U),
+		m_out_start(*this, "start%u", 1U)
+	{ }
+
+	void jockeyc(machine_config &config) ATTR_COLD;
+
+private:
 	void jockeyc_mux_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void jockeyc_out_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	u16 trackball_r(offs_t offset);
 
-	DECLARE_MACHINE_START(jockeyc);
-	DECLARE_MACHINE_START(inttoote);
+	void jockeyc_map(address_map &map) ATTR_COLD;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	optional_ioport m_p1x;
+	optional_ioport m_p1y;
+	output_finder<2> m_out_cancel;
+	output_finder<2> m_out_payout;
+	output_finder<2> m_out_start;
+};
 
+class inttoote_state : public jockeyc_state_base
+{
+public:
+	inttoote_state(const machine_config &mconfig, device_type type, const char *tag) :
+		jockeyc_state_base(mconfig, type, tag),
+		m_inttoote_700000(*this, "inttoote_700000"),
+		m_out_help(*this, "help"),
+		m_out_start(*this, "start")
+	{ }
+
+	void inttoote(machine_config &config) ATTR_COLD;
+
+	void init_inttoote() ATTR_COLD;
+
+private:
 	void inttoote_mux_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void inttoote_out_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 inttoote_700000_r(offs_t offset);
 
 	void inttoote_map(address_map &map) ATTR_COLD;
-	void jockeyc_map(address_map &map) ATTR_COLD;
 
-	required_device<upd4992_device> m_rtc;  // ! Actually D4911C !
-	required_device<ticket_dispenser_device> m_hopper1, m_hopper2; // the 2nd hopper is optional
-
-	optional_shared_ptr<u16> m_inttoote_700000;
-	required_ioport_array<5> m_key1, m_key2;
-	required_ioport m_dsw1, m_dsw2_3;
-	optional_ioport m_cabinet;
-	optional_ioport m_p1x;
-	optional_ioport m_p1y;
-
-	output_finder<2> m_out_cancel;
-	output_finder<2> m_out_payout;
-	output_finder<2> m_out_start;
+	required_shared_ptr<u16> m_inttoote_700000;
 	output_finder<> m_out_help;
-	output_finder<> m_out_itstart;
-
-	u16 m_mux = 0;
-	u16 m_out = 0;
-
-	void update_hoppers();
-	void show_outputs();
+	output_finder<> m_out_start;
 };
 
 
@@ -2787,13 +2808,6 @@ void seta_state::drgnunit_map(address_map &map)
                                 The Roulette
 ***************************************************************************/
 
-void setaroul_state::machine_start()
-{
-	seta_state::machine_start();
-
-	m_leds.resolve();
-}
-
 // Coin drop
 void setaroul_state::machine_reset()
 {
@@ -3631,7 +3645,7 @@ void crazyfgt_state::crazyfgt_map(address_map &map)
 ***************************************************************************/
 
 // RTC (To do: write a D4911C device)
-u16 jockeyc_state::rtc_r(offs_t offset)
+u16 jockeyc_state_base::rtc_r(offs_t offset)
 {
 	if (offset >= 7)
 		++offset;
@@ -3640,30 +3654,27 @@ u16 jockeyc_state::rtc_r(offs_t offset)
 	return (m_rtc->read(offset / 2) >> ((offset & 1) * 4)) & 0xf;
 }
 
-void jockeyc_state::rtc_w(u16 data)
+void jockeyc_state_base::rtc_w(u16 data)
 {
 }
 
 // Outputs
-void jockeyc_state::show_outputs()
+void jockeyc_state_base::show_outputs()
 {
 #ifdef MAME_DEBUG
 	popmessage("Mux: %04X Out: %04X", m_mux & (~0xf8), m_out);
 #endif
 }
 
-u16 jockeyc_state::mux_r()
+u16 jockeyc_state_base::mux_r()
 {
-	switch (m_mux & 0xf8)
+	u16 result = 0xffff;
+	for (unsigned i = 0; 5 > i; ++i)
 	{
-		case 0x08:  return (m_key2[0]->read() << 8) | m_key1[0]->read();
-		case 0x10:  return (m_key2[1]->read() << 8) | m_key1[1]->read();
-		case 0x20:  return (m_key2[2]->read() << 8) | m_key1[2]->read();
-		case 0x40:  return (m_key2[3]->read() << 8) | m_key1[3]->read();
-		case 0x80:  return (m_key2[4]->read() << 8) | m_key1[4]->read();
+		if (BIT(m_mux, i + 3))
+			result &= (m_key2[i]->read() << 8) | m_key1[i]->read();
 	}
-	logerror("%06X: unknown key read, mux = %04x\n", m_maincpu->pc(), m_mux);
-	return 0xffff;
+	return result;
 }
 
 void jockeyc_state::jockeyc_mux_w(offs_t offset, u16 data, u16 mem_mask)
@@ -3716,15 +3727,15 @@ void jockeyc_state::jockeyc_out_w(offs_t offset, u16 data, u16 mem_mask)
 	m_out_start[0] = BIT(data, 14);
 	m_out_cancel[1] = BIT(data, 5);
 
-	machine().bookkeeping().coin_counter_w(6, data  & 0x2000); // coin 2/4
-	machine().bookkeeping().coin_counter_w(5, data  & 0x1000); // p1 hopper coin out
-	machine().bookkeeping().coin_counter_w(2, data  & 0x0200); // coin 1/3
+	machine().bookkeeping().coin_counter_w(6, BIT(data, 13)); // coin 2/4
+	machine().bookkeeping().coin_counter_w(5, BIT(data, 12)); // p1 hopper coin out
+	machine().bookkeeping().coin_counter_w(2, BIT(data,  9)); // coin 1/3
 
 	update_hoppers();
 	show_outputs();
 }
 
-void jockeyc_state::update_hoppers()
+void jockeyc_state_base::update_hoppers()
 {
 	if (!m_cabinet)
 		return;
@@ -3742,7 +3753,7 @@ void jockeyc_state::update_hoppers()
 	}
 }
 
-u16 jockeyc_state::dsw_r(offs_t offset)
+u16 jockeyc_state_base::dsw_r(offs_t offset)
 {
 	const int shift = offset * 4;
 	return  ((((m_dsw1->read()   >> shift)     & 0xf)) << 0) |
@@ -3750,7 +3761,7 @@ u16 jockeyc_state::dsw_r(offs_t offset)
 			((((m_dsw2_3->read() >> (shift+8)) & 0xf)) << 8) ;
 }
 
-u16 jockeyc_state::comm_r()
+u16 jockeyc_state_base::comm_r()
 {
 	return 0xffff;//machine().rand();
 }
@@ -3826,7 +3837,7 @@ void jockeyc_state::jockeyc_map(address_map &map)
 
 // Same as Jockey Club but with additional protection
 
-void jockeyc_state::inttoote_mux_w(offs_t offset, u16 data, u16 mem_mask)
+void inttoote_state::inttoote_mux_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_mux);
 
@@ -3835,13 +3846,13 @@ void jockeyc_state::inttoote_mux_w(offs_t offset, u16 data, u16 mem_mask)
 	// 0x0800 lamp (start button)
 
 	m_out_help = BIT(data, 12);
-	m_out_itstart = BIT(data, 11);
+	m_out_start = BIT(data, 11);
 
 	update_hoppers();
 	show_outputs();
 }
 
-void jockeyc_state::inttoote_out_w(offs_t offset, u16 data, u16 mem_mask)
+void inttoote_state::inttoote_out_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_out);
 
@@ -3851,27 +3862,27 @@ void jockeyc_state::inttoote_out_w(offs_t offset, u16 data, u16 mem_mask)
 	// 0x0100 meter (key out)
 	// 0x0080 ? set when there are credits
 
-	machine().bookkeeping().coin_counter_w(0, data  & 0x2000); // key in
-	machine().bookkeeping().coin_counter_w(1, data  & 0x1000); // coin out
-	machine().bookkeeping().coin_counter_w(2, data  & 0x0800); // coin in
-	machine().bookkeeping().coin_counter_w(3, data  & 0x0100); // key out
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 13)); // key in
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 12)); // coin out
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 11)); // coin in
+	machine().bookkeeping().coin_counter_w(3, BIT(data,  8)); // key out
 
 	update_hoppers();
 	show_outputs();
 }
 
-u16 jockeyc_state::inttoote_700000_r(offs_t offset)
+u16 inttoote_state::inttoote_700000_r(offs_t offset)
 {
 	return m_inttoote_700000[offset] & 0x3f;
 }
 
-void jockeyc_state::inttoote_map(address_map &map)
+void inttoote_state::inttoote_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom(); // ROM (up to 2MB)
 
-	map(0x200000, 0x200001).rw(FUNC(jockeyc_state::mux_r), FUNC(jockeyc_state::inttoote_mux_w));
+	map(0x200000, 0x200001).rw(FUNC(inttoote_state::mux_r), FUNC(inttoote_state::inttoote_mux_w));
 	map(0x200002, 0x200003).portr("COIN");
-	map(0x200010, 0x200011).portr("SERVICE").w(FUNC(jockeyc_state::inttoote_out_w));
+	map(0x200010, 0x200011).portr("SERVICE").w(FUNC(inttoote_state::inttoote_out_w));
 
 	map(0x300000, 0x300001).w(m_watchdog, FUNC(watchdog_timer_device::reset16_w));
 
@@ -3880,11 +3891,11 @@ void jockeyc_state::inttoote_map(address_map &map)
 	map(0x300040, 0x300041).nopw();    // lev4 ack
 	map(0x300060, 0x300061).nopw();    // lev6 ack
 
-	map(0x500000, 0x500003).r(FUNC(jockeyc_state::dsw_r)); // DSW x 3
+	map(0x500000, 0x500003).r(FUNC(inttoote_state::dsw_r)); // DSW x 3
 
-	map(0x700000, 0x700101).ram().r(FUNC(jockeyc_state::inttoote_700000_r)).share("inttoote_700000");
+	map(0x700000, 0x700101).ram().r(FUNC(inttoote_state::inttoote_700000_r)).share(m_inttoote_700000);
 
-	map(0x800000, 0x80001f).rw(FUNC(jockeyc_state::rtc_r), FUNC(jockeyc_state::rtc_w));
+	map(0x800000, 0x80001f).rw(FUNC(inttoote_state::rtc_r), FUNC(inttoote_state::rtc_w));
 
 	map(0x900000, 0x903fff).rw(m_x1snd, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 
@@ -7798,7 +7809,7 @@ void setaroul_state::setaroul(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	X1_001(config, m_spritegen, 16_MHz_XTAL, m_palette, gfx_setaroul_sprites);
-	m_spritegen->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	m_spritegen->set_gfxbank_callback(FUNC(setaroul_state::setac_gfxbank_callback));
 	// position kludges
 	m_spritegen->set_fg_xoffsets(0, 7); // unknown (flipped offsets are unused: game handles flipping manually without setting the flip bit)
 	m_spritegen->set_fg_yoffsets(-0x12, 0x0e);
@@ -7809,7 +7820,7 @@ void setaroul_state::setaroul(machine_config &config)
 
 	// devices
 	UPD4992(config, m_rtc, 32'768); // ! Actually D4911C !
-	ACIA6850(config, "acia0", 0);
+	ACIA6850(config, "acia0");
 	TICKET_DISPENSER(config, "hopper", attotime::from_msec(150));
 
 	// video hardware
@@ -7955,7 +7966,7 @@ void seta_state::gundhara(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::wrofaero_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
-	pit8254_device &pit(PIT8254(config, "pit", 0)); // uPD71054C
+	pit8254_device &pit(PIT8254(config, "pit")); // uPD71054C
 	pit.set_clk<0>(16000000/2/8);
 	pit.out_handler<0>().set(FUNC(seta_state::pit_out0));
 
@@ -7994,13 +8005,6 @@ void seta_state::gundhara(machine_config &config)
 /***************************************************************************
                                 Zombie Raid
 ***************************************************************************/
-
-void zombraid_state::machine_start()
-{
-	seta_state::machine_start();
-
-	m_gun_recoil.resolve();
-}
 
 void zombraid_state::zombraid(machine_config &config)
 {
@@ -8117,7 +8121,7 @@ void seta_state::kamenrid(machine_config &config)
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
-	pit8254_device &pit(PIT8254(config, "pit", 0)); // uPD71054C
+	pit8254_device &pit(PIT8254(config, "pit")); // uPD71054C
 	pit.set_clk<0>(16000000/2/8);
 	pit.out_handler<0>().set(FUNC(seta_state::pit_out0));
 
@@ -8286,7 +8290,7 @@ void seta_state::madshark(machine_config &config)
 	M68000(config, m_maincpu, 16000000);   // 16 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::madshark_map);
 
-	pit8254_device &pit(PIT8254(config, "pit", 0)); // uPD71054C
+	pit8254_device &pit(PIT8254(config, "pit")); // uPD71054C
 	pit.set_clk<0>(16000000/2/8);
 	pit.out_handler<0>().set(FUNC(seta_state::pit_out0));
 
@@ -8367,8 +8371,6 @@ void magspeed_state::machine_start()
 {
 	seta_state::machine_start();
 
-	m_leds.resolve();
-
 	save_item(NAME(m_lights));
 }
 
@@ -8381,7 +8383,7 @@ void magspeed_state::magspeed(machine_config &config)
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
-	pit8254_device &pit(PIT8254(config, "pit", 0)); // uPD71054C
+	pit8254_device &pit(PIT8254(config, "pit")); // uPD71054C
 	pit.set_clk<0>(16000000/2/8);
 	pit.out_handler<0>().set(FUNC(magspeed_state::pit_out0));
 
@@ -8428,7 +8430,7 @@ void seta_state::msgundam(machine_config &config)
 	M68000(config, m_maincpu, 16000000);   // 16 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::msgundam_map);
 
-	pit8254_device &pit(PIT8254(config, "pit", 0)); // uPD71054C
+	pit8254_device &pit(PIT8254(config, "pit")); // uPD71054C
 	pit.set_clk<0>(16000000/2/8);
 	pit.out_handler<0>().set(FUNC(seta_state::pit_out0));
 
@@ -8862,7 +8864,7 @@ void seta_state::wrofaero(machine_config &config)
 	M68000(config, m_maincpu, 16000000);   // 16 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::wrofaero_map);
 
-	pit8254_device &pit(PIT8254(config, "pit", 0)); // uPD71054C
+	pit8254_device &pit(PIT8254(config, "pit")); // uPD71054C
 	pit.set_clk<0>(16000000/2/8);
 	pit.out_handler<0>().set(FUNC(seta_state::pit_out0));
 
@@ -9055,7 +9057,7 @@ void crazyfgt_state::crazyfgt(machine_config &config)
 ***************************************************************************/
 
 // Test mode shows a 16ms and 2ms counters, then there's vblank and presumably ACIA irqs ...
-TIMER_DEVICE_CALLBACK_MEMBER(jockeyc_state::interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(jockeyc_state_base::interrupt)
 {
 	int scanline = param;
 
@@ -9073,25 +9075,24 @@ TIMER_DEVICE_CALLBACK_MEMBER(jockeyc_state::interrupt)
 		m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
-MACHINE_START_MEMBER(jockeyc_state, jockeyc)
+void jockeyc_state_base::machine_start()
 {
-	m_out_cancel.resolve();
-	m_out_payout.resolve();
-	m_out_start.resolve();
+	seta_state::machine_start();
+
+	save_item(NAME(m_mux));
+	save_item(NAME(m_out));
 }
 
 
-void jockeyc_state::jockeyc(machine_config &config)
+void jockeyc_state_base::jockeyc_base(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, XTAL(16'000'000)/2); // TMP68000N-8
-	m_maincpu->set_addrmap(AS_PROGRAM, &jockeyc_state::jockeyc_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(jockeyc_state::interrupt), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(jockeyc_state_base::interrupt), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_seconds(2.0)); // jockeyc: watchdog test error if over 2.5s
 
 	X1_001(config, m_spritegen, 16000000, m_palette, gfx_sprites);
-	m_spritegen->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	m_spritegen->set_gfxbank_callback(FUNC(jockeyc_state_base::setac_gfxbank_callback));
 	// position kludges
 	m_spritegen->set_fg_xoffsets(0, 0); // sprites correct? (bets), tilemap correct (test grid)
 	m_spritegen->set_fg_yoffsets(-0x12+8, 0x0e);
@@ -9099,10 +9100,9 @@ void jockeyc_state::jockeyc(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_MACHINE_START_OVERRIDE(jockeyc_state, jockeyc)
 	// devices
 	UPD4992(config, m_rtc, 32'768); // ! Actually D4911C !
-	ACIA6850(config, "acia0", 0);
+	ACIA6850(config, "acia0");
 	TICKET_DISPENSER(config, "hopper1", attotime::from_msec(150));
 	TICKET_DISPENSER(config, "hopper2", attotime::from_msec(150));
 
@@ -9112,12 +9112,12 @@ void jockeyc_state::jockeyc(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(seta_state::screen_update_seta_layers));
+	screen.set_screen_update(FUNC(jockeyc_state_base::screen_update_seta_layers));
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_drgnunit).set_xoffsets(126, -2);
 	m_layers[0]->set_screen(m_screen);
-	PALETTE(config, m_palette, FUNC(seta_state::palette_init_RRRRRGGGGGBBBBB_proms), 512 * 1);
+	PALETTE(config, m_palette, FUNC(jockeyc_state_base::palette_init_RRRRRGGGGGBBBBB_proms), 512 * 1);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
@@ -9125,6 +9125,14 @@ void jockeyc_state::jockeyc(machine_config &config)
 	X1_010(config, m_x1snd, 16000000);
 	m_x1snd->add_route(0, "speaker", 1.0, 0);
 	m_x1snd->add_route(1, "speaker", 1.0, 1);
+}
+
+void jockeyc_state::jockeyc(machine_config &config)
+{
+	jockeyc_base(config);
+
+	M68000(config, m_maincpu, XTAL(16'000'000)/2); // TMP68000N-8
+	m_maincpu->set_addrmap(AS_PROGRAM, &jockeyc_state::jockeyc_map);
 
 	// layout
 	config.set_default_layout(layout_jockeyc);
@@ -9135,20 +9143,12 @@ void jockeyc_state::jockeyc(machine_config &config)
                              International Toote
 ***************************************************************************/
 
-MACHINE_START_MEMBER(jockeyc_state, inttoote)
+void inttoote_state::inttoote(machine_config &config)
 {
-	m_out_help.resolve();
-	m_out_itstart.resolve();
-}
+	jockeyc_base(config);
 
-void jockeyc_state::inttoote(machine_config &config)
-{
-	jockeyc(config);
-
-	M68000(config.replace(), m_maincpu, XTAL(16'000'000)); // TMP68HC000N-16
-	m_maincpu->set_addrmap(AS_PROGRAM, &jockeyc_state::inttoote_map);
-
-	MCFG_MACHINE_START_OVERRIDE(jockeyc_state, inttoote)
+	M68000(config, m_maincpu, XTAL(16'000'000)); // TMP68HC000N-16
+	m_maincpu->set_addrmap(AS_PROGRAM, &inttoote_state::inttoote_map);
 
 	m_layers[0]->set_xoffsets(0, -2);
 
@@ -9156,8 +9156,8 @@ void jockeyc_state::inttoote(machine_config &config)
 	PIA6821(config, "pia0");
 	PIA6821(config, "pia1");
 
-	ACIA6850(config, "acia1", 0);
-	ACIA6850(config, "acia2", 0);
+	ACIA6850(config, "acia1");
+	ACIA6850(config, "acia2");
 
 	// layout
 	config.set_default_layout(layout_inttoote);
@@ -11255,7 +11255,7 @@ void seta_state::init_wiggie()
 	}
 }
 
-void jockeyc_state::init_inttoote()
+void inttoote_state::init_inttoote()
 {
 	// code patches due to unemulated protection (to be removed...)
 	u16 *ROM = (u16 *)memregion( "maincpu" )->base();
@@ -11293,7 +11293,7 @@ GAME( 1994, superbar,  wiggie,   superbar,  thunderl,  seta_state,     init_wigg
 
 GAME( 1990, jockeyc,   0,        jockeyc,   jockeyc,   jockeyc_state,  empty_init,     ROT0,   "Seta (Visco license)",      "Jockey Club (v1.18)", 0 )
 GAME( 1993, inttoote2, jockeyc,  jockeyc,   jockeyc,   jockeyc_state,  empty_init,     ROT0,   "bootleg (Coinmaster)",      "International Toote II (v1.24, P387.V01)", 0 )
-GAME( 1998, inttoote,  jockeyc,  inttoote,  inttoote,  jockeyc_state,  init_inttoote,  ROT0,   "bootleg (Coinmaster)",      "International Toote (Germany, P523.V01)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1998, inttoote,  jockeyc,  inttoote,  inttoote,  inttoote_state, init_inttoote,  ROT0,   "bootleg (Coinmaster)",      "International Toote (Germany, P523.V01)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1990, gderby,    jockeyc,  jockeyc,   jockeyc,   jockeyc_state,  empty_init,     ROT0,   "hack (CODERE)",             "Gran Derby (Spanish hack of Jockey Club)", 0 )
 
 GAME( 1992, rezon,     0,        rezon,     rezon,     seta_state,     empty_init,     ROT0,   "Allumer",                   "Rezon", 0 ) // License: Jumper

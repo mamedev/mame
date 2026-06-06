@@ -85,11 +85,11 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void p0(machine_config &config);   // base config
-	void p2(machine_config &config);   // multi-mode card
-	void p3(machine_config &config);   // unknown card
-	void r1(machine_config &config);   // r1
-	void r1v(machine_config &config);  // r1 with votrax
+	void p0(machine_config &config) ATTR_COLD;   // base config
+	void p2(machine_config &config) ATTR_COLD;   // multi-mode card
+	void p3(machine_config &config) ATTR_COLD;   // unknown card
+	void r1(machine_config &config) ATTR_COLD;   // r1
+	void r1v(machine_config &config) ATTR_COLD;  // r1 with votrax
 	DECLARE_INPUT_CHANGED_MEMBER(slam_w);
 
 protected:
@@ -499,9 +499,6 @@ void gts80a_state::port3b_w(u8 data)
 
 void gts80a_state::machine_start()
 {
-	m_digits.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_lamprow));
 	save_item(NAME(m_swrow));
 	save_item(NAME(m_segment));

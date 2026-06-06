@@ -69,9 +69,9 @@ public:
 		m_p1_unknown = 0x00;
 	}
 
-	void splus(machine_config &config);
+	void splus(machine_config &config) ATTR_COLD;
 
-	void init_splus();
+	void init_splus() ATTR_COLD;
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -116,12 +116,6 @@ private:
 
 	int16_t m_stepper_pos[5];
 	uint8_t m_stop_pos[5];
-
-	virtual void machine_start() override
-	{
-		m_digits.resolve();
-		m_leds.resolve();
-	}
 
 	// Pointers to External RAM
 	required_shared_ptr<uint8_t> m_cmosl_ram;

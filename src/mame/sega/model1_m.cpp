@@ -12,9 +12,6 @@
 
 void model1_state::machine_start()
 {
-	m_digits.resolve();
-	m_outs.resolve();
-
 	m_copro_ram_data = std::make_unique<u32[]>(0x2000);
 
 	save_pointer(NAME(m_copro_ram_data), 0x2000);

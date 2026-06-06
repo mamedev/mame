@@ -42,6 +42,8 @@
 #include "formats/ap_dsk35.h"
 #include "layout/generic.h"
 
+#include "endianness.h"
+
 #define LOG_RAM (1U << 1)
 
 #define VERBOSE (0)
@@ -127,7 +129,7 @@ void v8_device::device_add_mconfig(machine_config &config)
 	m_pseudovia->writevideo_handler().set(FUNC(v8_device::via2_video_config_w));
 	m_pseudovia->irq_callback().set(FUNC(v8_device::via2_irq));
 
-	ARIEL(config, m_ariel, 0);
+	ARIEL(config, m_ariel);
 }
 
 //-------------------------------------------------

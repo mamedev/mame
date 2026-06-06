@@ -79,7 +79,7 @@ class rc2014_bus_device : public device_t
 {
 public:
 	// construction/destruction
-	rc2014_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rc2014_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~rc2014_bus_device();
 
 	void clk_w(int state);
@@ -177,7 +177,7 @@ class rc2014_ext_bus_device : public rc2014_bus_device
 {
 public:
 	// construction/destruction
-	rc2014_ext_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rc2014_ext_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void clk2_w(int state);
 	void page_w(int state);
@@ -258,7 +258,7 @@ class rc2014_rc80_bus_device : public rc2014_ext_bus_device
 {
 public:
 	// construction/destruction
-	rc2014_rc80_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rc2014_rc80_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void add_card(device_rc2014_rc80_card_interface &card);
 

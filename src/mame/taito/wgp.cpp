@@ -410,6 +410,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "sound/ymopn.h"
 
 #include "emupal.h"
+#include "input.h" // for video debug keys
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
@@ -1644,7 +1645,7 @@ void wgp_state::wgp(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(30000));
 
-	TC0220IOC(config, m_tc0220ioc, 0);
+	TC0220IOC(config, m_tc0220ioc);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
@@ -1673,7 +1674,7 @@ void wgp_state::wgp(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wgp);
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_palette(m_palette);
 
 	// sound hardware
@@ -1686,7 +1687,7 @@ void wgp_state::wgp(machine_config &config)
 	ymsnd.add_route(1, "speaker", 1.0, 0);
 	ymsnd.add_route(2, "speaker", 1.0, 1);
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_tc0140syt->reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }

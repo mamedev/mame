@@ -123,6 +123,7 @@ TODO:
 
 #include "asmjit/asmjit/a64.h"
 
+#include <bit>
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
@@ -286,14 +287,14 @@ inline bool is_valid_immediate_mask(uint64_t val, size_t bytes)
 	}
 
 	// check if set bits are contiguous
-	const auto lz = count_leading_zeros_64(val & make_bitmask<uint64_t>(width));
+	const auto lz = std::countl_zero(val & make_bitmask<uint64_t>(width));
 	const uint64_t invleftaligned = ~(val << lz);
 	if (!(invleftaligned & (invleftaligned + 1)))
 		return true;
 
 	// what about unset bits?
 	val = ~val;
-	const auto ls = count_leading_zeros_64(val & make_bitmask<uint64_t>(width));
+	const auto ls = std::countl_zero(val & make_bitmask<uint64_t>(width));
 	const uint64_t inv2leftaligned = ~(val << ls);
 	return !(inv2leftaligned & (inv2leftaligned + 1));
 }
@@ -1066,7 +1067,7 @@ inline a64::Mem drcbe_arm64::emit_loadstore_address_setup(a64::Assembler &a, con
 		const a64::Gp indreg = TEMP_REG3.x();
 		if (indp.is_int_register())
 			a.sxtw(indreg, indp.get_register_int(4));
-		else if ((util::endianness::native == util::endianness::big) && indp.is_cold_register())
+		else if ((std::endian::native == std::endian::big) && indp.is_cold_register())
 			emit_ldrsw_mem(a, indreg, reinterpret_cast<uint8_t *>(indp.memory()) + 4);
 		else
 			emit_ldrsw_mem(a, indreg, indp.memory());
@@ -1271,7 +1272,7 @@ void drcbe_arm64::mov_reg_param(a64::Assembler &a, uint32_t regsize, const a64::
 	}
 	else if (src.is_memory())
 	{
-		if ((util::endianness::native == util::endianness::big) && (regsize == 4) && src.is_cold_register())
+		if ((std::endian::native == std::endian::big) && (regsize == 4) && src.is_cold_register())
 			emit_ldr_mem(a, dstreg, reinterpret_cast<uint8_t *>(src.memory()) + 4);
 		else
 			emit_ldr_mem(a, dstreg, src.memory());
@@ -1370,7 +1371,7 @@ void drcbe_arm64::mov_mem_param(a64::Assembler &a, uint32_t regsize, void *dst, 
 	}
 	else if (src.is_memory())
 	{
-		if ((util::endianness::native == util::endianness::big) && (regsize == 4) && src.is_cold_register())
+		if ((std::endian::native == std::endian::big) && (regsize == 4) && src.is_cold_register())
 			emit_ldr_mem(a, scratch, reinterpret_cast<uint8_t *>(src.memory()) + 4);
 		else
 			emit_ldr_mem(a, scratch, src.memory());
@@ -1600,7 +1601,7 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 			accessors.address_mask = m_space[space]->addrmask() & make_bitmask<offs_t>(accessors.specific.address_width) & ~make_bitmask<offs_t>(accessors.specific.native_mask_bits);
 			offs_t const shiftedmask = accessors.address_mask >> accessors.specific.low_bits;
 			offs_t const nomask = ~offs_t(0);
-			accessors.high_bits = 32 - count_leading_zeros_32(shiftedmask);
+			accessors.high_bits = std::bit_width(shiftedmask);
 			accessors.no_mask = nomask == accessors.address_mask;
 			accessors.mask_simple = !accessors.no_mask && is_valid_immediate_mask(accessors.address_mask, 4);
 			accessors.mask_high_bits = (shiftedmask & (shiftedmask + 1)) != 0;
@@ -3348,7 +3349,7 @@ void drcbe_arm64::op_sext(a64::Assembler &a, const uml::instruction &inst)
 		if (srcp.is_memory())
 		{
 			uintptr_t mem = uintptr_t(srcp.memory());
-			if (util::endianness::native == util::endianness::big)
+			if (std::endian::native == std::endian::big)
 				mem ^= (inst.size() - 1) & ~((1 << size) - 1);
 
 			if (size == SIZE_BYTE)
@@ -3570,8 +3571,8 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 	if (maskp.is_immediate() && shiftp.is_immediate() && !maskp.is_immediate_value(util::make_bitmask<uint64_t>(instbits)))
 	{
 		// A mask of all 1s will be handled efficiently in the unoptimized path, so only optimize for the other cases if possible
-		const auto pop = population_count_64(maskp.immediate());
-		const auto lz = count_leading_zeros_64(maskp.immediate()) & (instbits - 1);
+		const auto pop = std::popcount(maskp.immediate());
+		const auto lz = std::countl_zero(maskp.immediate()) & (instbits - 1);
 		const auto invlamask = ~(maskp.immediate() << lz) & instmask;
 		const bool is_contiguous = (invlamask & (invlamask + 1)) == 0;
 		const auto s = shiftp.immediate() & (instbits - 1);
@@ -3678,8 +3679,8 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 	bool optimized = false;
 	if (maskp.is_immediate() && shiftp.is_immediate())
 	{
-		const auto pop = population_count_64(maskp.immediate());
-		const auto lz = count_leading_zeros_64(maskp.immediate()) & (instbits - 1);
+		const auto pop = std::popcount(maskp.immediate());
+		const auto lz = std::countl_zero(maskp.immediate()) & (instbits - 1);
 		const auto invlamask = ~(maskp.immediate() << lz) & util::make_bitmask<uint64_t>(instbits);
 		const bool is_right_aligned = (maskp.immediate() & (maskp.immediate() + 1)) == 0;
 		const bool is_contiguous = (invlamask & (invlamask + 1)) == 0;
@@ -5252,7 +5253,7 @@ void drcbe_arm64::op_fload(a64::Assembler &a, const uml::instruction &inst)
 		const a64::Gp indreg = TEMP_REG1.x();
 		if (indp.is_int_register())
 			a.sxtw(indreg, indp.get_register_int(4));
-		else if ((util::endianness::native == util::endianness::big) && indp.is_cold_register())
+		else if ((std::endian::native == std::endian::big) && indp.is_cold_register())
 			emit_ldrsw_mem(a, indreg, reinterpret_cast<uint8_t *>(indp.memory()) + 4);
 		else
 			emit_ldrsw_mem(a, indreg, indp.memory());
@@ -5289,7 +5290,7 @@ void drcbe_arm64::op_fstore(a64::Assembler &a, const uml::instruction &inst)
 		const a64::Gp indreg = TEMP_REG1.x();
 		if (indp.is_int_register())
 			a.sxtw(indreg, indp.get_register_int(4));
-		else if ((util::endianness::native == util::endianness::big) && indp.is_cold_register())
+		else if ((std::endian::native == std::endian::big) && indp.is_cold_register())
 			emit_ldrsw_mem(a, indreg, reinterpret_cast<uint8_t *>(indp.memory()) + 4);
 		else
 			emit_ldrsw_mem(a, indreg, indp.memory());

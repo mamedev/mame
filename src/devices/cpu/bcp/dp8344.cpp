@@ -40,7 +40,10 @@
 
 #include "emu.h"
 #include "cpu/bcp/dp8344.h"
+
 #include "cpu/bcp/bcpdasm.h"
+
+#include <bit>
 
 
 //**************************************************************************
@@ -857,7 +860,7 @@ void dp8344_device::transmit_fifo_push(u8 data)
 			// Calculate odd parity on 3270 data frames
 			if (!BIT(m_tcr, 2))
 			{
-				if ((population_count_32(data) & 1) == 0)
+				if ((std::popcount(data) & 1) == 0)
 					frame |= 0x100;
 				else
 					frame &= 0x2ff;
@@ -865,7 +868,7 @@ void dp8344_device::transmit_fifo_push(u8 data)
 
 			// Calculate word parity
 			frame &= 0x3ff;
-			if ((population_count_32(frame) & 1) != BIT(m_tcr, 3))
+			if ((std::popcount(frame) & 1) != BIT(m_tcr, 3))
 				frame |= 0x400;
 		}
 		receive_fifo_push(frame);

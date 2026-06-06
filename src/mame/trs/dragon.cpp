@@ -509,7 +509,7 @@ void dragon_state::dragon_base(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("dragon_cass");
 
-	PRINTER(config, m_printer, 0);
+	PRINTER(config, m_printer);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -565,7 +565,7 @@ void dragon64_state::dragon64(machine_config &config)
 	m_cococart->halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	// acia
-	MOS6551(config, m_acia, 0);
+	MOS6551(config, m_acia);
 	m_acia->set_xtal(1.8432_MHz_XTAL);
 	m_acia->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));

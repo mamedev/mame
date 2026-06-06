@@ -124,8 +124,13 @@ public:
 	{
 		m_gfxdecode.set_tag(std::forward<T>(decode_tag));
 	}
+	template <typename T> segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&decode_tag)
+		: segaic16_video_device(mconfig, tag, owner, 0, std::forward<T>(decode_tag))
+	{
+		m_gfxdecode.set_tag(std::forward<T>(decode_tag));
+	}
 
-	segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
 	template <typename... T> void set_pagelatch_cb(T &&... args) { m_pagelatch_cb.set(std::forward<T>(args)...); }
