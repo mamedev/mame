@@ -191,24 +191,10 @@ public:
 	void mark_dirty(u32 code) { if (code < elements()) { m_dirty[code] = 1; m_dirtyseq++; } }
 	void mark_all_dirty() { memset(&m_dirty[0], 1, elements()); }
 
-	void decode_data(u32 code)
-	{
-		assert(code < elements());
-		if (code < m_dirty.size() && m_dirty[code])
-			decode(code);
-	}
-
-	void decode_all()
-	{
-		for (int i = 0; i < elements(); i++)
-		{
-			decode_data(i);
-		}
-	}
-
 	const u8 *get_data(u32 code)
 	{
-		decode_data(code);
+		assert(code < elements());
+		if (code < m_dirty.size() && m_dirty[code]) decode(code);
 		return m_gfxdata + code * m_char_modulo + m_starty * m_line_modulo + m_startx;
 	}
 
@@ -219,11 +205,12 @@ public:
 		return m_pen_usage[code];
 	}
 
-	// used by gfx viewer, get original data regardless source clip
-	const u8 *get_source_data(u32 code)
+	void decode_all()
 	{
-		decode_data(code);
-		return m_gfxdata + code * m_char_modulo;
+		for (int i = 0; i < elements(); i++)
+		{
+			get_data(i);
+		}
 	}
 
 	// ----- core graphics drawing -----
