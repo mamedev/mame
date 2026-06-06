@@ -14,6 +14,8 @@
 #include "machine/ram.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
+#include "machine/buffer.h"
+#include "machine/output_latch.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "x820kb.h"
@@ -86,6 +88,7 @@ public:
 	uint8_t kbpio_pb_r();
 	void fdc_intrq_w(int state);
 	void fdc_drq_w(int state);
+	void cpu_halt_w(int state);
 
 protected:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -130,6 +133,8 @@ protected:
 	bool m_fdc_drq = false;                     /* data request */
 	int m_8n5 = 0;                          /* 5.25" / 8" drive select */
 	int m_400_460 = 0;                      /* double sided disk detect */
+	uint8_t m_fdc_xor = 0xff;               /* FDC data-bus inversion (0xff = first-gen FD1771; 0x00 = 820-II FD1797) */
+	bool m_cpu_halted = false;              /* Z80 /HALT, tracked via halt_cb to gate the FDC /NMI */
 };
 
 class bigboard_state : public xerox820_state
@@ -161,9 +166,12 @@ public:
 	xerox820ii_state(const machine_config &mconfig, device_type type, const char *tag) :
 		xerox820_state(mconfig, type, tag),
 		m_speaker(*this, "speaker"),
-		m_sasibus(*this, SASIBUS_TAG)
+		m_sasibus(*this, SASIBUS_TAG),
+		m_sasi_hd(*this, SASIBUS_TAG ":1:harddisk")
 	{
 	}
+
+	uint8_t kbpio_pa_r(); // adds the 820-II disk-board personality bits to the base PA read
 
 	void bell_w(offs_t offset, uint8_t data);
 	void slden_w(offs_t offset, uint8_t data);
@@ -172,18 +180,41 @@ public:
 	void sync_w(offs_t offset, uint8_t data);
 
 	void rdpio_pb_w(uint8_t data);
+	uint8_t rdpio_pb_r();
 	void rdpio_pardy_w(int state);
+	void sasi_data_w(uint8_t data); // port-A out -> SASI data bus + assert ACK (U11 74LS74 set via PARDY)
+	void sasi_req_w(int state);     // SASI REQ -> status bit3 + clears ACK FF (handshake)
+	void sasi_io_w(int state);      // SASI I/O -> status bit4 + releases the host data latch when the target drives (input)
 
-	void xerox168(machine_config &config);
-	void xerox820ii(machine_config &config);
+	// The 820-II disk daughterboard (9R80758) came in three personalities, modelled
+	// as separate machines that share xerox820ii_common(): a main-board FD1797 floppy
+	// controller with either 5.25" or 8" drives, or a Shugart SASI host adapter
+	// (SA1403D) carrying the 8" floppies + an ST-506 rigid disk.  The 16/8 (8086 add-in
+	// board) layers on top of any of the three.
+	void xerox820ii_common(machine_config &config); // shared 820-II hardware (no disk drives)
+	void xerox820ii_sasi(machine_config &config);    // add the SA1403D SASI host adapter
+	void xerox820ii(machine_config &config);   // 8" floppy
+	void xerox820ii5(machine_config &config);  // 5.25" floppy
+	void xerox820iis(machine_config &config);  // 8" floppy + SASI rigid disk
+	void xerox168(machine_config &config);     // 16/8, 8" floppy
+	void xerox1685(machine_config &config);    // 16/8, 5.25" floppy
+	void xerox168s(machine_config &config);    // 16/8, 8" floppy + SASI rigid disk
 	void xerox168_mem(address_map &map) ATTR_COLD;
-	void xerox820ii_io(address_map &map) ATTR_COLD;
+	void xerox820ii_io(address_map &map) ATTR_COLD;  // FD1797 floppy controller at 0x10-0x13
+	void xerox820iis_io(address_map &map) ATTR_COLD; // SASI host-adapter PIO at 0x10-0x13
 	void xerox820ii_mem(address_map &map) ATTR_COLD;
 protected:
 	virtual void machine_reset() override ATTR_COLD;
 
+	void add_8086(machine_config &config); // the 16/8 add-in 8086 board
+
 	required_device<speaker_sound_device> m_speaker;
-	required_device<scsi_port_device> m_sasibus;
+	optional_device<scsi_port_device> m_sasibus;        // SASI personality only
+	optional_device<sa1403d_device> m_sasi_hd;          // SA1403D controller (serves the floppies + rigid disk over SASI)
+	optional_device<input_buffer_device> m_sasi_ctrl_in{*this, "sasi_ctrl_in"};
+	optional_device<output_latch_device> m_sasi_data_out{*this, "sasi_data_out"};
+	bool m_sasi_ackff = false; // U11 74LS74 Q -> SASI ACK (set by port-A write/PARDY, cleared by REQ)
+	int m_sasi_board = 0;      // disk daughterboard: 0 = FD1797 floppy, 1 = SASI host adapter (set per machine)
 };
 
 #endif // MAME_XEROX_XEROX820_H
