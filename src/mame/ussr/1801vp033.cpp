@@ -138,11 +138,11 @@ uint16_t k1801vp033_device::bpic_read(offs_t offset)
 
 	switch (offset & 3)
 	{
-	case 0:
+	case 2:
 		data = m_tcsr & BPICCSR_RD;
 		break;
 
-	case 2:
+	case 3:
 		data = m_tbuf;
 		break;
 	}
@@ -181,9 +181,9 @@ void k1801vp033_device::bpic_write(offs_t offset, uint16_t data, uint16_t mem_ma
 {
 	LOG("%s W %06o <- %06o & %06o\n", machine().describe_context(), 0177510 + (offset << 1), data, mem_mask);
 
-	switch (offset & 3)
+	switch (offset)
 	{
-	case 0:
+	case 2:
 		if ((data & CSR_IE) == 0)
 		{
 			clear_virq(m_bpic_write_txrdy, 1, 1, m_txrdy);
@@ -196,7 +196,7 @@ void k1801vp033_device::bpic_write(offs_t offset, uint16_t data, uint16_t mem_ma
 		m_bpic_write_reset(!BIT(m_tcsr, 14));
 		break;
 
-	case 2:
+	case 3:
 		m_tbuf = data & 0377;
 		m_tcsr &= ~BPICCSR_DRQ;
 		clear_virq(m_bpic_write_txrdy, m_tcsr, CSR_IE, m_txrdy);
@@ -211,7 +211,7 @@ void k1801vp033_device::pic_write(offs_t offset, uint16_t data, uint16_t mem_mas
 {
 	LOG("%s W %06o <- %06o & %06o\n", machine().describe_context(), 0177510 + (offset << 1), data, mem_mask);
 
-	switch (offset & 3)
+	switch (offset)
 	{
 	case 0:
 		m_tcsr = ((m_tcsr & ~PICCSR_WR) | (data & PICCSR_WR));
