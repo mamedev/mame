@@ -321,15 +321,9 @@ void psion5mx_state::update_amp()
 	static const float codec_volume[4] = { 1.0f, 0.75f, 0.5f, 0.25f };
 
 	if (m_amp_enable)
-	{
-		m_buzzer->set_output_gain(ALL_OUTPUTS, 1.0);
 		m_codec->set_output_gain(ALL_OUTPUTS, codec_volume[m_volume]); // VOL
-	}
 	else
-	{
-		m_buzzer->set_output_gain(ALL_OUTPUTS, 0.0);
 		m_codec->set_output_gain(ALL_OUTPUTS, 0.0);
-	}
 }
 
 

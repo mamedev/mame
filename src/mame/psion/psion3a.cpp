@@ -437,19 +437,13 @@ void psion3a_base_state::portcd_w(uint16_t data)
 {
 	// TODO: LCD backlight BIT(data, 0) (Series 3mx only)
 
-	// TODO: MSC1192 speaker amplifier, can be put into standby to mute audio (buzzer maybe Series 3mx only)
+	// TODO: MSC1192 speaker amplifier, can be put into standby to mute audio.
 	static const float codec_volume[4] = { 1.0f, 0.75f, 0.5f, 0.25f };
 
 	if (BIT(data, 3)) // AMPEN
-	{
-		//m_buzzer->set_output_gain(ALL_OUTPUTS, 1.0);
 		m_codec->set_output_gain(ALL_OUTPUTS, codec_volume[BIT(data, 6, 2)]); // VOL
-	}
 	else
-	{
-		//m_buzzer->set_output_gain(ALL_OUTPUTS, 0.0);
 		m_codec->set_output_gain(ALL_OUTPUTS, 0.0);
-	}
 
 	// TODO: LCD contrast BIT(data, 8, 4)
 
