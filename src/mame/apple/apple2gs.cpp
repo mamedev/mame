@@ -507,58 +507,13 @@ private:
 	bool m_accel_fast = false;
 	bool m_accel_present = false;
 	bool m_accel_temp_slowdown = false;
+	bool m_accel_warm_boot = false;
 	int m_accel_stage = 0;
 	u32 m_accel_speed = 0;
 	u8 m_accel_slotspk = 0, m_accel_gsxsettings = 0, m_accel_percent = 0;
+	memory_passthrough_handler m_accel_tap;
 
-	void accel_full_speed()
-	{
-		bool isfast = false;
-
-		if (m_speed & SPEED_HIGH)
-		{
-			isfast = true;
-		}
-
-		if ((m_motors_active & (m_speed & 0x0f)) != 0)
-		{
-			isfast = false;
-		}
-
-		if (isfast)
-		{
-			m_maincpu->set_unscaled_clock(m_accel_speed);
-		}
-		else
-		{
-			m_maincpu->set_unscaled_clock(A2GS_1M, true); // re-align with PH0
-		}
-	}
-
-	void accel_normal_speed()
-	{
-		bool isfast = false;
-
-		if (m_speed & SPEED_HIGH)
-		{
-			isfast = true;
-		}
-
-		if ((m_motors_active & (m_speed & 0x0f)) != 0)
-		{
-			isfast = false;
-		}
-
-		if (isfast)
-		{
-			m_maincpu->set_unscaled_clock(A2GS_2_8M);
-		}
-		else
-		{
-			m_maincpu->set_unscaled_clock(A2GS_1M, true); // re-align with PH0
-		}
-	}
-
+	void accel_reset();
 	void accel_temp_delay(int ms, bool condition);
 	void accel_stop_delay();
 	void accel_slot(int slot);
@@ -852,6 +807,7 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_accel_gsxsettings));
 	save_item(NAME(m_accel_percent));
 	save_item(NAME(m_accel_temp_slowdown));
+	save_item(NAME(m_accel_warm_boot));
 	save_item(NAME(m_accel_speed));
 	save_item(NAME(m_motoroff_time));
 }
@@ -939,14 +895,11 @@ void apple2gs_state::machine_reset()
 	m_maincpu->reset();
 
 	// Setup ZipGS
-	m_accel_unlocked = false;
-	m_accel_stage = 0;
-	m_accel_slotspk = 0x45; // slots 6, 2, and speaker slow
-	m_accel_gsxsettings = 0x59; // paddle and counter slow, CPS, GS
-	m_accel_percent = 0;    // 100% speed
 	m_accel_present = false;
+	m_accel_unlocked = false;
 	m_accel_temp_slowdown = false;
 	m_accel_fast = false;
+	m_accel_warm_boot = false;
 
 	// is Zip enabled?
 	if (m_sysconfig->read() & 0x01)
@@ -955,8 +908,7 @@ void apple2gs_state::machine_reset()
 		m_accel_present = true;
 		int idxSpeed = (m_sysconfig->read() >> 1);
 		m_accel_speed = speeds[idxSpeed];
-		m_accel_fast = true;
-		accel_full_speed();
+		accel_reset();
 	}
 }
 
@@ -996,31 +948,40 @@ void apple2gs_state::lower_irq(int irq)
 
 void apple2gs_state::update_speed()
 {
-	bool isfast = false;
+	const bool isfast = (m_speed & SPEED_HIGH) && !(m_speed & m_motors_active);
+	const bool noaccel = !m_accel_fast || m_accel_temp_slowdown;
+	u32 new_speed = m_accel_speed;
+	m_last_speed = true;
 
-	if (m_speed & SPEED_HIGH)
+	if (isfast && noaccel)
 	{
-		isfast = true;
+		new_speed = A2GS_2_8M.value();
+	}
+	else if (!isfast && (noaccel || BIT(m_accel_gsxsettings, 3)))
+	{
+		new_speed = A2GS_1M.value();
+		m_last_speed = false;
 	}
 
-	if ((m_motors_active & (m_speed & 0x0f)) != 0)
+	m_maincpu->set_unscaled_clock(new_speed, !m_last_speed); // re-align with PH0
+}
+
+void apple2gs_state::accel_reset()
+{
+	if (!m_accel_warm_boot)
 	{
-		isfast = false;
+		m_accel_unlocked = false;
+		m_accel_stage = 0;
+		m_accel_gsxsettings = 0x59; // paddle and counter slow, CPS, GS
+		m_accel_slotspk = 0x45; // slots 6, 2, and speaker slow
+		m_accel_percent = 0; // 100% speed
+		m_accel_fast = true;
+		update_speed();
 	}
 
-	// prevent unnecessary reschedules by only setting this if it changed
-	if (isfast != m_last_speed)
-	{
-		if ((m_accel_present) && (isfast))
-		{
-			accel_full_speed();
-		}
-		else
-		{
-			m_maincpu->set_unscaled_clock(isfast ? A2GS_2_8M : A2GS_1M, !isfast);
-		}
-		m_last_speed = isfast;
-	}
+	// C059 bit 2 shows boot status
+	m_accel_gsxsettings = (m_accel_gsxsettings & ~0x04) | (m_accel_warm_boot ? 0x04 : 0);
+	m_accel_warm_boot = true;
 }
 
 void apple2gs_state::accel_temp_delay(int ms, bool condition)
@@ -1030,7 +991,7 @@ void apple2gs_state::accel_temp_delay(int ms, bool condition)
 	{
 		m_accel_temp_slowdown = true;
 		m_acceltimer->adjust(attotime::from_msec(ms));
-		accel_normal_speed();
+		update_speed();
 	}
 }
 
@@ -1038,8 +999,7 @@ void apple2gs_state::accel_stop_delay()
 {
 	m_accel_temp_slowdown = false;
 	m_acceltimer->adjust(attotime::never);
-	if (m_accel_fast)
-		accel_full_speed();
+	update_speed();
 }
 
 void apple2gs_state::accel_slot(int slot)
@@ -1846,19 +1806,31 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return m_rom[offset + 0x3c000];
 
 		default:
-			do_io(offset);
-
-			if (m_accel_unlocked)
+			/*
+			When a ZipGS is present, side-effects to annunciators are skipped
+			IF the accelerator is unlocked AND the current instruction executes
+			from cache.  Cache is not emulated here, but as an approximation,
+			m_accel_fast differentiates all-cached and not-cached.
+			*/
+			if (((offset & 0xf8) != 0x58) || !m_accel_unlocked || !m_accel_fast)
 			{
-				if (offset == 0x59)
-				{
+				do_io(offset);
+			}
+
+			if (m_accel_unlocked) switch(offset)
+			{
+				case 0x58: return 0xFF; // undocumented, not floating bus
+				case 0x5d: return 0x00; // "bank"
+				case 0x5e: return 0x00; // cache tag
+				case 0x5f: return 0x00; // clears C05B bit 6
+
+				case 0x59:
 					return m_accel_gsxsettings;
-				}
-				else if (offset == 0x5a)
-				{
+
+				case 0x5a:
 					return m_accel_percent | 0x0f;
-				}
-				else if (offset == 0x5b) // Zip status flags
+
+				case 0x5b: // status flags
 				{
 					// bits 0-1 are cache size: [8, 16, 32, 64]kB
 					const u8 b01 = 0x03;
@@ -1866,16 +1838,17 @@ u8 apple2gs_state::c000_r(offs_t offset)
 					const u8 b3 = m_accel_temp_slowdown ? 0x08 : 0x00;
 					// bit 4 is set if the Zip is disabled
 					const u8 b4 = m_accel_fast ? 0x00 : 0x10;
-					// bit 7 is a 1.0035 millisecond clock; the value changes every 0.50175 milliseconds
-					const int time = machine().time().as_ticks(1.0F / 0.00050175F);
+					// bit 5 is set if LC caching is disabled
+					const u8 b5 = BIT(m_accel_gsxsettings, 7) ? 0x20 : 0x00;
+					// bit 7 is a tap on the PH0 clock divided by 1024; edge every 512 cycles
+					const int time = machine().time().as_ticks(1021800 / 512.0F);
 					const u8 b7 = (time & 1) ? 0x80 : 0x00;
-					return b7 | b4 | b3 | b01;
+					return b7 | b5 | b4 | b3 | b01;
 				}
-				else if (offset == 0x5c)
-				{
+
+				case 0x5c:
 					// C036 motor detection overrides slots 4-7
 					return m_accel_slotspk | (m_speed << 4);
-				}
 			}
 			break;
 	}
@@ -2153,8 +2126,8 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			accel_stop_delay();
 			if (m_accel_unlocked)
 			{
-				m_accel_gsxsettings = data & 0xf8;
-				m_accel_gsxsettings |= 0x01;    // indicate this is a GS
+				m_accel_gsxsettings = (data & 0xf8) | (m_accel_gsxsettings & 0x07);
+				update_speed(); // CPS Follow
 			}
 			do_io(offset);
 			break;
@@ -2165,10 +2138,43 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			{
 				if ((data & 0xf0) == 0x50)
 				{
-					m_accel_stage++;
-					if (m_accel_stage == 4)
+					if (m_accel_stage == 0)
 					{
-						m_accel_unlocked = true;
+						m_accel_stage = 1;
+						m_accel_tap = m_maincpu->space(AS_PROGRAM).install_write_tap(
+							0x000000, 0xffffff, "zip_unlock",
+							[this](offs_t offset, u8 &data, u8 mem_mask)
+						{
+							if(!machine().side_effects_disabled())
+							{
+								bool iobank = false;
+
+								switch(offset >> 16)
+								{
+									// default:
+									//  if (!(m_speed & SPEED_ALLBANKS)) break; // (not supported)
+									case 0x00: case 0x01:
+										if (m_shadow & SHAD_IOLC) break;
+									case 0xe0: case 0xe1:
+										iobank = true;
+								}
+								offset &= 0xFFFF;
+
+								if ((offset != 0xc05a) || ((data & 0xf0) != 0x50) || !iobank)
+								{
+									// any other write instruction between the first
+									// four 5x writes will invalidate the unlock
+									m_accel_stage = 0;
+									m_accel_tap.remove();
+								}
+								else if (++m_accel_stage == 4)
+								{
+									// at least four writes of 5x in succession
+									m_accel_unlocked = true;
+									m_accel_tap.remove();
+								}
+							}
+						}, &m_accel_tap);
 					}
 				}
 				else if ((data & 0xf0) == 0xa0)
@@ -2181,18 +2187,18 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 				{
 					// disable acceleration
 					m_accel_fast = false;
-					accel_normal_speed();
+					update_speed();
 				}
 			}
 			do_io(offset);
 			break;
 
-		case 0x5b: // Zip full speed
+		case 0x5b: // enable acceleration
 			accel_stop_delay();
 			if (m_accel_unlocked)
 			{
 				m_accel_fast = true;
-				accel_full_speed();
+				update_speed();
 			}
 			do_io(offset);
 			break;
@@ -2215,7 +2221,9 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			do_io(offset);
 			break;
 
-		case 0x58:
+		case 0x58: // Zip cold boot
+			m_accel_warm_boot = false;
+			[[fallthrough]];
 		case 0x5e:
 		case 0x5f:
 			accel_stop_delay();
@@ -3367,6 +3375,8 @@ void apple2gs_state::adbmicro_p2_out(u8 data)
 		m_adb_reset_freeze = 2;
 		m_a2bus->reset_bus();
 		m_maincpu->reset();
+		if (m_accel_present)
+			accel_reset();
 		m_video->set_newvideo(0x41);
 
 		m_lcram = false;

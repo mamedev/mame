@@ -514,6 +514,7 @@ private:
 	int m_accel_stage;
 	u32 m_accel_speed;
 	u8 m_accel_slotspk, m_accel_gameio, m_laser_speed;
+	memory_passthrough_handler m_accel_tap;
 
 	emu_timer *m_strobe_timer;
 	u8  m_next_strobe;
@@ -555,8 +556,8 @@ private:
 	void raise_irq(int irq);
 	void lower_irq(int irq);
 	void update_iic_mouse();
-	void accel_full_speed();
-	void accel_normal_speed();
+	void accel_update_speed();
+	void accel_reset();
 	void accel_temp_delay(int ms, bool condition);
 	void accel_stop_delay();
 	void accel_slot(int slot);
@@ -1265,22 +1266,12 @@ void apple2e_state::machine_reset()
 	m_yirq = false;
 	m_mockingboard4c = false;
 	m_cec_bank = 0;
-	m_accel_unlocked = false;
-	m_accel_stage = 0;
-	m_accel_slotspk = 0xE4; // slots 7, 6, 5, 2 slow
-	m_accel_gameio = 0x40;  // paddle delay on
 	m_accel_present = false;
+	m_accel_unlocked = false;
 	m_accel_temp_slowdown = false;
-	m_accel_disable_delay = false;
 	m_accel_fast = false;
 	m_centronics_busy = false;
 	m_35sel = false;
-
-	// is Zip enabled?
-	if (m_sysconfig.read_safe(0) & 0x10)
-	{
-		m_accel_present = true;
-	}
 
 	// IIe prefers INTCXROM default to off, IIc has it always on
 	if (m_rom_ptr[0x3bc0] == 0x00)
@@ -1310,26 +1301,21 @@ void apple2e_state::machine_reset()
 		m_isiicplus = false;
 	}
 
-	u8 config = m_sysconfig.read_safe(0) & 0x30;
-
-	if (((config & 0x10) == 0x10) || (m_isiicplus))
+	// Zip configuration
+	if ((m_isiicplus) || (m_sysconfig.read_safe(0) & 0x10))
 	{
+		m_accel_present = true;
 		m_accel_speed = 4000000;    // Zip speed, set if present, even if not active initially
-
-		if (((config & 0x20) == 0x20) || (m_isiicplus))
-		{
-			accel_full_speed();
-			m_accel_fast = true;
-		}
+		accel_reset();
 	}
-
-	if (m_accel_laser)
+	else if (m_accel_laser)
 	{
 		m_accel_present = true;
 		m_accel_speed = 1021800;
 		m_accel_slotspk = 0x46; // slots 6, 2, 1 slow
 		if (m_slotdevice[5] != nullptr) m_accel_slotspk |= 0x20;
 		if (m_slotdevice[7] != nullptr) m_accel_slotspk |= 0x80;
+		m_accel_gameio = 0x00;
 	}
 
 	if (m_has_laser_mouse)
@@ -1469,6 +1455,8 @@ void apple2e_state::reset_w(int state)
 		{
 			m_reset_latch = true;
 			m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+			if (m_accel_present)
+				accel_reset();
 
 			// All MMU switches off (80STORE, RAMRD, RAMWRT, INTCXROM, ALTZP, SLOTC3ROM, PAGE2, HIRES, INTC8ROM)
 			// Sather, Fig 5.13
@@ -1537,14 +1525,36 @@ void apple2e_state::reset_w(int state)
 /***************************************************************************
     I/O
 ***************************************************************************/
-void apple2e_state::accel_full_speed()
+void apple2e_state::accel_update_speed()
 {
-	m_maincpu->set_unscaled_clock(m_accel_speed);
+	if (!m_accel_fast || m_accel_temp_slowdown)
+	{
+		m_maincpu->set_unscaled_clock(m_pal ? 1016966 : 1021800, true); // re-align to PH0
+	}
+	else
+	{
+		m_maincpu->set_unscaled_clock(m_accel_speed);
+	}
 }
 
-void apple2e_state::accel_normal_speed()
+void apple2e_state::accel_reset()
 {
-	m_maincpu->set_unscaled_clock(m_pal ? 1016966 : 1021800, true); // re-align to PH0
+	if (!m_accel_laser)
+	{
+		m_accel_unlocked = false;
+		m_accel_stage = 0;
+		m_accel_slotspk = 0xE4; // slots 7, 6, 5, 2 slow
+		m_accel_gameio = 0x40;  // paddle delay on
+		m_accel_disable_delay = false;
+
+		// Zip Chip embedded firmware watches for Esc and space keys
+		// This is not emulated, config "Bootup speed" is an approximation
+		m_accel_fast = ((m_isiicplus) || (m_sysconfig.read_safe(0) & 0x20));
+		accel_update_speed();
+	}
+
+	// IIc+ firmware overwrites registers after reset
+	// Laser firmware watches for 1/2/3 keys and overwrites speed
 }
 
 void apple2e_state::accel_temp_delay(int ms, bool condition)
@@ -1552,18 +1562,17 @@ void apple2e_state::accel_temp_delay(int ms, bool condition)
 	// C05B status bit toggles even when accelerator is disabled
 	if ((m_accel_present) && (!m_accel_disable_delay) && (condition))
 	{
-		m_accel_temp_slowdown = true;
 		m_acceltimer->adjust(attotime::from_msec(ms));
-		accel_normal_speed();
+		m_accel_temp_slowdown = true;
+		accel_update_speed();
 	}
 }
 
 void apple2e_state::accel_stop_delay()
 {
-	m_accel_temp_slowdown = false;
 	m_acceltimer->adjust(attotime::never);
-	if (m_accel_fast)
-		accel_full_speed();
+	m_accel_temp_slowdown = false;
+	accel_update_speed();
 }
 
 void apple2e_state::accel_slot(int slot)
@@ -2217,11 +2226,26 @@ u8 apple2e_state::c000_r(offs_t offset)
 		// but this this is incorrect: they only exist on the IIc.
 
 		default:
-			do_io(offset);
-
-			if (m_accel_unlocked)
+			/*
+			When a Zip is present, side-effects to annunciators are skipped
+			IF the accelerator is unlocked AND the current instruction executes
+			from cache.  Cache is not emulated here, but as an approximation,
+			m_accel_fast differentiates all-cached and not-cached.
+			*/
+			if (((offset & 0xf8) != 0x58) || !m_accel_unlocked || !m_accel_fast)
 			{
-				if (offset == 0x5b) // Zip status flags
+				do_io(offset);
+			}
+
+			if (m_accel_unlocked) switch(offset)
+			{
+				case 0x58: return 0xC0; // undocumented, not floating bus
+				case 0x59: return 0x20;
+				case 0x5a: return 0x00;
+				case 0x5d: return 0x00;
+				case 0x5f: return 0x00; // clears C05B bit 6
+
+				case 0x5b: // status flags
 				{
 					// bits 0-1 are cache size; [8, 16, 32, 64]kB
 					const u8 b01 = 0x03;
@@ -2229,15 +2253,26 @@ u8 apple2e_state::c000_r(offs_t offset)
 					const u8 b3 = m_accel_temp_slowdown ? 0x08 : 0x00;
 					// bit 4 is set if the Zip is disabled
 					const u8 b4 = m_accel_fast ? 0x00 : 0x10;
-					// bit 7 is a 1.0035 millisecond clock; the value changes every 0.50175 milliseconds
-					const int time = machine().time().as_ticks(1.0F / 0.00050175F);
+					// bit 5 is set if LC caching is disabled
+					const u8 b5 = BIT(m_accel_gameio, 7) ? 0x20 : 0x00;
+					// bit 7 is a tap on the PH0 clock divided by 1024; edge every 512 cycles
+					const int time = machine().time().as_ticks((m_pal ? 1016966 : 1021800) / 512.0F);
 					const u8 b7 = (time & 1) ? 0x80 : 0x00;
-					return b7 | b4 | b3 | b01;
+					return b7 | b5 | b4 | b3 | b01;
 				}
-				else if (offset == 0x5c)
-				{
+
+				case 0x5c:
 					return m_accel_slotspk;
-				}
+
+				case 0x5e: // synthesizes state, similar to STATEREG
+					return  (m_altzp ? 0x80 : 0x00) |
+							(m_ramrd ? 0x40 : 0x00) |
+							(m_ramwrt ? 0x20 : 0x00) |
+							(m_video->get_80store() ? 0x10 : 0x00) |
+							(m_video->get_hires() ? 0x08 : 0x00) |
+							(m_video->get_page2() ? 0x04 : 0x00) |
+							(m_lcram2 ? 0x00 : 0x02) |
+							(m_lcram ? 0x00 : 0x01);
 			}
 			break;
 	}
@@ -2329,31 +2364,27 @@ void apple2e_state::laser_calc_speed()
 {
 	if (m_laser_fdc_on)
 	{
-		accel_normal_speed();
 		m_accel_fast = false;
-		return;
 	}
-
-	switch ((m_laser_speed & 0xc0) >> 6)
+	else switch ((m_laser_speed & 0xc0) >> 6)
 	{
 		case 0:
 		case 1:
-			accel_normal_speed();
 			m_accel_fast = false;
 			break;
 
 		case 2:
 			m_accel_speed = A2BUS_7M_CLOCK.value()/3;   // 2.38 MHz
 			m_accel_fast = true;
-			accel_full_speed();
 			break;
 
 		case 3:
 			m_accel_speed = A2BUS_7M_CLOCK.value()/2;   // 3.58 MHz
 			m_accel_fast = true;
-			accel_full_speed();
 			break;
 	}
+
+	accel_update_speed();
 }
 
 void apple2e_state::c000_laser_w(offs_t offset, u8 data)
@@ -2526,10 +2557,30 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 			{
 				if (data == 0x5a)
 				{
-					m_accel_stage++;
-					if (m_accel_stage == 4)
+					if (m_accel_stage == 0)
 					{
-						m_accel_unlocked = true;
+						m_accel_stage = 1;
+						m_accel_tap = m_maincpu->space(AS_PROGRAM).install_write_tap(
+							0x0000, 0xffff, "zip_unlock",
+							[this](offs_t offset, u8 &data, u8 mem_mask)
+						{
+							if(!machine().side_effects_disabled())
+							{
+								if ((offset != 0xc05a) || (data != 0x5a))
+								{
+									// any other write instruction between the first
+									// four 5A writes will invalidate the unlock
+									m_accel_stage = 0;
+									m_accel_tap.remove();
+								}
+								else if (++m_accel_stage == 4)
+								{
+									// at least four writes of 5A in succession
+									m_accel_unlocked = true;
+									m_accel_tap.remove();
+								}
+							}
+						}, &m_accel_tap);
 					}
 				}
 				else if (data == 0xa5)
@@ -2542,17 +2593,17 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 				{
 					// disable acceleration
 					m_accel_fast = false;
-					accel_normal_speed();
+					accel_update_speed();
 				}
 			}
 			do_io(offset);
 			break;
 
-		case 0x5b: // Zip full speed
+		case 0x5b: // enable acceleration
 			if (m_accel_unlocked)
 			{
 				m_accel_fast = true;
-				accel_full_speed();
+				accel_update_speed();
 			}
 			do_io(offset);
 			break;
