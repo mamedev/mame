@@ -2153,8 +2153,10 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 								{
 									// default:
 									//  if (!(m_speed & SPEED_ALLBANKS)) break; // (not supported)
+									//  [[fallthrough]];
 									case 0x00: case 0x01:
 										if (m_shadow & SHAD_IOLC) break;
+										[[fallthrough]];
 									case 0xe0: case 0xe1:
 										iobank = true;
 								}
