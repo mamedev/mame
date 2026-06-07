@@ -40,6 +40,90 @@ and a good number of capacitors and resistors.
 #include "speaker.h"
 #include "tilemap.h"
 
+#define LOG_BLIT  (1U << 1) // tailored for stdout
+
+#define VERBOSE (0)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
+
+
+class subsino_sg001_device : public device_t
+{
+public:
+	subsino_sg001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	static constexpr feature_type unemulated_features() { return feature::GRAPHICS; }
+
+	// TODO: convert to address_map once we have a better grasp of this
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+private:
+	u8 m_blit_data[0x20];
+	void blitter_exec();
+};
+
+
+DEFINE_DEVICE_TYPE(SUBSINO_SG001, subsino_sg001_device, "subsino_sg001", "Subsino SG001 custom video chip")
+
+subsino_sg001_device::subsino_sg001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SUBSINO_SG001, tag, owner, clock)
+{
+}
+
+void subsino_sg001_device::device_start()
+{
+	save_item(NAME(m_blit_data));
+}
+
+void subsino_sg001_device::device_reset()
+{
+}
+
+u8 subsino_sg001_device::read(offs_t offset)
+{
+	// bit 7: blitter busy
+	if (offset == 0x10)
+		return 0;
+
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_BLIT, "Warning: blitter read at %06x\n", offset + 0xc0);
+
+	return m_blit_data[offset];
+}
+
+void subsino_sg001_device::write(offs_t offset, u8 data)
+{
+	const u8 prev = m_blit_data[offset];
+	m_blit_data[offset] = data;
+	// -x-- ---- 0 -> 1 blitter trigger
+	// ---- ---x bpp or GFX bank select? $a000xx = 1 on first execs then 0, $4000xx = 1
+	if (offset == 0x1d && !BIT(prev, 6) && BIT(data, 6))
+	{
+		LOGMASKED(LOG_BLIT, "%s blitter exec: %02x\n", this->tag(), data);
+		blitter_exec();
+	}
+}
+
+// writes to $dc then $c0-$c8, $d0-$d4/$d9 (*) finally to trigger at $dd
+// (*) range depends on trigger bit 0
+void subsino_sg001_device::blitter_exec()
+{
+	int i;
+	LOGMASKED(LOG_BLIT, "\t$dc: %02x\n", m_blit_data[0x1c]);
+	LOGMASKED(LOG_BLIT, "\t$c0: ");
+	for (i = 0; i < 9; i++)
+		LOGMASKED(LOG_BLIT, "%02x ", m_blit_data[0x00 + i]);
+	LOGMASKED(LOG_BLIT, "\n\t$d0: ");
+	for (i = 0; i < 0xa; i++)
+		LOGMASKED(LOG_BLIT, "%02x ", m_blit_data[0x10 + i]);
+	LOGMASKED(LOG_BLIT, "\n");
+}
+
 
 namespace {
 
@@ -49,7 +133,8 @@ public:
 	subsino_kr_h8_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_sg001(*this, "sg001_%u", 0U)
 	{ }
 
 	void modcart(machine_config &config) ATTR_COLD;
@@ -60,10 +145,12 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device_array<subsino_sg001_device, 2> m_sg001;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void program_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -84,33 +171,52 @@ void subsino_kr_h8_state::program_map(address_map &map)
 	map(0x000000, 0x007fff).rom();
 	map(0x080000, 0x0bffff).rom();
 	map(0x200000, 0x207fff).ram();
-	map(0x400000, 0x4000ff).ram(); // SG001 commands?
+//	map(0x400000, 0x40007f).ram(); // SG001 commands?
+	map(0x400094, 0x400094).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x400095, 0x400095).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x400096, 0x400096).w("ramdac", FUNC(ramdac_device::mask_w));
+	// I/O? vblank? (res & 0xe0) == 0xc0 before setting palette
+	map(0x40009e, 0x40009e).lr8(NAME([] () { return 0xc0; }));
+	map(0x4000c0, 0x4000df).rw(m_sg001[0], FUNC(subsino_sg001_device::read), FUNC(subsino_sg001_device::write));
 	map(0x600000, 0x60001f).rw("io", FUNC(ss9802_device::read), FUNC(ss9802_device::write));
 	// map(0x600060, 0x600061);
 	// map(0x800000, 0x800001);
-	map(0xa00000, 0xa000ff).ram(); // second SG001 commands?
+//	map(0xa00000, 0xa000ff).ram(); // second SG001 commands?
+	map(0xa000c0, 0xa000df).rw(m_sg001[1], FUNC(subsino_sg001_device::read), FUNC(subsino_sg001_device::write));
 }
 
+void subsino_kr_h8_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 static INPUT_PORTS_START( modcart )
+	// bits 0, 4, 5, 7 used during current state loop
 	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
+	PORT_DIPNAME( 0x01, 0x01, "IN0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DS1:1")
@@ -141,9 +247,10 @@ INPUT_PORTS_END
 
 
 // TODO: probably variable tile sizes like subsino2.cpp
+// Bottom part of both banks doesn't decode properly, can bpp select too?
 static GFXDECODE_START( gfx_modcart )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x8_raw, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x8_raw, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x8_raw, 0, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x8_raw, 0, 1 )
 GFXDECODE_END
 
 
@@ -174,6 +281,9 @@ void subsino_kr_h8_state::modcart(machine_config &config)
 	io.out_port_callback<8>().set([this] (uint8_t data) { logerror("%s io port 8 write: %02x\n", machine().describe_context(), data); });
 	io.out_port_callback<9>().set([this] (uint8_t data) { logerror("%s io port 9 write: %02x\n", machine().describe_context(), data); });
 
+	SUBSINO_SG001(config, m_sg001[0], 0);
+	SUBSINO_SG001(config, m_sg001[1], 0);
+
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: verify once it works
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 512-1, 0, 256-16-1);
@@ -186,7 +296,8 @@ void subsino_kr_h8_state::modcart(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_modcart);
 	PALETTE(config, "palette").set_entries(256);
 
-	RAMDAC(config, "ramdac", "palette");
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", "palette"));
+	ramdac.set_addrmap(0, &subsino_kr_h8_state::ramdac_map);
 
 	SPEAKER(config, "mono").front_center();
 
