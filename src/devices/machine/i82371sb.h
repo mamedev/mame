@@ -11,17 +11,17 @@
 #include "bus/ata/ataintf.h"
 #include "bus/isa/isa.h"
 
+#include "machine/am9517a.h"
+#include "machine/ds128x.h"
 #include "machine/idectrl.h"
 #include "machine/ins8250.h"
-#include "machine/ds128x.h"
+#include "machine/nvram.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
+#include "machine/ram.h"
 
 #include "sound/spkrdev.h"
-#include "machine/ram.h"
-#include "machine/nvram.h"
 
-#include "machine/am9517a.h"
 
 class i82371sb_isa_device : public pci_device
 {

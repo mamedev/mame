@@ -47,7 +47,6 @@ private:
 
 	u32 m_ram_size = 0;
 
-	void map_bios(address_space *memory_space, uint32_t start, uint32_t end);
 	void map_shadowram(address_space *memory_space, offs_t start_offs, offs_t end_offs, u8 setting);
 
 	virtual uint8_t latency_timer_r() override;

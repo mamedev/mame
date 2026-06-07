@@ -51,6 +51,7 @@ void i82434nx_pcmc_device::device_reset()
 	status = 0x0200;
 
 	m_latency_timer = 0x20;
+	std::fill(std::begin(m_pam), std::end(m_pam), 0U);
 
 	remap_cb();
 }
@@ -126,16 +127,6 @@ void i82434nx_pcmc_device::config_address_w(offs_t offset, uint32_t data, uint32
 	pci_host_device::config_address_w(offset, data, mem_mask);
 }
 
-/*
- * BIOS remapping
- */
-
-void i82434nx_pcmc_device::map_bios(address_space *memory_space, uint32_t start, uint32_t end)
-{
-	uint32_t mask = m_region->bytes() - 1;
-	memory_space->install_rom(start, end, m_region->base() + (start & mask));
-}
-
 // For each PAM register:
 // -x-- CE Cache Enable
 // --x- WE Write Enable
@@ -173,10 +164,8 @@ void i82434nx_pcmc_device::map_extra(
 
 	regenerate_config_mapping();
 
+	// TODO: PAM0 bits 3-0 memory hole at 512K
 	memory_space->install_ram(0x00000000, 0x0009ffff, &m_ram[0x00000000/4]);
-
-	map_bios(memory_space, 0xffffffff - m_region->bytes() + 1, 0xffffffff);
-	map_bios(memory_space, 0x000e0000, 0x000fffff);
 
 	int i;
 
@@ -201,7 +190,6 @@ void i82434nx_pcmc_device::map_extra(
 	}
 
 	map_shadowram(memory_space, 0xf0000, 0xfffff, (m_pam[0] >> 4) & 3);
-	// TODO: PAM0 bits 3-0 memory hole at 512K
 
 	memory_space->install_ram(0x00100000, m_ram_size - 1, &m_ram[0x00100000/4]);
 }
