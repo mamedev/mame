@@ -33,6 +33,7 @@ and a good number of capacitors and resistors.
 #include "subsino_io.h"
 
 #include "cpu/h8/h83048.h"
+#include "machine/ds2430a.h"
 #include "video/ramdac.h"
 
 #include "emupal.h"
@@ -134,7 +135,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_sg001(*this, "sg001_%u", 0U)
+		m_sg001(*this, "sg001_%u", 0U),
+		m_eeprom(*this, "eeprom")
 	{ }
 
 	void modcart(machine_config &config) ATTR_COLD;
@@ -146,8 +148,14 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device_array<subsino_sg001_device, 2> m_sg001;
+	required_device<ds2430a_device> m_eeprom;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void out_a_w(u8 data);
+	void out_b_w(u8 data);
+	void out_c_w(u8 data);
+	void out_d_w(u8 data);
 
 	void program_map(address_map &map) ATTR_COLD;
 	void ramdac_map(address_map &map) ATTR_COLD;
@@ -163,6 +171,28 @@ uint32_t subsino_kr_h8_state::screen_update(screen_device &screen, bitmap_ind16 
 	bitmap.fill(0, cliprect);
 
 	return 0;
+}
+
+
+void subsino_kr_h8_state::out_a_w(u8 data)
+{
+	logerror("%s output A write: %02x\n", machine().describe_context(), data);
+}
+
+void subsino_kr_h8_state::out_b_w(u8 data)
+{
+	logerror("%s output B write: %02x\n", machine().describe_context(), data);
+}
+
+void subsino_kr_h8_state::out_c_w(u8 data)
+{
+	logerror("%s output C write: %02x\n", machine().describe_context(), data);
+}
+
+void subsino_kr_h8_state::out_d_w(u8 data)
+{
+	// TODO: bit 3 = unknown output
+	m_eeprom->data_w(!BIT(data, 6));
 }
 
 
@@ -192,31 +222,103 @@ void subsino_kr_h8_state::ramdac_map(address_map &map)
 
 static INPUT_PORTS_START( modcart )
 	// bits 0, 4, 5, 7 used during current state loop
-	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, "IN0" )
+	PORT_START("IN-A")
+	PORT_DIPNAME( 0x01, 0x01, "IN-A0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, "IN-A1" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, "IN-A2" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, "IN-A3" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, "IN-A4" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, "IN-A5" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, "IN-A6" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, "IN-A7" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN-B")
+	PORT_DIPNAME( 0x01, 0x01, "IN-B0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "IN-B1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "IN-B2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "IN-B3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "IN-B4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "IN-B5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "IN-B6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "IN-B7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN-C")
+	PORT_DIPNAME( 0x01, 0x01, "IN-C0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "IN-C1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "IN-C2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "IN-C3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "IN-C4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "IN-C5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "IN-C6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "IN-C7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN-D")
+	PORT_DIPNAME( 0x01, 0x01, "IN-D0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "IN-D1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "IN-D2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // output
+	PORT_DIPNAME( 0x10, 0x10, "IN-D4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "IN-D5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED ) // output
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(ds2430a_device::data_r))
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DS1:1")
@@ -261,25 +363,19 @@ void subsino_kr_h8_state::modcart(machine_config &config)
 
 	ss9802_device &io(SS9802(config, "io"));
 	io.in_port_callback<0>().set([this] () { logerror("%s io port 0 read\n", machine().describe_context()); return 0xff; });
-	io.in_port_callback<1>().set([this] () { logerror("%s io port 1 read\n", machine().describe_context()); return 0xff; });
-	io.in_port_callback<2>().set([this] () { logerror("%s io port 2 read\n", machine().describe_context()); return 0xff; });
-	io.in_port_callback<3>().set([this] () { logerror("%s io port 3 read\n", machine().describe_context()); return 0xff; });
-	io.in_port_callback<4>().set([this] () { logerror("%s io port 4 read\n", machine().describe_context()); return 0xff; });
-	io.in_port_callback<5>().set_ioport("IN0"); // maybe
-	io.in_port_callback<6>().set_ioport("DSW"); // maybe
-	io.in_port_callback<7>().set([this] () { logerror("%s io port 7 read\n", machine().describe_context()); return 0xff; });
-	io.in_port_callback<8>().set([this] () { logerror("%s io port 8 read\n", machine().describe_context()); return 0xff; });
-	io.in_port_callback<9>().set([this] () { logerror("%s io port 9 read\n", machine().describe_context()); return 0xff; });
 	io.out_port_callback<0>().set([this] (uint8_t data) { logerror("%s io port 0 write: %02x\n", machine().describe_context(), data); });
-	io.out_port_callback<1>().set([this] (uint8_t data) { logerror("%s io port 1 write: %02x\n", machine().describe_context(), data); });
-	io.out_port_callback<2>().set([this] (uint8_t data) { logerror("%s io port 2 write: %02x\n", machine().describe_context(), data); });
-	io.out_port_callback<3>().set([this] (uint8_t data) { logerror("%s io port 3 write: %02x\n", machine().describe_context(), data); });
-	io.out_port_callback<4>().set([this] (uint8_t data) { logerror("%s io port 4 write: %02x\n", machine().describe_context(), data); });
-	io.out_port_callback<5>().set([this] (uint8_t data) { logerror("%s io port 5 write: %02x\n", machine().describe_context(), data); });
-	io.out_port_callback<6>().set([this] (uint8_t data) { logerror("%s io port 6 write: %02x\n", machine().describe_context(), data); });
-	io.out_port_callback<7>().set([this] (uint8_t data) { logerror("%s io port 7 write: %02x\n", machine().describe_context(), data); });
-	io.out_port_callback<8>().set([this] (uint8_t data) { logerror("%s io port 8 write: %02x\n", machine().describe_context(), data); });
-	io.out_port_callback<9>().set([this] (uint8_t data) { logerror("%s io port 9 write: %02x\n", machine().describe_context(), data); });
+	io.in_port_callback<1>().set_ioport("DSW"); // maybe
+	io.out_port_callback<2>().set([this] (uint8_t data) { logerror("%s io port 1 write: %02x\n", machine().describe_context(), data); });
+	io.in_port_callback<3>().set_ioport("IN-C"); // maybe
+	io.in_port_callback<4>().set_ioport("IN-B"); // maybe
+	io.in_port_callback<5>().set_ioport("IN-A"); // maybe
+	io.in_port_callback<6>().set_ioport("IN-D"); // maybe
+	io.out_port_callback<6>().set(FUNC(subsino_kr_h8_state::out_d_w));
+	io.out_port_callback<7>().set(FUNC(subsino_kr_h8_state::out_c_w));
+	io.out_port_callback<8>().set(FUNC(subsino_kr_h8_state::out_b_w));
+	io.out_port_callback<9>().set(FUNC(subsino_kr_h8_state::out_a_w));
+
+	DS2430A(config, m_eeprom).set_timing_scale(0.32);
 
 	SUBSINO_SG001(config, m_sg001[0], 0);
 	SUBSINO_SG001(config, m_sg001[1], 0);
