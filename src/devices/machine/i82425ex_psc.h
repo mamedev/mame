@@ -37,7 +37,7 @@ public:
 //  void smi_act_w(int state);
 
 protected:
-	i82425ex_psc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+//	i82425ex_psc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
