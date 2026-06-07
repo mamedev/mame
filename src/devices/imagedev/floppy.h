@@ -293,6 +293,7 @@ public:
 
 	int get_cyl() const { return m_cyl; }
 	bool on_track() const { return !m_subcyl; }
+	floppy_image *get_image() const { return m_image.get(); } // for HLE controllers that read the mounted image directly
 
 	virtual void mon_w(int state);
 	bool ready_r();
