@@ -12,9 +12,9 @@ license:CC0-1.0
 		<notes>The second tape is damaged, and there is no known-good dump of the installer floppy. However, the NWF-672RB installation floppy supports both RISC and CISC machines and works with this tape set.</notes>
 		<sharedfeat name="compatibility" value="CISC" />
 
-		<!-- Source: bitsavers.org -->
-		<!-- The volume markers all list the build date as 07/15/91. -->
 		<!--
+		Source: bitsavers.org
+		The volume markers all list the build date as 07/15/91.
 		The markers also identify the kit as NWF-671C. The NWU prefix on the tape label, used above, is specific to
 		the US release. Each tape is still marked with their original NWF volume names in the data.
 		-->
