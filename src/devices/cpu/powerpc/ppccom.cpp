@@ -1621,17 +1621,15 @@ void ppc_device::ppccom_execute_tlbl()
 	if (m_flavor == PPC_MODEL_602) // TODO
 		return;
 
-	/* determine entry number; we use machine().rand() for associativity */
+	// determine entry number; we use machine().rand() for associativity
 	entrynum = ((address >> 12) & 0x1f) | (machine().rand() & 0x20) | (isitlb ? 0x40 : 0);
 
-	/* determine the flags */
-	flags = FLAG_VALID | READ_ALLOWED | FETCH_ALLOWED;
+	// Determine the access flags, for both supervisor and user modes.
+	flags = FLAG_VALID | READ_ALLOWED | FETCH_ALLOWED | USER_READ_ALLOWED | USER_FETCH_ALLOWED;
 	if (m_core->spr[SPR603_RPA] & 0x80)
-		flags |= WRITE_ALLOWED;
-	if (isitlb)
-		flags |= FETCH_ALLOWED;
+		flags |= WRITE_ALLOWED | USER_WRITE_ALLOWED;
 
-	/* load the entry */
+	// load the entry
 	vtlb_load(entrynum, 1, address, (m_core->spr[SPR603_RPA] & 0xfffff000) | flags);
 }
 

@@ -497,7 +497,6 @@ void ppc_device::ppc_cfunc_printf_probe()
 		m_core->r[28], m_core->r[29], m_core->r[30], m_core->r[31]);
 }
 
-
 /*-------------------------------------------------
     cfunc_unimplemented - handler for
     unimplemented opcdes
@@ -1328,14 +1327,21 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 			UML_MOV(block, SPR32(SPR4XX_DEAR), I0);                                 // mov     [dear],i0
 			UML_EXH(block, *m_exception[EXCEPTION_DSI], I0);               // exh     dsi,i0
 		}
-
-		/* 603 case: TLBMISS exception */
+		// 603 case: BAT protection violations raise DSI, otherwise it's a TLB miss
 		else if (m_cap & PPCCAP_603_MMU)
 		{
-			UML_MOV(block, SPR32(SPR603_DMISS), I0);                                    // mov     [dmiss],i0
-			UML_MOV(block, SPR32(SPR603_DCMP), mem(&m_core->mmu603_cmp));                      // mov     [dcmp],[mmu603_cmp]
-			UML_MOV(block, SPR32(SPR603_HASH1), mem(&m_core->mmu603_hash[0]));                 // mov     [hash1],[mmu603_hash][0]
-			UML_MOV(block, SPR32(SPR603_HASH2), mem(&m_core->mmu603_hash[1]));                 // mov     [hash2],[mmu603_hash][1]
+			m_core->param1 = iswrite ? 1 : 0;
+			UML_CALLC(block, (c_function)cfunc_ppccom_get_dsisr, this);
+			UML_TEST(block, mem(&m_core->param1), DSISR_PROTECTED);                     // BAT protection violation?
+			UML_JMPc(block, COND_Z, label);                                             // if not, it's a TLB miss, go to label
+			UML_MOV(block, SPR32(SPROEA_DSISR), mem(&m_core->param1));                  // DSI: set DSISR (DAR set by handler)
+			UML_EXH(block, *m_exception[EXCEPTION_DSI], I0);                            // exh dsi,i0
+
+			UML_LABEL(block, label++);                                                  // label++: (TLB miss)
+			UML_MOV(block, SPR32(SPR603_DMISS), I0);                                    // mov [dmiss],i0
+			UML_MOV(block, SPR32(SPR603_DCMP), mem(&m_core->mmu603_cmp));               // mov [dcmp], [mmu603_cmp]
+			UML_MOV(block, SPR32(SPR603_HASH1), mem(&m_core->mmu603_hash[0]));          // mov [hash1],[mmu603_hash][0]
+			UML_MOV(block, SPR32(SPR603_HASH2), mem(&m_core->mmu603_hash[1]));          // mov [hash2],[mmu603_hash][1]
 			if (iswrite)
 				UML_EXH(block, *m_exception[EXCEPTION_DTLBMISSS], I0);     // exh     dtlbmisss,i0
 			else
@@ -2435,12 +2441,14 @@ bool ppc_device::generate_instruction_13(drcuml_block &block, compiler_state *co
 					UML_ROLINS(block, MSR32, SPR32(SPROEA_SRR1), 0, 0x87c0ffff);    // rolins  [msr],[srr1],0,0x87c0ffff
 				else
 				{
+					// 603 always clears MSR[TGPR] on RFI.  The 603 manual's wording is ambiguous, but QEMU
+					// (which has PPC contributions from Freescale/Motorola) does it and PowerMac firmware
+					// clearly requires it.  Otherwise the 68K emulator is entered with an invalid stack pointer.
 					UML_MOV(block, I0, MSR32);                                          // mov     i0,[msr]
-					UML_ROLINS(block, MSR32, SPR32(SPROEA_SRR1), 0, 0x87c0ffff |  MSR603_TGPR);
-																							// rolins  [msr],[srr1],0,0x87c0ffff | MSR603_TGPR
-					UML_XOR(block, I0, I0, MSR32);                              // xor     i0,i0,[msr]
-					UML_TEST(block, I0, MSR603_TGPR);                               // test    i0,tgpr
-					UML_CALLHc(block, COND_NZ, *m_swap_tgpr);                      // callh   swap_tgpr,nz
+					UML_ROLINS(block, MSR32, SPR32(SPROEA_SRR1), 0, 0x87c0ffff);        // rolins  [msr],[srr1],0,0x87c0ffff   ; copy non-TGPR bits
+					UML_AND(block, MSR32, MSR32, ~uint32_t(MSR603_TGPR));               // and     [msr],[msr],~TGPR              ; always clear TGPR
+					UML_TEST(block, I0, MSR603_TGPR);                                   // test    i0,tgpr                       ; was old TGPR set?
+					UML_CALLHc(block, COND_NZ, *m_swap_tgpr);                           // callh   swap_tgpr,nz                  ; swap on 1->0
 				}
 			}
 			else if (m_cap & PPCCAP_4XX)
@@ -3321,8 +3329,6 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 			UML_GETFLGS(block, I0, FLAG_Z | FLAG_C | FLAG_S);                           // getflgs i0,zcs
 			UML_LOAD(block, I0, m_cmp_cr_table, I0, SIZE_BYTE, SCALE_x1);// load    i0,cmp_cr_table,i0,byte
 			UML_OR(block, CR32(0), I0, XERSO32);                               // or      [cr0],i0,[xerso]
-
-			generate_compute_flags(block, desc, true, 0, false);                       // <update flags>
 			return true;
 
 		case 0x2d5: /* STSWI */
@@ -3432,6 +3438,8 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 			}
 			else if (spr == SPROEA_PVR)
 				UML_MOV(block, R32(G_RD(op)), m_flavor);                         // mov     rd,flavor
+			else if (spr == SPR601_MQ && m_flavor != PPC_MODEL_601)
+				UML_MOV(block, R32(G_RD(op)), 0);
 			else
 			{
 				generate_update_cycles(block, compiler, desc->pc, false);           // <update cycles>
