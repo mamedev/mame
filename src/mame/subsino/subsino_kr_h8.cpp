@@ -82,6 +82,13 @@ uint32_t subsino_kr_h8_state::screen_update(screen_device &screen, bitmap_ind16 
 void subsino_kr_h8_state::program_map(address_map &map)
 {
 	map(0x000000, 0x007fff).rom();
+	map(0x080000, 0x0bffff).rom();
+	map(0x200000, 0x207fff).ram();
+	map(0x400000, 0x4000ff).ram(); // SG001 commands?
+	map(0x600000, 0x60001f).rw("io", FUNC(ss9802_device::read), FUNC(ss9802_device::write));
+	// map(0x600060, 0x600061);
+	// map(0x800000, 0x800001);
+	map(0xa00000, 0xa000ff).ram(); // second SG001 commands?
 }
 
 
@@ -133,10 +140,10 @@ static INPUT_PORTS_START( modcart )
 INPUT_PORTS_END
 
 
-// TODO: verify
+// TODO: probably variable tile sizes like subsino2.cpp
 static GFXDECODE_START( gfx_modcart )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x8_raw, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_packed_msb, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x8_raw, 0, 16 )
 GFXDECODE_END
 
 
@@ -145,7 +152,27 @@ void subsino_kr_h8_state::modcart(machine_config &config)
 	H83044(config, m_maincpu, 32_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_kr_h8_state::program_map);
 
-	SS9802(config, "io");
+	ss9802_device &io(SS9802(config, "io"));
+	io.in_port_callback<0>().set([this] () { logerror("%s io port 0 read\n", machine().describe_context()); return 0xff; });
+	io.in_port_callback<1>().set([this] () { logerror("%s io port 1 read\n", machine().describe_context()); return 0xff; });
+	io.in_port_callback<2>().set([this] () { logerror("%s io port 2 read\n", machine().describe_context()); return 0xff; });
+	io.in_port_callback<3>().set([this] () { logerror("%s io port 3 read\n", machine().describe_context()); return 0xff; });
+	io.in_port_callback<4>().set([this] () { logerror("%s io port 4 read\n", machine().describe_context()); return 0xff; });
+	io.in_port_callback<5>().set_ioport("IN0"); // maybe
+	io.in_port_callback<6>().set_ioport("DSW"); // maybe
+	io.in_port_callback<7>().set([this] () { logerror("%s io port 7 read\n", machine().describe_context()); return 0xff; });
+	io.in_port_callback<8>().set([this] () { logerror("%s io port 8 read\n", machine().describe_context()); return 0xff; });
+	io.in_port_callback<9>().set([this] () { logerror("%s io port 9 read\n", machine().describe_context()); return 0xff; });
+	io.out_port_callback<0>().set([this] (uint8_t data) { logerror("%s io port 0 write: %02x\n", machine().describe_context(), data); });
+	io.out_port_callback<1>().set([this] (uint8_t data) { logerror("%s io port 1 write: %02x\n", machine().describe_context(), data); });
+	io.out_port_callback<2>().set([this] (uint8_t data) { logerror("%s io port 2 write: %02x\n", machine().describe_context(), data); });
+	io.out_port_callback<3>().set([this] (uint8_t data) { logerror("%s io port 3 write: %02x\n", machine().describe_context(), data); });
+	io.out_port_callback<4>().set([this] (uint8_t data) { logerror("%s io port 4 write: %02x\n", machine().describe_context(), data); });
+	io.out_port_callback<5>().set([this] (uint8_t data) { logerror("%s io port 5 write: %02x\n", machine().describe_context(), data); });
+	io.out_port_callback<6>().set([this] (uint8_t data) { logerror("%s io port 6 write: %02x\n", machine().describe_context(), data); });
+	io.out_port_callback<7>().set([this] (uint8_t data) { logerror("%s io port 7 write: %02x\n", machine().describe_context(), data); });
+	io.out_port_callback<8>().set([this] (uint8_t data) { logerror("%s io port 8 write: %02x\n", machine().describe_context(), data); });
+	io.out_port_callback<9>().set([this] (uint8_t data) { logerror("%s io port 9 write: %02x\n", machine().describe_context(), data); });
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: verify once it works
 	screen.set_size(512, 256);
@@ -154,6 +181,7 @@ void subsino_kr_h8_state::modcart(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_screen_update(FUNC(subsino_kr_h8_state::screen_update));
 	screen.set_palette("palette");
+	screen.screen_vblank().set_inputline(m_maincpu, 0);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_modcart);
 	PALETTE(config, "palette").set_entries(256);
@@ -188,7 +216,30 @@ ROM_START( modcart )
 	ROM_LOAD( "u19", 0x200000, 0x200000, NO_DUMP )
 ROM_END
 
+ROM_START( coolbi )
+	ROM_REGION( 0xc0000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "ss9689_6433044a22f.u31",    0x00000, 0x08000, CRC(ece09075) SHA1(a8bc3aa44f30a6f919f4151c6093fb52e5da2f40) ) // wasn't dumped for this set, but part number matches
+	ROM_LOAD( "cool_bi std u35 v1.06.u35", 0x80000, 0x40000, CRC(51e66960) SHA1(faa754e1ca7e44b902de4093b47982cb717f89a3) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD32_BYTE( "cool_bi std u26 v100.u26", 0x000000, 0x80000, CRC(f0fead44) SHA1(9a37762f03bea0f87bf82018b01a4cc7d57be644) )
+	ROM_LOAD32_BYTE( "cool_bi std u27 v100.u27", 0x000001, 0x80000, CRC(f334a774) SHA1(d4c82d6163fe9c99a7112dc848b8950422ae6bdf) )
+	ROM_LOAD32_BYTE( "cool_bi std u28 v100.u28", 0x000002, 0x80000, CRC(0f70527c) SHA1(df980ebe8913c49e2f1b9978f65333217124c1bf) )
+	ROM_LOAD32_BYTE( "cool_bi std u29 v100.u29", 0x000003, 0x80000, CRC(9b974d8d) SHA1(3d4e4ce6d99019a5aff7bd34afd9ea7c2e9ba3f8) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_LOAD32_BYTE( "cool_bi std u22 v100.u22", 0x000000, 0x100000, CRC(61f20b6e) SHA1(9ae69553c8b450ef72825b8955d6f547cb73d65a) )
+	ROM_LOAD32_BYTE( "cool_bi std u23 v100.u23", 0x000001, 0x100000, CRC(b25aee87) SHA1(7e86a4cd7957fc2309854a52352d23e9798f9f58) )
+	ROM_LOAD32_BYTE( "cool_bi std u24 v100.u24", 0x000002, 0x100000, CRC(07bb7895) SHA1(cc1bbf5a99e48fcf13546fa90384039cbd8fe6af) )
+	ROM_LOAD32_BYTE( "cool_bi std u25 v100.u25", 0x000003, 0x100000, CRC(0cd41da8) SHA1(cba678d0be79da7c7079fe9cbfd929a78a5b946b) )
+
+	ROM_REGION( 0x400000, "ss9804", ROMREGION_ERASE00 )
+	ROM_LOAD( "u18", 0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD( "u19", 0x200000, 0x200000, NO_DUMP )
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 2002, modcart, 0, modcart, modcart, subsino_kr_h8_state, empty_init, ROT0, "Subsino", "Modern Cart", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, modcart, 0, modcart, modcart, subsino_kr_h8_state, empty_init, ROT0, "Subsino", "Modern Cart",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, coolbi,  0, modcart, modcart, subsino_kr_h8_state, empty_init, ROT0, "Subsino", "Cool-Bi Cool-Bi", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
