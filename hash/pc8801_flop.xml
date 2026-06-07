@@ -33186,15 +33186,19 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Hangs after Cross Media Soft animation -->
-	<!-- FDC stalls [Tries to read a missing CHRN=(01 01 00 01)] -->
 	<software name="starsymp" supported="no">
 		<description>Star Symphony</description>
 		<year>1986</year>
 		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
+		<notes><![CDATA[
+FDC stalls [Tries to read a missing CHRN=(01 01 00 01)] (fixed?)
+Fails to load on PC-8801, needs OPN range to return open bus
+Not extensively tested
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198609xx"/>
 		<info name="alt_title" value="スターシンフォニー"/>
+		<info name="usage" value="Copy disk B as a .mfi container, then mount it in second drive with r/w permissions then follow English instructions."/>
 		<!--combined image-->
 		<!--rom name="star symphony.d88" size="698512" crc="d79e7454" sha1="515f5acfb2f8c8939fdc42b031f4027785c25206"/-->
 
@@ -33214,6 +33218,7 @@ Not extensively tested
 		</part>
 	</software>
 
+	<!-- TODO: probably same as above -->
 	<!-- Hangs after Cross Media Soft animation -->
 	<!-- FDC stalls [Tries to read a missing CHRN=(01 01 00 01)] -->
 	<software name="starsympa" cloneof="starsymp" supported="no">
@@ -33434,7 +33439,7 @@ Not extensively tested
 	</software>
 
 	<software name="storm">
-		<description>Storm</description>
+		<description>Storm: Neo Strategic Simulation</description>
 		<year>1988</year>
 		<publisher>マイクロネット (Micronet)</publisher>
 		<!-- PC8801 -->

@@ -1760,6 +1760,7 @@ void pc8801_state::pc8801(machine_config &config)
 
 	SOFTWARE_LIST(config, "tape_list").set_original("pc8801_cass");
 	SOFTWARE_LIST(config, "disk_n88_list").set_original("pc8801_flop");
+	SOFTWARE_LIST(config, "disk_n88_orig_list").set_original("pc8801_flop_orig");
 	SOFTWARE_LIST(config, "disk_n_list").set_compatible("pc8001_flop");
 	SOFTWARE_LIST(config, "flop_generic_list").set_compatible("generic_flop_525").set_filter("pc8801");
 }
