@@ -1259,9 +1259,10 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	// TODO: these really maps to "general purpose inputs" UIP1 / UIP2
-	PORT_DIPNAME( 0x40, 0x40, "Memory wait" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+//	PORT_DIPNAME( 0x40, 0x40, "Memory wait" )
+//	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+//	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Disable CMD SING" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1285,13 +1286,15 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_DIPNAME( 0x20, 0x20, "Duplex" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, "Half" )
 	PORT_DIPSETTING(    0x00, "Full" )
-	// TODO: vanilla PC8801 and mkII doesn't have V2
-	PORT_DIPNAME( 0x40, 0x40, "BASIC speed select" ) PORT_DIPLOCATION("SW3:1") // actually SW3:0!
-	PORT_DIPSETTING(    0x40, "High Speed Mode (V1H, V2)" )
-	PORT_DIPSETTING(    0x00, "Standard Mode (V1S)" )
-	PORT_DIPNAME( 0x80, 0x00, "BASIC Version select" ) PORT_DIPLOCATION("SW4:2")
-	PORT_DIPSETTING(    0x80, "V1 Mode" )
-	PORT_DIPSETTING(    0x00, "V2 Mode" )
+	// vanilla PC8801 and mkII doesn't have V2
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+//	PORT_DIPNAME( 0x40, 0x40, "BASIC speed select" ) PORT_DIPLOCATION("SW3:1") // actually SW3:0!
+//	PORT_DIPSETTING(    0x40, "High Speed Mode (V1H, V2)" )
+//	PORT_DIPSETTING(    0x00, "Standard Mode (V1S)" )
+//	PORT_DIPNAME( 0x80, 0x00, "BASIC Version select" ) PORT_DIPLOCATION("SW4:2")
+//	PORT_DIPSETTING(    0x80, "V1 Mode" )
+//	PORT_DIPSETTING(    0x00, "V2 Mode" )
 
 	PORT_START("CTRL")
 	PORT_DIPNAME( 0x02, 0x02, "Monitor Type" )
@@ -1319,10 +1322,9 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_DIPSETTING(    0x08, "9600bps" )
 	PORT_DIPSETTING(    0x09, "19200bps" )
 	#endif
-	// TODO: unemulated waitstate weight
-	PORT_DIPNAME( 0x40, 0x40, "Speed mode" )
-	PORT_DIPSETTING(    0x00, "Slow" )
-	PORT_DIPSETTING(    0x40, DEF_STR( High ) )
+//	PORT_DIPNAME( 0x40, 0x40, "Speed mode" )
+//	PORT_DIPSETTING(    0x00, "Slow" )
+//	PORT_DIPSETTING(    0x40, DEF_STR( High ) )
 
 	PORT_START("MEM")
 	PORT_CONFNAME( 0x0f, 0x0a, "Extension memory" )
@@ -1348,8 +1350,25 @@ static INPUT_PORTS_START( pc8801 )
 //  PORT_CONFSETTING(    0x01, "OPNA (YM2608)" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( pc8801fh )
+static INPUT_PORTS_START( pc8801mk2sr )
 	PORT_INCLUDE( pc8801 )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x40, 0x40, "Memory wait" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x40, 0x40, "BASIC speed select" ) PORT_DIPLOCATION("SW3:1") // actually SW3:0!
+	PORT_DIPSETTING(    0x40, "High Speed Mode (V1H, V2)" )
+	PORT_DIPSETTING(    0x00, "Standard Mode (V1S)" )
+	PORT_DIPNAME( 0x80, 0x00, "BASIC Version select" ) PORT_DIPLOCATION("SW4:2")
+	PORT_DIPSETTING(    0x80, "V1 Mode" )
+	PORT_DIPSETTING(    0x00, "V2 Mode" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( pc8801fh )
+	PORT_INCLUDE( pc8801mk2sr )
 
 	// TODO: KEY12, KEY13 and KEY14 have extended meaning
 	// "KEY12" F6 - F10, BS, INS, DEL
@@ -1853,7 +1872,7 @@ ROM_END
 
 /*
  * The dump only included "maincpu".
- * Other roms arbitrariely taken from PC-8801 & PC-8801 MkIISR
+ * Other roms arbitrarily taken from PC-8801 & PC-8801 MkIISR
  * (there should be at least 1 Kanji ROM).
  */
 ROM_START( pc8801mk2 )
@@ -2056,15 +2075,15 @@ ROM_START( pc8801mc )
 ROM_END
 
 
-COMP( 1981, pc8801,      0,      0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS ) // MIG for border, heavy V1 timing issues
+COMP( 1981, pc8801,      0,      0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS ) // MIG for border, heavy V1 timing issues, has no floppy drive by default
 // PC-8801A (120V, USA & Canada) / PC-8801B (240V, Export?) for Western markets according to a NEC brochure
-COMP( 1983, pc8801mk2,   pc8801, 0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801mkII",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING ) // as above but no border
+COMP( 1983, pc8801mk2,   pc8801, 0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801mkII",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING ) // as above but no border and with built-in floppy (mostly)
 
 // internal OPN
-COMP( 1985, pc8801mk2sr, 0,           0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIISR", MACHINE_IMPERFECT_TIMING )
-//COMP( 1985, pc8801mk2tr, pc8801mk2sr, 0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIITR", MACHINE_IMPERFECT_TIMING )
-COMP( 1985, pc8801mk2fr, pc8801mk2sr, 0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIFR", MACHINE_IMPERFECT_TIMING )
-COMP( 1985, pc8801mk2mr, pc8801mk2sr, 0,      pc8801mk2mr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIMR", MACHINE_IMPERFECT_TIMING )
+COMP( 1985, pc8801mk2sr, 0,           0,      pc8801mk2sr, pc8801mk2sr, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIISR", MACHINE_IMPERFECT_TIMING )
+//COMP( 1985, pc8801mk2tr, pc8801mk2sr, 0,      pc8801mk2sr, pc8801mk2sr, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIITR", MACHINE_IMPERFECT_TIMING )
+COMP( 1985, pc8801mk2fr, pc8801mk2sr, 0,      pc8801mk2sr, pc8801mk2sr, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIFR", MACHINE_IMPERFECT_TIMING )
+COMP( 1985, pc8801mk2mr, pc8801mk2sr, 0,      pc8801mk2mr, pc8801mk2sr, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIMR", MACHINE_IMPERFECT_TIMING )
 
 // internal OPNA
 //COMP( 1986, pc8801fh,    pc8801mh, 0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801FH",     MACHINE_IMPERFECT_TIMING )

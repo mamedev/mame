@@ -22,7 +22,7 @@
 #include "emupal.h"
 #include "screen.h"
 
-#define Z80_TAG         "z80"
+#define Z80_TAG         "maincpu"
 #define N80SR_ROM_TAG   "n80sr_rom"
 #define I8251_TAG       "i8251"
 #define I8257_TAG       "i8257"
