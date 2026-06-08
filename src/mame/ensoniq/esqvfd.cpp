@@ -18,10 +18,10 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(ESQ1X22,     esq1x22_device,     "esq1x22",     "Ensoniq 1x22 VFD")
-DEFINE_DEVICE_TYPE(ESQ2X40,     esq2x40_device,     "esq2x40",     "Ensoniq 2x40 VFD")
-DEFINE_DEVICE_TYPE(ESQ2X40_SQ1, esq2x40_sq1_device, "esq2x40_sq1", "Ensoniq 2x40 VFD (SQ-1 variant)")
-DEFINE_DEVICE_TYPE(ESQ2X40_VFX, esq2x40_vfx_device, "esq2x40_vfx", "Ensoniq 2x40 VFD (VFX Family variant)")
+DEFINE_DEVICE_TYPE(ESQ1X22,      esq1x22_device,      "esq1x22",      "Ensoniq 1x22 VFD")
+DEFINE_DEVICE_TYPE(ESQ2X40_ESQ1, esq2x40_esq1_device, "esq2x40_esq1", "Ensoniq 2x40 VFD")
+DEFINE_DEVICE_TYPE(ESQ2X40_SQ1,  esq2x40_sq1_device,  "esq2x40_sq1",  "Ensoniq 2x40 VFD (SQ-1 variant)")
+DEFINE_DEVICE_TYPE(ESQ2X40_VFX,  esq2x40_vfx_device,  "esq2x40_vfx",  "Ensoniq 2x40 VFD (VFX Family variant)")
 
 // adapted from bfm_bd1, rearranged to work with ASCII data used by the Ensoniq h/w
 static const uint16_t font[] = {
@@ -124,38 +124,45 @@ static const uint16_t font[] = {
 	0x0000, // 0000 0000 0000 0000 (DEL)
 };
 
-esqvfd_device::esqvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, dimensions_param &&dimensions) :
+esqvfd_device::esqvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rows, int cols) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_vfds(std::move(std::get<0>(dimensions))),
-	m_rows(std::get<1>(dimensions)),
-	m_cols(std::get<2>(dimensions))
+	m_rows(rows),
+	m_cols(cols),
+	m_blink_on(false),
+	m_cursx(0),
+	m_cursy(0),
+	m_savedx(0),
+	m_savedy(0),
+	m_curattr(0),
+	m_lastchar(0)
 {
 }
 
 void esqvfd_device::device_start()
 {
+	m_storage = std::make_unique_clear<uint8_t []>(m_rows * m_cols * 3);
+	m_chars = std::span(&m_storage[0], m_rows * m_cols);
+	m_attrs = std::span(&m_storage[m_rows * m_cols], m_rows * m_cols);
+	m_dirty = std::span(&m_storage[m_rows * m_cols * 2], m_rows * m_cols);
+
 	save_item(NAME(m_cursx));
 	save_item(NAME(m_cursy));
 	save_item(NAME(m_savedx));
 	save_item(NAME(m_savedy));
 	save_item(NAME(m_curattr));
-	save_item(NAME(m_chars));
-	save_item(NAME(m_attrs));
-	save_item(NAME(m_dirty));
+	save_pointer(&m_chars.data(), "m_chars", m_rows * m_cols);
+	save_pointer(&m_attrs.data(), "m_attrs", m_rows * m_cols);
+	save_pointer(&m_dirty.data(), "m_dirty", m_rows * m_cols);
 	save_item(NAME(m_lastchar));
 	save_item(NAME(m_blink_on));
 }
 
 void esqvfd_device::device_reset()
 {
-	m_cursx = m_cursy = 0;
+	clear_display();
 	m_savedx = m_savedy = 0;
-	m_curattr = AT_NORMAL;
 	m_lastchar = 0;
 	m_blink_on = false;
-	memset(m_chars, 0, sizeof(m_chars));
-	memset(m_attrs, 0, sizeof(m_attrs));
-	memset(m_dirty, 1, sizeof(m_attrs));
 }
 
 // generic display update; can override from child classes if not good enough
@@ -163,16 +170,16 @@ void esqvfd_device::update_display()
 {
 	for (int row = 0; row < m_rows; row++) {
 		for (int col = 0; col < m_cols; col++) {
-			if (m_dirty[row][col]) {
-				uint32_t segdata = conv_segments(font[m_chars[row][col]]);
+			if (dirty(row, col)) {
+				uint32_t segdata = conv_segments(font[chars(row, col)]);
 
 				// digits:
-				m_vfds->set((row * m_cols) + col, segdata);
+				set_vfd(row, col, segdata);
 
 				// underlines:
-				m_vfds->set((row * m_cols) + col + (m_rows * m_cols), (m_attrs[row][col] & AT_UNDERLINE) ? 1 : 0);
+				set_vfd(row + m_rows, col, (attrs(row, col) & AT_UNDERLINE) ? 1 : 0);
 
-				m_dirty[row][col] = 0;
+				dirty(row, col) = 0;
 			}
 		}
 	}
@@ -206,22 +213,25 @@ void esqvfd_device::set_blink_on(bool blink_on)
 
 	for (int row = 0; row < m_rows; row++) {
 		for (int col = 0; col < m_cols; col++) {
-			m_dirty[row][col] |= m_attrs[row][col] & AT_BLINK;
+			dirty(row, col) |= attrs(row, col) & AT_BLINK;
 		}
 	}
 	update_display();
 }
 
-void esqvfd_device::clear()
+void esqvfd_device::clear_display()
 {
 	m_cursx = m_cursy = m_curattr = 0;
-	memset(m_chars, 0, sizeof(m_chars));
-	memset(m_attrs, 0, sizeof(m_attrs));
-	memset(m_dirty, 1, sizeof(m_dirty));
-
-	update_display();
+	std::fill(m_chars.begin(), m_chars.end(), 0);
+	std::fill(m_attrs.begin(), m_attrs.end(), 0);
+	std::fill(m_dirty.begin(), m_dirty.end(), 1);
 }
 
+void esqvfd_device::clear()
+{
+	clear_display();
+	update_display();
+}
 
 /* 2x40 VFD display used in the ESQ-1, VFX-SD, SD-1, and others */
 
@@ -238,11 +248,11 @@ void esq2x40_device::write_char(uint8_t data)
 		for (uint8_t j = 0; j < m_rows; j++) {
 			for (uint8_t i = 0; i < m_cols; i++) {
 				if (m_cursy == j && i >= m_cursx && i < m_cursx + data)
-					m_attrs[j][i] |= AT_UNDERLINE;
+					attrs(j, i) |= AT_UNDERLINE;
 				else
-					m_attrs[j][i] &= ~AT_UNDERLINE;
+					attrs(j, i) &= ~AT_UNDERLINE;
 
-				m_dirty[j][i] = 1;
+				dirty(j, i) = 1;
 			}
 		}
 
@@ -302,14 +312,14 @@ void esq2x40_device::write_char(uint8_t data)
 				break;
 
 			case 0xd9:  // underline current character
-				m_attrs[m_cursy][m_cursx] |= AT_UNDERLINE;
-				m_dirty[m_cursy][m_cursx] = 1;
+				attrs(m_cursy, m_cursx) |= AT_UNDERLINE;
+				dirty(m_cursy, m_cursx) = 1;
 				LOGDC("set underline at (%d,%d)\n", m_cursy, m_cursx);
 				break;
 
 			case 0xdb:  // de-underline current character
-				m_attrs[m_cursy][m_cursx] &= ~AT_UNDERLINE;
-				m_dirty[m_cursy][m_cursx] = 1;
+				attrs(m_cursy, m_cursx) &= ~AT_UNDERLINE;
+				dirty(m_cursy, m_cursx) = 1;
 				LOGDC("clear underline at (%d,%d)\n", m_cursy, m_cursx);
 				break;
 
@@ -328,7 +338,7 @@ void esq2x40_device::write_char(uint8_t data)
 			case 0xf6:  // restore cursor position
 				m_cursx = m_savedx;
 				m_cursy = m_savedy;
-				m_curattr = m_attrs[m_cursy][m_cursx];
+				m_curattr = attrs(m_cursy, m_cursx);
 				LOGDC("restore cursor position (%d,%d) attr %x\n", m_cursy, m_cursx, m_curattr);
 				break;
 
@@ -346,9 +356,9 @@ void esq2x40_device::write_char(uint8_t data)
 				break;
 		}
 	} else if ((data >= 0x20) && (data <= 0x5f)) {
-		m_chars[m_cursy][m_cursx] = data - ' ';
-		m_attrs[m_cursy][m_cursx] = m_curattr;
-		m_dirty[m_cursy][m_cursx] = 1;
+		chars(m_cursy, m_cursx) = data - ' ';
+		attrs(m_cursy, m_cursx) = m_curattr;
+		dirty(m_cursy, m_cursx) = 1;
 
 		cursor_right();
 		LOGDC("char '%c', cursor now (%d,%d)\n", data, m_cursy, m_cursx);
@@ -363,26 +373,26 @@ bool esq2x40_device::write_contents(std::ostream &o)
 {
 	o.put((char) 0xd6); // clear screen
 
-	uint8_t attrs = 0;
+	uint8_t attr = 0;
 	for (int row = 0; row < 2; row++) {
 		o.put((char) (0x80 + (40 * row))); // move to first column this row
 
 		for (int col = 0; col < 40; col++) {
-			if (m_attrs[row][col] != attrs) {
-				attrs = m_attrs[row][col];
+			if (attrs(row, col) != attr) {
+				attr = attrs(row, col);
 
 				o.put((char) 0xd1); // all attributes off
 
-				if (attrs & AT_BLINK) {
+				if (attr & AT_BLINK) {
 					o.put((char) 0xd0); // blink on
 				}
 
-				if (attrs & AT_UNDERLINE) {
+				if (attr & AT_UNDERLINE) {
 					o.put((char) 0xd3); // underline
 				}
 			}
 
-			o.put((char) (m_chars[row][col] + ' '));
+			o.put((char) (chars(row, col) + ' '));
 		}
 	}
 
@@ -399,12 +409,13 @@ bool esq2x40_device::write_contents(std::ostream &o)
 
 
 esq2x40_device::esq2x40_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	esqvfd_device(mconfig, type, tag, owner, clock, make_dimensions<2, 40>(*this))
+	esqvfd_device(mconfig, type, tag, owner, clock, 2, 40)
 {
 }
 
-esq2x40_device::esq2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	esq2x40_device(mconfig, ESQ2X40, tag, owner, clock)
+esq2x40_esq1_device::esq2x40_esq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	esq2x40_device(mconfig, ESQ2X40_ESQ1, tag, owner, clock),
+	m_vfds(*this, "vfd%u", 0U)
 {
 }
 
@@ -420,7 +431,8 @@ const tiny_rom_entry *esq2x40_vfx_device::device_rom_region() const
 
 esq2x40_vfx_device::esq2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	esq2x40_device(mconfig, ESQ2X40_VFX, tag, owner, clock),
-	m_font(*this, "font")
+	m_font(*this, "font"),
+	m_vfds(*this, "vfd%u", 0U)
 {
 }
 
@@ -436,11 +448,11 @@ void esq2x40_vfx_device::update_display()
 {
 	for (int row = 0; row < m_rows; row++) {
 		for (int col = 0; col < m_cols; col++) {
-			if (m_dirty[row][col]) {
-				uint8_t c = m_chars[row][col];
+			if (dirty(row, col)) {
+				uint8_t c = chars(row, col);
 
 				uint16_t char_segments = m_font[c < 96 ? c : 0];
-				auto attr = m_attrs[row][col];
+				auto attr = attrs(row, col);
 				uint16_t segments;
 
 				if ((attr & AT_BLINK) && !m_blink_on) {
@@ -456,16 +468,16 @@ void esq2x40_vfx_device::update_display()
 						segments = char_segments;
 				}
 
-				m_vfds->set((row * m_cols) + col, segments);
+				set_vfd(row, col, segments);
 
-				m_dirty[row][col] = 0;
+				dirty(row, col) = 0;
 			}
 		}
 	}
 }
 
 
-/* 1x22 display from the VFX (not right, but it'll do for now) */
+/* 1x22 display for the EPS family (not right, but it'll do for now) */
 
 void esq1x22_device::device_add_mconfig(machine_config &config)
 {
@@ -478,10 +490,6 @@ void esq1x22_device::write_char(uint8_t data)
 	if (data >= 0x60) {
 		switch (data) {
 			case 'f':   // clear screen
-				m_cursx = m_cursy = 0;
-				memset(m_chars, 0, sizeof(m_chars));
-				memset(m_attrs, 0, sizeof(m_attrs));
-				memset(m_dirty, 1, sizeof(m_dirty));
 				break;
 
 			default:
@@ -490,8 +498,8 @@ void esq1x22_device::write_char(uint8_t data)
 		}
 	} else {
 		if ((data >= 0x20) && (data <= 0x5f)) {
-			m_chars[0][m_cursx] = data - ' ';
-			m_dirty[0][m_cursx] = 1;
+			chars(0, m_cursx) = data - ' ';
+			dirty(0, m_cursx) = 1;
 			m_cursx++;
 
 			if (m_cursx >= 23) {
@@ -504,7 +512,8 @@ void esq1x22_device::write_char(uint8_t data)
 }
 
 esq1x22_device::esq1x22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	esqvfd_device(mconfig, ESQ1X22, tag, owner, clock, make_dimensions<1, 22>(*this))
+	esqvfd_device(mconfig, ESQ1X22, tag, owner, clock, 1, 22),
+	m_vfds(*this, "vfd%u", 0U)
 {
 }
 
@@ -528,9 +537,9 @@ void esq2x40_sq1_device::write_char(uint8_t data)
 	} else if (m_wait88shift) {
 		m_wait88shift = false;
 	} else if ((data >= 0x20) && (data <= 0x7f)) {
-		m_chars[m_cursy][m_cursx] = data - ' ';
-		m_attrs[m_cursy][m_cursx] = m_curattr;
-		m_dirty[m_cursy][m_cursx] = 1;
+		chars(m_cursy, m_cursx) = data - ' ';
+		attrs(m_cursy, m_cursx) = m_curattr;
+		dirty(m_cursy, m_cursx) = 1;
 		m_cursx++;
 
 		if (m_cursx >= 39) {
@@ -539,10 +548,7 @@ void esq2x40_sq1_device::write_char(uint8_t data)
 
 		update_display();
 	} else if (data == 0x83) {
-		m_cursx = m_cursy = 0;
-		memset(m_chars, 0, sizeof(m_chars));
-		memset(m_attrs, 0, sizeof(m_attrs));
-		memset(m_dirty, 1, sizeof(m_dirty));
+		clear_display();
 	} else if (data == 0x87) {
 		m_wait87shift = true;
 	} else if (data == 0x88) {
@@ -553,7 +559,8 @@ void esq2x40_sq1_device::write_char(uint8_t data)
 }
 
 esq2x40_sq1_device::esq2x40_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	esqvfd_device(mconfig, ESQ2X40_SQ1, tag, owner, clock, make_dimensions<2, 40>(*this))
+	esqvfd_device(mconfig, ESQ2X40_SQ1, tag, owner, clock, 2, 40),
+	m_vfds(*this, "vfd%u", 0U)
 {
 	m_wait87shift = false;
 	m_wait88shift = false;

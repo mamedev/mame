@@ -287,7 +287,7 @@
 				<param name="n" start="~s~" increment="1" />
 				<param name="x" start="0" increment="342" />
 
-				<param name="input" value="vfd~n~" />
+				<param name="input" value="vfd:vfd~n~" />
 				<group ref="vfd_cell">
 					<bounds x="~x~" y="~y~" width="342" height="572" />
 				</group>
@@ -2577,6 +2577,15 @@
 			<bounds x="20" y="15" width="20" height="60" />
 		</group>
 	</group>
+	<group name="DisplayOnly">
+		<bounds x="11" y="30.75936" width="223" height="20.48129" />
+		<element ref="rect_glass">
+			<bounds x="11" y="30.75936" width="223" height="20.48129" />
+		</element>
+		<group ref="vfd">
+			<bounds x="12" y="32.50936" width="221" height="18.48129" />
+		</group>
+	</group>
 
 	<view name="Full">
 		<element ref="rect_black">
@@ -2739,6 +2748,11 @@
 			<bounds x="42.5" y="86.36667" width="190" height="12.66667" />
 		</element>
 	</view>
+	<view name="Display">
+		<group ref="DisplayOnly">
+			<bounds x="11" y="30.75936" width="223" height="20.48129" />
+		</group>
+	</view>
 	<script>
 		<![CDATA[
 			-- Keep track of the pointer managers
@@ -2749,13 +2763,14 @@
 			file:set_resolve_tags_callback(
 				function ()
 					for view_name, view in pairs(file.views) do
-						-- Hide the warning about requiring the Layout plugin.
-						view.items["plugin_warning"]:set_state(0)
-
-						local manager = PointerManager:create(view)
-						pointer_managers[view_name] = manager
 
 						if view.unqualified_name == "Full" then
+							-- Hide the warning about requiring the Layout plugin.
+							view.items["plugin_warning"]:set_state(0)
+
+							local manager = PointerManager:create(view)
+							pointer_managers[view_name] = manager
+
 							manager:addHandler(SliderHandler:create(view, "slider_volume", "slider_knob_volume", "analog_volume"))
 							manager:addHandler(SliderHandler:create(view, "slider_data_entry", "slider_knob_data_entry", "analog_data_entry"))
 							media_change_notifiers[":cart"] = add_media_change_notifier(view, "media_cartridge", ":cart")
@@ -2766,6 +2781,12 @@
 						end
 
 						if view.unqualified_name == "Compact" then
+							-- Hide the warning about requiring the Layout plugin.
+							view.items["plugin_warning"]:set_state(0)
+
+							local manager = PointerManager:create(view)
+							pointer_managers[view_name] = manager
+
 							manager:addHandler(SliderHandler:create(view, "slider_volume", "slider_knob_volume", "analog_volume"))
 							manager:addHandler(SliderHandler:create(view, "slider_data_entry", "slider_knob_data_entry", "analog_data_entry"))
 							manager:addHandler(SliderHandler:create(view, "wheel_pitch_bend", "wheel_knob_pitch_bend", "analog_pitch_bend", true, true))
@@ -2774,11 +2795,23 @@
 						end
 
 						if view.unqualified_name == "Panel" then
+							-- Hide the warning about requiring the Layout plugin.
+							view.items["plugin_warning"]:set_state(0)
+
+							local manager = PointerManager:create(view)
+							pointer_managers[view_name] = manager
+
 							manager:addHandler(SliderHandler:create(view, "slider_volume", "slider_knob_volume", "analog_volume"))
 							manager:addHandler(SliderHandler:create(view, "slider_data_entry", "slider_knob_data_entry", "analog_data_entry"))
 						end
 
 						if view.unqualified_name == "Tablet" then
+							-- Hide the warning about requiring the Layout plugin.
+							view.items["plugin_warning"]:set_state(0)
+
+							local manager = PointerManager:create(view)
+							pointer_managers[view_name] = manager
+
 							manager:addHandler(SliderHandler:create(view, "slider_volume", "slider_knob_volume", "analog_volume"))
 							manager:addHandler(SliderHandler:create(view, "slider_data_entry", "slider_knob_data_entry", "analog_data_entry"))
 						end
@@ -3108,12 +3141,17 @@
 				local full_width = octaves_width + w_white
 
 				local function find_12_key(x, y, w, h)
-					if x > octaves_width then
+					if x < 0 or full_width < x then
+						return nil
+					end
+
+					if octaves_width <= x then
 						return 12 * n_octaves
 					end
 
 					local octave, kx = math.modf((x / w) * (full_width / octave_shift))
 					if octave == n_octaves then
+						-- this should already have been taken care of by the above
 						return 12 * octave
 					end
 
@@ -3167,6 +3205,9 @@
 			KeyboardHandler = {}
 
 			function KeyboardHandler:create(view, clickarea_id, key_id_prefix, port_prefix, from_octave, n_octaves)
+				local from_key = 12 * from_octave
+				local n_keys = 12 * n_octaves + 1
+
 				local instance = {
 					view = view,
 					clickarea = view.items[clickarea_id],
@@ -3190,10 +3231,7 @@
 					return nil
 				end
 
-				local from_key = 12 * from_octave
-				local n_keys = 12 * n_octaves + 1
-
-				for i = 0, n_keys -1 do
+				for i = 0, n_keys - 1 do
 					local key_info = k12[(i % 12) + 1]
 					local key = {
 						id = key_id_prefix .. i,
@@ -3217,7 +3255,7 @@
 
 					function key:updateViewItemState()
 						if self.pressure > 0 then
-							self.item:set_state(127 + key.pressure)
+							self.item:set_state(127 + self.pressure)
 						elseif self.velocity > 0 then
 							self.item:set_state(self.velocity)
 						else

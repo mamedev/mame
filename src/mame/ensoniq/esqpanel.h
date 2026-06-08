@@ -95,16 +95,16 @@ protected:
 	required_device<esq1x22_device> m_vfd;
 };
 
-class esqpanel2x40_device : public esqpanel_device {
+class esqpanel2x40_esq1_device : public esqpanel_device {
 public:
-	esqpanel2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	esqpanel2x40_esq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void send_to_display(uint8_t data) override { m_vfd->write_char(data); }
 
-	required_device<esq2x40_device> m_vfd;
+	required_device<esq2x40_esq1_device> m_vfd;
 };
 
 class esqpanel2x40_vfx_device : public esqpanel_device {
@@ -191,10 +191,10 @@ protected:
 	required_device<esq2x16_sq1_device> m_vfd;
 };
 
-DECLARE_DEVICE_TYPE(ESQPANEL1X22,     esqpanel1x22_device)
-DECLARE_DEVICE_TYPE(ESQPANEL2X40,     esqpanel2x40_device)
-DECLARE_DEVICE_TYPE(ESQPANEL2X40_VFX, esqpanel2x40_vfx_device)
-DECLARE_DEVICE_TYPE(ESQPANEL2X40_SQ1, esqpanel2x40_sq1_device)
-DECLARE_DEVICE_TYPE(ESQPANEL2X16_SQ1, esqpanel2x16_sq1_device)
+DECLARE_DEVICE_TYPE(ESQPANEL1X22,      esqpanel1x22_device)
+DECLARE_DEVICE_TYPE(ESQPANEL2X40_ESQ1, esqpanel2x40_esq1_device)
+DECLARE_DEVICE_TYPE(ESQPANEL2X40_VFX,  esqpanel2x40_vfx_device)
+DECLARE_DEVICE_TYPE(ESQPANEL2X40_SQ1,  esqpanel2x40_sq1_device)
+DECLARE_DEVICE_TYPE(ESQPANEL2X16_SQ1,  esqpanel2x16_sq1_device)
 
 #endif // MAME_ENSONIQ_ESQPANEL_H
