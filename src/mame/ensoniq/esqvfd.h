@@ -4,10 +4,12 @@
 #define MAME_ENSONIQ_ESQVFD_H
 
 #include <memory>
+#include <span>
 #include <tuple>
 
 
-class esqvfd_device : public device_t {
+class esqvfd_device : public device_t
+{
 public:
 	void write(uint8_t data) { write_char(data); }
 
@@ -35,25 +37,27 @@ protected:
 	uint8_t &attrs(unsigned row, unsigned col) { return m_attrs[index_for(row, col)]; }
 	uint8_t &dirty(unsigned row, unsigned col) { return m_dirty[index_for(row, col)]; }
 
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
 	static constexpr uint8_t AT_NORMAL      = 0x00;
 	static constexpr uint8_t AT_UNDERLINE   = 0x01;
 	static constexpr uint8_t AT_BLINK       = 0x02;
 
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-
-	int m_rows = 0, m_cols = 0;
-	bool m_blink_on = false;
-	int m_cursx = 0, m_cursy = 0;
-	int m_savedx = 0, m_savedy = 0;
-	uint8_t m_curattr = 0;
-	uint8_t m_lastchar = 0;
-	std::vector<uint8_t> m_chars;
-	std::vector<uint8_t> m_attrs;
-	std::vector<uint8_t> m_dirty;
+	int const m_rows, m_cols;
+	std::unique_ptr<uint8_t []> m_storage;
+	std::span<uint8_t> m_chars;
+	std::span<uint8_t> m_attrs;
+	std::span<uint8_t> m_dirty;
+	bool m_blink_on;
+	int16_t m_cursx, m_cursy;
+	int16_t m_savedx, m_savedy;
+	uint8_t m_curattr;
+	uint8_t m_lastchar;
 };
 
-class esq1x22_device : public esqvfd_device {
+class esq1x22_device : public esqvfd_device
+{
 public:
 	esq1x22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -70,7 +74,8 @@ private:
 
 // Virtual superclass for ESQ1- and VFX-family 2x40 displays,
 // allowing common code to be shared.
-class esq2x40_device : public esqvfd_device {
+class esq2x40_device : public esqvfd_device
+{
 public:
 	esq2x40_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -81,7 +86,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
-class esq2x40_esq1_device : public esq2x40_device {
+class esq2x40_esq1_device : public esq2x40_device
+{
 public:
 	esq2x40_esq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -92,7 +98,8 @@ private:
 	output_finder<2 * 40 * 2> m_vfds;
 };
 
-class esq2x40_vfx_device : public esq2x40_device {
+class esq2x40_vfx_device : public esq2x40_device
+{
 public:
 	esq2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual void update_display() override;
@@ -102,7 +109,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	const tiny_rom_entry *device_rom_region() const override;
+	const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	required_region_ptr<u16> m_font;
