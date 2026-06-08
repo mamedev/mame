@@ -128,22 +128,31 @@ esqvfd_device::esqvfd_device(const machine_config &mconfig, device_type type, co
 	device_t(mconfig, type, tag, owner, clock),
 	m_rows(rows),
 	m_cols(cols),
-	m_chars(rows * cols),
-	m_attrs(rows * cols),
-	m_dirty(rows * cols)
+	m_blink_on(false),
+	m_cursx(0),
+	m_cursy(0),
+	m_savedx(0),
+	m_savedy(0),
+	m_curattr(0),
+	m_lastchar(0)
 {
 }
 
 void esqvfd_device::device_start()
 {
+	m_storage = std::make_unique_clear<uint8_t []>(m_rows * m_cols * 3);
+	m_chars = std::span(&m_storage[0], m_rows * m_cols);
+	m_attrs = std::span(&m_storage[m_rows * m_cols], m_rows * m_cols);
+	m_dirty = std::span(&m_storage[m_rows * m_cols * 2], m_rows * m_cols);
+
 	save_item(NAME(m_cursx));
 	save_item(NAME(m_cursy));
 	save_item(NAME(m_savedx));
 	save_item(NAME(m_savedy));
 	save_item(NAME(m_curattr));
-	save_item(NAME(m_chars));
-	save_item(NAME(m_attrs));
-	save_item(NAME(m_dirty));
+	save_pointer(&m_chars.data(), "m_chars", m_rows * m_cols);
+	save_pointer(&m_attrs.data(), "m_attrs", m_rows * m_cols);
+	save_pointer(&m_dirty.data(), "m_dirty", m_rows * m_cols);
 	save_item(NAME(m_lastchar));
 	save_item(NAME(m_blink_on));
 }
