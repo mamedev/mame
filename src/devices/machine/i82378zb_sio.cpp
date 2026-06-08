@@ -1,10 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders: Angelo Salese
+/**************************************************************************************************
+
+Intel 82378ZB (SIO) & 82379AB (SIO.A) southbridges
+
+Has a X-Bus device that maps the various optional devices in place of a Super I/O.
+ECSADDR[2:0] connects thru two 74F138 decoders, page 112~115 diagrams for x86 based systems.
+Flash BIOS, keyboard, RTC, IDE, FDC, LPT, COMs and configuration RAM maps there
+
+BeBox likely maps just a subset of this given that it has an actual Super I/O (i82091aa)
+for LPT, COMs and FDC. This is translated in clients to be responsible about mapping the
+individual devices, as sub-device of this.
+
+**************************************************************************************************/
 
 #include "emu.h"
 #include "i82378zb_sio.h"
 
-#include "bus/pc_kbd/keyboards.h"
 #include "speaker.h"
 
 #define LOG_IRQ      (1U << 1) // log line state
@@ -17,6 +29,8 @@
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(I82378ZB_SIO, i82378zb_sio_device, "i82378zb_sio", "Intel 82378ZB System I/O (SIO)")
+//DEFINE_DEVICE_TYPE(I82379AB_SIO, i82379ab_sio_device, "i82379ab_sio", "Intel 82379AB System I/O (SIO.A)")
+
 
 i82378zb_sio_device::i82378zb_sio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, type, tag, owner, clock)
@@ -24,11 +38,11 @@ i82378zb_sio_device::i82378zb_sio_device(const machine_config &mconfig, device_t
 	, m_pic(*this, "pic%u", 0U)
 	, m_dma(*this, "dma%u", 0U)
 	, m_pit(*this, "pit")
-	, m_keybc(*this, "keybc")
-	, m_at_con(*this, "at_con")
-//  , m_rtc(*this, "rtc")
 	, m_isabus(*this, "isabus")
 	, m_speaker(*this, "speaker")
+	, m_xbus_keybc(*this, "xbus_keybc")
+//  , m_xbus_rtc(*this, "xbus_rtc")
+	, m_xbus_ide(*this, "xbus_ide%u", 0U)
 	, m_boot_state_hook(*this)
 	, m_write_a20m(*this)
 	, m_write_cpureset(*this)
@@ -103,6 +117,7 @@ void i82378zb_sio_device::device_add_mconfig(machine_config &config)
 	m_pic[1]->out_int_callback().set(m_pic[0], FUNC(pic8259_device::ir2_w));
 	m_pic[1]->in_sp_callback().set_constant(0);
 
+	// TODO: ISA bus runs at 6 to 8.33 MHz
 	ISA16(config, m_isabus);
 	m_isabus->irq3_callback().set(FUNC(i82378zb_sio_device::pc_irq3_w));
 	m_isabus->irq4_callback().set(FUNC(i82378zb_sio_device::pc_irq4_w));
@@ -123,17 +138,6 @@ void i82378zb_sio_device::device_add_mconfig(machine_config &config)
 	m_isabus->drq6_callback().set(m_dma[1], FUNC(am9517a_device::dreq2_w));
 	m_isabus->drq7_callback().set(m_dma[1], FUNC(am9517a_device::dreq3_w));
 	m_isabus->iochck_callback().set(FUNC(i82378zb_sio_device::iochck_w));
-
-	AT_KEYBOARD_CONTROLLER(config, m_keybc, XTAL(12'000'000));
-	m_keybc->hot_res().set(FUNC(i82378zb_sio_device::cpu_reset_w));
-	m_keybc->gate_a20().set(FUNC(i82378zb_sio_device::cpu_a20_w));
-	m_keybc->kbd_irq().set(m_pic[0], FUNC(pic8259_device::ir1_w));
-	m_keybc->kbd_clk().set(m_at_con, FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_keybc->kbd_data().set(m_at_con, FUNC(pc_kbdc_device::data_write_from_mb));
-
-	PC_KBDC(config, m_at_con, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
-	m_at_con->out_clock_cb().set("keybc", FUNC(at_keyboard_controller_device::kbd_clk_w));
-	m_at_con->out_data_cb().set("keybc", FUNC(at_keyboard_controller_device::kbd_data_w));
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -156,6 +160,17 @@ void i82378zb_sio_device::device_start()
 //  m_pci_root->set_irq_handler(pci_irq_handler(*this, FUNC(i82378zb_sio_device::irq_handler)));
 
 	save_item(NAME(m_ubcsa));
+	save_item(NAME(m_ubcsb));
+	save_item(NAME(m_port92));
+
+	save_item(NAME(m_ext_gatea20));
+	save_item(NAME(m_fast_gatea20));
+
+	// X-Bus config optimizers, for checking presence of objects
+	m_has_xbus.keyboard = m_xbus_keybc != nullptr;
+	m_has_xbus.flash_bios = m_region != nullptr;
+	// we expect both IDE slots to be filled for now (X-Bus decodes from 1 bit alone)
+	m_has_xbus.ide = m_xbus_ide[0] != nullptr && m_xbus_ide[1] != nullptr;
 }
 
 void i82378zb_sio_device::device_reset()
@@ -173,6 +188,9 @@ void i82378zb_sio_device::device_reset()
 
 	m_ubcsa = 0x07;
 	m_ubcsb = 0x4f;
+
+	m_ext_gatea20 = 0;
+	m_fast_gatea20 = 0;
 
 	remap_cb();
 }
@@ -255,20 +273,33 @@ void i82378zb_sio_device::map_extra(
 	// assume that map_extra of the southbridge is called before the one of the northbridge
 	m_isabus->remap(AS_PROGRAM, 0, 1 << 24);
 	// TODO: bits 7-6 in UBCSA for BIOS enable control
-	map_bios(memory_space, 0xffffffff - m_region->bytes() + 1, 0xffffffff);
-	map_bios(memory_space, 0x000e0000, 0x000fffff);
+	if (m_has_xbus.flash_bios)
+	{
+		map_bios(memory_space, 0xffffffff - m_region->bytes() + 1, 0xffffffff);
+		map_bios(memory_space, 0x000e0000, 0x000fffff);
+	}
 	m_isabus->remap(AS_IO, 0, 0xffff);
 	io_space->install_device(0, 0xffff, *this, &i82378zb_sio_device::internal_io_map);
 
-	// TODO: UBCSA bit 4 for IDE
 	// TODO: UBCSA bits 3,2 for FDC + bit 5 for location address
 
-	if (BIT(m_ubcsa, 1))
+	// decodes IDE signals after FDC (i.e. overrides $3f6 / $376)
+	if (BIT(m_ubcsa, 4) && m_has_xbus.ide)
 	{
-		m_isabus->install_device(0x60, 0x60, read8smo_delegate(*m_keybc, FUNC(at_keyboard_controller_device::data_r)), write8smo_delegate(*m_keybc, FUNC(at_keyboard_controller_device::data_w)));
-		m_isabus->install_device(0x64, 0x64, read8smo_delegate(*m_keybc, FUNC(at_keyboard_controller_device::status_r)), write8smo_delegate(*m_keybc, FUNC(at_keyboard_controller_device::command_w)));
+		io_space->install_readwrite_handler(0x1f0, 0x1f7, read32s_delegate(*m_xbus_ide[0], FUNC(ide_controller_32_device::cs0_r)), write32s_delegate(*m_xbus_ide[0], FUNC(ide_controller_32_device::cs0_w)));
+		io_space->install_readwrite_handler(0x3f0, 0x3f7, read32s_delegate(*m_xbus_ide[0], FUNC(ide_controller_32_device::cs1_r)), write32s_delegate(*m_xbus_ide[0], FUNC(ide_controller_32_device::cs1_w)));
+
+		io_space->install_readwrite_handler(0x170, 0x177, read32s_delegate(*m_xbus_ide[1], FUNC(ide_controller_32_device::cs0_r)), write32s_delegate(*m_xbus_ide[1], FUNC(ide_controller_32_device::cs0_w)));
+		io_space->install_readwrite_handler(0x370, 0x377, read32s_delegate(*m_xbus_ide[1], FUNC(ide_controller_32_device::cs1_r)), write32s_delegate(*m_xbus_ide[1], FUNC(ide_controller_32_device::cs1_w)));
 	}
 
+	if (BIT(m_ubcsa, 1) && m_has_xbus.keyboard)
+	{
+		io_space->install_readwrite_handler(0x60, 0x60, read8smo_delegate(*m_xbus_keybc, FUNC(at_keyboard_controller_device::data_r)), write8smo_delegate(*m_xbus_keybc, FUNC(at_keyboard_controller_device::data_w)));
+		io_space->install_readwrite_handler(0x64, 0x64, read8smo_delegate(*m_xbus_keybc, FUNC(at_keyboard_controller_device::status_r)), write8smo_delegate(*m_xbus_keybc, FUNC(at_keyboard_controller_device::command_w)));
+	}
+
+	// This maps thru X-Bus but we don't know yet the type it expects so using devcb for now.
 	if (BIT(m_ubcsa, 0))
 	{
 		// no read support at $70
@@ -281,7 +312,14 @@ void i82378zb_sio_device::map_extra(
 		);
 	}
 
-	// TODO: UBCSB stuff, gated thru a X-Bus container because BeBox won't care
+	// TODO: does it decode on BeBox?
+	if (BIT(m_ubcsb, 6))
+	{
+		io_space->install_readwrite_handler(0x92, 0x92,
+			read8sm_delegate(*this, FUNC(i82378zb_sio_device::port92_r)),
+			write8sm_delegate(*this, FUNC(i82378zb_sio_device::port92_w))
+		);
+	}
 }
 
 /*
@@ -525,13 +563,40 @@ void i82378zb_sio_device::at_dma8237_2_w(offs_t offset, uint8_t data)
 	m_dma[1]->write(offset / 2, data);
 }
 
-// TODO: has 92h fast port
 void i82378zb_sio_device::cpu_a20_w(int state)
 {
-	m_write_a20m(state);
+	m_ext_gatea20 = state;
+	m_write_a20m(m_fast_gatea20 | m_ext_gatea20);
+}
+
+void i82378zb_sio_device::fast_gatea20(int state)
+{
+	m_fast_gatea20 = state;
+	m_write_a20m(m_fast_gatea20 | m_ext_gatea20);
 }
 
 void i82378zb_sio_device::cpu_reset_w(int state)
 {
 	m_write_cpureset(state);
 }
+
+u8 i82378zb_sio_device::port92_r(offs_t offset)
+{
+	return 0x24 | m_port92;
+}
+
+void i82378zb_sio_device::port92_w(offs_t offset, u8 data)
+{
+	fast_gatea20(BIT(data, 1));
+
+	// TODO: alt system reset
+//  if (!BIT(m_port92, 0) && BIT(data, 0))
+//  {
+//      // pulse reset line
+//      m_write_cpureset(1);
+//      m_write_cpureset(0);
+//  }
+
+	m_port92 = data & 3;
+}
+

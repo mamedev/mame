@@ -9,10 +9,10 @@
 #include "pci.h"
 
 #include "bus/isa/isa.h"
-#include "bus/pc_kbd/pc_kbdc.h"
 #include "cpu/i386/i386.h"
 #include "machine/am9517a.h"
 #include "machine/at_keybc.h"
+#include "machine/idectrl.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "sound/spkrdev.h"
@@ -35,6 +35,14 @@ public:
 	auto a20m() { return m_write_a20m.bind(); }
 	auto cpureset() { return m_write_cpureset.bind(); }
 //	auto pcirst() { return m_write_pcirst.bind(); }
+
+	// X-Bus integrations
+	void pc_irq1_w(int state);
+	void pc_irq14_w(int state);
+	void pc_irq15_w(int state);
+
+	void cpu_a20_w(int state);
+	void cpu_reset_w(int state);
 
 	auto rtcale() { return m_rtcale.bind(); }
 	auto rtccs_read() { return m_rtccs_read.bind(); }
@@ -61,11 +69,12 @@ private:
 	required_device_array<pic8259_device, 2> m_pic;
 	required_device_array<am9517a_device, 2> m_dma;
 	required_device<pit8254_device> m_pit;
-	required_device<at_keyboard_controller_device> m_keybc;
-	required_device<pc_kbdc_device> m_at_con;
 
 	required_device<isa16_device> m_isabus;
 	required_device<speaker_sound_device> m_speaker;
+
+	optional_device<at_keyboard_controller_device> m_xbus_keybc;
+	optional_device_array<ide_controller_32_device, 2> m_xbus_ide;
 
 	devcb_write8 m_boot_state_hook;
 	devcb_write_line m_write_a20m;
@@ -75,6 +84,12 @@ private:
 	devcb_read8 m_rtccs_read;
 	devcb_write8 m_rtccs_write;
 
+	struct {
+		bool keyboard;
+		bool flash_bios;
+		bool ide;
+	} m_has_xbus;
+
 	void map_bios(address_space *memory_space, uint32_t start, uint32_t end);
 
 	u8 m_ubcsa;
@@ -83,6 +98,17 @@ private:
 	void rtc_index_w(offs_t offset, u8 data);
 	u8 rtc_data_r(offs_t offset);
 	void rtc_data_w(offs_t offset, u8 data);
+
+	u8 m_port92;
+	int m_ext_gatea20;
+	int m_fast_gatea20;
+
+	u8 port92_r(offs_t offset);
+	void port92_w(offs_t offset, u8 data);
+	void emulated_kbreset(int state);
+	void emulated_gatea20(int state);
+	void fast_gatea20(int state);
+	void keyboard_gatea20(int state);
 
 	// Southbridge common stuff
 	void at_pit8254_out0_changed(int state);
@@ -120,7 +146,6 @@ private:
 	void at_portb_w(uint8_t data);
 	void at_speaker_set_spkrdata(uint8_t data);
 	uint8_t get_slave_ack(offs_t offset);
-	void pc_irq1_w(int state);
 	void pc_irq3_w(int state);
 	void pc_irq4_w(int state);
 	void pc_irq5_w(int state);
@@ -131,8 +156,6 @@ private:
 	void pc_irq10_w(int state);
 	void pc_irq11_w(int state);
 	void pc_irq12m_w(int state);
-	void pc_irq14_w(int state);
-	void pc_irq15_w(int state);
 
 //	void pc_pirqa_w(int state);
 //	void pc_pirqb_w(int state);
@@ -160,11 +183,8 @@ private:
 	uint16_t m_dma_high_byte = 0;
 	uint8_t m_channel_check = 0;
 	bool m_nmi_enabled = false;
-
-	void cpu_a20_w(int state);
-	void cpu_reset_w(int state);
-
 };
+
 
 DECLARE_DEVICE_TYPE(I82378ZB_SIO, i82378zb_sio_device)
 //DECLARE_DEVICE_TYPE(I82379AB_SIOA, i82379ab_sio_device)

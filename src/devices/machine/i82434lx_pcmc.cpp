@@ -120,11 +120,13 @@ void i82434nx_pcmc_device::latency_timer_w(u8 data)
 
 void i82434nx_pcmc_device::config_address_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	// TODO: same byte vs. dword access as i82425ex_psc
-	//if (mem_mask == 0x0000'ff00)
-	//  m_ib->trc_w(offset, data >> 8);
-	//else
-	pci_host_device::config_address_w(offset, data, mem_mask);
+	if (mem_mask == 0xffff'ffff)
+		pci_host_device::config_address_w(offset, data, mem_mask);
+	else
+	{
+		// TODO: same byte vs. dword access as i82425ex_psc
+		LOG("config_address_w byte: %08x & %08x -> %08x\n", offset, mem_mask, data);
+	}
 }
 
 // For each PAM register:
