@@ -26,11 +26,11 @@ public:
 protected:
 	esqvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rows, int cols);
 
-	virtual void set_vfd(unsigned index, uint32_t value) = 0;
+	virtual void set_vfd_at_index(unsigned index, uint32_t value) = 0;
 
 	int index_for(unsigned row, unsigned col) { return row * m_cols + col; }
 
-	void set_vfd(unsigned row, unsigned col, uint32_t value) { set_vfd(index_for(row, col), value); }
+	void set_vfd(unsigned row, unsigned col, uint32_t value) { set_vfd_at_index(index_for(row, col), value); }
 	uint8_t &chars(unsigned row, unsigned col) { return m_chars[index_for(row, col)]; }
 	uint8_t &attrs(unsigned row, unsigned col) { return m_attrs[index_for(row, col)]; }
 	uint8_t &dirty(unsigned row, unsigned col) { return m_dirty[index_for(row, col)]; }
@@ -60,7 +60,7 @@ public:
 	virtual void write_char(uint8_t data) override;
 
 protected:
-	virtual void set_vfd(unsigned index, uint32_t value) override { m_vfds[index] = value; }
+	virtual void set_vfd_at_index(unsigned index, uint32_t value) override { m_vfds[index] = value; }
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
@@ -86,7 +86,7 @@ public:
 	esq2x40_esq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void set_vfd(unsigned index, uint32_t value) override { m_vfds[index] = value; }
+	virtual void set_vfd_at_index(unsigned index, uint32_t value) override { m_vfds[index] = value; }
 
 private:
 	output_finder<2 * 40 * 2> m_vfds;
@@ -98,7 +98,7 @@ public:
 	virtual void update_display() override;
 
 protected:
-	virtual void set_vfd(unsigned index, uint32_t value) override { m_vfds[index] = value; }
+	virtual void set_vfd_at_index(unsigned index, uint32_t value) override { m_vfds[index] = value; }
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -116,7 +116,7 @@ public:
 	virtual void write_char(uint8_t data) override;
 
 protected:
-	virtual void set_vfd(unsigned index, uint32_t value) override { m_vfds[index] = value; }
+	virtual void set_vfd_at_index(unsigned index, uint32_t value) override { m_vfds[index] = value; }
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 

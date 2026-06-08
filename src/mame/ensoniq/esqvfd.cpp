@@ -459,7 +459,7 @@ void esq2x40_vfx_device::update_display()
 						segments = char_segments;
 				}
 
-				m_vfds[(row * m_cols) + col] = segments;
+				set_vfd(row, col, segments);
 
 				dirty(row, col) = 0;
 			}
