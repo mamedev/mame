@@ -30,8 +30,6 @@ public:
 	virtual bool supports_save() const noexcept override;
 
 private:
-	void fixnum(char *start, char *end) const;
-
 	// Rich per-sector record produced by extract_track().
 	// Captures everything IMD's per-sector type byte can encode.
 	struct extracted_sector

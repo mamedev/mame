@@ -411,20 +411,6 @@ const char *imd_format::extensions() const noexcept
 	return "imd";
 }
 
-void imd_format::fixnum(char *start, char *end) const
-{
-	end--;
-	if(*end != '0')
-		return;
-	while(end > start) {
-		end--;
-		if(*end == ' ')
-			*end = '0';
-		else if(*end != '0')
-			return;
-	};
-}
-
 int imd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	char h[4];
