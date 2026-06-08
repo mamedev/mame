@@ -10,6 +10,7 @@
 
 #include "esq1by22.lh"
 #include "esq2by40.lh"
+#include "esq2by40_vfx.lh"
 
 #define LOG_DISPLAY_COMMANDS (1U << 1)
 #define LOGDC(...) LOGMASKED(LOG_DISPLAY_COMMANDS, __VA_ARGS__)
@@ -438,9 +439,7 @@ esq2x40_vfx_device::esq2x40_vfx_device(const machine_config &mconfig, const char
 
 void esq2x40_vfx_device::device_add_mconfig(machine_config &config)
 {
-	// Do not set a default layout. This display must be used
-	// within a layout that includes the VFD elements, such as
-	// vfx.lay, vfxsd.lay or sd1.lay.
+	config.set_default_layout(layout_esq2by40_vfx);
 }
 
 // Handles blinking of underline and of entire character,
