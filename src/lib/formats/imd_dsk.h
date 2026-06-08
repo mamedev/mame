@@ -69,10 +69,6 @@ private:
 	// unrecognised).
 	bool detect_track(const floppy_image &image, int cyl, int head,
 	                  track_info &out) const;
-
-	// CRC-16-CCITT, polynomial 0x1021, big-endian; used to validate
-	// IDAM and DAM records.
-	static uint16_t crc16_ccitt(const uint8_t *data, int len, uint16_t init = 0xffff);
 };
 
 extern const imd_format FLOPPY_IMD_FORMAT;

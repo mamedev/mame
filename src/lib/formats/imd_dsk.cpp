@@ -10,6 +10,7 @@
 
 #include "imd_dsk.h"
 #include "flopimg_legacy.h"
+#include "imageutl.h"
 
 #include "ioprocs.h"
 
@@ -723,17 +724,6 @@ bool imd_format::supports_save() const noexcept
 	return true;
 }
 
-uint16_t imd_format::crc16_ccitt(const uint8_t *data, int len, uint16_t init)
-{
-	uint16_t crc = init;
-	for (int i = 0; i < len; i++) {
-		crc ^= uint16_t(data[i]) << 8;
-		for (int b = 0; b < 8; b++)
-			crc = (crc & 0x8000) ? uint16_t((crc << 1) ^ 0x1021) : uint16_t(crc << 1);
-	}
-	return crc;
-}
-
 // Single-bit reader with wrap-around.  The private sbit_rp method in
 // floppy_image_format_t is not visible from this translation unit, so
 // keep an identical local copy.
@@ -833,7 +823,7 @@ void imd_format::extract_track_rich(const std::vector<bool> &bs, bool is_mfm,
 		uint16_t idam_stored_crc = uint16_t(uint16_t(crc_hi) << 8 | crc_lo);
 
 		uint8_t idam_buf[8];
-		int idam_buf_len;
+		size_t idam_buf_len;
 		if (is_mfm) {
 			idam_buf[0] = 0xa1; idam_buf[1] = 0xa1; idam_buf[2] = 0xa1;
 			idam_buf[3] = idam_marks[i].type_byte;
@@ -850,7 +840,7 @@ void imd_format::extract_track_rich(const std::vector<bool> &bs, bool is_mfm,
 			idam_buf[4] = sec.idam_size;
 			idam_buf_len = 5;
 		}
-		sec.addr_crc_ok = (crc16_ccitt(idam_buf, idam_buf_len) == idam_stored_crc);
+		sec.addr_crc_ok = (ccitt_crc16(0xffff, idam_buf, idam_buf_len) == idam_stored_crc);
 
 		if (sec.idam_size >= 8) {
 			// Idam size >= 8 means the size code byte fell outside the
@@ -898,7 +888,7 @@ void imd_format::extract_track_rich(const std::vector<bool> &bs, bool is_mfm,
 			dam_buf = { dam_marks[dam_idx].type_byte };
 		}
 		dam_buf.insert(dam_buf.end(), sec.data.begin(), sec.data.end());
-		sec.data_crc_ok = (crc16_ccitt(dam_buf.data(), int(dam_buf.size())) == dam_stored_crc);
+		sec.data_crc_ok = (ccitt_crc16(0xffff, dam_buf.data(), size_t(dam_buf.size())) == dam_stored_crc);
 		sec.has_data    = true;
 
 		if (sec.addr_crc_ok || sec.data_crc_ok)
