@@ -14,6 +14,7 @@ public:
 	virtual void write_char(uint8_t data) = 0;
 	virtual void update_display();
 	virtual bool write_contents(std::ostream &o) { return false; }
+	virtual void clear_display();
 	virtual void clear();
 	virtual void cursor_left();
 	virtual void cursor_right();
@@ -25,6 +26,15 @@ public:
 protected:
 	esqvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rows, int cols);
 
+	virtual void set_vfd(unsigned index, uint32_t value) = 0;
+
+	int index_for(unsigned row, unsigned col) { return row * m_cols + col; }
+
+	void set_vfd(unsigned row, unsigned col, uint32_t value) { set_vfd(index_for(row, col), value); }
+	uint8_t &chars(unsigned row, unsigned col) { return m_chars[index_for(row, col)]; }
+	uint8_t &attrs(unsigned row, unsigned col) { return m_attrs[index_for(row, col)]; }
+	uint8_t &dirty(unsigned row, unsigned col) { return m_dirty[index_for(row, col)]; }
+
 	static constexpr uint8_t AT_NORMAL      = 0x00;
 	static constexpr uint8_t AT_UNDERLINE   = 0x01;
 	static constexpr uint8_t AT_BLINK       = 0x02;
@@ -32,16 +42,15 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	output_finder<160> m_vfds;
+	int m_rows = 0, m_cols = 0;
 	bool m_blink_on = false;
 	int m_cursx = 0, m_cursy = 0;
 	int m_savedx = 0, m_savedy = 0;
-	int const m_rows = 0, m_cols = 0;
 	uint8_t m_curattr = 0;
 	uint8_t m_lastchar = 0;
-	uint8_t m_chars[2][40]{};
-	uint8_t m_attrs[2][40]{};
-	uint8_t m_dirty[2][40]{};
+	std::vector<uint8_t> m_chars;
+	std::vector<uint8_t> m_attrs;
+	std::vector<uint8_t> m_dirty;
 };
 
 class esq1x22_device : public esqvfd_device {
@@ -51,15 +60,19 @@ public:
 	virtual void write_char(uint8_t data) override;
 
 protected:
+	virtual void set_vfd(unsigned index, uint32_t value) override { m_vfds[index] = value; }
+
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
+	output_finder<1 * 22 * 2> m_vfds;
 };
 
+// Virtual superclass for ESQ1- and VFX-family 2x40 displays,
+// allowing common code to be shared.
 class esq2x40_device : public esqvfd_device {
 public:
 	esq2x40_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	esq2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void write_char(uint8_t data) override;
 	virtual bool write_contents(std::ostream &o) override;
@@ -68,18 +81,32 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
+class esq2x40_esq1_device : public esq2x40_device {
+public:
+	esq2x40_esq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void set_vfd(unsigned index, uint32_t value) override { m_vfds[index] = value; }
+
+private:
+	output_finder<2 * 40 * 2> m_vfds;
+};
+
 class esq2x40_vfx_device : public esq2x40_device {
 public:
 	esq2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual void update_display() override;
 
 protected:
+	virtual void set_vfd(unsigned index, uint32_t value) override { m_vfds[index] = value; }
+
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	const tiny_rom_entry *device_rom_region() const override;
 
 private:
 	required_region_ptr<u16> m_font;
+	output_finder<2 * 40> m_vfds;
 };
 
 class esq2x40_sq1_device : public esqvfd_device {
@@ -89,15 +116,18 @@ public:
 	virtual void write_char(uint8_t data) override;
 
 protected:
+	virtual void set_vfd(unsigned index, uint32_t value) override { m_vfds[index] = value; }
+
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
+	output_finder<2 * 40 * 2> m_vfds;
 	bool m_wait87shift, m_wait88shift;
 };
 
-DECLARE_DEVICE_TYPE(ESQ1X22,     esq1x22_device)
-DECLARE_DEVICE_TYPE(ESQ2X40,     esq2x40_device)
-DECLARE_DEVICE_TYPE(ESQ2X40_SQ1, esq2x40_sq1_device)
-DECLARE_DEVICE_TYPE(ESQ2X40_VFX, esq2x40_vfx_device)
+DECLARE_DEVICE_TYPE(ESQ1X22,      esq1x22_device)
+DECLARE_DEVICE_TYPE(ESQ2X40_ESQ1, esq2x40_esq1_device)
+DECLARE_DEVICE_TYPE(ESQ2X40_SQ1,  esq2x40_sq1_device)
+DECLARE_DEVICE_TYPE(ESQ2X40_VFX,  esq2x40_vfx_device)
 
 #endif // MAME_ENSONIQ_ESQVFD_H

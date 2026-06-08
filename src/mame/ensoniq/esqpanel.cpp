@@ -413,10 +413,10 @@ namespace esqpanel {
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ESQPANEL1X22,     esqpanel1x22_device,     "esqpanel122",     "Ensoniq front panel with 1x22 VFD")
-DEFINE_DEVICE_TYPE(ESQPANEL2X40,     esqpanel2x40_device,     "esqpanel240",     "Ensoniq front panel with 2x40 VFD")
-DEFINE_DEVICE_TYPE(ESQPANEL2X40_VFX, esqpanel2x40_vfx_device, "esqpanel240_vfx", "Ensoniq front panel with 2x40 VFD for VFX family")
-DEFINE_DEVICE_TYPE(ESQPANEL2X16_SQ1, esqpanel2x16_sq1_device, "esqpanel216_sq1", "Ensoniq front panel with 2x16 LCD")
+DEFINE_DEVICE_TYPE(ESQPANEL1X22,      esqpanel1x22_device,     "esqpanel122",      "Ensoniq front panel with 1x22 VFD")
+DEFINE_DEVICE_TYPE(ESQPANEL2X40_ESQ1, esqpanel2x40_esq1_device,     "esqpanel240_esq1", "Ensoniq front panel with 2x40 VFD for ESQ1 family")
+DEFINE_DEVICE_TYPE(ESQPANEL2X40_VFX,  esqpanel2x40_vfx_device, "esqpanel240_vfx",  "Ensoniq front panel with 2x40 VFD for VFX family")
+DEFINE_DEVICE_TYPE(ESQPANEL2X16_SQ1,  esqpanel2x16_sq1_device, "esqpanel216_sq1",  "Ensoniq front panel with 2x16 LCD")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -745,14 +745,14 @@ esqpanel1x22_device::esqpanel1x22_device(const machine_config &mconfig, const ch
 
 /* panel with 2x40 VFD display used in the ESQ-1, SQ-80 */
 
-void esqpanel2x40_device::device_add_mconfig(machine_config &config)
+void esqpanel2x40_esq1_device::device_add_mconfig(machine_config &config)
 {
-	ESQ2X40(config, m_vfd, 60);
+	ESQ2X40_ESQ1(config, m_vfd, 60);
 }
 
 
-esqpanel2x40_device::esqpanel2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	esqpanel_device(mconfig, ESQPANEL2X40, tag, owner, clock),
+esqpanel2x40_esq1_device::esqpanel2x40_esq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	esqpanel_device(mconfig, ESQPANEL2X40_ESQ1, tag, owner, clock),
 	m_vfd(*this, "vfd")
 {
 	m_eps_mode = false;
