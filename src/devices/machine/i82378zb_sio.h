@@ -13,6 +13,7 @@
 #include "machine/am9517a.h"
 #include "machine/at_keybc.h"
 #include "machine/idectrl.h"
+#include "machine/intelfsh.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "sound/spkrdev.h"
@@ -73,6 +74,7 @@ private:
 	required_device<isa16_device> m_isabus;
 	required_device<speaker_sound_device> m_speaker;
 
+	optional_device<intelfsh8_device> m_xbus_flash;
 	optional_device<at_keyboard_controller_device> m_xbus_keybc;
 	optional_device_array<ide_controller_32_device, 2> m_xbus_ide;
 
@@ -85,8 +87,8 @@ private:
 	devcb_write8 m_rtccs_write;
 
 	struct {
-		bool keyboard;
 		bool flash_bios;
+		bool keyboard;
 		bool ide;
 	} m_has_xbus;
 

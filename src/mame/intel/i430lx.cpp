@@ -10,7 +10,7 @@ Gigabyte GA-586IP config:
 - Intel 82434NX (PCMC) as northbridge
 - Intel 82433NX (LBX) local bus accelerator
 - Intel 82378ZB (SIO) as southbridge
-- Texas Instruments BENCHMARQ bq3287AMT RTC (ds1287 clone?)
+- Texas Instruments BENCHMARQ bq3287AMT RTC (ds12885 clone? Wants at least 128 bytes of SRAM)
 - No super I/O for keyboard/RTC, those are southbridge responsibility under X-Bus
 
 Regular SIO is reused by earlier I420ZX "Saturn II" chipset and in BeBox
@@ -20,7 +20,7 @@ Regular SIO is reused by earlier I420ZX "Saturn II" chipset and in BeBox
 TODO:
 - Remaining X-Bus peripherals for SIO (FDC, COM x2, LPT);
 - Monkey write config_maps for both bridges;
-- RTC doesn't save, wrong type or needs to store as flash ROM?
+- Understand why IDE and FDC doesn't get enabled in X-Bus (mapped in ISA bus for these BIOSes?)
 
 **************************************************************************************************/
 
@@ -38,8 +38,9 @@ TODO:
 //#include "bus/rs232/terminal.h"
 #include "cpu/i386/i386.h"
 #include "machine/at_keybc.h"
+#include "machine/ds128x.h"
 #include "machine/idectrl.h"
-#include "machine/mc146818.h"
+#include "machine/intelfsh.h"
 #include "machine/i82378zb_sio.h"
 #include "machine/i82434lx_pcmc.h"
 #include "machine/pci.h"
@@ -57,6 +58,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_rtc(*this, "rtc")
+		, m_flash(*this, "pci:02.0:xbus_flash")
 		, m_keybc(*this, "pci:02.0:xbus_keybc")
 		, m_at_con(*this, "at_con")
 		, m_ide(*this, "pci:02.0:xbus_ide%u", 0U)
@@ -69,7 +71,8 @@ protected:
 //	void i430lx(machine_config &config) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<ds1287_device> m_rtc;
+	required_device<ds12885_device> m_rtc;
+	required_device<intelfsh8_device> m_flash;
 	required_device<at_keyboard_controller_device> m_keybc;
 	required_device<pc_kbdc_device> m_at_con;
 	required_device_array<ide_controller_32_device, 2> m_ide;
@@ -101,7 +104,7 @@ void i430lx_state::i430nx(machine_config &config)
 //  m_maincpu->smiact().set("pci:00.0", FUNC(i82434nx_pcmc_device::smi_act_w));
 
 	// Texas Instruments BENCHMARQ bq3287AMT RTC
-	DS1287(config, m_rtc, XTAL(32'768));
+	DS12885(config, m_rtc, XTAL(32'768));
 	m_rtc->set_binary(true);
 	// TODO: alarm irq
 //	m_rtc->irq().set ...
@@ -120,6 +123,8 @@ void i430lx_state::i430nx(machine_config &config)
 	isa.rtccs_write().set([this](u8 data) { m_rtc->data_w(data); });
 
 	// X-Bus devices
+	AMD_29F010(config, m_flash);
+
 	AT_KEYBOARD_CONTROLLER(config, m_keybc, XTAL(12'000'000));
 	m_keybc->hot_res().set("pci:02.0", FUNC(i82378zb_sio_device::cpu_reset_w));
 	m_keybc->gate_a20().set("pci:02.0", FUNC(i82378zb_sio_device::cpu_a20_w));
@@ -134,7 +139,7 @@ void i430lx_state::i430nx(machine_config &config)
 	IDE_CONTROLLER_32(config, m_ide[0]).options(ata_devices, "hdd", nullptr, false);
 	m_ide[0]->irq_handler().set("pci:02.0", FUNC(i82378zb_sio_device::pc_irq14_w));
 
-	IDE_CONTROLLER_32(config, m_ide[1]).options(ata_devices, nullptr, nullptr, false);
+	IDE_CONTROLLER_32(config, m_ide[1]).options(ata_devices, "cdrom", nullptr, false);
 	m_ide[1]->irq_handler().set("pci:02.0", FUNC(i82378zb_sio_device::pc_irq15_w));
 
 	// 1x AT keyboard
@@ -159,7 +164,7 @@ void i430lx_state::sy029c2(machine_config &config)
 }
 
 ROM_START( ga586ip )
-	ROM_REGION32_LE(0x20000, "pci:02.0", 0)
+	ROM_REGION32_LE(0x20000, "pci:02.0:xbus_flash", 0)
 	// 05/06/96-NEPTUNE-2A59AG01-00
 	ROM_SYSTEM_BIOS(0, "v20",  "GA-586IP V2.0 (4.51G)")
 	ROMX_LOAD( "ip.20",  0x00000, 0x20000, CRC(77963e13) SHA1(af091749ac0e14b69dbfe5b2f4cb040ed06e56d9), ROM_BIOS(0))
@@ -172,7 +177,7 @@ ROM_START( ga586ip )
 ROM_END
 
 ROM_START( sy029c2 )
-	ROM_REGION32_LE(0x20000, "pci:02.0", 0)
+	ROM_REGION32_LE(0x20000, "pci:02.0:xbus_flash", 0)
 	// 08/12/94-NEPTUNE-2A59AS21-00
 	ROM_SYSTEM_BIOS(0, "a1",  "SY-029C2 rev A.1 (4.50G)")
 	ROMX_LOAD( "p54c.bin",  0x00000, 0x20000, CRC(86a39522) SHA1(d97088bdda4e832b1f5830306cf4dcf1c60180d3), ROM_BIOS(0))

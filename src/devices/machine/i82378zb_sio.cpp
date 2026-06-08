@@ -40,6 +40,7 @@ i82378zb_sio_device::i82378zb_sio_device(const machine_config &mconfig, device_t
 	, m_pit(*this, "pit")
 	, m_isabus(*this, "isabus")
 	, m_speaker(*this, "speaker")
+	, m_xbus_flash(*this, "xbus_flash")
 	, m_xbus_keybc(*this, "xbus_keybc")
 //  , m_xbus_rtc(*this, "xbus_rtc")
 	, m_xbus_ide(*this, "xbus_ide%u", 0U)
@@ -168,7 +169,7 @@ void i82378zb_sio_device::device_start()
 
 	// X-Bus config optimizers, for checking presence of objects
 	m_has_xbus.keyboard = m_xbus_keybc != nullptr;
-	m_has_xbus.flash_bios = m_region != nullptr;
+	m_has_xbus.flash_bios = m_xbus_flash != nullptr;
 	// we expect both IDE slots to be filled for now (X-Bus decodes from 1 bit alone)
 	m_has_xbus.ide = m_xbus_ide[0] != nullptr && m_xbus_ide[1] != nullptr;
 }
@@ -272,11 +273,11 @@ void i82378zb_sio_device::map_extra(
 {
 	// assume that map_extra of the southbridge is called before the one of the northbridge
 	m_isabus->remap(AS_PROGRAM, 0, 1 << 24);
-	// TODO: bits 7-6 in UBCSA for BIOS enable control
+	// TODO: bits 7-6 in UBCSA for BIOS enable control, retrieve region size from flash type
 	if (m_has_xbus.flash_bios)
 	{
-		map_bios(memory_space, 0xffffffff - m_region->bytes() + 1, 0xffffffff);
-		map_bios(memory_space, 0x000e0000, 0x000fffff);
+		memory_space->install_readwrite_handler(0xfffe0000, 0xffffffff, read8sm_delegate(*m_xbus_flash, FUNC(intelfsh8_device::read)), write8sm_delegate(*m_xbus_flash, FUNC(intelfsh8_device::write)));
+		memory_space->install_readwrite_handler(0x000e0000, 0x000fffff, read8sm_delegate(*m_xbus_flash, FUNC(intelfsh8_device::read)), write8sm_delegate(*m_xbus_flash, FUNC(intelfsh8_device::write)));
 	}
 	m_isabus->remap(AS_IO, 0, 0xffff);
 	io_space->install_device(0, 0xffff, *this, &i82378zb_sio_device::internal_io_map);
@@ -284,7 +285,10 @@ void i82378zb_sio_device::map_extra(
 	// TODO: UBCSA bits 3,2 for FDC + bit 5 for location address
 
 	// decodes IDE signals after FDC (i.e. overrides $3f6 / $376)
-	if (BIT(m_ubcsa, 4) && m_has_xbus.ide)
+	// TODO: ga586ip & sy029c2 initializes UBCSA with 0xc3 but it sure accesses it anyway
+	// (both this and FDC not on X-Bus?)
+	//if (BIT(m_ubcsa, 4) && m_has_xbus.ide)
+	if (m_has_xbus.ide)
 	{
 		io_space->install_readwrite_handler(0x1f0, 0x1f7, read32s_delegate(*m_xbus_ide[0], FUNC(ide_controller_32_device::cs0_r)), write32s_delegate(*m_xbus_ide[0], FUNC(ide_controller_32_device::cs0_w)));
 		io_space->install_readwrite_handler(0x3f0, 0x3f7, read32s_delegate(*m_xbus_ide[0], FUNC(ide_controller_32_device::cs1_r)), write32s_delegate(*m_xbus_ide[0], FUNC(ide_controller_32_device::cs1_w)));
