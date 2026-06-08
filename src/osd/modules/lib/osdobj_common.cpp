@@ -468,6 +468,7 @@ void osd_common_t::update(bool skip_redraw)
 	// irregular intervals in some circumstances (e.g., multi-screen games
 	// or games with asynchronous updates).
 	//
+	m_output->update();
 	if (m_watchdog != nullptr)
 		m_watchdog->reset();
 }

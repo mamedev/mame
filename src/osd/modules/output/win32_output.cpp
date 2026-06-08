@@ -89,6 +89,7 @@ public:
 	virtual void notify(const output_item &item, s32 seconds, s64 attoseconds) override;
 	virtual void pause() override;
 	virtual void resume() override;
+	virtual void update() override { }
 
 	running_machine &machine() { return *m_machine; }
 

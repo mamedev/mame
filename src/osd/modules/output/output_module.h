@@ -31,6 +31,7 @@ public:
 	virtual void notify(osd::output_item const &item, std::int32_t seconds, std::int64_t attoseconds) = 0;
 	virtual void pause() = 0;
 	virtual void resume() = 0;
+	virtual void update() = 0;
 };
 
 #endif // MAME_OSD_OUTPUT_OUTPUT_MODULE_H

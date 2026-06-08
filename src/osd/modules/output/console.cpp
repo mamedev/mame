@@ -35,6 +35,7 @@ public:
 	{ osd_printf_info("pause = 1\n"); }
 	virtual void resume() override
 	{ osd_printf_info("pause = 0\n"); }
+	virtual void update() override { }
 };
 
 } // anonymous namespace
