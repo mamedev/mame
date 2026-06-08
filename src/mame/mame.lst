@@ -22778,6 +22778,7 @@ entrada
 
 @source:intel/i430lx.cpp
 ga586ip
+sy029c2
 
 @source:intel/imds2.cpp
 imds2

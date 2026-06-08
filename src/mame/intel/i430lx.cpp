@@ -65,6 +65,7 @@ public:
 	{ }
 
 	void i430nx(machine_config &config) ATTR_COLD;
+	void sy029c2(machine_config &config) ATTR_COLD;
 
 protected:
 //	void i430lx(machine_config &config) ATTR_COLD;
@@ -153,6 +154,13 @@ void i430lx_state::i430nx(machine_config &config)
 	PCI_SLOT(config, "pci:4", pci_cards, 4, 3, 0, 1, 2, nullptr);
 }
 
+// very similar to ga586ip, with unknown RTC type and extra ISA slot
+void i430lx_state::sy029c2(machine_config &config)
+{
+	i430lx_state::i430nx(config);
+	ISA16_SLOT(config, "isa5", 0, "pci:02.0:isabus", pc_isa16_cards, nullptr, false);
+}
+
 ROM_START( ga586ip )
 	ROM_REGION32_LE(0x20000, "pci:02.0", 0)
 	// 05/06/96-NEPTUNE-2A59AG01-00
@@ -166,10 +174,19 @@ ROM_START( ga586ip )
 	ROMX_LOAD( "ip.18",  0x00000, 0x20000, CRC(45c4c162) SHA1(8b3183fa8c2be91e3889eea8612e6e7ec6dac97e), ROM_BIOS(2))
 ROM_END
 
+ROM_START( sy029c2 )
+	ROM_REGION32_LE(0x20000, "pci:02.0", 0)
+	// 08/12/94-NEPTUNE-2A59AS21-00
+	ROM_SYSTEM_BIOS(0, "a1",  "SY-029C2 rev A.1 (4.50G)")
+	ROMX_LOAD( "p54c.bin",  0x00000, 0x20000, CRC(86a39522) SHA1(d97088bdda4e832b1f5830306cf4dcf1c60180d3), ROM_BIOS(0))
+ROM_END
+
+
 } // anonymous namespace
 
 // LX chipset
 // ...
 
 // NX chipset
-COMP( 1994, ga586ip, 0, 0,      i430nx, 0, i430lx_state, empty_init, "Gigabyte",  "GA-586IP (Intel I430NX Neptune chipset)", MACHINE_NOT_WORKING )
+COMP( 1994, ga586ip, 0, 0,      i430nx,  0, i430lx_state, empty_init, "Gigabyte",  "GA-586IP (Intel I430NX Neptune chipset)", MACHINE_NOT_WORKING )
+COMP( 1994, sy029c2, 0, 0,      sy029c2, 0, i430lx_state, empty_init, "Soyo",      "SY-029C2 (Intel I430NX Neptune chipset)", MACHINE_NOT_WORKING )
