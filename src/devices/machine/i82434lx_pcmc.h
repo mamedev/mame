@@ -39,8 +39,10 @@ protected:
 
 	virtual void config_map(address_map &map) override ATTR_COLD;
 
+	virtual uint32_t config_address_r(offs_t offset, uint32_t mem_mask = ~0) override;
 	virtual void config_address_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) override;
 
+	virtual void io_configuration_access_map(address_map &map) override;
 private:
 	required_device<cpu_device> m_host_cpu;
 	std::vector<uint32_t> m_ram;
@@ -53,6 +55,8 @@ private:
 	void latency_timer_w(uint8_t data);
 
 	u8 m_latency_timer;
+
+	u8 m_cse, m_trc, m_forw, m_pcams;
 
 	u8 m_pam[7];
 };

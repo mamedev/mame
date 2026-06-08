@@ -19,9 +19,7 @@ Regular SIO is reused by earlier I420ZX "Saturn II" chipset and in BeBox
 
 TODO:
 - Remaining X-Bus peripherals for SIO (FDC, COM x2, LPT);
-- Doesn't access any PCI config space (all writes are in byte units);
 - Monkey write config_maps for both bridges;
-- Understand why a PCI VGA card doesn't draw (BIOS shenanigans?);
 - RTC doesn't save, wrong type or needs to store as flash ROM?
 
 **************************************************************************************************/
@@ -144,11 +142,10 @@ void i430lx_state::i430nx(machine_config &config)
 	ISA16_SLOT(config, "isa1", 0, "pci:02.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa2", 0, "pci:02.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa3", 0, "pci:02.0:isabus", pc_isa16_cards, nullptr, false);
-	// TODO: temporary mapping, want a PCI card here (which somehow doesn't work)
-	ISA16_SLOT(config, "isa4", 0, "pci:02.0:isabus", pc_isa16_cards, "svga_et4k", false);
+	ISA16_SLOT(config, "isa4", 0, "pci:02.0:isabus", pc_isa16_cards, nullptr, false);
 
 	// 4x PCI slots
-	PCI_SLOT(config, "pci:1", pci_cards, 7, 0, 1, 2, 3, nullptr);
+	PCI_SLOT(config, "pci:1", pci_cards, 7, 0, 1, 2, 3, "gd5446");
 	PCI_SLOT(config, "pci:2", pci_cards, 6, 1, 2, 3, 0, nullptr);
 	PCI_SLOT(config, "pci:3", pci_cards, 5, 2, 3, 0, 1, nullptr);
 	PCI_SLOT(config, "pci:4", pci_cards, 4, 3, 0, 1, 2, nullptr);

@@ -252,7 +252,7 @@ public:
 	// construction/destruction
 	mv64361_pci_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	uint32_t config_address_r(offs_t offset, uint32_t mem_mask = ~0);
+	virtual uint32_t config_address_r(offs_t offset, uint32_t mem_mask = ~0) override;
 	virtual void config_address_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) override;
 	uint32_t config_data_r(offs_t offset, uint32_t mem_mask = ~0);
 	void config_data_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

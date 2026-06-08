@@ -37,6 +37,10 @@ void i82434nx_pcmc_device::device_start()
 
 	save_item(NAME(m_latency_timer));
 	save_item(NAME(m_pam));
+	save_item(NAME(m_cse));
+	save_item(NAME(m_trc));
+	save_item(NAME(m_forw));
+	save_item(NAME(m_pcams));
 }
 
 void i82434nx_pcmc_device::device_reset()
@@ -51,6 +55,8 @@ void i82434nx_pcmc_device::device_reset()
 	status = 0x0200;
 
 	m_latency_timer = 0x20;
+	m_cse = m_forw = m_trc = m_pcams = 0;
+
 	std::fill(std::begin(m_pam), std::end(m_pam), 0U);
 
 	remap_cb();
@@ -118,14 +124,65 @@ void i82434nx_pcmc_device::latency_timer_w(u8 data)
  * PCI config host
  */
 
+uint32_t i82434nx_pcmc_device::config_address_r(offs_t offset, uint32_t mem_mask)
+{
+	// TODO: if NX m_pcams is 0 then it can't access the canonical PCI range
+	if (mem_mask == 0xffff'ffff)
+		return pci_host_device::config_address_r();
+
+	switch(mem_mask)
+	{
+		case 0x0000'00ff:
+			return m_cse;
+
+		case 0x0000'ff00:
+			return m_trc;
+
+		case 0x00ff'0000:
+			return m_forw;
+
+		case 0xff00'0000:
+			return m_pcams;
+	}
+
+	if (!machine().side_effects_disabled())
+		LOG("Warning: config_address_r access with a %08x access!\n", mem_mask);
+	return 0xff;
+}
+
 void i82434nx_pcmc_device::config_address_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
+	// TODO: as above
 	if (mem_mask == 0xffff'ffff)
 		pci_host_device::config_address_w(offset, data, mem_mask);
 	else
 	{
-		// TODO: same byte vs. dword access as i82425ex_psc
-		LOG("config_address_w byte: %08x & %08x -> %08x\n", offset, mem_mask, data);
+		switch(mem_mask)
+		{
+			case 0x0000'00ff:
+				// bit 0 is special cycle enabled (unsupported by this flavour)
+				m_cse = data & 0xfe;
+				break;
+
+			case 0x0000'ff00:
+				m_trc = (data >> 8) & 0x7;
+				if (m_trc)
+					LOG("TRC write %02x\n", data);
+				break;
+
+			case 0x00ff'0000:
+				m_forw = data >> 16;
+				break;
+
+			case 0xff00'0000:
+				// PMC register, NX only
+				m_pcams = BIT(data, 24);
+				break;
+
+			default:
+				LOG("Warning: config_address_w access with a %08x -> %08x access!\n", mem_mask, data);
+				break;
+		}
 	}
 }
 
@@ -158,11 +215,50 @@ void i82434nx_pcmc_device::map_shadowram(address_space *memory_space, offs_t sta
 	}
 }
 
+void i82434nx_pcmc_device::io_configuration_access_map(address_map &map)
+{
+	pci_host_device::io_configuration_access_map(map);
+
+	// https://wiki.osdev.org/PCI#Configuration_Space_Access_Mechanism_#2
+	// uses an extra I/O space for accessing PCI devices
+	// we handle key at this level for now, BIOSes loves to flip CSE on -> <access> -> off again,
+	// which causes a performance problem due of the remap_cb calls.
+	// NOTE: lx has no regular CONFADD/CONFDATA!
+	// TODO: FORW implementation, for bus number
+	map(0xc000, 0xcfff).lrw32(
+		NAME([this] (offs_t offset, u32 mem_mask) {
+			if (!(m_cse & 0xf0))
+			{
+				if (!machine().side_effects_disabled())
+					LOG("Warning: read $%04x space with CSE key disabled!\n", offset + 0xc000);
+				return 0xffff'ffff;
+			}
+			const u32 config_number = offset * 4;
+			const u8 devnum = (config_number & 0xf00) >> 8;
+			const u8 fnum = (m_cse >> 1) & 7;
+			return root_config_read(0, (devnum << 3) | fnum, config_number & 0xfc, mem_mask);
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			if (!(m_cse & 0xf0))
+			{
+				if (!machine().side_effects_disabled())
+					LOG("Warning: write $%04x & %08x -> %08x space with CSE key disabled!\n", offset + 0xc000, mem_mask, data);
+				return;
+			}
+
+			const u32 config_number = offset * 4;
+			const u8 devnum = (config_number & 0xf00) >> 8;
+			const u8 fnum = (m_cse >> 1) & 7;
+			root_config_write(0, (devnum << 3) | fnum, config_number & 0xfc, data, mem_mask);
+		})
+	);
+}
+
 void i82434nx_pcmc_device::map_extra(
 	uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space
 ) {
-	io_space->install_device(0, 0xffff,  *static_cast<pci_host_device *>(this), &pci_host_device::io_configuration_access_map);
+	io_space->install_device(0, 0xffff,  *static_cast<i82434nx_pcmc_device *>(this), &i82434nx_pcmc_device::io_configuration_access_map);
 
 	regenerate_config_mapping();
 

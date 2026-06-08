@@ -246,14 +246,15 @@ protected:
 
 class pci_host_device : public pci_bridge_device {
 public:
-	void io_configuration_access_map(address_map &map) ATTR_COLD;
+	virtual void io_configuration_access_map(address_map &map) ATTR_COLD;
 
 	void set_spaces(address_space *memory, address_space *io = nullptr, address_space *busmaster = nullptr);
 
 protected:
 	pci_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	uint32_t config_address_r();
+	// offset is just to get mem_mask, early Intel chipsets cares
+	virtual uint32_t config_address_r(offs_t offset = 0, uint32_t mem_mask = ~0);
 	virtual void config_address_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t config_data_r(offs_t offset, uint32_t mem_mask = ~0);
 	void config_data_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

@@ -968,7 +968,7 @@ void pci_host_device::regenerate_mapping()
 				io_window_start, io_window_end, io_offset, io_space);
 }
 
-uint32_t pci_host_device::config_address_r()
+uint32_t pci_host_device::config_address_r(offs_t offset, uint32_t mem_mask)
 {
 	return config_address;
 }
