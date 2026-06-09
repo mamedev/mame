@@ -358,10 +358,15 @@ static NETLIST_START(MB3730_SIL)
 	NET_C(VOFF.2, RREF1.2)
 
 	// Internal closed-loop gain: OUT M -> RF -> MINUS -> RG -> FB pin.
-	// DC (FB cap open) -> unity; AC (FB cap shorted) -> 1 + RF/RG per leg,
-	// i.e. ~55dB across the bridge (datasheet typ).
+	// DC (FB cap open) -> unity; AC (FB cap shorted) -> 1 + RF/RG = GAIN per
+	// leg, i.e. ~2*GAIN across the bridge. The default GAIN=281 is the
+	// datasheet-typ ~55dB bridged (RG=100); a board may override it with
+	// PARAM(<instance>.GAIN, ...) to retune the amp without editing this model
+	// (RG is derived as RF/(GAIN-1), RF fixed at 28k).
+	DEFPARAM(GAIN, 281)
 	RES(RF, RES_K(28))
 	RES(RG, 100)
+	PARAM(RG.R, "28000.0 / ($(@.GAIN) - 1.0)")
 	NET_C(MAIN.OUT, RF.1)
 	NET_C(RF.2, RG.1, MAIN.MINUS)
 

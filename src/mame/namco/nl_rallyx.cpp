@@ -20,6 +20,10 @@
 //   * MB3730_SIL  14W BTL power amp (opamp_lib); the speaker is bridged across
 //     OUT-M (pin 6) and OUT-I (pin 5).
 //
+// The Namco WSG ("software" music/effects, the AUDIO net on the schematic) is
+// mixed into the power-amp input through R28/C28 at the R30/VR1 junction; MAME
+// drives it via the I_AUDIO analog input (NETLIST_STREAM_INPUT on cin0).
+//
 // The audible output is the differential voltage across the bridged speaker,
 // taken via a unity VCVS (OUTPUT = OUT-M - OUT-I).
 //
@@ -112,6 +116,12 @@ NETLIST_START(rallyx)
 	RES(R30, RES_K(4.7))                // output series R
 	RES(VR1, RES_K(1))                  // volume pot (max) / downstream load
 
+	// Namco WSG ("software" audio) injected by MAME and mixed at the R30/VR1
+	// junction. I_AUDIO is an ideal source driven each sample by the WSG stream.
+	ANALOG_INPUT(I_AUDIO, 0)            // WSG output (NETLIST_STREAM_INPUT cin0)
+	RES(R28, RES_K(10))                 // WSG -> R30/VR1 junction mixing resistor
+	CAP(C28, CAP_N(47))                 // 0.047uF junction filter (to GND)
+
 	NET_C(I_V12, U741.7, C7.1)          // pin7 = +12V
 	NET_C(GND, U741.4, C7.2)            // pin4 = GND
 
@@ -127,10 +137,18 @@ NETLIST_START(rallyx)
 	NET_C(R30.2, VR1.1)
 	NET_C(VR1.2, GND)
 
+	// Mix the WSG audio into the R30/VR1 junction (R28 series, C28 to GND)
+	NET_C(I_AUDIO, R28.1)
+	NET_C(R28.2, R30.2, C28.1)
+	NET_C(C28.2, GND)
+
 	//
 	// MB3730 BTL power amp (opamp_lib) + bridged speaker
 	//
 	MB3730_SIL(U3730)
+	PARAM(U3730.GAIN, 29)               // ~35dB bridged (vs datasheet 281/~55dB):
+	                                    // lowers the explosion noise floor; the
+	                                    // injected WSG audio is boosted to suit.
 
 	CAP(C4, CAP_U(0.1))                 // pin1 input coupling
 	CAP(C26, CAP_U(220))                // pin2 FB cap (AC gain corner)
