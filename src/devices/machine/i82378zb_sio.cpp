@@ -57,6 +57,7 @@ i82378zb_sio_device::i82378zb_sio_device(const machine_config &mconfig, device_t
 i82378zb_sio_device::i82378zb_sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i82378zb_sio_device(mconfig, I82378ZB_SIO, tag, owner, clock)
 {
+	// 0x00 for 82378IB (as per PCI.exe)
 	// 0x03 for 82378ZB A0-Stepping
 	// 0x88 for 82379AB A0-Stepping
 	// No class code
@@ -199,7 +200,8 @@ void i82378zb_sio_device::device_reset()
 void i82378zb_sio_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-	map(0x09, 0x3f).lr8(NAME([] () { return 0; }));
+	// reserved range on this controller (starts at 0x09 really, but need revision being mapped)
+	map(0x10, 0x3f).lr8(NAME([] () { return 0; }));
 
 	map(0x4e, 0x4e).lrw8(
 		NAME([this] (offs_t offset) {

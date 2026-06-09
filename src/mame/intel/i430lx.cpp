@@ -19,7 +19,7 @@ Regular SIO is reused by earlier I420ZX "Saturn II" chipset and in BeBox
 
 TODO:
 - Remaining X-Bus peripherals for SIO (FDC, COM x2, LPT);
-- Monkey write config_maps for both bridges;
+- Monkey write config_maps for southbridge;
 - Understand why IDE and FDC doesn't get enabled in X-Bus (mapped in ISA bus for these BIOSes?)
 
 **************************************************************************************************/
@@ -123,6 +123,7 @@ void i430lx_state::i430nx(machine_config &config)
 	isa.rtccs_write().set([this](u8 data) { m_rtc->data_w(data); });
 
 	// X-Bus devices
+	// TODO: unknown flash type, just to get a 0x20000 sized one
 	AMD_29F010(config, m_flash);
 
 	AT_KEYBOARD_CONTROLLER(config, m_keybc, XTAL(12'000'000));
