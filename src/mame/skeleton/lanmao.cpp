@@ -26,13 +26,17 @@ Oki M6295 (or clone, not readable)
 TODO (all):
 - SVG / less simplistic layout?
 
-TODO (panda2 and msaiche):
+TODO (panda2 panda3 panda4 and msaiche):
 - inputs aren't verified
 
-Todo:
-pkzw
+TODO (pkzw)
 - add ~data at led_w of all 32 to 64 led at data_map
 - inputs aren't verified
+TODO (mcaishen)
+- led on and off function are inverted, required to use ~data.
+- Will start to hang after bet.
+- inputs aren't verified
+
 
 For Lan Mao, schematics and manual with list of error codes are available.
 
@@ -118,27 +122,6 @@ protected:
 	void data_map(address_map &map) ATTR_COLD;
 };
 
-class pkzw_state : public panda2_state
-{
-public:
-	pkzw_state(const machine_config &mconfig, device_type type, const char *tag) : 
-	panda2_state(mconfig, type, tag)
-	, 		m_leds(*this, "led%u", 0U)
-
-
-	{ }
-
-
-	void pkzw(machine_config &config) ATTR_COLD;
-	output_finder<64> m_leds;
-
-private:
-	template <uint8_t Which1> void leds_w(uint8_t data);
-
-	void data_map(address_map &map) ATTR_COLD;
-	void program_map(address_map &map) ATTR_COLD;
-
-};
 
 
 
@@ -164,6 +147,7 @@ private:
 
 
 
+
 class lanmao_state : public panda2_state
 {
 public:
@@ -185,6 +169,44 @@ private:
 	void data_map(address_map &map) ATTR_COLD;
 };
 
+class pkzw_state : public panda2_state
+{
+public:
+	pkzw_state(const machine_config &mconfig, device_type type, const char *tag) : 
+	panda2_state(mconfig, type, tag)
+	, 		m_leds(*this, "led%u", 0U)
+
+
+	{ }
+
+
+	void pkzw(machine_config &config) ATTR_COLD;
+	output_finder<64> m_leds;
+
+private:
+	template <uint8_t Which1> void leds_w(uint8_t data);
+
+	void data_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
+
+};
+
+class mcaishen_state : public panda2_state
+{
+public:
+	mcaishen_state(const machine_config &mconfig, device_type type, const char *tag) : 
+	panda2_state(mconfig, type, tag)
+
+	{ }
+
+
+	void mcaishen(machine_config &config) ATTR_COLD;
+
+private:
+	void data_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
+
+};
 
 
 
@@ -297,6 +319,25 @@ void panda2_state::data_map(address_map &map)
 	map(0xc000, 0xc001).w("ym", FUNC(ym2413_device::write)); // according to schematics and present on PCB, but doesn't seem used?
 }
 
+
+void mcaishen_state::program_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom();
+}
+
+void mcaishen_state::data_map(address_map &map)
+{
+	
+	map(0x8000, 0x87ff).ram().share("nvram");
+	map(0x9000, 0x9001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x9002, 0x9003).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0xb000, 0xb001).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0xc000, 0xc001).w("ym", FUNC(ym2413_device::write)); 
+
+}
+
+
+
 void panda3_state::program_map(address_map &map)
 {
 	map(0x0000, 0xffff).rom();
@@ -308,7 +349,7 @@ void panda3_state::data_map(address_map &map)
 	map(0x9000, 0x9001).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x9002, 0x9003).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0xb000, 0xb001).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0xc000, 0xc001).w("ym", FUNC(ym2413_device::write)); // according to schematics and present on PCB, but doesn't seem used?
+	map(0xc000, 0xc001).w("ym", FUNC(ym2413_device::write));
 	map(0xf800, 0xf800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
 }
@@ -508,6 +549,43 @@ static INPUT_PORTS_START( baowang )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "P3:8" )
 	
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( mcaishen ) 
+
+	PORT_INCLUDE( panda2 )
+	PORT_MODIFY("KEYS2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME( "Single" ) // unused?
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME( "Shift Right" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME( "Shift Left" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(3)
+
+	PORT_MODIFY("DSW")
+	
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DSW:1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DSW:2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DSW:3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DSW:4")
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DSW:5")
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW:6")
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DSW:7")
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW:8")
+	PORT_MODIFY("P3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "P3:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "P3:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "P3:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "P3:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "P3:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "P3:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "P3:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "P3:8" )
+	
+INPUT_PORTS_END
+
+
 
 
 
@@ -733,6 +811,55 @@ void panda2_state::panda2(machine_config &config)
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
+void mcaishen_state::mcaishen(machine_config &config)
+{
+	
+	I8052(config, m_maincpu, XTAL(10'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcaishen_state::program_map);
+	m_maincpu->set_addrmap(AS_DATA, &mcaishen_state::data_map);
+	
+	m_maincpu->port_in_cb<0>().set([this] () { LOGPORTS8052("%s CPU port 0 read\n", machine().describe_context()); return 0xff; });
+	m_maincpu->port_in_cb<1>().set(FUNC(mcaishen_state::i8052_p1_r));
+	m_maincpu->port_in_cb<2>().set([this] () { LOGPORTS8052("%s CPU port 2 read\n", machine().describe_context()); return 0xff; });
+	m_maincpu->port_in_cb<3>().set_ioport("P3");
+	m_maincpu->port_out_cb<0>().set([this] (uint8_t data) { LOGPORTS8052("%s CPU port 0 write: %02x\n", machine().describe_context(), data); });
+	m_maincpu->port_out_cb<1>().set(FUNC(mcaishen_state::i8052_p1_w));
+	m_maincpu->port_out_cb<2>().set([this] (uint8_t data) { LOGPORTS8052("%s CPU port 2 write: %02x\n", machine().describe_context(), data); });
+	m_maincpu->port_out_cb<3>().set([this] (uint8_t data) { LOGPORTS8052("%s CPU port 3 write: %02x\n", machine().describe_context(), data); });
+
+
+	i8279_device &kdc(I8279(config, "kdc", XTAL(10'000'000) / 6)); // TODO: divider
+	kdc.out_irq_callback().set([this] (int state) { LOGPORTS8279("%s I8279 irq write: %02x\n", machine().describe_context(), state); }); // not connected according to schematics
+	kdc.out_sl_callback().set([this] (uint8_t data) { m_kbd_line = data; }); // 4 bit port
+	kdc.out_disp_callback().set(FUNC(mcaishen_state::display_w)); // to 7-seg LEDs through to 2 CD4511 according to schematics
+	kdc.out_bd_callback().set([this] (int state) { LOGPORTS8279("%s I8279 bd write: %01x\n", machine().describe_context(), state); }); // not connected according to schematics
+	kdc.in_rl_callback().set(FUNC(mcaishen_state::keyboard_r));
+	kdc.in_shift_callback().set([this] () { LOGPORTS8279("%s I8279 shift read\n", machine().describe_context()); return 1; }); // not connected according to schematics
+	kdc.in_ctrl_callback().set([this] () { LOGPORTS8279("%s I8279 ctrl read\n", machine().describe_context()); return 1; }); // not connected according to schematics
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+
+	HOPPER(config, m_hopper, attotime::from_msec(100)); // Guessed
+
+	config.set_default_layout(layout_marywu);
+
+	SPEAKER(config, "mono").front_center();
+
+	YM2413(config, "ym", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.5);
+
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL(10'000'000) / 6)); // TODO: divider
+	ay1.port_a_write_callback().set(FUNC(mcaishen_state::leds_w<0>));
+	ay1.port_b_write_callback().set(FUNC(mcaishen_state::leds_w<1>));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.5);
+
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL(10'000'000) / 6)); // TODO: divider
+	ay2.port_a_write_callback().set(FUNC(mcaishen_state::leds_w<2>));
+	ay2.port_b_write_callback().set(FUNC(mcaishen_state::leds_w<3>));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.5);
+
+	}
+
 void panda3_state::panda3(machine_config &config)
 {
 	
@@ -905,7 +1032,7 @@ ROM_START( panda3 )
 
 ROM_END
 
-ROM_START( panda3a )
+ROM_START( panda3clr)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xm3-22v.kai", 0x00000, 0x10000, CRC(396E842F) SHA1(8000b5a0dd12c789c836577ebdda4f1b8068c4c4) )
 
@@ -926,6 +1053,7 @@ ROM_START( panda4 )
 	ROM_LOAD( "mao4-x.020", 0x00000, 0x40000, CRC(4EA3BAF7) SHA1(4f099d9c367308259a163dc965dd69f92521a5df) )
 	
 ROM_END
+
 ROM_START( baowang )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "w78e065.bin", 0x00000, 0x10000, CRC(F67B8DB6) SHA1(96cc23afadc98728538bfafd3783c7cd2997c608) )
@@ -933,6 +1061,19 @@ ROM_START( baowang )
 	ROM_REGION( 0x80000, "oki", 0 ) // adpcm rom 
 	ROM_LOAD( "w27e040-12.bin", 0x00000, 0x80000, CRC(232A3840) SHA1(ced2f04566b1d2cf821e20334630a43476cca0ae) )
 	ROM_END
+
+ROM_START( mcaishen )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "w78e065.bin", 0x00000, 0x10000, CRC(565A1E2E) SHA1(56b0cdd7acdff011894849b304d1e4de0e5ac1b1) )
+	ROM_END
+
+ROM_START( mcaishenclr)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "w78e065.bin", 0x00000, 0x10000, CRC(63B2A515) SHA1(73f584df7221395b29d4315b56681f355d9f8253) )
+    ROM_END
+
+
+
 
 ROM_START( msaiche ) // 玛莉赛车 (Mǎlì Sàichē - Mario Racing)
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -1137,14 +1278,15 @@ ROM_END
 
 } // anonymous namespace
 
-
-GAME( 1991, msaiche,   0,   panda2, msaiche,   panda2_state, empty_init, ROT0, "Hengfa Electronics",          "Mali Saiche",                  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 1996, panda2,    0,   panda2, panda2,    panda2_state, empty_init, ROT0, "Kelly",                       "Panda 2",                      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( ????, panda3,    0,   panda3, panda3,    panda3_state, empty_init, ROT0, "Jianrong",                    "Panda 3",                      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( ????, panda3a,   0,   panda3, panda3,    panda3_state, empty_init, ROT0, "unknown",                     "Panda 3 (Clear NVRAM ROM) ",   MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 1998, panda4,    0,   panda4, panda4,    panda3_state, empty_init, ROT0, "unknown",                     "Panda 4",                      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 1999, baowang,   0,   panda4, baowang,   panda3_state, empty_init, ROT0, "Hengfa Electronics",          "Bao Wang",                     MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 2003, lanmao,    0,   lanmao, lanmao,    lanmao_state, empty_init, ROT0, "Changsheng Electric Company", "Lan Mao",                      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1989, mcaishen,     0,   mcaishen, mcaishen,   mcaishen_state, empty_init, ROT0, "unknown",                     "MaLi Cai Shen",                    MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1989, mcaishenclr,  0,   mcaishen, mcaishen,   mcaishen_state, empty_init, ROT0, "unknown",                     "MaLi Cai Shen (Clear NVRAM ROM)",  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1991, msaiche,      0,   panda2,   msaiche,   panda2_state,   empty_init, ROT0, "Hengfa Electronics",          "Mali Saiche",                      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1996, panda2,       0,   panda2,   panda2,    panda2_state,   empty_init, ROT0, "Kelly",                       "Panda 2",                          MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( ????, panda3,       0,   panda3,   panda3,    panda3_state,   empty_init, ROT0, "Jianrong",                    "Panda 3",                          MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( ????, panda3clr,    0,   panda3,   panda3,    panda3_state,   empty_init, ROT0, "unknown",                     "Panda 3 (Clear NVRAM ROM) ",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1998, panda4,       0,   panda4,   panda4,    panda3_state,   empty_init, ROT0, "unknown",                     "Panda 4",                          MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1999, baowang,      0,   panda4,   baowang,   panda3_state,   empty_init, ROT0, "Hengfa Electronics",          "Bao Wang",                         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2003, lanmao,       0,   lanmao,   lanmao,    lanmao_state,   empty_init, ROT0, "Changsheng Electric Company", "Lan Mao",                          MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 
 // for the following sets no effort has been made yet to emulate the different behaviour. Most have also different LED layout
 GAME( 1998, pkzw,     0,     pkzw,   pkzw,    pkzw_state,   empty_init, ROT0, "Hengfa Electronics",          "PK Zhiwang",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
