@@ -77,6 +77,7 @@ protected:
 	required_device<pc_kbdc_device> m_at_con;
 	//required_device_array<ide_controller_32_device, 2> m_ide;
 
+	void x86_softlists(machine_config &config);
 private:
 	void main_io(address_map &map) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
@@ -92,6 +93,18 @@ void i430lx_state::main_io(address_map &map)
 {
 	map.unmap_value_high();
 }
+
+void i430lx_state::x86_softlists(machine_config &config)
+{
+	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
+	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");
+	SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
+	SOFTWARE_LIST(config, "win_cdrom_list").set_original("generic_cdrom").set_filter("ibmpc");
+	SOFTWARE_LIST(config, "at_hdd_list").set_original("ibm5170_hdd");
+	SOFTWARE_LIST(config, "midi_disk_list").set_compatible("midi_flop");
+	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
+}
+
 
 void i430lx_state::i430nx(machine_config &config)
 {
@@ -155,6 +168,8 @@ void i430lx_state::i430nx(machine_config &config)
 	PCI_SLOT(config, "pci:2", pci_cards, 6, 1, 2, 3, 0, nullptr);
 	PCI_SLOT(config, "pci:3", pci_cards, 5, 2, 3, 0, 1, nullptr);
 	PCI_SLOT(config, "pci:4", pci_cards, 4, 3, 0, 1, 2, nullptr);
+
+	x86_softlists(config);
 }
 
 // very similar to ga586ip, with unknown RTC type and extra ISA slot

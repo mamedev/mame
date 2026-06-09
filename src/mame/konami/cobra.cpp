@@ -19,7 +19,7 @@
     COBRA/603 GN645-PWB(A)   CPU Board
     ----------------------------------
         IBM PowerPC 603EV
-        Motorola XPC105ARX66CD
+        Motorola XPC105ARX66CD (MPC105)
 
     COBRA/403 GN645-PWB(B)   SUB Board
     ----------------------------------
@@ -33,7 +33,7 @@
     COBRA/604 GN645-PWB(C)   GFX Board
     ----------------------------------
         IBM PowerPC 604
-        Motorola XPC105ARX66CD
+        Motorola XPC105ARX66CD (MPC105)
         Toshiba TMP47P241VM MCU (internal ROM?)
         4x CY7C4231 FIFO (2K x 9)
         Xilinx XC4300E FPGA

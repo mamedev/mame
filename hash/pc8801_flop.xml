@@ -33198,6 +33198,7 @@ Not extensively tested
 		<!-- PC8801 -->
 		<info name="release" value="198609xx"/>
 		<info name="alt_title" value="スターシンフォニー"/>
+		<!-- NOTE: works with disk A as well, game is bundled with 1 disk -->
 		<info name="usage" value="Copy disk B as a .mfi container, then mount it in second drive with r/w permissions then follow English instructions."/>
 		<!--combined image-->
 		<!--rom name="star symphony.d88" size="698512" crc="d79e7454" sha1="515f5acfb2f8c8939fdc42b031f4027785c25206"/-->
@@ -52220,7 +52221,7 @@ Tests [Sound Board 2]
 		<description>Dark Dungeon</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V2, on prompt type load &quot;MADDD.M88&quot; then run"/>
+		<info name="usage" value="Needs BASIC V2, on prompt type load &quot;MADDD.M88&quot; then run. Looks incompatible with PC8801MA+ (throws bad allocation table on disk reading)"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
