@@ -109,23 +109,13 @@ protected:
 
 class esqpanel2x40_vfx_device : public esqpanel_device {
 public:
-	esqpanel2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, int panel_type = UNKNOWN, uint32_t clock = 0);
+	esqpanel2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	DECLARE_INPUT_CHANGED_MEMBER(button_change);
 	DECLARE_INPUT_CHANGED_MEMBER(patch_select_change);
 	DECLARE_INPUT_CHANGED_MEMBER(analog_value_change);
 	DECLARE_INPUT_CHANGED_MEMBER(key_change);
 	void set_floppy_active(bool floppy_active) override;
-
-	void set_family_member(int family_member);
-
-	enum panel_types : int {
-		UNKNOWN = 0,
-		VFX,
-		VFX_SD,
-		SD_1,
-		SD_1_32
-	};
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -143,8 +133,6 @@ protected:
 	static constexpr uint8_t AT_BLINK       = 0x02;
 
 private:
-	int m_panel_type;
-
 	emu_timer *m_blink_timer = nullptr;
 	uint8_t m_blink_phase;
 

@@ -51,7 +51,7 @@ license:CC0-1.0
 			<param name="n" start="~s~" increment="1" />
 			<param name="x" start="0" increment="342" />
 
-			<param name="input" value="vfd:vfd~n~" />
+			<param name="input" value="vfd~n~" />
 			<group ref="vfd_cell">
 				<bounds x="~x~" y="~y~" width="342" height="572" />
 			</group>
