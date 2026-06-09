@@ -30,6 +30,10 @@ public:
 
 	auto codec_r_callback() { return read_codec.bind(); }
 	auto codec_w_callback() { return write_codec.bind(); }
+	auto scsi0_r_callback() { return read_scsi0.bind(); }
+	auto scsi0_w_callback() { return write_scsi0.bind(); }
+	auto scsi1_r_callback() { return read_scsi1.bind(); }
+	auto scsi1_w_callback() { return write_scsi1.bind(); }
 
 	template <typename... T> void set_maincpu_tag(T &&... args) { m_maincpu.set_tag(std::forward<T>(args)...); }
 
@@ -42,8 +46,11 @@ public:
 	u32 codec_dma_read(offs_t offset);
 	void codec_dma_write(offs_t offset, u32 data);
 
-	u32 codec_r(offs_t offset);
-	void codec_w(offs_t offset, u32 data);
+	u32 codec_r(offs_t offset, u32 mem_mask);
+	void codec_w(offs_t offset, u32 data, u32 mem_mask);
+
+	void scsi0_irq(int state) { set_irq_line<12>(state); }
+	void scsi1_irq(int state) { set_irq_line<13>(state); }
 
 protected:
 	// device_t implementattion
@@ -54,9 +61,6 @@ protected:
 	virtual void config_map(address_map &map) override ATTR_COLD;
 
 	void common_init();
-
-	uint16_t swim_r(offs_t offset, u16 mem_mask);
-	void swim_w(offs_t offset, u16 data, u16 mem_mask);
 
 	u32 macio_r(offs_t offset);
 	void macio_w(offs_t offset, u32 data, u32 mem_mask);
@@ -72,11 +76,19 @@ protected:
 	u16 mac_via_r(offs_t offset);
 	void mac_via_w(offs_t offset, u16 data, u16 mem_mask);
 
+	u8 scsi0_r(offs_t offset);
+	void scsi0_w(offs_t offset, u8 data);
+	u8 scsi1_r(offs_t offset);
+	void scsi1_w(offs_t offset, u8 data);
+
 	devcb_write_line write_irq, write_pb4, write_pb5, write_cb2;
 	devcb_read_line read_pb3;
 
 	devcb_read32 read_codec;
 	devcb_write32 write_codec;
+
+	devcb_read8 read_scsi0, read_scsi1;
+	devcb_write8 write_scsi0, write_scsi1;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via1;
@@ -121,6 +133,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	virtual uint8_t cache_line_size_r() override { return 0x08; }
 
 	required_device<dbdma_device> m_dma_scsi1;
 };
