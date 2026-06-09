@@ -19,11 +19,15 @@
   systems
 
 
-  BTNAB
-  -----
+  Bugs that exist on real hardware
+  --------------------------------
 
   Some of the VT3xx versions of Move Fun (and reskins of it) have broken 'Lives' counter
   VT3xx versions of Mr Onion can show incorrect tiles behind keys that were picked up
+
+  Bugs that need to be verified
+  -----------------------------
+  lxcmcypp (game 05, Turbo Hovercraft) has a broken raster split
 
 
   ***************************************************************************/
