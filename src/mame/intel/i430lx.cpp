@@ -19,8 +19,8 @@ Regular SIO is reused by earlier I420ZX "Saturn II" chipset and in BeBox
 
 TODO:
 - Remaining X-Bus peripherals for SIO (FDC, COM x2, LPT);
-- Monkey write config_maps for southbridge;
-- Understand why IDE and FDC doesn't get enabled in X-Bus (mapped in ISA bus for these BIOSes?)
+- Understand why IDE and FDC doesn't get enabled in X-Bus (mapped in ISA bus for these BIOSes?);
+- Implement remaining features in north/southbridges (SMI and PIRQ not enabled by these BIOSes);
 
 **************************************************************************************************/
 

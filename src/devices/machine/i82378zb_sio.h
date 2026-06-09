@@ -94,8 +94,32 @@ private:
 
 	void map_bios(address_space *memory_space, uint32_t start, uint32_t end);
 
+	u8 m_pcicon;
+	u8 m_pac;
+	u8 m_papc;
+	u8 m_arbprix;
+	u8 m_mcscon;
+	u8 m_mcsboh;
+	u8 m_mcstoh;
+	u8 m_mcstom;
+	u8 m_iadcon;
+	u8 m_iadrbe;
+	u8 m_iadboh;
+	u8 m_iadtoh;
+	u8 m_icrt;
+	u8 m_icd;
 	u8 m_ubcsa;
 	u8 m_ubcsb;
+	u8 m_mar[3];
+	u8 m_pirq[4];
+	u16 m_bios_timer_base;
+	u8 m_smicntl;
+	u16 m_smien;
+	u32 m_see;
+	u8 m_ftmr;
+	u16 m_smireq;
+	u8 m_ctltmr;
+	u8 m_ctltmrh;
 
 	void rtc_index_w(offs_t offset, u8 data);
 	u8 rtc_data_r(offs_t offset);
