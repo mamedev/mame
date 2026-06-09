@@ -9,6 +9,9 @@
 #include "emu.h"
 #include "raiden2.h"
 
+#include "input.h" // for COP debug keys
+
+
 #define DUMP_COP (0)
 
 void xsedae_state::m_videoram_private_w(offs_t offset, u16 data)

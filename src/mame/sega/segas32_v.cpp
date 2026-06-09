@@ -180,6 +180,8 @@
 #include "emu.h"
 #include "segas32.h"
 
+#include "input.h" // for video debug keys
+
 #include "endianness.h"
 
 #include <algorithm>

@@ -212,127 +212,69 @@ void srmp6_state::video_start()
 	save_item(NAME(m_lastb2));
 }
 
-#if 0
-static int xixi = 0;
-#endif
-
 u32 srmp6_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int alpha;
-	int x,y,tileno,height,width,xw,yw,sprite,xb,yb;
-	u16 *sprite_list = m_sprram->buffer();
-	u16 mainlist_offset = 0;
-
-	union
-	{
-		s16 a;
-		u16 b;
-	} temp;
+	u16 const *const sprite_list = m_sprram->buffer();
 
 	bitmap.fill(0, cliprect);
 
-#if 0
-	//debug
-	if (machine().input().code_pressed_once(KEYCODE_Q))
-	{
-		++xixi;
-		logerror("%x\n",xixi);
-	}
-
-	if (machine().input().code_pressed_once(KEYCODE_W))
-	{
-		--xixi;
-		logerror("%x\n",xixi);
-	}
-#endif
-
 	// Main spritelist is 0x0000 - 0x1fff in spriteram, sublists follow
-	while (mainlist_offset<0x2000/2)
+	u16 mainlist_offset = 0;
+	while (mainlist_offset < 0x2000/2)
 	{
-		u16 *sprite_sublist = &sprite_list[sprite_list[mainlist_offset+1]<<3];
-		u16 sublist_length=sprite_list[mainlist_offset+0] & 0x7fff; //+1 ?
-		s16 global_x,global_y, flip_x, flip_y;
-		u16 global_pal;
+		u16 const *sprite_sublist = &sprite_list[sprite_list[mainlist_offset+1]<<3];
+		u16 sublist_length = sprite_list[mainlist_offset+0] & 0x7fff; //+1 ?
 
 		// end of list marker
-		if (sprite_list[mainlist_offset+0] == 0x8000)
+		if (sprite_list[mainlist_offset + 0] == 0x8000)
 			break;
 
-		if (sprite_list[mainlist_offset+0] != 0)
+		if (sprite_list[mainlist_offset + 0] != 0)
 		{
-			temp.b=sprite_list[mainlist_offset+2];
-			global_x=temp.a;
-			temp.b=sprite_list[mainlist_offset+3];
-			global_y=temp.a;
+			s16 const global_x = s16(sprite_list[mainlist_offset + 2]);
+			s16 const global_y = s16(sprite_list[mainlist_offset + 3]);
 
-			global_pal = sprite_list[mainlist_offset+4] & 0x7;
+			u16 const global_pal = sprite_list[mainlist_offset + 4] & 0x7;
 
-			if ((sprite_list[mainlist_offset+5] & 0x700) == 0x700)
-			{
-				alpha = pal5bit(sprite_list[mainlist_offset+5] & 0x1f);
-			}
-			else
-			{
-				alpha = 255;
-			}
-			//  logerror("%x %x \n",sprite_list[mainlist_offset+1],sublist_length);
+			int const alpha = ((sprite_list[mainlist_offset + 5] & 0x700) == 0x700)
+					? pal5bit(sprite_list[mainlist_offset + 5] & 0x1f)
+					: 255;
+			//logerror("%x %x \n", sprite_list[mainlist_offset + 1], sublist_length);
 
 			while (sublist_length)
 			{
-				sprite=sprite_sublist[0] & 0x7fff;
-				flip_x=sprite_sublist[1]>>8&1;
-				flip_y=sprite_sublist[1]>>9&1;
-				temp.b=sprite_sublist[2];
-				x=temp.a;
-				temp.b=sprite_sublist[3];
-				y=temp.a;
-				//x+=global_x;
-				//y+=global_y;
+				int const sprite = sprite_sublist[0] & 0x7fff;
+				u16 const flip_x = BIT(sprite_sublist[1], 8);
+				u16 const flip_y = BIT(sprite_sublist[1], 9);
+				int x = s16(sprite_sublist[2]);
+				int y = s16(sprite_sublist[3]);
 
-				width=((sprite_sublist[1]) & 0x3);
-				height=((sprite_sublist[1]>>2) & 0x3);
+				int const width = 1 << ((sprite_sublist[1]) & 0x3);
+				int const height = 1 << ((sprite_sublist[1]>>2) & 0x3);
 
-				height = 1 << height;
-				width = 1 << width;
-
-				y-=height*8;
-				tileno = sprite;
+				y -= height*8;
+				int tileno = sprite;
 				//tileno += (sprite_list[4] & 0xf)*0x4000; // this makes things worse in places (title screen for example)
 
-				for (xw = 0; xw < width; xw++)
+				for (int xw = 0; xw < width; xw++)
 				{
-					for (yw = 0; yw < height; yw++)
+					for (int yw = 0; yw < height; yw++)
 					{
-						if (!flip_x)
-							xb=x+xw*8+global_x;
-						else
-							xb=x+(width-xw-1)*8+global_x;
+						int const xb = x + global_x + ((!flip_x ? xw : (width - xw - 1)) * 8);
+						int const yb = y + global_y + ((!flip_y ? yw : (height - yw - 1)) * 8);
 
-						if (!flip_y)
-							yb=y+yw*8+global_y;
-						else
-							yb=y+(height-yw-1)*8+global_y;
-
-						m_gfxdecode->gfx(0)->alpha(bitmap,cliprect,tileno,global_pal,flip_x,flip_y,xb,yb,0,alpha);
+						m_gfxdecode->gfx(0)->alpha(bitmap, cliprect, tileno, global_pal, flip_x, flip_y, xb, yb, 0, alpha);
 						tileno++;
 					}
 				}
-				sprite_sublist+=8;
+				sprite_sublist += 8;
 				--sublist_length;
 			}
 		}
-		mainlist_offset+=8;
+		mainlist_offset += 8;
 	}
 
 	m_sprram->copy();
-
-	if (machine().input().code_pressed_once(KEYCODE_Q))
-	{
-		FILE *p=fopen("tileram.bin","wb");
-		fwrite(m_tileram.get(), 1, 0x100000*16, p);
-		fclose(p);
-	}
-
 
 	return 0;
 }

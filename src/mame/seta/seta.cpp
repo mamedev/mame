@@ -1260,6 +1260,7 @@ Note: on screen copyright is (c)1998 Coinmaster.
 
 #include "diserial.h"
 #include "emupal.h"
+#include "input.h" // for video debug keys
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"

@@ -1119,11 +1119,18 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 			}
 			return true;
 
+		case 0x096: // STWCX.
+			desc.set_gpr_used_or_zero(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_gpr_used(G_RS(op));
+			desc.set_writes_memory();
+			desc.set_cr_modified(0);
+			return true;
+
 		case 0x1b6: // ECOWX
 			if (!(m_ppc.m_cap & PPCCAP_VEA))
 				return false;
 			[[fallthrough]];
-		case 0x096: // STWCX.
 		case 0x097: // STWX
 		case 0x0d7: // STBX
 		case 0x197: // STHX

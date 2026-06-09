@@ -16,6 +16,9 @@
 #include "options.h"
 #include "coretmpl.h"
 
+#include <string>
+#include <string_view>
+
 
 #define OPTION_PRIORITY_CMDLINE     OPTION_PRIORITY_HIGH + 1
 // core options

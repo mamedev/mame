@@ -9,6 +9,8 @@
 
 #include "emu.h"
 #include "midyunit.h"
+
+#include "input.h" // for DMA debug keys
 #include "screen.h"
 
 

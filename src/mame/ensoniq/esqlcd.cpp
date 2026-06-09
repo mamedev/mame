@@ -11,7 +11,7 @@
 //#define VERBOSE 1
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(ESQ2X16_SQ1, esq2x16_sq1_device, "esq2x16_sq1", "Ensoniq 2x16 VFD (SQ-1 variant)")
+DEFINE_DEVICE_TYPE(ESQ2X16_SQ1, esq2x16_sq1_device, "esq2x16_sq1", "Ensoniq 2x16 LCD (SQ-1 variant)")
 
 // --- SQ1 - Parduz --------------------------------------------------------------------------------------------------------------------------
 
@@ -305,7 +305,7 @@ void esq2x16_sq1_device::write_char(uint8_t data)
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
 esq2x16_sq1_device::esq2x16_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	esqvfd_device(mconfig, ESQ2X16_SQ1, tag, owner, clock, make_dimensions<2, 16>(*this)),
+	device_t(mconfig, ESQ2X16_SQ1, tag, owner, clock),
 	m_lcdPix(*this, "pg_%u%03u", 1U, 0U),
 	m_leds(*this, "rLed_%u", 0U)
 {
@@ -325,6 +325,15 @@ void esq2x16_sq1_device::update_display()
 			}
 		}
 	}
+}
+//--------------------------------------------------------------------------------------------------------------------------------------------
+void esq2x16_sq1_device::device_start()
+{
+	save_item(NAME(m_lcdpg));
+	save_item(NAME(m_lcdPage));
+	save_item(NAME(m_lcdPos));
+	save_item(NAME(m_lcdSavedPos));
+	save_item(NAME(m_lcd_command));
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
 void esq2x16_sq1_device::device_reset()

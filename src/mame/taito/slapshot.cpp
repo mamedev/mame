@@ -30,7 +30,7 @@ The palette generator is 8 bits per color gun like the Taito F3 system.
 Like Metal Black the palette space is doubled, and the first half used
 for sprites only so the second half can be devoted to tilemaps.
 
-The main cpu is a 68000.
+The main CPU is a 68000.
 
 There is a slave Z80 which interfaces with a YM2610B for sound.
 Commands are written to it by the 68000 (as in the Taito F2 games).

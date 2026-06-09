@@ -2330,6 +2330,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/mb87013.h,MACHINES["MB87013"] = true
+---------------------------------------------------
+
+if MACHINES["MB87013"] then
+	files {
+		MAME_DIR .. "src/devices/machine/mb87013.cpp",
+		MAME_DIR .. "src/devices/machine/mb87013.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/mb87030.h,MACHINES["MB87030"] = true
 ---------------------------------------------------
 
@@ -2932,6 +2944,8 @@ if MACHINES["PCI"] then
 		MAME_DIR .. "src/devices/machine/i82425ex_psc.h",
 		MAME_DIR .. "src/devices/machine/i82426ex_ib.cpp",
 		MAME_DIR .. "src/devices/machine/i82426ex_ib.h",
+		MAME_DIR .. "src/devices/machine/i82434lx_pcmc.cpp",
+		MAME_DIR .. "src/devices/machine/i82434lx_pcmc.h",
 		MAME_DIR .. "src/devices/machine/i82439hx.cpp",
 		MAME_DIR .. "src/devices/machine/i82439hx.h",
 		MAME_DIR .. "src/devices/machine/i82439tx.cpp",
@@ -2948,6 +2962,8 @@ if MACHINES["PCI"] then
 		MAME_DIR .. "src/devices/machine/i82371eb_acpi.h",
 		MAME_DIR .. "src/devices/machine/i82371eb_usb.cpp",
 		MAME_DIR .. "src/devices/machine/i82371eb_usb.h",
+		MAME_DIR .. "src/devices/machine/i82378zb_sio.cpp",
+		MAME_DIR .. "src/devices/machine/i82378zb_sio.h",
 		MAME_DIR .. "src/devices/machine/lpc.h",
 		MAME_DIR .. "src/devices/machine/lpc-acpi.cpp",
 		MAME_DIR .. "src/devices/machine/lpc-acpi.h",

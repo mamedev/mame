@@ -94,6 +94,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/tmp68301.h"
 #include "machine/bankdev.h"
 #include "machine/eepromser.h"
@@ -102,7 +103,9 @@ TODO:
 #include "machine/msm6242.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
+
 #include "emupal.h"
+#include "input.h" // for video debug keys
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"

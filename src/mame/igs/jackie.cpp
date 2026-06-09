@@ -489,8 +489,9 @@ void jackie_state::spec8way_io_map(address_map &map)
 
 int jackie_state::hopper_r()
 {
+	// FIXME: use a hopper device
 	if (m_hopper) return !(m_screen->frame_number() % 10);
-	return machine().input().code_pressed(KEYCODE_H);
+	else return 0;
 }
 
 static INPUT_PORTS_START( jackie )

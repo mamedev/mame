@@ -78,7 +78,7 @@ void vme_mvme327a_device::device_add_mconfig(machine_config &config)
 	MC68153(config, m_bim);
 	PIT68230(config, m_pit);
 
-	WD37C65C(config, m_fdc);
+	WD37C65(config, m_fdc, 32_MHz_XTAL / 2); // WD37C65-PL
 
 	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, nullptr, false);

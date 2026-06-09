@@ -143,7 +143,7 @@ const tiny_rom_entry *sns_pro_fighter_qa_device::device_rom_region() const
 
 void sns_pro_fighter_qa_device::device_add_mconfig(machine_config &config)
 {
-	WD37C65C(config, "fdc", 16_MHz_XTAL); // actually GM82C765B
+	WD37C65B(config, "fdc", 16_MHz_XTAL); // actually GM82C765B
 	FLOPPY_CONNECTOR(config, "fdc:0", profght_floppies, "35dd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 
 	SNS_CART_SLOT(config, "cartslot", snes_cart, nullptr);
@@ -259,7 +259,7 @@ const tiny_rom_entry *sns_pro_fighter_x_device::device_rom_region() const
 
 void sns_pro_fighter_x_device::device_add_mconfig(machine_config &config)
 {
-	WD37C65C(config, "fdc", 16_MHz_XTAL); // actually GM82C765B
+	WD37C65B(config, "fdc", 16_MHz_XTAL); // actually GM82C765B
 	FLOPPY_CONNECTOR(config, "fdc:0", profght_floppies, "35dd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 
 	SNS_CART_SLOT(config, "cartslot", snes_cart, nullptr);

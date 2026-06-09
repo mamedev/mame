@@ -14,6 +14,8 @@
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/tms34010/tms34010.h"
 
+#include "input.h" // for DMA debug keys
+
 #define LOG_DMA             (1U << 1)
 
 #define VERBOSE (0)

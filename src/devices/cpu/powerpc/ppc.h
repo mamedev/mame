@@ -189,7 +189,7 @@ protected:
 		PPC_MODEL_403GCX            = 0x00201400,
 		PPC_MODEL_405GP             = 0x40110000,
 		PPC_MODEL_601               = 0x00010000,
-		PPC_MODEL_603               = 0x00030000,   /* "Wart" */
+		PPC_MODEL_603               = 0x00030001,   /* "Wart" */
 		PPC_MODEL_604               = 0x00040000,   /* "Zephyr" */
 		PPC_MODEL_602               = 0x00050200,   /* "Galahad" */
 		PPC_MODEL_603E              = 0x00060103,   /* "Stretch", version 1.3 */

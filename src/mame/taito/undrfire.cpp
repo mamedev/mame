@@ -60,7 +60,7 @@
     enabled - kludge.
 
 
-    Todo
+    TODO
     ----
 
     What does the 0xb00000 area do... alpha blending ??

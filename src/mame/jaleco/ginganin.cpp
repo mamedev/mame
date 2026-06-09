@@ -128,10 +128,6 @@ private:
 	tilemap_t *m_tx_tilemap = nullptr;
 	u16 m_layers_ctrl = 0;
 	u8 m_flipscreen = 0;
-#ifdef MAME_DEBUG
-	int m_posx = 0;
-	int m_posy = 0;
-#endif
 
 	void fgram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void txtram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -147,16 +143,6 @@ private:
 
 
 /**************************************************************************
-
-Note:   if MAME_DEBUG is defined, pressing Z with:
-
-        Q       shows background
-        W       shows foreground
-        E       shows frontmost (text) layer
-        A       shows sprites
-
-        Keys can be used together!
-
 
 [Screen]
     Visible Size:       256H x 240V
@@ -369,44 +355,16 @@ void ginganin_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 u32 ginganin_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int layers_ctrl1 = m_layers_ctrl;
-
-#ifdef MAME_DEBUG
-if (machine().input().code_pressed(KEYCODE_Z))
-{
-	int msk = 0;
-
-	if (machine().input().code_pressed(KEYCODE_Q)) { msk |= 0xfff1;}
-	if (machine().input().code_pressed(KEYCODE_W)) { msk |= 0xfff2;}
-	if (machine().input().code_pressed(KEYCODE_E)) { msk |= 0xfff4;}
-	if (machine().input().code_pressed(KEYCODE_A)) { msk |= 0xfff8;}
-	if (msk != 0) layers_ctrl1 &= msk;
-
-#define SETSCROLL \
-	m_bg_tilemap->set_scrollx(0, m_posx); \
-	m_bg_tilemap->set_scrolly(0, m_posy); \
-	m_fg_tilemap->set_scrollx(0, m_posx); \
-	m_fg_tilemap->set_scrolly(0, m_posy); \
-	popmessage("B>%04X:%04X F>%04X:%04X",m_posx%(BG_NX*16),m_posy%(BG_NY*16),m_posx%(FG_NX*16),m_posy%(FG_NY*16));
-
-	if (machine().input().code_pressed(KEYCODE_L)) { m_posx +=8; SETSCROLL }
-	if (machine().input().code_pressed(KEYCODE_J)) { m_posx -=8; SETSCROLL }
-	if (machine().input().code_pressed(KEYCODE_K)) { m_posy +=8; SETSCROLL }
-	if (machine().input().code_pressed(KEYCODE_I)) { m_posy -=8; SETSCROLL }
-	if (machine().input().code_pressed(KEYCODE_H)) { m_posx = m_posy = 0; SETSCROLL }
-}
-#endif
-
-	if (layers_ctrl1 & 1)
+	if (m_layers_ctrl & 1)
 		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(0, cliprect);
 
-	if (layers_ctrl1 & 2)
+	if (m_layers_ctrl & 2)
 		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	if (layers_ctrl1 & 8)
+	if (m_layers_ctrl & 8)
 		draw_sprites(bitmap, cliprect);
-	if (layers_ctrl1 & 4)
+	if (m_layers_ctrl & 4)
 		m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;

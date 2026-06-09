@@ -208,7 +208,7 @@ private:
 	required_device<pc_kbdc_device> m_kbd;
 	required_device<z80scc_device> m_scc;
 	required_device_array<rs232_port_device, 2> m_tty;
-	required_device<wd37c65c_device> m_fdc;
+	required_device<wd37c65b_device> m_fdc;
 	required_device<nscsi_bus_device> m_scsibus;
 	required_device<aic6250_device> m_scsi;
 	required_device<am7990_device> m_net;
@@ -316,9 +316,9 @@ void mips_i2000_state::iop_io_map(address_map &map)
 		NAME([this] (offs_t offset, u16 mem_mask) { return m_mmu[offset]; }),
 		NAME([this] (offs_t offset, u16 data, u16 mem_mask) { m_mmu[offset] = data; }));
 
-	map(0x0040, 0x0043).m(m_fdc, FUNC(wd37c65c_device::map)).umask16(0xff);
-	map(0x0044, 0x0045).w(m_fdc, FUNC(wd37c65c_device::dor_w)).umask16(0xff);
-	map(0x0048, 0x0049).w(m_fdc, FUNC(wd37c65c_device::ccr_w)).umask16(0xff);
+	map(0x0040, 0x0043).m(m_fdc, FUNC(wd37c65b_device::map)).umask16(0xff);
+	map(0x0044, 0x0045).w(m_fdc, FUNC(wd37c65b_device::dor_w)).umask16(0xff);
+	map(0x0048, 0x0049).w(m_fdc, FUNC(wd37c65b_device::ccr_w)).umask16(0xff);
 	//map(0x004c, 0x004d).r(m_fdc, FUNC(?)).umask16(0xff);
 
 	map(0x0080, 0x0083).rw(m_scsi, FUNC(aic6250_device::read), FUNC(aic6250_device::write)).umask16(0xff);
@@ -576,7 +576,7 @@ void mips_i2000_state::i2000(machine_config &config)
 	m_scc->out_txdb_callback().set(m_tty[1], FUNC(rs232_port_device::write_txd));
 
 	// floppy controller and drive
-	WD37C65C(config, m_fdc, 16_MHz_XTAL);
+	WD37C65B(config, m_fdc, 16_MHz_XTAL);
 	m_fdc->intrq_wr_callback().set_inputline(m_iop, INPUT_LINE_IRQ6);
 	//m_fdc->drq_wr_callback().set();
 	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);

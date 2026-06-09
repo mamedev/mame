@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include "interface/output.h"
+
 #include <any>
 #include <cassert>
 #include <functional>
@@ -20,7 +22,7 @@
 #include <string>
 #include <string_view>
 #include <type_traits>
-#include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -34,7 +36,7 @@ class output_manager
 private:
 	template <typename Input, std::make_unsigned_t<Input> DefaultMask> friend class devcb_write;
 
-	using notifier_func = void (*)(const char *outname, s32 value, void *param);
+	using notifier_func = void (*)(void *param, osd::output_item const &item, s32 seconds, s64 attoseconds);
 
 	class output_notify
 	{
@@ -45,68 +47,153 @@ private:
 		{
 		}
 
-		void operator()(char const *outname, s32 value) const { m_notifier(outname, value, m_param); }
+		void operator()(attotime const &when, osd::output_item const &item) const
+		{ m_notifier(m_param, item, when.seconds(), when.attoseconds()); }
 
 	private:
 		notifier_func   m_notifier;       // callback to call
-		void *          m_param;          // parameter to pass the callback
+		void            *m_param;         // parameter to pass the callback
 	};
 	using notify_vector = std::vector<output_notify>;
 
-	class output_item
+	class item_impl
 	{
 	public:
-		output_item(output_item &&) = delete;
-		output_item(output_item const &) = delete;
-		output_item &operator=(output_item &&) = delete;
-		output_item &operator=(output_item const &) = delete;
+		item_impl(output_manager &manager, device_t &device, std::string_view name);
 
-		output_item(
-				output_manager &manager,
-				std::string &&name,
-				u32 id,
-				s32 value);
+		osd::output_item const &data() const { return m_data; }
+		device_t &device() const { return m_device; }
+		std::string_view const &name() const { return m_data.name(); }
+		std::string_view const &device_tag() const { return m_data.device_tag(); }
+		std::string const &qualified_name() const { return m_data.qualified_name(); }
+		s32 const &get() const { return m_data.value(); }
+		void set(s32 value) const { if (m_data.value() != value) { notify(value); } }
+		void notify(s32 value) const;
 
-		std::string const &name() const { return m_name; }
-		u32 id() const { return m_id; }
-		s32 const &get() const { return m_value; }
-		void set(s32 value) { if (m_value != value) { notify(value); } }
-		void notify(s32 value);
-
-		void set_notifier(notifier_func callback, void *param) { m_notifylist.emplace_back(callback, param); }
+		void add_notifier(notifier_func callback, void *param) const { m_notifylist.emplace_back(callback, param); }
 
 	private:
-		output_manager      &m_manager;     // parent output manager
-		std::string const   m_name;         // string name of the item
-		u32 const           m_id;           // unique ID for this item
-		s32                 m_value;        // current value
-		notify_vector       m_notifylist;   // list of notifier callbacks
+		class item_data : public osd::output_item
+		{
+		public:
+			item_data(std::string_view n, std::string_view d) : osd::output_item(std::move(n), d) { }
+			void set(s32 value) { m_value = value; }
+		};
+
+		output_manager          &m_manager;     // parent output manager
+		device_t                &m_device;      // associated device
+		mutable item_data       m_data;         // base data
+		mutable notify_vector   m_notifylist;   // list of notifier callbacks
 	};
+
+	struct item_hash
+	{
+		using is_transparent = void;
+
+		std::size_t operator()(item_impl const &a) const
+		{
+			auto const x = std::hash<device_t *>()(&a.device());
+			auto const y = std::hash<std::string_view>()(a.name());
+			return x ^ (y << 1);
+		}
+
+		std::size_t operator()(std::pair<device_t &, std::string_view> const &a) const
+		{
+			auto const x = std::hash<device_t *>()(&a.first);
+			auto const y = std::hash<std::string_view>()(a.second);
+			return x ^ (y << 1);
+		}
+	};
+
+	struct item_equal
+	{
+		using is_transparent = void;
+
+		bool operator()(item_impl const &a, item_impl const &b) const
+		{ return (&a.device() == &b.device()) && (a.name() == b.name()); }
+
+		bool operator()(item_impl const &a, std::pair<device_t &, std::string_view> const &b) const
+		{ return (&a.device() == &b.first) && (a.name() == b.second); }
+
+		bool operator()(std::pair<device_t &, std::string_view> const &a, item_impl const &b) const
+		{ return (&a.first == &b.device()) && (a.second == b.name()); }
+	};
+
+	struct qualified_name_hash : protected std::hash<std::string_view>
+	{
+		using is_transparent = void;
+
+		using std::hash<std::string_view>::operator();
+
+		std::size_t operator()(item_impl const &a) const
+		{ return std::hash<std::string_view>::operator()(a.qualified_name()); }
+	};
+
+	struct qualified_name_equal
+	{
+		using is_transparent = void;
+
+		bool operator()(item_impl const &a, item_impl const &b) const
+		{ return a.qualified_name() == b.qualified_name(); }
+
+		bool operator()(item_impl const &a, std::string_view b) const
+		{ return a.qualified_name() == b; }
+
+		bool operator()(std::string_view a, item_impl const &b) const
+		{ return a == b.qualified_name(); }
+	};
+
+	struct unqualified_name_hash : protected std::hash<std::string_view>
+	{
+		using is_transparent = void;
+
+		using std::hash<std::string_view>::operator();
+
+		std::size_t operator()(item_impl const &a) const
+		{ return std::hash<std::string_view>::operator()(a.name()); }
+	};
+
+	struct unqualified_name_equal
+	{
+		using is_transparent = void;
+
+		bool operator()(item_impl const &a, item_impl const &b) const
+		{ return a.name() == b.name(); }
+
+		bool operator()(item_impl const &a, std::string_view b) const
+		{ return a.name() == b; }
+
+		bool operator()(std::string_view a, item_impl const &b) const
+		{ return a == b.name(); }
+	};
+
+	using item_reference = std::reference_wrapper<item_impl const>;
+	using item_set = std::unordered_set<item_impl, item_hash, item_equal>;
+	using qualified_name_set = std::unordered_set<item_reference, qualified_name_hash, qualified_name_equal>;
+	using unqualified_name_set = std::unordered_set<item_reference, unqualified_name_hash, unqualified_name_equal>;
 
 	class item_creator_proxy;
 	template <unsigned M, unsigned... N> struct item_proxy_array { typedef typename item_proxy_array<N...>::type type[M]; };
 	template <unsigned N> struct item_proxy_array<N> { typedef item_creator_proxy type[N]; };
 	template <unsigned... N> using item_proxy_array_t = typename item_proxy_array<N...>::type;
 
-	output_item *find_item(device_t &device, std::string_view string);
-	output_item &create_new_item(device_t &device, std::string_view outname, s32 value);
-	output_item *find_or_create_item(device_t &device, std::string_view outname, s32 value);
+	item_impl const *find_item(device_t &device, std::string_view name);
+	item_impl const &find_or_create_item(device_t &device, std::string_view name);
 
 	// event handlers
-	void pause();
-	void resume();
 	void presave() ATTR_COLD;
 	void postload() ATTR_COLD;
 
 	static bool validate_name(device_t &device, std::string_view name);
 
 	// internal state
-	running_machine &m_machine;                  // reference to our machine
-	util::transparent_string_unordered_map<std::string, output_item> m_itemtable;
-	notify_vector m_global_notifylist;
-	std::vector<std::reference_wrapper<output_item> > m_save_order;
-	std::unique_ptr<s32 []> m_save_data;
-	u32 m_uniqueid;
+	running_machine             &m_machine;
+	item_set                    m_itemtable;
+	qualified_name_set          m_qualified;
+	unqualified_name_set        m_unqualified;
+	notify_vector               m_global_notifylist;
+	std::vector<item_reference> m_save_order;
+	std::unique_ptr<s32 []>     m_save_data;
 
 public:
 	template <typename X, unsigned... N> class output_finder;
@@ -123,23 +210,17 @@ public:
 	running_machine &machine() const { return m_machine; }
 
 	// set a notifier on a particular output
-	void set_notifier(std::string_view outname, notifier_func callback, void *param);
+	void add_notifier(device_t &device, std::string_view name, notifier_func callback, void *param);
 
-	// set a notifier globally
-	void set_global_notifier(notifier_func callback, void *param);
+	// add a notifier globally
+	void add_global_notifier(notifier_func callback, void *param);
 
 	// immediately call a notifier for all outputs
 	template <typename T> void notify_all(T &&notifier) const
 	{
 		for (auto const &item : m_itemtable)
-			notifier(item.second.name().c_str(), item.second.get());
+			notifier(item.data());
 	}
-
-	// map a name to a unique ID
-	u32 name_to_id(std::string_view outname);
-
-	// map a unique ID back to a name
-	const char *id_to_name(u32 id);
 };
 
 template <unsigned... N> using output_finder = output_manager::output_finder<void, N...>;

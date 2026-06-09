@@ -301,62 +301,37 @@ void esd16_state::video_start()
 
 u32 esd16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int layers_ctrl = -1;
-
 	screen.priority().fill(0, cliprect);
 
-#ifdef MAME_DEBUG
-if (machine().input().code_pressed(KEYCODE_Z))
-{
-	int msk = 0;
-	if (machine().input().code_pressed(KEYCODE_Q))  msk |= 1;
-	if (machine().input().code_pressed(KEYCODE_W))  msk |= 2;
-	if (machine().input().code_pressed(KEYCODE_A))  msk |= 4;
-	if (msk != 0) layers_ctrl &= msk;
-}
-#endif
-
-	if (layers_ctrl & 1)
+	if (m_layersize[0] & 0x0001)
 	{
-		if (m_layersize[0] & 0x0001)
-		{
-			m_tilemap_16x16[0]->set_scrollx(0, m_scroll[0][0]);
-			m_tilemap_16x16[0]->set_scrolly(0, m_scroll[0][1]);
-			m_tilemap_16x16[0]->draw(screen, bitmap, cliprect, 0, 0);
-		}
-		else
-		{
-			m_tilemap[0]->set_scrollx(0, m_scroll[0][0]);
-			m_tilemap[0]->set_scrolly(0, m_scroll[0][1]);
-			m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
-		}
+		m_tilemap_16x16[0]->set_scrollx(0, m_scroll[0][0]);
+		m_tilemap_16x16[0]->set_scrolly(0, m_scroll[0][1]);
+		m_tilemap_16x16[0]->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
 	{
-		bitmap.fill(0, cliprect);
+		m_tilemap[0]->set_scrollx(0, m_scroll[0][0]);
+		m_tilemap[0]->set_scrolly(0, m_scroll[0][1]);
+		m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 	}
 
 
-	if (layers_ctrl & 2)
+	if (m_layersize[0] & 0x0002)
 	{
-		if (m_layersize[0] & 0x0002)
-		{
-			m_tilemap_16x16[1]->set_scrollx(0, m_scroll[1][0]);
-			m_tilemap_16x16[1]->set_scrolly(0, m_scroll[1][1]);
-			m_tilemap_16x16[1]->draw(screen, bitmap, cliprect, 0, 1);
-		}
-		else
-		{
-			m_tilemap[1]->set_scrollx(0, m_scroll[1][0]);
-			m_tilemap[1]->set_scrolly(0, m_scroll[1][1]);
-			m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 1);
-		}
-
+		m_tilemap_16x16[1]->set_scrollx(0, m_scroll[1][0]);
+		m_tilemap_16x16[1]->set_scrolly(0, m_scroll[1][1]);
+		m_tilemap_16x16[1]->draw(screen, bitmap, cliprect, 0, 1);
+	}
+	else
+	{
+		m_tilemap[1]->set_scrollx(0, m_scroll[1][0]);
+		m_tilemap[1]->set_scrolly(0, m_scroll[1][1]);
+		m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 1);
 	}
 
-	if (layers_ctrl & 4) m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 
-//  popmessage("%04x %04x %04x %04x %04x",head_unknown1[0],head_layersize[0],head_unknown3[0],head_unknown4[0],head_unknown5[0]);
 	return 0;
 }
 

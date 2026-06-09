@@ -30,17 +30,17 @@ paradise: I'm not sure it's working correctly:
 - The high scores table can't be entered !?
 
 
-penky: we need to delay the irqs at startup or it won't boot. Either one of
-       ports 0x2003.r or 0x2005.w starts up the irq timer (confirmed via trojan)
+penky: we need to delay the IRQs at startup or it won't boot. Either one of
+       ports 0x2003.r or 0x2005.w starts up the IRQ timer (confirmed via trojan)
 
 madball and clone: the Oki ROM is 0x80000, seems to be banked, but there's no banking
 for it in the driver
 
-Alternate dipswitch settings for Penky as found in scanned Pins & Dip manual:
+Alternate DIP switch settings for Penky as found in scanned Pins & DIP manual:
 
 DIPSW-A
 --------------------------------------------------------------------
-    DipSwitch Title   |  Function  | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+    DIP Switch Title  |  Function  | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
 --------------------------------------------------------------------
                       |   70 Sec   |off|off|                       |*
       Game Time       |   60 Sec   |on |off|                       |
@@ -65,7 +65,7 @@ majority @ end of time|    70%     |                   |on |on |   |
 
 DIPSW-B
 --------------------------------------------------------------------
-    DipSwitch Title   |  Function  | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+    DIP Switch Title  |  Function  | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
 --------------------------------------------------------------------
                       | 1cn / 1pl  |off|off|                       |*
         Coinage       | 1cn / 2pl  |on |off|                       |
@@ -408,50 +408,27 @@ void paradise_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 uint32_t paradise_state::screen_update_paradise(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int layers_ctrl = -1;
-
-#ifdef MAME_DEBUG
-if (machine().input().code_pressed(KEYCODE_Z))
-{
-	int mask = 0;
-	if (machine().input().code_pressed(KEYCODE_Q))  mask |= 1;
-	if (machine().input().code_pressed(KEYCODE_W))  mask |= 2;
-	if (machine().input().code_pressed(KEYCODE_E))  mask |= 4;
-	if (machine().input().code_pressed(KEYCODE_R))  mask |= 8;
-	if (machine().input().code_pressed(KEYCODE_A))  mask |= 16;
-	if (mask != 0) layers_ctrl &= mask;
-}
-#endif
-
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	if (!(m_priority & 4))  // Screen blanking
 		return 0;
 
 	if (m_priority & 1)
-		if (layers_ctrl & 16)
-			draw_sprites(bitmap, cliprect);
+		draw_sprites(bitmap, cliprect);
 
-	if (layers_ctrl & 1)    m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
-	if (layers_ctrl & 2)    m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-	if (layers_ctrl & 4)    copybitmap_trans(bitmap, m_tmpbitmap, flip_screen(), flip_screen(), 0, 0, cliprect, 0x80f);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+	copybitmap_trans(bitmap, m_tmpbitmap, flip_screen(), flip_screen(), 0, 0, cliprect, 0x80f);
+
+	if (!(m_priority & 2))
+		m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
+
+	if (!(m_priority & 1))
+		draw_sprites(bitmap, cliprect);
 
 	if (m_priority & 2)
-	{
-		if (!(m_priority & 1))
-			if (layers_ctrl & 16)
-				draw_sprites(bitmap, cliprect);
-		if (layers_ctrl & 8)
-			m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
-	}
-	else
-	{
-		if (layers_ctrl & 8)
-			m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
-		if (!(m_priority & 1))
-			if (layers_ctrl & 16)
-				draw_sprites(bitmap, cliprect);
-	}
+		m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
+
 	return 0;
 }
 

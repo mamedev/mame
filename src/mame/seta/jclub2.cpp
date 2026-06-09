@@ -88,7 +88,7 @@
   - Boot with Config + P1 Payout + P1 Cancel  :  Administrator Setup (release payout quickly, or it will end with a failure)
   - Boot with Config + P1 Start  + P1 Cancel  :  Write ID Enter Write Code
 
-  To do:
+  TODO:
   - Emulate coin double sensor. At the moment you will need to enter the config menu and change to single sensor
   - Visible area under non-wide setting is $160 pixels wide instead of $150
   - Extend palette to 0x20000 entries (palette_device::allocate_palette() prevents more than 0x10000)
@@ -113,6 +113,7 @@
 #include "sound/setapcm.h"
 
 #include "emupal.h"
+#include "input.h" // for video debug keys
 #include "speaker.h"
 #include "tilemap.h"
 

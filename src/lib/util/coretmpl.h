@@ -333,7 +333,7 @@ using osd::s64;
 template <typename CharT, typename Traits = std::char_traits<CharT> >
 struct transparent_string_equal
 {
-	using is_transparent = std::true_type;
+	using is_transparent = void;
 
 	template <typename AllocA, typename AllocB>
 	bool operator()(std::basic_string<CharT, Traits, AllocA> const &a, std::basic_string<CharT, Traits, AllocB> const &b) const
@@ -368,7 +368,7 @@ struct transparent_string_equal
 template <typename CharT, typename Traits = std::char_traits<CharT> >
 struct transparent_string_less
 {
-	using is_transparent = std::true_type;
+	using is_transparent = void;
 
 	template <typename AllocA, typename AllocB>
 	bool operator()(std::basic_string<CharT, Traits, AllocA> const &a, std::basic_string<CharT, Traits, AllocB> const &b) const
@@ -403,7 +403,7 @@ struct transparent_string_less
 template <typename CharT, typename Traits = std::char_traits<CharT> >
 struct transparent_string_hash : protected std::hash<std::basic_string_view<CharT, Traits> >
 {
-	using is_transparent = std::true_type;
+	using is_transparent = void;
 
 	using std::hash<std::basic_string_view<CharT, Traits> >::operator();
 

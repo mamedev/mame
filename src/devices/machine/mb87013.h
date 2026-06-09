@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 /***************************************************************************
 
-    Roland MB87013 QD (Quick Disk) Drive Interface Adapter
+    Fujitsu MB87013 QD (Quick Disk) Drive Interface Adapter
 
 ****************************************************************************
                             _____   _____
@@ -29,8 +29,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_ROLAND_MB87013_H
-#define MAME_ROLAND_MB87013_H
+#ifndef MAME_MACHINE_MB87013_H
+#define MAME_MACHINE_MB87013_H
 
 #pragma once
 
@@ -86,4 +86,4 @@ private:
 // device type declaration
 DECLARE_DEVICE_TYPE(MB87013, mb87013_device)
 
-#endif // MAME_ROLAND_MB87013_H
+#endif // MAME_MACHINE_MB87013_H

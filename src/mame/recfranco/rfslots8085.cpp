@@ -737,7 +737,7 @@ void rfslots8085_state::add_em_reels(machine_config &config, int symbols, attoti
 	for(int i = 0; i < symbols; i++)
 		detents.insert(i * STEPS_PER_SYMBOL);
 
-	EM_REEL(config, m_reel, symbols * STEPS_PER_SYMBOL, detents, period);
+	EM_REEL(config, m_reel, m_reel.finder_tag(), symbols * STEPS_PER_SYMBOL, detents, period);
 	m_reel->set_direction(em_reel_device::dir::FORWARD);
 }
 

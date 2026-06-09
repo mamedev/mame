@@ -7,14 +7,15 @@
 #pragma once
 
 #include "pci.h"
+
 #include "bus/isa/isa.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "cpu/i386/i386.h"
 #include "machine/am9517a.h"
+#include "machine/at_keybc.h"
+#include "machine/ds128x.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/ds128x.h"
-#include "machine/at_keybc.h"
 #include "sound/spkrdev.h"
 
 

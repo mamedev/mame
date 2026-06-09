@@ -22776,6 +22776,10 @@ basic52
 a486ap4
 entrada
 
+@source:intel/i430lx.cpp
+ga586ip
+sy029c2
+
 @source:intel/imds2.cpp
 imds2
 
@@ -35849,6 +35853,7 @@ armwrest
 punchita
 punchout
 punchouta
+punchoutah
 punchoutj
 spnchout
 spnchouta
@@ -42678,6 +42683,7 @@ usclssic
 @source:seta/hanaawas.cpp
 hanaawas
 hanaawasa
+hanaawmh
 
 @source:seta/hanadojo.cpp
 hanadojo
@@ -42837,7 +42843,7 @@ renju
 daifugo
 hana6
 hana6bl
-hanaren2
+hanaren
 harashi
 speedatk
 
@@ -45062,6 +45068,7 @@ victor6a
 victor6b
 
 @source:subsino/subsino_kr_h8.cpp
+coolbi
 modcart
 
 @source:subsino/subsino2.cpp
@@ -46598,6 +46605,7 @@ raiga
 raigaa
 ryukendn
 ryukendna
+ryukendnb
 shadoww
 shadowwa
 stratof

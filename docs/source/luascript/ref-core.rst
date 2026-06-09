@@ -457,17 +457,6 @@ Instantiation
 manager.machine.output
     Gets the output manager for the current emulation session.
 
-Methods
-~~~~~~~
-
-output:name_to_id(name)
-    Gets the per-session unique integer ID for the specified output, or zero if
-    it doesn’t exist.
-output:id_to_name(id)
-    Gets the name for the output with the specified per-session unique ID, or
-    ``nil`` if it doesn’t exist.  This method has O(n) complexity, so avoid
-    calling it when performance is important.
-
 
 .. _luascript-ref-paramman:
 

@@ -210,6 +210,7 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 #include "video/resnet.h"
 
 #include "emupal.h"
+#include "input.h" // for LaserDisc debug keys
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"

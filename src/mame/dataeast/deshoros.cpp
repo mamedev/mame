@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, hap
-/***************************************************************************
+/**************************************************************************************************
 
 Destiny (c) 1983 Data East Corporation
 
@@ -22,12 +22,12 @@ push the main service button F2.
 
 
 TODO:
-- Identify display controller and dump the character ROM,
-  then emulate the graphics with genuine artwork display;
+- Identify display controller and dump the character ROM, should be a dot matrix display, perhaps
+  with missing sub-board?
 - Printer emulation;
 - Exact sound & irq frequency;
 
-***************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
@@ -74,7 +74,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 public:
-	uint32_t screen_update_destiny(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -88,7 +88,7 @@ void destiny_state::video_start()
 	m_led_array[20] = 0;
 }
 
-uint32_t destiny_state::screen_update_destiny(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t destiny_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	popmessage("%s",m_led_array);
 	return 0;
@@ -282,7 +282,7 @@ void destiny_state::destiny(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(6*16, 9*2);
 	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(destiny_state::screen_update_destiny));
+	screen.set_screen_update(FUNC(destiny_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
@@ -324,4 +324,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1983, destiny, 0, destiny,  destiny, destiny_state, empty_init, ROT0, "Data East Corporation", "Destiny - The Fortuneteller (USA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NODEVICE_PRINTER )
+GAME( 1983, destiny, 0, destiny,  destiny, destiny_state, empty_init, ROT0, "Data East Corporation", "Destiny: The Fortuneteller (USA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_PRINTER )

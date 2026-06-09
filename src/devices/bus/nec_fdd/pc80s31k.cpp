@@ -159,7 +159,7 @@ Used as a communication protocol flags
 //#define VERBOSE 1
 #include "logmacro.h"
 
-//#include "formats/hxchfe_dsk.h"
+#include "formats/hxchfe_dsk.h"
 #include "formats/pc98fdi_dsk.h"
 #include "formats/xdf_dsk.h"
 
@@ -270,8 +270,8 @@ static void pc88_floppy_formats(format_registration &fr)
 	// need FDI and XDF for PC-88VA
 	fr.add(FLOPPY_XDF_FORMAT);
 	fr.add(FLOPPY_PC98FDI_FORMAT);
-	// eventually ...
-//  fr.add(FLOPPY_HFE_FORMAT);
+	// preliminary, HFE needs double head support (i.e. won't work with pc8801ma)
+	fr.add(FLOPPY_HFE_FORMAT);
 }
 
 void pc80s31_device::device_add_mconfig(machine_config &config)

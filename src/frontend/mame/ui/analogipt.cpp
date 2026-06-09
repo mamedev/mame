@@ -13,6 +13,7 @@
 
 #include "ui/textbox.h"
 
+#include "input.h"
 #include "uiinput.h"
 
 #include <algorithm>

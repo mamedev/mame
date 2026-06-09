@@ -23,6 +23,7 @@
 #include "drivenum.h"
 #include "emuopts.h"
 #include "fileio.h"
+#include "input.h"
 #include "inputdev.h"
 #include "natkeyboard.h"
 #include "screen.h"
@@ -643,7 +644,6 @@ void lua_engine::on_machine_prestart()
 void lua_engine::on_machine_reset()
 {
 	m_notifiers->on_reset();
-	execute_function("LUA_ON_START");
 }
 
 void lua_engine::on_machine_stop()
@@ -659,7 +659,6 @@ void lua_engine::on_machine_stop()
 	expired.clear();
 
 	m_notifiers->on_stop();
-	execute_function("LUA_ON_STOP");
 }
 
 void lua_engine::on_machine_before_load_settings()
@@ -670,13 +669,11 @@ void lua_engine::on_machine_before_load_settings()
 void lua_engine::on_machine_pause()
 {
 	m_notifiers->on_pause();
-	execute_function("LUA_ON_PAUSE");
 }
 
 void lua_engine::on_machine_resume()
 {
 	m_notifiers->on_resume();
-	execute_function("LUA_ON_RESUME");
 }
 
 void lua_engine::on_machine_frame()
@@ -686,8 +683,6 @@ void lua_engine::on_machine_frame()
 	resume_tasks(m_lua_state, tasks, true); // TODO: doesn't need to return anything
 
 	m_notifiers->on_frame();
-
-	execute_function("LUA_ON_FRAME");
 }
 
 void lua_engine::on_machine_presave()
@@ -2302,8 +2297,6 @@ void lua_engine::initialize()
 				osd_printf_warning("[LUA] output.get_indexed_value is deprecated - please use output proxy objects\n");
 				return output_proxy(o.machine().root_device(), util::string_format("%s%d", basename, index)).get();
 			});
-	output_type["name_to_id"] = &output_manager::name_to_id;
-	output_type["id_to_name"] = &output_manager::id_to_name;
 
 
 	auto mame_manager_type = sol().registry().new_usertype<mame_machine_manager>("manager", sol::no_constructor);

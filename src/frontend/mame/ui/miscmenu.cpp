@@ -28,6 +28,8 @@
 #include "romload.h"
 #include "uiinput.h"
 
+#include "input.h"
+
 #include "osdepend.h"
 
 #include "path.h"

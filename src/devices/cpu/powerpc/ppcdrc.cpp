@@ -434,10 +434,9 @@ void ppc_device::code_compile_block(uint8_t mode, offs_t pc)
     aren't interrupts
 -------------------------------------------------*/
 
-static void cfunc_printf_exception(void *param)
+static void cfunc_printf_exception(ppc_device &ppc)
 {
-	ppc_device *ppc = (ppc_device *)param;
-	ppc->ppc_cfunc_printf_exception();
+	ppc.ppc_cfunc_printf_exception();
 }
 
 void ppc_device::ppc_cfunc_printf_exception()
@@ -452,10 +451,9 @@ void ppc_device::ppc_cfunc_printf_exception()
     debugging
 -------------------------------------------------*/
 
-static void cfunc_printf_debug(void *param)
+static void cfunc_printf_debug(ppc_device &ppc)
 {
-	ppc_device *ppc = (ppc_device *)param;
-	ppc->ppc_cfunc_printf_debug();
+	ppc.ppc_cfunc_printf_debug();
 }
 
 void ppc_device::ppc_cfunc_printf_debug()
@@ -469,10 +467,9 @@ void ppc_device::ppc_cfunc_printf_debug()
     state and return
 -------------------------------------------------*/
 
-static void cfunc_printf_probe(void *param)
+static void cfunc_printf_probe(ppc_device &ppc)
 {
-	ppc_device *ppc = (ppc_device *)param;
-	ppc->ppc_cfunc_printf_probe();
+	ppc.ppc_cfunc_printf_probe();
 }
 
 void ppc_device::ppc_cfunc_printf_probe()
@@ -497,16 +494,14 @@ void ppc_device::ppc_cfunc_printf_probe()
 		m_core->r[28], m_core->r[29], m_core->r[30], m_core->r[31]);
 }
 
-
 /*-------------------------------------------------
     cfunc_unimplemented - handler for
     unimplemented opcdes
 -------------------------------------------------*/
 
-static void cfunc_unimplemented(void *param)
+static void cfunc_unimplemented(ppc_device &ppc)
 {
-	ppc_device *ppc = (ppc_device *)param;
-	ppc->ppc_cfunc_unimplemented();
+	ppc.ppc_cfunc_unimplemented();
 }
 
 void ppc_device::ppc_cfunc_unimplemented()
@@ -515,10 +510,9 @@ void ppc_device::ppc_cfunc_unimplemented()
 	fatalerror("PC=%08X: Unimplemented op %08X\n", m_core->pc, opcode);
 }
 
-static void cfunc_ppccom_mismatch(void *param)
+static void cfunc_ppccom_mismatch(ppc_device &ppc)
 {
-	ppc_device *ppc = (ppc_device *)param;
-	ppc->ppc_cfunc_ppccom_mismatch();
+	ppc.ppc_cfunc_ppccom_mismatch();
 }
 
 void ppc_device::ppc_cfunc_ppccom_mismatch()
@@ -526,82 +520,69 @@ void ppc_device::ppc_cfunc_ppccom_mismatch()
 //  printf("cfunc_ppccom_mismatch %08X\n", m_core->pc);
 }
 
-static void cfunc_ppccom_tlb_fill(void *param)
+static void cfunc_ppccom_tlb_fill(ppc_device &ppc)
 {
-	ppc_device *ppc = (ppc_device *)param;
-	ppc->ppccom_tlb_fill();
+	ppc.ppccom_tlb_fill();
 }
 
-static void cfunc_ppccom_update_fprf(void *param)
+static void cfunc_ppccom_update_fprf(ppc_device &ppc)
 {
-	ppc_device *ppc = (ppc_device *)param;
-	ppc->ppccom_update_fprf();
+	ppc.ppccom_update_fprf();
 }
 
-static void cfunc_ppccom_dcstore_callback(void *param)
+static void cfunc_ppccom_dcstore_callback(ppc_device &ppc)
 {
-	ppc_device *ppc = (ppc_device *)param;
-	ppc->ppccom_dcstore_callback();
+	ppc.ppccom_dcstore_callback();
 }
 
-static void cfunc_ppccom_execute_tlbie(void *param)
+static void cfunc_ppccom_execute_tlbie(ppc_device &ppc)
 {
-	ppc_device *ppc = (ppc_device *)param;
-	ppc->ppccom_execute_tlbie();
+	ppc.ppccom_execute_tlbie();
 }
 
-static void cfunc_ppccom_execute_tlbia(void *param)
+static void cfunc_ppccom_execute_tlbia(ppc_device &ppc)
 {
-	ppc_device *ppc = (ppc_device *)param;
-	ppc->ppccom_execute_tlbia();
+	ppc.ppccom_execute_tlbia();
 }
 
-static void cfunc_ppccom_execute_tlbl(void *param)
+static void cfunc_ppccom_execute_tlbl(ppc_device &ppc)
 {
-	ppc_device *ppc = (ppc_device *)param;
-	ppc->ppccom_execute_tlbl();
+	ppc.ppccom_execute_tlbl();
 }
 
-static void cfunc_ppccom_execute_mfspr(void *param)
+static void cfunc_ppccom_execute_mfspr(ppc_device &ppc)
 {
-	ppc_device *ppc = (ppc_device *)param;
-	ppc->ppccom_execute_mfspr();
+	ppc.ppccom_execute_mfspr();
 }
 
-static void cfunc_ppccom_execute_mftb(void *param)
+static void cfunc_ppccom_execute_mftb(ppc_device &ppc)
 {
-	ppc_device *ppc = (ppc_device *)param;
-	ppc->ppccom_execute_mftb();
+	ppc.ppccom_execute_mftb();
 }
 
-static void cfunc_ppccom_execute_mtspr(void *param)
+static void cfunc_ppccom_execute_mtspr(ppc_device &ppc)
 {
-	ppc_device *ppc = (ppc_device *)param;
-	ppc->ppccom_execute_mtspr();
+	ppc.ppccom_execute_mtspr();
 }
 
-static void cfunc_ppccom_tlb_flush(void *param)
+static void cfunc_ppccom_tlb_flush(ppc_device &ppc)
 {
-	ppc_device *ppc = (ppc_device *)param;
-	ppc->ppccom_tlb_flush();
+	ppc.ppccom_tlb_flush();
 }
 
-static void cfunc_ppccom_execute_mfdcr(void *param)
+static void cfunc_ppccom_execute_mfdcr(ppc_device &ppc)
 {
-	ppc_device *ppc = (ppc_device *)param;
-	ppc->ppccom_execute_mfdcr();
+	ppc.ppccom_execute_mfdcr();
 }
 
-static void cfunc_ppccom_execute_mtdcr(void *param)
+static void cfunc_ppccom_execute_mtdcr(ppc_device &ppc)
 {
-	ppc_device *ppc = (ppc_device *)param;
-	ppc->ppccom_execute_mtdcr();
+	ppc.ppccom_execute_mtdcr();
 }
 
-static void cfunc_ppccom_get_dsisr(void *param)
+static void cfunc_ppccom_get_dsisr(ppc_device &ppc)
 {
-	ppc_device *ppc = (ppc_device *)param;
-	ppc->ppccom_get_dsisr();
+	ppc.ppccom_get_dsisr();
 }
 
 /***************************************************************************
@@ -724,8 +705,8 @@ void ppc_device::static_generate_tlb_mismatch()
 	UML_LOAD(block, I2, (void *)vtlb_table(), I1, SIZE_DWORD, SCALE_x4);    // load    i2,[vtlb],i1,dword
 	UML_MOV(block, mem(&m_core->param0), I0);                               // mov     [param0],i0
 	UML_MOV(block, mem(&m_core->param1), TR_FETCH);                         // mov     [param1],TR_FETCH
-	UML_CALLC(block, (c_function)cfunc_ppccom_mismatch, this);
-	UML_CALLC(block, (c_function)cfunc_ppccom_tlb_fill, this);              // callc   tlbfill,ppc
+	UML_CALLC(block, cfunc_ppccom_mismatch, this);
+	UML_CALLC(block, cfunc_ppccom_tlb_fill, this);                          // callc   tlbfill,ppc
 	UML_LOAD(block, I1, (void *)vtlb_table(), I1, SIZE_DWORD, SCALE_x4);    // load    i1,[vtlb],i1,dword
 	UML_TEST(block, I1, FETCH_ALLOWED);                                     // test    i1,FETCH_ALLOWED
 	UML_JMPc(block, COND_Z, isi = label++);                                 // jmp     isi,z
@@ -742,8 +723,8 @@ void ppc_device::static_generate_tlb_mismatch()
 	{
 		// DAR gets the address, DSISR gets the 'reason' flags
 		UML_MOV(block, SPR32(SPROEA_DAR), mem(&m_core->param0));             // mov     [dar],[param0]
-		m_core->param1 = 0; // always a read here
-		UML_CALLC(block, (c_function)cfunc_ppccom_get_dsisr, this);         // get DSISR to param1
+		UML_MOV(block, mem(&m_core->param1), 0); // always a read here
+		UML_CALLC(block, cfunc_ppccom_get_dsisr, this);         // get DSISR to param1
 		UML_MOV(block, SPR32(SPROEA_DSISR), mem(&m_core->param1));          // move [dsisr], [param1]
 		UML_EXH(block, *m_exception[EXCEPTION_ISI], I0);                   // exh     isi,i0
 	}
@@ -1305,57 +1286,56 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 	/* handle an alignment exception */
 	if (alignex != 0)
 	{
-		UML_LABEL(block, alignex);                                                      // alignex:
-		UML_RECOVER(block, SPR32(SPROEA_DSISR), MAPVAR_DSISR);                              // recover [dsisr],DSISR
-		UML_EXH(block, *m_exception[EXCEPTION_ALIGN], I0);                 // exh     align,i0
+		UML_LABEL(block, alignex);                                          // alignex:
+		UML_RECOVER(block, SPR32(SPROEA_DSISR), MAPVAR_DSISR);              // recover [dsisr],DSISR
+		UML_EXH(block, *m_exception[EXCEPTION_ALIGN], I0);                  // exh     align,i0
 	}
 
 	/* handle a TLB miss */
 	if (tlbmiss != 0)
 	{
-		UML_LABEL(block, tlbmiss);                                                      // tlbmiss:
-		UML_MOV(block, mem(&m_core->param0), I0);                                          // mov     [param0],i0
-		UML_MOV(block, mem(&m_core->param1), translate_type);                              // mov     [param1],translate_type
-		UML_CALLC(block, (c_function)cfunc_ppccom_tlb_fill, this);                                             // callc   tlbfill,ppc
+		UML_LABEL(block, tlbmiss);                                          // tlbmiss:
+		UML_MOV(block, mem(&m_core->param0), I0);                           // mov     [param0],i0
+		UML_MOV(block, mem(&m_core->param1), translate_type);               // mov     [param1],translate_type
+		UML_CALLC(block, cfunc_ppccom_tlb_fill, this);                                             // callc   tlbfill,ppc
 		UML_SHR(block, I3, I0, 12);                                         // shr     i3,i0,12
 		UML_LOAD(block, I3, (void *)vtlb_table(), I3, SIZE_DWORD, SCALE_x4);// load    i3,[vtlb],i3,dword
-		UML_TEST(block, I3, (uint64_t)1 << translate_type);                           // test    i3,1 << translate_type
-		UML_JMPc(block, COND_NZ, tlbreturn);                                                    // jmp     tlbreturn,nz
+		UML_TEST(block, I3, (uint64_t)1 << translate_type);                 // test    i3,1 << translate_type
+		UML_JMPc(block, COND_NZ, tlbreturn);                                // jmp     tlbreturn,nz
 
-		/* 4XX case: protection exception */
 		if (m_cap & PPCCAP_4XX)
 		{
-			UML_MOV(block, SPR32(SPR4XX_DEAR), I0);                                 // mov     [dear],i0
-			UML_EXH(block, *m_exception[EXCEPTION_DSI], I0);               // exh     dsi,i0
+			// 4XX case: protection exception
+			UML_MOV(block, SPR32(SPR4XX_DEAR), I0);                         // mov     [dear],i0
+			UML_EXH(block, *m_exception[EXCEPTION_DSI], I0);                // exh     dsi,i0
 		}
-
-		/* 603 case: TLBMISS exception */
 		else if (m_cap & PPCCAP_603_MMU)
 		{
-			UML_MOV(block, SPR32(SPR603_DMISS), I0);                                    // mov     [dmiss],i0
-			UML_MOV(block, SPR32(SPR603_DCMP), mem(&m_core->mmu603_cmp));                      // mov     [dcmp],[mmu603_cmp]
-			UML_MOV(block, SPR32(SPR603_HASH1), mem(&m_core->mmu603_hash[0]));                 // mov     [hash1],[mmu603_hash][0]
-			UML_MOV(block, SPR32(SPR603_HASH2), mem(&m_core->mmu603_hash[1]));                 // mov     [hash2],[mmu603_hash][1]
-			if (iswrite)
-				UML_EXH(block, *m_exception[EXCEPTION_DTLBMISSS], I0);     // exh     dtlbmisss,i0
-			else
-				UML_EXH(block, *m_exception[EXCEPTION_DTLBMISSL], I0);     // exh     dtlbmissl,i0
-		}
+			// 603 case: BAT protection violations raise DSI, otherwise it's a TLB miss
+			UML_MOV(block, mem(&m_core->param1), iswrite ? 1 : 0);
+			UML_CALLC(block, cfunc_ppccom_get_dsisr, this);
+			UML_TEST(block, mem(&m_core->param1), DSISR_PROTECTED);                     // BAT protection violation?
+			UML_JMPc(block, COND_Z, label);                                             // if not, it's a TLB miss, go to label
+			UML_MOV(block, SPR32(SPROEA_DSISR), mem(&m_core->param1));                  // DSI: set DSISR (DAR set by handler)
+			UML_EXH(block, *m_exception[EXCEPTION_DSI], I0);                            // exh dsi,i0
 
-		/* general case: DSI exception */
+			UML_LABEL(block, label++);                                                  // label++: (TLB miss)
+			UML_MOV(block, SPR32(SPR603_DMISS), I0);                                    // mov [dmiss],i0
+			UML_MOV(block, SPR32(SPR603_DCMP), mem(&m_core->mmu603_cmp));               // mov [dcmp], [mmu603_cmp]
+			UML_MOV(block, SPR32(SPR603_HASH1), mem(&m_core->mmu603_hash[0]));          // mov [hash1],[mmu603_hash][0]
+			UML_MOV(block, SPR32(SPR603_HASH2), mem(&m_core->mmu603_hash[1]));          // mov [hash2],[mmu603_hash][1]
+			if (iswrite)
+				UML_EXH(block, *m_exception[EXCEPTION_DTLBMISSS], I0);                  // exh     dtlbmisss,i0
+			else
+				UML_EXH(block, *m_exception[EXCEPTION_DTLBMISSL], I0);                  // exh     dtlbmissl,i0
+		}
 		else
 		{
+			// general case: DSI exception
 			UML_MOV(block, SPR32(SPROEA_DAR), mem(&m_core->param0));            // mov [dar],[param0]
 			// signal read or write to cfunc to get proper reason back
-			if (iswrite)
-			{
-				m_core->param1 = 1;
-			}
-			else
-			{
-				m_core->param1 = 0;
-			}
-			UML_CALLC(block, (c_function)cfunc_ppccom_get_dsisr, this);         // get DSISR to param1
+			UML_MOV(block, mem(&m_core->param1), iswrite ? 1 : 0);
+			UML_CALLC(block, cfunc_ppccom_get_dsisr, this);                     // get DSISR to param1
 			UML_MOV(block, SPR32(SPROEA_DSISR), mem(&m_core->param1));          // move [dsisr], [param1]
 			UML_EXH(block, *m_exception[EXCEPTION_DSI], I0);                    // exh dsi,i0
 		}
@@ -1861,7 +1841,7 @@ void ppc_device::generate_fp_flags(drcuml_block &block, const opcode_desc *desc,
 			UML_FDMOV(block, mem(&m_core->f[regnum]), freg(m_fdregmap[regnum].freg() - REG_F0));
 
 		UML_MOV(block, mem(&m_core->param0), G_RD(desc->opptr));
-		UML_CALLC(block, (c_function)cfunc_ppccom_update_fprf, this);
+		UML_CALLC(block, cfunc_ppccom_update_fprf, this);
 	}
 }
 
@@ -2435,12 +2415,14 @@ bool ppc_device::generate_instruction_13(drcuml_block &block, compiler_state *co
 					UML_ROLINS(block, MSR32, SPR32(SPROEA_SRR1), 0, 0x87c0ffff);    // rolins  [msr],[srr1],0,0x87c0ffff
 				else
 				{
+					// 603 always clears MSR[TGPR] on RFI.  The 603 manual's wording is ambiguous, but QEMU
+					// (which has PPC contributions from Freescale/Motorola) does it and PowerMac firmware
+					// clearly requires it.  Otherwise the 68K emulator is entered with an invalid stack pointer.
 					UML_MOV(block, I0, MSR32);                                          // mov     i0,[msr]
-					UML_ROLINS(block, MSR32, SPR32(SPROEA_SRR1), 0, 0x87c0ffff |  MSR603_TGPR);
-																							// rolins  [msr],[srr1],0,0x87c0ffff | MSR603_TGPR
-					UML_XOR(block, I0, I0, MSR32);                              // xor     i0,i0,[msr]
-					UML_TEST(block, I0, MSR603_TGPR);                               // test    i0,tgpr
-					UML_CALLHc(block, COND_NZ, *m_swap_tgpr);                      // callh   swap_tgpr,nz
+					UML_ROLINS(block, MSR32, SPR32(SPROEA_SRR1), 0, 0x87c0ffff);        // rolins  [msr],[srr1],0,0x87c0ffff   ; copy non-TGPR bits
+					UML_AND(block, MSR32, MSR32, ~uint32_t(MSR603_TGPR));               // and     [msr],[msr],~TGPR              ; always clear TGPR
+					UML_TEST(block, I0, MSR603_TGPR);                                   // test    i0,tgpr                       ; was old TGPR set?
+					UML_CALLHc(block, COND_NZ, *m_swap_tgpr);                           // callh   swap_tgpr,nz                  ; swap on 1->0
 				}
 			}
 			else if (m_cap & PPCCAP_4XX)
@@ -3321,8 +3303,6 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 			UML_GETFLGS(block, I0, FLAG_Z | FLAG_C | FLAG_S);                           // getflgs i0,zcs
 			UML_LOAD(block, I0, m_cmp_cr_table, I0, SIZE_BYTE, SCALE_x1);// load    i0,cmp_cr_table,i0,byte
 			UML_OR(block, CR32(0), I0, XERSO32);                               // or      [cr0],i0,[xerso]
-
-			generate_compute_flags(block, desc, true, 0, false);                       // <update flags>
 			return true;
 
 		case 0x2d5: /* STSWI */
@@ -3349,7 +3329,7 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 		case 0x036: /* DCBST */
 			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                          // add     i0,ra,rb
 			UML_MOV(block, mem(&m_core->param0), I0);                                      // mov     [param0],i0
-			UML_CALLC(block, (c_function)cfunc_ppccom_dcstore_callback, this);
+			UML_CALLC(block, cfunc_ppccom_dcstore_callback, this);
 			return true;
 
 		case 0x056: /* DCBF */
@@ -3377,25 +3357,25 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 
 		case 0x132: /* TLBIE */
 			UML_MOV(block, mem(&m_core->param0), R32(G_RB(op)));                               // mov     [param0],rb
-			UML_CALLC(block, (c_function)cfunc_ppccom_execute_tlbie, this);                                    // callc   ppccom_execute_tlbie,ppc
+			UML_CALLC(block, cfunc_ppccom_execute_tlbie, this);                                    // callc   ppccom_execute_tlbie,ppc
 			return true;
 
 		case 0x172: /* TLBIA */
-			UML_CALLC(block, (c_function)cfunc_ppccom_execute_tlbia, this);                                    // callc   ppccom_execute_tlbia,ppc
+			UML_CALLC(block, cfunc_ppccom_execute_tlbia, this);                                    // callc   ppccom_execute_tlbia,ppc
 			return true;
 
 		case 0x3d2: /* TLBLD */
 			assert(m_cap & PPCCAP_603_MMU);
 			UML_MOV(block, mem(&m_core->param0), R32(G_RB(op)));                               // mov     [param0],rb
 			UML_MOV(block, mem(&m_core->param1), 0);                                       // mov     [param1],0
-			UML_CALLC(block, (c_function)cfunc_ppccom_execute_tlbl, this);                                     // callc   ppccom_execute_tlbl,ppc
+			UML_CALLC(block, cfunc_ppccom_execute_tlbl, this);                                     // callc   ppccom_execute_tlbl,ppc
 			return true;
 
 		case 0x3f2: /* TLBLI */
 			assert(m_cap & PPCCAP_603_MMU);
 			UML_MOV(block, mem(&m_core->param0), R32(G_RB(op)));                               // mov     [param0],rb
 			UML_MOV(block, mem(&m_core->param1), 1);                                       // mov     [param1],1
-			UML_CALLC(block, (c_function)cfunc_ppccom_execute_tlbl, this);                                     // callc   ppccom_execute_tlbl,ppc
+			UML_CALLC(block, cfunc_ppccom_execute_tlbl, this);                                     // callc   ppccom_execute_tlbl,ppc
 			return true;
 
 		case 0x013: /* MFCR */
@@ -3432,11 +3412,13 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 			}
 			else if (spr == SPROEA_PVR)
 				UML_MOV(block, R32(G_RD(op)), m_flavor);                         // mov     rd,flavor
+			else if (spr == SPR601_MQ && m_flavor != PPC_MODEL_601)
+				UML_MOV(block, R32(G_RD(op)), 0);
 			else
 			{
 				generate_update_cycles(block, compiler, desc->pc, false);           // <update cycles>
 				UML_MOV(block, mem(&m_core->param0), spr);                             // mov     [param0],spr
-				UML_CALLC(block, (c_function)cfunc_ppccom_execute_mfspr, this);                                // callc   ppccom_execute_mfspr,ppc
+				UML_CALLC(block, cfunc_ppccom_execute_mfspr, this);                                // callc   ppccom_execute_mfspr,ppc
 				UML_MOV(block, R32(G_RD(op)), mem(&m_core->param1));                           // mov     rd,[param1]
 			}
 			return true;
@@ -3458,7 +3440,7 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 				return false;
 			generate_update_cycles(block, compiler, desc->pc, false);               // <update cycles>
 			UML_MOV(block, mem(&m_core->param0), tbr);                                 // mov     [param0],tbr
-			UML_CALLC(block, (c_function)cfunc_ppccom_execute_mftb, this);                                     // callc   ppccom_execute_mftb,ppc
+			UML_CALLC(block, cfunc_ppccom_execute_mftb, this);                                     // callc   ppccom_execute_mftb,ppc
 			UML_MOV(block, R32(G_RD(op)), mem(&m_core->param1));                               // mov     rd,[param1]
 			return true;
 		}
@@ -3504,7 +3486,7 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 				generate_update_cycles(block, compiler, desc->pc, false);           // <update cycles>
 				UML_MOV(block, mem(&m_core->param0), spr);                             // mov     [param0],spr
 				UML_MOV(block, mem(&m_core->param1), R32(G_RS(op)));                           // mov     [param1],rs
-				UML_CALLC(block, (c_function)cfunc_ppccom_execute_mtspr, this);                                // callc   ppccom_execute_mtspr,ppc
+				UML_CALLC(block, cfunc_ppccom_execute_mtspr, this);                                // callc   ppccom_execute_mtspr,ppc
 				compiler->checkints = true;
 				generate_update_cycles(block, compiler, desc->pc + 4, true);       // <update cycles>
 			}
@@ -3513,13 +3495,13 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 
 		case 0x0d2: /* MTSR */
 			UML_MOV(block, SR32(G_SR(op)), R32(G_RS(op)));                                  // mov     sr[G_SR],rs
-			UML_CALLC(block, (c_function)cfunc_ppccom_tlb_flush, this);                                        // callc   ppccom_tlb_flush,ppc
+			UML_CALLC(block, cfunc_ppccom_tlb_flush, this);                                        // callc   ppccom_tlb_flush,ppc
 			return true;
 
 		case 0x0f2: /* MTSRIN */
 			UML_SHR(block, I0, R32(G_RB(op)), 28);                              // shr     i0,G_RB,28
 			UML_STORE(block, &m_core->sr[0], I0, R32(G_RS(op)), SIZE_DWORD, SCALE_x4); // store   sr,i0,rs,dword
-			UML_CALLC(block, (c_function)cfunc_ppccom_tlb_flush, this);                            // callc   ppccom_tlb_flush,ppc
+			UML_CALLC(block, cfunc_ppccom_tlb_flush, this);                            // callc   ppccom_tlb_flush,ppc
 			return true;
 
 		case 0x200: /* MCRXR */
@@ -3549,7 +3531,7 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 			assert(m_cap & PPCCAP_4XX);
 			generate_update_cycles(block, compiler, desc->pc, false);               // <update cycles>
 			UML_MOV(block, mem(&m_core->param0), spr);                                 // mov     [param0],spr
-			UML_CALLC(block, (c_function)cfunc_ppccom_execute_mfdcr, this);                                    // callc   ppccom_execute_mfdcr,ppc
+			UML_CALLC(block, cfunc_ppccom_execute_mfdcr, this);                                    // callc   ppccom_execute_mfdcr,ppc
 			UML_MOV(block, R32(G_RD(op)), mem(&m_core->param1));                               // mov     rd,[param1]
 			return true;
 		}
@@ -3561,7 +3543,7 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 			generate_update_cycles(block, compiler, desc->pc, false);               // <update cycles>
 			UML_MOV(block, mem(&m_core->param0), spr);                                 // mov     [param0],spr
 			UML_MOV(block, mem(&m_core->param1), R32(G_RS(op)));                               // mov     [param1],rs
-			UML_CALLC(block, (c_function)cfunc_ppccom_execute_mtdcr, this);                                    // callc   ppccom_execute_mtdcr,ppc
+			UML_CALLC(block, cfunc_ppccom_execute_mtdcr, this);                                    // callc   ppccom_execute_mtdcr,ppc
 			compiler->checkints = true;
 			generate_update_cycles(block, compiler, desc->pc + 4, true);           // <update cycles>
 			return true;

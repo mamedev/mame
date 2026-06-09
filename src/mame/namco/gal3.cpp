@@ -140,6 +140,7 @@ better notes (complete chip lists) for each board still needed
 #include "sound/c140.h"
 
 #include "emupal.h"
+#include "input.h" // for video debug keys
 #include "layout/generic.h"
 #include "speaker.h"
 

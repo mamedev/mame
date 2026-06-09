@@ -159,6 +159,7 @@ Notes:
 #include "sound/ymopl.h"
 
 #include "emupal.h"
+#include "input.h" // for video debug keys
 #include "screen.h"
 #include "speaker.h"
 

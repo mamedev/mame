@@ -74,31 +74,23 @@ public:
 
 	void sm7238(machine_config &config);
 
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+
 private:
-	void write_keyboard_clock(int state);
-	void write_printer_clock(int state);
+	void sm7238_io(address_map &map) ATTR_COLD;
+	void sm7238_mem(address_map &map) ATTR_COLD;
+	void videobank_map(address_map &map) ATTR_COLD;
 
 	void control_w(uint8_t data);
 	void text_control_w(uint8_t data);
 	void vmem_w(offs_t offset, uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void sm7238_io(address_map &map) ATTR_COLD;
-	void sm7238_mem(address_map &map) ATTR_COLD;
-	void videobank_map(address_map &map) ATTR_COLD;
-
 	void recompute_parameters();
 
-	struct
-	{
-		uint8_t control = 0;
-		uint16_t ptr = 0;
-		int stride = 0;
-		bool reverse = false;
-	} m_video;
-
-	virtual void machine_reset() override ATTR_COLD;
+	void write_keyboard_clock(int state);
+	void write_printer_clock(int state);
 
 	required_device<i8080_cpu_device> m_maincpu;
 	required_device<nvram_device> m_nvram;
@@ -118,7 +110,16 @@ private:
 	required_device<pit8253_device> m_t_color;
 	required_device<pit8253_device> m_t_iface;
 	required_device<screen_device> m_screen;
+
+	struct
+	{
+		uint8_t control = 0;
+		uint16_t ptr = 0;
+		int stride = 0;
+		bool reverse = false;
+	} m_video;
 };
+
 
 void sm7238_state::sm7238_mem(address_map &map)
 {
@@ -152,11 +153,13 @@ void sm7238_state::sm7238_io(address_map &map)
 	map(0xbc, 0xbf).rw(m_t_iface, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 }
 
+
 void sm7238_state::machine_reset()
 {
 	m_video = decltype(m_video)();
 	m_videobank->set_bank(0);
 }
+
 
 void sm7238_state::control_w(uint8_t data)
 {
@@ -193,6 +196,7 @@ void sm7238_state::vmem_w(offs_t offset, uint8_t data)
 	m_p_videoram[offset + 0x1000] = data;
 }
 
+
 void sm7238_state::write_keyboard_clock(int state)
 {
 	m_i8251kbd->write_txc(state);
@@ -204,6 +208,7 @@ void sm7238_state::write_printer_clock(int state)
 	m_i8251prn->write_txc(state);
 	m_i8251prn->write_rxc(state);
 }
+
 
 void sm7238_state::recompute_parameters()
 {
@@ -333,7 +338,6 @@ uint32_t sm7238_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
 /* F4 Character Displayer */
 static const gfx_layout sm7238_charlayout =
 {
@@ -351,6 +355,7 @@ static const gfx_layout sm7238_charlayout =
 static GFXDECODE_START( gfx_sm7238 )
 	GFXDECODE_ENTRY("chargen", 0x0000, sm7238_charlayout, 0, 1)
 GFXDECODE_END
+
 
 void sm7238_state::sm7238(machine_config &config)
 {

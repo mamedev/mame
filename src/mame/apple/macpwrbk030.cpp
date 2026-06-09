@@ -1139,7 +1139,7 @@ void macpb030_state::macpb160_map(address_map &map)
 	map(0x50f06000, 0x50f07fff).rw(FUNC(macpb030_state::scsi_drq_r), FUNC(macpb030_state::scsi_drq_w));
 	map(0x50f10000, 0x50f11fff).rw(FUNC(macpb030_state::scsi_r), FUNC(macpb030_state::scsi_w));
 	map(0x50f12060, 0x50f12063).r(FUNC(macpb030_state::scsi_drq_r));
-	map(0x50f14000, 0x50f15fff).rw(m_easc, FUNC(asc_device::read), FUNC(asc_device::write));
+	map(0x50f14000, 0x50f15fff).rw(m_easc, FUNC(asc_easc_device::read), FUNC(asc_easc_device::write));
 	map(0x50f16000, 0x50f17fff).rw(FUNC(macpb030_state::swim_r), FUNC(macpb030_state::swim_w));
 	map(0x50f24000, 0x50f27fff).r(FUNC(macpb030_state::buserror_r)); // bus error here to make sure we aren't mistaken for another decoder
 	map(0x50f80000, 0x50fbffff).rw(FUNC(macpb030_state::niagra_r), FUNC(macpb030_state::niagra_w));
@@ -1159,7 +1159,7 @@ void macpb030_state::macpb165c_map(address_map &map)
 	map(0x50f06000, 0x50f07fff).rw(FUNC(macpb030_state::scsi_drq_r), FUNC(macpb030_state::scsi_drq_w));
 	map(0x50f10000, 0x50f11fff).rw(FUNC(macpb030_state::scsi_r), FUNC(macpb030_state::scsi_w));
 	map(0x50f12060, 0x50f12063).r(FUNC(macpb030_state::scsi_drq_r));
-	map(0x50f14000, 0x50f15fff).rw(m_easc, FUNC(asc_device::read), FUNC(asc_device::write));
+	map(0x50f14000, 0x50f15fff).rw(m_easc, FUNC(asc_easc_device::read), FUNC(asc_easc_device::write));
 	map(0x50f16000, 0x50f17fff).rw(FUNC(macpb030_state::swim_r), FUNC(macpb030_state::swim_w));
 	map(0x50f20000, 0x50f21fff).r(FUNC(macpb030_state::buserror_r)); // bus error here to detect we're not the grayscale 160/165/180
 	map(0x50f24000, 0x50f27fff).r(FUNC(macpb030_state::buserror_r)); // bus error here to make sure we aren't mistaken for another decoder

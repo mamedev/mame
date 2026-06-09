@@ -54,7 +54,6 @@
 #include "save.h"
 
 // I/O
-#include "input.h"
 #include "ioport.h"
 #include "output.h"
 

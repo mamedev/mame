@@ -123,8 +123,6 @@ protected:
 	u8        m_unknown_irq = 0U;
 	u8        m_agallet_vblank_irq = 0U;
 
-	int       m_rasflag = 0;
-	int       m_old_rasflag = 0;
 	u16       m_leds[2]{};
 
 	void add_base_config(machine_config &config, int layer) ATTR_COLD;
