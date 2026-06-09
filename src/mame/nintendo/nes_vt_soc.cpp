@@ -310,17 +310,31 @@ void nes_vt02_vt03_soc_device::update_banks()
 	m_bankaddr[3] = get_banks(bank);
 }
 
-u16 nes_vt02_vt03_soc_device::decode_nt_addr(u16 addr, bool reading)
+u16 nes_vt02_vt03_soc_device::decode_nt_addr(u16 addr, bool handle_single_page)
 {
-	// bit 0 = HV (0 = Horizontal, 1 = Vertical)
-	// bit 1 = 0 (HV Mode)
-	//
-	// or
-	// 
-	// bit 0 = Page (0 = Page 0, 1 = Page 1)
-	// bit 1 = 1 (One Page mode) 
+	/* bit 0 = HV(0 = Horizontal, 1 = Vertical)
+	   bit 1 = 0 (HV Mode)
 
-	if ((!(m_410x[0x6] & 0x02)) || reading == false)
+	   or
+	 
+	   bit 0 = Page (0 = Page 0, 1 = Page 1)
+	   bit 1 = 1 (One Page mode) 
+	
+	   does single page mode only affect rendering, not PPU accesses?
+	   several games require single page mode when rendering, but have
+	   incorrect rendering if it's applied to PPU reads/writes outside
+	   of rendering.  could also be a timing issue?
+
+	   Games switching between single page and HV modes include (from lxcmcyspn)
+	   'Golf'
+	   'Explorer' (and the 'Spider Jump' reskin)
+	   'Fruit Killer'
+	   'Space Castle'
+	   'Mini Golf'
+	   'Action Ball'
+	*/
+
+	if ((!(m_410x[0x6] & 0x02)) || handle_single_page == false)
 	{
 		bool vert_mirror = !(m_410x[0x6] & 0x01);
 		int a11 = (addr >> 11) & 0x01;
@@ -330,18 +344,11 @@ u16 nes_vt02_vt03_soc_device::decode_nt_addr(u16 addr, bool reading)
 	}
 	else
 	{
-		// used by:
-		// 'Golf'
-		// 'Explorer' (and the 'Spider Jump' reskin) - requires writes to use the standard h/v mirroring? maybe timing issue instead?
-		// 'Fruit Killer'
-		// 'Space Castle' (see Explorer comment)
-		// 'Mini Golf' (see Explorer comment)
-
 		u8 page = m_410x[0x6] & 0x01;
 		u16 base = (addr & 0x3ff);
 
 		if (page)
-			base ^= 0x400;
+			base |= 0x400;
 
 		return base;
 	}

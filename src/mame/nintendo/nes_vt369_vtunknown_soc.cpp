@@ -137,15 +137,14 @@ void vt3xx_soc_base_device::vt369_soundram_w(offs_t offset, u8 data)
 	m_soundram[offset & 0x7ff] = data;
 }
 
-u8 vt3xx_soc_base_device::vt369_ppu_mirror_r(offs_t offset)
+u8 vt3xx_soc_base_device::vt369_ppu_nt_direct_r(offs_t offset)
 {
-	return m_ppu->ppu_vram_direct_read(0x2000 + (offset & 0x0fff));
+	return m_ntram[decode_nt_addr(offset, false)];
 }
 
-void vt3xx_soc_base_device::vt369_ppu_mirror_w(offs_t offset, u8 data)
+void vt3xx_soc_base_device::vt369_ppu_nt_direct_w(offs_t offset, u8 data)
 {
-	const offs_t address = 0x2000 + (offset & 0x0fff);
-	m_ppu->ppu_vram_direct_write(address, data);
+	m_ntram[decode_nt_addr(offset, false)] = data;
 }
 
 void vt3xx_soc_base_device::vt369_relative_w(offs_t offset, u8 data)
@@ -307,7 +306,7 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 	map(0x2050, 0x2050).w(FUNC(vt3xx_soc_base_device::vt3xx_2050_w));
 	map(0x2102, 0x2102).w(FUNC(vt3xx_soc_base_device::vt3xx_2102_w));
 
-	map(0x3000, 0x3fff).rw(FUNC(vt3xx_soc_base_device::vt369_ppu_mirror_r), FUNC(vt3xx_soc_base_device::vt369_ppu_mirror_w));
+	map(0x3000, 0x3fff).rw(FUNC(vt3xx_soc_base_device::vt369_ppu_nt_direct_r), FUNC(vt3xx_soc_base_device::vt369_ppu_nt_direct_w));
 
 	map(0x4000, 0x4017).w(m_apu, FUNC(nes_apu_vt_device::write));
 
