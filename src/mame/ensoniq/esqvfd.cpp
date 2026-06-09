@@ -8,7 +8,7 @@
 #include "emu.h"
 #include "esqvfd.h"
 
-#include "esq1by22.lh"
+#include "esq1by22_eps.lh"
 #include "esq2by40.lh"
 #include "esq2by40_vfx.lh"
 
@@ -480,7 +480,7 @@ void esq2x40_vfx_device::update_display()
 
 void esq1x22_device::device_add_mconfig(machine_config &config)
 {
-	config.set_default_layout(layout_esq1by22);
+	config.set_default_layout(layout_esq1by22_eps);
 }
 
 
