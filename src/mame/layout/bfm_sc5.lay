@@ -149,7 +149,7 @@ license:CC0-1.0
 		</element>
 
 
-	<element name="reel1:pos" ref="Steppers" state="0">
+		<element name="reel1:pos" ref="Steppers" state="0">
 			<bounds x="250" y="350" width="10" height="5"/>
 		</element>
 		<element name="reel2:pos" ref="Steppers" state="0">
@@ -169,71 +169,71 @@ license:CC0-1.0
 			<bounds x="350" y="410" width="10" height="5"/>
 		</element>
 
-	<!-- these are typically the reel lamps, so duplicate them here -->
-	<element name="lamp32" ref="reellamp" state="0">
-		<bounds x="210" y="300" width="50" height="17"/>
-	</element>
-	<element name="lamp33" ref="reellamp" state="0">
-		<bounds x="210" y="317" width="50" height="17"/>
-	</element>
-	<element name="lamp34" ref="reellamp" state="0">
-		<bounds x="210" y="333" width="50" height="17"/>
-	</element>
+		<!-- these are typically the reel lamps, so duplicate them here -->
+		<element name="lamp32" ref="reellamp" state="0">
+			<bounds x="210" y="300" width="50" height="17"/>
+		</element>
+		<element name="lamp33" ref="reellamp" state="0">
+			<bounds x="210" y="317" width="50" height="17"/>
+		</element>
+		<element name="lamp34" ref="reellamp" state="0">
+			<bounds x="210" y="333" width="50" height="17"/>
+		</element>
 
-	<element name="lamp35" ref="reellamp" state="0">
-		<bounds x="260" y="300" width="50" height="17"/>
-	</element>
-	<element name="lamp36" ref="reellamp" state="0">
-		<bounds x="260" y="317" width="50" height="17"/>
-	</element>
-	<element name="lamp37" ref="reellamp" state="0">
-		<bounds x="260" y="333" width="50" height="17"/>
-	</element>
+		<element name="lamp35" ref="reellamp" state="0">
+			<bounds x="260" y="300" width="50" height="17"/>
+		</element>
+		<element name="lamp36" ref="reellamp" state="0">
+			<bounds x="260" y="317" width="50" height="17"/>
+		</element>
+		<element name="lamp37" ref="reellamp" state="0">
+			<bounds x="260" y="333" width="50" height="17"/>
+		</element>
 
-	<element name="lamp48" ref="reellamp" state="0">
-		<bounds x="310" y="300" width="50" height="17"/>
-	</element>
-	<element name="lamp49" ref="reellamp" state="0">
-		<bounds x="310" y="317" width="50" height="17"/>
-	</element>
-	<element name="lamp50" ref="reellamp" state="0">
-		<bounds x="310" y="333" width="50" height="17"/>
-	</element>
+		<element name="lamp48" ref="reellamp" state="0">
+			<bounds x="310" y="300" width="50" height="17"/>
+		</element>
+		<element name="lamp49" ref="reellamp" state="0">
+			<bounds x="310" y="317" width="50" height="17"/>
+		</element>
+		<element name="lamp50" ref="reellamp" state="0">
+			<bounds x="310" y="333" width="50" height="17"/>
+		</element>
 
-	<element name="lamp51" ref="reellamp" state="0">
-		<bounds x="210" y="360" width="50" height="17"/>
-	</element>
-	<element name="lamp52" ref="reellamp" state="0">
-		<bounds x="210" y="377" width="50" height="17"/>
-	</element>
-	<element name="lamp53" ref="reellamp" state="0">
-		<bounds x="210" y="393" width="50" height="17"/>
-	</element>
+		<element name="lamp51" ref="reellamp" state="0">
+			<bounds x="210" y="360" width="50" height="17"/>
+		</element>
+		<element name="lamp52" ref="reellamp" state="0">
+			<bounds x="210" y="377" width="50" height="17"/>
+		</element>
+		<element name="lamp53" ref="reellamp" state="0">
+			<bounds x="210" y="393" width="50" height="17"/>
+		</element>
 
-	<element name="reel1:scroll" ref="SteppersReel1" state="0">
-		<bounds x="210" y="300" width="50" height="50"/>
-	</element>
-	<element name="reel2:scroll" ref="SteppersReel2" state="0">
-		<bounds x="260" y="300" width="50" height="50"/>
-	</element>
-	<element name="reel3:scroll" ref="SteppersReel3" state="0">
-		<bounds x="310" y="300" width="50" height="50"/>
-	</element>
+		<element name="reel1:scroll" ref="SteppersReel1" state="0">
+			<bounds x="210" y="300" width="50" height="50"/>
+		</element>
+		<element name="reel2:scroll" ref="SteppersReel2" state="0">
+			<bounds x="260" y="300" width="50" height="50"/>
+		</element>
+		<element name="reel3:scroll" ref="SteppersReel3" state="0">
+			<bounds x="310" y="300" width="50" height="50"/>
+		</element>
 
-	<element name="reel4:scroll" ref="SteppersReel4" state="0">
-		<bounds x="210" y="360" width="50" height="50"/>
-	</element>
-	<element name="reel5:scroll" ref="SteppersReel5" state="0">
-		<bounds x="260" y="360" width="50" height="50"/>
-	</element>
-	<element name="reel6:scroll" ref="SteppersReel6" state="0">
-		<bounds x="310" y="360" width="50" height="50"/>
-	</element>
-
-
+		<element name="reel4:scroll" ref="SteppersReel4" state="0">
+			<bounds x="210" y="360" width="50" height="50"/>
+		</element>
+		<element name="reel5:scroll" ref="SteppersReel5" state="0">
+			<bounds x="260" y="360" width="50" height="50"/>
+		</element>
+		<element name="reel6:scroll" ref="SteppersReel6" state="0">
+			<bounds x="310" y="360" width="50" height="50"/>
+		</element>
 
 
-	<element name="lamp0" ref="matrixlamp" state="0">
+
+
+		<element name="lamp0" ref="matrixlamp" state="0">
 			<bounds x="0" y="0" width="7" height="7"/>
 		</element>
 		<element name="lamp1" ref="matrixlamp" state="0">
