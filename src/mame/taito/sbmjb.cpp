@@ -9,6 +9,7 @@
     Packy no Treasure Slot (パッキイのトレジャースロット) (c) 1997 Taito - video: https://www.youtube.com/watch?v=IPse14eGiqM
     Harikiri Junior Baseball (はりきりジュニアベースボール) (c) 1998 Taito - video: https://www.youtube.com/watch?v=eRZctnd8whE
     Sonic Blast Man no Janken Battle (ソニックブラストマンのジャンケンバトル) (c) 1998 Taito - video: https://www.youtube.com/watch?v=AFWLMHbpQz8
+    Manpuku Hanten (満腹飯店) (c) 2000 Taito - video: https://www.youtube.com/watch?v=wlhkR--oi98
     Renda Fighter (レンダファイター) (c) 2000 Taito - video: https://www.youtube.com/watch?v=GbeX28lbqbk
 
     Main components:
@@ -93,7 +94,7 @@ void sbmjb_state::screen_vblank(int state) // TODO: copy-pasted from other drive
 
 void sbmjb_state::main_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0x0000, 0x8fff).rom().region("maincpu", 0);
 	map(0xc000, 0xdfff).ram();
 	map(0xe000, 0xe0ff).ram().share("m66220fp0"); // TODO: really?
 	map(0xe100, 0xe7ff).ram();
@@ -492,6 +493,28 @@ ROM_START( sbmjb ) // all labels were peeled off / unreadable
 	ROM_LOAD( "e41-03.ic24", 0x200, 0x117, CRC(d906c8ea) SHA1(eae9c9c25b4affe4baf7ba034c61670d24f5c4d1) )
 ROM_END
 
+ROM_START( manpukuh )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // Main ver. 2.00 2000/09/07
+	ROM_LOAD( "e95-05.ic12", 0x00000, 0x10000, CRC(575ce8a7) SHA1(5a2598ba7c0c162c0629c5b34c92dd329b83d408) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "e95-04.ic5", 0x00000, 0x10000, CRC(c4b2d83f) SHA1(91a318c9a0b7834f2bf5e4e57cc2465e317b2e44) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x80000, "vdpcpu", 0 ) // Video ver. 2.00 2000/09/07
+	ROM_LOAD( "e95-01.ic52", 0x00000, 0x80000, CRC(f09c7971) SHA1(b12257f071e6cb7c7eb75c2558a3f209fc4c1dcf) )
+
+	ROM_REGION( 0x100000, "vdpcpu:gfx", 0 )
+	ROM_LOAD16_BYTE( "e95-02.ic49", 0x00000, 0x80000, CRC(8cd2cada) SHA1(9f1cec3fd0591a679dc7fe4690d8096a690d5059) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "e95-03.ic48", 0x00001, 0x80000, CRC(9a0060bf) SHA1(b5ec3e467180a3411b8a5934b0d24dfcd506402d) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "e95-06.ic3", 0x00000, 0x40000, CRC(1129636c) SHA1(c7146071e9b305414e593189937f4d62d73d258c) )
+
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "e41-02.ic51", 0x000, 0x117, CRC(67fd54e0) SHA1(f64fb33b9a4a935af5662b5103709131727c8411) )
+	ROM_LOAD( "e41-03.ic24", 0x200, 0x117, CRC(d906c8ea) SHA1(eae9c9c25b4affe4baf7ba034c61670d24f5c4d1) )
+ROM_END
+
 ROM_START( rendfgtr )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // Main ver. 2.02 2000/04/17
 	ROM_LOAD( "e88-05.ic12", 0x00000, 0x10000, CRC(8d723f55) SHA1(d73ae0938180a32ef82c195b97ebfd46aa0e1346) ) // 1xxxxxxxxxxxxxxx = 0xFF
@@ -522,4 +545,5 @@ GAME( 1997, bubbroul17, bubbroul, sbmjb,    bubbroul, sbmjb_state, empty_init, R
 GAME( 1997, packyts,    0,        sbmjb,    packyts,  sbmjb_state, empty_init, ROT0, "Taito Corporation", "Packy no Treasure Slot (Japan, main ver. 1.3, video ver. 1.1)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, harikiri,   0,        sbmjb,    harikiri, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Harikiri Junior Baseball (Japan, main ver. 1.0, video ver. 1.3)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, sbmjb,      0,        sbmjb,    sbmjb,    sbmjb_state, empty_init, ROT0, "Taito Corporation", "Sonic Blast Man no Janken Battle (Japan, main ver. 1.1, video ver. 1.0)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, manpukuh,   0,        sbmjb,    rendfgtr, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Manpuku Hanten (Japan, main ver. 2.00, video ver. 2.00)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2000, rendfgtr,   0,        sbmjb,    rendfgtr, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Renda Fighter (Japan, main ver. 2.02, video ver. 2.03)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
