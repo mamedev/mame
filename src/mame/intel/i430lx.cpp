@@ -19,8 +19,8 @@ Regular SIO is reused by earlier I420ZX "Saturn II" chipset and in BeBox
 
 TODO:
 - Remaining X-Bus peripherals for SIO (FDC, COM x2, LPT);
-- Understand why IDE and FDC doesn't get enabled in X-Bus (mapped in ISA bus for these BIOSes?);
-- Implement remaining features in north/southbridges (SMI and PIRQ not enabled by these BIOSes);
+- Implement remaining features in north/southbridges (SMI and PIRQ not enabled by these BIOSes,
+  needs to be tested in a Windows install);
 
 **************************************************************************************************/
 
@@ -61,7 +61,7 @@ public:
 		, m_flash(*this, "pci:02.0:xbus_flash")
 		, m_keybc(*this, "pci:02.0:xbus_keybc")
 		, m_at_con(*this, "at_con")
-		, m_ide(*this, "pci:02.0:xbus_ide%u", 0U)
+//		, m_ide(*this, "pci:02.0:xbus_ide%u", 0U)
 	{ }
 
 	void i430nx(machine_config &config) ATTR_COLD;
@@ -75,7 +75,7 @@ protected:
 	required_device<intelfsh8_device> m_flash;
 	required_device<at_keyboard_controller_device> m_keybc;
 	required_device<pc_kbdc_device> m_at_con;
-	required_device_array<ide_controller_32_device, 2> m_ide;
+	//required_device_array<ide_controller_32_device, 2> m_ide;
 
 private:
 	void main_io(address_map &map) ATTR_COLD;
@@ -109,7 +109,7 @@ void i430lx_state::i430nx(machine_config &config)
 	// TODO: alarm irq
 //	m_rtc->irq().set ...
 
-	// TODO: config space not verified
+	// config space not verified, but should be good given how BIOSes accesses at $cxxx
 	PCI_ROOT(config, "pci");
 	// max RAM 512MB
 	I82434NX_PCMC(config, "pci:00.0", "maincpu", 64*1024*1024);
@@ -137,16 +137,16 @@ void i430lx_state::i430nx(machine_config &config)
 	m_at_con->out_clock_cb().set(m_keybc, FUNC(at_keyboard_controller_device::kbd_clk_w));
 	m_at_con->out_data_cb().set(m_keybc, FUNC(at_keyboard_controller_device::kbd_data_w));
 
-	IDE_CONTROLLER_32(config, m_ide[0]).options(ata_devices, "hdd", nullptr, false);
-	m_ide[0]->irq_handler().set("pci:02.0", FUNC(i82378zb_sio_device::pc_irq14_w));
-
-	IDE_CONTROLLER_32(config, m_ide[1]).options(ata_devices, "cdrom", nullptr, false);
-	m_ide[1]->irq_handler().set("pci:02.0", FUNC(i82378zb_sio_device::pc_irq15_w));
+//	IDE_CONTROLLER_32(config, m_ide[0]).options(ata_devices, "hdd", nullptr, false);
+//	m_ide[0]->irq_handler().set("pci:02.0", FUNC(i82378zb_sio_device::pc_irq14_w));
+//
+//	IDE_CONTROLLER_32(config, m_ide[1]).options(ata_devices, "cdrom", nullptr, false);
+//	m_ide[1]->irq_handler().set("pci:02.0", FUNC(i82378zb_sio_device::pc_irq15_w));
 
 	// 1x AT keyboard
 	// 4x ISA slots
-	ISA16_SLOT(config, "isa1", 0, "pci:02.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa2", 0, "pci:02.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa1", 0, "pci:02.0:isabus", pc_isa16_cards, "fdc_smc", false);
+	ISA16_SLOT(config, "isa2", 0, "pci:02.0:isabus", pc_isa16_cards, "ide", false);
 	ISA16_SLOT(config, "isa3", 0, "pci:02.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa4", 0, "pci:02.0:isabus", pc_isa16_cards, nullptr, false);
 

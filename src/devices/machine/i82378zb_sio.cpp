@@ -198,6 +198,11 @@ void i82378zb_sio_device::device_start()
 	m_has_xbus.flash_bios = m_xbus_flash != nullptr;
 	// we expect both IDE slots to be filled for now (X-Bus decodes from 1 bit alone)
 	m_has_xbus.ide = m_xbus_ide[0] != nullptr && m_xbus_ide[1] != nullptr;
+
+	LOG("X-Bus configuration:\n");
+	LOG("\tKeyboard %d\n", m_has_xbus.keyboard);
+	LOG("\tFlash BIOS %d\n", m_has_xbus.flash_bios);
+	LOG("\tIDE %d\n", m_has_xbus.ide);
 }
 
 void i82378zb_sio_device::device_reset()
@@ -580,10 +585,8 @@ void i82378zb_sio_device::map_extra(
 	// TODO: UBCSA bits 3,2 for FDC + bit 5 for location address
 
 	// decodes IDE signals after FDC (i.e. overrides $3f6 / $376)
-	// TODO: ga586ip & sy029c2 initializes UBCSA with 0xc3 but it sure accesses it anyway
-	// (both this and FDC not on X-Bus?)
-	//if (BIT(m_ubcsa, 4) && m_has_xbus.ide)
-	if (m_has_xbus.ide)
+	// ga586ip & sy029c2 initializes UBCSA with 0xc3, which implies both aren't on X-Bus
+	if (BIT(m_ubcsa, 4) && m_has_xbus.ide)
 	{
 		io_space->install_readwrite_handler(0x1f0, 0x1f7, read32s_delegate(*m_xbus_ide[0], FUNC(ide_controller_32_device::cs0_r)), write32s_delegate(*m_xbus_ide[0], FUNC(ide_controller_32_device::cs0_w)));
 		io_space->install_readwrite_handler(0x3f0, 0x3f7, read32s_delegate(*m_xbus_ide[0], FUNC(ide_controller_32_device::cs1_r)), write32s_delegate(*m_xbus_ide[0], FUNC(ide_controller_32_device::cs1_w)));
@@ -622,6 +625,7 @@ void i82378zb_sio_device::map_extra(
 		);
 	}
 
+	// TODO: all of these enabled by ga586ip
 	// BIT(m_ubcsb, 5:4) LPT enable
 	// BIT(m_ubcsb, 3:2) COM2 enable
 	// BIT(m_ubcsb, 1:0) COM1 enable
