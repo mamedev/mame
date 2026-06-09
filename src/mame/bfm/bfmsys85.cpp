@@ -83,19 +83,18 @@ public:
 		driver_device(mconfig, type, tag),
 		m_vfd(*this, "vfd"),
 		m_maincpu(*this, "maincpu"),
-		m_reel(*this, "reel%u", 0U),
+		m_reel(*this, "reel%u", 1U),
 		m_acia6850_0(*this, "acia6850_0"),
 		m_meters(*this, "meters"),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void bfmsys85(machine_config &config);
-	void memmap(address_map &map) ATTR_COLD;
+	void bfmsys85(machine_config &config) ATTR_COLD;
 
 	INTERRUPT_GEN_MEMBER(timer_irq);
 
-	void init_decode();
-	void init_nodecode();
+	void init_decode() ATTR_COLD;
+	void init_nodecode() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -122,6 +121,8 @@ private:
 	required_device<acia6850_device> m_acia6850_0;
 	required_device<meters_device> m_meters;
 	output_finder<256> m_lamps;
+
+	void memmap(address_map &map) ATTR_COLD;
 
 	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 	void watchdog_w(uint8_t data);

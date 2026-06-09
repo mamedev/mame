@@ -177,7 +177,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_nvram(*this, "nvram")
-		, m_reels(*this, "reel%u", 0U)
+		, m_reels(*this, "reel%u", 1U)
 		, m_meters(*this, "meters")
 		, m_vfd(*this, "vfd")
 		, m_triac(*this, "triac%u", 0U)
@@ -190,9 +190,9 @@ public:
 		, m_ptm2(*this, "ptm_ic2")
 	{ }
 
-	void mpu3base(machine_config &config);
+	void mpu3base(machine_config &config) ATTR_COLD;
 
-	void init_mpu3();
+	void init_mpu3() ATTR_COLD;
 
 protected:
 	void mpu3_basemap(address_map &map) ATTR_COLD;
@@ -289,8 +289,8 @@ public:
 		, m_characteriser(*this, "characteriser")
 	{ }
 
-	void mpu3_chr_3000(machine_config &config);
-	void mpu3_chr_c000(machine_config &config);
+	void mpu3_chr_3000(machine_config &config) ATTR_COLD;
+	void mpu3_chr_c000(machine_config &config) ATTR_COLD;
 
 private:
 	void mpu3_map_chr_3000(address_map &map) ATTR_COLD;

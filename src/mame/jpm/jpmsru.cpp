@@ -86,7 +86,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_inputs(*this, "IN%u", 0U),
-		m_reel(*this, "reel%u", 0U),
+		m_reel(*this, "reel%u", 1U),
 		m_lamp(*this, "lamp%u", 0U),
 		m_digits(*this, "digit%u", 0U),
 		m_audio_in(*this, "nl_audio:in%u", 0U),

@@ -27,7 +27,7 @@ public:
 	ecoinf2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_reels(*this, "reel%s", 0U),
+		m_reels(*this, "reel%s", 1U),
 		m_meters(*this, "meters"),
 		m_coins(*this, "COINS"),
 		m_key(*this, "PERKEY"),

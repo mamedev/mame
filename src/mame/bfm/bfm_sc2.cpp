@@ -345,13 +345,14 @@ class bfm_sc2_vid_state : public bfm_sc2_state
 public:
 	using bfm_sc2_state::bfm_sc2_state;
 
-	void init_quintoon();
-	void init_adder_dutch();
-	void init_pyramid();
-	void init_sltsbelg();
-	void init_gldncrwn();
-	void scorpion2_vid(machine_config &config);
-	void scorpion2_vidm(machine_config &config);
+	void init_quintoon() ATTR_COLD;
+	void init_adder_dutch() ATTR_COLD;
+	void init_pyramid() ATTR_COLD;
+	void init_sltsbelg() ATTR_COLD;
+	void init_gldncrwn() ATTR_COLD;
+
+	void scorpion2_vid(machine_config &config) ATTR_COLD;
+	void scorpion2_vidm(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
@@ -369,10 +370,10 @@ public:
 	bfm_sc2_novid_state(const machine_config &mconfig, device_type type, const char *tag)
 		: bfm_sc2_state(mconfig, type, tag)
 		, m_dm01(*this, "dm01")
-		, m_reel(*this, "reel%u", 0)
+		, m_reel(*this, "reel%u", 1)
 	{ }
 
-	void init_drwho();
+	void init_drwho() ATTR_COLD;
 
 protected:
 	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
@@ -402,12 +403,13 @@ class bfm_sc2_awp_state : public bfm_sc2_novid_state
 public:
 	using bfm_sc2_novid_state::bfm_sc2_novid_state;
 
-	void init_bbrkfst();
-	void init_drwhon();
-	void init_focus();
-	void init_bfmcgslm();
-	void scorpion3(machine_config &config);
-	void scorpion2(machine_config &config);
+	void init_bbrkfst() ATTR_COLD;
+	void init_drwhon() ATTR_COLD;
+	void init_focus() ATTR_COLD;
+	void init_bfmcgslm() ATTR_COLD;
+
+	void scorpion3(machine_config &config) ATTR_COLD;
+	void scorpion2(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
@@ -419,13 +421,14 @@ class bfm_sc2_dmd_state : public bfm_sc2_novid_state
 public:
 	using bfm_sc2_novid_state::bfm_sc2_novid_state;
 
-	void init_luvjub();
-	void init_cpeno1();
-	void init_ofah();
-	void init_prom();
-	void scorpion2_dm01(machine_config &config);
-	void scorpion2_dm01_5m(machine_config &config);
-	void scorpion2_dm01_3m(machine_config &config);
+	void init_luvjub() ATTR_COLD;
+	void init_cpeno1() ATTR_COLD;
+	void init_ofah() ATTR_COLD;
+	void init_prom() ATTR_COLD;
+
+	void scorpion2_dm01(machine_config &config) ATTR_COLD;
+	void scorpion2_dm01_5m(machine_config &config) ATTR_COLD;
+	void scorpion2_dm01_3m(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
