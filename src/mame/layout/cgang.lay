@@ -348,6 +348,10 @@ authors:hap
 			<bounds state="255" x="8.5" y="8" width="45" height="9" />
 			<color alpha="0.6" />
 		</element>
+
+		<element ref="nothing" inputtag="IN1" inputmask="0x40" clickthrough="yes">
+			<bounds x="7" y="5" width="48" height="55" />
+		</element>
 	</group>
 
 
