@@ -39,11 +39,10 @@
 // Some debug output
 
 #define LOG_STEP        (1U << 1)
-#define LOG_TRACK       (1U << 2)
-#define LOG_SND         (1U << 3)
-#define LOG_SND_CONFIG  (1U << 4)
-#define LOG_SND_DETAIL  (1U << 5)
-#define LOG_MACDRIVE    (1U << 6)
+#define LOG_SND         (1U << 2)
+#define LOG_SND_CONFIG  (1U << 3)
+#define LOG_SND_DETAIL  (1U << 4)
+#define LOG_MACDRIVE    (1U << 5)
 #define VERBOSE ( LOG_SND_CONFIG )
 
 #include "logmacro.h"
@@ -962,7 +961,7 @@ void floppy_image_device::stp_w(int state)
 			}
 			if(ocyl != m_cyl)
 			{
-				LOGMASKED(LOG_TRACK, "track %d\n", m_cyl);
+				LOGMASKED(LOG_STEP, "track %d [%f]\n", m_cyl, machine().time().as_double());
 				if (m_make_sound) m_sound_out->step(m_cyl);
 				track_changed();
 			}
@@ -1014,8 +1013,8 @@ void floppy_image_device::seek_phase_w(int _phases)
 	cache_clear();
 
 	if(next_pos != cur_pos) {
-		LOGMASKED(LOG_STEP, "track %d.%d\n", m_cyl, m_subcyl);
-		if (m_make_sound) m_sound_out->step(m_subcyl);
+		LOGMASKED(LOG_STEP, "track %d.%d [%f]\n", m_cyl, m_subcyl, machine().time().as_double());
+		if (m_make_sound) m_sound_out->step(m_cyl, m_subcyl);
 	}
 
 	/* Update disk detection if applicable */
@@ -1461,24 +1460,36 @@ void floppy_sound_samples::add_spin_sample(const char* filename, int type)
 	m_fulllist.push_back(entry);
 }
 
-void floppy_sound_samples::add_step_sample(const char* filename, int mintrack, int maxtrack)
+void floppy_sound_samples::add_step_sample(const char* filename, int dir)
+{
+	add_step_sample(filename, 0, 99, dir);
+}
+
+void floppy_sound_samples::add_step_sample(const char* filename, int mintrack, int maxtrack, int dir)
 {
 	floppy_sound_entry entry;
 	entry.type = STEP;
 	entry.mintrack = mintrack;
 	entry.maxtrack = maxtrack;
+	entry.dir = dir;
 	entry.filename = filename;
 	entry.form_factor = m_current_form_factor;
 	entry.directory = m_current_dir;
 	m_fulllist.push_back(entry);
 }
 
-void floppy_sound_samples::add_seek_sample(const char* filename, int nominal_rate, int max_rate, int mintrack, int maxtrack)
+void floppy_sound_samples::add_seek_sample(const char* filename, int nominal_rate, int max_rate, int dir)
+{
+	add_seek_sample(filename, nominal_rate, max_rate, 0, 99, dir);
+}
+
+void floppy_sound_samples::add_seek_sample(const char* filename, int nominal_rate, int max_rate, int mintrack, int maxtrack, int dir)
 {
 	floppy_sound_entry entry;
 	entry.type = SEEK;
 	entry.rate = nominal_rate;
 	entry.maxrate = max_rate;
+	entry.dir = dir;
 	entry.filename = filename;
 	entry.form_factor = m_current_form_factor;
 	entry.directory = m_current_dir;
@@ -1529,13 +1540,14 @@ int floppy_sound_samples::find_spin(int spintype) const
     In the definition, the range must be specified, where (0, 99) is used for
     all tracks (all emulated drives have less than 99 tracks).
 */
-int floppy_sound_samples::find_step(int track) const
+int floppy_sound_samples::find_step(int track, int dir) const
 {
 	for (const floppy_sound_entry& entry : m_fulllist)
 	{
 		if (entry.form_factor == m_current_form_factor &&
 			entry.type == STEP &&
-			track >= entry.mintrack && track <= entry.maxtrack)
+			track >= entry.mintrack && track <= entry.maxtrack &&
+			(entry.dir == BOTH || entry.dir == dir))
 			return entry.index;  // found it
 	}
 	return QUIET;
@@ -1555,7 +1567,7 @@ int floppy_sound_samples::find_step(int track) const
     there is no slower rate, -1 is returned. The caller should then use single
     step sounds.
 */
-int floppy_sound_samples::find_seek(double rate, int track, double& pitch) const
+int floppy_sound_samples::find_seek(double rate, int track, int dir, double& pitch) const
 {
 	int index = QUIET;
 	int maxrate = 100;
@@ -1568,7 +1580,8 @@ int floppy_sound_samples::find_seek(double rate, int track, double& pitch) const
 		if (entry.form_factor == m_current_form_factor &&
 			entry.type == SEEK &&
 			track >= entry.mintrack &&
-			track <= entry.maxtrack)
+			track <= entry.maxtrack &&
+			(entry.dir == BOTH || entry.dir == dir))
 		{
 			// The rate must not exceed the maxrate of the sample
 			// Also, if we already found an entry with a lower maxrate,
@@ -1590,6 +1603,8 @@ floppy_sound_device::floppy_sound_device(const machine_config &mconfig, const ch
 	: samples_device(mconfig, FLOPPYSOUND, tag, owner, clock),
 		m_sound(nullptr),
 		m_samplelist(nullptr),
+		m_last_track(0),
+		m_last_subtrack(0),
 		m_motor_on(false),
 		m_with_disk(false),
 		m_spin_kind(floppy_sound_samples::QUIET),
@@ -1641,6 +1656,8 @@ floppy_sound_device::floppy_sound_device(const machine_config &mconfig, const ch
 
 void floppy_sound_device::register_for_save_states()
 {
+	save_item(NAME(m_last_track));
+	save_item(NAME(m_last_subtrack));
 	save_item(NAME(m_motor_on));
 	save_item(NAME(m_with_disk));
 	save_item(NAME(m_spin_kind));
@@ -1764,17 +1781,39 @@ void floppy_sound_device::motor(bool running, bool withdisk)
 /*
     Activate the step sound.
 */
-void floppy_sound_device::step(int track)
+void floppy_sound_device::step(int track, int subtrack)
 {
 	if (samples_loaded())
 	{
 		m_sound->update();  // required
 
-		m_step_sample = m_samplelist->find_step(track);
-		attotime now = machine().time();
+		int dir = 0;
+
+		// Determine direction
+		if (track >= m_last_track)
+			if (track > m_last_track || subtrack > m_last_subtrack)
+				dir = floppy_sound_samples::IN;
+
+		if (track <= m_last_track)
+			if (track < m_last_track || subtrack < m_last_subtrack)
+				dir = floppy_sound_samples::OUT;
+
+		m_last_track = track;
+		m_last_subtrack = subtrack;
+
 		double rate = 0;
-		rate = (m_last_step_time == attotime::zero)? 0 : (now - m_last_step_time).as_double() * 1000;
-		m_last_step_time = now;
+
+		// Take the time only from subtrack 0 to subtrack 0
+		if (subtrack == 0)
+		{
+			attotime now = machine().time();
+			rate = (m_last_step_time == attotime::zero)? 0 : (now - m_last_step_time).as_double() * 1000;
+			m_last_step_time = now;
+		}
+
+		// Wait until we can safely calculate a rate
+		if (rate == 0)
+			return;
 
 		bool recalc = false;
 
@@ -1785,7 +1824,7 @@ void floppy_sound_device::step(int track)
 		//     in seek -> continue with seek sample
 		// (seek sample timeout is set to twice the step rate)
 
-		// If the step rate changed by more than 10%, we have to change the
+		// If the step rate changed by more than 5%, we may have to change the
 		// seek sample
 		if (m_step_rate == 0)
 		{
@@ -1798,7 +1837,7 @@ void floppy_sound_device::step(int track)
 			{
 				double raterel = (m_step_rate - rate) / m_step_rate;
 				if (raterel < 0) raterel = -raterel;
-				if (raterel > 0.10 && m_in_seek)
+				if (raterel > 0.05 && m_in_seek)
 				{
 					recalc = true;
 					LOGMASKED(LOG_SND, "Step rate has changed from %.1f to %.1f ms\n", m_step_rate, rate);
@@ -1811,55 +1850,56 @@ void floppy_sound_device::step(int track)
 		{
 			if (recalc || !m_in_seek)
 			{
-				LOGMASKED(LOG_SND, "Seeking with rate = %.1f ms\n", m_step_rate);
+				int newseek = m_samplelist->find_seek(m_step_rate, track, dir, m_seek_pitch);
 
-				int newseek = m_samplelist->find_seek(m_step_rate, track, m_seek_pitch);
-				if (newseek == floppy_sound_samples::QUIET)
-				{
-					// Could not find a proper seek sample, i.e. the step
-					// interval became too long
-					m_in_seek = false;
-					// Last step sample was completed, this is not a seek process
-					m_seek_sample = floppy_sound_samples::QUIET;
-					m_seek_samplepos = 0;
-				}
-				else
+				// If we get a QUIET, then there is no matching seek sample,
+				// i.e. the step interval became too long for a seek; we have an isolated step sound
+
+				if (newseek != floppy_sound_samples::QUIET)
 				{
 					// Start the new seek sound from the beginning (but only if
 					// we changed it, or we will get ugly sounds in the output)
 					if (newseek != m_seek_sample) m_seek_samplepos = 0;
 
-					m_seek_sample = newseek;
-
-					LOGMASKED(LOG_SND_DETAIL, "Step rate = %.1f ms, seek sample = %d, pitch = %f\n", m_step_rate, m_seek_sample, m_seek_pitch);
+					LOGMASKED(LOG_SND_DETAIL, "Step rate = %.1f ms, seek sample = %d, pitch = %f\n", m_step_rate, newseek, m_seek_pitch);
 				}
+				m_seek_sample = newseek;
 			}
-
-			// Set the timeout for the seek sound. When it expires,
-			// we assume that the seek process is over, and we'll play the
-			// rest of the step sound.
-			// This will be retriggered with each step pulse.
-			m_seek_sound_timeout = (int)(m_step_rate * 2 * 44.1);
 		}
 		else
 		{
-			LOGMASKED(LOG_SND_DETAIL, "Step sample completed\n");
 			m_in_seek = false;
 			// Last step sample was completed, this is not a seek process
 			m_seek_sample = floppy_sound_samples::QUIET;
 			m_seek_samplepos = 0;
 		}
 
-		// If we switch to the seek sample, let's keep the position of the
-		// step sample; else reset the step sample position.
+		// If we have a single step (outside of a seek), reset the step sample position
 		if (m_seek_sample == floppy_sound_samples::QUIET)
 		{
+			m_step_sample = m_samplelist->find_step(track, dir);
 			m_step_samplepos = 0;
 			m_in_seek = false;
+			LOGMASKED(LOG_SND_DETAIL, "Step rate = %.1f ms\n", m_step_rate);
 		}
 		else
 		{
+			// Keep the position of the current step sample and
+			// enter or remain in seek mode
 			m_in_seek = true;
+
+			// Also keep the current step_sample for a later resume
+
+			// Set the timeout for the seek sound. When it expires,
+			// we assume that the seek process is over, and we'll play the
+			// rest of the step sound.
+			// This will be retriggered with each step pulse.
+			// For rapid steps, set a minimum of 20 ms for the timeout.
+			m_seek_sound_timeout = (m_step_rate < 10)? 20 : (m_step_rate * 2);
+
+			// Number of updates with 44100 Hz per millisecond (rounded)
+			// Will be decremented by one for each update
+			m_seek_sound_timeout *= 44;
 		}
 	}
 }
@@ -1891,7 +1931,7 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream)
 
 			if (m_spin_samplepos >= sampleend)
 			{
-				LOGMASKED(LOG_SND_DETAIL, "Spin sample %d completed\n", m_spin_sample);
+				// LOGMASKED(LOG_SND_DETAIL, "Spin sample %d completed\n", m_spin_sample);
 				// Motor sample has completed
 				switch (m_spin_kind)
 				{
@@ -1947,7 +1987,7 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream)
 		// As long as we have a seek sound, there is a pending step sound
 		if (m_seek_sound_timeout == 1)
 		{
-			LOGMASKED(LOG_SND_DETAIL, "Finish step sound\n");
+			LOGMASKED(LOG_SND_DETAIL, "Seek end, resume step sound\n");
 			// Not retriggered; switch back to the last step sound
 			m_seek_sample = floppy_sound_samples::QUIET;
 			m_seek_sound_timeout = 0;
@@ -1988,6 +2028,7 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream)
 					// Step sample done
 					m_step_samplepos = 0;
 					m_step_sample = floppy_sound_samples::QUIET;
+					LOGMASKED(LOG_SND_DETAIL, "Step sample completed\n");
 				}
 			}
 		}
