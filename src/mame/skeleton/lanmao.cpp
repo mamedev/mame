@@ -928,13 +928,11 @@ ROM_START( panda4 )
 ROM_END
 ROM_START( baowang )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "w78e065-12.bin", 0x00000, 0x10000, CRC(F67B8DB6) SHA1(96cc23afadc98728538bfafd3783c7cd2997c608) )
+	ROM_LOAD( "w78e065.bin", 0x00000, 0x10000, CRC(F67B8DB6) SHA1(96cc23afadc98728538bfafd3783c7cd2997c608) )
 	
 	ROM_REGION( 0x80000, "oki", 0 ) // adpcm rom 
-	ROM_LOAD( "adpcm.bin", 0x00000, 0x80000, CRC(232A3840) SHA1(ced2f04566b1d2cf821e20334630a43476cca0ae) )
-	
-ROM_END
-
+	ROM_LOAD( "w27e040-12.bin", 0x00000, 0x80000, CRC(232A3840) SHA1(ced2f04566b1d2cf821e20334630a43476cca0ae) )
+	ROM_END
 
 ROM_START( msaiche ) // 玛莉赛车 (Mǎlì Sàichē - Mario Racing)
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -1140,13 +1138,13 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1991, msaiche,  0,    panda2, msaiche,   panda2_state, empty_init, ROT0, "Hengfa Electronics",          "Mali Saiche",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1991, msaiche,  0,    panda2, msaiche,   panda2_state, empty_init, ROT0, "Hengfa Electronics",          "Mali Saiche",                  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 GAME( 1996, panda2,    0,   panda2, panda2,    panda2_state, empty_init, ROT0, "Kelly",                       "Panda 2",                      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 GAME( ????, panda3,    0,   panda3, panda3,    panda3_state, empty_init, ROT0, "Jianrong",                    "Panda 3",                      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 GAME( ????, panda3a,   0,   panda3, panda3,    panda3_state, empty_init, ROT0, "unknown",                     "Panda 3 (Clear NVRAM ROM) ",   MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 GAME( 1998, panda4,    0,   panda4, panda4,    panda3_state, empty_init, ROT0, "unknown",                     "Panda 4",                      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 GAME( 1999  baowang,   0,   panda4, baowang,   panda3_state, empty_init, ROT0, "Hengfa Electronics",          "Bao Wang",                     MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 2003, lanmao,   0,    lanmao,  lanmao,  lanmao_state,  empty_init, ROT0, "Changsheng Electric Company", "Lan Mao",                 MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2003, lanmao,   0,    lanmao,  lanmao,  lanmao_state,  empty_init, ROT0, "Changsheng Electric Company", "Lan Mao",                      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 
 // for the following sets no effort has been made yet to emulate the different behaviour. Most have also different LED layout
 GAME( 1998, pkzw,     0,     pkzw,   pkzw,    pkzw_state,   empty_init, ROT0, "Hengfa Electronics",           "PK Zhiwang",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
