@@ -130,6 +130,7 @@ protected:
 	bool m_fdc_drq = false;                     /* data request */
 	int m_8n5 = 0;                          /* 5.25" / 8" drive select */
 	int m_400_460 = 0;                      /* double sided disk detect */
+	bool m_drvsel_binary = false;           /* drive select: false = Xerox 820 bit-per-drive; true = Big Board binary unit# */
 };
 
 class bigboard_state : public xerox820_state
@@ -144,6 +145,7 @@ public:
 	void kbpio_pa_w(uint8_t data);
 
 	void bigboard(machine_config &config);
+	void bigboard5(machine_config &config);
 protected:
 	virtual void machine_reset() override ATTR_COLD;
 
