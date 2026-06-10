@@ -28,6 +28,11 @@ public:
 
 	auto kbstb_wr_callback() { return m_kbstb_cb.bind(); }
 
+	// 820-II: emit the power-on "keyboard available" announce its monitor waits
+	// for (the original 820 has no announce).  Both machines use the same plain
+	// ASCII key encoding.
+	void set_xerox820ii(bool state) { m_xerox820ii = state; }
+
 	uint8_t read() { return m_bus; }
 
 protected:
@@ -49,6 +54,10 @@ private:
 
 	uint8_t m_p1;
 	uint8_t m_bus;
+	bool m_xerox820ii;
+	emu_timer *m_announce_timer;
+
+	TIMER_CALLBACK_MEMBER(announce);
 
 	uint8_t kb_p1_r();
 	void kb_p1_w(uint8_t data);
