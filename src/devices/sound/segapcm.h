@@ -36,11 +36,13 @@ protected:
 	// device_rom_interface overrides
 	virtual void rom_bank_pre_change() override;
 
+	virtual uint32_t get_bank(uint8_t ctrl) { return 0; }
+
 	struct voice_t
 	{
-		void tick(uint32_t bankmask, uint32_t bankshift);
+		void tick();
 
-		device_rom_interface<AddrBits> *host;
+		segapcm_device<MaxVoices, Divider, AddrBits> *host;
 
 		uint32_t addr = ~0; // current address (16.8 fixed point)
 		uint16_t loop = ~0; // loop address
@@ -72,9 +74,6 @@ protected:
 
 	required_shared_ptr<uint8_t> m_ram;
 
-	int m_bankshift;
-	int m_bankmask;
-
 private:
 	voice_t m_voice[MaxVoices];
 	sound_stream* m_stream;
@@ -105,6 +104,13 @@ public:
 	void set_bank(int bank) { m_bankshift = (bank & 0xf); m_bankmask = (0x70 | ((bank >> 16) & 0xfc)); }
 
 	void map(address_map &map) ATTR_COLD;
+
+protected:
+	virtual uint32_t get_bank(uint8_t ctrl) override { return (ctrl & m_bankmask) << m_bankshift; }
+
+private:
+	int m_bankshift;
+	int m_bankmask;
 };
 
 DECLARE_DEVICE_TYPE(SEGAPCM_DISCRETE, segapcm_discrete_device)

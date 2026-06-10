@@ -31,7 +31,8 @@ DEFINE_DEVICE_TYPE(SEGA_315_5218,    sega_315_5218_device,    "sega_315_5218",  
 // 0x85     current address (16-23)
 // 0x86     bit 0: channel disable?
 //          bit 1: loop disable
-//          other bits: bank
+//          bit 7: unknown (discrete logic)
+//          other bits: bank (315-5218)
 // 0x87     ?
 
 // only lower half of register set is valid
@@ -69,8 +70,6 @@ segapcm_device<MaxVoices, Divider, AddrBits>::segapcm_device(const machine_confi
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface<AddrBits>(mconfig, *this)
 	, m_ram(*this, "ram")
-	, m_bankshift(12)
-	, m_bankmask(0x70)
 	, m_stream(nullptr)
 {
 }
@@ -90,6 +89,8 @@ segapcm_discrete_device::segapcm_discrete_device(const machine_config &mconfig, 
 
 sega_315_5218_device::sega_315_5218_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: segapcm_device<16, 128, 21>(mconfig, SEGA_315_5218, tag, owner, clock)
+	, m_bankshift(12)
+	, m_bankmask(0x70)
 {
 }
 
@@ -158,7 +159,7 @@ void segapcm_device<MaxVoices, Divider, AddrBits>::sound_stream_update(sound_str
 		for (int ch = 0; ch < MAX_VOICES; ch++)
 		{
 			voice_t &voice = m_voice[ch];
-			voice.tick(m_bankmask, m_bankshift);
+			voice.tick();
 			lout += voice.lout;
 			rout += voice.rout;
 		}
@@ -168,7 +169,7 @@ void segapcm_device<MaxVoices, Divider, AddrBits>::sound_stream_update(sound_str
 }
 
 template<unsigned MaxVoices, unsigned Divider, unsigned AddrBits>
-void segapcm_device<MaxVoices, Divider, AddrBits>::voice_t::tick(uint32_t bankmask, uint32_t bankshift)
+void segapcm_device<MaxVoices, Divider, AddrBits>::voice_t::tick()
 {
 	// only process active channels
 	lout = rout = 0;
@@ -186,7 +187,7 @@ void segapcm_device<MaxVoices, Divider, AddrBits>::voice_t::tick(uint32_t bankma
 				addr = (uint32_t(loop) << 8);
 		}
 		// fetch the sample
-		const uint32_t bank = (ctrl & bankmask) << bankshift;
+		const uint32_t bank = host->get_bank(ctrl);
 		const int8_t v = host->read_byte(bank + (addr >> 8)) - 0x80;
 		// apply panning and advance
 		lout = v * (lvol & 0x7f);
