@@ -185,7 +185,7 @@ macro   retn
 
 macro   z80n:retn
 	m_out_retn_seen_cb(1);
-	if (m_stackless && m_stackless_retn_en) {
+	if (m_stackless_retn_en) {
 		m_stackless_retn_en = false;
 		SP += 2; //@pop
 		m_pc.b.l = m_in_nextreg_cb(0xc2);
@@ -906,10 +906,10 @@ macro   z80n:take_nmi
 	m_iff1 = 0;
 	m_r++;
 	+ 5
-	m_stackless_retn_en = true;
 	m_out_nextreg_cb(0xc2, m_pc.b.l);
 	m_out_nextreg_cb(0xc3, m_pc.b.h);
 	if (m_stackless) {
+		m_stackless_retn_en = true;
 		SP -= 2;
 	} else {
 		@wm16_sp PC
