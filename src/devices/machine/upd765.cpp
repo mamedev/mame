@@ -2040,6 +2040,8 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 				if(command[0] & 0x80) {
 					command[3] = command[3] ^ 1;
 					command[4] = 1;
+					if((command[3] & 1) && !done)
+						fi.st0 |= 4;
 					if(fi.dev)
 						fi.dev->ss_w(command[3] & 1);
 				}
@@ -2191,6 +2193,8 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 				if(command[0] & 0x80) {
 					command[3] = command[3] ^ 1;
 					command[4] = 1;
+					if((command[3] & 1) && !done)
+						fi.st0 |= 4;
 					if(fi.dev)
 						fi.dev->ss_w(command[3] & 1);
 				}
