@@ -349,8 +349,9 @@ authors:hap
 			<color alpha="0.6" />
 		</element>
 
+		<!-- clickable area for lightgun trigger -->
 		<element ref="nothing" inputtag="IN1" inputmask="0x40" clickthrough="yes">
-			<bounds x="7" y="5" width="48" height="55" />
+			<bounds x="7" y="6.5" width="48" height="50.5" />
 		</element>
 	</group>
 
