@@ -12,6 +12,7 @@ Gigabyte GA-586IP config:
 - Intel 82378ZB (SIO) as southbridge
 - Texas Instruments BENCHMARQ bq3287AMT RTC (ds12885 clone? Wants at least 128 bytes of SRAM)
 - No super I/O for keyboard/RTC, those are southbridge responsibility under X-Bus
+- NCR53C810 SCSI controller (concealed under a Price Tag style on Retro Web picture)
 
 Regular SIO is reused by earlier I420ZX "Saturn II" chipset and in BeBox
 "Mercury" 82433LX/82434LX are earlier revisions of the northbridge
@@ -21,6 +22,8 @@ TODO:
 - Remaining X-Bus peripherals for SIO (FDC, COM x2, LPT);
 - Implement remaining features in north/southbridges (SMI and PIRQ not enabled by these BIOSes,
   needs to be tested in a Windows install);
+- ga586ip: loads a NCRPCI-3.06.00 BIOS module if it finds a 53C810 SCSI card, hangs there just
+  like ncr53c825;
 
 **************************************************************************************************/
 

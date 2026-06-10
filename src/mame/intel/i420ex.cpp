@@ -27,6 +27,7 @@ TODO:
    vendor ID then tries to write then read $cx34-$cx37 (a.k.a. the otherwise r/o capptr_r)
 - isa1:sb16_lle: DMA crashes with high DMA (unsupported?)
 - serport0:logitech_mouse: fails freedos13 init on every odd boot;
+- a486ap4: ugly startup buzzer for work RAM check;
 
 **************************************************************************************************/
 

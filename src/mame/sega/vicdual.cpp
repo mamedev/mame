@@ -3700,6 +3700,67 @@ void vicdual_state::invinco(machine_config &config)
 	invinco_audio(config);
 }
 
+/*************************************
+ *
+ *  Deep Scan / Car Hunt
+ *
+ *************************************/
+
+static INPUT_PORTS_START( deepscch )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // probably unused
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // probably unused
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(vicdual_state::fake_lives_r<0x001>))
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:5") // SW1 @ C1, 6-pos (is #6 unconnected?)
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_NAME("P1 Up / Fire Left") // it's UP on Car Hunt but Fire Left on Deep Scan, what was it on the control panel??
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // probably unused
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // probably unused
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(vicdual_state::fake_lives_r<0x002>))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(vicdual_state::cblank_comp_r))
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // probably unused
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // probably unused
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(vicdual_state::fake_lives_r<0x101>))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(vicdual_state::timer_value_r))
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // probably unused
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // probably unused
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(vicdual_state::fake_lives_r<0x102>))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(vicdual_state::coin_status_r))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Game Select") PORT_TOGGLE
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_COIN_DEFAULT
+
+	PORT_START("FAKE_LIVES.0")
+	PORT_DIPNAME( 0x03, 0x03, "Deep Scan Lives" )  PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x02, "1" )
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x03, "4" )
+
+	PORT_START("FAKE_LIVES.1")
+	PORT_DIPNAME( 0x03, 0x01, "Car Hunt Lives" )   PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x03, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+INPUT_PORTS_END
 
 
 /*************************************
@@ -4476,6 +4537,39 @@ ROM_START( invds )
 	ROM_LOAD( "316-0206.u14", 0x0000, 0x0020, CRC(9617d796) SHA1(7cff2741866095ff42eadd8022bea349ec8d2f39) )    // control PROM
 ROM_END
 
+ROM_START( deepscch )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+    ROM_LOAD( "ds1.u33",     0x0000, 0x0400, CRC(ceaede4d) SHA1(9ed7c5313f0610323956fbb05ef07eb3b1240362) )
+    ROM_LOAD( "ds2.u32",     0x0400, 0x0400, CRC(8cb21166) SHA1(a0768464e1c3e17051ef241d596f45e177a9f95c) )
+    ROM_LOAD( "ds3.u31",     0x0800, 0x0400, CRC(27a54b47) SHA1(9c8876cabbdb3c3745fc462c92470b3fc771f96b) )
+    ROM_LOAD( "ds4.u30",     0x0c00, 0x0400, CRC(f3ff0c08) SHA1(d8918be8395984d8209ed39aac3ebcf26ae2c345) )
+    ROM_LOAD( "ds5.u29",     0x1000, 0x0400, CRC(d5ecb6d9) SHA1(5cbaf5fa169632fb682865d0e9d420de2435c6c6) )
+    ROM_LOAD( "ds6.u28",     0x1400, 0x0400, CRC(89cb6ec6) SHA1(ea4f9f10768ca4dcd00889cbb0184d0c855a5b82) )
+    ROM_LOAD( "ds7.u27",     0x1800, 0x0400, CRC(f2c0d46c) SHA1(4e07e1d061ec6ef59e43f1dcb9b75016c30b2272) )
+    ROM_LOAD( "ds8.u26",     0x1c00, 0x0400, CRC(4834d3df) SHA1(e8bbbdb1dbaf780b34cffa9e4cb79229dae49998) )
+	// moved here so to not interact with the temporary reload
+	ROM_LOAD( "ch.u4",       0x3000, 0x0400, NO_DUMP )
+	ROM_LOAD( "ds9.u8",      0x2000, 0x0400, CRC(30e5bf4f) SHA1(d05aeeda233e72789ec9c3be540e18405c72c84b) )
+	ROM_RELOAD(              0x3000, 0x0400 )
+	// u7 ~ u1 all not populated
+	ROM_LOAD( "ch.u7",       0x2400, 0x0400, NO_DUMP )
+	ROM_LOAD( "ch.u6",       0x2800, 0x0400, NO_DUMP )
+	ROM_LOAD( "ch.u5",       0x2c00, 0x0400, NO_DUMP )
+	ROM_LOAD( "ch.u3",       0x3400, 0x0400, NO_DUMP )
+	ROM_LOAD( "ch.u2",       0x3800, 0x0400, NO_DUMP )
+	ROM_LOAD( "ch.u1",       0x3c00, 0x0400, NO_DUMP )
+	ROM_COPY( "maincpu",     0x0000, 0x4000, 0x4000 )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	// not dumped for this set, looks swapped compared to carhntds
+	ROM_LOAD( "prom.u44", 0x0010, 0x0010, BAD_DUMP CRC(a0811288) SHA1(a6e78c26f7eeb70125eee715eb6a3e3c82ed7fc8) )    // color PROM
+	ROM_CONTINUE( 0x0000, 0x0010 )
+
+	ROM_REGION( 0x0020, "user1", 0 )
+	// marking scratched, near u44
+	ROM_LOAD( "prom.u63", 0x0000, 0x0020, NO_DUMP)
+ROM_END
+
 ROM_START( carhntds )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr617.u33",      0x0000, 0x0400, CRC(0bbfdb4e) SHA1(383599276923264602a0b5efeac9697d9c15a20f) )
@@ -5224,6 +5318,7 @@ GAME( 1980, samuraij,   samurai,  samurai,   samurai,   vicdual_state,   empty_i
 GAME( 1979, invinco,    0,        invinco,   invinco,   vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco",                                                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, invcarht,   0,        carhntds,  carhntds,  vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Car Hunt (Germany)",                           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, invds,      0,        invds,     invds,     vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Deep Scan",                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, deepscch,    0,       carhntds,  deepscch,  vicdual_state,   empty_init, ROT270, "Sega",                    "Deep Scan / Car Hunt",                                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // missing Car Hunt portion
 GAME( 1979, carhntds,   0,        carhntds,  carhntds,  vicdual_state,   empty_init, ROT270, "Sega",                    "Car Hunt / Deep Scan (France)",                          MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, tranqgun,   0,        tranqgun,  tranqgun,  tranqgun_state,  empty_init, ROT270, "Sega",                    "Tranquillizer Gun",                                      MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spacetrk,   0,        spacetrk,  spacetrk,  vicdual_state,   empty_init, ROT270, "Sega",                    "Space Trek (upright)",                                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
