@@ -17,8 +17,8 @@
 
 template<unsigned MaxVoices, unsigned Divider, unsigned AddrBits>
 class segapcm_device : public device_t,
-							public device_sound_interface,
-							public device_rom_interface<AddrBits>
+					   public device_sound_interface,
+					   public device_rom_interface<AddrBits>
 {
 protected:
 	static constexpr unsigned MAX_VOICES = MaxVoices;  // max voices
@@ -53,6 +53,7 @@ protected:
 		int32_t rout = 0;   // right output
 	};
 
+	// read/write handlers
 	uint8_t voice_addr_r(offs_t offset);
 	uint8_t voice_loop_r(offs_t offset);
 	uint8_t voice_end_r(offs_t offset);

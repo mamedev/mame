@@ -1770,13 +1770,18 @@ void vgmplay_device::execute_run()
 			case 0xc0:
 			{
 				pulse_act_led(CT_SEGAPCM);
-				uint16_t offset = m_file->read_word(m_pc + 1);
-				if ((offset & 0x7fff) <= 0xff) // only low 8 bit of offset is valid
+				const uint16_t offset = m_file->read_word(m_pc + 1);
+				const uint8_t data = m_file->read_byte(m_pc + 3);
+				if ((offset & 0x7ff) <= 0xff) // only low 11 bit of offset is checked
 				{
 					if (offset & 0x8000)
-						m_io->write_byte(A_SEGAPCM_1 + (offset & 0x7fff), m_file->read_byte(m_pc + 3));
+						m_io->write_byte(A_SEGAPCM_1 + (offset & 0xff), data);
 					else
-						m_io->write_byte(A_SEGAPCM_0 + (offset & 0x7fff), m_file->read_byte(m_pc + 3));
+						m_io->write_byte(A_SEGAPCM_0 + (offset & 0xff), data);
+				}
+				else
+				{
+					logerror("%s: Unknown Sega PCM %d write %04x = %02x\n", machine().describe_context(), (offset & 0x8000) >> 15, offset & 0x7fff, data);
 				}
 				m_pc += 4;
 				break;

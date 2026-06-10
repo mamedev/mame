@@ -9,12 +9,6 @@
 
 #include <algorithm>
 
-// constants
-template<unsigned MaxVoices, unsigned Divider, unsigned AddrBits>
-constexpr unsigned segapcm_device<MaxVoices, Divider, AddrBits>::MAX_VOICES;
-template<unsigned MaxVoices, unsigned Divider, unsigned AddrBits>
-constexpr unsigned segapcm_device<MaxVoices, Divider, AddrBits>::CLOCK_DIVIDER;
-
 // device type definition
 DEFINE_DEVICE_TYPE(SEGAPCM_DISCRETE, segapcm_discrete_device, "segapcm_discrete", "Sega PCM (Discrete logic)")
 DEFINE_DEVICE_TYPE(SEGA_315_5218,    sega_315_5218_device,    "sega_315_5218",    "Sega 315-5218 PCM")
@@ -43,7 +37,6 @@ DEFINE_DEVICE_TYPE(SEGA_315_5218,    sega_315_5218_device,    "sega_315_5218",  
 // only lower half of register set is valid
 void segapcm_discrete_device::map(address_map &map)
 {
-	map.unmap_value_high();
 	map(0x00, 0xff).ram().share(m_ram); // for debug, or scratchpad RAM?
 	map(0x42, 0x42).select(0x38).rw(FUNC(segapcm_discrete_device::voice_lvol_r), FUNC(segapcm_discrete_device::voice_lvol_w));
 	map(0x43, 0x43).select(0x38).rw(FUNC(segapcm_discrete_device::voice_rvol_r), FUNC(segapcm_discrete_device::voice_rvol_w));
@@ -56,7 +49,6 @@ void segapcm_discrete_device::map(address_map &map)
 
 void sega_315_5218_device::map(address_map &map)
 {
-	map.unmap_value_high();
 	map(0x00, 0xff).ram().share(m_ram); // for debug, or scratchpad RAM?
 	map(0x02, 0x02).select(0x78).rw(FUNC(sega_315_5218_device::voice_lvol_r), FUNC(sega_315_5218_device::voice_lvol_w));
 	map(0x03, 0x03).select(0x78).rw(FUNC(sega_315_5218_device::voice_rvol_r), FUNC(sega_315_5218_device::voice_rvol_w));
