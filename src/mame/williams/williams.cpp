@@ -2725,7 +2725,7 @@ thought the violent imagery would negatively affect sales.  Right before Robotro
 Williams president Mike Stroll to revert back to the original skull graphic.
 
 */
-ROM_START( robotron ) // Solid Blue labels, "B" type ROMs labeled 3005-13 through 3005-24
+ROM_START( robotron ) // "Release 5" Solid Blue labels, "B" type ROMs labeled 3005-13 through 3005-24
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2084_rom_1b_3005-13.e4",  0x00000, 0x1000, CRC(66c7d3ef) SHA1(f6d60e26c209c1df2cc01ac07ad5559daa1b7118) ) // == 2084_rom_1b_3005-1.e4
 	ROM_LOAD( "2084_rom_2b_3005-14.c4",  0x01000, 0x1000, CRC(5bc6c614) SHA1(4d6e82bc29f49100f7751ccfc6a9ff35695b84b3) ) // == 2084_rom_2b_3005-2.c4
@@ -2748,7 +2748,7 @@ ROM_START( robotron ) // Solid Blue labels, "B" type ROMs labeled 3005-13 throug
 	ROM_LOAD( "decoder_rom_6.3c", 0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09821
 ROM_END
 
-ROM_START( robotronyo ) // Yellow label / Red stripe & Black print or Yellow label / Red stripe & Green print "B" type ROMs numbered 3005-13 through 3005-24
+ROM_START( robotronyo ) // "Release 4" Yellow label / Red stripe & Black print or Yellow label / Red stripe & Green print "B" type ROMs numbered 3005-13 through 3005-24
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2084_rom_1b_3005-1.e4",   0x00000, 0x1000, CRC(66c7d3ef) SHA1(f6d60e26c209c1df2cc01ac07ad5559daa1b7118) )
 	ROM_LOAD( "2084_rom_2b_3005-2.c4",   0x01000, 0x1000, CRC(5bc6c614) SHA1(4d6e82bc29f49100f7751ccfc6a9ff35695b84b3) )
@@ -2762,6 +2762,29 @@ ROM_START( robotronyo ) // Yellow label / Red stripe & Black print or Yellow lab
 	ROM_LOAD( "2084_rom_10b_3005-10.a7", 0x0d000, 0x1000, CRC(4a9d5f52) SHA1(d5ae801e60ed829e7ef5c54a18aefca54eae827f) ) // originally printed as "A" ROMs, the A is overwitten with "B"
 	ROM_LOAD( "2084_rom_11b_3005-11.c7", 0x0e000, 0x1000, CRC(2afc5e7f) SHA1(f3405be9ad2287f3921e7dbd9c5313c91fa7f8d6) )
 	ROM_LOAD( "2084_rom_12b_3005-12.e7", 0x0f000, 0x1000, CRC(45da9202) SHA1(81b3b2a72a3c871e8d7b9348056622c90a20d876) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "video_sound_rom_3_std_767.ic12", 0xf000, 0x1000, CRC(c56c1d28) SHA1(15afefef11bfc3ab78f61ab046701db78d160ec3) ) // P/N A-5342-09910
+
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
+	ROM_LOAD( "decoder_rom_6.3c", 0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09821
+ROM_END
+
+ROM_START( robotronr3 ) // "Release 3" Censored prototype seen in the Robotron promo videotape, recovered from the Vid Kidz dev system
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "r3_1.e4",                 0x00000, 0x1000, CRC(2e5433ee) SHA1(cee8701578889b62968d423f6ddb53f7afe0bdbb) )
+	ROM_LOAD( "r3_2.c4",                 0x01000, 0x1000, CRC(5bc6c614) SHA1(4d6e82bc29f49100f7751ccfc6a9ff35695b84b3) ) // == 2084_rom_2b_3005-2.c4
+	ROM_LOAD( "r3_3.a4",                 0x02000, 0x1000, CRC(37962af2) SHA1(6f9774b3ba9d9855b92b0be3eeaa2b631d0b5d4a) )
+	ROM_LOAD( "r3_4.e5",                 0x03000, 0x1000, CRC(9c140843) SHA1(14ebc056cde6cd9baf13199ab7ed76a8655dade4) )
+	ROM_LOAD( "r3_5.c5",                 0x04000, 0x1000, CRC(24726007) SHA1(8b4ed881f64e3ce73ac1a9ae2c184721c1ab37cc) )
+	ROM_LOAD( "r3_6.a5",                 0x05000, 0x1000, CRC(097e174d) SHA1(287b9a865806e4d47c172a458b0eb5a7fcdfc46b) )
+	ROM_LOAD( "r3_7.e6",                 0x06000, 0x1000, CRC(17a7ce34) SHA1(fe733128370e680655260671dc5ebec6a4a14795) )
+	ROM_LOAD( "r3_8.c6",                 0x07000, 0x1000, CRC(b6e8dbb9) SHA1(c92754816cd4a5c92a40055dde6d1e5820d72434) )
+	ROM_LOAD( "r3_9.a6",                 0x08000, 0x1000, CRC(e7b53345) SHA1(0abade37d956fe66f820c9ba15be009715f9c9e3) )
+	ROM_LOAD( "r3_10.a7",                0x0d000, 0x1000, CRC(1fb75828) SHA1(cf190089c7f32bca6d2f801bc539be22ad445f8e) )
+	ROM_LOAD( "r3_11.c7",                0x0e000, 0x1000, CRC(ccfaf7da) SHA1(172f9f24cc2099929021246b7109e03d7140367a) )
+	ROM_LOAD( "r3_12.e7",                0x0f000, 0x1000, CRC(cfdc9990) SHA1(ab6fad9211edf9f4ede933d9756348be11947a80) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "video_sound_rom_3_std_767.ic12", 0xf000, 0x1000, CRC(c56c1d28) SHA1(15afefef11bfc3ab78f61ab046701db78d160ec3) ) // P/N A-5342-09910
@@ -2867,28 +2890,6 @@ ROM_START( robotrontd ) // Tie-Die version starts with a "Solid Blue label" set
 	ROM_LOAD( "decoder_rom_6.3c", 0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09821
 ROM_END
 
-ROM_START( robotronr3 ) // "Release 3" prototype build with censored graphic that replaces the skull and crossbones
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "r3_1.e4",                 0x00000, 0x1000, CRC(2e5433ee) SHA1(cee8701578889b62968d423f6ddb53f7afe0bdbb) )
-	ROM_LOAD( "2084_rom_2b_3005-14.c4",  0x01000, 0x1000, CRC(5bc6c614) SHA1(4d6e82bc29f49100f7751ccfc6a9ff35695b84b3) ) // == 2084_rom_2b_3005-2.c4
-	ROM_LOAD( "r3_3.a4",                 0x02000, 0x1000, CRC(37962af2) SHA1(6f9774b3ba9d9855b92b0be3eeaa2b631d0b5d4a) )
-	ROM_LOAD( "r3_4.e5",                 0x03000, 0x1000, CRC(9c140843) SHA1(14ebc056cde6cd9baf13199ab7ed76a8655dade4) )
-	ROM_LOAD( "r3_5.c5",                 0x04000, 0x1000, CRC(24726007) SHA1(8b4ed881f64e3ce73ac1a9ae2c184721c1ab37cc) )
-	ROM_LOAD( "r3_6.a5",                 0x05000, 0x1000, CRC(097e174d) SHA1(287b9a865806e4d47c172a458b0eb5a7fcdfc46b) )
-	ROM_LOAD( "r3_7.e6",                 0x06000, 0x1000, CRC(17a7ce34) SHA1(fe733128370e680655260671dc5ebec6a4a14795) )
-	ROM_LOAD( "r3_8.c6",                 0x07000, 0x1000, CRC(b6e8dbb9) SHA1(c92754816cd4a5c92a40055dde6d1e5820d72434) )
-	ROM_LOAD( "r3_9.a6",                 0x08000, 0x1000, CRC(e7b53345) SHA1(0abade37d956fe66f820c9ba15be009715f9c9e3) )
-	ROM_LOAD( "r3_10.a7",                0x0d000, 0x1000, CRC(1fb75828) SHA1(cf190089c7f32bca6d2f801bc539be22ad445f8e) )
-	ROM_LOAD( "r3_11.c7",                0x0e000, 0x1000, CRC(ccfaf7da) SHA1(172f9f24cc2099929021246b7109e03d7140367a) )
-	ROM_LOAD( "r3_12.e7",                0x0f000, 0x1000, CRC(cfdc9990) SHA1(ab6fad9211edf9f4ede933d9756348be11947a80) )
-
-	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "video_sound_rom_3_std_767.ic12", 0xf000, 0x1000, CRC(c56c1d28) SHA1(15afefef11bfc3ab78f61ab046701db78d160ec3) ) // P/N A-5342-09910
-
-	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
-	ROM_LOAD( "decoder_rom_6.3c", 0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09821
-ROM_END
 
 /*
 
@@ -4000,15 +4001,13 @@ GAME( 1982, conquest,   0,        williams_b1,      conquest, conquest_state,  e
 
 GAME( 1982, robotron,   0,        williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz",                   "Robotron: 2084 (Solid Blue label)",    MACHINE_SUPPORTS_SAVE ) // aka "Release 5"
 GAME( 1982, robotronyo, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz",                   "Robotron: 2084 (Yellow/Orange label)", MACHINE_SUPPORTS_SAVE ) // aka "Release 4"
+GAME( 1982, robotronr3, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz",                   "Robotron: 2084 (Release 3)",           MACHINE_SUPPORTS_SAVE ) // censored prototype
 GAME( 1982, robotronun, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz (Unidesa license)", "Robotron: 2084 (Unidesa license)",     MACHINE_SUPPORTS_SAVE )
 
 // the 3 below are all noteworthy hacks of the Solid Blue set
 GAME( 1987, robotron87, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "hack", "Robotron: 2084 (1987 'shot-in-the-corner' bugfix)", MACHINE_SUPPORTS_SAVE ) // fixes a reset bug.  aka "Release 6"
 GAME( 2012, robotron12, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "hack", "Robotron: 2084 (2012 'wave 201 start' hack)",       MACHINE_SUPPORTS_SAVE ) // includes sitc bug fix, used for competitive play.
 GAME( 2015, robotrontd, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "hack", "Robotron: 2084 (2015 'tie-die V2' hack)",           MACHINE_SUPPORTS_SAVE ) // inc. sitc fix, mods by some of the original developers, see backstory here http://www.robotron2084guidebook.com/gameplay/raceto100million/robo2k14_tie-die-romset/  (I guess there's a tie-die V1 before it was released to the public?)
-
-// Release 3 is the censored prototype seen in the Robotron promo videotape, it was recovered from the Vid Kidz dev system
-GAME( 1982, robotronr3, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz", "Robotron: 2084 (Release 3)",         MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, joust,      0,        joust,            joust,    williams_state,  empty_init,    ROT0,   "Williams", "Joust (Green label)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1982, joustr,     joust,    joust,            joust,    williams_state,  empty_init,    ROT0,   "Williams", "Joust (Red label)",    MACHINE_SUPPORTS_SAVE )
