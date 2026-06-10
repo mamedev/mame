@@ -48220,7 +48220,7 @@ ExtractDisk  [09]"第4集 B     " -> "jam vol.1 (alt)_09.d88"
 Not extensively tested
 ]]></notes>
 
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="353184">    <!-- Data CRC16: 19900 -->
 				<rom name="pc-8801fh_systemdisk.d88" size="353184" crc="155e38a2" sha1="dd310bf1a7c95a805999ac0a697fefc666b0fc32"/>
 			</dataarea>
@@ -48296,7 +48296,7 @@ Not extensively tested
 		<notes><![CDATA[
 [SIGSEGV in d88 loading]
 ]]></notes>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1128864">   <!-- Data CRC16: 64726 -->
 				<rom name="pc-8801mh_systemdisk.d88" size="1128864" crc="f8b5d2f5" sha1="3ea0b6b574f8df2da597eff19796b8d0181ab2c8"/>
 			</dataarea>
@@ -56528,7 +56528,7 @@ Sends a 0xff to I/O port $e6, flip that to 0x00 to make it boot
 		<description>Wizard88 Report Vol 90.1-3 (alt)</description>
 		<year>1990</year>
 		<publisher>Westside Softhouse</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 1388 -->
 				<rom name="wizard 88 report 90013.d88" size="348848" crc="6338716c" sha1="9e66db0f006ac122cc43f6067349dfc91964d4dd"/>
 			</dataarea>
@@ -56594,7 +56594,7 @@ Sends a 0xff to I/O port $e6, flip that to 0x00 to make it boot
 		<description>Wizard88 Report Vol 90.11-3 (alt)</description>
 		<year>1990</year>
 		<publisher>Westside Softhouse</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 44550 -->
 				<rom name="wizard 88 report 90113.d88" size="348848" crc="0a6599dc" sha1="80c781db6af8090623cb5bfcaee8b299eb37604c"/>
 			</dataarea>
@@ -56627,7 +56627,7 @@ Sends a 0xff to I/O port $e6, flip that to 0x00 to make it boot
 		<description>Wizard88 Report Vol 91.3-1 (alt)</description>
 		<year>1991</year>
 		<publisher>Westside Softhouse</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 51695 -->
 				<rom name="wizard 88 report 91031 (a).d88" size="348848" crc="72c8df04" sha1="90ec298c3a936ed5ca9f7fb3f509e34cf0815bd6"/>
 			</dataarea>
@@ -58087,7 +58087,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 v1.1 (alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 15844 -->
 				<rom name="the file master 88 v1.1.d88" size="348832" crc="0a9a01ce" sha1="81b22e780e2dd4d59ffa66ee12a1db6fb42c1485"/>
 			</dataarea>
@@ -58098,7 +58098,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 Filer 1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 7523 -->
 				<rom name="the file master 88 filer 1.d88" size="348832" crc="1a162902" sha1="0c606bde18e5286583654afbdddeba19cbd0e9d9"/>
 			</dataarea>
@@ -58109,7 +58109,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 Filer 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 7297 -->
 				<rom name="the file master 88 filer 2.d88" size="348832" crc="9edeaded" sha1="74c7e70da1df786fc5f02494dec4162dac3f0fa7"/>
 			</dataarea>
@@ -58120,7 +58120,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 Filer 3</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 32108 -->
 				<rom name="the file master 88 filer 3.d88" size="348832" crc="4eba4a40" sha1="170e6b7cace9f26e898e8480b23cc798225696a9"/>
 			</dataarea>
@@ -58131,7 +58131,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 Filer 4</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 53590 -->
 				<rom name="the file master 88 filer 4.d88" size="348832" crc="486511d3" sha1="8e6380949d7af11fbd29f692edd828334659ab47"/>
 			</dataarea>
@@ -58142,7 +58142,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 Filer 5</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 16173 -->
 				<rom name="the file master 88 filer 5.d88" size="348832" crc="e15e8501" sha1="05b196fa628a9c19b1903fa351ef11677185ec5d"/>
 			</dataarea>
@@ -58153,7 +58153,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 Filer 6</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 25652 -->
 				<rom name="the file master 88 filer 6.d88" size="348832" crc="295c4b09" sha1="e54ae35b2dc0921b1c851e484ce97dbfb6b2342e"/>
 			</dataarea>
@@ -58164,7 +58164,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 Filer 7</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 23836 -->
 				<rom name="the file master 88 filer 7.d88" size="348832" crc="2a9dd41a" sha1="5f870b6e379b465496f9c42b324c76ebf63280ba"/>
 			</dataarea>
@@ -58175,7 +58175,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 Filer 8</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 7009 -->
 				<rom name="the file master 88 filer 8.d88" size="348832" crc="d2c283c4" sha1="aeb973e875ea162bfb52484869027c3b19d44a77"/>
 			</dataarea>
@@ -58186,7 +58186,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 Filer 9</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 3292 -->
 				<rom name="the file master 88 filer 9.d88" size="348832" crc="76619253" sha1="f51eebdfd9913c2130e2b15e7b7966e8ffa90324"/>
 			</dataarea>
@@ -58197,7 +58197,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 Filer 10</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 49902 -->
 				<rom name="the file master 88 filer 10.d88" size="348832" crc="590a91dd" sha1="f5c6e912fac8892376dcd8c7a2ffd16edbfefcb4"/>
 			</dataarea>
@@ -58208,7 +58208,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 Filer 11</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 31309 -->
 				<rom name="the file master 88 filer 11.d88" size="348832" crc="6b64e91f" sha1="b9c7702786dfd6a8c07e8d21bfc8ca3b434e1261"/>
 			</dataarea>
@@ -58219,7 +58219,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 Filer 12</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 63750 -->
 				<rom name="the file master 88 filer 12.d88" size="348832" crc="a51ab073" sha1="cd061f8cb171ef4a126bb44a3da167c49a6cd25a"/>
 			</dataarea>
@@ -58231,7 +58231,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
         <description>The File Master 88 Filer 13</description>
         <year>19??</year>
         <publisher>&lt;unknown&gt;</publisher>
-        <part name="disk" interface="floppy_5_25">
+        <part name="flop1" interface="floppy_5_25">
             <dataarea name="flop" size="349504">
                 <rom name="the file master 88 filer 13.d88" size="349504" crc="9864dfa4" sha1="f862fea04211612e7719b58e8a389a4a9589a5c0"/>
             </dataarea>
@@ -58243,7 +58243,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 Filer 14</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 20467 -->
 				<rom name="the file master 88 filer 14.d88" size="348832" crc="93f493f7" sha1="3fe93a20002e7aa4101c8b77cd102b6e7d9828dc"/>
 			</dataarea>
@@ -58881,7 +58881,7 @@ ExtractDisk  [03]"backup          " -> "z's staff kid88_03.d88"
 		<description>PC-8801mkIISR System Disk</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 14462 -->
 				<rom name="pc-8801mkiisr_systemdisk.d88" size="348832" crc="a2d55405" sha1="d54ed934c0b5563f827000945cfe9b809cc985a7"/>
 			</dataarea>
