@@ -2860,12 +2860,13 @@ Unemulated optional [GSX8800] sound board support
 		</part>
 	</software>
 
-	<software name="genchohi" supported="no">
+	<software name="genchohi" supported="partial">
 		<description>Aoki Ookami to Shiroki Mejika - Genchou Hishi</description>
 		<year>1992</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19920730"/>
@@ -2909,12 +2910,12 @@ Unemulated optional [GSX8800] sound board support
 		</part>
 	</software>
 
-	<software name="genghis" supported="no">
+	<software name="genghis" supported="yes">
 		<description>Aoki Ookami to Shiroki Mejika - Genghis Khan</description>
 		<year>1988</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198801xx"/>
@@ -2951,13 +2952,14 @@ Unemulated optional [GSX8800] sound board support
 		</part>
 	</software>
 
-	<software name="genghisa" cloneof="genghis" supported="no">
+	<software name="genghisa" cloneof="genghis" supported="partial">
 		<!-- "soundware?" -->
 		<description>Aoki Ookami to Shiroki Mejika - Genghis Khan (soundware maybe)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Investigate what's this soundware thing
 ]]></notes>
 		<!--combined image-->
 		<!--rom name="aoki ookami to shiroki mejika genghis khan(soundware maybe).d88" size="1523408" crc="ae73482b" sha1="113ef542a74152928e34adf899a8e9e7e8e7c720"/-->
@@ -8016,61 +8018,64 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="daikokai" supported="no">
+	<software name="daikokai" supported="partial">
 		<description>Daikoukai Jidai</description>
 		<year>1990</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"CANNOT LOAD YSHELL.COM" [PC=0xe200, PC=0xe297, CHRN=(0, 0, 2, 512)]
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199005xx"/>
 		<info name="alt_title" value="大航海時代"/>
+		<info name="usage" value="Insert Umi (sea) disk after opening, boot with Main and Umi to skip opening. Insert Minato (port) disk after character creation."/>
 		<!--combined image-->
 		<!--rom name="daikokai jidai.d88" size="2049184" crc="5e5a4cae" sha1="aabf20b93ea0f9df313d9108243867beac150c41"/-->
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Main" />
+			<feature name="part_id" value="Main Disk" />
 			<dataarea name="flop" size="391264">
 				<rom name="daikokai jidai (main).d88" size="391264" crc="81aefc07" sha1="c0f65e64650f2c2a76a3c9bc02981f80729874ac"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Opening" />
+			<feature name="part_id" value="Opening Disk" />
 			<dataarea name="flop" size="391248">
 				<rom name="daikokai jidai (opening).d88" size="391248" crc="8a6dc0fb" sha1="ad12633699fa601f805792cfd2282ecb0ea4829f"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Minato" />
+			<feature name="part_id" value="Minato Disk (Port)" />
 			<dataarea name="flop" size="391248">
 				<rom name="daikokai jidai (minato).d88" size="391248" crc="8e44caf0" sha1="d1065dc73dd9cfba8be35e25db5d2d0c3e3b50f6"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Umi" />
+			<feature name="part_id" value="Umi Disk (Sea)" />
 			<dataarea name="flop" size="401648">
 				<rom name="daikokai jidai (umi).d88" size="401648" crc="64183ca9" sha1="4599b0dd421dfe578f0ecf78f04e425a6c30f9a1"/>
 			</dataarea>
 		</part>
 
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="User" />
+			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="473776">
 				<rom name="daikokai jidai (user).d88" size="473776" crc="c245da03" sha1="ccae6359126a9f645ffc546c5d9eff261ce2201d"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="daikokaia" cloneof="daikokai" supported="no">
+	<software name="daikokaia" cloneof="daikokai" supported="partial">
 		<description>Daikoukai Jidai (alt?)</description>
 		<year>1990</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199005xx"/>
@@ -8079,35 +8084,35 @@ Not extensively tested
 		<!--rom name="daikokai jidai.d88" size="1936000" crc="29319bf5" sha1="197f0a4d1f267f0be95cb80d8f167e6969761fab"/-->
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Main" />
+			<feature name="part_id" value="Main Disk" />
 			<dataarea name="flop" size="391808">
 				<rom name="daikokai jidai (a) (main).d88" size="391808" crc="adccaf27" sha1="36b5dcef73781916cf67e8a98b22102c310a4a6b"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Umi" />
-			<dataarea name="flop" size="386048">
-				<rom name="daikokai jidai (a) (umi).d88" size="386048" crc="6b866afe" sha1="d24e3a820cb7a0881dc0f99ff469fd57bd0b0ade"/>
-			</dataarea>
-		</part>
-
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Opening" />
+			<feature name="part_id" value="Opening Disk" />
 			<dataarea name="flop" size="391248">
 				<rom name="daikokai jidai (a) (opening).d88" size="391248" crc="70d1596c" sha1="4abd7509f63e8dbd4f44fcc3119ea78c352ad0c9"/>
 			</dataarea>
 		</part>
 
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Umi Disk" />
+			<dataarea name="flop" size="386048">
+				<rom name="daikokai jidai (a) (umi).d88" size="386048" crc="6b866afe" sha1="d24e3a820cb7a0881dc0f99ff469fd57bd0b0ade"/>
+			</dataarea>
+		</part>
+
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Minato" />
+			<feature name="part_id" value="Minato Disk" />
 			<dataarea name="flop" size="386048">
 				<rom name="daikokai jidai (a) (minato).d88" size="386048" crc="9c36851f" sha1="95e34f979522896d79e29c3707c7b8f5e4753e35"/>
 			</dataarea>
 		</part>
 
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="User" />
+			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="380848">
 				<rom name="daikokai jidai (a) (user).d88" size="380848" crc="f53f1e13" sha1="fc8a8454adb556d3ca597abd08a8394031974b1a"/>
 			</dataarea>
@@ -11795,12 +11800,14 @@ FDC stalls [Tries to find a missing CHRN=(00 00 01 01)]
 		</part>
 	</software>
 
-	<software name="eurosens" supported="no">
+	<software name="eurosens" supported="partial">
 		<description>Europa Sensen</description>
 		<year>1991</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
+[timing] One line off in places during intro
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19911221"/>
@@ -11837,12 +11844,14 @@ FDC stalls [Tries to find a missing CHRN=(00 00 01 01)]
 		</part>
 	</software>
 
-	<software name="eurosensa" cloneof="eurosens" supported="no">
+	<software name="eurosensa" cloneof="eurosens" supported="partial">
 		<description>Europa Sensen (alt?)</description>
 		<year>1991</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
+[timing] One line off in places during intro
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19911221"/>
@@ -16950,16 +16959,18 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="inindo" supported="no">
+	<software name="inindo" supported="partial">
 		<description>Inindou: Datou Nobunaga</description>
 		<year>1991</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19910719"/>
 		<info name="alt_title" value="伊忍道 打倒信長"/>
+		<info name="usage" value="Boot with disks A and D for opening"/>
 		<!--combined image-->
 		<!--rom name="inindo.d88" size="1978192" crc="bfebfab5" sha1="c947f2e7bb82e0b0b421af4a409a26fc351d36b8"/-->
 
@@ -16999,16 +17010,18 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="inindoa" cloneof="inindo" supported="no">
+	<software name="inindoa" cloneof="inindo" supported="partial">
 		<description>Inindou: Datou Nobunaga (alt?)</description>
 		<year>1991</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19910719"/>
 		<info name="alt_title" value="伊忍道 打倒信長"/>
+		<info name="usage" value="Boot with disks A and D for opening"/>
 		<!--combined image-->
 		<!--rom name="inindo.d88" size="1930272" crc="2237c01b" sha1="02f13c7d481ece86919944e9a91b11c551a91c36"/-->
 
@@ -17148,12 +17161,12 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="ishinara" supported="no">
+	<software name="ishinara" supported="yes">
 		<description>Ishin no Arashi</description>
 		<year>1989</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198904xx"/>
@@ -17190,12 +17203,12 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="ishinaraa" cloneof="ishinara" supported="no">
+	<software name="ishinaraa" cloneof="ishinara" supported="yes">
 		<description>Ishin no Arashi (alt?)</description>
 		<year>1989</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198904xx"/>
@@ -17232,12 +17245,12 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="ishinarab" cloneof="ishinara" supported="no">
+	<software name="ishinarab" cloneof="ishinara" supported="yes">
 		<description>Ishin no Arashi (alt User Disk)</description>
 		<year>1989</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198904xx"/>
@@ -19852,11 +19865,14 @@ ExtractDisk  [04]"D_USER          " -> "kon'yamo asamade powerful mahjong 2_04.d
 		<year>1990</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Throws a "DISK I/O ERROR" after opening at disk swap time (works standalone)
+Optional [redbook] audio CD on PC-8801MC
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19900723"/>
 		<info name="alt_title" value="ランペルール"/>
+		<info name="usage" value="Boot A and C to skip opening" />
 		<!--combined image-->
 		<!--rom name="l'empereur.d88" size="1611616" crc="e21aaca9" sha1="f9a1eb1a7f3a8919e991ed5454bc9aced84169ef"/-->
 
@@ -24831,12 +24847,13 @@ Gameplay is too fast, requires [V1S] support
 		</part>
 	</software>
 
-	<software name="nobubufu" supported="no">
+	<software name="nobubufu" supported="partial">
 		<description>Nobunaga no Yabou - Bushou Fuunroku</description>
 		<year>1990</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19901212"/>
@@ -24873,12 +24890,13 @@ Gameplay is too fast, requires [V1S] support
 		</part>
 	</software>
 
-	<software name="nobubufua" cloneof="nobubufu" supported="no">
+	<software name="nobubufua" cloneof="nobubufu" supported="partial">
 		<description>Nobunaga no Yabou - Bushou Fuunroku (alt)</description>
 		<year>1990</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19901212"/>
@@ -24915,12 +24933,12 @@ Gameplay is too fast, requires [V1S] support
 		</part>
 	</software>
 
-	<software name="nobuseng" supported="no">
+	<software name="nobuseng" supported="yes">
 		<description>Nobunaga no Yabou - Sengoku Gunyuuden</description>
 		<year>1988</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198812xx"/>
@@ -24950,12 +24968,12 @@ Gameplay is too fast, requires [V1S] support
 		</part>
 	</software>
 
-	<software name="nobusenga" cloneof="nobuseng" supported="no">
+	<software name="nobusenga" cloneof="nobuseng" supported="yes">
 		<description>Nobunaga no Yabou - Sengoku Gunyuuden (alt)</description>
 		<year>1988</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198812xx"/>
@@ -25000,12 +25018,12 @@ ExtractDisk  [04]"DATAディスク  " -> "Nobunaga no Yabo Sengokugun'yuden 04.d
 
 -->
 
-	<software name="nobusengb" cloneof="nobuseng" supported="no">
+	<software name="nobusengb" cloneof="nobuseng" supported="yes">
 		<description>Nobunaga no Yabou - Sengoku Gunyuuden (alt 2)</description>
 		<year>1988</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198812xx"/>
@@ -28911,16 +28929,18 @@ Crashes after title screen
 		</part>
 	</software>
 
-	<software name="royalbld" supported="no">
+	<software name="royalbld" supported="partial">
 		<description>Royal Blood</description>
 		<year>1991</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19910927"/>
 		<info name="alt_title" value="ロイヤルブラッド"/>
+		<info name="usage" value="Boot with disks A and C to skip opening"/>
 		<!--combined image-->
 		<!--rom name="royal blood.d88" size="1523408" crc="acfd4828" sha1="38e763712c321f980872944ec7f5f10f7fc7b91c"/-->
 
@@ -29457,15 +29477,17 @@ ExtractDisk  [02]"ｻﾝｺﾞｸｼ B      " -> "Sangokushi 02.d88"
 		</part>
 	</software>
 
-	<software name="sangokub" cloneof="sangoku" supported="no">
-		<description>Sangokushi (19861210, SR Ban?)</description>
-		<year>1985</year>
+	<!-- These sets are later rereleases supporting PC-8801mk2SR OPN -->
+	<!-- and running on YDOS like all later Koei later releases -->
+	<software name="sangokub" supported="yes">
+		<description>Sangokushi (SR Ban)</description>
+		<year>1986</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
 ]]></notes>
-		<!-- PC8801 -->
-		<info name="release" value="198512xx"/>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="19861210"/>
 		<info name="alt_title" value="三国志"/>
 		<!--combined image-->
 		<!--rom name="sangokushi ver.1.2(sr ver).d88" size="1114048" crc="56c09cfb" sha1="2af41af6b2c1846dcca1452d6f4b7b463d8b8b94"/-->
@@ -29492,16 +29514,15 @@ ExtractDisk  [02]"ｻﾝｺﾞｸｼ B      " -> "Sangokushi 02.d88"
 		</part>
 	</software>
 
-	<!-- TODO: shouldn't be a clone of sangoku? -->
-	<software name="sangokuc" cloneof="sangoku" supported="no">
-		<description>Sangokushi (19861210, SR Ban?, alt)</description>
-		<year>1985</year>
+	<software name="sangokuc" cloneof="sangokub" supported="yes">
+		<description>Sangokushi (SR Ban, alt)</description>
+		<year>1986</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
 ]]></notes>
-		<!-- PC8801 -->
-		<info name="release" value="198512xx"/>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="19861210"/>
 		<info name="alt_title" value="三国志"/>
 		<!--combined image-->
 		<!--rom name="sangokushi 86-10-10.d88" size="1114048" crc="77b4251d" sha1="059941439a1888111e150afa9987335a76f312be"/-->
@@ -29528,16 +29549,16 @@ ExtractDisk  [02]"ｻﾝｺﾞｸｼ B      " -> "Sangokushi 02.d88"
 		</part>
 	</software>
 
-	<!-- TODO: shouldn't be a clone of sangoku? -->
-	<software name="sangokud" cloneof="sangoku" supported="no">
-		<description>Sangokushi (SR Ban?)</description>
+	<software name="sangokud" cloneof="sangokub" supported="yes">
+		<description>Sangokushi (SR Ban, alt 2)</description>
 		<year>1987</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
 ]]></notes>
 		<!-- PC8801mk2SR -->
-		<info name="release" value="198704xx"/>
+		<!-- was 198704xx (?) -->
+		<info name="release" value="19861210"/>
 		<info name="alt_title" value="三国志SR版"/>
 		<!--combined image-->
 		<!--rom name="sangokushi sr.d88" size="1142832" crc="adb97e00" sha1="60c074525d555efabc480ccafb19aa454a4b2178"/-->
@@ -29589,12 +29610,13 @@ ExtractDisk  [02]"ｻﾝｺﾞｸｼ B      " -> "Sangokushi 02.d88"
 		</part>
 	</software>
 
-	<software name="sangoku2" supported="no">
+	<software name="sangoku2" supported="partial">
 		<description>Sangokushi II</description>
 		<year>1989</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198912xx"/>
@@ -29638,12 +29660,13 @@ ExtractDisk  [02]"ｻﾝｺﾞｸｼ B      " -> "Sangokushi 02.d88"
 		</part>
 	</software>
 
-	<software name="sangoku2a" cloneof="sangoku2" supported="no">
+	<software name="sangoku2a" cloneof="sangoku2" supported="partial">
 		<description>Sangokushi II (alt)</description>
 		<year>1989</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198912xx"/>
@@ -29687,12 +29710,13 @@ ExtractDisk  [02]"ｻﾝｺﾞｸｼ B      " -> "Sangokushi 02.d88"
 		</part>
 	</software>
 
-	<software name="sangoku2b" cloneof="sangoku2" supported="no">
+	<software name="sangoku2b" cloneof="sangoku2" supported="partial">
 		<description>Sangokushi II (alt 2)</description>
 		<year>1989</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198912xx"/>
@@ -29741,7 +29765,9 @@ ExtractDisk  [02]"ｻﾝｺﾞｸｼ B      " -> "Sangokushi 02.d88"
 		<year>1989</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
+Throws "DISK I/O ERROR" on data disk creation
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198912xx"/>
@@ -33186,7 +33212,7 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="starsymp" supported="no">
+	<software name="starsymp" supported="partial">
 		<description>Star Symphony</description>
 		<year>1986</year>
 		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
@@ -33500,48 +33526,6 @@ Not extensively tested
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="348848">
 				<rom name="sugoroku yakyu-do (disk 2).d88" size="348848" crc="32437caf" sha1="bdde88d102d0e8cbdd6a114f7ea701bfecf01c75"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="suikodtc" supported="no">
-		<description>Suikoden - Tenmei no Chikai</description>
-		<year>1989</year>
-		<publisher>光栄 (Koei)</publisher>
-		<notes><![CDATA[
-"Cannot load YSHELL.COM"
-]]></notes>
-		<!-- PC8801mk2SR -->
-		<info name="release" value="198903xx"/>
-		<info name="alt_title" value="水滸伝・天命の誓い"/>
-		<!--combined image-->
-		<!--rom name="suikoden tenmei no chikai.d88" size="1523984" crc="47b7691a" sha1="d1ba54fdbc752de8f6e55cae1f4c1625b7fa4d22"/-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A" />
-			<dataarea name="flop" size="381408">
-				<rom name="suikoden tenmei no chikai (disk a).d88" size="381408" crc="967ec064" sha1="c939f4ecf8a4745d98195b3cf89d7685030f7fb5"/>
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B" />
-			<dataarea name="flop" size="380864">
-				<rom name="suikoden tenmei no chikai (disk b).d88" size="380864" crc="e09e4658" sha1="a429d6240af414351d2c2aacad6d9628434d8825"/>
-			</dataarea>
-		</part>
-
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C" />
-			<dataarea name="flop" size="380864">
-				<rom name="suikoden tenmei no chikai (disk c).d88" size="380864" crc="402fe23b" sha1="630dbac8448c68a74e4b67876cf4cb6c2e4ad0f5"/>
-			</dataarea>
-		</part>
-
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="User" />
-			<dataarea name="flop" size="380848">
-				<rom name="suikoden tenmei no chikai (user).d88" size="380848" crc="dd27714b" sha1="bd6b68c84d5f599f9bdefc4b85da084d4b0afc61"/>
 			</dataarea>
 		</part>
 	</software>
@@ -34222,11 +34206,14 @@ FDC stalls [Tries to read a missing CHRN=(00 00 f7 01)]
 		<year>1990</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Throws a DISK I/O ERROR:2B:RENMAIN.OVL at disk swap time or with direct A and C loading
+Optional [redbook] audio CD on PC-8801MC
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199011xx"/>
 		<info name="alt_title" value="提督の決断"/>
+		<info name="usage" value="Boot with disks A and C to skip opening"/>
 		<!--combined image-->
 		<!--rom name="teitoku no ketsudan.d88" size="1518656" crc="008dada3" sha1="648a1f274f4ef5a8f0adb52055a39879c7fd4a6a"/-->
 
@@ -34259,10 +34246,15 @@ FDC stalls [Tries to read a missing CHRN=(00 00 f7 01)]
 		</part>
 	</software>
 
-	<software name="teiketsua" cloneof="teiketsu">
+	<software name="teiketsua" cloneof="teiketsu" supported="no">
 		<description>Teitoku no Ketsudan (alt)</description>
 		<year>1990</year>
 		<publisher>光栄 (Koei)</publisher>
+		<notes><![CDATA[
+"Cannot load YSHELL.COM" (fixed)
+Throws a DISK I/O ERROR:2B:RENMAIN.OVL at disk swap time or with direct A and C loading
+Optional [redbook] audio CD on PC-8801MC
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199011xx"/>
 		<info name="alt_title" value="提督の決断"/>
@@ -50859,12 +50851,12 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="suikoden" supported="no">
-		<description>Suikoden</description>
+	<software name="suikoden" supported="yes">
+		<description>Suikoden: Tenmei no Chikai</description>
 		<year>19??</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
 ]]></notes>
 		<!--combined image-->
 		<!--rom name="suikoden.d88" size="1549440" crc="bd419395" sha1="f7fa63af86bc7f04c14226c6170d70035c2ef64a"/-->
@@ -50898,12 +50890,12 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="suikodena" cloneof="suikoden" supported="no">
-		<description>Suikoden (alt)</description>
+	<software name="suikodena" cloneof="suikoden" supported="yes">
+		<description>Suikoden: Tenmei no Chikai (alt)</description>
 		<year>19??</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
 ]]></notes>
 		<!--combined image-->
 		<!--rom name="suikoden.d88" size="1142544" crc="b1d19804" sha1="b903317939ab88fb89c30bb2da35c999a60396ab"/-->
@@ -50926,6 +50918,49 @@ Not extensively tested
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="380848">
 				<rom name="suikoden (a) (disk c).d88" size="380848" crc="8e3143d9" sha1="d6b161bc780be5cd5b2b19aca1d84a9c1d5da07f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suikodtc" cloneof="suikoden" supported="yes">
+		<description>Suikoden: Tenmei no Chikai (alt 2)</description>
+		<year>1989</year>
+		<publisher>光栄 (Koei)</publisher>
+		<notes><![CDATA[
+"Cannot load YSHELL.COM" (fixed)
+]]></notes>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198903xx"/>
+		<info name="alt_title" value="水滸伝・天命の誓い"/>
+		<info name="usage" value="Boot with disks A and C to skip opening"/>
+		<!--combined image-->
+		<!--rom name="suikoden tenmei no chikai.d88" size="1523984" crc="47b7691a" sha1="d1ba54fdbc752de8f6e55cae1f4c1625b7fa4d22"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="381408">
+				<rom name="suikoden tenmei no chikai (disk a).d88" size="381408" crc="967ec064" sha1="c939f4ecf8a4745d98195b3cf89d7685030f7fb5"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="380864">
+				<rom name="suikoden tenmei no chikai (disk b).d88" size="380864" crc="e09e4658" sha1="a429d6240af414351d2c2aacad6d9628434d8825"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="380864">
+				<rom name="suikoden tenmei no chikai (disk c).d88" size="380864" crc="402fe23b" sha1="630dbac8448c68a74e4b67876cf4cb6c2e4ad0f5"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="User" />
+			<dataarea name="flop" size="380848">
+				<rom name="suikoden tenmei no chikai (user).d88" size="380848" crc="dd27714b" sha1="bd6b68c84d5f599f9bdefc4b85da084d4b0afc61"/>
 			</dataarea>
 		</part>
 	</software>
