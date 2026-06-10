@@ -15,6 +15,24 @@ NOTE:
 -->
 <softwarelist name="pc98_flop_orig" description="NEC PC-98 original disk images">
 
+<!-- !Painting and Graphic makers  -->
+
+	<software name="mps" supported="partial">
+		<description>Multi Paint System (v1.01)</description>
+		<year>1992</year>
+		<publisher>シーラボ (C-lab)</publisher>
+		<notes><![CDATA[
+Not extensively tested, has [printer] and [tablet] options, also cfr. pc98:mpssfsp disks
+]]></notes>
+		<info name="alt_title" value="マルチペイントシステム" />
+		<info name="release" value="19920701" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="8597392">
+				<rom name="multi paint.mfi" size="8597392" crc="55aefc10" sha1="607a170cc1f3a8c078356ba1d4d15b8f699271e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- !Games -->
 
 	<!-- FIXME: Aggres (Riverhill Soft) disk B throws "fail1" (2D interface) -->

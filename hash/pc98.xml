@@ -1879,6 +1879,40 @@ Moans while executing ISD.EXE, r/w I/O ports $d0, expecting a device to be conne
 		</part>
 	</software>
 
+	<!-- "Multi Paint System: Otonoshimi Set 1" known to exist, possibly very similar to this -->
+	<software name="mpssfsp" supported="partial">
+		<description>Multi Paint System: Secret Fun Set Plus</description>
+		<year>1995</year>
+		<publisher>シーラボ (C-lab)</publisher>
+		<notes><![CDATA[
+Expansion disk for pc98_flop_orig:mps
+Has [EGC] issues during auto demo: leaves trails when kanji drawing, some closing windows fails to clear completely.
+Teal Disk unchecked: has various drivers for printers and Wacom serial tablets cfr. DOC folder
+]]></notes>
+		<info name="alt_title" value="マルチペイントシステム マル秘お楽しみセット" />
+		<info name="usage" value="Requires HDD DOS install. Auto Demo disk: run demo.bat" />
+		<!-- TODO: can't load as 3.5", looks suspicious -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Pink Disk (Auto Demo)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="mpspink.hdm" size="1261568" crc="30e9c621" sha1="6690ee1f6f8af3fa40c29bd86ebed90b9a827a50" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Blue Disk (Art/CG)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="mpsblue.hdm" size="1261568" crc="4a2c117f" sha1="352f03bd0f01d55b6b5c5684db2a90991884aca7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Teal Disk (Expansion/Install)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="mpsteal.hdm" size="1261568" crc="66e1987f" sha1="fe268885ccc9c16cd5fe94bd7d4a61ff6e537968" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
 <!-- !Sound players/makers (MIDI Applications et al.) -->
 
 	<software name="714midij">
