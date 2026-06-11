@@ -881,7 +881,13 @@ uint32_t chain_manager::process_screen_chains(uint32_t view, osd_window& window)
 
 		uint16_t screen_width = prim.m_screen_width;
 		uint16_t screen_height = prim.m_screen_height;
-		if (window.swap_xy())
+		// The synthetic vector prim (m_prim == nullptr, see inject_vector_screen) is already
+		// window-oriented: its dimensions come from the window, not from the (possibly rotated)
+		// screen. Applying the rotation swap here would disagree with the unswapped dims set in
+		// inject_vector_screen step (1), making m_native_dims flip orientation every frame and
+		// rebuild every NATIVE render target each frame (massive create/destroy churn: VRAM
+		// sawtooth, stale-frame artifacts from recycled target memory, large render stalls).
+		if (window.swap_xy() && prim.m_prim != nullptr)
 		{
 			std::swap(screen_width, screen_height);
 		}
