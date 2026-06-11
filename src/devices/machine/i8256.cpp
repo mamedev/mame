@@ -910,7 +910,6 @@ TIMER_CALLBACK_MEMBER(i8256_device::brg_tick)
 void i8256_device::write_rxd(int state)
 {
 	m_rxd = state ? 1 : 0;
-	LOGRX("I8256: Presented a %d\n", m_rxd);
 }
 
 void i8256_device::write_cts(int state)
@@ -920,10 +919,37 @@ void i8256_device::write_cts(int state)
 
 void i8256_device::write_rxc(int state)
 {
-	m_rxc = state ? 1 : 0;
+	state = state ? 1 : 0;
+	if (m_rxc == state)
+		return;
+	m_rxc = state;
+
+	// RxC is only an input when external 1x clocks are selected;
+	// data is clocked into the receiver on the rising edge
+	if ((m_command2 & 0x0f) == I8256_BAUD_TXC && state)
+		receiver_tick();
 }
 
 void i8256_device::write_txc(int state)
 {
-	m_txc = state ? 1 : 0;
+	state = state ? 1 : 0;
+	if (m_txc == state)
+		return;
+	m_txc = state;
+
+	const uint8_t baud = m_command2 & 0x0f;
+	if (baud > I8256_BAUD_TXC32)
+		return; // TxC is an output when the internal baud rate generator is used
+
+	if (state)
+	{
+		// in the /64 and /32 modes TxC is a common clock for receiver and transmitter
+		if (baud != I8256_BAUD_TXC)
+			receiver_tick();
+	}
+	else
+	{
+		// data is clocked out of the transmitter on the falling edge
+		transmitter_tick();
+	}
 }
