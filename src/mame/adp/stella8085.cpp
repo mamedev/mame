@@ -57,7 +57,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ppi(*this, "ppi"),
 		m_uart(*this, "muart"),
-		m_printer(*this, "printer"),
+		m_rs232(*this, "rs232"),
 		m_kdc(*this, "kdc"),
 		m_tz(*this, "TZ%u", 0U),
 		m_dsw(*this, "DSW"),
@@ -81,7 +81,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
 	required_device<i8256_device> m_uart;
-	required_device<rs232_port_device> m_printer;
+	required_device<rs232_port_device> m_rs232;
 	required_device<i8279_device> m_kdc;
 	required_ioport_array<8> m_tz;
 	required_ioport m_dsw;
@@ -565,10 +565,10 @@ void stella8085_state::dicemstr(machine_config &config)
 	I8256(config, m_uart, 10.240_MHz_XTAL / 2); // divider not verified
 	m_uart->int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
 
-	RS232_PORT(config, m_printer, default_rs232_devices, nullptr);
-	m_uart->txd_handler().set(m_printer, FUNC(rs232_port_device::write_txd));
-	m_printer->rxd_handler().set(m_uart, FUNC(i8256_device::write_rxd));
-	m_printer->cts_handler().set(m_uart, FUNC(i8256_device::write_cts));
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_uart->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
+	m_rs232->rxd_handler().set(m_uart, FUNC(i8256_device::write_rxd));
+	m_rs232->cts_handler().set(m_uart, FUNC(i8256_device::write_cts));
 
 	I8279(config, m_kdc, 10.240_MHz_XTAL / 4); // divider not verified
 	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));
@@ -600,10 +600,10 @@ void stella8085_state::doppelpot(machine_config &config)
 	m_uart->in_p1_callback().set(FUNC(stella8085_state::lw_r));
 	m_uart->out_p1_callback().set(FUNC(stella8085_state::machine2_w));
 
-	RS232_PORT(config, m_printer, default_rs232_devices, nullptr);
-	m_uart->txd_handler().set(m_printer, FUNC(rs232_port_device::write_txd));
-	m_printer->rxd_handler().set(m_uart, FUNC(i8256_device::write_rxd));
-	m_printer->cts_handler().set(m_uart, FUNC(i8256_device::write_cts));
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_uart->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
+	m_rs232->rxd_handler().set(m_uart, FUNC(i8256_device::write_rxd));
+	m_rs232->cts_handler().set(m_uart, FUNC(i8256_device::write_cts));
 
 	I8279(config, m_kdc, 6.144_MHz_XTAL / 2);
 	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));
