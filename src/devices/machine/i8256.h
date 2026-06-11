@@ -42,28 +42,25 @@ public:
 
 	i8256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto inta_callback()    { return m_in_inta_cb.bind(); }
 	auto int_callback()     { return m_out_int_cb.bind(); }
-	auto extint_callback()  { return m_in_extint_cb.bind(); }
+	auto txd_handler()      { return m_txd_handler.bind(); }
 
-	auto txd_handler() { return m_txd_handler.bind(); }
-
-	auto in_p2_callback()   { return m_in_p2_cb.bind(); }
-	auto out_p2_callback()  { return m_out_p2_cb.bind(); }
 	auto in_p1_callback()   { return m_in_p1_cb.bind(); }
 	auto out_p1_callback()  { return m_out_p1_cb.bind(); }
-
-	void write_rxc(int state);
-	void write_rxd(int state);
-	void write_cts(int state);
-	void write_txc(int state);
-	void write_extint(int state);
+	auto in_p2_callback()   { return m_in_p2_cb.bind(); }
+	auto out_p2_callback()  { return m_out_p2_cb.bind(); }
 
 	void write(offs_t offset, uint8_t data);
 	uint8_t read(offs_t offset);
 
 	// interrupt acknowledge (RST n instruction in 8085 mode, vector 40H-47H in 8086 mode)
 	uint8_t inta_r();
+
+	void write_rxd(int state);
+	void write_rxc(int state);
+	void write_txc(int state);
+	void write_cts(int state);
+	void write_extint(int state);
 
 	uint8_t p1_r();
 	void    p1_w(uint8_t data);
@@ -84,16 +81,13 @@ private:
 	int acknowledge();
 	void update_int();
 
-	devcb_read_line m_in_inta_cb;
 	devcb_write_line m_out_int_cb;
-	devcb_read_line m_in_extint_cb;
-
 	devcb_write_line m_txd_handler;
 
-	devcb_read8 m_in_p2_cb;
-	devcb_write8 m_out_p2_cb;
 	devcb_read8 m_in_p1_cb;
 	devcb_write8 m_out_p1_cb;
+	devcb_read8 m_in_p2_cb;
+	devcb_write8 m_out_p2_cb;
 
 	emu_timer *m_timer;
 	emu_timer *m_brg_timer;
