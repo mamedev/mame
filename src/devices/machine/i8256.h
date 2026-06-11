@@ -38,8 +38,6 @@
 class i8256_device : public device_t
 {
 public:
-	static constexpr flags_type emulation_flags() { return flags::SAVE_UNSUPPORTED; }
-
 	i8256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto int_callback()     { return m_out_int_cb.bind(); }

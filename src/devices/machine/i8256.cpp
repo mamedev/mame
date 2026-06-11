@@ -263,7 +263,6 @@ void i8256_device::device_start()
 	save_item(NAME(m_txd));
 }
 
-
 void i8256_device::device_reset()
 {
 	m_command1 = 0;
@@ -298,6 +297,7 @@ void i8256_device::soft_reset()
 	m_status = I8256_STATUS_TR_EMPTY | I8256_STATUS_TB_EMPTY;
 	m_int_enable = 0;
 	m_int_request = 0;
+	update_int();
 
 	m_rx_state = I8256_STATE_START;
 	m_rx_counter = 0;
@@ -311,6 +311,7 @@ void i8256_device::soft_reset()
 	m_tx_shift = 0;
 	m_tx_parity = false;
 	m_tx_break = false;
+	output_txd(1);
 }
 
 TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
@@ -410,7 +411,7 @@ uint8_t i8256_device::read(offs_t offset)
 
 	// In the 8-bit mode, AD0-AD3 select the register and AD4 is ignored, while
 	// AD1-AD4 are used in the 16-bit mode and AD0 is a second chip select, active low.
-	if (BIT(m_command1,I8256_CMD1_8086))
+	if (BIT(m_command1, I8256_CMD1_8086))
 	{
 		if (BIT(offset, 0))
 			return 0xff;
@@ -476,7 +477,7 @@ void i8256_device::write(offs_t offset, uint8_t data)
 {
 	uint8_t reg = offset & 0x0f;
 
-	if (BIT(m_command1,I8256_CMD1_8086))
+	if (BIT(m_command1, I8256_CMD1_8086))
 	{
 		if (BIT(offset, 0))
 			return;
