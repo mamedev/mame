@@ -3000,7 +3000,8 @@ void specnext_state::map_mem(address_map &map)
 		map(0x0000 + i * 0x2000, 0x1fff + i * 0x2000).noprw();
 		map(0x0000 + i * 0x2000, 0x1fff + i * 0x2000).view(views[i].get());
 		views[i].get()[0](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).bankrw(m_bank_ram[i]);
-		views[i].get()[1](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).bankr(m_bank_ram[i]);
+		views[i].get()[1](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).bankr(m_bank_ram[i])
+			.lw8(NAME([](offs_t, u8) {})); // SIGSEGV failure under investigation
 
 		// bank5
 		views[i].get()[0x2a](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).lrw8(
