@@ -410,7 +410,6 @@ protected:
 
 	void nakajies_io_map_fdc(address_map &map) ATTR_COLD;
 
-	u8 fdc_dor_r();
 	void fdc_dor_w(u8 data);
 	u8 fdc_msr_r();
 	u8 fdc_fifo_r();
@@ -466,11 +465,10 @@ void nakajies_state::nakajies_io_map(address_map &map)
 	map(0x0070, 0x0070).lw8(
 		NAME([this](u8 data) {
 			// Firmware writes 0x01 here immediately before entering the retained
-			// power-off loop.  The screen update path shows an emulator status message.
+			// power-off loop.
 			if (BIT(data, 0))
 			{
 				m_lcd_on = false;
-				m_screen->set_brightness(0xa6);
 				m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 			}
 		})
@@ -493,7 +491,8 @@ void nakajies_fdc_state::nakajies_io_map_fdc(address_map &map)
 	nakajies_io_map(map);
 	map(0x00e0, 0x00e0).r(m_fdc, FUNC(n82077aa_device::sra_r));
 	map(0x00e1, 0x00e1).r(m_fdc, FUNC(n82077aa_device::srb_r));
-	map(0x00e2, 0x00e2).rw(FUNC(nakajies_fdc_state::fdc_dor_r), FUNC(nakajies_fdc_state::fdc_dor_w));
+	map(0x00e2, 0x00e2).r(m_fdc, FUNC(n82077aa_device::dor_r));
+	map(0x00e2, 0x00e2).w(FUNC(nakajies_fdc_state::fdc_dor_w));
 	map(0x00e3, 0x00e3).rw(m_fdc, FUNC(n82077aa_device::tdr_r), FUNC(n82077aa_device::tdr_w));
 	map(0x00e4, 0x00e4).r(FUNC(nakajies_fdc_state::fdc_msr_r));
 	map(0x00e4, 0x00e4).w(m_fdc, FUNC(n82077aa_device::dsr_w));
@@ -532,12 +531,6 @@ static u8 t200_fdc_command_length(u8 command)
 static u16 t200_fdc_sector_size(u8 n, u8 dtl)
 {
 	return n ? (128U << n) : dtl;
-}
-
-
-u8 nakajies_fdc_state::fdc_dor_r()
-{
-	return m_fdc->dor_r();
 }
 
 
@@ -580,11 +573,14 @@ u8 nakajies_fdc_state::fdc_fifo_r()
 	{
 		const u8 data = m_fdc_reset_sense_data[m_fdc_reset_sense_pos & 1];
 
-		m_fdc_reset_sense_pos++;
-		if (m_fdc_reset_sense_pos == 2)
+		if (!machine().side_effects_disabled())
 		{
-			m_fdc_reset_sense_pos = 0;
-			m_fdc_reset_sense_active = false;
+			m_fdc_reset_sense_pos++;
+			if (m_fdc_reset_sense_pos == 2)
+			{
+				m_fdc_reset_sense_pos = 0;
+				m_fdc_reset_sense_active = false;
+			}
 		}
 
 		return data;
@@ -594,12 +590,15 @@ u8 nakajies_fdc_state::fdc_fifo_r()
 	{
 		const u8 data = m_fdc->fifo_r();
 
-		m_fdc_data_fifo_reads--;
-
-		if (!m_fdc_data_fifo_reads)
+		if (!machine().side_effects_disabled())
 		{
-			m_fdc->tc_w(true);
-			m_fdc->tc_w(false);
+			m_fdc_data_fifo_reads--;
+
+			if (!m_fdc_data_fifo_reads)
+			{
+				m_fdc->tc_w(true);
+				m_fdc->tc_w(false);
+			}
 		}
 
 		return data;
@@ -613,11 +612,14 @@ u8 nakajies_fdc_state::fdc_fifo_r()
 			data &= ~0x04;
 		}
 
-		m_fdc_sense_interrupt_pos++;
-		if (data == 0x80 || m_fdc_sense_interrupt_pos == 2)
+		if (!machine().side_effects_disabled())
 		{
-			m_fdc_sense_interrupt_active = false;
-			m_fdc_sense_interrupt_pos = 0;
+			m_fdc_sense_interrupt_pos++;
+			if (data == 0x80 || m_fdc_sense_interrupt_pos == 2)
+			{
+				m_fdc_sense_interrupt_active = false;
+				m_fdc_sense_interrupt_pos = 0;
+			}
 		}
 	}
 
@@ -1118,7 +1120,6 @@ INPUT_CHANGED_MEMBER(nakajies_state::power_button_nmi)
 	}
 	else
 	{
-		m_screen->set_brightness(0xff);
 		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 		machine().schedule_soft_reset();
 	}
@@ -1136,7 +1137,6 @@ INPUT_CHANGED_MEMBER(nakajies_state::power_button_irq)
 		set_irq(0x01); // IRQ vector 0xff: warm/power-management source.
 	else
 	{
-		m_screen->set_brightness(0xff);
 		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 		machine().schedule_soft_reset();
 	}
@@ -1189,7 +1189,6 @@ void nakajies_state::machine_reset()
 	m_irq_active = 0;
 	m_lcd_memory_start = 0;
 	m_lcd_on = true;
-	m_screen->set_brightness(0xff);
 	m_keyboard_row_reset = BIT(m_irq_enabled, 3) ? 0xfe : 0xff;
 	m_keyboard_row = (BIT(m_keyboard_row_reset, 0) && (m_ram_base[0x6d29] <= 0x09)) ? m_ram_base[0x6d29] : 0;
 	m_uart_control = 0;
@@ -1218,47 +1217,6 @@ u32 nakajies_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	if (!m_lcd_on)
 	{
 		bitmap.fill(0, cliprect);
-
-		static constexpr char message[] = "POWERED OFF";
-		static constexpr u8 glyphs[8][7] =
-		{
-			{ 0x1e, 0x11, 0x11, 0x1e, 0x10, 0x10, 0x10 }, // P
-			{ 0x0e, 0x11, 0x11, 0x11, 0x11, 0x11, 0x0e }, // O
-			{ 0x11, 0x11, 0x11, 0x15, 0x15, 0x15, 0x0a }, // W
-			{ 0x1f, 0x10, 0x10, 0x1e, 0x10, 0x10, 0x1f }, // E
-			{ 0x1e, 0x11, 0x11, 0x1e, 0x14, 0x12, 0x11 }, // R
-			{ 0x1e, 0x11, 0x11, 0x11, 0x11, 0x11, 0x1e }, // D
-			{ 0x1f, 0x10, 0x10, 0x1e, 0x10, 0x10, 0x10 }, // F
-			{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }  // space
-		};
-
-		constexpr int scale = 2;
-		constexpr int glyph_width = 5;
-		constexpr int glyph_height = 7;
-		constexpr int glyph_spacing = 1;
-		const int text_width = (sizeof(message) - 1) * (glyph_width + glyph_spacing) * scale - glyph_spacing * scale;
-		const int start_x = (screen.width() - text_width) / 2;
-		const int start_y = (screen.height() - glyph_height * scale) / 2;
-
-		for (int i = 0; message[i] != 0; i++)
-		{
-			const int glyph = (message[i] == 'P') ? 0 :
-					(message[i] == 'O') ? 1 :
-					(message[i] == 'W') ? 2 :
-					(message[i] == 'E') ? 3 :
-					(message[i] == 'R') ? 4 :
-					(message[i] == 'D') ? 5 :
-					(message[i] == 'F') ? 6 : 7;
-			const int x_base = start_x + i * (glyph_width + glyph_spacing) * scale;
-
-			for (int y = 0; y < glyph_height; y++)
-				for (int x = 0; x < glyph_width; x++)
-					if (BIT(glyphs[glyph][y], glyph_width - 1 - x))
-						for (int sy = 0; sy < scale; sy++)
-							for (int sx = 0; sx < scale; sx++)
-								bitmap.pix(start_y + y * scale + sy, x_base + x * scale + sx) = 1;
-		}
-
 		return 0;
 	}
 
