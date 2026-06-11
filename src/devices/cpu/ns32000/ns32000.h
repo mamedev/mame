@@ -67,21 +67,20 @@ protected:
 		SIZE_Q = 7,
 	};
 
-	// time needed to read or write a memory operand
+	// Time needed to read or write a memory operand: the first bus cycle
+	// costs 3 (4 with address translation), each additional one 4 (5).
+	// The number of bus cycles depends on the bus width of the device,
+	// the operand size, and operand alignment.
 	unsigned top(size_code const size, u32 const address = 0) const
 	{
 		unsigned const tmmu = m_mmu ? 1 : 0;
+		unsigned const bytes = size + 1;
+		unsigned const bpt = 1U << Width;
 
-		switch (size)
-		{
-		case SIZE_B: return 3 + tmmu;
-		case SIZE_W: return (address & 1) ? 7 + 2 * tmmu : 3 + tmmu;
-		case SIZE_D: return (address & 1) ? 11 + 3 * tmmu : 7 + 2 * tmmu;
-		case SIZE_Q: return (address & 1) ? 19 + 5 * tmmu : 15 + 4 * tmmu;
-		}
+		// number of bus cycles required for the transfer
+		unsigned const n = (bytes + (address & (bpt - 1)) + (bpt - 1)) >> Width;
 
-		// can't happen
-		return 0;
+		return 3 + (n - 1) * 4 + n * tmmu;
 	}
 
 	struct addr_mode
