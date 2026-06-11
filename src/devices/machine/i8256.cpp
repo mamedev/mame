@@ -406,12 +406,16 @@ void i8256_device::write_extint(int state)
 
 uint8_t i8256_device::read(offs_t offset)
 {
-	// In the 8-bit mode, AD0-AD3 are used to select the proper register, while AD1-AD4 are used in the 16-bit mode.
-	// AD4 in the 8-bit mote is ignored as an address, while AD0 in the 16-bit mode is used as a second chip select, active low.
-	if (BIT(m_command1,I8256_CMD1_8086))
-		offset = offset >> 1;
-
 	uint8_t reg = offset & 0x0f;
+
+	// In the 8-bit mode, AD0-AD3 select the register and AD4 is ignored, while
+	// AD1-AD4 are used in the 16-bit mode and AD0 is a second chip select, active low.
+	if (BIT(m_command1,I8256_CMD1_8086))
+	{
+		if (BIT(offset, 0))
+			return 0xff;
+		reg = (offset >> 1) & 0x0f;
+	}
 
 	switch (reg)
 	{
@@ -420,9 +424,10 @@ uint8_t i8256_device::read(offs_t offset)
 		case I8256_REG_CMD2:
 			return m_command2;
 		case I8256_REG_CMD3:
-			return m_command3 & 0x76; // When command Register 3 is read, bits 0, 3, and 7 will always be zero.
+			// when command register 3 is read, bits 0, 3, and 7 will always be zero
+			return m_command3 & 0x76;
 		case I8256_REG_MODE:
-		   return m_mode;
+			return m_mode;
 		case I8256_REG_PORT1C:
 			return m_port1_control;
 		case I8256_REG_INTEN:
@@ -435,21 +440,34 @@ uint8_t i8256_device::read(offs_t offset)
 			return level * 4;
 		}
 		case I8256_REG_BUFFER:
+			if (!machine().side_effects_disabled())
+				m_status &= ~I8256_STATUS_RB_FULL;
 			return m_rx_buffer;
 		case I8256_REG_PORT1:
-			return m_port1_int;
+			return p1_r();
 		case I8256_REG_PORT2:
-			return m_port2_int;
+			return p2_r();
 		case I8256_REG_TIMER1:
 		case I8256_REG_TIMER2:
 		case I8256_REG_TIMER3:
 		case I8256_REG_TIMER4:
 		case I8256_REG_TIMER5:
-			return m_timers[reg-10];
+			return m_timers[reg - I8256_REG_TIMER1];
 		case I8256_REG_STATUS:
-			return m_status;
+		{
+			const uint8_t status = m_status;
+			if (!machine().side_effects_disabled())
+			{
+				uint8_t clear = I8256_STATUS_OVERRUN_ERROR | I8256_STATUS_PARITY_ERROR | I8256_STATUS_BREAK;
+				// reading the status register does not reset FE in transmission mode
+				if (!BIT(m_modification, I8256_MOD_TME))
+					clear |= I8256_STATUS_FRAMING_ERROR;
+				m_status &= ~clear;
+			}
+			return status;
+		}
 		default:
-			LOG("I8256 Read unmapped register: %u\n", reg);
+			LOG("read unmapped register: %u\n", reg);
 			return 0xff;
 	}
 }
@@ -458,78 +476,141 @@ void i8256_device::write(offs_t offset, uint8_t data)
 {
 	uint8_t reg = offset & 0x0f;
 
-	// In the 8-bit mode, AD0-AD3 are used to select the proper register, while AD1-AD4 are used in the 16-bit mode.
-	// AD4 in the 8-bit mote is ignored as an address.
-
 	if (BIT(m_command1,I8256_CMD1_8086))
 	{
-		if (!BIT(offset,0)) // AD0 in the 16-bit mode is used as a second chip select, active low.
-			reg = (offset >> 1) & 0x0f;
-		else
+		if (BIT(offset, 0))
 			return;
+		reg = (offset >> 1) & 0x0f;
 	}
 
 	switch (reg)
 	{
 		case I8256_REG_CMD1:
-			if (m_command1 != data)
+			if (BIT(m_command1 ^ data, I8256_CMD1_FRQ))
 			{
-				m_command1 = data;
-
-				if (BIT(m_command1,I8256_CMD1_FRQ))
-					m_timer->adjust(attotime::from_hz(1000), 0, attotime::from_hz(1000));
-				else
-					m_timer->adjust(attotime::from_hz(16000), 0, attotime::from_hz(16000));
-
-				if (BIT(m_command1,I8256_CMD1_8086))
-					LOG("I8256 Enabled 8086 mode\n");
+				const int freq = BIT(data, I8256_CMD1_FRQ) ? 1000 : 16000;
+				m_timer->adjust(attotime::from_hz(freq), 0, attotime::from_hz(freq));
 			}
+			m_command1 = data;
+
+			m_data_bits = 8 - (BIT(data, I8256_CMD1_L0) | (BIT(data, I8256_CMD1_L1) << 1));
+			m_stop_sel = (data >> I8256_CMD1_S0) & 3;
+
+			LOGSETUP("CR1: %d data bits, stop bit select %d, %s mode\n",
+					m_data_bits, m_stop_sel, BIT(data, I8256_CMD1_8086) ? "8086" : "8085");
 			break;
+
 		case I8256_REG_CMD2:
-			if (m_command2 != data)
-			{
-				m_command2 = data;
+		{
+			const uint8_t changed = m_command2 ^ data;
+			m_command2 = data;
 
-				LOG("I8256 Clock Scale: %u\n", SYS_CLOCK_DIVIDER[(m_command2 & 0x30 >> 4)]);
-				if ((clock() / SYS_CLOCK_DIVIDER[(m_command2 & 0x30 >> 4)]) != 1024000)
-					logerror("I8256 Internal Clock should be 1024000, calculated: %u\n", (clock() / SYS_CLOCK_DIVIDER[(m_command2 & 0x30 >> 4)]));
-			}
-			break;
-		case I8256_REG_CMD3:
-			m_command3 = data;
-			if (BIT(m_command3,I8256_CMD3_RST))
+			m_parity_enable = BIT(data, I8256_CMD2_PARITY_ENABLE);
+			m_parity_even = BIT(data, I8256_CMD2_EVEN_PARITY);
+
+			LOGSETUP("CR2: %s parity, system clock prescaler /%d, baud select %X\n",
+					m_parity_enable ? (m_parity_even ? "even" : "odd") : "no",
+					SYS_CLOCK_DIVIDER[(data >> 4) & 3], data & 0x0f);
+			if ((clock() / SYS_CLOCK_DIVIDER[(data >> 4) & 3]) != 1'024'000)
+				logerror("internal clock should be 1024000, calculated: %u\n", clock() / SYS_CLOCK_DIVIDER[(data >> 4) & 3]);
+
+			const uint8_t baud = data & 0x0f;
+			if (!(changed & 0x0f))
+				break;
+			switch (baud)
 			{
-				m_status = 0x30;
+				case I8256_BAUD_TXC:
+					m_divide = 1;
+					m_brg_timer->adjust(attotime::never);
+					break;
+				case I8256_BAUD_TXC64:
+					m_divide = 64;
+					m_brg_timer->adjust(attotime::never);
+					break;
+				case I8256_BAUD_TXC32:
+					m_divide = 32;
+					m_brg_timer->adjust(attotime::never);
+					break;
+				default:
+				{
+					// internal baud rate generator; the bit clock is emulated in
+					// 1/32 bit steps, the granularity of the modification register
+					m_divide = 32;
+					const attotime period = attotime::from_hz(BAUD_RATES[baud] * 32);
+					m_brg_timer->adjust(period, 0, period);
+					break;
+				}
 			}
 			break;
+		}
+
+		case I8256_REG_CMD3:
+			// bit 7 high sets any bits which are also high, bit 7 low resets them
+			if (BIT(data, I8256_CMD3_SET))
+				m_command3 |= data & 0x7f;
+			else
+				m_command3 &= ~(data & 0x7f);
+
+			if (BIT(m_command3, I8256_CMD3_RST))
+			{
+				soft_reset();
+				m_command3 &= ~(1 << I8256_CMD3_RST);
+			}
+
+			// nested interrupt mode is not emulated
+			m_command3 &= ~(1 << I8256_CMD3_END);
+			break;
+
 		case I8256_REG_MODE:
 			m_mode = data;
 			break;
+
 		case I8256_REG_PORT1C:
 			m_port1_control = data;
 			break;
+
+		case I8256_REG_INTEN: // set interrupts
+			m_int_enable |= data;
+			break;
+
+		case I8256_REG_INTAD: // reset interrupts
+			m_int_enable &= ~data;
+			m_int_request &= ~data;
+			update_int();
+			break;
+
 		case I8256_REG_BUFFER:
-			LOGTX("I8256 write serial: %u\n", data);
+			LOGTX("transmitter buffer %02X\n", data);
 			m_tx_buffer = data;
+			m_status &= ~I8256_STATUS_TB_EMPTY;
 			break;
+
 		case I8256_REG_PORT1:
-			m_port1_int = data;
+			p1_w(data);
 			break;
+
 		case I8256_REG_PORT2:
-			m_port2_int = data;
+			p2_w(data);
 			break;
+
 		case I8256_REG_TIMER1:
 		case I8256_REG_TIMER2:
 		case I8256_REG_TIMER3:
 		case I8256_REG_TIMER4:
 		case I8256_REG_TIMER5:
-			m_timers[reg-10] = data;
+			m_timers[reg - I8256_REG_TIMER1] = data;
 			break;
-		case I8256_REG_STATUS:
-			m_modification = data;
+
+		case I8256_REG_STATUS: // modification register
+			m_modification = data & 0x7f;
+			m_rx_sample = (BIT(data, I8256_MOD_RS4) ? 32 : 16) - ((data >> I8256_MOD_RS0) & 0x0f);
+			LOGSETUP("modification: sample point %d/32%s%s\n", m_rx_sample,
+					BIT(data, I8256_MOD_DSC) ? ", start bit check disabled" : "",
+					BIT(data, I8256_MOD_TME) ? ", transmission mode" : "");
 			break;
+
 		default:
-			LOG("I8256 Unmapped write %02x to %02x\n", data, reg);
+			LOG("unmapped write %02X to %02X\n", data, reg);
 			break;
 	}
 }
