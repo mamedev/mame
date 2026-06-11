@@ -77,6 +77,10 @@ private:
 
 	void soft_reset();
 
+	void transmitter_tick();
+	uint16_t stop_length() const;
+	void output_txd(int state);
+
 	void request_interrupt(int level);
 	int acknowledge();
 	void update_int();

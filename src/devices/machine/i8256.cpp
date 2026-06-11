@@ -161,14 +161,14 @@ enum // Upper / Lower
 
 enum
 {
-	I8256_STATUS_FRAMING_ERROR,
-	I8256_STATUS_OVERRUN_ERROR,
-	I8256_STATUS_PARITY_ERROR,
-	I8256_STATUS_BREAK,
-	I8256_STATUS_TR_EMPTY,
-	I8256_STATUS_TB_EMPTY,
-	I8256_STATUS_RB_FULL,
-	I8256_STATUS_INT
+	I8256_STATUS_FRAMING_ERROR  = 0x01,
+	I8256_STATUS_OVERRUN_ERROR  = 0x02,
+	I8256_STATUS_PARITY_ERROR   = 0x04,
+	I8256_STATUS_BREAK          = 0x08,
+	I8256_STATUS_TR_EMPTY       = 0x10,
+	I8256_STATUS_TB_EMPTY       = 0x20,
+	I8256_STATUS_RB_FULL        = 0x40,
+	I8256_STATUS_INT            = 0x80
 };
 
 enum
@@ -295,7 +295,7 @@ void i8256_device::device_reset()
 
 void i8256_device::soft_reset()
 {
-	m_status = 1 << I8256_STATUS_TR_EMPTY | 1 << I8256_STATUS_TB_EMPTY;
+	m_status = I8256_STATUS_TR_EMPTY | I8256_STATUS_TB_EMPTY;
 	m_int_enable = 0;
 	m_int_request = 0;
 
@@ -669,12 +669,131 @@ void i8256_device::p2_w(uint8_t data)
 }
 
 //**************************************************************************
+//  SERIAL TRANSMITTER
+//**************************************************************************
+
+uint16_t i8256_device::stop_length() const
+{
+	switch (m_stop_sel)
+	{
+	default:
+	case I8256_STOP_1:   return m_divide;
+	case I8256_STOP_15:  return m_divide + m_divide / 2;
+	case I8256_STOP_2:   return m_divide * 2;
+	case I8256_STOP_075: return std::max<u16>(1, (m_divide * 3) / 4);
+	}
+}
+
+void i8256_device::output_txd(int state)
+{
+	if (m_txd != state)
+	{
+		m_txd = state;
+		m_txd_handler(state);
+	}
+}
+
+void i8256_device::transmitter_tick()
+{
+	m_tx_counter++;
+
+	switch (m_tx_state)
+	{
+	case I8256_STATE_START:
+		m_tx_counter = 0;
+
+		if (BIT(m_command3, I8256_CMD3_TBRK))
+		{
+			// continuous break, inhibits buffer transfers until cleared
+			output_txd(0);
+		}
+		else if (BIT(m_command3, I8256_CMD3_SBRK))
+		{
+			// single character break: start, data, parity and stop bits all low
+			LOGTX("TX single character break\n");
+			m_tx_break = true;
+			m_tx_bits = 0;
+			m_status &= ~I8256_STATUS_TR_EMPTY;
+			m_tx_state = I8256_STATE_DATA;
+			output_txd(0);
+		}
+		else if (!(m_status & I8256_STATUS_TB_EMPTY) && !m_cts)
+		{
+			// transfer the buffer to the transmitter register
+			m_tx_shift = m_tx_buffer;
+			LOGTX("TX character %02X\n", m_tx_shift);
+			m_tx_break = false;
+			m_tx_bits = 0;
+			m_tx_parity = false;
+			m_status |= I8256_STATUS_TB_EMPTY;
+			m_status &= ~I8256_STATUS_TR_EMPTY;
+			request_interrupt(I8256_INT_TX);
+			m_tx_state = I8256_STATE_DATA;
+			output_txd(0); // start bit
+		}
+		else
+			output_txd(1);
+		break;
+
+	case I8256_STATE_DATA:
+		if (m_tx_counter >= m_divide)
+		{
+			m_tx_counter = 0;
+
+			if (m_tx_bits < m_data_bits)
+			{
+				const int bit = m_tx_break ? 0 : BIT(m_tx_shift, m_tx_bits);
+				m_tx_bits++;
+				if (bit)
+					m_tx_parity = !m_tx_parity;
+				output_txd(bit);
+			}
+			else if (m_tx_bits == m_data_bits && m_parity_enable)
+			{
+				m_tx_bits++;
+				const bool parity = m_parity_even ? m_tx_parity : !m_tx_parity;
+				output_txd(m_tx_break ? 0 : parity);
+			}
+			else
+			{
+				m_tx_state = I8256_STATE_STOP;
+				output_txd(m_tx_break ? 0 : 1);
+			}
+		}
+		break;
+
+	case I8256_STATE_STOP:
+		if (m_tx_counter >= stop_length())
+		{
+			m_tx_counter = 0;
+			m_tx_state = I8256_STATE_START;
+
+			if (m_tx_break)
+			{
+				// SBRK is automatically cleared after one character time of break
+				m_command3 &= ~(1 << I8256_CMD3_SBRK);
+				m_tx_break = false;
+				output_txd(1);
+			}
+
+			m_status |= I8256_STATUS_TR_EMPTY;
+			// TRE generates an interrupt when the transmitter register finished
+			// transmitting and the buffer is empty
+			if (m_status & I8256_STATUS_TB_EMPTY)
+				request_interrupt(I8256_INT_TX);
+		}
+		break;
+	}
+}
+
+//**************************************************************************
 //  SERIAL CLOCKING
 //**************************************************************************
 
 TIMER_CALLBACK_MEMBER(i8256_device::brg_tick)
 {
 	LOG("I8256 BRG Tick\n");
+	transmitter_tick();
 }
 
 void i8256_device::write_rxd(int state)
