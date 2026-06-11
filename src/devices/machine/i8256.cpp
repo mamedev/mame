@@ -196,20 +196,21 @@ DEFINE_DEVICE_TYPE(I8256, i8256_device, "intel_8256", "Intel 8256AH Multifunctio
 
 i8256_device::i8256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, I8256, tag, owner, clock),
-	m_in_inta_cb(*this, 0),
 	m_out_int_cb(*this),
-	m_in_extint_cb(*this, 0),
 	m_txd_handler(*this),
-	m_in_p2_cb(*this, 0),
-	m_out_p2_cb(*this),
 	m_in_p1_cb(*this, 0),
 	m_out_p1_cb(*this),
+	m_in_p2_cb(*this, 0),
+	m_out_p2_cb(*this),
 	m_timer(nullptr),
 	m_brg_timer(nullptr),
 	m_rxd(1),
-	m_cts(1),
+	m_cts(0),
+	m_extint(0),
 	m_rxc(0),
-	m_txc(0)
+	m_txc(0),
+	m_int_state(false),
+	m_txd(1)
 {
 }
 
