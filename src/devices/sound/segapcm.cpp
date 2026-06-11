@@ -61,16 +61,25 @@ void sega_315_5218_device::map(address_map &map)
 }
 
 //-------------------------------------------------
+//  segapcm_base_device - constructor
+//-------------------------------------------------
+
+segapcm_base_device::segapcm_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, device_rom_interface<21>(mconfig, *this)
+	, m_ram(*this, "ram")
+	, m_stream(nullptr)
+{
+}
+
+//-------------------------------------------------
 //  segapcm_device - constructor
 //-------------------------------------------------
 
-template<unsigned MaxVoices, unsigned Divider, unsigned AddrBits>
-segapcm_device<MaxVoices, Divider, AddrBits>::segapcm_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
-	, device_sound_interface(mconfig, *this)
-	, device_rom_interface<AddrBits>(mconfig, *this)
-	, m_ram(*this, "ram")
-	, m_stream(nullptr)
+template<unsigned MaxVoices>
+segapcm_device<MaxVoices>::segapcm_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: segapcm_base_device(mconfig, type, tag, owner, clock)
 {
 }
 
@@ -79,7 +88,7 @@ segapcm_device<MaxVoices, Divider, AddrBits>::segapcm_device(const machine_confi
 //-------------------------------------------------
 
 segapcm_discrete_device::segapcm_discrete_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segapcm_device<8, 64, 16>(mconfig, SEGAPCM_DISCRETE, tag, owner, clock)
+	: segapcm_device<8>(mconfig, SEGAPCM_DISCRETE, tag, owner, clock)
 {
 }
 
@@ -88,7 +97,7 @@ segapcm_discrete_device::segapcm_discrete_device(const machine_config &mconfig, 
 //-------------------------------------------------
 
 sega_315_5218_device::sega_315_5218_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segapcm_device<16, 128, 21>(mconfig, SEGA_315_5218, tag, owner, clock)
+	: segapcm_device<16>(mconfig, SEGA_315_5218, tag, owner, clock)
 	, m_bankshift(12)
 	, m_bankmask(0x70)
 {
@@ -99,10 +108,15 @@ sega_315_5218_device::sega_315_5218_device(const machine_config &mconfig, const 
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-template<unsigned MaxVoices, unsigned Divider, unsigned AddrBits>
-void segapcm_device<MaxVoices, Divider, AddrBits>::device_start()
+void segapcm_base_device::device_start()
 {
 	std::fill_n(&m_ram[0], m_ram.length(), 0xff);
+}
+
+template<unsigned MaxVoices>
+void segapcm_device<MaxVoices>::device_start()
+{
+	segapcm_base_device::device_start();
 
 	m_stream = stream_alloc(0, 2, clock() / CLOCK_DIVIDER);
 
@@ -126,8 +140,8 @@ void segapcm_device<MaxVoices, Divider, AddrBits>::device_start()
 //  changes
 //-------------------------------------------------
 
-template<unsigned MaxVoices, unsigned Divider, unsigned AddrBits>
-void segapcm_device<MaxVoices, Divider, AddrBits>::device_clock_changed()
+template<unsigned MaxVoices>
+void segapcm_device<MaxVoices>::device_clock_changed()
 {
 	m_stream->set_sample_rate(clock() / CLOCK_DIVIDER);
 }
@@ -138,8 +152,7 @@ void segapcm_device<MaxVoices, Divider, AddrBits>::device_clock_changed()
 //  ROM banking changes
 //-------------------------------------------------
 
-template<unsigned MaxVoices, unsigned Divider, unsigned AddrBits>
-void segapcm_device<MaxVoices, Divider, AddrBits>::rom_bank_pre_change()
+void segapcm_base_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }
@@ -149,27 +162,26 @@ void segapcm_device<MaxVoices, Divider, AddrBits>::rom_bank_pre_change()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-template<unsigned MaxVoices, unsigned Divider, unsigned AddrBits>
-void segapcm_device<MaxVoices, Divider, AddrBits>::sound_stream_update(sound_stream &stream)
+template<unsigned MaxVoices>
+void segapcm_device<MaxVoices>::sound_stream_update(sound_stream &stream)
 {
 	/* loop over streams */
 	for (int i = 0; i < stream.samples(); i++)
 	{
 		int32_t lout = 0, rout = 0;
-		for (int ch = 0; ch < MAX_VOICES; ch++)
+		for (auto &elem : m_voice)
 		{
-			voice_t &voice = m_voice[ch];
-			voice.tick();
-			lout += voice.lout;
-			rout += voice.rout;
+			elem.tick();
+			lout += elem.lout;
+			rout += elem.rout;
 		}
 		stream.put_int(0, i, lout, 32768);
 		stream.put_int(1, i, rout, 32768);
 	}
 }
 
-template<unsigned MaxVoices, unsigned Divider, unsigned AddrBits>
-void segapcm_device<MaxVoices, Divider, AddrBits>::voice_t::tick()
+template<unsigned MaxVoices>
+void segapcm_device<MaxVoices>::voice_t::tick()
 {
 	// only process active channels
 	lout = rout = 0;
@@ -199,8 +211,8 @@ void segapcm_device<MaxVoices, Divider, AddrBits>::voice_t::tick()
 }
 
 // read/write handlers
-template<unsigned MaxVoices, unsigned Divider, unsigned AddrBits>
-uint8_t segapcm_device<MaxVoices, Divider, AddrBits>::voice_addr_r(offs_t offset)
+template<unsigned MaxVoices>
+uint8_t segapcm_device<MaxVoices>::voice_addr_r(offs_t offset)
 {
 	m_stream->update();
 	voice_t &voice = m_voice[offset >> 3];
@@ -208,8 +220,8 @@ uint8_t segapcm_device<MaxVoices, Divider, AddrBits>::voice_addr_r(offs_t offset
 	return (voice.addr >> shift) & 0xff;
 }
 
-template<unsigned MaxVoices, unsigned Divider, unsigned AddrBits>
-uint8_t segapcm_device<MaxVoices, Divider, AddrBits>::voice_loop_r(offs_t offset)
+template<unsigned MaxVoices>
+uint8_t segapcm_device<MaxVoices>::voice_loop_r(offs_t offset)
 {
 	m_stream->update();
 	voice_t &voice = m_voice[offset >> 3];
@@ -217,48 +229,48 @@ uint8_t segapcm_device<MaxVoices, Divider, AddrBits>::voice_loop_r(offs_t offset
 	return (voice.loop >> shift) & 0xff;
 }
 
-template<unsigned MaxVoices, unsigned Divider, unsigned AddrBits>
-uint8_t segapcm_device<MaxVoices, Divider, AddrBits>::voice_end_r(offs_t offset)
+template<unsigned MaxVoices>
+uint8_t segapcm_device<MaxVoices>::voice_end_r(offs_t offset)
 {
 	m_stream->update();
 	voice_t &voice = m_voice[offset >> 3];
 	return voice.end;
 }
 
-template<unsigned MaxVoices, unsigned Divider, unsigned AddrBits>
-uint8_t segapcm_device<MaxVoices, Divider, AddrBits>::voice_freq_r(offs_t offset)
+template<unsigned MaxVoices>
+uint8_t segapcm_device<MaxVoices>::voice_freq_r(offs_t offset)
 {
 	m_stream->update();
 	voice_t &voice = m_voice[offset >> 3];
 	return voice.freq;
 }
 
-template<unsigned MaxVoices, unsigned Divider, unsigned AddrBits>
-uint8_t segapcm_device<MaxVoices, Divider, AddrBits>::voice_lvol_r(offs_t offset)
+template<unsigned MaxVoices>
+uint8_t segapcm_device<MaxVoices>::voice_lvol_r(offs_t offset)
 {
 	m_stream->update();
 	voice_t &voice = m_voice[offset >> 3];
 	return voice.lvol;
 }
 
-template<unsigned MaxVoices, unsigned Divider, unsigned AddrBits>
-uint8_t segapcm_device<MaxVoices, Divider, AddrBits>::voice_rvol_r(offs_t offset)
+template<unsigned MaxVoices>
+uint8_t segapcm_device<MaxVoices>::voice_rvol_r(offs_t offset)
 {
 	m_stream->update();
 	voice_t &voice = m_voice[offset >> 3];
 	return voice.rvol;
 }
 
-template<unsigned MaxVoices, unsigned Divider, unsigned AddrBits>
-uint8_t segapcm_device<MaxVoices, Divider, AddrBits>::voice_ctrl_r(offs_t offset)
+template<unsigned MaxVoices>
+uint8_t segapcm_device<MaxVoices>::voice_ctrl_r(offs_t offset)
 {
 	m_stream->update();
 	voice_t &voice = m_voice[offset >> 3];
 	return voice.ctrl;
 }
 
-template<unsigned MaxVoices, unsigned Divider, unsigned AddrBits>
-void segapcm_device<MaxVoices, Divider, AddrBits>::voice_addr_w(offs_t offset, uint8_t data)
+template<unsigned MaxVoices>
+void segapcm_device<MaxVoices>::voice_addr_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 	voice_t &voice = m_voice[offset >> 3];
@@ -266,8 +278,8 @@ void segapcm_device<MaxVoices, Divider, AddrBits>::voice_addr_w(offs_t offset, u
 	voice.addr = (voice.addr & ~(0xff << shift)) | (uint32_t(data) << shift);
 }
 
-template<unsigned MaxVoices, unsigned Divider, unsigned AddrBits>
-void segapcm_device<MaxVoices, Divider, AddrBits>::voice_loop_w(offs_t offset, uint8_t data)
+template<unsigned MaxVoices>
+void segapcm_device<MaxVoices>::voice_loop_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 	voice_t &voice = m_voice[offset >> 3];
@@ -275,40 +287,40 @@ void segapcm_device<MaxVoices, Divider, AddrBits>::voice_loop_w(offs_t offset, u
 	voice.loop = (voice.loop & ~(0xff << shift)) | (uint32_t(data) << shift);
 }
 
-template<unsigned MaxVoices, unsigned Divider, unsigned AddrBits>
-void segapcm_device<MaxVoices, Divider, AddrBits>::voice_end_w(offs_t offset, uint8_t data)
+template<unsigned MaxVoices>
+void segapcm_device<MaxVoices>::voice_end_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 	voice_t &voice = m_voice[offset >> 3];
 	voice.end = data;
 }
 
-template<unsigned MaxVoices, unsigned Divider, unsigned AddrBits>
-void segapcm_device<MaxVoices, Divider, AddrBits>::voice_freq_w(offs_t offset, uint8_t data)
+template<unsigned MaxVoices>
+void segapcm_device<MaxVoices>::voice_freq_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 	voice_t &voice = m_voice[offset >> 3];
 	voice.freq = data;
 }
 
-template<unsigned MaxVoices, unsigned Divider, unsigned AddrBits>
-void segapcm_device<MaxVoices, Divider, AddrBits>::voice_lvol_w(offs_t offset, uint8_t data)
+template<unsigned MaxVoices>
+void segapcm_device<MaxVoices>::voice_lvol_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 	voice_t &voice = m_voice[offset >> 3];
 	voice.lvol = data;
 }
 
-template<unsigned MaxVoices, unsigned Divider, unsigned AddrBits>
-void segapcm_device<MaxVoices, Divider, AddrBits>::voice_rvol_w(offs_t offset, uint8_t data)
+template<unsigned MaxVoices>
+void segapcm_device<MaxVoices>::voice_rvol_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 	voice_t &voice = m_voice[offset >> 3];
 	voice.rvol = data;
 }
 
-template<unsigned MaxVoices, unsigned Divider, unsigned AddrBits>
-void segapcm_device<MaxVoices, Divider, AddrBits>::voice_ctrl_w(offs_t offset, uint8_t data)
+template<unsigned MaxVoices>
+void segapcm_device<MaxVoices>::voice_ctrl_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 	voice_t &voice = m_voice[offset >> 3];
@@ -316,5 +328,5 @@ void segapcm_device<MaxVoices, Divider, AddrBits>::voice_ctrl_w(offs_t offset, u
 }
 
 // template class definition
-template class segapcm_device<8, 64, 16>;
-template class segapcm_device<16, 128, 21>;
+template class segapcm_device<8>;
+template class segapcm_device<16>;
