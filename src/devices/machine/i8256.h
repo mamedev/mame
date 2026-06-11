@@ -58,7 +58,7 @@ public:
 	void write_cts(int state);
 	void write_txc(int state);
 
-	void write(offs_t offset, u8 data);
+	void write(offs_t offset, uint8_t data);
 	uint8_t read(offs_t offset);
 
 	uint8_t p1_r();
@@ -82,24 +82,48 @@ private:
 	devcb_read8 m_in_p1_cb;
 	devcb_write8 m_out_p1_cb;
 
-	int32_t m_rxc;
-	int32_t m_rxd;
-	int32_t m_cts;
-	int32_t m_txc;
-
-	uint8_t m_command1, m_command2, m_command3;
-
-	uint8_t m_mode;
-	uint8_t m_port1_control;
-	uint8_t m_interrupts, m_current_interrupt_level;
-	uint8_t m_tx_buffer, m_rx_buffer;
-	uint8_t m_port1_int, m_port2_int;
-	uint8_t m_timers[5];
 	emu_timer *m_timer;
 
-	uint8_t m_status, m_modification;
+	// registers
+	uint8_t m_command1, m_command2, m_command3;
+	uint8_t m_mode;
+	uint8_t m_port1_control;
+	uint8_t m_modification;
+	uint8_t m_int_enable, m_int_request;
+	uint8_t m_status;
+	uint8_t m_rx_buffer, m_tx_buffer;
+	uint8_t m_port1_int, m_port2_int;
+	uint8_t m_timers[5];
 
-	TIMER_CALLBACK_MEMBER(timer_check);
+	// serial frame settings
+	uint8_t m_data_bits;
+	bool m_parity_enable, m_parity_even;
+	uint8_t m_stop_sel;
+	u16 m_divide;
+	uint8_t m_rx_sample;
+
+	// input line states
+	uint8_t m_rxd, m_cts, m_extint;
+	uint8_t m_rxc, m_txc;
+
+	// interrupt output
+	bool m_int_state;
+
+	// receiver
+	uint8_t m_rx_state;
+	u16 m_rx_counter;
+	uint8_t m_rx_bits;
+	u16 m_rx_shift;
+	bool m_rx_parity;
+
+	// transmitter
+	uint8_t m_tx_state;
+	u16 m_tx_counter;
+	uint8_t m_tx_bits;
+	uint8_t m_tx_shift;
+	bool m_tx_parity;
+	bool m_tx_break;
+	uint8_t m_txd;
 };
 
 DECLARE_DEVICE_TYPE(I8256, i8256_device)

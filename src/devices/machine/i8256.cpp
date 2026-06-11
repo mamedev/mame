@@ -182,6 +182,14 @@ enum
 	I8256_MOD_RS4,
 	I8256_MOD_0
 };
+
+enum
+{
+	I8256_STATE_START,
+	I8256_STATE_DATA,
+	I8256_STATE_STOP,
+	I8256_STATE_BREAK
+};
 } // anonymous namespace
 
 DEFINE_DEVICE_TYPE(I8256, i8256_device, "intel_8256", "Intel 8256AH Multifunction microprocessor support controller")
@@ -196,33 +204,60 @@ i8256_device::i8256_device(const machine_config &mconfig, const char *tag, devic
 	m_out_p2_cb(*this),
 	m_in_p1_cb(*this, 0),
 	m_out_p1_cb(*this),
-	m_rxc(0),
+	m_timer(nullptr),
 	m_rxd(1),
 	m_cts(1),
-	m_txc(0),
-	m_timer(nullptr)
+	m_rxc(0),
+	m_txc(0)
 {
 }
 
 void i8256_device::device_start()
 {
-	// FIXME: not everything that needs to be is saved here
 	save_item(NAME(m_command1));
 	save_item(NAME(m_command2));
 	save_item(NAME(m_command3));
 	save_item(NAME(m_mode));
 	save_item(NAME(m_port1_control));
-	save_item(NAME(m_interrupts));
-	save_item(NAME(m_current_interrupt_level));
+	save_item(NAME(m_modification));
+	save_item(NAME(m_int_enable));
+	save_item(NAME(m_int_request));
+	save_item(NAME(m_status));
 	save_item(NAME(m_rx_buffer));
 	save_item(NAME(m_tx_buffer));
 	save_item(NAME(m_port1_int));
 	save_item(NAME(m_port2_int));
 	save_item(NAME(m_timers));
-	save_item(NAME(m_status));
 
-	m_timer = timer_alloc(FUNC(i8256_device::timer_check), this);
+	save_item(NAME(m_data_bits));
+	save_item(NAME(m_parity_enable));
+	save_item(NAME(m_parity_even));
+	save_item(NAME(m_stop_sel));
+	save_item(NAME(m_divide));
+	save_item(NAME(m_rx_sample));
+
+	save_item(NAME(m_rxd));
+	save_item(NAME(m_cts));
+	save_item(NAME(m_extint));
+	save_item(NAME(m_rxc));
+	save_item(NAME(m_txc));
+	save_item(NAME(m_int_state));
+
+	save_item(NAME(m_rx_state));
+	save_item(NAME(m_rx_counter));
+	save_item(NAME(m_rx_bits));
+	save_item(NAME(m_rx_shift));
+	save_item(NAME(m_rx_parity));
+
+	save_item(NAME(m_tx_state));
+	save_item(NAME(m_tx_counter));
+	save_item(NAME(m_tx_bits));
+	save_item(NAME(m_tx_shift));
+	save_item(NAME(m_tx_parity));
+	save_item(NAME(m_tx_break));
+	save_item(NAME(m_txd));
 }
+
 
 void i8256_device::device_reset()
 {
@@ -231,33 +266,21 @@ void i8256_device::device_reset()
 	m_command3 = 0;
 	m_mode = 0;
 	m_port1_control = 0;
-	m_interrupts = 0;
+	m_modification = 0;
 
-	m_tx_buffer = 0;
+	m_data_bits = 8;
+	m_parity_enable = false;
+	m_parity_even = false;
+	m_stop_sel = I8256_STOP_1;
+	m_divide = 1;
+	m_rx_sample = 16; // sample at bit center
+
 	m_rx_buffer = 0;
+	m_tx_buffer = 0;
 	m_port1_int = 0;
 	m_port2_int = 0;
+
 	memset(m_timers, 0, sizeof(m_timers));
-
-	m_status = 0x30; // TRE and TBE
-
-	m_timer->adjust(attotime::from_hz(16000), 0, attotime::from_hz(16000));
-}
-
-TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
-{
-	for (int i = 0; i < 5; ++i)
-	{
-		if (m_timers[i] > 0)
-		{
-			m_timers[i]--;
-			if (m_timers[i] == 0 && BIT(m_interrupts,timer_interrupt[i])) // If the interrupt is enabled
-			{
-				m_current_interrupt_level = timer_interrupt[i];
-				m_out_int_cb(1); // it occurs when the counter changes from 1 to 0.
-			}
-		}
-	}
 }
 
 uint8_t i8256_device::read(offs_t offset)
@@ -267,7 +290,7 @@ uint8_t i8256_device::read(offs_t offset)
 	if (BIT(m_command1,I8256_CMD1_8086))
 		offset = offset >> 1;
 
-	u8 reg = offset & 0x0f;
+	uint8_t reg = offset & 0x0f;
 
 	switch (reg)
 	{
@@ -281,11 +304,6 @@ uint8_t i8256_device::read(offs_t offset)
 		   return m_mode;
 		case I8256_REG_PORT1C:
 			return m_port1_control;
-		case I8256_REG_INTEN:
-			return m_interrupts;
-		case I8256_REG_INTAD:
-			m_out_int_cb(0);
-			return m_current_interrupt_level*4;
 		case I8256_REG_BUFFER:
 			return m_rx_buffer;
 		case I8256_REG_PORT1:
@@ -306,9 +324,9 @@ uint8_t i8256_device::read(offs_t offset)
 	}
 }
 
-void i8256_device::write(offs_t offset, u8 data)
+void i8256_device::write(offs_t offset, uint8_t data)
 {
-	u8 reg = offset & 0x0f;
+	uint8_t reg = offset & 0x0f;
 
 	// In the 8-bit mode, AD0-AD3 are used to select the proper register, while AD1-AD4 are used in the 16-bit mode.
 	// AD4 in the 8-bit mote is ignored as an address.
@@ -351,7 +369,6 @@ void i8256_device::write(offs_t offset, u8 data)
 			m_command3 = data;
 			if (BIT(m_command3,I8256_CMD3_RST))
 			{
-				m_interrupts = 0;
 				m_status = 0x30;
 			}
 			break;
@@ -360,12 +377,6 @@ void i8256_device::write(offs_t offset, u8 data)
 			break;
 		case I8256_REG_PORT1C:
 			m_port1_control = data;
-			break;
-		case I8256_REG_INTEN:
-			m_interrupts = m_interrupts | data;
-			break;
-		case I8256_REG_INTAD: // reset interrupt
-			m_interrupts = m_interrupts & ~data;
 			break;
 		case I8256_REG_BUFFER:
 			LOGTX("I8256 write serial: %u\n", data);
