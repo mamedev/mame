@@ -34,10 +34,8 @@
 
 #pragma once
 
-#include "diserial.h"
 
-
-class i8256_device : public device_t, public device_serial_interface
+class i8256_device : public device_t
 {
 public:
 	static constexpr flags_type emulation_flags() { return flags::SAVE_UNSUPPORTED; }
@@ -90,9 +88,6 @@ private:
 	int32_t m_txc;
 
 	uint8_t m_command1, m_command2, m_command3;
-	uint8_t m_data_bits_count;
-	parity_t m_parity;
-	stop_bits_t m_stop_bits;
 
 	uint8_t m_mode;
 	uint8_t m_port1_control;
@@ -104,22 +99,7 @@ private:
 
 	uint8_t m_status, m_modification;
 
-	uint8_t m_sync_byte_count, m_rxc_count, m_txc_count;
-	uint8_t m_br_factor;
-	uint8_t m_rxd_bits;
-	uint8_t m_rx_data, m_tx_data;
-	uint8_t m_sync1, m_sync2, m_sync8, m_sync16;
-
 	TIMER_CALLBACK_MEMBER(timer_check);
-
-	void receive_clock();
-	void sync1_rxc();
-	void sync2_rxc();
-	bool is_tx_enabled();
-	void check_for_tx_start();
-	void start_tx();
-	void transmit_clock();
-	void receive_character(uint8_t ch);
 };
 
 DECLARE_DEVICE_TYPE(I8256, i8256_device)
