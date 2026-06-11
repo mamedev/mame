@@ -9,8 +9,18 @@
 #include "emu.h"
 #include "i8256.h"
 
-//#define VERBOSE 1
+#define LOG_SETUP (1U << 1)
+#define LOG_RX    (1U << 2)
+#define LOG_TX    (1U << 3)
+#define LOG_INT   (1U << 4)
+
+//#define VERBOSE (LOG_GENERAL | LOG_SETUP)
 #include "logmacro.h"
+
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP, __VA_ARGS__)
+#define LOGRX(...)    LOGMASKED(LOG_RX,    __VA_ARGS__)
+#define LOGTX(...)    LOGMASKED(LOG_TX,    __VA_ARGS__)
+#define LOGINT(...)   LOGMASKED(LOG_INT,   __VA_ARGS__)
 
 
 namespace {
@@ -364,7 +374,7 @@ void i8256_device::write(offs_t offset, u8 data)
 			m_interrupts = m_interrupts & ~data;
 			break;
 		case I8256_REG_BUFFER:
-			LOG("I8256 write serial: %u\n", data);
+			LOGTX("I8256 write serial: %u\n", data);
 			m_tx_buffer = data;
 			break;
 		case I8256_REG_PORT1:
@@ -439,7 +449,7 @@ void i8256_device::p2_w(uint8_t data)
 void i8256_device::write_rxd(int state)
 {
 	m_rxd = state ? 1 : 0;
-	LOG("I8256: Presented a %d\n", m_rxd);
+	LOGRX("I8256: Presented a %d\n", m_rxd);
 }
 
 void i8256_device::write_cts(int state)
