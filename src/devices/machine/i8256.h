@@ -71,6 +71,8 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
+	void soft_reset();
+
 	devcb_read_line m_in_inta_cb;
 	devcb_write_line m_out_int_cb;
 	devcb_read_line m_in_extint_cb;
@@ -83,6 +85,7 @@ private:
 	devcb_write8 m_out_p1_cb;
 
 	emu_timer *m_timer;
+	emu_timer *m_brg_timer;
 
 	// registers
 	uint8_t m_command1, m_command2, m_command3;
