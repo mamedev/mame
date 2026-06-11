@@ -664,7 +664,20 @@ uint8_t i8256_device::p1_r()
 void i8256_device::p1_w(uint8_t data)
 {
 	// all bits are latched; input pins output the latch if the direction is changed later
+	const uint8_t prev = m_port1_int;
 	m_port1_int = data;
+
+	// with BITI set, a low-to-high transition on P17 generates the
+	// level 1 interrupt in place of timer 2
+	if (BIT(m_command1, I8256_CMD1_BITI) && !BIT(prev, 7) && BIT(data, 7))
+		request_interrupt(I8256_INT_TIMER2);
+
+	// event counters 2 and 3 decrement on high-to-low transitions of P12 and P13
+	if (BIT(m_mode, I8256_MODE_CT2) && BIT(prev, 2) && !BIT(data, 2))
+		count_timer(1);
+	if (BIT(m_mode, I8256_MODE_CT3) && BIT(prev, 3) && !BIT(data, 3))
+		count_timer(2);
+
 	m_out_p1_cb(0, m_port1_int & m_port1_control);
 }
 
@@ -680,8 +693,19 @@ uint8_t i8256_device::p2_r()
 			return (m_in_p2_cb(0) & 0x0f) | (m_port2_int & 0xf0);
 		case I8256_PORT2C_OO:
 			return m_port2_int;
-		default: // TODO: input and handshake modes
+		case I8256_PORT2C_HI:
+			// TODO: byte handshake input (STB/IBF on port 1)
+			return m_in_p2_cb(0);
+		case I8256_PORT2C_HO:
+			// TODO: byte handshake output (ACK/OBF on port 1)
 			return m_port2_int;
+		case I8256_PORT2C_TEST:
+			// TODO: test mode places the baud rate generator output on port 1 P14
+			return 0;
+		case I8256_PORT2C_DNU:
+		default:
+			// "do not use"
+			return 0;
 	}
 }
 
