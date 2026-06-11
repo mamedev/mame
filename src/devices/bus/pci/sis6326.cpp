@@ -379,6 +379,9 @@ uint32_t sis6326_pci_device::GetROP(uint8_t rop, uint32_t src, uint32_t dst, uin
 		case 0xa0:  // DPa (win98se help tooltip borders)
 			ret = dst & pat;
 			break;
+		case 0xa5:  // PDxn (moving kana drawing window in jp win98se, keyboard 3rd option)
+			ret = ~(pat ^ dst);
+			break;
 		case 0xaa:  // D
 			ret = dst;
 			break;
