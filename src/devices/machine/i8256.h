@@ -71,6 +71,9 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
+	TIMER_CALLBACK_MEMBER(timer_check);
+	TIMER_CALLBACK_MEMBER(brg_tick);
+	
 	void soft_reset();
 
 	devcb_read_line m_in_inta_cb;

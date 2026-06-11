@@ -215,6 +215,9 @@ i8256_device::i8256_device(const machine_config &mconfig, const char *tag, devic
 
 void i8256_device::device_start()
 {
+	m_timer = timer_alloc(FUNC(i8256_device::timer_check), this);
+	m_brg_timer = timer_alloc(FUNC(i8256_device::brg_tick), this);
+
 	save_item(NAME(m_command1));
 	save_item(NAME(m_command2));
 	save_item(NAME(m_command3));
@@ -307,6 +310,24 @@ void i8256_device::soft_reset()
 	m_tx_shift = 0;
 	m_tx_parity = false;
 	m_tx_break = false;
+}
+
+TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
+{
+	for (int i = 0; i < 5; i++)
+	{
+		if (m_timers[i] > 0)
+		{
+			m_timers[i]--;
+			if (m_timers[i] == 0)
+			{
+				// the interrupt occurs when the counter changes from 1 to 0
+				LOG("I8256 Timer %u\n", i);
+				// timer interrupts are automatically disabled when the request is generated
+				m_int_enable &= ~(1 << timer_interrupt[i]);
+			}
+		}
+	}
 }
 
 uint8_t i8256_device::read(offs_t offset)
@@ -476,6 +497,14 @@ void i8256_device::p2_w(uint8_t data)
 		m_out_p2_cb(0, port2_data);
 }
 
+//**************************************************************************
+//  SERIAL CLOCKING
+//**************************************************************************
+
+TIMER_CALLBACK_MEMBER(i8256_device::brg_tick)
+{
+	LOG("I8256 BRG Tick\n");
+}
 
 void i8256_device::write_rxd(int state)
 {
