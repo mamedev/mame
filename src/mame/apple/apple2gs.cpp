@@ -307,8 +307,6 @@ private:
 
 	bool m_adb_line = false;
 
-	address_space *m_maincpu_space = nullptr;
-
 	// align timing to match observed hardware behavior
 	static constexpr int ALIGN_VBL = 4;
 	static constexpr int ALIGN_CNT = 2;
@@ -858,8 +856,6 @@ void apple2gs_state::machine_reset()
 	m_sndglu_ctrl = 0;
 	m_sndglu_addr = 0;
 	m_sndglu_dummy_read = 0;
-
-	m_maincpu_space = &m_maincpu->space(AS_PROGRAM);
 
 	m_b0_0000bank.select(0);
 	m_e0_0000bank.select(0);
@@ -2376,6 +2372,7 @@ u8 apple2gs_state::read_slot_rom(int slotbias, int offset)
 	const int slotnum = ((offset>>8) & 0xf) + slotbias;
 
 //  printf("read_slot_rom: sl %d offs %x, cnxx_slot %d\n", slotnum, offset, m_cnxx_slot);
+	slow_cycle();
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
@@ -2425,8 +2422,6 @@ u8 apple2gs_state::c100_r(offs_t offset)
 {
 	const int slot = ((offset>>8) & 0xf) + 1;
 
-	slow_cycle();
-
 	// SETSLOTCXROM is disabled, so the $C02D SLOT register controls what's in each slot
 	if (!BIT(m_slotromsel, slot))
 	{
@@ -2440,23 +2435,19 @@ void apple2gs_state::c100_w(offs_t offset, u8 data)
 {
 	const int slot = ((offset>>8) & 0xf) + 1;
 
-	slow_cycle();
-
 	if (BIT(m_slotromsel, slot))
 	{
 		write_slot_rom(1, offset, data);
 	}
 }
 
-u8 apple2gs_state::c300_int_r(offs_t offset)  { slow_cycle(); return read_int_rom(0x3c300, offset); }
-u8 apple2gs_state::c300_r(offs_t offset)  { slow_cycle(); return read_slot_rom(3, offset); }
-void apple2gs_state::c300_w(offs_t offset, u8 data) { slow_cycle(); write_slot_rom(3, offset, data); }
+u8 apple2gs_state::c300_int_r(offs_t offset)  { return read_int_rom(0x3c300, offset); }
+u8 apple2gs_state::c300_r(offs_t offset)  { return read_slot_rom(3, offset); }
+void apple2gs_state::c300_w(offs_t offset, u8 data) { write_slot_rom(3, offset, data); }
 
 u8 apple2gs_state::c400_r(offs_t offset)
 {
 	const int slot = ((offset>>8) & 0xf) + 4;
-
-	slow_cycle();
 
 	if (!BIT(m_slotromsel, slot))
 	{
@@ -2470,8 +2461,6 @@ void apple2gs_state::c400_w(offs_t offset, u8 data)
 {
 	const int slot = ((offset>>8) & 0xf) + 4;
 
-	slow_cycle();
-
 	if (BIT(m_slotromsel, slot))
 	{
 		write_slot_rom(4, offset, data);
@@ -2480,8 +2469,6 @@ void apple2gs_state::c400_w(offs_t offset, u8 data)
 
 u8 apple2gs_state::c800_r(offs_t offset)
 {
-	slow_cycle();
-
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
 		m_cnxx_slot = CNXX_UNCLAIMED;
@@ -2496,6 +2483,7 @@ u8 apple2gs_state::c800_r(offs_t offset)
 
 	if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
 	{
+		slow_cycle();
 		return m_slotdevice[m_cnxx_slot]->read_c800(offset&0xfff);
 	}
 
@@ -2504,10 +2492,9 @@ u8 apple2gs_state::c800_r(offs_t offset)
 
 void apple2gs_state::c800_w(offs_t offset, u8 data)
 {
-	slow_cycle();
-
 	if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
 	{
+		slow_cycle();
 		m_slotdevice[m_cnxx_slot]->write_c800(offset&0xfff, data);
 	}
 
@@ -2550,6 +2537,7 @@ u8 apple2gs_state::inh_r(offs_t offset)
 {
 	if (m_inh_slot != -1)
 	{
+		slow_cycle();
 		return m_slotdevice[m_inh_slot]->read_inh_rom(offset + 0xd000);
 	}
 
@@ -2561,6 +2549,7 @@ void apple2gs_state::inh_w(offs_t offset, u8 data)
 {
 	if (m_inh_slot != -1)
 	{
+		slow_cycle();
 		m_slotdevice[m_inh_slot]->write_inh_rom(offset + 0xd000, data);
 	}
 }
@@ -3087,12 +3076,9 @@ void apple2gs_state::bank1_0000_sh_w(offs_t offset, u8 data)
 {
 	m_ram_ptr[offset + 0x10000] = data;
 
-	switch (offset>>8)
+	switch (offset>>10)
 	{
-		case 0x04:  // text page 1
-		case 0x05:
-		case 0x06:
-		case 0x07:
+		case 0x01:  // text page 1
 			if (!(m_shadow & SHAD_TXTPG1))
 			{
 				slow_cycle();
@@ -3100,10 +3086,7 @@ void apple2gs_state::bank1_0000_sh_w(offs_t offset, u8 data)
 			}
 			break;
 
-		case 0x08:  // text page 2 (only shadowable on ROM 03)
-		case 0x09:
-		case 0x0a:
-		case 0x0b:
+		case 0x02:  // text page 2 (only shadowable on ROM 03)
 			if ((!(m_shadow & SHAD_TXTPG2)) && (m_is_rom3))
 			{
 				slow_cycle();
@@ -3112,10 +3095,7 @@ void apple2gs_state::bank1_0000_sh_w(offs_t offset, u8 data)
 			break;
 
 			// hi-res page 1
-		case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
-		case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
-		case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
-		case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
+		case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 			if ((!(m_shadow & SHAD_HIRESPG1) && !(m_shadow & SHAD_AUXHIRES)) || !(m_shadow & SHAD_SUPERHIRES))
 			{
 				auxram0000_w(offset, data);
@@ -3123,10 +3103,7 @@ void apple2gs_state::bank1_0000_sh_w(offs_t offset, u8 data)
 			break;
 
 			// hi-res page 2
-		case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45: case 0x46: case 0x47:
-		case 0x48: case 0x49: case 0x4a: case 0x4b: case 0x4c: case 0x4d: case 0x4e: case 0x4f:
-		case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57:
-		case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f:
+		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
 			if ((!(m_shadow & SHAD_HIRESPG2) && !(m_shadow & SHAD_AUXHIRES)) || !(m_shadow & SHAD_SUPERHIRES))
 			{
 				auxram0000_w(offset, data);
