@@ -533,50 +533,57 @@ void i8256_device::write(offs_t offset, uint8_t data)
 	}
 }
 
+//**************************************************************************
+//  PARALLEL PORTS
+//**************************************************************************
+
 uint8_t i8256_device::p1_r()
 {
-	// if control bit is 0 (input), read from callback else use output latch
-	uint8_t input = m_in_p1_cb(0);
-	uint8_t result = 0;
-	for (int i = 0; i < 8; i++)
-	{
-		if (BIT(m_port1_control, i)) // output
-			result |= (m_port1_int & (1 << i));
-		else // input
-			result |= (input & (1 << i));
-	}
-	return result;
+	// control bit 1 = output (read from latch), 0 = input (read from callback)
+	return (m_in_p1_cb(0) & ~m_port1_control) | (m_port1_int & m_port1_control);
 }
 
 void i8256_device::p1_w(uint8_t data)
 {
-	m_port1_int = (m_port1_int & ~m_port1_control) | (data & m_port1_control);
+	// all bits are latched; input pins output the latch if the direction is changed later
+	m_port1_int = data;
 	m_out_p1_cb(0, m_port1_int & m_port1_control);
 }
 
 uint8_t i8256_device::p2_r()
 {
-	uint8_t p2c = m_mode & 0x03;
-	if (p2c == I8256_PORT2C_II || p2c == I8256_PORT2C_IO)
-		return m_in_p2_cb(0);
-	else
-		return m_port2_int;
+	switch (m_mode & 0x07)
+	{
+		case I8256_PORT2C_II:
+			return m_in_p2_cb(0);
+		case I8256_PORT2C_IO:
+			return (m_in_p2_cb(0) & 0xf0) | (m_port2_int & 0x0f);
+		case I8256_PORT2C_OI:
+			return (m_in_p2_cb(0) & 0x0f) | (m_port2_int & 0xf0);
+		case I8256_PORT2C_OO:
+			return m_port2_int;
+		default: // TODO: input and handshake modes
+			return m_port2_int;
+	}
 }
 
 void i8256_device::p2_w(uint8_t data)
 {
-	uint8_t p2c = m_mode & 0x03;
 	m_port2_int = data;
-	uint8_t port2_data = 0;
-	switch (p2c)
+	switch (m_mode & 0x07)
 	{
-		case I8256_PORT2C_IO: port2_data = m_port2_int & 0x0f; break;
-		case I8256_PORT2C_OI: port2_data = m_port2_int & 0xf0; break;
-		case I8256_PORT2C_OO: port2_data = m_port2_int; break;
-		default: port2_data = 0; break;
+		case I8256_PORT2C_IO:
+			m_out_p2_cb(0, data & 0x0f);
+			break;
+		case I8256_PORT2C_OI:
+			m_out_p2_cb(0, data & 0xf0);
+			break;
+		case I8256_PORT2C_OO:
+			m_out_p2_cb(0, data);
+			break;
+		default: // TODO: input and handshake modes
+			break;
 	}
-	if (p2c == I8256_PORT2C_IO || p2c == I8256_PORT2C_OI || p2c == I8256_PORT2C_OO)
-		m_out_p2_cb(0, port2_data);
 }
 
 //**************************************************************************
