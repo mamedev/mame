@@ -322,13 +322,86 @@ TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
 			if (m_timers[i] == 0)
 			{
 				// the interrupt occurs when the counter changes from 1 to 0
-				LOG("I8256 Timer %u\n", i);
+				request_interrupt(timer_interrupt[i]);
 				// timer interrupts are automatically disabled when the request is generated
 				m_int_enable &= ~(1 << timer_interrupt[i]);
 			}
 		}
 	}
 }
+
+//**************************************************************************
+//  INTERRUPT CONTROLLER
+//**************************************************************************
+
+void i8256_device::update_int()
+{
+	const bool state = m_int_request != 0;
+
+	if (state)
+		m_status |= I8256_STATUS_INT;
+	else
+		m_status &= ~I8256_STATUS_INT;
+
+	if (m_int_state != state)
+	{
+		m_int_state = state;
+		m_out_int_cb(state ? 1 : 0);
+	}
+}
+
+void i8256_device::request_interrupt(int level)
+{
+	if (BIT(m_int_enable, level))
+	{
+		LOGINT("interrupt request on level %d\n", level);
+		m_int_request |= 1 << level;
+		update_int();
+	}
+}
+
+// acknowledge the highest priority pending interrupt (level 0 is highest)
+int i8256_device::acknowledge()
+{
+	for (int level = 0; level < 8; level++)
+	{
+		if (BIT(m_int_request, level))
+		{
+			if (!machine().side_effects_disabled())
+			{
+				m_int_request &= ~(1 << level);
+				update_int();
+			}
+			return level;
+		}
+	}
+	return -1;
+}
+
+uint8_t i8256_device::inta_r()
+{
+	const int level = std::max(acknowledge(), 0);
+
+	if (BIT(m_command1, I8256_CMD1_8086))
+		return 0x40 + level; // interrupt vector
+	else
+		return 0xc7 | (level << 3); // RST n instruction
+}
+
+void i8256_device::write_extint(int state)
+{
+	state = state ? 1 : 0;
+	if (m_extint == state)
+		return;
+
+	m_extint = state;
+	if (state)
+		request_interrupt(I8256_INT_EXTINT);
+}
+
+//**************************************************************************
+//  MICROPROCESSOR INTERFACE
+//**************************************************************************
 
 uint8_t i8256_device::read(offs_t offset)
 {
@@ -351,6 +424,15 @@ uint8_t i8256_device::read(offs_t offset)
 		   return m_mode;
 		case I8256_REG_PORT1C:
 			return m_port1_control;
+		case I8256_REG_INTEN:
+			return m_int_enable;
+		case I8256_REG_INTAD:
+		{
+			// the identifier is the number of the interrupt level multiplied by 4;
+			// reading has the same effect as a hardware interrupt acknowledge
+			const int level = std::max(acknowledge(), 0);
+			return level * 4;
+		}
 		case I8256_REG_BUFFER:
 			return m_rx_buffer;
 		case I8256_REG_PORT1:

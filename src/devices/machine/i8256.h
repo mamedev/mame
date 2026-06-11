@@ -57,9 +57,13 @@ public:
 	void write_rxd(int state);
 	void write_cts(int state);
 	void write_txc(int state);
+	void write_extint(int state);
 
 	void write(offs_t offset, uint8_t data);
 	uint8_t read(offs_t offset);
+
+	// interrupt acknowledge (RST n instruction in 8085 mode, vector 40H-47H in 8086 mode)
+	uint8_t inta_r();
 
 	uint8_t p1_r();
 	void    p1_w(uint8_t data);
@@ -73,8 +77,12 @@ protected:
 private:
 	TIMER_CALLBACK_MEMBER(timer_check);
 	TIMER_CALLBACK_MEMBER(brg_tick);
-	
+
 	void soft_reset();
+
+	void request_interrupt(int level);
+	int acknowledge();
+	void update_int();
 
 	devcb_read_line m_in_inta_cb;
 	devcb_write_line m_out_int_cb;
