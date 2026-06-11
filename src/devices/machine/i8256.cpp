@@ -105,15 +105,9 @@ enum
 	I8256_BAUD_50
 };
 
-enum
-{
-	I8256_SCLK_DIV5, // 5.12 MHz
-	I8256_SCLK_DIV3, // 3.072 MHz
-	I8256_SCLK_DIV2, // 2.048 MHz
-	I8256_SCLK_DIV1  // 1.024 MHz
-};
+constexpr int BAUD_RATES[16] = {0, 0, 0, 19200, 9600, 4800, 2400, 1200, 600, 300, 200, 150, 110, 100, 75, 50};
 
-constexpr int SYS_CLOCK_DIVIDER[4] = {5,3,2,1};
+constexpr int SYS_CLOCK_DIVIDER[4] = {5, 3, 2, 1};
 
 enum
 {
