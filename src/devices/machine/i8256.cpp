@@ -669,6 +669,124 @@ void i8256_device::p2_w(uint8_t data)
 }
 
 //**************************************************************************
+//  SERIAL RECEIVER
+//**************************************************************************
+
+// position of the sample point within a bit, in bit clocks
+uint16_t i8256_device::rx_sample_point() const
+{
+	return std::max<uint16_t>(1, (m_rx_sample * m_divide) / 32);
+}
+
+void i8256_device::receiver_tick()
+{
+	m_rx_counter++;
+
+	switch (m_rx_state)
+	{
+	case I8256_STATE_START:
+		if (m_rx_counter == 1 && m_rxd)
+		{
+			// line is marking, no start bit yet
+			m_rx_counter = 0;
+		}
+		else if (m_rx_counter >= rx_sample_point())
+		{
+			// the start bit is checked once at sampling time (unless disabled by DSC)
+			if (!m_rxd || BIT(m_modification, I8256_MOD_DSC))
+			{
+				LOGRX("RX start bit\n");
+				m_rx_state = I8256_STATE_DATA;
+				m_rx_counter = 0;
+				m_rx_shift = 0;
+				m_rx_bits = 0;
+				m_rx_parity = false;
+			}
+			else
+			{
+				LOGRX("RX false start bit\n");
+				m_rx_counter = 0;
+			}
+		}
+		break;
+
+	case I8256_STATE_DATA:
+		if (m_rx_counter >= m_divide)
+		{
+			m_rx_counter = 0;
+
+			if (m_rxd)
+			{
+				m_rx_shift |= 1 << m_rx_bits;
+				m_rx_parity = !m_rx_parity;
+			}
+			m_rx_bits++;
+
+			if (m_rx_bits == m_data_bits + (m_parity_enable ? 1 : 0))
+				m_rx_state = I8256_STATE_STOP;
+		}
+		break;
+
+	case I8256_STATE_STOP:
+		// the character is transferred and all status bits are evaluated
+		// when the first stop bit is sampled
+		if (m_rx_counter >= m_divide)
+		{
+			m_rx_counter = 0;
+			m_rx_state = I8256_STATE_START;
+
+			const bool fe = !m_rxd;
+			const uint8_t data = m_rx_shift & ((1 << m_data_bits) - 1);
+
+			if (fe && data == 0)
+			{
+				// break character: BD is set even when the receiver is disabled,
+				// and the character is not transferred to the receiver buffer
+				LOGRX("RX break detected\n");
+				m_status |= I8256_STATUS_BREAK;
+				request_interrupt(I8256_INT_RX);
+				m_rx_state = I8256_STATE_BREAK;
+			}
+			else if (BIT(m_command3, I8256_CMD3_RxE))
+			{
+				LOGRX("RX character %02X\n", data);
+
+				// on overrun the previous character is lost
+				if (m_status & I8256_STATUS_RB_FULL)
+					m_status |= I8256_STATUS_OVERRUN_ERROR;
+				m_rx_buffer = data;
+				m_status |= I8256_STATUS_RB_FULL;
+
+				if (m_parity_enable && (m_parity_even ? m_rx_parity : !m_rx_parity))
+					m_status |= I8256_STATUS_PARITY_ERROR;
+
+				if (BIT(m_modification, I8256_MOD_TME))
+				{
+					// in transmission mode FE indicates that the transmitter
+					// was active during the reception of a character
+					if (!(m_status & I8256_STATUS_TR_EMPTY))
+						m_status |= I8256_STATUS_FRAMING_ERROR;
+				}
+				else if (fe)
+					m_status |= I8256_STATUS_FRAMING_ERROR;
+
+				request_interrupt(I8256_INT_RX);
+			}
+		}
+		break;
+
+	case I8256_STATE_BREAK:
+		// the receiver is idled until the line returns to marking
+		if (m_rxd)
+		{
+			m_rx_state = I8256_STATE_START;
+			m_rx_counter = 0;
+		}
+		break;
+	}
+}
+
+//**************************************************************************
 //  SERIAL TRANSMITTER
 //**************************************************************************
 
@@ -792,7 +910,7 @@ void i8256_device::transmitter_tick()
 
 TIMER_CALLBACK_MEMBER(i8256_device::brg_tick)
 {
-	LOG("I8256 BRG Tick\n");
+	receiver_tick();
 	transmitter_tick();
 }
 
