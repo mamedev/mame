@@ -306,21 +306,64 @@ void i8256_device::soft_reset()
 	output_txd(1);
 }
 
+// timer interrupts are automatically disabled when the request is generated
+void i8256_device::request_timer_interrupt(int level)
+{
+	request_interrupt(level);
+	m_int_enable &= ~(1 << level);
+}
+
+// decrement a timer or cascaded timer pair; single timers generate an
+// interrupt request on the transition from 01H to 00H, cascaded ones on
+// the transition from 0001H to 0000H
+void i8256_device::count_timer(int i)
+{
+	// timers 4 and 5 hold the upper bytes of cascaded timers 2 and 3
+	const bool t24 = (i == 1) && BIT(m_mode, I8256_MODE_T24);
+	const bool t35 = (i == 2) && BIT(m_mode, I8256_MODE_T35);
+	const int high = t24 ? 3 : 4;
+
+	if (m_timers[i] == 0)
+	{
+		// the low byte of a cascaded pair wraps and decrements the upper byte
+		if ((t24 || t35) && m_timers[high] > 0)
+		{
+			m_timers[high]--;
+			m_timers[i] = 255;
+		}
+		return;
+	}
+
+	m_timers[i]--;
+	if (m_timers[i] != 0)
+		return;
+
+	if (t24 || t35)
+	{
+		if (m_timers[high] == 0)
+			request_timer_interrupt(t24 ? I8256_INT_TIMER4 : I8256_INT_TIMER3); // levels 6 and 3
+	}
+	else if (i == 1 && BIT(m_command1, I8256_CMD1_BITI))
+	{
+		// with BITI set, level 1 belongs to the port 1 P17 interrupt instead of timer 2
+	}
+	else
+		request_timer_interrupt(timer_interrupt[i]);
+}
+
 TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
 {
 	for (int i = 0; i < 5; i++)
 	{
-		if (m_timers[i] > 0)
-		{
-			m_timers[i]--;
-			if (m_timers[i] == 0)
-			{
-				// the interrupt occurs when the counter changes from 1 to 0
-				request_interrupt(timer_interrupt[i]);
-				// timer interrupts are automatically disabled when the request is generated
-				m_int_enable &= ~(1 << timer_interrupt[i]);
-			}
-		}
+		// the upper bytes of cascaded pairs do not count on their own
+		if ((i == 3 && BIT(m_mode, I8256_MODE_T24)) || (i == 4 && BIT(m_mode, I8256_MODE_T35)))
+			continue;
+
+		// with CT2/CT3 set, timers 2 and 3 count port 1 events instead of the internal clock
+		if ((i == 1 && BIT(m_mode, I8256_MODE_CT2)) || (i == 2 && BIT(m_mode, I8256_MODE_CT3)))
+			continue;
+
+		count_timer(i);
 	}
 }
 
