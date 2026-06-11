@@ -205,6 +205,7 @@ i8256_device::i8256_device(const machine_config &mconfig, const char *tag, devic
 	m_in_p1_cb(*this, 0),
 	m_out_p1_cb(*this),
 	m_timer(nullptr),
+	m_brg_timer(nullptr),
 	m_rxd(1),
 	m_cts(1),
 	m_rxc(0),
@@ -281,6 +282,31 @@ void i8256_device::device_reset()
 	m_port2_int = 0;
 
 	memset(m_timers, 0, sizeof(m_timers));
+
+	soft_reset();
+
+	m_brg_timer->adjust(attotime::never);
+	m_timer->adjust(attotime::from_hz(16000), 0, attotime::from_hz(16000));
+}
+
+void i8256_device::soft_reset()
+{
+	m_status = 1 << I8256_STATUS_TR_EMPTY | 1 << I8256_STATUS_TB_EMPTY;
+	m_int_enable = 0;
+	m_int_request = 0;
+
+	m_rx_state = I8256_STATE_START;
+	m_rx_counter = 0;
+	m_rx_bits = 0;
+	m_rx_shift = 0;
+	m_rx_parity = false;
+
+	m_tx_state = I8256_STATE_START;
+	m_tx_counter = 0;
+	m_tx_bits = 0;
+	m_tx_shift = 0;
+	m_tx_parity = false;
+	m_tx_break = false;
 }
 
 uint8_t i8256_device::read(offs_t offset)
