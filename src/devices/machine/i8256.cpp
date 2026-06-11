@@ -125,7 +125,7 @@ enum
 	I8256_INT_TIMER5
 };
 
-const char timer_interrupt[5] = {I8256_INT_TIMER1, I8256_INT_TIMER2, I8256_INT_TIMER3, I8256_INT_TIMER4, I8256_INT_TIMER5};
+const uint8_t timer_interrupt[5] = {I8256_INT_TIMER1, I8256_INT_TIMER2, I8256_INT_TIMER3, I8256_INT_TIMER4, I8256_INT_TIMER5};
 
 enum
 {
@@ -791,7 +791,7 @@ uint16_t i8256_device::stop_length() const
 	case I8256_STOP_1:   return m_divide;
 	case I8256_STOP_15:  return m_divide + m_divide / 2;
 	case I8256_STOP_2:   return m_divide * 2;
-	case I8256_STOP_075: return std::max<u16>(1, (m_divide * 3) / 4);
+	case I8256_STOP_075: return std::max<uint16_t>(1, (m_divide * 3) / 4);
 	}
 }
 
