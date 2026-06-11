@@ -75,6 +75,9 @@ private:
 
 	void soft_reset();
 
+	void count_timer(int i);
+	void request_timer_interrupt(int level);
+
 	void receiver_tick();
 	void transmitter_tick();
 	uint16_t rx_sample_point() const;
