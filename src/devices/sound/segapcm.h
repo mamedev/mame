@@ -30,6 +30,23 @@ protected:
 
 	virtual uint32_t get_bank(uint8_t ctrl) { return 0; }
 
+	struct voice_t
+	{
+		void tick();
+
+		segapcm_base_device *host;
+
+		uint32_t addr = ~0; // current address (16.8 fixed point)
+		uint16_t loop = ~0; // loop address
+		uint8_t end = ~0;   // end address (bit 16-8 valid)
+		uint8_t freq = ~0;  // frequency
+		uint8_t lvol = ~0;  // left volume
+		uint8_t rvol = ~0;  // right volume
+		uint8_t ctrl = ~0;  // control bits
+		int32_t lout = 0;   // left output
+		int32_t rout = 0;   // right output
+	};
+
 	required_shared_ptr<uint8_t> m_ram;
 	sound_stream* m_stream;
 };
@@ -68,23 +85,6 @@ protected:
 	void voice_ctrl_w(offs_t offset, uint8_t data);
 
 private:
-	struct voice_t
-	{
-		void tick();
-
-		segapcm_device *host;
-
-		uint32_t addr = ~0; // current address (16.8 fixed point)
-		uint16_t loop = ~0; // loop address
-		uint8_t end = ~0;   // end address (bit 16-8 valid)
-		uint8_t freq = ~0;  // frequency
-		uint8_t lvol = ~0;  // left volume
-		uint8_t rvol = ~0;  // right volume
-		uint8_t ctrl = ~0;  // control bits
-		int32_t lout = 0;   // left output
-		int32_t rout = 0;   // right output
-	};
-
 	voice_t m_voice[MaxVoices];
 };
 

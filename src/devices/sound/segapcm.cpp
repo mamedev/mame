@@ -180,8 +180,7 @@ void segapcm_device<MaxVoices>::sound_stream_update(sound_stream &stream)
 	}
 }
 
-template<unsigned MaxVoices>
-void segapcm_device<MaxVoices>::voice_t::tick()
+void segapcm_base_device::voice_t::tick()
 {
 	// only process active channels
 	lout = rout = 0;
