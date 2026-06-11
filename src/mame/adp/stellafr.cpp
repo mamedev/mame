@@ -9,11 +9,11 @@ CPU Board:
 ----------
  ____________________________________________________________
  |           ______________  ______________     ___________ |
- | 74HC245N  | t1 i       |  |KM681000ALP7|     |+        | |
+ | 74HC245N  | t1 i       |  |NVRAM       |     |+        | |
  | 74HC573   |____________|  |____________|     |  3V Bat | |
  |                                              |         | |
  |           ______________  ______________     |        -| |
- |           | t1 ii      |  |KM681000ALP7|     |_________| |
+ |           | t1 ii      |  |NVRAM       |     |_________| |
  |     |||   |____________|  |____________| |||             |
  |     |||   ___________                    |||  M62X42B    |
  | X   |||   |         |                    |||             |
@@ -26,10 +26,10 @@ CPU Board:
 Parts:
 
  68EC000FN8         - Motorola 68k CPU
- KM681000ALP7       - 128K X 8 Bit Low Power CMOS Static RAM
+ NVRAM              - Either KM681000ALP7 128K X 8 Bit Low Power CMOS Static RAM or ST M48T08 timekeeper
  OKIM62X42B         - Real-time Clock ic With Built-in Crystal
  MAX691CPE          - P Reset ic With Watchdog And Battery Switchover
- X                    - 8MHz xtal
+ X                  - 12/8MHz xtal
  3V Bat             - Lithium 3V power module
 
 Sound  and I/O board:
@@ -90,10 +90,12 @@ Connectors:
 
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68681.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
+#include "machine/timekpr.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "speaker.h"
@@ -196,12 +198,17 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart"),
-		m_nvram(*this, "nvram"),
+		m_printer(*this, "printer"),
+		m_ym2149(*this, "ym2149"),
 		m_dac(*this, "dac"),
-		m_digits(*this, "digit%u", 0U),
+		m_speaker(*this, "speaker"),
+		m_digits(*this, "digit%02u", 0U),
+		m_coinled(*this, "anzled%u", 0U),
+		m_magnet(*this, "magnet%u", 0U),
 		m_lamps(*this, "lamp%u", 0U),
 		m_leds(*this, "led%u", 0U),
-		m_in0(*this, "IN0")
+		m_in0(*this, "IN0"),
+		m_door(*this, "DOOR")
 	{ }
 
 	void sus_tk(machine_config &config) ATTR_COLD;
@@ -214,12 +221,17 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
-	required_device<nvram_device> m_nvram;
+	required_device<rs232_port_device> m_printer;
+	required_device<ym2149_device> m_ym2149;
 	required_device<ad7224_device> m_dac;
-	output_finder<8> m_digits;
+	required_device<speaker_device> m_speaker;
+	output_finder<74> m_digits;
+	output_finder<5> m_coinled;
+	output_finder<2> m_magnet;
 	output_finder<128> m_lamps;
 	output_finder<2> m_leds;
 	required_ioport m_in0;
+	required_ioport m_door;
 
 	uint8_t m_ma1;
 	uint8_t m_ma2;
@@ -229,17 +241,32 @@ private:
 	uint16_t m_mux1;
 	uint8_t m_anz2;
 	uint8_t m_mux2;
+	uint8_t m_strobe;
+
+	uint16_t m_anz1_bank[8];
+	uint8_t m_anz_bank;      // which of the two ANZ banks per scan step (0/1)
+	uint8_t m_anz_cycle;     // module pair: 0 = modules 0/1, 1 = modules 2/3
+	uint8_t m_anz_prevpos;   // previous step (to detect wrap)
 
 	uint8_t mux_r();
+	uint8_t duart_input_r();
+	void enable_w(uint8_t data);
 	void mux_w(uint8_t data);
-	void mux2_w(uint8_t data);
 	void duart_output_w(uint8_t data);
-	void ay8910_portb_w(uint8_t data);
-	void lamps_w(uint8_t row, uint16_t data);
+	void ym2149_portb_w(uint8_t data);
+	void lamps_w(bool second);
+	void anzeigen_w();
+	void anzout_digit_w(int anzout, int even_field);
+	void anzout_aux(int even_field);
+	void service_w();
+	static uint8_t digit_map(int field, uint8_t s);
 
+	void mem_map_steuereinheit(address_map &map) ATTR_COLD;
 	void mem_map_tk(address_map &map) ATTR_COLD;
 	void mem_map_rtc(address_map &map) ATTR_COLD;
 	void fc7_map(address_map &map) ATTR_COLD;
+
+	void steuereinheit(machine_config &config) ATTR_COLD;
 };
 
 
@@ -268,8 +295,11 @@ uint8_t stellafr_state::mux_r()
 	return data;
 }
 
-void stellafr_state::lamps_w(uint8_t row, uint16_t data)
+void stellafr_state::lamps_w(bool second)
 {
+	uint8_t row = (m_mux1 >> 12) & 0x07;
+	uint16_t data = m_mux1 & 0x0fff;
+
 	LOG("Row %d\n",row);
 	for (int i = 0; i < 8; i++)
 	{
@@ -279,43 +309,124 @@ void stellafr_state::lamps_w(uint8_t row, uint16_t data)
 	}
 }
 
-void stellafr_state::mux_w(uint8_t data)
+uint8_t stellafr_state::digit_map(int field, uint8_t s)
 {
-	bool enma1  = BIT(data,U5_EN1MA);
-	bool enma2  = BIT(data,U5_EN2MA);
-	bool aw1    = BIT(data,U5_AW1);
-	bool aw2    = BIT(data,U5_AW2);
-	bool enanz1 = BIT(data,U5_ENANZ1); //enable 7seg
-	bool enmux1 = BIT(data,U5_ENMUX1); //enable lamps/buttons
-	bool enanz2 = BIT(data,U5_ENANZ2);
-	bool enmux2 = BIT(data,U5_ENMUX2);
-
-	if (enma1)
-		; // LOG("1MA %d\n",m_ma1);
-	if (enma1)
-		; // LOG("ME %d\n",m_me);
-	if (enma2)
-		; // LOG("2MA %d\n",m_ma2);
-	if (enanz1)
-		; // LOG("ANZ1 %d\n",m_anz1); //main 7seg led out
-	if (enanz1)
-		; // LOG("ST %d\n",m_ma1);
-	if (enmux1)
-		lamps_w((m_mux1 >> 12) & 0x07, m_mux1 & 0x0FFF); //main lamps out
-	if (enanz2)
-		; // LOG("ANZ2 %d\n",m_anz2);
-	if (enmux2)
-		; // LOG("MUX2 %d\n",m_mux2);
-	if (aw1)
-		;
-	if (aw2)
-		;
+	// they switched up the segment wiring between the shift register and the display
+	if (field & 1)
+		return bitswap<8>(s, 0, 4, 1, 6, 5, 7, 3, 2); // digits 1 & 3
+	else
+		return bitswap<8>(s, 7, 3, 4, 2, 1, 0, 6, 5); // digits 0 & 2
 }
 
-void stellafr_state::mux2_w(uint8_t data)
+// Each Anzout chain is one or two 74HC4094s holding two modules: the even field of the pair
+// just latched lives in the low 4094 (segment s in bit s), the odd field in the
+// high 4094.  Only that pair is updated; the other two fields belong to the
+// other module pair and are written on its strobe.
+void stellafr_state::anzout_digit_w(int anzout, int even_field)
+{
+	int const odd_field = even_field | 1;
+	uint16_t const v = m_anz1_bank[anzout];
+	m_digits[anzout * 10 + even_field] = digit_map(even_field, v & 0xff) & 0x7f;
+	m_digits[anzout * 10 + odd_field]  = digit_map(odd_field, v >> 8) & 0x7f;
+}
+
+// Anzout4 chain, only one 4094: coin-accept LEDs + magnets.
+void stellafr_state::anzout_aux(int even_field)
+{
+	if (even_field != 2)
+		return;
+	uint8_t const aux = m_anz1_bank[4] >> 8;
+	m_coinled[0] = BIT(aux, 0); // 0,10 DM
+	m_coinled[1] = BIT(aux, 1); // 1 DM
+	m_coinled[2] = BIT(aux, 2); // 2 DM
+	m_coinled[3] = BIT(aux, 3); // 5 DM
+	m_magnet[0] = BIT(aux, 4); // Magnet L
+	m_magnet[1] = BIT(aux, 5); // Magnet R
+	// bit 6 = NC
+	m_coinled[4] = BIT(aux, 7); // Freispiele
+}
+
+void stellafr_state::anzeigen_w()
+{
+	// clock one bit downstream
+	for (uint8_t i = 0; i < 8; i++)
+		m_anz1_bank[i] = (m_anz1_bank[i] >> 1) | (BIT(m_anz1, i) << 15);
+
+	// which module/segment this strobe belongs to, derived from the MUX1 "lz"
+	// select alone: after bank 0 it sits in bits 4-7, after bank 1 in bits 12-15.
+	int const sel = m_anz_bank ? ((m_mux1 >> 12) & 0x0f) : ((m_mux1 >> 4) & 0x0f);
+	int const pos = 7 - (sel & 0x07);
+	if (m_anz_bank == 0)
+	{
+		if (pos == 0 && m_anz_prevpos == 7) // select wrap 7->0: next module pair
+			m_anz_cycle ^= 1;
+		m_anz_prevpos = pos;
+	}
+
+	// either U6A or U9 QP7 triggering the enable
+	if (pos == 7 && m_anz_bank == 1)
+	{
+		int const even_field = m_anz_cycle << 1;
+
+		anzout_digit_w(0, even_field); // 150er
+		anzout_digit_w(1, even_field); // usually NC
+		anzout_digit_w(2, even_field); // usually NC
+		anzout_digit_w(3, even_field); // Serienspeicher
+		anzout_aux(even_field); // coin-accept LEDs + magnets (Anzout4 high 4094)
+		anzout_digit_w(5, even_field); // Munzspeicher
+		anzout_digit_w(6, even_field); // usually NC
+		anzout_digit_w(7, even_field); // usually NC
+	}
+
+	m_anz_bank ^= 1; // the two banks alternate, reset by ENMUX down
+}
+
+void stellafr_state::service_w()
+{
+	; // LOG("Service %d\n", m_ma1);
+}
+
+void stellafr_state::enable_w(uint8_t data)
+{
+	// ENMUX falls just before the first ANZ bank of each scan step, so its
+	// falling edge re-aligns the ANZ bank counter
+	if (!BIT(data, U5_ENMUX1) && BIT(m_strobe, U5_ENMUX1))
+		m_anz_bank = 0;
+
+	if (BIT(data, U5_ENMUX1) && !BIT(m_strobe, U5_ENMUX1))
+		lamps_w(false); // P12
+
+	if (BIT(data, U5_EN1MA) && !BIT(m_strobe, U5_EN1MA))
+		; // LOG("1MA %d / ME %d\n", m_ma1, m_me); // P7
+
+	if (BIT(data, U5_EN2MA) && !BIT(m_strobe, U5_EN2MA))
+		; // LOG("2MA %d\n", m_ma2); // P7
+
+	if (BIT(data, U5_ENANZ1) && !BIT(m_strobe, U5_ENANZ1))
+	{
+		anzeigen_w(); // P12
+		service_w();  // P6
+	}
+
+	if (BIT(data, U5_ENANZ2) && !BIT(m_strobe, U5_ENANZ2))
+		; // anzeigen_w(true); // P13
+
+	if (BIT(data, U5_ENMUX2) && !BIT(m_strobe, U5_ENMUX2))
+		; // lamps_w(true); // P13
+
+	if (BIT(data, U5_AW1) && !BIT(m_strobe, U5_AW1))
+		; // P8
+
+	if (BIT(data, U5_AW2) && !BIT(m_strobe, U5_AW2))
+		; // P14
+
+	m_strobe = data;
+}
+
+void stellafr_state::mux_w(uint8_t data)
 {
 	// anz goes into one 74hc4094
-	// mux has 2 chained for lamp cols 0 - 11, 3 bits for lz encoded and EnSDAp
+	// mux has 2 chained 74hc4094 for lamp cols 0 - 11, 3 bits for lz encoded and EnSDAp
 	m_ma1   = (m_ma1   << 1) | BIT(data,U1_1MA);
 	m_ma2   = (m_ma2   << 1) | BIT(data,U1_2MA);
 	m_me    = (m_me    << 1) | BIT(data,U1_ME);
@@ -326,46 +437,57 @@ void stellafr_state::mux2_w(uint8_t data)
 	m_mux2  = (m_mux2  << 1) | BIT(data,U1_MUX2);
 }
 
+uint8_t stellafr_state::duart_input_r()
+{
+	uint8_t data = 0x00;
+
+	if (BIT(m_door->read(), 0))
+		data |= (1 << PORT_I_DOOR);
+
+	return data;
+}
+
 void stellafr_state::duart_output_w(uint8_t data)
 {
+	m_speaker->set_input_gain(0, !BIT(data, PORT_O_EN_SPK) ? 0.9 : 0.0);
 	m_leds[0] = !BIT(data, PORT_O_LED0);
 	m_leds[1] = !BIT(data, PORT_O_SDA);
 }
 
-void stellafr_state::ay8910_portb_w(uint8_t data)
+void stellafr_state::ym2149_portb_w(uint8_t data)
 {
+	//TODO
+
+	//PORT_B
+}
+
+void stellafr_state::mem_map_steuereinheit(address_map &map)
+{
+	// controlled by U17 74HC138
+	map(0x800001, 0x800001).w(m_dac, FUNC(dac_byte_interface::data_w)); // Y0
+	// Y1 device on cpu board
+	// Y2 graphics board
+	map(0x8000c1, 0x8000c1).w(FUNC(stellafr_state::enable_w)); // Y3 En out
+	map(0x800100, 0x800101).rw(FUNC(stellafr_state::mux_r), FUNC(stellafr_state::mux_w)); // Y4 SP/ME out / Inputs
+	map(0x800141, 0x800141).rw(m_ym2149, FUNC(ym2149_device::data_r), FUNC(ym2149_device::address_w)); // Y5
+	map(0x800143, 0x800143).w(m_ym2149, FUNC(ym2149_device::data_w)); // Y5
+	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff); // Y6
+	// Y7 NC
 }
 
 void stellafr_state::mem_map_tk(address_map &map)
 {
+	mem_map_steuereinheit(map);
 	map(0x000000, 0x0fffff).rom();
-	// controlled by U17 74HC138
-	map(0x800001, 0x800001).w(m_dac, FUNC(dac_byte_interface::data_w)); // Y0
-	// Y1 device on cpu board
-	// Y2 device on cpu board
-	map(0x8000c1, 0x8000c1).w(FUNC(stellafr_state::mux2_w)); // Y3 SP/ME II out
-	map(0x800100, 0x800101).rw(FUNC(stellafr_state::mux_r), FUNC(stellafr_state::mux_w)); // Y4 SP/ME I out / Inputs
-	map(0x800141, 0x800141).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)); // Y5
-	map(0x800143, 0x800143).w("aysnd", FUNC(ay8910_device::data_w)); // Y5
-	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff); // Y6
-	// Y7 NC
-	map(0xff0000, 0xffffff).ram().share("nvram");
+	map(0xff0000, 0xffffff).ram().share("timekeeper").umask16(0x00ff);
+	map(0xff0000, 0xffffff).ram().share("zeropower").umask16(0xff00);
 }
 
 void stellafr_state::mem_map_rtc(address_map &map)
 {
+	mem_map_steuereinheit(map);
 	map(0x000000, 0x0fffff).rom();
 	map(0x400000, 0x40001f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
-	// controlled by U17 74HC138
-	map(0x800001, 0x800001).w(m_dac, FUNC(dac_byte_interface::data_w)); // Y0
-	// Y1 device on cpu board
-	// Y2 device on cpu board
-	map(0x8000c1, 0x8000c1).w(FUNC(stellafr_state::mux2_w)); // Y3 SP/ME II out
-	map(0x800100, 0x800101).rw(FUNC(stellafr_state::mux_r), FUNC(stellafr_state::mux_w)); // Y4 SP/ME I out / Inputs
-	map(0x800141, 0x800141).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)); // Y5
-	map(0x800143, 0x800143).w("aysnd", FUNC(ay8910_device::data_w)); // Y5
-	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff); // Y6
-	// Y7 NC
 	map(0xfc0000, 0xffffff).ram().share("nvram");
 }
 
@@ -377,11 +499,19 @@ void stellafr_state::fc7_map(address_map &map)
 void stellafr_state::machine_start()
 {
 	save_item(NAME(m_mux1));
+	save_item(NAME(m_strobe));
+	save_item(NAME(m_anz_bank));
+	save_item(NAME(m_anz_cycle));
+	save_item(NAME(m_anz_prevpos));
 }
 
 void stellafr_state::machine_reset()
 {
 	m_mux1 = 0;
+	m_strobe = 0;
+	m_anz_bank = 0;
+	m_anz_cycle = 0;
+	m_anz_prevpos = 0;
 }
 
 static INPUT_PORTS_START( stellafr )
@@ -391,51 +521,62 @@ static INPUT_PORTS_START( stellafr )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_SLOT_STOP1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SLOT_STOP2 )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_GAMBLE_LOW ) // Right
+
+	PORT_START("DOOR")
+	PORT_CONFNAME( 0x01, 0x00, "Door" ) // P21 - Türschalter
+	PORT_CONFSETTING(    0x00, "Closed" )
+	PORT_CONFSETTING(    0x01, "Open" )
 INPUT_PORTS_END
 
-
-void stellafr_state::sus_tk(machine_config &config)
+void stellafr_state::steuereinheit(machine_config &config)
 {
-	M68000(config, m_maincpu, 8'000'000 ); //?
-	m_maincpu->set_addrmap(AS_PROGRAM, &stellafr_state::mem_map_tk);
-	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &stellafr_state::fc7_map);
-
 	MC68681(config, m_duart, 3'686'400);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_2); // ?
+	m_duart->inport_cb().set(FUNC(stellafr_state::duart_input_r));
 	m_duart->outport_cb().set(FUNC(stellafr_state::duart_output_w));
 
-	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
+	// P20 - Serielle-Schnittstelle for printer
+	m_duart->a_tx_cb().set(m_printer, FUNC(rs232_port_device::write_txd));
+
+	RS232_PORT(config, m_printer, default_rs232_devices, "printer");
+	m_printer->rxd_handler().set(m_duart, FUNC(mc68681_device::rx_a_w));
+
+	// RS485 (P18 - RS485 Aus, P19 - RS485 Ein)
+	// m_duart->b_tx_cb().set(m_rs485, ???);
+	// m_rs485->rxd_handler().set(m_duart, FUNC(mc68681_device::rx_b_w));
 
 	AD7224(config, m_dac, 0);
 
-	SPEAKER(config, "mono").front_center();
-	ay8910_device &aysnd(AY8910(config, "aysnd", 1'000'000));
-	aysnd.add_route(ALL_OUTPUTS, "mono", 0.85);
-	aysnd.port_a_read_callback().set_ioport("IN0");
-	aysnd.port_b_write_callback().set(FUNC(stellafr_state::ay8910_portb_w));
+	SPEAKER(config, m_speaker).front_center();
+	YM2149(config, m_ym2149, 3'686'400 / 2);
+	m_ym2149->add_route(ALL_OUTPUTS, m_speaker, 0.9);
+	m_ym2149->port_a_read_callback().set_ioport("IN0");
+	m_ym2149->port_b_write_callback().set(FUNC(stellafr_state::ym2149_portb_w));
+}
+
+void stellafr_state::sus_tk(machine_config &config)
+{
+	steuereinheit(config);
+
+	M68000(config, m_maincpu, 8'000'000 );
+	m_maincpu->set_addrmap(AS_PROGRAM, &stellafr_state::mem_map_tk);
+	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &stellafr_state::fc7_map);
+
+	MK48T08(config, "timekeeper");
+	MK48T08(config, "zeropower");
 }
 
 void stellafr_state::sus_rtc(machine_config &config)
 {
-	M68000(config, m_maincpu, 12'000'000 ); //?
+	steuereinheit(config);
+
+	M68000(config, m_maincpu, 12'000'000 );
 	m_maincpu->set_addrmap(AS_PROGRAM, &stellafr_state::mem_map_rtc);
 	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &stellafr_state::fc7_map);
 
-	MC68681(config, m_duart, 3'686'400);
-	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_2); // ?
-	m_duart->outport_cb().set(FUNC(stellafr_state::duart_output_w));
-
-	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	MSM6242(config, "rtc", XTAL(32'768));
-
-	AD7224(config, m_dac, 0);
-
-	SPEAKER(config, "mono").front_center();
-	ay8910_device &aysnd(AY8910(config, "aysnd", 1'000'000));
-	aysnd.add_route(ALL_OUTPUTS, "mono", 0.85);
-	aysnd.port_a_read_callback().set_ioport("IN0");
-	aysnd.port_b_write_callback().set(FUNC(stellafr_state::ay8910_portb_w));
 }
 
 ROM_START( actionf2 )
