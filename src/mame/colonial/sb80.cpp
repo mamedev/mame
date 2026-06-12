@@ -36,13 +36,19 @@
         Z80 PIO present on board, two ports; one wired Centronics-style
             for the printer via the J1 riser daughtercard.  Not used by
             Dave's CBIOS, so not wired in this driver yet.
-        256-byte bootstrap ROM at $0000-$00FF on /RESET; banked out via
-            OUT ($EA),A once the disk-loaded BOOT routine takes over.
-            (The ROM contains a separate diagnostic "POWER ON RESET"
-            variant at offsets $80-$FF, addressed at $00-$7F when the
-            other bank is selected; that variant ends in a memory test
-            and HLT, and is not used in the normal cold-boot path.
-            We expose only the IPL section at $00-$7F.)
+        256-byte bootstrap ROM chip = two parallel 128-byte programs: the
+            cold-boot IPL (chip $00-$7F) and a standalone "POWER ON RESET"
+            memory-test diagnostic (chip $80-$FF, ends in HLT).  The board
+            reads the ROM through a 128-byte window at $0000-$007F with a
+            bank bit selecting which half is visible; the diagnostic runs
+            only when its half is banked down to $0000 (its own SIO table
+            sits at chip $F2 = window offset $72, matching its LD HL,$0072).
+            On a normal cold boot the IPL half occupies $0000-$007F (reset
+            vector at $0000, DRQ/NMI handler at $0066, SIO init table at
+            $006C) and $0080-$00FF is RAM (also the CP/M default DMA buffer);
+            OUT ($EA),A then banks the window out to RAM.  The full 256-byte
+            chip is dumped; only the IPL half is mapped (the diagnostic
+            bank-select is a power-on mode, not modelled).
 
     Cold boot:
 
@@ -80,6 +86,7 @@
 #include "machine/z80sio.h"
 #include "machine/wd_fdc.h"
 #include "formats/imd_dsk.h"
+#include "formats/td0_dsk.h"
 #include "softlist_dev.h"
 
 
@@ -134,14 +141,20 @@ private:
 };
 
 
-// $00-$FF: bootstrap ROM at /RESET, banked out via OUT ($EA),A.
-// The ROM is only 128 bytes of active code ($00-$7F); we map the full 256-byte
-// region (with the unused power-on/memory-test variant at $80-$FF) and let the
-// bank toggle swing the whole window over to RAM at unboot time.
+// $00-$7F: 128-byte bootstrap-ROM window at /RESET, banked out via OUT ($EA),A.
+// The 256-byte chip holds two parallel 128-byte programs: the cold-boot IPL
+// (chip $00-$7F) and a standalone power-on memory-test diagnostic (chip
+// $80-$FF).  The board reads the ROM through a 128-byte window at $0000-$007F
+// with a bank bit selecting which half appears there; the diagnostic runs only
+// when banked down to $0000 (its own SIO table lives at chip $F2 = window
+// offset $72, which is why its LD HL,$0072 resolves correctly).  So on a normal
+// cold boot only the IPL half is visible at $00-$7F and $0080-$00FF is RAM
+// (also the CP/M default DMA buffer).  We model the IPL window only; the
+// diagnostic bank-select is a power-on mode, not used in the boot path.
 void sb80_state::mem_map(address_map &map)
 {
 	map(0x0000, 0xffff).ram().share("mainram");
-	map(0x0000, 0x00ff).bankr("bootbank");
+	map(0x0000, 0x007f).bankr("bootbank");
 }
 
 void sb80_state::io_map(address_map &map)
@@ -296,6 +309,7 @@ static void sb80_floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
 	fr.add(FLOPPY_IMD_FORMAT);
+	fr.add(FLOPPY_TD0_FORMAT);
 }
 
 
@@ -416,7 +430,7 @@ void sb80_state::sb80(machine_config &config)
 
 	// WD1793 + four 8" SSDD drives.  IBM-3740-style cold-boot tracks
 	// (25x128 FM track 0 + MFM data tracks) and the all-MFM 8x1024
-	// variant are both produced by the IMD reader.
+	// variant are both produced by the IMD and TD0 readers.
 	FD1793(config, m_fdc, 2_MHz_XTAL); // 1MHz clock for 5.25", 2MHz for 8"
 	m_fdc->drq_wr_callback().set(FUNC(sb80_state::fdc_drq_w));
 	// INTRQ is not wired to the CPU in the IPL flow -- the BIOS polls.
@@ -425,6 +439,8 @@ void sb80_state::sb80(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy[1], sb80_floppies, "8dsdd", sb80_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy[2], sb80_floppies, nullptr, sb80_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy[3], sb80_floppies, nullptr, sb80_floppy_formats);
+
+	SOFTWARE_LIST(config, "flop_list").set_original("sb80_flop");
 }
 
 
