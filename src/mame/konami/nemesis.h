@@ -226,7 +226,6 @@ protected:
 
 	void gradius_map(address_map &map) ATTR_COLD;
 	void konamigt_map(address_map &map) ATTR_COLD;
-	void nemesis_base_map(address_map &map) ATTR_COLD;
 	void nemesis_map(address_map &map) ATTR_COLD;
 	void rf2_gx400_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;

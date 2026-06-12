@@ -493,6 +493,7 @@ void gx400_state::gx400_base_map(address_map &map)
 	map(0x010000, 0x01ffff).ram(); // PROGRAM RAM
 	map(0x020000, 0x027fff).rw(FUNC(gx400_state::sound_sharedram_word_r), FUNC(gx400_state::sound_sharedram_word_w));
 	map(0x030000, 0x03ffff).ram().w(FUNC(gx400_state::charram_w)).share(m_charram);
+	// unknown write at 0x040000 thorugh 0x04ffff
 	gx400_video_map(map);
 	map(0x05c001, 0x05c001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x05c402, 0x05c403).portr("DSW0");
@@ -502,7 +503,7 @@ void gx400_state::gx400_base_map(address_map &map)
 	map(0x05cc00, 0x05cc01).portr("IN0");
 	map(0x05cc02, 0x05cc03).portr("IN1");
 	map(0x05cc04, 0x05cc05).portr("IN2");
-	// Unknown read at 0x05d001
+	// Unknown read at 0x05d000 through 0x05ffff
 	map(0x05e000, 0x05e00f).w("outlatch", FUNC(ls259_device::write_d0)).umask16(0xff00);
 	map(0x05e000, 0x05e00f).w("intlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff);
 }
@@ -515,11 +516,10 @@ void gx400_state::addon_gx456_map(address_map &map)
 
 void gx400_state::addon_gx561_map(address_map &map)
 {
-	map(0x060000, 0x067fff).ram();         /* WORK RAM */
 	map(0x070000, 0x070001).r(FUNC(gx400_state::konamigt_input_word_r));
 }
 
-void gx400_state::nemesis_base_map(address_map &map)
+void gx400_state::nemesis_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x04ffff).ram().w(FUNC(gx400_state::charram_w)).share(m_charram);
@@ -534,17 +534,12 @@ void gx400_state::nemesis_base_map(address_map &map)
 	map(0x05cc06, 0x05cc07).portr("TEST");
 	map(0x05e000, 0x05e00f).w("outlatch", FUNC(ls259_device::write_d0)).umask16(0xff00);
 	map(0x05e000, 0x05e00f).w("intlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff);
-}
-
-void gx400_state::nemesis_map(address_map &map)
-{
-	nemesis_base_map(map);
 	map(0x060000, 0x067fff).ram();         /* WORK RAM */
 }
 
 void gx400_state::konamigt_map(address_map &map)
 {
-	nemesis_base_map(map);
+	nemesis_map(map);
 	addon_gx561_map(map);
 }
 
@@ -972,7 +967,7 @@ static INPUT_PORTS_START( rf2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_BUTTON3 ) /* gear (0-7) */
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_BUTTON3 ) /* gear (0-7) - actually analog? */
 	PORT_BIT( 0x8f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
@@ -3146,7 +3141,7 @@ GAME( 1985, bubsys,      0,        bubsys,     bubsys,     bubsys_state,   bubsy
 
 GAME( 1985, bs_gradius,  bubsys,   bs_gradius, bs_gradius, bubsys_state,   bubsys_init,     ROT0,   "Konami", "Gradius (Bubble System)",                 MACHINE_UNEMULATED_PROTECTION )
 GAME( 1985, bs_gwarrior, bubsys,   bubsys,     gwarrior,   bubsys_state,   bubsys_init,     ROT0,   "Konami", "Galactic Warriors (Bubble System)",       MACHINE_UNEMULATED_PROTECTION )
-GAME( 1985, bs_rf2,      bubsys,   bs_rf2,     rf2,        bubsys_state,   bubsys_init,     ROT0,   "Konami", "Konami RF2: Red Fighter (Bubble System)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1985, bs_rf2,      bubsys,   bs_rf2,     rf2,        bubsys_state,   bubsys_init,     ROT0,   "Konami", "Konami RF2: Red Fighter (Bubble System)", MACHINE_UNEMULATED_PROTECTION )
 GAME( 1985, bs_twinbee,  bubsys,   bubsys,     bs_twinbee, bubsys_state,   bs_twinbee_init, ROT90,  "Konami", "TwinBee (Bubble System)",                 MACHINE_UNEMULATED_PROTECTION )
 
 // Bubble System Attack Rush was announced, but never released
