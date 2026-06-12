@@ -2885,6 +2885,8 @@ if BUSES["ISA"] then
 		MAME_DIR .. "src/devices/bus/isa/ibm_speech.h",
 		MAME_DIR .. "src/devices/bus/isa/ide.cpp",
 		MAME_DIR .. "src/devices/bus/isa/ide.h",
+		MAME_DIR .. "src/devices/bus/isa/dsi32.cpp",
+		MAME_DIR .. "src/devices/bus/isa/dsi32.h",
 		MAME_DIR .. "src/devices/bus/isa/lbaenhancer.cpp",
 		MAME_DIR .. "src/devices/bus/isa/lbaenhancer.h",
 		MAME_DIR .. "src/devices/bus/isa/lpt.cpp",
