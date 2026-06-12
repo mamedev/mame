@@ -81,6 +81,15 @@ uint32_t pc9821_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
+
+	pc9801_96_device *wnd_accel = subdevice<pc9801_96_device>("cbus:0:pc9801_96");
+	if (wnd_accel)
+	{
+		uint32_t res = wnd_accel->screen_update(screen, bitmap, cliprect);
+		if (res != 0)
+			return res;
+	}
+
 	if(m_video_ff[DISPLAY_REG] != 0)
 	{
 		if (m_ex_video_ff[ANALOG_256_MODE])
