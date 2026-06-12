@@ -124,6 +124,88 @@ void kaypro84_state::kaypro484_io(address_map &map)
 	map(0x24, 0x24).mirror(3).rw(FUNC(kaypro84_state::rtc_r), FUNC(kaypro84_state::rtc_w));
 }
 
+// Kaypro 10 ('84) with the WD1002-HD0 Winchester controller wired up.
+// 0x80 is the board's sector-buffer data port (the host bursts a 512-byte
+// sector through it with INIR/OTIR, then polls BUSY/DRQ at 0x87); 0x81-0x87
+// are the WD1010 task-file registers 1-7 (error/precomp, sector count, sector
+// number, cyl low, cyl high, SDH, status/command) -- see the V1.9E ROM source.
+void kaypro84_state::kaypro1084_io(address_map &map)
+{
+	kaypro484_io(map);
+	map(0x80, 0x87).rw(FUNC(kaypro84_state::hdc_r), FUNC(kaypro84_state::hdc_w));
+}
+
+// Kaypro 10 (1983, Bd. 81-180) with the WD1002-HD0 wired up.  Same controller
+// at the same ports as the '84, but on the simpler kaypro10_io (no z80pio/RTC).
+void kaypro84_state::kaypro10hd_io(address_map &map)
+{
+	kaypro10_io(map);
+	map(0x80, 0x87).rw(FUNC(kaypro84_state::hdc_r), FUNC(kaypro84_state::hdc_w));
+}
+
+u8 kaypro84_state::hdc_r(offs_t offset)
+{
+	if (offset == 0)   // 0x80: host reads the buffered sector (data already in the buffer)
+	{
+		u8 const data = m_hdc_buf[m_hdc_ptr & 0x1ff];
+		if (!machine().side_effects_disabled())
+			m_hdc_ptr++;
+		return data;
+	}
+	return m_hdc->read(offset);   // 0x81-0x87 -> WD1010 task-file regs 1-7
+}
+
+void kaypro84_state::hdc_w(offs_t offset, u8 data)
+{
+	if (offset == 0)   // 0x80: WD1002 sector-buffer data port
+	{
+		m_hdc_buf[m_hdc_ptr & 0x1ff] = data;
+		if ((m_hdc_ptr++ & 0x1ff) == 0x1ff)
+			m_hdc->brdy_w(1);   // host has filled a full 512-byte sector
+		return;
+	}
+	if (offset == 6)   // SDH (Size/Drive/Head)
+	{
+		// Head select comes from SDH bits 0-2 (MAME's wd1010 takes head via head_w).
+		m_hdc->head_w(data & 0x07);
+		// The Kaypro 10 has one fixed Winchester; its drive-select latch presents it
+		// as WD1010 "drive 1" (dsel01=08h).  Collapse any drive-select onto the single
+		// configured drive (0) so the controller always finds the disk.
+		data &= ~0x18;
+	}
+	if (offset == 7)   // command register: start each command with a clean buffer handshake
+	{
+		m_hdc->brdy_w(0);
+		m_hdc_ptr = 0;
+	}
+	m_hdc->write(offset, data);   // 0x81-0x87 -> WD1010 task-file regs 1-7
+}
+
+// WD1010 <-> board sector buffer: the controller drains/fills the buffer here
+// (no host-side BRDY handshake on these accesses).
+u8 kaypro84_state::hdc_buf_in()
+{
+	u8 const data = m_hdc_buf[m_hdc_ptr & 0x1ff];
+	m_hdc_ptr++;
+	return data;
+}
+
+void kaypro84_state::hdc_buf_out(u8 data)
+{
+	m_hdc_buf[m_hdc_ptr & 0x1ff] = data;
+	// once the controller has filled a whole sector, the board reports buffer-ready so the
+	// READ command completes -- the host then reads the buffer afterward (or not, on a verify).
+	if ((m_hdc_ptr++ & 0x1ff) == 0x1ff)
+		m_hdc->brdy_w(1);
+}
+
+// WD1010 buffer-counter reset (BCR): just rewind the pointer; BRDY is managed at command edges.
+void kaypro84_state::hdc_bcr_w(int state)
+{
+	if (state)
+		m_hdc_ptr = 0;
+}
+
 
 static INPUT_PORTS_START(kaypro)
 	// everything comes from the keyboard device
@@ -412,23 +494,37 @@ void kaypro84_state::kaypro1(machine_config &config)
 	SOFTWARE_LIST(config.replace(), "flop_list").set_original("kaypro").set_filter("G");
 }
 
+// WD1002-HD0 Winchester controller (WD1010-based) + 10MB ST506 drive (Shugart
+// 712 class: 306 cyl x 4 heads x 17 sec x 512 B).  The board's sector buffer is
+// exposed at I/O 0x80; the WD1010 task file at 0x81-0x87 (see the V1.9/V1.9E ROM
+// source).  Both Kaypro 10 boards (81-180 '83 and 81-181 '84) carry the same
+// controller -- only the surrounding I/O map differs -- so share the wiring here.
+void kaypro84_state::add_hdc(machine_config &config)
+{
+	config.device_remove("fdc:1");  // the HD models carry a single floppy drive
+	WD1010(config, m_hdc, 5'000'000);
+	m_hdc->out_bcr_callback().set(FUNC(kaypro84_state::hdc_bcr_w));
+	m_hdc->in_data_callback().set(FUNC(kaypro84_state::hdc_buf_in));
+	m_hdc->out_data_callback().set(FUNC(kaypro84_state::hdc_buf_out));
+	HARDDISK(config, m_hdd, 0);
+}
+
 void kaypro84_state::kaypro10(machine_config &config)
 {
 	kaypro484(config);
-	m_maincpu->set_addrmap(AS_IO, &kaypro84_state::kaypro10_io);
+	m_maincpu->set_addrmap(AS_IO, &kaypro84_state::kaypro10hd_io);
 	m_maincpu->set_daisy_config(kaypro10_daisy_chain);
 	config.device_remove("z80pio");
 	config.device_remove("rtc");
-	config.device_remove("fdc:1");  // only has 1 floppy drive
-	// need to add hard drive & controller
+	add_hdc(config);  // WD1002-HD0 + 10MB drive (also removes fdc:1)
 	SOFTWARE_LIST(config.replace(), "flop_list").set_original("kaypro").set_filter("E");
 }
 
 void kaypro84_state::kaypro1084(machine_config &config)
 {
 	kaypro484(config);
-	config.device_remove("fdc:1");  // only has 1 floppy drive
-	// need to add hard drive & controller
+	m_maincpu->set_addrmap(AS_IO, &kaypro84_state::kaypro1084_io);
+	add_hdc(config);  // WD1002-HD0 + 10MB drive (also removes fdc:1)
 	SOFTWARE_LIST(config.replace(), "flop_list").set_original("kaypro").set_filter("E");
 }
 
