@@ -1271,9 +1271,9 @@ void specnext_state::rxd_w(int state)
 
 void specnext_state::turbosound_address_w(u8 data)
 {
-	if ((data & 0x9c) == 0x9c)
-		m_ay_select = (data & 3) % 3;
-	else
+	if (m_nr_08_psg_turbosound_en && (data & 0x9c) == 0x9c)
+		m_ay_select = (data & 0x02) ? ((data & 0x01) ? 0 : 1) : ((data & 0x01) ? 2 : 0);
+	else if ((data & 0xe0) == 0)
 		m_ay[m_nr_08_psg_turbosound_en ? m_ay_select : 0]->address_w(data);
 }
 
