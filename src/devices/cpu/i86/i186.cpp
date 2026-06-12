@@ -578,6 +578,11 @@ void i80186_cpu_device::execute_run()
 							do
 							{
 								i_insb();
+								if (m_io_stall)
+								{
+									m_io_stall = false;
+									break;
+								}
 								c--;
 							} while (c > 0 && m_icount > 0);
 						}
@@ -592,6 +597,11 @@ void i80186_cpu_device::execute_run()
 							do
 							{
 								i_insw();
+								if (m_io_stall)
+								{
+									m_io_stall = false;
+									break;
+								}
 								c--;
 							} while (c > 0 && m_icount > 0);
 						}
@@ -606,6 +616,11 @@ void i80186_cpu_device::execute_run()
 							do
 							{
 								i_outsb();
+								if (m_io_stall)
+								{
+									m_io_stall = false;
+									break;
+								}
 								c--;
 							} while (c > 0 && m_icount > 0);
 						}
@@ -620,6 +635,11 @@ void i80186_cpu_device::execute_run()
 							do
 							{
 								i_outsw();
+								if (m_io_stall)
+								{
+									m_io_stall = false;
+									break;
+								}
 								c--;
 							} while (c > 0 && m_icount > 0);
 						}

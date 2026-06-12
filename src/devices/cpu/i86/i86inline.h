@@ -496,7 +496,16 @@ inline void i8086_common_cpu_device::ExpandFlags(uint16_t f)
 inline void i8086_common_cpu_device::i_insb()
 {
 	uint32_t ea = calc_addr(ES, m_regs.w[DI], 1, I8086_WRITE);
-	write_byte(ea, read_port_byte(m_regs.w[DX]));
+	uint8_t const data = read_port_byte(m_regs.w[DX]);
+	if (access_to_be_redone())
+	{
+		// the device wait-stated the cycle; restart the instruction
+		m_io_stall = true;
+		m_ip = m_prev_ip;
+		m_icount -= 4;
+		return;
+	}
+	write_byte(ea, data);
 	m_regs.w[DI] += -2 * m_DF + 1;
 	CLK(IN_IMM8);
 }
@@ -504,7 +513,15 @@ inline void i8086_common_cpu_device::i_insb()
 inline void i8086_common_cpu_device::i_insw()
 {
 	uint32_t ea = calc_addr(ES, m_regs.w[DI], 2, I8086_WRITE);
-	write_word(ea, read_port_word(m_regs.w[DX]));
+	uint16_t const data = read_port_word(m_regs.w[DX]);
+	if (access_to_be_redone())
+	{
+		m_io_stall = true;
+		m_ip = m_prev_ip;
+		m_icount -= 4;
+		return;
+	}
+	write_word(ea, data);
 	m_regs.w[DI] += -4 * m_DF + 2;
 	CLK(IN_IMM16);
 }
@@ -512,6 +529,14 @@ inline void i8086_common_cpu_device::i_insw()
 inline void i8086_common_cpu_device::i_outsb()
 {
 	write_port_byte(m_regs.w[DX], GetMemB(DS, m_regs.w[SI]));
+	if (access_to_be_redone())
+	{
+		// the device wait-stated the cycle; restart the instruction
+		m_io_stall = true;
+		m_ip = m_prev_ip;
+		m_icount -= 4;
+		return;
+	}
 	m_regs.w[SI] += -2 * m_DF + 1;
 	CLK(OUT_IMM8);
 }
@@ -519,6 +544,13 @@ inline void i8086_common_cpu_device::i_outsb()
 inline void i8086_common_cpu_device::i_outsw()
 {
 	write_port_word(m_regs.w[DX], GetMemW(DS, m_regs.w[SI]));
+	if (access_to_be_redone())
+	{
+		m_io_stall = true;
+		m_ip = m_prev_ip;
+		m_icount -= 4;
+		return;
+	}
 	m_regs.w[SI] += -4 * m_DF + 2;
 	CLK(OUT_IMM16);
 }
