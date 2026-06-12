@@ -66,6 +66,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_soundlatch(*this, "soundlatch%u", 0),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_scroll_low(*this, "scroll_low"),
@@ -86,6 +87,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_audiocpu;
+	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -362,8 +364,8 @@ void vulgus_state::main_map(address_map &map)
 	map(0xc002, 0xc002).portr("P2");
 	map(0xc003, 0xc003).portr("DSW1");
 	map(0xc004, 0xc004).portr("DSW2");
-	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc801, 0xc801).nopw(); // ?
+	map(0xc800, 0xc800).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
+	map(0xc801, 0xc801).w(m_soundlatch[1], FUNC(generic_latch_8_device::write));
 	map(0xc802, 0xc803).ram().share(m_scroll_low);
 	map(0xc804, 0xc804).w(FUNC(vulgus_state::control_w));
 	map(0xc805, 0xc805).w(FUNC(vulgus_state::palette_bank_w));
@@ -386,7 +388,8 @@ void vulgus_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x47ff).ram();
-	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x6000, 0x6000).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
+	map(0x6001, 0x6001).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));
 	map(0x8000, 0x8001).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0xc000, 0xc001).w("ay2", FUNC(ay8910_device::address_data_w));
 }
@@ -596,7 +599,7 @@ GFXDECODE_END
 void vulgus_state::vulgus(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 12_MHz_XTAL / 4);  // 3 MHz
+	Z80(config, m_maincpu, 12_MHz_XTAL / 4); // 3 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &vulgus_state::main_map);
 
 	Z80(config, m_audiocpu, 12_MHz_XTAL / 4); // 3 MHz
@@ -617,7 +620,8 @@ void vulgus_state::vulgus(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
 	AY8910(config, "ay1", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.25); // 1.5 MHz
 	AY8910(config, "ay2", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.25); // 1.5 MHz
@@ -846,4 +850,4 @@ GAME( 1984, vulgusa, vulgus, vulgus, vulgus,  vulgus_state,   empty_init,   ROT9
 GAME( 1984, vulgusj, vulgus, vulgus, vulgus,  vulgus_state,   empty_init,   ROT270, "Capcom",          "Vulgus (Japan?)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1984, mach9,   vulgus, vulgus, vulgus,  vulgus_state,   empty_init,   ROT270, "bootleg (Itisa)", "Mach-9 (bootleg of Vulgus)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, 1942iti, 1942,   vulgus, 1942iti, _1942iti_state, empty_init,   ROT270, "bootleg (Itisa)", "1942 (Itisa bootleg)",       MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1984, 1942iti, 1942,   vulgus, 1942iti, _1942iti_state, empty_init,   ROT270, "bootleg (Itisa)", "1942 (bootleg on Vulgus hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

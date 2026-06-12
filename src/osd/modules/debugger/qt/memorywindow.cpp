@@ -220,6 +220,36 @@ MemoryWindow::~MemoryWindow()
 }
 
 
+bool MemoryWindow::selectSpace(address_space &space)
+{
+	auto *const view = m_memTable->view<debug_view_memory>();
+	std::size_t i = 0;
+	for (auto &ptr : view->source_list())
+	{
+		auto const *const source = downcast<debug_view_memory_source const *>(ptr.get());
+		auto const [mintf, spacenum] = source->space();
+		assert(!mintf || ((0 <= spacenum) && mintf->has_space(spacenum)));
+		if (mintf && (&mintf->space(spacenum) == &space))
+		{
+			if (view->source() != source)
+				m_memoryComboBox->setCurrentIndex(i);
+			return true;
+		}
+		++i;
+	}
+	return false;
+}
+
+
+void MemoryWindow::debugActOpenMemory()
+{
+	MemoryWindow *foo = new MemoryWindow(m_debugger, this);
+	foo->m_memoryComboBox->setCurrentIndex(m_memTable->sourceIndex());
+	foo->m_inputEdit->setText(QString::fromUtf8(m_memTable->view<debug_view_memory>()->expression()));
+	foo->expressionSubmitted();
+}
+
+
 void MemoryWindow::restoreConfiguration(util::xml::data_node const &node)
 {
 	WindowQt::restoreConfiguration(node);

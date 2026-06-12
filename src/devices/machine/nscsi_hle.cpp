@@ -191,6 +191,12 @@ void nscsi_full_device::step(bool timeout)
 		break;
 
 	case TARGET_NEXT_CONTROL: {
+		// An empty control queue means the target has deferred the phase
+		// sequence (e.g. a slow medium operation still in progress): hold the
+		// connection in the current state; the deferred scsi_data_in()/
+		// scsi_status_complete() pushes will resume stepping.
+		if(m_buf_control_rpos == m_buf_control_wpos)
+			return;
 		control *ctl = buf_control_pop();
 		switch(ctl->m_action) {
 		case BC_MSG_OR_COMMAND:
@@ -413,6 +419,17 @@ void nscsi_full_device::scsi_status_complete(uint8_t st)
 	c->m_param1 = SM_COMMAND_COMPLETE;
 	c = buf_control_push();
 	c->m_action = BC_BUS_FREE;
+	scsi_resume_deferred();
+}
+
+// Resume a deferred phase sequence: if the state machine is parked in
+// TARGET_NEXT_CONTROL on an empty queue (see step()), freshly pushed control
+// entries need a kick to start processing.  Calls from inside scsi_command()/
+// scsi_message() are no-ops because the state has not advanced yet.
+void nscsi_full_device::scsi_resume_deferred()
+{
+	if(m_scsi_state == TARGET_NEXT_CONTROL && m_buf_control_rpos != m_buf_control_wpos)
+		step(false);
 }
 
 void nscsi_full_device::scsi_data_in(int buf, int size)
@@ -433,6 +450,7 @@ void nscsi_full_device::scsi_data_in(int buf, int size)
 	c->m_action = BC_DATA_IN;
 	c->m_param1 = buf;
 	c->m_param2 = size;
+	scsi_resume_deferred();
 }
 
 void nscsi_full_device::scsi_data_out(int buf, int size)
@@ -442,6 +460,7 @@ void nscsi_full_device::scsi_data_out(int buf, int size)
 	c->m_action = BC_DATA_OUT;
 	c->m_param1 = buf;
 	c->m_param2 = size;
+	scsi_resume_deferred();
 }
 
 //////////////////////////////////////////////////////////////////////////////

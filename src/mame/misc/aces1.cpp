@@ -54,17 +54,18 @@ namespace {
 class aces1_state : public driver_device
 {
 public:
-	aces1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_reel(*this, "reel%u", 0U),
-			m_io_ports(*this, {"IO1", "IO2", "IO3", "IO4", "IO5", "IO6", "IO7", "IO8"}),
-			m_lamps(*this, "lamp%u", 0U),
-			m_digits(*this, "digit%u", 0U)
+	aces1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_reel(*this, "reel%u", 1U),
+		m_io_ports(*this, "IO%u", 1U),
+		m_lamps(*this, "lamp%u", 0U),
+		m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void init_aces1();
-	void aces1(machine_config &config);
+	void init_aces1() ATTR_COLD;
+
+	void aces1(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

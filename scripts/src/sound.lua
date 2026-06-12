@@ -1308,6 +1308,18 @@ if SOUNDS["VA_VCA"] then
 end
 
 --------------------------------------------------
+-- Virtual analog voltage-controlled oscillator (VCO)
+--@src/devices/sound/va_vco.h,SOUNDS["VA_VCO"] = true
+--------------------------------------------------
+
+if SOUNDS["VA_VCO"] then
+	files {
+		MAME_DIR .. "src/devices/sound/va_vco.cpp",
+		MAME_DIR .. "src/devices/sound/va_vco.h",
+	}
+end
+
+--------------------------------------------------
 -- Virtual analog voltage-controlled filters (VCFs)
 --@src/devices/sound/va_vcf.h,SOUNDS["VA_VCF"] = true
 --------------------------------------------------

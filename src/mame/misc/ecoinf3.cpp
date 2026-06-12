@@ -35,7 +35,7 @@ public:
 	ecoinf3_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_reels(*this, "reel%u", 0U),
+		m_reels(*this, "reel%u", 1U),
 		m_lamp_outputs(*this, "lamp%u", 0U),
 		m_vfd_outputs(*this, "vfd%u", 0U)
 	{
@@ -43,6 +43,7 @@ public:
 
 	void init_ecoinf3() ATTR_COLD;
 	void init_ecoinf3_swap() ATTR_COLD;
+
 	void ecoinf3_pyramid(machine_config &config) ATTR_COLD;
 
 private:

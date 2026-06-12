@@ -30,7 +30,11 @@ public:
 
 	virtual void restoreConfiguration(util::xml::data_node const &node) override;
 
+	bool selectSpace(address_space &space);
+
 protected:
+	virtual void debugActOpenMemory() override;
+
 	virtual void saveConfigurationToNode(util::xml::data_node &node) override;
 
 	// Used to intercept the user hitting the up arrow in the input widget

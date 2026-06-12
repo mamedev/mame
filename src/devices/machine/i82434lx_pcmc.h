@@ -58,7 +58,21 @@ private:
 
 	u8 m_cse, m_trc, m_forw, m_pcams;
 
+	u8 m_hcs;
+	u8 m_dfc;
+	u8 m_scc;
+	u8 m_hbc;
+	u8 m_pbc;
+	u8 m_dramc;
+	u8 m_dramt;
 	u8 m_pam[7];
+	u8 m_drb[8];
+	u8 m_drbe[8];
+	u8 m_errcmd;
+	u8 m_errsts;
+	u16 m_msg;
+	u32 m_fbr;
+	u8 m_smrs, m_smrs_mask;
 };
 
 

@@ -17,7 +17,8 @@ TODO:
  * Hopper hookup doesn't work properly.  MAME counts far more "tickets
    dispensed" than the number of coins/tickets the games are supposed to
    pay out.
- * dbshahb: Implement different video chip, different memory map
+ * dbshahb: Some GFX glitches when entering test mode. IRQs could probably
+   be improved. Hopper. DSW definitions incomplete.
  * fengyunz: Stops with linking error (bypassed for now).
    Also needs DSW definitions
  * xyddzhh: Improve DSW definitions
@@ -79,7 +80,6 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
-private:
 	required_device<m68000_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -98,13 +98,30 @@ private:
 	optional_ioport_array<5> m_key;
 	required_ioport m_inputs;
 
+	uint8_t m_mux = 0;
+	uint8_t m_irq_enable = 0;
+
+	uint16_t unk_r();
+
+	// Interrupts
+	void irq_enable_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	void irq_ack_w(uint8_t data);
+
+	// Video
+	template<unsigned N> void videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	void pixram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void pixpal_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+
+private:
 	tilemap_t *m_tilemap[2]{};
 	bitmap_ind16 m_pixbitmap;
 
 	uint16_t m_prot_val = 0;
-	uint8_t m_mux = 0;
-	uint8_t m_irq_enable = 0;
 	uint8_t m_pixpal = 0;
+
+	void draw_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// Protection
 	uint16_t bmcpokr_prot_r();
@@ -113,7 +130,6 @@ private:
 	uint16_t shendeng_prot_r();
 	uint16_t xyddzhh_prot_r();
 	void prot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t unk_r();
 
 	// I/O
 	void mux_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
@@ -122,21 +138,10 @@ private:
 	uint16_t mjmaglmp_dsw_r();
 	uint16_t xyddzhh_dsw_r();
 
-	// Interrupts
-	void irq_enable_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
-	void irq_ack_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	// Video
 	template<unsigned N> TILE_GET_INFO_MEMBER(get_tile_info);
-	template<unsigned N> void videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
 	void pixbitmap_redraw();
-	void pixram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void pixpal_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
-
-	void draw_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void bmcpokr_mem(address_map &map) ATTR_COLD;
 	void fengyunh_map(address_map &map) ATTR_COLD;
@@ -146,6 +151,30 @@ private:
 	void shendeng_map(address_map &map) ATTR_COLD;
 	void xyddzhh_map(address_map &map) ATTR_COLD;
 };
+
+class dbshahb_state : public bmcpokr_state
+{
+public:
+	dbshahb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		bmcpokr_state(mconfig, type, tag)
+	{ }
+
+	void dbshahb(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	uint8_t m_idptr = 0;
+	uint8_t m_idclk = 0;
+
+	uint8_t idchip_r();
+	void idchip_w(uint8_t data);
+	void output_w(uint8_t data);
+
+	void dbshahb_map(address_map &map) ATTR_COLD;
+};
+
 
 /***************************************************************************
                                 Video Hardware
@@ -401,6 +430,25 @@ void bmcpokr_state::prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 //  logerror("%s: prot val = %04x\n", machine().describe_context(), m_prot_val);
 }
 
+// Game checks the bytes read with a table in ROM at 0x17d38.
+uint8_t dbshahb_state::idchip_r()
+{
+	static constexpr uint8_t id[] = { 0x00, 0x94, 0x11, 0x12, 0x09, 0xc0, 0x44, 0x23, 0x04 };
+
+	uint8_t const ret = id[m_idptr % sizeof(id)];
+	return ret;
+}
+
+void dbshahb_state::idchip_w(uint8_t data)
+{
+	if (BIT(data, 1)) // reset
+		m_idptr = 0;
+	else if (BIT(m_idclk, 0) && !BIT(data, 0))
+		m_idptr++;
+
+	m_idclk = data;
+}
+
 /***************************************************************************
                                 Memory Maps
 ***************************************************************************/
@@ -417,6 +465,7 @@ void bmcpokr_state::mux_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 
 	// popmessage("mux %04x", m_mux);
 }
+
 uint16_t bmcpokr_state::dsw_r()
 {
 	return m_dsw[BIT(~m_mux, 5, 2)]->read() << 8;
@@ -429,10 +478,29 @@ int bmcpokr_state::hopper_r()
 	return (m_mux & 0x01) ? (m_hopper->line_r() ^ 1) : 1;
 }
 
+void dbshahb_state::output_w(uint8_t data)
+{
+	// bit 0 is ticket dispenser according to test mode
+	m_hopper->motor_w(BIT(data, 0));
+
+	// bit 1 is coin counter according to test mode
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
+
+	// bit 2 is pay out counter according to test mode
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 2));
+
+	// bit 3 unknown
+	// bit 4 seems always set
+	// bit 5 is jackpot lamp according to test mode
+	// bit 6 unknown
+	// bit 7 seems always set
+}
+
 void bmcpokr_state::irq_enable_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_irq_enable);
 }
+
 void bmcpokr_state::irq_ack_w(uint8_t data)
 {
 	for (int i = 1; i < 8; i++)
@@ -631,6 +699,46 @@ void bmcpokr_state::fengyunh_map(address_map &map)
 	shendeng_map(map);
 
 	map(0x330000, 0x330001).r(FUNC(bmcpokr_state::fengyunh_prot_r));
+}
+
+void dbshahb_state::dbshahb_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x210000, 0x21ffff).ram().share(m_nvram);
+
+	map(0x280000, 0x29ffff).ram().w(FUNC(dbshahb_state::pixram_w)).share(m_pixram);
+	map(0x2a0000, 0x2a7fff).ram().w(FUNC(dbshahb_state::videoram_w<0>)).share(m_videoram[0]);
+	map(0x2a8000, 0x2affff).ram().w(FUNC(dbshahb_state::videoram_w<1>)).share(m_videoram[1]);
+	map(0x2b0000, 0x2dffff).ram(); // TODO: game writes data here too, but it's unused?
+	map(0x2ff800, 0x2ff9ff).ram().share(m_scrollram[0]);
+	map(0x2ffa00, 0x2ffbff).ram().share(m_scrollram[1]);
+	map(0x2ffc00, 0x2ffdff).ram().share(m_scrollram[2]);
+	map(0x2ffe00, 0x2fffff).ram();
+
+	map(0x320000, 0x320003).ram().share(m_layerctrl);
+	map(0x320004, 0x320005).ram();
+	map(0x330000, 0x330001).w(FUNC(dbshahb_state::output_w));
+	map(0x340001, 0x340001).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x340003, 0x340003).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x340005, 0x340005).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x350000, 0x350001).portr("INPUTS");
+	map(0x360001, 0x360001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x370000, 0x370003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
+	map(0x380000, 0x380001).lr16(NAME([this] () -> uint16_t { return m_dsw[m_mux]->read() << 8; }));
+
+	// the 0x390000-0x39001f block needs to be completely verified
+	map(0x390005, 0x390005).w(FUNC(dbshahb_state::pixpal_w));
+	map(0x390006, 0x390007).ram().share(m_backpen);
+	map(0x390008, 0x390009).ram();
+	map(0x39000b, 0x39000b).lr8(NAME([this] () -> uint8_t { return m_irq_enable; })).w(FUNC(dbshahb_state::irq_enable_w));
+	map(0x39000e, 0x39000f).ram().share(m_priority);
+	map(0x39000d, 0x39000d).w(FUNC(dbshahb_state::irq_ack_w));
+	map(0x390010, 0x390011).r(FUNC(dbshahb_state::unk_r));
+	map(0x390015, 0x390015).lr8(NAME([] () -> uint8_t { return 0x2d; })); // seems enough to satisfy the check. TODO: identify what this really is
+	map(0x390018, 0x390019).ram(); // ??
+
+	map(0x3a0000, 0x3a0000).rw(FUNC(dbshahb_state::idchip_r), FUNC(dbshahb_state::idchip_w)); // TODO: this check was reversed by AI, verify
+	map(0x3b0000, 0x3b0000).lw8(NAME([this] (uint8_t data) { m_mux = data & 0x03; }));
 }
 
 /***************************************************************************
@@ -1260,6 +1368,75 @@ static INPUT_PORTS_START( xyddzhh )
 	PORT_DIPSETTING(    0x80, "100,000" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dbshahb )
+	// input test is accessible by keeping take (default G) and Test (default F2) pressed during boot / reset
+	PORT_START("INPUTS")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  ) // 開分 KEY-IN
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_POKER_HOLD5   ) // 保5
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_POKER_HOLD4   ) // 保4
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_POKER_HOLD2   ) // 保2
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD1   ) // 保1
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_POKER_HOLD3   ) // 保3
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL   ) // 開始 START
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   ) // 比倍 DOUBLE
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BET    ) // 押分 BET
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // HP
+	PORT_SERVICE_NO_TOGGLE( 0x0400, IP_ACTIVE_LOW      ) // 查帳 SERVICE
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) // 洗分 KEY-OUT
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE   ) // 得分 SCORE
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_LOW    ) // 小 SMALL
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH   ) // 大 BIG
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1         ) PORT_IMPULSE(5) // 投幣 COIN
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Game Title" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, "Da Bai Sha Huobao Ban" )
+	PORT_DIPSETTING(    0x00, "Redaiyu Huobao Ban" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
+
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW2:2" )
+	PORT_DIPNAME(           0x0c, 0x0c, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(              0x0c, "1 Coin/10 Credits, 1 Key-In/100 Credits" )
+	PORT_DIPSETTING(              0x08, "1 Coin/20 Credits, 1 Key-In/200 Credits" )
+	PORT_DIPSETTING(              0x04, "1 Coin/50 Credits, 1 Key-In/500 Credits" )
+	PORT_DIPSETTING(              0x00, "1 Coin/100 Credits, 1 Key-In/1000 Credits" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )
+	PORT_DIPNAME(           0xc0, 0xc0, "Bonus Bet" ) PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPSETTING(              0x00, "250 Credits" )
+	PORT_DIPSETTING(              0x40, "500 Credits" )
+	PORT_DIPSETTING(              0x80, "750 Credits" )
+	PORT_DIPSETTING(              0xc0, "1000 Credits" )
+
+	PORT_START("DSW3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW3:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW3:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW3:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW3:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW3:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
+
+	PORT_START("DSW4")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW4:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW4:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW4:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW4:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW4:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW4:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW4:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW4:8" )
+INPUT_PORTS_END
+
 
 /***************************************************************************
                                 Graphics Layout
@@ -1288,14 +1465,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(bmcpokr_state::interrupt)
 {
 	int const scanline = param;
 
-	if (scanline == 240)
-		if (BIT(m_irq_enable, 2)) m_maincpu->set_input_line(2, ASSERT_LINE);
+	if (BIT(m_irq_enable, 0)) // global IRQ enable? needed to disable IRQs during NVRAM check in dbshahb (fails otherwise)
+	{
+		if (scanline == 240)
+			if (BIT(m_irq_enable, 2)) m_maincpu->set_input_line(2, ASSERT_LINE);
 
-	if (scanline == 128)
-		if (BIT(m_irq_enable, 3)) m_maincpu->set_input_line(3, ASSERT_LINE);
+		if (scanline == 128)
+			if (BIT(m_irq_enable, 3)) m_maincpu->set_input_line(3, ASSERT_LINE);
 
-	if (scanline == 64)
-		if (BIT(m_irq_enable, 6)) m_maincpu->set_input_line(6, ASSERT_LINE);
+		if (scanline == 64)
+			if (BIT(m_irq_enable, 6)) m_maincpu->set_input_line(6, ASSERT_LINE);
+	}
 }
 
 void bmcpokr_state::ramdac_map(address_map &map)
@@ -1310,6 +1490,15 @@ void bmcpokr_state::machine_start()
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_pixpal));
 }
+
+void dbshahb_state::machine_start()
+{
+	bmcpokr_state::machine_start();
+
+	save_item(NAME(m_idptr));
+	save_item(NAME(m_idclk));
+}
+
 
 void bmcpokr_state::bmcpokr(machine_config &config)
 {
@@ -1339,6 +1528,12 @@ void bmcpokr_state::bmcpokr(machine_config &config)
 	YM2413(config, "ymsnd", 42_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 1.00); // UM3567 @3.50MHz (42/12)
 
 	OKIM6295(config, m_oki, 42_MHz_XTAL / 40, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00); // M6295 @1.05MHz (42/40)
+}
+
+void dbshahb_state::dbshahb(machine_config &config)
+{
+	bmcpokr(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dbshahb_state::dbshahb_map);
 }
 
 void bmcpokr_state::fengyunh(machine_config &config)
@@ -1663,6 +1858,8 @@ ROM_START( mjmaglmp )
 	ROM_LOAD( "ja-a-901.u6", 0x00000, 0x40000, CRC(25f36d00) SHA1(c182348340ca67ad69d1a67c58b47d6371a725c9) )
 ROM_END
 
+// 大白鯊 火爆版 (Dà Bái Shā Huǒbào Bǎn) (Great White Shark - Hot Version) / 热带鱼 火爆版 (Rèdàiyú Huǒbào Bǎn) (Tropical Fish – Hot Version)
+// title selectable via DIP
 // HB PCB. Has BMC AIA90610 (rebadged M68K), BMC VDA90513 + BMC SYA70521 + Inmos IMSG171P-35 for video, UM3567 + U6295 for sound, 4 banks of 8 DIP switches
 ROM_START( dbshahb )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 Code
@@ -1681,10 +1878,13 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 1998, fengyunh, 0,        fengyunh, fengyunh, bmcpokr_state, empty_init, ROT0, "BMC",       "Fengyun Hui",              MACHINE_SUPPORTS_SAVE )
-GAME( 1998, shendeng, mjmaglmp, shendeng, shendeng, bmcpokr_state, empty_init, ROT0, "BMC",       "Pili Shen Deng",           MACHINE_SUPPORTS_SAVE )
-GAME( 1998, fengyunz, 0,        fengyunz, xyddzhh,  bmcpokr_state, empty_init, ROT0, "BMC",       "Fengyun Zhengba",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, bmcpokr,  0,        bmcpokr,  bmcpokr,  bmcpokr_state, empty_init, ROT0, "BMC",       "Dongfang Shenlong",        MACHINE_SUPPORTS_SAVE )
-GAME( 2000, mjmaglmp, 0,        mjmaglmp, mjmaglmp, bmcpokr_state, empty_init, ROT0, "BMC",       "Mahou no Lamp (v. JAA02)", MACHINE_SUPPORTS_SAVE )
-GAME( 2006, xyddzhh,  0,        xyddzhh,  xyddzhh,  bmcpokr_state, empty_init, ROT0, "Herb Home", "Xingyun Dou Dizhu",        MACHINE_SUPPORTS_SAVE )
-GAME( 200?, dbshahb,  0,        bmcpokr,  xyddzhh,  bmcpokr_state, empty_init, ROT0, "H.B.",      "Da Bai Sha (H.B.)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+// on BMC PCBs
+GAME( 1998, fengyunh, 0,        fengyunh, fengyunh, bmcpokr_state, empty_init, ROT0, "BMC",       "Fengyun Hui",                                          MACHINE_SUPPORTS_SAVE )
+GAME( 1998, shendeng, mjmaglmp, shendeng, shendeng, bmcpokr_state, empty_init, ROT0, "BMC",       "Pili Shen Deng",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1998, fengyunz, 0,        fengyunz, xyddzhh,  bmcpokr_state, empty_init, ROT0, "BMC",       "Fengyun Zhengba",                                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, bmcpokr,  0,        bmcpokr,  bmcpokr,  bmcpokr_state, empty_init, ROT0, "BMC",       "Dongfang Shenlong",                                    MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mjmaglmp, 0,        mjmaglmp, mjmaglmp, bmcpokr_state, empty_init, ROT0, "BMC",       "Mahou no Lamp (v. JAA02)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 2006, xyddzhh,  0,        xyddzhh,  xyddzhh,  bmcpokr_state, empty_init, ROT0, "Herb Home", "Xingyun Dou Dizhu",                                    MACHINE_SUPPORTS_SAVE )
+
+// on HB PCBs
+GAME( 200?, dbshahb,  0,        dbshahb,  dbshahb,  dbshahb_state, empty_init, ROT0, "H.B.",      "Da Bai Sha Huobao Ban / Redaiyu Huobao Ban (ver 0.1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

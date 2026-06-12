@@ -83,37 +83,38 @@ class jpmsru_state : public driver_device
 {
 public:
 	jpmsru_state(const machine_config &mconfig, device_type type, const char *tag) :
-			driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_inputs(*this, "IN%u", 0U),
-			m_reel(*this, "reel%u", 0U),
-			m_lamp(*this, "lamp%u", 0U),
-			m_digits(*this, "digit%u", 0U),
-			m_audio_in(*this, "nl_audio:in%u", 0U),
-			m_samples(*this, "samples"),
-			m_nvram(*this, "nvram", 0x100, ENDIANNESS_BIG),
-			m_dips(*this, "DIP%u", 0U)
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_inputs(*this, "IN%u", 0U),
+		m_reel(*this, "reel%u", 1U),
+		m_lamp(*this, "lamp%u", 0U),
+		m_digits(*this, "digit%u", 0U),
+		m_audio_in(*this, "nl_audio:in%u", 0U),
+		m_samples(*this, "samples"),
+		m_nvram(*this, "nvram", 0x100, ENDIANNESS_BIG),
+		m_dips(*this, "DIP%u", 0U)
 	{ }
 
-	void jpmsru_3k(machine_config &config);
-	void jpmsru_3k_busext(machine_config &config);
-	void jpmsru_4k(machine_config &config);
-	void jpmsru_6k(machine_config &config);
-	void ewn(machine_config &config);
-	void ewn2(machine_config &config);
-	void ndu(machine_config &config);
-	void dud(machine_config &config);
-	void lan(machine_config &config);
-	void super2(machine_config &config);
-	void ews(machine_config &config);
-	void lt(machine_config &config);
-	void sup2p(machine_config &config);
-	void lal(machine_config &config);
+	void jpmsru_3k(machine_config &config) ATTR_COLD;
+	void jpmsru_3k_busext(machine_config &config) ATTR_COLD;
+	void jpmsru_4k(machine_config &config) ATTR_COLD;
+	void jpmsru_6k(machine_config &config) ATTR_COLD;
+	void ewn(machine_config &config) ATTR_COLD;
+	void ewn2(machine_config &config) ATTR_COLD;
+	void ndu(machine_config &config) ATTR_COLD;
+	void dud(machine_config &config) ATTR_COLD;
+	void lan(machine_config &config) ATTR_COLD;
+	void super2(machine_config &config) ATTR_COLD;
+	void ews(machine_config &config) ATTR_COLD;
+	void lt(machine_config &config) ATTR_COLD;
+	void sup2p(machine_config &config) ATTR_COLD;
+	void lal(machine_config &config) ATTR_COLD;
 
 	template <unsigned N> int opto_r() { return m_opto[N]; }
+
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void device_post_load() override;
+	virtual void device_post_load() override ATTR_COLD;
 
 	template <unsigned N> void opto_cb(int state) { m_opto[N] = state; }
 
@@ -196,7 +197,7 @@ public:
 			m_dac(*this, "dac")
 	{ }
 
-	void lc(machine_config &config);
+	void lc(machine_config &config) ATTR_COLD;
 
 private:
 	void outputs_lc(address_map &map) ATTR_COLD;

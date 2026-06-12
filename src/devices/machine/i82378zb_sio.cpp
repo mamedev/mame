@@ -57,6 +57,7 @@ i82378zb_sio_device::i82378zb_sio_device(const machine_config &mconfig, device_t
 i82378zb_sio_device::i82378zb_sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i82378zb_sio_device(mconfig, I82378ZB_SIO, tag, owner, clock)
 {
+	// 0x00 for 82378IB (as per PCI.exe)
 	// 0x03 for 82378ZB A0-Stepping
 	// 0x88 for 82379AB A0-Stepping
 	// No class code
@@ -160,8 +161,33 @@ void i82378zb_sio_device::device_start()
 //  m_pci_root->set_pin_mapper(pci_pin_mapper(*this, FUNC(i82378zb_sio_device::pin_mapper)));
 //  m_pci_root->set_irq_handler(pci_irq_handler(*this, FUNC(i82378zb_sio_device::irq_handler)));
 
+	save_item(NAME(m_pcicon));
+	save_item(NAME(m_pac));
+	save_item(NAME(m_papc));
+	save_item(NAME(m_arbprix));
+	save_item(NAME(m_mcscon));
+	save_item(NAME(m_mcsboh));
+	save_item(NAME(m_mcstoh));
+	save_item(NAME(m_mcstom));
+	save_item(NAME(m_iadcon));
+	save_item(NAME(m_iadrbe));
+	save_item(NAME(m_iadboh));
+	save_item(NAME(m_iadtoh));
+	save_item(NAME(m_icrt));
+	save_item(NAME(m_icd));
 	save_item(NAME(m_ubcsa));
 	save_item(NAME(m_ubcsb));
+	save_item(NAME(m_mar));
+	save_item(NAME(m_pirq));
+	save_item(NAME(m_bios_timer_base));
+	save_item(NAME(m_smicntl));
+	save_item(NAME(m_smien));
+	save_item(NAME(m_see));
+	save_item(NAME(m_ftmr));
+	save_item(NAME(m_smireq));
+	save_item(NAME(m_ctltmr));
+	save_item(NAME(m_ctltmrh));
+
 	save_item(NAME(m_port92));
 
 	save_item(NAME(m_ext_gatea20));
@@ -172,6 +198,11 @@ void i82378zb_sio_device::device_start()
 	m_has_xbus.flash_bios = m_xbus_flash != nullptr;
 	// we expect both IDE slots to be filled for now (X-Bus decodes from 1 bit alone)
 	m_has_xbus.ide = m_xbus_ide[0] != nullptr && m_xbus_ide[1] != nullptr;
+
+	LOG("X-Bus configuration:\n");
+	LOG("\tKeyboard %d\n", m_has_xbus.keyboard);
+	LOG("\tFlash BIOS %d\n", m_has_xbus.flash_bios);
+	LOG("\tIDE %d\n", m_has_xbus.ide);
 }
 
 void i82378zb_sio_device::device_reset()
@@ -187,8 +218,32 @@ void i82378zb_sio_device::device_reset()
 	// statuses, bits 13-11
 	status = 0x0200;
 
+	m_pcicon = 0x20;
+	m_pac = 0x00;
+	m_papc = 0x04;
+	m_arbprix = 0;
+	m_mcscon = 0x00;
+	m_mcsboh = 0x10;
+	m_mcstoh = 0x0f;
+	m_mcstom = 0x00;
+	m_iadcon = 0x01;
+	m_iadrbe = 0x00;
+	m_iadboh = 0x10;
+	m_iadtoh = 0x0f;
+	m_icrt = 0x56;
+	m_icd = 0x40;
 	m_ubcsa = 0x07;
 	m_ubcsb = 0x4f;
+	std::fill(std::begin(m_mar), std::end(m_mar), 0U);
+	std::fill(std::begin(m_pirq), std::end(m_pirq), 0x80U);
+	m_bios_timer_base = 0x0078;
+	m_smicntl = 0x08;
+	m_smien = 0x0000;
+	m_see = 0x00000000;
+	m_ftmr = 0x0f;
+	m_smireq = 0x0000;
+	m_ctltmr = 0x00;
+	m_ctltmrh = 0x00;
 
 	m_ext_gatea20 = 0;
 	m_fast_gatea20 = 0;
@@ -199,7 +254,142 @@ void i82378zb_sio_device::device_reset()
 void i82378zb_sio_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-	map(0x09, 0x3f).lr8(NAME([] () { return 0; }));
+	// reserved range on this controller (starts at 0x09 really, but need revision being mapped)
+	map(0x10, 0x3f).lr8(NAME([] () { return 0; }));
+
+	map(0x40, 0x40).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_pcicon;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("40h: PCICON PCI Control %02x\n", data);
+			m_pcicon = data & 0x7f;
+		})
+	);
+	map(0x41, 0x41).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_pac;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("41h: PAC PCI Arbiter Control %02x\n", data);
+			m_pac = data & 0x1f;
+		})
+	);
+	map(0x42, 0x42).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_papc;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("42h: PAPC PCI Arbiter Priority Control %02x\n", data);
+			m_papc = data;
+		})
+	);
+	map(0x43, 0x43).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_arbprix;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("43h: ARBPRIX PCI Arbiter Priority Control %02x\n", data);
+			m_arbprix = BIT(data, 0);
+		})
+	);
+	map(0x44, 0x44).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_mcscon;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("44h: MCSCON MEMCS# Control %02x\n", data);
+			m_mcscon = data & 0x1f;
+		})
+	);
+	map(0x45, 0x45).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_mcsboh;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("45h: MCSBOH MEMCS# Bottom Of Hole %02x\n", data);
+			m_mcsboh = data;
+		})
+	);
+	map(0x46, 0x46).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_mcstoh;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("45h: MCSTOH MEMCS# Top Of Hole %02x\n", data);
+			m_mcstoh = data;
+		})
+	);
+	map(0x47, 0x47).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_mcstom;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("47h: MCSTOM MEMCS# Top Of Memory %02x\n", data);
+			m_mcstom = data;
+		})
+	);
+	map(0x48, 0x48).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_iadcon;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("48h: IADCON ISA Address Decoder Control %02x\n", data);
+			m_iadcon = data;
+		})
+	);
+	map(0x49, 0x49).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_iadrbe;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("49h: IADRBE ISA Address Decoder ROM Block Enable %02x\n", data);
+			m_iadrbe = data;
+		})
+	);
+	map(0x4a, 0x4a).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_iadboh;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("4Ah: IADBOH ISA Address Decoder Bottom Of Hole %02x\n", data);
+			m_iadboh = data;
+		})
+	);
+	map(0x4b, 0x4b).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_iadtoh;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("4Bh: IADTOH ISA Address Decoder Top Of Hole %02x\n", data);
+			m_iadtoh = data;
+		})
+	);
+	map(0x4c, 0x4c).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_icrt;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("4Ch: ICRT ISA Controller Recovery Timer %02x\n", data);
+			m_icrt = data & 0x7f;
+		})
+	);
+	// -x-- ---- Positive decode of $xxxf0000 BIOS enable
+	// --x- ---- Coprocessor Error Enable
+	// ---x ---- IRQ12/M mouse function enable
+	// ---- x--- RSTDRV enable (for resetting ISA bus clock below)
+	// ---- -xxx PCICLK-to-ISA SYSCLK divisor (unlisted combinations <reserved>)
+	// ---- -000 4 (33 MHz) -> 8.33 MHz
+	// ---- -001 3 (25 Mhz) -> 8.33 MHz
+	map(0x4d, 0x4d).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_icd;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("4Dh: ICD ISA Clock Divisor %02x\n", data);
+			m_icd = data & 0x7f;
+		})
+	);
 
 	map(0x4e, 0x4e).lrw8(
 		NAME([this] (offs_t offset) {
@@ -221,6 +411,116 @@ void i82378zb_sio_device::config_map(address_map &map)
 			remap_cb();
 		})
 	);
+
+	map(0x54, 0x56).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_mar[offset];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("%02Xh: MAR%d MEMCS# Attribute %02x\n", offset + 0x54, offset + 1, data);
+			m_mar[offset] = data;
+			// TODO: r/w enable for PCI/ISA ROM segments
+		})
+	);
+
+	map(0x60, 0x63).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_pirq[offset];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("%02Xh: PIRQ%d PIRQ Route Control %02x\n", offset + 0x60, offset, data);
+			m_pirq[offset] = data & 0x8f;
+		})
+	);
+
+	// map(0x70, 0x70) PACC, 'AB only
+	// map(0x71, 0x71) APICBASE, 'AB only
+
+	map(0x80, 0x81).lrw16(
+		NAME([this] (offs_t offset) {
+			return m_bios_timer_base;
+		}),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			LOG("80h: BIOS Timer Base Address %04x\n", data, mem_mask);
+			COMBINE_DATA(&m_bios_timer_base);
+			m_bios_timer_base &= ~2;
+			if (BIT(m_bios_timer_base, 0))
+				LOG("\tWarning: enabled\n");
+		})
+	);
+
+	map(0xa0, 0xa0).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_smicntl;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("A0h: SMICNTL SMI Control %02x\n", data);
+			// TODO: bits 6 writable in 'AB
+			m_smicntl = data & 0x0f;
+		})
+	);
+
+	map(0xa2, 0xa3).lrw16(
+		NAME([this] (offs_t offset) {
+			return m_smien;
+		}),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			LOG("A2h: SMIEN SMI Enable %04x & %04x\n", data, mem_mask);
+			COMBINE_DATA(&m_smien);
+			m_smien &= 0x00ff;
+		})
+	);
+	map(0xa4, 0xa7).lrw32(
+		NAME([this] (offs_t offset) {
+			return m_see;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			LOG("A4h: SEE System Event Enable %08x & %08x\n", data, mem_mask);
+			COMBINE_DATA(&m_see);
+			// TODO: bits 30, 27~24 writable on 'AB
+			// m_see &= 0xef00fffb;
+			m_see &= 0xa000fffb;
+		})
+	);
+	map(0xa8, 0xa8).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_ftmr;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("A8h: FTMR Fast Off Timer %02x\n", data);
+			m_ftmr = data;
+		})
+	);
+	map(0xaa, 0xab).lrw16(
+		NAME([this] (offs_t offset) {
+			return m_smireq;
+		}),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			LOG("AAh: SMIREQ SMI Request %04x & %04x\n", data, mem_mask);
+			COMBINE_DATA(&m_smireq);
+			m_smireq &= 0x00ff;
+		})
+	);
+
+	map(0xac, 0xac).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_ctltmr;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("ACh: CTLTMR Clock Scale STPCLK# Low Timer %02x\n", data);
+			m_ctltmr = data;
+		})
+	);
+	map(0xae, 0xae).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_ctltmrh;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("AEh: CTLTMRH Clock Scale STPCLK# High Timer %02x\n", data);
+			m_ctltmrh = data;
+		})
+	);
+
 }
 
 void i82378zb_sio_device::internal_io_map(address_map &map)
@@ -285,10 +585,8 @@ void i82378zb_sio_device::map_extra(
 	// TODO: UBCSA bits 3,2 for FDC + bit 5 for location address
 
 	// decodes IDE signals after FDC (i.e. overrides $3f6 / $376)
-	// TODO: ga586ip & sy029c2 initializes UBCSA with 0xc3 but it sure accesses it anyway
-	// (both this and FDC not on X-Bus?)
-	//if (BIT(m_ubcsa, 4) && m_has_xbus.ide)
-	if (m_has_xbus.ide)
+	// ga586ip & sy029c2 initializes UBCSA with 0xc3, which implies both aren't on X-Bus
+	if (BIT(m_ubcsa, 4) && m_has_xbus.ide)
 	{
 		io_space->install_readwrite_handler(0x1f0, 0x1f7, read32s_delegate(*m_xbus_ide[0], FUNC(ide_controller_32_device::cs0_r)), write32s_delegate(*m_xbus_ide[0], FUNC(ide_controller_32_device::cs0_w)));
 		io_space->install_readwrite_handler(0x3f0, 0x3f7, read32s_delegate(*m_xbus_ide[0], FUNC(ide_controller_32_device::cs1_r)), write32s_delegate(*m_xbus_ide[0], FUNC(ide_controller_32_device::cs1_w)));
@@ -316,6 +614,8 @@ void i82378zb_sio_device::map_extra(
 		);
 	}
 
+	// BIT(m_ubcsb, 7) configuration RAM decode enable
+
 	// TODO: does it decode on BeBox?
 	if (BIT(m_ubcsb, 6))
 	{
@@ -324,6 +624,11 @@ void i82378zb_sio_device::map_extra(
 			write8sm_delegate(*this, FUNC(i82378zb_sio_device::port92_w))
 		);
 	}
+
+	// TODO: all of these enabled by ga586ip
+	// BIT(m_ubcsb, 5:4) LPT enable
+	// BIT(m_ubcsb, 3:2) COM2 enable
+	// BIT(m_ubcsb, 1:0) COM1 enable
 }
 
 /*

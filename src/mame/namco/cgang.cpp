@@ -2,16 +2,15 @@
 // copyright-holders:hap
 /*******************************************************************************
 
-『コズモギャングス』 (COSMOGANGS) by Namco, 1990. USA distribution was handled by
-Data East, they titled it "Cosmo Gang".
+『コズモギャングス』 (COSMOGANGS) by Namco, 1990. USA distribution was handled
+by Data East, they titled it "Cosmo Gang".
 
 It is an electromechanical arcade lightgun game. There is no screen, feedback
 is with motorized elements, lamps and 7segs, and of course sounds and music.
 
-To shoot the targets in MAME, either enable -mouse and click on one of the
-pink aliens(left mouse button doubles as gun trigger by default).
-Or, configure the gun aim inputs and share them with the trigger. For example
-use Z,X,C,V,B for the gun aims, and "Z or X or C or V or B" for the trigger.
+To shoot the targets in MAME, either click on one of the pink aliens, or assign
+the gun aim inputs and share them with the trigger. For example use Z,X,C,V,B
+for the gun aims, and "Z or X or C or V or B" for the trigger.
 
 TODO:
 - dump/add Japanese version
@@ -114,7 +113,7 @@ public:
 		m_cg_count(*this, "cg_count%u", 0U)
 	{ }
 
-	void cgang(machine_config &config);
+	void cgang(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

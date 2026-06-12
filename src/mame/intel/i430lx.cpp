@@ -12,6 +12,7 @@ Gigabyte GA-586IP config:
 - Intel 82378ZB (SIO) as southbridge
 - Texas Instruments BENCHMARQ bq3287AMT RTC (ds12885 clone? Wants at least 128 bytes of SRAM)
 - No super I/O for keyboard/RTC, those are southbridge responsibility under X-Bus
+- NCR53C810 SCSI controller (concealed under a Price Tag style on Retro Web picture)
 
 Regular SIO is reused by earlier I420ZX "Saturn II" chipset and in BeBox
 "Mercury" 82433LX/82434LX are earlier revisions of the northbridge
@@ -19,8 +20,10 @@ Regular SIO is reused by earlier I420ZX "Saturn II" chipset and in BeBox
 
 TODO:
 - Remaining X-Bus peripherals for SIO (FDC, COM x2, LPT);
-- Monkey write config_maps for both bridges;
-- Understand why IDE and FDC doesn't get enabled in X-Bus (mapped in ISA bus for these BIOSes?)
+- Implement remaining features in north/southbridges (SMI and PIRQ not enabled by these BIOSes,
+  needs to be tested in a Windows install);
+- ga586ip: loads a NCRPCI-3.06.00 BIOS module if it finds a 53C810 SCSI card, hangs there just
+  like ncr53c825;
 
 **************************************************************************************************/
 
@@ -61,7 +64,7 @@ public:
 		, m_flash(*this, "pci:02.0:xbus_flash")
 		, m_keybc(*this, "pci:02.0:xbus_keybc")
 		, m_at_con(*this, "at_con")
-		, m_ide(*this, "pci:02.0:xbus_ide%u", 0U)
+//		, m_ide(*this, "pci:02.0:xbus_ide%u", 0U)
 	{ }
 
 	void i430nx(machine_config &config) ATTR_COLD;
@@ -75,8 +78,9 @@ protected:
 	required_device<intelfsh8_device> m_flash;
 	required_device<at_keyboard_controller_device> m_keybc;
 	required_device<pc_kbdc_device> m_at_con;
-	required_device_array<ide_controller_32_device, 2> m_ide;
+	//required_device_array<ide_controller_32_device, 2> m_ide;
 
+	void x86_softlists(machine_config &config);
 private:
 	void main_io(address_map &map) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
@@ -92,6 +96,18 @@ void i430lx_state::main_io(address_map &map)
 {
 	map.unmap_value_high();
 }
+
+void i430lx_state::x86_softlists(machine_config &config)
+{
+	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
+	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");
+	SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
+	SOFTWARE_LIST(config, "win_cdrom_list").set_original("generic_cdrom").set_filter("ibmpc");
+	SOFTWARE_LIST(config, "at_hdd_list").set_original("ibm5170_hdd");
+	SOFTWARE_LIST(config, "midi_disk_list").set_compatible("midi_flop");
+	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
+}
+
 
 void i430lx_state::i430nx(machine_config &config)
 {
@@ -109,7 +125,7 @@ void i430lx_state::i430nx(machine_config &config)
 	// TODO: alarm irq
 //	m_rtc->irq().set ...
 
-	// TODO: config space not verified
+	// config space not verified, but should be good given how BIOSes accesses at $cxxx
 	PCI_ROOT(config, "pci");
 	// max RAM 512MB
 	I82434NX_PCMC(config, "pci:00.0", "maincpu", 64*1024*1024);
@@ -123,6 +139,7 @@ void i430lx_state::i430nx(machine_config &config)
 	isa.rtccs_write().set([this](u8 data) { m_rtc->data_w(data); });
 
 	// X-Bus devices
+	// TODO: unknown flash type, just to get a 0x20000 sized one
 	AMD_29F010(config, m_flash);
 
 	AT_KEYBOARD_CONTROLLER(config, m_keybc, XTAL(12'000'000));
@@ -136,16 +153,16 @@ void i430lx_state::i430nx(machine_config &config)
 	m_at_con->out_clock_cb().set(m_keybc, FUNC(at_keyboard_controller_device::kbd_clk_w));
 	m_at_con->out_data_cb().set(m_keybc, FUNC(at_keyboard_controller_device::kbd_data_w));
 
-	IDE_CONTROLLER_32(config, m_ide[0]).options(ata_devices, "hdd", nullptr, false);
-	m_ide[0]->irq_handler().set("pci:02.0", FUNC(i82378zb_sio_device::pc_irq14_w));
-
-	IDE_CONTROLLER_32(config, m_ide[1]).options(ata_devices, "cdrom", nullptr, false);
-	m_ide[1]->irq_handler().set("pci:02.0", FUNC(i82378zb_sio_device::pc_irq15_w));
+//	IDE_CONTROLLER_32(config, m_ide[0]).options(ata_devices, "hdd", nullptr, false);
+//	m_ide[0]->irq_handler().set("pci:02.0", FUNC(i82378zb_sio_device::pc_irq14_w));
+//
+//	IDE_CONTROLLER_32(config, m_ide[1]).options(ata_devices, "cdrom", nullptr, false);
+//	m_ide[1]->irq_handler().set("pci:02.0", FUNC(i82378zb_sio_device::pc_irq15_w));
 
 	// 1x AT keyboard
 	// 4x ISA slots
-	ISA16_SLOT(config, "isa1", 0, "pci:02.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa2", 0, "pci:02.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa1", 0, "pci:02.0:isabus", pc_isa16_cards, "fdc_smc", false);
+	ISA16_SLOT(config, "isa2", 0, "pci:02.0:isabus", pc_isa16_cards, "ide", false);
 	ISA16_SLOT(config, "isa3", 0, "pci:02.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa4", 0, "pci:02.0:isabus", pc_isa16_cards, nullptr, false);
 
@@ -154,6 +171,8 @@ void i430lx_state::i430nx(machine_config &config)
 	PCI_SLOT(config, "pci:2", pci_cards, 6, 1, 2, 3, 0, nullptr);
 	PCI_SLOT(config, "pci:3", pci_cards, 5, 2, 3, 0, 1, nullptr);
 	PCI_SLOT(config, "pci:4", pci_cards, 4, 3, 0, 1, 2, nullptr);
+
+	x86_softlists(config);
 }
 
 // very similar to ga586ip, with unknown RTC type and extra ISA slot

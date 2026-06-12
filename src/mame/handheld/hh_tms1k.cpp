@@ -4747,9 +4747,9 @@ ROM_END
   * 2 7seg LEDs, 5 lamps, 1-bit sound
   * 3 lightsensors, lightgun
 
-  To play it in MAME, either use the clickable artwork with -mouse, or set
-  button 1 to "Z or X or C" and each lightsensor to one of those keys.
-  Although the game seems mostly playable without having to use the gun trigger
+  To play it in MAME, either use the clickable artwork, or set button 1 to
+  "Z or X or C" and each lightsensor to one of those keys. Although the game
+  seems mostly playable without having to use the gun trigger
 
 *******************************************************************************/
 

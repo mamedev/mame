@@ -1866,10 +1866,30 @@ u8 specnext_state::reg_r(offs_t nr_register)
 		port_253b_dat = (0b00000 << 3);// | (i_ESP_GPIO_20(2) <<) | (0 << 1) | i_ESP_GPIO_20(0);
 		break;
 	case 0xb0:
-		port_253b_dat = 0;//(i_KBD_EXTENDED_KEYS(8) <<) | (i_KBD_EXTENDED_KEYS(9) <<) | (i_KBD_EXTENDED_KEYS(10) <<) | (i_KBD_EXTENDED_KEYS(11) <<) | (i_KBD_EXTENDED_KEYS(1) <<) | i_KBD_EXTENDED_KEYS(15 downto 13);
+		{
+			const u8 plus1 = m_io_plus1->read();
+			port_253b_dat = (BIT(~m_io_plus3->read(), 1) << 7) // ;
+				| (BIT(~m_io_plus3->read(), 0) << 6)           // "
+				| (BIT(~m_io_plus4->read(), 3) << 5)           // ,
+				| (BIT(~m_io_plus4->read(), 2) << 4)           // .
+				| (BIT(~plus1, 3) << 3)                        // UP
+				| (BIT(~plus1, 4) << 2)                        // DOWN
+				| (BIT(~m_io_plus0->read(), 4) << 1)           // LEFT
+				| (BIT(~plus1, 2) << 0);                       // RIGHT
+		}
 		break;
 	case 0xb1:
-		port_253b_dat = 0;//(i_KBD_EXTENDED_KEYS(12) <<) | (i_KBD_EXTENDED_KEYS(7 downto 2) <<) | i_KBD_EXTENDED_KEYS(0);
+		{
+			const u8 plus0 = m_io_plus0->read();
+			port_253b_dat = (BIT(~m_io_plus1->read(), 0) << 7) // DELETE
+				| (BIT(~plus0, 0) << 6)                        // EDIT
+				| (BIT(~m_io_plus2->read(), 0) << 5)           // BREAK
+				| (BIT(~plus0, 3) << 4)                        // INV VIDEO
+				| (BIT(~plus0, 2) << 3)                        // TRUE VIDEO
+				| (BIT(~m_io_plus1->read(), 1) << 2)           // GRAPH
+				| (BIT(~plus0, 1) << 1)                        // CAPS LOCK
+				| (BIT(~m_io_plus2->read(), 1) << 0);          // EXTEND
+		}
 		break;
 	case 0xb2:
 		{
@@ -2071,7 +2091,8 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		if (m_nr_03_config_mode == 1)
 		{
 			nr_0a_mf_type_w(BIT(nr_wr_dat, 6, 2));
-			m_nr_0a_sd_swap = BIT(nr_wr_dat, 5);
+			if (BIT(nr_wr_dat, 2))
+				m_nr_0a_sd_swap = BIT(nr_wr_dat, 5);
 		}
 		m_nr_0a_divmmc_automap_en = BIT(nr_wr_dat, 4);
 		m_nr_0a_mouse_button_reverse = BIT(nr_wr_dat, 3);

@@ -286,9 +286,9 @@ void vt82c586b_isa_device::config_map(address_map &map)
 			LOG("46h: Miscellaneous Control 1 %02x\n", data);
 		})
 	);
-	// bit 5 EISA $4d0/$4d1 enable
-	// bit 3 <reserved> but can be written to
-	// bit 0 PCI reset
+	// --x- ---- EISA $4d0/$4d1 enable
+	// ---- x--- <reserved> but can be written to
+	// ---- ---x PCI reset
 	map(0x47, 0x47).lrw8(
 		NAME([this] () { return m_misc_control[1]; }),
 		NAME([this] (offs_t offset, u8 data) {

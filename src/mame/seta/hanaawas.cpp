@@ -556,7 +556,7 @@ ROM_START( hanaawmh )
 	ROM_CONTINUE(           0x3000, 0x1000 )
 
 	ROM_REGION( 0x0400, "iomcu", 0 )
-	ROM_LOAD( "3j",  0x0000, 0x0400, NO_DUMP )
+	ROM_LOAD( "d8741ad.3j",  0x0000, 0x0400, NO_DUMP )
 
 	ROM_REGION( 0x8000, "tiles", 0 )
 	ROM_LOAD( "5.9a",       0x0000, 0x4000, CRC(c0cedc6e) SHA1(8c28e2a4a15a87ca19302d9592e363b561347695) )
@@ -564,10 +564,9 @@ ROM_START( hanaawmh )
 	ROM_LOAD( "7.12a",      0x4000, 0x4000, CRC(ec7a7fd0) SHA1(ce582b38133a65e706dd172f0120c1c50b6e1353) )
 	// socket at 13a empty
 
-	ROM_REGION( 0x0220, "proms", 0 )
-	ROM_LOAD( "13j.bpr",    0x0000, 0x0020, CRC(99300d85) SHA1(dd383db1f3c8c6d784121d32f20ffed3d83e2278) BAD_DUMP ) // not dumped for this set
-	ROM_LOAD( "2a.bpr",     0x0020, 0x0100, CRC(e26f21a2) SHA1(d0df06f833e0f97872d9d2ffeb7feef94aaaa02a) )  // lookup table
-	ROM_LOAD( "6g.bpr",     0x0120, 0x0100, CRC(4d94fed5) SHA1(3ea8e6fb95d5677991dc90fe7435f91e5320bb16) BAD_DUMP  )  // not dumped for this set
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "13j.bpr",    0x0000, 0x0020, CRC(99300d85) SHA1(dd383db1f3c8c6d784121d32f20ffed3d83e2278) ) // colors
+	ROM_LOAD( "2a.bpr",     0x0020, 0x0100, CRC(e26f21a2) SHA1(d0df06f833e0f97872d9d2ffeb7feef94aaaa02a) ) // lookup table
 ROM_END
 
 } // anonymous namespace

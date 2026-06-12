@@ -96,7 +96,7 @@ protected:
 		m_samples(*this, "samples")
 	{ }
 
-	void mpu12_base(machine_config &config);
+	void mpu12_base(machine_config &config) ATTR_COLD;
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -149,8 +149,8 @@ public:
 		m_reels(*this, "emreel%u", 1U)
 	{ }
 
-	void mpu1(machine_config &config);
-	void mpu1_lg(machine_config &config);
+	void mpu1(machine_config &config) ATTR_COLD;
+	void mpu1_lg(machine_config &config) ATTR_COLD;
 
 protected:
 	enum { STEPS_PER_SYMBOL = 20 };
@@ -222,19 +222,19 @@ public:
 		mpu12_base_state(mconfig, type, tag),
 		m_pia3(*this, "pia3"),
 		m_pia4(*this, "pia4"),
-		m_reels(*this, "reel%u", 0U)
+		m_reels(*this, "reel%u", 1U)
 	{ }
 
-	void mpu2_stepper(machine_config &config);
-	void mpu2_stepper_rockon(machine_config &config);
-	void mpu2_stepper_hilite(machine_config &config);
-	void mpu2_stepper_splite(machine_config &config);
-	void mpu2_stepper_frpoly(machine_config &config);
-	void mpu2_stepper_triple(machine_config &config);
+	void mpu2_stepper(machine_config &config) ATTR_COLD;
+	void mpu2_stepper_rockon(machine_config &config) ATTR_COLD;
+	void mpu2_stepper_hilite(machine_config &config) ATTR_COLD;
+	void mpu2_stepper_splite(machine_config &config) ATTR_COLD;
+	void mpu2_stepper_frpoly(machine_config &config) ATTR_COLD;
+	void mpu2_stepper_triple(machine_config &config) ATTR_COLD;
 
 private:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void device_post_load() override;
+	virtual void device_post_load() override ATTR_COLD;
 
 	template <unsigned N> void opto_cb(int state) { m_optos[N] = state; }
 

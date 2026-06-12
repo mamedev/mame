@@ -310,13 +310,48 @@ void nes_vt02_vt03_soc_device::update_banks()
 	m_bankaddr[3] = get_banks(bank);
 }
 
-u16 nes_vt02_vt03_soc_device::decode_nt_addr(u16 addr)
+u16 nes_vt02_vt03_soc_device::decode_nt_addr(u16 addr, bool handle_single_page)
 {
-	bool vert_mirror = !(m_410x[0x6] & 0x01);
-	int a11 = (addr >> 11) & 0x01;
-	int a10 = (addr >> 10) & 0x01;
-	u16 base = (addr & 0x3FF);
-	return ((vert_mirror ? a10 : a11) << 10) | base;
+	/* bit 0 = HV(0 = Horizontal, 1 = Vertical)
+	   bit 1 = 0 (HV Mode)
+
+	   or
+	 
+	   bit 0 = Page (0 = Page 0, 1 = Page 1)
+	   bit 1 = 1 (One Page mode) 
+	
+	   does single page mode only affect rendering, not PPU accesses?
+	   several games require single page mode when rendering, but have
+	   incorrect rendering if it's applied to PPU reads/writes outside
+	   of rendering.  could also be a timing issue?
+
+	   Games switching between single page and HV modes include (from lxcmcyspn)
+	   'Golf'
+	   'Explorer' (and the 'Spider Jump' reskin)
+	   'Fruit Killer'
+	   'Space Castle'
+	   'Mini Golf'
+	   'Action Ball'
+	*/
+
+	if ((!(m_410x[0x6] & 0x02)) || handle_single_page == false)
+	{
+		bool vert_mirror = !(m_410x[0x6] & 0x01);
+		int a11 = (addr >> 11) & 0x01;
+		int a10 = (addr >> 10) & 0x01;
+		u16 base = (addr & 0x3ff);
+		return ((vert_mirror ? a10 : a11) << 10) | base;
+	}
+	else
+	{
+		u8 page = m_410x[0x6] & 0x01;
+		u16 base = (addr & 0x3ff);
+
+		if (page)
+			base |= 0x400;
+
+		return base;
+	}
 }
 
 void nes_vt02_vt03_soc_device::vt03_410x_w(offs_t offset, u8 data)
@@ -510,13 +545,13 @@ void nes_vt02_vt03_soc_device::video_irq(bool hblank, int scanline, bool vblank,
 /* todo, handle custom VT nametable stuff here */
 u8 nes_vt02_vt03_soc_device::nt_r(offs_t offset)
 {
-	return m_ntram[decode_nt_addr(offset)];
+	return m_ntram[decode_nt_addr(offset, true)];
 }
 
 void nes_vt02_vt03_soc_device::nt_w(offs_t offset, u8 data)
 {
 	//logerror("nt wr %04x %02x", offset, data);
-	m_ntram[decode_nt_addr(offset)] = data;
+	m_ntram[decode_nt_addr(offset, false)] = data;
 }
 
 
