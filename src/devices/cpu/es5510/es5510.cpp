@@ -48,7 +48,7 @@ DEFINE_DEVICE_TYPE(ES5510, es5510_device, "es5510", "Ensoniq ES5510")
 
 #define FLAG_MASK (FLAG_N | FLAG_C | FLAG_V | FLAG_LT | FLAG_Z)
 
-char *stpcpy_int (char *dst, const char *src)
+inline static char *stpcpy_int (char *dst, const char *src)
 {
 	const size_t len = strlen (src);
 	return (char *) memcpy (dst, src, len + 1) + len;
@@ -85,6 +85,16 @@ inline static int32_t add(int32_t a, int32_t b, uint8_t &flags) {
 	flags = setFlagTo(flags, FLAG_V, overflow);
 	flags = setFlagTo(flags, FLAG_LT, lessThan);
 	return result & 0x00ffffff;
+}
+
+// When writing a 24-bit value to 16-bit DOL, round the value
+// towards 0 rather than -infinity.
+static inline int16_t round_24_to_16(int32_t dol24)
+{
+	int add =                    // what to add to the raw shifted value
+		BIT(dol24, 23)             // value is negative
+		&& ((dol24 & 0xff) != 0);  // value has a non-zero fractional part
+	return static_cast<int16_t>((dol24 >> 8) + add);
 }
 
 inline static int32_t saturate(int32_t value, uint8_t &flags, bool negative) {
@@ -798,8 +808,8 @@ void es5510_device::execute_run() {
 				if (ram_pp.io) { // read from I/O and store into DIL
 					dil = 0; // read_io(ram_pp.address);
 				} else { // read from DRAM and store into DIL
-					dil = dram_r(ram_pp.address) << 8;
-					LOG_EXEC("  . RAM: read %x (%d) from address %x\n", dil, dil, ram_pp.address);
+					dil = dram_r(ram_pp.address);
+					LOG_EXEC("  . RAM: read %x (%d) from address %x\n", dil, util::sext(dil, 16), ram_pp.address);
 				}
 			}
 
@@ -902,8 +912,9 @@ void es5510_device::execute_run() {
 			if (mulacc.src == SRC_DST_REG) {
 				mulacc.cValue = read_reg(mulacc.cReg);
 			} else { // must be SRC_DST_DELAY
-				LOG_EXEC("  . reading %x (%d) from dil\n", dil, util::sext(dil, 24));
-				mulacc.cValue = dil;
+				uint32_t dil24 = dil << 8;
+				LOG_EXEC("  . reading %x (%d) [of %x (%d)] from dil\n", dil24, util::sext(dil24, 24), dil, util::sext(dil, 16));
+				mulacc.cValue = dil24;
 			}
 			mulacc.dValue = read_reg(mulacc.dReg);
 
@@ -952,13 +963,15 @@ void es5510_device::execute_run() {
 					if (alu.src == SRC_DST_REG) {
 						alu.bValue = read_reg(alu.bReg);
 					} else { // must be SRC_DST_DELAY
-						alu.bValue = dil;
+						alu.bValue = dil << 8;
+						LOG_EXEC("  . reading %x (%d) [of %x (%d)] from dil\n", alu.bValue, util::sext(alu.bValue, 24), dil, util::sext(dil, 16));
 					}
 				} else {
 					if (alu.src == SRC_DST_REG) {
 						alu.aValue = read_reg(alu.aReg);
 					} else { // must be SRC_DST_DELAY
-						alu.aValue = dil;
+						alu.aValue = dil << 8;
+						LOG_EXEC("  . reading %x (%d) [of %x (%d)] from dil\n", alu.aValue, util::sext(alu.aValue, 24), dil, util::sext(dil, 16));
 					}
 					alu.bValue = read_reg(alu.bReg);
 				}
@@ -969,16 +982,18 @@ void es5510_device::execute_run() {
 				if (ram_p.cycle == RAM_CYCLE_WRITE) {
 					// If this is a write cycle, write the frontmost DOL value to RAM or I/O
 					if (ram_p.io) {
-						// write_io(ram_p.io, dol[0]);
+						// TODO: implement i/o writing.
+						// write_io(ram_p.address, dol[0]]);
+						LOG_EXEC("  . RAM: writing %x (%d) to I/O address %x\n", dol[0], util::sext(dol[0], 16), ram_p.address);
 					} else {
-						dram_w(ram_p.address, dol[0] >> 8);
-						LOG_EXEC("  . RAM: writing %x (%d) [of %x (%d)] to address %x\n", dol[0]&0xffff00, util::sext(dol[0] & 0xffff00, 24), dol[0], util::sext(dol[0], 24), ram_p.address);
+						dram_w(ram_p.address, dol[0]);
+						LOG_EXEC("  . RAM: writing %x (%d) to address %x\n", dol[0], util::sext(dol[0], 16), ram_p.address);
 					}
 				}
-				// If this is a Write or Dump cycle, eject the frontmost DL value.
+				// If this is a Write or Dump cycle, eject the frontmost DOL value.
 				LOG_EXEC("  . ejecting from DOL: [ ");
-				if (dol_count >= 1) LOG_EXEC("{ %x (%d) }", dol[0], util::sext(dol[0], 24));
-				if (dol_count == 2) LOG_EXEC(", { %x (%d) }", dol[1], util::sext(dol[1], 24));
+				if (dol_count >= 1) LOG_EXEC("{ %x (%d) }", dol[0], util::sext(dol[0], 16));
+				if (dol_count == 2) LOG_EXEC(", { %x (%d) }", dol[1], util::sext(dol[1], 16));
 				LOG_EXEC(" ] -> [ ");
 
 				dol[0] = dol[1];
@@ -986,8 +1001,8 @@ void es5510_device::execute_run() {
 					--dol_count;
 				}
 
-				if (dol_count >= 1) LOG_EXEC("{ %x (%d) }", dol[0], util::sext(dol[0], 24));
-				if (dol_count == 2) LOG_EXEC(", { %x (%d) }", dol[1], util::sext(dol[1], 24));
+				if (dol_count >= 1) LOG_EXEC("{ %x (%d) }", dol[0], util::sext(dol[0], 16));
+				if (dol_count == 2) LOG_EXEC(", { %x (%d) }", dol[1], util::sext(dol[1], 16));
 				LOG_EXEC(" ]\n");
 			}
 
@@ -1029,7 +1044,7 @@ int32_t es5510_device::read_reg(uint8_t reg)
 		case 241: RETURN16(ser3l, ser3l);
 		case 242: RETURN(macl, mac_overflow ? (machl < 0 ? 0x00000000 : 0x00ffffff) : (machl >>  0) & 0x00ffffff);
 		case 243: RETURN(mach, mac_overflow ? (machl < 0 ? 0x00800000 : 0x007fffff) : (machl >> 24) & 0x00ffffff);
-		case 244: RETURN(dil, dil); // DIL when reading
+		case 244: RETURN16(dil, dil); // DIL when reading
 		case 245: RETURN(dlength, dlength);
 		case 246: RETURN(abase, abase);
 		case 247: RETURN(bbase, bbase);
@@ -1166,20 +1181,21 @@ void es5510_device::write_reg(uint8_t reg, int32_t value)
 }
 
 void es5510_device::write_to_dol(int32_t value) {
-	LOG_EXEC(". writing %x (%d) to DOL: [ ", value, value);
-	if (dol_count >= 1) LOG_EXEC("{ %x (%d) }", dol[0], util::sext(dol[0], 24));
-	if (dol_count == 2) LOG_EXEC(", { %x (%d) }", dol[1], util::sext(dol[1], 24));
+	uint16_t dol16 = round_24_to_16(value);
+	LOG_EXEC(". writing %x (%d) [of %x (%d)] to DOL: [ ", dol16, util::sext(dol16, 16), value, util::sext(value, 24));
+	if (dol_count >= 1) LOG_EXEC("{ %x (%d) }", dol[0], util::sext(dol[0], 16));
+	if (dol_count == 2) LOG_EXEC(", { %x (%d) }", dol[1], util::sext(dol[1], 16));
 	LOG_EXEC(" ] -> [ ");
 
 	if (dol_count >= 2) {
 		dol[0] = dol[1];
-		dol[1] = value;
+		dol[1] = dol16;
 	} else {
-		dol[dol_count++] = value;
+		dol[dol_count++] = dol16;
 	}
 
-	LOG_EXEC("{%x (%d)}", dol[0], util::sext(dol[0], 24));
-	if (dol_count == 2) LOG_EXEC(", {%x (%d)}", dol[1], util::sext(dol[1], 24));
+	LOG_EXEC("{%x (%d)}", dol[0], util::sext(dol[0], 16));
+	if (dol_count == 2) LOG_EXEC(", {%x (%d)}", dol[1], util::sext(dol[1], 16));
 	LOG_EXEC(" ]\n");
 }
 
