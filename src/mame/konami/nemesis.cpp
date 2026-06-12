@@ -3081,15 +3081,15 @@ void bubsys_state::bs_twinbee_init()
 	// the twinbee bubble data is in a stripped down, predecoded state already, why?
 	// this reencodes it to something the loading code can actually use
 
-	uint8_t *src = memregion("bubblememory_temp")->base();
-	uint8_t *dst = m_bubblememory_region->base();
+	const uint8_t *const src = memregion("bubblememory_temp")->base();
+	uint8_t *const dst = m_bubblememory_region->base();
 
 	for (int i = 0; i < 0x806; i++)
 	{
 		[[maybe_unused]] uint16_t crc = 0;
 
-		int sourcebase = i * 0x80;
-		int destbase = i * 0x90;
+		const int sourcebase = i * 0x80;
+		const int destbase = i * 0x90;
 
 		for (int j = 0; j < 0x80; j++)
 		{
@@ -3107,8 +3107,8 @@ void bubsys_state::bs_twinbee_init()
 			dst[destbase + j + 1] = temp1;
 		}
 
-		dst[destbase+0x83] = i >> 8;
-		dst[destbase+0x82] = i & 0xff;
+		dst[destbase + 0x83] = i >> 8;
+		dst[destbase + 0x82] = i & 0xff;
 	}
 
 	bubsys_init();
