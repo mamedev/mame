@@ -277,6 +277,12 @@ machine.options (read-only)
     emulation session.
 machine.samplerate (read-only)
     The output audio sample rate in Hertz.
+machine.sync_interval
+    Attempt to synchronize simulated time with real time at an interval of
+    this many microseconds of simulated time, independent of frame rate.
+    Set to `0` to disable. Corresponds to the
+    :ref:`sync_interval <mame-commandline-sync-interval>` command line option,
+    but can override its value at runtime.
 machine.paused (read-only)
     A Boolean indicating whether emulation is not currently running, usually
     because the session has been paused or the emulated system has not completed
@@ -372,8 +378,16 @@ video.frameskip (read/write)
     The number of emulated video frames to skip drawing out of every twelve, or
     -1 to automatically adjust the number of frames to skip to maintain the
     target emulation speed.
+video.screenless_framerate (read/write)
+    The frame rate to use when the emulated machine does not have a screen.
+    Set `0` (in fact, any value less than `1`) to use the device's default,
+    usually MAME's default of 60 frames per second.
+    
+    Corresponds to the
+    :ref:`screenless_framerate <mame-commandline-screenless-framerate>` command
+    line option, but can override its value at runtime.
 video.speed_percent (read-only)
-    The current emulated speed as a percentage of the full speed adjusted by the
+    The current emulated speed as a percentage ofma the full speed adjusted by the
     speed factor.
 video.effective_frameskip (read-only)
     The number of emulated frames that are skipped out of every twelve.
