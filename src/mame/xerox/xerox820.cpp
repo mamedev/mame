@@ -570,15 +570,146 @@ void xerox820ii_state::xerox168_mem(address_map &map)
 	map(0xff000, 0xfffff).rom().region(I8086_TAG, 0); // 8086 boot ROM (signature 0x0909 at 0xFFFFC; LOAD86 reads it at Z80 window 0xBFFC)
 }
 
-void xerox820_state::mk83_mem(address_map &map)
+// MK-83: 256K DRAM = fixed top 32K + a 0x0000-0x7FFF window holding one of
+// eight 32K pages, selected by the 3-bit bank code {PA7,PA6,P14.5} (see the
+// mk83_state comment in xerox820.h).  Bank code 6 overlays the 4K monitor
+// EPROM at 0x0000 and the video RAM at 0x7000 (the trampoline at 0xFB25
+// switches to code 6 around every call into the EPROM-resident routines);
+// bank code 7 decodes to the same DRAM half-row as the fixed top page.
+void mk83_state::mk83_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x2fff).view(m_view);
-	m_view[0](0x0000, 0x2fff).ram();
-	m_view[1](0x0000, 0x0fff).rom().region(Z80_TAG, 0);
-	map(0x3000, 0x6fff).ram();
-	map(0x7000, 0x7fff).ram().share("video_ram");
-	map(0x8000, 0xffff).ram();
+	map(0x0000, 0x7fff).view(m_view);
+	m_view[0](0x0000, 0x7fff).ram();
+	m_view[1](0x0000, 0x7fff).ram();
+	m_view[2](0x0000, 0x7fff).ram();
+	m_view[3](0x0000, 0x7fff).ram();
+	m_view[4](0x0000, 0x7fff).ram();
+	m_view[5](0x0000, 0x7fff).ram();
+	m_view[6](0x0000, 0x7fff).ram();
+	m_view[6](0x0000, 0x0fff).rom().region(Z80_TAG, 0);
+	m_view[6](0x7000, 0x7fff).ram().share("video_ram");
+	m_view[7](0x0000, 0x7fff).ram().share("mainram");
+	map(0x8000, 0xffff).ram().share("mainram");
+}
+
+// I/O decode per the U86 74LS138 (schematic sheet 2): 00 BAUDA, 04 SIO,
+// 08 GP PIO, 0C BAUDB (the SIO-B console baud), 10 FD1797, 14 SCROLL/bank
+// latch, 18 CTC, 1C KBD PIO.  Same layout as the Xerox 820 except that the
+// scroll latch takes the DATA byte (plus bank bit B2) rather than sampling
+// the address lines.
+void mk83_state::mk83_io(address_map &map)
+{
+	map(0x00, 0x00).mirror(0xff03).w(COM8116_TAG, FUNC(com8116_device::str_w));
+	map(0x04, 0x07).mirror(0xff00).rw(m_sio, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
+	map(0x08, 0x0b).mirror(0xff00).rw(Z80PIO_GP_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x0c, 0x0c).mirror(0xff03).w(COM8116_TAG, FUNC(com8116_device::stt_w));
+	map(0x10, 0x13).mirror(0xff00).rw(FUNC(mk83_state::fdc_r), FUNC(mk83_state::fdc_w));
+	map(0x14, 0x14).mirror(0xff03).w(FUNC(mk83_state::scroll_bank_w));
+	map(0x18, 0x1b).mirror(0xff00).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x1c, 0x1f).mirror(0xff00).rw(m_kbpio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+}
+
+void mk83_state::update_bank()
+{
+	m_view.select((m_bank_hi << 1) | m_bank_lo);
+}
+
+void mk83_state::scroll_bank_w(uint8_t data)
+{
+	// 0x14-0x17 write latch: bits 0-4 = CRT scroll row, bit 5 = bank bit B2.
+	// The monitor also mirrors the bank code into bits 6-7 here, but on the
+	// hardware those bank bits come from the PIO-A pins (bits 6-7 of this
+	// latch are unconnected), which is what makes the power-on state safe:
+	// the EPROM's first OUT (14h) is the video-clear's scroll value 0x17 with
+	// bank bits 0, and only the PA6/PA7 pull-ups keep the EPROM mapped.
+	m_scroll = data & 0x1f;
+	m_bank_lo = BIT(data, 5);
+	update_bank();
+}
+
+uint8_t mk83_state::mk83_kbpio_pa_r()
+{
+	/*
+
+	    bit     signal      description
+
+	    3       PBRDY       keyboard PIO-B ready
+	    6       B0          bank (pull-up; reads 1 while programmed as input)
+	    7       B1          bank (pull-up; reads 1 while programmed as input)
+
+	*/
+	return 0xc0 | (m_kbpio->rdy_b() << 3);
+}
+
+void mk83_state::mk83_kbpio_pa_w(uint8_t data)
+{
+	/*
+
+	    bit     signal      description
+
+	    0       DVSEL0      drive select unit # bit 0 (binary, decoded to DVSEL1-3 + J7)
+	    1       DVSEL1      drive select unit # bit 1
+	    2       MOTOR       1 = drive motor off (the 8 Hz tick ISR sets it after ~3 ticks)
+	    3       PBRDY       (input)
+	    4       SIZE        drive size per the FF6B geometry config (1 = 8")  [TODO: verify against media]
+	    5       DENS        density per the geometry config (1 = MFM)         [TODO: verify against media]
+	    6       B0          bank code bit 1
+	    7       B1          bank code bit 2
+
+	    MAME's z80pio passes mode-3 input bits to this callback as 1, which
+	    models the PA6/PA7 pull-ups: from power-on until the monitor's F7F7
+	    re-programs the I/O mask (CF 08), bits 6-7 are inputs and the bank
+	    code stays {1,1,B2} = EPROM mapped, regardless of the values the init
+	    code writes through here.
+
+	*/
+	floppy_image_device *floppy = nullptr;
+
+	switch (data & 0x03)
+	{
+	case 0: floppy = m_floppy0->get_device(); break;
+	case 1: floppy = m_floppy1->get_device(); break;
+	}
+
+	m_fdc->set_floppy(floppy);
+
+	if (floppy)
+		floppy->mon_w(BIT(data, 2));
+
+	// bits 4-5 feed the FDC9229BT data-separator config; model size as the
+	// FD1797 clock and density as DDEN until real media pins them down
+	m_fdc->set_unscaled_clock(BIT(data, 4) ? 16_MHz_XTAL / 8 : 16_MHz_XTAL / 16);
+	m_fdc->dden_w(!BIT(data, 5));
+
+	m_bank_hi = data >> 6;
+	update_bank();
+}
+
+uint8_t mk83_state::mk83_kbpio_pb_r()
+{
+	return m_kbdata ^ 0xff;     // ASCII keyboard, inverted (the ISR at 03B0 CPLs it back)
+}
+
+void mk83_state::kb_put(u8 data)
+{
+	// latch the byte and pulse the PIO-B strobe: the falling edge samples
+	// pb_r, the rising edge raises the PIO interrupt (vector 0x1A -> the
+	// type-ahead FIFO at FF30)
+	m_kbdata = data;
+	m_kbpio->strobe_b(0);
+	m_kbpio->strobe_b(1);
+}
+
+// FD1797 DRQ drives /NMI directly (no /HALT gate on this board: the monitor
+// installs an EX AF/EXX/INI/EXX/EX AF/RETN handler at 0x0066 and polls the
+// busy bit while DRQ-NMIs move the bytes).  INTRQ is not wired to /NMI here:
+// the command end is detected by the busy poll, and an INTRQ-NMI would inject
+// a spurious INI after the last byte.
+void mk83_state::mk83_fdc_drq_w(int state)
+{
+	m_fdc_drq = bool(state);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1535,11 +1666,173 @@ void xerox820ii_state::xerox1685s(machine_config &config) // 16/8 low profile, 5
 	m_maincpu->set_addrmap(AS_IO, &xerox820ii_state::xerox1685s_io);
 }
 
-void xerox820_state::mk83(machine_config & config)
+void mk83_state::machine_start()
 {
-	xerox820(config);
+	xerox820_state::machine_start();
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &xerox820_state::mk83_mem);
+	save_item(NAME(m_kbdata));
+	save_item(NAME(m_bank_hi));
+	save_item(NAME(m_bank_lo));
+}
+
+void mk83_state::machine_reset()
+{
+	// power-on bank code = {1,1,0} = 6 (EPROM mapped): PA6/PA7 pull-ups with
+	// the PIO reset to inputs, port-0x14 latch bit 5 clear
+	m_bank_hi = 3;
+	m_bank_lo = 0;
+	update_bank();
+
+	m_fdc_xor = 0x00;   // the MK-83's FD1797 data bus is not inverted (unlike the Big Board FD1771)
+	m_fdc->reset();
+
+	// /SYNC idles inactive (RxD mark): the boot's console select polls RR0
+	// bit 4 for a serial start bit and would otherwise mis-detect one
+	m_sio->synca_w(1);
+	m_sio->syncb_w(1);
+}
+
+// Drives shipped with the MK3000: BASF 6106 5.25" 40-track SS/DD and Shugart
+// SA465 5.25" 80-track DS/DD; the board also carries a 50-pin 8" connector
+// (the monitor's default FF6B geometry is in fact 8" SSSD 77x26x128).
+static void mk83_floppies(device_slot_interface &device)
+{
+	device.option_add("basf6106", FLOPPY_525_SSDD);
+	device.option_add("sa465", FLOPPY_525_QD);
+	device.option_add("sa800", FLOPPY_8_SSDD);
+	device.option_add("sa850", FLOPPY_8_DSDD);
+}
+
+static void mk83_floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();    // includes IMD, the format the surviving Big Board family disks ship in
+}
+
+void mk83_state::mk83(machine_config &config)
+{
+	/* basic machine hardware: Z80A at 2.5 MHz (20 MHz crystal / 8, schematic sheet 2) */
+	Z80(config, m_maincpu, 20_MHz_XTAL / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mk83_state::mk83_mem);
+	m_maincpu->set_addrmap(AS_IO, &mk83_state::mk83_io);
+	m_maincpu->set_daisy_config(xerox820_daisy_chain);
+
+	/* video hardware: 14.318 MHz dot clock (sheet 3), 80x24, 7x10 cells, 5x7 glyphs */
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(mk83_state::screen_update));
+	screen.set_raw(14.318181_MHz_XTAL, 910, 0, 560, 262, 0, 240);
+
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_xerox820);
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
+
+	/* keyboard PIO (also drive select, motor, FDC9229 config and the bank bits) */
+	Z80PIO(config, m_kbpio, 20_MHz_XTAL / 8);
+	m_kbpio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_kbpio->in_pa_callback().set(FUNC(mk83_state::mk83_kbpio_pa_r));
+	m_kbpio->out_pa_callback().set(FUNC(mk83_state::mk83_kbpio_pa_w));
+	m_kbpio->in_pb_callback().set(FUNC(mk83_state::mk83_kbpio_pb_r));
+
+	/* general purpose (printer) PIO */
+	z80pio_device& pio_gp(Z80PIO(config, Z80PIO_GP_TAG, 20_MHz_XTAL / 8));
+	pio_gp.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
+	/* CTC: ch2 timer (/16, TC 210) cascades into ch3 counter (TC 93) for the
+	   8 Hz tick that runs the monitor's H/K clock and motor timeout; the disk
+	   code also reads the ch3 down-counter (port 0x1B) as its spin-up timer */
+	Z80CTC(config, m_ctc, 20_MHz_XTAL / 8);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
+
+	/* FD1797 + FDC9229BT; 16 MHz xtal on sheet 5 (1 MHz FDC clock for 5.25", 2 MHz for 8") */
+	FD1797(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->drq_wr_callback().set(FUNC(mk83_state::mk83_fdc_drq_w));
+	FLOPPY_CONNECTOR(config, FD1771_TAG":0", mk83_floppies, "sa465", mk83_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1771_TAG":1", mk83_floppies, "basf6106", mk83_floppy_formats);
+
+	/* SIO: channel B (data 0x05 / control 0x07) is the serial console option */
+	Z80SIO(config, m_sio, 20_MHz_XTAL / 8);
+	m_sio->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
+	m_sio->out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
+	m_sio->out_rtsa_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
+	m_sio->out_txdb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
+	m_sio->out_dtrb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_dtr));
+	m_sio->out_rtsb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
+	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
+	// the boot console select watches the /SYNC pin (RR0 bit 4) for a start
+	// bit to autobaud a serial console, so RxD also feeds /SYNC
+	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_sio, FUNC(z80sio_device::rxa_w));
+	rs232a.rxd_handler().append(m_sio, FUNC(z80sio_device::synca_w));
+	rs232a.cts_handler().set(m_sio, FUNC(z80sio_device::ctsa_w));
+	rs232a.dcd_handler().set(m_sio, FUNC(z80sio_device::dcda_w));
+
+	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_sio, FUNC(z80sio_device::rxb_w));
+	rs232b.rxd_handler().append(m_sio, FUNC(z80sio_device::syncb_w));
+	rs232b.cts_handler().set(m_sio, FUNC(z80sio_device::ctsb_w));
+	rs232b.dcd_handler().set(m_sio, FUNC(z80sio_device::dcdb_w));
+
+	com8116_device &dbrg(COM8116(config, COM8116_TAG, 5.0688_MHz_XTAL));
+	dbrg.fr_handler().set(m_sio, FUNC(z80sio_device::rxca_w));
+	dbrg.fr_handler().append(m_sio, FUNC(z80sio_device::txca_w));
+	dbrg.ft_handler().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
+
+	/* ASCII keyboard -> inverted data on PIO-B with a strobe per byte */
+	GENERIC_KEYBOARD(config, m_gkb, 0);
+	m_gkb->set_keyboard_callback(FUNC(mk83_state::kb_put));
+}
+
+// MK-84: the MK-83 platform at 5 MHz with the Xerox 820's HALT-gated
+// DRQ/INTRQ -> /NMI handshake (manual section 1.6) and the FDC9229
+// size/density configuration on PIO-A bits 5/4, active low
+void mk84_state::mk84_kbpio_pa_w(uint8_t data)
+{
+	/*
+
+	    bit     signal      description
+
+	    0       DVSEL0      drive select unit # bit 0
+	    1       DVSEL1      drive select unit # bit 1
+	    2       MOTOR       1 = drive motor off
+	    3       PBRDY       (input)
+	    4       DD          FDC9229 density: 0 = double (MFM)
+	    5       SIZE        FDC9229 format: 0 = 8", 1 = 5.25"
+	    6       B0          bank code bit 1
+	    7       B1          bank code bit 2
+
+	*/
+	floppy_image_device *floppy = nullptr;
+
+	switch (data & 0x03)
+	{
+	case 0: floppy = m_floppy0->get_device(); break;
+	case 1: floppy = m_floppy1->get_device(); break;
+	}
+
+	m_fdc->set_floppy(floppy);
+
+	if (floppy)
+		floppy->mon_w(BIT(data, 2));
+
+	m_fdc->set_unscaled_clock(BIT(data, 5) ? 16_MHz_XTAL / 16 : 16_MHz_XTAL / 8);
+	m_fdc->dden_w(BIT(data, 4));
+
+	m_bank_hi = data >> 6;
+	update_bank();
+}
+
+void mk84_state::mk84(machine_config &config)
+{
+	mk83(config);
+
+	/* Z80B at 5 MHz (20 MHz crystal / 4, manual section 1.1) */
+	m_maincpu->set_clock(20_MHz_XTAL / 4);
+	m_maincpu->halt_cb().set(FUNC(mk84_state::cpu_halt_w)); // FDC DRQ/INTRQ -> /NMI is /HALT-gated
+
+	m_kbpio->out_pa_callback().set(FUNC(mk84_state::mk84_kbpio_pa_w));
+
+	m_fdc->intrq_wr_callback().set(FUNC(mk84_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(mk84_state::fdc_drq_w));
 }
 
 /* ROMs */
@@ -1663,10 +1956,18 @@ ROM_END
 
 ROM_START( mk83 )
 	ROM_REGION( 0x1000, Z80_TAG, 0 )
-	ROM_LOAD( "2732mk83.bin", 0x0000, 0x1000, CRC(a845c7e1) SHA1(3ccf629c5cd384953794ac4a1d2b45678bd40e92) )
+	ROM_LOAD( "2732mk83.bin", 0x0000, 0x1000, CRC(a845c7e1) SHA1(3ccf629c5cd384953794ac4a1d2b45678bd40e92) ) // "SCOMAR MULTIPROG.   REL. 2.00" system monitor (U67; sockets U68-U70 for option ROMs are empty)
 
 	ROM_REGION( 0x800, "chargen", 0 )
-	ROM_LOAD( "2716mk83.bin", 0x0000, 0x0800, CRC(10bf0d81) SHA1(7ec73670a4d9d6421a5d6a4c4edc8b7c87923f6c) )
+	ROM_LOAD( "2716mk83.bin", 0x0000, 0x0800, CRC(10bf0d81) SHA1(7ec73670a4d9d6421a5d6a4c4edc8b7c87923f6c) ) // character generator (U73), same chip as the Big Board's
+ROM_END
+
+ROM_START( mk84 )
+	ROM_REGION( 0x1000, Z80_TAG, 0 )
+	ROM_LOAD( "mon84.bin", 0x0000, 0x1000, CRC(e49f3c1b) SHA1(0eb614c295a42f7c2191e5a5fafec5d9432e9ee2) ) // "MK-84 monitor 1.1 - ADE Elettronica" (U67; three independent dumps agree)
+
+	ROM_REGION( 0x800, "chargen", 0 )
+	ROM_LOAD( "2716mk83.bin", 0x0000, 0x0800, BAD_DUMP CRC(10bf0d81) SHA1(7ec73670a4d9d6421a5d6a4c4edc8b7c87923f6c) ) // not dumped from an MK-84 yet; the MK-83's character generator (the Big Board chip) is presumed identical
 ROM_END
 
 ROM_START( mojmikro )
@@ -1719,5 +2020,6 @@ COMP( 1983, x168,     x820ii,   0,      xerox168,    xerox820, xerox820ii_state,
 COMP( 1983, x1685,    x820ii,   0,      xerox1685,   xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8 (5.25\" floppy)",     0 )
 COMP( 1983, x1685s,   x820ii,   0,      xerox1685s,  xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8 (5.25\" rigid disk unit)", 0 ) // rigid controller is a documented reconstruction (real unit, likely a WD1002-05, is undumped)
 COMP( 1983, x168s,    x820ii,   0,      xerox168s,   xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8 (SASI hard disk)",    0 )
-COMP( 1983, mk83,     bigboard, 0,      mk83,        xerox820, xerox820_state,   empty_init, "Scomar",                     "MK-83",                          MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1983, mk83,     0,        0,      mk83,        xerox820, mk83_state,       empty_init, "ADE Elettronica",            "MK-83",                          MACHINE_NO_SOUND_HW ) // fitted firmware is Scomar's MULTIPROG REL. 2.00; no original MK3000 media survives - boots a CP/M 2.2 disk reconstructed from the period format tables
+COMP( 1984, mk84,     0,        0,      mk84,        xerox820, mk84_state,       empty_init, "ADE Elettronica",            "MK-84",                          MACHINE_NO_SOUND_HW )
 COMP( 1985, mojmikro, bigboard, 0,      bigboard,    xerox820, bigboard_state,   empty_init, "<unknown>",                  "Moj mikro Slovenija",            0 )
