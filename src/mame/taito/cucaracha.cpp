@@ -53,6 +53,12 @@ public:
 
 	void cucaracha(machine_config &config) ATTR_COLD;
 
+	// This game has no screen, so would run at a 60Hz frame rate by default.
+	// Provide a 100Hz frame rate here, to match the 100Hz interrupt that
+	// drives emulation, see the call to `m_maincpu->set_periodic_int()`
+	// in the constructor.
+	virtual attoseconds_t default_screenless_frame_period() const override { return HZ_TO_ATTOSECONDS(100); }
+
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
