@@ -363,6 +363,7 @@ void scmp_device::execute_one(int opcode)
 						tmp = m_AC;
 						m_AC = GET_PTR_REG(ptr)->b.h;
 						GET_PTR_REG(ptr)->b.h = tmp;
+						if ( opcode == 0x34 ) m_PC.w.l = ADD12(m_PC.w.l,1); // After exchange CPU increment PC, like XPAL
 						break;
 			case 0x3c:  case 0x3d :case 0x3e: case 0x3f:
 						// XPPC
