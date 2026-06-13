@@ -62,9 +62,6 @@ protected:
 
 	uint64_t cycles;
 	uint8_t data_reg, address;
-	attotime write_start_time;
-	attotime write_buffer[32];
-	int write_position;
 	bool write_line_active;
 
 	const uint8_t *m_rom_p6;

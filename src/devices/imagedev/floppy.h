@@ -337,7 +337,10 @@ public:
 
 	attotime time_next_index();
 	attotime get_next_transition(const attotime &from_when);
-	void write_flux(const attotime &start, const attotime &end, int transition_count, const attotime *transitions);
+	void write_start(const attotime &when);
+	void write_flux_change(const attotime &when);
+	void write_end(const attotime &when);
+	void write_flush(const attotime &when);
 	void set_write_splice(const attotime &when);
 	int get_sides() { return m_sides; }
 	uint32_t get_form_factor() const;
@@ -423,6 +426,10 @@ protected:
 	bool m_cache_weak;
 
 	bool m_image_dirty, m_track_dirty;
+	bool m_writing;
+	int m_write_cyl, m_write_ss, m_write_subcyl;
+	attotime m_write_start_time;
+	std::vector<attotime> m_write_transition_times;
 	int m_ready_counter;
 
 	load_cb m_cur_load_cb;
@@ -452,6 +459,7 @@ protected:
 	attotime position_to_time(const attotime &base, int position) const;
 
 	void commit_image();
+	void write_do_flush(const attotime &when);
 
 	u32 hash32(u32 val) const;
 

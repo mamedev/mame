@@ -81,9 +81,6 @@ protected:
 
 		uint8_t pi;
 		uint16_t shift_reg_write;
-		attotime write_start_time;
-		attotime write_buffer[32];
-		int write_position;
 	};
 
 	// device_t implementation
