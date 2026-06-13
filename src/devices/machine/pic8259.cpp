@@ -76,7 +76,8 @@ void pic8259_device::set_irq_line(int irq, int state)
 		LOG("set_irq_line(): PIC cleared IR%d line\n", irq);
 
 		m_irq_lines &= ~mask;
-		m_irr &= ~mask;
+		if (m_level_trig_mode)
+			m_irr &= ~mask;
 	}
 
 	if (m_inta_sequence == 0)

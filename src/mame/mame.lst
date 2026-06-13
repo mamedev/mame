@@ -597,6 +597,11 @@ s3000xl
 cd3000i
 cd3000xl
 
+@source:akai/s900.cpp
+s900
+s950
+s950scsi
+
 @source:akai/x7000.cpp
 s612
 s700
