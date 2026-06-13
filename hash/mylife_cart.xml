@@ -8,6 +8,8 @@ license:CC0-1.0
 
     NO ROM:
     Revista - SEEPROM only (was blank)
+	
+	the ROM cartridges appear to be data only
 -->
 
 <!--
@@ -83,5 +85,22 @@ CEi = CE Internal ROM! (set to VCC in Cartridge-PCB)
 			-->
 		</part>
 	</software>
+	
+	<software name="cdisco" supported="no">
+		<description>Club Disco (Italy)</description>
+		<year>200?</year>
+		<publisher>Giochi Preziosi / Playmates</publisher>
+		<part name="cart" interface="mylife_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="clubdisco.bin" size="0x800000" crc="d18006e7" sha1="ad2282766899610dc7fb32118b2eb7b434d01d01"/>
+			</dataarea>
+			<!-- blank -->
+			<!--
+			<dataarea name="seeprom" size="0x100">
+			    <rom name="af24bc02.bin" size="0x100" crc="fea8a821" sha1="c744cac6af7621524fc3a2b0a9a135a32b33c81b"/>
+			</dataarea>
+			-->
+		</part>
+	</software>	
 
 </softwarelist>

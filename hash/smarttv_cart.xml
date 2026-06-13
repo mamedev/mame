@@ -17,13 +17,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="enlunait" cloneof="amuseprk" supported="no"> <!-- first bytes of ROM are 0xff, erasing part of the checksum string, but checksum otherwise matches -->
+	<software name="enlunait" cloneof="amuseprk" supported="no"> <!-- checksum matches header -->
 		<description>English Luna Park (Italy)</description>
 		<year>200?</year>
 		<publisher>Clementoni</publisher>
 		<part name="cart" interface="smarttv_cart">
 			<dataarea name="rom" size="0x400000">
-				<rom name="English Luna Park (Italy).bin" size="0x400000" crc="4bfa7b27" sha1="b594844b25f470a7a07a2a4f43d2c2573dfb80aa"/>
+				<rom name="English Luna Park (Italy).bin" size="0x400000" crc="299d0c70" sha1="58ec947f3915f505b428fce18b031226070275f1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -148,5 +148,16 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="cars2it" supported="no"> <!-- checksum matches header -->
+		<description>Disney/Pixar Cars 2 (Italy)</description>
+		<year>200?</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="Cars 2 (Italy).bin" size="0x400000" crc="f01308ba" sha1="1e0253e9de08fe9b9b1832dae6dfe90fcf27d261"/>
+			</dataarea>
+		</part>
+	</software>	
 
 </softwarelist>
