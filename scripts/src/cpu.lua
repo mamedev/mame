@@ -2778,6 +2778,25 @@ if opt_tool(CPUS, "TMS1000") then
 end
 
 --------------------------------------------------
+-- Texas Instruments TMC1500 series
+--@src/devices/cpu/tmc1500/tmc1500.h,CPUS["TMC1500"] = true
+--------------------------------------------------
+
+if CPUS["TMC1500"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/tmc1500/tmc1500.cpp",
+		MAME_DIR .. "src/devices/cpu/tmc1500/tmc1500.h",
+	}
+end
+
+if opt_tool(CPUS, "TMC1500") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tmc1500/tmc1500_dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tmc1500/tmc1500_dasm.h")
+end
+
+
+
+--------------------------------------------------
 -- Texas Instruments TMS7000 series
 --@src/devices/cpu/tms7000/tms7000.h,CPUS["TMS7000"] = true
 --------------------------------------------------
