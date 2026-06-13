@@ -25,9 +25,9 @@
 #include "cpu/m68000/m68030.h"
 #include "imagedev/floppy.h"
 #include "machine/6840ptm.h"
+#include "machine/am9517a.h"
 #include "machine/clock.h"
 #include "machine/mb87030.h"
-#include "machine/upd71071.h"
 #include "machine/upd765.h"
 #include "machine/z80scc.h"
 #include "video/bt45x.h"
@@ -580,11 +580,13 @@ void future32a_state::future32a(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &future32a_state::mem);
 	m_maincpu->set_addrmap(m68030_device::AS_CPU_SPACE, &future32a_state::cpu_space_map);
 
-	UPD71071(config, m_dma);
-	m_dma->set_cpu_tag(m_maincpu->tag());
-	m_dma->set_clock((50_MHz_XTAL / 5).value());
-	m_dma->dma_read_callback<1>().set(m_scsi, FUNC(mb89352_device::dma_r));
-	m_dma->dma_write_callback<1>().set(m_scsi, FUNC(mb89352_device::dma_w));
+	UPD71071(config, m_dma, 50_MHz_XTAL / 5);
+	m_dma->in_memr_callback().set([this](offs_t offset) { return m_maincpu->space(AS_PROGRAM).read_byte(offset); });
+	m_dma->out_memw_callback().set([this](offs_t offset, u8 data) { return m_maincpu->space(AS_PROGRAM).write_byte(offset, data); });
+	m_dma->in_ior_callback<1>().set(m_scsi, FUNC(mb89352_device::dma_r));
+	m_dma->out_iow_callback<1>().set(m_scsi, FUNC(mb89352_device::dma_w));
+	m_dma->out_hreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_dma->out_hreq_callback().append(m_dma, FUNC(upd71071_device::hack_w));
 
 	UPD72120(config, m_agdc, 32_MHz_XTAL / 2);
 
@@ -637,7 +639,7 @@ void future32a_state::future32a(machine_config &config)
 
 	MB89352(config, m_scsi, 32000000/4);
 	sbus.set_external_device(7, m_scsi);
-	m_scsi->out_dreq_callback().set([this](int state) { m_dma->dmarq(state, 1); });
+	m_scsi->out_dreq_callback().set(m_dma, FUNC(upd71071_device::dreq1_w));
 	m_scsi->out_irq_callback().set(DEVICE_SELF, FUNC(future32a_state::scsi_irq_w));
 }
 
