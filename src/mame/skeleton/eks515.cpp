@@ -9,7 +9,7 @@
 
 #include "emu.h"
 
-#include "cpu/z80/z80.h"
+#include "cpu/mcs51/i80c51.h"
 #include "screen.h"
 
 namespace {
@@ -45,6 +45,11 @@ void eks515_state::machine_reset()
 {
 }
 
+void eks515_state::prog_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom().region("maincpu", 0);
+}
+
 static INPUT_PORTS_START( eks515 )
 INPUT_PORTS_END
 
@@ -56,7 +61,9 @@ uint32_t eks515_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 void eks515_state::eks515(machine_config &config)
 {
 	// unknown CPU types
-	Z80(config, "fakecpu", 4000000);
+	i80c31_device &maincpu(I80C31(config, "maincpu", 12'000'000));
+	maincpu.set_addrmap(AS_PROGRAM, &eks515_state::prog_map);
+	maincpu.port_in_cb<3>().set_constant(0xff); // silence logging
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
