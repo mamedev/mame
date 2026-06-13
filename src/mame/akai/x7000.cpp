@@ -673,8 +673,8 @@ u8 s612_state::cpu_bank_lsb_r(offs_t offset)
 template<int Voice>
 void s612_state::dreq_set_w(int state)
 {
-	if (state)
-		m_dma[Voice / 4]->dreq_w<Voice % 4>(0);
+	// DREQ is generated on both clock edges
+	m_dma[Voice / 4]->dreq_w<Voice % 4>(0);
 }
 /**************************************************************************/
 template<int Voice>
