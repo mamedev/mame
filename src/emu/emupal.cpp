@@ -75,6 +75,11 @@ palette_device::palette_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, bgr_222_t)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_bgr_222)), 64)
+{
+}
+
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rgb_555_t)
 	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_rgb_555)), 32768)
 {
@@ -687,6 +692,18 @@ void palette_device::palette_init_3bit_bgr(palette_device &palette)
 {
 	for (int i = 0; i < 8; i++)
 		palette.set_pen_color(i, rgb_t(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0)));
+}
+
+
+/*-------------------------------------------------
+    standard 2-2-2 palette for games using a
+    6-bit color space
+-------------------------------------------------*/
+
+void palette_device::palette_init_bgr_222(palette_device &palette)
+{
+	for (int i = 0; i < 64; i++)
+		palette.set_pen_color(i, rgbexpand<2,2,2>(i, 0, 2, 4));
 }
 
 
