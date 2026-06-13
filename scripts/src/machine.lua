@@ -4043,18 +4043,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/upd71071.h,MACHINES["UPD71071"] = true
----------------------------------------------------
-
-if MACHINES["UPD71071"] then
-	files {
-		MAME_DIR .. "src/devices/machine/upd71071.cpp",
-		MAME_DIR .. "src/devices/machine/upd71071.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/upd765.h,MACHINES["UPD765"] = true
 ---------------------------------------------------
 
