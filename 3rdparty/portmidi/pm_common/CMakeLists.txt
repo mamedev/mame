@@ -16,9 +16,9 @@
 set(PM_STATIC_LIB_NAME "portmidi" CACHE STRING 
     "For static builds, the PortMidi library name, e.g. portmidi-static.
      Default is portmidi")
-set(PM_ACTUAL_LIB_NAME "portmidi")
+set(PM_ACTUAL_LIB_NAME "portmidi" PARENT_SCOPE)
 if(NOT BUILD_SHARED_LIBS)
-  set(PM_ACTUAL_LIB_NAME ${PM_STATIC_LIB_NAME})
+  set(PM_ACTUAL_LIB_NAME ${PM_STATIC_LIB_NAME} PARENT_SCOPE)
 endif()
 
 # set the build directory for libportmidi.a to be in portmidi, not in 
@@ -78,31 +78,49 @@ if(NOT WIN32)
   find_package(Threads REQUIRED)
 endif()
 
+# Check for sndio
+if(USE_SNDIO)
+  include (FindPackageHandleStandardArgs)
+  find_path(SNDIO_INCLUDE_DIRS NAMES sndio.h)
+  find_library(SNDIO_LIBRARY sndio)
+  find_package_handle_standard_args(Sndio
+      REQUIRED_VARS SNDIO_LIBRARY SNDIO_INCLUDE_DIRS)
+endif(USE_SNDIO)
+
 # first include the appropriate system-dependent file:
-if(UNIX AND APPLE)
+if(SNDIO_FOUND AND USE_SNDIO)
+  set(PM_LIB_PRIVATE_SRC
+      ${PMDIR}/porttime/ptlinux.c
+      ${PMDIR}/pm_sndio/pmsndio.c)
+  set(PM_NEEDED_LIBS Threads::Threads ${SNDIO_LIBRARY} PARENT_SCOPE)
+  target_link_libraries(portmidi PRIVATE Threads::Threads ${SNDIO_LIBRARY})
+  target_include_directories(portmidi PRIVATE ${SNDIO_INCLUDE_DIRS})
+elseif(UNIX AND APPLE)
   set(Threads::Threads "" PARENT_SCOPE)
-  find_library(COREAUDIO_LIBRARY CoreAudio REQUIRED)
-  find_library(COREFOUNDATION_LIBRARY CoreFoundation REQUIRED)
-  find_library(COREMIDI_LIBRARY CoreMIDI REQUIRED)
-  find_library(CORESERVICES_LIBRARY CoreServices REQUIRED)
   set(PM_LIB_PRIVATE_SRC 
       ${PMDIR}/porttime/ptmacosx_mach.c
       ${PMDIR}/pm_mac/pmmac.c
-      ${PMDIR}/pm_mac/pmmacosxcm.c
-      ${PMDIR}/pm_mac/finddefault.c
-      ${PMDIR}/pm_mac/readbinaryplist.c)
-  set(PM_NEEDED_LIBS ${CMAKE_THREAD_LIBS_INIT} ${COREAUDIO_LIBRARY}
-      ${COREFOUNDATION_LIBRARY} ${COREMIDI_LIBRARY} ${CORESERVICES_LIBRARY}
+      ${PMDIR}/pm_mac/pmmacosxcm.c)
+  set(PM_NEEDED_LIBS 
+      ${CMAKE_THREAD_LIBS_INIT}
+      -Wl,-framework,CoreAudio
+      -Wl,-framework,CoreFoundation
+      -Wl,-framework,CoreMIDI
+      -Wl,-framework,CoreServices
       PARENT_SCOPE)
-  target_link_libraries(portmidi PRIVATE Threads::Threads ${COREAUDIO_LIBRARY}
-      ${COREFOUNDATION_LIBRARY} ${COREMIDI_LIBRARY} ${CORESERVICES_LIBRARY})
+  target_link_libraries(portmidi PRIVATE
+      Threads::Threads
+      -Wl,-framework,CoreAudio
+      -Wl,-framework,CoreFoundation
+      -Wl,-framework,CoreMIDI
+      -Wl,-framework,CoreServices
+  )
   # set to CMake default; is this right?:
   set_target_properties(portmidi PROPERTIES MACOSX_RPATH ON)
 elseif(HAIKU)
   set(PM_LIB_PRIVATE_SRC
       ${PMDIR}/porttime/pthaiku.cpp
-      ${PMDIR}/pm_haiku/pmhaiku.cpp
-      ${PMDIR}/pm_linux/finddefault.c)
+      ${PMDIR}/pm_haiku/pmhaiku.cpp)
   set(PM_NEEDED_LIBS be midi midi2 PARENT_SCOPE)
   target_link_libraries(portmidi PRIVATE be midi midi2)
 elseif(UNIX)
@@ -110,8 +128,7 @@ elseif(UNIX)
   set(PM_LIB_PRIVATE_SRC
       ${PMDIR}/porttime/ptlinux.c
       ${PMDIR}/pm_linux/pmlinux.c
-      ${PMDIR}/pm_linux/pmlinuxnull.c
-      ${PMDIR}/pm_linux/finddefault.c)
+      ${PMDIR}/pm_linux/pmlinuxnull.c)
   if(${LINUX_DEFINES} MATCHES ".*PMALSA.*")
     # Note that ALSA is not required if PMNULL is defined -- PortMidi will then
     # compile without ALSA and report no MIDI devices. Later, PMSNDIO or PMJACK
