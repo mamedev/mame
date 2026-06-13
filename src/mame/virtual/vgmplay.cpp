@@ -6,8 +6,8 @@
 
 #include "emu.h"
 
-#ifndef QSOUND_LLE
-#define QSOUND_LLE
+#ifndef CAPCOM_Q1_LLE
+#define CAPCOM_Q1_LLE
 #endif
 
 #include "mega32x.h"
@@ -24,6 +24,7 @@
 #include "sound/c140.h"
 #include "sound/c352.h"
 #include "sound/c6280.h"
+#include "sound/capcom_q1.h"
 #include "sound/es5503.h"
 #include "sound/es5506.h"
 #include "sound/gb.h"
@@ -35,7 +36,6 @@
 #include "sound/okim6258.h"
 #include "sound/okim6295.h"
 #include "sound/pokey.h"
-#include "sound/qsound.h"
 #include "sound/rf5c68.h"
 #include "sound/saa1099.h"
 #include "sound/scsp.h"
@@ -518,7 +518,7 @@ private:
 	required_device_array<c219_device, 2> m_c219;
 	required_device_array<k053260_device, 2> m_k053260;
 	required_device_array<pokey_device, 2> m_pokey;
-	required_device<qsound_device> m_qsound;
+	required_device<capcom_q1_device> m_qsound;
 	required_device_array<scsp_device, 2> m_scsp;
 	required_device_array<wswan_sound_device, 2> m_wswan;
 	required_device_array<vboysnd_device, 2> m_vsu_vue;
@@ -3457,7 +3457,7 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_K053260_1, vgmplay_device::A_K053260_1 + 0x2f).w(m_k053260[1], FUNC(k053260_device::write));
 	map(vgmplay_device::A_POKEY_0, vgmplay_device::A_POKEY_0 + 0xf).w(m_pokey[0], FUNC(pokey_device::write));
 	map(vgmplay_device::A_POKEY_1, vgmplay_device::A_POKEY_1 + 0xf).w(m_pokey[1], FUNC(pokey_device::write));
-	map(vgmplay_device::A_QSOUND, vgmplay_device::A_QSOUND + 0x2).w(m_qsound, FUNC(qsound_device::qsound_w));
+	map(vgmplay_device::A_QSOUND, vgmplay_device::A_QSOUND + 0x2).w(m_qsound, FUNC(capcom_q1_device::write));
 	map(vgmplay_device::A_VSU_VUE_0, vgmplay_device::A_VSU_VUE_0 + 0x5ff).w(m_vsu_vue[0], FUNC(vboysnd_device::write));
 	map(vgmplay_device::A_VSU_VUE_1, vgmplay_device::A_VSU_VUE_1 + 0x5ff).w(m_vsu_vue[1], FUNC(vboysnd_device::write));
 	map(vgmplay_device::A_SAA1099_0, vgmplay_device::A_SAA1099_0 + 1).w(m_saa1099[0], FUNC(saa1099_device::write));
@@ -3990,7 +3990,7 @@ void vgmplay_state::vgmplay(machine_config &config)
 	m_pokey[1]->add_route(ALL_OUTPUTS, m_viz, 0.5, 0);
 	m_pokey[1]->add_route(ALL_OUTPUTS, m_viz, 0.5, 1);
 
-	QSOUND(config, m_qsound);
+	CAPCOM_Q1(config, m_qsound, 0);
 	m_qsound->set_addrmap(0, &vgmplay_state::qsound_map<0>);
 	m_qsound->add_route(0, m_viz, 1, 0);
 	m_qsound->add_route(1, m_viz, 1, 1);
