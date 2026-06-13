@@ -3037,26 +3037,74 @@ void specnext_state::map_io(address_map &map)
 	map(0x0001, 0x0001).mirror(0xfff4).lr8(NAME([this]() { // #bff5
 		return m_nr_08_psg_turbosound_en ? m_ay_select : 0;
 	}));
-	map(0xc005, 0xc005).mirror(0x3ff8).lr8(NAME([this]() { // #fffd
-		return m_ay[m_nr_08_psg_turbosound_en ? m_ay_select : 0]->data_r();
-	})).w(FUNC(specnext_state::turbosound_address_w));
-	map(0x8005, 0x8005).mirror(0x3ff8).lw8(NAME([this](u8 data) { // #bffd
-		m_ay[m_nr_08_psg_turbosound_en ? m_ay_select : 0]->data_w(data);
+
+	map(0x000f, 0x000f).mirror(0xff00).lw8(NAME([this](u8 data) {
+		if (m_nr_08_dac_en)
+			m_dac[1]->data_w(data);
+	}));
+	map(0x004f, 0x004f).mirror(0xff00).lw8(NAME([this](u8 data) {
+		if (m_nr_08_dac_en)
+			m_dac[2]->data_w(data);
+	}));
+	map(0x005f, 0x005f).mirror(0xff00).lw8(NAME([this](u8 data) {
+		if (m_nr_08_dac_en)
+			m_dac[3]->data_w(data);
+	}));
+	map(0x00b3, 0x00b3).mirror(0xff00).lw8(NAME([this](u8 data) {
+		if (m_nr_08_dac_en && port_dac_mono_BC_b3_io_en())
+		{
+			m_dac[1]->data_w(data);
+			m_dac[2]->data_w(data);
+		}
+	}));
+	map(0x00df, 0x00df).mirror(0xff00).lw8(NAME([this](u8 data) {
+		if (m_nr_08_dac_en && port_dac_mono_AD_df_io_en())
+		{
+			m_dac[0]->data_w(data);
+			m_dac[3]->data_w(data);
+		}
+	}));
+	map(0x00f1, 0x00f1).mirror(0xff00).lw8(NAME([this](u8 data) {
+		if (m_nr_08_dac_en)
+			m_dac[0]->data_w(data);
+	}));
+	map(0x00f3, 0x00f3).mirror(0xff00).lw8(NAME([this](u8 data) {
+		if (m_nr_08_dac_en)
+			m_dac[1]->data_w(data);
+	}));
+	map(0x00f9, 0x00f9).mirror(0xff00).lw8(NAME([this](u8 data) {
+		if (m_nr_08_dac_en)
+			m_dac[2]->data_w(data);
+	}));
+	map(0x00fb, 0x00fb).mirror(0xff00).lw8(NAME([this](u8 data) {
+		if (m_nr_08_dac_en && port_dac_mono_AD_fb_io_en())
+		{
+			m_dac[0]->data_w(data);
+			m_dac[3]->data_w(data);
+		}
 	}));
 
+	map(0xd001, 0xd001).mirror(0x0ffc).lw8(NAME([this](u8 data) {
+		if (port_dffd_io_en())
+		{
+			if (!port_7ffd_locked() || nr_8f_mapping_mode_profi())
+			{
+				m_port_dffd_data = data;
+				memory_change(0xdffd, data);
+			}
+		}
+		else
+		{
+			// #dffd disabled - falls through to #fffd on hardware (port_fffd_wr AND NOT port_dffd)
+			turbosound_address_w(data);
+		}
+	}));
 	map(0x0001, 0x0001).select(0x7ffc).lw8(NAME([this](offs_t offset, u8 data) {
 		const bool p3_timing_hw_en = (m_nr_03_machine_timing & 3) == 0b11;
 		if (port_7ffd_io_en() && (BIT(offset, 14) || !p3_timing_hw_en) && !port_7ffd_locked())
 		{
 			port_7ffd_reg_w(data);
 			memory_change(0x7ffd, data);
-		}
-	}));
-	map(0xd001, 0xd001).mirror(0x0ffc).lw8(NAME([this](u8 data) {
-		if (port_dffd_io_en() && (!port_7ffd_locked() || nr_8f_mapping_mode_profi()))
-		{
-			m_port_dffd_data = data;
-			memory_change(0xdffd, data);
 		}
 	}));
 	map(0x1001, 0x1001).mirror(0x0ffc).lw8(NAME([this](u8 data) {
@@ -3072,6 +3120,13 @@ void specnext_state::map_io(address_map &map)
 			m_port_eff7_data = data;
 			memory_change(0xeff7, data);
 		}
+	}));
+
+	map(0xc005, 0xc005).mirror(0x3ff8).lr8(NAME([this]() { // #fffd
+		return m_ay[m_nr_08_psg_turbosound_en ? m_ay_select : 0]->data_r();
+	})).w(FUNC(specnext_state::turbosound_address_w));
+	map(0x8005, 0x8005).mirror(0x3ff8).lw8(NAME([this](u8 data) { // #bffd
+		m_ay[m_nr_08_psg_turbosound_en ? m_ay_select : 0]->data_w(data);
 	}));
 
 	map(0x2001, 0x2001).mirror(0x0ffc).lr8(NAME([]() {
@@ -3184,51 +3239,6 @@ void specnext_state::map_io(address_map &map)
 
 	map(0x0037, 0x0037).mirror(0xff00).r(FUNC(specnext_state::kempston_md_r<1>));
 
-	map(0x00f1, 0x00f1).mirror(0xff00).lw8(NAME([this](u8 data) {
-		if (m_nr_08_dac_en)
-			m_dac[0]->data_w(data);
-	}));
-	map(0x000f, 0x000f).mirror(0xff00).lw8(NAME([this](u8 data) {
-		if (m_nr_08_dac_en)
-			m_dac[1]->data_w(data);
-	}));
-	map(0x00f3, 0x00f3).mirror(0xff00).lw8(NAME([this](u8 data) {
-		if (m_nr_08_dac_en)
-			m_dac[1]->data_w(data);
-	}));
-	map(0x00df, 0x00df).mirror(0xff00).lw8(NAME([this](u8 data) {
-		if (m_nr_08_dac_en && port_dac_mono_AD_df_io_en())
-		{
-			m_dac[0]->data_w(data);
-			m_dac[3]->data_w(data);
-		}
-	}));
-	map(0x00fb, 0x00fb).mirror(0xff00).lw8(NAME([this](u8 data) {
-		if (m_nr_08_dac_en && port_dac_mono_AD_fb_io_en())
-		{
-			m_dac[0]->data_w(data);
-			m_dac[3]->data_w(data);
-		}
-	}));
-	map(0x00b3, 0x00b3).mirror(0xff00).lw8(NAME([this](u8 data) {
-		if (m_nr_08_dac_en && port_dac_mono_BC_b3_io_en())
-		{
-			m_dac[1]->data_w(data);
-			m_dac[2]->data_w(data);
-		}
-	}));
-	map(0x004f, 0x004f).mirror(0xff00).lw8(NAME([this](u8 data) {
-		if (m_nr_08_dac_en)
-			m_dac[2]->data_w(data);
-	}));
-	map(0x00f9, 0x00f9).mirror(0xff00).lw8(NAME([this](u8 data) {
-		if (m_nr_08_dac_en)
-			m_dac[2]->data_w(data);
-	}));
-	map(0x005f, 0x005f).mirror(0xff00).lw8(NAME([this](u8 data) {
-		if (m_nr_08_dac_en)
-			m_dac[3]->data_w(data);
-	}));
 
 	map(0x0000, 0xffff).view(m_io_expbus_view);
 	m_io_expbus_view[0]; // exp bus disabled
