@@ -1029,7 +1029,7 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 		if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), l[0]);
 		if (ula_en)
 		{
-			m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07, l[0]);
+			m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07);
 			if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, l[0]);
 			else m_ula_scr->draw(screen, bitmap, clip256x192, l[0]);
 		}
