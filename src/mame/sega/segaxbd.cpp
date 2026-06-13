@@ -1075,7 +1075,7 @@ void segaxbd_state::sound_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xefff).rom();
-	map(0xf000, 0xf0ff).mirror(0x0700).rw("pcm", FUNC(segapcm_device::read), FUNC(segapcm_device::write));
+	map(0xf000, 0xf0ff).mirror(0x0700).m("pcm", FUNC(sega_315_5218_device::map));
 	map(0xf800, 0xffff).ram();
 }
 
@@ -1100,7 +1100,7 @@ void segaxbd_state::smgp_sound2_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xefff).rom();
-	map(0xf000, 0xf0ff).mirror(0x0700).rw("pcm2", FUNC(segapcm_device::read), FUNC(segapcm_device::write));
+	map(0xf000, 0xf0ff).mirror(0x0700).m("pcm2", FUNC(sega_315_5218_device::map));
 	map(0xf800, 0xffff).ram();
 }
 
@@ -1853,8 +1853,8 @@ void segaxbd_state::xboard_base_mconfig(machine_config &config)
 	ymsnd.add_route(0, "speaker", 0.15, 0);
 	ymsnd.add_route(1, "speaker", 0.15, 1);
 
-	segapcm_device &pcm(SEGAPCM(config, "pcm", SOUND_CLOCK/4));
-	pcm.set_bank(segapcm_device::BANK_512);
+	sega_315_5218_device &pcm(SEGA_315_5218(config, "pcm", SOUND_CLOCK/4));
+	pcm.set_bank(sega_315_5218_device::BANK_512);
 	pcm.add_route(0, "speaker", 0.35, 0);
 	pcm.add_route(1, "speaker", 0.35, 1);
 }
@@ -2034,8 +2034,8 @@ void segaxbd_smgp_fd1094_state::device_add_mconfig(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "rear", 2).rear();
 
-	segapcm_device &pcm2(SEGAPCM(config, "pcm2", SOUND_CLOCK/4));
-	pcm2.set_bank(segapcm_device::BANK_512);
+	sega_315_5218_device &pcm2(SEGA_315_5218(config, "pcm2", SOUND_CLOCK/4));
+	pcm2.set_bank(sega_315_5218_device::BANK_512);
 	pcm2.add_route(0, "rear", 0.35, 0);
 	pcm2.add_route(1, "rear", 0.35, 1);
 }
@@ -2078,8 +2078,8 @@ void segaxbd_smgp_state::device_add_mconfig(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "rear", 2).rear();
 
-	segapcm_device &pcm2(SEGAPCM(config, "pcm2", SOUND_CLOCK/4));
-	pcm2.set_bank(segapcm_device::BANK_512);
+	sega_315_5218_device &pcm2(SEGA_315_5218(config, "pcm2", SOUND_CLOCK/4));
+	pcm2.set_bank(sega_315_5218_device::BANK_512);
 	pcm2.add_route(0, "rear", 0.35, 0);
 	pcm2.add_route(1, "rear", 0.35, 1);
 }
