@@ -1879,7 +1879,7 @@ GAME( 1981, cityatta,   pleiads, pleiads,  cityatta, phoenix_state, empty_init, 
 GAME( 1981, capitol,    pleiads, phoenix,  capitol,  phoenix_state, empty_init,           ROT90, "bootleg? (Universal Video Spiel)",       "Capitol",                                                    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 
 /*** Others ***/
-// was Microtrain from Germany, or is this just a German version? (some text is in German)
+// Germ Wars is the original game name, although the set here appears to be a version fo the German market
 // The Rock-Ola set still credits Microtrain as the developer in the ROM data
-GAME( 1982, germwars,   0,       survival, survival, phoenix_state, empty_init,           ROT90, "Microtrain",                             "Germ Wars (Germany)",                                        MACHINE_SUPPORTS_SAVE )
+GAME( 1982, germwars,   0,       survival, survival, phoenix_state, empty_init,           ROT90, "Microtrain (Seevend Automaten license)", "Germ Wars (Germany)",                                        MACHINE_SUPPORTS_SAVE )
 GAME( 1982, survival,   germwars,survival, survival, phoenix_state, empty_init,           ROT90, "Microtrain (Rock-Ola license)",          "Survival",                                                   MACHINE_SUPPORTS_SAVE ) // colors match PCB
