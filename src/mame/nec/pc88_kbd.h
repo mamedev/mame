@@ -7,7 +7,7 @@
 #pragma once
 
 #include "machine/keyboard.h"
-#include "diserial.h"
+//#include "diserial.h"
 
 class pc8001_kbd_device : public device_t
 {
@@ -16,7 +16,7 @@ public:
 
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	u8 read_direct(offs_t offset) { return m_io_keys[offset]->read(); }
+	u8 read_direct(offs_t offset) { return m_io_keys[offset]->read() ^ 0xff; }
 
 protected:
 	pc8001_kbd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -44,10 +44,37 @@ public:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
+class pc88va_kbd_device : public device_t
+						, protected device_matrix_keyboard_interface<16>
+{
+public:
+	pc88va_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	auto irq_cb() { return m_irq_cb.bind(); }
+	u8 read_direct(offs_t offset) { return m_key_rows[offset]->read() ^ 0xff; }
+
+	// TODO: interface not yet done
+	u8 read(offs_t offset) { if (offset) { return m_scan_code; } else { return 0; } }
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	virtual void key_make(uint8_t row, uint8_t column) override;
+	virtual void key_break(uint8_t row, uint8_t column) override;
+	virtual void key_repeat(uint8_t row, uint8_t column) override;
+	uint8_t translate(uint8_t row, uint8_t column);
+
+private:
+	devcb_write_line m_irq_cb;
+	u8 m_scan_code;
+};
 
 DECLARE_DEVICE_TYPE(PC8001_KBD,   pc8001_kbd_device)
 DECLARE_DEVICE_TYPE(PC8801_KBD,   pc8801_kbd_device)
 DECLARE_DEVICE_TYPE(PC8801FH_KBD, pc8801fh_kbd_device)
-
+DECLARE_DEVICE_TYPE(PC88VA_KBD,   pc88va_kbd_device)
 
 #endif // MAME_NEC_PC88_KBD_H
