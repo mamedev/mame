@@ -135,8 +135,8 @@ private:
 	required_device<sn76496_device> m_snsnd;
 	required_device<mc146818_device> m_rtc;
 	required_device<ncr5385_device> m_scsi;
-	required_device<input_merger_all_high_device> m_vint;
 	required_device<x2210_device> m_novram;
+	required_device<input_merger_all_high_device> m_vint;
 
 	required_region_ptr<u16> m_prom;
 	required_shared_ptr<u16> m_mainram;
