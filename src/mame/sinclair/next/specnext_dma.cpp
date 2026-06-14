@@ -51,6 +51,10 @@ void specnext_dma_device::write(u8 data)
 {
 	if (num_follow() == 0)
 	{
+		// ZXN DMA has no search mode. Force WR0 mode bits to transfer.
+		if ((data & 0x80) == 0 && (data & 0x87) != 0x00 && (data & 0x87) != 0x04)
+			data = (data | 0x01) & ~0x02;
+
 		z80dma_device::write(data);
 		if ((data & 0x83) == 0x83) // WR6
 		{
