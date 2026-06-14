@@ -99,7 +99,7 @@ ROM_END
 
 } // anonymous namespace
 
-CONS( 200?, mylife,       0,              0,      mylife,  mylife, mylife_state, empty_init, "Giochi Preziosi / Playmates", "My Life (UK)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // maybe US, found in UK
-CONS( 200?, mylifei,      mylife,         0,      mylife,  mylife, mylife_state, empty_init, "Giochi Preziosi / Playmates", "My Life (Italy)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, mylife,       0,              0,      mylife,  mylife, mylife_state, empty_init, "Giochi Preziosi / Playmates", "My Life - Another life in your hands (UK)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // maybe US, found in UK
+CONS( 200?, mylifei,      mylife,         0,      mylife,  mylife, mylife_state, empty_init, "Giochi Preziosi / Playmates", "My Life - Un' altra vita nelle tue mani (Italy)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // there was a follow-up system 'My Real Life'
