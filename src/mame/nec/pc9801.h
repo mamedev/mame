@@ -15,6 +15,7 @@
 #include "bus/ata/ataintf.h"
 #include "bus/pc98_cbus/slot.h"
 #include "bus/rs232/rs232.h"
+#include "bus/pc98_cbus/pc9801_96.h"
 
 #include "cpu/i386/i386.h"
 #include "cpu/i86/i286.h"
