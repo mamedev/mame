@@ -10618,8 +10618,6 @@ Optional [redbook] audio CD on PC-8801MC, requires dump of the actual OST to fix
 		</part>
 	</software>
 
-	<!-- Hangs when selecting any option -->
-	<!-- FDC stalls [Tries to read CHR=(0b 00 01) with N=6, existing ones have R=8x N=3] -->
 	<software name="dslayed2" supported="no">
 <!--
 ExtractDisk  [01]"START DISK      " -> "dragon slayer eiyu densetsu 2_01.d88"
@@ -10634,6 +10632,11 @@ ExtractDisk  [08]"SCENARIO DISK 4 " -> "dragon slayer eiyu densetsu 2_08.d88"
 		<description>Dragon Slayer - Eiyuu Densetsu 2</description>
 		<year>1992</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<notes><![CDATA[
+Hangs when selecting any option (TODO: retest me)
+FDC stalls [Tries to read CHR=(0b 00 01) with N=6, existing ones have R=8x N=3]
+Optional [redbook] audio CD on PC-8801MC, requires dump of the actual OST to fix playback there
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19920319"/>
 		<info name="alt_title" value="ドラゴンスレイヤー英雄伝説2"/>
@@ -10698,10 +10701,13 @@ ExtractDisk  [08]"SCENARIO DISK 4 " -> "dragon slayer eiyu densetsu 2_08.d88"
 		</part>
 	</software>
 
-	<software name="dslayed2a" cloneof="dslayed2">
+	<software name="dslayed2a" cloneof="dslayed2" supported="no">
 		<description>Dragon Slayer - Eiyuu Densetsu 2 (alt Program Disk)</description>
 		<year>1992</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<notes><![CDATA[
+(Same as dslayed2)
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19920319"/>
 		<info name="alt_title" value="ドラゴンスレイヤー英雄伝説2"/>
@@ -10783,6 +10789,9 @@ but in different order
 		<description>Dragon Slayer - Eiyuu Densetsu 2 (alt Program Disk 2)</description>
 		<year>1992</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<notes><![CDATA[
+Doesn't boot, needs floppy order to be fixed
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19920319"/>
 		<info name="alt_title" value="ドラゴンスレイヤー英雄伝説2"/>
@@ -10791,6 +10800,7 @@ but in different order
 		<!-- Only disks 1 and 8 diff, and disks are shifted -> check! -->
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="427088">
 				<rom name="eiyu densetsu ii_01.d88" size="427088" crc="c6aad443" sha1="4745e436a0c4e66da2b50c2d0cfc6217cc292827"/>
 			</dataarea>
@@ -10838,6 +10848,7 @@ but in different order
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Start Disk" />
 			<dataarea name="flop" size="414992">
 				<rom name="eiyu densetsu ii_08.d88" size="414992" crc="8fde9837" sha1="7a7c05c202f15386339a50112609b1fdbb29e012"/>
 			</dataarea>
@@ -13657,11 +13668,13 @@ ExtractDisk  [04]"Data Disk    " -> "formula cms_04.d88"
 		</part>
 	</software>
 
-	<!-- Hangs after Game Arts logo animation, [i8214] spurious irqs -->
 	<software name="gamblerpd" cloneof="gamblerp" supported="no">
 		<description>Gambler Jikochuushinha Mahjong Puzzle Collection Demo</description>
 		<year>1989</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
+		<notes><![CDATA[
+Hangs after Game Arts logo animation, [i8214] spurious irqs
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="392368">
 				<rom name="gambler jikochushin-ha mahjong puzzle demo.d88" size="392368" crc="8a5e4dc6" sha1="e6339abe5cf5cc2f0c774227cb6ce23bcc8b6830"/>
@@ -26928,13 +26941,17 @@ ExtractDisk  [03]"ｼﾅﾘｵ2        " -> "phantasie iv the birth of heroes_03
 		</part>
 	</software>
 
-	<software name="popful">
+	<software name="popful" supported="partial">
 		<description>Popful Mail</description>
 		<year>1991</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<notes><![CDATA[
+Optional [redbook] audio CD on PC-8801MC, requires dump of the actual OST to fix playback there
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19911220"/>
 		<info name="alt_title" value="ぽっぷるめいる"/>
+		<!-- TODO: pinpoint disk combinations for skipping opening -->
 		<!--combined image-->
 		<!--rom name="popful mail.d88" size="2496656" crc="acbb1bc0" sha1="3ef2dea25b96c478469e60fefaad9c083255e6d6"/-->
 
@@ -26981,10 +26998,13 @@ ExtractDisk  [03]"ｼﾅﾘｵ2        " -> "phantasie iv the birth of heroes_03
 		</part>
 	</software>
 
-	<software name="popfula" cloneof="popful">
+	<software name="popfula" cloneof="popful" supported="partial">
 		<description>Popful Mail (alt Program Disk)</description>
 		<year>1991</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<notes><![CDATA[
+Optional [redbook] audio CD on PC-8801MC, requires dump of the actual OST to fix playback there
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19911220"/>
 		<info name="alt_title" value="ぽっぷるめいる"/>
@@ -29023,6 +29043,9 @@ Optional [redbook] audio CD on PC-8801MC
 		<description>Rune Worth</description>
 		<year>1990</year>
 		<publisher>T&amp;E Soft</publisher>
+		<notes><![CDATA[
+Hangs after PCM check (pc8801ma) or at title screen (pc8801mk2sr), spurious [i8214] sound irqs (regression, related to gamblerpd)
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199001xx"/>
 		<info name="alt_title" value="ルーンワース"/>
@@ -50965,9 +50988,11 @@ Not extensively tested
 		</part>
 	</software>
 
+	<!-- Looks too old to be an actual floppy release? -->
 	<software name="superbas">
 		<description>Super Baseball</description>
-		<year>19??</year>
+		<year>1982</year>
+		<!-- Tinysoft / Sawaji Sawada -->
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Needs BASIC V1"/>
 
@@ -57474,7 +57499,9 @@ ExtractDisk  [04]"D DISK          " -> "musium sound board ii_04.d88"
 		<notes><![CDATA[
 Boots with a "Caramity Boy" screen and hangs there
 "第二回作品制作快調!" -> "Sequel being worked on, everything is fine" (wtf?)
+Doesn't seem to have a path for ignoring this screen, incomplete dump?
 ]]></notes>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="425392">
 				<rom name="nformat disk.d88" size="425392" crc="30965674" sha1="eb378b400433b15b3e4c66e1a27615f04056ce60"/>
