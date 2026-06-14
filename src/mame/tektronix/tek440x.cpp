@@ -113,7 +113,12 @@ private:
 	u8 mapcntl_r();
 	void mapcntl_w(u8 data);
 	void sound_w(u8 data);
+	u8 diag_r();
 	void diag_w(u8 data);
+	
+	// need to handle loopback mode
+	u8 duart_r(offs_t offset);
+	void duart_w(offs_t offset, u8 data);
 
 	u8 nvram_r(address_space &space, offs_t offset);
 	void nvram_w(offs_t offset, u8 data);
@@ -151,6 +156,7 @@ private:
 	bool m_kb_tdata;
 	bool m_kb_rclamp;
 	bool m_kb_loop;
+	u8 m_diag;
 };
 
 
@@ -168,8 +174,8 @@ void tek440x_state::machine_start()
 	save_item(NAME(m_kb_rdata));
 	save_item(NAME(m_kb_tdata));
 	save_item(NAME(m_kb_rclamp));
-	save_item(NAME(m_kb_loop));
-}
+	save_item(NAME(m_kb_loop));	
+	save_item(NAME(m_diag));
 
 
 
@@ -290,12 +296,19 @@ void tek440x_state::sound_w(u8 data)
 	m_boot = false;
 }
 
+u8 tek440x_state::diag_r()
+{
+	return m_diag;
+}
+
 void tek440x_state::diag_w(u8 data)
 {
 	if (!m_kb_rclamp && m_kb_loop != BIT(data, 7))
 		m_keyboard->kdo_w(!BIT(data, 7) || m_kb_tdata);
 
 	m_kb_loop = BIT(data, 7);
+	m_diag = data;
+
 }
 
 void tek440x_state::kb_rdata_w(int state)
@@ -386,6 +399,25 @@ void tek440x_state::store_w(u8 data)
 }
 
 
+u8 tek440x_state::duart_r(offs_t offset)
+{
+	return m_duart->read(offset);
+}
+
+void tek440x_state::duart_w(offs_t offset, u8 data)
+{
+	// Transmit Buffer?
+	if (offset == 3)
+	{
+		if (m_kb_loop)
+		{
+			m_duart->write(0x0, 0x80);
+		}
+	}
+
+	m_duart->write(offset, data);
+}
+
 void tek440x_state::logical_map(address_map &map)
 {
 	map(0x000000, 0x7fffff).rw(FUNC(tek440x_state::memory_r), FUNC(tek440x_state::memory_w));
@@ -429,10 +461,11 @@ void tek440x_state::physical_map(address_map &map)
 
 	// 7a0000-7bffff peripheral board I/O
 	// 7a0000-7affff: reserved
-	map(0x7b0000, 0x7b0000).w(FUNC(tek440x_state::diag_w));
+	map(0x7b0000, 0x7b0000).rw(FUNC(tek440x_state::diag_r),FUNC(tek440x_state::diag_w));
 	// 7b1000-7b1fff: diagnostic registers
 	// 7b2000-7b3fff: Centronics printer data
-	map(0x7b4000, 0x7b401f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0xff00);
+
+	map(0x7b4000, 0x7b401f).rw(FUNC(tek440x_state::duart_r), FUNC(tek440x_state::duart_w)).umask16(0xff00);
 	// 7b6000-7b7fff: Mouse
 	map(0x7b8000, 0x7b8003).mirror(0x100).rw("timer", FUNC(am9513_device::read16), FUNC(am9513_device::write16));
 	// 7ba000-7bbfff: MC146818 RTC
