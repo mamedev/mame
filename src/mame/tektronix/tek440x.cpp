@@ -152,8 +152,6 @@ private:
 	output_finder<4> m_leds;
 	output_finder<> m_led_disk;
 
-	int m_u244latch;
-	
 	bool m_boot;
 	u8 m_map_control;
 	bool m_kb_rdata;
