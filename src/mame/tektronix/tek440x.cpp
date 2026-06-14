@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, AJR
+// copyright-holders:R. Belmont, AJR, Adam Billyard
 /***************************************************************************
 
     Tektronix 440x "AI Workstations"
@@ -18,21 +18,24 @@
         * NCR5385 SCSI controller
 		* X2210 NVRAM
 
+		* 8255 Centronics printer interface
+		* X2210 NVRAM
+				
         Video is a 640x480 1bpp window on a 1024x1024 VRAM area; smooth panning around that area
         is possible as is flat-out changing the scanout address.
 
-    IRQ levels:
+    IRQ levels:	(see Figure 2.1-8)
         7 = Debug (NMI)
         6 = VBL
         5 = UART
         4 = Spare (exp slots)
         3 = SCSI
-        2 = DMA
-        1 = Timer
+        2 = DMA (ethernet)
+        1 = Timer	(and Printer)
         0 = Unused
 
     MMU info:
-        Map control register (location unk): bit 15 = VM enable, bits 10-8 = process ID
+        Map control register (location 0x780000): bit 5 = Wenable, bit 4 = VMenable, bits3-0 process ID
 
         Map entries:
             bit 15 = dirty
@@ -66,8 +69,31 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "tek4404.lh"
+
+#define LOG_MMU (1U << 1)
+#define LOG_FPU (1U << 2)
+#define LOG_SCSI (1U << 3)
+#define LOG_IRQ (1U << 4)
+
+#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
+// tek4404 MSU uses a 6502 that is slow to ACK
+unsigned constexpr TEK4404_ACK_DELAY = 30'000;
+
+// mapcntl bits
+constexpr int MAP_VM_ENABLE = 4;
+constexpr int MAP_SYS_WR_ENABLE = 5;
+// mapcntrl result bits
+constexpr int MAP_BLOCK_ACCESS = 6;
+constexpr int MAP_CPU_WR = 7;
+
+#define OFF8_TO_OFF16(A)	((A)>>1)
+#define OFF16_TO_OFF8(A)	((A)<<1)
+
+//constexpr offs_t MAXRAM = 0x200000;	// +1MB
+constexpr offs_t MAXRAM = 0x400000;	// +3MB
 namespace {
 
 class tek440x_state : public driver_device
@@ -87,7 +113,7 @@ public:
 		m_prom(*this, "bootrom"),
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram"),
-		m_map(*this, "map", 0x1000, ENDIANNESS_BIG),
+		m_map(*this, "map", 0x1000, ENDIANNESS_BIG),		// 2k 16-bit entries
 		m_map_view(*this, "map"),
 		m_boot(false),
 		m_map_control(0),
@@ -395,7 +421,7 @@ void tek440x_state::logical_map(address_map &map)
 
 void tek440x_state::physical_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).ram().share("mainram");
+	map(0x000000, MAXRAM-1).ram().share("mainram");						// +1MB RAM option;
 	map(0x600000, 0x61ffff).ram().share("vram");
 
 	// 700000-71ffff spare 0
