@@ -17,6 +17,7 @@
         * AM9513 timer (source of timer IRQ)
         * NCR5385 SCSI controller
 
+		* X2210 NVRAM
         Video is a 640x480 1bpp window on a 1024x1024 VRAM area; smooth panning around that area
         is possible as is flat-out changing the scanout address.
 
@@ -58,6 +59,7 @@
 #include "machine/ncr5385.h"
 #include "machine/ns32081.h"
 #include "machine/nscsi_bus.h"
+#include "machine/x2212.h"
 #include "sound/sn76496.h"
 
 #include "emupal.h"
@@ -81,7 +83,8 @@ public:
 		m_rtc(*this, "rtc"),
 		m_scsi(*this, "ncr5385"),
 		m_vint(*this, "vint"),
-		m_prom(*this, "bootrom"),
+		m_prom(*this, "maincpu"),
+		m_novram(*this, "novram"),
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram"),
 		m_map(*this, "map", 0x1000, ENDIANNESS_BIG),
@@ -110,6 +113,14 @@ private:
 	void sound_w(u8 data);
 	void diag_w(u8 data);
 
+	uint8_t nvram_r(offs_t offset);
+	void nvram_w(offs_t offset, u8 data);
+	uint8_t recall_r();
+	void recall_w(uint8_t data);
+	uint8_t store_r();
+	void store_w(uint8_t data);
+
+
 	void kb_rdata_w(int state);
 	void kb_tdata_w(int state);
 	void kb_rclamp_w(int state);
@@ -125,6 +136,7 @@ private:
 	required_device<mc146818_device> m_rtc;
 	required_device<ncr5385_device> m_scsi;
 	required_device<input_merger_all_high_device> m_vint;
+	required_device<x2210_device> m_novram;
 
 	required_region_ptr<u16> m_prom;
 	required_shared_ptr<u16> m_mainram;
@@ -174,6 +186,9 @@ void tek440x_state::machine_reset()
 }
 
 
+	
+	m_novram->recall(ASSERT_LINE);
+	m_novram->recall(CLEAR_LINE);
 
 /*************************************
  *
@@ -312,6 +327,61 @@ void tek440x_state::kb_tdata_w(int state)
 	}
 }
 
+
+uint8_t tek440x_state::nvram_r(offs_t offset)
+{
+	u8 data = m_novram->read(m_maincpu->space(0), offset);
+
+	LOG("nvram_r(%d) => %02x pc(%08x)\n",offset, data, m_maincpu->pc());
+
+	// kick it up to top 4 bits
+	return data << 4;
+}
+void tek440x_state::nvram_w(offs_t offset, u8 data)
+{
+	LOG("nvram_w(%d) <= %02x\n",offset, data);
+
+	// duplicate in lower 4 bits
+	m_novram->write(offset, data | (data >> 4));
+}
+	
+uint8_t tek440x_state::recall_r()
+{
+	LOG("recall_r\n");
+	if (!machine().side_effects_disabled())
+	{
+		m_novram->recall(1);
+		m_novram->recall(0);
+	}
+
+	return 0xff;
+}
+
+void tek440x_state::recall_w(uint8_t data)
+{
+	LOG("recall_w\n");
+	m_novram->recall(1);
+	m_novram->recall(0);
+}
+
+uint8_t tek440x_state::store_r()
+{
+	LOG("store_r\n");
+	if (!machine().side_effects_disabled())
+	{
+		m_novram->store(1);
+		m_novram->store(0);
+	}
+
+	return 0xff;
+}
+
+void tek440x_state::store_w(uint8_t data)
+{
+	LOG("store_w\n");
+	m_novram->store(1);
+	m_novram->store(0);
+}
 void tek440x_state::logical_map(address_map &map)
 {
 	map(0x000000, 0x7fffff).rw(FUNC(tek440x_state::memory_r), FUNC(tek440x_state::memory_w));
@@ -326,7 +396,13 @@ void tek440x_state::physical_map(address_map &map)
 
 	// 700000-71ffff spare 0
 	// 720000-73ffff spare 1
-	map(0x740000, 0x747fff).rom().mirror(0x8000).region("bootrom", 0);
+	map(0x740000, 0x747fff).rom().mirror(0x8000).region("maincpu", 0);
+	// 721000-72107f net ram
+	map(0x721000, 0x7210ff).rw(FUNC(tek440x_state::nvram_r), FUNC(tek440x_state::nvram_w));
+	// 722000-722fff nvram nybbles
+	map(0x722000, 0x722fff).rw(FUNC(tek440x_state::recall_r), FUNC(tek440x_state::recall_w));
+	map(0x723000, 0x723fff).rw(FUNC(tek440x_state::store_r), FUNC(tek440x_state::store_w));
+	
 	map(0x760000, 0x760fff).ram().mirror(0xf000); // debug RAM
 
 	// 780000-79ffff processor board I/O
