@@ -80,6 +80,7 @@ public:
 		m_duart(*this, "duart"),
 		m_keyboard(*this, "keyboard"),
 		m_snsnd(*this, "snsnd"),
+		m_timer(*this, "timer"),
 		m_rtc(*this, "rtc"),
 		m_scsi(*this, "ncr5385"),
 		m_novram(*this, "novram"),
@@ -121,6 +122,12 @@ private:
 	void recall_w(u8 data);
 	u8 store_r();
 	void store_w(u8 data);
+	
+	// need to handle bit 8 reset
+	void timer_irq(int state);
+	u16 timer_r(offs_t offset);
+	void timer_w(offs_t offset, u16 data);
+
 
 	void kb_rdata_w(int state);
 	void kb_tdata_w(int state);
@@ -134,6 +141,7 @@ private:
 	required_device<mc68681_device> m_duart;
 	required_device<tek410x_keyboard_device> m_keyboard;
 	required_device<sn76496_device> m_snsnd;
+	required_device<am9513_device> m_timer;
 	required_device<mc146818_device> m_rtc;
 	required_device<ncr5385_device> m_scsi;
 	required_device<x2210_device> m_novram;
@@ -145,6 +153,9 @@ private:
 	memory_share_creator<u16> m_map;
 	memory_view m_map_view;
 
+
+	int m_u244latch;
+	
 	bool m_boot;
 	u8 m_map_control;
 	bool m_kb_rdata;
@@ -183,6 +194,7 @@ void tek440x_state::machine_reset()
 {
 	m_boot = true;
 	diag_w(0);
+	m_u244latch = 0;
 	m_keyboard->kdo_w(1);
 	mapcntl_w(0);
 	m_vint->in_w<1>(0);
@@ -386,6 +398,52 @@ void tek440x_state::store_w(u8 data)
 }
 
 
+void tek440x_state::timer_irq(int state)
+{
+	LOGMASKED(LOG_IRQ,"%10s: irq1_raise %04x\n", machine().time().as_string(8), state);
+	
+	if (state == 0)
+	{
+		//LOG("M68K_IRQ_1 assert\n");
+		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
+
+		m_u244latch = 1;
+	}
+	else
+	{
+		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);	
+	}
+}
+
+// to handle offset 0x1xx reads resetting TPInt...
+u16 tek440x_state::timer_r(offs_t offset)
+{
+	LOGMASKED(LOG_IRQ,"%10s: timer_r %08x pc(%08x)\n", machine().time().as_string(8), offset, m_maincpu->pc());
+
+	//if (m_u244latch)
+	{
+		LOGMASKED(LOG_IRQ,"timer_r: M68K_IRQ_1 clear\n");
+		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+		m_u244latch = 0;
+	}
+
+	return m_timer->read16(offset);
+}
+
+// to handle offset 0x1xx writes resetting TPInt...
+void tek440x_state::timer_w(offs_t offset, u16 data)
+{
+	//LOG("timer_w %08x %04x pc(%08x)\n", OFF16_TO_OFF8(offset), data, m_maincpu->pc());
+	m_timer->write16(offset, data);
+
+	//if (m_u244latch)
+	{
+		LOGMASKED(LOG_IRQ,"timer_w: M68K_IRQ_1 clear\n");
+		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+		m_u244latch = 0;
+	}
+}
+
 void tek440x_state::logical_map(address_map &map)
 {
 	map(0x000000, 0x7fffff).rw(FUNC(tek440x_state::memory_r), FUNC(tek440x_state::memory_w));
@@ -435,7 +493,14 @@ void tek440x_state::physical_map(address_map &map)
 	map(0x7b4000, 0x7b401f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0xff00);
 	// 7b6000-7b7fff: Mouse
 	map(0x7b8000, 0x7b8003).mirror(0x100).rw("timer", FUNC(am9513_device::read16), FUNC(am9513_device::write16));
+
+	map(0x7b8000, 0x7b8003).rw(m_timer, FUNC(am9513_device::read16), FUNC(am9513_device::write16));
+	map(0x7b8100, 0x7b8103).rw(FUNC(tek440x_state::timer_r), FUNC(tek440x_state::timer_w));
+	
 	// 7ba000-7bbfff: MC146818 RTC
+	map(0x7ba000, 0x7ba03f).rw(m_rtc, FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct));
+
+	
 	map(0x7bc000, 0x7bc000).lw8(
 		[this](u8 data)
 		{
@@ -521,9 +586,14 @@ void tek440x_state::tek4404(machine_config &config)
 	m_keyboard->tdata_callback().set(FUNC(tek440x_state::kb_tdata_w));
 	m_keyboard->rdata_callback().set(FUNC(tek440x_state::kb_rdata_w));
 
-	AM9513(config, "timer", 40_MHz_XTAL / 4 / 10); // from CPU E output
+	AM9513(config, m_timer, 40_MHz_XTAL / 4 / 10 ); // from CPU E output
 
-	MC146818(config, m_rtc, 32.768_MHz_XTAL);
+	// see diagram page 2.2-6
+	INPUT_MERGER_ALL_HIGH(config, "irq1").output_handler().set(FUNC(tek440x_state::timer_irq));
+	m_timer->out1_cb().set("irq1", FUNC(input_merger_device::in_w<0>));
+	m_timer->out2_cb().set("irq1", FUNC(input_merger_device::in_w<1>));
+
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 
 	auto &scsi(NSCSI_BUS(config, "scsi"));
 	// hard disk is a Micropolis 1304 (https://www.micropolis.com/support/hard-drives/1304)
