@@ -4333,3 +4333,20 @@ if opt_tool(CPUS, "DSP563XX") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp563xx/dsp563xxd.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp563xx/dsp563xxd.h")
 end
+
+--------------------------------------------------
+-- Mystery CPU architecture used in "My Life"
+--@src/devices/cpu/mylife/mylife.h,CPUS["MYLIFE"] = true
+--------------------------------------------------
+
+if CPUS["MYLIFE"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/mylife/mylife.cpp",
+		MAME_DIR .. "src/devices/cpu/mylife/mylife.h",
+	}
+end
+
+if opt_tool(CPUS, "MYLIFE") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mylife/mylifed.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mylife/mylifed.h")
+end

@@ -3,6 +3,8 @@
 
 #include "emu.h"
 
+#include "cpu/mylife/mylife.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
@@ -31,6 +33,8 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void prog_map(address_map &map) ATTR_COLD;
+
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) ATTR_COLD;
 };
 
@@ -39,12 +43,19 @@ uint32_t mylife_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	return 0;
 }
 
+void mylife_state::prog_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom();
+}
+
 static INPUT_PORTS_START( mylife )
 INPUT_PORTS_END
 
 void mylife_state::mylife(machine_config &config)
 {
 	// unknown main CPU
+	mylife_cpu_device &maincpu(MYLIFE_CPU(config, "maincpu", 10'000'000));
+	maincpu.set_addrmap(AS_PROGRAM, &mylife_state::prog_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
