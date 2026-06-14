@@ -14,10 +14,14 @@ Hardware notes:
 The MCU is inside the cartridge, not the console, in theory it could have any MCU.
 The console itself has the video hardware and controls.
 
-TODO:
-- change cartridge to slot device? there are free homebrew games by Inufuto that
-  currently won't work, since cartridge PCB has an MC6803 + 32KB ROM + 8KB RAM
+Inufuto cartridge support has been added. The Inufuto games use a cartridge PCB
+that has an MC6803 + 32KB ROM + 8KB RAM.
 
+The Inufuto cartridge is mapped to the last 32k of the address space, and the
+last 4k of the cartridge is loaded into the CPU ROM area.
+
+TODO:
+  
 *******************************************************************************/
 
 #include "emu.h"
@@ -102,12 +106,21 @@ DEVICE_IMAGE_LOAD_MEMBER(ctvboy_state::cart_load)
 {
 	u32 size = m_cart->common_get_size("rom");
 
-	if (size != 0x1000)
-		return std::make_pair(image_error::INVALIDLENGTH, "Invalid ROM file size (must be 4096 bytes)");
+	if (size != 0x1000 && size != 0x8000)
+		return std::make_pair(image_error::INVALIDLENGTH, "Invalid ROM file size (must be 4096 or 32768 bytes)");
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_BIG);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
-	memcpy(memregion("maincpu")->base(), m_cart->get_rom_base(), size);
+	
+	if (0x8000 == size)
+	{
+		memcpy(memregion("maincpu")->base(), m_cart->get_rom_base() + 0x7000, 0x1000);
+	}
+
+	else
+	{
+		memcpy(memregion("maincpu")->base(), m_cart->get_rom_base(), size);
+	}
 
 	return std::make_pair(std::error_condition(), std::string());
 }
@@ -199,6 +212,8 @@ void ctvboy_state::main_map(address_map &map)
 {
 	map(0x1000, 0x17ff).ram().share(m_vram);
 	map(0x2000, 0x2000).w(FUNC(ctvboy_state::mc6847_w));
+	map(0x4000, 0x5fff).ram();
+	map(0x8000, 0xffff).r("cartslot", FUNC(generic_slot_device::read_rom));
 }
 
 
@@ -268,7 +283,7 @@ void ctvboy_state::ctvboy(machine_config &config)
 ROM_START( ctvboy )
 	// nothing here yet, ROM is on the cartridge
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
-ROM_END
+	ROM_END
 
 } // anonymous namespace
 

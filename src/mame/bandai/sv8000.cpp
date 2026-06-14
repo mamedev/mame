@@ -201,8 +201,8 @@ void sv8000_state::i8255_portc_w(u8 data)
 void sv8000_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0fff).r("cartslot", FUNC(generic_slot_device::read_rom));
-	map(0x8000, 0x83ff).ram(); // Work RAM
+	map(0x0000, 0x7fff).r("cartslot", FUNC(generic_slot_device::read_rom));
+	map(0x8000, 0x8fff).ram(); // Work RAM
 	map(0xc000, 0xcfff).ram().share(m_videoram);
 }
 
@@ -318,7 +318,7 @@ void sv8000_state::sv8000(machine_config &config)
 *******************************************************************************/
 
 ROM_START( sv8000 )
-	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF ) // Mapped by the cartridge slot
+	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASEFF ) // Mapped by the cartridge slot
 ROM_END
 
 } // anonymous namespace
