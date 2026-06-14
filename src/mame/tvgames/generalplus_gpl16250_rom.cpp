@@ -872,7 +872,7 @@ CONS(2012, imgame,    0,       0, tkmag220, tkmag220, tkmag220_game_state,  empt
 // a 180 game Family Sport I'm Game! also exists (and some Famiclones)
 
 // beijuehh was sold with a note that 'X-Racer III crashes in-game' (might only not crash in MAME as we're not executing the protection running in the timers)
-// The 'Helicopter' game has serverly broken scrolling even on the real devices, not an emulation bug.
+// The 'Helicopter' game has severly broken scrolling even on the real devices, not an emulation bug.
 CONS(201?, beijuehh,    0,       0, beijuehh, beijuehh, beijuehh_game_state,  empty_init,      "Beijue",      "Beijue 16 Bit Handheld Games 220-in-1 (Game Boy style case)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS(201?, bornk220,    beijuehh,0, beijuehh, beijuehh, beijuehh_game_state,  empty_init,      "BornKid",     "BornKid 16 Bit Handheld Games 220-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
