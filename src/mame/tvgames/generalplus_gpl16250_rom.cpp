@@ -501,10 +501,33 @@ ROM_START( gp230 )
 	ROM_LOAD16_WORD_SWAP( "s29gl01gp12tfi01.u2", 0x0000000, 0x8000000, CRC(9deb638e) SHA1(d5815135f48178460eee4a3abd45d79fabe1bcfa) )
 ROM_END
 
+// upper address line ordering is likely wrong on either beijuehh or bornk220
+// currently swapped when loading bornk220 so they match what the beijuehh banking code expects
 ROM_START( beijuehh )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "beijeu.bin", 0x0000000, 0x8000000, CRC(e7b968af) SHA1(a39a3a70e6e0827e4395e09e55983eb9e9348e4a) ) // some address lines might be swapped
+	ROM_LOAD16_WORD_SWAP( "beijeu.bin", 0x0000000, 0x8000000, CRC(e7b968af) SHA1(a39a3a70e6e0827e4395e09e55983eb9e9348e4a) )
 ROM_END
+
+ROM_START( bornk220 )
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "bornkid220.bin", 0x0000000, 0x0800000, CRC(1cd39ea1) SHA1(5a748f2a654ac51014d727a4a0e661e81151a249) )
+	ROM_CONTINUE(0x1000000, 0x0800000)
+	ROM_CONTINUE(0x0800000, 0x0800000)
+	ROM_CONTINUE(0x1800000, 0x0800000)
+	ROM_CONTINUE(0x2000000, 0x0800000)
+	ROM_CONTINUE(0x3000000, 0x0800000)
+	ROM_CONTINUE(0x2800000, 0x0800000)
+	ROM_CONTINUE(0x3800000, 0x0800000)
+	ROM_CONTINUE(0x4000000, 0x0800000)
+	ROM_CONTINUE(0x5000000, 0x0800000)
+	ROM_CONTINUE(0x4800000, 0x0800000)
+	ROM_CONTINUE(0x5800000, 0x0800000)
+	ROM_CONTINUE(0x6000000, 0x0800000)
+	ROM_CONTINUE(0x7000000, 0x0800000)
+	ROM_CONTINUE(0x6800000, 0x0800000)
+	ROM_CONTINUE(0x7800000, 0x0800000)
+ROM_END
+
 
 ROM_START( bornkidh )
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
@@ -848,10 +871,11 @@ CONS(201?, gp230,  0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_i
 CONS(2012, imgame,    0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "I'm Game / Senca",      "I'm Game! GP120 (Family Sport 120-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // a 180 game Family Sport I'm Game! also exists (and some Famiclones)
 
-// Also sold as 'BornKid 220 in 1' There are lower capacity versions too, was sold with note that 'X-Racer III crashes in-game'
-// Does the 'Helicopter' game work properly on real hardware? The function at 0x0D2BE7 uses RAM address 0x2372 for the upper bits of the tile base offset calculation
-// but that RAM address doesn't appear to be written anywhere in the code, resulting in scrolling being entirely broken.
+// beijuehh was sold with a note that 'X-Racer III crashes in-game' (might only not crash in MAME as we're not executing the protection running in the timers)
+// The 'Helicopter' game has serverly broken scrolling even on the real devices, not an emulation bug.
 CONS(201?, beijuehh,    0,       0, beijuehh, beijuehh, beijuehh_game_state,  empty_init,      "Beijue",      "Beijue 16 Bit Handheld Games 220-in-1 (Game Boy style case)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS(201?, bornk220,    beijuehh,0, beijuehh, beijuehh, beijuehh_game_state,  empty_init,      "BornKid",     "BornKid 16 Bit Handheld Games 220-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
 CONS(201?, bornkidh,    0,       0, beijuehh, beijuehh, beijuehh_game_state,  empty_init,      "BornKid",     "BornKid 16 Bit Handheld Games 100-in-1 (model GB-10X)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // die on this one is 'GCM420'
