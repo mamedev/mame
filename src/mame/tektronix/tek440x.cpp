@@ -157,6 +157,9 @@ private:
 	bool m_kb_tdata;
 	bool m_kb_rclamp;
 	bool m_kb_loop;
+	
+	int m_fpu_finished;
+
 };
 
 
