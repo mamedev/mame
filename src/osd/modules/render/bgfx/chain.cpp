@@ -103,6 +103,17 @@ void bgfx_chain::process(chain_manager::screen_prim &prim, int view, int screen,
 	bool rotation_swap_xy = (window.target()->orientation() & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
 	bool swap_xy = orientation_swap_xy ^ rotation_swap_xy;
 
+	// The synthetic vector prim (m_prim == nullptr, see inject_vector_screen) is already
+	// window-oriented: the FBO is drawn in window space, so the screen rotation has already
+	// been applied to the line geometry. Passing rotation metadata to the shaders here would
+	// make them re-apply orientation handling (e.g. fs_distortion swaps u_target_dims by
+	// u_swap_xy before comparing against u_quad_dims) and distort the aspect ratio.
+	if (prim.m_prim == nullptr)
+	{
+		rotation_type = 0;
+		swap_xy = false;
+	}
+
 	float screen_scale_x =  1.0f;
 	float screen_scale_y = 1.0f;
 	float screen_offset_x = 0.0f;

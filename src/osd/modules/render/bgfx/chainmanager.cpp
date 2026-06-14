@@ -14,8 +14,10 @@
 #include <bx/readerwriter.h>
 #include <bx/file.h>
 
+#include "emu.h"
 #include "emucore.h"
 #include "render.h"
+#include "screen.h"
 #include "../frontend/mame/ui/slider.h"
 
 #include "modules/lib/osdobj_common.h"
@@ -27,7 +29,9 @@
 #include "bgfxutil.h"
 
 #include "chain.h"
+#include "chainentry.h"
 #include "chainreader.h"
+#include "fbotextureprovider.h"
 #include "slider.h"
 #include "target.h"
 #include "texture.h"
@@ -84,9 +88,38 @@ chain_manager::chain_manager(
 	, m_default_chain_index(-1)
 {
 	m_converters.clear();
+	// Determine the game type (vector vs raster) once in the constructor and cache it
+	detect_vector_game();
 	refresh_available_chains();
 	parse_chain_selections(options.bgfx_screen_chains());
 	init_texture_converters();
+}
+
+// Scan the machine's screen devices; if any is SCREEN_TYPE_VECTOR, treat this as a vector game.
+void chain_manager::detect_vector_game()
+{
+	m_is_vector_game = false;
+	screen_device_enumerator screens(m_machine.root_device());
+	for (screen_device& s : screens)
+	{
+		if (s.screen_type() == SCREEN_TYPE_VECTOR)
+		{
+			m_is_vector_game = true;
+			break;
+		}
+	}
+}
+
+// Scan m_available_chains and build the list of absolute indices compatible with the current
+// game type (m_is_vector_game). CHAIN_NONE (0) is always included.
+void chain_manager::rebuild_compat_chain_indices()
+{
+	m_compat_chain_indices.clear();
+	for (size_t i = 0; i < m_available_chains.size(); i++)
+	{
+		if (i == CHAIN_NONE || m_available_chains[i].m_is_vector == m_is_vector_game)
+			m_compat_chain_indices.push_back(i);
+	}
 }
 
 chain_manager::~chain_manager()
@@ -114,7 +147,9 @@ void chain_manager::get_default_chain_info(std::string &out_chain_name, int32_t 
 	}
 
 	out_chain_index = m_default_chain_index;
-	out_chain_name = "default";
+	// For a vector game, m_default_chain_index is the absolute index of the first vector chain.
+	// Look up the correct name from m_available_chains (the old code returned a hardcoded "default").
+	out_chain_name = m_available_chains[m_default_chain_index].m_name;
 	return;
 }
 
@@ -138,6 +173,10 @@ void chain_manager::refresh_available_chains()
 					return y.m_name != "default";
 				else if (y.m_name == "default")
 					return false;
+				else if (x.m_name == "default-vector")
+					return y.m_name != "default-vector";
+				else if (y.m_name == "default-vector")
+					return false;
 				std::wstring const xstr = wstring_from_utf8(x.m_name);
 				std::wstring const ystr = wstring_from_utf8(y.m_name);
 				return coll.compare(xstr.data(), xstr.data() + xstr.size(), ystr.data(), ystr.data() + ystr.size()) < 0;
@@ -145,14 +184,45 @@ void chain_manager::refresh_available_chains()
 
 	if (m_default_chain_index == -1)
 	{
-		for (size_t i = 0; i < m_available_chains.size(); i++)
+		if (m_is_vector_game)
 		{
-			if (m_available_chains[i].m_name == "default")
+			// A vector game cannot use the "default" raster chain. Prefer the dedicated minimal
+			// "default-vector" chain; otherwise fall back to the first available vector chain (and
+			// if none exists at all, stay -1 = CHAIN_NONE).
+			for (size_t i = 0; i < m_available_chains.size(); i++)
 			{
-				m_default_chain_index = int32_t(i);
+				if (m_available_chains[i].m_is_vector && m_available_chains[i].m_name == "default-vector")
+				{
+					m_default_chain_index = int32_t(i);
+					break;
+				}
+			}
+			if (m_default_chain_index == -1)
+			{
+				for (size_t i = 0; i < m_available_chains.size(); i++)
+				{
+					if (m_available_chains[i].m_is_vector)
+					{
+						m_default_chain_index = int32_t(i);
+						break;
+					}
+				}
+			}
+		}
+		else
+		{
+			for (size_t i = 0; i < m_available_chains.size(); i++)
+			{
+				if (m_available_chains[i].m_name == "default")
+				{
+					m_default_chain_index = int32_t(i);
+				}
 			}
 		}
 	}
+
+	// rebuild the compat index list (indices shift on every refresh)
+	rebuild_compat_chain_indices();
 
 	destroy_unloaded_chains();
 }
@@ -200,7 +270,40 @@ void chain_manager::find_available_chains(std::string_view root, std::string_vie
 					// Does it end in .json?
 					if (test_segment == extension)
 					{
-						m_available_chains.emplace_back(std::string(name.substr(0, start)), std::string(path));
+						// Lightweight JSON pre-scan to extract the "screen_type" tag
+						std::string chain_name(name.substr(0, start));
+						std::string chain_subdir(path);
+						bool is_vector = false;
+						{
+							std::string full_relpath = chain_subdir.empty()
+								? (chain_name + ".json")
+								: util::path_concat(chain_subdir, chain_name + ".json");
+							std::string full_abspath = util::path_concat(std::string(root), full_relpath);
+							bx::FileReader rdr;
+							if (bx::open(&rdr, full_abspath.c_str()))
+							{
+								int32_t sz = bx::getSize(&rdr);
+								if (sz > 0)
+								{
+									std::unique_ptr<char[]> buf(new (std::nothrow) char[sz + 1]);
+									if (buf)
+									{
+										bx::ErrorAssert err;
+										bx::read(&rdr, buf.get(), sz, &err);
+										buf[sz] = 0;
+										Document doc;
+										doc.Parse<kParseCommentsFlag>(buf.get());
+										if (!doc.HasParseError() && doc.HasMember("screen_type") && doc["screen_type"].IsString())
+										{
+											if (std::string_view(doc["screen_type"].GetString()) == "vector")
+												is_vector = true;
+										}
+									}
+								}
+								bx::close(&rdr);
+							}
+						}
+						m_available_chains.emplace_back(std::move(chain_name), std::move(chain_subdir), is_vector);
 					}
 				}
 			}
@@ -296,6 +399,27 @@ void chain_manager::parse_chain_selections(std::string_view chain_str)
 
 		if (chain_index < m_available_chains.size())
 		{
+			// Verify screen_type compatibility; fall back if incompatible.
+			const bool compat = (chain_index == CHAIN_NONE) ||
+				(m_available_chains[chain_index].m_is_vector == m_is_vector_game);
+			if (!compat)
+			{
+				// Informational only: the default selection ("default") is a raster chain, so vector
+				// games routinely fall back here. Keep it at verbose level to avoid console noise.
+				osd_printf_verbose("BGFX: chain '%s' is not compatible with %s game; using fallback\n",
+					std::string(chain_names[index]).c_str(),
+					m_is_vector_game ? "vector" : "raster");
+				// Pick the first compatible chain (other than CHAIN_NONE); if none, stay CHAIN_NONE.
+				chain_index = CHAIN_NONE;
+				for (size_t i : m_compat_chain_indices)
+				{
+					if (i != CHAIN_NONE)
+					{
+						chain_index = i;
+						break;
+					}
+				}
+			}
 			m_current_chain[index] = chain_index;
 			m_chain_names[index] = m_available_chains[chain_index].m_name;
 		}
@@ -406,6 +530,80 @@ void chain_manager::process_screen_quad(uint32_t view, uint32_t screen, screen_p
 	view += chain->applicable_passes();
 }
 
+// inject a GPU-rendered FBO as "screen0" for vector game chain processing.
+// Call this once per frame before process_screen_chains() when rendering a vector game.
+//
+// Design notes:
+//   - update_target_sizes() is called BEFORE update_screen_count() so that the
+//     "output0" target (if ever created) would have correct dimensions.
+//   - m_targets.update_screen_count() is intentionally NOT called here.
+//     This leaves "output0" absent from target_manager, so chainentry::setup_view()
+//     falls back to BGFX_INVALID_HANDLE (= real backbuffer) for the final pass.
+//     No post-chain blit is therefore needed.
+//   - prim.m_prim is set to nullptr.  This is safe as long as the chain JSON does not
+//     set apply_tint=true on any entry (misc/blit does not).
+void chain_manager::inject_vector_screen(bgfx::TextureHandle color_tex,
+	uint16_t width, uint16_t height, uint16_t vec_fb_w, uint16_t vec_fb_h)
+{
+	// (1) Set native dims first so any TARGET_STYLE_NATIVE targets get correct sizes.
+	m_targets.update_target_sizes(0, width, height, TARGET_STYLE_NATIVE,
+		m_user_prescale, m_max_prescale_size);
+
+	// (2) Register FBO color attachment as "screen0" in the chain texture manager.
+	m_textures.remove_provider("screen0");
+	auto prov = std::make_unique<bgfx_fbo_texture_provider>(color_tex, vec_fb_w, vec_fb_h);
+	m_textures.add_provider("screen0", std::move(prov));
+
+	// (3) Build synthetic screen_prim from window dimensions.
+	screen_prim prim;
+	prim.m_prim           = nullptr; // safe: chain does not use apply_tint
+	prim.m_screen_width   = width;
+	prim.m_screen_height  = height;
+	prim.m_quad_width     = width;
+	prim.m_quad_height    = height;
+	prim.m_tex_width      = float(vec_fb_w);
+	prim.m_tex_height     = float(vec_fb_h);
+	prim.m_rowpixels      = vec_fb_w;
+	prim.m_palette_length = 0;
+	prim.m_flags          = 0;
+
+	if (m_screen_prims.empty())
+		m_screen_prims.push_back(prim);
+	else
+		m_screen_prims[0] = prim;
+
+	// (4) Trigger chain loading on first call (no-op on subsequent frames).
+	update_screen_count(1);
+
+	// (5) If the current chain is incompatible with vector, swap to the first vector chain.
+	//     The old code hardcoded the "vector-starwars" string; this is replaced by a screen_type-tag
+	//     based check, so any chain JSON carrying a "screen_type": "vector" tag becomes a candidate.
+	if (!m_screen_chains.empty() && m_current_chain[0] != CHAIN_NONE)
+	{
+		const size_t cur = size_t(m_current_chain[0]);
+		if (cur < m_available_chains.size() && !m_available_chains[cur].m_is_vector)
+		{
+			// swap to the first vector chain
+			for (size_t i = 0; i < m_available_chains.size(); i++)
+			{
+				if (m_available_chains[i].m_is_vector)
+				{
+					if (m_screen_chains[0] != nullptr)
+					{
+						delete m_screen_chains[0];
+						m_screen_chains[0] = nullptr;
+					}
+					m_current_chain[0] = int32_t(i);
+					m_chain_names[0] = m_available_chains[i].m_name;
+					load_chains();
+					break;
+				}
+			}
+		}
+	}
+
+}
+
 uint32_t chain_manager::count_screens(render_primitive* prim)
 {
 	uint32_t screen_count = 0;
@@ -478,17 +676,24 @@ void chain_manager::set_current_chain(uint32_t screen, int32_t chain_index)
 	}
 }
 
+// The chain-selection slider works in indices into m_compat_chain_indices.
+// newval and the return value are compat-list indices; internal m_current_chain[id] holds the absolute index.
 int32_t chain_manager::slider_changed(int id, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
 	{
-		set_current_chain(id, newval);
+		// convert the compat-list index to an absolute chain index
+		if (newval >= 0 && size_t(newval) < m_compat_chain_indices.size())
+		{
+			int32_t abs_idx = int32_t(m_compat_chain_indices[newval]);
+			set_current_chain(id, abs_idx);
 
-		std::vector<std::vector<float>> settings = slider_settings();
-		reload_chains();
-		restore_slider_settings(id, settings);
+			std::vector<std::vector<float>> settings = slider_settings();
+			reload_chains();
+			restore_slider_settings(id, settings);
 
-		m_slider_notifier.set_sliders_dirty();
+			m_slider_notifier.set_sliders_dirty();
+		}
 	}
 
 	if (str != nullptr)
@@ -496,7 +701,13 @@ int32_t chain_manager::slider_changed(int id, std::string *str, int32_t newval)
 		*str = m_available_chains[m_current_chain[id]].m_name;
 	}
 
-	return m_current_chain[id];
+	// also convert the return value to a compat-list index (the UI displays this index)
+	for (size_t i = 0; i < m_compat_chain_indices.size(); i++)
+	{
+		if (int32_t(m_compat_chain_indices[i]) == m_current_chain[id])
+			return int32_t(i);
+	}
+	return 0;
 }
 
 void chain_manager::create_selection_slider(uint32_t screen_index)
@@ -506,9 +717,19 @@ void chain_manager::create_selection_slider(uint32_t screen_index)
 		return;
 	}
 
+	// The slider value is an index into m_compat_chain_indices.
+	// Convert the absolute index (m_current_chain[screen_index]) to its position in the compat list for defval.
 	int32_t minval = 0;
-	int32_t defval = m_current_chain[screen_index];
-	int32_t maxval = m_available_chains.size() - 1;
+	int32_t maxval = m_compat_chain_indices.empty() ? 0 : int32_t(m_compat_chain_indices.size()) - 1;
+	int32_t defval = 0;
+	for (size_t i = 0; i < m_compat_chain_indices.size(); i++)
+	{
+		if (int32_t(m_compat_chain_indices[i]) == m_current_chain[screen_index])
+		{
+			defval = int32_t(i);
+			break;
+		}
+	}
 	int32_t incval = 1;
 
 	using namespace std::placeholders;
@@ -660,7 +881,13 @@ uint32_t chain_manager::process_screen_chains(uint32_t view, osd_window& window)
 
 		uint16_t screen_width = prim.m_screen_width;
 		uint16_t screen_height = prim.m_screen_height;
-		if (window.swap_xy())
+		// The synthetic vector prim (m_prim == nullptr, see inject_vector_screen) is already
+		// window-oriented: its dimensions come from the window, not from the (possibly rotated)
+		// screen. Applying the rotation swap here would disagree with the unswapped dims set in
+		// inject_vector_screen step (1), making m_native_dims flip orientation every frame and
+		// rebuild every NATIVE render target each frame (massive create/destroy churn: VRAM
+		// sawtooth, stale-frame artifacts from recycled target memory, large render stalls).
+		if (window.swap_xy() && prim.m_prim != nullptr)
 		{
 			std::swap(screen_width, screen_height);
 		}
@@ -760,7 +987,15 @@ void chain_manager::load_config(util::xml::data_node const &windownode)
 					if (m_available_chains.end() != found)
 					{
 						auto const chainnum = found - m_available_chains.begin();
-						if (chainnum != m_current_chain[index])
+						// Verify screen_type compatibility; ignore an incompatible cfg.
+						const bool compat = (size_t(chainnum) == CHAIN_NONE) ||
+							(m_available_chains[chainnum].m_is_vector == m_is_vector_game);
+						if (!compat)
+						{
+							osd_printf_warning("BGFX: config chain '%s' not compatible with %s game; ignoring\n",
+								chainname, m_is_vector_game ? "vector" : "raster");
+						}
+						else if (chainnum != m_current_chain[index])
 						{
 							m_current_chain[index] = chainnum;
 							changed = true;
