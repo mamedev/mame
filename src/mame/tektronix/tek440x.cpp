@@ -178,7 +178,6 @@ void tek440x_state::machine_start()
 	save_item(NAME(m_kb_tdata));
 	save_item(NAME(m_kb_rclamp));
 	save_item(NAME(m_kb_loop));
-}
 	
 	m_maincpu->space(AS_PROGRAM).install_write_tap(0x7be002, 0x7be003, "led_tap", [this](offs_t offset, u16 &data, u16 mem_mask)
 		{ m_led_disk = !(data & 0x18);});
@@ -188,6 +187,7 @@ void tek440x_state::machine_start()
 			m_leds[0] = BIT(data, 0); m_leds[1] = BIT(data, 1); m_leds[2] = BIT(data, 2); m_leds[3] = BIT(data, 3);
 		});
 
+}
 
 
 /*************************************
