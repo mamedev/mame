@@ -66,6 +66,12 @@
 #include "screen.h"
 #include "speaker.h"
 
+#define LOG_MMU (1U << 1)
+#define LOG_FPU (1U << 2)
+#define LOG_SCSI (1U << 3)
+#define LOG_IRQ (1U << 4)
+
+#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
 namespace {
@@ -84,8 +90,8 @@ public:
 		m_scsi(*this, "ncr5385"),
 		m_novram(*this, "novram"),
 		m_vint(*this, "vint"),
-		m_prom(*this, "maincpu"),
 		m_fpu(*this, "fpu"),
+		m_prom(*this, "maincpu"),
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram"),
 		m_map(*this, "map", 0x1000, ENDIANNESS_BIG),
@@ -288,6 +294,11 @@ void tek440x_state::mapcntl_w(u8 data)
 {
 	if (BIT(data, 5))
 		m_map_view.select(0);
+	else
+		m_map_view.disable();
+	m_map_control = data & 0x1f;
+}
+
 void tek440x_state::fpu_finished(int val)
 {
 
@@ -357,11 +368,6 @@ u16 tek440x_state::fpu_r(offs_t offset)
 	}
 	
 	return result;
-}
-
-	else
-		m_map_view.disable();
-	m_map_control = data & 0x1f;
 }
 
 void tek440x_state::sound_w(u8 data)
