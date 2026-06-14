@@ -442,7 +442,7 @@ void tek440x_state::tek4404(machine_config &config)
 
 	auto &scsi(NSCSI_BUS(config, "scsi"));
 	// hard disk is a Micropolis 1304 (https://www.micropolis.com/support/hard-drives/1304)
-	// with a Xebec 1401 SASI adapter inside the Mass Storage Unit
+	// with an Adaptec 4000 chipset inside the Mass Storage Unit
 	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, "tek_msu_fdc");
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
@@ -450,8 +450,8 @@ void tek440x_state::tek4404(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr);
-
-	NCR5385(config, m_scsi, 40_MHz_XTAL / 4);
+	// clock crystal p2.2-25
+	NCR5385(config, m_scsi, 3.6864_MHz_XTAL);
 	scsi.set_external_device(7, m_scsi);
 	m_scsi->irq().set_inputline(m_maincpu, M68K_IRQ_3);
 
