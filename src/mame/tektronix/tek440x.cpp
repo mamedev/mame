@@ -83,8 +83,8 @@ public:
 		m_rtc(*this, "rtc"),
 		m_scsi(*this, "ncr5385"),
 		m_vint(*this, "vint"),
-		m_prom(*this, "maincpu"),
 		m_novram(*this, "novram"),
+		m_prom(*this, "maincpu"),
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram"),
 		m_map(*this, "map", 0x1000, ENDIANNESS_BIG),
@@ -183,13 +183,10 @@ void tek440x_state::machine_reset()
 	m_keyboard->kdo_w(1);
 	mapcntl_w(0);
 	m_vint->in_w<1>(0);
-}
-
-
 	
 	m_novram->recall(ASSERT_LINE);
 	m_novram->recall(CLEAR_LINE);
-
+}
 /*************************************
  *
  *  Video refresh
