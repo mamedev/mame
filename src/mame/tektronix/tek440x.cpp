@@ -176,8 +176,7 @@ void tek440x_state::machine_start()
 	save_item(NAME(m_kb_rclamp));
 	save_item(NAME(m_kb_loop));	
 	save_item(NAME(m_diag));
-
-
+}
 
 /*************************************
  *
