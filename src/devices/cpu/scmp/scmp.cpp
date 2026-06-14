@@ -356,6 +356,7 @@ void scmp_device::execute_one(int opcode)
 						tmp = m_AC;
 						m_AC = GET_PTR_REG(ptr)->b.l;
 						GET_PTR_REG(ptr)->b.l = tmp;
+						if ( opcode == 0x30 ) m_PC.w.l = ADD12(m_PC.w.l,1); // After exchange CPU increment PC, like XPPC
 						break;
 			case 0x34:  case 0x35 :case 0x36: case 0x37:
 						// XPAH
