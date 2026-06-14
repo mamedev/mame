@@ -80,6 +80,7 @@ public:
 		m_duart(*this, "duart"),
 		m_keyboard(*this, "keyboard"),
 		m_snsnd(*this, "snsnd"),
+		m_lance(*this, "lance"),
 		m_rtc(*this, "rtc"),
 		m_scsi(*this, "ncr5385"),
 		m_novram(*this, "novram"),
@@ -134,6 +135,7 @@ private:
 	required_device<mc68681_device> m_duart;
 	required_device<tek410x_keyboard_device> m_keyboard;
 	required_device<sn76496_device> m_snsnd;
+	required_device<am7990_device> m_lance;
 	required_device<mc146818_device> m_rtc;
 	required_device<ncr5385_device> m_scsi;
 	required_device<x2210_device> m_novram;
