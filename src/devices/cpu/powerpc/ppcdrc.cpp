@@ -721,12 +721,12 @@ void ppc_device::static_generate_tlb_mismatch()
 	UML_LABEL(block, isi);                                                  // isi:
 	if (!(m_cap & PPCCAP_603_MMU))
 	{
-		// DAR gets the address, DSISR gets the 'reason' flags
-		UML_MOV(block, SPR32(SPROEA_DAR), mem(&m_core->param0));             // mov     [dar],[param0]
-		UML_MOV(block, mem(&m_core->param1), 0); // always a read here
-		UML_CALLC(block, cfunc_ppccom_get_dsisr, this);         // get DSISR to param1
-		UML_MOV(block, SPR32(SPROEA_DSISR), mem(&m_core->param1));          // move [dsisr], [param1]
-		UML_EXH(block, *m_exception[EXCEPTION_ISI], I0);                   // exh     isi,i0
+		// an ISI reports its fault reason in SRR1 (passed as the exception parameter)
+		UML_MOV(block, mem(&m_core->param1), 0);                            // always a read here
+		UML_CALLC(block, cfunc_ppccom_get_dsisr, this);                     // get reason to param1
+		UML_MOV(block, I0, mem(&m_core->param1));                           // mov i0, [param1]
+		UML_AND(block, I0, I0, DSISR_NOT_FOUND | DSISR_PROTECTED);          // keep the SRR1 ISI reason bits
+		UML_EXH(block, *m_exception[EXCEPTION_ISI], I0);                    // exh isi,i0
 	}
 	else
 	{
@@ -759,8 +759,8 @@ void ppc_device::static_generate_exception(uint8_t exception, int recover, const
 	alloc_handle(m_drcuml.get(), &exception_handle, name);
 	UML_HANDLE(block, *exception_handle);                                                   // handle  name
 
-	/* exception parameter is expected to be the fault address in this case */
-	if (exception == EXCEPTION_ISI || exception == EXCEPTION_DSI)
+	/* a DSI reports the faulting data address in DAR (an ISI uses SRR0/SRR1 instead) */
+	if (exception == EXCEPTION_DSI)
 	{
 		UML_GETEXP(block, I0);                                                          // getexp  i0
 		UML_MOV(block, SPR32(SPROEA_DAR), I0);                                          // mov     [dar],i0
@@ -792,12 +792,14 @@ void ppc_device::static_generate_exception(uint8_t exception, int recover, const
 			UML_LABEL(block, not_decrementer);                                          // not_decrementer:
 		}
 
-		/* exception PC goes into SRR0 */
+		// exception PC goes into SRR0
 		UML_MOV(block, SPR32(SPROEA_SRR0), I0);                                     // mov     [srr0],i0
 
-		/* MSR bits go into SRR1, along with some exception-specific data */
+		// MSR bits go into SRR1, along with some exception-specific data
 		UML_AND(block, SPR32(SPROEA_SRR1), MSR32, 0x87c0ffff);                          // and     [srr1],[msr],0x87c0ffff
-		if (exception == EXCEPTION_PROGRAM)
+
+		// an ISI (reason flags) and a PROGRAM exception both carry their SRR1 status in the exception parameter
+		if (exception == EXCEPTION_ISI || exception == EXCEPTION_PROGRAM)
 		{
 			UML_GETEXP(block, I1);                                                      // getexp  i1
 			UML_OR(block, SPR32(SPROEA_SRR1), SPR32(SPROEA_SRR1), I1);                  // or      [srr1],[srr1],i1

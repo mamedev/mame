@@ -1964,25 +1964,97 @@
 			<color red="1.0" green="1.0" blue="1.0"/>
 		</rect>
 	</element>
-	<element name="reel0" defstate="0">
-		<reel reelreversed="1" stateoffset="0" numsymbolsvisible="3" symbollist="reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel">
-			<color red="0.0" green="0.0" blue="0.0"/>
-		</reel>
+	<element name="reel0">
+		<rect> <bounds x="0" y="0" width="80" height="740"/> <color alpha="0.0"/> </rect>
+		<text string="reel"> <bounds x="4" y="9"   width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="46"  width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="83"  width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="120" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="157" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="194" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="231" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="268" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="305" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="342" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="379" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="416" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="453" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="490" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="527" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="564" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="601" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="638" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="675" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="712" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 	</element>
-	<element name="reel1" defstate="0">
-		<reel reelreversed="1" stateoffset="0" numsymbolsvisible="3" symbollist="reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel">
-			<color red="0.0" green="0.0" blue="0.0"/>
-		</reel>
+	<element name="reel1">
+		<rect> <bounds x="0" y="0" width="80" height="740"/> <color alpha="0.0"/> </rect>
+		<text string="reel"> <bounds x="4" y="9"   width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="46"  width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="83"  width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="120" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="157" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="194" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="231" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="268" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="305" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="342" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="379" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="416" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="453" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="490" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="527" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="564" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="601" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="638" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="675" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="712" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 	</element>
-	<element name="reel2" defstate="0">
-		<reel reelreversed="1" stateoffset="0" numsymbolsvisible="3" symbollist="reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel">
-			<color red="0.0" green="0.0" blue="0.0"/>
-		</reel>
+	<element name="reel2">
+		<rect> <bounds x="0" y="0" width="80" height="740"/> <color alpha="0.0"/> </rect>
+		<text string="reel"> <bounds x="4" y="9"   width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="46"  width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="83"  width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="120" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="157" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="194" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="231" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="268" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="305" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="342" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="379" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="416" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="453" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="490" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="527" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="564" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="601" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="638" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="675" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="712" width="72" height="19"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 	</element>
-	<element name="reel3" defstate="0">
-		<reel reelreversed="1" stateoffset="0" numsymbolsvisible="3" symbollist="reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel,reel">
-			<color red="0.0" green="0.0" blue="0.0"/>
-		</reel>
+	<element name="reel3">
+		<rect> <bounds x="0" y="0" width="80" height="540"/> <color alpha="0.0"/> </rect>
+		<text string="reel"> <bounds x="4" y="7"   width="72" height="13"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="34"  width="72" height="13"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="61"  width="72" height="13"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="88"  width="72" height="13"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="115" width="72" height="13"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="142" width="72" height="13"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="169" width="72" height="13"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="196" width="72" height="13"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="223" width="72" height="13"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="250" width="72" height="13"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="277" width="72" height="13"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="304" width="72" height="13"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="331" width="72" height="13"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="358" width="72" height="13"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="385" width="72" height="13"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="412" width="72" height="13"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="439" width="72" height="13"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="466" width="72" height="13"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="493" width="72" height="13"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="reel"> <bounds x="4" y="520" width="72" height="13"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 	</element>
 	<element name="led_background">
 		<rect>
@@ -2281,8 +2353,9 @@
 		<element name="lamp40" ref="reel_lamp" state="0">
 			<bounds x="217.0000" y="565.3333" width="80.0000" height="36.6667"/>
 		</element>
-		<element name="reel1:scroll" ref="reel0" state="0">
+		<element ref="reel0">
 			<bounds x="217" y="492" width="80" height="110"/>
+			<yscroll name="reel1:scroll" size="0.15" wrap="yes" min="65536" max="1"/>
 		</element>
 		<element ref="reel_background">
 			<bounds x="337" y="492" width="80" height="110"/>
@@ -2296,8 +2369,9 @@
 		<element name="lamp41" ref="reel_lamp" state="0">
 			<bounds x="337.0000" y="565.3333" width="80.0000" height="36.6667"/>
 		</element>
-		<element name="reel2:scroll" ref="reel1" state="0">
+		<element ref="reel1">
 			<bounds x="337" y="492" width="80" height="110"/>
+			<yscroll name="reel2:scroll" size="0.15" wrap="yes" min="65536" max="1"/>
 		</element>
 		<element ref="reel_background">
 			<bounds x="457" y="492" width="80" height="110"/>
@@ -2311,8 +2385,9 @@
 		<element name="lamp42" ref="reel_lamp" state="0">
 			<bounds x="457.0000" y="565.3333" width="80.0000" height="36.6667"/>
 		</element>
-		<element name="reel3:scroll" ref="reel2" state="0">
+		<element ref="reel2">
 			<bounds x="457" y="492" width="80" height="110"/>
+			<yscroll name="reel3:scroll" size="0.15" wrap="yes" min="65536" max="1"/>
 		</element>
 		<element ref="reel_background">
 			<bounds x="321" y="208" width="80" height="80"/>
@@ -2326,8 +2401,9 @@
 		<element name="lamp-2" ref="reel_lamp" state="0">
 			<bounds x="321.0000" y="261.3333" width="80.0000" height="26.6667"/>
 		</element>
-		<element name="reel4:scroll" ref="reel3" state="0">
+		<element ref="reel3">
 			<bounds x="321" y="208" width="80" height="80"/>
+			<yscroll name="reel4:scroll" size="0.15" wrap="yes" min="65536" max="1"/>
 		</element>
 		<element name="lamp71" ref="lamp_71_1_border" state="0">
 			<bounds x="819" y="133" width="77" height="44"/>
@@ -4257,8 +4333,9 @@
 		<element name="lamp40" ref="reel_lamp" state="0">
 			<bounds x="1100.0000" y="192.0000" width="120.0000" height="80.0000"/>
 		</element>
-		<element name="reel1:scroll" ref="reel0" state="0">
+		<element ref="reel0">
 			<bounds x="1100" y="32" width="120" height="240"/>
+			<yscroll name="reel1:scroll" size="0.15" wrap="yes" min="65536" max="1"/>
 		</element>
 		<element ref="reel_background">
 			<bounds x="1240" y="32" width="120" height="240"/>
@@ -4272,8 +4349,9 @@
 		<element name="lamp41" ref="reel_lamp" state="0">
 			<bounds x="1240.0000" y="192.0000" width="120.0000" height="80.0000"/>
 		</element>
-		<element name="reel2:scroll" ref="reel1" state="0">
+		<element ref="reel1">
 			<bounds x="1240" y="32" width="120" height="240"/>
+			<yscroll name="reel2:scroll" size="0.15" wrap="yes" min="65536" max="1"/>
 		</element>
 		<element ref="reel_background">
 			<bounds x="1380" y="32" width="120" height="240"/>
@@ -4287,8 +4365,9 @@
 		<element name="lamp42" ref="reel_lamp" state="0">
 			<bounds x="1380.0000" y="192.0000" width="120.0000" height="80.0000"/>
 		</element>
-		<element name="reel3:scroll" ref="reel2" state="0">
+		<element ref="reel2">
 			<bounds x="1380" y="32" width="120" height="240"/>
+			<yscroll name="reel3:scroll" size="0.15" wrap="yes" min="65536" max="1"/>
 		</element>
 		<element ref="reel_background">
 			<bounds x="1520" y="32" width="120" height="240"/>
@@ -4302,8 +4381,9 @@
 		<element name="lamp-2" ref="reel_lamp" state="0">
 			<bounds x="1520.0000" y="192.0000" width="120.0000" height="80.0000"/>
 		</element>
-		<element name="reel4:scroll" ref="reel3" state="0">
+		<element ref="reel3">
 			<bounds x="1520" y="32" width="120" height="240"/>
+			<yscroll name="reel4:scroll" size="0.15" wrap="yes" min="65536" max="1"/>
 		</element>
 		<element name="reel1:pos" ref="debug_stepper_value">
 			<bounds x="1100" y="272" width="50" height="30"/>

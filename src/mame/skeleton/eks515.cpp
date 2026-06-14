@@ -60,8 +60,7 @@ uint32_t eks515_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 void eks515_state::eks515(machine_config &config)
 {
-	// unknown CPU types
-	i80c31_device &maincpu(I80C31(config, "maincpu", 12'000'000));
+	i80c31_device &maincpu(I80C31(config, "maincpu", 12'000'000)); // exact type unknown
 	maincpu.set_addrmap(AS_PROGRAM, &eks515_state::prog_map);
 	maincpu.port_in_cb<3>().set_constant(0xff); // silence logging
 

@@ -66,7 +66,7 @@ private:
 	required_device<ym2413_device> m_ym2413;
 };
 
-#include "gamball.lh"
+#include "m4gambal.lh"
 #include "m4addr.lh"
 
 
@@ -608,7 +608,7 @@ INPUT_PORTS_END
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAMEL( year, setname, parent, cheatchr_gambal(R4, RT1), mpu4, mpu4mod4yam_machines_state, init_m4, ROT0, company, title, MACHINE_REQUIRES_ARTWORK | MACHINE_MECHANICAL, layout_gamball )
+	GAMEL( year, setname, parent, cheatchr_gambal(R4, RT1), mpu4, mpu4mod4yam_machines_state, init_m4, ROT0, company, title, MACHINE_REQUIRES_ARTWORK | MACHINE_MECHANICAL, layout_m4gambal )
 
 GAME_CUSTOM( 199?, m4gambal,       0,          "gbbx.p1",  0x0000, 0x010000, CRC(0b5adcd0) SHA1(1a198bd4a1e7d6bf4cf025c43d35aaef351415fc), "Barcrest","Gamball (Barcrest) (MPU4) (GBB 2.0)" )
 GAME_CUSTOM( 199?, m4gambal__a,    m4gambal,   "gabcx.p1", 0x0000, 0x010000, CRC(52c35266) SHA1(bda49005de88094fbc84621f63b33f0e0a9c0bd3), "Barcrest","Gamball (Barcrest) (MPU4) (GAB 2.0, set 1)" )

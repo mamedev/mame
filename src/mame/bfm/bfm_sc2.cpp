@@ -177,7 +177,7 @@ Adder hardware:
 
 #include "sc2_vfd.lh"
 #include "sc2_dmd.lh"
-#include "drwho.lh"
+#include "sc2drwho.lh"
 
 #include "sc2ptytm1.lh"
 #include "sc2cpe.lh"
@@ -8634,38 +8634,38 @@ GAMEL( 1997, gldncrwnhop, gldncrwn, scorpion2_vid,  gldncrwn, bfm_sc2_vid_state,
 ********************************************************************************************************************************************************************************************************************/
 
 // PROJECT NUMBER 6305  DR WHO TIMELORD - 28-SEP-1994 11:14:58
-GAMEL( 1994, sc2drwho,    0,        scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 1, UK, Single Site) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-288
-GAMEL( 1994, sc2drwhou,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwhon, 0, "BFM",         "Dr.Who The Timelord (set 1, UK, Single Site) (Scorpion 2/3) (not encrypted)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) //  GAME No 95-750-288 (unencrypted bootleg?)
-GAMEL( 1994, sc2drwhop,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 1, UK, Single Site Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-751-288
+GAMEL( 1994, sc2drwho,    0,        scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 1, UK, Single Site) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-750-288
+GAMEL( 1994, sc2drwhou,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwhon, 0, "BFM",         "Dr.Who The Timelord (set 1, UK, Single Site) (Scorpion 2/3) (not encrypted)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) //  GAME No 95-750-288 (unencrypted bootleg?)
+GAMEL( 1994, sc2drwhop,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 1, UK, Single Site Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-751-288
 // PROJECT NUMBER 6305  DR WHO TIMELORD IRISH ALL CASH   - 28-SEP-1994 11:20:17
-GAMEL( 1994, sc2drwho1,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 2, UK, Arcade) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-290
-GAMEL( 1994, sc2drwho1p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 2, UK, Arcade, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-751-290
+GAMEL( 1994, sc2drwho1,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 2, UK, Arcade) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-750-290
+GAMEL( 1994, sc2drwho1p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 2, UK, Arcade, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-751-290
 // PROJECT NUMBER 6305  DR WHO TIMELORD NO JP SPIN - 17-NOV-1994 09:34:50
-GAMEL( 1994, sc2drwho2,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 3, UK, no Jackpot spin) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-309
-GAMEL( 1994, sc2drwho2p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 3, UK, no Jackpot spin, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-751-309
+GAMEL( 1994, sc2drwho2,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 3, UK, no Jackpot spin) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-750-309
+GAMEL( 1994, sc2drwho2p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 3, UK, no Jackpot spin, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-751-309
 // PROJECT NUMBER 6305  DR WHO TIMELORD ARCADE - 24-OCT-1995 16:12:44
-GAMEL( 1994, sc2drwho3,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 4, UK, Arcade) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-536
-GAMEL( 1994, sc2drwho3p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 4, UK, Arcade, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-751-536
+GAMEL( 1994, sc2drwho3,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 4, UK, Arcade) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-750-536
+GAMEL( 1994, sc2drwho3p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 4, UK, Arcade, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-751-536
 // PROJECT NUMBER 6305  DR WHO TIMELORD 4/8 - 24-OCT-1995 16:14:30
-GAMEL( 1994, sc2drwho4,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 5, UK) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-535
-GAMEL( 1994, sc2drwho4p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 5, UK, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-751-535
+GAMEL( 1994, sc2drwho4,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 5, UK) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-750-535
+GAMEL( 1994, sc2drwho4p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 5, UK, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-751-535
 // PROJECT NUMBER 6305  DR WHO TIMELORD IRISH ALL CASH 4/8 - 25-OCT-1995 09:50:12
-GAMEL( 1994, sc2drwho5,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 6, UK, Arcade, 8GBP Jackpot) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-531
-GAMEL( 1994, sc2drwho5p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 6, UK, Arcade, 8GBP Jackpot, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-751-531
+GAMEL( 1994, sc2drwho5,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 6, UK, Arcade, 8GBP Jackpot) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-750-531
+GAMEL( 1994, sc2drwho5p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 6, UK, Arcade, 8GBP Jackpot, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-751-531
 // PROJECT NUMBER 6305  TIMELORD ARCADE 10P PLAY 4/8 - 25-OCT-1995 09:53:06
-GAMEL( 1994, sc2drwho6,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 7, UK, Arcade) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-533
-GAMEL( 1994, sc2drwho6p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 7, UK, Arcade, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-751-533
+GAMEL( 1994, sc2drwho6,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 7, UK, Arcade) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-750-533
+GAMEL( 1994, sc2drwho6p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 7, UK, Arcade, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-751-533
 // PROJECT NUMBER 6305  DR WHO TIMELORD 10 POUNDS - 28-MAR-1996 13:21:58
-GAMEL( 1994, sc2drwho7,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 8, UK, Arcade, 10GBP Jackpot) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-661
-GAMEL( 1994, sc2drwho7p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 8, UK, Arcade, 10GBP Jackpot, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-751-661
+GAMEL( 1994, sc2drwho7,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 8, UK, Arcade, 10GBP Jackpot) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-750-661
+GAMEL( 1994, sc2drwho7p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 8, UK, Arcade, 10GBP Jackpot, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-751-661
 // PROJECT NUMBER 6419  DR WHO TIMELORD DELUXE - 8-MAR-1995 15:37:53
-GAMEL( 1994, sc2drwhodx,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord Deluxe (set 1) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-370
+GAMEL( 1994, sc2drwhodx,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord Deluxe (set 1) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-750-370
 // PROJECT NUMBER 6419  TIMELORD DELUXE MULTI-SITE ALL CASH - 4-DEC-1995 10:48:34
-GAMEL( 1994, sc2drwhodx1, sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord Deluxe (set 2) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-572
+GAMEL( 1994, sc2drwhodx1, sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord Deluxe (set 2) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-750-572
 // PROJECT NUMBER 6999  TIMELORD AT PLAYMAKER 5P/10p  500P - 15-SEP-1997 10:02:47
-GAMEL( 1994, sc2drwhomz,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM/Mazooma", "Dr.Who The Timelord (Mazooma) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL | MACHINE_NOT_WORKING,layout_drwho) // GAME No TLVMAZ12_N, error 99
+GAMEL( 1994, sc2drwhomz,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM/Mazooma", "Dr.Who The Timelord (Mazooma) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL | MACHINE_NOT_WORKING,layout_sc2drwho) // GAME No TLVMAZ12_N, error 99
 // PROJECT NUMBER TLP12  TIMELORD AT PLAYMAKER 5P/10p  500P - 15-SEP-1997 10:03:49
-GAMEL( 1994, sc2drwhomzp, sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM/Mazooma", "Dr.Who The Timelord (Mazooma, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL | MACHINE_NOT_WORKING,layout_drwho) // GAME No TLVMAZ12_P,  error 99
+GAMEL( 1994, sc2drwhomzp, sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM/Mazooma", "Dr.Who The Timelord (Mazooma, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL | MACHINE_NOT_WORKING,layout_sc2drwho) // GAME No TLVMAZ12_P,  error 99
 
 /********************************************************************************************************************************************************************************************************************
  The Big Breakfast

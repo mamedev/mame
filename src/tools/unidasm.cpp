@@ -135,6 +135,7 @@ using util::BIT;
 #include "cpu/mn10300/mn103dasm.h"
 #include "cpu/mpk1839/kl1839vm1dasm.h"
 #include "cpu/msm65x2/msm65x2d.h"
+#include "cpu/mylife/mylifed.h"
 #include "cpu/nanoprocessor/nanoprocessor_dasm.h"
 #include "cpu/nec/necdasm.h"
 #include "cpu/nios2/nios2dasm.h"
@@ -562,6 +563,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "mn1870",          be,  0, []() -> util::disasm_interface * { return new mn1870_disassembler; } },
 	{ "mn1880",          be,  0, []() -> util::disasm_interface * { return new mn1880_disassembler; } },
 	{ "msm65x2",         le,  0, []() -> util::disasm_interface * { return new msm65x2_disassembler; } },
+	{ "mylife",          le, -1, []() -> util::disasm_interface * { return new mylife_disassembler; } },
 	{ "nanoprocessor",   le,  0, []() -> util::disasm_interface * { return new hp_nanoprocessor_disassembler; } },
 	{ "nec",             le,  0, []() -> util::disasm_interface * { return new nec_disassembler(&nec_unidasm); } },
 	{ "nios2",           le,  0, []() -> util::disasm_interface * { return new nios2_disassembler; } },

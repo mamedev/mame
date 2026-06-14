@@ -68,8 +68,6 @@ public:
 
 	void pc88va(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
-
 protected:
 	struct tsp_t
 	{
@@ -90,23 +88,14 @@ protected:
 		u8 spwr_offset = 0;
 	};
 
-	struct keyb_t
-	{
-		u8 data = 0;
-	};
-	keyb_t m_keyb;
-
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 	virtual void video_reset() override ATTR_COLD;
 	void palette_init(palette_device &palette) const;
 
-protected:
 	void pc88va_cbus(machine_config &config);
-
 private:
-
 	required_device<v50_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<upd765a_device> m_fdc;
@@ -158,7 +147,6 @@ private:
 	uint16_t bios_bank_r();
 	void bios_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t rom_bank_r();
-	uint8_t key_r(offs_t offset);
 	void backupram_wp_1_w(uint16_t data);
 	void backupram_wp_0_w(uint16_t data);
 	uint8_t kanji_ram_r(offs_t offset);

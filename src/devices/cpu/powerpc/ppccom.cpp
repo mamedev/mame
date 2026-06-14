@@ -1715,9 +1715,9 @@ void ppc_device::ppccom_execute_mfspr()
 
 			case SPR601_RTCLR_PWR:
 				{
+					// get fractional seconds and convert to nanoseconds
 					const uint64_t remainder = (total_cycles() - m_rtc_zero_cycles) % clock();
-					const double seconds = remainder / clock();             // get fractional seconds
-					m_core->param1 = (uint64_t)(seconds * 1'000'000'000);   // and convert to nanoseconds
+					m_core->param1 = (remainder * 1'000'000'000ULL) / clock();
 				}
 				return;
 		}
