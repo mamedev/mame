@@ -76,6 +76,8 @@
 #include "softlist.h"
 #include "speaker.h"
 
+#include <numbers>
+
 #include "logmacro.h"
 
 namespace {
@@ -220,11 +222,13 @@ void minitel_state::sound_stream_update(sound_stream &stream)
 
 	if (dtmf_active)
 	{
+		using std::numbers::pi;
+
 		// Generate the two frequencies selected by RDTMF.
 		const double LOW_FREQS[4] = { 697, 770, 852, 941 };
 		const double HIGH_FREQS[4] = { 1209, 1336, 1477, 1633 };
-		const double rate1 = 2.0 * M_PI * LOW_FREQS[bitswap<2>(modem_rdtmf_reg, 1, 0)] / MODEM_SAMPLE_RATE;
-		const double rate2 = 2.0 * M_PI * HIGH_FREQS[bitswap<2>(modem_rdtmf_reg, 3, 2)] / MODEM_SAMPLE_RATE;
+		const double rate1 = 2.0 * pi * LOW_FREQS[bitswap<2>(modem_rdtmf_reg, 1, 0)] / MODEM_SAMPLE_RATE;
+		const double rate2 = 2.0 * pi * HIGH_FREQS[bitswap<2>(modem_rdtmf_reg, 3, 2)] / MODEM_SAMPLE_RATE;
 		for (s32 i = 0; i < stream.samples(); i++)
 		{
 			double val = 0;
@@ -233,8 +237,8 @@ void minitel_state::sound_stream_update(sound_stream &stream)
 			if (modem_rptf_reg != 0x4) // unless low-only filtered
 				val += sin(modem_dtmf_phase2);
 			stream.put(0, i, 0.5 * val); // mixed sine waves
-			modem_dtmf_phase1 = fmod(modem_dtmf_phase1 + rate1, 2.0 * M_PI);
-			modem_dtmf_phase2 = fmod(modem_dtmf_phase2 + rate2, 2.0 * M_PI);
+			modem_dtmf_phase1 = fmod(modem_dtmf_phase1 + rate1, 2.0 * pi);
+			modem_dtmf_phase2 = fmod(modem_dtmf_phase2 + rate2, 2.0 * pi);
 		}
 	}
 	else
