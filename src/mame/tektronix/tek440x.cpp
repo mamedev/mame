@@ -410,8 +410,14 @@ void tek440x_state::physical_map(address_map &map)
 	map(0x722000, 0x722fff).rw(FUNC(tek440x_state::recall_r), FUNC(tek440x_state::recall_w));
 	map(0x723000, 0x723fff).rw(FUNC(tek440x_state::store_r), FUNC(tek440x_state::store_w));
 
+	// 720000-720fff spare 1 (ethernet)
+	map(0x720000, 0x720007).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w));
+
 	map(0x740000, 0x747fff).rom().mirror(0x8000).region("bootrom", 0);
 
+	// 700000-71ffff spare 0
+	// 720000-73ffff spare 1
+	map(0x740000, 0x747fff).rom().mirror(0x8000).region("maincpu", 0);
 	map(0x760000, 0x760fff).ram().mirror(0xf000); // debug RAM
 
 	// 780000-79ffff processor board I/O
