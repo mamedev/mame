@@ -66,6 +66,7 @@
 #include "screen.h"
 #include "speaker.h"
 
+#define LOG_IRQ (1U << 4)
 #include "logmacro.h"
 
 namespace {
