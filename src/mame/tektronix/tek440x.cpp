@@ -81,7 +81,7 @@ public:
 		m_rtc(*this, "rtc"),
 		m_scsi(*this, "ncr5385"),
 		m_vint(*this, "vint"),
-		m_prom(*this, "maincpu"),
+		m_prom(*this, "bootrom"),
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram"),
 		m_map(*this, "map", 0x1000, ENDIANNESS_BIG),
@@ -326,7 +326,7 @@ void tek440x_state::physical_map(address_map &map)
 
 	// 700000-71ffff spare 0
 	// 720000-73ffff spare 1
-	map(0x740000, 0x747fff).rom().mirror(0x8000).region("maincpu", 0);
+	map(0x740000, 0x747fff).rom().mirror(0x8000).region("bootrom", 0);
 	map(0x760000, 0x760fff).ram().mirror(0xf000); // debug RAM
 
 	// 780000-79ffff processor board I/O
