@@ -205,6 +205,8 @@ void minitel_state::machine_start()
 
 void minitel_state::sound_stream_update(sound_stream &stream)
 {
+	using std::numbers::pi;
+
 	// In real hardware, DTMF tones are emitted on the phone line if DTMF=0,
 	// MCBC=1 and RTS=0. Given we only emulate the monitor output on the
 	// speaker, we also require that the transmit signal is selected for
@@ -222,8 +224,6 @@ void minitel_state::sound_stream_update(sound_stream &stream)
 
 	if (dtmf_active)
 	{
-		using std::numbers::pi;
-
 		// Generate the two frequencies selected by RDTMF.
 		const double LOW_FREQS[4] = { 697, 770, 852, 941 };
 		const double HIGH_FREQS[4] = { 1209, 1336, 1477, 1633 };
@@ -251,11 +251,11 @@ void minitel_state::sound_stream_update(sound_stream &stream)
 	{
 		// Generate the fixed frequency.
 		const double BEEP_FREQ = 2982;
-		const double rate = 2.0 * M_PI * BEEP_FREQ / MODEM_SAMPLE_RATE;
+		const double rate = 2.0 * pi * BEEP_FREQ / MODEM_SAMPLE_RATE;
 		for (s32 i = 0; i < stream.samples(); i++)
 		{
-			stream.put(0, i, modem_beep_phase >= M_PI ? +1 : -1); // square wave
-			modem_beep_phase = fmod(modem_beep_phase + rate, 2.0 * M_PI);
+			stream.put(0, i, modem_beep_phase >= pi ? +1 : -1); // square wave
+			modem_beep_phase = fmod(modem_beep_phase + rate, 2.0 * pi);
 		}
 	}
 	else
