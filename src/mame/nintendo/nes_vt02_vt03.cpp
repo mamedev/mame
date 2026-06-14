@@ -1691,7 +1691,8 @@ CONS( 201?, 88in1joy,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty
 
 CONS( 200?, mc_aa2,     0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "100 in 1 Arcade Action II (AT-103)", MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 200?, vt50in1,    0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "unknown 50 in 1 VT based handheld", MACHINE_IMPERFECT_GRAPHICS )
+// Inspiron Distribution Ltd. 'HGIFT4'
+CONS( 200?, vt50in1,    0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "game on! TV 50 in 1 Arcade Game", MACHINE_IMPERFECT_GRAPHICS )
 
 // Runs fine, non-sport 121 in 1 games perfect, but minor graphical issues in
 // sport games, also no sound in menu or sport games due to missing PCM
