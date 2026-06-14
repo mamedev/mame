@@ -16,8 +16,6 @@
         * MC68681 DUART / timer (3.6864 MHz clock) (serial channel A = keyboard, channel B = RS-232 port)
         * AM9513 timer (source of timer IRQ)
         * NCR5385 SCSI controller
-		* X2210 NVRAM
-
 		* 8255 Centronics printer interface
 		* X2210 NVRAM
 				
