@@ -95,10 +95,8 @@ void pc9801_96_device::io_map(address_map &map)
 
 	map(0x0902, 0x0902).rw(FUNC(pc9801_96_device::video_enable_r), FUNC(pc9801_96_device::video_enable_w));
 
-	map(0xfa2, 0xfa2).rw(FUNC(pc9801_96_device::reg_index_r), FUNC(pc9801_96_device::reg_index_w));
-	map(0xfa3, 0xfa3).rw(FUNC(pc9801_96_device::reg_data_r), FUNC(pc9801_96_device::reg_data_w));
-	map(0xfaa, 0xfaa).rw(FUNC(pc9801_96_device::reg_index_r), FUNC(pc9801_96_device::reg_index_w));
-	map(0xfab, 0xfab).rw(FUNC(pc9801_96_device::reg_data_r), FUNC(pc9801_96_device::reg_data_w));
+	map(0xfa2, 0xfa2).mirror(8).rw(FUNC(pc9801_96_device::reg_index_r), FUNC(pc9801_96_device::reg_index_w));
+	map(0xfa3, 0xfa3).mirror(8).rw(FUNC(pc9801_96_device::reg_data_r), FUNC(pc9801_96_device::reg_data_w));
 
 	map(0x0c50, 0x0c5f).rw(FUNC(pc9801_96_device::vga_read_3c0), FUNC(pc9801_96_device::vga_write_3c0));
 	map(0x0b54, 0x0b55).rw(FUNC(pc9801_96_device::vga_read_3b4), FUNC(pc9801_96_device::vga_write_3b4));
