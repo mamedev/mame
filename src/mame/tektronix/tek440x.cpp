@@ -67,8 +67,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "tek4404.lh"
-
 #define LOG_MMU (1U << 1)
 #define LOG_FPU (1U << 2)
 #define LOG_SCSI (1U << 3)
