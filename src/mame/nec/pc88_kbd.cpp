@@ -231,7 +231,7 @@ pc8801fh_kbd_device::pc8801fh_kbd_device(const machine_config &mconfig, const ch
 }
 
 static INPUT_PORTS_START( pc8801fh_kbd )
-	PORT_INCLUDE( pc8001_kbd )
+	PORT_INCLUDE( pc8801_kbd )
 
 	PORT_MODIFY("KEYC")
 	// TODO: F6~F10 key mapping, BS, INS, DEL aliases
