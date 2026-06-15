@@ -90,6 +90,11 @@ offs_t mylife_disassembler::disassemble(std::ostream &stream, offs_t pc, const m
 		util::stream_format(stream, "addi r%d, 0x%02X", BIT(op, 8, 3), BIT(op, 5, 3) << 3 | BIT(op, 0, 3));
 		return 1 | SUPPORTED;
 	}
+	else if ((op & 0xf818) == 0x0818)
+	{
+		util::stream_format(stream, "adci r%d, 0x%02X", BIT(op, 8, 3), BIT(op, 5, 3) << 3 | BIT(op, 0, 3));
+		return 1 | SUPPORTED;
+	}
 	else if ((op & 0xf818) == 0x1000)
 	{
 		util::stream_format(stream, "op10 r%d, r%d, r%d", BIT(op, 8, 3), BIT(op, 5, 3), BIT(op, 0, 3));
