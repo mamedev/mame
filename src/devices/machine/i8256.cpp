@@ -211,6 +211,13 @@ void i8256_device::device_start()
 	m_timer = timer_alloc(FUNC(i8256_device::timer_check), this);
 	m_brg_timer = timer_alloc(FUNC(i8256_device::brg_tick), this);
 
+	// buffers, parallel port latches and timer counts retain their contents on reset
+	m_rx_buffer = 0;
+	m_tx_buffer = 0;
+	m_port1_int = 0;
+	m_port2_int = 0;
+	std::fill(std::begin(m_timers), std::end(m_timers), 0);
+
 	save_item(NAME(m_command1));
 	save_item(NAME(m_command2));
 	save_item(NAME(m_command3));
@@ -270,13 +277,6 @@ void i8256_device::device_reset()
 	m_stop_sel = I8256_STOP_1;
 	m_divide = 1;
 	m_rx_sample = 16; // sample at bit center
-
-	m_rx_buffer = 0;
-	m_tx_buffer = 0;
-	m_port1_int = 0;
-	m_port2_int = 0;
-
-	std::fill(std::begin(m_timers), std::end(m_timers), 0);
 
 	soft_reset();
 
