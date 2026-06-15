@@ -276,7 +276,7 @@ void i8256_device::device_reset()
 	m_port1_int = 0;
 	m_port2_int = 0;
 
-	memset(m_timers, 0, sizeof(m_timers));
+	std::fill(std::begin(m_timers), std::end(m_timers), 0);
 
 	soft_reset();
 
