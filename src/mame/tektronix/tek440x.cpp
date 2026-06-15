@@ -296,6 +296,7 @@ void tek440x_state::mapcntl_w(u8 data)
 		m_map_view.select(0);
 	else
 		m_map_view.disable();
+
 	m_map_control = data & 0x1f;
 }
 
