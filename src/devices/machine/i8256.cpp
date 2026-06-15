@@ -312,7 +312,7 @@ void i8256_device::soft_reset()
 void i8256_device::update_timer_rate()
 {
 	const int divider = BIT(m_command1, I8256_CMD1_FRQ) ? 1024 : 64;
-	const attotime period = attotime::from_hz((clock() / SYS_CLOCK_DIVIDER[(m_command2 & 0x30) >> 4]) / divider);
+	const attotime period = attotime::from_hz((clock() / SYS_CLOCK_DIVIDER[BIT(m_command2, I8256_CMD2_C0, 2)]) / divider);
 	m_timer->adjust(period, 0, period);
 }
 
@@ -462,7 +462,7 @@ uint8_t i8256_device::read(offs_t offset)
 	{
 		if (BIT(offset, 0))
 			return 0xff;
-		reg = (offset >> 1) & 0x0f;
+		reg = BIT(offset, 1, 4);
 	}
 
 	switch (reg)
@@ -528,7 +528,7 @@ void i8256_device::write(offs_t offset, uint8_t data)
 	{
 		if (BIT(offset, 0))
 			return;
-		reg = (offset >> 1) & 0x0f;
+		reg = BIT(offset, 1, 4);
 	}
 
 	switch (reg)
@@ -541,7 +541,7 @@ void i8256_device::write(offs_t offset, uint8_t data)
 			update_timer_rate();
 
 		m_data_bits = 8 - (BIT(data, I8256_CMD1_L0) | (BIT(data, I8256_CMD1_L1) << 1));
-		m_stop_sel = (data >> I8256_CMD1_S0) & 3;
+		m_stop_sel = BIT(data, I8256_CMD1_S0, 2);
 
 		LOGSETUP("CR1: %d data bits, stop bit select %d, %s mode\n",
 				m_data_bits, m_stop_sel, BIT(data, I8256_CMD1_8086) ? "8086" : "8085");
@@ -558,12 +558,12 @@ void i8256_device::write(offs_t offset, uint8_t data)
 
 		LOGSETUP("CR2: %s parity, system clock prescaler /%d, baud select %X\n",
 				m_parity_enable ? (m_parity_even ? "even" : "odd") : "no",
-				SYS_CLOCK_DIVIDER[(data >> 4) & 3], data & 0x0f);
-		if ((clock() / SYS_CLOCK_DIVIDER[(data >> 4) & 3]) != 1'024'000)
-			logerror("internal clock should be 1024000, calculated: %u\n", clock() / SYS_CLOCK_DIVIDER[(data >> 4) & 3]);
+				SYS_CLOCK_DIVIDER[BIT(data, I8256_CMD2_C0, 2)], data & 0x0f);
+		if ((clock() / SYS_CLOCK_DIVIDER[BIT(data, I8256_CMD2_C0, 2)]) != 1'024'000)
+			logerror("internal clock should be 1024000, calculated: %u\n", clock() / SYS_CLOCK_DIVIDER[BIT(data, I8256_CMD2_C0, 2)]);
 
 		// the system clock prescaler also feeds the counter/timer
-		if (changed & 0x30)
+		if (BIT(changed, I8256_CMD2_C0, 2))
 			update_timer_rate();
 
 		const uint8_t baud = data & 0x0f;
@@ -655,7 +655,7 @@ void i8256_device::write(offs_t offset, uint8_t data)
 
 	case I8256_REG_STATUS: // modification register
 		m_modification = data & 0x7f;
-		m_rx_sample = (BIT(data, I8256_MOD_RS4) ? 32 : 16) - ((data >> I8256_MOD_RS0) & 0x0f);
+		m_rx_sample = (BIT(data, I8256_MOD_RS4) ? 32 : 16) - BIT(data, I8256_MOD_RS0, 4);
 		LOGSETUP("modification: sample point %d/32%s%s\n", m_rx_sample,
 				BIT(data, I8256_MOD_DSC) ? ", start bit check disabled" : "",
 				BIT(data, I8256_MOD_TME) ? ", transmission mode" : "");
