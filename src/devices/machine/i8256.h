@@ -115,7 +115,7 @@ private:
 	uint8_t m_data_bits;
 	bool m_parity_enable, m_parity_even;
 	uint8_t m_stop_sel;
-	u16 m_divide;
+	uint16_t m_divide;
 	uint8_t m_rx_sample;
 
 	// input line states
@@ -127,14 +127,14 @@ private:
 
 	// receiver
 	uint8_t m_rx_state;
-	u16 m_rx_counter;
+	uint16_t m_rx_counter;
 	uint8_t m_rx_bits;
-	u16 m_rx_shift;
+	uint16_t m_rx_shift;
 	bool m_rx_parity;
 
 	// transmitter
 	uint8_t m_tx_state;
-	u16 m_tx_counter;
+	uint16_t m_tx_counter;
 	uint8_t m_tx_bits;
 	uint8_t m_tx_shift;
 	bool m_tx_parity;
