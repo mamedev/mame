@@ -512,7 +512,7 @@ void cirrus_gd5428_vga_device::gc_map(address_map &map)
 		})
 	);
 	// BitBLT Transparent Colour Mask 0
-	map(0x36, 0x36).lrw8(
+	map(0x38, 0x38).lrw8(
 		NAME([this](offs_t offset) {
 			return m_blt_trans_colour_mask & 0xff;
 		}),
@@ -521,7 +521,7 @@ void cirrus_gd5428_vga_device::gc_map(address_map &map)
 		})
 	);
 	// BitBLT Transparent Colour Mask 1
-	map(0x37, 0x37).lrw8(
+	map(0x39, 0x39).lrw8(
 		NAME([this](offs_t offset) {
 			return m_blt_trans_colour_mask >> 8;
 		}),
@@ -547,10 +547,10 @@ void cirrus_gd5428_vga_device::sequencer_map(address_map &map)
 			return (gc_locked) ? 0x0f : m_lock_reg;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			// TODO: extensions are always enabled on the GD5429
-			// bits 3,5,6,7 ignored
-
-			gc_locked = (data & 0x17) != 0x12;
+			if (m_chip_id < 0x9c)
+				gc_locked = (data & 0x17) != 0x12;
+			else
+				gc_locked = false; // CL-GD5429+
 			LOG("Cirrus register extensions %s\n", gc_locked ? "unlocked" : "locked");
 			m_lock_reg = data & 0x17;
 			recompute_params();
