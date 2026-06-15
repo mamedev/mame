@@ -685,10 +685,10 @@ void i8256_device::p1_w(uint8_t data)
 	if (BIT(m_command1, I8256_CMD1_BITI) && !BIT(prev, 7) && BIT(data, 7))
 		request_interrupt(I8256_INT_TIMER2);
 
-	// event counters 2 and 3 decrement on high-to-low transitions of P12 and P13
-	if (BIT(m_mode, I8256_MODE_CT2) && BIT(prev, 2) && !BIT(data, 2))
+	// event counters 2 and 3 decrement on low-to-high transitions of P12 and P13
+	if (BIT(m_mode, I8256_MODE_CT2) && !BIT(prev, 2) && BIT(data, 2))
 		count_timer(1);
-	if (BIT(m_mode, I8256_MODE_CT3) && BIT(prev, 3) && !BIT(data, 3))
+	if (BIT(m_mode, I8256_MODE_CT3) && !BIT(prev, 3) && BIT(data, 3))
 		count_timer(2);
 
 	m_out_p1_cb(0, m_port1_int & m_port1_control);
