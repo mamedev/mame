@@ -81,7 +81,7 @@ public:
 		m_rtc(*this, "rtc"),
 		m_scsi(*this, "ncr5385"),
 		m_vint(*this, "vint"),
-		m_prom(*this, "maincpu"),
+		m_prom(*this, "bootrom"),
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram"),
 		m_map(*this, "map", 0x1000, ENDIANNESS_BIG),
@@ -326,7 +326,7 @@ void tek440x_state::physical_map(address_map &map)
 
 	// 700000-71ffff spare 0
 	// 720000-73ffff spare 1
-	map(0x740000, 0x747fff).rom().mirror(0x8000).region("maincpu", 0);
+	map(0x740000, 0x747fff).rom().mirror(0x8000).region("bootrom", 0);
 	map(0x760000, 0x760fff).ram().mirror(0xf000); // debug RAM
 
 	// 780000-79ffff processor board I/O
@@ -475,7 +475,7 @@ void tek440x_state::tek4404(machine_config &config)
  *************************************/
 
 ROM_START( tek4404 )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x8000, "bootrom", 0 )
 	ROM_LOAD16_BYTE( "tek_u158.bin", 0x000000, 0x004000, CRC(9939e660) SHA1(66b4309e93e4ff20c1295dc2ec2a8d6389b2578c) )
 	ROM_LOAD16_BYTE( "tek_u163.bin", 0x000001, 0x004000, CRC(a82dcbb1) SHA1(a7e4545e9ea57619faacc1556fa346b18f870084) )
 
