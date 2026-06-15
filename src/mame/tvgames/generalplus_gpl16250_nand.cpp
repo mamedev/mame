@@ -689,6 +689,15 @@ ROM_START( vbaby )
 	ROM_LOAD( "vbaby.bin", 0x0000, 0x8400000, CRC(d904441b) SHA1(3742bc4e1e403f061ce2813ecfafc6f30a44d287) )
 ROM_END
 
+ROM_START( tiviboo )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+
+	ROM_REGION( 0x8400000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "hy27uf081G2a.u3", 0x0000, 0x8400000, CRC(69d08014) SHA1(d290c646c8223b3a47c0579e19d15a6717c7e4a8) )
+ROM_END
+
+
 ROM_START( mgtfit )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
@@ -939,6 +948,7 @@ CONS(2010, wlsair60,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gp
 CONS(200?, beambox,    0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_beambox,       "Hasbro",                                   "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, mgtfit,     0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60,      "MGT",                                      "Fitness Konsole (NC1470)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // probably has other names in English too? menus don't appear to be in German
 CONS(200?, vbaby,      0, 0, generalplus_gpac800_vbaby, jak_car2, generalplus_gpac800_vbaby_game_state, nand_vbaby,         "VTech",                                    "V.Baby", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, tiviboo,    0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_vbaby,         "VTech",                                    "Tivi Boo (France)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, kiugames,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_kiugames,      "VideoJet",                                 "Kiu Games",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // probably has other names in English too? menus don't appear to be in German
 
 CONS(2011, jak_gtg,    0, 0, generalplus_gpac800,       jak_gtg,  generalplus_gpac800_game_state,       nand_init210,       "JAKKS Pacific Inc / HotGen Ltd",           "Golden Tee Golf (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
