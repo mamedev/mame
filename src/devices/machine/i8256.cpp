@@ -352,15 +352,14 @@ void i8256_device::count_timer(int i)
 	{
 		if (m_timers[high] == 0)
 			request_timer_interrupt(t24 ? I8256_INT_TIMER4 : I8256_INT_TIMER3); // levels 6 and 3
+		return;
 	}
-	else if (i == 1 && BIT(m_command1, I8256_CMD1_BITI))
-	{
-		// with BITI set, level 1 belongs to the port 1 P17 interrupt instead of timer 2
-	}
-	else
-	{
-		request_timer_interrupt(TIMER_INTERRUPT[i]);
-	}
+
+	// with BITI set, level 1 belongs to the port 1 P17 interrupt instead of timer 2
+	if (i == 1 && BIT(m_command1, I8256_CMD1_BITI))
+		return;
+
+	request_timer_interrupt(TIMER_INTERRUPT[i]);
 }
 
 TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
