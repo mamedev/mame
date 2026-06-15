@@ -309,6 +309,11 @@ offs_t mylife_disassembler::disassemble(std::ostream &stream, offs_t pc, const m
 		util::stream_format(stream, "op5a r%d, r%d", BIT(op, 8, 3), BIT(op, 5, 3));
 		return 1 | SUPPORTED;
 	}
+	else if ((op & 0xf81f) == 0x580b)
+	{
+		util::stream_format(stream, "ldc r%d, r%d+", BIT(op, 8, 3), BIT(op, 5, 3));
+		return 1 | SUPPORTED;
+	}
 	else if ((op & 0xf81f) == 0x580c)
 	{
 		util::stream_format(stream, "ror r%d, r%d", BIT(op, 8, 3), BIT(op, 5, 3));
