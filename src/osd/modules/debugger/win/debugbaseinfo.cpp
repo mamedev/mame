@@ -15,7 +15,6 @@ namespace osd::debugger::win {
 debugbase_info::debugbase_info(debugger_windows_interface &debugger) :
 	m_debugger(debugger),
 	m_machine(debugger.machine()),
-	m_metrics(debugger.metrics()),
 	m_waiting_for_debugger(debugger.waiting_for_debugger())
 {
 }

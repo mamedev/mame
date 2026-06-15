@@ -1342,7 +1342,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 	// sizing: constrain to the aspect ratio unless control key is held down
 	case WM_SIZING:
 		{
-			RECT *rect = (RECT *)lparam;
+			auto const rect = reinterpret_cast<RECT *>(lparam);
 			if (window->keepaspect() && (window->target()->scale_mode() == SCALE_FRACTIONAL) && !(GetAsyncKeyState(VK_CONTROL) & 0x8000))
 			{
 				osd_rect r = window->constrain_to_aspect_ratio(RECT_to_osd_rect(*rect), wparam);
@@ -1355,10 +1355,23 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 		}
 		break;
 
+	// effective resolution/scaling changed
+	case WM_DPICHANGED:
+		{
+			auto const suggested = reinterpret_cast<RECT const *>(lparam);
+			SetWindowPos(
+					window->platform_window(),
+					nullptr,
+					suggested->left, suggested->top,
+					suggested->right - suggested->left, suggested->bottom - suggested->top,
+					SWP_NOZORDER | SWP_NOACTIVATE);
+		}
+		break;
+
 	// syscommands: catch win_start_maximized
 	case WM_SYSCOMMAND:
 		{
-			uint16_t cmd = wparam & 0xfff0;
+			uint16_t const cmd = wparam & 0xfff0;
 
 			// prevent screensaver or monitor power events
 			if (cmd == SC_MONITORPOWER || cmd == SC_SCREENSAVE)
@@ -1912,17 +1925,16 @@ void win_window_info::set_fullscreen(int fullscreen)
 		SetWindowPos(platform_window(), HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 		SetWindowPos(platform_window(), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
-		// if we have previous non-fullscreen bounds, use those
 		if (m_non_fullscreen_bounds.right != m_non_fullscreen_bounds.left)
 		{
+			// if we have previous non-fullscreen bounds, use those
 			SetWindowPos(platform_window(), HWND_TOP, m_non_fullscreen_bounds.left, m_non_fullscreen_bounds.top,
 						rect_width(&m_non_fullscreen_bounds), rect_height(&m_non_fullscreen_bounds),
 						SWP_NOZORDER);
 		}
-
-		// otherwise, set a small size and maximize from there
 		else
 		{
+			// otherwise, set a small size and maximize from there
 			SetWindowPos(platform_window(), HWND_TOP, 0, 0, MIN_WINDOW_DIMX, MIN_WINDOW_DIMY, SWP_NOZORDER);
 			maximize_window();
 		}

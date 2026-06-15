@@ -39,30 +39,34 @@ static int exec_cc = 0;
 
 DEFINE_DEVICE_TYPE(ES5510, es5510_device, "es5510", "Ensoniq ES5510")
 
-#define FLAG_N (1 << 7)
-#define FLAG_C (1 << 6)
-#define FLAG_V (1 << 5)
-#define FLAG_LT (1 << 4)
-#define FLAG_Z (1 << 3)
-#define FLAG_NOT (1 << 2)
+constexpr uint8_t FLAG_N = 1 << 7;
+constexpr uint8_t FLAG_C = 1 << 6;
+constexpr uint8_t FLAG_V = 1 << 5;
+constexpr uint8_t FLAG_LT = 1 << 4;
+constexpr uint8_t FLAG_Z = 1 << 3;
+constexpr uint8_t FLAG_NOT = 1 << 2;
 
-#define FLAG_MASK (FLAG_N | FLAG_C | FLAG_V | FLAG_LT | FLAG_Z)
+constexpr uint8_t FLAG_MASK = FLAG_N | FLAG_C | FLAG_V | FLAG_LT | FLAG_Z;
 
-inline static char *stpcpy_int (char *dst, const char *src)
+// FIXME: rework the code so this "I can't believe it's not strcpy!" buffer overrun waiting to happen isn't needed
+inline char *stpcpy_int (char *dst, const char *src)
 {
-	const size_t len = strlen (src);
+	const size_t len = strlen(src);
 	return (char *) memcpy (dst, src, len + 1) + len;
 }
 
-inline static uint8_t setFlag(uint8_t ccr, uint8_t flag) {
+constexpr uint8_t setFlag(uint8_t ccr, uint8_t flag)
+{
 	return ccr | flag;
 }
 
-inline static uint8_t clearFlag(uint8_t ccr, uint8_t flag) {
+constexpr uint8_t clearFlag(uint8_t ccr, uint8_t flag)
+{
 	return ccr & ~flag;
 }
 
-inline static uint8_t setFlagTo(uint8_t ccr, uint8_t flag, bool set) {
+constexpr uint8_t setFlagTo(uint8_t ccr, uint8_t flag, bool set)
+{
 	return set ? setFlag(ccr, flag) : clearFlag(ccr, flag);
 }
 
@@ -70,15 +74,15 @@ inline static bool isFlagSet(uint8_t ccr, uint8_t flag) {
 	return (ccr & flag) != 0;
 }
 
-inline static int32_t add(int32_t a, int32_t b, uint8_t &flags) {
-	int32_t aSign = a & 0x00800000;
-	int32_t bSign = b & 0x00800000;
-	int32_t result = a + b;
-	int32_t resultSign = result & 0x00800000;
-	bool overflow = (aSign == bSign) && (aSign != resultSign);
-	bool carry = result & 0x01000000;
-	bool negative = resultSign != 0;
-	bool lessThan = (overflow && !negative) || (!overflow && negative);
+inline int32_t add(int32_t a, int32_t b, uint8_t &flags) {
+	int32_t const aSign = a & 0x00800000;
+	int32_t const bSign = b & 0x00800000;
+	int32_t const result = a + b;
+	int32_t const resultSign = result & 0x00800000;
+	bool const overflow = (aSign == bSign) && (aSign != resultSign);
+	bool const carry = result & 0x01000000;
+	bool const negative = resultSign != 0;
+	bool const lessThan = (overflow && !negative) || (!overflow && negative);
 	flags = setFlagTo(flags, FLAG_C, carry);
 	flags = setFlagTo(flags, FLAG_N, negative);
 	flags = setFlagTo(flags, FLAG_Z, (result & 0x00ffffff) == 0);
@@ -89,15 +93,15 @@ inline static int32_t add(int32_t a, int32_t b, uint8_t &flags) {
 
 // When writing a 24-bit value to 16-bit DOL, round the value
 // towards 0 rather than -infinity.
-static inline int16_t round_24_to_16(int32_t dol24)
+inline int16_t round_24_to_16(int32_t dol24)
 {
-	int add =                    // what to add to the raw shifted value
-		BIT(dol24, 23)             // value is negative
-		&& ((dol24 & 0xff) != 0);  // value has a non-zero fractional part
-	return static_cast<int16_t>((dol24 >> 8) + add);
+	// value is negative and has a non-zero fractional part
+	bool const add = BIT(dol24, 23) && ((dol24 & 0xff) != 0);
+	return int16_t((dol24 >> 8) + (add ? 1 : 0));
 }
 
-inline static int32_t saturate(int32_t value, uint8_t &flags, bool negative) {
+inline int32_t saturate(int32_t value, uint8_t &flags, bool negative)
+{
 	if (isFlagSet(flags, FLAG_V)) {
 		flags = setFlagTo(flags, FLAG_N, negative);
 		flags = clearFlag(flags, FLAG_Z);
@@ -107,11 +111,13 @@ inline static int32_t saturate(int32_t value, uint8_t &flags, bool negative) {
 	}
 }
 
-inline static int32_t negate(int32_t value) {
+constexpr int32_t negate(int32_t value)
+{
 	return ((value ^ 0x00ffffff) + 1) & 0x00ffffff;
 }
 
-inline static int32_t asl(int32_t value, int shift, uint8_t &flags) {
+inline int32_t asl(int32_t value, int shift, uint8_t &flags)
+{
 	const int32_t src24 = value & 0x00ffffff;
 	const bool carry = BIT(src24, 24 - shift);
 	const int64_t shifted = util::sext(src24, 24) << shift;
