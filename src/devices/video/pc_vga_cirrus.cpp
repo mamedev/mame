@@ -512,7 +512,7 @@ void cirrus_gd5428_vga_device::gc_map(address_map &map)
 		})
 	);
 	// BitBLT Transparent Colour Mask 0
-	map(0x36, 0x36).lrw8(
+	map(0x38, 0x38).lrw8(
 		NAME([this](offs_t offset) {
 			return m_blt_trans_colour_mask & 0xff;
 		}),
@@ -521,7 +521,7 @@ void cirrus_gd5428_vga_device::gc_map(address_map &map)
 		})
 	);
 	// BitBLT Transparent Colour Mask 1
-	map(0x37, 0x37).lrw8(
+	map(0x39, 0x39).lrw8(
 		NAME([this](offs_t offset) {
 			return m_blt_trans_colour_mask >> 8;
 		}),
@@ -544,15 +544,14 @@ void cirrus_gd5428_vga_device::sequencer_map(address_map &map)
 	);
 	map(0x06, 0x06).lrw8(
 		NAME([this] (offs_t offset) {
-			return (gc_locked) ? 0x0f : m_lock_reg;
+			return m_lock_reg;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			// TODO: extensions are always enabled on the GD5429
 			// bits 3,5,6,7 ignored
-
-			gc_locked = (data & 0x17) != 0x12;
+			m_lock_reg = ((data & 0x17) == 0x12) ? 0x12 : 0x0f;
+			if (m_chip_id < 0x9c)
+				gc_locked = (m_lock_reg != 0x12);
 			LOG("Cirrus register extensions %s\n", gc_locked ? "unlocked" : "locked");
-			m_lock_reg = data & 0x17;
 			recompute_params();
 		})
 	);
@@ -600,9 +599,16 @@ void cirrus_gd5428_vga_device::sequencer_map(address_map &map)
 	);
 	map(0x0f, 0x0f).lrw8(
 		NAME([this] (offs_t offset) {
-			u8 res = vga.sequencer.data[0x0f] & 0xe7;
-			// 32-bit DRAM data bus width (1MB-2MB)
-			res |= 0x18;
+			u8 res = vga.sequencer.data[0x0f] & ~0x98;
+			u32 vram_k = vga.svga_intf.vram_size >> 10;
+			if (vram_k == 512)
+				res |= 0x08; // 16-bit DRAM
+			else if (vram_k == 1024)
+				res |= 0x10; // 32-bit DRAM (1MB)
+			else if (vram_k == 2048)
+				res |= 0x18; // 32-bit DRAM (2MB)
+			else if (vram_k == 4096)
+				res |= 0x98; // 64-bit DRAM (4MB)
 			return res;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
@@ -657,6 +663,7 @@ void cirrus_gd5428_vga_device::sequencer_map(address_map &map)
 			m_scratchpad3 = data;
 		})
 	);
+	//TODO: SR17: Configuration Readback and Extended Control Register (Except CL-GD5420)
 	map(0x1b, 0x1e).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_vclk_denom[offset];
@@ -706,17 +713,17 @@ void cirrus_gd5430_vga_device::device_start()
 void cirrus_gd5446_vga_device::device_start()
 {
 	cirrus_gd5428_vga_device::device_start();
-	m_chip_id = 0x80 | 0x39;  // GD5446
+	m_chip_id = 0xb8;  // GD5446
 }
 
 
 void cirrus_gd5428_vga_device::device_reset()
 {
 	svga_device::device_reset();
-	gc_locked = true;
+	gc_locked = (m_chip_id < 0x9c);
 	gc_mode_ext = 0;
 	gc_bank[0] = gc_bank[1] = 0;
-	m_lock_reg = 0;
+	m_lock_reg = 0x0f;
 	m_blt_status = 0;
 	m_cursor_attr = 0x00;  // disable hardware cursor and extra palette
 	m_cursor_x = m_cursor_y = 0;
