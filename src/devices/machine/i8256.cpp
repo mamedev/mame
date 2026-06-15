@@ -514,10 +514,8 @@ uint8_t i8256_device::read(offs_t offset)
 		}
 		return status;
 	}
-	default:
-		LOG("read unmapped register: %u\n", reg);
-		return 0xff;
 	}
+	return 0xff;
 }
 
 void i8256_device::write(offs_t offset, uint8_t data)
@@ -659,10 +657,6 @@ void i8256_device::write(offs_t offset, uint8_t data)
 		LOGSETUP("modification: sample point %d/32%s%s\n", m_rx_sample,
 				BIT(data, I8256_MOD_DSC) ? ", start bit check disabled" : "",
 				BIT(data, I8256_MOD_TME) ? ", transmission mode" : "");
-		break;
-
-	default:
-		LOG("unmapped write %02X to %02X\n", data, reg);
 		break;
 	}
 }
