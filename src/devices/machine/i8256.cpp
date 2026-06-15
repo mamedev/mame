@@ -335,12 +335,16 @@ void i8256_device::count_timer(int i)
 
 	if (m_timers[i] == 0)
 	{
-		// the low byte of a cascaded pair wraps and decrements the upper byte
-		if ((t24 || t35) && m_timers[high] > 0)
+		// timers count down continuously and wrap around past zero; the low
+		// byte of a cascaded pair borrows from the upper byte (FFFFH on wrap)
+		if (t24 || t35)
 		{
-			m_timers[high]--;
-			m_timers[i] = 255;
+			if (m_timers[high] == 0)
+				m_timers[high] = 255;
+			else
+				m_timers[high]--;
 		}
+		m_timers[i] = 255;
 		return;
 	}
 
