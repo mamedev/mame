@@ -75,7 +75,7 @@
 #define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
-// tek4404 MSU uses a 6502 that is slow to ACK
+// tek4404 MSU uses a 8085 that is slow to ACK
 unsigned constexpr TEK4404_ACK_DELAY = 30'000;
 
 // mapcntl bits
