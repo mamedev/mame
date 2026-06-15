@@ -281,7 +281,7 @@ void i8256_device::device_reset()
 	soft_reset();
 
 	m_brg_timer->adjust(attotime::never);
-	m_timer->adjust(attotime::from_hz(16000), 0, attotime::from_hz(16000));
+	update_timer_rate();
 }
 
 void i8256_device::soft_reset()
@@ -304,6 +304,16 @@ void i8256_device::soft_reset()
 	m_tx_parity = false;
 	m_tx_break = false;
 	output_txd(1);
+}
+
+// reconfigure the counter/timer clock from the prescaled system clock; the
+// system clock prescaler is selected by CMD2 bits 4-5 and the timer divider
+// (16 kHz vs 1 kHz at the nominal 1.024 MHz internal clock) by CMD1 FRQ
+void i8256_device::update_timer_rate()
+{
+	const int divider = BIT(m_command1, I8256_CMD1_FRQ) ? 1024 : 64;
+	const attotime period = attotime::from_hz((clock() / SYS_CLOCK_DIVIDER[(m_command2 & 0x30) >> 4]) / divider);
+	m_timer->adjust(period, 0, period);
 }
 
 // timer interrupts are automatically disabled when the request is generated
@@ -524,12 +534,11 @@ void i8256_device::write(offs_t offset, uint8_t data)
 	switch (reg)
 	{
 		case I8256_REG_CMD1:
-			if (BIT(m_command1 ^ data, I8256_CMD1_FRQ))
-			{
-				const int freq = BIT(data, I8256_CMD1_FRQ) ? 1000 : 16000;
-				m_timer->adjust(attotime::from_hz(freq), 0, attotime::from_hz(freq));
-			}
+		{
+			const bool frq_changed = BIT(m_command1 ^ data, I8256_CMD1_FRQ);
 			m_command1 = data;
+			if (frq_changed)
+				update_timer_rate();
 
 			m_data_bits = 8 - (BIT(data, I8256_CMD1_L0) | (BIT(data, I8256_CMD1_L1) << 1));
 			m_stop_sel = (data >> I8256_CMD1_S0) & 3;
@@ -537,6 +546,7 @@ void i8256_device::write(offs_t offset, uint8_t data)
 			LOGSETUP("CR1: %d data bits, stop bit select %d, %s mode\n",
 					m_data_bits, m_stop_sel, BIT(data, I8256_CMD1_8086) ? "8086" : "8085");
 			break;
+		}
 
 		case I8256_REG_CMD2:
 		{
@@ -551,6 +561,10 @@ void i8256_device::write(offs_t offset, uint8_t data)
 					SYS_CLOCK_DIVIDER[(data >> 4) & 3], data & 0x0f);
 			if ((clock() / SYS_CLOCK_DIVIDER[(data >> 4) & 3]) != 1'024'000)
 				logerror("internal clock should be 1024000, calculated: %u\n", clock() / SYS_CLOCK_DIVIDER[(data >> 4) & 3]);
+
+			// the system clock prescaler also feeds the counter/timer
+			if (changed & 0x30)
+				update_timer_rate();
 
 			const uint8_t baud = data & 0x0f;
 			if (!(changed & 0x0f))
