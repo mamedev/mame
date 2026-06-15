@@ -924,8 +924,14 @@ void scsp_device::UpdateRegR(int reg)
 				u32 SGC = (slot->EG.state) & 3;
 				u32 CA = (slot->cur_addr >> (SHIFT + 12)) & 0xf;
 				u32 EG = (0x1f - (slot->EG.volume >> (EG_SHIFT + 5))) & 0x1f;
-				/* note: according to the manual MSLC is write only, CA, SGC and EG read only.  */
-				m_udata.data[0x8/2] =  /*(MSLC << 11) |*/ (CA << 7) | (SGC << 5) | EG;
+				/* note: per the manual MSLC is write-only and CA/SGC/EG are read-only,
+				   but the MSLC field must be preserved in the internal register.
+				   Software selects a slot via MSLC once and then polls this register
+				   repeatedly to read that slot's CA (current play address) - e.g. to
+				   pace streaming / double-buffered PCM voices. Zeroing MSLC on read
+				   makes every poll after the first monitor slot 0 instead of the
+				   selected slot, so streaming voices get refilled off the wrong slot. */
+				m_udata.data[0x8/2] = (MSLC << 11) | (CA << 7) | (SGC << 5) | EG;
 			}
 			break;
 
