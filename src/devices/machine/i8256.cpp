@@ -314,8 +314,8 @@ void i8256_device::request_timer_interrupt(int level)
 }
 
 // decrement a timer or cascaded timer pair; single timers generate an
-// interrupt request on the transition from 01H to 00H, cascaded ones on
-// the transition from 0001H to 0000H
+// interrupt request on the transition from 01 to 00, cascaded ones on
+// the transition from 0001 to 0000
 void i8256_device::count_timer(int i)
 {
 	// timers 4 and 5 hold the upper bytes of cascaded timers 2 and 3
@@ -348,7 +348,9 @@ void i8256_device::count_timer(int i)
 		// with BITI set, level 1 belongs to the port 1 P17 interrupt instead of timer 2
 	}
 	else
+	{
 		request_timer_interrupt(timer_interrupt[i]);
+	}
 }
 
 TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
@@ -444,8 +446,8 @@ uint8_t i8256_device::read(offs_t offset)
 {
 	uint8_t reg = offset & 0x0f;
 
-	// In the 8-bit mode, AD0-AD3 select the register and AD4 is ignored, while
-	// AD1-AD4 are used in the 16-bit mode and AD0 is a second chip select, active low.
+	// In 8-bit mode, AD0-AD3 select the register and AD4 is ignored, while
+	// AD1-AD4 are used in 16-bit mode and AD0 is a second chip select, active low.
 	if (BIT(m_command1, I8256_CMD1_8086))
 	{
 		if (BIT(offset, 0))
