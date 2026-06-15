@@ -74,6 +74,7 @@ private:
 	TIMER_CALLBACK_MEMBER(brg_tick);
 
 	void soft_reset();
+	void update_timer_rate();
 
 	void count_timer(int i);
 	void request_timer_interrupt(int level);
