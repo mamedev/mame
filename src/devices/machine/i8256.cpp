@@ -125,7 +125,7 @@ enum
 	I8256_INT_TIMER5
 };
 
-const uint8_t timer_interrupt[5] = {I8256_INT_TIMER1, I8256_INT_TIMER2, I8256_INT_TIMER3, I8256_INT_TIMER4, I8256_INT_TIMER5};
+constexpr uint8_t TIMER_INTERRUPT[5] = {I8256_INT_TIMER1, I8256_INT_TIMER2, I8256_INT_TIMER3, I8256_INT_TIMER4, I8256_INT_TIMER5};
 
 enum
 {
@@ -359,7 +359,7 @@ void i8256_device::count_timer(int i)
 	}
 	else
 	{
-		request_timer_interrupt(timer_interrupt[i]);
+		request_timer_interrupt(TIMER_INTERRUPT[i]);
 	}
 }
 
@@ -540,7 +540,7 @@ void i8256_device::write(offs_t offset, uint8_t data)
 		if (frq_changed)
 			update_timer_rate();
 
-		m_data_bits = 8 - (BIT(data, I8256_CMD1_L0) | (BIT(data, I8256_CMD1_L1) << 1));
+		m_data_bits = 8 - BIT(data, I8256_CMD1_L0, 2);
 		m_stop_sel = BIT(data, I8256_CMD1_S0, 2);
 
 		LOGSETUP("CR1: %d data bits, stop bit select %d, %s mode\n",
