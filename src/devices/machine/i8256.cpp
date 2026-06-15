@@ -365,7 +365,7 @@ void i8256_device::count_timer(int i)
 
 TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
 {
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < int(std::size(m_timers)); i++)
 	{
 		// the upper bytes of cascaded pairs do not count on their own
 		if ((i == 3 && BIT(m_mode, I8256_MODE_T24)) || (i == 4 && BIT(m_mode, I8256_MODE_T35)))
