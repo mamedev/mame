@@ -23,6 +23,11 @@
 #include <cstdio>
 #include <algorithm>
 
+// Should writes to DOL, which is 16 bits wide, round towards zero?
+// This seems to fix a noise issue, but may not be what the hardware does.
+// Currently being investigated.
+#define DOL_ROUND_TOWARDS_ZERO 0
+
 #define VERBOSE_EXEC 0
 
 #define LOG_EXECUTION (1U << 1)
@@ -91,6 +96,8 @@ inline int32_t add(int32_t a, int32_t b, uint8_t &flags) {
 	return result & 0x00ffffff;
 }
 
+#if DOL_ROUND_TOWARDS_ZERO
+
 // When writing a 24-bit value to 16-bit DOL, round the value
 // towards 0 rather than -infinity.
 inline int16_t round_24_to_16(int32_t dol24)
@@ -99,6 +106,17 @@ inline int16_t round_24_to_16(int32_t dol24)
 	bool const add = BIT(dol24, 23) && ((dol24 & 0xff) != 0);
 	return int16_t((dol24 >> 8) + (add ? 1 : 0));
 }
+
+#else  // !DOL_ROUND_TOWARDS_ZERO <=> round towards -infinity
+
+// When writing a 24-bit value to 16-bit DOL, shift away the
+// low-order 8 bits, rounding towards -infinity.
+inline int16_t round_24_to_16(int32_t dol24)
+{
+	return int16_t(dol24 >> 8);
+}
+
+#endif  // DOL_ROUND_TOWARDS_ZERO
 
 inline int32_t saturate(int32_t value, uint8_t &flags, bool negative)
 {
