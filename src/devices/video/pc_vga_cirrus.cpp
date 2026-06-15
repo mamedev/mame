@@ -544,15 +544,14 @@ void cirrus_gd5428_vga_device::sequencer_map(address_map &map)
 	);
 	map(0x06, 0x06).lrw8(
 		NAME([this] (offs_t offset) {
-			return (gc_locked) ? 0x0f : m_lock_reg;
+			return m_lock_reg;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
+			// bits 3,5,6,7 ignored
+			m_lock_reg = ((data & 0x17) == 0x12) ? 0x12 : 0x0f;
 			if (m_chip_id < 0x9c)
-				gc_locked = (data & 0x17) != 0x12;
-			else
-				gc_locked = false; // CL-GD5429+
+				gc_locked = (m_lock_reg != 0x12);
 			LOG("Cirrus register extensions %s\n", gc_locked ? "unlocked" : "locked");
-			m_lock_reg = data & 0x17;
 			recompute_params();
 		})
 	);
@@ -721,10 +720,10 @@ void cirrus_gd5446_vga_device::device_start()
 void cirrus_gd5428_vga_device::device_reset()
 {
 	svga_device::device_reset();
-	gc_locked = true;
+	gc_locked = (m_chip_id < 0x9c);
 	gc_mode_ext = 0;
 	gc_bank[0] = gc_bank[1] = 0;
-	m_lock_reg = 0;
+	m_lock_reg = 0x0f;
 	m_blt_status = 0;
 	m_cursor_attr = 0x00;  // disable hardware cursor and extra palette
 	m_cursor_x = m_cursor_y = 0;
