@@ -714,7 +714,7 @@ void cirrus_gd5430_vga_device::device_start()
 void cirrus_gd5446_vga_device::device_start()
 {
 	cirrus_gd5428_vga_device::device_start();
-	m_chip_id = 0x80 | 0x39;  // GD5446
+	m_chip_id = 0xb8;  // GD5446
 }
 
 
