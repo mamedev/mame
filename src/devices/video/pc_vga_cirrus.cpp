@@ -600,9 +600,16 @@ void cirrus_gd5428_vga_device::sequencer_map(address_map &map)
 	);
 	map(0x0f, 0x0f).lrw8(
 		NAME([this] (offs_t offset) {
-			u8 res = vga.sequencer.data[0x0f] & 0xe7;
-			// 32-bit DRAM data bus width (1MB-2MB)
-			res |= 0x18;
+			u8 res = vga.sequencer.data[0x0f] & ~0x98;
+			u32 vram_k = vga.svga_intf.vram_size >> 10;
+			if (vram_k == 512)
+				res |= 0x08; // 16-bit DRAM
+			else if (vram_k == 1024)
+				res |= 0x10; // 32-bit DRAM (1MB)
+			else if (vram_k == 2048)
+				res |= 0x18; // 32-bit DRAM (2MB)
+			else if (vram_k == 4096)
+				res |= 0x98; // 64-bit DRAM (4MB)
 			return res;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
@@ -657,6 +664,7 @@ void cirrus_gd5428_vga_device::sequencer_map(address_map &map)
 			m_scratchpad3 = data;
 		})
 	);
+	//TODO: SR17: Configuration Readback and Extended Control Register (Except CL-GD5420)
 	map(0x1b, 0x1e).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_vclk_denom[offset];
