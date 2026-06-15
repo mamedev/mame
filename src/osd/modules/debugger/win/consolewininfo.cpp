@@ -258,7 +258,7 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 		// try to find the work bounds for the monitor
 		RECT work_bounds;
 		SystemParametersInfo(SPI_GETWORKAREA, 0, &work_bounds, 0);
-		HMONITOR const nearest_monitor = MonitorFromWindow(window((), MONITOR_DEFAULTTONEAREST);
+		HMONITOR const nearest_monitor = MonitorFromWindow(window(), MONITOR_DEFAULTTONEAREST);
 		if (nearest_monitor)
 		{
 			MONITORINFO info;

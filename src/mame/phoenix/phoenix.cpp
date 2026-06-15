@@ -1645,7 +1645,6 @@ ROM_START( pleiadsgmp )
 ROM_END
 
 // MM "COMPUTER"GAME" <<ROME>> "ITALY" <<FENIX>> PCB
-//
 ROM_START( pleiadsmm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1_mm.1l", 0x0000, 0x0800, CRC(b02767d6) SHA1(6dd22c95862d2464e5b327096566767b4fdc5c50) ) // confirmed by multiple dumps
@@ -1667,8 +1666,8 @@ ROM_START( pleiadsmm )
 	ROM_LOAD( "ic40.bin",  0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) BAD_DUMP ) // not dumped for this set
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "cpu41.bin", 0x0000, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) BAD_DUMP ) // not dumped for this set
-	ROM_LOAD( "cpu40.bin", 0x0100, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) BAD_DUMP ) // not dumped for this set
+	ROM_LOAD( "7051.right", 0x0000, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) BAD_DUMP ) // not readable for this set, but the other PROM matches
+	ROM_LOAD( "7051.left",  0x0100, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )
 ROM_END
 
 // Famaresa "580" PCB set (580-001 and 580-002).
@@ -1873,7 +1872,7 @@ GAME( 1981, pleiadbl,   pleiads, pleiads,  pleiadbl, phoenix_state, empty_init, 
 GAME( 1981, pleiadsb2,  pleiads, pleiads,  pleiads,  phoenix_state, empty_init,           ROT90, "bootleg (ESG)",                          "Pleiads (bootleg set 2)",                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pleiadsn,   pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (Niemer S.A.)",                  "Pleiads (Niemer S.A.)",                                      MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pleiadsgmp, pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (GMP Games)",                    "Pleiads (GMP Games)",                                        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pleiadsmm,  pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (ManilaMatic)",                  "Pleiads (bootleg, ManilaMatic)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pleiadsmm,  pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (ManilaMatic)",                  "Pleiads (bootleg, ManilaMatic)",                             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // one bad ROM, crashes at the end of level 1
 GAME( 1981, pleiadss,   pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (Famaresa)",                     "Pleiads (Famaresa, Spanish bootleg)",                        MACHINE_SUPPORTS_SAVE ) // colours match PCB (but are ugly)
 GAME( 1981, cityatta,   pleiads, pleiads,  cityatta, phoenix_state, empty_init,           ROT90, "bootleg (Petaco S.A.)",                  "City Attack (Petaco S.A., bootleg of Pleiads)",              MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // Colors are bad, as seen on the screenshot from https://www.recreativas.org/city-attack-454-petaco
 GAME( 1981, capitol,    pleiads, phoenix,  capitol,  phoenix_state, empty_init,           ROT90, "bootleg? (Universal Video Spiel)",       "Capitol",                                                    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

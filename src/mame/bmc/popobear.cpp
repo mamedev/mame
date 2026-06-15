@@ -8,12 +8,12 @@ Popo Bear (c) 2000 BMC
 TODO:
 - BGM seems quite off;
 - timer chip (controls auto-animation on title screen + something else during gameplay?);
-- complete I/Os (BMC-A00211 PCB has 4 banks of DIPs but only 1 is hooked up?);
 - Identify what's on $600000 & $620000;
 - Uses tas opcode to sync to irq, from VDP?
-- magkengo: doesn't boot, expects $530000 bit 7 to be low but then doesn't upload any
-  meaningful GFX (different bpp? qiwang does the same checks);
-- qiwang: uses unhandled GFX features, needs correct I/O
+- magkengo: uses unhandled GFX features (sprite problems); also needs hopper hook-up;
+- qiwang: uses unhandled GFX features (sprite problems), needs verifying of I/O / DIP definitions
+  (available in test mode), hopper support;
+- pixram probably has a color base and a priority register, like bmcpokr.cpp.
 
 ===================================================================================================
 
@@ -125,9 +125,12 @@ public:
 		, m_screen(*this, "screen")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
+		, m_oki(*this, "oki")
 		, m_spriteram(*this, "spriteram")
 		, m_vram(*this, "vram")
 		, m_vregs(*this, "vregs")
+		, m_dsw(*this, "DSW%u", 1U)
+		, m_in1(*this, "IN1")
 	{
 		m_tilemap_base[0] = 0xf0000;
 		m_tilemap_base[1] = 0xf4000;
@@ -137,8 +140,10 @@ public:
 
 	void popobear(machine_config &config) ATTR_COLD;
 	void qiwang(machine_config &config) ATTR_COLD;
+	void magkengo(machine_config &config) ATTR_COLD;
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -146,32 +151,57 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<okim6295_device> m_oki;
 
-	required_shared_ptr<uint16_t> m_spriteram;
-	required_shared_ptr<uint16_t> m_vram;
-	required_shared_ptr<uint16_t> m_vregs;
+	required_shared_ptr<u16> m_spriteram;
+	required_shared_ptr<u16> m_vram;
+	required_shared_ptr<u16> m_vregs;
 
-	std::vector<uint16_t> m_vram_rearranged;
-	int m_tilemap_base[4]{};
+	required_ioport_array<4> m_dsw;
+	required_ioport m_in1;
+
+	bool m_alt_video = false; // configuration. TODO: shouldn't be needed
+	int m_tilemap_base[4]{}; // configuration. TODO: shouldn't be needed
+	std::vector<u16> m_vram_rearranged;
+
 	tilemap_t *m_bg_tilemap[4]{};
 
-	template <unsigned N> TILE_GET_INFO_MEMBER(get_tile_info);
+	u8 m_irq_enable = 0;
+	u8 m_dsw_select = 0;
 
-	void irq_ack_w(uint8_t data);
-	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	template <uint8_t Mystery_value> uint8_t _620000_r();
+	// magkendo protection
+	u8 m_idptr = 0;
+	u8 m_idclk = 0;
+	u8 m_idpage = 0;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	template <u8 Number> TILE_GET_INFO_MEMBER(get_tile_info);
+
+	int tilemap_base_words(u8 number) const;
+
+	void irq_ack_w(u8 data);
+	void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	template <u8 Mystery_value> u8 _620000_r();
+
+	void popobear_ctrl_w(u8 data);
+	void magkengo_ctrl_w(u8 data);
+
+	// magkendo protection
+	u8 idchip_r();
+	void idchip_w(u8 data);
+
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 
-	void main_map(address_map &map) ATTR_COLD;
+	void base_map(address_map &map) ATTR_COLD;
+	void popobear_main_map(address_map &map) ATTR_COLD;
 	void qiwang_main_map(address_map &map) ATTR_COLD;
+	void magkengo_main_map(address_map &map) ATTR_COLD;
 };
 
 
-void popobear_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void popobear_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
 
@@ -209,10 +239,20 @@ GFXDECODE_START(gfx_popobear)
 	GFXDECODE_RAM( "vram", 0, char_layout, 0, 1 )
 GFXDECODE_END
 
-template <unsigned N> TILE_GET_INFO_MEMBER(popobear_state::get_tile_info)
+int popobear_state::tilemap_base_words(u8 number) const // TODO: this is probably slightly hacky
 {
-	int const base = m_tilemap_base[N];
-	int const tileno = m_vram[base / 2 + tile_index];
+	if (m_alt_video)   // magkengo, qiwang: tile-map bases live in the video registers
+	{
+		static const int base_reg[4] = { 3, 5, 8, 10 };
+		return (m_vregs[base_reg[number]] & 0xffff) << 4;
+	}
+	return m_tilemap_base[number] / 2;   // popobear: fixed bases; vreg[8]/[10] are scroll
+}
+
+template <u8 Number> TILE_GET_INFO_MEMBER(popobear_state::get_tile_info)
+{
+	int const base = tilemap_base_words(Number);
+	int const tileno = m_vram[base + tile_index];
 	int const flipyx = (tileno >> 14);
 	tileinfo.set(0, tileno & 0x3fff, 0, TILE_FLIPYX(flipyx));
 }
@@ -221,7 +261,7 @@ void popobear_state::video_start()
 {
 	m_vram_rearranged.resize(0x100000 / 2);
 
-	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<uint8_t *>(&m_vram_rearranged[0]));
+	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<u8 *>(&m_vram_rearranged[0]));
 
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(popobear_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(popobear_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
@@ -232,8 +272,6 @@ void popobear_state::video_start()
 	m_bg_tilemap[1]->set_transparent_pen(0);
 	m_bg_tilemap[2]->set_transparent_pen(0);
 	m_bg_tilemap[3]->set_transparent_pen(0);
-
-	save_item(NAME(m_vram_rearranged));
 }
 
 
@@ -250,7 +288,7 @@ void popobear_state::video_start()
  */
 void popobear_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t* vram = reinterpret_cast<uint8_t *>(m_spriteram.target());
+	u8* vram = reinterpret_cast<u8 *>(m_spriteram.target());
 
 	for (int drawpri = 0xf; drawpri >= 0x0; drawpri--)
 	{
@@ -258,7 +296,7 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		// 0x*29 = 32 x 32
 		for (int i = 0x800 - 8; i >= 0; i -= 8)
 		{
-			uint16_t *sprdata = &m_spriteram[(0x7f800 + i) / 2];
+			u16 *sprdata = &m_spriteram[(0x7f800 + i) / 2];
 
 			int const param = sprdata[0];
 			int const pri = (param & 0x0f00) >> 8;
@@ -322,7 +360,7 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 				for (int xi = 0; xi < width; xi++)
 				{
-					uint8_t const pix = vram[BYTE_XOR_BE(spr_num)];
+					u8 const pix = vram[BYTE_XOR_BE(spr_num)];
 					int const x_draw = (x_dir) ? x + ((width - 1) - xi) : x + xi;
 
 					if (cliprect.contains(x_draw, y_draw))
@@ -333,7 +371,7 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 						// granularity also means colour bank is applied *0x40
 						// and we have 2 more possible colour bank bits
 						// colours on game over screen are still wrong without the weird param kludge above
-						if (pix & 0x3f)
+						if (pix & 0x3f) // TODO: this breaks portraits on qiwang's title screen (if (pix) fixes them)
 						{
 							bitmap.pix(y_draw, x_draw) = m_palette->pen(((pix + (add_it)) & 0xff) + 0x100);
 						}
@@ -346,16 +384,11 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-uint32_t popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
-	const rectangle &visarea = screen.visible_area();
-	rectangle clip = visarea;
-
-	//popmessage("%04x",m_vregs[0/2]);
-	uint16_t* vreg = m_vregs;
-
+	u16 const *const vreg = m_vregs;
 	// popmessage("%04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x",vreg[0x00],vreg[0x01],vreg[0x02],vreg[0x03],vreg[0x04],vreg[0x05],vreg[0x06], vreg[0x07],vreg[0x08],vreg[0x09],vreg[0x0a],vreg[0x0b],m_vregs[0x0c],m_vregs[0x0d],vreg[0x0e],vreg[0x0f]);
 
 	// vreg[0x00] also looks like it could be some enable registers
@@ -366,93 +399,95 @@ uint32_t popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	// vreg[0x01] is always
 	// 0xfefb
 
+	// Per-layer enable byte; a layer draws when non-zero.  Value 0x1f selects the
+	// per-line (line-scroll) mode on the upper two layers; every other non-zero
+	// value is a plain layer.
+	int const enable[4] = {
+		(vreg[0x0c] & 0xff00) >> 8,   // layer 0
+		(vreg[0x0c] & 0x00ff),        // layer 1
+		(vreg[0x0d] & 0xff00) >> 8,   // layer 2
+		(vreg[0x0d] & 0x00ff)         // layer 3
+	};
 
+	// pixram
+	if (!enable[0] && !enable[1] && !enable[2] && !enable[3] && BIT(vreg[0x0e], 5))
+	{
+		u8 const *const fb = reinterpret_cast<u8 const *>(m_vram.target()) + ((vreg[0x0e] & 0x0f) << 16);
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			{
+				u8 const byte = fb[BYTE_XOR_BE(y * 0x100 + (x >> 1))];
+				bitmap.pix(y, x) = m_palette->pen((x & 1) ? (byte & 0x0f) : (byte >> 4));
+			}
+		return 0;
+	}
 
-	// these are more than just enable, they get written with 0x0d and 0x1f (and 0x00 when a layer is off)
-	// seems to be related to the linescroll mode at least? maybe sizes?
-	int const enable0 = (m_vregs[0x0c] & 0xff00) >> 8;
-	int const enable1 = (m_vregs[0x0c] & 0x00ff) >> 0;
-	int const enable2 = (m_vregs[0x0d] & 0xff00) >> 8;
-	int const enable3 = (m_vregs[0x0d] & 0x00ff) >> 0;
+	// Tile RAM and tile gfx share VRAM and the per-layer base can move at runtime,
+	// so revalidate every frame (vram_w already marks dirty on write).
+	for (auto &tm : m_bg_tilemap)
+		tm->mark_all_dirty();
 
-	if ((enable0 != 0x00) && (enable0 != 0x0d) && (enable0 != 0x1f)) logerror("unknown enable0 value %02x\n", enable0);
-	if ((enable1 != 0x00) && (enable1 != 0x0d) && (enable1 != 0x1f)) logerror("unknown enable1 value %02x\n", enable1);
-	if ((enable2 != 0x00) && (enable2 != 0x0d)) logerror("unknown enable2 value %02x\n", enable2);
-	if ((enable3 != 0x00) && (enable3 != 0x0d)) logerror("unknown enable3 value %02x\n", enable3);
-
-
-	// for popobear, the lower 2 tilemaps use regular scrolling. qiwang doesn't seem to agree
+	// Lower two layers: whole-layer scroll.
 	m_bg_tilemap[2]->set_scrollx(0, vreg[0x07]);
 	m_bg_tilemap[2]->set_scrolly(0, vreg[0x08]);
-
 	m_bg_tilemap[3]->set_scrollx(0, vreg[0x09]);
 	m_bg_tilemap[3]->set_scrolly(0, vreg[0x0a]);
+	if (enable[3]) m_bg_tilemap[3]->draw(screen, bitmap, cliprect, 0, 0);
+	if (enable[2]) m_bg_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
 
-	if (enable3) m_bg_tilemap[3]->draw(screen, bitmap, cliprect, 0, 0);
-	if (enable2) m_bg_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
+	// Upper two layers: line-scroll only in mode 0x1f (popobear).  The line
+	// tables live in VRAM at (scroll-pointer register << 9): layer0 = vreg[3],
+	// layer1 = vreg[5], shared high-byte table = vreg[6] (e.g. 0x06fa -> 0xdf400).
+	// Any other non-zero enable is a plain layer (magkengo uses 0x05/0x0d/0x1d).
+	rectangle clip = cliprect;
 
-	// the upper 2 tilemaps have a lineselect / linescroll logic
-
-	int scrollbase;
-	int scrollbase2;
-
-	if (enable1 == 0x1f)
+	if (enable[1] == 0x1f)
 	{
-		scrollbase = 0xdf600;
-		scrollbase2 = 0xdf800;
-
-		for (int line = 0; line < 240; line++)
+		int const base = vreg[0x05] << 9, hi = vreg[0x06] << 9;
+		for (int line = cliprect.min_y; line <= cliprect.max_y; line++)
 		{
-			uint16_t const val = m_vram[scrollbase / 2 + line];
-			uint16_t const upper = (m_vram[scrollbase2 / 2 + line] & 0xff00) >> 8;
-
+			u16 const v = m_vram[base / 2 + line];
+			u16 const u = (m_vram[hi / 2 + line] & 0xff00) >> 8;
 			clip.sety(line, line);
-
-			m_bg_tilemap[1]->set_scrollx(0, (val & 0x00ff) | (upper << 8));
-			m_bg_tilemap[1]->set_scrolly(0, ((val & 0xff00) >> 8) - line);
-
+			m_bg_tilemap[1]->set_scrollx(0, (v & 0x00ff) | (u << 8));
+			m_bg_tilemap[1]->set_scrolly(0, ((v & 0xff00) >> 8) - line);
 			m_bg_tilemap[1]->draw(screen, bitmap, clip, 0, 0);
 		}
 	}
-	else if (enable1 != 0x00)
+	else if (enable[1])
 	{
 		m_bg_tilemap[1]->set_scrollx(0, 0);
 		m_bg_tilemap[1]->set_scrolly(0, 0);
 		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 	}
 
-	if (enable0 == 0x1f)
+	if (enable[0] == 0x1f)
 	{
-		scrollbase = 0xdf400;
-		scrollbase2 = 0xdf800;
-
-		for (int line = 0; line < 240; line++)
+		int const base = vreg[0x03] << 9, hi = vreg[0x06] << 9;
+		for (int line = cliprect.min_y; line <= cliprect.max_y; line++)
 		{
-			uint16_t const val = m_vram[scrollbase / 2 + line];
-			uint16_t const upper = (m_vram[scrollbase2 / 2 + line] & 0x00ff) >> 0;
-
+			u16 const v = m_vram[base / 2 + line];
+			u16 const u = (m_vram[hi / 2 + line] & 0x00ff);
 			clip.sety(line, line);
-
-			m_bg_tilemap[0]->set_scrollx(0, (val & 0x00ff) | (upper << 8));
-			m_bg_tilemap[0]->set_scrolly(0, ((val & 0xff00) >> 8) - line);
-
+			m_bg_tilemap[0]->set_scrollx(0, (v & 0x00ff) | (u << 8));
+			m_bg_tilemap[0]->set_scrolly(0, ((v & 0xff00) >> 8) - line);
 			m_bg_tilemap[0]->draw(screen, bitmap, clip, 0, 0);
 		}
 	}
-	else if (enable0 != 0x00)
+	else if (enable[0])
 	{
 		m_bg_tilemap[0]->set_scrollx(0, 0);
 		m_bg_tilemap[0]->set_scrolly(0, 0);
 		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 	}
 
-	if (BIT(m_vregs[0x00], 8))
+	if (BIT(vreg[0x00], 8))
 		draw_sprites(bitmap, cliprect);
 
 	return 0;
 }
 
-void popobear_state::irq_ack_w(uint8_t data)
+void popobear_state::irq_ack_w(u8 data)
 {
 	for (int i = 0; i < 8; i++)
 	{
@@ -461,15 +496,81 @@ void popobear_state::irq_ack_w(uint8_t data)
 	}
 }
 
-template <uint8_t Mystery_value>
-uint8_t popobear_state::_620000_r()
+template <u8 Mystery_value>
+u8 popobear_state::_620000_r()
 {
 	// TODO: checked while flipping bit 0 in clock select fashion at POST
 	// refuses to boot with either bits 1-2 high.
 	return Mystery_value;
 }
 
-void popobear_state::main_map(address_map &map)
+
+void popobear_state::machine_start()
+{
+	save_item(NAME(m_vram_rearranged));
+	save_item(NAME(m_dsw_select));
+	save_item(NAME(m_irq_enable));
+
+	save_item(NAME(m_idptr));
+	save_item(NAME(m_idclk));
+	save_item(NAME(m_idpage));
+}
+
+
+void popobear_state::popobear_ctrl_w(u8 data)
+{
+	m_dsw_select = data & 0x03;
+	m_oki->set_rom_bank(BIT(data, 6));
+
+	// bit 2 and 3 always set?
+
+	if (data & 0xfc)
+		logerror("%s unknown popbear_ctrl_w %02x\n", machine().describe_context(), data);
+}
+
+void popobear_state::magkengo_ctrl_w(u8 data)
+{
+	m_dsw_select = (data & 0x0c) >> 2;
+	m_oki->set_rom_bank(BIT(data, 6));
+
+	if (data & 0xb3)
+		logerror("%s unknown magkengo_ctrl_w %02x\n", machine().describe_context(), data);
+}
+
+
+
+// Game checks the bytes read with 2 tables in ROM at 0xb508 / 0xb510
+u8 popobear_state::idchip_r()
+{
+	static constexpr u8 id_a[] = { 0x00, 0x02, 0x03, 0x39, 0x11, 0x95 };
+	static constexpr u8 id_b[] = { 0x00, 0x14, 0x21, 0x24, 0x31, 0x43, 0x51, 0x25, 0x26 };
+
+	if (m_idpage)
+		return id_b[m_idptr % sizeof(id_b)];
+
+	return id_a[m_idptr % sizeof(id_a)];
+}
+
+void popobear_state::idchip_w(u8 data)
+{
+	if (data == 0x02) // reset
+	{
+		m_idptr = 0;
+		m_idpage = 0;
+	}
+	else if (data == 0xc8) // page B select
+	{
+		m_idptr = 0;
+		m_idpage = 1;
+	}
+	else if (BIT(m_idclk, 0) && !BIT(data, 0)) // byte select
+		m_idptr++;
+
+	m_idclk = data;
+}
+
+
+void popobear_state::base_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x03ffff).rom();
@@ -479,12 +580,15 @@ void popobear_state::main_map(address_map &map)
 
 	// TODO: is the 48xxxx block entirely from AIA90423?
 	map(0x480000, 0x48001f).ram().share(m_vregs);
+	map(0x480020, 0x48003f).ram(); // to suppress excessive log spamming. TODO: identify remaining reads / writes
+	map(0x480030, 0x480030).lw8(NAME([this] (u8 data) { m_irq_enable = data; }));
 	map(0x480031, 0x480031).w(FUNC(popobear_state::irq_ack_w));
 	map(0x480034, 0x480035).nopr(); // uses bset/bclr to write, which causes a read (ignored)
 	map(0x480035, 0x480035).lw8(
-		NAME([this] (offs_t offset, uint8_t data) {
+		NAME([this] (offs_t offset, u8 data) {
 			// "coin meter" in pinout
 			machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
+			if (data & 0xfd) logerror("%s unknown 4800035 write: %02x\n", machine().describe_context(), data);
 		})
 	);
 	map(0x48003a, 0x48003b).lr16(
@@ -494,33 +598,53 @@ void popobear_state::main_map(address_map &map)
 			// - PC=039532 latches in $2100b5-b2 with $48003a / $480022 (upper bytes)
 			// - PC=039f4a Reads $48003a (word), writes contents of $480022 (word),
 			//   ANDs with 0xf for title screen anim.
-			const u8 frame_count = (m_maincpu->total_cycles() >> 8) & 0xf;
+			const u16 frame_count = (m_maincpu->total_cycles() >> 8) & 0xffff; // needs 16 bits or qiwang hangs during attract
 			return frame_count;
 		})
 	);
 
 	map(0x480400, 0x4807ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+}
+
+void popobear_state::popobear_main_map(address_map &map)
+{
+	base_map(map);
 
 	map(0x500000, 0x500001).portr("IN0");
-	map(0x520000, 0x520001).portr("IN1");
+	map(0x520000, 0x520000).lr8(NAME([this] () -> u8 { return m_in1->read(); }));
+	map(0x520001, 0x520001).lr8(NAME([this] () -> u8 { return m_dsw[m_dsw_select]->read(); }));
 	map(0x540001, 0x540001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x550000, 0x550003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
 
-//  map(0x600000, 0x600001).nopw(); // activated during transitions, bits 0-3
-	map(0x620000, 0x620000).r(FUNC(popobear_state::_620000_r<0x09>));
+	map(0x600000, 0x600000).w(FUNC(popobear_state::popobear_ctrl_w));
+	map(0x620000, 0x620001).nopw();
+	map(0x620000, 0x620000).r(FUNC(popobear_state::_620000_r<0x09>)); // stuck displaying P XXXXX otherwise
 	map(0x800000, 0xbfffff).rom().region("gfx_data", 0);
 }
 
 void popobear_state::qiwang_main_map(address_map &map)
 {
-	main_map(map);
+	popobear_main_map(map);
 
-	map(0x500000, 0x500001).lr16(NAME([] () -> uint16_t { return 0x0000; })); // TODO: while booting, it specifically checks for this not to return 0xffff. Any other value is ok
-	map(0x620000, 0x620000).r(FUNC(popobear_state::_620000_r<0x01>));
+	map(0x620000, 0x620000).r(FUNC(popobear_state::_620000_r<0x01>)); // stuck displaying P XXXXX otherwise
+}
+
+void popobear_state::magkengo_main_map(address_map &map)
+{
+	base_map(map);
+
+	map(0x500001, 0x500001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x520000, 0x520001).portr("IN0");
+	map(0x530000, 0x530000).lr8(NAME([this] () -> u8 { return m_in1->read(); }));
+	map(0x530001, 0x530001).lr8(NAME([this] () -> u8 { return m_dsw[m_dsw_select]->read(); }));
+	map(0x540000, 0x540000).w(FUNC(popobear_state::magkengo_ctrl_w));
+	map(0x540000, 0x540001).portr("COIN");
+	map(0x550000, 0x550000).rw(FUNC(popobear_state::idchip_r), FUNC(popobear_state::idchip_w)); // TODO: this check was reversed by AI, verify
+
+	map(0x600000, 0x7fffff).rom().region("gfx_data", 0);
 }
 
 
-// TODO: unconfirmed diplocations
 static INPUT_PORTS_START( popobear )
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
@@ -541,6 +665,13 @@ static INPUT_PORTS_START( popobear )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x1e, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )// only works with not coin inserted
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -552,52 +683,310 @@ static INPUT_PORTS_START( popobear )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Very_Easy ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x1e00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x2000, 0x2000, "Service?" ) // hangs if flipped on during attract
-	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START("DSW2") // TODO: where are this read?
-	PORT_DIPNAME( 0x01, 0x00, "Arrow" ) PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x00, "DSW2:2" ) PORT_DIPLOCATION("SW2:2")
+	PORT_START("DSW2") // read in DIP test, only the first switch has definition
+	PORT_DIPNAME( 0x01, 0x01, "Pilot Lamp" ) PORT_DIPLOCATION("SW2:1") // in reality it shows the arrow with the direction taken
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "DSW2:3" ) PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "DSW2:4" ) PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "DSW2:5" ) PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "DSW2:6" ) PORT_DIPLOCATION("SW2:6")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "DSW2:7" ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "DSW2:8" ) PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW3") // read in DIP test, but no definitions
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW4") // read in DIP test, but no definitions
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( qiwang )
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) // TODO: hopper line_r
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Key In (Player 2)") PORT_CODE(KEYCODE_3)
+	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )// only works with not coin inserted
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("DSW1") // read in DIP test, definitions from test mode
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1") // not defined in test mode
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Payout Mode" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, "Returns Coins" )
+	PORT_DIPSETTING(    0x00, "Key-Out" )
+	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:3,4,5")
+	PORT_DIPSETTING(    0x14, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x1c, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(    0x10, "1 Coin/15 Credits" )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_20C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_25C ) )
+	PORT_DIPSETTING(    0x04, "1 Coin/30 Credits" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_50C ) )
+	PORT_DIPNAME( 0x60, 0x60, "Key-In / Key-Out Rate" ) PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_100C ) )
+	PORT_DIPSETTING(    0x00, "1 Coin/500 Credits" )
+	PORT_DIPNAME( 0x80, 0x80, "Credit Limit" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, "2000" )
+	PORT_DIPSETTING(    0x00, "10000" )
+
+	PORT_START("DSW2") // read in DIP test, definitions from test mode
+	PORT_DIPNAME( 0x03, 0x03, "Jackpot Limit" ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, "3000" )
+	PORT_DIPSETTING(    0x02, "5000" )
+	PORT_DIPSETTING(    0x01, "10000" )
+	PORT_DIPSETTING(    0x00, "50000" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Maximum Bet" ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x04, "20" )
+	PORT_DIPSETTING(    0x0c, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPSETTING(    0x08, "200" )
+	PORT_DIPNAME( 0x30, 0x30, "Payout Rate" ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x00, "Lowest" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Low ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( High ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Countdown Seconds" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, "10" )
+
+	PORT_START("DSW3") // read in DIP test, but no definitions
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW4") // read in DIP test, but no definitions
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( magkengo )
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN ) // works as slot stop 1 in test mode, along with the other one mapped below. Game bug?
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start /Stop All Reels")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in input test
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in input test
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop Reel 3 / Double Up")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SLOT_STOP4 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1") // $530000
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) // TODO: hopper line
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in input test
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop Reel 1 / Take")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SLOT_STOP5 ) PORT_NAME("Stop Reel 5 / Bet")
+
+	PORT_START("COIN")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in input test
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 ) // both coins register as same in input test
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in input test
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in input test
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in input test
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in input test
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in input test
+
+	// single 8-DIP bank on this board, but reads 4
+	// most settings are done in software
+	// DIP definitions taken from test mode
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Payout Type" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, "Pay One" )
+	PORT_DIPSETTING(    0x01, "Pay All" )
+	PORT_DIPNAME( 0x02, 0x02, "Max Win Times" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x00, "1000" )
+	PORT_DIPSETTING(    0x02, "2000" )
+	PORT_DIPNAME( 0x04, 0x04, "Reel Auto Stop" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "L Win Mode" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Auto Play" ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6") // no effect shown in test mode
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:7") // no effect shown in test mode
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8") // no effect shown in test mode
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2") // not physically present on PCB
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW3") // not physically present on PCB
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW4") // not physically present on PCB
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( magkengou )
+	PORT_INCLUDE(magkengo)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x20, 0x20, "Auto Ticket" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Quick Take" ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(popobear_state::scanline_cb)
 {
@@ -605,23 +994,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(popobear_state::scanline_cb)
 
 	// vblank-in
 	// Order is trusted, 5 as vblank-in makes title mosaic-esque rotation to draw incorrectly
-	if (scanline == 240)
+	if (scanline == 240 && BIT(m_irq_enable, 3))
 		m_maincpu->set_input_line(3, ASSERT_LINE);
 
 	// vblank-out
-	if (scanline == 0)
+	if (scanline == 0   && BIT(m_irq_enable, 5))
 		m_maincpu->set_input_line(5, ASSERT_LINE);
 
 	// TODO: actually a timer irq, tied with YM2413 sound chip (controls BGM tempo)
 	// the YM2413 doesn't have interrupts?
-	if (scanline == 64 || scanline == 192)
+	if ((scanline == 64 || scanline == 192) && BIT(m_irq_enable, 2))
 		m_maincpu->set_input_line(2, ASSERT_LINE);
 }
 
 void popobear_state::popobear(machine_config &config)
 {
 	M68000(config, m_maincpu, 42_MHz_XTAL / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &popobear_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &popobear_state::popobear_main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(popobear_state::scanline_cb), "screen", 0, 1);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -648,7 +1037,19 @@ void popobear_state::qiwang(machine_config &config)
 	popobear(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &popobear_state::qiwang_main_map);
+
+	m_alt_video = true;
 }
+
+void popobear_state::magkengo(machine_config &config)
+{
+	popobear(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &popobear_state::magkengo_main_map);
+
+	m_alt_video = true;
+}
+
 
 ROM_START( popobear )
 	ROM_REGION( 0x040000, "maincpu", 0 )
@@ -708,7 +1109,7 @@ ROM_START( magkengou )
 	ROM_LOAD16_BYTE( "magical_kengo_2005_l1_b_101_u26.u26", 0x000001, 0x020000, CRC(30a8c00e) SHA1(7e7ffdc165312103465d67375ba2bac0800d3df4) )
 
 	ROM_REGION16_BE( 0x400000, "gfx_data", ROMREGION_ERASE00 )
-	ROM_LOAD( "magical_kengo_2005_l8_a_301_u7.u7", 0x000000, 0x200000, CRC(58e3acba) SHA1(59e105507d336451c3e2517a5a1f853d5edc7375) )
+	ROM_LOAD16_WORD_SWAP( "magical_kengo_2005_l8_a_301_u7.u7", 0x000000, 0x200000, CRC(58e3acba) SHA1(59e105507d336451c3e2517a5a1f853d5edc7375) )
 	// u3 and u4 empty not populated
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -719,9 +1120,9 @@ ROM_END
 
 
 // BMC-A00211 PCB
-GAME( 2000, popobear,  0,        popobear, popobear, popobear_state, empty_init, ROT0, "BMC",       "PoPo Bear",                          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE )
-GAME( 2010, qiwang,    0,        qiwang,   popobear, popobear_state, empty_init, ROT0, "Herb Home", "Qi Wang",                            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, popobear,  0,        popobear, popobear,  popobear_state, empty_init, ROT0, "BMC",       "PoPo Bear",                          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE )
+GAME( 2010, qiwang,    0,        qiwang,   qiwang,    popobear_state, empty_init, ROT0, "Herb Home", "Qi Wang (ver. C1.3)",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE )
 
 // HERBHOME 20A23-* PCB
-GAME( 2005, magkengo,  0,        popobear, popobear, popobear_state, empty_init, ROT0, "Herb Home", "Magical Kengo 2005 (Ver. 1.2)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE )
-GAME( 2005, magkengou, magkengo, popobear, popobear, popobear_state, empty_init, ROT0, "Herb Home", "Magical Kengo 2005 (Ver. USA 1.10)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE )
+GAME( 2005, magkengo,  0,        magkengo, magkengo,  popobear_state, empty_init, ROT0, "Herb Home", "Magical Kengo 2005 (Ver. 1.2)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE )
+GAME( 2005, magkengou, magkengo, magkengo, magkengou, popobear_state, empty_init, ROT0, "Herb Home", "Magical Kengo 2005 (Ver. USA 1.10)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE )
