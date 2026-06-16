@@ -164,7 +164,7 @@ private:
 	bool m_kb_rclamp;
 	bool m_kb_loop;
 	
-	int m_fpu_finished;
+	bool m_fpu_finished;
 
 };
 
@@ -307,7 +307,7 @@ void tek440x_state::fpu_finished(int val)
 	if (val == 0)
 	{
 		LOGMASKED(LOG_FPU, "fpu_finished\n");
-		m_fpu_finished = 1;
+		m_fpu_finished = true;
 	}
 }
 
@@ -330,7 +330,7 @@ void tek440x_state::fpu_w(offs_t offset, u16 data)
 		// broadcast slave id  (0xbe or 0x3e)
 		case 6:
 			LOGMASKED(LOG_FPU,"fpu_w: broadcast slave 0x%04x\n", data);
-			m_fpu_finished = 0;
+			m_fpu_finished = false;
 			m_fpu->slow_write(data);
 			break;
 		case 7:
