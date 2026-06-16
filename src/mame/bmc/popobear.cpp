@@ -640,6 +640,7 @@ void popobear_state::magkengo_main_map(address_map &map)
 	map(0x540000, 0x540000).w(FUNC(popobear_state::magkengo_ctrl_w));
 	map(0x540000, 0x540001).portr("COIN");
 	map(0x550000, 0x550000).rw(FUNC(popobear_state::idchip_r), FUNC(popobear_state::idchip_w)); // TODO: this check was reversed by AI, verify
+	map(0x570000, 0x570001).nopw(); // TODO: probably lamps
 
 	map(0x600000, 0x7fffff).rom().region("gfx_data", 0);
 }
@@ -667,7 +668,7 @@ static INPUT_PORTS_START( popobear )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x1e, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )// only works with not coin inserted
+	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )// only works with no coin inserted
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
@@ -799,7 +800,7 @@ static INPUT_PORTS_START( qiwang )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )                                      // 投弊Ｂ
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )  PORT_NAME("Key In A")        // 開分Ａ
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )         PORT_NAME("Key In B") PORT_CODE(KEYCODE_3) // 開分Ｂ
-	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )// only works with not coin inserted
+	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )// only works with no coin inserted
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )                                     // 雙打開始
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )                                     // 單打開始
 

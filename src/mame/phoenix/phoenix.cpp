@@ -865,6 +865,30 @@ ROM_START( phoenixc4 ) // verified main and ROMs PCBs and 2 PROMs
 	ROM_RELOAD(               0x0000, 0x0100 ) // the dump had 2 identical proms with different names
 ROM_END
 
+ROM_START( phoenixjpl ) // verified 2 PCBs and 2 PROMs. A mix of other bootlegs, with a couple unique ROMs
+	ROM_REGION( 0x10000, "maincpu", 0 ) // handwritten labels
+	ROM_LOAD( "px_1.ic45", 0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) )
+	ROM_LOAD( "px_2.ic46", 0x0800, 0x0800, CRC(dbc942fa) SHA1(9fe224e6ced407289dfa571468259a021d942b7d) )
+	ROM_LOAD( "px_3.ic47", 0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
+	ROM_LOAD( "px_4.ic48", 0x1800, 0x0800, CRC(f2d4ae42) SHA1(7240e6ed22db30689a31f5d933afb89acf1efc8c) ) // unique at the time of adding
+	ROM_LOAD( "px_5.ic49", 0x2000, 0x0800, CRC(a105e4e7) SHA1(b35142a91b6b7fdf7535202671793393c9f4685f) )
+	ROM_LOAD( "px_6.ic50", 0x2800, 0x0800, CRC(8c83bff7) SHA1(3dfb090d7e3a9ae8da882b06e166c48555eaf77c) )
+	ROM_LOAD( "px_7.ic51", 0x3000, 0x0800, CRC(079ac364) SHA1(55b17c069b191cd1752e78068ef683b33c094e56) )
+	ROM_LOAD( "px_8.ic52", 0x3800, 0x0800, CRC(e43fef84) SHA1(c071cc8daef86c8a67a4bfbaf681a30c6591d78c) ) // unique at the time of adding
+
+	ROM_REGION( 0x1000, "bgtiles", 0 ) // printed labels
+	ROM_LOAD( "011.ic23", 0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "012.ic24", 0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 ) // printed labels
+	ROM_LOAD( "009.ic39", 0x0000, 0x0800, CRC(bb0525ed) SHA1(86db1c7584fb3846bfd47535e1585eeb7fbbb1fe) )
+	ROM_LOAD( "010.ic40", 0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // not dumped yet, taken from a set with identical GFX ROMs
+	ROM_LOAD( "mmi6301.ic40", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) BAD_DUMP ) // palette low bits
+	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) BAD_DUMP ) // palette high bits
+ROM_END
+
 ROM_START( phoenixgu ) // verified 2 PCBs, 2 PROMs
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "phoenix.45",   0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) )
@@ -1832,6 +1856,7 @@ GAME( 1981, phoenixc,   phoenix, phoenix,  phoenixt, phoenix_state, empty_init, 
 GAME( 1981, phoenixc2,  phoenix, phoenix,  phoenixt, phoenix_state, empty_init,           ROT90, "bootleg (G.G.I. Corporation)",           "Phoenix (G.G.I. Corporation, set 1)",                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenixc3,  phoenix, phoenix,  phoenixt, phoenix_state, empty_init,           ROT90, "bootleg (G.G.I. Corporation)",           "Phoenix (G.G.I. Corporation, set 2)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenixc4,  phoenix, phoenix,  phoenixt, phoenix_state, empty_init,           ROT90, "bootleg (G.G.I. Corporation)",           "Phoenix (G.G.I. Corporation, set 3)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1981, phoenixjpl, phoenix, phoenix,  phoenixt, phoenix_state, empty_init,           ROT90, "bootleg (JP Leisure)",                   "Phoenix (JP Leisure bootleg)",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenixgu,  phoenix, phoenix,  phoenixt, phoenix_state, empty_init,           ROT90, "bootleg? (G. Universal Video)",          "Phoenix (G. Universal Video bootleg)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenixi,   phoenix, condor,   condor,   phoenix_state, init_oneprom_coindsw, ROT90, "bootleg (IDI)",                          "Phoenix (IDI bootleg)",                                      MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // Needs correct color PROM decode
 GAME( 1980, fenixn,     phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg (Niemer)",                       "Fenix (Niemer bootleg of Phoenix)",                          MACHINE_SUPPORTS_SAVE )
