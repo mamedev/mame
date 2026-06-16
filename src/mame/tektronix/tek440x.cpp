@@ -393,14 +393,16 @@ void tek440x_state::physical_map(address_map &map)
 
 	// 700000-71ffff spare 0
 	// 720000-73ffff spare 1
-	map(0x740000, 0x747fff).rom().mirror(0x8000).region("maincpu", 0);
+
 	// maps 128 address range to nvram (see p2.8-3)
 	// 721000-72107f net ram
 	map(0x721000, 0x7210ff).rw(FUNC(tek440x_state::nvram_r), FUNC(tek440x_state::nvram_w));
 	// 722000-722fff nvram nybbles
 	map(0x722000, 0x722fff).rw(FUNC(tek440x_state::recall_r), FUNC(tek440x_state::recall_w));
 	map(0x723000, 0x723fff).rw(FUNC(tek440x_state::store_r), FUNC(tek440x_state::store_w));
-	
+
+	map(0x740000, 0x747fff).rom().mirror(0x8000).region("maincpu", 0);
+
 	map(0x760000, 0x760fff).ram().mirror(0xf000); // debug RAM
 
 	// 780000-79ffff processor board I/O
