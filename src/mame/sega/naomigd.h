@@ -18,14 +18,9 @@
 class idegdrom_device : public pci_device
 {
 public:
-	template <typename... T>
-	idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&... space) :
-		idegdrom_device(mconfig, tag, owner, clock)
-	{
-		m_ide.lookup()->set_bus_master_space(std::forward<T>(space)...);
-	}
 	idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	template <typename... T> void set_bus_master_space(T &&... space) { m_ide.lookup()->set_bus_master_space(std::forward<T>(space)...); }
 	auto irq_callback() { return irq_cb.bind(); }
 
 	void map_command(address_map &map) ATTR_COLD;

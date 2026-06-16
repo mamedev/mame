@@ -1078,7 +1078,8 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 	SEGA315_6154(config, m_315_6154);
 	m_315_6154->set_addrmap(sega_315_6154_device::AS_PCI_MEMORY, &naomi_gdrom_board::pci_map);
 
-	IDE_GDROM(config, m_idegdrom, 0, m_315_6154, sega_315_6154_device::AS_PCI_MEMORY);
+	IDE_GDROM(config, m_idegdrom);
+	m_idegdrom->set_bus_master_space(m_315_6154, sega_315_6154_device::AS_PCI_MEMORY);
 	m_idegdrom->irq_callback().set_inputline(m_maincpu, SH4_IRL2);
 
 	PIC16C622(config, m_securitycpu, PIC_CLOCK);
