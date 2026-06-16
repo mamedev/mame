@@ -75,6 +75,8 @@
 #define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
+namespace {
+
 // tek4404 MSU uses a 8085 that is slow to ACK
 unsigned constexpr TEK4404_ACK_DELAY = 30'000;
 
@@ -88,9 +90,8 @@ constexpr int MAP_CPU_WR = 7;
 #define OFF8_TO_OFF16(A)	((A)>>1)
 #define OFF16_TO_OFF8(A)	((A)<<1)
 
-//constexpr offs_t MAXRAM = 0x200000;	// +1MB
 constexpr offs_t MAXRAM = 0x400000;	// +3MB
-namespace {
+
 
 class tek440x_state : public driver_device
 {
@@ -417,7 +418,7 @@ void tek440x_state::logical_map(address_map &map)
 
 void tek440x_state::physical_map(address_map &map)
 {
-	map(0x000000, MAXRAM-1).ram().share("mainram");						// +1MB RAM option;
+	map(0x000000, MAXRAM-1).ram().share("mainram");						// +3MB RAM option;
 	map(0x600000, 0x61ffff).ram().share("vram");
 
 	// 700000-71ffff spare 0
