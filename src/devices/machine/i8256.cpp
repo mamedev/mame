@@ -548,7 +548,6 @@ void i8256_device::write(offs_t offset, uint8_t data)
 					m_data_bits, m_stop_sel, BIT(data, I8256_CMD1_8086) ? "8086" : "8085");
 			break;
 		}
-
 		case I8256_REG_CMD2:
 		{
 			const uint8_t changed = m_command2 ^ data;
@@ -596,7 +595,6 @@ void i8256_device::write(offs_t offset, uint8_t data)
 			}
 			break;
 		}
-
 		case I8256_REG_CMD3:
 			// bit 7 high sets any bits which are also high, bit 7 low resets them
 			if (BIT(data, I8256_CMD3_SET))
@@ -613,39 +611,31 @@ void i8256_device::write(offs_t offset, uint8_t data)
 			// TODO: nested interrupt mode is not emulated
 			m_command3 &= ~(1 << I8256_CMD3_END);
 			break;
-
 		case I8256_REG_MODE:
 			m_mode = data;
 			break;
-
 		case I8256_REG_PORT1C:
 			m_port1_control = data;
 			break;
-
 		case I8256_REG_INTEN: // set interrupts
 			m_int_enable |= data;
 			break;
-
 		case I8256_REG_INTAD: // reset interrupts
 			m_int_enable &= ~data;
 			m_int_request &= ~data;
 			update_int();
 			break;
-
 		case I8256_REG_BUFFER:
 			LOGTX("transmitter buffer %02X\n", data);
 			m_tx_buffer = data;
 			m_status &= ~I8256_STATUS_TB_EMPTY;
 			break;
-
 		case I8256_REG_PORT1:
 			p1_w(data);
 			break;
-
 		case I8256_REG_PORT2:
 			p2_w(data);
 			break;
-
 		case I8256_REG_TIMER1:
 		case I8256_REG_TIMER2:
 		case I8256_REG_TIMER3:
@@ -653,7 +643,6 @@ void i8256_device::write(offs_t offset, uint8_t data)
 		case I8256_REG_TIMER5:
 			m_timers[reg - I8256_REG_TIMER1] = data;
 			break;
-
 		case I8256_REG_STATUS: // modification register
 			m_modification = data & 0x7f;
 			m_rx_sample = (BIT(data, I8256_MOD_RS4) ? 32 : 16) - BIT(data, I8256_MOD_RS0, 4);
