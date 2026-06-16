@@ -14,7 +14,8 @@
 
 
 class pc9801_96_device : public device_t,
-                         public device_pc98_cbus_slot_interface
+                         public device_pc98_cbus_slot_interface,
+                         public device_memory_interface
 {
 public:
 	pc9801_96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -26,9 +27,15 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
+	virtual space_config_vector memory_space_config() const override;
+
+	virtual void wab_map(address_map &map) ATTR_COLD;
+	virtual uint8_t board_id_r();
 
 private:
 	required_device<cirrus_gd5428_vga_device> m_vga;
+
+	const address_space_config m_wab_space_config;
 
 	uint8_t m_reg_index;
 	uint8_t m_reg_data[8];
@@ -48,6 +55,14 @@ private:
 
 	uint8_t video_enable_r();
 	void video_enable_w(uint8_t data);
+
+	uint8_t window_r();
+	void window_w(uint8_t data);
+	uint8_t linear_addr_r();
+	void linear_addr_w(uint8_t data);
+	uint8_t relay_r();
+	void relay_w(uint8_t data);
+	uint8_t window_index_r();
 
 	uint8_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);
