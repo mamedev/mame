@@ -56,6 +56,10 @@ public:
 	//
 	void set_seek_timing(uint32_t track_us, uint32_t average_us, uint32_t full_us, uint32_t rpm, uint8_t interleave);
 
+	// underlying media image, exposed so a host-side high-level emulator can run
+	// commands directly against the media (parallels nscsi_tape_device::image())
+	required_device<harddisk_image_device> image;
+
 protected:
 	nscsi_harddisk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -75,7 +79,6 @@ protected:
 	// READ/WRITE/SEEK (6- and 10-byte) opcodes.
 	attotime seek_time(uint32_t lba);
 
-	required_device<harddisk_image_device> image;
 	std::string m_default_model_name;
 	uint8_t block[512];
 	int lba, cur_lba, blocks;

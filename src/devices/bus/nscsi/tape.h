@@ -20,6 +20,10 @@ public:
 	// construction
 	nscsi_tape_device(const machine_config &config, const char *tag, device_t *owner, u32 clock = 0);
 
+	// expose the underlying tape image (parallels nscsi_harddisk_device::image) so a host-side
+	// high-level emulator can run commands directly against the media
+	simh_tape_image_device *image() const { return m_image; }
+
 protected:
 	nscsi_tape_device(const machine_config &config, device_type type, const char *tag, device_t *owner, u32 clock, const std::string_view manufacturer, const std::string_view product, const std::string_view revision);
 
