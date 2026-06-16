@@ -610,7 +610,7 @@ void i8256_device::write(offs_t offset, uint8_t data)
 				m_command3 &= ~(1 << I8256_CMD3_RST);
 			}
 
-			// nested interrupt mode is not emulated
+			// TODO: nested interrupt mode is not emulated
 			m_command3 &= ~(1 << I8256_CMD3_END);
 			break;
 
@@ -727,9 +727,9 @@ void i8256_device::p2_w(uint8_t data)
 	m_port2_int = data;
 	switch (m_mode & 0x07)
 	{
-		case I8256_PORT2C_IO: port2_data = m_port2_int & 0x0f; break;
-		case I8256_PORT2C_OI: port2_data = m_port2_int & 0xf0; break;
-		case I8256_PORT2C_OO: port2_data = m_port2_int; break;
+		case I8256_PORT2C_IO: m_out_p2_cb(0, data & 0x0f); break;
+		case I8256_PORT2C_OI: m_out_p2_cb(0, data & 0xf0); break;
+		case I8256_PORT2C_OO: m_out_p2_cb(0, data); break;
 		default: // TODO: input and handshake modes
 			break;
 	}
@@ -751,105 +751,105 @@ void i8256_device::receiver_tick()
 
 	switch (m_rx_state)
 	{
-	case I8256_STATE_START:
-		if (m_rx_counter == 1 && m_rxd)
-		{
-			// line is marking, no start bit yet
-			m_rx_counter = 0;
-		}
-		else if (m_rx_counter >= rx_sample_point())
-		{
-			// the start bit is checked once at sampling time (unless disabled by DSC)
-			if (!m_rxd || BIT(m_modification, I8256_MOD_DSC))
+		case I8256_STATE_START:
+			if (m_rx_counter == 1 && m_rxd)
 			{
-				LOGRX("RX start bit\n");
-				m_rx_state = I8256_STATE_DATA;
-				m_rx_counter = 0;
-				m_rx_shift = 0;
-				m_rx_bits = 0;
-				m_rx_parity = false;
-			}
-			else
-			{
-				LOGRX("RX false start bit\n");
+				// line is marking, no start bit yet
 				m_rx_counter = 0;
 			}
-		}
-		break;
+			else if (m_rx_counter >= rx_sample_point())
+			{
+				// the start bit is checked once at sampling time (unless disabled by DSC)
+				if (!m_rxd || BIT(m_modification, I8256_MOD_DSC))
+				{
+					LOGRX("RX start bit\n");
+					m_rx_state = I8256_STATE_DATA;
+					m_rx_counter = 0;
+					m_rx_shift = 0;
+					m_rx_bits = 0;
+					m_rx_parity = false;
+				}
+				else
+				{
+					LOGRX("RX false start bit\n");
+					m_rx_counter = 0;
+				}
+			}
+			break;
 
-	case I8256_STATE_DATA:
-		if (m_rx_counter >= m_divide)
-		{
-			m_rx_counter = 0;
+		case I8256_STATE_DATA:
+			if (m_rx_counter >= m_divide)
+			{
+				m_rx_counter = 0;
 
+				if (m_rxd)
+				{
+					m_rx_shift |= 1 << m_rx_bits;
+					m_rx_parity = !m_rx_parity;
+				}
+				m_rx_bits++;
+
+				if (m_rx_bits == m_data_bits + (m_parity_enable ? 1 : 0))
+					m_rx_state = I8256_STATE_STOP;
+			}
+			break;
+
+		case I8256_STATE_STOP:
+			// the character is transferred and all status bits are evaluated
+			// when the first stop bit is sampled
+			if (m_rx_counter >= m_divide)
+			{
+				m_rx_counter = 0;
+				m_rx_state = I8256_STATE_START;
+
+				const bool fe = !m_rxd;
+				const uint8_t data = m_rx_shift & ((1 << m_data_bits) - 1);
+
+				if (fe && data == 0)
+				{
+					// break character: BD is set even when the receiver is disabled,
+					// and the character is not transferred to the receiver buffer
+					LOGRX("RX break detected\n");
+					m_status |= I8256_STATUS_BREAK;
+					request_interrupt(I8256_INT_RX);
+					m_rx_state = I8256_STATE_BREAK;
+				}
+				else if (BIT(m_command3, I8256_CMD3_RxE))
+				{
+					LOGRX("RX character %02X\n", data);
+
+					// on overrun the previous character is lost
+					if (m_status & I8256_STATUS_RB_FULL)
+						m_status |= I8256_STATUS_OVERRUN_ERROR;
+					m_rx_buffer = data;
+					m_status |= I8256_STATUS_RB_FULL;
+
+					if (m_parity_enable && (m_parity_even ? m_rx_parity : !m_rx_parity))
+						m_status |= I8256_STATUS_PARITY_ERROR;
+
+					if (BIT(m_modification, I8256_MOD_TME))
+					{
+						// in transmission mode FE indicates that the transmitter
+						// was active during the reception of a character
+						if (!(m_status & I8256_STATUS_TR_EMPTY))
+							m_status |= I8256_STATUS_FRAMING_ERROR;
+					}
+					else if (fe)
+						m_status |= I8256_STATUS_FRAMING_ERROR;
+
+					request_interrupt(I8256_INT_RX);
+				}
+			}
+			break;
+
+		case I8256_STATE_BREAK:
+			// the receiver is idled until the line returns to marking
 			if (m_rxd)
 			{
-				m_rx_shift |= 1 << m_rx_bits;
-				m_rx_parity = !m_rx_parity;
+				m_rx_state = I8256_STATE_START;
+				m_rx_counter = 0;
 			}
-			m_rx_bits++;
-
-			if (m_rx_bits == m_data_bits + (m_parity_enable ? 1 : 0))
-				m_rx_state = I8256_STATE_STOP;
-		}
-		break;
-
-	case I8256_STATE_STOP:
-		// the character is transferred and all status bits are evaluated
-		// when the first stop bit is sampled
-		if (m_rx_counter >= m_divide)
-		{
-			m_rx_counter = 0;
-			m_rx_state = I8256_STATE_START;
-
-			const bool fe = !m_rxd;
-			const uint8_t data = m_rx_shift & ((1 << m_data_bits) - 1);
-
-			if (fe && data == 0)
-			{
-				// break character: BD is set even when the receiver is disabled,
-				// and the character is not transferred to the receiver buffer
-				LOGRX("RX break detected\n");
-				m_status |= I8256_STATUS_BREAK;
-				request_interrupt(I8256_INT_RX);
-				m_rx_state = I8256_STATE_BREAK;
-			}
-			else if (BIT(m_command3, I8256_CMD3_RxE))
-			{
-				LOGRX("RX character %02X\n", data);
-
-				// on overrun the previous character is lost
-				if (m_status & I8256_STATUS_RB_FULL)
-					m_status |= I8256_STATUS_OVERRUN_ERROR;
-				m_rx_buffer = data;
-				m_status |= I8256_STATUS_RB_FULL;
-
-				if (m_parity_enable && (m_parity_even ? m_rx_parity : !m_rx_parity))
-					m_status |= I8256_STATUS_PARITY_ERROR;
-
-				if (BIT(m_modification, I8256_MOD_TME))
-				{
-					// in transmission mode FE indicates that the transmitter
-					// was active during the reception of a character
-					if (!(m_status & I8256_STATUS_TR_EMPTY))
-						m_status |= I8256_STATUS_FRAMING_ERROR;
-				}
-				else if (fe)
-					m_status |= I8256_STATUS_FRAMING_ERROR;
-
-				request_interrupt(I8256_INT_RX);
-			}
-		}
-		break;
-
-	case I8256_STATE_BREAK:
-		// the receiver is idled until the line returns to marking
-		if (m_rxd)
-		{
-			m_rx_state = I8256_STATE_START;
-			m_rx_counter = 0;
-		}
-		break;
+			break;
 	}
 }
 
@@ -861,11 +861,11 @@ uint16_t i8256_device::stop_length() const
 {
 	switch (m_stop_sel)
 	{
-	default:
-	case I8256_STOP_1:   return m_divide;
-	case I8256_STOP_15:  return m_divide + m_divide / 2;
-	case I8256_STOP_2:   return m_divide * 2;
-	case I8256_STOP_075: return std::max<uint16_t>(1, (m_divide * 3) / 4);
+		default:
+		case I8256_STOP_1:   return m_divide;
+		case I8256_STOP_15:  return m_divide + m_divide / 2;
+		case I8256_STOP_2:   return m_divide * 2;
+		case I8256_STOP_075: return std::max<uint16_t>(1, (m_divide * 3) / 4);
 	}
 }
 
@@ -884,90 +884,90 @@ void i8256_device::transmitter_tick()
 
 	switch (m_tx_state)
 	{
-	case I8256_STATE_START:
-		m_tx_counter = 0;
-
-		if (BIT(m_command3, I8256_CMD3_TBRK))
-		{
-			// continuous break, inhibits buffer transfers until cleared
-			output_txd(0);
-		}
-		else if (BIT(m_command3, I8256_CMD3_SBRK))
-		{
-			// single character break: start, data, parity and stop bits all low
-			LOGTX("TX single character break\n");
-			m_tx_break = true;
-			m_tx_bits = 0;
-			m_status &= ~I8256_STATUS_TR_EMPTY;
-			m_tx_state = I8256_STATE_DATA;
-			output_txd(0);
-		}
-		else if (!(m_status & I8256_STATUS_TB_EMPTY) && !m_cts)
-		{
-			// transfer the buffer to the transmitter register
-			m_tx_shift = m_tx_buffer;
-			LOGTX("TX character %02X\n", m_tx_shift);
-			m_tx_break = false;
-			m_tx_bits = 0;
-			m_tx_parity = false;
-			m_status |= I8256_STATUS_TB_EMPTY;
-			m_status &= ~I8256_STATUS_TR_EMPTY;
-			request_interrupt(I8256_INT_TX);
-			m_tx_state = I8256_STATE_DATA;
-			output_txd(0); // start bit
-		}
-		else
-			output_txd(1);
-		break;
-
-	case I8256_STATE_DATA:
-		if (m_tx_counter >= m_divide)
-		{
+		case I8256_STATE_START:
 			m_tx_counter = 0;
 
-			if (m_tx_bits < m_data_bits)
+			if (BIT(m_command3, I8256_CMD3_TBRK))
 			{
-				const int bit = m_tx_break ? 0 : BIT(m_tx_shift, m_tx_bits);
-				m_tx_bits++;
-				if (bit)
-					m_tx_parity = !m_tx_parity;
-				output_txd(bit);
+				// continuous break, inhibits buffer transfers until cleared
+				output_txd(0);
 			}
-			else if (m_tx_bits == m_data_bits && m_parity_enable)
+			else if (BIT(m_command3, I8256_CMD3_SBRK))
 			{
-				m_tx_bits++;
-				const bool parity = m_parity_even ? m_tx_parity : !m_tx_parity;
-				output_txd(m_tx_break ? 0 : parity);
+				// single character break: start, data, parity and stop bits all low
+				LOGTX("TX single character break\n");
+				m_tx_break = true;
+				m_tx_bits = 0;
+				m_status &= ~I8256_STATUS_TR_EMPTY;
+				m_tx_state = I8256_STATE_DATA;
+				output_txd(0);
+			}
+			else if (!(m_status & I8256_STATUS_TB_EMPTY) && !m_cts)
+			{
+				// transfer the buffer to the transmitter register
+				m_tx_shift = m_tx_buffer;
+				LOGTX("TX character %02X\n", m_tx_shift);
+				m_tx_break = false;
+				m_tx_bits = 0;
+				m_tx_parity = false;
+				m_status |= I8256_STATUS_TB_EMPTY;
+				m_status &= ~I8256_STATUS_TR_EMPTY;
+				request_interrupt(I8256_INT_TX);
+				m_tx_state = I8256_STATE_DATA;
+				output_txd(0); // start bit
 			}
 			else
-			{
-				m_tx_state = I8256_STATE_STOP;
-				output_txd(m_tx_break ? 0 : 1);
-			}
-		}
-		break;
-
-	case I8256_STATE_STOP:
-		if (m_tx_counter >= stop_length())
-		{
-			m_tx_counter = 0;
-			m_tx_state = I8256_STATE_START;
-
-			if (m_tx_break)
-			{
-				// SBRK is automatically cleared after one character time of break
-				m_command3 &= ~(1 << I8256_CMD3_SBRK);
-				m_tx_break = false;
 				output_txd(1);
-			}
+			break;
 
-			m_status |= I8256_STATUS_TR_EMPTY;
-			// TRE generates an interrupt when the transmitter register finished
-			// transmitting and the buffer is empty
-			if (m_status & I8256_STATUS_TB_EMPTY)
-				request_interrupt(I8256_INT_TX);
-		}
-		break;
+		case I8256_STATE_DATA:
+			if (m_tx_counter >= m_divide)
+			{
+				m_tx_counter = 0;
+
+				if (m_tx_bits < m_data_bits)
+				{
+					const int bit = m_tx_break ? 0 : BIT(m_tx_shift, m_tx_bits);
+					m_tx_bits++;
+					if (bit)
+						m_tx_parity = !m_tx_parity;
+					output_txd(bit);
+				}
+				else if (m_tx_bits == m_data_bits && m_parity_enable)
+				{
+					m_tx_bits++;
+					const bool parity = m_parity_even ? m_tx_parity : !m_tx_parity;
+					output_txd(m_tx_break ? 0 : parity);
+				}
+				else
+				{
+					m_tx_state = I8256_STATE_STOP;
+					output_txd(m_tx_break ? 0 : 1);
+				}
+			}
+			break;
+
+		case I8256_STATE_STOP:
+			if (m_tx_counter >= stop_length())
+			{
+				m_tx_counter = 0;
+				m_tx_state = I8256_STATE_START;
+
+				if (m_tx_break)
+				{
+					// SBRK is automatically cleared after one character time of break
+					m_command3 &= ~(1 << I8256_CMD3_SBRK);
+					m_tx_break = false;
+					output_txd(1);
+				}
+
+				m_status |= I8256_STATUS_TR_EMPTY;
+				// TRE generates an interrupt when the transmitter register finished
+				// transmitting and the buffer is empty
+				if (m_status & I8256_STATUS_TB_EMPTY)
+					request_interrupt(I8256_INT_TX);
+			}
+			break;
 	}
 }
 
