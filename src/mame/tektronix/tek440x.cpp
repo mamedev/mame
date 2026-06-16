@@ -129,7 +129,6 @@ private:
 	u16 timer_r(offs_t offset);
 	void timer_w(offs_t offset, u16 data);
 
-
 	void kb_rdata_w(int state);
 	void kb_tdata_w(int state);
 	void kb_rclamp_w(int state);
@@ -155,7 +154,7 @@ private:
 	memory_view m_map_view;
 
 
-	int m_u244latch;
+	bool m_u244latch;
 	
 	bool m_boot;
 	u8 m_map_control;
@@ -195,7 +194,7 @@ void tek440x_state::machine_reset()
 {
 	m_boot = true;
 	diag_w(0);
-	m_u244latch = 0;
+	m_u244latch = false;
 	m_keyboard->kdo_w(1);
 	mapcntl_w(0);
 	m_vint->in_w<1>(0);
@@ -408,7 +407,7 @@ void tek440x_state::timer_irq(int state)
 		//LOG("M68K_IRQ_1 assert\n");
 		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 
-		m_u244latch = 1;
+		m_u244latch = true;
 	}
 	else
 	{
@@ -425,7 +424,7 @@ u16 tek440x_state::timer_r(offs_t offset)
 	{
 		LOGMASKED(LOG_IRQ,"timer_r: M68K_IRQ_1 clear\n");
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
-		m_u244latch = 0;
+		m_u244latch = false;
 	}
 
 	return m_timer->read16(offset);
@@ -441,7 +440,7 @@ void tek440x_state::timer_w(offs_t offset, u16 data)
 	{
 		LOGMASKED(LOG_IRQ,"timer_w: M68K_IRQ_1 clear\n");
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
-		m_u244latch = 0;
+		m_u244latch = false;
 	}
 }
 
