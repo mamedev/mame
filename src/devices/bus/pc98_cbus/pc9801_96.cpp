@@ -1,4 +1,5 @@
 // license:BSD-3-Clause
+// copyright-holders: BlueRain
 #include "emu.h"
 #include "pc9801_96.h"
 #include "screen.h"
