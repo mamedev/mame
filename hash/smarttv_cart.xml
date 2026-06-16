@@ -158,6 +158,17 @@ license:CC0-1.0
 				<rom name="Cars 2 (Italy).bin" size="0x400000" crc="f01308ba" sha1="1e0253e9de08fe9b9b1832dae6dfe90fcf27d261"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
+
+	<software name="casatop" supported="no"> <!-- checksum matches header -->
+		<description>La Casa Di Topolino (Italy)</description>
+		<year>200?</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="La Casa Di Topolino (Italy).bin" size="0x400000" crc="a027fc87" sha1="908f300a51871aa1226a5bd85113c61fb4ad9f11"/>
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>

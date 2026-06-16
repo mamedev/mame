@@ -55,7 +55,7 @@ CEi = CE Internal ROM! (set to VCC in Cartridge-PCB)
 	<software name="hannah" supported="no">
 		<description>Hannah Montana (Italy)</description>
 		<year>200?</year>
-		<publisher>Giochi Preziosi / Playmates</publisher>
+		<publisher>Giochi Preziosi</publisher>
 		<part name="cart" interface="mylife_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="hannah.bin" size="0x800000" crc="f695fe8e" sha1="b5db32e659a35b6ce6d7f633cecf073e028dd45b"/>
@@ -72,7 +72,7 @@ CEi = CE Internal ROM! (set to VCC in Cartridge-PCB)
 	<software name="summer" supported="no">
 		<description>Summer Party (Italy)</description>
 		<year>200?</year>
-		<publisher>Giochi Preziosi / Playmates</publisher>
+		<publisher>Giochi Preziosi</publisher>
 		<part name="cart" interface="mylife_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="summerparty.bin" size="0x800000" crc="24ee4969" sha1="9252f77fd8ff60d1e0cd68cfe363b0ee846343f2"/>
@@ -89,7 +89,7 @@ CEi = CE Internal ROM! (set to VCC in Cartridge-PCB)
 	<software name="cdisco" supported="no">
 		<description>Club Disco (Italy)</description>
 		<year>200?</year>
-		<publisher>Giochi Preziosi / Playmates</publisher>
+		<publisher>Giochi Preziosi</publisher>
 		<part name="cart" interface="mylife_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="clubdisco.bin" size="0x800000" crc="d18006e7" sha1="ad2282766899610dc7fb32118b2eb7b434d01d01"/>
@@ -101,6 +101,17 @@ CEi = CE Internal ROM! (set to VCC in Cartridge-PCB)
 			</dataarea>
 			-->
 		</part>
-	</software>	
+	</software>
+	
+	<software name="cdiscos" cloneof="cdisco" supported="no">
+		<description>Club Disco (Spain)</description>
+		<year>200?</year>
+		<publisher>Giochi Preziosi</publisher>
+		<part name="cart" interface="mylife_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="clubdisco_spain.bin" size="0x800000" crc="8f200051" sha1="253a7bf48908eee8084c01fcc22b07db729d4714"/>
+			</dataarea>
+		</part>
+	</software>		
 
 </softwarelist>

@@ -97,9 +97,16 @@ ROM_START( mylifei )
 	ROM_LOAD( "af24bc02.u8", 0x000, 0x100, CRC(17c6eb00) SHA1(2b30cb3a924f4905f98cc8220edaee156eaf59ae) )
 ROM_END
 
+ROM_START( mylifes )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF ) // no TSOP pads
+	ROM_LOAD( "mylife_spain.bin", 0x000000, 0x800000, CRC(83bb90bf) SHA1(44d3e62577e03766af5a92f421ed3a96616a5857) )
+ROM_END
+
 } // anonymous namespace
 
 CONS( 200?, mylife,       0,              0,      mylife,  mylife, mylife_state, empty_init, "Giochi Preziosi / Playmates", "My Life - Another life in your hands (UK)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // maybe US, found in UK
-CONS( 200?, mylifei,      mylife,         0,      mylife,  mylife, mylife_state, empty_init, "Giochi Preziosi / Playmates", "My Life - Un'altra vita nelle tue mani (Italy)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, mylifei,      mylife,         0,      mylife,  mylife, mylife_state, empty_init, "Giochi Preziosi",             "My Life - Un'altra vita nelle tue mani (Italy)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+// who was the Spanish distributor, what's the Spanish subtitle?
+CONS( 200?, mylifes,      mylife,         0,      mylife,  mylife, mylife_state, empty_init, "Giochi Preziosi",             "My Life (Spain)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-// there was a follow-up system 'My Real Life'
+// there was a follow-up system 'My Real Life' featuring a camera, unknown if it's the same tech
