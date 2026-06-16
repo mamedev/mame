@@ -113,11 +113,11 @@ private:
 	void sound_w(u8 data);
 	void diag_w(u8 data);
 
-	uint8_t nvram_r(offs_t offset);
+	u8 nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, u8 data);
-	uint8_t recall_r();
+	u8 recall_r();
 	void recall_w(uint8_t data);
-	uint8_t store_r();
+	u8 store_r();
 	void store_w(uint8_t data);
 
 
@@ -325,24 +325,24 @@ void tek440x_state::kb_tdata_w(int state)
 }
 
 
-uint8_t tek440x_state::nvram_r(offs_t offset)
+u8 tek440x_state::nvram_r(offs_t offset)
 {
 	u8 data = m_novram->read(m_maincpu->space(0), offset);
 
-	LOG("nvram_r(%d) => %02x pc(%08x)\n",offset, data, m_maincpu->pc());
+	LOG("nvram_r(%d) => %02x pc(%08x)\n", offset, data, m_maincpu->pc());
 
 	// kick it up to top 4 bits
 	return data << 4;
 }
 void tek440x_state::nvram_w(offs_t offset, u8 data)
 {
-	LOG("nvram_w(%d) <= %02x\n",offset, data);
+	LOG("nvram_w(%d) <= %02x\n", offset, data);
 
 	// duplicate in lower 4 bits
 	m_novram->write(offset, data | (data >> 4));
 }
 	
-uint8_t tek440x_state::recall_r()
+u8 tek440x_state::recall_r()
 {
 	LOG("recall_r\n");
 	if (!machine().side_effects_disabled())
@@ -354,14 +354,14 @@ uint8_t tek440x_state::recall_r()
 	return 0xff;
 }
 
-void tek440x_state::recall_w(uint8_t data)
+void tek440x_state::recall_w(u8 data)
 {
 	LOG("recall_w\n");
 	m_novram->recall(1);
 	m_novram->recall(0);
 }
 
-uint8_t tek440x_state::store_r()
+u8 tek440x_state::store_r()
 {
 	LOG("store_r\n");
 	if (!machine().side_effects_disabled())
@@ -394,6 +394,7 @@ void tek440x_state::physical_map(address_map &map)
 	// 700000-71ffff spare 0
 	// 720000-73ffff spare 1
 	map(0x740000, 0x747fff).rom().mirror(0x8000).region("maincpu", 0);
+	// maps 128 address range to nvram (see p2.8-3)
 	// 721000-72107f net ram
 	map(0x721000, 0x7210ff).rw(FUNC(tek440x_state::nvram_r), FUNC(tek440x_state::nvram_w));
 	// 722000-722fff nvram nybbles
