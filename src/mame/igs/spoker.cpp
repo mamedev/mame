@@ -217,8 +217,8 @@ public:
 		m_ymsnd(*this, "ymsnd")
 	{ }
 
-	void jinhuang(machine_config &config)ATTR_COLD;
-	void jinhulu2(machine_config &config)ATTR_COLD;
+	void jinhuang(machine_config &config) ATTR_COLD;
+	void jinhulu2(machine_config &config) ATTR_COLD;
 
 	void init_dafuwng3() ATTR_COLD;
 	void init_dahuangg() ATTR_COLD;
@@ -429,7 +429,7 @@ void spoker_state::nmi_and_coins_w(uint8_t data)
 	if (data & 0x22)
 	{
 		logerror("%s: nmi_and_coins = %02x\n", machine().describe_context(), data);
-//      popmessage("%02x", data);
+		//popmessage("%02x", data);
 	}
 
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));   // coin_a
@@ -439,7 +439,7 @@ void spoker_state::nmi_and_coins_w(uint8_t data)
 
 	m_leds[6] = BIT(data, 6);   // led for coin out / hopper active
 
-	if ((!m_nmi_ack) && BIT(data, 7))
+	if (!m_nmi_ack && BIT(data, 7))
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	m_nmi_ack = BIT(data, 7);     // nmi acknowledge, 0 -> 1
@@ -478,7 +478,7 @@ void spokeru_state::nmi_video_leds_w(uint8_t data)
 	m_leds[4] = BIT(data, 0); // start?
 	m_leds[5] = BIT(data, 2); // l_bet?
 
-	if ((!m_nmi_ack) && BIT(data, 5))
+	if (!m_nmi_ack && BIT(data, 5))
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	m_nmi_ack = BIT(data, 5);     // NMI acknowledge, 0 -> 1
@@ -495,7 +495,7 @@ void jinhulu2_state::nmi_w(uint8_t data)
 	if (data & 0xef)
 		logerror("nmi_w: %02x\n", data & 0xef);
 
-	if ((!m_nmi_ack) && BIT(data, 4))
+	if (!m_nmi_ack && BIT(data, 4))
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	m_nmi_ack = BIT(data, 4);     // NMI acknowledge, 0 -> 1
@@ -528,7 +528,7 @@ void spoker_state::magic_w(offs_t offset, uint8_t data)
 			break;
 
 		default:
-//          popmessage("magic %x <- %04x", m_igs_magic[0], data);
+			//popmessage("magic %x <- %04x", m_igs_magic[0], data);
 			logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_igs_magic[0], data);
 	}
 }
