@@ -3,7 +3,7 @@
 
 #include "emu.h"
 
-#include "cpu/mylife/mylife.h"
+#include "cpu/edsp/edsp.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -53,8 +53,7 @@ INPUT_PORTS_END
 
 void mylife_state::mylife(machine_config &config)
 {
-	// unknown main CPU
-	mylife_cpu_device &maincpu(MYLIFE_CPU(config, "maincpu", 10'000'000));
+	emg2000a_device &maincpu(EMG2000A(config, "maincpu", 27'000'000));
 	maincpu.set_addrmap(AS_PROGRAM, &mylife_state::prog_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
