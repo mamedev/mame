@@ -17,10 +17,6 @@
  * harddisk, tape at -scsi:7 tape), reproducing the MiniBus address-latch protocol;
  * this boots UNIX System V to single user.
  *
- * A faster but less faithful high-level (HLE) I/O processor -- the Z80 held suspended with
- * the host mailbox serviced in software against the same nscsi disk/tape -- is selectable in
- * the Machine Configuration menu ("I/O Processor").  The default is the faithful LLE Z80 IOP.
- *
  * TODO:
  *  - configurable ram size (1M, 2M, 4M, 8M)
  */
@@ -45,12 +41,6 @@
 #include "bus/nscsi/tape.h"
 #include "machine/nscsi_bus.h"
 
-// the HLE I/O processor accesses the nscsi disk/tape images directly
-#include "imagedev/harddriv.h"
-#include "imagedev/simh_tape_image.h"
-#include "util/tape_file_interface.h"
-#include "multibyte.h"
-
 #define LOG_PARITY (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL|LOG_PARITY)
@@ -73,10 +63,7 @@ public:
 		, m_iop(*this, "iop")
 		, m_scsi(*this, "ncr5385")
 		, m_scsibus(*this, "scsi")
-		, m_hle_disk(*this, "scsi:1:harddisk")
-		, m_hle_tape(*this, "scsi:7:tape")
 		, m_led(*this, "led%u", 1U)
-		, m_iopcfg(*this, "IOPCFG")
 		, m_boot(*this, "boot")
 	{
 	}
@@ -115,16 +102,6 @@ protected:
 	template <unsigned Source> void iop_int(int state);
 	void scsi_dreq_w(int state); // MiniBus DMA engine: '646 byte<->main-mem word mover
 
-	// HLE (simulated) SCSI I/O processor
-	void hle_start_io(u8 cmd);
-	TIMER_CALLBACK_MEMBER(hle_complete);
-	u8 hle_tape(u8 const *cdb, u32 dataptr, u32 tptptr, u32 length, u8 &chanstatus);
-	// translate a transfer offset to a physical byte address.  Buffered I/O has
-	// tptptr==0 and a flat dataptr; raw (B_PHYS) I/O has tptptr = phys addr of the
-	// user buffer's NS32082 PTE array (512-byte pages) with dataptr = offset within
-	// the first page -- walk the page table to scatter/gather (do_scsi in io/scsi.c).
-	u32 hle_xlate(u32 dataptr, u32 tptptr, u32 off);
-
 private:
 	required_device<ns32016_device> m_cpu;
 	required_device<ns32081_device> m_fpu;
@@ -138,18 +115,8 @@ private:
 	required_device<z80_device> m_iop;
 	required_device<ncr5385_device> m_scsi;
 	required_device<nscsi_bus_device> m_scsibus;
-	optional_device<nscsi_harddisk_device> m_hle_disk; // scsi:1 disk, accessed directly by the HLE
-	optional_device<nscsi_tape_device> m_hle_tape;     // scsi:7 tape, accessed directly by the HLE
 
 	output_finder<5> m_led;
-
-	required_ioport m_iopcfg;     // machine-config: 0=HLE (simulated IOP), 1=LLE (Z80 IOP)
-	bool m_hle = false;           // resolved from m_iopcfg at machine_reset (default LLE)
-
-	// HLE I/O-processor state
-	emu_timer *m_hle_timer = nullptr; // allocated in machine_start
-	u8 m_hle_cmd;
-	u8 m_hle_tape_sense; // pending tape sense byte2 (filemark/EOM flags)
 
 	memory_view m_boot;
 	memory_passthrough_handler m_boot_mph;
@@ -178,21 +145,17 @@ private:
 	u8 m_iop_sts;
 	u8 m_iop_vec;
 	// iop<->host main-memory DMA bridge state
-	u32 m_iop_base;     // cpt base byte-address latched from host cmd-00 + 3 bytes (HLE)
-	u8  m_iop_basecnt;  // countdown while capturing the 3 base bytes (HLE)
-	u32 m_iop_waddr;    // bridge word-address counter (byte addr = waddr << 1)
-	u8  m_iop_hipage;   // U76 page latch (A16-23), loaded from C012 by the NMI handler
-	u8  m_u44;          // U44 low address counter (AD01-08), loaded from C010
-	u8  m_u59;          // U59 high address latch (AD09-15), from C011 by the NMI handler
-	bool m_dma_hi;      // '646 (U60/U61) byte lane: false=DMALODAT, true=DMAHIDAT
+	u32 m_iop_waddr; // bridge word-address counter (byte addr = waddr << 1)
+	u8 m_iop_hipage; // U76 page latch (A16-23), loaded from C012 by the NMI handler
+	u8 m_u44; // U44 low address counter (AD01-08), loaded from C010
+	u8 m_u59; // U59 high address latch (AD09-15), from C011 by the NMI handler
+	bool m_dma_hi; // '646 (U60/U61) byte lane: false=DMALODAT, true=DMAHIDAT
 	bool m_iop_cmd_pending; // C011 bit 0x40: host command waiting to be read
-	u8   m_iop_wlow;        // low byte stashed by a C016 main-mem write
-	bool m_iop_wpending;    // a C016 write is awaiting its C017 high byte
+	u8 m_iop_wlow; // low byte stashed by a C016 main-mem write
+	bool m_iop_wpending; // a C016 write is awaiting its C017 high byte
 	// resolved handle to the 32016 program space for the '646 DMA byte mover and the
 	// C012-C017 word ports; avoids a space lookup on every DREQ.  Resolved in machine_start.
 	memory_access<24, 1, 0, ENDIANNESS_LITTLE>::specific m_dma_space;
-	// console (DUART1 ch B) 8N1-force
-	u8    m_con_mrptr;        // shadow of the channel MR pointer (0=MR1, 1=MR2)
 
 	u16 m_nmi_state;      // non-maskable interrupt status register
 
@@ -217,8 +180,6 @@ void icm3216_state::machine_start()
 	save_item(NAME(m_iop_cmd));
 	save_item(NAME(m_iop_sts));
 	save_item(NAME(m_iop_vec));
-	save_item(NAME(m_iop_base));
-	save_item(NAME(m_iop_basecnt));
 	save_item(NAME(m_iop_waddr));
 	save_item(NAME(m_iop_hipage));
 	save_item(NAME(m_u44));
@@ -227,9 +188,6 @@ void icm3216_state::machine_start()
 	save_item(NAME(m_iop_cmd_pending));
 	save_item(NAME(m_iop_wlow));
 	save_item(NAME(m_iop_wpending));
-	save_item(NAME(m_hle_cmd));
-	save_item(NAME(m_hle_tape_sense));
-	save_item(NAME(m_con_mrptr));
 	save_item(NAME(m_nmi_state));
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_parity_enable));
@@ -238,50 +196,13 @@ void icm3216_state::machine_start()
 	save_item(NAME(m_parity_count));
 
 	save_pointer(NAME(m_parity), RAM_SIZE);
-
-	m_hle_timer = timer_alloc(FUNC(icm3216_state::hle_complete), this);
-
-	// HACK: the kernel switches the console DUART (DUART1 ch B, regs 0x08-0x0b at 0xa00050-
-	// 0xa00056) to 7E1 once it goes interrupt-driven.  Real hardware ran a 7E1 terminal, but
-	// MAME's built-in terminal can't display 7E1, so pin the framing back to 8N1 to keep the
-	// console usable.  This is a host-terminal workaround, not an scn2681 emulation bug.
-	m_cpu->space(0).install_write_tap(0xa0'0050, 0xa0'0057, "icm_console",
-		[this](offs_t a, u16 &data, u16 mem_mask)
-		{
-			if (!(mem_mask & 0x00ff))
-				return;
-			u8 b = data & 0xff;
-			switch ((a - 0xa0'0050) >> 1)
-			{
-			case 0: // MR1B / MR2B (MR pointer selects which)
-				if (m_con_mrptr == 0) { b = (b & 0xe0) | 0x13; m_con_mrptr = 1; } // 8 bits, no parity
-				else                    b &= 0xf3;                                 // 1 stop bit
-				data = (data & 0xff00) | b;
-				break;
-			case 2: // CRB: command 1 (bits 6:4 = 001) resets the MR pointer to MR1
-				if (((b >> 4) & 7) == 1)
-					m_con_mrptr = 0;
-				break;
-			}
-		});
-	// reads of MR also advance the device's MR pointer -- keep the shadow in sync
-	m_cpu->space(0).install_read_tap(0xa0'0050, 0xa0'0051, "icm_console_mr",
-		[this](offs_t, u16 &, u16)
-		{
-			if (!machine().side_effects_disabled() && m_con_mrptr == 0)
-				m_con_mrptr = 1;
-		});
 }
 
 void icm3216_state::machine_reset()
 {
-	m_hle = !BIT(m_iopcfg->read(), 0); // IOPCFG: 0 = HLE, 1 = LLE (default)
-
 	m_iop_cmd = 0;
 	m_iop_sts = 0;
 	m_iop_vec = 0;
-	m_iop_base = 0;
-	m_iop_basecnt = 0;
 	m_iop_waddr = 0;
 	m_iop_hipage = 0;
 	m_u44 = 0;
@@ -290,8 +211,6 @@ void icm3216_state::machine_reset()
 	m_iop_cmd_pending = false;
 	m_iop_wlow = 0;
 	m_iop_wpending = false;
-	m_hle_cmd = 0;
-	m_hle_tape_sense = 0;
 
 	m_boot.select(0);
 
@@ -304,12 +223,6 @@ void icm3216_state::machine_reset()
 				m_boot_mph.remove();
 			}
 		});
-
-	// HLE: hold the Z80 I/O processor in suspension so it doesn't run the
-	// firmware or drive the (now-bypassed) NCR5385; the host mailbox is serviced
-	// directly in software (iop_w -> hle_start_io).
-	if (m_hle)
-		m_iop->suspend(SUSPEND_REASON_DISABLE, true);
 
 	m_duart[0]->ip6_w(1); // IP6 = J4-3 SINGLE STEP input (N.O. switch + ~5K pull-up): idle = high
 
@@ -325,8 +238,6 @@ void icm3216_state::machine_reset()
 		wbcd(0x0a, t.month);                 // 0-based -> kernel's tm_mon
 		wbcd(0x0c, (t.year - 1970) % 100);   // years-since-1970 -> kernel 1970+nn
 	}
-
-	m_con_mrptr = 0; // channel MR pointer points to MR1 after reset
 
 	m_nmi_state = 0;
 
@@ -395,13 +306,6 @@ void icm3216_state::iop_pio_map(address_map &map)
 }
 
 static INPUT_PORTS_START(icm3216)
-	// Selects how the SCSI I/O processor is emulated.  Default = LLE: the real Z80 IOP firmware
-	// drives the NCR5385 over the nscsi bus.  HLE holds the Z80 suspended and services the host
-	// mailbox in software against the same nscsi disk (scsi:1) / tape (scsi:7).  Machine Config menu.
-	PORT_START("IOPCFG")
-	PORT_CONFNAME(0x01, 0x01, "I/O Processor")
-	PORT_CONFSETTING(   0x00, "Simulated (HLE)")
-	PORT_CONFSETTING(   0x01, "Emulated Z80 (LLE)")
 INPUT_PORTS_END
 
 static void scsi_devices(device_slot_interface &device)
@@ -661,32 +565,6 @@ void icm3216_state::iop_w(u8 data)
 	 *  0x2n   abort i/o subchannel n
 	 */
 	LOG("iop_w 0x%02x (%s)\n", data, machine().describe_context());
-	// snoop the "write command pointer table" sequence (cmd 0x00 followed by 3
-	// base-address bytes, LSB first) and latch the cpt base. Bill's bridge uses this
-	// base to supply the high address bits; the IOP then streams by writing only the
-	// low byte to C010.
-	if (m_iop_basecnt)
-	{
-		m_iop_base |= u32(data) << (8 * (3 - m_iop_basecnt));
-		m_iop_basecnt--;
-	}
-	else
-	{
-		if (data == 0x00)
-		{
-			m_iop_base = 0;
-			m_iop_basecnt = 3;
-		}
-	}
-	if (m_hle)
-	{
-		// HLE: service the mailbox in software, bypassing the Z80 + ncr5385.
-		// During the 3-byte base capture (m_iop_basecnt was just decremented) there is
-		// no command to run; otherwise dispatch the command.
-		if (!m_iop_basecnt && data != 0x00)
-			hle_start_io(data);
-		return;
-	}
 
 	m_iop_cmd = data;
 	m_iop_cmd_pending = true; // C011 bit 0x40 -> IOP command poll @0x032e
@@ -694,351 +572,6 @@ void icm3216_state::iop_w(u8 data)
 	m_iop_sts |= IOP_BSY;
 
 	iop_int<1>(1);
-}
-
-// HLE (simulated) SCSI I/O processor ----------------------------------------
-// Host writes a mailbox command (0x1n = start i/o on subchannel n).  We latch it,
-// raise BSY, and complete after a short delay -- the host polls iop_r() for BSY to
-// clear.  The real work (read the iocb from 32016 memory, run the SCSI command
-// against the disk image, write results + status back) happens in hle_complete().
-void icm3216_state::hle_start_io(u8 cmd)
-{
-	switch (cmd & 0xf0)
-	{
-	case 0x10: // start i/o on subchannel (cmd & 0x0f)
-		m_hle_cmd = cmd;
-		m_iop_sts |= IOP_BSY;
-		m_hle_timer->adjust(attotime::from_usec(50)); // mimic IOP latency
-		break;
-	case 0x00:
-		if (cmd == 0x01) // acknowledge interrupt -> clear completion flags
-			m_iop_sts &= ~(IOP_IRS | IOP_IID);
-		else             // 0x02/0x03/0x05 resets
-			m_iop_sts &= ~(IOP_BSY | IOP_IRS | IOP_IID);
-		m_icu->ir_w<13>(0); // drop the SCSI completion interrupt
-		break;
-	default: // 0x2n abort etc.
-		m_iop_sts &= ~IOP_BSY;
-		break;
-	}
-}
-
-u32 icm3216_state::hle_xlate(u32 dataptr, u32 tptptr, u32 off)
-{
-	if (!tptptr)
-		return dataptr + off; // buffered: flat physical address
-	// raw (B_PHYS): dataptr is the offset within the first buffer page; tptptr points
-	// at the user buffer's PTE array.  Pages are 512 bytes; physical page = PTE & PFNMASK.
-	address_space &m = m_cpu->space(0);
-	u32 const pos = dataptr + off;
-	offs_t const ptea = tptptr + (pos >> 9) * 4; // 4-byte PTEs, 512-byte pages
-	u32 const pte = u32(m.read_byte(ptea)) | (u32(m.read_byte(ptea + 1)) << 8)
-		| (u32(m.read_byte(ptea + 2)) << 16) | (u32(m.read_byte(ptea + 3)) << 24);
-	return (pte & 0xfffe00u) | (pos & 0x1ff); // PFNMASK | in-page offset
-}
-
-TIMER_CALLBACK_MEMBER(icm3216_state::hle_complete)
-{
-	address_space &m = m_cpu->space(0);
-	auto rd32 = [&m](offs_t a) -> u32 {
-		return u32(m.read_byte(a)) | (u32(m.read_byte(a + 1)) << 8)
-			| (u32(m.read_byte(a + 2)) << 16) | (u32(m.read_byte(a + 3)) << 24);
-	};
-
-	unsigned const sub = m_hle_cmd & 0x0f;
-	u32 const iocb = rd32(m_iop_base + sub * 4); // cpt[sub] -> iocb pointer (LE)
-	u8 const idbyte = m.read_byte(iocb + 1);
-	unsigned const devid = (idbyte >> 4) & 7;
-	unsigned const lun = idbyte & 7;
-	u8 cdb[12];
-	for (int i = 0; i < 12; i++)
-		cdb[i] = m.read_byte(iocb + 2 + i);
-	u32 const dataptr = rd32(iocb + 16);
-	u32 const tptptr = rd32(iocb + 20); // raw-I/O page-table pointer (0 = buffered/flat)
-	u32 const length = rd32(iocb + 24);
-
-	u8 status = 0x00;     // SCSI status byte (00 = GOOD)
-	u8 chanstatus = 0x00; // IOP channel status (00 = OK)
-
-	auto put = [&](u32 off, u8 v) { m.write_byte(hle_xlate(dataptr, tptptr, off), v); };
-	auto get = [&](u32 off) -> u8 { return m.read_byte(hle_xlate(dataptr, tptptr, off)); };
-
-	u8 block[2048];
-
-	// SCSI target IDs (devid == SCSI id; kernel scsi.h UNIT_TO_CHAN = unit>>2): the
-	// initiator (NCR5385) is strapped to id 0, the root disk is id 1, and the tape is
-	// id 7 (per the ICM manual -- Unix's /dev/rmt minor 224 -> channel 7).
-	if (devid == 7 && lun == 0 && m_hle_tape && m_hle_tape->image()->get_file())
-	{
-		status = hle_tape(cdb, dataptr, tptptr, length, chanstatus);
-	}
-	else if (!(devid == 1 && lun == 0 && m_hle_disk && m_hle_disk->image->exists()))
-	{
-		// no device at this address: selection failure (encoding TBD, empirical)
-		status = 0x02;
-		chanstatus = 0x10;
-	}
-	else
-	{
-	u32 const secbytes = m_hle_disk->image->get_info().sectorbytes ? m_hle_disk->image->get_info().sectorbytes : 512;
-	switch (cdb[0])
-	{
-	case 0x00: // TEST UNIT READY
-	case 0x01: // REZERO UNIT (recalibrate) -- no-op for a disk image. The
-		   // standalone monitor's _dcopen() (lib/libb2/dc.c) issues this
-		   // before reading the block0 label; the kernel never did, which
-		   // is why it wasn't needed until V1.283.
-		break;
-
-	case 0x12: // INQUIRY
-	{
-		std::vector<u8> inq;
-		m_hle_disk->image->get_inquiry_data(inq);
-		u8 buf[96];
-		std::fill_n(buf, sizeof(buf), 0);
-		buf[0] = 0x00; // direct-access device
-		buf[1] = 0x00; // not removable
-		buf[2] = 0x02; // SCSI-2
-		buf[3] = 0x02;
-		buf[4] = 0x1f; // additional length
-		std::fill_n(buf + 8, 28, u8(' '));
-		if (!inq.empty())
-			std::copy_n(inq.begin(), std::min<size_t>(inq.size(), 28), buf + 8);
-		else
-			std::memcpy(buf + 8, "NSC     ICM-3216 HLE   ", 23);
-		u32 const n = std::min<u32>(length, 36);
-		for (u32 i = 0; i < n; i++) put(i, buf[i]);
-		break;
-	}
-
-	case 0x25: // READ CAPACITY (10)
-	{
-		auto const &info = m_hle_disk->image->get_info();
-		u32 const last = info.cylinders * info.heads * info.sectors - 1;
-		put(0, last >> 24); put(1, last >> 16); put(2, last >> 8); put(3, last);
-		put(4, info.sectorbytes >> 24); put(5, info.sectorbytes >> 16);
-		put(6, info.sectorbytes >> 8); put(7, info.sectorbytes);
-		break;
-	}
-
-	case 0x08: // READ (6)
-	case 0x28: // READ (10)
-	{
-		u32 lba, blocks;
-		if (cdb[0] == 0x08) { lba = (u32(cdb[1] & 0x1f) << 16) | (cdb[2] << 8) | cdb[3]; blocks = cdb[4] ? cdb[4] : 256; }
-		else { lba = (u32(cdb[2]) << 24) | (cdb[3] << 16) | (cdb[4] << 8) | cdb[5]; blocks = (cdb[7] << 8) | cdb[8]; }
-		for (u32 b = 0; b < blocks; b++)
-		{
-			if (!m_hle_disk->image->read(lba + b, block)) { status = 0x02; break; }
-			for (u32 i = 0; i < secbytes; i++) put(b * secbytes + i, block[i]);
-		}
-		break;
-	}
-
-	case 0x0a: // WRITE (6)
-	case 0x2a: // WRITE (10)
-	{
-		u32 lba, blocks;
-		if (cdb[0] == 0x0a) { lba = (u32(cdb[1] & 0x1f) << 16) | (cdb[2] << 8) | cdb[3]; blocks = cdb[4] ? cdb[4] : 256; }
-		else { lba = (u32(cdb[2]) << 24) | (cdb[3] << 16) | (cdb[4] << 8) | cdb[5]; blocks = (cdb[7] << 8) | cdb[8]; }
-		for (u32 b = 0; b < blocks; b++)
-		{
-			for (u32 i = 0; i < secbytes; i++) block[i] = get(b * secbytes + i);
-			if (!m_hle_disk->image->write(lba + b, block)) { status = 0x02; break; }
-		}
-		break;
-	}
-
-	case 0x03: // REQUEST SENSE
-	{
-		u8 buf[18];
-		std::fill_n(buf, sizeof(buf), 0);
-		buf[0] = 0x70; // current errors, valid
-		buf[7] = 10;   // additional sense length
-		u32 const n = std::min<u32>(length, 18);
-		for (u32 i = 0; i < n; i++) put(i, buf[i]);
-		break;
-	}
-
-	case 0x1a: // MODE SENSE (6) -- minimal header
-	{
-		u8 buf[4] = { 3, 0, 0, 0 };
-		u32 const n = std::min<u32>(length, 4);
-		for (u32 i = 0; i < n; i++) put(i, buf[i]);
-		break;
-	}
-
-	case 0x15: // MODE SELECT -- accept (image geometry is fixed)
-	case 0x04: // FORMAT UNIT -- the CHD is already a formatted image
-		break;
-
-	default:
-		status = 0x02; // CHECK CONDITION
-		break;
-	}
-	} // end disk command set
-
-	m.write_byte(iocb + 14, status);     // iocb.status
-	m.write_byte(iocb + 15, chanstatus); // iocb.chanstatus
-
-	// completion: clear BSY, raise interrupt-request with the subchannel id.  The
-	// host polls iop_r() for IRS (the monitor) and/or takes the interrupt (the
-	// kernel's scsiintr).  Acks with mailbox cmd 0x01.
-	m_iop_sts = u8((m_iop_sts & ~IOP_BSY) | IOP_IRS | (sub & IOP_IID));
-
-	// signal the SCSI completion on NS32202 input 13 (ICU_SCSI=0x2000, per
-	// buts/ns32000/sys/icu.h). The kernel programs IR13 edge-triggered and
-	// active-low (ELTG bit13=0, TPL bit13=0), so a steady level never latches --
-	// the ICU recognizes only a high->low edge. Pulse it; the falling edge sets
-	// IPND bit 13 (cleared by the CPU's interrupt-acknowledge). The monitor is
-	// unaffected -- it polls iop_r() for IRS rather than taking the interrupt.
-	m_icu->ir_w<13>(1);
-	m_icu->ir_w<13>(0);
-}
-
-// HLE SCSI tape (devid 6) command set, against the owned SIMH .tap image.
-// Returns the SCSI status byte; sets chanstatus for filemark/EOM conditions.
-u8 icm3216_state::hle_tape(u8 const *cdb, u32 dataptr, u32 tptptr, u32 length, u8 &chanstatus)
-{
-	address_space &m = m_cpu->space(0);
-	tape_file_interface *tf = m_hle_tape->image()->get_file();
-	auto put = [&](u32 off, u8 v) { m.write_byte(hle_xlate(dataptr, tptptr, off), v); };
-	auto get = [&](u32 off) -> u8 { return m.read_byte(hle_xlate(dataptr, tptptr, off)); };
-	u32 const blocklen = 512; // fixed block length
-	u8 status = 0x00;
-
-	switch (cdb[0])
-	{
-	case 0x00: // TEST UNIT READY
-		break;
-
-	case 0x01: // REWIND
-		tf->rewind(false);
-		break;
-
-	case 0x12: // INQUIRY -- sequential-access (tape) device
-	{
-		u8 buf[36];
-		std::fill_n(buf, sizeof(buf), 0);
-		buf[0] = 0x01; // sequential-access device
-		buf[1] = 0x80; // removable
-		buf[2] = 0x02; // SCSI-2
-		buf[3] = 0x02;
-		buf[4] = 0x1f;
-		std::fill_n(buf + 8, 28, u8(' '));
-		std::memcpy(buf + 8, "NSC     ICM-3216 HLE TAPE", 25);
-		u32 const n = std::min<u32>(length, 36);
-		for (u32 i = 0; i < n; i++) put(i, buf[i]);
-		break;
-	}
-
-	case 0x03: // REQUEST SENSE -- report a pending filemark/EOM if any
-	{
-		u8 buf[18];
-		std::fill_n(buf, sizeof(buf), 0);
-		buf[0] = 0x70;              // current errors, valid
-		buf[2] = m_hle_tape_sense;  // EOM(0x40)/FILEMARK(0x80) + sense key
-		buf[7] = 10;
-		u32 const n = std::min<u32>(length, 18);
-		for (u32 i = 0; i < n; i++) put(i, buf[i]);
-		m_hle_tape_sense = 0;
-		break;
-	}
-
-	case 0x05: // READ BLOCK LIMITS
-		put(0, 0);
-		put(1, 0); put(2, blocklen >> 8); put(3, blocklen & 0xff); // max block len
-		put(4, blocklen >> 8); put(5, blocklen & 0xff);            // min block len
-		break;
-
-	case 0x08: // READ (6)
-	{
-		bool const fixed = cdb[1] & 0x01;
-		u32 const count = get_u24be(&cdb[2]);
-		u8 buf[2048];
-		if (fixed)
-		{
-			for (u32 b = 0; b < count; b++)
-			{
-				auto const [st, len] = tf->read_block(buf, blocklen);
-				bool const fm = (st == tape_status::FILEMARK || st == tape_status::FILEMARK_EW);
-				bool const eod = (st == tape_status::EOD || st == tape_status::EOM);
-				if (fm || eod)
-				{
-					status = 0x02;
-					chanstatus = fm ? 0x01 : 0x02;
-					m_hle_tape_sense = fm ? 0x80 : 0x40;
-					// zero-fill the unread remainder of the requested transfer so a
-					// partition-sized copy past a short tape file matches a clean
-					// (formatted, zeroed) disk rather than leaving stale buffer data.
-					for (u32 z = b; z < count; z++)
-						for (u32 i = 0; i < blocklen; i++) put(z * blocklen + i, 0);
-					break;
-				}
-				for (u32 i = 0; i < len && i < blocklen; i++) put(b * blocklen + i, buf[i]);
-			}
-		}
-		else // variable: one record of up to `count` bytes
-		{
-			u32 const want = std::min<u32>(count, sizeof(buf));
-			auto const [st, len] = tf->read_block(buf, want);
-			for (u32 i = 0; i < len; i++) put(i, buf[i]);
-			if (st == tape_status::FILEMARK || st == tape_status::FILEMARK_EW)
-			{ chanstatus = 0x01; m_hle_tape_sense = 0x80; }
-			else if (st == tape_status::EOD || st == tape_status::EOM)
-			{ chanstatus = 0x02; m_hle_tape_sense = 0x40; }
-		}
-		break;
-	}
-
-	case 0x11: // SPACE
-	{
-		u8 const type = cdb[1] & 0x07; // 0=blocks 1=filemarks 3=EOD
-		s32 count = s32(get_u24be(&cdb[2]));
-		if (count & 0x00800000) count |= ~0x00ffffff; // sign-extend 24-bit
-		if (type == 1)
-			(count >= 0) ? (void)tf->space_filemarks(count) : (void)tf->space_filemarks_reverse(-count);
-		else if (type == 0)
-			(count >= 0) ? (void)tf->space_blocks(count) : (void)tf->space_blocks_reverse(-count);
-		else if (type == 3)
-			tf->space_eod();
-		break;
-	}
-
-	case 0x0a: // WRITE (6)
-	{
-		bool const fixed = cdb[1] & 0x01;
-		u32 const count = get_u24be(&cdb[2]);
-		u8 buf[2048];
-		if (fixed)
-			for (u32 b = 0; b < count; b++)
-			{
-				for (u32 i = 0; i < blocklen; i++) buf[i] = get(b * blocklen + i);
-				tf->write_block(buf, blocklen);
-			}
-		else
-		{
-			u32 const n = std::min<u32>(count, sizeof(buf));
-			for (u32 i = 0; i < n; i++) buf[i] = get(i);
-			tf->write_block(buf, n);
-		}
-		break;
-	}
-
-	case 0x10: // WRITE FILEMARKS
-		tf->write_filemarks(get_u24be(&cdb[2]));
-		break;
-
-	case 0x1a: // MODE SENSE
-	case 0x15: // MODE SELECT
-		break;
-
-	default:
-		status = 0x02;
-		break;
-	}
-
-	return status;
 }
 
 // iop<->host mailbox + main-memory DMA bridge (c010-c017).
