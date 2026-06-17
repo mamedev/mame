@@ -36,8 +36,8 @@ The BCS is a box that can be used to convert over 300 floppy-disk formats.
 ***************************************************************************
 
 
-To Do: Everything.
-Status: Just a closet skeleton
+To Do: FDC card, Centronics card, EIC card, Experimenter board, video RAM visibility, keyboard
+Status: Video works, otherwise skeleton
 
 
 ***************************************************************************/
@@ -96,7 +96,7 @@ private:
 	required_device<z80pio_device> m_pio;
 	required_device<z80dart_device> m_dart;
 	required_device<mc6845_device> m_crtc;
-	required_region_ptr<u8> m_p_chargen;
+	required_region_ptr<uint8_t> m_p_chargen;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_colorram;
 	required_device<palette_device> m_palette;
@@ -212,10 +212,10 @@ void elzet80_state::elzet80(machine_config &config)
 	rs232b.dcd_handler().set(m_dart, FUNC(z80dart_device::dcdb_w));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(8_MHz_XTAL, 512, 0, 320, 326, 0, 240);
+	m_screen->set_raw(15_MHz_XTAL, 512, 0, 320, 326, 0, 240);
 	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 
-	MC6845(config, m_crtc, 4_MHz_XTAL);
+	MC6845(config, m_crtc, 15_MHz_XTAL);
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
