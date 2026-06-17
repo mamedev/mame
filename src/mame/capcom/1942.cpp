@@ -35,7 +35,6 @@ c806      bit 0-1 ROM bank selector 00=1-N5.BIN
                                     10=1-N7.BIN
 
 
-
 SOUND CPU:
 
 0000-3fff ROM
@@ -45,7 +44,6 @@ SOUND CPU:
 8001      8910 #1 write
 c000      8910 #2 control
 c001      8910 #2 write
-
 
 
 Game runs in interrupt mode 0 (the devices supply the interrupt number).
@@ -58,6 +56,9 @@ correctly.
 0x08 is the sound card service interrupt. The game uses this to throw sounds
      at the sound CPU.
 
+
+TODO:
+- spriteram can only be written during vblank
 
 ***************************************************************************
 
@@ -215,6 +216,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(_1942_state::scanline)
 
 void _1942_state::_1942_map(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xc000).portr("SYSTEM");
@@ -228,7 +230,7 @@ void _1942_state::_1942_map(address_map &map)
 	map(0xc804, 0xc804).w(FUNC(_1942_state::control_w));
 	map(0xc805, 0xc805).w(FUNC(_1942_state::palette_bank_w));
 	map(0xc806, 0xc806).w(FUNC(_1942_state::bankswitch_w));
-	map(0xcc00, 0xcc7f).ram().share("spriteram");
+	map(0xcc00, 0xcc7f).writeonly().share("spriteram");
 	map(0xd000, 0xd7ff).ram().w(FUNC(_1942_state::fgvideoram_w)).share("fg_videoram");
 	map(0xd800, 0xdbff).ram().w(FUNC(_1942_state::bgvideoram_w)).share("bg_videoram");
 	map(0xe000, 0xefff).ram();

@@ -42,6 +42,10 @@ c001      AY-3-8910 #2 write
 
 All Clocks and Vsync verified by Corrado Tomaselli (August 2012)
 
+TODO:
+- spriteram can only be written during vblank
+- 1942iti sprite glitches
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -301,15 +305,12 @@ void vulgus_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
-		int const code = m_spriteram[offs];
+		int code = (m_spriteram[offs] & 0x7f) | (BIT(m_spriteram[offs + 1], 5) << 7) | (BIT(m_spriteram[offs], 7) << 8);
 		int const color = m_spriteram[offs + 1] & 0x0f;
 		int sy = m_spriteram[offs + 2];
-		int sx = m_spriteram[offs + 3];
+		int sx = m_spriteram[offs + 3] - (BIT(m_spriteram[offs + 1], 4) << 8);
 		bool const flip = flip_screen() ? true : false;
 		int dir = 1;
-
-		if (sy == 0)
-			continue;
 
 		if (flip)
 		{
@@ -318,12 +319,13 @@ void vulgus_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			dir = -1;
 		}
 
-		// draw sprite rows (16*16, 16*32, or 16*64)
-		int row = (m_spriteram[offs + 1] & 0xc0) >> 6;
-		if (row == 2) row = 3;
+		// draw sprite rows (16*16, 16*32, 16*64, or 16*256)
+		int const size = (m_spriteram[offs + 1] & 0xc0) >> 6;
+		int const row = (size == 3) ? 16 : (1 << size);
+		code &= ~(row - 1);
 
-		for (; row >= 0; row--)
-			gfx->transpen(bitmap, cliprect, code + row, color, flip, flip, sx, sy + 16 * row * dir, 15);
+		for (int i = 0; i < row; i++)
+			gfx->transpen(bitmap, cliprect, code + i, color, flip, flip, sx, sy + 16 * i * dir, 15);
 	}
 }
 
@@ -358,6 +360,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(vulgus_state::scanline)
 
 void vulgus_state::main_map(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x0000, 0x9fff).rom();
 	map(0xc000, 0xc000).portr("SYSTEM");
 	map(0xc001, 0xc001).portr("P1");
@@ -370,7 +373,7 @@ void vulgus_state::main_map(address_map &map)
 	map(0xc804, 0xc804).w(FUNC(vulgus_state::control_w));
 	map(0xc805, 0xc805).w(FUNC(vulgus_state::palette_bank_w));
 	map(0xc902, 0xc903).ram().share(m_scroll_high);
-	map(0xcc00, 0xcc7f).ram().share(m_spriteram);
+	map(0xcc00, 0xcc7f).writeonly().share(m_spriteram);
 	map(0xd000, 0xd7ff).ram().w(FUNC(vulgus_state::fgvideoram_w)).share(m_fgvideoram);
 	map(0xd800, 0xdfff).ram().w(FUNC(vulgus_state::bgvideoram_w)).share(m_bgvideoram);
 	map(0xe000, 0xefff).ram();
@@ -561,6 +564,7 @@ static const gfx_layout charlayout =
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
 	16*8
 };
+
 static const gfx_layout tilelayout =
 {
 	16,16,
@@ -573,6 +577,7 @@ static const gfx_layout tilelayout =
 			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
 	32*8
 };
+
 static const gfx_layout spritelayout =
 {
 	16,16,
@@ -656,11 +661,11 @@ ROM_START( vulgus ) // Board ID# 84602-01A-1
 	ROM_LOAD( "2-6a.bin",     0x08000, 0x2000, CRC(5a26b38f) SHA1(987a4844c4568a088932f43a3aff847e6d6b4860) )
 	ROM_LOAD( "2-7a.bin",     0x0a000, 0x2000, CRC(1e1ca773) SHA1(dbced07d4a886ed9ad3302aaa37bc02c599ee132) )
 
-	ROM_REGION( 0x08000, "sprites", 0 )
+	ROM_REGION( 0x10000, "sprites", ROMREGION_ERASEFF )
 	ROM_LOAD( "2-2n.bin",     0x00000, 0x2000, CRC(6db1b10d) SHA1(85bf67ce4d60b260767ba5fe9b9777f857937fe3) )
-	ROM_LOAD( "2-3n.bin",     0x02000, 0x2000, CRC(5d8c34ec) SHA1(7b7df89398bf83ace1a8c216ca8526beae90972d) )
-	ROM_LOAD( "2-4n.bin",     0x04000, 0x2000, CRC(0071a2e3) SHA1(3f7bb4658d2126576a0f8f46f2c947eec1cd231a) )
-	ROM_LOAD( "2-5n.bin",     0x06000, 0x2000, CRC(4023a1ec) SHA1(8b69b9cd6db37db94a00da8712413055a631186a) )
+	ROM_LOAD( "2-3n.bin",     0x04000, 0x2000, CRC(5d8c34ec) SHA1(7b7df89398bf83ace1a8c216ca8526beae90972d) )
+	ROM_LOAD( "2-4n.bin",     0x08000, 0x2000, CRC(0071a2e3) SHA1(3f7bb4658d2126576a0f8f46f2c947eec1cd231a) )
+	ROM_LOAD( "2-5n.bin",     0x0c000, 0x2000, CRC(4023a1ec) SHA1(8b69b9cd6db37db94a00da8712413055a631186a) )
 
 	ROM_REGION( 0x0100, "irqprom", 0 )
 	ROM_LOAD( "82s126.9k",    0x0000, 0x0100, CRC(32b10521) SHA1(10b258e32813cfa3a853cbd146657b11c08cb770) ) // interrupt timing
@@ -697,11 +702,11 @@ ROM_START( vulgusa )
 	ROM_LOAD( "2-6a.bin",     0x08000, 0x2000, CRC(5a26b38f) SHA1(987a4844c4568a088932f43a3aff847e6d6b4860) )
 	ROM_LOAD( "2-7a.bin",     0x0a000, 0x2000, CRC(1e1ca773) SHA1(dbced07d4a886ed9ad3302aaa37bc02c599ee132) )
 
-	ROM_REGION( 0x08000, "sprites", 0 )
+	ROM_REGION( 0x10000, "sprites", ROMREGION_ERASEFF )
 	ROM_LOAD( "2-2n.bin",     0x00000, 0x2000, CRC(6db1b10d) SHA1(85bf67ce4d60b260767ba5fe9b9777f857937fe3) )
-	ROM_LOAD( "2-3n.bin",     0x02000, 0x2000, CRC(5d8c34ec) SHA1(7b7df89398bf83ace1a8c216ca8526beae90972d) )
-	ROM_LOAD( "2-4n.bin",     0x04000, 0x2000, CRC(0071a2e3) SHA1(3f7bb4658d2126576a0f8f46f2c947eec1cd231a) )
-	ROM_LOAD( "2-5n.bin",     0x06000, 0x2000, CRC(4023a1ec) SHA1(8b69b9cd6db37db94a00da8712413055a631186a) )
+	ROM_LOAD( "2-3n.bin",     0x04000, 0x2000, CRC(5d8c34ec) SHA1(7b7df89398bf83ace1a8c216ca8526beae90972d) )
+	ROM_LOAD( "2-4n.bin",     0x08000, 0x2000, CRC(0071a2e3) SHA1(3f7bb4658d2126576a0f8f46f2c947eec1cd231a) )
+	ROM_LOAD( "2-5n.bin",     0x0c000, 0x2000, CRC(4023a1ec) SHA1(8b69b9cd6db37db94a00da8712413055a631186a) )
 
 	ROM_REGION( 0x0100, "irqprom", 0 )
 	ROM_LOAD( "82s126.9k",    0x0000, 0x0100, CRC(32b10521) SHA1(10b258e32813cfa3a853cbd146657b11c08cb770) ) // interrupt timing
@@ -738,11 +743,11 @@ ROM_START( vulgusj )
 	ROM_LOAD( "2-6a.bin",     0x08000, 0x2000, CRC(5a26b38f) SHA1(987a4844c4568a088932f43a3aff847e6d6b4860) )
 	ROM_LOAD( "2-7a.bin",     0x0a000, 0x2000, CRC(1e1ca773) SHA1(dbced07d4a886ed9ad3302aaa37bc02c599ee132) )
 
-	ROM_REGION( 0x08000, "sprites", 0 )
+	ROM_REGION( 0x10000, "sprites", ROMREGION_ERASEFF )
 	ROM_LOAD( "2-2n.bin",     0x00000, 0x2000, CRC(6db1b10d) SHA1(85bf67ce4d60b260767ba5fe9b9777f857937fe3) )
-	ROM_LOAD( "2-3n.bin",     0x02000, 0x2000, CRC(5d8c34ec) SHA1(7b7df89398bf83ace1a8c216ca8526beae90972d) )
-	ROM_LOAD( "2-4n.bin",     0x04000, 0x2000, CRC(0071a2e3) SHA1(3f7bb4658d2126576a0f8f46f2c947eec1cd231a) )
-	ROM_LOAD( "2-5n.bin",     0x06000, 0x2000, CRC(4023a1ec) SHA1(8b69b9cd6db37db94a00da8712413055a631186a) )
+	ROM_LOAD( "2-3n.bin",     0x04000, 0x2000, CRC(5d8c34ec) SHA1(7b7df89398bf83ace1a8c216ca8526beae90972d) )
+	ROM_LOAD( "2-4n.bin",     0x08000, 0x2000, CRC(0071a2e3) SHA1(3f7bb4658d2126576a0f8f46f2c947eec1cd231a) )
+	ROM_LOAD( "2-5n.bin",     0x0c000, 0x2000, CRC(4023a1ec) SHA1(8b69b9cd6db37db94a00da8712413055a631186a) )
 
 	ROM_REGION( 0x0100, "irqprom", 0 )
 	ROM_LOAD( "82s126.9k",    0x0000, 0x0100, CRC(32b10521) SHA1(10b258e32813cfa3a853cbd146657b11c08cb770) ) // interrupt timing
@@ -779,11 +784,11 @@ ROM_START( mach9 )
 	ROM_LOAD( "12_6a.bin",   0x08000, 0x2000, CRC(5a26b38f) SHA1(987a4844c4568a088932f43a3aff847e6d6b4860) )
 	ROM_LOAD( "13_7a.bin",   0x0a000, 0x2000, CRC(8033cd4f) SHA1(5eb2e5931e44ca6bf64117dd34e9b6072e6b0ffc) )
 
-	ROM_REGION( 0x08000, "sprites", 0 )
+	ROM_REGION( 0x10000, "sprites", ROMREGION_ERASEFF )
 	ROM_LOAD( "14_2n.bin",   0x00000, 0x2000, CRC(6db1b10d) SHA1(85bf67ce4d60b260767ba5fe9b9777f857937fe3) )
-	ROM_LOAD( "15_3n.bin",   0x02000, 0x2000, CRC(5d8c34ec) SHA1(7b7df89398bf83ace1a8c216ca8526beae90972d) )
-	ROM_LOAD( "16_4n.bin",   0x04000, 0x2000, CRC(0071a2e3) SHA1(3f7bb4658d2126576a0f8f46f2c947eec1cd231a) )
-	ROM_LOAD( "17_5n.bin",   0x06000, 0x2000, CRC(4023a1ec) SHA1(8b69b9cd6db37db94a00da8712413055a631186a) )
+	ROM_LOAD( "15_3n.bin",   0x04000, 0x2000, CRC(5d8c34ec) SHA1(7b7df89398bf83ace1a8c216ca8526beae90972d) )
+	ROM_LOAD( "16_4n.bin",   0x08000, 0x2000, CRC(0071a2e3) SHA1(3f7bb4658d2126576a0f8f46f2c947eec1cd231a) )
+	ROM_LOAD( "17_5n.bin",   0x0c000, 0x2000, CRC(4023a1ec) SHA1(8b69b9cd6db37db94a00da8712413055a631186a) )
 
 	ROM_REGION( 0x0100, "irqprom", 0 )
 	ROM_LOAD( "82s129_9k.bin",    0x0000, 0x0100, CRC(32b10521) SHA1(10b258e32813cfa3a853cbd146657b11c08cb770) ) // interrupt timing
