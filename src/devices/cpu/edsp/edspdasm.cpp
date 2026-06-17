@@ -203,24 +203,26 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 	}
 	else if ((op & 0xf81f) == 0x3808)
 	{
+		// ADD with imm16 to indirect destination
 		util::stream_format(stream, "[r%d] = r%d + #0x%04X", BIT(op, 8, 3), BIT(op, 5, 3), opcodes.r16(pc + 1));
 		return 2 | SUPPORTED;
 	}
 	else if ((op & 0xf81f) == 0x380a)
 	{
+		// SUB with imm16 to indirect destination
 		util::stream_format(stream, "[r%d] = r%d - #0x%04X", BIT(op, 8, 3), BIT(op, 5, 3), opcodes.r16(pc + 1));
 		return 2 | SUPPORTED;
 	}
 	else if ((op & 0xf81f) == 0x380c)
 	{
-		// AND with RAM16
-		util::stream_format(stream, "[r%d] = r%d AND 0x%04X", BIT(op, 8, 3), BIT(op, 5, 3), opcodes.r16(pc + 1));
+		// AND with imm16 to indirect destination
+		util::stream_format(stream, "[r%d] = r%d AND #0x%04X", BIT(op, 8, 3), BIT(op, 5, 3), opcodes.r16(pc + 1));
 		return 2 | SUPPORTED;
 	}
 	else if ((op & 0xf81f) == 0x380d)
 	{
-		// OR with RAM16
-		util::stream_format(stream, "[r%d] = r%d OR 0x%04X", BIT(op, 8, 3), BIT(op, 5, 3), opcodes.r16(pc + 1));
+		// OR with imm16 to indirect destination
+		util::stream_format(stream, "[r%d] = r%d OR #0x%04X", BIT(op, 8, 3), BIT(op, 5, 3), opcodes.r16(pc + 1));
 		return 2 | SUPPORTED;
 	}
 	else if ((op & 0xf81e) == 0x3810)
