@@ -86,7 +86,7 @@ public:
 		m_novram(*this, "novram"),
 		m_vint(*this, "vint"),
 		m_printer(*this, "printer"),
-		m_prom(*this, "maincpu"),
+		m_prom(*this, "bootrom"),
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram"),
 		m_map(*this, "map", 0x1000, ENDIANNESS_BIG),
