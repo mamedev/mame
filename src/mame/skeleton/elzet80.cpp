@@ -44,6 +44,7 @@ Status: Just a closet skeleton
 
 #include "emu.h"
 
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
 #include "machine/z80ctc.h"
@@ -64,8 +65,6 @@ public:
 	elzet80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_ctc(*this, "ctc")
-		, m_dma(*this, "dma")
 		, m_pio(*this, "pio")
 		, m_dart(*this, "uart")
 		, m_crtc(*this, "crtc")
@@ -94,8 +93,6 @@ private:
 
 	floppy_image_device *m_floppy = nullptr;
 	required_device<cpu_device> m_maincpu;
-	required_device<z80ctc_device> m_ctc;
-	required_device<z80dma_device> m_dma;
 	required_device<z80pio_device> m_pio;
 	required_device<z80dart_device> m_dart;
 	required_device<mc6845_device> m_crtc;
@@ -147,7 +144,7 @@ void elzet80_state::mem_map(address_map &map)
 void elzet80_state::io_map(address_map &map)
 {
 	map(0x00, 0x03).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0x04, 0x07).rw(m_dart, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
+	map(0x04, 0x07).rw(m_dart, FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
 	map(0x28, 0x28).nopw(); // toggle video memory access
 	map(0x29, 0x29).noprw(); // video card (unused)
 	map(0x2a, 0x2a).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
@@ -162,13 +159,13 @@ INPUT_PORTS_END
 static const gfx_layout elzet_charlayout =
 {
 	8, 12,                  /* 8 x 12 characters */
-	256,                    /* 128 characters */
+	256,                    /* 256 characters */
 	1,                      /* 1 bits per pixel */
 	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8  },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
 	8*16                    /* every char takes 16 bytes */
 };
 
@@ -198,10 +195,18 @@ void elzet80_state::elzet80(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &elzet80_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &elzet80_state::io_map);
 
-	Z80PIO(config, m_pio);
+	Z80PIO(config, m_pio, 4_MHz_XTAL);
 	Z80DART(config, m_dart, 6144000); // discrete oscillator
-	Z80CTC(config, m_ctc);
-	Z80DMA(config, m_dma);
+
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_dart, FUNC(z80dart_device::rxa_w));
+	rs232a.rxc_handler().set(m_dart, FUNC(z80dart_device::rxca_w));
+	rs232a.cts_handler().set(m_dart, FUNC(z80dart_device::ctsa_w));
+	rs232a.dcd_handler().set(m_dart, FUNC(z80dart_device::dcda_w));
+
+	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_dart, FUNC(z80dart_device::rxb_w));
+	rs232b.dcd_handler().set(m_dart, FUNC(z80dart_device::dcdb_w));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(8_MHz_XTAL, 512, 0, 320, 326, 0, 240);
