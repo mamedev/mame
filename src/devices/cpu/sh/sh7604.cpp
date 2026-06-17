@@ -1103,21 +1103,20 @@ void sh7604_device::vcrdiv_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 uint32_t sh7604_device::dvcr_r()
 {
-	return (m_divu_ovfie ? 2 : 0) | (m_divu_ovf ? 1 : 0);
+	return (m_divu_ovfie << 1) | (m_divu_ovf << 0);
 }
 
 void sh7604_device::dvcr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		if (data & 1)
-			m_divu_ovf = false;
-		if (data & 2)
-		{
-			m_divu_ovfie = BIT(data, 1);
-			if (m_divu_ovfie)
-				LOG("SH2: unemulated DIVU OVF interrupt enable\n");
-		}
+		// both bits are regular r/w
+		// - vblokbrk/sarukani writes a '0' to clear a divide by zero OVF when beating
+		//   a stage with game timer <= 10
+		m_divu_ovf = BIT(data, 0);
+		m_divu_ovfie = BIT(data, 1);
+		if (m_divu_ovfie)
+			LOG("SH2: unemulated DIVU OVF interrupt enable\n");
 		sh2_recalc_irq();
 	}
 }
@@ -1139,6 +1138,7 @@ uint32_t sh7604_device::dvdnt_r()
 
 void sh7604_device::dvdnt_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
+	// TODO: this is really a separate register that happens to be shared with DVDNTL
 	COMBINE_DATA(&m_dvdntl);
 	int32_t a = m_dvdntl;
 	int32_t b = m_dvsr;
@@ -1147,6 +1147,7 @@ void sh7604_device::dvdnt_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	{
 		m_dvdntl = a / b;
 		m_dvdnth = a % b;
+		// TODO: 40 cycles
 	}
 	else
 	{
@@ -1154,6 +1155,7 @@ void sh7604_device::dvdnt_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		m_dvdntl = 0x7fffffff;
 		m_dvdnth = 0x7fffffff;
 		sh2_recalc_irq();
+		// TODO: 8 cycles
 	}
 }
 
@@ -1187,11 +1189,13 @@ void sh7604_device::dvdntl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			m_dvdntl = 0x7fffffff;
 			m_dvdnth = 0x7fffffff;
 			sh2_recalc_irq();
+			// TODO: 6 cycles, plenty of these in saturn:vkyoute2
 		}
 		else
 		{
 			m_dvdntl = q;
 			m_dvdnth = a % b;
+			// TODO: 39 cycles
 		}
 	}
 	else
@@ -1200,6 +1204,7 @@ void sh7604_device::dvdntl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		m_dvdntl = 0x7fffffff;
 		m_dvdnth = 0x7fffffff;
 		sh2_recalc_irq();
+		// TODO: 6 cycles
 	}
 }
 
