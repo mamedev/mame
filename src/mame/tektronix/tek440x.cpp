@@ -303,6 +303,8 @@ void tek440x_state::diag_w(u8 data)
 		m_keyboard->kdo_w(!BIT(data, 7) || m_kb_tdata);
 
 	m_kb_loop = BIT(data, 7);
+	m_diag = data;
+}
 
 void tek440x_state::printer_pc_w(u8 data)
 {
