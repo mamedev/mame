@@ -69,6 +69,7 @@ public:
 		, m_pio(*this, "pio")
 		, m_dart(*this, "uart")
 		, m_crtc(*this, "crtc")
+		, m_p_chargen(*this, "chargen")
 		, m_p_videoram(*this, "videoram")
 		, m_p_colorram(*this, "colorram")
 		, m_palette(*this, "palette")
@@ -86,6 +87,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
+	MC6845_UPDATE_ROW(update_row);
 
 	void mem_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
@@ -97,6 +99,7 @@ private:
 	required_device<z80pio_device> m_pio;
 	required_device<z80dart_device> m_dart;
 	required_device<mc6845_device> m_crtc;
+	required_region_ptr<u8> m_p_chargen;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_colorram;
 	required_device<palette_device> m_palette;
@@ -107,6 +110,31 @@ private:
 	//required_ioport_array<8> m_io_keyboard;
 };
 
+MC6845_UPDATE_ROW( elzet80_state::update_row )
+{
+	rgb_t const *const pens = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
+
+	for (uint16_t x = 0; x < x_count; x++)
+	{
+		uint16_t mem = (ma + x) & 0x7ff;
+		uint8_t chr = m_p_videoram[mem];
+
+		/* get pattern of pixels for that character scanline */
+		uint16_t gfx = m_p_chargen[(chr<<4) | ra] ^ ((x == cursor_x) ? 0x1ff : 0);
+
+		/* Display a scanline of a character (9 pixels) */
+		*p++ = pens[BIT(gfx, 8)];
+		*p++ = pens[BIT(gfx, 7)];
+		*p++ = pens[BIT(gfx, 6)];
+		*p++ = pens[BIT(gfx, 5)];
+		*p++ = pens[BIT(gfx, 4)];
+		*p++ = pens[BIT(gfx, 3)];
+		*p++ = pens[BIT(gfx, 2)];
+		*p++ = pens[BIT(gfx, 1)];
+		*p++ = pens[BIT(gfx, 0)];
+	}
+}
 
 void elzet80_state::mem_map(address_map &map)
 {
@@ -122,7 +150,7 @@ void elzet80_state::io_map(address_map &map)
 	map(0x04, 0x07).rw(m_dart, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 	map(0x28, 0x28).nopw(); // toggle video memory access
 	map(0x29, 0x29).noprw(); // video card (unused)
-	map(0x2a, 0x2a).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x2a, 0x2a).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x2b, 0x2b).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map.global_mask(0xff);
 	map.unmap_value_high();
@@ -176,11 +204,14 @@ void elzet80_state::elzet80(machine_config &config)
 	Z80DMA(config, m_dma);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(50);
+	m_screen->set_raw(8_MHz_XTAL, 512, 0, 320, 326, 0, 240);
 	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 
 	MC6845(config, m_crtc, 4_MHz_XTAL);
 	m_crtc->set_screen(m_screen);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(elzet80_state::update_row));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_elzet);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
