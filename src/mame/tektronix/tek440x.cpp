@@ -138,6 +138,7 @@ private:
 	required_device<ncr5385_device> m_scsi;
 	required_device<x2210_device> m_novram;
 	required_device<input_merger_all_high_device> m_vint;
+	required_device<mos6551_device> m_acia;
 
 	required_region_ptr<u16> m_prom;
 	required_shared_ptr<u16> m_mainram;
@@ -424,7 +425,7 @@ void tek440x_state::physical_map(address_map &map)
 	// 786000-787fff: spare
 	map(0x788000, 0x788000).w(FUNC(tek440x_state::sound_w));
 	// 78a000-78bfff: NS32081 FPU
-	map(0x78c000, 0x78c007).rw("aica", FUNC(mos6551_device::read), FUNC(mos6551_device::write)).umask16(0xff00);
+	map(0x78c000, 0x78c007).rw(m_acia, FUNC(mos6551_device::read), FUNC(mos6551_device::write)).umask16(0xff00);
 	// 78e000-78ffff: spare
 
 	// 7a0000-7bffff peripheral board I/O
@@ -504,10 +505,10 @@ void tek440x_state::tek4404(machine_config &config)
 	screen.screen_vblank().set(m_vint, FUNC(input_merger_all_high_device::in_w<1>));
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	mos6551_device &aica(MOS6551(config, "aica", 40_MHz_XTAL / 4 / 10));
-	aica.set_xtal(1.8432_MHz_XTAL);
-	aica.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-	aica.irq_handler().set_inputline(m_maincpu, M68K_IRQ_7);
+	MOS6551(config, m_acia, 40_MHz_XTAL / 4 / 10);
+	m_acia->set_xtal(1.8432_MHz_XTAL);
+	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_acia->irq_handler().set_inputline(m_maincpu, M68K_IRQ_7);
 
 	X2210(config, m_novram);
 
@@ -541,10 +542,10 @@ void tek440x_state::tek4404(machine_config &config)
 	m_scsi->irq().set_inputline(m_maincpu, M68K_IRQ_3);
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
-	rs232.rxd_handler().set("aica", FUNC(mos6551_device::write_rxd));
-	rs232.dcd_handler().set("aica", FUNC(mos6551_device::write_dcd));
-	rs232.dsr_handler().set("aica", FUNC(mos6551_device::write_dsr));
-	rs232.cts_handler().set("aica", FUNC(mos6551_device::write_cts));
+	rs232.rxd_handler().set(m_acia, FUNC(mos6551_device::write_rxd));
+	rs232.dcd_handler().set(m_acia, FUNC(mos6551_device::write_dcd));
+	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
+	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
 
 	SPEAKER(config, "mono").front_center();
 
