@@ -77,6 +77,7 @@ Notes:
       SKNSA1 is BIOS (Asia)
       HM514260, W24257, LH5168, M62X42 all smt SRAM
       LH540202 is DIP SRAM
+      SH2 is HD6417604F28 (SH7604)
 
 
 Cart Layout
@@ -793,7 +794,6 @@ GFXDECODE_END
 // XTALs : 28.636MHz, 33.3333MHz, 21.504MHz
 void skns_state::skns(machine_config &config)
 {
-	// HD6417604F28
 	SH7604(config, m_maincpu, XTAL(28'636'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &skns_state::skns_map);
 
