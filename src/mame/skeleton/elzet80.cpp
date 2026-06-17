@@ -22,7 +22,7 @@ CARDS: (some are optional)
 - EIC (contains PIO, DART, Z80B)
 - Experimenter board (contains PIO, CTC)
 - Video (contains MC6845, 2k vram, 2k attr-ram, chargen roms, 15MHz xtal)
-- CPU (contains Z80, SIO, PIO, 4MHz xtal)
+- CPU (contains Z80, DART, PIO, 4MHz xtal, 4/8K ROM, 2K RAM)
 
 The keyboard plugs into the front by using a stereo audio plug, like you
 have on a modern computer's line-out jack. There's no internal information
@@ -62,7 +62,7 @@ public:
 		, m_ctc(*this, "ctc")
 		, m_dma(*this, "dma")
 		, m_pio(*this, "pio")
-		, m_uart(*this, "uart")
+		, m_dart(*this, "uart")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
@@ -85,7 +85,7 @@ private:
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80dma_device> m_dma;
 	required_device<z80pio_device> m_pio;
-	required_device<z80sio_device> m_uart;
+	required_device<z80dart_device> m_dart;
 	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -95,10 +95,20 @@ private:
 
 void elzet80_state::mem_map(address_map &map)
 {
+	map(0x0000, 0x0fff).rom(); // CPU card ROM
+	map(0x2000, 0xffff).ram(); // 64K RAM card
+	map(0xe000, 0xe7ff).ram(); // video attribute RAM
+	map(0xe800, 0xefff).ram(); // video character RAM
 }
 
 void elzet80_state::io_map(address_map &map)
 {
+	map(0x00, 0x03).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x04, 0x07).rw(m_dart, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
+	map(0x28, 0x28).nopw(); // toggle video memory access
+	map(0x29, 0x29).noprw(); // video card (unused)
+	map(0x2a, 0x2a).noprw(); // 6845 address register
+	map(0x2b, 0x2b).noprw(); // 6845 init register
 	map.global_mask(0xff);
 	map.unmap_value_high();
 }
@@ -135,7 +145,7 @@ void elzet80_state::elzet80(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:1", elzet80_floppies, "fdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	Z80PIO(config, m_pio);
-	Z80SIO(config, m_uart);
+	Z80DART(config, m_dart, 6144000); // discrete oscillator
 	Z80CTC(config, m_ctc);
 	Z80DMA(config, m_dma);
 }
