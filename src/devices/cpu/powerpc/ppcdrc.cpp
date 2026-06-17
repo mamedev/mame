@@ -939,7 +939,7 @@ void ppc_device::static_generate_exception(uint8_t exception, int recover, const
     static_generate_memory_accessor
 ------------------------------------------------------------------*/
 
-void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite, int ismasked, int isreserve, const char *name, uml::code_handle *&handleptr, uml::code_handle *masked)
+void ppc_device::static_generate_memory_accessor(int mode, int size, bool iswrite, bool ismasked, bool isreserve, const char *name, uml::code_handle *&handleptr, uml::code_handle *masked)
 {
 	/* on entry, address is in I0; data for writes is in I1; masks are in I2 */
 	/* on exit, read result is in I0 */
@@ -1014,8 +1014,8 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 	{
 		if (iswrite)
 		{
-			int dowrite = label++;
-			UML_CMP(block, mem(&m_core->reserve), 0);                              // cmp     reserve,0
+			const uml::code_label dowrite = label++;
+			UML_TEST(block, mem(&m_core->reserve), 0xffffffff);                    // test    reserve,0xffffffff
 			UML_JMPc(block, COND_NZ, dowrite);                                     // bnz      1:
 			UML_MOV(block, CR32(0), XERSO32);                                      // mov     [cr0],[xerso]
 			UML_RET(block);                                                        // ret
@@ -1026,7 +1026,7 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 		else
 		{
 			UML_MOV(block, mem(&m_core->reserve), 1);                              // mov     reserve,1
-			UML_AND(block, I3, I0, 0xffffffe0);                                    // and     i3,i0,0xffffffe0
+			UML_AND(block, I3, I0, m_reservation_mask);                            // and     i3,i0,m_reservation_mask
 			UML_MOV(block, mem(&m_core->reserve_address), I3);                     // mov     reserve_address,i3
 		}
 	}

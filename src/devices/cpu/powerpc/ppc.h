@@ -214,7 +214,7 @@ protected:
 	};
 
 	// construction/destruction
-	ppc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int address_bits, int data_bits, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor, address_map_constructor internal_map);
+	ppc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int address_bits, int data_bits, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor, address_map_constructor internal_map, uint32_t reservation_size);
 
 public:
 	virtual ~ppc_device() override;
@@ -582,6 +582,9 @@ protected:
 	/* internal stuff */
 	uint8_t               m_cache_dirty;                /* true if we need to flush the cache */
 
+	/* reservation granularity */
+	uint32_t              m_reservation_mask;
+
 	/* register mappings */
 	uml::parameter   m_regmap[32];                 /* parameter to register mappings for all 32 integer registers */
 	uml::parameter   m_fdregmap[32];               /* parameter to register mappings for all 32 floating point registers */
@@ -684,7 +687,7 @@ protected:
 	void static_generate_out_of_cycles();
 	void static_generate_tlb_mismatch();
 	void static_generate_exception(uint8_t exception, int recover, const char *name);
-	void static_generate_memory_accessor(int mode, int size, int iswrite, int ismasked, int isreserve, const char *name, uml::code_handle *&handleptr, uml::code_handle *masked);
+	void static_generate_memory_accessor(int mode, int size, bool iswrite, bool ismasked, bool isreserve, const char *name, uml::code_handle *&handleptr, uml::code_handle *masked);
 	void static_generate_swap_tgpr();
 	void static_generate_lsw_entries(int mode);
 	void static_generate_stsw_entries(int mode);
@@ -803,7 +806,7 @@ public:
 
 	void internal_ppc4xx(address_map &map) ATTR_COLD;
 protected:
-	ppc4xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor);
+	ppc4xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor, uint32_t reservation_size);
 
 	virtual void execute_set_input(int inputnum, int state) override;
 };
