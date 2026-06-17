@@ -196,7 +196,10 @@ void elzet80_state::elzet80(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &elzet80_state::io_map);
 
 	Z80PIO(config, m_pio, 4_MHz_XTAL);
-	Z80DART(config, m_dart, 6144000); // discrete oscillator
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
+	Z80DART(config, m_dart, 6144000); // FET-oscillator
+	m_dart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_dart, FUNC(z80dart_device::rxa_w));
