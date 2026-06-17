@@ -78,11 +78,13 @@
 
 #include <numbers>
 
+//#define VERBOSE 1
 #include "logmacro.h"
+
 
 namespace {
 
-const int MODEM_SAMPLE_RATE = 48000;
+constexpr int MODEM_SAMPLE_RATE = 48'000;
 
 // 14174 Control register bits definition
 enum

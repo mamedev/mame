@@ -3,14 +3,15 @@
 
 #include "emu.h"
 
-#include "cpu/edsp/edsp.h"
-
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
+#include "cpu/edsp/edsp.h"
 
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
 
 namespace {
 
