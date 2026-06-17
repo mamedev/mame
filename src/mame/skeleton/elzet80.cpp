@@ -16,7 +16,7 @@ Behind the drives is a cage that can hold up to 8 slots that plug into a
 small motherboard.
 CARDS: (some are optional)
 - Floppy Disk Controller: choice of FDC 2: (basic) or FDC3 (also has 128K RAM)
-    (main chips are PIO, DMA, MB8877A)
+    (main chips are PIO, DMA, MB8877A/SAB1793)
 - Dynamic RAM: choice of 64k or 256k
 - Centronics (contains PIO, CTC)
 - EIC (contains PIO, DART, Z80B)
@@ -25,8 +25,7 @@ CARDS: (some are optional)
 - CPU (contains Z80, DART, PIO, 4MHz xtal, 4/8K ROM, 2K RAM)
 
 The keyboard plugs into the front by using a stereo audio plug, like you
-have on a modern computer's line-out jack. There's no internal information
-for it.
+have on a modern computer's line-out jack. It's using a serial interface.
 
 
 The ELZET/K is a similar computer but is a slightly smaller form factor.
@@ -66,14 +65,18 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_pio(*this, "pio")
-		, m_dart(*this, "uart")
+		, m_dart(*this, "dart")
+		, m_pctc(*this, "pctc")
+		, m_ppio(*this, "ppio")
 		, m_crtc(*this, "crtc")
 		, m_p_chargen(*this, "chargen")
 		, m_p_videoram(*this, "videoram")
 		, m_p_colorram(*this, "colorram")
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
+		, m_fdma(*this, "fdma")
 		, m_fdc(*this, "fdc")
+		, m_fpio(*this, "fpio")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
 		//, m_io_keyboard(*this, "LINE%d", 0U)
@@ -95,13 +98,17 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<z80dart_device> m_dart;
+	required_device<z80ctc_device> m_pctc;
+	required_device<z80pio_device> m_ppio;
 	required_device<mc6845_device> m_crtc;
 	required_region_ptr<uint8_t> m_p_chargen;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_colorram;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
+	required_device<z80dma_device> m_fdma;
 	required_device<fd1793_device> m_fdc;
+	required_device<z80pio_device> m_fpio;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	//required_ioport_array<8> m_io_keyboard;
@@ -145,10 +152,22 @@ void elzet80_state::io_map(address_map &map)
 {
 	map(0x00, 0x03).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x04, 0x07).rw(m_dart, FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
+
+	// printer card
+	map(0x20, 0x23).rw(m_pctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x24, 0x27).rw(m_ppio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+
+	// video card
 	map(0x28, 0x28).nopw(); // toggle video memory access
 	map(0x29, 0x29).noprw(); // video card (unused)
 	map(0x2a, 0x2a).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x2b, 0x2b).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+
+	// fdc card
+	map(0x60, 0x63).rw(m_fdma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0x68, 0x6b).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+	map(0x6c, 0x6f).rw(m_fpio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+
 	map.global_mask(0xff);
 	map.unmap_value_high();
 }
@@ -211,6 +230,10 @@ void elzet80_state::elzet80(machine_config &config)
 	rs232b.rxd_handler().set(m_dart, FUNC(z80dart_device::rxb_w));
 	rs232b.dcd_handler().set(m_dart, FUNC(z80dart_device::dcdb_w));
 
+	Z80CTC(config, m_pctc, 4_MHz_XTAL);
+	Z80PIO(config, m_ppio, 4_MHz_XTAL);
+
+	// video
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(15_MHz_XTAL, 512, 0, 320, 326, 0, 240);
 	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
@@ -224,8 +247,13 @@ void elzet80_state::elzet80(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_elzet);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	// devices
-	FD1793(config, m_fdc, 1000000);    // unknown where this is derived
+	// floppy
+	Z80DMA(config, m_fdma, 4_MHz_XTAL);
+	m_fdma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	FD1793(config, m_fdc, 4_MHz_XTAL);
+	Z80PIO(config, m_fpio, 4_MHz_XTAL);
+	m_fpio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	//m_fpio->out_pa_callback().set(DRIVE SELECT);
 	FLOPPY_CONNECTOR(config, "fdc:0", elzet80_floppies, "fdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", elzet80_floppies, "fdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
