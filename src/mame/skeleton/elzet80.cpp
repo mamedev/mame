@@ -43,6 +43,7 @@ Status: Just a closet skeleton
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
 #include "machine/z80ctc.h"
@@ -50,6 +51,10 @@ Status: Just a closet skeleton
 #include "machine/z80sio.h"
 #include "machine/z80pio.h"
 #include "machine/wd_fdc.h"
+#include "video/mc6845.h"
+
+#include "emupal.h"
+#include "screen.h"
 
 namespace {
 
@@ -63,6 +68,11 @@ public:
 		, m_dma(*this, "dma")
 		, m_pio(*this, "pio")
 		, m_dart(*this, "uart")
+		, m_crtc(*this, "crtc")
+		, m_p_videoram(*this, "videoram")
+		, m_p_colorram(*this, "colorram")
+		, m_palette(*this, "palette")
+		, m_screen(*this, "screen")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
@@ -86,6 +96,11 @@ private:
 	required_device<z80dma_device> m_dma;
 	required_device<z80pio_device> m_pio;
 	required_device<z80dart_device> m_dart;
+	required_device<mc6845_device> m_crtc;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_colorram;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -97,8 +112,8 @@ void elzet80_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom(); // CPU card ROM
 	map(0x2000, 0xffff).ram(); // 64K RAM card
-	map(0xe000, 0xe7ff).ram(); // video attribute RAM
-	map(0xe800, 0xefff).ram(); // video character RAM
+	map(0xe000, 0xe7ff).ram().share("colorram"); // video attribute RAM
+	map(0xe800, 0xefff).ram().share("videoram"); // video character RAM
 }
 
 void elzet80_state::io_map(address_map &map)
@@ -107,8 +122,8 @@ void elzet80_state::io_map(address_map &map)
 	map(0x04, 0x07).rw(m_dart, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 	map(0x28, 0x28).nopw(); // toggle video memory access
 	map(0x29, 0x29).noprw(); // video card (unused)
-	map(0x2a, 0x2a).noprw(); // 6845 address register
-	map(0x2b, 0x2b).noprw(); // 6845 init register
+	map(0x2a, 0x2a).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x2b, 0x2b).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map.global_mask(0xff);
 	map.unmap_value_high();
 }
@@ -116,6 +131,22 @@ void elzet80_state::io_map(address_map &map)
 static INPUT_PORTS_START( elzet80 )
 INPUT_PORTS_END
 
+static const gfx_layout elzet_charlayout =
+{
+	8, 12,                  /* 8 x 12 characters */
+	256,                    /* 128 characters */
+	1,                      /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8  },
+	8*16                    /* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( gfx_elzet )
+	GFXDECODE_ENTRY( "chargen", 0x0000, elzet_charlayout, 0, 1 )
+GFXDECODE_END
 
 void elzet80_state::machine_start()
 {
@@ -139,15 +170,25 @@ void elzet80_state::elzet80(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &elzet80_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &elzet80_state::io_map);
 
-	// devices
-	FD1793(config, m_fdc, 1000000);    // unknown where this is derived
-	FLOPPY_CONNECTOR(config, "fdc:0", elzet80_floppies, "fdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", elzet80_floppies, "fdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-
 	Z80PIO(config, m_pio);
 	Z80DART(config, m_dart, 6144000); // discrete oscillator
 	Z80CTC(config, m_ctc);
 	Z80DMA(config, m_dma);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
+
+	MC6845(config, m_crtc, 4_MHz_XTAL);
+	m_crtc->set_screen(m_screen);
+
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_elzet);
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
+
+	// devices
+	FD1793(config, m_fdc, 1000000);    // unknown where this is derived
+	FLOPPY_CONNECTOR(config, "fdc:0", elzet80_floppies, "fdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", elzet80_floppies, "fdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 
