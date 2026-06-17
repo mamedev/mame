@@ -425,7 +425,17 @@ u32 popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	// Lower two layers: whole-layer scroll.
 	m_bg_tilemap[2]->set_scrollx(0, vreg[0x07]);
-	m_bg_tilemap[2]->set_scrolly(0, vreg[0x08]);
+
+	if (vreg[0x00] & 0x0100)
+	{
+		// guessed, qiwang needs something like this to show playing pieces
+		m_bg_tilemap[2]->set_scrolly(0, 0);
+	}
+	else
+	{
+		m_bg_tilemap[2]->set_scrolly(0, vreg[0x08]);
+	}
+
 	m_bg_tilemap[3]->set_scrollx(0, vreg[0x09]);
 	m_bg_tilemap[3]->set_scrolly(0, vreg[0x0a]);
 	if (enable[3]) m_bg_tilemap[3]->draw(screen, bitmap, cliprect, 0, 0);
