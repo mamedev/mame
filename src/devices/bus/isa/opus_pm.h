@@ -64,9 +64,11 @@ private:
 	uint8_t window_r(offs_t offset);
 	void window_w(offs_t offset, uint8_t data);
 	offs_t window_phys(offs_t offset, bool write);  // window mapping (init: physical low; RUN: via 32082 MMU)
-	uint8_t csr_r(offs_t offset);
+	uint8_t csr_r(offs_t offset);                   // host status register (base+FFF0)
 	void csr_w(offs_t offset, uint8_t data);
-	void csr_strobe(unsigned reg);
+	uint8_t csr_strobe_r(offs_t reg);               // address strobes (base+FFF1..FFF7): read fires too
+	void csr_strobe_w(offs_t reg, uint8_t data);
+	void csr_strobe(offs_t reg);
 
 	// 32016/32032 side I/O registers
 	uint8_t slave_reg_r(offs_t offset);

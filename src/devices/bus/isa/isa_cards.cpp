@@ -36,10 +36,10 @@
 #include "acb2072.h"
 #include "cl_sh260.h"
 #include "dsi32.h"
-#include "opus_pm.h"
 #include "hdc.h"
 #include "lrk330.h"
 #include "omti8621.h"
+#include "opus_pm.h"
 #include "ultra12f.h"
 #include "wd1002a_wx1.h"
 #include "wd1007a.h"
@@ -135,14 +135,14 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("fdc_ps2", ISA8_FDC_PS2);
 	device.option_add("fdc344", ISA8_FDC344);
 	device.option_add("fdcmag", ISA8_FDCMAG);
-	device.option_add("rt1000b", ISA8_RT1000B);
-	device.option_add("wdxt_gen", ISA8_WDXT_GEN);
-	device.option_add("xtide", ISA8_XTIDE);
-	device.option_add("side116", ISA8_SIDE116);
-	device.option_add("hdc", ISA8_HDC);
 	device.option_add("dsi32", ISA8_DSI32);
+	device.option_add("hdc", ISA8_HDC);
 	device.option_add("opus_pm100", ISA8_OPUS_PM100);
 	device.option_add("opus_pm110", ISA8_OPUS_PM110);
+	device.option_add("rt1000b", ISA8_RT1000B);
+	device.option_add("side116", ISA8_SIDE116);
+	device.option_add("wdxt_gen", ISA8_WDXT_GEN);
+	device.option_add("xtide", ISA8_XTIDE);
 	device.option_add("adlib", ISA8_ADLIB);
 	device.option_add("hercules", ISA8_HERCULES);
 	device.option_add("gblaster", ISA8_GAME_BLASTER);

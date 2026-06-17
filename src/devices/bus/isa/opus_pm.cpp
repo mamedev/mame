@@ -119,16 +119,8 @@ ioport_constructor isa8_opus_pm100_device::device_input_ports() const
 
 void isa8_opus_pm100_device::cpu_map(address_map &map)
 {
-	// DRAM (4MB: 1MB base + 3MB expansion).  The communication page, the host
-	// command ring and the I/O buffers live in the first 64KB; the kernel
-	// reaches them at virtual FF0000 ("DMA space") through the MMU.  The board
-	// must be modelled full-size: the slave's power-up routine sizes RAM by
-	// writing a bank tag to the top word of every 512KB bank across 0-4MB and
-	// reading it back; backing only 2MB leaves banks 5-8 unmapped, so sizing
-	// never resolves and the Level-2 test runs away.
-	map(0x000000, 0x3fffff).lrw8(
-			NAME([this](offs_t offset) { return m_ram[offset]; }),
-			NAME([this](offs_t offset, u8 data) { m_ram[offset] = data; }));
+	// DRAM (the full 4MB, plus its two top-of-space aliases) is installed
+	// directly in device_start via install_ram(); see the note there.
 	// the four I/O registers decode in two images: at A23 high with
 	// A17-A16 selecting the register (800000/810000/820000/830000 =
 	// WAIT/STAT/C.ACK/C.IRQ -- the monitor's page tables use these),
@@ -138,16 +130,6 @@ void isa8_opus_pm100_device::cpu_map(address_map &map)
 	map(0xfff000, 0xfff7ff).lrw8(
 			NAME([this](offs_t offset) { return slave_reg_r((offset & 0x600) << 7); }),
 			NAME([this](offs_t offset, u8 data) { slave_reg_w((offset & 0x600) << 7, data); }));
-	// DRAM also answers the top of the 16MB space modulo its size:
-	// FF0000-FFFFFF reaches the top 64KB of the array, where the
-	// monitor relocates itself and maintains the communication page
-	// ("DMA space"; the interrupt stack grows down from 1000000)
-	map(0xff0000, 0xffefff).lrw8(
-			NAME([this](offs_t offset) { return m_ram[0x3f0000 + offset]; }),
-			NAME([this](offs_t offset, u8 data) { m_ram[0x3f0000 + offset] = data; }));
-	map(0xfffe00, 0xffffff).lrw8(
-			NAME([this](offs_t offset) { return m_ram[0x3ffe00 + offset]; }),
-			NAME([this](offs_t offset, u8 data) { m_ram[0x3ffe00 + offset] = data; }));
 }
 
 void isa8_opus_pm100_device::device_add_mconfig(machine_config &config)
@@ -178,6 +160,18 @@ void isa8_opus_pm100_device::device_start()
 	set_isa_device();
 
 	m_ram = std::make_unique<uint8_t[]>(0x400000);
+
+	// Install DRAM directly rather than through per-byte map trampolines (the
+	// 32032 has a 32-bit data bus, so a trampoline costs four calls per dword).
+	// The board must be modelled full-size: the slave's power-up routine sizes
+	// RAM by tagging the top word of every 512KB bank across 0-4MB and reading
+	// it back, so a short array leaves banks unmapped and sizing runs away.
+	// The same array also answers the top of the 16MB space -- FF0000-FFEFFF is
+	// the "DMA space" window where the monitor relocates and keeps the comm
+	// page, and FFFE00-FFFFFF mirrors the interrupt stack.
+	m_cpu->space(AS_PROGRAM).install_ram(0x000000, 0x3fffff, m_ram.get());
+	m_cpu->space(AS_PROGRAM).install_ram(0xff0000, 0xffefff, m_ram.get() + 0x3f0000);
+	m_cpu->space(AS_PROGRAM).install_ram(0xfffe00, 0xffffff, m_ram.get() + 0x3ffe00);
 
 	m_start_timer = timer_alloc(FUNC(isa8_opus_pm100_device::start_cpu), this);
 
@@ -222,9 +216,19 @@ void isa8_opus_pm100_device::remap(int space_id, offs_t start, offs_t end)
 	if (space_id == AS_PROGRAM)
 	{
 		offs_t const base = offs_t(m_seg->read()) << 4;
-		m_isa->install_memory(base, base + 0xffff,
-				read8sm_delegate(*this, FUNC(isa8_opus_pm100_device::window_r)),
-				write8sm_delegate(*this, FUNC(isa8_opus_pm100_device::window_w)));
+		// the shared comm-page window; the host CSRs sit in the last 16 bytes
+		m_isa->install_memory(base, base + 0xffef,
+				emu::rw_delegate(*this, FUNC(isa8_opus_pm100_device::window_r)),
+				emu::rw_delegate(*this, FUNC(isa8_opus_pm100_device::window_w)));
+		// address strobes at base+FFF1..FFF7 (the offset is the register number);
+		// any access fires, so install for both read and write
+		m_isa->install_memory(base + 0xfff0, base + 0xfff7,
+				emu::rw_delegate(*this, FUNC(isa8_opus_pm100_device::csr_strobe_r)),
+				emu::rw_delegate(*this, FUNC(isa8_opus_pm100_device::csr_strobe_w)));
+		// the status register at base+FFF0 overrides the strobe image there
+		m_isa->install_memory(base + 0xfff0, base + 0xfff0,
+				emu::rw_delegate(*this, FUNC(isa8_opus_pm100_device::csr_r)),
+				emu::rw_delegate(*this, FUNC(isa8_opus_pm100_device::csr_w)));
 	}
 }
 
@@ -289,31 +293,25 @@ offs_t isa8_opus_pm100_device::window_phys(offs_t offset, bool write)
 	if (!m_window_top || !m_mmu)
 		return offset & 0x3fffff;                          // INITIALIZE: physical low
 	u32 addr = 0xff0000 | offset;                          // RUN: top 8 bits forced to 1
-	if (m_mmu->translate(m_cpu->space(AS_PROGRAM), 0x0a /*ST_ODT*/, addr, false, write, false, true /*suppress faults*/)
+	if (m_mmu->translate(m_cpu->space(AS_PROGRAM), ns32000::ST_ODT, addr, false, write, false, true /*suppress faults*/)
 			== ns32000_mmu_interface::COMPLETE)
 		return addr & 0x3fffff;
 	return (0xff0000 | offset) & 0x3fffff;                 // untranslated fallback
 }
 
-// the window covers the shared page
+// the window covers the shared page (the host CSRs at the top are installed separately)
 uint8_t isa8_opus_pm100_device::window_r(offs_t offset)
 {
-	if (offset >= 0xfff0)
-		return csr_r(offset & 0x0f);
-
 	return m_ram[window_phys(offset, false)];
 }
 
 void isa8_opus_pm100_device::window_w(offs_t offset, uint8_t data)
 {
-	if (offset >= 0xfff0)
-		csr_w(offset & 0x0f, data);
-	else
-		m_ram[window_phys(offset, true)] = data;
+	m_ram[window_phys(offset, true)] = data;
 }
 
 // CSR registers 1-7 are address strobes: reads trigger too
-void isa8_opus_pm100_device::csr_strobe(unsigned reg)
+void isa8_opus_pm100_device::csr_strobe(offs_t reg)
 {
 	switch (reg)
 	{
@@ -363,39 +361,45 @@ void isa8_opus_pm100_device::csr_strobe(unsigned reg)
 	}
 }
 
+// host status register (base+FFF0)
 uint8_t isa8_opus_pm100_device::csr_r(offs_t offset)
 {
-	if (offset == 0)
-	{
-		uint8_t stat = 0;
-		if (m_int_slave)
-			stat |= 0x80;
-		if (m_irq_latch)
-			stat |= 0x40;
-		if (!m_running)
-			stat |= 0x08;
-		// live bus-state bits, as the host samples them: TSO (low only
-		// during a TCU cycle) always reads high, CWT (low only during
-		// refresh) and CTTL (the slave clock) toggle.  The monitor's
-		// power-up test accumulates AND/OR over a thousand reads and
-		// requires TSO constant and at least one of the others moving.
-		uint64_t const phase = machine().time().as_ticks(m_cpu->clock());
-		stat |= 0x02;                               // TSO
-		stat |= (phase & 1) ? 0x01 : 0x00;          // CTTL
-		stat |= ((phase % 31) != 0) ? 0x04 : 0x00;  // CWT low on refresh only
-		return stat;
-	}
-
-	if (offset <= 7 && !machine().side_effects_disabled())
-		csr_strobe(offset);
-
-	return 0xff;
+	uint8_t stat = 0;
+	if (m_int_slave)
+		stat |= 0x80;
+	if (m_irq_latch)
+		stat |= 0x40;
+	if (!m_running)
+		stat |= 0x08;
+	// live bus-state bits, as the host samples them: TSO (low only
+	// during a TCU cycle) always reads high, CWT (low only during
+	// refresh) and CTTL (the slave clock) toggle.  The monitor's
+	// power-up test accumulates AND/OR over a thousand reads and
+	// requires TSO constant and at least one of the others moving.
+	uint64_t const phase = machine().time().as_ticks(m_cpu->clock());
+	stat |= 0x02;                               // TSO
+	stat |= (phase & 1) ? 0x01 : 0x00;          // CTTL
+	stat |= ((phase % 31) != 0) ? 0x04 : 0x00;  // CWT low on refresh only
+	return stat;
 }
 
 void isa8_opus_pm100_device::csr_w(offs_t offset, uint8_t data)
 {
-	if (offset >= 1 && offset <= 7)
-		csr_strobe(offset);
+	// the status register is read-only
+}
+
+// the address strobes (base+FFF1..FFF7): a read fires the strobe too, so guard
+// it against the debugger's side-effect-free probes; a write always fires
+uint8_t isa8_opus_pm100_device::csr_strobe_r(offs_t reg)
+{
+	if (!machine().side_effects_disabled())
+		csr_strobe(reg);
+	return 0xff;
+}
+
+void isa8_opus_pm100_device::csr_strobe_w(offs_t reg, uint8_t data)
+{
+	csr_strobe(reg);
 }
 
 uint8_t isa8_opus_pm100_device::slave_reg_r(offs_t offset)
