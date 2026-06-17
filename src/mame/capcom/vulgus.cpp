@@ -44,7 +44,7 @@ All Clocks and Vsync verified by Corrado Tomaselli (August 2012)
 
 TODO:
 - spriteram can only be written during vblank
-- 1942iti sprite glitches
+- 1942iti sprite glitches and soft locks/resets
 
 ***************************************************************************/
 
@@ -69,12 +69,12 @@ public:
 	vulgus_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_scroll_low(*this, "scroll_low"),
+		m_scroll_high(*this, "scroll_high"),
 		m_audiocpu(*this, "audiocpu"),
 		m_soundlatch(*this, "soundlatch%u", 0),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_scroll_low(*this, "scroll_low"),
-		m_scroll_high(*this, "scroll_high"),
 		m_spriteram(*this, "spriteram"),
 		m_fgvideoram(*this, "fgvideoram"),
 		m_bgvideoram(*this, "bgvideoram"),
@@ -85,9 +85,14 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_scroll_low;
+	required_shared_ptr<uint8_t> m_scroll_high;
+
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	virtual void video_start() override ATTR_COLD;
 	virtual void main_map(address_map &map) ATTR_COLD;
+	virtual void update_scroll();
 
 private:
 	required_device<cpu_device> m_audiocpu;
@@ -95,8 +100,6 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<uint8_t> m_scroll_low;
-	required_shared_ptr<uint8_t> m_scroll_high;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_fgvideoram;
 	required_shared_ptr<uint8_t> m_bgvideoram;
@@ -104,7 +107,6 @@ private:
 
 	uint8_t m_palette_bank = 0;
 	tilemap_t *m_fg_tilemap = nullptr;
-	tilemap_t *m_bg_tilemap = nullptr;
 
 	void fgvideoram_w(offs_t offset, uint8_t data);
 	void bgvideoram_w(offs_t offset, uint8_t data);
@@ -136,8 +138,8 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-
 	virtual void main_map(address_map &map) override ATTR_COLD;
+	virtual void update_scroll() override;
 
 private:
 	required_memory_bank m_rombank;
@@ -329,10 +331,21 @@ void vulgus_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	}
 }
 
-uint32_t vulgus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void vulgus_state::update_scroll()
 {
 	m_bg_tilemap->set_scrollx(0, m_scroll_low[1] + 256 * m_scroll_high[1]);
 	m_bg_tilemap->set_scrolly(0, m_scroll_low[0] + 256 * m_scroll_high[0]);
+}
+
+void _1942iti_state::update_scroll()
+{
+	m_bg_tilemap->set_scrollx(0, m_scroll_low[1] + 256 * m_scroll_low[0]);
+	m_bg_tilemap->set_scrolly(0, m_scroll_high[1] + 256 * m_scroll_high[0]); // ?
+}
+
+uint32_t vulgus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	update_scroll();
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
@@ -389,7 +402,7 @@ void _1942iti_state::main_map(address_map &map)
 
 void vulgus_state::sound_map(address_map &map)
 {
-	map(0x0000, 0x1fff).rom();
+	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
 	map(0x6000, 0x6000).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 	map(0x6001, 0x6001).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));
@@ -640,14 +653,14 @@ void vulgus_state::vulgus(machine_config &config)
 ***************************************************************************/
 
 ROM_START( vulgus ) // Board ID# 84602-01A-1
-	ROM_REGION( 0x1c000, "maincpu", 0 )
+	ROM_REGION( 0x1c000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "vulgus.002",   0x0000, 0x2000, CRC(e49d6c5d) SHA1(48072aaa1f2603b6301d7542cc3df10ead2847bb) )
 	ROM_LOAD( "vulgus.003",   0x2000, 0x2000, CRC(51acef76) SHA1(14dda82b90f9c3a309561a73c300cb54b5fca77d) )
 	ROM_LOAD( "vulgus.004",   0x4000, 0x2000, CRC(489e7f60) SHA1(f3f685955fc42f238909dcdb5edc4c117e5543db) )
 	ROM_LOAD( "vulgus.005",   0x6000, 0x2000, CRC(de3a24a8) SHA1(6bc9dda7dbbbef82e9f61c9d5cf1555e5290b249) )
 	ROM_LOAD( "1-8n.bin",     0x8000, 0x2000, CRC(6ca5ca41) SHA1(6f28d143e984d3d6af3114702ec27d6e878cc35f) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "1-11c.bin",    0x0000, 0x2000, CRC(3bd2acf4) SHA1(b58fb1ea7e30018102ee420d52a1597615412eb1) )
 
 	ROM_REGION( 0x02000, "chars", 0 )
@@ -681,14 +694,14 @@ ROM_START( vulgus ) // Board ID# 84602-01A-1
 ROM_END
 
 ROM_START( vulgusa )
-	ROM_REGION( 0x1c000, "maincpu", 0 )
+	ROM_REGION( 0x1c000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "v2",           0x0000, 0x2000, CRC(3e18ff62) SHA1(03f61cc25b4c258effac2172f25641b668a1ae97) )
 	ROM_LOAD( "v3",           0x2000, 0x2000, CRC(b4650d82) SHA1(4567dfe2b12c59f8c75f5198a136a9afe4975e09) )
 	ROM_LOAD( "v4",           0x4000, 0x2000, CRC(5b26355c) SHA1(4220b70ad2bdfe269d4ac4e957114dbd3cea0975) )
 	ROM_LOAD( "v5",           0x6000, 0x2000, CRC(4ca7f10e) SHA1(a3c278aecbb63063b660854ccef6fbaff7e58e32) )
 	ROM_LOAD( "1-8n.bin",     0x8000, 0x2000, CRC(6ca5ca41) SHA1(6f28d143e984d3d6af3114702ec27d6e878cc35f) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "1-11c.bin",    0x0000, 0x2000, CRC(3bd2acf4) SHA1(b58fb1ea7e30018102ee420d52a1597615412eb1) )
 
 	ROM_REGION( 0x02000, "chars", 0 )
@@ -722,14 +735,14 @@ ROM_START( vulgusa )
 ROM_END
 
 ROM_START( vulgusj )
-	ROM_REGION( 0x1c000, "maincpu", 0 )
+	ROM_REGION( 0x1c000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "1-4n.bin",     0x0000, 0x2000, CRC(fe5a5ca5) SHA1(bb1b5ba5ce54f5e329d23fb8ad1357f65f10d6bf) )
 	ROM_LOAD( "1-5n.bin",     0x2000, 0x2000, CRC(847e437f) SHA1(1d45ca0b92e7aa3099b8a61c27629d9bec3f25b8) )
 	ROM_LOAD( "1-6n.bin",     0x4000, 0x2000, CRC(4666c436) SHA1(a2c921f30f91fead59c4d85d4a5ea8acbcfbf424) )
 	ROM_LOAD( "1-7n.bin",     0x6000, 0x2000, CRC(ff2097f9) SHA1(49789c26a2adde043e5dba9d45a89509a211f05c) )
 	ROM_LOAD( "1-8n.bin",     0x8000, 0x2000, CRC(6ca5ca41) SHA1(6f28d143e984d3d6af3114702ec27d6e878cc35f) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "1-11c.bin",    0x0000, 0x2000, CRC(3bd2acf4) SHA1(b58fb1ea7e30018102ee420d52a1597615412eb1) )
 
 	ROM_REGION( 0x02000, "chars", 0 )
@@ -763,14 +776,14 @@ ROM_START( vulgusj )
 ROM_END
 
 ROM_START( mach9 )
-	ROM_REGION( 0x1c000, "maincpu", 0 )
+	ROM_REGION( 0x1c000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "02_4n.bin",   0x0000, 0x2000, CRC(b3310b0c) SHA1(f083d8633da69acaa03e7566f28e87ef0482927d) )
 	ROM_LOAD( "03_5n.bin",   0x2000, 0x2000, CRC(51acef76) SHA1(14dda82b90f9c3a309561a73c300cb54b5fca77d) )
 	ROM_LOAD( "04_6n.bin",   0x4000, 0x2000, CRC(489e7f60) SHA1(f3f685955fc42f238909dcdb5edc4c117e5543db) )
 	ROM_LOAD( "05_7n.bin",   0x6000, 0x2000, CRC(ef3e4278) SHA1(eb3433827a53b2e9c2b09add7376982e84b29558) )
 	ROM_LOAD( "06_8n.bin",   0x8000, 0x2000, CRC(6ca5ca41) SHA1(6f28d143e984d3d6af3114702ec27d6e878cc35f) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "07_11c.bin",  0x0000, 0x2000, CRC(3bd2acf4) SHA1(b58fb1ea7e30018102ee420d52a1597615412eb1) )
 
 	ROM_REGION( 0x02000, "chars", 0 )
@@ -814,7 +827,7 @@ ROM_START( 1942iti )
 	ROM_LOAD( "daughter_2764.2",     0x14000, 0x2000, CRC(9eca91e1) SHA1(48ccb608519debb681fa4f78985a074e05040edc) )
 	ROM_LOAD( "daughter_27128.1",    0x18000, 0x4000, CRC(c661c8eb) SHA1(d5acf045d5773b01430bb54bc92ccd291318d2d7) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "27128.c11",           0x00000, 0x4000, CRC(bd87f06b) SHA1(821f85cf157f81117eeaba0c3cf0337eac357e58) )
 
 	ROM_REGION( 0x2000, "chars", 0 )
