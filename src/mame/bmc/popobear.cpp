@@ -10,8 +10,8 @@ TODO:
 - timer chip (controls auto-animation on title screen + something else during gameplay?);
 - Identify what's on $600000 & $620000;
 - Uses tas opcode to sync to irq, from VDP?
-- magkengo: uses unhandled GFX features (sprite problems); also needs hopper hook-up;
-- qiwang: uses unhandled GFX features (sprite problems), needs verifying of I/O / DIP definitions
+- magkengo: needs hopper hook-up;
+- qiwang: uses unhandled GFX features (tilemap priority), needs verifying of I/O / DIP definitions
   (available in test mode), hopper support;
 - pixram probably has a color base and a priority register, like bmcpokr.cpp.
 
@@ -305,6 +305,9 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			if (pri != drawpri)
 				continue;
 
+			if (param == 0) // end of list marker (confirmed from qiwang, must be done after pri check)
+				return;
+
 			int y = sprdata[1];
 			int x = sprdata[2];
 			int spr_num = sprdata[3];
@@ -321,36 +324,35 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 			if (param & 0xf000) color_bank = (machine().rand() & 0x3);
 
-
-
 			int add_it = 0;
+			int palmask = 0x00;
 
-			// this isn't understood, not enough evidence.
 			switch (param & 3)
 			{
 				case 0x0: // girls in the intro (qiwang)
-				//color_bank = (machine().rand() & 0x3);
-				add_it = color_bank * 0x40;
+				palmask = 0xff;
+				// color_bank bits never set?
 				break;
 
 				case 0x1: // butterflies in intro, enemy characters, line of characters, stage start text
-				//color_bank = (machine().rand() & 0x3);
+				palmask = 0x1f;
 				add_it = color_bank * 0x40;
+				// pixel_bits & 0xe0 sometimes set, why?
 				break;
 
-				case 0x2: // characters in intro, main player, powerups, timer, large dancing chars between levels (0x3f?)
-				//color_bank = (machine().rand() & 0x3);
+				case 0x2: // characters in intro, main player, powerups, timer, large dancing chars between levels
+				palmask = 0x3f;
 				add_it = color_bank * 0x40;
+				// pixel bits & 0xc0 not seen used
 				break;
 
 				case 0x3: // letters on GAME OVER need this..
+				palmask = 0x1f;
 				add_it = color_bank * 0x40;
 				add_it += 0x20;
+				// pixel_bits & 0xe0 sometimes set, why?
 				break;
 			}
-
-			if (param == 0) // this avoids some glitches during the intro in popobear, when the panda gets stunned
-				continue;
 
 			spr_num <<= 3;
 
@@ -360,20 +362,17 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 				for (int xi = 0; xi < width; xi++)
 				{
-					u8 const pix = vram[BYTE_XOR_BE(spr_num)];
+					u8 pix = vram[BYTE_XOR_BE(spr_num)];
 					int const x_draw = (x_dir) ? x + ((width - 1) - xi) : x + xi;
+					pix &= palmask;
+					// sometimes upper pix bits are set, but are either unneeded
+					// or have some non-colour purpose
 
 					if (cliprect.contains(x_draw, y_draw))
 					{
-						// this is a bit strange, pix data is basically 8-bit
-						// but we have to treat 0x00, 0x40, 0x80, 0xc0
-						// see scores when you collect an item, must be at least steps of 0x40 or one of the female panda gfx between levels breaks.. might depend on lower bits?
-						// granularity also means colour bank is applied *0x40
-						// and we have 2 more possible colour bank bits
-						// colours on game over screen are still wrong without the weird param kludge above
-						if (pix & 0x3f) // TODO: this breaks portraits on qiwang's title screen (if (pix) fixes them)
+						if (pix)
 						{
-							bitmap.pix(y_draw, x_draw) = m_palette->pen(((pix + (add_it)) & 0xff) + 0x100);
+							bitmap.pix(y_draw, x_draw) = m_palette->pen((pix | add_it) + 0x100);
 						}
 					}
 
