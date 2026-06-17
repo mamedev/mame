@@ -243,7 +243,7 @@ int popobear_state::tilemap_base_words(u8 number) const // TODO: this is probabl
 {
 	if (m_alt_video)   // magkengo, qiwang: tile-map bases live in the video registers
 	{
-		static const int base_reg[4] = { 3, 5, 8, 10 };
+		constexpr int base_reg[4] = { 3, 5, 8, 10 };
 		return (m_vregs[base_reg[number]] & 0xffff) << 4;
 	}
 	return m_tilemap_base[number] / 2;   // popobear: fixed bases; vreg[8]/[10] are scroll
@@ -329,24 +329,24 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 			switch (param & 3)
 			{
-				case 0x0: // girls in the intro (qiwang)
+			case 0x0: // girls in the intro (qiwang)
 				palmask = 0xff;
 				// color_bank bits never set?
 				break;
 
-				case 0x1: // butterflies in intro, enemy characters, line of characters, stage start text
+			case 0x1: // butterflies in intro, enemy characters, line of characters, stage start text
 				palmask = 0x1f;
 				add_it = color_bank * 0x40;
 				// pixel_bits & 0xe0 sometimes set, why?
 				break;
 
-				case 0x2: // characters in intro, main player, powerups, timer, large dancing chars between levels
+			case 0x2: // characters in intro, main player, powerups, timer, large dancing chars between levels
 				palmask = 0x3f;
 				add_it = color_bank * 0x40;
 				// pixel bits & 0xc0 not seen used
 				break;
 
-				case 0x3: // letters on GAME OVER need this..
+			case 0x3: // letters on GAME OVER need this
 				palmask = 0x1f;
 				add_it = color_bank * 0x40;
 				add_it += 0x20;
@@ -358,15 +358,12 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 			for (int yi = 0; yi < height; yi++)
 			{
-				int const y_draw = (y_dir) ? y + ((height - 1) - yi) : y + yi;
+				int const y_draw = y + (y_dir ? (height - 1 - yi) : yi);
 
 				for (int xi = 0; xi < width; xi++)
 				{
-					u8 pix = vram[BYTE_XOR_BE(spr_num)];
-					int const x_draw = (x_dir) ? x + ((width - 1) - xi) : x + xi;
-					pix &= palmask;
-					// sometimes upper pix bits are set, but are either unneeded
-					// or have some non-colour purpose
+					u8 const pix = vram[BYTE_XOR_BE(spr_num)] & palmask; // sometimes upper bits are set, but are either unused or have some non-colour purpose
+					int const x_draw = x + (x_dir ? (width - 1 - xi) : xi);
 
 					if (cliprect.contains(x_draw, y_draw))
 					{
@@ -541,13 +538,13 @@ void popobear_state::magkengo_ctrl_w(u8 data)
 // Game checks the bytes read with 2 tables in ROM at 0xb508 / 0xb510
 u8 popobear_state::idchip_r()
 {
-	static constexpr u8 id_a[] = { 0x00, 0x02, 0x03, 0x39, 0x11, 0x95 };
-	static constexpr u8 id_b[] = { 0x00, 0x14, 0x21, 0x24, 0x31, 0x43, 0x51, 0x25, 0x26 };
+	constexpr u8 id_a[] = { 0x00, 0x02, 0x03, 0x39, 0x11, 0x95 };
+	constexpr u8 id_b[] = { 0x00, 0x14, 0x21, 0x24, 0x31, 0x43, 0x51, 0x25, 0x26 };
 
 	if (m_idpage)
-		return id_b[m_idptr % sizeof(id_b)];
+		return id_b[m_idptr % std::size(id_b)];
 
-	return id_a[m_idptr % sizeof(id_a)];
+	return id_a[m_idptr % std::size(id_a)];
 }
 
 void popobear_state::idchip_w(u8 data)
