@@ -454,21 +454,41 @@ u32 popobear_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, c
 	// so revalidate every frame (vram_w already marks dirty on write).
 	mark_tilemaps_dirty();
 
-	// Lower two layers: whole-layer scroll.
+	// line-scroll only in mode 0x1f (popobear).  The line
+	// tables live in VRAM at (scroll-pointer register << 9): layer0 = vreg[3],
+	// layer1 = vreg[5], shared high-byte table = vreg[6] (e.g. 0x06fa -> 0xdf400).
+	// Any other non-zero enable is a plain layer (magkengo uses 0x05/0x0d/0x1d).
+	rectangle clip = cliprect;
 
-	m_bg_tilemap[3][get_tilemap_size(3)]->set_scrollx(0, vreg[0x09]);
-	m_bg_tilemap[3][get_tilemap_size(3)]->set_scrolly(0, vreg[0x0a]);
-	if (get_tilemap_enable(3)) m_bg_tilemap[3][get_tilemap_size(3)]->draw(screen, bitmap, cliprect, 0, 0);
+	// Tilemap 3
+
+	if (get_tilemap_enable(3) & 0x02) // 0x10 is NOT set on popobear ending, and this mode is needed on the bottom layer
+	{
+		int const base = vreg[0x0a] << 9, hi = vreg[0x0d] << 9;
+		for (int line = cliprect.min_y; line <= cliprect.max_y; line++)
+		{
+			u16 const v = m_vram[base / 2 + line];
+			u16 const u = (m_vram[hi / 2 + line] & 0x00ff);
+			clip.sety(line, line);
+			m_bg_tilemap[3][get_tilemap_size(0)]->set_scrollx(0, (v & 0x00ff) | (u << 8));
+			m_bg_tilemap[3][get_tilemap_size(0)]->set_scrolly(0, ((v & 0xff00) >> 8) - line);
+			m_bg_tilemap[3][get_tilemap_size(0)]->draw(screen, bitmap, clip, 0, 0);
+		}
+	}
+	else if (get_tilemap_enable(3))
+	{
+		m_bg_tilemap[3][get_tilemap_size(0)]->set_scrollx(0, vreg[0x09]);
+		m_bg_tilemap[3][get_tilemap_size(0)]->set_scrolly(0, vreg[0x0a] & 0x1ff);
+		m_bg_tilemap[3][get_tilemap_size(0)]->draw(screen, bitmap, cliprect, 0, 0);
+	}
+
+	// Tilemap 2 (should probably also have the rowscroll features)
 
 	m_bg_tilemap[2][get_tilemap_size(2)]->set_scrollx(0, vreg[0x07]);
 	m_bg_tilemap[2][get_tilemap_size(2)]->set_scrolly(0, vreg[0x08]);
 	if (get_tilemap_enable(2)) m_bg_tilemap[2][get_tilemap_size(2)]->draw(screen, bitmap, cliprect, 0, 0);
 
-	// Upper two layers: line-scroll only in mode 0x1f (popobear).  The line
-	// tables live in VRAM at (scroll-pointer register << 9): layer0 = vreg[3],
-	// layer1 = vreg[5], shared high-byte table = vreg[6] (e.g. 0x06fa -> 0xdf400).
-	// Any other non-zero enable is a plain layer (magkengo uses 0x05/0x0d/0x1d).
-	rectangle clip = cliprect;
+	// Tilemap 1
 
 	if (get_tilemap_enable(1) & 0x10) // or & 0x02
 	{
@@ -489,6 +509,8 @@ u32 popobear_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, c
 		m_bg_tilemap[1][get_tilemap_size(1)]->set_scrolly(0, 0);
 		m_bg_tilemap[1][get_tilemap_size(1)]->draw(screen, bitmap, cliprect, 0, 0);
 	}
+
+	// Tilemap 0
 
 	if (get_tilemap_enable(0) & 0x10) // or & 0x02
 	{
