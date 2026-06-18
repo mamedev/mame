@@ -284,6 +284,8 @@ void popobear_state::video_start()
 	for (int i = 0; i < 2; i++)
 		for (int j = 0; j < 4; j++)
 			m_bg_tilemap[j][i]->set_transparent_pen(0);
+
+	save_item(NAME(m_vram_rearranged));
 }
 
 
@@ -558,7 +560,6 @@ u8 popobear_state::_620000_r()
 
 void popobear_state::machine_start()
 {
-	save_item(NAME(m_vram_rearranged));
 	save_item(NAME(m_dsw_select));
 	save_item(NAME(m_irq_enable));
 
