@@ -56,7 +56,7 @@ void pm_term(void) {
 }
 
 
-static PmDeviceID pm_get_default_device_id(int is_input, char *key) {
+static PmDeviceID pm_get_default_device_id(int is_input, const char *key) {
 #define PATTERN_MAX 256
     /* Find first input or device -- this is the default. */
     PmDeviceID id = pmNoDevice;

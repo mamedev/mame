@@ -147,7 +147,7 @@ general MIDI device queries
 */
 
 /* add a device after converting device (product) name to UTF-8 */
-static void pm_add_device_w(char *api, WCHAR *device_name, int is_input,
+static void pm_add_device_w(const char *api, WCHAR *device_name, int is_input,
                             int is_virtual, void *descriptor, pm_fns_type dictionary)
 {
     char utf8name[4 * MAXPNAMELEN];
