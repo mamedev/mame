@@ -153,7 +153,8 @@ Type input device number: >>6  [pick a working input device]
  when you play B3 (B below Middle C)]
 >> [ENTER to exit]
 
-19. ./recvvirtual [in one shell, macOS and Linux only]
+19. ./recvvirtual -h [in one shell, macOS and Linux only]
+    ./recvvirtual -m vvv [for mac, or -c vvv -p vvvport for linux]
     ./testio [in another shell]
 [For testio application:]
     Latency in ms: >>0 
@@ -165,7 +166,8 @@ Type input device number: >>6  [pick a working input device]
 [For recvvirtual application:]
     >> [ENTER to quit]
 
-20. ./sendvirtual [in one shell, macOS and Linux only]
+20. ./sendvirtual -h [in one shell, macOS and Linux only]
+    ./sendvirtual -m vvv [for mac, or -c vvv -p vvvport for linux]
     ./mm [in another shell]
 [For mm application:]
     Type input device number: >>10 [select the "portmidi" device]
@@ -349,22 +351,7 @@ Check output of fastrcv: there should be no errors, just msg/sec.]
 [Second instance should report "PortMidi call failed...
    PortMidi: Cannot create virtual device: name is taken"]
 
-32. pmdefaults (if built, requires Java and some CMake options)
-    [must be run from pm_java/pmdefaults]
-    ./testio
-[In pmdefaults: 
-    Select an input device. Input should flash the green
-        test light.
-    Select an output device. Test button should play a note.
-    Save the selections.
-    Quit the program.]
-[In testio:]
-    Latency in ms: >>0
-    enter your choice... >>5 [test both]
-    [In the device list, default devices are marked. They
-    should match the devices selected with pmdefaults.]
-    ^C to quit.
-33. pmlist
+32. pmlist
     ./pmlist  [check the output]
               [plug in or remove a device]
     >> [type RETURN]
