@@ -469,7 +469,7 @@ u32 popobear_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, c
 	// Any other non-zero enable is a plain layer (magkengo uses 0x05/0x0d/0x1d).
 	rectangle clip = cliprect;
 
-	if (get_tilemap_enable(1) == 0x1f)
+	if (get_tilemap_enable(1) & 0x10) // or & 0x02
 	{
 		int const base = vreg[0x05] << 9, hi = vreg[0x06] << 9;
 		for (int line = cliprect.min_y; line <= cliprect.max_y; line++)
@@ -489,7 +489,7 @@ u32 popobear_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, c
 		m_bg_tilemap[1][get_tilemap_size(1)]->draw(screen, bitmap, cliprect, 0, 0);
 	}
 
-	if (get_tilemap_enable(0) == 0x1f)
+	if (get_tilemap_enable(0) & 0x10) // or & 0x02
 	{
 		int const base = vreg[0x03] << 9, hi = vreg[0x06] << 9;
 		for (int line = cliprect.min_y; line <= cliprect.max_y; line++)
