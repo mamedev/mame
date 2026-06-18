@@ -394,7 +394,7 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 u8 popobear_state::get_tilemap_enable(int which)
 {
-	u16 const* const vreg = m_vregs;
+	u16 const *const vreg = m_vregs;
 	// Per-layer enable byte; a layer draws when non-zero.  Value 0x1f selects the
 	// per-line (line-scroll) mode on the upper two layers; every other non-zero
 	// value is a plain layer.
@@ -425,7 +425,7 @@ u32 popobear_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, c
 {
 	bitmap.fill(0, cliprect);
 
-	u16 const* const vreg = m_vregs;
+	u16 const *const vreg = m_vregs;
 	// popmessage("%04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x",vreg[0x00],vreg[0x01],vreg[0x02],vreg[0x03],vreg[0x04],vreg[0x05],vreg[0x06], vreg[0x07],vreg[0x08],vreg[0x09],vreg[0x0a],vreg[0x0b],m_vregs[0x0c],m_vregs[0x0d],vreg[0x0e],vreg[0x0f]);
 
 	// vreg[0x00] also looks like it could be some enable registers
