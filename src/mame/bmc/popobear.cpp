@@ -507,8 +507,9 @@ u32 popobear_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, c
 
 	draw_tilemap(screen, bitmap, cliprect, 3, 0xa, 0xb, 0x9);
 	draw_tilemap(screen, bitmap, cliprect, 2, 0x8, 0xb, 0x7);
+
 	draw_tilemap(screen, bitmap, cliprect, 1, 0x5, 0x6, 0x4);
-	draw_tilemap(screen, bitmap, cliprect, 0, 0x3, 0x6, 0x4);
+	draw_tilemap(screen, bitmap, cliprect, 0, 0x3, 0x6, 0x2);
 
 	if (BIT(m_vregs[0x00], 8))
 		draw_sprites(bitmap, cliprect);
