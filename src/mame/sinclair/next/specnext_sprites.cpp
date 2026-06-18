@@ -363,8 +363,6 @@ void specnext_sprites_device::device_start()
 	save_item(NAME(m_attr_index));
 	save_item(NAME(m_pattern_index));
 	save_item(NAME(m_mirror_sprite_q));
-
-	update_config();
 }
 
 void specnext_sprites_device::device_reset()
@@ -381,6 +379,7 @@ void specnext_sprites_device::device_reset()
 void specnext_sprites_device::device_post_load()
 {
 	m_sprites_cache.clear();
+	update_config();
 }
 
 
