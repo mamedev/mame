@@ -192,10 +192,10 @@ private:
 	u8 idchip_r();
 	void idchip_w(u8 data);
 
-	void draw_tilemap3(screen_device &screen, bitmap_ind16& bitmap, const rectangle &cliprect);
-	void draw_tilemap2(screen_device &screen, bitmap_ind16& bitmap, const rectangle &cliprect);
-	void draw_tilemap1(screen_device &screen, bitmap_ind16& bitmap, const rectangle &cliprect);
-	void draw_tilemap0(screen_device &screen, bitmap_ind16& bitmap, const rectangle &cliprect);
+	void draw_tilemap3(screen_device &screen, bitmap_ind16& bitmap, const rectangle &cliprect, int which);
+	void draw_tilemap2(screen_device &screen, bitmap_ind16& bitmap, const rectangle &cliprect, int which);
+	void draw_tilemap1(screen_device &screen, bitmap_ind16& bitmap, const rectangle &cliprect, int which);
+	void draw_tilemap0(screen_device &screen, bitmap_ind16& bitmap, const rectangle &cliprect, int which);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -427,11 +427,11 @@ u8 popobear_state::get_tilemap_size(int which)
 		return 1;
 }
 
-void popobear_state::draw_tilemap3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void popobear_state::draw_tilemap3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which)
 {
 	rectangle clip = cliprect;
-	int size = get_tilemap_size(3);
-	if (get_tilemap_enable(3) & 0x02) // 0x10 is NOT set on popobear ending, and this mode is needed on the bottom layer
+	int size = get_tilemap_size(which);
+	if (get_tilemap_enable(which) & 0x02) // 0x10 is NOT set on popobear ending, and this mode is needed on the bottom layer
 	{
 
 		int const base = m_vregs[0x0a] << 9, hi = m_vregs[0x0b] << 9;
@@ -440,33 +440,33 @@ void popobear_state::draw_tilemap3(screen_device &screen, bitmap_ind16 &bitmap, 
 			u16 const v = m_vram[base / 2 + line];
 			u16 const u = (m_vram[hi / 2 + line] & 0x00ff);
 			clip.sety(line, line);
-			m_bg_tilemap[3][size]->set_scrollx(0, (v & 0x00ff) | (u << 8));
-			m_bg_tilemap[3][size]->set_scrolly(0, ((v & 0xff00) >> 8) - line);
-			m_bg_tilemap[3][size]->draw(screen, bitmap, clip, 0, 0);
+			m_bg_tilemap[which][size]->set_scrollx(0, (v & 0x00ff) | (u << 8));
+			m_bg_tilemap[which][size]->set_scrolly(0, ((v & 0xff00) >> 8) - line);
+			m_bg_tilemap[which][size]->draw(screen, bitmap, clip, 0, 0);
 		}
 	}
-	else if (get_tilemap_enable(3))
+	else if (get_tilemap_enable(which))
 	{
-		m_bg_tilemap[3][size]->set_scrollx(0, m_vregs[0x09]);
-		m_bg_tilemap[3][size]->set_scrolly(0, m_vregs[0x0a] & 0x1ff);
-		m_bg_tilemap[3][size]->draw(screen, bitmap, cliprect, 0, 0);
+		m_bg_tilemap[which][size]->set_scrollx(0, m_vregs[0x09]);
+		m_bg_tilemap[which][size]->set_scrolly(0, m_vregs[0x0a] & 0x1ff);
+		m_bg_tilemap[which][size]->draw(screen, bitmap, cliprect, 0, 0);
 	}
 }
 
-void popobear_state::draw_tilemap2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void popobear_state::draw_tilemap2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which)
 {
 	// Tilemap 2 (should probably also have the rowscroll features)
-	int size = get_tilemap_size(2);
-	m_bg_tilemap[2][size]->set_scrollx(0, m_vregs[0x07]);
-	m_bg_tilemap[2][size]->set_scrolly(0, m_vregs[0x08]);
-	if (get_tilemap_enable(2)) m_bg_tilemap[2][get_tilemap_size(2)]->draw(screen, bitmap, cliprect, 0, 0);
+	int size = get_tilemap_size(which);
+	m_bg_tilemap[which][size]->set_scrollx(0, m_vregs[0x07]);
+	m_bg_tilemap[which][size]->set_scrolly(0, m_vregs[0x08]);
+	if (get_tilemap_enable(which)) m_bg_tilemap[which][size]->draw(screen, bitmap, cliprect, 0, 0);
 }
 
-void popobear_state::draw_tilemap1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void popobear_state::draw_tilemap1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which)
 {
-	int size = get_tilemap_size(1);
+	int size = get_tilemap_size(which);
 	rectangle clip = cliprect;
-	if (get_tilemap_enable(1) & 0x10) // or & 0x02
+	if (get_tilemap_enable(which) & 0x02) // or & 0x10
 	{
 		int const base = m_vregs[0x05] << 9, hi = m_vregs[0x06] << 9;
 		for (int line = cliprect.min_y; line <= cliprect.max_y; line++)
@@ -474,24 +474,24 @@ void popobear_state::draw_tilemap1(screen_device &screen, bitmap_ind16 &bitmap, 
 			u16 const v = m_vram[base / 2 + line];
 			u16 const u = (m_vram[hi / 2 + line] & 0xff00) >> 8;
 			clip.sety(line, line);
-			m_bg_tilemap[1][size]->set_scrollx(0, (v & 0x00ff) | (u << 8));
-			m_bg_tilemap[1][size]->set_scrolly(0, ((v & 0xff00) >> 8) - line);
-			m_bg_tilemap[1][size]->draw(screen, bitmap, clip, 0, 0);
+			m_bg_tilemap[which][size]->set_scrollx(0, (v & 0x00ff) | (u << 8));
+			m_bg_tilemap[which][size]->set_scrolly(0, ((v & 0xff00) >> 8) - line);
+			m_bg_tilemap[which][size]->draw(screen, bitmap, clip, 0, 0);
 		}
 	}
-	else if (get_tilemap_enable(1))
+	else if (get_tilemap_enable(which))
 	{
-		m_bg_tilemap[1][size]->set_scrollx(0, 0);
-		m_bg_tilemap[1][size]->set_scrolly(0, 0);
-		m_bg_tilemap[1][size]->draw(screen, bitmap, cliprect, 0, 0);
+		m_bg_tilemap[which][size]->set_scrollx(0, 0);
+		m_bg_tilemap[which][size]->set_scrolly(0, 0);
+		m_bg_tilemap[which][size]->draw(screen, bitmap, cliprect, 0, 0);
 	}
 }
 
-void popobear_state::draw_tilemap0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void popobear_state::draw_tilemap0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which)
 {
-	int size = get_tilemap_size(0);
+	int size = get_tilemap_size(which);
 	rectangle clip = cliprect;
-	if (get_tilemap_enable(0) & 0x10) // or & 0x02
+	if (get_tilemap_enable(which) & 0x02) // or & 0x10
 	{
 		int const base = m_vregs[0x03] << 9, hi = m_vregs[0x06] << 9;
 		for (int line = cliprect.min_y; line <= cliprect.max_y; line++)
@@ -499,16 +499,16 @@ void popobear_state::draw_tilemap0(screen_device &screen, bitmap_ind16 &bitmap, 
 			u16 const v = m_vram[base / 2 + line];
 			u16 const u = (m_vram[hi / 2 + line] & 0x00ff);
 			clip.sety(line, line);
-			m_bg_tilemap[0][size]->set_scrollx(0, (v & 0x00ff) | (u << 8));
-			m_bg_tilemap[0][size]->set_scrolly(0, ((v & 0xff00) >> 8) - line);
-			m_bg_tilemap[0][size]->draw(screen, bitmap, clip, 0, 0);
+			m_bg_tilemap[which][size]->set_scrollx(0, (v & 0x00ff) | (u << 8));
+			m_bg_tilemap[which][size]->set_scrolly(0, ((v & 0xff00) >> 8) - line);
+			m_bg_tilemap[which][size]->draw(screen, bitmap, clip, 0, 0);
 		}
 	}
-	else if (get_tilemap_enable(0))
+	else if (get_tilemap_enable(which))
 	{
-		m_bg_tilemap[0][size]->set_scrollx(0, 0);
-		m_bg_tilemap[0][size]->set_scrolly(0, m_vregs[0x03] & 0x1ff); // popobear ending credit scroll
-		m_bg_tilemap[0][size]->draw(screen, bitmap, cliprect, 0, 0);
+		m_bg_tilemap[which][size]->set_scrollx(0, 0);
+		m_bg_tilemap[which][size]->set_scrolly(0, m_vregs[0x03] & 0x1ff); // popobear ending credit scroll
+		m_bg_tilemap[which][size]->draw(screen, bitmap, cliprect, 0, 0);
 	}
 }
 
@@ -565,10 +565,10 @@ u32 popobear_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, c
 	// layer1 = m_vregs[5], shared high-byte table = m_vregs[6] (e.g. 0x06fa -> 0xdf400).
 	// Any other non-zero enable is a plain layer (magkengo uses 0x05/0x0d/0x1d).
 
-	draw_tilemap3(screen, bitmap, cliprect);
-	draw_tilemap2(screen, bitmap, cliprect);
-	draw_tilemap1(screen, bitmap, cliprect);
-	draw_tilemap0(screen, bitmap, cliprect);
+	draw_tilemap3(screen, bitmap, cliprect, 3);
+	draw_tilemap2(screen, bitmap, cliprect, 2);
+	draw_tilemap1(screen, bitmap, cliprect, 1);
+	draw_tilemap0(screen, bitmap, cliprect, 0);
 
 	if (BIT(m_vregs[0x00], 8))
 		draw_sprites(bitmap, cliprect);
