@@ -435,7 +435,12 @@ void popobear_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, c
 		for (int line = cliprect.min_y; line <= cliprect.max_y; line++)
 		{
 			u16 const v = m_vram[base / 2 + line];
-			u16 const u = (m_vram[hi / 2 + line] & 0xff00) >> 8;
+			u16 u;
+			if (which & 1)
+				u = (m_vram[hi / 2 + line] & 0xff00) >> 8;
+			else
+				u = (m_vram[hi / 2 + line] & 0x00ff);
+
 			clip.sety(line, line);
 			m_bg_tilemap[which][size]->set_scrollx(0, (v & 0x00ff) | (u << 8));
 			m_bg_tilemap[which][size]->set_scrolly(0, ((v & 0xff00) >> 8) - line);
