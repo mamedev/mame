@@ -146,6 +146,7 @@
 
 #include "osdcore.h" // osd_printf_*
 
+#include <cstring>
 #include <tuple>
 
 #define HFE_FORMAT_HEADER   "HXCPICFE"

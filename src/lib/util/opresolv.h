@@ -43,8 +43,6 @@
 
 #pragma once
 
-#include "coretmpl.h"
-
 #include <cstdlib>
 #include <span>
 #include <string>
