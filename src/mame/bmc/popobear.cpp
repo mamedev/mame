@@ -440,7 +440,7 @@ u32 popobear_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, c
 	// pixram
 	if (!get_tilemap_enable(0) && !get_tilemap_enable(1) && !get_tilemap_enable(2) && !get_tilemap_enable(3) && BIT(vreg[0x0e], 5))
 	{
-		u8 const* const fb = reinterpret_cast<u8 const*>(m_vram.target()) + ((vreg[0x0e] & 0x0f) << 16);
+		u8 const *const fb = reinterpret_cast<u8 const *>(m_vram.target()) + ((vreg[0x0e] & 0x0f) << 16);
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
