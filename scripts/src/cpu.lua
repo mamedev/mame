@@ -4335,18 +4335,18 @@ if opt_tool(CPUS, "DSP563XX") then
 end
 
 --------------------------------------------------
--- Mystery CPU architecture used in "My Life"
---@src/devices/cpu/mylife/mylife.h,CPUS["MYLIFE"] = true
+-- Elan eDSP
+--@src/devices/cpu/edsp/edsp.h,CPUS["EDSP"] = true
 --------------------------------------------------
 
-if CPUS["MYLIFE"] then
+if CPUS["EDSP"] then
 	files {
-		MAME_DIR .. "src/devices/cpu/mylife/mylife.cpp",
-		MAME_DIR .. "src/devices/cpu/mylife/mylife.h",
+		MAME_DIR .. "src/devices/cpu/edsp/edsp.cpp",
+		MAME_DIR .. "src/devices/cpu/edsp/edsp.h",
 	}
 end
 
-if opt_tool(CPUS, "MYLIFE") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mylife/mylifed.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mylife/mylifed.h")
+if opt_tool(CPUS, "EDSP") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/edsp/edspdasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/edsp/edspdasm.h")
 end

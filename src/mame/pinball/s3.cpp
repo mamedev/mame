@@ -20,6 +20,37 @@ Games:
 - Phoenix (#485)
 - Pokerino (#488)
 
+--
+
+Note on the original/shipped PROM configuration, via https://github.com/vpinball/pinmame/issues/583 :
+All S3 games have two files in common:
+ROM_LOAD("white1.716", 0x1000, 0x0800, CRC(9bbbf14f)
+ROM_LOAD("white2.716", 0x1800, 0x0800, CRC(4d4010dd)
+
+But they are distinguished by the file
+ROM_LOAD("gamerom.716", 0x0000, 0x0800, CRC(..)
+which is unique for each game.
+
+According to the schematics, however, the physical configuration of the memory chips (PROM and EPROM) on the original boards was slightly different
+(using Hot Tip as an example, but the same applies to other games):
+The schematic (page 7 for Hot Tip) clearly indicates that IC17 and IC20 are two 2Kx8 EPROMs (17=upper, 20=lower), i.e., 2716 size=0x0800
+However, there is NO other EPROM 2716 size=0x0800 on the board which would be corresponding to gamerom.716!
+Instead, there are two 512x8 PROMs (type 7641/6341, compatible with the 74S474 and 82S141) called IC21 and IC22, and the correct dumps of these two 512x8 PROMs have been available on IPDB for years.
+
+Comparing these two files with gamerom.716 yields the following:
+prom1.474   [0x200] CRC(ebfc71cb) SHA1(6b6204c1e78873f22e9c12a40cd2eea73d9272c8) SUM(6aaf)
+prom2.474   [0x200] CRC(2d0a402f) SHA1(93c33da7e0f329cddb2eb149df98316f7525d24e) SUM(87a7)
+gamerom.716 [0x800] CRC(b1d4fd9b) SHA1(e55ecf1328a55979c4cf8f3fb4e6761747e0abc4) SUM(f256)
+1xxxxxxxxxx = 0x00
+prom1.474 gamerom.716 [1/4] IDENTICAL
+prom2.474 gamerom.716 [2/4] IDENTICAL
+
+So, gamerom.716 has the second half completely empty (0x00) and the first half of it is the concatenation of these two PROMs.
+This can be explained by the fact that if a PROM breaks, it was virtually impossible for the arcade manager to repair/replace it,
+but these could have been easily replaced with a simple 2716, reprogrammed as "gamerom.716".
+
+--
+
 When first used, it appears frozen (the score should alternate). Press F3 to fix.
 
 Sound:

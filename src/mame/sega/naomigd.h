@@ -5,27 +5,23 @@
 
 #pragma once
 
-#include "naomibd.h"
-#include "cpu/pic16c62x/pic16c62x.h"
-#include "machine/i2cmem.h"
-#include "machine/eepromser.h"
 #include "315-6154.h"
+#include "naomibd.h"
+
+#include "cpu/pic16c62x/pic16c62x.h"
+#include "machine/eepromser.h"
+#include "machine/i2cmem.h"
 #include "machine/idectrl.h"
 
-// For ide gdrom controller
+// For IDE GDROM controller
 
-class idegdrom_device : public pci_device {
+class idegdrom_device : public pci_device
+{
 public:
-	idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const char *image_tag, const char *space_tag, int space_id);
-	idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *image_tag, const char *space_tag, int space_id)
-		: idegdrom_device(mconfig, tag, owner, 0, image_tag, space_tag, space_id)
-	{
-	}
 	idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	template <typename... T> void set_bus_master_space(T &&... space) { m_ide.lookup()->set_bus_master_space(std::forward<T>(space)...); }
 	auto irq_callback() { return irq_cb.bind(); }
-
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	void map_command(address_map &map) ATTR_COLD;
 	void map_control(address_map &map) ATTR_COLD;
@@ -38,6 +34,7 @@ public:
 	void ide_irq(int state);
 
 protected:
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -47,8 +44,6 @@ protected:
 private:
 	required_device<bus_master_ide_controller_device> m_ide;
 	devcb_write_line irq_cb;
-	const char *space_owner_tag;
-	int space_owner_id;
 };
 
 DECLARE_DEVICE_TYPE(IDE_GDROM, idegdrom_device)

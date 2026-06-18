@@ -1023,7 +1023,7 @@ void votrax_sc01_device::build_injection_filter(double *a, double *b,
 												double c3,  // Cap between the two op-amps
 												double c4)  // Cap over second op-amp
 {
-	// First compute the three coefficients of H(s) = (k0 + k2*s)/(k1 - k2*s)
+	// First compute the three coefficients of H(s) = (k0 + k2*s)/(k1 + k2*s)
 	double k0 = m_cclock * c2t;
 	double k1 = m_cclock * (c1b * c3 / c2t - c2t);
 	double k2 = c2b;
@@ -1036,12 +1036,6 @@ void votrax_sc01_device::build_injection_filter(double *a, double *b,
 
 	a[0] = k0 + m;
 	a[1] = k0 - m;
-	b[0] = k1 - m;
-	b[1] = k1 + m;
-
-	// That ends up in a numerically unstable filter.  Neutralize it for now.
-	a[0] = 0;
-	a[1] = 0;
-	b[0] = 1;
-	b[1] = 0;
+	b[0] = k1 + m;
+	b[1] = k1 - m;
 }

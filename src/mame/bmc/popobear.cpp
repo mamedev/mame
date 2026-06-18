@@ -10,8 +10,8 @@ TODO:
 - timer chip (controls auto-animation on title screen + something else during gameplay?);
 - Identify what's on $600000 & $620000;
 - Uses tas opcode to sync to irq, from VDP?
-- magkengo: uses unhandled GFX features (sprite problems); also needs hopper hook-up;
-- qiwang: uses unhandled GFX features (sprite problems), needs verifying of I/O / DIP definitions
+- magkengo: needs hopper hook-up;
+- qiwang: uses unhandled GFX features (tilemap priority), needs verifying of I/O / DIP definitions
   (available in test mode), hopper support;
 - pixram probably has a color base and a priority register, like bmcpokr.cpp.
 
@@ -243,7 +243,7 @@ int popobear_state::tilemap_base_words(u8 number) const // TODO: this is probabl
 {
 	if (m_alt_video)   // magkengo, qiwang: tile-map bases live in the video registers
 	{
-		static const int base_reg[4] = { 3, 5, 8, 10 };
+		constexpr int base_reg[4] = { 3, 5, 8, 10 };
 		return (m_vregs[base_reg[number]] & 0xffff) << 4;
 	}
 	return m_tilemap_base[number] / 2;   // popobear: fixed bases; vreg[8]/[10] are scroll
@@ -305,6 +305,9 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			if (pri != drawpri)
 				continue;
 
+			if (param == 0) // end of list marker (confirmed from qiwang, must be done after pri check)
+				return;
+
 			int y = sprdata[1];
 			int x = sprdata[2];
 			int spr_num = sprdata[3];
@@ -321,59 +324,52 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 			if (param & 0xf000) color_bank = (machine().rand() & 0x3);
 
-
-
 			int add_it = 0;
+			int palmask = 0x00;
 
-			// this isn't understood, not enough evidence.
 			switch (param & 3)
 			{
-				case 0x0: // girls in the intro (qiwang)
-				//color_bank = (machine().rand() & 0x3);
-				add_it = color_bank * 0x40;
+			case 0x0: // girls in the intro (qiwang)
+				palmask = 0xff;
+				// color_bank bits never set?
 				break;
 
-				case 0x1: // butterflies in intro, enemy characters, line of characters, stage start text
-				//color_bank = (machine().rand() & 0x3);
+			case 0x1: // butterflies in intro, enemy characters, line of characters, stage start text
+				palmask = 0x1f;
 				add_it = color_bank * 0x40;
+				// pixel_bits & 0xe0 sometimes set, why?
 				break;
 
-				case 0x2: // characters in intro, main player, powerups, timer, large dancing chars between levels (0x3f?)
-				//color_bank = (machine().rand() & 0x3);
+			case 0x2: // characters in intro, main player, powerups, timer, large dancing chars between levels
+				palmask = 0x3f;
 				add_it = color_bank * 0x40;
+				// pixel bits & 0xc0 not seen used
 				break;
 
-				case 0x3: // letters on GAME OVER need this..
+			case 0x3: // letters on GAME OVER need this
+				palmask = 0x1f;
 				add_it = color_bank * 0x40;
 				add_it += 0x20;
+				// pixel_bits & 0xe0 sometimes set, why?
 				break;
 			}
-
-			if (param == 0) // this avoids some glitches during the intro in popobear, when the panda gets stunned
-				continue;
 
 			spr_num <<= 3;
 
 			for (int yi = 0; yi < height; yi++)
 			{
-				int const y_draw = (y_dir) ? y + ((height - 1) - yi) : y + yi;
+				int const y_draw = y + (y_dir ? (height - 1 - yi) : yi);
 
 				for (int xi = 0; xi < width; xi++)
 				{
-					u8 const pix = vram[BYTE_XOR_BE(spr_num)];
-					int const x_draw = (x_dir) ? x + ((width - 1) - xi) : x + xi;
+					u8 const pix = vram[BYTE_XOR_BE(spr_num)] & palmask; // sometimes upper bits are set, but are either unused or have some non-colour purpose
+					int const x_draw = x + (x_dir ? (width - 1 - xi) : xi);
 
 					if (cliprect.contains(x_draw, y_draw))
 					{
-						// this is a bit strange, pix data is basically 8-bit
-						// but we have to treat 0x00, 0x40, 0x80, 0xc0
-						// see scores when you collect an item, must be at least steps of 0x40 or one of the female panda gfx between levels breaks.. might depend on lower bits?
-						// granularity also means colour bank is applied *0x40
-						// and we have 2 more possible colour bank bits
-						// colours on game over screen are still wrong without the weird param kludge above
-						if (pix & 0x3f) // TODO: this breaks portraits on qiwang's title screen (if (pix) fixes them)
+						if (pix)
 						{
-							bitmap.pix(y_draw, x_draw) = m_palette->pen(((pix + (add_it)) & 0xff) + 0x100);
+							bitmap.pix(y_draw, x_draw) = m_palette->pen((pix | add_it) + 0x100);
 						}
 					}
 
@@ -542,13 +538,13 @@ void popobear_state::magkengo_ctrl_w(u8 data)
 // Game checks the bytes read with 2 tables in ROM at 0xb508 / 0xb510
 u8 popobear_state::idchip_r()
 {
-	static constexpr u8 id_a[] = { 0x00, 0x02, 0x03, 0x39, 0x11, 0x95 };
-	static constexpr u8 id_b[] = { 0x00, 0x14, 0x21, 0x24, 0x31, 0x43, 0x51, 0x25, 0x26 };
+	constexpr u8 id_a[] = { 0x00, 0x02, 0x03, 0x39, 0x11, 0x95 };
+	constexpr u8 id_b[] = { 0x00, 0x14, 0x21, 0x24, 0x31, 0x43, 0x51, 0x25, 0x26 };
 
 	if (m_idpage)
-		return id_b[m_idptr % sizeof(id_b)];
+		return id_b[m_idptr % std::size(id_b)];
 
-	return id_a[m_idptr % sizeof(id_a)];
+	return id_a[m_idptr % std::size(id_a)];
 }
 
 void popobear_state::idchip_w(u8 data)
@@ -640,6 +636,7 @@ void popobear_state::magkengo_main_map(address_map &map)
 	map(0x540000, 0x540000).w(FUNC(popobear_state::magkengo_ctrl_w));
 	map(0x540000, 0x540001).portr("COIN");
 	map(0x550000, 0x550000).rw(FUNC(popobear_state::idchip_r), FUNC(popobear_state::idchip_w)); // TODO: this check was reversed by AI, verify
+	map(0x570000, 0x570001).nopw(); // TODO: probably lamps
 
 	map(0x600000, 0x7fffff).rom().region("gfx_data", 0);
 }
@@ -667,7 +664,7 @@ static INPUT_PORTS_START( popobear )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x1e, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )// only works with not coin inserted
+	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )// only works with no coin inserted
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
@@ -799,7 +796,7 @@ static INPUT_PORTS_START( qiwang )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )                                      // 投弊Ｂ
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )  PORT_NAME("Key In A")        // 開分Ａ
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )         PORT_NAME("Key In B") PORT_CODE(KEYCODE_3) // 開分Ｂ
-	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )// only works with not coin inserted
+	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )// only works with no coin inserted
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )                                     // 雙打開始
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )                                     // 單打開始
 
