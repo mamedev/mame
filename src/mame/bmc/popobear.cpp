@@ -192,6 +192,10 @@ private:
 	u8 idchip_r();
 	void idchip_w(u8 data);
 
+	void draw_tilemap3(screen_device &screen, bitmap_ind16& bitmap, const rectangle &cliprect);
+	void draw_tilemap2(screen_device &screen, bitmap_ind16& bitmap, const rectangle &cliprect);
+	void draw_tilemap1(screen_device &screen, bitmap_ind16& bitmap, const rectangle &cliprect);
+	void draw_tilemap0(screen_device &screen, bitmap_ind16& bitmap, const rectangle &cliprect);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -423,53 +427,14 @@ u8 popobear_state::get_tilemap_size(int which)
 		return 1;
 }
 
-u32 popobear_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
+void popobear_state::draw_tilemap3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(0, cliprect);
-
-	u16 const *const vreg = m_vregs;
-	// popmessage("%04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x",vreg[0x00],vreg[0x01],vreg[0x02],vreg[0x03],vreg[0x04],vreg[0x05],vreg[0x06], vreg[0x07],vreg[0x08],vreg[0x09],vreg[0x0a],vreg[0x0b],m_vregs[0x0c],m_vregs[0x0d],vreg[0x0e],vreg[0x0f]);
-
-	// vreg[0x00] also looks like it could be some enable registers
-	// 0x82ff - BMC logo
-	// 0x8aff - some attract scenes (no sprites)
-	// 0x8bff - game attract scenes etc. (sprites)
-
-	// vreg[0x01] is always
-	// 0xfefb
-
-
-	// pixram
-	if (!get_tilemap_enable(0) && !get_tilemap_enable(1) && !get_tilemap_enable(2) && !get_tilemap_enable(3) && BIT(vreg[0x0e], 5))
-	{
-		u8 const *const fb = reinterpret_cast<u8 const *>(m_vram.target()) + ((vreg[0x0e] & 0x0f) << 16);
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-			{
-				u8 const byte = fb[BYTE_XOR_BE(y * 0x100 + (x >> 1))];
-				bitmap.pix(y, x) = m_palette->pen((x & 1) ? (byte & 0x0f) : (byte >> 4));
-			}
-		return 0;
-	}
-
-	// Tile RAM and tile gfx share VRAM and the per-layer base can move at runtime,
-	// so revalidate every frame (vram_w already marks dirty on write).
-	mark_tilemaps_dirty();
-
-	// line-scroll only in mode 0x1f (popobear).  The line
-	// tables live in VRAM at (scroll-pointer register << 9): layer0 = vreg[3],
-	// layer1 = vreg[5], shared high-byte table = vreg[6] (e.g. 0x06fa -> 0xdf400).
-	// Any other non-zero enable is a plain layer (magkengo uses 0x05/0x0d/0x1d).
 	rectangle clip = cliprect;
-
-	int size;
-
-	// Tilemap 3
-	size = get_tilemap_size(3);
+	int size = get_tilemap_size(3);
 	if (get_tilemap_enable(3) & 0x02) // 0x10 is NOT set on popobear ending, and this mode is needed on the bottom layer
 	{
 
-		int const base = vreg[0x0a] << 9, hi = vreg[0x0d] << 9;
+		int const base = m_vregs[0x0a] << 9, hi = m_vregs[0x0b] << 9;
 		for (int line = cliprect.min_y; line <= cliprect.max_y; line++)
 		{
 			u16 const v = m_vram[base / 2 + line];
@@ -482,23 +447,28 @@ u32 popobear_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, c
 	}
 	else if (get_tilemap_enable(3))
 	{
-		m_bg_tilemap[3][size]->set_scrollx(0, vreg[0x09]);
-		m_bg_tilemap[3][size]->set_scrolly(0, vreg[0x0a] & 0x1ff);
+		m_bg_tilemap[3][size]->set_scrollx(0, m_vregs[0x09]);
+		m_bg_tilemap[3][size]->set_scrolly(0, m_vregs[0x0a] & 0x1ff);
 		m_bg_tilemap[3][size]->draw(screen, bitmap, cliprect, 0, 0);
 	}
+}
 
+void popobear_state::draw_tilemap2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
 	// Tilemap 2 (should probably also have the rowscroll features)
-
-	size = get_tilemap_size(2);
-	m_bg_tilemap[2][size]->set_scrollx(0, vreg[0x07]);
-	m_bg_tilemap[2][size]->set_scrolly(0, vreg[0x08]);
+	int size = get_tilemap_size(2);
+	m_bg_tilemap[2][size]->set_scrollx(0, m_vregs[0x07]);
+	m_bg_tilemap[2][size]->set_scrolly(0, m_vregs[0x08]);
 	if (get_tilemap_enable(2)) m_bg_tilemap[2][get_tilemap_size(2)]->draw(screen, bitmap, cliprect, 0, 0);
+}
 
-	// Tilemap 1
-	size = get_tilemap_size(1);
+void popobear_state::draw_tilemap1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int size = get_tilemap_size(1);
+	rectangle clip = cliprect;
 	if (get_tilemap_enable(1) & 0x10) // or & 0x02
 	{
-		int const base = vreg[0x05] << 9, hi = vreg[0x06] << 9;
+		int const base = m_vregs[0x05] << 9, hi = m_vregs[0x06] << 9;
 		for (int line = cliprect.min_y; line <= cliprect.max_y; line++)
 		{
 			u16 const v = m_vram[base / 2 + line];
@@ -515,12 +485,15 @@ u32 popobear_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, c
 		m_bg_tilemap[1][size]->set_scrolly(0, 0);
 		m_bg_tilemap[1][size]->draw(screen, bitmap, cliprect, 0, 0);
 	}
+}
 
-	// Tilemap 0
-	size = get_tilemap_size(0);
+void popobear_state::draw_tilemap0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int size = get_tilemap_size(0);
+	rectangle clip = cliprect;
 	if (get_tilemap_enable(0) & 0x10) // or & 0x02
 	{
-		int const base = vreg[0x03] << 9, hi = vreg[0x06] << 9;
+		int const base = m_vregs[0x03] << 9, hi = m_vregs[0x06] << 9;
 		for (int line = cliprect.min_y; line <= cliprect.max_y; line++)
 		{
 			u16 const v = m_vram[base / 2 + line];
@@ -534,11 +507,70 @@ u32 popobear_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, c
 	else if (get_tilemap_enable(0))
 	{
 		m_bg_tilemap[0][size]->set_scrollx(0, 0);
-		m_bg_tilemap[0][size]->set_scrolly(0, vreg[0x03] & 0x1ff); // popobear ending credit scroll
+		m_bg_tilemap[0][size]->set_scrolly(0, m_vregs[0x03] & 0x1ff); // popobear ending credit scroll
 		m_bg_tilemap[0][size]->draw(screen, bitmap, cliprect, 0, 0);
 	}
+}
 
-	if (BIT(vreg[0x00], 8))
+u32 popobear_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
+{
+	bitmap.fill(0, cliprect);
+	// popmessage("%04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x",vreg[0x00],vreg[0x01],vreg[0x02],vreg[0x03],vreg[0x04],vreg[0x05],vreg[0x06], vreg[0x07],vreg[0x08],vreg[0x09],vreg[0x0a],vreg[0x0b],m_vregs[0x0c],m_vregs[0x0d],vreg[0x0e],vreg[0x0f]);
+
+	// vreg[0x00] also looks like it could be some enable registers
+	// 0x82ff - BMC logo
+	// 0x8aff - some attract scenes (no sprites)
+	// 0x8bff - game attract scenes etc. (sprites)
+
+	// vreg[0x01] is always
+	// 0xfefb
+	
+	// regs
+	// 0  see above
+	// 1
+	// 2  tilemap 0 xscroll
+	// 3  tilemap 0 yscroll
+	// 4  tilemap 1 xscroll
+	// 5  tilemap 1 yscroll
+	// 6  tilemap 0/1 high base
+	// 7  tilemap 2 xscroll
+	// 8  tilemap 2 yscroll
+	// 9  tilemap 3 xscroll
+	// a  tilemap 3 yscroll
+	// b  tilemap 2/3 high base
+	// c  enable 0/1
+	// d  enable 2/3
+	// e
+	// f
+	
+	// pixram
+	if (!get_tilemap_enable(0) && !get_tilemap_enable(1) && !get_tilemap_enable(2) && !get_tilemap_enable(3) && BIT(m_vregs[0x0e], 5))
+	{
+		u8 const *const fb = reinterpret_cast<u8 const *>(m_vram.target()) + ((m_vregs[0x0e] & 0x0f) << 16);
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			{
+				u8 const byte = fb[BYTE_XOR_BE(y * 0x100 + (x >> 1))];
+				bitmap.pix(y, x) = m_palette->pen((x & 1) ? (byte & 0x0f) : (byte >> 4));
+			}
+		return 0;
+	}
+
+	// Tile RAM and tile gfx share VRAM and the per-layer base can move at runtime,
+	// so revalidate every frame (vram_w already marks dirty on write).
+	mark_tilemaps_dirty();
+
+	// line-scroll only in mode 0x1f (popobear).  The line
+	// tables live in VRAM at (scroll-pointer register << 9): layer0 = m_vregs[3],
+	// layer1 = m_vregs[5], shared high-byte table = m_vregs[6] (e.g. 0x06fa -> 0xdf400).
+	// Any other non-zero enable is a plain layer (magkengo uses 0x05/0x0d/0x1d).
+
+	draw_tilemap3(screen, bitmap, cliprect);
+	draw_tilemap2(screen, bitmap, cliprect);
+	draw_tilemap1(screen, bitmap, cliprect);
+	draw_tilemap0(screen, bitmap, cliprect);
+
+	if (BIT(m_vregs[0x00], 8))
 		draw_sprites(bitmap, cliprect);
 
 	return 0;
