@@ -455,12 +455,13 @@ u32 popobear_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, c
 	mark_tilemaps_dirty();
 
 	// Lower two layers: whole-layer scroll.
-	m_bg_tilemap[2][get_tilemap_size(2)]->set_scrollx(0, vreg[0x07]);
-	m_bg_tilemap[2][get_tilemap_size(2)]->set_scrolly(0, vreg[0x08]);
 
 	m_bg_tilemap[3][get_tilemap_size(3)]->set_scrollx(0, vreg[0x09]);
 	m_bg_tilemap[3][get_tilemap_size(3)]->set_scrolly(0, vreg[0x0a]);
 	if (get_tilemap_enable(3)) m_bg_tilemap[3][get_tilemap_size(3)]->draw(screen, bitmap, cliprect, 0, 0);
+
+	m_bg_tilemap[2][get_tilemap_size(2)]->set_scrollx(0, vreg[0x07]);
+	m_bg_tilemap[2][get_tilemap_size(2)]->set_scrolly(0, vreg[0x08]);
 	if (get_tilemap_enable(2)) m_bg_tilemap[2][get_tilemap_size(2)]->draw(screen, bitmap, cliprect, 0, 0);
 
 	// Upper two layers: line-scroll only in mode 0x1f (popobear).  The line
@@ -505,7 +506,7 @@ u32 popobear_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, c
 	else if (get_tilemap_enable(0))
 	{
 		m_bg_tilemap[0][get_tilemap_size(0)]->set_scrollx(0, 0);
-		m_bg_tilemap[0][get_tilemap_size(0)]->set_scrolly(0, 0);
+		m_bg_tilemap[0][get_tilemap_size(0)]->set_scrolly(0, vreg[0x03] & 0x1ff); // popobear ending credit scroll
 		m_bg_tilemap[0][get_tilemap_size(0)]->draw(screen, bitmap, cliprect, 0, 0);
 	}
 
