@@ -77,9 +77,6 @@
 
 namespace {
 
-// tek4404 MSU uses a 8085 that is slow to ACK
-unsigned constexpr TEK4404_ACK_DELAY = 30'000;
-
 // mapcntl bits
 constexpr int MAP_VM_ENABLE = 4;
 constexpr int MAP_SYS_WR_ENABLE = 5;
