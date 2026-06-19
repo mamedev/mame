@@ -760,8 +760,9 @@ void ppc_device::static_generate_exception(uint8_t exception, int recover, const
 	alloc_handle(m_drcuml.get(), &exception_handle, name);
 	UML_HANDLE(block, *exception_handle);                                                   // handle  name
 
-	   // DSIs and alignment exceptions report the faulting data address in DAR (ISIs uses SRR0/SRR1 instead)
-	   if (exception == EXCEPTION_DSI || exception == EXCEPTION_ALIGN)  {
+	// DSIs and alignment exceptions report the faulting data address in DAR (ISIs uses SRR0/SRR1 instead)
+	if (exception == EXCEPTION_DSI || exception == EXCEPTION_ALIGN)
+	{
 		UML_GETEXP(block, I0);                                                          // getexp  i0
 		UML_MOV(block, SPR32(SPROEA_DAR), I0);                                          // mov     [dar],i0
 	}
@@ -923,7 +924,15 @@ void ppc_device::static_generate_exception(uint8_t exception, int recover, const
     static_generate_memory_accessor
 ------------------------------------------------------------------*/
 
-void ppc_device::static_generate_memory_accessor(int mode, int size, bool iswrite, bool ismasked, bool isreserve, const char *name, uml::code_handle *&handleptr, uml::code_handle *masked)
+void ppc_device::static_generate_memory_accessor(
+		int mode,
+		int size,
+		bool iswrite,
+		bool ismasked,
+		bool isreserve,
+		const char *name,
+		uml::code_handle *&handleptr,
+		uml::code_handle *masked)
 {
 	/* on entry, address is in I0; data for writes is in I1; masks are in I2 */
 	/* on exit, read result is in I0 */

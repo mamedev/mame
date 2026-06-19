@@ -35,7 +35,7 @@ The BCS is a box that can be used to convert over 300 floppy-disk formats.
 ***************************************************************************
 
 
-To Do: FDC card, Centronics card, EIC card, Experimenter board, video RAM visibility, keyboard
+TODO: FDC card, Centronics card, EIC card, Experimenter board, video RAM visibility, keyboard
 Status: Video works, otherwise skeleton
 
 
@@ -55,6 +55,7 @@ Status: Video works, otherwise skeleton
 
 #include "emupal.h"
 #include "screen.h"
+
 
 namespace {
 
@@ -82,7 +83,7 @@ public:
 		//, m_io_keyboard(*this, "LINE%d", 0U)
 	{ }
 
-	void elzet80(machine_config &config);
+	void elzet80(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
