@@ -164,7 +164,7 @@ private:
 	int m_tilemap_base[4]{}; // configuration. TODO: shouldn't be needed
 	std::vector<u16> m_vram_rearranged;
 
-	tilemap_t *m_bg_tilemap[4]{};
+	tilemap_t *m_bg_tilemap[4][2]{};
 
 	u8 m_irq_enable = 0;
 	u8 m_dsw_select = 0;
@@ -176,6 +176,9 @@ private:
 
 	template <u8 Number> TILE_GET_INFO_MEMBER(get_tile_info);
 
+	u8 get_tilemap_size(int which);
+	u8 get_tilemap_enable(int which);
+	void mark_tilemaps_dirty();
 	int tilemap_base_words(u8 number) const;
 
 	void irq_ack_w(u8 data);
@@ -189,6 +192,7 @@ private:
 	u8 idchip_r();
 	void idchip_w(u8 data);
 
+	void draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int basereg, int hireg, int xreg);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -200,6 +204,13 @@ private:
 	void magkengo_main_map(address_map &map) ATTR_COLD;
 };
 
+void popobear_state::mark_tilemaps_dirty()
+{
+	// unfortunately tilemaps and tilegfx share the same RAM so we're always dirty if we write to RAM
+	for (int i = 0; i < 2; i++)
+		for (int j = 0; j < 4; j++)
+			m_bg_tilemap[j][i]->mark_all_dirty();
+}
 
 void popobear_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
@@ -217,11 +228,7 @@ void popobear_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
 	COMBINE_DATA(&m_vram_rearranged[swapped_offset]);
 	m_gfxdecode->gfx(0)->mark_dirty((swapped_offset) / 32);
 
-	// unfortunately tilemaps and tilegfx share the same RAM so we're always dirty if we write to RAM
-	m_bg_tilemap[0]->mark_all_dirty();
-	m_bg_tilemap[1]->mark_all_dirty();
-	m_bg_tilemap[2]->mark_all_dirty();
-	m_bg_tilemap[3]->mark_all_dirty();
+	mark_tilemaps_dirty();
 }
 
 static const gfx_layout char_layout =
@@ -263,15 +270,23 @@ void popobear_state::video_start()
 
 	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<u8 *>(&m_vram_rearranged[0]));
 
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(popobear_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(popobear_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-	m_bg_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(popobear_state::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-	m_bg_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(popobear_state::get_tile_info<3>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	// full height (drawn when enable bits are 0x0d / 0x1d / 0x1f?)
+	m_bg_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(popobear_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_bg_tilemap[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(popobear_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_bg_tilemap[2][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(popobear_state::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_bg_tilemap[3][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(popobear_state::get_tile_info<3>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 
-	m_bg_tilemap[0]->set_transparent_pen(0);
-	m_bg_tilemap[1]->set_transparent_pen(0);
-	m_bg_tilemap[2]->set_transparent_pen(0);
-	m_bg_tilemap[3]->set_transparent_pen(0);
+	// half height (drawn when enable bits are 0x05)
+	m_bg_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(popobear_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
+	m_bg_tilemap[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(popobear_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
+	m_bg_tilemap[2][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(popobear_state::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
+	m_bg_tilemap[3][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(popobear_state::get_tile_info<3>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
+
+	for (int i = 0; i < 2; i++)
+		for (int j = 0; j < 4; j++)
+			m_bg_tilemap[j][i]->set_transparent_pen(0);
+
+	save_item(NAME(m_vram_rearranged));
 }
 
 
@@ -288,7 +303,7 @@ void popobear_state::video_start()
  */
 void popobear_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8* vram = reinterpret_cast<u8 *>(m_spriteram.target());
+	u8 *vram = reinterpret_cast<u8 *>(m_spriteram.target());
 
 	for (int drawpri = 0xf; drawpri >= 0x0; drawpri--)
 	{
@@ -380,21 +395,9 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-u32 popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u8 popobear_state::get_tilemap_enable(int which)
 {
-	bitmap.fill(0, cliprect);
-
 	u16 const *const vreg = m_vregs;
-	// popmessage("%04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x",vreg[0x00],vreg[0x01],vreg[0x02],vreg[0x03],vreg[0x04],vreg[0x05],vreg[0x06], vreg[0x07],vreg[0x08],vreg[0x09],vreg[0x0a],vreg[0x0b],m_vregs[0x0c],m_vregs[0x0d],vreg[0x0e],vreg[0x0f]);
-
-	// vreg[0x00] also looks like it could be some enable registers
-	// 0x82ff - BMC logo
-	// 0x8aff - some attract scenes (no sprites)
-	// 0x8bff - game attract scenes etc. (sprites)
-
-	// vreg[0x01] is always
-	// 0xfefb
-
 	// Per-layer enable byte; a layer draws when non-zero.  Value 0x1f selects the
 	// per-line (line-scroll) mode on the upper two layers; every other non-zero
 	// value is a plain layer.
@@ -405,10 +408,90 @@ u32 popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		(vreg[0x0d] & 0x00ff)         // layer 3
 	};
 
-	// pixram
-	if (!enable[0] && !enable[1] && !enable[2] && !enable[3] && BIT(vreg[0x0e], 5))
+	return enable[which];
+}
+
+u8 popobear_state::get_tilemap_size(int which)
+{
+	u8 enable = get_tilemap_enable(which);
+
+	// 0x0d / 0x1d / 0x1f = larger tilemap
+	// 0x05 = smaller tilemap
+
+	if (enable & 0x08)
+		return 0;
+	else
+		return 1;
+}
+
+
+void popobear_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int basereg, int hireg, int xreg)
+{
+	int size = get_tilemap_size(which);
+	rectangle clip = cliprect;
+	if (get_tilemap_enable(which) & 0x02) // or & 0x10 (no, based on popobear ending)
 	{
-		u8 const *const fb = reinterpret_cast<u8 const *>(m_vram.target()) + ((vreg[0x0e] & 0x0f) << 16);
+		int const base = m_vregs[basereg] << 9, hi = m_vregs[hireg] << 9;
+		for (int line = cliprect.min_y; line <= cliprect.max_y; line++)
+		{
+			u16 const v = m_vram[base / 2 + line];
+			u16 u;
+			if (which & 1)
+				u = (m_vram[hi / 2 + line] & 0xff00) >> 8;
+			else
+				u = (m_vram[hi / 2 + line] & 0x00ff);
+
+			clip.sety(line, line);
+			m_bg_tilemap[which][size]->set_scrollx(0, (v & 0x00ff) | (u << 8));
+			m_bg_tilemap[which][size]->set_scrolly(0, ((v & 0xff00) >> 8) - line);
+			m_bg_tilemap[which][size]->draw(screen, bitmap, clip, 0, 0);
+		}
+	}
+	else if (get_tilemap_enable(which))
+	{
+		m_bg_tilemap[which][size]->set_scrollx(0, m_vregs[xreg]);
+		m_bg_tilemap[which][size]->set_scrolly(0, m_vregs[basereg] & 0x1ff);
+
+		m_bg_tilemap[which][size]->draw(screen, bitmap, cliprect, 0, 0);
+	}
+}
+
+
+u32 popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(0, cliprect);
+	// popmessage("%04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x",vreg[0x00],vreg[0x01],vreg[0x02],vreg[0x03],vreg[0x04],vreg[0x05],vreg[0x06], vreg[0x07],vreg[0x08],vreg[0x09],vreg[0x0a],vreg[0x0b],m_vregs[0x0c],m_vregs[0x0d],vreg[0x0e],vreg[0x0f]);
+
+	// vreg[0x00] also looks like it could be some enable registers
+	// 0x82ff - BMC logo
+	// 0x8aff - some attract scenes (no sprites)
+	// 0x8bff - game attract scenes etc. (sprites)
+
+	// vreg[0x01] is always
+	// 0xfefb
+	
+	// regs
+	// 0  see above
+	// 1
+	// 2  tilemap 0 xscroll
+	// 3  tilemap 0 yscroll
+	// 4  tilemap 1 xscroll
+	// 5  tilemap 1 yscroll
+	// 6  tilemap 0/1 high base
+	// 7  tilemap 2 xscroll
+	// 8  tilemap 2 yscroll
+	// 9  tilemap 3 xscroll
+	// a  tilemap 3 yscroll
+	// b  tilemap 2/3 high base
+	// c  enable 0/1
+	// d  enable 2/3
+	// e
+	// f
+	
+	// pixram
+	if (!get_tilemap_enable(0) && !get_tilemap_enable(1) && !get_tilemap_enable(2) && !get_tilemap_enable(3) && BIT(m_vregs[0x0e], 5))
+	{
+		u8 const *const fb = reinterpret_cast<u8 const *>(m_vram.target()) + ((m_vregs[0x0e] & 0x0f) << 16);
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
@@ -420,64 +503,20 @@ u32 popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	// Tile RAM and tile gfx share VRAM and the per-layer base can move at runtime,
 	// so revalidate every frame (vram_w already marks dirty on write).
-	for (auto &tm : m_bg_tilemap)
-		tm->mark_all_dirty();
+	mark_tilemaps_dirty();
 
-	// Lower two layers: whole-layer scroll.
-	m_bg_tilemap[2]->set_scrollx(0, vreg[0x07]);
-	m_bg_tilemap[2]->set_scrolly(0, vreg[0x08]);
-	m_bg_tilemap[3]->set_scrollx(0, vreg[0x09]);
-	m_bg_tilemap[3]->set_scrolly(0, vreg[0x0a]);
-	if (enable[3]) m_bg_tilemap[3]->draw(screen, bitmap, cliprect, 0, 0);
-	if (enable[2]) m_bg_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
-
-	// Upper two layers: line-scroll only in mode 0x1f (popobear).  The line
-	// tables live in VRAM at (scroll-pointer register << 9): layer0 = vreg[3],
-	// layer1 = vreg[5], shared high-byte table = vreg[6] (e.g. 0x06fa -> 0xdf400).
+	// line-scroll only in mode 0x1f (popobear).  The line
+	// tables live in VRAM at (scroll-pointer register << 9): layer0 = m_vregs[3],
+	// layer1 = m_vregs[5], shared high-byte table = m_vregs[6] (e.g. 0x06fa -> 0xdf400).
 	// Any other non-zero enable is a plain layer (magkengo uses 0x05/0x0d/0x1d).
-	rectangle clip = cliprect;
 
-	if (enable[1] == 0x1f)
-	{
-		int const base = vreg[0x05] << 9, hi = vreg[0x06] << 9;
-		for (int line = cliprect.min_y; line <= cliprect.max_y; line++)
-		{
-			u16 const v = m_vram[base / 2 + line];
-			u16 const u = (m_vram[hi / 2 + line] & 0xff00) >> 8;
-			clip.sety(line, line);
-			m_bg_tilemap[1]->set_scrollx(0, (v & 0x00ff) | (u << 8));
-			m_bg_tilemap[1]->set_scrolly(0, ((v & 0xff00) >> 8) - line);
-			m_bg_tilemap[1]->draw(screen, bitmap, clip, 0, 0);
-		}
-	}
-	else if (enable[1])
-	{
-		m_bg_tilemap[1]->set_scrollx(0, 0);
-		m_bg_tilemap[1]->set_scrolly(0, 0);
-		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-	}
+	draw_tilemap(screen, bitmap, cliprect, 3, 0xa, 0xb, 0x9);
+	draw_tilemap(screen, bitmap, cliprect, 2, 0x8, 0xb, 0x7);
 
-	if (enable[0] == 0x1f)
-	{
-		int const base = vreg[0x03] << 9, hi = vreg[0x06] << 9;
-		for (int line = cliprect.min_y; line <= cliprect.max_y; line++)
-		{
-			u16 const v = m_vram[base / 2 + line];
-			u16 const u = (m_vram[hi / 2 + line] & 0x00ff);
-			clip.sety(line, line);
-			m_bg_tilemap[0]->set_scrollx(0, (v & 0x00ff) | (u << 8));
-			m_bg_tilemap[0]->set_scrolly(0, ((v & 0xff00) >> 8) - line);
-			m_bg_tilemap[0]->draw(screen, bitmap, clip, 0, 0);
-		}
-	}
-	else if (enable[0])
-	{
-		m_bg_tilemap[0]->set_scrollx(0, 0);
-		m_bg_tilemap[0]->set_scrolly(0, 0);
-		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
-	}
+	draw_tilemap(screen, bitmap, cliprect, 1, 0x5, 0x6, 0x4);
+	draw_tilemap(screen, bitmap, cliprect, 0, 0x3, 0x6, 0x2);
 
-	if (BIT(vreg[0x00], 8))
+	if (BIT(m_vregs[0x00], 8))
 		draw_sprites(bitmap, cliprect);
 
 	return 0;
@@ -503,7 +542,6 @@ u8 popobear_state::_620000_r()
 
 void popobear_state::machine_start()
 {
-	save_item(NAME(m_vram_rearranged));
 	save_item(NAME(m_dsw_select));
 	save_item(NAME(m_irq_enable));
 
