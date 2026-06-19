@@ -47,7 +47,6 @@ private:
 	uint8_t m_video_enable;
 
 	void io_map(address_map &map);
-	void update_vram_mapping();
 
 	uint8_t reg_index_r();
 	void reg_index_w(uint8_t data);

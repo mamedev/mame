@@ -60,7 +60,7 @@ void pc9801_96_device::device_reset()
 	m_relay_ctrl = 0;
 	m_video_enable = 0;
 
-	update_vram_mapping();
+	m_bus->remap(AS_PROGRAM, 0, 0xffffff);
 }
 
 void pc9801_96_device::remap(int space_id, offs_t start, offs_t end)
@@ -69,29 +69,25 @@ void pc9801_96_device::remap(int space_id, offs_t start, offs_t end)
 	{
 		m_bus->install_device(0x0000, 0xffff, *this, &pc9801_96_device::io_map);
 	}
-}
-
-void pc9801_96_device::update_vram_mapping()
-{
-	if (!m_bus)
-		return;
-
-	address_space &program_space = m_bus->space(AS_PROGRAM);
-
-	if (m_prev_vram_window_addr != 0)
+	else if (space_id == AS_PROGRAM)
 	{
-		program_space.unmap_readwrite(m_prev_vram_window_addr, m_prev_vram_window_addr + 0xffff);
-		m_prev_vram_window_addr = 0;
-	}
+		address_space &program_space = m_bus->space(AS_PROGRAM);
 
-	if (m_vram_window_addr != 0)
-	{
-		program_space.install_readwrite_handler(
-			m_vram_window_addr, m_vram_window_addr + 0xffff,
-			read8sm_delegate(*this, FUNC(pc9801_96_device::vram_r)),
-			write8sm_delegate(*this, FUNC(pc9801_96_device::vram_w))
-		);
-		m_prev_vram_window_addr = m_vram_window_addr;
+		if (m_prev_vram_window_addr != 0)
+		{
+			program_space.unmap_readwrite(m_prev_vram_window_addr, m_prev_vram_window_addr + 0xffff);
+			m_prev_vram_window_addr = 0;
+		}
+
+		if (m_vram_window_addr != 0)
+		{
+			program_space.install_readwrite_handler(
+				m_vram_window_addr, m_vram_window_addr + 0xffff,
+				read8sm_delegate(*this, FUNC(pc9801_96_device::vram_r)),
+				write8sm_delegate(*this, FUNC(pc9801_96_device::vram_w))
+			);
+			m_prev_vram_window_addr = m_vram_window_addr;
+		}
 	}
 }
 
@@ -250,7 +246,7 @@ void pc9801_96_device::window_w(uint8_t data)
 			m_vram_window_addr = 0;
 			break;
 	}
-	update_vram_mapping();
+	m_bus->remap(AS_PROGRAM, 0, 0xffffff);
 }
 
 uint8_t pc9801_96_device::linear_addr_r()
@@ -261,7 +257,7 @@ uint8_t pc9801_96_device::linear_addr_r()
 void pc9801_96_device::linear_addr_w(uint8_t data)
 {
 	m_linear_vram_addr = (data << 24);
-	update_vram_mapping();
+	m_bus->remap(AS_PROGRAM, 0, 0xffffff);
 }
 
 uint8_t pc9801_96_device::relay_r()
