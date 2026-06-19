@@ -23,7 +23,7 @@ void s1c33l27_device::device_reset()
 
 void s1c33l27_device::internal_map(address_map &map)
 {
-	map(0x00000000, 0x00005fff).ram();
+	map(0x00000000, 0x00004fff).ram();
 	map(0x00008000, 0x0000ffff).ram();
 	map(0x00084000, 0x000847ff).ram();
 	// 0x00300000-0x003000ff Misc Registers (MISC)

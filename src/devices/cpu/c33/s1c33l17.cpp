@@ -23,7 +23,7 @@ void s1c33l17_device::device_reset()
 
 void s1c33l17_device::internal_map(address_map &map)
 {
-	map(0x00000000, 0x00005fff).ram();
+	map(0x00000000, 0x00004fff).ram();
 	map(0x00084000, 0x000847ff).ram();
 	// 0x00300010-0x00300020 Misc Register (1)
 	// 0x00300260-0x003002af Interrupt Controller
