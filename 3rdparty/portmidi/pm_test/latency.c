@@ -155,7 +155,7 @@ void pt_callback(PtTimestamp timestamp, void *userData)
 }
 
 
-int main()
+int main(int argc, char *argv[])
 {
     int i;
     int len;

@@ -1504,6 +1504,8 @@ bool ppc_device::frontend::describe_3b(uint32_t op, opcode_desc &desc, const opc
 
 		case 0x16:  // FSQRTSx
 		case 0x18:  // FRESx
+			if (is_601_class())     // 601 implements neither fsqrts nor fres -> illegal
+				return false;
 			desc.set_fpr_used(G_RB(op));
 			desc.set_fpr_modified(G_RD(op));
 			if (op & M_RC)
@@ -1584,6 +1586,8 @@ bool ppc_device::frontend::describe_3f(uint32_t op, opcode_desc &desc, const opc
 
 			case 0x16:  // FSQRTx
 			case 0x1a:  // FSQRTEx
+				if (is_601_class())     // 601 implements neither fsqrt nor frsqrte -> illegal
+					return false;
 				desc.set_fpr_used(G_RB(op));
 				desc.set_fpr_modified(G_RD(op));
 				if (op & M_RC)
@@ -1592,13 +1596,15 @@ bool ppc_device::frontend::describe_3f(uint32_t op, opcode_desc &desc, const opc
 				return true;
 
 			case 0x17:  // FSELx
+				if (is_601_class())     // 601 has no fsel -> illegal
+					return false;
 				desc.set_fpr_used(G_RA(op));
 				desc.set_fpr_used(G_RB(op));
 				desc.set_fpr_used(G_REGC(op));
 				desc.set_fpr_modified(G_RD(op));
 				if (op & M_RC)
 					desc.set_cr_modified(1);
-				desc.cycles = 2;    // 601/603
+				desc.cycles = 2;    // 603
 				return true;
 
 			case 0x1c:  // FMSUBx
