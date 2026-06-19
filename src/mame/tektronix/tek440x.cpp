@@ -116,9 +116,9 @@ private:
 	u8 nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, u8 data);
 	u8 recall_r();
-	void recall_w(uint8_t data);
+	void recall_w(u8 data);
 	u8 store_r();
-	void store_w(uint8_t data);
+	void store_w(u8 data);
 
 
 	void kb_rdata_w(int state);
@@ -373,7 +373,7 @@ u8 tek440x_state::store_r()
 	return 0xff;
 }
 
-void tek440x_state::store_w(uint8_t data)
+void tek440x_state::store_w(u8 data)
 {
 	LOG("store_w\n");
 	m_novram->store(1);
