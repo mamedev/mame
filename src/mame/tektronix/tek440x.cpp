@@ -68,6 +68,9 @@
 
 #include "logmacro.h"
 
+constexpr offs_t OFF8_TO_OFF16(offs_t x) { return x>>1; }
+constexpr offs_t OFF16_TO_OFF8(offs_t x) { return x<<1; }
+
 namespace {
 
 class tek440x_state : public driver_device
