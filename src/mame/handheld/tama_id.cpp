@@ -57,7 +57,7 @@ INPUT_PORTS_END
 
 void tama_id_state::tamaid(machine_config &config)
 {
-	S1C33L17(config, m_maincpu, 10'000'000); // possibly S1C33L19 (with JPEG decoder/encoder); unknown clock
+	S1C33E07(config, m_maincpu, 10'000'000); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &tama_id_state::mem_map);
 
 	// wrong, just so it's clear this has a screen
