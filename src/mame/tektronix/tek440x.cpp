@@ -84,9 +84,6 @@ constexpr int MAP_SYS_WR_ENABLE = 5;
 constexpr int MAP_BLOCK_ACCESS = 6;
 constexpr int MAP_CPU_WR = 7;
 
-constexpr offs_t OFF8_TO_OFF16(offs_t x) { return x>>1; }
-constexpr offs_t OFF16_TO_OFF8(offs_t x) { return x<<1; }
-
 constexpr offs_t MAXRAM = 0x400000;	// +3MB
 
 
