@@ -324,12 +324,11 @@ void tek440x_state::kb_tdata_w(int state)
 	}
 }
 
-
 u8 tek440x_state::nvram_r(address_space &space, offs_t offset)
 {
 	uu8 data = m_novram->read(space, offset);
 
-	LOG("nvram_r(%d) => %02x pc(%08x)\n", offset, data, m_maincpu->pc());
+	LOG("nvram_r(0x%x) => 0x%02x pc(%08x)\n", offset, data, m_maincpu->pc());
 
 	// kick it up to top 4 bits
 	return data << 4;
@@ -338,7 +337,7 @@ u8 tek440x_state::nvram_r(address_space &space, offs_t offset)
 
 void tek440x_state::nvram_w(offs_t offset, u8 data)
 {
-	LOG("nvram_w(%d) <= %02x\n", offset, data);
+	LOG("nvram_w(0x%x) <= %02x\n", offset, data);
 
 	m_novram->write(offset, data >> 4);
 }
