@@ -77,7 +77,7 @@ segapcm_base_device::segapcm_base_device(const machine_config &mconfig, device_t
 //  segapcm_device - constructor
 //-------------------------------------------------
 
-template<unsigned MaxVoices>
+template <unsigned MaxVoices>
 segapcm_device<MaxVoices>::segapcm_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: segapcm_base_device(mconfig, type, tag, owner, clock)
 {
@@ -113,14 +113,14 @@ void segapcm_base_device::device_start()
 	std::fill_n(&m_ram[0], m_ram.length(), 0xff);
 }
 
-template<unsigned MaxVoices>
+template <unsigned MaxVoices>
 void segapcm_device<MaxVoices>::device_start()
 {
 	segapcm_base_device::device_start();
 
 	m_stream = stream_alloc(0, 2, clock() / CLOCK_DIVIDER);
 
-	for (auto & elem : m_voice)
+	for (auto &elem : m_voice)
 		elem.host = this;
 
 	save_item(STRUCT_MEMBER(m_voice, addr));
@@ -140,7 +140,7 @@ void segapcm_device<MaxVoices>::device_start()
 //  changes
 //-------------------------------------------------
 
-template<unsigned MaxVoices>
+template <unsigned MaxVoices>
 void segapcm_device<MaxVoices>::device_clock_changed()
 {
 	m_stream->set_sample_rate(clock() / CLOCK_DIVIDER);
@@ -162,7 +162,7 @@ void segapcm_base_device::rom_bank_pre_change()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-template<unsigned MaxVoices>
+template <unsigned MaxVoices>
 void segapcm_device<MaxVoices>::sound_stream_update(sound_stream &stream)
 {
 	/* loop over streams */
@@ -210,7 +210,7 @@ void segapcm_base_device::voice_t::tick()
 }
 
 // read/write handlers
-template<unsigned MaxVoices>
+template <unsigned MaxVoices>
 uint8_t segapcm_device<MaxVoices>::voice_addr_r(offs_t offset)
 {
 	m_stream->update();
@@ -219,7 +219,7 @@ uint8_t segapcm_device<MaxVoices>::voice_addr_r(offs_t offset)
 	return (voice.addr >> shift) & 0xff;
 }
 
-template<unsigned MaxVoices>
+template <unsigned MaxVoices>
 uint8_t segapcm_device<MaxVoices>::voice_loop_r(offs_t offset)
 {
 	m_stream->update();
@@ -228,7 +228,7 @@ uint8_t segapcm_device<MaxVoices>::voice_loop_r(offs_t offset)
 	return (voice.loop >> shift) & 0xff;
 }
 
-template<unsigned MaxVoices>
+template <unsigned MaxVoices>
 uint8_t segapcm_device<MaxVoices>::voice_end_r(offs_t offset)
 {
 	m_stream->update();
@@ -236,7 +236,7 @@ uint8_t segapcm_device<MaxVoices>::voice_end_r(offs_t offset)
 	return voice.end;
 }
 
-template<unsigned MaxVoices>
+template <unsigned MaxVoices>
 uint8_t segapcm_device<MaxVoices>::voice_freq_r(offs_t offset)
 {
 	m_stream->update();
@@ -244,7 +244,7 @@ uint8_t segapcm_device<MaxVoices>::voice_freq_r(offs_t offset)
 	return voice.freq;
 }
 
-template<unsigned MaxVoices>
+template <unsigned MaxVoices>
 uint8_t segapcm_device<MaxVoices>::voice_lvol_r(offs_t offset)
 {
 	m_stream->update();
@@ -252,7 +252,7 @@ uint8_t segapcm_device<MaxVoices>::voice_lvol_r(offs_t offset)
 	return voice.lvol;
 }
 
-template<unsigned MaxVoices>
+template <unsigned MaxVoices>
 uint8_t segapcm_device<MaxVoices>::voice_rvol_r(offs_t offset)
 {
 	m_stream->update();
@@ -260,7 +260,7 @@ uint8_t segapcm_device<MaxVoices>::voice_rvol_r(offs_t offset)
 	return voice.rvol;
 }
 
-template<unsigned MaxVoices>
+template <unsigned MaxVoices>
 uint8_t segapcm_device<MaxVoices>::voice_ctrl_r(offs_t offset)
 {
 	m_stream->update();
@@ -268,7 +268,7 @@ uint8_t segapcm_device<MaxVoices>::voice_ctrl_r(offs_t offset)
 	return voice.ctrl;
 }
 
-template<unsigned MaxVoices>
+template <unsigned MaxVoices>
 void segapcm_device<MaxVoices>::voice_addr_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
@@ -277,7 +277,7 @@ void segapcm_device<MaxVoices>::voice_addr_w(offs_t offset, uint8_t data)
 	voice.addr = (voice.addr & ~(0xff << shift)) | (uint32_t(data) << shift);
 }
 
-template<unsigned MaxVoices>
+template <unsigned MaxVoices>
 void segapcm_device<MaxVoices>::voice_loop_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
@@ -286,7 +286,7 @@ void segapcm_device<MaxVoices>::voice_loop_w(offs_t offset, uint8_t data)
 	voice.loop = (voice.loop & ~(0xff << shift)) | (uint32_t(data) << shift);
 }
 
-template<unsigned MaxVoices>
+template <unsigned MaxVoices>
 void segapcm_device<MaxVoices>::voice_end_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
@@ -294,7 +294,7 @@ void segapcm_device<MaxVoices>::voice_end_w(offs_t offset, uint8_t data)
 	voice.end = data;
 }
 
-template<unsigned MaxVoices>
+template <unsigned MaxVoices>
 void segapcm_device<MaxVoices>::voice_freq_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
@@ -302,7 +302,7 @@ void segapcm_device<MaxVoices>::voice_freq_w(offs_t offset, uint8_t data)
 	voice.freq = data;
 }
 
-template<unsigned MaxVoices>
+template <unsigned MaxVoices>
 void segapcm_device<MaxVoices>::voice_lvol_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
@@ -310,7 +310,7 @@ void segapcm_device<MaxVoices>::voice_lvol_w(offs_t offset, uint8_t data)
 	voice.lvol = data;
 }
 
-template<unsigned MaxVoices>
+template <unsigned MaxVoices>
 void segapcm_device<MaxVoices>::voice_rvol_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
@@ -318,7 +318,7 @@ void segapcm_device<MaxVoices>::voice_rvol_w(offs_t offset, uint8_t data)
 	voice.rvol = data;
 }
 
-template<unsigned MaxVoices>
+template <unsigned MaxVoices>
 void segapcm_device<MaxVoices>::voice_ctrl_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
@@ -326,6 +326,6 @@ void segapcm_device<MaxVoices>::voice_ctrl_w(offs_t offset, uint8_t data)
 	voice.ctrl = data;
 }
 
-// template class definition
+// template class instantiation
 template class segapcm_device<8>;
 template class segapcm_device<16>;
