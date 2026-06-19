@@ -22,7 +22,7 @@ class segapcm_base_device : public device_t,
 protected:
 	segapcm_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	// device_rom_interface overrides
@@ -48,7 +48,7 @@ protected:
 	};
 
 	required_shared_ptr<uint8_t> m_ram;
-	sound_stream* m_stream;
+	sound_stream *m_stream;
 };
 
 template<unsigned MaxVoices>
@@ -60,11 +60,11 @@ protected:
 
 	segapcm_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
-	// sound stream update overrides
+	// device_sound_interface implementation
 	virtual void sound_stream_update(sound_stream &stream) override;
 
 	// read/write handlers
