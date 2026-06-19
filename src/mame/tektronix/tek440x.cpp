@@ -334,12 +334,13 @@ u8 tek440x_state::nvram_r(offs_t offset)
 	// kick it up to top 4 bits
 	return data << 4;
 }
+
 void tek440x_state::nvram_w(offs_t offset, u8 data)
 {
 	LOG("nvram_w(%d) <= %02x\n", offset, data);
 
 	// duplicate in lower 4 bits
-	m_novram->write(offset, data | (data >> 4));
+	m_novram->write(offset, data >> 4);
 }
 	
 u8 tek440x_state::recall_r()
