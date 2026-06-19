@@ -327,11 +327,12 @@ void tek440x_state::kb_tdata_w(int state)
 
 u8 tek440x_state::nvram_r(address_space &space, offs_t offset)
 {
-	uu8 data = m_novram->read(space, offset >> 1);
+	uu8 data = m_novram->read(space, offset);
 
 	LOG("nvram_r(%d) => %02x pc(%08x)\n", offset, data, m_maincpu->pc());
 
 	// kick it up to top 4 bits
+	return data << 4;
 	return data << 4;
 }
 
@@ -339,7 +340,7 @@ void tek440x_state::nvram_w(offs_t offset, u8 data)
 {
 	LOG("nvram_w(%d) <= %02x\n", offset, data);
 
-	m_novram->write(offset >> 1, data >> 4);
+	m_novram->write(offset, data >> 4);
 }
 	
 u8 tek440x_state::recall_r()
@@ -396,7 +397,7 @@ void tek440x_state::physical_map(address_map &map)
 
 	// maps 128 address range to nvram (see p2.8-3)
 	// 721000-72107f net ram (A0 ignored, uses A1-A6)
-	map(0x721000, 0x72107f).rw(FUNC(tek440x_state::nvram_r), FUNC(tek440x_state::nvram_w));	//.unit_mask(0x00ff).cswidth(16);
+	map(0x721000, 0x72107f).rw(FUNC(tek440x_state::nvram_r), FUNC(tek440x_state::nvram_w)).umask16(0xff00).cswidth(16);
 	// 722000-722fff nvram nybbles
 	map(0x722000, 0x722fff).rw(FUNC(tek440x_state::recall_r), FUNC(tek440x_state::recall_w));
 	map(0x723000, 0x723fff).rw(FUNC(tek440x_state::store_r), FUNC(tek440x_state::store_w));
