@@ -4248,6 +4248,10 @@ if CPUS["C33"] then
 		MAME_DIR .. "src/devices/cpu/c33/c33helpers.ipp",
 		MAME_DIR .. "src/devices/cpu/c33/c33std.cpp",
 		MAME_DIR .. "src/devices/cpu/c33/c33std.h",
+		MAME_DIR .. "src/devices/cpu/c33/s1c33l17.cpp",
+		MAME_DIR .. "src/devices/cpu/c33/s1c33l17.h",
+		MAME_DIR .. "src/devices/cpu/c33/s1c33l27.cpp",
+		MAME_DIR .. "src/devices/cpu/c33/s1c33l27.h",
 		MAME_DIR .. "src/devices/cpu/c33/s1c33209.cpp",
 		MAME_DIR .. "src/devices/cpu/c33/s1c33209.h",
 	}
