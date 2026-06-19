@@ -137,6 +137,8 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 
+#define VERBOSE (0)
+#include "logmacro.h"
 
 namespace {
 
@@ -341,9 +343,7 @@ void ssfindo_state::io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	uint32_t temp = 0;
 	COMBINE_DATA(&temp);
 
-#if 0
-	logerror("[io_w] = %x @%x [latch=%x]\n",data,m_maincpu->pc(),m_adrLatch);
-#endif
+	LOG("%s: [io_w] %x [latch=%x]\n", machine().describe_context(), data, m_adrLatch);
 
 	if(m_adrLatch==1)
 		m_flashAdr=(temp>>16)&0xff;
@@ -357,9 +357,10 @@ void ssfindo_state::io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 void ssfindo_state::debug_w(uint32_t data)
 {
-#if 0
-	osd_printf_debug("%c",data&0xff); //debug texts - malloc (ie "64 KBytes allocated, elapsed : 378 KBytes, free : 2231 KBytes")
-#endif
+	if (0)
+	{
+		osd_printf_debug("%c", data & 0xff); //debug texts - malloc (ie "64 KBytes allocated, elapsed : 378 KBytes, free : 2231 KBytes")
+	}
 }
 
 uint32_t ssfindo_state::ff4_r()
