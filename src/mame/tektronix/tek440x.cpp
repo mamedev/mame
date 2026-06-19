@@ -16,8 +16,8 @@
         * MC68681 DUART / timer (3.6864 MHz clock) (serial channel A = keyboard, channel B = RS-232 port)
         * AM9513 timer (source of timer IRQ)
         * NCR5385 SCSI controller
-
 		* X2210 NVRAM
+
         Video is a 640x480 1bpp window on a 1024x1024 VRAM area; smooth panning around that area
         is possible as is flat-out changing the scanout address.
 
@@ -97,11 +97,13 @@ public:
 		m_kb_loop(false)
 	{ }
 
-	void tek4404(machine_config &config);
+	void tek4404(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	u16 memory_r(offs_t offset, u16 mem_mask);
@@ -119,7 +121,6 @@ private:
 	void recall_w(u8 data);
 	u8 store_r();
 	void store_w(u8 data);
-
 
 	void kb_rdata_w(int state);
 	void kb_tdata_w(int state);
@@ -151,6 +152,8 @@ private:
 	bool m_kb_rclamp;
 	bool m_kb_loop;
 };
+
+
 
 /*************************************
  *
@@ -187,6 +190,9 @@ void tek440x_state::machine_reset()
 	m_novram->recall(ASSERT_LINE);
 	m_novram->recall(CLEAR_LINE);
 }
+
+
+
 /*************************************
  *
  *  Video refresh
@@ -328,25 +334,24 @@ u8 tek440x_state::nvram_r(address_space &space, offs_t offset)
 {
 	u8 data = m_novram->read(space, offset);
 
-	LOG("nvram_r(0x%x) => 0x%02x\n", offset, data);
+	LOG("%s: nvram_r(0x%x) => 0x%02x\n", machine().describe_context(), offset, data);
 
 	// kick it up to top 4 bits
-	return data << 4;
 	return data << 4;
 }
 
 void tek440x_state::nvram_w(offs_t offset, u8 data)
 {
-	LOG("nvram_w(0x%x) <= %02x\n", offset, data);
+	LOG("%s: nvram_w(0x%x) <= %02x\n", machine().describe_context(), offset, data);
 
 	m_novram->write(offset, data >> 4);
 }
 	
 u8 tek440x_state::recall_r()
 {
-	LOG("recall_r\n");
 	if (!machine().side_effects_disabled())
 	{
+		LOG("%s: recall_r\n", machine().describe_context());
 		m_novram->recall(1);
 		m_novram->recall(0);
 	}
@@ -356,16 +361,16 @@ u8 tek440x_state::recall_r()
 
 void tek440x_state::recall_w(u8 data)
 {
-	LOG("recall_w\n");
+	LOG("%s: recall_w\n", machine().describe_context());
 	m_novram->recall(1);
 	m_novram->recall(0);
 }
 
 u8 tek440x_state::store_r()
 {
-	LOG("store_r\n");
 	if (!machine().side_effects_disabled())
 	{
+		LOG("%s: store_r\n", machine().describe_context());
 		m_novram->store(1);
 		m_novram->store(0);
 	}
@@ -375,10 +380,12 @@ u8 tek440x_state::store_r()
 
 void tek440x_state::store_w(u8 data)
 {
-	LOG("store_w\n");
+	LOG("%s: store_w\n", machine().describe_context());
 	m_novram->store(1);
 	m_novram->store(0);
 }
+
+
 void tek440x_state::logical_map(address_map &map)
 {
 	map(0x000000, 0x7fffff).rw(FUNC(tek440x_state::memory_r), FUNC(tek440x_state::memory_w));
@@ -396,7 +403,7 @@ void tek440x_state::physical_map(address_map &map)
 
 	// maps 128 address range to nvram (see p2.8-3)
 	// 721000-72107f net ram (A0 ignored, uses A1-A6)
-	map(0x721000, 0x72107f).rw(FUNC(tek440x_state::nvram_r), FUNC(tek440x_state::nvram_w)).umask16(0xff00).cswidth(16);
+	map(0x721000, 0x72107f).umask16(0xff00).cswidth(16).rw(FUNC(tek440x_state::nvram_r), FUNC(tek440x_state::nvram_w));
 	// 722000-722fff nvram nybbles
 	map(0x722000, 0x722fff).rw(FUNC(tek440x_state::recall_r), FUNC(tek440x_state::recall_w));
 	map(0x723000, 0x723fff).rw(FUNC(tek440x_state::store_r), FUNC(tek440x_state::store_w));
@@ -491,7 +498,7 @@ void tek440x_state::tek4404(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	screen.set_raw(25.2_MHz_XTAL, 800, 0, 640, 525, 0, 480); // 31.5 kHz horizontal (guessed), 60 Hz vertical
+	screen.set_raw(25.2_MHz_XTAL, 800, 0, 640, 525, 0, 480); // 31.5 kHz horizontal, 60 Hz vertical
 	screen.set_screen_update(FUNC(tek440x_state::screen_update));
 	screen.set_palette("palette");
 	screen.screen_vblank().set(m_vint, FUNC(input_merger_all_high_device::in_w<1>));
