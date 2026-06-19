@@ -328,7 +328,7 @@ u8 tek440x_state::nvram_r(address_space &space, offs_t offset)
 {
 	u8 data = m_novram->read(space, offset);
 
-	LOG("nvram_r(0x%x) => 0x%02x pc(%08x)\n", offset, data, m_maincpu->pc());
+	LOG("nvram_r(0x%x) => 0x%02x\n", offset, data);
 
 	// kick it up to top 4 bits
 	return data << 4;
