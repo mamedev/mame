@@ -24,20 +24,20 @@
 
 ****************************************************************************
 
-    video-decoder proms added for Defender,Stargate,Robotron,Joust,Sinistar,
-    Bubbles, etc. by HIGHWAYMAN, all decoder proms are 512x8.
-    defender original pcb's used a single prom(decoder1).
-    newer defender pcb's used 2 proms(decoder2,decoder3) this was to allow
+    video-decoder PROMs added for Defender, Stargate, Robotron, Joust,
+    Sinistar, Bubbles, etc. by HIGHWAYMAN, all decoder PROMs are 512x8.
+    defender original PCBs used a single PROM (decoder1).
+    newer defender PCBs used 2 PROMs (decoder2, decoder3) this was to allow
     video inversion for the cocktail table, decoders 1 & 2 are the same code.
-    white was first romset, then green/blue the only difference was the chips used,
+    white was first ROM set, then green/blue the only difference was the chips used,
     the final version was red, only red can run in a cocktail table.
     (red also has *much* improved enemy AI and is harder to play)
-    Colony7 uses a different chip for decoder2(cs10), but decoder3 is the same.
-    early stargate pcb's used decoder4, and decoder5.
-    newer stargate pcb's and the other games on that hardware used decoder4 and decoder6
+    Colony7 uses a different chip for decoder2 (cs10), but decoder3 is the same.
+    early stargate PCBs used decoder4, and decoder5.
+    newer stargate PCBs and the other games on that hardware used decoder4 and decoder6
     this was probably just to fix a minor bug in decoder5.
-    Blaster uses decoder4 and decoder6 and 2 other proms.
-    if i could find more proms i would clean this up into a table - maybe later.
+    Blaster uses decoder4 and decoder6 and 2 other PROMs.
+    if I could find more PROMs I would clean this up into a table - maybe later.
 
 ****************************************************************************
 
@@ -81,9 +81,9 @@
                    Blaster only: bits 6-7 are for selecting the sound board
     c80f rom_pia_ctrlb
 
-    C900 rom_enable_scr_ctrl  Switch between video ram and rom at 0000-97FF
+    C900 rom_enable_scr_ctrl  Switch between video RAM and ROM at 0000-97FF
 
-    C940 Blaster only: Select bank in the color Prom for color remap
+    C940 Blaster only: Select bank in the color PROM for color remap
     C980 Blaster only: Select which ROM is at 0000-3FFF
     C9C0 Blaster only: bit 0 = enable the color 0 changing each lines
                        bit 1 = erase back each frame
@@ -338,7 +338,7 @@
 
     C3FC      WatchDog
 
-    C400-C4FF CMOS ram battery backed up
+    C400-C4FF CMOS RAM battery backed up
 
     C800      6 bits of the video counters bits 2-7
 
@@ -479,6 +479,7 @@ Reference videos: https://www.youtube.com/watch?v=R5OeC6Wc_yI
 #include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
+
 #include "speaker.h"
 
 
@@ -3999,15 +4000,15 @@ GAME( 1981, stargate,   0,        williams_base,    stargate, williams_state,  e
 
 GAME( 1982, conquest,   0,        williams_b1,      conquest, conquest_state,  empty_init,    ROT270, "Williams / Vid Kidz", "Conquest (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, robotron,   0,        williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz",                   "Robotron: 2084 (Solid Blue label)",    MACHINE_SUPPORTS_SAVE ) // aka "Release 5"
-GAME( 1982, robotronyo, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz",                   "Robotron: 2084 (Yellow/Orange label)", MACHINE_SUPPORTS_SAVE ) // aka "Release 4"
-GAME( 1982, robotronr3, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz",                   "Robotron: 2084 (Release 3)",           MACHINE_SUPPORTS_SAVE ) // censored prototype
-GAME( 1982, robotronun, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz (Unidesa license)", "Robotron: 2084 (Unidesa license)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1982, robotron,   0,        williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz",                   "Robotron: 2084 (Release 5, solid blue label)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, robotronyo, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz",                   "Robotron: 2084 (Release 4, yellow/orange label)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, robotronr3, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz",                   "Robotron: 2084 (Release 3, prototype)",           MACHINE_SUPPORTS_SAVE ) // censored prototype
+GAME( 1982, robotronun, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz (Unidesa license)", "Robotron: 2084 (Unidesa license)",                MACHINE_SUPPORTS_SAVE )
 
 // the 3 below are all noteworthy hacks of the Solid Blue set
-GAME( 1987, robotron87, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "hack", "Robotron: 2084 (1987 'shot-in-the-corner' bugfix)", MACHINE_SUPPORTS_SAVE ) // fixes a reset bug.  aka "Release 6"
-GAME( 2012, robotron12, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "hack", "Robotron: 2084 (2012 'wave 201 start' hack)",       MACHINE_SUPPORTS_SAVE ) // includes sitc bug fix, used for competitive play.
-GAME( 2015, robotrontd, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "hack", "Robotron: 2084 (2015 'tie-die V2' hack)",           MACHINE_SUPPORTS_SAVE ) // inc. sitc fix, mods by some of the original developers, see backstory here http://www.robotron2084guidebook.com/gameplay/raceto100million/robo2k14_tie-die-romset/  (I guess there's a tie-die V1 before it was released to the public?)
+GAME( 1987, robotron87, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "hack", "Robotron: 2084 (1987 'shot-in-the-corner' bug fix)", MACHINE_SUPPORTS_SAVE ) // fixes a reset bug.  aka "Release 6"
+GAME( 2012, robotron12, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "hack", "Robotron: 2084 (2012 'wave 201 start' hack)",        MACHINE_SUPPORTS_SAVE ) // includes SitC bug fix, used for competitive play.
+GAME( 2015, robotrontd, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "hack", "Robotron: 2084 (2015 'tie-die V2' hack)",            MACHINE_SUPPORTS_SAVE ) // inc. SitC fix, mods by some of the original developers, see backstory here http://www.robotron2084guidebook.com/gameplay/raceto100million/robo2k14_tie-die-romset/  (I guess there's a tie-die V1 before it was released to the public?)
 
 GAME( 1982, joust,      0,        joust,            joust,    williams_state,  empty_init,    ROT0,   "Williams", "Joust (Green label)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1982, joustr,     joust,    joust,            joust,    williams_state,  empty_init,    ROT0,   "Williams", "Joust (Red label)",    MACHINE_SUPPORTS_SAVE )

@@ -406,7 +406,7 @@ private:
 const char *const ioport_manager::seqtypestrings[] = { "standard", "increment", "decrement" };
 
 
-u8 const inp_header::MAGIC[inp_header::OFFS_BASETIME - inp_header::OFFS_MAGIC] = { 'M', 'A', 'M', 'E', 'I', 'N', 'P', 0 };
+u8 const inp_header::MAGIC[] = { 'M', 'A', 'M', 'E', 'I', 'N', 'P', 0 };
 
 
 
@@ -1500,7 +1500,7 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog) 
 	}
 
 	// Name keyboard key names
-	if (field.type_class() == INPUT_CLASS_KEYBOARD && field.specific_name() == nullptr)
+	if ((field.type_class() == INPUT_CLASS_KEYBOARD) && !field.specific_name())
 	{
 		// loop through each character on the field
 		for (int which = 0; which < (1 << (UCHAR_SHIFT_END - UCHAR_SHIFT_BEGIN + 1)); which++)
@@ -3013,7 +3013,7 @@ time_t ioport_manager::playback_init()
 
 	// return an explicit error if file isn't found in given path
 	if (filerr == std::errc::no_such_file_or_directory)
-		fatalerror("Input file %s not found\n",filename);
+		fatalerror("Input file %s not found\n", filename);
 
 	// TODO: bail out any other error laconically for now
 	if (filerr)

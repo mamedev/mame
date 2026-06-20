@@ -1223,7 +1223,7 @@ void segaorun_state::sound_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xefff).rom();
-	map(0xf000, 0xf0ff).mirror(0x0700).rw("pcm", FUNC(segapcm_device::read), FUNC(segapcm_device::write));
+	map(0xf000, 0xf0ff).mirror(0x0700).m("pcm", FUNC(sega_315_5218_device::map));
 	map(0xf800, 0xffff).ram();
 }
 
@@ -1537,8 +1537,8 @@ void segaorun_state::outrun_base(machine_config &config)
 	ymsnd.add_route(0, "speaker", 0.30, 0);
 	ymsnd.add_route(1, "speaker", 0.30, 1);
 
-	segapcm_device &pcm(SEGAPCM(config, "pcm", 16_MHz_XTAL / 4));
-	pcm.set_bank(segapcm_device::BANK_512);
+	sega_315_5218_device &pcm(SEGA_315_5218(config, "pcm", 16_MHz_XTAL / 4));
+	pcm.set_bank(sega_315_5218_device::BANK_512);
 	pcm.add_route(0, "speaker", 0.70, 0);
 	pcm.add_route(1, "speaker", 0.70, 1);
 }

@@ -284,6 +284,7 @@ protected:
 
 	uint16_t  m_ip;
 	uint16_t  m_prev_ip;
+	bool      m_io_stall = false;   // I/O wait-state (IOCHRDY) restart pending
 
 	int32_t   m_SignVal;
 	uint32_t  m_AuxVal, m_OverVal, m_ZeroVal, m_CarryVal, m_ParityVal; /* 0 or non-0 valued flags */

@@ -97,7 +97,6 @@ public:
 		BQ4845(config, m_rtc, 32.768_kHz_XTAL);
 		m_rtc->int_handler().set(m_ctc, FUNC(z80ctc_device::trg3));
 		m_rtc->rst_handler().set([this](int state) { if (!state && started() && m_jp2->read()) machine().schedule_soft_reset(); }); // HACK: inputs cannot be read during startup & can't hold machine reset low
-		m_rtc->write_wdi(1);
 
 		CLOCK(config, m_ctc_clock, 4.096_MHz_XTAL).signal_handler().set(FUNC(z80clock_state::prescaler));
 
@@ -147,6 +146,8 @@ protected:
 
 	virtual void machine_reset() override ATTR_COLD
 	{
+		m_rtc->write_wdi(1);
+
 		/// HACK: start the sio clock on first write for speed
 		m_sio_clock->set_clock_scale(0.0);
 	}

@@ -43,6 +43,7 @@ protected:
 	void editwnd_select_all();
 	void set_edit_defstr(const std::string &string) { m_edit_defstr = string; }
 
+	virtual void update_dpi() override;
 	virtual void draw_contents(HDC dc) override;
 
 	virtual void save_configuration_to_node(util::xml::data_node &node) override;

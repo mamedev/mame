@@ -6,9 +6,12 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "cpu/edsp/edsp.h"
+
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
 
 namespace {
 
@@ -31,6 +34,8 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void prog_map(address_map &map) ATTR_COLD;
+
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) ATTR_COLD;
 };
 
@@ -39,12 +44,18 @@ uint32_t mylife_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	return 0;
 }
 
+void mylife_state::prog_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom();
+}
+
 static INPUT_PORTS_START( mylife )
 INPUT_PORTS_END
 
 void mylife_state::mylife(machine_config &config)
 {
-	// unknown main CPU
+	emg2000a_device &maincpu(EMG2000A(config, "maincpu", 27'000'000));
+	maincpu.set_addrmap(AS_PROGRAM, &mylife_state::prog_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
@@ -86,9 +97,16 @@ ROM_START( mylifei )
 	ROM_LOAD( "af24bc02.u8", 0x000, 0x100, CRC(17c6eb00) SHA1(2b30cb3a924f4905f98cc8220edaee156eaf59ae) )
 ROM_END
 
+ROM_START( mylifes )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF ) // no TSOP pads
+	ROM_LOAD( "mylife_spain.bin", 0x000000, 0x800000, CRC(83bb90bf) SHA1(44d3e62577e03766af5a92f421ed3a96616a5857) )
+ROM_END
+
 } // anonymous namespace
 
-CONS( 200?, mylife,       0,              0,      mylife,  mylife, mylife_state, empty_init, "Giochi Preziosi / Playmates", "My Life (UK)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // maybe US, found in UK
-CONS( 200?, mylifei,      mylife,         0,      mylife,  mylife, mylife_state, empty_init, "Giochi Preziosi / Playmates", "My Life (Italy)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, mylife,       0,              0,      mylife,  mylife, mylife_state, empty_init, "Giochi Preziosi / Playmates", "My Life - Another life in your hands (UK)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // maybe US, found in UK
+CONS( 200?, mylifei,      mylife,         0,      mylife,  mylife, mylife_state, empty_init, "Giochi Preziosi",             "My Life - Un'altra vita nelle tue mani (Italy)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+// who was the Spanish distributor, what's the Spanish subtitle?
+CONS( 200?, mylifes,      mylife,         0,      mylife,  mylife, mylife_state, empty_init, "Giochi Preziosi",             "My Life (Spain)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-// there was a follow-up system 'My Real Life'
+// there was a follow-up system 'My Real Life' featuring a camera, unknown if it's the same tech

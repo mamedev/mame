@@ -40,6 +40,7 @@ function maintargetosdoptions(_target,_subtarget)
 		"dinput8",
 		"ole32",
 		"psapi",
+		"shcore",
 		"shlwapi",
 		"uuid",
 	}
@@ -166,6 +167,8 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/debugger/win/consolewininfo.h",
 		MAME_DIR .. "src/osd/modules/debugger/win/debugbaseinfo.cpp",
 		MAME_DIR .. "src/osd/modules/debugger/win/debugbaseinfo.h",
+		MAME_DIR .. "src/osd/modules/debugger/win/debuggerprefs.cpp",
+		MAME_DIR .. "src/osd/modules/debugger/win/debuggerprefs.h",
 		MAME_DIR .. "src/osd/modules/debugger/win/debugviewinfo.cpp",
 		MAME_DIR .. "src/osd/modules/debugger/win/debugviewinfo.h",
 		MAME_DIR .. "src/osd/modules/debugger/win/debugwininfo.cpp",

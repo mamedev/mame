@@ -660,7 +660,10 @@ void hd44780_base_device::control_write(u8 data)
 		}
 		m_first_cmd = true;
 
-		m_char_size = BIT(m_ir, 2) ? 10 : 8;
+		if (BIT(m_ir, 3))
+			m_char_size = 8; // 5x10 chars not available in 2 line mode
+		else
+			m_char_size = BIT(m_ir, 2) ? 10 : 8;
 		m_data_len  = BIT(m_ir, 4) ? 8 : 4;
 		m_num_line  = BIT(m_ir, 3) + 1;
 		correct_ac();

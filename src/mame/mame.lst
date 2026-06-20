@@ -19642,6 +19642,7 @@ galaxiani
 galaxianiii
 galaxianm
 galaxianmo
+galaxianoly
 galaxianrp
 galaxiant
 galaxrcgg
@@ -20618,6 +20619,7 @@ monty
 @source:handheld/mylife.cpp
 mylife
 mylifei
+mylifes
 
 @source:handheld/pensebem.cpp
 pbem2017
@@ -35563,6 +35565,7 @@ vsmaxx17
 vsmaxx77
 vsmaxxvd
 vt25in1
+vt50in1
 vtboxing
 vtpinball
 vtsndtest
@@ -37437,6 +37440,7 @@ falconz
 fenix
 fenixexpl
 fenixn
+germwars
 griffon
 griffono
 nextfase
@@ -37456,6 +37460,7 @@ phoenixgu
 phoenixha
 phoenixi
 phoenixj
+phoenixjpl
 phoenixs
 phoenixt
 pleiadbl
@@ -37465,6 +37470,7 @@ pleiadsb2
 pleiadsgmp
 pleiadsi
 pleiadsia
+pleiadsmm
 pleiadsn
 pleiadss
 survival
@@ -42777,6 +42783,7 @@ setaroula
 setaroulm
 simpsonjr
 sokonuke
+spkings
 stg
 superbar
 thunderl
@@ -47464,28 +47471,30 @@ mobigos
 mobigo2
 
 @source:tvgames/generalplus_gpl16250_nand.cpp
-wlsair60
-kiugames
+beambox
 jak_camp
 jak_car2
+jak_duck
 jak_gtg
-jak_sspop
-jak_hmhsm
 jak_hmg2
+jak_hmhsm
 jak_hmpt
 jak_hsmg2
-jak_umdf
-jak_duck
+jak_sspop
 jak_swc
-jak_wdzh
-jak_wdbg
 jak_tsm
-vbaby
+jak_umdf
+jak_wdbg
+jak_wdzh
+kiugames
 mgtfit
-beambox
+tiviboo
+vbaby
+wlsair60
 
 @source:tvgames/generalplus_gpl16250_rom.cpp
 beijuehh
+bornk220
 bornkidh
 dressmtv
 fpsport
@@ -47641,6 +47650,7 @@ jak_dood
 jak_sbdd
 jak_spdmo
 jak_spdmoa
+jak_spdmob
 jak_ssmo
 jak_thom
 jak_thomp

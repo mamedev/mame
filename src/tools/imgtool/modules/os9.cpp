@@ -16,6 +16,7 @@
 #include "opresolv.h"
 
 #include <cstdio>
+#include <cstring>
 #include <ctime>
 
 enum creation_policy_t

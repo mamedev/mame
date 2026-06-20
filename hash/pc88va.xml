@@ -421,7 +421,6 @@ Display off in places during intro
 [gfx] Requires fractional DOT scrolling (horizontal)
 [gfx] wrong draw mode for status bar in gameplay
 [gfx] needs cliprect at gameplay startup
-Unplayable with [keyboard]
 ]]></notes>
 		<info name="alt_title" value="オルテウス" />
 		<info name="usage" value="Kana Lock on pauses the game"/>
