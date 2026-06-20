@@ -50,6 +50,7 @@
 #include "bus/nscsi/hd.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68010.h"
+#include "machine/am79c90.h"
 #include "machine/am9513.h"
 #include "machine/bankdev.h"
 #include "machine/input_merger.h"
@@ -505,6 +506,20 @@ void tek440x_state::tek4404(machine_config &config)
 
 	INPUT_MERGER_ALL_HIGH(config, m_vint);
 	m_vint->output_handler().set_inputline(m_maincpu, M68K_IRQ_6);
+
+	// ethernet
+	AM7990(config, m_lance, 40_MHz_XTAL / 4);
+	m_lance->intr_out().set_inputline(m_maincpu, M68K_IRQ_2).invert();
+
+	m_lance->dma_in().set([this](offs_t offset) {
+		u16 data = m_vm->read16(OFF8_TO_OFF16(offset));
+		//LOG("dma_in 0x%08x => %04x\n",offset,data);
+		return data;
+	});
+	m_lance->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask) {
+		//LOG("dma_out 0x%08x <= %04x\n",offset, data);
+		return m_vm->write16(OFF8_TO_OFF16(offset),data, mem_mask);
+	});
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
