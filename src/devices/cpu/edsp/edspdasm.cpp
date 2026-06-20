@@ -6,7 +6,8 @@
 
     Instruction encodings for this 16-bit DSP architecture are based on
     guesswork; many, including the multiply and divide instructions,
-    remain unidentified.
+    remain unidentified. It is also likely that different model series add
+    or delete a few instructions.
 
     System registers are mapped in the I/O space, but the locations differ
     between model series. For example, SPA (stack pointer address) is
@@ -31,21 +32,22 @@ namespace {
 
 const char *const c_conditions[15] =
 {
-	"lo",
-	"hs",
-	"cond2",
-	"cond3",
+	"lo/cc",
+	"hs/cs",
+	"vc", // not used in mylife, unconfirmed
+	"vs", // not used in mylife, unconfirmed
 	"ne",
 	"eq",
-	"cond6",
-	"cond7",
-	"ts", // or perhaps tc
-	"cond9",
+	"pl", // not used in mylife, unconfirmed
+	"mi", // not used in mylife, unconfirmed
+	// next two are possibly reversed
+	"tc",
+	"ts", // not used in mylife
 	"ge",
 	"lt",
 	"gt",
 	"le",
-	"cond14"
+	"ls" // not used in mylife, unconfirmed
 };
 
 }

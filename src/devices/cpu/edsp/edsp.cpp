@@ -177,6 +177,63 @@ u16 edsp_device::add(u16 s, u16 t, bool c) noexcept
 	return u16(d);
 }
 
+bool edsp_device::test_condition(u8 cond) const noexcept
+{
+	switch (cond)
+	{
+	case 0: // LO or CC: C==0
+		return !BIT(m_sr, 0);
+
+	case 1: // HS or CS: C==1
+		return BIT(m_sr, 0);
+
+	case 2: // VC: V==0
+		return !BIT(m_sr, 1);
+
+	case 3: // VS: V==1
+		return BIT(m_sr, 1);
+
+	case 4: // NE: Z==0
+		return !BIT(m_sr, 2);
+
+	case 5: // EQ: Z==1
+		return BIT(m_sr, 2);
+
+	case 6: // PL: N==0
+		return !BIT(m_sr, 3);
+
+	case 7: // MI: N==1
+		return BIT(m_sr, 3);
+
+	case 8: // TC: T==0
+		return !BIT(m_sr, 4);
+
+	case 9: // TS: T==1
+		return BIT(m_sr, 4);
+
+	case 10: // GE: (N^V)==0
+		return BIT(m_sr, 3) == BIT(m_sr, 1);
+
+	case 11: // LT: (N^V)==1
+		return BIT(m_sr, 3) != BIT(m_sr, 1);
+
+	case 12: // GT: Z|(N^V)==0
+		return BIT(m_sr, 3) == BIT(m_sr, 1) && !BIT(m_sr, 2);
+
+	case 13: // LE: Z|(N^V)==1
+		return BIT(m_sr, 3) != BIT(m_sr, 1) || BIT(m_sr, 2);
+
+	case 14: // LS: (C==0)|(Z==1)
+		return !BIT(m_sr, 0) || BIT(m_sr, 2);
+
+	case 15: // unconditional
+		return true;
+
+	default: // should never happen
+		return false;
+	}
+}
+
 void edsp_device::execute_run()
 {
 	do
@@ -305,54 +362,7 @@ void edsp_device::execute_run()
 			else if ((op & 0xf87f) == 0x3818)
 			{
 				// IF cond JMP Long_addr
-				bool branch = false;
-				switch (BIT(op, 7, 4))
-				{
-				case 0: // LO
-					branch = !BIT(m_sr, 0);
-					break;
-
-				case 1: // HS
-					branch = BIT(m_sr, 0);
-					break;
-
-				case 4: // NE
-					branch = !BIT(m_sr, 2);
-					break;
-
-				case 5: // EQ
-					branch = BIT(m_sr, 2);
-					break;
-
-				case 8: // TS
-					branch = BIT(m_sr, 4);
-					break;
-
-				case 10: // GE
-					branch = BIT(m_sr, 3) == BIT(m_sr, 1);
-					break;
-
-				case 11: // LT
-					branch = BIT(m_sr, 3) != BIT(m_sr, 1);
-					break;
-
-				case 12: // GT
-					branch = BIT(m_sr, 3) == BIT(m_sr, 1) && !BIT(m_sr, 2);
-					break;
-
-				case 13: // LE
-					branch = BIT(m_sr, 3) != BIT(m_sr, 1) || BIT(m_sr, 2);
-					break;
-
-				case 15:
-					branch = true;
-					break;
-
-				default:
-					logerror("Unemulated branch condition %d @ PC = 0x%04X\n", BIT(op, 7, 4), m_ppc);
-					break;
-				}
-				if (branch)
+				if (test_condition(BIT(op, 7, 4)))
 				{
 					const u16 addr = m_cache.read_word(m_pc);
 					m_pc = addr;
@@ -507,54 +517,7 @@ void edsp_device::execute_run()
 			else if ((op & 0xe000) == 0x8000)
 			{
 				// IF cond JMP Short_addr
-				bool branch = false;
-				switch (BIT(op, 9, 4))
-				{
-				case 0: // LO
-					branch = !BIT(m_sr, 0);
-					break;
-
-				case 1: // HS
-					branch = BIT(m_sr, 0);
-					break;
-
-				case 4: // NE
-					branch = !BIT(m_sr, 2);
-					break;
-
-				case 5: // EQ
-					branch = BIT(m_sr, 2);
-					break;
-
-				case 8: // TS
-					branch = BIT(m_sr, 4);
-					break;
-
-				case 10: // GE
-					branch = BIT(m_sr, 3) == BIT(m_sr, 1);
-					break;
-
-				case 11: // LT
-					branch = BIT(m_sr, 3) != BIT(m_sr, 1);
-					break;
-
-				case 12: // GT
-					branch = BIT(m_sr, 3) == BIT(m_sr, 1) && !BIT(m_sr, 2);
-					break;
-
-				case 13: // LE
-					branch = BIT(m_sr, 3) != BIT(m_sr, 1) || BIT(m_sr, 2);
-					break;
-
-				case 15:
-					branch = true;
-					break;
-
-				default:
-					logerror("Unemulated branch condition %d @ PC = 0x%04X\n", BIT(op, 9, 4), m_ppc);
-					break;
-				}
-				if (branch)
+				if (test_condition(BIT(op, 9, 4)))
 				{
 					m_pc += util::sext(op, 9);
 					m_icount -= 2;

@@ -47,6 +47,7 @@ protected:
 
 private:
 	u16 add(u16 s, u16 t, bool c) noexcept;
+	bool test_condition(u8 cond) const noexcept;
 
 	const address_space_config m_program_config;
 	const address_space_config m_data_config;
