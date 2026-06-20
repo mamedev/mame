@@ -383,6 +383,10 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	LOGTEXT("=== Start TEXT frame\n");
 
+	// "the sum of the split screen height must match the height of the previous screen"
+	// - mightmag loads from PC Engine OS, disables split 1 by pushing a split 0 RH from 384 to 400
+	u32 rh_sum = 0;
+
 	// four layers
 	for (int layer_n = 0; layer_n < 4; layer_n ++)
 	{
@@ -404,17 +408,18 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		const u8 screen_fg_col = (tsp_regs[0xa / 2] & 0xf000) >> 12;
 		const u8 screen_bg_col = (tsp_regs[0xa / 2] & 0x0f00) >> 8;
 
-		// TODO: how even vh/vw can run have all these bytes?
+		// TODO: how even vh/vw can have all these bytes?
 		const u8 vh = (tsp_regs[4 / 2] & 0x7ff);
 		const u16 vw = (tsp_regs[8 / 2] & 0x3ff) / 2;
 
-
-		if (vh == 0 || vw == 0)
+		if (vh == 0 || vw == 0 || rh_sum > cliprect.max_y)
 		{
-			LOGTEXT("\t%d skip VW = %d VH = %d\n"
+			LOGTEXT("\t%d skip VW = %d VH = %d rh_sum %d cliprect.max_y %d\n"
 				, layer_n
 				, vw
 				, vh
+				, rh_sum
+				, cliprect.max_y
 			);
 			continue;
 		}
@@ -680,6 +685,8 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				}
 			}
 		}
+
+		rh_sum += rh;
 	}
 
 	copyrozbitmap_trans(
