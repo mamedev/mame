@@ -84,16 +84,16 @@ private:
 	std::deque<uint8_t> m_to_pd32;
 	std::deque<uint8_t> m_to_host;
 
-	uint8_t m_pdir = 0xff;  // last ICU port-direction write (1 = input)
-	uint8_t m_pdat = 0xff;  // ICU port-data shadow (resets high)
+	uint8_t m_pdir;         // last ICU port-direction write (1 = input)
+	uint8_t m_pdat;         // ICU port-data shadow (resets high)
 	bool m_swap;            // EPROM at 0 (true at power-on; cleared via ICU G1)
-	bool m_swap_staged = false;
-	uint32_t m_swap_entry = 0;
+	bool m_swap_staged;
+	uint32_t m_swap_entry;
 	bool m_rsti;            // latched host software reset
 	bool m_sreq;            // PD32 requests host service
-	uint8_t m_pair_even = 0;
-	bool m_pair_valid = false;
-	bool m_wpair_valid = false;
+	uint8_t m_pair_even;
+	bool m_pair_valid;
+	bool m_wpair_valid;
 };
 
 DECLARE_DEVICE_TYPE(ISA8_PD32, isa8_pd32_device)
