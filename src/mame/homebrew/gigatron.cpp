@@ -186,7 +186,7 @@ void gigatron_state::machine_start()
 	address_space &ram_space = m_maincpu->space(AS_DATA);
 	ram_space.unmap_readwrite(0x0000, 0xffff);
 	// external RAM has 8 bit data bus
-	ram_space.install_ram(0x0000, m_ram->size() - 1, m_ram->pointer()<uint8_t>);
+	ram_space.install_ram(0x0000, m_ram->size() - 1, m_ram->pointer<uint8_t>());
 
 	// Save state stuff
 	save_item(NAME(m_lights));
