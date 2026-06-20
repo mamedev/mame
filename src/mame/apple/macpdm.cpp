@@ -651,14 +651,14 @@ void macpdm_state::ram_size(){
 		space.install_ram(alias_base, alias_base + simm_size - 1, 0, (void *)ram_a);
 
 		// install RAM B
-		u32 b_base = sizes[config];
-
-		if (simm_size < (128*1024*1024))
-		{
-			b_base += mb_ram_size;
-		}
-
+		const u32 b_base = 0x8000000;
 		space.install_ram(b_base, b_base + simm_size - 1, 0, (void *)ram_b);
+
+		if (simm_size < 8*1024*1024)
+		{
+			const u32 alias_base_b = alias_base + simm_size - (8*1024*1024);
+			space.install_ram(alias_base_b, alias_base_b + simm_size - 1, 0, (void *)ram_b);
+		}
 	}
 }
 
@@ -1254,7 +1254,7 @@ void macpdm_state::macpdm(machine_config &config)
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("8M");
-	m_ram->set_extra_options("12M,24M,72M,264M");
+	m_ram->set_extra_options("16M,24M,40M,136M");
 
 	nubus_device &nubus(NUBUS(config, "nubus"));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
