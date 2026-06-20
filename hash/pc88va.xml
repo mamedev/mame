@@ -555,7 +555,7 @@ Burps on [FDC] access after disk swap with program and player disks, trying to s
 		<year>1986</year>
 		<publisher>システムソフト (System Soft)</publisher>
 		<notes><![CDATA[
-Needs [dac1bit] clicks on gameplay
+Needs [dac1bit] clicks on gameplay (fixed)
 May crash with disk error when entering winning animation (verify)
 Winning animation is glitchy [OFX/OFY]?, uses [IDP] text transpen with upper bits set (for flame effect?), press mouse left button to return to game
 [OPNA] seems to cut off shortly on intro and winning screen compared to VAEG

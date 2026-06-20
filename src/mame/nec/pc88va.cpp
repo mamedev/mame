@@ -950,9 +950,22 @@ void pc88va_state::r232_ctrl_portb_w(uint8_t data)
 	// ...
 }
 
+/*
+ * System port 8
+ * 1--- ---- Always '1'
+ * -x-- ---- N88V3 LED
+ * --x- ---- N88V2 LED
+ * ---x ---- N88V1 LED
+ * ---- x--- XBEEP
+ * (following are available in 8259 mode only)
+ * ---- -x-- XTXRMF RS-232C TxRDY irq mask (1 = enabled)
+ * ---- --x- XTXEMF RS-232C TxEMPTY irq mask
+ * ---- ---x XRXRMF RS-232C RxRDY irq mask
+ */
 void pc88va_state::r232_ctrl_portc_w(uint8_t data)
 {
-	// ...
+	m_dac1bit_disable = BIT(data, 3);
+	m_dac1bit->set_output_gain(0, m_dac1bit_disable ? 0.0 : 1.0);
 }
 
 /****************************************
@@ -1086,6 +1099,9 @@ void pc88va_state::machine_reset()
 	m_sound_irq_pending = false;
 
 	m_dack = -1;
+
+	m_dac1bit_disable = true;
+	m_dac1bit->set_output_gain(0, 0.0);
 }
 
 // NOTE: PC-88VA implementation omits some C-Bus lines compared to PC-98.
@@ -1119,9 +1135,11 @@ void pc88va_state::pc88va(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc88va_state::io_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(pc88va_state::vrtc_irq), "screen", 0, 1);
 	m_maincpu->icu_slave_ack_cb().set(m_pic2, FUNC(pic8259_device::acknowledge));
-	m_maincpu->set_tclk(MASTER_CLOCK);
+	m_maincpu->set_tclk(MASTER_CLOCK / 2);
 	// "timer 1"
-	m_maincpu->tout1_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+//	m_maincpu->tout0_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_maincpu->tout1_cb().set(m_dac1bit, FUNC(speaker_sound_device::level_w));
+//	m_maincpu->tout2_cb().set RS-232C Baud Rate Setting
 	// ch2 is FDC, ch0/3 are "user". ch1 is unused
 	m_maincpu->out_hreq_cb().set(m_maincpu, FUNC(v50_device::hack_w));
 	m_maincpu->out_eop_cb().set(FUNC(pc88va_state::tc_w));
@@ -1195,6 +1213,8 @@ void pc88va_state::pc88va(machine_config &config)
 	m_opna->add_route(0, m_speaker, 0.25, 1);
 	m_opna->add_route(1, m_speaker, 0.50, 0);
 	m_opna->add_route(2, m_speaker, 0.50, 1);
+
+	SPEAKER_SOUND(config, m_dac1bit).add_route(ALL_OUTPUTS, "speaker", 0.40, 0).add_route(ALL_OUTPUTS, "speaker", 0.40, 1);
 
 	// TODO: set pc98 compatible
 	// Needs a MS-Engine disk dump first, that applies an overlay on PC Engine OS so that it can run PC-98 software

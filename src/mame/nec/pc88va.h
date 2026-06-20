@@ -27,6 +27,7 @@
 #include "machine/timer.h"
 #include "machine/upd1990a.h"
 #include "machine/upd765.h"
+#include "sound/spkrdev.h"
 #include "sound/ymopn.h"
 
 #include "emupal.h"
@@ -53,6 +54,7 @@ public:
 		// labelled "マウス" (mouse) - can't use "mouse" because of core -mouse option
 		, m_mouse_port(*this, "mouseport")
 		, m_opna(*this, "opna")
+		, m_dac1bit(*this, "dac1bit")
 		, m_speaker(*this, "speaker")
 		, m_palram(*this, "palram")
 		, m_sysbank(*this, "sysbank")
@@ -107,6 +109,7 @@ private:
 	required_device<pc98_cbus_root_device> m_cbus_root;
 	required_device<msx_general_purpose_port_device> m_mouse_port;
 	required_device<ym2608_device> m_opna;
+	required_device<speaker_sound_device> m_dac1bit;
 	required_device<speaker_device> m_speaker;
 	required_shared_ptr<uint16_t> m_palram;
 	required_device<address_map_bank_device> m_sysbank;
@@ -123,6 +126,7 @@ private:
 	uint8_t m_timer3_io_reg = 0;
 	emu_timer *m_t3_mouse_timer = nullptr;
 	bool m_rstmd = false;
+	bool m_dac1bit_disable;
 
 	// FDC
 	emu_timer *m_fdc_timer = nullptr;
