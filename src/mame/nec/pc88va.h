@@ -179,6 +179,7 @@ private:
 
 	u16 m_text_transpen;
 	bool m_td;
+	bitmap_rgb32 m_text_bitmap;
 	bitmap_rgb32 m_graphic_bitmap[2];
 
 	struct {
@@ -259,6 +260,8 @@ private:
 	uint8_t m_buf_ram[16]{};
 	u8 m_crtc_regs[15]{};
 	u16 m_vrtc_irq_line = 432;
+	// u32 for cache
+	u32 m_vertical_magnify;
 
 	uint8_t idp_status_r();
 	void idp_command_w(uint8_t data);

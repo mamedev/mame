@@ -38,6 +38,8 @@ void pc88va_state::video_start()
 	m_gfxdecode->gfx(3)->set_source(m_kanji_ram.get());
 	m_vrtc_irq_line = 432;
 
+	m_screen->register_screen_bitmap(m_text_bitmap);
+
 	for (int i = 0; i < 2; i++)
 		m_screen->register_screen_bitmap(m_graphic_bitmap[i]);
 
@@ -53,6 +55,7 @@ void pc88va_state::video_start()
 	save_pointer(NAME(m_kanji_ram), kanjiram_size);
 
 	save_item(NAME(m_vrtc_irq_line));
+	save_item(NAME(m_vertical_magnify));
 }
 
 // TODO: all needs to be verified
@@ -65,6 +68,7 @@ void pc88va_state::video_reset()
 	m_pltm = 0;
 	m_pltp = 0;
 	m_video_pri_reg[0] = m_video_pri_reg[1] = 0;
+	m_vertical_magnify = 0x10000;
 }
 
 void pc88va_state::palette_init(palette_device &palette) const
@@ -321,6 +325,8 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			}
 		}
 	}
+
+	// TODO: verify if IDP global vertical magnify also affects sprites
 }
 
 // TODO: handcrafted kanji ROM causes this, should be simplified by a more accurate dump
@@ -369,6 +375,8 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	// punt if text disable is on
 	if(m_td == true)
 		return;
+
+	m_text_bitmap.fill(0, cliprect);
 
 	uint16_t const *const tvram = m_tvram;
 	uint8_t const *const kanji = memregion("kanji")->base();
@@ -599,7 +607,7 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 							if(secret) { pen = 0; } //hide text
 
 							if(pen != 0 && pen != m_text_transpen)
-								bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
+								m_text_bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
 						}
 					}
 				}
@@ -634,7 +642,7 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 							if(secret) { pen = 0; } //hide text
 
 							if(pen != 0 && pen != m_text_transpen)
-								bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
+								m_text_bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
 						}
 					}
 				}
@@ -666,13 +674,20 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 							if(secret) { pen = 0; } //hide text
 
 							if(pen != 0)
-								bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
+								m_text_bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
 						}
 					}
 				}
 			}
 		}
 	}
+
+	copyrozbitmap_trans(
+		bitmap, cliprect, m_text_bitmap,
+		0, 0,
+		0x10000, 0, 0, m_vertical_magnify,
+		false, 0
+	);
 }
 
 /*
@@ -1261,10 +1276,12 @@ void pc88va_state::recompute_parameters()
 
 	visarea.set(0, h_vis_area - 1, 0, v_vis_area - 1);
 
-	// TODO: vertical global magnify at bit 7
+	// Global vertical magnify, used by setup menu in 24kHz
+	m_vertical_magnify = (m_crtc_regs[0x00] & 0xc0) == 0x80 ? 0x8000 : 0x10000;
 	// TODO: actual clock source must be external, assume known PC-88 XTALs
 	// TODO: a bit off compared to PC-88 equivalent with the configured values
 	// TODO: famista pukes a 31.2 Hz vertical in 24kHz mode
+	// (sets 0xc0 regardless of CRT Mode setting)
 	const int clock_speed = !!BIT(m_crtc_regs[0x00], 6) ? (31'948'800 / 4) : (28'636'363 / 2);
 
 	refresh = HZ_TO_ATTOSECONDS(clock_speed) * h_vis_area * v_vis_area;
