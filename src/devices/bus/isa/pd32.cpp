@@ -60,9 +60,16 @@ isa8_pd32_device::isa8_pd32_device(const machine_config &mconfig, const char *ta
 	, m_lowmem(*this, "lowmem")
 	, m_himem(*this, "himem")
 	, m_ram(*this, "ram", 0x200000, ENDIANNESS_LITTLE)
+	, m_pdir(0xff)
+	, m_pdat(0xff)
 	, m_swap(true)
+	, m_swap_staged(false)
+	, m_swap_entry(0)
 	, m_rsti(false)
 	, m_sreq(false)
+	, m_pair_even(0)
+	, m_pair_valid(false)
+	, m_wpair_valid(false)
 {
 }
 
