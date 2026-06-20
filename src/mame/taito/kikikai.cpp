@@ -1381,11 +1381,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, kikikai,   0,        kikikai,  kikikai,  kikikai_state,  empty_init, ROT90, "Taito Corporation",          "KiKi KaiKai",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kikikai,   0,        kikikai,  kikikai,  kikikai_state,  empty_init, ROT90, "Taito",                      "KiKi KaiKai",                                MACHINE_SUPPORTS_SAVE )
 GAME( 1986, knightb,   kikikai,  knightb,  kikikai,  mexico86_state, empty_init, ROT90, "bootleg",                    "Knight Boy (bootleg of KiKi KaiKai, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, knightba,  kikikai,  knightba, knightba, base_state,     empty_init, ROT90, "bootleg (Game Corporation)", "Knight Boy (bootleg of KiKi KaiKai, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // missing coins/dsw, can be played using service to coin
 
-GAME( 1986, kicknrun,  0,        kicknrun, kicknrun, kikikai_state,  empty_init, ROT0,  "Taito Corporation",          "Kick and Run (World)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1986, kicknrunu, kicknrun, kicknrun, kicknrun, kikikai_state,  empty_init, ROT0,  "Taito America Corp",         "Kick and Run (US)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kicknrun,  0,        kicknrun, kicknrun, kikikai_state,  empty_init, ROT0,  "Taito",                      "Kick and Run (World)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kicknrunu, kicknrun, kicknrun, kicknrun, kikikai_state,  empty_init, ROT0,  "Taito America",              "Kick and Run (US)",                          MACHINE_SUPPORTS_SAVE )
 GAME( 1986, mexico86,  kicknrun, mexico86, kicknrun, mexico86_state, empty_init, ROT0,  "bootleg",                    "Mexico 86 (bootleg of Kick and Run, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, mexico86a, kicknrun, mexico86, kicknrun, mexico86_state, empty_init, ROT0,  "bootleg",                    "Mexico 86 (bootleg of Kick and Run, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
