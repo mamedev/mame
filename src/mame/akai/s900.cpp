@@ -722,7 +722,7 @@ void s900_state::voice_eop_w(int state)
 {
 	m_voice_eop[Num] = state;
 	if ((m_current_voice / 4) == Num)
-		m_pic->set_irq_line(m_current_voice, state);
+		m_pic->set_irq_line(m_current_voice, !state);
 }
 
 /**************************************************************************/
