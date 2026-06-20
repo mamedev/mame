@@ -52,6 +52,7 @@ void emg2000a_device::data_map(address_map &map)
 void emg2000a_device::io_map(address_map &map)
 {
 	map(0x01, 0x01).rw(FUNC(emg2000a_device::sr_r), FUNC(emg2000a_device::sr_w));
+	map(0x03, 0x03).rw(FUNC(emg2000a_device::bank_r), FUNC(emg2000a_device::bank_w));
 	map(0x0c, 0x0d).rw(FUNC(emg2000a_device::inte_r), FUNC(emg2000a_device::inte_w));
 	map(0x0e, 0x0f).rw(FUNC(emg2000a_device::intf_r), FUNC(emg2000a_device::intf_w));
 	map(0x13, 0x13).rw(FUNC(emg2000a_device::spa_r), FUNC(emg2000a_device::spa_w));
@@ -106,6 +107,7 @@ void edsp_device::device_start()
 	save_item(NAME(m_r));
 	save_item(NAME(m_inte));
 	save_item(NAME(m_intf));
+	save_item(NAME(m_bank));
 }
 
 void edsp_device::device_reset()
@@ -118,6 +120,7 @@ void edsp_device::device_reset()
 	m_sr = 0;
 	m_inte = 0;
 	m_intf = 0;
+	m_bank = 0;
 }
 
 u16 edsp_device::sr_r()
@@ -128,6 +131,16 @@ u16 edsp_device::sr_r()
 void edsp_device::sr_w(u16 data)
 {
 	m_sr = data;
+}
+
+u16 edsp_device::bank_r()
+{
+	return m_bank;
+}
+
+void edsp_device::bank_w(u16 data)
+{
+	m_bank = data;
 }
 
 u16 edsp_device::inte_r(offs_t offset)
@@ -234,11 +247,16 @@ bool edsp_device::test_condition(u8 cond) const noexcept
 	}
 }
 
+u16 edsp_device::read_program_word(u16 addr)
+{
+	return m_program.read_word(addr >= 0x8000 ? addr + (u32(BIT(m_bank, 0, 9)) << 15) : addr);
+}
+
 void edsp_device::execute_run()
 {
 	do
 	{
-		if ((m_sr & SR_GIE) && (m_inte & m_intf))
+		if ((m_sr & SR_GIE) && (m_inte & m_intf) && !m_rcr)
 		{
 			// TODO: respect INTP
 			const int i = std::countr_zero(m_inte & m_intf);
@@ -441,14 +459,14 @@ void edsp_device::execute_run()
 			}
 			else if ((op & 0xf81f) == 0x5809)
 			{
-				const u16 data = m_program.read_word(m_r[BIT(op, 5, 3)]);
+				const u16 data = read_program_word(m_r[BIT(op, 5, 3)]);
 				m_r[BIT(op, 8, 3)] = data;
 				m_icount -= 2; // TODO: repeat timing
 			}
 			else if ((op & 0xf81f) == 0x580f)
 			{
 				// TODO: banking
-				const u16 data = m_program.read_word(m_r[BIT(op, 5, 3)]);
+				const u16 data = read_program_word(m_r[BIT(op, 5, 3)]);
 				m_r[BIT(op, 5, 3)]++;
 				m_data.write_word(m_r[BIT(op, 8, 3)], data);
 				m_r[BIT(op, 8, 3)]++;

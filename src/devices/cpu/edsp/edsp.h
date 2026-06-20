@@ -38,6 +38,8 @@ protected:
 	// register access
 	u16 sr_r();
 	void sr_w(u16 data);
+	u16 bank_r();
+	void bank_w(u16 data);
 	u16 inte_r(offs_t offset);
 	void inte_w(offs_t offset, u16 data);
 	u16 intf_r(offs_t offset);
@@ -48,6 +50,7 @@ protected:
 private:
 	u16 add(u16 s, u16 t, bool c) noexcept;
 	bool test_condition(u8 cond) const noexcept;
+	u16 read_program_word(u16 addr);
 
 	const address_space_config m_program_config;
 	const address_space_config m_data_config;
@@ -71,6 +74,7 @@ private:
 	u16 m_r[8];
 	u32 m_inte;
 	u32 m_intf;
+	u16 m_bank;
 };
 
 class emg2000a_device : public edsp_device
