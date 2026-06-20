@@ -419,9 +419,6 @@ void tek440x_state::physical_map(address_map &map)
 
 	map(0x740000, 0x747fff).rom().mirror(0x8000).region("bootrom", 0);
 
-	// 700000-71ffff spare 0
-	// 720000-73ffff spare 1
-	map(0x740000, 0x747fff).rom().mirror(0x8000).region("maincpu", 0);
 	map(0x760000, 0x760fff).ram().mirror(0xf000); // debug RAM
 
 	// 780000-79ffff processor board I/O
