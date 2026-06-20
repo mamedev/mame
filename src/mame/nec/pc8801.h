@@ -13,6 +13,8 @@
 
 #include "pc8001.h"
 
+#include "pc88_sdip.h"
+
 #include "bus/centronics/ctronics.h"
 #include "bus/msx/ctrl/ctrl.h"
 #include "bus/nec_fdd/pc80s31k.h"
@@ -22,7 +24,6 @@
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
 #include "machine/bankdev.h"
-#include "machine/eepromser.h"
 #include "machine/i8214.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
@@ -277,7 +278,7 @@ protected:
 	virtual void main_map(address_map &map) override ATTR_COLD;
 	virtual void main_io(address_map &map) override ATTR_COLD;
 private:
-	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<pc88_sdip_device> m_eeprom;
 	required_device<ym2608_device> m_opna;
 	memory_view m_setup_mem_view;
 	memory_view m_setup_io_view;

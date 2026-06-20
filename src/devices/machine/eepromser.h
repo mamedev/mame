@@ -210,12 +210,15 @@ protected:
 //**************************************************************************
 
 // macro for declaring a new device class
+// protected method is for nec/pc88_sdip (an exception for reading the internal data)
 #define DECLARE_SERIAL_EEPROM_DEVICE(_baseclass, _lowercase, _uppercase, _bits) \
 class eeprom_serial_##_lowercase##_##_bits##bit_device : public eeprom_serial_##_baseclass##_device \
 { \
 public: \
 	eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, eeprom_serial_streaming enable_streaming = eeprom_serial_streaming::DISABLE); \
 	eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock); \
+protected: \
+	eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock); \
 }; \
 DECLARE_DEVICE_TYPE(EEPROM_##_uppercase##_##_bits##BIT, eeprom_serial_##_lowercase##_##_bits##bit_device)
 
