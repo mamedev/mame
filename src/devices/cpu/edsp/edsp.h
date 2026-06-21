@@ -46,8 +46,12 @@ protected:
 	void intf_w(offs_t offset, u16 data);
 	u16 spa_r();
 	void spa_w(u16 data);
+	u16 timer01_r(offs_t offset);
+	void timer01_w(offs_t offset, u16 data);
 
 private:
+	TIMER_CALLBACK_MEMBER(timer01_interrupt);
+
 	u16 add(u16 s, u16 t, bool c) noexcept;
 	bool test_condition(u8 cond) const noexcept;
 	u16 read_program_word(u16 addr);
@@ -75,6 +79,10 @@ private:
 	u32 m_inte;
 	u32 m_intf;
 	u16 m_bank;
+	u8 m_trl[2];
+	u16 m_tcon[2];
+
+	emu_timer *m_timer01[2];
 };
 
 class emg2000a_device : public edsp_device

@@ -56,6 +56,7 @@ void emg2000a_device::io_map(address_map &map)
 	map(0x0c, 0x0d).rw(FUNC(emg2000a_device::inte_r), FUNC(emg2000a_device::inte_w));
 	map(0x0e, 0x0f).rw(FUNC(emg2000a_device::intf_r), FUNC(emg2000a_device::intf_w));
 	map(0x13, 0x13).rw(FUNC(emg2000a_device::spa_r), FUNC(emg2000a_device::spa_w));
+	map(0x40, 0x43).rw(FUNC(emg2000a_device::timer01_r), FUNC(emg2000a_device::timer01_w));
 	// TODO: I/O ports & everything else
 }
 
@@ -96,6 +97,9 @@ void edsp_device::device_start()
 	state_add(EDSP_INTE, "INTE", m_inte);
 	state_add(EDSP_INTF, "INTF", m_intf);
 
+	for (int n = 0; n < 2; n++)
+		m_timer01[n] = timer_alloc(FUNC(edsp_device::timer01_interrupt), this);
+
 	save_item(NAME(m_pc));
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_sp));
@@ -121,6 +125,13 @@ void edsp_device::device_reset()
 	m_inte = 0;
 	m_intf = 0;
 	m_bank = 0;
+
+	for (int n = 0; n < 2; n++)
+	{
+		m_trl[n] = 0;
+		m_tcon[n] = 0;
+		m_timer01[n]->enable(false);
+	}
 }
 
 u16 edsp_device::sr_r()
@@ -177,6 +188,44 @@ u16 edsp_device::spa_r()
 void edsp_device::spa_w(u16 data)
 {
 	m_sp = data;
+}
+
+u16 edsp_device::timer01_r(offs_t offset)
+{
+	if (BIT(offset, 0))
+		return m_tcon[offset >> 1];
+	else
+		return m_trl[offset >> 1];
+}
+
+void edsp_device::timer01_w(offs_t offset, u16 data)
+{
+	const int which = offset >> 1;
+	if (BIT(offset, 0))
+	{
+		m_tcon[which] = data;
+		if (BIT(data, 15) && !m_timer01[which]->enabled())
+		{
+			const attotime period = clocks_to_attotime((m_trl[which] + 1) << (m_tcon[which] + 6));
+			logerror("Timer %d enabled at %.3f Hz\n", which, period.as_hz());
+			m_timer01[which]->adjust(period, which);
+		}
+		else if (!BIT(data, 15) && m_timer01[which]->enabled())
+		{
+			logerror("Timer %d disabled\n", which);
+			m_timer01[which]->enable(false);
+		}
+	}
+	else
+		m_trl[which] = BIT(data, 0, 8);
+}
+
+TIMER_CALLBACK_MEMBER(edsp_device::timer01_interrupt)
+{
+	m_intf |= 1 << (param + 1);
+
+	const attotime period = clocks_to_attotime((m_trl[param] + 1) << (m_tcon[param] + 6));
+	m_timer01[param]->adjust(period, param);
 }
 
 u16 edsp_device::add(u16 s, u16 t, bool c) noexcept
