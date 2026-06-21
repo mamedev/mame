@@ -5,7 +5,13 @@
     Elan Microelectronics eDSP disassembler
 
     Instruction encodings for this 16-bit DSP architecture are based on
-    guesswork; many remain unidentified.
+    guesswork; many, including the multiply and divide instructions,
+    remain unidentified. It is also likely that different model series add
+    or delete a few instructions.
+
+    System registers are mapped in the I/O space, but the locations differ
+    between model series. For example, SPA (stack pointer address) is
+    IO[0x11] on the eSL and eSLS series, but IO[0x13] on eMG2000A.
 
 ***************************************************************************/
 
@@ -26,21 +32,22 @@ namespace {
 
 const char *const c_conditions[15] =
 {
-	"lo",
-	"hs",
-	"cond2",
-	"cond3",
+	"lo/cc",
+	"hs/cs",
+	"vc", // not used in mylife, unconfirmed
+	"vs", // not used in mylife, unconfirmed
 	"ne",
 	"eq",
-	"cond6",
-	"cond7",
-	"ts", // or perhaps tc
-	"cond9",
+	"pl", // not used in mylife, unconfirmed
+	"mi", // not used in mylife, unconfirmed
+	// next two are possibly reversed
+	"tc",
+	"ts", // not used in mylife
 	"ge",
 	"lt",
 	"gt",
 	"le",
-	"cond14"
+	"ls" // not used in mylife, unconfirmed
 };
 
 }
@@ -150,7 +157,7 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 	{
 		// XOR with register direct, indirect or imm6
 		if (op == 0x3000 + 0x0121 * BIT(op, 0, 3))
-			util::stream_format(stream, "r%d = 0", BIT(op, 0, 3));
+			util::stream_format(stream, "clr r%d", BIT(op, 0, 3));
 		else switch (BIT(op, 3, 2))
 		{
 		case 0:
@@ -259,13 +266,13 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 		const u8 cond = BIT(op, 7, 4);
 		if (cond != 15)
 			util::stream_format(stream, "if %s ", c_conditions[cond]);
-		util::stream_format(stream, "ljmp 0x%04X", u32(opcodes.r16(pc + 1)));
+		util::stream_format(stream, "jmp 0x%04X (L)", u32(opcodes.r16(pc + 1)));
 		return 2 | (cond != 15 ? STEP_COND : 0) | SUPPORTED;
 	}
 	else if (op == 0x3819)
 	{
 		// Call absolute address
-		util::stream_format(stream, "lcall 0x%04X", u32(opcodes.r16(pc + 1)));
+		util::stream_format(stream, "call 0x%04X (L)", u32(opcodes.r16(pc + 1)));
 		return 2 | STEP_OVER | SUPPORTED;
 	}
 	else if (op == 0x381a)
@@ -326,13 +333,20 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 	}
 	else if ((op & 0xf81f) == 0x5800)
 	{
-		util::stream_format(stream, "r%d = OP50 r%d", BIT(op, 8, 3), BIT(op, 5, 3));
+		// Logical complement
+		util::stream_format(stream, "r%d = COM r%d", BIT(op, 8, 3), BIT(op, 5, 3));
 		return 1 | SUPPORTED;
 	}
-//  else if ((op & 0xf81f) == 0x5801) - might have a different format
+	else if ((op & 0xf81f) == 0x5801)
+	{
+		// possibly a multiply instruction
+		util::stream_format(stream, "r%d = r%d OP51 r%d", BIT(op, 8, 3), BIT(op, 8, 3), BIT(op, 5, 3));
+		return 1 | SUPPORTED;
+	}
 	else if ((op & 0xf81f) == 0x5802)
 	{
-		util::stream_format(stream, "r%d = OP52 r%d", BIT(op, 8, 3), BIT(op, 5, 3));
+		// Two's complement
+		util::stream_format(stream, "r%d = NEG r%d", BIT(op, 8, 3), BIT(op, 5, 3));
 		return 1 | SUPPORTED;
 	}
 	else if ((op & 0xf81f) == 0x5803)
@@ -450,7 +464,7 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 		util::stream_format(stream, "r%d.h = #0x%02X", BIT(op, 8, 3), BIT(op, 0, 8));
 		return 1 | SUPPORTED;
 	}
-	else if (op >= 0x8000 && op < 0xa000)
+	else if ((op & 0xe000) == 0x8000)
 	{
 		// Short branch
 		const u8 cond = BIT(op, 9, 4);

@@ -32,8 +32,8 @@ x--- ---- Built-in FDD i/f (?, the other setting is <prohibited> anyway)
 ---- --x- Terminal Mode '1' Basic '0' (same as DSW1 bit 1)
 
 TODO:
-- define aliases for MA2/MC (CPU clock switch and BASIC mode)
-- Hookup for PC-88VA
+- define aliases for MA2/MC (CPU clock switch and BASIC mode);
+- "SDIP" as name is unconfirmed;
 
 **************************************************************************************************/
 

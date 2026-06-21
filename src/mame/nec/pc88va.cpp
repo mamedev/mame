@@ -16,8 +16,6 @@ TODO:
 - pc88va is also known to have a slightly different banking scheme and
   regular YM2203 as default sound board.
 - video emulation is lacking many features, cfr. pc88va_v.cpp;
-- keyboard runs on undumped MCU, we currently stick irqs together on
-  selected keys in order to have an easier QoL while testing this.
 - Backport from PC-8801 main map, apply supersets where applicable;
   \- IDP has EMUL for upd3301
   \- In emulation mode HW still relies to a i8214, so it bridges thru
@@ -82,6 +80,7 @@ brk 8Ch AH=02h read calendar clock -> CH = hour, CL = minutes, DH = seconds, DL 
 #include "emu.h"
 #include "pc88va.h"
 #include "pc88_kbd.h"
+#include "pc88va_memsw.h"
 
 #include "bus/pc98_cbus/options.h"
 
@@ -114,7 +113,6 @@ uint8_t pc88va_state::kanji_ram_r(offs_t offset)
 	return m_kanji_ram[offset];
 }
 
-// TODO: settings area should be write protected depending on the m_backupram_wp bit, separate from this
 void pc88va_state::kanji_ram_w(offs_t offset, uint8_t data)
 {
 	m_kanji_ram[offset] = data;
@@ -218,16 +216,6 @@ uint8_t pc88va_state::rom_bank_r()
 {
 	// bit 7 low is PC-88VA-91 rom bank status
 	return 0xff;
-}
-
-void pc88va_state::backupram_wp_1_w(uint16_t data)
-{
-	m_backupram_wp = 1;
-}
-
-void pc88va_state::backupram_wp_0_w(uint16_t data)
-{
-	m_backupram_wp = 0;
 }
 
 /*
@@ -494,14 +482,6 @@ TIMER_CALLBACK_MEMBER(pc88va_state::t3_mouse_callback)
 }
 
 
-uint8_t pc88va_state::backupram_dsw_r(offs_t offset)
-{
-	if(offset == 0)
-		return m_kanji_ram[0x1fc2 / 2] & 0xff;
-
-	return m_kanji_ram[0x1fc6 / 2] & 0xff;
-}
-
 // TODO: pc8801_state::port31_w
 void pc88va_state::sys_port1_w(uint8_t data)
 {
@@ -555,6 +535,7 @@ void pc88va_state::sysbank_map(address_map &map)
 	map(0x240000, 0x24ffff).rom().region("kanji", 0x40000);
 	// Backup RAM & PCG
 	map(0x250000, 0x253fff).rw(FUNC(pc88va_state::kanji_ram_r),FUNC(pc88va_state::kanji_ram_w));
+	map(0x251fc0, 0x251fdf).rw("memsw", FUNC(pc88va_memsw_device::read), FUNC(pc88va_memsw_device::write));
 	// c-d dictionary
 	map(0x300000, 0x37ffff).rom().region("dictionary", 0);
 }
@@ -583,7 +564,7 @@ void pc88va_state::io_map(address_map &map)
 	map(0x0000, 0x000f).r("kbd", FUNC(pc88va_kbd_device::read_direct));
 	map(0x0010, 0x0010).w(FUNC(pc88va_state::rtc_w)); // Printer / Calendar Clock Interface
 	map(0x0020, 0x0021).noprw(); // RS-232C
-	map(0x0030, 0x0031).rw(FUNC(pc88va_state::backupram_dsw_r), FUNC(pc88va_state::sys_port1_w)); // 0x30 (R) DSW1 (W) Text Control Port 0 / 0x31 (R) DSW2 (W) System Port 1
+	map(0x0030, 0x0031).r("memsw", FUNC(pc88va_memsw_device::dsw_r)).w(FUNC(pc88va_state::sys_port1_w)); // 0x30 (R) DSW1 (W) Text Control Port 0 / 0x31 (R) DSW2 (W) System Port 1
 	map(0x0032, 0x0032).rw(FUNC(pc88va_state::misc_ctrl_r), FUNC(pc88va_state::misc_ctrl_w));
 //  map(0x0034, 0x0034) GVRAM Control Port 1
 //  map(0x0035, 0x0035) GVRAM Control Port 2
@@ -644,8 +625,8 @@ void pc88va_state::io_map(address_map &map)
 //  map(0x0190, 0x0191) System Port 5
 	map(0x0190, 0x0190).rw(FUNC(pc88va_state::sys_port5_r), FUNC(pc88va_state::sys_port5_w));
 //  map(0x0196, 0x0197) Keyboard sub CPU command port
-	map(0x0198, 0x0199).w(FUNC(pc88va_state::backupram_wp_1_w)); //Backup RAM write inhibit
-	map(0x019a, 0x019b).w(FUNC(pc88va_state::backupram_wp_0_w)); //Backup RAM write permission
+	map(0x0198, 0x0199).w("memsw", FUNC(pc88va_memsw_device::write_disable_w));
+	map(0x019a, 0x019b).w("memsw", FUNC(pc88va_memsw_device::write_enable_w));
 //  map(0x01a0, 0x01a7) V50 TCU
 	map(0x01a8, 0x01a8).w(FUNC(pc88va_state::timer3_ctrl_reg_w)); // General-purpose timer 3 control port
 	map(0x01b0, 0x01b7).rw(FUNC(pc88va_state::fdc_r), FUNC(pc88va_state::fdc_w)).umask16(0x00ff); // FDC related (765)
@@ -655,6 +636,12 @@ void pc88va_state::io_map(address_map &map)
 	map(0x01c6, 0x01c7).nopw(); // ???
 	map(0x01c8, 0x01cf).rw("d8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00); //i8255 3 (byte access)
 //  map(0x01d0, 0x01d1) Expansion RAM bank selection
+//  map(0x01e2, 0x01e2) (w) <unknown> accessed in EEPROM fashion at boot (?)
+	map(0x01e6, 0x01e6).lr8(NAME([] () {
+		// (r) <unknown> bit 7 read at BIOS boot after above, looped by 0x10000 cycles (?)
+		// at '0' makes boot way slower (???)
+		return 0xff;
+	}));
 	map(0x0200, 0x027f).ram().share("fb_regs"); // Frame buffer 0-1-2-3 control parameter
 	// TODO: shinraba writes to 0x340-0x37f on transition between opening and title screens (mirror? core bug?)
 	map(0x0300, 0x033f).ram().w(FUNC(pc88va_state::palette_ram_w)).share("palram"); // Palette RAM (xBBBBxRRRRxGGGG format)
@@ -963,9 +950,22 @@ void pc88va_state::r232_ctrl_portb_w(uint8_t data)
 	// ...
 }
 
+/*
+ * System port 8
+ * 1--- ---- Always '1'
+ * -x-- ---- N88V3 LED
+ * --x- ---- N88V2 LED
+ * ---x ---- N88V1 LED
+ * ---- x--- XBEEP
+ * (following are available in 8259 mode only)
+ * ---- -x-- XTXRMF RS-232C TxRDY irq mask (1 = enabled)
+ * ---- --x- XTXEMF RS-232C TxEMPTY irq mask
+ * ---- ---x XRXRMF RS-232C RxRDY irq mask
+ */
 void pc88va_state::r232_ctrl_portc_w(uint8_t data)
 {
-	// ...
+	m_dac1bit_disable = BIT(data, 3);
+	m_dac1bit->set_output_gain(0, m_dac1bit_disable ? 0.0 : 1.0);
 }
 
 /****************************************
@@ -1084,7 +1084,6 @@ void pc88va_state::machine_reset()
 
 	m_bank_reg = 0x4100;
 	m_sysbank->set_bank(1);
-	m_backupram_wp = 1;
 	m_rstmd = false;
 
 	m_tsp.tvram_vreg_offset = 0;
@@ -1100,6 +1099,9 @@ void pc88va_state::machine_reset()
 	m_sound_irq_pending = false;
 
 	m_dack = -1;
+
+	m_dac1bit_disable = true;
+	m_dac1bit->set_output_gain(0, 0.0);
 }
 
 // NOTE: PC-88VA implementation omits some C-Bus lines compared to PC-98.
@@ -1133,9 +1135,11 @@ void pc88va_state::pc88va(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc88va_state::io_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(pc88va_state::vrtc_irq), "screen", 0, 1);
 	m_maincpu->icu_slave_ack_cb().set(m_pic2, FUNC(pic8259_device::acknowledge));
-	m_maincpu->set_tclk(MASTER_CLOCK);
+	m_maincpu->set_tclk(MASTER_CLOCK / 2);
 	// "timer 1"
-	m_maincpu->tout1_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+//	m_maincpu->tout0_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_maincpu->tout1_cb().set(m_dac1bit, FUNC(speaker_sound_device::level_w));
+//	m_maincpu->tout2_cb().set RS-232C Baud Rate Setting
 	// ch2 is FDC, ch0/3 are "user". ch1 is unused
 	m_maincpu->out_hreq_cb().set(m_maincpu, FUNC(v50_device::hack_w));
 	m_maincpu->out_eop_cb().set(FUNC(pc88va_state::tc_w));
@@ -1184,6 +1188,9 @@ void pc88va_state::pc88va(machine_config &config)
 
 	UPD4990A(config, m_rtc);
 
+	// assume being available on all variants
+	PC88VA_MEMSW(config, "memsw");
+
 	ADDRESS_MAP_BANK(config, "sysbank").set_map(&pc88va_state::sysbank_map).set_options(ENDIANNESS_LITTLE, 16, 22, 0x40000);
 
 	MSX_GENERAL_PURPOSE_PORT(config, m_mouse_port, msx_general_purpose_port_devices, "joystick");
@@ -1206,6 +1213,8 @@ void pc88va_state::pc88va(machine_config &config)
 	m_opna->add_route(0, m_speaker, 0.25, 1);
 	m_opna->add_route(1, m_speaker, 0.50, 0);
 	m_opna->add_route(2, m_speaker, 0.50, 1);
+
+	SPEAKER_SOUND(config, m_dac1bit).add_route(ALL_OUTPUTS, "speaker", 0.40, 0).add_route(ALL_OUTPUTS, "speaker", 0.40, 1);
 
 	// TODO: set pc98 compatible
 	// Needs a MS-Engine disk dump first, that applies an overlay on PC Engine OS so that it can run PC-98 software

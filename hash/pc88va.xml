@@ -345,7 +345,9 @@ Runs slow in gameplay
 		<year>198?</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<notes><![CDATA[
-Needs [IDP] text display to go off for bottommost row (bumps strip 1 height from 384 to 400)
+Needs [IDP] text display to go off for bottommost row (bumps strip 1 height from 384 to 400) (fixed)
+Randomly hangs with a "please wait" when exiting town
+(character select: 3, 1, +, 1, CR, *. In dungeon go north, turn 6 when reaching wall, turn 6 at first split, go north until exit town screen reached and accept with 1)
 ]]></notes>
 		<info name="alt_title" value="マイトアンドマジック" />
 		<info name="usage" value="Boot with Disk C in drive 1"/>
@@ -364,10 +366,11 @@ Needs [IDP] text display to go off for bottommost row (bumps strip 1 height from
 			</dataarea>
 		</part>
 
+		<!-- baddump: non-factory save (characters at LV200!) -->
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A - User" />
 			<dataarea name="flop" size="1094592">
-				<rom name="might &amp; magic(diska_userdisk) (star craft).d88" size="1094592" crc="de68bba5" sha1="d6be57c867a3cca8b694bc2b129705c653ae44da"/>
+				<rom name="might &amp; magic(diska_userdisk) (star craft).d88" size="1094592" crc="de68bba5" sha1="d6be57c867a3cca8b694bc2b129705c653ae44da" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -552,7 +555,7 @@ Burps on [FDC] access after disk swap with program and player disks, trying to s
 		<year>1986</year>
 		<publisher>システムソフト (System Soft)</publisher>
 		<notes><![CDATA[
-Needs [dac1bit] clicks on gameplay
+Needs [dac1bit] clicks on gameplay (fixed)
 May crash with disk error when entering winning animation (verify)
 Winning animation is glitchy [OFX/OFY]?, uses [IDP] text transpen with upper bits set (for flame effect?), press mouse left button to return to game
 [OPNA] seems to cut off shortly on intro and winning screen compared to VAEG
@@ -580,7 +583,6 @@ Omake: if sound irqs don't run then needs to press key 0 pad to move on
 		<info name="alt_title" value="神羅万象"/>
 		<info name="usage" value="Hold enter at boot to skip intro, press F2 on title screen to load a game, press F5 for sound test" />
 
-		<!-- baddump: non-factory save -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1331888">
@@ -588,6 +590,7 @@ Omake: if sound irqs don't run then needs to press key 0 pad to move on
 			</dataarea>
 		</part>
 
+		<!-- baddump: non-factory save -->
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1296112">

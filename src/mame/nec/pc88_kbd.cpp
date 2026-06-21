@@ -9,7 +9,7 @@ I/O ports are normally read in direct/parallel-ish form, eventually exposed as s
 http://www.maroon.dti.ne.jp/youkan/pc88/iomap.html
 
 TODO:
-- pc88va_kbd: serial interface, add key modifiers;
+- pc88va_kbd: serial interface, add key modifiers, runs on undumped MCU really;
 
 **************************************************************************************************/
 
@@ -241,6 +241,7 @@ static INPUT_PORTS_START( pc8801fh_kbd )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F8")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F9")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F10")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Backspace")
 
 	PORT_MODIFY("KEYD")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Henkan") // 変換 / conversion

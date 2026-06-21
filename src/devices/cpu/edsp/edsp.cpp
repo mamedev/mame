@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 /***************************************************************************
 
-    Skeleton CPU device.
+    Preliminary eDSP 16-bit execution core.
 
 ***************************************************************************/
 
@@ -11,6 +11,8 @@
 #include "edspdasm.h"
 
 DEFINE_DEVICE_TYPE(EMG2000A, emg2000a_device, "emg2000a", "Elan eMG2000A TV Game Processor")
+
+constexpr u16 SR_GIE = 0x0020; // 0x8000 on eSL/eSLS
 
 edsp_device::edsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor program_map, address_map_constructor data_map, address_map_constructor io_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
@@ -49,7 +51,12 @@ void emg2000a_device::data_map(address_map &map)
 
 void emg2000a_device::io_map(address_map &map)
 {
-	// TODO: everything
+	map(0x01, 0x01).rw(FUNC(emg2000a_device::sr_r), FUNC(emg2000a_device::sr_w));
+	map(0x03, 0x03).rw(FUNC(emg2000a_device::bank_r), FUNC(emg2000a_device::bank_w));
+	map(0x0c, 0x0d).rw(FUNC(emg2000a_device::inte_r), FUNC(emg2000a_device::inte_w));
+	map(0x0e, 0x0f).rw(FUNC(emg2000a_device::intf_r), FUNC(emg2000a_device::intf_w));
+	map(0x13, 0x13).rw(FUNC(emg2000a_device::spa_r), FUNC(emg2000a_device::spa_w));
+	// TODO: I/O ports & everything else
 }
 
 device_memory_interface::space_config_vector edsp_device::memory_space_config() const
@@ -68,11 +75,16 @@ std::unique_ptr<util::disasm_interface> edsp_device::create_disassembler()
 
 void edsp_device::device_start()
 {
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_DATA).specific(m_data);
+	space(AS_IO).specific(m_io);
+
 	set_icountptr(m_icount);
 
 	state_add(EDSP_PC, "PC", m_pc);
 	state_add(STATE_GENPC, "GENPC", m_pc).noshow();
-	state_add(STATE_GENPCBASE, "GENPCBASE", m_pc).noshow();
+	state_add(STATE_GENPCBASE, "GENPCBASE", m_ppc).noshow();
 	state_add(EDSP_SP, "SP", m_sp);
 	state_add(EDSP_RC, "RC", m_rcr);
 	state_add(EDSP_LC, "LC", m_lcr);
@@ -81,8 +93,11 @@ void edsp_device::device_start()
 	state_add(EDSP_SR, "SR", m_sr);
 	for (int n = 0; n < 8; n++)
 		state_add(EDSP_R0 + n, util::string_format("R%d", n).c_str(), m_r[n]);
+	state_add(EDSP_INTE, "INTE", m_inte);
+	state_add(EDSP_INTF, "INTF", m_intf);
 
 	save_item(NAME(m_pc));
+	save_item(NAME(m_ppc));
 	save_item(NAME(m_sp));
 	save_item(NAME(m_rcr));
 	save_item(NAME(m_lcr));
@@ -90,6 +105,9 @@ void edsp_device::device_start()
 	save_item(NAME(m_lea));
 	save_item(NAME(m_sr));
 	save_item(NAME(m_r));
+	save_item(NAME(m_inte));
+	save_item(NAME(m_intf));
+	save_item(NAME(m_bank));
 }
 
 void edsp_device::device_reset()
@@ -100,10 +118,512 @@ void edsp_device::device_reset()
 	m_lsa = 0;
 	m_lea = 0;
 	m_sr = 0;
+	m_inte = 0;
+	m_intf = 0;
+	m_bank = 0;
+}
+
+u16 edsp_device::sr_r()
+{
+	return m_sr;
+}
+
+void edsp_device::sr_w(u16 data)
+{
+	m_sr = data;
+}
+
+u16 edsp_device::bank_r()
+{
+	return m_bank;
+}
+
+void edsp_device::bank_w(u16 data)
+{
+	m_bank = data;
+}
+
+u16 edsp_device::inte_r(offs_t offset)
+{
+	return BIT(m_inte, offset ? 16 : 0, 16);
+}
+
+void edsp_device::inte_w(offs_t offset, u16 data)
+{
+	if (offset)
+		m_inte = u32(data) << 16 | (m_inte & 0x0000ffff);
+	else
+		m_inte = data | (m_inte & 0xffff0000);
+}
+
+u16 edsp_device::intf_r(offs_t offset)
+{
+	return BIT(m_intf, offset ? 16 : 0, 16);
+}
+
+void edsp_device::intf_w(offs_t offset, u16 data)
+{
+	if (offset)
+		m_intf = u32(data) << 16 | (m_intf & 0x0000ffff);
+	else
+		m_intf = data | (m_intf & 0xffff0000);
+}
+
+u16 edsp_device::spa_r()
+{
+	return m_sp;
+}
+
+void edsp_device::spa_w(u16 data)
+{
+	m_sp = data;
+}
+
+u16 edsp_device::add(u16 s, u16 t, bool c) noexcept
+{
+	u32 d = u32(s) + t + (c ? 1 : 0);
+	m_sr = (m_sr & 0xfff0)
+			| (BIT(d, 15) ? 0x0008 : 0)
+			| (u16(d) ? 0 : 0x0004)
+			| (BIT((d ^ s) & ~(s ^ t), 15) ? 0x0002 : 0)
+			| (BIT(d, 16) ? 0x0001 : 0);
+	return u16(d);
+}
+
+bool edsp_device::test_condition(u8 cond) const noexcept
+{
+	switch (cond)
+	{
+	case 0: // LO or CC: C==0
+		return !BIT(m_sr, 0);
+
+	case 1: // HS or CS: C==1
+		return BIT(m_sr, 0);
+
+	case 2: // VC: V==0
+		return !BIT(m_sr, 1);
+
+	case 3: // VS: V==1
+		return BIT(m_sr, 1);
+
+	case 4: // NE: Z==0
+		return !BIT(m_sr, 2);
+
+	case 5: // EQ: Z==1
+		return BIT(m_sr, 2);
+
+	case 6: // PL: N==0
+		return !BIT(m_sr, 3);
+
+	case 7: // MI: N==1
+		return BIT(m_sr, 3);
+
+	case 8: // TC: T==0
+		return !BIT(m_sr, 4);
+
+	case 9: // TS: T==1
+		return BIT(m_sr, 4);
+
+	case 10: // GE: (N^V)==0
+		return BIT(m_sr, 3) == BIT(m_sr, 1);
+
+	case 11: // LT: (N^V)==1
+		return BIT(m_sr, 3) != BIT(m_sr, 1);
+
+	case 12: // GT: Z|(N^V)==0
+		return BIT(m_sr, 3) == BIT(m_sr, 1) && !BIT(m_sr, 2);
+
+	case 13: // LE: Z|(N^V)==1
+		return BIT(m_sr, 3) != BIT(m_sr, 1) || BIT(m_sr, 2);
+
+	case 14: // LS: (C==0)|(Z==1)
+		return !BIT(m_sr, 0) || BIT(m_sr, 2);
+
+	case 15: // unconditional
+		return true;
+
+	default: // should never happen
+		return false;
+	}
+}
+
+u16 edsp_device::read_program_word(u16 addr)
+{
+	return m_program.read_word(addr >= 0x8000 ? addr + (u32(BIT(m_bank, 0, 9)) << 15) : addr);
 }
 
 void edsp_device::execute_run()
 {
-	debugger_instruction_hook(m_pc);
-	m_icount = 0;
+	do
+	{
+		if ((m_sr & SR_GIE) && (m_inte & m_intf) && !m_rcr)
+		{
+			// TODO: respect INTP
+			const int i = std::countr_zero(m_inte & m_intf);
+			standard_irq_callback(i, m_pc);
+
+			m_data.write_word(m_sp, m_pc);
+			m_sp--;
+			m_pc = 0x0006 + i * 2;
+			m_sr &= ~SR_GIE;
+			m_icount -= 2;
+		}
+		else
+		{
+			m_ppc = m_pc;
+			debugger_instruction_hook(m_pc);
+			const u16 op = m_cache.read_word(m_pc);
+			if (m_rcr)
+				m_rcr--;
+			else
+				m_pc++;
+
+			if (op < 0x3800)
+			{
+				const u16 s = BIT(op, 3, 2) == 2 ? m_data.read_word(BIT(op, 5, 3)) : m_r[BIT(op, 3, 2) == 3 ? BIT(op, 8, 3) : BIT(op, 5, 3)];
+				const u16 t = BIT(op, 3, 2) == 3 ? BIT(op, 5, 3) << 3 | BIT(op, 0, 3) : m_r[BIT(op, 0, 3)];
+
+				u16 d = 0;
+				switch (BIT(op, 11, 3))
+				{
+				case 0: // ADD
+					d = add(s, t, false);
+					break;
+
+				case 1: // ADC
+					d = add(s, t, BIT(m_sr, 0));
+					break;
+
+				case 2: // SUB
+					d = add(s, ~t, true);
+					break;
+
+				case 3: // SUBB
+					d = add(s, ~t, BIT(m_sr, 0));
+					break;
+
+				case 4: // AND
+					d = s & t;
+					m_sr = (m_sr & 0xfff0) | (s16(d) < 0 ? 0x0008 : 0) | (d == 0 ? 0x0004 : 0);
+					break;
+
+				case 5: // OR
+					d = s | t;
+					m_sr = (m_sr & 0xfff0) | (s16(d) < 0 ? 0x0008 : 0) | (d == 0 ? 0x0004 : 0);
+					break;
+
+				case 6: // XOR
+					d = s ^ t;
+					m_sr = (m_sr & 0xfff0) | (s16(d) < 0 ? 0x0008 : 0) | (d == 0 ? 0x0004 : 0);
+					break;
+				}
+
+				if (BIT(op, 3, 2) == 1)
+					m_data.write_word(BIT(op, 8, 3), d);
+				else
+					m_r[BIT(op, 8, 3)] = d;
+				m_icount -= 1;
+			}
+			else if ((op & 0xf810) == 0x3800 && BIT(op, 0, 3) != 7)
+			{
+				const u16 s = m_r[BIT(op, 5, 3)];
+				const u16 imm16 = m_cache.read_word(m_pc);
+
+				u16 d = 0;
+				switch (BIT(op, 0, 3))
+				{
+				case 0: // ADD
+					d = add(s, imm16, false);
+					break;
+
+				case 1: // ADC
+					d = add(s, imm16, BIT(m_sr, 0));
+					break;
+
+				case 2: // SUB
+					d = add(s, ~imm16, true);
+					break;
+
+				case 3: // SUBB
+					d = add(s, ~imm16, BIT(m_sr, 0));
+					break;
+
+				case 4: // AND
+					d = s & imm16;
+					m_sr = (m_sr & 0xfff0) | (s16(d) < 0 ? 0x0008 : 0) | (d == 0 ? 0x0004 : 0);
+					break;
+
+				case 5: // OR
+					d = s | imm16;
+					m_sr = (m_sr & 0xfff0) | (s16(d) < 0 ? 0x0008 : 0) | (d == 0 ? 0x0004 : 0);
+					break;
+
+				case 6: // XOR
+					d = s ^ imm16;
+					m_sr = (m_sr & 0xfff0) | (s16(d) < 0 ? 0x0008 : 0) | (d == 0 ? 0x0004 : 0);
+					break;
+				}
+
+				if (BIT(op, 3))
+					m_data.write_word(m_r[BIT(op, 8, 3)], d);
+				else
+					m_r[BIT(op, 8, 3)] = d;
+				m_pc++;
+				m_icount -= 2;
+			}
+			else if ((op & 0xf8ff) == 0x3817)
+			{
+				// RPT
+				m_rcr = m_r[BIT(op, 8, 3)];
+				m_icount -= 1;
+			}
+			else if ((op & 0xf87f) == 0x3818)
+			{
+				// IF cond JMP Long_addr
+				if (test_condition(BIT(op, 7, 4)))
+				{
+					const u16 addr = m_cache.read_word(m_pc);
+					m_pc = addr;
+				}
+				else
+					m_pc++;
+				m_icount -= 2;
+			}
+			else if (op == 0x3819)
+			{
+				// CALL Long_addr
+				const u16 addr = m_cache.read_word(m_pc);
+				m_data.write_word(m_sp, m_pc + 1);
+				m_sp--;
+				m_pc = addr;
+				m_icount -= 2;
+			}
+			else if (op == 0x383a)
+			{
+				// RET
+				m_sp++;
+				m_pc = m_data.read_word(m_sp);
+				m_icount -= 2;
+			}
+			else if (op == 0x385a)
+			{
+				// RETI
+				m_sp++;
+				m_pc = m_data.read_word(m_sp);
+				m_sr |= SR_GIE;
+				m_icount -= 2;
+			}
+			else if ((op & 0xf81f) == 0x381b)
+			{
+				m_sp += BIT(op, 5, 6);
+				m_icount -= 1;
+			}
+			else if ((op & 0xf81f) == 0x381c)
+			{
+				m_sp -= BIT(op, 5, 6);
+				m_icount -= 1;
+			}
+			else if ((op & 0xfe18) == 0x4818)
+			{
+				// CMP
+				const u16 s = BIT(op, 8) ? m_data.read_word(m_r[BIT(op, 5, 3)]) : m_r[BIT(op, 5, 3)];
+				const u16 t = m_r[BIT(op, 0, 3)];
+				(void)add(s, ~t, true);
+				m_icount -= 1;
+			}
+			else if ((op & 0xf81f) == 0x5803)
+			{
+				m_r[BIT(op, 8, 3)] = m_data.read_word(m_r[BIT(op, 5, 3)]);
+				m_icount -= 1;
+			}
+			else if ((op & 0xf81f) == 0x5805)
+			{
+				const u16 data = m_data.read_word(m_r[BIT(op, 5, 3)]);
+				m_r[BIT(op, 5, 3)]++;
+				m_r[BIT(op, 8, 3)] = data;
+				m_icount -= 1;
+			}
+			else if ((op & 0xf81f) == 0x5806)
+			{
+				// SHL
+				const u16 s = m_r[BIT(op, 5, 3)];
+				m_r[BIT(op, 8, 3)] = add(s, s, false);
+				m_icount -= 1;
+			}
+			else if ((op & 0xf81f) == 0x5807)
+			{
+				const u16 data = m_data.read_word(m_r[BIT(op, 5, 3)]);
+				m_r[BIT(op, 5, 3)]--;
+				m_r[BIT(op, 8, 3)] = data;
+				m_icount -= 1;
+			}
+			else if ((op & 0xf81f) == 0x5809)
+			{
+				const u16 data = read_program_word(m_r[BIT(op, 5, 3)]);
+				m_r[BIT(op, 8, 3)] = data;
+				m_icount -= 2; // TODO: repeat timing
+			}
+			else if ((op & 0xf81f) == 0x580f)
+			{
+				// TODO: banking
+				const u16 data = read_program_word(m_r[BIT(op, 5, 3)]);
+				m_r[BIT(op, 5, 3)]++;
+				m_data.write_word(m_r[BIT(op, 8, 3)], data);
+				m_r[BIT(op, 8, 3)]++;
+				m_icount -= 2; // TODO: repeat timing
+			}
+			else if ((op & 0xf81f) == 0x581b)
+			{
+				m_data.write_word(m_r[BIT(op, 8, 3)], m_r[BIT(op, 5, 3)]);
+				m_icount -= 1;
+			}
+			else if ((op & 0xf81f) == 0x581d)
+			{
+				m_data.write_word(m_r[BIT(op, 8, 3)], m_r[BIT(op, 5, 3)]);
+				m_r[BIT(op, 8, 3)]++;
+				m_icount -= 1;
+			}
+			else if ((op & 0xf8ff) == 0x581e)
+			{
+				// PUSH
+				m_data.write_word(m_sp, m_r[BIT(op, 8, 3)]);
+				m_sp--;
+				m_icount -= 1;
+			}
+			else if ((op & 0xf8ff) == 0x583e)
+			{
+				// POP
+				m_sp++;
+				m_r[BIT(op, 8, 3)] = m_data.read_word(m_sp);
+				m_icount -= 1;
+			}
+			else if ((op & 0xf8ff) == 0x585e)
+			{
+				m_pc = m_r[BIT(op, 8, 3)];
+				m_icount -= 2;
+			}
+			else if ((op & 0xf8ff) == 0x589e)
+			{
+				m_r[BIT(op, 8, 3)] = m_data.read_word(m_cache.read_word(m_pc));
+				m_pc++;
+				m_icount -= 2;
+			}
+			else if ((op & 0xf8ff) == 0x58be)
+			{
+				m_data.write_word(m_cache.read_word(m_pc), m_r[BIT(op, 8, 3)]);
+				m_pc++;
+				m_icount -= 2;
+			}
+			else if ((op & 0xf8ff) == 0x58de)
+			{
+				m_data.write_word(m_r[BIT(op, 8, 3)], m_cache.read_word(m_pc));
+				m_pc++;
+				m_icount -= 2;
+			}
+			else if ((op & 0xf800) == 0x6000)
+			{
+				// MOV low immediate
+				m_r[BIT(op, 8, 3)] = BIT(op, 0, 8);
+				m_icount -= 1;
+			}
+			else if ((op & 0xf800) == 0x6800)
+			{
+				// MOV high immediate
+				m_r[BIT(op, 8, 3)] = (m_r[BIT(op, 8, 3)] & 0x00ff) | BIT(op, 0, 8) << 8;
+				m_icount -= 1;
+			}
+			else if ((op & 0xe000) == 0x8000)
+			{
+				// IF cond JMP Short_addr
+				if (test_condition(BIT(op, 9, 4)))
+				{
+					m_pc += util::sext(op, 9);
+					m_icount -= 2;
+				}
+				else
+					m_icount -= 1;
+			}
+			else if ((op & 0xff00) == 0xa000)
+			{
+				const u16 data = m_data.read_word(m_r[3] - BIT(op, 0, 5));
+				m_r[BIT(op, 5, 3)] = data;
+				m_icount -= 1;
+			}
+			else if ((op & 0xff00) == 0xa400)
+			{
+				m_data.write_word(m_r[3] - BIT(op, 0, 5), m_r[BIT(op, 5, 3)]);
+				m_icount -= 1;
+			}
+			else if ((op & 0xff80) == 0xa800)
+			{
+				m_r[BIT(op, 0, 3)] |= u16(1) << BIT(op, 3, 4);
+				m_icount -= 1;
+			}
+			else if ((op & 0xff00) == 0xa900)
+			{
+				const u8 port = BIT(op, 7) << 3 | BIT(op, 0, 3);
+				m_io.write_word(port, m_io.read_word(port) | u16(1) << BIT(op, 3, 4));
+				m_icount -= 1;
+			}
+			else if ((op & 0xff80) == 0xaa00)
+			{
+				m_r[BIT(op, 0, 3)] &= ~(u16(1) << BIT(op, 3, 4));
+				m_icount -= 1;
+			}
+			else if ((op & 0xff00) == 0xab00)
+			{
+				const u8 port = BIT(op, 7) << 3 | BIT(op, 0, 3);
+				m_io.write_word(port, m_io.read_word(port) & ~(u16(1) << BIT(op, 3, 4)));
+				m_icount -= 1;
+			}
+			else if ((op & 0xff80) == 0xac00)
+			{
+				if (BIT(m_r[BIT(op, 0, 3)], BIT(op, 3, 4)))
+					m_sr |= 0x0010;
+				else
+					m_sr &= 0xffef;
+				m_icount -= 1;
+			}
+			else if ((op & 0xf880) == 0xb000)
+			{
+				// IN
+				m_r[BIT(op, 8, 3)] = m_io.read_word(BIT(op, 0, 7));
+				m_icount -= 1;
+			}
+			else if ((op & 0xf880) == 0xb080)
+			{
+				// OUT
+				m_io.write_word(BIT(op, 0, 7), m_r[BIT(op, 8, 3)]);
+				m_icount -= 1;
+			}
+			else if ((op & 0xff80) == 0xb800)
+			{
+				// PUSH IO[addr]
+				m_data.write_word(m_sp, m_io.read_word(BIT(op, 0, 7)));
+				m_sp--;
+				m_icount -= 1;
+			}
+			else if ((op & 0xff80) == 0xb880)
+			{
+				// POP IO[addr]
+				m_sp++;
+				m_io.write_word(BIT(op, 0, 7), m_data.read_word(m_sp));
+				m_icount -= 1;
+			}
+			else if (op >= 0xc000)
+			{
+				// CALL Short_addr
+				m_data.write_word(m_sp, m_pc);
+				m_sp--;
+				m_pc = BIT(op, 0, 14);
+				m_icount -= 2;
+			}
+			else
+			{
+				logerror("Unemulated/undefined instruction 0x%04X @ PC = 0x%04X\n", op, m_ppc);
+				m_icount -= 1;
+			}
+		}
+	}
+	while (m_icount > 0);
 }

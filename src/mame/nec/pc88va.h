@@ -27,6 +27,7 @@
 #include "machine/timer.h"
 #include "machine/upd1990a.h"
 #include "machine/upd765.h"
+#include "sound/spkrdev.h"
 #include "sound/ymopn.h"
 
 #include "emupal.h"
@@ -53,6 +54,7 @@ public:
 		// labelled "マウス" (mouse) - can't use "mouse" because of core -mouse option
 		, m_mouse_port(*this, "mouseport")
 		, m_opna(*this, "opna")
+		, m_dac1bit(*this, "dac1bit")
 		, m_speaker(*this, "speaker")
 		, m_palram(*this, "palram")
 		, m_sysbank(*this, "sysbank")
@@ -107,6 +109,7 @@ private:
 	required_device<pc98_cbus_root_device> m_cbus_root;
 	required_device<msx_general_purpose_port_device> m_mouse_port;
 	required_device<ym2608_device> m_opna;
+	required_device<speaker_sound_device> m_dac1bit;
 	required_device<speaker_device> m_speaker;
 	required_shared_ptr<uint16_t> m_palram;
 	required_device<address_map_bank_device> m_sysbank;
@@ -122,8 +125,8 @@ private:
 	uint16_t m_bank_reg = 0;
 	uint8_t m_timer3_io_reg = 0;
 	emu_timer *m_t3_mouse_timer = nullptr;
-	uint8_t m_backupram_wp = 0;
 	bool m_rstmd = false;
+	bool m_dac1bit_disable;
 
 	// FDC
 	emu_timer *m_fdc_timer = nullptr;
@@ -147,14 +150,11 @@ private:
 	uint16_t bios_bank_r();
 	void bios_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t rom_bank_r();
-	void backupram_wp_1_w(uint16_t data);
-	void backupram_wp_0_w(uint16_t data);
 	uint8_t kanji_ram_r(offs_t offset);
 	void kanji_ram_w(offs_t offset, uint8_t data);
 
 	uint16_t sysop_r();
 	void timer3_ctrl_reg_w(uint8_t data);
-	uint8_t backupram_dsw_r(offs_t offset);
 	void sys_port1_w(uint8_t data);
 	u8 sys_port5_r();
 	void sys_port5_w(u8 data);
@@ -183,6 +183,7 @@ private:
 
 	u16 m_text_transpen;
 	bool m_td;
+	bitmap_rgb32 m_text_bitmap;
 	bitmap_rgb32 m_graphic_bitmap[2];
 
 	struct {
@@ -263,6 +264,8 @@ private:
 	uint8_t m_buf_ram[16]{};
 	u8 m_crtc_regs[15]{};
 	u16 m_vrtc_irq_line = 432;
+	// u32 for cache
+	u32 m_vertical_magnify;
 
 	uint8_t idp_status_r();
 	void idp_command_w(uint8_t data);
