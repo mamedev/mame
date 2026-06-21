@@ -4025,7 +4025,7 @@ ns32000_mmu_interface::translate_result ns32532_device::translate(address_space 
 		: ((write || st == ns32000::ST_RMW) ? PL_SRW : PL_SRO);
 
 	// translation look-aside buffer: a hit avoids the two page-table reads
-	bool const rmw = (write || st == ns32000::ST_RMW);
+	bool const rmw = write || (st == ns32000::ST_RMW);
 	u32 const tlb_vpn = address >> 12;
 	tlb_entry &tlb = m_tlb[tlb_vpn & (TLB_ENTRIES - 1)];
 	if (tlb.valid && tlb.tag == tlb_vpn && tlb.as == address_space)

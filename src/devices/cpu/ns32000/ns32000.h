@@ -247,6 +247,23 @@ protected:
 	virtual u16 slave(u8 opbyte, u16 opword, addr_mode op1, addr_mode op2) override;
 
 private:
+	static constexpr unsigned TLB_ENTRIES = 1024; // power of two
+
+	struct tlb_entry
+	{
+		u32  tag;   // virtual page number (address >> 12)
+		u32  pfn;   // physical frame (PTE.PFN, page-aligned)
+		u8   pl;    // effective (most restrictive) protection level
+		bool as;    // address space
+		bool ci;    // cache inhibit
+		bool m;     // level-2 PTE modified bit
+		bool valid;
+	};
+
+	void tlb_flush();                      // invalidate all entries
+	void tlb_flush_as(bool as);            // invalidate one address space (PTBn load)
+	void tlb_invalidate(u32 va, bool as);  // invalidate one page (IVARn write)
+
 	address_space_config m_pt1_config;
 	address_space_config m_pt2_config;
 
@@ -262,22 +279,7 @@ private:
 	// speed; capacity does not affect correctness as long as invalidation (PTBn
 	// load, IVARn write) is exact.  R/M bits follow the hardware: a write to a
 	// cached page whose recorded M bit is clear still walks, to set PTE.M.
-	struct tlb_entry
-	{
-		u32  tag;   // virtual page number (address >> 12)
-		u32  pfn;   // physical frame (PTE.PFN, page-aligned)
-		u8   pl;    // effective (most restrictive) protection level
-		bool as;    // address space
-		bool ci;    // cache inhibit
-		bool m;     // level-2 PTE modified bit
-		bool valid;
-	};
-	static constexpr unsigned TLB_ENTRIES = 1024; // power of two
 	tlb_entry m_tlb[TLB_ENTRIES];
-
-	void tlb_flush();                      // invalidate all entries
-	void tlb_flush_as(bool as);            // invalidate one address space (PTBn load)
-	void tlb_invalidate(u32 va, bool as);  // invalidate one page (IVARn write)
 
 	// debug registers
 	u32 m_dcr; // debug condition

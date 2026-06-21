@@ -44,9 +44,10 @@ protected:
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
+
+	offs_t window_phys(offs_t offset, bool write);  // window mapping (init: physical low; RUN: via 32082 MMU)
 
 	void cpu_map(address_map &map) ATTR_COLD;
 
@@ -60,7 +61,6 @@ private:
 	// host side: the 64KB memory window
 	virtual uint8_t window_r(offs_t offset) = 0;
 	virtual void window_w(offs_t offset, uint8_t data) = 0;
-	offs_t window_phys(offs_t offset, bool write);  // window mapping (init: physical low; RUN: via 32082 MMU)
 	uint8_t csr_r(offs_t offset);                   // host status register (base+FFF0)
 	void csr_w(offs_t offset, uint8_t data);
 	uint8_t csr_strobe_r(offs_t reg);               // address strobes (base+FFF1..FFF7): read fires too

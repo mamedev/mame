@@ -25,6 +25,7 @@
 #include "util/vecstream.h"
 #include "util/xmlfile.h"
 
+#include <bit>
 #include <cctype>
 #include <algorithm>
 #include <cmath>
@@ -1135,13 +1136,7 @@ inline render_color interpolate_color(emu::render::detail::color_vector const &s
 unsigned get_state_shift(ioport_value mask)
 {
 	// get shift to right-align LSB
-	unsigned result(0U);
-	while (mask && !BIT(mask, 0))
-	{
-		++result;
-		mask >>= 1;
-	}
-	return result;
+	return mask ? std::countr_zero(mask) : 0U;
 }
 
 std::string make_child_output_tag(

@@ -142,7 +142,7 @@ void isa8_opus_pm100_device_base::cpu_map(address_map &map)
 void isa8_opus_pm100_device::device_add_mconfig(machine_config &config)
 {
 	ns32016_device &cpu = NS32016(config, m_cpu, 20_MHz_XTAL / 2);
-	cpu.set_addrmap(AS_PROGRAM, &isa8_opus_pm100_device_base::cpu_map);
+	cpu.set_addrmap(AS_PROGRAM, &isa8_opus_pm100_device::cpu_map);
 	cpu.set_fpu(m_fpu);
 	cpu.set_mmu(m_mmu);
 
@@ -326,22 +326,22 @@ offs_t isa8_opus_pm100_device_base::window_phys(offs_t offset, bool write)
 }
 
 // the window covers the shared page (the host CSRs at the top are installed separately)
-uint8_t isa8_opus_pm100_device_base::window_r(offs_t offset)
+uint8_t isa8_opus_pm100_device::window_r(offs_t offset)
 {
 	return util::little_endian_cast<uint8_t const>(&m_ram[0])[window_phys(offset, false)];
 }
 
-uint8_t isa8_opus_pm110_device_base::window_r(offs_t offset)
+uint8_t isa8_opus_pm110_device::window_r(offs_t offset)
 {
 	return util::little_endian_cast<uint8_t const>(&m_ram[0])[window_phys(offset, false)];
 }
 
-void isa8_opus_pm100_device_base::window_w(offs_t offset, uint8_t data)
+void isa8_opus_pm100_device::window_w(offs_t offset, uint8_t data)
 {
 	util::little_endian_cast<uint8_t>(&m_ram[0])[window_phys(offset, true)] = data;
 }
 
-void isa8_opus_pm110_device_base::window_w(offs_t offset, uint8_t data)
+void isa8_opus_pm110_device::window_w(offs_t offset, uint8_t data)
 {
 	util::little_endian_cast<uint8_t>(&m_ram[0])[window_phys(offset, true)] = data;
 }

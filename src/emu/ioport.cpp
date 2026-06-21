@@ -91,22 +91,6 @@ inline s32 apply_scale(s32 value, s64 scale)
 	return (s64(value) * scale) / (1 << 24);
 }
 
-//-------------------------------------------------
-//  compute_shift -- get shift required to right-
-//  align an I/O port field value
-//-------------------------------------------------
-
-inline u8 compute_shift(ioport_value mask)
-{
-	u8 result = 0U;
-	while (mask && !BIT(mask, 0))
-	{
-		mask >>= 1;
-		++result;
-	}
-	return result;
-}
-
 
 
 //**************************************************************************
@@ -3565,7 +3549,7 @@ void dynamic_field::write(ioport_value newval)
 
 analog_field::analog_field(ioport_field &field) :
 	m_field(field),
-	m_shift(compute_shift(field.mask())),
+	m_shift(field.mask() ? std::countr_zero(field.mask()) : 0U),
 	m_adjdefvalue((field.defvalue() & field.mask()) >> m_shift),
 	m_adjmin((field.minval() & field.mask()) >> m_shift),
 	m_adjmax((field.maxval() & field.mask()) >> m_shift),
