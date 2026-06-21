@@ -95,6 +95,7 @@ static const u32 size_mask[] = { 0x0000'00ffU, 0x0000'ffffU, 0x0000'0000U, 0xfff
 
 template <int HighBits, int Width>ns32000_device<HighBits, Width>::ns32000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_mmu_uses_cfg_m(true)
 	, m_address_mask(util::make_bitmask<u32>(HighBits))
 	, m_program_config("program", ENDIANNESS_LITTLE, 8 << Width, HighBits, 0)
 	, m_iam_config("iam", ENDIANNESS_LITTLE, 8 << Width, HighBits, 0)
@@ -151,6 +152,8 @@ ns32532_device::ns32532_device(const machine_config &mconfig, const char *tag, d
 	, m_pt1_config("pt1", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_pt2_config("pt2", ENDIANNESS_LITTLE, 32, 32, 0)
 {
+	// the on-chip MMU gates translation via MSR/MCR, not the CFG M bit
+	m_mmu_uses_cfg_m = false;
 }
 
 template <int HighBits, int Width> void ns32000_device<HighBits, Width>::device_start()
@@ -266,7 +269,13 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::state_s
 template <int HighBits, int Width> template<typename T> T ns32000_device<HighBits, Width>::mem_read(unsigned st, u32 address, bool user, bool pfs)
 {
 	u32 physical = address;
-	ns32000_mmu_interface::translate_result tr = m_mmu ?
+	// the CPU routes accesses through the external MMU only once SETCFG has
+	// enabled it (CFG M).  When the MMU is idle/just-reset the page tables are
+	// ignored and every address is physical, regardless of a stale MSR
+	// translation-enable.  (The 32532's on-chip MMU gates internally, so it
+	// clears m_mmu_uses_cfg_m and always consults translate().)
+	bool const xlat = m_mmu && (!m_mmu_uses_cfg_m || (m_cfg & CFG_M));
+	ns32000_mmu_interface::translate_result tr = xlat ?
 		m_mmu->translate(m_bus[st].space(), st, physical, (m_psr & PSR_U) || user, false, pfs) : ns32000_mmu_interface::COMPLETE;
 
 	if (tr == ns32000_mmu_interface::COMPLETE)
@@ -281,7 +290,7 @@ template <int HighBits, int Width> template<typename T> T ns32000_device<HighBit
 		{
 			u32 const pagemask = ((m_cfg & CFG_P) ? 0xfffU : 0x1ffU) & ~unitmask;
 
-			if (!m_mmu || (~address & pagemask))
+			if (!xlat || (~address & pagemask))
 			{
 				// unaligned access, one page (or no mmu)
 				switch (sizeof(T))
@@ -351,7 +360,9 @@ template <int HighBits, int Width> template<typename T> T ns32000_device<HighBit
 template <int HighBits, int Width> template<typename T> void ns32000_device<HighBits, Width>::mem_write(unsigned st, u32 address, u64 data, bool user)
 {
 	u32 physical = address;
-	ns32000_mmu_interface::translate_result tr = m_mmu ?
+	// see mem_read: the external MMU is consulted only when SETCFG has enabled it
+	bool const xlat = m_mmu && (!m_mmu_uses_cfg_m || (m_cfg & CFG_M));
+	ns32000_mmu_interface::translate_result tr = xlat ?
 		m_mmu->translate(m_bus[st].space(), st, physical, (m_psr & PSR_U) || user, true) : ns32000_mmu_interface::COMPLETE;
 
 	if (tr == ns32000_mmu_interface::COMPLETE)
@@ -365,7 +376,7 @@ template <int HighBits, int Width> template<typename T> void ns32000_device<High
 		{
 			u32 const pagemask = ((m_cfg & CFG_P) ? 0xfffU : 0x1ffU) & ~unitmask;
 
-			if (!m_mmu || (~address & pagemask))
+			if (!xlat || (~address & pagemask))
 			{
 				// unaligned access, one page (or no mmu)
 				switch (sizeof(T))
@@ -3671,7 +3682,7 @@ template <int HighBits, int Width> device_memory_interface::space_config_vector 
 template <int HighBits, int Width> bool ns32000_device<HighBits, Width>::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
 	target_space = &space(spacenum);
-	return !m_mmu || m_mmu->translate(space(spacenum), spacenum, address, m_psr & PSR_U, intention == TR_WRITE, false, true) == ns32000_mmu_interface::COMPLETE;
+	return !(m_mmu && (!m_mmu_uses_cfg_m || (m_cfg & CFG_M))) || m_mmu->translate(space(spacenum), spacenum, address, m_psr & PSR_U, intention == TR_WRITE, false, true) == ns32000_mmu_interface::COMPLETE;
 }
 
 template <int HighBits, int Width> std::unique_ptr<util::disasm_interface> ns32000_device<HighBits, Width>::create_disassembler()
