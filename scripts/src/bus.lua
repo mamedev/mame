@@ -4356,6 +4356,8 @@ if BUSES["PC98_CBUS"] then
 		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_55.h",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_86.cpp",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_86.h",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_96.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_96.h",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_118.cpp",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_118.h",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/pcfxga.cpp",
