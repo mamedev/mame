@@ -217,9 +217,9 @@ uint8_t pc9801_96_device::window_r()
 	if (m_vram_window_addr == 0xf00000)
 		return 0xa0;
 	if (m_vram_window_addr == 0xf40000)
-		return 0xc0;
-	if (m_vram_window_addr == 0xf60000)
 		return 0xe0;
+	if (m_vram_window_addr == 0xf60000)
+		return 0xc0;
 	return 0x00;
 }
 
@@ -237,10 +237,10 @@ void pc9801_96_device::window_w(uint8_t data)
 			m_vram_window_addr = 0xf00000;
 			break;
 		case 0xc0:
-			m_vram_window_addr = 0xf40000;
+			m_vram_window_addr = 0xf60000;
 			break;
 		case 0xe0:
-			m_vram_window_addr = 0xf60000;
+			m_vram_window_addr = 0xf40000;
 			break;
 		default:
 			m_vram_window_addr = 0;
