@@ -200,29 +200,41 @@ ROM_END
 } // anonymous namespace
 
 // these are all basically the same thing but with different wallpapers / alarm sounds etc.
-CONS( 2021, atw_avbp, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Marvel Avengers Black Panther (Accutime, AVG4608PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+// part name extensions
+// PH = Peers Hardy UK
+// AZ = ? (Amazon?)
+// TK = ? (TK Maxx?)
+// 
+// blue PCB
 CONS( 2021, atw_barb, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Barbie (Accutime, BAB4064PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2021, atw_batm, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Batman (Accutime, BAT4732PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2021, atw_dp,   0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Disney Princess (Accutime, PN425?)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2022, atw_dp,   0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Disney Princess (Accutime, PN425?)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2021, atw_enc,  0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Encarto (Accutime, ENC4000)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2021, atw_fz,   0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Frozen (Accutime, FZN4151PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2021, atw_fz2,  0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Frozen (Accutime, FZN4587)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2021, atw_gaby, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Gabby's Dollhouse (Accutime, GAB4007PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2021, atw_hpot, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Harry Potter (Accutime, HP4107PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2021, atw_jwld, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Jurassic World (Accutime, JRW4041)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2021, atw_lilo, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Lilo & Stitch (Accutime, LS4027PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2021, atw_lol,  0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: L.O.L. Surprise (Accutime, LOL4264PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2021, atw_lola, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: L.O.L. Surprise (Accutime, LOL4588TK)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2021, atw_mine, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Minecraft (Accutime, MIN4045)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2021, atw_mv,   0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Marvel Avengers (Accutime, AVG4597PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2021, atw_mva,  0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Marvel Avengers (Accutime, AVG4597)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2021, atw_paw,  0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Paw Patrol (Accutime, PAW4275PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2021, atw_pepa, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Peppa Pig (Accutime, PPG4086PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2021, atw_pok,  0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Pokemon (Accutime, POK4231PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2021, atw_rbh,  0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Rainbow High (Accutime, RNB4017PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2021, atw_ryan, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Ryan's World (Accutime, RYW4003AZ)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2021, atw_soni, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Sonic the Hedgehog (Accutime, SNC4055)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2021, atw_spdm, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Spider-Man (Accutime, SPD4588)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2021, atw_swst, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Star Wars: Stormtropper (Accutime, STM4353PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2021, atw_swy,  0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Star Wars: The Mandalorian (Accutime, MNL4023PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2021, atw_toys, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Toy Story (Accutime, LTY4000PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+// black PCB
+CONS( 2022, atw_avbp, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Marvel Avengers Black Panther (Accutime, AVG4608PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2022, atw_hpot, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Harry Potter (Accutime, HP4107PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2022, atw_jwld, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Jurassic World (Accutime, JRW4041)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2022, atw_lola, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: L.O.L. Surprise (Accutime, LOL4588TK)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2022, atw_pepa, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Peppa Pig (Accutime, PPG4086PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+// red PCB
+CONS( 2022, atw_swst, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Star Wars: Stormtropper (Accutime, STM4353PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2022, atw_swy,  0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Star Wars: The Mandalorian (Accutime, MNL4023PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
