@@ -361,7 +361,6 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 	}
 	else if ((op & 0xf81f) == 0x5806)
 	{
-		// shift direction unclear
 		util::stream_format(stream, "r%d = SHL r%d", BIT(op, 8, 3), BIT(op, 5, 3));
 		return 1 | SUPPORTED;
 	}
@@ -382,8 +381,7 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 	}
 	else if ((op & 0xf81f) == 0x580a)
 	{
-		// shift direction unclear
-		util::stream_format(stream, "r%d = ROL r%d", BIT(op, 5, 3), BIT(op, 8, 3));
+		util::stream_format(stream, "r%d = SHR r%d", BIT(op, 5, 3), BIT(op, 8, 3));
 		return 1 | SUPPORTED;
 	}
 	else if ((op & 0xf81f) == 0x580b)
@@ -400,7 +398,7 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 	else if ((op & 0xf81f) == 0x580e)
 	{
 		// shift direction unclear (SHR or ASR?)
-		util::stream_format(stream, "r%d = SHR r%d", BIT(op, 8, 3), BIT(op, 5, 3));
+		util::stream_format(stream, "r%d = ASR r%d", BIT(op, 8, 3), BIT(op, 5, 3));
 		return 1 | SUPPORTED;
 	}
 	else if ((op & 0xf81f) == 0x580f)

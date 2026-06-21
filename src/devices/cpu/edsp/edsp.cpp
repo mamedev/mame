@@ -57,7 +57,7 @@ void emg2000a_device::io_map(address_map &map)
 	map(0x0e, 0x0f).rw(FUNC(emg2000a_device::intf_r), FUNC(emg2000a_device::intf_w));
 	map(0x13, 0x13).rw(FUNC(emg2000a_device::spa_r), FUNC(emg2000a_device::spa_w));
 	map(0x40, 0x43).rw(FUNC(emg2000a_device::timer01_r), FUNC(emg2000a_device::timer01_w));
-	// TODO: I/O ports & everything else
+	// TODO: lots of other ports and registers
 }
 
 device_memory_interface::space_config_vector edsp_device::memory_space_config() const
@@ -112,6 +112,8 @@ void edsp_device::device_start()
 	save_item(NAME(m_inte));
 	save_item(NAME(m_intf));
 	save_item(NAME(m_bank));
+	save_item(NAME(m_trl));
+	save_item(NAME(m_tcon));
 }
 
 void edsp_device::device_reset()
@@ -512,9 +514,22 @@ void edsp_device::execute_run()
 				m_r[BIT(op, 8, 3)] = data;
 				m_icount -= 2; // TODO: repeat timing
 			}
+			else if ((op & 0xf81f) == 0x580a)
+			{
+				// SHR
+				const u16 s = m_r[BIT(op, 5, 3)];
+				m_r[BIT(op, 8, 3)] = s >> 1;
+				m_sr = (m_sr & 0xfff0) | (s >> 1 ? 0 : 0x0004) | (BIT(s, 0) ? 0x0003 : 0);
+			}
+			else if ((op & 0xf81f) == 0x580b)
+			{
+				const u16 data = read_program_word(m_r[BIT(op, 5, 3)]);
+				m_r[BIT(op, 5, 3)]++;
+				m_r[BIT(op, 8, 3)] = data;
+				m_icount -= 2; // TODO: repeat timing
+			}
 			else if ((op & 0xf81f) == 0x580f)
 			{
-				// TODO: banking
 				const u16 data = read_program_word(m_r[BIT(op, 5, 3)]);
 				m_r[BIT(op, 5, 3)]++;
 				m_data.write_word(m_r[BIT(op, 8, 3)], data);
