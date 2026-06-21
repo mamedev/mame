@@ -92,6 +92,14 @@ static INPUT_PORTS_START( tvbg_2button )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Boggle uses 2 buttons for gameplay, other units do read this to enter secret test mode, but none of the games need it?
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( lexiig10 )
+	PORT_INCLUDE( tvbg_2button )
+
+	PORT_MODIFY("IN2")
+	// there are 4 buttons on the device (although 2 of them could just be turbo buttons, unconfirmed)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )
+INPUT_PORTS_END
 
 void elan_ep3a19a_state::machine_start()
 {
@@ -198,6 +206,7 @@ CONS( 2007, tvbg3c, 0, 0, elan_ep3a19a_1mb, tvbg_2button, elan_ep3a19a_state, in
 
 // exact SoC type not verified for below sets
 
-// hybrid system with an LCD game on the controller (uses a separate MCU)
+// hybrid system with an LCD game on the controller (uses a separate MCU glob, not emulated)
 // "Credit:XiAn Hummer Software Studio(CHINA) Tel:86-29-84270600 Email:HummerSoft@126.com Http://www.hummersoft.com" string in ROM
-CONS( 2006, lexiig10, 0, 0, elan_ep3a19a_2mb_pal_fast, tvbg_2button, elan_ep3a19a_state, empty_init, "Lexibook", "Color Console IG10 (DualMax 20 in 1 TV part)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=SoKKIKSDGhY
+CONS( 2006, lexiig10, 0, 0, elan_ep3a19a_2mb_pal_fast, lexiig10, elan_ep3a19a_state, empty_init, "Lexibook", "Color Console IG10 (DualMax 20 in 1 TV part)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// Sunnyflyer 30-in-1 contains the games from lexiig10 so probably fits here too ( https://blog.12bit.club/?post=6 )
