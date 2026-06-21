@@ -205,12 +205,13 @@ ROM_END
 // PH = Peers Hardy UK
 // AZ = ? (Amazon?)
 // TK = ? (TK Maxx?)
-// 
+//
+
 // blue PCB
 CONS( 2021, atw_barb, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Barbie (Accutime, BAB4064PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2021, atw_batm, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Batman (Accutime, BAT4732PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2022, atw_dp,   0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Disney Princess (Accutime, PN425?)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2021, atw_enc,  0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Encarto (Accutime, ENC4000)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2021, atw_enc,  0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Encanto (Accutime, ENC4000)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2021, atw_fz,   0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Frozen (Accutime, FZN4151PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2021, atw_fz2,  0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Frozen (Accutime, FZN4587)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2021, atw_gaby, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Gabby's Dollhouse (Accutime, GAB4007PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
