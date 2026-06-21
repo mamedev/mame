@@ -566,14 +566,23 @@ uint8_t macpdm_state::hmc_r(offs_t offset)
 void macpdm_state::hmc_w(offs_t offset, uint8_t data)
 {
 	if(offset & 8)
+	{
 		m_hmc_bit = 0;
-	else {
+	}
+	else
+	{
 		if(data & 1)
+		{
 			m_hmc_buffer |= u64(1) << m_hmc_bit;
+		}
 		else
+		{
 			m_hmc_buffer &= ~(u64(1) << m_hmc_bit);
+		}
+
 		m_hmc_bit ++;
-		if(m_hmc_bit == 35) {
+		if(m_hmc_bit == 35)
+		{
 			m_hmc_reg = m_hmc_buffer & ~3; // csiz is readonly, we pretend there isn't a l2 cache
 			m_video->set_vram_offset(m_hmc_reg & 0x200000000 ? 0 : 0x100000);
 			ram_size();
@@ -647,11 +656,15 @@ void macpdm_state::ram_size(){
 		}
 
 		// install a complete image of RAM A in the slot above the top of memory (which is actually where the ROM code looks for it)
-		const u32 alias_base = (sizes[config] * 2);
+		const u32 alias_base = 0x10000000;
 		space.install_ram(alias_base, alias_base + simm_size - 1, 0, (void *)ram_a);
 
 		// install RAM B
-		const u32 b_base = 0x8000000;
+		const u32 b_base = (config != 0) ? (sizes[config] * 2) : 0x08000000;    // B base is 32 megs for config 0
+		if (b_base == alias_base)
+		{
+			space.unmap_readwrite(alias_base, alias_base + simm_size - 1);
+		}
 		space.install_ram(b_base, b_base + simm_size - 1, 0, (void *)ram_b);
 
 		if (simm_size < 8*1024*1024)
