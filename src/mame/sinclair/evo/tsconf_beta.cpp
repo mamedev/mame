@@ -11,6 +11,7 @@
 #include "formats/trd_dsk.h"
 
 
+namespace {
 
 void floppy_formats(format_registration &fr)
 {
