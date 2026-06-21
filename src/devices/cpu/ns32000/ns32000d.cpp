@@ -319,6 +319,13 @@ offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_b
 
 			size_code const size = size_code(opword & 3);
 
+			// NS32CG16 BitBlt option suffix: DA = decrement address (opword bit 9),
+			// -S = complement source (opword bit 7)
+			char const *const bbo =
+				(BIT(opword, 9) && BIT(opword, 7)) ? " DA,-S" :
+				BIT(opword, 9) ? " DA" :
+				BIT(opword, 7) ? " -S" : "";
+
 			switch (BIT(opword, 2, 4))
 			{
 			case 0:
@@ -340,6 +347,18 @@ offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_b
 				else
 					util::stream_format(stream, "SKPS%c   %s", size_char[size], options[BIT(opword, 8, 3)]);
 				break;
+			// NS32CG16 graphics instructions (Format-5 opcodes 4-14)
+			case 0x4: util::stream_format(stream, "BBSTOD%s", bbo); break;
+			case 0x5: util::stream_format(stream, "EXTBLT"); break;
+			case 0x6: util::stream_format(stream, "BBOR%s", bbo); break;
+			case 0x7: util::stream_format(stream, "MOVMP%c", size_char[size]); break;
+			case 0x8: util::stream_format(stream, "BITWT"); break;
+			case 0x9: util::stream_format(stream, "TBITS   %d", BIT(opword, 7)); break;
+			case 0xa: util::stream_format(stream, "BBAND%s", bbo); break;
+			case 0xb: util::stream_format(stream, "SBITPS"); break;
+			case 0xc: util::stream_format(stream, "BBFOR"); break;
+			case 0xd: util::stream_format(stream, "SBITS"); break;
+			case 0xe: util::stream_format(stream, "BBXOR%s", bbo); break;
 			default: bytes = 1; break;
 			}
 		}
