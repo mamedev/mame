@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, R. Belmont
 /***************************************************************************
 
     ppc.h
@@ -26,12 +26,12 @@
     CONSTANTS
 ***************************************************************************/
 
-/* general constants */
+// general constants
 #define PPC_MAX_FASTRAM         4
 #define PPC_MAX_HOTSPOTS        16
 
 
-/* interrupt types */
+// interrupt types
 #define PPC_IRQ                 0       /* external IRQ */
 #define PPC_IRQ_LINE_0          0       /* (4XX) external IRQ0 */
 #define PPC_IRQ_LINE_1          1       /* (4XX) external IRQ1 */
@@ -40,7 +40,7 @@
 #define PPC_IRQ_LINE_4          4       /* (4XX) external IRQ4 */
 
 
-/* register enumeration */
+// register enumeration
 enum
 {
 	PPC_PC = 1,
@@ -158,13 +158,13 @@ enum
 	PPC_SR15
 };
 
-/* compiler-specific options */
+// compiler-specific options
 #define PPCDRC_STRICT_VERIFY        0x0001          /* verify all instructions */
 #define PPCDRC_FLUSH_PC             0x0002          /* flush the PC value before each memory access */
 #define PPCDRC_ACCURATE_SINGLES     0x0004          /* do excessive rounding to make single-precision results "accurate" */
 
 
-/* common sets of options */
+// common sets of options
 #define PPCDRC_COMPATIBLE_OPTIONS   (PPCDRC_STRICT_VERIFY | PPCDRC_FLUSH_PC | PPCDRC_ACCURATE_SINGLES)
 #define PPCDRC_FASTEST_OPTIONS      (0)
 
@@ -180,7 +180,7 @@ protected:
 	class frontend;
 	class opcode_desc;
 
-	/* PowerPC flavors */
+	// PowerPC flavors
 	enum powerpc_flavor
 	{
 		PPC_MODEL_403GA             = 0x00200000,
@@ -189,32 +189,32 @@ protected:
 		PPC_MODEL_403GCX            = 0x00201400,
 		PPC_MODEL_405GP             = 0x40110000,
 		PPC_MODEL_601               = 0x00010000,
-		PPC_MODEL_603               = 0x00030001,   /* "Wart" */
-		PPC_MODEL_604               = 0x00040000,   /* "Zephyr" */
-		PPC_MODEL_602               = 0x00050200,   /* "Galahad" */
-		PPC_MODEL_603E              = 0x00060103,   /* "Stretch", version 1.3 */
-		PPC_MODEL_603EV             = 0x00070000,   /* "Valiant" */
-		PPC_MODEL_603R              = 0x00071202,   /* "Goldeneye", version 2.1 */
-		PPC_MODEL_740               = 0x00080301,   /* "Arthur", version 3.1 */
+		PPC_MODEL_603               = 0x00030001,   // "Wart"
+		PPC_MODEL_604               = 0x00040000,   // "Zephyr"
+		PPC_MODEL_602               = 0x00050200,   // "Galahad"
+		PPC_MODEL_603E              = 0x00060103,   // "Stretch", version 1.3
+		PPC_MODEL_603EV             = 0x00070000,   // "Valiant"
+		PPC_MODEL_603R              = 0x00071202,   // "Goldeneye", version 2.1
+		PPC_MODEL_740               = 0x00080301,   // "Arthur", version 3.1
 		PPC_MODEL_750               = PPC_MODEL_740,
-		PPC_MODEL_740P              = 0x00080202,   /* "Conan Doyle", version 1.2 */
+		PPC_MODEL_740P              = 0x00080202,   // "Conan Doyle", version 1.2
 		PPC_MODEL_750P              = PPC_MODEL_740P,
-		PPC_MODEL_755               = 0x00083203,   /* "Goldfinger", version 2.3 */
-		PPC_MODEL_7400              = 0x000c0209,   /* "Max", version 2.9 */
-		PPC_MODEL_7410              = 0x800c1104,   /* "Nitro", version 3.4 */
-		PPC_MODEL_7450              = 0x80000201,   /* "Vger", version 2.1 */
-		PPC_MODEL_7451              = 0x80000203,   /* "Vger", version 2.3 */
+		PPC_MODEL_755               = 0x00083203,   // "Goldfinger", version 2.3
+		PPC_MODEL_7400              = 0x000c0209,   // "Max", version 2.9
+		PPC_MODEL_7410              = 0x800c1104,   // "Nitro", version 3.4
+		PPC_MODEL_7450              = 0x80000201,   // "Vger", version 2.1
+		PPC_MODEL_7451              = 0x80000203,   // "Vger", version 2.3
 		PPC_MODEL_7441              = PPC_MODEL_7451,
-		PPC_MODEL_7455              = 0x80010303,   /* "Apollo 6", version 3.3 */
+		PPC_MODEL_7455              = 0x80010303,   // "Apollo 6", version 3.3
 		PPC_MODEL_7445              = PPC_MODEL_7455,
-		PPC_MODEL_7457              = 0x80020101,   /* "Apollo 7", version 1.1 */
-		PPC_MODEL_MPC8240           = 0x00810101,   /* "Kahlua" */
-		PPC_MODEL_MPC8241           = 0x80811014,   /* "Kahlua Lt" */
-		PPC_MODEL_MPC8245           = 0x80811014    /* "Kahlua II" */
+		PPC_MODEL_7457              = 0x80020101,   // "Apollo 7", version 1.1
+		PPC_MODEL_MPC8240           = 0x00810101,   // "Kahlua"
+		PPC_MODEL_MPC8241           = 0x80811014,   // "Kahlua Lt"
+		PPC_MODEL_MPC8245           = 0x80811014    // "Kahlua II"
 	};
 
 	// construction/destruction
-	ppc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int address_bits, int data_bits, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor, address_map_constructor internal_map);
+	ppc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int address_bits, int data_bits, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor, address_map_constructor internal_map, uint32_t reservation_size);
 
 public:
 	virtual ~ppc_device() override;
@@ -287,8 +287,8 @@ protected:
 	{
 		EXCEPTION_RESET         = 1,
 		EXCEPTION_MACHCHECK     = 2,
-		EXCEPTION_DSI           = 3,        /* PPCCAP_OEA */
-		EXCEPTION_PROTECTION    = 3,        /* PPCCAP_4XX */
+		EXCEPTION_DSI           = 3,        // PPCCAP_OEA
+		EXCEPTION_PROTECTION    = 3,        // PPCCAP_4XX
 		EXCEPTION_ISI           = 4,
 		EXCEPTION_EI            = 5,
 		EXCEPTION_ALIGN         = 6,
@@ -298,9 +298,9 @@ protected:
 		EXCEPTION_SYSCALL       = 12,
 		EXCEPTION_TRACE         = 13,
 		EXCEPTION_FPASSIST      = 14,
-		EXCEPTION_ITLBMISS      = 16,       /* PPCCAP_603_MMU */
-		EXCEPTION_DTLBMISSL     = 17,       /* PPCCAP_603_MMU */
-		EXCEPTION_DTLBMISSS     = 18,       /* PPCCAP_603_MMU */
+		EXCEPTION_ITLBMISS      = 16,       // PPCCAP_603_MMU
+		EXCEPTION_DTLBMISSL     = 17,       // PPCCAP_603_MMU
+		EXCEPTION_DTLBMISSS     = 18,       // PPCCAP_603_MMU
 		EXCEPTION_COUNT
 	};
 
@@ -323,23 +323,28 @@ protected:
 		uint32_t sr[16];
 		uint32_t spr[1024];
 		int icount;
-		uint32_t mode;                       /* current global mode */
+		uint32_t mode;                       // current global mode
 		uint32_t irq_pending;
-		/* parameters for calls */
+
+		// parameters for calls
 		uint32_t param0;
 		uint32_t param1;
-		/* PowerPC 603-specific state */
+
+		// PowerPC 603-specific state
 		uint32_t mmu603_cmp;
 		uint32_t mmu603_hash[2];
 		uint32_t mmu603_r[4];
-		/* parameters for subroutines */
-		uint32_t       tempaddr;                   /* temporary address storage */
-		drcuml_ireg  tempdata;                   /* temporary data storage */
-		uint32_t       updateaddr;                 /* update address storage */
-		uint32_t       swcount;                    /* counter for sw instructions */
-		const char * format;                     /* format string for printing */
-		uint32_t       arg0;                       /* print_debug argument 1 */
-		double       fp0;                        /* floating point 0 */
+
+		// parameters for subroutines
+		uint32_t        tempaddr;                   // temporary address storage
+		drcuml_ireg     tempdata;                   // temporary data storage
+		uint32_t        updateaddr;                 // update address storage
+		uint32_t        swcount;                    // counter for sw instructions
+		const char *    format;                     // format string for printing
+		uint32_t        arg0;                       // print_debug argument 1
+		double          fp0;                        // floating point 0
+		uint32_t        reserve;
+		uint32_t        reserve_address;
 	};
 
 	internal_ppc_state *m_core;
@@ -447,7 +452,7 @@ protected:
 
 	int m_interrupt_pending;
 
-	uint64_t m_tb;          /* 56-bit timebase register */
+	uint64_t m_tb;          // 56-bit timebase register
 
 	// STUFF added for the 6xx series
 	uint32_t m_dec, m_dec_frac;
@@ -467,7 +472,7 @@ protected:
 	int m_is603;
 	int m_is602;
 
-	/* PowerPC 602 specific registers */
+	// PowerPC 602 specific registers
 	uint32_t m_lt;
 	uint32_t m_sp;
 	uint32_t m_tcr;
@@ -476,14 +481,14 @@ protected:
 	uint32_t m_sebr;
 	uint32_t m_ser;
 
-	/* architectural distinctions */
+	// architectural distinctions
 	powerpc_flavor  m_flavor;
 	uint32_t        m_cap;
 	uint8_t         m_cache_line_size;
 	uint32_t        m_tb_divisor;
 
-	/* PowerPC 4xx-specific state */
-	/* PowerPC 4XX-specific serial port state */
+	// PowerPC 4xx-specific state
+	// PowerPC 4XX-specific serial port state
 	struct ppc4xx_spu_state
 	{
 		ppc4xx_spu_state(device_t &owner) : timer(nullptr), tx_cb(owner) { }
@@ -514,7 +519,7 @@ protected:
 	emu_timer *     m_buffered_dma_timer[4];
 	int             m_buffered_dma_rate[4];
 
-	/* internal stuff */
+	// internal stuff
 	std::function<u32 (offs_t)> m_pr32;
 	std::function<const void * (offs_t)> m_prptr;
 
@@ -535,7 +540,7 @@ protected:
 	read32_delegate::array<4> m_ext_dma_read_cb;
 	write32sm_delegate::array<4> m_ext_dma_write_cb;
 
-	/* PowerPC function pointers for memory accesses/exceptions */
+	// PowerPC function pointers for memory accesses/exceptions
 #ifdef PPC_H_INCLUDED_FROM_PPC_C
 	jmp_buf m_exception_jmpbuf;
 #endif
@@ -560,76 +565,81 @@ protected:
 	void (*m_optable63[1024])(uint32_t);
 	void (*m_optable[64])(uint32_t);
 
-	/* core state */
-	drc_cache           m_cache;                      /* pointer to the DRC code cache */
-	std::unique_ptr<drcuml_state>      m_drcuml;                     /* DRC UML generator state */
-	std::unique_ptr<frontend>          m_drcfe;                      /* pointer to the DRC front-end state */
-	uint32_t              m_drcoptions;                 /* configurable DRC options */
+	// core state
+	drc_cache           m_cache;                        // pointer to the DRC code cache
+	std::unique_ptr<drcuml_state>      m_drcuml;        // DRC UML generator state
+	std::unique_ptr<frontend>          m_drcfe;         // pointer to the DRC front-end state
+	uint32_t              m_drcoptions;                 // configurable DRC options
 
-	/* parameters for subroutines */
-	uint32_t              m_arg1;                       /* print_debug argument 2 */
+	// parameters for subroutines
+	uint32_t              m_arg1;                       // print_debug argument 2
 
-	/* tables */
-	uint8_t               m_fpmode[4];                  /* FPU mode table */
-	uint8_t               m_sz_cr_table[32];            /* SZ CR table */
-	uint8_t               m_cmp_cr_table[32];           /* CMP CR table */
-	uint8_t               m_cmpl_cr_table[32];          /* CMPL CR table */
-	uint8_t               m_fcmp_cr_table[32];          /* FCMP CR table */
+	// tables
+	uint8_t               m_fpmode[4];                  // FPU mode table
+	uint8_t               m_sz_cr_table[32];            // SZ CR table
+	uint8_t               m_cmp_cr_table[32];           // CMP CR table
+	uint8_t               m_cmpl_cr_table[32];          // CMPL CR table
+	uint8_t               m_fcmp_cr_table[32];          // FCMP CR table
 
-	/* internal stuff */
-	uint8_t               m_cache_dirty;                /* true if we need to flush the cache */
+	// internal stuff
+	uint8_t               m_cache_dirty;                // true if we need to flush the cache
 
-	/* register mappings */
-	uml::parameter   m_regmap[32];                 /* parameter to register mappings for all 32 integer registers */
-	uml::parameter   m_fdregmap[32];               /* parameter to register mappings for all 32 floating point registers */
+	// reservation granularity
+	uint32_t m_reservation_mask;
 
-	/* subroutines */
-	uml::code_handle *   m_entry;                      /* entry point */
-	uml::code_handle *   m_nocode;                     /* nocode exception handler */
-	uml::code_handle *   m_out_of_cycles;              /* out of cycles exception handler */
-	uml::code_handle *   m_tlb_mismatch;               /* tlb mismatch handler */
-	uml::code_handle *   m_swap_tgpr;                  /* swap TGPR handler */
-	uml::code_handle *   m_lsw[8][32];                 /* lsw entries */
-	uml::code_handle *   m_stsw[8][32];                /* stsw entries */
-	uml::code_handle *   m_read8[8];                   /* read byte */
-	uml::code_handle *   m_write8[8];                  /* write byte */
-	uml::code_handle *   m_read16[8];                  /* read half */
-	uml::code_handle *   m_read16mask[8];              /* read half */
-	uml::code_handle *   m_write16[8];                 /* write half */
-	uml::code_handle *   m_write16mask[8];             /* write half */
-	uml::code_handle *   m_read32[8];                  /* read word */
-	uml::code_handle *   m_read32align[8];             /* read word aligned */
-	uml::code_handle *   m_read32mask[8];              /* read word */
-	uml::code_handle *   m_write32[8];                 /* write word */
-	uml::code_handle *   m_write32align[8];            /* write word aligned */
-	uml::code_handle *   m_write32mask[8];             /* write word */
-	uml::code_handle *   m_read64[8];                  /* read double */
-	uml::code_handle *   m_read64mask[8];              /* read double */
-	uml::code_handle *   m_write64[8];                 /* write double */
-	uml::code_handle *   m_write64mask[8];             /* write double */
-	uml::code_handle *   m_exception[EXCEPTION_COUNT]; /* array of exception handlers */
-	uml::code_handle *   m_exception_norecover[EXCEPTION_COUNT];   /* array of exception handlers */
+	// register mappings
+	uml::parameter   m_regmap[32];                 // parameter to register mappings for all 32 integer registers
+	uml::parameter   m_fdregmap[32];               // parameter to register mappings for all 32 floating point registers
 
-	/* fast RAM */
-	/* fast RAM info */
+	// subroutines
+	uml::code_handle *   m_entry;                      // entry point
+	uml::code_handle *   m_nocode;                     // nocode exception handler
+	uml::code_handle *   m_out_of_cycles;              // out of cycles exception handler
+	uml::code_handle *   m_tlb_mismatch;               // tlb mismatch handler
+	uml::code_handle *   m_swap_tgpr;                  // swap TGPR handler
+	uml::code_handle *   m_lsw[8][32];                 // lsw entries
+	uml::code_handle *   m_stsw[8][32];                // stsw entries
+	uml::code_handle *   m_read8[8];                   // read byte
+	uml::code_handle *   m_write8[8];                  // write byte
+	uml::code_handle *   m_read16[8];                  // read half
+	uml::code_handle *   m_read16mask[8];              // read half
+	uml::code_handle *   m_write16[8];                 // write half
+	uml::code_handle *   m_write16mask[8];             // write half
+	uml::code_handle *   m_read32[8];                  // read word
+	uml::code_handle *   m_read32align[8];             // read word aligned
+	uml::code_handle *   m_read32mask[8];              // read word
+	uml::code_handle *   m_read32reserve[8];           // read word reserved
+	uml::code_handle *   m_write32[8];                 // write word
+	uml::code_handle *   m_write32align[8];            // write word aligned
+	uml::code_handle *   m_write32mask[8];             // write word
+	uml::code_handle *   m_write32reserve[8];          // write word reserved
+	uml::code_handle *   m_read64[8];                  // read double
+	uml::code_handle *   m_read64mask[8];              // read double
+	uml::code_handle *   m_write64[8];                 // write double
+	uml::code_handle *   m_write64mask[8];             // write double
+	uml::code_handle *   m_exception[EXCEPTION_COUNT]; // array of exception handlers
+	uml::code_handle *   m_exception_norecover[EXCEPTION_COUNT];   // array of exception handlers
+
+	// fast RAM
+	// fast RAM info
 	struct fast_ram_info
 	{
-		offs_t              start;                      /* start of the RAM block */
-		offs_t              end;                        /* end of the RAM block */
-		bool                readonly;                   /* true if read-only */
-		void *              base;                       /* base in memory where the RAM lives */
+		offs_t              start;                      // start of the RAM block
+		offs_t              end;                        // end of the RAM block
+		bool                readonly;                   // true if read-only
+		void *              base;                       // base in memory where the RAM lives
 	};
 
 	uint32_t              m_fastram_select;
 	fast_ram_info       m_fastram[PPC_MAX_FASTRAM];
 
-	/* hotspots */
-	/* hotspot info */
+	// hotspots
+	// hotspot info
 	struct hotspot_info
 	{
-		offs_t              pc;                         /* PC to consider */
-		uint32_t              opcode;                     /* required opcode at that PC */
-		uint32_t              cycles;                     /* number of cycles to eat when hit */
+		offs_t                pc;                         // PC to consider
+		uint32_t              opcode;                     // required opcode at that PC
+		uint32_t              cycles;                     // number of cycles to eat when hit
 	};
 	uint32_t              m_hotspot_select;
 	hotspot_info        m_hotspot[PPC_MAX_HOTSPOTS];
@@ -639,10 +649,10 @@ protected:
 	/* internal compiler state */
 	struct compiler_state
 	{
-		uint32_t              cycles;                     /* accumulated cycles */
-		uint8_t               checkints;                  /* need to check interrupts before next instruction */
-		uint8_t               checksoftints;              /* need to check software interrupts before next instruction */
-		uml::code_label  labelnum;                   /* index for local labels */
+		uint32_t            cycles;                     // accumulated cycles
+		uint8_t             checkints;                  // need to check interrupts before next instruction
+		uint8_t             checksoftints;              // need to check software interrupts before next instruction
+		uml::code_label     labelnum;                   // index for local labels
 	};
 
 	uint32_t get_cr();
@@ -679,7 +689,7 @@ protected:
 	void static_generate_out_of_cycles();
 	void static_generate_tlb_mismatch();
 	void static_generate_exception(uint8_t exception, int recover, const char *name);
-	void static_generate_memory_accessor(int mode, int size, int iswrite, int ismasked, const char *name, uml::code_handle *&handleptr, uml::code_handle *masked);
+	void static_generate_memory_accessor(int mode, int size, bool iswrite, bool ismasked, bool isreserve, const char *name, uml::code_handle *&handleptr, uml::code_handle *masked);
 	void static_generate_swap_tgpr();
 	void static_generate_lsw_entries(int mode);
 	void static_generate_stsw_entries(int mode);
@@ -703,20 +713,6 @@ protected:
 private:
 	powerpc_disassembler m_dasm;
 };
-
-
-//class ppc403_device : public ppc_device
-//{
-//public:
-//  ppc403_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-//};
-//
-//
-//class ppc405_device : public ppc_device
-//{
-//public:
-//  ppc405_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-//};
 
 
 class ppc603_device : public ppc_device
@@ -798,7 +794,7 @@ public:
 
 	void internal_ppc4xx(address_map &map) ATTR_COLD;
 protected:
-	ppc4xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor);
+	ppc4xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor, uint32_t reservation_size);
 
 	virtual void execute_set_input(int inputnum, int state) override;
 };

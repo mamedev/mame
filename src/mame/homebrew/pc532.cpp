@@ -34,6 +34,7 @@
 // busses and connectors
 #include "bus/rs232/rs232.h"
 #include "bus/nscsi/hd.h"
+#include "bus/nscsi/tape.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -291,6 +292,7 @@ template <unsigned ST> void pc532_state::cpu_map(address_map &map)
 static void scsi_devices(device_slot_interface &device)
 {
 	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add("tape", NSCSI_TAPE);
 }
 
 void pc532_state::pc532(machine_config &config)
@@ -314,7 +316,7 @@ void pc532_state::pc532(machine_config &config)
 	auto &slot(NSCSI_BUS(config, "slot"));
 	NSCSI_CONNECTOR(config, "slot:0", scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "slot:1", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "slot:2", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "slot:2", scsi_devices, "tape", false);
 	NSCSI_CONNECTOR(config, "slot:3", scsi_devices, nullptr, false);
 
 	DP8490(config, m_dp8490);
@@ -391,6 +393,9 @@ ROM_START(pc532)
 
 	ROM_SYSTEM_BIOS(1, "900328-9600", "Wed Mar 28 09:31:00 PST 1990, Bruce Culbertson, 9600bps")
 	ROMX_LOAD("900328_9600.u44", 0x0000, 0x8000, CRC(63caac86) SHA1(5c7011684b1bce3dd6b5fcf3c81479e40c61c4e3), ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS(2, "900427-9600", "Fri Apr 27 17:56:11 PDT 1990, Bruce Culbertson (direct exception mode), 9600bps")
+	ROMX_LOAD("culberts_900427_9600.u44", 0x0000, 0x8000, CRC(50724e69) SHA1(d6f140f1a5414892e4dbb5754da667b70ff90ebe), ROM_BIOS(2))
 ROM_END
 
 } // anonymous namespace

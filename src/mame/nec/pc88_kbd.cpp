@@ -9,7 +9,7 @@ I/O ports are normally read in direct/parallel-ish form, eventually exposed as s
 http://www.maroon.dti.ne.jp/youkan/pc88/iomap.html
 
 TODO:
-- pc88va_kbd: serial interface, add key modifiers;
+- pc88va_kbd: serial interface, add key modifiers, runs on undumped MCU really;
 
 **************************************************************************************************/
 
@@ -241,6 +241,7 @@ static INPUT_PORTS_START( pc8801fh_kbd )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F8")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F9")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F10")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Backspace")
 
 	PORT_MODIFY("KEYD")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Henkan") // 変換 / conversion
@@ -294,7 +295,7 @@ void pc88va_kbd_device::device_reset()
 
 uint8_t pc88va_kbd_device::translate(uint8_t row, uint8_t column)
 {
-	// this table is essentially same-ish as the one in pc98_kbd
+	// this table produces same-ish scancodes as the one in pc98_kbd
 	// TODO: some stuff currently unmapped
 	const u8 keytable[0x80] = {
 //      [0],   [1],   [2],   [3],   [4],   [5],   [6],   [7]
@@ -333,6 +334,12 @@ uint8_t pc88va_kbd_device::translate(uint8_t row, uint8_t column)
 		0xff,  0xff,  0x5a,  0xff,  0xff,  0xff,  0xff,  0xff,
 //      RET,   [RET], LSHIFT,RSHIFT,------,-----,-----,  <ID>
 		0xff,  0xff,  0xff,  0xff,  0xff,  0xff,  0xff,  0xff
+
+		// TODO: according to documentation last three ports are moved around (?)
+//      $0c: f.1,    f.2,    f.3,   f.4,   f.5,   BS,   INS,   DEL
+//      $0d: f.6,    f.7,    f.8,   f.9,   f.10,  変換,  決定,  SPACE
+//      $0e: RET FK, RET 10, LSHIFT,RSHIFT,PC,    全角,  -----,-----
+		// assume RET FK and RET 10 be equivalent of regular / numpad returns
 	};
 
 	const u8 key_select = row * 8 + column;

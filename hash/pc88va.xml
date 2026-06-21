@@ -345,7 +345,12 @@ Runs slow in gameplay
 		<year>198?</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<notes><![CDATA[
-Needs [IDP] text display to go off for bottommost row (bumps strip 1 height from 384 to 400)
+Needs [IDP] text display to go off for bottommost row (bumps strip 1 height from 384 to 400) (fixed)
+Randomly hangs with a "please wait" when exiting town
+(character select: 3, 1, +, 1, CR, *. In dungeon go north, turn 6 when reaching wall, turn 6 at first split, go north until exit town screen reached and accept with 1)
+Actual user disk procedure is unknown
+Omake: Prompts for a いやどすえ PC-98 if YADOS.EXE is run from PC Engine OS.
+This is a undumped coverdisk, pages 374~375 of Login 1987.10 mag, also cfr. https://relaxwind.info/retrobooks/login/1987/1987.html
 ]]></notes>
 		<info name="alt_title" value="マイトアンドマジック" />
 		<info name="usage" value="Boot with Disk C in drive 1"/>
@@ -364,10 +369,11 @@ Needs [IDP] text display to go off for bottommost row (bumps strip 1 height from
 			</dataarea>
 		</part>
 
+		<!-- baddump: non-factory save (characters at LV200!) -->
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A - User" />
 			<dataarea name="flop" size="1094592">
-				<rom name="might &amp; magic(diska_userdisk) (star craft).d88" size="1094592" crc="de68bba5" sha1="d6be57c867a3cca8b694bc2b129705c653ae44da"/>
+				<rom name="might &amp; magic(diska_userdisk) (star craft).d88" size="1094592" crc="de68bba5" sha1="d6be57c867a3cca8b694bc2b129705c653ae44da" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -378,6 +384,7 @@ Needs [IDP] text display to go off for bottommost row (bumps strip 1 height from
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<notes><![CDATA[
 Burps on [FDC] access after disk swap with program and player disks, trying to scan chrn=(4, 0, 1, 256)
+Hangs on Utility menu, [FDC] chrn=(18, 0, 1, 256)
 ]]></notes>
 		<info name="alt_title" value="マイトアンドマジック2" />
 		<sharedfeat name="mouseport_default" value="mouse"/>
@@ -552,7 +559,7 @@ Burps on [FDC] access after disk swap with program and player disks, trying to s
 		<year>1986</year>
 		<publisher>システムソフト (System Soft)</publisher>
 		<notes><![CDATA[
-Needs [dac1bit] clicks on gameplay
+Needs [dac1bit] clicks on gameplay (fixed)
 May crash with disk error when entering winning animation (verify)
 Winning animation is glitchy [OFX/OFY]?, uses [IDP] text transpen with upper bits set (for flame effect?), press mouse left button to return to game
 [OPNA] seems to cut off shortly on intro and winning screen compared to VAEG
@@ -573,14 +580,14 @@ Winning animation is glitchy [OFX/OFY]?, uses [IDP] text transpen with upper bit
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<notes><![CDATA[
 [gfx] needs cliprect and primask pen during intro
+[gfx] title screen should animate with a blue backdrop
 Runs at half speed
-[IDP] sprites wraparound on left edge
+[IDP] sprites wraparound on left edge (fixed)
 Omake: if sound irqs don't run then needs to press key 0 pad to move on
 ]]></notes>
 		<info name="alt_title" value="神羅万象"/>
 		<info name="usage" value="Hold enter at boot to skip intro, press F2 on title screen to load a game, press F5 for sound test" />
 
-		<!-- baddump: non-factory save -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1331888">
@@ -588,6 +595,7 @@ Omake: if sound irqs don't run then needs to press key 0 pad to move on
 			</dataarea>
 		</part>
 
+		<!-- baddump: non-factory save -->
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1296112">
@@ -1300,12 +1308,14 @@ Runs too slow, no sound?
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
 [gfx] Title screen doesn't show text layer? (verify)
-[IDP] sprites wraparound on left edge
+[IDP] sprites missing wraparound on top edge (verify)
+[IDP] sprite wobbles when scrolling up/down (verify)
 Runs too slow
-Crashes after stage 1
+Crashes after stage 1 (fixed, cfr. usage)
 ]]></notes>
 		<info name="developer" value="LOKAPALA" />
 		<info name="alt_title" value="ハティの空で" />
+		<info name="usage" value="Requires 640KB of RAM" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1298608">
 				<rom name="hati sora.d88" size="1298608" crc="bdee6770" sha1="445ba8da78cce7fd3c4d1bce263d8c8edd88849d"/>

@@ -77,6 +77,7 @@ public:
 		m_bg_tile_ram(*this, "bg_tile_ram"),
 		m_fg_tile_ram(*this, "fg_tile_ram"),
 		m_fg_color_ram(*this, "fg_color_ram"),
+		m_io_in(*this, "IN%u", 0U),
 		m_dsw(*this, "DSW%u", 1U),
 		m_leds(*this, "led%u", 0U)
 	{ }
@@ -103,22 +104,25 @@ protected:
 	required_device<palette_device> m_palette;
 
 	optional_shared_ptr<uint8_t> m_bg_tile_ram;
-	tilemap_t *m_bg_tilemap = nullptr;
 
 	required_shared_ptr<uint8_t> m_fg_tile_ram;
 	required_shared_ptr<uint8_t> m_fg_color_ram;
-	tilemap_t *m_fg_tilemap = nullptr;
 
+	optional_ioport_array<3> m_io_in;
 	optional_ioport_array<5> m_dsw;
 	output_finder<7> m_leds;
 
+	// video related
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+
 	// common
-	int m_nmi_ack = 0;
+	bool m_nmi_ack = false;
 	uint8_t m_out[3]{};
 
 	// spk116it and spk115it specific
-	int m_video_enable = 0;
-	int m_hopper = 0;
+	bool m_video_enable = false;
+	bool m_hopper = false;
 	uint8_t m_igs_magic[2]{};
 
 	// common
@@ -163,14 +167,28 @@ private:
 	void program_map(address_map &map) ATTR_COLD;
 };
 
-class xjinhuang_state : public spokeru_state
+class spokeru_igs003_state : public spokeru_state
+{
+protected:
+	spokeru_igs003_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spokeru_state(mconfig, type, tag),
+		m_service(*this, "SERVICE")
+	{ }
+
+	virtual void machine_start() override ATTR_COLD;
+
+	required_ioport m_service;
+
+	uint8_t m_protection_res = 0;
+	uint8_t m_input_sel = 0;
+};
+
+class xjinhuang_state : public spokeru_igs003_state
 {
 public:
 	xjinhuang_state(const machine_config &mconfig, device_type type, const char *tag) :
-		spokeru_state(mconfig, type, tag),
-		m_ymsnd(*this, "ymsnd"),
-		m_service(*this, "SERVICE"),
-		m_in1(*this, "IN1")
+		spokeru_igs003_state(mconfig, type, tag),
+		m_ymsnd(*this, "ymsnd")
 	{ }
 
 	void xjinhuang(machine_config &config) ATTR_COLD;
@@ -179,17 +197,10 @@ public:
 	void init_xjinhuang() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<ym2413_device> m_ymsnd;
-
-	required_ioport m_service;
-	required_ioport m_in1;
-
-	uint8_t m_protection_res = 0;
-	uint8_t m_input_sel = 0;
 
 	uint8_t igs003e_r();
 	void igs003e_w(uint8_t data);
@@ -198,18 +209,16 @@ private:
 	void portmap(address_map &map) ATTR_COLD;
 };
 
-class jinhulu2_state : public spokeru_state
+class jinhulu2_state : public spokeru_igs003_state
 {
 public:
 	jinhulu2_state(const machine_config &mconfig, device_type type, const char *tag) :
-		spokeru_state(mconfig, type, tag),
-		m_ymsnd(*this, "ymsnd"),
-		m_service(*this, "SERVICE"),
-		m_in1(*this, "IN1")
+		spokeru_igs003_state(mconfig, type, tag),
+		m_ymsnd(*this, "ymsnd")
 	{ }
 
-	void jinhuang(machine_config &config)ATTR_COLD;
-	void jinhulu2(machine_config &config)ATTR_COLD;
+	void jinhuang(machine_config &config) ATTR_COLD;
+	void jinhulu2(machine_config &config) ATTR_COLD;
 
 	void init_dafuwng3() ATTR_COLD;
 	void init_dahuangg() ATTR_COLD;
@@ -224,17 +233,10 @@ public:
 	void init_sleyuan2() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<ym2149_device> m_ymsnd;
-
-	required_ioport m_service;
-	required_ioport m_in1;
-
-	uint8_t m_protection_res = 0;
-	uint8_t m_input_sel = 0;
 
 	void nmi_w(uint8_t data);
 	uint8_t igs003c_r();
@@ -389,34 +391,15 @@ uint32_t jb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 		m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll_ram[0][i + 0x080]);
 	}
 
-	int startclipmin = 0;
-	const rectangle &visarea = screen.visible_area();
-
-	for (int j = 0; j < 0x100 - 1; j++)
+	for (int j = cliprect.min_y; j <= cliprect.max_y; j++)
 	{
-		rectangle clip;
 		int const rowenable = m_reel_scroll_ram[1][j];
 
 		// draw top of screen
-		clip.set(visarea.min_x, visarea.max_x, startclipmin, startclipmin + 1);
+		rectangle const clip(cliprect.min_x, cliprect.max_x, j, j);
 
-		if (rowenable == 0)
-		{
-			m_reel_tilemap[0]->draw(screen, bitmap, clip, 0, 0);
-		}
-		else if (rowenable == 1)
-		{
-			m_reel_tilemap[1]->draw(screen, bitmap, clip, 0, 0);
-		}
-		else if (rowenable == 2)
-		{
-			m_reel_tilemap[2]->draw(screen, bitmap, clip, 0, 0);
-		}
-		else if (rowenable == 3)
-		{
-		}
-
-		startclipmin += 1;
+		if (rowenable < 3)
+			m_reel_tilemap[rowenable]->draw(screen, bitmap, clip, 0, 0);
 	}
 
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -445,8 +428,8 @@ void spoker_state::nmi_and_coins_w(uint8_t data)
 {
 	if (data & 0x22)
 	{
-		logerror("PC %06X: nmi_and_coins = %02x\n", m_maincpu->pc(), data);
-//      popmessage("%02x", data);
+		logerror("%s: nmi_and_coins = %02x\n", machine().describe_context(), data);
+		//popmessage("%02x", data);
 	}
 
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));   // coin_a
@@ -456,10 +439,10 @@ void spoker_state::nmi_and_coins_w(uint8_t data)
 
 	m_leds[6] = BIT(data, 6);   // led for coin out / hopper active
 
-	if (((m_nmi_ack & 0x80) == 0) && data & 0x80)
+	if (!m_nmi_ack && BIT(data, 7))
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
-	m_nmi_ack = data & 0x80;     // nmi acknowledge, 0 -> 1
+	m_nmi_ack = BIT(data, 7);     // nmi acknowledge, 0 -> 1
 
 	m_out[0] = data;
 	show_out(machine(), m_out);
@@ -467,10 +450,10 @@ void spoker_state::nmi_and_coins_w(uint8_t data)
 
 void spokeru_state::coins_w(uint8_t data)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 0x01);   // coin_a
-	machine().bookkeeping().coin_counter_w(1, data & 0x04);   // coin_c
-	machine().bookkeeping().coin_counter_w(2, data & 0x08);   // key in
-	machine().bookkeeping().coin_counter_w(3, data & 0x10);   // coin out mech
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));   // coin_a
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 2));   // coin_c
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 3));   // key in
+	machine().bookkeeping().coin_counter_w(3, BIT(data, 4));   // coin out mech
 
 	m_leds[6] = BIT(data, 6);   // led for coin out / hopper active
 
@@ -483,8 +466,8 @@ void spoker_state::video_and_leds_w(uint8_t data)
 	m_leds[4] = BIT(data, 0); // start?
 	m_leds[5] = BIT(data, 2); // l_bet?
 
-	m_video_enable = data & 0x40;
-	m_hopper = (~data) & 0x80;
+	m_video_enable = BIT(data, 6);
+	m_hopper = BIT(~data, 7);
 
 	m_out[1] = data;
 	show_out(machine(), m_out);
@@ -495,13 +478,13 @@ void spokeru_state::nmi_video_leds_w(uint8_t data)
 	m_leds[4] = BIT(data, 0); // start?
 	m_leds[5] = BIT(data, 2); // l_bet?
 
-	if (((m_nmi_ack & 0x20) == 0) && data & 0x20)
+	if (!m_nmi_ack && BIT(data, 5))
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
-	m_nmi_ack = data & 0x20;     // NMI acknowledge, 0 -> 1
+	m_nmi_ack = BIT(data, 5);     // NMI acknowledge, 0 -> 1
 
-	m_video_enable = data & 0x40;
-	m_hopper = (~data) & 0x80;
+	m_video_enable = BIT(data, 6);
+	m_hopper = BIT(~data, 7);
 
 	m_out[1] = data;
 	show_out(machine(), m_out);
@@ -512,10 +495,10 @@ void jinhulu2_state::nmi_w(uint8_t data)
 	if (data & 0xef)
 		logerror("nmi_w: %02x\n", data & 0xef);
 
-	if (((m_nmi_ack & 0x10) == 0) && data & 0x10)
+	if (!m_nmi_ack && BIT(data, 4))
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
-	m_nmi_ack = data & 0x10;     // NMI acknowledge, 0 -> 1
+	m_nmi_ack = BIT(data, 4);     // NMI acknowledge, 0 -> 1
 
 	// TODO: bit 5 is set often
 }
@@ -526,7 +509,7 @@ void spoker_state::leds_w(uint8_t data)
 	m_leds[1] = BIT(data, 1);  // stop_2
 	m_leds[2] = BIT(data, 2);  // stop_3
 	m_leds[3] = BIT(data, 3);  // stop
-	// data & 0x10?
+	// BIT(data, 4)?
 
 	m_out[2] = data;
 	show_out(machine(), m_out);
@@ -545,8 +528,8 @@ void spoker_state::magic_w(offs_t offset, uint8_t data)
 			break;
 
 		default:
-//          popmessage("magic %x <- %04x", m_igs_magic[0], data);
-			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", m_maincpu->pc(), m_igs_magic[0], data);
+			//popmessage("magic %x <- %04x", m_igs_magic[0], data);
+			logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_igs_magic[0], data);
 	}
 }
 
@@ -566,7 +549,8 @@ uint8_t spoker_state::magic_r()
 			}
 
 		default:
-			logerror("%06x: warning, reading with igs_magic = %02x\n", m_maincpu->pc(), m_igs_magic[0]);
+			if (!machine().side_effects_disabled())
+				logerror("%s: warning, reading with igs_magic = %02x\n", machine().describe_context(), m_igs_magic[0]);
 	}
 
 	return 0;
@@ -574,7 +558,8 @@ uint8_t spoker_state::magic_r()
 
 uint8_t jinhulu2_state::igs003c_r()
 {
-	LOGIGS003("PC %06X: Protection read %02x\n", m_maincpu->pc(), m_protection_res);
+	if (!machine().side_effects_disabled())
+		LOGIGS003("%s: Protection read %02x\n", machine().describe_context(), m_protection_res);
 
 	return m_protection_res;
 }
@@ -584,7 +569,7 @@ void jinhulu2_state::igs003c_w(uint8_t data)
 	switch (data)
 	{
 		// case 0x01: break; // TODO: what does this do?
-		case 0x02: m_protection_res = ioport("IN0")->read(); break;
+		case 0x02: m_protection_res = m_io_in[0]->read(); break;
 		case 0x20: m_protection_res = 0x49; break;
 		case 0x21: m_protection_res = 0x47; break;
 		case 0x22: m_protection_res = 0x53; break;
@@ -595,13 +580,14 @@ void jinhulu2_state::igs003c_w(uint8_t data)
 		case 0x28: m_protection_res = 0x41; break;
 		case 0x2a: m_protection_res = 0x3e; break;
 		case 0x2b: m_protection_res = 0x41; break;
-		default: LOGIGS003("PC %06X: Protection write %02x\n", m_maincpu->pc(), data); m_protection_res = data;
+		default: LOGIGS003("%s: Protection write %02x\n", machine().describe_context(), data); m_protection_res = data;
 	}
 }
 
 uint8_t xjinhuang_state::igs003e_r()
 {
-	LOGIGS003("PC %06X: Protection read %02x\n", m_maincpu->pc(), m_protection_res);
+	if (!machine().side_effects_disabled())
+		LOGIGS003("%s: Protection read %02x\n", machine().describe_context(), m_protection_res);
 
 	return m_protection_res;
 }
@@ -611,7 +597,7 @@ void xjinhuang_state::igs003e_w(uint8_t data) // TODO: IGS003E is usually more c
 	switch (data)
 	{
 		// case 0x01: break; // TODO: what does this do?
-		case 0x02: m_protection_res = ioport("IN0")->read(); break;
+		case 0x02: m_protection_res = m_io_in[0]->read(); break;
 		case 0x20: m_protection_res = 0x49; break;
 		case 0x21: m_protection_res = 0x47; break;
 		case 0x22: m_protection_res = 0x53; break;
@@ -622,7 +608,7 @@ void xjinhuang_state::igs003e_w(uint8_t data) // TODO: IGS003E is usually more c
 		case 0x28: m_protection_res = 0x41; break;
 		case 0x2a: m_protection_res = 0x3e; break;
 		case 0x2b: m_protection_res = 0x41; break;
-		default: LOGIGS003("PC %06X: Protection write %02x\n", m_maincpu->pc(), data); m_protection_res = data;
+		default: LOGIGS003("%s: Protection write %02x\n", machine().describe_context(), data); m_protection_res = data;
 	}
 }
 
@@ -696,7 +682,7 @@ void xjinhuang_state::portmap(address_map &map)
 	map(0x5000, 0x5fff).ram().w(FUNC(xjinhuang_state::fg_tile_w)).share(m_fg_tile_ram);
 	map(0x6480, 0x6480).r(FUNC(xjinhuang_state::igs003e_r)).w(FUNC(xjinhuang_state::igs003e_w));
 	map(0x6482, 0x6482).w(FUNC(xjinhuang_state::nmi_video_leds_w));
-	map(0x64a1, 0x64a1).lr8(NAME([this] () -> uint8_t { return m_input_sel ? m_service->read() : m_in1->read(); }));
+	map(0x64a1, 0x64a1).lr8(NAME([this] () -> uint8_t { return m_input_sel ? m_service->read() : m_io_in[1]->read(); }));
 	map(0x64a2, 0x64a2).w(m_ymsnd, FUNC(ym2413_device::data_w));
 	map(0x64a3, 0x64a3).lw8(NAME([this] (uint8_t data) { m_input_sel = BIT(data, 0); m_ymsnd->address_w(data); }));
 	map(0x64b0, 0x64b0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -712,7 +698,7 @@ void jinhulu2_state::portmap(address_map &map)
 	map(0x4000, 0x4000).portr("DSW3");
 	map(0x4001, 0x4001).portr("DSW2");
 	map(0x4002, 0x4002).portr("DSW1");
-	map(0x5001, 0x5001).lr8(NAME([this] () -> uint8_t { return m_input_sel ? m_service->read() : m_in1->read(); }));
+	map(0x5001, 0x5001).lr8(NAME([this] () -> uint8_t { return m_input_sel ? m_service->read() : m_io_in[1]->read(); }));
 	map(0x5002, 0x5002).w(m_ymsnd, FUNC(ym2149_device::data_w));
 	map(0x5003, 0x5003).lw8(NAME([this] (uint8_t data) { m_input_sel = BIT(data, 0); m_ymsnd->address_w(data); }));
 	map(0x5010, 0x5010).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -1815,15 +1801,7 @@ void spoker_state::machine_start()
 	save_item(NAME(m_igs_magic));
 }
 
-void jinhulu2_state::machine_start()
-{
-	spoker_state::machine_start();
-
-	save_item(NAME(m_protection_res));
-	save_item(NAME(m_input_sel));
-}
-
-void xjinhuang_state::machine_start()
+void spokeru_igs003_state::machine_start()
 {
 	spoker_state::machine_start();
 
@@ -1833,9 +1811,9 @@ void xjinhuang_state::machine_start()
 
 void spoker_state::machine_reset()
 {
-	m_nmi_ack = 0;
-	m_hopper = 0;
-	m_video_enable = 1;
+	m_nmi_ack = false;
+	m_hopper = false;
+	m_video_enable = true;
 }
 
 
@@ -2846,36 +2824,36 @@ void spoker_state::init_3super8()
 ***************************************************************************/
 
 //    YEAR   NAME           PARENT    MACHINE   INPUT     STATE           INIT                ROT    COMPANY      FULLNAME                            FLAGS
-GAME( 1996,  spk306us,      0,        spokeru,  spk306us, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v306US)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  spk305us,      spk306us, spokeru,  spk305us, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v305US)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  spk205us,      spk306us, spokeru,  spk203us, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v205US)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  spk203us,      spk306us, spokeru,  spk203us, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v203US)",             MACHINE_SUPPORTS_SAVE ) // LS1. 8 203US in test mode
-GAME( 1996,  spk201ua,      spk306us, spokeru,  spk201ua, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v201UA)",             MACHINE_SUPPORTS_SAVE ) // still shows 200UA in test mode
-GAME( 1996,  spk200ua,      spk306us, spokeru,  spk200ua, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v200UA)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  spk200,        spk306us, spoker,   spk100,   spoker_state,   init_spk100,        ROT0,  "IGS",       "Super Poker (v200)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  spk130,        spk306us, spoker,   spk130,   spoker_state,   init_spk100,        ROT0,  "IGS",       "Super Poker (v130)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  spk120in,      spk306us, spoker,   spoker,   spoker_state,   init_spk120in,      ROT0,  "IGS",       "Super Poker (v120IN)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  spk116it,      spk306us, spoker,   spoker,   spoker_state,   init_spk116it,      ROT0,  "IGS",       "Super Poker (v116IT)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  spk116itmx,    spk306us, spoker,   spoker,   spoker_state,   init_spk114it,      ROT0,  "IGS",       "Super Poker (v116IT-MX)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  spk115it,      spk306us, spoker,   spoker,   spoker_state,   init_spk116it,      ROT0,  "IGS",       "Super Poker (v115IT)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  spk114it,      spk306us, spoker,   spk114it, spoker_state,   init_spk114it,      ROT0,  "IGS",       "Super Poker (v114IT)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  spk102ua,      spk306us, spokeru,  spk102ua, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v102UA)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  spk102u,       spk306us, spoker,   spk102ua, spoker_state,   init_spk100,        ROT0,  "IGS",       "Super Poker (v102U)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  spk100,        spk306us, spoker,   spk100,   spoker_state,   init_spk100,        ROT0,  "IGS",       "Super Poker (v100)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1997,  xjinhuang,     0,        xjinhuang,jinhulu2, xjinhuang_state,init_xjinhuang,     ROT0,  "IGS",       "Xin Jin Huangguan (V400CN)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // wrong GFX decode, memory map incomplete
-GAME( 1997,  jinhuang2,     0,        xjinhuang,jinhulu2, xjinhuang_state,init_jinhuang2,     ROT0,  "IGS",       "Jin Huangguan II (V310CN)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // wrong GFX decode, memory map incomplete
-GAME( 1993?, 3super8,       0,        _3super8, 3super8,  spoker_state,   init_3super8,       ROT0,  "<unknown>", "3 Super 8 (Italy)",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ROMs are badly dumped
-GAME( 1997,  jbell,         0,        jb,       jb,       jb_state,       init_spokeru,       ROT0,  "IGS",       "Jingle Bell (v200US)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  jinhulu2,      0,        jinhulu2, jinhulu2, jinhulu2_state, init_jinhulu2,      ROT0,  "IGS",       "Jin Hu Lu II (v412GS)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // tries to link to something?
-GAME( 1995,  jinhulu2120gi, jinhulu2, jinhulu2, jinhulu2, jinhulu2_state, init_jinhulu2120gi, ROT0,  "IGS",       "Jin Hu Lu II (v120GI)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
-GAME( 1996,  jinhulu2101is, jinhulu2, jinhulu2, jinhulu2, jinhulu2_state, init_jinhulu2101is, ROT0,  "IGS",       "Jin Hu Lu II (v101IS)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // tries to link to something?
-GAME( 1995,  jinhulu2100gi, jinhulu2, jinhulu2, jinhulu2, jinhulu2_state, init_jinhulu2100gi, ROT0,  "IGS",       "Jin Hu Lu II (v100GI)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper, ROM patch
-GAME( 1995,  huahuas2,      0,        jinhulu2, huahuas2, jinhulu2_state, init_huahuas2,      ROT0,  "IGS",       "Huahua Shijie II (v100FI, set 1)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
-GAME( 1995,  huahuas2a,     huahuas2, jinhulu2, huahuas2, jinhulu2_state, init_jinhulu2120gi, ROT0,  "IGS",       "Huahua Shijie II (v100FI, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // no GFX ROM dump, hopper
-GAME( 1995,  huluw2,        0,        jinhulu2, huluw2,   jinhulu2_state, init_huluw2,        ROT0,  "IGS",       "Hu Lu Wang II (v100KI)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
-GAME( 1995,  hsheng2,       0,        jinhulu2, jinhulu2, jinhulu2_state, init_hsheng2,       ROT0,  "IGS",       "Hua Shen II (v120DI)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
-GAME( 1995,  dafuwng3,      0,        jinhulu2, jinhulu2, jinhulu2_state, init_dafuwng3,      ROT0,  "IGS",       "Da Fu Weng III (V130LI)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
-GAME( 1996,  zuanshiw,      0,        jinhulu2, zuanshiw, jinhulu2_state, init_jinhulu2120gi, ROT0,  "IGS",       "Zuanshi Wutai (V110II)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
-GAME( 2002,  jinhuang,      0,        jinhuang, jinhuang, jinhulu2_state, init_jinhuang,      ROT0,  "IGS",       "Jin Huangguan",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different memory map
-GAME( 1998,  sleyuan2,      0,        jinhulu2, jinhulu2, jinhulu2_state, init_sleyuan2,      ROT0,  "IGS",       "Shuiguo Leyuan II (V150UI)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
-GAME( 1995,  dahuangg,      0,        jinhuang, jinhuang, jinhulu2_state, init_dahuangg,      ROT0,  "IGS",       "Da Huangguan",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
+GAME( 1996,  spk306us,      0,        spokeru,  spk306us, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v306US)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk305us,      spk306us, spokeru,  spk305us, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v305US)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk205us,      spk306us, spokeru,  spk203us, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v205US)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk203us,      spk306us, spokeru,  spk203us, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v203US)",                       MACHINE_SUPPORTS_SAVE ) // LS1. 8 203US in test mode
+GAME( 1996,  spk201ua,      spk306us, spokeru,  spk201ua, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v201UA)",                       MACHINE_SUPPORTS_SAVE ) // still shows 200UA in test mode
+GAME( 1996,  spk200ua,      spk306us, spokeru,  spk200ua, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v200UA)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk200,        spk306us, spoker,   spk100,   spoker_state,   init_spk100,        ROT0,  "IGS",       "Super Poker (v200)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk130,        spk306us, spoker,   spk130,   spoker_state,   init_spk100,        ROT0,  "IGS",       "Super Poker (v130)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk120in,      spk306us, spoker,   spoker,   spoker_state,   init_spk120in,      ROT0,  "IGS",       "Super Poker (v120IN)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk116it,      spk306us, spoker,   spoker,   spoker_state,   init_spk116it,      ROT0,  "IGS",       "Super Poker (v116IT)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk116itmx,    spk306us, spoker,   spoker,   spoker_state,   init_spk114it,      ROT0,  "IGS",       "Super Poker (v116IT-MX)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk115it,      spk306us, spoker,   spoker,   spoker_state,   init_spk116it,      ROT0,  "IGS",       "Super Poker (v115IT)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk114it,      spk306us, spoker,   spk114it, spoker_state,   init_spk114it,      ROT0,  "IGS",       "Super Poker (v114IT)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk102ua,      spk306us, spokeru,  spk102ua, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v102UA)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk102u,       spk306us, spoker,   spk102ua, spoker_state,   init_spk100,        ROT0,  "IGS",       "Super Poker (v102U)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk100,        spk306us, spoker,   spk100,   spoker_state,   init_spk100,        ROT0,  "IGS",       "Super Poker (v100)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1997,  xjinhuang,     0,        xjinhuang,jinhulu2, xjinhuang_state,init_xjinhuang,     ROT0,  "IGS",       "Xin Jin Huangguan (V400CN)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // wrong GFX decode, memory map incomplete
+GAME( 1997,  jinhuang2,     0,        xjinhuang,jinhulu2, xjinhuang_state,init_jinhuang2,     ROT0,  "IGS",       "Jin Huangguan II (V310CN)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // wrong GFX decode, memory map incomplete
+GAME( 1993?, 3super8,       0,        _3super8, 3super8,  spoker_state,   init_3super8,       ROT0,  "<unknown>", "3 Super 8 (Italy)",                          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ROMs are badly dumped
+GAME( 1997,  jbell,         0,        jb,       jb,       jb_state,       init_spokeru,       ROT0,  "IGS",       "Jingle Bell (v200US, alternative hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  jinhulu2,      0,        jinhulu2, jinhulu2, jinhulu2_state, init_jinhulu2,      ROT0,  "IGS",       "Jin Hu Lu II (v412GS)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // tries to link to something?
+GAME( 1995,  jinhulu2120gi, jinhulu2, jinhulu2, jinhulu2, jinhulu2_state, init_jinhulu2120gi, ROT0,  "IGS",       "Jin Hu Lu II (v120GI)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
+GAME( 1996,  jinhulu2101is, jinhulu2, jinhulu2, jinhulu2, jinhulu2_state, init_jinhulu2101is, ROT0,  "IGS",       "Jin Hu Lu II (v101IS)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // tries to link to something?
+GAME( 1995,  jinhulu2100gi, jinhulu2, jinhulu2, jinhulu2, jinhulu2_state, init_jinhulu2100gi, ROT0,  "IGS",       "Jin Hu Lu II (v100GI)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper, ROM patch
+GAME( 1995,  huahuas2,      0,        jinhulu2, huahuas2, jinhulu2_state, init_huahuas2,      ROT0,  "IGS",       "Huahua Shijie II (v100FI, set 1)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
+GAME( 1995,  huahuas2a,     huahuas2, jinhulu2, huahuas2, jinhulu2_state, init_jinhulu2120gi, ROT0,  "IGS",       "Huahua Shijie II (v100FI, set 2)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // no GFX ROM dump, hopper
+GAME( 1995,  huluw2,        0,        jinhulu2, huluw2,   jinhulu2_state, init_huluw2,        ROT0,  "IGS",       "Hu Lu Wang II (v100KI)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
+GAME( 1995,  hsheng2,       0,        jinhulu2, jinhulu2, jinhulu2_state, init_hsheng2,       ROT0,  "IGS",       "Hua Shen II (v120DI)",                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
+GAME( 1995,  dafuwng3,      0,        jinhulu2, jinhulu2, jinhulu2_state, init_dafuwng3,      ROT0,  "IGS",       "Da Fu Weng III (V130LI)",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
+GAME( 1996,  zuanshiw,      0,        jinhulu2, zuanshiw, jinhulu2_state, init_jinhulu2120gi, ROT0,  "IGS",       "Zuanshi Wutai (V110II)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
+GAME( 2002,  jinhuang,      0,        jinhuang, jinhuang, jinhulu2_state, init_jinhuang,      ROT0,  "IGS",       "Jin Huangguan",                              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different memory map
+GAME( 1998,  sleyuan2,      0,        jinhulu2, jinhulu2, jinhulu2_state, init_sleyuan2,      ROT0,  "IGS",       "Shuiguo Leyuan II (V150UI)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
+GAME( 1995,  dahuangg,      0,        jinhuang, jinhuang, jinhulu2_state, init_dahuangg,      ROT0,  "IGS",       "Da Huangguan",                               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper

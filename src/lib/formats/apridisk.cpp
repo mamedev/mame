@@ -15,6 +15,8 @@
 
 #include "osdcore.h" // osd_printf_error
 
+#include <cstring>
+
 
 apridisk_format::apridisk_format()
 {

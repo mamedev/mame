@@ -932,6 +932,19 @@ uint8_t pc8801fh_state::cpuclock_r()
 	return 0x10 | m_clock_setting;
 }
 
+/*
+ * ---- xxxx baud rate
+ * ---- 1000 19200 bps
+ * ---- 0111 9600 bps
+ * ---- 0110 4800 bps
+ * ---- 0101 2400 bps
+ * ---- 0100 1200 bps
+ * ---- 0011 600 bps
+ * ---- 0010 300 bps
+ * ---- 0001 150 bps
+ * ---- 0000 75 bps
+ * ---- 1xxx <invalid>
+ */
 uint8_t pc8801fh_state::baudrate_r()
 {
 	return 0xf0 | m_baudrate_val;
@@ -940,6 +953,7 @@ uint8_t pc8801fh_state::baudrate_r()
 void pc8801fh_state::baudrate_w(uint8_t data)
 {
 	m_baudrate_val = data & 0xf;
+	// TODO: change clock for RS-232C
 }
 
 /*
@@ -1175,6 +1189,8 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	// TODO: Coming from the old legacy driver as "EXSWITCH", where this maps?
+	// On FH+ machines this is driven by the BIOS SDIP itself (changed in port $6f)
+	// On mk2SR and earlier: fixed at 300 bps or expects a RS-232C card with physical dips?
 	PORT_START("CFG")
 	#if 0
 	PORT_DIPNAME( 0x0f, 0x08, "Serial speed" )
@@ -1241,6 +1257,21 @@ static INPUT_PORTS_START( pc8801fh )
 	PORT_DIPSETTING(    0x80, "4MHz" )
 	PORT_DIPSETTING(    0x00, "8MHz" )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( pc8801ma )
+	PORT_INCLUDE( pc8801fh )
+
+	PORT_MODIFY("DSW1")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("eeprom", FUNC(pc88_sdip_device::memory_weight_r))
+	PORT_BIT( 0x3e, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("eeprom", FUNC(pc88_sdip_device::dsw1_r))
+
+	PORT_MODIFY("DSW2")
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("eeprom", FUNC(pc88_sdip_device::dsw2_r))
+
+	PORT_MODIFY("CTRL")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("eeprom", FUNC(pc88_sdip_device::auto_boot_floppy_r))
+INPUT_PORTS_END
+
 
 /* Graphics Layouts */
 
@@ -1688,7 +1719,7 @@ void pc8801fh_state::pc8801fh(machine_config &config)
 {
 	pc8801mk2mr(config);
 
-	EEPROM_93C06_16BIT(config, m_eeprom); // NMC9306N
+	PC88_SDIP(config, m_eeprom); // NMC9306N
 
 	PC8801FH_KBD(config.replace(), "kbd");
 
@@ -1835,6 +1866,7 @@ ROM_END
 
 ROM_START( pc8801mh )
 	ROM_REGION( 0x8000,  "setup", ROMREGION_ERASEFF )
+	ROM_LOAD( "setup.bin", 0x00000, 0x8000, NO_DUMP )
 
 	ROM_REGION( 0x8000,  "n80rom", ROMREGION_ERASEFF ) // 1.8, but different BIOS code?
 	ROM_LOAD( "mh_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
@@ -1858,6 +1890,7 @@ ROM_END
 
 ROM_START( pc8801fa )
 	ROM_REGION( 0x8000,  "setup", ROMREGION_ERASEFF )
+	ROM_LOAD( "setup.bin", 0x00000, 0x8000, NO_DUMP )
 
 	ROM_REGION( 0x8000,  "n80rom", ROMREGION_ERASEFF ) // 1.8
 	ROM_LOAD( "fa_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
@@ -1912,6 +1945,7 @@ ROM_END
 
 ROM_START( pc8801ma2 )
 	ROM_REGION( 0x8000,  "setup", ROMREGION_ERASEFF )
+	ROM_LOAD( "setup.bin", 0x00000, 0x8000, NO_DUMP )
 
 	ROM_REGION( 0x8000,  "n80rom", ROMREGION_ERASEFF ) // 1.8
 	ROM_LOAD( "ma2_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
@@ -1938,6 +1972,7 @@ ROM_END
 
 ROM_START( pc8801mc )
 	ROM_REGION( 0x8000,  "setup", ROMREGION_ERASEFF )
+	ROM_LOAD( "setup.bin", 0x00000, 0x8000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "n80rom", ROMREGION_ERASEFF ) // 1.8
 	ROM_LOAD( "mc_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
@@ -2003,7 +2038,7 @@ COMP( 1985, pc8801mk2mr, pc8801mk2sr, 0,      pc8801mk2mr, pc8801mk2sr, pc8801mk
 //COMP( 1986, pc8801fh,    pc8801mh, 0,      pc8801fh,    pc8801fh, pc8801fh_state, init_setup_mode<false>, "NEC",   "PC-8801FH",     MACHINE_IMPERFECT_TIMING )
 COMP( 1986, pc8801mh,    0,        0,      pc8801fh,    pc8801fh, pc8801fh_state, init_setup_mode<false>, "NEC",   "PC-8801MH",     MACHINE_IMPERFECT_TIMING )
 COMP( 1987, pc8801fa,    pc8801mh, 0,      pc8801fh,    pc8801fh, pc8801fh_state, init_setup_mode<false>, "NEC",   "PC-8801FA",     MACHINE_IMPERFECT_TIMING )
-COMP( 1987, pc8801ma,    0,        0,      pc8801ma,    pc8801fh, pc8801ma_state, init_setup_mode<true>,  "NEC",   "PC-8801MA",     MACHINE_IMPERFECT_TIMING )
+COMP( 1987, pc8801ma,    0,        0,      pc8801ma,    pc8801ma, pc8801ma_state, init_setup_mode<true>,  "NEC",   "PC-8801MA",     MACHINE_IMPERFECT_TIMING )
 //COMP( 1988, pc8801fe,    pc8801ma, 0,      pc8801fa,    pc8801fh, pc8801ma_state, init_setup_mode<false>, "NEC",   "PC-8801FE",     MACHINE_IMPERFECT_TIMING )
 COMP( 1988, pc8801ma2,   pc8801ma, 0,      pc8801ma,    pc8801fh, pc8801ma_state, init_setup_mode<false>, "NEC",   "PC-8801MA2",    MACHINE_IMPERFECT_TIMING ) // missing SDIP-style BIOS bank?
 //COMP( 1989, pc8801fe2,   pc8801ma, 0,      pc8801fa,    pc8801fh, pc8801ma_state, init_setup_mode<false>, "NEC",   "PC-8801FE2",    MACHINE_IMPERFECT_TIMING )
