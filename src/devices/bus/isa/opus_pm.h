@@ -84,16 +84,16 @@ private:
 	required_ioport m_seg;
 	required_ioport m_irq;
 
-	std::unique_ptr<uint8_t[]> m_ram;
+	memory_share_creator<uint8_t> m_ram;
 
-	emu_timer *m_start_timer = nullptr;  // reset-before-run hold before the CPU executes
+	emu_timer *m_start_timer;  // reset-before-run hold before the CPU executes
 
 	bool m_running;     // CSR stat bit 3 (st_init) is the inverse
 	bool m_window_top;  // window covers the top page once the monitor is up
 	bool m_irq_enb;     // CPU-to-host interrupt enable (eirq/run)
 	bool m_irq_latch;   // CPU-to-host interrupt (R_C_IRQ)
 	bool m_int_slave;   // host-to-CPU interrupt (int/R_C_ACK)
-	int m_installed_irq = -1;
+	int m_installed_irq;
 };
 
 // Opus 110PM -- the same board with an NS32032 in place of the NS32016

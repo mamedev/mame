@@ -67,7 +67,7 @@ DEFINE_DEVICE_TYPE(ISA8_OPUS_PM110, isa8_opus_pm110_device, "opus_pm110", "Opus 
 // first instruction.  Models the real RUN/GO reset pulse: it clears stale board
 // state and keeps the slave halted long enough for the host's power-up tests to
 // read a clean status before the slave can run.
-static constexpr unsigned CPU_RESET_HOLD_US = 500000;  // 500 ms
+static constexpr unsigned CPU_RESET_HOLD_US = 500'000;  // 500 ms
 
 isa8_opus_pm100_device::isa8_opus_pm100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: isa8_opus_pm100_device(mconfig, ISA8_OPUS_PM100, tag, owner, clock)
@@ -82,11 +82,14 @@ isa8_opus_pm100_device::isa8_opus_pm100_device(const machine_config &mconfig, de
 	, m_mmu(*this, "mmu")
 	, m_seg(*this, "SEG")
 	, m_irq(*this, "IRQ")
+	, m_ram(*this, "ram", 0x400000, ENDIANNESS_LITTLE)
+	, m_start_timer(nullptr)
 	, m_running(false)
 	, m_window_top(false)
 	, m_irq_enb(false)
 	, m_irq_latch(false)
 	, m_int_slave(false)
+	, m_installed_irq(-1)
 {
 }
 
@@ -159,8 +162,6 @@ void isa8_opus_pm100_device::device_start()
 {
 	set_isa_device();
 
-	m_ram = std::make_unique<uint8_t[]>(0x400000);
-
 	// Install DRAM directly rather than through per-byte map trampolines (the
 	// 32032 has a 32-bit data bus, so a trampoline costs four calls per dword).
 	// The board must be modelled full-size: the slave's power-up routine sizes
@@ -169,13 +170,12 @@ void isa8_opus_pm100_device::device_start()
 	// The same array also answers the top of the 16MB space -- FF0000-FFEFFF is
 	// the "DMA space" window where the monitor relocates and keeps the comm
 	// page, and FFFE00-FFFFFF mirrors the interrupt stack.
-	m_cpu->space(AS_PROGRAM).install_ram(0x000000, 0x3fffff, m_ram.get());
-	m_cpu->space(AS_PROGRAM).install_ram(0xff0000, 0xffefff, m_ram.get() + 0x3f0000);
-	m_cpu->space(AS_PROGRAM).install_ram(0xfffe00, 0xffffff, m_ram.get() + 0x3ffe00);
+	m_cpu->space(AS_PROGRAM).install_ram(0x000000, 0x3fffff, m_ram.target());
+	m_cpu->space(AS_PROGRAM).install_ram(0xff0000, 0xffefff, m_ram.target() + 0x3f0000);
+	m_cpu->space(AS_PROGRAM).install_ram(0xfffe00, 0xffffff, m_ram.target() + 0x3ffe00);
 
 	m_start_timer = timer_alloc(FUNC(isa8_opus_pm100_device::start_cpu), this);
 
-	save_pointer(NAME(m_ram), 0x400000);
 	save_item(NAME(m_running));
 	save_item(NAME(m_window_top));
 	save_item(NAME(m_irq_enb));

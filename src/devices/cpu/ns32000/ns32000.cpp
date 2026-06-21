@@ -95,6 +95,7 @@ static const u32 size_mask[] = { 0x0000'00ffU, 0x0000'ffffU, 0x0000'0000U, 0xfff
 
 template <int HighBits, int Width>ns32000_device<HighBits, Width>::ns32000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_mmu_uses_cfg_m(true)
 	, m_address_mask(util::make_bitmask<u32>(HighBits))
 	, m_program_config("program", ENDIANNESS_LITTLE, 8 << Width, HighBits, 0)
 	, m_iam_config("iam", ENDIANNESS_LITTLE, 8 << Width, HighBits, 0)

@@ -152,7 +152,7 @@ protected:
 	// the external Series 32000 MMU (NS32082/NS32382) is consulted only after
 	// SETCFG has enabled it (CFG M); the NS32532's on-chip MMU gates internally
 	// (via MSR/MCR) and ignores CFG M, so it clears this in its constructor.
-	bool m_mmu_uses_cfg_m = true;
+	bool m_mmu_uses_cfg_m;
 
 	typename memory_access<HighBits, Width, 0, ENDIANNESS_LITTLE>::specific m_bus[16];
 
