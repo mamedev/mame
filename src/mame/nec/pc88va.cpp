@@ -104,7 +104,7 @@ brk 8Ch AH=02h read calendar clock -> CH = hour, CL = minutes, DH = seconds, DL 
 
 // TODO: verify clocks
 #define MASTER_CLOCK    (XTAL(31'948'800) / 4) // (based on PC-8801 and PC-9801)
-#define FM_CLOCK        (XTAL(31'948'800) / 4) // 3993600, / 8 for regular pc88va
+#define FM_CLOCK        (XTAL(31'948'800) / 4) // 3993600 * 2, / 8 for regular pc88va
 
 
 
@@ -512,6 +512,11 @@ void pc88va_state::main_map(address_map &map)
 {
 	map(0x00000, 0x7ffff).ram().share("workram");
 //  map(0x80000, 0x9ffff).ram(); // EMM
+	// TODO: no idea how EMM works yet
+	// - Regular V1/V2 should use ports $e2/$e3 like base
+	// - Guess it's not C-Bus compatible but rather PC-88VA-01/-02 doing the trick for all modes.
+	// - hatisora wants the segment populated otherwise it crashes after stage 1
+	map(0x80000, 0x9ffff).ram();
 	map(0xa0000, 0xdffff).m(m_sysbank, FUNC(address_map_bank_device::amap16));
 	map(0xe0000, 0xeffff).bankr("rom00_bank");
 	map(0xf0000, 0xfffff).bankr("rom10_bank");
@@ -853,10 +858,10 @@ static INPUT_PORTS_START( pc88va )
 
 	PORT_START("SYSOP_SW")
 	PORT_DIPNAME( 0x03, 0x01, "System Operational Mode" )
-//  PORT_DIPSETTING(    0x00, "Reserved" )
+	PORT_DIPSETTING(    0x00, "<Reserved>" )
 	PORT_DIPSETTING(    0x01, "N88 V2 Mode" )
 	PORT_DIPSETTING(    0x02, "N88 V1 Mode" )
-//  PORT_DIPSETTING(    0x03, "???" )
+	PORT_DIPSETTING(    0x03, "Option Mode" ) // ?
 INPUT_PORTS_END
 
 static const gfx_layout pc88va_chars_8x8 =
@@ -1135,6 +1140,7 @@ void pc88va_state::pc88va(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc88va_state::io_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(pc88va_state::vrtc_irq), "screen", 0, 1);
 	m_maincpu->icu_slave_ack_cb().set(m_pic2, FUNC(pic8259_device::acknowledge));
+	// beep and RS-232C runs at regular 3'993'600
 	m_maincpu->set_tclk(MASTER_CLOCK / 2);
 	// "timer 1"
 //	m_maincpu->tout0_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

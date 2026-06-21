@@ -576,8 +576,9 @@ Winning animation is glitchy [OFX/OFY]?, uses [IDP] text transpen with upper bit
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<notes><![CDATA[
 [gfx] needs cliprect and primask pen during intro
+[gfx] title screen should animate with a blue backdrop
 Runs at half speed
-[IDP] sprites wraparound on left edge
+[IDP] sprites wraparound on left edge (fixed)
 Omake: if sound irqs don't run then needs to press key 0 pad to move on
 ]]></notes>
 		<info name="alt_title" value="神羅万象"/>
@@ -1303,12 +1304,14 @@ Runs too slow, no sound?
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
 [gfx] Title screen doesn't show text layer? (verify)
-[IDP] sprites wraparound on left edge
+[IDP] sprites missing wraparound on top edge (verify)
+[IDP] sprite wobbles when scrolling up/down (verify)
 Runs too slow
-Crashes after stage 1
+Crashes after stage 1 (fixed, cfr. usage)
 ]]></notes>
 		<info name="developer" value="LOKAPALA" />
 		<info name="alt_title" value="ハティの空で" />
+		<info name="usage" value="Requires 640KB of RAM" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1298608">
 				<rom name="hati sora.d88" size="1298608" crc="bdee6770" sha1="445ba8da78cce7fd3c4d1bce263d8c8edd88849d"/>
