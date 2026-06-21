@@ -10,6 +10,10 @@
 // as with other ELAN drivers the clock speed is a bit of a mystery, and actual execution rate may depend on
 // many other bus related factors.
 
+// for Lexibook IG10 Glyptics will crash at even slightly lower clock speeds, while Moto Racing is far too fast
+// (Moto Racing might be missing raster effects)
+// The game mechanics in Racket are also unclear, seems impossible to hit the ball back?
+
 #include "emu.h"
 
 #include "screen.h"
@@ -208,5 +212,5 @@ CONS( 2007, tvbg3c, 0, 0, elan_ep3a19a_1mb, tvbg_2button, elan_ep3a19a_state, in
 
 // hybrid system with an LCD game on the controller (uses a separate MCU glob, not emulated)
 // "Credit:XiAn Hummer Software Studio(CHINA) Tel:86-29-84270600 Email:HummerSoft@126.com Http://www.hummersoft.com" string in ROM
-CONS( 2006, lexiig10, 0, 0, elan_ep3a19a_2mb_pal_fast, lexiig10, elan_ep3a19a_state, empty_init, "Lexibook", "Color Console IG10 (DualMax 20 in 1 TV part)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, lexiig10, 0, 0, elan_ep3a19a_2mb_pal_fast, lexiig10, elan_ep3a19a_state, empty_init, "Lexibook", "Color Console IG10 (DualMax 20 in 1 TV part)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // Sunnyflyer 30-in-1 contains the games from lexiig10 so probably fits here too ( https://blog.12bit.club/?post=6 )
