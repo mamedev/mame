@@ -568,7 +568,7 @@ void stella8085_state::dicemstr(machine_config &config)
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 	m_uart->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
 	m_rs232->rxd_handler().set(m_uart, FUNC(i8256_device::write_rxd));
-	m_rs232->cts_handler().set(m_uart, FUNC(i8256_device::write_cts));
+	// CTS is grounded
 
 	I8279(config, m_kdc, 10.240_MHz_XTAL / 4); // divider not verified
 	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));
@@ -603,7 +603,7 @@ void stella8085_state::doppelpot(machine_config &config)
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 	m_uart->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
 	m_rs232->rxd_handler().set(m_uart, FUNC(i8256_device::write_rxd));
-	m_rs232->cts_handler().set(m_uart, FUNC(i8256_device::write_cts));
+	// CTS is grounded
 
 	I8279(config, m_kdc, 6.144_MHz_XTAL / 2);
 	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));
