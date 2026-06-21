@@ -26,6 +26,7 @@ public:
 
 	void elan_ep3a19a(machine_config &config) ATTR_COLD;
 	void elan_ep3a19a_1mb(machine_config &config) ATTR_COLD;
+	void elan_ep3a19a_2mb(machine_config &config) ATTR_COLD;
 
 	void init_tvbg() ATTR_COLD;
 
@@ -125,6 +126,12 @@ void elan_ep3a19a_state::elan_ep3a19a_1mb(machine_config &config)
 	m_maincpu->set_addrmap(elan_ep3a19a_soc_device::AS_EXTERNAL, &elan_ep3a19a_state::elan_ep3a19a_extmap_1mb);
 }
 
+void elan_ep3a19a_state::elan_ep3a19a_2mb(machine_config &config)
+{
+	elan_ep3a19a(config);
+	m_maincpu->set_addrmap(elan_ep3a19a_soc_device::AS_EXTERNAL, &elan_ep3a19a_state::elan_ep3a19a_extmap_2mb);
+}
+
 ROM_START( tvbg6a )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "candyland_hhh_silly6.bin", 0x00000, 0x200000, CRC(8b16d725) SHA1(06af509d03df0e5a2ca502743797af9f4a5dc6f1) )
@@ -150,6 +157,11 @@ ROM_START( tvbg3c )
 	ROM_LOAD( "boggle_connect4.bin", 0x00000, 0x100000, CRC(c2374eea) SHA1(c6971cb5108828bc72fd1cf7edeb53915d196db7) )
 ROM_END
 
+ROM_START( lexiig10 )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "ig10.bin", 0x00000, 0x200000, CRC(f2eadf9b) SHA1(c8af9355bcd5704255e554f1358f59277b6b9339) )
+ROM_END
+
 void elan_ep3a19a_state::init_tvbg()
 {
 	// is this swapping internal to the ep3a19a type ELAN, or external; ROM glob had standard TSOP pinout pads that were used for dumping.
@@ -173,3 +185,8 @@ CONS( 2007, tvbg3b, 0, 0, elan_ep3a19a_1mb, tvbg_2button, elan_ep3a19a_state, in
 CONS( 2007, tvbg3c, 0, 0, elan_ep3a19a_1mb, tvbg_2button, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 3-in-1: Boggle, Connect 4, Roll Over", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=SoKKIKSDGhY
 
 // The back of the Silly 6 Pins 3-in-1 packaging suggests a Monopoly TV Board Game device was planned, but this does not appear to have been released.
+
+// exact SoC type not verified for below sets
+
+// hybrid system with an LCD game on the controller (uses a separate MCU)
+CONS( 2006, lexiig10, 0, 0, elan_ep3a19a_2mb, tvbg_2button, elan_ep3a19a_state, empty_init, "Lexibook", "Color Console IG10 (DualMax 20 in 1 TV part)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=SoKKIKSDGhY
