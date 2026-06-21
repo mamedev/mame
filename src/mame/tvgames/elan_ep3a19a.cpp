@@ -7,6 +7,9 @@
 // This is probably impossible on the single button units using real hardware as the 'B' input isn't connected
 // Currently these checksums fail in MAME due to the interrupt hack mapping over ROM, if you remove that hack they pass
 
+// as with other ELAN drivers the clock speed is a bit of a mystery, and actual execution rate may depend on
+// many other bus related factors.
+
 #include "emu.h"
 
 #include "screen.h"
@@ -26,7 +29,7 @@ public:
 
 	void elan_ep3a19a(machine_config &config) ATTR_COLD;
 	void elan_ep3a19a_1mb(machine_config &config) ATTR_COLD;
-	void elan_ep3a19a_2mb(machine_config &config) ATTR_COLD;
+	void elan_ep3a19a_2mb_pal_fast(machine_config &config) ATTR_COLD;
 
 	void init_tvbg() ATTR_COLD;
 
@@ -105,7 +108,7 @@ INTERRUPT_GEN_MEMBER(elan_ep3a19a_state::interrupt)
 
 void elan_ep3a19a_state::elan_ep3a19a(machine_config &config)
 {
-	ELAN_EP3A19A_SOC(config, m_maincpu, XTAL(21'477'272)/8);
+	ELAN_EP3A19A_SOC(config, m_maincpu, XTAL(21'477'272) / 8); // very unlikely to be /8
 	m_maincpu->set_addrmap(elan_ep3a19a_soc_device::AS_EXTERNAL, &elan_ep3a19a_state::elan_ep3a19a_extmap_2mb);
 	m_maincpu->set_vblank_int("screen", FUNC(elan_ep3a19a_state::interrupt));
 	m_maincpu->read_callback<0>().set_ioport("IN0");
@@ -126,10 +129,15 @@ void elan_ep3a19a_state::elan_ep3a19a_1mb(machine_config &config)
 	m_maincpu->set_addrmap(elan_ep3a19a_soc_device::AS_EXTERNAL, &elan_ep3a19a_state::elan_ep3a19a_extmap_1mb);
 }
 
-void elan_ep3a19a_state::elan_ep3a19a_2mb(machine_config &config)
+void elan_ep3a19a_state::elan_ep3a19a_2mb_pal_fast(machine_config &config)
 {
 	elan_ep3a19a(config);
+
 	m_maincpu->set_addrmap(elan_ep3a19a_soc_device::AS_EXTERNAL, &elan_ep3a19a_state::elan_ep3a19a_extmap_2mb);
+
+	// even slightly lower clocks causes Glyptics (the Columns clone) to crashes when dropping pieces
+	m_maincpu->set_clock(XTAL(26'601'712)); // same as a PAL NES
+	m_screen->set_refresh_hz(50);
 }
 
 ROM_START( tvbg6a )
@@ -159,6 +167,8 @@ ROM_END
 
 ROM_START( lexiig10 )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
+	// VIM??016  A116 99DD printed on ROM glob, if it's a checksum it's unclear how to calculate it
+	// ROM read consistently
 	ROM_LOAD( "ig10.bin", 0x00000, 0x200000, CRC(f2eadf9b) SHA1(c8af9355bcd5704255e554f1358f59277b6b9339) )
 ROM_END
 
@@ -189,4 +199,5 @@ CONS( 2007, tvbg3c, 0, 0, elan_ep3a19a_1mb, tvbg_2button, elan_ep3a19a_state, in
 // exact SoC type not verified for below sets
 
 // hybrid system with an LCD game on the controller (uses a separate MCU)
-CONS( 2006, lexiig10, 0, 0, elan_ep3a19a_2mb, tvbg_2button, elan_ep3a19a_state, empty_init, "Lexibook", "Color Console IG10 (DualMax 20 in 1 TV part)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=SoKKIKSDGhY
+// "Credit:XiAn Hummer Software Studio(CHINA) Tel:86-29-84270600 Email:HummerSoft@126.com Http://www.hummersoft.com" string in ROM
+CONS( 2006, lexiig10, 0, 0, elan_ep3a19a_2mb_pal_fast, tvbg_2button, elan_ep3a19a_state, empty_init, "Lexibook", "Color Console IG10 (DualMax 20 in 1 TV part)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=SoKKIKSDGhY
