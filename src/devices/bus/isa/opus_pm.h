@@ -36,14 +36,11 @@
 #include "machine/ns32081.h"
 #include "machine/ns32082.h"
 
-class isa8_opus_pm100_device : public device_t, public device_isa8_card_interface
+class isa8_opus_pm100_device_base : public device_t, public device_isa8_card_interface
 {
-public:
-	isa8_opus_pm100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 protected:
 	// for derived board variants (different CPU, same everything else)
-	isa8_opus_pm100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	isa8_opus_pm100_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -61,8 +58,8 @@ protected:
 
 private:
 	// host side: the 64KB memory window
-	uint8_t window_r(offs_t offset);
-	void window_w(offs_t offset, uint8_t data);
+	virtual uint8_t window_r(offs_t offset) = 0;
+	virtual void window_w(offs_t offset, uint8_t data) = 0;
 	offs_t window_phys(offs_t offset, bool write);  // window mapping (init: physical low; RUN: via 32082 MMU)
 	uint8_t csr_r(offs_t offset);                   // host status register (base+FFF0)
 	void csr_w(offs_t offset, uint8_t data);
@@ -84,8 +81,6 @@ private:
 	required_ioport m_seg;
 	required_ioport m_irq;
 
-	memory_share_creator<uint8_t> m_ram;
-
 	emu_timer *m_start_timer;  // reset-before-run hold before the CPU executes
 
 	bool m_running;     // CSR stat bit 3 (st_init) is the inverse
@@ -96,14 +91,37 @@ private:
 	int m_installed_irq;
 };
 
+class isa8_opus_pm100_device : public isa8_opus_pm100_device_base
+{
+public:
+	isa8_opus_pm100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+
+private:
+	virtual uint8_t window_r(offs_t offset) override;
+	virtual void window_w(offs_t offset, uint8_t data) override;
+
+	memory_share_creator<uint16_t> m_ram;
+};
+
 // Opus 110PM -- the same board with an NS32032 in place of the NS32016
-class isa8_opus_pm110_device : public isa8_opus_pm100_device
+class isa8_opus_pm110_device : public isa8_opus_pm100_device_base
 {
 public:
 	isa8_opus_pm110_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	virtual uint8_t window_r(offs_t offset) override;
+	virtual void window_w(offs_t offset, uint8_t data) override;
+
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+
+private:
+	memory_share_creator<uint32_t> m_ram;
 };
 
 DECLARE_DEVICE_TYPE(ISA8_OPUS_PM100, isa8_opus_pm100_device)
