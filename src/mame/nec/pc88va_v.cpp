@@ -44,18 +44,48 @@ void pc88va_state::video_start()
 		m_screen->register_screen_bitmap(m_graphic_bitmap[i]);
 
 	save_item(NAME(m_screen_ctrl_reg));
+	save_item(NAME(m_gden0));
+	save_item(NAME(m_ymmd));
+	save_item(NAME(m_dm));
+	save_item(NAME(m_vw));
 	save_item(NAME(m_gfx_ctrl_reg));
+	save_item(NAME(m_backdrop_color));
 	save_item(NAME(m_color_mode));
 	save_item(NAME(m_pltm));
 	save_item(NAME(m_pltp));
 
 	save_item(NAME(m_text_transpen));
+	save_item(NAME(m_td));
 	save_pointer(NAME(m_video_pri_reg), 2);
 	save_pointer(NAME(m_gvram), gvram_size);
 	save_pointer(NAME(m_kanji_ram), kanjiram_size);
 
 	save_item(NAME(m_vrtc_irq_line));
 	save_item(NAME(m_vertical_magnify));
+
+	save_item(STRUCT_MEMBER(m_singleplane, rop));
+	save_item(STRUCT_MEMBER(m_singleplane, patr));
+	save_item(STRUCT_MEMBER(m_singleplane, wss));
+//  save_item(STRUCT_MEMBER(m_singleplane, rbusy));
+
+	save_item(STRUCT_MEMBER(m_multiplane, aacc));
+	save_item(STRUCT_MEMBER(m_multiplane, gmap));
+	save_item(STRUCT_MEMBER(m_multiplane, xrpm));
+	save_item(STRUCT_MEMBER(m_multiplane, xwpm));
+	save_item(STRUCT_MEMBER(m_multiplane, cmpen));
+	save_item(STRUCT_MEMBER(m_multiplane, wss));
+	save_item(STRUCT_MEMBER(m_multiplane, pmod));
+	save_item(STRUCT_MEMBER(m_multiplane, rop));
+	save_item(STRUCT_MEMBER(m_multiplane, cmpr));
+	save_item(STRUCT_MEMBER(m_multiplane, patr));
+	save_item(STRUCT_MEMBER(m_multiplane, prrp));
+	save_item(STRUCT_MEMBER(m_multiplane, prwp));
+//  save_item(STRUCT_MEMBER(m_multiplane, rbusy));
+
+	save_item(STRUCT_MEMBER(m_picture_mask, top));
+	save_item(STRUCT_MEMBER(m_picture_mask, bottom));
+	save_item(STRUCT_MEMBER(m_picture_mask, left));
+	save_item(STRUCT_MEMBER(m_picture_mask, right));
 }
 
 // TODO: all needs to be verified
@@ -93,7 +123,8 @@ uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 {
 	uint8_t pri, cur_pri_lv;
 	uint32_t screen_pri;
-	bitmap.fill(0, cliprect);
+	// shinraba opening and title relies on backdrop color
+	bitmap.fill(m_palette->pen(0x20), cliprect);
 
 	// don't bother if we are under DSPOFF command
 	if(m_tsp.disp_on == false)
@@ -810,10 +841,13 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 		rectangle fb_cliprect(cliprect.min_x, cliprect.max_x, dsp, dsp + fbl - 1);
 		split_cliprect &= fb_cliprect;
 
+		// TODO: picture mask, actually under mixing not here (applies per screen not per layer)
+		// - fqueen and shinraba relies on this, both sets register $010a on demand.
+		//rectangle picture_mask_cliprect(m_picture_mask.left, m_picture_mask.right, m_picture_mask.top, m_picture_mask.bottom);
+		//split_cliprect &= picture_mask_cliprect;
+
 		if (split_cliprect.empty())
 			continue;
-
-		// TODO: picture mask
 
 		if (!m_dm)
 		{
@@ -1589,6 +1623,21 @@ void pc88va_state::gfx_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 u16 pc88va_state::gfx_ctrl_r()
 {
 	return m_gfx_ctrl_reg;
+}
+
+/*
+ * $10a Backdrop color
+ *
+ * GGGG**RRRR*BBBB* format
+ * [*] "set to '0' when all the upper bits of a gun are 0 and '1' otherwise" (?)
+ */
+void pc88va_state::backdrop_color_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_backdrop_color);
+	const u8 g = (m_backdrop_color >> 12) & 0xf;
+	const u8 r = (m_backdrop_color >> 6) & 0xf;
+	const u8 b = (m_backdrop_color >> 1) & 0xf;
+	m_palette->set_pen_color(0x20, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 /*

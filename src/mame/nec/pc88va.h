@@ -177,6 +177,7 @@ private:
 	bool m_ymmd;
 	u8 m_vw;
 	u16 m_gfx_ctrl_reg;
+	u16 m_backdrop_color;
 
 	u16 m_color_mode;
 	u8 m_pltm, m_pltp;
@@ -225,6 +226,7 @@ private:
 	void gfx_ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void video_pri_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
+	void backdrop_color_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void color_mode_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void text_transpen_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void text_control_1_w(u8 data);

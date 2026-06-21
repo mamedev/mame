@@ -604,7 +604,7 @@ void pc88va_state::io_map(address_map &map)
 	map(0x0106, 0x0109).w(FUNC(pc88va_state::video_pri_w)); // Palette Control Register (priority) / Direct Color Control Register (priority)
 //  map(0x010a, 0x010b) Picture Mask Mode Register
 	map(0x010c, 0x010d).w(FUNC(pc88va_state::color_mode_w)); // Color Palette Mode Register
-//  map(0x010e, 0x010f) Backdrop Color Register
+	map(0x010e, 0x010f).w(FUNC(pc88va_state::backdrop_color_w));
 //  map(0x0110, 0x0111) Color Code/Plain Mask Register
 //  map(0x0124, 0x0125) ? (related to Transparent Color of Graphic Screen 0)
 //  map(0x0126, 0x0127) ? (related to Transparent Color of Graphic Screen 1)
@@ -1143,9 +1143,9 @@ void pc88va_state::pc88va(machine_config &config)
 	// beep and RS-232C runs at regular 3'993'600
 	m_maincpu->set_tclk(MASTER_CLOCK / 2);
 	// "timer 1"
-//	m_maincpu->tout0_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+//  m_maincpu->tout0_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_maincpu->tout1_cb().set(m_dac1bit, FUNC(speaker_sound_device::level_w));
-//	m_maincpu->tout2_cb().set RS-232C Baud Rate Setting
+//  m_maincpu->tout2_cb().set RS-232C Baud Rate Setting
 	// ch2 is FDC, ch0/3 are "user". ch1 is unused
 	m_maincpu->out_hreq_cb().set(m_maincpu, FUNC(v50_device::hack_w));
 	m_maincpu->out_eop_cb().set(FUNC(pc88va_state::tc_w));
@@ -1166,7 +1166,8 @@ void pc88va_state::pc88va(machine_config &config)
 	m_screen->set_raw(XTAL(42'105'200) / 2, 848, 0, 640, 448, 0, 400);
 	m_screen->set_screen_update(FUNC(pc88va_state::screen_update));
 
-	PALETTE(config, m_palette, FUNC(pc88va_state::palette_init)).set_entries(32);
+	// +1 for backdrop color
+	PALETTE(config, m_palette, FUNC(pc88va_state::palette_init)).set_entries(32 + 1);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pc88va);
 
 	PC88VA_SGP(config, m_sgp);

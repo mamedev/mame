@@ -42,7 +42,9 @@ Garbage layer covering title and gameplay
 		<year>1989</year>
 		<publisher>呉ソフトウェア工房 (Kure Software Koubou)</publisher>
 		<notes><![CDATA[
-Text boxes often don't draw properly, making readability hard
+[gfx] Text boxes often don't draw properly, making readability hard. Comes from graphic layer not IDP.
+[gfx] bitmap draws desynced when scrolling up for a bit, OFY wrap?
+[gfx] has visible garbage on top/bottom, text layer should mask it thru secret?
 ]]></notes>
 		<info name="alt_title" value="ファーストクイーン" />
 		<info name="release" value="198901xx" />

@@ -348,8 +348,9 @@ Runs slow in gameplay
 Needs [IDP] text display to go off for bottommost row (bumps strip 1 height from 384 to 400) (fixed)
 Randomly hangs with a "please wait" when exiting town
 (character select: 3, 1, +, 1, CR, *. In dungeon go north, turn 6 when reaching wall, turn 6 at first split, go north until exit town screen reached and accept with 1)
-Prompts for a いやどすえ PC-98 disk if YADOS.EXE is run from PC Engine OS (?)
 Actual user disk procedure is unknown
+Omake: Prompts for a いやどすえ PC-98 if YADOS.EXE is run from PC Engine OS.
+This is a undumped coverdisk, pages 374~375 of Login 1987.10 mag, also cfr. https://relaxwind.info/retrobooks/login/1987/1987.html
 ]]></notes>
 		<info name="alt_title" value="マイトアンドマジック" />
 		<info name="usage" value="Boot with Disk C in drive 1"/>
@@ -383,6 +384,7 @@ Actual user disk procedure is unknown
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<notes><![CDATA[
 Burps on [FDC] access after disk swap with program and player disks, trying to scan chrn=(4, 0, 1, 256)
+Hangs on Utility menu, [FDC] chrn=(18, 0, 1, 256)
 ]]></notes>
 		<info name="alt_title" value="マイトアンドマジック2" />
 		<sharedfeat name="mouseport_default" value="mouse"/>
