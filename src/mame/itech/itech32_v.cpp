@@ -10,6 +10,8 @@
 #include "emu.h"
 #include "itech32.h"
 
+#include "input.h" // for blitter debug keys
+
 #include <algorithm>
 
 

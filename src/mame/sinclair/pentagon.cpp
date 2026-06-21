@@ -201,7 +201,7 @@ void pentagon_state::pentagon(machine_config &config)
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_pentagon);
 	SPECTRUM_ULA_UNCONTENDED(config.replace(), m_ula);
 
-	BETA_DISK(config, m_beta, 0);
+	BETA_DISK(config, m_beta);
 
 	SPEAKER(config.replace(), "speakers", 2).front();
 

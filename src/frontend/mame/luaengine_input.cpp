@@ -13,6 +13,7 @@
 
 #include "iptseqpoll.h"
 
+#include "input.h"
 #include "inputdev.h"
 #include "natkeyboard.h"
 #include "render.h"

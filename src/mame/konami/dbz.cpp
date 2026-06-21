@@ -553,13 +553,13 @@ void dbz_state::dbz(machine_config &config)
 	m_k053246->set_config(NORMAL_PLANE_ORDER, -87, 32); // or -52, 16?
 	m_k053246->set_palette("palette");
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
-	K053936(config, m_k053936[0], 0);
+	K053936(config, m_k053936[0]);
 	m_k053936[0]->set_wrap(1);
 	m_k053936[0]->set_offsets(-46, -16);
 
-	K053936(config, m_k053936[1], 0);
+	K053936(config, m_k053936[1]);
 	m_k053936[1]->set_wrap(1);
 	m_k053936[1]->set_offsets(-46, -16);
 

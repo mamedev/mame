@@ -95,7 +95,6 @@ private:
 
 void lk3000_state::machine_start()
 {
-	m_digits.resolve();
 	memset(m_ram, 0xff, 0x400);
 
 	// register for savestates

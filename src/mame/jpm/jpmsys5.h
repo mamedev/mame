@@ -44,11 +44,11 @@ public:
 		m_lamps(*this, "lamp%u", 0U),
 		m_sys5leds(*this, "digit%u", 0U),
 		m_reellamp_out(*this, "reellamp%u", 0U),
-		m_reel(*this, "reel%u", 0U)
+		m_reel(*this, "reel%u", 1U)
 	{ }
 
-	void jpmsys5(machine_config &config);
-	void jpmsys5_ym(machine_config &config);
+	void jpmsys5(machine_config &config) ATTR_COLD;
+	void jpmsys5_ym(machine_config &config) ATTR_COLD;
 
 	void ptm_irq(int state);
 	void u26_o1_callback(int state);
@@ -66,10 +66,10 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void jpmsys5_common(machine_config &config);
-	void ymsound(machine_config &config);
-	void saasound(machine_config &config);
-	void reels(machine_config &config);
+	void jpmsys5_common(machine_config &config) ATTR_COLD;
+	void ymsound(machine_config &config) ATTR_COLD;
+	void saasound(machine_config &config) ATTR_COLD;
+	void reels(machine_config &config) ATTR_COLD;
 
 	void jpm_upd7759_w(offs_t offset, uint16_t data);
 	uint16_t jpm_upd7759_r();
@@ -163,13 +163,13 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(touchscreen_press);
 
-	void jpmsys5v(machine_config &config);
+	void jpmsys5v(machine_config &config) ATTR_COLD;
 
 private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void tmsvideo(machine_config &config);
+	void tmsvideo(machine_config &config) ATTR_COLD;
 
 	void generate_tms34061_interrupt(int state);
 	void sys5_tms34061_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

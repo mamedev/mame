@@ -31,7 +31,7 @@
 class rp5h01_device : public device_t
 {
 public:
-	rp5h01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rp5h01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void enable_w(int state);   // /CE
 	void reset_w(int state);    // RESET

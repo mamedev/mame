@@ -1098,12 +1098,12 @@ void ti_rs232_pio_device::device_add_mconfig(machine_config &config)
 	m_uart1->rcv_cb().set(FUNC(ti_rs232_pio_device::rcv1_callback));
 	m_uart1->xmit_cb().set(FUNC(ti_rs232_pio_device::xmit1_callback));
 	m_uart1->ctrl_cb().set(FUNC(ti_rs232_pio_device::ctrl1_callback));
-	TI99_RS232_DEV(config, m_serdev0, 0);
+	TI99_RS232_DEV(config, m_serdev0);
 	m_serdev0->connect(m_uart0);
-	TI99_RS232_DEV(config, m_serdev1, 0);
+	TI99_RS232_DEV(config, m_serdev1);
 	m_serdev1->connect(m_uart1);
 
-	TI99_PIO_DEV(config, m_piodev, 0);
+	TI99_PIO_DEV(config, m_piodev);
 	m_piodev->set_card(this);
 
 	LS259(config, m_crulatch); // U12

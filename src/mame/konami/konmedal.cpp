@@ -851,8 +851,6 @@ INPUT_PORTS_END
 
 void konmedal_state::machine_start_common()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_control));
 	save_item(NAME(m_control2));
 	save_item(NAME(m_ccu_int_time));

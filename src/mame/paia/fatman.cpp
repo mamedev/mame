@@ -618,11 +618,6 @@ void fatman_state::machine_start()
 	save_item(NAME(m_dac_i_fs));
 	save_item(NAME(m_octave_scalers));
 
-	m_pitch_cv_out.resolve();
-	m_velocity_cv_out.resolve();
-	m_gate_out.resolve();
-	m_gate_led.resolve();
-
 	m_vca_eg_comp_timer = timer_alloc(FUNC(fatman_state::vca_eg_comp_tripped), this);
 }
 

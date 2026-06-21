@@ -4846,6 +4846,19 @@ ROM_START( mjdiplob )
 	ROM_LOAD( "ic6k.bin",   0x0000, 0x0020, CRC(c1e427df) SHA1(9a9980d93dff4b87a940398b18277acaf946eeab) )
 ROM_END
 
+ROM_START( mjdiploba )
+	ROM_REGION( 0x90000, "maincpu", 0 )
+	ROM_LOAD( "071.4l",     0x00000, 0x10000, CRC(3f2a4d81) SHA1(046ac1908c5a796ba49d3e9d6e263d4e61c6f870) )
+	// bank switched ROMs follow
+	ROM_RELOAD(             0x10000, 0x10000 )              // 0,1
+	ROM_LOAD( "072.4k",     0x20000, 0x10000, CRC(a992bb85) SHA1(e60231e04831dac122d1d49a68641ee47b57faaf) )    // 2,3
+	ROM_LOAD( "073.4j",     0x30000, 0x10000, CRC(562ed64f) SHA1(42b4a7e5a8de4dde83c12d7b9facf561bc872978) )    // 4,5
+	ROM_LOAD( "074.4h",     0x40000, 0x10000, CRC(1eba0140) SHA1(0d0b95be338d7450ad3b24cc47e24e94f86dcefe) )    // 6,7
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "ic6k.bin",   0x0000, 0x0020, CRC(c1e427df) SHA1(9a9980d93dff4b87a940398b18277acaf946eeab) )
+ROM_END
+
 ROM_START( tontonb )
 	ROM_REGION( 0x90000, "maincpu", 0 )
 	ROM_LOAD( "091.5e",     0x00000, 0x10000, CRC(d8d67b59) SHA1(7e7a85df738f80fc031cda8a104ac9c7b3e24785) )
@@ -5320,12 +5333,13 @@ ROM_END
 
 ROM_START( majrjh ) // ROM test gives all ok
 	ROM_REGION( 0x290000, "maincpu", 0 )
-	ROM_LOAD( "1051d.5e",         0x000000, 0x80000, CRC(5fdc5f9e) SHA1(4a599f83ee1c8ae41a44e98694b6d5515a29b813) ) // 1ST AND 2ND HALF IDENTICAL, tested as 2MB anyway
+	ROM_LOAD( "1051.5e",         0x000000, 0x80000, CRC(5fdc5f9e) SHA1(4a599f83ee1c8ae41a44e98694b6d5515a29b813) ) // 1ST AND 2ND HALF IDENTICAL, tested as 2MB anyway
+	// also seen with correctly sized ROM with hashes CRC(e87a77cb) SHA1(3480116e016c9c1d76e41113d585ef159204ad67)
 	ROM_LOAD( "tmp91p640n-10.3c", 0x000000, 0x04000, CRC(129a11c7) SHA1(450a6a7da29c9206937a16701b34075cda338147) ) // MCU has pins 9 to 10 & 12 to 15 stripped out
 	ROM_COPY( "maincpu", 0x00000, 0x010000, 0x80000 )
 	ROM_COPY( "maincpu", 0x00000, 0x090000, 0x80000 )
-	ROM_LOAD( "1053d.3e",         0x110000, 0x80000, CRC(e5abd309) SHA1(7d80ab9f7bcc66d7332c60a0d02c123582c31a34) )
-	ROM_LOAD( "1052d.4e",         0x210000, 0x80000, CRC(7200599c) SHA1(32e7caad9a9ea756b699f601fab90a419a437f57) )
+	ROM_LOAD( "1053.3e",         0x110000, 0x80000, CRC(e5abd309) SHA1(7d80ab9f7bcc66d7332c60a0d02c123582c31a34) )
+	ROM_LOAD( "1052.4e",         0x210000, 0x80000, CRC(7200599c) SHA1(32e7caad9a9ea756b699f601fab90a419a437f57) )
 
 	ROM_REGION( 0x400, "proms", 0 ) // Color PROMs
 	ROM_LOAD( "d105-2.7e", 0x000, 0x200, CRC(587bca5a) SHA1(327f7bfa035f652bbbfba3f74715515236322c09) )
@@ -6635,7 +6649,8 @@ GAME( 1986,  mjsenka,     0,        mjsenka,  mjyarou,    royalmah_prgbank_state
 GAME( 1986,  mjyarou,     0,        mjyarou,  mjyarou,    royalmah_prgbank_state, init_chalgirl, ROT0,   "Visco / Video System",       "Mahjong Yarou (Japan, set 1)",          MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS ) // never seems to set the palette bank?
 GAME( 1986,  mjyarou2,    mjyarou,  mjyarou,  mjyarou,    royalmah_prgbank_state, init_chalgirl, ROT0,   "Visco / Video System",       "Mahjong Yarou (Japan, set 2)",          MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS ) // never seems to set the palette bank?
 GAME( 1986?, mjclub,      0,        mjclub,   mjclub,     royalmah_prgbank_state, init_tontonb,  ROT0,   "Xex",                        "Mahjong Club (Japan)",                  0 )
-GAME( 1987,  mjdiplob,    0,        mjdiplob, mjdiplob,   royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Mahjong Diplomat (Japan)",              0 )
+GAME( 1987,  mjdiplob,    0,        mjdiplob, mjdiplob,   royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Mahjong Diplomat (Japan, V2)",          0 )
+GAME( 1987,  mjdiploba,   mjdiplob, mjdiplob, mjdiplob,   royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Mahjong Diplomat (Japan)",              0 )
 GAME( 1987,  tontonb,     0,        tontonb,  tontonb,    royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Tonton (Japan, set 1)",                 0 )
 GAME( 1987,  tontonba,    tontonb,  tontonb,  tontonb,    royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Tonton (Japan, ver. 1.00)",             MACHINE_NOT_WORKING ) // hangs when entering bookkeeping, works after reset
 GAME( 1987,  makaijan,    0,        makaijan, makaijan,   royalmah_prgbank_state, init_dynax,    ROT0,   "Dynax",                      "Makaijan (Japan)",                      0 )

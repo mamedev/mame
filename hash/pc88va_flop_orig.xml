@@ -74,7 +74,7 @@ Text boxes often don't draw properly, making readability hard
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="5329817">
-				<rom name="kawaisou monogatari (disk a).mfi" size="5329817" crc="36f34b1" sha1="06b6088aec27c4e44cd0f09c3fb5fd3774c64e8e" offset="0" />
+				<rom name="kawaisou monogatari (disk a).mfi" size="5329817" crc="036f34b1" sha1="06b6088aec27c4e44cd0f09c3fb5fd3774c64e8e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">

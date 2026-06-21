@@ -435,7 +435,7 @@ void sbasketb_state::sbasketb(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	TRACKFLD_AUDIO(config, "soundbrd", 0, m_audiocpu, m_vlm);
+	TRACKFLD_AUDIO(config, "soundbrd", m_audiocpu, m_vlm);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
 

@@ -3,13 +3,14 @@
 
 #include "emu.h"
 
-#include "screen.h"
-#include "speaker.h"
+#include "unknown_bftetris_lcdc.h"
 
 #include "machine/generalplus_gpl951xx_soc.h"
 #include "machine/generic_spi_flash.h"
 
-#include "unknown_bftetris_lcdc.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 namespace {
 
@@ -355,9 +356,9 @@ void generalplus_gpl951xx_game_state::gpl951xx(machine_config &config)
 
 	m_screen->screen_vblank().set(m_maincpu, FUNC(generalplus_gpl951xx_device::vblank));
 
-	UNKNOWN_BFTETRIS_LCDC(config, m_lcdc, 0);
+	UNKNOWN_BFTETRIS_LCDC(config, m_lcdc);
 
-	GENERIC_SPI_FLASH(config, m_genspi, 0);
+	GENERIC_SPI_FLASH(config, m_genspi);
 
 	SPEAKER(config, "speaker", 2).front();
 }
@@ -516,7 +517,7 @@ ROM_END
 
 ROM_START( punirune )
 	ROM_REGION16_BE(0x800000, "spi", ROMREGION_ERASE00)
-	ROM_LOAD16_WORD_SWAP( "25l64.ic103", 0x0000, 0x800000, CRC(0737edc0) SHA1(fce19d91a0522a75e676197fb18645b8c6a273b8) )
+	ROM_LOAD16_WORD_SWAP( "25l64.ic103", 0x0000, 0x800000, CRC(97ce057d) SHA1(6244afd57990b178b4c404d6a08735b6db5348f8) )
 ROM_END
 
 ROM_START( punirunea )
@@ -526,17 +527,12 @@ ROM_END
 
 ROM_START( punij1m )
 	ROM_REGION16_BE(0x800000, "spi", ROMREGION_ERASE00)
-	ROM_LOAD16_WORD_SWAP( "japan_v1pcb_mint_25l6433f.ic103", 0x0000, 0x800000, CRC(76f28b5b) SHA1(be04d60c88df52951dd51eab2f5bf5f1dc2405e8) )
+	ROM_LOAD16_WORD_SWAP( "japan_v1pcb_mint_pink_25l6433f.ic103", 0x0000, 0x800000, CRC(b83c43f3) SHA1(f811d7ad6d28efe4f897155ca20da04168cdb975) )
 ROM_END
 
-ROM_START( punij1pk ) // this might be the same software revision as punij1m with different save (or default save) data
+ROM_START( punij1pu ) // different software revision to punij1m but same case style
 	ROM_REGION16_BE(0x800000, "spi", ROMREGION_ERASE00)
-	ROM_LOAD16_WORD_SWAP( "japan_v1pcb_pink_25l6433f.ic103", 0x0000, 0x800000, CRC(9268c881) SHA1(10bacfa48b3d02956d804396b652829ff868d947) )
-ROM_END
-
-ROM_START( punij1pu ) // different software revision to punij1m / punij1pk but same case style
-	ROM_REGION16_BE(0x800000, "spi", ROMREGION_ERASE00)
-	ROM_LOAD16_WORD_SWAP( "japan_v1pcb_purple_25l6433f.ic103", 0x0000, 0x800000, CRC(5b73bcb6) SHA1(109b6fa29693e7622c528d95d2a995d37a1cd8ca) )
+	ROM_LOAD16_WORD_SWAP( "japan_v1pcb_purple_25l6433f.ic103", 0x0000, 0x800000, CRC(ac6dd1f2) SHA1(00e65f272e45cc7f01f69a5d971728a9a7fdf17a) )
 ROM_END
 
 ROM_START( punij2pk )
@@ -546,7 +542,7 @@ ROM_END
 
 ROM_START( punifrnd )
 	ROM_REGION16_BE(0x800000, "spi", ROMREGION_ERASE00)
-	ROM_LOAD16_WORD_SWAP( "25oh64.ic3", 0x0000, 0x800000, CRC(622ca9b3) SHA1(4206393a4458ffcdb63352e743481865532fe8b5) )
+	ROM_LOAD16_WORD_SWAP( "25oh64.ic3", 0x0000, 0x800000, CRC(49e14af2) SHA1(477d1335587894793bac913c877d82dba46884d3) )
 ROM_END
 
 ROM_START( punistar )
@@ -621,12 +617,12 @@ ROM_END
 
 ROM_START( segapet2 )
 	ROM_REGION16_BE(0x800000, "spi", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "purple_gpr25l64.ic3", 0x0000, 0x800000, CRC(e223eabf) SHA1(fa88173361af7f8cb7651bd7ccb73d7137eb6cf9) )
+	ROM_LOAD16_WORD_SWAP( "purple_gpr25l64.ic3", 0x0000, 0x800000, CRC(a5f2cd07) SHA1(ba510b2afce3826f5153f6a606bf9d2d3b1c4399) )
 ROM_END
 
 ROM_START( segapet2a )
 	ROM_REGION16_BE(0x800000, "spi", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "orange_gpr25l64.ic3", 0x0000, 0x800000, CRC(25605da6) SHA1(2733f30037551b2e5895efbb19ed953e81405141) )
+	ROM_LOAD16_WORD_SWAP( "orange_gpr25l64.ic3", 0x0000, 0x800000, CRC(3776c81a) SHA1(6ba67098a38e4efe7bab63ff052c98a00e1cdabd) )
 ROM_END
 
 ROM_START( segapet3 )
@@ -646,7 +642,7 @@ ROM_END
 
 ROM_START( bubltea )
 	ROM_REGION16_BE(0x800000, "spi", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "gpr25l64.ic2", 0x0000, 0x800000, CRC(a6d73241) SHA1(bc67d932ffc83d91dc2d64f40bbce08c1e8b9f4e) )
+	ROM_LOAD16_WORD_SWAP( "gpr25l64.ic2", 0x0000, 0x800000, CRC(56549fa7) SHA1(4a03b4c69035baa48b146ecee3912a3b0672b845) )
 ROM_END
 
 void generalplus_gpl951xx_game_state::init_fif()
@@ -680,8 +676,7 @@ CONS(2021, punirune,  0,        0, puni, puni, generalplus_gpl951xx_game_state, 
 CONS(2021, punirunea, punirune, 0, puni, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (HXR-1 PCB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // the case on these looks like the European release, including English title logo.  CPU is a glob, PUNIRUNZU_MAIN_DICE_V1 on PCB
-CONS(2021, punij1m,  punirune, 0, puni, puni, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_DICE_V1, mint, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2021, punij1pk, punirune, 0, puni, puni, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_DICE_V1, pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, punij1m,  punirune, 0, puni, puni, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_DICE_V1, mint/pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2021, punij1pu, punirune, 0, puni, puni, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_DICE_V1, purple, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // the case on these is similar to the above, but the text is in Japanese, uses PUNIRUNZU_MAIN_V2 on pcb
@@ -730,8 +725,8 @@ CONS( 2018, segapet1a, segapet1, 0, puni, segapet1, generalplus_gpl951xx_game_st
 CONS( 2020, segaptdx,  0,        0, puni, segapet1, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu DX (190313A P)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // also もっちりペット もっちまるず
-CONS( 2019, segapet2,  0,        0, puni, segapet2, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu (2019 version, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS( 2019, segapet2a, segapet2, 0, puni, segapet2, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu (2019 version, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2019, segapet2,  0,        0, puni, segapet2, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu (2019 version, purple)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2019, segapet2a, segapet2, 0, puni, segapet2, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu (2019 version, orange)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // these ones have motors in the ears and a more fluffy cover
 // もっちふわペット もっちまるず

@@ -2568,7 +2568,7 @@ void nbmj8688_state::NBMJDRV_4096(machine_config &config)
 	Z80(config, m_maincpu, 5000000);   /* 5.00 MHz */
 	m_maincpu->set_vblank_int("screen", FUNC(nbmj8688_state::irq0_line_hold));
 
-	NB1413M3(config, m_nb1413m3, 0);
+	NB1413M3(config, m_nb1413m3);
 	m_nb1413m3->set_blitter_rom_tag("gfx1");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -2727,7 +2727,7 @@ void nbmj8688_state::mbmj_p16bit_LCD(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::secolove_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::p16bit_LCD_io_map);
 
-	NB1413M3(config, m_nb1413m3, 0);
+	NB1413M3(config, m_nb1413m3);
 	m_nb1413m3->set_blitter_rom_tag("gfx1");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);

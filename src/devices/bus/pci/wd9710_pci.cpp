@@ -60,7 +60,7 @@ void wd9710_pci_device::device_add_mconfig(machine_config &config)
 	screen.set_screen_update("vga", FUNC(wd90c33_vga_device::screen_update));
 
 	// TODO: bump to specific WD9710 VGA core
-	WD90C33(config, m_vga, 0);
+	WD90C33(config, m_vga);
 	m_vga->set_screen("screen");
 	// 2MB, 4MB
 	m_vga->set_vram_size(4*1024*1024);

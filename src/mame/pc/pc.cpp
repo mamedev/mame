@@ -212,12 +212,11 @@ void pc_state::pccga(machine_config &config)
 	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
 
-	// FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false);
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "lpt", false);
-	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
-	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, "cga", false);
+	ISA8_SLOT(config, "isa2", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, "fdc_xt", false);
+	ISA8_SLOT(config, "isa3", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, "lpt", false);
+	ISA8_SLOT(config, "isa4", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, "com", false);
+	ISA8_SLOT(config, "isa5", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, nullptr, false);
 
 	/* keyboard */
 	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
@@ -408,9 +407,11 @@ enter the system bootstrap sequence detailed below.
 void pc_state::mpc1600(machine_config &config)
 {
 	pccga(config);
-	ISA8_SLOT(config, "isa6", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa7", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa8", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+
+	ISA8_SLOT(config, "isa6", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa7", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa8", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, nullptr, false);
+
 	subdevice<ram_device>(RAM_TAG)->set_default_size("128K").set_extra_options("256K, 512K, 640K");
 }
 
@@ -852,8 +853,9 @@ DIP settings:  Sw.1  Sw.2  Sw.3  Sw.4  Sw.5  Sw.6  Sw.7  Sw.8  effect
 void pc_state::ncrpc4i(machine_config & config)
 {
 	pccga(config);
-	ISA8_SLOT(config, "isa6", 0, "mb:isa", pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa7", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+
+	ISA8_SLOT(config, "isa6", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa7", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, nullptr, false);
 
 	subdevice<ram_device>(RAM_TAG)->set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 }
@@ -997,7 +999,7 @@ ROM_END
 void pc_state::poisk2(machine_config &config)
 {
 	/* basic machine hardware */
-	i8086_cpu_device &maincpu(I8086(config, "maincpu", 4772720));
+	i8086_cpu_device &maincpu(I8086(config, "maincpu", 4'772'720));
 	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc16_map);
 	maincpu.set_addrmap(AS_IO, &pc_state::pc16_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
@@ -1010,10 +1012,10 @@ void pc_state::poisk2(machine_config &config)
 	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
 
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga_poisk2", false); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "lpt", false);
-	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
+	ISA8_SLOT(config, "isa1", 4'772'720, "mb:isa", pc_isa8_cards, "cga_poisk2", false);
+	ISA8_SLOT(config, "isa2", 4'772'720, "mb:isa", pc_isa8_cards, "fdc_xt", false);
+	ISA8_SLOT(config, "isa3", 4'772'720, "mb:isa", pc_isa8_cards, "lpt", false);
+	ISA8_SLOT(config, "isa4", 4'772'720, "mb:isa", pc_isa8_cards, "com", false);
 
 	/* keyboard */
 	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
@@ -1099,7 +1101,7 @@ DEVICE_INPUT_DEFAULTS_END
 void pc_state::iskr3104(machine_config &config)
 {
 	/* basic machine hardware */
-	i8086_cpu_device &maincpu(I8086(config, "maincpu", 4772720));
+	i8086_cpu_device &maincpu(I8086(config, "maincpu", 4'772'720));
 	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc16_map);
 	maincpu.set_addrmap(AS_IO, &pc_state::pc16_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
@@ -1112,10 +1114,10 @@ void pc_state::iskr3104(machine_config &config)
 	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(iskr3104));
 
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "ega", false).set_option_default_bios("ega", "iskr3104"); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "lpt", false);
-	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
+	ISA8_SLOT(config, "isa1", 4'772'720, "mb:isa", pc_isa8_cards, "ega", false).set_option_default_bios("ega", "iskr3104");
+	ISA8_SLOT(config, "isa2", 4'772'720, "mb:isa", pc_isa8_cards, "fdc_xt", false);
+	ISA8_SLOT(config, "isa3", 4'772'720, "mb:isa", pc_isa8_cards, "lpt", false);
+	ISA8_SLOT(config, "isa4", 4'772'720, "mb:isa", pc_isa8_cards, "com", false);
 
 	/* keyboard */
 	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
@@ -1377,10 +1379,10 @@ void pc_state::zenith(machine_config &config)
 	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
 
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false).set_option_machine_config("fdc_xt", cfg_dual_720K);
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "lpt", false);
-	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
+	ISA8_SLOT(config, "isa1", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, "cga", false);
+	ISA8_SLOT(config, "isa2", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, "fdc_xt", false).set_option_machine_config("fdc_xt", cfg_dual_720K);
+	ISA8_SLOT(config, "isa3", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, "lpt", false);
+	ISA8_SLOT(config, "isa4", XTAL(14'318'181)/3, "mb:isa", pc_isa8_cards, "com", false);
 
 	/* keyboard */
 	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
@@ -1561,7 +1563,7 @@ SWA: SW1  SW2  SW3  SW4  SW5  SW6  SW7  SW8  effect
 void pc_state::juko16(machine_config &config)
 {
 	/* basic machine hardware */
-	v30_device &maincpu(V30(config, "maincpu", 4772720));
+	v30_device &maincpu(V30(config, "maincpu", 4'772'720));
 	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc16_map);
 	maincpu.set_addrmap(AS_IO, &pc_state::pc16_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
@@ -1574,10 +1576,10 @@ void pc_state::juko16(machine_config &config)
 	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
 
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "ega", false); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "lpt", false);
-	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
+	ISA8_SLOT(config, "isa1", 4'772'720, "mb:isa", pc_isa8_cards, "ega", false);
+	ISA8_SLOT(config, "isa2", 4'772'720, "mb:isa", pc_isa8_cards, "fdc_xt", false);
+	ISA8_SLOT(config, "isa3", 4'772'720, "mb:isa", pc_isa8_cards, "lpt", false);
+	ISA8_SLOT(config, "isa4", 4'772'720, "mb:isa", pc_isa8_cards, "com", false);
 
 	/* keyboard */
 	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
@@ -2104,7 +2106,7 @@ void pc_state::pc8_flash_map(address_map &map)
 void pc_state::modernxt(machine_config &config) // this is just to load the ROMs properly, the XT/AT hardware combination resp. the FE2010A (see notes) needs to be set up
 {
 	/* basic machine hardware */
-	v20_device &maincpu(V20(config, "maincpu", 8000000));
+	v20_device &maincpu(V20(config, "maincpu", 8'000'000));
 	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc8_flash_map);
 	maincpu.set_addrmap(AS_IO, &pc_state::pc8_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
@@ -2206,7 +2208,7 @@ Mass storage: No internal mass storage possible, boot via Arcnet or a project li
 void pc_state::earthst(machine_config &config)
 {
 	/* basic machine hardware */
-	v20_device &maincpu(V20(config, "maincpu", 8000000));
+	v20_device &maincpu(V20(config, "maincpu", 8'000'000));
 	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc8_map);
 	maincpu.set_addrmap(AS_IO, &pc_state::pc8_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));

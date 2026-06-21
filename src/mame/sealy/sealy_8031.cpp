@@ -210,7 +210,7 @@ void sealy_8031_state::jinsanse(machine_config &config)
 	m_maincpu->port_out_cb<2>().set([this] (uint8_t data) { LOGPORTS("%s: 8031 port 2 out %02x\n", machine().describe_context(), data); });
 	m_maincpu->port_out_cb<3>().set([this] (uint8_t data) { LOGPORTS("%s: 8031 port 3 out %02x\n", machine().describe_context(), data); });
 
-	AT28C16(config, "at28c16", 0);
+	AT28C16(config, "at28c16");
 
 	PIA6821(config, "pia0");
 

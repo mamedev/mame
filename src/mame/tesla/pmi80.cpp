@@ -56,10 +56,14 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void pmi80(machine_config &config);
+	void pmi80(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 	DECLARE_INPUT_CHANGED_MEMBER(int_button);
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	uint8_t keyboard_r();
@@ -73,8 +77,6 @@ private:
 	bool m_ledready = false;
 	bool m_cassbit = false, m_cassold = false;
 	u16 m_cass_cnt = 0U;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void machine_start() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi1;
 	required_device<cassette_image_device> m_cass;
@@ -203,8 +205,6 @@ void pmi80_state::machine_reset()
 
 void pmi80_state::machine_start()
 {
-	m_digits.resolve();
-
 	save_item(NAME(m_keyrow));
 	save_item(NAME(m_ledready));
 	save_item(NAME(m_cassbit));

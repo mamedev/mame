@@ -8,9 +8,14 @@
 class ky3211_device : public device_t, public device_gfx_interface
 {
 public:
-	ky3211_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ky3211_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	template <typename T> ky3211_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag)
 		: ky3211_device(mconfig, tag, owner, clock)
+	{
+		set_palette(std::forward<T>(palette_tag));
+	}
+	template <typename T> ky3211_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag)
+		: ky3211_device(mconfig, tag, owner)
 	{
 		set_palette(std::forward<T>(palette_tag));
 	}
@@ -42,9 +47,14 @@ private:
 class ky10510_device : public ky3211_device
 {
 public:
-	ky10510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ky10510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	template <typename T> ky10510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag)
 		: ky10510_device(mconfig, tag, owner, clock)
+	{
+		set_palette(std::forward<T>(palette_tag));
+	}
+	template <typename T> ky10510_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag)
+		: ky10510_device(mconfig, tag, owner)
 	{
 		set_palette(std::forward<T>(palette_tag));
 	}

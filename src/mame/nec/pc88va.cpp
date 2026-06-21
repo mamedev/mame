@@ -16,8 +16,6 @@ TODO:
 - pc88va is also known to have a slightly different banking scheme and
   regular YM2203 as default sound board.
 - video emulation is lacking many features, cfr. pc88va_v.cpp;
-- keyboard runs on undumped MCU, we currently stick irqs together on
-  selected keys in order to have an easier QoL while testing this.
 - Backport from PC-8801 main map, apply supersets where applicable;
   \- IDP has EMUL for upd3301
   \- In emulation mode HW still relies to a i8214, so it bridges thru
@@ -42,7 +40,7 @@ TODO:
 - Support for PC8801 compatible mode & PC80S31K (floppy interface);
 
 Notes:
-- hold F8 at POST to bring software dip settings menu, F5 to cycle between pages;
+- hold PC key at POST to bring software dip settings menu, F5 to cycle between pages;
 - PC-88VA-91 is a ROM upgrade kit for a PC-88VA -> VA2/VA3.
   Has four roms, marked by VAEG as VUROM00.ROM, VUROM08.ROM, VUROM1.ROM, VUDIC.ROM.
 
@@ -81,6 +79,8 @@ brk 8Ch AH=02h read calendar clock -> CH = hour, CL = minutes, DH = seconds, DL 
 
 #include "emu.h"
 #include "pc88va.h"
+#include "pc88_kbd.h"
+#include "pc88va_memsw.h"
 
 #include "bus/pc98_cbus/options.h"
 
@@ -113,7 +113,6 @@ uint8_t pc88va_state::kanji_ram_r(offs_t offset)
 	return m_kanji_ram[offset];
 }
 
-// TODO: settings area should be write protected depending on the m_backupram_wp bit, separate from this
 void pc88va_state::kanji_ram_w(offs_t offset, uint8_t data)
 {
 	m_kanji_ram[offset] = data;
@@ -217,26 +216,6 @@ uint8_t pc88va_state::rom_bank_r()
 {
 	// bit 7 low is PC-88VA-91 rom bank status
 	return 0xff;
-}
-
-uint8_t pc88va_state::key_r(offs_t offset)
-{
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
-											"KEY4", "KEY5", "KEY6", "KEY7",
-											"KEY8", "KEY9", "KEYA", "KEYB",
-											"KEYC", "KEYD", "KEYE", "KEYF" };
-
-	return ioport(keynames[offset])->read();
-}
-
-void pc88va_state::backupram_wp_1_w(uint16_t data)
-{
-	m_backupram_wp = 1;
-}
-
-void pc88va_state::backupram_wp_0_w(uint16_t data)
-{
-	m_backupram_wp = 0;
 }
 
 /*
@@ -503,14 +482,6 @@ TIMER_CALLBACK_MEMBER(pc88va_state::t3_mouse_callback)
 }
 
 
-uint8_t pc88va_state::backupram_dsw_r(offs_t offset)
-{
-	if(offset == 0)
-		return m_kanji_ram[0x1fc2 / 2] & 0xff;
-
-	return m_kanji_ram[0x1fc6 / 2] & 0xff;
-}
-
 // TODO: pc8801_state::port31_w
 void pc88va_state::sys_port1_w(uint8_t data)
 {
@@ -564,6 +535,7 @@ void pc88va_state::sysbank_map(address_map &map)
 	map(0x240000, 0x24ffff).rom().region("kanji", 0x40000);
 	// Backup RAM & PCG
 	map(0x250000, 0x253fff).rw(FUNC(pc88va_state::kanji_ram_r),FUNC(pc88va_state::kanji_ram_w));
+	map(0x251fc0, 0x251fdf).rw("memsw", FUNC(pc88va_memsw_device::read), FUNC(pc88va_memsw_device::write));
 	// c-d dictionary
 	map(0x300000, 0x37ffff).rom().region("dictionary", 0);
 }
@@ -589,10 +561,10 @@ void pc88va_state::sgp_map(address_map &map)
 // (*) are specific N88 V1 / V2 ports
 void pc88va_state::io_map(address_map &map)
 {
-	map(0x0000, 0x000f).r(FUNC(pc88va_state::key_r)); // Keyboard ROW reading
+	map(0x0000, 0x000f).r("kbd", FUNC(pc88va_kbd_device::read_direct));
 	map(0x0010, 0x0010).w(FUNC(pc88va_state::rtc_w)); // Printer / Calendar Clock Interface
 	map(0x0020, 0x0021).noprw(); // RS-232C
-	map(0x0030, 0x0031).rw(FUNC(pc88va_state::backupram_dsw_r), FUNC(pc88va_state::sys_port1_w)); // 0x30 (R) DSW1 (W) Text Control Port 0 / 0x31 (R) DSW2 (W) System Port 1
+	map(0x0030, 0x0031).r("memsw", FUNC(pc88va_memsw_device::dsw_r)).w(FUNC(pc88va_state::sys_port1_w)); // 0x30 (R) DSW1 (W) Text Control Port 0 / 0x31 (R) DSW2 (W) System Port 1
 	map(0x0032, 0x0032).rw(FUNC(pc88va_state::misc_ctrl_r), FUNC(pc88va_state::misc_ctrl_w));
 //  map(0x0034, 0x0034) GVRAM Control Port 1
 //  map(0x0035, 0x0035) GVRAM Control Port 2
@@ -653,17 +625,23 @@ void pc88va_state::io_map(address_map &map)
 //  map(0x0190, 0x0191) System Port 5
 	map(0x0190, 0x0190).rw(FUNC(pc88va_state::sys_port5_r), FUNC(pc88va_state::sys_port5_w));
 //  map(0x0196, 0x0197) Keyboard sub CPU command port
-	map(0x0198, 0x0199).w(FUNC(pc88va_state::backupram_wp_1_w)); //Backup RAM write inhibit
-	map(0x019a, 0x019b).w(FUNC(pc88va_state::backupram_wp_0_w)); //Backup RAM write permission
+	map(0x0198, 0x0199).w("memsw", FUNC(pc88va_memsw_device::write_disable_w));
+	map(0x019a, 0x019b).w("memsw", FUNC(pc88va_memsw_device::write_enable_w));
 //  map(0x01a0, 0x01a7) V50 TCU
 	map(0x01a8, 0x01a8).w(FUNC(pc88va_state::timer3_ctrl_reg_w)); // General-purpose timer 3 control port
 	map(0x01b0, 0x01b7).rw(FUNC(pc88va_state::fdc_r), FUNC(pc88va_state::fdc_w)).umask16(0x00ff); // FDC related (765)
 	map(0x01b8, 0x01bb).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
 //  map(0x01c0, 0x01c1) keyboard scan code, polled thru IRQ1 ...
-	map(0x01c1, 0x01c1).lr8(NAME([this] () { return m_keyb.data; }));
+	map(0x01c0, 0x01c1).r("kbd", FUNC(pc88va_kbd_device::read));
 	map(0x01c6, 0x01c7).nopw(); // ???
 	map(0x01c8, 0x01cf).rw("d8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00); //i8255 3 (byte access)
 //  map(0x01d0, 0x01d1) Expansion RAM bank selection
+//  map(0x01e2, 0x01e2) (w) <unknown> accessed in EEPROM fashion at boot (?)
+	map(0x01e6, 0x01e6).lr8(NAME([] () {
+		// (r) <unknown> bit 7 read at BIOS boot after above, looped by 0x10000 cycles (?)
+		// at '0' makes boot way slower (???)
+		return 0xff;
+	}));
 	map(0x0200, 0x027f).ram().share("fb_regs"); // Frame buffer 0-1-2-3 control parameter
 	// TODO: shinraba writes to 0x340-0x37f on transition between opening and title screens (mirror? core bug?)
 	map(0x0300, 0x033f).ram().w(FUNC(pc88va_state::palette_ram_w)).share("palram"); // Palette RAM (xBBBBxRRRRxGGGG format)
@@ -840,178 +818,8 @@ void pc88va_state::opna_map(address_map &map)
 	map(0x000000, 0x1fffff).ram();
 }
 
-// TODO: quick and dirty support
-// should really inherit from the PC8001/PC8801 family as a device, applying the fact that is running on (undumped) MCU instead
-INPUT_CHANGED_MEMBER(pc88va_state::key_stroke)
-{
-	if(newval && !oldval)
-	{
-		m_keyb.data = uint8_t(param & 0xff);
-		//m_keyb.status &= ~1;
-		m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
-		m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
-	}
-
-	// TODO: eventually thrown away by the MCU after set time
-	if(oldval && !newval)
-	{
-		m_keyb.data = 0xff;
-		//m_keyb.status |= 1;
-	}
-}
-
-#define VA_PORT_SCAN(_scancode_) \
-	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pc88va_state::key_stroke), _scancode_)
 
 static INPUT_PORTS_START( pc88va )
-	PORT_START("KEY0")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD)       PORT_CHAR(UCHAR_MAMEKEY(0_PAD)) VA_PORT_SCAN(0x4e)
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD)       PORT_CHAR(UCHAR_MAMEKEY(1_PAD)) VA_PORT_SCAN(0x4a)
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD)       PORT_CHAR(UCHAR_MAMEKEY(2_PAD)) VA_PORT_SCAN(0x4b)
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD)       PORT_CHAR(UCHAR_MAMEKEY(3_PAD)) VA_PORT_SCAN(0x4c)
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD)       PORT_CHAR(UCHAR_MAMEKEY(4_PAD)) VA_PORT_SCAN(0x46)
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5_PAD)       PORT_CHAR(UCHAR_MAMEKEY(5_PAD)) VA_PORT_SCAN(0x47)
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD)       PORT_CHAR(UCHAR_MAMEKEY(6_PAD)) VA_PORT_SCAN(0x48)
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD)       PORT_CHAR(UCHAR_MAMEKEY(7_PAD)) VA_PORT_SCAN(0x42)
-
-	PORT_START("KEY1")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD)       PORT_CHAR(UCHAR_MAMEKEY(8_PAD)) VA_PORT_SCAN(0x43)
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD)       PORT_CHAR(UCHAR_MAMEKEY(9_PAD)) VA_PORT_SCAN(0x44)
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK)    PORT_CHAR(UCHAR_MAMEKEY(ASTERISK)) VA_PORT_SCAN(0x45)
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)    PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD)) VA_PORT_SCAN(0x49)
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGUP)        PORT_CHAR(UCHAR_MAMEKEY(EQUALS_PAD)) VA_PORT_SCAN(0x4d)
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGDN)        PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD)) VA_PORT_SCAN(0x4f)
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)     PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD)) VA_PORT_SCAN(0x39)
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER)       PORT_CHAR(13) VA_PORT_SCAN(0x1c)
-
-	PORT_START("KEY2")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)   PORT_CHAR('@') VA_PORT_SCAN(0x1a)
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)           PORT_CHAR('a') PORT_CHAR('A') VA_PORT_SCAN(0x1d)
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)           PORT_CHAR('b') PORT_CHAR('B') VA_PORT_SCAN(0x2d)
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)           PORT_CHAR('c') PORT_CHAR('C') VA_PORT_SCAN(0x2b)
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)           PORT_CHAR('d') PORT_CHAR('D') VA_PORT_SCAN(0x1f)
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)           PORT_CHAR('e') PORT_CHAR('E') VA_PORT_SCAN(0x12)
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)           PORT_CHAR('f') PORT_CHAR('F') VA_PORT_SCAN(0x20)
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)           PORT_CHAR('g') PORT_CHAR('G') VA_PORT_SCAN(0x21)
-
-	PORT_START("KEY3")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)           PORT_CHAR('h') PORT_CHAR('H') VA_PORT_SCAN(0x22)
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)           PORT_CHAR('i') PORT_CHAR('I') VA_PORT_SCAN(0x17)
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)           PORT_CHAR('j') PORT_CHAR('J') VA_PORT_SCAN(0x23)
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)           PORT_CHAR('k') PORT_CHAR('K') VA_PORT_SCAN(0x24)
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)           PORT_CHAR('l') PORT_CHAR('L') VA_PORT_SCAN(0x25)
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)           PORT_CHAR('m') PORT_CHAR('M') VA_PORT_SCAN(0x2f)
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)           PORT_CHAR('n') PORT_CHAR('N') VA_PORT_SCAN(0x2e)
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)           PORT_CHAR('o') PORT_CHAR('O') VA_PORT_SCAN(0x18)
-
-	PORT_START("KEY4")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)           PORT_CHAR('p') PORT_CHAR('P') VA_PORT_SCAN(0x19)
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)           PORT_CHAR('q') PORT_CHAR('Q') VA_PORT_SCAN(0x10)
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)           PORT_CHAR('r') PORT_CHAR('R') VA_PORT_SCAN(0x13)
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)           PORT_CHAR('s') PORT_CHAR('S') VA_PORT_SCAN(0x1e)
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)           PORT_CHAR('t') PORT_CHAR('T') VA_PORT_SCAN(0x14)
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)           PORT_CHAR('u') PORT_CHAR('U') VA_PORT_SCAN(0x16)
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)           PORT_CHAR('v') PORT_CHAR('V') VA_PORT_SCAN(0x2c)
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)           PORT_CHAR('w') PORT_CHAR('W') VA_PORT_SCAN(0x11)
-
-	PORT_START("KEY5")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)           PORT_CHAR('x') PORT_CHAR('X') VA_PORT_SCAN(0x2a)
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)           PORT_CHAR('y') PORT_CHAR('Y') VA_PORT_SCAN(0x15)
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)           PORT_CHAR('z') PORT_CHAR('Z') VA_PORT_SCAN(0x29)
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)  PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH2)  PORT_CHAR(0xA5) PORT_CHAR('|')
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)   PORT_CHAR(']') PORT_CHAR('}')
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)      PORT_CHAR('^')
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)       PORT_CHAR('-') PORT_CHAR('=')
-
-	PORT_START("KEY6")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)           PORT_CHAR('0')
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)           PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)           PORT_CHAR('2') PORT_CHAR('"')
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)           PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)           PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)           PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)           PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)           PORT_CHAR('7') PORT_CHAR('\'')
-
-	PORT_START("KEY7")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)           PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)           PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)       PORT_CHAR(':') PORT_CHAR('*') VA_PORT_SCAN(0x27)
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)       PORT_CHAR(';') PORT_CHAR('+') VA_PORT_SCAN(0x26)
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)       PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)        PORT_CHAR('.') PORT_CHAR('>') VA_PORT_SCAN(0x50)
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)       PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("  _") PORT_CODE(KEYCODE_DEL)            PORT_CHAR(0) PORT_CHAR('_')
-
-	PORT_START("KEY8")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Clr Home") PORT_CODE(KEYCODE_HOME)      PORT_CHAR(UCHAR_MAMEKEY(HOME))
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP)   PORT_CHAR(UCHAR_MAMEKEY(UP)) VA_PORT_SCAN(0x3a)
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) VA_PORT_SCAN(0x3c)
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del Ins") PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(UCHAR_MAMEKEY(DEL)) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Grph") PORT_CODE(KEYCODE_LALT)  PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(F7))
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Kana") PORT_CODE(KEYCODE_LCONTROL) PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(F6))
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RCONTROL)                        PORT_CHAR(UCHAR_SHIFT_2)
-
-	PORT_START("KEY9")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Stop")                                  PORT_CHAR(UCHAR_MAMEKEY(PAUSE)) VA_PORT_SCAN(0x60)
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F1)                              PORT_CHAR(UCHAR_MAMEKEY(F1))
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F2)                              PORT_CHAR(UCHAR_MAMEKEY(F2))
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F3)                              PORT_CHAR(UCHAR_MAMEKEY(F3))
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F4)                              PORT_CHAR(UCHAR_MAMEKEY(F4))
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5)                              PORT_CHAR(UCHAR_MAMEKEY(F5)) VA_PORT_SCAN(0x66)
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)                           PORT_CHAR(' ') VA_PORT_SCAN(0x34)
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC)                             PORT_CHAR(UCHAR_MAMEKEY(ESC))
-
-	PORT_START("KEYA")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)                             PORT_CHAR('\t')
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN)   PORT_CHAR(UCHAR_MAMEKEY(DOWN)) VA_PORT_SCAN(0x3d)
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT)   PORT_CHAR(UCHAR_MAMEKEY(LEFT)) VA_PORT_SCAN(0x3b)
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Help") PORT_CODE(KEYCODE_END)           PORT_CHAR(UCHAR_MAMEKEY(F8))
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Copy") PORT_CODE(KEYCODE_F2)            PORT_CHAR(UCHAR_MAMEKEY(PRTSCR))
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD)                       PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD)                       PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
-
-	PORT_START("KEYB")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Roll Up") PORT_CODE(KEYCODE_F8)         PORT_CHAR(UCHAR_MAMEKEY(PGUP))
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Roll Down") PORT_CODE(KEYCODE_F9)       PORT_CHAR(UCHAR_MAMEKEY(PGDN))
-	// TODO: definitely other bits in here, cfr. pc8801ma extra keys
-	PORT_BIT(0xfc,IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("KEYC")
-	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1) VA_PORT_SCAN(0x62)
-	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2) VA_PORT_SCAN(0x63)
-	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F3") PORT_CODE(KEYCODE_F3) VA_PORT_SCAN(0x64)
-	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F4") PORT_CODE(KEYCODE_F4) VA_PORT_SCAN(0x65)
-	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F5") PORT_CODE(KEYCODE_F5) VA_PORT_SCAN(0x66)
-	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) VA_PORT_SCAN(0x0e)
-	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("INS") PORT_CODE(KEYCODE_INSERT)
-	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("DEL") PORT_CODE(KEYCODE_DEL)
-
-	PORT_START("KEYD")
-	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F6") PORT_CODE(KEYCODE_F6) VA_PORT_SCAN(0x67)
-	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F7") PORT_CODE(KEYCODE_F7) VA_PORT_SCAN(0x68)
-	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F8") PORT_CODE(KEYCODE_F8) VA_PORT_SCAN(0x69)
-	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F9") PORT_CODE(KEYCODE_F9) VA_PORT_SCAN(0x6a)
-	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F10") PORT_CODE(KEYCODE_F10) VA_PORT_SCAN(0x6b)
-	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) // Conversion?
-	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) // Decision?
-	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Space") // ?
-
-	PORT_START("KEYE")
-	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad Enter") PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(13) VA_PORT_SCAN(0x79)
-	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Left Shift") PORT_CODE(KEYCODE_LSHIFT)
-	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_RSHIFT)
-	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD)
-	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD)
-	PORT_BIT(0xc0,IP_ACTIVE_LOW,IPT_UNUSED)
-
-	PORT_START("KEYF")
-	PORT_BIT(0xff,IP_ACTIVE_LOW,IPT_UNUSED)
-
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x00, "CRT Mode" )
 	PORT_DIPSETTING(    0x01, "15.7 KHz" )
@@ -1142,9 +950,22 @@ void pc88va_state::r232_ctrl_portb_w(uint8_t data)
 	// ...
 }
 
+/*
+ * System port 8
+ * 1--- ---- Always '1'
+ * -x-- ---- N88V3 LED
+ * --x- ---- N88V2 LED
+ * ---x ---- N88V1 LED
+ * ---- x--- XBEEP
+ * (following are available in 8259 mode only)
+ * ---- -x-- XTXRMF RS-232C TxRDY irq mask (1 = enabled)
+ * ---- --x- XTXEMF RS-232C TxEMPTY irq mask
+ * ---- ---x XRXRMF RS-232C RxRDY irq mask
+ */
 void pc88va_state::r232_ctrl_portc_w(uint8_t data)
 {
-	// ...
+	m_dac1bit_disable = BIT(data, 3);
+	m_dac1bit->set_output_gain(0, m_dac1bit_disable ? 0.0 : 1.0);
 }
 
 /****************************************
@@ -1263,7 +1084,6 @@ void pc88va_state::machine_reset()
 
 	m_bank_reg = 0x4100;
 	m_sysbank->set_bank(1);
-	m_backupram_wp = 1;
 	m_rstmd = false;
 
 	m_tsp.tvram_vreg_offset = 0;
@@ -1279,6 +1099,9 @@ void pc88va_state::machine_reset()
 	m_sound_irq_pending = false;
 
 	m_dack = -1;
+
+	m_dac1bit_disable = true;
+	m_dac1bit->set_output_gain(0, 0.0);
 }
 
 // NOTE: PC-88VA implementation omits some C-Bus lines compared to PC-98.
@@ -1287,7 +1110,7 @@ void pc88va_state::machine_reset()
 // cfr. schematics pg. 260, "external bus, videoboard connector"
 void pc88va_state::pc88va_cbus(machine_config &config)
 {
-	PC98_CBUS_ROOT(config, m_cbus_root, 0);
+	PC98_CBUS_ROOT(config, m_cbus_root);
 	m_cbus_root->int_cb<0>().set_inputline(m_maincpu, INPUT_LINE_IRQ3);
 	m_cbus_root->int_cb<1>().set_inputline(m_maincpu, INPUT_LINE_IRQ5);
 	m_cbus_root->int_cb<2>().set_inputline(m_maincpu, INPUT_LINE_IRQ6);
@@ -1299,6 +1122,7 @@ void pc88va_state::pc88va_cbus(machine_config &config)
 	m_maincpu->out_iow_cb<0>().set([this] (u8 data) { m_cbus_root->dack_w(0, data); });
 
 	// should be 3 slots for each iteration here
+	// FIXME: set clock to SCKL1 clock frequency
 	PC98_CBUS_SLOT(config, "cbus:0", 0, "cbus", pc88va_cbus_devices, nullptr);
 	PC98_CBUS_SLOT(config, "cbus:1", 0, "cbus", pc88va_cbus_devices, nullptr);
 	PC98_CBUS_SLOT(config, "cbus:2", 0, "cbus", pc88va_cbus_devices, nullptr);
@@ -1311,9 +1135,11 @@ void pc88va_state::pc88va(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc88va_state::io_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(pc88va_state::vrtc_irq), "screen", 0, 1);
 	m_maincpu->icu_slave_ack_cb().set(m_pic2, FUNC(pic8259_device::acknowledge));
-	m_maincpu->set_tclk(MASTER_CLOCK);
+	m_maincpu->set_tclk(MASTER_CLOCK / 2);
 	// "timer 1"
-	m_maincpu->tout1_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+//	m_maincpu->tout0_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_maincpu->tout1_cb().set(m_dac1bit, FUNC(speaker_sound_device::level_w));
+//	m_maincpu->tout2_cb().set RS-232C Baud Rate Setting
 	// ch2 is FDC, ch0/3 are "user". ch1 is unused
 	m_maincpu->out_hreq_cb().set(m_maincpu, FUNC(v50_device::hack_w));
 	m_maincpu->out_eop_cb().set(FUNC(pc88va_state::tc_w));
@@ -1349,7 +1175,7 @@ void pc88va_state::pc88va(machine_config &config)
 	d8255_3.out_pc_callback().set(FUNC(pc88va_state::r232_ctrl_portc_w));
 
 	// external PIC
-	PIC8259(config, m_pic2, 0);
+	PIC8259(config, m_pic2);
 	m_pic2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ7);
 	m_pic2->in_sp_callback().set_constant(0);
 
@@ -1362,9 +1188,15 @@ void pc88va_state::pc88va(machine_config &config)
 
 	UPD4990A(config, m_rtc);
 
+	// assume being available on all variants
+	PC88VA_MEMSW(config, "memsw");
+
 	ADDRESS_MAP_BANK(config, "sysbank").set_map(&pc88va_state::sysbank_map).set_options(ENDIANNESS_LITTLE, 16, 22, 0x40000);
 
 	MSX_GENERAL_PURPOSE_PORT(config, m_mouse_port, msx_general_purpose_port_devices, "joystick");
+
+	pc88va_kbd_device &kbd(PC88VA_KBD(config, "kbd"));
+	kbd.irq_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 
 	SPEAKER(config, m_speaker, 2).front();
 
@@ -1381,6 +1213,8 @@ void pc88va_state::pc88va(machine_config &config)
 	m_opna->add_route(0, m_speaker, 0.25, 1);
 	m_opna->add_route(1, m_speaker, 0.50, 0);
 	m_opna->add_route(2, m_speaker, 0.50, 1);
+
+	SPEAKER_SOUND(config, m_dac1bit).add_route(ALL_OUTPUTS, "speaker", 0.40, 0).add_route(ALL_OUTPUTS, "speaker", 0.40, 1);
 
 	// TODO: set pc98 compatible
 	// Needs a MS-Engine disk dump first, that applies an overlay on PC Engine OS so that it can run PC-98 software

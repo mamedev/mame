@@ -441,7 +441,7 @@ void r2dtank_state::r2dtank(machine_config &config)
 
 	/* 74LS123: This timer is responsible for delaying the PIA1's port input. */
 	/* This delay ensures that CA1 is only changed in the VBLANK region, but not in HBLANK. */
-	ttl74123_device &ttl74123(TTL74123(config, "74123", 0));
+	ttl74123_device &ttl74123(TTL74123(config, "74123"));
 	ttl74123.set_connection_type(TTL74123_GROUNDED);    /* the hook up type */
 	ttl74123.set_resistor_value(RES_K(22));             /* resistor connected to RCext */
 	ttl74123.set_capacitor_value(CAP_U(0.01));          /* capacitor connected to Cext and RCext */

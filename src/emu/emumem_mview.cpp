@@ -10,8 +10,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include <list>
-#include <map>
 #include "emuopts.h"
 #include "debug/debugcpu.h"
 
@@ -26,6 +24,11 @@
 #include "emumem_hep.h"
 #include "emumem_het.h"
 #include "emumem_hws.h"
+
+#include <bit>
+#include <list>
+#include <map>
+
 
 #define VERBOSE 0
 
@@ -637,7 +640,7 @@ std::pair<handler_entry *, handler_entry *> memory_view::make_handlers(address_s
 		m_space = &space;
 
 		offs_t span = addrstart ^ addrend;
-		u32 awidth = 32 - count_leading_zeros_32(span);
+		u32 awidth = std::bit_width(span);
 
 		h_make(awidth, m_config->data_width(), m_config->addr_shift(), space, *this, addrstart, addrend, m_handler_read, m_handler_write);
 		m_handler_read->ref();

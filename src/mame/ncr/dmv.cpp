@@ -437,14 +437,26 @@ static void dmv_floppies(device_slot_interface &device)
 
 void dmv_state::ifsel_r(int ifsel, offs_t offset, uint8_t &data)
 {
-	for (auto &slot : { m_slot2, m_slot2a, m_slot3, m_slot4, m_slot5, m_slot6, m_slot7, m_slot7a })
-		slot->io_read(ifsel, offset, data);
+	m_slot2->io_read(ifsel, offset, data);
+	m_slot2a->io_read(ifsel, offset, data);
+	m_slot3->io_read(ifsel, offset, data);
+	m_slot4->io_read(ifsel, offset, data);
+	m_slot5->io_read(ifsel, offset, data);
+	m_slot6->io_read(ifsel, offset, data);
+	m_slot7->io_read(ifsel, offset, data);
+	m_slot7a->io_read(ifsel, offset, data);
 }
 
 void dmv_state::ifsel_w(int ifsel, offs_t offset, uint8_t data)
 {
-	for(auto &slot : { m_slot2, m_slot2a, m_slot3, m_slot4, m_slot5, m_slot6, m_slot7, m_slot7a })
-		slot->io_write(ifsel, offset, data);
+	m_slot2->io_write(ifsel, offset, data);
+	m_slot2a->io_write(ifsel, offset, data);
+	m_slot3->io_write(ifsel, offset, data);
+	m_slot4->io_write(ifsel, offset, data);
+	m_slot5->io_write(ifsel, offset, data);
+	m_slot6->io_write(ifsel, offset, data);
+	m_slot7->io_write(ifsel, offset, data);
+	m_slot7a->io_write(ifsel, offset, data);
 }
 
 void dmv_state::exp_program_w(offs_t offset, uint8_t data)
@@ -633,8 +645,6 @@ INPUT_PORTS_END
 
 void dmv_state::machine_start()
 {
-	m_leds.resolve();
-
 	// register for state saving
 	save_item(NAME(m_ramoutdis));
 	save_item(NAME(m_switch16));
@@ -814,7 +824,7 @@ void dmv_state::dmv(machine_config &config)
 
 	config.set_perfect_quantum(m_maincpu);
 
-	DMV_KEYBOARD(config, m_keyboard, 0);
+	DMV_KEYBOARD(config, m_keyboard);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -854,7 +864,7 @@ void dmv_state::dmv(machine_config &config)
 	FLOPPY_CONNECTOR(config, "i8272:0", dmv_floppies, "525dd", dmv_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "i8272:1", dmv_floppies, "525dd", dmv_state::floppy_formats);
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(50);
 	m_pit->out_handler<0>().set(FUNC(dmv_state::pit_out0));
 	m_pit->set_clk<2>(XTAL(24'000'000) / 3 / 16);
@@ -865,24 +875,44 @@ void dmv_state::dmv(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	DMVCART_SLOT(config, m_slot1, dmv_slot1, nullptr);
+	m_slot1->set_memspace(m_maincpu, AS_PROGRAM);
+	m_slot1->set_iospace(m_maincpu, AS_IO);
+
 	DMVCART_SLOT(config, m_slot2, dmv_slot2_6, nullptr);
 	m_slot2->out_int().set(FUNC(dmv_state::busint2_w));
 	m_slot2->out_irq().set(FUNC(dmv_state::irq2_w));
+	m_slot2->set_memspace(m_maincpu, AS_PROGRAM);
+	m_slot2->set_iospace(m_maincpu, AS_IO);
+
 	DMVCART_SLOT(config, m_slot2a, dmv_slot2a, nullptr);
 	m_slot2a->out_int().set(FUNC(dmv_state::busint2a_w));
 	m_slot2a->out_irq().set(FUNC(dmv_state::irq2a_w));
+	m_slot2a->set_memspace(m_maincpu, AS_PROGRAM);
+	m_slot2a->set_iospace(m_maincpu, AS_IO);
+
 	DMVCART_SLOT(config, m_slot3, dmv_slot2_6, nullptr);
 	m_slot3->out_int().set(FUNC(dmv_state::busint3_w));
 	m_slot3->out_irq().set(FUNC(dmv_state::irq3_w));
+	m_slot3->set_memspace(m_maincpu, AS_PROGRAM);
+	m_slot3->set_iospace(m_maincpu, AS_IO);
+
 	DMVCART_SLOT(config, m_slot4, dmv_slot2_6, nullptr);
 	m_slot4->out_int().set(FUNC(dmv_state::busint4_w));
 	m_slot4->out_irq().set(FUNC(dmv_state::irq4_w));
+	m_slot4->set_memspace(m_maincpu, AS_PROGRAM);
+	m_slot4->set_iospace(m_maincpu, AS_IO);
+
 	DMVCART_SLOT(config, m_slot5, dmv_slot2_6, nullptr);
 	m_slot5->out_int().set(FUNC(dmv_state::busint5_w));
 	m_slot5->out_irq().set(FUNC(dmv_state::irq5_w));
+	m_slot5->set_memspace(m_maincpu, AS_PROGRAM);
+	m_slot5->set_iospace(m_maincpu, AS_IO);
+
 	DMVCART_SLOT(config, m_slot6, dmv_slot2_6, nullptr);
 	m_slot6->out_int().set(FUNC(dmv_state::busint6_w));
 	m_slot6->out_irq().set(FUNC(dmv_state::irq6_w));
+	m_slot6->set_memspace(m_maincpu, AS_PROGRAM);
+	m_slot6->set_iospace(m_maincpu, AS_IO);
 
 	DMVCART_SLOT(config, m_slot7, dmv_slot7, nullptr);
 	m_slot7->prog_read().set(FUNC(dmv_state::exp_program_r));
@@ -890,18 +920,17 @@ void dmv_state::dmv(machine_config &config)
 	m_slot7->out_thold().set(FUNC(dmv_state::thold7_w));
 	m_slot7->out_int().set(FUNC(dmv_state::busint7_w));
 	m_slot7->out_irq().set(FUNC(dmv_state::irq7_w));
+	m_slot7->set_memspace(m_maincpu, AS_PROGRAM);
+	m_slot7->set_iospace(m_maincpu, AS_IO);
+
 	DMVCART_SLOT(config, m_slot7a, dmv_slot7a, "k230");
 	m_slot7a->prog_read().set(FUNC(dmv_state::exp_program_r));
 	m_slot7a->prog_write().set(FUNC(dmv_state::exp_program_w));
 	m_slot7a->out_thold().set(FUNC(dmv_state::thold7_w));
 	m_slot7a->out_int().set(FUNC(dmv_state::busint7a_w));
 	m_slot7a->out_irq().set(FUNC(dmv_state::irq7a_w));
-
-	for (auto &slot : { m_slot1, m_slot2, m_slot2a, m_slot3, m_slot4, m_slot5, m_slot6, m_slot7, m_slot7a })
-	{
-		slot->set_memspace(m_maincpu, AS_PROGRAM);
-		slot->set_iospace(m_maincpu, AS_IO);
-	}
+	m_slot7a->set_memspace(m_maincpu, AS_PROGRAM);
+	m_slot7a->set_iospace(m_maincpu, AS_IO);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("dmv");
 

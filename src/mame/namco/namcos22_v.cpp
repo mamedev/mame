@@ -342,11 +342,10 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 		}
 	}
 
+	const int color = node->data.quad.color;
 	const int cz_value = node->data.quad.cz_value;
 	const int cz_type = node->data.quad.cz_type;
 	const int cz_adjust = node->data.quad.cz_adjust;
-	const int color2 = cz_adjust >> 16 & 0xff;
-	const int color = node->data.quad.color | color2;
 	const int objectflags = node->data.quad.objectflags;
 
 	namcos22_object_data &extra = object_data().next();
@@ -438,7 +437,17 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 			extra.shade_enabled = false;
 		}
 		else
-			extra.pens += color2;
+		{
+			// unknown masking? timecris sets pen to 0x3a at the helicopter when it definitely wants 0x1a
+			extra.pens += (cz_adjust >> 16 & 0x7f) & (color | 0x1f);
+		}
+	}
+
+	// disable poly fog
+	if (BIT(cz_adjust, 23))
+	{
+		extra.zfog_enabled = false;
+		extra.fogfactor = 0;
 	}
 
 	if (m_state.m_is_ss22)
@@ -1411,6 +1420,7 @@ void namcos22_state::slavesim_handle_233002(const s32 *src)
 
 	    objectflags:
 	    001fffff: common
+	    003fffff: alpinerd distant scenery ground level when reaching finish (white)
 	    003fffff: adillor arrows on level select screen (no effect?)
 	    003fffff: propcycl attract mode particles when Solitar rises (unknown effect)
 	    003fffff: timecris shoot helicopter (white, but shading enabled)

@@ -420,11 +420,6 @@ INPUT_PORTS_END
 
 void cz230s_state::machine_start()
 {
-	m_lcd_seg.resolve();
-	m_led.resolve();
-	m_rhythm.resolve();
-	m_mode.resolve();
-
 	m_rhythm = 1;
 	m_mode = 1;
 

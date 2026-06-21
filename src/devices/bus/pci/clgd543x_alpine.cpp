@@ -71,7 +71,7 @@ void cirrus_gd5434_pci_device::device_add_mconfig(machine_config &config)
 	screen.set_screen_update(m_vga, FUNC(cirrus_gd5430_vga_device::screen_update));
 
 	// TODO: '34
-	CIRRUS_GD5430_VGA(config, m_vga, 0);
+	CIRRUS_GD5430_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	// 1MB or 2MB, max 4MB
 	m_vga->set_vram_size(2*1024*1024);

@@ -166,20 +166,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/at28.h,MACHINES["AT28"] = true
----------------------------------------------------
-
-if MACHINES["AT28"] then
-	files {
-		MAME_DIR .. "src/devices/machine/at28.cpp",
-		MAME_DIR .. "src/devices/machine/at28.h",
-		MAME_DIR .. "src/devices/machine/ee28.ipp",
-		MAME_DIR .. "src/devices/machine/ee28.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/autoconfig.h,MACHINES["AUTOCONFIG"] = true
 ---------------------------------------------------
 
@@ -1401,6 +1387,24 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/at28.h,MACHINES["EEPROM28"] = true
+--@src/devices/machine/eeprom28.h,MACHINES["EEPROM28"] = true
+--@src/devices/machine/x28.h,MACHINES["EEPROM28"] = true
+---------------------------------------------------
+
+if MACHINES["EEPROM28"] then
+	files {
+		MAME_DIR .. "src/devices/machine/at28.cpp",
+		MAME_DIR .. "src/devices/machine/at28.h",
+		MAME_DIR .. "src/devices/machine/eeprom28.ipp",
+		MAME_DIR .. "src/devices/machine/eeprom28.h",
+		MAME_DIR .. "src/devices/machine/x28.cpp",
+		MAME_DIR .. "src/devices/machine/x28.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/eeprom.h,MACHINES["EEPROMDEV"] = true
 --@src/devices/machine/eepromser.h,MACHINES["EEPROMDEV"] = true
 --@src/devices/machine/eeprompar.h,MACHINES["EEPROMDEV"] = true
@@ -2326,6 +2330,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/mb87013.h,MACHINES["MB87013"] = true
+---------------------------------------------------
+
+if MACHINES["MB87013"] then
+	files {
+		MAME_DIR .. "src/devices/machine/mb87013.cpp",
+		MAME_DIR .. "src/devices/machine/mb87013.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/mb87030.h,MACHINES["MB87030"] = true
 ---------------------------------------------------
 
@@ -2928,6 +2944,8 @@ if MACHINES["PCI"] then
 		MAME_DIR .. "src/devices/machine/i82425ex_psc.h",
 		MAME_DIR .. "src/devices/machine/i82426ex_ib.cpp",
 		MAME_DIR .. "src/devices/machine/i82426ex_ib.h",
+		MAME_DIR .. "src/devices/machine/i82434lx_pcmc.cpp",
+		MAME_DIR .. "src/devices/machine/i82434lx_pcmc.h",
 		MAME_DIR .. "src/devices/machine/i82439hx.cpp",
 		MAME_DIR .. "src/devices/machine/i82439hx.h",
 		MAME_DIR .. "src/devices/machine/i82439tx.cpp",
@@ -2944,6 +2962,8 @@ if MACHINES["PCI"] then
 		MAME_DIR .. "src/devices/machine/i82371eb_acpi.h",
 		MAME_DIR .. "src/devices/machine/i82371eb_usb.cpp",
 		MAME_DIR .. "src/devices/machine/i82371eb_usb.h",
+		MAME_DIR .. "src/devices/machine/i82378zb_sio.cpp",
+		MAME_DIR .. "src/devices/machine/i82378zb_sio.h",
 		MAME_DIR .. "src/devices/machine/lpc.h",
 		MAME_DIR .. "src/devices/machine/lpc-acpi.cpp",
 		MAME_DIR .. "src/devices/machine/lpc-acpi.h",
@@ -3597,12 +3617,12 @@ if MACHINES["SPG2XX"] then
 		MAME_DIR .. "src/devices/machine/generalplus_gpl951xx_rtc.h",
 		MAME_DIR .. "src/devices/machine/generalplus_gpce4_soc.cpp",
 		MAME_DIR .. "src/devices/machine/generalplus_gpce4_soc.h",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl_chx.cpp",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl_chx.h",
 		MAME_DIR .. "src/devices/machine/generalplus_gpl_dma.cpp",
 		MAME_DIR .. "src/devices/machine/generalplus_gpl_dma.h",
 		MAME_DIR .. "src/devices/machine/generalplus_gpl_timebase.cpp",
 		MAME_DIR .. "src/devices/machine/generalplus_gpl_timebase.h",
-		MAME_DIR .. "src/devices/machine/generalplus_gpl_chx.cpp",
-		MAME_DIR .. "src/devices/machine/generalplus_gpl_chx.h",
 		MAME_DIR .. "src/devices/machine/spg_renderer.cpp",
 		MAME_DIR .. "src/devices/machine/spg_renderer.h",
 		MAME_DIR .. "src/devices/machine/gpl_renderer.cpp",
@@ -4203,20 +4223,6 @@ if MACHINES["X2212"] then
 	files {
 		MAME_DIR .. "src/devices/machine/x2212.cpp",
 		MAME_DIR .. "src/devices/machine/x2212.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/x28.h,MACHINES["X28"] = true
----------------------------------------------------
-
-if MACHINES["X28"] then
-	files {
-		MAME_DIR .. "src/devices/machine/x28.cpp",
-		MAME_DIR .. "src/devices/machine/x28.h",
-		MAME_DIR .. "src/devices/machine/ee28.ipp",
-		MAME_DIR .. "src/devices/machine/ee28.h",
 	}
 end
 

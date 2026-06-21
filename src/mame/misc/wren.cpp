@@ -62,9 +62,9 @@ public:
 		, m_caps_led(*this, "caps_led")
 	{ }
 
-	void wren(machine_config &config);
+	void wren(machine_config &config) ATTR_COLD;
 
-	void init_wren();
+	void init_wren() ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_palette);
 
@@ -171,9 +171,6 @@ void wren_state::io_map(address_map &map)
 
 void wren_state::machine_start()
 {
-	m_power_led.resolve();
-	m_caps_led.resolve();
-
 	m_kbd_col       = 0x00;
 	m_video_control = 0x00;
 	m_relay_control = 0x00;

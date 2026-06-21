@@ -616,9 +616,6 @@ void lchicken_state::machine_start()
 {
 	hh_cop400_state::machine_start();
 
-	m_motor_pos_out.resolve();
-	m_motor_on_out.resolve();
-
 	// register for savestates
 	save_item(NAME(m_motor_pos));
 }

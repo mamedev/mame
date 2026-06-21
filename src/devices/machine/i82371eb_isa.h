@@ -19,11 +19,18 @@ public:
 		set_cpu_tag(std::forward<T>(cpu_tag));
 		m_has_internal_rtc = internal_rtc;
 	}
+	template <typename T, std::enable_if_t<!std::is_integral_v<std::remove_reference_t<T>>, int> = 0>
+	i82371eb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, bool internal_rtc = false)
+		: i82371eb_isa_device(mconfig, tag, owner, 0)
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+		m_has_internal_rtc = internal_rtc;
+	}
 
 	auto a20m() { return m_a20m_callback.bind(); }
 	void a20gate_w(int state);
 
-	i82371eb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i82371eb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void device_start() override;

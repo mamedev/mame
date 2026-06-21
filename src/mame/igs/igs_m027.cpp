@@ -83,7 +83,8 @@
  TODO:
  * Communication for games that support linked mode
  * IGS025 protection for Chess Challenge II
- * Emulate necessary peripherals for Extra Draw (might not belong here)
+ * Extra Draw and Xingyun Xiaochou hang cause of IRQ problems
+ * Emulate necessary peripherals for Extra Draw
  * I/O for remaining games
  * tshs101 has IGS3590 + NT3570F instead of Oki
 */
@@ -282,8 +283,6 @@ private:
 
 void igs_m027_state::machine_start()
 {
-	m_out_lamps.resolve();
-
 	std::fill(std::begin(m_xor_table), std::end(m_xor_table), 0);
 	std::fill(std::begin(m_io_select), std::end(m_io_select), 0xff);
 	m_first_start = true;
@@ -2560,7 +2559,7 @@ void igs_m027_state::m027_noppi(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs_m027_state::interrupt), "screen", 0, 1);
 
-	IGS017_IGS031(config, m_igs017_igs031, 0);
+	IGS017_IGS031(config, m_igs017_igs031);
 	m_igs017_igs031->set_text_reverse_bits(true);
 	m_igs017_igs031->in_pa_callback().set(NAME((&igs_m027_state::dsw_r<1, 0, 0>)));
 	m_igs017_igs031->in_pb_callback().set_ioport("PORTB");
@@ -4541,7 +4540,8 @@ ROM_START( tswxp ) // IGS PCB-0489-17-FM-1. 2 banks of 8 switches (1 unpopulated
 	ROM_LOAD( "u4", 0x000000, 0x200000, CRC(2e392e51) SHA1(5ff901f8ab877674f3b68e38497babc0a7369a85) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
-// 幸运小丑 / 幸运手机 (Xìngyùn Xiǎochǒu / Xìngyùn Shǒujī)
+// 幸运小丑 / 幸运手机 (Xìngyùn Xiǎochǒu / Xìngyùn Shǒujī).
+// At first boot the following password is required to initialize RTC NVRAM: 312746545908452995882136421362
 ROM_START( xyxcxysj ) // IGS PCB-0417-01-GF. 3 banks of 8 switches. 1 PPI. ST M48T18-100PC1 RTC / NVRAM.
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal rom of IGS027A ARM based MCU
@@ -4558,6 +4558,9 @@ ROM_START( xyxcxysj ) // IGS PCB-0417-01-GF. 3 banks of 8 switches. 1 PPI. ST M4
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "sp.u3", 0x00000, 0x80000, CRC(cb62e464) SHA1(6191fd40e58cb22e88395fa794a7b9540432436c) )
+
+	ROM_REGION( 0x2000, "rtc", 0 ) // pre-initialized
+	ROM_LOAD( "m48t18.u30", 0x0000, 0x2000, CRC(9c84a94a) SHA1(ff2cff054f8d635babebb06fc961b2268b687619) )
 ROM_END
 
 
@@ -4918,9 +4921,9 @@ GAME(  2000, tshs,          0,        zhongguo,     tshs,          igs_m027_stat
 GAME(  2000, tshs101,       tshs,     tshs101,      tshs101,       igs_m027_state, init_slqz3,    ROT0, "IGS", "Tiansheng Haoshou (V101CN)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // unemulated sound chips
 GAME(  2006, tswxp,         0,        tct2p,        tswxp,         igs_m027_state, init_tswxp,    ROT0, "IGS", "Taishan Wuxian Jiaqiang Ban (V101CN)", 0 )
 GAME(  2000, mgfx,          0,        mgzz,         mgfx,          igs_m027_state, init_mgfx,     ROT0, "IGS", "Manguan Fuxing (V104T)", 0 )
-GAME(  2004, xyxcxysj,      0,        xyxcxysj,     base,          igs_m027_state, init_xyxcxysj, ROT0, "IGS", "Xingyun Xiaochou / Xingyun Shouji (V233CN)", MACHINE_NOT_WORKING ) // freezes waiting for something
+GAME(  2004, xyxcxysj,      0,        xyxcxysj,     base,          igs_m027_state, init_xyxcxysj, ROT0, "IGS", "Xingyun Xiaochou / Xingyun Shouji (V233CN)", MACHINE_NOT_WORKING ) // IRQ problems
 // this has a 2nd 8255
-GAME(  2001, extradrw,      0,        extradrw,     base,          igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )
+GAME(  2001, extradrw,      0,        extradrw,     base,          igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING ) // IRQ problems
 // these have an IGS025 protection device instead of the 8255
 GAME(  2002, chessc2,       0,        chessc2,      gonefsh,       igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II (ver. 1445A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME(  2002, gonefsh2,      0,        chessc2,      gonefsh,       igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2 (ver. 1445A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

@@ -30,19 +30,10 @@
 #include "emu.h"
 
 #include "bus/ata/ataintf.h"
-#include "bus/nscsi/devices.h"
 #include "bus/midi/midi.h"
+#include "bus/nscsi/devices.h"
 #include "cpu/nec/v5x.h"
 #include "cpu/upd7810/upd7810.h"
-#include "formats/dfi_dsk.h"
-#include "formats/hxchfe_dsk.h"
-#include "formats/hxcmfm_dsk.h"
-#include "formats/imd_dsk.h"
-#include "formats/mfi_dsk.h"
-#include "formats/td0_dsk.h"
-#include "formats/dsk_dsk.h"
-#include "formats/pc_dsk.h"
-#include "formats/ipf_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/74259.h"
 #include "machine/i8255.h"
@@ -60,7 +51,19 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include "formats/dfi_dsk.h"
+#include "formats/dsk_dsk.h"
+#include "formats/hxchfe_dsk.h"
+#include "formats/hxcmfm_dsk.h"
+#include "formats/imd_dsk.h"
+#include "formats/ipf_dsk.h"
+#include "formats/mfi_dsk.h"
+#include "formats/pc_dsk.h"
+#include "formats/td0_dsk.h"
+
 #include "mpc2000xl.lh"
+
+namespace {
 
 #define ENABLE_FLASH (0)
 
@@ -436,19 +439,22 @@ uint8_t mpc2000_state::subcpu_pc_r()
 			rv = 0;
 			break;
 		}
-		m_quadrature_phase++;
-		m_quadrature_phase &= 7;
-
-		// generate a complete 4-part pulse train for each single change in the position
-		if (m_quadrature_phase == 0)
+		if (!machine().side_effects_disabled())
 		{
-			if (m_count_dial < 0)
+			m_quadrature_phase++;
+			m_quadrature_phase &= 7;
+
+			// generate a complete 4-part pulse train for each single change in the position
+			if (m_quadrature_phase == 0)
 			{
-				m_count_dial++;
-			}
-			else
-			{
-				m_count_dial--;
+				if (m_count_dial < 0)
+				{
+					m_count_dial++;
+				}
+				else
+				{
+					m_count_dial--;
+				}
 			}
 		}
 	}
@@ -459,13 +465,7 @@ uint8_t mpc2000_state::subcpu_pc_r()
 // drum pad row select, active low
 void mpc2000_state::subcpu_pb_w(uint8_t data)
 {
-	// convert to 1/2/4/8
-	m_drum_scan_row = (data & 0xf) ^ 0xf;
-	if (m_drum_scan_row != 0)
-	{
-		// get a row number 0-3
-		m_drum_scan_row = count_leading_zeros_32(m_drum_scan_row) - 28;
-	}
+	m_drum_scan_row = data;
 }
 
 // main buttons row select (PC1-PC3)
@@ -476,38 +476,46 @@ void mpc2000_state::subcpu_pc_w(uint8_t data)
 
 uint8_t mpc2000_state::an0_pads_r()
 {
-	if (m_drums[m_drum_scan_row]->read() & 0x80)
+	unsigned hit = 0;
+	for (unsigned i = 0; 4 > i; ++i)
 	{
-		return 0xff;
+		if (!BIT(m_drum_scan_row, 3 - i))
+			hit |= m_drums[i]->read();
 	}
-	return 0;
+	return BIT(hit, 7) ? 0xff : 0;
 }
 
 uint8_t mpc2000_state::an1_pads_r()
 {
-	if (m_drums[m_drum_scan_row]->read() & 0x40)
+	unsigned hit = 0;
+	for (unsigned i = 0; 4 > i; ++i)
 	{
-		return 0xff;
+		if (!BIT(m_drum_scan_row, 3 - i))
+			hit |= m_drums[i]->read();
 	}
-	return 0;
+	return BIT(hit, 6) ? 0xff : 0;
 }
 
 uint8_t mpc2000_state::an2_pads_r()
 {
-	if (m_drums[m_drum_scan_row]->read() & 0x20)
+	unsigned hit = 0;
+	for (unsigned i = 0; 4 > i; ++i)
 	{
-		return 0xff;
+		if (!BIT(m_drum_scan_row, 3 - i))
+			hit |= m_drums[i]->read();
 	}
-	return 0;
+	return BIT(hit, 5) ? 0xff : 0;
 }
 
 uint8_t mpc2000_state::an3_pads_r()
 {
-	if (m_drums[m_drum_scan_row]->read() & 0x10)
+	unsigned hit = 0;
+	for (unsigned i = 0; 4 > i; ++i)
 	{
-		return 0xff;
+		if (!BIT(m_drum_scan_row, 3 - i))
+			hit |= m_drums[i]->read();
 	}
-	return 0;
+	return BIT(hit, 4) ? 0xff : 0;
 }
 
 uint8_t mpc2000_state::an4_r()
@@ -865,5 +873,7 @@ ROM_END
 void mpc2000_state::init_mpc2000()
 {
 }
+
+} // anonymous namespace
 
 CONS( 1994, mpc2000xl, 0, 0, mpc2000, mpc2000, mpc2000_state, init_mpc2000, "Akai / Roger Linn", "MPC 2000XL", MACHINE_NOT_WORKING )

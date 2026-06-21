@@ -202,6 +202,6 @@ uint16_t naomi_m2_board::read_callback(uint32_t addr)
 
 void naomi_m2_board::device_add_mconfig(machine_config &config)
 {
-	SEGA315_5881_CRYPT(config, m_cryptdevice, 0);
+	SEGA315_5881_CRYPT(config, m_cryptdevice);
 	m_cryptdevice->set_read_cb(FUNC(naomi_m2_board::read_callback));
 }

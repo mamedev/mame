@@ -1464,6 +1464,11 @@ ROM_START( 88in1joy )
 	ROM_LOAD( "88in1joystick.bin", 0x00000, 0x400000, CRC(86b8d819) SHA1(6da387b2e6ce02a3ec203e2af8a961959ba1cf62) )
 ROM_END
 
+ROM_START( vt50in1 )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "50in1.bin", 0x00000, 0x400000, CRC(11207f34) SHA1(43f459b3ec14ddf2a9c7e9a3cebcb15c4301c1d9 ) )
+ROM_END
+
 ROM_START( gamezn2 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD16_WORD_SWAP( "gamezone2.bin", 0x00000, 0x400000, CRC(f7b2d609) SHA1(7d2d8f6e822c4e6b97e9accaa524b7910c6b97bf) ) // byteswapped as protection?
@@ -1673,7 +1678,6 @@ CONS( 2010, hs36blk,  0,        0,  nes_vt_waixing_2mb, nes_vt, nes_vt_waixing_s
 
 // unsorted, these were all in nes.xml listed as ONE BUS systems
 CONS( 200?, mc_dg101,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "dreamGEAR", "dreamGEAR 101 in 1", MACHINE_IMPERFECT_GRAPHICS ) // dreamGear, but no enhanced games?
-CONS( 200?, mc_aa2,     0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "100 in 1 Arcade Action II (AT-103)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, mc_105te,   0,        0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "2011 Super HiK 105 in 1 Turbo Edition", MACHINE_NOT_WORKING )
 CONS( 200?, mc_8x6cb,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "CoolBoy",   "888888 in 1 (Coolboy AEF-390)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 201?, fccomp88,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "Columbus Circle", "FC Compact 88-in-1 (CC-SFFC-WT) (Japan)", MACHINE_IMPERFECT_GRAPHICS )
@@ -1681,9 +1685,14 @@ CONS( 201?, fccomp88,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty
 // Works fine, uses ony VT02 features
 CONS( 201?, mc_tv200,   0,        0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty_init, "Thumbs Up", "200 in 1 Retro TV Game", MACHINE_IMPERFECT_GRAPHICS )
 
+// these 3 have common issues with Street War (Mighty Final Fight) and Space War where text isn't rendered correctly (Mapper issue?)
 // TODO: add cart port and hook up nes_vt_cart.xml
 CONS( 201?, 88in1joy,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "Play Vision", "Joystick88", MACHINE_IMPERFECT_GRAPHICS )
 
+CONS( 200?, mc_aa2,     0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "100 in 1 Arcade Action II (AT-103)", MACHINE_IMPERFECT_GRAPHICS )
+
+// Inspiron Distribution Ltd. 'HGIFT4'
+CONS( 200?, vt50in1,    0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "game on! TV 50 in 1 Arcade Game", MACHINE_IMPERFECT_GRAPHICS )
 
 // Runs fine, non-sport 121 in 1 games perfect, but minor graphical issues in
 // sport games, also no sound in menu or sport games due to missing PCM

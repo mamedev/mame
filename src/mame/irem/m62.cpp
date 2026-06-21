@@ -948,7 +948,7 @@ void m62_state::ldrun(machine_config &config)
 	PALETTE(config, m_spr_palette, FUNC(m62_state::m62_spr), 256);
 
 	// sound hardware
-	IREM_M62_AUDIO(config, m_audio, 0);
+	IREM_M62_AUDIO(config, m_audio);
 }
 
 

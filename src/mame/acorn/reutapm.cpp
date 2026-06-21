@@ -319,7 +319,7 @@ void reuters_state::reutapm(machine_config &config)
 	m_uservia->ca2_handler().set("printer", FUNC(centronics_device::write_strobe));
 	m_uservia->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(reuters_state::kbd_put));
 
 	centronics_device &centronics(CENTRONICS(config, "printer", centronics_devices, "printer"));
@@ -327,7 +327,7 @@ void reuters_state::reutapm(machine_config &config)
 	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
 	centronics.set_output_latch(latch);
 
-	acia6850_device &acia1(ACIA6850(config, "acia1", 0));
+	acia6850_device &acia1(ACIA6850(config, "acia1"));
 	acia1.txd_handler().set("rs423", FUNC(rs232_port_device::write_txd));
 	acia1.rts_handler().set("rs423", FUNC(rs232_port_device::write_rts));
 	acia1.rts_handler().append("serproc1", FUNC(acorn_serproc_device::write_rtsi));
@@ -368,7 +368,7 @@ void reuters_state::reutapm(machine_config &config)
 	m_adlc->out_irq_cb().set(FUNC(reuters_state::adlc_irq_w));
 	//m_adlc->out_rts_cb().
 
-	econet_device &econet(ECONET(config, "network", 0));
+	econet_device &econet(ECONET(config, "network"));
 	econet.clk_wr_callback().set(m_adlc, FUNC(mc6854_device::txc_w));
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
 	econet.data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));

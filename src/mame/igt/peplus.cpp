@@ -1377,10 +1377,6 @@ INPUT_PORTS_END
 
 void peplus_state::machine_start()
 {
-	m_bnka.resolve();
-	m_bnkb.resolve();
-	m_bnkc.resolve();
-
 	m_assert_lp_timer = timer_alloc(FUNC(peplus_state::assert_lp), this);
 
 	save_item(NAME(m_last_cycles));

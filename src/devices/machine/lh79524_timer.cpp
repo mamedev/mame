@@ -15,15 +15,19 @@ DEFINE_DEVICE_TYPE(LH79524_TIMER, lh79524_timer_device, "lh79524_timer", "LH7952
 
 lh79524_timer_device::lh79524_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, LH79524_TIMER, tag, owner, clock)
-	, m_irq_cb(*this) {
+	, m_irq_cb(*this)
+	, m_timer_index(0)
+{
 }
 
-void lh79524_timer_device::set_timer_index(int index) {
-	timer_index = index;
+void lh79524_timer_device::set_timer_index(int index)
+{
+	m_timer_index = index;
 }
 
 
-void lh79524_timer_device::device_start() {
+void lh79524_timer_device::device_start()
+{
 	m_tick_timer = timer_alloc(FUNC(lh79524_timer_device::timer_update), this);
 
 	save_item(NAME(m_control));
@@ -35,7 +39,8 @@ void lh79524_timer_device::device_start() {
 	save_item(NAME(m_cmp1));
 }
 
-void lh79524_timer_device::device_reset() {
+void lh79524_timer_device::device_reset()
+{
 	m_control = 0;
 	m_cap_control = 0;
 	m_inten = 0;
@@ -49,7 +54,8 @@ void lh79524_timer_device::device_reset() {
 	update_interrupt();
 }
 
-void lh79524_timer_device::update_interrupt() {
+void lh79524_timer_device::update_interrupt()
+{
 	if ((m_status & 0x7) & (m_inten & 0x7)) {
 		m_irq_cb(ASSERT_LINE);
 	} else {
@@ -58,20 +64,22 @@ void lh79524_timer_device::update_interrupt() {
 
 }
 
-void lh79524_timer_device::device_clock_changed() {
+void lh79524_timer_device::device_clock_changed()
+{
 	if (BIT(m_control, 1)) {
-		uint32_t hclk_div_value = (m_control >> 2) & 0x7;
+		uint32_t const hclk_div_value = (m_control >> 2) & 0x7;
 		m_tick_timer->adjust(attotime::from_hz(clock() / (2U << hclk_div_value)), 0, attotime::from_hz(clock() / (2U << hclk_div_value)));
 	} else {
 		m_tick_timer->adjust(attotime::never);
 	}
 }
 
-TIMER_CALLBACK_MEMBER(lh79524_timer_device::timer_update) {
+TIMER_CALLBACK_MEMBER(lh79524_timer_device::timer_update)
+{
 	if (!BIT(m_control, 1))
 		return;
 
-	bool tc = (timer_index == 0) ?  BIT(m_cap_control, 14) : BIT(m_control, 13);
+	bool tc = (m_timer_index == 0) ?  BIT(m_cap_control, 14) : BIT(m_control, 13);
 
 	uint16_t limit = tc ? m_cmp1 : 0xffff;
 
@@ -93,9 +101,10 @@ TIMER_CALLBACK_MEMBER(lh79524_timer_device::timer_update) {
 	update_interrupt();
 }
 
-uint32_t lh79524_timer_device::read(offs_t offset, uint32_t mem_mask) {
+uint32_t lh79524_timer_device::read(offs_t offset, uint32_t mem_mask)
+{
 	offs_t addr = offset << 2;
-	if (timer_index >= 1 && addr >= 0x04) {
+	if (m_timer_index >= 1 && addr >= 0x04) {
 		addr += 0x04;
 	}
 	switch (addr) {
@@ -120,9 +129,10 @@ uint32_t lh79524_timer_device::read(offs_t offset, uint32_t mem_mask) {
 	return 0;
 }
 
-void lh79524_timer_device::write(offs_t offset, uint32_t data, uint32_t mem_mask) {
+void lh79524_timer_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
 	offs_t addr = offset << 2;
-	if (timer_index >= 1 && addr >= 0x04) {
+	if (m_timer_index >= 1 && addr >= 0x04) {
 		addr += 0x04;
 	}
 	switch (addr) {

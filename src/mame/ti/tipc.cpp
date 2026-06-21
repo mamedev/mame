@@ -511,7 +511,7 @@ void tipc_state::tipc(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &tipc_state::tipc_io);
 	m_maincpu->set_irq_acknowledge_callback(m_pic8259, FUNC(pic8259_device::inta_cb));
 
-	I8251(config, m_upd8251, 0);
+	I8251(config, m_upd8251);
 	m_upd8251->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
 	m_upd8251->txd_handler().append(m_upd8251, FUNC(i8251_device::write_dsr)); // keyboard loops back tx to dsr
 	m_upd8251->dtr_handler().set_inputline(m_maincpu, INPUT_LINE_NMI).invert();

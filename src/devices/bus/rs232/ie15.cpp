@@ -33,7 +33,7 @@ private:
 
 void ie15_terminal_device::device_add_mconfig(machine_config &config)
 {
-	IE15(config, m_ie15, 0);
+	IE15(config, m_ie15);
 
 	m_ie15->rs232_conn_txd_handler().set(FUNC(ie15_terminal_device::output_rxd));
 	//m_ie15->rs232_conn_rts_handler().set(FUNC(ie15_terminal_device::route_term_rts));

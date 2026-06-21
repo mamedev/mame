@@ -162,7 +162,7 @@ TILE_GET_INFO_MEMBER(igs009_state::get_reel_tile_info)
 
 	tileinfo.set(0,
 			(code) + (((tile_index + 1) & 0x3) * 0x100),
-			(code & 0x80) ? 0xc : 0,
+			BIT(code, 7) ? 0xc : 0,
 			0);
 }
 
@@ -187,7 +187,7 @@ void igs009_state::bg_scroll_w(offs_t offset, uint8_t data)
 TILE_GET_INFO_MEMBER(igs009_state::get_fg_tile_info)
 {
 	int const code = m_fg_tile_ram[tile_index] | (m_fg_color_ram[tile_index] << 8);
-	tileinfo.set(1, code, (4* (code >> 14) + 3), 0);
+	tileinfo.set(1, code, (4 * (code >> 14) + 3), 0);
 }
 
 void igs009_state::fg_tile_w(offs_t offset, uint8_t data)
@@ -238,68 +238,34 @@ void gp98_state::video_start()
 
 uint32_t igs009_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int layers_ctrl = m_video_enable ? -1 : 0;
-
-#ifdef MAME_DEBUG
-	if (machine().input().code_pressed(KEYCODE_Z))
+	if (!m_video_enable)
 	{
-		int mask = 0;
-		if (machine().input().code_pressed(KEYCODE_Q))  mask |= 1;
-		if (machine().input().code_pressed(KEYCODE_W))  mask |= 2;
-		if (machine().input().code_pressed(KEYCODE_A))  mask |= 4;
-		if (mask != 0) layers_ctrl &= mask;
+		bitmap.fill(m_palette->black_pen(), cliprect);
+		return 0;
 	}
-#endif
-
-	if (layers_ctrl & 1)
+	for (int i = 0; i < 0x80; i++)
 	{
-		int startclipmin = 0;
-		const rectangle &visarea = screen.visible_area();
-
-		for (int i= 0; i < 0x80; i++)
-		{
-			m_reel_tilemap[0]->set_scrolly(i, m_bg_scroll[0][i] * 2);
-			m_reel_tilemap[1]->set_scrolly(i, m_bg_scroll[0][i + 0x80] * 2);
-			m_reel_tilemap[2]->set_scrolly(i, m_bg_scroll[0][i + 0x100] * 2);
-			m_reel_tilemap[3]->set_scrolly(i, m_bg_scroll[0][i + 0x180] * 2);
-		}
-
-		for (int zz = 0; zz < 0x80 - 8; zz++)
-		{
-			rectangle clip;
-			int const rowenable = m_bg_scroll[1][zz];
-
-			// draw top of screen
-			clip.set(visarea.min_x, visarea.max_x, startclipmin, startclipmin + 2);
-
-			bitmap.fill(m_palette->pen(rowenable), clip);
-
-			if (rowenable==0)
-			{ // 0 and 1 are the same? or is there a global switchoff?
-				m_reel_tilemap[0]->draw(screen, bitmap, clip, 0, 0);
-			}
-			else if (rowenable == 1)
-			{
-				m_reel_tilemap[1]->draw(screen, bitmap, clip, 0, 0);
-			}
-			else if (rowenable == 2)
-			{
-				m_reel_tilemap[2]->draw(screen, bitmap, clip, 0, 0);
-			}
-			else if (rowenable == 3)
-			{
-				m_reel_tilemap[3]->draw(screen, bitmap, clip, 0, 0);
-			}
-
-
-			startclipmin += 2;
-		}
-
+		m_reel_tilemap[0]->set_scrolly(i, m_bg_scroll[0][i] * 2);
+		m_reel_tilemap[1]->set_scrolly(i, m_bg_scroll[0][i + 0x80] * 2);
+		m_reel_tilemap[2]->set_scrolly(i, m_bg_scroll[0][i + 0x100] * 2);
+		m_reel_tilemap[3]->set_scrolly(i, m_bg_scroll[0][i + 0x180] * 2);
 	}
-	else bitmap.fill(m_palette->black_pen(), cliprect);
 
+	for (int zz = (cliprect.min_y >> 1), startclipmin = (cliprect.min_y & ~1); zz < ((cliprect.max_y + 1) >> 1); zz++, startclipmin += 2)
+	{
+		int const rowenable = m_bg_scroll[1][zz];
 
-	if (layers_ctrl & 2) m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		// draw top of screen
+		rectangle const clip(cliprect.min_x, cliprect.max_x, startclipmin, startclipmin + 1);
+
+		bitmap.fill(m_palette->pen(rowenable), clip);
+
+		// 0 and 1 are the same? or is there a global switchoff?
+		if (rowenable < 4)
+			m_reel_tilemap[rowenable]->draw(screen, bitmap, clip, 0, 0);
+	}
+
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -320,7 +286,7 @@ void igs009_state::nmi_and_coins_w(uint8_t data)
 {
 	if ((m_nmi_enable ^ data) & (~0xdd))
 	{
-		logerror("PC %06X: nmi_and_coins = %02x\n", m_maincpu->pc(), data);
+		logerror("%s: nmi_and_coins = %02x\n", machine().describe_context(), data);
 //      popmessage("%02x", data);
 	}
 
@@ -369,35 +335,37 @@ void igs009_state::magic_w(offs_t offset, uint8_t data)
 	if (offset == 0)
 		return;
 
-	switch(m_igs_magic[0])
+	switch (m_igs_magic[0])
 	{
 		case 0x01:
 			break;
 
 		default:
 //          popmessage("magic %x <- %04x",m_igs_magic[0],data);
-			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", m_maincpu->pc(), m_igs_magic[0], data);
+			logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_igs_magic[0], data);
 	}
 }
 
 uint8_t igs009_state::magic_r()
 {
-	switch(m_igs_magic[0])
+	switch (m_igs_magic[0])
 	{
 		case 0x00:
 		{
 			uint8_t result = 0xff;
-			if (BIT(~m_igs_magic[1], 0)) result &= m_dsw[0]->read();
-			if (BIT(~m_igs_magic[1], 1)) result &= m_dsw[1]->read();
-			if (BIT(~m_igs_magic[1], 2)) result &= m_dsw[2]->read();
-			if (BIT(~m_igs_magic[1], 3)) result &= m_dsw[3]->read();
-			if (BIT(~m_igs_magic[1], 4)) result &= m_dsw[4]->read();
-			logerror("%06x: warning, reading dsw with igs_magic[1] = %02x\n", m_maincpu->pc(), m_igs_magic[1]);
+			for (int i = 0; i < 5; i++)
+			{
+				if (BIT(~m_igs_magic[1], i))
+					result &= m_dsw[i]->read();
+			}
+			if (!machine().side_effects_disabled())
+				logerror("%s: warning, reading dsw with igs_magic[1] = %02x\n", machine().describe_context(), m_igs_magic[1]);
 			return result;
 		}
 
 		default:
-			logerror("%06x: warning, reading with igs_magic = %02x\n", m_maincpu->pc(), m_igs_magic[0]);
+			if (!machine().side_effects_disabled())
+				logerror("%s: warning, reading with igs_magic = %02x\n", machine().describe_context(), m_igs_magic[0]);
 	}
 
 	return 0;
@@ -704,9 +672,6 @@ GFXDECODE_END
 
 void igs009_state::machine_start()
 {
-	m_leds.resolve();
-
-
 	save_item(NAME(m_video_enable));
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_out));
@@ -763,7 +728,7 @@ void igs009_state::jingbell(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	YM2413(config, "ymsnd", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	OKIM6295(config, "oki",12_MHz_XTAL / 12, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+	OKIM6295(config, "oki", 12_MHz_XTAL / 12, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 

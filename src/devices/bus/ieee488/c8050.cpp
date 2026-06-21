@@ -826,8 +826,6 @@ sfd1001_device::sfd1001_device(const machine_config &mconfig, const char *tag, d
 
 void c8050_device::device_start()
 {
-	m_leds.resolve();
-
 	// install image callbacks
 	m_fdc->set_floppy(m_floppy0, m_floppy1);
 

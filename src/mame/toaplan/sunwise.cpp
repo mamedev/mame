@@ -542,7 +542,7 @@ void sunwise_state::othldrby(machine_config &config) // Sunwise S951060-VGP PCB 
 	M68000(config, m_maincpu, 20_MHz_XTAL/2); // assumed same as pwrkick
 	m_maincpu->set_addrmap(AS_PROGRAM, &sunwise_state::othldrby_68k_mem);
 
-	TOAPLAN_COINCOUNTER(config, "coincounter", 0);
+	TOAPLAN_COINCOUNTER(config, "coincounter");
 
 	UPD4992(config, m_rtc, 32.768_kHz_XTAL);
 

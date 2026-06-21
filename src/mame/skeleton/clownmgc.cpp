@@ -250,7 +250,7 @@ void clownmgc_state::clownmgc(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	NS16550(config, "uart", 0); // TODO: clock
+	NS16550(config, "uart"); // TODO: clock
 
 	HOPPER(config, m_hopper, attotime::from_msec(100));
 

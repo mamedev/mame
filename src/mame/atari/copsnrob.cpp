@@ -412,7 +412,6 @@ GFXDECODE_END
 void copsnrob_state::machine_start()
 {
 	save_item(NAME(m_misc));
-	m_leds.resolve();
 }
 
 void copsnrob_state::machine_reset()

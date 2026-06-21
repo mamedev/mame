@@ -865,6 +865,30 @@ ROM_START( phoenixc4 ) // verified main and ROMs PCBs and 2 PROMs
 	ROM_RELOAD(               0x0000, 0x0100 ) // the dump had 2 identical proms with different names
 ROM_END
 
+ROM_START( phoenixjpl ) // verified 2 PCBs and 2 PROMs. A mix of other bootlegs, with a couple unique ROMs
+	ROM_REGION( 0x10000, "maincpu", 0 ) // handwritten labels
+	ROM_LOAD( "px_1.ic45", 0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) )
+	ROM_LOAD( "px_2.ic46", 0x0800, 0x0800, CRC(dbc942fa) SHA1(9fe224e6ced407289dfa571468259a021d942b7d) )
+	ROM_LOAD( "px_3.ic47", 0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
+	ROM_LOAD( "px_4.ic48", 0x1800, 0x0800, CRC(f2d4ae42) SHA1(7240e6ed22db30689a31f5d933afb89acf1efc8c) ) // unique at the time of adding
+	ROM_LOAD( "px_5.ic49", 0x2000, 0x0800, CRC(a105e4e7) SHA1(b35142a91b6b7fdf7535202671793393c9f4685f) )
+	ROM_LOAD( "px_6.ic50", 0x2800, 0x0800, CRC(8c83bff7) SHA1(3dfb090d7e3a9ae8da882b06e166c48555eaf77c) )
+	ROM_LOAD( "px_7.ic51", 0x3000, 0x0800, CRC(079ac364) SHA1(55b17c069b191cd1752e78068ef683b33c094e56) )
+	ROM_LOAD( "px_8.ic52", 0x3800, 0x0800, CRC(e43fef84) SHA1(c071cc8daef86c8a67a4bfbaf681a30c6591d78c) ) // unique at the time of adding
+
+	ROM_REGION( 0x1000, "bgtiles", 0 ) // printed labels
+	ROM_LOAD( "011.ic23", 0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "012.ic24", 0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 ) // printed labels
+	ROM_LOAD( "009.ic39", 0x0000, 0x0800, CRC(bb0525ed) SHA1(86db1c7584fb3846bfd47535e1585eeb7fbbb1fe) )
+	ROM_LOAD( "010.ic40", 0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // not dumped yet, taken from a set with identical GFX ROMs
+	ROM_LOAD( "mmi6301.ic40", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) BAD_DUMP ) // palette low bits
+	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) BAD_DUMP ) // palette high bits
+ROM_END
+
 ROM_START( phoenixgu ) // verified 2 PCBs, 2 PROMs
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "phoenix.45",   0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) )
@@ -1644,6 +1668,32 @@ ROM_START( pleiadsgmp )
 	ROM_LOAD( "cpu40.bin", 0x0100, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )
 ROM_END
 
+// MM "COMPUTER"GAME" <<ROME>> "ITALY" <<FENIX>> PCB
+ROM_START( pleiadsmm )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1_mm.1l", 0x0000, 0x0800, CRC(b02767d6) SHA1(6dd22c95862d2464e5b327096566767b4fdc5c50) ) // confirmed by multiple dumps
+	ROM_LOAD( "2_mm.1m", 0x0800, 0x0800, CRC(c82557b4) SHA1(d3ed8c5282bd75a65f8f6ecc096ab9668a8cdedd) BAD_DUMP ) // this was dumped only from one PCB, and is bad. Using pleiadsgmp's for now.
+	ROM_LOAD( "3_mm.1n", 0x1000, 0x0800, CRC(ca9e7d1f) SHA1(963684dda71e9ec4cec982dc26224eac7077f8fe) ) // confirmed by multiple dumps
+	ROM_LOAD( "4_mm.1o", 0x1800, 0x0800, CRC(b6668f7d) SHA1(3b25ca55db3fc671a0d2e412ba0d05aa0e378c82) ) // confirmed by multiple dumps
+	ROM_LOAD( "5_mm.1p", 0x2000, 0x0800, CRC(263576e7) SHA1(4c8f4ef413e96f3ce11e0eefdc41dbc11d8e5d20) ) // confirmed by multiple dumps
+	ROM_LOAD( "6_mm.1q", 0x2800, 0x0800, CRC(f1a8a00d) SHA1(5c183e3a73fa882ffec3cb9219fb5619e625591a) ) // confirmed by multiple dumps
+	ROM_LOAD( "7_mm.1r", 0x3000, 0x0800, CRC(17f56102) SHA1(e8fc5a8d247359662a02174a0fcf03dc9622da60) ) // confirmed by multiple dumps
+	ROM_LOAD( "8_mm.1s", 0x3800, 0x0800, CRC(0ca24fea) SHA1(c28ec6dc86174fc65fe66dad7f406d22794af4ba) ) // confirmed by multiple dumps
+
+	ROM_REGION( 0x1000, "bgtiles", 0 )
+	ROM_LOAD( "9_mm.2n",  0x0000, 0x0800, CRC(aaa31011) SHA1(698bfb1a0137e1f44f77bd338ae40c41dc2a772c) ) // confirmed by multiple dumps
+	ROM_LOAD( "10_mm.2o", 0x0800, 0x0800, CRC(4e30f9e7) SHA1(da023a94725dc40107cd97e4decfd4dc0f9f00ee) ) // confirmed by multiple dumps
+
+	ROM_REGION( 0x1000, "fgtiles", ROMREGION_ERASE00 )
+	// only unpopulated sockets, using pleiadsgmp's for now
+	ROM_LOAD( "ic39.bin",  0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) BAD_DUMP ) // not dumped for this set
+	ROM_LOAD( "ic40.bin",  0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) BAD_DUMP ) // not dumped for this set
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "7051.right", 0x0000, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) BAD_DUMP ) // not readable for this set, but the other PROM matches
+	ROM_LOAD( "7051.left",  0x0100, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )
+ROM_END
+
 // Famaresa "580" PCB set (580-001 and 580-002).
 ROM_START( pleiadss )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1719,6 +1769,30 @@ ROM_START( capitol )
 	ROM_LOAD( "ic40.prm",     0x0100, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )
 ROM_END
 
+ROM_START( germwars )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "001b-1.1a", 0x0000, 0x0800, CRC(aba21b11) SHA1(ce17a499e2d226f091075304a7cb8d308edab6dd) )
+	ROM_LOAD( "001b-2.2a", 0x0800, 0x0800, CRC(e377b8d9) SHA1(990b8e7f3dab669b05c0002dadd67932aba069ec) )
+	ROM_LOAD( "001b-3.3a", 0x1000, 0x0800, CRC(22ca6d19) SHA1(cb2422a46feb1d0f2f9e262825ce10dce17ee2a1) )
+	ROM_LOAD( "001b-4.4a", 0x1800, 0x0800, CRC(de50ca63) SHA1(a468a48f1e5a6f80b7ae3de54c9f474342471e49) )
+	ROM_LOAD( "001b-5.5a", 0x2000, 0x0800, CRC(fdf29f03) SHA1(4dd0fe194aa9817783d0c8cdc18589f4757cb77b) )
+	ROM_LOAD( "001b-6.6a", 0x2800, 0x0800, CRC(8192b32a) SHA1(5900c7c173a0c1fe0b37ebf70fa3117406b3a5b5) )
+	ROM_LOAD( "001b-7.7a", 0x3000, 0x0800, CRC(971b0686) SHA1(41ebe48fe698407caea2a32e6ddebdbce9dc50bc) )
+	ROM_LOAD( "001b-8.8a", 0x3800, 0x0800, CRC(416c4ab2) SHA1(6652d68a219a63f63619833ea423f72d72496844) )
+
+	ROM_REGION( 0x1000, "bgtiles", 0 )
+	ROM_LOAD( "001b-11.3d",  0x0000, 0x0800, CRC(3d1ce38d) SHA1(48b94027467ba360c08a7f56bb75474e6859381f) )
+	ROM_LOAD( "001b-12.4d",  0x0800, 0x0800, CRC(cd150da9) SHA1(642264c0eed34ae2b9f1156d261786361f296d1a) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 )
+	ROM_LOAD( "001b-09.3b",  0x0000, 0x0800, CRC(41dee996) SHA1(55a792504b2ffc1236eb3f427dee38893e1ca5b7) )
+	ROM_LOAD( "001b-10.4b",  0x0800, 0x0800, CRC(a255d6dc) SHA1(1b2f635f4392d0df1cbd527dcf6cf662b2a1014e) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // not verified for this set
+	ROM_LOAD( "n82s129n.u40",    0x0000, 0x0100, BAD_DUMP CRC(b3e20669) SHA1(4f01c5d74fc8abe748dd88e4513edf52b977ee32) ) // palette low bits
+	ROM_LOAD( "n82s129n.u41",    0x0100, 0x0100, BAD_DUMP CRC(abddf69a) SHA1(e22c380a94fb491bec95c4f4c2d4f072839c09cf) ) // palette high bits
+ROM_END
+
 ROM_START( survival )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "g959-32a_45.u45", 0x0000, 0x0800, CRC(0bc53541) SHA1(0d1bcf226b89d0cfe0864aab8126b276273a23c2) )
@@ -1782,6 +1856,7 @@ GAME( 1981, phoenixc,   phoenix, phoenix,  phoenixt, phoenix_state, empty_init, 
 GAME( 1981, phoenixc2,  phoenix, phoenix,  phoenixt, phoenix_state, empty_init,           ROT90, "bootleg (G.G.I. Corporation)",           "Phoenix (G.G.I. Corporation, set 1)",                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenixc3,  phoenix, phoenix,  phoenixt, phoenix_state, empty_init,           ROT90, "bootleg (G.G.I. Corporation)",           "Phoenix (G.G.I. Corporation, set 2)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenixc4,  phoenix, phoenix,  phoenixt, phoenix_state, empty_init,           ROT90, "bootleg (G.G.I. Corporation)",           "Phoenix (G.G.I. Corporation, set 3)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1981, phoenixjpl, phoenix, phoenix,  phoenixt, phoenix_state, empty_init,           ROT90, "bootleg (JP Leisure)",                   "Phoenix (JP Leisure bootleg)",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenixgu,  phoenix, phoenix,  phoenixt, phoenix_state, empty_init,           ROT90, "bootleg? (G. Universal Video)",          "Phoenix (G. Universal Video bootleg)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenixi,   phoenix, condor,   condor,   phoenix_state, init_oneprom_coindsw, ROT90, "bootleg (IDI)",                          "Phoenix (IDI bootleg)",                                      MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // Needs correct color PROM decode
 GAME( 1980, fenixn,     phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg (Niemer)",                       "Fenix (Niemer bootleg of Phoenix)",                          MACHINE_SUPPORTS_SAVE )
@@ -1822,9 +1897,13 @@ GAME( 1981, pleiadbl,   pleiads, pleiads,  pleiadbl, phoenix_state, empty_init, 
 GAME( 1981, pleiadsb2,  pleiads, pleiads,  pleiads,  phoenix_state, empty_init,           ROT90, "bootleg (ESG)",                          "Pleiads (bootleg set 2)",                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pleiadsn,   pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (Niemer S.A.)",                  "Pleiads (Niemer S.A.)",                                      MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pleiadsgmp, pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (GMP Games)",                    "Pleiads (GMP Games)",                                        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pleiadsmm,  pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (ManilaMatic)",                  "Pleiads (bootleg, ManilaMatic)",                             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // one bad ROM, crashes at the end of level 1
 GAME( 1981, pleiadss,   pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (Famaresa)",                     "Pleiads (Famaresa, Spanish bootleg)",                        MACHINE_SUPPORTS_SAVE ) // colours match PCB (but are ugly)
 GAME( 1981, cityatta,   pleiads, pleiads,  cityatta, phoenix_state, empty_init,           ROT90, "bootleg (Petaco S.A.)",                  "City Attack (Petaco S.A., bootleg of Pleiads)",              MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // Colors are bad, as seen on the screenshot from https://www.recreativas.org/city-attack-454-petaco
 GAME( 1981, capitol,    pleiads, phoenix,  capitol,  phoenix_state, empty_init,           ROT90, "bootleg? (Universal Video Spiel)",       "Capitol",                                                    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 
 /*** Others ***/
-GAME( 1982, survival,   0,       survival, survival, phoenix_state, empty_init,           ROT90, "Rock-Ola",                               "Survival",                                                   MACHINE_SUPPORTS_SAVE ) // colors match PCB
+// Germ Wars is the original game name, although the set here appears to be a version for the German market
+// The Rock-Ola set still credits Microtrain as the developer in the ROM data
+GAME( 1982, germwars,   0,       survival, survival, phoenix_state, empty_init,           ROT90, "Microtrain (Seevend Automaten license)", "Germ Wars (Germany)",                                        MACHINE_SUPPORTS_SAVE )
+GAME( 1982, survival,   germwars,survival, survival, phoenix_state, empty_init,           ROT90, "Microtrain (Rock-Ola license)",          "Survival",                                                   MACHINE_SUPPORTS_SAVE ) // colors match PCB

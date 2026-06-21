@@ -52,6 +52,8 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
+#include <bit>
+
 // internal artwork
 #include "saitek_ecbackg.lh"
 #include "saitek_sbackgc.lh"
@@ -75,8 +77,6 @@ public:
 		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
-	void shared(machine_config &config);
-
 	DECLARE_INPUT_CHANGED_MEMBER(init_board);
 	DECLARE_INPUT_CHANGED_MEMBER(bear_off);
 	DECLARE_INPUT_CHANGED_MEMBER(power_off) { if (newval) m_power = false; }
@@ -84,6 +84,8 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD { m_power = true; }
+
+	void shared(machine_config &config) ATTR_COLD;
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
@@ -120,8 +122,6 @@ protected:
 
 void sbackgc_base_state::machine_start()
 {
-	m_out_lcd.resolve();
-
 	// register for savestates
 	save_item(NAME(m_power));
 	save_item(NAME(m_led_data));
@@ -140,7 +140,7 @@ public:
 		sbackgc_base_state(mconfig, type, tag)
 	{ }
 
-	void sbackgc(machine_config &config);
+	void sbackgc(machine_config &config) ATTR_COLD;
 
 private:
 	// I/O handlers
@@ -161,7 +161,7 @@ public:
 		sbackgc_base_state(mconfig, type, tag)
 	{ }
 
-	void ecbackg(machine_config &config);
+	void ecbackg(machine_config &config) ATTR_COLD;
 
 private:
 	// I/O handlers
@@ -412,7 +412,7 @@ void sbackgc_base_state::update_lcd()
 	for (int i = 0; i < 2; i++)
 	{
 		// LCD common is analog (voltage level)
-		const u8 com = population_count_32(m_lcd_com >> (i * 2) & 3);
+		const u8 com = std::popcount(m_lcd_com >> (i * 2) & 3U);
 		const u32 data = (com == 0) ? m_lcd_segs : (com == 2) ? ~m_lcd_segs : 0;
 		m_lcd_pwm->write_row(i, data);
 	}
@@ -425,8 +425,8 @@ void sbackgc_base_state::lcd_segs_w(offs_t offset, u8 data, u8 mem_mask)
 		return;
 
 	// R3x-R8x: LCD segments (P1x,P3x,P4x on ecbackg)
-	const u8 width = 32 - count_leading_zeros_32(mem_mask);
-	const u8 mask = (1 << width) - 1;
+	const u8 width = std::bit_width(mem_mask);
+	const u8 mask = util::make_bitmask<u8>(width);
 	const u8 shift = width * N;
 
 	m_lcd_segs = (m_lcd_segs & ~(mask << shift)) | ((data & mask) << shift);

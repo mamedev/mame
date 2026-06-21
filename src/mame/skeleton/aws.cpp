@@ -183,7 +183,7 @@ void aws_state::aws_base(machine_config &config)
 	m_dmac->out_memw_cb().set(FUNC(aws_state::ram_w));
 	m_dmac->out_iow_cb<2>().set(m_crtc,FUNC(i8275_device::dack_w));
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(19.6608_MHz_XTAL / 16);  // 1.23 MHz
 	m_pit->out_handler<0>().set(FUNC(aws_state::pit_out0_w));  // Tone generator
 	m_pit->set_clk<1>(19.6608_MHz_XTAL / 16);  // 1.23 MHz
@@ -211,8 +211,8 @@ void aws_state::aws_base(machine_config &config)
 void aws_state::fdc_board(machine_config &config)
 {
 	I8272A(config, m_fdc, 0);
-	PIC8259(config, m_pic, 0);
-	PIT8253(config, m_fdc_pit, 0);
+	PIC8259(config, m_pic);
+	PIT8253(config, m_fdc_pit);
 	m_fdc_pit->set_clk<0>(19.6608_MHz_XTAL / 16);  // 1.23 MHz
 //  m_fdc_pit->out_handler<0>().set(FUNC(aws_state::pit_out0_w));  // INT5
 	m_fdc_pit->set_clk<1>(19.6608_MHz_XTAL / 16);  // 1.23 MHz

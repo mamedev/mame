@@ -488,7 +488,7 @@ private:
 // ======================> render_target
 
 // a render_target describes a surface that is being rendered to
-class render_target
+class render_target final : public osd::ui_event_handler
 {
 	friend class simple_list<render_target>;
 	friend class render_manager;
@@ -567,6 +567,15 @@ public:
 	// resolve tag lookups
 	void resolve_tags();
 
+	// osd::ui_event_handler implementation
+	virtual void push_window_focus_event() override;
+	virtual void push_window_defocus_event() override;
+	virtual void push_mouse_wheel_event(s32 x, s32 y, short delta, int lines) override;
+	virtual void push_pointer_update(pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 buttons, u32 pressed, u32 released, s16 clicks) override;
+	virtual void push_pointer_leave(pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 released, s16 clicks) override;
+	virtual void push_pointer_abort(pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 released, s16 clicks) override;
+	virtual void push_char_event(char32_t ch) override;
+
 private:
 	// constants
 	static inline constexpr int NUM_PRIMLISTS = 3;
@@ -615,6 +624,7 @@ private:
 	// internal state
 	render_target *         m_next;                     // link to next target
 	render_manager &        m_manager;                  // reference to our owning manager
+	ui_event_sink &         m_event_sink;               // handler for incoming UI events
 	render_container *const m_ui_container;             // container for drawing UI elements
 	std::list<layout_file>  m_filelist;                 // list of layout files
 	view_mask_vector        m_views;                    // views we consider
@@ -658,7 +668,7 @@ class render_manager
 
 public:
 	// construction/destruction
-	render_manager(running_machine &machine);
+	render_manager(running_machine &machine, ui_event_sink &event_sink);
 	~render_manager();
 
 	// getters
@@ -705,6 +715,7 @@ private:
 
 	// internal state
 	running_machine &               m_machine;                  // reference back to the machine
+	ui_event_sink &                 m_event_sink;
 
 	// array of live targets
 	simple_list<render_target>      m_targetlist;               // list of targets

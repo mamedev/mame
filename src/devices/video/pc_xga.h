@@ -17,7 +17,7 @@ public:
 		OTI111
 	};
 
-	xga_copro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	xga_copro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	u8 xga_read(offs_t offset);
 	void xga_write(offs_t offset, u8 data);

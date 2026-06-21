@@ -13,6 +13,7 @@
 #include "debugwin.h"
 
 #include "debugbaseinfo.h"
+#include "uimetrics.h"
 
 
 namespace osd::debugger::win {
@@ -23,6 +24,8 @@ public:
 	virtual ~debugwin_info();
 
 	bool is_valid() const { return m_wnd != nullptr; }
+
+	ui_metrics const &metrics() const { return m_metrics; }
 
 	void set_ignore_char_lparam(LPARAM value) { m_ignore_char_lparam = value >> 16; }
 	bool check_ignore_char_lparam(LPARAM value)
@@ -129,9 +132,12 @@ protected:
 	HWND window() const { return m_wnd; }
 	uint32_t minwidth() const { return m_minwidth; }
 	uint32_t maxwidth() const { return m_maxwidth; }
+	uint32_t minheight() const { return m_minheight; }
 	void set_minwidth(uint32_t value) { m_minwidth = value; }
 	void set_maxwidth(uint32_t value) { m_maxwidth = value; }
+	void set_minheight(uint32_t value) { m_minheight = value; }
 
+	virtual void update_dpi();
 	virtual void recompute_children();
 	virtual void update_menu() { }
 	virtual bool handle_command(WPARAM wparam, LPARAM lparam);
@@ -152,6 +158,7 @@ private:
 
 	static void register_window_class();
 
+	ui_metrics      m_metrics;
 	bool const      m_is_main_console;
 
 	HWND            m_wnd;

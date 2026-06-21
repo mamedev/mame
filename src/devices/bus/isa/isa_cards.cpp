@@ -35,9 +35,11 @@
 // storage (MFM/RLL/ESDI)
 #include "acb2072.h"
 #include "cl_sh260.h"
+#include "dsi32.h"
 #include "hdc.h"
 #include "lrk330.h"
 #include "omti8621.h"
+#include "pd32.h"
 #include "ultra12f.h"
 #include "wd1002a_wx1.h"
 #include "wd1007a.h"
@@ -139,6 +141,8 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("xtide", ISA8_XTIDE);
 	device.option_add("side116", ISA8_SIDE116);
 	device.option_add("hdc", ISA8_HDC);
+	device.option_add("dsi32", ISA8_DSI32);
+	device.option_add("pd32", ISA8_PD32);
 	device.option_add("adlib", ISA8_ADLIB);
 	device.option_add("hercules", ISA8_HERCULES);
 	device.option_add("gblaster", ISA8_GAME_BLASTER);

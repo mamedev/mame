@@ -53,6 +53,8 @@
 #include "layout/generic.h"
 #include "screen.h"
 
+#include "endianness.h"
+
 #include <algorithm>
 
 #define LOG_CRTC    (1U << 1)

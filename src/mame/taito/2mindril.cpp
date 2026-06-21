@@ -357,7 +357,7 @@ void _2mindril_state::drill(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(_2mindril_state::vblank_irq));
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_2mindril);
 
-	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio"));
 	tc0510nio.read_0_callback().set_ioport("DSW");
 	tc0510nio.read_1_callback().set(FUNC(_2mindril_state::arm_pwr_r));
 	tc0510nio.read_2_callback().set(FUNC(_2mindril_state::sensors_r));

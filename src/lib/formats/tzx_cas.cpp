@@ -33,6 +33,7 @@ TODO:
 #include "multibyte.h"
 
 #include <cmath>
+#include <cstring>
 
 
 #define TZX_WAV_FREQUENCY   44100

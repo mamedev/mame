@@ -113,7 +113,7 @@ void wpcsnd_device::device_add_mconfig(machine_config &config)
 
 	AD7524(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.25);
 
-	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, *this, 0.5);
+	HC55516(config, m_hc55516).add_route(ALL_OUTPUTS, *this, 0.5);
 }
 
 

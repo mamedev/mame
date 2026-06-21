@@ -313,7 +313,7 @@ void dogyuun_state::dogyuun_base(machine_config &config)
 	M68000(config, m_maincpu, 25_MHz_XTAL/2);           /* verified on pcb */
 	m_maincpu->reset_cb().set(FUNC(dogyuun_state::reset_audiocpu));
 
-	TOAPLAN_COINCOUNTER(config, m_coincounter, 0);
+	TOAPLAN_COINCOUNTER(config, m_coincounter);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

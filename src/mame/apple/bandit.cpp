@@ -17,6 +17,16 @@ enum
 	AS_PCI_IO = 2
 };
 
+enum
+{
+	SYSTEM_ID = 4,
+	VERSION,
+	MEM_CONFIG,
+	GPIO_IN = 12,
+	GPIO_DDR,
+	GPIO_OUT
+};
+
 DEFINE_DEVICE_TYPE(BANDIT, bandit_host_device, "banditpci", "Apple Bandit PowerPC-to-PCI bridge")
 DEFINE_DEVICE_TYPE(ASPEN, aspen_host_device, "aspenpci", "Apple Aspen PowerPC-to-PCI bridge and memory controller")
 
@@ -44,6 +54,37 @@ bandit_host_device::bandit_host_device(const machine_config &mconfig, const char
 
 aspen_host_device::aspen_host_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: bandit_host_device(mconfig, ASPEN, tag, owner, clock)
+{
+}
+
+void aspen_host_device::device_start()
+{
+	bandit_host_device::device_start();
+
+	m_cpu_space->install_read_handler(0xf8000000, 0xf80007ff, emu::rw_delegate(*this, FUNC(aspen_host_device::regs_r)));
+	m_cpu_space->install_write_handler(0xf8000000, 0xf80007ff, emu::rw_delegate(*this, FUNC(aspen_host_device::regs_w)));
+}
+
+u32 aspen_host_device::regs_r(offs_t offset, u32 mem_mask)
+{
+	u32 r = 0;
+	switch (offset & 0x1f)
+	{
+		case SYSTEM_ID:
+			r = 0x40010000;
+			break;
+
+		case VERSION:
+			r = 0x01000000;
+			break;
+
+		default:
+			break;
+	}
+	return r;
+}
+
+void aspen_host_device::regs_w(offs_t offset, u32 data, u32 mem_mask)
 {
 }
 
@@ -145,8 +186,6 @@ u32 bandit_host_device::be_config_data_r(offs_t offset, u32 mem_mask)
 
 void bandit_host_device::be_config_data_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	// printf("config_data_w: %08x @ %08x mask %08x\n", data, offset, mem_mask);
-
 	pci_host_device::config_data_ex_w(offset, swapendian_int32(data), mem_mask);
 }
 
@@ -185,25 +224,43 @@ void bandit_host_device::pci_io_w(offs_t offset, u32 data, u32 mem_mask)
 	this->space(AS_PCI_IO).write_dword(Base + (offset * 4), swapendian_int32(data), swapendian_int32((mem_mask)));
 }
 
+template <u32 Base>
+u32 bandit_host_device::cpu_memory_r(offs_t offset, u32 mem_mask)
+{
+	return swapendian_int32(m_cpu_space->read_dword(Base + (offset * 4), swapendian_int32(mem_mask)));
+}
+
+template <u32 Base>
+void bandit_host_device::cpu_memory_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	m_cpu_space->write_dword(Base + (offset * 4), swapendian_int32(data), swapendian_int32(mem_mask));
+}
+
+template u32 bandit_host_device::cpu_memory_r<0>(offs_t offset, u32 mem_mask);
+template void bandit_host_device::cpu_memory_w<0>(offs_t offset, u32 data, u32 mem_mask);
+
 // map PCI memory and I/O space stuff here
 void bandit_host_device::map_extra(u64 memory_window_start, u64 memory_window_end, u64 memory_offset, address_space *memory_space,
 									 u64 io_window_start, u64 io_window_end, u64 io_offset, address_space *io_space)
 {
-}
-
-u32 aspen_host_device::be_config_address_r()
-{
-	return m_last_config_address;
+	memory_space->install_read_handler(0, 0x3fff'ffff, read32s_delegate(*this, FUNC(bandit_host_device::cpu_memory_r<0>)));
+	memory_space->install_write_handler(0, 0x3fff'ffff, write32s_delegate(*this, FUNC(bandit_host_device::cpu_memory_w<0>)));
 }
 
 void aspen_host_device::be_config_address_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	m_last_config_address = data;
 
+	u32 cfg;
 	if ((data & 3) == 1)
 	{
-		data |= 0x80000000;
+		cfg = data | 0x80000000;
+	}
+	else
+	{
+		const u32 dev = (((data >> 11) & 0x1f) + 11) & 0x1f;
+		cfg = (1u << dev) | (data & 0xfc);
 	}
 
-	pci_host_device::config_address_w(offset, data, mem_mask);
+	pci_host_device::config_address_w(offset, cfg, mem_mask);
 }

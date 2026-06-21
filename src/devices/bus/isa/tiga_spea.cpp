@@ -41,7 +41,7 @@ void isa16_fga4he_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(vga_device::screen_update));
 
-	HT208_VIDEO7_VGA(config, m_vga, 0);
+	HT208_VIDEO7_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(256*1024);
 //  m_vga->setup_rom_bank_cb().set([this] (u8 data) { printf("%02x\n", data); });

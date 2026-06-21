@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, R. Belmont
 /***************************************************************************
 
     ppccom.h
@@ -31,17 +31,17 @@
     CONSTANTS
 ***************************************************************************/
 
-/* size of the execution code cache */
+// size of the execution code cache
 #define CACHE_SIZE                      (32 * 1024 * 1024)
 
-/* compilation boundaries -- how far back/forward does the analysis extend? */
+// compilation boundaries -- how far back/forward does the analysis extend?
 #define COMPILE_BACKWARDS_BYTES         128
 #define COMPILE_FORWARDS_BYTES          512
 #define COMPILE_MAX_INSTRUCTIONS        ((COMPILE_BACKWARDS_BYTES/4) + (COMPILE_FORWARDS_BYTES/4))
 #define COMPILE_MAX_SEQUENCE            64
 
 
-/* core parameters */
+// core parameters
 #define POWERPC_MIN_PAGE_SHIFT      12
 #define POWERPC_MIN_PAGE_SIZE       (1 << POWERPC_MIN_PAGE_SHIFT)
 #define POWERPC_MIN_PAGE_MASK       (POWERPC_MIN_PAGE_SIZE - 1)
@@ -49,12 +49,12 @@
 #define PPC603_FIXED_TLB_ENTRIES    128
 
 
-/* cycle parameters */
+// cycle parameters
 #define POWERPC_COUNT_READ_TBL      100
 #define POWERPC_COUNT_READ_DEC      100
 
 
-/* internal capabilities flags */
+// internal capabilities flags
 #define PPCCAP_OEA                  0x01        /* TRUE if we conform to the OEA */
 #define PPCCAP_VEA                  0x02        /* TRUE if we conform to the VEA */
 #define PPCCAP_FPU                  0x04        /* TRUE if we have an FPU */
@@ -67,7 +67,7 @@
 #define PPCCAP_750_TLB              0x200       /* TRUE if we have the extended 740/750 series TLB */
 #define PPCCAP_LEGACY_POWER         0x400       /* TRUE if we support the legacy POWER instructions */
 
-/* exception types */
+// exception types
 enum
 {
 	EXCEPTION_RESET         = 1,
@@ -90,19 +90,19 @@ enum
 };
 
 
-/* SPRs */
+// SPRs
 enum
 {
-	/* UISA SPR register indexes */
+	// UISA SPR register indexes
 	SPR_XER             = 0x001,    /* R/W  Fixed Point Exception Register */
 	SPR_LR              = 0x008,    /* R/W  Link Register */
 	SPR_CTR             = 0x009,    /* R/W  Count Register */
 
-	/* VEA SPR register indexes */
+	// VEA SPR register indexes
 	SPRVEA_TBL_R        = 0x10c,    /* R    Time Base Low */
 	SPRVEA_TBU_R        = 0x10d,    /* R    Time Base High */
 
-	/* OEA SPR register indexes */
+	// OEA SPR register indexes
 	SPROEA_DSISR        = 0x012,    /* R/W  DSI Status Register */
 	SPROEA_DAR          = 0x013,    /* R/W  Data Address Register */
 	SPROEA_DEC          = 0x016,    /* R/W  Decrementer Register */
@@ -134,7 +134,7 @@ enum
 	SPROEA_DBAT3L       = 0x21f,    /* R/W  Data BAT 3 Lower */
 	SPROEA_DABR         = 0x3f5,    /* R/W  Data Address Breakpoint Register */
 
-	/* PowerPC 4XX SPR register indexes */
+	// PowerPC 4XX SPR register indexes
 	SPR4XX_SRR0         = 0x01a,    /* R/W  403GA Machine Status Save/Restore Register 0 */
 	SPR4XX_SRR1         = 0x01b,    /* R/W  403GA Machine Status Save/Restore Register 1 */
 	SPR4XX_SPRG0        = 0x110,    /* R/W  403GA SPR General 0 */
@@ -172,7 +172,7 @@ enum
 	SPR4XX_PBL2         = 0x3fe,    /* R/W  403GA 406GA Protection Bound Lower 2 */
 	SPR4XX_PBU2         = 0x3ff,    /* R/W  403GA 406GA Protection Bound Upper 2 */
 
-	/* PowerPC 601 POWER back compatibility SPR indexes */
+	// PowerPC 601 POWER back compatibility SPR indexes
 	SPR601_MQ           = 0x000,    /* R/W  Muliplicand/Quotient for 601 POWER instructions */
 	SPR601_RTCUR_PWR    = 0x004,    /* R    Counts up number set in SPR 20 once per second, POWER only */
 	SPR601_RTCLR_PWR    = 0x005,    /* R    Number of nanoseconds between the seconds counted in SPR 4 */
@@ -180,7 +180,7 @@ enum
 	SPR601_RTCUW_PWR    = 0x014,    /* W    Seconds counter, set here and read SPR 4 */
 	SPR601_RTCLW_PWR    = 0x015,    /* W    Nanoseconds counter, not clear what writing here does */
 
-	/* PowerPC 602 SPR register indexes */
+	// PowerPC 602 SPR register indexes
 	SPR602_TCR          = 0x3d8,    /* 602 */
 	SPR602_IBR          = 0x3da,    /* 602 */
 	SPR602_ESASRR       = 0x3db,    /* 602 */
@@ -189,7 +189,7 @@ enum
 	SPR602_SP           = 0x3fd,    /* 602 */
 	SPR602_LT           = 0x3fe,    /* 602 */
 
-	/* PowerPC 603 SPR register indexes */
+	// PowerPC 603 SPR register indexes
 	SPR603_TBL_R        = 0x10c,    /* R   603 Time Base Low (Read-only) */
 	SPR603_TBU_R        = 0x10d,    /* R   603 Time Base High (Read-only) */
 	SPR603_TBL_W        = 0x11c,    /* W   603 Time Base Low (Write-only) */
@@ -207,7 +207,7 @@ enum
 	SPR603_HID2         = 0x3f3     /* R/W 603 */
 };
 
-/* PowerPC 4XX DCR register indexes */
+// PowerPC 4XX DCR register indexes
 enum
 {
 	DCR4XX_EXISR        = 0x040,    /* external interrupt status */
@@ -247,7 +247,7 @@ enum
 };
 
 
-/* PowerPC 4XX SPU register indexes */
+// PowerPC 4XX SPU register indexes
 enum
 {
 	SPU4XX_LINE_STATUS      = 0x00,
@@ -260,8 +260,7 @@ enum
 	SPU4XX_BUFFER           = 0x09
 };
 
-
-/* FPSCR register bits */
+// FPSCR register bits
 #define FPSCR_FX            0x80000000
 #define FPSCR_FEX           0x40000000
 #define FPSCR_VX            0x20000000
@@ -269,22 +268,46 @@ enum
 #define FPSCR_UX            0x08000000
 #define FPSCR_ZX            0x04000000
 #define FPSCR_XX            0x02000000
+#define FPSCR_VXSNAN        0x01000000  // invalid: signaling NaN
+#define FPSCR_VXISI         0x00800000  // invalid: inf - inf */
+#define FPSCR_VXIDI         0x00400000  // invalid: inf / inf */
+#define FPSCR_VXZDZ         0x00200000  // invalid: 0 / 0
+#define FPSCR_VXIMZ         0x00100000  // invalid: inf * 0
+#define FPSCR_VXVC          0x00080000  // invalid: compare of a NaN (ordered)
+#define FPSCR_VXSQRT        0x00000200  // invalid: sqrt of a negative
+#define FPSCR_VXCVI         0x00000100  // invalid: integer convert overflow
+#define FPSCR_VE            0x00000080  // invalid operation enable
+#define FPSCR_OE            0x00000040  // overflow enable
+#define FPSCR_UE            0x00000020  // underflow enable
+#define FPSCR_ZE            0x00000010  // zero divide enable
+#define FPSCR_XE            0x00000008  // inexact enable
+#define FPSCR_VX_ANY        0x01F80700  // OR of all invalid-operation sub-bits
+
+// bit positions of FPSCR register bits
+#define FPSCR_VXSNAN_BIT    24
+#define FPSCR_VXISI_BIT     23
+#define FPSCR_VXIDI_BIT     22
+#define FPSCR_VXZDZ_BIT     21
+#define FPSCR_VXIMZ_BIT     20
+#define FPSCR_VXVC_BIT      19
+#define FPSCR_VXSQRT_BIT    9
+#define FPSCR_VXCVI_BIT     8
 
 
-/* XER register bits */
+// XER register bits
 #define XER_SO              0x80000000
 #define XER_OV              0x40000000
 #define XER_CA              0x20000000
 
 
-/* Machine State Register bits - common */
+// Machine State Register bits - common
 #define MSR_ILE             0x00010000  /* Interrupt Little Endian Mode */
 #define MSR_EE              0x00008000  /* External Interrupt Enable */
 #define MSR_PR              0x00004000  /* Problem State */
 #define MSR_ME              0x00001000  /* Machine Check Enable */
 #define MSR_LE              0x00000001  /* Little Endian */
 
-/* Machine State Register bits - OEA */
+// Machine State Register bits - OEA
 #define MSROEA_POW          0x00040000  /* Power Management Enable */
 #define MSROEA_FP           0x00002000  /* Floating Point Available */
 #define MSROEA_FE0          0x00000800  /* FP Exception Mode 0 */
@@ -296,27 +319,27 @@ enum
 #define MSROEA_DR           0x00000010  /* Data Relocate */
 #define MSROEA_RI           0x00000002  /* Recoverable Interrupt Enable */
 
-/* Machine State Register bits - 4XX */
+// Machine State Register bits - 4XX
 #define MSR4XX_WE           0x00040000  /* Wait State Enable */
 #define MSR4XX_CE           0x00020000  /* Critical Interrupt Enable */
 #define MSR4XX_DE           0x00000200  /* Debug Exception Enable */
 #define MSR4XX_PE           0x00000008  /* Protection Enable (reserved for others) */
 #define MSR4XX_PX           0x00000004  /* Protection Exclusive Mode (reserved for others) */
 
-/* Machine State Register bits - 602 */
+// Machine State Register bits - 602
 #define MSR602_AP           0x00800000  /* Access privilege state */
 #define MSR602_SA           0x00400000  /* Supervisor access mode */
 
-/* Machine State Register bits - 603 */
+// Machine State Register bits - 603
 #define MSR603_TGPR         0x00020000  /* Temporary GPR Remapping */
 
-/* ESA Save and Restore Register bits - 602 */
+// ESA Save and Restore Register bits - 602
 #define SPR602_ESASRR_EE    0x00000001  /* External Interrupt Enable */
 #define SPR602_ESASRR_SA    0x00000002  /* Supervisor access mode */
 #define SPR602_ESASRR_AP    0x00000004  /* Access privilege state */
 #define SPR602_ESASRR_PR    0x00000008  /* Privilege Level */
 
-/* DSISR bits for DSI/alignment exceptions */
+// DSISR bits for DSI/alignment exceptions
 #define DSISR_DIRECT        0x80000000      /* DSI: direct-store error interrupt */
 #define DSISR_NOT_FOUND     0x40000000      /* DSI: not found in HTEG or DBAT */
 #define DSISR_PROTECTED     0x08000000      /* DSI: exception due to protection */
@@ -328,7 +351,7 @@ enum
 #define DSISR_INSTRUCTION   0x000fffff      /* align: instruction decoding bits FIXME: mask/shift depends on addressing mode */
 
 
-/* PowerPC 4XX IRQ bits */
+// PowerPC 4XX IRQ bits
 #define PPC4XX_IRQ_BIT_CRITICAL     (0x80000000 >> 0)
 #define PPC4XX_IRQ_BIT_SPUR         (0x80000000 >> 4)
 #define PPC4XX_IRQ_BIT_SPUT         (0x80000000 >> 5)
@@ -348,7 +371,7 @@ enum
 #define PPC4XX_IRQ_BIT_DMA(n)       (PPC4XX_IRQ_BIT_DMA0 >> (n))
 
 
-/* PowerPC 4XX DMA control bits */
+// PowerPC 4XX DMA control bits
 #define PPC4XX_DMACR_CE             0x80000000      /* channel enable */
 #define PPC4XX_DMACR_CIE            0x40000000      /* channel interrupt enable */
 #define PPC4XX_DMACR_TD             0x20000000      /* transfer direction */
@@ -370,7 +393,7 @@ enum
 #define PPC4XX_DMACR_PCE            0x00000008
 
 
-/* PowerPC 4XX Timer control register bits */
+// PowerPC 4XX Timer control register bits
 #define PPC4XX_TCR_WP_MASK          0xc0000000      /* watchdog period */
 #define PPC4XX_TCR_WRC_MASK         0x30000000      /* watchdog reset control */
 #define PPC4XX_TCR_WIE              0x08000000      /* watchdog interrupt enable */
@@ -380,7 +403,7 @@ enum
 #define PPC4XX_TCR_ARE              0x00400000      /* auto reload enable */
 
 
-/* PowerPC 4XX Timer status register bits */
+// PowerPC 4XX Timer status register bits
 #define PPC4XX_TSR_ENW              0x80000000      /* enable next watchdog */
 #define PPC4XX_TSR_WIS              0x40000000      /* watchdog interrupt status */
 #define PPC4XX_TSR_WRS_MASK         0x30000000      /* watchdog reset status */
@@ -388,7 +411,7 @@ enum
 #define PPC4XX_TSR_FIS              0x04000000      /* FIT interrupt status */
 
 
-/* instruction decoding masks */
+// instruction decoding masks
 #define M_LI                0x03fffffc
 #define M_AA                0x00000002
 #define M_LK                0x00000001

@@ -1146,40 +1146,31 @@ end
 	configuration { }
 
 	files {
-		MAME_DIR .. "3rdparty/portmidi/pm_common/portmidi.c",
 		MAME_DIR .. "3rdparty/portmidi/pm_common/pmutil.c",
+		MAME_DIR .. "3rdparty/portmidi/pm_common/portmidi.c",
 	}
 
 	if _OPTIONS["targetos"]=="windows" then
 		files {
-			MAME_DIR .. "3rdparty/portmidi/porttime/ptwinmm.c",
 			MAME_DIR .. "3rdparty/portmidi/pm_win/pmwin.c",
 			MAME_DIR .. "3rdparty/portmidi/pm_win/pmwinmm.c",
 			MAME_DIR .. "3rdparty/portmidi/porttime/ptwinmm.c",
 		}
-	end
-
-	if _OPTIONS["targetos"]=="linux" then
+	elseif _OPTIONS["targetos"]=="linux" then
 		files {
 			MAME_DIR .. "3rdparty/portmidi/pm_linux/pmlinux.c",
 			MAME_DIR .. "3rdparty/portmidi/pm_linux/pmlinuxalsa.c",
-			MAME_DIR .. "3rdparty/portmidi/pm_linux/finddefault.c",
 			MAME_DIR .. "3rdparty/portmidi/porttime/ptlinux.c",
 		}
-	end
-	if _OPTIONS["targetos"]=="netbsd" then
+	elseif _OPTIONS["targetos"]=="netbsd" then
 		files {
 			MAME_DIR .. "3rdparty/portmidi/pm_linux/pmlinux.c",
-			MAME_DIR .. "3rdparty/portmidi/pm_linux/finddefault.c",
 			MAME_DIR .. "3rdparty/portmidi/porttime/ptlinux.c",
 		}
-	end
-	if _OPTIONS["targetos"]=="macosx" then
+	elseif _OPTIONS["targetos"]=="macosx" then
 		files {
 			MAME_DIR .. "3rdparty/portmidi/pm_mac/pmmac.c",
 			MAME_DIR .. "3rdparty/portmidi/pm_mac/pmmacosxcm.c",
-			MAME_DIR .. "3rdparty/portmidi/pm_mac/finddefault.c",
-			MAME_DIR .. "3rdparty/portmidi/pm_mac/readbinaryplist.c",
 			MAME_DIR .. "3rdparty/portmidi/porttime/ptmacosx_mach.c",
 		}
 	end

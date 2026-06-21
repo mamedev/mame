@@ -67,6 +67,7 @@ void awacs_macrisc_device::device_start()
 	save_item(NAME(m_phase));
 	save_item(NAME(m_active));
 	save_item(NAME(m_registers));
+	save_item(NAME(m_snd_control));
 }
 
 //-------------------------------------------------
@@ -78,6 +79,7 @@ void awacs_macrisc_device::device_reset()
 	m_phase = 0;
 	m_active = ACTIVE_OUT;      // AWACS is always running, Screamer has a real enable/disable bit
 	m_registers[1] = REGISTER_1_MUTE;
+	m_snd_control = 0;
 	m_stream->set_sample_rate(clock() / 1024);
 }
 
@@ -124,7 +126,7 @@ uint32_t awacs_macrisc_device::read_macrisc(offs_t offset)
 	switch (offset)
 	{
 		case 0:     // Audio Control
-			return 0;
+			return swapendian_int32(m_snd_control);
 
 		case 4:     // Audio CODEC Control
 			return 0;
@@ -144,8 +146,10 @@ void awacs_macrisc_device::write_macrisc(offs_t offset, uint32_t data)
 	switch (offset)
 	{
 		case 0: // Audio Control
+			m_snd_control = data;
 			m_stream->set_sample_rate(clock() / rates[(data >> 8) & 7]);
 			LOG("%s: sample rate to %d Hz\n", tag(), clock() / rates[(data >> 8) & 7]);
+			m_registers[1] = 0;
 			break;
 
 		case 4: // Audio CODEC Control
@@ -164,7 +168,6 @@ void awacs_macrisc_device::write_macrisc(offs_t offset, uint32_t data)
 			break;
 
 		case 12: // Byte swap
-			printf("CODEC byte swap: %08x\n", data);
 			break;
 	}
 }

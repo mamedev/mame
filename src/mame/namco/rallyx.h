@@ -8,7 +8,8 @@
 #include "timeplt_a.h"
 
 #include "sound/namco.h"
-#include "sound/samples.h"
+
+#include "machine/netlist.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -23,7 +24,7 @@ public:
 		m_radarattr(*this, "radarattr"),
 		m_maincpu(*this, "maincpu"),
 		m_namco_sound(*this, "namco"),
-		m_samples(*this, "samples"),
+		m_bang(*this, "snd_nl:i_bang"),
 		m_timeplt_audio(*this, "timeplt_audio"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -61,7 +62,6 @@ private:
 		uint8_t color = 0;
 	};
 
-	bool      m_last_bang = 0;
 	uint8_t   m_spriteram_base = 0;
 	bool      m_stars_enable = 0;
 	uint16_t  m_total_stars = 0;
@@ -73,7 +73,7 @@ private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	optional_device<namco_wsg_device> m_namco_sound;
-	optional_device<samples_device> m_samples;
+	optional_device<netlist_mame_logic_input_device> m_bang;
 	optional_device<timeplt_audio_device> m_timeplt_audio;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

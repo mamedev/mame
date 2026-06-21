@@ -219,7 +219,7 @@ void shoken_md06_state::petitlot(machine_config &config)
 	m_maincpu->in_p4_callback().set([this] () { logerror("%s CPU port 4 read\n", machine().describe_context()); return (uint8_t)0; });
 	m_maincpu->out_p4_callback().set([this] (uint8_t data) { logerror("%s CPU port 4 write: %02x\n", machine().describe_context(), data); });
 
-	RTC62423(config, "rtc", 0);
+	RTC62423(config, "rtc");
 }
 
 void shoken_md06_state::polarstar(machine_config &config)

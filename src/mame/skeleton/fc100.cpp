@@ -67,11 +67,11 @@ public:
 		, m_uart(*this, "uart")
 		, m_centronics(*this, "centronics")
 		, m_keyboard(*this, "KEY.%u", 0U)
+		, m_chargen_view(*this, "chargen_view")
+		, m_chargen_ram(*this, "chargen_ram")
 	{ }
 
 	void fc100(machine_config &config);
-
-	void init_fc100();
 
 private:
 	uint8_t mc6847_videoram_r(offs_t offset);
@@ -119,6 +119,8 @@ private:
 	required_device<i8251_device> m_uart;
 	required_device<centronics_device> m_centronics;
 	required_ioport_array<16> m_keyboard;
+	memory_view m_chargen_view;
+	required_shared_ptr<u8> m_chargen_ram;
 };
 
 
@@ -126,8 +128,12 @@ void fc100_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x5fff).rom().region("roms", 0);
-	//map(0x6000, 0x6fff)      // mapped by the cartslot
-	map(0x7800, 0x7fff).bankr("bankr").bankw("bankw"); // Banked RAM/ROM
+	map(0x6000, 0x6fff).r(m_cart, FUNC(generic_slot_device::read_rom));
+	map(0x7800, 0x7fff).view(m_chargen_view); // Banked RAM/ROM
+	m_chargen_view[0](0x7800, 0x7fff).rom().region("chargen", 0x800).lw8(
+		NAME([this] (offs_t offset, uint8_t data) { m_chargen_ram[offset] = data; })
+	);
+	m_chargen_view[1](0x7800, 0x7fff).ram().share("chargen_ram");
 	map(0x8000, 0xbfff).ram(); // expansion ram pack - if omitted you get a 'Pages?' prompt at boot
 	map(0xc000, 0xffff).ram().share("videoram");
 }
@@ -457,9 +463,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::kansas_r)
 
 void fc100_state::machine_start()
 {
-	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6fff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
-
 	save_item(NAME(m_ag));
 	save_item(NAME(m_gm2));
 	save_item(NAME(m_gm1));
@@ -490,30 +493,19 @@ void fc100_state::machine_reset()
 	m_cassbit = 0;
 	m_cassold = 0;
 	m_key_pressed = 0;
-	membank("bankr")->set_entry(0);
-	membank("bankw")->set_entry(0);
+	m_chargen_view.select(0);
 	m_uart->write_cts(0);
 }
 
 void fc100_state::port60_w(offs_t offset, uint8_t data)
 {
 	if (m_banksw_unlocked)
-		membank("bankr")->set_entry(offset);
+		m_chargen_view.select(offset);
 }
 
 void fc100_state::port70_w(offs_t offset, uint8_t data)
 {
 	m_banksw_unlocked = (bool)offset;
-}
-
-void fc100_state::init_fc100()
-{
-	uint8_t *ram = memregion("ram")->base();
-	uint8_t *cgen = memregion("chargen")->base()+0x800;
-
-	membank("bankr")->configure_entry(0, &cgen[0]);
-	membank("bankw")->configure_entry(0, &ram[0]);
-	membank("bankr")->configure_entry(1, &ram[0]);
 }
 
 void fc100_state::fc100(machine_config &config)
@@ -550,7 +542,7 @@ void fc100_state::fc100(machine_config &config)
 	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 	m_uart->txd_handler().set([this] (bool state) { m_cassbit = state; });
 	clock_device &uart_clock(CLOCK(config, "uart_clock", XTAL(4'915'200)/16/16)); // gives 19200
 	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
@@ -582,8 +574,6 @@ ROM_START( fc100 )
 	ROM_REGION( 0x800, "mcu", ROMREGION_ERASE00 )
 	ROM_LOAD( "mcu.bin", 0x000, 0x800, NO_DUMP )
 
-	ROM_REGION( 0x800, "ram", ROMREGION_ERASE00 )
-
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "cg-04-01.u53",  0x0000, 0x1000, CRC(2de75b7f) SHA1(464369d98cbae92ffa322ebaa4404cf5b26825f1) )
 ROM_END
@@ -594,4 +584,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME  FLAGS
-CONS( 1982, fc100, 0,      0,      fc100,   fc100, fc100_state, init_fc100, "Goldstar", "FC-100", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, fc100, 0,      0,      fc100,   fc100, fc100_state, empty_init, "Goldstar", "FC-100", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

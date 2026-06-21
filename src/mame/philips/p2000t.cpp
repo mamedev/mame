@@ -678,7 +678,7 @@ void p2000t_state::p2000t(machine_config &config)
 	saa5050.set_screen_size(80, 24, 80);
 
 	/* the mini cassette driver */
-	MDCR(config, m_mdcr, 0);
+	MDCR(config, m_mdcr);
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("16K").set_extra_options("16K,32K,48K,64K,80K,102K");

@@ -381,10 +381,10 @@ void rc702_state::rc702(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	/* Keyboard */
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(rc702_state::kbd_put));
 
-	TTL7474(config, m_7474, 0);
+	TTL7474(config, m_7474);
 	m_7474->output_cb().set(FUNC(rc702_state::q_w));
 	m_7474->comp_output_cb().set(FUNC(rc702_state::qbar_w));
 

@@ -1745,7 +1745,7 @@ void pc6001_state::pc6001(machine_config &config)
 	m_ppi->out_pc_callback().set(FUNC(pc6001_state::ppi_portc_w));
 
 	/* uart */
-	I8251(config, "uart", 0);
+	I8251(config, "uart");
 
 	MSX_GENERAL_PURPOSE_PORT(config, m_joy[0], msx_general_purpose_port_devices, "joystick");
 	MSX_GENERAL_PURPOSE_PORT(config, m_joy[1], msx_general_purpose_port_devices, "joystick");

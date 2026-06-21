@@ -9,6 +9,7 @@
 
 #include "emu.h"
 
+#include "cpu/mcs51/i80c51.h"
 #include "screen.h"
 
 namespace {
@@ -22,6 +23,8 @@ public:
 	{ }
 
 	void eks515(machine_config &config) ATTR_COLD;
+
+	void init_eks515() ATTR_COLD;
 
 private:
 	virtual void machine_start() override ATTR_COLD;
@@ -42,6 +45,11 @@ void eks515_state::machine_reset()
 {
 }
 
+void eks515_state::prog_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom().region("maincpu", 0);
+}
+
 static INPUT_PORTS_START( eks515 )
 INPUT_PORTS_END
 
@@ -52,7 +60,9 @@ uint32_t eks515_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 void eks515_state::eks515(machine_config &config)
 {
-	// unknown CPU types
+	i80c31_device &maincpu(I80C31(config, "maincpu", 12'000'000)); // exact type unknown
+	maincpu.set_addrmap(AS_PROGRAM, &eks515_state::prog_map);
+	maincpu.port_in_cb<3>().set_constant(0xff); // silence logging
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -70,7 +80,14 @@ ROM_START( eks515 )
 	ROM_LOAD( "en25t80.u7", 0x000000, 0x100000, CRC(2a37d746) SHA1(c5f4e0d800e03b359e255060bcedbd615262d0b6) )
 ROM_END
 
+void eks515_state::init_eks515()
+{
+	memory_region *rgn = memregion("subcpu");
+	for (u32 addr = 0x000040; addr < rgn->bytes(); addr++)
+		rgn->as_u8(addr) ^= 0xa5 ^ ((addr >> 2) & 0x54);
+}
+
 } // anonymous namespace
 
 // name and product code taken from sticker on back of unit
-CONS( 201?, eks515, 0, 0, eks515, eks515, eks515_state, empty_init, "Easy Karaoke", "Karaoke Screen Party (EKS-515)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 201?, eks515, 0, 0, eks515, eks515, eks515_state, init_eks515, "Easy Karaoke", "Karaoke Screen Party (EKS-515)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

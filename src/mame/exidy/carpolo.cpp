@@ -241,28 +241,28 @@ void carpolo_state::carpolo(machine_config &config)
 	pia1.ca2_handler().set(FUNC(carpolo_state::coin3_interrupt_clear_w));
 	pia1.cb2_handler().set(FUNC(carpolo_state::coin4_interrupt_clear_w));
 
-	TTL7474(config, m_ttl7474_2s_1, 0);
+	TTL7474(config, m_ttl7474_2s_1);
 	m_ttl7474_2s_1->comp_output_cb().set(FUNC(carpolo_state::ttl7474_2s_1_q_cb));
 
-	TTL7474(config, m_ttl7474_2s_2, 0);
+	TTL7474(config, m_ttl7474_2s_2);
 	m_ttl7474_2s_2->comp_output_cb().set(FUNC(carpolo_state::ttl7474_2s_2_q_cb));
 
-	TTL7474(config, m_ttl7474_2u_1, 0);
+	TTL7474(config, m_ttl7474_2u_1);
 	m_ttl7474_2u_1->comp_output_cb().set(FUNC(carpolo_state::ttl7474_2u_1_q_cb));
 
-	TTL7474(config, m_ttl7474_2u_2, 0);
+	TTL7474(config, m_ttl7474_2u_2);
 	m_ttl7474_2u_2->comp_output_cb().set(FUNC(carpolo_state::ttl7474_2u_2_q_cb));
 
-	TTL7474(config, m_ttl7474_1f_1, 0);
-	TTL7474(config, m_ttl7474_1f_2, 0);
-	TTL7474(config, m_ttl7474_1d_1, 0);
-	TTL7474(config, m_ttl7474_1d_2, 0);
-	TTL7474(config, m_ttl7474_1c_1, 0);
-	TTL7474(config, m_ttl7474_1c_2, 0);
-	TTL7474(config, m_ttl7474_1a_1, 0);
-	TTL7474(config, m_ttl7474_1a_2, 0);
+	TTL7474(config, m_ttl7474_1f_1);
+	TTL7474(config, m_ttl7474_1f_2);
+	TTL7474(config, m_ttl7474_1d_1);
+	TTL7474(config, m_ttl7474_1d_2);
+	TTL7474(config, m_ttl7474_1c_1);
+	TTL7474(config, m_ttl7474_1c_2);
+	TTL7474(config, m_ttl7474_1a_1);
+	TTL7474(config, m_ttl7474_1a_2);
 
-	TTL74148(config, m_ttl74148_3s, 0);
+	TTL74148(config, m_ttl74148_3s);
 	m_ttl74148_3s->out_cb().set(FUNC(carpolo_state::ttl74148_3s_cb));
 
 	TTL153(config, m_ttl74153_1k);

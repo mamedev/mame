@@ -192,7 +192,7 @@ void terak_v_device::device_add_mconfig(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(terak_v_device::kbd_put));
 
 	// built-in piezo

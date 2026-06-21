@@ -54,7 +54,7 @@ license:CC0-1.0
 			</element>
 			<element ref="Reel" state="0">
 				<bounds x="~x~" y="145" width="30" height="135"/>
-				<yscroll name="sreel~i~" size="0.25" wrap="yes" min="65536" max="0"/>
+				<yscroll name="reel~i~:scroll" size="0.25" wrap="yes" min="65536" max="0"/>
 			</element>
 		</repeat>
 		<element name="digit5" ref="LCD"><bounds x="76" y="280" width="24" height="40" /></element>

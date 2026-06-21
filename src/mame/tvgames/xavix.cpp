@@ -1615,7 +1615,7 @@ void xavix_state::xavix(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(xavix_state::scanline_cb), "screen", 0, 1);
 
-	XAVIX_ADC(config, m_adc, 0);
+	XAVIX_ADC(config, m_adc);
 	m_adc->read_0_callback().set_ioport("AN0");
 	m_adc->read_1_callback().set_ioport("AN1");
 	m_adc->read_2_callback().set_ioport("AN2");
@@ -1625,13 +1625,13 @@ void xavix_state::xavix(machine_config &config)
 	m_adc->read_6_callback().set_ioport("AN6");
 	m_adc->read_7_callback().set_ioport("AN7");
 
-	XAVIX_ANPORT(config, m_anport, 0);
+	XAVIX_ANPORT(config, m_anport);
 	m_anport->read_0_callback().set(FUNC(xavix_state::anport0_r));
 	m_anport->read_1_callback().set(FUNC(xavix_state::anport1_r));
 	m_anport->read_2_callback().set(FUNC(xavix_state::anport2_r));
 	m_anport->read_3_callback().set(FUNC(xavix_state::anport3_r));
 
-	XAVIX_MATH(config, m_math, 0);
+	XAVIX_MATH(config, m_math);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1691,7 +1691,7 @@ void xavix_i2c_state::xavix_i2c_24c02(machine_config &config)
 {
 	xavix(config);
 
-	I2C_24C02(config, "i2cmem", 0);
+	I2C_24C02(config, "i2cmem");
 }
 
 void xavix_i2c_state::xavix_i2c_24c02_4mb(machine_config &config)
@@ -1732,7 +1732,7 @@ void xavix_i2c_state::xavix_i2c_24lc04(machine_config &config)
 {
 	xavix(config);
 
-	I2C_24C04(config, "i2cmem", 0); // 24LC04 on Nostalgia games, 24C04 on others
+	I2C_24C04(config, "i2cmem"); // 24LC04 on Nostalgia games, 24C04 on others
 }
 
 void xavix_i2c_state::xavix_i2c_24lc04_4mb(machine_config &config)
@@ -1788,7 +1788,7 @@ void xavix_i2c_state::xavix_i2c_24c08(machine_config &config)
 {
 	xavix(config);
 
-	I2C_24C08(config, "i2cmem", 0);
+	I2C_24C08(config, "i2cmem");
 }
 
 void xavix_i2c_state::xavix_i2c_24c08_4mb(machine_config &config)
@@ -1801,7 +1801,7 @@ void xavix_i2c_state::xavix_i2c_24c16(machine_config& config)
 {
 	xavix(config);
 
-	I2C_24C16(config, "i2cmem", 0);
+	I2C_24C16(config, "i2cmem");
 }
 
 void xavix_i2c_state::xavix_i2c_24c16_4mb(machine_config& config)
@@ -1878,7 +1878,7 @@ void xavix_mtrk_state::xavix_mtrk(machine_config &config)
 {
 	xavix_4mb(config);
 
-	XAVIX_MTRK_WHEEL(config, m_wheel, 0);
+	XAVIX_MTRK_WHEEL(config, m_wheel);
 	m_wheel->event_out_cb().set(FUNC(xavix_state::ioevent_trg08));
 }
 
@@ -1893,7 +1893,7 @@ void xavix_madfb_state::xavix_madfb(machine_config &config)
 {
 	xavix_4mb(config);
 
-	XAVIX_MADFB_BALL(config, m_ball, 0);
+	XAVIX_MADFB_BALL(config, m_ball);
 	m_ball->event_out_cb().set(FUNC(xavix_state::ioevent_trg01));
 }
 
@@ -1902,14 +1902,14 @@ void xavix_cart_state::xavix_cart(machine_config &config)
 {
 	xavix(config);
 
-	EKARA_CART_SLOT(config, m_cartslot, 0, ekara_cart, nullptr);
+	EKARA_CART_SLOT(config, m_cartslot, ekara_cart, nullptr);
 }
 
 void xavix_i2c_cart_state::xavix_i2c_taiko(machine_config &config)
 {
 	xavix_cart(config);
 
-	I2C_24C02(config, "i2cmem", 0); // 24LC02
+	I2C_24C02(config, "i2cmem"); // 24LC02
 
 	SOFTWARE_LIST(config, "cart_list").set_original("ekara_cart").set_filter("TAIKO");
 }
@@ -1920,7 +1920,7 @@ void xavix_i2c_cart_state::xavix_i2c_jpopira(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	I2C_24C02(config, "i2cmem", 0); // 24LC02
+	I2C_24C02(config, "i2cmem"); // 24LC02
 
 	SOFTWARE_LIST(config, "cart_list").set_original("ekara_cart").set_filter("JPOPIRA");
 }

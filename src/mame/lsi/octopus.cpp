@@ -927,12 +927,12 @@ void octopus_state::octopus(machine_config &config)
 	m_dma2->out_dack_callback<2>().set(FUNC(octopus_state::dack6_w));
 	m_dma2->out_dack_callback<3>().set(FUNC(octopus_state::dack7_w));
 
-	PIC8259(config, m_pic1, 0);
+	PIC8259(config, m_pic1);
 	m_pic1->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic1->in_sp_callback().set_constant(1);
 	m_pic1->read_slave_ack_callback().set(FUNC(octopus_state::get_slave_ack));
 
-	PIC8259(config, m_pic2, 0);
+	PIC8259(config, m_pic2);
 	m_pic2->out_int_callback().set(m_pic1, FUNC(pic8259_device::ir7_w));
 	m_pic2->in_sp_callback().set_constant(0);
 
@@ -949,7 +949,7 @@ void octopus_state::octopus(machine_config &config)
 	m_rtc->irq().set(m_pic2, FUNC(pic8259_device::ir2_w));
 
 	// Keyboard UART
-	I8251(config, m_kb_uart, 0);
+	I8251(config, m_kb_uart);
 	m_kb_uart->rxrdy_handler().set("pic_slave", FUNC(pic8259_device::ir4_w));
 	m_kb_uart->dtr_handler().set(FUNC(octopus_state::spk_w));
 	m_kb_uart->rts_handler().set(FUNC(octopus_state::beep_w));
@@ -967,7 +967,7 @@ void octopus_state::octopus(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy[1], octopus_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 	SOFTWARE_LIST(config, "fd_list").set_original("octopus");
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(4.9152_MHz_XTAL / 2);  // DART channel A
 	m_pit->out_handler<0>().set(FUNC(octopus_state::serial_clock_w));  // being able to write both Rx and Tx clocks at one time would be nice
 	m_pit->set_clk<1>(4.9152_MHz_XTAL / 2);  // DART channel B

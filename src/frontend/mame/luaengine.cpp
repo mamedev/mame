@@ -23,6 +23,7 @@
 #include "drivenum.h"
 #include "emuopts.h"
 #include "fileio.h"
+#include "input.h"
 #include "inputdev.h"
 #include "natkeyboard.h"
 #include "screen.h"
@@ -643,7 +644,6 @@ void lua_engine::on_machine_prestart()
 void lua_engine::on_machine_reset()
 {
 	m_notifiers->on_reset();
-	execute_function("LUA_ON_START");
 }
 
 void lua_engine::on_machine_stop()
@@ -659,7 +659,6 @@ void lua_engine::on_machine_stop()
 	expired.clear();
 
 	m_notifiers->on_stop();
-	execute_function("LUA_ON_STOP");
 }
 
 void lua_engine::on_machine_before_load_settings()
@@ -670,13 +669,11 @@ void lua_engine::on_machine_before_load_settings()
 void lua_engine::on_machine_pause()
 {
 	m_notifiers->on_pause();
-	execute_function("LUA_ON_PAUSE");
 }
 
 void lua_engine::on_machine_resume()
 {
 	m_notifiers->on_resume();
-	execute_function("LUA_ON_RESUME");
 }
 
 void lua_engine::on_machine_frame()
@@ -686,8 +683,6 @@ void lua_engine::on_machine_frame()
 	resume_tasks(m_lua_state, tasks, true); // TODO: doesn't need to return anything
 
 	m_notifiers->on_frame();
-
-	execute_function("LUA_ON_FRAME");
 }
 
 void lua_engine::on_machine_presave()
@@ -1413,6 +1408,14 @@ void lua_engine::initialize()
 	core_options_entry_type.set("has_range", &core_options::entry::has_range);
 
 
+	auto output_proxy_type = sol().registry().new_usertype<output_proxy>(
+			"output_proxy",
+			sol::call_constructor, sol::constructors<output_proxy(device_t &, std::string_view)>());
+	output_proxy_type.set_function("exists", &output_proxy::exists);
+	output_proxy_type.set_function("get", &output_proxy::get);
+	output_proxy_type.set_function("set", &output_proxy::set);
+
+
 	auto machine_type = sol().registry().new_usertype<running_machine>("machine", sol::no_constructor);
 	machine_type.set_function("exit", &running_machine::schedule_exit);
 	machine_type.set_function("hard_reset", &running_machine::schedule_hard_reset);
@@ -1564,6 +1567,7 @@ void lua_engine::initialize()
 	device_type.set_function("memshare", &device_t::memshare);
 	device_type.set_function("membank", &device_t::membank);
 	device_type.set_function("ioport", &device_t::ioport);
+	device_type.set_function("output", [] (device_t &d, std::string_view name) { return output_proxy(d, name); });
 	device_type.set_function("subdevice", static_cast<device_t *(device_t::*)(std::string_view) const>(&device_t::subdevice));
 	device_type.set_function("siblingdevice", static_cast<device_t *(device_t::*)(std::string_view) const>(&device_t::siblingdevice));
 	device_type.set_function("parameter", &device_t::parameter);
@@ -2265,20 +2269,34 @@ void lua_engine::initialize()
 
 
 	auto output_type = sol().registry().new_usertype<output_manager>("output", sol::no_constructor);
-	output_type["set_value"] = &output_manager::set_value;
-	output_type["set_indexed_value"] =
-		[] (output_manager &o, char const *basename, int index, int value)
-		{
-			o.set_value(util::string_format("%s%d", basename, index), value);
-		};
-	output_type["get_value"] = &output_manager::get_value;
-	output_type["get_indexed_value"] =
-		[] (output_manager &o, char const *basename, int index)
-		{
-			return o.get_value(util::string_format("%s%d", basename, index));
-		};
-	output_type["name_to_id"] = &output_manager::name_to_id;
-	output_type["id_to_name"] = &output_manager::id_to_name;
+	output_type.set_function(
+			"set_value",
+			[] (output_manager &o, char const *name, int value)
+			{
+				osd_printf_warning("[LUA] output.set_value is deprecated - please use output proxy objects\n");
+				output_proxy(o.machine().root_device(), name).set(value);
+			});
+	output_type.set_function(
+			"set_indexed_value",
+			[] (output_manager &o, char const *basename, int index, int value)
+			{
+				osd_printf_warning("[LUA] output.set_indexed_value is deprecated - please use output proxy objects\n");
+				output_proxy(o.machine().root_device(), util::string_format("%s%d", basename, index)).set(value);
+			});
+	output_type.set_function(
+			"get_value",
+			[] (output_manager &o, char const *name)
+			{
+				osd_printf_warning("[LUA] output.get_value is deprecated - please use output proxy objects\n");
+				return output_proxy(o.machine().root_device(), name).get();
+			});
+	output_type.set_function(
+			"get_indexed_value",
+			[] (output_manager &o, char const *basename, int index)
+			{
+				osd_printf_warning("[LUA] output.get_indexed_value is deprecated - please use output proxy objects\n");
+				return output_proxy(o.machine().root_device(), util::string_format("%s%d", basename, index)).get();
+			});
 
 
 	auto mame_manager_type = sol().registry().new_usertype<mame_machine_manager>("manager", sol::no_constructor);

@@ -21,6 +21,10 @@
 
 #include "cpu/drcumlsh.h"
 
+#include "endianness.h"
+
+#include <bit>
+
 //#define VERBOSE 1
 #include "logmacro.h"
 
@@ -198,7 +202,7 @@ void sh2_device::check_pending_irq(const char *message)
 		int irq = m_sh2_state->internal_irq_level;
 		if (m_sh2_state->pending_irq)
 		{
-			int external_irq = 15 - (count_leading_zeros_32(m_sh2_state->pending_irq) - 16);
+			int external_irq = std::bit_width(m_sh2_state->pending_irq) - 1;
 			if (external_irq >= irq)
 			{
 				irq = external_irq;

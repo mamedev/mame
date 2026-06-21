@@ -120,9 +120,8 @@ public:
 	void coco_floating_map(address_map &map) ATTR_COLD;
 
 protected:
-	// device-level overrides
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// changed handlers
 	virtual void pia1_pa_changed(uint8_t data);

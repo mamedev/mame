@@ -56,7 +56,7 @@ private:
 
 void msx_cart_gouda_scsi_device::device_add_mconfig(machine_config &config)
 {
-	auto &scsi(NSCSI_BUS(config, "scsi", 0));
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr, false);
@@ -132,7 +132,7 @@ private:
 
 void msx_cart_mega_scsi_device::device_add_mconfig(machine_config &config)
 {
-	auto &scsi(NSCSI_BUS(config, "scsi", 0));
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr, false);

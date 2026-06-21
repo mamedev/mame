@@ -191,6 +191,8 @@ NOTES:
 
 #include "speaker.h"
 
+#include <numbers>
+
 //#define VERBOSE 1
 #include "logmacro.h"
 
@@ -290,11 +292,13 @@ void esq1_filters::recalc_filter(filter &f)
 	double g = 6060*exp(vfc/28.5);
 	double zc = g/tan(g/2/44100);
 
-/*  if(f.vfc) {
-        double ff = g/(2*M_PI);
-        double fzc = 2*M_PI*ff/tan(M_PI*ff/44100);
-        fprintf(stderr, "%02x f=%f zc=%f zc1=%f\n", f.vfc, g/(2*M_PI), zc, fzc);
-    }*/
+	//if(f.vfc) {
+	if(0) {
+        constexpr double PI = std::numbers::pi;
+        double ff = g/(2*PI);
+        double fzc = 2*PI*ff/tan(PI*ff/44100);
+        fprintf(stderr, "%02x f=%f zc=%f zc1=%f\n", f.vfc, g/(2*PI), zc, fzc);
+    }
 
 	double gzc = zc/g;
 	double gzc2 = gzc*gzc;
@@ -424,7 +428,7 @@ private:
 	required_device<scn2681_device> m_duart;
 	required_device<esq1_filters> m_filters;
 	optional_device<wd1772_device> m_fdc;
-	optional_device<esqpanel2x40_device> m_panel;
+	optional_device<esqpanel2x40_esq1_device> m_panel;
 	required_ioport m_volume_slider;
 	required_ioport m_data_entry_slider;
 	required_ioport m_pitch_wheel;
@@ -659,10 +663,10 @@ void esq1_state::esq1(machine_config &config)
 	m_duart->set_clocks(8_MHz_XTAL / 16, 8_MHz_XTAL / 16, 8_MHz_XTAL / 8, 8_MHz_XTAL / 8);
 	m_duart->irq_cb().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	m_duart->a_tx_cb().set(m_mdout, FUNC(midi_port_device::write_txd));
-	m_duart->b_tx_cb().set(m_panel, FUNC(esqpanel2x40_device::rx_w));
+	m_duart->b_tx_cb().set(m_panel, FUNC(esqpanel2x40_esq1_device::rx_w));
 	m_duart->outport_cb().set(FUNC(esq1_state::duart_output));
 
-	ESQPANEL2X40(config, m_panel);
+	ESQPANEL2X40_ESQ1(config, m_panel);
 	m_panel->write_tx().set(m_duart, FUNC(scn2681_device::rx_b_w));
 
 	auto &mdin(MIDI_PORT(config, "mdin"));

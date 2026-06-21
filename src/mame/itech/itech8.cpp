@@ -1722,14 +1722,14 @@ void itech8_state::itech8_core_devices(machine_config &config)
 	m_screen->set_size(512, 263);
 	m_screen->screen_vblank().set(FUNC(itech8_state::generate_nmi));
 
-	TMS34061(config, m_tms34061, 0);
+	TMS34061(config, m_tms34061);
 	m_tms34061->set_rowshift(8); // VRAM address is (row << rowshift) | col
 	m_tms34061->set_vram_size(itech8_state::VRAM_SIZE);
 	m_tms34061->int_callback().set(FUNC(itech8_state::generate_tms34061_interrupt));
 
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch, 0);
+	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, M6809_IRQ_LINE);
 }
 

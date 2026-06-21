@@ -51,7 +51,7 @@ public:
 	{
 	}
 
-	void pc1500(machine_config &config);
+	void pc1500(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -80,7 +80,7 @@ private:
 	output_finder<> m_pro;
 	output_finder<> m_run;
 
-	uint8_t m_kb_matrix;
+	uint8_t m_kb_matrix = 0;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -165,20 +165,7 @@ uint32_t pc1500_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 void pc1500_state::machine_start()
 {
-	m_busy.resolve();
-	m_shift.resolve();
-	m_sml.resolve();
-	m_small.resolve();
-	m_iii.resolve();
-	m_ii.resolve();
-	m_i.resolve();
-	m_def.resolve();
-	m_de.resolve();
-	m_g.resolve();
-	m_rad.resolve();
-	m_reserve.resolve();
-	m_pro.resolve();
-	m_run.resolve();
+	save_item(NAME(m_kb_matrix));
 }
 
 void pc1500_state::machine_reset()

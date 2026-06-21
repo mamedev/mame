@@ -264,10 +264,10 @@ void bbl380_state::bbl380(machine_config &config)
 	m_screen->set_visarea(0, 160 - 1, 0, 128 - 1);
 	m_screen->set_screen_update(FUNC(bbl380_state::screen_update));
 
-	BL_HANDHELDS_MENUCONTROL(config, m_menucontrol, 0);
-	ST7735(config, m_lcdc, 0);
+	BL_HANDHELDS_MENUCONTROL(config, m_menucontrol);
+	ST7735(config, m_lcdc);
 
-	GENERIC_SPI_FLASH(config, m_genspi, 0);
+	GENERIC_SPI_FLASH(config, m_genspi);
 
 	// LCD controller seems to be either Sitronix ST7735R or (if RDDID bytes match) Ilitek ILI9163C
 	// (SoC's built-in LCDC is unused or nonexistent?)

@@ -124,7 +124,7 @@ private:
 class hng64_lamps_device : public device_t
 {
 public:
-	hng64_lamps_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hng64_lamps_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	template <unsigned N> auto lamps_out_cb() { return m_lamps_out_cb[N].bind(); }
 

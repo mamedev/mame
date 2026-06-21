@@ -113,7 +113,7 @@ void inder_vid_device::device_add_mconfig(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(256);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &inder_vid_device::ramdac_map);
 	ramdac.set_split_read(1);
 }

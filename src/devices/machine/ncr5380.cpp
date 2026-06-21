@@ -32,12 +32,13 @@ DEFINE_DEVICE_TYPE(DP8490,   dp8490_device,   "dp8490",   "National Semiconducto
 
 ALLOW_SAVE_TYPE(ncr5380_device::state);
 
-ncr5380_device::ncr5380_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, bool has_lbs)
+ncr5380_device::ncr5380_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, bool has_lbs, bool self_reset_int)
 	: device_t(mconfig, type, tag, owner, clock)
 	, nscsi_device_interface(mconfig, *this)
 	, m_irq_handler(*this)
 	, m_drq_handler(*this)
 	, m_has_lbs(has_lbs)
+	, m_self_reset_int(self_reset_int)
 {
 }
 
@@ -57,7 +58,7 @@ cxd1180_device::cxd1180_device(machine_config const &mconfig, char const *tag, d
 }
 
 dp8490_device::dp8490_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: ncr5380_device(mconfig, DP8490, tag, owner, clock, true)
+	: ncr5380_device(mconfig, DP8490, tag, owner, clock, true, false)
 {
 }
 
@@ -195,7 +196,13 @@ void ncr5380_device::scsi_ctrl_changed()
 				m_state = IDLE;
 				m_state_timer->enable(false);
 
-				set_drq(true);
+				// A phase change ends the DMA transfer.  DRQ must be deasserted:
+				// the chip can only request a DMA byte while the bus phase matches
+				// TCR, so leaving DRQ asserted with phase-match clear is wrong and
+				// hangs pseudo-DMA drivers that poll (DRQ && !PHASEMATCH) for the
+				// end of a transfer (e.g. NetBSD/pc532 ncr_pdma_out's "final DREQ"
+				// wait).  The phase-change interrupt is the signal to software.
+				set_drq(false);
 				set_irq(true);
 			}
 		}
@@ -265,7 +272,17 @@ void ncr5380_device::icmd_w(u8 data)
 		device_reset();
 		m_scsi_bus->ctrl_w(m_scsi_refid, S_RST, S_RST);
 
-		set_irq(true);
+		// A host-issued SCSI reset (ICR /RST) raises an interrupt on the base
+		// NCR5380/53C80: "SCSI reset RST is similar to a chip reset, but
+		// generates an interrupt" (datasheet) -- the chip monitors /RST,
+		// including the one it drives.  device_reset() above cleared IRQ, and
+		// the nscsi bus does not reflect a device's own /RST back to it, so the
+		// interrupt must be raised explicitly here.  The DP8490 EASI is the
+		// exception: its ICR-issued reset performs the chip-reset actions, which
+		// "[do] not create an interrupt" (DP8490 datasheet 6.4 -> 6.2), unlike
+		// an externally applied reset (6.3).  m_self_reset_int encodes this.
+		if (m_self_reset_int)
+			set_irq(true);
 	}
 
 	m_icmd = (m_icmd & ~IC_WRITE) | (data & IC_WRITE);
@@ -505,6 +522,13 @@ int ncr5380_device::state_step()
 
 			delay = -1;
 		}
+		else
+			// no REQ yet: poll at the SCSI REQ/ACK period.  Re-arming at zero
+			// would spin with emulated time frozen, so the target could never
+			// change the bus -- hanging the emulation (seen booting Minix
+			// 1.3/pc532, whose root-mount read polls REQ in a window NetBSD's
+			// timing skipped).  100 ns lets time advance so the target responds.
+			delay = 100;
 		break;
 	case DMA_IN_ACK:
 		if (!(ctrl & S_REQ))
@@ -514,6 +538,8 @@ int ncr5380_device::state_step()
 			// clear ACK
 			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 		}
+		else
+			delay = 100; // REQ still asserted: poll for the target to deassert it
 		break;
 
 	case DMA_OUT_DRQ:
@@ -523,19 +549,18 @@ int ncr5380_device::state_step()
 		delay = -1;
 		break;
 	case DMA_OUT_REQ:
-		if (ctrl & S_REQ)
+		if ((ctrl & S_REQ) && (ctrl & S_PHASE_MASK) == (m_tcmd & TC_PHASE))
 		{
-			if ((ctrl & S_PHASE_MASK) == (m_tcmd & TC_PHASE))
-			{
-				LOGMASKED(LOG_DMA, "dma out: 0x%02x\n", m_odata);
+			LOGMASKED(LOG_DMA, "dma out: 0x%02x\n", m_odata);
 
-				m_state = DMA_OUT_ACK;
+			m_state = DMA_OUT_ACK;
 
-				// assert data and ACK
-				m_scsi_bus->data_w(m_scsi_refid, m_odata);
-				m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK, S_ACK);
-			}
+			// assert data and ACK
+			m_scsi_bus->data_w(m_scsi_refid, m_odata);
+			m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK, S_ACK);
 		}
+		else
+			delay = 100; // no REQ yet in the expected phase: poll
 		break;
 	case DMA_OUT_ACK:
 		if (!(ctrl & S_REQ))
@@ -554,6 +579,8 @@ int ncr5380_device::state_step()
 			m_scsi_bus->data_w(m_scsi_refid, 0);
 			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 		}
+		else
+			delay = 100; // REQ still asserted: poll for the target to deassert it
 		break;
 	}
 

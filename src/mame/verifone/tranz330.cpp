@@ -183,7 +183,7 @@ void tranz330_state::tranz330(machine_config &config)
 
 	// sound
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, "speaker", 0)
+	SPEAKER_SOUND(config, "speaker")
 			.add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 

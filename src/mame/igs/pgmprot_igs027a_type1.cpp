@@ -62,6 +62,8 @@
 
 #include "screen.h"
 
+#include "endianness.h"
+
 #define LOG_PROT    (1U << 1)
 #define LOG_ALL     (LOG_PROT)
 

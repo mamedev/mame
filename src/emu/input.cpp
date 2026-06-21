@@ -8,19 +8,23 @@
 
 ****************************************************************************
 
-    To do:
+    TODO:
         * auto-selecting joystick configs
         * per-joystick configs?
         * test half-axis selections
-        * add input test menu
         * get rid of osd_customize_inputport_list
 
 ***************************************************************************/
 
 #include "emu.h"
+#include "input.h"
+
+#include "emuopts.h"
 #include "inputdev.h"
 
 #include "corestr.h"
+
+#include <cstdio>
 
 
 
@@ -55,6 +59,122 @@ struct code_string_table
 
 	u32             m_code;
 	const char *    m_string;
+};
+
+
+// ======================> input_class_keyboard
+
+// class of device that provides keyboard input
+class input_class_keyboard : public input_class
+{
+public:
+	// construction/destruction
+	input_class_keyboard(input_manager &manager, bool multi, s32 threshold, bool steadykey)
+		: input_class(manager, DEVICE_CLASS_KEYBOARD, "keyboard", ITEM_CLASS_ABSOLUTE, true, multi)
+		, m_threshold(threshold)
+		, m_steadykey_enabled(steadykey)
+	{
+	}
+
+	// helpers
+	void frame_callback()
+	{
+		// iterate over all devices in our class
+		for (int devnum = 0; devnum <= maxindex(); devnum++)
+			if (device(devnum) != nullptr)
+				downcast<input_device_keyboard &>(*device(devnum)).apply_steadykey();
+	}
+
+protected:
+	// specific overrides
+	virtual std::unique_ptr<input_device> make_device(std::string_view name, std::string_view id, void *internal) override
+	{
+		return std::make_unique<input_device_keyboard>(*this, name, id, internal, m_threshold, m_steadykey_enabled);
+	}
+
+private:
+	s32 const   m_threshold;            // threshold for treating absolute axis as active
+	bool const  m_steadykey_enabled;    // steadykey enabled for keyboards
+};
+
+
+// ======================> input_class_mouse
+
+// class of device that provides mouse input
+class input_class_mouse : public input_class
+{
+public:
+	// construction/destruction
+	input_class_mouse(input_manager &manager, bool enabled, bool multi, s32 threshold)
+		: input_class(manager, DEVICE_CLASS_MOUSE, "mouse", ITEM_CLASS_RELATIVE, enabled, multi)
+		, m_threshold(threshold)
+	{
+	}
+
+protected:
+	// specific overrides
+	virtual std::unique_ptr<input_device> make_device(std::string_view name, std::string_view id, void *internal) override
+	{
+		return std::make_unique<input_device_mouse>(*this, name, id, internal, m_threshold);
+	}
+
+private:
+	s32 const   m_threshold;            // threshold for treating absolute axis as active
+};
+
+
+// ======================> input_class_lightgun
+
+// class of device that provides lightgun input
+class input_class_lightgun : public input_class
+{
+public:
+	// construction/destruction
+	input_class_lightgun(input_manager &manager, bool enabled, s32 threshold)
+		: input_class(manager, DEVICE_CLASS_LIGHTGUN, "lightgun", ITEM_CLASS_ABSOLUTE, enabled, true)
+		, m_threshold(threshold)
+	{
+	}
+
+protected:
+	// specific overrides
+	virtual std::unique_ptr<input_device> make_device(std::string_view name, std::string_view id, void *internal) override
+	{
+		return std::make_unique<input_device_lightgun>(*this, name, id, internal, m_threshold);
+	}
+
+private:
+	s32 const               m_threshold;            // threshold for treating absolute axis as active
+};
+
+
+// ======================> input_class_joystick
+
+// class of device that provides joystick input
+class input_class_joystick : public input_class
+{
+public:
+	// construction/destruction
+	input_class_joystick(input_manager &manager, bool enabled, s32 threshold, s32 deadzone, s32 saturation, char const *mapstring)
+		: input_class(manager, DEVICE_CLASS_JOYSTICK, "joystick", ITEM_CLASS_ABSOLUTE, enabled, true)
+		, m_mapstring((!mapstring[0] || (std::string_view("auto") == mapstring)) ? "" : mapstring)
+		, m_threshold(threshold)
+		, m_deadzone(deadzone)
+		, m_saturation(saturation)
+	{
+	}
+
+protected:
+	// specific overrides
+	virtual std::unique_ptr<input_device> make_device(std::string_view name, std::string_view id, void *internal) override
+	{
+		return std::make_unique<input_device_joystick>(*this, name, id, internal, m_threshold, m_deadzone, m_saturation, m_mapstring.c_str());
+	}
+
+	std::string const   m_mapstring;
+	s32 const           m_threshold;   // threshold for treating absolute axis as active
+	s32 const           m_deadzone;    // deadzone for joystick
+	s32 const           m_saturation;  // saturation position for joystick
 };
 
 
@@ -414,16 +534,45 @@ input_manager::input_manager(running_machine &machine) : m_machine(machine)
 	reset_memory();
 
 	// create pointers for the classes
-	m_class[DEVICE_CLASS_KEYBOARD] = std::make_unique<input_class_keyboard>(*this);
-	m_class[DEVICE_CLASS_MOUSE] = std::make_unique<input_class_mouse>(*this);
-	m_class[DEVICE_CLASS_LIGHTGUN] = std::make_unique<input_class_lightgun>(*this);
-	m_class[DEVICE_CLASS_JOYSTICK] = std::make_unique<input_class_joystick>(*this);
+	auto &options = machine.options();
+	s32 const threshold = std::max<s32>(s32(options.joystick_threshold() * osd::input_device::ABSOLUTE_MAX), 1);
+	auto kbdclass = std::make_unique<input_class_keyboard>(
+			*this,
+			options.multi_keyboard(),
+			threshold,
+			options.steadykey());
+	auto mouseclass = std::make_unique<input_class_mouse>(
+			*this,
+			options.mouse(),
+			options.multi_mouse(),
+			threshold);
+	auto gunclass = std::make_unique<input_class_lightgun>(
+			*this,
+			options.lightgun(),
+			threshold);
+	auto joyclass = std::make_unique<input_class_joystick>(
+			*this,
+			options.joystick(),
+			threshold,
+			s32(options.joystick_deadzone() * osd::input_device::ABSOLUTE_MAX),
+			s32(options.joystick_saturation() * osd::input_device::ABSOLUTE_MAX),
+			options.joystick_map());
+
+	// request a per-frame callback for the keyboard class
+	machine.add_notifier(
+			MACHINE_NOTIFY_FRAME,
+			machine_notify_delegate(&input_class_keyboard::frame_callback, kbdclass.get()));
+
+	m_class[DEVICE_CLASS_KEYBOARD] = std::move(kbdclass);
+	m_class[DEVICE_CLASS_MOUSE] = std::move(mouseclass);
+	m_class[DEVICE_CLASS_LIGHTGUN] = std::move(gunclass);
+	m_class[DEVICE_CLASS_JOYSTICK] = std::move(joyclass);
 
 #ifdef MAME_DEBUG
 	for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; ++devclass)
 	{
-		assert(m_class[devclass] != nullptr);
-		assert(m_class[devclass]->devclass() == devclass);
+		assert(m_class[devclass]);
+		assert(m_class[devclass]->device_class() == devclass);
 	}
 #endif
 }
@@ -457,6 +606,9 @@ bool input_manager::class_enabled(input_device_class devclass) const
 
 osd::input_device &input_manager::add_device(input_device_class devclass, std::string_view name, std::string_view id, void *internal)
 {
+	if (machine().phase() != machine_phase::INIT)
+		throw emu_fatalerror("Can only call input_class::add_device at init time!");
+
 	return device_class(devclass).add_device(name, id, internal);
 }
 
@@ -653,7 +805,7 @@ std::string input_manager::code_name(input_code code) const
 	std::string str;
 
 	// keyboard 0 doesn't show a class or index if it is the only one
-	input_device_class const device_class = item->device().devclass();
+	input_device_class const device_class = item->device().device_class();
 	if ((device_class != DEVICE_CLASS_KEYBOARD) || (m_class[device_class]->maxindex() > 0))
 	{
 		// determine the devclass part
@@ -843,7 +995,7 @@ input_code input_manager::code_from_token(std::string_view _token)
 //  the given input item ID
 //-------------------------------------------------
 
-const char *input_manager::standard_token(input_item_id itemid) const
+const char *input_manager::standard_token(input_item_id itemid) noexcept
 {
 	return (itemid <= ITEM_ID_MAXIMUM) ? (*itemid_token_table)[itemid] : nullptr;
 }

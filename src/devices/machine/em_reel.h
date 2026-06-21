@@ -30,14 +30,17 @@ public:
 	template <typename T>
 	em_reel_device(
 			const machine_config &mconfig, const char *tag, device_t *owner,
-			uint16_t steps, T &&detents, attotime period, dir direction = dir::REVERSE) :
+			const char *output, uint16_t steps, T &&detents, attotime period, dir direction = dir::REVERSE) :
 		em_reel_device(mconfig, tag, owner, 0)
 	{
+		set_output_name(output);
 		set_max_pos(steps);
 		set_detents(std::forward<T>(detents));
 		set_rotation_period(period);
 		set_direction(direction);
 	}
+
+	void set_output_name(const char *name) { m_reel_out.set_name(name); }
 
 	// Movement state callback, used for playing samples
 	auto state_changed_callback() { return m_state_cb.bind(); }

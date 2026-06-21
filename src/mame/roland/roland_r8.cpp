@@ -85,6 +85,7 @@ R8 mkII doesn't seem to store the tone list in the program ROM.
 #include "speaker.h"
 
 #include <array>
+#include <bit>
 
 
 namespace {
@@ -197,7 +198,7 @@ std::pair<std::error_condition, std::string> roland_r8_base_state::pcmrom_load(g
 	u8 *base = pcmcard->get_rom_base();
 	if (size < PCMCARD_SIZE)
 	{
-		u32 mirror = (1 << (31 - count_leading_zeros_32(size)));
+		u32 mirror = std::bit_floor(size);
 		if (mirror < 0x020000)  // due to how address descrambling works, we can currently only do mirroring for 128K pages
 			mirror = 0x020000;
 		for (u32 ofs = mirror; ofs < PCMCARD_SIZE; ofs += mirror)

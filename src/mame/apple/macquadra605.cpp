@@ -73,7 +73,7 @@ public:
 	void init_macqd605();
 
 private:
-	required_device<m68040_device> m_maincpu;
+	required_device<m68000_musashi_device> m_maincpu;
 	required_device<memcjr_device> m_memcjr;
 	required_device<primetime_device> m_primetime;
 	required_device<macadb_device> m_macadb;
@@ -228,7 +228,7 @@ void quadra605_state::macqd605(machine_config &config)
 	m_primetime->pb5_callback().set(m_cuda, FUNC(cuda_device::set_tip));
 	m_primetime->write_cb2().set(m_cuda, FUNC(cuda_device::set_via_data));
 
-	nubus_device &nubus(NUBUS(config, "pds", 0));
+	nubus_device &nubus(NUBUS(config, "pds"));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.set_bus_mode(nubus_device::nubus_mode_t::QUADRA_DAFB);
 	nubus.out_irqe_callback().set(m_primetime, FUNC(primetime_device::via2_irq_w<0x20>));
@@ -247,18 +247,20 @@ void quadra605_state::maclc475(machine_config &config)
 {
 	macqd605(config);
 
+	M68LC040(config.replace(), m_maincpu, 25_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &quadra605_state::lc475_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
+
+	// TODO: This machine really had 5MiB of RAM base, we need actual memory controller support for that to work
 }
 
 void quadra605_state::maclc575(machine_config &config)
 {
 	macqd605(config);
 
-	M68040(config.replace(), m_maincpu, 33_MHz_XTAL);
+	M68LC040(config.replace(), m_maincpu, 33_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &quadra605_state::lc575_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
-
-	m_ram->set_default_size("5M");
 }
 
 ROM_START( macqd605 )

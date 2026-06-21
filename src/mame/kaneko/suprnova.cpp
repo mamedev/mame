@@ -77,6 +77,7 @@ Notes:
       SKNSA1 is BIOS (Asia)
       HM514260, W24257, LH5168, M62X42 all smt SRAM
       LH540202 is DIP SRAM
+      SH2 is HD6417604F28 (SH7604)
 
 
 Cart Layout
@@ -756,6 +757,7 @@ void skns_state::skns_map(address_map &map)
 	map(0x00400000, 0x00400003).portr("400000");
 	map(0x00400004, 0x00400007).portr("400004");
 	/* In between is write only */
+//	map(0x00400008, 0x0040000b) read by vblokbrk/sarukani, propagated to $06000110 buffer (never read to?)
 	map(0x0040000c, 0x0040000f).portr("40000c");
 	map(0x00800000, 0x00801fff).ram().share("nvram"); /* 'backup' RAM */
 	map(0x00c00000, 0x00c00001).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)); /* ymz280_w (sound) */
@@ -823,7 +825,7 @@ void skns_state::skns(machine_config &config)
 	PALETTE(config, m_palette).set_entries(32768);
 	GFXDECODE(config, m_gfxdecode, m_palette, skns_bg);
 
-	KANEKO_RLE_SPRITES(config, m_spritegen, 0);
+	KANEKO_RLE_SPRITES(config, m_spritegen);
 	m_spritegen->set_screen(m_screen);
 
 	/* sound hardware */

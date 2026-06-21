@@ -28,7 +28,6 @@ public:
 
 protected:
 	virtual void video_start() override ATTR_COLD;
-	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void port30_w(uint8_t data);

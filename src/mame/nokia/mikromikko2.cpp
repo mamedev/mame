@@ -351,9 +351,9 @@ void mm2_state::mm2(machine_config &config)
 	X2212(config, m_novram);
 
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MIKROMIKKO2_EXPANSION_BUS(config, m_exp, 0);
+	MIKROMIKKO2_EXPANSION_BUS(config, m_exp);
 	m_exp->set_memspace(m_maincpu, AS_PROGRAM);
 	m_exp->set_iospace(m_maincpu, AS_IO);
 	m_exp->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
@@ -367,11 +367,11 @@ void mm2_state::mm2(machine_config &config)
 	m_exp->hold4_callback().set(FUNC(mm2_state::hold4_w));
 	m_exp->hold5_callback().set(FUNC(mm2_state::hold5_w));
 
-	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp1", 0, m_exp, mikromikko2_expansion_bus_cards, "mmc186", false);
-	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp2", 0, m_exp, mikromikko2_expansion_bus_cards, "crtc186", false);
-	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp3", 0, m_exp, mikromikko2_expansion_bus_cards, nullptr, false);
-	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp4", 0, m_exp, mikromikko2_expansion_bus_cards, nullptr, false);
-	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp5", 0, m_exp, mikromikko2_expansion_bus_cards, "meme186", false);
+	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp1", m_exp, mikromikko2_expansion_bus_cards, "mmc186", false);
+	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp2", m_exp, mikromikko2_expansion_bus_cards, "crtc186", false);
+	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp3", m_exp, mikromikko2_expansion_bus_cards, nullptr, false);
+	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp4", m_exp, mikromikko2_expansion_bus_cards, nullptr, false);
+	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp5", m_exp, mikromikko2_expansion_bus_cards, "meme186", false);
 }
 
 ROM_START( mm2m35d )

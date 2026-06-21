@@ -104,8 +104,8 @@ public:
 		m_int(0)
 	{}
 
-	void einstein(machine_config &config);
-	void einst256(machine_config &config);
+	void einstein(machine_config &config) ATTR_COLD;
+	void einst256(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(joystick_button);
 
@@ -465,8 +465,6 @@ void einstein_state::reset_w(uint8_t data)
 
 void einstein_state::machine_start()
 {
-	m_alpha_lock_led.resolve();
-
 	// initialize memory mapping
 	m_bank1->configure_entry(0, m_ram->pointer());
 	m_bank1->configure_entry(1, m_bios->base());

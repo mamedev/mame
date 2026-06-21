@@ -19,18 +19,6 @@
 #include <array>
 #include <cstdint>
 
-#define EE28_LOG_GENERAL (1 << 0)
-#define EE28_LOG_DETAIL (1 << 1)
-// #define EE28_VERBOSE (EE28_LOG_GENERAL | EE28_LOG_DETAIL)
-
-#if defined(EE28_VERBOSE) && (EE28_VERBOSE)
-#define EE28LOGMASKED(mask, ...) do { if (EE28_VERBOSE & (mask)) (logerror)(__VA_ARGS__); } while (0)
-#define EE28LOG(...) EE28LOGMASKED(EE28_LOG_GENERAL, __VA_ARGS__)
-#else
-#define EE28LOGMASKED(...)
-#define EE28LOG(...)
-#endif // EE28_VERBOSE
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -112,11 +100,9 @@
 #define EEPROM28_PARAMS_WITH_DEFAULTS int AddressBits, uint32_t PageSizeBytes, uint32_t TBLCUsec, uint32_t TWCUsec, bool ProgramOnRead = false, bool HasIdPage = false, bool HasHardwareChipErase = false, bool HasSoftwareChipErase = false, uint32_t TCEUsec = 20'000
 #define EEPROM28_ARGS AddressBits, PageSizeBytes, TBLCUsec, TWCUsec, ProgramOnRead, HasIdPage, HasHardwareChipErase, HasSoftwareChipErase, TCEUsec
 
-template<EEPROM28_PARAMS_WITH_DEFAULTS>
+template <EEPROM28_PARAMS_WITH_DEFAULTS>
 class eeprom28_device : public device_t
 {
-	using self = eeprom28_device<EEPROM28_ARGS>;
-
 public:
 	static constexpr bool HAS_ID_PAGE = HasIdPage;
 	static constexpr bool HAS_HARDWARE_CHIP_ERASE = HasHardwareChipErase;
@@ -145,12 +131,7 @@ public:
 	static constexpr uint8_t INVERSE_DATA_BIT = 1 << 7;
 	static constexpr uint8_t TOGGLE_BIT = 1 << 6;
 
-	// construction/destruction
-	eeprom28_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0)
-	: device_t(mconfig, type, tag, owner, clock)
-	{}
-
-	virtual ~eeprom28_device() {}
+	virtual ~eeprom28_device();
 
 	void write(uint32_t offset, uint8_t data);
 	uint8_t read(uint32_t offset);
@@ -203,82 +184,7 @@ public:
 		m_access_id_page = (state != 0);
 	}
 
-#ifndef X28_VISIBLE_FOR_TESTING
 protected:
-#endif // X28_VISIBLE_FOR_TESTING
-
-	// device-level overrides
-	virtual void device_start() override ATTR_COLD
-	{
-		if (m_t_blc_usec > 0 && m_start_programming_timer == nullptr) {
-			m_start_programming_timer = timer_alloc(FUNC(self::start_programming_cycle), this);
-		}
-
-		if (m_t_wc_usec > 0 && m_programming_completed_timer == nullptr) {
-			m_programming_completed_timer = timer_alloc(FUNC(self::programming_cycle_complete), this);
-		}
-
-		save_item(NAME(m_storage));
-		save_item(NAME(m_program_buffer_to_eeprom));
-		save_item(NAME(m_last_written_offset));
-		save_item(NAME(m_toggle_bit));
-		save_item(NAME(m_state));
-		save_item(NAME(m_command_state));
-		save_item(NAME(m_software_data_protection_enabled));
-		save_item(NAME(m_buffering_page));
-		save_item(NAME(m_page_buffer));
-
-		save_item(NAME(m_t_blc_usec));
-		save_item(NAME(m_t_wc_usec));
-		save_item(NAME(m_program_on_read));
-
-		save_item(NAME(m_t_ce_usec));
-		save_item(NAME(m_chip_erase));
-		save_item(NAME(m_access_id_page));
-	}
-
-	virtual void device_reset() override ATTR_COLD
-	{
-		if (m_start_programming_timer != nullptr)
-			m_start_programming_timer->enable(false);
-
-		if (m_programming_completed_timer != nullptr)
-			m_programming_completed_timer->enable(false);
-
-		change_to_state(COMMAND_STATE_NONE);
-		change_to_state(STATE_IDLE);
-
-		m_last_written_offset = -1;
-		m_software_data_protection_enabled = false;
-		m_buffering_page = -1;
-	}
-
-	// Change State to a new internal state
-	void change_to_state(int ns)
-	{
-		EE28LOGMASKED(EE28_LOG_DETAIL, "Changing state to %d\r\n", ns);
-		m_state = ns;
-	}
-
-	// Error in the internal state machine, return to the correct idle internal state
-	void state_machine_error()
-	{
-		change_to_state(m_software_data_protection_enabled ? STATE_IDLE : STATE_BUFFERING);
-	}
-
-	// Change State to a new command processing state
-	void change_to_command_state(int ns)
-	{
-		EE28LOGMASKED(EE28_LOG_DETAIL, "Changing state to %d\r\n", ns);
-		m_command_state = ns;
-	}
-
-	// Error in the command state machine, return to the correct idle internal state
-	void command_state_machine_error()
-	{
-		change_to_command_state(COMMAND_STATE_NONE);
-	}
-
 	// internal state
 	enum {
 		// idle state: reads work as normal, writes will succeed or fail depending on
@@ -350,186 +256,90 @@ protected:
 		//   recent address writte, /DATA Polling will not.
 	};
 
-	std::array<uint8_t, TOTAL_SIZE_BYTES> m_storage {};
-	bool m_program_buffer_to_eeprom = false;
-	emu_timer *m_start_programming_timer = nullptr;
-	emu_timer *m_programming_completed_timer = nullptr;
-	uint32_t m_last_written_offset = 0;
-	uint8_t m_toggle_bit = 0;
-	int m_state = STATE_IDLE;
-	int m_command_state = COMMAND_STATE_NONE;
-	bool m_software_data_protection_enabled = false;
-	int32_t m_buffering_page = -1;
+	// construction/destruction
+	eeprom28_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	// Change State to a new internal state
+	void change_to_state(int ns);
+
+	// Error in the internal state machine, return to the correct idle internal state
+	void state_machine_error();
+
+	// Change State to a new command processing state
+	void change_to_command_state(int ns);
+
+	// Error in the command state machine, return to the correct idle internal state
+	void command_state_machine_error();
+
+	// Timer callbacks
+	void start_programming_cycle(s32 param = 0);
+	void programming_cycle_complete(s32 param = 0);
+
+	// Software Data Protection Helper
+	void disable_software_data_protection();
+
+	// Chip Erase
+	void start_erase_cycle() requires (HasHardwareChipErase || HasSoftwareChipErase);
+
+	// are we accessing the ID page?
+	bool is_accessing_id_page(uint32_t offset) const requires HasIdPage;
+
+	uint32_t storage_offset(uint32_t offset) const requires HasIdPage;
+	uint32_t storage_offset(uint32_t offset) const requires (!HasIdPage);
+	uint32_t storage_page(uint32_t offset) const;
+
+	std::array<uint8_t, TOTAL_SIZE_BYTES> m_storage; // FIXME: dynamically allocate this, it's too heavy for a device class
+	bool m_program_buffer_to_eeprom;
+	emu_timer *m_start_programming_timer;
+	emu_timer *m_programming_completed_timer;
+	uint32_t m_last_written_offset;
+	uint8_t m_toggle_bit;
+	int m_state;
+	int m_command_state;
+	bool m_software_data_protection_enabled;
+	int32_t m_buffering_page;
 	std::array<uint8_t, PAGE_SIZE_BYTES> m_page_buffer;
 
 	// Configurable overrides: initialize per the device's definition.
-	uint32_t m_t_blc_usec = T_BLC_USEC;
-	uint32_t m_t_wc_usec = T_WC_USEC;
-	bool m_program_on_read = PROGRAM_ON_READ;
-	uint32_t m_t_ce_usec = T_CE_USEC;
+	uint32_t m_t_blc_usec;
+	uint32_t m_t_wc_usec;
+	bool m_program_on_read;
+	uint32_t m_t_ce_usec;
 
-	bool m_chip_erase = false;
-	bool m_access_id_page = false;
-
-	// Timer callbacks
-	void start_programming_cycle(s32 param = 0)
-	{
-		EE28LOG("%s: start_programming_cycle for page %04x\n", machine().describe_context(), m_buffering_page);
-		change_to_state(STATE_PROGRAMMING);
-
-		if (m_program_buffer_to_eeprom) {
-			EE28LOG("%s: writing buffer to page %04x\n", machine().describe_context(), m_buffering_page);
-			std::memcpy(&m_storage[storage_page(m_buffering_page)], &m_page_buffer[0], PAGE_SIZE_BYTES);
-		}
-
-		m_buffering_page = -1;
-
-		if (m_t_wc_usec == 0) {
-			programming_cycle_complete();
-		} else if (m_t_wc_usec > 0) {
-			m_programming_completed_timer->adjust(attotime::from_usec(m_t_wc_usec));
-		}
-	}
-
-	void programming_cycle_complete(s32 param = 0)
-	{
-		EE28LOG("%s: programming_cycle_complete\n", machine().describe_context());
-		change_to_state(STATE_IDLE);
-
-		m_program_buffer_to_eeprom = false;
-		EE28LOGMASKED(EE28_LOG_DETAIL, "m_program_buffer_to_eeprom -> %d\r\n", m_program_buffer_to_eeprom);
-	}
-
-	// Software Data Protection Helper
-	void disable_software_data_protection() {
-		// We have now received a complete "disable write protection" command. So we:
-		// - Disable write protection, i.e., enable writes.
-		m_software_data_protection_enabled = false;
-		// - Note that we're no longer in a command sequence.
-		change_to_command_state(COMMAND_STATE_NONE);
-		// - Write protection was disabled, and the preceding writes were just part of that command sequence.
-		m_program_buffer_to_eeprom = false;
-		// printf("m_program_buffer_to_eeprom -> %d\r\n", m_program_buffer_to_eeprom);
-
-		if (m_t_blc_usec > 0) {
-			// Since we're explicitly starting the programming cycle, disable the timer
-			m_start_programming_timer->enable(false);
-		}
-
-		// - Start the programming cycle
-		start_programming_cycle();
-	}
-
-	// Chip Erase
-	void start_erase_cycle() requires (HasHardwareChipErase || HasSoftwareChipErase) {
-		if (HAS_CHIP_ERASE) {
-			change_to_state(STATE_PROGRAMMING);
-
-			// Erase all the data by setting it to 0xff
-			std::fill_n(&m_storage[0], TOTAL_SIZE_BYTES, 0xff);
-
-			if (m_t_ce_usec > 0) {
-				m_programming_completed_timer->adjust(attotime::from_usec(TCEUsec));
-			} else {
-				programming_cycle_complete();
-			}
-		}
-	}
-
-	// are we accessing the ID page?
-	bool is_accessing_id_page(uint32_t offset) requires HasIdPage {
-		if (HAS_ID_PAGE) {
-			return m_access_id_page && (offset & PAGE_MASK) == ID_PAGE_OFFSET;
-		} else {
-			return false;
-		}
-	}
-
-	uint32_t storage_offset(uint32_t offset) requires HasIdPage {
-		return is_accessing_id_page(offset) ? (offset - ID_PAGE_OFFSET + DATA_SIZE_BYTES) : offset;
-	}
-
-	uint32_t storage_offset(uint32_t offset) requires (!HasIdPage) {
-		return offset;
-	}
-
-	uint32_t storage_page(uint32_t offset) {
-		return storage_offset(offset) & PAGE_MASK;
-	}
+	bool m_chip_erase;
+	bool m_access_id_page;
 };
-
-// include the implementations for read() and write()
-#include "eeprom28.ipp"
 
 /*
  * A variant of the eeprom28_device class that implements `device_nvram_interface`
  * for when the EEPROM represents non-volatile memory used in a bigger system.
  * Same template parameters as `eeprom28_device`.
  */
-template<EEPROM28_PARAMS_WITH_DEFAULTS>
-class eeprom28_nvram_device
-: public eeprom28_device<EEPROM28_ARGS>
-, public device_nvram_interface
+template <EEPROM28_PARAMS_WITH_DEFAULTS>
+class eeprom28_nvram_device : public eeprom28_device<EEPROM28_ARGS>, public device_nvram_interface
 {
-	using self = eeprom28_nvram_device<EEPROM28_ARGS>;
 	using super = eeprom28_device<EEPROM28_ARGS>;
 
 public:
-	eeprom28_nvram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0)
-	: super(mconfig, type, tag, owner, clock)
-	, device_nvram_interface(mconfig, *this)
-	, m_default_data(*this, DEVICE_SELF)
-	{
-	}
+	virtual ~eeprom28_nvram_device();
 
 protected:
-	optional_region_ptr<uint8_t> m_default_data;
+	eeprom28_nvram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// derived class overrides
-	virtual void nvram_default() override
-	{
-		std::fill_n(&this->m_storage[0], self::TOTAL_SIZE_BYTES, 0xff);
+	virtual void nvram_default() override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 
-		/* populate from a memory region if present */
-		if (m_default_data.found())
-		{
-			std::memcpy(&this->m_storage[0], &m_default_data[0], std::min(static_cast<size_t>(self::TOTAL_SIZE_BYTES), m_default_data.length()));
-		}
-	}
-
-	virtual bool nvram_read(util::read_stream &file) override
-	{
-		std::vector<uint8_t> buffer(self::TOTAL_SIZE_BYTES + 2);
-
-		// try to read one more byte than we really need, to detect wrong-size input
-		auto const [err, actual] = util::read(file, &buffer[0], self::TOTAL_SIZE_BYTES + 2);
-		if (err || (actual != self::TOTAL_SIZE_BYTES + 1))
-			return false;
-
-		std::memcpy(&this->m_storage[0], &buffer[0], self::TOTAL_SIZE_BYTES);
-		this->m_software_data_protection_enabled = buffer[self::TOTAL_SIZE_BYTES] != 0;
-
-		return true;
-	}
-
-	virtual bool nvram_write(util::write_stream &file) override
-	{
-		std::vector<uint8_t> buffer(self::TOTAL_SIZE_BYTES + 1);
-
-		std::memcpy(&buffer[0], &this->m_storage[0], self::TOTAL_SIZE_BYTES);
-		buffer[self::TOTAL_SIZE_BYTES] = this->m_software_data_protection_enabled;
-
-		auto const [err, actual] = util::write(file, &buffer[0], self::TOTAL_SIZE_BYTES + 1);
-		return !err;
-	}
+	optional_region_ptr<uint8_t> m_default_data;
 };
 
 #undef EEPROM28_PARAMS
 #undef EEPROM28_PARAMS_WITH_DEFAULTS
 #undef EEPROM28_ARGS
-
-#undef EE28_VERBOSE
-#undef EE28LOG
-#undef EE28LOGMASKED
 
 #endif // MAME_MACHINE_EEPROM28_H

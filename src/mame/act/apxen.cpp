@@ -491,19 +491,19 @@ void apxen_state::apxen(machine_config &config)
 	EEPROM_93C06_16BIT(config, m_eeprom); // NMC9306
 	m_eeprom->do_callback().set(m_sio, FUNC(z80sio_device::ctsb_w));
 
-	PIC8259(config, m_pic[0], 0);
+	PIC8259(config, m_pic[0]);
 	m_pic[0]->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic[0]->in_sp_callback().set_constant(1);
 	m_pic[0]->read_slave_ack_callback().set(FUNC(apxen_state::get_slave_ack));
 
-	PIC8259(config, m_pic[1], 0);
+	PIC8259(config, m_pic[1]);
 	m_pic[1]->out_int_callback().set(m_pic[0], FUNC(pic8259_device::ir2_w));
 	m_pic[1]->in_sp_callback().set_constant(0);
 
 	XEN_DAISY(config, m_daisy);
 	m_daisy->set_daisy_config(xen_daisy_chain);
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(2000000);
 	m_pit->out_handler<0>().set(m_sio, FUNC(z80sio_device::rxca_w));
 	m_pit->set_clk<1>(2000000);

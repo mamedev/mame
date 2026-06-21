@@ -36,6 +36,9 @@
 #include "machine/upd765.h"
 #include "wangpckb.h"
 
+#define VERBOSE 0
+#include "logmacro.h"
+
 
 namespace {
 
@@ -224,14 +227,6 @@ private:
 
 
 //**************************************************************************
-//  MACROS/CONSTANTS
-//**************************************************************************
-
-#define LOG 0
-
-
-
-//**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
 
@@ -268,11 +263,8 @@ void wangpc_state::fdc_ctrl_w(uint8_t data)
 	if (BIT(data, 2)) m_fdc_dd0 = 0;
 	if (BIT(data, 3)) m_fdc_dd1 = 0;
 
-	if (LOG)
-	{
-		logerror("%s: Enable /EOP %u\n", machine().describe_context(), m_enable_eop);
-		logerror("%s: Disable /DREQ2 %u\n", machine().describe_context(), m_disable_dreq2);
-	}
+	LOG("%s: Enable /EOP %u\n", machine().describe_context(), m_enable_eop);
+	LOG("%s: Disable /DREQ2 %u\n", machine().describe_context(), m_disable_dreq2);
 
 	update_fdc_tc();
 	update_fdc_drq();
@@ -281,54 +273,58 @@ void wangpc_state::fdc_ctrl_w(uint8_t data)
 
 uint8_t wangpc_state::deselect_drive1_r()
 {
-	m_ds1 = false;
-	select_drive();
+	if (!machine().side_effects_disabled())
+		deselect_drive1_w(0);
 
 	return 0xff;
 }
 
 void wangpc_state::deselect_drive1_w(uint8_t data)
 {
-	deselect_drive1_r();
+	m_ds1 = false;
+	select_drive();
 }
 
 uint8_t wangpc_state::select_drive1_r()
 {
-	m_ds1 = true;
-	select_drive();
+	if (!machine().side_effects_disabled())
+		select_drive1_w(0);
 
 	return 0xff;
 }
 
 void wangpc_state::select_drive1_w(uint8_t data)
 {
-	select_drive1_r();
+	m_ds1 = true;
+	select_drive();
 }
 
 uint8_t wangpc_state::deselect_drive2_r()
 {
-	m_ds2 = false;
-	select_drive();
+	if (!machine().side_effects_disabled())
+		deselect_drive2_w(0);
 
 	return 0xff;
 }
 
 void wangpc_state::deselect_drive2_w(uint8_t data)
 {
-	deselect_drive2_r();
+	m_ds2 = false;
+	select_drive();
 }
 
 uint8_t wangpc_state::select_drive2_r()
 {
-	m_ds2 = true;
-	select_drive();
+	if (!machine().side_effects_disabled())
+		select_drive2_w(0);
 
 	return 0xff;
 }
 
 void wangpc_state::select_drive2_w(uint8_t data)
 {
-	select_drive2_r();
+	m_ds2 = true;
+	select_drive();
 }
 
 uint8_t wangpc_state::motor1_on_r(offs_t offset)
@@ -341,7 +337,7 @@ uint8_t wangpc_state::motor1_on_r(offs_t offset)
 
 void wangpc_state::motor1_on_w(offs_t offset, uint8_t data)
 {
-	if (LOG) logerror("%s: Drive 1 motor %s\n", machine().describe_context(), offset ? "ON" : "OFF");
+	LOG("%s: Drive 1 motor %s\n", machine().describe_context(), offset ? "ON" : "OFF");
 
 	m_floppy[0]->mon_w(!offset);
 }
@@ -356,38 +352,40 @@ uint8_t wangpc_state::motor2_on_r(offs_t offset)
 
 void wangpc_state::motor2_on_w(offs_t offset, uint8_t data)
 {
-	if (LOG) logerror("%s: Drive 2 motor %s\n", machine().describe_context(), offset ? "ON" : "OFF");
+	LOG("%s: Drive 2 motor %s\n", machine().describe_context(), offset ? "ON" : "OFF");
 
 	m_floppy[1]->mon_w(!offset);
 }
 
 uint8_t wangpc_state::fdc_reset_r()
 {
-	if (LOG) logerror("%s: FDC reset\n", machine().describe_context());
-
-	m_fdc->reset();
+	if (!machine().side_effects_disabled())
+		fdc_reset_w(0);
 
 	return 0xff;
 }
 
 void wangpc_state::fdc_reset_w(uint8_t data)
 {
-	fdc_reset_r();
+	LOG("%s: FDC reset\n", machine().describe_context());
+
+	m_fdc->reset();
 }
 
 uint8_t wangpc_state::fdc_tc_r()
 {
-	if (LOG) logerror("%s: FDC TC\n", machine().describe_context());
-
-	m_fdc->tc_w(1);
-	m_fdc->tc_w(0);
+	if (!machine().side_effects_disabled())
+		fdc_tc_w(0);
 
 	return 0xff;
 }
 
 void wangpc_state::fdc_tc_w(uint8_t data)
 {
-	fdc_tc_r();
+	LOG("%s: FDC TC\n", machine().describe_context());
+
+	m_fdc->tc_w(1);
+	m_fdc->tc_w(0);
 }
 
 
@@ -397,7 +395,7 @@ void wangpc_state::fdc_tc_w(uint8_t data)
 
 void wangpc_state::dma_page_w(offs_t offset, uint8_t data)
 {
-	if (LOG) logerror("%s: DMA page %u: %06x\n", machine().describe_context(), offset + 1, (data & 0x0f) << 16);
+	LOG("%s: DMA page %u: %06x\n", machine().describe_context(), offset + 1, (data & 0x0f) << 16);
 
 	m_dma_page[offset + 1] = data & 0x0f;
 }
@@ -443,7 +441,7 @@ uint8_t wangpc_state::status_r()
 
 void wangpc_state::timer0_irq_clr_w(uint8_t data)
 {
-	//if (LOG) logerror("%s: Timer 0 IRQ clear\n", machine().describe_context());
+	//LOG("%s: Timer 0 IRQ clear\n", machine().describe_context());
 
 	m_pic->ir0_w(0);
 }
@@ -455,10 +453,13 @@ void wangpc_state::timer0_irq_clr_w(uint8_t data)
 
 uint8_t wangpc_state::timer2_irq_clr_r()
 {
-	//if (LOG) logerror("%s: Timer 2 IRQ clear\n", machine().describe_context());
+	if (!machine().side_effects_disabled())
+	{
+		//LOG("%s: Timer 2 IRQ clear\n", machine().describe_context());
 
-	m_timer2_irq = 1;
-	check_level1_interrupts();
+		m_timer2_irq = 1;
+		check_level1_interrupts();
+	}
 
 	return 0xff;
 }
@@ -470,7 +471,7 @@ uint8_t wangpc_state::timer2_irq_clr_r()
 
 void wangpc_state::nmi_mask_w(uint8_t data)
 {
-	if (LOG) logerror("%s: NMI mask %02x\n", machine().describe_context(), data);
+	LOG("%s: NMI mask %02x\n", machine().describe_context(), data);
 }
 
 
@@ -480,9 +481,12 @@ void wangpc_state::nmi_mask_w(uint8_t data)
 
 uint8_t wangpc_state::led_on_r()
 {
-	if (LOG) logerror("%s: Diagnostic LED on\n", machine().describe_context());
+	if (!machine().side_effects_disabled())
+	{
+		LOG("%s: Diagnostic LED on\n", machine().describe_context());
 
-	m_led_diagnostic = 1;
+		m_led_diagnostic = 1;
+	}
 
 	return 0xff;
 }
@@ -494,7 +498,7 @@ uint8_t wangpc_state::led_on_r()
 
 void wangpc_state::fpu_mask_w(uint8_t data)
 {
-	if (LOG) logerror("%s: FPU mask %02x\n", machine().describe_context(), data);
+	LOG("%s: FPU mask %02x\n", machine().describe_context(), data);
 }
 
 
@@ -504,11 +508,14 @@ void wangpc_state::fpu_mask_w(uint8_t data)
 
 uint8_t wangpc_state::dma_eop_clr_r()
 {
-	if (LOG) logerror("%s: EOP clear\n", machine().describe_context());
+	if (!machine().side_effects_disabled())
+	{
+		LOG("%s: EOP clear\n", machine().describe_context());
 
-	m_dma_eop = 1;
+		m_dma_eop = 1;
 
-	check_level2_interrupts();
+		check_level2_interrupts();
+	}
 
 	return 0xff;
 }
@@ -520,7 +527,7 @@ uint8_t wangpc_state::dma_eop_clr_r()
 
 void wangpc_state::uart_tbre_clr_w(uint8_t data)
 {
-	if (LOG) logerror("%s: TBRE clear\n", machine().describe_context());
+	LOG("%s: TBRE clear\n", machine().describe_context());
 
 	m_uart_tbre = 0;
 
@@ -534,13 +541,16 @@ void wangpc_state::uart_tbre_clr_w(uint8_t data)
 
 uint8_t wangpc_state::uart_r()
 {
-	m_uart_dr = 0;
-
-	check_level2_interrupts();
+	if (!machine().side_effects_disabled())
+	{
+		m_uart_dr = 0;
+		check_level2_interrupts();
+	}
 
 	uint8_t data = m_uart->read();
 
-	if (LOG) logerror("%s: UART read %02x\n", machine().describe_context(), data);
+	if (!machine().side_effects_disabled())
+		LOG("%s: UART read %02x\n", machine().describe_context(), data);
 
 	return data;
 }
@@ -552,7 +562,7 @@ uint8_t wangpc_state::uart_r()
 
 void wangpc_state::uart_w(uint8_t data)
 {
-	if (LOG) logerror("%s: UART write %02x\n", machine().describe_context(), data);
+	LOG("%s: UART write %02x\n", machine().describe_context(), data);
 
 	switch (data)
 	{
@@ -572,7 +582,7 @@ void wangpc_state::uart_w(uint8_t data)
 	case 0x1d: m_led[0] = m_led[1] = m_led[2] = m_led[3] = m_led[4] = m_led[5] = 0; break;
 	}
 
-	if (LOG) popmessage("%u%u%u%u%u%u", m_led[0], m_led[1], m_led[2], m_led[3], m_led[4], m_led[5]);
+	if (VERBOSE) popmessage("%u%u%u%u%u%u", m_led[0], m_led[1], m_led[2], m_led[3], m_led[4], m_led[5]);
 
 	m_uart_tbre = 0;
 	check_level2_interrupts();
@@ -587,8 +597,11 @@ void wangpc_state::uart_w(uint8_t data)
 
 uint8_t wangpc_state::centronics_r()
 {
-	m_dav = 1;
-	check_level1_interrupts();
+	if (!machine().side_effects_disabled())
+	{
+		m_dav = 1;
+		check_level1_interrupts();
+	}
 
 	return m_cent_data_in->read();
 }
@@ -616,10 +629,13 @@ void wangpc_state::centronics_w(uint8_t data)
 
 uint8_t wangpc_state::busy_clr_r()
 {
-	if (LOG) logerror("%s: BUSY clear\n", machine().describe_context());
+	if (!machine().side_effects_disabled())
+	{
+		LOG("%s: BUSY clear\n", machine().describe_context());
 
-	m_centronics_busy = 0;
-	check_level1_interrupts();
+		m_centronics_busy = 0;
+		check_level1_interrupts();
+	}
 
 	return 0xff;
 }
@@ -631,7 +647,7 @@ uint8_t wangpc_state::busy_clr_r()
 
 void wangpc_state::acknlg_clr_w(uint8_t data)
 {
-	if (LOG) logerror("%s: ACKNLG clear\n", machine().describe_context());
+	LOG("%s: ACKNLG clear\n", machine().describe_context());
 
 	m_centronics_ack = 1;
 	check_level1_interrupts();
@@ -644,9 +660,12 @@ void wangpc_state::acknlg_clr_w(uint8_t data)
 
 uint8_t wangpc_state::led_off_r()
 {
-	if (LOG) logerror("%s: Diagnostic LED off\n", machine().describe_context());
+	if (!machine().side_effects_disabled())
+	{
+		LOG("%s: Diagnostic LED off\n", machine().describe_context());
 
-	m_led_diagnostic = 0;
+		m_led_diagnostic = 0;
+	}
 
 	return 0xff;
 }
@@ -658,7 +677,7 @@ uint8_t wangpc_state::led_off_r()
 
 void wangpc_state::parity_nmi_clr_w(uint8_t data)
 {
-	if (LOG) logerror("%s: Parity NMI clear\n", machine().describe_context());
+	LOG("%s: Parity NMI clear\n", machine().describe_context());
 }
 
 
@@ -815,7 +834,7 @@ void wangpc_state::eop_w(int state)
 
 	if (state)
 	{
-		if (LOG) logerror("EOP set\n");
+		LOG("EOP set\n");
 
 		m_dma_eop = 0;
 		check_level2_interrupts();
@@ -1014,13 +1033,13 @@ void wangpc_state::ppi_pc_w(uint8_t data)
 
 void wangpc_state::pit0_w(int state)
 {
-	if (state)
+	if (!state)
 		m_pic->ir0_w(1);
 }
 
 void wangpc_state::pit2_w(int state)
 {
-	if (state)
+	if (!state)
 	{
 		m_timer2_irq = 0;
 		check_level1_interrupts();
@@ -1035,7 +1054,7 @@ void wangpc_state::uart_dr_w(int state)
 {
 	if (state)
 	{
-		if (LOG) logerror("DR set\n");
+		LOG("DR set\n");
 
 		m_uart_dr = 1;
 		check_level2_interrupts();
@@ -1046,7 +1065,7 @@ void wangpc_state::uart_tbre_w(int state)
 {
 	if (state)
 	{
-		if (LOG) logerror("TBRE set\n");
+		LOG("TBRE set\n");
 
 		m_uart_tbre = 1;
 		check_level2_interrupts();
@@ -1075,14 +1094,14 @@ static void wangpc_floppies(device_slot_interface &device)
 
 void wangpc_state::fdc_irq(int state)
 {
-	if (LOG) logerror("FDC INT %u\n", state);
+	LOG("FDC INT %u\n", state);
 
 	check_level2_interrupts();
 }
 
 void wangpc_state::fdc_drq(int state)
 {
-	if (LOG) logerror("FDC DRQ %u\n", state);
+	LOG("FDC DRQ %u\n", state);
 
 	m_fdc_drq = state;
 	update_fdc_drq();
@@ -1103,7 +1122,7 @@ void wangpc_state::update_fdc_drq()
 
 void wangpc_state::write_centronics_ack(int state)
 {
-	if (LOG) logerror("ACKNLG %u\n", state);
+	LOG("ACKNLG %u\n", state);
 
 	m_centronics_ack = state;
 
@@ -1112,7 +1131,7 @@ void wangpc_state::write_centronics_ack(int state)
 
 void wangpc_state::write_centronics_busy(int state)
 {
-	if (LOG) logerror("BUSY %u\n", state);
+	LOG("BUSY %u\n", state);
 
 	m_centronics_busy = state;
 
@@ -1135,7 +1154,7 @@ void wangpc_state::write_centronics_perror(int state)
 
 void wangpc_state::bus_irq2_w(int state)
 {
-	if (LOG) logerror("Bus IRQ2 %u\n", state);
+	LOG("Bus IRQ2 %u\n", state);
 
 	m_bus_irq2 = state;
 
@@ -1159,8 +1178,6 @@ void wangpc_state::machine_start()
 	m_floppy[0]->setup_unload_cb(floppy_image_device::unload_cb(&wangpc_state::on_disk0_unload, this));
 	m_floppy[1]->setup_load_cb(floppy_image_device::load_cb(&wangpc_state::on_disk1_load, this));
 	m_floppy[1]->setup_unload_cb(floppy_image_device::unload_cb(&wangpc_state::on_disk1_unload, this));
-
-	m_led_diagnostic.resolve();
 
 	// state saving
 	save_item(NAME(m_dma_page));
@@ -1206,7 +1223,7 @@ void wangpc_state::on_disk0_load(floppy_image_device *image)
 
 void wangpc_state::on_disk0_unload(floppy_image_device *image)
 {
-	if (LOG) logerror("Door 1 disturbed\n");
+	LOG("Door 1 disturbed\n");
 
 	m_fdc_dd0 = 1;
 	check_level2_interrupts();
@@ -1224,7 +1241,7 @@ void wangpc_state::on_disk1_load(floppy_image_device *image)
 
 void wangpc_state::on_disk1_unload(floppy_image_device *image)
 {
-	if (LOG) logerror("Door 2 disturbed\n");
+	LOG("Door 2 disturbed\n");
 
 	m_fdc_dd1 = 1;
 	check_level2_interrupts();

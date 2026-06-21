@@ -696,11 +696,11 @@ void juku_state::juku(machine_config &config)
 	m_maincpu->in_inta_func().set(m_pic, FUNC(pic8259_device::acknowledge));
 
 	// КР580ВН59
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	// КР580ВИ53 #1
-	PIT8253(config, m_pit[0], 0);
+	PIT8253(config, m_pit[0]);
 	m_pit[0]->set_clk<0>(16_MHz_XTAL/16); // РК171 16000kHz variations on board
 	m_pit[0]->set_clk<1>(16_MHz_XTAL/16); // РК170ББ-14ГC 16000kHz in specs
 	m_pit[0]->set_clk<2>(16_MHz_XTAL/16);
@@ -710,7 +710,7 @@ void juku_state::juku(machine_config &config)
 	//m_pit[0]->out_handler<1>().set(?, ?); // HOR RTR
 
 	// КР580ВИ53 #2
-	PIT8253(config, m_pit[1], 0);
+	PIT8253(config, m_pit[1]);
 	m_pit[0]->out_handler<2>().set(m_pit[1], FUNC(pit8253_device::write_clk1)); // HOR SYNC DSL
 	m_pit[0]->out_handler<2>().append(m_pit[1], FUNC(pit8253_device::write_clk2));
 	m_pit[1]->out_handler<0>().append(m_pit[1], FUNC(pit8253_device::write_gate1));
@@ -720,7 +720,7 @@ void juku_state::juku(machine_config &config)
 	//m_pit[1]->out_handler<2>().append(m_pit[1], FUNC(pit8253_device::write_clk2));
 
 	// КР580ВИ53 #3
-	PIT8253(config, m_pit[2], 0);
+	PIT8253(config, m_pit[2]);
 	m_pit[2]->set_clk<0>(16_MHz_XTAL/13); // 1.23 MHz
 	m_pit[2]->set_clk<1>(16_MHz_XTAL/8); // 2 MHz
 	m_pit[1]->out_handler<1>().append(m_pit[2], FUNC(pit8253_device::write_clk2)); // ~49.92 Hz
@@ -738,12 +738,12 @@ void juku_state::juku(machine_config &config)
 	I8255A(config, m_pio[1]);
 
 	// КР580ВВ51A
-	I8251(config, m_sio[0], 0);
+	I8251(config, m_sio[0]);
 	m_sio[0]->rxrdy_handler().set(m_pic, FUNC(pic8259_device::ir2_w));
 	m_sio[0]->txrdy_handler().set(m_pic, FUNC(pic8259_device::ir3_w));
 
 	// КР580ВВ51A (instead of FDC?)
-	I8251(config, m_sio[1], 0);
+	I8251(config, m_sio[1]);
 	m_sio[1]->rxrdy_handler().set(m_pic, FUNC(pic8259_device::ir0_w));
 	m_sio[1]->txrdy_handler().set(m_pic, FUNC(pic8259_device::ir1_w));
 
@@ -758,7 +758,7 @@ void juku_state::juku(machine_config &config)
 	m_speaker->set_levels(3, SPEAKER_LEVELS);
 
 	// К155ИВ1
-	TTL74148(config, m_key_encoder, 0);
+	TTL74148(config, m_key_encoder);
 
 	// E4701 (joystick like mouse device)
 	JUKU_MOUSE(config, m_mouse);

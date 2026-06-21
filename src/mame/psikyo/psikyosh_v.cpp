@@ -119,7 +119,12 @@ TODO:
 #include "emu.h"
 #include "psikyosh.h"
 
+#include "input.h" // for video debug keys
+
+#include "endianness.h"
+
 #include <algorithm>
+
 
 //#define DEBUG_KEYS
 //#define DEBUG_MESSAGE

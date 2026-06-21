@@ -17,11 +17,12 @@ TODO:
 - waitstates (relevant for V1 mode);
 - hook Z80_INPUT_LINE_BUSREQ to DMA interactions in place of HALT (common with pc8001);
 - complete support for partial palette updates (pretty off in p8suite analog RGB test);
-- understand why i8214 needs a dis hack setter (depends on attached i8212?);
+- understand why i8214 needs a dis_hack setter (depends on attached i8212?);
 - slotify extended work RAM, make sure that p8suite memtest88 detects it properly;
 - better state machine isolation of features between various models.
-  Vanilla PC-8801 doesn't have analog palette, PC80S31 device as default
+  \- Vanilla PC-8801 doesn't have analog palette, PC80S31 device as default
   (uses external minidisk instead), only model with working border color, other misc banking bits.
+  \- GVRAM and ALU is reused by PC-8001mk2SR, except moved in $8000 range rather than $c000.
 - double check dipswitches;
 - backport/merge what is portable to PC-8001;
 - Kanji LV1/LV2 ROM hookups needs to be moved at slot level.
@@ -29,13 +30,25 @@ TODO:
   can be optionally installed;
 - Pinpoint number of EXPansion slots for each machine (currently hardwired to 1),
   guessing from the back panels seems that each model can install between 1 to 3 cards.
-  Also note: most cards aren't compatible between each other;
+  Also note: most cards aren't bus compatible between each other;
+- FH+: move EEPROM emulation in an SDIP device;
 
 Notes:
 - Later models have washed out palette with some SWs, with no red component.
   This is because you have to set up the V1 / V2 DIP-SW to V1 mode for those games
   (BIOS sets up analog palette and never changes back otherwise).
   cfr. SW list usage SW notes that specifically needs V1.
+- FH+ models should all start from a overlay ROM, showing the current BASIC mode and checking
+  if PC key is held at startup for bringing up setup mode screens.
+  MA2 and MC will also show the current BASIC mode, on MA that's still controlled thru a physical
+  switch.
+  This is currently undumped for all machines but MA at current time.
+- Holding following keys during setup mode boot have the following effects:
+\- [D]: clears EEPROM contents;
+\- [STOP]: aborts loading boot device (floppy);
+\- [ESC]: <unknown purpose>;
+\- [N][8][0]: Boots in N-Basic (MA2+ only?);
+\- [B][C][G]: "Advanced Setup Mode" for CMD SING settings (MA2+ only?);
 
 ===================================================================================================
 
@@ -100,6 +113,7 @@ Notes:
 
 
 #include "emu.h"
+#include "pc88_kbd.h"
 #include "pc8801.h"
 
 #include "softlist_dev.h"
@@ -197,7 +211,9 @@ uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 {
 	if(m_gfx_ctrl & 8)
 	{
-		// BG Pal applies to 1bpp mode only, sharrier draws blue backdrop with pen #0
+		// BG Pal applies to 1bpp mode only
+		// - sharrier draws blue backdrop with pen #0 during gameplay
+		// - archon sets a blue BG Pal but definitely expects pen #0 black (BPS logo)
 		const bool bitmap_color_mode = bool(m_gfx_ctrl & 0x10);
 		bitmap.fill(m_palette->pen(bitmap_color_mode ? 0 : BGPAL_PEN), cliprect);
 
@@ -296,72 +312,6 @@ uint8_t pc8801_state::dackv(offs_t offset)
 	return 0;
 }
 
-uint8_t pc8801_state::alu_r(offs_t offset)
-{
-	uint8_t b, r, g;
-
-	/* store data to ALU regs */
-	for(int i = 0; i < 3; i++)
-		m_alu_reg[i] = m_gvram[i*0x4000 + offset];
-
-	b = m_gvram[offset + 0x0000];
-	r = m_gvram[offset + 0x4000];
-	g = m_gvram[offset + 0x8000];
-	if(!(m_alu_ctrl2 & 1)) { b^=0xff; }
-	if(!(m_alu_ctrl2 & 2)) { r^=0xff; }
-	if(!(m_alu_ctrl2 & 4)) { g^=0xff; }
-
-	return b & r & g;
-}
-
-void pc8801_state::alu_w(offs_t offset, uint8_t data)
-{
-	int i;
-
-	// ALU write mode
-	switch(m_alu_ctrl2 & 0x30)
-	{
-		// logic operation
-		case 0x00:
-		{
-			uint8_t logic_op;
-
-			for(i = 0; i < 3; i++)
-			{
-				logic_op = (m_alu_ctrl1 & (0x11 << i)) >> i;
-
-				switch(logic_op)
-				{
-					case 0x00: { m_gvram[i*0x4000 + offset] &= ~data; } break;
-					case 0x01: { m_gvram[i*0x4000 + offset] |= data; } break;
-					case 0x10: { m_gvram[i*0x4000 + offset] ^= data; } break;
-					case 0x11: break; // NOP
-				}
-			}
-		}
-		break;
-
-		// restore data from ALU regs
-		case 0x10:
-		{
-			for(i = 0; i < 3; i++)
-				m_gvram[i*0x4000 + offset] = m_alu_reg[i];
-		}
-		break;
-
-		// swap ALU reg 1 into R GVRAM
-		case 0x20:
-			m_gvram[0x0000 + offset] = m_alu_reg[1];
-			break;
-
-		// swap ALU reg 0 into B GVRAM
-		case 0x30:
-			m_gvram[0x4000 + offset] = m_alu_reg[0];
-			break;
-	}
-}
-
-
 uint8_t pc8801_state::wram_r(offs_t offset)
 {
 	return m_work_ram[offset];
@@ -411,23 +361,17 @@ uint8_t pc8801_state::high_wram_r(offs_t offset)
 	return m_hi_work_ram[offset];
 }
 
+// TODO: high TVRAM even
+// μPD3301 DMAs from this instead of the regular work RAM in later models
+// to resolve a bus bottleneck.
 void pc8801_state::high_wram_w(offs_t offset, uint8_t data)
 {
 	m_hi_work_ram[offset] = data;
 }
 
 // TODO: remove these virtual trampolines once we modernize memory map
-// Needs confirmation about really not being there tho, given the design
-// may be that both dictionary and CD-ROM are generic slots instead.
-inline uint8_t pc8801_state::dictionary_rom_r(offs_t offset)
-{
-	return 0xff;
-}
-
-inline bool pc8801_state::dictionary_rom_enable()
-{
-	return false;
-}
+// CD-ROM stuff should be moved in expansion slot so that MA can mount it
+// (once we have a BIOS for that)
 
 inline uint8_t pc8801_state::cdbios_rom_r(offs_t offset)
 {
@@ -439,149 +383,90 @@ inline bool pc8801_state::cdbios_rom_enable()
 	return false;
 }
 
-uint8_t pc8801_state::mem_r(offs_t offset)
-{
-	if(offset <= 0x7fff)
-	{
-		if(m_extram_mode & 1)
-			return ext_wram_r(offset | (m_extram_bank * 0x8000));
-
-		if(m_gfx_ctrl & 2)
-			return wram_r(offset);
-
-		if(cdbios_rom_enable())
-			return cdbios_rom_r(offset & 0x7fff);
-
-		if(m_gfx_ctrl & 4)
-			return nbasic_rom_r(offset);
-
-		if(offset >= 0x6000 && offset <= 0x7fff && ((m_ext_rom_bank & 1) == 0))
-			return n88basic_rom_r(0x8000 + (offset & 0x1fff) + (0x2000 * (m_misc_ctrl & 3)));
-
-		return n88basic_rom_r(offset);
-	}
-	else if(offset >= 0x8000 && offset <= 0x83ff) // work RAM window
-	{
-		uint32_t window_offset;
-
-		// work RAM read select or N-Basic select always banks this as normal work RAM
-		if(m_gfx_ctrl & 6)
-			return wram_r(offset);
-
-		window_offset = (offset & 0x3ff) + (m_window_offset_bank << 8);
-
-		// castlex and imenes accesses this
-		// TODO: high TVRAM even
-		if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
-			return high_wram_r(window_offset & 0xfff);
-
-		return wram_r(window_offset);
-	}
-	else if(offset >= 0x8400 && offset <= 0xbfff)
-	{
-		return wram_r(offset);
-	}
-	else if(offset >= 0xc000 && offset <= 0xffff)
-	{
-		if(dictionary_rom_enable())
-			return dictionary_rom_r(offset & 0x3fff);
-
-		if(m_misc_ctrl & 0x40)
-		{
-			if(!machine().side_effects_disabled())
-				m_vram_sel = 3;
-
-			if(m_alu_ctrl2 & 0x80)
-				return alu_r(offset & 0x3fff);
-		}
-
-		if(m_vram_sel == 3)
-		{
-			if(offset >= 0xf000 && offset <= 0xffff && (m_misc_ctrl & 0x10))
-				return high_wram_r(offset & 0xfff);
-
-			return wram_r(offset);
-		}
-
-		return gvram_r((offset & 0x3fff) + (0x4000 * m_vram_sel));
-	}
-
-	return 0xff;
-}
-
-void pc8801_state::mem_w(offs_t offset, uint8_t data)
-{
-	if(offset <= 0x7fff)
-	{
-		if(m_extram_mode & 0x10)
-			ext_wram_w(offset | (m_extram_bank * 0x8000),data);
-		else
-			wram_w(offset,data);
-
-		return;
-	}
-	else if(offset >= 0x8000 && offset <= 0x83ff)
-	{
-		// work RAM read select or N-Basic select always banks this as normal work RAM
-		if(m_gfx_ctrl & 6)
-			wram_w(offset,data);
-		else
-		{
-			uint32_t window_offset;
-
-			window_offset = (offset & 0x3ff) + (m_window_offset_bank << 8);
-
-			// castlex and imenes accesses this
-			// TODO: high TVRAM even
-			// μPD3301 DMAs from this instead of the regular work RAM in later models
-			// to resolve a bus bottleneck.
-			if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
-				high_wram_w(window_offset & 0xfff,data);
-			else
-				wram_w(window_offset,data);
-		}
-
-		return;
-	}
-	else if(offset >= 0x8400 && offset <= 0xbfff)
-	{
-		wram_w(offset,data);
-		return;
-	}
-	else if(offset >= 0xc000 && offset <= 0xffff)
-	{
-		if(m_misc_ctrl & 0x40)
-		{
-			if(!machine().side_effects_disabled())
-				m_vram_sel = 3;
-
-			if(m_alu_ctrl2 & 0x80)
-			{
-				alu_w(offset & 0x3fff,data);
-				return;
-			}
-		}
-
-		if(m_vram_sel == 3)
-		{
-			if(offset >= 0xf000 && offset <= 0xffff && (m_misc_ctrl & 0x10))
-			{
-				high_wram_w(offset & 0xfff,data);
-				return;
-			}
-
-			wram_w(offset,data);
-			return;
-		}
-
-		gvram_w((offset & 0x3fff) + (0x4000 * m_vram_sel),data);
-		return;
-	}
-}
-
 void pc8801_state::main_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(pc8801_state::mem_r), FUNC(pc8801_state::mem_w));
+	map(0x0000, 0x7fff).lrw8(
+		NAME([this] (offs_t offset) {
+			if(m_extram_mode & 1)
+				return ext_wram_r(offset | (m_extram_bank * 0x8000));
+
+			if(m_gfx_ctrl & 2)
+				return wram_r(offset);
+
+			if(cdbios_rom_enable())
+				return cdbios_rom_r(offset & 0x7fff);
+
+			if(m_gfx_ctrl & 4)
+				return nbasic_rom_r(offset);
+
+			if(offset >= 0x6000 && offset <= 0x7fff && ((m_ext_rom_bank & 1) == 0))
+				return n88basic_rom_r(0x8000 + (offset & 0x1fff) + (0x2000 * (m_misc_ctrl & 3)));
+
+			return n88basic_rom_r(offset);
+		}),
+		NAME([this] (offs_t offset, uint8_t data) {
+			if(m_extram_mode & 0x10)
+				ext_wram_w(offset | (m_extram_bank * 0x8000), data);
+			else
+				wram_w(offset, data);
+		})
+	);
+	map(0x8000, 0xbfff).lrw8(
+		NAME([this] (offs_t offset) {
+			return wram_r(offset + 0x8000);
+		}),
+		NAME([this] (offs_t offset, uint8_t data) {
+			wram_w(offset + 0x8000, data);
+		})
+	);
+	// Text window overlay
+	map(0x8000, 0x83ff).view(m_window_view);
+	m_window_view[0](0x8000, 0x83ff).lrw8(
+		NAME([this] (offs_t offset) {
+			const uint16_t window_offset = (offset & 0x3ff) + (m_window_offset_bank << 8);
+
+			// castlex and imenes accesses this
+			if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
+				return high_wram_r(window_offset & 0xfff);
+
+			return wram_r(window_offset);
+		}),
+		NAME([this] (offs_t offset, uint8_t data) {
+			const uint16_t window_offset = (offset & 0x3ff) + (m_window_offset_bank << 8);
+
+			// castlex and imenes accesses this
+			if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
+				high_wram_w(window_offset & 0xfff, data);
+			else
+				wram_w(window_offset, data);
+		})
+	);
+	map(0xc000, 0xffff).m(m_gvram_bank, FUNC(address_map_bank_device::amap8));
+}
+
+uint8_t pc8801_state::wram_c000_r(offs_t offset)
+{
+	if((offset & 0x3000) == 0x3000 && (m_misc_ctrl & 0x10))
+		return high_wram_r(offset & 0xfff);
+
+	return wram_r(offset + 0xc000);
+}
+
+void pc8801_state::wram_c000_w(offs_t offset, uint8_t data)
+{
+	if((offset & 0x3000) == 0x3000 && (m_misc_ctrl & 0x10))
+	{
+		high_wram_w(offset & 0xfff, data);
+		return;
+	}
+
+	wram_w(offset + 0xc000, data);
+}
+
+void pc8801_state::gvram_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rw(FUNC(pc8801_state::gvram_r), FUNC(pc8801_state::gvram_w));
+	map(0xc000, 0xffff).rw(FUNC(pc8801_state::wram_c000_r), FUNC(pc8801_state::wram_c000_w));
 }
 
 uint8_t pc8801_state::ext_rom_bank_r()
@@ -624,6 +509,12 @@ void pc8801_state::port30_w(uint8_t data)
 void pc8801_state::port31_w(uint8_t data)
 {
 	m_gfx_ctrl = data;
+
+	// RMODE or MMODE maps $8000-$83ff as regular work RAM
+	if (m_gfx_ctrl & 6)
+		m_window_view.disable();
+	else
+		m_window_view.select(0);
 
 //  set_screen_frequency((data & 0x11) != 0x11);
 //  dynamic_res_change();
@@ -704,6 +595,12 @@ uint8_t pc8801_state::vram_select_r()
 void pc8801_state::vram_select_w(offs_t offset, uint8_t data)
 {
 	m_vram_sel = offset & 3;
+	flush_gvram_access();
+}
+
+void pc8801_state::flush_gvram_access()
+{
+	m_gvram_bank->set_bank(m_vram_sel);
 }
 
 void pc8801_state::irq_level_w(uint8_t data)
@@ -757,7 +654,7 @@ void pc8801_state::window_bank_inc_w(uint8_t data)
  * ---- 00-- TV / video mode
  * ---- 01-- None (as in disabling the screen entirely?)
  * ---- 10-- Analog RGB mode
- * ---- 11-- Optional mode
+ * ---- 11-- Option mode
  * ---- --xx internal EROM selection
  */
 uint8_t pc8801_state::misc_ctrl_r()
@@ -770,6 +667,8 @@ void pc8801_state::misc_ctrl_w(uint8_t data)
 	m_misc_ctrl = data;
 
 	m_sound_irq_enable = ((data & 0x80) == 0);
+
+	flush_gvram_access();
 
 	// Note: this will map to no irq anyway if there isn't any device interested in INT4
 	if (m_sound_irq_enable)
@@ -866,16 +765,6 @@ void pc8801_state::extram_bank_w(uint8_t data)
 	m_extram_bank = data;
 }
 
-void pc8801_state::alu_ctrl1_w(uint8_t data)
-{
-	m_alu_ctrl1 = data;
-}
-
-void pc8801_state::alu_ctrl2_w(uint8_t data)
-{
-	m_alu_ctrl2 = data;
-}
-
 /*
  * $e8-$eb kanji LV1
  * $ec-$ef kanji LV2
@@ -908,16 +797,154 @@ template <unsigned kanji_level> void pc8801_state::kanji_w(offs_t offset, uint8_
 	// https://retrocomputerpeople.web.fc2.com/machines/nec/8801/io_map88.html
 }
 
+/*
+ * PC-8801mkIISR overrides (ALU)
+ */
+
+uint8_t pc8801mk2sr_state::alu_r(offs_t offset)
+{
+	uint8_t b, r, g;
+
+	// ignore for debugger, wouldn't make sense anyway
+	if (machine().side_effects_disabled())
+		return 0xff;
+
+	offset &= 0x3fff;
+
+	/* store data to ALU regs */
+	for(int i = 0; i < 3; i++)
+		m_alu_reg[i] = m_gvram[i*0x4000 + offset];
+
+	b = m_alu_reg[0];
+	r = m_alu_reg[1];
+	g = m_alu_reg[2];
+	if(!(m_alu_ctrl2 & 1)) { b^=0xff; }
+	if(!(m_alu_ctrl2 & 2)) { r^=0xff; }
+	if(!(m_alu_ctrl2 & 4)) { g^=0xff; }
+
+	return b & r & g;
+}
+
+void pc8801mk2sr_state::alu_w(offs_t offset, uint8_t data)
+{
+	int i;
+
+	offset &= 0x3fff;
+
+	// ALU write mode
+	switch(m_alu_ctrl2 & 0x30)
+	{
+		// logic operation
+		case 0x00:
+		{
+			uint8_t logic_op;
+
+			for(i = 0; i < 3; i++)
+			{
+				logic_op = (m_alu_ctrl1 & (0x11 << i)) >> i;
+
+				switch(logic_op)
+				{
+					case 0x00: { m_gvram[i*0x4000 + offset] &= ~data; } break;
+					case 0x01: { m_gvram[i*0x4000 + offset] |= data; } break;
+					case 0x10: { m_gvram[i*0x4000 + offset] ^= data; } break;
+					case 0x11: break; // NOP
+				}
+			}
+		}
+		break;
+
+		// restore data from ALU regs
+		case 0x10:
+		{
+			for(i = 0; i < 3; i++)
+				m_gvram[i*0x4000 + offset] = m_alu_reg[i];
+		}
+		break;
+
+		// swap ALU reg 1 into R GVRAM
+		case 0x20:
+			m_gvram[0x0000 + offset] = m_alu_reg[1];
+			break;
+
+		// swap ALU reg 0 into B GVRAM
+		case 0x30:
+			m_gvram[0x4000 + offset] = m_alu_reg[0];
+			break;
+	}
+}
+
+void pc8801mk2sr_state::alu_ctrl1_w(uint8_t data)
+{
+	m_alu_ctrl1 = data;
+}
+
+void pc8801mk2sr_state::alu_ctrl2_w(uint8_t data)
+{
+	m_alu_ctrl2 = data;
+	flush_gvram_access();
+}
+
+void pc8801mk2sr_state::flush_gvram_access()
+{
+	if (BIT(m_misc_ctrl, 6))
+	{
+		if (BIT(m_alu_ctrl2, 7))
+		{
+			m_alu_view.select(0);
+		}
+		else
+		{
+			m_alu_view.disable();
+		}
+
+		// NOTE: ALU enabled wins over GVRAM, to the point of disabling its latch when setting changes
+		m_vram_sel = 3;
+	}
+	else
+		m_alu_view.disable();
+
+	pc8801_state::flush_gvram_access();
+}
+
+
+void pc8801mk2sr_state::main_map(address_map &map)
+{
+	pc8801_state::main_map(map);
+	map(0xc000, 0xffff).view(m_alu_view);
+	m_alu_view[0](0xc000, 0xffff).rw(FUNC(pc8801mk2sr_state::alu_r), FUNC(pc8801mk2sr_state::alu_w));
+}
+
 
 /*
- * PC8801FH overrides (CPU clock switch)
+ * PC8801FH overrides (CPU clock switch & setup mode)
  */
+
+void pc8801fh_state::main_map(address_map &map)
+{
+	pc8801mk2sr_state::main_map(map);
+	map(0x0000, 0x7fff).view(m_setup_mem_view);
+	m_setup_mem_view[0](0x0000, 0x7fff).rom().region("setup", 0);
+}
 
 uint8_t pc8801fh_state::cpuclock_r()
 {
 	return 0x10 | m_clock_setting;
 }
 
+/*
+ * ---- xxxx baud rate
+ * ---- 1000 19200 bps
+ * ---- 0111 9600 bps
+ * ---- 0110 4800 bps
+ * ---- 0101 2400 bps
+ * ---- 0100 1200 bps
+ * ---- 0011 600 bps
+ * ---- 0010 300 bps
+ * ---- 0001 150 bps
+ * ---- 0000 75 bps
+ * ---- 1xxx <invalid>
+ */
 uint8_t pc8801fh_state::baudrate_r()
 {
 	return 0xf0 | m_baudrate_val;
@@ -926,6 +953,7 @@ uint8_t pc8801fh_state::baudrate_r()
 void pc8801fh_state::baudrate_w(uint8_t data)
 {
 	m_baudrate_val = data & 0xf;
+	// TODO: change clock for RS-232C
 }
 
 /*
@@ -937,11 +965,6 @@ inline uint8_t pc8801ma_state::dictionary_rom_r(offs_t offset)
 	return m_dictionary_rom[offset + ((m_dic_bank & 0x1f) * 0x4000)];
 }
 
-inline bool pc8801ma_state::dictionary_rom_enable()
-{
-	return m_dic_ctrl;
-}
-
 void pc8801ma_state::dic_bank_w(uint8_t data)
 {
 	m_dic_bank = data & 0x1f;
@@ -950,6 +973,16 @@ void pc8801ma_state::dic_bank_w(uint8_t data)
 void pc8801ma_state::dic_ctrl_w(uint8_t data)
 {
 	m_dic_ctrl = (data ^ 1) & 1;
+}
+
+uint8_t pc8801ma_state::wram_c000_r(offs_t offset)
+{
+	// overlays at Work RAM level (GVRAM and ALU wins over this) and on reads only
+	if (m_dic_ctrl)
+		return dictionary_rom_r(offset);
+
+	// assume unchanged vs. vanilla PC-8801
+	return pc8801fh_state::wram_c000_r(offset);
 }
 
 /*
@@ -970,32 +1003,15 @@ void pc8801_state::main_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x00, 0x00).portr("KEY0");
-	map(0x01, 0x01).portr("KEY1");
-	map(0x02, 0x02).portr("KEY2");
-	map(0x03, 0x03).portr("KEY3");
-	map(0x04, 0x04).portr("KEY4");
-	map(0x05, 0x05).portr("KEY5");
-	map(0x06, 0x06).portr("KEY6");
-	map(0x07, 0x07).portr("KEY7");
-	map(0x08, 0x08).portr("KEY8");
-	map(0x09, 0x09).portr("KEY9");
-	map(0x0a, 0x0a).portr("KEY10");
-	map(0x0b, 0x0b).portr("KEY11");
-	map(0x0c, 0x0c).portr("KEY12");
-	map(0x0d, 0x0d).portr("KEY13");
-	map(0x0e, 0x0e).portr("KEY14");
-	map(0x0f, 0x0f).portr("KEY15");
+	map(0x00, 0x0f).r("kbd", FUNC(pc8001_kbd_device::read_direct));
 	map(0x10, 0x10).w(FUNC(pc8801_state::port10_w));
 	map(0x20, 0x21).mirror(0x0e).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write)); // CMT / RS-232C ch. 0
 	map(0x30, 0x30).portr("DSW1").w(FUNC(pc8801_state::port30_w));
 	map(0x31, 0x31).portr("DSW2").w(FUNC(pc8801_state::port31_w));
 	map(0x32, 0x32).rw(FUNC(pc8801_state::misc_ctrl_r), FUNC(pc8801_state::misc_ctrl_w));
+	// NOTE: anything after 0x32 reads 0xff on a PC8801MA real HW test
 //  map(0x33, 0x33) PC8001mkIISR port, mirror on PC8801?
-	// TODO: ALU not installed on pre-mkIISR machines
-	// NB: anything after 0x32 reads 0xff on a PC8801MA real HW test
-	map(0x34, 0x34).w(FUNC(pc8801_state::alu_ctrl1_w));
-	map(0x35, 0x35).w(FUNC(pc8801_state::alu_ctrl2_w));
+//  map(0x34, 0x35) ALU regs, unmapped on regular
 //  map(0x35, 0x35).r <unknown>, accessed by cancanb during OP, mistake? Mirror for intended HW?
 	map(0x40, 0x40).rw(FUNC(pc8801_state::port40_r), FUNC(pc8801_state::port40_w));
 //  map(0x44, 0x47).rw internal OPN/OPNA sound card for 8801mkIISR and beyond
@@ -1051,12 +1067,30 @@ void pc8801_state::main_io(address_map &map)
 void pc8801mk2sr_state::main_io(address_map &map)
 {
 	pc8801_state::main_io(map);
+	map(0x34, 0x34).w(FUNC(pc8801mk2sr_state::alu_ctrl1_w));
+	map(0x35, 0x35).w(FUNC(pc8801mk2sr_state::alu_ctrl2_w));
+
 	map(0x44, 0x45).rw(m_opn, FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 }
 
 void pc8801fh_state::main_io(address_map &map)
 {
 	pc8801_state::main_io(map);
+	map(0x10, 0x17).view(m_setup_io_view);
+	// $11, $12, $13 written to at startup, unknown purpose
+	m_setup_io_view[0](0x11, 0x11).lr8(NAME([this] (offs_t offset) {
+		// bit 7: unknown, read at startup, flips $9002 to 0x80
+		return m_eeprom->do_read();
+	}));
+	m_setup_io_view[0](0x14, 0x14).lw8(NAME([this] (offs_t offset, u8 data) {
+		m_eeprom->di_write(BIT(data, 0));
+		m_eeprom->clk_write(BIT(data, 1));
+		m_eeprom->cs_write(BIT(data, 2));
+	}));
+	m_setup_io_view[0](0x15, 0x15).lw8(NAME([this] (offs_t offset, u8 data) { m_setup_mem_view.disable(); m_setup_io_view.disable(); }));
+	map(0x34, 0x34).w(FUNC(pc8801fh_state::alu_ctrl1_w));
+	map(0x35, 0x35).w(FUNC(pc8801fh_state::alu_ctrl2_w));
+
 	map(0x44, 0x47).rw(m_opna, FUNC(ym2608_device::read), FUNC(ym2608_device::write));
 
 	map(0x6e, 0x6e).r(FUNC(pc8801fh_state::cpuclock_r));
@@ -1067,6 +1101,7 @@ void pc8801ma_state::main_io(address_map &map)
 {
 	pc8801fh_state::main_io(map);
 	map(0xf0, 0xf0).w(FUNC(pc8801ma_state::dic_bank_w));
+	// TODO: readable
 	map(0xf1, 0xf1).w(FUNC(pc8801ma_state::dic_ctrl_w));
 }
 
@@ -1083,157 +1118,7 @@ void pc8801fh_state::opna_map(address_map &map)
 	map(0x000000, 0x1fffff).ram();
 }
 
-/* Input Ports */
-
-// TODO: move to a pc8801_keyboard_device, merge with pc8001.cpp implementation
-/* 2008-05 FP:
-Small note about the strange default mapping of function keys:
-the top line of keys in PC8801 keyboard is as follows
-[STOP][COPY]      [F1][F2][F3][F4][F5]      [ROLL UP][ROLL DOWN]
-Therefore, in Full Emulation mode, "F1" goes to 'F3' and so on
-
-Also, the Keypad has 16 keys, making impossible to map it in a satisfactory
-way to a PC keypad. Therefore, default settings for these keys in Full
-Emulation are currently based on the effect of the key rather than on
-their real position
-
-About natural keyboards: currently,
-- "Stop" is mapped to 'Pause'
-- "Copy" is mapped to 'Print Screen'
-- "Kana" is mapped to 'F6'
-- "Grph" is mapped to 'F7'
-- "Roll Up" and "Roll Down" are mapped to 'Page Up' and 'Page Down'
-- "Help" is mapped to 'F8'
- */
-
 static INPUT_PORTS_START( pc8801 )
-	PORT_START("KEY0")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD)       PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD)       PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD)       PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD)       PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD)       PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5_PAD)       PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD)       PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD)       PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
-
-	PORT_START("KEY1")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD)       PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD)       PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK)    PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)    PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGUP)        PORT_CHAR(UCHAR_MAMEKEY(EQUALS_PAD))
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGDN)        PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD))
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)     PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(13)
-
-	PORT_START("KEY2")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)   PORT_CHAR('@')
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)           PORT_CHAR('a') PORT_CHAR('A')
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)           PORT_CHAR('b') PORT_CHAR('B')
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)           PORT_CHAR('c') PORT_CHAR('C')
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)           PORT_CHAR('d') PORT_CHAR('D')
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)           PORT_CHAR('e') PORT_CHAR('E')
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)           PORT_CHAR('f') PORT_CHAR('F')
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)           PORT_CHAR('g') PORT_CHAR('G')
-
-	PORT_START("KEY3")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)           PORT_CHAR('h') PORT_CHAR('H')
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)           PORT_CHAR('i') PORT_CHAR('I')
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)           PORT_CHAR('j') PORT_CHAR('J')
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)           PORT_CHAR('k') PORT_CHAR('K')
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)           PORT_CHAR('l') PORT_CHAR('L')
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)           PORT_CHAR('m') PORT_CHAR('M')
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)           PORT_CHAR('n') PORT_CHAR('N')
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)           PORT_CHAR('o') PORT_CHAR('O')
-
-	PORT_START("KEY4")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)           PORT_CHAR('p') PORT_CHAR('P')
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)           PORT_CHAR('q') PORT_CHAR('Q')
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)           PORT_CHAR('r') PORT_CHAR('R')
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)           PORT_CHAR('s') PORT_CHAR('S')
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)           PORT_CHAR('t') PORT_CHAR('T')
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)           PORT_CHAR('u') PORT_CHAR('U')
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)           PORT_CHAR('v') PORT_CHAR('V')
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)           PORT_CHAR('w') PORT_CHAR('W')
-
-	PORT_START("KEY5")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)           PORT_CHAR('x') PORT_CHAR('X')
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)           PORT_CHAR('y') PORT_CHAR('Y')
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)           PORT_CHAR('z') PORT_CHAR('Z')
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)  PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH2)  PORT_CHAR(0xA5) PORT_CHAR('|')
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)   PORT_CHAR(']') PORT_CHAR('}')
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)      PORT_CHAR('^')
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)       PORT_CHAR('-') PORT_CHAR('=')
-
-	PORT_START("KEY6")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)           PORT_CHAR('0')
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)           PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)           PORT_CHAR('2') PORT_CHAR('"')
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)           PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)           PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)           PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)           PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)           PORT_CHAR('7') PORT_CHAR('\'')
-
-	PORT_START("KEY7")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)           PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)           PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)       PORT_CHAR(':') PORT_CHAR('*')
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)       PORT_CHAR(';') PORT_CHAR('+')
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)       PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)        PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)       PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("  _") PORT_CODE(KEYCODE_DEL)            PORT_CHAR(0) PORT_CHAR('_')
-
-	PORT_START("KEY8")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Clr Home") PORT_CODE(KEYCODE_HOME)      PORT_CHAR(UCHAR_MAMEKEY(HOME))
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP)   PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del Ins") PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(UCHAR_MAMEKEY(DEL)) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Grph") PORT_CODE(KEYCODE_LALT)  PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(F7))
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Kana") PORT_CODE(KEYCODE_LCONTROL) PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(F6))
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RCONTROL)                        PORT_CHAR(UCHAR_SHIFT_2)
-
-	PORT_START("KEY9")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Stop") PORT_CODE(KEYCODE_F1)            PORT_CHAR(UCHAR_MAMEKEY(PAUSE))
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F3)                              PORT_CHAR(UCHAR_MAMEKEY(F1))
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F4)                              PORT_CHAR(UCHAR_MAMEKEY(F2))
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5)                              PORT_CHAR(UCHAR_MAMEKEY(F3))
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F6)                              PORT_CHAR(UCHAR_MAMEKEY(F4))
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F7)                              PORT_CHAR(UCHAR_MAMEKEY(F5))
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)                           PORT_CHAR(' ')
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC)                             PORT_CHAR(UCHAR_MAMEKEY(ESC))
-
-	PORT_START("KEY10")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)                             PORT_CHAR('\t')
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN)   PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT)   PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Help") PORT_CODE(KEYCODE_END)           PORT_CHAR(UCHAR_MAMEKEY(F8))
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Copy") PORT_CODE(KEYCODE_F2)            PORT_CHAR(UCHAR_MAMEKEY(PRTSCR))
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD)                       PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD)                       PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
-
-	PORT_START("KEY11")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Roll Up") PORT_CODE(KEYCODE_F8)         PORT_CHAR(UCHAR_MAMEKEY(PGUP))
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Roll Down") PORT_CODE(KEYCODE_F9)       PORT_CHAR(UCHAR_MAMEKEY(PGDN))
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY12")     /* port 0x0c */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY13")     /* port 0x0d */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY14")     /* port 0x0e */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY15")     /* port 0x0f */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "BASIC" ) PORT_DIPLOCATION("SW4:1")
 	PORT_DIPSETTING(    0x01, "N88-BASIC" )
@@ -1254,9 +1139,10 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	// TODO: these really maps to "general purpose inputs" UIP1 / UIP2
-	PORT_DIPNAME( 0x40, 0x40, "Memory wait" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+//	PORT_DIPNAME( 0x40, 0x40, "Memory wait" )
+//	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+//	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Disable CMD SING" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1280,13 +1166,15 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_DIPNAME( 0x20, 0x20, "Duplex" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, "Half" )
 	PORT_DIPSETTING(    0x00, "Full" )
-	// TODO: vanilla PC8801 and mkII doesn't have V2
-	PORT_DIPNAME( 0x40, 0x40, "BASIC speed select" ) PORT_DIPLOCATION("SW3:1") // actually SW3:0!
-	PORT_DIPSETTING(    0x40, "High Speed Mode (V1H, V2)" )
-	PORT_DIPSETTING(    0x00, "Standard Mode (V1S)" )
-	PORT_DIPNAME( 0x80, 0x00, "BASIC Version select" ) PORT_DIPLOCATION("SW4:2")
-	PORT_DIPSETTING(    0x80, "V1 Mode" )
-	PORT_DIPSETTING(    0x00, "V2 Mode" )
+	// vanilla PC8801 and mkII doesn't have V2
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+//	PORT_DIPNAME( 0x40, 0x40, "BASIC speed select" ) PORT_DIPLOCATION("SW3:1") // actually SW3:0!
+//	PORT_DIPSETTING(    0x40, "High Speed Mode (V1H, V2)" )
+//	PORT_DIPSETTING(    0x00, "Standard Mode (V1S)" )
+//	PORT_DIPNAME( 0x80, 0x00, "BASIC Version select" ) PORT_DIPLOCATION("SW4:2")
+//	PORT_DIPSETTING(    0x80, "V1 Mode" )
+//	PORT_DIPSETTING(    0x00, "V2 Mode" )
 
 	PORT_START("CTRL")
 	PORT_DIPNAME( 0x02, 0x02, "Monitor Type" )
@@ -1301,6 +1189,8 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	// TODO: Coming from the old legacy driver as "EXSWITCH", where this maps?
+	// On FH+ machines this is driven by the BIOS SDIP itself (changed in port $6f)
+	// On mk2SR and earlier: fixed at 300 bps or expects a RS-232C card with physical dips?
 	PORT_START("CFG")
 	#if 0
 	PORT_DIPNAME( 0x0f, 0x08, "Serial speed" )
@@ -1314,10 +1204,9 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_DIPSETTING(    0x08, "9600bps" )
 	PORT_DIPSETTING(    0x09, "19200bps" )
 	#endif
-	// TODO: unemulated waitstate weight
-	PORT_DIPNAME( 0x40, 0x40, "Speed mode" )
-	PORT_DIPSETTING(    0x00, "Slow" )
-	PORT_DIPSETTING(    0x40, DEF_STR( High ) )
+//	PORT_DIPNAME( 0x40, 0x40, "Speed mode" )
+//	PORT_DIPSETTING(    0x00, "Slow" )
+//	PORT_DIPSETTING(    0x40, DEF_STR( High ) )
 
 	PORT_START("MEM")
 	PORT_CONFNAME( 0x0f, 0x0a, "Extension memory" )
@@ -1343,20 +1232,46 @@ static INPUT_PORTS_START( pc8801 )
 //  PORT_CONFSETTING(    0x01, "OPNA (YM2608)" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( pc8801fh )
+static INPUT_PORTS_START( pc8801mk2sr )
 	PORT_INCLUDE( pc8801 )
 
-	// TODO: KEY12, KEY13 and KEY14 have extended meaning
-	// "KEY12" F6 - F10, BS, INS, DEL
-	// "KEY13" kanji control (lower 4 bits)
-	// "KEY14" Normal & Numpad RETURN, Left Shift, Right Shift.
-	//         bit 7 acts as extension identifier (0 for FH+ keyboards).
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x40, 0x40, "Memory wait" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x40, 0x40, "BASIC speed select" ) PORT_DIPLOCATION("SW3:1") // actually SW3:0!
+	PORT_DIPSETTING(    0x40, "High Speed Mode (V1H, V2)" )
+	PORT_DIPSETTING(    0x00, "Standard Mode (V1S)" )
+	PORT_DIPNAME( 0x80, 0x00, "BASIC Version select" ) PORT_DIPLOCATION("SW4:2")
+	PORT_DIPSETTING(    0x80, "V1 Mode" )
+	PORT_DIPSETTING(    0x00, "V2 Mode" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( pc8801fh )
+	PORT_INCLUDE( pc8801mk2sr )
 
 	PORT_MODIFY("CFG")
 	PORT_DIPNAME( 0x80, 0x80, "Main CPU clock" )
 	PORT_DIPSETTING(    0x80, "4MHz" )
 	PORT_DIPSETTING(    0x00, "8MHz" )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( pc8801ma )
+	PORT_INCLUDE( pc8801fh )
+
+	PORT_MODIFY("DSW1")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("eeprom", FUNC(pc88_sdip_device::memory_weight_r))
+	PORT_BIT( 0x3e, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("eeprom", FUNC(pc88_sdip_device::dsw1_r))
+
+	PORT_MODIFY("DSW2")
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("eeprom", FUNC(pc88_sdip_device::dsw2_r))
+
+	PORT_MODIFY("CTRL")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("eeprom", FUNC(pc88_sdip_device::auto_boot_floppy_r))
+INPUT_PORTS_END
+
 
 /* Graphics Layouts */
 
@@ -1413,9 +1328,6 @@ void pc8801_state::machine_start()
 	save_item(NAME(m_window_offset_bank));
 	save_item(NAME(m_text_layer_mask));
 	save_item(NAME(m_bitmap_layer_mask));
-	save_pointer(NAME(m_alu_reg), 3);
-	save_item(NAME(m_alu_ctrl1));
-	save_item(NAME(m_alu_ctrl2));
 	save_item(NAME(m_extram_mode));
 	save_item(NAME(m_extram_bank));
 	save_item(NAME(m_extram_size));
@@ -1440,15 +1352,13 @@ void pc8801_state::machine_reset()
 	m_ext_rom_bank = 0xff;
 	m_gfx_ctrl = 0x31;
 	m_window_offset_bank = 0x80;
+	m_window_view.select(0);
 	m_misc_ctrl = 0x80;
 	// N-BASIC never pings $53, definitely expects text layer to be enabled on default
 	m_text_layer_mask = false;
 	m_bitmap_layer_mask = 0;
 	m_vram_sel = 3;
-
-	// initialize ALU
-	for(int i = 0; i < 3; i++)
-		m_alu_reg[i] = 0x00;
+	m_gvram_bank->set_bank(3);
 
 	m_beeper->set_state(0);
 
@@ -1477,6 +1387,27 @@ void pc8801_state::machine_reset()
 	m_crtc->set_unscaled_clock(pixel_clock_setting ? PIXEL_CLOCK_24KHz : PIXEL_CLOCK_15KHz);
 }
 
+void pc8801mk2sr_state::machine_start()
+{
+	pc8801_state::machine_start();
+
+	save_pointer(NAME(m_alu_reg), 3);
+	save_item(NAME(m_alu_ctrl1));
+	save_item(NAME(m_alu_ctrl2));
+}
+
+void pc8801mk2sr_state::machine_reset()
+{
+	pc8801_state::machine_reset();
+
+	// initialize ALU, assume disabled by default
+	for(int i = 0; i < 3; i++)
+		m_alu_reg[i] = 0x00;
+	m_alu_ctrl1 = m_alu_ctrl2 = 0;
+
+	m_alu_view.disable();
+}
+
 void pc8801fh_state::machine_start()
 {
 	pc8801mk2sr_state::machine_start();
@@ -1495,6 +1426,18 @@ void pc8801fh_state::machine_reset()
 	// TODO: FDC board shouldn't be connected to the clock setting, verify
 //  m_fdccpu->set_unscaled_clock(m_clock_setting ?  XTAL(4'000'000) : XTAL(8'000'000));
 	m_baudrate_val = 0;
+
+	// intermediate conditional until we have a dump for all these machines
+	if (m_has_setup_mode)
+	{
+		m_setup_mem_view.select(0);
+		m_setup_io_view.select(0);
+	}
+	else
+	{
+		m_setup_mem_view.disable();
+		m_setup_io_view.disable();
+	}
 }
 
 void pc8801ma_state::machine_start()
@@ -1510,6 +1453,7 @@ void pc8801ma_state::machine_reset()
 	pc8801fh_state::machine_reset();
 
 	m_dic_bank = 0;
+	// disable by default (inverted in handler)
 	m_dic_ctrl = 0;
 }
 
@@ -1675,9 +1619,8 @@ void pc8801_state::pc8801(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("pc8801_cass");
 
-
 	// TODO: clock, receiver handler, DCD?
-	I8251(config, m_usart, 0);
+	I8251(config, m_usart);
 	m_usart->txd_handler().set(FUNC(pc8801_state::txdata_callback));
 	m_usart->rxrdy_handler().set(FUNC(pc8801_state::rxrdy_irq_w));
 
@@ -1713,7 +1656,11 @@ void pc8801_state::pc8801(machine_config &config)
 
 	TIMER(config, "rtc_timer").configure_periodic(FUNC(pc8801_state::clock_irq_w), attotime::from_hz(600));
 
-	// Note: original models up to OPNA variants really have an internal mono speaker,
+	ADDRESS_MAP_BANK(config, m_gvram_bank).set_map(&pc8801_state::gvram_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x4000);
+
+	PC8801_KBD(config, "kbd");
+
+	// NOTE: original models up to OPNA variants really have an internal mono speaker,
 	// but user eventually can have a stereo mixing audio card mounted so for simplicity we MCM here.
 	SPEAKER(config, m_speaker, 2).front();
 
@@ -1736,6 +1683,7 @@ void pc8801_state::pc8801(machine_config &config)
 
 	SOFTWARE_LIST(config, "tape_list").set_original("pc8801_cass");
 	SOFTWARE_LIST(config, "disk_n88_list").set_original("pc8801_flop");
+	SOFTWARE_LIST(config, "disk_n88_orig_list").set_original("pc8801_flop_orig");
 	SOFTWARE_LIST(config, "disk_n_list").set_compatible("pc8001_flop");
 	SOFTWARE_LIST(config, "flop_generic_list").set_compatible("generic_flop_525").set_filter("pc8801");
 }
@@ -1771,6 +1719,10 @@ void pc8801fh_state::pc8801fh(machine_config &config)
 {
 	pc8801mk2mr(config);
 
+	PC88_SDIP(config, m_eeprom); // NMC9306N
+
+	PC8801FH_KBD(config.replace(), "kbd");
+
 	config.device_remove("opn");
 
 	YM2608(config, m_opna, MASTER_CLOCK*2);
@@ -1801,7 +1753,7 @@ void pc8801mc_state::pc8801mc(machine_config &config)
 {
 	pc8801ma(config);
 
-	PC8801_31(config, m_cdrom_if, 0);
+	PC8801_31(config, m_cdrom_if);
 	m_cdrom_if->rom_bank_cb().set([this](bool state) { m_cdrom_bank = state; });
 	m_cdrom_if->drq_cb().set(m_dma, FUNC(i8257_device::dreq1_w));
 	m_dma->in_ior_cb<1>().set(m_cdrom_if, FUNC(pc8801_31_device::dma_r));
@@ -1828,7 +1780,7 @@ ROM_END
 
 /*
  * The dump only included "maincpu".
- * Other roms arbitrariely taken from PC-8801 & PC-8801 MkIISR
+ * Other roms arbitrarily taken from PC-8801 & PC-8801 MkIISR
  * (there should be at least 1 Kanji ROM).
  */
 ROM_START( pc8801mk2 )
@@ -1913,6 +1865,9 @@ ROM_START( pc8801mk2mr )
 ROM_END
 
 ROM_START( pc8801mh )
+	ROM_REGION( 0x8000,  "setup", ROMREGION_ERASEFF )
+	ROM_LOAD( "setup.bin", 0x00000, 0x8000, NO_DUMP )
+
 	ROM_REGION( 0x8000,  "n80rom", ROMREGION_ERASEFF ) // 1.8, but different BIOS code?
 	ROM_LOAD( "mh_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
 
@@ -1934,6 +1889,9 @@ ROM_START( pc8801mh )
 ROM_END
 
 ROM_START( pc8801fa )
+	ROM_REGION( 0x8000,  "setup", ROMREGION_ERASEFF )
+	ROM_LOAD( "setup.bin", 0x00000, 0x8000, NO_DUMP )
+
 	ROM_REGION( 0x8000,  "n80rom", ROMREGION_ERASEFF ) // 1.8
 	ROM_LOAD( "fa_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
 
@@ -1956,6 +1914,11 @@ ROM_END
 
 // newer floppy BIOS and Jisyo (dictionary) ROM, otherwise same as FA
 ROM_START( pc8801ma )
+	ROM_REGION( 0x80000, "raw_bios", ROMREGION_ERASEFF )
+	ROM_LOAD( "hn62404p.ic52", 0x00000, 0x80000, CRC(f6d9ec78) SHA1(893e2a19fbe6cd72a80639ac698f8fce28655c18) )
+
+	ROM_REGION( 0x8000,  "setup", ROMREGION_ERASEFF )
+
 	ROM_REGION( 0x8000,  "n80rom", ROMREGION_ERASEFF ) // 1.8
 	ROM_LOAD( "ma_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
 
@@ -1976,10 +1939,14 @@ ROM_START( pc8801ma )
 	ROM_COPY( "kanji", 0x1000, 0x0000, 0x0800 )
 
 	ROM_REGION( 0x80000, "dictionary", 0 )
+	// d23c4000c.ic49
 	ROM_LOAD( "ma_jisyo.rom", 0x00000, 0x80000, CRC(a6108f4d) SHA1(3665db538598abb45d9dfe636423e6728a812b12) )
 ROM_END
 
 ROM_START( pc8801ma2 )
+	ROM_REGION( 0x8000,  "setup", ROMREGION_ERASEFF )
+	ROM_LOAD( "setup.bin", 0x00000, 0x8000, NO_DUMP )
+
 	ROM_REGION( 0x8000,  "n80rom", ROMREGION_ERASEFF ) // 1.8
 	ROM_LOAD( "ma2_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
 
@@ -2004,6 +1971,9 @@ ROM_START( pc8801ma2 )
 ROM_END
 
 ROM_START( pc8801mc )
+	ROM_REGION( 0x8000,  "setup", ROMREGION_ERASEFF )
+	ROM_LOAD( "setup.bin", 0x00000, 0x8000, NO_DUMP )
+
 	ROM_REGION( 0x08000, "n80rom", ROMREGION_ERASEFF ) // 1.8
 	ROM_LOAD( "mc_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
 
@@ -2030,26 +2000,49 @@ ROM_START( pc8801mc )
 	ROM_LOAD( "mc_jisyo.rom", 0x00000, 0x80000, CRC(bd6eb062) SHA1(deef0cc2a9734ba891a6d6c022aa70ffc66f783e) )
 ROM_END
 
+// need to handle this in driver_init, the first half is interleaved with odd bytes being 0xff
+// the resulting mapping is:
+// 0x00000 - 0x07fff n88rom @ 0x0000
+// 0x08000 - 0x0ffff n80rom
+// 0x10000 - 0x17fff n88rom @ 0x8000
+// 0x18000 - 0x1ffff setup
+// Second half contains kanji ROM levels, in linear form.
+template <bool IS_DUMPED> void pc8801fh_state::init_setup_mode()
+{
+	m_has_setup_mode = IS_DUMPED;
 
-COMP( 1981, pc8801,      0,      0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+	if (m_has_setup_mode)
+	{
+		uint8_t *BIOS = memregion("raw_bios")->base();
+		uint8_t *SETUP = memregion("setup")->base();
+
+		int j = 0;
+		for (int i = 0x30000; i < 0x40000; i += 2)
+		{
+			SETUP[j++] = BIOS[i];
+		}
+	}
+}
+
+COMP( 1981, pc8801,      0,      0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS ) // MIG for border, heavy V1 timing issues, has no floppy drive by default
 // PC-8801A (120V, USA & Canada) / PC-8801B (240V, Export?) for Western markets according to a NEC brochure
-COMP( 1983, pc8801mk2,   pc8801, 0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801mkII",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, pc8801mk2,   pc8801, 0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801mkII",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING ) // as above but no border and with built-in floppy (mostly)
 
 // internal OPN
-COMP( 1985, pc8801mk2sr, 0,           0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIISR", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
-//COMP( 1985, pc8801mk2tr, pc8801mk2sr, 0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIITR", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1985, pc8801mk2fr, pc8801mk2sr, 0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIFR", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1985, pc8801mk2mr, pc8801mk2sr, 0,      pc8801mk2mr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIMR", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1985, pc8801mk2sr, 0,           0,      pc8801mk2sr, pc8801mk2sr, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIISR", MACHINE_IMPERFECT_TIMING )
+//COMP( 1985, pc8801mk2tr, pc8801mk2sr, 0,      pc8801mk2sr, pc8801mk2sr, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIITR", MACHINE_IMPERFECT_TIMING )
+COMP( 1985, pc8801mk2fr, pc8801mk2sr, 0,      pc8801mk2sr, pc8801mk2sr, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIFR", MACHINE_IMPERFECT_TIMING )
+COMP( 1985, pc8801mk2mr, pc8801mk2sr, 0,      pc8801mk2mr, pc8801mk2sr, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIMR", MACHINE_IMPERFECT_TIMING )
 
-// internal OPNA
-//COMP( 1986, pc8801fh,    pc8801mh, 0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801FH",     MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1986, pc8801mh,    0,        0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801MH",     MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1987, pc8801fa,    pc8801mh, 0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801FA",     MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1987, pc8801ma,    0,        0,      pc8801ma,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801MA",     MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
-//COMP( 1988, pc8801fe,    pc8801ma, 0,      pc8801fa,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801FE",     MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1988, pc8801ma2,   pc8801ma, 0,      pc8801ma,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801MA2",    MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
-//COMP( 1989, pc8801fe2,   pc8801ma, 0,      pc8801fa,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801FE2",    MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1989, pc8801mc,    pc8801ma, 0,      pc8801mc,    pc8801fh, pc8801mc_state, empty_init, "NEC",   "PC-8801MC",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+// internal OPNA + newer keyboard model.
+//COMP( 1986, pc8801fh,    pc8801mh, 0,      pc8801fh,    pc8801fh, pc8801fh_state, init_setup_mode<false>, "NEC",   "PC-8801FH",     MACHINE_IMPERFECT_TIMING )
+COMP( 1986, pc8801mh,    0,        0,      pc8801fh,    pc8801fh, pc8801fh_state, init_setup_mode<false>, "NEC",   "PC-8801MH",     MACHINE_IMPERFECT_TIMING )
+COMP( 1987, pc8801fa,    pc8801mh, 0,      pc8801fh,    pc8801fh, pc8801fh_state, init_setup_mode<false>, "NEC",   "PC-8801FA",     MACHINE_IMPERFECT_TIMING )
+COMP( 1987, pc8801ma,    0,        0,      pc8801ma,    pc8801ma, pc8801ma_state, init_setup_mode<true>,  "NEC",   "PC-8801MA",     MACHINE_IMPERFECT_TIMING )
+//COMP( 1988, pc8801fe,    pc8801ma, 0,      pc8801fa,    pc8801fh, pc8801ma_state, init_setup_mode<false>, "NEC",   "PC-8801FE",     MACHINE_IMPERFECT_TIMING )
+COMP( 1988, pc8801ma2,   pc8801ma, 0,      pc8801ma,    pc8801fh, pc8801ma_state, init_setup_mode<false>, "NEC",   "PC-8801MA2",    MACHINE_IMPERFECT_TIMING ) // missing SDIP-style BIOS bank?
+//COMP( 1989, pc8801fe2,   pc8801ma, 0,      pc8801fa,    pc8801fh, pc8801ma_state, init_setup_mode<false>, "NEC",   "PC-8801FE2",    MACHINE_IMPERFECT_TIMING )
+COMP( 1989, pc8801mc,    pc8801ma, 0,      pc8801mc,    pc8801fh, pc8801mc_state, init_setup_mode<false>, "NEC",   "PC-8801MC",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING ) // missing SDIP-style BIOS bank, extra CD issues (dioscd essentially), otherwise same as MA
 
 // PC98DO (PC88+PC98, V33 + μPD70008AC)
 // belongs to own driver

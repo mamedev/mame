@@ -362,9 +362,9 @@ void tomcat_state::tomcat(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	M48T02(config, "m48t02", 0);
+	M48T02(config, "m48t02");
 
-	VECTOR(config, "vector", 0);
+	VECTOR(config, "vector");
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
 	screen.set_refresh_hz(40);
 	//screen.set_refresh_hz((double)XTAL(12'000'000) / 16 / 16 / 16 / 12  / 5 );
@@ -372,7 +372,7 @@ void tomcat_state::tomcat(machine_config &config)
 	screen.set_visarea(0, 280, 0, 250);
 	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
-	avg_device &avg(AVG_STARWARS(config, "avg", 0));
+	avg_device &avg(AVG_STARWARS(config, "avg"));
 	avg.set_vector("vector");
 	avg.set_memory(m_maincpu, AS_PROGRAM, 0x800000);
 

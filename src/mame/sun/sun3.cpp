@@ -199,6 +199,8 @@ fefc34a - start of mem_size, which queries ECC registers for each memory board
 
 #include "screen.h"
 
+#include "endianness.h"
+
 //#define VERBOSE 1
 #include "logmacro.h"
 

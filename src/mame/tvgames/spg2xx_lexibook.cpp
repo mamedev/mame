@@ -332,7 +332,7 @@ void spg2xx_cybrtvbb_game_state::cybrtvbb(machine_config &config)
 	m_maincpu->portc_out().set(FUNC(spg2xx_cybrtvbb_game_state::portc_w));
 
 	// cybrtvfe has a position for this too, but it's unpopulated
-	I2C_24C02(config, "i2cmem", 0);
+	I2C_24C02(config, "i2cmem");
 }
 
 void spg2xx_lexizeus_game_state::lexizeus(machine_config &config)

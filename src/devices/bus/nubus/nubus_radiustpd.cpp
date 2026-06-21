@@ -14,6 +14,8 @@
 #include "nubus_radiustpd.h"
 #include "screen.h"
 
+#include "endianness.h"
+
 #include <algorithm>
 
 namespace {

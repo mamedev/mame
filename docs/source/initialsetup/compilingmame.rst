@@ -83,6 +83,11 @@ sources in parallel::
 Microsoft Windows
 -----------------
 
+The information here is very detailed, and assumes you’re aware of the options
+available and what they mean.  As an alternative, we also provide `a tutorial
+for compiling MAME on Windows <https://https://www.mamedev.org/tools/>`_ on our
+web site.
+
 MAME for Windows is built using the MSYS2 environment.  You will need a 64-bit
 version of Windows 10 1809 or later and a reasonably up-to-date MSYS2
 installation.  Building for 64-bit ARM (AArch64) requires a 64-bit ARM system
@@ -110,7 +115,6 @@ These instructions assume you have some familiarity with MSYS2 and the
   <https://www.msys2.org/>`_.
 * Install packages necessary to build MAME.  At the very least, you’ll need
   ``bash``, ``git`` and ``make``.
-* For debugging you may want to install ``gdb``.
 * To generate API documentation from source, you’ll need ``doxygen``.
 * If you plan to rebuild bgfx shaders and you want to rebuild the GLSL parser,
   you’ll need ``bison``.
@@ -128,6 +132,7 @@ building for.
   and archiver), you’ll need ``mingw-w64-ucrt-x86_64-lld``,
   ``mingw-w64-ucrt-x86_64-llvm-tools``, ``mingw-w64-ucrt-x86_64-llvm`` and
   ``mingw-w64-ucrt-x86_64-libc++``.
+* For debugging, you may want to install ``mingw-w64-ucrt-x86_64-gdb``.
 * To build against the portable SDL interfaces, you’ll need
   ``mingw-w64-ucrt-x86_64-SDL2`` and ``mingw-w64-ucrt-x86_64-SDL2_ttf``.
 * To build the Qt debugger, you’ll need ``mingw-w64-ucrt-x86_64-qt6-base``.
@@ -150,6 +155,7 @@ building for.
   and archiver), you’ll need ``mingw-w64-clang-x86_64-lld``,
   ``mingw-w64-clang-x86_64-llvm-tools``, ``mingw-w64-clang-x86_64-llvm`` and
   ``mingw-w64-clang-x86_64-libc++``.
+* For debugging, you may want to install ``mingw-w64-clang-x86_64-gdb``.
 * To build against the portable SDL interfaces, you’ll need
   ``mingw-w64-clang-x86_64-SDL2`` and ``mingw-w64-clang-x86_64-SDL2_ttf``.
 * To build the Qt debugger, you’ll need ``mingw-w64-clang-x86_64-qt6-base``.
@@ -172,6 +178,7 @@ building for.
   and archiver), you’ll need ``mingw-w64-clang-aarch64-lld``,
   ``mingw-w64-clang-aarch64-llvm-tools``, ``mingw-w64-clang-aarch64-llvm`` and
   ``mingw-w64-clang-aarch64-libc++``.
+* For debugging, you may want to install ``mingw-w64-clang-aarch64-lldb``.
 * To build against the portable SDL interfaces, you’ll need
   ``mingw-w64-clang-aarch64-SDL2`` and ``mingw-w64-clang-aarch64-SDL2_ttf``.
 * To build the Qt debugger, you’ll need ``mingw-w64-clang-aarch64-qt6-base``.
@@ -233,7 +240,7 @@ directory).  MSYS2 tools work best in an MSYS2 terminal, while MinGW tools work
 best in a Microsoft command prompt.
 
 The most obvious symptom of this is that arrow keys don’t work in interactive
-programs if you run them in the wrong kind of terminal.  If you run MinGW gdb or
+programs if you run them in the wrong kind of terminal.  If you run MinGW GDB or
 python from an MSYS2 terminal window, command history won’t work and it may not
 be possible to interrupt an attached program with gdb.  Similarly it may be very
 difficult to edit using MSYS2 vim in a Microsoft command prompt window.
@@ -243,9 +250,9 @@ earlier in the ``PATH`` environment variable for the build environments.  If you
 want to use an interactive MSYS2 program from an MSYS2 shell, you may need to
 type the absolute path to avoid using the MinGW equivalent instead.
 
-MSYS2 gdb may have issues debugging MinGW programs like MAME.  You may get
-better results by installing the MinGW version of gdb and running it from a
-Microsoft command prompt window to debug MAME.
+MSYS2 GDB has issues debugging MinGW programs like MAME.  You will get better
+results by installing the MinGW version of GDB or LLDB and running it from a
+Windows Command Prompt window to debug MAME.
 
 GNU Make supports both POSIX-style shells (e.g. bash) and the Microsoft cmd.exe
 shell.  When using the cmd.exe shell, the ``copy`` command doesn’t provide a
@@ -322,11 +329,11 @@ Compilation is exactly as described above in All Platforms.
 Apple macOS
 -----------
 
-You’ll need a few prerequisites to get started.  Make sure you’re on macOS 11.0
-Big Sur or later.  You will need SDL 2 version 2.0.14 or later.  You’ll also
-need to install Python 3 – it’s currently included with the Xcode command line
-tools, but you can also install a stand-alone version or get it via the Homebrew
-package manager.
+You’ll need a few prerequisites to get started.  Make sure you’re on macOS 14.5
+“Sonoma” or later and Xcode 16.2 or later.  You will need SDL 2 version 2.0.14
+or later.  You’ll also need to install Python 3 – it’s currently included with
+the Xcode command line tools, but you can also install a stand-alone version or
+get it via the Homebrew package manager.
 
 * Install **Xcode** from the Mac App Store or
   `ADC <https://developer.apple.com/download/more/>`_ (AppleID required).

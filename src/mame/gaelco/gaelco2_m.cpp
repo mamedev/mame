@@ -13,7 +13,8 @@
 #include "gaelco2.h"
 
 #include "machine/eepromser.h"
-#include "chd.h"
+
+#include "endianness.h"
 
 
 /***************************************************************************

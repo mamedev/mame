@@ -223,7 +223,6 @@ TIMER_CALLBACK_MEMBER(videopin_state::interrupt_callback)
 
 void videopin_state::machine_start()
 {
-	m_leds.resolve();
 	m_interrupt_timer = timer_alloc(FUNC(videopin_state::interrupt_callback), this);
 
 	save_item(NAME(m_time_pushed));

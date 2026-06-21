@@ -1831,7 +1831,7 @@ void pc9801vm_state::config_video(machine_config &config)
 
 void pc9801_state::config_keyboard(machine_config &config)
 {
-	I8251(config, m_sio_kbd, 0);
+	I8251(config, m_sio_kbd);
 	m_sio_kbd->txd_handler().set("keyb", FUNC(pc98_kbd_device::input_txd));
 	m_sio_kbd->dtr_handler().set("keyb", FUNC(pc98_kbd_device::input_rty));
 	m_sio_kbd->rts_handler().set("keyb", FUNC(pc98_kbd_device::input_kbde));
@@ -1843,7 +1843,7 @@ void pc9801_state::config_keyboard(machine_config &config)
 	kbd_clock.signal_handler().set(m_sio_kbd, FUNC(i8251_device::write_rxc));
 	kbd_clock.signal_handler().append(m_sio_kbd, FUNC(i8251_device::write_txc));
 
-	PC98_KBD(config, m_keyb, 0);
+	PC98_KBD(config, m_keyb);
 	m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
 }
 
@@ -1874,7 +1874,7 @@ void pc9801_state::pc9801_mouse(machine_config &config)
 
 void pc9801_state::pc9801_cbus(machine_config &config)
 {
-	PC98_CBUS_ROOT(config, m_cbus_root, 0);
+	PC98_CBUS_ROOT(config, m_cbus_root);
 	m_cbus_root->int_cb<0>().set("pic8259_master", FUNC(pic8259_device::ir3_w));
 	m_cbus_root->int_cb<1>().set("pic8259_master", FUNC(pic8259_device::ir5_w));
 	m_cbus_root->int_cb<2>().set("pic8259_master", FUNC(pic8259_device::ir6_w));
@@ -1913,7 +1913,7 @@ void pc9801vm_state::pc9801_ide(machine_config &config)
 void pc98_base_state::pc9801_serial(machine_config &config)
 {
 	// clocked by PIT channel 2
-	I8251(config, m_sio_rs, 0);
+	I8251(config, m_sio_rs);
 	m_sio_rs->txd_handler().set("serial", FUNC(rs232_port_device::write_txd));
 	m_sio_rs->rts_handler().set("serial", FUNC(rs232_port_device::write_rts));
 	m_sio_rs->dtr_handler().set("serial", FUNC(rs232_port_device::write_dtr));
@@ -1929,7 +1929,7 @@ void pc98_base_state::pc9801_serial(machine_config &config)
 
 void pc9801_state::pc9801_common(machine_config &config)
 {
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(MAIN_CLOCK_X1); // heartbeat IRQ
 	m_pit->out_handler<0>().set(m_pic1, FUNC(pic8259_device::ir0_w));
 	m_pit->set_clk<1>(MAIN_CLOCK_X1); // Memory Refresh
@@ -1956,22 +1956,22 @@ void pc9801_state::pc9801_common(machine_config &config)
 	m_dmac->out_dack_callback<2>().set(FUNC(pc9801_state::dack2_w));
 	m_dmac->out_dack_callback<3>().set(FUNC(pc9801_state::dack3_w));
 
-	PIC8259(config, m_pic1, 0);
+	PIC8259(config, m_pic1);
 	m_pic1->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic1->in_sp_callback().set_constant(1);
 	m_pic1->read_slave_ack_callback().set(FUNC(pc9801_state::get_slave_ack));
 
-	PIC8259(config, m_pic2, 0);
+	PIC8259(config, m_pic2);
 	m_pic2->out_int_callback().set(m_pic1, FUNC(pic8259_device::ir7_w)); // TODO: Check ir7_w
 	m_pic2->in_sp_callback().set_constant(0);
 
-	I8255(config, m_ppi_sys, 0);
+	I8255(config, m_ppi_sys);
 	m_ppi_sys->in_pa_callback().set_ioport("DSW2");
 	m_ppi_sys->in_pb_callback().set(FUNC(pc9801_state::ppi_sys_portb_r));
 	m_ppi_sys->in_pc_callback().set_constant(0xa0); // 0x80 cpu triple fault reset flag?
 //  m_ppi_sys->out_pc_callback().set(FUNC(pc9801_state::ppi_sys_portc_w));
 
-	I8255(config, m_ppi_prn, 0);
+	I8255(config, m_ppi_prn);
 	// TODO: other ports
 	m_ppi_prn->in_pb_callback().set(FUNC(pc9801_state::ppi_prn_portb_r));
 
@@ -1980,7 +1980,7 @@ void pc9801_state::pc9801_common(machine_config &config)
 
 	pc9801_serial(config);
 
-	PC98_MEMSW(config, m_memsw, 0);
+	PC98_MEMSW(config, m_memsw);
 
 	UPD765A(config, m_fdc_2hd, 8'000'000, true, true);
 	m_fdc_2hd->intrq_wr_callback().set(m_pic2, FUNC(pic8259_device::ir3_w));
@@ -2234,7 +2234,7 @@ void pc9801us_state::pc9801us(machine_config &config)
 	PC98_119_KBD(config.replace(), m_keyb, 0);
 	m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
 
-	PC98_SDIP(config, "sdip", 0);
+	PC98_SDIP(config, "sdip");
 
 	// RAM 640KB ~ 14.6MB
 	// m_ram->set_default_size("2M");
@@ -2257,10 +2257,10 @@ void pc9801us_state::pc9801fs(machine_config &config)
 
 	pit_clock_config(config, xtal / 4);
 
-//  PC98_119_KBD(config.replace(), m_keyb, 0);
+//  PC98_119_KBD(config.replace(), m_keyb);
 //  m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
 
-	PC98_SDIP(config, "sdip", 0);
+	PC98_SDIP(config, "sdip");
 
 	// RAM 640KB ~ 14.6MB
 	// m_ram->set_default_size("2M");
@@ -2281,7 +2281,7 @@ void pc9801bx_state::pc9801bx2(machine_config &config)
 
 	pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST, /4 ~ /7
 
-	PC98_SDIP(config, "sdip", 0);
+	PC98_SDIP(config, "sdip");
 
 	// RAM 1.8 MB (U2/M2) / 3.6 MB (U7) ~ 19.6 MB (from EMS?)
 	config.device_remove("simm");

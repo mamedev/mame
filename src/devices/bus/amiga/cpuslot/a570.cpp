@@ -112,14 +112,14 @@ void a570_device::device_add_mconfig(machine_config &config)
 	m_dmac->csx0_a4_write_cb().set(m_tpi, FUNC(tpi6525_device::write));
 	m_dmac->xdack_read_cb().set(m_drive, FUNC(cr511b_device::read));
 
-	AT28C16(config, "nvram0", 0);
-	AT28C16(config, "nvram1", 0);
+	AT28C16(config, "nvram0");
+	AT28C16(config, "nvram1");
 
-	TPI6525(config, m_tpi, 0);
+	TPI6525(config, m_tpi);
 	m_tpi->out_irq_cb().set(m_irq, FUNC(input_merger_any_high_device::in_w<1>));
 	m_tpi->out_pb_cb().set(FUNC(a570_device::tpi_portb_w));
 
-	CR511B(config, m_drive, 0);
+	CR511B(config, m_drive);
 	m_drive->add_route(0, "speaker", 1.0, 0);
 	m_drive->add_route(1, "speaker", 1.0, 1);
 	m_drive->scor_cb().set(m_tpi, FUNC(tpi6525_device::i1_w)).invert();

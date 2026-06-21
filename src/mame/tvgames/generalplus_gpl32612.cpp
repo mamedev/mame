@@ -612,7 +612,7 @@ CONS( 2014, bandolap,        0,        0,      gpl32612, gpl32612, generalplus_g
 CONS( 2018, disbestf,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Disney & Disney/Pixar Characters Best Friends PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32630A
-CONS( 2020, anp2020t,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Anpanman Chiiku Paddo (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2020, anp2020t,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Anpanman Chiiku Pad (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32630A has GPspispi header  マーメイドアクアポット
 CONS( 2021, banaquap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Tropical Rouge! PreCure: Mermaid Aqua Pot (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

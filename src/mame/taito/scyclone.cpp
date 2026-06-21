@@ -704,7 +704,7 @@ void scyclone_state::scyclone(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
 
-	HC55516(config, m_cvsd, 0).add_route(ALL_OUTPUTS, "speaker", 0.4);
+	HC55516(config, m_cvsd).add_route(ALL_OUTPUTS, "speaker", 0.4);
 	CLOCK(config, m_cvsd_clock, 14400); // unknown clock source, but this matches PCB recording
 	m_cvsd_clock->signal_handler().set(FUNC(scyclone_state::cvsd_tick));
 	m_cvsd_clock->signal_handler().append(m_cvsd, FUNC(hc55516_device::mclock_w));

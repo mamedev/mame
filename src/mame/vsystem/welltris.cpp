@@ -849,7 +849,7 @@ void welltris_state::welltris(machine_config &config)
 
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
-	VSYSTEM_SPR2(config, m_spr_old, 0, "palette", gfx_welltris_spr);
+	VSYSTEM_SPR2(config, m_spr_old, "palette", gfx_welltris_spr);
 	m_spr_old->set_pritype(-1);
 
 	// sound hardware

@@ -12,6 +12,7 @@
 #include "ui/viewgfx.h"
 
 #include "emupal.h"
+#include "input.h"
 #include "render.h"
 #include "rendfont.h"
 #include "rendutil.h"

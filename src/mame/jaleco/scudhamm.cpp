@@ -271,7 +271,6 @@ u32 scudhamm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 void scudhamm_state::machine_start()
 {
-	m_leds.resolve();
 	m_scudhamm_motor_command = 0;
 
 	save_item(NAME(m_prev));
@@ -523,9 +522,6 @@ void captflag_state::machine_start()
 	m_oki_bank[1]->configure_entries(0, 0x100000 / 0x20000, memregion("oki2")->base(), 0x20000);
 	m_oki_bank[0]->set_entry(1);
 	m_oki_bank[1]->set_entry(1);
-
-	m_motor_left_output.resolve();
-	m_motor_right_output.resolve();
 
 	save_item(NAME(m_captflag_leds));
 	save_item(NAME(m_motor_command));

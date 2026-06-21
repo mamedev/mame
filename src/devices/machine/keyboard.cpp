@@ -11,7 +11,7 @@ Example of usage in a driver.
 
 In the machine config function:
 
-    generic_keyboard_device &kbd(GENERIC_KEYBOARD(config, KEYBOARD_TAG, 0));
+    generic_keyboard_device &kbd(GENERIC_KEYBOARD(config, KEYBOARD_TAG));
     kbd.set_keyboard_callback(FUNC(xxx_state::kbd_put));
 
 In the code:

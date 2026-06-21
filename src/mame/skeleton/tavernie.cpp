@@ -418,7 +418,7 @@ void cpu09_state::cpu09(machine_config &config)
 	m_ptm->o2_callback().set_inputline("maincpu", INPUT_LINE_NMI);
 	m_ptm->irq_callback().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
@@ -450,7 +450,7 @@ void ivg09_state::ivg09(machine_config &config)
 	/* Devices */
 	subdevice<rs232_port_device>("rs232")->set_default_option(nullptr);
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(ivg09_state::kbd_put));
 
 	MC6845(config, m_crtc, 1008000); // unknown clock

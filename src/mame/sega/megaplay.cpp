@@ -36,6 +36,8 @@ this reason.
 #include "cpu/z80/z80.h"
 #include "machine/cxd1095.h"
 
+#include "endianness.h"
+
 
 namespace {
 

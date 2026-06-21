@@ -100,8 +100,8 @@ public:
 		m_segs(*this, "seg%u", 0U)
 	{ }
 
-	void ti74(machine_config &config);
-	void ti95(machine_config &config);
+	void ti74(machine_config &config) ATTR_COLD;
+	void ti95(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(battery_status_changed);
 
@@ -142,8 +142,6 @@ private:
 
 void ti74_state::machine_start()
 {
-	m_segs.resolve();
-
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 

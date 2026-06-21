@@ -1087,6 +1087,10 @@ NETLIST_EXTERNAL(opamp_lib)
 #define MC3340_DIP(name) \
 	NET_REGISTER_DEV(MC3340_DIP, name)
 
+// usage       : MB3730_SIL(name)
+#define MB3730_SIL(name) \
+	NET_REGISTER_DEV(MB3730_SIL, name)
+
 // usage       : TL081_DIP(name)
 #define TL081_DIP(name) \
 	NET_REGISTER_DEV(TL081_DIP, name)

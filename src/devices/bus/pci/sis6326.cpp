@@ -71,7 +71,7 @@ void sis6326_pci_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(sis6326_vga_device::screen_update));
 
-	SIS6326_VGA(config, m_vga, 0);
+	SIS6326_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	// 4MB, max 8MB
 	m_vga->set_vram_size(4*1024*1024);
@@ -378,6 +378,9 @@ uint32_t sis6326_pci_device::GetROP(uint8_t rop, uint32_t src, uint32_t dst, uin
 			break;
 		case 0xa0:  // DPa (win98se help tooltip borders)
 			ret = dst & pat;
+			break;
+		case 0xa5:  // PDxn (moving kana drawing window in jp win98se, keyboard 3rd option)
+			ret = ~(pat ^ dst);
 			break;
 		case 0xaa:  // D
 			ret = dst;

@@ -45,8 +45,7 @@ public:
 	void coco3_mem(address_map &map) ATTR_COLD;
 
 protected:
-	// device-level overrides
-	virtual void device_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 	virtual void update_cart_base(uint8_t *cart_base) override;
 

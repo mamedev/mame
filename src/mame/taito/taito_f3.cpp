@@ -462,7 +462,7 @@ void taito_f3_state::f3(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
 
-	TAITO_EN(config, m_taito_en, 0);
+	TAITO_EN(config, m_taito_en);
 	m_taito_en->add_route(0, "speaker", 1.0, 0);
 	m_taito_en->add_route(1, "speaker", 1.0, 1);
 }

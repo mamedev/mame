@@ -14,7 +14,7 @@ The game has 8 captive balls in 2 banks of 4, and they can be released by hittin
 Status:
 - Skeleton
 
-ToDo:
+TODO:
 - Everything
 - The audio prom is the same one used in Atari System 2, so the sound card should be the
   same.
@@ -42,12 +42,13 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void fourx4(machine_config &config);
+	void fourx4(machine_config &config) ATTR_COLD;
 
 private:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
 	void mem_map(address_map &map) ATTR_COLD;
+
 	required_device<m6502_device> m_maincpu;
 	output_finder<68> m_digits;  // don't know how many
 	output_finder<80> m_io_outputs;   // ?? solenoids + ?? lamps
@@ -69,9 +70,6 @@ INPUT_PORTS_END
 void atari_4x4_state::machine_start()
 {
 	genpin_class::machine_start();
-
-	m_digits.resolve();
-	m_io_outputs.resolve();
 
 	//save_item(NAME(m_segment));
 }

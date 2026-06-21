@@ -20,6 +20,7 @@
 #include "multibyte.h"
 #include "strformat.h"
 
+#include <cstring>
 #include <optional>
 
 

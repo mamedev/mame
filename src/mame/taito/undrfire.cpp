@@ -60,7 +60,7 @@
     enabled - kludge.
 
 
-    Todo
+    TODO
     ----
 
     What does the 0xb00000 area do... alpha blending ??
@@ -203,14 +203,6 @@ Board contains only 29 ROMs and not much else.
 
 #include "cbombers.lh"
 
-
-void undrfire_state::machine_start()
-{
-	m_lamp_start.resolve();
-	m_gun_recoil.resolve();
-	m_lamp.resolve();
-	m_wheel_vibration.resolve();
-}
 
 /**********************************************************
             GAME INPUTS
@@ -517,7 +509,7 @@ void undrfire_state::undrfire(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio"));
 	tc0510nio.read_0_callback().set_ioport("INPUTS0");
 	tc0510nio.read_1_callback().set_ioport("INPUTS1");
 	tc0510nio.read_2_callback().set_ioport("INPUTS2");
@@ -541,11 +533,11 @@ void undrfire_state::undrfire(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_undrfire);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 16384);
 
-	TC0620SCC(config, m_tc0620scc, 0);
+	TC0620SCC(config, m_tc0620scc);
 	m_tc0620scc->set_offsets(50, 8);
 	m_tc0620scc->set_palette(m_palette);
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x24, 0);
 	m_tc0480scp->set_offsets_tx(-1, 0);
@@ -553,7 +545,7 @@ void undrfire_state::undrfire(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
 
-	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
+	taito_en_device &taito_en(TAITO_EN(config, "taito_en"));
 	taito_en.add_route(0, "speaker", 1.0, 0);
 	taito_en.add_route(1, "speaker", 1.0, 1);
 }
@@ -578,7 +570,7 @@ void undrfire_state::cbombers(machine_config &config)
 	adc.eoc_ff_callback().set_inputline("maincpu", 5);
 	adc.in_callback<0>().set_ioport("STEER");
 
-	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio"));
 	tc0510nio.read_0_callback().set_ioport("INPUTS0");
 	tc0510nio.read_1_callback().set_ioport("INPUTS1");
 	tc0510nio.read_2_callback().set_ioport("INPUTS2");
@@ -602,22 +594,22 @@ void undrfire_state::cbombers(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_undrfire);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 16384);
 
-	TC0620SCC(config, m_tc0620scc, 0);
+	TC0620SCC(config, m_tc0620scc);
 	m_tc0620scc->set_offsets(50, 8);
 	m_tc0620scc->set_palette(m_palette);
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x24, 0);
 	m_tc0480scp->set_offsets_tx(-1, 0);
 	m_tc0480scp->set_col_base(4096);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
 
-	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
+	taito_en_device &taito_en(TAITO_EN(config, "taito_en"));
 	taito_en.add_route(0, "speaker", 1.0, 0);
 	taito_en.add_route(1, "speaker", 1.0, 1);
 }

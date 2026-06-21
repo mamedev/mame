@@ -17,8 +17,14 @@ public:
 	{
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}
+	template <typename T>
+	i82371eb_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: i82371eb_ide_device(mconfig, tag, owner)
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+	}
 
-	i82371eb_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i82371eb_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 DECLARE_DEVICE_TYPE(I82371EB_IDE, i82371eb_ide_device)

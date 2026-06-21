@@ -31,7 +31,7 @@ protected:
 class pcd_video_device : public pcdx_video_device
 {
 public:
-	pcd_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pcd_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void map(address_map &map) override ATTR_COLD;
 	void vram_sw_w(uint8_t data);

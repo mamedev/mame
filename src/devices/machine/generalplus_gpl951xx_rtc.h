@@ -12,7 +12,7 @@ class gpl951xx_rtc_device :   public device_t,
 {
 public:
 
-	gpl951xx_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gpl951xx_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void rtc_regs(address_map &map) ATTR_COLD;
 
@@ -64,7 +64,7 @@ private:
 	// these are 48-bit registers
 	u64 m_loadcnt;
 	u64 m_alarmdat;
-	u64 m_timerval; 
+	u64 m_timerval;
 };
 
 DECLARE_DEVICE_TYPE(GPL951XX_RTC, gpl951xx_rtc_device)

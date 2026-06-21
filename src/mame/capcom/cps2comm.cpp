@@ -574,6 +574,11 @@ cps2_comm_device::cps2_comm_device(machine_config const &mconfig, char const *ta
 }
 
 
+cps2_comm_device::~cps2_comm_device()
+{
+}
+
+
 u16 cps2_comm_device::usart_data_r(offs_t offset, u16 mem_mask)
 {
 	if (!BIT(m_usart_status, 1) && m_context && !machine().side_effects_disabled() && m_context->usart_get(m_usart_rx_data))

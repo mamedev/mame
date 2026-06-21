@@ -87,8 +87,8 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(on_button);
 
-	void risc2500(machine_config &config);
-	void montreux(machine_config &config);
+	void risc2500(machine_config &config) ATTR_COLD;
+	void montreux(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -140,11 +140,6 @@ private:
 
 void risc2500_state::machine_start()
 {
-	m_lcd_dmz.resolve();
-	m_lcd_digit.resolve();
-	m_lcd_seg.resolve();
-	m_lcd_sym.resolve();
-
 	m_boot_timer = timer_alloc(FUNC(risc2500_state::disable_bootrom), this);
 	m_boot_view[1].install_ram(0, m_ram->size() - 1, m_ram->pointer());
 	m_nvram->set_base(m_ram->pointer(), m_ram->size());

@@ -491,9 +491,6 @@ void zr107_state::ccu_w(uint32_t data)
 
 void zr107_state::machine_start()
 {
-	m_pcb_digit.resolve();
-	m_wheel_motor.resolve();
-
 	// set conservative DRC options
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
@@ -775,9 +772,9 @@ void zr107_state::zr107(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 4096);
 
-	K001005(config, m_k001005, 0, m_k001006_1);
+	K001005(config, m_k001005, m_k001006_1);
 
-	K001006(config, m_k001006_1, 0);
+	K001006(config, m_k001006_1);
 	m_k001006_1->set_gfx_region("textures");
 
 	K056800(config, m_k056800, XTAL(18'432'000));
@@ -799,7 +796,7 @@ void zr107_state::zr107(machine_config &config)
 	adc0838_device &adc(ADC0838(config, "adc0838"));
 	adc.set_input_callback(FUNC(zr107_state::adc0838_callback));
 
-	KONPPC(config, m_konppc, 0);
+	KONPPC(config, m_konppc);
 	m_konppc->set_dsp_tag(0, m_dsp);
 	m_konppc->set_num_boards(1);
 	m_konppc->set_cgboard_type(konppc_device::CGBOARD_TYPE_ZR107);
@@ -835,12 +832,12 @@ void jetwave_state::jetwave(machine_config &config)
 
 	m_palette->set_format(4, raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>, 16384);
 
-	K001604(config, m_k001604, 0);
+	K001604(config, m_k001604);
 	m_k001604->set_palette(m_palette);
 
 	// The second K001006 chip connects to the second K001005 chip.
 	// Hook this up when the K001005 separation is understood (seems the load balancing is done on hardware).
-	K001006(config, m_k001006_2, 0);
+	K001006(config, m_k001006_2);
 	m_k001006_2->set_gfx_region("textures");
 
 	m_konppc->set_cgboard_type(konppc_device::CGBOARD_TYPE_GTICLUB);
@@ -849,7 +846,7 @@ void jetwave_state::jetwave(machine_config &config)
 /*****************************************************************************/
 
 ROM_START( midnrun )
-	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program ROMs
 	ROM_LOAD32_BYTE( "476ea1a01.20u", 0x000000, 0x80000, CRC(ea70edf2) SHA1(51c882383a150ba118ccd39eb869525fcf5eee3c) ) // Program version EAA, v1.11 (EUR)
 	ROM_LOAD32_BYTE( "476ea1a02.17u", 0x000001, 0x80000, CRC(1462994f) SHA1(c8614c6c416f81737cc77c46eea6d8d440bc8cf3) )
 	ROM_LOAD32_BYTE( "476ea1a03.15u", 0x000002, 0x80000, CRC(b770ae46) SHA1(c61daa8353802957eb1c2e2c6204c3a98569627e) )
@@ -875,7 +872,7 @@ ROM_START( midnrun )
 ROM_END
 
 ROM_START( midnrunj )
-	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program ROMs
 	ROM_LOAD32_BYTE( "476ja1d01.20u", 0x000000, 0x80000, CRC(68d05950) SHA1(d0ff9b9b628563e18a3eaa7b96b7e9e442c001a9) ) // Program version JAD, v1.10 (JPN)
 	ROM_LOAD32_BYTE( "476ja1d02.17u", 0x000001, 0x80000, CRC(b12a14be) SHA1(d65281791874b90351442b94173d96582cfacd10) )
 	ROM_LOAD32_BYTE( "476ja1d03.15u", 0x000002, 0x80000, CRC(f768c8f1) SHA1(b8242995bdb4f9ac078fd59ffc70c31014396c92) )
@@ -901,7 +898,7 @@ ROM_START( midnrunj )
 ROM_END
 
 ROM_START( midnruna )
-	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program ROMs
 	ROM_LOAD32_BYTE( "477aaa01.20u", 0x000000, 0x80000, CRC(3aa31517) SHA1(315d9c3c930493e39bc497ceafa0c4ef6fa64e4d) ) // Program version AAA, v1.10 (ASA)
 	ROM_LOAD32_BYTE( "477aaa02.17u", 0x000001, 0x80000, CRC(c506bd3d) SHA1(d44ed2cb39f0da44f681190132c7603dfca813d9) )
 	ROM_LOAD32_BYTE( "477aaa03.15u", 0x000002, 0x80000, CRC(53f8e898) SHA1(ba83a60a411bb307cb0e424099716ccf888a4f39) )
@@ -927,7 +924,7 @@ ROM_START( midnruna )
 ROM_END
 
 ROM_START( midnruna2 )
-	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program ROMs
 	ROM_LOAD32_BYTE( "477ab1d01.20u", 0x000000, 0x80000, CRC(3aa31517) SHA1(315d9c3c930493e39bc497ceafa0c4ef6fa64e4d) ) // labeled AB1, but still program version AAA, v1.10 (ASA)
 	ROM_LOAD32_BYTE( "477ab1d02.17u", 0x000001, 0x80000, CRC(c506bd3d) SHA1(d44ed2cb39f0da44f681190132c7603dfca813d9) )
 	ROM_LOAD32_BYTE( "477ab1d03.15u", 0x000002, 0x80000, CRC(53f8e898) SHA1(ba83a60a411bb307cb0e424099716ccf888a4f39) )
@@ -953,7 +950,7 @@ ROM_START( midnruna2 )
 ROM_END
 
 ROM_START( windheat )
-	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program ROMs
 	ROM_LOAD32_BYTE( "677eaa01.20u", 0x000000, 0x080000, CRC(500b61f4) SHA1(ec39165412978c0dbd3cbf1f7b6989b5d7ba20a0) ) // Program version EAA, v2.11 (EUR)
 	ROM_LOAD32_BYTE( "677eaa02.17u", 0x000001, 0x080000, CRC(99f9fd3b) SHA1(aaec5d7f4e46648aab3738ab09e46b312caee58f) )
 	ROM_LOAD32_BYTE( "677eaa03.15u", 0x000002, 0x080000, CRC(c46eba6b) SHA1(80fea082d09071875d30a6a838736cf3a3e4501d) )
@@ -979,7 +976,7 @@ ROM_START( windheat )
 ROM_END
 
 ROM_START( windheatu )
-	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program ROMs
 	ROM_LOAD32_BYTE( "677ubc01.20u", 0x000000, 0x080000, CRC(63198721) SHA1(7f34131bf51d573d0c683b28df2567a0b911c98c) ) // Program version UBC, v2.22 (USA)
 	ROM_LOAD32_BYTE( "677ubc02.17u", 0x000001, 0x080000, CRC(bdb00e2d) SHA1(c54b2250047576e12e9936300989e40494b4659d) )
 	ROM_LOAD32_BYTE( "677ubc03.15u", 0x000002, 0x080000, CRC(0f7d8c1f) SHA1(63de03c7be794b6dae8d0af69e894ac573dbbc11) )
@@ -1005,7 +1002,7 @@ ROM_START( windheatu )
 ROM_END
 
 ROM_START( windheatj )
-	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program ROMs
 	ROM_LOAD32_BYTE( "677jaa01.20u", 0x000000, 0x080000, CRC(559b8def) SHA1(6f2e8f29b0d9a950e71015270560813adc20b689) ) // Program version JAA, v2.11 (JPN)
 	ROM_LOAD32_BYTE( "677jaa02.17u", 0x000001, 0x080000, CRC(cc230575) SHA1(be2da67600ab5edad2e8b7711c4cf985befe28bf) )
 	ROM_LOAD32_BYTE( "677jaa03.15u", 0x000002, 0x080000, CRC(20b04701) SHA1(463be36c7f65b4aa3c3f2b1f37d1e6c1f5106cbb) )
@@ -1031,7 +1028,7 @@ ROM_START( windheatj )
 ROM_END
 
 ROM_START( windheata )
-	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program ROMs
 	ROM_LOAD32_BYTE( "677aaa01.20u", 0x000000, 0x080000, CRC(0d88d0e2) SHA1(93da258bfdb2baa1796916ea8350fff521d43373) ) // Program version AAA, 2.11 (ASA)
 	ROM_LOAD32_BYTE( "677aaa02.17u", 0x000001, 0x080000, CRC(f71044a3) SHA1(a88990d4a65b610f695f4a6ff42868d04f6ba1b3) )
 	ROM_LOAD32_BYTE( "677aaa03.15u", 0x000002, 0x080000, CRC(3c897588) SHA1(718b0eb57f23a3117d2ad3c58e53196f72fc61bf) )
@@ -1057,7 +1054,7 @@ ROM_START( windheata )
 ROM_END
 
 ROM_START( jetwave )
-	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program ROMs
 	ROM_LOAD32_BYTE( "678eab01.20u", 0x000000, 0x080000, CRC(bc657198) SHA1(e521bb2c1b1a3ae934c98ce1656d35821fc287c9) ) // Program version EAB, EUR v1.04
 	ROM_LOAD32_BYTE( "678eab02.17u", 0x000001, 0x080000, CRC(a9a57090) SHA1(ae0273b00c64687f8f835aba531580654edd1097) )
 	ROM_LOAD32_BYTE( "678eab03.15u", 0x000002, 0x080000, CRC(483aaff0) SHA1(86e011337532f6ff0174393758784b276143ba10) )
@@ -1066,7 +1063,7 @@ ROM_START( jetwave )
 	ROM_REGION(0x20000, "audiocpu", 0)      // M68K program
 	ROM_LOAD16_WORD_SWAP( "678a07.19l", 0x000000, 0x020000, CRC(bb3f5875) SHA1(97f80d9b55d4177217b7cd1ba14e8ed2d64376bb) )
 
-	ROM_REGION32_BE(0x400000, "datarom", 0)   // data roms
+	ROM_REGION32_BE(0x400000, "datarom", 0)   // data ROMs
 	ROM_LOAD32_WORD_SWAP( "685a05.10u", 0x000000, 0x200000, CRC(00e59741) SHA1(d799910d4e85482b0e92a3cc9043f81d97b2fb02) )
 	ROM_LOAD32_WORD_SWAP( "685a06.8u",  0x000002, 0x200000, CRC(fc98c6a5) SHA1(a84583bb7296fa9e0c284b2ac59e2dc7b2689eee) )
 
@@ -1083,7 +1080,7 @@ ROM_START( jetwave )
 ROM_END
 
 ROM_START( waveshrk )
-	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program ROMs
 	ROM_LOAD32_BYTE( "678uab01.20u", 0x000000, 0x080000, CRC(a9b9ceed) SHA1(36f0d18481d7c3e7358e02473e54bc6b52d5c26b) ) // Program version UAB, USA v1.04
 	ROM_LOAD32_BYTE( "678uab02.17u", 0x000001, 0x080000, CRC(5ed24ac8) SHA1(d659c751558d4f8d89314466a37c04ac2df46879) )
 	ROM_LOAD32_BYTE( "678uab03.15u", 0x000002, 0x080000, CRC(f4a595e7) SHA1(e05e7ea6613ecf70d8470af5fe0c6a7274c6e45b) )
@@ -1092,7 +1089,7 @@ ROM_START( waveshrk )
 	ROM_REGION(0x20000, "audiocpu", 0)      // M68K program
 	ROM_LOAD16_WORD_SWAP( "678a07.19l", 0x000000, 0x020000, CRC(bb3f5875) SHA1(97f80d9b55d4177217b7cd1ba14e8ed2d64376bb) )
 
-	ROM_REGION32_BE(0x400000, "datarom", 0)   // data roms
+	ROM_REGION32_BE(0x400000, "datarom", 0)   // data ROMs
 	ROM_LOAD32_WORD_SWAP( "685a05.10u", 0x000000, 0x200000, CRC(00e59741) SHA1(d799910d4e85482b0e92a3cc9043f81d97b2fb02) )
 	ROM_LOAD32_WORD_SWAP( "685a06.8u",  0x000002, 0x200000, CRC(fc98c6a5) SHA1(a84583bb7296fa9e0c284b2ac59e2dc7b2689eee) )
 
@@ -1109,7 +1106,7 @@ ROM_START( waveshrk )
 ROM_END
 
 ROM_START( jetwavej )
-	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program ROMs
 	ROM_LOAD32_BYTE( "678jab01.20u", 0x000000, 0x080000, CRC(fa3da5cc) SHA1(33307e701e6eb28d44e0653ac3f1de47fc17779d) ) // Program version JAB, JPN v1.04
 	ROM_LOAD32_BYTE( "678jab02.17u", 0x000001, 0x080000, CRC(01c6713e) SHA1(68e27c018f974e820ba2e99d89a743e53faf1e65) )
 	ROM_LOAD32_BYTE( "678jab03.15u", 0x000002, 0x080000, CRC(21c757cb) SHA1(1de6df8e4c52d40882cbf771ff7215ed7b53f251) )
@@ -1118,7 +1115,7 @@ ROM_START( jetwavej )
 	ROM_REGION(0x20000, "audiocpu", 0)      // M68K program
 	ROM_LOAD16_WORD_SWAP( "678a07.19l", 0x000000, 0x020000, CRC(bb3f5875) SHA1(97f80d9b55d4177217b7cd1ba14e8ed2d64376bb) )
 
-	ROM_REGION32_BE(0x400000, "datarom", 0)   // data roms
+	ROM_REGION32_BE(0x400000, "datarom", 0)   // data ROMs
 	ROM_LOAD32_WORD_SWAP( "685a05.10u", 0x000000, 0x200000, CRC(00e59741) SHA1(d799910d4e85482b0e92a3cc9043f81d97b2fb02) )
 	ROM_LOAD32_WORD_SWAP( "685a06.8u",  0x000002, 0x200000, CRC(fc98c6a5) SHA1(a84583bb7296fa9e0c284b2ac59e2dc7b2689eee) )
 

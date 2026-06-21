@@ -509,7 +509,7 @@ void atm_state::atm(machine_config &config)
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_atm);
 	SPECTRUM_ULA_UNCONTENDED(config.replace(), m_ula);
 
-	BETA_DISK(config, m_beta, 0);
+	BETA_DISK(config, m_beta);
 	ATA_INTERFACE(config, m_ata).options(atm_ata_devices, nullptr, nullptr, false);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "covox");

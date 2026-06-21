@@ -419,8 +419,6 @@ void shtngmst_state::machine_start()
 {
 	system1_state::machine_start();
 
-	m_gun_solenoid.resolve();
-
 	save_item(NAME(m_gun_output));
 	save_item(NAME(m_gun_trigger));
 }
@@ -2207,7 +2205,7 @@ void system1_state::sys1ppi(machine_config &config)
 	Z80(config, m_soundcpu, SOUND_CLOCK/2);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &system1_state::sound_map);
 
-	TIMER(config, "soundirq", 0).configure_scanline(FUNC(system1_state::soundirq_gen), "screen", 32, 64);
+	TIMER(config, "soundirq").configure_scanline(FUNC(system1_state::soundirq_gen), "screen", 32, 64);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 

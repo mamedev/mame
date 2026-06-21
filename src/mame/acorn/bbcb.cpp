@@ -568,7 +568,7 @@ void bbcb_state::bbcb(machine_config &config)
 	m_adlc->out_irq_cb().set(FUNC(bbcb_state::adlc_irq_w));
 	//m_adlc->out_rts_cb().
 
-	econet_device &econet(ECONET(config, "network", 0));
+	econet_device &econet(ECONET(config, "network"));
 	econet.clk_wr_callback().set(m_adlc, FUNC(mc6854_device::txc_w));
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
 	econet.data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));

@@ -41,7 +41,7 @@ void al_magicsound_device::device_add_mconfig(machine_config &config)
 	// According to the schematics, the clock is from the clock pin on the expansion port (4MHz), and
 	// passes through an inverter to each CLK pin on both timers.  This seems to be too fast.
 	// Timer outputs to SAM0/1/2/3 are sample clocks for each sound channel, D/A0 is the low bit of the channel select.
-	PIT8254(config, m_timer1, 0);
+	PIT8254(config, m_timer1);
 	m_timer1->set_clk<0>(4000000);
 	m_timer1->out_handler<0>().set(FUNC(al_magicsound_device::sam0_w));
 	m_timer1->set_clk<1>(4000000);
@@ -49,7 +49,7 @@ void al_magicsound_device::device_add_mconfig(machine_config &config)
 	m_timer1->set_clk<2>(4000000);
 	m_timer1->out_handler<2>().set(FUNC(al_magicsound_device::sam2_w));
 
-	PIT8254(config, m_timer2, 0);
+	PIT8254(config, m_timer2);
 	m_timer2->set_clk<0>(4000000);
 	m_timer2->out_handler<0>().set(FUNC(al_magicsound_device::sam3_w));
 	m_timer2->set_clk<1>(4000000);

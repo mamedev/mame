@@ -488,11 +488,11 @@ void malzak_state::malzak(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_malzak);
 	PALETTE(config, m_palette, FUNC(malzak_state::palette_init), 128);
 
-	S2636(config, m_s2636[0], 0);
+	S2636(config, m_s2636[0]);
 	m_s2636[0]->set_offsets(0, -16);  // -8, -16
 	m_s2636[0]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	S2636(config, m_s2636[1], 0);
+	S2636(config, m_s2636[1]);
 	m_s2636[1]->set_offsets(0, -16);  // -9, -16
 	m_s2636[1]->add_route(ALL_OUTPUTS, "mono", 0.25);
 

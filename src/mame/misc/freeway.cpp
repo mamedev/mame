@@ -39,12 +39,9 @@ public:
 	{
 	}
 
-	void freeway(machine_config &config);
+	void freeway(machine_config &config) ATTR_COLD;
 
 	void nmi_w(int state);
-
-protected:
-	virtual void machine_start() override ATTR_COLD;
 
 private:
 	MC6845_UPDATE_ROW(update_row);
@@ -67,11 +64,6 @@ private:
 
 	void palette_init(palette_device &palette) const;
 };
-
-void freeway_state::machine_start()
-{
-	m_lamps.resolve();
-}
 
 // TODO: just the minimum to show errors on screen
 MC6845_UPDATE_ROW(freeway_state::update_row)

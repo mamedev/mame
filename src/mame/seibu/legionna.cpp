@@ -1189,7 +1189,7 @@ void legionna_state::legionna(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &legionna_state::seibu_sound_map);
 	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	RAIDEN2COP(config, m_raiden2cop, 0);
+	RAIDEN2COP(config, m_raiden2cop);
 	m_raiden2cop->videoramout_cb().set(FUNC(legionna_state::videowrite_cb_w));
 	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
 	m_raiden2cop->set_host_cpu_tag(m_maincpu);
@@ -1203,7 +1203,7 @@ void legionna_state::legionna(machine_config &config)
 	screen.set_screen_update(FUNC(legionna_state::screen_update_legionna));
 	screen.set_palette(m_palette);
 
-	SEIBU_CRTC(config, m_crtc, 0);
+	SEIBU_CRTC(config, m_crtc);
 	m_crtc->layer_en_callback().set(FUNC(legionna_state::tilemap_enable_w));
 	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
 	m_crtc->layer_scroll_callback().set(FUNC(legionna_state::tile_scroll_w));
@@ -1226,7 +1226,7 @@ void legionna_state::legionna(machine_config &config)
 	OKIM6295(config, m_oki, 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	SEIBU_SOUND(config, m_seibu_sound, 0);
+	SEIBU_SOUND(config, m_seibu_sound);
 	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
 	m_seibu_sound->coin_io_callback().set_ioport("COIN");
 	m_seibu_sound->set_rom_tag("audiocpu");
@@ -1246,7 +1246,7 @@ void legionna_state::heatbrl(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &legionna_state::seibu_sound_map);
 	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	RAIDEN2COP(config, m_raiden2cop, 0);
+	RAIDEN2COP(config, m_raiden2cop);
 	m_raiden2cop->videoramout_cb().set(FUNC(legionna_state::videowrite_cb_w));
 	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
 	m_raiden2cop->set_host_cpu_tag(m_maincpu);
@@ -1260,7 +1260,7 @@ void legionna_state::heatbrl(machine_config &config)
 	screen.set_screen_update(FUNC(legionna_state::screen_update_heatbrl));
 	screen.set_palette(m_palette);
 
-	SEIBU_CRTC(config, m_crtc, 0);
+	SEIBU_CRTC(config, m_crtc);
 	m_crtc->layer_en_callback().set(FUNC(legionna_state::tilemap_enable_w));
 	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
 	m_crtc->layer_scroll_callback().set(FUNC(legionna_state::tile_scroll_w));
@@ -1283,7 +1283,7 @@ void legionna_state::heatbrl(machine_config &config)
 	OKIM6295(config, m_oki, 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	SEIBU_SOUND(config, m_seibu_sound, 0);
+	SEIBU_SOUND(config, m_seibu_sound);
 	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
 	m_seibu_sound->coin_io_callback().set_ioport("COIN");
 	m_seibu_sound->set_rom_tag("audiocpu");
@@ -1304,7 +1304,7 @@ void legionna_state::godzilla(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &legionna_state::godzilla_sound_io_map);
 	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	RAIDEN2COP(config, m_raiden2cop, 0);
+	RAIDEN2COP(config, m_raiden2cop);
 	m_raiden2cop->videoramout_cb().set(FUNC(legionna_state::videowrite_cb_w));
 	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
 	m_raiden2cop->set_host_cpu_tag(m_maincpu);
@@ -1319,7 +1319,7 @@ void legionna_state::godzilla(machine_config &config)
 	screen.set_screen_update(FUNC(legionna_state::screen_update_godzilla));
 	screen.set_palette(m_palette);
 
-	SEIBU_CRTC(config, m_crtc, 0);
+	SEIBU_CRTC(config, m_crtc);
 	m_crtc->layer_en_callback().set(FUNC(legionna_state::tilemap_enable_w));
 	m_crtc->layer_scroll_callback().set(FUNC(legionna_state::tile_scroll_w));
 	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
@@ -1345,7 +1345,7 @@ void legionna_state::godzilla(machine_config &config)
 	OKIM6295(config, m_oki, 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	SEIBU_SOUND(config, m_seibu_sound, 0);
+	SEIBU_SOUND(config, m_seibu_sound);
 	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
 	m_seibu_sound->coin_io_callback().set_ioport("COIN");
 	m_seibu_sound->set_rom_tag("audiocpu");
@@ -1365,7 +1365,7 @@ void legionna_state::denjinmk(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &legionna_state::seibu_sound_map);
 	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	RAIDEN2COP(config, m_raiden2cop, 0);
+	RAIDEN2COP(config, m_raiden2cop);
 	m_raiden2cop->videoramout_cb().set(FUNC(legionna_state::videowrite_cb_w));
 	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
 	m_raiden2cop->set_host_cpu_tag(m_maincpu);
@@ -1379,7 +1379,7 @@ void legionna_state::denjinmk(machine_config &config)
 	screen.set_screen_update(FUNC(legionna_state::screen_update_godzilla));
 	screen.set_palette(m_palette);
 
-	SEIBU_CRTC(config, m_crtc, 0);
+	SEIBU_CRTC(config, m_crtc);
 	m_crtc->layer_en_callback().set(FUNC(legionna_state::tilemap_enable_w));
 	m_crtc->layer_scroll_callback().set(FUNC(legionna_state::tile_scroll_w));
 	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
@@ -1404,7 +1404,7 @@ void legionna_state::denjinmk(machine_config &config)
 	OKIM6295(config, m_oki, 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	SEIBU_SOUND(config, m_seibu_sound, 0);
+	SEIBU_SOUND(config, m_seibu_sound);
 	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
 	m_seibu_sound->coin_io_callback().set_ioport("COIN");
 	m_seibu_sound->set_rom_tag("audiocpu");
@@ -1424,7 +1424,7 @@ void legionna_state::grainbow(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &legionna_state::seibu_sound_map);
 	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	RAIDEN2COP(config, m_raiden2cop, 0);
+	RAIDEN2COP(config, m_raiden2cop);
 	m_raiden2cop->videoramout_cb().set(FUNC(legionna_state::videowrite_cb_w));
 	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
 	m_raiden2cop->set_host_cpu_tag(m_maincpu);
@@ -1438,7 +1438,7 @@ void legionna_state::grainbow(machine_config &config)
 	screen.set_screen_update(FUNC(legionna_state::screen_update_grainbow));
 	screen.set_palette(m_palette);
 
-	SEIBU_CRTC(config, m_crtc, 0);
+	SEIBU_CRTC(config, m_crtc);
 	m_crtc->layer_en_callback().set(FUNC(legionna_state::tilemap_enable_w));
 	m_crtc->layer_scroll_callback().set(FUNC(legionna_state::tile_scroll_w));
 	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
@@ -1463,7 +1463,7 @@ void legionna_state::grainbow(machine_config &config)
 	OKIM6295(config, m_oki, 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	SEIBU_SOUND(config, m_seibu_sound, 0);
+	SEIBU_SOUND(config, m_seibu_sound);
 	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
 	m_seibu_sound->coin_io_callback().set_ioport("COIN");
 	m_seibu_sound->set_rom_tag("audiocpu");
@@ -1483,7 +1483,7 @@ void legionna_state::cupsoc(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &legionna_state::seibu_sound_map);
 	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	RAIDEN2COP(config, m_raiden2cop, 0);
+	RAIDEN2COP(config, m_raiden2cop);
 	m_raiden2cop->videoramout_cb().set(FUNC(legionna_state::videowrite_cb_w));
 	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
 	m_raiden2cop->set_host_cpu_tag(m_maincpu);
@@ -1501,7 +1501,7 @@ void legionna_state::cupsoc(machine_config &config)
 	screen.set_screen_update(FUNC(legionna_state::screen_update_grainbow));
 	screen.set_palette(m_palette);
 
-	SEIBU_CRTC(config, m_crtc, 0);
+	SEIBU_CRTC(config, m_crtc);
 	m_crtc->layer_en_callback().set(FUNC(legionna_state::tilemap_enable_w));
 	m_crtc->layer_scroll_callback().set(FUNC(legionna_state::tile_scroll_w));
 	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
@@ -1524,7 +1524,7 @@ void legionna_state::cupsoc(machine_config &config)
 	OKIM6295(config, m_oki, 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	SEIBU_SOUND(config, m_seibu_sound, 0);
+	SEIBU_SOUND(config, m_seibu_sound);
 	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
 	m_seibu_sound->coin_io_callback().set_ioport("COIN");
 	m_seibu_sound->set_rom_tag("audiocpu");

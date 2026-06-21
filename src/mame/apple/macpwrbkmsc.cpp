@@ -847,7 +847,7 @@ void macpbmsc_state::macpd210(machine_config &config)
 
 	DS2401(config, m_battserial, 0); // actually DS2400, but 2400/2401 are compatible
 
-	PWRBKDUO(config, m_dockslot, 0);
+	PWRBKDUO(config, m_dockslot);
 	m_dockslot->set_space(m_maincpu, AS_PROGRAM);
 	m_dockslot->set_maincpu_tag("maincpu");
 	m_dockslot->set_screen_tag(":gsc:screen");

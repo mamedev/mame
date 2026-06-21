@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <climits>
 #include <cmath>
+#include <numbers>
 
 DEFINE_DEVICE_TYPE(UPD933, upd933_device, "upd933", "NEC uPD933")
 
@@ -29,7 +30,7 @@ void upd933_device::device_start()
 	m_irq_timer = timer_alloc(FUNC(upd933_device::timer_tick), this);
 
 	for (int i = 0; i < 0x800; i++)
-		m_cosine[i] = 0xfff * (1 - cos(2.0 * M_PI * i / 0x7ff)) / 2;
+		m_cosine[i] = 0xfff * (1 - cos(2.0 * std::numbers::pi * i / 0x7ff)) / 2;
 
 	for (int i = 0; i < 0x80; i++)
 	{

@@ -493,7 +493,7 @@ void gpworld_state::gpworld(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(gpworld_state::vblank_callback));
 
 
-	PIONEER_LDV1000(config, m_laserdisc, 0);
+	PIONEER_LDV1000(config, m_laserdisc);
 	m_laserdisc->set_overlay(512, 256, FUNC(gpworld_state::screen_update));
 	m_laserdisc->add_route(0, "speaker", 1.0, 0);
 	m_laserdisc->add_route(1, "speaker", 1.0, 1);
