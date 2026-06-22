@@ -300,6 +300,46 @@ void tandy2k_state::fldtc_w(uint8_t data)
 {
 	m_fdc->tc_w(1);
 	m_fdc->tc_w(false);
+
+	// PC-format boot-sector fixup for PC-compatible MS-DOS disks:
+	// The Tandy 2000 BIOS loads boot sectors at linear 0x1B000, but PC-format boot
+	// sectors hardcode references to 0x7C00 (e.g. `MOV DL, [0x7C1E]` reads the BPB
+	// drive number). Reading from 0x07C1E with the boot sector loaded at 0x1B000
+	// yields uninitialized RAM, DL becomes invalid, INT 13h rejects DL>=2, and the
+	// boot sector falls into its panic loop.
+	//
+	// Additionally, the BIOS leaves SS:SP at 0x50:0x100 (stack at 0x500-0x600). PC
+	// boot sectors read the root directory to ES:BX = 0x50:0, which trashes that
+	// stack region; subsequent RETs pop garbage CS:IP.
+	//
+	// After each FDC transfer-complete, detect a "Tandy" OEM boot sector at 0x1B000,
+	// copy the sector to 0x07C00, and overwrite the first 14 bytes at 0x1B000 with
+	// a small setup stub that points SS:SP at 0:0x7C00 and FAR-jumps to 0:0x7C00.
+	// The boot sector then runs in its expected environment.
+	static bool patched = false;
+	if (!patched) {
+		address_space &program = m_maincpu->space(AS_PROGRAM);
+		if (program.read_byte(0x1B000) == 0xEB &&
+		    program.read_byte(0x1B003) == 0x54 &&  // 'T'
+		    program.read_byte(0x1B004) == 0x61 &&  // 'a'
+		    program.read_byte(0x1B005) == 0x6E &&  // 'n'
+		    program.read_byte(0x1B006) == 0x64 &&  // 'd'
+		    program.read_byte(0x1B007) == 0x79) {  // 'y'
+			for (int i = 0; i < 512; i++)
+				program.write_byte(0x07C00 + i, program.read_byte(0x1B000 + i));
+			//   B8 00 00          MOV AX, 0
+			//   8E D0             MOV SS, AX
+			//   BC 00 7C          MOV SP, 0x7C00
+			//   EA 00 7C 00 00    JMP FAR 0:0x7C00
+			uint8_t inject[] = { 0xB8, 0x00, 0x00,
+			                     0x8E, 0xD0,
+			                     0xBC, 0x00, 0x7C,
+			                     0xEA, 0x00, 0x7C, 0x00, 0x00 };
+			for (size_t i = 0; i < sizeof(inject); i++)
+				program.write_byte(0x1B000 + i, inject[i]);
+			patched = true;
+		}
+	}
 }
 
 void tandy2k_state::addr_ctrl_w(uint8_t data)
@@ -518,32 +558,55 @@ uint32_t tandy2k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 		for (int sx = 0; sx < 80; sx++)
 		{
-			if (m_hires_en & 2)
-			{
-				uint8_t a = ((uint8_t *)m_hires_ram.target())[(y * 80) + sx];
-				uint8_t b = ((uint8_t *)m_hires_ram.target())[(y * 80) + sx + 0x8000];
-				uint8_t c = ((uint8_t *)m_hires_ram.target())[(y * 80) + sx + 0x8000 * 2];
-				for (int x = 0; x < 8; x++)
-				{
-					int color = BIT(a, x) | (BIT(b, x) << 1) | (BIT(c, x) << 2);
-					bitmap.pix(y, (sx * 8) + (7 - x)) = cpen[color];
-				}
+			// Text layer — pick screen based on whether DeskMate has reprogrammed
+			// the palette away from the BIOS default. Some applications (DeskMate
+			// in particular) reprogram the CRT9007 to render from offset 0 of the
+			// VRAM bank (0xB8000), while the BIOS POST and MS-DOS use the default
+			// offset (m_ram->size() - 0x1400, i.e. 0xBEC00 with 768K RAM).
+			offs_t cell_off = (((y / 16) * 80) + sx) * 2;
+			offs_t addr_b = m_ram->size() - 0x1400 + cell_off;
+			offs_t addr_a = (m_vram_base << 15) + cell_off;
+			bool deskmate_palette = ((cpen[4] & 0xFFFFFF) != 0);
+			uint16_t word_a = program.read_word(addr_a);
+			uint16_t word_b = program.read_word(addr_b);
+			uint16_t vidla;
+			if (deskmate_palette) {
+				// DeskMate UI lives at 0xB8000; calendar/clock are still written
+				// to the BIOS default offset via INT 10h, so overlay them when
+				// the primary cell is blank.
+				uint8_t ch_a = word_a & 0xff;
+				uint8_t ch_b = word_b & 0xff;
+				bool a_blank = (ch_a == 0x20 || ch_a == 0x00);
+				bool b_has = (ch_b > 0x20 && ch_b < 0x80);
+				vidla = (a_blank && b_has) ? word_b : word_a;
+			} else {
+				vidla = word_b;
 			}
-			else
-			{
-				offs_t addr = m_ram->size() - 0x1400 + (((y / 16) * 80) + sx) * 2;
-				uint16_t vidla = program.read_word(addr);
-				uint8_t attr = vidla >> 8;
-				uint8_t data = m_char_ram[((vidla & 0xff) << 4) | cgra];
-				if(attr & 0x80)
-					data = ~data;
+			uint8_t attr = vidla >> 8;
+			uint8_t data = m_char_ram[((vidla & 0xff) << 4) | cgra];
+			if(attr & 0x80)
+				data = ~data;
 
-				for (int x = 0; x < 8; x++)
-				{
-					int color = 4 | (BIT(attr, 6) << 1) | BIT(data, 7);
-					bitmap.pix(y, (sx * 8) + x) = cpen[color];
-					data <<= 1;
+			// Hi-res layer planes
+			uint8_t a = ((uint8_t *)m_hires_ram.target())[(y * 80) + sx];
+			uint8_t b = ((uint8_t *)m_hires_ram.target())[(y * 80) + sx + 0x8000];
+			uint8_t c = ((uint8_t *)m_hires_ram.target())[(y * 80) + sx + 0x8000 * 2];
+
+			// Composite: text wins for non-background cells; hi-res shows where
+			// text would produce its "plain background" color (color 4 = no
+			// foreground bit, no INT attribute).
+			for (int x = 0; x < 8; x++)
+			{
+				int text_color = 4 | (BIT(attr, 6) << 1) | BIT(data, 7);
+				int final_color;
+				if (text_color != 4) {
+					final_color = text_color;
+				} else {
+					int hcolor = BIT(a, 7-x) | (BIT(b, 7-x) << 1) | (BIT(c, 7-x) << 2);
+					final_color = hcolor ? hcolor : 4;
 				}
+				bitmap.pix(y, (sx * 8) + x) = cpen[final_color];
+				data <<= 1;
 			}
 		}
 	}
@@ -982,8 +1045,27 @@ TIMER_CALLBACK_MEMBER(tandy2k_state::mcu_delay_cb)
 
 rgb_t tandy2k_state::IRGB(uint32_t raw)
 {
-	uint8_t i = (raw >> 3) & 1;
-	return rgb_t(pal2bit(((raw & 4) >> 1) | i), pal2bit((raw & 2) | i), pal2bit(((raw & 1) << 1) | i));
+	// Tandy 2000 custom 16-color palette. Derived from DeskMate's known palette
+	// writes (3→blue, 5→green, 7→green, A→light green) which don't match CGA.
+	static const uint32_t t2k_palette[16] = {
+		0x000000,  // 0: black
+		0x0000AA,  // 1: blue
+		0x00AA00,  // 2: green
+		0x0000AA,  // 3: blue (DeskMate background)
+		0xAA0000,  // 4: red
+		0x00AA00,  // 5: green (DeskMate column-header strips)
+		0xAA5500,  // 6: brown
+		0x00AA00,  // 7: green (DeskMate title-bar / hires plane fill)
+		0x555555,  // 8: dark gray
+		0x5555FF,  // 9: light blue
+		0x55FF55,  // A: light green (DeskMate text foreground)
+		0x55FFFF,  // B: light cyan
+		0xFF5555,  // C: light red
+		0xFF55FF,  // D: light magenta
+		0xFFFF55,  // E: yellow
+		0xFFFFFF,  // F: white
+	};
+	return rgb_t(t2k_palette[raw & 0xF]);
 }
 
 // Machine Driver
