@@ -513,6 +513,17 @@ uint32_t ppc601_device::get_decrementer()
 void ppc601_device::set_decrementer(uint32_t newdec)
 {
 	m_dec_zero_cycles = total_cycles() + (uint64_t)newdec * clock() / 1'000'000'000;
+	m_decrementer_int_timer->adjust(cycles_to_attotime(m_dec_zero_cycles - total_cycles()));
+}
+
+TIMER_CALLBACK_MEMBER(ppc601_device::decrementer_int_callback)
+{
+	// set the decrementer IRQ state
+	m_core->irq_pending |= 0x02;
+
+	// advance by another full tick
+	m_dec_zero_cycles += ((uint64_t)1 << 32) * clock() / 1'000'000'000;
+	m_decrementer_int_timer->adjust(cycles_to_attotime(m_dec_zero_cycles - total_cycles()));
 }
 
 
@@ -728,7 +739,7 @@ void ppc_device::device_start()
 		fatalerror("%s: PPC: serial clock (%d) must not be more than half of the system clock (%d)\n", tag(), m_serial_clock, m_system_clock);
 
 	/* allocate a timer for the compare interrupt */
-	if ((m_cap & PPCCAP_OEA) && (m_tb_divisor))
+	if ((m_cap & PPCCAP_OEA) && (m_tb_divisor || (m_flavor == PPC_MODEL_601)))
 		m_decrementer_int_timer = timer_alloc(FUNC(ppc_device::decrementer_int_callback), this);
 
 	/* and for the 4XX interrupts if needed */
@@ -1197,7 +1208,7 @@ void ppc_device::device_reset()
 
 		/* reset the decrementer */
 		m_dec_zero_cycles = total_cycles();
-		if (m_tb_divisor)
+		if (m_tb_divisor || (m_flavor == PPC_MODEL_601))
 		{
 			decrementer_int_callback(0);
 		}
