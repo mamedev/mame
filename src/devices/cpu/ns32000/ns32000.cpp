@@ -6,7 +6,6 @@
 #include "ns32000.h"
 #include "ns32000d.h"
 #include "debug/debugcpu.h"
-#include "video/dp8510.h"
 
 #define LOG_TRANSLATE (1U << 1)
 //#define VERBOSE (LOG_TRANSLATE)
@@ -140,13 +139,8 @@ ns32016_device::ns32016_device(const machine_config &mconfig, const char *tag, d
 
 ns32cg16_device::ns32cg16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: ns32000_device(mconfig, NS32CG16, tag, owner, clock, true)
-	, m_bpu(*this, finder_base::DUMMY_TAG)
+	, m_out_bpu(*this)
 {
-}
-
-dp8510_device *ns32cg16_device::bpu() const
-{
-	return m_bpu;
 }
 
 ns32032_device::ns32032_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -2411,18 +2405,20 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::execute
 								//   R3 height in lines, R4 horizontal increment in bytes,
 								//   R5 current width (working), R6 source warp, R7 dest warp.
 								// The shift/mask/logic combine is performed by an external
-								// DP8510/DP8511 BITBLT processing unit (BPU): the instruction
-								// reads source and destination words, feeds them to the BPU
-								// and writes the BPU's output back.  A cleared PSR L (from a
-								// preceding CMPQB 1,2) requests preloading, which primes the
-								// BPU pipeline with an extra source word per line.  With no
-								// BPU connected the same bus cycles run as a pseudo-DMA copy
-								// of source to destination.  (On the real part that copy only
-								// latched with more than one wait state - the bus-cycle timing
-								// took priority over the late-arriving data; the supported
-								// >1-wait-state case is modelled here.)
+								// DP8510/DP8511 BITBLT processing unit (BPU).  The instruction
+								// itself only runs the bus cycles - read source, read
+								// destination, write - and asserts out_bpu() for the duration;
+								// a BPU wired up in the driver snoops those cycles via memory
+								// taps, latching the source/destination words and substituting
+								// its processed output on the write.  With no BPU connected the
+								// cycles run as a plain source-to-destination copy.  A cleared
+								// PSR L (from a preceding CMPQB 1,2) requests preloading, which
+								// primes the BPU pipeline with an extra source word per line.
+								// (On the real part that copy only latched with more than one
+								// wait state - the bus-cycle timing took priority over the
+								// late-arriving data; the supported >1-wait-state case is
+								// modelled here.)
 								{
-									dp8510_device *const blt = bpu();
 									bool const preload = !(m_psr & PSR_L);
 									s32 const incr = s32(m_r[4]);
 
@@ -2431,32 +2427,29 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::execute
 									// words = R2 / horizontal increment
 									u32 const ewidth = incr ? u32(s32(m_r[2]) / incr) : 0;
 									tex = 35 + ((preload ? 17 : 11) + 13 * ewidth) * m_r[3];
+
+									bpu_window(true);
 									while (m_r[3])
 									{
 										m_r[5] = m_r[2];
 
-										if (blt && preload)
+										if (preload)
 										{
-											blt->source_w(mem_read<u16>(ns32000::ST_ODT, m_r[0]), false);
+											// preload source word (latched by the BPU tap)
+											mem_read<u16>(ns32000::ST_ODT, m_r[0]);
 											m_r[0] += incr;
 										}
 
 										while (m_r[5])
 										{
 											u16 const src = mem_read<u16>(ns32000::ST_ODT, m_r[0]);
-											u16 const dst = mem_read<u16>(ns32000::ST_ODT, m_r[1]);
+											// destination read - value discarded here, but the
+											// bus cycle is what the BPU's tap latches
+											mem_read<u16>(ns32000::ST_ODT, m_r[1]);
 
-											u16 out;
-											if (blt)
-											{
-												blt->source_w(src, true);
-												blt->destination_w(dst, false);
-												out = blt->output_r();
-											}
-											else
-												out = src; // pseudo-DMA copy
-
-											mem_write<u16>(ns32000::ST_ODT, m_r[1], out);
+											// default behaviour is a plain copy; a BPU tap
+											// replaces the written value with output_r()
+											mem_write<u16>(ns32000::ST_ODT, m_r[1], src);
 
 											m_r[0] += incr;
 											m_r[1] += incr;
@@ -2467,6 +2460,7 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::execute
 										m_r[1] += m_r[7];
 										m_r[3]--;
 									}
+									bpu_window(false);
 								}
 								break;
 							default: // 0xf reserved

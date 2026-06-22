@@ -8,8 +8,6 @@
 
 #include "common.h"
 
-class dp8510_device;
-
 template <int HighBits, int Width>
 class ns32000_device : public cpu_device
 {
@@ -144,10 +142,10 @@ protected:
 	virtual void lpr(unsigned reg, addr_mode const mode, bool user, unsigned &tex);
 	virtual void spr(unsigned reg, addr_mode const mode, bool user, unsigned &tex);
 
-	// the external DP8510/DP8511 BITBLT processing unit driven by EXTBLT,
-	// or nullptr if none is connected (in which case EXTBLT degrades to a
-	// pseudo-DMA source-to-destination copy)
-	virtual dp8510_device *bpu() const { return nullptr; }
+	// EXTBLT (NS32CG16) asserts this around the block transfer so an external
+	// BPU wired up in the driver can snoop the source/destination bus cycles
+	// via memory taps; the base CPU has no BPU and ignores it.
+	virtual void bpu_window(bool active) { }
 
 	// slave protocol helpers
 	virtual u16 slave(u8 opbyte, u16 opword, addr_mode op1, addr_mode op2);
@@ -298,15 +296,16 @@ class ns32cg16_device : public ns32000_device<24, 1>
 public:
 	ns32cg16_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	// connect an external DP8510/DP8511 BITBLT processing unit (the BPU that
-	// EXTBLT drives); without it EXTBLT performs a pseudo-DMA copy
-	template <typename T> void set_bpu(T &&tag) { m_bpu.set_tag(std::forward<T>(tag)); }
+	// EXTBLT asserts this for the duration of the block transfer; a DP8510/
+	// DP8511 BITBLT processing unit attached in the driver uses it to gate the
+	// memory taps that route the source/destination words through the BPU.
+	auto out_bpu() { return m_out_bpu.bind(); }
 
 protected:
-	virtual dp8510_device *bpu() const override;
+	virtual void bpu_window(bool active) override { m_out_bpu(active); }
 
 private:
-	optional_device<dp8510_device> m_bpu;
+	devcb_write_line m_out_bpu;
 };
 
 DECLARE_DEVICE_TYPE(NS32008, ns32008_device)
