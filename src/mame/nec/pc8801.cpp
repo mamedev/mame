@@ -31,7 +31,13 @@ TODO:
 - Pinpoint number of EXPansion slots for each machine (currently hardwired to 1),
   guessing from the back panels seems that each model can install between 1 to 3 cards.
   Also note: most cards aren't bus compatible between each other;
-- FH+: move EEPROM emulation in an SDIP device;
+- pc8801mc: add setup mode support
+  \- uses an incompatible backup method than FH+ (MEMSW at $e000, copied at $9000), prints a lengthy
+     "backup failure" message at cold boots, $f2 bit 0 looks a view overlay;
+  \- writable CPU clock select at $6f (actually clears bit 4 in place of 0);
+  \- cannot bring setup menu (table scan at PC=0x335, result at PC=d0 A=1)
+  \- check for $9014 to be high otherwise refuses to initialize CD system
+     (side effect of default with CD boot disabled in MEMSW);
 
 Notes:
 - Later models have washed out palette with some SWs, with no red component.
@@ -1971,8 +1977,11 @@ ROM_START( pc8801ma2 )
 ROM_END
 
 ROM_START( pc8801mc )
+	ROM_REGION( 0x80000, "raw_bios", ROMREGION_ERASEFF )
+	ROM_LOAD( "hn62324bp.ic21", 0x00000, 0x80000, CRC(49924b82) SHA1(78bdae521d1fec7d459cec0aa4e4656bae836207) )
+
 	ROM_REGION( 0x8000,  "setup", ROMREGION_ERASEFF )
-	ROM_LOAD( "setup.bin", 0x00000, 0x8000, NO_DUMP )
+	ROM_COPY( "raw_bios", 0x18000, 0, 0x8000 )
 
 	ROM_REGION( 0x08000, "n80rom", ROMREGION_ERASEFF ) // 1.8
 	ROM_LOAD( "mc_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
@@ -1997,6 +2006,7 @@ ROM_START( pc8801mc )
 	ROM_COPY( "kanji", 0x1000, 0x0000, 0x0800 )
 
 	ROM_REGION( 0x80000, "dictionary", 0 )
+	// d23c4000.ic23
 	ROM_LOAD( "mc_jisyo.rom", 0x00000, 0x80000, CRC(bd6eb062) SHA1(deef0cc2a9734ba891a6d6c022aa70ffc66f783e) )
 ROM_END
 
@@ -2024,6 +2034,24 @@ template <bool IS_DUMPED> void pc8801fh_state::init_setup_mode()
 	}
 }
 
+// Uses a linear form
+// 0x00000 - 0x07fff n88rom @ 0x0000
+// 0x08000 - 0x0ffff n80rom
+// 0x10000 - 0x17fff n88rom @ 0x8000
+// 0x18000 - 0x1ffff setup
+// 0x20000 - 0x2ffff CD BIOS
+// 0x30000 - 0x3bfff <blank>
+// 0x3c000 - 0x3dfff upper bank for FDC BIOS?
+// 0x3e000 - 0x3ffff FDC BIOS (match ma_disk.rom)
+// 0x40000 - 0x7ffff kanji/CG
+// hn62324bp.ic21 [4/4]      mc_kanji2.rom           IDENTICAL
+// hn62324bp.ic21 [3/4]      kanji1.rom              7.713318% (?)
+void pc8801mc_state::init_pc8801mc()
+{
+	// flip to true for testing setup mode
+	m_has_setup_mode = false;
+}
+
 COMP( 1981, pc8801,      0,      0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS ) // MIG for border, heavy V1 timing issues, has no floppy drive by default
 // PC-8801A (120V, USA & Canada) / PC-8801B (240V, Export?) for Western markets according to a NEC brochure
 COMP( 1983, pc8801mk2,   pc8801, 0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801mkII",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING ) // as above but no border and with built-in floppy (mostly)
@@ -2034,15 +2062,15 @@ COMP( 1985, pc8801mk2sr, 0,           0,      pc8801mk2sr, pc8801mk2sr, pc8801mk
 COMP( 1985, pc8801mk2fr, pc8801mk2sr, 0,      pc8801mk2sr, pc8801mk2sr, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIFR", MACHINE_IMPERFECT_TIMING )
 COMP( 1985, pc8801mk2mr, pc8801mk2sr, 0,      pc8801mk2mr, pc8801mk2sr, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIMR", MACHINE_IMPERFECT_TIMING )
 
-// internal OPNA + newer keyboard model.
+// internal OPNA + newer keyboard model + software dips
 //COMP( 1986, pc8801fh,    pc8801mh, 0,      pc8801fh,    pc8801fh, pc8801fh_state, init_setup_mode<false>, "NEC",   "PC-8801FH",     MACHINE_IMPERFECT_TIMING )
 COMP( 1986, pc8801mh,    0,        0,      pc8801fh,    pc8801fh, pc8801fh_state, init_setup_mode<false>, "NEC",   "PC-8801MH",     MACHINE_IMPERFECT_TIMING )
 COMP( 1987, pc8801fa,    pc8801mh, 0,      pc8801fh,    pc8801fh, pc8801fh_state, init_setup_mode<false>, "NEC",   "PC-8801FA",     MACHINE_IMPERFECT_TIMING )
 COMP( 1987, pc8801ma,    0,        0,      pc8801ma,    pc8801ma, pc8801ma_state, init_setup_mode<true>,  "NEC",   "PC-8801MA",     MACHINE_IMPERFECT_TIMING )
 //COMP( 1988, pc8801fe,    pc8801ma, 0,      pc8801fa,    pc8801fh, pc8801ma_state, init_setup_mode<false>, "NEC",   "PC-8801FE",     MACHINE_IMPERFECT_TIMING )
-COMP( 1988, pc8801ma2,   pc8801ma, 0,      pc8801ma,    pc8801fh, pc8801ma_state, init_setup_mode<false>, "NEC",   "PC-8801MA2",    MACHINE_IMPERFECT_TIMING ) // missing SDIP-style BIOS bank?
+COMP( 1988, pc8801ma2,   pc8801ma, 0,      pc8801ma,    pc8801fh, pc8801ma_state, init_setup_mode<false>, "NEC",   "PC-8801MA2",    MACHINE_IMPERFECT_TIMING )
 //COMP( 1989, pc8801fe2,   pc8801ma, 0,      pc8801fa,    pc8801fh, pc8801ma_state, init_setup_mode<false>, "NEC",   "PC-8801FE2",    MACHINE_IMPERFECT_TIMING )
-COMP( 1989, pc8801mc,    pc8801ma, 0,      pc8801mc,    pc8801fh, pc8801mc_state, init_setup_mode<false>, "NEC",   "PC-8801MC",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING ) // missing SDIP-style BIOS bank, extra CD issues (dioscd essentially), otherwise same as MA
+COMP( 1989, pc8801mc,    pc8801ma, 0,      pc8801mc,    pc8801fh, pc8801mc_state, init_pc8801mc, "NEC",   "PC-8801MC",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING ) // extra CD issues (dioscd essentially), otherwise same as MA
 
 // PC98DO (PC88+PC98, V33 + μPD70008AC)
 // belongs to own driver

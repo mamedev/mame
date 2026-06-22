@@ -277,6 +277,8 @@ protected:
 
 	virtual void main_map(address_map &map) override ATTR_COLD;
 	virtual void main_io(address_map &map) override ATTR_COLD;
+
+	bool m_has_setup_mode;
 private:
 	required_device<pc88_sdip_device> m_eeprom;
 	required_device<ym2608_device> m_opna;
@@ -290,8 +292,6 @@ private:
 
 	uint8_t m_clock_setting = 0;
 	uint8_t m_baudrate_val = 0;
-
-	bool m_has_setup_mode;
 };
 
 // MA has a newer floppy BIOS, an extra dictionary ROM and optional bay for CD-ROM i/f
@@ -333,6 +333,7 @@ public:
 	{ }
 
 	void pc8801mc(machine_config &config);
+	void init_pc8801mc();
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

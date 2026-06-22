@@ -580,7 +580,7 @@ Winning animation is glitchy [OFX/OFY]?, uses [IDP] text transpen with upper bit
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<notes><![CDATA[
 [gfx] needs cliprect and primask pen during intro
-[gfx] title screen should animate with a blue backdrop
+[gfx] title screen should animate with a blue backdrop (fixed)
 Runs at half speed
 [IDP] sprites wraparound on left edge (fixed)
 Omake: if sound irqs don't run then needs to press key 0 pad to move on
