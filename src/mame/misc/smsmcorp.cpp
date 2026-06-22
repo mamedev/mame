@@ -31,7 +31,7 @@ SMS Sure Shot (poker?)
 * 3 chips were removed from the board; two are shown as removed
   in the schematic, one was removed later (an apparently
   unnecessary data buffer on one of the z80 external latches)
-* Does NOT have a daughterboard with additional roms; in fact,
+* Does NOT have a daughterboard with additional ROMs; in fact,
   connector J1 for the ribbon cable to the daughterboard isn't
   populated with pins at all
 * Serial Number A-108 etched in board, on back.
@@ -39,17 +39,17 @@ SMS Sure Shot (poker?)
 
 smsbingo (Lord Nightmare)
 SMS Bingo
-Someone on the MW forums has this iirc, but it isn't dumped yet - LN
+Someone on the MW forums has this IIRC, but it isn't dumped yet - LN
 
 
 
 **** Notes from schematics (applies to all drivers):
-Framebuffer is six tms4416 16384*4 chips; chips are arranged as three
+Framebuffer is six TMS4416 16384*4 chips; chips are arranged as three
 planes of 16384*8 bits per plane, one plane per color channel.
 Screen resolution is probably either 212x256 (two bits per plane, per
-pixel) or 424x256 (one bit per plane per pixel), depending on the pals
+pixel) or 424x256 (one bit per plane per pixel), depending on the PALs
 installed. See schematics on page 6. The counters at U137 and U139
-compare against binary 0b110101 (53) in comparitor at U138, and as soon
+compare against binary 0b110101 (53) in comparator at U138, and as soon
 as it hits that, HDONE is pulled high on the next MCLR clock.
 This means there will be 53 (0-52) counts in the X counter before HDONE;
 as each count refers to one 8 bit address, and the addressed 4416 rams
@@ -64,20 +64,20 @@ resistors or other PWM fun) it should be possible to get:
 
 
 * The socket at U50 and the 3 pin connector J3 is for an
-  undumped intel 8050 MCU used for rs232 serial communication,
+  undumped Intel 8050 MCU used for rs232 serial communication,
   for either linking together machines, or more likely for factory
-  testing. The function of this internal rom is probably simple
+  testing. The function of this internal ROM is probably simple
   enough to HLE or to even rewrite from scratch, but I doubt the code
   on any of the dumped games even touches it, it was probably for use
-  with a specific game or for a set of hardware test roms to report
+  with a specific game or for a set of hardware test ROMs to report
   errors.
   (schematic page 4)
   The pinout of J3 is:
-     pin 1 (toward bottom of pcb): rs232 input to pcb
-     (pre-level shifted to 5v i.e. with a max232 or mc1489)
+     pin 1 (toward bottom of PCB): rs232 input to PCB
+     (pre-level shifted to 5v i.e. with a MAX232 or MC1489)
      pin 2 : ground
-     pin 3 : rs232 output to elsewhere (to be sent to a max232 or
-     mc1488 to shift to rs232 voltage levels)
+     pin 3 : rs232 output to elsewhere (to be sent to a MAX232 or
+     MC1488 to shift to rs232 voltage levels)
 
 * The 8255 PPI at U13 (connected to the 8088) is connected to 75451
   drivers on all pins EXCEPT pins PC3 through PC0.
@@ -139,40 +139,40 @@ resistors or other PWM fun) it should be possible to get:
   PC0 - Coin (input)
 
 
-* The function of the pals is:
+* The function of the PALs is:
 LOCATION    DOTS        TYPE        PURPOSE
 U32         1Green      DMPAL10L8NC Decodes the gated by U33/U34)
    high address lines of the 8088, for mainboard ROM mapping. A
-   different pal is probably used depending on whether the
-   mainboard has 2764 or 27128 roms installed.
+   different PAL is probably used depending on whether the
+   mainboard has 2764 or 27128 ROMs installed.
    SMS Sure Shot: dumped ok as truth table, mainboard has 4 2764s
    SMS Trivia: bad (chip shorted internally), mainboard has 2 27128s
    SMS Bingo: not dumped
    (schematic page 2)
 U38         3Blue           PAL10L8CN   Decodes the (gated by U36)
-   high address lines of the z80 address bus, for mapping of the z80
-   ROM, RAM, Counter control, 4 z80-to-8088 ports (2 one direction,
-   2 the other), the ay-3-8910, and the two 8255 PPIs.
+   high address lines of the Z80 address bus, for mapping of the Z80
+   ROM, RAM, Counter control, 4 Z80-to-8088 ports (2 one direction,
+   2 the other), the AY-3-8910, and the two 8255 PPIs.
    (schematic page 10)
 U39         3Green          PAL10L8CN   Accessory decoder to U38, helps
-   with the 4 z80-to-8088 ports.
+   with the 4 Z80-to-8088 ports.
    (schematic page 10)
 U40         1Red              PAL10L8CN   Connects to the low bits of the
    8088 address bus for decoding writing to/reading from the 8088 side of
-   the 4 z80-to-8088 ports.
+   the 4 Z80-to-8088 ports.
    (schematic page 10, note this chip is mismarked as U9 on the page,
     it is the chip in the lower left)
 U52         1Blue           PAL10L8CN   Decodes the (gated by U33/U34)
-   high address lines of the 8088, for main memory mapping of ram,
-   z80 communication, video, serial I/O (to U50), and the output-only
+   high address lines of the 8088, for main memory mapping of RAM,
+   Z80 communication, video, serial I/O (to U50), and the output-only
    8255 at U13 (which controls button lights and the coin hopper)
    SMS Sure Shot: dumped ok as truth table
    SMS Trivia: checksum 0, probably bad
    SMS Bingo: not dumped
    (schematic page 1)
 U58         3Brown          DMPAL10H8NC Controls BDIR and BC1 on the
-   ay-3-8910 given the low two address bits of the z80 bits, the
-   ay-3-8910 enable line, and the buffered z80 RD and WR lines.
+   AY-3-8910 given the low two address bits of the Z80 bits, the
+   AY-3-8910 enable line, and the buffered Z80 RD and WR lines.
    (schematic page 12)
 U80         2Blue           PAL10H8CN   State machine which controls StartH,
    StartV, and the related functions involving the shifters for framebuffer
@@ -191,20 +191,20 @@ U109        2Brown          PAL14H4CN   Determines next state of the
 U110        2Red            PAL10L8CN   Translates output of U109
    before being sent to counters/color reg latch/etc.
    (schematic page 5)
-U128        Blue-Brown-Blue PAL10H8CN   One of three 'sync' pals which
+U128        Blue-Brown-Blue PAL10H8CN   One of three 'sync' PALs which
    control the memory and other timing subsystem, fed by a 4 bit counter.
    this particular pal has one external feedback bit.
    (schematic page 6)
-U129        Red-Green-Red   DMPAL10H8NC Second of three 'sync' pals
+U129        Red-Green-Red   DMPAL10H8NC Second of three 'sync' PALs
    This one has 2 external feedback bits.
    (schematic page 6)
-U130        3Red            PAL10H8CN   Third of three 'sync' pals'
+U130        3Red            PAL10H8CN   Third of three 'sync' PALs'
    This one has 3 external feedback bits plus three extra inputs from elsewhere
    which are not readable on the schematic. Will trace them later.
    (schematic page 6)
-U140        1Brown          PAL14H4CN   This and the next 5 pals are used
+U140        1Brown          PAL14H4CN   This and the next 5 PALs are used
    to shift the framebuffer data, 4 bits at a time. This is done in parallel
-   (8 bits per channel) for output. all 6 pals are the same.
+   (8 bits per channel) for output. all 6 PALs are the same.
    (schematic page 7)
 U141        1Brown          PAL14H4CN
 U142        1Brown          PAL14H4CN
@@ -215,11 +215,13 @@ U145        1Brown          PAL14H4CN
 
 */
 #include "emu.h"
+
 #include "cpu/i86/i86.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -237,50 +239,74 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void smsjoker(machine_config &config) ATTR_COLD;
 	void sureshot(machine_config &config) ATTR_COLD;
-	void sms(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
+	required_device<cpu_device> m_maincpu;
+
+	void alt_main_map(address_map &map) ATTR_COLD;
+
 private:
-	void bankswitch_w(uint8_t data);
+	required_device<screen_device> m_screen;
+	output_finder<10> m_lamps;
+
+	uint8_t m_communication_port[4] {};
+	uint8_t m_communication_port_status = 0;
+	bitmap_ind16 m_bitmap;
+	uint8_t m_vid_regs[7] {};
+
 	uint8_t link_r(offs_t offset);
 	void link_w(offs_t offset, uint8_t data);
 	uint8_t z80_8088_r();
 	uint8_t p03_r(offs_t offset);
 	void p03_w(offs_t offset, uint8_t data);
-	void video_w(offs_t offset, uint8_t data);
+
 	uint8_t ppi0_c_r();
 	void ppi0_a_w(uint8_t data);
 	void ppi0_b_w(uint8_t data);
-	DECLARE_MACHINE_START(sureshot);
-	uint32_t screen_update_sms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void sms_map(address_map &map) ATTR_COLD;
-	void sub_map(address_map &map) ATTR_COLD;
-	void sureshot_map(address_map &map) ATTR_COLD;
 
-	uint8_t m_communication_port[4]{};
-	uint8_t m_communication_port_status = 0;
-	bitmap_ind16 m_bitmap;
-	uint8_t m_vid_regs[7]{};
-	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
-	output_finder<10> m_lamps;
+	void video_w(offs_t offset, uint8_t data);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 };
 
+class smsmfg_banked_state : public smsmfg_state
+{
+public:
+	smsmfg_banked_state(const machine_config &mconfig, device_type type, const char *tag) :
+		smsmfg_state(mconfig, type, tag),
+		m_rombank(*this, "rombank")
+	{ }
+
+	void sms(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	required_memory_bank m_rombank;
+
+	void bankswitch_w(uint8_t data);
+
+	void main_map(address_map &map) ATTR_COLD;
+};
 
 /*************************************
  *
- *  Bankswitching (for trivia question roms)
+ *  Bankswitching (for trivia question ROMs)
  *
  *************************************/
 
-void smsmfg_state::bankswitch_w(uint8_t data)
+void smsmfg_banked_state::bankswitch_w(uint8_t data)
 {
-	membank("bank1")->set_entry(data);
+	m_rombank->set_entry(data);
 }
 
 /*************************************
@@ -363,27 +389,27 @@ void smsmfg_state::p03_w(offs_t offset, uint8_t data)
 
 static INPUT_PORTS_START(sms)
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Draw")  /* Draw Button */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Deal")  /* Deal Button */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Bet")   /* Bet Button */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 )    /* Lighted Button 5 */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )    /* Lighted Button 4 */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )    /* Lighted Button 3 */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )    /* Lighted Button 2 */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )    /* Lighted Button 1 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Draw")  // Draw Button
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Deal")  // Deal Button
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Bet")   // Bet Button
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 )    // Lighted Button 5
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )    // Lighted Button 4
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )    // Lighted Button 3
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )    // Lighted Button 2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )    // Lighted Button 1
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Coin Error reset */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )    /* Operator Mode */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Remote Knockoff */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Coin Error reset
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )    // Operator Mode
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Remote Knockoff
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Cancel")   /* Cancel Button */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Stand")     /* Stand Button */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Cancel")   // Cancel Button
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Stand")     // Stand Button
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )  PORT_IMPULSE(1) /* Coin */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )  PORT_IMPULSE(1) // Coin
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -405,14 +431,14 @@ uint8_t smsmfg_state::ppi0_c_r()
   PC7 - unused
   PC6 - unused
   PC5 - unused
-  PC4 - Battery Charge control (for 8088 ram backup 3.6v Nicad)
+  PC4 - Battery Charge control (for 8088 RAM backup 3.6v Nicad)
   PC3 - (pulled high externally, input) - unused? possibly for an ABC hopper
   PC2 - (pulled high externally, input) - unused? possibly for an ABC hopper
   PC1 - (pulled high externally, input) - "Hopper Count",
       probably a beam to check the hopper coin out
   PC0 - "Video BZ" (Video Blanking Zone, is an input)
       it's probably vblank or hblank, 0 is always returned, games wait for this bit
-      to become 0 before accesing video
+      to become 0 before accessing video
 */
 	return 0;
 }
@@ -420,20 +446,20 @@ uint8_t smsmfg_state::ppi0_c_r()
 void smsmfg_state::ppi0_a_w(uint8_t data)
 {
 	//popmessage("Lamps: %d %d %d %d %d %d %d", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1) );
-	m_lamps[0] = BIT(~data, 7); /* Display Light 1 */
-	m_lamps[1] = BIT(~data, 6); /* Display Light 2 */
-	m_lamps[2] = BIT(~data, 5); /* Display Light 3 */
-	m_lamps[3] = BIT(~data, 4); /* Display Light 4 */
-	m_lamps[4] = BIT(~data, 3); /* Display Light 5 */
-	m_lamps[5] = BIT(~data, 2); /* Bet Light */
-	m_lamps[6] = BIT(~data, 1); /* Deal Light */
-	m_lamps[7] = BIT(~data, 0); /* Draw Light */
+	m_lamps[0] = BIT(~data, 7); // Display Light 1
+	m_lamps[1] = BIT(~data, 6); // Display Light 2
+	m_lamps[2] = BIT(~data, 5); // Display Light 3
+	m_lamps[3] = BIT(~data, 4); // Display Light 4
+	m_lamps[4] = BIT(~data, 3); // Display Light 5
+	m_lamps[5] = BIT(~data, 2); // Bet Light
+	m_lamps[6] = BIT(~data, 1); // Deal Light
+	m_lamps[7] = BIT(~data, 0); // Draw Light
 }
 
 void smsmfg_state::ppi0_b_w(uint8_t data)
 {
-	m_lamps[8] = BIT(~data, 7); /* Stand Light */
-	m_lamps[9] = BIT(~data, 6); /* Cancel Light */
+	m_lamps[8] = BIT(~data, 7); // Stand Light
+	m_lamps[9] = BIT(~data, 6); // Cancel Light
 
 	machine().bookkeeping().coin_counter_w(0, BIT(data,1));
 	machine().bookkeeping().coin_lockout_w(0, BIT(data,5));
@@ -449,26 +475,26 @@ void smsmfg_state::ppi0_b_w(uint8_t data)
 void smsmfg_state::video_w(offs_t offset, uint8_t data)
 {
 	m_vid_regs[offset] = data;
-	if ( offset == 5 )
+	if (offset == 5)
 	{
-		int xstart = m_vid_regs[0] + m_vid_regs[1]*256;
+		int const xstart = m_vid_regs[0] + m_vid_regs[1] * 256;
 		int width = m_vid_regs[2];
-		int ystart = m_vid_regs[3];
+		int const ystart = m_vid_regs[3];
 		int height = m_vid_regs[4];
-		int color = m_vid_regs[5];
+		int const color = m_vid_regs[5];
 
-		if ( height == 0 )
+		if (height == 0)
 			height = 256;
 
-		if ( width == 0 )
+		if (width == 0)
 			width = 256;
 
-		for ( int y = ystart; y < ystart + height; y++ )
+		for (int y = ystart; y < ystart + height; y++)
 		{
-			for ( int x = xstart; x < xstart + width; x++ )
+			for (int x = xstart; x < xstart + width; x++)
 			{
-				if ( y < 256 )
-				m_bitmap.pix(y, x) = color;
+				if (y < 256)
+					m_bitmap.pix(y, x) = color;
 			}
 		}
 	}
@@ -482,7 +508,7 @@ void smsmfg_state::video_start()
 	save_item(NAME(m_bitmap));
 }
 
-uint32_t smsmfg_state::screen_update_sms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t smsmfg_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
@@ -494,26 +520,32 @@ uint32_t smsmfg_state::screen_update_sms(screen_device &screen, bitmap_ind16 &bi
  *
  *************************************/
 
-void smsmfg_state::sms_map(address_map &map)
-{
-	map(0x00000, 0x007ff).ram().share("nvram");
-	map(0x00800, 0x00803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x01000, 0x01007).w(FUNC(smsmfg_state::video_w));
-	map(0x01800, 0x01803).rw(FUNC(smsmfg_state::link_r), FUNC(smsmfg_state::link_w));
-	map(0x04000, 0x07fff).bankr("bank1");
-	map(0x04000, 0x04000).w(FUNC(smsmfg_state::bankswitch_w));
-	map(0x08000, 0x0ffff).rom();
-	map(0xf8000, 0xfffff).rom(); // mirror for vectors
-}
-
-void smsmfg_state::sureshot_map(address_map &map)
+void smsmfg_state::main_map(address_map &map)
 {
 	map(0x00000, 0x007ff).ram().share("nvram");
 	map(0x02000, 0x02007).w(FUNC(smsmfg_state::video_w));
 	map(0x03000, 0x03003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x03800, 0x03803).rw(FUNC(smsmfg_state::link_r), FUNC(smsmfg_state::link_w));
-	map(0x08000, 0x0ffff).rom();
-	map(0xf8000, 0xfffff).rom(); // mirror for vectors
+	map(0x08000, 0x0ffff).rom().region("maincpu", 0).mirror(0xf0000);
+}
+
+void smsmfg_state::alt_main_map(address_map &map)
+{
+	map(0x00000, 0x007ff).ram().share("nvram");
+	map(0x00800, 0x00803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x01000, 0x01007).w(FUNC(smsmfg_banked_state::video_w));
+	map(0x01800, 0x01803).rw(FUNC(smsmfg_banked_state::link_r), FUNC(smsmfg_banked_state::link_w));
+	map(0x02000, 0x021ff).ram(); // extra RAM?
+	map(0x08000, 0x0ffff).rom().region("maincpu", 0).mirror(0xf0000);
+}
+
+void smsmfg_banked_state::main_map(address_map &map)
+{
+	smsmfg_state::alt_main_map(map);
+
+	map(0x02000, 0x021ff).unmaprw();
+	map(0x04000, 0x07fff).bankr(m_rombank);
+	map(0x04000, 0x04000).w(FUNC(smsmfg_banked_state::bankswitch_w));
 }
 
 void smsmfg_state::sub_map(address_map &map)
@@ -534,16 +566,15 @@ void smsmfg_state::sub_map(address_map &map)
 
 void smsmfg_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 16, memregion("questions")->base(), 0x4000);
-
 	save_item(NAME(m_communication_port_status));
 	save_item(NAME(m_communication_port));
 }
 
-MACHINE_START_MEMBER(smsmfg_state,sureshot)
+void smsmfg_banked_state::machine_start()
 {
-	save_item(NAME(m_communication_port_status));
-	save_item(NAME(m_communication_port));
+	m_rombank->configure_entries(0, 16, memregion("questions")->base(), 0x4000);
+
+	smsmfg_state::machine_start();
 }
 
 void smsmfg_state::machine_reset()
@@ -551,13 +582,13 @@ void smsmfg_state::machine_reset()
 	m_communication_port_status = 0;
 }
 
-void smsmfg_state::sms(machine_config &config)
+void smsmfg_state::sureshot(machine_config &config)
 {
-	I8088(config, m_maincpu, XTAL(24'000'000)/8);
-	m_maincpu->set_addrmap(AS_PROGRAM, &smsmfg_state::sms_map);
+	I8088(config, m_maincpu, 24_MHz_XTAL / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &smsmfg_state::main_map);
 
-	z80_device &soundcpu(Z80(config, "soundcpu", XTAL(16'000'000)/8));
-	soundcpu.set_addrmap(AS_PROGRAM, &smsmfg_state::sub_map);
+	z80_device &audiocpu(Z80(config, "audiocpu", 16_MHz_XTAL / 8));
+	audiocpu.set_addrmap(AS_PROGRAM, &smsmfg_state::sub_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
@@ -573,30 +604,35 @@ void smsmfg_state::sms(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(0x1b0, 0x100);
 	m_screen->set_visarea(0, 0x1af, 0, 0xff);
-	m_screen->set_screen_update(FUNC(smsmfg_state::screen_update_sms));
+	m_screen->set_screen_update(FUNC(smsmfg_state::screen_update));
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::BGR_3BIT);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "aysnd", XTAL(16'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8910(config, "aysnd", 16_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
-void smsmfg_state::sureshot(machine_config &config)
+void smsmfg_state::smsjoker(machine_config &config)
 {
-	sms(config);
+	sureshot(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &smsmfg_state::sureshot_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &smsmfg_state::alt_main_map);
+}
 
-	MCFG_MACHINE_START_OVERRIDE(smsmfg_state,sureshot)
+void smsmfg_banked_state::sms(machine_config &config)
+{
+	sureshot(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &smsmfg_banked_state::main_map);
 }
 
 /*************************************
@@ -693,36 +729,35 @@ ROM text showed...
 */
 
 ROM_START( trvhang )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "sms.17",       0xf8000, 0x04000, CRC(af6ef980) SHA1(f0f98d1f91de718a63b87c5f1c6ee3bd854d1c1b) )
-	ROM_LOAD( "sms.16",       0xfc000, 0x04000, CRC(b827d883) SHA1(68d6c2127ef9e537471c414ca7baa89c63997bbb) )
-	ROM_COPY( "maincpu",    0xf8000, 0x08000, 0x8000 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "sms.17", 0x0000, 0x4000, CRC(af6ef980) SHA1(f0f98d1f91de718a63b87c5f1c6ee3bd854d1c1b) )
+	ROM_LOAD( "sms.16", 0x4000, 0x4000, CRC(b827d883) SHA1(68d6c2127ef9e537471c414ca7baa89c63997bbb) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "sms.26",       0x0000, 0x1000, CRC(e04bb922) SHA1(1df90720f11a5b736273f43272d7727b3020f848) )
-	ROM_RELOAD(               0x1000, 0x1000 )
+	ROM_REGION( 0x2000, "audiocpu", 0 )
+	ROM_LOAD( "sms.26", 0x0000, 0x1000, CRC(e04bb922) SHA1(1df90720f11a5b736273f43272d7727b3020f848) )
+	ROM_RELOAD(         0x1000, 0x1000 )
 
 	ROM_REGION( 0x40000, "questions", 0 )
 	// anything
-	ROM_LOAD( "0anything1.d8", 0x00000, 0x4000, CRC(80096807) SHA1(a38b1b13365577c0c588b8e196ee1a6c774ce3a3) )
-	ROM_LOAD( "1anything2.d7", 0x04000, 0x4000, CRC(d09946b6) SHA1(b5827945ce380f09ee758c4296f06f00ef3cbd0a) )
-	ROM_LOAD( "2anything3.d6", 0x08000, 0x4000, CRC(5b12fd09) SHA1(15804480e65bfb3207d24a1679bb78d1ad491d70) )
-	ROM_LOAD( "3anything4.d5", 0x0c000, 0x4000, CRC(f1a37ed7) SHA1(687a610319b21091cbc53232b47eb99dabe12f02) )
+	ROM_LOAD( "0_anything.1_042485.d8", 0x00000, 0x4000, CRC(80096807) SHA1(a38b1b13365577c0c588b8e196ee1a6c774ce3a3) )
+	ROM_LOAD( "1_anything.2_042485.d7", 0x04000, 0x4000, CRC(d09946b6) SHA1(b5827945ce380f09ee758c4296f06f00ef3cbd0a) )
+	ROM_LOAD( "2_anything.3_042485.d6", 0x08000, 0x4000, CRC(5b12fd09) SHA1(15804480e65bfb3207d24a1679bb78d1ad491d70) )
+	ROM_LOAD( "3_anything.4_042485.d5", 0x0c000, 0x4000, CRC(f1a37ed7) SHA1(687a610319b21091cbc53232b47eb99dabe12f02) )
 	// movies
-	ROM_LOAD( "4movies1.d4",   0x10000, 0x4000, CRC(76993bd1) SHA1(b9a97ab7c6d35f5fdda04342e0b3773618deedef) )
-	ROM_LOAD( "5movies1.d3",   0x14000, 0x4000, CRC(8c5f62ef) SHA1(34ac235358a71620a6619dbb16255c363f34df53) )
-	ROM_LOAD( "6movies1.d2",   0x18000, 0x4000, CRC(13c9fe08) SHA1(6b7d055621ce578446d320f98f7a4cd095e756b0) )
-	ROM_LOAD( "7movies1.d1",   0x1c000, 0x4000, CRC(04f627c0) SHA1(c656b66c60059a1b068c4a7262f07f4c136c34c1) )
+	ROM_LOAD( "4_movies.1_042485.d4",   0x10000, 0x4000, CRC(76993bd1) SHA1(b9a97ab7c6d35f5fdda04342e0b3773618deedef) )
+	ROM_LOAD( "5_movies.2_042485.d3",   0x14000, 0x4000, CRC(8c5f62ef) SHA1(34ac235358a71620a6619dbb16255c363f34df53) )
+	ROM_LOAD( "6_movies.3_042485.d2",   0x18000, 0x4000, CRC(13c9fe08) SHA1(6b7d055621ce578446d320f98f7a4cd095e756b0) )
+	ROM_LOAD( "7_movies.4_042485.d1",   0x1c000, 0x4000, CRC(04f627c0) SHA1(c656b66c60059a1b068c4a7262f07f4c136c34c1) )
 	// sports
-	ROM_LOAD( "8sports1.d16",  0x20000, 0x4000, CRC(b700e7e6) SHA1(42b2c12c6af5f15d909e15ee3e7ca2e13e0142c2) )
-	ROM_LOAD( "9sports2.d15",  0x24000, 0x4000, CRC(bec225fe) SHA1(13252894eca30e06354885a21ecad43965cfd3ef) )
-	ROM_LOAD( "10sports3.d14", 0x28000, 0x4000, CRC(3bfe9b52) SHA1(0cdd9ec6ed784fab9272d50821994be5b0fd0532) )
-	ROM_LOAD( "11sports4.d13", 0x2c000, 0x4000, CRC(9bb8dbad) SHA1(0dd9ed23e6794a86a12906b326e984a2d58cc4c6) )
+	ROM_LOAD( "8_sports.1_042485.d16",  0x20000, 0x4000, CRC(b700e7e6) SHA1(42b2c12c6af5f15d909e15ee3e7ca2e13e0142c2) )
+	ROM_LOAD( "9_sports.2_042485.d15",  0x24000, 0x4000, CRC(bec225fe) SHA1(13252894eca30e06354885a21ecad43965cfd3ef) )
+	ROM_LOAD( "10_sports.3_042485.d14", 0x28000, 0x4000, CRC(3bfe9b52) SHA1(0cdd9ec6ed784fab9272d50821994be5b0fd0532) )
+	ROM_LOAD( "11_sports.4_042485.d13", 0x2c000, 0x4000, CRC(9bb8dbad) SHA1(0dd9ed23e6794a86a12906b326e984a2d58cc4c6) )
 	// music
-	ROM_LOAD( "12music1.d9",   0x30000, 0x4000, CRC(c1691ec9) SHA1(95725fa315944c0786e2a32d483703173eb2e730) )
-	ROM_LOAD( "13music1.d10",  0x34000, 0x4000, CRC(df0da39f) SHA1(29103dca8b0c1967791e8ddd722153874e16bbda) )
-	ROM_LOAD( "14music1.d11",  0x38000, 0x4000, CRC(114b4aa6) SHA1(2621d1042b0774d60be88cc8d62613aa07c12552) )
-	ROM_LOAD( "15music1.d12",  0x3c000, 0x4000, CRC(59a40e4f) SHA1(e726ce624c76ee527edc51c1e5757b7d433dcf8c) )
+	ROM_LOAD( "12_music.1_042485.d9",   0x30000, 0x4000, CRC(c1691ec9) SHA1(95725fa315944c0786e2a32d483703173eb2e730) )
+	ROM_LOAD( "13_music.2_042485.d10",  0x34000, 0x4000, CRC(df0da39f) SHA1(29103dca8b0c1967791e8ddd722153874e16bbda) )
+	ROM_LOAD( "14_music.3_042485.d11",  0x38000, 0x4000, CRC(114b4aa6) SHA1(2621d1042b0774d60be88cc8d62613aa07c12552) )
+	ROM_LOAD( "15_music.4_042485.d12",  0x3c000, 0x4000, CRC(59a40e4f) SHA1(e726ce624c76ee527edc51c1e5757b7d433dcf8c) )
 
 
 	ROM_REGION( 0x1000, "plds", 0 )
@@ -809,39 +844,35 @@ saved in JEDEC format
 */
 
 ROM_START( trvhanga )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "sms2.u17",   0xf8000, 0x04000, CRC(e5c880a1) SHA1(da777c4e126da2f03a663f8c8f565bda8520c883) )
-	ROM_LOAD( "sms2.16",    0xfc000, 0x04000, CRC(85484aee) SHA1(7c282bd208bd644d5d57ac399942c95211e87bf4) )
-	ROM_COPY( "maincpu",    0xf8000, 0x08000, 0x8000 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "sms2.u17", 0x0000, 0x4000, CRC(e5c880a1) SHA1(da777c4e126da2f03a663f8c8f565bda8520c883) )
+	ROM_LOAD( "sms2.16",  0x4000, 0x4000, CRC(85484aee) SHA1(7c282bd208bd644d5d57ac399942c95211e87bf4) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "sms2.26",       0x0000, 0x1000, CRC(e04bb922) SHA1(1df90720f11a5b736273f43272d7727b3020f848) )
-	ROM_RELOAD(               0x1000, 0x1000 )
-
-	ROM_REGION( 0x4000, "user", 0 )
-	ROM_LOAD( "sms2.u19",    0x00000, 0x04000, CRC(5e10059b) SHA1(f0eb490d41009ffe1c80216f699557480110954b) ) // unknown rom (leftover from conversion?)
+	ROM_REGION( 0x2000, "audiocpu", 0 )
+	ROM_LOAD( "sms2.26", 0x0000, 0x1000, CRC(e04bb922) SHA1(1df90720f11a5b736273f43272d7727b3020f848) )
+	ROM_RELOAD(          0x1000, 0x1000 )
 
 	ROM_REGION( 0x40000, "questions", 0 )
 	// sex
-	ROM_LOAD( "0sex1.d8", 0x00000, 0x4000, NO_DUMP )
-	ROM_LOAD( "1sex2.d7", 0x04000, 0x4000, NO_DUMP )
-	ROM_LOAD( "2sex3.d6", 0x08000, 0x4000, NO_DUMP )
-	ROM_LOAD( "3sex4.d5", 0x0c000, 0x4000, NO_DUMP )
+	ROM_LOAD( "0_sex.1_042985.d8",      0x00000, 0x4000, CRC(b2edfc02) SHA1(4223cfe855c48a3421476f87e91ee7f6265ac1bc) )
+	ROM_LOAD( "1_sex.2_042985.d7",      0x04000, 0x4000, CRC(6ff3aded) SHA1(eb2b3c12462f27965dfbaa886048877fa00a1e99) )
+	ROM_LOAD( "2_sex.3_042985.d6",      0x08000, 0x4000, CRC(d2770d6c) SHA1(5a2c517a27e35bee598afde8bee0a0bc41a0461e) )
+	ROM_LOAD( "3_sex.4_042985.d5",      0x0c000, 0x4000, CRC(0de01632) SHA1(4d5b7f9b9378890277d207d6c41c9e8d8ebab566) )
 	// movies
-	ROM_LOAD( "4movies1.d4",   0x10000, 0x4000, NO_DUMP )
-	ROM_LOAD( "5movies1.d3",   0x14000, 0x4000, NO_DUMP )
-	ROM_LOAD( "6movies1.d2",   0x18000, 0x4000, NO_DUMP )
-	ROM_LOAD( "7movies1.d1",   0x1c000, 0x4000, NO_DUMP )
+	ROM_LOAD( "4_movies.1_042485.d4",   0x10000, 0x4000, CRC(76993bd1) SHA1(b9a97ab7c6d35f5fdda04342e0b3773618deedef) )
+	ROM_LOAD( "5_movies.2_042485.d3",   0x14000, 0x4000, CRC(8c5f62ef) SHA1(34ac235358a71620a6619dbb16255c363f34df53) )
+	ROM_LOAD( "6_movies.3_042485.d2",   0x18000, 0x4000, CRC(13c9fe08) SHA1(6b7d055621ce578446d320f98f7a4cd095e756b0) )
+	ROM_LOAD( "7_movies.4_042485.d1",   0x1c000, 0x4000, CRC(04f627c0) SHA1(c656b66c60059a1b068c4a7262f07f4c136c34c1) )
 	// sports
-	ROM_LOAD( "8sports1.d16",  0x20000, 0x4000, NO_DUMP )
-	ROM_LOAD( "9sports2.d15",  0x24000, 0x4000, NO_DUMP )
-	ROM_LOAD( "10sports3.d14", 0x28000, 0x4000, NO_DUMP )
-	ROM_LOAD( "11sports4.d13", 0x2c000, 0x4000, NO_DUMP )
+	ROM_LOAD( "8_sports.1_042485.d16",  0x20000, 0x4000, CRC(b700e7e6) SHA1(42b2c12c6af5f15d909e15ee3e7ca2e13e0142c2) )
+	ROM_LOAD( "9_sports.2_042485.d15",  0x24000, 0x4000, CRC(bec225fe) SHA1(13252894eca30e06354885a21ecad43965cfd3ef) )
+	ROM_LOAD( "10_sports.3_042485.d14", 0x28000, 0x4000, CRC(3bfe9b52) SHA1(0cdd9ec6ed784fab9272d50821994be5b0fd0532) )
+	ROM_LOAD( "11_sports.4_042485.d13", 0x2c000, 0x4000, CRC(9bb8dbad) SHA1(0dd9ed23e6794a86a12906b326e984a2d58cc4c6) )
 	// music
-	ROM_LOAD( "12music1.d9",   0x30000, 0x4000, NO_DUMP )
-	ROM_LOAD( "13music1.d10",  0x34000, 0x4000, NO_DUMP )
-	ROM_LOAD( "14music1.d11",  0x38000, 0x4000, NO_DUMP )
-	ROM_LOAD( "15music1.d12",  0x3c000, 0x4000, NO_DUMP )
+	ROM_LOAD( "12_music.1_042485.d9",   0x30000, 0x4000, CRC(c1691ec9) SHA1(95725fa315944c0786e2a32d483703173eb2e730) )
+	ROM_LOAD( "13_music.2_042485.d10",  0x34000, 0x4000, CRC(df0da39f) SHA1(29103dca8b0c1967791e8ddd722153874e16bbda) )
+	ROM_LOAD( "14_music.3_042485.d11",  0x38000, 0x4000, CRC(114b4aa6) SHA1(2621d1042b0774d60be88cc8d62613aa07c12552) )
+	ROM_LOAD( "15_music.4_042485.d12",  0x3c000, 0x4000, CRC(59a40e4f) SHA1(e726ce624c76ee527edc51c1e5757b7d433dcf8c) ) // this was actually substituted by a program ROM from another game, but the music question set is the same as trvhang
 
 	ROM_REGION( 0x1000, "plds", 0 )
 	ROM_LOAD( "dmpal10l8nc.32.bin",  0x000000, 0x00002c, CRC(558ca47e) SHA1(4612e5dd9832bcbf6d7b3bce803f92ea2ee03b98) )
@@ -867,58 +898,68 @@ ROM_END
 
 
 ROM_START( sms4in1 ) // VERSION SWS1-052587
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "sms_26.19", 0xf8000, 0x02000, CRC(f6da0e37) SHA1(e7c64bb1915955dacb01ab0b19c327066615b5bb) )
-	ROM_LOAD( "sms_26.18", 0xfa000, 0x02000, CRC(6685c236) SHA1(7cc96d4b6253f3a57f5dd1da115997eb89184c0b) )
-	ROM_LOAD( "sms_26.17", 0xfc000, 0x02000, CRC(9972f206) SHA1(afcfbf004ee5457cb576ad421bee61ec42f5c057) )
-	ROM_LOAD( "sms_26.16", 0xfe000, 0x02000, CRC(0290772b) SHA1(7e7b68598473b86fcf770f3472560c828241d966) )
-	ROM_COPY( "maincpu",   0xf8000, 0x08000, 0x8000 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "sms_26.19", 0x0000, 0x02000, CRC(f6da0e37) SHA1(e7c64bb1915955dacb01ab0b19c327066615b5bb) )
+	ROM_LOAD( "sms_26.18", 0x2000, 0x02000, CRC(6685c236) SHA1(7cc96d4b6253f3a57f5dd1da115997eb89184c0b) )
+	ROM_LOAD( "sms_26.17", 0x4000, 0x02000, CRC(9972f206) SHA1(afcfbf004ee5457cb576ad421bee61ec42f5c057) )
+	ROM_LOAD( "sms_26.16", 0x6000, 0x02000, CRC(0290772b) SHA1(7e7b68598473b86fcf770f3472560c828241d966) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "sms_26.26", 0x0000, 0x1000, CRC(e04bb922) SHA1(1df90720f11a5b736273f43272d7727b3020f848) )
 	ROM_RELOAD(            0x1000, 0x1000 )
 ROM_END
 
 
 ROM_START( sms4in1a ) // VERSION SWS1-110984
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "set4_u19_2764.bin", 0xf8000, 0x02000, CRC(6f6116b9) SHA1(f91412ca9b911e2a822dab91c96e5f655e7ebb1b) )
-	ROM_LOAD( "set4_u18_2764.bin", 0xfa000, 0x02000, CRC(cc13a404) SHA1(1c00d173706c5e88cee69f9c52efa64dbdf4c15b) )
-	ROM_LOAD( "set4_u17_2764.bin", 0xfc000, 0x02000, CRC(fee0f422) SHA1(56ffafce78cf96c0b91b44a8408909b06499c960) )
-	ROM_LOAD( "set4_u16_2764.bin", 0xfe000, 0x02000, CRC(87ed2873) SHA1(daa13f20cac4a41335d972be6772dff5d7555c10) )
-	ROM_COPY( "maincpu",  0xf8000, 0x08000, 0x8000 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "set4_u19_2764.bin", 0x0000, 0x2000, CRC(6f6116b9) SHA1(f91412ca9b911e2a822dab91c96e5f655e7ebb1b) )
+	ROM_LOAD( "set4_u18_2764.bin", 0x2000, 0x2000, CRC(cc13a404) SHA1(1c00d173706c5e88cee69f9c52efa64dbdf4c15b) )
+	ROM_LOAD( "set4_u17_2764.bin", 0x4000, 0x2000, CRC(fee0f422) SHA1(56ffafce78cf96c0b91b44a8408909b06499c960) )
+	ROM_LOAD( "set4_u16_2764.bin", 0x6000, 0x2000, CRC(87ed2873) SHA1(daa13f20cac4a41335d972be6772dff5d7555c10) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "set4_u26_73184_2732.bin", 0x0000, 0x1000, CRC(e04bb922) SHA1(1df90720f11a5b736273f43272d7727b3020f848) )
-	ROM_RELOAD(           0x1000, 0x1000 )
+	ROM_RELOAD(                          0x1000, 0x1000 )
 ROM_END
 
 
-ROM_START( smsjoker )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	// U19 was not populated
-	ROM_LOAD( "set3_u18_hl_dlxe_080585.bin", 0xfa000, 0x02000, CRC(70614c00) SHA1(90c53e892ece4ceca0476be3653f160a49fd4bc9) )
-	ROM_LOAD( "set3_u17_hl_dlxe_080585.bin", 0xfc000, 0x02000, CRC(872fb1c4) SHA1(a23d093b26c42aa66279d6dfa6d59789f5862d96) )
-	ROM_LOAD( "set3_u16_hl_dlxe_080585.bin", 0xfe000, 0x02000, CRC(786c0792) SHA1(a7eea01c79b0d8baecdbda06ddbca40b39d8513a) )
-	ROM_COPY( "maincpu",  0xf8000, 0x08000, 0x8000 )
+// this set was found on a Trivia Hangup PCB. u19 was fitted at its place, but clearly didn't belong to that game.
+// u12 was fitted in one of the question's sockets, and clearly didn't belong there, too.
+// assembled together they form a coherent program
+ROM_START( smsjoker ) // VERSION HL-DLX-T-021286
+	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "021686.u19", 0x0000, 0x4000, CRC(5e10059b) SHA1(f0eb490d41009ffe1c80216f699557480110954b) ) // this had a handwritten label "u19 trivia due 021686"
+	ROM_LOAD( "021686.u17", 0x4000, 0x4000, CRC(cab4fa90) SHA1(c39bd62fae95408aa6e6f4b7fb8f53070a5e2588) ) // this has a printed label with hand-overwritten u17 021686 text "MUSIC u17 021686"
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "set3_u26_26_73184_2732.bin", 0x0000, 0x1000, CRC(e04bb922) SHA1(1df90720f11a5b736273f43272d7727b3020f848) )
-	ROM_RELOAD(           0x1000, 0x1000 )
-ROM_END
-
-
-ROM_START( sureshot )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "u-19 hldly s.shot 020687.u19.a12.bin", 0xf8000, 0x02000, CRC(028bdb61) SHA1(e39c27cc6dec12de5a5e60d544f35448e49baee1) )
-	ROM_LOAD( "u-18 hldly s.shot 020687.u18.a11.bin", 0xfa000, 0x02000, CRC(5aa083f1) SHA1(3eed1a7421e7abcc41a1bddf655b1e777d843898) )
-	ROM_LOAD( "u-17 hldly s.shot 020687.u17.a10.bin", 0xfc000, 0x02000, CRC(a37432d6) SHA1(398462642ab0b34efdb6ff4756758057b9833e10) )
-	ROM_LOAD( "u-16 hldly s.shot 020687.u16.a9.bin",  0xfe000, 0x02000, CRC(d7f756d5) SHA1(5c7f62b02b4d4836881c3da0604448c34ede674b) )
-	ROM_COPY( "maincpu",    0xf8000, 0x08000, 0x8000 )
-
-	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "26 404 073184.u26.b5.bin", 0x0000, 0x1000, CRC(e04bb922) SHA1(1df90720f11a5b736273f43272d7727b3020f848) )
-	ROM_RELOAD(               0x1000, 0x1000 )
+	ROM_RELOAD(                           0x1000, 0x1000 )
+ROM_END
+
+
+ROM_START( smsjokera) // VERSION HL-DLX-080585
+	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASE00 )
+	// U19 was not populated
+	ROM_LOAD( "set3_u18_hl_dlxe_080585.bin", 0x2000, 0x2000, CRC(70614c00) SHA1(90c53e892ece4ceca0476be3653f160a49fd4bc9) )
+	ROM_LOAD( "set3_u17_hl_dlxe_080585.bin", 0x4000, 0x2000, CRC(872fb1c4) SHA1(a23d093b26c42aa66279d6dfa6d59789f5862d96) )
+	ROM_LOAD( "set3_u16_hl_dlxe_080585.bin", 0x6000, 0x2000, CRC(786c0792) SHA1(a7eea01c79b0d8baecdbda06ddbca40b39d8513a) )
+
+	ROM_REGION( 0x2000, "audiocpu", 0 )
+	ROM_LOAD( "set3_u26_26_73184_2732.bin", 0x0000, 0x1000, CRC(e04bb922) SHA1(1df90720f11a5b736273f43272d7727b3020f848) )
+	ROM_RELOAD(                             0x1000, 0x1000 )
+ROM_END
+
+
+ROM_START( sureshot ) // VERSION SURESHOT-020687
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "u-19 hldly s.shot 020687.u19.a12.bin", 0x0000, 0x2000, CRC(028bdb61) SHA1(e39c27cc6dec12de5a5e60d544f35448e49baee1) )
+	ROM_LOAD( "u-18 hldly s.shot 020687.u18.a11.bin", 0x2000, 0x2000, CRC(5aa083f1) SHA1(3eed1a7421e7abcc41a1bddf655b1e777d843898) )
+	ROM_LOAD( "u-17 hldly s.shot 020687.u17.a10.bin", 0x4000, 0x2000, CRC(a37432d6) SHA1(398462642ab0b34efdb6ff4756758057b9833e10) )
+	ROM_LOAD( "u-16 hldly s.shot 020687.u16.a9.bin",  0x6000, 0x2000, CRC(d7f756d5) SHA1(5c7f62b02b4d4836881c3da0604448c34ede674b) )
+
+	ROM_REGION( 0x2000, "audiocpu", 0 )
+	ROM_LOAD( "26 404 073184.u26.b5.bin", 0x0000, 0x1000, CRC(e04bb922) SHA1(1df90720f11a5b736273f43272d7727b3020f848) )
+	ROM_RELOAD(                           0x1000, 0x1000 )
 ROM_END
 
 /*
@@ -958,15 +999,14 @@ Silkscreened on top     P/N 1001
 .145    pal14h4     1 brown sticker with 145 written on it
 */
 
-ROM_START( secondch )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "u19.19", 0xf8000, 0x02000, CRC(5ab3d30f) SHA1(16120c6d6a9d494c12f6609e5cb1311a4b40672b) )
-	ROM_LOAD( "u18.18", 0xfa000, 0x02000, CRC(941a1401) SHA1(92934d40bb256e18b996582c1af253d06732462f) )
-	ROM_LOAD( "u17.17", 0xfc000, 0x02000, CRC(88717e9f) SHA1(01b78f3ddd78e74e799d5f8ffe2f3cbcf5e6b7a2) )
-	ROM_LOAD( "u16.16", 0xfe000, 0x02000, CRC(6c9a0224) SHA1(01152024b48461c3b9ac63a9265129dabacd0462) )
-	ROM_COPY( "maincpu",0xf8000, 0x08000, 0x8000 )
+ROM_START( secondch ) // VERSION SECOND-062886
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "u19.19", 0x0000, 0x2000, CRC(5ab3d30f) SHA1(16120c6d6a9d494c12f6609e5cb1311a4b40672b) )
+	ROM_LOAD( "u18.18", 0x2000, 0x2000, CRC(941a1401) SHA1(92934d40bb256e18b996582c1af253d06732462f) )
+	ROM_LOAD( "u17.17", 0x4000, 0x2000, CRC(88717e9f) SHA1(01b78f3ddd78e74e799d5f8ffe2f3cbcf5e6b7a2) )
+	ROM_LOAD( "u16.16", 0x6000, 0x2000, CRC(6c9a0224) SHA1(01152024b48461c3b9ac63a9265129dabacd0462) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "@26.26", 0x0000, 0x1000, CRC(e04bb922) SHA1(1df90720f11a5b736273f43272d7727b3020f848) )
 	ROM_RELOAD(         0x1000, 0x1000 )
 ROM_END
@@ -974,10 +1014,11 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1984, trvhang,  0,       sms,      sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 1)",   MACHINE_SUPPORTS_SAVE ) // Version Trivia-1-050185
-GAME( 1984, trvhanga, 0,       sms,      sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 2)",   MACHINE_NOT_WORKING )   // Version Trivia-2-011586
-GAME( 1984, sms4in1,  0,       sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "4-in-1 (version SWS1-052587)",     MACHINE_SUPPORTS_SAVE ) // still shows 1984 copyright on title screen
-GAME( 1984, sms4in1a, sms4in1, sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "4-in-1 (version SWS1-110984)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1985, smsjoker, 0,       sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Joker Poker With Hi-Lo Double-Up", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sureshot, 0,       sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Sure Shot",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1985, secondch, 0,       sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Second Chance",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1984, trvhang,   0,        sms,      sms, smsmfg_banked_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (version Trivia-1-050185)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1984, trvhanga,  trvhang,  sms,      sms, smsmfg_banked_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (version Trivia-2-011586)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sms4in1,   0,        sureshot, sms, smsmfg_state,        empty_init, ROT0, "SMS Manufacturing Corp.", "4-in-1 (version SWS1-052587)",                               MACHINE_SUPPORTS_SAVE ) // still shows 1984 copyright on title screen
+GAME( 1984, sms4in1a,  sms4in1,  sureshot, sms, smsmfg_state,        empty_init, ROT0, "SMS Manufacturing Corp.", "4-in-1 (version SWS1-110984)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1984, smsjoker,  0,        smsjoker, sms, smsmfg_state,        empty_init, ROT0, "SMS Manufacturing Corp.", "Joker Poker With Hi-Lo Double-Up (version HL-DLX-T-021286)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, smsjokera, smsjoker, sureshot, sms, smsmfg_state,        empty_init, ROT0, "SMS Manufacturing Corp.", "Joker Poker With Hi-Lo Double-Up (version HL-DLX-080585)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sureshot,  0,        sureshot, sms, smsmfg_state,        empty_init, ROT0, "SMS Manufacturing Corp.", "Sure Shot",                                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, secondch,  0,        sureshot, sms, smsmfg_state,        empty_init, ROT0, "SMS Manufacturing Corp.", "Second Chance",                                              MACHINE_SUPPORTS_SAVE )
