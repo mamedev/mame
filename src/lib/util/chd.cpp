@@ -11,7 +11,6 @@
 #include "avhuff.h"
 #include "cdrom.h"
 #include "corefile.h"
-#include "coretmpl.h"
 #include "flac.h"
 #include "hashing.h"
 #include "multibyte.h"
@@ -24,6 +23,7 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdlib>
+#include <cstring>
 #include <ctime>
 #include <new>
 #include <tuple>

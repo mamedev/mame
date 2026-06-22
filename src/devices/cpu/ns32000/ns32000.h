@@ -149,6 +149,11 @@ protected:
 
 	u32 m_cfg; // configuration register
 
+	// the external Series 32000 MMU (NS32082/NS32382) is consulted only after
+	// SETCFG has enabled it (CFG M); the NS32532's on-chip MMU gates internally
+	// (via MSR/MCR) and ignores CFG M, so it clears this in its constructor.
+	bool m_mmu_uses_cfg_m;
+
 	typename memory_access<HighBits, Width, 0, ENDIANNESS_LITTLE>::specific m_bus[16];
 
 private:
@@ -242,6 +247,23 @@ protected:
 	virtual u16 slave(u8 opbyte, u16 opword, addr_mode op1, addr_mode op2) override;
 
 private:
+	static constexpr unsigned TLB_ENTRIES = 1024; // power of two
+
+	struct tlb_entry
+	{
+		u32  tag;   // virtual page number (address >> 12)
+		u32  pfn;   // physical frame (PTE.PFN, page-aligned)
+		u8   pl;    // effective (most restrictive) protection level
+		bool as;    // address space
+		bool ci;    // cache inhibit
+		bool m;     // level-2 PTE modified bit
+		bool valid;
+	};
+
+	void tlb_flush();                      // invalidate all entries
+	void tlb_flush_as(bool as);            // invalidate one address space (PTBn load)
+	void tlb_invalidate(u32 va, bool as);  // invalidate one page (IVARn write)
+
 	address_space_config m_pt1_config;
 	address_space_config m_pt2_config;
 
@@ -250,6 +272,14 @@ private:
 	u32 m_tear;    // translation exception address
 	u32 m_mcr;     // memory management control
 	u32 m_msr;     // memory management status
+
+	// translation look-aside buffer (Section 3.4.4).  Caches completed page
+	// table walks so the common case avoids two extra memory reads per access.
+	// Modelled with more entries than the real 64-entry TLB purely for emulation
+	// speed; capacity does not affect correctness as long as invalidation (PTBn
+	// load, IVARn write) is exact.  R/M bits follow the hardware: a write to a
+	// cached page whose recorded M bit is clear still walks, to set PTE.M.
+	tlb_entry m_tlb[TLB_ENTRIES];
 
 	// debug registers
 	u32 m_dcr; // debug condition

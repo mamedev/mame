@@ -616,6 +616,8 @@ bool ppc_device::frontend::describe_13(uint32_t op, opcode_desc &desc, const opc
 				return false;
 			if (is_601_class())
 				desc.cycles = 6;    // 601
+			// end the block here
+			desc.set_end_sequence();
 			return true;
 
 		case 0x210: // BCCTRx
@@ -960,11 +962,21 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 		case 0x0f6: // DCBTST
 		case 0x116: // DCBT
 		case 0x2f6: // DCBA
+			if (!(m_ppc.m_cap & (PPCCAP_VEA | PPCCAP_4XX)))
+			{
+				return false;
+			}
+			desc.set_gpr_used_or_zero(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			return true;
+
 		case 0x3d6: // ICBI
 			if (!(m_ppc.m_cap & (PPCCAP_VEA | PPCCAP_4XX)))
 				return false;
 			desc.set_gpr_used_or_zero(G_RA(op));
 			desc.set_gpr_used(G_RB(op));
+			// end the block immediately since the cache could be flushing for the next instruction
+			desc.set_end_sequence();
 			return true;
 
 		case 0x1d6: // DCBI
@@ -1504,6 +1516,8 @@ bool ppc_device::frontend::describe_3b(uint32_t op, opcode_desc &desc, const opc
 
 		case 0x16:  // FSQRTSx
 		case 0x18:  // FRESx
+			if (is_601_class())     // 601 implements neither fsqrts nor fres -> illegal
+				return false;
 			desc.set_fpr_used(G_RB(op));
 			desc.set_fpr_modified(G_RD(op));
 			if (op & M_RC)
@@ -1584,6 +1598,8 @@ bool ppc_device::frontend::describe_3f(uint32_t op, opcode_desc &desc, const opc
 
 			case 0x16:  // FSQRTx
 			case 0x1a:  // FSQRTEx
+				if (is_601_class())     // 601 implements neither fsqrt nor frsqrte -> illegal
+					return false;
 				desc.set_fpr_used(G_RB(op));
 				desc.set_fpr_modified(G_RD(op));
 				if (op & M_RC)
@@ -1592,13 +1608,15 @@ bool ppc_device::frontend::describe_3f(uint32_t op, opcode_desc &desc, const opc
 				return true;
 
 			case 0x17:  // FSELx
+				if (is_601_class())     // 601 has no fsel -> illegal
+					return false;
 				desc.set_fpr_used(G_RA(op));
 				desc.set_fpr_used(G_RB(op));
 				desc.set_fpr_used(G_REGC(op));
 				desc.set_fpr_modified(G_RD(op));
 				if (op & M_RC)
 					desc.set_cr_modified(1);
-				desc.cycles = 2;    // 601/603
+				desc.cycles = 2;    // 603
 				return true;
 
 			case 0x1c:  // FMSUBx

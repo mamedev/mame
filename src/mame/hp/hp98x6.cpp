@@ -972,6 +972,7 @@ void hp9826_36_state::machine_start()
 void hp9826_36_state::machine_reset()
 {
 	hp98x6_base_state::machine_reset();
+	m_fdc->dden_w(0);
 	m_curr_floppy = nullptr;
 	floppy_reset();
 }
@@ -996,7 +997,6 @@ void hp9826_36_state::hp9826_36(machine_config &mconfig, unsigned dot_clock, int
 
 	FD1793(mconfig, m_fdc, HPIB_CLOCK / 5);
 	m_fdc->set_force_ready(true);
-	m_fdc->dden_w(0);
 	m_fdc->intrq_wr_callback().set(FUNC(hp9826_36_state::fdc_irq_w));
 	m_fdc->drq_wr_callback().set(FUNC(hp9826_36_state::fdc_drq_w));
 	m_fdc->hld_wr_callback().set(FUNC(hp9826_36_state::fdc_hld_w));

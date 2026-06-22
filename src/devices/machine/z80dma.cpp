@@ -167,6 +167,7 @@ void z80dma_device::device_start()
 	save_item(NAME(m_byte_counter));
 	save_item(NAME(m_rdy));
 	save_item(NAME(m_force_ready));
+	save_item(NAME(m_reset_pointer));
 	save_item(NAME(m_wait));
 	save_item(NAME(m_waits_extra));
 	save_item(NAME(m_busrq));

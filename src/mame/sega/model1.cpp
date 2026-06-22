@@ -804,7 +804,7 @@ void model1_state::irq_raise(int level)
 	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-IRQ_CALLBACK_MEMBER(model1_state::irq_callback)
+u8 model1_state::irq_callback()
 {
 	for (int i = 0; i < 8; i++)
 		if (BIT(m_irq_status, i))
@@ -1713,7 +1713,7 @@ void model1_state::model1(machine_config &config)
 	V60(config, m_maincpu, 32_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model1_state::model1_mem);
 	m_maincpu->set_addrmap(AS_IO, &model1_state::model1_io);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(model1_state::irq_callback));
+	m_maincpu->irq_cycle_callback().set(FUNC(model1_state::irq_callback));
 
 	// vf (at least) depends on default being 1-filled for ranking to initialize properly
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // 2x MB84256A-70LL + battery

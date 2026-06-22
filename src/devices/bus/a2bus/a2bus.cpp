@@ -35,7 +35,7 @@
       D2  47   4  A2
       D1  48   3  A1
       D0  49   2  A0
-    -12V  50   1  /IOSEL
+    +12V  50   1  /IOSEL
 
      (front of computer)
 
@@ -65,6 +65,7 @@
            peripherals must be regenerated from this signal using additional logic.
  /DEVSEL - asserted on an access to C0nX, where n = the slot number plus 8.
    D0-D7 - 8-bit data bus
+    +12V - 12 volts DC power
      +5V - 5 volts DC power
  DMA OUT - see DMA IN
  INT OUT - see INT IN

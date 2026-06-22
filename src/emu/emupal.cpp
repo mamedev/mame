@@ -75,6 +75,11 @@ palette_device::palette_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, bgr_222_t)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_bgr_222)), 64)
+{
+}
+
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rgb_555_t)
 	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_rgb_555)), 32768)
 {
@@ -691,6 +696,18 @@ void palette_device::palette_init_3bit_bgr(palette_device &palette)
 
 
 /*-------------------------------------------------
+    standard 2-2-2 palette for games using a
+    6-bit color space
+-------------------------------------------------*/
+
+void palette_device::palette_init_bgr_222(palette_device &palette)
+{
+	for (int i = 0; i < 64; i++)
+		palette.set_pen_color(i, rgbexpand<2, 2, 2>(i, 0, 2, 4));
+}
+
+
+/*-------------------------------------------------
     RRRR_GGGG_BBBB - standard 4-4-4 palette,
     assuming the commonly used resistor values:
 
@@ -746,21 +763,21 @@ void palette_device::palette_init_rgb_444_proms(palette_device &palette)
 void palette_device::palette_init_rgb_555(palette_device &palette)
 {
 	for (int i = 0; i < 0x8000; i++)
-		palette.set_pen_color(i, rgbexpand<5,5,5>(i, 10, 5, 0));
+		palette.set_pen_color(i, rgbexpand<5, 5, 5>(i, 10, 5, 0));
 }
 
 
 void palette_device::palette_init_grb_555(palette_device &palette)
 {
 	for (int i = 0; i < 0x8000; i++)
-		palette.set_pen_color(i, rgbexpand<5,5,5>(i, 5, 10, 0));
+		palette.set_pen_color(i, rgbexpand<5, 5, 5>(i, 5, 10, 0));
 }
 
 
 void palette_device::palette_init_bgr_555(palette_device &palette)
 {
 	for (int i = 0; i < 0x8000; i++)
-		palette.set_pen_color(i, rgbexpand<5,5,5>(i, 0, 5, 10));
+		palette.set_pen_color(i, rgbexpand<5, 5, 5>(i, 0, 5, 10));
 }
 
 
@@ -773,13 +790,13 @@ void palette_device::palette_init_bgr_555(palette_device &palette)
 void palette_device::palette_init_rgb_565(palette_device &palette)
 {
 	for (int i = 0; i < 0x10000; i++)
-		palette.set_pen_color(i, rgbexpand<5,6,5>(i, 11, 5, 0));
+		palette.set_pen_color(i, rgbexpand<5, 6, 5>(i, 11, 5, 0));
 }
 
 void palette_device::palette_init_bgr_565(palette_device &palette)
 {
 	for (int i = 0; i < 0x10000; i++)
-		palette.set_pen_color(i, rgbexpand<5,6,5>(i, 0, 5, 11));
+		palette.set_pen_color(i, rgbexpand<5, 6, 5>(i, 0, 5, 11));
 }
 
 rgb_t raw_to_rgb_converter::IRRRRRGGGGGBBBBB_decoder(u32 raw)

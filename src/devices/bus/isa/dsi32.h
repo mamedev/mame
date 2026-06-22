@@ -32,9 +32,10 @@
 #include "isa.h"
 
 #include "cpu/ns32000/ns32000.h"
+#include "machine/mc68681.h"
 #include "machine/ns32081.h"
 #include "machine/ns32082.h"
-#include "machine/mc68681.h"
+
 
 class isa8_dsi32_device : public device_t, public device_isa8_card_interface
 {
@@ -44,9 +45,10 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual void remap(int space_id, offs_t start, offs_t end) override;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 private:
 	void cpu_map(address_map &map) ATTR_COLD;
@@ -67,7 +69,6 @@ private:
 	required_device<ns32082_device> m_mmu;
 	required_device<scn2681_device> m_duart;
 	required_ioport m_jumpers;
-
 
 	uint8_t m_control;      // bus flags port: b0 DIAG, b1 INT32K, b2 RESET, b3 RFSH INHIBIT
 	uint8_t m_page;

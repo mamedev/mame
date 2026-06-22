@@ -167,7 +167,7 @@ private:
 
 	void ram_size();
 
-	uint32_t id_r();
+	uint32_t id_r(offs_t offset, uint32_t mem_mask);
 
 	uint8_t diag_r(offs_t offset);
 
@@ -248,7 +248,7 @@ void macpdm_state::driver_init()
 {
 	m_maincpu->space().install_ram(0, m_ram->mask(), 0, m_ram->pointer());
 
-	m_model_id = 0xa55a3011;
+	m_model_id = 0xa55a3010;
 	// 7100 = a55a3012
 	// 8100 = a55a3013
 
@@ -566,14 +566,23 @@ uint8_t macpdm_state::hmc_r(offs_t offset)
 void macpdm_state::hmc_w(offs_t offset, uint8_t data)
 {
 	if(offset & 8)
+	{
 		m_hmc_bit = 0;
-	else {
+	}
+	else
+	{
 		if(data & 1)
+		{
 			m_hmc_buffer |= u64(1) << m_hmc_bit;
+		}
 		else
+		{
 			m_hmc_buffer &= ~(u64(1) << m_hmc_bit);
+		}
+
 		m_hmc_bit ++;
-		if(m_hmc_bit == 35) {
+		if(m_hmc_bit == 35)
+		{
 			m_hmc_reg = m_hmc_buffer & ~3; // csiz is readonly, we pretend there isn't a l2 cache
 			m_video->set_vram_offset(m_hmc_reg & 0x200000000 ? 0 : 0x100000);
 			ram_size();
@@ -647,18 +656,22 @@ void macpdm_state::ram_size(){
 		}
 
 		// install a complete image of RAM A in the slot above the top of memory (which is actually where the ROM code looks for it)
-		const u32 alias_base = (sizes[config] * 2);
+		const u32 alias_base = 0x10000000;
 		space.install_ram(alias_base, alias_base + simm_size - 1, 0, (void *)ram_a);
 
 		// install RAM B
-		u32 b_base = sizes[config];
-
-		if (simm_size < (128*1024*1024))
+		const u32 b_base = (config != 0) ? (sizes[config] * 2) : 0x08000000;    // B base is 32 megs for config 0
+		if (b_base == alias_base)
 		{
-			b_base += mb_ram_size;
+			space.unmap_readwrite(alias_base, alias_base + simm_size - 1);
 		}
-
 		space.install_ram(b_base, b_base + simm_size - 1, 0, (void *)ram_b);
+
+		if (simm_size < 8*1024*1024)
+		{
+			const u32 alias_base_b = alias_base + simm_size - (8*1024*1024);
+			space.install_ram(alias_base_b, alias_base_b + simm_size - 1, 0, (void *)ram_b);
+		}
 	}
 }
 
@@ -697,8 +710,16 @@ void macpdm_state::hdsel_w(int hdsel)
 		m_cur_floppy->ss_w(hdsel);
 }
 
-uint32_t macpdm_state::id_r()
+uint32_t macpdm_state::id_r(offs_t offset,uint32_t mem_mask)
 {
+	// Real hardware doesn't return the right value on a 32 bit sized access.
+	// The actual value returned is unknown, but the 0xA55A signature must NOT match when
+	// read that way in order for PDM machines to be identified properly.
+	if (mem_mask == 0xffff'ffff)
+	{
+		return m_model_id & 0xffff;
+	}
+
 	return m_model_id;
 }
 
@@ -880,7 +901,8 @@ uint8_t macpdm_state::dma_scsi_a_ctrl_r()
 
 void macpdm_state::dma_scsi_a_ctrl_w(uint8_t data)
 {
-	m_dma_scsi_a_ctrl = data & 0x42;
+	// the boot ROM expects bits 2 and 3 to read and write in order to ID a production AMIC and set the correct boxFlag
+	m_dma_scsi_a_ctrl = data & 0x4e;
 	if(data & 1) {
 		m_dma_scsi_a_ctrl &= 0x40;
 		m_dma_scsi_a_cur_offset = 0;
@@ -1154,7 +1176,7 @@ void macpdm_state::pdm_map(address_map &map)
 	map(0x50f32102, 0x50f32103).rw(FUNC(macpdm_state::dma_berr_flag_r), FUNC(macpdm_state::dma_berr_flag_w));
 
 	map(0x50f40000, 0x50f4000f).rw(FUNC(macpdm_state::hmc_r), FUNC(macpdm_state::hmc_w));
-	map(0x5ffffff8, 0x5fffffff).r(FUNC(macpdm_state::id_r));
+	map(0x5ffffffc, 0x5fffffff).r(FUNC(macpdm_state::id_r));
 
 	map(0xffc00000, 0xffffffff).rom().region("bootrom", 0);
 }
@@ -1245,7 +1267,7 @@ void macpdm_state::macpdm(machine_config &config)
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("8M");
-	m_ram->set_extra_options("12M,24M,72M,264M");
+	m_ram->set_extra_options("16M,24M,40M,136M");
 
 	nubus_device &nubus(NUBUS(config, "nubus"));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
@@ -1258,6 +1280,7 @@ void macpdm_state::macpdm(machine_config &config)
 
 	MACADB(config, m_macadb, IO_CLOCK/2);
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
+	m_cuda->zero_default_pram();                    // the default PRAM that's OK for 68k is bad for PowerMacs
 	m_cuda->set_default_bios_tag("341s0060");
 	m_cuda->reset_callback().set(FUNC(macpdm_state::cuda_reset_w));
 	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));

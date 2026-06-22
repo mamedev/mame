@@ -102,7 +102,7 @@ private:
 	void bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(model1_interrupt);
-	IRQ_CALLBACK_MEMBER(irq_callback);
+	u8 irq_callback();
 
 	// TGP
 	u16 fifoin_status_r();

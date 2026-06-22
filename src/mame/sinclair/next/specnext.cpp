@@ -409,7 +409,7 @@ private:
 	u8 m_port_ff_data;
 	bool m_port_1ffd_special_old;
 	u8 m_port_1ffd_data;
-	u8 m_port_7ffd_data;
+	//u8 m_port_7ffd_data;
 	u8 m_port_dffd_data;
 	u8 m_port_eff7_data;
 	u8 m_port_e7_reg;

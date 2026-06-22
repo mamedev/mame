@@ -377,17 +377,10 @@ uint64_t naomi_gdrom_board::des_encrypt_decrypt(bool decrypt, uint64_t src, cons
 
 // For ide gdrom controller
 
-DEFINE_DEVICE_TYPE(IDE_GDROM, idegdrom_device, "ide_gdrom", "ide gdrom controller")
+DEFINE_DEVICE_TYPE(IDE_GDROM, idegdrom_device, "ide_gdrom", "IDE GDROM controller")
 
-idegdrom_device::idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const char *image_tag, const char *space_tag, int space_id)
-	: idegdrom_device(mconfig, tag, owner, clock)
-{
-	space_owner_tag = space_tag;
-	space_owner_id = space_id;
-}
-
-idegdrom_device::idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, IDE_GDROM, tag, owner, clock),
+idegdrom_device::idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pci_device(mconfig, IDE_GDROM, tag, owner, clock),
 	m_ide(*this, "ide"),
 	irq_cb(*this)
 {
@@ -433,7 +426,6 @@ void idegdrom_device::device_add_mconfig(machine_config &config)
 {
 	BUS_MASTER_IDE_CONTROLLER(config, m_ide).options(gdrom_devices, "gdrom", nullptr, true);
 	m_ide->irq_handler().set(*this, FUNC(idegdrom_device::ide_irq));
-	m_ide->set_bus_master_space(space_owner_tag, space_owner_id);
 }
 
 void idegdrom_device::map_command(address_map &map)
@@ -1082,20 +1074,27 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &naomi_gdrom_board::sh4_io_map);
 
 	PCI_ROOT(config, "pci");
+
 	SEGA315_6154(config, m_315_6154);
 	m_315_6154->set_addrmap(sega_315_6154_device::AS_PCI_MEMORY, &naomi_gdrom_board::pci_map);
-	IDE_GDROM(config, m_idegdrom, image_tag, m_315_6154->tag(), sega_315_6154_device::AS_PCI_MEMORY);
+
+	IDE_GDROM(config, m_idegdrom);
+	m_idegdrom->set_bus_master_space(m_315_6154, sega_315_6154_device::AS_PCI_MEMORY);
 	m_idegdrom->irq_callback().set_inputline(m_maincpu, SH4_IRL2);
+
 	PIC16C622(config, m_securitycpu, PIC_CLOCK);
 	m_securitycpu->read_b().set(FUNC(naomi_gdrom_board::pic_dimm_r));
 	m_securitycpu->write_b().set(FUNC(naomi_gdrom_board::pic_dimm_w));
 	m_securitycpu->set_config(0x3fff - 0x04);
+
 	I2C_24C01(config, m_i2c0);
 	m_i2c0->set_e0(0);
 	m_i2c0->set_wc(1);
+
 	I2C_24C01(config, m_i2c1);
 	m_i2c1->set_e0(1);
 	m_i2c1->set_wc(1);
+
 	EEPROM_93C46_8BIT(config, m_eeprom, 0);
 }
 

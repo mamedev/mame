@@ -348,10 +348,12 @@ static INPUT_PORTS_START( modcart )
 INPUT_PORTS_END
 
 
-// TODO: probably variable tile sizes like subsino2.cpp
-// Bottom part of both banks doesn't decode properly, can bpp select too?
+// Variable tile sizes like subsino2.cpp
+// End portions of both banks have tables + other undecoded stuff, more bpp select?
 static GFXDECODE_START( gfx_modcart )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x8_raw, 0, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_lsb, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x8_raw, 0, 1 )
 GFXDECODE_END
 

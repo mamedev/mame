@@ -776,7 +776,7 @@ void upd765_family_device::fifo_push(uint8_t data, bool internal)
 	int thr = (fifocfg & FIF_THR)+1;
 	if(!fifo_write && (!fifo_expected || fifo_pos >= thr || (fifocfg & FIF_DIS)))
 		enable_transfer();
-	if(fifo_write && (fifo_pos == 16 || !fifo_expected))
+	if(fifo_write && (fifo_pos == 16 || !fifo_expected || (fifocfg & FIF_DIS)))
 		disable_transfer();
 }
 

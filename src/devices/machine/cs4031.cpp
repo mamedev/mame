@@ -774,6 +774,7 @@ void cs4031_device::keyb_data_w(u8 data)
 	if (BIT(m_registers[SOFT_RESET_AND_GATEA20], 7) && m_keybc_d1_written)
 	{
 		m_keybc_data_blocked = true;
+		m_keybc_d1_written = false;
 		emulated_kbreset(BIT(data, 0));
 		emulated_gatea20(BIT(data, 1));
 	}

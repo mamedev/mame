@@ -21,6 +21,7 @@
 #include <zlib.h>
 #include <zstd.h>
 
+#include <cstring>
 #include <new>
 
 

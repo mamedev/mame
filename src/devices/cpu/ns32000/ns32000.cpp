@@ -95,6 +95,7 @@ static const u32 size_mask[] = { 0x0000'00ffU, 0x0000'ffffU, 0x0000'0000U, 0xfff
 
 template <int HighBits, int Width>ns32000_device<HighBits, Width>::ns32000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_mmu_uses_cfg_m(true)
 	, m_address_mask(util::make_bitmask<u32>(HighBits))
 	, m_program_config("program", ENDIANNESS_LITTLE, 8 << Width, HighBits, 0)
 	, m_iam_config("iam", ENDIANNESS_LITTLE, 8 << Width, HighBits, 0)
@@ -151,6 +152,8 @@ ns32532_device::ns32532_device(const machine_config &mconfig, const char *tag, d
 	, m_pt1_config("pt1", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_pt2_config("pt2", ENDIANNESS_LITTLE, 32, 32, 0)
 {
+	// the on-chip MMU gates translation via MSR/MCR, not the CFG M bit
+	m_mmu_uses_cfg_m = false;
 }
 
 template <int HighBits, int Width> void ns32000_device<HighBits, Width>::device_start()
@@ -266,7 +269,13 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::state_s
 template <int HighBits, int Width> template<typename T> T ns32000_device<HighBits, Width>::mem_read(unsigned st, u32 address, bool user, bool pfs)
 {
 	u32 physical = address;
-	ns32000_mmu_interface::translate_result tr = m_mmu ?
+	// the CPU routes accesses through the external MMU only once SETCFG has
+	// enabled it (CFG M).  When the MMU is idle/just-reset the page tables are
+	// ignored and every address is physical, regardless of a stale MSR
+	// translation-enable.  (The 32532's on-chip MMU gates internally, so it
+	// clears m_mmu_uses_cfg_m and always consults translate().)
+	bool const xlat = m_mmu && (!m_mmu_uses_cfg_m || (m_cfg & CFG_M));
+	ns32000_mmu_interface::translate_result tr = xlat ?
 		m_mmu->translate(m_bus[st].space(), st, physical, (m_psr & PSR_U) || user, false, pfs) : ns32000_mmu_interface::COMPLETE;
 
 	if (tr == ns32000_mmu_interface::COMPLETE)
@@ -281,7 +290,7 @@ template <int HighBits, int Width> template<typename T> T ns32000_device<HighBit
 		{
 			u32 const pagemask = ((m_cfg & CFG_P) ? 0xfffU : 0x1ffU) & ~unitmask;
 
-			if (!m_mmu || (~address & pagemask))
+			if (!xlat || (~address & pagemask))
 			{
 				// unaligned access, one page (or no mmu)
 				switch (sizeof(T))
@@ -351,7 +360,9 @@ template <int HighBits, int Width> template<typename T> T ns32000_device<HighBit
 template <int HighBits, int Width> template<typename T> void ns32000_device<HighBits, Width>::mem_write(unsigned st, u32 address, u64 data, bool user)
 {
 	u32 physical = address;
-	ns32000_mmu_interface::translate_result tr = m_mmu ?
+	// see mem_read: the external MMU is consulted only when SETCFG has enabled it
+	bool const xlat = m_mmu && (!m_mmu_uses_cfg_m || (m_cfg & CFG_M));
+	ns32000_mmu_interface::translate_result tr = xlat ?
 		m_mmu->translate(m_bus[st].space(), st, physical, (m_psr & PSR_U) || user, true) : ns32000_mmu_interface::COMPLETE;
 
 	if (tr == ns32000_mmu_interface::COMPLETE)
@@ -365,7 +376,7 @@ template <int HighBits, int Width> template<typename T> void ns32000_device<High
 		{
 			u32 const pagemask = ((m_cfg & CFG_P) ? 0xfffU : 0x1ffU) & ~unitmask;
 
-			if (!m_mmu || (~address & pagemask))
+			if (!xlat || (~address & pagemask))
 			{
 				// unaligned access, one page (or no mmu)
 				switch (sizeof(T))
@@ -3671,7 +3682,7 @@ template <int HighBits, int Width> device_memory_interface::space_config_vector 
 template <int HighBits, int Width> bool ns32000_device<HighBits, Width>::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
 	target_space = &space(spacenum);
-	return !m_mmu || m_mmu->translate(space(spacenum), spacenum, address, m_psr & PSR_U, intention == TR_WRITE, false, true) == ns32000_mmu_interface::COMPLETE;
+	return !(m_mmu && (!m_mmu_uses_cfg_m || (m_cfg & CFG_M))) || m_mmu->translate(space(spacenum), spacenum, address, m_psr & PSR_U, intention == TR_WRITE, false, true) == ns32000_mmu_interface::COMPLETE;
 }
 
 template <int HighBits, int Width> std::unique_ptr<util::disasm_interface> ns32000_device<HighBits, Width>::create_disassembler()
@@ -3898,6 +3909,28 @@ void ns32532_device::device_reset()
 	m_mcr = 0;
 	m_msr = 0;
 	m_dcr = 0;
+
+	tlb_flush();
+}
+
+void ns32532_device::tlb_flush()
+{
+	for (tlb_entry &e : m_tlb)
+		e.valid = false;
+}
+
+void ns32532_device::tlb_flush_as(bool as)
+{
+	for (tlb_entry &e : m_tlb)
+		if (e.as == as)
+			e.valid = false;
+}
+
+void ns32532_device::tlb_invalidate(u32 va, bool as)
+{
+	tlb_entry &e = m_tlb[(va >> 12) & (TLB_ENTRIES - 1)];
+	if (e.valid && e.tag == (va >> 12) && e.as == as)
+		e.valid = false;
 }
 
 device_memory_interface::space_config_vector ns32532_device::memory_space_config() const
@@ -3986,12 +4019,38 @@ ns32000_mmu_interface::translate_result ns32532_device::translate(address_space 
 	if ((!user && !(m_mcr & MCR_TS)) || (user && !(m_mcr & MCR_TU)))
 		return COMPLETE;
 
-	// TODO: translation look-aside buffer
-
 	bool const address_space = (m_mcr & MCR_DS) && user;
 	unsigned const access_level = (user && !(m_mcr & MCR_AO))
 		? ((write || st == ns32000::ST_RMW) ? PL_URW : PL_URO)
 		: ((write || st == ns32000::ST_RMW) ? PL_SRW : PL_SRO);
+
+	// translation look-aside buffer: a hit avoids the two page-table reads
+	bool const rmw = write || (st == ns32000::ST_RMW);
+	u32 const tlb_vpn = address >> 12;
+	tlb_entry &tlb = m_tlb[tlb_vpn & (TLB_ENTRIES - 1)];
+	if (tlb.valid && tlb.tag == tlb_vpn && tlb.as == address_space)
+	{
+		if (unsigned(tlb.pl) < access_level)
+		{
+			if (!suppress)
+			{
+				m_msr = MSR(st, user, write, TEX_PROT);
+				m_tear = address;
+				return ABORT;
+			}
+			else
+				return CANCEL;
+		}
+
+		// a write to a page whose modified bit is not yet recorded must fall
+		// through to the walk so that PTE.M gets set in the page table
+		if (!(rmw && !tlb.m))
+		{
+			address = tlb.pfn | BIT(address, 0, 12);
+
+			return COMPLETE;
+		}
+	}
 
 	LOGMASKED(LOG_TRANSLATE, "translate address_space %d access_level %d page table 0x%08x address 0x%08x\n",
 		address_space, access_level, m_ptb[address_space], address);
@@ -4071,6 +4130,21 @@ ns32000_mmu_interface::translate_result ns32532_device::translate(address_space 
 	// set modified and referenced
 	if ((!(pte2 & PTE_R) || ((write || st == ns32000::ST_RMW) && !(pte2 & PTE_M))) && !suppress)
 		m_bus[ns32000::ST_PT2].write_dword(pte2_address, pte2 | ((write || st == ns32000::ST_RMW) ? PTE_M : 0) | PTE_R);
+
+	// update the translation look-aside buffer (not on suppressed probes, which
+	// do not set the PTE R/M bits).  The effective protection level is the more
+	// restrictive of the two levels; the recorded M bit reflects the page table
+	// after the (possible) write above.
+	if (!suppress)
+	{
+		tlb.valid = true;
+		tlb.tag = tlb_vpn;
+		tlb.as = address_space;
+		tlb.pfn = pte2 & PTE_PFN;
+		tlb.pl = u8(std::min<u32>(pte1 & PTE_PL, pte2 & PTE_PL));
+		tlb.ci = bool(pte2 & PTE_CI);
+		tlb.m = bool(pte2 & PTE_M) || rmw;
+	}
 
 	address = (pte2 & PTE_PFN) | BIT(address, 0, 12);
 	LOGMASKED(LOG_TRANSLATE, "translate complete 0x%08x\n", address);
@@ -4209,13 +4283,13 @@ u16 ns32532_device::slave(u8 opbyte, u16 opword, addr_mode op1, addr_mode op2)
 			switch (BIT(opword, 7, 4))
 			{
 			case 0x8: break;
-			case 0x9: m_mcr = gen_read(op1); break;
+			case 0x9: m_mcr = gen_read(op1); tlb_flush(); break;
 			case 0xa: m_msr = gen_read(op1); break;
 			case 0xb: m_tear = gen_read(op1); break;
-			case 0xc: m_ptb[0] = gen_read(op1) & ~0xfffU; break; // TODO: invalidate TLB
-			case 0xd: m_ptb[1] = gen_read(op1) & ~0xfffU; break; // TODO: invalidate TLB
-			case 0xe: gen_read(op1); break; // ivar0
-			case 0xf: gen_read(op1); break; // ivar1
+			case 0xc: m_ptb[0] = gen_read(op1) & ~0xfffU; tlb_flush_as(0); break; // loading PTBn invalidates its address space
+			case 0xd: m_ptb[1] = gen_read(op1) & ~0xfffU; tlb_flush_as(1); break;
+			case 0xe: tlb_invalidate(gen_read(op1), 0); break; // ivar0: purge one page in AS0
+			case 0xf: tlb_invalidate(gen_read(op1), 1); break; // ivar1: purge one page in AS1
 			default:
 				interrupt(UND);
 				break;

@@ -120,6 +120,7 @@
 #include "opresolv.h"
 
 #include <cstdio>
+#include <cstring>
 #include <ctime>
 
 

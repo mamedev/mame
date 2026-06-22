@@ -38,21 +38,54 @@ void pc88va_state::video_start()
 	m_gfxdecode->gfx(3)->set_source(m_kanji_ram.get());
 	m_vrtc_irq_line = 432;
 
+	m_screen->register_screen_bitmap(m_text_bitmap);
+
 	for (int i = 0; i < 2; i++)
 		m_screen->register_screen_bitmap(m_graphic_bitmap[i]);
 
 	save_item(NAME(m_screen_ctrl_reg));
+	save_item(NAME(m_gden0));
+	save_item(NAME(m_ymmd));
+	save_item(NAME(m_dm));
+	save_item(NAME(m_vw));
 	save_item(NAME(m_gfx_ctrl_reg));
+	save_item(NAME(m_backdrop_color));
 	save_item(NAME(m_color_mode));
 	save_item(NAME(m_pltm));
 	save_item(NAME(m_pltp));
 
 	save_item(NAME(m_text_transpen));
+	save_item(NAME(m_td));
 	save_pointer(NAME(m_video_pri_reg), 2);
 	save_pointer(NAME(m_gvram), gvram_size);
 	save_pointer(NAME(m_kanji_ram), kanjiram_size);
 
 	save_item(NAME(m_vrtc_irq_line));
+	save_item(NAME(m_vertical_magnify));
+
+	save_item(STRUCT_MEMBER(m_singleplane, rop));
+	save_item(STRUCT_MEMBER(m_singleplane, patr));
+	save_item(STRUCT_MEMBER(m_singleplane, wss));
+//  save_item(STRUCT_MEMBER(m_singleplane, rbusy));
+
+	save_item(STRUCT_MEMBER(m_multiplane, aacc));
+	save_item(STRUCT_MEMBER(m_multiplane, gmap));
+	save_item(STRUCT_MEMBER(m_multiplane, xrpm));
+	save_item(STRUCT_MEMBER(m_multiplane, xwpm));
+	save_item(STRUCT_MEMBER(m_multiplane, cmpen));
+	save_item(STRUCT_MEMBER(m_multiplane, wss));
+	save_item(STRUCT_MEMBER(m_multiplane, pmod));
+	save_item(STRUCT_MEMBER(m_multiplane, rop));
+	save_item(STRUCT_MEMBER(m_multiplane, cmpr));
+	save_item(STRUCT_MEMBER(m_multiplane, patr));
+	save_item(STRUCT_MEMBER(m_multiplane, prrp));
+	save_item(STRUCT_MEMBER(m_multiplane, prwp));
+//  save_item(STRUCT_MEMBER(m_multiplane, rbusy));
+
+	save_item(STRUCT_MEMBER(m_picture_mask, top));
+	save_item(STRUCT_MEMBER(m_picture_mask, bottom));
+	save_item(STRUCT_MEMBER(m_picture_mask, left));
+	save_item(STRUCT_MEMBER(m_picture_mask, right));
 }
 
 // TODO: all needs to be verified
@@ -65,6 +98,7 @@ void pc88va_state::video_reset()
 	m_pltm = 0;
 	m_pltp = 0;
 	m_video_pri_reg[0] = m_video_pri_reg[1] = 0;
+	m_vertical_magnify = 0x10000;
 }
 
 void pc88va_state::palette_init(palette_device &palette) const
@@ -89,7 +123,8 @@ uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 {
 	uint8_t pri, cur_pri_lv;
 	uint32_t screen_pri;
-	bitmap.fill(0, cliprect);
+	// shinraba opening and title relies on backdrop color
+	bitmap.fill(m_palette->pen(0x20), cliprect);
 
 	// don't bother if we are under DSPOFF command
 	if(m_tsp.disp_on == false)
@@ -321,6 +356,8 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			}
 		}
 	}
+
+	// TODO: verify if IDP global vertical magnify also affects sprites
 }
 
 // TODO: handcrafted kanji ROM causes this, should be simplified by a more accurate dump
@@ -370,10 +407,16 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	if(m_td == true)
 		return;
 
+	m_text_bitmap.fill(0, cliprect);
+
 	uint16_t const *const tvram = m_tvram;
 	uint8_t const *const kanji = memregion("kanji")->base();
 
 	LOGTEXT("=== Start TEXT frame\n");
+
+	// "the sum of the split screen height must match the height of the previous screen"
+	// - mightmag loads from PC Engine OS, disables split 1 by pushing a split 0 RH from 384 to 400
+	u32 rh_sum = 0;
 
 	// four layers
 	for (int layer_n = 0; layer_n < 4; layer_n ++)
@@ -396,17 +439,18 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		const u8 screen_fg_col = (tsp_regs[0xa / 2] & 0xf000) >> 12;
 		const u8 screen_bg_col = (tsp_regs[0xa / 2] & 0x0f00) >> 8;
 
-		// TODO: how even vh/vw can run have all these bytes?
+		// TODO: how even vh/vw can have all these bytes?
 		const u8 vh = (tsp_regs[4 / 2] & 0x7ff);
 		const u16 vw = (tsp_regs[8 / 2] & 0x3ff) / 2;
 
-
-		if (vh == 0 || vw == 0)
+		if (vh == 0 || vw == 0 || rh_sum > cliprect.max_y)
 		{
-			LOGTEXT("\t%d skip VW = %d VH = %d\n"
+			LOGTEXT("\t%d skip VW = %d VH = %d rh_sum %d cliprect.max_y %d\n"
 				, layer_n
 				, vw
 				, vh
+				, rh_sum
+				, cliprect.max_y
 			);
 			continue;
 		}
@@ -599,7 +643,7 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 							if(secret) { pen = 0; } //hide text
 
 							if(pen != 0 && pen != m_text_transpen)
-								bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
+								m_text_bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
 						}
 					}
 				}
@@ -634,7 +678,7 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 							if(secret) { pen = 0; } //hide text
 
 							if(pen != 0 && pen != m_text_transpen)
-								bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
+								m_text_bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
 						}
 					}
 				}
@@ -666,13 +710,22 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 							if(secret) { pen = 0; } //hide text
 
 							if(pen != 0)
-								bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
+								m_text_bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
 						}
 					}
 				}
 			}
 		}
+
+		rh_sum += rh;
 	}
+
+	copyrozbitmap_trans(
+		bitmap, cliprect, m_text_bitmap,
+		0, 0,
+		0x10000, 0, 0, m_vertical_magnify,
+		false, 0
+	);
 }
 
 /*
@@ -788,10 +841,13 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 		rectangle fb_cliprect(cliprect.min_x, cliprect.max_x, dsp, dsp + fbl - 1);
 		split_cliprect &= fb_cliprect;
 
+		// TODO: picture mask, actually under mixing not here (applies per screen not per layer)
+		// - fqueen and shinraba relies on this, both sets register $010a on demand.
+		//rectangle picture_mask_cliprect(m_picture_mask.left, m_picture_mask.right, m_picture_mask.top, m_picture_mask.bottom);
+		//split_cliprect &= picture_mask_cliprect;
+
 		if (split_cliprect.empty())
 			continue;
-
-		// TODO: picture mask
 
 		if (!m_dm)
 		{
@@ -1261,10 +1317,12 @@ void pc88va_state::recompute_parameters()
 
 	visarea.set(0, h_vis_area - 1, 0, v_vis_area - 1);
 
-	// TODO: vertical global magnify at bit 7
+	// Global vertical magnify, used by setup menu in 24kHz
+	m_vertical_magnify = (m_crtc_regs[0x00] & 0xc0) == 0x80 ? 0x8000 : 0x10000;
 	// TODO: actual clock source must be external, assume known PC-88 XTALs
 	// TODO: a bit off compared to PC-88 equivalent with the configured values
 	// TODO: famista pukes a 31.2 Hz vertical in 24kHz mode
+	// (sets 0xc0 regardless of CRT Mode setting)
 	const int clock_speed = !!BIT(m_crtc_regs[0x00], 6) ? (31'948'800 / 4) : (28'636'363 / 2);
 
 	refresh = HZ_TO_ATTOSECONDS(clock_speed) * h_vis_area * v_vis_area;
@@ -1565,6 +1623,21 @@ void pc88va_state::gfx_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 u16 pc88va_state::gfx_ctrl_r()
 {
 	return m_gfx_ctrl_reg;
+}
+
+/*
+ * $10a Backdrop color
+ *
+ * GGGG**RRRR*BBBB* format
+ * [*] "set to '0' when all the upper bits of a gun are 0 and '1' otherwise" (?)
+ */
+void pc88va_state::backdrop_color_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_backdrop_color);
+	const u8 g = (m_backdrop_color >> 12) & 0xf;
+	const u8 r = (m_backdrop_color >> 6) & 0xf;
+	const u8 b = (m_backdrop_color >> 1) & 0xf;
+	m_palette->set_pen_color(0x20, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 /*

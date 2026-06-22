@@ -20619,6 +20619,7 @@ monty
 @source:handheld/mylife.cpp
 mylife
 mylifei
+mylifes
 
 @source:handheld/pensebem.cpp
 pbem2017
@@ -35523,6 +35524,7 @@ gamezn2
 hs36blk
 hs36red
 joysti30
+lg600fr
 lxnoddy
 majgnc
 majkon
@@ -35564,6 +35566,7 @@ vsmaxx17
 vsmaxx77
 vsmaxxvd
 vt25in1
+vt50in1
 vtboxing
 vtpinball
 vtsndtest
@@ -35684,6 +35687,7 @@ lxcmcyfzb
 lxcmcyls
 lxcmcypj
 lxcmcypp
+lxcmcypp75
 lxcmcyppa
 lxcmcysp
 lxcmcyspa
@@ -37438,6 +37442,7 @@ falconz
 fenix
 fenixexpl
 fenixn
+germwars
 griffon
 griffono
 nextfase
@@ -37457,6 +37462,7 @@ phoenixgu
 phoenixha
 phoenixi
 phoenixj
+phoenixjpl
 phoenixs
 phoenixt
 pleiadbl
@@ -42779,6 +42785,7 @@ setaroula
 setaroulm
 simpsonjr
 sokonuke
+spkings
 stg
 superbar
 thunderl
@@ -47409,6 +47416,7 @@ omar2
 rbitgen
 
 @source:tvgames/elan_ep3a19a.cpp
+lexiig10
 tvbg3a
 tvbg3b
 tvbg3c
@@ -47466,28 +47474,30 @@ mobigos
 mobigo2
 
 @source:tvgames/generalplus_gpl16250_nand.cpp
-wlsair60
-kiugames
+beambox
 jak_camp
 jak_car2
+jak_duck
 jak_gtg
-jak_sspop
-jak_hmhsm
 jak_hmg2
+jak_hmhsm
 jak_hmpt
 jak_hsmg2
-jak_umdf
-jak_duck
+jak_sspop
 jak_swc
-jak_wdzh
-jak_wdbg
 jak_tsm
-vbaby
+jak_umdf
+jak_wdbg
+jak_wdzh
+kiugames
 mgtfit
-beambox
+tiviboo
+vbaby
+wlsair60
 
 @source:tvgames/generalplus_gpl16250_rom.cpp
 beijuehh
+bornk220
 bornkidh
 dressmtv
 fpsport

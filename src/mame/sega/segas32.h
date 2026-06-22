@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "cpu/v60/v60.h"
 #include "sound/multipcm.h"
 #include "s32comm.h"
 #include "machine/timer.h"
@@ -158,6 +159,7 @@ protected:
 	void mix_all_layers(int which, int xoffs, bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t enablemask);
 	void print_mixer_data(int which);
 	uint32_t multi32_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index);
+	u8 irq_callback();
 	void update_irq_state();
 	void signal_v60_irq(int which);
 	void update_sound_irq_state();
@@ -215,7 +217,7 @@ protected:
 	optional_shared_ptr<uint8_t> m_soundram;
 	memory_share_array_creator<uint16_t, 2> m_paletteram;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<v60_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<multipcm_device> m_multipcm;
 	required_device<gfxdecode_device> m_gfxdecode;

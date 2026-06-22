@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, R. Belmont
 /***************************************************************************
 
-    ppccom.c
+    ppccom.cpp
 
     Common PowerPC definitions and functions
 
@@ -18,6 +18,10 @@
 
 #include "endianness.h"
 
+#include <bit>
+
+#include <cstring>
+
 
 /***************************************************************************
     DEBUGGING
@@ -32,10 +36,10 @@
     CONSTANTS
 ***************************************************************************/
 
-#define DOUBLE_SIGN     (0x8000000000000000U)
-#define DOUBLE_EXP      (0x7ff0000000000000U)
-#define DOUBLE_FRAC     (0x000fffffffffffffU)
-#define DOUBLE_ZERO     (0)
+static constexpr uint64_t DOUBLE_SIGN = 0x8000000000000000U;
+static constexpr uint64_t DOUBLE_EXP  = 0x7ff0000000000000U;
+static constexpr uint64_t DOUBLE_FRAC = 0x000fffffffffffffU;
+static constexpr uint64_t DOUBLE_ZERO = 0;
 
 
 
@@ -215,7 +219,12 @@ DEFINE_DEVICE_TYPE(PPC740,    ppc740_device,    "ppc740",     "IBM PowerPC 740")
 DEFINE_DEVICE_TYPE(PPC750,    ppc750_device,    "ppc750",     "IBM PowerPC 750")
 
 
-ppc_device::ppc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int address_bits, int data_bits, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor, address_map_constructor internal_map)
+ppc_device::ppc_device(
+		const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock,
+		int address_bits, int data_bits,
+		powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor,
+		address_map_constructor internal_map,
+		uint32_t reservation_size)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
 	, m_program_config("program", ENDIANNESS_BIG, data_bits, address_bits, 0, internal_map)
@@ -236,8 +245,11 @@ ppc_device::ppc_device(const machine_config &mconfig, device_type type, const ch
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
 	, m_drcoptions(0)
+	, m_reservation_mask(~uint32_t(reservation_size - 1))
 	, m_dasm(powerpc_disassembler())
 {
+	assert(std::has_single_bit(reservation_size));
+
 	m_program_config.m_logaddr_width = 32;
 	m_program_config.m_page_shift = POWERPC_MIN_PAGE_SHIFT;
 
@@ -251,43 +263,33 @@ ppc_device::~ppc_device()
 {
 }
 
-//ppc403_device::ppc403_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-//  : ppc_device(mconfig, PPC403, "PPC403", tag, owner, clock, "ppc403", 32?, 64?)
-//{
-//}
-//
-//ppc405_device::ppc405_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-//  : ppc_device(mconfig, PPC405, "PPC405", tag, owner, clock, "ppc405", 32?, 64?)
-//{
-//}
-
 ppc603_device::ppc603_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc_device(mconfig, PPC603, tag, owner, clock, 32, 64, PPC_MODEL_603, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, address_map_constructor())
+	: ppc_device(mconfig, PPC603, tag, owner, clock, 32, 64, PPC_MODEL_603, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, address_map_constructor(), 32)
 {
 }
 
 ppc603e_device::ppc603e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc_device(mconfig, PPC603E, tag, owner, clock, 32, 64, PPC_MODEL_603E, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, address_map_constructor())
+	: ppc_device(mconfig, PPC603E, tag, owner, clock, 32, 64, PPC_MODEL_603E, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, address_map_constructor(), 32)
 {
 }
 
 ppc603r_device::ppc603r_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc_device(mconfig, PPC603R, tag, owner, clock, 32, 64, PPC_MODEL_603R, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, address_map_constructor())
+	: ppc_device(mconfig, PPC603R, tag, owner, clock, 32, 64, PPC_MODEL_603R, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, address_map_constructor(), 32)
 {
 }
 
 ppc602_device::ppc602_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc_device(mconfig, PPC602, tag, owner, clock, 32, 64, PPC_MODEL_602, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, address_map_constructor())
+	: ppc_device(mconfig, PPC602, tag, owner, clock, 32, 64, PPC_MODEL_602, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, address_map_constructor(), 32)
 {
 }
 
 mpc8240_device::mpc8240_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc_device(mconfig, MPC8240, tag, owner, clock, 32, 64, PPC_MODEL_MPC8240, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4/* unknown */, address_map_constructor())
+	: ppc_device(mconfig, MPC8240, tag, owner, clock, 32, 64, PPC_MODEL_MPC8240, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4/* unknown */, address_map_constructor(), 32)
 {
 }
 
 ppc601_device::ppc601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc_device(mconfig, PPC601, tag, owner, clock, 32, 64, PPC_MODEL_601, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_MFIOC | PPCCAP_601BAT | PPCCAP_LEGACY_POWER, 0 /* no TB */, address_map_constructor())
+	: ppc_device(mconfig, PPC601, tag, owner, clock, 32, 64, PPC_MODEL_601, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_MFIOC | PPCCAP_601BAT | PPCCAP_LEGACY_POWER, 0 /* no TB */, address_map_constructor(), 32)
 {
 }
 
@@ -298,17 +300,17 @@ std::unique_ptr<util::disasm_interface> ppc601_device::create_disassembler()
 }
 
 ppc604_device::ppc604_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc_device(mconfig, PPC604, tag, owner, clock, 32, 64, PPC_MODEL_604, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_604_MMU, 4, address_map_constructor())
+	: ppc_device(mconfig, PPC604, tag, owner, clock, 32, 64, PPC_MODEL_604, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_604_MMU, 4, address_map_constructor(), 32)
 {
 }
 
 ppc740_device::ppc740_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc_device(mconfig, PPC740, tag, owner, clock, 32, 64, PPC_MODEL_740, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_604_MMU | PPCCAP_750_TLB , 4, address_map_constructor())
+	: ppc_device(mconfig, PPC740, tag, owner, clock, 32, 64, PPC_MODEL_740, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_604_MMU | PPCCAP_750_TLB , 4, address_map_constructor(), 32)
 {
 }
 
 ppc750_device::ppc750_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc_device(mconfig, PPC750, tag, owner, clock, 32, 64, PPC_MODEL_750, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_604_MMU | PPCCAP_750_TLB, 4, address_map_constructor())
+	: ppc_device(mconfig, PPC750, tag, owner, clock, 32, 64, PPC_MODEL_750, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_604_MMU | PPCCAP_750_TLB, 4, address_map_constructor(), 32)
 {
 }
 
@@ -317,23 +319,23 @@ void ppc4xx_device::internal_ppc4xx(address_map &map)
 	map(0x40000000, 0x4000000f).rw(FUNC(ppc4xx_device::ppc4xx_spu_r), FUNC(ppc4xx_device::ppc4xx_spu_w));
 }
 
-ppc4xx_device::ppc4xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor)
-	: ppc_device(mconfig, type, tag, owner, clock, 31, 32, flavor, cap, tb_divisor, address_map_constructor(FUNC(ppc4xx_device::internal_ppc4xx), this))
+ppc4xx_device::ppc4xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor, uint32_t reservation_size)
+	: ppc_device(mconfig, type, tag, owner, clock, 31, 32, flavor, cap, tb_divisor, address_map_constructor(FUNC(ppc4xx_device::internal_ppc4xx), this), reservation_size)
 {
 }
 
 ppc403ga_device::ppc403ga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc4xx_device(mconfig, PPC403GA, tag, owner, clock, PPC_MODEL_403GA, PPCCAP_4XX, 1)
+	: ppc4xx_device(mconfig, PPC403GA, tag, owner, clock, PPC_MODEL_403GA, PPCCAP_4XX, 1, 16)
 {
 }
 
 ppc403gcx_device::ppc403gcx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc4xx_device(mconfig, PPC403GCX, tag, owner, clock, PPC_MODEL_403GCX, PPCCAP_4XX, 1)
+	: ppc4xx_device(mconfig, PPC403GCX, tag, owner, clock, PPC_MODEL_403GCX, PPCCAP_4XX, 1, 16)
 {
 }
 
 ppc405gp_device::ppc405gp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc4xx_device(mconfig, PPC405GP, tag, owner, clock, PPC_MODEL_405GP, PPCCAP_4XX | PPCCAP_VEA, 1)
+	: ppc4xx_device(mconfig, PPC405GP, tag, owner, clock, PPC_MODEL_405GP, PPCCAP_4XX | PPCCAP_VEA, 1, 32)
 {
 }
 
@@ -450,7 +452,7 @@ inline void ppc_device::set_timebase(uint64_t newtb)
     decrementer value
 -------------------------------------------------*/
 
-inline uint32_t ppc_device::get_decrementer()
+uint32_t ppc_device::get_decrementer()
 {
 	int64_t cycles_until_zero = m_dec_zero_cycles - total_cycles();
 	cycles_until_zero = std::max<int64_t>(cycles_until_zero, 0);
@@ -468,7 +470,7 @@ inline uint32_t ppc_device::get_decrementer()
     set_decrementer - set the decremeter
 -------------------------------------------------*/
 
-inline void ppc_device::set_decrementer(uint32_t newdec)
+void ppc_device::set_decrementer(uint32_t newdec)
 {
 	uint64_t cycles_until_done = ((uint64_t)newdec + 1) * m_tb_divisor;
 	uint32_t curdec = get_decrementer();
@@ -494,34 +496,26 @@ inline void ppc_device::set_decrementer(uint32_t newdec)
 }
 
 
-#if 0
 /*-------------------------------------------------
-    is_nan_double - is a double value a NaN
+    The 601's decrementer, like the 601-specific
+    RTC mechanism, counts nanoseconds, not bus
+    clocks.  This implementation allows pmac6100
+    to Gestalt itself properly (the boot ROM counts
+    decrementer ticks vs. instruction execution).
 -------------------------------------------------*/
 
-static inline int is_nan_double(double x)
+uint32_t ppc601_device::get_decrementer()
 {
-	uint64_t xi = *(uint64_t*)&x;
-	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
-			((xi & DOUBLE_FRAC) != DOUBLE_ZERO) );
+	const int64_t cycles_until_zero = (int64_t)m_dec_zero_cycles - (int64_t)total_cycles();
+	return (uint32_t)(cycles_until_zero * 1'000'000'000LL / clock());
 }
-#endif
 
-
-/*-------------------------------------------------
-    is_qnan_double - is a double value a
-    quiet NaN
--------------------------------------------------*/
-
-static inline int is_qnan_double(double x)
+void ppc601_device::set_decrementer(uint32_t newdec)
 {
-	uint64_t xi = *(uint64_t*)&x;
-	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
-			((xi & 0x0008000000000000U) == 0x0008000000000000U) );
+	m_dec_zero_cycles = total_cycles() + (uint64_t)newdec * clock() / 1'000'000'000;
 }
 
 
-#if 0
 /*-------------------------------------------------
     is_snan_double - is a double value a
     signaling NaN
@@ -533,59 +527,6 @@ static inline int is_snan_double(double x)
 	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
 			((xi & DOUBLE_FRAC) != DOUBLE_ZERO) &&
 			((xi & 0x0008000000000000U) == DOUBLE_ZERO) );
-}
-#endif
-
-
-/*-------------------------------------------------
-    is_infinity_double - is a double value
-    infinity
--------------------------------------------------*/
-
-static inline int is_infinity_double(double x)
-{
-	uint64_t xi = *(uint64_t*)&x;
-	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
-			((xi & DOUBLE_FRAC) == DOUBLE_ZERO) );
-}
-
-
-/*-------------------------------------------------
-    is_normalized_double - is a double value
-    normalized
--------------------------------------------------*/
-
-static inline int is_normalized_double(double x)
-{
-	uint64_t exp;
-	uint64_t xi = *(uint64_t*)&x;
-	exp = (xi & DOUBLE_EXP) >> 52;
-
-	return (exp >= 1) && (exp <= 2046);
-}
-
-
-/*-------------------------------------------------
-    is_denormalized_double - is a double value
-    denormalized
--------------------------------------------------*/
-
-static inline int is_denormalized_double(double x)
-{
-	uint64_t xi = *(uint64_t*)&x;
-	return( ((xi & DOUBLE_EXP) == 0) &&
-			((xi & DOUBLE_FRAC) != DOUBLE_ZERO) );
-}
-
-
-/*-------------------------------------------------
-    sign_double - return sign of a double value
--------------------------------------------------*/
-
-static inline int sign_double(double x)
-{
-	uint64_t xi = *(uint64_t*)&x;
-	return ((xi & DOUBLE_SIGN) != 0);
 }
 
 
@@ -622,9 +563,11 @@ void ppc_device::device_start()
 	memset(m_read32, 0, sizeof(m_read32));
 	memset(m_read32align, 0, sizeof(m_read32align));
 	memset(m_read32mask, 0, sizeof(m_read32mask));
+	memset(m_read32reserve, 0, sizeof(m_read32reserve));
 	memset(m_write32, 0, sizeof(m_write32));
 	memset(m_write32align, 0, sizeof(m_write32align));
 	memset(m_write32mask, 0, sizeof(m_write32mask));
+	memset(m_write32reserve, 0, sizeof(m_write32reserve));
 	memset(m_read64, 0, sizeof(m_read64));
 	memset(m_read64mask, 0, sizeof(m_read64mask));
 	memset(m_write64, 0, sizeof(m_write64));
@@ -841,6 +784,9 @@ void ppc_device::device_start()
 	save_item(NAME(m_tb_zero_cycles));
 	save_item(NAME(m_dec_zero_cycles));
 
+	save_item(NAME(m_core->reserve));
+	save_item(NAME(m_core->reserve_address));
+
 	// Register debugger state
 	state_add(PPC_PC,    "PC", m_core->pc).formatstr("%08X");
 	state_add(PPC_MSR,   "MSR", m_core->msr).formatstr("%08X");
@@ -930,6 +876,8 @@ void ppc_device::device_start()
 	m_drcuml->symbol_add(&m_cmp_cr_table, sizeof(m_cmp_cr_table), "cmp_cr_table");
 	m_drcuml->symbol_add(&m_cmpl_cr_table, sizeof(m_cmpl_cr_table), "cmpl_cr_table");
 	m_drcuml->symbol_add(&m_fcmp_cr_table, sizeof(m_fcmp_cr_table), "fcmp_cr_table");
+	m_drcuml->symbol_add(&m_core->reserve, sizeof(m_core->reserve), "reserve");
+	m_drcuml->symbol_add(&m_core->reserve_address, sizeof(m_core->reserve_address), "reserve_address");
 
 	/* initialize the front-end helper */
 	m_drcfe = std::make_unique<frontend>(*this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
@@ -999,25 +947,30 @@ void ppc_device::device_start()
 			static_generate_exception(EXCEPTION_DTLBMISSS, true,  "exception_dtlb_miss_store");
 		}
 
+		// add the shared floating-point status-flag finalizer
+		static_generate_fpscr_finish();
+
 		/* add subroutines for memory accesses */
 		for (int mode = 0; mode < 8; mode++)
 		{
-			static_generate_memory_accessor(mode, 1, false, false, "read8",       m_read8[mode],       nullptr);
-			static_generate_memory_accessor(mode, 1, true,  false, "write8",      m_write8[mode],      nullptr);
-			static_generate_memory_accessor(mode, 2, false, true,  "read16mask",  m_read16mask[mode],  nullptr);
-			static_generate_memory_accessor(mode, 2, false, false, "read16",      m_read16[mode],      m_read16mask[mode]);
-			static_generate_memory_accessor(mode, 2, true,  true,  "write16mask", m_write16mask[mode], nullptr);
-			static_generate_memory_accessor(mode, 2, true,  false, "write16",     m_write16[mode],     m_write16mask[mode]);
-			static_generate_memory_accessor(mode, 4, false, true,  "read32mask",  m_read32mask[mode],  nullptr);
-			static_generate_memory_accessor(mode, 4, false, false, "read32align", m_read32align[mode], nullptr);
-			static_generate_memory_accessor(mode, 4, false, false, "read32",      m_read32[mode],      m_read32mask[mode]);
-			static_generate_memory_accessor(mode, 4, true,  true,  "write32mask", m_write32mask[mode], nullptr);
-			static_generate_memory_accessor(mode, 4, true,  false, "write32align",m_write32align[mode],nullptr);
-			static_generate_memory_accessor(mode, 4, true,  false, "write32",     m_write32[mode],     m_write32mask[mode]);
-			static_generate_memory_accessor(mode, 8, false, true,  "read64mask",  m_read64mask[mode],  nullptr);
-			static_generate_memory_accessor(mode, 8, false, false, "read64",      m_read64[mode],      m_read64mask[mode]);
-			static_generate_memory_accessor(mode, 8, true,  true,  "write64mask", m_write64mask[mode], nullptr);
-			static_generate_memory_accessor(mode, 8, true,  false, "write64",     m_write64[mode],     m_write64mask[mode]);
+			static_generate_memory_accessor(mode, 1, false, false, false, "read8", m_read8[mode], nullptr);
+			static_generate_memory_accessor(mode, 1, true, false, false, "write8", m_write8[mode], nullptr);
+			static_generate_memory_accessor(mode, 2, false, true, false, "read16mask", m_read16mask[mode], nullptr);
+			static_generate_memory_accessor(mode, 2, false, false, false, "read16", m_read16[mode], m_read16mask[mode]);
+			static_generate_memory_accessor(mode, 2, true, true, false, "write16mask", m_write16mask[mode], nullptr);
+			static_generate_memory_accessor(mode, 2, true, false, false, "write16", m_write16[mode], m_write16mask[mode]);
+			static_generate_memory_accessor(mode, 4, false, true, false, "read32mask", m_read32mask[mode], nullptr);
+			static_generate_memory_accessor(mode, 4, false, false, false, "read32align", m_read32align[mode], nullptr);
+			static_generate_memory_accessor(mode, 4, false, false, true, "read32reserve", m_read32reserve[mode], nullptr);
+			static_generate_memory_accessor(mode, 4, false, false, false, "read32", m_read32[mode], m_read32mask[mode]);
+			static_generate_memory_accessor(mode, 4, true, true, false, "write32mask", m_write32mask[mode], nullptr);
+			static_generate_memory_accessor(mode, 4, true, false, false, "write32align", m_write32align[mode], nullptr);
+			static_generate_memory_accessor(mode, 4, true, false, true, "write32reserve", m_write32reserve[mode], nullptr);
+			static_generate_memory_accessor(mode, 4, true, false, false, "write32", m_write32[mode], m_write32mask[mode]);
+			static_generate_memory_accessor(mode, 8, false, true, false, "read64mask", m_read64mask[mode], nullptr);
+			static_generate_memory_accessor(mode, 8, false, false, false, "read64", m_read64[mode], m_read64mask[mode]);
+			static_generate_memory_accessor(mode, 8, true, true, false, "write64mask", m_write64mask[mode], nullptr);
+			static_generate_memory_accessor(mode, 8, true, false, false, "write64", m_write64[mode], m_write64mask[mode]);
 			static_generate_lsw_entries(mode);
 			static_generate_stsw_entries(mode);
 		}
@@ -2153,50 +2106,66 @@ void ppc_device::ppccom_execute_mtdcr()
 ***************************************************************************/
 
 /*-------------------------------------------------
-    ppccom_update_fprf - update the FPRF field
-    of the FPSCR register
+    ppccom_fcmp_vx - raise the invalid-operation
+    FPSCR bits for an fcmpu/fcmpo of a NaN operand
 -------------------------------------------------*/
 
-void ppc_device::ppccom_update_fprf()
+void ppc_device::ppccom_fcmp_vx()
 {
-	uint32_t fprf;
-	double f = m_core->f[m_core->param0];
+	uint32_t op = m_core->param0;
+	const double a = m_core->fpscr_op[0];
+	const double b = m_core->fpscr_op[1];
 
-	if (is_qnan_double(f))
+	uint32_t fpscr = m_core->fpscr;
+	const uint32_t oldfpscr = fpscr;
+	uint32_t newexc = 0;
+
+	const bool snan = is_snan_double(a) || is_snan_double(b);
+	const bool fcmpo = (((op >> 1) & 0x3ff) == 0x020);
+
+	if (snan)
 	{
-		fprf = 0x11;
+		newexc |= FPSCR_VXSNAN;
+		if (fcmpo && !(fpscr & FPSCR_VE))
+		{
+			newexc |= FPSCR_VXVC;
+		}
 	}
-	else if (is_infinity_double(f))
+	else if (fcmpo)
 	{
-		if (sign_double(f))     /* -Infinity */
-			fprf = 0x09;
-		else                    /* +Infinity */
-			fprf = 0x05;
+		// unordered without an SNaN case, such as QNaN
+		newexc |= FPSCR_VXVC;
 	}
-	else if (is_normalized_double(f))
+
+	fpscr |= newexc;
+	if (newexc & ~oldfpscr)
 	{
-		if (sign_double(f))     /* -Normalized */
-			fprf = 0x08;
-		else                    /* +Normalized */
-			fprf = 0x04;
+		fpscr |= FPSCR_FX;
 	}
-	else if (is_denormalized_double(f))
+
+	// now update the derived VX and FEX bits
+	if (fpscr & FPSCR_VX_ANY)
 	{
-		if (sign_double(f))     /* -Denormalized */
-			fprf = 0x18;
-		else                    /* +Denormalized */
-			fprf = 0x14;
+		fpscr |= FPSCR_VX;
 	}
 	else
 	{
-		if (sign_double(f))     /* -Zero */
-			fprf = 0x12;
-		else                    /* +Zero */
-			fprf = 0x02;
+		fpscr &= ~FPSCR_VX;
 	}
 
-	m_core->fpscr &= ~0x0001f000;
-	m_core->fpscr |= fprf << 12;
+	const bool fex = ((fpscr & FPSCR_VX) && (fpscr & FPSCR_VE)) ||
+			   ((fpscr & FPSCR_OX) && (fpscr & FPSCR_OE)) ||
+			   ((fpscr & FPSCR_UX) && (fpscr & FPSCR_UE)) ||
+			   ((fpscr & FPSCR_ZX) && (fpscr & FPSCR_ZE)) ||
+			   ((fpscr & FPSCR_XX) && (fpscr & FPSCR_XE));
+	if (fex)
+	{
+		fpscr |= FPSCR_FEX;
+	}
+	else
+	{
+		fpscr &= ~FPSCR_FEX;
+	}
 }
 
 
@@ -2209,14 +2178,14 @@ void ppc_device::ppccom_update_fprf()
     whenever a decrementer interrupt is generated
 -------------------------------------------------*/
 
-TIMER_CALLBACK_MEMBER( ppc_device::decrementer_int_callback )
+TIMER_CALLBACK_MEMBER(ppc_device::decrementer_int_callback)
 {
 	uint64_t cycles_until_next;
 
-	/* set the decrementer IRQ state */
+	// set the decrementer IRQ state
 	m_core->irq_pending |= 0x02;
 
-	/* advance by another full rev */
+	// advance by another full tick
 	m_dec_zero_cycles += (uint64_t)m_tb_divisor << 32;
 	cycles_until_next = m_dec_zero_cycles - total_cycles();
 	m_decrementer_int_timer->adjust(cycles_to_attotime(cycles_until_next));
