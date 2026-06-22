@@ -14,12 +14,12 @@ class pc8001_kbd_device : public device_t
 public:
 	pc8001_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
-
 	u8 read_direct(offs_t offset) { return m_io_keys[offset]->read() ^ 0xff; }
 
 protected:
 	pc8001_kbd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual void device_start() override { }
 	virtual void device_reset() override { }
@@ -33,6 +33,7 @@ class pc8801_kbd_device : public pc8001_kbd_device
 public:
 	pc8801_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
@@ -41,10 +42,12 @@ class pc8801fh_kbd_device : public pc8001_kbd_device
 public:
 	pc8801fh_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
-
 	int read_id_r();
 	auto read_id() { return m_read_id_cb.bind(); }
+
+protected:
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
 private:
 	devcb_read_line m_read_id_cb;
 };
@@ -55,8 +58,6 @@ class pc88va_kbd_device : public device_t
 public:
 	pc88va_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
-
 	auto irq_cb() { return m_irq_cb.bind(); }
 	u8 read_direct(offs_t offset) { return m_key_rows[offset]->read() ^ 0xff; }
 
@@ -66,6 +67,8 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual void key_make(uint8_t row, uint8_t column) override;
 	virtual void key_break(uint8_t row, uint8_t column) override;

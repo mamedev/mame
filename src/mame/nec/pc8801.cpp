@@ -1044,7 +1044,7 @@ void pc8801fh_state::main_io(address_map &map)
 	// $11, $12, $13 written to at startup, unknown purpose
 	m_setup_io_view[0](0x11, 0x11).lr8(NAME([this] (offs_t offset) {
 		// bit 7: unknown, read at startup, flips $9002 to 0x80
-		// on MC bit 7 high will disable CD-ROM, to concealing its option in setup menu.
+		// on MC bit 7 high will disable CD-ROM, concealing its option in setup menu.
 		return m_eeprom->do_read();
 	}));
 	m_setup_io_view[0](0x14, 0x14).lw8(NAME([this] (offs_t offset, u8 data) {

@@ -282,9 +282,16 @@ pc88va_kbd_device::pc88va_kbd_device(const machine_config &mconfig, const char *
 {
 }
 
+static INPUT_PORTS_START( pc88va_kbd )
+	PORT_INCLUDE( pc8801fh_kbd )
+
+	PORT_MODIFY("KEYE")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // FH identifier, assume low for this
+INPUT_PORTS_END
+
 ioport_constructor pc88va_kbd_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( pc8801fh_kbd );
+	return INPUT_PORTS_NAME( pc88va_kbd );
 }
 
 void pc88va_kbd_device::device_start()
