@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, R. Belmont
 /***************************************************************************
 
-    ppccom.c
+    ppccom.cpp
 
     Common PowerPC definitions and functions
 
@@ -19,6 +19,8 @@
 #include "endianness.h"
 
 #include <bit>
+
+#include <cstring>
 
 
 /***************************************************************************
@@ -261,16 +263,6 @@ ppc_device::~ppc_device()
 {
 }
 
-//ppc403_device::ppc403_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-//  : ppc_device(mconfig, PPC403, "PPC403", tag, owner, clock, "ppc403", 32?, 64?)
-//{
-//}
-//
-//ppc405_device::ppc405_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-//  : ppc_device(mconfig, PPC405, "PPC405", tag, owner, clock, "ppc405", 32?, 64?)
-//{
-//}
-
 ppc603_device::ppc603_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ppc_device(mconfig, PPC603, tag, owner, clock, 32, 64, PPC_MODEL_603, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, address_map_constructor(), 32)
 {
@@ -460,7 +452,7 @@ inline void ppc_device::set_timebase(uint64_t newtb)
     decrementer value
 -------------------------------------------------*/
 
-inline uint32_t ppc_device::get_decrementer()
+uint32_t ppc_device::get_decrementer()
 {
 	int64_t cycles_until_zero = m_dec_zero_cycles - total_cycles();
 	cycles_until_zero = std::max<int64_t>(cycles_until_zero, 0);
@@ -478,7 +470,7 @@ inline uint32_t ppc_device::get_decrementer()
     set_decrementer - set the decremeter
 -------------------------------------------------*/
 
-inline void ppc_device::set_decrementer(uint32_t newdec)
+void ppc_device::set_decrementer(uint32_t newdec)
 {
 	uint64_t cycles_until_done = ((uint64_t)newdec + 1) * m_tb_divisor;
 	uint32_t curdec = get_decrementer();
@@ -504,34 +496,26 @@ inline void ppc_device::set_decrementer(uint32_t newdec)
 }
 
 
-#if 0
 /*-------------------------------------------------
-    is_nan_double - is a double value a NaN
+    The 601's decrementer, like the 601-specific
+    RTC mechanism, counts nanoseconds, not bus
+    clocks.  This implementation allows pmac6100
+    to Gestalt itself properly (the boot ROM counts
+    decrementer ticks vs. instruction execution).
 -------------------------------------------------*/
 
-static inline int is_nan_double(double x)
+uint32_t ppc601_device::get_decrementer()
 {
-	uint64_t xi = *(uint64_t*)&x;
-	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
-			((xi & DOUBLE_FRAC) != DOUBLE_ZERO) );
+	const int64_t cycles_until_zero = (int64_t)m_dec_zero_cycles - (int64_t)total_cycles();
+	return (uint32_t)(cycles_until_zero * 1'000'000'000LL / clock());
 }
-#endif
 
-
-/*-------------------------------------------------
-    is_qnan_double - is a double value a
-    quiet NaN
--------------------------------------------------*/
-
-static inline int is_qnan_double(double x)
+void ppc601_device::set_decrementer(uint32_t newdec)
 {
-	uint64_t xi = *(uint64_t*)&x;
-	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
-			((xi & 0x0008000000000000U) == 0x0008000000000000U) );
+	m_dec_zero_cycles = total_cycles() + (uint64_t)newdec * clock() / 1'000'000'000;
 }
 
 
-#if 0
 /*-------------------------------------------------
     is_snan_double - is a double value a
     signaling NaN
@@ -543,59 +527,6 @@ static inline int is_snan_double(double x)
 	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
 			((xi & DOUBLE_FRAC) != DOUBLE_ZERO) &&
 			((xi & 0x0008000000000000U) == DOUBLE_ZERO) );
-}
-#endif
-
-
-/*-------------------------------------------------
-    is_infinity_double - is a double value
-    infinity
--------------------------------------------------*/
-
-static inline int is_infinity_double(double x)
-{
-	uint64_t xi = *(uint64_t*)&x;
-	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
-			((xi & DOUBLE_FRAC) == DOUBLE_ZERO) );
-}
-
-
-/*-------------------------------------------------
-    is_normalized_double - is a double value
-    normalized
--------------------------------------------------*/
-
-static inline int is_normalized_double(double x)
-{
-	uint64_t exp;
-	uint64_t xi = *(uint64_t*)&x;
-	exp = (xi & DOUBLE_EXP) >> 52;
-
-	return (exp >= 1) && (exp <= 2046);
-}
-
-
-/*-------------------------------------------------
-    is_denormalized_double - is a double value
-    denormalized
--------------------------------------------------*/
-
-static inline int is_denormalized_double(double x)
-{
-	uint64_t xi = *(uint64_t*)&x;
-	return( ((xi & DOUBLE_EXP) == 0) &&
-			((xi & DOUBLE_FRAC) != DOUBLE_ZERO) );
-}
-
-
-/*-------------------------------------------------
-    sign_double - return sign of a double value
--------------------------------------------------*/
-
-static inline int sign_double(double x)
-{
-	uint64_t xi = *(uint64_t*)&x;
-	return ((xi & DOUBLE_SIGN) != 0);
 }
 
 
@@ -1015,6 +946,9 @@ void ppc_device::device_start()
 			static_generate_exception(EXCEPTION_DTLBMISSL, true,  "exception_dtlb_miss_load");
 			static_generate_exception(EXCEPTION_DTLBMISSS, true,  "exception_dtlb_miss_store");
 		}
+
+		// add the shared floating-point status-flag finalizer
+		static_generate_fpscr_finish();
 
 		/* add subroutines for memory accesses */
 		for (int mode = 0; mode < 8; mode++)
@@ -2172,50 +2106,66 @@ void ppc_device::ppccom_execute_mtdcr()
 ***************************************************************************/
 
 /*-------------------------------------------------
-    ppccom_update_fprf - update the FPRF field
-    of the FPSCR register
+    ppccom_fcmp_vx - raise the invalid-operation
+    FPSCR bits for an fcmpu/fcmpo of a NaN operand
 -------------------------------------------------*/
 
-void ppc_device::ppccom_update_fprf()
+void ppc_device::ppccom_fcmp_vx()
 {
-	uint32_t fprf;
-	double f = m_core->f[m_core->param0];
+	uint32_t op = m_core->param0;
+	const double a = m_core->fpscr_op[0];
+	const double b = m_core->fpscr_op[1];
 
-	if (is_qnan_double(f))
+	uint32_t fpscr = m_core->fpscr;
+	const uint32_t oldfpscr = fpscr;
+	uint32_t newexc = 0;
+
+	const bool snan = is_snan_double(a) || is_snan_double(b);
+	const bool fcmpo = (((op >> 1) & 0x3ff) == 0x020);
+
+	if (snan)
 	{
-		fprf = 0x11;
+		newexc |= FPSCR_VXSNAN;
+		if (fcmpo && !(fpscr & FPSCR_VE))
+		{
+			newexc |= FPSCR_VXVC;
+		}
 	}
-	else if (is_infinity_double(f))
+	else if (fcmpo)
 	{
-		if (sign_double(f))     /* -Infinity */
-			fprf = 0x09;
-		else                    /* +Infinity */
-			fprf = 0x05;
+		// unordered without an SNaN case, such as QNaN
+		newexc |= FPSCR_VXVC;
 	}
-	else if (is_normalized_double(f))
+
+	fpscr |= newexc;
+	if (newexc & ~oldfpscr)
 	{
-		if (sign_double(f))     /* -Normalized */
-			fprf = 0x08;
-		else                    /* +Normalized */
-			fprf = 0x04;
+		fpscr |= FPSCR_FX;
 	}
-	else if (is_denormalized_double(f))
+
+	// now update the derived VX and FEX bits
+	if (fpscr & FPSCR_VX_ANY)
 	{
-		if (sign_double(f))     /* -Denormalized */
-			fprf = 0x18;
-		else                    /* +Denormalized */
-			fprf = 0x14;
+		fpscr |= FPSCR_VX;
 	}
 	else
 	{
-		if (sign_double(f))     /* -Zero */
-			fprf = 0x12;
-		else                    /* +Zero */
-			fprf = 0x02;
+		fpscr &= ~FPSCR_VX;
 	}
 
-	m_core->fpscr &= ~0x0001f000;
-	m_core->fpscr |= fprf << 12;
+	const bool fex = ((fpscr & FPSCR_VX) && (fpscr & FPSCR_VE)) ||
+			   ((fpscr & FPSCR_OX) && (fpscr & FPSCR_OE)) ||
+			   ((fpscr & FPSCR_UX) && (fpscr & FPSCR_UE)) ||
+			   ((fpscr & FPSCR_ZX) && (fpscr & FPSCR_ZE)) ||
+			   ((fpscr & FPSCR_XX) && (fpscr & FPSCR_XE));
+	if (fex)
+	{
+		fpscr |= FPSCR_FEX;
+	}
+	else
+	{
+		fpscr &= ~FPSCR_FEX;
+	}
 }
 
 
@@ -2228,14 +2178,14 @@ void ppc_device::ppccom_update_fprf()
     whenever a decrementer interrupt is generated
 -------------------------------------------------*/
 
-TIMER_CALLBACK_MEMBER( ppc_device::decrementer_int_callback )
+TIMER_CALLBACK_MEMBER(ppc_device::decrementer_int_callback)
 {
 	uint64_t cycles_until_next;
 
-	/* set the decrementer IRQ state */
+	// set the decrementer IRQ state
 	m_core->irq_pending |= 0x02;
 
-	/* advance by another full rev */
+	// advance by another full tick
 	m_dec_zero_cycles += (uint64_t)m_tb_divisor << 32;
 	cycles_until_next = m_dec_zero_cycles - total_cycles();
 	m_decrementer_int_timer->adjust(cycles_to_attotime(cycles_until_next));

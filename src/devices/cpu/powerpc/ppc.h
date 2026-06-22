@@ -139,6 +139,10 @@ enum
 	PPC_TBL,
 	PPC_TBH,
 	PPC_DEC,
+	PPC_DAR,
+	PPC_DSISR,
+	PPC_IBAT0U, PPC_IBAT0L, PPC_IBAT1U, PPC_IBAT1L,
+	PPC_IBAT2U, PPC_IBAT2L, PPC_IBAT3U, PPC_IBAT3L,
 
 	PPC_SR0,
 	PPC_SR1,
@@ -233,7 +237,7 @@ public:
 	void ppcdrc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
 	void ppcdrc_add_hotspot(offs_t pc, uint32_t opcode, uint32_t cycles);
 
-	TIMER_CALLBACK_MEMBER(decrementer_int_callback);
+	virtual TIMER_CALLBACK_MEMBER(decrementer_int_callback);
 	TIMER_CALLBACK_MEMBER(ppc4xx_buffered_dma_callback);
 	TIMER_CALLBACK_MEMBER(ppc4xx_fit_callback);
 	TIMER_CALLBACK_MEMBER(ppc4xx_pit_callback);
@@ -257,6 +261,7 @@ public:
 	void ppccom_execute_mfdcr();
 	void ppccom_execute_mtdcr();
 	void ppccom_get_dsisr();
+	void ppccom_fcmp_vx();
 
 protected:
 	// device_t implementation
@@ -345,6 +350,9 @@ protected:
 		double          fp0;                        // floating point 0
 		uint32_t        reserve;
 		uint32_t        reserve_address;
+
+		// FP save values
+		double fpscr_op[2];
 	};
 
 	internal_ppc_state *m_core;
@@ -619,6 +627,7 @@ protected:
 	uml::code_handle *   m_write64mask[8];             // write double
 	uml::code_handle *   m_exception[EXCEPTION_COUNT]; // array of exception handlers
 	uml::code_handle *   m_exception_norecover[EXCEPTION_COUNT];   // array of exception handlers
+	uml::code_handle *   m_fpscr_finish;
 
 	// fast RAM
 	// fast RAM info
@@ -661,8 +670,8 @@ protected:
 	void set_xer(uint32_t value);
 	uint64_t get_timebase();
 	void set_timebase(uint64_t newtb);
-	uint32_t get_decrementer();
-	void set_decrementer(uint32_t newdec);
+	virtual uint32_t get_decrementer();
+	virtual void set_decrementer(uint32_t newdec);
 	uint32_t ppccom_translate_address_internal(int intention, bool debug, offs_t &address);
 	void ppc4xx_set_irq_line(uint32_t bitmask, int state);
 	int ppc4xx_get_irq_line(uint32_t bitmask);
@@ -693,13 +702,15 @@ protected:
 	void static_generate_swap_tgpr();
 	void static_generate_lsw_entries(int mode);
 	void static_generate_stsw_entries(int mode);
+	void static_generate_fpscr_finish();
+	void generate_set_fmod(drcuml_block &block);
 	void generate_update_mode(drcuml_block &block);
 	void generate_update_cycles(drcuml_block &block, compiler_state *compiler, uml::parameter param, bool allow_exception);
 	void generate_checksum_block(drcuml_block &block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
 	void generate_sequence_instruction(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc);
 	void generate_compute_flags(drcuml_block &block, const opcode_desc *desc, int updatecr, uint32_t xermask, int invertcarry);
 	void generate_shift_flags(drcuml_block &block, const opcode_desc *desc, uint32_t op);
-	void generate_fp_flags(drcuml_block &block, const opcode_desc *desc, int updatefprf);
+	void generate_fp_flags(drcuml_block &block, const opcode_desc *desc);
 	void generate_branch(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc, int source, uint8_t link);
 	void generate_branch_bo(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc, uint32_t bo, uint32_t bi, int source, int link);
 	bool generate_opcode(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc);
@@ -757,6 +768,10 @@ public:
 
 protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	virtual uint32_t get_decrementer() override;
+	virtual void set_decrementer(uint32_t newdec) override;
+	virtual TIMER_CALLBACK_MEMBER(decrementer_int_callback) override;
 };
 
 
