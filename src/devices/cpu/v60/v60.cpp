@@ -94,6 +94,7 @@ v60_device::v60_device(const machine_config &mconfig, const char *tag, device_t 
 
 v60_device::v60_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int databits, int addrbits, uint32_t pir)
 	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_irq_cycle(*this, 0)
 	, m_program_config("program", ENDIANNESS_LITTLE, databits, addrbits, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 24, 0)
 	, m_start_pc(0xfffffff0)
@@ -562,7 +563,7 @@ void v60_device::stall()
 
 void v60_device::v60_do_irq(int vector)
 {
-	debugger_exception_hook(vector);
+	standard_irq_callback(vector, PC);
 	uint32_t oldPSW = v60_update_psw_for_exception(1, 0);
 
 	// Push PC and PSW onto the stack
@@ -584,7 +585,7 @@ void v60_device::v60_try_irq()
 		if(m_irq_line != ASSERT_LINE)
 			m_irq_line = CLEAR_LINE;
 
-		vector = standard_irq_callback(0, PC);
+		vector = m_irq_cycle();
 
 		v60_do_irq(vector + 0x40);
 	}

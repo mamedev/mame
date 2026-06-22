@@ -5,7 +5,6 @@
 
 #pragma once
 
-
 enum
 {
 	V60_R0 = 1,
@@ -88,6 +87,8 @@ public:
 
 	void stall();
 
+	auto irq_cycle_callback() { return m_irq_cycle.bind(); }
+
 protected:
 	v60_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int databits, int addrbits, uint32_t pir);
 
@@ -147,6 +148,8 @@ private:
 	static const am_func s_Op58Table[32];
 	static const am_func s_Op5ATable[32];
 	static const am_func s_OpCodeTable[256];
+
+	devcb_read8 m_irq_cycle;
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
@@ -790,4 +793,4 @@ public:
 DECLARE_DEVICE_TYPE(V60, v60_device)
 DECLARE_DEVICE_TYPE(V70, v70_device)
 
-#endif // MAME_CPU_V60_V60_H
+#endif

@@ -696,7 +696,7 @@ void segas32_state::signal_v60_irq(int which)
 }
 
 
-IRQ_CALLBACK_MEMBER(segas32_state::irq_callback)
+u8 segas32_state::irq_callback()
 {
 	const uint8_t effirq = m_v60_irq_control[7] & ~m_v60_irq_control[6] & 0x1f;
 	for (int vector = 0; vector < 5; vector++)
@@ -2252,7 +2252,7 @@ void segas32_state::device_add_mconfig(machine_config &config)
 
 	/* basic machine hardware */
 	V60(config, m_maincpu, MAIN_CLOCK/2);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(segas32_state::irq_callback));
+	m_maincpu->irq_cycle_callback().set(FUNC(segas32_state::irq_callback));
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas32_state::system32_map);
 	m_maincpu->set_vblank_int("screen", FUNC(segas32_state::start_of_vblank_int));
 
@@ -2552,7 +2552,7 @@ void sega_multi32_state::device_add_mconfig(machine_config &config)
 
 	/* basic machine hardware */
 	V70(config, m_maincpu, MULTI32_CLOCK/2);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(sega_multi32_state::irq_callback));
+	m_maincpu->irq_cycle_callback().set(FUNC(sega_multi32_state::irq_callback));
 	m_maincpu->set_addrmap(AS_PROGRAM, &sega_multi32_state::multi32_map);
 	m_maincpu->set_vblank_int("screen", FUNC(segas32_state::start_of_vblank_int));
 
