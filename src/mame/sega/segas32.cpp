@@ -683,32 +683,27 @@ void segas32_state::device_reset()
 void segas32_state::update_irq_state()
 {
 	const uint8_t effirq = m_v60_irq_control[7] & ~m_v60_irq_control[6] & 0x1f;
-	int vector;
-
-	/* loop over interrupt vectors, finding the highest priority one with */
-	/* an unmasked interrupt pending */
-	for (vector = 0; vector < 5; vector++)
-		if (BIT(effirq, vector))
-		{
-			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, vector); // V60
-			break;
-		}
-
-	/* if we didn't find any, clear the interrupt line */
-	if (vector == 5)
-		m_maincpu->set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, effirq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 void segas32_state::signal_v60_irq(int which)
 {
-	/* see if this interrupt input is mapped to any vectors; if so, mark them */
-	for (int i = 0; i < 5; i++)
-		if (m_v60_irq_control[i] == which)
-			m_v60_irq_control[7] |= 1 << i;
+	/* mark this source as pending */
+	if (which >= 0 && which < 5)
+		m_v60_irq_control[7] |= 1 << which;
 	update_irq_state();
 }
 
+
+IRQ_CALLBACK_MEMBER(segas32_state::irq_callback)
+{
+	const uint8_t effirq = m_v60_irq_control[7] & ~m_v60_irq_control[6] & 0x1f;
+	for (int vector = 0; vector < 5; vector++)
+		if (BIT(effirq, vector))
+			return m_v60_irq_control[vector];
+	return 0;
+}
 
 TIMER_DEVICE_CALLBACK_MEMBER(segas32_state::signal_v60_irq_callback)
 {
@@ -2257,6 +2252,7 @@ void segas32_state::device_add_mconfig(machine_config &config)
 
 	/* basic machine hardware */
 	V60(config, m_maincpu, MAIN_CLOCK/2);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(segas32_state::irq_callback));
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas32_state::system32_map);
 	m_maincpu->set_vblank_int("screen", FUNC(segas32_state::start_of_vblank_int));
 
@@ -2556,6 +2552,7 @@ void sega_multi32_state::device_add_mconfig(machine_config &config)
 
 	/* basic machine hardware */
 	V70(config, m_maincpu, MULTI32_CLOCK/2);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(sega_multi32_state::irq_callback));
 	m_maincpu->set_addrmap(AS_PROGRAM, &sega_multi32_state::multi32_map);
 	m_maincpu->set_vblank_int("screen", FUNC(segas32_state::start_of_vblank_int));
 

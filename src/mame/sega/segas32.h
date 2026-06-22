@@ -158,6 +158,7 @@ protected:
 	void mix_all_layers(int which, int xoffs, bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t enablemask);
 	void print_mixer_data(int which);
 	uint32_t multi32_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index);
+	IRQ_CALLBACK_MEMBER(irq_callback);
 	void update_irq_state();
 	void signal_v60_irq(int which);
 	void update_sound_irq_state();
