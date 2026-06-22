@@ -51,7 +51,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<f8_cpu_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<3> m_inputs;
@@ -216,9 +216,9 @@ void teammate_state::teammate(machine_config &config)
 	F8(config, m_maincpu, 3'600'000/2); // R/C osc, approximation
 	m_maincpu->set_addrmap(AS_PROGRAM, &teammate_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &teammate_state::main_io);
-	m_maincpu->set_irq_acknowledge_callback("psu", FUNC(f38t56_device::int_acknowledge));
 
 	f38t56_device &psu(F38T56(config, "psu", 3'600'000/2));
+	m_maincpu->int_cycle_callback().set(psu, FUNC(f38t56_device::int_acknowledge));
 	psu.set_int_vector(0x20);
 	psu.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 	psu.read_a().set(FUNC(teammate_state::input_r));

@@ -47,7 +47,7 @@ f3853_device::f3853_device(const machine_config &mconfig, device_type type, cons
 	device_t(mconfig, type, tag, owner, clock),
 	m_int_req_callback(*this),
 	m_pri_out_callback(*this), // TODO: not implemented
-	m_int_daisy_chain_callback(*this),
+	m_int_daisy_chain_callback(*this, 0),
 	m_int_vector(0),
 	m_prescaler(31),
 	m_priority_line(false),
@@ -85,11 +85,6 @@ f38t56_device::f38t56_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 //  initialisation
 //-------------------------------------------------
-
-void f3853_device::device_resolve_objects()
-{
-	m_int_daisy_chain_callback.resolve();
-}
 
 void f3853_device::device_start()
 {
@@ -151,7 +146,7 @@ void f3853_device::set_interrupt_request_line()
 	m_int_req_callback(m_request_flipflop && !m_priority_line ? ASSERT_LINE : CLEAR_LINE);
 }
 
-IRQ_CALLBACK_MEMBER(f3853_device::int_acknowledge)
+u16 f3853_device::int_acknowledge()
 {
 	if (m_external_int_enable && !m_priority_line && m_request_flipflop)
 	{
@@ -165,8 +160,8 @@ IRQ_CALLBACK_MEMBER(f3853_device::int_acknowledge)
 		set_interrupt_request_line();
 		return timer_interrupt_vector();
 	}
-	else if (!m_int_daisy_chain_callback.isnull())
-		return m_int_daisy_chain_callback(device, irqline);
+	else if (!m_int_daisy_chain_callback.isunset())
+		return m_int_daisy_chain_callback();
 	else
 	{
 		// should never happen

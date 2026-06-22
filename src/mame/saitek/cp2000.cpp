@@ -62,7 +62,7 @@ protected:
 
 private:
 	// devices/pointers
-	required_device<cpu_device> m_maincpu;
+	required_device<f8_cpu_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
 	required_device<sensorboard_device> m_board;
 	required_device<dac_1bit_device> m_dac;
@@ -208,9 +208,9 @@ void cp2000_state::cp2000(machine_config &config)
 	F8(config, m_maincpu, 2'750'000); // see driver notes
 	m_maincpu->set_addrmap(AS_PROGRAM, &cp2000_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &cp2000_state::main_io);
-	m_maincpu->set_irq_acknowledge_callback("f3853", FUNC(f3853_device::int_acknowledge));
 
 	f3853_device &f3853(F3853(config, "f3853", 2'750'000));
+	m_maincpu->int_cycle_callback().set(f3853, FUNC(f3853_device::int_acknowledge));
 	f3853.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
