@@ -424,7 +424,7 @@ void edsp_device::execute_run()
 			}
 			else if ((op & 0xf8ff) == 0x3817)
 			{
-				// RPT
+				// RPT Rn
 				m_rcr = m_r[BIT(op, 8, 3)];
 				m_icount -= 1;
 			}
@@ -448,6 +448,12 @@ void edsp_device::execute_run()
 				m_sp--;
 				m_pc = addr;
 				m_icount -= 2;
+			}
+			else if ((op & 0xf81f) == 0x381f)
+			{
+				// RPT #imm6
+				m_rcr = BIT(op, 5, 6);
+				m_icount -= 1;
 			}
 			else if (op == 0x383a)
 			{
@@ -507,6 +513,13 @@ void edsp_device::execute_run()
 				m_r[BIT(op, 5, 3)]--;
 				m_r[BIT(op, 8, 3)] = data;
 				m_icount -= 1;
+			}
+			else if ((op & 0xf81f) == 0x5808)
+			{
+				// ASR
+				const u16 s = m_r[BIT(op, 5, 3)];
+				m_r[BIT(op, 8, 3)] = s16(s) >> 1;
+				m_sr = (m_sr & 0xfff0) | (s16(s) < 0 ? 0x0008 : 0) | (s16(s) >> 1 ? 0 : 0x0004) | (BIT(s, 0) ? 0x0001 : 0);
 			}
 			else if ((op & 0xf81f) == 0x5809)
 			{

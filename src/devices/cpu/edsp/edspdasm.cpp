@@ -305,8 +305,8 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 //  else if (op == 0x381e) - used very rarely
 	else if ((op & 0xf81f) == 0x381f)
 	{
-		// possibly rotate instead of logical or arithmetic shift? combined shift with r1?
-		util::stream_format(stream, "r0 = r0 SHR #%d", BIT(op, 5, 6) + 1);
+		// Repeat next instruction (#imm6+1) times
+		util::stream_format(stream, "rpt #%d", BIT(op, 5, 6));
 		return 1 | SUPPORTED;
 	}
 	else if ((op & 0xf818) == 0x4000)
@@ -371,7 +371,7 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 	}
 	else if ((op & 0xf81f) == 0x5808)
 	{
-		util::stream_format(stream, "r%d = OP58 r%d", BIT(op, 8, 3), BIT(op, 5, 3));
+		util::stream_format(stream, "r%d = ASR r%d", BIT(op, 8, 3), BIT(op, 5, 3));
 		return 1 | SUPPORTED;
 	}
 	else if ((op & 0xf81f) == 0x5809)
@@ -397,8 +397,8 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 	}
 	else if ((op & 0xf81f) == 0x580e)
 	{
-		// shift direction unclear (SHR or ASR?)
-		util::stream_format(stream, "r%d = ASR r%d", BIT(op, 8, 3), BIT(op, 5, 3));
+		// shift direction unclear
+		util::stream_format(stream, "r%d = ROL r%d", BIT(op, 8, 3), BIT(op, 5, 3));
 		return 1 | SUPPORTED;
 	}
 	else if ((op & 0xf81f) == 0x580f)
