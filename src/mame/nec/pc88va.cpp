@@ -602,9 +602,11 @@ void pc88va_state::io_map(address_map &map)
 	map(0x0100, 0x0101).rw(FUNC(pc88va_state::screen_ctrl_r), FUNC(pc88va_state::screen_ctrl_w)); // Screen Control Register
 	map(0x0102, 0x0103).rw(FUNC(pc88va_state::gfx_ctrl_r), FUNC(pc88va_state::gfx_ctrl_w));
 	map(0x0106, 0x0109).w(FUNC(pc88va_state::video_pri_w)); // Palette Control Register (priority) / Direct Color Control Register (priority)
-//  map(0x010a, 0x010b) Picture Mask Mode Register
-	map(0x010c, 0x010d).w(FUNC(pc88va_state::color_mode_w)); // Color Palette Mode Register
+	map(0x010a, 0x010b).w(FUNC(pc88va_state::picture_mask_mode_w));
+	map(0x010c, 0x010d).w(FUNC(pc88va_state::color_mode_w));
 	map(0x010e, 0x010f).w(FUNC(pc88va_state::backdrop_color_w));
+	map(0x0110, 0x0110).w(FUNC(pc88va_state::plain_mask_w));
+	map(0x0111, 0x0111).w(FUNC(pc88va_state::color_code_w));
 //  map(0x0110, 0x0111) Color Code/Plain Mask Register
 //  map(0x0124, 0x0125) ? (related to Transparent Color of Graphic Screen 0)
 //  map(0x0126, 0x0127) ? (related to Transparent Color of Graphic Screen 1)
