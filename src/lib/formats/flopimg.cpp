@@ -2004,8 +2004,13 @@ void floppy_image_format_t::build_pc_track_mfm(int track, int head, floppy_image
 				mfm_w(track_data, 8, 0xe5);
 			crc = calc_crc_ccitt(track_data, cpos, track_data.size());
 			mfm_w(track_data, 16, crc);
-			for (size_t j = data_cpos; j < track_data.size(); j++)
-				track_data[j] = (track_data[j] & floppy_image::TIME_MASK) | floppy_image::MG_N;
+			// Encode the weak data+CRC area as a single MG_N span.
+			// generate_track_from_levels will emit (MG_N, start)(MG_E, end).
+			size_t weak_end = track_data.size();
+			track_data[data_cpos] = (track_data[data_cpos] & floppy_image::TIME_MASK) | floppy_image::MG_N;
+			track_data[weak_end - 1] = (track_data[weak_end - 1] & floppy_image::TIME_MASK) | floppy_image::MG_E;
+			for (size_t j = data_cpos + 1; j < weak_end - 1; j++)
+				track_data[j] = (track_data[j] & floppy_image::TIME_MASK) | MG_0;
 			// Gap 3 between sectors
 			if (i != sector_count - 1)
 				for (int j = 0; j < gap_3; j++) mfm_w(track_data, 8, 0x4e);
@@ -2025,13 +2030,18 @@ void floppy_image_format_t::build_pc_track_mfm(int track, int head, floppy_image
 					mfm_w(track_data, 8, sects[i].data[j]);
 				crc = calc_crc_ccitt(track_data, cpos, track_data.size());
 				mfm_w(track_data, 16, crc);
-				// Corrupt bytes 256+ to MG_D.  Speedlock compares
-				// successive sector reads at byte position 256+;
+				// Encode bytes 256+ as a single MG_D span.  Speedlock
+				// compares successive reads at byte position 256+;
 				// per-revolution randomness makes them differ naturally.
 				size_t weak_start = data_cpos + 256 * 16;
-				if (weak_start < track_data.size())
-					for (size_t j = weak_start; j < track_data.size(); j++)
-						track_data[j] = (track_data[j] & floppy_image::TIME_MASK) | floppy_image::MG_D;
+				size_t weak_end = track_data.size();
+				if (weak_start < weak_end)
+				{
+					track_data[weak_start] = (track_data[weak_start] & floppy_image::TIME_MASK) | floppy_image::MG_D;
+					track_data[weak_end - 1] = (track_data[weak_end - 1] & floppy_image::TIME_MASK) | floppy_image::MG_E;
+					for (size_t j = weak_start + 1; j < weak_end - 1; j++)
+						track_data[j] = (track_data[j] & floppy_image::TIME_MASK) | MG_0;
+				}
 			}
 			else
 			{

@@ -1078,26 +1078,6 @@ void floppy_image_device::cache_fill_index(const std::vector<uint32_t> &buf, int
 		base += m_rev_time;
 	}
 
-	// For weak entries (MG_D or MG_N), skip consecutive weak entries so
-	// the cache sees a single long zone rather than many tiny ones.
-	// The guard (index != m_cache_index) prevents an infinite loop on
-	// fully non-formatted tracks where every entry is weak.
-	u32 type = m_cache_entry & floppy_image::MG_MASK;
-	if(type == floppy_image::MG_D || type == floppy_image::MG_N)
-	{
-		while(index != m_cache_index)
-		{
-			u32 nt = buf[index] & floppy_image::MG_MASK;
-			if(nt != floppy_image::MG_D && nt != floppy_image::MG_N)
-				break;
-			index ++;
-			if(index >= cells) {
-				index = 0;
-				base += m_rev_time;
-			}
-		}
-	}
-
 	m_cache_end_time = position_to_time(base, buf[index] & floppy_image::TIME_MASK);
 }
 
