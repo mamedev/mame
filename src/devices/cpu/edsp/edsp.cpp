@@ -370,7 +370,7 @@ void edsp_device::execute_run()
 				}
 
 				if (BIT(op, 3, 2) == 1)
-					m_data.write_word(BIT(op, 8, 3), d);
+					m_data.write_word(m_r[BIT(op, 8, 3)], d);
 				else
 					m_r[BIT(op, 8, 3)] = d;
 				m_icount -= 1;
