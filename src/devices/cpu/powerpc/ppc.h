@@ -771,7 +771,7 @@ protected:
 
 	virtual uint32_t get_decrementer() override;
 	virtual void set_decrementer(uint32_t newdec) override;
-	virtual TIMER_CALLBACK_MEMBER(decrementer_int_callback) override;
+	//	virtual TIMER_CALLBACK_MEMBER(decrementer_int_callback) override;
 };
 
 
