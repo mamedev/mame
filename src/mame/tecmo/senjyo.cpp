@@ -1378,6 +1378,46 @@ ROM_START( baluba )
 	ROM_LOAD( "07b.bin", 0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) ) // waveform
 ROM_END
 
+ROM_START( balubab )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "3.bin",  0x0000, 0x4000, CRC(0e2ebe32) SHA1(d5cac260b19dc4e8d2064a7e3de5d52ab0eb95d0) )
+	ROM_LOAD( "2.bin",  0x4000, 0x4000, CRC(cde97076) SHA1(ef47851b2ed0d820e1564545795b707d00d5c6ce) )
+
+	ROM_REGION( 0x2000, "sub", 0 )
+	ROM_LOAD( "1.bin",  0x0000, 0x2000, CRC(a13c1a95) SHA1(f83018dd21a70491a1af1060229df8c0a0f519a2) )
+
+	ROM_REGION( 0x03000, "fgtiles", 0 )
+	ROM_LOAD( "16.bin", 0x00000, 0x1000, CRC(3dda0d84) SHA1(473c307c157bb229a31cd82ce4cdeca1ff604019) )
+	ROM_LOAD( "17.bin", 0x01000, 0x1000, CRC(3ebc79d8) SHA1(a29b4e314446821cd4a2b1a9d3ff16ee3b6a8f7a) )
+	ROM_LOAD( "18.bin", 0x02000, 0x1000, CRC(c4430deb) SHA1(e4c18ff2e2c82f3bce346267bc86d4160cb11995) )
+
+	ROM_REGION( 0x06000, "bgtiles1", 0 )
+	ROM_LOAD( "12.bin", 0x00000, 0x2000, CRC(90f88c43) SHA1(e4ea963d9c31e34f70aa2b710760e0a102567988) )
+	ROM_LOAD( "11.bin", 0x02000, 0x2000, CRC(ab117070) SHA1(d9a8580f3b0919208801b00501579cf81665fc36) )
+	ROM_LOAD( "10.bin", 0x04000, 0x2000, CRC(e13b44b0) SHA1(70f3d2465a7652405e23809c81d7ec6ec501835b) )
+
+	ROM_REGION( 0x06000, "bgtiles2", 0 )
+	ROM_LOAD( "15.bin", 0x00000, 0x2000, CRC(a6541c8d) SHA1(d7a211c58c2067f257f5a9e343ca4bf689edd514) )
+	ROM_LOAD( "14.bin", 0x02000, 0x2000, CRC(afccdd18) SHA1(d238b52a9bb2dfffaf82ca38bc81c0cbd256f79c) )
+	ROM_LOAD( "13.bin", 0x04000, 0x2000, CRC(69542e65) SHA1(4119a6f784ed57592d45d325123b261c8f118ca7) )
+
+	ROM_REGION( 0x03000, "bgtiles3", 0 )
+	ROM_LOAD( "8.bin",  0x00000, 0x1000, CRC(96f36428) SHA1(6303066ac6f913e745e63109317ed71c2a4d9aec) )
+    ROM_IGNORE(0x1000)
+	ROM_LOAD( "7.bin",  0x01000, 0x1000, CRC(c2c89e2b) SHA1(4882f700cfcf37a9b3eebc6e22d9d70e49cb26b6) )
+	ROM_IGNORE(0x1000)
+	ROM_LOAD( "9.bin",  0x02000, 0x1000, CRC(93890ac1) SHA1(c90b828ef83220ab1d5cbbbc3de6562753fecb82) )
+	ROM_IGNORE(0x1000)
+
+	ROM_REGION( 0x0c000, "sprites", 0 )
+	ROM_LOAD( "6.bin",  0x00000, 0x4000, CRC(3b6b6e96) SHA1(c55f4b6a5f7738a082c02d1adadd9e1d68a0d293) )
+	ROM_LOAD( "5.bin",  0x04000, 0x4000, CRC(dd954124) SHA1(f37687197d1564331dc27dace23dec462d02202c) )
+	ROM_LOAD( "4.bin",  0x08000, 0x4000, CRC(7ac24983) SHA1(4ac32d95af3147af5b9b1af1f292bb629c5d4fb9) )
+
+	ROM_REGION( 0x0020, "dac", 0 )
+	ROM_LOAD( "07b.bin", 0x0000, 0x0020, BAD_DUMP CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) ) // Not dumped on this set
+ROM_END
+
 
 void senjyo_state::init_starforc()
 {
@@ -1406,11 +1446,12 @@ void senjyo_state::init_senjyo()
 } // anonymous namespace
 
 
-GAME( 1983, senjyo,    0,        senjyo,    senjyo,   senjyo_state, init_senjyo,   ROT90, "Tehkan",                      "Senjyo",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1984, starforc,  0,        senjyo,    starforc, senjyo_state, init_starforc, ROT90, "Tehkan",                      "Star Force",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1984, starforce, starforc, senjyox_e, starforc, senjyo_state, init_starfore, ROT90, "Tehkan",                      "Star Force (encrypted, set 1)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1984, starforcb, starforc, starforb,  starforc, senjyo_state, init_starfore, ROT90, "bootleg",                     "Star Force (encrypted, bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, starforca, starforc, senjyox_a, starforc, senjyo_state, init_starfora, ROT90, "Tehkan",                      "Star Force (encrypted, set 2)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1984, megaforc,  starforc, senjyo,    starforc, senjyo_state, init_starforc, ROT90, "Tehkan",                      "Mega Force (World)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1985, megaforcu, starforc, senjyo,    starforc, senjyo_state, init_starforc, ROT90, "Tehkan (Video Ware license)", "Mega Force (US)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1986, baluba,    0,        senjyo,    baluba,   senjyo_state, init_starforc, ROT90, "Able Corp, Ltd.",             "Baluba-louk no Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, senjyo,    0,        senjyo,    senjyo,   senjyo_state, init_senjyo,   ROT90, "Tehkan",                      "Senjyo",                                   MACHINE_SUPPORTS_SAVE )
+GAME( 1984, starforc,  0,        senjyo,    starforc, senjyo_state, init_starforc, ROT90, "Tehkan",                      "Star Force",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1984, starforce, starforc, senjyox_e, starforc, senjyo_state, init_starfore, ROT90, "Tehkan",                      "Star Force (encrypted, set 1)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1984, starforcb, starforc, starforb,  starforc, senjyo_state, init_starfore, ROT90, "bootleg",                     "Star Force (encrypted, bootleg)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1984, starforca, starforc, senjyox_a, starforc, senjyo_state, init_starfora, ROT90, "Tehkan",                      "Star Force (encrypted, set 2)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1984, megaforc,  starforc, senjyo,    starforc, senjyo_state, init_starforc, ROT90, "Tehkan",                      "Mega Force (World)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, megaforcu, starforc, senjyo,    starforc, senjyo_state, init_starforc, ROT90, "Tehkan (Video Ware license)", "Mega Force (US)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1986, baluba,    0,        senjyo,    baluba,   senjyo_state, init_starforc, ROT90, "Able Corp, Ltd.",             "Baluba-louk no Densetsu (Japan)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1986, balubab,   baluba,   senjyo,    baluba,   senjyo_state, init_starforc, ROT90, "bootleg",                     "Baluba-louk no Densetsu (bootleg, Japan)", MACHINE_SUPPORTS_SAVE )
