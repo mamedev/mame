@@ -946,17 +946,6 @@ void floppy_image_format_t::generate_track_from_levels(int track, int head, cons
 		total_time += time;
 	}
 
-	// Merge consecutive MG_D zones so the weak-zone cache sees a single
-	// long zone instead of many tiny ones (each cell is < 16us threshold).
-	for (size_t j = 1; j < dest.size(); )
-	{
-		if ((dest[j] & floppy_image::MG_MASK) == floppy_image::MG_D
-			&& (dest[j - 1] & floppy_image::MG_MASK) == floppy_image::MG_D)
-			dest.erase(dest.begin() + j);
-		else
-			j++;
-	}
-
 	normalize_times(dest, total_time);
 	image.set_write_splice_position(track, head, splice_angular_pos);
 }
@@ -2003,7 +1992,7 @@ void floppy_image_format_t::build_pc_track_mfm(int track, int head, floppy_image
 		if (!sects[i].data)
 		{
 			// No Data sector: unformatted data area.  Emit a valid DAM
-			// so the FDC can find it, then generate MG_D for the data
+			// so the FDC can find it, then generate MG_N for the data
 			// and CRC area.  The floppy device's weak-zone cache produces
 			// random transitions on each revolution.
 			for (int j = 0; j < 12; j++) mfm_w(track_data, 8, 0x00);
@@ -2016,7 +2005,7 @@ void floppy_image_format_t::build_pc_track_mfm(int track, int head, floppy_image
 			crc = calc_crc_ccitt(track_data, cpos, track_data.size());
 			mfm_w(track_data, 16, crc);
 			for (size_t j = data_cpos; j < track_data.size(); j++)
-				track_data[j] = (track_data[j] & floppy_image::TIME_MASK) | floppy_image::MG_D;
+				track_data[j] = (track_data[j] & floppy_image::TIME_MASK) | floppy_image::MG_N;
 			// Gap 3 between sectors
 			if (i != sector_count - 1)
 				for (int j = 0; j < gap_3; j++) mfm_w(track_data, 8, 0x4e);
@@ -2038,8 +2027,7 @@ void floppy_image_format_t::build_pc_track_mfm(int track, int head, floppy_image
 				mfm_w(track_data, 16, crc);
 				// Corrupt bytes 256+ to MG_D.  Speedlock compares
 				// successive sector reads at byte position 256+;
-				// per-revolution MG_D randomness makes them differ
-				// naturally.  Bytes 0-255 stay as normal MFM data.
+				// per-revolution randomness makes them differ naturally.
 				size_t weak_start = data_cpos + 256 * 16;
 				if (weak_start < track_data.size())
 					for (size_t j = weak_start; j < track_data.size(); j++)
@@ -2052,7 +2040,7 @@ void floppy_image_format_t::build_pc_track_mfm(int track, int head, floppy_image
 				crc = calc_crc_ccitt(track_data, cpos, track_data.size());
 				mfm_w(track_data, 16, crc);
 			}
-			// Gap 3 between sectors (only for sectors with data)
+			// Gap 3 between sectors
 			if (i != sector_count - 1)
 				for (int j = 0; j < gap_3; j++) mfm_w(track_data, 8, 0x4e);
 		}
