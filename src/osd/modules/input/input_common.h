@@ -43,10 +43,6 @@ enum
 };
 
 #define MAX_KEYS            256
-#define MAX_AXES            32
-#define MAX_BUTTONS         32
-#define MAX_HATS            8
-#define MAX_POV             4
 
 
 //============================================================

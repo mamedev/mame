@@ -669,6 +669,8 @@ public:
 	}
 
 protected:
+	static constexpr unsigned MAX_BUTTONS = 32;
+
 	// state information for a mouse
 	struct mouse_state
 	{
@@ -1029,6 +1031,10 @@ private:
 class sdl_joystick_device : public sdl_joystick_device_base
 {
 public:
+	static constexpr unsigned MAX_AXES = 32;
+	static constexpr unsigned MAX_BUTTONS = 128;
+	static constexpr unsigned MAX_HATS = 8;
+
 	sdl_joystick_device(
 			std::string &&name,
 			std::string &&id,
@@ -2481,8 +2487,8 @@ protected:
 				SDL_JoystickNumButtons(joy),
 				SDL_JoystickNumHats(joy),
 				SDL_JoystickNumBalls(joy));
-		if (SDL_JoystickNumButtons(joy) > MAX_BUTTONS)
-			osd_printf_verbose("Joystick:   ...  Has %d buttons which exceeds supported %d buttons\n", SDL_JoystickNumButtons(joy), MAX_BUTTONS);
+		if (SDL_JoystickNumButtons(joy) > sdl_joystick_device::MAX_BUTTONS)
+			osd_printf_verbose("Joystick:   ...  Has %d buttons which exceeds supported %d buttons\n", SDL_JoystickNumButtons(joy), sdl_joystick_device::MAX_BUTTONS);
 
 		// instantiate device
 		sdl_joystick_device &devinfo = sixaxis
