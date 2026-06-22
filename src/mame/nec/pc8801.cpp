@@ -31,13 +31,11 @@ TODO:
 - Pinpoint number of EXPansion slots for each machine (currently hardwired to 1),
   guessing from the back panels seems that each model can install between 1 to 3 cards.
   Also note: most cards aren't bus compatible between each other;
-- pc8801mc: add setup mode support
-  \- uses an incompatible backup method than FH+ (MEMSW at $e000, copied at $9000), prints a lengthy
-     "backup failure" message at cold boots, $f2 bit 0 looks a view overlay;
-  \- writable CPU clock select at $6f (actually clears bit 4 in place of 0);
-  \- cannot bring setup menu (table scan at PC=0x335, result at PC=d0 A=1)
-  \- check for $9014 to be high otherwise refuses to initialize CD system
-     (side effect of default with CD boot disabled in MEMSW);
+- pc8801mc: several setup mode unknowns:
+  \- tries to clear $6f CPU clock select bit 4, halts CPU?
+  \- only PC=0x00d0 A=1 branch is checked. A=2 and A=4 clears MEMSW, A=5 unknown;
+  \- V1 mode is currently non-functional (boots in V2 even if V1S/V1H is selected);
+  \- EEPROM needs removing;
 
 Notes:
 - Later models have washed out palette with some SWs, with no red component.
@@ -803,6 +801,71 @@ template <unsigned kanji_level> void pc8801_state::kanji_w(offs_t offset, uint8_
 	// https://retrocomputerpeople.web.fc2.com/machines/nec/8801/io_map88.html
 }
 
+void pc8801_state::main_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x0f).r("kbd", FUNC(pc8001_kbd_device::read_direct));
+	map(0x10, 0x10).w(FUNC(pc8801_state::port10_w));
+	map(0x20, 0x21).mirror(0x0e).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write)); // CMT / RS-232C ch. 0
+	map(0x30, 0x30).portr("DSW1").w(FUNC(pc8801_state::port30_w));
+	map(0x31, 0x31).portr("DSW2").w(FUNC(pc8801_state::port31_w));
+	map(0x32, 0x32).rw(FUNC(pc8801_state::misc_ctrl_r), FUNC(pc8801_state::misc_ctrl_w));
+	// NOTE: anything after 0x32 reads 0xff on a PC8801MA real HW test
+//  map(0x33, 0x33) PC8001mkIISR port, mirror on PC8801?
+//  map(0x34, 0x35) ALU regs, unmapped on regular
+//  map(0x35, 0x35).r <unknown>, accessed by cancanb during OP, mistake? Mirror for intended HW?
+	map(0x40, 0x40).rw(FUNC(pc8801_state::port40_r), FUNC(pc8801_state::port40_w));
+//  map(0x44, 0x47).rw internal OPN/OPNA sound card for 8801mkIISR and beyond
+//  uPD3301
+	map(0x50, 0x51).rw(m_crtc, FUNC(upd3301_device::read), FUNC(upd3301_device::write));
+
+	map(0x52, 0x52).w(FUNC(pc8801_state::bgpal_w));
+	map(0x53, 0x53).w(FUNC(pc8801_state::layer_masking_w));
+	map(0x54, 0x5b).w(FUNC(pc8801_state::palram_w));
+	map(0x5c, 0x5c).r(FUNC(pc8801_state::vram_select_r));
+	map(0x5c, 0x5f).w(FUNC(pc8801_state::vram_select_w));
+//  i8257
+	map(0x60, 0x68).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write));
+
+//  map(0x6e, 0x6f) clock settings (8801FH and later)
+	map(0x70, 0x70).rw(FUNC(pc8801_state::window_bank_r), FUNC(pc8801_state::window_bank_w));
+	map(0x71, 0x71).rw(FUNC(pc8801_state::ext_rom_bank_r), FUNC(pc8801_state::ext_rom_bank_w));
+	map(0x78, 0x78).w(FUNC(pc8801_state::window_bank_inc_w));
+//  map(0x82, 0x82).w access window for PC8801-16
+//  map(0x8e, 0x8e).r <unknown>, accessed by scruiser on boot (a board ID?)
+//  map(0x90, 0x9f) PC-8801-31 CD-ROM i/f (8801MC)
+//  map(0xa0, 0xa3) GSX-8800 or network board
+//  map(0xa8, 0xad).rw expansion OPN (Sound Board) or OPNA (Sound Board II)
+//  map(0xb0, 0xb3) General Purpose I/O
+//  map(0xb4, 0xb4) PC-8801-17 Video art board
+//  map(0xb5, 0xb5) PC-8801-18 Video digitizing unit
+//  map(0xbc, 0xbf) External mini floppy disk I/F (i8255), PC-8801-13 / -20 / -22
+//  map(0xc0, 0xc3) USART RS-232C ch. 1 / ch. 2
+//  map(0xc4, 0xc7) PC-8801-10 Music interface board (MIDI), GSX-8800 PIT?
+//  map(0xc8, 0xc8) RS-232C ch. 1 "prohibited gate" (?)
+//  map(0xca, 0xca) RS-232C ch. 2 "prohibited gate" (?)
+//  map(0xc8, 0xcd) JMB-X1 OPM / SSG chips
+//  map(0xd0, 0xdf) GP-IB
+//  map(0xd3, 0xd4) PC-8801-10 Music interface board (MIDI)
+//  map(0xdc, 0xdf) PC-8801-12 MODEM (built-in for mkIITR)
+	// $e2-$e3 are standard for mkIIMR, MH / MA / MA2 / MC
+	// also used by expansion boards -02 / -02N, -22,
+	// and -17 video art board (transfers from RAM?)
+	map(0xe2, 0xe2).rw(FUNC(pc8801_state::extram_mode_r), FUNC(pc8801_state::extram_mode_w));
+	map(0xe3, 0xe3).rw(FUNC(pc8801_state::extram_bank_r), FUNC(pc8801_state::extram_bank_w));
+	map(0xe4, 0xe4).w(FUNC(pc8801_state::irq_level_w));
+	map(0xe6, 0xe6).w(FUNC(pc8801_state::irq_mask_w));
+//  map(0xe7, 0xe7).noprw(); /* arcus writes here, mirror of above? */
+	map(0xe8, 0xeb).rw(FUNC(pc8801_state::kanji_r<0>), FUNC(pc8801_state::kanji_w<0>));
+	map(0xec, 0xef).rw(FUNC(pc8801_state::kanji_r<1>), FUNC(pc8801_state::kanji_w<1>));
+//  map(0xf0, 0xf1) dictionary bank (8801MA and later)
+//  map(0xf3, 0xf3) DMA floppy (direct access like PC88VA?)
+//  map(0xf4, 0xf7) DMA 5'25-inch floppy (?)
+//  map(0xf8, 0xfb) DMA 8-inch floppy (?)
+	map(0xfc, 0xff).m(m_pc80s31, FUNC(pc80s31_device::host_map));
+}
+
 /*
  * PC-8801mkIISR overrides (ALU)
  */
@@ -921,6 +984,15 @@ void pc8801mk2sr_state::main_map(address_map &map)
 	m_alu_view[0](0xc000, 0xffff).rw(FUNC(pc8801mk2sr_state::alu_r), FUNC(pc8801mk2sr_state::alu_w));
 }
 
+void pc8801mk2sr_state::main_io(address_map &map)
+{
+	pc8801_state::main_io(map);
+	map(0x34, 0x34).w(FUNC(pc8801mk2sr_state::alu_ctrl1_w));
+	map(0x35, 0x35).w(FUNC(pc8801mk2sr_state::alu_ctrl2_w));
+
+	map(0x44, 0x45).rw(m_opn, FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
+
 
 /*
  * PC8801FH overrides (CPU clock switch & setup mode)
@@ -933,6 +1005,9 @@ void pc8801fh_state::main_map(address_map &map)
 	m_setup_mem_view[0](0x0000, 0x7fff).rom().region("setup", 0);
 }
 
+// x--- ---- <unknown> On MC prints "change CPU clock" if bit 7 high. MA tests it as well.
+// ---x ---- <unknown> MC writes on it
+// ---- ---x Current CPU speed setting
 uint8_t pc8801fh_state::cpuclock_r()
 {
 	return 0x10 | m_clock_setting;
@@ -961,6 +1036,32 @@ void pc8801fh_state::baudrate_w(uint8_t data)
 	m_baudrate_val = data & 0xf;
 	// TODO: change clock for RS-232C
 }
+
+void pc8801fh_state::main_io(address_map &map)
+{
+	pc8801_state::main_io(map);
+	map(0x10, 0x17).view(m_setup_io_view);
+	// $11, $12, $13 written to at startup, unknown purpose
+	m_setup_io_view[0](0x11, 0x11).lr8(NAME([this] (offs_t offset) {
+		// bit 7: unknown, read at startup, flips $9002 to 0x80
+		// on MC bit 7 high will disable CD-ROM, to concealing its option in setup menu.
+		return m_eeprom->do_read();
+	}));
+	m_setup_io_view[0](0x14, 0x14).lw8(NAME([this] (offs_t offset, u8 data) {
+		m_eeprom->di_write(BIT(data, 0));
+		m_eeprom->clk_write(BIT(data, 1));
+		m_eeprom->cs_write(BIT(data, 2));
+	}));
+	m_setup_io_view[0](0x15, 0x15).lw8(NAME([this] (offs_t offset, u8 data) { m_setup_mem_view.disable(); m_setup_io_view.disable(); }));
+	map(0x34, 0x34).w(FUNC(pc8801fh_state::alu_ctrl1_w));
+	map(0x35, 0x35).w(FUNC(pc8801fh_state::alu_ctrl2_w));
+
+	map(0x44, 0x47).rw(m_opna, FUNC(ym2608_device::read), FUNC(ym2608_device::write));
+
+	map(0x6e, 0x6e).r(FUNC(pc8801fh_state::cpuclock_r));
+	map(0x6f, 0x6f).rw(FUNC(pc8801fh_state::baudrate_r), FUNC(pc8801fh_state::baudrate_w));
+}
+
 
 /*
  * PC8801MA overrides (dictionary)
@@ -991,6 +1092,14 @@ uint8_t pc8801ma_state::wram_c000_r(offs_t offset)
 	return pc8801fh_state::wram_c000_r(offset);
 }
 
+void pc8801ma_state::main_io(address_map &map)
+{
+	pc8801fh_state::main_io(map);
+	map(0xf0, 0xf0).w(FUNC(pc8801ma_state::dic_bank_w));
+	// TODO: readable
+	map(0xf1, 0xf1).w(FUNC(pc8801ma_state::dic_ctrl_w));
+}
+
 /*
  * PC8801MC overrides (CD-ROM)
  */
@@ -1005,117 +1114,32 @@ inline bool pc8801mc_state::cdbios_rom_enable()
 	return m_cdrom_bank;
 }
 
-void pc8801_state::main_io(address_map &map)
+void pc8801mc_state::main_map(address_map &map)
 {
-	map.global_mask(0xff);
-	map.unmap_value_high();
-	map(0x00, 0x0f).r("kbd", FUNC(pc8001_kbd_device::read_direct));
-	map(0x10, 0x10).w(FUNC(pc8801_state::port10_w));
-	map(0x20, 0x21).mirror(0x0e).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write)); // CMT / RS-232C ch. 0
-	map(0x30, 0x30).portr("DSW1").w(FUNC(pc8801_state::port30_w));
-	map(0x31, 0x31).portr("DSW2").w(FUNC(pc8801_state::port31_w));
-	map(0x32, 0x32).rw(FUNC(pc8801_state::misc_ctrl_r), FUNC(pc8801_state::misc_ctrl_w));
-	// NOTE: anything after 0x32 reads 0xff on a PC8801MA real HW test
-//  map(0x33, 0x33) PC8001mkIISR port, mirror on PC8801?
-//  map(0x34, 0x35) ALU regs, unmapped on regular
-//  map(0x35, 0x35).r <unknown>, accessed by cancanb during OP, mistake? Mirror for intended HW?
-	map(0x40, 0x40).rw(FUNC(pc8801_state::port40_r), FUNC(pc8801_state::port40_w));
-//  map(0x44, 0x47).rw internal OPN/OPNA sound card for 8801mkIISR and beyond
-//  uPD3301
-	map(0x50, 0x51).rw(m_crtc, FUNC(upd3301_device::read), FUNC(upd3301_device::write));
-
-	map(0x52, 0x52).w(FUNC(pc8801_state::bgpal_w));
-	map(0x53, 0x53).w(FUNC(pc8801_state::layer_masking_w));
-	map(0x54, 0x5b).w(FUNC(pc8801_state::palram_w));
-	map(0x5c, 0x5c).r(FUNC(pc8801_state::vram_select_r));
-	map(0x5c, 0x5f).w(FUNC(pc8801_state::vram_select_w));
-//  i8257
-	map(0x60, 0x68).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write));
-
-//  map(0x6e, 0x6f) clock settings (8801FH and later)
-	map(0x70, 0x70).rw(FUNC(pc8801_state::window_bank_r), FUNC(pc8801_state::window_bank_w));
-	map(0x71, 0x71).rw(FUNC(pc8801_state::ext_rom_bank_r), FUNC(pc8801_state::ext_rom_bank_w));
-	map(0x78, 0x78).w(FUNC(pc8801_state::window_bank_inc_w));
-//  map(0x82, 0x82).w access window for PC8801-16
-//  map(0x8e, 0x8e).r <unknown>, accessed by scruiser on boot (a board ID?)
-//  map(0x90, 0x9f) PC-8801-31 CD-ROM i/f (8801MC)
-//  map(0xa0, 0xa3) GSX-8800 or network board
-//  map(0xa8, 0xad).rw expansion OPN (Sound Board) or OPNA (Sound Board II)
-//  map(0xb0, 0xb3) General Purpose I/O
-//  map(0xb4, 0xb4) PC-8801-17 Video art board
-//  map(0xb5, 0xb5) PC-8801-18 Video digitizing unit
-//  map(0xbc, 0xbf) External mini floppy disk I/F (i8255), PC-8801-13 / -20 / -22
-//  map(0xc0, 0xc3) USART RS-232C ch. 1 / ch. 2
-//  map(0xc4, 0xc7) PC-8801-10 Music interface board (MIDI), GSX-8800 PIT?
-//  map(0xc8, 0xc8) RS-232C ch. 1 "prohibited gate" (?)
-//  map(0xca, 0xca) RS-232C ch. 2 "prohibited gate" (?)
-//  map(0xc8, 0xcd) JMB-X1 OPM / SSG chips
-//  map(0xd0, 0xdf) GP-IB
-//  map(0xd3, 0xd4) PC-8801-10 Music interface board (MIDI)
-//  map(0xdc, 0xdf) PC-8801-12 MODEM (built-in for mkIITR)
-	// $e2-$e3 are standard for mkIIMR, MH / MA / MA2 / MC
-	// also used by expansion boards -02 / -02N, -22,
-	// and -17 video art board (transfers from RAM?)
-	map(0xe2, 0xe2).rw(FUNC(pc8801_state::extram_mode_r), FUNC(pc8801_state::extram_mode_w));
-	map(0xe3, 0xe3).rw(FUNC(pc8801_state::extram_bank_r), FUNC(pc8801_state::extram_bank_w));
-	map(0xe4, 0xe4).w(FUNC(pc8801_state::irq_level_w));
-	map(0xe6, 0xe6).w(FUNC(pc8801_state::irq_mask_w));
-//  map(0xe7, 0xe7).noprw(); /* arcus writes here, mirror of above? */
-	map(0xe8, 0xeb).rw(FUNC(pc8801_state::kanji_r<0>), FUNC(pc8801_state::kanji_w<0>));
-	map(0xec, 0xef).rw(FUNC(pc8801_state::kanji_r<1>), FUNC(pc8801_state::kanji_w<1>));
-//  map(0xf0, 0xf1) dictionary bank (8801MA and later)
-//  map(0xf3, 0xf3) DMA floppy (direct access like PC88VA?)
-//  map(0xf4, 0xf7) DMA 5'25-inch floppy (?)
-//  map(0xf8, 0xfb) DMA 8-inch floppy (?)
-	map(0xfc, 0xff).m(m_pc80s31, FUNC(pc80s31_device::host_map));
-}
-
-void pc8801mk2sr_state::main_io(address_map &map)
-{
-	pc8801_state::main_io(map);
-	map(0x34, 0x34).w(FUNC(pc8801mk2sr_state::alu_ctrl1_w));
-	map(0x35, 0x35).w(FUNC(pc8801mk2sr_state::alu_ctrl2_w));
-
-	map(0x44, 0x45).rw(m_opn, FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-}
-
-void pc8801fh_state::main_io(address_map &map)
-{
-	pc8801_state::main_io(map);
-	map(0x10, 0x17).view(m_setup_io_view);
-	// $11, $12, $13 written to at startup, unknown purpose
-	m_setup_io_view[0](0x11, 0x11).lr8(NAME([this] (offs_t offset) {
-		// bit 7: unknown, read at startup, flips $9002 to 0x80
-		return m_eeprom->do_read();
-	}));
-	m_setup_io_view[0](0x14, 0x14).lw8(NAME([this] (offs_t offset, u8 data) {
-		m_eeprom->di_write(BIT(data, 0));
-		m_eeprom->clk_write(BIT(data, 1));
-		m_eeprom->cs_write(BIT(data, 2));
-	}));
-	m_setup_io_view[0](0x15, 0x15).lw8(NAME([this] (offs_t offset, u8 data) { m_setup_mem_view.disable(); m_setup_io_view.disable(); }));
-	map(0x34, 0x34).w(FUNC(pc8801fh_state::alu_ctrl1_w));
-	map(0x35, 0x35).w(FUNC(pc8801fh_state::alu_ctrl2_w));
-
-	map(0x44, 0x47).rw(m_opna, FUNC(ym2608_device::read), FUNC(ym2608_device::write));
-
-	map(0x6e, 0x6e).r(FUNC(pc8801fh_state::cpuclock_r));
-	map(0x6f, 0x6f).rw(FUNC(pc8801fh_state::baudrate_r), FUNC(pc8801fh_state::baudrate_w));
-}
-
-void pc8801ma_state::main_io(address_map &map)
-{
-	pc8801fh_state::main_io(map);
-	map(0xf0, 0xf0).w(FUNC(pc8801ma_state::dic_bank_w));
-	// TODO: readable
-	map(0xf1, 0xf1).w(FUNC(pc8801ma_state::dic_ctrl_w));
+	pc8801ma_state::main_map(map);
+	// range unconfirmed
+	// really looks 0x00~0x2f in size, while 0x30~0x5f is just a copy for checking if SRAM works?
+	// 0x60~0x7f unused by this point.
+	map(0xe000, 0xe07f).view(m_memsw_view);
+	m_memsw_view[0](0xe000, 0xe07f).rw("memsw", FUNC(pc8801mc_memsw_device::read), FUNC(pc8801mc_memsw_device::write));
 }
 
 void pc8801mc_state::main_io(address_map &map)
 {
 	pc8801ma_state::main_io(map);
 	map(0x90, 0x9f).m(m_cdrom_if, FUNC(pc8801_31_device::amap));
+	// TODO: verify if it also requires the setup view to be enabled
+	map(0xf2, 0xf2).lw8(NAME([this] (offs_t offset, u8 data) {
+		if (!BIT(data, 0))
+			m_memsw_view.select(0);
+		else
+			m_memsw_view.disable();
+	}));
 }
+
+/*
+ * OPNA memory map
+ */
 
 void pc8801fh_state::opna_map(address_map &map)
 {
@@ -1276,6 +1300,25 @@ static INPUT_PORTS_START( pc8801ma )
 
 	PORT_MODIFY("CTRL")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("eeprom", FUNC(pc88_sdip_device::auto_boot_floppy_r))
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( pc8801mc )
+	PORT_INCLUDE( pc8801fh )
+
+	PORT_MODIFY("DSW1")
+	PORT_BIT( 0x7e, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("memsw", FUNC(pc8801mc_memsw_device::dsw1_r))
+	// TODO: is bit 0 (N88/N Basic switch) even available on MC?
+	// TODO: CMD SING should be available from the advanced setup menu
+
+	PORT_MODIFY("DSW2")
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("memsw", FUNC(pc8801mc_memsw_device::dsw2_r))
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("memsw", FUNC(pc8801mc_memsw_device::boot_mode_r))
+
+	PORT_MODIFY("CTRL")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("memsw", FUNC(pc8801mc_memsw_device::auto_boot_floppy_r))
+
+	PORT_MODIFY("CFG")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("memsw", FUNC(pc8801mc_memsw_device::cpu_clock_r))
 INPUT_PORTS_END
 
 
@@ -1476,6 +1519,7 @@ void pc8801mc_state::machine_reset()
 
 	// Hold STOP during boot to bypass CDROM BIOS at POST (PC=0x10)
 	m_cdrom_bank = true;
+	m_memsw_view.disable();
 }
 
 // DE-9 mouse port on front panel (labelled "マウス") - MSX-compatible
@@ -1758,6 +1802,12 @@ void pc8801ma_state::pc8801ma(machine_config &config)
 void pc8801mc_state::pc8801mc(machine_config &config)
 {
 	pc8801ma(config);
+
+	// pull ID line low otherwise setup menu won't work
+	pc8801fh_kbd_device &kbd(PC8801FH_KBD(config.replace(), "kbd"));
+	kbd.read_id().set_constant(0);
+
+	PC8801MC_MEMSW(config, m_memsw);
 
 	PC8801_31(config, m_cdrom_if);
 	m_cdrom_if->rom_bank_cb().set([this](bool state) { m_cdrom_bank = state; });
@@ -2045,11 +2095,10 @@ template <bool IS_DUMPED> void pc8801fh_state::init_setup_mode()
 // 0x3e000 - 0x3ffff FDC BIOS (match ma_disk.rom)
 // 0x40000 - 0x7ffff kanji/CG
 // hn62324bp.ic21 [4/4]      mc_kanji2.rom           IDENTICAL
-// hn62324bp.ic21 [3/4]      kanji1.rom              7.713318% (?)
+// hn62324bp.ic21 [3/4]      kanji1.rom              7.713318% (shuffled around looks like)
 void pc8801mc_state::init_pc8801mc()
 {
-	// flip to true for testing setup mode
-	m_has_setup_mode = false;
+	m_has_setup_mode = true;
 }
 
 COMP( 1981, pc8801,      0,      0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS ) // MIG for border, heavy V1 timing issues, has no floppy drive by default
@@ -2070,7 +2119,7 @@ COMP( 1987, pc8801ma,    0,        0,      pc8801ma,    pc8801ma, pc8801ma_state
 //COMP( 1988, pc8801fe,    pc8801ma, 0,      pc8801fa,    pc8801fh, pc8801ma_state, init_setup_mode<false>, "NEC",   "PC-8801FE",     MACHINE_IMPERFECT_TIMING )
 COMP( 1988, pc8801ma2,   pc8801ma, 0,      pc8801ma,    pc8801fh, pc8801ma_state, init_setup_mode<false>, "NEC",   "PC-8801MA2",    MACHINE_IMPERFECT_TIMING )
 //COMP( 1989, pc8801fe2,   pc8801ma, 0,      pc8801fa,    pc8801fh, pc8801ma_state, init_setup_mode<false>, "NEC",   "PC-8801FE2",    MACHINE_IMPERFECT_TIMING )
-COMP( 1989, pc8801mc,    pc8801ma, 0,      pc8801mc,    pc8801fh, pc8801mc_state, init_pc8801mc, "NEC",   "PC-8801MC",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING ) // extra CD issues (dioscd essentially), otherwise same as MA
+COMP( 1989, pc8801mc,    0,        0,      pc8801mc,    pc8801mc, pc8801mc_state, init_pc8801mc, "NEC",   "PC-8801MC",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING ) // extra CD issues (dioscd essentially), otherwise same as MA
 
 // PC98DO (PC88+PC98, V33 + μPD70008AC)
 // belongs to own driver

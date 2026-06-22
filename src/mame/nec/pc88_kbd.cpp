@@ -9,6 +9,8 @@ I/O ports are normally read in direct/parallel-ish form, eventually exposed as s
 http://www.maroon.dti.ne.jp/youkan/pc88/iomap.html
 
 TODO:
+- pc8801fh_kbd: MC needs the identifier to be high rather than low for setup keys to work properly.
+                Settable from a port?
 - pc88va_kbd: serial interface, add key modifiers, runs on undumped MCU really;
 
 **************************************************************************************************/
@@ -227,6 +229,7 @@ ioport_constructor pc8801_kbd_device::device_input_ports() const
 
 pc8801fh_kbd_device::pc8801fh_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pc8001_kbd_device(mconfig, PC8801FH_KBD, tag, owner, clock)
+	, m_read_id_cb(*this, 1)
 {
 }
 
@@ -252,12 +255,17 @@ static INPUT_PORTS_START( pc8801fh_kbd )
 	PORT_MODIFY("KEYE")
 	// TODO: Normal & Numpad RETURN, Left Shift, Right Shift aliases here at bits 0-3
 	// as above
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // FH identifier really
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(pc8801fh_kbd_device::read_id_r)) // FH+ identifier
 INPUT_PORTS_END
 
 ioport_constructor pc8801fh_kbd_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( pc8801fh_kbd );
+}
+
+int pc8801fh_kbd_device::read_id_r()
+{
+	return m_read_id_cb();
 }
 
 /*

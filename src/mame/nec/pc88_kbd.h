@@ -42,6 +42,11 @@ public:
 	pc8801fh_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	int read_id_r();
+	auto read_id() { return m_read_id_cb.bind(); }
+private:
+	devcb_read_line m_read_id_cb;
 };
 
 class pc88va_kbd_device : public device_t
