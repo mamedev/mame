@@ -520,6 +520,7 @@ void edsp_device::execute_run()
 				const u16 s = m_r[BIT(op, 5, 3)];
 				m_r[BIT(op, 8, 3)] = s16(s) >> 1;
 				m_sr = (m_sr & 0xfff0) | (s16(s) < 0 ? 0x0008 : 0) | (s16(s) >> 1 ? 0 : 0x0004) | (BIT(s, 0) ? 0x0001 : 0);
+				m_icount -= 1;
 			}
 			else if ((op & 0xf81f) == 0x5809)
 			{
@@ -533,6 +534,7 @@ void edsp_device::execute_run()
 				const u16 s = m_r[BIT(op, 5, 3)];
 				m_r[BIT(op, 8, 3)] = s >> 1;
 				m_sr = (m_sr & 0xfff0) | (s >> 1 ? 0 : 0x0004) | (BIT(s, 0) ? 0x0003 : 0);
+				m_icount -= 1;
 			}
 			else if ((op & 0xf81f) == 0x580b)
 			{
