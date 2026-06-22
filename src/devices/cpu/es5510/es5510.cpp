@@ -1116,11 +1116,11 @@ int8_t countLowOnes(int32_t x) {
 }
 
 #if VERBOSE_EXEC
-#define WRITE_REG(r, x) do { r = value; LOG_EXEC("  . writing %x (%d) to " #r "\n", r, util::sext(r, 24)); } while(0)
-#define WRITE_REG16(r, x) do { r = ((value >> 8) & 0xffff); LOG_EXEC("  . writing %x (%d) as %x (%d) to " #r "\n", value, util::sext(value, 24), r, r); } while(0)
+#define WRITE_REG(r, x) do { r = (x); LOG_EXEC("  . writing %x (%d) to " #r "\n", r, util::sext(r, 24)); } while(0)
+#define WRITE_REG16(r, x) do { r = (((x) >> 8) & 0xffff); LOG_EXEC("  . writing %x (%d) as %x (%d) to " #r "\n", (x)), util::sext((x), 24), r, r); } while(0)
 #else
-#define WRITE_REG(r, x) do { r = value; } while(0)
-#define WRITE_REG16(r, x) do { r = ((value >> 8) & 0xffff); } while(0)
+#define WRITE_REG(r, x) do { r = (x); } while(0)
+#define WRITE_REG16(r, x) do { r = (((x) >> 8) & 0xffff); } while(0)
 #endif
 
 void es5510_device::write_reg(uint8_t reg, int32_t value)
