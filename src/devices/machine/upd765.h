@@ -58,9 +58,6 @@ public:
 	void set_select_lines_connected(bool select);
 	void set_ts_line_connected(bool ts);
 	void set_floppy(floppy_image_device *image);
-	void add_weak_sector(int track, int head, int sector, int size);
-	bool is_weak_sector(int track, int head, int sector, int size) const;
-
 	virtual void soft_reset();
 
 protected:
@@ -247,9 +244,6 @@ protected:
 	devcb_read_line ts_cb;
 	devcb_write8 us_cb;
 	bool cur_irq, irq, drq, internal_drq, tc, tc_done, locked, mfm, scan_done;
-	u32 m_weak_sector_key = 0;
-	u32 m_weak_sector_counter = 0;
-
 	floppy_info flopi[4];
 
 	int fifo_pos, fifo_expected, command_pos, result_pos, sectors_read;

@@ -302,8 +302,6 @@ void upd765_family_device::device_start()
 	save_item(NAME(cur_rate));
 	save_item(NAME(selected_drive));
 	save_item(NAME(drive_busy));
-	save_item(NAME(m_weak_sector_key));
-	save_item(NAME(m_weak_sector_counter));
 
 	for(int i=0; i != 4; i++) {
 		char name[2];
@@ -362,8 +360,6 @@ void upd765_family_device::device_reset()
 	if(has_dor)
 		dor = 0x00;
 	locked = false;
-	m_weak_sector_key = 0;
-	m_weak_sector_counter = 0;
 	soft_reset();
 }
 
@@ -1140,20 +1136,12 @@ void upd765_family_device::live_run(attotime limit)
 			break;
 		}
 
-		case READ_SECTOR_DATA_BYTE: {
-			if (is_weak_sector(command[2], command[3], command[4], sector_size)) {
-				int slot = (cur_live.bit_counter >> 4) - 1;
-				if (slot >= 256) {
-					cur_live.data_reg ^= m_weak_sector_counter & 0xff;
-					m_weak_sector_counter++;
-				}
-			}
+		case READ_SECTOR_DATA_BYTE:
 			if(!tc_done)
 				fifo_push(cur_live.data_reg, true);
 			cur_live.state = READ_SECTOR_DATA;
 			checkpoint();
 			break;
-		}
 
 		case SCAN_SECTOR_DATA_BYTE:
 			if(!scan_done) { // TODO: handle stp, x68000 sets it to 0xff (as it would dtl)?
@@ -2035,7 +2023,6 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 				fi.st0 |= ST0_FAIL;
 				st1 |= ST1_DE;
 				st2 |= ST2_DD;
-				add_weak_sector(command[2], command[3], command[4], sector_size);
 				fi.sub_state = COMMAND_DONE;
 				break;
 			}
@@ -2399,7 +2386,6 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 			if(cur_live.crc) {
 				st1 |= ST1_DE;
 				st2 |= ST2_DD;
-				add_weak_sector(command[2], command[3], command[4], sector_size);
 			}
 			bool done = tc_done;
 			sectors_read++;
@@ -3655,14 +3641,4 @@ void hd63266f_device::index_callback(floppy_image_device *floppy, int state)
 		}
 	}
 	upd765_family_device::index_callback(floppy, state);
-}
-
-void upd765_family_device::add_weak_sector(int track, int head, int sector, int size)
-{
-	m_weak_sector_key = (u32(track) << 16) | (u32(head) << 12) | (u32(sector) << 4) | (u32(size) & 0xf);
-}
-
-bool upd765_family_device::is_weak_sector(int track, int head, int sector, int size) const
-{
-	return m_weak_sector_key == ((u32(track) << 16) | (u32(head) << 12) | (u32(sector) << 4) | (u32(size) & 0xf));
 }
