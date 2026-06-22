@@ -345,7 +345,6 @@ Runs slow in gameplay
 		<year>198?</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<notes><![CDATA[
-Needs [IDP] text display to go off for bottommost row (bumps strip 1 height from 384 to 400) (fixed)
 Randomly hangs with a "please wait" when exiting town
 (character select: 3, 1, +, 1, CR, *. In dungeon go north, turn 6 when reaching wall, turn 6 at first split, go north until exit town screen reached and accept with 1)
 Actual user disk procedure is unknown
@@ -427,7 +426,7 @@ Display off in places during intro
 [gfx] broken scroll bases for main menu
 [gfx] Requires fractional DOT scrolling (horizontal)
 [gfx] wrong draw mode for status bar in gameplay
-[gfx] needs cliprect at gameplay startup
+[gfx] uses various forms of picture mask
 ]]></notes>
 		<info name="alt_title" value="オルテウス" />
 		<info name="usage" value="Kana Lock on pauses the game"/>
@@ -506,7 +505,7 @@ Display off in places during intro
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
 [SGP] extensive VD usage in gameplay
-[gfx] intro uses cliprect
+[gfx] intro uses picture mask
 [gfx] Requires fractional DOT scrolling (horizontal)
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
@@ -579,7 +578,7 @@ Winning animation is glitchy [OFX/OFY]?, uses [IDP] text transpen with upper bit
 		<year>1987</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<notes><![CDATA[
-[gfx] needs cliprect and primask pen during intro
+[gfx] needs picture mask and primask pen during intro
 [gfx] title screen should animate with a blue backdrop (fixed)
 Runs at half speed
 [IDP] sprites wraparound on left edge (fixed)
@@ -817,60 +816,67 @@ Fails [floppy] copy protection, draws "TETRIS IS ONLY 6,800 YEN" on title screen
 		<year>1992</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<notes><![CDATA[
-[IDP] doesn't disable PC-Engine OS function strip during intro (same as mightmag?)
 Runs too slow
-Black screen if directly selecting new game or after intro
 Has unemulated [MIDI] options
 ]]></notes>
 		<info name="release" value="199201xx"/>
 		<info name="alt_title" value="幻影都市 ～イリュージョンシティ～"/>
+		<info name="usage" value="Boot game with user disk in drive B:"/>
+		<sharedfeat name="mouseport_default" value="mouse"/>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk 1.fdi" size="1265664" crc="6c28f456" sha1="b9595c3798b0faf5152df79f1ea1c74ce3a07672"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="User Disk" />
+			<dataarea name="flop" size="1265664">
+				<rom name="user disk.fdi" size="1265664" crc="c1c566df" sha1="0211d36ee53453122d6e2df604d5fdf6c9bfba3a"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk 2.fdi" size="1265664" crc="408aba76" sha1="5770ff0dc637776d6cb5e30cd4a128fb783befa3"/>
 			</dataarea>
 		</part>
 
-		<part name="flop3" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk 3.fdi" size="1265664" crc="da57a623" sha1="3fbd4cdeccf99e531b34dfe5a3fe890966307fa8"/>
 			</dataarea>
 		</part>
 
-		<part name="flop4" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk 4.fdi" size="1265664" crc="cfb2c03b" sha1="b7397ef886811f71927d53c6d940167f01147b9d"/>
 			</dataarea>
 		</part>
 
-		<part name="flop5" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk 5.fdi" size="1265664" crc="1187eea4" sha1="7ad2a757460adaff37d73c59287b941241d1e160"/>
 			</dataarea>
 		</part>
 
-		<part name="flop6" interface="floppy_5_25">
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk 6.fdi" size="1265664" crc="3256197f" sha1="26a46c2f6124c569b3586e6b9dd97e521460bc0e"/>
 			</dataarea>
 		</part>
 
-		<part name="flop7" interface="floppy_5_25">
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 7"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk 7.fdi" size="1265664" crc="2b71cca8" sha1="60b32fe6816be8a9b0b35d9b779ab5baa2fac8af"/>
-			</dataarea>
-		</part>
-
-		<part name="flop8" interface="floppy_5_25">
-			<feature name="part_id" value="User Disk" />
-			<dataarea name="flop" size="1265664">
-				<rom name="user disk.fdi" size="1265664" crc="c1c566df" sha1="0211d36ee53453122d6e2df604d5fdf6c9bfba3a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -880,7 +886,6 @@ Has unemulated [MIDI] options
 		<year>1990</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<notes><![CDATA[
-[IDP] doesn't disable PC-Engine OS function strip until after few moments in intro (same as mightmag?)
 Optionally wants kana lock enabled for entering a name for new game [keyboard] irq
 Not extensively tested
 ]]></notes>
@@ -1282,9 +1287,8 @@ All disks fail initial bootstrap [FDC]
 		<year>2006</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-[gfx] uses various forms of cliprect mask
-[IDP] doesn't disable PC-Engine OS function strip (same as mightmag?)
-Runs too slow, no sound?
+[gfx] uses various forms of picture mask
+Runs too slow?
 ]]></notes>
 		<info name="developer" value="Shinra" />
 		<info name="alt_title" value="ハレ晴レユカイ" />
@@ -1309,7 +1313,7 @@ Runs too slow, no sound?
 		<notes><![CDATA[
 [gfx] Title screen doesn't show text layer? (verify)
 [IDP] sprites missing wraparound on top edge (verify)
-[IDP] sprite wobbles when scrolling up/down (verify)
+[IDP] sprites wobble when scrolling up/down (verify)
 Runs too slow
 Crashes after stage 1 (fixed, cfr. usage)
 ]]></notes>
@@ -1355,7 +1359,7 @@ Crashes after stage 1 (fixed, cfr. usage)
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-[gfx] Gameplay don't mask bullets on right side
+[gfx] Gameplay don't mask bullets on right side, needs picture mask
 [gfx] background needs vertical scrolling
 Runs too slow
 Needs joystick in otherwise it loops on title screen
