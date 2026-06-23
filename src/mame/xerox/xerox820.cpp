@@ -62,6 +62,7 @@
 #include "speaker.h"
 
 #include "formats/flopimg.h"
+#include "formats/imd_dsk.h"
 
 
 /* Read/Write Handlers */
@@ -257,8 +258,21 @@ void xerox820_state::kbpio_pa_w(uint8_t data)
 	/* drive select */
 	floppy_image_device *floppy = nullptr;
 
-	if (BIT(data, 0)) floppy = m_floppy0->get_device();
-	if (BIT(data, 1)) floppy = m_floppy1->get_device();
+	if (m_drvsel_binary)
+	{
+		// Big Board: the low 2 bits are a binary drive-unit number (drive 0 = 00),
+		// demuxed to one select line.  The Xerox 820 instead uses one bit per drive.
+		switch (data & 0x03)
+		{
+		case 0: floppy = m_floppy0->get_device(); break;
+		case 1: floppy = m_floppy1->get_device(); break;
+		}
+	}
+	else
+	{
+		if (BIT(data, 0)) floppy = m_floppy0->get_device();
+		if (BIT(data, 1)) floppy = m_floppy1->get_device();
+	}
 
 	m_fdc->set_floppy(floppy);
 
@@ -429,6 +443,12 @@ static void xerox820_floppies(device_slot_interface &device)
 	device.option_add("sa850", FLOPPY_8_DSDD); // Shugart SA-850
 }
 
+// Big Board 8" CP/M disks ship as IMD images.
+static void bigboard_floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_IMD_FORMAT);
+}
+
 void xerox820_state::update_nmi()
 {
 	int halt = m_maincpu->state_int(Z80_HALT);
@@ -531,6 +551,15 @@ void bigboard_state::machine_reset()
 	m_beeper->set_state(0);
 
 	m_fdc->reset();
+
+	// The Big Board's monitor selects drives by a binary unit number in the low
+	// bits of the system PIO port (drive 0 = 0), not the Xerox 820's bit-per-drive.
+	m_drvsel_binary = true;
+
+	// 8" Shugart drives spin continuously (no motor-control line); force the
+	// motor on so the WD1771 sees READY for the boot ROM's RESTORE.
+	if (floppy_image_device *fd = m_floppy0->get_device()) fd->mon_w(0);
+	if (floppy_image_device *fd = m_floppy1->get_device()) fd->mon_w(0);
 }
 
 void xerox820ii_state::machine_reset()
@@ -666,6 +695,31 @@ void xerox820_state::xerox820(machine_config &config)
 void bigboard_state::bigboard(machine_config &config)
 {
 	xerox820(config);
+
+	// The Big Board uses 8" SSSD drives (Shugart SA-800) read by the WD1771 in FM
+	// at the 8" 2 MHz clock, not the Xerox 820's 5.25" SA-400 at 1 MHz; its disks
+	// ship as IMD.
+	m_fdc->set_clock(20_MHz_XTAL / 10);
+	FLOPPY_CONNECTOR(config.replace(), FD1771_TAG":0", xerox820_floppies, "sa800", bigboard_floppy_formats);
+	FLOPPY_CONNECTOR(config.replace(), FD1771_TAG":1", xerox820_floppies, "sa800", bigboard_floppy_formats);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beeper, 950).add_route(ALL_OUTPUTS, "mono", 1.00); /* bigboard only */
+	TIMER(config, m_beep_timer).configure_generic(FUNC(bigboard_state::beep_timer));
+}
+
+void bigboard_state::bigboard5(machine_config &config)
+{
+	xerox820(config);
+
+	// A common field modification ran the Big Board from 5.25" SA-400 drives in
+	// place of the stock 8" SA-800.  The WD1771 (FM/single density) stays at its
+	// 5.25" 1 MHz clock (the Xerox 820 default), and the monitor auto-selects the
+	// 5.25" disk parameters from the drive's form factor (kbpio_pa_r bit 4).
+	FLOPPY_CONNECTOR(config.replace(), FD1771_TAG":0", xerox820_floppies, "sa400l", bigboard_floppy_formats);
+	FLOPPY_CONNECTOR(config.replace(), FD1771_TAG":1", xerox820_floppies, "sa400l", bigboard_floppy_formats);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 950).add_route(ALL_OUTPUTS, "mono", 1.00); /* bigboard only */
@@ -797,6 +851,7 @@ ROM_START( bigboard )
 ROM_END
 
 #define rom_mk82 rom_bigboard
+#define rom_bigboard5 rom_bigboard
 
 ROM_START( x820 )
 	ROM_REGION( 0x1000, Z80_TAG, 0 )
@@ -930,10 +985,11 @@ ROM_END
 /* System Drivers */
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT     CLASS             INIT        COMPANY                       FULLNAME        FLAGS
-COMP( 1980, bigboard, 0,        0,      bigboard,   xerox820, bigboard_state,   empty_init, "Digital Research Computers", "Big Board",    MACHINE_NOT_WORKING )
-COMP( 1981, x820,     bigboard, 0,      xerox820,   xerox820, xerox820_state,   empty_init, "Xerox",                      "Xerox 820",    MACHINE_NO_SOUND_HW )
-COMP( 1982, mk82,     bigboard, 0,      bigboard,   xerox820, bigboard_state,   empty_init, "Scomar",                     "MK-82",        MACHINE_NOT_WORKING )
+COMP( 1980, bigboard, 0,        0,      bigboard,   xerox820, bigboard_state,   empty_init, "Digital Research Computers", "Big Board",                 0 )
+COMP( 1980, bigboard5,bigboard, 0,      bigboard5,  xerox820, bigboard_state,   empty_init, "Digital Research Computers", "Big Board (5.25\" drives)", MACHINE_NOT_WORKING )
+COMP( 1981, x820,     bigboard, 0,      xerox820,   xerox820, xerox820_state,   empty_init, "Xerox",                      "Xerox 820",                 MACHINE_NO_SOUND_HW )
+COMP( 1982, mk82,     bigboard, 0,      bigboard,   xerox820, bigboard_state,   empty_init, "Scomar",                     "MK-82",                     0 )
 COMP( 1983, x820ii,   0,        0,      xerox820ii, xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 820-II", MACHINE_NOT_WORKING )
 COMP( 1983, x168,     x820ii,   0,      xerox168,   xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8",   MACHINE_NOT_WORKING )
 COMP( 1983, mk83,     bigboard, 0,      mk83,       xerox820, xerox820_state,   empty_init, "Scomar",                     "MK-83",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1985, mojmikro, bigboard, 0,      bigboard,   xerox820, bigboard_state,   empty_init, "<unknown>",                  "Moj mikro Slovenija",  MACHINE_NOT_WORKING )
+COMP( 1985, mojmikro, bigboard, 0,      bigboard,   xerox820, bigboard_state,   empty_init, "<unknown>",                  "Moj mikro Slovenija",  0 )
