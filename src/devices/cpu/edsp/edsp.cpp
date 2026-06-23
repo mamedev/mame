@@ -29,6 +29,9 @@ emg2000a_device::emg2000a_device(const machine_config &mconfig, const char *tag,
 		address_map_constructor(FUNC(emg2000a_device::program_map), this),
 		address_map_constructor(FUNC(emg2000a_device::data_map), this),
 		address_map_constructor(FUNC(emg2000a_device::io_map), this))
+	, m_in_pa_cb(*this, 0xffff)
+	, m_out_pa_cb(*this)
+	, m_in_pb_cb(*this, 0xff)
 {
 }
 
@@ -46,6 +49,7 @@ void emg2000a_device::data_map(address_map &map)
 	map(0x3400, 0x73ff).ram(); // 16KW VRAM
 	//map(0x8000, 0x8fff); // PPU Register
 	//map(0x9000, 0x9fff); // APU Register
+	map(0x9023, 0x9023).nopr();
 	map(0xe000, 0xe3ff).ram(); // Palette table
 }
 
@@ -54,10 +58,14 @@ void emg2000a_device::io_map(address_map &map)
 	map(0x01, 0x01).rw(FUNC(emg2000a_device::sr_r), FUNC(emg2000a_device::sr_w));
 	map(0x02, 0x02).ram(); // TODO: saved and restored during interrupts
 	map(0x03, 0x03).rw(FUNC(emg2000a_device::bank_r), FUNC(emg2000a_device::bank_w));
+	map(0x09, 0x09).rw(FUNC(emg2000a_device::porta_r), FUNC(emg2000a_device::porta_w));
+	map(0x0a, 0x0a).r(FUNC(emg2000a_device::portb_r));
 	map(0x0c, 0x0d).rw(FUNC(emg2000a_device::inte_r), FUNC(emg2000a_device::inte_w));
 	map(0x0e, 0x0f).rw(FUNC(emg2000a_device::intf_r), FUNC(emg2000a_device::intf_w));
 	map(0x13, 0x13).rw(FUNC(emg2000a_device::spa_r), FUNC(emg2000a_device::spa_w));
 	map(0x14, 0x16).ram(); // TODO: saved and restored during interrupts
+	map(0x21, 0x21).rw(FUNC(emg2000a_device::pdira_r), FUNC(emg2000a_device::pdira_w));
+	map(0x24, 0x24).rw(FUNC(emg2000a_device::pcona_r), FUNC(emg2000a_device::pcona_w));
 	map(0x40, 0x43).rw(FUNC(emg2000a_device::timer01_r), FUNC(emg2000a_device::timer01_w));
 	// TODO: lots of other ports and registers
 }
@@ -118,6 +126,15 @@ void edsp_device::device_start()
 	save_item(NAME(m_tcon));
 }
 
+void emg2000a_device::device_start()
+{
+	edsp_device::device_start();
+
+	save_item(NAME(m_pdata));
+	save_item(NAME(m_pdira));
+	save_item(NAME(m_pcona));
+}
+
 void edsp_device::device_reset()
 {
 	m_pc = 0;
@@ -136,6 +153,15 @@ void edsp_device::device_reset()
 		m_tcon[n] = 0;
 		m_timer01[n]->enable(false);
 	}
+}
+
+void emg2000a_device::device_reset()
+{
+	edsp_device::device_reset();
+
+	m_pdata = 0;
+	m_pdira = 0;
+	m_pcona = 0;
 }
 
 u16 edsp_device::sr_r()
@@ -192,6 +218,45 @@ u16 edsp_device::spa_r()
 void edsp_device::spa_w(u16 data)
 {
 	m_sp = data;
+}
+
+u16 emg2000a_device::porta_r()
+{
+	return (m_in_pa_cb() & ~m_pdira) | (m_pdata & m_pdira);
+}
+
+void emg2000a_device::porta_w(u16 data)
+{
+	m_pdata = data;
+	if (m_pdira)
+		m_out_pa_cb(0, m_pdata | ~m_pdira, m_pdira);
+}
+
+u16 emg2000a_device::portb_r()
+{
+	// TODO: data direction
+	return m_in_pb_cb();
+}
+
+u16 emg2000a_device::pdira_r()
+{
+	return m_pdira;
+}
+
+void emg2000a_device::pdira_w(u16 data)
+{
+	m_pdira = data;
+	m_out_pa_cb(0, m_pdata | ~m_pdira, m_pdira);
+}
+
+u16 emg2000a_device::pcona_r()
+{
+	return m_pcona;
+}
+
+void emg2000a_device::pcona_w(u16 data)
+{
+	m_pcona = data;
 }
 
 u16 edsp_device::timer01_r(offs_t offset)
