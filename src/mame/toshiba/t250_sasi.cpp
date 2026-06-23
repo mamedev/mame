@@ -204,7 +204,7 @@ u8 t250_sasi_host_device::hsts_r()
 	// called.  BIOS' hsel1 loop polls hsts hundreds of times per microsecond
 	// while waiting for BSY assertion, so doing the transition here is plenty
 	// responsive.
-	if (m_sasi_phase == SASI_SELECTING && (ctrl & nscsi_device_interface::S_BSY))
+	if (!machine().side_effects_disabled() && (m_sasi_phase == SASI_SELECTING) && (ctrl & nscsi_device_interface::S_BSY))
 	{
 		m_scsi_bus->ctrl_w(m_scsi_refid, 0, nscsi_device_interface::S_SEL);
 		m_scsi_bus->data_w(m_scsi_refid, 0);
@@ -399,15 +399,18 @@ u8 t250_sasi_host_device::hdata1_r()
 	{
 	case SASI_PASSTHROUGH:
 		data = m_scsi_bus->data_r();
-		if (m_scsi_bus->ctrl_r() & nscsi_device_interface::S_REQ)
+		if (!machine().side_effects_disabled())
 		{
-			m_scsi_bus->ctrl_w(m_scsi_refid, nscsi_device_interface::S_ACK, nscsi_device_interface::S_ACK);
-			m_sasi_ack_timer->adjust(SASI_PULSE);
+			if (m_scsi_bus->ctrl_r() & nscsi_device_interface::S_REQ)
+			{
+				m_scsi_bus->ctrl_w(m_scsi_refid, nscsi_device_interface::S_ACK, nscsi_device_interface::S_ACK);
+				m_sasi_ack_timer->adjust(SASI_PULSE);
+			}
+			// If the bus just dropped BSY (target completed message-in), return
+			// to idle so the next selection starts clean.
+			if (!(m_scsi_bus->ctrl_r() & nscsi_device_interface::S_BSY))
+				m_sasi_phase = SASI_IDLE;
 		}
-		// If the bus just dropped BSY (target completed message-in), return
-		// to idle so the next selection starts clean.
-		if (!(m_scsi_bus->ctrl_r() & nscsi_device_interface::S_BSY))
-			m_sasi_phase = SASI_IDLE;
 		break;
 
 	case SASI_SWALLOW_CMD:
@@ -421,8 +424,11 @@ u8 t250_sasi_host_device::hdata1_r()
 		// Return 0 and advance to SWALLOW_STATUS, asserting synth_req so
 		// hgetrs' req1 poll passes and the next read returns the status.
 		data = 0x00;
-		m_sasi_phase = SASI_SWALLOW_STATUS;
-		m_sasi_synth_req = true;
+		if (!machine().side_effects_disabled())
+		{
+			m_sasi_phase = SASI_SWALLOW_STATUS;
+			m_sasi_synth_req = true;
+		}
 		break;
 
 	case SASI_SWALLOW_STATUS:
@@ -432,9 +438,12 @@ u8 t250_sasi_host_device::hdata1_r()
 		// and synth_bsy now so the second read sees no REQ and BIOS exits
 		// the wait loop, then return to IDLE.
 		data = 0x00;
-		m_sasi_synth_req = false;
-		m_sasi_synth_bsy = false;
-		m_sasi_phase = SASI_IDLE;
+		if (!machine().side_effects_disabled())
+		{
+			m_sasi_synth_req = false;
+			m_sasi_synth_bsy = false;
+			m_sasi_phase = SASI_IDLE;
+		}
 		break;
 
 	case SASI_IDLE:

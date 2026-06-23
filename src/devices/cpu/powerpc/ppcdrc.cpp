@@ -1017,7 +1017,7 @@ void ppc_device::static_generate_memory_accessor(
 		else
 		{
 			UML_MOV(block, mem(&m_core->reserve), 1);          // mov     reserve,1
-			UML_AND(block, I3, I0, 0xffff'ffe0);               // and     i3,i0,0xffffffe0
+			UML_AND(block, I3, I0, m_reservation_mask);        // and     i3,i0,m_reservation_mask
 			UML_MOV(block, mem(&m_core->reserve_address), I3); // mov     reserve_address,i3
 		}
 	}
@@ -1032,12 +1032,12 @@ void ppc_device::static_generate_memory_accessor(
 				if (m_fastram[ramnum].end != 0xffffffff)
 				{
 					UML_CMP(block, I0, m_fastram[ramnum].end);         // cmp     i0,end
-					UML_JMPc(block, COND_A, skip);                                              // ja      skip
+					UML_JMPc(block, COND_A, skip);                     // ja      skip
 				}
 				if (m_fastram[ramnum].start != 0x00000000)
 				{
-					UML_CMP(block, I0, m_fastram[ramnum].start);           // cmp     i0,fastram_start
-					UML_JMPc(block, COND_B, skip);                                              // jb      skip
+					UML_CMP(block, I0, m_fastram[ramnum].start);       // cmp     i0,fastram_start
+					UML_JMPc(block, COND_B, skip);                     // jb      skip
 				}
 
 				if (!iswrite)

@@ -749,9 +749,9 @@ void xerox820ii_state::xerox820ii(machine_config &config)
 	/* devices */
 	Z80PIO(config, m_kbpio, 16_MHz_XTAL / 4);
 	m_kbpio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_kbpio->in_pa_callback().set(FUNC(xerox820_state::kbpio_pa_r));
-	m_kbpio->out_pa_callback().set(FUNC(xerox820_state::kbpio_pa_w));
-	m_kbpio->in_pb_callback().set(FUNC(xerox820_state::kbpio_pb_r));
+	m_kbpio->in_pa_callback().set(FUNC(xerox820ii_state::kbpio_pa_r));
+	m_kbpio->out_pa_callback().set(FUNC(xerox820ii_state::kbpio_pa_w));
+	m_kbpio->in_pb_callback().set(FUNC(xerox820ii_state::kbpio_pb_r));
 
 	z80pio_device& pio_gp(Z80PIO(config, Z80PIO_GP_TAG, 16_MHz_XTAL / 4));
 	pio_gp.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -768,11 +768,11 @@ void xerox820ii_state::xerox820ii(machine_config &config)
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
 	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
-	//TIMER(config, "ctc").configure_periodic(FUNC(xerox820_state::ctc_tick), attotime::from_hz(16_MHz_XTAL / 4));
+	//TIMER(config, "ctc").configure_periodic(FUNC(xerox820ii_state::ctc_tick), attotime::from_hz(16_MHz_XTAL / 4));
 
 	FD1797(config, m_fdc, 16_MHz_XTAL / 8);
-	m_fdc->intrq_wr_callback().set(FUNC(xerox820_state::fdc_intrq_w));
-	m_fdc->drq_wr_callback().set(FUNC(xerox820_state::fdc_drq_w));
+	m_fdc->intrq_wr_callback().set(FUNC(xerox820ii_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(xerox820ii_state::fdc_drq_w));
 	FLOPPY_CONNECTOR(config, FD1797_TAG":0", xerox820_floppies, "sa450", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, FD1797_TAG":1", xerox820_floppies, "sa450", floppy_image_device::default_mfm_floppy_formats);
 
@@ -820,7 +820,7 @@ void xerox820ii_state::xerox820ii(machine_config &config)
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("xerox820ii");
-	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(xerox820_state::quickload_cb));
+	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(xerox820ii_state::quickload_cb));
 }
 
 void xerox820ii_state::xerox168(machine_config &config)

@@ -18,8 +18,8 @@
 
 #include "endianness.h"
 
+#include <algorithm>
 #include <bit>
-
 #include <cstring>
 
 
@@ -563,28 +563,31 @@ void ppc_device::device_start()
 	m_out_of_cycles = nullptr;
 	m_tlb_mismatch = nullptr;
 	m_swap_tgpr = nullptr;
-	memset(m_lsw, 0, sizeof(m_lsw));
-	memset(m_stsw, 0, sizeof(m_stsw));
-	memset(m_read8, 0, sizeof(m_read8));
-	memset(m_write8, 0, sizeof(m_write8));
-	memset(m_read16, 0, sizeof(m_read16));
-	memset(m_read16mask, 0, sizeof(m_read16mask));
-	memset(m_write16, 0, sizeof(m_write16));
-	memset(m_write16mask, 0, sizeof(m_write16mask));
-	memset(m_read32, 0, sizeof(m_read32));
-	memset(m_read32align, 0, sizeof(m_read32align));
-	memset(m_read32mask, 0, sizeof(m_read32mask));
-	memset(m_read32reserve, 0, sizeof(m_read32reserve));
-	memset(m_write32, 0, sizeof(m_write32));
-	memset(m_write32align, 0, sizeof(m_write32align));
-	memset(m_write32mask, 0, sizeof(m_write32mask));
-	memset(m_write32reserve, 0, sizeof(m_write32reserve));
-	memset(m_read64, 0, sizeof(m_read64));
-	memset(m_read64mask, 0, sizeof(m_read64mask));
-	memset(m_write64, 0, sizeof(m_write64));
-	memset(m_write64mask, 0, sizeof(m_write64mask));
-	memset(m_exception, 0, sizeof(m_exception));
-	memset(m_exception_norecover, 0, sizeof(m_exception_norecover));
+	for (auto &lsw : m_lsw)
+		std::fill(std::begin(lsw), std::end(lsw), nullptr);
+	for (auto &stsw : m_stsw)
+		std::fill(std::begin(stsw), std::end(stsw), nullptr);
+	std::fill(std::begin(m_read8), std::end(m_read8), nullptr);
+	std::fill(std::begin(m_write8), std::end(m_write8), nullptr);
+	std::fill(std::begin(m_read16), std::end(m_read16), nullptr);
+	std::fill(std::begin(m_read16mask), std::end(m_read16mask), nullptr);
+	std::fill(std::begin(m_write16), std::end(m_write16), nullptr);
+	std::fill(std::begin(m_write16mask), std::end(m_write16mask), nullptr);
+	std::fill(std::begin(m_read32), std::end(m_read32), nullptr);
+	std::fill(std::begin(m_read32align), std::end(m_read32align), nullptr);
+	std::fill(std::begin(m_read32mask), std::end(m_read32mask), nullptr);
+	std::fill(std::begin(m_read32reserve), std::end(m_read32reserve), nullptr);
+	std::fill(std::begin(m_write32), std::end(m_write32), nullptr);
+	std::fill(std::begin(m_write32align), std::end(m_write32align), nullptr);
+	std::fill(std::begin(m_write32mask), std::end(m_write32mask), nullptr);
+	std::fill(std::begin(m_write32reserve), std::end(m_write32reserve), nullptr);
+	std::fill(std::begin(m_read64), std::end(m_read64), nullptr);
+	std::fill(std::begin(m_read64mask), std::end(m_read64mask), nullptr);
+	std::fill(std::begin(m_write64), std::end(m_write64), nullptr);
+	std::fill(std::begin(m_write64mask), std::end(m_write64mask), nullptr);
+	std::fill(std::begin(m_exception), std::end(m_exception), nullptr);
+	std::fill(std::begin(m_exception_norecover), std::end(m_exception_norecover), nullptr);
+	m_fpscr_finish = nullptr;
 
 	/* initialize the implementation state tables */
 	memcpy(m_fpmode, fpmode_source, sizeof(fpmode_source));

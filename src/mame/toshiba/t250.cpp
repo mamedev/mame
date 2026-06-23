@@ -110,15 +110,15 @@ public:
 		, m_vpg_view(*this, "vpg_view")
 	{ }
 
-	void t250(machine_config &config);
-	void t200(machine_config &config);
+	void t250(machine_config &config) ATTR_COLD;
+	void t200(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void common(machine_config &config);
+	void common(machine_config &config) ATTR_COLD;
 	void mem_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 

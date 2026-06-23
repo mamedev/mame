@@ -26,6 +26,9 @@ class t250_ccm_device : public device_t
 public:
 	t250_ccm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	auto rxrdy_handler() { return m_rxrdy_cb.bind(); }
+	auto txrdy_handler() { return m_txrdy_cb.bind(); }
+
 	u8   pit_r(offs_t offset)            { return m_pit->read(offset); }
 	void pit_w(offs_t offset, u8 data)   { m_pit->write(offset, data); }
 	u8   usart_r(offs_t offset)          { return m_usart->read(offset); }
@@ -33,8 +36,6 @@ public:
 	void mode_w(u8 data);                   // 0xA6 — CCM mode register
 	u8   cicts_r();                         // 0xA7 — CI/CTS status
 
-	auto rxrdy_handler() { return m_rxrdy_cb.bind(); }
-	auto txrdy_handler() { return m_txrdy_cb.bind(); }
 	bool rxrdy_state() const { return m_rxrdy_state; }
 	bool txrdy_state() const { return m_txrdy_state; }
 	bool cts_r() const       { return m_cts; }
