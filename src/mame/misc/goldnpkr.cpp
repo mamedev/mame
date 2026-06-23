@@ -1124,7 +1124,8 @@ public:
 		m_discrete(*this, "discrete"),
 		m_hopper(*this, "hopper"),
 		m_ay8910(*this, "ay8910"),
-		m_snsnd(*this, "snsnd")
+		m_snsnd(*this, "snsnd"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
 	void wildcard(machine_config &config) ATTR_COLD;
@@ -1177,6 +1178,8 @@ public:
 	void init_olym65() ATTR_COLD;
 	void init_glfev() ATTR_COLD;
 	void init_ped42() ATTR_COLD;
+	void init_dep9801() ATTR_COLD;
+	void init_dash() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -1256,10 +1259,12 @@ private:
 	void unkicpf40_map(address_map &map) ATTR_COLD;
 	void wing_w90_map(address_map &map) ATTR_COLD;
 	void dep_9801_map(address_map &map) ATTR_COLD;
+	void dep_9801_opcodes_map(address_map &map) ATTR_COLD;
 
 	optional_device<ticket_dispenser_device> m_hopper;
 	optional_device<ay8910_device> m_ay8910;
 	optional_device<sn76489a_device> m_snsnd;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	tilemap_t *m_bg_tilemap = nullptr;
 	uint8_t m_pia0_PA_data = 0;
@@ -2158,10 +2163,19 @@ void goldnpkr_state::wing_w90_map(address_map &map)
 
 void goldnpkr_state::dep_9801_map(address_map &map)
 {
-	common_io_map(map);
-
 	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
+	map(0x0804, 0x0807).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0808, 0x080b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0c00, 0x0c00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0c01, 0x0c01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share(m_videoram);
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share(m_colorram);
 	map(0x2000, 0xffff).rom();
+}
+
+void goldnpkr_state::dep_9801_opcodes_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom().share(m_decrypted_opcodes);
 }
 
 
@@ -5799,6 +5813,7 @@ void goldnpkr_state::dep_9801(machine_config &config)
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::dep_9801_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &goldnpkr_state::dep_9801_opcodes_map);
 
 	// video hardware
 	m_gfxdecode->set_info(gfx_dep_9801);
@@ -14151,6 +14166,9 @@ ROM_START( dash_a37 )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "27s13.2m", 0x0000, 0x0200, CRC(71b04758) SHA1(09f4dc2ded3466880622e2416787a47ca8886fd4) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )
+	ROM_LOAD( "nvram", 0x0000, 0x0800, CRC(8e4f79e6) SHA1(95cf8f80eebbb3c122e7e880e8f3be8aea29af69) )
 ROM_END
 
 ROM_START( dash_a37b )
@@ -14185,6 +14203,9 @@ ROM_START( dash_a37b )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "27s13.2m", 0x0000, 0x0200, CRC(71b04758) SHA1(09f4dc2ded3466880622e2416787a47ca8886fd4) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )
+	ROM_LOAD( "nvram", 0x0000, 0x0800, CRC(9c895c1d) SHA1(323a18bc671d64b408d6861e0a248f42abc2eae9) )
 ROM_END
 
 ROM_START( lfhouse )
@@ -14881,6 +14902,57 @@ void goldnpkr_state::init_ped42()
 	ROM[0x7ef6] = 0x7f;
 }
 
+void goldnpkr_state::init_dep9801() // placeholder until the decryption is done for all sets
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0x00000; i < 0x10000; i++)
+		m_decrypted_opcodes[i] = rom[i];
+}
+
+void goldnpkr_state::init_dash()
+{
+	static const uint8_t opcode_xortable[0x10][0x08] =
+	{ //  0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07
+		{ 0x80,0x8c,0x8c,0x80,0x20,0x2c,0x2c,0x20 },    // 0x00
+		{ 0x2c,0xa8,0x2c,0xa8,0x2c,0xa8,0x2c,0xa8 },    // 0x01
+		{ 0x80,0x8c,0x8c,0x80,0x20,0x2c,0x2c,0x20 },    // 0x02
+		{ 0x2c,0xa8,0x2c,0xa8,0x2c,0xa8,0x2c,0xa8 },    // 0x03
+		{ 0x80,0x8c,0x8c,0x80,0x20,0x2c,0x2c,0x20 },    // 0x04
+		{ 0x2c,0xa8,0x2c,0xa8,0x2c,0xa8,0x2c,0xa8 },    // 0x05
+		{ 0x80,0x8c,0x8c,0x80,0x20,0x2c,0x2c,0x20 },    // 0x06
+		{ 0x2c,0xa8,0x2c,0xa8,0x2c,0xa8,0x2c,0xa8 },    // 0x07
+		{ 0x84,0x88,0x0c,0x00,0xa0,0xac,0x28,0x24 },    // 0x40
+		{ 0x84,0x88,0x0c,0x00,0xa0,0xac,0x28,0x24 },    // 0x41
+		{ 0x08,0x08,0x20,0x20,0xa8,0xa8,0x80,0x80 },    // 0x42
+		{ 0x08,0x08,0x20,0x20,0xa8,0xa8,0x80,0x80 },    // 0x43
+		{ 0x2c,0xa8,0x04,0x80,0x08,0x8c,0x20,0xa4 },    // 0x44
+		{ 0x2c,0xa8,0x04,0x80,0x08,0x8c,0x20,0xa4 },    // 0x45
+		{ 0x2c,0xa8,0x04,0x80,0x08,0x8c,0x20,0xa4 },    // 0x46
+		{ 0x2c,0xa8,0x04,0x80,0x08,0x8c,0x20,0xa4 },    // 0x47
+	};
+
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0x00000; i < 0x10000; i++)
+	{
+		// logic is reminiscent of machine/segacrpt_device.cpp
+
+		// pick the row in the table from bits 0, 1, 2 and 6 of the address
+		uint8_t const row = bitswap<4>(i, 6, 2, 1, 0);
+
+		// pick the column in the table from bits 2,3,5,7 of the source data
+		uint8_t col = bitswap<3>(rom[i], 5, 3, 2);
+
+		// however the upper part is mirrored
+			if (BIT(rom[i], 7))
+				col = 7 - col;
+
+		// only opcodes are encrypted
+		m_decrypted_opcodes[i] = rom[i] ^ opcode_xortable[row][col];
+	}
+
+}
 
 } // anonymous namespace
 
@@ -15109,14 +15181,14 @@ GAME(  1987, gp_ped42_85, goldnpkr, goldnpkr, goldnpkr,  goldnpkr_state, init_pe
 GAME(  1987, gp_ped42_80, goldnpkr, goldnpkr, goldnpkr,  goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 80%)",          0 )  // no lamps
 GAME(  1987, gp_ped42_70, goldnpkr, goldnpkr, goldnpkr,  goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 70%)",          0 )  // no lamps
 
-// DEP 9801 encrypted platform...
-GAME(  1998, dash_a37,  0,         dep_9801,  goldnpkr, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "Dash! (A37, ver 1998/10/22)",                MACHINE_NOT_WORKING )
-GAME(  1996, dash_a37b, dash_a37,  dep_9801,  goldnpkr, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "Dash! (A37, ver 1996/11/18)",                MACHINE_NOT_WORKING )
-GAME(  1996, lfhouse,   0,         dep_9801,  goldnpkr, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "Lucky Full House (ver 1.16, data ver 1.05)", MACHINE_NOT_WORKING )
-GAME(  1994, lfhouseb,  lfhouse,   dep_9801,  goldnpkr, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "Lucky Full House (ver 1.15, data ver 1.04)", MACHINE_NOT_WORKING )
-GAME(  1992, dynchance, 0,         dep_9801,  goldnpkr, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "Dynamic Chance (Type-3.0 Part 1-2)",         MACHINE_NOT_WORKING )
-GAME(  1992, dynchancf, dynchance, dep_9801,  goldnpkr, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "Dynamic Chance (Type-3.0 Part 1-2, alt)",    MACHINE_NOT_WORKING )
-GAME(  1997, dynplus,   dynchance, dep_9801,  goldnpkr, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "Dynamic Plus One (SP Type ver 1.10)",        MACHINE_NOT_WORKING )
+// DEP 9801 encrypted platform... (only dash_a37 and clone decrypted for now)
+GAME(  1998, dash_a37,  0,         dep_9801,  goldnpkr, goldnpkr_state, init_dash,   ROT0,   "<unknown>",                "Dash! (A37, ver 1998/10/22)",                MACHINE_NOT_WORKING )
+GAME(  1996, dash_a37b, dash_a37,  dep_9801,  goldnpkr, goldnpkr_state, init_dash,   ROT0,   "<unknown>",                "Dash! (A37, ver 1996/11/18)",                MACHINE_NOT_WORKING )
+GAME(  1996, lfhouse,   0,         dep_9801,  goldnpkr, goldnpkr_state, init_dep9801,ROT0,   "<unknown>",                "Lucky Full House (ver 1.16, data ver 1.05)", MACHINE_NOT_WORKING )
+GAME(  1994, lfhouseb,  lfhouse,   dep_9801,  goldnpkr, goldnpkr_state, init_dep9801,ROT0,   "<unknown>",                "Lucky Full House (ver 1.15, data ver 1.04)", MACHINE_NOT_WORKING )
+GAME(  1992, dynchance, 0,         dep_9801,  goldnpkr, goldnpkr_state, init_dep9801,ROT0,   "<unknown>",                "Dynamic Chance (Type-3.0 Part 1-2)",         MACHINE_NOT_WORKING )
+GAME(  1992, dynchancf, dynchance, dep_9801,  goldnpkr, goldnpkr_state, init_dep9801,ROT0,   "<unknown>",                "Dynamic Chance (Type-3.0 Part 1-2, alt)",    MACHINE_NOT_WORKING )
+GAME(  1997, dynplus,   dynchance, dep_9801,  goldnpkr, goldnpkr_state, init_dep9801,ROT0,   "<unknown>",                "Dynamic Plus One (SP Type ver 1.10)",        MACHINE_NOT_WORKING )
 
 
 /*************************************** SETS W/IRQ0 ***************************************/
