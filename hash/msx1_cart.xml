@@ -317,7 +317,7 @@ Ultra Chess - [K085] Al Alamiah
 		<year>1986</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="蒼き狼と白き牝鹿 ジンギスカン" />
-		<info name="gtin" value="04988615000225"/>
+		<info name="barcode" value="4988615000225"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-621 KAGA" />
@@ -373,7 +373,7 @@ Ultra Chess - [K085] Al Alamiah
 		<info name="serial" value="TEX-75" />
 		<info name="alt_title" value="ディーヴァ ストーリー4·アスラの血流" />
 		<info name="serial" value="TEX-75"/>
-		<info name="gtin" value="049886049030752"/>
+		<info name="barcode" value="49886049030752"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
 			<feature name="slot" value="ascii8" />
@@ -389,7 +389,7 @@ Ultra Chess - [K085] Al Alamiah
 		<year>1987</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="alt_title" value="デジタルデビル物語 女神転生" />
-		<info name="gtin" value="04988624920019"/>
+		<info name="barcode" value="4988624920019"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
@@ -406,7 +406,7 @@ Ultra Chess - [K085] Al Alamiah
 		<publisher>Enix</publisher>
 		<info name="serial" value="E-G186" />
 		<info name="alt_title" value="ドラゴンクエスト" />
-		<info name="gtin" value="04988601001861"/>
+		<info name="barcode" value="4988601001861"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
@@ -473,7 +473,7 @@ Ultra Chess - [K085] Al Alamiah
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="R55X5812" />
 		<info name="alt_title" value="ファンタジーゾーン" />
-		<info name="gtin" value="04988013008694"/>
+		<info name="barcode" value="4988013008694"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
@@ -522,7 +522,7 @@ Ultra Chess - [K085] Al Alamiah
 		<publisher>Sony</publisher>
 		<info name="serial" value="HBS-G053C" />
 		<info name="alt_title" value="ガルフォース カオスの攻防" />
-		<info name="gtin" value="04901780056651"/>
+		<info name="barcode" value="4901780056651"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii16" />
@@ -604,7 +604,7 @@ Ultra Chess - [K085] Al Alamiah
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="TEX-70" />
 		<info name="alt_title" value="ハイドライドII" />
-		<info name="gtin" value="04988604030707"/>
+		<info name="barcode" value="4988604030707"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-621M" />
 			<feature name="slot" value="ascii8_sram" />
@@ -626,7 +626,7 @@ Ultra Chess - [K085] Al Alamiah
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="TEX-79" />
 		<info name="alt_title" value="ハイドライド3" />
-		<info name="gtin" value="04988604030790"/>
+		<info name="barcode" value="4988604030790"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M008M" />
 			<feature name="slot" value="ascii8" />
@@ -679,7 +679,7 @@ Ultra Chess - [K085] Al Alamiah
 		<info name="serial" value="E-G187" />
 		<info name="alt_title" value="軽井沢誘拐案内" />
 		<info name="usage" value="Requires a Japanese system."/>
-		<info name="gtin" value="04988601001878"/>
+		<info name="barcode" value="4988601001878"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
@@ -743,7 +743,7 @@ Ultra Chess - [K085] Al Alamiah
 		<publisher>Hi-Score Software</publisher>
 		<info name="alt_title" value="MSX英和辞典" />
 		<info name="serial" value="M-2012"/>
-		<info name="gtin" value="04988002146970"/>
+		<info name="barcode" value="4988002146970"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M008S" />
 			<feature name="slot" value="ascii8" />
@@ -824,7 +824,7 @@ Ultra Chess - [K085] Al Alamiah
 		<year>1987</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="信長の野望 全国版" />
-		<info name="gtin" value="04988615000126"/>
+		<info name="barcode" value="4988615000126"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-621 KAGA" />
@@ -883,7 +883,7 @@ kept for now until finding out what those bytes affect...
 		<year>1988</year>
 		<publisher>Irem</publisher>
 		<info name="serial" value="IM-04" />
-		<info name="gtin" value="04962891300040"/>
+		<info name="barcode" value="4962891300040"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="MSX-004" />
 			<feature name="slot" value="rtype" />
@@ -901,7 +901,7 @@ kept for now until finding out what those bytes affect...
 		<year>1988</year>
 		<publisher>Irem</publisher>
 		<info name="serial" value="IM-04" />
-		<info name="gtin" value="04962891300040"/>
+		<info name="barcode" value="4962891300040"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="rtype" />
 			<feature name="mapper" value="IREM TAM-S1" />
@@ -918,7 +918,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Koei</publisher>
 		<info name="serial" value="MXKN11008" />
 		<info name="alt_title" value="三國志" />
-		<info name="gtin" value="04988615000003"/>
+		<info name="barcode" value="4988615000003"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
@@ -937,7 +937,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Koei</publisher>
 		<info name="serial" value="MXKN11008" />
 		<info name="alt_title" value="三國志" />
-		<info name="gtin" value="04988615000003"/>
+		<info name="barcode" value="4988615000003"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-2M" />
@@ -957,7 +957,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="戦場の狼" />
 		<info name="serial" value="2019101"/>
-		<info name="gtin" value="04988606200191"/>
+		<info name="barcode" value="4988606200191"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
@@ -993,7 +993,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="TEX-76" />
 		<info name="alt_title" value="スーパーレイドック" />
-		<info name="gtin" value="04988604030769"/>
+		<info name="barcode" value="4988604030769"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
 			<feature name="slot" value="ascii8" />
@@ -1111,7 +1111,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Enix</publisher>
 		<info name="alt_title" value="ウイングマン2 キータクラーの復活" />
 		<info name="serial" value="E-G191"/>
-		<info name="gtin" value="04988601001915"/>
+		<info name="barcode" value="4988601001915"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
@@ -1146,7 +1146,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Pack-In-Video</publisher>
 		<info name="serial" value="MS-7" />
 		<info name="alt_title" value="ヤングシャーロック・ドイルの遺産" />
-		<info name="gtin" value="04988110800078"/>
+		<info name="barcode" value="4988110800078"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="MSX-2MX" />
 			<feature name="slot" value="ascii8" />
@@ -1167,7 +1167,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Irem</publisher>
 		<info name="serial" value="IM-02" />
 		<info name="alt_title" value="１０ヤードファイト" />
-		<info name="gtin" value="04988891300026"/>
+		<info name="barcode" value="4988891300026"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -1182,7 +1182,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Irem</publisher>
 		<info name="serial" value="IM-02" />
 		<info name="alt_title" value="１０ヤードファイト" />
-		<info name="gtin" value="04988891300026"/>
+		<info name="barcode" value="4988891300026"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -1313,7 +1313,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>GA-Yume / HOT・B</publisher>
 		<info name="alt_title" value="ア・ナ・ザ" />
 		<info name="serial" value="MXHB21002"/>
-		<info name="gtin" value="04967948000027"/>
+		<info name="barcode" value="4967948000027"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -1473,7 +1473,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="R48X5513" />
 		<info name="alt_title" value="アルカザール" />
-		<info name="gtin" value="04988013001091"/>
+		<info name="barcode" value="4988013001091"/>
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="0x10000">
 				<rom name="alcazar - the forgotten fortress (japan).rom" size="0x4000" crc="3ee454b0" sha1="807676038cbba043b8099eba9c5840a4811a7e59" />
@@ -1532,7 +1532,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JX-13" />
 		<info name="alt_title" value="エイリアン８" />
-		<info name="gtin" value="04907859102090"/>
+		<info name="barcode" value="4907859102090"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -1616,7 +1616,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="R49X5103" />
 		<info name="alt_title" value="アルファロイド" />
-		<info name="gtin" value="04988013007192"/>
+		<info name="barcode" value="4988013007192"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -1632,7 +1632,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="R49X5103" />
 		<info name="alt_title" value="アルファロイド" />
-		<info name="gtin" value="04988013007192"/>
+		<info name="barcode" value="4988013007192"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -1878,7 +1878,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Nidecom</publisher>
 		<info name="alt_title" value="アルカノイド" />
 		<info name="serial" value="MSX10"/>
-		<info name="gtin" value="04988611860076"/>
+		<info name="barcode" value="4988611860076"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -1894,7 +1894,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Nidecom</publisher>
 		<info name="alt_title" value="アルカノイド" />
 		<info name="serial" value="MSX10"/>
-		<info name="gtin" value="04988611860076"/>
+		<info name="barcode" value="4988611860076"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -2048,7 +2048,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="R49X5090" />
 		<info name="alt_title" value="バックトゥザフューチャー" />
-		<info name="gtin" value="04988013001695"/>
+		<info name="barcode" value="4988013001695"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -2063,7 +2063,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="R49X5090" />
 		<info name="alt_title" value="バックトゥザフューチャー" />
-		<info name="gtin" value="04988013001695"/>
+		<info name="barcode" value="4988013001695"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -2078,7 +2078,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="R49X5090" />
 		<info name="alt_title" value="バックトゥザフューチャー" />
-		<info name="gtin" value="04988013001695"/>
+		<info name="barcode" value="4988013001695"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -2203,7 +2203,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="R49X5807" />
 		<info name="alt_title" value="バンクパニック" />
-		<info name="gtin" value="04988013004399"/>
+		<info name="barcode" value="4988013004399"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -2218,7 +2218,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="R49X5807" />
 		<info name="alt_title" value="バンクパニック" />
-		<info name="gtin" value="04988013004399"/>
+		<info name="barcode" value="4988013004399"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -2301,7 +2301,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Pack-In-Video</publisher>
 		<info name="alt_title" value="バットマン" />
 		<info name="serial" value="MS-13"/>
-		<info name="gtin" value="04988110800139"/>
+		<info name="barcode" value="4988110800139"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2710,7 +2710,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="XR-1043" />
 		<info name="alt_title" value="ボンバーキング" />
-		<info name="gtin" value="04988607102821"/>
+		<info name="barcode" value="4988607102821"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2960,7 +2960,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Jaleco</publisher>
 		<info name="alt_title" value="ブレイクイン"/>
 		<info name="serial" value="JX-14" />
-		<info name="gtin" value="04907859102106"/>
+		<info name="barcode" value="4907859102106"/>
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="0x10000">
 				<rom name="break in (japan).rom" size="0x10000" crc="8801b31e" sha1="bcfdb43b275c62a76856aab94fb1b53bd92b2db2" />
@@ -3328,7 +3328,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Casio</publisher>
 		<info name="serial" value="GPM-118" />
 		<info name="alt_title" value="カーファイター" />
-		<info name="gtin" value="04971850170464"/>
+		<info name="barcode" value="4971850170464"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
@@ -3636,7 +3636,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Sony</publisher>
 		<info name="serial" value="HBS-G047C" />
 		<info name="alt_title" value="チャンピオンシップロードランナー" />
-		<info name="gtin" value="04901780008216"/>
+		<info name="barcode" value="4901780008216"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -4224,7 +4224,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Heart Soft</publisher>
 		<info name="serial" value="HRK-22" />
 		<info name="alt_title" value="クレイズ" />
-		<info name="gtin" value="04988641002187"/>
+		<info name="barcode" value="4988641002187"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -4806,7 +4806,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="R49X5805" />
 		<info name="alt_title" value="どきどきペンギンランド" />
-		<info name="gtin" value="04988013000896"/>
+		<info name="barcode" value="4988013000896"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -4821,7 +4821,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="R49X5805" />
 		<info name="alt_title" value="どきどきペンギンランド" />
-		<info name="gtin" value="04988013000896"/>
+		<info name="barcode" value="4988013000896"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -4960,7 +4960,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Victor</publisher>
 		<info name="alt_title" value="ドレイナー" />
 		<info name="serial" value="M-2009"/>
-		<info name="gtin" value="04988002126309"/>
+		<info name="barcode" value="4988002126309"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -5028,7 +5028,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="serial" value="HM-021" />
 		<info name="alt_title" value="ダンクショット" />
-		<info name="gtin" value="04988610115214"/>
+		<info name="barcode" value="4988610115214"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -5043,7 +5043,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="serial" value="HM-021" />
 		<info name="alt_title" value="ダンクショット" />
-		<info name="gtin" value="04988610115214"/>
+		<info name="barcode" value="4988610115214"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -5057,7 +5057,7 @@ kept for now until finding out what those bytes affect...
 		<year>1988</year>
 		<publisher>Toshiba EMI</publisher>
 		<info name="serial" value="PS-2023G" />
-		<info name="gtin" value="04988006022621"/>
+		<info name="barcode" value="4988006022621"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -5371,7 +5371,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Casio</publisher>
 		<info name="serial" value="GPM-129" />
 		<info name="alt_title" value="エクゾイドＺエリア５" />
-		<info name="gtin" value="04971850104971"/>
+		<info name="barcode" value="4971850104971"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -5509,7 +5509,7 @@ kept for now until finding out what those bytes affect...
 		<year>1987</year>
 		<publisher>Hot-B</publisher>
 		<info name="alt_title" value="フェアリーランドストーリー" />
-		<info name="gtin" value="04967948000041"/>
+		<info name="barcode" value="4967948000041"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -5524,7 +5524,7 @@ kept for now until finding out what those bytes affect...
 		<year>1987</year>
 		<publisher>Hot-B</publisher>
 		<info name="alt_title" value="フェアリーランドストーリー" />
-		<info name="gtin" value="04967948000041"/>
+		<info name="barcode" value="4967948000041"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -5782,7 +5782,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="フライトデッキ" />
 		<info name="serial" value="R49X5105"/>
-		<info name="gtin" value="04988013008298"/>
+		<info name="barcode" value="4988013008298"/>
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="0x10000">
 				<rom name="flight deck (japan).rom" size="0x10000" crc="a00526d0" sha1="3eee7c72362522c27866d4367a8cf1e22932db32" />
@@ -5796,7 +5796,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="フライトデッキ" />
 		<info name="serial" value="R49X5105"/>
-		<info name="gtin" value="04988013008298"/>
+		<info name="barcode" value="4988013008298"/>
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="0x10000">
 				<rom name="flight deck (japan) (alt 1).rom" size="0x10000" crc="4b162065" sha1="488f01314da5644fbf2ca938c6f9720ef2b0d0f9" />
@@ -6508,7 +6508,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC734" />
 		<info name="alt_title" value="グーニーズ" />
-		<info name="gtin" value="04988602502619"/>
+		<info name="barcode" value="4988602502619"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -6602,7 +6602,7 @@ kept for now until finding out what those bytes affect...
 		<year>1986</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="KN327" />
-		<info name="gtin" value="05015173100438"/>
+		<info name="barcode" value="5015173100438"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -6616,7 +6616,7 @@ kept for now until finding out what those bytes affect...
 		<year>1986</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="KN327" />
-		<info name="gtin" value="05015173100438"/>
+		<info name="barcode" value="5015173100438"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -6630,7 +6630,7 @@ kept for now until finding out what those bytes affect...
 		<year>1986</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="KN327" />
-		<info name="gtin" value="05015173100438"/>
+		<info name="barcode" value="5015173100438"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -6699,7 +6699,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="ガルケイブ" />
 		<info name="serial" value="R49X5810"/>
-		<info name="gtin" value="04988013006591"/>
+		<info name="barcode" value="4988013006591"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -6714,7 +6714,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="ガルケイブ" />
 		<info name="serial" value="R49X5810"/>
-		<info name="gtin" value="04988013006591"/>
+		<info name="barcode" value="4988013006591"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -6820,7 +6820,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Nidecom</publisher>
 		<info name="serial" value="MSX-8" />
 		<info name="alt_title" value="ジャイロダイン" />
-		<info name="gtin" value="04988611860038"/>
+		<info name="barcode" value="4988611860038"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -6890,7 +6890,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="R49X5806" />
 		<info name="alt_title" value="ハングオン" />
-		<info name="gtin" value="04988013003590"/>
+		<info name="barcode" value="4988013003590"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -6905,7 +6905,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="R49X5806" />
 		<info name="alt_title" value="ハングオン" />
-		<info name="gtin" value="04988013003590"/>
+		<info name="barcode" value="4988013003590"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -6920,7 +6920,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="R49X5806" />
 		<info name="alt_title" value="ハングオン" />
-		<info name="gtin" value="04988013003590"/>
+		<info name="barcode" value="4988013003590"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -7253,7 +7253,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>MicroCabin</publisher>
 		<info name="serial" value="44780" />
 		<info name="alt_title" value="は～りぃふぉっくすＭＳＸスペシャル" />
-		<info name="gtin" value="04988608447808"/>
+		<info name="barcode" value="4988608447808"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16_sram" />
@@ -7317,7 +7317,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="TEX-62" />
 		<info name="alt_title" value="ハイドライド" />
-		<info name="gtin" value="04988604030622"/>
+		<info name="barcode" value="4988604030622"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -7569,7 +7569,7 @@ Character creation does not write the new character data.
 		<description>Ink - Exxon Surfing</description>
 		<year>2006</year>
 		<publisher>Matra</publisher>
-		<info name="gtin" value="00737875698505"/>
+		<info name="barcode" value="0737875698505"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ink" />
 			<dataarea name="rom" size="0x80000">
@@ -7627,7 +7627,7 @@ Character creation does not write the new character data.
 		<publisher>Casio</publisher>
 		<info name="serial" value="GPM-132" />
 		<info name="alt_title" value="一寸法師のどんなもんだい" />
-		<info name="gtin" value="04971850105008"/>
+		<info name="barcode" value="4971850105008"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -7642,7 +7642,7 @@ Character creation does not write the new character data.
 		<publisher>Casio</publisher>
 		<info name="serial" value="GPM-132" />
 		<info name="alt_title" value="一寸法師のどんなもんだい" />
-		<info name="gtin" value="04971850105008"/>
+		<info name="barcode" value="4971850105008"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -8164,7 +8164,7 @@ Character creation does not write the new character data.
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC739" />
 		<info name="alt_title" value="魔城伝説" />
-		<info name="gtin" value="04988602505832"/>
+		<info name="barcode" value="4988602505832"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -8203,7 +8203,7 @@ Character creation does not write the new character data.
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC749" />
 		<info name="alt_title" value="ガリウスの迷宮 ~ Galious no Meikyuu (Box?)" />
-		<info name="gtin" value="04988602526226"/>
+		<info name="barcode" value="4988602526226"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -8233,7 +8233,7 @@ Character creation does not write the new character data.
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC754" />
 		<info name="alt_title" value="シャロム" />
-		<info name="gtin" value="04988602532265"/>
+		<info name="barcode" value="4988602532265"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -8508,7 +8508,7 @@ Character creation does not write the new character data.
 		<publisher>Casio</publisher>
 		<info name="serial" value="GPM-124" />
 		<info name="alt_title" value="仔猫の大冒険 チビちゃんがいく" />
-		<info name="gtin" value="04971850104186"/>
+		<info name="barcode" value="4971850104186"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -8808,7 +8808,7 @@ Character creation does not write the new character data.
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="R49X5079" />
 		<info name="alt_title" value="ルナーボール" />
-		<info name="gtin" value="04988013001398"/>
+		<info name="barcode" value="4988013001398"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -9128,7 +9128,7 @@ Character creation does not write the new character data.
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="serial" value="HM-023" />
 		<info name="alt_title" value="迷宮神話" />
-		<info name="gtin" value="04988610115238"/>
+		<info name="barcode" value="4988610115238"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -9144,7 +9144,7 @@ Character creation does not write the new character data.
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="serial" value="HM-023" />
 		<info name="alt_title" value="迷宮神話" />
-		<info name="gtin" value="04988610115238"/>
+		<info name="barcode" value="4988610115238"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -9186,7 +9186,7 @@ Character creation does not write the new character data.
 		<publisher>Sony</publisher>
 		<info name="serial" value="HBS-G049C" />
 		<info name="alt_title" value="ミッドナイトブラザーズずっこけ探偵 ~ Midnight Brothers Zukkoke Tantei (Box?)" />
-		<info name="gtin" value="04901780008223"/>
+		<info name="barcode" value="4901780008223"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -9296,7 +9296,7 @@ Character creation does not write the new character data.
 		<publisher>Natsume</publisher>
 		<info name="serial" value="NP-003" />
 		<info name="alt_title" value="三つ目がとおる" />
-		<info name="gtin" value="04988635100059"/>
+		<info name="barcode" value="4988635100059"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -9433,7 +9433,7 @@ Character creation does not write the new character data.
 		<publisher>Victor</publisher>
 		<info name="alt_title" value="モールモール2" />
 		<info name="serial" value="M-2003"/>
-		<info name="gtin" value="04988002015023"/>
+		<info name="barcode" value="4988002015023"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -10055,7 +10055,7 @@ Character creation does not write the new character data.
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC742" />
 		<info name="alt_title" value="グラディウス" />
-		<info name="gtin" value="04988602510744"/>
+		<info name="barcode" value="4988602510744"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -10071,7 +10071,7 @@ Character creation does not write the new character data.
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC742" />
 		<info name="alt_title" value="グラディウス" />
-		<info name="gtin" value="04988602510744"/>
+		<info name="barcode" value="4988602510744"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -10087,7 +10087,7 @@ Character creation does not write the new character data.
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC751" />
 		<info name="alt_title" value="グラディウス2" />
-		<info name="gtin" value="04988602528701"/>
+		<info name="barcode" value="4988602528701"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -10103,7 +10103,7 @@ Character creation does not write the new character data.
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC751" />
 		<info name="alt_title" value="グラディウス2" />
-		<info name="gtin" value="04988602528701"/>
+		<info name="barcode" value="4988602528701"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -10161,7 +10161,7 @@ Character creation does not write the new character data.
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC764" />
 		<info name="alt_title" value="ゴーファーの野望 EPISODE II" />
-		<info name="gtin" value="04988602546415"/>
+		<info name="barcode" value="4988602546415"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -10177,7 +10177,7 @@ Character creation does not write the new character data.
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC764" />
 		<info name="alt_title" value="ゴーファーの野望 EPISODE II" />
-		<info name="gtin" value="04988602546415"/>
+		<info name="barcode" value="4988602546415"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -10193,7 +10193,7 @@ Character creation does not write the new character data.
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC764" />
 		<info name="alt_title" value="ゴーファーの野望 EPISODE II" />
-		<info name="gtin" value="04988602546415"/>
+		<info name="barcode" value="4988602546415"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -10338,7 +10338,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="R49X5808" />
 		<info name="alt_title" value="忍者プリンセス" />
-		<info name="gtin" value="04988013004795"/>
+		<info name="barcode" value="4988013004795"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -10353,7 +10353,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="R49X5808" />
 		<info name="alt_title" value="忍者プリンセス" />
-		<info name="gtin" value="04988013004795"/>
+		<info name="barcode" value="4988013004795"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -10437,7 +10437,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Victor</publisher>
 		<info name="serial" value="M-2004" />
 		<info name="alt_title" value="ミクとしおりのニャンニャンプロレス" />
-		<info name="gtin" value="04988002023141"/>
+		<info name="barcode" value="4988002023141"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -10520,7 +10520,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="R49X5066" />
 		<info name="alt_title" value="ゴルゴ１３狼の巣 ~ Golgo 13 Okami no Su (Box)" />
-		<info name="gtin" value="04988013001299"/>
+		<info name="barcode" value="4988013001299"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
@@ -10536,7 +10536,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="オセロ"/>
 		<info name="serial" value="R49X5089" />
-		<info name="gtin" value="04988013002494"/>
+		<info name="barcode" value="4988013002494"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -10717,7 +10717,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC759" />
 		<info name="alt_title" value="パロディウス～タコは地球を救う～" />
-		<info name="gtin" value="04988602537079"/>
+		<info name="barcode" value="4988602537079"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -10733,7 +10733,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC759" />
 		<info name="alt_title" value="パロディウス～タコは地球を救う～" />
-		<info name="gtin" value="04988602537079"/>
+		<info name="barcode" value="4988602537079"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -10837,7 +10837,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Victor</publisher>
 		<info name="serial" value="M-2002" />
 		<info name="alt_title" value="ペガサス" />
-		<info name="gtin" value="04988002018291"/>
+		<info name="barcode" value="4988002018291"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -10852,7 +10852,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC743" />
 		<info name="alt_title" value="夢大陸アドベンチャー" />
-		<info name="gtin" value="04988602511550"/>
+		<info name="barcode" value="4988602511550"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -11170,7 +11170,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Sony</publisher>
 		<info name="serial" value="HBS-G054C" />
 		<info name="alt_title" value="プレイボール" />
-		<info name="gtin" value="04901780055531"/>
+		<info name="barcode" value="4901780055531"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -11188,7 +11188,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Victor</publisher>
 		<info name="serial" value="M-2005" />
 		<info name="alt_title" value="ポイントX占領作戦" />
-		<info name="gtin" value="04988002025503"/>
+		<info name="barcode" value="4988002025503"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -11203,7 +11203,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="R49X5091" />
 		<info name="alt_title" value="ポリスストーリー" />
-		<info name="gtin" value="04988013001794"/>
+		<info name="barcode" value="4988013001794"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -11218,7 +11218,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="R49X5091" />
 		<info name="alt_title" value="ポリスストーリー" />
-		<info name="gtin" value="04988013001794"/>
+		<info name="barcode" value="4988013001794"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -11233,7 +11233,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="R49X5091" />
 		<info name="alt_title" value="ポリスストーリー" />
-		<info name="gtin" value="04988013001794"/>
+		<info name="barcode" value="4988013001794"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -11335,7 +11335,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="R48X5086" />
 		<info name="alt_title" value="プロテクター" />
-		<info name="gtin" value="04988013000995"/>
+		<info name="barcode" value="4988013000995"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
@@ -11407,7 +11407,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC746" />
 		<info name="alt_title" value="Ｑバート" />
-		<info name="gtin" value="04988602512755"/>
+		<info name="barcode" value="4988602512755"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -11778,7 +11778,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<description>Roc'n Rope</description>
 		<year>2008</year>
 		<publisher>Icon Games</publisher>
-		<info name="gtin" value="07399111110528"/>
+		<info name="barcode" value="7399111110528"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -11890,7 +11890,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC758" />
 		<info name="alt_title" value="沙羅曼蛇" />
-		<info name="gtin" value="04988602532425"/>
+		<info name="barcode" value="4988602532425"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -11990,7 +11990,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Toshiba EMI</publisher>
 		<info name="serial" value="PS-2019G" />
 		<info name="alt_title" value="スカーレット７" />
-		<info name="gtin" value="04988006004900"/>
+		<info name="barcode" value="4988006004900"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -12295,7 +12295,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Magical Zoo</publisher>
 		<info name="serial" value="MXMH21052" />
 		<info name="alt_title" value="スカイギャルド" />
-		<info name="gtin" value="04988614000011"/>
+		<info name="barcode" value="4988614000011"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -12350,7 +12350,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Seika Romox</publisher>
 		<info name="alt_title" value="スネイクイット" />
 		<info name="serial" value="SR-003"/>
-		<info name="gtin" value="04988625000031"/>
+		<info name="barcode" value="4988625000031"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -12365,7 +12365,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Seika Romox</publisher>
 		<info name="alt_title" value="スネイクイット" />
 		<info name="serial" value="SR-003"/>
-		<info name="gtin" value="04988625000031"/>
+		<info name="barcode" value="4988625000031"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -12395,7 +12395,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Pack-In-Video</publisher>
 		<info name="serial" value="MS-6" />
 		<info name="alt_title" value="スペースキャンプ" />
-		<info name="gtin" value="04988110800061"/>
+		<info name="barcode" value="4988110800061"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -12410,7 +12410,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Pack-In-Video</publisher>
 		<info name="serial" value="MS-6" />
 		<info name="alt_title" value="スペースキャンプ" />
-		<info name="gtin" value="04988110800061"/>
+		<info name="barcode" value="4988110800061"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -12528,7 +12528,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Irem</publisher>
 		<info name="serial" value="IM-01" />
 		<info name="alt_title" value="スペランカー" />
-		<info name="gtin" value="04962891300019"/>
+		<info name="barcode" value="4962891300019"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -12543,7 +12543,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Irem</publisher>
 		<info name="serial" value="IM-01" />
 		<info name="alt_title" value="スペランカー" />
-		<info name="gtin" value="04962891300019"/>
+		<info name="barcode" value="4962891300019"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -12765,7 +12765,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Casio</publisher>
 		<info name="serial" value="GPM-125" />
 		<info name="alt_title" value="賢者の石" />
-		<info name="gtin" value="04971850104193"/>
+		<info name="barcode" value="4971850104193"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
@@ -13429,7 +13429,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Victor</publisher>
 		<info name="alt_title" value="ナイルの涙 ~ Nile no Namida (Box?)" />
 		<info name="serial" value="M-2006"/>
-		<info name="gtin" value="04988002102358"/>
+		<info name="barcode" value="4988002102358"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -13878,7 +13878,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Toshiba EMI</publisher>
 		<info name="serial" value="PS-2020G" />
 		<info name="alt_title" value="トランプエイド" />
-		<info name="gtin" value="04988006006836"/>
+		<info name="barcode" value="4988006006836"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -13945,7 +13945,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC740" />
 		<info name="alt_title" value="ツインビー" />
-		<info name="gtin" value="04988602510034"/>
+		<info name="barcode" value="4988602510034"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -14294,7 +14294,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="戦場の狼" />
 		<info name="serial" value="2019101"/>
-		<info name="gtin" value="04988606200191"/>
+		<info name="barcode" value="4988606200191"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
@@ -14433,7 +14433,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Casio</publisher>
 		<info name="serial" value="GPM-131" />
 		<info name="alt_title" value="闇の竜王ハデスの紋章" />
-		<info name="gtin" value="04971850104995"/>
+		<info name="barcode" value="4971850104995"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -14449,7 +14449,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Casio</publisher>
 		<info name="serial" value="GPM-131" />
 		<info name="alt_title" value="闇の竜王ハデスの紋章" />
-		<info name="gtin" value="04971850104995"/>
+		<info name="barcode" value="4971850104995"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -14615,7 +14615,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Casio</publisher>
 		<info name="serial" value="GPM-123" />
 		<info name="alt_title" value="妖怪屋敷" />
-		<info name="gtin" value="04971850104179"/>
+		<info name="barcode" value="4971850104179"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -14630,7 +14630,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Casio</publisher>
 		<info name="serial" value="GPM-123" />
 		<info name="alt_title" value="妖怪屋敷" />
-		<info name="gtin" value="04971850104179"/>
+		<info name="barcode" value="4971850104179"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -14880,7 +14880,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="R49X5804" />
 		<info name="alt_title" value="ズーム９０９" />
-		<info name="gtin" value="04988013000797"/>
+		<info name="barcode" value="4988013000797"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -15054,7 +15054,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<year>19??</year>
 		<publisher>Panasoft</publisher>
 		<info name="serial" value="SW-M004"/>
-		<info name="gtin" value="04902704840035"/>
+		<info name="barcode" value="4902704840035"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="rom1" interface="msx_cart">
 			<feature name="slot" value="fmpac" />
@@ -15072,7 +15072,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<year>1985</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC735"/>
-		<info name="gtin" value="04988602502633"/>
+		<info name="barcode" value="4988602502633"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
@@ -15087,7 +15087,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<year>1985</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC735"/>
-		<info name="gtin" value="04988602502633"/>
+		<info name="barcode" value="4988602502633"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
@@ -15203,7 +15203,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC741" />
 		<info name="alt_title" value="新世ＳＩＺＥＲ" />
-		<info name="gtin" value="04988602510072"/>
+		<info name="barcode" value="4988602510072"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="synthesizer" />
 			<dataarea name="rom" size="0x8000">
@@ -15218,7 +15218,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC735" />
 		<info name="alt_title" value="コナミのゲームを１０倍楽しむカートリッジ" />
-		<info name="gtin" value="04988602502633"/>
+		<info name="barcode" value="4988602502633"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
@@ -15233,7 +15233,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC735" />
 		<info name="alt_title" value="コナミのゲームを１０倍楽しむカートリッジ" />
-		<info name="gtin" value="04988602502633"/>
+		<info name="barcode" value="4988602502633"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
@@ -15248,7 +15248,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC755" />
 		<info name="alt_title" value="コナミの新１０倍カートリッジ" />
-		<info name="gtin" value="04988602532326"/>
+		<info name="barcode" value="4988602532326"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="gamemaster2" />
 			<feature name="mapper" value="GMASTER2" />
@@ -15266,7 +15266,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC755" />
 		<info name="alt_title" value="コナミの新１０倍カートリッジ" />
-		<info name="gtin" value="04988602532326"/>
+		<info name="barcode" value="4988602532326"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="gamemaster2" />
 			<feature name="mapper" value="GMASTER2" />
