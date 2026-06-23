@@ -43,6 +43,81 @@ Two version updaters known:
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
+#include "util/multibyte.h"
+
+static const uint32_t SMALLOS_BEGIN = 0x00'0000;
+static const uint32_t APPLETS_BEGIN = 0x00'8000;
+static const uint32_t FULLOS_BEGIN  = 0x0c'0000;
+static const uint32_t APPLETS_END   = FULLOS_BEGIN;
+static const uint32_t ROM_SIZE      = 0x10'0000;
+static const uint32_t RAM_SIZE      = 0x04'0000;
+
+static const uint32_t APPLET_MAGIC_START = 0xc0ff'eead;
+static const uint32_t APPLET_MAGIC_END   = 0xcafe'feed;
+
+DECLARE_DEVICE_TYPE(ALPHASMART_APPLET, alphasmart_applet_device)
+
+class alphasmart_applet_device : public device_t, public device_image_interface
+{
+public:
+	alphasmart_applet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0)
+		: device_t(mconfig, ALPHASMART_APPLET, tag, owner, clock)
+		, device_image_interface(mconfig, *this)
+	{ }
+
+	// device_image_interface requirements
+	virtual const char *image_interface() const noexcept override { return "alphasmart_applet"; }
+	virtual const char *file_extensions() const noexcept override { return "os3kapp"; }
+	virtual bool is_readable() const noexcept override { return true; }
+	virtual bool is_writeable()	const noexcept override { return false; }
+	virtual bool is_creatable()	const noexcept override { return false; }
+	virtual bool is_reset_on_load()	const noexcept override { return false; }
+	virtual const char *image_type_name() const noexcept override { return "SmartApplet"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "applet"; }
+
+	const uint8_t *data() const { return m_data.data(); }
+	uint32_t size() const { return m_data.size(); }
+	bool loaded() const { return !m_data.empty(); }
+
+protected:
+	virtual void device_start() override { }
+
+	virtual std::pair<std::error_condition, std::string> call_load() override
+	{
+		uint32_t const len = length();
+		if (len < 12)
+			return std::make_pair(image_error::INVALIDLENGTH, "File too small");
+
+		m_data.resize(len);
+		if (fread(m_data.data(), m_data.size()) != m_data.size())
+		{
+			m_data.clear();
+			return std::make_pair(image_error::UNSPECIFIED, "Read error");
+		}
+
+		// Validate magic bytes and length
+		uint32_t const sm = get_u32be(&m_data[0]);
+		uint32_t const sz = get_u32be(&m_data[4]);
+		uint32_t const em = get_u32be(&m_data[len - 4]);
+		if (sm != APPLET_MAGIC_START || sz != len || em != APPLET_MAGIC_END)
+		{
+			m_data.clear();
+			return std::make_pair(image_error::INVALIDIMAGE, "Invalid applet format");
+		}
+
+		return std::make_pair(std::error_condition(), std::string());
+	}
+
+	virtual void call_unload() override
+	{
+		m_data.clear();
+	}
+
+private:
+	std::vector<uint8_t> m_data;
+};
+
+DEFINE_DEVICE_TYPE(ALPHASMART_APPLET, alphasmart_applet_device, "alphasmart_applet", "AlphaSmart Applet")
 
 namespace
 {
@@ -55,8 +130,10 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_lcdc(*this, "ks0066_%u", 0U)
 		, m_nvram(*this, "nvram")
-		, m_nvram_base(*this, "nvram", 0x40000, ENDIANNESS_BIG)
+		, m_nvram_base(*this, "nvram", RAM_SIZE, ENDIANNESS_BIG)
+		, m_flash_base(*this, "flash", ROM_SIZE, ENDIANNESS_BIG)
 		, m_keyboard(*this, "COL.%u", 0)
+		, m_applet(*this, "applet")
 	{
 	}
 
@@ -64,12 +141,22 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
 
+void init_empty_flash(nvram_device &nvram, void *base, size_t size)
+{
+	// Copy reset vectors from flash into NVRAM
+	memory_region *rom = memregion("maincpu");
+	memcpy(m_nvram_base, rom->base(), 0x400);
+	memcpy(&m_flash_base[0], rom->base(), rom->bytes());
+}
+
 protected:
 	required_device<mc68328_base_device> m_maincpu;
 	required_device_array<ks0066_device, 2> m_lcdc;
 	required_device<nvram_device> m_nvram;
 	memory_share_creator<uint16_t> m_nvram_base;
+	memory_share_creator<uint16_t> m_flash_base;
 	required_ioport_array<16> m_keyboard;
+	required_device<alphasmart_applet_device> m_applet;
 
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
 
@@ -117,23 +204,72 @@ uint32_t alphasmart3k_state::screen_update(screen_device &screen, bitmap_ind16 &
 void alphasmart3k_state::machine_start()
 {
 	m_tmp_bitmap = std::make_unique<bitmap_ind16>(6 * 40, 9 * 4);
+
+	// Hold CPU in reset until flash is ready
+	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 void alphasmart3k_state::machine_reset()
 {
-	memcpy(m_nvram_base, memregion("maincpu")->base(), 0x400);
+	if (m_applet->loaded())
+	{
+		uint32_t const sz = m_applet->size();
+		uint8_t const *src = m_applet->data();
+		uint8_t *dst = (uint8_t *)&m_flash_base[0];
+
+		// Scan flash to find next free slot after existing applets
+		uint32_t offset = APPLETS_BEGIN;
+		while (offset + 8 <= APPLETS_END)
+		{
+			uint32_t const sm = get_u32be(&dst[offset]);
+			if (sm != APPLET_MAGIC_START) break;
+			uint32_t const sz = get_u32be(&dst[offset + 4]);
+			if (sz < 8 || offset + sz > APPLETS_END) break;
+			uint32_t const em = get_u32be(&dst[offset + sz - 4]);
+			if (em != APPLET_MAGIC_END) break;
+
+			offset += sz;
+		}
+
+printf("%02X%02X%02X%02X %02X%02X%02X%02X\n", dst[0], dst[1], dst[2], dst[3], dst[offset], dst[offset+1], dst[offset+2], dst[offset+3]);
+		if (offset + sz <= APPLETS_END)
+		{
+/*
+			uint32_t words = sz / 2;
+			for (uint32_t i = 0; i < words; i++)
+			{
+				dst[offset + i] = get_u16be(&src[i * 2]);
+			}
+*/
+			uint16_t *dest = &m_flash_base[0];
+printf("%04X%04X %04X%04X\n", dest[0], dest[1], dest[offset/2], dest[offset/2+1]);
+			memcpy(dst + offset, src, sz);
+			logerror("alphasmart: installed applet at flash+0x%06X size 0x%X\n", offset, sz);
+printf("%04X%04X %04X%04X\n", dest[0], dest[1], dest[offset/2], dest[offset/2+1]);
+		}
+		else
+		{
+			logerror("alphasmart: applet too large to fit, flash full\n");
+		}
+
+		// Auto-eject: applet is now in flash, medium no longer needed
+		m_applet->unload();
+	}
 
 	m_matrix[0] = m_matrix[1] = 0;
 	m_port_a = 0;
 	m_port_d = 0;
 
 	m_port_c = 0;
+
+    // Release CPU now that initialization is complete
+	m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 void alphasmart3k_state::main_map(address_map &map)
 {
 	map(0x0000'0000, 0x0003'ffff).ram().share("nvram");
-	map(0x0040'0000, 0x004f'ffff).rom().region("maincpu", 0);
+	map(0x0040'0000, 0x004f'ffff).ram().share("flash");
 	map(0x0060'0000, 0x0060'0000).rw(FUNC(alphasmart3k_state::kb_matrixh_r), FUNC(alphasmart3k_state::kb_matrixh_w));
 }
 
@@ -437,21 +573,17 @@ void alphasmart3k_state::alphasmart3k(machine_config &config)
 	PALETTE(config, "palette", FUNC(alphasmart3k_state::alphasmart_palette), 2);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "flash", nvram_device::DEFAULT_ALL_1).set_custom_handler(FUNC(alphasmart3k_state::init_empty_flash));
+	ALPHASMART_APPLET(config, m_applet);
 }
 
 // ROM definitions
 
 ROM_START( asma3k )
-	ROM_REGION( 0x104'000, "maincpu", 0 )
-	ROM_LOAD( "smallos3krom.os3kos",          0x00'0000, 0x0'3A96, CRC(dbf15afb) SHA1(8c3e631e877b85f453f05905036735c89404a308) )
-	ROM_LOAD( "os3krom.os3kos",               0x0C'0000, 0x4'3BF0, CRC(66de6a17) SHA1(7d800836ca69479b9bb05612d138f9c10428a262) )
-	ROM_COPY( "maincpu",                      0x10'0000, 0x0'4000, 0x4000 )
-	ROM_LOAD( "alphawordplus.os3kapp",        0x00'8000, 0x1'8CDC, CRC(a1d551ed) SHA1(2d0202c83d725a94131bd48f7d3905900a2cdfc7) )
-	ROM_LOAD( "calculator.os3kapp",           0x02'0CDC, 0x0'5E38, CRC(f5bcaad5) SHA1(bfc2f87f44319f96bdad63c3dfca75422002379c) )
-	ROM_LOAD( "controlpanel.os3kapp",         0x02'6B14, 0x0'5EC8, CRC(4333bf0e) SHA1(18e8dbab584f5250a0eeb1de863f70388d4c3785) )
-	ROM_LOAD( "keywords.os3kapp",             0x02'C9DC, 0x1'80E4, CRC(d9cc69af) SHA1(6c6d75dd84da219d20f7be6339df3d4261c2d3a8) )
-	ROM_LOAD( "spellcheck small usa.os3kapp", 0x04'4AC0, 0x2'D1A8, CRC(1c0e8bd3) SHA1(97f5c67eaf74870bb232f8c11a55a2fc94dad45c) )
-	ROM_LOAD( "thesaurus small usa.os3kapp",  0x07'1C68, 0x3'F5E4, CRC(95121e74) SHA1(ead2cba7b17b1e783362a26b23731b10217c32a9) )
+	ROM_REGION( ROM_SIZE, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "smallos3krom.os3kos", SMALLOS_BEGIN, 0x0'3A96, CRC(dbf15afb) SHA1(8c3e631e877b85f453f05905036735c89404a308) )
+	ROM_LOAD( "os3krom.os3kos",      FULLOS_BEGIN,  0x4'0000, CRC(66de6a17) SHA1(7d800836ca69479b9bb05612d138f9c10428a262) )
+	ROM_CONTINUE(                    0x4000, 0x3BF0 )
 ROM_END
 
 } // anonymous namespace
