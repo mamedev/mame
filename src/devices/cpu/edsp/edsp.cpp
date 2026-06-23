@@ -52,10 +52,12 @@ void emg2000a_device::data_map(address_map &map)
 void emg2000a_device::io_map(address_map &map)
 {
 	map(0x01, 0x01).rw(FUNC(emg2000a_device::sr_r), FUNC(emg2000a_device::sr_w));
+	map(0x02, 0x02).ram(); // TODO: saved and restored during interrupts
 	map(0x03, 0x03).rw(FUNC(emg2000a_device::bank_r), FUNC(emg2000a_device::bank_w));
 	map(0x0c, 0x0d).rw(FUNC(emg2000a_device::inte_r), FUNC(emg2000a_device::inte_w));
 	map(0x0e, 0x0f).rw(FUNC(emg2000a_device::intf_r), FUNC(emg2000a_device::intf_w));
 	map(0x13, 0x13).rw(FUNC(emg2000a_device::spa_r), FUNC(emg2000a_device::spa_w));
+	map(0x14, 0x16).ram(); // TODO: saved and restored during interrupts
 	map(0x40, 0x43).rw(FUNC(emg2000a_device::timer01_r), FUNC(emg2000a_device::timer01_w));
 	// TODO: lots of other ports and registers
 }
@@ -449,6 +451,11 @@ void edsp_device::execute_run()
 				m_pc = addr;
 				m_icount -= 2;
 			}
+			else if (op == 0x381a)
+			{
+				// NOP
+				m_icount -= 1;
+			}
 			else if ((op & 0xf81f) == 0x381f)
 			{
 				// RPT #imm6
@@ -480,12 +487,25 @@ void edsp_device::execute_run()
 				m_sp -= BIT(op, 5, 6);
 				m_icount -= 1;
 			}
+			else if ((op & 0xff18) == 0x4000)
+			{
+				// MUL (signs unknown, assuming UU for now)
+				const u32 d = u32(m_r[BIT(op, 5, 3)]) * m_r[BIT(op, 0, 3)];
+				m_r[0] = BIT(d, 0, 16);
+				m_r[1] = BIT(d, 16, 16);
+				m_icount -= 1;
+			}
 			else if ((op & 0xfe18) == 0x4818)
 			{
 				// CMP
 				const u16 s = BIT(op, 8) ? m_data.read_word(m_r[BIT(op, 5, 3)]) : m_r[BIT(op, 5, 3)];
 				const u16 t = m_r[BIT(op, 0, 3)];
 				(void)add(s, ~t, true);
+				m_icount -= 1;
+			}
+			else if ((op & 0xf81f) == 0x5801)
+			{
+				m_r[BIT(op, 8, 3)] = m_r[BIT(op, 5, 3)];
 				m_icount -= 1;
 			}
 			else if ((op & 0xf81f) == 0x5803)

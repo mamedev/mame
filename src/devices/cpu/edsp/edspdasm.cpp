@@ -302,20 +302,22 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 		util::stream_format(stream, "sp = sp - #%d", BIT(op, 5, 6));
 		return 1 | SUPPORTED;
 	}
-//  else if (op == 0x381e) - used very rarely
+//  else if (op == 0x381e) - used very rarely in mylife (trap?)
 	else if ((op & 0xf81f) == 0x381f)
 	{
 		// Repeat next instruction (#imm6+1) times
 		util::stream_format(stream, "rpt #%d", BIT(op, 5, 6));
 		return 1 | SUPPORTED;
 	}
-	else if ((op & 0xf818) == 0x4000)
+	else if ((op & 0xff18) == 0x4000)
 	{
-		util::stream_format(stream, "r%d = r%d OP40 r%d", BIT(op, 8, 3), BIT(op, 5, 3), BIT(op, 0, 3));
+		// unknown whether this is SS, SU, US or UU
+		util::stream_format(stream, "D = r%d * r%d", BIT(op, 5, 3), BIT(op, 0, 3));
 		return 1 | SUPPORTED;
 	}
 	else if ((op & 0xf818) == 0x4018)
 	{
+		// probably another type of multiplication
 		util::stream_format(stream, "r%d = r%d OP4x r%d", BIT(op, 8, 3), BIT(op, 5, 3), BIT(op, 0, 3));
 		return 1 | SUPPORTED;
 	}
@@ -339,8 +341,7 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 	}
 	else if ((op & 0xf81f) == 0x5801)
 	{
-		// possibly a multiply instruction
-		util::stream_format(stream, "r%d = r%d OP51 r%d", BIT(op, 8, 3), BIT(op, 8, 3), BIT(op, 5, 3));
+		util::stream_format(stream, "r%d = r%d", BIT(op, 8, 3), BIT(op, 5, 3));
 		return 1 | SUPPORTED;
 	}
 	else if ((op & 0xf81f) == 0x5802)
@@ -395,6 +396,12 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 		util::stream_format(stream, "r%d = ROR r%d", BIT(op, 8, 3), BIT(op, 5, 3));
 		return 1 | SUPPORTED;
 	}
+	else if ((op & 0xf81f) == 0x580d)
+	{
+		// not used in mylife
+		util::stream_format(stream, "[r%d++] = P[r%d--]", BIT(op, 8, 3), BIT(op, 5, 3));
+		return 1 | SUPPORTED;
+	}
 	else if ((op & 0xf81f) == 0x580e)
 	{
 		// shift direction unclear
@@ -404,6 +411,36 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 	else if ((op & 0xf81f) == 0x580f)
 	{
 		util::stream_format(stream, "[r%d++] = P[r%d++]", BIT(op, 8, 3), BIT(op, 5, 3));
+		return 1 | SUPPORTED;
+	}
+	else if ((op & 0xf81f) == 0x5811)
+	{
+		// not used in mylife
+		util::stream_format(stream, "r%d = P[r%d--]", BIT(op, 8, 3), BIT(op, 5, 3));
+		return 1 | SUPPORTED;
+	}
+	else if ((op & 0xf81f) == 0x5813)
+	{
+		// not used in mylife
+		util::stream_format(stream, "[r%d] = P[r%d++]", BIT(op, 8, 3), BIT(op, 5, 3));
+		return 1 | SUPPORTED;
+	}
+	else if ((op & 0xf81f) == 0x5815)
+	{
+		// not used in mylife
+		util::stream_format(stream, "[r%d--] = P[r%d--]", BIT(op, 8, 3), BIT(op, 5, 3));
+		return 1 | SUPPORTED;
+	}
+	else if ((op & 0xf81f) == 0x5817)
+	{
+		// not used in mylife
+		util::stream_format(stream, "[r%d] = P[r%d]", BIT(op, 8, 3), BIT(op, 5, 3));
+		return 1 | SUPPORTED;
+	}
+	else if ((op & 0xf81f) == 0x5819)
+	{
+		// not used in mylife
+		util::stream_format(stream, "[r%d++] = P[r%d]", BIT(op, 8, 3), BIT(op, 5, 3));
 		return 1 | SUPPORTED;
 	}
 	else if ((op & 0xf81f) == 0x581b)
@@ -445,9 +482,15 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 		util::stream_format(stream, "[r%d] = #0x%04X", BIT(op, 8, 3), opcodes.r16(pc + 1));
 		return 2 | SUPPORTED;
 	}
+	else if ((op & 0xf81f) == 0x581f)
+	{
+		// not used in mylife
+		util::stream_format(stream, "[r%d--] = r%d", BIT(op, 8, 3), BIT(op, 5, 3));
+		return 1 | SUPPORTED;
+	}
 	else if ((op & 0xf800) == 0x6000)
 	{
-		// MOV imm8 to register
+		// MOV imm8 to register (clear high byte)
 		util::stream_format(stream, "r%d = ", BIT(op, 8, 3));
 		u16 op2 = opcodes.r16(pc + 1);
 		if (((op ^ op2) & 0xff00) == 0x0800)
