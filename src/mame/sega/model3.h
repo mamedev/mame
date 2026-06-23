@@ -217,7 +217,7 @@ private:
 	required_shared_ptr<uint64_t> m_paletteram64;
 	optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
 	optional_device<dsb2_device> m_dsb2;        // 68k-based MPEG Digital Sound Board
-	optional_device<i8251_device> m_uart;
+	required_device<i8251_device> m_uart;
 	required_shared_ptr<uint16_t> m_soundram;
 
 	required_device<gfxdecode_device> m_gfxdecode;
