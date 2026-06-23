@@ -73,7 +73,7 @@
 #define LOG_SCSI (1U << 3)
 #define LOG_IRQ (1U << 4)
 
-#define VERBOSE (LOG_GENERAL)
+//#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
 namespace {
@@ -84,9 +84,6 @@ constexpr int MAP_SYS_WR_ENABLE = 5;
 // mapcntrl result bits
 constexpr int MAP_BLOCK_ACCESS = 6;
 constexpr int MAP_CPU_WR = 7;
-
-constexpr offs_t MAXRAM = 0x400000;	// +3MB
-
 
 class tek440x_state : public driver_device
 {
@@ -204,10 +201,6 @@ void tek440x_state::machine_reset()
 {
 	m_ram_ptr = (uint16_t *)m_ram->pointer();
 	m_ram_size = m_ram->size();
-	// sanity: can only be 1,2 or 4MB
-	if ((m_ram_size != 0x100000) && (m_ram_size != 0x200000) && (m_ram_size != 0x400000))
-		m_ram_size = MAXRAM;
-	
 	m_ram_size_words = (m_ram_size >> 1);
 	LOG("RAM config: 0x%08x bytes, 0x%08x words => %p\n",m_ram_size, m_ram_size_words, m_ram_ptr);
 	
