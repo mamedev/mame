@@ -8,6 +8,11 @@
 char const *const cond_code[] = { "EQ", "NE", "CS", "CC", "HI", "LS", "GT", "LE", "FS", "FC", "LO", "HS", "LT", "GE", "R", "N" };
 char const size_char[] = { 'B','W',' ','D' };
 
+ns32000_disassembler::ns32000_disassembler(model variant)
+	: m_model(variant)
+{
+}
+
 s32 ns32000_disassembler::displacement(offs_t pc, data_buffer const &opcodes, unsigned &bytes)
 {
 	u32 const byte0 = opcodes.r8(pc + bytes++);
@@ -615,8 +620,12 @@ offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_b
 	case 0x1e:
 		// format 14: xxxx xsss s0oo ooii 0001 1110
 		{
-			// TODO: different mmu registers for 32332 and 32532
-			char const *const mmureg[] = { "BPR0", "BPR1", "", "", "PF0", "PF1", "", "", "SC", "", "MSR", "BCNT", "PTB0", "PTB1", "", "EIA" };
+			// LMR/SMR address a different register set depending on the MMU: the
+			// external NS32082 (used by the NS32008/016/032; the NS32332/NS32382
+			// pair is still a TODO) versus the NS32532's on-chip MMU.
+			static char const *const mmureg_ext[] = { "BPR0", "BPR1", "", "", "PF0", "PF1", "", "", "SC", "", "MSR", "BCNT", "PTB0", "PTB1", "", "EIA" };
+			static char const *const mmureg_532[] = { "", "", "", "", "", "", "", "", "", "MCR", "MSR", "TEAR", "PTB0", "PTB1", "IVAR0", "IVAR1" };
+			char const *const *const mmureg = (m_model == model::ns32532) ? mmureg_532 : mmureg_ext;
 
 			u16 const opword = opcodes.r16(pc + bytes); bytes += 2;
 
@@ -634,6 +643,26 @@ offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_b
 			case 1: util::stream_format(stream, "WRVAL   %s", mode[0].mode); break;
 			case 2: util::stream_format(stream, "LMR     %s, %s", mmureg[quick], mode[0].mode); break;
 			case 3: util::stream_format(stream, "SMR     %s, %s", mmureg[quick], mode[0].mode); break;
+			case 9:
+				// CINV options, src (NS32532 only): invalidate cache line(s) or,
+				// with A, the entire cache.  Options in the short field: A = 0x4
+				// (all), I = 0x2 (instruction cache), D = 0x1 (data cache).
+				if (m_model == model::ns32532)
+				{
+					static char const *const cinv_opt[] = { "A", "I", "D" };
+					std::string opts;
+					for (unsigned i = 0; i < 3; i++)
+						if (BIT(quick, 2 - i))
+						{
+							if (!opts.empty())
+								opts.append(",");
+							opts.append(cinv_opt[i]);
+						}
+					util::stream_format(stream, "CINV    [%s], %s", opts, mode[0].mode);
+				}
+				else
+					bytes = 1;
+				break;
 			default: bytes = 1; break;
 			}
 		}
