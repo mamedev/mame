@@ -302,7 +302,8 @@ public:
 	auto out_bpu() { return m_out_bpu.bind(); }
 
 protected:
-	virtual void bpu_window(bool active) override { m_out_bpu(active); }
+	// /BPU is active low; output the physical level (0 = low/asserted)
+	virtual void bpu_window(bool active) override { m_out_bpu(active ? 0 : 1); }
 
 private:
 	devcb_write_line m_out_bpu;
