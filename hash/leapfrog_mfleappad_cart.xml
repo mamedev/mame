@@ -55,21 +55,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="carsfr" supported="no">
-		<description>Disney/Pixar Cars (France)</description>
-		<year>2005</year>
-		<publisher>LeapFrog</publisher>
-		<info name="serial" value="500-12021"/>
-		<part name="cart" interface="leapfrog_mfleappad_cart">
-			<feature name="pcb" value="57000+003+7211"/>
-			<feature name="pcb_rev" value="REV:00"/>
-			<feature name="u1" value="Oki 16M(F)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
-			<dataarea name="rom" size="0x200000">
-				<rom name="500-12021 - Cars (France).bin" size="0x200000" crc="562d3789" sha1="45e7a0ef447dd540c1d72585f54555238e2add82" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="dorafr" supported="no">
 		<description>Dora the Explorer - À la rescousse (France)</description>
 		<year>2003</year>
@@ -111,6 +96,21 @@ license:CC0-1.0
 			<feature name="u1" value="OKI 32(J)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
 				<rom name="500-12148 - Cars (SPA).bin" size="0x400000" crc="6ace95ff" sha1="d272646c0a06876a3e39907e6e6e65b45339f53a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carsfr" cloneof="cars" supported="no">
+		<description>Disney/Pixar Cars (France)</description>
+		<year>2005</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12021"/>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<feature name="pcb" value="57000+003+7211"/>
+			<feature name="pcb_rev" value="REV:00"/>
+			<feature name="u1" value="Oki 16M(F)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-12021 - Cars (France).bin" size="0x200000" crc="562d3789" sha1="45e7a0ef447dd540c1d72585f54555238e2add82" />
 			</dataarea>
 		</part>
 	</software>
