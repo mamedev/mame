@@ -1989,18 +1989,17 @@ void floppy_image_format_t::build_pc_track_mfm(int track, int head, floppy_image
 		mfm_w(track_data, 16, crc);
 		for(int j=0; j<gap_2; j++) mfm_w(track_data, 8, 0x4e);
 
-		if (!sects[i].data)
-		{
+		if (!sects[i].data) {
 			// No Data sector: unformatted data area.  Emit a valid DAM
 			// so the FDC can find it, then generate MG_N for the data
 			// and CRC area.  The floppy device's weak-zone cache produces
 			// random transitions on each revolution.
-			for (int j = 0; j < 12; j++) mfm_w(track_data, 8, 0x00);
+			for(int j=0; j<12; j++) mfm_w(track_data, 8, 0x00);
 			cpos = track_data.size();
-			for (int j = 0; j < 3; j++) raw_w(track_data, 16, 0x4489);
+			for(int j=0; j<3; j++) raw_w(track_data, 16, 0x4489);
 			mfm_w(track_data, 8, 0xfb);
 			size_t data_cpos = track_data.size();
-			for (int j = 0; j < sects[i].actual_size; j++)
+			for(int j=0; j<sects[i].actual_size; j++)
 				mfm_w(track_data, 8, 0xe5);
 			crc = calc_crc_ccitt(track_data, cpos, track_data.size());
 			mfm_w(track_data, 16, crc);
@@ -2009,25 +2008,21 @@ void floppy_image_format_t::build_pc_track_mfm(int track, int head, floppy_image
 			size_t weak_end = track_data.size();
 			track_data[data_cpos] = (track_data[data_cpos] & floppy_image::TIME_MASK) | floppy_image::MG_N;
 			track_data[weak_end - 1] = (track_data[weak_end - 1] & floppy_image::TIME_MASK) | floppy_image::MG_E;
-			for (size_t j = data_cpos + 1; j < weak_end - 1; j++)
+			for(size_t j=data_cpos+1; j<weak_end-1; j++)
 				track_data[j] = (track_data[j] & floppy_image::TIME_MASK) | MG_0;
 			// Gap 3 between sectors
-			if (i != sector_count - 1)
-				for (int j = 0; j < gap_3; j++) mfm_w(track_data, 8, 0x4e);
-		}
-		else
-		{
+			if(i != sector_count - 1)
+				for(int j=0; j<gap_3; j++) mfm_w(track_data, 8, 0x4e);
+		} else {
 			// sync, DAM, data and gap 3
-			for (int j = 0; j < 12; j++) mfm_w(track_data, 8, 0x00);
+			for(int j=0; j<12; j++) mfm_w(track_data, 8, 0x00);
 			cpos = track_data.size();
-			for (int j = 0; j < 3; j++) raw_w(track_data, 16, 0x4489);
+			for(int j=0; j< 3; j++) raw_w(track_data, 16, 0x4489);
 			mfm_w(track_data, 8, sects[i].deleted ? 0xf8 : 0xfb);
 
-			if (sects[i].bad_data_crc)
-			{
+			if(sects[i].bad_data_crc) {
 				size_t data_cpos = track_data.size();
-				for (int j = 0; j < sects[i].actual_size; j++)
-					mfm_w(track_data, 8, sects[i].data[j]);
+				for(int j=0; j<sects[i].actual_size; j++) mfm_w(track_data, 8, sects[i].data[j]);
 				crc = calc_crc_ccitt(track_data, cpos, track_data.size());
 				mfm_w(track_data, 16, crc);
 				// Encode bytes 256+ as a single MG_D span.  Speedlock
@@ -2035,24 +2030,21 @@ void floppy_image_format_t::build_pc_track_mfm(int track, int head, floppy_image
 				// per-revolution randomness makes them differ naturally.
 				size_t weak_start = data_cpos + 256 * 16;
 				size_t weak_end = track_data.size();
-				if (weak_start < weak_end)
-				{
+				if(weak_start < weak_end) {
 					track_data[weak_start] = (track_data[weak_start] & floppy_image::TIME_MASK) | floppy_image::MG_D;
 					track_data[weak_end - 1] = (track_data[weak_end - 1] & floppy_image::TIME_MASK) | floppy_image::MG_E;
-					for (size_t j = weak_start + 1; j < weak_end - 1; j++)
+					for(size_t j=weak_start+1; j<weak_end-1; j++)
 						track_data[j] = (track_data[j] & floppy_image::TIME_MASK) | MG_0;
 				}
-			}
-			else
-			{
-				for (int j = 0; j < sects[i].actual_size; j++)
+			} else {
+				for(int j=0; j<sects[i].actual_size; j++)
 					mfm_w(track_data, 8, sects[i].data[j]);
 				crc = calc_crc_ccitt(track_data, cpos, track_data.size());
 				mfm_w(track_data, 16, crc);
 			}
 			// Gap 3 between sectors
-			if (i != sector_count - 1)
-				for (int j = 0; j < gap_3; j++) mfm_w(track_data, 8, 0x4e);
+			if(i != sector_count-1)
+				for(int j=0; j<gap_3; j++) mfm_w(track_data, 8, 0x4e);
 		}
 	}
 
