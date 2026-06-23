@@ -5,6 +5,73 @@ license:CC0-1.0
 -->
 <softwarelist name="leapfrog_mfleappad_cart" description="LeapFrog My First LeapPad cartridges">
 
+
+	<software name="jourflop" supported="no">
+		<description>La journee extraordinaire de Flop (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-01358 - La journee extraordinaire de Flop (France).bin" size="0x200000" crc="c59fcb21" sha1="1de7758cc813a9418f0c198881951495e7c584f4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winniefr" supported="no">
+		<description>500-01392 - Winnie et l'arbre à miel (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-01392 - Winnie et l'arbre a miel (France).bin" size="0x200000" crc="fb255005" sha1="f30cd66840fdb10ab79636ca357a30d045ee07ca" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="koafr" supported="no">
+		<description>Koa et les chiffres fous (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-01394 - Koa et les chiffres fous (France).bin" size="0x200000" crc="e0b7b8fd" sha1="3635c16e8a89ba18511ad488d24ae985922e41da" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="carsfr" supported="no">
+		<description>Cars (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-12021 - Cars (France).bin" size="0x200000" crc="562d3789" sha1="45e7a0ef447dd540c1d72585f54555238e2add82" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="dorafr" supported="no">
+		<description>Dora the Explorer - À la rescousse (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="UBL 500-10338 - Dora the Explorer - a la rescousse (France).bin" size="0x200000" crc="d3bb89bd" sha1="28ce21a0d97fa20f3caf83bf51f57b99406e33a3" />
+			</dataarea>
+		</part>
+	</software>	
+	
+	<software name="volantfr" supported="no">
+		<description>UBL 500-11141 - Les fourmis au volant! (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="UBL 500-11141 - Les fourmis au volant (France).bin" size="0x400000" crc="2d813275" sha1="e0c636e2440a3214d81b48a014fbb64ac3383b43" />
+			</dataarea>
+		</part>
+	</software>		
+	
 	<software name="carss" supported="no">
 		<description>Disney/Pixar Cars (Spain)</description>
 		<year>2005</year>
