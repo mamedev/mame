@@ -5,7 +5,7 @@ license:CC0-1.0
 -->
 <softwarelist name="leapfrog_leappad_cart" description="LeapFrog LeapPad / CocoPad / Benesse Qpad cartridges">
 
-	<software name="musique" supported="no">
+	<software name="musique" cloneof="hititmstro" supported="no">
 		<description>Musique, Maestro! (France)</description>
 		<year>200?</year>
 		<publisher>LeapFrog</publisher>
@@ -17,7 +17,7 @@ license:CC0-1.0
 	</software>
 
 
-	<software name="livreint" supported="no">
+	<software name="livreint" cloneof="lpbook" supported="no">
 		<description>Livre interactif (France)</description>
 		<year>200?</year>
 		<publisher>LeapFrog</publisher>
@@ -50,7 +50,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="lionfr" supported="no">
+	<software name="lionfr" cloneof="lionking" supported="no">
 		<description>Le Roi Lion (France)</description>
 		<year>200?</year>
 		<publisher>LeapFrog</publisher>
@@ -61,8 +61,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="histprinc" supported="no">
-		<description>Histoires de princesses (France)</description>
+	<software name="histprinc" cloneof="princess" supported="no">
+		<description>Disney Princesse - Histoires de princesses (France)</description>
 		<year>200?</year>
 		<publisher>LeapFrog</publisher>
 		<part name="cart" interface="leapfrog_leappad_cart">
@@ -72,7 +72,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="scoobfr" supported="no">
+	<software name="scoobfr" cloneof="scoobydonut" supported="no">
 		<description>Scooby-Doo et le mystere des beignets (France)</description>
 		<year>200?</year>
 		<publisher>LeapFrog</publisher>

@@ -18,7 +18,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="winniefr" supported="no">
-		<description>500-01392 - Winnie et l'arbre à miel (France)</description>
+		<description>Winnie et l'arbre à miel (France)</description>
 		<year>200?</year>
 		<publisher>LeapFrog</publisher>
 		<part name="cart" interface="leapfrog_mfleappad_cart">
@@ -40,7 +40,7 @@ license:CC0-1.0
 	</software>
 	
 	<software name="carsfr" supported="no">
-		<description>Cars (France)</description>
+		<description>Disney/Pixar Cars (France)</description>
 		<year>200?</year>
 		<publisher>LeapFrog</publisher>
 		<part name="cart" interface="leapfrog_mfleappad_cart">
@@ -62,7 +62,7 @@ license:CC0-1.0
 	</software>	
 	
 	<software name="volantfr" supported="no">
-		<description>UBL 500-11141 - Les fourmis au volant! (France)</description>
+		<description>Les fourmis au volant! (France)</description>
 		<year>200?</year>
 		<publisher>LeapFrog</publisher>
 		<part name="cart" interface="leapfrog_mfleappad_cart">
