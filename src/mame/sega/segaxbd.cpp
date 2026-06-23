@@ -82,8 +82,8 @@ Notes:
         Type (note 1) 27C1000    27C1000    27C1000    27C1000    27C1000    27C1000    27C1000    27C1000    27C512     27C512     27C512     831000     831000     831000     831000     831000     831000     831000     831000     831000     831000     831000     831000     27C1000    27C1000    27C1000    27C1000    27C512     27C512     831000     831000     831000
         Location      IC58       IC63       IC57       IC62       IC20       IC29       IC21       IC30       IC154      IC153      IC152      IC90       IC94       IC98       IC102      IC91       IC95       IC99       IC103      IC92       IC96       IC100      IC104      IC93       IC97       IC101      IC105      IC40       IC17       IC11       IC12       IC13
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-After Burner (set1)   EPR-11092  EPR-11093  EPR-10950? EPR-10951? EPR-11090  EPR-11091  -          -          EPR-11089  EPR-11088  EPR-11087  MPR-10932  MPR-10934  MPR-10936  MPR-10938  MPR-10933  MPR-10935  MPR-10937  MPR-10939  EPR-11094  EPR-11095  EPR-11096  EPR-11097  EPR-11098  EPR-11099  EPR-11100  EPR-11101  EPR-10922  EPR-10923  MPR-10930  MPR-10931  EPR-10929
-After Burner (set2)   EPR-10940  EPR-10941  -          -          EPR-10927  EPR-10928  -          -          EPR-10926  EPR-10925  EPR-10924  MPR-10932  MPR-10934  MPR-10936  MPR-10938  MPR-10933  MPR-10935  MPR-10937  MPR-10939  EPR-10942  EPR-10943  EPR-10944  EPR-10945  EPR-10946  EPR-10947  EPR-10948  EPR-10949  EPR-10922  MPR-10923  MPR-10930  MPR-10931  EPR-10929
+After Burner (1.32)   EPR-11092  EPR-11093  EPR-10950? EPR-10951? EPR-11090  EPR-11091  -          -          EPR-11089  EPR-11088  EPR-11087  MPR-10932  MPR-10934  MPR-10936  MPR-10938  MPR-10933  MPR-10935  MPR-10937  MPR-10939  EPR-11094  EPR-11095  EPR-11096  EPR-11097  EPR-11098  EPR-11099  EPR-11100  EPR-11101  EPR-10922  EPR-10923  MPR-10930  MPR-10931  EPR-10929
+After Burner (1.31)   EPR-10940  EPR-10941  -          -          EPR-10927  EPR-10928  -          -          EPR-10926  EPR-10925  EPR-10924  MPR-10932  MPR-10934  MPR-10936  MPR-10938  MPR-10933  MPR-10935  MPR-10937  MPR-10939  EPR-10942  EPR-10943  EPR-10944  EPR-10945  EPR-10946  EPR-10947  EPR-10948  EPR-10949  EPR-10922  MPR-10923  MPR-10930  MPR-10931  EPR-10929
 After Burner 2        EPR-11107  EPR-11108  -          -          EPR-11109  EPR-11110  -          -          EPR-11115  EPR-11114  EPR-11113  MPR-10932  MPR-10934  MPR-10936  MPR-10938  MPR-10933  MPR-10935  MPR-10937  MPR-10939  MPR-11103  MPR-11104  MPR-11105  MPR-11106  EPR-11116  EPR-11117  EPR-11118  EPR-11119  EPR-10922  EPR-11112  MPR-10930  MPR-10931  EPR-11102
 After Burner 2 (Ger)  EPR-11173A EPR-11174A -          -          EPR-11109  EPR-11110  -          -          EPR-11115  EPR-11114  EPR-11113  MPR-10932  MPR-10934  MPR-10936  MPR-10938  MPR-10933  MPR-10935  MPR-10937  MPR-10939  MPR-11103  MPR-11104  MPR-11105  MPR-11106  EPR-11116  EPR-11117  EPR-11118  EPR-11119  EPR-10922  EPR-11112  MPR-10930  MPR-10931  EPR-11102
 Line Of Fire (set 3)  EPR-12849  EPR-12850  -          -          EPR-12804  EPR-12805  EPR-12802  EPR-12803  OPR-12791  OPR-12792  OPR-12793  EPR-12787  EPR-12788  EPR-12789  EPR-12790  EPR-12783  EPR-12784  EPR-12785  EPR-12786  EPR-12779  EPR-12780  EPR-12781  EPR-12782  EPR-12775  EPR-12776  EPR-12777  EPR-12778  -          EPR-12798  EPR-12799  EPR-12800  EPR-12801
@@ -2144,7 +2144,7 @@ void segaxbd_new_state::sega_rascot(machine_config &config)
 // NOTE: Sega manual # 420-5812 desginates this ROM set as After Burner Deluxe Type, shows game board as: GAME BD 834-6335
 //       Sega manual # 420-5798-01 AT desginates this ROM set as After Burner Upright Type, shows game board as: GAME BD 834-6335-01
 //       Test menu screen shows:  DIAGNOSTIC VER. 1.32
-//       Dipswitch selectable between Upright, Moving Standard, Moving Deluxe
+//       DIP switch selectable between Upright, Moving Standard, Moving Deluxe
 //       EPR-10950 @IC57 & EPR-10951 @IC62 are listed in both manuals. Are they required?, they aren't tested for in the ROM tests.
 //       These EPR numbers for this version end (EPR-11101) right before After Burner II EPR numbers start (EPR-11102)
 //
@@ -2200,9 +2200,9 @@ ROM_END
 //  CPU: 68000 (317-????)
 //
 // NOTE: Test menu screen shows:  DIAGNOSTIC VER. 1.31
-//       Dipswitch selectable between Upright, Moving Standard, Moving Deluxe
+//       DIP switch selectable between Upright, Moving Standard, Moving Deluxe
 //
-ROM_START( aburnera )
+ROM_START( aburner131 )
 	ROM_REGION( 0x80000, "mainpcb:maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-10940.58", 0x00000, 0x20000, CRC(4d132c4e) SHA1(007af52167c369177b86fc0f8b007ebceba2a30c) )
 	ROM_LOAD16_BYTE( "epr-10941.63", 0x00001, 0x20000, CRC(136ea264) SHA1(606ac67db53a6002ed1bd71287aed2e3e720cdf4) )
@@ -4887,8 +4887,8 @@ void segaxbd_new_state_double::init_gprider_double()
 //**************************************************************************
 
 //    YEAR, NAME,      PARENT,   MACHINE,             INPUT,    STATE,             INIT,          MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1987, aburner,   0,        sega_aburner2,       aburner,  segaxbd_new_state, init_aburner2, ROT0, "Sega", "After Burner (deluxe/upright, set 1)", 0 ) // Game ID #: 834-6335-01 AFTER BURNER
-GAME( 1987, aburnera,  aburner,  sega_aburner2,       aburner,  segaxbd_new_state, init_aburner2, ROT0, "Sega", "After Burner (deluxe/upright, set 2)", 0 ) // Game ID #: 834-6335-02 AFTER BURNER
+GAME( 1987, aburner,   0,        sega_aburner2,       aburner,  segaxbd_new_state, init_aburner2, ROT0, "Sega", "After Burner (VER 1.32, deluxe/upright)", 0 ) // Game ID #: 834-6335-01 AFTER BURNER
+GAME( 1987, aburner131,aburner,  sega_aburner2,       aburner,  segaxbd_new_state, init_aburner2, ROT0, "Sega", "After Burner (VER 1.31, deluxe/upright)", 0 ) // Game ID #: 834-6335-02 AFTER BURNER
 
 GAME( 1987, aburner2,  0,        sega_aburner2,       aburner2, segaxbd_new_state, init_aburner2, ROT0, "Sega", "After Burner II", 0 )
 GAME( 1987, aburner2g, aburner2, sega_aburner2,       aburner2, segaxbd_new_state, init_aburner2, ROT0, "Sega", "After Burner II (German)", 0 )

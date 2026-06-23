@@ -198,7 +198,7 @@ void dinput_keyboard_device::configure(input_device &device)
 {
 	// populate it
 	char defname[20];
-	for (unsigned keynum = 0; keynum < MAX_KEYS; keynum++)
+	for (unsigned keynum = 0; keynum < m_keyboard.MAX_KEYS; keynum++)
 	{
 		input_item_id itemid = keyboard_trans_table::instance().map_di_scancode_to_itemid(keynum);
 

@@ -61,7 +61,7 @@ public:
 	{
 		keyboard_trans_table const &table = keyboard_trans_table::instance();
 
-		for (int keynum = 0; keynum < MAX_KEYS; keynum++)
+		for (int keynum = 0; keynum < m_keyboard.MAX_KEYS; keynum++)
 		{
 			input_item_id itemid = table.map_di_scancode_to_itemid(keynum);
 			TCHAR keyname[100];
