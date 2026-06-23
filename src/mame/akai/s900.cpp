@@ -128,7 +128,7 @@ protected:
 	required_device<input_merger_any_high_device> m_nmi;
 	required_device<pic8259_device> m_pic;
 	required_device<acia6850_device> m_acia;
-	required_device<v5x_dmau_device> m_dma;
+	required_device<upd71071_device> m_dma;
 	required_device<hd44780_device> m_lcdc;
 
 	required_device<upd765_family_device> m_fdc;
@@ -136,7 +136,7 @@ protected:
 
 	required_device_array<pit8254_device, 3> m_sample_timer;
 	required_device_array<pit8253_device, 3> m_filter_timer;
-	required_device_array<v5x_dmau_device, 2> m_voice_dma;
+	required_device_array<upd71071_device, 2> m_voice_dma;
 
 	required_device_array<dac_12bit_r2r_twos_complement_device, 8> m_dac;
 	required_device<adc12_device> m_adc;
@@ -281,9 +281,9 @@ void s900_state::common_map(address_map &map)
 	map(0x006a, 0x006b).mirror(0xff04).umask16(0x00ff).portr("PORT6A");
 	map(0x0068, 0x006f).mirror(0xff00).w(FUNC(s900_state::dial_reset_w));
 	map(0x0078, 0x007f).select(0xff00).umask16(0x00ff).w(FUNC(s900_state::envelope_w));
-	map(0x0080, 0x009f).mirror(0xfe00).rw(m_dma, FUNC(v5x_dmau_device::read), FUNC(v5x_dmau_device::write));
-	map(0x00a0, 0x00bf).mirror(0xfe00).rw(m_voice_dma[0], FUNC(v5x_dmau_device::read), FUNC(v5x_dmau_device::write));
-	map(0x00c0, 0x00df).mirror(0xfe00).rw(m_voice_dma[1], FUNC(v5x_dmau_device::read), FUNC(v5x_dmau_device::write));
+	map(0x0080, 0x009f).mirror(0xfe00).rw(m_dma, FUNC(upd71071_device::read), FUNC(upd71071_device::write));
+	map(0x00a0, 0x00bf).mirror(0xfe00).rw(m_voice_dma[0], FUNC(upd71071_device::read), FUNC(upd71071_device::write));
+	map(0x00c0, 0x00df).mirror(0xfe00).rw(m_voice_dma[1], FUNC(upd71071_device::read), FUNC(upd71071_device::write));
 	map(0x00e0, 0x00ff).mirror(0xfe00).umask16(0x00ff).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0180, 0x019f).mirror(0xfe00).r(FUNC(s900_state::adc_r));
 }
@@ -396,9 +396,9 @@ void s900_state::base_config(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
-	V5X_DMAU(config, m_dma, clk/2); // FIXME: actually upd71071
+	UPD71071(config, m_dma, clk/2);
 	m_dma->out_hreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	m_dma->out_hreq_callback().append(m_dma, FUNC(v5x_dmau_device::hack_w));
+	m_dma->out_hreq_callback().append(m_dma, FUNC(upd71071_device::hack_w));
 
 	// sound
 	SPEAKER(config, "speaker", 8);
@@ -425,10 +425,10 @@ void s900_state::base_config(machine_config &config)
 	linein.add_route(0, "monitor", 1.0 / 6);
 
 	// voice 0-3 DMA
-	V5X_DMAU(config, m_voice_dma[0], clk/2); // FIXME: actually upd71071
+	UPD71071(config, m_voice_dma[0], clk/2);
 	m_voice_dma[0]->dreq_active_low();
-	m_voice_dma[0]->out_hreq_callback().set(m_dma, FUNC(v5x_dmau_device::dreq2_w));
-	m_dma->out_dack_callback<2>().set(m_voice_dma[0], FUNC(v5x_dmau_device::hack_w));
+	m_voice_dma[0]->out_hreq_callback().set(m_dma, FUNC(upd71071_device::dreq2_w));
+	m_dma->out_dack_callback<2>().set(m_voice_dma[0], FUNC(upd71071_device::hack_w));
 	m_voice_dma[0]->out_eop_callback().set(FUNC(s900_state::voice_eop_w<0>));
 	m_voice_dma[0]->out_io16w_callback<0>().set(FUNC(s900_state::voice_dma_io_w<0>));
 	m_voice_dma[0]->out_io16w_callback<1>().set(FUNC(s900_state::voice_dma_io_w<1>));
@@ -440,10 +440,10 @@ void s900_state::base_config(machine_config &config)
 	m_voice_dma[0]->out_dack_callback<3>().set(FUNC(s900_state::voice_dreq_clear_w<3>));
 
 	// voice 4-7 DMA
-	V5X_DMAU(config, m_voice_dma[1], clk/2); // FIXME: actually upd71071
+	UPD71071(config, m_voice_dma[1], clk/2);
 	m_voice_dma[1]->dreq_active_low();
-	m_voice_dma[1]->out_hreq_callback().set(m_dma, FUNC(v5x_dmau_device::dreq3_w));
-	m_dma->out_dack_callback<3>().set(m_voice_dma[1], FUNC(v5x_dmau_device::hack_w));
+	m_voice_dma[1]->out_hreq_callback().set(m_dma, FUNC(upd71071_device::dreq3_w));
+	m_dma->out_dack_callback<3>().set(m_voice_dma[1], FUNC(upd71071_device::hack_w));
 	m_voice_dma[1]->out_eop_callback().set(FUNC(s900_state::voice_eop_w<1>));
 	m_voice_dma[1]->out_io16w_callback<0>().set(FUNC(s900_state::voice_dma_io_w<4>));
 	m_voice_dma[1]->out_io16w_callback<1>().set(FUNC(s900_state::voice_dma_io_w<5>));
