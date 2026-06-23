@@ -5,6 +5,128 @@ license:CC0-1.0
 -->
 <softwarelist name="leapfrog_leappad_cart" description="LeapFrog LeapPad / CocoPad / Benesse Qpad cartridges">
 
+	<software name="musique" supported="no">
+		<description>Musique, Maestro! (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-01357 - Musique, Maestro (France).bin" size="0x400000" crc="e77d1e3d" sha1="f418febc05305afb79521f536598bdac7e95d2e8" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="livreint" supported="no">
+		<description>Livre interactif (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-01369 UBL - Livre interactif (France).bin" size="0x400000" crc="364852a1" sha1="c84bf9b5b2752f416a9dcff4138e070a1c0b4c6a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ratfr" supported="no">
+		<description>Ratatouille (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-12681 - Ratatouille (France).bin" size="0x200000" crc="c9225047" sha1="0051cab32f2e24d2fa94d73a0190864f04526732" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="intsci" supported="no">
+		<description>Interactif Sciences - Extraordinaires mammiferes! (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="LeapPad - Interactif Sciences - Extraordinaires mammiferes (France).bin" size="0x400000" crc="33d35d7d" sha1="d40c6506a7c1c908a89a45d30a9ccd4f17824c4f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionfr" supported="no">
+		<description>Le Roi Lion (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="UBL 500-10341 - Le Roi Lion (France).bin" size="0x400000" crc="65d294ed" sha1="b217757ce332b7a8645b51d38dc38a8d929f9279" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="histprinc" supported="no">
+		<description>Histoires de princesses (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="UBL 500-10818 - Histoires de princesses (France).bin" size="0x200000" crc="4d4537f1" sha1="6b4093ad64e4c4662522906309b7a61d345b0e6f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scoobfr" supported="no">
+		<description>Scooby-Doo et le mystere des beignets (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="UBL 500-10819 - Scooby-Doo et le mystere des beignets (France).bin" size="0x200000" crc="f7e5eb54" sha1="71314f89ab4cca4f95743bd9d10812ca6cb1a49c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winniefr" supported="no">
+		<description>Winnie et les pots de miel (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="UBL 500-10820 - Winnie et les pots de miel (France).bin" size="0x200000" crc="7389d0b3" sha1="70ecd4279c0e919fea50cfd9af9a28829847e628" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nemofr" supported="no">
+		<description>Le Monde De Nemo (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="UBL 500-10839 - Le Monde De Nemo (France).bin" size="0x200000" crc="80bf1e33" sha1="2e5cd191f611456e59ce4836abf3524a8346cda2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="koafait" supported="no">
+		<description>Koa fait les courses (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="UBL 500-10868 - Koa fait les courses (France).bin" size="0x200000" crc="42fb0d7a" sha1="8593ae140a0130ee9a4e878b2d9c035d5b70852c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="surflop" supported="no">
+		<description>On Peut Compter Sur Flop! (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="UBL 500-10869 - On Peut Compter Sur Flop (France).bin" size="0x200000" crc="debafd59" sha1="cc1e903e60121a58ba773a35c9e75df14e6000d6" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tiggerbnca" cloneof="tiggerbnc" supported="no">
 		<description>Disney's Bounce, Tigger, Bounce (UK)</description>
 		<year>200?</year>
@@ -1332,7 +1454,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="oej1ggdni" supported="no">
 		<description>Oyako Eigo Step 1-gatsu gou - Doubutsuen ni Ikou! (Japan)</description>
 		<year>2003</year>
@@ -1406,7 +1528,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="oej5gg" supported="no">
 		<description>Oyako Eigo Jump 5-gatsu gou - Okashi no Kuni no Daibouken (Japan)</description>
 		<year>2003</year>
@@ -1508,7 +1630,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="kland1" supported="no">
 		<description>Korasho Land 1: Gakkou e Ikou! (Japan)</description>
 		<year>2004</year>
