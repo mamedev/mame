@@ -213,4 +213,4 @@ CONS( 2007, tvbg3c, 0, 0, elan_ep3a19a_1mb, tvbg_2button, elan_ep3a19a_state, in
 // hybrid system with an LCD game on the controller (uses a separate MCU glob, not emulated)
 // "Credit:XiAn Hummer Software Studio(CHINA) Tel:86-29-84270600 Email:HummerSoft@126.com Http://www.hummersoft.com" string in ROM
 CONS( 2006, lexiig10, 0, 0, elan_ep3a19a_2mb_pal_fast, lexiig10, elan_ep3a19a_state, empty_init, "Lexibook", "Color Console IG10 (DualMax 20 in 1 TV part)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-// Sunnyflyer 30-in-1 contains the games from lexiig10 so probably fits here too ( https://blog.12bit.club/?post=6 )
+// Sunnyflyer 30-in-1 looks similar to lexiig10 (especially the Bomberman clone) so probably fits here too ( https://blog.12bit.club/?post=6 )
