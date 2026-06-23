@@ -100,7 +100,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="carsfr" cloneof="cars" supported="no">
+	<software name="carsfr" cloneof="carss" supported="no">
 		<description>Disney/Pixar Cars (France)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
