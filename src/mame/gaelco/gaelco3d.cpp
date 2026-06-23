@@ -1829,7 +1829,7 @@ ROM_START( footbpow11 ) // Version 1.1 - REF. 000208 ROM board
 
 	ROM_REGION( 0x4000, "io", ROMREGION_ERASEFF )
 	/* ID = 0x3F8B, 0x3F8B, 0x3F81, 0x3F8A
-	   Config Word (from bit 13 to bit 0: 11111110110000 */
+	   Config Word (from bit 13 to bit 0: 11111110110001 */
 	ROM_LOAD("football_power_pic16c710.u3", 0x000, 0x400, CRC(9b68caa8) SHA1(cd9999fba4c1c70c2d28248ca9c7106f13226700) ) // I/O for the ball controller
 
 	ROM_REGION( 0x104, "plds", 0 )
