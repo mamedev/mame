@@ -59,8 +59,8 @@ void s11_state::s11_main_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");
 	// TODO:
-	//map(0x0000, 0x077f).ram().share("nvram"); // unprotected ram area
-	//map(0x0780, 0x07ff).rw(FUNC(prot_ram_r), FUNC(prot_ram_w)); // protected ram area
+	//map(0x0000, 0x077f).ram().share("nvram"); // unprotected RAM area
+	//map(0x0780, 0x07ff).rw(FUNC(prot_ram_r), FUNC(prot_ram_w)); // protected RAM area
 	map(0x2100, 0x2103).rw(m_pia21, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
 	map(0x2200, 0x2200).w(FUNC(s11_state::sol3_w)); // solenoids
 	map(0x2400, 0x2403).rw(m_pia24, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
@@ -161,7 +161,7 @@ INPUT_PORTS_END
 
 TIMER_CALLBACK_MEMBER(s11_state::irq_timer)
 {
-	// handle the cd4020 14-bit timer irq counter; this timer fires on the rising and falling edges of Q5, every 32 clocks
+	// handle the cd4020 14-bit timer IRQ counter; this timer fires on the rising and falling edges of Q5, every 32 clocks
 	m_timer_count += 0x20;
 	m_timer_count &= 0x3fff;
 	// handle the reset case (happens on the high level of Eclock, so supersedes the firing of the timer int)
@@ -210,7 +210,7 @@ void s11_state::pia_irq(int state)
 
 void s11_state::main_irq(int state)
 {
-	// handle the fact that the Advance and Up/Down switches are gated by the combined timer/pia irq signal
+	// handle the fact that the Advance and Up/Down switches are gated by the combined timer/PIA IRQ signal
 	if(state == CLEAR_LINE)
 	{
 		m_pia28->ca1_w(1);
@@ -426,19 +426,19 @@ void s11_state::init_s11()
 
 void s11_state::s11(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M6802(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &s11_state::s11_main_map);
 	INPUT_MERGER_ANY_HIGH(config, m_mainirq).output_handler().set(FUNC(s11_state::main_irq));
 	INPUT_MERGER_ANY_HIGH(config, m_piairq).output_handler().set(FUNC(s11_state::pia_irq));
 
-	/* Video */
+	// Video
 	config.set_default_layout(layout_s11);
 
-	/* Sound */
+	// Sound
 	genpin_audio(config);
 
-	/* Devices */
+	// Devices
 	PIA6821(config, m_pia21);
 	m_pia21->readpa_handler().set(FUNC(s11_state::sound_r));
 	m_pia21->set_port_a_input_overrides_output_mask(0xff);
@@ -493,22 +493,22 @@ void s11_state::s11(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* Add the soundcard */
+	// Add the soundcard
 	M6808(config, m_audiocpu, XTAL(4'000'000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &s11_state::s11_audio_map);
 	INPUT_MERGER_ANY_HIGH(config, m_audioirq).output_handler().set_inputline(m_audiocpu, M6808_IRQ_LINE);
 
 	MC1408(config, m_dac, 0);
 
-	// common CVSD filter for system 11 and 11a, this is also the same filter circuit as Sinistar/System 6 uses, and is ALMOST the same filter from the s11 bg sound boards, see /mame/audio/s11c_bg.cpp
-	// The CVSD filter has a large gain, about 4.6x
-	// The filter is boosting the ~5vpp audio signal from the CVSD chip to a ~23vpp (really ~17vpp) theoretical audio signal that the s11
-	// mainboard outputs on its volume control-repurposed-as-audio-out connector.
-	// In reality, the S11 mainboard outputs audio at a virtual ground level between +5v and -12v (so, 17VPP balanced around -7VDC), but since
-	// the CVSD chip's internal DAC can only output between a bit over +0x180/-0x180 out of 0x200, the most voltage it can ever output is
-	// between (assuming 0x1ff is 5VDC and 0x300 is 0VDC) a max of 4.375VDC and a min of 0.625VDC, i.e. 3.75VPP centered on 2.5VDC.
-	// In reality, the range is likely less than that.
-	// This means multiplying a 3.75VPP signal by 4.6 is 17.25VPP, which is almost exactly the expected 17V (12v+5v) VPP the output should have.
+	/* common CVSD filter for system 11 and 11a, this is also the same filter circuit as Sinistar/System 6 uses, and is ALMOST the same filter from the s11 bg sound boards, see /mame/audio/s11c_bg.cpp
+	   The CVSD filter has a large gain, about 4.6x
+	   The filter is boosting the ~5vpp audio signal from the CVSD chip to a ~23vpp (really ~17vpp) theoretical audio signal that the s11
+	   mainboard outputs on its volume control-repurposed-as-audio-out connector.
+	   In reality, the S11 mainboard outputs audio at a virtual ground level between +5v and -12v (so, 17VPP balanced around -7VDC), but since
+	   the CVSD chip's internal DAC can only output between a bit over +0x180/-0x180 out of 0x200, the most voltage it can ever output is
+	   between (assuming 0x1ff is 5VDC and 0x300 is 0VDC) a max of 4.375VDC and a min of 0.625VDC, i.e. 3.75VPP centered on 2.5VDC.
+	   In reality, the range is likely less than that.
+	   This means multiplying a 3.75VPP signal by 4.6 is 17.25VPP, which is almost exactly the expected 17V (12v+5v) VPP the output should have. */
 	FILTER_BIQUAD(config, m_cvsd_filter2).opamp_mfb_lowpass_setup(RES_K(27), RES_K(15), RES_K(27), CAP_P(4700), CAP_P(1200));
 	FILTER_BIQUAD(config, m_cvsd_filter).opamp_mfb_lowpass_setup(RES_K(43), RES_K(36), RES_K(180), CAP_P(1800), CAP_P(180));
 	m_cvsd_filter->add_route(ALL_OUTPUTS, m_cvsd_filter2, 1.0);
@@ -528,7 +528,7 @@ void s11_state::s11(machine_config &config)
 void s11_state::s11_bgs(machine_config &config)
 {
 	s11(config);
-	/* Add the background sound card */
+	// Add the background sound card
 	S11_BGS(config, m_bg);
 	m_dac->add_route(ALL_OUTPUTS, m_bg, 0.5/2.0);
 	m_cvsd_filter2->add_route(ALL_OUTPUTS, m_bg, 0.5/2.0);
@@ -542,7 +542,7 @@ void s11_state::s11_bgs(machine_config &config)
 void s11_state::s11_bgm(machine_config &config)
 {
 	s11(config);
-	/* Add the background music card */
+	// Add the background music card
 	S11_BGM(config, m_bg);
 	m_dac->add_route(ALL_OUTPUTS, m_bg, 0.5319/2.0);
 	m_cvsd_filter2->add_route(ALL_OUTPUTS, m_bg, 0.5319/2.0);
@@ -647,6 +647,63 @@ ROM_START(hs_l3)
 	ROM_LOAD("hs_u4.l1", 0x0000, 0x8000, CRC(0f96e094) SHA1(58650705a02a71ced85f5c2a243722a35282cbf7))
 ROM_END
 
+/* Unidesa / Cirsa silkscreened PCB, identical to the Williams one (also same P/N):
+ ___________________________________________________________________________________________________________________________________________________
+|                                                                                                                                                  |
+|                                                                                                                                                  |
+|  UNIDESA PCB 5764-12091-00                                                                                                                       |
+|                                                           _________   _________   _________   _________   _________   _________   _________      |
+|                                                          |________|  |HEP4011BP  |HEP4011BP  |_7408N__|  |_7408N__|  |_7408N__|  |_7408N__|      |
+|                                                              __________________                                                                SWITCH 2
+|                                                             | HD46821P        |   _________   _________   _________   _________                  |
+|                                                             |_________________|  |TC4020BP|  DM74LS374N   Xtal 4MHz  |________|                SWITCH 1
+|                                                                                                  ____________     __________________             |
+|        _________   _________   _________   _________   ___   _________   _________   _________  | EPROM U27 |    | MC6802P         |             |
+|       |_7416N__|  |_7416N__|  |_7408N__|  |_7408N__|  |__|  SN74LS138N  SN74LS04ND  |________|  |___________|    |_________________|   ___       |
+|                                                                                                                                       |__|       |
+|       __________________     __________________     __________________                           ____________                                    |
+|      |     HD46821P    |    |     HD46821P    |    |     HD46821P    |   _________   _________  | EPROM U26 |   _________  _________             |
+|      |_________________|    |_________________|    |_________________|  |DM74LS00N  |SN74LS20N  |___________|  |SN74LS02N |________|             |
+|                                                                                                                                                  |
+|                        _________     _________      __________________                           ____________   _________  _________             |
+|                       |74LS02PC|    |_7407N__|     |     HD46821P    |   _________   _________  |HM6116LP-4 |  SN74LS139N |________|   ---       |
+|                                                    |_________________|  |SN74LS08N  |________|  |___________|     __________________  |__|       |
+|                                                                                                                  | MC68B21P        |             |
+|                           DIAGNOSTICS                                                                            |_________________|             |
+|                                      \                                                     __________________     __________________             |
+|                          BLANKING-> o o o <- +5V VDC                                      | MC6802P         |    | MC6821P         |   _________ |
+|                                      LEDs                                                 |_________________|    |_________________|  |________| |
+|                                                          3 x 1.5V AA BATTs                 ____________   ____________   _________     _________ |
+|                                     ____________           (unpopulated)                  |TMM2016BP-10  | EPROM U22 |  |SN74LS139    |________| |
+|                        _________   | SN74154N  |                                          |___________|  |___________|   _________               |
+|                       |_7402N__|   |___________|                                                          ------------  |SN74LS139               |
+|                                                                                                          | EPROM U21 |   _________               |
+|                                                                                                          |___________|  |M74LS374|               |
+|__________________________________________________________________________________________________________________________________________________|
+
+Also has the text "Raymond Gay" engraved on it (Ray worked to design the first solid state board system for Williams).
+
+There are no Spanish or Cirsa / Unidesa strings on the ROMs.
+Complete Unidesa / Cirsa manual with schematics:  https://www.recreativas.org/manuales/pinballs
+*/
+ROM_START(hs_uc)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("hs_u26_rom_2_rev_1_2764.u26",                 0x4000, 0x2000, CRC(e1777763) SHA1(bf06fa77f44e9c9f638c8e4b172b009d6596e934))
+	ROM_RELOAD( 0x6000, 0x2000)
+	ROM_LOAD("high_speed_u27_rom_1_rev_1_27c256.u27",       0x8000, 0x8000, CRC(bea2881b) SHA1(1070472ecf5f09ed3b27b9b97ae5dac7a2b474bf))
+
+	ROM_REGION(0x10000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("high_speed_u21_sound_rom_1_rev_1_27c256.u21", 0x8000, 0x8000, CRC(dbd2374f) SHA1(3362da097d556c55c18bc013e9d9a65aa9e6d30d))
+	ROM_LOAD("high_speed_u22_sound_rom_2_rev_1_27c256.u22", 0x0000, 0x8000, CRC(c03be631) SHA1(53823e0f55377a45aa181882c310dd307cf368f5))
+
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("hs_u4.l1",                                    0x0000, 0x8000, BAD_DUMP CRC(0f96e094) SHA1(58650705a02a71ced85f5c2a243722a35282cbf7)) // Not dumped on this PCB
+
+	// The Cirsa pinball has an additional Credit Conversion PCB with a 8035 CPU, an external 2716 EPROM, a 4 dip-switches bank and a 6.144 MHz xtal.
+	ROM_REGION(0x800, "coins", ROMREGION_ERASEFF)
+	ROM_LOAD("conversor_creditos_2716.ic3",                 0x0000, 0x0800, NO_DUMP) // Not dumped
+ROM_END
+
 /*-------------------------
 / Road Kings 07/86 (#542)
 /--------------------------*/
@@ -705,12 +762,13 @@ ROM_END
 
 
 // Pinball
-GAME( 1986, grand_l4, 0,        s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-4)",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, grand_l3, grand_l4, s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-3)",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, grand_l1, grand_l4, s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-1)",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, hs_l4,    0,        s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-4)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, hs_l3,    hs_l4,    s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-3)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rdkng_l4, 0,        s11_bgm,  s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-4)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rdkng_l1, rdkng_l4, s11_bgm,  s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-1)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rdkng_l2, rdkng_l4, s11_bgm,  s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-2)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rdkng_l3, rdkng_l4, s11_bgm,  s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-3)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, grand_l4, 0,        s11_bgs, s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-4)",                                             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, grand_l3, grand_l4, s11_bgs, s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-3)",                                             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, grand_l1, grand_l4, s11_bgs, s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-1)",                                             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, hs_l4,    0,        s11_bgs, s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-4)",                                               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, hs_l3,    hs_l4,    s11_bgs, s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-3)",                                               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, hs_uc,    hs_l4,    s11_bgs, s11, s11_state, init_s11, ROT0, "Williams (Unidesa / Cirsa license)", "High Speed (Unidesa / Cirsa license)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rdkng_l4, 0,        s11_bgm, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-4)",                                               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rdkng_l1, rdkng_l4, s11_bgm, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-1)",                                               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rdkng_l2, rdkng_l4, s11_bgm, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-2)",                                               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rdkng_l3, rdkng_l4, s11_bgm, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-3)",                                               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
