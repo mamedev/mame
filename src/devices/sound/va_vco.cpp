@@ -6,6 +6,26 @@
 
 #include <limits>
 
+
+namespace {
+
+// A faster way to do fmod(x, 1.0F).
+inline float fmod1f(float x)
+{
+	if (x < 0.0F || x >= 1.0F)
+		x -= floorf(x);
+	return x;
+}
+
+// Converts from [-1, 1] to [min_value, max_value]
+inline float transform(float x, float min_value, float max_value)
+{
+	return (max_value - min_value) * (x + 1.0F) / 2.0F + min_value;
+}
+
+}  // anonymous namespace
+
+
 va_vco_device::va_vco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: va_vco_device(mconfig, VA_VCO, tag, owner, clock)
 {
@@ -36,6 +56,7 @@ va_vco_device::va_vco_device(const machine_config &mconfig, device_type type, co
 	, m_sync(false)
 	, m_sync_phase(0)
 	, m_sync_step(0)
+	, m_last_sample_time(attotime::zero)
 {
 }
 
@@ -148,15 +169,19 @@ attotime va_vco_device::ramp_time_to_thresh(float threshold)
 {
 	m_stream->update();
 
-	float remaining = 0.0F;
-	const float thresh_phase = (threshold - m_ramp_min) / (m_ramp_max - m_ramp_min);
-	if (m_phase < thresh_phase)
-		remaining = thresh_phase - m_phase;
-	else
-		remaining = 1.0F - m_phase + thresh_phase;
+	const float dt = float((machine().time() - m_last_sample_time).as_double());
+	assert(dt >= 0.0F);
 
-	const float t = remaining / m_freq;
-	return attotime::from_double(t);
+	const float osc_phase = fmod1f(m_phase + dt * m_freq);
+	const float thresh_phase = (threshold - m_ramp_min) / (m_ramp_max - m_ramp_min);
+
+	float remaining = 0.0F;
+	if (osc_phase < thresh_phase)
+		remaining = thresh_phase - osc_phase;
+	else
+		remaining = 1.0F - osc_phase + thresh_phase;
+
+	return attotime::from_double(remaining / m_freq);
 }
 
 void va_vco_device::device_start()
@@ -174,20 +199,7 @@ void va_vco_device::device_start()
 	save_item(NAME(m_sync));
 	save_item(NAME(m_sync_phase));
 	save_item(NAME(m_sync_step));
-}
-
-// A faster way to do fmod(x, 1.0F).
-static inline float fmod1f(float x)
-{
-	if (x < 0.0F || x >= 1.0F)
-		x -= floorf(x);
-	return x;
-}
-
-// Converts from [-1, 1] to [min_value, max_value]
-static inline float transform(float x, float min_value, float max_value)
-{
-	return (max_value - min_value) * (x + 1.0F) / 2.0F + min_value;
+	save_item(NAME(m_last_sample_time));
 }
 
 // Implementation is based on:
@@ -317,13 +329,13 @@ float va_vco_device::pulse_wave(float phase) const
 {
 	float wave = (phase < m_pw) ? 1.0F : -1.0F;  // [-1, 1]
 	if (m_pulse_dc_comp)
-		wave -= m_pw + m_pw - 1.0F;  // Between [-1, 1] and [-2, 2], depending on PW.
+		wave -= m_pw + m_pw - 1.0F;  // [-2, 2], see configure_pulse_dc_comp() usage doc.
 	return wave;
 }
 
 float va_vco_device::tripulse_wave(float phase) const
 {
-	// Between [-1, 1] and [-2, 2], depending on m_pulse_dc_comp and m_pw.
+	// Either [-1, 1] or [-2, 2], depending on m_pulse_dc_comp.
 	return pulse_wave(tripulse_reset_phase(phase));
 }
 
@@ -657,6 +669,8 @@ void va_vco_device::sound_stream_update(sound_stream &stream)
 		m_phase = fmod1f(m_phase + m_step);
 		m_sync_phase = fmod1f(m_sync_phase + m_sync_step);
 	}
+
+	m_last_sample_time = stream.end_time() - stream.sample_period();
 }
 
 DEFINE_DEVICE_TYPE(VA_VCO, va_vco_device, "va_vco", "Virtual Analog Oscillator")

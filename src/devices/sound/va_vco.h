@@ -228,6 +228,7 @@ private:
 	bool m_sync;
 	float m_sync_phase;  // 0-1
 	float m_sync_step;
+	attotime m_last_sample_time;
 };
 
 #endif  // MAME_SOUND_VA_VCO_H
