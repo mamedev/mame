@@ -17221,6 +17221,9 @@ bit90
 @source:coleco/wrinkles.cpp
 wrinkles
 
+@source:colonial/sb80.cpp
+sb80
+
 @source:comad/funybubl.cpp
 funybubl
 funybublc
