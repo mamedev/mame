@@ -4027,6 +4027,7 @@ end
 --@src/devices/bus/nscsi/devices.h,BUSES["NSCSI"] = true
 --@src/devices/bus/nscsi/hd.h,BUSES["NSCSI"] = true
 --@src/devices/bus/nscsi/s1410.h,BUSES["NSCSI"] = true
+--@src/devices/bus/nscsi/sa1403d.h,BUSES["NSCSI"] = true
 ---------------------------------------------------
 
 if BUSES["NSCSI"] then
@@ -4063,6 +4064,8 @@ if BUSES["NSCSI"] then
 		MAME_DIR .. "src/devices/bus/nscsi/pc98_hd.h",
 		MAME_DIR .. "src/devices/bus/nscsi/s1410.cpp",
 		MAME_DIR .. "src/devices/bus/nscsi/s1410.h",
+		MAME_DIR .. "src/devices/bus/nscsi/sa1403d.cpp",
+		MAME_DIR .. "src/devices/bus/nscsi/sa1403d.h",
 		MAME_DIR .. "src/devices/bus/nscsi/smoc501.cpp",
 		MAME_DIR .. "src/devices/bus/nscsi/smoc501.h",
 		MAME_DIR .. "src/devices/bus/nscsi/tape.cpp",
