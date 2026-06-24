@@ -873,4 +873,25 @@ All games fails loading
 		</part>
 	</software>
 
+	<software name="1541algn">
+		<description>1541/1571 Drive Alignment</description>
+		<year>1987</year>
+		<publisher>Free Spirit Software</publisher>
+		<notes><![CDATA[
+LOAD "*",8
+]]></notes>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="1541_1571_drive_alignment_s0.g64" size="279582" crc="b6d3296b" sha1="2820b8c6a07461182eaa946ab65892310fb022b4"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="1541_1571_drive_alignment_s1.g64" size="279582" crc="dc31e1b2" sha1="be1043f10d4798472a28e86faaad230d43ca9059"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

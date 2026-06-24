@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="c64_quik" description="Commodore 64 quickload">
+
+	<software name="brklmts">
+		<description>Broken Limits</description>
+		<year>1987</year>
+		<publisher>Wizax</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="10712">
+				<rom name="broken_limits.t64" size="10712" crc="d34a2027" sha1="733776b2813acd21ae74960401da71ee15cfbe94"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
