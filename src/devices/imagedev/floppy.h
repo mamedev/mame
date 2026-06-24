@@ -180,7 +180,7 @@ public:
 	void unload() { m_firstturn = true; }
 	bool samples_loaded() { return m_samples_available; }
 	void register_for_save_states();
-	void set_samples(floppy_sound_samples *samples, int form_factor);
+	void set_samples(floppy_sound_samples *samples, int form_factor, int maxtrack);
 
 protected:
 	void device_start() override ATTR_COLD;
@@ -193,6 +193,7 @@ private:
 	floppy_sound_samples* m_samplelist;
 	floppy_sound_samples m_default_samples;
 
+	int    m_max_track;
 	int    m_last_track;
 	int    m_last_subtrack;
 

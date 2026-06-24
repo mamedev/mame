@@ -566,7 +566,7 @@ void floppy_image_device::device_start()
 	floppy_connector *conn = dynamic_cast<floppy_connector*>(device().owner());
 	if (conn != nullptr)  // just in case that the floppy connects to something else
 	{
-		m_sound_out->set_samples(conn->get_samples(), m_form_factor);
+		m_sound_out->set_samples(conn->get_samples(), m_form_factor, m_tracks);
 		m_make_sound = conn->use_sound();
 	}
 
@@ -953,18 +953,20 @@ void floppy_image_device::stp_w(int state)
 		cache_clear();
 		m_stp = state;
 		if ( m_stp == 0 ) {
-			int ocyl = m_cyl;
+			// Allow to reach track -1 or track==max for the sound routine
 			if ( m_dir ) {
-				if ( m_cyl ) m_cyl--;
+				m_cyl--;
 			} else {
-				if ( m_cyl < m_tracks-1 ) m_cyl++;
+				m_cyl++;
 			}
-			if(ocyl != m_cyl)
-			{
-				LOGMASKED(LOG_STEP, "track %d [%f]\n", m_cyl, machine().time().as_double());
-				if (m_make_sound) m_sound_out->step(m_cyl);
-				track_changed();
-			}
+			LOGMASKED(LOG_STEP, "track %d [%f]\n", m_cyl, machine().time().as_double());
+			if (m_make_sound) m_sound_out->step(m_cyl);
+				
+			// Correct the possibly invalid track number
+			if (m_cyl < 0) m_cyl = 0;
+			else if (m_cyl > m_tracks-1) m_cyl = m_tracks-1;
+			else track_changed();
+
 			/* Update disk detection if applicable */
 			if (exists() && !m_dskchg_writable)
 			{
@@ -1489,6 +1491,8 @@ void floppy_sound_samples::add_seek_sample(const char* filename, int nominal_rat
 	entry.type = SEEK;
 	entry.rate = nominal_rate;
 	entry.maxrate = max_rate;
+	entry.mintrack = mintrack;
+	entry.maxtrack = maxtrack;
 	entry.dir = dir;
 	entry.filename = filename;
 	entry.form_factor = m_current_form_factor;
@@ -1725,13 +1729,14 @@ void floppy_sound_device::device_start()
 	m_firstturn = true;
 }
 
-void floppy_sound_device::set_samples(floppy_sound_samples *samples, int form_factor)
+void floppy_sound_device::set_samples(floppy_sound_samples *samples, int form_factor, int maxtrack)
 {
 	m_samplelist = samples;
 	if (m_samplelist != nullptr)
 		m_samplelist->select(form_factor);
 
 	m_default_samples.select(form_factor);
+	m_max_track = maxtrack;
 }
 
 /*
@@ -1826,7 +1831,8 @@ void floppy_sound_device::step(int track, int subtrack)
 
 		// If the step rate changed by more than 5%, we may have to change the
 		// seek sample
-		if (m_step_rate == 0)
+		// If the track is outside of the valid range, we also have to switch the seek sound
+		if (m_step_rate == 0 || track < 0 || track >= m_max_track)
 		{
 			recalc = true;
 			m_step_rate = rate;
