@@ -80,11 +80,11 @@
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
 #include "machine/com8116.h"
-#include "machine/z80daisy.h"
+#include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
+#include "machine/z80daisy.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
-#include "machine/wd_fdc.h"
 #include "formats/imd_dsk.h"
 #include "formats/td0_dsk.h"
 #include "softlist_dev.h"
@@ -111,12 +111,13 @@ public:
 
 	void sb80(machine_config &config);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 private:
 	void mem_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
-
-	void machine_start() override ATTR_COLD;
-	void machine_reset() override ATTR_COLD;
 
 	void unboot_w(uint8_t data);
 	void dsel_w(uint8_t data);
@@ -453,4 +454,4 @@ ROM_END
 
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY                          FULLNAME  FLAGS
-COMP( 1982, sb80, 0,      0,      sb80,    0,     sb80_state,   empty_init, "Colonial Data Services Corp.",  "SB-80",  MACHINE_SUPPORTS_SAVE )
+COMP( 1982, sb80, 0,      0,      sb80,    0,     sb80_state,   empty_init, "Colonial Data Services",  "SB-80",  MACHINE_SUPPORTS_SAVE )
