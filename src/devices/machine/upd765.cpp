@@ -43,6 +43,7 @@
 
 DEFINE_DEVICE_TYPE(UPD765A,        upd765a_device,        "upd765a",        "NEC uPD765A FDC")
 DEFINE_DEVICE_TYPE(UPD765B,        upd765b_device,        "upd765b",        "NEC uPD765B FDC")
+DEFINE_DEVICE_TYPE(UPD7265,        upd7265_device,        "upd7265",        "NEC uPD7265 FDC")
 DEFINE_DEVICE_TYPE(I8272A,         i8272a_device,         "i8272a",         "Intel 8272A FDC")
 DEFINE_DEVICE_TYPE(UPD72065,       upd72065_device,       "upd72065",       "NEC uPD72065 FDC")
 DEFINE_DEVICE_TYPE(UPD72066,       upd72066_device,       "upd72066",       "NEC uPD72066 FDC")
@@ -73,6 +74,12 @@ void upd765b_device::map(address_map &map)
 {
 	map(0x0, 0x0).r(FUNC(upd765b_device::msr_r));
 	map(0x1, 0x1).rw(FUNC(upd765b_device::fifo_r), FUNC(upd765b_device::fifo_w));
+}
+
+void upd7265_device::map(address_map &map)
+{
+	map(0x0, 0x0).r(FUNC(upd7265_device::msr_r));
+	map(0x1, 0x1).rw(FUNC(upd7265_device::fifo_r), FUNC(upd7265_device::fifo_w));
 }
 
 void i8272a_device::map(address_map &map)
@@ -2871,6 +2878,11 @@ upd765a_device::upd765a_device(const machine_config &mconfig, const char *tag, d
 }
 
 upd765b_device::upd765b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, UPD765B, tag, owner, clock)
+{
+	has_dor = false;
+}
+
+upd7265_device::upd7265_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, UPD7265, tag, owner, clock)
 {
 	has_dor = false;
 }

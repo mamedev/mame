@@ -1823,6 +1823,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/s900_dsk.h,FORMATS["S900_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "S900_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/s900_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/s900_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/sap_dsk.h,FORMATS["SAP_DSK"] = true
 --------------------------------------------------
 
