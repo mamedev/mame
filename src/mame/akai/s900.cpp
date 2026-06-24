@@ -9,7 +9,6 @@
 	standard 3.5" floppies.
 
 	TODO:
-	- replace DMA controllers w/ uPD71071 (software DMA requests are needed for correct playback)
 	- output & input filters (9x MF6-50)
 	- layouts
 	- software list
@@ -18,6 +17,7 @@
 	  uninitialized pointer, so further recording attempts will crash.
 	  Deleting/zeroing out the branch at address 04593 avoids the issue.
 	  The 2.1 and 4.0 OS disks don't have this issue; the (undumped) 1.2c ROM might not either
+	- RS232 port for S950 (shares 6850 w/ MIDI)
 ***************************************************************************/
 
 #include "emu.h"
