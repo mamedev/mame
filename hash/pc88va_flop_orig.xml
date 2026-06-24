@@ -44,7 +44,6 @@ Garbage layer covering title and gameplay (fixed)
 		<notes><![CDATA[
 [gfx] Text boxes often don't draw properly, making readability hard. Comes from graphic layer not IDP.
 [gfx] bitmap draws desynced when scrolling up for a bit, OFY wrap?
-[gfx] has visible garbage on top/bottom, uses picture mask
 ]]></notes>
 		<info name="alt_title" value="ファーストクイーン" />
 		<info name="release" value="198901xx" />
@@ -98,7 +97,7 @@ Garbage layer covering title and gameplay (fixed)
 		<year>1988</year>
 		<publisher>ハミングバード (HummingBird)</publisher>
 		<notes><![CDATA[
-[FDC] randomly black screen
+[FDC] randomly black screen or throws file disk errors
 ]]></notes>
 		<info name="alt_title" value="ロードス島戦記 灰色の魔女" />
 		<info name="release" value="198809xx" />

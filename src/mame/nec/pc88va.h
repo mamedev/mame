@@ -188,6 +188,7 @@ private:
 	bool m_td;
 	bitmap_rgb32 m_text_bitmap;
 	bitmap_rgb32 m_graphic_bitmap[2];
+	bitmap_rgb32 m_bitmap_screen[6];
 
 	struct {
 		bool aacc;
@@ -216,6 +217,8 @@ private:
 		u16 left, right;
 		u8 gmp, mkm[2];
 	} m_picture_mask;
+
+	bool is_layer_scissored(int pri, int which);
 
 	u8 rop_execute(u8 plane_rop, u8 src, u8 dst, u8 pat);
 	u8 gvram_singleplane_r(offs_t offset);

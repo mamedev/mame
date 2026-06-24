@@ -4,6 +4,7 @@
 #include "emu.h"
 #include "pc88va.h"
 
+//#include "input.h"
 
 #define LOG_IDP     (1U << 1) // TSP data
 #define LOG_FB      (1U << 2) // framebuffer strips (verbose)
@@ -44,6 +45,9 @@ void pc88va_state::video_start()
 
 	for (int i = 0; i < 2; i++)
 		m_screen->register_screen_bitmap(m_graphic_bitmap[i]);
+
+	for (int i = 0; i < 6; i++)
+		m_screen->register_screen_bitmap(m_bitmap_screen[i]);
 
 	save_item(NAME(m_screen_ctrl_reg));
 	save_item(NAME(m_gden0));
@@ -129,9 +133,38 @@ void pc88va_state::palette_init(palette_device &palette) const
 	}
 }
 
+// outer = 1 examples:
+// - shinraba intro and start of level
+// - rtype intro
+// - shanghai winning animation (texture scissoring)
+// - fqueen (graphic layers being concealed on top/bottom)
+// - famista playfield (covers some lines at bottom)
+// inner = 0 examples:
+// - olteus intro and gameplay
+// - upo gameplay
+bool pc88va_state::is_layer_scissored(int pri, int which)
+{
+	const uint8_t actual_gmp = m_picture_mask.gmp + 1;
+	switch(m_picture_mask.mkm[which])
+	{
+		// Next layer
+		case 1:
+			return actual_gmp == pri;
+		// All higher layers (can't be current as per rtype)
+		case 2:
+			return actual_gmp > pri;
+		// All lower layers (+ current according to upo)
+		case 3:
+			return actual_gmp <= pri;
+	}
+	// NOP
+	return false;
+}
+
 uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t pri, cur_pri_lv;
+	int pri;
+	uint8_t cur_pri_lv;
 	uint32_t screen_pri;
 	// shinraba opening and title relies on backdrop color
 	bitmap.fill(m_palette->pen(0x20), cliprect);
@@ -171,9 +204,13 @@ uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 	//popmessage("%08x", screen_pri);
 
+
 	for(pri = 0; pri < 6; pri++)
 	{
+		const u8 screen_num = 5 - pri;
 		cur_pri_lv = (screen_pri >> (pri * 4)) & 0xf;
+
+		m_bitmap_screen[screen_num].fill(0);
 
 		if(cur_pri_lv & 8) // enable layer
 		{
@@ -184,11 +221,11 @@ uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 				{
 					// 8 = graphic 0
 					case 0:
-						draw_graphic_layer(bitmap, cliprect, 0);
+						draw_graphic_layer(m_bitmap_screen[screen_num], cliprect, 0);
 						break;
 					// 9 = graphic 1
 					case 1:
-						draw_graphic_layer(bitmap, cliprect, 1);
+						draw_graphic_layer(m_bitmap_screen[screen_num], cliprect, 1);
 						break;
 					default:
 						popmessage("Undocumented pri level %d", cur_pri_lv);
@@ -198,28 +235,66 @@ uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 			{
 				switch(cur_pri_lv & 3) // (palette color mode)
 				{
-					case 0: draw_text(bitmap, cliprect); break;
-					case 1: draw_sprites(bitmap, cliprect); break;
+					case 0: draw_text(m_bitmap_screen[screen_num], cliprect); break;
+					case 1: draw_sprites(m_bitmap_screen[screen_num], cliprect); break;
 					/* A = graphic 0 */
 					case 2:
-						draw_graphic_layer(bitmap, cliprect, 0);
+						draw_graphic_layer(m_bitmap_screen[screen_num], cliprect, 0);
 						break;
 					/* B = graphic 1 */
 					case 3:
-						draw_graphic_layer(bitmap, cliprect, 1);
+						draw_graphic_layer(m_bitmap_screen[screen_num], cliprect, 1);
 						break;
 				}
 			}
 		}
 	}
 
+	// mix screens, apply per-screen picture mask here
+
+	// vertical values are doubled when in 400 mode
+	// FIXME: currently querying the screen dims rather than CRTC values for famista
+	// cfr. recompute_parameters fn
+	//const u8 in_line400 = !BIT(m_crtc_regs[0], 7);
+	const u8 in_line400 = m_screen->visible_area().height() >= 400;
+
+	rectangle picture_cliprect(m_picture_mask.left, m_picture_mask.right, m_picture_mask.top << in_line400,(m_picture_mask.bottom << in_line400) | in_line400);
+
+	for (pri = 5; pri >= 0; pri--)
+	{
+		rectangle screen_cliprect = cliprect;
+
+		// outer: just apply an intersection
+		if (is_layer_scissored(pri, 1))
+			screen_cliprect &= picture_cliprect;
+
+		// inner: we need to copy pixel by pixel and apply a set theory complement
+		// using both inner and outer is untested and guessed (should be very rare use)
+		if (is_layer_scissored(pri, 0))
+		{
+			for (int y = screen_cliprect.min_y; y <= screen_cliprect.max_y; y++)
+			{
+				bool y_cross = y >= picture_cliprect.min_y && y <= picture_cliprect.max_y;
+
+				for (int x = screen_cliprect.min_x; x <= screen_cliprect.max_x; x++)
+				{
+					if (y_cross && x >= picture_cliprect.min_x && x <= picture_cliprect.max_x)
+						continue;
+
+					u32 const pix = m_bitmap_screen[pri].pix(y, x);
+
+					if (pix)
+						bitmap.pix(y, x) = pix;
+				}
+			}
+		}
+		else
+			copybitmap_trans(bitmap, m_bitmap_screen[pri], 0,0,0,0, screen_cliprect, 0);
+	}
+
 	if ((m_picture_mask.mkm[0] || m_picture_mask.mkm[1]) && LIVE_PICTURE_MASK_VIEW)
 	{
 		const char* mkm_modes[] = {"NOP", "Next low", "All high", "All low"};
-		// vertical values are doubled when in 400 mode
-		// TODO: famista doesn't work with this, may be related with the CRTC error above.
-		const u8 in_line400 = !BIT(m_crtc_regs[0], 7);
-
 		popmessage("GMP %d MKM1 outer %s MKM0 inner %s\nx0 %d y0 %d - x1 %d y1 %d",
 			m_picture_mask.gmp + 1, mkm_modes[m_picture_mask.mkm[1]], mkm_modes[m_picture_mask.mkm[0]],
 			m_picture_mask.left, m_picture_mask.top << in_line400, m_picture_mask.right, (m_picture_mask.bottom << in_line400) | 1);
@@ -862,12 +937,6 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 		// rtype definitely don't want to be clipped on fbw, assume valid for pitch calc only.
 		rectangle fb_cliprect(cliprect.min_x, cliprect.max_x, dsp, dsp + fbl - 1);
 		split_cliprect &= fb_cliprect;
-
-		// TODO: picture mask, actually under mixing not here (applies per screen not per layer)
-		// - fqueen, shinraba and rtype use outer mode
-		// - olteus and upo use inner mode
-		//rectangle picture_mask_cliprect(m_picture_mask.left, m_picture_mask.right, m_picture_mask.top, m_picture_mask.bottom);
-		//split_cliprect &= picture_mask_cliprect;
 
 		if (split_cliprect.empty())
 			continue;

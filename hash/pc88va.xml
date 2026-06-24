@@ -143,6 +143,7 @@ Transition between 3rd and 4th sequences don't look right, [IDP]
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
 [gfx] status bar has wrong colors [OFX/OFY]
+[gfx] colors currently blanked except status bar (regression)
 ]]></notes>
 		<info name="alt_title" value="アニメフレーマー" />
 		<sharedfeat name="mouseport_default" value="mouse"/>
@@ -169,7 +170,7 @@ Transition between 3rd and 4th sequences don't look right, [IDP]
 		<year>1987</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
-[gfx] status bar has wrong colors [OFX/OFY]
+(same as animefrm)
 ]]></notes>
 		<sharedfeat name="mouseport_default" value="mouse"/>
 		<!-- labels were swapped -->
@@ -425,8 +426,7 @@ Hangs on Utility menu, [FDC] chrn=(18, 0, 1, 256)
 Display off in places during intro
 [gfx] broken scroll bases for main menu
 [gfx] Requires fractional DOT scrolling (horizontal)
-[gfx] wrong draw mode for status bar in gameplay
-[gfx] uses various forms of picture mask
+[gfx] wrong draw mode for status bar in gameplay (currently concealed by picture mask)
 ]]></notes>
 		<info name="alt_title" value="オルテウス" />
 		<info name="usage" value="Kana Lock on pauses the game"/>
@@ -505,7 +505,6 @@ Display off in places during intro
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
 [SGP] extensive VD usage in gameplay
-[gfx] intro uses picture mask
 [gfx] Requires fractional DOT scrolling (horizontal)
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
@@ -558,9 +557,10 @@ Burps on [FDC] access after disk swap with program and player disks, trying to s
 		<year>1986</year>
 		<publisher>システムソフト (System Soft)</publisher>
 		<notes><![CDATA[
-Needs [dac1bit] clicks on gameplay (fixed)
-May crash with disk error when entering winning animation (verify)
-Winning animation is glitchy [OFX/OFY]?, uses [IDP] text transpen with upper bits set (for flame effect?), press mouse left button to return to game
+[IDP] cursor blink present on title screen (verify)
+May crash with disk error when entering winning animation (verify, can't reproduce)
+[gfx] Winning animation a bit offset, requires fractional horizontal scrolling
+Winning animation uses [IDP] text transpen with upper bits set, unknown purpose
 [OPNA] seems to cut off shortly on intro and winning screen compared to VAEG
 ]]></notes>
 		<info name="alt_title" value="上海" />
@@ -578,11 +578,11 @@ Winning animation is glitchy [OFX/OFY]?, uses [IDP] text transpen with upper bit
 		<year>1987</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<notes><![CDATA[
-[gfx] needs picture mask and primask pen during intro
-[gfx] title screen should animate with a blue backdrop (fixed)
 Runs at half speed
-[IDP] sprites wraparound on left edge (fixed)
+[gfx] is white flash (backdrop) during maiden prayer in intro supposed to be full screen? (verify)
 Omake: if sound irqs don't run then needs to press key 0 pad to move on
+Omake: CG intro scene with thunderstorm has a blurry signature concealed by picture mask
+[IDP] concealed text line after said scene
 ]]></notes>
 		<info name="alt_title" value="神羅万象"/>
 		<info name="usage" value="Hold enter at boot to skip intro, press F2 on title screen to load a game, press F5 for sound test" />
