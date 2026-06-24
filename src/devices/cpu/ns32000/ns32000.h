@@ -18,7 +18,7 @@ public:
 	void rdy_w(int state) { m_ready = !state; }
 
 protected:
-	ns32000_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+	ns32000_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, bool cg16 = false);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -142,6 +142,11 @@ protected:
 	virtual void lpr(unsigned reg, addr_mode const mode, bool user, unsigned &tex);
 	virtual void spr(unsigned reg, addr_mode const mode, bool user, unsigned &tex);
 
+	// EXTBLT (NS32CG16) asserts this around the block transfer so an external
+	// BPU wired up in the driver can snoop the source/destination bus cycles
+	// via memory taps; the base CPU has no BPU and ignores it.
+	virtual void bpu_window(bool active) { }
+
 	// slave protocol helpers
 	virtual u16 slave(u8 opbyte, u16 opword, addr_mode op1, addr_mode op2);
 	u16 slave_slow(ns32000_slow_slave_interface &slave, u8 opbyte, u16 opword, addr_mode op1, addr_mode op2);
@@ -196,6 +201,7 @@ private:
 	bool m_wait;
 	bool m_sequential;
 	bool m_ready;
+	bool m_cg16;   // NS32CG16 graphics-instruction variant enabled
 };
 
 class ns32008_device : public ns32000_device<24, 0>
@@ -288,10 +294,33 @@ private:
 	u32 m_bpc; // breakpoint program counter
 };
 
+// NS32CG16 — graphics/printer variant: an NS32016 (24-bit address, 16-bit bus)
+// plus the Series 32000 graphics instructions (Format-5 extensions).  The base
+// constructor's cg16 flag enables that instruction group; the chip is otherwise
+// an NS32016.
+class ns32cg16_device : public ns32000_device<24, 1>
+{
+public:
+	ns32cg16_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+	// EXTBLT asserts this for the duration of the block transfer; a DP8510/
+	// DP8511 BITBLT processing unit attached in the driver uses it to gate the
+	// memory taps that route the source/destination words through the BPU.
+	auto out_bpu() { return m_out_bpu.bind(); }
+
+protected:
+	// /BPU is active low; output the physical level (0 = low/asserted)
+	virtual void bpu_window(bool active) override { m_out_bpu(active ? 0 : 1); }
+
+private:
+	devcb_write_line m_out_bpu;
+};
+
 DECLARE_DEVICE_TYPE(NS32008, ns32008_device)
 DECLARE_DEVICE_TYPE(NS32016, ns32016_device)
 DECLARE_DEVICE_TYPE(NS32032, ns32032_device)
 DECLARE_DEVICE_TYPE(NS32332, ns32332_device)
 DECLARE_DEVICE_TYPE(NS32532, ns32532_device)
+DECLARE_DEVICE_TYPE(NS32CG16, ns32cg16_device)
 
 #endif // MAME_CPU_NS32000_NS32000_H
