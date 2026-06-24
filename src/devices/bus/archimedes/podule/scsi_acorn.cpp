@@ -22,6 +22,8 @@
 #include "machine/am9517a.h"
 #include "machine/wd33c9x.h"
 
+#include "endianness.h"
+
 
 namespace {
 
@@ -42,7 +44,6 @@ protected:
 	arc_scsi_aka30_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 		: device_t(mconfig, type, tag, owner, clock)
 		, device_archimedes_podule_interface(mconfig, *this)
-		, m_maincpu(*this, ":maincpu")
 		, m_wd33c93(*this, "wd33c93a")
 		, m_dmac(*this, "dma")
 		, m_podule_rom(*this, "podule_rom")
@@ -66,10 +67,12 @@ protected:
 	virtual void memc_map(address_map &map) override ATTR_COLD;
 
 private:
-	required_device<cpu_device> m_maincpu;
 	required_device<wd33c93a_device> m_wd33c93;
 	required_device<upd71071_device> m_dmac;
 	required_memory_region m_podule_rom;
+
+	u8 dma_ram_r(offs_t offset);
+	void dma_ram_w(offs_t offset, u8 data);
 
 	void update_interrupts();
 
@@ -173,6 +176,17 @@ const tiny_rom_entry *arc_scsi_aka32_device::device_rom_region() const
 }
 
 
+u8 arc_scsi_aka30_device::dma_ram_r(offs_t offset)
+{
+	return util::little_endian_cast<u8>(m_podule_ram.get())[offset & 0xffff];
+}
+
+void arc_scsi_aka30_device::dma_ram_w(offs_t offset, u8 data)
+{
+	util::little_endian_cast<u8>(m_podule_ram.get())[offset & 0xffff] = data;
+}
+
+
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
@@ -194,13 +208,12 @@ void arc_scsi_aka30_device::device_add_mconfig(machine_config &config)
 	m_wd33c93->drq_cb().set(m_dmac, FUNC(upd71071_device::dreq0_w));
 
 	UPD71071(config, m_dmac, DERIVED_CLOCK(1, 1));
-	m_dmac->in_memr_callback().set([this](offs_t offset) { return m_maincpu->space(AS_PROGRAM).read_byte(offset); });
-	m_dmac->out_memw_callback().set([this](offs_t offset, u8 data) { return m_maincpu->space(AS_PROGRAM).write_byte(offset, data); });
+	m_dmac->in_memr_callback().set(FUNC(arc_scsi_aka30_device::dma_ram_r));
+	m_dmac->out_memw_callback().set(FUNC(arc_scsi_aka30_device::dma_ram_w));
 	m_dmac->out_eop_callback().set([this](int state) { m_dmac_int = state; update_interrupts(); });
 	m_dmac->in_ior_callback<0>().set(m_wd33c93, FUNC(wd33c93a_device::dma_r));
 	m_dmac->out_iow_callback<0>().set(m_wd33c93, FUNC(wd33c93a_device::dma_w));
-	m_dmac->out_hreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	m_dmac->out_hreq_callback().append(m_dmac, FUNC(upd71071_device::hack_w));
+	m_dmac->out_hreq_callback().set(m_dmac, FUNC(upd71071_device::hack_w));
 }
 
 
