@@ -177,7 +177,6 @@ void nscsi_sa1403d_device::device_start()
 	save_item(NAME(m_xfer_lun));
 	save_item(NAME(m_cur_lba));
 	save_item(NAME(m_block));
-	save_item(NAME(m_xferbuf));
 	save_item(NAME(m_f_write));
 	save_item(NAME(m_f_lun));
 	save_item(NAME(m_f_lba));

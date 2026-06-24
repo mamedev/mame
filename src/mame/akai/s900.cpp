@@ -77,8 +77,7 @@ public:
 		, m_keys(*this, "KEY%u", 0)
 	{}
 
-	void base_config(machine_config &config);
-	void s900(machine_config &config);
+	void s900(machine_config &config) ATTR_COLD;
 
 	ioport_value fdc_irq_r() { return m_fdc->get_irq(); }
 
@@ -93,6 +92,8 @@ protected:
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+	void base_config(machine_config &config) ATTR_COLD;
 
 	virtual void common_map(address_map &map) ATTR_COLD;
 	void mem_map(address_map &map) ATTR_COLD;
@@ -109,9 +110,9 @@ protected:
 	void dial_reset_w(u8) { m_dial_count = 0x8; }
 	u8 dial_count_r() { return m_dial_count; }
 
-	template<int Voice> void voice_dreq_set_w(int state);
-	template<int Voice> void voice_dreq_clear_w(int state);
-	template<int Num> void voice_eop_w(int state);
+	template <int Voice> void voice_dreq_set_w(int state);
+	template <int Voice> void voice_dreq_clear_w(int state);
+	template <int Num> void voice_eop_w(int state);
 
 	void adc_dreq_set_w(int state);
 	void adc_dreq_clear_w(int state);
@@ -120,7 +121,7 @@ protected:
 
 	u16 voice_dma_mem_r(offs_t offset);
 	void voice_dma_mem_w(offs_t offset, u16 data);
-	template<int Voice> void voice_dma_io_w(offs_t offset, u16 data);
+	template <int Voice> void voice_dma_io_w(offs_t offset, u16 data);
 
 	void envelope_w(offs_t offset, u8 data);
 
@@ -164,8 +165,8 @@ public:
 		, m_scsi_regs(*this, "scsi_regs")
 	{}
 
-	void s950(machine_config &config);
-	void s950scsi(machine_config &config);
+	void s950(machine_config &config) ATTR_COLD;
+	void s950scsi(machine_config &config) ATTR_COLD;
 
 	ioport_value floppy_density_r();
 	ioport_value hd_irq_r() { return m_hd_irq; }
@@ -193,7 +194,7 @@ protected:
 	void adc_dreq_set_w(int state);
 
 	void update_dreq();
-	template<int Num> void dma_dreq_w(int state);
+	template <int Num> void dma_dreq_w(int state);
 	void dma_dack_w(int state);
 	void dma_eop_w(int state);
 
@@ -698,7 +699,7 @@ INPUT_CHANGED_MEMBER(s900_state::dial_w)
 }
 
 /**************************************************************************/
-template<int Voice>
+template <int Voice>
 void s900_state::voice_dreq_set_w(int state)
 {
 	// DREQ generated on both clock edges
@@ -706,7 +707,7 @@ void s900_state::voice_dreq_set_w(int state)
 }
 
 /**************************************************************************/
-template<int Voice>
+template <int Voice>
 void s900_state::voice_dreq_clear_w(int state)
 {
 	if (!state)
@@ -717,7 +718,7 @@ void s900_state::voice_dreq_clear_w(int state)
 }
 
 /**************************************************************************/
-template<int Num>
+template <int Num>
 void s900_state::voice_eop_w(int state)
 {
 	m_voice_eop[Num] = state;
@@ -779,7 +780,7 @@ void s900_state::voice_dma_mem_w(offs_t offset, u16 data)
 }
 
 /**************************************************************************/
-template<int Voice>
+template <int Voice>
 void s900_state::voice_dma_io_w(offs_t offset, u16 data)
 {
 	m_dac[Voice]->write(data >> 4);
@@ -804,7 +805,7 @@ void s950_state::update_dreq()
 }
 
 /**************************************************************************/
-template<int Num>
+template <int Num>
 void s950_state::dma_dreq_w(int state)
 {
 	m_dreq[Num] = state;
@@ -956,7 +957,8 @@ ROM_START( s950scsi )
 	ROM_LOAD16_BYTE("s950_1_2b_lsb.ic12", 0x0000, 0x8000, CRC(01e0c3ad) SHA1(a374289a6110d97ac0871bdfbe8defe0036dc928))
 	ROM_LOAD16_BYTE("s950_1_2b_msb.ic11", 0x0001, 0x8000, CRC(5b5d25cf) SHA1(05d9c4c21ed60c289ea6ec23308c6454b43b200e))
 ROM_END
-}
+
+} // anonymous namespace
 
 SYST( 1986, s900,      0,        0, s900,     s900,  s900_state,  empty_init, "Akai", "S900 MIDI Digital Sampler", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 SYST( 1988, s950,      0,        0, s950,     s950,  s950_state,  empty_init, "Akai", "S950 MIDI Digital Sampler", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

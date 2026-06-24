@@ -49,7 +49,7 @@ class am9517a_device :  public device_t,
 
 public:
 	// construction/destruction
-	am9517a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	am9517a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto out_hreq_callback() { return m_out_hreq_cb.bind(); }
 	auto out_eop_callback() { return m_out_eop_cb.bind(); }
@@ -79,11 +79,13 @@ public:
 	void dreq3_w(int state);
 
 protected:
-	am9517a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	am9517a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+
+	// device_execute_interface implementation
 	virtual void execute_run() override;
 
 	virtual void end_of_process();
@@ -161,9 +163,9 @@ public:
 	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
-	upd71071_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	upd71071_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -200,8 +202,7 @@ public:
 	pcxport_dmac_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_reset() override ATTR_COLD;
-
+	virtual void soft_reset() override;
 	virtual void end_of_process() override;
 };
 

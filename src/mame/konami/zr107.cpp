@@ -244,8 +244,9 @@ protected:
 	void k054539_irq_gen(int state);
 	double adc0838_callback(uint8_t input);
 
-	void sharc_memmap(address_map &map) ATTR_COLD;
+	void base_memmap(address_map &map) ATTR_COLD;
 	void sound_memmap(address_map &map) ATTR_COLD;
+	void sharc_memmap(address_map &map) ATTR_COLD;
 
 	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -505,46 +506,53 @@ void zr107_state::machine_start()
 	save_item(NAME(m_sound_intck));
 }
 
-void midnrun_state::main_memmap(address_map &map)
+
+void zr107_state::base_memmap(address_map &map)
 {
 	map(0x00000000, 0x000fffff).ram().share(m_workram);
-	map(0x74000000, 0x74001fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)).mirror(0x2000);
-	map(0x74020000, 0x7402003f).rw(m_k056832, FUNC(k056832_device::word_r), FUNC(k056832_device::word_w));
-	map(0x74060000, 0x7406003f).rw(FUNC(midnrun_state::ccu_r), FUNC(midnrun_state::ccu_w));
-	map(0x74080000, 0x74081fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0x740a0000, 0x740a3fff).r(m_k056832, FUNC(k056832_device::rom_word_r));
+	map(0x00000000, 0x000fffff).ram().share(m_workram);
+
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc)); // 21N 21K 23N 23K
 	map(0x78010000, 0x7801ffff).w(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
 	map(0x78040000, 0x7804000f).rw(m_k001006_1, FUNC(k001006_device::read), FUNC(k001006_device::write));
 	map(0x780c0000, 0x780c0007).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
-	map(0x7e000000, 0x7e003fff).rw(FUNC(midnrun_state::sysreg_r), FUNC(midnrun_state::sysreg_w));
+
+	map(0x7e000000, 0x7e003fff).rw(FUNC(zr107_state::sysreg_r), FUNC(zr107_state::sysreg_w));
 	map(0x7e008000, 0x7e009fff).m(m_k056230, FUNC(k056230_device::regs_map));  // LANC registers
 	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::ram_r), FUNC(k056230_device::ram_w)); // LANC Buffer RAM (27E)
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
+
 	map(0x7f800000, 0x7f9fffff).rom().region("prgrom", 0);
 	map(0x7fe00000, 0x7fffffff).rom().region("prgrom", 0);
 }
 
 
+void midnrun_state::main_memmap(address_map &map)
+{
+	base_memmap(map);
+
+	map(0x74000000, 0x74001fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)).mirror(0x2000);
+	map(0x74020000, 0x7402003f).rw(m_k056832, FUNC(k056832_device::word_r), FUNC(k056832_device::word_w));
+	map(0x74060000, 0x7406003f).rw(FUNC(midnrun_state::ccu_r), FUNC(midnrun_state::ccu_w));
+	map(0x74080000, 0x74081fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x740a0000, 0x740a3fff).r(m_k056832, FUNC(k056832_device::rom_word_r));
+
+	//map(0x78080000, 0x780bffff) TODO 4X 8X 11X 15X 4Y 8Y 11Y 15Y
+}
+
+
 void jetwave_state::main_memmap(address_map &map)
 {
-	map(0x00000000, 0x000fffff).ram().share(m_workram);
+	base_memmap(map);
+
 	map(0x74000000, 0x740000ff).rw(m_k001604, FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w));
 	map(0x74010000, 0x7401ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x74020000, 0x7403ffff).rw(m_k001604, FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));
 	map(0x74040000, 0x7407ffff).rw(m_k001604, FUNC(k001604_device::char_r), FUNC(k001604_device::char_w));
-	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc)); // 21N 21K 23N 23K
-	map(0x78010000, 0x7801ffff).w(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
-	map(0x78040000, 0x7804000f).rw(m_k001006_1, FUNC(k001006_device::read), FUNC(k001006_device::write));
+
 	map(0x78080000, 0x7808000f).rw(m_k001006_2, FUNC(k001006_device::read), FUNC(k001006_device::write));
-	map(0x780c0000, 0x780c0007).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
-	map(0x7e000000, 0x7e003fff).rw(FUNC(jetwave_state::sysreg_r), FUNC(jetwave_state::sysreg_w));
-	map(0x7e008000, 0x7e009fff).m(m_k056230, FUNC(k056230_device::regs_map));  // LANC registers
-	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::ram_r), FUNC(k056230_device::ram_w)); // LANC Buffer RAM (27E)
-	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
+
 	map(0x7f000000, 0x7f3fffff).rom().region("datarom", 0);
-	map(0x7f800000, 0x7f9fffff).rom().region("prgrom", 0);
-	map(0x7fe00000, 0x7fffffff).rom().region("prgrom", 0);
 }
 
 

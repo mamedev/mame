@@ -95,7 +95,7 @@ const float cs4031_device::m_dma_clock_divider[] =
 
 void cs4031_device::device_add_mconfig(machine_config &config)
 {
-	AM9517A(config, m_dma1);
+	AM9517A(config, m_dma1, 0);
 	m_dma1->out_hreq_callback().set(m_dma2, FUNC(am9517a_device::dreq0_w));
 	m_dma1->out_eop_callback().set(FUNC(cs4031_device::dma1_eop_w));
 	m_dma1->in_memr_callback().set(FUNC(cs4031_device::dma_read_byte));
@@ -113,7 +113,7 @@ void cs4031_device::device_add_mconfig(machine_config &config)
 	m_dma1->out_dack_callback<2>().set(FUNC(cs4031_device::dma1_dack2_w));
 	m_dma1->out_dack_callback<3>().set(FUNC(cs4031_device::dma1_dack3_w));
 
-	AM9517A(config, m_dma2);
+	AM9517A(config, m_dma2, 0);
 	m_dma2->out_hreq_callback().set(FUNC(cs4031_device::dma2_hreq_w));
 	m_dma2->in_memr_callback().set(FUNC(cs4031_device::dma_read_word));
 	m_dma2->out_memw_callback().set(FUNC(cs4031_device::dma_write_word));

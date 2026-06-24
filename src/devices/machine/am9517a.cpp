@@ -419,7 +419,7 @@ void am9517a_device::end_of_process()
 	else
 	{
 		// mask out channel
-		m_mask |= 1 << m_current_channel;
+		mask_channel(m_current_channel, true);
 	}
 
 	set_eop(CLEAR_LINE);
@@ -1284,23 +1284,11 @@ void upd71071_device::dma_write()
 		am9517a_device::dma_write();
 }
 
-void pcxport_dmac_device::device_reset()
+void pcxport_dmac_device::soft_reset()
 {
-	m_state = STATE_SI;
-	m_command = 0;
-	m_status &= 0xf0;
-	m_request = 0;
+	am9517a_device::soft_reset();
+
 	m_mask = 0;
-	m_temp = 0;
-	m_msb = 0;
-	m_current_channel = -1;
-	m_last_channel = 3;
-	m_hreq = -1;
-
-	set_hreq(0);
-	set_eop(CLEAR_LINE);
-
-	set_dack();
 }
 
 void pcxport_dmac_device::end_of_process()

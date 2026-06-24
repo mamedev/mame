@@ -1596,11 +1596,6 @@ uint64_t model3_state::real3d_status_r(offs_t offset)
 }
 
 /* SCSP interface */
-uint8_t model3_state::model3_sound_r(offs_t offset)
-{
-	return m_uart->read(offset);
-}
-
 void model3_state::model3_sound_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
@@ -1654,7 +1649,7 @@ void model3_state::model3_10_mem(address_map &map)
 	map(0x98000000, 0x980fffff).w(FUNC(model3_state::real3d_polygon_ram_w));
 
 	map(0xf0040000, 0xf004003f).mirror(0x0e000000).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask64(0xff000000ff000000);
-	map(0xf0080000, 0xf008ffff).mirror(0x0e000000).rw(FUNC(model3_state::model3_sound_r), FUNC(model3_state::model3_sound_w));
+	map(0xf0080000, 0xf008ffff).mirror(0x0e000000).r(m_uart, FUNC(i8251_device::read)).w(FUNC(model3_state::model3_sound_w));
 	map(0xf00c0000, 0xf00dffff).mirror(0x0e000000).ram().share("backup");    /* backup SRAM */
 	map(0xf0100000, 0xf010003f).mirror(0x0e000000).rw(FUNC(model3_state::model3_sys_r), FUNC(model3_state::model3_sys_w));
 	map(0xf0140000, 0xf014003f).mirror(0x0e000000).rw(FUNC(model3_state::model3_rtc_r), FUNC(model3_state::model3_rtc_w));

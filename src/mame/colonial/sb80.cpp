@@ -85,9 +85,11 @@
 #include "machine/z80daisy.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
+
+#include "softlist_dev.h"
+
 #include "formats/imd_dsk.h"
 #include "formats/td0_dsk.h"
-#include "softlist_dev.h"
 
 
 namespace {
@@ -109,7 +111,7 @@ public:
 		, m_brg(*this, "brg")
 	{ }
 
-	void sb80(machine_config &config);
+	void sb80(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

@@ -25,8 +25,7 @@ pc9801_96_device::pc9801_96_device(const machine_config &mconfig, const char *ta
 device_memory_interface::space_config_vector pc9801_96_device::memory_space_config() const
 {
 	return space_config_vector {
-		std::make_pair(0, &m_wab_space_config)
-	};
+			std::make_pair(0, &m_wab_space_config) };
 }
 
 void pc9801_96_device::device_add_mconfig(machine_config &config)
@@ -82,10 +81,9 @@ void pc9801_96_device::remap(int space_id, offs_t start, offs_t end)
 		if (m_vram_window_addr != 0)
 		{
 			program_space.install_readwrite_handler(
-				m_vram_window_addr, m_vram_window_addr + 0xffff,
-				read8sm_delegate(*this, FUNC(pc9801_96_device::vram_r)),
-				write8sm_delegate(*this, FUNC(pc9801_96_device::vram_w))
-			);
+					m_vram_window_addr, m_vram_window_addr + 0xffff,
+					read8sm_delegate(*this, FUNC(pc9801_96_device::vram_r)),
+					write8sm_delegate(*this, FUNC(pc9801_96_device::vram_w)));
 			m_prev_vram_window_addr = m_vram_window_addr;
 		}
 	}

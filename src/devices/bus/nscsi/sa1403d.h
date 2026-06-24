@@ -38,6 +38,8 @@
 class nscsi_sa1403d_device : public nscsi_full_device
 {
 public:
+	static constexpr flags_type emulation_flags() { return flags::SAVE_UNSUPPORTED; }
+
 	nscsi_sa1403d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// drive types, in the AS30 DIP encoding (0-3); 4+ are later-firmware

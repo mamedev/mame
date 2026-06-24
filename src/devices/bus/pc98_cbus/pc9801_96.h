@@ -21,14 +21,16 @@ class pc9801_96_device : public device_t,
 public:
 	pc9801_96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
-	virtual space_config_vector memory_space_config() const override;
+
+	virtual space_config_vector memory_space_config() const override ATTR_COLD;
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void wab_map(address_map &map) ATTR_COLD;
 	virtual uint8_t board_id_r();
@@ -46,7 +48,7 @@ private:
 	uint8_t m_relay_ctrl;
 	uint8_t m_video_enable;
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 	uint8_t reg_index_r();
 	void reg_index_w(uint8_t data);
