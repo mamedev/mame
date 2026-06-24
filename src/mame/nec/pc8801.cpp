@@ -34,7 +34,6 @@ TODO:
 - pc8801mc: several setup mode unknowns:
   \- tries to clear $6f CPU clock select bit 4, halts CPU?
   \- only PC=0x00d0 A=1 branch is checked. A=2 and A=4 clears MEMSW, A=5 unknown;
-  \- V1 mode is currently non-functional (boots in V2 even if V1S/V1H is selected);
   \- EEPROM needs removing;
 
 Notes:

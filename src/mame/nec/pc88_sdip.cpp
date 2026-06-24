@@ -144,6 +144,6 @@ ioport_value pc8801mc_memsw_device::dsw2_r()
 	return res;
 }
 ioport_value pc8801mc_memsw_device::auto_boot_floppy_r() { return BIT(m_bram[7], 0); }
-ioport_value pc8801mc_memsw_device::boot_mode_r() { return m_bram[1] >> 6; }
+ioport_value pc8801mc_memsw_device::boot_mode_r() { return m_bram[1] & 3; }
 ioport_value pc8801mc_memsw_device::cpu_clock_r() { return BIT(m_bram[0], 0); }
 

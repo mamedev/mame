@@ -1292,6 +1292,7 @@ Runs too slow?
 ]]></notes>
 		<info name="developer" value="Shinra" />
 		<info name="alt_title" value="ハレ晴レユカイ" />
+		<info name="usage" value="Requires 640KB RAM set in setup menu for BGM"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
 				<rom name="harehare1.d88" size="1331888" crc="1488f784" sha1="96f93801318ed850f1074fb5f050420d098d85b5"/>
