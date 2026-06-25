@@ -330,7 +330,7 @@ void ppc_device::code_compile_block(uint8_t mode, offs_t pc)
 	auto profile = g_profiler.start(PROFILER_DRC_COMPILE);
 
 	// get a description of this sequence
-	desclist = m_drcfe->describe_code(pc);
+	desclist = m_drcfe->describe_code(pc, (mode & MODE_LITTLE_ENDIAN) != 0);
 	if (m_drcuml->logging() || m_drcuml->logging_native())
 		log_opcode_desc(desclist, 0);
 
