@@ -300,7 +300,8 @@ private:
 	static void fclip_clip_right(view_t*, point_t*, point_t*, point_t*);
 
 	// Rendering
-	void    tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	enum render_pass { RENDER_OBJECTS, RENDER_DIRECT };
+	void    tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect, render_pass pass);
 	void    tgp_scan();
 
 	void        sort_quads() const;

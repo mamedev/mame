@@ -1009,25 +1009,13 @@ int model1_state::push_direct(int list_offset) {
 		old_p0->x, old_p0->y, old_p0->z,
 		old_p1->x, old_p1->y, old_p1->z);
 
-	//m_view-transform_point(old_p0);
-	//m_view->transform_point(old_p1);
-	if (old_p0->z > 0)
-	{
-		m_view->project_point_direct(old_p0);
-	}
-	else
-	{
-		old_p0->s.x = old_p0->s.y = 0;
-	}
-
-	if (old_p1->z > 0)
-	{
-		m_view->project_point_direct(old_p1);
-	}
-	else
-	{
-		old_p1->s.x = old_p1->s.y = 0;
-	}
+	// Direct (2D-projected) polys are screen-space: project_point_direct only
+	// offsets x/y by the viewport centre and ignores z, so project every vertex
+	// unconditionally.  Guarding on z > 0 and snapping behind-"camera" vertices
+	// to (0,0) spawns huge spurious triangles radiating from the screen origin
+	// (the bogus red cross over the SWA cockpit once direct polys draw on top).
+	m_view->project_point_direct(old_p0);
+	m_view->project_point_direct(old_p1);
 
 	list_offset += 18;
 
@@ -1084,14 +1072,8 @@ int model1_state::push_direct(int list_offset) {
 
 		//m_view->transform_point(p0);
 		//m_view->transform_point(p1);
-		if (p0->z > 0)
-		{
-			m_view->project_point_direct(p0);
-		}
-		if (p1->z > 0)
-		{
-			m_view->project_point_direct(p1);
-		}
+		m_view->project_point_direct(p0);
+		m_view->project_point_direct(p1);
 
 		if (old_p0 && old_p1)
 			LOGMASKED(LOG_TGP, "VIDEOD:     %08x (%d, %d) (%d, %d) (%d, %d) (%d, %d)\n",
@@ -1144,7 +1126,14 @@ int model1_state::push_direct(int list_offset) {
 				cquad.col = MOIRE | (m_palette->pen(0) & 0xffffff);
 		}
 
-		fclip_push_quad(0, cquad);
+		// Direct polys are screen-space - project_point_direct only offsets x/y by
+		// the viewport centre and ignores z.  fclip_push_quad's frustum clip tests
+		// vertices against z-scaled planes (y > z*a_bottom, ...), which for a direct
+		// poly with small/zero z collapses every plane onto the origin and culls the
+		// whole poly (e.g. the SWA FIGHTER CONTROL console moiré rect, all z = 0).
+		// Skip the frustum clip and queue the quad directly; fill_quad still scissors
+		// it to the viewport rectangle.
+		*m_quadpt++ = cquad;
 
 	next:
 		switch (link) {
@@ -1330,7 +1319,7 @@ void model1_state::view_t::set_view_translation(float x, float y)
 
 
 
-void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect, render_pass pass)
 {
 	m_render_done = 1;
 	if ((m_listctl[1] & 0x1f) == 0x1f)
@@ -1359,13 +1348,20 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				// 5 = decor
 				// 6 = ??  draw object (57bd4, 387460, 2ad)
 
-				if (true || zz >= 666)
+				// 3D objects belong to the first pass (below the HUD); the
+				// second pass only draws the direct (2D-projected) polys.
+				if (pass == RENDER_OBJECTS && (true || zz >= 666))
 					push_object(readi(list_offset + 2), readi(list_offset + 4), readi(list_offset + 6));
 				list_offset += 8;
 				break;
 			case 2:
 			{
-				list_offset = draw_direct(bitmap, cliprect, list_offset);
+				// Direct polys are deferred to the second pass so they land on
+				// top of the HUD tilemaps; the object pass just walks past them.
+				if (pass == RENDER_DIRECT)
+					list_offset = draw_direct(bitmap, cliprect, list_offset);
+				else
+					list_offset = skip_direct(list_offset);
 				break;
 			}
 			case 3:
@@ -1688,12 +1684,18 @@ uint32_t model1_state::screen_update_model1(screen_device &screen, bitmap_rgb32 
 	m_tiles->draw(screen, bitmap, cliprect, 2, 0, 0);
 	m_tiles->draw(screen, bitmap, cliprect, 0, 0, 0);
 
-	tgp_render(bitmap, cliprect);
+	// 3D objects render below the HUD tilemaps.
+	tgp_render(bitmap, cliprect, RENDER_OBJECTS);
 
 	m_tiles->draw(screen, bitmap, cliprect, 7, 0, 0);
 	m_tiles->draw(screen, bitmap, cliprect, 5, 0, 0);
 	m_tiles->draw(screen, bitmap, cliprect, 3, 0, 0);
 	m_tiles->draw(screen, bitmap, cliprect, 1, 0, 0);
+
+	// The direct (2D-projected) polys - callouts, pointer lines, viewport tints
+	// (e.g. Star Wars Arcade's FIGHTER CONTROL / cockpit screens) - are drawn by
+	// the hardware on top of the tilemap HUD, so a second pass draws only those.
+	tgp_render(bitmap, cliprect, RENDER_DIRECT);
 
 	return 0;
 }
