@@ -151,21 +151,22 @@ u32 model1_state::copro_ramadr_r(offs_t offset)
 	return m_copro_ram_adr[offset >> 3];
 }
 
+// Sega Model 1 stores vertices to test in RAM at 4 bytes each (X, Y, Z, radius)
+// so a loop wanting to walk all of the X positions needs to skip 4 bytes each time.
+// Page 4 of the coprocessor RAM (0x40000) is used for this purpose, and the low bits
+// of the address are used to select which of the 4 values is being read/written.
+
 void model1_state::copro_ramdata_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	if(m_copro_ram_adr[offset >> 3] & 0x40000) {
-		COMBINE_DATA(&m_copro_ram_data[0x1000 | (m_copro_ram_adr[offset >> 3] & 0x1fff)]);
-	} else {
-		COMBINE_DATA(&m_copro_ram_data[m_copro_ram_adr[offset >> 3] & 0x1fff]);
-	}
-	m_copro_ram_adr[offset >> 3] ++;
+	COMBINE_DATA(&m_copro_ram_data[m_copro_ram_adr[offset >> 3] & 0x1fff]);
+	m_copro_ram_adr[offset >> 3] += (m_copro_ram_adr[offset >> 3] & 0x40000) ? 4 : 1;
 }
 
 u32 model1_state::copro_ramdata_r(offs_t offset)
 {
-	u32 val = (m_copro_ram_adr[offset >> 3] & 0x40000) ? m_copro_ram_data[0x1000 | (m_copro_ram_adr[offset >> 3] & 0x1fff)] : m_copro_ram_data[m_copro_ram_adr[offset >> 3] & 0x1fff];
+	u32 val = m_copro_ram_data[m_copro_ram_adr[offset >> 3] & 0x1fff];
 	if(!machine().side_effects_disabled())
-		m_copro_ram_adr[offset >> 3] ++;
+		m_copro_ram_adr[offset >> 3] += (m_copro_ram_adr[offset >> 3] & 0x40000) ? 4 : 1;
 	return val;
 }
 
