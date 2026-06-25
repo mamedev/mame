@@ -170,7 +170,7 @@ void pres2k_state::pres2k(machine_config &config)
 	m_ppi->out_pb_callback().set(FUNC(pres2k_state::ppi_pb_w));
 	m_ppi->in_pc_callback().set(FUNC(pres2k_state::ppi_pc_r));
 
-	v9938_device &v9938(V9938(config, "v9938", XTAL(21'477'272) / 6));
+	v9938_device &v9938(V9938(config, "v9938", XTAL(21'477'272)));
 	v9938.set_screen_ntsc("screen");
 	v9938.set_vram_size(1024 * 128);
 	v9938.int_cb().set_inputline("maincpu", 0);
