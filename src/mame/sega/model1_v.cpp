@@ -1131,7 +1131,18 @@ int model1_state::push_direct(int list_offset) {
 		}
 		//cquad.col  = scale_color(machine().pens[0x1000|(m_tgp_ram[tex_adr-0x40000] & 0x3ff)],((float) (lum>>24)) / 128.0);
 		if (flags & 0x00002000)
+		{
 			cquad.col |= MOIRE;
+			// A moiré (stipple-translucent) direct poly whose flat colour resolves
+			// to the transparent texture pen (index 0x1000 -> black) is a "fade
+			// toward backdrop" overlay, not a black fill.  Painting the pen
+			// literally gives a black/scene checkerboard (the Star Wars Arcade
+			// gunner 2nd-viewport overlay); the arcade alternates backdrop/scene.
+			// Paint the backdrop pen (palette[0]) so the stipple reads
+			// backdrop/scene.
+			if ((m_tgp_ram[tex_adr - 0x40000] & 0x3ff) == 0)
+				cquad.col = MOIRE | (m_palette->pen(0) & 0xffffff);
+		}
 
 		fclip_push_quad(0, cquad);
 
