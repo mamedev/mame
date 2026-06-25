@@ -912,7 +912,7 @@ void model1_state::model1_mem(address_map &map)
 
 	/* OBJ  */
 
-	/* COL  */ map(0x900000, 0x903fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	/* COL  */ map(0x900000, 0x903fff).ram().w(FUNC(model1_state::model1_paletteram_w)).share("palette");
 	/*      */ map(0x910000, 0x91bfff).ram().share("color_xlat");
 
 	/* EX0  */

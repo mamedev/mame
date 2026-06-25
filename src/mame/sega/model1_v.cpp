@@ -1240,6 +1240,26 @@ void model1_state::model1_listctl_w(offs_t offset, u16 data, u16 mem_mask)
 	LOGMASKED(LOG_TGP, "VIDEO: control=%08x\n", (m_listctl[1] << 16) | m_listctl[0]);
 }
 
+void model1_state::model1_paletteram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_paletteram16[offset]);
+	u16 const v = m_paletteram16[offset];
+	int r = pal5bit((v >> 0) & 0x1f);
+	int g = pal5bit((v >> 5) & 0x1f);
+	int b = pal5bit((v >> 10) & 0x1f);
+	// Bit 15 is an intensity/shade bit, not unused as the plain xBGR_555 decode
+	// assumes.  Almost every entry has it set (full brightness); a handful clear
+	// it to render dimmed (e.g. Star Wars Arcade's grey menu backdrop pen 0x7777).
+	// Halve the channels when it is clear so those pens stop reading too bright.
+	if (!BIT(v, 15))
+	{
+		r >>= 1;
+		g >>= 1;
+		b >>= 1;
+	}
+	m_palette->set_pen_color(offset, r, g, b);
+}
+
 void model1_state::view_t::init_translation_matrix()
 {
 	memset(translation, 0, sizeof(translation));

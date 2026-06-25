@@ -146,6 +146,7 @@ private:
 	virtual void video_start() override ATTR_COLD;
 	u16 model1_listctl_r(offs_t offset);
 	void model1_listctl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void model1_paletteram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	uint32_t screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_vblank_model1(int state);
