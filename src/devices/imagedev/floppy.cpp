@@ -940,6 +940,15 @@ bool floppy_image_device::twosid_r()
 	case floppy_image::SSQD:
 	case floppy_image::SSQD16:
 		return true;
+	case 0:
+		{
+			// The loaded format did not tag a variant; fall back to the
+			// observed geometry so formats that never call set_variant()
+			// keep their previous behaviour (no regression).
+			int tracks = 0, heads = 0;
+			m_image->get_actual_geometry(tracks, heads);
+			return heads == 1;
+		}
 	default:
 		return false;
 	}
