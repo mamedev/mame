@@ -1518,7 +1518,14 @@ void ppc_device::static_generate_stsw_entries(int mode)
 void ppc_device::generate_update_mode(drcuml_block &block)
 {
 	// LE in bit 0 of mode
-	UML_AND(block, I0, MSR32, MSR_LE);                                          // and     i0,msr,MSR_LE
+	if (m_flavor == PPC_MODEL_601)
+	{
+		UML_BFXU(block, I0, SPR32(SPR603_HID0), 3, 1);                      // bfxu    i0,[hid0],3,1
+	}
+	else
+	{
+		UML_AND(block, I0, MSR32, MSR_LE);                                  // and     i0,msr,MSR_LE
+	}
 
 	// DR (OEA and 403GCX) in bit 1 of mode
 	if ((m_cap & PPCCAP_OEA) || m_flavor == PPC_MODEL_403GCX)
@@ -3892,6 +3899,12 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 				UML_MOV(block, mem(&m_core->param0), spr);                             // mov     [param0],spr
 				UML_MOV(block, mem(&m_core->param1), R32(G_RS(op)));                           // mov     [param1],rs
 				UML_CALLC(block, cfunc_ppccom_execute_mtspr, this);                                // callc   ppccom_execute_mtspr,ppc
+				if (spr == SPR603_HID0 && m_flavor == PPC_MODEL_601)
+				{
+					// the little endian mode bit is in HID0 on PPC601;
+					// thus, update mode for that scenario in case HID0_LM changed
+					generate_update_mode(block);                               // <update mode>
+				}
 				compiler->checkints = true;
 				generate_update_cycles(block, compiler, desc->pc + 4, true);       // <update cycles>
 			}
