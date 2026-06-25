@@ -28,6 +28,7 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |A38 | Yuke Yuke Yamaguchi-kun ||
 |A39 | Wyvern F-0 ||
 |A40 | Super Speed Race Junior ||
+|A44 | Uchuu Senkan Yamato ||
 |A45 | The FairyLand Story ||
 |A47 | Tiger Heli ||
 |A49 | Lady Master of Kung Fu ||
@@ -37,9 +38,11 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |A53 | Bygone (prototype) ||
 |A54 | Legend of Kage ||
 |A55 | Super Dead Heat ||
+|A56 | Time Gal ||
 |A58 | Happy Lucky! | with A40 pld on video board, earlier game on same HW? |
+|A60 | Hore Hore Mogu | ほれほれもぐ, undumped |
 |A62 | Halley's Comet ||
-|A64 | (Land Sea Air) LSA Squad ||
+|A64 | Land Sea Air Squad / Riku Kai Kuu Saizensen ||
 |A67 | Big Event Golf ||
 |A68 | Get Star ||
 |A70 | Presenter 2000 ||
@@ -48,15 +51,16 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |A74 | Daikaiju no Gyakushu ||
 |A75 | Arkanoid ||
 |A76 | Slap Fight (older, tiger heli hw, conversion kit?) ||
-|A77 | Slap Fight/Alcon (newer, dedicated JAMMA hw) ||
+|A77 | Slap Fight / Alcon (newer, dedicated JAMMA hw) ||
 |A78 | Bubble Bobble ||
 |A80 | Cycle Shooting (older hw?) ||
 |A85 | Kiki KaiKai ||
 |A87 | Kick & Run ||
-|??? |Prebillian | somewhere in the A8x, A9x, or maybe B0x range, most likely |
 |A96 | Darius / Darius Extra ||
 |A97 | Cycle Shooting (newer hw?) ||
 |A98 | Plump Pop ||
+|A?? | Ninja Hayate ||
+|A?? | Prebillian | somewhere in the A8x, A9x, or maybe B0x range, most likely |
 |B02 | Sky Shark/Flying Shark | also FS? |
 |B03 | Super Qix | also BO? |
 |B04 | Rastan/Rastan Saga ||
