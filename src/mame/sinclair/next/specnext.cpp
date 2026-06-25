@@ -850,9 +850,17 @@ void specnext_state::bank_update(u8 bank)
 			{
 				if (!sram_active && !sram_mem_hide_n && (sram_bank5 || sram_bank7))
 				{
-					views[bank].get().select(sram_A21_A13);
-					LOGMEM("RAM%d = bank%d\n", bank, sram_bank5 ? 5 : 7);
-					m_page_shadow[bank] = -1;
+					if (m_page_shadow[bank] == sram_A21_A13)
+					{
+						views[bank].get().select(sram_A21_A13);
+						LOGMEM("RAM%d = bank%d\n", bank, sram_bank5 ? 5 : 7);
+						m_page_shadow[bank] = -1;
+					}
+					else
+					{
+						views[bank].get().select(0x100 | sram_A21_A13);
+						LOGMEM("ROM%d = bank%d\n", bank, sram_bank5 ? 5 : 7);
+					}
 				}
 				else
 				{
@@ -3003,19 +3011,25 @@ void specnext_state::map_mem(address_map &map)
 		views[i].get()[1](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).bankr(m_bank_ram[i]);
 
 		// bank5
-		views[i].get()[0x2a](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).lrw8(
+		views[i].get()[0x02a](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).lrw8(
 			NAME([this](offs_t offset) { return m_bram_bank5[offset & 0x1fff]; }),
 			NAME([this](offs_t offset, u8 data) { m_screen->update_now(); m_bram_bank5[offset & 0x1fff] = data; })
 		);
-		views[i].get()[0x2b](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).lrw8(
+		views[i].get()[0x12a](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).lr8(
+			NAME([this](offs_t offset) { return m_bram_bank5[offset & 0x1fff]; }));
+		views[i].get()[0x02b](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).lrw8(
 			NAME([this](offs_t offset) { return m_bram_bank5[0x2000 + (offset & 0x1fff)]; }),
 			NAME([this](offs_t offset, u8 data) { m_screen->update_now(); m_bram_bank5[0x2000 + (offset & 0x1fff)] = data; })
 		);
+		views[i].get()[0x12b](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).lr8(
+			NAME([this](offs_t offset) { return m_bram_bank5[0x2000 + (offset & 0x1fff)]; }));
 		// bank7
-		views[i].get()[0x2e](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).lrw8(
+		views[i].get()[0x02e](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).lrw8(
 			NAME([this](offs_t offset) { return m_bram_bank7[offset & 0x1fff]; }),
 			NAME([this](offs_t offset, u8 data) { m_screen->update_now(); m_bram_bank7[offset & 0x1fff] = data; })
 		);
+		views[i].get()[0x12e](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).lr8(
+			NAME([this](offs_t offset) { return m_bram_bank7[offset & 0x1fff]; }));
 	}
 	views[0].get()[2](0x0000, 0x1fff).bankr(m_bank_boot_rom);
 	views[1].get()[2](0x2000, 0x3fff).bankr(m_bank_boot_rom);
