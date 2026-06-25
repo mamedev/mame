@@ -1,4 +1,4 @@
-# Taito HW
+# **src/mame/taito** #
 
 ## List of released games by standard SKU format
 
@@ -15,7 +15,7 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |A16 | Victorious Nine ||
 |A17 | Field Day / The Undoukai ||
 |A20 | Kick Start: Wheelie King ||
-|A21 | Gyrodyne ||
+|A21 | Gyrodine | in [orca/kyugo.cpp](../orca/kyugo.cpp) as `gyrodinet` |
 |A22 | Buggy Challenge ||
 |A23 | Rumba Lumber ||
 |A24 | Birdie King 3 ||
@@ -30,7 +30,7 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |A40 | Super Speed Race Junior ||
 |A44 | Uchuu Senkan Yamato ||
 |A45 | The FairyLand Story ||
-|A47 | Tiger Heli ||
+|A47 | Tiger Heli | In [toaplan/slapfght.cpp](../toaplan/slapfght.cpp) |
 |A49 | Lady Master of Kung Fu ||
 |A50 | N.Y. Captor ||
 |A51 | Legend of Kage (prototype on Metal Soldier Isaac II hardware) ||
@@ -44,14 +44,14 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |A62 | Halley's Comet ||
 |A64 | Land Sea Air Squad / Riku Kai Kuu Saizensen ||
 |A67 | Big Event Golf ||
-|A68 | Get Star ||
+|A68 | Get Star / Guardian |  In [toaplan/slapfght.cpp](../toaplan/slapfght.cpp) |
 |A70 | Presenter 2000 ||
 |A71 | Tokio / Scramble Formation ||
 |A72 | The 26th Z (Japan, location test) ||
 |A74 | Daikaiju no Gyakushu ||
 |A75 | Arkanoid ||
-|A76 | Slap Fight (older, tiger heli hw, conversion kit?) ||
-|A77 | Slap Fight / Alcon (newer, dedicated JAMMA hw) ||
+|A76 | Slap Fight (older, tiger heli hw, conversion kit?) |  In [toaplan/slapfght.cpp](../toaplan/slapfght.cpp) |
+|A77 | Slap Fight / Alcon (newer, dedicated JAMMA hw) | In [toaplan/slapfght.cpp](../toaplan/slapfght.cpp) |
 |A78 | Bubble Bobble ||
 |A80 | Cycle Shooting (older hw?) ||
 |A85 | Kiki KaiKai ||
@@ -61,7 +61,7 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |A98 | Plump Pop ||
 |A?? | Ninja Hayate ||
 |A?? | Prebillian | somewhere in the A8x, A9x, or maybe B0x range, most likely |
-|B02 | Sky Shark/Flying Shark | also FS? |
+|B02 | Sky Shark / Flying Shark / Hishou Zame | In [toaplan/twincobr.cpp](../toaplan/twincobr.cpp) |
 |B03 | Super Qix | also BO? |
 |B04 | Rastan/Rastan Saga ||
 |B06 | Extermination ||
@@ -74,8 +74,8 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |B20 | Operation Wolf ||
 |B22 | Rainbow Islands ||
 |B23 | Exzisus (conversion kit for standard JAMMA cabinet) ||
-|B25 | Pyros/Wardner ||
-|B30 | Kyukyoku Tiger ||
+|B25 | Wardner / Pyros | In [toaplan/wardner.cpp](../toaplan/wardner.cpp) |
+|B30 | Kyukyoku Tiger / Twin Cobra | In [toaplan/twincobr.cpp](../toaplan/twincobr.cpp) |
 |B31 | The Ninja Warriors ||
 |B33 | Continental Circus ||
 |B35 | Kageki ||
@@ -84,7 +84,7 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |B41 | Bonze Adventure / Jigoku Meguri ||
 |B42 | Kuri Kinton ||
 |B44 | Chuka Taisen ||
-|B45 | Rally Bike (TP-012) ||
+|B45 | Rally Bike | TP-012, in [toaplan/rallybik.cpp](../toaplan/rallybik.cpp) |
 |B50 | Kabuki-Z ||
 |B51 | Syvalion (H system) ||
 |B52 | Chase H.Q. ||
@@ -93,16 +93,17 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |B58 | Enforce ||
 |B61 | Superman ||
 |B62 | Top Landing ||
-|B65 | Truxton ||
+|B65 | Truxton / Tatsujin | In [toaplan/toaplan1.cpp](../toaplan/toaplan1.cpp) |
 |B67 | Operation Thunderbolt ||
 |B68 | Asuka & Asuka ||
 |B70 | Fighting Hawk ||
 |B72 | Master of Weapon / Yukiwo ||
-|B73 | Heavy Unit ||
+|B73 | Heavy Unit | in [kaneko/hvyunit.cpp](../kaneko/hvyunit.cpp) |
 |B77 | Aqua Jack ||
 |B81 | Nastar/Rastan Saga 2 ||
 |B82 | Final Blow ||
 |B87 | Twin Hawk / Daisenpu ||
+|B90 | Hellfire | In [toaplan/toaplan1.cpp](../toaplan/toaplan1.cpp) |
 |B91 | Night Striker ||
 |B93 | Rambo III ||
 |B95 | Don Doko Don ||
@@ -206,11 +207,12 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |E11 | Gekirindan ||
 |E15 | Twin Cobra 2 / Kyukyoku Tiger 2 ||
 |E17 | Landing Gear ||
+|E18 | Super Football Champ | In [sony/zn.cpp](../sony/zn.cpp) |
 |E21 | Bubble Memories ||
 |E22 | Psychic Force / EX ||
 |E23 | Side by Side ||
 |E24 | Raystorm ||
-|E25 | Fighters' Impact / A ||
+|E25 | Fighters' Impact / A | In [sony/zn.cpp](../sony/zn.cpp) |
 |E28 | Cleopatra Fortune ||
 |E29 | Puzzle Bobble 3 ||
 |E30 | Capriccio Spin 2 ||
@@ -219,7 +221,7 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |E35 | Densha de GO! / EX ||
 |E36 | Arkanoid Returns ||
 |E38 | Side by Side 2 ||
-|E39 | G Darius/Ver2 ||
+|E39 | G Darius/Ver2 | In [sony/zn.cpp](../sony/zn.cpp) |
 |E40 | Kirameki Star Road ||
 |E41 | Honoo no Invader ||
 |E44 | Kirameki Star Road ||
@@ -249,3 +251,5 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |F34 | Space Invaders / Qix Silver Anniversary Edition ||
 |F39 | Dinoking Kids ||
 |F54 | Dinoking Battle ||
+|F?? | Hard Puncher Hajime no Ippo - The Fighting! | F06? In [namco/namcos10.cpp](../namco/namcos10.cpp) as `ippo` / `ippo2` |
+|F?? | Hard Puncher Hajime no Ippo 2 - The Fighting! - Ouja e no chousen | F06 as above? |
