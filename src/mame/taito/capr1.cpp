@@ -256,7 +256,7 @@ E96-01-1.IC42 ; MAIN PRG
 E96-02.IC58   ; ADPCM
 */
 
-ROM_START( capriccio )
+ROM_START( csesame1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "e96-01-1.ic42", 0x00000, 0x010000, CRC(a1513905) SHA1(a04b26080c1f5610de4d65f75350fb25b5375c8e) ) // M27C1001
 
@@ -288,5 +288,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1996, cspin2,     0, cspin2, cspin2, capr1_state, empty_init, ROT0, "Taito", "Capriccio Spin 2", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 199?, capriccio,  0, cspin2, cspin2, capr1_state, empty_init, ROT0, "Taito", "Capriccio Sesame", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1996, cspin2,    0, cspin2, cspin2, capr1_state, empty_init, ROT0, "Taito", "Capriccio Spin 2", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 199?, csesame1,  0, cspin2, cspin2, capr1_state, empty_init, ROT0, "Taito", "Capriccio Sesame", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
