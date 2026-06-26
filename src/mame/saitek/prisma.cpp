@@ -84,6 +84,7 @@ private:
 	u8 m_inp_mux = 0;
 	u8 m_led_select = 0;
 	u8 m_led_direct = 0;
+	u8 m_port1 = 0xff;
 
 	// I/O handlers
 	void lcd_pwm_w(offs_t offset, u8 data);
@@ -112,6 +113,7 @@ void prisma_state::machine_start()
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_select));
 	save_item(NAME(m_led_direct));
+	save_item(NAME(m_port1));
 }
 
 INPUT_CHANGED_MEMBER(prisma_state::change_cpu_freq)
@@ -144,7 +146,7 @@ void prisma_state::standby(int state)
 
 INPUT_CHANGED_MEMBER(prisma_state::go_button)
 {
-	if (newval && m_maincpu->standby())
+	if (newval && BIT(m_port1, 7))
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
@@ -181,6 +183,8 @@ void prisma_state::p1_w(u8 data)
 	m_dac->write(BIT(data, 4));
 
 	// P16: ext power (no need to emulate it)
+	// P17: enable Go button
+	m_port1 = data;
 }
 
 void prisma_state::p2_w(u8 data)

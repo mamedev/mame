@@ -348,6 +348,9 @@ enum
 // Machine State Register bits - 603
 #define MSR603_TGPR         0x00020000  /* Temporary GPR Remapping */
 
+// Checkstop Sources and Enables Register bits - 601
+#define SPR601_HID0_LM      0x00000008  /* Little Endian */
+
 // ESA Save and Restore Register bits - 602
 #define SPR602_ESASRR_EE    0x00000001  /* External Interrupt Enable */
 #define SPR602_ESASRR_SA    0x00000002  /* Supervisor access mode */

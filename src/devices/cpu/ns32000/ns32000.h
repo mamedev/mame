@@ -237,7 +237,7 @@ public:
 
 	// ns32000_mmu_interface implementation
 	virtual void state_add(device_state_interface &parent, int &index) override;
-	virtual translate_result translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool rdwrval = false, bool suppress = false) override;
+	virtual translate_result translate(address_space &space, unsigned st, offs_t &address, bool user, bool write, bool rdwrval = false, bool suppress = false) override;
 
 protected:
 	// device_t implementation
@@ -246,6 +246,9 @@ protected:
 
 	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
+
+	// device_disasm_interface implementation
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual u32 const PSR_MSK() override { return 0x0ff7; }
 	virtual void lpr(unsigned reg, addr_mode const mode, bool user, unsigned &tex) override;

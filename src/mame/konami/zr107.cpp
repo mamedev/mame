@@ -211,6 +211,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_dsp(*this, "dsp"),
 		m_watchdog(*this, "watchdog"),
+		m_eeprom(*this, "eeprom"),
 		m_k056230(*this, "k056230"),
 		m_k056800(*this, "k056800"),
 		m_workram(*this, "workram"),
@@ -220,9 +221,8 @@ public:
 		m_palette(*this, "palette"),
 		m_sharc_dataram(*this, "sharc_dataram"),
 		m_konppc(*this, "konppc"),
+		m_adc(*this, "adc0838"),
 		m_in(*this, "IN%u", 0U),
-		m_out4(*this, "OUT4"),
-		m_eepromout(*this, "EEPROMOUT"),
 		m_analog(*this, "ANALOG%u", 1U),
 		m_pcb_digit(*this, "pcbdigit%u", 0U),
 		m_wheel_motor(*this, "wheel_motor")
@@ -252,6 +252,7 @@ protected:
 	required_device<cpu_device> m_audiocpu;
 	required_device<adsp21062_device> m_dsp;
 	required_device<watchdog_timer_device> m_watchdog;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<k056230_device> m_k056230;
 	required_device<k056800_device> m_k056800;
 	required_shared_ptr<uint32_t> m_workram;
@@ -261,8 +262,8 @@ protected:
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint32_t> m_sharc_dataram;
 	required_device<konppc_device> m_konppc;
+	required_device<adc0838_device> m_adc;
 	required_ioport_array<5> m_in;
-	required_ioport m_out4, m_eepromout;
 	optional_ioport_array<3> m_analog;
 	output_finder<2> m_pcb_digit;
 	output_finder<> m_wheel_motor;
@@ -419,8 +420,10 @@ void zr107_state::sysreg_w(offs_t offset, uint8_t data)
 			    0x02 = EEPCLK
 			    0x01 = EEPDI
 			*/
-			m_eepromout->write(data & 0x07, 0xff);
-			m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+			m_audiocpu->set_input_line(INPUT_LINE_RESET, BIT(~data, 4));
+			m_eeprom->cs_write(BIT(data, 2));
+			m_eeprom->clk_write(BIT(data, 1));
+			m_eeprom->di_write(BIT(data, 0));
 			LOGSYSREG("System register 0 = %02X\n", data);
 			break;
 
@@ -440,7 +443,9 @@ void zr107_state::sysreg_w(offs_t offset, uint8_t data)
 			if (BIT(data, 6))    // CG Board 0 IRQ Ack
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 			m_konppc->set_cgboard_id((data >> 4) & 3);
-			m_out4->write(data, 0xff);
+			m_adc->cs_write(BIT(data, 2));
+			m_adc->di_write(BIT(data, 1));
+			m_adc->clk_write(BIT(data, 0));
 			LOGSYSREG("System register 1 = %02X\n", data);
 			break;
 
@@ -604,16 +609,6 @@ static INPUT_PORTS_START( zr107 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc0838", FUNC(adc083x_device::sars_read))
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
-
-	PORT_START("EEPROMOUT")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::di_write))
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write))
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
-
-	PORT_START("OUT4")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0838", FUNC(adc083x_device::cs_write))
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0838", FUNC(adc083x_device::di_write))
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0838", FUNC(adc083x_device::clk_write))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( midnrun )
@@ -764,7 +759,7 @@ void zr107_state::zr107(machine_config &config)
 	m_dsp->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
 	m_dsp->set_addrmap(AS_DATA, &zr107_state::sharc_memmap);
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	K056230(config, m_k056230);
 	m_k056230->irq_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
@@ -801,8 +796,8 @@ void zr107_state::zr107(machine_config &config)
 	k054539_2.add_route(0, "speaker", 0.75, 0);
 	k054539_2.add_route(1, "speaker", 0.75, 1);
 
-	adc0838_device &adc(ADC0838(config, "adc0838"));
-	adc.set_input_callback(FUNC(zr107_state::adc0838_callback));
+	ADC0838(config, m_adc);
+	m_adc->set_input_callback(FUNC(zr107_state::adc0838_callback));
 
 	KONPPC(config, m_konppc);
 	m_konppc->set_dsp_tag(0, m_dsp);
