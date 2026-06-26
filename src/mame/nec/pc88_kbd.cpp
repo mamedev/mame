@@ -9,6 +9,8 @@ I/O ports are normally read in direct/parallel-ish form, eventually exposed as s
 http://www.maroon.dti.ne.jp/youkan/pc88/iomap.html
 
 TODO:
+- pc8801fh_kbd: MC needs the identifier to be high rather than low for setup keys to work properly.
+                Settable from a port?
 - pc88va_kbd: serial interface, add key modifiers, runs on undumped MCU really;
 
 **************************************************************************************************/
@@ -227,6 +229,7 @@ ioport_constructor pc8801_kbd_device::device_input_ports() const
 
 pc8801fh_kbd_device::pc8801fh_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pc8001_kbd_device(mconfig, PC8801FH_KBD, tag, owner, clock)
+	, m_read_id_cb(*this, 1)
 {
 }
 
@@ -252,12 +255,17 @@ static INPUT_PORTS_START( pc8801fh_kbd )
 	PORT_MODIFY("KEYE")
 	// TODO: Normal & Numpad RETURN, Left Shift, Right Shift aliases here at bits 0-3
 	// as above
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // FH identifier really
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(pc8801fh_kbd_device::read_id_r)) // FH+ identifier
 INPUT_PORTS_END
 
 ioport_constructor pc8801fh_kbd_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( pc8801fh_kbd );
+}
+
+int pc8801fh_kbd_device::read_id_r()
+{
+	return m_read_id_cb();
 }
 
 /*
@@ -274,9 +282,16 @@ pc88va_kbd_device::pc88va_kbd_device(const machine_config &mconfig, const char *
 {
 }
 
+static INPUT_PORTS_START( pc88va_kbd )
+	PORT_INCLUDE( pc8801fh_kbd )
+
+	PORT_MODIFY("KEYE")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // FH identifier, assume low for this
+INPUT_PORTS_END
+
 ioport_constructor pc88va_kbd_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( pc8801fh_kbd );
+	return INPUT_PORTS_NAME( pc88va_kbd );
 }
 
 void pc88va_kbd_device::device_start()
@@ -295,7 +310,7 @@ void pc88va_kbd_device::device_reset()
 
 uint8_t pc88va_kbd_device::translate(uint8_t row, uint8_t column)
 {
-	// this table is essentially same-ish as the one in pc98_kbd
+	// this table produces same-ish scancodes as the one in pc98_kbd
 	// TODO: some stuff currently unmapped
 	const u8 keytable[0x80] = {
 //      [0],   [1],   [2],   [3],   [4],   [5],   [6],   [7]
@@ -334,6 +349,12 @@ uint8_t pc88va_kbd_device::translate(uint8_t row, uint8_t column)
 		0xff,  0xff,  0x5a,  0xff,  0xff,  0xff,  0xff,  0xff,
 //      RET,   [RET], LSHIFT,RSHIFT,------,-----,-----,  <ID>
 		0xff,  0xff,  0xff,  0xff,  0xff,  0xff,  0xff,  0xff
+
+		// TODO: according to documentation last three ports are moved around (?)
+//      $0c: f.1,    f.2,    f.3,   f.4,   f.5,   BS,   INS,   DEL
+//      $0d: f.6,    f.7,    f.8,   f.9,   f.10,  変換,  決定,  SPACE
+//      $0e: RET FK, RET 10, LSHIFT,RSHIFT,PC,    全角,  -----,-----
+		// assume RET FK and RET 10 be equivalent of regular / numpad returns
 	};
 
 	const u8 key_select = row * 8 + column;

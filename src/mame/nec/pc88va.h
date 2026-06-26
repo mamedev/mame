@@ -177,6 +177,9 @@ private:
 	bool m_ymmd;
 	u8 m_vw;
 	u16 m_gfx_ctrl_reg;
+	u16 m_backdrop_color;
+	u8 m_g3msk, m_88md, m_gnsw;
+	u8 m_tscr, m_gcf;
 
 	u16 m_color_mode;
 	u8 m_pltm, m_pltp;
@@ -185,6 +188,7 @@ private:
 	bool m_td;
 	bitmap_rgb32 m_text_bitmap;
 	bitmap_rgb32 m_graphic_bitmap[2];
+	bitmap_rgb32 m_bitmap_screen[6];
 
 	struct {
 		bool aacc;
@@ -211,7 +215,10 @@ private:
 	struct {
 		u16 top, bottom;
 		u16 left, right;
+		u8 gmp, mkm[2];
 	} m_picture_mask;
+
+	bool is_layer_scissored(int pri, int which);
 
 	u8 rop_execute(u8 plane_rop, u8 src, u8 dst, u8 pat);
 	u8 gvram_singleplane_r(offs_t offset);
@@ -225,6 +232,10 @@ private:
 	void gfx_ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void video_pri_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
+	void picture_mask_mode_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void backdrop_color_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void plain_mask_w(offs_t offset, u8 data);
+	void color_code_w(offs_t offset, u8 data);
 	void color_mode_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void text_transpen_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void text_control_1_w(u8 data);

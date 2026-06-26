@@ -277,6 +277,8 @@ protected:
 
 	virtual void main_map(address_map &map) override ATTR_COLD;
 	virtual void main_io(address_map &map) override ATTR_COLD;
+
+	bool m_has_setup_mode;
 private:
 	required_device<pc88_sdip_device> m_eeprom;
 	required_device<ym2608_device> m_opna;
@@ -290,8 +292,6 @@ private:
 
 	uint8_t m_clock_setting = 0;
 	uint8_t m_baudrate_val = 0;
-
-	bool m_has_setup_mode;
 };
 
 // MA has a newer floppy BIOS, an extra dictionary ROM and optional bay for CD-ROM i/f
@@ -330,14 +330,18 @@ public:
 		: pc8801ma_state(mconfig, type, tag)
 		, m_cdrom_if(*this, "cdrom_if")
 		, m_cdrom_bios(*this, "cdrom_bios")
+		, m_memsw(*this, "memsw")
+		, m_memsw_view(*this, "memsw_view")
 	{ }
 
 	void pc8801mc(machine_config &config);
+	void init_pc8801mc();
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
+	virtual void main_map(address_map &map) override ATTR_COLD;
 	virtual void main_io(address_map &map) override ATTR_COLD;
 
 private:
@@ -346,6 +350,8 @@ private:
 
 	required_device<pc8801_31_device> m_cdrom_if;
 	required_region_ptr<u8> m_cdrom_bios;
+	required_device<pc8801mc_memsw_device> m_memsw;
+	memory_view m_memsw_view;
 
 	bool m_cdrom_bank = true;
 };

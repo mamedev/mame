@@ -555,6 +555,8 @@ public:
 	}
 
 private:
+	static constexpr unsigned MAX_BUTTONS = INPUT_MAX_BUTTONS;
+
 	struct lightgun_state
 	{
 		int32_t lX, lY;

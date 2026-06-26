@@ -51,7 +51,7 @@ protected:
 
 private:
 	// devices/pointers
-	required_device<cpu_device> m_maincpu;
+	required_device<f8_cpu_device> m_maincpu;
 	required_device<hlcd0538_device> m_lcd1;
 	required_device<hlcd0539_device> m_lcd2;
 	required_device<pwm_display_device> m_display;
@@ -215,9 +215,9 @@ void exechess_state::exechess(machine_config &config)
 	F8(config, m_maincpu, 4'500'000/2); // measured
 	m_maincpu->set_addrmap(AS_PROGRAM, &exechess_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &exechess_state::main_io);
-	m_maincpu->set_irq_acknowledge_callback("psu", FUNC(f38t56_device::int_acknowledge));
 
 	f38t56_device &psu(F38T56(config, "psu", 4'500'000/2));
+	m_maincpu->int_cycle_callback().set(psu, FUNC(f38t56_device::int_acknowledge));
 	psu.set_int_vector(0x0020);
 	psu.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 	psu.read_a().set(FUNC(exechess_state::ram_data_r));

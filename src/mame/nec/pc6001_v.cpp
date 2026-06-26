@@ -401,10 +401,10 @@ uint32_t pc6001mk2_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 					pen[1] = m_video_base[count+0x2000] >> (6-i*2) & 3;
 
 					int color = 0x10;
-					color |= ((pen[0] & 1) << 2);
-					color |= ((pen[0] & 2) >> 1);
-					color |= ((pen[1] & 1) << 1);
-					color |= ((pen[1] & 2) << 2);
+					color |= BIT(pen[0], 1) << 0;
+					color |= BIT(pen[1], 0) << 1;
+					color |= BIT(pen[0], 0) << 2;
+					color |= BIT(pen[1], 1) << 3;
 
 					if (cliprect.contains((x+i)*2+0, y))
 						bitmap.pix(y, (x+i)*2+0) = m_palette->pen(color);
@@ -441,16 +441,16 @@ uint32_t pc6001mk2_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 					if(m_bgcol_bank & 4) //PC-6001 emulation mode
 					{
 						color = 0x08;
-						color |= (pen[0]) | (pen[1]<<1);
+						color |= (pen[0]) | (pen[1] << 1);
 						color |= (m_bgcol_bank & 1) << 2;
 					}
 					else //Mk-2 mode
 					{
 						color = 0x10;
-						color |= ((pen[0] & 1) << 2);
-						color |= ((pen[1] & 1) >> 0);
-						color |= ((m_bgcol_bank & 1) << 1);
-						color |= ((m_bgcol_bank & 2) << 2);
+						color |= BIT(pen[1], 0) << 0;
+						color |= BIT(m_bgcol_bank, 0) << 1;
+						color |= BIT(pen[0], 0) << 2;
+						color |= BIT(m_bgcol_bank, 1) << 3;
 					}
 
 					if (cliprect.contains(x+i, y))
@@ -575,7 +575,7 @@ uint32_t pc6001mk2sr_state::screen_update(screen_device &screen, bitmap_ind16 &b
 				vram_addr = ((x + scroll_x) % x_pitch) + ((y + scroll_y) % y_pitch) * x_pitch;
 
 				// wants RGB -> BRG rotation
-				// (is it using a different palette bank?)
+				// (essentially the same bitswap as the planar modes above, applied to packed format)
 				u8 color = bitswap<4>(m_gvram[vram_addr] & 0x0f, 3, 0, 2, 1) + 0x10;
 				if (cliprect.contains(x, y))
 					bitmap.pix(y, x) = m_palette->pen(color);

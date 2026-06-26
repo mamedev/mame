@@ -21,6 +21,7 @@ namespace osd::debugger::win {
 ui_metrics::ui_metrics(debugger_preferences const &prefs) :
 	m_prefs(prefs),
 	m_debug_font(nullptr),
+	m_dpi(0),
 	m_debug_font_height(0),
 	m_debug_font_width(0),
 	m_debug_font_ascent(0),

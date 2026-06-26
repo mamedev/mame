@@ -8,6 +8,8 @@
 
 #include "cpu/edsp/edsp.h"
 
+#include "machine/i2cmem.h"
+
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -21,6 +23,7 @@ public:
 	mylife_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_screen(*this, "screen")
+		, m_seeprom(*this, "seeprom")
 		, m_cart(*this, "cartslot")
 	{ }
 
@@ -30,9 +33,13 @@ protected:
 
 private:
 	required_device<screen_device> m_screen;
+	required_device<i2cmem_device> m_seeprom;
 	required_device<generic_slot_device> m_cart;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	u16 pa_r();
+	void pa_w(u16 data);
 
 	void prog_map(address_map &map) ATTR_COLD;
 
@@ -42,6 +49,17 @@ private:
 uint32_t mylife_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
+}
+
+u16 mylife_state::pa_r()
+{
+	return m_seeprom->read_sda() << 9;
+}
+
+void mylife_state::pa_w(u16 data)
+{
+	m_seeprom->write_scl(BIT(data, 8));
+	m_seeprom->write_sda(BIT(data, 9));
 }
 
 void mylife_state::prog_map(address_map &map)
@@ -54,8 +72,12 @@ INPUT_PORTS_END
 
 void mylife_state::mylife(machine_config &config)
 {
-	emg2000a_device &maincpu(EMG2000A(config, "maincpu", 27'000'000));
+	emg2000a_device &maincpu(EMG2000A(config, "maincpu", 27_MHz_XTAL));
 	maincpu.set_addrmap(AS_PROGRAM, &mylife_state::prog_map);
+	maincpu.in_pa_callback().set(FUNC(mylife_state::pa_r));
+	maincpu.out_pa_callback().set(FUNC(mylife_state::pa_w));
+
+	I2C_24C02(config, m_seeprom);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
@@ -85,7 +107,7 @@ ROM_START( mylife )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF ) // no TSOP pads
 	ROM_LOAD( "mylife_ml-01.u1", 0x000000, 0x800000, CRC(48f98fd2) SHA1(15911b30a0702f28d016b6452303e3c5ee9e14ab) )
 
-	ROM_REGION( 0x800000, "seeprom", ROMREGION_ERASEFF ) // probably just settings
+	ROM_REGION( 0x100, "seeprom", ROMREGION_ERASEFF ) // probably just settings
 	ROM_LOAD( "af24bc02.u8", 0x000, 0x100, CRC(bec6d965) SHA1(80a7b385735a5d31388798fe301e6e019c93f84a) )
 ROM_END
 
@@ -93,7 +115,7 @@ ROM_START( mylifei )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF ) // dumped via TSOP pads
 	ROM_LOAD( "mylife36.u7", 0x000000, 0x800000, CRC(bfc9b801) SHA1(97612a8c3eb9e76190f59363efa59e5cd72d2be6) )
 
-	ROM_REGION( 0x800000, "seeprom", ROMREGION_ERASEFF ) // probably just settings
+	ROM_REGION( 0x100, "seeprom", ROMREGION_ERASEFF ) // probably just settings
 	ROM_LOAD( "af24bc02.u8", 0x000, 0x100, CRC(17c6eb00) SHA1(2b30cb3a924f4905f98cc8220edaee156eaf59ae) )
 ROM_END
 

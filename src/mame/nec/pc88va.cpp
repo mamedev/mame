@@ -104,7 +104,7 @@ brk 8Ch AH=02h read calendar clock -> CH = hour, CL = minutes, DH = seconds, DL 
 
 // TODO: verify clocks
 #define MASTER_CLOCK    (XTAL(31'948'800) / 4) // (based on PC-8801 and PC-9801)
-#define FM_CLOCK        (XTAL(31'948'800) / 4) // 3993600, / 8 for regular pc88va
+#define FM_CLOCK        (XTAL(31'948'800) / 4) // 3993600 * 2, / 8 for regular pc88va
 
 
 
@@ -512,6 +512,11 @@ void pc88va_state::main_map(address_map &map)
 {
 	map(0x00000, 0x7ffff).ram().share("workram");
 //  map(0x80000, 0x9ffff).ram(); // EMM
+	// TODO: no idea how EMM works yet
+	// - Regular V1/V2 should use ports $e2/$e3 like base
+	// - Guess it's not C-Bus compatible but rather PC-88VA-01/-02 doing the trick for all modes.
+	// - hatisora wants the segment populated otherwise it crashes after stage 1
+	map(0x80000, 0x9ffff).ram();
 	map(0xa0000, 0xdffff).m(m_sysbank, FUNC(address_map_bank_device::amap16));
 	map(0xe0000, 0xeffff).bankr("rom00_bank");
 	map(0xf0000, 0xfffff).bankr("rom10_bank");
@@ -597,9 +602,11 @@ void pc88va_state::io_map(address_map &map)
 	map(0x0100, 0x0101).rw(FUNC(pc88va_state::screen_ctrl_r), FUNC(pc88va_state::screen_ctrl_w)); // Screen Control Register
 	map(0x0102, 0x0103).rw(FUNC(pc88va_state::gfx_ctrl_r), FUNC(pc88va_state::gfx_ctrl_w));
 	map(0x0106, 0x0109).w(FUNC(pc88va_state::video_pri_w)); // Palette Control Register (priority) / Direct Color Control Register (priority)
-//  map(0x010a, 0x010b) Picture Mask Mode Register
-	map(0x010c, 0x010d).w(FUNC(pc88va_state::color_mode_w)); // Color Palette Mode Register
-//  map(0x010e, 0x010f) Backdrop Color Register
+	map(0x010a, 0x010b).w(FUNC(pc88va_state::picture_mask_mode_w));
+	map(0x010c, 0x010d).w(FUNC(pc88va_state::color_mode_w));
+	map(0x010e, 0x010f).w(FUNC(pc88va_state::backdrop_color_w));
+	map(0x0110, 0x0110).w(FUNC(pc88va_state::plain_mask_w));
+	map(0x0111, 0x0111).w(FUNC(pc88va_state::color_code_w));
 //  map(0x0110, 0x0111) Color Code/Plain Mask Register
 //  map(0x0124, 0x0125) ? (related to Transparent Color of Graphic Screen 0)
 //  map(0x0126, 0x0127) ? (related to Transparent Color of Graphic Screen 1)
@@ -853,10 +860,10 @@ static INPUT_PORTS_START( pc88va )
 
 	PORT_START("SYSOP_SW")
 	PORT_DIPNAME( 0x03, 0x01, "System Operational Mode" )
-//  PORT_DIPSETTING(    0x00, "Reserved" )
+	PORT_DIPSETTING(    0x00, "<Reserved>" )
 	PORT_DIPSETTING(    0x01, "N88 V2 Mode" )
 	PORT_DIPSETTING(    0x02, "N88 V1 Mode" )
-//  PORT_DIPSETTING(    0x03, "???" )
+	PORT_DIPSETTING(    0x03, "Option Mode" ) // ?
 INPUT_PORTS_END
 
 static const gfx_layout pc88va_chars_8x8 =
@@ -1135,11 +1142,12 @@ void pc88va_state::pc88va(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc88va_state::io_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(pc88va_state::vrtc_irq), "screen", 0, 1);
 	m_maincpu->icu_slave_ack_cb().set(m_pic2, FUNC(pic8259_device::acknowledge));
+	// beep and RS-232C runs at regular 3'993'600
 	m_maincpu->set_tclk(MASTER_CLOCK / 2);
 	// "timer 1"
-//	m_maincpu->tout0_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+//  m_maincpu->tout0_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_maincpu->tout1_cb().set(m_dac1bit, FUNC(speaker_sound_device::level_w));
-//	m_maincpu->tout2_cb().set RS-232C Baud Rate Setting
+//  m_maincpu->tout2_cb().set RS-232C Baud Rate Setting
 	// ch2 is FDC, ch0/3 are "user". ch1 is unused
 	m_maincpu->out_hreq_cb().set(m_maincpu, FUNC(v50_device::hack_w));
 	m_maincpu->out_eop_cb().set(FUNC(pc88va_state::tc_w));
@@ -1160,7 +1168,8 @@ void pc88va_state::pc88va(machine_config &config)
 	m_screen->set_raw(XTAL(42'105'200) / 2, 848, 0, 640, 448, 0, 400);
 	m_screen->set_screen_update(FUNC(pc88va_state::screen_update));
 
-	PALETTE(config, m_palette, FUNC(pc88va_state::palette_init)).set_entries(32);
+	// +1 for backdrop color
+	PALETTE(config, m_palette, FUNC(pc88va_state::palette_init)).set_entries(32 + 1);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pc88va);
 
 	PC88VA_SGP(config, m_sgp);

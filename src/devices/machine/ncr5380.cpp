@@ -32,12 +32,13 @@ DEFINE_DEVICE_TYPE(DP8490,   dp8490_device,   "dp8490",   "National Semiconducto
 
 ALLOW_SAVE_TYPE(ncr5380_device::state);
 
-ncr5380_device::ncr5380_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, bool has_lbs)
+ncr5380_device::ncr5380_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, bool has_lbs, bool self_reset_int)
 	: device_t(mconfig, type, tag, owner, clock)
 	, nscsi_device_interface(mconfig, *this)
 	, m_irq_handler(*this)
 	, m_drq_handler(*this)
 	, m_has_lbs(has_lbs)
+	, m_self_reset_int(self_reset_int)
 {
 }
 
@@ -57,7 +58,7 @@ cxd1180_device::cxd1180_device(machine_config const &mconfig, char const *tag, d
 }
 
 dp8490_device::dp8490_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: ncr5380_device(mconfig, DP8490, tag, owner, clock, true)
+	: ncr5380_device(mconfig, DP8490, tag, owner, clock, true, false)
 {
 }
 
@@ -269,12 +270,19 @@ void ncr5380_device::icmd_w(u8 data)
 	{
 		LOG("scsi reset issued\n");
 		device_reset();
-		// a host-commanded reset (ICR R̅S̅T̅) must not interrupt this chip:
-		// device_reset() has already deasserted IRQ, and the bus does not
-		// reflect a device's own R̅S̅T̅ back to it, so scsi_ctrl_changed() is
-		// not re-entered here.  Only an externally-initiated reset interrupts.
-		// (Without this the NetBSD/pc532 monitor aborts on the spurious IRQ.)
 		m_scsi_bus->ctrl_w(m_scsi_refid, S_RST, S_RST);
+
+		// A host-issued SCSI reset (ICR /RST) raises an interrupt on the base
+		// NCR5380/53C80: "SCSI reset RST is similar to a chip reset, but
+		// generates an interrupt" (datasheet) -- the chip monitors /RST,
+		// including the one it drives.  device_reset() above cleared IRQ, and
+		// the nscsi bus does not reflect a device's own /RST back to it, so the
+		// interrupt must be raised explicitly here.  The DP8490 EASI is the
+		// exception: its ICR-issued reset performs the chip-reset actions, which
+		// "[do] not create an interrupt" (DP8490 datasheet 6.4 -> 6.2), unlike
+		// an externally applied reset (6.3).  m_self_reset_int encodes this.
+		if (m_self_reset_int)
+			set_irq(true);
 	}
 
 	m_icmd = (m_icmd & ~IC_WRITE) | (data & IC_WRITE);

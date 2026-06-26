@@ -82,8 +82,10 @@ Notes:
         Type (note 1) 27C1000    27C1000    27C1000    27C1000    27C1000    27C1000    27C1000    27C1000    27C512     27C512     27C512     831000     831000     831000     831000     831000     831000     831000     831000     831000     831000     831000     831000     27C1000    27C1000    27C1000    27C1000    27C512     27C512     831000     831000     831000
         Location      IC58       IC63       IC57       IC62       IC20       IC29       IC21       IC30       IC154      IC153      IC152      IC90       IC94       IC98       IC102      IC91       IC95       IC99       IC103      IC92       IC96       IC100      IC104      IC93       IC97       IC101      IC105      IC40       IC17       IC11       IC12       IC13
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-After Burner          EPR-10940  EPR-10941  -          -          EPR-10927  EPR-10928  -          -          EPR-10926  EPR-10925  EPR-10924  MPR-10932  MPR-10934  MPR-10936  MPR-10938  MPR-10933  MPR-10935  MPR-10937  MPR-10939  EPR-10942  EPR-10943  EPR-10944  EPR-10945  EPR-10946  EPR-10947  EPR-10948  EPR-10949  EPR-10922  MPR-10923  MPR-10930  MPR-10931  MPR-11102
+After Burner (1.32)   EPR-11092  EPR-11093  EPR-10950? EPR-10951? EPR-11090  EPR-11091  -          -          EPR-11089  EPR-11088  EPR-11087  MPR-10932  MPR-10934  MPR-10936  MPR-10938  MPR-10933  MPR-10935  MPR-10937  MPR-10939  EPR-11094  EPR-11095  EPR-11096  EPR-11097  EPR-11098  EPR-11099  EPR-11100  EPR-11101  EPR-10922  EPR-10923  MPR-10930  MPR-10931  EPR-10929
+After Burner (1.31)   EPR-10940  EPR-10941  -          -          EPR-10927  EPR-10928  -          -          EPR-10926  EPR-10925  EPR-10924  MPR-10932  MPR-10934  MPR-10936  MPR-10938  MPR-10933  MPR-10935  MPR-10937  MPR-10939  EPR-10942  EPR-10943  EPR-10944  EPR-10945  EPR-10946  EPR-10947  EPR-10948  EPR-10949  EPR-10922  MPR-10923  MPR-10930  MPR-10931  EPR-10929
 After Burner 2        EPR-11107  EPR-11108  -          -          EPR-11109  EPR-11110  -          -          EPR-11115  EPR-11114  EPR-11113  MPR-10932  MPR-10934  MPR-10936  MPR-10938  MPR-10933  MPR-10935  MPR-10937  MPR-10939  MPR-11103  MPR-11104  MPR-11105  MPR-11106  EPR-11116  EPR-11117  EPR-11118  EPR-11119  EPR-10922  EPR-11112  MPR-10930  MPR-10931  EPR-11102
+After Burner 2 (Ger)  EPR-11173A EPR-11174A -          -          EPR-11109  EPR-11110  -          -          EPR-11115  EPR-11114  EPR-11113  MPR-10932  MPR-10934  MPR-10936  MPR-10938  MPR-10933  MPR-10935  MPR-10937  MPR-10939  MPR-11103  MPR-11104  MPR-11105  MPR-11106  EPR-11116  EPR-11117  EPR-11118  EPR-11119  EPR-10922  EPR-11112  MPR-10930  MPR-10931  EPR-11102
 Line Of Fire (set 3)  EPR-12849  EPR-12850  -          -          EPR-12804  EPR-12805  EPR-12802  EPR-12803  OPR-12791  OPR-12792  OPR-12793  EPR-12787  EPR-12788  EPR-12789  EPR-12790  EPR-12783  EPR-12784  EPR-12785  EPR-12786  EPR-12779  EPR-12780  EPR-12781  EPR-12782  EPR-12775  EPR-12776  EPR-12777  EPR-12778  -          EPR-12798  EPR-12799  EPR-12800  EPR-12801
 Line Of Fire (set 2)  EPR-12847A EPR-12848A -          -          EPR-12804  EPR-12805  EPR-12802  EPR-12803  OPR-12791  OPR-12792  OPR-12793  EPR-12787  EPR-12788  EPR-12789  EPR-12790  EPR-12783  EPR-12784  EPR-12785  EPR-12786  EPR-12779  EPR-12780  EPR-12781  EPR-12782  EPR-12775  EPR-12776  EPR-12777  EPR-12778  -          EPR-12798  EPR-12799  EPR-12800  EPR-12801
 Line Of Fire (set 1)  EPR-12794  EPR-12795  -          -          EPR-12804  EPR-12805  EPR-12802  EPR-12803  OPR-12791  OPR-12792  OPR-12793  EPR-12787  EPR-12788  EPR-12789  EPR-12790  EPR-12783  EPR-12784  EPR-12785  EPR-12786  EPR-12779  EPR-12780  EPR-12781  EPR-12782  EPR-12775  EPR-12776  EPR-12777  EPR-12778  -          EPR-12798  EPR-12799  EPR-12800  EPR-12801
@@ -194,18 +196,19 @@ OTHER:
       IC1  : NEC uPC324 Low Power Quad Operational Amplifier (DIP14)
       IC2  : NEC uPC4082 J-FET Dual Input Operational Amplifier (DIP8)
       IC3  : Yamaha YM3012 Sound Digital to Analog Converter (DIP16)
-      IC5  : M8736 MF6CN-50 (DIP14)
-      IC6  : M8736 MF6CN-50 (DIP14)
+      IC4  : 4066 Analog Bilateral Switch (DIP14)
+      IC5  : NS MF6CN-50 Switched Capacitor Filter (DIP14)
+      IC6  : NS MF6CN-50 Switched Capacitor Filter (DIP14)
       IC7  : Exar MP7633JN CMOS 10-Bit Multiplying Digital to Analog Converter (== AD7533 / AD7530 / AD7520) (DIP16)
       BATT : 5.5 volt 0.1uF Super Cap
-      CNA  : 10 pin +5V / GND Power Connector
-      CNB  : 20 pin Analog Controls Connector
-      CNC  : 26 pin Connector for ?
-      CND  : 50 pin Digital Controls/Buttons Connector
-      CNE  : 6 pin Connector for ?
-      CNF  : 4 pin Stereo Sound Output Connector
-      CNG  : 6 pin RGB/Sync/GND Connector
-      CNH  : 10 pin Connector for ?
+      CNA  : AMP 10 pin +5V / GND Power Connector
+      CNB  : AMP 20 pin Analog Controls Connector
+      CNC  : MIL 26 pin Connector to DRIVE BD
+      CND  : AMP 50 pin Digital Controls/Buttons Connector
+      CNE  : JST 6 pin Stereo Audio Line Out
+      CNF  : JST 4 pin Stereo Sound Output Connector
+      CNG  : JST 6 pin RGB/Sync/GND Connector
+      CNH  : AMP 10 pin +5V / GND Power Connector
       CNI  : 30 pin Expansion Connector (not populated)
       VSync: 59.6368Hz  \ (measured via EL4583 & TTi PFM1300)
       HSync: 15.5645kHz /
@@ -2134,35 +2137,72 @@ void segaxbd_new_state::sega_rascot(machine_config &config)
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
-//  After Burner, Sega X-board
+//  After Burner Deluxe/Upright, Sega X-board
+//  Sega Game ID #: 834-6335-01 AFTER BURNER
 //  CPU: 68000 (317-????)
 //
-//  Missing the Deluxe/Upright English (US?) version ROM set
-//   Program ROMs:
-//     EPR-11092.58
-//     EPR-11093.63
-//     EPR-10950.57
-//     EPR-10951.62
-//   Sub-Program
-//     EPR-11090.30
-//     EPR-11091.20
-//   Fix Scroll Character
-//     EPR-11089.154
-//     EPR-11088.153
-//     EPR-11087.152
-//   Object (Character & Scene Scenery)
-//     EPR-11098.93
-//     EPR-11099.97
-//     EPR-11100.101
-//     EPR-11101.105
-//     EPR-11094.92--
-//     EPR-11095.96  \ These 4 found in After Burner II (German)??
-//     EPR-11096.100 /
-//     EPR-11097.104-
-//   Sound Data
-//     EPR-10929.13
+// NOTE: Sega manual # 420-5812 desginates this ROM set as After Burner Deluxe Type, shows game board as: GAME BD 834-6335
+//       Sega manual # 420-5798-01 AT desginates this ROM set as After Burner Upright Type, shows game board as: GAME BD 834-6335-01
+//       Test menu screen shows:  DIAGNOSTIC VER. 1.32
+//       DIP switch selectable between Upright, Moving Standard, Moving Deluxe
+//       EPR-10950 @IC57 & EPR-10951 @IC62 are listed in both manuals. Are they required?, they aren't tested for in the ROM tests.
+//       These EPR numbers for this version end (EPR-11101) right before After Burner II EPR numbers start (EPR-11102)
 //
 ROM_START( aburner )
+	ROM_REGION( 0x80000, "mainpcb:maincpu", 0 ) // MAIN PROGRAM
+	ROM_LOAD16_BYTE( "epr-11092.58", 0x00000, 0x20000, CRC(fa02b5cb) SHA1(3e78158cfd13e5de6006f36c0c0ac5195104ba48) )
+	ROM_LOAD16_BYTE( "epr-11093.63", 0x00001, 0x20000, CRC(89a288c4) SHA1(3b780827e542fd17e1ed023116ce9643cc917df9) )
+	ROM_LOAD16_BYTE( "epr-10950.57", 0x40000, 0x20000, NO_DUMP ) // manuals show as used, but they weren't in ROM set. Are they required?
+	ROM_LOAD16_BYTE( "epr-10951.62", 0x40001, 0x20000, NO_DUMP ) // manuals show as used, but they weren't in ROM set. Are they required?
+
+	ROM_REGION( 0x80000, "mainpcb:subcpu", 0 ) // SUB PROGRAM
+	ROM_LOAD16_BYTE( "epr-11090.20", 0x00000, 0x20000, CRC(8eda767d) SHA1(33c21bbccf079a267171fc2797034845ef12e57c) )
+	ROM_LOAD16_BYTE( "epr-11091.29", 0x00001, 0x20000, CRC(0c3e9a93) SHA1(097f96b79d4db96fd39dad53ab68100d6d007039) )
+
+	ROM_REGION( 0x30000, "mainpcb:gfx1", 0 ) // FIX SCROLL CHARACTER
+	ROM_LOAD( "epr-11089.154", 0x00000, 0x10000, CRC(95bc1587) SHA1(c8e230a6ca0444adbf7c434b07e3e6be42cfa7c1) )
+	ROM_LOAD( "epr-11088.153", 0x10000, 0x10000, CRC(39d09c13) SHA1(e467e4b4e0be7848af2a052d5a11d0a0dd467d56) )
+	ROM_LOAD( "epr-11087.152", 0x20000, 0x10000, CRC(2aea8441) SHA1(b6d1b5b67371d71ef4e0c30d61b87a1f816151af) )
+
+	ROM_REGION32_LE( 0x200000, "mainpcb:sprites", 0 ) // OBJECT (CHARACTER & SCENE SCENERY)
+	ROM_LOAD32_BYTE( "mpr-10932.90",  0x000000, 0x20000, CRC(cc0821d6) SHA1(22e84419a585209bbda1466d2180504c316a9b7f) ) // First 8 ROMs are MPR, the rest are EPR
+	ROM_LOAD32_BYTE( "mpr-10934.94",  0x000001, 0x20000, CRC(4a51b1fa) SHA1(2eed018a5a1e935bb72b6f440a794466a1397dc5) )
+	ROM_LOAD32_BYTE( "mpr-10936.98",  0x000002, 0x20000, CRC(ada70d64) SHA1(ba6203b0fdb4c4998b7be5b446eb8354751d553a) )
+	ROM_LOAD32_BYTE( "mpr-10938.102", 0x000003, 0x20000, CRC(e7675baf) SHA1(aa979319a44c0b18c462afb5ca9cdeed2292c76a) )
+	ROM_LOAD32_BYTE( "mpr-10933.91",  0x080000, 0x20000, CRC(c8efb2c3) SHA1(ba31da93f929f2c457e60b2099d5a1ba6b5a9f48) )
+	ROM_LOAD32_BYTE( "mpr-10935.95",  0x080001, 0x20000, CRC(c1e23521) SHA1(5e95f3b6ff9f4caca676eaa6c84f1200315218ea) )
+	ROM_LOAD32_BYTE( "mpr-10937.99",  0x080002, 0x20000, CRC(f0199658) SHA1(cd67504fef53f637a3b1c723c4a04148f88028d2) )
+	ROM_LOAD32_BYTE( "mpr-10939.103", 0x080003, 0x20000, CRC(a0d49480) SHA1(6c4234456bc09ae771beec284d7aa21ebe474f6f) )
+	ROM_LOAD32_BYTE( "epr-11094.92",  0x100000, 0x20000, CRC(bdd60da2) SHA1(01673837c5ad84fa087728a05549ac01542ef4e9) )
+	ROM_LOAD32_BYTE( "epr-11095.96",  0x100001, 0x20000, CRC(06a35fce) SHA1(c39ae02fc8246e883c4f4c320f668ce6ca9c845a) )
+	ROM_LOAD32_BYTE( "epr-11096.100", 0x100002, 0x20000, CRC(027b0689) SHA1(c704c79faadb5e445fd3bd9281683b09831782d2) )
+	ROM_LOAD32_BYTE( "epr-11097.104", 0x100003, 0x20000, CRC(9e1fec09) SHA1(6cc47d86852b988bfcd64cb4ed7d832c683e3114) )
+	ROM_LOAD32_BYTE( "epr-11098.93",  0x180000, 0x20000, CRC(22f432da) SHA1(3a811d5d7d326440fe1bfb569cc64bdec57d06fa) )
+	ROM_LOAD32_BYTE( "epr-11099.97",  0x180001, 0x20000, CRC(debd9460) SHA1(ebdd9a68b1925c568832a652405702f88ad3c682) )
+	ROM_LOAD32_BYTE( "epr-11100.101", 0x180002, 0x20000, CRC(7823c611) SHA1(b7cf798a1d4fba40cb8197502dc0b7243ca2efe2) )
+	ROM_LOAD32_BYTE( "epr-11101.105", 0x180003, 0x20000, CRC(ef294c12) SHA1(762bf031cbe7d43db6f35fad82d5d8903211a8ab) )
+
+	ROM_REGION( 0x10000, "mainpcb:segaic16road", ROMREGION_ERASE00 ) // ROAD
+	ROM_LOAD( "epr-10922.40", 0x000000, 0x10000, CRC(b49183d4) SHA1(71d87bfbce858049ccde9597ab15575b3cdba892) )
+
+	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // SOUND PROGRAM
+	ROM_LOAD( "epr-10923.17", 0x00000, 0x10000, CRC(6888eb8f) SHA1(8f8fffb214842a5d356e33f5a97099bc6407384f) )
+
+	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // SOUND DATA
+	ROM_LOAD( "mpr-10931.11", 0x00000, 0x20000, CRC(9209068f) SHA1(01f3dda1c066d00080c55f2c86c506b6b2407f98) )
+	ROM_LOAD( "mpr-10930.12", 0x20000, 0x20000, CRC(6493368b) SHA1(328aff19ff1d1344e9115f519d3962390c4e5ba4) )
+	ROM_LOAD( "epr-10929.13", 0x40000, 0x20000, CRC(6c07c78d) SHA1(3868b1824f43e4f2b4fbcd9274bfb3000c889d12) )
+ROM_END
+
+//*************************************************************************************************************************
+//  After Burner Deluxe/Upright, Sega X-board
+//  Sega Game ID #: 834-6335-02 AFTER BURNER
+//  CPU: 68000 (317-????)
+//
+// NOTE: Test menu screen shows:  DIAGNOSTIC VER. 1.31
+//       DIP switch selectable between Upright, Moving Standard, Moving Deluxe
+//
+ROM_START( aburner131 )
 	ROM_REGION( 0x80000, "mainpcb:maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-10940.58", 0x00000, 0x20000, CRC(4d132c4e) SHA1(007af52167c369177b86fc0f8b007ebceba2a30c) )
 	ROM_LOAD16_BYTE( "epr-10941.63", 0x00001, 0x20000, CRC(136ea264) SHA1(606ac67db53a6002ed1bd71287aed2e3e720cdf4) )
@@ -2213,6 +2253,10 @@ ROM_END
 //  After Burner II, Sega X-board
 //  CPU: 68000 (317-????)
 //
+// NOTE: Test menu screen shows:  DIAGNOSTIC VER. 2.00
+//       DIP switch selectable between Upright, Moving Standard, Moving Deluxe
+//       reportedly known to exist is a French version with program ROMs EPR-11171 @ IC58 & EPR-11172 @ IC63
+//
 ROM_START( aburner2 )
 	ROM_REGION( 0x80000, "mainpcb:maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-11107.58", 0x00000, 0x20000, CRC(6d87bab7) SHA1(ab34fe78f1f216037b3e3dca3e61f1b31c05cedf) )
@@ -2254,13 +2298,16 @@ ROM_START( aburner2 )
 	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
 	ROM_LOAD( "mpr-10931.11", 0x00000, 0x20000, CRC(9209068f) SHA1(01f3dda1c066d00080c55f2c86c506b6b2407f98) )
 	ROM_LOAD( "mpr-10930.12", 0x20000, 0x20000, CRC(6493368b) SHA1(328aff19ff1d1344e9115f519d3962390c4e5ba4) )
-	ROM_LOAD( "epr-11102.13", 0x40000, 0x20000, CRC(6c07c78d) SHA1(3868b1824f43e4f2b4fbcd9274bfb3000c889d12) )
+	ROM_LOAD( "epr-11102.13", 0x40000, 0x20000, CRC(6c07c78d) SHA1(3868b1824f43e4f2b4fbcd9274bfb3000c889d12) ) // == epr-10929.13? - need to verify
 ROM_END
 
 //*************************************************************************************************************************
 //  After Burner II (German), Sega X-board
 //  CPU: 68000 (317-????)
 //  Sega Game ID #: 834-6335-04 AFTER BURNER
+//
+// NOTE: Test menu screen shows:  DIAGNOSTIC VER. 2.01
+//       DIP switch selectable between Upright, Moving Standard, Moving Deluxe
 //
 ROM_START( aburner2g )
 	ROM_REGION( 0x80000, "mainpcb:maincpu", 0 ) // 68000 code
@@ -2303,7 +2350,7 @@ ROM_START( aburner2g )
 	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
 	ROM_LOAD( "mpr-10931.11", 0x00000, 0x20000, CRC(9209068f) SHA1(01f3dda1c066d00080c55f2c86c506b6b2407f98) ) // There is known to exist German Sample ROMs
 	ROM_LOAD( "mpr-10930.12", 0x20000, 0x20000, CRC(6493368b) SHA1(328aff19ff1d1344e9115f519d3962390c4e5ba4) )
-	ROM_LOAD( "epr-10929.13", 0x40000, 0x20000, CRC(6c07c78d) SHA1(3868b1824f43e4f2b4fbcd9274bfb3000c889d12) )
+	ROM_LOAD( "epr-11102.13", 0x40000, 0x20000, CRC(6c07c78d) SHA1(3868b1824f43e4f2b4fbcd9274bfb3000c889d12) ) // == epr-10929.13? - need to verify
 ROM_END
 
 
@@ -4845,10 +4892,11 @@ void segaxbd_new_state_double::init_gprider_double()
 //**************************************************************************
 
 //    YEAR, NAME,      PARENT,   MACHINE,             INPUT,    STATE,             INIT,          MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1987, aburner,   0,        sega_aburner2,       aburner,  segaxbd_new_state, init_aburner2, ROT0, "Sega", "After Burner", 0 )
+GAME( 1987, aburner,   0,        sega_aburner2,       aburner,  segaxbd_new_state, init_aburner2, ROT0, "Sega", "After Burner (VER 1.32, deluxe/upright)", 0 ) // Game ID #: 834-6335-01 AFTER BURNER
+GAME( 1987, aburner131,aburner,  sega_aburner2,       aburner,  segaxbd_new_state, init_aburner2, ROT0, "Sega", "After Burner (VER 1.31, deluxe/upright)", 0 ) // Game ID #: 834-6335-02 AFTER BURNER
 
-GAME( 1987, aburner2,  0,        sega_aburner2,       aburner2, segaxbd_new_state, init_aburner2, ROT0, "Sega", "After Burner II", 0 )
-GAME( 1987, aburner2g, aburner2, sega_aburner2,       aburner2, segaxbd_new_state, init_aburner2, ROT0, "Sega", "After Burner II (German)", 0 )
+GAME( 1987, aburner2,  0,        sega_aburner2,       aburner2, segaxbd_new_state, init_aburner2, ROT0, "Sega", "After Burner II (VER 2.00, deluxe/upright)", 0 )
+GAME( 1987, aburner2g, aburner2, sega_aburner2,       aburner2, segaxbd_new_state, init_aburner2, ROT0, "Sega", "After Burner II (German, VER 2.01, deluxe/upright)", 0 )
 
 GAME( 1987, thndrbld,  0,        sega_xboard_fd1094,  thndrbld, segaxbd_new_state, empty_init,    ROT0, "Sega", "Thunder Blade (upright) (FD1094 317-0056)", 0 )
 GAME( 1987, thndrbld1, thndrbld, sega_xboard,         thndrbd1, segaxbd_new_state, empty_init,    ROT0, "Sega", "Thunder Blade (deluxe/standing) (unprotected)", 0 )

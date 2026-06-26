@@ -383,6 +383,19 @@ public:
 	virtual void map(address_map &map) override ATTR_COLD;
 };
 
+class upd7265_device : public upd765_family_device {
+public:
+	upd7265_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool ready, bool select)
+		: upd7265_device(mconfig, tag, owner, clock)
+	{
+		set_ready_line_connected(ready);
+		set_select_lines_connected(select);
+	}
+	upd7265_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void map(address_map &map) override ATTR_COLD;
+};
+
 class i8272a_device : public upd765_family_device {
 public:
 	i8272a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool ready)
@@ -669,6 +682,7 @@ private:
 
 DECLARE_DEVICE_TYPE(UPD765A,        upd765a_device)
 DECLARE_DEVICE_TYPE(UPD765B,        upd765b_device)
+DECLARE_DEVICE_TYPE(UPD7265,        upd7265_device)
 DECLARE_DEVICE_TYPE(I8272A,         i8272a_device)
 DECLARE_DEVICE_TYPE(UPD72065,       upd72065_device)
 DECLARE_DEVICE_TYPE(UPD72066,       upd72066_device)

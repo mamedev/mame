@@ -95,7 +95,7 @@ const float cs4031_device::m_dma_clock_divider[] =
 
 void cs4031_device::device_add_mconfig(machine_config &config)
 {
-	AM9517A(config, m_dma1);
+	AM9517A(config, m_dma1, 0);
 	m_dma1->out_hreq_callback().set(m_dma2, FUNC(am9517a_device::dreq0_w));
 	m_dma1->out_eop_callback().set(FUNC(cs4031_device::dma1_eop_w));
 	m_dma1->in_memr_callback().set(FUNC(cs4031_device::dma_read_byte));
@@ -113,7 +113,7 @@ void cs4031_device::device_add_mconfig(machine_config &config)
 	m_dma1->out_dack_callback<2>().set(FUNC(cs4031_device::dma1_dack2_w));
 	m_dma1->out_dack_callback<3>().set(FUNC(cs4031_device::dma1_dack3_w));
 
-	AM9517A(config, m_dma2);
+	AM9517A(config, m_dma2, 0);
 	m_dma2->out_hreq_callback().set(FUNC(cs4031_device::dma2_hreq_w));
 	m_dma2->in_memr_callback().set(FUNC(cs4031_device::dma_read_word));
 	m_dma2->out_memw_callback().set(FUNC(cs4031_device::dma_write_word));
@@ -172,7 +172,6 @@ cs4031_device::cs4031_device(const machine_config &mconfig, const char *tag, dev
 	m_write_spkr(*this),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_keybc(*this, finder_base::DUMMY_TAG),
-	m_isa(*this, finder_base::DUMMY_TAG),
 	m_bios(*this, finder_base::DUMMY_TAG),
 	m_space(nullptr),
 	m_space_io(nullptr),
@@ -556,26 +555,17 @@ void cs4031_device::update_read_region(int index, offs_t start, offs_t end)
 	if (!BIT(m_registers[SHADOW_READ], index) && BIT(m_registers[ROMCS], index))
 	{
 		LOGMEMORY("ROM read from %x to %x\n", start, end);
-
 		m_space->install_rom(start, end, m_bios + start);
 	}
 	else if (!BIT(m_registers[SHADOW_READ], index) && !BIT(m_registers[ROMCS], index))
 	{
 		LOGMEMORY("ISA read from %x to %x\n", start, end);
-
-		m_space->install_rom(start, end, m_isa + start - 0xc0000);
+		// no need to do anything here
 	}
 	else if (BIT(m_registers[SHADOW_READ], index))
 	{
 		LOGMEMORY("RAM read from %x to %x\n", start, end);
-
 		m_space->install_rom(start, end, m_ram + start);
-	}
-	else
-	{
-		LOGMEMORY("NOP read from %x to %x\n", start, end);
-
-		m_space->nop_read(start, end);
 	}
 }
 
@@ -584,25 +574,21 @@ void cs4031_device::update_write_region(int index, offs_t start, offs_t end)
 	if (!BIT(m_registers[SHADOW_WRITE], index) && BIT(m_registers[ROMCS], index) && BIT(m_registers[ROMCS], 7))
 	{
 		LOGMEMORY("ROM write from %x to %x\n", start, end);
-
 		m_space->install_writeonly(start, end, m_bios + start);
 	}
 	else if (!BIT(m_registers[SHADOW_WRITE], index) && !BIT(m_registers[ROMCS], index))
 	{
 		LOGMEMORY("ISA write from %x to %x\n", start, end);
-
-		m_space->install_writeonly(start, end, m_isa + start - 0xc0000);
+		// no need to do anything here
 	}
 	else if (BIT(m_registers[SHADOW_WRITE], index))
 	{
 		LOGMEMORY("RAM write from %x to %x\n", start, end);
-
 		m_space->install_writeonly(start, end, m_ram + start);
 	}
 	else
 	{
 		LOGMEMORY("NOP write from %x to %x\n", start, end);
-
 		m_space->nop_write(start, end);
 	}
 }

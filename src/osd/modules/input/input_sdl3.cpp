@@ -605,7 +605,7 @@ public:
 	virtual void reset() override
 	{
 		sdl_device::reset();
-		memset(&m_keyboard.state, 0, sizeof(m_keyboard.state));
+		memset(&m_keyboard, 0, sizeof(m_keyboard));
 		m_capslock_pressed = std::chrono::steady_clock::time_point::min();
 	}
 
@@ -619,7 +619,7 @@ public:
 					m_trans_table[keynum].ui_name,
 					std::string_view(),
 					itemid,
-					generic_button_get_state<s32>,
+					generic_button_get_state<u8>,
 					&m_keyboard.state[m_trans_table[keynum].sdl_scancode]);
 		}
 	}
@@ -628,9 +628,7 @@ private:
 	// state information for a keyboard
 	struct keyboard_state
 	{
-		s32 state[0x3ff];         // must be s32!
-		s8  oldkey[MAX_KEYS];
-		s8  currkey[MAX_KEYS];
+		u8  state[0x3ff];
 	};
 
 	[[maybe_unused]] SDL_KeyboardID m_keyboard_id;
@@ -666,11 +664,13 @@ public:
 	}
 
 protected:
+	static constexpr unsigned MAX_BUTTONS = INPUT_MAX_BUTTONS;
+
 	// state information for a mouse
 	struct mouse_state
 	{
 		s32 lX, lY, lV, lH;
-		s32 buttons[MAX_BUTTONS];
+		u8  buttons[MAX_BUTTONS];
 	};
 
 	sdl_mouse_device_base(std::string &&name, std::string &&id, input_module &module) :
@@ -700,13 +700,13 @@ protected:
 		// add buttons
 		for (int button = 0; button < buttons; button++)
 		{
-			input_item_id itemid = (input_item_id)(ITEM_ID_BUTTON1 + button);
+			input_item_id itemid = input_item_id(ITEM_ID_BUTTON1 + button);
 			int const offset = button ^ (((1 == button) || (2 == button)) ? 3 : 0);
 			device.add_item(
 					default_button_name(button),
 					std::string_view(),
 					itemid,
-					generic_button_get_state<s32>,
+					generic_button_get_state<u8>,
 					&m_mouse.buttons[offset]);
 		}
 	}
@@ -1021,6 +1021,10 @@ private:
 class sdl_joystick_device : public sdl_joystick_device_base
 {
 public:
+	static constexpr unsigned MAX_AXES = 32;
+	static constexpr unsigned MAX_BUTTONS = 128;
+	static constexpr unsigned MAX_HATS = 8;
+
 	sdl_joystick_device(
 			std::string &&name,
 			std::string &&id,
@@ -1089,7 +1093,7 @@ public:
 					default_button_name(button),
 					std::string_view(),
 					itemid,
-					generic_button_get_state<s32>,
+					generic_button_get_state<u8>,
 					&m_joystick.buttons[button]);
 
 			// there are sixteen action button types
@@ -1132,7 +1136,7 @@ public:
 					tempname,
 					std::string_view(),
 					itemid,
-					generic_button_get_state<s32>,
+					generic_button_get_state<u8>,
 					&m_joystick.hatsU[hat]);
 
 			snprintf(tempname, sizeof(tempname), "Hat %d Down", hat + 1);
@@ -1141,7 +1145,7 @@ public:
 					tempname,
 					std::string_view(),
 					itemid,
-					generic_button_get_state<s32>,
+					generic_button_get_state<u8>,
 					&m_joystick.hatsD[hat]);
 
 			snprintf(tempname, sizeof(tempname), "Hat %d Left", hat + 1);
@@ -1150,7 +1154,7 @@ public:
 					tempname,
 					std::string_view(),
 					itemid,
-					generic_button_get_state<s32>,
+					generic_button_get_state<u8>,
 					&m_joystick.hatsL[hat]);
 
 			snprintf(tempname, sizeof(tempname), "Hat %d Right", hat + 1);
@@ -1159,7 +1163,7 @@ public:
 					tempname,
 					std::string_view(),
 					itemid,
-					generic_button_get_state<s32>,
+					generic_button_get_state<u8>,
 					&m_joystick.hatsR[hat]);
 		}
 
@@ -1387,9 +1391,9 @@ protected:
 	struct sdl_joystick_state
 	{
 		s32 axes[MAX_AXES];
-		s32 buttons[MAX_BUTTONS];
-		s32 hatsU[MAX_HATS], hatsD[MAX_HATS], hatsL[MAX_HATS], hatsR[MAX_HATS];
 		s32 balls[MAX_AXES];
+		u8  buttons[MAX_BUTTONS];
+		u8  hatsU[MAX_HATS], hatsD[MAX_HATS], hatsL[MAX_HATS], hatsR[MAX_HATS];
 	};
 
 	sdl_joystick_state m_joystick;
@@ -1679,7 +1683,7 @@ public:
 							buttonnames[button],
 							std::string_view(),
 							button_item++,
-							generic_button_get_state<s32>,
+							generic_button_get_state<u8>,
 							&m_controller.buttons[button]);
 					if (field && (std::size(numberedbuttons) > buttoncount))
 						std::get<1>(numberedbuttons[buttoncount]) = button;
@@ -1771,7 +1775,7 @@ public:
 						buttonnames[button],
 						std::string_view(),
 						item,
-						generic_button_get_state<s32>,
+						generic_button_get_state<u8>,
 						&m_controller.buttons[button]);
 			}
 		}
@@ -1946,8 +1950,7 @@ public:
 		{
 			// took lower paddles
 		}
-		else
-		if (consume_trigger_pair(assignments, IPT_UI_PAGE_UP, IPT_UI_PAGE_DOWN, axisitems[SDL_GAMEPAD_AXIS_LEFT_TRIGGER].first, axisitems[SDL_GAMEPAD_AXIS_RIGHT_TRIGGER].first))
+		else if (consume_trigger_pair(assignments, IPT_UI_PAGE_UP, IPT_UI_PAGE_DOWN, axisitems[SDL_GAMEPAD_AXIS_LEFT_TRIGGER].first, axisitems[SDL_GAMEPAD_AXIS_RIGHT_TRIGGER].first))
 		{
 			// took analog triggers
 		}
@@ -2132,7 +2135,7 @@ private:
 	struct sdl_controller_state
 	{
 		s32 axes[SDL_GAMEPAD_AXIS_COUNT];
-		s32 buttons[SDL_GAMEPAD_BUTTON_COUNT];
+		u8  buttons[SDL_GAMEPAD_BUTTON_COUNT];
 	};
 
 	sdl_controller_state m_controller;
@@ -2546,8 +2549,8 @@ protected:
 				SDL_GetNumJoystickButtons(joy),
 				SDL_GetNumJoystickHats(joy),
 				SDL_GetNumJoystickBalls(joy));
-		if (SDL_GetNumJoystickButtons(joy) > MAX_BUTTONS)
-			osd_printf_verbose("Joystick:   ...  Has %d buttons which exceeds supported %d buttons\n", SDL_GetNumJoystickButtons(joy), MAX_BUTTONS);
+		if (SDL_GetNumJoystickButtons(joy) > sdl_joystick_device::MAX_BUTTONS)
+			osd_printf_verbose("Joystick:   ...  Has %d buttons which exceeds supported %d buttons\n", SDL_GetNumJoystickButtons(joy), sdl_joystick_device::MAX_BUTTONS);
 
 		// instantiate device
 		sdl_joystick_device &devinfo = sixaxis

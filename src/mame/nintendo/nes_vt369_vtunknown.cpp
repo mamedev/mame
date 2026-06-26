@@ -1129,6 +1129,13 @@ ROM_START( lxcmcyppa ) // all games selectable
 	VT3XX_INTERNAL_NO_SWAP
 ROM_END
 
+ROM_START( lxcmcypp75 ) // all games selectable
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "jl2365pa-a.u1", 0x00000, 0x2000000, CRC(c6f17abd) SHA1(336ea385dec851a648d50b6f854920f95f86b21f) )
+
+	VT3XX_INTERNAL_NO_SWAP
+ROM_END
+
 ROM_START( lxcypkdp ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "ddp.u2", 0x00000, 0x4000000, CRC(ac5ce022) SHA1(450d11886385aeadc81e62090acd1d8ef8fedcd8) )
@@ -1779,6 +1786,7 @@ CONS( 2014, lxcmcyfd,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_s
 // later JL2365 models (with added bitswap)
 CONS( 200?, lxcmcyfza, lxcmcyfz,  0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Frozen (JL2365FZ-6)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2018, lxcmcyppa, lxcmcypp,  0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol (JL2365PA-5)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2018, lxcmcypp75,lxcmcypp,  0,  vt36x_32mb,             vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol (JL2365PA-A, 75-in-1)", MACHINE_IMPERFECT_GRAPHICS )
 // JL2367 models (150-in-1 versions, newer case style)
 CONS( 2018, lxcmcypp,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol (JL2367PA)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2020, lxcmcybt,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Batman (JL2367BAT)", MACHINE_IMPERFECT_GRAPHICS )

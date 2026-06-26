@@ -55,25 +55,25 @@
 
 
 // internal capabilities flags
-#define PPCCAP_OEA                  0x01        /* TRUE if we conform to the OEA */
-#define PPCCAP_VEA                  0x02        /* TRUE if we conform to the VEA */
-#define PPCCAP_FPU                  0x04        /* TRUE if we have an FPU */
-#define PPCCAP_MISALIGNED           0x08        /* TRUE if misaligned accesses are supported */
-#define PPCCAP_4XX                  0x10        /* TRUE if we are a non-OEA 4XX class chip */
-#define PPCCAP_603_MMU              0x20        /* TRUE if we have 603-class MMU features */
-#define PPCCAP_MFIOC                0x40        /* TRUE if we have memory-forced I/O controller interface accesses */
-#define PPCCAP_601BAT               0x80        /* TRUE if we're doing 601-style BATs (unified I/D, different bit layout) */
-#define PPCCAP_604_MMU              0x100       /* TRUE if we have 604-class MMU features */
-#define PPCCAP_750_TLB              0x200       /* TRUE if we have the extended 740/750 series TLB */
-#define PPCCAP_LEGACY_POWER         0x400       /* TRUE if we support the legacy POWER instructions */
+#define PPCCAP_OEA                  0x01        // TRUE if we conform to the OEA
+#define PPCCAP_VEA                  0x02        // TRUE if we conform to the VEA
+#define PPCCAP_FPU                  0x04        // TRUE if we have an FPU
+#define PPCCAP_MISALIGNED           0x08        // TRUE if misaligned accesses are supported
+#define PPCCAP_4XX                  0x10        // TRUE if we are a non-OEA 4XX class chip
+#define PPCCAP_603_MMU              0x20        // TRUE if we have 603-class MMU features */
+#define PPCCAP_MFIOC                0x40        // TRUE if we have memory-forced I/O controller interface accesses
+#define PPCCAP_601BAT               0x80        // TRUE if we're doing 601-style BATs (unified I/D, different bit layout)
+#define PPCCAP_604_MMU              0x100       // TRUE if we have 604-class MMU features
+#define PPCCAP_750_TLB              0x200       // TRUE if we have the extended 740/750 series TLB
+#define PPCCAP_LEGACY_POWER         0x400       // TRUE if we support the legacy POWER instructions
 
 // exception types
 enum
 {
 	EXCEPTION_RESET         = 1,
 	EXCEPTION_MACHCHECK     = 2,
-	EXCEPTION_DSI           = 3,        /* PPCCAP_OEA */
-	EXCEPTION_PROTECTION    = 3,        /* PPCCAP_4XX */
+	EXCEPTION_DSI           = 3,        // PPCCAP_OEA
+	EXCEPTION_PROTECTION    = 3,        // PPCCAP_4XX
 	EXCEPTION_ISI           = 4,
 	EXCEPTION_EI            = 5,
 	EXCEPTION_ALIGN         = 6,
@@ -83,9 +83,9 @@ enum
 	EXCEPTION_SYSCALL       = 12,
 	EXCEPTION_TRACE         = 13,
 	EXCEPTION_FPASSIST      = 14,
-	EXCEPTION_ITLBMISS      = 16,       /* PPCCAP_603_MMU */
-	EXCEPTION_DTLBMISSL     = 17,       /* PPCCAP_603_MMU */
-	EXCEPTION_DTLBMISSS     = 18,       /* PPCCAP_603_MMU */
+	EXCEPTION_ITLBMISS      = 16,       // PPCCAP_603_MMU
+	EXCEPTION_DTLBMISSL     = 17,       // PPCCAP_603_MMU
+	EXCEPTION_DTLBMISSS     = 18,       // PPCCAP_603_MMU
 	EXCEPTION_COUNT
 };
 
@@ -94,117 +94,117 @@ enum
 enum
 {
 	// UISA SPR register indexes
-	SPR_XER             = 0x001,    /* R/W  Fixed Point Exception Register */
-	SPR_LR              = 0x008,    /* R/W  Link Register */
-	SPR_CTR             = 0x009,    /* R/W  Count Register */
+	SPR_XER             = 0x001,    // R/W  Fixed Point Exception Register
+	SPR_LR              = 0x008,    // R/W  Link Register
+	SPR_CTR             = 0x009,    // R/W  Count Register
 
 	// VEA SPR register indexes
-	SPRVEA_TBL_R        = 0x10c,    /* R    Time Base Low */
-	SPRVEA_TBU_R        = 0x10d,    /* R    Time Base High */
+	SPRVEA_TBL_R        = 0x10c,    // R    Time Base Low
+	SPRVEA_TBU_R        = 0x10d,    // R    Time Base High
 
 	// OEA SPR register indexes
-	SPROEA_DSISR        = 0x012,    /* R/W  DSI Status Register */
-	SPROEA_DAR          = 0x013,    /* R/W  Data Address Register */
-	SPROEA_DEC          = 0x016,    /* R/W  Decrementer Register */
-	SPROEA_SDR1         = 0x019,    /* R/W  Page Table Configuration */
-	SPROEA_SRR0         = 0x01a,    /* R/W  Machine Status Save/Restore Register 0 */
-	SPROEA_SRR1         = 0x01b,    /* R/W  Machine Status Save/Restore Register 1 */
-	SPROEA_SPRG0        = 0x110,    /* R/W  SPR General 0 */
-	SPROEA_SPRG1        = 0x111,    /* R/W  SPR General 1 */
-	SPROEA_SPRG2        = 0x112,    /* R/W  SPR General 2 */
-	SPROEA_SPRG3        = 0x113,    /* R/W  SPR General 3 */
-	SPROEA_ASR          = 0x118,    /* R/W  Address Space Register (64-bit only) */
-	SPROEA_EAR          = 0x11a,    /* R/W  External Access Register */
-	SPROEA_PVR          = 0x11f,    /* R    Processor Version Number */
-	SPROEA_IBAT0U       = 0x210,    /* R/W  Instruction BAT 0 Upper */
-	SPROEA_IBAT0L       = 0x211,    /* R/W  Instruction BAT 0 Lower */
-	SPROEA_IBAT1U       = 0x212,    /* R/W  Instruction BAT 1 Upper */
-	SPROEA_IBAT1L       = 0x213,    /* R/W  Instruction BAT 1 Lower */
-	SPROEA_IBAT2U       = 0x214,    /* R/W  Instruction BAT 2 Upper */
-	SPROEA_IBAT2L       = 0x215,    /* R/W  Instruction BAT 2 Lower */
-	SPROEA_IBAT3U       = 0x216,    /* R/W  Instruction BAT 3 Upper */
-	SPROEA_IBAT3L       = 0x217,    /* R/W  Instruction BAT 3 Lower */
-	SPROEA_DBAT0U       = 0x218,    /* R/W  Data BAT 0 Upper */
-	SPROEA_DBAT0L       = 0x219,    /* R/W  Data BAT 0 Lower */
-	SPROEA_DBAT1U       = 0x21a,    /* R/W  Data BAT 1 Upper */
-	SPROEA_DBAT1L       = 0x21b,    /* R/W  Data BAT 1 Lower */
-	SPROEA_DBAT2U       = 0x21c,    /* R/W  Data BAT 2 Upper */
-	SPROEA_DBAT2L       = 0x21d,    /* R/W  Data BAT 2 Lower */
-	SPROEA_DBAT3U       = 0x21e,    /* R/W  Data BAT 3 Upper */
-	SPROEA_DBAT3L       = 0x21f,    /* R/W  Data BAT 3 Lower */
-	SPROEA_DABR         = 0x3f5,    /* R/W  Data Address Breakpoint Register */
+	SPROEA_DSISR        = 0x012,    // R/W  DSI Status Register
+	SPROEA_DAR          = 0x013,    // R/W  Data Address Register
+	SPROEA_DEC          = 0x016,    // R/W  Decrementer Register
+	SPROEA_SDR1         = 0x019,    // R/W  Page Table Configuration
+	SPROEA_SRR0         = 0x01a,    // R/W  Machine Status Save/Restore Register 0
+	SPROEA_SRR1         = 0x01b,    // R/W  Machine Status Save/Restore Register 1
+	SPROEA_SPRG0        = 0x110,    // R/W  SPR General 0
+	SPROEA_SPRG1        = 0x111,    // R/W  SPR General 1
+	SPROEA_SPRG2        = 0x112,    // R/W  SPR General 2
+	SPROEA_SPRG3        = 0x113,    // R/W  SPR General 3
+	SPROEA_ASR          = 0x118,    // R/W  Address Space Register (64-bit only)
+	SPROEA_EAR          = 0x11a,    // R/W  External Access Register
+	SPROEA_PVR          = 0x11f,    // R    Processor Version Number
+	SPROEA_IBAT0U       = 0x210,    // R/W  Instruction BAT 0 Upper
+	SPROEA_IBAT0L       = 0x211,    // R/W  Instruction BAT 0 Lower
+	SPROEA_IBAT1U       = 0x212,    // R/W  Instruction BAT 1 Upper
+	SPROEA_IBAT1L       = 0x213,    // R/W  Instruction BAT 1 Lower
+	SPROEA_IBAT2U       = 0x214,    // R/W  Instruction BAT 2 Upper
+	SPROEA_IBAT2L       = 0x215,    // R/W  Instruction BAT 2 Lower
+	SPROEA_IBAT3U       = 0x216,    // R/W  Instruction BAT 3 Upper
+	SPROEA_IBAT3L       = 0x217,    // R/W  Instruction BAT 3 Lower
+	SPROEA_DBAT0U       = 0x218,    // R/W  Data BAT 0 Upper
+	SPROEA_DBAT0L       = 0x219,    // R/W  Data BAT 0 Lower
+	SPROEA_DBAT1U       = 0x21a,    // R/W  Data BAT 1 Upper
+	SPROEA_DBAT1L       = 0x21b,    // R/W  Data BAT 1 Lower
+	SPROEA_DBAT2U       = 0x21c,    // R/W  Data BAT 2 Upper
+	SPROEA_DBAT2L       = 0x21d,    // R/W  Data BAT 2 Lower
+	SPROEA_DBAT3U       = 0x21e,    // R/W  Data BAT 3 Upper
+	SPROEA_DBAT3L       = 0x21f,    // R/W  Data BAT 3 Lower
+	SPROEA_DABR         = 0x3f5,    // R/W  Data Address Breakpoint Register
 
 	// PowerPC 4XX SPR register indexes
-	SPR4XX_SRR0         = 0x01a,    /* R/W  403GA Machine Status Save/Restore Register 0 */
-	SPR4XX_SRR1         = 0x01b,    /* R/W  403GA Machine Status Save/Restore Register 1 */
-	SPR4XX_SPRG0        = 0x110,    /* R/W  403GA SPR General 0 */
-	SPR4XX_SPRG1        = 0x111,    /* R/W  403GA SPR General 1 */
-	SPR4XX_SPRG2        = 0x112,    /* R/W  403GA SPR General 2 */
-	SPR4XX_SPRG3        = 0x113,    /* R/W  403GA SPR General 3 */
-	SPR4XX_PVR          = 0x11f,    /* R    403GA Processor Version Number */
-	SPR4XX_PID          = 0x3b1,    /* R/W  403GCX Process ID */
-	SPR4XX_SGR          = 0x3b9,    /* R/W  403GCX Storage Guarded Register */
-	SPR4XX_DCWR         = 0x3ba,    /* R/W  403GCX Data Cache Write Through */
-	SPR4XX_TBHU         = 0x3cc,    /* R/W  403GCX Time Base High User-mode */
-	SPR4XX_TBLU         = 0x3cd,    /* R/W  403GCX Time Base Low User-mode */
-	SPR4XX_ICDBDR       = 0x3d3,    /* R    403GA 406GA Instruction Cache Debug Data Register */
-	SPR4XX_ESR          = 0x3d4,    /* R/W  403GA 406GA Exception Syndrome Register */
-	SPR4XX_DEAR         = 0x3d5,    /* R    403GA 406GA Data Exception Address Register */
-	SPR4XX_EVPR         = 0x3d6,    /* R/W  403GA 406GA Exception Vector Prefix Register */
-	SPR4XX_CDBCR        = 0x3d7,    /* R/W  403GA 406GA Cache Debug Control Register */
-	SPR4XX_TSR          = 0x3d8,    /* R/C  403GA 406GA Timer Status Register */
-	SPR4XX_TCR          = 0x3da,    /* R/W  403GA 406GA Timer Control Register */
-	SPR4XX_PIT          = 0x3db,    /* R/W  403GA 406GA Programmable Interval Timer */
-	SPR4XX_TBHI         = 0x3dc,    /* R/W  403GA 406GA Time Base High */
-	SPR4XX_TBLO         = 0x3dd,    /* R/W  403GA 406GA Time Base Low */
-	SPR4XX_SRR2         = 0x3de,    /* R/W  403GA 406GA Machine Status Save/Restore Register 2 */
-	SPR4XX_SRR3         = 0x3df,    /* R/W  403GA 406GA Machine Status Save/Restore Register 3 */
-	SPR4XX_DBSR         = 0x3f0,    /* R/C  403GA 406GA Debug Status Register */
-	SPR4XX_DBCR         = 0x3f2,    /* R/W  403GA 406GA Debug Control Register */
-	SPR4XX_IAC1         = 0x3f4,    /* R/W  403GA 406GA Instruction Address Compare 1 */
-	SPR4XX_IAC2         = 0x3f5,    /* R/W  403GA 406GA Instruction Address Compare 2 */
-	SPR4XX_DAC1         = 0x3f6,    /* R/W  403GA 406GA Data Address Compare 1 */
-	SPR4XX_DAC2         = 0x3f7,    /* R/W  403GA 406GA Data Address Compare 2 */
-	SPR4XX_DCCR         = 0x3fa,    /* R/W  403GA 406GA Data Cache Cacheability Register */
-	SPR4XX_ICCR         = 0x3fb,    /* R/W  403GA 406GA Instruction Cache Cacheability Registe */
-	SPR4XX_PBL1         = 0x3fc,    /* R/W  403GA 406GA Protection Bound Lower 1 */
-	SPR4XX_PBU1         = 0x3fd,    /* R/W  403GA 406GA Protection Bound Upper 1 */
-	SPR4XX_PBL2         = 0x3fe,    /* R/W  403GA 406GA Protection Bound Lower 2 */
-	SPR4XX_PBU2         = 0x3ff,    /* R/W  403GA 406GA Protection Bound Upper 2 */
+	SPR4XX_SRR0         = 0x01a,    // R/W  403GA Machine Status Save/Restore Register 0
+	SPR4XX_SRR1         = 0x01b,    // R/W  403GA Machine Status Save/Restore Register 1
+	SPR4XX_SPRG0        = 0x110,    // R/W  403GA SPR General 0
+	SPR4XX_SPRG1        = 0x111,    // R/W  403GA SPR General 1
+	SPR4XX_SPRG2        = 0x112,    // R/W  403GA SPR General 2
+	SPR4XX_SPRG3        = 0x113,    // R/W  403GA SPR General 3
+	SPR4XX_PVR          = 0x11f,    // R    403GA Processor Version Number
+	SPR4XX_PID          = 0x3b1,    // R/W  403GCX Process ID
+	SPR4XX_SGR          = 0x3b9,    // R/W  403GCX Storage Guarded Register
+	SPR4XX_DCWR         = 0x3ba,    // R/W  403GCX Data Cache Write Through
+	SPR4XX_TBHU         = 0x3cc,    // R/W  403GCX Time Base High User-mode
+	SPR4XX_TBLU         = 0x3cd,    // R/W  403GCX Time Base Low User-mode
+	SPR4XX_ICDBDR       = 0x3d3,    // R    403GA 406GA Instruction Cache Debug Data Register
+	SPR4XX_ESR          = 0x3d4,    // R/W  403GA 406GA Exception Syndrome Register
+	SPR4XX_DEAR         = 0x3d5,    // R    403GA 406GA Data Exception Address Register
+	SPR4XX_EVPR         = 0x3d6,    // R/W  403GA 406GA Exception Vector Prefix Register
+	SPR4XX_CDBCR        = 0x3d7,    // R/W  403GA 406GA Cache Debug Control Register
+	SPR4XX_TSR          = 0x3d8,    // R/C  403GA 406GA Timer Status Register
+	SPR4XX_TCR          = 0x3da,    // R/W  403GA 406GA Timer Control Register
+	SPR4XX_PIT          = 0x3db,    // R/W  403GA 406GA Programmable Interval Timer
+	SPR4XX_TBHI         = 0x3dc,    // R/W  403GA 406GA Time Base High
+	SPR4XX_TBLO         = 0x3dd,    // R/W  403GA 406GA Time Base Low
+	SPR4XX_SRR2         = 0x3de,    // R/W  403GA 406GA Machine Status Save/Restore Register 2
+	SPR4XX_SRR3         = 0x3df,    // R/W  403GA 406GA Machine Status Save/Restore Register 3
+	SPR4XX_DBSR         = 0x3f0,    // R/C  403GA 406GA Debug Status Register
+	SPR4XX_DBCR         = 0x3f2,    // R/W  403GA 406GA Debug Control Register
+	SPR4XX_IAC1         = 0x3f4,    // R/W  403GA 406GA Instruction Address Compare 1
+	SPR4XX_IAC2         = 0x3f5,    // R/W  403GA 406GA Instruction Address Compare 2
+	SPR4XX_DAC1         = 0x3f6,    // R/W  403GA 406GA Data Address Compare 1
+	SPR4XX_DAC2         = 0x3f7,    // R/W  403GA 406GA Data Address Compare 2
+	SPR4XX_DCCR         = 0x3fa,    // R/W  403GA 406GA Data Cache Cacheability Register
+	SPR4XX_ICCR         = 0x3fb,    // R/W  403GA 406GA Instruction Cache Cacheability Register
+	SPR4XX_PBL1         = 0x3fc,    // R/W  403GA 406GA Protection Bound Lower 1
+	SPR4XX_PBU1         = 0x3fd,    // R/W  403GA 406GA Protection Bound Upper 1
+	SPR4XX_PBL2         = 0x3fe,    // R/W  403GA 406GA Protection Bound Lower 2
+	SPR4XX_PBU2         = 0x3ff,    // R/W  403GA 406GA Protection Bound Upper 2
 
 	// PowerPC 601 POWER back compatibility SPR indexes
-	SPR601_MQ           = 0x000,    /* R/W  Muliplicand/Quotient for 601 POWER instructions */
-	SPR601_RTCUR_PWR    = 0x004,    /* R    Counts up number set in SPR 20 once per second, POWER only */
-	SPR601_RTCLR_PWR    = 0x005,    /* R    Number of nanoseconds between the seconds counted in SPR 4 */
-	SPR601_PWRDEC       = 0x006,    /* R    Decrementer register mirror for POWER compatibilty */
-	SPR601_RTCUW_PWR    = 0x014,    /* W    Seconds counter, set here and read SPR 4 */
-	SPR601_RTCLW_PWR    = 0x015,    /* W    Nanoseconds counter, not clear what writing here does */
+	SPR601_MQ           = 0x000,    // R/W  Muliplicand/Quotient for 601 POWER instructions
+	SPR601_RTCUR_PWR    = 0x004,    // R    Counts up number set in SPR 20 once per second, POWER only
+	SPR601_RTCLR_PWR    = 0x005,    // R    Number of nanoseconds between the seconds counted in SPR 4
+	SPR601_PWRDEC       = 0x006,    // R    Decrementer register mirror for POWER compatibilty
+	SPR601_RTCUW_PWR    = 0x014,    // W    Seconds counter, set here and read SPR 4
+	SPR601_RTCLW_PWR    = 0x015,    // W    Nanoseconds counter, not clear what writing here does
 
 	// PowerPC 602 SPR register indexes
-	SPR602_TCR          = 0x3d8,    /* 602 */
-	SPR602_IBR          = 0x3da,    /* 602 */
-	SPR602_ESASRR       = 0x3db,    /* 602 */
-	SPR602_SEBR         = 0x3de,    /* 602 */
-	SPR602_SER          = 0x3df,    /* 602 */
-	SPR602_SP           = 0x3fd,    /* 602 */
-	SPR602_LT           = 0x3fe,    /* 602 */
+	SPR602_TCR          = 0x3d8,    // 602
+	SPR602_IBR          = 0x3da,    // 602
+	SPR602_ESASRR       = 0x3db,    // 602
+	SPR602_SEBR         = 0x3de,    // 602
+	SPR602_SER          = 0x3df,    // 602
+	SPR602_SP           = 0x3fd,    // 602
+	SPR602_LT           = 0x3fe,    // 602
 
 	// PowerPC 603 SPR register indexes
-	SPR603_TBL_R        = 0x10c,    /* R   603 Time Base Low (Read-only) */
-	SPR603_TBU_R        = 0x10d,    /* R   603 Time Base High (Read-only) */
-	SPR603_TBL_W        = 0x11c,    /* W   603 Time Base Low (Write-only) */
-	SPR603_TBU_W        = 0x11d,    /* W   603 Time Base Hight (Write-only) */
-	SPR603_DMISS        = 0x3d0,    /* R   603 Data TLB Miss Address Register */
-	SPR603_DCMP         = 0x3d1,    /* R   603 Data TLB Compare Register */
-	SPR603_HASH1        = 0x3d2,    /* R   603 Primary Hash Address Register */
-	SPR603_HASH2        = 0x3d3,    /* R   603 Secondary Hash Address Register */
-	SPR603_IMISS        = 0x3d4,    /* R   603 Instruction TLB Miss Address Register */
-	SPR603_ICMP         = 0x3d5,    /* R   603 Instruction TLB Compare Register */
-	SPR603_RPA          = 0x3d6,    /* R/W 603 Required Physical Address Register */
-	SPR603_HID0         = 0x3f0,    /* R/W 603 Hardware Implementation Register 0 */
-	SPR603_HID1         = 0x3f1,    /* R/W 603 Hardware Implementation Register 1 */
-	SPR603_IABR         = 0x3f2,    /* R/W 603 Instruction Address Breakpoint Register */
-	SPR603_HID2         = 0x3f3     /* R/W 603 */
+	SPR603_TBL_R        = 0x10c,    // R   603 Time Base Low (Read-only)
+	SPR603_TBU_R        = 0x10d,    // R   603 Time Base High (Read-only)
+	SPR603_TBL_W        = 0x11c,    // W   603 Time Base Low (Write-only)
+	SPR603_TBU_W        = 0x11d,    // W   603 Time Base Hight (Write-only)
+	SPR603_DMISS        = 0x3d0,    // R   603 Data TLB Miss Address Register
+	SPR603_DCMP         = 0x3d1,    // R   603 Data TLB Compare Register
+	SPR603_HASH1        = 0x3d2,    // R   603 Primary Hash Address Register
+	SPR603_HASH2        = 0x3d3,    // R   603 Secondary Hash Address Register
+	SPR603_IMISS        = 0x3d4,    // R   603 Instruction TLB Miss Address Register
+	SPR603_ICMP         = 0x3d5,    // R   603 Instruction TLB Compare Register
+	SPR603_RPA          = 0x3d6,    // R/W 603 Required Physical Address Register
+	SPR603_HID0         = 0x3f0,    // R/W 603 Hardware Implementation Register 0
+	SPR603_HID1         = 0x3f1,    // R/W 603 Hardware Implementation Register 1
+	SPR603_IABR         = 0x3f2,    // R/W 603 Instruction Address Breakpoint Register
+	SPR603_HID2         = 0x3f3     // R/W 603
 };
 
 // PowerPC 4XX DCR register indexes
@@ -261,13 +261,14 @@ enum
 };
 
 // FPSCR register bits
-#define FPSCR_FX            0x80000000
-#define FPSCR_FEX           0x40000000
-#define FPSCR_VX            0x20000000
-#define FPSCR_OX            0x10000000
-#define FPSCR_UX            0x08000000
-#define FPSCR_ZX            0x04000000
-#define FPSCR_XX            0x02000000
+#define FPSCR_FX            0x80000000  // at least one exception bit is set
+#define FPSCR_FEX           0x40000000  // at least one *enabled* exception bit is set
+#define FPSCR_VX            0x20000000  // invalid FP operation
+#define FPSCR_OX            0x10000000  // overflow
+#define FPSCR_UX            0x08000000  // underflow
+#define FPSCR_ZX            0x04000000  // divide by zero
+#define FPSCR_XX            0x02000000  // inexact
+#define FPSCR_X_MASK        0x3e000000  // VX|OX|UX|ZX|XX
 #define FPSCR_VXSNAN        0x01000000  // invalid: signaling NaN
 #define FPSCR_VXISI         0x00800000  // invalid: inf - inf */
 #define FPSCR_VXIDI         0x00400000  // invalid: inf / inf */
@@ -281,9 +282,12 @@ enum
 #define FPSCR_UE            0x00000020  // underflow enable
 #define FPSCR_ZE            0x00000010  // zero divide enable
 #define FPSCR_XE            0x00000008  // inexact enable
+#define FPSCR_ENABLE_MASK   0x000000F8  // mask for all exception enable bits
 #define FPSCR_VX_ANY        0x01F80700  // OR of all invalid-operation sub-bits
 
 // bit positions of FPSCR register bits
+#define FPSCR_OX_BIT        28
+#define FPSCR_ZX_BIT        26
 #define FPSCR_VXSNAN_BIT    24
 #define FPSCR_VXISI_BIT     23
 #define FPSCR_VXIDI_BIT     22
@@ -293,6 +297,17 @@ enum
 #define FPSCR_VXSQRT_BIT    9
 #define FPSCR_VXCVI_BIT     8
 
+// FPRF definitions (Table 2-2 in the 601 User's Manual)
+#define FPRF_MASK           0x0001f000
+#define FPRF_NEG_DENORM     0x00018000
+#define FPRF_POS_DENORM     0x00014000
+#define FPRF_NEG_ZERO       0x00012000
+#define FPRF_QUIET_NAN      0x00011000
+#define FPRF_NEG_INF        0x00009000
+#define FPRF_POS_INF        0x00005000
+#define FPRF_NEG_NORMAL     0x00008000
+#define FPRF_POS_NORMAL     0x00004000
+#define FPRF_POS_ZERO       0x00002000
 
 // XER register bits
 #define XER_SO              0x80000000
@@ -332,6 +347,9 @@ enum
 
 // Machine State Register bits - 603
 #define MSR603_TGPR         0x00020000  /* Temporary GPR Remapping */
+
+// Checkstop Sources and Enables Register bits - 601
+#define SPR601_HID0_LM      0x00000008  /* Little Endian */
 
 // ESA Save and Restore Register bits - 602
 #define SPR602_ESASRR_EE    0x00000001  /* External Interrupt Enable */

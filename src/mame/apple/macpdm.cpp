@@ -39,10 +39,12 @@ class macpdm_state : public driver_device
 public:
 	macpdm_state(const machine_config &mconfig, device_type type, const char *tag);
 
-	void macpdm(machine_config &config);
+	void macpdm(machine_config &config) ATTR_COLD;
 
-	void driver_init();
-	virtual void driver_reset() override;
+	void driver_init() ATTR_COLD;
+
+protected:
+	virtual void driver_reset() override ATTR_COLD;
 
 private:
 	required_device<ppc_device> m_maincpu;
@@ -355,11 +357,13 @@ void macpdm_state::irq_control_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
-		if((m_irq_control ^ data) & 0x40) {
+		if ((m_irq_control ^ data) & 0x40)
+		{
 			m_irq_control = (m_irq_control & ~0xc0) | (data & 0x40);
 			m_maincpu->set_input_line(PPC_IRQ, CLEAR_LINE);
 		}
-		if((data & 0xc0) == 0xc0 && (m_irq_control & 0x80)) {
+		if ((data & 0xc0) == 0xc0 && (m_irq_control & 0x80))
+		{
 			m_irq_control &= 0x7f;
 			m_maincpu->set_input_line(PPC_IRQ, CLEAR_LINE);
 		}
@@ -373,14 +377,20 @@ void macpdm_state::irq_main_set(uint8_t mask, int state)
 
 	m_irq_control ^= mask;
 
-	if(m_irq_control & 0x40) {
+	if (m_irq_control & 0x40)
+	{
 		m_irq_control |= 0x80;
 		m_maincpu->set_input_line(PPC_IRQ, ASSERT_LINE);
-	} else {
-		if(m_irq_control & 0x3f) {
+	}
+	else
+	{
+		if (m_irq_control & 0x3f)
+		{
 			m_irq_control |= 0x80;
 			m_maincpu->set_input_line(PPC_IRQ, ASSERT_LINE);
-		} else {
+		}
+		else
+		{
 			m_irq_control &= 0x7f;
 			m_maincpu->set_input_line(PPC_IRQ, CLEAR_LINE);
 		}
@@ -391,7 +401,7 @@ void macpdm_state::irq_main_set(uint8_t mask, int state)
 
 void macpdm_state::via2_irq_main_set(uint8_t mask, int state)
 {
-	if(((m_via2_ifr & mask) != 0) == state)
+	if (((m_via2_ifr & mask) != 0) == state)
 		return;
 
 	m_via2_ifr ^= mask;
@@ -402,7 +412,7 @@ void macpdm_state::via2_irq_main_set(uint8_t mask, int state)
 
 void macpdm_state::via2_irq_slot_set(uint8_t mask, int state)
 {
-	if(((m_via2_sifr & mask) == 0) == state)
+	if (((m_via2_sifr & mask) == 0) == state)
 		return;
 
 	m_via2_sifr ^= mask;
@@ -481,7 +491,7 @@ uint8_t macpdm_state::via2_ier_r()
 
 void macpdm_state::via2_ier_w(uint8_t data)
 {
-	if(data & 0x80)
+	if (data & 0x80)
 		m_via2_ier |= data & 0x3b;
 	else
 		m_via2_ier &= ~data;
@@ -508,7 +518,7 @@ uint8_t macpdm_state::via2_sier_r()
 
 void macpdm_state::via2_sier_w(uint8_t data)
 {
-	if(data & 0x80)
+	if (data & 0x80)
 		m_via2_sier |= data & 0x78;
 	else
 		m_via2_sier &= ~data;
@@ -529,7 +539,8 @@ uint8_t macpdm_state::via2_sifr_r()
 
 void macpdm_state::via2_sifr_w(uint8_t data)
 {
-	if(data & (~m_via2_sifr) & 0x40) {
+	if (data & (~m_via2_sifr) & 0x40)
+	{
 		m_via2_sifr |= 0x40;
 		via2_irq_main_set(0x02, ((~m_via2_sifr) & m_via2_sier) != 0);
 	}
@@ -559,21 +570,31 @@ void macpdm_state::scsi_w(offs_t offset, uint8_t data)
 uint8_t macpdm_state::hmc_r(offs_t offset)
 {
 	const uint8_t rv = (m_hmc_reg >> m_hmc_bit) & 1;
-	m_hmc_bit++;
+	if (!machine().side_effects_disabled())
+		m_hmc_bit++;
 	return rv;
 }
 
 void macpdm_state::hmc_w(offs_t offset, uint8_t data)
 {
-	if(offset & 8)
+	if (offset & 8)
+	{
 		m_hmc_bit = 0;
-	else {
-		if(data & 1)
+	}
+	else
+	{
+		if (data & 1)
+		{
 			m_hmc_buffer |= u64(1) << m_hmc_bit;
+		}
 		else
+		{
 			m_hmc_buffer &= ~(u64(1) << m_hmc_bit);
-		m_hmc_bit ++;
-		if(m_hmc_bit == 35) {
+		}
+
+		m_hmc_bit++;
+		if (m_hmc_bit == 35)
+		{
 			m_hmc_reg = m_hmc_buffer & ~3; // csiz is readonly, we pretend there isn't a l2 cache
 			m_video->set_vram_offset(m_hmc_reg & 0x200000000 ? 0 : 0x100000);
 			ram_size();
@@ -647,11 +668,15 @@ void macpdm_state::ram_size(){
 		}
 
 		// install a complete image of RAM A in the slot above the top of memory (which is actually where the ROM code looks for it)
-		const u32 alias_base = (sizes[config] * 2);
+		const u32 alias_base = 0x10000000;
 		space.install_ram(alias_base, alias_base + simm_size - 1, 0, (void *)ram_a);
 
 		// install RAM B
-		const u32 b_base = 0x8000000;
+		const u32 b_base = (config != 0) ? (sizes[config] * 2) : 0x08000000;    // B base is 32 megs for config 0
+		if (b_base == alias_base)
+		{
+			space.unmap_readwrite(alias_base, alias_base + simm_size - 1);
+		}
 		space.install_ram(b_base, b_base + simm_size - 1, 0, (void *)ram_b);
 
 		if (simm_size < 8*1024*1024)
@@ -671,7 +696,7 @@ uint8_t macpdm_state::diag_r(offs_t offset)
 
 void macpdm_state::phases_w(uint8_t phases)
 {
-	if(m_cur_floppy)
+	if (m_cur_floppy)
 		m_cur_floppy->seek_phase_w(phases);
 }
 
@@ -682,9 +707,9 @@ void macpdm_state::sel35_w(int sel35)
 
 void macpdm_state::devsel_w(uint8_t devsel)
 {
-	if(devsel == 1)
+	if (devsel == 1)
 		m_cur_floppy = m_floppy[0]->get_device();
-	else if(devsel == 2)
+	else if (devsel == 2)
 		m_cur_floppy = m_floppy[1]->get_device();
 	else
 		m_cur_floppy = nullptr;
@@ -693,11 +718,11 @@ void macpdm_state::devsel_w(uint8_t devsel)
 
 void macpdm_state::hdsel_w(int hdsel)
 {
-	if(m_cur_floppy)
+	if (m_cur_floppy)
 		m_cur_floppy->ss_w(hdsel);
 }
 
-uint32_t macpdm_state::id_r(offs_t offset,uint32_t mem_mask)
+uint32_t macpdm_state::id_r(offs_t offset, uint32_t mem_mask)
 {
 	// Real hardware doesn't return the right value on a 32 bit sized access.
 	// The actual value returned is unknown, but the 0xA55A signature must NOT match when
@@ -815,23 +840,29 @@ void macpdm_state::dma_scsi_a_step()
 {
 	m_dma_scsi_a_in_step = true;
 
-	if(m_dma_scsi_a_ctrl & 0x40) {
-		while(m_via2_ifr & 0x01) {
-			if(m_dma_scsi_buffer_word_count == 0) {
+	if (m_dma_scsi_a_ctrl & 0x40)
+	{
+		while (m_via2_ifr & 0x01)
+		{
+			if (m_dma_scsi_buffer_word_count == 0)
+			{
 				m_dma_scsi_buffer_word_count = 4;
 				m_dma_scsi_buffer = m_maincpu->space().read_qword(m_dma_scsi_a_base_adr + m_dma_scsi_a_cur_offset);
 				m_dma_scsi_a_cur_offset += 8;
 			}
-			m_dma_scsi_buffer_word_count --;
+			m_dma_scsi_buffer_word_count--;
 			m_ncr53c94->dma16_swap_w(m_dma_scsi_buffer >> (16*m_dma_scsi_buffer_word_count));
 		}
-
-	} else {
-		while(m_via2_ifr & 0x01) {
+	}
+	else
+	{
+		while (m_via2_ifr & 0x01)
+		{
 			uint16_t w = m_ncr53c94->dma16_swap_r();
 			m_dma_scsi_buffer = (m_dma_scsi_buffer & ~(u64(0xffff) << (48 - 16*m_dma_scsi_buffer_word_count))) | (u64(w) << (48 - 16*m_dma_scsi_buffer_word_count));
-			m_dma_scsi_buffer_word_count ++;
-			if(m_dma_scsi_buffer_word_count == 4) {
+			m_dma_scsi_buffer_word_count++;
+			if(m_dma_scsi_buffer_word_count == 4)
+			{
 				m_dma_scsi_buffer_word_count = 0;
 				m_maincpu->space().write_qword(m_dma_scsi_a_base_adr + m_dma_scsi_a_cur_offset, m_dma_scsi_buffer);
 				m_dma_scsi_a_cur_offset += 8;
@@ -850,7 +881,7 @@ void macpdm_state::scsi_irq(int state)
 void macpdm_state::scsi_drq(int state)
 {
 	via2_irq_main_set(0x01, state);
-	if((m_dma_scsi_a_ctrl & 0x02) && (m_via2_ifr & 0x01) && !m_dma_scsi_a_in_step)
+	if ((m_dma_scsi_a_ctrl & 0x02) && (m_via2_ifr & 0x01) && !m_dma_scsi_a_in_step)
 		dma_scsi_a_step();
 }
 
@@ -890,29 +921,34 @@ void macpdm_state::dma_scsi_a_ctrl_w(uint8_t data)
 {
 	// the boot ROM expects bits 2 and 3 to read and write in order to ID a production AMIC and set the correct boxFlag
 	m_dma_scsi_a_ctrl = data & 0x4e;
-	if(data & 1) {
+	if (data & 1)
+	{
 		m_dma_scsi_a_ctrl &= 0x40;
 		m_dma_scsi_a_cur_offset = 0;
 		m_dma_scsi_buffer_word_count = 0;
 	}
-	if(data & 0x10) {
-		while(m_via2_ifr & 0x01) {
+	if (data & 0x10)
+	{
+		while (m_via2_ifr & 0x01)
+		{
 			uint16_t w = m_ncr53c94->dma16_swap_r();
 			m_dma_scsi_buffer = (m_dma_scsi_buffer & ~(u64(0xffff) << (48 - 16*m_dma_scsi_buffer_word_count))) | (u64(w) << (48 - 16*m_dma_scsi_buffer_word_count));
-			m_dma_scsi_buffer_word_count ++;
-			if(m_dma_scsi_buffer_word_count == 4) {
+			m_dma_scsi_buffer_word_count++;
+			if (m_dma_scsi_buffer_word_count == 4)
+			{
 				m_dma_scsi_buffer_word_count = 0;
 				m_maincpu->space().write_qword(m_dma_scsi_a_base_adr + m_dma_scsi_a_cur_offset, m_dma_scsi_buffer);
 				m_dma_scsi_a_cur_offset += 8;
 			}
 		}
-		if(m_dma_scsi_buffer_word_count) {
+		if (m_dma_scsi_buffer_word_count)
+		{
 			m_maincpu->space().write_qword(m_dma_scsi_a_base_adr + m_dma_scsi_a_cur_offset, m_dma_scsi_buffer);
 			m_dma_scsi_buffer_word_count = 0;
 		}
 	}
 
-	if((m_dma_scsi_a_ctrl & 0x02) && (m_via2_ifr & 0x01) && !m_dma_scsi_a_in_step)
+	if ((m_dma_scsi_a_ctrl & 0x02) && (m_via2_ifr & 0x01) && !m_dma_scsi_a_in_step)
 		dma_scsi_a_step();
 
 	logerror("dma_scsi_a_ctrl_w %02x\n", m_dma_scsi_a_ctrl);
@@ -927,7 +963,8 @@ void macpdm_state::dma_scsi_b_ctrl_w(uint8_t data)
 {
 	// Channel B is not actually connected to anything
 	m_dma_scsi_b_ctrl = data & 0x42;
-	if(data & 1) {
+	if (data & 1)
+	{
 		m_dma_scsi_b_ctrl &= 0x40;
 		m_dma_scsi_b_cur_offset = 0;
 	}
@@ -955,12 +992,13 @@ uint8_t macpdm_state::dma_floppy_ctrl_r()
 void macpdm_state::dma_floppy_ctrl_w(uint8_t data)
 {
 	m_dma_floppy_ctrl = (m_dma_floppy_ctrl & 0x80) | (data & 0x4a);
-	if(data & 0x01) {
+	if (data & 0x01)
+	{
 		m_dma_floppy_ctrl &= 0x7f;
 		m_dma_floppy_offset = 0;
 	}
 
-	if(data & 0x80)
+	if (data & 0x80)
 		m_dma_floppy_ctrl &= 0x7f;
 
 	logerror("dma floppy ctrl %02x\n", m_dma_floppy_ctrl);
@@ -999,17 +1037,22 @@ void macpdm_state::dma_floppy_step()
 {
 	m_dma_floppy_in_step = true;
 
-	if(m_dma_floppy_ctrl & 0x40) {
+	if (m_dma_floppy_ctrl & 0x40)
+	{
 		fatalerror("floppy dma write\n");
 
-	} else {
-		while(m_floppy_drq) {
+	}
+	else
+	{
+		while (m_floppy_drq)
+		{
 			u8 r = m_fdc->dma_r();
 			m_maincpu->space().write_byte(m_dma_floppy_adr + m_dma_floppy_offset, r);
 			m_dma_floppy_offset ++;
 			m_dma_floppy_byte_count --;
 			//          logerror("dma_w %03x, %02x\n", m_dma_floppy_offset, r);
-			if(m_dma_floppy_byte_count == 0) {
+			if (m_dma_floppy_byte_count == 0)
+			{
 				m_dma_floppy_ctrl &= ~0x02;
 				m_dma_floppy_ctrl |= 0x80;
 				logerror("dma floppy done\n");
@@ -1025,7 +1068,7 @@ void macpdm_state::dma_floppy_step()
 void macpdm_state::fdc_drq(int state)
 {
 	m_floppy_drq = state;
-	if((m_dma_floppy_ctrl & 0x02) && m_floppy_drq && !m_dma_floppy_in_step)
+	if ((m_dma_floppy_ctrl & 0x02) && m_floppy_drq && !m_dma_floppy_in_step)
 		dma_floppy_step();
 }
 
@@ -1170,7 +1213,7 @@ void macpdm_state::pdm_map(address_map &map)
 
 void macpdm_state::macpdm(machine_config &config)
 {
-	PPC601(config, m_maincpu, 60000000);
+	PPC601(config, m_maincpu, 60'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpdm_state::pdm_map);
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 

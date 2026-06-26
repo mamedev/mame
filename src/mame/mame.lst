@@ -597,6 +597,11 @@ s3000xl
 cd3000i
 cd3000xl
 
+@source:akai/s900.cpp
+s900
+s950
+s950scsi
+
 @source:akai/x7000.cpp
 s612
 s700
@@ -2774,16 +2779,16 @@ pwrinst2a
 pwrinst2j
 pwrinst2ja
 sailormn
+sailormne
 sailormnh
-sailormnj
 sailormnk
-sailormnn
+sailormnne
 sailormnnh
 sailormnnj
 sailormnnk
 sailormnnt
 sailormnnu
-sailormno
+sailormnoe
 sailormnoh
 sailormnoj
 sailormnok
@@ -17216,6 +17221,9 @@ bit90
 @source:coleco/wrinkles.cpp
 wrinkles
 
+@source:colonial/sb80.cpp
+sb80
+
 @source:comad/funybubl.cpp
 funybubl
 funybublc
@@ -20224,7 +20232,32 @@ scrablexa
 tmbaskb
 
 @source:handheld/hh_mediatek_mt6260a.cpp
-sonicwtc
+atw_avbp
+atw_barb
+atw_batm
+atw_dp
+atw_enc
+atw_fz
+atw_fz2
+atw_gaby
+atw_hpot
+atw_jwld
+atw_lilo
+atw_lol
+atw_lola
+atw_mine
+atw_mv
+atw_mva
+atw_paw
+atw_pepa
+atw_pok
+atw_rbh
+atw_ryan
+atw_soni
+atw_spdm
+atw_swst
+atw_swy
+atw_toys
 
 @source:handheld/hh_pic16.cpp
 drdunk
@@ -33165,10 +33198,11 @@ smotor
 
 @source:misc/smsmcorp.cpp
 secondch
-sureshot
-smsjoker
 sms4in1
 sms4in1a
+smsjoker
+smsjokera
+sureshot
 trvhang
 trvhanga
 
@@ -35524,6 +35558,7 @@ gamezn2
 hs36blk
 hs36red
 joysti30
+lg600fr
 lxnoddy
 majgnc
 majkon
@@ -35580,6 +35615,7 @@ cybar120
 dturbogt
 gujtv108
 joypad65
+lxplasma
 mc_dcat8
 mc_dcat8a
 msiwwe
@@ -35686,6 +35722,7 @@ lxcmcyfzb
 lxcmcyls
 lxcmcypj
 lxcmcypp
+lxcmcypp75
 lxcmcyppa
 lxcmcysp
 lxcmcyspa
@@ -38443,6 +38480,7 @@ grand_l3
 grand_l4
 hs_l3
 hs_l4
+hs_uc
 rdkng_l1
 rdkng_l2
 rdkng_l3
@@ -41847,6 +41885,7 @@ abcopd
 abcopj
 abcopjd
 aburner
+aburner131
 aburner2
 aburner2g
 gprider
@@ -45674,6 +45713,9 @@ pitnrunb
 pkspirit
 shun
 
+@source:taito/pres2k.cpp
+pres2k
+
 @source:taito/qix.cpp
 complexx
 elecyoyo
@@ -47249,6 +47291,10 @@ pasopia
 pasopia7
 pasopia7lcd
 
+@source:toshiba/t250.cpp
+t200
+t250
+
 @source:trainer/amico2k.cpp
 amico2k
 
@@ -47414,6 +47460,7 @@ omar2
 rbitgen
 
 @source:tvgames/elan_ep3a19a.cpp
+lexiig10
 tvbg3a
 tvbg3b
 tvbg3c
@@ -47659,6 +47706,7 @@ sstarkar
 
 @source:tvgames/spg29x.cpp
 bratzlfe
+gameclik
 hyprscan
 jak_bbh
 jak_bbsf
@@ -47807,6 +47855,7 @@ jak_xmenp
 jak_capc
 jak_care
 jak_dbz
+jak_dbza
 jak_disf
 jak_disn
 jak_dora
@@ -47844,10 +47893,11 @@ tvtchsb
 arcade3d
 cybrtvbb
 cybrtvfe
-lexizeus
-lexiseal
 discpal
 disppal
+lexiseal
+lexizeus
+pokermor
 vgcaplet
 vgcap35
 vsplus
@@ -49365,6 +49415,7 @@ notetakr
 
 @source:xerox/xerox820.cpp
 bigboard
+bigboard5
 mk82
 mk83
 mojmikro

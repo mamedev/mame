@@ -46,8 +46,12 @@ protected:
 	void intf_w(offs_t offset, u16 data);
 	u16 spa_r();
 	void spa_w(u16 data);
+	u16 timer01_r(offs_t offset);
+	void timer01_w(offs_t offset, u16 data);
 
 private:
+	TIMER_CALLBACK_MEMBER(timer01_interrupt);
+
 	u16 add(u16 s, u16 t, bool c) noexcept;
 	bool test_condition(u8 cond) const noexcept;
 	u16 read_program_word(u16 addr);
@@ -75,6 +79,10 @@ private:
 	u32 m_inte;
 	u32 m_intf;
 	u16 m_bank;
+	u8 m_trl[2];
+	u16 m_tcon[2];
+
+	emu_timer *m_timer01[2];
 };
 
 class emg2000a_device : public edsp_device
@@ -82,10 +90,38 @@ class emg2000a_device : public edsp_device
 public:
 	emg2000a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	// configuration
+	auto in_pa_callback() { return m_in_pa_cb.bind(); }
+	auto out_pa_callback() { return m_out_pa_cb.bind(); }
+	auto in_pb_callback() { return m_in_pb_cb.bind(); }
+
+protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
 private:
+	// internal address maps
 	void program_map(address_map &map);
 	void data_map(address_map &map);
 	void io_map(address_map &map);
+
+	u16 porta_r();
+	void porta_w(u16 data);
+	u16 portb_r();
+	u16 pdira_r();
+	void pdira_w(u16 data);
+	u16 pcona_r();
+	void pcona_w(u16 data);
+
+	// device callbacks
+	devcb_read16 m_in_pa_cb;
+	devcb_write16 m_out_pa_cb;
+	devcb_read8 m_in_pb_cb;
+
+	u16 m_pdata;
+	u16 m_pdira;
+	u16 m_pcona;
 };
 
 

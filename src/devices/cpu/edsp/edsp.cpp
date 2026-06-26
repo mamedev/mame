@@ -29,6 +29,9 @@ emg2000a_device::emg2000a_device(const machine_config &mconfig, const char *tag,
 		address_map_constructor(FUNC(emg2000a_device::program_map), this),
 		address_map_constructor(FUNC(emg2000a_device::data_map), this),
 		address_map_constructor(FUNC(emg2000a_device::io_map), this))
+	, m_in_pa_cb(*this, 0xffff)
+	, m_out_pa_cb(*this)
+	, m_in_pb_cb(*this, 0xff)
 {
 }
 
@@ -46,17 +49,25 @@ void emg2000a_device::data_map(address_map &map)
 	map(0x3400, 0x73ff).ram(); // 16KW VRAM
 	//map(0x8000, 0x8fff); // PPU Register
 	//map(0x9000, 0x9fff); // APU Register
+	map(0x9023, 0x9023).nopr();
 	map(0xe000, 0xe3ff).ram(); // Palette table
 }
 
 void emg2000a_device::io_map(address_map &map)
 {
 	map(0x01, 0x01).rw(FUNC(emg2000a_device::sr_r), FUNC(emg2000a_device::sr_w));
+	map(0x02, 0x02).ram(); // TODO: saved and restored during interrupts
 	map(0x03, 0x03).rw(FUNC(emg2000a_device::bank_r), FUNC(emg2000a_device::bank_w));
+	map(0x09, 0x09).rw(FUNC(emg2000a_device::porta_r), FUNC(emg2000a_device::porta_w));
+	map(0x0a, 0x0a).r(FUNC(emg2000a_device::portb_r));
 	map(0x0c, 0x0d).rw(FUNC(emg2000a_device::inte_r), FUNC(emg2000a_device::inte_w));
 	map(0x0e, 0x0f).rw(FUNC(emg2000a_device::intf_r), FUNC(emg2000a_device::intf_w));
 	map(0x13, 0x13).rw(FUNC(emg2000a_device::spa_r), FUNC(emg2000a_device::spa_w));
-	// TODO: I/O ports & everything else
+	map(0x14, 0x16).ram(); // TODO: saved and restored during interrupts
+	map(0x21, 0x21).rw(FUNC(emg2000a_device::pdira_r), FUNC(emg2000a_device::pdira_w));
+	map(0x24, 0x24).rw(FUNC(emg2000a_device::pcona_r), FUNC(emg2000a_device::pcona_w));
+	map(0x40, 0x43).rw(FUNC(emg2000a_device::timer01_r), FUNC(emg2000a_device::timer01_w));
+	// TODO: lots of other ports and registers
 }
 
 device_memory_interface::space_config_vector edsp_device::memory_space_config() const
@@ -96,6 +107,9 @@ void edsp_device::device_start()
 	state_add(EDSP_INTE, "INTE", m_inte);
 	state_add(EDSP_INTF, "INTF", m_intf);
 
+	for (int n = 0; n < 2; n++)
+		m_timer01[n] = timer_alloc(FUNC(edsp_device::timer01_interrupt), this);
+
 	save_item(NAME(m_pc));
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_sp));
@@ -108,6 +122,17 @@ void edsp_device::device_start()
 	save_item(NAME(m_inte));
 	save_item(NAME(m_intf));
 	save_item(NAME(m_bank));
+	save_item(NAME(m_trl));
+	save_item(NAME(m_tcon));
+}
+
+void emg2000a_device::device_start()
+{
+	edsp_device::device_start();
+
+	save_item(NAME(m_pdata));
+	save_item(NAME(m_pdira));
+	save_item(NAME(m_pcona));
 }
 
 void edsp_device::device_reset()
@@ -121,6 +146,22 @@ void edsp_device::device_reset()
 	m_inte = 0;
 	m_intf = 0;
 	m_bank = 0;
+
+	for (int n = 0; n < 2; n++)
+	{
+		m_trl[n] = 0;
+		m_tcon[n] = 0;
+		m_timer01[n]->enable(false);
+	}
+}
+
+void emg2000a_device::device_reset()
+{
+	edsp_device::device_reset();
+
+	m_pdata = 0;
+	m_pdira = 0;
+	m_pcona = 0;
 }
 
 u16 edsp_device::sr_r()
@@ -177,6 +218,83 @@ u16 edsp_device::spa_r()
 void edsp_device::spa_w(u16 data)
 {
 	m_sp = data;
+}
+
+u16 emg2000a_device::porta_r()
+{
+	return (m_in_pa_cb() & ~m_pdira) | (m_pdata & m_pdira);
+}
+
+void emg2000a_device::porta_w(u16 data)
+{
+	m_pdata = data;
+	if (m_pdira)
+		m_out_pa_cb(0, m_pdata | ~m_pdira, m_pdira);
+}
+
+u16 emg2000a_device::portb_r()
+{
+	// TODO: data direction
+	return m_in_pb_cb();
+}
+
+u16 emg2000a_device::pdira_r()
+{
+	return m_pdira;
+}
+
+void emg2000a_device::pdira_w(u16 data)
+{
+	m_pdira = data;
+	m_out_pa_cb(0, m_pdata | ~m_pdira, m_pdira);
+}
+
+u16 emg2000a_device::pcona_r()
+{
+	return m_pcona;
+}
+
+void emg2000a_device::pcona_w(u16 data)
+{
+	m_pcona = data;
+}
+
+u16 edsp_device::timer01_r(offs_t offset)
+{
+	if (BIT(offset, 0))
+		return m_tcon[offset >> 1];
+	else
+		return m_trl[offset >> 1];
+}
+
+void edsp_device::timer01_w(offs_t offset, u16 data)
+{
+	const int which = offset >> 1;
+	if (BIT(offset, 0))
+	{
+		m_tcon[which] = data;
+		if (BIT(data, 15) && !m_timer01[which]->enabled())
+		{
+			const attotime period = clocks_to_attotime((m_trl[which] + 1) << (m_tcon[which] + 6));
+			logerror("Timer %d enabled at %.3f Hz\n", which, period.as_hz());
+			m_timer01[which]->adjust(period, which);
+		}
+		else if (!BIT(data, 15) && m_timer01[which]->enabled())
+		{
+			logerror("Timer %d disabled\n", which);
+			m_timer01[which]->enable(false);
+		}
+	}
+	else
+		m_trl[which] = BIT(data, 0, 8);
+}
+
+TIMER_CALLBACK_MEMBER(edsp_device::timer01_interrupt)
+{
+	m_intf |= 1 << (param + 1);
+
+	const attotime period = clocks_to_attotime((m_trl[param] + 1) << (m_tcon[param] + 6));
+	m_timer01[param]->adjust(period, param);
 }
 
 u16 edsp_device::add(u16 s, u16 t, bool c) noexcept
@@ -319,7 +437,7 @@ void edsp_device::execute_run()
 				}
 
 				if (BIT(op, 3, 2) == 1)
-					m_data.write_word(BIT(op, 8, 3), d);
+					m_data.write_word(m_r[BIT(op, 8, 3)], d);
 				else
 					m_r[BIT(op, 8, 3)] = d;
 				m_icount -= 1;
@@ -373,7 +491,7 @@ void edsp_device::execute_run()
 			}
 			else if ((op & 0xf8ff) == 0x3817)
 			{
-				// RPT
+				// RPT Rn
 				m_rcr = m_r[BIT(op, 8, 3)];
 				m_icount -= 1;
 			}
@@ -397,6 +515,17 @@ void edsp_device::execute_run()
 				m_sp--;
 				m_pc = addr;
 				m_icount -= 2;
+			}
+			else if (op == 0x381a)
+			{
+				// NOP
+				m_icount -= 1;
+			}
+			else if ((op & 0xf81f) == 0x381f)
+			{
+				// RPT #imm6
+				m_rcr = BIT(op, 5, 6);
+				m_icount -= 1;
 			}
 			else if (op == 0x383a)
 			{
@@ -423,12 +552,25 @@ void edsp_device::execute_run()
 				m_sp -= BIT(op, 5, 6);
 				m_icount -= 1;
 			}
+			else if ((op & 0xff18) == 0x4000)
+			{
+				// MUL (signs unknown, assuming UU for now)
+				const u32 d = u32(m_r[BIT(op, 5, 3)]) * m_r[BIT(op, 0, 3)];
+				m_r[0] = BIT(d, 0, 16);
+				m_r[1] = BIT(d, 16, 16);
+				m_icount -= 1;
+			}
 			else if ((op & 0xfe18) == 0x4818)
 			{
 				// CMP
 				const u16 s = BIT(op, 8) ? m_data.read_word(m_r[BIT(op, 5, 3)]) : m_r[BIT(op, 5, 3)];
 				const u16 t = m_r[BIT(op, 0, 3)];
 				(void)add(s, ~t, true);
+				m_icount -= 1;
+			}
+			else if ((op & 0xf81f) == 0x5801)
+			{
+				m_r[BIT(op, 8, 3)] = m_r[BIT(op, 5, 3)];
 				m_icount -= 1;
 			}
 			else if ((op & 0xf81f) == 0x5803)
@@ -457,15 +599,37 @@ void edsp_device::execute_run()
 				m_r[BIT(op, 8, 3)] = data;
 				m_icount -= 1;
 			}
+			else if ((op & 0xf81f) == 0x5808)
+			{
+				// ASR
+				const u16 s = m_r[BIT(op, 5, 3)];
+				m_r[BIT(op, 8, 3)] = s16(s) >> 1;
+				m_sr = (m_sr & 0xfff0) | (s16(s) < 0 ? 0x0008 : 0) | (s16(s) >> 1 ? 0 : 0x0004) | (BIT(s, 0) ? 0x0001 : 0);
+				m_icount -= 1;
+			}
 			else if ((op & 0xf81f) == 0x5809)
 			{
 				const u16 data = read_program_word(m_r[BIT(op, 5, 3)]);
 				m_r[BIT(op, 8, 3)] = data;
 				m_icount -= 2; // TODO: repeat timing
 			}
+			else if ((op & 0xf81f) == 0x580a)
+			{
+				// SHR
+				const u16 s = m_r[BIT(op, 5, 3)];
+				m_r[BIT(op, 8, 3)] = s >> 1;
+				m_sr = (m_sr & 0xfff0) | (s >> 1 ? 0 : 0x0004) | (BIT(s, 0) ? 0x0003 : 0);
+				m_icount -= 1;
+			}
+			else if ((op & 0xf81f) == 0x580b)
+			{
+				const u16 data = read_program_word(m_r[BIT(op, 5, 3)]);
+				m_r[BIT(op, 5, 3)]++;
+				m_r[BIT(op, 8, 3)] = data;
+				m_icount -= 2; // TODO: repeat timing
+			}
 			else if ((op & 0xf81f) == 0x580f)
 			{
-				// TODO: banking
 				const u16 data = read_program_word(m_r[BIT(op, 5, 3)]);
 				m_r[BIT(op, 5, 3)]++;
 				m_data.write_word(m_r[BIT(op, 8, 3)], data);

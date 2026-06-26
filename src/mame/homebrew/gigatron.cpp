@@ -10,9 +10,13 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/gigatron/gigatron.h"
-#include "screen.h"
+#include "machine/ram.h"
 #include "sound/dac.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 
 #include "gigatron.lh"
@@ -20,9 +24,8 @@
 
 namespace {
 
-#define MAIN_CLOCK 6250000
-#define VSYNC      0x80
-#define HSYNC      0x40
+static constexpr uint8_t VSYNC = 0x80;
+static constexpr uint8_t HSYNC = 0x40;
 
 /***************************************************************************
 
@@ -30,6 +33,8 @@ namespace {
 
     Hook up a quikload for loading .gt1 files
     HLE the keyboard and Pluggy McPlugface
+    RAM expander support
+    Add support for later revision BIOS
 
 ***************************************************************************/
 
@@ -45,43 +50,44 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_dac(*this, "dac")
+		, m_ram(*this, RAM_TAG)
 		, m_screen(*this, "screen")
 		, m_io_inputs(*this, "GAMEPAD")
 		, m_blinken(*this, "blinken%u", 1U)
 	{
 	}
 
-	void gigatron(machine_config &config);
+	void gigatron(machine_config &config) ATTR_COLD;
 
-private:
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
+protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 	virtual void video_reset() override ATTR_COLD;
 
-	void prog_map(address_map &map) ATTR_COLD;
-	void data_map(address_map &map) ATTR_COLD;
-
-	uint8_t m_lights; //blinkenlights
-
-	//Video Generation stuff
-	uint8_t m_out;
-	int16_t m_row;
-	int16_t m_col;
-	uint8_t m_pixel;
-
-	uint8_t m_dacoutput;
-
+private:
 	void port_outx(uint8_t data);
 	void port_out(uint8_t data);
 
-	std::unique_ptr<bitmap_rgb32> m_bitmap_render;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void prog_map(address_map &map) ATTR_COLD;
+
+	uint8_t m_lights = 0; //blinkenlights
+
+	//Video Generation stuff
+	uint8_t m_out = 0;
+	int16_t m_row = 0;
+	int16_t m_col = 0;
+	uint8_t m_pixel = 0;
+
+	uint8_t m_dacoutput = 0;
+
+	bitmap_ind16 m_bitmap_render;
 
 	required_device<gigatron_cpu_device> m_maincpu;
 	required_device<dac_byte_interface> m_dac;
+	required_device<ram_device> m_ram;
 	required_device<screen_device> m_screen;
 	required_ioport m_io_inputs;
 
@@ -94,21 +100,19 @@ private:
 
 void gigatron_state::video_start()
 {
-	m_bitmap_render = std::make_unique<bitmap_rgb32>(640, 480);
+	m_bitmap_render.allocate(640, 480);
 }
 
 void gigatron_state::video_reset()
 {
-	uint32_t *dest = &m_bitmap_render->pix(0, 0);
-	for(uint32_t i = 0; i < 640*480; i++)
-		*dest++ = 0;
+	m_bitmap_render.fill(0);
 }
 
 void gigatron_state::port_out(uint8_t data)
 {
 	m_pixel = data;
-	uint8_t out = m_pixel;
-	uint8_t falling = m_out & ~out;
+	const uint8_t out = m_pixel;
+	const uint8_t falling = m_out & ~out;
 
 	if (falling & VSYNC)
 	{
@@ -129,22 +133,19 @@ void gigatron_state::port_out(uint8_t data)
 		return;
 	}
 
-	if((m_row >= 0 && m_row < 480) && (m_col >= 0 && m_col < 640))
+	if ((m_row >= 0 && m_row < 480) && (m_col >= 0 && m_col < 640))
 	{
-		uint8_t r = (out << 6) & 0xC0;
-		uint8_t g = (out << 4) & 0xC0;
-		uint8_t b = (out << 2) & 0xC0;
-		uint32_t *dest = &m_bitmap_render->pix(m_row, m_col);
-		for(uint8_t i = 0; i < 4; i++)
-			*dest++ = b|(g<<8)|(r<<16);
+		uint16_t *const dest = &m_bitmap_render.pix(m_row, m_col);
+		const uint8_t color = out & 0x3f;
+		for (uint8_t i = 0; i < 4; i++)
+			dest[i] = color;
 	}
 	m_col += 4;
 }
 
-//6-bit color, VGA
-uint32_t gigatron_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t gigatron_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	copybitmap(bitmap, *m_bitmap_render, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, m_bitmap_render, 0, 0, 0, 0, cliprect);
 	video_reset();
 
 	m_blinken[0] = BIT(m_lights, 3);
@@ -162,11 +163,6 @@ uint32_t gigatron_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 void gigatron_state::prog_map(address_map &map)
 {
 	map(0x0000, 0xffff).rom().region("maincpu", 0);
-}
-
-void gigatron_state::data_map(address_map &map)
-{
-	map(0x0000, 0xffff).ram();
 }
 
 //**************************************************************************
@@ -187,6 +183,11 @@ INPUT_PORTS_END
 
 void gigatron_state::machine_start()
 {
+	address_space &ram_space = m_maincpu->space(AS_DATA);
+	ram_space.unmap_readwrite(0x0000, 0xffff);
+	// external RAM has 8 bit data bus
+	ram_space.install_ram(0x0000, m_ram->size() - 1, m_ram->pointer<uint8_t>());
+
 	// Save state stuff
 	save_item(NAME(m_lights));
 	save_item(NAME(m_out));
@@ -210,11 +211,11 @@ void gigatron_state::machine_reset()
 void gigatron_state::port_outx(uint8_t data)
 {
 	//Write sound to DAC
-	m_dacoutput = (data & 0xF0) >> 4;
+	m_dacoutput = (data & 0xf0) >> 4;
 	m_dac->write(m_dacoutput);
 
 	//Blinkenlights
-	m_lights = data & 0xF;
+	m_lights = data & 0xf;
 }
 
 void gigatron_state::gigatron(machine_config &config)
@@ -225,19 +226,24 @@ void gigatron_state::gigatron(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	DAC_4BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	GTRON(config, m_maincpu, MAIN_CLOCK);
+	GTRON(config, m_maincpu, 6'250'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gigatron_state::prog_map);
-	m_maincpu->set_addrmap(AS_DATA, &gigatron_state::data_map);
 	m_maincpu->outx_cb().set(FUNC(gigatron_state::port_outx));
 	m_maincpu->out_cb().set(FUNC(gigatron_state::port_out));
 	m_maincpu->ir_cb().set_ioport("GAMEPAD").invert();
 
+	RAM(config, m_ram).set_default_size("64K").set_extra_options("32K");
+
 	/* video hardware */
-	screen_device &m_screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	m_screen.set_refresh_hz(59.98);
-	m_screen.set_size(640, 480);
-	m_screen.set_visarea(0, 640-1, 0, 480-1);
-	m_screen.set_screen_update(FUNC(gigatron_state::screen_update));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(59.98);
+	m_screen->set_size(640, 480);
+	m_screen->set_visarea(0, 640-1, 0, 480-1);
+	m_screen->set_screen_update(FUNC(gigatron_state::screen_update));
+	m_screen->set_palette("palette");
+
+	// 6-bit color, VGA
+	PALETTE(config, "palette", palette_device::BGR_222);
 }
 
 ROM_START( gigatron )

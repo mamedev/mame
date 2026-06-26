@@ -71,7 +71,7 @@ public:
 
 	auto int_req_callback() { return m_int_req_callback.bind(); }
 	auto pri_out_callback() { return m_pri_out_callback.bind(); }
-	template <typename... T> void set_int_daisy_chain_callback(T &&... args) { m_int_daisy_chain_callback.set(std::forward<T>(args)...); }
+	auto int_daisy_chain_callback() { return m_int_daisy_chain_callback.bind(); }
 
 	virtual uint8_t read(offs_t offset);
 	virtual void write(offs_t offset, uint8_t data);
@@ -81,13 +81,12 @@ public:
 
 	virtual TIMER_CALLBACK_MEMBER(timer_callback);
 
-	IRQ_CALLBACK_MEMBER(int_acknowledge);
+	u16 int_acknowledge();
 
 protected:
 	f3853_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -99,7 +98,7 @@ protected:
 
 	devcb_write_line m_int_req_callback;
 	devcb_write_line m_pri_out_callback;
-	device_irq_acknowledge_delegate m_int_daisy_chain_callback;
+	devcb_read16 m_int_daisy_chain_callback;
 
 	uint16_t m_int_vector; // Bit 7 is set to 0 for timer interrupts, 1 for external interrupts
 	u8 m_prescaler;

@@ -70,7 +70,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
+	required_device<f8_cpu_device> m_mcu;
 	required_device<f38t56_device> m_psu;
 	required_device<hlcd0538_device> m_lcd1;
 	required_device<hlcd0539_device> m_lcd2;
@@ -357,7 +357,7 @@ void savant_state::savant(machine_config &config)
 	F8(config, m_mcu, 4_MHz_XTAL/2);
 	m_mcu->set_addrmap(AS_PROGRAM, &savant_state::mcu_map);
 	m_mcu->set_addrmap(AS_IO, &savant_state::mcu_io);
-	m_mcu->set_irq_acknowledge_callback("psu", FUNC(f38t56_device::int_acknowledge));
+	m_mcu->int_cycle_callback().set(m_psu, FUNC(f38t56_device::int_acknowledge));
 
 	F38T56(config, m_psu, 4_MHz_XTAL/2);
 	m_psu->set_int_vector(0x0020);

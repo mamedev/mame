@@ -10,7 +10,7 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
 		<notes><![CDATA[
-Garbage layer covering title and gameplay
+Garbage layer covering title and gameplay (fixed)
 [FDC] randomly doesn't boot
 ]]></notes>
 		<info name="alt_title" value="アランティアＶＡスペシャル" />
@@ -42,7 +42,8 @@ Garbage layer covering title and gameplay
 		<year>1989</year>
 		<publisher>呉ソフトウェア工房 (Kure Software Koubou)</publisher>
 		<notes><![CDATA[
-Text boxes often don't draw properly, making readability hard
+[gfx] Text boxes often don't draw properly, making readability hard. Comes from graphic layer not IDP.
+[gfx] bitmap draws desynced when scrolling up for a bit, OFY wrap?
 ]]></notes>
 		<info name="alt_title" value="ファーストクイーン" />
 		<info name="release" value="198901xx" />
@@ -96,7 +97,7 @@ Text boxes often don't draw properly, making readability hard
 		<year>1988</year>
 		<publisher>ハミングバード (HummingBird)</publisher>
 		<notes><![CDATA[
-[FDC] randomly black screen
+[FDC] randomly black screen or throws file disk errors
 ]]></notes>
 		<info name="alt_title" value="ロードス島戦記 灰色の魔女" />
 		<info name="release" value="198809xx" />

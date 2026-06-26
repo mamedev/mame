@@ -123,7 +123,7 @@ void ct486_state::ct486(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ct486_state::ct486_io);
 	m_maincpu->set_irq_acknowledge_callback("cs4031", FUNC(cs4031_device::int_ack_r));
 
-	CS4031(config, m_cs4031, XTAL(25'000'000), "maincpu", "isa", "bios", "keybc", RAM_TAG);
+	CS4031(config, m_cs4031, XTAL(25'000'000), "maincpu", "bios", "keybc", RAM_TAG);
 	// cpu connections
 	m_cs4031->hold().set(FUNC(ct486_state::cs4031_hold));
 	m_cs4031->nmi().set_inputline("maincpu", INPUT_LINE_NMI);
@@ -236,19 +236,16 @@ void ct486_state::ast611(machine_config &config)
 //**************************************************************************
 
 ROM_START( ct486 )
-	ROM_REGION(0x40000, "isa", ROMREGION_ERASEFF)
 	ROM_REGION(0x100000, "bios", 0)
 	ROM_LOAD("chips_1.ami", 0xf0000, 0x10000, CRC(a14a7511) SHA1(b88d09be66905ed2deddc26a6f8522e7d2d6f9a8))
 ROM_END
 
 ROM_START( ast6000 )
-	ROM_REGION(0x40000, "isa", ROMREGION_ERASEFF)
 	ROM_REGION(0x100000, "bios", 0)
 	ROM_LOAD("ast6000.bin", 0xe0000, 0x20000, CRC(8982ac34) SHA1(07c10a8857bb91fc673c4299b17214e9ebad4524))
 ROM_END
 
 ROM_START( ast611 )
-	ROM_REGION(0x40000, "isa", ROMREGION_ERASEFF)
 	ROM_REGION(0x100000, "bios", 0)
 	ROM_LOAD("ast_611s.bin", 0xe0000, 0x20000, CRC(5e7a4eef) SHA1(955a346d882298ad623d9a31079b059d28e43b9e))
 ROM_END

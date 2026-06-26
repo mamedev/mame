@@ -65,6 +65,34 @@ void adc10_device::sound_stream_update(sound_stream &stream)
 
 DEFINE_DEVICE_TYPE(ADC10, adc10_device, "adc10", "10-bit signed ADC")
 
+adc12_device::adc12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ADC12, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	m_stream(nullptr),
+	m_current_value(0)
+{
+}
+
+u16 adc12_device::read()
+{
+	m_stream->update();
+	return m_current_value;
+}
+
+void adc12_device::device_start()
+{
+	save_item(NAME(m_current_value));
+	m_stream = stream_alloc(1, 0, clock() ? clock() : SAMPLE_RATE_INPUT_ADAPTIVE);
+}
+
+void adc12_device::sound_stream_update(sound_stream &stream)
+{
+	sound_stream::sample_t last_sample = stream.get(0, stream.samples()-1);
+	m_current_value = std::clamp(int(2048 * last_sample), -2048, 2047);
+}
+
+DEFINE_DEVICE_TYPE(ADC12, adc12_device, "adc12", "12-bit signed ADC")
+
 adc16_device::adc16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ADC16, tag, owner, clock),
 	device_sound_interface(mconfig, *this),

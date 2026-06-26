@@ -1337,6 +1337,8 @@ if BUSES["C64"] then
 	files {
 		MAME_DIR .. "src/devices/bus/c64/exp.cpp",
 		MAME_DIR .. "src/devices/bus/c64/exp.h",
+		MAME_DIR .. "src/devices/bus/c64/action_replay.cpp",
+		MAME_DIR .. "src/devices/bus/c64/action_replay.h",
 		MAME_DIR .. "src/devices/bus/c64/buscard.cpp",
 		MAME_DIR .. "src/devices/bus/c64/buscard.h",
 		MAME_DIR .. "src/devices/bus/c64/buscard2.cpp",
@@ -2921,8 +2923,8 @@ if BUSES["ISA"] then
 		MAME_DIR .. "src/devices/bus/isa/num9rev.h",
 		MAME_DIR .. "src/devices/bus/isa/omti8621.cpp",
 		MAME_DIR .. "src/devices/bus/isa/omti8621.h",
-		MAME_DIR .. "src/devices/bus/isa/opus100pm.cpp",
-		MAME_DIR .. "src/devices/bus/isa/opus100pm.h",
+		MAME_DIR .. "src/devices/bus/isa/opus_pm.cpp",
+		MAME_DIR .. "src/devices/bus/isa/opus_pm.h",
 		MAME_DIR .. "src/devices/bus/isa/p1_fdc.cpp",
 		MAME_DIR .. "src/devices/bus/isa/p1_fdc.h",
 		MAME_DIR .. "src/devices/bus/isa/p1_hdc.cpp",
@@ -4027,6 +4029,7 @@ end
 --@src/devices/bus/nscsi/devices.h,BUSES["NSCSI"] = true
 --@src/devices/bus/nscsi/hd.h,BUSES["NSCSI"] = true
 --@src/devices/bus/nscsi/s1410.h,BUSES["NSCSI"] = true
+--@src/devices/bus/nscsi/sa1403d.h,BUSES["NSCSI"] = true
 ---------------------------------------------------
 
 if BUSES["NSCSI"] then
@@ -4063,6 +4066,8 @@ if BUSES["NSCSI"] then
 		MAME_DIR .. "src/devices/bus/nscsi/pc98_hd.h",
 		MAME_DIR .. "src/devices/bus/nscsi/s1410.cpp",
 		MAME_DIR .. "src/devices/bus/nscsi/s1410.h",
+		MAME_DIR .. "src/devices/bus/nscsi/sa1403d.cpp",
+		MAME_DIR .. "src/devices/bus/nscsi/sa1403d.h",
 		MAME_DIR .. "src/devices/bus/nscsi/smoc501.cpp",
 		MAME_DIR .. "src/devices/bus/nscsi/smoc501.h",
 		MAME_DIR .. "src/devices/bus/nscsi/tape.cpp",
@@ -4356,6 +4361,8 @@ if BUSES["PC98_CBUS"] then
 		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_55.h",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_86.cpp",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_86.h",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_96.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_96.h",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_118.cpp",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_118.h",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/pcfxga.cpp",

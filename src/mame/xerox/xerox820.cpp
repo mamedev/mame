@@ -62,6 +62,7 @@
 #include "speaker.h"
 
 #include "formats/flopimg.h"
+#include "formats/imd_dsk.h"
 
 
 /* Read/Write Handlers */
@@ -257,8 +258,21 @@ void xerox820_state::kbpio_pa_w(uint8_t data)
 	/* drive select */
 	floppy_image_device *floppy = nullptr;
 
-	if (BIT(data, 0)) floppy = m_floppy0->get_device();
-	if (BIT(data, 1)) floppy = m_floppy1->get_device();
+	if (m_drvsel_binary)
+	{
+		// Big Board: the low 2 bits are a binary drive-unit number (drive 0 = 00),
+		// demuxed to one select line.  The Xerox 820 instead uses one bit per drive.
+		switch (data & 0x03)
+		{
+		case 0: floppy = m_floppy0->get_device(); break;
+		case 1: floppy = m_floppy1->get_device(); break;
+		}
+	}
+	else
+	{
+		if (BIT(data, 0)) floppy = m_floppy0->get_device();
+		if (BIT(data, 1)) floppy = m_floppy1->get_device();
+	}
 
 	m_fdc->set_floppy(floppy);
 
@@ -429,6 +443,12 @@ static void xerox820_floppies(device_slot_interface &device)
 	device.option_add("sa850", FLOPPY_8_DSDD); // Shugart SA-850
 }
 
+// Big Board 8" CP/M disks ship as IMD images.
+static void bigboard_floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_IMD_FORMAT);
+}
+
 void xerox820_state::update_nmi()
 {
 	int halt = m_maincpu->state_int(Z80_HALT);
@@ -531,6 +551,15 @@ void bigboard_state::machine_reset()
 	m_beeper->set_state(0);
 
 	m_fdc->reset();
+
+	// The Big Board's monitor selects drives by a binary unit number in the low
+	// bits of the system PIO port (drive 0 = 0), not the Xerox 820's bit-per-drive.
+	m_drvsel_binary = true;
+
+	// 8" Shugart drives spin continuously (no motor-control line); force the
+	// motor on so the WD1771 sees READY for the boot ROM's RESTORE.
+	if (floppy_image_device *fd = m_floppy0->get_device()) fd->mon_w(0);
+	if (floppy_image_device *fd = m_floppy1->get_device()) fd->mon_w(0);
 }
 
 void xerox820ii_state::machine_reset()
@@ -666,6 +695,31 @@ void xerox820_state::xerox820(machine_config &config)
 void bigboard_state::bigboard(machine_config &config)
 {
 	xerox820(config);
+
+	// The Big Board uses 8" SSSD drives (Shugart SA-800) read by the WD1771 in FM
+	// at the 8" 2 MHz clock, not the Xerox 820's 5.25" SA-400 at 1 MHz; its disks
+	// ship as IMD.
+	m_fdc->set_clock(20_MHz_XTAL / 10);
+	FLOPPY_CONNECTOR(config.replace(), FD1771_TAG":0", xerox820_floppies, "sa800", bigboard_floppy_formats);
+	FLOPPY_CONNECTOR(config.replace(), FD1771_TAG":1", xerox820_floppies, "sa800", bigboard_floppy_formats);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beeper, 950).add_route(ALL_OUTPUTS, "mono", 1.00); /* bigboard only */
+	TIMER(config, m_beep_timer).configure_generic(FUNC(bigboard_state::beep_timer));
+}
+
+void bigboard_state::bigboard5(machine_config &config)
+{
+	xerox820(config);
+
+	// A common field modification ran the Big Board from 5.25" SA-400 drives in
+	// place of the stock 8" SA-800.  The WD1771 (FM/single density) stays at its
+	// 5.25" 1 MHz clock (the Xerox 820 default), and the monitor auto-selects the
+	// 5.25" disk parameters from the drive's form factor (kbpio_pa_r bit 4).
+	FLOPPY_CONNECTOR(config.replace(), FD1771_TAG":0", xerox820_floppies, "sa400l", bigboard_floppy_formats);
+	FLOPPY_CONNECTOR(config.replace(), FD1771_TAG":1", xerox820_floppies, "sa400l", bigboard_floppy_formats);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 950).add_route(ALL_OUTPUTS, "mono", 1.00); /* bigboard only */
@@ -695,9 +749,9 @@ void xerox820ii_state::xerox820ii(machine_config &config)
 	/* devices */
 	Z80PIO(config, m_kbpio, 16_MHz_XTAL / 4);
 	m_kbpio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_kbpio->in_pa_callback().set(FUNC(xerox820_state::kbpio_pa_r));
-	m_kbpio->out_pa_callback().set(FUNC(xerox820_state::kbpio_pa_w));
-	m_kbpio->in_pb_callback().set(FUNC(xerox820_state::kbpio_pb_r));
+	m_kbpio->in_pa_callback().set(FUNC(xerox820ii_state::kbpio_pa_r));
+	m_kbpio->out_pa_callback().set(FUNC(xerox820ii_state::kbpio_pa_w));
+	m_kbpio->in_pb_callback().set(FUNC(xerox820ii_state::kbpio_pb_r));
 
 	z80pio_device& pio_gp(Z80PIO(config, Z80PIO_GP_TAG, 16_MHz_XTAL / 4));
 	pio_gp.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -714,11 +768,11 @@ void xerox820ii_state::xerox820ii(machine_config &config)
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
 	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
-	//TIMER(config, "ctc").configure_periodic(FUNC(xerox820_state::ctc_tick), attotime::from_hz(16_MHz_XTAL / 4));
+	//TIMER(config, "ctc").configure_periodic(FUNC(xerox820ii_state::ctc_tick), attotime::from_hz(16_MHz_XTAL / 4));
 
 	FD1797(config, m_fdc, 16_MHz_XTAL / 8);
-	m_fdc->intrq_wr_callback().set(FUNC(xerox820_state::fdc_intrq_w));
-	m_fdc->drq_wr_callback().set(FUNC(xerox820_state::fdc_drq_w));
+	m_fdc->intrq_wr_callback().set(FUNC(xerox820ii_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(xerox820ii_state::fdc_drq_w));
 	FLOPPY_CONNECTOR(config, FD1797_TAG":0", xerox820_floppies, "sa450", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, FD1797_TAG":1", xerox820_floppies, "sa450", floppy_image_device::default_mfm_floppy_formats);
 
@@ -766,7 +820,7 @@ void xerox820ii_state::xerox820ii(machine_config &config)
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("xerox820ii");
-	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(xerox820_state::quickload_cb));
+	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(xerox820ii_state::quickload_cb));
 }
 
 void xerox820ii_state::xerox168(machine_config &config)
@@ -797,6 +851,7 @@ ROM_START( bigboard )
 ROM_END
 
 #define rom_mk82 rom_bigboard
+#define rom_bigboard5 rom_bigboard
 
 ROM_START( x820 )
 	ROM_REGION( 0x1000, Z80_TAG, 0 )
@@ -856,10 +911,10 @@ ROM_START( x820ii )
 	ROMX_LOAD( "u35.5.0_537p10830.bin", 0x1000, 0x0800, CRC(278fa75f) SHA1(f47cf9eb30366211280f93a8460523fcc53eebe9), ROM_BIOS(5) )
 	ROMX_LOAD( "v500.u36", 0x1800, 0x0800, NO_DUMP, ROM_BIOS(5) )
 
-	ROM_SYSTEM_BIOS( 6, "v50v018", "Balcones Operating System v5.0 v018" ) // shows ROM ERROR
+	ROM_SYSTEM_BIOS( 6, "v50v018", "Balcones Operating System v5.0 v018" )
 	ROMX_LOAD( "537p10828.u33.5.0.bin", 0x0000, 0x0800, CRC(a17af0f1) SHA1(b1d9a151ed4558f49b3cdc1adbf348b54da48877), ROM_BIOS(6) )
 	ROMX_LOAD( "537p10829.u34.5.0.bin", 0x0800, 0x0800, CRC(c9f5182e) SHA1(ac830848614cea984c849a42687ea2944d6765d9), ROM_BIOS(6) )
-	ROMX_LOAD( "537p10830.u35.5.0.bin", 0x1000, 0x0800, BAD_DUMP CRC(cc4e1c2b) SHA1(375bbed76d9088dec82b9599cd810727d3e605f3), ROM_BIOS(6) )
+	ROMX_LOAD( "u35.5.0_537p10830.bin", 0x1000, 0x0800, CRC(278fa75f) SHA1(f47cf9eb30366211280f93a8460523fcc53eebe9), ROM_BIOS(6) ) // good dump (matches v50 u35); previously BAD_DUMP cc4e1c2b which caused ROM ERROR
 	ROMX_LOAD( "537p10831.u36.5.0.bin", 0x1800, 0x0800, CRC(cda7f598) SHA1(08ffd18959e1708136076c82486b8d121a04fa23), ROM_BIOS(6) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
@@ -930,10 +985,11 @@ ROM_END
 /* System Drivers */
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT     CLASS             INIT        COMPANY                       FULLNAME        FLAGS
-COMP( 1980, bigboard, 0,        0,      bigboard,   xerox820, bigboard_state,   empty_init, "Digital Research Computers", "Big Board",    MACHINE_NOT_WORKING )
-COMP( 1981, x820,     bigboard, 0,      xerox820,   xerox820, xerox820_state,   empty_init, "Xerox",                      "Xerox 820",    MACHINE_NO_SOUND_HW )
-COMP( 1982, mk82,     bigboard, 0,      bigboard,   xerox820, bigboard_state,   empty_init, "Scomar",                     "MK-82",        MACHINE_NOT_WORKING )
+COMP( 1980, bigboard, 0,        0,      bigboard,   xerox820, bigboard_state,   empty_init, "Digital Research Computers", "Big Board",                 0 )
+COMP( 1980, bigboard5,bigboard, 0,      bigboard5,  xerox820, bigboard_state,   empty_init, "Digital Research Computers", "Big Board (5.25\" drives)", MACHINE_NOT_WORKING )
+COMP( 1981, x820,     bigboard, 0,      xerox820,   xerox820, xerox820_state,   empty_init, "Xerox",                      "Xerox 820",                 MACHINE_NO_SOUND_HW )
+COMP( 1982, mk82,     bigboard, 0,      bigboard,   xerox820, bigboard_state,   empty_init, "Scomar",                     "MK-82",                     0 )
 COMP( 1983, x820ii,   0,        0,      xerox820ii, xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 820-II", MACHINE_NOT_WORKING )
 COMP( 1983, x168,     x820ii,   0,      xerox168,   xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8",   MACHINE_NOT_WORKING )
 COMP( 1983, mk83,     bigboard, 0,      mk83,       xerox820, xerox820_state,   empty_init, "Scomar",                     "MK-83",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1985, mojmikro, bigboard, 0,      bigboard,   xerox820, bigboard_state,   empty_init, "<unknown>",                  "Moj mikro Slovenija",  MACHINE_NOT_WORKING )
+COMP( 1985, mojmikro, bigboard, 0,      bigboard,   xerox820, bigboard_state,   empty_init, "<unknown>",                  "Moj mikro Slovenija",  0 )

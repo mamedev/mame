@@ -39,6 +39,7 @@
 #include "hdc.h"
 #include "lrk330.h"
 #include "omti8621.h"
+#include "opus_pm.h"
 #include "pd32.h"
 #include "ultra12f.h"
 #include "wd1002a_wx1.h"
@@ -105,7 +106,6 @@
 #include "chessmsr.h"
 #include "finalchs.h"
 #include "hpblp.h"
-#include "opus100pm.h"
 #include "pcat512me.h"
 #include "zxbus_adapter.h"
 
@@ -136,13 +136,15 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("fdc_ps2", ISA8_FDC_PS2);
 	device.option_add("fdc344", ISA8_FDC344);
 	device.option_add("fdcmag", ISA8_FDCMAG);
+	device.option_add("dsi32", ISA8_DSI32);
+	device.option_add("hdc", ISA8_HDC);
+	device.option_add("opus_pm100", ISA8_OPUS_PM100);
+	device.option_add("opus_pm110", ISA8_OPUS_PM110);
+	device.option_add("pd32", ISA8_PD32);
 	device.option_add("rt1000b", ISA8_RT1000B);
+	device.option_add("side116", ISA8_SIDE116);
 	device.option_add("wdxt_gen", ISA8_WDXT_GEN);
 	device.option_add("xtide", ISA8_XTIDE);
-	device.option_add("side116", ISA8_SIDE116);
-	device.option_add("hdc", ISA8_HDC);
-	device.option_add("dsi32", ISA8_DSI32);
-	device.option_add("pd32", ISA8_PD32);
 	device.option_add("adlib", ISA8_ADLIB);
 	device.option_add("hercules", ISA8_HERCULES);
 	device.option_add("gblaster", ISA8_GAME_BLASTER);
@@ -170,7 +172,6 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("babyblue2", ISA8_BABYBLUE2);
 	device.option_add("acb2072", ACB2072);
 	device.option_add("3xtwin", ISA8_3XTWIN);
-	device.option_add("opus108pm", ISA8_OPUS108PM);
 	device.option_add("ibm_speech", ISA8_IBM_SPEECH);
 	device.option_add("zxbus_adapter", ISA8_ZXBUS);
 	device.option_add("ubpnic", ISA8_UBPNIC);

@@ -243,7 +243,7 @@ void emax_state::emaxp(machine_config &config)
 
 void emax_state::emax2(machine_config &config)
 {
-	NS32016(config, m_maincpu, 20_MHz_XTAL / 2); // NS32CG16V-10 (FIXME)
+	NS32CG16(config, m_maincpu, 20_MHz_XTAL / 2); // NS32CG16V-10
 	m_maincpu->set_addrmap(AS_PROGRAM, &emax_state::emax2_map);
 
 	EEPROM_93C06_16BIT(config, "eeprom"); // NMC93C06N

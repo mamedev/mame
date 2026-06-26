@@ -72,8 +72,13 @@ public:
 		m_400_460(0)
 	{ }
 
-	void mk83(machine_config &config);
-	void xerox820(machine_config &config);
+	void mk83(machine_config &config) ATTR_COLD;
+	void xerox820(machine_config &config) ATTR_COLD;
+
+protected:
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
@@ -86,12 +91,6 @@ public:
 	uint8_t kbpio_pb_r();
 	void fdc_intrq_w(int state);
 	void fdc_drq_w(int state);
-
-protected:
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-
-	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 
 	void mk83_mem(address_map &map) ATTR_COLD;
 	void xerox820_io(address_map &map) ATTR_COLD;
@@ -130,6 +129,7 @@ protected:
 	bool m_fdc_drq = false;                     /* data request */
 	int m_8n5 = 0;                          /* 5.25" / 8" drive select */
 	int m_400_460 = 0;                      /* double sided disk detect */
+	bool m_drvsel_binary = false;           /* drive select: false = Xerox 820 bit-per-drive; true = Big Board binary unit# */
 };
 
 class bigboard_state : public xerox820_state
@@ -141,11 +141,13 @@ public:
 		, m_beep_timer(*this, "beep_timer")
 	{ }
 
-	void kbpio_pa_w(uint8_t data);
+	void bigboard(machine_config &config) ATTR_COLD;
+	void bigboard5(machine_config &config) ATTR_COLD;
 
-	void bigboard(machine_config &config);
 protected:
 	virtual void machine_reset() override ATTR_COLD;
+
+	void kbpio_pa_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(beep_timer);
 
@@ -165,22 +167,24 @@ public:
 	{
 	}
 
+	void rdpio_pb_w(uint8_t data);
+	void rdpio_pardy_w(int state);
+
+	void xerox168(machine_config &config) ATTR_COLD;
+	void xerox820ii(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+
 	void bell_w(offs_t offset, uint8_t data);
 	void slden_w(offs_t offset, uint8_t data);
 	void chrom_w(offs_t offset, uint8_t data);
 	void lowlite_w(uint8_t data);
 	void sync_w(offs_t offset, uint8_t data);
 
-	void rdpio_pb_w(uint8_t data);
-	void rdpio_pardy_w(int state);
-
-	void xerox168(machine_config &config);
-	void xerox820ii(machine_config &config);
 	void xerox168_mem(address_map &map) ATTR_COLD;
 	void xerox820ii_io(address_map &map) ATTR_COLD;
 	void xerox820ii_mem(address_map &map) ATTR_COLD;
-protected:
-	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<speaker_sound_device> m_speaker;
 	required_device<scsi_port_device> m_sasibus;

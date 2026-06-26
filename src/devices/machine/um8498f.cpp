@@ -44,7 +44,7 @@ um8498f_device::um8498f_device(const machine_config &mconfig, const char *tag, d
 
 void um8498f_device::device_add_mconfig(machine_config &config)
 {
-	AM9517A(config, m_dma[0]);
+	AM9517A(config, m_dma[0], 0);
 	m_dma[0]->out_hreq_callback().set(m_dma[1], FUNC(am9517a_device::dreq0_w));
 	m_dma[0]->out_eop_callback().set(FUNC(um8498f_device::dma1_eop_w));
 	m_dma[0]->in_memr_callback().set(FUNC(um8498f_device::dma_read_byte));
@@ -62,7 +62,7 @@ void um8498f_device::device_add_mconfig(machine_config &config)
 	m_dma[0]->out_dack_callback<2>().set(FUNC(um8498f_device::dma1_dack2_w));
 	m_dma[0]->out_dack_callback<3>().set(FUNC(um8498f_device::dma1_dack3_w));
 
-	AM9517A(config, m_dma[1]);
+	AM9517A(config, m_dma[1], 0);
 	m_dma[1]->out_hreq_callback().set(FUNC(um8498f_device::dma2_hreq_w));
 	m_dma[1]->in_memr_callback().set(FUNC(um8498f_device::dma_read_word));
 	m_dma[1]->out_memw_callback().set(FUNC(um8498f_device::dma_write_word));

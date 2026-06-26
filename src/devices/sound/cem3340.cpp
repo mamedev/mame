@@ -49,6 +49,7 @@ cem3340_device::cem3340_device(const machine_config &mconfig, const char *tag, d
 	configure_ramp_range(RAMP_MIN, RAMP_MAX);
 	configure_pulse_range(PULSE_MIN, PULSE_MAX);
 	configure_triangle_range(TRIANGLE_MIN, TRIANGLE_MAX);
+	configure_sync_type(SYNC_TYPE_REVERSE);
 }
 
 cem3340_device::cem3340_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)

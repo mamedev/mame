@@ -211,6 +211,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_dsp(*this, "dsp"),
 		m_watchdog(*this, "watchdog"),
+		m_eeprom(*this, "eeprom"),
 		m_k056230(*this, "k056230"),
 		m_k056800(*this, "k056800"),
 		m_workram(*this, "workram"),
@@ -220,9 +221,8 @@ public:
 		m_palette(*this, "palette"),
 		m_sharc_dataram(*this, "sharc_dataram"),
 		m_konppc(*this, "konppc"),
+		m_adc(*this, "adc0838"),
 		m_in(*this, "IN%u", 0U),
-		m_out4(*this, "OUT4"),
-		m_eepromout(*this, "EEPROMOUT"),
 		m_analog(*this, "ANALOG%u", 1U),
 		m_pcb_digit(*this, "pcbdigit%u", 0U),
 		m_wheel_motor(*this, "wheel_motor")
@@ -244,13 +244,15 @@ protected:
 	void k054539_irq_gen(int state);
 	double adc0838_callback(uint8_t input);
 
-	void sharc_memmap(address_map &map) ATTR_COLD;
+	void base_memmap(address_map &map) ATTR_COLD;
 	void sound_memmap(address_map &map) ATTR_COLD;
+	void sharc_memmap(address_map &map) ATTR_COLD;
 
 	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<adsp21062_device> m_dsp;
 	required_device<watchdog_timer_device> m_watchdog;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<k056230_device> m_k056230;
 	required_device<k056800_device> m_k056800;
 	required_shared_ptr<uint32_t> m_workram;
@@ -260,8 +262,8 @@ protected:
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint32_t> m_sharc_dataram;
 	required_device<konppc_device> m_konppc;
+	required_device<adc0838_device> m_adc;
 	required_ioport_array<5> m_in;
-	required_ioport m_out4, m_eepromout;
 	optional_ioport_array<3> m_analog;
 	output_finder<2> m_pcb_digit;
 	output_finder<> m_wheel_motor;
@@ -418,8 +420,10 @@ void zr107_state::sysreg_w(offs_t offset, uint8_t data)
 			    0x02 = EEPCLK
 			    0x01 = EEPDI
 			*/
-			m_eepromout->write(data & 0x07, 0xff);
-			m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+			m_audiocpu->set_input_line(INPUT_LINE_RESET, BIT(~data, 4));
+			m_eeprom->cs_write(BIT(data, 2));
+			m_eeprom->clk_write(BIT(data, 1));
+			m_eeprom->di_write(BIT(data, 0));
 			LOGSYSREG("System register 0 = %02X\n", data);
 			break;
 
@@ -439,7 +443,9 @@ void zr107_state::sysreg_w(offs_t offset, uint8_t data)
 			if (BIT(data, 6))    // CG Board 0 IRQ Ack
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 			m_konppc->set_cgboard_id((data >> 4) & 3);
-			m_out4->write(data, 0xff);
+			m_adc->cs_write(BIT(data, 2));
+			m_adc->di_write(BIT(data, 1));
+			m_adc->clk_write(BIT(data, 0));
 			LOGSYSREG("System register 1 = %02X\n", data);
 			break;
 
@@ -505,46 +511,53 @@ void zr107_state::machine_start()
 	save_item(NAME(m_sound_intck));
 }
 
-void midnrun_state::main_memmap(address_map &map)
+
+void zr107_state::base_memmap(address_map &map)
 {
 	map(0x00000000, 0x000fffff).ram().share(m_workram);
-	map(0x74000000, 0x74001fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)).mirror(0x2000);
-	map(0x74020000, 0x7402003f).rw(m_k056832, FUNC(k056832_device::word_r), FUNC(k056832_device::word_w));
-	map(0x74060000, 0x7406003f).rw(FUNC(midnrun_state::ccu_r), FUNC(midnrun_state::ccu_w));
-	map(0x74080000, 0x74081fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0x740a0000, 0x740a3fff).r(m_k056832, FUNC(k056832_device::rom_word_r));
+	map(0x00000000, 0x000fffff).ram().share(m_workram);
+
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc)); // 21N 21K 23N 23K
 	map(0x78010000, 0x7801ffff).w(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
 	map(0x78040000, 0x7804000f).rw(m_k001006_1, FUNC(k001006_device::read), FUNC(k001006_device::write));
 	map(0x780c0000, 0x780c0007).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
-	map(0x7e000000, 0x7e003fff).rw(FUNC(midnrun_state::sysreg_r), FUNC(midnrun_state::sysreg_w));
+
+	map(0x7e000000, 0x7e003fff).rw(FUNC(zr107_state::sysreg_r), FUNC(zr107_state::sysreg_w));
 	map(0x7e008000, 0x7e009fff).m(m_k056230, FUNC(k056230_device::regs_map));  // LANC registers
 	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::ram_r), FUNC(k056230_device::ram_w)); // LANC Buffer RAM (27E)
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
+
 	map(0x7f800000, 0x7f9fffff).rom().region("prgrom", 0);
 	map(0x7fe00000, 0x7fffffff).rom().region("prgrom", 0);
 }
 
 
+void midnrun_state::main_memmap(address_map &map)
+{
+	base_memmap(map);
+
+	map(0x74000000, 0x74001fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)).mirror(0x2000);
+	map(0x74020000, 0x7402003f).rw(m_k056832, FUNC(k056832_device::word_r), FUNC(k056832_device::word_w));
+	map(0x74060000, 0x7406003f).rw(FUNC(midnrun_state::ccu_r), FUNC(midnrun_state::ccu_w));
+	map(0x74080000, 0x74081fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x740a0000, 0x740a3fff).r(m_k056832, FUNC(k056832_device::rom_word_r));
+
+	//map(0x78080000, 0x780bffff) TODO 4X 8X 11X 15X 4Y 8Y 11Y 15Y
+}
+
+
 void jetwave_state::main_memmap(address_map &map)
 {
-	map(0x00000000, 0x000fffff).ram().share(m_workram);
+	base_memmap(map);
+
 	map(0x74000000, 0x740000ff).rw(m_k001604, FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w));
 	map(0x74010000, 0x7401ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x74020000, 0x7403ffff).rw(m_k001604, FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));
 	map(0x74040000, 0x7407ffff).rw(m_k001604, FUNC(k001604_device::char_r), FUNC(k001604_device::char_w));
-	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc)); // 21N 21K 23N 23K
-	map(0x78010000, 0x7801ffff).w(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
-	map(0x78040000, 0x7804000f).rw(m_k001006_1, FUNC(k001006_device::read), FUNC(k001006_device::write));
+
 	map(0x78080000, 0x7808000f).rw(m_k001006_2, FUNC(k001006_device::read), FUNC(k001006_device::write));
-	map(0x780c0000, 0x780c0007).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
-	map(0x7e000000, 0x7e003fff).rw(FUNC(jetwave_state::sysreg_r), FUNC(jetwave_state::sysreg_w));
-	map(0x7e008000, 0x7e009fff).m(m_k056230, FUNC(k056230_device::regs_map));  // LANC registers
-	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::ram_r), FUNC(k056230_device::ram_w)); // LANC Buffer RAM (27E)
-	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
+
 	map(0x7f000000, 0x7f3fffff).rom().region("datarom", 0);
-	map(0x7f800000, 0x7f9fffff).rom().region("prgrom", 0);
-	map(0x7fe00000, 0x7fffffff).rom().region("prgrom", 0);
 }
 
 
@@ -596,16 +609,6 @@ static INPUT_PORTS_START( zr107 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc0838", FUNC(adc083x_device::sars_read))
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
-
-	PORT_START("EEPROMOUT")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::di_write))
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write))
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
-
-	PORT_START("OUT4")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0838", FUNC(adc083x_device::cs_write))
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0838", FUNC(adc083x_device::di_write))
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0838", FUNC(adc083x_device::clk_write))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( midnrun )
@@ -756,7 +759,7 @@ void zr107_state::zr107(machine_config &config)
 	m_dsp->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
 	m_dsp->set_addrmap(AS_DATA, &zr107_state::sharc_memmap);
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	K056230(config, m_k056230);
 	m_k056230->irq_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
@@ -793,8 +796,8 @@ void zr107_state::zr107(machine_config &config)
 	k054539_2.add_route(0, "speaker", 0.75, 0);
 	k054539_2.add_route(1, "speaker", 0.75, 1);
 
-	adc0838_device &adc(ADC0838(config, "adc0838"));
-	adc.set_input_callback(FUNC(zr107_state::adc0838_callback));
+	ADC0838(config, m_adc);
+	m_adc->set_input_callback(FUNC(zr107_state::adc0838_callback));
 
 	KONPPC(config, m_konppc);
 	m_konppc->set_dsp_tag(0, m_dsp);
