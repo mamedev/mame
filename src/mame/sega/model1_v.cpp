@@ -106,7 +106,7 @@ void model1_state::draw_hline_moired(bitmap_rgb32 &bitmap, int x1, int x2, int y
 	uint32_t *const base = &bitmap.pix(y);
 	while(x1 <= x2)
 	{
-		if((x1^y) & 1)
+		if(!((x1^y) & 1))
 		{
 			base[x1] = color;
 		}
@@ -227,7 +227,7 @@ static void draw_wireframe_line(bitmap_rgb32 &bitmap, int x1, int y1, int x2, in
 	for (;;)
 	{
 		if (x1 >= 0 && x1 < bitmap.width() && y1 >= 0 && y1 < bitmap.height())
-			if (!moire || ((x1 ^ y1) & 1))
+			if (!moire || !((x1 ^ y1) & 1))
 				bitmap.pix(y1, x1) = color;
 		if (x1 == x2 && y1 == y2)
 			break;
