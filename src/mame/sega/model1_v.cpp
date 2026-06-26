@@ -221,7 +221,7 @@ void model1_state::fill_line(bitmap_rgb32 &bitmap, view_t *view, int color, int3
 // directly restores the full span (e.g. the Star Wars Arcade target box).
 static void draw_wireframe_line(bitmap_rgb32 &bitmap, int x1, int y1, int x2, int y2, uint32_t color, bool moire)
 {
-	int dx = abs(x2 - x1), dy = abs(y2 - y1);
+	int dx = std::abs(x2 - x1), dy = std::abs(y2 - y1);
 	int sx = x1 < x2 ? 1 : -1, sy = y1 < y2 ? 1 : -1;
 	int err = dx - dy;
 	for (;;)
@@ -1394,7 +1394,6 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect, r
 	if ((m_listctl[1] & 0x1f) == 0x1f)
 	{
 		set_current_render_list();
-		int zz = 0;
 		LOGMASKED(LOG_TGP, "VIDEO: render list %d\n", get_list_number());
 
 		m_view->init_translation_matrix();
@@ -1409,26 +1408,23 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect, r
 				list_offset += 2;
 				break;
 			case 1:
+				// command 0x01 = object drawn below the cat1 HUD tilemaps
+				if (pass == RENDER_BELOW_HUD)
+					push_object(readi(list_offset + 2), readi(list_offset + 4), readi(list_offset + 6));
+				list_offset += 8;
+				break;
 			case 0x41:
-				// 1 = plane 1
-				// 2 = ??  draw object (413d3, 17c4c, e)
-				// 3 = plane 2
-				// 4 = ??  draw object (408a8, a479, 9)
-				// 5 = decor
-				// 6 = ??  draw object (57bd4, 387460, 2ad)
-
-				// 3D objects belong to the first pass (below the HUD); the
-				// second pass only draws the direct (2D-projected) polys.
-				if (pass == RENDER_OBJECTS && (true || zz >= 666))
+				// command 0x41 = object drawn above the HUD (e.g. SWA radar blips)
+				if (pass == RENDER_ABOVE_HUD)
 					push_object(readi(list_offset + 2), readi(list_offset + 4), readi(list_offset + 6));
 				list_offset += 8;
 				break;
 			case 2:
 			{
-				// Direct polys are deferred to the second pass so they land on
-				// top of the HUD tilemaps; the object pass just walks past them.
-				if (pass == RENDER_DIRECT)
-					list_offset = draw_direct(bitmap, cliprect, list_offset);
+				// direct (2D-projected) polys; push them in the below-HUD pass so
+				// they share the per-viewport z-sort with the 0x01 objects
+				if (pass == RENDER_BELOW_HUD)
+					list_offset = push_direct(list_offset);
 				else
 					list_offset = skip_direct(list_offset);
 				break;
@@ -1496,7 +1492,6 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect, r
 			}
 			case 7:
 				LOGMASKED(LOG_TGP, "VIDEO:   code 7 (%d)\n", readi(list_offset + 2));
-				zz++;
 				list_offset += 4;
 				break;
 			case 8:
@@ -1667,6 +1662,8 @@ void model1_state::video_start()
 	m_pointdb = std::make_unique<point_t[]>(1000000*2);
 	m_quaddb  = std::make_unique<quad_t[]>(1000000);
 	m_quadind = make_unique_clear<quad_t *[]>(1000000);
+	m_overlay_block = std::make_unique<uint8_t[]>(SCREEN_W * SCREEN_H);
+	m_overlay_hud_snapshot = std::make_unique<uint32_t[]>(SCREEN_W * SCREEN_H);
 
 	m_pointpt = &m_pointdb[0];
 	m_quadpt = &m_quaddb[0];
@@ -1684,6 +1681,31 @@ void model1_state::video_start()
 	save_pointer(NAME(m_tgp_ram), 0x100000-0x40000);
 	save_pointer(NAME(m_poly_ram), 0x40000);
 	save_item(NAME(m_listctl));
+}
+
+// Snapshot the HUD after the cat1 tilemaps are composited: a pixel is a bright
+// "feature" (grid lines, struts) when any channel is above near-black, otherwise
+// it is transparent/screen background where the above-HUD blips may show.
+void model1_state::build_overlay_mask(bitmap_rgb32 &bitmap)
+{
+	for (int i = 0; i < SCREEN_W * SCREEN_H; i++)
+	{
+		uint32_t argb = bitmap.pix(i / SCREEN_W, i % SCREEN_W);
+		int r = (argb >> 16) & 0xff;
+		int g = (argb >> 8) & 0xff;
+		int b = argb & 0xff;
+		m_overlay_block[i] = (r > 8 || g > 8 || b > 8);
+		m_overlay_hud_snapshot[i] = argb;
+	}
+}
+
+// Restore the bright HUD features over the above-HUD blip pass, so blips only
+// remain where the HUD pixel was transparent / near-black.
+void model1_state::apply_overlay_stencil(bitmap_rgb32 &bitmap)
+{
+	for (int i = 0; i < SCREEN_W * SCREEN_H; i++)
+		if (m_overlay_block[i])
+			bitmap.pix(i / SCREEN_W, i % SCREEN_W) = m_overlay_hud_snapshot[i];
 }
 
 uint32_t model1_state::screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1753,18 +1775,22 @@ uint32_t model1_state::screen_update_model1(screen_device &screen, bitmap_rgb32 
 	m_tiles->draw(screen, bitmap, cliprect, 2, 0, 0);
 	m_tiles->draw(screen, bitmap, cliprect, 0, 0, 0);
 
-	// 3D objects render below the HUD tilemaps.
-	tgp_render(bitmap, cliprect, RENDER_OBJECTS);
+	// 3D objects (0x01) and direct polys (0x02) render below the HUD tilemaps,
+	// sharing the per-viewport z-sort.
+	tgp_render(bitmap, cliprect, RENDER_BELOW_HUD);
 
+	// HUD tilemaps (cat1): cockpit struts, grid lines, radar screen background.
 	m_tiles->draw(screen, bitmap, cliprect, 7, 0, 0);
 	m_tiles->draw(screen, bitmap, cliprect, 5, 0, 0);
 	m_tiles->draw(screen, bitmap, cliprect, 3, 0, 0);
 	m_tiles->draw(screen, bitmap, cliprect, 1, 0, 0);
 
-	// The direct (2D-projected) polys - callouts, pointer lines, viewport tints
-	// (e.g. Star Wars Arcade's FIGHTER CONTROL / cockpit screens) - are drawn by
-	// the hardware on top of the tilemap HUD, so a second pass draws only those.
-	tgp_render(bitmap, cliprect, RENDER_DIRECT);
+	// 0x41 objects (e.g. radar blips) draw on top of the HUD, but the hardware
+	// only lets them through "background" HUD pixels. Snapshot the HUD, draw the
+	// above-HUD pass, then restore the bright HUD features over it.
+	build_overlay_mask(bitmap);
+	tgp_render(bitmap, cliprect, RENDER_ABOVE_HUD);
+	apply_overlay_stencil(bitmap);
 
 	return 0;
 }

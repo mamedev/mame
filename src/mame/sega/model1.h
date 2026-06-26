@@ -300,7 +300,7 @@ private:
 	static void fclip_clip_right(view_t*, point_t*, point_t*, point_t*);
 
 	// Rendering
-	enum render_pass { RENDER_OBJECTS, RENDER_DIRECT };
+	enum render_pass { RENDER_BELOW_HUD, RENDER_ABOVE_HUD };
 	void    tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect, render_pass pass);
 	void    tgp_scan();
 
@@ -335,6 +335,17 @@ private:
 
 	// run-time rendering
 	uint16_t* m_display_list_current = nullptr;
+
+	// 0x41 objects (e.g. the Star Wars Arcade radar blips) draw on top of the
+	// cat1 HUD tilemaps, but only through "background" HUD pixels (transparent or
+	// near-black); bright HUD features still occlude them.  Snapshot the HUD
+	// before the above-HUD pass and restore the feature pixels afterwards.
+	static constexpr int SCREEN_W = 496;
+	static constexpr int SCREEN_H = 384;
+	std::unique_ptr<uint8_t[]>  m_overlay_block;
+	std::unique_ptr<uint32_t[]> m_overlay_hud_snapshot;
+	void build_overlay_mask(bitmap_rgb32 &bitmap);
+	void apply_overlay_stencil(bitmap_rgb32 &bitmap);
 
 	optional_shared_ptr<uint16_t> m_paletteram16;
 	required_device<palette_device> m_palette;
