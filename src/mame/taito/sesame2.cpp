@@ -62,7 +62,7 @@ void sesame2_state::prg_map(address_map &map)
 {
 	map(0x000000, 0x7ffff).rom().region("program", 0);
 	map(0x200000, 0x21ffff).ram();
-	
+
 	//map(0x400000, 0x400000).w(m_oki, FUNC(okim9810_device::write));
 	//map(0x400001, 0x400001).w(m_oki, FUNC(okim9810_device::tmp_register_w));
 	//map(0x400002, 0x400002).r(m_oki, FUNC(okim9810_device::read));
