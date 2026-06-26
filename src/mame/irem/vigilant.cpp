@@ -1861,12 +1861,12 @@ ROM_START( kikcubic )
 	ROM_LOAD( "mqj_a-sp-.ic34", 0x00000, 0x10000, CRC(bbcf3582) SHA1(4a5b9d4161b26e3ca400573fa78268893e42d5db) )
 
 	ROM_REGION( 0x20000, "chars", 0 )
-	ROM_LOAD( "mqj-c0.ic71", 0x00000, 0x10000, CRC(975585c5) SHA1(eb8245e458a5d4880add5b4a305a4468fa8f6491) ) // M5M27512 mask ROM soldered in place at C0 / IC71
-	ROM_LOAD( "mqj-c1.ic72", 0x10000, 0x10000, CRC(49d9936d) SHA1(c4169ddd481c19e8e24457e2fe011db1b34db6d3) ) // M5M27512 mask ROM soldered in place at C1 / IC72
+	ROM_LOAD( "mqj_a-c0-.ic71", 0x00000, 0x10000, CRC(975585c5) SHA1(eb8245e458a5d4880add5b4a305a4468fa8f6491) ) // also known to be nondescript soldered in place mask ROMs
+	ROM_LOAD( "mqj_a-c1-.ic72", 0x10000, 0x10000, CRC(49d9936d) SHA1(c4169ddd481c19e8e24457e2fe011db1b34db6d3) ) // also known to be nondescript soldered in place mask ROMs
 
 	ROM_REGION( 0x80000, "sprites", 0 )
-	ROM_LOAD( "mqj-00.ic97", 0x00000, 0x40000, CRC(7fb0c58f) SHA1(f70ff39e2d648606686c87cf1a7a3ffb46c2656a) ) // SHARP mask ROM soldered in place simply stamped 00 / IC97
-	ROM_LOAD( "mqj-10.ic95", 0x40000, 0x40000, CRC(3a189205) SHA1(063d664d4cf709931b5e3a5b6eb7c75bcd57b518) ) // SHARP mask ROM soldered in place simply stamped 01 / IC95
+	ROM_LOAD( "mqj_a-00-.ic97", 0x00000, 0x40000, CRC(7fb0c58f) SHA1(f70ff39e2d648606686c87cf1a7a3ffb46c2656a) ) // also known to be nondescript soldered in place mask ROMs
+	ROM_LOAD( "mqj_a-10-.ic95", 0x40000, 0x40000, CRC(3a189205) SHA1(063d664d4cf709931b5e3a5b6eb7c75bcd57b518) ) // also known to be nondescript soldered in place mask ROMs
 	// 01 at IC96 & 11 at IC94 unpopulated
 
 	ROM_REGION( 0x10000, "m72", 0 ) // samples

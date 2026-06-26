@@ -1158,6 +1158,7 @@ public:
 	void dynplus(machine_config &config) ATTR_COLD;
 	void dynchance(machine_config &config) ATTR_COLD;
 	void lfhouse(machine_config &config) ATTR_COLD;
+	void unkdep(machine_config &config) ATTR_COLD;
 
 	void init_vkdlswwh() ATTR_COLD;
 	void init_icp1db() ATTR_COLD;
@@ -1190,6 +1191,7 @@ public:
 	void init_dash() ATTR_COLD;
 	void init_dynplus() ATTR_COLD;
 	void init_dynchance() ATTR_COLD;
+	void init_unkdep() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -1272,6 +1274,7 @@ private:
 	void dynplus_map(address_map &map) ATTR_COLD;
 	void dynchance_map(address_map &map) ATTR_COLD;
 	void lfhouse_map(address_map &map) ATTR_COLD;
+	void unkdep_map(address_map &map) ATTR_COLD;
 	void dep_9801_opcodes_map(address_map &map) ATTR_COLD;
 
 	optional_device<ticket_dispenser_device> m_hopper;
@@ -2215,6 +2218,18 @@ void goldnpkr_state::lfhouse_map(address_map &map)
 	common_io_map(map);
 
 	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x8000, 0xffff).rom();
+}
+
+void goldnpkr_state::unkdep_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
+	map(0x2800, 0x2800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x2801, 0x2801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x2844, 0x2847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x2848, 0x284b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x6000, 0x63ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share(m_videoram);
+	map(0x6800, 0x6bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share(m_colorram);
 	map(0x8000, 0xffff).rom();
 }
 
@@ -5887,6 +5902,13 @@ void goldnpkr_state::lfhouse(machine_config &config)
 	dash_a37(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::lfhouse_map);
+}
+
+void goldnpkr_state::unkdep(machine_config &config)
+{
+	dash_a37(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::unkdep_map);
 }
 
 
@@ -14447,6 +14469,45 @@ ROM_START( dynplus )
 	ROM_LOAD( "nvram", 0x0000, 0x0800, CRC(5bdc6ce4) SHA1(5c47047128e8cd17da7e31cd175ae35498a868d0) )
 ROM_END
 
+// this program ROM was fitted on a Boram PCB (see misc/boramz80.cpp), probably due to an error while reassembling it
+// thus, there are no GFX ROMs nor PROM available
+ROM_START( unkdep )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "223.rom", 0x8000, 0x8000, CRC(1d776d37) SHA1(6918cddb0b47d28cf8145823f869dfd2296c0eed) )
+
+	ROM_REGION( 0x8000, "gfxpool", 0 )
+	ROM_LOAD( "1.5l", 0x0000, 0x4000, CRC(a501edc4) SHA1(95fc04c16cde89636023639db236fba261ccd21b) )
+	ROM_IGNORE(               0x4000 )
+	ROM_LOAD( "2.5n", 0x4000, 0x4000, CRC(58ee8082) SHA1(2fd5b73c8fa87607ba115dc61616852e323c164d) )
+	ROM_IGNORE(               0x4000 )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
+	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x5000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx2", 0 )  // cards
+	ROM_COPY( "gfxpool", 0x1800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x0800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x5800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx3", 0 )  // extra 1
+	ROM_COPY( "gfxpool", 0x3000, 0x0000, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x2000, 0x0800, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x7000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx4", 0 )  // extra 2
+	ROM_COPY( "gfxpool", 0x3800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x2800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x7800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "27s13.2m", 0x0000, 0x0200, CRC(b5c007e4) SHA1(d66f68ad9e637c5720e71151c360d2053090b7b8) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )
+	ROM_LOAD( "nvram", 0x0000, 0x0800, CRC(1820ac92) SHA1(45816fa66ac5e892050eaf84557992f10aba9433) )
+ROM_END
+
 
 /*********************************************
 *                Driver Init                 *
@@ -15123,7 +15184,51 @@ void goldnpkr_state::init_dynchance()
 		uint8_t const col = bitswap<3>(BIT(rom[i], 7) ? ~rom[i] : rom[i], 5, 3, 2);
 
 		// only opcodes are encrypted
-		m_decrypted_opcodes[i] = (opcode_xortable[row][col] != 0) ? (rom[i] ^ opcode_xortable[row][col]) : opcode_xortable[row][col];
+		m_decrypted_opcodes[i] = rom[i] ^ opcode_xortable[row][col];
+	}
+}
+
+void goldnpkr_state::init_unkdep()
+{
+	static const uint8_t opcode_xortable[0x10][0x08] =
+	{ //  0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07
+		{ 0xa8, 0xa4, 0x20, 0x2c, 0x8c, 0x80, 0x04, 0x08 }, // 0x00
+		{ 0xa4, 0x80, 0xa8, 0x8c, 0x04, 0x20, 0x08, 0x2c }, // 0x01
+		{ 0xa8, 0xa4, 0x20, 0x2c, 0x8c, 0x80, 0x04, 0x08 }, // 0x02
+		{ 0xa4, 0x80, 0xa8, 0x8c, 0x04, 0x20, 0x08, 0x2c }, // 0x03
+		{ 0xa8, 0xa4, 0x20, 0x2c, 0x8c, 0x80, 0x04, 0x08 }, // 0x04
+		{ 0xa4, 0x80, 0xa8, 0x8c, 0x04, 0x20, 0x08, 0x2c }, // 0x05
+		{ 0xa8, 0xa4, 0x20, 0x2c, 0x8c, 0x80, 0x04, 0x08 }, // 0x06
+		{ 0xa4, 0x80, 0xa8, 0x8c, 0x04, 0x20, 0x08, 0x2c }, // 0x07
+		{ 0x84, 0x00, 0x84, 0x00, 0x84, 0x00, 0x84, 0x00 }, // 0x40
+		{ 0x84, 0x00, 0x84, 0x00, 0x84, 0x00, 0x84, 0x00 }, // 0x41
+		{ 0x28, 0xac, 0x28, 0xac, 0x28, 0xac, 0x28, 0xac }, // 0x42
+		{ 0x28, 0xac, 0x28, 0xac, 0x28, 0xac, 0x28, 0xac }, // 0x43
+		{ 0xac, 0xa0, 0xa0, 0xac, 0xac, 0xa0, 0xa0, 0xac }, // 0x44
+		{ 0xac, 0xa0, 0xa0, 0xac, 0xac, 0xa0, 0xa0, 0xac }, // 0x45
+		{ 0xac, 0xa0, 0xa0, 0xac, 0xac, 0xa0, 0xa0, 0xac }, // 0x46
+		{ 0xac, 0xa0, 0xa0, 0xac, 0xac, 0xa0, 0xa0, 0xac }, // 0x47
+	};
+
+	uint8_t *rom = memregion("maincpu")->base() + 0x8000;
+
+	for (int i = 0x0000; i < 0x8000; i++)
+	{
+		// logic is reminiscent of machine/segacrpt_device.cpp
+
+		// pick the row in the table from bits 0, 1, 2 and 6 of the address
+		uint8_t const row = bitswap<4>(i, 6, 2, 1, 0);
+
+		// pick the column in the table from bits 2,3,5,7 of the source data
+		// however the upper part is mirrored
+		uint8_t const col = bitswap<3>(BIT(rom[i], 7) ? ~rom[i] : rom[i], 5, 3, 2);
+
+		// decrypt opcodes
+		m_decrypted_opcodes[i] = rom[i] ^ opcode_xortable[row][col];
+
+		// decrypt data
+		if ((i < 0x1000) || (i > 0xb000))
+			rom[i] ^ 0X8f;
 	}
 }
 
@@ -15362,6 +15467,7 @@ GAME(  1994, lfhouseb,  lfhouse,   lfhouse,   goldnpkr, goldnpkr_state, init_lfh
 GAME(  1992, dynchance, 0,         dynchance, goldnpkr, goldnpkr_state, init_dynchance,ROT0, "<unknown>",                "Dynamic Chance (Type-3.0 Part 1-2)",         MACHINE_NOT_WORKING )
 GAME(  1992, dynchancf, dynchance, dynchance, goldnpkr, goldnpkr_state, init_dynchance,ROT0, "<unknown>",                "Dynamic Chance (Type-3.0 Part 1-2, alt)",    MACHINE_NOT_WORKING )
 GAME(  1997, dynplus,   dynchance, dynplus,   goldnpkr, goldnpkr_state, init_dynplus,ROT0,   "<unknown>",                "Dynamic Plus One (SP Type ver 1.10)",        MACHINE_NOT_WORKING )
+GAME(  1998, unkdep,    lfhouse,         unkdep,    goldnpkr, goldnpkr_state, init_unkdep, ROT0,   "<unknown>",                "unknown DEP 9801 poker game",                MACHINE_NOT_WORKING )
 
 
 /*************************************** SETS W/IRQ0 ***************************************/
