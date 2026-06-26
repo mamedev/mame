@@ -948,16 +948,32 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 			float spec = compute_specular(vn, m_view->light, dif, lightmode);
 			float ln = m_view->lightparams[lightmode].a + m_view->lightparams[lightmode].d * std::max(0.0f, dif) + spec;
 			int lumval = 255.0f * std::min(1.0f, ln);
-			int color = m_paletteram16[0x1000 | (m_tgp_ram[tex_adr - 0x40000] & 0x3ff)];
+			// bits [11:10] of the tile word select a colour mode: bit 10 marks a
+			// flat UI element (radar blips, HUD text) drawn unlit, and mode 01
+			// additionally blinks by rotating the BGR channels on alternate frames.
+			uint16_t tex_data = m_tgp_ram[tex_adr - 0x40000];
+			int color = m_paletteram16[0x1000 | (tex_data & 0x3ff)];
 			int r = (color >> 0x0) & 0x1f;
 			int g = (color >> 0x5) & 0x1f;
 			int b = (color >> 0xA) & 0x1f;
+			if (((tex_data >> 10) & 3) == 1 && (m_screen->frame_number() & 1))
+			{
+				// rotate b -> g -> r -> b
+				int tmp = b;
+				b = r;
+				r = g;
+				g = tmp;
+			}
 
 			lumval >>= 2; //there must be a luma translation table somewhere
 			if (lumval > 0x3f)
 				lumval = 0x3f;
 			else if (lumval < 0)
 				lumval = 0;
+
+			// flat UI element: draw unlit at full intensity instead of shading it
+			if (tex_data & 0x400)
+				lumval = 0x3f;
 
 			r = (m_color_xlat[(r << 8) | lumval | 0x0] >> 3) & 0x1f;
 			g = (m_color_xlat[(g << 8) | lumval | 0x2000] >> 3) & 0x1f;
