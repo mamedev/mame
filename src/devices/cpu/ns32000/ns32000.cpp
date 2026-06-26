@@ -4051,8 +4051,12 @@ template <int HighBits, int Width> bool ns32000_device<HighBits, Width>::memory_
 
 template <int HighBits, int Width> std::unique_ptr<util::disasm_interface> ns32000_device<HighBits, Width>::create_disassembler()
 {
-	return std::make_unique<ns32000_disassembler>(
-		(type() == NS32532) ? ns32000_disassembler::model::ns32532 : ns32000_disassembler::model::ns32032);
+	return std::make_unique<ns32000_disassembler>(ns32000_disassembler::model::ns32032);
+}
+
+std::unique_ptr<util::disasm_interface> ns32532_device::create_disassembler()
+{
+	return std::make_unique<ns32000_disassembler>(ns32000_disassembler::model::ns32532);
 }
 
 template <int HighBits, int Width> u16 ns32000_device<HighBits, Width>::slave(u8 opbyte, u16 opword, addr_mode op1, addr_mode op2)

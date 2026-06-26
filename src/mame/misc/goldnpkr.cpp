@@ -2189,8 +2189,8 @@ void goldnpkr_state::dash_a37_map(address_map &map)
 void goldnpkr_state::dynplus_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
-	map(0x3804, 0x3807).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write)).mirror(0x0080);
-	map(0x3808, 0x380b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write)).mirror(0x0080);
+	map(0x3804, 0x3807).mirror(0x0080).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x3808, 0x380b).mirror(0x0080).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x3840, 0x3840).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x3841, 0x3841).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x6000, 0x63ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share(m_videoram);
@@ -15038,11 +15038,8 @@ void goldnpkr_state::init_dash()
 		uint8_t const row = bitswap<4>(i, 6, 2, 1, 0);
 
 		// pick the column in the table from bits 2,3,5,7 of the source data
-		uint8_t col = bitswap<3>(rom[i], 5, 3, 2);
-
 		// however the upper part is mirrored
-			if (BIT(rom[i], 7))
-				col = 7 - col;
+		uint8_t const col = bitswap<3>(BIT(rom[i], 7) ? ~rom[i] : rom[i], 5, 3, 2);
 
 		// only opcodes are encrypted
 		m_decrypted_opcodes[i] = rom[i] ^ opcode_xortable[row][col];
@@ -15082,11 +15079,8 @@ void goldnpkr_state::init_dynplus()
 		uint8_t const row = bitswap<4>(i, 6, 2, 1, 0);
 
 		// pick the column in the table from bits 2,3,5,7 of the source data
-		uint8_t col = bitswap<3>(rom[i], 5, 3, 2);
-
 		// however the upper part is mirrored
-			if (BIT(rom[i], 7))
-				col = 7 - col;
+		uint8_t const col = bitswap<3>(BIT(rom[i], 7) ? ~rom[i] : rom[i], 5, 3, 2);
 
 		// only opcodes are encrypted
 		m_decrypted_opcodes[i] = rom[i] ^ opcode_xortable[row][col];
@@ -15125,14 +15119,11 @@ void goldnpkr_state::init_dynchance()
 		uint8_t const row = bitswap<4>(i, 6, 2, 1, 0);
 
 		// pick the column in the table from bits 2,3,5,7 of the source data
-		uint8_t col = bitswap<3>(rom[i], 5, 3, 2);
-
 		// however the upper part is mirrored
-			if (BIT(rom[i], 7))
-				col = 7 - col;
+		uint8_t const col = bitswap<3>(BIT(rom[i], 7) ? ~rom[i] : rom[i], 5, 3, 2);
 
 		// only opcodes are encrypted
-		m_decrypted_opcodes[i] = (opcode_xortable[row][col] != 0) ? rom[i] ^ opcode_xortable[row][col] : opcode_xortable[row][col];
+		m_decrypted_opcodes[i] = (opcode_xortable[row][col] != 0) ? (rom[i] ^ opcode_xortable[row][col]) : opcode_xortable[row][col];
 	}
 }
 
