@@ -894,7 +894,7 @@ void tsconf_state::tsconf_spi_miso_w(u8 data)
 	m_zctl_di |= data;
 }
 
-IRQ_CALLBACK_MEMBER(tsconf_state::irq_vector)
+void tsconf_state::on_iack(int state)
 {
 	u8 vector = 0xff;
 	if (m_int_mask & 1)
@@ -915,7 +915,7 @@ IRQ_CALLBACK_MEMBER(tsconf_state::irq_vector)
 	if (!m_int_mask)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
-	return vector;
+	m_maincpu->vector_w(vector);
 }
 
 TIMER_CALLBACK_MEMBER(tsconf_state::irq_off)

@@ -4052,12 +4052,11 @@ void specnext_state::tbblue(machine_config &config)
 	m_maincpu->set_memory_map(&specnext_state::map_mem);
 	m_maincpu->set_io_map(&specnext_state::map_io);
 	m_maincpu->set_vblank_int("screen", FUNC(specnext_state::specnext_interrupt));
-	m_maincpu->set_irq_acknowledge_callback(NAME([](device_t &, int){ return 0xff; }));
 	m_maincpu->out_nextreg_cb().set([this](offs_t offset, u8 data) { m_next_regs.write_byte(offset, data); });
 	m_maincpu->in_nextreg_cb().set([this](offs_t offset) { return m_next_regs.read_byte(offset); });
 	m_maincpu->out_retn_seen_cb().set(FUNC(specnext_state::leave_nmi));
 	m_maincpu->busack_cb().set(m_dma, FUNC(specnext_dma_device::bai_w));
-	m_maincpu->irqack_cb().set([this](int) { m_screen->update_now(); });
+	m_maincpu->irqack_cb().set([this](int) { m_screen->update_now(); m_maincpu->vector_w(0xff); });
 
 	SPECNEXT_IM2(config, m_im2_line);
 	m_im2_line->irq_callback().set(FUNC(specnext_state::irq_w));

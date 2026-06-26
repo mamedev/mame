@@ -1958,10 +1958,10 @@ void sprinter_state::sprinter(machine_config &config)
 	m_maincpu->set_m1_map(&sprinter_state::map_fetch);
 	m_maincpu->set_memory_map(&sprinter_state::map_mem);
 	m_maincpu->set_io_map(&sprinter_state::map_io);
-	m_maincpu->set_irq_acknowledge_callback(NAME([](device_t &, int){ return 0xff; }));
 	m_maincpu->irqack_cb().set(m_irqs, FUNC(input_merger_any_high_device::in_clear<2>));
 	m_maincpu->irqack_cb().append(m_irqs, FUNC(input_merger_any_high_device::in_clear<1>));
 	m_maincpu->irqack_cb().append(m_irqs, FUNC(input_merger_any_high_device::in_clear<0>));
+	m_maincpu->irqack_cb().append([this](int) { m_maincpu->vector_w(0xff); });
 
 	DS12885(config, m_rtc, XTAL(32'768)); // should be DS12887A
 	ATA_INTERFACE(config, m_ata[0]).options(sprinter_ata_devices, "hdd", "cdrom", false);

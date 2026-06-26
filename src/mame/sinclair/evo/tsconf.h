@@ -161,7 +161,7 @@ private:
 	emu_timer *m_scanline_irq_timer = nullptr;
 
 	INTERRUPT_GEN_MEMBER(tsconf_vblank_interrupt);
-	IRQ_CALLBACK_MEMBER(irq_vector);
+	void on_iack(int state);
 	u8 m_int_mask;
 	bool m_update_on_m1;
 

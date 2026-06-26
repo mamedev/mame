@@ -919,21 +919,19 @@ macro   z80n:take_nmi
 	WZ = PC;
 	set_service_attention<SA_NMI_PENDING, 0>();
 
-macro   irqfetch
+macro   irqvectorpull
 {
-	// fetch the IRQ vector
+	// check daisy presence and pull IRQ vector
 	device_z80daisy_interface *intf = daisy_get_irq_device();
-	m_tmp_irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w);
-	LOGMASKED(LOG_INT, "single INT m_tmp_irq_vector $%02x\n", m_tmp_irq_vector);
+	if (intf != nullptr) vector_w(intf->z80daisy_irq_ack());
 }
 
-macro   t6a84:irqfetch
+macro   t6a84:irqvectorpull
 {
-	// fetch the IRQ vector
+	// check daisy presence and pull IRQ vector
 	paged_irqfetch();
 	device_z80daisy_interface *intf = daisy_get_irq_device();
-	m_tmp_irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w);
-	LOGMASKED(LOG_INT, "single INT m_tmp_irq_vector $%02x\n", m_tmp_irq_vector);
+	if (intf != nullptr) vector_w(intf->z80daisy_irq_ack());
 }
 
 macro   take_interrupt
@@ -943,9 +941,11 @@ macro   take_interrupt
 	m_iff1 = m_iff2 = 0;
 	// say hi
 	// Not precise in all cases. z80 must finish current instruction (NOP) to reach this state - in such case frame timings are shifter from cb event if calculated based on it.
+	m_tmp_irq_vector = standard_irq_callback(0, m_pc.w);
 	m_irqack_cb(1);
 	m_r++;
-	@irqfetch
+	@irqvectorpull
+	LOGMASKED(LOG_INT, "single INT m_tmp_irq_vector $%02x\n", m_tmp_irq_vector);
 	// 'interrupt latency' cycles
 	+ 2
 	// Interrupt mode 2. Call [i:databyte]

@@ -290,7 +290,7 @@ void tsconf_state::tsconf(machine_config &config)
 	m_maincpu->set_memory_map(&tsconf_state::tsconf_mem);
 	m_maincpu->set_io_map(&tsconf_state::tsconf_io);
 	m_maincpu->set_m1_map(&tsconf_state::tsconf_switch);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(tsconf_state::irq_vector));
+	m_maincpu->irqack_cb().set(FUNC(tsconf_state::on_iack));
 
 	m_maincpu->set_vblank_int("screen", FUNC(tsconf_state::tsconf_vblank_interrupt));
 

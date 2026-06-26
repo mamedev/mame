@@ -43,6 +43,8 @@ public:
 	auto halt_cb() { return m_halt_cb.bind(); }
 	auto busack_cb() { return m_busack_cb.bind(); }
 
+	void vector_w(u8 vector, u8 mask = 0xff);
+
 	// output pins state
 	int halt_r() { return m_halt; }
 	int busack_r() { return m_busack_state; }

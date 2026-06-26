@@ -19,6 +19,15 @@ TODO:
     or not the previous instruction touched the flag register.
   This Z80 emulator assumes a ZiLOG NMOS model.
 
+
+- Current implementation supports both irq vector set models (push and pull).
+  Ideally devices must avoid "pull":
+  - m_maincpu->set_irq_acknowledge_callback(NAME([](device_t &, int){ return vector; }));
+  - m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, vector);
+  Prefer "push" instead:
+  - m_maincpu->irqack_cb().set([this](int) { m_maincpu->vector_w(vector); });
+  - daisy_chain_interface must be refactored
+
 *****************************************************************************/
 
 #include "emu.h"
@@ -821,6 +830,11 @@ void z80_device::execute_set_input(int inputnum, int state)
 	default:
 		break;
 	}
+}
+
+void z80_device::vector_w(u8 vector, u8 mask)
+{
+	m_tmp_irq_vector = (m_tmp_irq_vector & ~mask) | (vector & mask);
 }
 
 /**************************************************************************
