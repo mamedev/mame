@@ -135,7 +135,7 @@ void sesame2_state::sesame2(machine_config &config)
 
 }
 
-ROM_START( sesame2 )
+ROM_START( csesame2 )
 	ROM_REGION16_BE(0x080000, "program", 0)
 	ROM_LOAD( "f25-05.ic56",   0x000000, 0x080000, CRC(2205de06) SHA1(a67c2c2d626d805ff7e2d26a6c7d3e217ec0b3de) )
 
