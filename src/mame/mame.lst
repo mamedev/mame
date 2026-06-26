@@ -45518,6 +45518,9 @@ buggychlt
 csesame1
 cspin2
 
+@source:taito/capr2.cpp
+csesame2
+
 @source:taito/caprcyc.cpp
 caprcyc
 
@@ -45815,9 +45818,6 @@ sbowling
 
 @source:taito/scyclone.cpp
 scyclone
-
-@source:taito/sesame2.cpp
-csesame2
 
 @source:taito/slapshot.cpp
 opwolf3
