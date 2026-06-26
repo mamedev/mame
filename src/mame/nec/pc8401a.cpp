@@ -376,7 +376,7 @@ private:
 	void palette_init(palette_device &palette) const;
 
 	void scan_keyboard();
-	void bankswitch(uint8_t data);
+	void bankswitch_w(uint8_t data);
 
 	// keyboard state
 	int m_key_strobe = 0;           // key pressed
@@ -388,6 +388,7 @@ private:
 
 	uint8_t m_key_latch = 0;
 	bool m_key_irq_enable = false;
+	IRQ_CALLBACK_MEMBER(vector_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
 	void pc8401a_lcdc(address_map &map) ATTR_COLD;
 	void pc8401a_mem(address_map &map) ATTR_COLD;
@@ -436,7 +437,7 @@ void pc8401a_state::scan_keyboard()
 		}
 	}
 
-	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xef); // Z80 - RST 28h
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	m_key_strobe = 1;
 }
 
@@ -488,7 +489,7 @@ void pc8401a_state::port71_w(uint8_t data)
 	m_key_latch = data;
 }
 
-void pc8401a_state::bankswitch(uint8_t data)
+void pc8401a_state::bankswitch_w(uint8_t data)
 {
 	// set up A0/A1 memory banking
 	m_bankdev0->set_bank(data & 0xf);
@@ -500,7 +501,7 @@ void pc8401a_state::bankswitch(uint8_t data)
 	m_crt_view.select(BIT(data, 6));
 
 	if (BIT(data, 7))
-		throw emu_fatalerror("Unknown bank bit 7 set");
+		popmessage("Unknown bank bit 7 set");
 }
 
 /*
@@ -519,7 +520,7 @@ void pc8401a_state::mmr_w(uint8_t data)
 {
 	if (data != m_mmr)
 	{
-		bankswitch(data);
+		bankswitch_w(data);
 	}
 
 	m_mmr = data;
@@ -799,7 +800,12 @@ void pc8401a_state::machine_start()
 void pc8401a_state::machine_reset()
 {
 	m_key_irq_enable = false;
-	bankswitch(0);
+	bankswitch_w(0);
+}
+
+IRQ_CALLBACK_MEMBER(pc8401a_state::vector_r)
+{
+	return 0xef; // Z80 - RST 28h
 }
 
 void pc8401a_state::pc8401a(machine_config &config)
@@ -807,6 +813,7 @@ void pc8401a_state::pc8401a(machine_config &config)
 	Z80(config, m_maincpu, 7.987_MHz_XTAL / 2); // NEC uPD70008C
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc8401a_state::pc8401a_mem);
 	m_maincpu->set_addrmap(AS_IO, &pc8401a_state::pc8500_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(pc8401a_state::vector_r));
 
 	// unknown frequency, roughly fits idle sleep mode
 	TIMER(config, "keyboard").configure_periodic(FUNC(pc8401a_state::keyboard_tick), attotime::from_hz(60));
@@ -874,6 +881,7 @@ ROM_START( pc8500 )
 ROM_END
 
 } // anonymous namespace
+
 
 /* System Drivers */
 
