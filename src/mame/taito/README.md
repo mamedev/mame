@@ -33,7 +33,7 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |A47 | Tiger Heli | In [toaplan/slapfght.cpp](../toaplan/slapfght.cpp) |
 |A49 | Lady Master of Kung Fu ||
 |A50 | N.Y. Captor ||
-|A51 | Legend of Kage (prototype on Metal Soldier Isaac II hardware) ||
+|A51 | Legend of Kage (Metal Soldier Isaac II hardware) ||
 |A52 | Typhoon Gal / Onna Sanshirou ||
 |A53 | Bygone (prototype) ||
 |A54 | Legend of Kage ||
@@ -50,20 +50,20 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |A72 | The 26th Z (Japan, location test) ||
 |A74 | Daikaiju no Gyakushu ||
 |A75 | Arkanoid ||
-|A76 | Slap Fight (older, tiger heli hw, conversion kit?) |  In [toaplan/slapfght.cpp](../toaplan/slapfght.cpp) |
-|A77 | Slap Fight / Alcon (newer, dedicated JAMMA hw) | In [toaplan/slapfght.cpp](../toaplan/slapfght.cpp) |
+|A76 | Slap Fight (older, Tiger Heli HW, conversion kit?) |  In [toaplan/slapfght.cpp](../toaplan/slapfght.cpp) |
+|A77 | Slap Fight / Alcon (newer, dedicated JAMMA HW) | In [toaplan/slapfght.cpp](../toaplan/slapfght.cpp) |
 |A78 | Bubble Bobble ||
-|A80 | Cycle Shooting (older hw?) ||
+|A80 | Cycle Shooting (older HW?) ||
 |A85 | Kiki KaiKai ||
 |A87 | Kick & Run ||
 |A96 | Darius / Darius Extra ||
-|A97 | Cycle Shooting (newer hw?) ||
+|A97 | Cycle Shooting (newer HW?) ||
 |A98 | Plump Pop ||
 |A?? | Ninja Hayate ||
-|A?? | Prebillian | somewhere in the A8x, A9x, or maybe B0x range, most likely |
+|A?? | Prebillian | probably a Kaneko board, doesn't belong here |
 |B02 | Sky Shark / Flying Shark / Hishou Zame | In [toaplan/twincobr.cpp](../toaplan/twincobr.cpp) |
 |B03 | Super Qix | also BO? |
-|B04 | Rastan/Rastan Saga ||
+|B04 | Rastan / Rastan Saga ||
 |B06 | Extermination ||
 |B08 | Arkanoid: Revenge of Doh ||
 |B09 | Midnight Landing ||
@@ -84,7 +84,7 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |B41 | Bonze Adventure / Jigoku Meguri ||
 |B42 | Kuri Kinton ||
 |B44 | Chuka Taisen ||
-|B45 | Rally Bike | TP-012, in [toaplan/rallybik.cpp](../toaplan/rallybik.cpp) |
+|B45 | Rally Bike / Dash Yarou | TP-012, in [toaplan/rallybik.cpp](../toaplan/rallybik.cpp) |
 |B50 | Kabuki-Z ||
 |B51 | Syvalion (H system) ||
 |B52 | Chase H.Q. ||
@@ -100,7 +100,7 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |B72 | Master of Weapon / Yukiwo ||
 |B73 | Heavy Unit | in [kaneko/hvyunit.cpp](../kaneko/hvyunit.cpp) |
 |B77 | Aqua Jack ||
-|B81 | Nastar/Rastan Saga 2 ||
+|B81 | Nastar / Rastan Saga 2 ||
 |B82 | Final Blow ||
 |B87 | Twin Hawk / Daisenpu ||
 |B90 | Hellfire | In [toaplan/toaplan1.cpp](../toaplan/toaplan1.cpp) |
@@ -116,16 +116,16 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |C07 | Darius 2 / Sagaia ||
 |C09 | Special Criminal Investigation ||
 |C11 | Mega Blast ||
-|C12 | Tetris (With Sega, Conversion kit for B81 Nastar/Rastan Saga 2) ||
+|C12 | Tetris (with Sega, conversion kit for B81 Nastar/Rastan Saga 2) ||
 |C16 | Violence Fight ||
 |C17 | Maze of Flott ||
 |C20 | Puzznic (L system) ||
 |C21 | Cadash ||
-|C26 | Tetris (With Sega, Conversion kit for B56 Go for the Gold (H system)) ||
+|C26 | Tetris (with Sega, conversion kit for B56 Go for the Gold (H system)) ||
 |C28 | Thunder Fox ||
 |C32 | World Grand Prix ||
 |C34 | Battle Shark ||
-|C35 | Tetris (With Sega, Conversion kit for B72 Master of Weapon) ||
+|C35 | Tetris (with Sega, conversion kit for B72 Master of Weapon) ||
 |C38 | Cameltry ||
 |C41 | Quiz Torimonochou ||
 |C42 | Parent Jack ||
@@ -137,7 +137,7 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |C57 | Space Gun ||
 |C59 | Hit the Ice ||
 |C63 | Palamedes (L system) ||
-|C64 | Space Invaders '91/Majestic Twelve - The Space Invaders Part IV ||
+|C64 | Space Invaders '91 / Majestic Twelve - The Space Invaders Part IV ||
 |C67 | Evil Stone | This game is odd, may be a title hack of an otherwise undumped taito game? |
 |C69 | Sonic Blast Man ||
 |C71 | Gun & Frontier ||
@@ -152,10 +152,13 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |C85 | The Ninja Kids ||
 |C88 | Eibise ||
 |C91 | Solitary Fighter ||
-|C92 | Quiz Quest ||
+|C92 | Quiz Quest - Hime to Yuusha no Monogatari ||
 |C98 | PuLiRuLa ||
 |C99 | Galactic Storm ||
+|D03 | Jewelry Gold | ジュエリーゴールド, undumped |
+|D05 | New Capriccio | ニューカプリチオ, undumped |
 |D12 | Metal Black | World version with D16 main roms? |
+|D15 | Arcanum | アルカナム, undumped |
 |D19 | Quiz Chikyu Bouei Gun ||
 |D20 | Yes/No Sinri Tokimeki Chart ||
 |D21 | Ring Rage ||
@@ -170,6 +173,7 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |D40 | Grid Seeker: Project Storm Hammer ||
 |D41 | Poker Spirit ||
 |D43 | Shun ||
+|D44 | Vertexer | ヴァーテクサー, undumped |
 |D46 | Super Chase - Criminal Termination ||
 |D48 | Quiz Jinsei Gekijoh ||
 |D49 | Super Cup Finals / Hat Trick Hero '93 ||
@@ -177,6 +181,7 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |D52 | Captain Zodiac ||
 |D53 | Top Ranking Stars / Prime Time Fighters ||
 |D55 | Quiz Crayon Shinchan ||
+|D57 | Mind Escort | マインドエスコート, undumped |
 |D58 | 2 Minute Drill ||
 |D63 | Quiz Crayon Shinchan Orato Asobo ||
 |D66 | Gun Lock / Ray Force ||
@@ -187,16 +192,18 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |D72 | Quiz Sekai wa SHOW by shobai ||
 |D74 | Operation Wolf 3 ||
 |D76 | Real Puncher ||
-|D77 | (F3 System Base Board?) ||
+|D77 | Taito F3 motherboard | D77 on PALs |
 |D78 | International Cup '94 / Hat Trick Hero '94 ||
 |D83 | Chase Bombers ||
 |D84 | Kaiser Knuckle / Global Champion ||
 |D87 | Darius Gaiden ||
+|D88 | X-2000 Pro | undumped |
 |D89 | Space Invaders DX (single pcb version) ||
 |D90 | Bubble Symphony / Bubble Bobble II ||
 |D93 | Space Invaders DX ||
 |D94 | Power Goal / Hat Trick Hero '95 ||
 |D95 | Quiz Theater - 3tsu no Monogatari ||
+|D96 | Puzzle Bobble (Neo-Geo) | In [snk/neogeo.cpp](../snk/neogeo.cpp) |
 |D97 | Victory Shoot ||
 |Dxx | Puzzle Bobble (System B version; exact game number is unknown, between d70 and d92) |
 |E02 | Elevator Action Returns ||
@@ -216,29 +223,35 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |E28 | Cleopatra Fortune ||
 |E29 | Puzzle Bobble 3 ||
 |E30 | Capriccio Spin 2 ||
+|E31 | Mini Jong | ミニジャン, undumped |
 |E32 | Magical Date / EX ||
 |E34 | Heroine's Memory ||
 |E35 | Densha de GO! / EX ||
 |E36 | Arkanoid Returns ||
+|E37 | Solottol | そろっと～る？, undumped |
 |E38 | Side by Side 2 ||
-|E39 | G Darius/Ver2 | In [sony/zn.cpp](../sony/zn.cpp) |
-|E40 | Kirameki Star Road ||
+|E39 | G-Darius / Ver2 | In [sony/zn.cpp](../sony/zn.cpp) |
 |E41 | Honoo no Invader ||
 |E44 | Kirameki Star Road ||
 |E46 | Puchi Carat ||
+|E47 | Moero! Chokkyu-kun | 燃えろ！直球くん, undumped |
 |E48 | Bubblen Roulette ||
 |E49 | Puzzle Bobble 4 ||
 |E51 | Pop'n Pop ||
 |E52 | Densha de GO! 2 Kousoku-hen ||
 |E55 | Packy no Treasure Slot ||
-|E59 | Psychic Force 2012 | bootscreen ROM uses E58 |
+|E56 | Genshizin Pokonpo | 原始人ポコンポ, undumped |
+|E58 | Taito Wolf motherboard | bootscreen ROM uses E58 |
+|E59 | Psychic Force 2012 ||
 |E61 | Land Maker ||
 |E63 | Operation Tiger / Second Mission ||
+|E66 | Jyanken Battle (Jyanken Power-tchu!) | ジャンケンパワッチュ！, undumped |
 |E67 | Harikiri Junior Baseball ||
 |E68 | Taito Type Zero BIOS / Battle Gear ||
 |E69 | Capriccio Cyclone | With an E68 sound ROM, earlier set? |
 |E74 | Power Shovel ni Norou!! - Power Shovel Simulator ||
 |E82 | Landing High Japan ||
+|E83 | Mawasunda!! | まわすんだ～!!, in [sony/taitogn.cpp](../sony/taitogn.cpp) |
 |E85 | Densha de GO 3! Tsukin-hen ||
 |E87 | Battle Gear 2 ||
 |E88 | Renda Fighter ||
@@ -246,10 +259,17 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |E98 | Stunt Typhoon Plus ||
 |Exx | Twin Qix ||
 |Exx | Sonic Blast Man no Janken Battle | reuses E41 for plds |
+|F12 | Tomé Baachan no Dagashiya | とめばあちゃんの駄菓子屋, undumped |
 |F14 | Raizin Ping Pong ||
 |F19 | Hello Kitty Koi no Shugoshin Uranai ||
+|F21 | Capriccio Move | カプリチオムーブ, undumped |
+|F30 | Capriccio G-One | カプリチオG-ONE, undumped |
 |F34 | Space Invaders / Qix Silver Anniversary Edition ||
 |F39 | Dinoking Kids ||
+|F42 | Capriccio G-One HG | カプリチオG-ONE HG, undumped |
 |F54 | Dinoking Battle ||
+|F58 | Capriccio Star | カプリチオスター, undumped |
 |F?? | Hard Puncher Hajime no Ippo - The Fighting! | F06? In [namco/namcos10.cpp](../namco/namcos10.cpp) as `ippo` / `ippo2` |
 |F?? | Hard Puncher Hajime no Ippo 2 - The Fighting! - Ouja e no chousen | F06 as above? |
+|G05 | Capriccio Sesami W | カプリチオセサミW, undumped |
+|G16 | Nail Stage | ネイルステージ, undumped |
