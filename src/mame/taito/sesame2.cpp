@@ -142,7 +142,7 @@ ROM_START( sesame2 )
 	ROM_LOAD( "f26-04.ic58",  0x000000, 0x200000, CRC(4d013fc5) SHA1(4ae6dfe57db341a2bc52068149966ca2842d20e4) )
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "at93c46.ic67", 0x00, 0x80, NO_DUMP )
+	ROM_LOAD( "at93c46.ic67", 0x00, 0x80, CRC(652d544c) SHA1(cd5bd20e9a0f22d7367cc169e2844a02751c7c91) )
 ROM_END
 
 } // anonymous namespace
