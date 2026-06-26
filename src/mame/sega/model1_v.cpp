@@ -1662,8 +1662,10 @@ void model1_state::video_start()
 	m_pointdb = std::make_unique<point_t[]>(1000000*2);
 	m_quaddb  = std::make_unique<quad_t[]>(1000000);
 	m_quadind = make_unique_clear<quad_t *[]>(1000000);
-	m_overlay_block = std::make_unique<uint8_t[]>(SCREEN_W * SCREEN_H);
-	m_overlay_hud_snapshot = std::make_unique<uint32_t[]>(SCREEN_W * SCREEN_H);
+	m_overlay_stride = m_screen->width();
+	int overlay_pixels = m_overlay_stride * m_screen->height();
+	m_overlay_block = std::make_unique<uint8_t[]>(overlay_pixels);
+	m_overlay_hud_snapshot = std::make_unique<uint32_t[]>(overlay_pixels);
 
 	m_pointpt = &m_pointdb[0];
 	m_quadpt = &m_quaddb[0];
@@ -1684,28 +1686,39 @@ void model1_state::video_start()
 }
 
 // Snapshot the HUD after the cat1 tilemaps are composited: a pixel is a bright
-// "feature" (grid lines, struts) when any channel is above near-black, otherwise
-// it is transparent/screen background where the above-HUD blips may show.
-void model1_state::build_overlay_mask(bitmap_rgb32 &bitmap)
+// "feature" (grid lines, struts) when any channel rises above near-black,
+// otherwise it is transparent/screen background where the above-HUD blips show.
+void model1_state::build_overlay_mask(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (int i = 0; i < SCREEN_W * SCREEN_H; i++)
+	constexpr int feature_level = 8; // anything darker counts as HUD background
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint32_t argb = bitmap.pix(i / SCREEN_W, i % SCREEN_W);
-		int r = (argb >> 16) & 0xff;
-		int g = (argb >> 8) & 0xff;
-		int b = argb & 0xff;
-		m_overlay_block[i] = (r > 8 || g > 8 || b > 8);
-		m_overlay_hud_snapshot[i] = argb;
+		uint32_t const *const src = &bitmap.pix(y);
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			uint32_t argb = src[x];
+			int r = (argb >> 16) & 0xff, g = (argb >> 8) & 0xff, b = argb & 0xff;
+			int i = y * m_overlay_stride + x;
+			m_overlay_block[i] = (r > feature_level || g > feature_level || b > feature_level);
+			m_overlay_hud_snapshot[i] = argb;
+		}
 	}
 }
 
 // Restore the bright HUD features over the above-HUD blip pass, so blips only
 // remain where the HUD pixel was transparent / near-black.
-void model1_state::apply_overlay_stencil(bitmap_rgb32 &bitmap)
+void model1_state::apply_overlay_stencil(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (int i = 0; i < SCREEN_W * SCREEN_H; i++)
-		if (m_overlay_block[i])
-			bitmap.pix(i / SCREEN_W, i % SCREEN_W) = m_overlay_hud_snapshot[i];
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		uint32_t *const dst = &bitmap.pix(y);
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			int i = y * m_overlay_stride + x;
+			if (m_overlay_block[i])
+				dst[x] = m_overlay_hud_snapshot[i];
+		}
+	}
 }
 
 uint32_t model1_state::screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1788,9 +1801,9 @@ uint32_t model1_state::screen_update_model1(screen_device &screen, bitmap_rgb32 
 	// 0x41 objects (e.g. radar blips) draw on top of the HUD, but the hardware
 	// only lets them through "background" HUD pixels. Snapshot the HUD, draw the
 	// above-HUD pass, then restore the bright HUD features over it.
-	build_overlay_mask(bitmap);
+	build_overlay_mask(bitmap, cliprect);
 	tgp_render(bitmap, cliprect, RENDER_ABOVE_HUD);
-	apply_overlay_stencil(bitmap);
+	apply_overlay_stencil(bitmap, cliprect);
 
 	return 0;
 }

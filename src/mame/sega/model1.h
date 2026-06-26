@@ -340,12 +340,11 @@ private:
 	// cat1 HUD tilemaps, but only through "background" HUD pixels (transparent or
 	// near-black); bright HUD features still occlude them.  Snapshot the HUD
 	// before the above-HUD pass and restore the feature pixels afterwards.
-	static constexpr int SCREEN_W = 496;
-	static constexpr int SCREEN_H = 384;
+	int m_overlay_stride = 0;
 	std::unique_ptr<uint8_t[]>  m_overlay_block;
 	std::unique_ptr<uint32_t[]> m_overlay_hud_snapshot;
-	void build_overlay_mask(bitmap_rgb32 &bitmap);
-	void apply_overlay_stencil(bitmap_rgb32 &bitmap);
+	void build_overlay_mask(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void apply_overlay_stencil(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	optional_shared_ptr<uint16_t> m_paletteram16;
 	required_device<palette_device> m_palette;
