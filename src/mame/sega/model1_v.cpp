@@ -214,6 +214,29 @@ void model1_state::fill_line(bitmap_rgb32 &bitmap, view_t *view, int color, int3
 	}
 }
 
+// Draw a solid line between two screen points (integer Bresenham).  Wireframe
+// primitives reach the rasterizer as a degenerate quad with two coincident
+// vertex pairs (A,A,B,B); fill_quad only touches one pixel per scanline, so a
+// near-horizontal wire would collapse to a handful of dots.  Drawing the line
+// directly restores the full span (e.g. the Star Wars Arcade target box).
+static void draw_wireframe_line(bitmap_rgb32 &bitmap, int x1, int y1, int x2, int y2, uint32_t color, bool moire)
+{
+	int dx = abs(x2 - x1), dy = abs(y2 - y1);
+	int sx = x1 < x2 ? 1 : -1, sy = y1 < y2 ? 1 : -1;
+	int err = dx - dy;
+	for (;;)
+	{
+		if (x1 >= 0 && x1 < bitmap.width() && y1 >= 0 && y1 < bitmap.height())
+			if (!moire || ((x1 ^ y1) & 1))
+				bitmap.pix(y1, x1) = color;
+		if (x1 == x2 && y1 == y2)
+			break;
+		int e2 = 2 * err;
+		if (e2 > -dy) { err -= dy; x1 += sx; }
+		if (e2 < dx)  { err += dx; y1 += sy; }
+	}
+}
+
 void model1_state::fill_quad(bitmap_rgb32 &bitmap, view_t *view, const quad_t& q) const
 {
 	spoint_t p[8];
@@ -227,6 +250,36 @@ void model1_state::fill_quad(bitmap_rgb32 &bitmap, view_t *view, const quad_t& q
 					q.p[1]->s.x, q.p[1]->s.y,
 					q.p[2]->s.x, q.p[2]->s.y,
 					q.p[3]->s.x, q.p[3]->s.y);
+	}
+
+	// A wireframe primitive arrives as a degenerate quad with only two distinct
+	// screen vertices (A,A,B,B); rasterize it as a line so near-horizontal wires
+	// keep their full span instead of collapsing to one pixel per row.
+	{
+		int ax = q.p[0]->s.x, ay = q.p[0]->s.y;
+		int bx = ax, by = ay, ndist = 1;
+		for (int i = 1; i < 4; i++)
+		{
+			int vx = q.p[i]->s.x, vy = q.p[i]->s.y;
+			if (vx == ax && vy == ay)
+				continue;
+			if (ndist == 1)
+			{
+				bx = vx;
+				by = vy;
+				ndist = 2;
+			}
+			else if (vx != bx || vy != by)
+			{
+				ndist = 3;
+				break;
+			}
+		}
+		if (ndist == 2)
+		{
+			draw_wireframe_line(bitmap, ax, ay, bx, by, color & ~MOIRE, (color & MOIRE) != 0);
+			return;
+		}
 	}
 
 	for (int i = 0; i < 4; i++)
