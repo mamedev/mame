@@ -14475,15 +14475,15 @@ ROM_START( unkdep )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "223.rom", 0x8000, 0x8000, CRC(1d776d37) SHA1(6918cddb0b47d28cf8145823f869dfd2296c0eed) )
 
-	ROM_REGION( 0x8000, "gfxpool", 0 )
-	ROM_LOAD( "1.5l", 0x0000, 0x4000, CRC(a501edc4) SHA1(95fc04c16cde89636023639db236fba261ccd21b) )
-	ROM_IGNORE(               0x4000 )
-	ROM_LOAD( "2.5n", 0x4000, 0x4000, CRC(58ee8082) SHA1(2fd5b73c8fa87607ba115dc61616852e323c164d) )
-	ROM_IGNORE(               0x4000 )
+	ROM_REGION( 0x8000, "gfxpool", ROMREGION_ERASE00 )
+	ROM_LOAD( "5l", 0x0000, 0x4000, NO_DUMP )
+	ROM_IGNORE(             0x4000 )
+	ROM_LOAD( "5n", 0x4000, 0x4000, NO_DUMP )
+	ROM_IGNORE(             0x4000 )
 
 	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
-	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (empty)
-	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (data)
 	ROM_COPY( "gfxpool", 0x5000, 0x1000, 0x0800 ) // src-dest-size (data)
 
 	ROM_REGION( 0x1800, "gfx2", 0 )  // cards
@@ -14492,8 +14492,8 @@ ROM_START( unkdep )
 	ROM_COPY( "gfxpool", 0x5800, 0x1000, 0x0800 ) // src-dest-size (data)
 
 	ROM_REGION( 0x1800, "gfx3", 0 )  // extra 1
-	ROM_COPY( "gfxpool", 0x3000, 0x0000, 0x0800 ) // src-dest-size (empty)
-	ROM_COPY( "gfxpool", 0x2000, 0x0800, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x3000, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x2000, 0x0800, 0x0800 ) // src-dest-size (data)
 	ROM_COPY( "gfxpool", 0x7000, 0x1000, 0x0800 ) // src-dest-size (data)
 
 	ROM_REGION( 0x1800, "gfx4", 0 )  // extra 2
@@ -14501,8 +14501,8 @@ ROM_START( unkdep )
 	ROM_COPY( "gfxpool", 0x2800, 0x0800, 0x0800 ) // src-dest-size (data)
 	ROM_COPY( "gfxpool", 0x7800, 0x1000, 0x0800 ) // src-dest-size (data)
 
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "27s13.2m", 0x0000, 0x0200, CRC(b5c007e4) SHA1(d66f68ad9e637c5720e71151c360d2053090b7b8) )
+	ROM_REGION( 0x0200, "proms", ROMREGION_ERASE00 )
+	ROM_LOAD( "7116.2m", 0x0000, 0x0200, NO_DUMP )
 
 	ROM_REGION( 0x0800, "nvram", 0 )
 	ROM_LOAD( "nvram", 0x0000, 0x0800, CRC(1820ac92) SHA1(45816fa66ac5e892050eaf84557992f10aba9433) )
@@ -15225,10 +15225,6 @@ void goldnpkr_state::init_unkdep()
 
 		// decrypt opcodes
 		m_decrypted_opcodes[i] = rom[i] ^ opcode_xortable[row][col];
-
-		// decrypt data
-		if ((i < 0x1000) || (i > 0xb000))
-			rom[i] ^ 0X8f;
 	}
 }
 
