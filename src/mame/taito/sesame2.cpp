@@ -149,4 +149,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 200?, sesame2, 0, sesame2, sesame2, sesame2_state, empty_init, ROT270, "Taito", "Sesame 2", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_NO_SOUND )
+GAME( 200?, csesame2, 0, sesame2, sesame2, sesame2_state, empty_init, ROT270, "Taito", "Capriccio Sesame 2", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_NO_SOUND )
