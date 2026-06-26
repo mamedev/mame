@@ -31,7 +31,8 @@ class sesame2_state : public driver_device
 public:
 	sesame2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_oki(*this, "oki")
 	{ }
 
 	void sesame2(machine_config &config);
@@ -44,6 +45,8 @@ private:
 
 	// devices
 	required_device<h8s2394_device> m_maincpu;
+	optional_device<okim9810_device> m_oki;
+
 };
 
 uint8_t sesame2_state::portf_r()
@@ -60,9 +63,9 @@ void sesame2_state::prg_map(address_map &map)
 	map(0x000000, 0x7ffff).rom().region("program", 0);
 	map(0x200000, 0x21ffff).ram();
 	
-	//map(0x400000, 0x400000).w("oki", FUNC(okim9810_device::write));
-	//map(0x400001, 0x400001).w("oki", FUNC(okim9810_device::tmp_register_w));
-	//map(0x400002, 0x400002).r("oki", FUNC(okim9810_device::read));
+	//map(0x400000, 0x400000).w(m_oki, FUNC(okim9810_device::write));
+	//map(0x400001, 0x400001).w(m_oki, FUNC(okim9810_device::tmp_register_w));
+	//map(0x400002, 0x400002).r(m_oki, FUNC(okim9810_device::read));
 }
 
 static INPUT_PORTS_START( sesame2 )
@@ -126,9 +129,9 @@ void sesame2_state::sesame2(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	okim9810_device &oki(OKIM9810(config, "oki", XTAL(4'096'000)));
-	oki.add_route(0, "speaker", 0.80, 0);
-	oki.add_route(1, "speaker", 0.80, 1);
+	OKIM9810(config, m_oki, XTAL(4'096'000));
+	m_oki->add_route(0, "speaker", 0.80, 0);
+	m_oki->add_route(1, "speaker", 0.80, 1);
 
 }
 
