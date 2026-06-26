@@ -1337,6 +1337,8 @@ if BUSES["C64"] then
 	files {
 		MAME_DIR .. "src/devices/bus/c64/exp.cpp",
 		MAME_DIR .. "src/devices/bus/c64/exp.h",
+		MAME_DIR .. "src/devices/bus/c64/action_replay.cpp",
+		MAME_DIR .. "src/devices/bus/c64/action_replay.h",
 		MAME_DIR .. "src/devices/bus/c64/buscard.cpp",
 		MAME_DIR .. "src/devices/bus/c64/buscard.h",
 		MAME_DIR .. "src/devices/bus/c64/buscard2.cpp",
