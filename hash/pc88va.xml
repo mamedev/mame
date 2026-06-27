@@ -143,7 +143,6 @@ Transition between 3rd and 4th sequences don't look right, [IDP]
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
 [gfx] status bar has wrong colors [OFX/OFY]
-[gfx] colors currently blanked except status bar (regression)
 ]]></notes>
 		<info name="alt_title" value="アニメフレーマー" />
 		<sharedfeat name="mouseport_default" value="mouse"/>

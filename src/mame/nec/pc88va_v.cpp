@@ -313,7 +313,7 @@ inline u8 pc88va_state::get_layer_pal_bank(u8 which)
 		return (m_pltm & 1) << 4;
 
 	// N/A for 32 color mode
-	if (m_pltm == 3)
+	if (m_pltm == 7)
 		return 0;
 
 	// HW quirk: text and sprites colors will be joined when either one is selected in PLTP
@@ -1035,6 +1035,7 @@ void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &
 	}
 }
 
+// animefrm
 void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 dsp_start_base, u16 scrollx, u8 pal_base, u16 fb_width, u16 fb_height)
 {
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
