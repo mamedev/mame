@@ -69,8 +69,8 @@ newoption {
 	},
 }
 
-if not _OPTIONS["USE_SDL"] then
-	_OPTIONS["USE_SDL"] = "0"
+if not _OPTIONS["USE_SDL3"] then
+	_OPTIONS["USE_SDL3"] = "0"
 end
 
 newoption {

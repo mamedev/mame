@@ -16,10 +16,12 @@
 
 #include "assignmenthelper.h"
 #include "input_common.h"
+#include "input_sdlcommon.h"
 
 #include "interface/inputseq.h"
 #include "modules/lib/osdobj_common.h"
 #include "osdsdl.h"
+
 // emu
 #include "inpttype.h"
 
@@ -966,7 +968,7 @@ private:
 //  sdl_joystick_device_base
 //============================================================
 
-class sdl_joystick_device_base : public sdl_device, protected joystick_assignment_helper
+class sdl_joystick_device_base : public sdl_device
 {
 public:
 	std::optional<std::string> const &serial() const { return m_serial; }
@@ -997,7 +999,7 @@ protected:
 
 	void set_instance(SDL_JoystickID instance)
 	{
-		assert(-1 == m_instance);
+		assert(0 > m_instance);
 		assert(0 <= instance);
 
 		m_instance = instance;
@@ -1018,13 +1020,9 @@ private:
 //  sdl_joystick_device
 //============================================================
 
-class sdl_joystick_device : public sdl_joystick_device_base
+class sdl_joystick_device : public sdl_joystick_device_base, public sdl_joystick_device_common
 {
 public:
-	static constexpr unsigned MAX_AXES = 32;
-	static constexpr unsigned MAX_BUTTONS = 128;
-	static constexpr unsigned MAX_HATS = 8;
-
 	sdl_joystick_device(
 			std::string &&name,
 			std::string &&id,
@@ -1036,7 +1034,6 @@ public:
 				std::move(id),
 				module,
 				serial),
-		m_joystick({{0}}),
 		m_joydevice(joy),
 		m_hapdevice(SDL_OpenHapticFromJoystick(joy))
 	{
@@ -1045,276 +1042,28 @@ public:
 
 	virtual void configure(input_device &device) override
 	{
-		input_device::assignment_vector assignments;
-		char tempname[32];
-
-		int const axiscount = SDL_GetNumJoystickAxes(m_joydevice);
-		int const buttoncount = SDL_GetNumJoystickButtons(m_joydevice);
-		int const hatcount = SDL_GetNumJoystickHats(m_joydevice);
-		int const ballcount = SDL_GetNumJoystickBalls(m_joydevice);
-
-		// loop over all axes
-		input_item_id axisactual[MAX_AXES];
-		for (int axis = 0; (axis < MAX_AXES) && (axis < axiscount); axis++)
-		{
-			input_item_id itemid;
-
-			if (axis < INPUT_MAX_AXIS)
-				itemid = input_item_id(ITEM_ID_XAXIS + axis);
-			else if (axis < (INPUT_MAX_AXIS + INPUT_MAX_ADD_ABSOLUTE))
-				itemid = input_item_id(ITEM_ID_ADD_ABSOLUTE1 + axis - INPUT_MAX_AXIS);
-			else
-				itemid = ITEM_ID_OTHER_AXIS_ABSOLUTE;
-
-			snprintf(tempname, sizeof(tempname), "A%d", axis + 1);
-			axisactual[axis] = device.add_item(
-					tempname,
-					std::string_view(),
-					itemid,
-					generic_axis_get_state<s32>,
-					&m_joystick.axes[axis]);
-		}
-
-		// loop over all buttons
-		for (int button = 0; (button < MAX_BUTTONS) && (button < buttoncount); button++)
-		{
-			input_item_id itemid;
-
-			m_joystick.buttons[button] = 0;
-
-			if (button < INPUT_MAX_BUTTONS)
-				itemid = input_item_id(ITEM_ID_BUTTON1 + button);
-			else if (button < INPUT_MAX_BUTTONS + INPUT_MAX_ADD_SWITCH)
-				itemid = input_item_id(ITEM_ID_ADD_SWITCH1 + button - INPUT_MAX_BUTTONS);
-			else
-				itemid = ITEM_ID_OTHER_SWITCH;
-
-			input_item_id const actual = device.add_item(
-					default_button_name(button),
-					std::string_view(),
-					itemid,
-					generic_button_get_state<u8>,
-					&m_joystick.buttons[button]);
-
-			// there are sixteen action button types
-			if (button < 16)
-			{
-				input_seq const seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, actual));
-				assignments.emplace_back(ioport_type(IPT_BUTTON1 + button), SEQ_TYPE_STANDARD, seq);
-
-				// assign the first few buttons to UI actions and pedals
-				switch (button)
-				{
-				case 0:
-					assignments.emplace_back(IPT_PEDAL, SEQ_TYPE_INCREMENT, seq);
-					assignments.emplace_back(IPT_UI_SELECT, SEQ_TYPE_STANDARD, seq);
-					break;
-				case 1:
-					assignments.emplace_back(IPT_PEDAL2, SEQ_TYPE_INCREMENT, seq);
-					assignments.emplace_back((3 > buttoncount) ? IPT_UI_CLEAR : IPT_UI_BACK, SEQ_TYPE_STANDARD, seq);
-					break;
-				case 2:
-					assignments.emplace_back(IPT_PEDAL3, SEQ_TYPE_INCREMENT, seq);
-					assignments.emplace_back(IPT_UI_CLEAR, SEQ_TYPE_STANDARD, seq);
-					break;
-				case 3:
-					assignments.emplace_back(IPT_UI_HELP, SEQ_TYPE_STANDARD, seq);
-					break;
-				}
-			}
-		}
-
-		// loop over all hats
-		input_item_id hatactual[MAX_HATS][4];
-		for (int hat = 0; (hat < MAX_HATS) && (hat < hatcount); hat++)
-		{
-			input_item_id itemid;
-
-			snprintf(tempname, sizeof(tempname), "Hat %d Up", hat + 1);
-			itemid = input_item_id((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1UP + (4 * hat) : ITEM_ID_OTHER_SWITCH);
-			hatactual[hat][0] = device.add_item(
-					tempname,
-					std::string_view(),
-					itemid,
-					generic_button_get_state<u8>,
-					&m_joystick.hatsU[hat]);
-
-			snprintf(tempname, sizeof(tempname), "Hat %d Down", hat + 1);
-			itemid = input_item_id((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1DOWN + (4 * hat) : ITEM_ID_OTHER_SWITCH);
-			hatactual[hat][1] = device.add_item(
-					tempname,
-					std::string_view(),
-					itemid,
-					generic_button_get_state<u8>,
-					&m_joystick.hatsD[hat]);
-
-			snprintf(tempname, sizeof(tempname), "Hat %d Left", hat + 1);
-			itemid = input_item_id((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1LEFT + (4 * hat) : ITEM_ID_OTHER_SWITCH);
-			hatactual[hat][2] = device.add_item(
-					tempname,
-					std::string_view(),
-					itemid,
-					generic_button_get_state<u8>,
-					&m_joystick.hatsL[hat]);
-
-			snprintf(tempname, sizeof(tempname), "Hat %d Right", hat + 1);
-			itemid = input_item_id((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1RIGHT + (4 * hat) : ITEM_ID_OTHER_SWITCH);
-			hatactual[hat][3] = device.add_item(
-					tempname,
-					std::string_view(),
-					itemid,
-					generic_button_get_state<u8>,
-					&m_joystick.hatsR[hat]);
-		}
-
-		// loop over all (track)balls
-		for (int ball = 0; (ball < (MAX_AXES / 2)) && (ball < ballcount); ball++)
-		{
-			int itemid;
-
-			if (ball * 2 < INPUT_MAX_ADD_RELATIVE)
-				itemid = ITEM_ID_ADD_RELATIVE1 + ball * 2;
-			else
-				itemid = ITEM_ID_OTHER_AXIS_RELATIVE;
-
-			snprintf(tempname, sizeof(tempname), "R%d X", ball + 1);
-			input_item_id const xactual = device.add_item(
-					tempname,
-					std::string_view(),
-					input_item_id(itemid),
-					generic_axis_get_state<s32>,
-					&m_joystick.balls[ball * 2]);
-
-			snprintf(tempname, sizeof(tempname), "R%d Y", ball + 1);
-			input_item_id const yactual = device.add_item(
-					tempname,
-					std::string_view(),
-					input_item_id(itemid + 1),
-					generic_axis_get_state<s32>,
-					&m_joystick.balls[ball * 2 + 1]);
-
-			if (0 == ball)
-			{
-				// assign the first trackball to dial, trackball, mouse and lightgun inputs
-				input_seq const xseq(make_code(ITEM_CLASS_RELATIVE, ITEM_MODIFIER_NONE, xactual));
-				input_seq const yseq(make_code(ITEM_CLASS_RELATIVE, ITEM_MODIFIER_NONE, yactual));
-				assignments.emplace_back(IPT_DIAL,        SEQ_TYPE_STANDARD, xseq);
-				assignments.emplace_back(IPT_DIAL_V,      SEQ_TYPE_STANDARD, yseq);
-				assignments.emplace_back(IPT_TRACKBALL_X, SEQ_TYPE_STANDARD, xseq);
-				assignments.emplace_back(IPT_TRACKBALL_Y, SEQ_TYPE_STANDARD, yseq);
-				assignments.emplace_back(IPT_LIGHTGUN_X,  SEQ_TYPE_STANDARD, xseq);
-				assignments.emplace_back(IPT_LIGHTGUN_Y,  SEQ_TYPE_STANDARD, yseq);
-				assignments.emplace_back(IPT_MOUSE_X,     SEQ_TYPE_STANDARD, xseq);
-				assignments.emplace_back(IPT_MOUSE_Y,     SEQ_TYPE_STANDARD, yseq);
-				if (2 > axiscount)
-				{
-					// use it for joystick inputs if axes are limited
-					assignments.emplace_back(IPT_AD_STICK_X, SEQ_TYPE_STANDARD, xseq);
-					assignments.emplace_back(IPT_AD_STICK_Y, SEQ_TYPE_STANDARD, yseq);
-				}
-				else
-				{
-					// use for non-centring throttle control
-					assignments.emplace_back(IPT_AD_STICK_Z, SEQ_TYPE_STANDARD, yseq);
-				}
-			}
-			else if ((1 == ball) && (2 > axiscount))
-			{
-				// provide a non-centring throttle control
-				input_seq const yseq(make_code(ITEM_CLASS_RELATIVE, ITEM_MODIFIER_NONE, yactual));
-				assignments.emplace_back(IPT_AD_STICK_Z, SEQ_TYPE_STANDARD, yseq);
-			}
-		}
-
-		// set up default assignments for axes and hats
-		add_directional_assignments(
-				assignments,
-				(1 <= axiscount) ? axisactual[0] : ITEM_ID_INVALID, // assume first axis is X
-				(2 <= axiscount) ? axisactual[1] : ITEM_ID_INVALID, // assume second axis is Y
-				(1 <= hatcount) ? hatactual[0][2] : ITEM_ID_INVALID,
-				(1 <= hatcount) ? hatactual[0][3] : ITEM_ID_INVALID,
-				(1 <= hatcount) ? hatactual[0][0] : ITEM_ID_INVALID,
-				(1 <= hatcount) ? hatactual[0][1] : ITEM_ID_INVALID);
-		if (2 <= axiscount)
-		{
-			// put pedals on the last of the second, third or fourth axis
-			input_item_id const pedalitem = axisactual[(std::min)(axiscount, 4) - 1];
-			assignments.emplace_back(
-					IPT_PEDAL,
-					SEQ_TYPE_STANDARD,
-					input_seq(make_code(ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NEG, pedalitem)));
-			assignments.emplace_back(
-					IPT_PEDAL2,
-					SEQ_TYPE_STANDARD,
-					input_seq(make_code(ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_POS, pedalitem)));
-		}
-		if (3 <= axiscount)
-		{
-			// assign X/Y to one of the twin sticks
-			assignments.emplace_back(
-					(4 <= axiscount) ? IPT_JOYSTICKLEFT_LEFT : IPT_JOYSTICKRIGHT_LEFT,
-					SEQ_TYPE_STANDARD,
-					input_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_LEFT, axisactual[0])));
-			assignments.emplace_back(
-					(4 <= axiscount) ? IPT_JOYSTICKLEFT_RIGHT : IPT_JOYSTICKRIGHT_RIGHT,
-					SEQ_TYPE_STANDARD,
-					input_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_RIGHT, axisactual[0])));
-			assignments.emplace_back(
-					(4 <= axiscount) ? IPT_JOYSTICKLEFT_UP : IPT_JOYSTICKRIGHT_UP,
-					SEQ_TYPE_STANDARD,
-					input_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_UP, axisactual[1])));
-			assignments.emplace_back(
-					(4 <= axiscount) ? IPT_JOYSTICKLEFT_DOWN : IPT_JOYSTICKRIGHT_DOWN,
-					SEQ_TYPE_STANDARD,
-					input_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_DOWN, axisactual[1])));
-
-			// use third or fourth axis for Z
-			input_seq const seq(make_code(ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NONE, axisactual[(std::min)(axiscount, 4) - 1]));
-			assignments.emplace_back(IPT_AD_STICK_Z, SEQ_TYPE_STANDARD, seq);
-
-			// use this for focus next/previous to make system selection menu practical to navigate
-			input_seq const upseq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NEG, axisactual[2]));
-			input_seq const downseq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_POS, axisactual[2]));
-			assignments.emplace_back(IPT_UI_FOCUS_PREV, SEQ_TYPE_STANDARD, upseq);
-			assignments.emplace_back(IPT_UI_FOCUS_NEXT, SEQ_TYPE_STANDARD, downseq);
-			if (4 <= axiscount)
-			{
-				// use for zoom as well if there's another axis to use for previous/next group
-				assignments.emplace_back(IPT_UI_ZOOM_IN, SEQ_TYPE_STANDARD, downseq);
-				assignments.emplace_back(IPT_UI_ZOOM_OUT, SEQ_TYPE_STANDARD, upseq);
-			}
-
-			// use this for twin sticks, too
-			assignments.emplace_back((4 <= axiscount) ? IPT_JOYSTICKRIGHT_LEFT : IPT_JOYSTICKLEFT_UP, SEQ_TYPE_STANDARD, upseq);
-			assignments.emplace_back((4 <= axiscount) ? IPT_JOYSTICKRIGHT_RIGHT : IPT_JOYSTICKLEFT_DOWN, SEQ_TYPE_STANDARD, downseq);
-
-			// put previous/next group on the last of the third or fourth axis
-			input_item_id const groupitem = axisactual[(std::min)(axiscount, 4) - 1];
-			assignments.emplace_back(
-					IPT_UI_PREV_GROUP,
-					SEQ_TYPE_STANDARD,
-					input_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NEG, groupitem)));
-			assignments.emplace_back(
-					IPT_UI_NEXT_GROUP,
-					SEQ_TYPE_STANDARD,
-					input_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_POS, groupitem)));
-		}
-		if (4 <= axiscount)
-		{
-			// use this for twin sticks
-			input_seq const upseq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NEG, axisactual[3]));
-			input_seq const downseq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_POS, axisactual[3]));
-			assignments.emplace_back(IPT_JOYSTICKRIGHT_UP, SEQ_TYPE_STANDARD, upseq);
-			assignments.emplace_back(IPT_JOYSTICKRIGHT_DOWN, SEQ_TYPE_STANDARD, downseq);
-		}
-
-		// set default assignments
-		device.set_default_assignments(std::move(assignments));
+		configure_common(
+				device,
+				SDL_GetNumJoystickAxes(m_joydevice),
+				SDL_GetNumJoystickButtons(m_joydevice),
+				SDL_GetNumJoystickHats(m_joydevice),
+				SDL_GetNumJoystickBalls(m_joydevice));
 	}
 
 	~sdl_joystick_device()
 	{
 		close_device();
+	}
+
+	virtual void poll(bool relative_reset) override
+	{
+		sdl_joystick_device_base::poll(relative_reset);
+
+		if (relative_reset)
+		{
+			for (unsigned i = 0; MAX_AXES > i; ++i)
+				m_joystick.balls[i] = std::exchange(m_ball[i], 0);
+		}
 	}
 
 	virtual void reset() override
@@ -1339,8 +1088,8 @@ public:
 			//printf("Ball %d %d\n", event.jball.xrel, event.jball.yrel);
 			if (event.jball.ball < (MAX_AXES / 2))
 			{
-				m_joystick.balls[event.jball.ball * 2] = event.jball.xrel * input_device::RELATIVE_PER_PIXEL;
-				m_joystick.balls[event.jball.ball * 2 + 1] = event.jball.yrel * input_device::RELATIVE_PER_PIXEL;
+				m_ball[event.jball.ball * 2] += event.jball.xrel * input_device::RELATIVE_PER_PIXEL;
+				m_ball[event.jball.ball * 2 + 1] += event.jball.yrel * input_device::RELATIVE_PER_PIXEL;
 			}
 			break;
 
@@ -1386,26 +1135,9 @@ public:
 		osd_printf_verbose("Joystick: %s [ID %s] reconnected\n", name(), id());
 	}
 
-protected:
-	// state information for a joystick
-	struct sdl_joystick_state
-	{
-		s32 axes[MAX_AXES];
-		s32 balls[MAX_AXES];
-		u8  buttons[MAX_BUTTONS];
-		u8  hatsU[MAX_HATS], hatsD[MAX_HATS], hatsL[MAX_HATS], hatsR[MAX_HATS];
-	};
-
-	sdl_joystick_state m_joystick;
-
 private:
 	SDL_Joystick *m_joydevice;
 	SDL_Haptic *m_hapdevice;
-
-	void clear_buffer()
-	{
-		memset(&m_joystick, 0, sizeof(m_joystick));
-	}
 
 	void close_device()
 	{
@@ -1464,7 +1196,7 @@ public:
 //  sdl_game_controller_device
 //============================================================
 
-class sdl_game_controller_device : public sdl_joystick_device_base
+class sdl_game_controller_device : public sdl_joystick_device_base, protected joystick_assignment_helper
 {
 public:
 	sdl_game_controller_device(
@@ -1635,23 +1367,23 @@ public:
 
 		// add automatically numbered buttons
 		std::tuple<SDL_GamepadButton, SDL_GamepadAxis, bool> const generalbuttons[]{
-				{ SDL_GAMEPAD_BUTTON_SOUTH,             SDL_GAMEPAD_AXIS_INVALID,      true },
-				{ SDL_GAMEPAD_BUTTON_EAST,             SDL_GAMEPAD_AXIS_INVALID,      true },
-				{ SDL_GAMEPAD_BUTTON_WEST,             SDL_GAMEPAD_AXIS_INVALID,      true },
-				{ SDL_GAMEPAD_BUTTON_NORTH,             SDL_GAMEPAD_AXIS_INVALID,      true },
-				{ SDL_GAMEPAD_BUTTON_LEFT_SHOULDER,  SDL_GAMEPAD_AXIS_INVALID,      true },
-				{ SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER, SDL_GAMEPAD_AXIS_INVALID,      true },
-				{ SDL_GAMEPAD_BUTTON_INVALID,       SDL_GAMEPAD_AXIS_LEFT_TRIGGER,  true },
-				{ SDL_GAMEPAD_BUTTON_INVALID,       SDL_GAMEPAD_AXIS_RIGHT_TRIGGER, true },
-				{ SDL_GAMEPAD_BUTTON_LEFT_STICK,     SDL_GAMEPAD_AXIS_INVALID,      true },
-				{ SDL_GAMEPAD_BUTTON_RIGHT_STICK,    SDL_GAMEPAD_AXIS_INVALID,      true },
-				{ SDL_GAMEPAD_BUTTON_RIGHT_PADDLE1,       SDL_GAMEPAD_AXIS_INVALID,      true },
-				{ SDL_GAMEPAD_BUTTON_LEFT_PADDLE1,       SDL_GAMEPAD_AXIS_INVALID,      true },
-				{ SDL_GAMEPAD_BUTTON_RIGHT_PADDLE2,       SDL_GAMEPAD_AXIS_INVALID,      true },
-				{ SDL_GAMEPAD_BUTTON_LEFT_PADDLE2,       SDL_GAMEPAD_AXIS_INVALID,      true },
-				{ SDL_GAMEPAD_BUTTON_GUIDE,         SDL_GAMEPAD_AXIS_INVALID,      false },
-				{ SDL_GAMEPAD_BUTTON_MISC1,         SDL_GAMEPAD_AXIS_INVALID,      false },
-				{ SDL_GAMEPAD_BUTTON_TOUCHPAD,      SDL_GAMEPAD_AXIS_INVALID,      false },
+				{ SDL_GAMEPAD_BUTTON_SOUTH,          SDL_GAMEPAD_AXIS_INVALID,       true },
+				{ SDL_GAMEPAD_BUTTON_EAST,           SDL_GAMEPAD_AXIS_INVALID,       true },
+				{ SDL_GAMEPAD_BUTTON_WEST,           SDL_GAMEPAD_AXIS_INVALID,       true },
+				{ SDL_GAMEPAD_BUTTON_NORTH,          SDL_GAMEPAD_AXIS_INVALID,       true },
+				{ SDL_GAMEPAD_BUTTON_LEFT_SHOULDER,  SDL_GAMEPAD_AXIS_INVALID,       true },
+				{ SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER, SDL_GAMEPAD_AXIS_INVALID,       true },
+				{ SDL_GAMEPAD_BUTTON_INVALID,        SDL_GAMEPAD_AXIS_LEFT_TRIGGER,  true },
+				{ SDL_GAMEPAD_BUTTON_INVALID,        SDL_GAMEPAD_AXIS_RIGHT_TRIGGER, true },
+				{ SDL_GAMEPAD_BUTTON_LEFT_STICK,     SDL_GAMEPAD_AXIS_INVALID,       true },
+				{ SDL_GAMEPAD_BUTTON_RIGHT_STICK,    SDL_GAMEPAD_AXIS_INVALID,       true },
+				{ SDL_GAMEPAD_BUTTON_RIGHT_PADDLE1,  SDL_GAMEPAD_AXIS_INVALID,       true },
+				{ SDL_GAMEPAD_BUTTON_LEFT_PADDLE1,   SDL_GAMEPAD_AXIS_INVALID,       true },
+				{ SDL_GAMEPAD_BUTTON_RIGHT_PADDLE2,  SDL_GAMEPAD_AXIS_INVALID,       true },
+				{ SDL_GAMEPAD_BUTTON_LEFT_PADDLE2,   SDL_GAMEPAD_AXIS_INVALID,       true },
+				{ SDL_GAMEPAD_BUTTON_GUIDE,          SDL_GAMEPAD_AXIS_INVALID,       false },
+				{ SDL_GAMEPAD_BUTTON_MISC1,          SDL_GAMEPAD_AXIS_INVALID,       false },
+				{ SDL_GAMEPAD_BUTTON_TOUCHPAD,       SDL_GAMEPAD_AXIS_INVALID,       false },
 				};
 		input_item_id button_item = ITEM_ID_BUTTON1;
 		unsigned buttoncount = 0;
@@ -1709,7 +1441,6 @@ public:
 								break;
 							default:
 								avail = digitaltriggers;
-								break;
 							}
 						}
 					}
@@ -2935,26 +2666,10 @@ private:
 } // namespace osd
 
 
-#else // defined(SDLMAME_SDL3)
-
-namespace osd {
-
-namespace {
-MODULE_NOT_SUPPORTED(sdl_keyboard_module, OSD_KEYBOARDINPUT_PROVIDER, "sdl")
-MODULE_NOT_SUPPORTED(sdl_mouse_module, OSD_MOUSEINPUT_PROVIDER, "sdl")
-MODULE_NOT_SUPPORTED(sdl_lightgun_module, OSD_LIGHTGUNINPUT_PROVIDER, "sdl")
-MODULE_NOT_SUPPORTED(sdl_joystick_module, OSD_JOYSTICKINPUT_PROVIDER, "sdljoy")
-MODULE_NOT_SUPPORTED(sdl_game_controller_module, OSD_JOYSTICKINPUT_PROVIDER, "sdlgame")
-} // anonymous namespace
-
-} // namespace osd
-
-#endif // defined(SDLMAME_SDL3)
-
-#ifdef SDLMAME_SDL3
 MODULE_DEFINITION(KEYBOARDINPUT_SDL, osd::sdl_keyboard_module)
 MODULE_DEFINITION(MOUSEINPUT_SDL, osd::sdl_mouse_module)
 MODULE_DEFINITION(LIGHTGUNINPUT_SDL, osd::sdl_lightgun_module)
 MODULE_DEFINITION(JOYSTICKINPUT_SDLJOY, osd::sdl_joystick_module)
 MODULE_DEFINITION(JOYSTICKINPUT_SDLGAME, osd::sdl_game_controller_module)
-#endif
+
+#endif // define(OSD_SDL) && defined(SDLMAME_SDL3)
