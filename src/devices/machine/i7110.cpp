@@ -7,6 +7,7 @@
 
     **** TODO ****
     - Commands to be tested: WR_BLR, WR_BL, RD_FSA_STAT, RCD
+    - More than 1 MBM
 
 *********************************************************************/
 
@@ -773,7 +774,6 @@ ibubble_device::ibubble_device(const machine_config &mconfig, const char *tag, d
 	, m_select_b(false)
 	, m_dirty(false)
 {
-	set_must_be_loaded(true);
 }
 
 void ibubble_device::field_rotate(int state)
@@ -1115,19 +1115,17 @@ void ibubble_device::device_add_mconfig(machine_config &config)
 //     else
 //       goto read_mbm_changed
 //   else
-//     mbm_select_changed = check_mbm_change()
+//     ar = (ar + 1) & 0x7fff
+//     mbm_select_changed = selected_mbms != fsa_ch_mask(nfc,mbm_select)
 //     if n_pages == 0
 //       set_op_complete()
 //       fsa_to_bmc_xfer()
-//       ar = (ar + 1) & 0x7fff
 //       leave_read_bubble()
 //     else if mbm_select_changed
 //       fsa_to_bmc_xfer() @S19
-//       cmd_w(selected_mbms, FSA_CMD_SWRESET) + delay
-//       ar = (ar + 1) & 0x7fff
+//       cmd_w(selected_mbms, FSA_CMD_SWRESET) + delay @S1
 //       goto read_mbm_changed
 //     else
-//       ar = (ar + 1) & 0x7fff
 //       delay 320 clocks @S4
 //       goto read_loop
 //   fn read_seek()
@@ -1816,7 +1814,7 @@ void i7220_1_device::update_drq()
 {
 	bool new_drq;
 
-	if (get_busy_state() && m_cmdr != cmds::CMDS_RESET_FIFO) {
+	if (get_busy_state()) {
 		if (BIT(m_en, EN_DMA)) {
 			if (m_read_cmd) {
 				new_drq = !m_fifo.empty();
@@ -2345,14 +2343,13 @@ void i7220_1_device::do_rd_data()
 				delay(CLKS_CMD, S14);
 			}
 		} else {
-			m_mbm_select_changed = check_mbm_change();
+			m_mbm_select_changed = inc_ar();
 			if (get_n_pages() == 0) {
 				set_op_complete();
 				call_subcmd(cmds::SUBCMD_FSA_BMC_XFER, S20);
 			} else if (m_mbm_select_changed) {
 				call_subcmd(cmds::SUBCMD_FSA_BMC_XFER, S19);
 			} else {
-				inc_ar();
 				delay(320, S4);
 			}
 		}
@@ -2384,7 +2381,7 @@ void i7220_1_device::do_rd_data()
 	case S15:
 		if (!BIT(m_str, STAT_UNCORRERR)) {
 			if (BIT(m_en, EN_INT_ERR)) {
-				m_fsm_state = S21;
+				m_fsm_state = S20;
 			} else {
 				cmd_w(m_selected_chs, fsa_channel_device::FSA_CMD_RCD);
 				delay(CLKS_CMD, S16);
@@ -2411,10 +2408,10 @@ void i7220_1_device::do_rd_data()
 			} else {
 				set_op_fail();
 			}
-			m_fsm_state = S21;
+			m_fsm_state = S20;
 		} else if (BIT(m_str, STAT_UNCORRERR)) {
 			set_op_fail();
-			m_fsm_state = S21;
+			m_fsm_state = S20;
 		} else {
 			m_fsm_state = S1;
 		}
@@ -2422,21 +2419,15 @@ void i7220_1_device::do_rd_data()
 
 	case S19:
 		cmd_w(m_selected_chs, fsa_channel_device::FSA_CMD_SWRESET);
-		inc_ar();
 		delay(CLKS_CMD, S1);
 		break;
 
 	case S20:
-		inc_ar();
-		m_fsm_state = S21;
+		cmd_w(m_selected_chs, fsa_channel_device::FSA_CMD_NOP);
+		delay(CLKS_CMD, S21);
 		break;
 
 	case S21:
-		cmd_w(m_selected_chs, fsa_channel_device::FSA_CMD_NOP);
-		delay(CLKS_CMD, S22);
-		break;
-
-	case S22:
 		leave();
 		break;
 
@@ -3366,15 +3357,10 @@ uint16_t i7220_1_device::get_la() const
 
 bool i7220_1_device::inc_ar()
 {
-	bool mbm_change = check_mbm_change();
+	auto old_mbm = get_mbm_select();
 	m_ar = (m_ar + 1) & AR_MASK;
 	LOGFSM("AR: %04x\n", m_ar);
-	return mbm_change;
-}
-
-bool i7220_1_device::check_mbm_change() const
-{
-	return (m_ar & LA_MASK) == LA_MASK;
+	return old_mbm != get_mbm_select();
 }
 
 void i7220_1_device::select_chs()
