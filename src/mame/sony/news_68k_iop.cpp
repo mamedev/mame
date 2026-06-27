@@ -1665,12 +1665,11 @@ namespace
 		ROM_REGION32_BE(0x100, "idrom", 0)
 		ROM_LOAD("nws831-idrom.bin", 0x0, 0x100, CRC(167de13d) SHA1(3e46392671324e92f1e34ddd8ac3c6d94144b3d2) BAD_DUMP)
 
-		ROM_REGION16_BE(0x40000, "krom", 0) // NWB-512 Kanji ROM
-		//ROM_LOAD("aa1.bin", 0x00000, 0x20000, CRC(167de13d) SHA1(3e46392671324e92f1e34ddd8ac3c6d94144b3d2) BAD_DUMP)
-		//ROM_LOAD("aa2.bin", 0x20000, 0x20000, CRC(167de13d) SHA1(3e46392671324e92f1e34ddd8ac3c6d94144b3d2) BAD_DUMP)
-		//ROM_LOAD16_BYTE("aa_even.bin", 0x0000, 0x20000, CRC(167de13d) SHA1(3e46392671324e92f1e34ddd8ac3c6d94144b3d2) BAD_DUMP)
-		//ROM_LOAD16_BYTE("aa_odd.bin", 0x0001, 0x20000, CRC(167de13d) SHA1(3e46392671324e92f1e34ddd8ac3c6d94144b3d2) BAD_DUMP)
-		ROM_LOAD("news_font_full.bin", 0x00000, 0x40000, CRC(167de13d) SHA1(3e46392671324e92f1e34ddd8ac3c6d94144b3d2) BAD_DUMP)
+		// NWB-512 Kanji ROM
+		// TODO: this mapping should be set up by the graphics card instead when it is moved to a separate device
+		ROM_REGION16_BE(0x40000, "krom", 0)
+		ROM_LOAD16_BYTE("nwb512-ic128-hn62301ap-aa1.bin", 0x0000, 0x20000, CRC(3eaa0dbc) SHA1(9c4e66cc122fd60963f51649c945cdfc39f230eb))
+		ROM_LOAD16_BYTE("nwb512-ic127-hn62301ap-aa2.bin", 0x0001, 0x20000, CRC(b8705af7) SHA1(915333f082ecbfee512f1166fc38d9dd29dcaf26))
 	ROM_END
 
 } // anonymous namespace
