@@ -1003,6 +1003,7 @@ void tmnt_state::tmntucbl(machine_config &config)
 
 ***************************************************************************/
 
+// PCB: GX903 PWB351819
 ROM_START( cuebrick )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 2*64k for 68000 code */
 	ROM_LOAD16_BYTE( "903d25.g12",   0x00000, 0x10000, CRC(8d575663) SHA1(0e308e04936efa80351bf808ac304d3fcc82f19a) )
