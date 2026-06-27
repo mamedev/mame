@@ -103,7 +103,7 @@ private:
 	void scyclone_sub_iomap(address_map &map) ATTR_COLD;
 	void scyclone_sub_map(address_map &map) ATTR_COLD;
 
-	INTERRUPT_GEN_MEMBER(main_irq);
+	IRQ_CALLBACK_MEMBER(vector_r);
 
 	// video-related
 	std::unique_ptr<uint8_t[]> m_vram;
@@ -657,10 +657,11 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(scyclone_state::main_irq)
+// CPU runs in IM0
+IRQ_CALLBACK_MEMBER(scyclone_state::vector_r)
 {
-	// CPU runs in IM0
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // Z80 - RST 10h
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	return 0xd7; // Z80 - RST 10h
 }
 
 void scyclone_state::scyclone(machine_config &config)
@@ -669,7 +670,7 @@ void scyclone_state::scyclone(machine_config &config)
 	Z80(config, m_maincpu, 5_MHz_XTAL/2); // MOSTEK Z80-CPU 2.5MHz? (there's also a 9.987MHz XTAL), intermissions seem driven directly by CPU speed for reference
 	m_maincpu->set_addrmap(AS_PROGRAM, &scyclone_state::scyclone_map);
 	m_maincpu->set_addrmap(AS_IO, &scyclone_state::scyclone_iomap);
-	m_maincpu->set_vblank_int("screen", FUNC(scyclone_state::main_irq));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(scyclone_state::vector_r));
 
 	Z80(config, m_subcpu, 5_MHz_XTAL/2); // LH0080 Z80-CPU SHARP 2.5MHz (5Mhz XTAL on this sub-pcb)
 	m_subcpu->set_addrmap(AS_PROGRAM, &scyclone_state::scyclone_sub_map);
@@ -687,6 +688,7 @@ void scyclone_state::scyclone(machine_config &config)
 	m_screen->set_visarea(0, 256-1, 0, 256-32-1);
 	m_screen->set_screen_update(FUNC(scyclone_state::screen_update_scyclone));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE); // due to hw collisions
+	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ0, ASSERT_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_scyclone);
 	PALETTE(config, m_palette).set_entries(8 + 4*4);
