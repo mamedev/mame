@@ -153,10 +153,10 @@ public:
 	frontend(ppc_device &ppc, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
 	~frontend();
 
-	opcode_desc const *describe_code(offs_t startpc);
+	opcode_desc const *describe_code(offs_t startpc, bool little_endian);
 
 protected:
-	bool describe(opcode_desc &desc, const opcode_desc *prev);
+	bool describe(opcode_desc &desc, const opcode_desc *prev, bool little_endian);
 
 	// inlines
 	static constexpr uint32_t compute_spr(uint32_t spr) { return ((spr >> 5) | (spr << 5)) & 0x3ff; }

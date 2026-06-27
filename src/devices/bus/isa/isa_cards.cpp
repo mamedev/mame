@@ -59,6 +59,7 @@
 #include "ultra24f.h"
 
 // storage (IDE/XT-IDE)
+#include "eidemax.h"
 #include "ide.h"
 #include "side116.h"
 #include "xtide.h"
@@ -240,6 +241,7 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("lrk331", LRK331);
 	device.option_add("hpblp", HPBLP);
 	device.option_add("wss", ISA16_WSS);
+	device.option_add("eidemax", ISA16_EIDEMAX);
 
 	// EISA cards
 	// TODO: move to own block

@@ -903,6 +903,8 @@ protected:
 
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
+private:
+	IRQ_CALLBACK_MEMBER(sound_vector_r);
 };
 
 
@@ -1399,7 +1401,8 @@ void jpopnics_state::subbankswitch_w(uint8_t data)
 void tnzsb_state::sound_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	// IM1
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 // handler called by the 2203 emulator when the internal timers cause an IRQ
