@@ -3126,7 +3126,7 @@ double height bitmap on non-interlace mode
 		<publisher>ラブ・ガン (Love Gun)</publisher>
 		<info name="alt_title" value="デンジャラス トイズ" />
 		<info name="release" value="19961213" />
-		<info name="usage" value="Required HDD install from DOS, requires 520K minimum of conventional memory" />
+		<info name="usage" value="Requires HDD install from DOS, requires 520K minimum of conventional memory" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1261568">
@@ -69138,6 +69138,23 @@ pc9821: runs too fast
 		</part>
 	</software>
 
+	<!-- alt .2hd format known to exist, assume same but raw -->
+	<software name="sgunyan" supported="yes">
+		<description>Steel Gun Nyan</description>
+		<year>1992</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Uses [DAC1BIT] for speech, controlled thru CPU frequency
+]]></notes>
+		<info name="author" value="Studio 玄米茶" />
+		<info name="usage" value="Boot from msdos50a floppy, insert a blank disk in drive B: and format /s B:. Once done do format a second time then insert this disk in drive A: and follow instructions. Game controls thru mouse." />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="921600">
+				<rom name="steel_gun_nyan.fdi" size="921600" crc="acca23b9" sha1="01a74a18216823009d0c14888f052e8566f3ab05" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="studiopl" supported="yes">
 		<!-- year assumed by DOS dir contents -->
 		<description>Studio Pal CG Shuu</description>
@@ -69323,7 +69340,7 @@ Eventually crashes with an out of heap memory, wants 550k minimum?
 ]]></notes>
 		<info name="author" value="ZUN" />
 		<info name="alt_title" value="東方靈異伝 ～ The Highly Responsive to Prayers" />
-		<info name="usage" value="Required HDD install from DOS" />
+		<info name="usage" value="Requires HDD install from DOS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1265664">
 				<rom name="thdisk1.fdi" size="1265664" crc="19d4e3ee" sha1="9f3045f9d039176b0b0ece2b5cf1f15a2e8693a2" offset="0" />
