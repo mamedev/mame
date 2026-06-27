@@ -66,6 +66,7 @@ void pc88va_state::video_start()
 	save_item(NAME(m_pltp));
 
 	save_item(NAME(m_text_transpen));
+	save_item(NAME(m_text_transmask));
 	save_item(NAME(m_td));
 	save_pointer(NAME(m_video_pri_reg), 2);
 	save_pointer(NAME(m_gvram), gvram_size);
@@ -436,8 +437,7 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 						int pen = (bitswap<16>(tvram[data_offset],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8)) >> (12 - (x_s * 4)) & 0xf;
 
-						//if (pen != 0 && pen != m_text_transpen)
-						if (pen != 0)
+						if (!m_text_transmask[pen])
 						{
 							for (int mg = 0; mg < m_tsp.spr_mg + 1; mg ++)
 							{
@@ -740,7 +740,7 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 							if(secret) { pen = 0; } //hide text
 
-							if(pen != 0 && pen != m_text_transpen)
+							if (!m_text_transmask[pen])
 								m_text_bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
 						}
 					}
@@ -775,7 +775,7 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 							if(secret) { pen = 0; } //hide text
 
-							if(pen != 0 && pen != m_text_transpen)
+							if (!m_text_transmask[pen])
 								m_text_bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
 						}
 					}
@@ -807,7 +807,7 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 							if(secret) { pen = 0; } //hide text
 
-							if(pen != 0)
+							if (!m_text_transmask[pen])
 								m_text_bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
 						}
 					}
@@ -983,7 +983,7 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 	);
 }
 
-// TODO: incomplete
+// TODO: incomplete, no known cases yet
 void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u8 pal_base)
 {
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -1007,27 +1007,28 @@ void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &
 	}
 }
 
+// famista
 void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 dsp_start_base, u16 scrollx, u8 pal_base, u16 fb_width, u16 fb_height)
 {
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 
-	//printf("%d %d %d %08x %d\n", y_min, y_max, fb_width, start_offset, fb_height);
-
-	const u32 base_address = (fb_start_offset & 0x20000) | (display_start_offset & 0x1ffff);
+	// cannot wrap page boundaries (playfield)
+	const u32 base_page = fb_start_offset & 0x20000;
+	const u32 base_address = display_start_offset & 0x1ffff;
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u32 line_offset = (((y - dsp_start_base) * fb_width) + base_address) & 0x3ffff;
+		const u32 line_offset = ((y - dsp_start_base) * fb_width) + base_address;
 
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
 			u16 x_char = (x >> 1);
-			u32 bitmap_offset = (line_offset + x_char - (scrollx >> 6)) & 0x3ffff;
+			u32 bitmap_offset = (line_offset + x_char - (scrollx >> 6)) & 0x1ffff;
 
 			for (int xi = 0; xi < 2; xi ++)
 			{
-				u8 color = (m_gvram[bitmap_offset] >> (xi ? 0 : 4)) & 0xf;
+				u8 color = (m_gvram[bitmap_offset | base_page] >> (xi ? 0 : 4)) & 0xf;
 
 				if(color && cliprect.contains(x + xi, y))
 					bitmap.pix(y, x + xi) = m_palette->pen(color + pal_base);
@@ -1043,6 +1044,7 @@ void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &c
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 
 	//printf("%d %d %d %08x %d\n", y_min, y_max, fb_width, start_offset, fb_height);
+	// TODO: fix paging
 	const u32 base_address = (fb_start_offset & 0x20000) | (display_start_offset & 0x1ffff);
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -1061,21 +1063,25 @@ void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &c
 	}
 }
 
+// boomer
 void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 dsp_start_base, u16 scrollx, u16 fb_width, u16 fb_height)
 {
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
-	const u32 base_address = (fb_start_offset & 0x20000) | (display_start_offset & 0x1ffff);
+
+	// cannot wrap page boundaries (jumping at start of level)
+	const u32 base_page = fb_start_offset & 0x20000;
+	const u32 base_address = display_start_offset & 0x1ffff;
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u32 line_offset = (((y - dsp_start_base) * fb_width) + base_address) & 0x3ffff;
+		const u32 line_offset = (((y - dsp_start_base) * fb_width) + base_address);
 
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			u32 bitmap_offset = (line_offset + x - (scrollx >> 6)) & 0x3ffff;
+			u32 bitmap_offset = (line_offset + x - (scrollx >> 6)) & 0x1ffff;
 
-			uint32_t color = (m_gvram[bitmap_offset] & 0xff);
+			uint32_t color = (m_gvram[bitmap_offset | base_page] & 0xff);
 
 			// boomer suggests that transparency is calculated over just color = 0, may be settable?
 			// TODO: may not be clamped to palNbit
@@ -1094,6 +1100,7 @@ void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle 
 {
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
+	// TODO: check paging
 	const u32 base_address = (display_start_offset & 0x3ffff);
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -1118,7 +1125,7 @@ void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle 
 	}
 }
 
-// famista, all inufuto games, alantia
+// all inufuto games, alantia
 void pc88va_state::draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 scrollx, u8 pal_base, u16 fb_width, u16 fb_height)
 {
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
@@ -1877,15 +1884,22 @@ void pc88va_state::color_code_w(offs_t offset, u8 data)
 /*
  * $12e Text & Sprite Transparent Color /　テキスト／スプライト透明色レジスタ
  *
+ * x--- ---- ---- ---- TSTC15 pen 15 (1) transparent (0) opaque
+ * -x-- ---- ---- ---- TSTC14 pen 14 ^
+ * ...
+ * ---- ---- ---- --x- TSTC1  pen 1 ^
+ * ---- ---- ---- ---x always 1 (pen 0 always transparent)
  */
 void pc88va_state::text_transpen_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	// TODO: understand what these are for, docs blabbers about text/sprite color separation?
-	//  cfr. rogueall, olteus on disk swap screen
-	// shanghai on winning animation (flips 0xf801 / 0x07c1, intentional?)
+	// - shanghai on winning animation (flips 0xf801 / 0x07c1 for flame drawing in mesh pattern)
+	// - famista team letters on turn change scorecard
 	COMBINE_DATA(&m_text_transpen);
-	if (m_text_transpen & 0xfff0)
-		popmessage("text transpen > 15 (%04x)", m_text_transpen);
+	// bit 0 always on
+	m_text_transpen |= 1;
+	// cache
+	for (int i = 0; i < 16; i++)
+		m_text_transmask[i] = BIT(m_text_transpen, i);
 }
 
 void pc88va_state::picture_mask_w(offs_t offset, u16 data, u16 mem_mask)

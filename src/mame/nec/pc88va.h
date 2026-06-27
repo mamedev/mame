@@ -185,6 +185,7 @@ private:
 	u8 m_pltm, m_pltp;
 
 	u16 m_text_transpen;
+	u8 m_text_transmask[16];
 	bool m_td;
 	bitmap_rgb32 m_text_bitmap;
 	bitmap_rgb32 m_graphic_bitmap[2];
