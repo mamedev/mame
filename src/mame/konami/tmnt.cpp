@@ -1004,7 +1004,7 @@ void tmnt_state::tmntucbl(machine_config &config)
 ***************************************************************************/
 
 // Main board: PWB(A) 302190B
-// Graphics board: PWB(B) 302191B
+// Video board: PWB(B) 302191B
 // NVRAM board: GC903 PWB451803
 ROM_START( cuebrick )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 2*64k for 68000 code */
@@ -1022,6 +1022,9 @@ ROM_START( cuebrick )
 	ROM_LOAD32_BYTE( "903d22.k10",  0x000001, 0x10000, CRC(95ad8591) SHA1(4e3c8c794be1cd78044eb0eebfa3c755e2aaf54f) )
 	ROM_LOAD32_BYTE( "903d21.k8",   0x000002, 0x10000, CRC(3c7bf8cd) SHA1(c487e0109f56b3b0e2aa2c4db2dfb30ad74fb0ab) )
 	ROM_LOAD32_BYTE( "903d20.k6",   0x000003, 0x10000, CRC(2872a1bb) SHA1(da7c7a41860283eac49facaa3beb712d3be7db56) )
+
+	ROM_REGION( 0x4000, "gfx", 0 )
+	ROM_LOAD( "903e14.d8", 0x0000, 0x4000, NO_DUMP ) // "27128" on video board
 ROM_END
 
 ROM_START( mia )
