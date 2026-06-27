@@ -2252,7 +2252,7 @@ protected:
 		SDL_Joystick *const joy = SDL_OpenJoystick(sdl_id);
 		if (!joy)
 		{
-			osd_printf_error("Joystick: Could not open SDL joystick %d: %s.\n", (int)sdl_id, SDL_GetError());
+			osd_printf_error("Joystick: Could not open SDL joystick %u: %s.\n", sdl_id, SDL_GetError());
 			return nullptr;
 		}
 

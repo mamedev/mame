@@ -35,7 +35,7 @@ public:
 		m_oki(*this, "oki")
 	{ }
 
-	void sesame2(machine_config &config);
+	void sesame2(machine_config &config) ATTR_COLD;
 
 private:
 	void prg_map(address_map &map) ATTR_COLD;
@@ -46,7 +46,6 @@ private:
 	// devices
 	required_device<h8s2394_device> m_maincpu;
 	optional_device<okim9810_device> m_oki;
-
 };
 
 uint8_t sesame2_state::portf_r()
@@ -132,7 +131,6 @@ void sesame2_state::sesame2(machine_config &config)
 	OKIM9810(config, m_oki, XTAL(4'096'000));
 	m_oki->add_route(0, "speaker", 0.80, 0);
 	m_oki->add_route(1, "speaker", 0.80, 1);
-
 }
 
 ROM_START( csesame2 )

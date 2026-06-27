@@ -69143,6 +69143,7 @@ pc9821: runs too fast
 		<description>Steel Gun Nyan</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<info name="alt_title" value="鋼鉄銃娘" /> <!-- with furigana スティールガンにゃん -->
 		<notes><![CDATA[
 Uses [DAC1BIT] for speech, controlled thru CPU frequency
 ]]></notes>

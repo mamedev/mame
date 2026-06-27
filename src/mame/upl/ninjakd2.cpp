@@ -184,11 +184,11 @@ public:
 		m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
-	void ninjakd2b(machine_config &config);
-	void ninjakd2(machine_config &config);
+	void ninjakd2b(machine_config &config) ATTR_COLD;
+	void ninjakd2(machine_config &config) ATTR_COLD;
 
-	void init_ninjakd2();
-	void init_bootleg();
+	void init_ninjakd2() ATTR_COLD;
+	void init_bootleg() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -203,10 +203,10 @@ protected:
 	void bankselect_w(uint8_t data);
 	void soundreset_w(uint8_t data);
 
-	void video_init_common();
+	void video_init_common() ATTR_COLD;
 
 	void ninjakd2_pcm_play_w(uint8_t data);
-	void ninjakd2_init_samples();
+	void ninjakd2_init_samples() ATTR_COLD;
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(ninjakd2_get_bg_tile_info);
@@ -215,12 +215,12 @@ protected:
 	IRQ_CALLBACK_MEMBER( vector_r );
 
 	void bg_ctrl(int offset, int data, tilemap_t* tilemap);
-	void gfx_unscramble();
+	void gfx_unscramble() ATTR_COLD;
 	void update_sprites();
 
 	void ninjakid_nopcm_sound_cpu(address_map &map) ATTR_COLD;
 
-	void ninjakd2_core(machine_config &config);
+	void ninjakd2_core(machine_config &config) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -243,7 +243,7 @@ protected:
 private:
 	void draw_sprites(bitmap_ind16 &bitmap);
 	void erase_sprites(bitmap_ind16 &bitmap);
-	void lineswap_gfx_roms(const char *region, const int bit);
+	void lineswap_gfx_roms(const char *region, const int bit) ATTR_COLD;
 	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 	void ninjakd2_main_cpu(address_map &map) ATTR_COLD;
 	void ninjakd2_sound_cpu(address_map &map) ATTR_COLD;
@@ -266,10 +266,10 @@ public:
 		ninjakd2_state(mconfig, type, tag)
 	{ }
 
-	void arkarea(machine_config &config);
-	void mnight(machine_config &config);
+	void arkarea(machine_config &config) ATTR_COLD;
+	void mnight(machine_config &config) ATTR_COLD;
 
-	void init_mnight();
+	void init_mnight() ATTR_COLD;
 
 private:
 	void mnight_main_cpu(address_map &map) ATTR_COLD;
@@ -286,10 +286,10 @@ public:
 		mnight_state(mconfig, type, tag)
 	{ }
 
-	void robokid(machine_config &config);
+	void robokid(machine_config &config) ATTR_COLD;
 
-	void init_robokid();
-	void init_robokidj();
+	void init_robokid() ATTR_COLD;
+	void init_robokidj() ATTR_COLD;
 
 protected:
 	template <int Layer> uint8_t robokid_bg_videoram_r(offs_t offset);
@@ -297,7 +297,7 @@ protected:
 	template <int Layer> void robokid_bg_ctrl_w(offs_t offset, uint8_t data);
 	template <int Layer> void robokid_bg_bank_w(uint8_t data);
 
-	void video_init_banked(uint32_t vram_alloc_size);
+	void video_init_banked(uint32_t vram_alloc_size) ATTR_COLD;
 	TILEMAP_MAPPER_MEMBER(robokid_bg_scan);
 	template <int Layer> TILE_GET_INFO_MEMBER(robokid_get_bg_tile_info);
 
@@ -326,7 +326,7 @@ public:
 		m_pad_io(*this, "PAD%u", 1U)
 	{ }
 
-	void omegaf(machine_config &config);
+	void omegaf(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -343,8 +343,8 @@ private:
 	TILEMAP_MAPPER_MEMBER(omegaf_bg_scan);
 	uint32_t screen_update_omegaf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void io_protection_start();
-	void io_protection_reset();
+	void io_protection_start() ATTR_COLD;
+	void io_protection_reset() ATTR_COLD;
 
 	required_ioport_array<2> m_dsw_io;
 	required_ioport_array<2> m_pad_io;
