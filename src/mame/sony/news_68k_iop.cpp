@@ -262,6 +262,7 @@ namespace
 		[[maybe_unused]] void fb_fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 		[[maybe_unused]] void fb_set_pixel(uint16_t x, uint16_t y, bool on);
 		[[maybe_unused]] uint16_t execute_rop(uint8_t opcode, uint16_t source, uint16_t destination);
+		[[maybe_unused]] void fb_rop_cycle(uint16_t data);
 
 		// [[maybe_unused]] void fb_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
@@ -275,7 +276,7 @@ namespace
 		required_device<ram_device> m_ram;
 		required_region_ptr<u32> m_eprom;
 		required_region_ptr<u32> m_idrom;
-		required_region_ptr<u32> m_krom;
+		required_region_ptr<u16> m_krom;
 
 		// Platform hardware
 		required_device<msm58321_device> m_rtc;
@@ -334,6 +335,7 @@ namespace
 		[[maybe_unused]] uint16_t m_fb_limit_x = 0; // LXA
 		[[maybe_unused]] uint16_t m_fb_limit_y = 0; // YC
 		[[maybe_unused]] uint16_t m_fb_shift = 0;
+		[[maybe_unused]] uint16_t m_fb_carry = 0; // leftover bits after shifting
 		[[maybe_unused]] uint8_t m_fb_rop_func = 0;
 		[[maybe_unused]] bool m_fb_suppress_advance = false; // false = auto-increment after rop
 		[[maybe_unused]] bool m_fb_x_direction = false; // true = top -> bottom
@@ -672,10 +674,10 @@ namespace
 		}
 
 		// Compute first mask
-		m_fb_mask1 = ~(0xffff >> (m_fb_destination_x % 16)); // determine first mask based on bit offset in first word
+		m_fb_mask1 = ~(0xffff >> (m_fb_destination_x % 16)); // determine first mask based on bit offset in first word TODO: direction?
 		m_fb_mask1_armed = true;
 
-		LOGMASKED(LOG_FB, "Destination set to (0x%x, 0x%x)\n", m_fb_destination_x, m_fb_destination_y);
+		LOGMASKED(LOG_FB, "Destination set to (0x%x, 0x%x) x word offset = 0x%x\n", m_fb_destination_x, m_fb_destination_y, (m_fb_destination_x - 1) >> 4);
 		check_operation_start(offset);
 	}
 
@@ -699,12 +701,14 @@ namespace
 	void news_iop_state::limit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	{
 		check_mem_mask(mem_mask);
+		LOGMASKED(LOG_FB, "limit_w(0x%x, 0x%x, 0x%x)\n", offset, data, mem_mask);
 
 		m_fb_limit_x = x_address(data);
 		m_fb_limit_y = y_address(offset);
-		// TODO: set mask2
+		const uint16_t last_pixel = (m_fb_limit_x - 1) & 0xf;     // last pixel's position in the last word
+		m_fb_mask2 = 0xffff >> (last_pixel + 1);        // preserve everything at/after the right edge
 
-		LOGMASKED(LOG_FB, "Limit set to (0x%x, 0x%x)\n", m_fb_limit_x, m_fb_limit_y);
+		LOGMASKED(LOG_FB, "Limit set to (0x%x, 0x%x) x word offset = 0x%x\n", m_fb_limit_x, m_fb_limit_y, (m_fb_limit_x - 1) >> 4);
 		check_operation_start(offset);
 	}
 
@@ -744,6 +748,7 @@ namespace
 			LOGMASKED(LOG_FB, "func=0x%x ", m_fb_rop_func);
 		}
 		LOGMASKED(LOG_FB, "\n");
+		//machine().debug_break();
 	}
 
 	void news_iop_state::pixel_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -757,61 +762,179 @@ namespace
 	uint16_t news_iop_state::execute_rop(const uint8_t opcode, const uint16_t source, const uint16_t destination)
 	{
 		uint16_t result;
+		[[maybe_unused]] std::string op; // Unused when tracing is disabled
+
 		switch (opcode)
 		{
-			case 0x0: // ~S
+			case 0x0:
+				op = "~S";
 				result = ~source;
 				break;
-			case 0x1: // ~(S|D)
+			case 0x1:
+				op = "~(S | D)";
 				result = ~(source | destination);
 				break;
-			case 0x2: // ~S & D
+			case 0x2:
+				op = "~S & D";
 				result = ~source & destination;
 				break;
-			case 0x3: // 0
+			case 0x3:
+				op = "0";
 				result = 0;
 				break;
-			case 0x4: // ~(S&D)
+			case 0x4:
+				op = "~(S & D)";
 				result = ~(source & destination);
 				break;
-			case 0x5: // ~D
+			case 0x5:
+				op = "~D";
 				result = ~destination;
 				break;
-			case 0x6: // S ^ D
+			case 0x6:
+				op = "S ^ D";
 				result = source ^ destination;
 				break;
-			case 0x7: // S & ~D
+			case 0x7:
+				op = "S & ~D";
 				result = source & ~destination;
 				break;
-			case 0x8: // ~S | D
+			case 0x8:
+				op = "~S | D";
 				result = ~source | destination;
 				break;
-			case 0x9: // ~(S^D)
+			case 0x9:
+				op = "~(S ^ D)";
 				result = ~(source ^ destination);
 				break;
-			case 0xa: // D
+			case 0xa:
+				op = "D";
 				result = destination;
 				break;
-			case 0xb: // S & D
+			case 0xb:
+				op = "S & D";
 				result = source & destination;
 				break;
-			case 0xc: // 1
+			case 0xc:
+				op = "1";
 				result = 1;
 				break;
-			case 0xd: // S | ~D
+			case 0xd:
+				op = "S | ~D";
 				result = source | ~destination;
 				break;
-			case 0xe: // S | D
+			case 0xe:
+				op = "S | D";
 				result = source | destination;
 				break;
-			case 0xf: // S
+			case 0xf:
+				op = "S";
 				result = source;
 				break;
 			default:
 				fatalerror("news_68k_iop: invalid ROP function code 0x%x", opcode);
 		}
-		LOGMASKED(LOG_FB, "execute_rop(0x%x, 0x%x, 0x%x) = 0x%x\n", opcode, source, destination, result);
+
+		LOGMASKED(LOG_FB, "execute_rop(0x%x/%s, 0x%x, 0x%x) = 0x%x\n", opcode, op, source, destination, result);
 		return result;
+	}
+
+ 	void news_iop_state::fb_rop_cycle(uint16_t data)
+	{
+		// Calculate source by shifting bits and update carryover
+		// TODO: clean this up
+		uint16_t source;
+		if (m_fb_x_direction)
+		{
+			source = (uint16_t)((data >> m_fb_shift) | m_fb_carry);
+			m_fb_carry = (uint16_t)(((uint32_t)data << (16 - m_fb_shift)) & 0xffff);
+		}
+		else
+		{
+			source = (uint16_t)((data << m_fb_shift) | m_fb_carry);
+			m_fb_carry = (uint16_t)(((uint32_t)data >> (16 - m_fb_shift)) & 0xffff);
+		}
+
+		// Get destination data
+		// Graphics ops are always word-aligned. However, mask1 and mask2 make non-aligned access work as expected.
+		uint32_t byte_offset = m_fb_destination_y * 128 + ((m_fb_current_x >> 4) << 1); // Y: 1024 / 8 = 128 bytes per row. Guarantee X is word-aligned first by chopping LSB
+		uint16_t destination = m_vram->read(byte_offset) << 8 | m_vram->read(byte_offset + 1);
+		LOGMASKED(LOG_FB, "fb_rop_cycle: destination (0x%x, 0x%x) => 0x%x = 0x%x\n", m_fb_destination_x, m_fb_destination_y, byte_offset, destination);
+
+		uint16_t result = execute_rop(m_fb_rop_func, source, destination);
+
+// dest_x, limit_x, width = limit_x - dest_x, mask2
+		LOGMASKED(LOG_FB, "dest_x: 0x%x limit_x: 0x%x width: 0x%x mask2: 0x%x\n", m_fb_destination_x, m_fb_limit_x, m_fb_limit_x - m_fb_destination_x, m_fb_mask2);
+
+		if (m_fb_mask1_armed) // TODO: replace with first word check?
+		{
+			result &= ~m_fb_mask1; // Clear bits that need to be preserved
+			result |= destination & m_fb_mask1; // Apply masked bits from destination
+			m_fb_mask1_armed = false;
+		}
+
+		// If this is the last FIFO push of the row (we have leftover bits from the shift in the shifter), we need to apply them.
+		const uint16_t source_words = ((m_fb_source_x & 0xf) // Get the pixel offset within word
+											+ m_fb_limit_x - m_fb_destination_x + 0xf) // Add the width in pixels, rounded up
+											>> 4; // Convert to word address
+		const uint16_t destination_words = ((m_fb_destination_x & 0xf) + m_fb_limit_x - m_fb_destination_x + 0xf) >> 4;
+		LOGMASKED(LOG_FB, "source words = 0x%x, destination words = 0x%x\n", source_words, destination_words);
+
+		const uint16_t rel_word = (m_fb_current_x - m_fb_destination_x) >> 4;
+		if (rel_word >= source_words - 1 && source_words < destination_words) {
+			if (m_fb_carry != 0) {
+			LOGMASKED(LOG_FB, "Last source word detected when extra write is needed! destination (0x%x, 0x%x) => 0x%x = 0x%x 0x%x\n", m_fb_destination_x, m_fb_destination_y, byte_offset, result >> 8 & 0xff, result & 0xff);
+			}
+
+			// write last FIFO word of row as assembled above and prepare destination word with carry
+			m_vram->write(byte_offset, result >> 8 & 0xff);
+			m_vram->write(byte_offset + 1, result & 0xff);
+			m_fb_current_x += m_fb_x_direction ? 16 : -16;
+			result = m_fb_carry;
+			// TODO: writing a destination word should be in a helper, but that is far from the only thing wrong with this.
+			byte_offset += 2;
+			destination = m_vram->read(byte_offset) << 8 | m_vram->read(byte_offset + 1);
+		}
+
+		// If we are setting the last word of the row, we need to apply mask2.
+		const uint16_t last_destination_word = (m_fb_limit_x - 1) >> 4;
+		const bool is_last_destination_word = m_fb_current_x >> 4 == last_destination_word;
+		LOGMASKED(LOG_FB, "fb_rop_cycle: current_word = 0x%x last_word = 0x%x\n", m_fb_current_x >> 4, last_destination_word);
+		if (is_last_destination_word)
+		{
+			LOGMASKED(LOG_FB, "fb_rop_cycle: applying mask2: 0x%x vs shift of 0x%x, carry = 0x%x, mask 1 was 0x%x\n", m_fb_mask2, m_fb_shift, m_fb_carry, m_fb_mask1);
+			result &= ~m_fb_mask2;
+			result |= destination & m_fb_mask2;
+		}
+
+		// Write result back to VRAM
+		LOGMASKED(LOG_FB, "fb_rop_cycle: destination (0x%x, 0x%x) => 0x%x = 0x%x 0x%x\n", m_fb_destination_x, m_fb_destination_y, byte_offset, result >> 8 & 0xff, result & 0xff);
+		m_vram->write(byte_offset, result >> 8 & 0xff);
+		m_vram->write(byte_offset + 1, result & 0xff);
+
+		// Advance ROCC state
+		m_fb_current_x += m_fb_x_direction ? 16 : -16;
+		LOGMASKED(LOG_FB, "fb_rop_cycle: advanced current x to 0x%x\n", m_fb_current_x);
+
+		// If we are now past the limit, that means we just finished a row and need to reset x and advance y
+		if (is_last_destination_word)
+		{
+			LOGMASKED(LOG_FB, "fb_rop_cycle: done with row, advancing y\n");
+			m_fb_current_x = m_fb_destination_x;
+			m_fb_destination_y += m_fb_y_direction ? 1 : -1;
+			m_fb_mask1_armed = true;
+			m_fb_carry = 0;
+
+			if (!m_fb_limit_y)
+			{
+				LOGMASKED(LOG_FB, "fb_rop_cycle: ROP done!\n");
+				m_fb_busy = false;
+			}
+			else
+			{
+				m_fb_limit_y--;
+				LOGMASKED(LOG_FB, "fb_rop_cycle: decremented limit to 0x%x\n", m_fb_limit_y);
+			}
+		}
 	}
 
 	void news_iop_state::fb_fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -821,75 +944,15 @@ namespace
 
 		if (!m_fb_busy)
 		{
-			// fatalerror("IOP tried to push data without starting an op!");
-			machine().debug_break();
+			fatalerror("IOP tried to push data without starting an op!");
 		}
 
 		// TODO: validate offset versus the setup in the ROP reg
 
-		if (!m_fb_x_direction || !m_fb_y_direction)
-		{
-			machine().debug_break();
-		}
-
 		if (!m_fb_row_fill)
 		{
-			LOGMASKED(LOG_FB, "fb_fifo_w: pushing 0x%x to pix!\n", data);
-
-			// Graphics ops are always word-aligned. However, mask1 and mask2 make non-aligned access work as expected.
-			const uint32_t byte_offset = m_fb_destination_y * 128 + (m_fb_current_x >> 3); // Y: 1024 / 8 = 128 bytes per row
-
-			// Set word
-			const uint16_t destination = m_vram->read(byte_offset) << 8 | m_vram->read(byte_offset + 1);
-			LOGMASKED(LOG_FB, "fb_fifo_w: destination (0x%x, 0x%x) => 0x%x = 0x%x\n", m_fb_destination_x, m_fb_destination_y, byte_offset, destination);
-
-			uint16_t result = execute_rop(m_fb_rop_func, data, destination); // TODO: apply shift here
-
-			// if (m_fb_mask1_armed) // TODO: replace with first word check?
-			// {
-			// 	result &= ~m_fb_mask1; // Clear bits that need to be preserved
-			// 	result |= destination & m_fb_mask1; // Unconditionally apply masked bits from destination
-			// 	m_fb_mask1_armed = false;
-			// }
-
-			// If we are setting the last word of the row, we need to apply mask2
-			// TODO: properly use direction: last_word needs to be m_fb_destination_x >> 4 when x_direction is false
-			//       and the advancing code needs to account for it as well.
-			const uint16_t last_word = (m_fb_limit_x - 1) >> 4;
-			const bool is_last_word = m_fb_current_x >> 4 == last_word;
-			// if (is_last_word)
-			// {
-			// 	result &= ~m_fb_mask2;
-			// 	result |= destination & m_fb_mask2;
-			// }
-
-			// Write result back to VRAM
-			LOGMASKED(LOG_FB, "fb_fifo_w: destination (0x%x, 0x%x) => 0x%x = 0x%x 0x%x\n", m_fb_destination_x, m_fb_destination_y, byte_offset, result >> 8 & 0xff, result & 0xff);
-			m_vram->write(byte_offset, result >> 8 & 0xff);
-			m_vram->write(byte_offset + 1, result & 0xff);
-
-			// Advance ROCC state
-			LOGMASKED(LOG_FB, "fb_fifo_w: incrementing current x from 0x%x to 0x%x\n", m_fb_current_x, m_fb_current_x + 16);
-			m_fb_current_x += 16;
-
-			// If we are now past the limit, that means we just finished a row and need to reset x and advance y
-			if (is_last_word)
-			{
-				LOGMASKED(LOG_FB, "fb_fifo_w: done with row, advancing y\n");
-				m_fb_current_x = m_fb_destination_x;
-				m_fb_destination_y++;
-				m_fb_mask1_armed = true;
-
-				if (!m_fb_limit_y)
-				{
-					LOGMASKED(LOG_FB, "fb_fifo_w: ROP done!\n");
-					m_fb_busy = false;
-				}
-				else
-				{
-					m_fb_limit_y--;
-				}
-			}
+			LOGMASKED(LOG_FB, "fb_fifo_w: pushing unpacked word 0x%x!\n", data);
+			fb_rop_cycle(data);
 		}
 		else
 		{
@@ -1018,8 +1081,9 @@ namespace
 		// map(0x20fc0000, 0x20ffffff).rom().region("krom", 0);
 		map(0x20fc0000, 0x20ffffff).lr16([this] (offs_t offset, uint16_t mem_mask) {
 			LOGMASKED(LOG_FB, "krom read offset 0x%x = 0x%x\n", offset, m_krom[offset]);
-			// machine().debug_break();
-			return 0xbb;
+			//machine().debug_break();
+			return m_krom[offset];
+			//return 0xffff;
 		}, "krom_r");   //.rom().region("krom", 0);
 
 		// Expansion slot SCC (bus errors here kill iopboot, so the probe process may not use bus errors, at least not with the same setup as extio)
@@ -1447,11 +1511,11 @@ namespace
 
 		// scc channel A
 		RS232_PORT(config, m_serial[0], default_rs232_devices, nullptr);//"terminal");
-		m_serial[0]->cts_handler().set(m_scc_external, FUNC(z80scc_device::ctsa_w));
-		m_serial[0]->dcd_handler().set(m_scc_external, FUNC(z80scc_device::dcda_w));
-		m_serial[0]->rxd_handler().set(m_scc_external, FUNC(z80scc_device::rxa_w));
-		m_scc_external->out_rtsa_callback().set(m_serial[0], FUNC(rs232_port_device::write_rts));
-		m_scc_external->out_txda_callback().set(m_serial[0], FUNC(rs232_port_device::write_txd));
+		m_serial[0]->cts_handler().set(m_scc_peripheral, FUNC(z80scc_device::ctsa_w));
+		m_serial[0]->dcd_handler().set(m_scc_peripheral, FUNC(z80scc_device::dcda_w));
+		m_serial[0]->rxd_handler().set(m_scc_peripheral, FUNC(z80scc_device::rxa_w));
+		m_scc_peripheral->out_rtsa_callback().set(m_serial[0], FUNC(rs232_port_device::write_rts));
+		m_scc_peripheral->out_txda_callback().set(m_serial[0], FUNC(rs232_port_device::write_txd));
 
 		// scc channel B
 		RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
@@ -1601,9 +1665,12 @@ namespace
 		ROM_REGION32_BE(0x100, "idrom", 0)
 		ROM_LOAD("nws831-idrom.bin", 0x0, 0x100, CRC(167de13d) SHA1(3e46392671324e92f1e34ddd8ac3c6d94144b3d2) BAD_DUMP)
 
-		ROM_REGION32_BE(0x40000, "krom", 0) // NWB-512 Kanji ROM
-		ROM_LOAD("aa2.bin", 0x00000, 0x20000, CRC(167de13d) SHA1(3e46392671324e92f1e34ddd8ac3c6d94144b3d2) BAD_DUMP)
-		ROM_LOAD("aa1.bin", 0x20000, 0x20000, CRC(167de13d) SHA1(3e46392671324e92f1e34ddd8ac3c6d94144b3d2) BAD_DUMP)
+		ROM_REGION16_BE(0x40000, "krom", 0) // NWB-512 Kanji ROM
+		//ROM_LOAD("aa1.bin", 0x00000, 0x20000, CRC(167de13d) SHA1(3e46392671324e92f1e34ddd8ac3c6d94144b3d2) BAD_DUMP)
+		//ROM_LOAD("aa2.bin", 0x20000, 0x20000, CRC(167de13d) SHA1(3e46392671324e92f1e34ddd8ac3c6d94144b3d2) BAD_DUMP)
+		//ROM_LOAD16_BYTE("aa_even.bin", 0x0000, 0x20000, CRC(167de13d) SHA1(3e46392671324e92f1e34ddd8ac3c6d94144b3d2) BAD_DUMP)
+		//ROM_LOAD16_BYTE("aa_odd.bin", 0x0001, 0x20000, CRC(167de13d) SHA1(3e46392671324e92f1e34ddd8ac3c6d94144b3d2) BAD_DUMP)
+		ROM_LOAD("news_font_full.bin", 0x00000, 0x40000, CRC(167de13d) SHA1(3e46392671324e92f1e34ddd8ac3c6d94144b3d2) BAD_DUMP)
 	ROM_END
 
 } // anonymous namespace
