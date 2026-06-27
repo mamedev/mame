@@ -860,11 +860,12 @@ namespace
 		uint16_t destination = m_vram->read(byte_offset) << 8 | m_vram->read(byte_offset + 1);
 		LOGMASKED(LOG_FB, "fb_rop_cycle: destination (0x%x, 0x%x) => 0x%x = 0x%x\n", m_fb_destination_x, m_fb_destination_y, byte_offset, destination);
 
+		// Execute raster operation with the appropriate source and destination data
 		uint16_t result = execute_rop(m_fb_rop_func, source, destination);
 
-// dest_x, limit_x, width = limit_x - dest_x, mask2
 		LOGMASKED(LOG_FB, "dest_x: 0x%x limit_x: 0x%x width: 0x%x mask2: 0x%x\n", m_fb_destination_x, m_fb_limit_x, m_fb_limit_x - m_fb_destination_x, m_fb_mask2);
 
+		// If this is the start of the row, apply the left mask
 		if (m_fb_mask1_armed) // TODO: replace with first word check?
 		{
 			result &= ~m_fb_mask1; // Clear bits that need to be preserved
@@ -1585,13 +1586,14 @@ namespace
 		m_rtc->d2_handler().set([this] (int data) { set_rtc_data_bit(2, data); });
 		m_rtc->d3_handler().set([this] (int data) { set_rtc_data_bit(3, data); });
 
+		// NWB-512 monochrome framebuffer + NWP-512D 15" Monochrome Display (816x1024)
+		RAM(config, m_vram);
+		m_vram->set_default_value(0);
+		m_vram->set_default_size("128KB");
+
 		SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 		m_screen->set_raw(816 * 1024 * 60, 816, 0, 816, 1024, 0, 1024);
 		m_screen->set_screen_update(FUNC(news_iop_state::screen_update));
-
-		RAM(config, m_vram);
-		m_vram->set_default_value(0xff); // TODO: should be 0, but setting to 1 for debugging block write
-		m_vram->set_default_size("128KB");
 	}
 
 	void news_iop_state::iop_autovector_map(address_map &map)
