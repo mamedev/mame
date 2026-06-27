@@ -62,7 +62,6 @@
 #include "emu.h"
 
 #include "news_020_mmu.h"
-#include "news_hid.h"
 #include "news_iop_scsi.h"
 
 #include "bus/nscsi/cd.h"
@@ -73,19 +72,17 @@
 #include "cpu/m68000/m68020.h"
 
 #include "machine/am79c90.h"
-#include "machine/bankdev.h"
 #include "machine/msm58321.h"
 #include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
-#include "machine/timekpr.h"
 #include "machine/upd765.h"
 #include "machine/z80scc.h"
 
 #include "imagedev/floppy.h"
 
-#include "formats/pc_dsk.h"
+#include "screen.h"
 
 #define LOG_INTERRUPT (1U << 1)
 #define LOG_ALL_INTERRUPT (1U << 2)
@@ -97,8 +94,9 @@
 #define LOG_SCSI (1U << 8)
 #define LOG_AST (1U << 9)
 #define LOG_RTC (1U << 10)
+#define LOG_FB (1U << 11)
 
-#define VERBOSE (LOG_GENERAL)
+#define VERBOSE (LOG_FB)
 
 #include "logmacro.h"
 
@@ -119,6 +117,7 @@ namespace
 			m_ram(*this, "ram"),
 			m_eprom(*this, "eprom"),
 			m_idrom(*this, "idrom"),
+			m_krom(*this, "krom"),
 			m_rtc(*this, "rtc"),
 			m_interval_timer(*this, "interval_timer"),
 			m_scc_external(*this, "scc_external"),
@@ -129,6 +128,8 @@ namespace
 			m_scsi_dma(*this, "scsi_dma"),
 			m_dip_switch(*this, "FRONT_PANEL"),
 			m_serial(*this, "serial%u", 0U),
+			m_screen(*this, "nwp512d"),
+			m_vram(*this, "vram"),
 			iop_irq_line_map({
 				{INPUT_LINE_IRQ1, {CPIRQ_3_1}},
 				{INPUT_LINE_IRQ2, {SCSI_IRQ, SCSI_DRQ}},
@@ -212,8 +213,8 @@ namespace
 		// 68k bus error handlers
 		void cpu_bus_error(offs_t offset, uint32_t mem_mask, bool write, uint8_t status);
 		void scsi_bus_error(uint8_t data);
-		uint32_t extio_bus_error_r(offs_t offset, uint32_t mem_mask);
-		void extio_bus_error_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+		[[maybe_unused]] uint32_t extio_bus_error_r(offs_t offset, uint32_t mem_mask);
+		[[maybe_unused]] void extio_bus_error_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 		uint32_t vme_bus_error_r(offs_t offset, uint32_t mem_mask);
 		void vme_bus_error_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
@@ -248,6 +249,22 @@ namespace
 		void interval_timer_tick(uint8_t data);
 		TIMER_CALLBACK_MEMBER(bus_error_off_cpu);
 
+		// Framebuffer functions
+		u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
+		[[maybe_unused]] void fb_reset();
+		[[maybe_unused]] void destination_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+		[[maybe_unused]] void source_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+		[[maybe_unused]] void limit_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+		[[maybe_unused]] void shift_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+		[[maybe_unused]] void rop_config_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+		[[maybe_unused]] void pixel_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+		[[maybe_unused]] void check_operation_start(offs_t offset);
+		[[maybe_unused]] void fb_fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+		[[maybe_unused]] void fb_set_pixel(uint16_t x, uint16_t y, bool on);
+		[[maybe_unused]] uint16_t execute_rop(uint8_t opcode, uint16_t source, uint16_t destination);
+
+		// [[maybe_unused]] void fb_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+
 	private:
 		// CPUs (2x 68020, but only the main processor has an FPU)
 		required_device<m68020_device> m_iop;    // I/O Processor (BSP, brings up system)
@@ -258,6 +275,7 @@ namespace
 		required_device<ram_device> m_ram;
 		required_region_ptr<u32> m_eprom;
 		required_region_ptr<u32> m_idrom;
+		required_region_ptr<u32> m_krom;
 
 		// Platform hardware
 		required_device<msm58321_device> m_rtc;
@@ -271,6 +289,10 @@ namespace
 		required_ioport m_dip_switch;
 		required_device_array<rs232_port_device, 2> m_serial;
 		std::unique_ptr<u16[]> m_net_ram;
+
+		// Framebuffer and CRT
+		required_device<screen_device> m_screen; // NWP-512D 15" Monochrome Display
+		required_device<ram_device> m_vram;
 
 		// IOP IRQ state
 		const std::map<int, std::vector<iop_irq_number>> iop_irq_line_map;
@@ -286,17 +308,45 @@ namespace
 		bool m_cpu_bus_error = false;
 		offs_t m_last_berr_pc_cpu = 0;
 		uint8_t m_cpu_bus_error_status = 0;
-		emu_timer *m_cpu_bus_error_timer;
+		emu_timer *m_cpu_bus_error_timer = nullptr;
 
 		// Front panel
 		bool m_panel_clear = false;
 		bool m_panel_shift = false;
-		int m_sw1_first_read = 0;
 		int m_panel_shift_count = 0;
 		uint8_t m_rtc_data = 0;
 
 		// Other constants
 		static constexpr int NET_RAM_SIZE = 8192; // 16K RAM, in 16-bit words
+
+		// Framebuffer state
+		// CXD1029: raster operation engine
+		// ROCC - Raster Operation Cycle Controller, state machine for framebuffer
+		// Where the NWS-1500 service manual uses specific names for signals, they are noted below.
+		// Technically, they may not have used this terminology on this framebuffer.
+		[[maybe_unused]] uint8_t m_fb_status = 0;
+		[[maybe_unused]] uint8_t m_fb_ctrl = 0;
+		[[maybe_unused]] uint16_t m_fb_destination_x = 0; // DRXA
+		[[maybe_unused]] uint16_t m_fb_current_x = 0; // offset from dst/src, DXA
+		[[maybe_unused]] uint16_t m_fb_destination_y = 0; // DYA
+		[[maybe_unused]] uint16_t m_fb_source_x = 0; // SRXA
+		[[maybe_unused]] uint16_t m_fb_source_y = 0; // SYA
+		[[maybe_unused]] uint16_t m_fb_limit_x = 0; // LXA
+		[[maybe_unused]] uint16_t m_fb_limit_y = 0; // YC
+		[[maybe_unused]] uint16_t m_fb_shift = 0;
+		[[maybe_unused]] uint8_t m_fb_rop_func = 0;
+		[[maybe_unused]] bool m_fb_suppress_advance = false; // false = auto-increment after rop
+		[[maybe_unused]] bool m_fb_x_direction = false; // true = top -> bottom
+		[[maybe_unused]] bool m_fb_y_direction = false; // true = left -> right
+		[[maybe_unused]] bool m_fb_row_fill = false; // true = write data fifo word across whole line
+		[[maybe_unused]] bool m_fb_read = false; // Tri-state with write - read = fb -> host, write = host -> fb, both = fb -> fb copy
+		[[maybe_unused]] bool m_fb_write = false;
+		[[maybe_unused]] bool m_fb_busy = false; // operation in progress
+
+		[[maybe_unused]] bool m_fb_mask1_armed = false; // at rectangle edge 1
+		[[maybe_unused]] uint16_t m_fb_mask1 = 0;
+		[[maybe_unused]] uint16_t m_fb_mask2 = 0;
+		[[maybe_unused]] uint16_t m_fb_op_counter = 0;
 	};
 
 	void news_iop_state::machine_start()
@@ -318,7 +368,6 @@ namespace
 		save_item(NAME(m_cpu_bus_error_status));
 		save_item(NAME(m_panel_clear));
 		save_item(NAME(m_panel_shift));
-		save_item(NAME(m_sw1_first_read));
 		save_item(NAME(m_panel_shift_count));
 		save_item(NAME(m_rtc_data));
 	}
@@ -527,10 +576,399 @@ namespace
 		m_cpu->set_emmu_enable(false);
 		m_mmu->set_mmu_enable(false);
 		m_mmu->set_rom_enable(true);
+
+		// Reset internal framebuffer state
+		fb_reset();
 	}
 
 	void news_iop_state::init_common()
 	{
+	}
+
+	u32 news_iop_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
+	{
+		// uint8_t const *pixel_pointer = m_vram->pointer();
+		static int log = 0;
+
+		// TODO: optimize this to read one byte at a time rather than bit
+		for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
+		{
+			for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x++) // make this 1024 instead of max_x to view offscreen area
+			{
+				const uint32_t byte_offset = y * 128 + (x >> 3); // Y: 1024 / 8 = 128 bytes per row
+				const uint16_t x_bit = 7 - (x & 7); // pixel 0 = bit 7
+
+				// Set desired pixel
+				uint8_t pixel = m_vram->read(byte_offset);
+				pixel = pixel & (1u << x_bit);
+				bitmap.pix(y, x) = pixel ? rgb_t::white() : rgb_t::black();
+
+				if (bitmap.pix(y,x) != rgb_t::black())
+				{
+					log = 1;
+				}
+
+				if (log > 0 && log < 1024 * 1024)
+				{
+					++log;
+					// LOGMASKED(LOG_FB, "y = %d x = %d pixel = 0x%x, bitmap = %d, byte offset = 0x%x\n", y, x, pixel, bitmap.pix(y, x), byte_offset);
+				}
+			}
+		}
+
+		return 0;
+	}
+
+	void news_iop_state::fb_reset()
+	{
+		m_fb_busy = false;
+	}
+
+	uint16_t x_address(uint16_t data)
+	{
+		return data & 0xfff; // When X is supplied, it is in D11-D0
+	}
+
+	uint16_t y_address(uint16_t data) // word offset
+	{
+		return data & 0xfff; // When Y is supplied, it is in A12-A1, but is already shifted down.
+	}
+
+	void check_mem_mask(uint16_t mem_mask)
+	{
+		if (mem_mask != 0xffff)
+		{
+			fatalerror("fb: non-word write!");
+		}
+	}
+
+	void news_iop_state::check_operation_start(offs_t offset)
+	{
+		if (offset & (0x4000 >> 1)) // word offset
+		{
+			LOGMASKED(LOG_FB, "Operation started\n");
+			m_fb_busy = true;
+			m_fb_current_x = m_fb_destination_x;
+
+			// TODO: if this is FB -> FB op, start it here, because the host won't write anything
+			if (m_fb_read && m_fb_write)
+			{
+				// fatalerror("Yikes, fb copy isn't done yet\n");
+			}
+		}
+	}
+
+	void news_iop_state::destination_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+	{
+		check_mem_mask(mem_mask);
+
+		m_fb_destination_x = x_address(data);
+		m_fb_destination_y = y_address(offset);
+
+		if (offset & (0x2000 >> 1))
+		{
+			// how much do we need to shift source by to align it with destination?
+			m_fb_shift = m_fb_destination_x % 16 - m_fb_source_x % 16;
+		}
+
+		// Compute first mask
+		m_fb_mask1 = ~(0xffff >> (m_fb_destination_x % 16)); // determine first mask based on bit offset in first word
+		m_fb_mask1_armed = true;
+
+		LOGMASKED(LOG_FB, "Destination set to (0x%x, 0x%x)\n", m_fb_destination_x, m_fb_destination_y);
+		check_operation_start(offset);
+	}
+
+	void news_iop_state::source_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+	{
+		check_mem_mask(mem_mask);
+
+		m_fb_source_x = x_address(data);
+		m_fb_source_y = y_address(offset);
+
+		if (offset & (0x2000 >> 1))
+		{
+			// how much do we need to shift source by to align it with destination?
+			m_fb_shift = m_fb_destination_x % 16 - m_fb_source_x % 16; // direction determined by x direction
+		}
+
+		LOGMASKED(LOG_FB, "Source set to (0x%x, 0x%x)\n", m_fb_source_x, m_fb_source_y);
+		check_operation_start(offset);
+	}
+
+	void news_iop_state::limit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+	{
+		check_mem_mask(mem_mask);
+
+		m_fb_limit_x = x_address(data);
+		m_fb_limit_y = y_address(offset);
+		// TODO: set mask2
+
+		LOGMASKED(LOG_FB, "Limit set to (0x%x, 0x%x)\n", m_fb_limit_x, m_fb_limit_y);
+		check_operation_start(offset);
+	}
+
+	void news_iop_state::shift_w(offs_t, uint16_t data, uint16_t mem_mask)
+	{
+		check_mem_mask(mem_mask);
+
+		m_fb_shift = data;
+		LOGMASKED(LOG_FB, "Shift set to 0x%x\n", m_fb_shift);
+	}
+
+	void news_iop_state::rop_config_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+	{
+		check_mem_mask(mem_mask);
+
+		LOGMASKED(LOG_FB, "rop_config_w(0x%x, 0x%x) = ", offset, data);
+
+		// These mappings are an educated guess based on NWS-1500 service manual and IOP behavior
+		offset <<= 1; // use byte offset
+		m_fb_suppress_advance = offset & 0x4;
+		m_fb_x_direction = offset & 0x10;
+		m_fb_y_direction = offset & 0x20;
+		m_fb_row_fill = offset & 0x80;
+		m_fb_read = offset & 0x100;
+		m_fb_write = offset & 0x200;
+		LOGMASKED(LOG_FB, "%s%s%s%s%s%s",
+			m_fb_write ? "fbwrite " : "",
+			m_fb_read ? "fbread " : "",
+			m_fb_row_fill ? "rowfill " : "",
+			m_fb_y_direction ? "yfwd " : "yrev ",
+			m_fb_x_direction ? "xfwd " : "xrev ",
+			m_fb_suppress_advance ? "supadv " : "");
+
+		if (offset & 400) // If set, load ROP function
+		{
+			m_fb_rop_func = data & 0xf;
+			LOGMASKED(LOG_FB, "func=0x%x ", m_fb_rop_func);
+		}
+		LOGMASKED(LOG_FB, "\n");
+	}
+
+	void news_iop_state::pixel_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+	{
+		// Set pixel to 1 at X (data), Y (offset[12:1])
+		check_mem_mask(mem_mask);
+		LOGMASKED(LOG_FB, "pixel_w(0x%x, 0x%x)\n", offset, data);
+		fb_set_pixel(x_address(data), y_address(offset), true);
+	}
+
+	uint16_t news_iop_state::execute_rop(const uint8_t opcode, const uint16_t source, const uint16_t destination)
+	{
+		uint16_t result;
+		switch (opcode)
+		{
+			case 0x0: // ~S
+				result = ~source;
+				break;
+			case 0x1: // ~(S|D)
+				result = ~(source | destination);
+				break;
+			case 0x2: // ~S & D
+				result = ~source & destination;
+				break;
+			case 0x3: // 0
+				result = 0;
+				break;
+			case 0x4: // ~(S&D)
+				result = ~(source & destination);
+				break;
+			case 0x5: // ~D
+				result = ~destination;
+				break;
+			case 0x6: // S ^ D
+				result = source ^ destination;
+				break;
+			case 0x7: // S & ~D
+				result = source & ~destination;
+				break;
+			case 0x8: // ~S | D
+				result = ~source | destination;
+				break;
+			case 0x9: // ~(S^D)
+				result = ~(source ^ destination);
+				break;
+			case 0xa: // D
+				result = destination;
+				break;
+			case 0xb: // S & D
+				result = source & destination;
+				break;
+			case 0xc: // 1
+				result = 1;
+				break;
+			case 0xd: // S | ~D
+				result = source | ~destination;
+				break;
+			case 0xe: // S | D
+				result = source | destination;
+				break;
+			case 0xf: // S
+				result = source;
+				break;
+			default:
+				fatalerror("news_68k_iop: invalid ROP function code 0x%x", opcode);
+		}
+		LOGMASKED(LOG_FB, "execute_rop(0x%x, 0x%x, 0x%x) = 0x%x\n", opcode, source, destination, result);
+		return result;
+	}
+
+	void news_iop_state::fb_fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+	{
+		LOGMASKED(LOG_FB, "(%s) fb_fifo_w(0x%x, 0x%x, 0x%x)\n", machine().describe_context(), offset, data, mem_mask);
+		check_mem_mask(mem_mask);
+
+		if (!m_fb_busy)
+		{
+			// fatalerror("IOP tried to push data without starting an op!");
+			machine().debug_break();
+		}
+
+		// TODO: validate offset versus the setup in the ROP reg
+
+		if (!m_fb_x_direction || !m_fb_y_direction)
+		{
+			machine().debug_break();
+		}
+
+		if (!m_fb_row_fill)
+		{
+			LOGMASKED(LOG_FB, "fb_fifo_w: pushing 0x%x to pix!\n", data);
+
+			// Graphics ops are always word-aligned. However, mask1 and mask2 make non-aligned access work as expected.
+			const uint32_t byte_offset = m_fb_destination_y * 128 + (m_fb_current_x >> 3); // Y: 1024 / 8 = 128 bytes per row
+
+			// Set word
+			const uint16_t destination = m_vram->read(byte_offset) << 8 | m_vram->read(byte_offset + 1);
+			LOGMASKED(LOG_FB, "fb_fifo_w: destination (0x%x, 0x%x) => 0x%x = 0x%x\n", m_fb_destination_x, m_fb_destination_y, byte_offset, destination);
+
+			uint16_t result = execute_rop(m_fb_rop_func, data, destination); // TODO: apply shift here
+
+			// if (m_fb_mask1_armed) // TODO: replace with first word check?
+			// {
+			// 	result &= ~m_fb_mask1; // Clear bits that need to be preserved
+			// 	result |= destination & m_fb_mask1; // Unconditionally apply masked bits from destination
+			// 	m_fb_mask1_armed = false;
+			// }
+
+			// If we are setting the last word of the row, we need to apply mask2
+			// TODO: properly use direction: last_word needs to be m_fb_destination_x >> 4 when x_direction is false
+			//       and the advancing code needs to account for it as well.
+			const uint16_t last_word = (m_fb_limit_x - 1) >> 4;
+			const bool is_last_word = m_fb_current_x >> 4 == last_word;
+			// if (is_last_word)
+			// {
+			// 	result &= ~m_fb_mask2;
+			// 	result |= destination & m_fb_mask2;
+			// }
+
+			// Write result back to VRAM
+			LOGMASKED(LOG_FB, "fb_fifo_w: destination (0x%x, 0x%x) => 0x%x = 0x%x 0x%x\n", m_fb_destination_x, m_fb_destination_y, byte_offset, result >> 8 & 0xff, result & 0xff);
+			m_vram->write(byte_offset, result >> 8 & 0xff);
+			m_vram->write(byte_offset + 1, result & 0xff);
+
+			// Advance ROCC state
+			LOGMASKED(LOG_FB, "fb_fifo_w: incrementing current x from 0x%x to 0x%x\n", m_fb_current_x, m_fb_current_x + 16);
+			m_fb_current_x += 16;
+
+			// If we are now past the limit, that means we just finished a row and need to reset x and advance y
+			if (is_last_word)
+			{
+				LOGMASKED(LOG_FB, "fb_fifo_w: done with row, advancing y\n");
+				m_fb_current_x = m_fb_destination_x;
+				m_fb_destination_y++;
+				m_fb_mask1_armed = true;
+
+				if (!m_fb_limit_y)
+				{
+					LOGMASKED(LOG_FB, "fb_fifo_w: ROP done!\n");
+					m_fb_busy = false;
+				}
+				else
+				{
+					m_fb_limit_y--;
+				}
+			}
+		}
+		else
+		{
+			// LOGMASKED(LOG_FB, "fb_fifo_w: pushing 0x%x to row 0x%x vs limit 0x%x!\n", data, m_fb_destination_y, m_fb_limit_y);
+
+			// Graphics ops are always word-aligned. However, mask1 and mask2 make non-aligned access work as expected.
+			const uint16_t word_count = (m_fb_limit_x >> 4) - (m_fb_current_x >> 4); // TODO: this doesn't work for single-transfers
+			for (uint16_t i = 0; i < word_count; i++)
+			{
+				const uint32_t byte_offset = m_fb_destination_y * 128 + (m_fb_current_x >> 3); // Y: 1024 / 8 = 128 bytes per row
+
+				// Set word
+				const uint16_t destination = m_vram->read(byte_offset) << 8 | m_vram->read(byte_offset + 1);
+				// LOGMASKED(LOG_FB, "fb_fifo_w: destination (0x%x, 0x%x) => 0x%x = 0x%x\n", m_fb_destination_x, m_fb_destination_y, byte_offset, destination);
+				uint16_t result = execute_rop(m_fb_rop_func, data, destination); // TODO: apply shift here
+
+				if (m_fb_mask1_armed)
+				{
+					result &= ~m_fb_mask1; // Clear bits that need to be preserved
+					result |= destination & m_fb_mask1; // Unconditionally apply masked bits from destination
+					m_fb_mask1_armed = false;
+				}
+
+				// If we are setting the last word of the row, we need to apply mask2
+				// TODO: properly use direction: last_word needs to be m_fb_destination_x >> 4 when x_direction is false
+				//       and the advancing code needs to account for it as well.
+				const uint16_t last_word = (m_fb_limit_x - 1) >> 4;
+				const bool is_last_word = m_fb_current_x >> 4 == last_word;
+				if (is_last_word)
+				{
+					result &= ~m_fb_mask2;
+					result |= destination & m_fb_mask2;
+				}
+
+				// Write result back to VRAM
+				// LOGMASKED(LOG_FB, "fb_fifo_w: destination (0x%x, 0x%x) => 0x%x = 0x%x 0x%x\n", m_fb_destination_x, m_fb_destination_y, byte_offset, result >> 8 & 0xff, result & 0xff);
+				m_vram->write(byte_offset, result >> 8 & 0xff);
+				m_vram->write(byte_offset + 1, result & 0xff);
+
+				// Advance ROCC state
+				m_fb_current_x += 16;
+
+				// If we are now past the limit, that means we just finished a row and need to reset x and advance y
+				if (is_last_word)
+				{
+					// LOGMASKED(LOG_FB, "fb_fifo_w: done with row, advancing y\n");
+					m_fb_current_x = m_fb_destination_x;
+					m_fb_destination_y++;
+					m_fb_mask1_armed = true;
+
+					if (!m_fb_limit_y)
+					{
+						// LOGMASKED(LOG_FB, "fb_fifo_w: ROP done!\n");
+						m_fb_busy = false;
+					}
+					else
+					{
+						m_fb_limit_y--;
+					}
+				}
+			}
+		}
+	}
+
+	void news_iop_state::fb_set_pixel(uint16_t x, uint16_t y, bool on)
+	{
+		// Wrap to framebuffer size
+		x %= 1024;
+		y %= 1024;
+
+		// LOGMASKED(LOG_FB, "fb_set_pixel(0x%x, 0x%x) = %d\n", x, y, on ? 1 : 0);
+		// Determine byte offset in VRAM
+		const uint32_t byte_offset = y * 128 + (x >> 3); // Y: 1024 / 8 = 128 bytes per row
+		const uint16_t x_bit = 7 - (x & 7); // pixel 0 = bit 7
+
+		// Set desired pixel
+		uint8_t pixel = m_vram->read(byte_offset);
+		pixel = (pixel & ~(1u << x_bit)) | ((on ? 1u : 0u) << x_bit);
+		m_vram->write(byte_offset, pixel);
 	}
 
 	void news_iop_state::iop_map(address_map &map)
@@ -542,7 +980,47 @@ namespace
 		map(0x03000000, 0x0300ffff).rom().region("eprom", 0).mirror(0x007f0000);
 
 		// IOP bus expansion I/O
-		map(0x20000000, 0x20ffffff).rw(FUNC(news_iop_state::extio_bus_error_r),FUNC(news_iop_state::extio_bus_error_w)).mirror(0x1f000000);
+		map(0x20000000, 0x20efffff).rw(FUNC(news_iop_state::extio_bus_error_r),FUNC(news_iop_state::extio_bus_error_w)).mirror(0x1f000000);
+
+		// NWB-512 Monochrome Framebuffer (816x1024)
+		// TODO: convert ranges to use `select` where it makes sense
+		map(0x20f02000, 0x20f02001).w(FUNC(news_iop_state::shift_w)); // shift count when only "load shift" is asserted
+		map(0x20f08000, 0x20f0ffff).w(FUNC(news_iop_state::destination_w)); // A13 = load shift, A14 = start execution
+		map(0x20f20000, 0x20f27fff).w(FUNC(news_iop_state::source_w)); // A13 = load shift, A14 = start execution
+		map(0x20f40000, 0x20f55fff).w(FUNC(news_iop_state::limit_w)); // A16 = source-space select (FB vs host), A14 = start execution
+		map(0x20f1a000, 0x20f1bfff).w(FUNC(news_iop_state::pixel_w));
+
+		map(0x20f60000, 0x20f60fff).w(FUNC(news_iop_state::rop_config_w)); // rop configuration TODO: is the end addr correct here?
+		map(0x20f70000, 0x20f70fff).w(FUNC(news_iop_state::fb_fifo_w)); // data ports
+
+		// TODO: double-check word mapping of these
+		map(0x20f80000, 0x20f80001).lr8(NAME([this] {
+			return 0x20 | (m_fb_busy ? 0x3 : 0x0);
+		}));
+		map(0x20f80000, 0x20f80001).lw8(NAME([this] (uint8_t data) { // confirmed 8-bit write
+			// NWS-1580 uses a newer version of the framebuffer that uses a similar ROP engine, these definitions
+			// can be found in the NWS-1580 service manual.
+			LOGMASKED(LOG_FB, "Write FB control = 0x%x (%s)\n", data, machine().describe_context());
+			LOGMASKED(LOG_FB, "\t%s framebuffer\n", data & 0x1 ? "enable" : "reset"); // TODO: implement reset
+			LOGMASKED(LOG_FB, "\t%s kanji ROM\n", data & 0x2 ? "enable" : "disable"); // TODO: not for mono?
+			LOGMASKED(LOG_FB, "\t%s v-sync interrupt\n", data & 0x8 ? "enable" : "disable");
+			LOGMASKED(LOG_FB, "\t%s command completion interrupt\n", data & 0x10 ? "enable" : "disable");
+			LOGMASKED(LOG_FB, "\treserved %s\n", data & 0x20 ? "set" : "cleared");
+			LOGMASKED(LOG_FB, "\tdimmer setting = 0x%x\n", (data & 0xC0) >> 6);
+
+			m_fb_ctrl = data;
+		}));
+
+		map(0x20fa0000, 0x20fa0000).lw8([this] (uint8_t data) {
+			LOGMASKED(LOG_FB, "Write plane mask = 0x%x\n", data);
+		}, "plane_mask_w");
+
+		// map(0x20fc0000, 0x20ffffff).rom().region("krom", 0);
+		map(0x20fc0000, 0x20ffffff).lr16([this] (offs_t offset, uint16_t mem_mask) {
+			LOGMASKED(LOG_FB, "krom read offset 0x%x = 0x%x\n", offset, m_krom[offset]);
+			// machine().debug_break();
+			return 0xbb;
+		}, "krom_r");   //.rom().region("krom", 0);
 
 		// Expansion slot SCC (bus errors here kill iopboot, so the probe process may not use bus errors, at least not with the same setup as extio)
 		// TODO: Does the fact that NEWS-OS 4 poke at these addresses mean that something is not configured properly elsewhere?
@@ -838,24 +1316,12 @@ namespace
 	{
 		// the shift pin and the counter drive a multiplexer (the shift pin also drives the counter)
 		uint8_t multiplexer_value = (m_panel_shift_count & 0x3) << 1;
-		multiplexer_value |= (m_panel_shift ? 0x1 : 0x0);
+		multiplexer_value |= m_panel_shift ? 0x1 : 0x0;
 
 		bool dcd_state = false;
 		if (multiplexer_value < 6) // DIPSW
 		{
-			// The reset condition (somehow) seems to start the multiplexer count at 5. This is a workaround to achieve the same results.
-			// This seems to be correct because it causes diag mode to start when SW6 is set, and also allows the NWB-512 init code to start
-			// when SW1 is set. When framebuffer emulation is added, this can be confirmed (maybe also with an oscilloscope readout?)
-			// The 2 is there because the reset condition of the emulated pins results in an extra reset.
-			if ((m_sw1_first_read < 2) && multiplexer_value == 0)
-			{
-				m_sw1_first_read++;
-				dcd_state = BIT(m_dip_switch->read(), 5);
-			}
-			else
-			{
-				dcd_state = BIT(m_dip_switch->read(), multiplexer_value);
-			}
+			dcd_state = BIT(m_dip_switch->read(), multiplexer_value);
 		}
 		else // IDROM
 		{
@@ -980,7 +1446,7 @@ namespace
 		m_scc_peripheral->out_rtsb_callback().set(FUNC(news_iop_state::handle_rts));
 
 		// scc channel A
-		RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
+		RS232_PORT(config, m_serial[0], default_rs232_devices, nullptr);//"terminal");
 		m_serial[0]->cts_handler().set(m_scc_external, FUNC(z80scc_device::ctsa_w));
 		m_serial[0]->dcd_handler().set(m_scc_external, FUNC(z80scc_device::dcda_w));
 		m_serial[0]->rxd_handler().set(m_scc_external, FUNC(z80scc_device::rxa_w));
@@ -1038,7 +1504,7 @@ namespace
 		m_scsi->drq_handler().set(DEVICE_SELF, FUNC(news_iop_state::scsi_drq_handler));
 
 		// Virtual device for handling SCSI DMA
-		// (workaround for 68k bus access limitiations; normally iopboot's BERR handler would deal with SCSI DMA stuff)
+		// (workaround for 68k bus access limitations; normally iopboot's BERR handler would deal with SCSI DMA stuff)
 		NEWS_IOP_SCSI_HELPER(config, m_scsi_dma);
 		m_scsi_dma->scsi_read_callback().set(m_scsi, FUNC(ncr53c80_device::read));
 		m_scsi_dma->scsi_write_callback().set(m_scsi, FUNC(ncr53c80_device::write));
@@ -1054,6 +1520,14 @@ namespace
 		m_rtc->d1_handler().set([this] (int data) { set_rtc_data_bit(1, data); });
 		m_rtc->d2_handler().set([this] (int data) { set_rtc_data_bit(2, data); });
 		m_rtc->d3_handler().set([this] (int data) { set_rtc_data_bit(3, data); });
+
+		SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+		m_screen->set_raw(816 * 1024 * 60, 816, 0, 816, 1024, 0, 1024);
+		m_screen->set_screen_update(FUNC(news_iop_state::screen_update));
+
+		RAM(config, m_vram);
+		m_vram->set_default_value(0xff); // TODO: should be 0, but setting to 1 for debugging block write
+		m_vram->set_default_size("128KB");
 	}
 
 	void news_iop_state::iop_autovector_map(address_map &map)
@@ -1096,9 +1570,8 @@ namespace
 			PORT_DIPNAME(0x07, 0x07, "Display")
 				PORT_DIPLOCATION("FRONT_PANEL:1,2,3")
 				PORT_DIPSETTING(0x07, "Console")
-				PORT_DIPSETTING(0x06, "NWB-512")
-				PORT_DIPSETTING(0x03, "NWB-225A")
-				PORT_DIPSETTING(0x00, "Autoselect")
+				PORT_DIPSETTING(0x06, "NWB-225A")
+				PORT_DIPSETTING(0x03, "NWB-512")
 			PORT_DIPNAME(0x08, 0x08, "Boot Device")
 				PORT_DIPLOCATION("FRONT_PANEL:4")
 				PORT_DIPSETTING(0x08, "SCSI")
@@ -1127,6 +1600,10 @@ namespace
 		// The upper two bits per nibble are programmed to ones on my NWS-831
 		ROM_REGION32_BE(0x100, "idrom", 0)
 		ROM_LOAD("nws831-idrom.bin", 0x0, 0x100, CRC(167de13d) SHA1(3e46392671324e92f1e34ddd8ac3c6d94144b3d2) BAD_DUMP)
+
+		ROM_REGION32_BE(0x40000, "krom", 0) // NWB-512 Kanji ROM
+		ROM_LOAD("aa2.bin", 0x00000, 0x20000, CRC(167de13d) SHA1(3e46392671324e92f1e34ddd8ac3c6d94144b3d2) BAD_DUMP)
+		ROM_LOAD("aa1.bin", 0x20000, 0x20000, CRC(167de13d) SHA1(3e46392671324e92f1e34ddd8ac3c6d94144b3d2) BAD_DUMP)
 	ROM_END
 
 } // anonymous namespace
