@@ -289,4 +289,4 @@ ROM_END
 
 
 GAME( 1996, cspin2,    0, cspin2, cspin2, capr1_state, empty_init, ROT0, "Taito", "Capriccio Spin 2", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 199?, csesame1,  0, cspin2, cspin2, capr1_state, empty_init, ROT0, "Taito", "Capriccio Sesame", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 2000?, csesame1,  0, cspin2, cspin2, capr1_state, empty_init, ROT0, "Taito", "Capriccio Sesame", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // between E95 (manpukuh) and E98 (styphp)
