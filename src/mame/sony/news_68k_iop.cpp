@@ -834,7 +834,7 @@ namespace
 				fatalerror("news_68k_iop: invalid ROP function code 0x%x", opcode);
 		}
 
-		LOGMASKED(LOG_FB, "execute_rop(0x%x/%s, 0x%x, 0x%x) = 0x%x\n", opcode, op, source, destination, result);
+		// LOGMASKED(LOG_FB, "execute_rop(0x%x/%s, 0x%x, 0x%x) = 0x%x\n", opcode, op, source, destination, result);
 		return result;
 	}
 
@@ -845,25 +845,27 @@ namespace
 		uint16_t source;
 		if (m_fb_x_direction)
 		{
-			source = (uint16_t)((data >> m_fb_shift) | m_fb_carry);
-			m_fb_carry = (uint16_t)(((uint32_t)data << (16 - m_fb_shift)) & 0xffff);
+			source = uint16_t(data >> m_fb_shift | m_fb_carry);
+			m_fb_carry = uint16_t(uint32_t(data) << (16 - m_fb_shift) & 0xffff);
 		}
 		else
 		{
-			source = (uint16_t)((data << m_fb_shift) | m_fb_carry);
-			m_fb_carry = (uint16_t)(((uint32_t)data >> (16 - m_fb_shift)) & 0xffff);
+			source = uint16_t(data << m_fb_shift | m_fb_carry);
+			m_fb_carry = uint16_t(uint32_t(data) >> (16 - m_fb_shift) & 0xffff);
 		}
 
 		// Get destination data
 		// Graphics ops are always word-aligned. However, mask1 and mask2 make non-aligned access work as expected.
 		uint32_t byte_offset = m_fb_destination_y * 128 + ((m_fb_current_x >> 4) << 1); // Y: 1024 / 8 = 128 bytes per row. Guarantee X is word-aligned first by chopping LSB
 		uint16_t destination = m_vram->read(byte_offset) << 8 | m_vram->read(byte_offset + 1);
-		LOGMASKED(LOG_FB, "fb_rop_cycle: destination (0x%x, 0x%x) => 0x%x = 0x%x\n", m_fb_destination_x, m_fb_destination_y, byte_offset, destination);
 
 		// Execute raster operation with the appropriate source and destination data
 		uint16_t result = execute_rop(m_fb_rop_func, source, destination);
 
-		LOGMASKED(LOG_FB, "dest_x: 0x%x limit_x: 0x%x width: 0x%x mask2: 0x%x\n", m_fb_destination_x, m_fb_limit_x, m_fb_limit_x - m_fb_destination_x, m_fb_mask2);
+		LOGMASKED(LOG_FB, "fb_rop_cycle:\n");
+		LOGMASKED(LOG_FB, "\tx,y(0x%x, 0x%x) => offs 0x%x\n", m_fb_current_x, m_fb_destination_y, byte_offset);
+		LOGMASKED(LOG_FB, "\tshift = 0x%x, source = 0x%x, carry = 0x%x, destination = 0x%x\n", m_fb_shift, source, m_fb_carry, destination);
+		LOGMASKED(LOG_FB, "\trop result = 0x%x\n", result);
 
 		// If this is the start of the row, apply the left mask
 		if (m_fb_mask1_armed) // TODO: replace with first word check?
@@ -871,55 +873,49 @@ namespace
 			result &= ~m_fb_mask1; // Clear bits that need to be preserved
 			result |= destination & m_fb_mask1; // Apply masked bits from destination
 			m_fb_mask1_armed = false;
+			LOGMASKED(LOG_FB, "\tstart of row, applied mask1=0x%x, new result = 0x%x\n", m_fb_mask1, result);
 		}
 
+		// TODO: writing a destination word should be in a helper, but that is far from the only thing wrong with this.
 		// If this is the last FIFO push of the row (we have leftover bits from the shift in the shifter), we need to apply them.
 		const uint16_t source_words = ((m_fb_source_x & 0xf) // Get the pixel offset within word
 											+ m_fb_limit_x - m_fb_destination_x + 0xf) // Add the width in pixels, rounded up
 											>> 4; // Convert to word address
 		const uint16_t destination_words = ((m_fb_destination_x & 0xf) + m_fb_limit_x - m_fb_destination_x + 0xf) >> 4;
-		LOGMASKED(LOG_FB, "source words = 0x%x, destination words = 0x%x\n", source_words, destination_words);
-
 		const uint16_t rel_word = (m_fb_current_x - m_fb_destination_x) >> 4;
 		if (rel_word >= source_words - 1 && source_words < destination_words) {
-			if (m_fb_carry != 0) {
-			LOGMASKED(LOG_FB, "Last source word detected when extra write is needed! destination (0x%x, 0x%x) => 0x%x = 0x%x 0x%x\n", m_fb_destination_x, m_fb_destination_y, byte_offset, result >> 8 & 0xff, result & 0xff);
-			}
-
 			// write last FIFO word of row as assembled above and prepare destination word with carry
 			m_vram->write(byte_offset, result >> 8 & 0xff);
 			m_vram->write(byte_offset + 1, result & 0xff);
 			m_fb_current_x += m_fb_x_direction ? 16 : -16;
-			result = m_fb_carry;
-			// TODO: writing a destination word should be in a helper, but that is far from the only thing wrong with this.
 			byte_offset += 2;
 			destination = m_vram->read(byte_offset) << 8 | m_vram->read(byte_offset + 1);
+			result = execute_rop(m_fb_rop_func, m_fb_carry, destination);
+			LOGMASKED(LOG_FB, "\tcarryover required, rel_word = 0x%x, source_words = 0x%x, destination_words = 0x%x, byte_offset now 0x%x, destination now 0x%x, result now 0x%x\n", rel_word, source_words, destination_words, byte_offset, destination, result);
 		}
 
 		// If we are setting the last word of the row, we need to apply mask2.
 		const uint16_t last_destination_word = (m_fb_limit_x - 1) >> 4;
 		const bool is_last_destination_word = m_fb_current_x >> 4 == last_destination_word;
-		LOGMASKED(LOG_FB, "fb_rop_cycle: current_word = 0x%x last_word = 0x%x\n", m_fb_current_x >> 4, last_destination_word);
 		if (is_last_destination_word)
 		{
-			LOGMASKED(LOG_FB, "fb_rop_cycle: applying mask2: 0x%x vs shift of 0x%x, carry = 0x%x, mask 1 was 0x%x\n", m_fb_mask2, m_fb_shift, m_fb_carry, m_fb_mask1);
 			result &= ~m_fb_mask2;
 			result |= destination & m_fb_mask2;
+			LOGMASKED(LOG_FB, "\tend of row, applied mask2=0x%x, new result = 0x%x\n", m_fb_mask2, result);
 		}
 
 		// Write result back to VRAM
-		LOGMASKED(LOG_FB, "fb_rop_cycle: destination (0x%x, 0x%x) => 0x%x = 0x%x 0x%x\n", m_fb_destination_x, m_fb_destination_y, byte_offset, result >> 8 & 0xff, result & 0xff);
+		LOGMASKED(LOG_FB, "\tdestination (0x%x, 0x%x) => 0x%x = 0x%x 0x%x\n", m_fb_current_x, m_fb_destination_y, byte_offset, result >> 8 & 0xff, result & 0xff);
 		m_vram->write(byte_offset, result >> 8 & 0xff);
 		m_vram->write(byte_offset + 1, result & 0xff);
 
 		// Advance ROCC state
 		m_fb_current_x += m_fb_x_direction ? 16 : -16;
-		LOGMASKED(LOG_FB, "fb_rop_cycle: advanced current x to 0x%x\n", m_fb_current_x);
 
 		// If we are now past the limit, that means we just finished a row and need to reset x and advance y
 		if (is_last_destination_word)
 		{
-			LOGMASKED(LOG_FB, "fb_rop_cycle: done with row, advancing y\n");
+			LOGMASKED(LOG_FB, "\tdone with row, advancing y\n");
 			m_fb_current_x = m_fb_destination_x;
 			m_fb_destination_y += m_fb_y_direction ? 1 : -1;
 			m_fb_mask1_armed = true;
@@ -927,13 +923,13 @@ namespace
 
 			if (!m_fb_limit_y)
 			{
-				LOGMASKED(LOG_FB, "fb_rop_cycle: ROP done!\n");
+				LOGMASKED(LOG_FB, "\tROP done!\n");
 				m_fb_busy = false;
 			}
 			else
 			{
 				m_fb_limit_y--;
-				LOGMASKED(LOG_FB, "fb_rop_cycle: decremented limit to 0x%x\n", m_fb_limit_y);
+				LOGMASKED(LOG_FB, "\tdecremented limit to 0x%x\n", m_fb_limit_y);
 			}
 		}
 	}
