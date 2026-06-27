@@ -1422,6 +1422,9 @@ ROM_START( miaj )
 	ROM_REGION( 0x20000, "upd", ROMREGION_ERASE00 )     // samples
 ROM_END
 
+// Main board: PWB(A) 302190B
+// Video board: PWB(B) 302191B
+// NVRAM board: GC903 PWB451803
 ROM_START( cuebrickj )
 	ROM_REGION( 0x40000, "maincpu", 0 )     // 68000 code (CPU A)
 	ROM_LOAD16_BYTE( "903_e05.6n",  0x00000, 0x10000, CRC(8b556220) SHA1(dbe24133e74018c4fe9332519394cbb882c4ed5a) )
