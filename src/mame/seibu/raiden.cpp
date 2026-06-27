@@ -180,6 +180,7 @@ protected:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	IRQ_CALLBACK_MEMBER( vector_r );
 	void vblank_irq(int state);
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap);
@@ -703,12 +704,18 @@ GFXDECODE_END
 
 /******************************************************************************/
 
+IRQ_CALLBACK_MEMBER(raiden_state::vector_r)
+{
+	// both CPUs points at the same vector
+	return 0xc8 / 4;
+}
+
 void raiden_state::vblank_irq(int state)
 {
 	if (state)
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8 / 4); // V30
-		m_subcpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8 / 4); // V30
+		m_maincpu->set_input_line(0, HOLD_LINE);
+		m_subcpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -717,9 +724,11 @@ void raiden_state::raiden(machine_config &config)
 	// basic machine hardware
 	V30(config, m_maincpu, 20_MHz_XTAL / 2); // NEC V30 CPU, 20MHz verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &raiden_state::main_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(raiden_state::vector_r));
 
 	V30(config, m_subcpu, 20_MHz_XTAL / 2); // NEC V30 CPU, 20MHz verified on PCB
 	m_subcpu->set_addrmap(AS_PROGRAM, &raiden_state::sub_map);
+	m_subcpu->set_irq_acknowledge_callback(FUNC(raiden_state::vector_r));
 
 	z80_device &audiocpu(Z80(config, "audiocpu", 14.318181_MHz_XTAL / 4)); // verified on PCB
 	audiocpu.set_addrmap(AS_PROGRAM, &raiden_state::seibu_sound_map);

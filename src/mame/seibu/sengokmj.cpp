@@ -4,12 +4,9 @@
 
 Sengoku Mahjong (c) 1991 Sigma
 
-driver by Angelo Salese & Pierpaolo Prazzoli
-
 Uses the same Seibu custom chips of the D-Con HW.
 
 TODO:
-- Find what the remaining video C.R.T. registers do;
 - Fix sprites bugs at a start of a play;
 - Check NVRAM boundaries;
 - How does the "SW Service Mode" (press F2 during gameplay) really work (inputs etc)? Nothing mapped works with it...
@@ -132,6 +129,7 @@ private:
 	TILE_GET_INFO_MEMBER(seibucrtc_sc2_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc3_tile_info);
 
+	IRQ_CALLBACK_MEMBER( vector_r );
 	void vblank_irq(int state);
 
 	uint32_t pri_cb(uint8_t pri, uint8_t ext);
@@ -407,7 +405,9 @@ void sengokmj_state::sengokmj_io_map(address_map &map)
 static INPUT_PORTS_START( sengokmj )
 	SEIBU_COIN_INPUTS   /* coin inputs read through sound cpu */
 
-	PORT_START("DSW") // Names and locations from service mode
+	// Names and locations from service mode
+	// TODO: improve labels
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -427,7 +427,8 @@ static INPUT_PORTS_START( sengokmj )
 	PORT_DIPNAME( 0x0040, 0x0040, "Out Sw" ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) ) // One of these probably selects coins
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) // The other probably selects tickets
-	PORT_DIPNAME( 0x0080, 0x0000, "Hopper" ) PORT_DIPLOCATION("SW1:8") //game gives hopper error with this off.
+	// game gives hopper error with this off. Meaning may be reversed
+	PORT_DIPNAME( 0x0080, 0x0000, "Hopper" ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x0100, 0x0100, "SW2:1" )
@@ -496,7 +497,7 @@ static INPUT_PORTS_START( sengokmj )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_DOOR ) // Only used in service mode?
-	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
+	PORT_SERVICE( 0x0002, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Opt. 1st") // Only used in service mode?
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -542,10 +543,15 @@ static GFXDECODE_START( gfx_sengokmj_spr )
 	GFXDECODE_ENTRY( "spr_gfx",0, tilelayout, 0x000, 0x40 ) /* Sprites */
 GFXDECODE_END
 
+IRQ_CALLBACK_MEMBER(sengokmj_state::vector_r)
+{
+	return 0xc8 / 4;
+}
+
 void sengokmj_state::vblank_irq(int state)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); // V30
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 void sengokmj_state::layer_en_w(uint16_t data)
@@ -565,6 +571,7 @@ void sengokmj_state::sengokmj(machine_config &config)
 	V30(config, m_maincpu, 16000000/2); /* V30-8 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &sengokmj_state::sengokmj_map);
 	m_maincpu->set_addrmap(AS_IO, &sengokmj_state::sengokmj_io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(sengokmj_state::vector_r));
 
 	z80_device &audiocpu(Z80(config, "audiocpu", 14318180/4));
 	audiocpu.set_addrmap(AS_PROGRAM, &sengokmj_state::seibu_sound_map);
@@ -651,4 +658,4 @@ ROM_END
 } // anonymous namespace
 
 GAME( 1991, sengokmj, 0, sengokmj, sengokmj, sengokmj_state, empty_init, ROT0, "Sigma", "Sengoku Mahjong (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-/*Non-Bet Version?*/
+// is a Non-Bet version a thing?
