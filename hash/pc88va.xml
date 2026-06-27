@@ -581,10 +581,10 @@ Runs at half speed
 [gfx] is white flash (backdrop) during maiden prayer in intro supposed to be full screen? (verify)
 Omake: if sound irqs don't run then needs to press key 0 pad to move on
 Omake: CG intro scene with thunderstorm has a blurry signature concealed by picture mask
-[IDP] concealed text line after said scene
+[IDP] concealed text line after said scene (btanb)
 ]]></notes>
 		<info name="alt_title" value="神羅万象"/>
-		<info name="usage" value="Hold enter at boot to skip intro, press F2 on title screen to load a game, press F5 for sound test" />
+		<info name="usage" value="Intro requires 25 text lines set in PC-88VA setup menu. Hold enter at boot to skip intro, press F2 on title screen to load a game, press F5 for sound test" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />

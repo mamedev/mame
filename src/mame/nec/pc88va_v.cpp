@@ -537,7 +537,8 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		const u8 screen_bg_col = (tsp_regs[0xa / 2] & 0x0f00) >> 8;
 
 		// TODO: how even vh/vw can have all these bytes?
-		const u8 vh = (tsp_regs[4 / 2] & 0x7ff);
+		// shinraba sets VH 26 -> 416 text lines, which shouldn't have any effect
+		const u16 vh = (tsp_regs[4 / 2] & 0x7ff);
 		const u16 vw = (tsp_regs[8 / 2] & 0x3ff) / 2;
 
 		if (vh == 0 || vw == 0 || rh_sum > cliprect.max_y)
