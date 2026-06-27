@@ -430,7 +430,7 @@ void tp84_state::filter_w(offs_t offset, uint8_t data)
 
 void tp84_state::sh_irqtrigger_w(uint8_t data)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 }
 
 

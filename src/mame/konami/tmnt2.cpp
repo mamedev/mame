@@ -499,7 +499,7 @@ void tmnt2_k053245_base_state::k053244_word_noA1_w(offs_t offset, uint16_t data,
 
 void prmrsocr_state::prmrsocr_sound_irq_w(uint16_t data)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 }
 
 void prmrsocr_state::prmrsocr_audio_bankswitch_w(uint8_t data)
@@ -628,7 +628,7 @@ void punkshot_state::thndrx2_eeprom_w(offs_t offset, uint16_t data, uint16_t mem
 
 		/* bit 5 triggers IRQ on sound cpu */
 		if (!m_lastirq && BIT(data, 5))
-			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+			m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 		m_lastirq = BIT(data, 5);
 
 		/* bit 6 = enable char ROM reading through the video RAM */
@@ -888,7 +888,7 @@ void punkshot_state::punkshot_0a0020_w(offs_t offset, uint16_t data, uint16_t me
 
 		/* bit 2 = trigger irq on sound CPU */
 		if (m_lastirq && BIT(~data, 2))
-			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+			m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 
 		m_lastirq = BIT(data, 2);
 
@@ -907,7 +907,7 @@ void lgtnfght_state::lgtnfght_0a0018_w(offs_t offset, uint16_t data, uint16_t me
 
 		/* bit 2 = trigger irq on sound CPU */
 		if (!m_lastirq && BIT(data, 2))
-			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+			m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 
 		m_lastirq = BIT(data, 2);
 
@@ -1345,7 +1345,7 @@ void lgtnfght_state::lgtnfght_main_map(address_map &map)
 void lgtnfght_state::ssriders_soundkludge_w(uint16_t dat)
 {
 	/* I think this is more than just a trigger */
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 }
 
 void blswhstl_state::blswhstl_main_map(address_map &map)

@@ -249,7 +249,7 @@ void twin16_state::cpua_register_w(offs_t offset, uint16_t data, uint16_t mem_ma
 		const int rising_edge = ~old & m_cpua_register;
 
 		if (BIT(rising_edge, 3))
-			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+			m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 
 		m_video->sprite_process_enable_w(BIT(~m_cpua_register, 6));
 
@@ -297,7 +297,7 @@ void fround_state::fround_cpu_register_w(offs_t offset, uint16_t data, uint16_t 
 	if (m_cpua_register != old)
 	{
 		if (BIT(~old, 3) && BIT(m_cpua_register, 3))
-			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+			m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 
 		m_video->sprite_process_enable_w(BIT(~m_cpua_register, 6));
 

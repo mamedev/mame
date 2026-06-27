@@ -279,7 +279,7 @@ void mikie_state::sh_irqtrigger_w(int state)
 	if (state)
 	{
 		// setting bit 0 low then high triggers IRQ on the sound CPU
-		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+		m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 	}
 }
 
