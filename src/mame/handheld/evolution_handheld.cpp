@@ -96,6 +96,7 @@ void evolution_handheldgame_state::buttdtct_ram_map(address_map &map)
 void evolution_handheldgame_state::snc7648s_map(address_map &map)
 {
 	map(0x000000, 0x00bfff).rom().region("maincpu", 0); // supposedly RAM, "boot from external flash, only one time after IC reset"
+	map(0x200000, 0x2007ff).rom().region("maincpu", 0xb000);
 	map(0x400000, 0x7fffff).rom().region("maincpu", 0);
 }
 
