@@ -261,9 +261,9 @@ void xsedae_state::combine32(u32 *val, offs_t offset, u16 data, u16 mem_mask)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(xsedae_state::interrupt)
+IRQ_CALLBACK_MEMBER(xsedae_state::vector_r)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc0 / 4);   /* V30 - VBL */
+	return 0xc0 / 4;
 }
 
 
@@ -1123,7 +1123,8 @@ void raiden2_state::raiden2(machine_config &config)
 	/* basic machine hardware */
 	V30(config, m_maincpu, XTAL(32'000'000)/2); /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &raiden2_state::raiden2_mem);
-	m_maincpu->set_vblank_int("screen", FUNC(raiden2_state::interrupt));
+	m_maincpu->set_vblank_int("screen", FUNC(raiden2_state::irq0_line_hold));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(raiden2_state::vector_r));
 
 	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state, raiden2)
 
@@ -1163,7 +1164,8 @@ void xsedae_state::zeroteam_base(machine_config &config)
 {
 	/* basic machine hardware */
 	V30(config, m_maincpu, XTAL(32'000'000)/2); /* verified on pcb */
-	m_maincpu->set_vblank_int("screen", FUNC(xsedae_state::interrupt));
+	m_maincpu->set_vblank_int("screen", FUNC(raiden2_state::irq0_line_hold));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(raiden2_state::vector_r));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

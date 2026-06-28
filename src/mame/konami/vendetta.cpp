@@ -356,7 +356,7 @@ void vendetta_state::z80_nmi_w(int state)
 
 void vendetta_state::z80_irq_w(uint8_t data)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 }
 
 uint8_t vendetta_state::z80_irq_r()

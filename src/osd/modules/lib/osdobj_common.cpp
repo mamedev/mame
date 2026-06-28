@@ -295,7 +295,7 @@ void osd_common_t::register_options()
 #endif
 	REGISTER_MODULE(m_mod_man, MIDI_NONE);
 
-#if defined(SDLMAME_SDL2) || defined(SDLMAME_SDL3)
+#if defined(OSD_SDL)
 	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_SDL);
 #endif
 	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_RAWINPUT);
@@ -303,7 +303,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_WIN32);
 	REGISTER_MODULE(m_mod_man, KEYBOARD_NONE);
 
-#if defined(SDLMAME_SDL2) || defined(SDLMAME_SDL3)
+#if defined(OSD_SDL)
 	REGISTER_MODULE(m_mod_man, MOUSEINPUT_SDL);
 #endif
 	REGISTER_MODULE(m_mod_man, MOUSEINPUT_RAWINPUT);
@@ -311,7 +311,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, MOUSEINPUT_WIN32);
 	REGISTER_MODULE(m_mod_man, MOUSE_NONE);
 
-#if defined(SDLMAME_SDL2) || defined(SDLMAME_SDL3)
+#if defined(OSD_SDL)
 	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_SDL);
 #endif
 	REGISTER_MODULE(m_mod_man, LIGHTGUN_X11);
@@ -319,13 +319,16 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_WIN32);
 	REGISTER_MODULE(m_mod_man, LIGHTGUN_NONE);
 
-#if defined(SDLMAME_SDL2) || defined(SDLMAME_SDL3)
+#if defined(OSD_SDL)
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_SDLGAME);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_SDLJOY);
 #endif
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_WINHYBRID);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_DINPUT);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_XINPUT);
+#if !defined(OSD_SDL) && defined(USE_SDL_JOYSTICK)
+	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_SDLJOY);
+#endif
 	REGISTER_MODULE(m_mod_man, JOYSTICK_NONE);
 
 	REGISTER_MODULE(m_mod_man, OUTPUT_NONE);

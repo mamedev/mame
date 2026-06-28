@@ -313,7 +313,7 @@ inline u8 pc88va_state::get_layer_pal_bank(u8 which)
 		return (m_pltm & 1) << 4;
 
 	// N/A for 32 color mode
-	if (m_pltm == 3)
+	if (m_pltm == 7)
 		return 0;
 
 	// HW quirk: text and sprites colors will be joined when either one is selected in PLTP
@@ -537,7 +537,8 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		const u8 screen_bg_col = (tsp_regs[0xa / 2] & 0x0f00) >> 8;
 
 		// TODO: how even vh/vw can have all these bytes?
-		const u8 vh = (tsp_regs[4 / 2] & 0x7ff);
+		// shinraba sets VH 26 -> 416 text lines, which shouldn't have any effect
+		const u16 vh = (tsp_regs[4 / 2] & 0x7ff);
 		const u16 vw = (tsp_regs[8 / 2] & 0x3ff) / 2;
 
 		if (vh == 0 || vw == 0 || rh_sum > cliprect.max_y)
@@ -1035,6 +1036,7 @@ void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &
 	}
 }
 
+// animefrm
 void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 dsp_start_base, u16 scrollx, u8 pal_base, u16 fb_width, u16 fb_height)
 {
 //  const u16 y_min = std::max(cliprect.min_y, y_start);

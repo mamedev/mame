@@ -254,7 +254,7 @@ uint8_t combatsc_state::trackball_r(offs_t offset)
 
 void combatsc_state::sh_irqtrigger_w(uint8_t data)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 }
 
 uint8_t combatsc_state::busy_r()

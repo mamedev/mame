@@ -147,7 +147,9 @@ private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, uint32_t pri_mask);
 
+	IRQ_CALLBACK_MEMBER( vector_r );
 	void vblank_irq(int state);
+
 	void master_map(address_map &map) ATTR_COLD;
 	void masterj_map(address_map &map) ATTR_COLD;
 	void sei80bu_encrypted_full_map(address_map &map) ATTR_COLD;
@@ -614,15 +616,20 @@ GFXDECODE_END
 
 // Interrupt Generator
 
+IRQ_CALLBACK_MEMBER(dynduke_state::vector_r)
+{
+	// both CPUs points at the same vector
+	return 0xc8 / 4;
+}
+
 void dynduke_state::vblank_irq(int state)
 {
 	if (state)
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8 / 4); // V30
-		m_slave->set_input_line_and_vector(0, HOLD_LINE, 0xc8 / 4); // V30
+		m_maincpu->set_input_line(0, HOLD_LINE);
+		m_slave->set_input_line(0, HOLD_LINE);
 	}
 }
-
 
 // Machine Driver
 
@@ -631,9 +638,11 @@ void dynduke_state::dynduke(machine_config &config)
 	// basic machine hardware
 	V30(config, m_maincpu, 16_MHz_XTAL / 2); // NEC V30-8 CPU
 	m_maincpu->set_addrmap(AS_PROGRAM, &dynduke_state::master_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(dynduke_state::vector_r));
 
 	V30(config, m_slave, 16_MHz_XTAL / 2); // NEC V30-8 CPU
 	m_slave->set_addrmap(AS_PROGRAM, &dynduke_state::slave_map);
+	m_slave->set_irq_acknowledge_callback(FUNC(dynduke_state::vector_r));
 
 	z80_device &audiocpu(Z80(config, "audiocpu", 14.318181_MHz_XTAL / 4));
 	audiocpu.set_addrmap(AS_PROGRAM, &dynduke_state::sound_map);

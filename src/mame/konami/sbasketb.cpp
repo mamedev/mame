@@ -292,7 +292,7 @@ uint32_t sbasketb_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void sbasketb_state::sh_irqtrigger_w(uint8_t data)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 }
 
 template <uint8_t Which>

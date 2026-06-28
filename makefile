@@ -28,6 +28,7 @@
 # NO_OPENGL = 0
 # USE_DISPATCH_GL = 0
 # USE_SDL = 1
+# USE_SDL3 = 1
 # SDL_INI_PATH = .;$HOME/.mame/;ini;
 # SDL2_MULTIAPI = 1
 # NO_USE_MIDI = 1
@@ -748,6 +749,10 @@ endif
 
 ifdef USE_SDL
 PARAMS += --USE_SDL='$(USE_SDL)'
+endif
+
+ifdef USE_SDL3
+PARAMS += --USE_SDL3='$(USE_SDL3)'
 endif
 
 ifdef SDL_INI_PATH

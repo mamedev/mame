@@ -395,8 +395,8 @@ void tmnt_state::_0a0000_w(offs_t offset, uint16_t data)
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);  /* 2 players version */
 
 	/* bit 3 high then low triggers irq on sound CPU */
-	if (m_last == 0x08 && (data & 0x08) == 0)
-		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	if (m_last == 0x08 && (data & 0x08) == 0 && m_audiocpu.found())
+		m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 
 	m_last = data & 0x08;
 
@@ -1003,6 +1003,7 @@ void tmnt_state::tmntucbl(machine_config &config)
 
 ***************************************************************************/
 
+// PCB: GX903 PWB351819
 ROM_START( cuebrick )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 2*64k for 68000 code */
 	ROM_LOAD16_BYTE( "903d25.g12",   0x00000, 0x10000, CRC(8d575663) SHA1(0e308e04936efa80351bf808ac304d3fcc82f19a) )

@@ -1282,8 +1282,7 @@ void upd765_family_device::live_run(attotime limit)
 		case WRITE_TRACK_SECTOR:
 			if(!cur_live.byte_counter) {
 				command[3]--;
-				if(command[3])
-					fifo_expect(4, true);
+				fifo_expect(4, true);
 			}
 			if(mfm) {
 				if(cur_live.byte_counter < 12)

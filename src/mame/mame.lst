@@ -45515,7 +45515,11 @@ buggychl
 buggychlt
 
 @source:taito/capr1.cpp
+csesame
 cspin2
+
+@source:taito/capr2.cpp
+csesame2
 
 @source:taito/caprcyc.cpp
 caprcyc
