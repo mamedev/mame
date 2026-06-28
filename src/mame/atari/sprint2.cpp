@@ -289,8 +289,6 @@ void sprint2_state::screen_vblank(int state)
 
 void sprint2_state::machine_start()
 {
-	m_gear_sel.resolve();
-
 	save_item(NAME(m_steering));
 	save_item(NAME(m_gear));
 	save_item(NAME(m_dial));

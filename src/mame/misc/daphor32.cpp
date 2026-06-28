@@ -182,7 +182,7 @@ void daphor_state::daphor32(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &daphor_state::mem_map);
 	maincpu.set_addrmap(AS_IO, &daphor_state::io_map);
 
-	i8251_device &uart(I8251(config, "uart", 0));
+	i8251_device &uart(I8251(config, "uart"));
 	uart.txd_handler().set("computer", FUNC(rs232_port_device::write_txd));
 	uart.dtr_handler().set("computer", FUNC(rs232_port_device::write_dtr));
 	uart.rts_handler().set("computer", FUNC(rs232_port_device::write_rts));
@@ -214,7 +214,7 @@ void daphor_state::daphor32(machine_config &config)
 	//ppi3.in_pc_callback().set_log("ppi3 - unmapped read port C");
 	ppi3.out_pc_callback().set(FUNC(daphor_state::ppi3_portc_w));
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(daphor_state::kbd_put));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

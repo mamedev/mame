@@ -51,7 +51,7 @@ public:
 	{
 	}
 
-	void pp(machine_config &config);
+	void pp(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -108,7 +108,6 @@ private:
 
 void pp_state::machine_start()
 {
-	m_kbd_leds.resolve();
 	m_kbd_leds[0] = 1; // power LED (green) is always on
 
 	m_fdc->dden_w(0);

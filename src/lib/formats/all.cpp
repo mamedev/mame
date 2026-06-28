@@ -586,6 +586,10 @@
 #include "rx50_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_S900_DSK
+#include "s900_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_SAP_DSK
 #include "sap_dsk.h"
 #endif
@@ -1563,5 +1567,10 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("Wren");
 #ifdef HAS_FORMATS_WREN_DSK
 	en.add(FLOPPY_WREN_FORMAT); // wren_dsk.h
+#endif
+
+	en.category("Akai");
+#ifdef HAS_FORMATS_S900_DSK
+	en.add(FLOPPY_S900_FORMAT); // s900_dsk.h
 #endif
 }

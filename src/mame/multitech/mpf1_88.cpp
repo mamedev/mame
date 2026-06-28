@@ -294,8 +294,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(mpf1_88_state::key_nmi)
 
 void mpf1_88_state::machine_start()
 {
-	m_leds.resolve();
-
 	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->mask(), m_ram->pointer());
 
 	// register for state saving
@@ -368,6 +366,7 @@ void mpf1_88_state::mpf1_88(machine_config &config)
 	isa8_device &isa8(ISA8(config, "isa", 3.579545_MHz_XTAL/2));
 	isa8.set_memspace(m_maincpu, AS_PROGRAM);
 	isa8.set_iospace(m_maincpu, AS_IO);
+	// FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "isa1", 0, "isa", mpf1_88_isa8_cards, nullptr, false);
 	ISA8_SLOT(config, "isa2", 0, "isa", mpf1_88_isa8_cards, nullptr, false);
 	ISA8_SLOT(config, "isa3", 0, "isa", mpf1_88_isa8_cards, nullptr, false);

@@ -381,7 +381,7 @@ void backfire_state::backfire(machine_config &config)
 	rscreen.set_screen_update(FUNC(backfire_state::screen_update_right));
 	rscreen.set_palette(m_palette);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
+	DECO16IC(config, m_deco_tilegen[0]);
 	m_deco_tilegen[0]->set_screen(m_lscreen);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
@@ -395,7 +395,7 @@ void backfire_state::backfire(machine_config &config)
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	DECO16IC(config, m_deco_tilegen[1], 0);
+	DECO16IC(config, m_deco_tilegen[1]);
 	m_deco_tilegen[1]->set_screen(m_lscreen);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
@@ -409,11 +409,11 @@ void backfire_state::backfire(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(3);
 	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen[0], 0, m_palette, gfx_backfire_spr1);
+	DECO_SPRITE(config, m_sprgen[0], m_palette, gfx_backfire_spr1);
 	m_sprgen[0]->set_screen(m_lscreen);
 	m_sprgen[0]->set_pri_callback(FUNC(backfire_state::pri_callback));
 
-	DECO_SPRITE(config, m_sprgen[1], 0, m_palette, gfx_backfire_spr2);
+	DECO_SPRITE(config, m_sprgen[1], m_palette, gfx_backfire_spr2);
 	m_sprgen[1]->set_screen("rscreen");
 	m_sprgen[1]->set_pri_callback(FUNC(backfire_state::pri_callback));
 

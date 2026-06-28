@@ -1823,6 +1823,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/s900_dsk.h,FORMATS["S900_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "S900_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/s900_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/s900_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/sap_dsk.h,FORMATS["SAP_DSK"] = true
 --------------------------------------------------
 
@@ -1842,6 +1854,18 @@ if opt_tool(FORMATS, "SC3000_BIT") then
 	files {
 		MAME_DIR.. "src/lib/formats/sc3000_bit.cpp",
 		MAME_DIR.. "src/lib/formats/sc3000_bit.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/scl_dsk.h,FORMATS["SCL_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "SCL_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/scl_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/scl_dsk.h",
 	}
 end
 

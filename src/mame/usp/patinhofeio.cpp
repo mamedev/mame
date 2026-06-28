@@ -28,13 +28,13 @@ public:
 		, m_decwriter(*this, "decwriter")
 		, m_tty(*this, "teletype")
 		, m_mode_button(*this, "MODE_BUTTON%u", 0U)
-		, m_output_acc(*this, "acc%u")
-		, m_output_opcode(*this, "opcode%u")
-		, m_output_mem_data(*this, "mem_data%u")
-		, m_output_mem_addr(*this, "mem_addr%u")
-		, m_output_pc(*this, "pc%u")
-		, m_output_rc(*this, "rc%u")
-		, m_output_flags(*this, "flags%u")
+		, m_output_acc(*this, "acc%u", 0U)
+		, m_output_opcode(*this, "opcode%u", 0U)
+		, m_output_mem_data(*this, "mem_data%u", 0U)
+		, m_output_mem_addr(*this, "mem_addr%u", 0U)
+		, m_output_pc(*this, "pc%u", 0U)
+		, m_output_rc(*this, "rc%u", 0U)
+		, m_output_flags(*this, "flags%u", 0U)
 	{ }
 
 	void init_patinho_feio() ATTR_COLD;
@@ -246,15 +246,6 @@ void patinho_feio_state::machine_start(){
 	m_teletype_timer = timer_alloc(FUNC(patinho_feio_state::teletype_callback), this);
 	m_decwriter_timer = timer_alloc(FUNC(patinho_feio_state::decwriter_callback), this);
 
-	m_mode_button.resolve();
-	m_output_acc.resolve();
-	m_output_opcode.resolve();
-	m_output_mem_data.resolve();
-	m_output_mem_addr.resolve();
-	m_output_pc.resolve();
-	m_output_rc.resolve();
-	m_output_flags.resolve();
-
 	// Copy some programs directly into RAM.
 	// This is a hack for setting up the computer
 	// while we don't support loading programs
@@ -345,7 +336,7 @@ void patinho_feio_state::patinho_feio(machine_config &config)
 //  m_maincpu->iodev_read<14>().set(FUNC(patinho_feio_state::papertapereader_data_r));
 
 	/* DECWRITER */
-	TELEPRINTER(config, m_decwriter, 0);
+	TELEPRINTER(config, m_decwriter);
 	m_decwriter->set_keyboard_callback(FUNC(patinho_feio_state::decwriter_kbd_input));
 
 	/* Teletype */

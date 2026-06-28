@@ -39,6 +39,8 @@ ToDo:
 #include "machine/6821pia.h"
 #include "machine/timer.h"
 
+#include "input.h" // FIXME: use inputs properly and remove this, reading keyboard directly is bad pracice
+
 #include "by17.lh"
 #include "by17_pwerplay.lh"
 #include "by17_matahari.lh"
@@ -72,9 +74,9 @@ public:
 		, m_solenoids(*this, "solenoid%u", 0U)
 	{ }
 
-	void init_by17();
-	void init_matahari();
-	void init_pwerplay();
+	void init_by17() ATTR_COLD;
+	void init_matahari() ATTR_COLD;
+	void init_pwerplay() ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(activity_button);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
@@ -82,7 +84,7 @@ public:
 	template <int Param> int saucer_x3();
 	template <int Param> int drop_target_x2();
 
-	void by17(machine_config &config);
+	void by17(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -958,10 +960,6 @@ void by17_state::init_pwerplay()
 void by17_state::machine_start()
 {
 	genpin_class::machine_start();
-
-	m_lamps.resolve();
-	m_digits.resolve();
-	m_solenoids.resolve();
 
 	save_item(NAME(m_u10a));
 	save_item(NAME(m_u10b));

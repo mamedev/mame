@@ -626,7 +626,7 @@ void jr200_state::jr200(machine_config &config)
 
 	// All sounds are produced by the MN1271
 
-	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS,"mono",0.50);
+	BEEP(config, m_beeper).add_route(ALL_OUTPUTS,"mono",0.50);
 }
 
 

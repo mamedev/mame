@@ -464,13 +464,12 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void mpu12wbk(machine_config &config);
+	void mpu12wbk(machine_config &config) ATTR_COLD;
 
-	void init_mpu12wbk();
+	void init_mpu12wbk() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
-	virtual void machine_start() override { m_lamps.resolve(); }
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;

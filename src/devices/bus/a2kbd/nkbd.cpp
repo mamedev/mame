@@ -394,7 +394,7 @@ ioport_constructor a2nkbd_device::device_input_ports() const
 void a2nkbd_device::device_add_mconfig(machine_config &config)
 {
 	// keyboard controller
-	AY3600(config, m_ay3600, 0);
+	AY3600(config, m_ay3600);
 	m_ay3600->x0().set_ioport("X0");
 	m_ay3600->x1().set_ioport("X1");
 	m_ay3600->x2().set_ioport("X2");
@@ -410,7 +410,7 @@ void a2nkbd_device::device_add_mconfig(machine_config &config)
 	m_ay3600->ako().set(FUNC(a2nkbd_device::ay3600_ako_w));
 
 	// repeat timer.  15 Hz from page 90 of "The Apple II Circuit Description"
-	TIMER(config, "repttmr", 0).configure_periodic(FUNC(a2nkbd_device::ay3600_repeat), attotime::from_hz(15));
+	TIMER(config, "repttmr").configure_periodic(FUNC(a2nkbd_device::ay3600_repeat), attotime::from_hz(15));
 }
 
 } // anonymous namespace

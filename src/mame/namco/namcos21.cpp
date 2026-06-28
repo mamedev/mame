@@ -864,22 +864,22 @@ void namcos21_state::winrun(machine_config &config)
 	m_c65->dp_in_callback().set(FUNC(namcos21_state::dpram_byte_r));
 	m_c65->dp_out_callback().set(FUNC(namcos21_state::dpram_byte_w));
 
-	NAMCOS21_DSP(config, m_namcos21_dsp, 0);
+	NAMCOS21_DSP(config, m_namcos21_dsp);
 	m_namcos21_dsp->set_renderer_tag("namcos21_3d");
 
-	NAMCO_C148(config, m_master_intc, 0, m_maincpu, true);
+	NAMCO_C148(config, m_master_intc, m_maincpu, true);
 	m_master_intc->link_c148_device(m_slave_intc);
 	m_master_intc->out_ext1_callback().set(FUNC(namcos21_state::sound_reset_w));
 	m_master_intc->out_ext2_callback().set(FUNC(namcos21_state::system_reset_w));
 
-	NAMCO_C148(config, m_slave_intc, 0, m_slave, false);
+	NAMCO_C148(config, m_slave_intc, m_slave, false);
 	m_slave_intc->link_c148_device(m_master_intc);
 
-	NAMCO_C148(config, m_gpu_intc, 0, m_gpu, false);
+	NAMCO_C148(config, m_gpu_intc, m_gpu, false);
 	m_gpu_intc->in_ext_callback().set([this](){ return m_screen->frame_number() & 1; });
 	m_gpu_intc->out_ext1_callback().set(FUNC(namcos21_state::gpu_enable_w));
 
-	NAMCO_C139(config, m_sci, 0);
+	NAMCO_C139(config, m_sci);
 
 	config.set_maximum_quantum(attotime::from_hz(60000));
 
@@ -893,7 +893,7 @@ void namcos21_state::winrun(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_888, 0x10000/2);
 
-	NAMCOS21_3D(config, m_namcos21_3d, 0);
+	NAMCOS21_3D(config, m_namcos21_3d);
 	m_namcos21_3d->set_framebuffer_size(496, 480);
 	m_namcos21_3d->set_num_palettes(0x20);
 	m_namcos21_3d->set_depth_reverse(true);

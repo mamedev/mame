@@ -452,11 +452,11 @@ void mbc200_state::mbc200(machine_config &config)
 	m_ppi_s->out_pb_callback().set("printdata", FUNC(output_latch_device::write));
 	m_ppi_s->out_pc_callback().set(FUNC(mbc200_state::ps_portc_w));
 
-	i8251_device &uart1(I8251(config, "uart1", 0)); // INS8251N
+	i8251_device &uart1(I8251(config, "uart1")); // INS8251N
 	//uart1.txd_handler().set(...); to keyboard
 	uart1.rts_handler().set("uart1", FUNC(i8251_device::write_cts));
 
-	i8251_device &uart2(I8251(config, "uart2", 0)); // INS8251A
+	i8251_device &uart2(I8251(config, "uart2")); // INS8251A
 	uart2.txd_handler().set("rs232c", FUNC(rs232_port_device::write_txd));
 	uart2.rts_handler().set("rs232c", FUNC(rs232_port_device::write_rts));
 	uart2.dtr_handler().set("rs232c", FUNC(rs232_port_device::write_dtr));
@@ -482,7 +482,7 @@ void mbc200_state::mbc200(machine_config &config)
 	rs232c.dsr_handler().set("uart2", FUNC(i8251_device::write_dsr));
 
 	// keyboard
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(mbc200_state::kbd_put));
 
 	// software lists

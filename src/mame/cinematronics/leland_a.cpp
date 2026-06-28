@@ -157,7 +157,7 @@ void leland_80186_sound_device::device_add_mconfig(machine_config &config)
 	}
 	AD7533(config, m_dac9, 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // ad7533.u64
 
-	PIT8254(config, m_pit[0], 0);
+	PIT8254(config, m_pit[0]);
 	m_pit[0]->set_clk<0>(4000000);
 	m_pit[0]->out_handler<0>().set(m_audiocpu, FUNC(i80186_cpu_device::drq0_w));
 	m_pit[0]->set_clk<1>(4000000);
@@ -165,7 +165,7 @@ void leland_80186_sound_device::device_add_mconfig(machine_config &config)
 	m_pit[0]->set_clk<2>(4000000);
 	m_pit[0]->out_handler<2>().set(FUNC(leland_80186_sound_device::pit0_2_w));
 
-	PIT8254(config, m_pit[1], 0);
+	PIT8254(config, m_pit[1]);
 	m_pit[1]->set_clk<0>(4000000);
 	m_pit[1]->out_handler<0>().set(FUNC(leland_80186_sound_device::pit1_0_w));
 	m_pit[1]->set_clk<1>(4000000);
@@ -192,7 +192,7 @@ void redline_80186_sound_device::device_add_mconfig(machine_config &config)
 		m_dacvol[i]->add_route(0, m_dac[i], -1.0, DAC_INPUT_RANGE_LO); // unknown DAC
 	}
 
-	PIT8254(config, m_pit[0], 0);
+	PIT8254(config, m_pit[0]);
 	m_pit[0]->set_clk<0>(7000000);
 	m_pit[0]->out_handler<0>().set(m_audiocpu, FUNC(i80186_cpu_device::drq0_w));
 	m_pit[0]->set_clk<1>(7000000);
@@ -200,14 +200,14 @@ void redline_80186_sound_device::device_add_mconfig(machine_config &config)
 	m_pit[0]->set_clk<2>(7000000);
 	m_pit[0]->out_handler<2>().set(FUNC(leland_80186_sound_device::pit0_2_w));
 
-	PIT8254(config, m_pit[1], 0);
+	PIT8254(config, m_pit[1]);
 	m_pit[1]->set_clk<0>(7000000);
 	m_pit[1]->out_handler<0>().set(FUNC(leland_80186_sound_device::pit1_0_w));
 	m_pit[1]->set_clk<1>(7000000);
 	m_pit[1]->out_handler<1>().set(FUNC(leland_80186_sound_device::pit1_1_w));
 	m_pit[1]->set_clk<2>(7000000);
 
-	PIT8254(config, m_pit[2], 0);
+	PIT8254(config, m_pit[2]);
 	m_pit[2]->set_clk<0>(7000000);
 	m_pit[2]->out_handler<0>().set(FUNC(leland_80186_sound_device::pit1_2_w));
 	m_pit[2]->set_clk<1>(7000000);
@@ -234,7 +234,7 @@ void ataxx_80186_sound_device::device_add_mconfig(machine_config &config)
 	}
 	AD7533(config, m_dac9, 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 
-	PIT8254(config, m_pit[0], 0);
+	PIT8254(config, m_pit[0]);
 	m_pit[0]->set_clk<0>(4000000);
 	m_pit[0]->out_handler<0>().set(m_audiocpu, FUNC(i80186_cpu_device::drq0_w));
 	m_pit[0]->set_clk<1>(4000000);
@@ -269,7 +269,7 @@ void wsf_80186_sound_device::device_add_mconfig(machine_config &config)
 	m_ymsnd->add_route(0, "speaker", 0.40);
 	m_ymsnd->add_route(1, "speaker", 0.40);
 
-	PIT8254(config, m_pit[0], 0);
+	PIT8254(config, m_pit[0]);
 	m_pit[0]->set_clk<0>(4000000);
 	m_pit[0]->out_handler<0>().set(m_audiocpu, FUNC(i80186_cpu_device::drq0_w));
 	m_pit[0]->set_clk<1>(4000000);

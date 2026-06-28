@@ -658,8 +658,6 @@ GFXDECODE_END
 
 void fun_tech_corp_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_vreg));
 	save_item(NAME(m_nmi_enable));
 }

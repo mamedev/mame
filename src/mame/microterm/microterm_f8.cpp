@@ -66,7 +66,7 @@ private:
 	void f8_mem(address_map &map) ATTR_COLD;
 	void f8_io(address_map &map) ATTR_COLD;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<f8_cpu_device> m_maincpu;
 	required_device<ay51013_device> m_uart;
 	required_device<rs232_port_device> m_io;
 	//required_device<rs232_port_device> m_aux;
@@ -527,12 +527,12 @@ INPUT_PORTS_END
 
 void microterm_f8_state::act5a(machine_config &config)
 {
-	cpu_device &maincpu(F8(config, "maincpu", 2_MHz_XTAL));
+	f8_cpu_device &maincpu(F8(config, "maincpu", 2_MHz_XTAL));
 	maincpu.set_addrmap(AS_PROGRAM, &microterm_f8_state::f8_mem);
 	maincpu.set_addrmap(AS_IO, &microterm_f8_state::f8_io);
-	maincpu.set_irq_acknowledge_callback("smi", FUNC(f3853_device::int_acknowledge));
 
 	f3853_device &smi(F3853(config, "smi", 2_MHz_XTAL));
+	maincpu.int_cycle_callback().set(smi, FUNC(f3853_device::int_acknowledge));
 	smi.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
 	AY51013(config, m_uart);

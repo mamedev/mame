@@ -2114,7 +2114,7 @@ void stepstag_state::stepstag(machine_config &config)
 
 	GENERIC_LATCH_16(config, m_soundlatch);
 
-	JALECO_VJ_PC(config, m_jaleco_vj_pc, 0);
+	JALECO_VJ_PC(config, m_jaleco_vj_pc);
 	m_jaleco_vj_pc->set_steppingstage_mode(true);
 	m_jaleco_vj_pc->add_route(0, "speaker", 1.0, 0);
 	m_jaleco_vj_pc->add_route(1, "speaker", 1.0, 1);
@@ -2201,7 +2201,7 @@ void stepstag_state::vjdash(machine_config &config)    // 4 Screens
 
 	GENERIC_LATCH_16(config, m_soundlatch);
 
-	JALECO_VJ_PC(config, m_jaleco_vj_pc, 0);
+	JALECO_VJ_PC(config, m_jaleco_vj_pc);
 	m_jaleco_vj_pc->set_steppingstage_mode(false);
 	m_jaleco_vj_pc->add_route(0, "speaker", 1.0, 0);
 	m_jaleco_vj_pc->add_route(1, "speaker", 1.0, 1);

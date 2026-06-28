@@ -90,8 +90,8 @@ void rfjailbrk_state::rfjailbrk(machine_config &config)
 	I8255A(config, "pia5"); // OKI M82C55A-2V
 	I8255A(config, "pia6"); // OKI M82C55A-2V
 
-	PIC8259(config, "pic1", 0); // CS82C59A
-	PIC8259(config, "pic2", 0); // CS82C59A
+	PIC8259(config, "pic1"); // CS82C59A
+	PIC8259(config, "pic2"); // CS82C59A
 
 	// Sound hardware
 

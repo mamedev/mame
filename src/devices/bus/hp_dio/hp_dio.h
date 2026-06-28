@@ -37,7 +37,14 @@ public:
 		set_dio(std::forward<T>(dio_tag));
 		set_options(std::forward<U>(opts), dflt, fixed);
 	}
-	dio16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T, typename U>
+	dio16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&dio_tag, U &&opts, const char *dflt, bool fixed) :
+		dio16_slot_device(mconfig, tag, owner)
+	{
+		set_dio(std::forward<T>(dio_tag));
+		set_options(std::forward<U>(opts), dflt, fixed);
+	}
+	dio16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// inline configuration
 	template <typename T> void set_dio(T &&dio_tag) { m_dio.set_tag(std::forward<T>(dio_tag)); }
@@ -59,7 +66,7 @@ class dio16_device : public device_t
 {
 public:
 	// construction/destruction
-	dio16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dio16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	// inline configuration
 	template <typename T> void set_program_space(T &&tag, int spacenum) { m_prgspace.set_tag(std::forward<T>(tag), spacenum); }
 
@@ -232,7 +239,14 @@ public:
 		set_dio(std::forward<T>(dio_tag));
 		set_options(std::forward<U>(opts), dflt, fixed);
 	}
-	dio32_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T, typename U>
+	dio32_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&dio_tag, U &&opts, const char *dflt, bool fixed) :
+		dio32_slot_device(mconfig, tag, owner)
+	{
+		set_dio(std::forward<T>(dio_tag));
+		set_options(std::forward<U>(opts), dflt, fixed);
+	}
+	dio32_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	// device_t implementation
@@ -244,7 +258,7 @@ class dio32_device : public dio16_device
 {
 public:
 	// construction/destruction
-	dio32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dio32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void install16_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler);
 

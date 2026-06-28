@@ -19,6 +19,8 @@
 
 #include "inpttype.h"
 
+#include "interface/inputseq.h"
+
 #include "ioprocs.h"
 
 #include <array>
@@ -326,6 +328,9 @@ enum input_string_index
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
+using osd::input_seq; // too much trouble to qualify this everywhere
+
 
 // constructor function pointer
 typedef void(*ioport_constructor)(device_t &owner, ioport_list &portlist, std::ostream &errorbuf);

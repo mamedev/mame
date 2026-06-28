@@ -692,7 +692,7 @@ void ti99_8_state::ti99_8(machine_config& config)
 	m_cpu->holda_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::holda_line));
 
 	// 9901 configuration
-	TMS9901(config, m_tms9901, 0);
+	TMS9901(config, m_tms9901);
 	m_tms9901->read_cb().set(FUNC(ti99_8_state::psi_input));
 	m_tms9901->p_out_cb(0).set(FUNC(ti99_8_state::keyC0));
 	m_tms9901->p_out_cb(1).set(FUNC(ti99_8_state::keyC1));
@@ -706,13 +706,13 @@ void ti99_8_state::ti99_8(machine_config& config)
 	m_tms9901->intreq_cb().set(FUNC(ti99_8_state::tms9901_interrupt));
 
 	// Mainboard with custom chips
-	TI99_MAINBOARD8(config, m_mainboard, 0);
+	TI99_MAINBOARD8(config, m_mainboard);
 	m_mainboard->ready_cb().set(FUNC(ti99_8_state::console_ready));
 	m_mainboard->reset_cb().set(FUNC(ti99_8_state::console_reset));
 	m_mainboard->hold_cb().set(FUNC(ti99_8_state::cpu_hold));
 
 	// Cartridge port
-	TI99_GROMPORT(config, m_gromport, 0, ti99_gromport_options_998, "single").extend();
+	TI99_GROMPORT(config, m_gromport, ti99_gromport_options_998, "single").extend();
 	m_gromport->ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::system_grom_ready));
 	m_gromport->reset_cb().set(FUNC(ti99_8_state::console_reset));
 
@@ -724,12 +724,12 @@ void ti99_8_state::ti99_8(machine_config& config)
 	SOFTWARE_LIST(config, "cart_list_ti99").set_original("ti99_cart");
 
 	// I/O port
-	TI99_IOPORT(config, m_ioport, 0, ti99_ioport_options_plain, nullptr);
+	TI99_IOPORT(config, m_ioport, ti99_ioport_options_plain, nullptr);
 	m_ioport->extint_cb().set(FUNC(ti99_8_state::extint));
 	m_ioport->ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::pbox_ready));
 
 	// Hexbus
-	HEXBUS(config, TI998_HEXBUS_TAG, 0, hexbus_options, nullptr);
+	HEXBUS(config, TI998_HEXBUS_TAG, hexbus_options, nullptr);
 
 	// Sound hardware
 	SPEAKER(config, "sound_out").front_center();
@@ -745,7 +745,7 @@ void ti99_8_state::ti99_8(machine_config& config)
 	vsp.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::speech_ready));
 	vsp.add_route(ALL_OUTPUTS, "speech_out", 0.50);
 
-	TMS6100(config, TI998_SPEECHROM_REG, 0);
+	TMS6100(config, TI998_SPEECHROM_REG);
 	vsp.m0_cb().set(TI998_SPEECHROM_REG, FUNC(tms6100_device::m0_w));
 	vsp.m1_cb().set(TI998_SPEECHROM_REG, FUNC(tms6100_device::m1_w));
 	vsp.addr_cb().set(TI998_SPEECHROM_REG, FUNC(tms6100_device::add_w));
@@ -754,7 +754,7 @@ void ti99_8_state::ti99_8(machine_config& config)
 
 	// Cassette drive
 	SPEAKER(config, "cass_out").front_center();
-	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "cass_out", 0.25);
+	CASSETTE(config, "cassette").add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
 	// GROM library
 	using namespace bus::ti99::internal;
@@ -785,7 +785,7 @@ void ti99_8_state::ti99_8(machine_config& config)
 	TMC0430(config, TI998_GLIB32_TAG, TI998_GROMLIB3_REG, 0x4000, 2).ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::p3_grom_ready));
 
 	// Joystick port
-	TI99_JOYPORT(config, m_joyport, 0, ti99_joyport_options_mouse, "twinjoy");
+	TI99_JOYPORT(config, m_joyport, ti99_joyport_options_mouse, "twinjoy");
 }
 
 /*

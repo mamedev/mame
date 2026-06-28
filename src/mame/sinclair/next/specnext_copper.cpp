@@ -2,6 +2,12 @@
 // copyright-holders:Andrei I. Holub
 /**********************************************************************
     Spectrum Next Copper
+
+Instruction format (16-bit, stored in even/odd byte pairs):
+  WAIT: bit15=1, bits14:9=H column (units of 8), bits8:0=V line
+  MOVE: bit15=0, bits14:8=nextreg address, bits7:0=value
+  NOP:  MOVE with address 0 and value 0
+
 Refs:
     https://gitlab.com/thesmog358/tbblue/-/raw/master/docs/extra-hw/copper/COPPER-v0.1c.TXT
 **********************************************************************/
@@ -43,8 +49,6 @@ void specnext_copper_device::copper_en_w(u8 data)
 	if (m_copper_en != data)
 	{
 		m_copper_en = data;
-		if ((m_copper_en == 0b01) || (m_copper_en == 0b11))
-			m_copper_list_addr = 0;
 		m_copper_dout = 0;
 
 		switch(m_copper_en)
@@ -56,6 +60,7 @@ void specnext_copper_device::copper_en_w(u8 data)
 			break;
 		case 0b01:
 			LOGCTRL("RESET\n");
+			m_copper_list_addr = 0;
 			m_timer->adjust(attotime::zero);
 			break;
 		case 0b10:
@@ -64,6 +69,7 @@ void specnext_copper_device::copper_en_w(u8 data)
 			break;
 		case 0b11:
 			LOGCTRL("FRAME\n");
+			m_copper_list_addr = 0;
 			m_frame_timer->adjust(m_in_until_pos_cb(0x0000));
 			break;
 		}

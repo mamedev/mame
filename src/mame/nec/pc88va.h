@@ -27,6 +27,7 @@
 #include "machine/timer.h"
 #include "machine/upd1990a.h"
 #include "machine/upd765.h"
+#include "sound/spkrdev.h"
 #include "sound/ymopn.h"
 
 #include "emupal.h"
@@ -53,6 +54,7 @@ public:
 		// labelled "マウス" (mouse) - can't use "mouse" because of core -mouse option
 		, m_mouse_port(*this, "mouseport")
 		, m_opna(*this, "opna")
+		, m_dac1bit(*this, "dac1bit")
 		, m_speaker(*this, "speaker")
 		, m_palram(*this, "palram")
 		, m_sysbank(*this, "sysbank")
@@ -67,8 +69,6 @@ public:
 	{ }
 
 	void pc88va(machine_config &config);
-
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
 protected:
 	struct tsp_t
@@ -90,23 +90,14 @@ protected:
 		u8 spwr_offset = 0;
 	};
 
-	struct keyb_t
-	{
-		u8 data = 0;
-	};
-	keyb_t m_keyb;
-
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 	virtual void video_reset() override ATTR_COLD;
 	void palette_init(palette_device &palette) const;
 
-protected:
 	void pc88va_cbus(machine_config &config);
-
 private:
-
 	required_device<v50_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<upd765a_device> m_fdc;
@@ -118,6 +109,7 @@ private:
 	required_device<pc98_cbus_root_device> m_cbus_root;
 	required_device<msx_general_purpose_port_device> m_mouse_port;
 	required_device<ym2608_device> m_opna;
+	required_device<speaker_sound_device> m_dac1bit;
 	required_device<speaker_device> m_speaker;
 	required_shared_ptr<uint16_t> m_palram;
 	required_device<address_map_bank_device> m_sysbank;
@@ -133,8 +125,8 @@ private:
 	uint16_t m_bank_reg = 0;
 	uint8_t m_timer3_io_reg = 0;
 	emu_timer *m_t3_mouse_timer = nullptr;
-	uint8_t m_backupram_wp = 0;
 	bool m_rstmd = false;
+	bool m_dac1bit_disable;
 
 	// FDC
 	emu_timer *m_fdc_timer = nullptr;
@@ -158,15 +150,11 @@ private:
 	uint16_t bios_bank_r();
 	void bios_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t rom_bank_r();
-	uint8_t key_r(offs_t offset);
-	void backupram_wp_1_w(uint16_t data);
-	void backupram_wp_0_w(uint16_t data);
 	uint8_t kanji_ram_r(offs_t offset);
 	void kanji_ram_w(offs_t offset, uint8_t data);
 
 	uint16_t sysop_r();
 	void timer3_ctrl_reg_w(uint8_t data);
-	uint8_t backupram_dsw_r(offs_t offset);
 	void sys_port1_w(uint8_t data);
 	u8 sys_port5_r();
 	void sys_port5_w(u8 data);
@@ -189,13 +177,21 @@ private:
 	bool m_ymmd;
 	u8 m_vw;
 	u16 m_gfx_ctrl_reg;
+	u16 m_backdrop_color;
+	u8 m_g3msk, m_88md, m_gnsw;
+	u8 m_tscr, m_gcf;
 
 	u16 m_color_mode;
 	u8 m_pltm, m_pltp;
 
+	u16 m_gntc[2];
+	u8 m_gfx_transmask[2][16];
 	u16 m_text_transpen;
+	u8 m_text_transmask[16];
 	bool m_td;
+	bitmap_rgb32 m_text_bitmap;
 	bitmap_rgb32 m_graphic_bitmap[2];
+	bitmap_rgb32 m_bitmap_screen[6];
 
 	struct {
 		bool aacc;
@@ -222,7 +218,10 @@ private:
 	struct {
 		u16 top, bottom;
 		u16 left, right;
+		u8 gmp, mkm[2];
 	} m_picture_mask;
+
+	bool is_layer_scissored(int pri, int which);
 
 	u8 rop_execute(u8 plane_rop, u8 src, u8 dst, u8 pat);
 	u8 gvram_singleplane_r(offs_t offset);
@@ -236,6 +235,11 @@ private:
 	void gfx_ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void video_pri_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
+	void picture_mask_mode_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void backdrop_color_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void plain_mask_w(offs_t offset, u8 data);
+	void color_code_w(offs_t offset, u8 data);
+	void gfx_transpen_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void color_mode_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void text_transpen_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void text_control_1_w(u8 data);
@@ -255,15 +259,25 @@ private:
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 which);
 
-	void draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u8 pal_base);
-	void draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 dsp_start_base, u16 scrollx, u8 pal_base, u16 fb_width, u16 fb_height);
-	void draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 dsp_start_base, u16 scrollx, u16 fb_width, u16 fb_height);
-	void draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 scrollx, u16 fb_width, u16 fb_height);
+	struct layer_params_t {
+		u32 fsa;
+		u32 dsa;
+		u16 dsp;
+		u16 ofx;
+		u16 ofy;
+		u16 fbw;
+		u16 fbl;
+	};
 
-	void draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 scrollx, u8 pal_base, u16 fb_width, u16 fb_height);
-	void draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 dsp_start_base, u16 scrollx, u8 pal_base, u16 fb_width, u16 fb_height);
+	void draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which);
+	void draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which);
+	void draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 which);
+	void draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 which);
 
-	uint32_t calc_kanji_rom_addr(uint8_t jis1,uint8_t jis2,int x,int y);
+	void draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which);
+	void draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which);
+
+	uint32_t calc_kanji_rom_addr(uint8_t jis1, uint8_t jis2, int x, int y);
 	void draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// IDP
@@ -275,6 +289,8 @@ private:
 	uint8_t m_buf_ram[16]{};
 	u8 m_crtc_regs[15]{};
 	u16 m_vrtc_irq_line = 432;
+	// u32 for cache
+	u32 m_vertical_magnify;
 
 	uint8_t idp_status_r();
 	void idp_command_w(uint8_t data);

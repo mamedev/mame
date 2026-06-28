@@ -47,14 +47,13 @@
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "cpu/arm7/arm7.h"
-
 #include "machine/lh79524_timer.h"
 #include "machine/vic_pl192.h"
 
-#include "softlist_dev.h"
-
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
+
 
 namespace {
 
@@ -80,7 +79,7 @@ public:
 		, m_remap_view(*this, "remap")
 	{ }
 
-	void pixter_multimedia(machine_config &config);
+	void pixter_multimedia(machine_config &config) ATTR_COLD;
 
 private:
 	// Remap Control, mapped at 0xfffe2008, offset 0x0008/4
@@ -115,9 +114,6 @@ private:
 	uint32_t gpiogh_r(offs_t offset);
 	uint32_t gpioij_r(offs_t offset);
 
-
-	int adc_count;
-
 	void apb_remap(uint32_t data);
 
 	uint32_t screen_update_pixtermu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -142,6 +138,8 @@ private:
 	memory_share_creator<uint32_t> m_dma;
 
 	memory_view m_remap_view;
+
+	int adc_count;
 };
 
 void pixter_multimedia_state::apb_remap(uint32_t data)
@@ -230,12 +228,12 @@ void pixter_multimedia_state::arm7_map(address_map &map)
 	// Remap Bank
 	map(0x0000'0000, 0x003f'ffff).view(m_remap_view);
 	m_remap_view[0](0x0000'0000, 0x0000'1fff).rom().region("bootrom", 0);
-	m_remap_view[1](0x0000'0000, 0x003f'ffff).ram().share("ndcs0");
-	m_remap_view[2](0x0000'0000, 0x0000'3fff).ram().share("internal_sram");
+	m_remap_view[1](0x0000'0000, 0x003f'ffff).ram().share(m_ndcs0);
+	m_remap_view[2](0x0000'0000, 0x0000'3fff).ram().share(m_internal_sram);
 	m_remap_view[3](0x0000'0000, 0x003f'ffff).rom().region("ncs1", 0);
 
 	// External SRAM
-	map(0x2000'0000, 0x203f'ffff).ram().share("ndcs0");
+	map(0x2000'0000, 0x203f'ffff).ram().share(m_ndcs0);
 	// nCS0 (Unused NAND Flash?)
 	// map(0x40000000, 0x403fffff)
 	// nCS1 (Chip-On-Board ROM)
@@ -246,14 +244,14 @@ void pixter_multimedia_state::arm7_map(address_map &map)
 	// map(0x4c00'0000, 0x4c3f'ffff)
 
 	// Internal SRAM
-	map(0x6000'0000, 0x6000'3fff).mirror(0x0fff'c000).ram().share("internal_sram");
+	map(0x6000'0000, 0x6000'3fff).mirror(0x0fff'c000).ram().share(m_internal_sram);
 
 	// Boot ROM
 	map(0x8000'0000, 0x8000'1fff).rom().region("bootrom", 0);
 
 	// APB Peripherals
 	// ADC
-	map(0xfffc'3000, 0xfffc'30ff).ram().share("adc").r(FUNC(pixter_multimedia_state::adc_r)).w(FUNC(pixter_multimedia_state::adc_w));
+	map(0xfffc'3000, 0xfffc'30ff).ram().share(m_adc).r(FUNC(pixter_multimedia_state::adc_r)).w(FUNC(pixter_multimedia_state::adc_w));
 	// Timers
 	map(0xfffc'4000, 0xfffc'402f).rw(m_timers[0], FUNC(lh79524_timer_device::read), FUNC(lh79524_timer_device::write));
 	map(0xfffc'4030, 0xfffc'404f).rw(m_timers[1], FUNC(lh79524_timer_device::read), FUNC(lh79524_timer_device::write));
@@ -268,18 +266,18 @@ void pixter_multimedia_state::arm7_map(address_map &map)
 	// GPIO A/B
 	map(0xfffd'f000, 0xfffd'f00f).r(FUNC(pixter_multimedia_state::gpioab_r));
 	// DMA
-	map(0xfffe'1000, 0xfffe'10ff).ram().share("dma").w(FUNC(pixter_multimedia_state::dma_w));
+	map(0xfffe'1000, 0xfffe'10ff).ram().share(m_dma).w(FUNC(pixter_multimedia_state::dma_w));
 
 	// Reset Clock and Power Controller
-	map(0xfffe'2000, 0xfffe'2fff).ram().share("clkrst").w(FUNC(pixter_multimedia_state::clkrst_w));
+	map(0xfffe'2000, 0xfffe'2fff).ram().share(m_clkrst).w(FUNC(pixter_multimedia_state::clkrst_w));
 	// Boot Controller
-	map(0xfffe'6000, 0xfffe'6fff).ram().share("bootctl").w(FUNC(pixter_multimedia_state::bootctl_w));
+	map(0xfffe'6000, 0xfffe'6fff).ram().share(m_bootctl).w(FUNC(pixter_multimedia_state::bootctl_w));
 
 
 	// External Memory Control
 	map(0xffff'1000, 0xffff'1fff).ram();
 	// Color LCD Control
-	map(0xffff'4000, 0xffff'4fff).ram().share("lcdc").w(FUNC(pixter_multimedia_state::lcdc_w)).r(FUNC(pixter_multimedia_state::lcdc_r));
+	map(0xffff'4000, 0xffff'4fff).ram().share(m_lcdc).w(FUNC(pixter_multimedia_state::lcdc_w)).r(FUNC(pixter_multimedia_state::lcdc_r));
 	// USB Device
 	map(0xffff'5000, 0xffff'5fff).ram();
 	// Interrupt Vector Control
@@ -309,9 +307,9 @@ void pixter_multimedia_state::lcdc_w(offs_t offset, uint32_t data, uint32_t mem_
 		for (int j = 0; j < 2; j++) {
 			uint16_t ibgr1555 = data >> (16 * j);
 			uint16_t i = ((ibgr1555 >> 15) & 0x1) << 2;
-			uint16_t b = ((ibgr1555 >> 10) & 0x1F) << 3 | i;
-			uint16_t g = ((ibgr1555 >> 5) & 0x1F) << 3 | i;
-			uint16_t r = ((ibgr1555 >> 0) & 0x1F) << 3 | i;
+			uint16_t b = ((ibgr1555 >> 10) & 0x1f) << 3 | i;
+			uint16_t g = ((ibgr1555 >> 5) & 0x1f) << 3 | i;
+			uint16_t r = ((ibgr1555 >> 0) & 0x1f) << 3 | i;
 
 			m_palette->set_pen_color(base + j, r, g, b);
 		}
@@ -327,7 +325,7 @@ uint32_t pixter_multimedia_state::lcdc_r(offs_t offset)
 uint32_t pixter_multimedia_state::ssp_r(offs_t offset)
 {
 	switch (offset << 2) {
-		case 0x0C: // status
+		case 0x0c: // status
 			return 1;
 		default:
 			return 0;
@@ -344,22 +342,22 @@ uint32_t pixter_multimedia_state::adc_r(offs_t offset)
 		case 0x08: { // result
 				if (adc_count > 0)
 					--adc_count;
-				unsigned index = ((m_adc[0x10 >> 2] & 0xF) -  adc_count);
+				unsigned index = ((m_adc[0x10 >> 2] & 0xf) -  adc_count);
 				unsigned hc = m_adc[(0x24 >> 2) + index], lc = m_adc[(0x64 >> 2) + index];
 				unsigned result = 0x3ff;
-				if (hc == 0xFF80 && lc == 0x1080) { // touch or no touch
+				if (hc == 0xff80 && lc == 0x1080) { // touch or no touch
 					result = m_touch[2]->read() ? 0 : 0x3ff;
-				} else if (hc == 0xFFA0 && lc == 0x1080) {
+				} else if (hc == 0xffa0 && lc == 0x1080) {
 					result = 0;
-				} else if (hc == 0xFF91 && lc == 0x0015) { // Y position
+				} else if (hc == 0xff91 && lc == 0x0015) { // Y position
 					result = (m_touch[1]->read() * 1023) / 176;
-				} else if (hc == 0xFF82 && lc == 0x00A2) { // X position
+				} else if (hc == 0xff82 && lc == 0x00a2) { // X position
 					result = 1023 - ((8 + m_touch[0]->read()) * 1023) / 176;
 				}
 				// At least one extra channel is used for battery
-				return (result << 6) | (index & 0xF);
+				return (result << 6) | (index & 0xf);
 			}
-		case 0x1C: // IRQ status
+		case 0x1c: // IRQ status
 			return (m_touch[2]->read() ? 8 : 0) | 4;
 		case 0x20: // FIFO status
 			if (adc_count == 16)
@@ -378,7 +376,7 @@ void pixter_multimedia_state::adc_w(offs_t offset, uint32_t data, uint32_t mem_m
 	switch (offset << 2) {
 		case 0x14:
 			if(data & 0x4) { // start conversion
-				adc_count = (m_adc[0x10 >> 2] & 0xF) + 1;
+				adc_count = (m_adc[0x10 >> 2] & 0xf) + 1;
 			};
 			return;
 		default:
@@ -391,7 +389,7 @@ uint32_t pixter_multimedia_state::gpioab_r(offs_t offset)
 {
 	switch (offset << 2) {
 		case 0x04: // port B data
-			return 0xFF;
+			return 0xff;
 		default:
 			return 0;
 	}
@@ -415,7 +413,7 @@ uint32_t pixter_multimedia_state::gpioij_r(offs_t offset)
 {
 	switch (offset << 2) {
 		case 0x00: // port I data
-			return 0xFF;
+			return 0xff;
 		default:
 			return 0;
 	}
@@ -424,23 +422,23 @@ uint32_t pixter_multimedia_state::gpioij_r(offs_t offset)
 void pixter_multimedia_state::dma_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset << 2) {
-		case 0xF4: // interrupt clear
+		case 0xf4: // interrupt clear
 			if (data & 0x2) {
-				m_dma[0xF8 >> 2] &= ~0x2;
+				m_dma[0xf8 >> 2] &= ~0x2;
 			}
 			break;
 		default:
 			COMBINE_DATA(&m_dma[offset]);
 			break;
 	}
-	m_vic->irq_w<21>(((m_dma[0xF0 >> 2] & 0x2) & (m_dma[0xF8 >> 2] & 0x2)) ? ASSERT_LINE : CLEAR_LINE);
+	m_vic->irq_w<21>(((m_dma[0xf0 >> 2] & 0x2) & (m_dma[0xf8 >> 2] & 0x2)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 uint32_t pixter_multimedia_state::screen_update_pixtermu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (!BIT(m_lcdc[0x01C>>2], 1))
+	if (!BIT(m_lcdc[0x01c >> 2], 1))
 		return 0;
-	const uint32_t base = (m_lcdc[0x010>>2] >> 2) & 0xfffff;
+	const uint32_t base = (m_lcdc[0x010 >> 2] >> 2) & 0xfffff;
 
 	for (int y = 0; y < 160; y++) {
 		for (int x = 0; x < 160; x++) {
@@ -457,7 +455,7 @@ uint32_t pixter_multimedia_state::screen_update_pixtermu(screen_device &screen, 
 		int y0 = 160;
 		for (int y = (y0 + 2); y <= (y0 + 14); y++) {
 			for (int x = (x0 + 2); x <= (x0 + 14); x++) {
-				bitmap.pix(y, x) = 0xFF;
+				bitmap.pix(y, x) = 0xff;
 			}
 		}
 	}
@@ -470,8 +468,8 @@ void pixter_multimedia_state::screen_vblank(int state)
 	// Triggering this on vblank is definitely wrong, but it's the best place to set this right now...
 	// The correct solution is to implement the SSP and DMA that drives the audio DAC. But without
 	// this interrupt the system won't run.
-	m_dma[0xF8 >> 2] |= 0x2;
-	m_vic->irq_w<21>(((m_dma[0xF0 >> 2] & 0x2) & (m_dma[0xF8 >> 2] & 0x2)) ? ASSERT_LINE : CLEAR_LINE);
+	m_dma[0xf8 >> 2] |= 0x2;
+	m_vic->irq_w<21>(((m_dma[0xf0 >> 2] & 0x2) & (m_dma[0xf8 >> 2] & 0x2)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_PORTS_START( pixter_multimedia )
@@ -494,7 +492,7 @@ void pixter_multimedia_state::pixter_multimedia(machine_config &config)
 	ARM7(config, m_maincpu, 76'205'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pixter_multimedia_state::arm7_map);
 
-	PL190_VIC(config, m_vic, 0);
+	PL190_VIC(config, m_vic);
 	m_vic->out_irq_cb().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE);
 	m_vic->out_fiq_cb().set_inputline(m_maincpu, arm7_cpu_device::ARM7_FIRQ_LINE);
 

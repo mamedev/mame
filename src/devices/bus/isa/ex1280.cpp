@@ -82,7 +82,7 @@ void isa16_ex1280_device::device_add_mconfig(machine_config &config)
 	m_screen->set_screen_update(m_cpu, FUNC(tms34010_device::tms340x0_rgb32));
 	m_screen->screen_vblank().set(FUNC(isa16_ex1280_device::vblank_w));
 
-	BT451(config, m_ramdac, 0);
+	BT451(config, m_ramdac);
 }
 
 

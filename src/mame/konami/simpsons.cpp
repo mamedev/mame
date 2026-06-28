@@ -370,7 +370,7 @@ void simpsons_state::coin_counter_w(uint8_t data)
 uint8_t simpsons_state::sound_interrupt_r()
 {
 	if (!machine().side_effects_disabled())
-		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+		m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 
 	return 0x00;
 }
@@ -672,7 +672,7 @@ void simpsons_state::simpsons(machine_config &config)
 	m_k053246->set_config(NORMAL_PLANE_ORDER, -43, 23);
 	m_k053246->set_palette("palette");
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();

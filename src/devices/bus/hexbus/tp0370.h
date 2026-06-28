@@ -21,7 +21,7 @@ namespace bus::hexbus {
 class ibc_device : public device_t
 {
 public:
-	ibc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ibc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	void device_start() override ATTR_COLD;
 	void device_reset() override ATTR_COLD;
 

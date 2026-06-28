@@ -13,6 +13,7 @@
 #include "config.h"
 #include "emuopts.h"
 #include "fileio.h"
+#include "input.h"
 #include "inputdev.h"
 #include "main.h"
 #include "natkeyboard.h"
@@ -30,7 +31,9 @@
 #include "osdepend.h"
 
 #include <algorithm>
+#include <bit>
 #include <cctype>
+#include <cstdio>
 #include <ctime>
 #include <sstream>
 #include <type_traits>
@@ -86,22 +89,6 @@ inline s64 recip_scale(s64 scale)
 inline s32 apply_scale(s32 value, s64 scale)
 {
 	return (s64(value) * scale) / (1 << 24);
-}
-
-//-------------------------------------------------
-//  compute_shift -- get shift required to right-
-//  align an I/O port field value
-//-------------------------------------------------
-
-inline u8 compute_shift(ioport_value mask)
-{
-	u8 result = 0U;
-	while (mask && !BIT(mask, 0))
-	{
-		mask >>= 1;
-		++result;
-	}
-	return result;
 }
 
 
@@ -403,7 +390,7 @@ private:
 const char *const ioport_manager::seqtypestrings[] = { "standard", "increment", "decrement" };
 
 
-u8 const inp_header::MAGIC[inp_header::OFFS_BASETIME - inp_header::OFFS_MAGIC] = { 'M', 'A', 'M', 'E', 'I', 'N', 'P', 0 };
+u8 const inp_header::MAGIC[] = { 'M', 'A', 'M', 'E', 'I', 'N', 'P', 0 };
 
 
 
@@ -1437,7 +1424,7 @@ void ioport_field::expand_diplocation(const char *location, std::ostream &errorb
 	}
 
 	// then verify the number of bits in the mask matches
-	int const bits = population_count_32(m_mask);
+	int const bits = std::popcount(m_mask);
 	if (bits > entries)
 		util::stream_format(errorbuf, "Switch location '%s' does not describe enough bits for mask %X\n", location, m_mask);
 	else if (bits < entries)
@@ -1497,7 +1484,7 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog) 
 	}
 
 	// Name keyboard key names
-	if (field.type_class() == INPUT_CLASS_KEYBOARD && field.specific_name() == nullptr)
+	if ((field.type_class() == INPUT_CLASS_KEYBOARD) && !field.specific_name())
 	{
 		// loop through each character on the field
 		for (int which = 0; which < (1 << (UCHAR_SHIFT_END - UCHAR_SHIFT_BEGIN + 1)); which++)
@@ -3010,7 +2997,7 @@ time_t ioport_manager::playback_init()
 
 	// return an explicit error if file isn't found in given path
 	if (filerr == std::errc::no_such_file_or_directory)
-		fatalerror("Input file %s not found\n",filename);
+		fatalerror("Input file %s not found\n", filename);
 
 	// TODO: bail out any other error laconically for now
 	if (filerr)
@@ -3562,7 +3549,7 @@ void dynamic_field::write(ioport_value newval)
 
 analog_field::analog_field(ioport_field &field) :
 	m_field(field),
-	m_shift(compute_shift(field.mask())),
+	m_shift(field.mask() ? std::countr_zero(field.mask()) : 0U),
 	m_adjdefvalue((field.defvalue() & field.mask()) >> m_shift),
 	m_adjmin((field.minval() & field.mask()) >> m_shift),
 	m_adjmax((field.maxval() & field.mask()) >> m_shift),

@@ -81,7 +81,7 @@ void tnshc08_state::tnshc08(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tnshc08_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &tnshc08_state::io_map);
 
-	I8255(config, m_ppi, 0);
+	I8255(config, m_ppi);
 	m_ppi->in_pb_callback().set(FUNC(tnshc08_state::ppi_r));
 }
 

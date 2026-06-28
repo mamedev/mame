@@ -16,7 +16,10 @@
 #include "tms34010.h"
 #include "34010dsm.h"
 
+#include "input.h" // for video debug keys
 #include "screen.h"
+
+#include <bit>
 
 #define LOG_CONTROL_REGS (1U << 1)
 #define LOG_GRAPHICS_OPS (1U << 2)

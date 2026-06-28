@@ -100,7 +100,7 @@ void cavepc_state::cavepc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cavepc_state::cavepc_map);
 	m_maincpu->set_addrmap(AS_IO, &cavepc_state::cavepc_io);
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 

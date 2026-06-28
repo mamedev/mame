@@ -700,12 +700,6 @@ void gl3000s_state::machine_start()
 	m_bank1->configure_entries(0, 0x20, bios, 0x4000);
 	m_bank2->configure_entries(0, 0x20, bios, 0x4000);
 	m_bank2->configure_entries(0x80, 0x10, cart, 0x4000);
-
-	m_lev_out.resolve();
-	m_try_out.resolve();
-	m_tick_out.resolve();
-	m_time_out.resolve();
-	m_points_out.resolve();
 }
 
 void gl4004_state::machine_start()

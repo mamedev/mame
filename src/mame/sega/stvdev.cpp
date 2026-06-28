@@ -59,7 +59,7 @@ void stvdev_state::stvdev(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &stvdev_state::stvdev_map);
 	m_maincpu->set_addrmap(AS_IO, &stvdev_state::stvdev_io);
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 

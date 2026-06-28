@@ -20,7 +20,7 @@
 
 #define STRING_MAX 80 /* used for console input */
 
-void show_usage()
+void show_usage(void)
 {
     printf("Usage: pmlist [-h]\n        -h means help.\n"
            "    Type return to rescan and list devices, q<ret> to quit\n");

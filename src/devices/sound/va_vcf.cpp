@@ -5,6 +5,7 @@
 #include "va_vcf.h"
 
 #include <cfloat>
+#include <numbers>
 
 va_lpf4_device::va_lpf4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: va_lpf4_device(mconfig, VA_LPF4, tag, owner, clock)
@@ -271,7 +272,7 @@ void va_lpf4_device::recalc_res()
 void va_lpf4_device::recalc_filter()
 {
 	const float T = 1.0F / sample_rate();
-	const float w = 2 * float(M_PI) * m_fc;
+	const float w = 2 * std::numbers::pi_v<float> * m_fc;
 
 	// Using the "bounded cutoff prewarping" strategy described in Zavalishin's
 	// "The art of VA filter design": if the cutoff is larger than some bound
@@ -283,7 +284,7 @@ void va_lpf4_device::recalc_filter()
 	// does not work well with standard cutoff prewarping.
 	// Here, we set the max at 16KHz (same as in the book). But for low sample
 	// rates, we use a fraction of Nyquist instead.
-	const float w_max = 2 * float(M_PI) * std::min(0.75F * sample_rate() / 2, 16'000.0F);
+	const float w_max = 2 * std::numbers::pi_v<float> * std::min(0.75F * sample_rate() / 2, 16'000.0F);
 	float g = 0;
 	if (w <= w_max)
 		g = tanf(w * T / 2);

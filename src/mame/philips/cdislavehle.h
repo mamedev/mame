@@ -32,7 +32,7 @@ class cdislave_hle_device : public device_t
 {
 public:
 	// construction/destruction
-	cdislave_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cdislave_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto int_callback() { return m_int_callback.bind(); }
 	auto read_mousex() { return m_read_mousex.bind(); }

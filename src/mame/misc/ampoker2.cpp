@@ -416,11 +416,6 @@
 #define MASTER_CLOCK    XTAL(6'000'000)
 
 
-void ampoker2_state::machine_start()
-{
-	m_lamps.resolve();
-}
-
 /**********************
 * Read/Write Handlers *
 *  - Output Ports -   *

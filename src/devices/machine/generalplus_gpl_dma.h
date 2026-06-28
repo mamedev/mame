@@ -8,7 +8,7 @@
 class gpl_dma_device : public device_t
 {
 public:
-	gpl_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gpl_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto space_read_callback() { return m_space_read_cb.bind(); }
 	auto space_write_callback() { return m_space_write_cb.bind(); }

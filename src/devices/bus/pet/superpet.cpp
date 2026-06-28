@@ -78,7 +78,7 @@ void superpet_device::device_add_mconfig(machine_config &config)
 
 	MOS6702(config, m_dongle, 16_MHz_XTAL / 16);
 
-	MOS6551(config, m_acia, 0);
+	MOS6551(config, m_acia);
 	m_acia->set_xtal(1.8432_MHz_XTAL);
 	m_acia->irq_handler().set(FUNC(superpet_device::acia_irq_w));
 	m_acia->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));

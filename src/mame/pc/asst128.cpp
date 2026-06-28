@@ -133,7 +133,7 @@ void asst128_state::asst128(machine_config &config)
 	kbd.out_clock_cb().set("mb", FUNC(asst128_mb_device::keyboard_clock_w));
 	kbd.out_data_cb().set("mb", FUNC(asst128_mb_device::keyboard_data_w));
 
-	PC_FDC_XT(config, m_fdc, 0);
+	PC_FDC_XT(config, m_fdc);
 	m_fdc->intrq_wr_callback().set("mb:pic8259", FUNC(pic8259_device::ir6_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", asst128_floppies, "525ssqd", asst128_state::asst128_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", asst128_floppies, "525ssqd", asst128_state::asst128_formats);

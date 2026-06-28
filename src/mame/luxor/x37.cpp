@@ -534,7 +534,7 @@ void x37_state::x37(machine_config &config)
 	m_cio->pc_rd_cb().set(FUNC(x37_state::cio_pc_r));
 	m_cio->pc_wr_cb().set(FUNC(x37_state::cio_pc_w));
 
-	NMC9306(config, m_nvram, 0);
+	NMC9306(config, m_nvram);
 
 	E0516(config, m_rtc, XTAL(32'768));
 	m_rtc->outsel_rd_cb().set_constant(0);
@@ -611,7 +611,7 @@ void x37_state::x37(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy[1], x37_floppies, nullptr, x37_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy[2], x37_floppies, nullptr, x37_state::floppy_formats).enable_sound(true);
 
-	LUXOR_X37_SASI(config, m_sasi, 0);
+	LUXOR_X37_SASI(config, m_sasi);
 	m_sasi->int_callback().set(m_cio, FUNC(z8536_device::pa7_w));
 	m_sasi->int_callback().append(FUNC(x37_state::sasi_int_w));
 	m_sasi->req0_callback().set(m_dmac, FUNC(hd63450_device::drq0_w));

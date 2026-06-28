@@ -293,7 +293,7 @@ void tosh1000_state::tosh1000(machine_config &config)
 
 	RAM(config, RAM_TAG).set_default_size("512K");
 
-	TOSH1000_BRAM(config, m_bram, 0);
+	TOSH1000_BRAM(config, m_bram);
 }
 
 

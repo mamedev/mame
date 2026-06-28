@@ -72,7 +72,7 @@ class pit68230_device :  public device_t
 {
 public:
 	// construction/destruction
-	pit68230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pit68230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto pa_in_callback() { return m_pa_in_cb.bind(); }
 	auto pa_out_callback() { return m_pa_out_cb.bind(); }

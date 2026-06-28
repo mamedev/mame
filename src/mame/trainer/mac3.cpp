@@ -55,7 +55,7 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void mac3(machine_config &config);
+	void mac3(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -202,8 +202,6 @@ void mac3_state::icm7228_mode_w(int state)
 
 void mac3_state::machine_start()
 {
-	m_digits.resolve();
-
 	m_cassette_timer = timer_alloc(FUNC(mac3_state::cassette_timer), this);
 	m_cassette_timer->adjust(attotime::from_hz(44100), 0, attotime::from_hz(44100));
 

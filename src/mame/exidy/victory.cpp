@@ -243,7 +243,7 @@ void victory_state::victory(machine_config &config)
 	PALETTE(config, m_palette).set_entries(64);
 
 	/* audio hardware */
-	EXIDY_VICTORY(config, "soundbd", 0);
+	EXIDY_VICTORY(config, "soundbd");
 }
 
 

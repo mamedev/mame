@@ -3688,7 +3688,7 @@ void igs011_oki_state::drgnwrld_igs012(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_oki_state::drgnwrld_igs012_mem);
 
-	IGS012(config, m_igs012, 0);
+	IGS012(config, m_igs012);
 }
 
 
@@ -3823,7 +3823,7 @@ void vbowl_state::vbowl(machine_config &config)
 	// irq 5 points to a debug function (all routines are clearly patched out)
 	// irq 4 points to an apparently unneeded routine
 
-	IGS012(config, m_igs012, 0);
+	IGS012(config, m_igs012);
 
 	m_screen->screen_vblank().set(FUNC(vbowl_state::screen_vblank));
 	//GFXDECODE(config, "gfxdecode", m_palette, gfx_igs011_hi);

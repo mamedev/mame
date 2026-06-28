@@ -277,18 +277,6 @@ void pioneer_pr8210_device::device_start()
 	m_process_vbi_timer = timer_alloc(FUNC(pioneer_pr8210_device::process_vbi_data), this);
 	m_vsync_off_timer = timer_alloc(FUNC(pioneer_pr8210_device::vsync_off), this);
 
-	// resolve outputs
-	m_audio1.resolve();
-	m_audio2.resolve();
-	m_clv.resolve();
-	m_cav.resolve();
-	m_srev.resolve();
-	m_sfwd.resolve();
-	m_play.resolve();
-	m_step.resolve();
-	m_pause.resolve();
-	m_standby.resolve();
-
 	// pass through to the parent
 	laserdisc_device::device_start();
 }

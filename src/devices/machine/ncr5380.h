@@ -30,7 +30,7 @@ public:
 	void dma_w(u8 val);
 
 protected:
-	ncr5380_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, bool has_lbs = false);
+	ncr5380_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, bool has_lbs = false, bool self_reset_int = true);
 
 	// device_t overrides
 	virtual void device_start() override ATTR_COLD;
@@ -165,6 +165,7 @@ private:
 	bool m_drq_state;
 
 	bool const m_has_lbs;
+	bool const m_self_reset_int; // host-issued (ICR) SCSI reset raises an interrupt (false on DP8490 EASI)
 };
 
 class ncr53c80_device : public ncr5380_device

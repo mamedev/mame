@@ -15,6 +15,14 @@
 #include "emu.h"
 #include "specnext_dma.h"
 
+#define LOG_UNDOC (1U << 1)
+
+#define VERBOSE (LOG_UNDOC)
+#include "logmacro.h"
+
+#define LOGUNDOC(...) LOGMASKED(LOG_UNDOC, __VA_ARGS__)
+
+
 // device type definition
 DEFINE_DEVICE_TYPE(SPECNEXT_DMA, specnext_dma_device, "specnext_dma", "Spectrum Next DMA")
 
@@ -42,6 +50,16 @@ specnext_dma_device::specnext_dma_device(const machine_config &mconfig, const ch
 {
 }
 
+void specnext_dma_device::dma_delay_w(bool dma_delay)
+{
+	if (m_dma_delay && !dma_delay && (m_dma_seq == SEQ_WAIT_READY))
+	{
+		set_busrq(ASSERT_LINE);
+		m_dma_seq = SEQ_WAITING_ACK;
+	}
+	m_dma_delay = dma_delay;
+}
+
 void specnext_dma_device::reset_byte_counter()
 {
 	m_byte_counter = m_dma_mode ? 0 : 1;
@@ -51,6 +69,12 @@ void specnext_dma_device::write(u8 data)
 {
 	if (num_follow() == 0)
 	{
+		if ((data & 0x82) == 0x02)
+		{
+			LOGUNDOC("WR0 uses with not Transfer mode bits set: %02x. Forcing Transfer mode.\n", data);
+			data = (data | 0x01) & ~0x02;
+		}
+
 		z80dma_device::write(data);
 		if ((data & 0x83) == 0x83) // WR6
 		{
@@ -97,8 +121,8 @@ TIMER_CALLBACK_MEMBER(specnext_dma_device::clock_w)
 			{
 				set_busrq(CLEAR_LINE);
 				m_dma_seq = SEQ_WAIT_READY;
-				return;
 			}
+			return;
 		}
 	}
 

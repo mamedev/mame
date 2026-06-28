@@ -57,7 +57,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	void smchess(machine_config &config);
+	void smchess(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -84,8 +84,6 @@ private:
 
 void mini_state::machine_start()
 {
-	m_computing.resolve();
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_lcd_select));

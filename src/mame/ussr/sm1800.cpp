@@ -196,7 +196,7 @@ void sm1800_state::sm1800(machine_config &config)
 	m_crtc->set_character_width(8);
 	m_crtc->set_display_callback(FUNC(sm1800_state::crtc_display_pixels));
 
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 }
 
 /* ROM definition */

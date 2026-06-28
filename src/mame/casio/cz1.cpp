@@ -781,11 +781,6 @@ int cz1_state::sync49_r()
 /**************************************************************************/
 void cz1_state::machine_start()
 {
-	m_leds.resolve();
-	m_led_env.resolve();
-	m_led_bank.resolve();
-	m_led_tone.resolve();
-
 	// aftertouch amp levels (TODO: are these correct?)
 	for (int i = 0; i < 0x40; i++)
 		m_volume[i] = pow(2, (float)i / 0x3f) - 1.0;

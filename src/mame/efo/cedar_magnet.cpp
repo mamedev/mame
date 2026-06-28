@@ -971,12 +971,12 @@ void cedar_magnet_state::cedar_magnet(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(0x400);
 
-	CEDAR_MAGNET_SOUND(config, m_cedsound, 0);
-	CEDAR_MAGNET_PLANE(config, m_cedplane0, 0);
-	CEDAR_MAGNET_PLANE(config, m_cedplane1, 0);
-	CEDAR_MAGNET_SPRITE(config, m_cedsprite, 0);
+	CEDAR_MAGNET_SOUND(config, m_cedsound);
+	CEDAR_MAGNET_PLANE(config, m_cedplane0);
+	CEDAR_MAGNET_PLANE(config, m_cedplane1);
+	CEDAR_MAGNET_SPRITE(config, m_cedsprite);
 
-	CEDAR_MAGNET_FLOP(config, "flop", 0);
+	CEDAR_MAGNET_FLOP(config, "flop");
 
 	config.set_perfect_quantum(m_maincpu);
 }

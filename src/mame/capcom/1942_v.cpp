@@ -237,9 +237,9 @@ void _1942_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			for (int i = 0; i < 4; i++)
 				objdata[i] = m_spriteram[obj_idx | i];
 
-			int code = (objdata[0] & 0x7f) + ((objdata[1] & 0x20) << 2) + ((objdata[0] & 0x80) << 1);
+			int code = (objdata[0] & 0x7f) | (BIT(objdata[1], 5) << 7) | (BIT(objdata[0], 7) << 8);
 			int col = objdata[1] & 0x0f;
-			int sx = objdata[3] - 0x10 * (objdata[1] & 0x10);
+			int sx = objdata[3] - (BIT(objdata[1], 4) << 8);
 			int sy = objdata[2];
 			int dir = 1;
 
@@ -247,7 +247,7 @@ void _1942_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			uint8_t v2c = (uint8_t)(~v) + (flip_screen() ? 0x01 : 0xff);
 			uint8_t lvbeta = v2c + valpha;
 			uint8_t vbeta = ~lvbeta;
-			bool vleq = vbeta <= ((~valpha) & 0xff);
+			bool vleq = vbeta <= (~valpha & 0xff);
 			bool vinlen = true;
 			uint8_t vlen = objdata[1] >> 6;
 			switch (vlen & 3)
@@ -274,17 +274,14 @@ void _1942_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				dir = -1;
 			}
 
-			/* handle double / quadruple height */
-			int i = (objdata[1] & 0xc0) >> 6;
-			if (i == 2)
-				i = 3;
+			// draw sprite rows (16*16, 16*32, 16*64, or 16*256)
+			const int row = (vlen == 3) ? 16 : (1 << vlen);
+			code &= ~(row - 1);
 
 			if (!vinzone)
 			{
-				do
-				{
+				for (int i = 0; i < row; i++)
 					m_gfxdecode->gfx(2)->transpen(bitmap, cliprecty, code + i, col, flip_screen(), flip_screen(), sx, sy + 16 * i * dir, 15);
-				} while (i-- > 0);
 			}
 		}
 	}
@@ -303,11 +300,9 @@ void _1942p_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
-		int code = (m_spriteram[offs] & 0x7f) + 4 * (m_spriteram[offs + 3] & 0x20)
-					+ 2 * (m_spriteram[offs] & 0x80);
+		int code = (m_spriteram[offs] & 0x7f) | (BIT(m_spriteram[offs + 3], 5) << 7) | (BIT(m_spriteram[offs], 7) << 8);
 		int col = m_spriteram[offs + 3] & 0x0f;
-
-		int sx = m_spriteram[offs + 2] - 0x10 * (m_spriteram[offs + 3] & 0x10);
+		int sx = m_spriteram[offs + 2] - (BIT(m_spriteram[offs + 3], 4) << 8);
 		int sy = m_spriteram[offs + 1];
 
 		if (flip_screen())

@@ -270,13 +270,12 @@ public:
 	{
 	}
 
-	void dx100(machine_config &config);
+	void dx100(machine_config &config) ATTR_COLD;
 
-	void led_w(int state)                  { m_led = state; }
+	void led_w(int state) { m_led = state; }
 	ioport_value midi_in_r() { return m_midi_in; }
 
 protected:
-	virtual void driver_start() override;
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
@@ -301,11 +300,6 @@ private:
 
 	required_device<cassette_image_device> m_cassette;
 };
-
-void yamaha_dx100_state::driver_start()
-{
-	m_led.resolve();
-}
 
 void yamaha_dx100_state::machine_start()
 {

@@ -780,7 +780,8 @@ void r2dx_v33_state::rdx_v33(machine_config &config)
 	/* basic machine hardware */
 	V33A(config, m_maincpu, 32000000/2); // ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &r2dx_v33_state::rdx_v33_map);
-	m_maincpu->set_vblank_int("screen", FUNC(r2dx_v33_state::interrupt));
+	m_maincpu->set_vblank_int("screen", FUNC(r2dx_v33_state::irq0_line_hold));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(r2dx_v33_state::vector_r));
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
@@ -807,7 +808,8 @@ void nzeroteam_state::nzerotea(machine_config &config)
 	/* basic machine hardware */
 	V33A(config, m_maincpu, XTAL(32'000'000)/2); /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nzeroteam_state::nzerotea_map);
-	m_maincpu->set_vblank_int("screen", FUNC(nzeroteam_state::interrupt));
+	m_maincpu->set_vblank_int("screen", FUNC(nzeroteam_state::irq0_line_hold));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(nzeroteam_state::vector_r));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);

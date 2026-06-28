@@ -86,8 +86,6 @@ u32 psr540_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 
 void psr540_state::machine_start()
 {
-	m_outputs.resolve();
-
 	save_item(NAME(m_pe));
 	save_item(NAME(m_led));
 	save_item(NAME(m_scan));

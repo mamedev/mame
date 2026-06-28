@@ -11,9 +11,15 @@
 class pc080sn_device : public device_t, public device_gfx_interface
 {
 public:
-	pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 	template <typename T> pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)
 		: pc080sn_device(mconfig, tag, owner, clock)
+	{
+		set_info(gfxinfo);
+		set_palette(std::forward<T>(palette_tag));
+	}
+	template <typename T> pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag, const gfx_decode_entry *gfxinfo)
+		: pc080sn_device(mconfig, tag, owner, 0, std::forward<T>(palette_tag), gfxinfo)
 	{
 		set_info(gfxinfo);
 		set_palette(std::forward<T>(palette_tag));

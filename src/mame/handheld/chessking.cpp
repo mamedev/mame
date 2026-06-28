@@ -333,7 +333,7 @@ void chessking_state::chesskng(machine_config &config)
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	BEEP(config, m_beeper, 0);
+	BEEP(config, m_beeper);
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// Cartridge

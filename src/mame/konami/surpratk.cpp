@@ -349,7 +349,7 @@ void surpratk_state::surpratk(machine_config &config)
 	m_k053244->set_sprite_callback(FUNC(surpratk_state::sprite_callback));
 	m_k053244->set_priority_shadows(true);
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();

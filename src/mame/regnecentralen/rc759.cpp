@@ -586,7 +586,7 @@ static void rc759_floppies(device_slot_interface &device)
 
 void rc759_state::rc759(machine_config &config)
 {
-	I80186(config, m_maincpu, 6000000);
+	I80186(config, m_maincpu, 6'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rc759_state::rc759_map);
 	m_maincpu->set_addrmap(AS_IO, &rc759_state::rc759_io);
 	m_maincpu->read_slave_ack_callback().set(FUNC(rc759_state::irq_callback));
@@ -614,11 +614,11 @@ void rc759_state::rc759(machine_config &config)
 
 	// video
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(1250000 * 16, 896, 96, 816, 377, 4, 364); // 22 kHz setting
+	screen.set_raw(1'250'000 * 16, 896, 96, 816, 377, 4, 364); // 22 kHz setting
 	screen.set_screen_update("txt", FUNC(i82730_device::screen_update));
 	screen.screen_vblank().set(m_maincpu, FUNC(i80186_cpu_device::tmrin0_w)); // TMRIN0 source not documented, but self-test needs something like this
 
-	I82730(config, m_txt, 1250000, m_maincpu);
+	I82730(config, m_txt, 1'250'000, m_maincpu);
 	m_txt->set_screen("screen");
 	m_txt->set_update_row_callback(FUNC(rc759_state::txt_update_row));
 	m_txt->sint().set(m_pic, FUNC(pic8259_device::ir4_w));
@@ -635,13 +635,14 @@ void rc759_state::rc759(machine_config &config)
 	m_cas->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	// expansion slot
+	// FIXME: set clock to MCLK frequency
 	ISBX_SLOT(config, m_isbx, 0, isbx_cards, nullptr);
 	m_isbx->mintr0().set("maincpu", FUNC(i80186_cpu_device::int1_w));
 	m_isbx->mintr1().set("maincpu", FUNC(i80186_cpu_device::int3_w));
-	m_isbx->mdrqt().set("maincpu", FUNC(i80186_cpu_device::drq0_w));
+	m_isbx->mdrqt().set("maincpu",  FUNC(i80186_cpu_device::drq0_w));
 
 	// floppy
-	WD2797(config, m_fdc, 2000000);
+	WD2797(config, m_fdc, 2'000'000);
 	m_fdc->intrq_wr_callback().set(m_pic, FUNC(pic8259_device::ir0_w));
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq0_w));
 

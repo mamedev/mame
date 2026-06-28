@@ -245,7 +245,6 @@ void s3000_state::machine_start()
 	save_item(NAME(m_count_dial));
 	save_item(NAME(m_quadrature_phase));
 
-	m_floppy_led.resolve();
 	m_floppy->get_device()->setup_led_cb(floppy_image_device::led_cb(&s3000_state::floppy_led_cb, this));
 }
 void s3000_state::machine_reset()

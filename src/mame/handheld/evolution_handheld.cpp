@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, AJR
 
 #include "emu.h"
 
@@ -16,13 +16,13 @@ class evolution_handheldgame_state : public driver_device
 public:
 	evolution_handheldgame_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_dmac_params(*this, "dmac_params")
 	{ }
 
 	void evolhh(machine_config &config) ATTR_COLD;
 	void smkatsum(machine_config &config) ATTR_COLD;
-	void buttdtct(machine_config &config) ATTR_COLD;
-	void pokeqz(machine_config &config) ATTR_COLD;
+	void yuleyuan(machine_config &config) ATTR_COLD;
 	void udrive(machine_config &config) ATTR_COLD;
 
 	void init_yuleyuan();
@@ -31,16 +31,20 @@ private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<sonix16_device> m_maincpu;
+	optional_shared_ptr<u16> m_dmac_params;
+
+	u16 dma_status_r();
+	void dma_control_w(u16 data);
 
 	void evolution_map(address_map &map) ATTR_COLD;
 	void evolution_ram_map(address_map &map) ATTR_COLD;
-	void smkatsum_map(address_map &map) ATTR_COLD;
+	void snc7001a_map(address_map &map) ATTR_COLD;
 	void smkatsum_ram_map(address_map &map) ATTR_COLD;
-	void buttdtct_ram_map(address_map &map) ATTR_COLD;
-	void pokeqz_map(address_map &map) ATTR_COLD;
+	void snc7648s_map(address_map &map) ATTR_COLD;
+	void yuleyuan_ram_map(address_map &map) ATTR_COLD;
 	void udrive_map(address_map &map) ATTR_COLD;
 	void udrive_ram_map(address_map &map) ATTR_COLD;
 };
@@ -53,11 +57,37 @@ void evolution_handheldgame_state::machine_reset()
 {
 }
 
+u16 evolution_handheldgame_state::dma_status_r()
+{
+	// bit 0 = DMA busy
+	return 0;
+}
+
+void evolution_handheldgame_state::dma_control_w(u16 data)
+{
+	if (BIT(data, 0))
+	{
+		address_space &srcspace = m_maincpu->space(AS_PROGRAM);
+		address_space &dstspace = m_maincpu->space(AS_DATA);
+
+		u32 src = u32(m_dmac_params[0]) << 16 | m_dmac_params[1];
+		u32 dst = u32(m_dmac_params[2]) << 16 | m_dmac_params[3];
+		u16 count = m_dmac_params[4];
+
+		logerror("%s: DMA from %06X-%06X to %06X-%06X\n", machine().describe_context(), src, src + count, dst, dst + count);
+
+		do
+		{
+			dstspace.write_word(dst++, srcspace.read_word(0x400000 | src++));
+		} while (count-- != 0);
+	}
+}
+
 static INPUT_PORTS_START( evolhh )
 INPUT_PORTS_END
 
 
-uint32_t evolution_handheldgame_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 evolution_handheldgame_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -76,24 +106,34 @@ void evolution_handheldgame_state::evolution_ram_map(address_map &map)
 	map(0x400000, 0x5fffff).rom().region("maincpu", 0);
 }
 
-void evolution_handheldgame_state::smkatsum_map(address_map &map)
+void evolution_handheldgame_state::snc7001a_map(address_map &map)
 {
-	map(0x000000, 0x3fffff).rom().region("maincpu", 0);
+	map(0x000000, 0x007fff).rom().region("maincpu", 0); // supposedly RAM, "boot from external flash, only one time after IC reset"
+	map(0x200000, 0x201fff).ram().share("program_ram"); // supposedly RAM, "boot from external flash, update anytime by user program" (tomyspt, hoppech)
+	map(0x400000, 0x7fffff).rom().region("maincpu", 0);
 }
 
 void evolution_handheldgame_state::smkatsum_ram_map(address_map &map)
 {
-	map(0x000000, 0x002fff).ram();
-}
-
-void evolution_handheldgame_state::buttdtct_ram_map(address_map &map)
-{
 	map(0x000000, 0x003fff).ram();
+	map(0x00fe27, 0x00fe2b).writeonly().share(m_dmac_params);
+	map(0x00fe2c, 0x00fe2c).rw(FUNC(evolution_handheldgame_state::dma_status_r), FUNC(evolution_handheldgame_state::dma_control_w));
+	map(0x200000, 0x201fff).ram().share("program_ram");
 }
 
-void evolution_handheldgame_state::pokeqz_map(address_map &map)
+void evolution_handheldgame_state::snc7648s_map(address_map &map)
 {
-	map(0x000000, 0x3fffff).rom().mirror(0x400000).region("maincpu", 0); // ?
+	map(0x000000, 0x00bfff).rom().region("maincpu", 0); // supposedly RAM, "boot from external flash, only one time after IC reset"
+	map(0x200000, 0x2007ff).ram().share("program_ram");
+	map(0x400000, 0x7fffff).rom().region("maincpu", 0);
+}
+
+void evolution_handheldgame_state::yuleyuan_ram_map(address_map &map)
+{
+	map(0x000000, 0x001fff).ram();
+	map(0x00fe27, 0x00fe2b).writeonly().share(m_dmac_params);
+	map(0x00fe2c, 0x00fe2c).rw(FUNC(evolution_handheldgame_state::dma_status_r), FUNC(evolution_handheldgame_state::dma_control_w));
+	map(0x200000, 0x2007ff).ram().share("program_ram");
 }
 
 void evolution_handheldgame_state::udrive_map(address_map &map)
@@ -132,22 +172,16 @@ void evolution_handheldgame_state::smkatsum(machine_config &config)
 {
 	evolhh(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &evolution_handheldgame_state::smkatsum_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &evolution_handheldgame_state::snc7001a_map);
 	m_maincpu->set_addrmap(AS_DATA, &evolution_handheldgame_state::smkatsum_ram_map);
 }
 
-void evolution_handheldgame_state::buttdtct(machine_config &config)
+void evolution_handheldgame_state::yuleyuan(machine_config &config)
 {
-	smkatsum(config);
+	evolhh(config);
 
-	m_maincpu->set_addrmap(AS_DATA, &evolution_handheldgame_state::buttdtct_ram_map);
-}
-
-void evolution_handheldgame_state::pokeqz(machine_config &config)
-{
-	smkatsum(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &evolution_handheldgame_state::pokeqz_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &evolution_handheldgame_state::snc7648s_map);
+	m_maincpu->set_addrmap(AS_DATA, &evolution_handheldgame_state::yuleyuan_ram_map);
 }
 
 void evolution_handheldgame_state::udrive(machine_config &config)
@@ -174,6 +208,7 @@ ROM_END
 
 ROM_START( smkatsum )
 	ROM_REGION( 0x800000, "maincpu", 0 )
+	// "SNC7001A" reversed at byte offset 0x010000
 	ROM_LOAD( "gpr25l64.ic4", 0x000000, 0x800000, CRC(85be7517) SHA1(f9b838e09ceff9b99f3e41f010ff12f6adfa9be1) )
 ROM_END
 
@@ -184,9 +219,11 @@ ROM_END
 
 ROM_START( pokexyqz )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
+	// "SNC7001A" reversed at byte offset 0x010a00
 	ROM_LOAD( "mx25l12835f.u3", 0x000000, 0x1000000, CRC(98e86224) SHA1(63872b7fb8a4ebb3260e3fbded03a93ae5403948) )
 
 	ROM_REGION( 0x4200000, "nand", 0 )
+	// "SNXROM" in wide characters at beginning
 	ROM_LOAD( "mx23j51243tc.u5", 0x000000, 0x4200000, CRC(2f2c6c0c) SHA1(b47dbd33909306aa882e4a3f246af3150de94837) )
 
 	ROM_REGION( 0x800, "i2cmem", 0 )
@@ -197,6 +234,7 @@ ROM_END
 
 ROM_START( pokesmqz )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
+	// "SNC7001A" reversed at byte offset 0x010a00
 	ROM_LOAD( "mx25l12845e.u3", 0x000000, 0x1000000, CRC(c9b79adf) SHA1(fd0180529166ed6daf73ae6734183031c42257a5) )
 
 	ROM_REGION( 0x800, "i2cmem", 0 )
@@ -205,11 +243,14 @@ ROM_END
 
 ROM_START( yuleyuan )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
+	// "SNC7648S" reversed at byte offset 0x018000 (after decryption)
+	// "SNXROM" in wide characters at byte offset 0x060000 (after decryption)
 	ROM_LOAD( "25l128.bin", 0x0000000, 0x1000000, CRC(51ab49e2) SHA1(ecad532d27efea55031ffd31ac4479c9c4eceae6) )
 ROM_END
 
 ROM_START( tomyspt )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
+	// "SNC7001A" reversed at byte offset 0x011200
 	ROM_LOAD( "mx25l12845e.u3", 0x000000, 0x1000000, CRC(3c8685ed) SHA1(289948c3d9a06db184397bc6a31ea594c404449d) )
 
 	// there was also a FT24C16.u4, blank on dumped unit
@@ -217,6 +258,7 @@ ROM_END
 
 ROM_START( hoppech )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
+	// "SNC7001A" reversed at byte offset 0x010a00
 	ROM_LOAD( "25l128.u3", 0x000000, 0x1000000, CRC(4a983ab2) SHA1(d5571cf0f3fcf872826a2ff8b45be69336b117dd) )
 ROM_END
 
@@ -241,20 +283,20 @@ CONS( 2006, evolhh,      0,       0,      evolhh, evolhh, evolution_handheldgame
 CONS( 2018, smkatsum,    0,       0,      smkatsum, evolhh, evolution_handheldgame_state, empty_init, "San-X / Tomy", "Sumikko Gurashi - Sumikko Atsume (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // おしりたんてい ププッとかいけつゲーム
-CONS( 2020, buttdtct,    0,       0,      buttdtct, evolhh, evolution_handheldgame_state, empty_init, "Tomy", "Oshiri Tantei - Puputto Kaiketsu Game (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2020, buttdtct,    0,       0,      smkatsum, evolhh, evolution_handheldgame_state, empty_init, "Tomy", "Oshiri Tantei - Puputto Kaiketsu Game (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-CONS( 2015, pokexyqz,    0,       0,      pokeqz, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Pokemon Encyclopedia Z Pokemon XY Quiz Game Rotom (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2015, pokexyqz,    0,       0,      smkatsum, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Pokemon Encyclopedia Z Pokemon XY Quiz Game Rotom (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // ロトム図鑑 サン＆ムーン ポケモン クイズ
-CONS( 2015, pokesmqz,    0,       0,      pokeqz, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Rotom Zukan Sun & Moon Pokemon Quiz (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2015, pokesmqz,    0,       0,      smkatsum, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Rotom Zukan Sun & Moon Pokemon Quiz (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-CONS( 201?, tomyspt,     0,       0,      pokeqz, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Pretty Rhythm Smart Pod Touch (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 201?, tomyspt,     0,       0,      smkatsum, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Pretty Rhythm Smart Pod Touch (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // ほっぺちゃん スイ☆コレ　ホワイト
-CONS( 201?, hoppech,     0,       0,      pokeqz, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Hoppe-chan SuiColle (white, Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 201?, hoppech,     0,       0,      smkatsum, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Hoppe-chan SuiColle (white, Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // 星座电子宠物机 (virtual pet by 育乐元)
-CONS( 2022, yuleyuan,    0,       0,      pokeqz, evolhh, evolution_handheldgame_state, init_yuleyuan, "Yule Yuan", "Xingzuo Dianzi Chongwu Ji", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // dumped from yellow model
+CONS( 2022, yuleyuan,    0,       0,      yuleyuan, evolhh, evolution_handheldgame_state, init_yuleyuan, "Yule Yuan", "Xingzuo Dianzi Chongwu Ji", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // dumped from yellow model
 
 // this uses TV output, rather than being a handheld
 // SONIX SNT110FG SoC, test mode shows '4941' as checksum

@@ -3111,7 +3111,6 @@ void taitoz_state::device_post_load()
 void taitoz_state::machine_start()
 {
 	save_item(NAME(m_cpua_ctrl));
-	m_cpua_out.resolve();
 }
 
 void taitoz_z80_sound_state::machine_start()
@@ -3125,8 +3124,6 @@ void taitoz_z80_sound_state::machine_start()
 void contcirc_state::machine_start()
 {
 	taitoz_z80_sound_state::machine_start();
-
-	m_shutter_out.resolve();
 
 	m_shutter_toggle = 0;
 	m_shutter_control = 0;
@@ -3142,23 +3139,6 @@ void sci_state::machine_start()
 	save_item(NAME(m_sci_int6));
 
 	m_int6_timer = timer_alloc(FUNC(sci_state::trigger_int6), this);
-}
-
-void nightstr_state::machine_start()
-{
-	taitoz_z80_sound_state::machine_start();
-
-	m_motor_dir.resolve();
-	m_motor_speed.resolve();
-	m_motor_debug.resolve();
-	m_lamps.resolve();
-}
-
-void spacegun_state::machine_start()
-{
-	taitoz_state::machine_start();
-
-	m_recoil.resolve();
 }
 
 void taitoz_state::machine_reset()
@@ -3196,7 +3176,7 @@ void contcirc_state::contcirc(machine_config &config) //OSC: 26.686, 24.000, 16.
 	m_subcpu->set_addrmap(AS_PROGRAM, &contcirc_state::contcirc_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(contcirc_state::irq6_line_hold));
 
-	TC0040IOC(config, m_tc0040ioc, 0);
+	TC0040IOC(config, m_tc0040ioc);
 	m_tc0040ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0040ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0040ioc->read_2_callback().set_ioport("IN0");
@@ -3211,12 +3191,12 @@ void contcirc_state::contcirc(machine_config &config) //OSC: 26.686, 24.000, 16.
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
-	TC0150ROD(config, m_tc0150rod, 0);
+	TC0150ROD(config, m_tc0150rod);
 
-	TC0110PCR(config, m_tc0110pcr, 0);
+	TC0110PCR(config, m_tc0110pcr);
 	m_tc0110pcr->set_shift(0);
 	m_tc0110pcr->set_color_callback(FUNC(contcirc_state::color_xrgb555));
 
@@ -3238,7 +3218,7 @@ void contcirc_state::contcirc(machine_config &config) //OSC: 26.686, 24.000, 16.
 	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rear", 1.0);
 	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "front", 1.0);
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_tc0140syt->reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -3257,7 +3237,7 @@ void chasehq_state::chasehq(machine_config &config) //OSC: 26.686, 24.000, 16.00
 	m_subcpu->set_addrmap(AS_PROGRAM, &chasehq_state::chasehq_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(chasehq_state::irq4_line_hold));
 
-	TC0040IOC(config, m_tc0040ioc, 0);
+	TC0040IOC(config, m_tc0040ioc);
 	m_tc0040ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0040ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0040ioc->read_2_callback().set_ioport("IN0");
@@ -3272,12 +3252,12 @@ void chasehq_state::chasehq(machine_config &config) //OSC: 26.686, 24.000, 16.00
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_chasehq);
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
-	TC0150ROD(config, m_tc0150rod, 0);
+	TC0150ROD(config, m_tc0150rod);
 
-	TC0110PCR(config, m_tc0110pcr, 0);
+	TC0110PCR(config, m_tc0110pcr);
 	m_tc0110pcr->set_shift(0);
 	m_tc0110pcr->set_color_callback(FUNC(chasehq_state::color_xbgr555));
 
@@ -3299,7 +3279,7 @@ void chasehq_state::chasehq(machine_config &config) //OSC: 26.686, 24.000, 16.00
 	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rear", 1.0);
 	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "front", 1.0);
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_tc0140syt->reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -3320,7 +3300,7 @@ void contcirc_state::enforce(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	TC0040IOC(config, m_tc0040ioc, 0);
+	TC0040IOC(config, m_tc0040ioc);
 	m_tc0040ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0040ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0040ioc->read_2_callback().set_ioport("IN0");
@@ -3336,12 +3316,12 @@ void contcirc_state::enforce(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
-	TC0150ROD(config, m_tc0150rod, 0);
+	TC0150ROD(config, m_tc0150rod);
 
-	TC0110PCR(config, m_tc0110pcr, 0);
+	TC0110PCR(config, m_tc0110pcr);
 	m_tc0110pcr->set_shift(0);
 	m_tc0110pcr->set_color_callback(FUNC(contcirc_state::color_xrgb555));
 
@@ -3362,7 +3342,7 @@ void contcirc_state::enforce(machine_config &config)
 	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_tc0140syt->reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -3380,7 +3360,7 @@ void taitoz_state::bshark_base(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	TC0220IOC(config, m_tc0220ioc, 0);
+	TC0220IOC(config, m_tc0220ioc);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
@@ -3395,10 +3375,10 @@ void taitoz_state::bshark_base(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_palette("palette");
 
-	TC0150ROD(config, m_tc0150rod, 0);
+	TC0150ROD(config, m_tc0150rod);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
@@ -3453,7 +3433,7 @@ void sci_state::sci(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(3000));
 
-	TC0220IOC(config, m_tc0220ioc, 0);
+	TC0220IOC(config, m_tc0220ioc);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
@@ -3469,10 +3449,10 @@ void sci_state::sci(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_palette("palette");
 
-	TC0150ROD(config, m_tc0150rod, 0);
+	TC0150ROD(config, m_tc0150rod);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
@@ -3491,7 +3471,7 @@ void sci_state::sci(machine_config &config)
 	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_tc0140syt->reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -3519,7 +3499,7 @@ void nightstr_state::nightstr(machine_config &config) //OSC: 26.686, 24.000, 16.
 	adc.in_callback<2>().set_ioport("X_ADJUST");
 	adc.in_callback<3>().set_ioport("Y_ADJUST");
 
-	TC0220IOC(config, m_tc0220ioc, 0);
+	TC0220IOC(config, m_tc0220ioc);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
@@ -3535,12 +3515,12 @@ void nightstr_state::nightstr(machine_config &config) //OSC: 26.686, 24.000, 16.
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_chasehq);
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
-	TC0150ROD(config, m_tc0150rod, 0);
+	TC0150ROD(config, m_tc0150rod);
 
-	TC0110PCR(config, m_tc0110pcr, 0);
+	TC0110PCR(config, m_tc0110pcr);
 	m_tc0110pcr->set_shift(0);
 	m_tc0110pcr->set_color_callback(FUNC(nightstr_state::color_xbgr555));
 
@@ -3562,7 +3542,7 @@ void nightstr_state::nightstr(machine_config &config) //OSC: 26.686, 24.000, 16.
 	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rear", 1.0);
 	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "front", 1.0);
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_tc0140syt->reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -3583,7 +3563,7 @@ void taitoz_z80_sound_state::aquajack(machine_config &config) //OSC: 26.686, 24.
 
 	config.set_maximum_quantum(attotime::from_hz(30000));
 
-	TC0220IOC(config, m_tc0220ioc, 0);
+	TC0220IOC(config, m_tc0220ioc);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
@@ -3598,12 +3578,12 @@ void taitoz_z80_sound_state::aquajack(machine_config &config) //OSC: 26.686, 24.
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
-	TC0150ROD(config, m_tc0150rod, 0);
+	TC0150ROD(config, m_tc0150rod);
 
-	TC0110PCR(config, m_tc0110pcr, 0);
+	TC0110PCR(config, m_tc0110pcr);
 	m_tc0110pcr->set_shift(0);
 	m_tc0110pcr->set_color_callback(FUNC(taitoz_z80_sound_state::color_xbgr555));
 
@@ -3624,7 +3604,7 @@ void taitoz_z80_sound_state::aquajack(machine_config &config) //OSC: 26.686, 24.
 	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_tc0140syt->reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -3651,7 +3631,7 @@ void spacegun_state::spacegun(machine_config &config) //OSC: 26.686, 24.000, 16.
 	adc.in_callback<2>().set_ioport("STICKX2");
 	adc.in_callback<3>().set_ioport("STICKY2");
 
-	TC0510NIO(config, m_tc0510nio, 0);
+	TC0510NIO(config, m_tc0510nio);
 	m_tc0510nio->read_0_callback().set_ioport("DSWA");
 	m_tc0510nio->read_1_callback().set_ioport("DSWB");
 	m_tc0510nio->read_2_callback().set_ioport("IN0");
@@ -3667,11 +3647,11 @@ void spacegun_state::spacegun(machine_config &config) //OSC: 26.686, 24.000, 16.
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_offsets(4, 0);
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
-	TC0110PCR(config, m_tc0110pcr, 0);
+	TC0110PCR(config, m_tc0110pcr);
 	m_tc0110pcr->set_shift(0);
 	m_tc0110pcr->set_color_callback(FUNC(spacegun_state::color_xrgb555));
 
@@ -3710,7 +3690,7 @@ void taitoz_z80_sound_state::dblaxle(machine_config &config)
 	// make quantum time to be a multiple of the xtal (fixes road layer stuck on continue)
 	config.set_maximum_quantum(attotime::from_hz(XTAL(32'000'000)/1024));
 
-	TC0510NIO(config, m_tc0510nio, 0);
+	TC0510NIO(config, m_tc0510nio);
 	m_tc0510nio->read_0_callback().set_ioport("DSWA");
 	m_tc0510nio->read_1_callback().set_ioport("DSWB");
 	m_tc0510nio->read_2_callback().set_ioport("IN0");
@@ -3726,11 +3706,11 @@ void taitoz_z80_sound_state::dblaxle(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette("palette");
 	m_tc0480scp->set_offsets(0x1f, 0x08);
 
-	TC0150ROD(config, m_tc0150rod, 0);
+	TC0150ROD(config, m_tc0150rod);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
@@ -3749,7 +3729,7 @@ void taitoz_z80_sound_state::dblaxle(machine_config &config)
 	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_tc0140syt->reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -3770,7 +3750,7 @@ void sci_state::racingb(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	TC0510NIO(config, m_tc0510nio, 0);
+	TC0510NIO(config, m_tc0510nio);
 	m_tc0510nio->read_0_callback().set_ioport("DSWA");
 	m_tc0510nio->read_1_callback().set_ioport("DSWB");
 	m_tc0510nio->read_2_callback().set_ioport("IN0");
@@ -3786,11 +3766,11 @@ void sci_state::racingb(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette("palette");
 	m_tc0480scp->set_offsets(0x1f, 0x08);
 
-	TC0150ROD(config, m_tc0150rod, 0);
+	TC0150ROD(config, m_tc0150rod);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
@@ -3809,7 +3789,7 @@ void sci_state::racingb(machine_config &config)
 	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_tc0140syt->reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }

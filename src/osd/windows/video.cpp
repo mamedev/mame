@@ -127,20 +127,22 @@ void windows_osd_interface::input_update(bool relative_reset)
 
 void windows_osd_interface::check_osd_inputs()
 {
+	auto &inp = machine().ui_input();
+
 	// check for toggling fullscreen mode
-	if (machine().ui_input().pressed(IPT_OSD_1))
+	if (inp.pressed(IPT_OSD_1))
 		winwindow_toggle_full_screen();
 
 	// check for taking fullscreen snap
-	if (machine().ui_input().pressed(IPT_OSD_2))
+	if (inp.pressed(IPT_OSD_2))
 		winwindow_take_snap();
 
 	// check for taking fullscreen video
-	if (machine().ui_input().pressed(IPT_OSD_3))
+	if (inp.pressed(IPT_OSD_3))
 		winwindow_take_video();
 
 	// check for taking fullscreen video
-	if (machine().ui_input().pressed(IPT_OSD_4))
+	if (inp.pressed(IPT_OSD_4))
 		winwindow_toggle_fsfx();
 }
 

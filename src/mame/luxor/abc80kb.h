@@ -22,7 +22,7 @@ class abc80_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
-	abc80_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	abc80_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto keydown_wr_callback() { return m_write_keydown.bind(); }
 

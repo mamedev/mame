@@ -48,7 +48,7 @@ public:
 		m_start_output(*this, "start")
 	{ }
 
-	void icecold(machine_config &config);
+	void icecold(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER( test_switch_press );
 	ioport_value motors_limit_r();
@@ -203,15 +203,7 @@ INPUT_PORTS_END
 
 void icecold_state::machine_start()
 {
-	m_digit_outputs.resolve();
-	m_lamp_outputs.resolve();
-	m_lmotor_output.resolve();
-	m_rmotor_output.resolve();
-	m_in_play.resolve();
-	m_good_game.resolve();
-	m_game_over.resolve();
-	m_tilt_output.resolve();
-	m_start_output.resolve();
+	// TODO: savestates
 }
 
 void icecold_state::machine_reset()
@@ -404,10 +396,10 @@ void icecold_state::icecold(machine_config &config)
 	kbdc.in_rl_callback().set(FUNC(icecold_state::kbd_r));              // kbd RL lines
 
 	// 30Hz signal from CH-C of ay0
-	TIMER(config, "sint_timer", 0).configure_periodic(FUNC(icecold_state::icecold_sint_timer), attotime::from_hz(30));
+	TIMER(config, "sint_timer").configure_periodic(FUNC(icecold_state::icecold_sint_timer), attotime::from_hz(30));
 
 	// for update motors position
-	TIMER(config, "motors_timer", 0).configure_periodic(FUNC(icecold_state::icecold_motors_timer), attotime::from_msec(50));
+	TIMER(config, "motors_timer").configure_periodic(FUNC(icecold_state::icecold_motors_timer), attotime::from_msec(50));
 
 	// video hardware
 	config.set_default_layout(layout_icecold);

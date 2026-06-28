@@ -449,7 +449,7 @@ static auto &K053246 = K053247;
 class k055673_device : public k053247_device
 {
 public:
-	k055673_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	k055673_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 	~k055673_device() { }
 
 protected:

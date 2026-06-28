@@ -54,7 +54,6 @@
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
-#include "tilemap.h"
 
 
 namespace {
@@ -66,7 +65,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_card(*this, "cardslot")
-		, m_gfxdecode(*this, "gfxdecode")
+		, m_crtc(*this, "crtc")
+		, m_palette(*this, "palette")
 		, m_videoram(*this, "videoram")
 		, m_kbd(*this, "X%u", 0U)
 	{ }
@@ -74,27 +74,25 @@ public:
 	void i7000(machine_config &config);
 
 protected:
-	virtual void video_start() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_card;
-	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<mc6845_device> m_crtc;
+	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_ioport_array<8> m_kbd;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	MC6845_UPDATE_ROW(crtc_update_row);
 	uint8_t m_row = 0;
-	tilemap_t *m_bg_tilemap = nullptr;
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	void i7000_palette(palette_device &palette) const;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(card_load);
 
 	uint8_t kbd_r();
 	void scanlines_w(uint8_t data);
+
 
 	void i7000_io(address_map &map) ATTR_COLD;
 	void i7000_mem(address_map &map) ATTR_COLD;
@@ -107,10 +105,6 @@ void i7000_state::scanlines_w(uint8_t data)
 
 uint8_t i7000_state::kbd_r()
 {
-	for (int i=0; i<40*25; i++){
-		m_bg_tilemap->mark_tile_dirty(i);
-	}
-
 	return m_kbd[m_row & 7]->read();
 }
 
@@ -237,8 +231,8 @@ void i7000_state::machine_start()
 
 void i7000_state::i7000_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(0x33, 0x33, 0x33));
-	palette.set_pen_color(1, rgb_t(0xBB, 0xBB, 0xBB));
+	palette.set_pen_color(0, rgb_t(0x33, 0x44, 0x5d));
+	palette.set_pen_color(1, rgb_t(0x67, 0xcc, 0xca));
 }
 
 /*FIXME: we still need to figure out the proper memory map
@@ -247,38 +241,37 @@ void i7000_state::i7000_mem(address_map &map)
 {
 	map(0x0000, 0x0fff).rom().region("boot", 0);
 	map(0x2000, 0x2fff).ram().share("videoram");
-	map(0x4000, 0xffff).ram();
-//  map(0x4000, 0xbfff).rom().region("cardslot", 0);
+	map(0x4000, 0xffff).ram().share("mainram");
 }
+
+/*
+	Notes:
+	The boot ROM programs the MC6845 CRTC for 40x25
+	and Redator reprograms it for 80x25;
+
+	The AGENCIA overlay also drives a register file at 0x28+
+	(written via a self-modifying OUT stub, read in its serial IRQ handler).
+*/
 
 void i7000_state::i7000_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-//  map(0x06, 0x06).w(FUNC(i7000_state::i7000_io_?_w));
-//  map(0x08, 0x09).w(FUNC(i7000_state::i7000_io_?_w)); //printer perhaps?
-//  map(0x0c, 0x0c).w(FUNC(i7000_state::i7000_io_?_w)); //0x0C and 0x10 may be related to mem page swapping. (self-test "4. PAG")
-//  map(0x10, 0x10).w(FUNC(i7000_state::i7000_io_?_w));
-//  map(0x14, 0x15).w(FUNC(i7000_state::i7000_io_?_w));
-
+//	map(0x06, 0x06).w(FUNC(i7000_state::i7000_io_?_w));
+	map(0x08, 0x08).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x09, 0x09).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+//	map(0x0c, 0x0c).w(FUNC(i7000_state::i7000_io_?_w));  // 0x0C and 0x10 may be related to mem page swapping. (self-test "4. PAG")
+//	map(0x14, 0x14).w(FUNC(i7000_state::i7000_io_?_w));  // The AGENCIA banking overlay's serial interrupt handlers write here
 	map(0x18, 0x1b).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-
-//  map(0x1c, 0x1c).w(FUNC(i7000_state::i7000_io_printer_data_w)); //ASCII data
+//	map(0x1c, 0x1c).w(FUNC(i7000_state::i7000_io_printer_data_w));  // ASCII data
 	map(0x1d, 0x1d).portr("DSW");
-//  map(0x1e, 0x1e).rw(FUNC(i7000_state::i7000_io_printer_status_r), FUNC(i7000_state::i7000_io_?_w));
-//  map(0x1f, 0x1f).w(FUNC(i7000_state::i7000_io_printer_strobe_w)); //self-test routine writes 0x08 and 0x09 (it seems that bit 0 is the strobe and bit 3 is an enable signal)
-//  map(0x20, 0x21).rw(FUNC(i7000_state::i7000_io_keyboard_r), FUNC(i7000_state::i7000_io_keyboard_w));
-
+//	map(0x1e, 0x1e).rw(FUNC(i7000_state::i7000_io_printer_status_r), FUNC(i7000_state::i7000_io_?_w));
+//	map(0x1f, 0x1f).w(FUNC(i7000_state::i7000_io_printer_strobe_w));  // self-test routine writes 0x08 and 0x09 (it seems that bit 0 is the strobe and bit 3 is an enable signal)
 	map(0x20, 0x21).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
-
-//  map(0x24, 0x24).r(FUNC(i7000_state::i7000_io_?_r));
-//  map(0x25, 0x25).w(FUNC(i7000_state::i7000_io_?_w));
-
-//  map(0x28, 0x2d).rw(FUNC(i7000_state::i7000_io_joystick_r), FUNC(i7000_state::i7000_io_joystick_w));
-
-//  map(0x3b, 0x3b).w(FUNC(i7000_state::i7000_io_?_w));
-//  map(0x66, 0x67).w(FUNC(i7000_state::i7000_io_?_w));
-//  map(0xbb, 0xbb).w(FUNC(i7000_state::i7000_io_?_w)); //may be related to page-swapping...
+//	map(0x28, 0x2d).rw(FUNC(i7000_state::i7000_io_joystick_r), FUNC(i7000_state::i7000_io_joystick_w));
+//	map(0x3b, 0x3b).w(FUNC(i7000_state::i7000_io_?_w));
+//	map(0x66, 0x67).w(FUNC(i7000_state::i7000_io_?_w));
+//	map(0xbb, 0xbb).w(FUNC(i7000_state::i7000_io_?_w));  // May be related to page-swapping; the AGENCIA overlay writes 0x0F here with interrupts masked
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(i7000_state::card_load)
@@ -291,49 +284,25 @@ DEVICE_IMAGE_LOAD_MEMBER(i7000_state::card_load)
 	return std::make_pair(std::error_condition(), std::string());
 }
 
-static const gfx_layout i7000_charlayout =
-{
-	8, 8,                   // 8 x 8 characters
-	256,                    // 256 characters
-	1,                      // 1 bits per pixel
-	{ 0 },                  // no bitplanes
-	// x offsets
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	// y offsets
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8                     // every char takes 8 bytes
-};
-
-static GFXDECODE_START( gfx_i7000 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, i7000_charlayout, 0, 8 )
-GFXDECODE_END
-
 /****************************
 * Video/Character functions *
 ****************************/
 
-TILE_GET_INFO_MEMBER(i7000_state::get_bg_tile_info)
+MC6845_UPDATE_ROW(i7000_state::crtc_update_row)
 {
-	tileinfo.set(0, /*code:*/ m_videoram[tile_index], /*color:*/ 0, 0);
-}
+	uint8_t const *const chargen = memregion("chargen")->base();
+	uint32_t *p = &bitmap.pix(y);
 
-void i7000_state::video_start()
-{
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(i7000_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
+	for (int col = 0; col < x_count; col++)
+	{
+		uint8_t const ch = m_videoram[(ma + col) & 0x07ff];
+		uint8_t bits = (ra > 7) ? 0 : chargen[((ch << 3) | (ra & 0x07)) & 0x07ff];
+		if (col == cursor_x)
+			bits ^= 0xff;
+		for (int cx = 0; cx < 8; cx++)
+			*p++ = m_palette->pen(BIT(bits, 7 - cx));
+	}
 }
-
-uint32_t i7000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	return 0;
-}
-
-/* ROCKWELL 6545 - Transparent Memory Addressing */
-MC6845_ON_UPDATE_ADDR_CHANGED(i7000_state::crtc_addr)
-{
-	/* What is this mandatory function meant to do ? */
-}
-
 
 void i7000_state::i7000(machine_config &config)
 {
@@ -345,32 +314,31 @@ void i7000_state::i7000(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_size(320, 200); /* 40x25 8x8 chars */
-	screen.set_visarea(0, 320-1, 0, 200-1);
-	screen.set_screen_update(FUNC(i7000_state::screen_update));
-	screen.set_palette("palette");
+	screen.set_size(640, 200); /* the CRTC reconfigures it */
+	screen.set_visarea(0, 640-1, 0, 200-1);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_i7000);
-	PALETTE(config, "palette", FUNC(i7000_state::i7000_palette), 2);
+	PALETTE(config, m_palette, FUNC(i7000_state::i7000_palette), 2);
 
-	r6545_1_device &crtc(R6545_1(config, "crtc", XTAL(20'000'000))); /* (?) */
-	crtc.set_screen("screen");
-	crtc.set_show_border_area(true);
-	crtc.set_char_width(8);
-	crtc.set_on_update_addr_change_callback(FUNC(i7000_state::crtc_addr));
+	MC6845(config, m_crtc, 14'318'181 / 8);  /* TODO: verify the dot clock and the 40/80-column divider on the PCB. */
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(i7000_state::crtc_update_row));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Programmable timer */
-	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253_device &pit8253(PIT8253(config, "pit8253"));
 //  pit8253.set_clk<0>(XTAL(4'000'000) / 2); /* TODO: verify on PCB */
 //  pit8253.out_handler<0>().set(FUNC(i7000_state::i7000_pit_out0));
 //  pit8253.set_clk<1>(XTAL(4'000'000) / 2); /* TODO: verify on PCB */
 //  pit8253.out_handler<1>().set(FUNC(i7000_state::i7000_pit_out1));
 	pit8253.set_clk<2>(XTAL(4'000'000) / 2); /* TODO: verify on PCB */
 	pit8253.out_handler<2>().set("speaker", FUNC(speaker_sound_device::level_w));
+
 
 	/* Keyboard interface */
 	i8279_device &kbdc(I8279(config, "i8279", 4000000)); /* guessed value. TODO: verify on PCB */
@@ -390,7 +358,7 @@ ROM_START( i7000 )
 	ROM_REGION( 0x1000, "boot", 0 )
 	ROM_LOAD( "i7000_boot_v1_4r02_15_10_85_d52d.rom",  0x0000, 0x1000, CRC(622412e5) SHA1(bf187a095600fd46a739c35132a85b5f39b2f867) )
 
-	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "i7000_chargen.rom", 0x0000, 0x0800, CRC(fb7383e9) SHA1(71a6561bb9ff3cbf74711fa7ab445f9b43f15626) )
 		/*
 		The character generator ROM originally dumped had

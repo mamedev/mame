@@ -17,6 +17,7 @@
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 #include "debugger.h"
+#include "input.h"
 #include "render.h"
 #include "ui/uimain.h"
 #include "uiinput.h"

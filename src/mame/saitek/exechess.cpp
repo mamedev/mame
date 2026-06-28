@@ -41,7 +41,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	void exechess(machine_config &config);
+	void exechess(machine_config &config) ATTR_COLD;
 
 	// battery status indicator is not software controlled
 	DECLARE_INPUT_CHANGED_MEMBER(battery) { m_battery = newval; }
@@ -51,7 +51,7 @@ protected:
 
 private:
 	// devices/pointers
-	required_device<cpu_device> m_maincpu;
+	required_device<f8_cpu_device> m_maincpu;
 	required_device<hlcd0538_device> m_lcd1;
 	required_device<hlcd0539_device> m_lcd2;
 	required_device<pwm_display_device> m_display;
@@ -79,7 +79,6 @@ private:
 
 void exechess_state::machine_start()
 {
-	m_battery.resolve();
 	m_ram = make_unique_clear<u8[]>(0x400);
 
 	// register for savestates
@@ -216,9 +215,9 @@ void exechess_state::exechess(machine_config &config)
 	F8(config, m_maincpu, 4'500'000/2); // measured
 	m_maincpu->set_addrmap(AS_PROGRAM, &exechess_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &exechess_state::main_io);
-	m_maincpu->set_irq_acknowledge_callback("psu", FUNC(f38t56_device::int_acknowledge));
 
 	f38t56_device &psu(F38T56(config, "psu", 4'500'000/2));
+	m_maincpu->int_cycle_callback().set(psu, FUNC(f38t56_device::int_acknowledge));
 	psu.set_int_vector(0x0020);
 	psu.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 	psu.read_a().set(FUNC(exechess_state::ram_data_r));
@@ -231,7 +230,7 @@ void exechess_state::exechess(machine_config &config)
 	m_lcd1->write_cols().set(FUNC(exechess_state::lcd_output_w<0>));
 	m_lcd1->write_interrupt().set(m_lcd2, FUNC(hlcd0539_device::lcd_w));
 
-	HLCD0539(config, m_lcd2, 0);
+	HLCD0539(config, m_lcd2);
 	m_lcd2->write_cols().set(FUNC(exechess_state::lcd_output_w<1>));
 	m_lcd2->write_interrupt().set("psu", FUNC(f38t56_device::ext_int_w)).invert();
 

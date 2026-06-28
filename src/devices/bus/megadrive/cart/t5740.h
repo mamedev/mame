@@ -16,6 +16,9 @@ class megadrive_hb_psolar_device : public device_t
 public:
 	megadrive_hb_psolar_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// protection is worked around, minor enough to warrant a "system wide" red flag.
+//	static constexpr feature_type imperfect_features() { return feature::PROTECTION; }
+
 	virtual void cart_map(address_map &map) override ATTR_COLD;
 	virtual void time_io_map(address_map &map) override ATTR_COLD;
 protected:

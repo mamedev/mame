@@ -141,32 +141,32 @@ void awacs_device::sound_stream_update(sound_stream &stream)
 		if(m_active & ACTIVE_OUT) {
 			if(m_output_buffer) {
 				m_output_buffer = false;
-				if(m_out_irq & 0x40)
-					m_out_irq |= 0x20;
-				else
-					m_out_irq |= 0x40;
-			} else {
-				m_output_buffer = true;
 				if(m_out_irq & 0x80)
 					m_out_irq |= 0x20;
 				else
 					m_out_irq |= 0x80;
+			} else {
+				m_output_buffer = true;
+				if(m_out_irq & 0x40)
+					m_out_irq |= 0x20;
+				else
+					m_out_irq |= 0x40;
 			}
 		}
 
 		if(m_active & ACTIVE_IN) {
 			if(m_input_buffer) {
 				m_input_buffer = false;
-				if(m_in_irq & 0x40)
-					m_in_irq |= 0x20;
-				else
-					m_in_irq |= 0x40;
-			} else {
-				m_input_buffer = true;
 				if(m_in_irq & 0x80)
 					m_in_irq |= 0x20;
 				else
 					m_in_irq |= 0x80;
+			} else {
+				m_input_buffer = true;
+				if(m_in_irq & 0x40)
+					m_in_irq |= 0x20;
+				else
+					m_in_irq |= 0x40;
 			}
 		}
 		update_irq();

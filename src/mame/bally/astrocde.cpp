@@ -26,6 +26,7 @@
     Game boards:
         90002 = Seawolf II Motherboard (seawolf2)
         90700 = Seawolf II Logic Board (seawolf2, ebases)
+        90708 = Game Board (spacezap, wow, gorf, robby)
         91312 = Characterization Card (seawolf2)
         91354 = CPU Board (ebases, spacezap, wow, gorf, robby)
         91355 = Pattern Board (spacezap, wow, gorf, robby)
@@ -52,7 +53,7 @@
         91356 = RAM Board
 
     Space Zap:
-        90706 = Space Zap Game Board
+        90708 = Game Board
         91354 = CPU Board
         91355 = Pattern Board
         91356 = RAM Board
@@ -87,7 +88,7 @@
         91846 = 640K EPROM board
 
     Ten Pin Deluxe:
-        91456 = 16 Color CPU Card
+        91465 = 16 Color CPU Card
         91466 = Screen RAM Board
         91467 = Super Game Memory
         91488 = Pattern Mover
@@ -1347,7 +1348,7 @@ void astrocde_state::spacezap(machine_config &config)
 	m_astrocade_sound[0]->so_cb<0>().set("watchdog", FUNC(watchdog_timer_device::reset_w));
 	m_astrocade_sound[0]->so_cb<3>().set("outlatch", FUNC(output_latch_device::write));
 
-	output_latch_device &outlatch(OUTPUT_LATCH(config, "outlatch", 0)); // MC14174B on game board at U16
+	output_latch_device &outlatch(OUTPUT_LATCH(config, "outlatch")); // MC14174B on game board at U16
 	outlatch.bit_handler<0>().set(FUNC(astrocde_state::coin_counter_w<0>));
 	outlatch.bit_handler<1>().set(FUNC(astrocde_state::coin_counter_w<1>));
 
@@ -1475,13 +1476,13 @@ void astrocde_state::profpac(machine_config &config)
 	m_bank4000->set_map(&astrocde_state::profpac_bank4000_map);
 	m_bank4000->set_addr_width(20);
 
-	output_latch_device &outlatch(OUTPUT_LATCH(config, "outlatch", 0)); // 74LS174 on game board at U6
+	output_latch_device &outlatch(OUTPUT_LATCH(config, "outlatch")); // 74LS174 on game board at U6
 	outlatch.bit_handler<0>().set(FUNC(astrocde_state::coin_counter_w<0>));
 	outlatch.bit_handler<1>().set(FUNC(astrocde_state::coin_counter_w<1>));
 	outlatch.bit_handler<2>().set_output("led0");
 	outlatch.bit_handler<3>().set_output("led1");
 
-	output_latch_device &lamplatch(OUTPUT_LATCH(config, "lamplatch", 0)); // 74LS174 on game board at U7
+	output_latch_device &lamplatch(OUTPUT_LATCH(config, "lamplatch")); // 74LS174 on game board at U7
 	lamplatch.bit_handler<0>().set_output("lamp0"); // left lamp A
 	lamplatch.bit_handler<1>().set_output("lamp1"); // left lamp B
 	lamplatch.bit_handler<2>().set_output("lamp2"); // left lamp C
@@ -1502,7 +1503,7 @@ void demndrgn_state::demndrgn(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &demndrgn_state::demndrgn_map);
 	m_maincpu->set_addrmap(AS_IO, &demndrgn_state::port_map_16col_pattern_demndrgn);
 
-	output_latch_device &outlatch(OUTPUT_LATCH(config, "outlatch", 0));
+	output_latch_device &outlatch(OUTPUT_LATCH(config, "outlatch"));
 	outlatch.bit_handler<0>().set(FUNC(astrocde_state::coin_counter_w<0>));
 	outlatch.bit_handler<1>().set(FUNC(astrocde_state::coin_counter_w<1>));
 	outlatch.bit_handler<2>().set_output("led0");
@@ -1871,7 +1872,7 @@ GAMEL( 1978, seawolf2,  0,    seawolf2, seawolf2,  seawolf2_state, init_seawolf2
 // 91354 CPU board + 90700 game board + 91356 RAM board
 GAMEL( 1980, ebases,    0,    ebases,   ebases,    ebases_state,   init_ebases,   ROT0,   "Dave Nutting Associates / Midway", "Extra Bases", MACHINE_SUPPORTS_SAVE, layout_spacezap )
 
-// 91354 CPU board + 90706 game board + 91356 RAM board + 91355 pattern board
+// 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board
 GAMEL( 1980, spacezap,  0,    spacezap, spacezap,  astrocde_state, init_spacezap, ROT0,   "Midway", "Space Zap (Midway)", MACHINE_SUPPORTS_SAVE, layout_spacezap ) // there's also an older version by Game-A-Tron on different hardware
 
 // 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91397 memory board

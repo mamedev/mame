@@ -36,6 +36,10 @@
 
 #include "cpu/drcumlsh.h"
 
+#include "endianness.h"
+
+#include <numbers>
+
 
 DEFINE_DEVICE_TYPE(SH3, sh3_device,   "sh3", "Hitachi SH-3 (Unidentified)")
 DEFINE_DEVICE_TYPE(SH7708S, sh7708s_device, "sh7708s", "Hitachi SH7708S")
@@ -2350,7 +2354,7 @@ void sh34_base_device::FSSCA(const uint16_t opcode)
 {
 	uint32_t n = REG_N;
 
-	float angle = (((float)(m_sh2_state->m_fpul & 0xFFFF)) / 65536.0f) * 2.0f * (float)M_PI;
+	float angle = (((float)(m_sh2_state->m_fpul & 0xFFFF)) / 65536.0f) * 2.0f * std::numbers::pi_v<float>;
 	FP_RFS(n) = sinf(angle);
 	FP_RFS(n + 1) = cosf(angle);
 }

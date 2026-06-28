@@ -130,8 +130,6 @@ private:
 
 void emu3_state::machine_start()
 {
-	m_led.resolve();
-
 	m_irq_latch = 0x4b;
 	m_irq_state = false;
 }

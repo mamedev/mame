@@ -164,7 +164,7 @@ void idpart_video_device::device_add_mconfig(machine_config &config)
 	m_dma->out_iow_cb<3>().set(m_mpsc, FUNC(i8274_device::da_w));
 
 	// PIT
-	PIT8254(config, m_pit, 0);
+	PIT8254(config, m_pit);
 	m_pit->set_clk<0>(XTAL(6'144'000) / 2);
 	m_pit->set_clk<1>(XTAL(6'144'000) / 2);
 	m_pit->set_clk<2>(XTAL(6'144'000) / 2);

@@ -189,7 +189,7 @@ void taito_type_x_state::taito_type_x(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &taito_type_x_state::taito_type_x_map);
 	m_maincpu->set_disable();
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 

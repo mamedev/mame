@@ -303,6 +303,8 @@ G)ame Connector, dual row 50 pins
 #include "screen.h"
 #include "tilemap.h"
 
+#include "endianness.h"
+
 
 #define LOG_TLCS_TO_PPC_COMMANDS (1U << 1)
 #define LOG_PPC_TO_TLCS_COMMANDS (1U << 2)
@@ -1071,7 +1073,7 @@ void taitopjc_state::taitopjc(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 32768);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
-	TC0780FPA(config, m_tc0780fpa, 0);
+	TC0780FPA(config, m_tc0780fpa);
 }
 
 

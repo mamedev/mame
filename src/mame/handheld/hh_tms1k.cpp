@@ -227,6 +227,9 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 
 #include "emu.h"
 
+// netlist
+#include "nl_bship.h"
+
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "cpu/tms1000/tms1000.h"
@@ -257,8 +260,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "screen.h"
 #include "speaker.h"
 
-// netlist
-#include "nl_bship.h"
+#include <bit>
 
 // internal artwork
 #include "t7in1ss.lh"
@@ -422,9 +424,6 @@ protected:
 
 void hh_tms1k_state::machine_start()
 {
-	// resolve outputs
-	m_out_power.resolve();
-
 	// register for savestates
 	save_item(NAME(m_o));
 	save_item(NAME(m_r));
@@ -989,9 +988,6 @@ public:
 
 	void bcheetah(machine_config &config);
 
-protected:
-	virtual void machine_start() override ATTR_COLD;
-
 private:
 	output_finder<> m_motor1;
 	output_finder<> m_motor2_left;
@@ -1001,16 +997,6 @@ private:
 	void write_o(u16 data);
 	u8 read_k();
 };
-
-void bcheetah_state::machine_start()
-{
-	hh_tms1k_state::machine_start();
-
-	// resolve outputs
-	m_motor1.resolve();
-	m_motor2_left.resolve();
-	m_motor2_right.resolve();
-}
 
 // handlers
 
@@ -4761,9 +4747,9 @@ ROM_END
   * 2 7seg LEDs, 5 lamps, 1-bit sound
   * 3 lightsensors, lightgun
 
-  To play it in MAME, either use the clickable artwork with -mouse, or set
-  button 1 to "Z or X or C" and each lightsensor to one of those keys.
-  Although the game seems mostly playable without having to use the gun trigger
+  To play it in MAME, either use the clickable artwork, or set button 1 to
+  "Z or X or C" and each lightsensor to one of those keys. Although the game
+  seems mostly playable without having to use the gun trigger
 
 *******************************************************************************/
 
@@ -5012,7 +4998,7 @@ ROM_END
   are denoted by words ("left", "center", "short", etc), and an alternate one
   with little guys drawn next to the LEDs.
 
-  led translation table: led LDzz from game PCB = MAME y.x:
+  LED translation table: LED LDzz from game PCB = MAME y.x:
 
     0 = -     10 = 1.2   20 = 4.2   30 = 6.0
     1 = 2.3   11 = 0.4   21 = 4.1   31 = 6.1
@@ -7617,7 +7603,7 @@ private:
 void elecdet_state::write_r(u32 data)
 {
 	// R7,R8(tied together): speaker out
-	m_speaker->level_w((m_o & 0x80) ? population_count_32(data >> 7 & 3) : 0);
+	m_speaker->level_w((m_o & 0x80) ? std::popcount(data >> 7 & 3U) : 0);
 
 	// R0-R6: select digit
 	m_display->matrix(data, bitswap<8>(m_o,7,5,2,1,4,0,6,3));
@@ -8022,7 +8008,7 @@ void starwlb_state::write_o(u16 data)
 	m_inp_mux = data & 3;
 
 	// O3-O6(tied together): speaker out (actually only writes 0x0 or 0xf)
-	m_speaker->level_w(population_count_32(data >> 3 & 0xf));
+	m_speaker->level_w(std::popcount(data >> 3 & 0xfU));
 
 	// O2: lamp
 	// O7: one more led
@@ -9167,7 +9153,9 @@ class mdndclab_state : public hh_tms1k_state
 {
 public:
 	mdndclab_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_tms1k_state(mconfig, type, tag)
+		hh_tms1k_state(mconfig, type, tag),
+		m_colwall(*this, "colwall%u%u", 1U, 1U),
+		m_rowwall(*this, "rowwall%u%u", 1U, 1U)
 	{ }
 
 	void mdndclab(machine_config &config);
@@ -9176,6 +9164,9 @@ private:
 	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
+
+	// these are used by the layout to store the presence of walls
+	output_finder<7, 8> m_colwall, m_rowwall;
 };
 
 // handlers
@@ -10124,13 +10115,6 @@ void bigtrak_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
 
-	// resolve outputs
-	m_left_motor_forward.resolve();
-	m_left_motor_reverse.resolve();
-	m_right_motor_forward.resolve();
-	m_right_motor_reverse.resolve();
-	m_ext_out.resolve();
-
 	// register for savestates
 	save_item(NAME(m_gearbox_pos));
 }
@@ -10151,8 +10135,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(bigtrak_state::gearbox_sim_tick)
 
 void bigtrak_state::update_speaker()
 {
-	int data = (m_o & 1) | (m_o >> 6 & 2) | (m_r >> 8 & 4);
-	m_speaker->level_w(population_count_32(data));
+	unsigned data = (m_o & 1) | (m_o >> 6 & 2) | (m_r >> 8 & 4);
+	m_speaker->level_w(std::popcount(data));
 }
 
 void bigtrak_state::write_r(u32 data)
@@ -10351,11 +10335,6 @@ private:
 void mbdtower_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
-
-	// resolve outputs
-	m_motor_pos_out.resolve();
-	m_card_pos_out.resolve();
-	m_motor_on_out.resolve();
 
 	// register for savestates
 	save_item(NAME(m_motor_pos));
@@ -10579,7 +10558,7 @@ void arcmania_state::write_r(u32 data)
 void arcmania_state::write_o(u16 data)
 {
 	// O0-O2(tied together): speaker out
-	m_speaker->level_w(population_count_32(data & 7));
+	m_speaker->level_w(std::popcount(data & 7U));
 
 	// O3,O4,O6: input mux
 	m_inp_mux = (data >> 3 & 3) | (data >> 4 & 4);
@@ -10860,7 +10839,7 @@ void merlin_state::write_r(u32 data)
 void merlin_state::write_o(u16 data)
 {
 	// O4-O6(tied together): speaker out
-	m_speaker->level_w(population_count_32(data >> 4 & 7));
+	m_speaker->level_w(std::popcount(data >> 4 & 7U));
 
 	// O0-O3: input mux
 	// O7: N/C
@@ -11169,7 +11148,7 @@ void stopthief_state::write_r(u32 data)
 	m_display->matrix(data & 7, bitswap<8>(m_o,3,5,2,1,4,0,6,7) & 0x7f);
 
 	// R3-R8(tied together): speaker out
-	m_speaker->level_w((m_o & 8) ? population_count_32(data >> 3 & 0x3f) : 0);
+	m_speaker->level_w((m_o & 8) ? std::popcount(data >> 3 & 0x3fU) : 0);
 }
 
 void stopthief_state::write_o(u16 data)

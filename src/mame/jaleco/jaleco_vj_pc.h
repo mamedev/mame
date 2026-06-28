@@ -16,7 +16,7 @@ class jaleco_vj_pc_device :
 		public device_mixer_interface
 {
 public:
-	jaleco_vj_pc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	jaleco_vj_pc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_steppingstage_mode(bool mode) { m_is_steppingstage = mode; }
 

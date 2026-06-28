@@ -688,12 +688,16 @@ std::pair<s16, bool> swp30_device::streaming_block::step(memory_access<25, 2, -2
 	// Not perfectly exact, there are some rounding-like issues from
 	// time to time
 	s32 index = (m_pos_dec >> 4) & 2047;
-	s16 result = (
+	// The 4-tap cubic interpolation can overshoot past full scale near loud
+	// peaks; saturate to s16 instead of letting the store wrap (a full-scale
+	// sign flip = an audible click on loud notes).
+	s32 racc = (
 				  - interpolation_table[0][index ^ 2047] * val0
 				  + interpolation_table[1][index ^ 2047] * val1
 				  + interpolation_table[1][index       ] * val2
 				  - interpolation_table[0][index       ] * val3
 				  ) >> 10;
+	s16 result = std::clamp<s32>(racc, -0x8000, 0x7fff);
 
 	u32 pitch = m_pitch + pitch_lfo;
 	if(m_finetune_active) {

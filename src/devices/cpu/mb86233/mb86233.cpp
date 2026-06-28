@@ -5,6 +5,8 @@
 #include "mb86233.h"
 #include "mb86233d.h"
 
+#include "corefloat.h"
+
 /*
   Driver based on the initial reverse-engineering of Elsemi, extended,
   generalized and made to look more like a cpu since then thanks in

@@ -736,8 +736,8 @@ protected:
 	void basra_w(offs_t offset, uint8_t data, uint8_t mem_mask);
 	uint8_t basrb_r(offs_t offset, uint8_t mem_mask);
 	void basrb_w(offs_t offset, uint8_t data, uint8_t mem_mask);
-	uint32_t ccr_r(offs_t offset, uint32_t mem_mask);
-	void ccr_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	virtual uint32_t ccr_r(offs_t offset, uint32_t mem_mask);
+	virtual void ccr_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	uint32_t tra_r(offs_t offset, uint32_t mem_mask);
 	void tra_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	uint32_t expevt_r(offs_t offset, uint32_t mem_mask);

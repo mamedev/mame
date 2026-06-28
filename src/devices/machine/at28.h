@@ -20,11 +20,11 @@
 DECLARE_DEVICE_TYPE(Type, Class##_device)                                                                       \
 /* The Class, which can now refer to the Device Type when calling the superclass's constructor */               \
 class Class##_device                                                                                            \
-: public eeprom28_device<AddrBits, PageBytes, TBLC, TWC, false, true, true, true __VA_OPT__(,) __VA_ARGS__>     \
+	: public eeprom28_device<AddrBits, PageBytes, TBLC, TWC, false, true, true, true __VA_OPT__(,) __VA_ARGS__>     \
 {                                                                                                               \
 public:                                                                                                      \
 	Class##_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0)        \
-	: eeprom28_device(mconfig, Type, tag, owner, clock) { }                                                    \
+		: eeprom28_device(mconfig, Type, tag, owner, clock) { }                                                    \
 };                                                                                                           \
 /* Device Type - includes a forward declaration of the Class */                                              \
 DECLARE_DEVICE_TYPE(Type##_NVRAM, Class##_nvram_device)                                                      \
@@ -33,7 +33,7 @@ class Class##_nvram_device : public eeprom28_nvram_device<AddrBits, PageBytes, T
 {                                                                                                            \
 public:                                                                                                      \
 	Class##_nvram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0)  \
-	: eeprom28_nvram_device(mconfig, Type##_NVRAM, tag, owner, clock) { }                                      \
+		: eeprom28_nvram_device(mconfig, Type##_NVRAM, tag, owner, clock) { }                                      \
 };
 
 // AT28C64B: 64kbit == 8k bytes, 64 bytes per page

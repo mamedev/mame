@@ -4,8 +4,8 @@
 
 Sega Saturn SMPC - System Manager and Peripheral Control MCU simulation
 
-The SMPC is actually a 4-bit Hitachi HD404920FS MCU, labeled with a Sega custom
-315-5744 (that needs decapping)
+The SMPC is actually a 4-bit Hitachi HD404920FS MCU (HD404358, HMCS400 compatible),
+labeled with a Sega custom 315-5744 (binary decap available)
 
 TODO:
 - timings;
@@ -25,137 +25,6 @@ SMPC NVRAM contents:
 [3] language select (0=English, 5=Japanese)
 
 *************************************************************************************/
-/* SMPC Addresses
-
-00
-01 -w  Input Register 0 (IREG)
-02
-03 -w  Input Register 1
-04
-05 -w  Input Register 2
-06
-07 -w  Input Register 3
-08
-09 -w  Input Register 4
-0a
-0b -w  Input Register 5
-0c
-0d -w  Input Register 6
-0e
-0f
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-1a
-1b
-1c
-1d
-1e
-1f -w  Command Register (COMREG)
-20
-21 r-  Output Register 0 (OREG)
-22
-23 r-  Output Register 1
-24
-25 r-  Output Register 2
-26
-27 r-  Output Register 3
-28
-29 r-  Output Register 4
-2a
-2b r-  Output Register 5
-2c
-2d r-  Output Register 6
-2e
-2f r-  Output Register 7
-30
-31 r-  Output Register 8
-32
-33 r-  Output Register 9
-34
-35 r-  Output Register 10
-36
-37 r-  Output Register 11
-38
-39 r-  Output Register 12
-3a
-3b r-  Output Register 13
-3c
-3d r-  Output Register 14
-3e
-3f r-  Output Register 15
-40
-41 r-  Output Register 16
-42
-43 r-  Output Register 17
-44
-45 r-  Output Register 18
-46
-47 r-  Output Register 19
-48
-49 r-  Output Register 20
-4a
-4b r-  Output Register 21
-4c
-4d r-  Output Register 22
-4e
-4f r-  Output Register 23
-50
-51 r-  Output Register 24
-52
-53 r-  Output Register 25
-54
-55 r-  Output Register 26
-56
-57 r-  Output Register 27
-58
-59 r-  Output Register 28
-5a
-5b r-  Output Register 29
-5c
-5d r-  Output Register 30
-5e
-5f r-  Output Register 31
-60
-61 r-  SR
-62
-63 rw  SF
-64
-65
-66
-67
-68
-69
-6a
-6b
-6c
-6d
-6e
-6f
-70
-71
-72
-73
-74
-75 rw PDR1
-76
-77 rw PDR2
-78
-79 -w DDR1
-7a
-7b -w DDR2
-7c
-7d -w IOSEL2/1
-7e
-7f -w EXLE2/1
-*/
 
 #include "emu.h"
 #include "smpc.h"
@@ -512,6 +381,8 @@ void smpc_hle_device::command_register_w(uint8_t data)
 	}
 	else if(m_comreg == 0x10)
 	{
+		// TODO: not allowed outside vblank
+
 		// copy ireg to our intback buffer
 		for(int i=0;i<3;i++)
 			m_intback_buf[i] = m_ireg[i];
@@ -524,7 +395,7 @@ void smpc_hle_device::command_register_w(uint8_t data)
 		if( m_ireg[0] != 0) // non-peripheral data
 			timing += 8;
 
-		// TODO: At vblank-out actually ...
+		// TODO: At vblank-out actually
 		if( m_ireg[1] & 8) // peripheral data
 			timing += 700;
 
@@ -571,12 +442,12 @@ TIMER_CALLBACK_MEMBER(smpc_hle_device::handle_command)
 			sf_ack(true); //set hand-shake flag
 			return;
 
-		case 0x0a: // NETLINKON
+		case 0x0a: // NETLINKON / COPON
 			// TODO: understand where NetLink actually lies and implement delegation accordingly
 			// (is it really an SH1 device like suggested by the space access or it overlays on CS2 bus?)
 			popmessage("%s: NetLink enabled", this->tag());
 			 [[fallthrough]];
-		case 0x0b: // NETLINKOFF
+		case 0x0b: // NETLINKOFF / COPOFF
 			LOGMASKED(LOG_COMMAND, "SMPC: %02x NETLINK%s\n", m_comreg, m_comreg & 1 ? "OFF" : "ON");
 			break;
 
@@ -649,6 +520,7 @@ TIMER_CALLBACK_MEMBER(smpc_hle_device::handle_command)
 			m_NMI_reset = m_comreg & 1;
 			break;
 
+		// TODO: undocumented commands SEC_GETSEED (0x1e) and SEC_VERIFY (0x1f)
 		default:
 			popmessage("%s: unemulated %02x command", this->tag(), m_comreg);
 			return;

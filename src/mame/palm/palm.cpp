@@ -617,7 +617,7 @@ void palm_state::palm_base(machine_config &config)
 	m_screen->set_visarea(0, 160 - 1, 0, 220 - 1);
 	m_screen->set_screen_update(FUNC(palm_state::screen_update));
 
-	MC68328_LCD(config, m_lcdctrl, 0);
+	MC68328_LCD(config, m_lcdctrl);
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -737,7 +737,7 @@ void palmm100_state::palmm100(machine_config &config)
 	m_screen->set_visarea(0, 160 - 1, 0, 220 - 1);
 	m_screen->set_screen_update(FUNC(palmm100_state::screen_update));
 
-	MC68328_LCD(config, m_lcdctrl, 0);
+	MC68328_LCD(config, m_lcdctrl);
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();

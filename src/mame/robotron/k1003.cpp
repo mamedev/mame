@@ -228,7 +228,6 @@ INPUT_PORTS_END
 
 void k1003_state::machine_start()
 {
-	m_digits.resolve();
 	save_item(NAME(m_disp_1));
 	save_item(NAME(m_disp_2));
 	save_item(NAME(m_digit));

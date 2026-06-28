@@ -15,6 +15,8 @@
 
 #include "audio_effects/aeffect.h"
 #include "audio_effects/eq.h"
+#include "input.h"
+
 
 namespace ui {
 

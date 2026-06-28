@@ -1002,7 +1002,7 @@ void hp9895_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_addrmap(AS_IO, &hp9895_device::z80_io_map);
 	m_cpu->refresh_cb().set(FUNC(hp9895_device::z80_m1_w));
 
-	PHI(config, m_phi, 0);
+	PHI(config, m_phi);
 	m_phi->eoi_write_cb().set(FUNC(hp9895_device::phi_eoi_w));
 	m_phi->dav_write_cb().set(FUNC(hp9895_device::phi_dav_w));
 	m_phi->nrfd_write_cb().set(FUNC(hp9895_device::phi_nrfd_w));

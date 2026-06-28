@@ -28,6 +28,8 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
+#include <bit>
+
 // internal artwork
 #include "cking_pmicrodx.lh"
 
@@ -90,7 +92,7 @@ void pmicrodx_state::machine_start()
 void pmicrodx_state::update_lcd()
 {
 	// LCD common is analog (voltage level)
-	const u8 com = population_count_32(m_lcd_com & 3);
+	const u8 com = std::popcount(m_lcd_com & 3U);
 	const u64 data = (com == 0) ? m_lcd_segs : (com == 2) ? ~m_lcd_segs : 0;
 	m_display->write_row(0, data);
 }

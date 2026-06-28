@@ -3,7 +3,7 @@
 
 #include "emu.h"
 
-#include "cpu/c33/s1c33209.h"
+#include "cpu/c33/s1c33l17.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -57,7 +57,7 @@ INPUT_PORTS_END
 
 void tama_id_state::tamaid(machine_config &config)
 {
-	S1C33209(config, m_maincpu, 10'000'000); // unknown model and clock
+	S1C33E07(config, m_maincpu, 10'000'000); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &tama_id_state::mem_map);
 
 	// wrong, just so it's clear this has a screen

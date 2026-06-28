@@ -29,7 +29,7 @@ class k1801vp014_device : public device_t,
 {
 public:
 	// construction/destruction
-	k1801vp014_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k1801vp014_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto virq_wr_callback() { return m_write_virq.bind(); }
 	auto keydown_wr_callback() { return m_write_keydown.bind(); }

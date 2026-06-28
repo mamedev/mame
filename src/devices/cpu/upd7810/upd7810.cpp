@@ -954,7 +954,6 @@ void upd7801_device::upd7810_take_irq()
 	{
 		irqline = UPD7810_INTF0;
 		vector = 0x0004;
-		IRR &= ~INTF0;
 	}
 	/* 3 - INTT - Masked by MKT bit */
 	if ( IRR & INTFT0 && 0 == ( MKL & 0x02 ) )
@@ -2121,7 +2120,7 @@ void upd7801_device::execute_set_input(int irqline, int state)
 		if ( state == ASSERT_LINE )
 			IRR |= INTF0;
 		else
-			IRR &= INTF0;
+			IRR &= ~INTF0;
 		break;
 
 	case UPD7810_INTF1:

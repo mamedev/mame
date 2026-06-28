@@ -921,7 +921,7 @@ void teradrive_state::teradrive(machine_config &config)
 	m_chipset->spkr_callback().set(FUNC(teradrive_state::wd7600_spkr));
 
 	// on board devices
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->set_memspace(m_x86cpu, AS_PROGRAM);
 	m_isabus->set_iospace(m_x86cpu, AS_IO);
 	m_isabus->iochck_callback().set(m_chipset, FUNC(wd7600_device::iochck_w));
@@ -1022,13 +1022,13 @@ void teradrive_state::teradrive(machine_config &config)
 	// TODO: gated thru VDP
 	hl.output_handler().set_inputline(m_md68kcpu, 2);
 
-	MEGADRIVE_IO_PORT(config, m_md_ioports[0], 0);
+	MEGADRIVE_IO_PORT(config, m_md_ioports[0]);
 	m_md_ioports[0]->hl_handler().set("hl", FUNC(input_merger_device::in_w<0>));
 
-	MEGADRIVE_IO_PORT(config, m_md_ioports[1], 0);
+	MEGADRIVE_IO_PORT(config, m_md_ioports[1]);
 	m_md_ioports[1]->hl_handler().set("hl", FUNC(input_merger_device::in_w<1>));
 
-	MEGADRIVE_IO_PORT(config, m_md_ioports[2], 0);
+	MEGADRIVE_IO_PORT(config, m_md_ioports[2]);
 	m_md_ioports[2]->hl_handler().set("hl", FUNC(input_merger_device::in_w<2>));
 
 	for (int N = 0; N < 3; N++)

@@ -167,6 +167,8 @@
 
 #include <zlib.h>
 
+#include <cstring>
+
 
 static const uint8_t JFD_HEADER[4] = { 'J', 'F', 'D', 'I' };
 static const uint8_t GZ_HEADER[2] = { 0x1f, 0x8b };

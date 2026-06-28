@@ -492,7 +492,7 @@ void lgtz80_state::fruitcat(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(0x100);
 
-	RAMDAC(config, "ramdac", 0, "palette").set_addrmap(0, &lgtz80_state::ramdac_map);
+	RAMDAC(config, "ramdac", "palette").set_addrmap(0, &lgtz80_state::ramdac_map);
 
 	SPEAKER(config, "mono").front_center();
 

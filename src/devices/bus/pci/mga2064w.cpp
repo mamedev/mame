@@ -56,7 +56,7 @@ void mga2064w_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(matrox_vga_device::screen_update));
 
-	MATROX_VGA(config, m_vga, 0);
+	MATROX_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(8*1024*1024);
 }

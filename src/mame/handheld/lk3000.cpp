@@ -63,7 +63,7 @@ protected:
 
 private:
 	// devices/pointers
-	required_device<cpu_device> m_maincpu;
+	required_device<f8_cpu_device> m_maincpu;
 	required_device_array<dl1414_device, 4> m_dl1414;
 	required_device<generic_slot_device> m_cart;
 	required_ioport_array<8> m_inputs;
@@ -95,7 +95,6 @@ private:
 
 void lk3000_state::machine_start()
 {
-	m_digits.resolve();
 	memset(m_ram, 0xff, 0x400);
 
 	// register for savestates
@@ -307,9 +306,9 @@ void lk3000_state::lk3000(machine_config &config)
 	F8(config, m_maincpu, 4_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lk3000_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &lk3000_state::main_io);
-	m_maincpu->set_irq_acknowledge_callback("psu", FUNC(f38t56_device::int_acknowledge));
 
 	auto &psu(F38T56(config, "psu", 4_MHz_XTAL/2));
+	m_maincpu->int_cycle_callback().set(psu, FUNC(f38t56_device::int_acknowledge));
 	psu.set_int_vector(0x20);
 	psu.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 	psu.read_a().set(FUNC(lk3000_state::p4_r));

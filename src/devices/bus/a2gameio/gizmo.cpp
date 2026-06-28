@@ -31,6 +31,7 @@ protected:
 	virtual void an0_w(int state) override;
 	virtual void an1_w(int state) override;
 	virtual void an2_w(int state) override;
+	virtual bool has_sw0() const override { return true; }
 
 private:
 	// input ports

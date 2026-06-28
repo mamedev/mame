@@ -82,7 +82,7 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void meyc8080(machine_config &config);
+	void meyc8080(machine_config &config) ATTR_COLD;
 
 private:
 	void lights_1_w(uint8_t data);
@@ -94,8 +94,6 @@ private:
 	void meyc8080_dac_4_w(uint8_t data);
 	uint32_t screen_update_meyc8080(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void meyc8080_map(address_map &map) ATTR_COLD;
-
-	virtual void machine_start() override { m_lamps.resolve(); }
 
 	required_shared_ptr<uint8_t> m_videoram_0;
 	required_shared_ptr<uint8_t> m_videoram_1;

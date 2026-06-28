@@ -498,7 +498,7 @@ void att_state::att(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(0x100);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", "palette"));
 	ramdac.set_addrmap(0, &att_state::ramdac_map);
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
@@ -528,7 +528,7 @@ void att_state::att3(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(0x100);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", "palette"));
 	ramdac.set_addrmap(0, &att_state::ramdac_map);
 
 	SPEAKER(config, "mono").front_center();

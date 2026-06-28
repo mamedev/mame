@@ -193,7 +193,7 @@ void dmv_k235_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &dmv_k235_device::k235_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 }
 

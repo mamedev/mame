@@ -59,11 +59,6 @@ void vsmile_state::machine_start()
 {
 	vsmile_base_state::machine_start();
 
-	m_redled.resolve();
-	m_yellowled.resolve();
-	m_blueled.resolve();
-	m_greenled.resolve();
-
 	save_item(NAME(m_ctrl_rts));
 	save_item(NAME(m_ctrl_select));
 }

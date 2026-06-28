@@ -17,6 +17,8 @@
 
 #include "emuopts.h"
 
+#include <bit>
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -1615,7 +1617,7 @@ void dspp_device::update_fifo_dma()
 
 	while (mask != 0)
 	{
-		uint32_t channel = 31 - count_leading_zeros_32(mask);
+		uint32_t channel = std::bit_width(mask) - 1;
 
 		const fifo_dma & dma = m_fifo_dma[channel];
 

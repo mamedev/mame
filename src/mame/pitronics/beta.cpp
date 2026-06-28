@@ -318,9 +318,6 @@ DEVICE_IMAGE_UNLOAD_MEMBER(beta_state::unload_beta_eprom)
 
 void beta_state::machine_start()
 {
-	m_digits.resolve();
-	m_leds.resolve();
-
 	m_led_refresh_timer = timer_alloc(FUNC(beta_state::led_refresh), this);
 
 	m_eprom_rom.resize(0x800);

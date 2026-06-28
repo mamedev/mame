@@ -306,7 +306,7 @@ void hr84_state::hr84(machine_config &config)
 	m_ay_5_2376->control().set([this]() { return int(BIT(m_modifiers->read(), 1)); });
 	m_ay_5_2376->strobe().set(m_pia0, FUNC(pia6821_device::ca1_w));
 
-	PIA6821(config, m_pia0, 0);
+	PIA6821(config, m_pia0);
 	m_pia0->readpa_handler().set(FUNC(hr84_state::pa_r));
 	m_pia0->writepb_handler().set(FUNC(hr84_state::pb_w));
 

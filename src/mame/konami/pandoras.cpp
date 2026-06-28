@@ -334,7 +334,7 @@ void pandoras_state::i8039_irqen_and_status_w(uint8_t data)
 
 void pandoras_state::z80_irqtrigger_w(uint8_t data)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 }
 
 template <uint8_t Which>

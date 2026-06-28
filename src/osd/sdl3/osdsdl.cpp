@@ -13,6 +13,7 @@
 // TODO: reduce dependence on concrete emu classes
 #include "emu.h"
 #include "main.h"
+#include "render.h"
 #include "uiinput.h"
 
 #include "ui/uimain.h"
@@ -522,35 +523,41 @@ void sdl_osd_interface::process_events()
 			break;
 
 		case SDL_EVENT_KEY_DOWN:
-			if (event.key.scancode == SDL_SCANCODE_LCTRL)
-				m_modifier_keys |= MODIFIER_KEY_LCTRL;
-			else if (event.key.scancode == SDL_SCANCODE_RCTRL)
-				m_modifier_keys |= MODIFIER_KEY_RCTRL;
-			else if (event.key.scancode == SDL_SCANCODE_LSHIFT)
-				m_modifier_keys |= MODIFIER_KEY_LSHIFT;
-			else if (event.key.scancode == SDL_SCANCODE_RSHIFT)
-				m_modifier_keys |= MODIFIER_KEY_RSHIFT;
+			{
+				auto const window = focus_window(event.key);
+				if (!window)
+					break;
 
-			if (event.key.key < 0x20)
-			{
-				// push control characters - they don't arrive as text input events
-				machine().ui_input().push_char_event(osd_common_t::window_list().front()->target(), event.key.key);
-			}
-			else if (m_modifier_keys & MODIFIER_KEY_CTRL)
-			{
-				// SDL filters out control characters for text input, so they are decoded here
-				if (event.key.key >= 0x40 && event.key.key < 0x7f)
+				if (event.key.scancode == SDL_SCANCODE_LCTRL)
+					m_modifier_keys |= MODIFIER_KEY_LCTRL;
+				else if (event.key.scancode == SDL_SCANCODE_RCTRL)
+					m_modifier_keys |= MODIFIER_KEY_RCTRL;
+				else if (event.key.scancode == SDL_SCANCODE_LSHIFT)
+					m_modifier_keys |= MODIFIER_KEY_LSHIFT;
+				else if (event.key.scancode == SDL_SCANCODE_RSHIFT)
+					m_modifier_keys |= MODIFIER_KEY_RSHIFT;
+
+				if (event.key.key < 0x20)
 				{
-					machine().ui_input().push_char_event(osd_common_t::window_list().front()->target(), event.key.key & 0x1f);
+					// push control characters - they don't arrive as text input events
+					window->target()->push_char_event(event.key.key);
 				}
-				else if (m_modifier_keys & MODIFIER_KEY_SHIFT)
+				else if (m_modifier_keys & MODIFIER_KEY_CTRL)
 				{
-					if (event.key.key == SDLK_2) // Ctrl-@ (NUL)
-						machine().ui_input().push_char_event(osd_common_t::window_list().front()->target(), 0x00);
-					else if (event.key.key == SDLK_6) // Ctrl-^ (RS)
-						machine().ui_input().push_char_event(osd_common_t::window_list().front()->target(), 0x1e);
-					else if (event.key.key == SDLK_MINUS) // Ctrl-_ (US)
-						machine().ui_input().push_char_event(osd_common_t::window_list().front()->target(), 0x1f);
+					// SDL filters out control characters for text input, so they are decoded here
+					if (event.key.key >= 0x40 && event.key.key < 0x7f)
+					{
+						window->target()->push_char_event(event.key.key & 0x1f);
+					}
+					else if (m_modifier_keys & MODIFIER_KEY_SHIFT)
+					{
+						if (event.key.key == SDLK_2) // Ctrl-@ (NUL)
+							window->target()->push_char_event(0x00);
+						else if (event.key.key == SDLK_6) // Ctrl-^ (RS)
+							window->target()->push_char_event(0x1e);
+						else if (event.key.key == SDLK_MINUS) // Ctrl-_ (US)
+							window->target()->push_char_event(0x1f);
+					}
 				}
 			}
 			break;
@@ -741,8 +748,8 @@ void sdl_osd_interface::process_window_event(SDL_Event const &event)
 		if (!window->fullscreen())
 #endif
 		{
-			//printf("event data1,data2 %d x %d %ld\n", event.window.data1, event.window.data2, sizeof(SDL_Event));
-			window->resize(event.window.data1, event.window.data2);
+			//osd_printf_info("got resize SDL window %s OSD window %p target %d (%d x %d)\n", event.window.windowID, window, window->target()->index(), event.window.data1, event.window.data2);
+			window->renderer().notify_changed();
 		}
 		break;
 
@@ -782,13 +789,13 @@ void sdl_osd_interface::process_window_event(SDL_Event const &event)
 
 	case SDL_EVENT_WINDOW_FOCUS_GAINED:
 		m_focus_window = window;
-		machine().ui_input().push_window_focus_event(window->target());
+		window->target()->push_window_focus_event();
 		break;
 
 	case SDL_EVENT_WINDOW_FOCUS_LOST:
 		if (window == m_focus_window)
 			m_focus_window = nullptr;
-		machine().ui_input().push_window_defocus_event(window->target());
+		window->target()->push_window_defocus_event();
 		break;
 
 	case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
@@ -821,7 +828,7 @@ void sdl_osd_interface::process_textinput_event(SDL_Event const &event)
 				}
 				ptr += chlen;
 				len -= chlen;
-				machine().ui_input().push_char_event(window->target(), ch);
+				window->target()->push_char_event(ch);
 			}
 		}
 	}
@@ -831,7 +838,8 @@ void sdl_osd_interface::process_textinput_event(SDL_Event const &event)
 void sdl_osd_interface::check_osd_inputs()
 {
 	// check for toggling fullscreen mode (don't do this in debug mode)
-	if (machine().ui_input().pressed(IPT_OSD_1) && !(machine().debug_flags & DEBUG_FLAG_OSD_ENABLED))
+	auto &inp = machine().ui_input();
+	if (inp.pressed(IPT_OSD_1) && !(machine().debug_flags & DEBUG_FLAG_OSD_ENABLED))
 	{
 		// destroy the renderers first so that the render module can bounce if it depends on having a window handle
 		for (auto it = osd_common_t::window_list().rbegin(); osd_common_t::window_list().rend() != it; ++it)
@@ -845,20 +853,20 @@ void sdl_osd_interface::check_osd_inputs()
 	if (USE_OPENGL)
 	{
 		// FIXME: on a per window basis
-		if (machine().ui_input().pressed(IPT_OSD_5))
+		if (inp.pressed(IPT_OSD_5))
 		{
 			video_config.filter = !video_config.filter;
 			machine().ui().popup_time(1, "Filter %s", video_config.filter? "enabled" : "disabled");
 		}
 	}
 
-	if (machine().ui_input().pressed(IPT_OSD_6))
+	if (inp.pressed(IPT_OSD_6))
 		dynamic_cast<sdl_window_info &>(*window).modify_prescale(-1);
 
-	if (machine().ui_input().pressed(IPT_OSD_7))
+	if (inp.pressed(IPT_OSD_7))
 		dynamic_cast<sdl_window_info &>(*window).modify_prescale(1);
 
-	if (machine().ui_input().pressed(IPT_OSD_8))
+	if (inp.pressed(IPT_OSD_8))
 		window->renderer().record();
 }
 

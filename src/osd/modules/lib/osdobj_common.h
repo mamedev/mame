@@ -16,7 +16,6 @@
 #include "osdepend.h"
 
 #include "modules/osdmodule.h"
-#include "modules/output/output_module.h"
 
 #include "emuopts.h"
 
@@ -270,8 +269,6 @@ public:
 	virtual void output_callback(osd_output_channel channel, const util::format_argument_pack<char> &args)  override;
 	bool verbose() const { return m_print_verbose; }
 	virtual void set_verbose(bool print_verbose) override { m_print_verbose = print_verbose; }
-
-	void notify(const char *outname, int32_t value) const { m_output->notify(outname, value); }
 
 	virtual void process_events() = 0;
 	virtual bool has_focus() const = 0;

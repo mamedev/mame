@@ -9,8 +9,8 @@
 #include "emu.h"
 #include "v620dasm.h"
 
-#include <array>
-#include <unordered_map>
+#include <bit>
+
 
 v620_disassembler::v620_disassembler()
 	: util::disasm_interface()
@@ -115,24 +115,6 @@ static const char *const s_jxif_ext_ops[7][3] =
 	{ "JS3N", "JS3NM", "XS3NM" }    // sense switch 3 not set (00x406)
 };
 
-static const std::unordered_map<u8, const char *> s_fpp_map =
-{
-	{ 0001, "FDV" },
-	{ 0010, "FAD" },
-	{ 0016, "FMU" },
-	{ 0020, "FLD" },
-	{ 0025, "FLT" },
-	{ 0050, "FSB" },
-	{ 0103, "FADD" },
-	{ 0106, "FMUD" },
-	{ 0122, "FLDD" },
-	{ 0135, "FDVD" },
-	{ 0143, "FSBD" },
-	{ 0200, "FST" },
-	{ 0221, "FIX" },
-	{ 0310, "FSTD" }
-};
-
 } // anonymous namespace
 
 void v620_disassembler::format_number(std::ostream &stream, u16 n) const
@@ -155,7 +137,7 @@ offs_t v620_disassembler::dasm_jxif(std::ostream &stream, u16 inst, u16 dest, of
 	const u16 cond = BIT(inst, 0, 9);
 	if ((cond & (cond - 1)) == 0)
 	{
-		const char *op = s_jxif_ops[32 - count_leading_zeros_32(cond)][BIT(inst, 9, 2) - 1];
+		const char *op = s_jxif_ops[std::bit_width(cond)][BIT(inst, 9, 2) - 1];
 		if (BIT(dest, 15))
 			util::stream_format(stream, "%-8s", std::string(op) + "*");
 		else
@@ -184,7 +166,7 @@ offs_t v620f_disassembler::dasm_jxif(std::ostream &stream, u16 inst, u16 dest, o
 	const u16 cond = BIT(inst, 0, 9);
 	if (cond == 0007 || (cond >= 0016 && (((cond - 6) & (cond - 7)) == 0)))
 	{
-		const char *op = s_jxif_ext_ops[32 - 3 - count_leading_zeros_32(cond)][BIT(inst, 9, 2) - 1];
+		const char *op = s_jxif_ext_ops[std::bit_width(cond) - 3][BIT(inst, 9, 2) - 1];
 		if (BIT(dest, 15))
 			util::stream_format(stream, "%-8s", std::string(op) + "*");
 		else
@@ -428,14 +410,31 @@ offs_t v75_disassembler::dasm_io(std::ostream &stream, u16 inst, offs_t pc, cons
 	if ((inst & 0177400) == 0105400)
 	{
 		// Floating point processor option
-		auto lookup = s_fpp_map.find(BIT(inst, 0, 8));
-		if (lookup != s_fpp_map.end())
+		const char *mnemonic = nullptr;
+		switch (BIT(inst, 0, 8))
+		{
+		case 0001: mnemonic = "FDV"; break;
+		case 0010: mnemonic = "FAD"; break;
+		case 0016: mnemonic = "FMU"; break;
+		case 0020: mnemonic = "FLD"; break;
+		case 0025: mnemonic = "FLT"; break;
+		case 0050: mnemonic = "FSB"; break;
+		case 0103: mnemonic = "FADD"; break;
+		case 0106: mnemonic = "FMUD"; break;
+		case 0122: mnemonic = "FLDD"; break;
+		case 0135: mnemonic = "FDVD"; break;
+		case 0143: mnemonic = "FSBD"; break;
+		case 0200: mnemonic = "FST"; break;
+		case 0221: mnemonic = "FIX"; break;
+		case 0310: mnemonic = "FSTD"; break;
+		}
+		if (mnemonic)
 		{
 			u16 addr = opcodes.r16(pc + 1);
 			if (BIT(addr, 15))
-				util::stream_format(stream, "%-8s", std::string(lookup->second) + "*");
+				util::stream_format(stream, "%-8s", std::string(mnemonic) + "*");
 			else
-				util::stream_format(stream, "%-8s", lookup->second);
+				util::stream_format(stream, "%-8s", mnemonic);
 			format_address(stream, addr & 077777);
 			return 2 | SUPPORTED;
 		}

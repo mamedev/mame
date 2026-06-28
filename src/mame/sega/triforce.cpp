@@ -462,6 +462,8 @@ Notes:
 #include "emupal.h"
 #include "screen.h"
 
+#include "endianness.h"
+
 
 namespace {
 

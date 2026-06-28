@@ -93,6 +93,7 @@ Notes:
 #include "sound/ymopn.h"
 
 #include "emupal.h"
+#include "input.h" // for video debug keys
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"

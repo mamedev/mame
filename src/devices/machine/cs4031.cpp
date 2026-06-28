@@ -128,16 +128,16 @@ void cs4031_device::device_add_mconfig(machine_config &config)
 	m_dma2->out_dack_callback<2>().set(FUNC(cs4031_device::dma2_dack2_w));
 	m_dma2->out_dack_callback<3>().set(FUNC(cs4031_device::dma2_dack3_w));
 
-	PIC8259(config, m_intc1, 0);
+	PIC8259(config, m_intc1);
 	m_intc1->out_int_callback().set(FUNC(cs4031_device::intc1_int_w));
 	m_intc1->in_sp_callback().set_constant(1);
 	m_intc1->read_slave_ack_callback().set(FUNC(cs4031_device::intc1_slave_ack_r));
 
-	PIC8259(config, m_intc2, 0);
+	PIC8259(config, m_intc2);
 	m_intc2->out_int_callback().set(m_intc1, FUNC(pic8259_device::ir2_w));
 	m_intc2->in_sp_callback().set_constant(0);
 
-	PIT8254(config, m_ctc, 0);
+	PIT8254(config, m_ctc);
 	m_ctc->set_clk<0>(XTAL(14'318'181) / 12.0);
 	m_ctc->out_handler<0>().set(m_intc1, FUNC(pic8259_device::ir0_w));
 	m_ctc->set_clk<1>(XTAL(14'318'181) / 12.0);
@@ -172,7 +172,6 @@ cs4031_device::cs4031_device(const machine_config &mconfig, const char *tag, dev
 	m_write_spkr(*this),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_keybc(*this, finder_base::DUMMY_TAG),
-	m_isa(*this, finder_base::DUMMY_TAG),
 	m_bios(*this, finder_base::DUMMY_TAG),
 	m_space(nullptr),
 	m_space_io(nullptr),
@@ -556,26 +555,17 @@ void cs4031_device::update_read_region(int index, offs_t start, offs_t end)
 	if (!BIT(m_registers[SHADOW_READ], index) && BIT(m_registers[ROMCS], index))
 	{
 		LOGMEMORY("ROM read from %x to %x\n", start, end);
-
 		m_space->install_rom(start, end, m_bios + start);
 	}
 	else if (!BIT(m_registers[SHADOW_READ], index) && !BIT(m_registers[ROMCS], index))
 	{
 		LOGMEMORY("ISA read from %x to %x\n", start, end);
-
-		m_space->install_rom(start, end, m_isa + start - 0xc0000);
+		// no need to do anything here
 	}
 	else if (BIT(m_registers[SHADOW_READ], index))
 	{
 		LOGMEMORY("RAM read from %x to %x\n", start, end);
-
 		m_space->install_rom(start, end, m_ram + start);
-	}
-	else
-	{
-		LOGMEMORY("NOP read from %x to %x\n", start, end);
-
-		m_space->nop_read(start, end);
 	}
 }
 
@@ -584,25 +574,21 @@ void cs4031_device::update_write_region(int index, offs_t start, offs_t end)
 	if (!BIT(m_registers[SHADOW_WRITE], index) && BIT(m_registers[ROMCS], index) && BIT(m_registers[ROMCS], 7))
 	{
 		LOGMEMORY("ROM write from %x to %x\n", start, end);
-
 		m_space->install_writeonly(start, end, m_bios + start);
 	}
 	else if (!BIT(m_registers[SHADOW_WRITE], index) && !BIT(m_registers[ROMCS], index))
 	{
 		LOGMEMORY("ISA write from %x to %x\n", start, end);
-
-		m_space->install_writeonly(start, end, m_isa + start - 0xc0000);
+		// no need to do anything here
 	}
 	else if (BIT(m_registers[SHADOW_WRITE], index))
 	{
 		LOGMEMORY("RAM write from %x to %x\n", start, end);
-
 		m_space->install_writeonly(start, end, m_ram + start);
 	}
 	else
 	{
 		LOGMEMORY("NOP write from %x to %x\n", start, end);
-
 		m_space->nop_write(start, end);
 	}
 }
@@ -774,6 +760,7 @@ void cs4031_device::keyb_data_w(u8 data)
 	if (BIT(m_registers[SOFT_RESET_AND_GATEA20], 7) && m_keybc_d1_written)
 	{
 		m_keybc_data_blocked = true;
+		m_keybc_d1_written = false;
 		emulated_kbreset(BIT(data, 0));
 		emulated_gatea20(BIT(data, 1));
 	}

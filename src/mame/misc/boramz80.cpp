@@ -25,7 +25,6 @@ TODO:
 TODO (game-specific):
 - pkboram: 0211 PCB only has 2 DIP banks, but the program reads 4?
 - pkrboram, pkts, tpkg2: girls' images need a different tilemap size?
-- tpkborama: decryption
 */
 
 
@@ -73,8 +72,6 @@ public:
 	template <uint16_t Base_prot_addr> void smaller_nvram(machine_config &config) ATTR_COLD;
 	template <uint16_t Base_prot_addr> void bigger_nvram(machine_config &config) ATTR_COLD;
 	template <uint16_t Base_prot_addr> void pkrboram(machine_config &config) ATTR_COLD;
-
-	void init_tpkborama() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -656,19 +653,9 @@ ROM_START( tpkboram )
 	ROM_LOAD( "8.pg6",  0x28000, 0x8000, CRC(8f2a8c3e) SHA1(5ec031dc1fa21a09c1a4ebc0b6bb5f899038801a) )
 	ROM_LOAD( "9.pg7",  0x30000, 0x8000, CRC(7dbbdeb5) SHA1(4d379b9e0c825174bf151117e3550809948e1763) )
 	ROM_LOAD( "10.pg8", 0x38000, 0x8000, CRC(4a293afa) SHA1(be532e6a476f78638e7f558bf8093e1914bc3688) )
-ROM_END
 
-// this runs on a newer ATPK-BORAM PK-0500 PCB. Given all GFX match tpkboram, it's probably a newer revision.
-// code is encrypted
-ROM_START( tpkborama )
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "223.rom", 0x0000, 0x8000, CRC(1d776d37) SHA1(6918cddb0b47d28cf8145823f869dfd2296c0eed) )
-
-	ROM_REGION( 0x4000, "chars", 0 ) // these are same as tpkboram
-	ROM_LOAD( "1.cg1", 0x0000, 0x2000, CRC(69f44d04) SHA1(2f98805e4b70ce3426078f35ff260a3bc97fab86) )
-	ROM_LOAD( "2.cg2", 0x2000, 0x2000, CRC(c1adf009) SHA1(0d5d8b39d40c807b9b5ed7418ba871c4d683286a) )
-
-	ROM_REGION( 0x40000, "tiles", 0 ) // these are all 1st and 2nd half identical, but same as tpkboram if split
+	/*
+	also seen as 1st and 2nd half identical with the following hashes
 	ROM_LOAD( "3.pg1",  0x00000, 0x8000, CRC(612c5b39) SHA1(9682167b1fbbcd34b71c2628641b646a2993f61b) )
 	ROM_IGNORE(                  0x8000 )
 	ROM_LOAD( "4.pg2",  0x08000, 0x8000, CRC(14ee6437) SHA1(a046b3efb14a400d201f7ce1c3ee0e01badb46a6) )
@@ -685,6 +672,7 @@ ROM_START( tpkborama )
 	ROM_IGNORE(                  0x8000 )
 	ROM_LOAD( "10.pg8", 0x38000, 0x8000, CRC(61a4e0f3) SHA1(8d9f0efd3b691eaf93c933c63ba6aa34ebad71b1) )
 	ROM_IGNORE(                  0x8000 )
+	*/
 ROM_END
 
 ROM_START( pkrboram ) // ATPK-BORAM PK-0500 PCB
@@ -744,24 +732,11 @@ ROM_START( pkts ) // ATPK-BORAM PK-0500 PCB
 	ROM_LOAD( "10.pg8", 0x70000, 0x10000, CRC(c8648897) SHA1(8f024d76b706fde3774d053be6aa307043ce4c06) )
 ROM_END
 
-
-void boramz80_state::init_tpkborama()
-{
-	uint8_t *rom = memregion("maincpu")->base();
-
-	for (int i = 0; i < 0x8000; i++)
-	{
-		// TODO
-		rom[i] = rom[i];
-	}
-}
-
 } // anonymous namespace
 
 
 GAME( 1987, pkboram,   0,        smaller_nvram<0x4824>, pkboram,  boramz80_state, empty_init,     ROT0, "Boram", "PK - New Exciting Poker!",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // PK-BORAM 0211 aug.04.1987. BORAM CORP
 GAME( 1988, tpkboram,  0,        bigger_nvram<0x55b2>,  tpkboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Turbo",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // PK-TURBO jan.29.1988. BORAM CORP.
-GAME( 1998, tpkborama, tpkboram, bigger_nvram<0x0000>,  tpkboram, boramz80_state, init_tpkborama, ROT0, "Boram", "PK Turbo (Ver 2.3B2, encrypted)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // dep inctype-23B1998 0519Ver 2.3B2
 GAME( 1990, pkrboram,  0,        pkrboram<0x6d43>,      pkrboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Rainbow (v 1.5)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // PK RAINBOW v1.5 BORAM Corp. 1990.11.06
 GAME( 1992, tpkg2,     0,        bigger_nvram<0x0115>,  tpkboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Turbo Great 2",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // PK TURBO GREAT2 1992.06.04 BORAM CORP.
 GAME( 19??, pkts,      0,        bigger_nvram<0x683f>,  pkts,     boramz80_state, empty_init,     ROT0, "Boram", "PK Turbo Special",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // PKS v100 BORAM CORP

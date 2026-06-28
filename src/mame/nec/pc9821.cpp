@@ -1131,6 +1131,7 @@ void pc9821_state::pc9821(machine_config &config)
 	m_pit->set_clk<1>(MAIN_CLOCK_X2);
 	m_pit->set_clk<2>(MAIN_CLOCK_X2);
 
+	// FIXME: set clock to SCKL1 clock frequency
 	PC98_CBUS_SLOT(config.replace(), "cbus:0", 0, "cbus", pc98_cbus_devices, "pc9801_86");
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_state, pc9821)
@@ -1151,7 +1152,7 @@ void pc9821_state::pc9821(machine_config &config)
 
 //  m_hgdc[1]->set_display_pixels(FUNC(pc9821_state::pegc_display_pixels));
 
-	PC98_SDIP(config, "sdip", 0);
+	PC98_SDIP(config, "sdip");
 
 	// RAM 1.6MB (S1) / 3.6 (S2) ~ 15M (with dedicated 10MB module)
 	config.device_remove("simm");
@@ -1224,6 +1225,7 @@ void pc9821_canbe_state::pc9821ce(machine_config &config)
 //  m_ram->set_extra_options("6M,8M,14M,15M");
 
 	// pc9801-86 (built-in)
+	// FIXME: set clock to SCKL1 clock frequency
 	PC98_CBUS_SLOT(config.replace(), "cbus:0", 0, "cbus", pc98_cbus_devices, nullptr);
 	PC98_CBUS_SLOT(config, "cbus:mb1", 0, "cbus", pc98_cbus_devices, "sound_pc9821ce", true);
 
@@ -1252,6 +1254,7 @@ void pc9821_canbe_state::pc9821cx3(machine_config &config)
 	//pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
 
 //  m_cbus[0]->set_default_option(nullptr);
+	// FIXME: set clock to SCKL1 clock frequency
 	PC98_CBUS_SLOT(config.replace(), "cbus:0", 0, "cbus", pc98_cbus_devices, nullptr);
 	PC98_CBUS_SLOT(config, "cbus:mb1", 0, "cbus", pc98_cbus_devices, "sound_pc9821cx3", true);
 
@@ -1272,7 +1275,7 @@ void pc9821_canbe_state::pc9821cx3(machine_config &config)
 	// C-Bus x 3
 	// PC-9821CB-B04, on dedicated bus (Fax/Modem 14'400 bps) and IrDA board (115'200 bps)
 	// Optional PC-9821C3-B02 MIDI board, on dedicated bus
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 
@@ -1307,7 +1310,7 @@ void pc9821_mate_x_state::pc9821xa16(machine_config &config)
 	// 1.2GB HDD
 	// CD-Rom x4
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 
 	// Xa16/W specs (same as above except)
@@ -1335,7 +1338,7 @@ void pc9821_mate_x_state::pc9821xv13(machine_config &config)
 
 	// Xv13/W identical to Xa16/W specs with MGA-2064W as PCI GFX card
 	// PCI rev 2.0 (VLSI Supercore596 Wildcat) or 2.1 (Intel 430HX)
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 
@@ -1352,7 +1355,7 @@ void pc9821_mate_r_state::pc9821ra20(machine_config &config)
 //  RAM(config.replace(), m_ram).set_default_size("16M").set_extra_options("32M,64M,128M");
 
 	// Intel 440FX
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 
 	// S3 manufactured Trident TGUI9682XGi with 2MB VRAM (on board PCI)
@@ -1376,7 +1379,7 @@ void pc9821_mate_r_state::pc9821ra266(machine_config &config)
 //  RAM(config.replace(), m_ram).set_default_size("32M").set_extra_options("64M,128M,192M,256M");
 
 	// Intel 440FX
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 
 	// Trident TGUI9682XGi + integrated 98 gfx card
@@ -1411,7 +1414,7 @@ void pc9821_mate_r_state::pc9821ra333(machine_config &config)
 	// 3.5"x1, 24xCD-ROM
 	// built-in ethernet 100BASE-TX/10BASE-T
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 

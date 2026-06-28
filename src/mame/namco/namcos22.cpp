@@ -3642,10 +3642,6 @@ ALLOW_SAVE_TYPE(namcos22_dsp_upload_state);
 
 void namcos22_state::machine_start()
 {
-	m_mcu_out.resolve();
-	m_cpuled_out.resolve();
-	m_wheel_motor.resolve();
-
 	m_portbits[0] = 0xffff;
 	m_portbits[1] = 0xffff;
 	m_dsp_upload_state = NAMCOS22_DSP_UPLOAD_READY;
@@ -6413,7 +6409,7 @@ GAME( 1994, cybrcomm,   0,        cybrcomm,  cybrcomm,   namcos22_state,  init_c
 GAME( 1995, raverace,   0,        namcos22,  raverace,   namcos22_state,  init_raverace,  ROT0, "Namco", "Rave Racer (World, RV2 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 07/16/95
 GAME( 1995, raveracej,  raverace, namcos22,  raverace,   namcos22_state,  init_raverace,  ROT0, "Namco", "Rave Racer (Japan, RV1 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 07/16/95
 GAME( 1995, raveraceja, raverace, namcos22,  raverace,   namcos22_state,  init_raverace,  ROT0, "Namco", "Rave Racer (Japan, RV1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 06/29/95
-GAME( 1994, acedrive,   0,        namcos22,  acedrive,   namcos22_state,  init_acedrive,  ROT0, "Namco", "Ace Driver: Racing Evolution (World, AD2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 94/10/20 16:22:25
+GAME( 1994, acedrive,   0,        namcos22,  acedrive,   namcos22_state,  init_acedrive,  ROT0, "Namco", "Ace Driver (World, AD2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 94/10/20 16:22:25
 GAME( 1996, victlap,    0,        namcos22,  victlap,    namcos22_state,  init_victlap,   ROT0, "Namco", "Ace Driver: Victory Lap (World, ADV2 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/05/21 19:39:59
 GAME( 1996, victlapa,   victlap,  namcos22,  victlap,    namcos22_state,  init_victlap,   ROT0, "Namco", "Ace Driver: Victory Lap (World, ADV2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/02/13 17:29:10
 GAME( 1996, victlapj,   victlap,  namcos22,  victlap,    namcos22_state,  init_victlap,   ROT0, "Namco", "Ace Driver: Victory Lap (Japan, ADV1 Ver.C)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/02/13 17:29:10

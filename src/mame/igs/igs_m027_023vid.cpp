@@ -402,7 +402,7 @@ void igs_m027_023vid_state::m027_023vid(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1400/2);
 
 	// PGM video
-	IGS023_VIDEO(config, m_video, 0);
+	IGS023_VIDEO(config, m_video);
 	m_video->set_palette(m_palette);
 	m_video->set_screen(m_screen);
 	m_video->read_spriteram_callback().set(FUNC(igs_m027_023vid_state::sprites_r));

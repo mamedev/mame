@@ -35,7 +35,6 @@ c806      bit 0-1 ROM bank selector 00=1-N5.BIN
                                     10=1-N7.BIN
 
 
-
 SOUND CPU:
 
 0000-3fff ROM
@@ -45,7 +44,6 @@ SOUND CPU:
 8001      8910 #1 write
 c000      8910 #2 control
 c001      8910 #2 write
-
 
 
 Game runs in interrupt mode 0 (the devices supply the interrupt number).
@@ -58,6 +56,9 @@ correctly.
 0x08 is the sound card service interrupt. The game uses this to throw sounds
      at the sound CPU.
 
+
+TODO:
+- spriteram can only be written during vblank
 
 ***************************************************************************
 
@@ -215,6 +216,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(_1942_state::scanline)
 
 void _1942_state::_1942_map(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xc000).portr("SYSTEM");
@@ -222,12 +224,13 @@ void _1942_state::_1942_map(address_map &map)
 	map(0xc002, 0xc002).portr("P2");
 	map(0xc003, 0xc003).portr("DSWA");
 	map(0xc004, 0xc004).portr("DSWB");
-	map(0xc800, 0xc800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xc800, 0xc800).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
+	map(0xc801, 0xc801).w(m_soundlatch[1], FUNC(generic_latch_8_device::write));
 	map(0xc802, 0xc803).w(FUNC(_1942_state::scroll_w));
 	map(0xc804, 0xc804).w(FUNC(_1942_state::control_w));
 	map(0xc805, 0xc805).w(FUNC(_1942_state::palette_bank_w));
 	map(0xc806, 0xc806).w(FUNC(_1942_state::bankswitch_w));
-	map(0xcc00, 0xcc7f).ram().share("spriteram");
+	map(0xcc00, 0xcc7f).writeonly().share("spriteram");
 	map(0xd000, 0xd7ff).ram().w(FUNC(_1942_state::fgvideoram_w)).share("fg_videoram");
 	map(0xd800, 0xdbff).ram().w(FUNC(_1942_state::bgvideoram_w)).share("bg_videoram");
 	map(0xe000, 0xefff).ram();
@@ -263,7 +266,7 @@ void _1942p_state::_1942p_map(address_map &map)
 	map(0xf000, 0xf3ff).ram().w(FUNC(_1942p_state::palette_w)).share("protopal");
 
 	map(0xf400, 0xf400).w(FUNC(_1942p_state::bankswitch_w));
-	map(0xf500, 0xf500).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xf500, 0xf500).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 	map(0xf600, 0xf600).nopw(); // ?
 
 	map(0xf700, 0xf700).portr("DSWA");
@@ -278,7 +281,7 @@ void _1942p_state::_1942p_sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
-	map(0xc000, 0xc000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xc000, 0xc000).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 }
 
 void _1942p_state::_1942p_sound_io(address_map &map)
@@ -295,7 +298,8 @@ void _1942_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
-	map(0x6000, 0x6000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x6000, 0x6000).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
+	map(0x6001, 0x6001).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));
 	map(0x8000, 0x8001).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0xc000, 0xc001).w("ay2", FUNC(ay8910_device::address_data_w));
 }
@@ -610,7 +614,8 @@ void _1942_state::_1942(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
 	ay8910_device &ay1(AY8910(config, "ay1", AUDIO_CLOCK));  /* 1.5 MHz */
 	ay1.set_flags(AY8910_RESISTOR_OUTPUT);
@@ -669,8 +674,8 @@ void _1942p_state::_1942p(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	AY8910(config, "ay1", AUDIO_CLOCK_1942P).add_route(ALL_OUTPUTS, "mono", 0.25); // 1.25 MHz - verified on PCB
 	AY8910(config, "ay2", AUDIO_CLOCK_1942P).add_route(ALL_OUTPUTS, "mono", 0.25); // 1.25 MHz - verified on PCB

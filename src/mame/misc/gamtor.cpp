@@ -65,7 +65,7 @@ class gamtor_vga_device : public svga_device
 {
 public:
 	// construction/destruction
-	gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 //  virtual uint8_t mem_r(offs_t offset) override;
 //  virtual void mem_w(offs_t offset, uint8_t data) override;
@@ -150,7 +150,7 @@ const tiny_rom_entry *gamtor_vga_device::device_rom_region() const
 class mc_mk4_hopper_device : public device_t
 {
 public:
-	mc_mk4_hopper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mc_mk4_hopper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	void mc_mk4_hopper(machine_config &mconfig) ATTR_COLD;
 
 protected:
@@ -176,7 +176,7 @@ void mc_mk4_hopper_device::device_start()
 
 void mc_mk4_hopper_device::device_add_mconfig(machine_config &config)
 {
-	HOPPER(config, m_hopper, 0);
+	HOPPER(config, m_hopper);
 }
 
 ROM_START(mc_mk4_hopper)
@@ -257,7 +257,7 @@ void gaminator_state::gaminator(machine_config &config)
 	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
 	screen.set_screen_update("vga", FUNC(gamtor_vga_device::screen_update));
 
-	gamtor_vga_device &vga(GAMTOR_VGA(config, "vga", 0));
+	gamtor_vga_device &vga(GAMTOR_VGA(config, "vga"));
 	vga.set_screen("screen");
 	vga.set_vram_size(0x100000);
 
@@ -266,7 +266,7 @@ void gaminator_state::gaminator(machine_config &config)
 
 	RTC72423(config, "rtc", XTAL(32'768)); // Fake crystal value, the 72423 uses its own internal crystal
 
-	MC_MK4_HOPPER(config, "hopper", 0);
+	MC_MK4_HOPPER(config, "hopper");
 }
 
 // Base ROMs for genuine Novomatic CoolFire PCB. Bootleg sets may use a different Russian bootleg hardware.

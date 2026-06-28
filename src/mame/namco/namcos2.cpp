@@ -1635,12 +1635,12 @@ void namcos2_base_state::configure_c116_standard(machine_config &config)
 
 void namcos2_base_state::configure_c148_standard(machine_config &config)
 {
-	NAMCO_C148(config, m_master_intc, 0, m_maincpu, true);
+	NAMCO_C148(config, m_master_intc, m_maincpu, true);
 	m_master_intc->link_c148_device(m_slave_intc);
 	m_master_intc->out_ext1_callback().set(FUNC(namcos2_base_state::sound_reset_w));
 	m_master_intc->out_ext2_callback().set(FUNC(namcos2_base_state::system_reset_w));
 
-	NAMCO_C148(config, m_slave_intc, 0, m_slave, false);
+	NAMCO_C148(config, m_slave_intc, m_slave, false);
 	m_slave_intc->link_c148_device(m_master_intc);
 }
 
@@ -1702,7 +1702,7 @@ void namcos2_base_state::configure_common_standard(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	NAMCO_C139(config, m_sci, 0);
+	NAMCO_C139(config, m_sci);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8);
@@ -1781,7 +1781,7 @@ void namcos2_base_state::configure_c45road_standard(machine_config &config)
 
 void finallap_state::configure_namcos2_sprite_standard(machine_config &config)
 {
-	NAMCOS2_SPRITE(config, m_ns2sprite, 0, m_c116, gfx_namcos2_spr);
+	NAMCOS2_SPRITE(config, m_ns2sprite, m_c116, gfx_namcos2_spr);
 	m_ns2sprite->set_screen(m_screen);
 	m_ns2sprite->set_spriteram_tag("spriteram");
 	m_ns2sprite->set_priority_callback(FUNC(finallap_state::sprite_pri_callback_ns2));
@@ -1790,7 +1790,7 @@ void finallap_state::configure_namcos2_sprite_standard(machine_config &config)
 
 void namcos2_state::configure_namcos2_roz_standard(machine_config &config)
 {
-	NAMCOS2_ROZ(config, m_ns2roz, 0);
+	NAMCOS2_ROZ(config, m_ns2roz);
 	m_ns2roz->set_palette(m_c116);
 	m_ns2roz->set_rozram_tag("rozram");
 	m_ns2roz->set_rozctrl_tag("rozctrl");
@@ -2045,7 +2045,7 @@ void metlhawk_state::metlhawk(machine_config &config)
 
 	m_screen->set_screen_update(FUNC(metlhawk_state::screen_update_metlhawk));
 
-	NAMCOS2_SPRITE_METALHAWK(config, m_ns2sprite, 0, m_c116, gfx_metlhawk_spr);
+	NAMCOS2_SPRITE_METALHAWK(config, m_ns2sprite, m_c116, gfx_metlhawk_spr);
 	m_ns2sprite->set_screen(m_screen);
 	m_ns2sprite->set_spriteram_tag("spriteram");
 	m_ns2sprite->set_priority_callback(FUNC(metlhawk_state::sprite_pri_callback_ns2));

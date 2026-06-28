@@ -173,7 +173,7 @@ void champ2_state::champ2(machine_config &config)
 
 	RAM(config, m_ram).set_default_size("15M").set_extra_options("640K,1024K,1664K,2M,4M,8M,15M");
 
-	for (auto bank : m_bank)
+	for (auto &bank : m_bank)
 		ADDRESS_MAP_BANK(config, bank).set_map(&champ2_state::bank_map).set_options(ENDIANNESS_LITTLE, 8, 21, 0x2000);
 
 	ns16450_device &uart(NS16450(config, "ns16450_0", XTAL(1'843'200)));

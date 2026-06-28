@@ -10,6 +10,7 @@
 #include "cpu/i386/i386.h"
 #include "imagedev/cdromimg.h"
 #include "imagedev/floppy.h"
+#include "machine/am9517a.h"
 #include "machine/fm_scsi.h"
 #include "machine/i8251.h"
 #include "machine/msm58321.h"
@@ -17,7 +18,6 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
-#include "machine/upd71071.h"
 #include "machine/wd_fdc.h"
 #include "sound/cdda.h"
 #include "sound/rf5c68.h"
@@ -280,6 +280,8 @@ private:
 	u8 m_vram_mask[4]{};
 	u8 m_vram_mask_addr = 0;
 
+	u8 m_dma_msb[2];
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	uint8_t towns_system_r(offs_t offset);
@@ -290,6 +292,8 @@ private:
 	void towns_sys6c_w(uint8_t data);
 	template<int Chip> uint8_t towns_dma_r(offs_t offset);
 	template<int Chip> void towns_dma_w(offs_t offset, uint8_t data);
+	template<int Chip> uint8_t towns_dma_mem_r(offs_t offset);
+	template<int Chip> void towns_dma_mem_w(offs_t offset, uint8_t data);
 	uint8_t towns_floppy_r(offs_t offset);
 	void towns_floppy_w(offs_t offset, uint8_t data);
 	uint8_t towns_keyboard_r(offs_t offset);
@@ -406,11 +410,10 @@ private:
 	inline uint8_t byte_to_bcd(uint8_t val);
 	inline uint8_t bcd_to_byte(uint8_t val);
 	inline uint32_t msf_to_lbafm(uint32_t val);  // because the CDROM core doesn't provide this;
-	uint16_t towns_fdc_dma_r();
-	void towns_fdc_dma_w(uint16_t data);
 	void towns_cdrom_set_irq(int line,int state);
 	uint8_t towns_cd_get_track();
-	uint16_t towns_cdrom_dma_r();
+	uint8_t towns_cdrom_dma_r();
+	void towns_cdrom_dack_w(int state);
 };
 
 class towns16_state : public towns_state

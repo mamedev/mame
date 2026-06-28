@@ -330,11 +330,11 @@ void whitestar_state::whitestar(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	DECOBSMT(config, m_decobsmt, 0);
+	DECOBSMT(config, m_decobsmt);
 	m_decobsmt->add_route(0, "speaker", 1.0, 0);
 	m_decobsmt->add_route(1, "speaker", 1.0, 1);
 
-	DECODMD2(config, m_decodmd, 0);
+	DECODMD2(config, m_decodmd);
 }
 
 void whitestar_state::whitestarm(machine_config &config)

@@ -289,7 +289,7 @@ void sega_segacd_device::device_add_mconfig(machine_config &config)
 	m_scdcpu->set_irq_acknowledge_callback(FUNC(sega_segacd_device::segacd_sub_int_callback));
 
 	// temporary until things are cleaned up
-	LC89510_TEMP(config, m_lc89510_temp, 0); // cd controller
+	LC89510_TEMP(config, m_lc89510_temp); // cd controller
 	m_lc89510_temp->set_cdc_do_dma_callback(FUNC(sega_segacd_device::SegaCD_CDC_Do_DMA)); // hack
 	m_lc89510_temp->set_cdrom_tag("^cdrom");
 	m_lc89510_temp->set_68k_tag(m_scdcpu);
@@ -1716,9 +1716,6 @@ void sega_segacd_device::device_start()
 	subdevice<nvram_device>("backupram")->set_base(&m_backupram[0], 0x2000);
 
 	segacd_4meg_prgbank = 0;
-
-	m_red_led.resolve();
-	m_green_led.resolve();
 
 	space.unmap_readwrite        (0x020000,0x3fffff);
 

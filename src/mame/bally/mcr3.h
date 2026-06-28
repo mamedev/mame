@@ -71,7 +71,6 @@ protected:
 	void spyhunt_map(address_map &map) ATTR_COLD;
 	void spyhunt_portmap(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override ATTR_COLD;
 
 	optional_shared_ptr<uint8_t> m_spyhunt_alpharam;

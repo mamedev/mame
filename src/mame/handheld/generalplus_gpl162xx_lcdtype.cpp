@@ -850,7 +850,7 @@ void gpl162xx_lcdtype_state::gpl162xx_lcdtype(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x8000);
 
-	BL_HANDHELDS_MENUCONTROL(config, m_menucontrol, 0);
+	BL_HANDHELDS_MENUCONTROL(config, m_menucontrol);
 	m_menucontrol->set_is_unsp_type_hack();
 
 }

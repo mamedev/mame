@@ -130,23 +130,24 @@ public:
 	bfm_sc1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_reels(*this, "reel%u", 0U),
+		m_reels(*this, "reel%u", 1U),
 		m_upd7759(*this, "upd"),
 		m_vfd0(*this, "vfd0"),
 		m_meters(*this, "meters"),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void init_toppoker();
-	void init_lotse_bank0();
-	void init_nocrypt_bank0();
-	void init_lotse();
-	void init_clatt();
-	void init_rou029();
-	void init_nocrypt();
-	void scorpion1_adder2(machine_config &config);
-	void scorpion1(machine_config &config);
-	void scorpion1_viper(machine_config &config);
+	void init_toppoker() ATTR_COLD;
+	void init_lotse_bank0() ATTR_COLD;
+	void init_nocrypt_bank0() ATTR_COLD;
+	void init_lotse() ATTR_COLD;
+	void init_clatt() ATTR_COLD;
+	void init_rou029() ATTR_COLD;
+	void init_nocrypt() ATTR_COLD;
+
+	void scorpion1_adder2(machine_config &config) ATTR_COLD;
+	void scorpion1(machine_config &config) ATTR_COLD;
+	void scorpion1_viper(machine_config &config) ATTR_COLD;
 
 protected:
 	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
@@ -182,7 +183,6 @@ protected:
 
 	void save_state();
 
-	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override ATTR_COLD;
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	void sc1_common_init(int reels, int decrypt, int defaultbank);
@@ -1108,7 +1108,7 @@ void bfm_sc1_state::scorpion1(machine_config &config)
 	REEL(config, m_reels[5], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
 	m_reels[5]->optic_handler().set(FUNC(bfm_sc1_state::reel_optic_cb<5>));
 
-	METERS(config, m_meters, 0).set_number(8);
+	METERS(config, m_meters).set_number(8);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -1123,7 +1123,7 @@ void bfm_sc1_state::scorpion1_adder2(machine_config &config)
 
 	config.set_default_layout(layout_sc1_vid);
 
-	BFM_ADDER2(config, "adder2", 0);
+	BFM_ADDER2(config, "adder2");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

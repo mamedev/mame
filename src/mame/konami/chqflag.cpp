@@ -393,8 +393,6 @@ void chqflag_state::machine_start()
 {
 	m_rombank->configure_entries(0, 0x50000 / 0x4000, memregion("maincpu")->base(), 0x4000);
 
-	m_start_lamp.resolve();
-
 	save_item(NAME(m_k051316_readroms));
 	save_item(NAME(m_last_vreg));
 	save_item(NAME(m_analog_ctrl));

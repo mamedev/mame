@@ -394,8 +394,6 @@ DEVICE_INPUT_DEFAULTS_END
 
 void softbox_state::machine_start()
 {
-	m_leds.resolve();
-
 	save_item(NAME(m_boot_cnt));
 }
 
@@ -422,14 +420,17 @@ uint8_t softbox_state::boot_r(offs_t offset)
 	   into the BIOS.  On reset, the Z80 will fetch it from 0x0000 and set
 	   its PC, then the normal map will be restored on the next
 	   instruction fetch. */
-	if (!m_boot_cnt)
+	if (!machine().side_effects_disabled())
 	{
-		m_boot_cnt = true;
-	}
-	else
-	{
-		m_boot_mem.disable();
-		m_boot_m1.disable();
+		if (!m_boot_cnt)
+		{
+			m_boot_cnt = true;
+		}
+		else
+		{
+			m_boot_mem.disable();
+			m_boot_m1.disable();
+		}
 	}
 	return m_rom[offset & 0x0fff];
 }
@@ -464,7 +465,7 @@ void softbox_state::softbox(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &softbox_state::softbox_io);
 
 	// devices
-	i8251_device &i8251(I8251(config, I8251_TAG, 0));
+	i8251_device &i8251(I8251(config, I8251_TAG));
 	i8251.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	i8251.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	i8251.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
@@ -492,7 +493,7 @@ void softbox_state::softbox(machine_config &config)
 
 	ieee488_device::add_cbm_devices(config, "c8050");
 
-	CORVUS_HDC(config, m_hdc, 0);
+	CORVUS_HDC(config, m_hdc);
 	HARDDISK(config, "harddisk1", "corvus_hdd");
 	HARDDISK(config, "harddisk2", "corvus_hdd");
 	HARDDISK(config, "harddisk3", "corvus_hdd");

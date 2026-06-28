@@ -128,7 +128,7 @@ void megadrive_segach_us_device::device_add_mconfig(machine_config &config)
 {
 	// each broadcast frame has 10 packets and 288 bytes per packet
 	// assuming 12Mbps download rate
-	TIMER(config, "packet_timer", 0).configure_periodic(FUNC(megadrive_segach_us_device::send_packets),
+	TIMER(config, "packet_timer").configure_periodic(FUNC(megadrive_segach_us_device::send_packets),
 			attotime::from_hz((12*128072) / 2880));
 
 	QUICKLOAD(config, "packet_stream", "img").set_load_callback(FUNC(megadrive_segach_us_device::quickload_cb));

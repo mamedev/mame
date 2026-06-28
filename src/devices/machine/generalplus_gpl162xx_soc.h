@@ -11,18 +11,17 @@
 
 #pragma once
 
-#include "cpu/unsp/unsp.h"
-#include "machine/timer.h"
-
-#include "screen.h"
-#include "emupal.h"
-
 #include "generalplus_gpl_dma.h"
 #include "generalplus_gpl_timebase.h"
 #include "generalplus_gpl162xx_soc_video.h"
 #include "spg2xx_audio.h"
 
-typedef device_delegate<void (u16, u16, u16, u16, u16)> sunplus_gcm394_cs_callback_device;
+#include "cpu/unsp/unsp.h"
+#include "machine/timer.h"
+
+#include "emupal.h"
+#include "screen.h"
+
 
 class sunplus_gcm394_base_device : public unsp_20_device, public device_mixer_interface
 {
@@ -75,6 +74,8 @@ public:
 	u16 get_ram_addr(u32 addr) { return m_mainram[addr]; }
 
 protected:
+	using cs_callback_delegate = device_delegate<void (u16, u16, u16, u16, u16)>;
+
 	sunplus_gcm394_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal);
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -337,7 +338,7 @@ protected:
 
 	// config registers (external pins)
 	int m_boot_mode; // 2 pins determine boot mode, likely only read at power-on
-	sunplus_gcm394_cs_callback_device m_cs_callback;
+	cs_callback_delegate m_cs_callback;
 
 	required_device<timer_device> m_timer_a;
 	required_device<timer_device> m_timer_b;

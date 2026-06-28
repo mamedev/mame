@@ -3,26 +3,134 @@
 license:CC0-1.0
 -->
 <mamelayout version="2">
-	<element name="SteppersReel1" defstate="0">
-		<reel stateoffset="45748" symbollist="bell,cherry,blue7  sym,melon,single bar,plum,triple bar,lemon,red7,cherry,melon  sym,plum,double bar,cherry,blue7,lemon"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
+	<element name="SteppersReel1">
+		<rect> <bounds x="0" y="0" width="50" height="272"/> <color alpha="0.0"/> </rect>
+		<text string="bell">       <bounds x="2" y="4"   width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="cherry">     <bounds x="2" y="21"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="blue7  sym"> <bounds x="2" y="38"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="melon">      <bounds x="2" y="55"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="single bar"> <bounds x="2" y="72"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="plum">       <bounds x="2" y="89"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="triple bar"> <bounds x="2" y="106" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="lemon">      <bounds x="2" y="123" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="red7">       <bounds x="2" y="140" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="cherry">     <bounds x="2" y="157" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="melon  sym"> <bounds x="2" y="174" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="plum">       <bounds x="2" y="191" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="double bar"> <bounds x="2" y="208" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="cherry">     <bounds x="2" y="225" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="blue7">      <bounds x="2" y="242" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="lemon">      <bounds x="2" y="259" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
 	</element>
-	<element name="SteppersReel2" defstate="0">
-		<reel stateoffset="45748" symbollist="bell,cherry,red7,melon,sbar   sym,plum,triple bar,lemon,blue7,cherry,melon,plum,dbar   sym,cherry,red7,lemon"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
+	<element name="SteppersReel2">
+		<rect> <bounds x="0" y="0" width="50" height="272"/> <color alpha="0.0"/> </rect>
+		<text string="bell">       <bounds x="2" y="4"   width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="cherry">     <bounds x="2" y="21"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="red7">       <bounds x="2" y="38"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="melon">      <bounds x="2" y="55"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="sbar   sym"> <bounds x="2" y="72"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="plum">       <bounds x="2" y="89"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="triple bar"> <bounds x="2" y="106" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="lemon">      <bounds x="2" y="123" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="blue7">      <bounds x="2" y="140" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="cherry">     <bounds x="2" y="157" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="melon">      <bounds x="2" y="174" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="plum">       <bounds x="2" y="191" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="dbar   sym"> <bounds x="2" y="208" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="cherry">     <bounds x="2" y="225" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="red7">       <bounds x="2" y="242" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="lemon">      <bounds x="2" y="259" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
 	</element>
-	<element name="SteppersReel3" defstate="0">
-		<reel stateoffset="45748" symbollist="bell,cherry,blue7,melon,single bar,plum,triple bar,lemon  sym,red7,cherry,melon,plum,double bar,cherry,blue7,lemon  sym"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
+	<element name="SteppersReel3">
+		<rect> <bounds x="0" y="0" width="50" height="272"/> <color alpha="0.0"/> </rect>
+		<text string="bell">       <bounds x="2" y="4"   width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="cherry">     <bounds x="2" y="21"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="blue7">      <bounds x="2" y="38"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="melon">      <bounds x="2" y="55"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="single bar"> <bounds x="2" y="72"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="plum">       <bounds x="2" y="89"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="triple bar"> <bounds x="2" y="106" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="lemon  sym"> <bounds x="2" y="123" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="red7">       <bounds x="2" y="140" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="cherry">     <bounds x="2" y="157" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="melon">      <bounds x="2" y="174" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="plum">       <bounds x="2" y="191" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="double bar"> <bounds x="2" y="208" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="cherry">     <bounds x="2" y="225" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="blue7">      <bounds x="2" y="242" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="lemon  sym"> <bounds x="2" y="259" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
 	</element>
-	<element name="SteppersReel4" defstate="0">
-		<reel stateoffset="45748" symbollist="bell,cherry,blue7,melon,single bar,plum   sym,triple bar,lemon,blank,cherry,melon,plum,dbar   sym,cherry,red7,lemon"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
+	<element name="SteppersReel4">
+		<rect> <bounds x="0" y="0" width="50" height="272"/> <color alpha="0.0"/> </rect>
+		<text string="bell">       <bounds x="2" y="4"   width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="cherry">     <bounds x="2" y="21"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="blue7">      <bounds x="2" y="38"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="melon">      <bounds x="2" y="55"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="single bar"> <bounds x="2" y="72"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="plum   sym"> <bounds x="2" y="89"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="triple bar"> <bounds x="2" y="106" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="lemon">      <bounds x="2" y="123" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="blank">      <bounds x="2" y="140" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="cherry">     <bounds x="2" y="157" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="melon">      <bounds x="2" y="174" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="plum">       <bounds x="2" y="191" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="dbar   sym"> <bounds x="2" y="208" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="cherry">     <bounds x="2" y="225" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="red7">       <bounds x="2" y="242" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="lemon">      <bounds x="2" y="259" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
 	</element>
-	<element name="SteppersReel5" defstate="0">
-		<reel stateoffset="45748" symbollist="num 12,num 11,num 10,num 9,num 8,num 7,num 6,num 5,num 4,num 3,num 2,num 1"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
+	<element name="SteppersReel5">
+		<rect> <bounds x="0" y="0" width="50" height="204"/> <color alpha="0.0"/> </rect>
+		<text string="num 12"> <bounds x="2" y="4"   width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="num 11"> <bounds x="2" y="21"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="num 10"> <bounds x="2" y="38"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="num 9">  <bounds x="2" y="55"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="num 8">  <bounds x="2" y="72"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="num 7">  <bounds x="2" y="89"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="num 6">  <bounds x="2" y="106" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="num 5">  <bounds x="2" y="123" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="num 4">  <bounds x="2" y="140" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="num 3">  <bounds x="2" y="157" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="num 2">  <bounds x="2" y="174" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="num 1">  <bounds x="2" y="191" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
 	</element>
-	<element name="SteppersReel6" defstate="0">
-		<reel stateoffset="45748" symbollist="10p,20p,50p,4PND,1p,2PND,3PND,1PND,meg streak,1.50PND,2.50PND,3.50PND,5PND,30p,40p,80p"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
+	<element name="SteppersReel6">
+		<rect> <bounds x="0" y="0" width="50" height="272"/> <color alpha="0.0"/> </rect>
+		<text string="10p">        <bounds x="2" y="4"   width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="20p">        <bounds x="2" y="21"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="50p">        <bounds x="2" y="38"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="4PND">       <bounds x="2" y="55"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="1p">         <bounds x="2" y="72"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="2PND">       <bounds x="2" y="89"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="3PND">       <bounds x="2" y="106" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="1PND">       <bounds x="2" y="123" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="meg streak"> <bounds x="2" y="140" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="1.50PND">    <bounds x="2" y="157" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="2.50PND">    <bounds x="2" y="174" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="3.50PND">    <bounds x="2" y="191" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="5PND">       <bounds x="2" y="208" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="30p">        <bounds x="2" y="225" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="40p">        <bounds x="2" y="242" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="80p">        <bounds x="2" y="259" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
 	</element>
-	<element name="SteppersReel7" defstate="0">
-		<reel stateoffset="45748" symbollist="4PND,10p,20p,50p,1p,2PND,3PND,1PND,meg streak,6PND,7PND,8PND,10PND,15PND,25PND,5PND"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="1" height="1" /></reel>
+	<element name="SteppersReel7">
+		<rect> <bounds x="0" y="0" width="50" height="272"/> <color alpha="0.0"/> </rect>
+		<text string="4PND">       <bounds x="2" y="4"   width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="10p">        <bounds x="2" y="21"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="20p">        <bounds x="2" y="38"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="50p">        <bounds x="2" y="55"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="1p">         <bounds x="2" y="72"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="2PND">       <bounds x="2" y="89"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="3PND">       <bounds x="2" y="106" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="1PND">       <bounds x="2" y="123" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="meg streak"> <bounds x="2" y="140" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="6PND">       <bounds x="2" y="157" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="7PND">       <bounds x="2" y="174" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="8PND">       <bounds x="2" y="191" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="10PND">      <bounds x="2" y="208" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="15PND">      <bounds x="2" y="225" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="25PND">      <bounds x="2" y="242" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="5PND">       <bounds x="2" y="259" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
 	</element>
 	<element name="lamplabelel0"><text string="cancel"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="lamplabelel1"><text string="hold1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
@@ -1013,16 +1121,34 @@ license:CC0-1.0
 		</repeat>
 
 		<element name="reel1:pos" ref="Steppers" state="0"><bounds x="40" y="350" width="10" height="5" /></element>
-		<element name="reel1:scroll" ref="SteppersReel1" state="0"><bounds x="0" y="300" width="50" height="50" /></element>
+		<element ref="SteppersReel1">
+			<bounds x="0" y="300" width="50" height="50" />
+			<yscroll name="reel1:scroll" size="0.1875" wrap="yes" min="19788" max="85323"/>
+		</element>
 		<element name="reel2:pos" ref="Steppers" state="0"><bounds x="90" y="350" width="10" height="5" /></element>
-		<element name="reel2:scroll" ref="SteppersReel2" state="0"><bounds x="50" y="300" width="50" height="50" /></element>
+		<element ref="SteppersReel2">
+			<bounds x="50" y="300" width="50" height="50" />
+			<yscroll name="reel2:scroll" size="0.1875" wrap="yes" min="19788" max="85323"/>
+		</element>
 		<element name="reel3:pos" ref="Steppers" state="0"><bounds x="140" y="350" width="10" height="5" /></element>
-		<element name="reel3:scroll" ref="SteppersReel3" state="0"><bounds x="100" y="300" width="50" height="50" /></element>
+		<element ref="SteppersReel3">
+			<bounds x="100" y="300" width="50" height="50" />
+			<yscroll name="reel3:scroll" size="0.1875" wrap="yes" min="19788" max="85323"/>
+		</element>
 		<element name="reel4:pos" ref="Steppers" state="0"><bounds x="190" y="350" width="10" height="5" /></element>
-		<element name="reel4:scroll" ref="SteppersReel4" state="0"><bounds x="150" y="300" width="50" height="50" /></element>
+		<element ref="SteppersReel4">
+			<bounds x="150" y="300" width="50" height="50" />
+			<yscroll name="reel4:scroll" size="0.1875" wrap="yes" min="19788" max="85323"/>
+		</element>
 		<element name="reel5:pos" ref="Steppers" state="0"><bounds x="240" y="350" width="10" height="5" /></element>
-		<element name="reel5:scroll" ref="SteppersReel5" state="0"><bounds x="200" y="300" width="50" height="50" /></element>
+		<element ref="SteppersReel5">
+			<bounds x="200" y="300" width="50" height="50" />
+			<yscroll name="reel5:scroll" size="0.25" wrap="yes" min="19788" max="85323"/>
+		</element>
 		<element name="reel6:pos" ref="Steppers" state="0"><bounds x="290" y="350" width="10" height="5" /></element>
-		<element name="reel6:scroll" ref="SteppersReel6" state="0"><bounds x="250" y="300" width="50" height="50" /></element>
+		<element ref="SteppersReel6">
+			<bounds x="250" y="300" width="50" height="50" />
+			<yscroll name="reel6:scroll" size="0.1875" wrap="yes" min="19788" max="85323"/>
+		</element>
 	</view>
 </mamelayout>

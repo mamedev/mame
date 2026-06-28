@@ -294,7 +294,7 @@ void kbash_state::kbash(machine_config &config)
 	audiocpu.p1_in_cb().set_ioport("JMPR").exor(0xff);
 	audiocpu.p2_out_cb().set_nop();  // bit 0 is FAULT according to kbash schematic
 
-	TOAPLAN_COINCOUNTER(config, "coincounter", 0);
+	TOAPLAN_COINCOUNTER(config, "coincounter");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

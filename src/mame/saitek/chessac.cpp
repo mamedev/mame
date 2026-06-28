@@ -35,6 +35,8 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
+#include <bit>
+
 // internal artwork
 #include "mephisto_schachak.lh"
 #include "saitek_chessac.lh"
@@ -57,8 +59,8 @@ public:
 		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
-	void chessac(machine_config &config);
-	void schachak(machine_config &config);
+	void chessac(machine_config &config) ATTR_COLD;
+	void schachak(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(go_button);
 
@@ -107,8 +109,6 @@ private:
 
 void chessac_state::machine_start()
 {
-	m_out_lcd.resolve();
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_lcd_segs));
@@ -163,7 +163,7 @@ void chessac_state::update_lcd()
 	for (int i = 0; i < 2; i++)
 	{
 		// LCD common is analog (voltage level)
-		const u8 com = population_count_32(m_lcd_com >> (i * 2) & 3);
+		const u8 com = std::popcount(m_lcd_com >> (i * 2) & 3U);
 		const u32 data = (com == 0) ? lcd_segs : (com == 2) ? ~lcd_segs : 0;
 		m_lcd_pwm->write_row(i, data);
 	}

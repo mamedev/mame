@@ -253,8 +253,6 @@ private:
 
 void spaceg_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_clatch));
 	save_item(NAME(m_platch));
 	save_item(NAME(m_shift));

@@ -246,6 +246,13 @@ static INPUT_PORTS_START( lexiseal )
 	PORT_BIT( 0xfffc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( pokermor )
+	PORT_INCLUDE(lexiseal)
+
+	PORT_MODIFY("P3")
+	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_UNUSED ) // rapid fire buttons function, but don't exist on hardware
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( cybrtvbb )
 	PORT_INCLUDE( lexiseal )
 
@@ -332,7 +339,7 @@ void spg2xx_cybrtvbb_game_state::cybrtvbb(machine_config &config)
 	m_maincpu->portc_out().set(FUNC(spg2xx_cybrtvbb_game_state::portc_w));
 
 	// cybrtvfe has a position for this too, but it's unpopulated
-	I2C_24C02(config, "i2cmem", 0);
+	I2C_24C02(config, "i2cmem");
 }
 
 void spg2xx_lexizeus_game_state::lexizeus(machine_config &config)
@@ -404,6 +411,11 @@ void spg2xx_vsplus_game_state::init_vsplus()
 ROM_START( lexizeus )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "lexibook1g900us.bin", 0x0000, 0x800000, CRC(c2370806) SHA1(cbb599c29c09b62b6a9951c724cd9fc496309cf9))
+ROM_END
+
+ROM_START( pokermor )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "29dl640e.u3", 0x000000, 0x800000, CRC(2f3cad70) SHA1(45e89eb948e4e84637f84427bfd1ab47c3637447) )
 ROM_END
 
 ROM_START( arcade3d )
@@ -519,7 +531,10 @@ ROM_END
 
 CONS( 200?, lexizeus,    0,     0,        lexizeus,     lexizeus, spg2xx_lexizeus_game_state, init_zeus, "Lexibook / JungleTac", "Zeus IG900 20-in-1 (US?)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad sound and some corrupt bg tilemap entries in Tiger Rescue, verify ROM data (same game runs in Zone 60 without issue)
 
-CONS( 200?, arcade3d,    0,     0,        lexizeus,     lexiseal, spg2xx_lexizeus_game_state, init_zeus, "Millennium 2000 GmbH / JungleTac", "Millennium Arcade 3D 15-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad sound and some corrupt bg tilemap entries in Tiger Rescue, verify ROM data (same game runs in Zone 60 without issue)
+CONS( 200?, arcade3d,    0,     0,        lexizeus,     lexiseal, spg2xx_lexizeus_game_state, init_zeus, "Millennium 2000 GmbH / JungleTac", "Millennium Arcade 3D 15-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// 2007.08.02 Rev 05 on PCB
+CONS( 2007, pokermor,    0,     0,        lexizeus,     pokermor, spg2xx_lexizeus_game_state, init_zeus, "SA.BI.NE trend", "Poker & More 18-in-1 (Germany)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) 
 
 CONS( 200?, vsplus,      0,     0,        vsplus,     vsplus, spg2xx_vsplus_game_state, init_vsplus, "<unknown> / JungleTac", "Vs Power Plus 30-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 

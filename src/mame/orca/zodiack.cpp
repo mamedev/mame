@@ -650,7 +650,7 @@ void zodiack_state::zodiack(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER).screen_vblank().set(FUNC(zodiack_state::vblank));
 
-	orca_ovg_40c_device &videopcb(ORCA_OVG_40C(config, "videopcb", 0));
+	orca_ovg_40c_device &videopcb(ORCA_OVG_40C(config, "videopcb"));
 	videopcb.set_screen("screen");
 
 	// sound hardware

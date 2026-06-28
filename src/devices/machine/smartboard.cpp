@@ -70,11 +70,22 @@ DEFINE_DEVICE_TYPE(TASC_SB30, tasc_sb30_device, "tasc_sb30", "Tasc SmartBoard SB
 tasc_sb30_device::tasc_sb30_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, TASC_SB30, tag, owner, clock)
 	, m_board(*this, "board")
-	, m_out_leds(*this, "sb30_led_%u.%u", 0U, 0U)
+	, m_out_leds()
 	, m_conf(*this, "CONF")
 	, m_data_out(*this)
 	, m_led_out(*this)
 { }
+
+
+//-------------------------------------------------
+//  device_config_complete
+//-------------------------------------------------
+
+void tasc_sb30_device::device_config_complete()
+{
+	if (m_led_out.isunset())
+		m_out_leds.emplace(*this, "sb30_led_%u.%u", 0U, 0U);
+}
 
 
 //-------------------------------------------------
@@ -83,9 +94,6 @@ tasc_sb30_device::tasc_sb30_device(const machine_config &mconfig, const char *ta
 
 void tasc_sb30_device::device_start()
 {
-	if (m_led_out.isunset())
-		m_out_leds.resolve();
-
 	// zerofill
 	m_data0 = 0;
 	m_data1 = 0;
@@ -301,7 +309,7 @@ void tasc_sb30_device::data0_w(int state)
 		{
 			// output board led(s)
 			if (m_led_out.isunset())
-				m_out_leds[m_pos & 7][m_pos >> 3 & 7] = m_data1;
+				(*m_out_leds)[m_pos & 7][m_pos >> 3 & 7] = m_data1;
 			else
 				m_led_out(m_pos & 0x3f, m_data1);
 		}

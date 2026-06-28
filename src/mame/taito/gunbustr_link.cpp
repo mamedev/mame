@@ -13,12 +13,13 @@
   * Set Link Play to On, and set the ID Number to 0 for one instance
     and 1 for the other instance (it helps to have separate NVRAM
     directories for the two instances).
-  * Start one instance in listening mode by setting the comm_localhost
-    to the listening address and comm_remotehost to an empty string.
+  * Start one instance in listening mode by setting comm_localhost to
+    the listening address and comm_remotehost to an empty string.
   * Start the other instance in connecting mode by setting
     comm_remotehost to the address to connect to (you should probably
-    set comm_localhost to an empty string, but if you set it, the
-    connecting socket will be bound to this address).
+    set comm_localhost to an empty string, but if you set it to
+    something else, the connecting socket will be bound to this
+    address).
   * Reset the two instances at approximately the same time, it may
     help to reset the instance with ID 0 slightly before resetting the
     instance with ID 1.
@@ -27,19 +28,20 @@
   mame gunbustr -comm_localhost "" -comm_remotehost 127.0.0.1 -comm_remoteport 1234
 
   Note that this implementation only works for the protocol used by
-  the Gunbuster game.
+  the Gunbuster game.  Software that uses the shared RAM in a
+  different way will not work correctly.
 
   Communication uses a pair of MB8421 dual-port 2K*8 static RAMs, one
   on each game board.  The RAMs are connected to the most significant
-  byte of the data bus (D24-D31), corresponding to the least
-  significant byte (the CPU uses the big Endian convention).  The
+  byte of the data bus (D24-D31).  Dynamic bus sizing is used to
+  automatically pack/unpack word and long word reads and writes.  The
   system accesses the "right" port of its own RAM and the "left" port
   of the remote RAM.
 
   The link between boards is a simple shared address/data bus,
   carrying 11 address lines and 8 data lines, as well as CS, RW and
-  BUSY signals.  A GAL16V8 is used to generate the control signals and
-  arbitrate the shared address/data bus.
+  BUSY signals.  A GAL16V8 is used to generate the control signals for
+  the RAM and arbitrate access to the shared address/data bus.
 
   The protocol used by the game treats the first 512 bytes of RAM as a
   pair of 256-byte buffers.  The first buffer is used by the system
@@ -419,6 +421,7 @@ private:
 
 			m_pending_begin[buffer] = BUFFER_BYTES;
 			m_pending_end[buffer] = 0;
+			m_last_sent = buffer;
 		}
 
 		m_sending = true;
@@ -541,9 +544,9 @@ void gunbustr_link_device::handshake_w(u8 data)
 {
 	u8 &val = m_shared_ram[(Buffer * BUFFER_BYTES) + (BUFFER_BYTES - 3)];
 	if (BIT(data, 0) && !BIT(val, 0))
-		check_pending(Buffer ^ 1);
+		check_pending(Buffer ^ 1); // intent to read received data - check for pending updates
 	if (!BIT(data, 1) && BIT(val, 1) && m_context)
-		m_context->send_buffer(Buffer, 0, BUFFER_BYTES - 4);
+		m_context->send_buffer(Buffer, 0, BUFFER_BYTES - 4); // completed writing data - send to remote system
 	val = data;
 }
 
@@ -551,7 +554,7 @@ void gunbustr_link_device::handshake_w(u8 data)
 template <unsigned Buffer>
 u16 gunbustr_link_device::sense_r()
 {
-	check_pending(Buffer);
+	check_pending(Buffer); // check for pending updates before reading sense value
 	return get_u16be(&m_shared_ram[(Buffer * BUFFER_BYTES) + (BUFFER_BYTES - 2)]);
 }
 

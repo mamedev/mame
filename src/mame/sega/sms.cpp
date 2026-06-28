@@ -991,7 +991,7 @@ void gamegear_state::gamegear(machine_config &config)
 
 	SOFTWARE_LIST(config, "cart_list").set_original("gamegear");
 
-	GAMEGEAR_IO_PORT(config, m_gg_ioport, 0);
+	GAMEGEAR_IO_PORT(config, m_gg_ioport);
 	m_gg_ioport->set_in_handler(m_port_gg_ext, FUNC(sms_control_port_device::in_r));
 	m_gg_ioport->set_out_handler(m_port_gg_ext, FUNC(sms_control_port_device::out_w));
 	m_gg_ioport->hl_handler().set(FUNC(gamegear_state::gg_nmi));

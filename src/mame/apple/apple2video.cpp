@@ -46,27 +46,31 @@ a2_video_device::a2_video_device(const machine_config &mconfig, device_type type
 	, device_palette_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
 	, m_base_model(model::II)
-	, m_vidconfig(*this, "a2_video_config") {}
+	, m_vidconfig(*this, "a2_video_config")
+{
+}
 
 a2_video_device::a2_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a2_video_device(mconfig, APPLE2_VIDEO, tag, owner, clock) {}
+	: a2_video_device(mconfig, APPLE2_VIDEO, tag, owner, clock)
+{
+}
 
 a2_video_device_composite::a2_video_device_composite(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a2_video_device(mconfig, APPLE2_VIDEO_COMPOSITE, tag, owner, clock) {}
+	: a2_video_device(mconfig, APPLE2_VIDEO_COMPOSITE, tag, owner, clock)
+{
+}
 
 a2_video_device_composite_rgb::a2_video_device_composite_rgb(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a2_video_device(mconfig, APPLE2_VIDEO_COMPOSITE_RGB, tag, owner, clock) {}
+	: a2_video_device(mconfig, APPLE2_VIDEO_COMPOSITE_RGB, tag, owner, clock)
+{
+}
 
-ALLOW_SAVE_TYPE(a2_video_device::model);
 
 void a2_video_device::device_start()
 {
 	// initialise for device_palette_interface
 	init_palette();
 
-	save_item(NAME(m_base_model));
-	save_item(NAME(m_scanner_period));
-	save_item(NAME(m_delay_bias));
 	save_item(NAME(m_hgr2));
 	save_item(NAME(m_page2));
 	save_item(NAME(m_flash));
@@ -93,8 +97,8 @@ void a2_video_device::device_start()
 void a2_video_device::device_reset()
 {
 	// cache derived values for delayed updates
-	m_scanner_period = m_base_model == model::IIGS ? 16 : 14;
-	m_delay_bias = m_base_model == model::IIGS ? 0 : 1;
+	m_scanner_period = (m_base_model == model::IIGS) ? 16 : 14;
+	m_delay_bias = (m_base_model == model::IIGS) ? 0 : 1;
 
 	// Start in fullscreen hires if there is no character ROM. This is used
 	// by the superga2 and tk2000 drivers, which support no other modes.
@@ -123,42 +127,34 @@ and machine-specific ram_size bounds to the output address.
 */
 u16 a2_video_device::scanner_address(int h_clock, int v_clock)
 {
-	u16 address;
-
-	// vars
-	int Hires, Mixed, Page2,
-		h_state, h_0, h_1, h_2, h_3, h_4, h_5,
-		v_state, v_A, v_B, v_C, v_0, v_1, v_2, v_3, v_4,
-		addend0, addend1, addend2, sum;
-
 	// machine state switches
-	Hires = (m_hires && m_graphics) ? 1 : 0;
-	Mixed = m_mix ? 1 : 0;
-	Page2 = use_page_2() ? 1 : 0;
+	int Hires = (m_hires && m_graphics) ? 1 : 0;
+	int const Mixed = m_mix ? 1 : 0;
+	int const Page2 = use_page_2() ? 1 : 0;
 
 	// calculate horizontal scanning state
-	h_state = h_clock - (h_clock > 0); // two 0 states: [0, 0...63]
-	h_0 = (h_state >> 0) & 1; // get horizontal state bits
-	h_1 = (h_state >> 1) & 1;
-	h_2 = (h_state >> 2) & 1;
-	h_3 = (h_state >> 3) & 1;
-	h_4 = (h_state >> 4) & 1;
-	h_5 = (h_state >> 5) & 1;
+	int const h_state = h_clock - (h_clock > 0); // two 0 states: [0, 0...63]
+	int const h_0 = BIT(h_state, 0); // get horizontal state bits
+	int const h_1 = BIT(h_state, 1);
+	int const h_2 = BIT(h_state, 2);
+	int const h_3 = BIT(h_state, 3);
+	int const h_4 = BIT(h_state, 4);
+	int const h_5 = BIT(h_state, 5);
 
 	// calculate vertical scanning state
-	v_state = 256 + v_clock; // V[543210CBA] = 100000000
+	int v_state = 256 + v_clock; // V[543210CBA] = 100000000
 	if (v_clock >= 256) // vertical overflow
 	{
 		v_state -= screen().height(); // compensate for preset
 	}
-	v_A = (v_state >> 0) & 1; // get vertical state bits
-	v_B = (v_state >> 1) & 1;
-	v_C = (v_state >> 2) & 1;
-	v_0 = (v_state >> 3) & 1;
-	v_1 = (v_state >> 4) & 1;
-	v_2 = (v_state >> 5) & 1;
-	v_3 = (v_state >> 6) & 1;
-	v_4 = (v_state >> 7) & 1;
+	int const v_A = BIT(v_state, 0); // get vertical state bits
+	int const v_B = BIT(v_state, 1);
+	int const v_C = BIT(v_state, 2);
+	int const v_0 = BIT(v_state, 3);
+	int const v_1 = BIT(v_state, 4);
+	int const v_2 = BIT(v_state, 5);
+	int const v_3 = BIT(v_state, 6);
+	int const v_4 = BIT(v_state, 7);
 
 	// calculate scanning memory address
 	if (Hires && Mixed && v_4 && v_2)
@@ -166,11 +162,12 @@ u16 a2_video_device::scanner_address(int h_clock, int v_clock)
 		Hires = 0; // address is in text memory for mixed hires
 	}
 
-	addend0 = 0x0D; // 1            1            0            1
-	addend1 =              (h_5 << 2) | (h_4 << 1) | (h_3 << 0);
-	addend2 = (v_4 << 3) | (v_3 << 2) | (v_4 << 1) | (v_3 << 0);
-	sum     = (addend0 + addend1 + addend2) & 0x0F;
+	int const addend0 = 0x0d; // 1            1            0            1
+	int const addend1 =              (h_5 << 2) | (h_4 << 1) | (h_3 << 0);
+	int const addend2 = (v_4 << 3) | (v_3 << 2) | (v_4 << 1) | (v_3 << 0);
+	int const sum     = (addend0 + addend1 + addend2) & 0x0f;
 
+	u16 address;
 	address  = h_0 << 0; // a0
 	address |= h_1 << 1; // a1
 	address |= h_2 << 2; // a2
@@ -265,7 +262,7 @@ void a2_video_device::res_w(int state)
 	if (m_hires != state)
 	{
 		// select lo-res or hi-res
-		delayed_update(m_base_model == model::IIGS ? 1 : 2);
+		delayed_update((m_base_model == model::IIGS) ? 1 : 2);
 		m_hires = state;
 	}
 }
@@ -349,7 +346,7 @@ void a2_video_device::set_GS_border(u8 border)
 void a2_video_device::set_newvideo(u8 newvideo)
 {
 	// select super hi-res and monochrome modes
-	if ((m_newvideo & 0xA0) != (newvideo & 0xA0))
+	if ((m_newvideo & 0xa0) != (newvideo & 0xa0))
 		screen().update_now();
 	m_newvideo = newvideo;
 }
@@ -466,13 +463,13 @@ static uint8_t const artifact_color_lut[2][1<<7] = {
 // that's a lost cause anyway.
 {
 	0x00,0x00,0x00,0x00,0x88,0x00,0xcc,0x00,0x11,0x11,0x55,0x11,0x99,0x99,0xdd,0xff,
-	0x22,0x22,0x66,0x66,0xaa,0xaa,0xee,0xee,0x33,0x33,0x33,0x33,0xbb,0xbB,0xff,0xff,
+	0x22,0x22,0x66,0x66,0xaa,0xaa,0xee,0xee,0x33,0x33,0x33,0x33,0xbb,0xbb,0xff,0xff,
 	0x00,0x00,0x44,0x44,0xcc,0xcc,0xcc,0xcc,0x55,0x55,0x55,0x55,0x99,0x99,0xdd,0xff,
-	0x66,0x22,0x66,0x66,0xee,0xaa,0xee,0xee,0x77,0x77,0x77,0x77,0xff,0xfF,0xff,0xff,
+	0x66,0x22,0x66,0x66,0xee,0xaa,0xee,0xee,0x77,0x77,0x77,0x77,0xff,0xff,0xff,0xff,
 	0x00,0x00,0x00,0x00,0x88,0x88,0x88,0x88,0x11,0x11,0x55,0x11,0x99,0x99,0xdd,0x99,
-	0x00,0x22,0x66,0x66,0xaa,0xaa,0xaa,0xaa,0x33,0x33,0x33,0x33,0xbb,0xbB,0xff,0xff,
+	0x00,0x22,0x66,0x66,0xaa,0xaa,0xaa,0xaa,0x33,0x33,0x33,0x33,0xbb,0xbb,0xff,0xff,
 	0x00,0x00,0x44,0x44,0xcc,0xcc,0xcc,0xcc,0x11,0x11,0x55,0x55,0x99,0x99,0xdd,0xdd,
-	0x00,0x22,0x66,0x66,0xee,0xaa,0xee,0xee,0xff,0x33,0xff,0x77,0xff,0xfF,0xff,0xff,
+	0x00,0x22,0x66,0x66,0xee,0xaa,0xee,0xee,0xff,0x33,0xff,0x77,0xff,0xff,0xff,0xff,
 }};
 
 template <int ContextBits, typename F>
@@ -1018,8 +1015,8 @@ uint32_t a2_video_device::palette_entries() const noexcept
 uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// de-jitter clock drift; video scanner latches whole bytes
-	const int left = cliprect.left() & ~0xF;
-	const int right = (cliprect.right() + 1) & ~0xF; // inclusive bounds
+	const int left = cliprect.left() & ~0xf;
+	const int right = (cliprect.right() + 1) & ~0xf; // inclusive bounds
 	const bool shr = BIT(m_newvideo, 7);
 
 	const int beamy = cliprect.top();

@@ -8,7 +8,7 @@
 class specnext_vtest_device : public device_t
 {
 public:
-	specnext_vtest_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	specnext_vtest_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void set_raster_offset(u16 offset_h, u16 offset_v) { m_offset_h = offset_h; m_offset_v = offset_v; }
 
