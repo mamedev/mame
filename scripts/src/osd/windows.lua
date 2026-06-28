@@ -24,13 +24,17 @@ function maintargetosdoptions(_target,_subtarget)
 
 	if _OPTIONS["USE_SDL"] == "1" then
 		links {
-			"SDL2.dll",
+			"SDL2",
+			"imm32",
+			"version",
 		}
 	end
 
 	if _OPTIONS["USE_SDL3"] == "1" then
 		links {
-			"SDL3.dll",
+			"SDL3",
+			"imm32",
+			"version",
 		}
 	end
 
@@ -49,10 +53,10 @@ end
 
 newoption {
 	trigger = "USE_SDL",
-	description = "Enable SDL2 sound output",
+	description = "Enable SDL2 sound output and joystick input",
 	allowed = {
-		{ "0",  "Disable SDL2 sound output"  },
-		{ "1",  "Enable SDL2 sound output"   },
+		{ "0",  "Disable SDL2 sound/joystick"  },
+		{ "1",  "Enable SDL2 sound/joystick"   },
 	},
 }
 
@@ -62,10 +66,10 @@ end
 
 newoption {
 	trigger = "USE_SDL3",
-	description = "Enable SDL3 sound output",
+	description = "Enable SDL3 sound output and joystick input",
 	allowed = {
-		{ "0",  "Disable SDL3 sound output"  },
-		{ "1",  "Enable SDL3 sound output"   },
+		{ "0",  "Disable SDL3 sound/joystick"  },
+		{ "1",  "Enable SDL3 sound/joystick"   },
 	},
 }
 
