@@ -3,8 +3,10 @@
 
 #include "emu.h"
 #include "va_vco.h"
+#include "corefloat.h"
 
 #include <limits>
+
 
 va_vco_device::va_vco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: va_vco_device(mconfig, VA_VCO, tag, owner, clock)
@@ -36,6 +38,7 @@ va_vco_device::va_vco_device(const machine_config &mconfig, device_type type, co
 	, m_sync(false)
 	, m_sync_phase(0)
 	, m_sync_step(0)
+	, m_last_sample_time(attotime::zero)
 {
 }
 
@@ -148,15 +151,19 @@ attotime va_vco_device::ramp_time_to_thresh(float threshold)
 {
 	m_stream->update();
 
-	float remaining = 0.0F;
-	const float thresh_phase = (threshold - m_ramp_min) / (m_ramp_max - m_ramp_min);
-	if (m_phase < thresh_phase)
-		remaining = thresh_phase - m_phase;
-	else
-		remaining = 1.0F - m_phase + thresh_phase;
+	const float dt = float((machine().time() - m_last_sample_time).as_double());
+	assert(dt >= 0.0F);
 
-	const float t = remaining / m_freq;
-	return attotime::from_double(t);
+	const float osc_phase = fpmod1(m_phase + dt * m_freq);
+	const float thresh_phase = (threshold - m_ramp_min) / (m_ramp_max - m_ramp_min);
+
+	float remaining = 0.0F;
+	if (osc_phase < thresh_phase)
+		remaining = thresh_phase - osc_phase;
+	else
+		remaining = 1.0F - osc_phase + thresh_phase;
+
+	return attotime::from_double(remaining / m_freq);
 }
 
 void va_vco_device::device_start()
@@ -174,20 +181,7 @@ void va_vco_device::device_start()
 	save_item(NAME(m_sync));
 	save_item(NAME(m_sync_phase));
 	save_item(NAME(m_sync_step));
-}
-
-// A faster way to do fmod(x, 1.0F).
-static inline float fmod1f(float x)
-{
-	if (x < 0.0F || x >= 1.0F)
-		x -= floorf(x);
-	return x;
-}
-
-// Converts from [-1, 1] to [min_value, max_value]
-static inline float transform(float x, float min_value, float max_value)
-{
-	return (max_value - min_value) * (x + 1.0F) / 2.0F + min_value;
+	save_item(NAME(m_last_sample_time));
 }
 
 // Implementation is based on:
@@ -220,7 +214,7 @@ std::pair<float, float> va_vco_device::poly_blep_corrections(
 	{
 		const auto [phase, jump] = disc[i];
 		current += jump * poly_blep(phase);
-		next += jump * poly_blep(fmod1f(phase + m_step));
+		next += jump * poly_blep(fpmod1(phase + m_step));
 	}
 
 	return std::make_pair(current, next);
@@ -267,7 +261,7 @@ std::pair<float, float> va_vco_device::poly_blamp_corrections(
 		// Note that the signs are opposite of those in the reference (see
 		// poly_blamp()), because the triangle wave in the reference is inverted.
 		current += corner * poly_blamp(1.0F - phase);
-		next += corner * poly_blamp(fmod1f(phase + m_step));
+		next += corner * poly_blamp(fpmod1(phase + m_step));
 	}
 
 	return std::make_pair(current, next);
@@ -317,13 +311,13 @@ float va_vco_device::pulse_wave(float phase) const
 {
 	float wave = (phase < m_pw) ? 1.0F : -1.0F;  // [-1, 1]
 	if (m_pulse_dc_comp)
-		wave -= m_pw + m_pw - 1.0F;  // Between [-1, 1] and [-2, 2], depending on PW.
+		wave -= m_pw + m_pw - 1.0F;  // [-2, 2], see configure_pulse_dc_comp() usage doc.
 	return wave;
 }
 
 float va_vco_device::tripulse_wave(float phase) const
 {
-	// Between [-1, 1] and [-2, 2], depending on m_pulse_dc_comp and m_pw.
+	// Either [-1, 1] or [-2, 2], depending on m_pulse_dc_comp.
 	return pulse_wave(tripulse_reset_phase(phase));
 }
 
@@ -363,25 +357,25 @@ float va_vco_device::reset_phase(float osc_phase) const
 // Phase distance from the top of the triangle.
 float va_vco_device::tritop_phase(float osc_phase) const
 {
-	return fmod1f(osc_phase + 0.5F);
+	return fpmod1(osc_phase + 0.5F);
 }
 
 // Phase distance from the mid-pulse flip (downwards jump), for a ramp-derived pulse.
 float va_vco_device::pulse_flip_phase(float osc_phase) const
 {
-	return fmod1f(osc_phase + (1.0F - m_pw));
+	return fpmod1(osc_phase + (1.0F - m_pw));
 }
 
 // Phase distance from the reset (upward jump), for a triangle-derived pulse.
 float va_vco_device::tripulse_reset_phase(float osc_phase) const
 {
-	return fmod1f(osc_phase + 0.5F * m_pw);
+	return fpmod1(osc_phase + 0.5F * m_pw);
 }
 
 // Phase distance from a flip (downwards jump), for a triangle-derived pulse.
 float va_vco_device::tripulse_flip_phase(float osc_phase) const
 {
-	return fmod1f(osc_phase + 1.0F - 0.5F * m_pw);
+	return fpmod1(osc_phase + 1.0F - 0.5F * m_pw);
 }
 
 // Using the PolyBLEP (for ramp and pulse) and PolyBLAMP (for triangle)
@@ -467,16 +461,16 @@ void va_vco_device::sound_stream_update(sound_stream &stream)
 		if (sync_event.synced)
 		{
 			sync_event.sync_ttr = time_to_reset(m_sync_phase, m_sync_step);
-			sync_event.phase_at_sync = fmod1f(old_phase + sync_event.sync_ttr * m_step);
+			sync_event.phase_at_sync = fpmod1(old_phase + sync_event.sync_ttr * m_step);
 
 			if (m_sync_type == SYNC_TYPE_REVERSE)
 				sync_event.new_phase_at_sync = 1.0F - sync_event.phase_at_sync;  // Triangle core reversed slope.
 			else  // m_sync_type == SYNC_TYPE_RESET
 				sync_event.new_phase_at_sync = 0.0F;  // Saw or triangle core reset.
 
-			const float delta = fmod1f(sync_event.phase_at_sync - old_phase);
+			const float delta = fpmod1(sync_event.phase_at_sync - old_phase);
 			sync_event.sync_phase = 1.0F - delta;  // Distance from the sync discontinuity.
-			m_phase = fmod1f(sync_event.new_phase_at_sync - delta);  // Oscillator phase adjusted for sync.
+			m_phase = fpmod1(sync_event.new_phase_at_sync - delta);  // Oscillator phase adjusted for sync.
 			sync_event.synced_osc_phase = m_phase;
 		}
 
@@ -505,7 +499,7 @@ void va_vco_device::sound_stream_update(sound_stream &stream)
 			const float ramp = ramp_wave(old_phase) + m_ramp_correction + current_corr;
 			m_ramp_correction = next_corr;
 
-			stream.put(OUTPUT_RAMP, i, transform(ramp, m_ramp_min, m_ramp_max));
+			stream.put(OUTPUT_RAMP, i, fmaprange(ramp, m_ramp_min, m_ramp_max));
 		}
 
 		if (pulse_out)
@@ -580,7 +574,7 @@ void va_vco_device::sound_stream_update(sound_stream &stream)
 			pulse += m_pulse_correction + current_corr;
 			m_pulse_correction = next_corr;
 
-			stream.put(OUTPUT_PULSE, i, transform(pulse, m_pulse_min, m_pulse_max));
+			stream.put(OUTPUT_PULSE, i, fmaprange(pulse, m_pulse_min, m_pulse_max));
 		}
 
 		if (tri_out)
@@ -639,7 +633,7 @@ void va_vco_device::sound_stream_update(sound_stream &stream)
 					// The sync caused the triangle to change direction.
 					// Need to apply a polyBLAMP correction.
 					triangle += corner * poly_blamp(1.0F - sync_event.sync_phase);
-					m_tri_correction += corner * poly_blamp(fmod1f(sync_event.sync_phase + m_step));
+					m_tri_correction += corner * poly_blamp(fpmod1(sync_event.sync_phase + m_step));
 				}
 				else  // m_sync_type == SYNC_TYPE_RESET
 				{
@@ -647,16 +641,18 @@ void va_vco_device::sound_stream_update(sound_stream &stream)
 					// Need to apply a polyBLEP correction.
 					const float sync_jump = tri_wave(sync_event.new_phase_at_sync) - tri_wave(sync_event.phase_at_sync);
 					triangle += sync_jump * poly_blep(sync_event.sync_phase);
-					m_tri_correction += sync_jump * poly_blep(fmod1f(sync_event.sync_phase + m_step));
+					m_tri_correction += sync_jump * poly_blep(fpmod1(sync_event.sync_phase + m_step));
 				}
 			}
 
-			stream.put(OUTPUT_TRIANGLE, i, transform(triangle, m_tri_min, m_tri_max));
+			stream.put(OUTPUT_TRIANGLE, i, fmaprange(triangle, m_tri_min, m_tri_max));
 		}
 
-		m_phase = fmod1f(m_phase + m_step);
-		m_sync_phase = fmod1f(m_sync_phase + m_sync_step);
+		m_phase = fpmod1(m_phase + m_step);
+		m_sync_phase = fpmod1(m_sync_phase + m_sync_step);
 	}
+
+	m_last_sample_time = stream.end_time() - stream.sample_period();
 }
 
 DEFINE_DEVICE_TYPE(VA_VCO, va_vco_device, "va_vco", "Virtual Analog Oscillator")
