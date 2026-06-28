@@ -30,7 +30,7 @@ Other stuff: NEC D4992 (RTC?) and xtal possibly 32.768kHz, 3V coin battery, 93L4
 #include "emu.h"
 
 #include "cpu/sh/sh7042.h"
-#include "machine/eepromser.cpp"
+#include "machine/eepromser.h"
 #include "machine/upd4992.h"
 #include "sound/okim9810.h"
 
@@ -155,7 +155,7 @@ ROM_START( hideseek )
 	ROM_LOAD16_WORD_SWAP( "s29gl128n.u9", 0x3000000, 0x1000000,  CRC(a47ca14a) SHA1(3b4417fc421cee30a9ad0fd9319220a8dae32da2) ) // empty!
 
 
-	ROM_REGION( 0x1000000, "ymz", 0 )
+	ROM_REGION( 0x1000000, "oki", 0 )
 	ROM_LOAD( "s29gl128n.u4", 0x000000, 0x1000000, CRC(b8eb7cdb) SHA1(a90c70058e50f3369a6e517e0a534b9ef1e0087c) )
 ROM_END
 
