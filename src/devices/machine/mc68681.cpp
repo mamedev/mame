@@ -1428,18 +1428,31 @@ void duart_channel::rx_fifo_push(uint8_t data, uint8_t errors)
 
 void duart_channel::tra_complete()
 {
-	if (!(SR & STATUS_TRANSMITTER_READY))
+	// The transmit shift register has just emptied.  Decide the next state from
+	// whether another byte is queued in the THR, not from the current TxRDY bit.
+	//
+	// The previous code keyed off TxRDY:
+	//     if (!(SR & TxRDY)) { if (m_tx_data_in_buffer) load_next(); }
+	//     else               { SR |= TxEMT; }
+	// which could deadlock the transmitter on a race between a CPU THR write and
+	// the final bit-time of the byte in the shift register: (1) reaching here with
+	// TxRDY set and a byte buffered took the else branch and dropped the buffered
+	// byte; (2) reaching here with TxRDY clear and nothing buffered did nothing,
+	// leaving the transmitter idle with TxRDY and TxEMT both clear.  In either case
+	// TxRDY never re-asserts and the transmit clock stays stopped, so a byte never
+	// drains and a polled transmitter never completes.
+	if (m_tx_data_in_buffer)
 	{
-		if (m_tx_data_in_buffer)
-		{
-			transmit_register_setup(m_tx_data);
-			m_bits_transmitted = 0;
-			m_tx_data_in_buffer = false;
-		}
+		// another byte is queued in the THR: move it into the shift register
+		transmit_register_setup(m_tx_data);
+		m_bits_transmitted = 0;
+		m_tx_data_in_buffer = false;
 	}
 	else
 	{
-		SR |= STATUS_TRANSMITTER_EMPTY;
+		// nothing queued: the transmitter is idle, so report both THR empty
+		// (TxRDY) and shift register empty (TxEMT)
+		SR |= STATUS_TRANSMITTER_READY | STATUS_TRANSMITTER_EMPTY;
 		update_interrupts();
 	}
 }
