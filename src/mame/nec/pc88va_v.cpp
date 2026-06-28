@@ -1039,22 +1039,23 @@ void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 
-	// cannot wrap page boundaries (playfield)
-	const u32 base_page = param.fsa & 0x20000;
-	const u32 base_address = param.dsa & 0x1ffff;
+	const u32 base_address = param.dsa & 0x3ffff;
+	const u32 y_wrap = param.fbl - param.ofy;
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u32 line_offset = ((y - param.dsp) * param.fbw) + base_address;
+		const int y_latch = y - param.dsp;
+		const u32 latched_address = (y_latch >= y_wrap) ? (param.fsa + param.ofx - y_wrap * param.fbw) : base_address;
+		const u32 line_offset = (y_latch * param.fbw) + latched_address;
 
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
 			u16 x_char = (x >> 1);
-			u32 bitmap_offset = (line_offset + x_char - (param.ofx >> 6)) & 0x1ffff;
+			u32 bitmap_offset = (line_offset + x_char - (param.ofx >> 6)) & 0x3ffff;
 
 			for (int xi = 0; xi < 2; xi ++)
 			{
-				u8 color = (m_gvram[bitmap_offset | base_page] >> (xi ? 0 : 4)) & 0xf;
+				u8 color = (m_gvram[bitmap_offset] >> (xi ? 0 : 4)) & 0xf;
 
 				if(color && cliprect.contains(x + xi, y))
 					bitmap.pix(y, x + xi) = m_palette->pen(color + pal_base);
@@ -1089,25 +1090,26 @@ void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &c
 	}
 }
 
-// boomer
+// boomer gameplay
 void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param)
 {
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 
-	// cannot wrap page boundaries (jumping at start of level)
-	const u32 base_page = param.fsa & 0x20000;
-	const u32 base_address = param.dsa & 0x1ffff;
+	const u32 base_address = param.dsa & 0x3ffff;
+	const u32 y_wrap = param.fbl - param.ofy;
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u32 line_offset = (((y - param.dsp) * param.fbw) + base_address);
+		const int y_latch = y - param.dsp;
+		const u32 latched_address = (y_latch >= y_wrap) ? (param.fsa + param.ofx - y_wrap * param.fbw) : base_address;
+		const u32 line_offset = (y_latch * param.fbw) + latched_address;
 
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			u32 bitmap_offset = (line_offset + x - (param.ofx >> 6)) & 0x1ffff;
+			u32 bitmap_offset = (line_offset + x - (param.ofx >> 6)) & 0x3ffff;
 
-			uint32_t color = (m_gvram[bitmap_offset | base_page] & 0xff);
+			uint32_t color = (m_gvram[bitmap_offset] & 0xff);
 
 			// boomer suggests that transparency is calculated over just color = 0, may be settable?
 			// TODO: may not be clamped to palNbit
@@ -1761,11 +1763,11 @@ u16 pc88va_state::gfx_ctrl_r()
  * $10c Color Palette Mode Register / カラーパレットモードレジスタ
  *
  * --xx ---- ---- ---- BDM1/BDM0 color backdrop mode #
- * --00 ---- ---- ---- inner background color, outer transparent
- * --01 ---- ---- ---- inner transparent, outer background
- * --10 ---- ---- ---- inside/outside background color
- * --11 ---- ---- ---- inside/outside transparent
- *                     \- mode 0 only available on 24.8KHz monitor
+ * --00 ---- ---- ---- display background color, border transparent
+ * --01 ---- ---- ---- display transparent, border background color
+ * --10 ---- ---- ---- display/border background color
+ * --11 ---- ---- ---- display/border transparent
+ *                     \- only mode 0 available on 24.8KHz monitor
  * ---- ---x xx-- ---- PLTM2/PLTM1/PLTM0 color palette mode
  * ---- ---0 xx-- ---- <V1/V2 Modes, cfr. pmode in $32 and pm00 in $31)>
  * ---- ---1 00-- ---- use palette bank 0
