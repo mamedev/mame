@@ -65,6 +65,8 @@ void pc88va_state::video_start()
 	save_item(NAME(m_pltm));
 	save_item(NAME(m_pltp));
 
+	save_item(NAME(m_gntc));
+	save_item(NAME(m_gfx_transmask));
 	save_item(NAME(m_text_transpen));
 	save_item(NAME(m_text_transmask));
 	save_item(NAME(m_td));
@@ -155,6 +157,7 @@ bool pc88va_state::is_layer_scissored(int pri, int which)
 		case 2:
 			return actual_gmp > pri;
 		// All lower layers (+ current according to upo)
+		// TODO: boomer should also mask sprites, perhaps different between inner and outer?
 		case 3:
 			return actual_gmp <= pri;
 	}
@@ -521,7 +524,7 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	if(m_td == true)
 		return;
 
-	m_text_bitmap.fill(0, cliprect);
+	m_text_bitmap.fill(0x20, cliprect);
 
 	uint16_t const *const tvram = m_tvram;
 	uint8_t const *const kanji = memregion("kanji")->base();
@@ -839,7 +842,7 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		bitmap, cliprect, m_text_bitmap,
 		0, 0,
 		0x10000, 0, 0, m_vertical_magnify,
-		false, 0
+		false, 0x20
 	);
 }
 
@@ -897,8 +900,8 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 		, layer_pal_bank
 	);
 
-//  m_graphic_bitmap[which].fill(m_palette->pen(layer_pal_bank), cliprect);
-	m_graphic_bitmap[which].fill(0, cliprect);
+	// use the border color entry as a marker for not drawing
+	m_graphic_bitmap[which].fill(0x20, cliprect);
 
 	const int layer_inc = (!is_5bpp) + 1;
 	const int layer_fixed = is_5bpp + 1;
@@ -916,7 +919,7 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 		}
 
 		// on layer = 1 fsa is always 0x20000, cfr. shanghai
-		// (almost likely an HW quirk, described in the docs)
+		// (HW quirk, described in the docs)
 		// also animefrm swaps this with layer 2 (main canvas)
 		const u32 fsa = (layer_n == layer_fixed) ? 0x20000
 			: (fb_strip_regs[0x00 / 2] & 0xfffc) | ((fb_strip_regs[0x02 / 2] & 0x3) << 16);
@@ -929,7 +932,10 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 		const u8 x_dot_offs = fb_strip_regs[0x08 / 2];
 		const u16 ofx = fb_strip_regs[0x0a / 2] & 0x7fc;
 		const u16 ofy = fb_strip_regs[0x0c / 2] & 0x3ff;
-		const u32 dsa = ((fb_strip_regs[0x0e / 2] & 0xfffc) | ((fb_strip_regs[0x10 / 2] & 0x3) << 16));
+		// ... shanghai and olteus (title) wants DSA fixed at 0x20000 for layer = 1 as well
+		const u32 dsa = (layer_n == layer_fixed) ? 0x20000
+			: ((fb_strip_regs[0x0e / 2] & 0xfffc) | ((fb_strip_regs[0x10 / 2] & 0x3) << 16));
+
 		const u16 dsh = fb_strip_regs[0x12 / 2] & 0x1ff;
 		const u16 dsp = fb_strip_regs[0x16 / 2] & 0x1ff;
 
@@ -972,7 +978,7 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 		{
 			switch(gfx_ctrl & 3)
 			{
-				case 1: draw_packed_gfx_4bpp(m_graphic_bitmap[which], split_cliprect, params, layer_pal_bank); break;
+				case 1: draw_packed_gfx_4bpp(m_graphic_bitmap[which], split_cliprect, params, layer_pal_bank, which); break;
 				default:
 					popmessage("pc88va_v.cpp: unhandled %d GFX mode DM = 0 (Multiplane)", which);
 					break;
@@ -983,16 +989,16 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 			switch(gfx_ctrl & 3)
 			{
 				//case 0: draw_indexed_gfx_1bpp(bitmap, cliprect, dsa, layer_pal_bank); break;
-				case 1: draw_indexed_gfx_4bpp(m_graphic_bitmap[which], split_cliprect, params, layer_pal_bank); break;
+				case 1: draw_indexed_gfx_4bpp(m_graphic_bitmap[which], split_cliprect, params, layer_pal_bank, which); break;
 				case 2:
 					if (is_5bpp)
 					{
-						draw_packed_gfx_5bpp(m_graphic_bitmap[which], split_cliprect, params, layer_pal_bank);
+						draw_packed_gfx_5bpp(m_graphic_bitmap[which], split_cliprect, params, layer_pal_bank, which);
 					}
 					else
-						draw_direct_gfx_8bpp(m_graphic_bitmap[which], split_cliprect, params);
+						draw_direct_gfx_8bpp(m_graphic_bitmap[which], split_cliprect, params, which);
 					break;
-				case 3: draw_direct_gfx_rgb565(m_graphic_bitmap[which], split_cliprect, params); break;
+				case 3: draw_direct_gfx_rgb565(m_graphic_bitmap[which], split_cliprect, params, which); break;
 				default:
 					popmessage("pc88va_v.cpp: unhandled %d GFX mode DM = 1 (Singleplane)", which);
 					break;
@@ -1000,17 +1006,16 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 		}
 	}
 
-	// TODO: primask_copyrozbitmap_trans
 	copyrozbitmap_trans(
 		bitmap, cliprect, m_graphic_bitmap[which],
 		0, 0,
 		pixel_size, 0, 0, line_size,
-		false, 0
+		false, 0x20
 	);
 }
 
 // TODO: incomplete, no known cases yet
-void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base)
+void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which)
 {
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -1026,7 +1031,7 @@ void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &
 				uint32_t color = (m_gvram[bitmap_offset] >> (7 - xi)) & 1;
 				int res_x = x + xi;
 
-				if(color && cliprect.contains(res_x, y))
+				if(!m_gfx_transmask[which][color] && cliprect.contains(res_x, y))
 					bitmap.pix(y, res_x) = m_palette->pen(color + pal_base);
 			}
 		}
@@ -1034,7 +1039,7 @@ void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &
 }
 
 // famista
-void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base)
+void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which)
 {
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
@@ -1057,7 +1062,7 @@ void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &
 			{
 				u8 color = (m_gvram[bitmap_offset] >> (xi ? 0 : 4)) & 0xf;
 
-				if(color && cliprect.contains(x + xi, y))
+				if(!m_gfx_transmask[which][color] && cliprect.contains(x + xi, y))
 					bitmap.pix(y, x + xi) = m_palette->pen(color + pal_base);
 			}
 		}
@@ -1065,7 +1070,7 @@ void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &
 }
 
 // animefrm
-void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base)
+void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which)
 {
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
@@ -1084,6 +1089,7 @@ void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &c
 
 			u8 color = m_gvram[bitmap_offset] & 0x1f;
 
+			// TODO: how transmask works with this?
 			if(color && cliprect.contains(x, y))
 				bitmap.pix(y, x) = m_palette->pen(color);
 		}
@@ -1091,7 +1097,7 @@ void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &c
 }
 
 // boomer gameplay
-void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param)
+void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 which)
 {
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
@@ -1111,7 +1117,8 @@ void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &c
 
 			uint32_t color = (m_gvram[bitmap_offset] & 0xff);
 
-			// boomer suggests that transparency is calculated over just color = 0, may be settable?
+			// TODO: how transmask works with this?
+			// boomer suggests that transparency is calculated over just color = 0, perhaps color & 0xf?
 			// TODO: may not be clamped to palNbit
 			if(color && cliprect.contains(x, y))
 			{
@@ -1124,7 +1131,7 @@ void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &c
 	}
 }
 
-void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param)
+void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 which)
 {
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
@@ -1142,6 +1149,7 @@ void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle 
 
 			uint16_t color = (m_gvram[bitmap_offset] & 0xff) | (m_gvram[bitmap_offset + 1] << 8);
 
+			// TODO: again transmask
 			if(cliprect.contains(x, y))
 			{
 				u8 b = pal5bit((color & 0x001f));
@@ -1154,7 +1162,7 @@ void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle 
 }
 
 // all inufuto games, alantia
-void pc88va_state::draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base)
+void pc88va_state::draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which)
 {
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
@@ -1179,7 +1187,7 @@ void pc88va_state::draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &c
 				for (int bank_num = 0; bank_num < num_banks; bank_num ++)
 					color |= ((m_gvram[bitmap_offset + bank_num * 0x10000] >> (7 - xi)) & 1) << bank_num;
 
-				if(color && cliprect.contains(x + xi, y))
+				if(!m_gfx_transmask[which][color] && cliprect.contains(x + xi, y))
 					bitmap.pix(y, x + xi) = m_palette->pen(color + pal_base);
 			}
 		}
@@ -1909,6 +1917,24 @@ void pc88va_state::color_code_w(offs_t offset, u8 data)
 	m_tscr = data >> 4;
 	m_gcf = data & 0xf;
 	LOG("I/O $111 Color Code %02x (TSCR %d GCF %d)\n", data, m_tscr, m_gcf);
+}
+
+/*
+ * $124 Graphics screen 0 Transparency / グラフィックススクリーン０の透明色レジスタ
+ * $126 Graphics screen 1 Transparency / グラフィックスクリーン１透明色レジスタ
+ *
+ * x--- ---- ---- ---- GnTC15 pen 15 (1) transparent (0) opaque
+ * -x-- ---- ---- ---- GnTC14 pen 14 ^
+ * ...
+ * ---- ---- ---- ---x GnTC1  pen 0 ^
+ */
+void pc88va_state::gfx_transpen_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	// - micromus wants pen 0x10 to be opaque (white sheet), sets 0 here
+	COMBINE_DATA(&m_gntc[offset]);
+	// cache
+	for (int i = 0; i < 16; i++)
+		m_gfx_transmask[offset][i] = BIT(m_gntc[offset], i);
 }
 
 

@@ -605,11 +605,12 @@ void pc88va_state::io_map(address_map &map)
 	map(0x010a, 0x010b).w(FUNC(pc88va_state::picture_mask_mode_w));
 	map(0x010c, 0x010d).w(FUNC(pc88va_state::color_mode_w));
 	map(0x010e, 0x010f).w(FUNC(pc88va_state::backdrop_color_w));
+//  map(0x0110, 0x0111) Color Code/Plain Mask Register
 	map(0x0110, 0x0110).w(FUNC(pc88va_state::plain_mask_w));
 	map(0x0111, 0x0111).w(FUNC(pc88va_state::color_code_w));
-//  map(0x0110, 0x0111) Color Code/Plain Mask Register
-//  map(0x0124, 0x0125) ? (related to Transparent Color of Graphic Screen 0)
-//  map(0x0126, 0x0127) ? (related to Transparent Color of Graphic Screen 1)
+//  map(0x0124, 0x0125) Graphic Screen 0 Transparency Register
+//  map(0x0126, 0x0127) Graphic Screen 1 Transparency Register
+	map(0x0124, 0x0127).w(FUNC(pc88va_state::gfx_transpen_w));
 	map(0x012e, 0x012f).w(FUNC(pc88va_state::text_transpen_w));
 	map(0x0130, 0x0137).w(FUNC(pc88va_state::picture_mask_w));
 	map(0x0142, 0x0142).rw(FUNC(pc88va_state::idp_status_r), FUNC(pc88va_state::idp_command_w)); //Text Controller (IDP) - (R) Status (W) command

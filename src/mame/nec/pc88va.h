@@ -184,6 +184,8 @@ private:
 	u16 m_color_mode;
 	u8 m_pltm, m_pltp;
 
+	u16 m_gntc[2];
+	u8 m_gfx_transmask[2][16];
 	u16 m_text_transpen;
 	u8 m_text_transmask[16];
 	bool m_td;
@@ -237,6 +239,7 @@ private:
 	void backdrop_color_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void plain_mask_w(offs_t offset, u8 data);
 	void color_code_w(offs_t offset, u8 data);
+	void gfx_transpen_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void color_mode_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void text_transpen_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void text_control_1_w(u8 data);
@@ -266,13 +269,13 @@ private:
 		u16 fbl;
 	};
 
-	void draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base);
-	void draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base);
-	void draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param);
-	void draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param);
+	void draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which);
+	void draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which);
+	void draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 which);
+	void draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 which);
 
-	void draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base);
-	void draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base);
+	void draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which);
+	void draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which);
 
 	uint32_t calc_kanji_rom_addr(uint8_t jis1, uint8_t jis2, int x, int y);
 	void draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
