@@ -22,6 +22,7 @@ public:
 	void evolhh(machine_config &config) ATTR_COLD;
 	void smkatsum(machine_config &config) ATTR_COLD;
 	void buttdtct(machine_config &config) ATTR_COLD;
+	void yuleyuan(machine_config &config) ATTR_COLD;
 	void udrive(machine_config &config) ATTR_COLD;
 
 	void init_yuleyuan();
@@ -36,9 +37,10 @@ private:
 
 	void evolution_map(address_map &map) ATTR_COLD;
 	void evolution_ram_map(address_map &map) ATTR_COLD;
-	void smkatsum_map(address_map &map) ATTR_COLD;
+	void snc7001a_map(address_map &map) ATTR_COLD;
 	void smkatsum_ram_map(address_map &map) ATTR_COLD;
 	void buttdtct_ram_map(address_map &map) ATTR_COLD;
+	void snc7648s_map(address_map &map) ATTR_COLD;
 	void udrive_map(address_map &map) ATTR_COLD;
 	void udrive_ram_map(address_map &map) ATTR_COLD;
 };
@@ -74,9 +76,10 @@ void evolution_handheldgame_state::evolution_ram_map(address_map &map)
 	map(0x400000, 0x5fffff).rom().region("maincpu", 0);
 }
 
-void evolution_handheldgame_state::smkatsum_map(address_map &map)
+void evolution_handheldgame_state::snc7001a_map(address_map &map)
 {
-	map(0x000000, 0x3fffff).rom().mirror(0x400000).region("maincpu", 0);
+	map(0x000000, 0x007fff).rom().region("maincpu", 0); // supposedly RAM, "boot from external flash, only one time after IC reset"
+	map(0x400000, 0x7fffff).rom().region("maincpu", 0);
 }
 
 void evolution_handheldgame_state::smkatsum_ram_map(address_map &map)
@@ -87,6 +90,12 @@ void evolution_handheldgame_state::smkatsum_ram_map(address_map &map)
 void evolution_handheldgame_state::buttdtct_ram_map(address_map &map)
 {
 	map(0x000000, 0x003fff).ram();
+}
+
+void evolution_handheldgame_state::snc7648s_map(address_map &map)
+{
+	map(0x000000, 0x00bfff).rom().region("maincpu", 0); // supposedly RAM, "boot from external flash, only one time after IC reset"
+	map(0x400000, 0x7fffff).rom().region("maincpu", 0);
 }
 
 void evolution_handheldgame_state::udrive_map(address_map &map)
@@ -125,7 +134,7 @@ void evolution_handheldgame_state::smkatsum(machine_config &config)
 {
 	evolhh(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &evolution_handheldgame_state::smkatsum_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &evolution_handheldgame_state::snc7001a_map);
 	m_maincpu->set_addrmap(AS_DATA, &evolution_handheldgame_state::smkatsum_ram_map);
 }
 
@@ -134,6 +143,13 @@ void evolution_handheldgame_state::buttdtct(machine_config &config)
 	smkatsum(config);
 
 	m_maincpu->set_addrmap(AS_DATA, &evolution_handheldgame_state::buttdtct_ram_map);
+}
+
+void evolution_handheldgame_state::yuleyuan(machine_config &config)
+{
+	smkatsum(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &evolution_handheldgame_state::snc7648s_map);
 }
 
 void evolution_handheldgame_state::udrive(machine_config &config)
@@ -248,7 +264,7 @@ CONS( 201?, tomyspt,     0,       0,      smkatsum, evolhh, evolution_handheldga
 CONS( 201?, hoppech,     0,       0,      smkatsum, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Hoppe-chan SuiColle (white, Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // 星座电子宠物机 (virtual pet by 育乐元)
-CONS( 2022, yuleyuan,    0,       0,      smkatsum, evolhh, evolution_handheldgame_state, init_yuleyuan, "Yule Yuan", "Xingzuo Dianzi Chongwu Ji", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // dumped from yellow model
+CONS( 2022, yuleyuan,    0,       0,      yuleyuan, evolhh, evolution_handheldgame_state, init_yuleyuan, "Yule Yuan", "Xingzuo Dianzi Chongwu Ji", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // dumped from yellow model
 
 // this uses TV output, rather than being a handheld
 // SONIX SNT110FG SoC, test mode shows '4941' as checksum
