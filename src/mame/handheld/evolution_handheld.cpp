@@ -154,7 +154,7 @@ void evolution_handheldgame_state::udrive_ram_map(address_map &map)
 
 void evolution_handheldgame_state::evolhh(machine_config &config)
 {
-	SONIX16(config, m_maincpu, XTAL(16'000'000));
+	SNL320(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &evolution_handheldgame_state::evolution_map);
 	m_maincpu->set_addrmap(AS_DATA, &evolution_handheldgame_state::evolution_ram_map);
 
@@ -172,6 +172,7 @@ void evolution_handheldgame_state::smkatsum(machine_config &config)
 {
 	evolhh(config);
 
+	SNC7001A(config.replace(), m_maincpu, 16'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &evolution_handheldgame_state::snc7001a_map);
 	m_maincpu->set_addrmap(AS_DATA, &evolution_handheldgame_state::smkatsum_ram_map);
 }
@@ -180,6 +181,7 @@ void evolution_handheldgame_state::yuleyuan(machine_config &config)
 {
 	evolhh(config);
 
+	SNC7648S(config.replace(), m_maincpu, 16'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &evolution_handheldgame_state::snc7648s_map);
 	m_maincpu->set_addrmap(AS_DATA, &evolution_handheldgame_state::yuleyuan_ram_map);
 }
@@ -188,13 +190,14 @@ void evolution_handheldgame_state::udrive(machine_config &config)
 {
 	evolhh(config);
 
+	SNT110(config.replace(), m_maincpu, 16'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &evolution_handheldgame_state::udrive_map);
 	m_maincpu->set_addrmap(AS_DATA, &evolution_handheldgame_state::udrive_ram_map);
 }
 
 ROM_START( evolhh )
 	ROM_REGION16_LE( 0x20000, "bootstrap", 0 )
-	ROM_LOAD( "bootstrap.bin", 0x00000, 0x20000, NO_DUMP ) // precise extent unknown
+	ROM_LOAD( "snl320_internal.bin", 0x00000, 0x20000, NO_DUMP )
 	ROM_FILL( 0x00000, 1, 0x40 )
 	ROM_FILL( 0x00001, 1, 0xfe )
 	ROM_FILL( 0x00002, 1, 0x04 )

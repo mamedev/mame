@@ -7,17 +7,22 @@
     Instruction timings are undocumented, and the timings currently used
     are probably very far from accurate.
 
+    No variant-specific features are emulated yet.
+
 ***************************************************************************/
 
 #include "emu.h"
 #include "sonix16.h"
 #include "sonix16d.h"
 
-// device type definition
-DEFINE_DEVICE_TYPE(SONIX16, sonix16_device, "sonix16", "Sonix 16-bit DSP")
+// device type definitions
+DEFINE_DEVICE_TYPE(SNL320, snl320_device, "snl320", "Sonix SNL320")
+DEFINE_DEVICE_TYPE(SNC7001A, snc7001a_device, "snc7001a", "Sonix SNC7001A")
+DEFINE_DEVICE_TYPE(SNC7648S, snc7648s_device, "snc7648s", "Sonix SNC7648S")
+DEFINE_DEVICE_TYPE(SNT110, snt110_device, "snt110", "Sonix SNT110")
 
-sonix16_device::sonix16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: cpu_device(mconfig, SONIX16, tag, owner, clock)
+sonix16_device::sonix16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_rom_config("rom", ENDIANNESS_LITTLE, 16, 24, -1)
 	, m_ram_config("ram", ENDIANNESS_LITTLE, 16, 24, -1)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 7, -1, address_map_constructor(FUNC(sonix16_device::io_map), this))
@@ -30,6 +35,26 @@ sonix16_device::sonix16_device(const machine_config &mconfig, const char *tag, d
 	std::fill(std::begin(m_ir), std::end(m_ir), 0);
 	std::fill(std::begin(m_ixbk), std::end(m_ixbk), 0);
 	std::fill(std::begin(m_ixbkram), std::end(m_ixbkram), 0);
+}
+
+snl320_device::snl320_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: sonix16_device(mconfig, SNL320, tag, owner, clock)
+{
+}
+
+snc7001a_device::snc7001a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: sonix16_device(mconfig, SNC7001A, tag, owner, clock)
+{
+}
+
+snc7648s_device::snc7648s_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: sonix16_device(mconfig, SNC7648S, tag, owner, clock)
+{
+}
+
+snt110_device::snt110_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: sonix16_device(mconfig, SNT110, tag, owner, clock)
+{
 }
 
 std::unique_ptr<util::disasm_interface> sonix16_device::create_disassembler()
