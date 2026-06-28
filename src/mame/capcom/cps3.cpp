@@ -87,6 +87,7 @@ Street Fighter III: New Generation                         SF3972A0F  CP3000U0G 
 
 Street Fighter III 2nd Impact: Giant Attack          1997  3GA97a00F  CP300000G  JAPAN   X          CAP-3GA000  CAP-3GA000  CAP-3GA-1    970930
 Street Fighter III 2nd Impact: Giant Attack                3GA97a00F  CP300000G  JAPAN   X          CAP-3GA000  ?           ?            971016*
+Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000C0G  ASIA    X                                               970930
 Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000C0G  ASIA        X                                           970930
 Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000C0G  ASIA        X                                           971016*
 Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000H0G  MEXICO  X          CAP-3GA0A0  CAP-3GA000  CAP-3GA-1    970930
@@ -2660,6 +2661,14 @@ ROM_START( sfiii2 )
 	DISK_IMAGE_READONLY( "cap-3ga000", 0, SHA1(a0c11a5c3057dc1ad3962aa38adf95acb3430bec) )
 ROM_END
 
+ROM_START( sfiii2a )
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
+	ROM_LOAD( "sfiii2_asia.29f400.u2", 0x000000, 0x080000, CRC(4518d589) SHA1(43dba305c1b630e0ee51697b6802109ebb8268b5) )
+
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "cap-3ga000", 0, SHA1(a0c11a5c3057dc1ad3962aa38adf95acb3430bec) )
+ROM_END
+
 ROM_START( sfiii2j )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii2_japan.29f400.u2", 0x000000, 0x080000, CRC(faea0a3e) SHA1(a03cd63bcf52e4d57f7a598c8bc8e243694624ec) )
@@ -4387,6 +4396,7 @@ GAME( 1997, sfiiina,     sfiii,    sfiii,    cps3,      cps3_state, init_sfiii, 
 GAMEL(1997, sfiii2,      0,        sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (USA 970930)", MACHINE_SUPPORTS_SAVE, layout_sfiii2 ) // layout is for widescreen support
 GAMEL(1997, sfiii2j,     sfiii2,   sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Japan 970930)", MACHINE_SUPPORTS_SAVE, layout_sfiii2 )
 GAMEL(1997, sfiii2h,     sfiii2,   sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Hispanic 970930)", MACHINE_SUPPORTS_SAVE, layout_sfiii2 )
+GAMEL(1997, sfiii2a,     sfiii2,   sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Asia 970930)", MACHINE_SUPPORTS_SAVE, layout_sfiii2 )
 GAMEL(1997, sfiii2n,     sfiii2,   sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Asia 970930, NO CD)", MACHINE_SUPPORTS_SAVE, layout_sfiii2 )
 
 /* JoJo's Venture / JoJo no Kimyou na Bouken */
