@@ -36,18 +36,15 @@
 
 #pragma once
 
+#include "x820kb.h"
 
-class xerox_lpk_device : public device_t
+
+class xerox_lpk_device : public xerox820_keyboard_device
 {
 public:
 	xerox_lpk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	auto kbstb_wr_callback() { return m_kbstb_cb.bind(); }
-
-	// interface-compatible with xerox_820_keyboard_device so the driver can
-	// read the latched byte the same way
-	uint8_t read() { return m_bus; }
-	void set_xerox820ii(bool state) { } // no-op; kept for wiring symmetry
+	virtual uint8_t read() override { return m_bus; }
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -64,10 +61,14 @@ private:
 
 	static constexpr int MATRIX_ROWS = 8;
 
+	TIMER_CALLBACK_MEMBER(scan_tick);
+
+	void queue(uint8_t b);
+	void send_key(uint8_t scancode, bool make, bool shift, bool ctrl);
+	uint8_t modifiers(bool shift, bool ctrl) const;
+
 	required_ioport_array<MATRIX_ROWS> m_rows;
 	ioport_value m_state[MATRIX_ROWS];
-
-	devcb_write_line m_kbstb_cb;
 
 	uint8_t m_bus;          // current byte presented to the host
 	bool    m_lock;         // local LOCK toggle state
@@ -78,12 +79,6 @@ private:
 	int     m_fifo_head, m_fifo_tail;
 
 	emu_timer *m_scan_timer; // polls the matrix + paces the FIFO
-
-	TIMER_CALLBACK_MEMBER(scan_tick);
-
-	void queue(uint8_t b);
-	void send_key(uint8_t scancode, bool make, bool shift, bool ctrl);
-	uint8_t modifiers(bool shift, bool ctrl) const;
 };
 
 DECLARE_DEVICE_TYPE(XEROX_LPK, xerox_lpk_device)

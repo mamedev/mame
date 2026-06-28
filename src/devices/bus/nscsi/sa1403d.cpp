@@ -99,6 +99,23 @@ nscsi_sa1403d_device::nscsi_sa1403d_device(const machine_config &mconfig, device
 	m_cfg_type[3] = SA1004;
 }
 
+
+//**************************************************************************
+//  nscsi_sa1403d_rgd5_device - Xerox 16/8 5.25" rigid disk unit complement
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(SA1403D_RGD5, nscsi_sa1403d_rgd5_device, "sa1403d_rgd5", "Shugart SA1403D (Xerox 5.25\" rigid disk unit)")
+
+nscsi_sa1403d_rgd5_device::nscsi_sa1403d_rgd5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nscsi_sa1403d_device(mconfig, SA1403D_RGD5, tag, owner, clock)
+{
+	set_drive_type(0, SA450);
+	set_drive_type(1, SA450);
+	set_drive_type(2, SA450);   // D: -- connector defaults empty (two-drive units)
+	set_drive_type(3, RIGID5);
+}
+
+
 static void sa1403d_floppies(device_slot_interface &device)
 {
 	device.option_add("sa400", FLOPPY_525_SSSD_35T);

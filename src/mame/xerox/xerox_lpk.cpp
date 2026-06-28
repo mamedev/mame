@@ -116,9 +116,8 @@ INPUT_PORTS_END
 
 
 xerox_lpk_device::xerox_lpk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, XEROX_LPK, tag, owner, clock),
+	xerox820_keyboard_device(mconfig, XEROX_LPK, tag, owner, clock),
 	m_rows(*this, "ROW%u", 0U),
-	m_kbstb_cb(*this),
 	m_bus(0xff),
 	m_lock(false),
 	m_fifo_head(0),

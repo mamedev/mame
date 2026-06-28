@@ -187,4 +187,17 @@ private:
 
 DECLARE_DEVICE_TYPE(NSCSI_SA1403D, nscsi_sa1403d_device)
 
+
+// The Xerox 16/8 5.25" rigid disk unit's controller: the same SA1403D with the
+// 5.25" drive complement (SA450 floppies on LUN 0-2; the advertised 10 MB
+// rigid -- exact drive model undetermined -- on LUN 3, presenting the
+// SA1004-compatible logical space the sdvr driver addresses).
+class nscsi_sa1403d_rgd5_device : public nscsi_sa1403d_device
+{
+public:
+	nscsi_sa1403d_rgd5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+DECLARE_DEVICE_TYPE(SA1403D_RGD5, nscsi_sa1403d_rgd5_device)
+
 #endif // MAME_BUS_NSCSI_SA1403D_H
