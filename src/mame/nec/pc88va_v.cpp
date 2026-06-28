@@ -326,6 +326,7 @@ inline u8 pc88va_state::get_layer_pal_bank(u8 which)
 	return (m_pltp == which) << 4;
 }
 
+// TODO: sprite drawing looks delayed one frame (famista newspaper)
 void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// punt if we are under SPROFF
@@ -385,14 +386,22 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 			spr_count = 0;
 
+			// untested, assume same as below
+			if (yp + ysize > 511)
+			{
+				ysize -= (0x200 - yp);
+				yp = 0;
+			}
+
 			for(int y_i = 0; y_i < ysize; y_i++)
 			{
+				int res_y = ((yp + y_i) & 0x1ff) << m_tsp.spr_mg;
+
 				for(int x_i = 0; x_i < xsize; x_i+=16)
 				{
 					for(int x_s = 0; x_s < 16; x_s++)
 					{
 						int res_x = (xp + x_i + x_s) & 0x3ff;
-						int res_y = (yp + y_i) << m_tsp.spr_mg;
 
 						const u32 data_offset = ((spda + spr_count) & 0xffff) / 2;
 						u8 pen = (bitswap<16>(tvram[data_offset],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15 - x_s)) & 1;
@@ -422,16 +431,24 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 			spr_count = 0;
 
+			// Hitting Y limits acts in a fun way as a form of vertical wraparound
+			// - famista sprite face on win/lose at newspaper screen when touching top edge
+			if (yp + ysize > 511)
+			{
+				ysize -= (0x200 - yp);
+				yp = 0;
+			}
+
 			for(int y_i = 0; y_i < ysize; y_i++)
 			{
+				int res_y = ((yp + y_i) & 0x1ff) << m_tsp.spr_mg;
+
 				for(int x_i = 0; x_i < xsize; x_i += 4)
 				{
 					for(int x_s = 0; x_s < 4; x_s ++)
 					{
 						// - shinraba player touching left edge of screen requires X wraparound
-						// - olteus doesn't want Y wraparound
 						int res_x = (xp + x_i + x_s) & 0x3ff;
-						int res_y = (yp + y_i) << m_tsp.spr_mg;
 
 						const u32 data_offset = ((spda + spr_count) & 0xffff) / 2;
 
@@ -1881,7 +1898,10 @@ void pc88va_state::plain_mask_w(offs_t offset, u8 data)
  *           1    ~ value: Sprite
  *           value+1 ~ 15: Text
  * ---- xxxx GCF Singleplane Graphic Foreground color for 1bpp mode
-*/
+ *
+ * TSCR is used for mixing IDP output with the two graphic layers.
+ * cfr. テキスト画面とスプライト画面の分離
+ */
 void pc88va_state::color_code_w(offs_t offset, u8 data)
 {
 	m_tscr = data >> 4;

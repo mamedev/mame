@@ -253,8 +253,9 @@ VIDEO.BAT has various superimpose effects, requires dedicated board
 		<notes><![CDATA[
 [SGP] playfield artifacts (press button 2 from pitcher side in 2p play)
 Lists dual port 1/2 as a unsupported [DE-9] input method
-Winning newspaper screen has [OFX/OFY] bug
-How to exit from attract mode once you enter it?
+Win/Lose newspaper screen has [OFX/OFY] bug, and an [IDP] one frame of sprite lag
+[IDP] text draws below sprites (verify)
+How to exit from attract mode once game enters it?
 ]]></notes>
 		<info name="alt_title" value="ファミリースタジアム" />
 		<info name="usage" value="Menuing works with keyboard only until game prompts you to use a joystick"/>
