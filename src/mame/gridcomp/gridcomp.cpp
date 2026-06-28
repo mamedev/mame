@@ -99,7 +99,10 @@
 namespace {
 
 #define I80130_TAG      "osp"
-#define NUMBER_OF_ROMS  4
+
+constexpr int APP_ROM_COUNT = 4;
+constexpr int APP_ROM_WINDOWS = 4;
+constexpr int APP_ROM_WINDOW_SIZE = 0x8000;
 
 class gridcomp_state : public driver_device
 {
@@ -116,6 +119,12 @@ public:
 		, m_tms9914(*this, "hpib")
 		, m_test_rom(*this, "test_rom")
 		, m_app_roms(*this, "app_rom%u", 0U)
+		, m_app_rom_view{
+			{*this, "app_rom_view0"},
+			{*this, "app_rom_view1"},
+			{*this, "app_rom_view2"},
+			{*this, "app_rom_view3"} }
+		, m_app_rom_bank(*this, "app_rom_bank%u", 0U)
 	{ }
 
 	static constexpr feature_type unemulated_features() { return feature::WAN; }
@@ -141,15 +150,17 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<tms9914_device> m_tms9914;
 	required_device<gridrom_socket_device> m_test_rom;
-	optional_device_array<gridrom_socket_device, 4> m_app_roms;
+	optional_device_array<gridrom_socket_device, APP_ROM_COUNT> m_app_roms;
+
+	memory_view m_app_rom_view[APP_ROM_WINDOWS];
+	optional_memory_bank_array<APP_ROM_WINDOWS> m_app_rom_bank;
+	uint8_t m_app_rom_window[APP_ROM_WINDOWS] = {};
+	bool m_app_rom_enabled = false;
 
 	bool m_kbd_ready = false;
 	uint16_t m_kbd_data = 0;
 
 	uint16_t *m_videoram = nullptr;
-
-	bool m_roms_enabled = false;
-	std::array<size_t, NUMBER_OF_ROMS> m_active_slots = {};
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
@@ -163,9 +174,10 @@ private:
 	void grid_dma_w(offs_t offset, uint8_t data);
 	uint8_t grid_dma_r(offs_t offset);
 
-	void app_rom_slot_mapper_w(offs_t offset, uint8_t data);
-	uint8_t app_rom_r(offs_t offset);
-	void app_rom_activator_w(offs_t offset, uint8_t data);
+	void update_app_rom_bank(int window);
+	void update_app_rom_banks();
+	void app_rom_select_w(offs_t offset, uint8_t data);
+	void app_rom_control_w(offs_t offset, uint8_t data);
 
 	template <int Width>
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -272,52 +284,67 @@ uint8_t gridcomp_state::grid_dma_r(offs_t offset)
 	return ret;
 }
 
-void gridcomp_state::app_rom_slot_mapper_w(offs_t offset, uint8_t data)
+void gridcomp_state::update_app_rom_bank(int window)
 {
-	// LOG("ROM SLOT MAPPER %02x <- %02x\n", offset, data);
-
-	// The Compass only has 4 slots for ROMs.
-	// TODO: How does the real laptop handle this situation?
-	if (data >= NUMBER_OF_ROMS)
+	if (!m_app_rom_enabled || !m_app_rom_bank[window])
+	{
+		m_app_rom_view[window].disable();
 		return;
+	}
 
-	// 4 slot selection registers are located at addresses:
-	// DFE0:8, DFE0:A, DFE0:C, and DFE0:E.
-	m_active_slots[offset] = data;
+	const uint8_t slot = m_app_rom_window[window];
+
+	gridrom_socket_device &rom = *m_app_roms[slot];
+	uint8_t *rom_base = rom.get_rom_base();
+
+	if (rom_base == nullptr)
+	{
+		m_app_rom_view[window].disable();
+		return;
+	}
+
+	const u32 size = rom.get_rom_size();
+
+	u32 chunk = 0;
+	if (size == 64 * 1024)
+		chunk = window & 1;
+	else if (size == 128 * 1024)
+		chunk = window;
+
+	m_app_rom_bank[window]->set_base(rom_base + chunk * APP_ROM_WINDOW_SIZE);
+	m_app_rom_view[window].select(0);
 }
 
-uint8_t gridcomp_state::app_rom_r(offs_t offset)
+void gridcomp_state::update_app_rom_banks()
 {
-	if (!m_roms_enabled)
-		return 0xFF;
-
-	// The address space of the ROM is divided into 4 "windows".
-	const uint32_t window_size = 0x8000;
-
-	// Calculate the quarter number from which we are reading.
-	const size_t quarter = offset / window_size;
-
-	// And look up which ROM slot is mapped to this window.
-	const size_t slot = m_active_slots[quarter];
-	const auto& rom = m_app_roms[slot];
-
-	// It does not matter what is returned if the ROM is not present because
-	// CCPROM checks the 0xBB66 marker at offset 9FF0:0,
-	// and then also verifies the checksum and other things.
-	if (!rom->exists())
-		return 0xFF;
-
-	return rom->read_rom(offset % rom->get_rom_size());
+	for (int window = 0; window < APP_ROM_WINDOWS; window++)
+	{
+		update_app_rom_bank(window);
+	}
 }
 
-void gridcomp_state::app_rom_activator_w(offs_t offset, uint8_t data)
+void gridcomp_state::app_rom_select_w(offs_t offset, uint8_t data)
 {
-	// LOG("ROM ACTIVATOR %02x <- %02x\n", offset, data);
+	const int window = offset;
+	const uint8_t rom = data & 0x03;
 
-	// TODO: Handle 32KB flag at offset 2.
+	m_app_rom_window[window] = rom;
+	update_app_rom_bank(window);
+}
 
-	if (offset == 8)
-		m_roms_enabled = data == 1;
+void gridcomp_state::app_rom_control_w(offs_t offset, uint8_t data)
+{
+	switch (offset)
+	{
+	case 2:
+		// TODO: Handle 32KB flag at offset 2.
+		break;
+
+	case 8:
+		m_app_rom_enabled = BIT(data, 0);
+		update_app_rom_banks();
+		break;
+	}
 }
 
 template <int Width>
@@ -350,13 +377,22 @@ void gridcomp_state::machine_start()
 	program.install_ram(0, m_ram->size() - 1, m_ram->pointer());
 
 	m_videoram = (uint16_t *)m_maincpu->space(AS_PROGRAM).get_write_ptr(0x400);
+
+	save_item(NAME(m_app_rom_window));
+	save_item(NAME(m_app_rom_enabled));
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(gridcomp_state::update_app_rom_banks), this));
+
+	update_app_rom_banks();
 }
 
 void gridcomp_state::machine_reset()
 {
 	m_kbd_ready = false;
-	m_roms_enabled = false;
-	m_active_slots = {};
+
+	std::fill_n(m_app_rom_window, APP_ROM_WINDOWS, 0);
+	m_app_rom_enabled = true;
+	update_app_rom_banks();
 }
 
 IRQ_CALLBACK_MEMBER(gridcomp_state::irq_callback)
@@ -384,15 +420,23 @@ void gridcomp_state::grid1101_map(address_map &map)
 void gridcomp_state::grid1121_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x80000, 0x9ffff).r(FUNC(gridcomp_state::app_rom_r));
+
+	for (int i = 0; i < APP_ROM_WINDOWS; i++) {
+		const offs_t start = 0x80000 + i * APP_ROM_WINDOW_SIZE;
+		const offs_t end = start + APP_ROM_WINDOW_SIZE - 1;
+
+		map(start, end).view(m_app_rom_view[i]);
+		m_app_rom_view[i][0](start, end).bankr(m_app_rom_bank[i]);
+	}
+
 	map(0xc0000, 0xcffff).r(m_test_rom, FUNC(gridrom_socket_device::read));
 	map(0xdfa00, 0xdfdff).rw(FUNC(gridcomp_state::grid_dma_r), FUNC(gridcomp_state::grid_dma_w)); // DMA
 	map(0xdfe00, 0xdfe07).unmapw();  // .w(FUNC(gridcomp_state::video_chip_w));
-	map(0xdfe08, 0xdfe0f).w(FUNC(gridcomp_state::app_rom_slot_mapper_w)).umask16(0x00ff);
+	map(0xdfe08, 0xdfe0f).w(FUNC(gridcomp_state::app_rom_select_w)).umask16(0x00ff);
 	map(0xdfe10, 0xdfe1f).unmapw(); // .rw(FUNC(gridcomp_state::uart_pal_r), FUNC(gridcomp_state::uart_pal_w));
 	map(0xdfe40, 0xdfe4f).w(FUNC(gridcomp_state::grid_sound_w));  // modem controller??
 	map(0xdfe80, 0xdfe83).rw("i7220", FUNC(i7220_device::read), FUNC(i7220_device::write)).umask16(0x00ff);
-	map(0xdfea0, 0xdfeaf).w(FUNC(gridcomp_state::app_rom_activator_w));
+	map(0xdfea0, 0xdfea9).w(FUNC(gridcomp_state::app_rom_control_w)).umask16(0x00ff);
 	map(0xdfec0, 0xdfecf).rw(FUNC(gridcomp_state::grid_modem_r), FUNC(gridcomp_state::grid_modem_w)).umask16(0x00ff); // incl. DTMF generator
 	map(0xdff00, 0xdff1f).rw(m_uart8274, FUNC(i8274_device::cd_ba_r), FUNC(i8274_device::cd_ba_w)).umask16(0x00ff);
 	map(0xdff40, 0xdff5f).rw(m_rtc, FUNC(mm58174_device::read), FUNC(mm58174_device::write)).umask16(0xff00);
@@ -523,7 +567,7 @@ void gridcomp_state::grid1121(machine_config &config)
 	// m_maincpu->set_clock(XTAL(24'000'000) / 3); // XXX
 	m_maincpu->set_addrmap(AS_PROGRAM, &gridcomp_state::grid1121_map);
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < APP_ROM_COUNT; i++)
 	{
 		GRIDROM_SOCKET(config, m_app_roms[i], gridrom_slot, "app_rom");
 		m_app_roms[i]->set_image_names("app-rom", "app-rom");
