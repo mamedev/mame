@@ -942,11 +942,20 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 		if (split_cliprect.empty())
 			continue;
 
+		layer_params_t params;
+		params.fsa = fsa;
+		params.dsa = dsa;
+		params.dsp = dsp;
+		params.ofx = ofx;
+		params.ofy = ofy;
+		params.fbw = fbw;
+		params.fbl = fbl;
+
 		if (!m_dm)
 		{
 			switch(gfx_ctrl & 3)
 			{
-				case 1: draw_packed_gfx_4bpp(m_graphic_bitmap[which], split_cliprect, fsa, dsa, ofx, layer_pal_bank, fbw, fbl); break;
+				case 1: draw_packed_gfx_4bpp(m_graphic_bitmap[which], split_cliprect, params, layer_pal_bank); break;
 				default:
 					popmessage("pc88va_v.cpp: unhandled %d GFX mode DM = 0 (Multiplane)", which);
 					break;
@@ -957,16 +966,16 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 			switch(gfx_ctrl & 3)
 			{
 				//case 0: draw_indexed_gfx_1bpp(bitmap, cliprect, dsa, layer_pal_bank); break;
-				case 1: draw_indexed_gfx_4bpp(m_graphic_bitmap[which], split_cliprect, fsa, dsa, dsp, ofx, layer_pal_bank, fbw, fbl); break;
+				case 1: draw_indexed_gfx_4bpp(m_graphic_bitmap[which], split_cliprect, params, layer_pal_bank); break;
 				case 2:
 					if (is_5bpp)
 					{
-						draw_packed_gfx_5bpp(m_graphic_bitmap[which], split_cliprect, fsa, dsa, dsp, ofx, layer_pal_bank, fbw, fbl);
+						draw_packed_gfx_5bpp(m_graphic_bitmap[which], split_cliprect, params, layer_pal_bank);
 					}
 					else
-						draw_direct_gfx_8bpp(m_graphic_bitmap[which], split_cliprect, fsa, dsa, dsp, ofx, fbw, fbl);
+						draw_direct_gfx_8bpp(m_graphic_bitmap[which], split_cliprect, params);
 					break;
-				case 3: draw_direct_gfx_rgb565(m_graphic_bitmap[which], split_cliprect, fsa, dsa, ofx, fbw, fbl); break;
+				case 3: draw_direct_gfx_rgb565(m_graphic_bitmap[which], split_cliprect, params); break;
 				default:
 					popmessage("pc88va_v.cpp: unhandled %d GFX mode DM = 1 (Singleplane)", which);
 					break;
@@ -984,11 +993,11 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 }
 
 // TODO: incomplete, no known cases yet
-void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u8 pal_base)
+void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base)
 {
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u32 line_offset = (((y * 640) / 8) + fb_start_offset) & 0x3ffff;
+		const u32 line_offset = (((y * 640) / 8) + param.fsa) & 0x3ffff;
 
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
 		{
@@ -1008,23 +1017,23 @@ void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &
 }
 
 // famista
-void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 dsp_start_base, u16 scrollx, u8 pal_base, u16 fb_width, u16 fb_height)
+void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base)
 {
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 
 	// cannot wrap page boundaries (playfield)
-	const u32 base_page = fb_start_offset & 0x20000;
-	const u32 base_address = display_start_offset & 0x1ffff;
+	const u32 base_page = param.fsa & 0x20000;
+	const u32 base_address = param.dsa & 0x1ffff;
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u32 line_offset = ((y - dsp_start_base) * fb_width) + base_address;
+		const u32 line_offset = ((y - param.dsp) * param.fbw) + base_address;
 
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
 			u16 x_char = (x >> 1);
-			u32 bitmap_offset = (line_offset + x_char - (scrollx >> 6)) & 0x1ffff;
+			u32 bitmap_offset = (line_offset + x_char - (param.ofx >> 6)) & 0x1ffff;
 
 			for (int xi = 0; xi < 2; xi ++)
 			{
@@ -1038,22 +1047,22 @@ void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &
 }
 
 // animefrm
-void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 dsp_start_base, u16 scrollx, u8 pal_base, u16 fb_width, u16 fb_height)
+void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base)
 {
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 
 	//printf("%d %d %d %08x %d\n", y_min, y_max, fb_width, start_offset, fb_height);
 	// TODO: fix paging
-	const u32 base_address = (fb_start_offset & 0x20000) | (display_start_offset & 0x1ffff);
+	const u32 base_address = (param.fsa & 0x20000) | (param.dsa & 0x1ffff);
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u32 line_offset = (((y - dsp_start_base) * fb_width) + base_address) & 0x3ffff;
+		const u32 line_offset = (((y - param.dsp) * param.fbw) + base_address) & 0x3ffff;
 
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			u32 bitmap_offset = (line_offset + x - (scrollx >> 6)) & 0x3ffff;
+			u32 bitmap_offset = (line_offset + x - (param.ofx >> 6)) & 0x3ffff;
 
 			u8 color = m_gvram[bitmap_offset] & 0x1f;
 
@@ -1064,22 +1073,22 @@ void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &c
 }
 
 // boomer
-void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 dsp_start_base, u16 scrollx, u16 fb_width, u16 fb_height)
+void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param)
 {
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 
 	// cannot wrap page boundaries (jumping at start of level)
-	const u32 base_page = fb_start_offset & 0x20000;
-	const u32 base_address = display_start_offset & 0x1ffff;
+	const u32 base_page = param.fsa & 0x20000;
+	const u32 base_address = param.dsa & 0x1ffff;
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u32 line_offset = (((y - dsp_start_base) * fb_width) + base_address);
+		const u32 line_offset = (((y - param.dsp) * param.fbw) + base_address);
 
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			u32 bitmap_offset = (line_offset + x - (scrollx >> 6)) & 0x1ffff;
+			u32 bitmap_offset = (line_offset + x - (param.ofx >> 6)) & 0x1ffff;
 
 			uint32_t color = (m_gvram[bitmap_offset | base_page] & 0xff);
 
@@ -1096,21 +1105,21 @@ void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &c
 	}
 }
 
-void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 scrollx, u16 fb_width, u16 fb_height)
+void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param)
 {
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 	// TODO: check paging
-	const u32 base_address = (display_start_offset & 0x3ffff);
+	const u32 base_address = (param.dsa & 0x3ffff);
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		// pc88vad requires halved pitch for first screen
-		const u32 line_offset = ((y * fb_width >> 1) + base_address) & 0x3ffff;
+		const u32 line_offset = ((y * param.fbw >> 1) + base_address) & 0x3ffff;
 
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			u32 bitmap_offset = ((line_offset + x - (scrollx >> 1)) << 1) & 0x3ffff;
+			u32 bitmap_offset = ((line_offset + x - (param.ofx >> 1)) << 1) & 0x3ffff;
 
 			uint16_t color = (m_gvram[bitmap_offset] & 0xff) | (m_gvram[bitmap_offset + 1] << 8);
 
@@ -1126,24 +1135,24 @@ void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle 
 }
 
 // all inufuto games, alantia
-void pc88va_state::draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 scrollx, u8 pal_base, u16 fb_width, u16 fb_height)
+void pc88va_state::draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base)
 {
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 
-	const u32 base_offset = display_start_offset >> 2;
+	const u32 base_offset = param.dsa >> 2;
 
 	// alantia disables 4th layer, uses it as local GFX storage
 	const u8 num_banks = m_g3msk + 3;
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u32 line_offset = ((y * (fb_width >> 2)) + base_offset) & 0x0ffff;
+		const u32 line_offset = ((y * (param.fbw >> 2)) + base_offset) & 0x0ffff;
 
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
 		{
 			u16 x_char = (x >> 3);
-			u32 bitmap_offset = (line_offset + x_char - (scrollx >> 2)) & 0x0ffff;
+			u32 bitmap_offset = (line_offset + x_char - (param.ofx >> 2)) & 0x0ffff;
 
 			for (int xi = 0; xi < 8; xi ++)
 			{
