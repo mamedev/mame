@@ -586,7 +586,7 @@ v40_device::v40_device(const machine_config &mconfig, const char *tag, device_t 
 }
 
 v50_device::v50_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: v50_base_device(mconfig, V50, tag, owner, clock, true, 6, 2, V30_TYPE)
+	: v50_base_device(mconfig, V50, tag, owner, clock, true, 6, 2, V33_TYPE)
 {
 }
 
