@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, AJR
 
 #include "emu.h"
 
@@ -16,12 +16,12 @@ class evolution_handheldgame_state : public driver_device
 public:
 	evolution_handheldgame_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_dmac_params(*this, "dmac_params")
 	{ }
 
 	void evolhh(machine_config &config) ATTR_COLD;
 	void smkatsum(machine_config &config) ATTR_COLD;
-	void buttdtct(machine_config &config) ATTR_COLD;
 	void yuleyuan(machine_config &config) ATTR_COLD;
 	void udrive(machine_config &config) ATTR_COLD;
 
@@ -31,16 +31,20 @@ private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<sonix16_device> m_maincpu;
+	optional_shared_ptr<u16> m_dmac_params;
+
+	u16 dma_status_r();
+	void dma_control_w(u16 data);
 
 	void evolution_map(address_map &map) ATTR_COLD;
 	void evolution_ram_map(address_map &map) ATTR_COLD;
 	void snc7001a_map(address_map &map) ATTR_COLD;
 	void smkatsum_ram_map(address_map &map) ATTR_COLD;
-	void buttdtct_ram_map(address_map &map) ATTR_COLD;
 	void snc7648s_map(address_map &map) ATTR_COLD;
+	void yuleyuan_ram_map(address_map &map) ATTR_COLD;
 	void udrive_map(address_map &map) ATTR_COLD;
 	void udrive_ram_map(address_map &map) ATTR_COLD;
 };
@@ -53,11 +57,37 @@ void evolution_handheldgame_state::machine_reset()
 {
 }
 
+u16 evolution_handheldgame_state::dma_status_r()
+{
+	// bit 0 = DMA busy
+	return 0;
+}
+
+void evolution_handheldgame_state::dma_control_w(u16 data)
+{
+	if (BIT(data, 0))
+	{
+		address_space &srcspace = m_maincpu->space(AS_PROGRAM);
+		address_space &dstspace = m_maincpu->space(AS_DATA);
+
+		u32 src = u32(m_dmac_params[0]) << 16 | m_dmac_params[1];
+		u32 dst = u32(m_dmac_params[2]) << 16 | m_dmac_params[3];
+		u16 count = m_dmac_params[4];
+
+		logerror("%s: DMA from %06X-%06X to %06X-%06X\n", machine().describe_context(), src, src + count, dst, dst + count);
+
+		do
+		{
+			dstspace.write_word(dst++, srcspace.read_word(0x400000 | src++));
+		} while (count-- != 0);
+	}
+}
+
 static INPUT_PORTS_START( evolhh )
 INPUT_PORTS_END
 
 
-uint32_t evolution_handheldgame_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 evolution_handheldgame_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -79,25 +109,31 @@ void evolution_handheldgame_state::evolution_ram_map(address_map &map)
 void evolution_handheldgame_state::snc7001a_map(address_map &map)
 {
 	map(0x000000, 0x007fff).rom().region("maincpu", 0); // supposedly RAM, "boot from external flash, only one time after IC reset"
-	map(0x200000, 0x201fff).rom().region("maincpu", 0x10a1a); // supposedly RAM, "boot from external flash, update anytime by user program" (tomyspt, hoppech)
+	map(0x200000, 0x201fff).ram().share("program_ram"); // supposedly RAM, "boot from external flash, update anytime by user program" (tomyspt, hoppech)
 	map(0x400000, 0x7fffff).rom().region("maincpu", 0);
 }
 
 void evolution_handheldgame_state::smkatsum_ram_map(address_map &map)
 {
-	map(0x000000, 0x002fff).ram();
-}
-
-void evolution_handheldgame_state::buttdtct_ram_map(address_map &map)
-{
 	map(0x000000, 0x003fff).ram();
+	map(0x00fe27, 0x00fe2b).writeonly().share(m_dmac_params);
+	map(0x00fe2c, 0x00fe2c).rw(FUNC(evolution_handheldgame_state::dma_status_r), FUNC(evolution_handheldgame_state::dma_control_w));
+	map(0x200000, 0x201fff).ram().share("program_ram");
 }
 
 void evolution_handheldgame_state::snc7648s_map(address_map &map)
 {
 	map(0x000000, 0x00bfff).rom().region("maincpu", 0); // supposedly RAM, "boot from external flash, only one time after IC reset"
-	map(0x200000, 0x2007ff).rom().region("maincpu", 0xb000);
+	map(0x200000, 0x2007ff).ram().share("program_ram");
 	map(0x400000, 0x7fffff).rom().region("maincpu", 0);
+}
+
+void evolution_handheldgame_state::yuleyuan_ram_map(address_map &map)
+{
+	map(0x000000, 0x001fff).ram();
+	map(0x00fe27, 0x00fe2b).writeonly().share(m_dmac_params);
+	map(0x00fe2c, 0x00fe2c).rw(FUNC(evolution_handheldgame_state::dma_status_r), FUNC(evolution_handheldgame_state::dma_control_w));
+	map(0x200000, 0x2007ff).ram().share("program_ram");
 }
 
 void evolution_handheldgame_state::udrive_map(address_map &map)
@@ -140,18 +176,12 @@ void evolution_handheldgame_state::smkatsum(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &evolution_handheldgame_state::smkatsum_ram_map);
 }
 
-void evolution_handheldgame_state::buttdtct(machine_config &config)
-{
-	smkatsum(config);
-
-	m_maincpu->set_addrmap(AS_DATA, &evolution_handheldgame_state::buttdtct_ram_map);
-}
-
 void evolution_handheldgame_state::yuleyuan(machine_config &config)
 {
-	smkatsum(config);
+	evolhh(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &evolution_handheldgame_state::snc7648s_map);
+	m_maincpu->set_addrmap(AS_DATA, &evolution_handheldgame_state::yuleyuan_ram_map);
 }
 
 void evolution_handheldgame_state::udrive(machine_config &config)
@@ -253,7 +283,7 @@ CONS( 2006, evolhh,      0,       0,      evolhh, evolhh, evolution_handheldgame
 CONS( 2018, smkatsum,    0,       0,      smkatsum, evolhh, evolution_handheldgame_state, empty_init, "San-X / Tomy", "Sumikko Gurashi - Sumikko Atsume (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // おしりたんてい ププッとかいけつゲーム
-CONS( 2020, buttdtct,    0,       0,      buttdtct, evolhh, evolution_handheldgame_state, empty_init, "Tomy", "Oshiri Tantei - Puputto Kaiketsu Game (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2020, buttdtct,    0,       0,      smkatsum, evolhh, evolution_handheldgame_state, empty_init, "Tomy", "Oshiri Tantei - Puputto Kaiketsu Game (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 CONS( 2015, pokexyqz,    0,       0,      smkatsum, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Pokemon Encyclopedia Z Pokemon XY Quiz Game Rotom (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
