@@ -79,6 +79,7 @@ void evolution_handheldgame_state::evolution_ram_map(address_map &map)
 void evolution_handheldgame_state::snc7001a_map(address_map &map)
 {
 	map(0x000000, 0x007fff).rom().region("maincpu", 0); // supposedly RAM, "boot from external flash, only one time after IC reset"
+	map(0x200000, 0x201fff).rom().region("maincpu", 0x10a1a); // supposedly RAM, "boot from external flash, update anytime by user program" (tomyspt, hoppech)
 	map(0x400000, 0x7fffff).rom().region("maincpu", 0);
 }
 
