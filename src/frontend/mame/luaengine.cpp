@@ -2205,6 +2205,7 @@ void lua_engine::initialize()
 	video_type["snap_native"] = sol::property(&video_manager::snap_native);
 	video_type["is_recording"] = sol::property(&video_manager::is_recording);
 	video_type["snapshot_target"] = sol::property(&video_manager::snapshot_target);
+	video_type["screenless_framerate"] = sol::property(&video_manager::screenless_framerate, &video_manager::set_screenless_framerate);
 
 
 	auto sound_type = sol().registry().new_usertype<sound_manager>("sound", sol::no_constructor);
