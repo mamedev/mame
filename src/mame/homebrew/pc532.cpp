@@ -90,6 +90,11 @@ private:
 	u32 dma_r(offs_t offset, u32 mem_mask);
 	void dma_w(offs_t offset, u32 data, u32 mem_mask);
 
+	// AIC6250 pseudo-DMA (BREQ/BACK), mirrors the DP8490 path above
+	void aic_breq_w(int state);
+	u32 aic_dma_r(offs_t offset, u32 mem_mask);
+	void aic_dma_w(offs_t offset, u32 data, u32 mem_mask);
+
 	memory_view m_swap;
 	memory_view m_select;
 
@@ -200,7 +205,6 @@ void pc532_state::irq_w(int state)
 }
 
 // TODO: byte and word accesses
-// TODO: A22 -> EOP
 u32 pc532_state::dma_r(offs_t offset, u32 mem_mask)
 {
 	u32 data = 0;
@@ -242,7 +246,6 @@ u32 pc532_state::dma_r(offs_t offset, u32 mem_mask)
 }
 
 // TODO: byte and word accesses
-// TODO: A22 -> EOP
 void pc532_state::dma_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (m_state == IDLE)
@@ -252,6 +255,90 @@ void pc532_state::dma_w(offs_t offset, u32 data, u32 mem_mask)
 			m_dma = data;
 			m_dp8490->dma_w(m_dma >> 0);
 			m_state = WR3;
+		}
+	}
+	else
+		m_cpu->rdy_w(1);
+}
+
+/*
+ * AIC6250 pseudo-DMA.  Functionally identical to the DP8490 path above, but the
+ * AIC6250 uses a BREQ/BACK handshake: each byte transferred over the pseudo-DMA
+ * window must be acknowledged with back_w(1), which causes the chip to drop BREQ
+ * and re-assert it (synchronously if its FIFO already holds the next byte, or via
+ * its internal timer otherwise) for the following byte.  Data transfers are whole
+ * sectors (multiples of 4 bytes), so no partial-doubleword completion is needed.
+ */
+void pc532_state::aic_breq_w(int state)
+{
+	if (state)
+	{
+		switch (m_state)
+		{
+		case RD1: m_dma |= u32(m_aic6250->dma_r()) << 8;  m_state = RD2; m_aic6250->back_w(1); break;
+		case RD2: m_dma |= u32(m_aic6250->dma_r()) << 16; m_state = RD3; m_aic6250->back_w(1); break;
+		case RD3: m_dma |= u32(m_aic6250->dma_r()) << 24; m_state = RD4; m_aic6250->back_w(1); break;
+
+		case WR3: m_aic6250->dma_w(m_dma >> 8);  m_state = WR2; m_aic6250->back_w(1); break;
+		case WR2: m_aic6250->dma_w(m_dma >> 16); m_state = WR1; m_aic6250->back_w(1); break;
+		case WR1: m_aic6250->dma_w(m_dma >> 24); m_state = IDLE; m_aic6250->back_w(1); break;
+
+		default:
+			break;
+		}
+	}
+
+	m_drq = state;
+}
+
+u32 pc532_state::aic_dma_r(offs_t offset, u32 mem_mask)
+{
+	u32 data = 0;
+
+	if (!machine().side_effects_disabled())
+	{
+		switch (m_state)
+		{
+		case IDLE:
+			if (m_drq)
+			{
+				m_dma = m_aic6250->dma_r();
+				m_state = RD1;
+				m_aic6250->back_w(1);
+
+				m_cpu->rdy_w(1);
+			}
+			break;
+
+		case RD1:
+		case RD2:
+		case RD3:
+			m_cpu->rdy_w(1);
+			break;
+
+		case RD4:
+			data = m_dma;
+			m_state = IDLE;
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	return data;
+}
+
+void pc532_state::aic_dma_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	if (m_state == IDLE)
+	{
+		if (m_drq)
+		{
+			m_dma = data;
+			m_aic6250->dma_w(m_dma >> 0);
+			m_state = WR3;
+			m_aic6250->back_w(1);
 		}
 	}
 	else
@@ -284,6 +371,7 @@ template <unsigned ST> void pc532_state::cpu_map(address_map &map)
 		m_select[0](0x3000'0000, 0x3000'0007).m(m_dp8490, FUNC(dp8490_device::map));
 		m_select[0](0x3800'0000, 0x3fff'ffff).rw(FUNC(pc532_state::dma_r), FUNC(pc532_state::dma_w));
 		m_select[1](0x3000'0000, 0x3000'0001).rw(m_aic6250, FUNC(aic6250_device::read), FUNC(aic6250_device::write));
+		m_select[1](0x3800'0000, 0x3fff'ffff).rw(FUNC(pc532_state::aic_dma_r), FUNC(pc532_state::aic_dma_w));
 	}
 
 	map(0xffff'fe00, 0xffff'feff).m(m_icu, FUNC(ns32202_device::map<BIT(ST, 1)>));
@@ -306,10 +394,12 @@ void pc532_state::pc532(machine_config &config)
 	NS32381(config, m_fpu, 50_MHz_XTAL / 2);
 	m_cpu->set_fpu(m_fpu);
 
+	config.set_maximum_quantum(attotime::from_usec(10));   // tight CPU<->DUART/ICU interleave
+
 	NS32202(config, m_icu, 3.6864_MHz_XTAL);
 	m_icu->out_int().set_inputline(m_cpu, INPUT_LINE_IRQ0).invert();
-	m_icu->out_g<0>().set([this](int state) { m_swap.select(state); });
-	m_icu->out_g<7>().set([this](int state) { m_select.select(state); });
+	m_icu->out_g<0>().set([this](int state) { m_swap.select(state); });    // G0 = RAM/ROM boot overlay
+	m_icu->out_g<7>().set([this](int state) { m_select.select(state); });  // G7 = DP8490 / AIC6250 select
 
 	DS1216E(config, m_rtc);
 
@@ -330,7 +420,7 @@ void pc532_state::pc532(machine_config &config)
 	AIC6250(config, m_aic6250, 20_MHz_XTAL);
 	scsi.set_external_device(0, m_aic6250);
 	m_aic6250->int_cb().set(m_icu, FUNC(ns32202_device::ir_w<5>));
-	// TODO: drq
+	m_aic6250->breq_cb().set(DEVICE_SELF, FUNC(pc532_state::aic_breq_w));
 
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr, false);
@@ -396,9 +486,12 @@ ROM_START(pc532)
 
 	ROM_SYSTEM_BIOS(2, "900427-9600", "Fri Apr 27 17:56:11 PDT 1990, Bruce Culbertson (direct exception mode), 9600bps")
 	ROMX_LOAD("culberts_900427_9600.u44", 0x0000, 0x8000, CRC(50724e69) SHA1(d6f140f1a5414892e4dbb5754da667b70ff90ebe), ROM_BIOS(2))
+
+	ROM_SYSTEM_BIOS(3, "dualboot", "Dual-boot loader: AIC6250/System V, DP8490/NetBSD")
+	ROMX_LOAD("pc532_dualboot.u44", 0x0000, 0x8000, CRC(ed5d7a78) SHA1(e4ef70e63d49113baccfe0dbaa71d3e77b92228f), ROM_BIOS(3))
 ROM_END
 
 } // anonymous namespace
 
 /*   YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY           FULLNAME  FLAGS */
-COMP(1989, pc532, 0,      0,      pc532,   0,     pc532_state, empty_init, "George Scolaro", "pc532",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP(1989, pc532, 0,      0,      pc532,   0,     pc532_state, empty_init, "George Scolaro", "pc532",  MACHINE_NO_SOUND_HW)
