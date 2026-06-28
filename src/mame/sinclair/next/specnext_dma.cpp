@@ -50,6 +50,16 @@ specnext_dma_device::specnext_dma_device(const machine_config &mconfig, const ch
 {
 }
 
+void specnext_dma_device::dma_delay_w(bool dma_delay)
+{
+	if (m_dma_delay && !dma_delay && (m_dma_seq == SEQ_WAIT_READY))
+	{
+		set_busrq(ASSERT_LINE);
+		m_dma_seq = SEQ_WAITING_ACK;
+	}
+	m_dma_delay = dma_delay;
+}
+
 void specnext_dma_device::reset_byte_counter()
 {
 	m_byte_counter = m_dma_mode ? 0 : 1;
@@ -111,8 +121,8 @@ TIMER_CALLBACK_MEMBER(specnext_dma_device::clock_w)
 			{
 				set_busrq(CLEAR_LINE);
 				m_dma_seq = SEQ_WAIT_READY;
-				return;
 			}
+			return;
 		}
 	}
 
