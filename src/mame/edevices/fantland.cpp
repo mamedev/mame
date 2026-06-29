@@ -108,12 +108,13 @@ protected:
 	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
+	// shared by fantland and galaxygn
+	IRQ_CALLBACK_MEMBER( audio_vector_r );
 private:
 	uint8_t spriteram_r(offs_t offset);
 	uint8_t spriteram2_r(offs_t offset);
 	void spriteram_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 	void spriteram2_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
-	void galaxygn_sound_irq(int state);
 	INTERRUPT_GEN_MEMBER(fantland_sound_irq);
 	void fantland_map(address_map &map) ATTR_COLD;
 	void fantland_sound_iomap(address_map &map) ATTR_COLD;
@@ -1048,9 +1049,14 @@ void fantland_state::vblank_irq(int state)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
+IRQ_CALLBACK_MEMBER(fantland_state::audio_vector_r)
+{
+	return 0x80 / 4;
+}
+
 INTERRUPT_GEN_MEMBER(fantland_state::fantland_sound_irq)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x80 / 4); // I8088
+	device.execute().set_input_line(0, HOLD_LINE); // I8088
 }
 
 void fantland_state::fantland(machine_config &config)
@@ -1062,6 +1068,7 @@ void fantland_state::fantland(machine_config &config)
 	I8088(config, m_audiocpu, 16_MHz_XTAL / 2);        // AMD P8088-2 - divider not verified
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fantland_state::fantland_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &fantland_state::fantland_sound_iomap);
+	m_audiocpu->set_irq_acknowledge_callback(FUNC(fantland_state::audio_vector_r));
 	m_audiocpu->set_periodic_int(FUNC(fantland_state::fantland_sound_irq), attotime::from_hz(8000));
 	// NMI when soundlatch is written
 
@@ -1090,12 +1097,6 @@ void fantland_state::fantland(machine_config &config)
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 }
 
-
-void fantland_state::galaxygn_sound_irq(int state)
-{
-	m_audiocpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0x80/4); // I8088
-}
-
 void fantland_state::galaxygn(machine_config &config)
 {
 	// Basic machine hardware
@@ -1106,6 +1107,7 @@ void fantland_state::galaxygn(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fantland_state::fantland_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &fantland_state::galaxygn_sound_iomap);
 	// IRQ by YM2151, NMI when soundlatch is written
+	m_audiocpu->set_irq_acknowledge_callback(FUNC(fantland_state::audio_vector_r));
 
 	// Video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1126,7 +1128,7 @@ void fantland_state::galaxygn(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3000000));
-	ymsnd.irq_handler().set(FUNC(fantland_state::galaxygn_sound_irq));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "speaker", 1.0);
 	ymsnd.add_route(1, "speaker", 1.0);
 }
