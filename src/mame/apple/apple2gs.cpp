@@ -215,7 +215,6 @@ private:
 	required_ioport m_sysconfig;
 
 	static constexpr int CNXX_UNCLAIMED = -1;
-	static constexpr int CNXX_INTROM = -2;
 
 	enum glu_reg_names
 	{
@@ -446,6 +445,7 @@ private:
 
 	bool m_intcxrom = false;
 	bool m_slotc3rom = false;
+	bool m_intc8rom = false;
 	bool m_altzp = false;
 	bool m_ramrd = false, m_ramwrt = false;
 	bool m_lcram = false, m_lcram2 = false, m_lcprewrite = false, m_lcwriteenable = false;
@@ -758,8 +758,8 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_an2));
 	save_item(NAME(m_an3));
 	save_item(NAME(m_intcxrom));
-	save_item(NAME(m_rombank));
 	save_item(NAME(m_slotc3rom));
+	save_item(NAME(m_intc8rom));
 	save_item(NAME(m_altzp));
 	save_item(NAME(m_ramrd));
 	save_item(NAME(m_ramwrt));
@@ -769,6 +769,7 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_lcram2));
 	save_item(NAME(m_lcprewrite));
 	save_item(NAME(m_lcwriteenable));
+	save_item(NAME(m_rombank));
 	save_item(NAME(m_shadow));
 	save_item(NAME(m_speed));
 	save_item(NAME(m_clock_control));
@@ -824,14 +825,15 @@ void apple2gs_state::machine_reset()
 	m_gameio->an2_w(0);
 	m_gameio->an3_w(0);
 	m_vbl = false;
-	m_slotc3rom = false;
 	m_irqmask = 0;
 	m_intcxrom = false;
-	m_rombank = false;
+	m_slotc3rom = false;
+	m_intc8rom = false;
 	m_video->a80store_w(false);
 	m_altzp = false;
 	m_ramrd = false;
 	m_ramwrt = false;
+	m_rombank = false;
 	m_video->set_newvideo(0x01); // verified on ROM03 hardware
 	m_slot_irq = false;
 	m_clkdata = 0;
@@ -1228,10 +1230,9 @@ void apple2gs_state::auxbank_update()
 
 void apple2gs_state::update_slotrom_banks()
 {
-	//printf("update_slotrom_banks: intcxrom %d cnxx_slot %d SLOT %02x\n", m_intcxrom, m_cnxx_slot, m_slotromsel);
+	//printf("update_slotrom_banks: intcxrom %d slotc3rom %d\n", m_intcxrom, m_slotc3rom);
 
-	// slot 3 ROM is controlled exclusively by SLOTC3ROM
-	if (!m_slotc3rom)
+	if ((m_intcxrom) || (!m_slotc3rom))
 	{
 		m_c300bank->set_bank(1);
 	}
@@ -1815,7 +1816,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 
 			if (m_accel_unlocked) switch(offset)
 			{
-				case 0x58: return 0xFF; // undocumented, not floating bus
+				case 0x58: return 0xff; // undocumented, not floating bus
 				case 0x5d: return 0x00; // "bank"
 				case 0x5e: return 0x00; // cache tag
 				case 0x5f: return 0x00; // clears C05B bit 6
@@ -2376,11 +2377,10 @@ u8 apple2gs_state::read_slot_rom(int slotbias, int offset)
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
-//      printf("slotdevice is not null\n");
+		// a bus fight here is resolved as "first-one-wins"
 		if ((m_cnxx_slot == CNXX_UNCLAIMED) && (m_slotdevice[slotnum]->take_c800()) && (!machine().side_effects_disabled()))
 		{
 			m_cnxx_slot = slotnum;
-			update_slotrom_banks();
 		}
 
 		return m_slotdevice[slotnum]->read_cnxx(offset&0xff);
@@ -2400,30 +2400,19 @@ void apple2gs_state::write_slot_rom(int slotbias, int offset, u8 data)
 		if ((m_cnxx_slot == CNXX_UNCLAIMED) && (m_slotdevice[slotnum]->take_c800()) && !machine().side_effects_disabled())
 		{
 			m_cnxx_slot = slotnum;
-			update_slotrom_banks();
 		}
 
 		m_slotdevice[slotnum]->write_cnxx(offset&0xff, data);
 	}
 }
 
-u8 apple2gs_state::read_int_rom(int slotbias, int offset)
-{
-	if ((m_cnxx_slot == CNXX_UNCLAIMED) && (!machine().side_effects_disabled()))
-	{
-		m_cnxx_slot = CNXX_INTROM;
-		update_slotrom_banks();
-	}
-
-	return m_rom[slotbias + offset];
-}
+u8 apple2gs_state::read_int_rom(int slotbias, int offset) { return m_rom[slotbias + offset]; }
 
 u8 apple2gs_state::c100_r(offs_t offset)
 {
 	const int slot = ((offset>>8) & 0xf) + 1;
 
-	// SETSLOTCXROM is disabled, so the $C02D SLOT register controls what's in each slot
-	if (!BIT(m_slotromsel, slot))
+	if (m_intcxrom || !BIT(m_slotromsel, slot))
 	{
 		return read_int_rom(0x3c100, offset);
 	}
@@ -2435,13 +2424,22 @@ void apple2gs_state::c100_w(offs_t offset, u8 data)
 {
 	const int slot = ((offset>>8) & 0xf) + 1;
 
-	if (BIT(m_slotromsel, slot))
+	if (!m_intcxrom && BIT(m_slotromsel, slot))
 	{
 		write_slot_rom(1, offset, data);
 	}
 }
 
-u8 apple2gs_state::c300_int_r(offs_t offset)  { return read_int_rom(0x3c300, offset); }
+u8 apple2gs_state::c300_int_r(offs_t offset)
+{
+	if ((!m_slotc3rom) && !machine().side_effects_disabled())
+	{
+		m_intc8rom = true;
+	}
+
+	return read_int_rom(0x3c300, offset);
+}
+
 u8 apple2gs_state::c300_r(offs_t offset)  { return read_slot_rom(3, offset); }
 void apple2gs_state::c300_w(offs_t offset, u8 data) { write_slot_rom(3, offset, data); }
 
@@ -2449,7 +2447,7 @@ u8 apple2gs_state::c400_r(offs_t offset)
 {
 	const int slot = ((offset>>8) & 0xf) + 4;
 
-	if (!BIT(m_slotromsel, slot))
+	if (m_intcxrom || !BIT(m_slotromsel, slot))
 	{
 		return read_int_rom(0x3c400, offset);
 	}
@@ -2461,7 +2459,7 @@ void apple2gs_state::c400_w(offs_t offset, u8 data)
 {
 	const int slot = ((offset>>8) & 0xf) + 4;
 
-	if (BIT(m_slotromsel, slot))
+	if (!m_intcxrom && BIT(m_slotromsel, slot))
 	{
 		write_slot_rom(4, offset, data);
 	}
@@ -2469,25 +2467,27 @@ void apple2gs_state::c400_w(offs_t offset, u8 data)
 
 u8 apple2gs_state::c800_r(offs_t offset)
 {
+	const int slot = m_cnxx_slot;
+	const int internal = (m_intcxrom) || (m_intc8rom);
+
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
 		m_cnxx_slot = CNXX_UNCLAIMED;
-		update_slotrom_banks();
-		return 0xff;
+		m_intc8rom = false;
 	}
 
-	if (m_cnxx_slot == CNXX_INTROM)
+	if (internal)
 	{
 		return m_rom[offset + 0x3c800];
 	}
 
-	if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
+	if ((slot > 0) && (m_slotdevice[slot] != nullptr))
 	{
 		slow_cycle();
-		return m_slotdevice[m_cnxx_slot]->read_c800(offset&0xfff);
+		return m_slotdevice[slot]->read_c800(offset&0xfff);
 	}
 
-	return 0xff;
+	return read_floatingbus();
 }
 
 void apple2gs_state::c800_w(offs_t offset, u8 data)
@@ -2501,7 +2501,7 @@ void apple2gs_state::c800_w(offs_t offset, u8 data)
 	if (offset == 0x7ff)
 	{
 		m_cnxx_slot = CNXX_UNCLAIMED;
-		update_slotrom_banks();
+		m_intc8rom = false;
 		return;
 	}
 }
@@ -3364,6 +3364,7 @@ void apple2gs_state::adbmicro_p2_out(u8 data)
 		m_lcwriteenable = true;
 		m_intcxrom = false;
 		m_slotc3rom = false;
+		m_intc8rom = false;
 		m_video->a80store_w(false);
 		m_altzp = false;
 		m_ramrd = false;
