@@ -83,7 +83,6 @@ blnctry:
 
 #include "mahjong.h"
 
-#include "cpu/m68000/mcf5206e.h"
 #include "cpu/m68000/tmp68301.h"
 #include "machine/eepromser.h"
 #include "machine/intelfsh.h"
