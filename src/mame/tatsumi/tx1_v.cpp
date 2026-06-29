@@ -37,7 +37,7 @@
 */
 IRQ_CALLBACK_MEMBER(tx1_state::vector_callback)
 {
-	// all irq entries have same pointer, 0xff from schematics?
+	// all irq entries have same pointer, 0xff from bus pull-ups
 	return 0xff;
 }
 

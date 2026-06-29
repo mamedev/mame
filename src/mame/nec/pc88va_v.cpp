@@ -905,11 +905,18 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 	// use the border color entry as a marker for not drawing
 	m_graphic_bitmap[which].fill(0x20, cliprect);
 
-	const int layer_inc = (!is_5bpp) + 1;
+//	const int layer_inc = (!is_5bpp) + 1;
 	const int layer_fixed = is_5bpp + 1;
 
-	for (int layer_n = which; layer_n < 4; layer_n += layer_inc)
+	for (int layer_n = which; layer_n < 4; layer_n ++)
 	{
+		// layer A: 0, 2, 3
+		// layer B: 1
+		// - olteus in particular wants to draw strip 3 (gameplay status bar) with
+		//   8bpp rather than 4bpp coming from layer B (for the foreground rocks)
+		if ((which & 1) ^ (layer_n == layer_fixed))
+			continue;
+
 		uint16_t const *const fb_strip_regs = &fb_regs[(layer_n * 0x20) / 2];
 		const u16 fbw = fb_strip_regs[0x04 / 2] & 0x7fc;
 
@@ -1755,6 +1762,7 @@ void pc88va_state::screen_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 	//                  YMMD           DM
 	// mightmag 0xb060  (0) screen 0  (0) multiplane
 	m_gden0 = !!(BIT(m_screen_ctrl_reg, 15));
+	// TODO: YMMD also acts as a page mask if enabled (& 0x1ffff rather than 0x3ffff)
 	m_ymmd = !!(BIT(m_screen_ctrl_reg, 11));
 	m_dm = !!(BIT(m_screen_ctrl_reg, 10));
 
