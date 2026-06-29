@@ -35,9 +35,15 @@
 /*
     TODO: Check interrupt timing from CRT config. Probably different between games.
 */
+IRQ_CALLBACK_MEMBER(tx1_state::vector_callback)
+{
+	// all irq entries have same pointer, 0xff from schematics?
+	return 0xff;
+}
+
 TIMER_CALLBACK_MEMBER(tx1_state::interrupt_callback)
 {
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // I8086
+	m_maincpu->set_input_line(0, HOLD_LINE); // I8086
 	m_interrupt_timer->adjust(m_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
