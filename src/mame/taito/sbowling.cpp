@@ -240,9 +240,9 @@ void sbowling_state::graph_control_w(uint8_t data)
 	    xx------ color PROM address lines A4,A3
 	*/
 
-	m_color_prom_address = ((data&0x07)<<7) | ((data&0xc0)>>3);
+	m_color_prom_address = ((data & 0x07) << 7) | ((data & 0xc0) >> 3);
 
-	m_bgmap = ((data>>4)^3) & 0x3;
+	m_bgmap = (~data >> 4) & 0x3;
 	m_tilemap->mark_all_dirty();
 }
 
@@ -282,7 +282,7 @@ static INPUT_PORTS_START( sbowling )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1   )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -403,13 +403,13 @@ void sbowling_state::sbowling_palette(palette_device &palette) const
 		bit0 = BIT(color_prom[i], 2);
 		bit1 = BIT(color_prom[i], 3);
 		bit2 = BIT(color_prom[i + 0x400], 0);
-		int const g = int(outputs_g[ (bit0<<0) | (bit1<<1) | (bit2<<2) ] + 0.5);
+		int const g = int(outputs_g[(bit0 << 0) | (bit1 << 1) | (bit2 << 2)] + 0.5);
 
 		// red component
 		bit0 = BIT(color_prom[i + 0x400], 1);
 		bit1 = BIT(color_prom[i + 0x400], 2);
 		bit2 = BIT(color_prom[i + 0x400], 3);
-		int const r = int(outputs_r[ (bit0<<0) | (bit1<<1) | (bit2<<2) ] + 0.5);
+		int const r = int(outputs_r[(bit0 << 0) | (bit1 << 1) | (bit2 << 2)] + 0.5);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
