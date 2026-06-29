@@ -1962,3 +1962,15 @@ if SOUNDS["FZ_PCM"] then
 		MAME_DIR .. "src/devices/sound/fz_pcm.h",
 	}
 end
+
+---------------------------------------------------
+-- Akai L6009
+--@src/devices/sound/l6009.h,SOUNDS["L6009"] = true
+---------------------------------------------------
+
+if SOUNDS["L6009"] then
+	files {
+		MAME_DIR .. "src/devices/sound/l6009.cpp",
+		MAME_DIR .. "src/devices/sound/l6009.h",
+	}
+end
