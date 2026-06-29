@@ -222,6 +222,7 @@ static INPUT_PORTS_START(st25)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
 	PORT_START("PORT17")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SLOT_STOP2 )
@@ -240,13 +241,16 @@ void st25_state::st25_1(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &st25_state::program_map_st25_1);
 	
 	m_maincpu->p2_out_cb().set(FUNC(st25_state::p2_w));
-	//m_maincpu->txd0_cb().set(FUNC(st25_state::txd0_w));
+	//m_maincpu->txd0_cb().set(FUNC(st25_state::txd0_w)); // Service
+	//m_maincpu->txd1_cb().set(FUNC(st25_state::txd1_w)); // Money
+
+	RS232_PORT(config, m_rs232); // NSM DATAprint
 
 	M48T58(config, m_rtc, 0); // ST M48T18-150PC1
 
 	SCN2681(config, m_duart, 3.6864_MHz_XTAL); // Philips SCC2692AC1N28
-
-	RS232_PORT(config, m_rs232); // NSM DATAprint
+	// Serial A: Card Reader
+	// Serial B: Duo
 
 	// Service (1x16 character LCD)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
