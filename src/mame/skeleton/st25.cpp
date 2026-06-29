@@ -87,6 +87,9 @@ public:
 	void st25_2(machine_config &config) ATTR_COLD;
 	void st25_3(machine_config &config) ATTR_COLD;
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
 private:
 	u8 m_okidata = 0;
 	u16 m_service = 0;
@@ -221,6 +224,12 @@ static INPUT_PORTS_START(st25)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )
 INPUT_PORTS_END
+
+void st25_state::machine_start()
+{
+	save_item(NAME(m_okidata));
+	save_item(NAME(m_service));
+}
 
 void st25_state::st25_1(machine_config &config)
 {
