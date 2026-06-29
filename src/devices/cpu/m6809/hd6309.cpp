@@ -110,6 +110,10 @@ March 2013 NPW:
     trap, whereas the emulator simply ignores the instruction. Credit to
     Darren Atkinson for the discovery of these bugs.
 
+260629 TJL:
+	Fix cycle count and condition code flags for DIVD and DIVQ based on Xroar
+	(with permission), hoglet67 and personal fuzzing.
+
 *****************************************************************************/
 
 #include "emu.h"
@@ -643,50 +647,94 @@ void hd6309_device::muld()
 
 bool hd6309_device::divq()
 {
-	int32_t result;
+	// internal execution base cycles (excludes addressing mode fetch): 24 native, 25 emulation
+	int target_cycles = hd6309_native_mode() ? 24 : 25;
 
 	// check for divide by zero
 	if (m_temp.w == 0)
-		return false;
-
-	int32_t q = m_q.q;
-	int32_t old_q = q;
-
-	// do the divide/modulo
-	result = q / (int16_t) m_temp.w;
-	m_q.r.d = q % (int16_t) m_temp.w;
-
-	// set NZ condition codes
-	m_q.r.w = set_flags<uint16_t>(CC_NZ, result);
-
-	// set C condition code
-	if (m_q.r.w & 0x0001)
-		m_cc |= CC_C;
-	else
-		m_cc &= ~CC_C;
-
-	if ((result > 32768) || (result < -32767))
 	{
-		// soft overflow
-		m_cc |= CC_V;
-
-		if  ((result > 65536 ) || (result < -65535 ))
+		if (!hd6309_native_mode())
 		{
-			// hard overflow - division is aborted
-			if (old_q < 0)
-				m_cc |= CC_N;
-			else if (old_q == 0 )
-				m_cc |= CC_Z;
+			target_cycles -= 2;
+		}
+		eat(target_cycles);
+		return false;
+	}
 
-			m_q.q = old_q;
+	uint32_t tmp1 = m_q.q;
+	uint16_t tmp2 = m_temp.w;
+
+	bool nsign = false;
+	bool vsign = false;
+
+	if ((tmp1 >> 31) & 1)
+	{
+		tmp1 = ~tmp1 + 1;
+		m_q.q = tmp1;
+		nsign = true;
+		target_cycles += 1; // negative dividend: +1 cycle
+	}
+
+	if ((tmp2 >> 15) & 1)
+	{
+		tmp2 = ~tmp2 + 1;
+		vsign = true;
+		target_cycles += 1; // negative divisor: +1 cycle
+	}
+
+	uint32_t quotient  = tmp1 / tmp2;
+	uint16_t remainder = tmp1 % tmp2;
+
+	m_cc &= ~(CC_N | CC_Z | CC_V | CC_C);
+
+	if ((quotient >> 16) != 0)
+	{
+		// range (hard) overflow
+		m_cc |= CC_V;
+		if (nsign)
+		{
+			m_cc |= CC_N;
+		}
+		target_cycles -= 13; // range overflow: -13 cycles
+		eat(target_cycles);
+		return true;
+	}
+
+	if (nsign)
+	{
+		remainder = ~remainder + 1;
+	}
+
+	if (nsign != vsign)
+	{
+		uint32_t new_quotient = ~quotient + 1;
+		if ((new_quotient & 0x8000) && !(quotient & 0x8000))
+		{
+			quotient = new_quotient;
 		}
 	}
-	else
+
+	m_q.r.d = remainder;
+	m_q.r.w = quotient & 0xffffff;
+
+	if (m_q.r.w & 1)
 	{
-		// no overflow
-		m_cc &= ~CC_V;
+		m_cc |= CC_C;
 	}
 
+	// check for 2's complement (soft) overflow
+	if ((((quotient >> 31) ^ (m_q.r.w >> 15)) & 1) == 0)
+	{
+		if (m_q.r.w == 0)     m_cc |= CC_Z;
+		if (m_q.r.w & 0x8000)  m_cc |= CC_N;
+	}
+	else
+	{
+		m_cc |= (CC_N | CC_V);
+		target_cycles -= 1; // 2's complement overflow: -1 cycle
+	}
+
+	eat(target_cycles);
 	return true;
 }
 
@@ -697,44 +745,94 @@ bool hd6309_device::divq()
 
 bool hd6309_device::divd()
 {
+	// internal execution base cycles (excludes addressing mode fetch): 24 native, 25 emulation
+	int target_cycles = hd6309_native_mode() ? 24 : 25;
+
 	// check for divide by zero
 	if (m_temp.b.l == 0)
-		return false;
-
-	int16_t old_d = m_q.r.d;
-	int16_t result;
-
-	// do the divide/modulo
-	result = ((int16_t) m_q.r.d) / (int8_t) m_temp.b.l;
-	m_q.r.a = ((int16_t) m_q.r.d) % (int8_t) m_temp.b.l;
-
-	// set NZ condition codes
-	m_q.r.b = set_flags<uint8_t>(CC_NZ, result);
-
-	// set C condition code
-	if (m_q.r.b & 0x01)
-		m_cc |= CC_C;
-	else
-		m_cc &= ~CC_C;
-
-	if ((result > 128) || (result < -127))
 	{
-		// soft overflow
-		m_cc |= CC_V;
-
-		if ((result > 256 ) || (result < -255 ))
+		if (!hd6309_native_mode())
 		{
-			// hard overflow - division is aborted
-			set_flags<uint16_t>(CC_NZ, old_d);
-			m_q.r.d = abs(old_d);
+			target_cycles -= 2; // emulation mode div-by-zero is 23 internal execution cycles
+		}
+		eat(target_cycles);
+		return false;
+	}
+
+	uint16_t tmp1 = m_q.r.d;
+	uint8_t  tmp2 = m_temp.b.l;
+
+	bool nsign = false;  // dividend sign
+	bool vsign = false;  // divisor sign
+
+	if ((tmp1 >> 15) & 1)
+	{
+		tmp1 = ~tmp1 + 1;
+		m_q.r.d = tmp1;
+		nsign = true;
+		target_cycles += 1; // negative dividend: +1 cycle
+	}
+
+	if ((tmp2 >> 7) & 1)
+	{
+		tmp2 = ~tmp2 + 1;
+		vsign = true;
+		target_cycles += 1; // negative divisor: +1 cycle
+	}
+
+	uint16_t quotient  = tmp1 / tmp2;
+	uint8_t  remainder = tmp1 % tmp2;
+
+	m_cc &= ~(CC_N | CC_Z | CC_V | CC_C);
+
+	if ((quotient >> 8) != 0)
+	{
+		// range (hard) overflow
+		m_cc |= CC_V;
+		if (nsign)
+		{
+			m_cc |= CC_N;
+		}
+		target_cycles -= 13; // range overflow: -13 cycles
+		eat(target_cycles);
+		return true;
+	}
+
+	if (nsign)
+	{
+		remainder = ~remainder + 1;
+	}
+
+	if (nsign != vsign)
+	{
+		uint16_t new_quotient = ~quotient + 1;
+		if ((new_quotient & 0x80) && !(quotient & 0x80))
+		{
+			quotient = new_quotient;
 		}
 	}
-	else
+
+	m_q.r.a = remainder;
+	m_q.r.b = quotient & 0xff;
+
+	if (m_q.r.b & 1)
 	{
-		// no overflow
-		m_cc &= ~CC_V;
+		m_cc |= CC_C;
 	}
 
+	// check for 2's complement (soft) overflow
+	if ((((quotient >> 15) ^ (m_q.r.b >> 7)) & 1) == 0)
+	{
+		if (m_q.r.b == 0)     m_cc |= CC_Z;
+		if (m_q.r.b & 0x80)  m_cc |= CC_N;
+	}
+	else
+	{
+		m_cc |= (CC_N | CC_V);
+		target_cycles -= 1; // 2's complement overflow: -1 cycle
+	}
+
+	eat(target_cycles);
 	return true;
 }
 
