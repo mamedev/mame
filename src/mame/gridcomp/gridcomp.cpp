@@ -147,9 +147,11 @@ private:
 
 	uint16_t *m_videoram = nullptr;
 
+	bool m_video_chip_activated = false;
+	bool m_widescreen_activated = false;
+
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	uint16_t grid_9ff0_r(offs_t offset);
 	uint16_t grid_keyb_r(offs_t offset);
 	uint8_t grid_modem_r(offs_t offset);
 	void grid_keyb_w(offs_t offset, uint16_t data);
@@ -160,8 +162,11 @@ private:
 	void grid_dma_w(offs_t offset, uint8_t data);
 	uint8_t grid_dma_r(offs_t offset);
 
+	void split_board_w(offs_t offset, uint8_t data);
+
 	template <int Width>
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_113x(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void kbd_put(u16 data);
 
@@ -184,23 +189,6 @@ static void rs232_devices(device_slot_interface &device)
 	*/
 
 	device.option_add("printer", SERIAL_PRINTER);
-}
-
-
-[[maybe_unused]] uint16_t gridcomp_state::grid_9ff0_r(offs_t offset)
-{
-	uint16_t data = 0;
-
-	switch (offset)
-	{
-	case 0:
-		data = 0xbb66;
-		break;
-	}
-
-	LOGDBG("9FF0: %02x == %02x\n", 0x9ff00 + (offset << 1), data);
-
-	return data;
 }
 
 uint16_t gridcomp_state::grid_keyb_r(offs_t offset)
@@ -282,6 +270,23 @@ uint8_t gridcomp_state::grid_dma_r(offs_t offset)
 	return ret;
 }
 
+void gridcomp_state::split_board_w(offs_t offset, uint8_t data)
+{
+	// LOG("SPLIT BOARD %02x <- %02x\n", offset, data);
+
+	switch (offset)
+	{
+	case 0:
+		m_video_chip_activated = data == 1;
+		break;
+
+	case 4:
+		if (m_video_chip_activated)
+			m_widescreen_activated = data == 0x0B;
+		break;
+	}
+}
+
 template <int Width>
 uint32_t gridcomp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -292,6 +297,47 @@ uint32_t gridcomp_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		int const offset = y * (Width / 16);
 
 		for (int x = offset; x < offset + Width / 16; x++)
+		{
+			uint16_t const gfx = m_videoram[x];
+
+			for (int i = 15; i >= 0; i--)
+			{
+				*p++ = BIT(gfx, i);
+			}
+		}
+	}
+
+	return 0;
+}
+
+uint32_t gridcomp_state::screen_update_113x(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if (m_widescreen_activated)
+	{
+		// In widescreen mode just copy the framebuffer to a bitmap.
+		// The image in the framebuffer is stored exactly as specified in set_raw.
+		screen_update<512>(screen, bitmap, cliprect);
+		return 0;
+	}
+
+	// In compatibility mode, only 320 by 240 pixels is stored in the framebuffer,
+	// and the image is centered on the screen, which requires adding padding
+	// and clear a region around the image.
+	bitmap.fill(0);
+
+	int const width = 320;
+	int const height = 240;
+
+	int const x_padding = (cliprect.width() - width) / 2;
+	int const y_padding = (cliprect.height() - height) / 2;
+
+	for (int y = 0; y < height; y++)
+	{
+		uint16_t *p = &bitmap.pix(cliprect.top() + y + y_padding, cliprect.left() + x_padding);
+
+		int const offset = y * (width / 16);
+
+		for (int x = offset; x < offset + width / 16; x++)
 		{
 			uint16_t const gfx = m_videoram[x];
 
@@ -344,11 +390,12 @@ void gridcomp_state::grid1101_map(address_map &map)
 void gridcomp_state::grid1121_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x90000, 0x97fff).unmaprw(); // ?? ROM slot
-	map(0x9ff00, 0x9ff0f).unmaprw(); // .r(FUNC(gridcomp_state::grid_9ff0_r)); // ?? ROM?
+	map(0x80000, 0x9ffff).unmapr(); // Application ROM
 	map(0xc0000, 0xcffff).r(m_test_rom, FUNC(gridrom_socket_device::read));
 	map(0xdfa00, 0xdfdff).rw(FUNC(gridcomp_state::grid_dma_r), FUNC(gridcomp_state::grid_dma_w)); // DMA
-	map(0xdfe00, 0xdfe1f).unmaprw(); // ??
+	map(0xdfe00, 0xdfe07).w(FUNC(gridcomp_state::split_board_w));
+	map(0xdfe08, 0xdfe0f).unmaprw();  // Application ROM
+	map(0xdfe10, 0xdfe1f).unmapw(); // .rw(FUNC(gridcomp_state::uart_pal_r), FUNC(gridcomp_state::uart_pal_w));
 	map(0xdfe40, 0xdfe4f).w(FUNC(gridcomp_state::grid_sound_w));  // modem controller??
 	map(0xdfe80, 0xdfe83).rw("i7220", FUNC(i7220_device::read), FUNC(i7220_device::write)).umask16(0x00ff);
 	map(0xdfea0, 0xdfeaf).unmaprw(); // ??
@@ -499,7 +546,7 @@ void gridcomp_state::grid1129(machine_config &config)
 void gridcomp_state::grid1131(machine_config &config)
 {
 	grid1121(config);
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(gridcomp_state::screen_update<512>));
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(gridcomp_state::screen_update_113x));
 	subdevice<screen_device>("screen")->set_raw(XTAL(15'000'000)/2, 720, 0, 512, 262, 0, 256);
 }
 
