@@ -100,7 +100,6 @@ private:
 	required_device<rs232_port_device> m_rs232;
 	required_device<hd44780_device> m_lcd;
 
-	void data_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 	void program_map_st25_1(address_map &map) ATTR_COLD;
 	void program_map_st25_3(address_map &map) ATTR_COLD;
@@ -175,8 +174,8 @@ void st25_state::p2_w(u8 data)
 
 void st25_state::service_strobe_w(u8 data)
 {
-	m_lcd->rs_w((m_service >> 8) & 0x01);
-	m_lcd->e_w((m_service >> 8) & 0x10);
+	m_lcd->rs_w(BIT(m_service,8));
+	m_lcd->e_w(BIT(m_service,12));
 	
 	// TODO: 0x04 and 0x08 control the top and bottom halves of the keyboard
 
