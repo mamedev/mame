@@ -228,7 +228,7 @@ bool ppc_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev, 
 		desc.set_end_sequence();
 		return true;
 	}
-	
+
 	// swizzle the physical address if in little endian mode
 	if (little_endian)
 	{
