@@ -88,7 +88,7 @@ public:
 	void st25_3(machine_config &config) ATTR_COLD;
 
 private:
-	uint16_t m_service;
+	u16 m_service;
 	required_device<v25_device> m_maincpu;
 	required_device<m48t58_device> m_rtc;
 	required_device<okim6376_device> m_oki;
@@ -101,10 +101,10 @@ private:
 	void program_map_st25_1(address_map &map) ATTR_COLD;
 	void program_map_st25_3(address_map &map) ATTR_COLD;
 
-	void io5_w(uint8_t data);
-	void p2_w(uint8_t data);
-	void service_strobe_w(uint8_t data);
-	//void txd0_w(uint8_t data);
+	void io5_w(u8 data);
+	void p2_w(u8 data);
+	void service_strobe_w(u8 data);
+	//void txd0_w(u8 data);
 
 };
 
@@ -161,19 +161,19 @@ void st25_state::program_map_st25_3(address_map &map)
 	map(0xfc000, 0xfffff).rom().region("maskrom", 0);
 }
 
-void st25_state::io5_w(uint8_t data)
+void st25_state::io5_w(u8 data)
 {
 	// pulse ST line
 	m_oki->st_w(1);
 	m_oki->st_w(0);
 }
 
-void st25_state::p2_w(uint8_t data)
+void st25_state::p2_w(u8 data)
 {
 	m_oki->write(data);
 }
 
-void st25_state::service_strobe_w(uint8_t data)
+void st25_state::service_strobe_w(u8 data)
 {
 	m_service = data;
 	m_lcd->e_w((m_service >> 8) & 0x01);
