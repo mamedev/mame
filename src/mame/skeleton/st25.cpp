@@ -103,7 +103,9 @@ private:
 	required_device<hd44780_device> m_lcd;
 
 	void io_map(address_map &map) ATTR_COLD;
-	void program_map(address_map &map) ATTR_COLD;
+	void program_map_st25(address_map &map) ATTR_COLD;
+	void program_map_st25_1(address_map &map) ATTR_COLD;
+	void program_map_st25_3(address_map &map) ATTR_COLD;
 
 	void io5_w(u8 data);
 	void p2_w(u8 data);
@@ -125,7 +127,7 @@ void st25_state::io_map(address_map &map)
 	map(0xe000, 0xffff).noprw(); // Y7
 }
 
-void st25_state::program_map(address_map &map)
+void st25_state::program_map_st25(address_map &map)
 {
       // ICC4 74AS138 inputs A17-19
       // O0 - V62C518256 mirrored 4 times
@@ -138,13 +140,20 @@ void st25_state::program_map(address_map &map)
       map(0xa0000, 0xa1fff).rw(m_rtc, FUNC(m48t58_device::read), FUNC(m48t58_device::write)).mirror(0x1e000);
       // O6 NC
       map(0xc0000, 0xdffff).noprw();
-      // O7 unpopulated footprint ICE3, populated on ST25.3
-      if (memregion("onboard"))
-              map(0xe0000, 0xfbfff).rom().region("onboard", 0);
-      else
-              map(0xe0000, 0xfbfff).noprw();
       // internal to CPU
       map(0xfc000, 0xfffff).rom().region("maskrom", 0);
+}
+
+void st25_state::program_map_st25_1(address_map &map)
+{
+	program_map_st25(map);
+	map(0xe0000, 0xfbfff).noprw();
+}
+
+void st25_state::program_map_st25_3(address_map &map)
+{
+	program_map_st25(map);
+	map(0xe0000, 0xfbfff).rom().region("onboard", 0);
 }
 
 void st25_state::io5_w(u8 data)
@@ -222,7 +231,7 @@ void st25_state::st25_1(machine_config &config)
 {
 	V25(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_IO, &st25_state::io_map);
-	m_maincpu->set_addrmap(AS_PROGRAM, &st25_state::program_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &st25_state::program_map_st25_1);
 
 	m_maincpu->p2_out_cb().set(FUNC(st25_state::p2_w));
 	//m_maincpu->txd0_cb().set(FUNC(st25_state::txd0_w)); // Service
@@ -265,7 +274,7 @@ void st25_state::st25_2(machine_config &config)
 void st25_state::st25_3(machine_config &config)
 {
 	st25_2(config);
-
+	m_maincpu->set_addrmap(AS_PROGRAM, &st25_state::program_map_st25_3);
 	// extra onboard region
 }
 
