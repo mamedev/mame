@@ -41,11 +41,13 @@ PROMs : NEC B406 (1kx4) x2
 ***********************************************************/
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -175,11 +177,13 @@ void sbowling_state::pix_shift_w(uint8_t data)
 {
 	m_pix_sh = data;
 }
+
 void sbowling_state::pix_data_w(uint8_t data)
 {
 	m_pix[0] = m_pix[1];
 	m_pix[1] = data;
 }
+
 uint8_t sbowling_state::pix_data_r()
 {
 	uint32_t p1, p0;
@@ -200,10 +204,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(sbowling_state::interrupt)
 {
 	int scanline = param;
 
-	if(scanline == 256)
+	if (scanline == 256)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); /* Z80 - RST 08h */
 
-	if(scanline == 128)
+	if (scanline == 128)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* Z80 - RST 10h */
 
 }
@@ -217,7 +221,6 @@ void sbowling_state::system_w(offs_t offset, uint8_t data)
 	    -----x-- 1 ?
 	    ----x--- flip screen/controls
 	*/
-
 
 	flip_screen_set(BIT(data, 3));
 
@@ -236,8 +239,6 @@ void sbowling_state::graph_control_w(uint8_t data)
 	    --xx---- background image select (address lines on tilemap rom)
 	    xx------ color PROM address lines A4,A3
 	*/
-
-
 
 	m_color_prom_address = ((data&0x07)<<7) | ((data&0xc0)>>3);
 
@@ -268,7 +269,7 @@ void sbowling_state::port_map(address_map &map)
 	map(0x00, 0x00).portr("IN0").w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x01, 0x01).rw(FUNC(sbowling_state::controls_r), FUNC(sbowling_state::pix_data_w));
 	map(0x02, 0x02).rw(FUNC(sbowling_state::pix_data_r), FUNC(sbowling_state::pix_shift_w));
-	map(0x03, 0x03).portr("IN1").nopw();
+	map(0x03, 0x03).portr("IN1").nopw(); // sound
 	map(0x04, 0x04).portr("DSW0").w(FUNC(sbowling_state::system_w));
 	map(0x05, 0x05).portr("DSW1").w(FUNC(sbowling_state::graph_control_w));
 }
@@ -281,14 +282,14 @@ static INPUT_PORTS_START( sbowling )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1   )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1   )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
@@ -340,20 +341,22 @@ static INPUT_PORTS_START( sbowling )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_8C ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("SW2:!1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )   PORT_DIPLOCATION("SW2:!1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "SW2:!2" )
-	PORT_DIPNAME( 0x04, 0x00, "Year Display" )  PORT_DIPLOCATION("SW2:!3")
+	PORT_DIPNAME( 0x02, 0x00, "Coin Slots" )         PORT_DIPLOCATION("SW2:!2")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPNAME( 0x04, 0x00, "Year Display" )       PORT_DIPLOCATION("SW2:!3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW2:!4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW2:!5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW2:!6" )
-	PORT_DIPNAME( 0x40, 0x00, "Ball Control Check" )  PORT_DIPLOCATION("SW2:!7")
+	PORT_DIPNAME( 0x40, 0x00, "Ball Control Check" ) PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Video Test" )  PORT_DIPLOCATION("SW2:!8")
+	PORT_DIPNAME( 0x80, 0x00, "Video Test" )         PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -417,6 +420,7 @@ void sbowling_state::sbowling(machine_config &config)
 	I8080(config, m_maincpu, XTAL(19'968'000)/10);   /* ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &sbowling_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &sbowling_state::port_map);
+
 	TIMER(config, "scantimer").configure_scanline(FUNC(sbowling_state::interrupt), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, "watchdog");
@@ -441,21 +445,21 @@ void sbowling_state::sbowling(machine_config &config)
 
 ROM_START( sbowling )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "kb01.6h",        0x0000, 0x1000, CRC(dd5d411a) SHA1(ca15676d234353bc47f642be13d58f3d6d880126))
-	ROM_LOAD( "kb02.5h",        0x1000, 0x1000, CRC(75d3c45f) SHA1(af6e6237b7b28efaac258e6ddd85518c3406b24a))
-	ROM_LOAD( "kb03.3h",        0x2000, 0x1000, CRC(955fbfb8) SHA1(05d501f924adc5b816670f6f5e58a98a0c1bc962))
+	ROM_LOAD( "kb01.6h",  0x0000, 0x1000, CRC(dd5d411a) SHA1(ca15676d234353bc47f642be13d58f3d6d880126) )
+	ROM_LOAD( "kb02.5h",  0x1000, 0x1000, CRC(75d3c45f) SHA1(af6e6237b7b28efaac258e6ddd85518c3406b24a) )
+	ROM_LOAD( "kb03.3h",  0x2000, 0x1000, CRC(955fbfb8) SHA1(05d501f924adc5b816670f6f5e58a98a0c1bc962) )
 
 	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_LOAD( "kb05.9k",        0x0000, 0x800,  CRC(4b4d9569) SHA1(d69e69add69ec11724090e34838ec8c61de81f4e))
-	ROM_LOAD( "kb06.7k",        0x0800, 0x800,  CRC(d89ba78b) SHA1(9e01be976e1e14feb8f7bd9f699a977a15a72e0d))
-	ROM_LOAD( "kb07.6k",        0x1000, 0x800,  CRC(9fb5db1a) SHA1(0b28ca5277ebe0d78d1a3f2d414efb5fd7c6e9ee))
+	ROM_LOAD( "kb05.9k",  0x0000, 0x0800, CRC(4b4d9569) SHA1(d69e69add69ec11724090e34838ec8c61de81f4e) )
+	ROM_LOAD( "kb06.7k",  0x0800, 0x0800, CRC(d89ba78b) SHA1(9e01be976e1e14feb8f7bd9f699a977a15a72e0d) )
+	ROM_LOAD( "kb07.6k",  0x1000, 0x0800, CRC(9fb5db1a) SHA1(0b28ca5277ebe0d78d1a3f2d414efb5fd7c6e9ee) )
 
 	ROM_REGION( 0x01000, "user1", 0 )
-	ROM_LOAD( "kb04.10k",       0x0000, 0x1000, CRC(1c27adc1) SHA1(a68748fbdbd8fb48f20b3675d793e5c156d1bd02))
+	ROM_LOAD( "kb04.10k", 0x0000, 0x1000, CRC(1c27adc1) SHA1(a68748fbdbd8fb48f20b3675d793e5c156d1bd02) )
 
 	ROM_REGION( 0x0800, "proms", 0 )
-	ROM_LOAD( "kb08.7m",        0x0000, 0x0400, CRC(e949e441) SHA1(8e0fe71ed6d4e6f94a703c27a8364da27b443730))
-	ROM_LOAD( "kb09.6m",        0x0400, 0x0400, CRC(e29191a6) SHA1(9a2c78a96ef6d118f4dacbea0b7d454b66a452ae))
+	ROM_LOAD( "kb08.7m",  0x0000, 0x0400, CRC(e949e441) SHA1(8e0fe71ed6d4e6f94a703c27a8364da27b443730) )
+	ROM_LOAD( "kb09.6m",  0x0400, 0x0400, CRC(e29191a6) SHA1(9a2c78a96ef6d118f4dacbea0b7d454b66a452ae) )
 ROM_END
 
 } // anonymous namespace
