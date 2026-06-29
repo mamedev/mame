@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "mb86235.h"
 
+#include "corefloat.h"
+
 /*********************
  *
  * Misc helpers

@@ -962,13 +962,6 @@ void cdtv_state::machine_start()
 	// setup dmac
 	m_dmac->set_address_space(&m_maincpu->space(AS_PROGRAM));
 	m_dmac->ramsz_w(0);
-
-	// resolve outputs
-	m_vfd_ampm.resolve();
-	m_vfd_digits.resolve();
-	m_vfd_colon.resolve();
-	m_vfd_volume.resolve();
-	m_cd_led.resolve();
 }
 
 void cdtv_state::machine_reset()
@@ -2100,14 +2093,15 @@ void a2000_state::a2000(machine_config &config)
 	m_cpuslot->ipl7_cb().set([this](int state) { m_maincpu->set_input_line(7, state); });
 
 	// zorro2 slots
+	// FIXME: set Zorro bus clock frequency
 	ZORRO2_BUS(config, m_zorro, 0);
 	m_zorro->int2_handler().set(FUNC(a2000_state::zorro2_int2_w));
 	m_zorro->int6_handler().set(FUNC(a2000_state::zorro2_int6_w));
-	ZORRO2_SLOT(config, "zorro2:1", zorro2_cards, nullptr);
-	ZORRO2_SLOT(config, "zorro2:2", zorro2_cards, nullptr);
-	ZORRO2_SLOT(config, "zorro2:3", zorro2_cards, nullptr);
-	ZORRO2_SLOT(config, "zorro2:4", zorro2_cards, nullptr);
-	ZORRO2_SLOT(config, "zorro2:5", zorro2_cards, nullptr);
+	ZORRO2_SLOT(config, "zorro2:1", 0, zorro2_cards, nullptr);
+	ZORRO2_SLOT(config, "zorro2:2", 0, zorro2_cards, nullptr);
+	ZORRO2_SLOT(config, "zorro2:3", 0, zorro2_cards, nullptr);
+	ZORRO2_SLOT(config, "zorro2:4", 0, zorro2_cards, nullptr);
+	ZORRO2_SLOT(config, "zorro2:5", 0, zorro2_cards, nullptr);
 }
 
 void a2000_state::a2000n(machine_config &config)
@@ -2233,12 +2227,12 @@ void cdtv_state::cdtv(machine_config &config)
 	m_dmac->csx0_a4_write_cb().set(m_tpi, FUNC(tpi6525_device::write));
 	m_dmac->xdack_read_cb().set(m_cdrom, FUNC(cr511b_device::read));
 
-	TPI6525(config, m_tpi, 0);
+	TPI6525(config, m_tpi);
 	m_tpi->out_irq_cb().set(FUNC(cdtv_state::tpi_int_w));
 	m_tpi->out_pb_cb().set(FUNC(cdtv_state::tpi_portb_w));
 	m_tpi->out_pc_cb().set(FUNC(cdtv_state::tpi_portc_w));
 
-	CR511B(config, m_cdrom, 0);
+	CR511B(config, m_cdrom);
 	m_cdrom->add_route(0, "speaker", 1.0, 0);
 	m_cdrom->add_route(1, "speaker", 1.0, 1);
 	m_cdrom->scor_cb().set(m_tpi, FUNC(tpi6525_device::i1_w)).invert();
@@ -2571,9 +2565,9 @@ void cd32_state::cd32(machine_config &config)
 	// disable floppy as default (available only via back port as expansion)
 	subdevice<floppy_connector>("fdc:0")->set_default_option(nullptr);
 
-	I2C_24C08(config, "i2cmem", 0); // AT24C08N
+	I2C_24C08(config, "i2cmem"); // AT24C08N
 
-	akiko_device &akiko(AKIKO(config, "akiko", 0));
+	akiko_device &akiko(AKIKO(config, "akiko"));
 	akiko.mem_r_callback().set(FUNC(amiga_state::chip_ram_r));
 	akiko.mem_w_callback().set(FUNC(amiga_state::chip_ram_w));
 	akiko.int_callback().set(FUNC(cd32_state::akiko_int_w));

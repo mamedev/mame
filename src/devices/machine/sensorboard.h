@@ -11,6 +11,9 @@
 
 #pragma once
 
+#include <optional>
+
+
 class sensorboard_device : public device_t, public device_nvram_interface
 {
 public:
@@ -84,12 +87,12 @@ public:
 	ioport_value check_ui_enabled() { return m_ui_enabled; }
 
 protected:
-	// device-level overrides
+	// device_t implementation
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_config_complete() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override { refresh(); }
-
-	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -98,9 +101,9 @@ protected:
 	virtual bool nvram_can_write() const override;
 
 private:
-	output_finder<0x10, 0x10> m_out_piece;
-	output_finder<0x20+1> m_out_pui;
-	output_finder<2> m_out_count;
+	std::optional<output_finder<0x10, 0x10> > m_out_piece;
+	std::optional<output_finder<0x20+1> > m_out_pui;
+	std::optional<output_finder<2> > m_out_count;
 	required_ioport_array<13> m_inp_rank;
 	required_ioport m_inp_spawn;
 	required_ioport m_inp_ui;

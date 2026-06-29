@@ -174,7 +174,7 @@ void vlc34010_state::base(machine_config &config)
 	screen.set_visarea(0*8, 31*8-1, 0*8, 31*8-1);
 	screen.set_screen_update(m_tms, FUNC(tms34010_device::tms340x0_rgb32));
 
-	BT471(config, "ramdac", 0); // type not correct
+	BT471(config, "ramdac"); // type not correct
 
 	MC68681(config, "duart0", 3.6864_MHz_XTAL);
 

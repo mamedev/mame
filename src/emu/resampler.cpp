@@ -6,6 +6,8 @@
 #include "emu.h"
 #include "resampler.h"
 
+#include <numbers>
+
 // How an accurate resampler works ?
 
 // Resampling uses a number of well-known theorems we are not trying
@@ -186,10 +188,10 @@ audio_resampler_hq::audio_resampler_hq(u32 fs, u32 ft, float latency, u32 max_or
 	// Compute the filter and send the coefficients to the appropriate phase
 	auto set_filter = [this](u32 i, float v) { m_coefficients[i % m_phases][i / m_phases] = v; };
 
-	double wc = 2 * M_PI * cutoff / (double(fs) * m_fsm / (1 << m_phase_shift));
-	double a = wc / M_PI;
+	double wc = 2 * std::numbers::pi * cutoff / (double(fs) * m_fsm / (1 << m_phase_shift));
+	double a = wc / std::numbers::pi;
 	for(u32 i = 1; i != hlen; i++) {
-		double win = cos(i*M_PI/hlen/2);
+		double win = cos(i * std::numbers::pi / hlen / 2);
 		win = win*win;
 		double s = a * sin(i*wc)/(i*wc) * win;
 

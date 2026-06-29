@@ -190,7 +190,7 @@ z8_device::z8_device(const machine_config &mconfig, device_type type, const char
 	, m_external_bus_reset(external_bus_reset)
 	, m_input{0xff, 0xff, 0xff, 0x0f}
 {
-	assert(((rom_size - 1) & rom_size) == 0);
+	assert(!rom_size || std::has_single_bit(rom_size));
 }
 
 

@@ -58,7 +58,7 @@ class duscc_channel : public device_t, public device_serial_interface
 	friend class duscc_device;
 
 public:
-	duscc_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	duscc_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// read register handlers
 	uint8_t do_dusccreg_cmr1_r();

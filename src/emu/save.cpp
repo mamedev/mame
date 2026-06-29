@@ -27,6 +27,7 @@
 
 #include "main.h"
 
+#include "util/endianness.h"
 #include "util/ioprocs.h"
 #include "util/ioprocsfilter.h"
 #include "util/multibyte.h"

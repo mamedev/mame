@@ -211,7 +211,7 @@ void tc0090lvc_device::device_post_load()
 void tc0090lvc_device::device_start()
 {
 	// rom_r assumes it can make a mask with (m_rom.length() - 1)
-	assert(!(m_rom.length() & (m_rom.length() - 1)));
+	assert(std::has_single_bit(m_rom.length()));
 
 	z80_device::device_start();
 

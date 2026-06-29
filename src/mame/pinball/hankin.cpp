@@ -53,7 +53,8 @@ public:
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
-	void hankin(machine_config &config);
+
+	void hankin(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -441,10 +442,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( hankin_state::timer_s )
 
 void hankin_state::machine_start()
 {
-	m_digits.resolve();
-	m_io_leds.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_timer_sb));
 	save_item(NAME(m_timer_s));
 	save_item(NAME(m_vol));

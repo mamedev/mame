@@ -521,8 +521,6 @@ INPUT_PORTS_END
 
 void imolagp_state::machine_start()
 {
-	m_digits.resolve();
-
 	save_item(NAME(m_vcontrol));
 	save_item(NAME(m_vreg));
 	save_item(NAME(m_scroll));

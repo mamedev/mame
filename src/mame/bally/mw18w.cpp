@@ -48,7 +48,6 @@ private:
 	void mw18w_map(address_map &map) ATTR_COLD;
 	void mw18w_portmap(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override { m_digits.resolve(); m_lamps.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	output_finder<10> m_digits;
 	output_finder<81> m_lamps;

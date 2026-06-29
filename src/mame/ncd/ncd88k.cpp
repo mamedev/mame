@@ -64,6 +64,8 @@
 #include "video/bt47x.h"
 #include "screen.h"
 
+#include "endianness.h"
+
 #define VERBOSE (0)
 #include "logmacro.h"
 
@@ -148,7 +150,7 @@ void ncd88k_state::ncd19c(machine_config &config)
 
 	SCN2681(config, "duart", 3'686'400);
 
-	BT458(config, m_ramdac, 0);
+	BT458(config, m_ramdac);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(125'000'000, 1680, 0, 1280, 1063, 0, 1024); // 74.4 kHz horizontal, 70 Hz vertical

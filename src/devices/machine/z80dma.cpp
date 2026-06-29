@@ -167,6 +167,7 @@ void z80dma_device::device_start()
 	save_item(NAME(m_byte_counter));
 	save_item(NAME(m_rdy));
 	save_item(NAME(m_force_ready));
+	save_item(NAME(m_reset_pointer));
 	save_item(NAME(m_wait));
 	save_item(NAME(m_waits_extra));
 	save_item(NAME(m_busrq));
@@ -184,7 +185,7 @@ void z80dma_device::device_reset()
 	m_timer->reset();
 
 	m_status = 0;
-	m_dma_seq = ~0;
+	m_dma_seq = SEQ_IDLE;
 	m_rdy = 0;
 	m_force_ready = 0;
 	m_wait = 0;
@@ -298,6 +299,8 @@ void z80dma_device::disable()
 	{
 		set_busrq(CLEAR_LINE);
 	}
+	m_dma_seq = SEQ_IDLE;
+	LOGDMA("IDLE\n");
 }
 
 void z80dma_device::update_bao()
@@ -607,6 +610,7 @@ TIMER_CALLBACK_MEMBER(z80dma_device::clock_w)
 		}
 		break;
 
+	case SEQ_IDLE:
 	default:
 		break;
 	}
@@ -919,6 +923,9 @@ void z80dma_device::bai_w(int state)
 {
 	m_busrq_ack = state;
 	update_bao();
+
+	if (m_busrq_ack && m_dma_seq == SEQ_IDLE)
+		set_busrq(CLEAR_LINE);
 }
 
 

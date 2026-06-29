@@ -58,7 +58,7 @@ public:
 		m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void k28(machine_config &config);
+	void k28(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_on);
 
@@ -94,8 +94,6 @@ private:
 
 void k28_state::machine_start()
 {
-	m_digits.resolve();
-
 	// register for savestates
 	save_item(NAME(m_power_on));
 	save_item(NAME(m_inp_mux));

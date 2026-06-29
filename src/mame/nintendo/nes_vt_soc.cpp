@@ -310,13 +310,48 @@ void nes_vt02_vt03_soc_device::update_banks()
 	m_bankaddr[3] = get_banks(bank);
 }
 
-u16 nes_vt02_vt03_soc_device::decode_nt_addr(u16 addr)
+u16 nes_vt02_vt03_soc_device::decode_nt_addr(u16 addr, bool handle_single_page)
 {
-	bool vert_mirror = !(m_410x[0x6] & 0x01);
-	int a11 = (addr >> 11) & 0x01;
-	int a10 = (addr >> 10) & 0x01;
-	u16 base = (addr & 0x3FF);
-	return ((vert_mirror ? a10 : a11) << 10) | base;
+	/* bit 0 = HV(0 = Horizontal, 1 = Vertical)
+	   bit 1 = 0 (HV Mode)
+
+	   or
+	 
+	   bit 0 = Page (0 = Page 0, 1 = Page 1)
+	   bit 1 = 1 (One Page mode) 
+	
+	   does single page mode only affect rendering, not PPU accesses?
+	   several games require single page mode when rendering, but have
+	   incorrect rendering if it's applied to PPU reads/writes outside
+	   of rendering.  could also be a timing issue?
+
+	   Games switching between single page and HV modes include (from lxcmcyspn)
+	   'Golf'
+	   'Explorer' (and the 'Spider Jump' reskin)
+	   'Fruit Killer'
+	   'Space Castle'
+	   'Mini Golf'
+	   'Action Ball'
+	*/
+
+	if ((!(m_410x[0x6] & 0x02)) || handle_single_page == false)
+	{
+		bool vert_mirror = !(m_410x[0x6] & 0x01);
+		int a11 = (addr >> 11) & 0x01;
+		int a10 = (addr >> 10) & 0x01;
+		u16 base = (addr & 0x3ff);
+		return ((vert_mirror ? a10 : a11) << 10) | base;
+	}
+	else
+	{
+		u8 page = m_410x[0x6] & 0x01;
+		u16 base = (addr & 0x3ff);
+
+		if (page)
+			base |= 0x400;
+
+		return base;
+	}
 }
 
 void nes_vt02_vt03_soc_device::vt03_410x_w(offs_t offset, u8 data)
@@ -345,12 +380,14 @@ void nes_vt02_vt03_soc_device::scrambled_410x_w(u16 offset, u8 data)
 
 	case 0x1:
 		// latch timer value
+		LOG("%s: vt03_410x_w timer latch %02x\n", machine().describe_context(), data);
 		m_410x[0x1] = data;
 		m_timer_running = 0;
 		break;
 
 	case 0x2:
 		// load latched value and start counting
+		LOG("%s: vt03_410x_w timer reload/start %02x (latch %02x)\n", machine().describe_context(), data, m_410x[0x1]);
 		m_410x[0x2] = data; // value doesn't matter?
 		m_timer_val = m_410x[0x1];
 
@@ -363,6 +400,7 @@ void nes_vt02_vt03_soc_device::scrambled_410x_w(u16 offset, u8 data)
 		break;
 
 	case 0x3:
+		LOG("%s: vt03_410x_w irq disable %02x\n", machine().describe_context(), data);
 		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 		// disable timer irq
 		m_410x[0x3] = data; // value doesn't matter?
@@ -371,6 +409,7 @@ void nes_vt02_vt03_soc_device::scrambled_410x_w(u16 offset, u8 data)
 
 	case 0x4:
 		// enable timer irq
+		LOG("%s: vt03_410x_w irq enable %02x\n", machine().describe_context(), data);
 		m_410x[0x4] = data; // value doesn't matter?
 		m_timer_irq_enabled = 1;
 		break;
@@ -493,7 +532,11 @@ void nes_vt02_vt03_soc_device::video_irq(bool hblank, int scanline, bool vblank,
 		}
 
 		if (irqstate)
+		{
+			LOG("%s: vt03 video irq assert hblank=%d scanline=%d vblank=%d blanked=%d timer=%d latch=%02x ctrl=%02x\n",
+					machine().describe_context(), hblank, scanline, vblank, blanked, m_timer_val, m_410x[0x1], m_410x[0x0b]);
 			m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+		}
 		//else
 		//  m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 	}
@@ -502,13 +545,13 @@ void nes_vt02_vt03_soc_device::video_irq(bool hblank, int scanline, bool vblank,
 /* todo, handle custom VT nametable stuff here */
 u8 nes_vt02_vt03_soc_device::nt_r(offs_t offset)
 {
-	return m_ntram[decode_nt_addr(offset)];
+	return m_ntram[decode_nt_addr(offset, true)];
 }
 
 void nes_vt02_vt03_soc_device::nt_w(offs_t offset, u8 data)
 {
 	//logerror("nt wr %04x %02x", offset, data);
-	m_ntram[decode_nt_addr(offset)] = data;
+	m_ntram[decode_nt_addr(offset, false)] = data;
 }
 
 

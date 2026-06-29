@@ -435,7 +435,7 @@ bool mbc6_device::check_ram(std::string &message)
 	memory_region *const nvramregion(cart_nvram_region());
 	auto const rambytes(ramregion ? ramregion->bytes() : 0);
 	auto const nvrambytes(nvramregion ? nvramregion->bytes() : 0);
-	if (rambytes && nvrambytes && ((rambytes & (PAGE_RAM_SIZE - 1)) || (nvrambytes & (PAGE_RAM_SIZE - 1)) || ((nvrambytes - 1) & nvrambytes)))
+	if (rambytes && nvrambytes && ((rambytes & (PAGE_RAM_SIZE - 1)) || (nvrambytes & (PAGE_RAM_SIZE - 1)) || !std::has_single_bit(nvrambytes)))
 	{
 		message = "Unsupported cartridge RAM size (if not all RAM is battery-backed, battery backed RAM size must be a power of two no smaller than 4 KiB, and total RAM size must be a multiple of 4 KiB)";
 		return false;

@@ -329,8 +329,6 @@ static const z80_daisy_config lc80_daisy_chain[] =
 
 void lc80_state::machine_start()
 {
-	m_halt_led.resolve();
-
 	// install RAM
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	const offs_t mirror = (program.map()->m_globalmask & 0xc000) | 0x1000;

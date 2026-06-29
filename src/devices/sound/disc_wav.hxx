@@ -24,6 +24,7 @@
  *
  ************************************************************************/
 
+#include <numbers>
 
 
 
@@ -445,18 +446,18 @@ DISCRETE_RESET(dss_lfsr_noise)
 
 DISCRETE_STEP(dss_noise)
 {
-	double v_out;
+	constexpr double PI = std::numbers::pi;
 
 	if(DSS_NOISE__ENABLE)
 	{
 		/* Only sample noise on rollover to next cycle */
-		if(m_phase > (2.0 * M_PI))
+		if(m_phase > (2.0 * PI))
 		{
 			/* GCC's rand returns a RAND_MAX value of 0x7fff */
 			int newval = (m_device->machine().rand() & 0x7fff) - 16384;
 
 			/* make sure the peak to peak values are the amplitude */
-			v_out = DSS_NOISE__AMP / 2;
+			double v_out = DSS_NOISE__AMP / 2;
 			if (newval > 0)
 				v_out *= ((double)newval / 16383);
 			else
@@ -473,11 +474,11 @@ DISCRETE_STEP(dss_noise)
 	}
 
 	/* Keep the new phasor in the 2Pi range.*/
-	m_phase = fmod(m_phase, 2.0 * M_PI);
+	m_phase = fmod(m_phase, 2.0 * PI);
 
 	/* The enable input only curtails output, phase rotation still occurs. */
 	/* We allow the phase to exceed 2Pi here, so we can tell when to sample the noise. */
-	m_phase += ((2.0 * M_PI * DSS_NOISE__FREQ) / this->sample_rate());
+	m_phase += ((2.0 * PI * DSS_NOISE__FREQ) / this->sample_rate());
 }
 
 
@@ -1098,11 +1099,12 @@ DISCRETE_RESET(dss_op_amp_osc)
 
 DISCRETE_STEP(dss_sawtoothwave)
 {
+	constexpr double PI = std::numbers::pi;
 	double v_out;
 
 	if(DSS_SAWTOOTHWAVE__ENABLE)
 	{
-		v_out = (m_type == 0) ? m_phase * (DSS_SAWTOOTHWAVE__AMP / (2.0 * M_PI)) : DSS_SAWTOOTHWAVE__AMP - (m_phase * (DSS_SAWTOOTHWAVE__AMP / (2.0 * M_PI)));
+		v_out = (m_type == 0) ? m_phase * (DSS_SAWTOOTHWAVE__AMP / (2.0 * PI)) : DSS_SAWTOOTHWAVE__AMP - (m_phase * (DSS_SAWTOOTHWAVE__AMP / (2.0 * PI)));
 		v_out -= DSS_SAWTOOTHWAVE__AMP / 2.0;
 		/* Add DC Bias component */
 		v_out = v_out + DSS_SAWTOOTHWAVE__BIAS;
@@ -1120,17 +1122,17 @@ DISCRETE_STEP(dss_sawtoothwave)
 	/*                    boils out to                           */
 	/*     phase step = (2Pi*output freq)/sample freq)           */
 	/* Also keep the new phasor in the 2Pi range.                */
-	m_phase = fmod((m_phase + ((2.0 * M_PI * DSS_SAWTOOTHWAVE__FREQ) / this->sample_rate())), 2.0 * M_PI);
+	m_phase = fmod((m_phase + ((2.0 * PI * DSS_SAWTOOTHWAVE__FREQ) / this->sample_rate())), 2.0 * PI);
 }
 
 DISCRETE_RESET(dss_sawtoothwave)
 {
-	double start;
+	constexpr double PI = std::numbers::pi;
 
 	/* Establish starting phase, convert from degrees to radians */
-	start = (DSS_SAWTOOTHWAVE__PHASE / 360.0) * (2.0 * M_PI);
+	double start = (DSS_SAWTOOTHWAVE__PHASE / 360.0) * (2.0 * PI);
 	/* Make sure its always mod 2Pi */
-	m_phase = fmod(start, 2.0 * M_PI);
+	m_phase = fmod(start, 2.0 * PI);
 
 	/* Invert gradient depending on sawtooth type /|/|/|/|/| or |\|\|\|\|\ */
 	m_type = (DSS_SAWTOOTHWAVE__GRAD) ? 1 : 0;
@@ -1278,6 +1280,8 @@ DISCRETE_RESET(dss_schmitt_osc)
 
 DISCRETE_STEP(dss_sinewave)
 {
+	constexpr double PI = std::numbers::pi;
+
 	/* Set the output */
 	if(DSS_SINEWAVE__ENABLE)
 	{
@@ -1296,17 +1300,17 @@ DISCRETE_STEP(dss_sinewave)
 	/*                    boils out to                           */
 	/*     phase step = (2Pi*output freq)/sample freq)           */
 	/* Also keep the new phasor in the 2Pi range.                */
-	m_phase=fmod((m_phase + ((2.0 * M_PI * DSS_SINEWAVE__FREQ) / this->sample_rate())), 2.0 * M_PI);
+	m_phase=fmod((m_phase + ((2.0 * PI * DSS_SINEWAVE__FREQ) / this->sample_rate())), 2.0 * PI);
 }
 
 DISCRETE_RESET(dss_sinewave)
 {
-	double start;
+	constexpr double PI = std::numbers::pi;
 
 	/* Establish starting phase, convert from degrees to radians */
-	start = (DSS_SINEWAVE__PHASE / 360.0) * (2.0 * M_PI);
+	double start = (DSS_SINEWAVE__PHASE / 360.0) * (2.0 * PI);
 	/* Make sure its always mod 2Pi */
-	m_phase = fmod(start, 2.0 * M_PI);
+	m_phase = fmod(start, 2.0 * PI);
 	/* Step the output to make it correct */
 	this->step();
 }
@@ -1333,8 +1337,10 @@ DISCRETE_RESET(dss_sinewave)
 
 DISCRETE_STEP(dss_squarewave)
 {
+	constexpr double PI = std::numbers::pi;
+
 	/* Establish trigger phase from duty */
-	m_trigger=((100-DSS_SQUAREWAVE__DUTY)/100)*(2.0*M_PI);
+	m_trigger=((100-DSS_SQUAREWAVE__DUTY)/100)*(2.0*PI);
 
 	/* Set the output */
 	if(DSS_SQUAREWAVE__ENABLE)
@@ -1357,17 +1363,17 @@ DISCRETE_STEP(dss_squarewave)
 	/*                    boils out to                           */
 	/*     phase step = (2Pi*output freq)/sample freq)           */
 	/* Also keep the new phasor in the 2Pi range.                */
-	m_phase=fmod(m_phase + ((2.0 * M_PI * DSS_SQUAREWAVE__FREQ) / this->sample_rate()), 2.0 * M_PI);
+	m_phase=fmod(m_phase + ((2.0 * PI * DSS_SQUAREWAVE__FREQ) / this->sample_rate()), 2.0 * PI);
 }
 
 DISCRETE_RESET(dss_squarewave)
 {
-	double start;
+	constexpr double PI = std::numbers::pi;
 
 	/* Establish starting phase, convert from degrees to radians */
-	start = (DSS_SQUAREWAVE__PHASE / 360.0) * (2.0 * M_PI);
+	double start = (DSS_SQUAREWAVE__PHASE / 360.0) * (2.0 * PI);
 	/* Make sure its always mod 2Pi */
-	m_phase = fmod(start, 2.0 * M_PI);
+	m_phase = fmod(start, 2.0 * PI);
 
 	/* Step the output */
 	this->step();
@@ -1468,12 +1474,12 @@ DISCRETE_RESET(dss_squarewfix)
 
 DISCRETE_STEP(dss_squarewave2)
 {
-	double newphase;
+	constexpr double PI = std::numbers::pi;
 
 	if(DSS_SQUAREWAVE2__ENABLE)
 	{
 		/* Establish trigger phase from time periods */
-		m_trigger = (DSS_SQUAREWAVE2__T_OFF / (DSS_SQUAREWAVE2__T_OFF + DSS_SQUAREWAVE2__T_ON)) * (2.0 * M_PI);
+		m_trigger = (DSS_SQUAREWAVE2__T_OFF / (DSS_SQUAREWAVE2__T_OFF + DSS_SQUAREWAVE2__T_ON)) * (2.0 * PI);
 
 		/* Work out the phase step based on phase/freq & sample rate */
 		/* The enable input only curtails output, phase rotation     */
@@ -1482,9 +1488,9 @@ DISCRETE_STEP(dss_squarewave2)
 		/*     phase step = 2Pi/(output period/sample period)        */
 		/*                    boils out to                           */
 		/*     phase step = 2Pi/(output period*sample freq)          */
-		newphase = m_phase + ((2.0 * M_PI) / ((DSS_SQUAREWAVE2__T_OFF + DSS_SQUAREWAVE2__T_ON) * this->sample_rate()));
+		double newphase = m_phase + ((2.0 * PI) / ((DSS_SQUAREWAVE2__T_OFF + DSS_SQUAREWAVE2__T_ON) * this->sample_rate()));
 		/* Keep the new phasor in the 2Pi range.*/
-		m_phase = fmod(newphase, 2.0 * M_PI);
+		m_phase = fmod(newphase, 2.0 * PI);
 
 		/* Add DC Bias component */
 		if(m_phase>m_trigger)
@@ -1500,16 +1506,17 @@ DISCRETE_STEP(dss_squarewave2)
 
 DISCRETE_RESET(dss_squarewave2)
 {
+	constexpr double PI = std::numbers::pi;
 	double start;
 
 	/* Establish starting phase, convert from degrees to radians */
 	/* Only valid if we have set the on/off time                 */
 	if((DSS_SQUAREWAVE2__T_OFF + DSS_SQUAREWAVE2__T_ON) != 0.0)
-		start = (DSS_SQUAREWAVE2__SHIFT / (DSS_SQUAREWAVE2__T_OFF + DSS_SQUAREWAVE2__T_ON)) * (2.0 * M_PI);
+		start = (DSS_SQUAREWAVE2__SHIFT / (DSS_SQUAREWAVE2__T_OFF + DSS_SQUAREWAVE2__T_ON)) * (2.0 * PI);
 	else
 		start = 0.0;
 	/* Make sure its always mod 2Pi */
-	m_phase = fmod(start, 2.0 * M_PI);
+	m_phase = fmod(start, 2.0 * PI);
 
 	/* Step the output */
 	this->step();
@@ -1719,10 +1726,12 @@ DISCRETE_RESET(dss_inverter_osc)
 
 DISCRETE_STEP(dss_trianglewave)
 {
+	constexpr double PI = std::numbers::pi;
+
 	if(DSS_TRIANGLEWAVE__ENABLE)
 	{
-		double v_out = m_phase < M_PI ? (DSS_TRIANGLEWAVE__AMP * (m_phase / (M_PI / 2.0) - 1.0)) / 2.0 :
-									(DSS_TRIANGLEWAVE__AMP * (3.0 - m_phase / (M_PI / 2.0))) / 2.0 ;
+		double v_out = m_phase < PI ? (DSS_TRIANGLEWAVE__AMP * (m_phase / (PI / 2.0) - 1.0)) / 2.0 :
+									(DSS_TRIANGLEWAVE__AMP * (3.0 - m_phase / (PI / 2.0))) / 2.0 ;
 
 		/* Add DC Bias component */
 		v_out  += DSS_TRIANGLEWAVE__BIAS;
@@ -1740,17 +1749,17 @@ DISCRETE_STEP(dss_trianglewave)
 	/*                    boils out to                           */
 	/*     phase step = (2Pi*output freq)/sample freq)           */
 	/* Also keep the new phasor in the 2Pi range.                */
-	m_phase=fmod((m_phase + ((2.0 * M_PI * DSS_TRIANGLEWAVE__FREQ) / this->sample_rate())), 2.0 * M_PI);
+	m_phase=fmod((m_phase + ((2.0 * PI * DSS_TRIANGLEWAVE__FREQ) / this->sample_rate())), 2.0 * PI);
 }
 
 DISCRETE_RESET(dss_trianglewave)
 {
-	double start;
+	constexpr double PI = std::numbers::pi;
 
 	/* Establish starting phase, convert from degrees to radians */
-	start = (DSS_TRIANGLEWAVE__PHASE / 360.0) * (2.0 * M_PI);
+	double start = (DSS_TRIANGLEWAVE__PHASE / 360.0) * (2.0 * PI);
 	/* Make sure its always mod 2Pi */
-	m_phase=fmod(start, 2.0 * M_PI);
+	m_phase=fmod(start, 2.0 * PI);
 
 	/* Step to set the output */
 	this->step();

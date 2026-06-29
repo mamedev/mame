@@ -1879,6 +1879,40 @@ Moans while executing ISD.EXE, r/w I/O ports $d0, expecting a device to be conne
 		</part>
 	</software>
 
+	<!-- "Multi Paint System: Otonoshimi Set 1" known to exist, possibly very similar to this -->
+	<software name="mpssfsp" supported="partial">
+		<description>Multi Paint System: Secret Fun Set Plus</description>
+		<year>1995</year>
+		<publisher>シーラボ (C-lab)</publisher>
+		<notes><![CDATA[
+Expansion disk for pc98_flop_orig:mps
+Has [EGC] issues during auto demo: leaves trails when kanji drawing, some closing windows fails to clear completely.
+Teal Disk unchecked: has various drivers for printers and Wacom serial tablets cfr. DOC folder
+]]></notes>
+		<info name="alt_title" value="マルチペイントシステム マル秘お楽しみセット" />
+		<info name="usage" value="Requires HDD DOS install. Auto Demo disk: run demo.bat" />
+		<!-- TODO: can't load as 3.5", looks suspicious -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Pink Disk (Auto Demo)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="mpspink.hdm" size="1261568" crc="30e9c621" sha1="6690ee1f6f8af3fa40c29bd86ebed90b9a827a50" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Blue Disk (Art/CG)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="mpsblue.hdm" size="1261568" crc="4a2c117f" sha1="352f03bd0f01d55b6b5c5684db2a90991884aca7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Teal Disk (Expansion/Install)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="mpsteal.hdm" size="1261568" crc="66e1987f" sha1="fe268885ccc9c16cd5fe94bd7d4a61ff6e537968" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
 <!-- !Sound players/makers (MIDI Applications et al.) -->
 
 	<software name="714midij">
@@ -3092,7 +3126,7 @@ double height bitmap on non-interlace mode
 		<publisher>ラブ・ガン (Love Gun)</publisher>
 		<info name="alt_title" value="デンジャラス トイズ" />
 		<info name="release" value="19961213" />
-		<info name="usage" value="Required HDD install from DOS, requires 520K minimum of conventional memory" />
+		<info name="usage" value="Requires HDD install from DOS, requires 520K minimum of conventional memory" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1261568">
@@ -26263,7 +26297,7 @@ Hangs on [MIDI] detection
 	</software>
 
 	<software name="inindo">
-		<description>Inindou - Datou Nobunaga</description>
+		<description>Inindou: Datou Nobunaga</description>
 		<year>1991</year>
 		<publisher>光栄 (Koei)</publisher>
 		<info name="alt_title" value="伊忍道 打倒信長" />
@@ -69104,6 +69138,24 @@ pc9821: runs too fast
 		</part>
 	</software>
 
+	<!-- alt .2hd format known to exist, assume same but raw -->
+	<software name="sgunyan" supported="yes">
+		<description>Steel Gun Nyan</description>
+		<year>1992</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Uses [DAC1BIT] for speech, controlled thru CPU frequency
+]]></notes>
+		<info name="alt_title" value="鋼鉄銃娘" /> <!-- with furigana スティールガンにゃん -->
+		<info name="author" value="Studio 玄米茶" />
+		<info name="usage" value="Boot from msdos50a floppy, insert a blank disk in drive B: and format /s B:. Once done do format a second time then insert this disk in drive A: and follow instructions. Game controls thru mouse." />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="921600">
+				<rom name="steel_gun_nyan.fdi" size="921600" crc="acca23b9" sha1="01a74a18216823009d0c14888f052e8566f3ab05" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="studiopl" supported="yes">
 		<!-- year assumed by DOS dir contents -->
 		<description>Studio Pal CG Shuu</description>
@@ -69289,7 +69341,7 @@ Eventually crashes with an out of heap memory, wants 550k minimum?
 ]]></notes>
 		<info name="author" value="ZUN" />
 		<info name="alt_title" value="東方靈異伝 ～ The Highly Responsive to Prayers" />
-		<info name="usage" value="Required HDD install from DOS" />
+		<info name="usage" value="Requires HDD install from DOS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1265664">
 				<rom name="thdisk1.fdi" size="1265664" crc="19d4e3ee" sha1="9f3045f9d039176b0b0ece2b5cf1f15a2e8693a2" offset="0" />

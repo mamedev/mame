@@ -5,19 +5,7 @@ license:CC0-1.0
 -->
 <softwarelist name="c64_flop_misc" description="Commodore 64 miscellaneous disks">
 
-	<!-- Games -->
-
-	<software name="arttu">
-		<description>Little Knight Arthur</description>
-		<year>1986</year>
-		<publisher>Pasi Hytönen</publisher>
-		<info name="protection" value="none" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="arthurc64.d64" size="174848" crc="f741ada3" sha1="84eb7ce5152370fe53604209ee7fb54a284bfa6e"/>
-			</dataarea>
-		</part>
-	</software>
+<!-- !Games -->
 
 	<software name="bbudge">
 		<description>Bill Budge: Pinball Construction Set</description>
@@ -30,6 +18,37 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
+    <!-- origin: archive.org -->
+    <software name="bopnrumb" supported="no">
+        <description>Bop 'n Rumble (cracked by The Last Science and The Artworx)</description>
+        <year>1987</year>
+        <publisher>Melbourne House</publisher>
+        <notes><![CDATA[
+LOAD "BOP N RUMBLE",8,1
+[VIC] player sprite cuts off in the middle
+]]></notes>
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="174848">
+                <rom name="bopn_rumble_1987_melbourne_house_h_the_last_sciencethe_artworx.d64" size="174848" crc="9ba2f963" sha1="d3e672d586f8fdc4719adce13cbe14a281bf7696" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <!-- origin: archive.org -->
+    <software name="detgame" supported="no">
+        <description>The Detective Game (cracked by Trianon)</description>
+        <year>1986</year>
+        <publisher>APS Software</publisher>
+        <notes><![CDATA[
+Laggy [joystick] fire button (half the times won't trigger)
+]]></notes>
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="174848">
+                <rom name="detective_game_the_1986_aps_software.d64" size="174848" crc="d6a07a1d" sha1="702b17a1aec12646283d32c0437295214fcf7dd5" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
 	<software name="fcc"> <!-- optional -->
 		<description>The Final ChessCard</description>
@@ -63,6 +82,18 @@ license:CC0-1.0
 			<feature name="part_id" value="Operates on Commodore"/>
 			<dataarea name="flop" size="174848">
 				<rom name="jingledisk (commodore).d64" size="174848" crc="2fc6663a" sha1="e81dab6d22df694f9f38ef6c03aa2305a62df140"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arttu">
+		<description>Little Knight Arthur</description>
+		<year>1986</year>
+		<publisher>Pasi Hytönen</publisher>
+		<info name="protection" value="none" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="arthurc64.d64" size="174848" crc="f741ada3" sha1="84eb7ce5152370fe53604209ee7fb54a284bfa6e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -108,9 +139,59 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- Compilations -->
+	<!-- origin: archive.org -->
+	<software name="ragsrich" supported="no">
+		<description>Rags to Riches</description>
+		<year>1985</year>
+		<publisher>Melody Hall Publishing</publisher>
+		<notes><![CDATA[
+Collectable objects oddly disappears during gameplay
+Lemon64 claims Joystick in port 2 but that's unresponsive, works in port 1 (verify)
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="rags_to_riches_1985_melody_hall_publishing.d64" size="174848" crc="4886602b" sha1="3dd1492bd402bb67d3d5a0844ab733f8a3206279" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
-	<!-- Applications -->
+    <!-- origin: archive.org -->
+    <software name="usagiyoj" supported="no">
+		<description>Samurai Warrior: The Battles of... Usagi Yojimbo</description>
+		<year>1988</year>
+		<publisher>Firebird Software</publisher>
+        <notes><![CDATA[
+LOAD "LOADER",8,1 then strike B
+Fails loading with "disk turbo" enabled
+All sprites are cutoff
+]]></notes>
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="174848">
+                <rom name="samurai_warrior_the_battles_of_usagi_yojimbo_1988_firebird.d64" size="174848" crc="4f744c0a" sha1="da54e72053c52ef681fabb32726865f667e0161b" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+	<!-- origin: archive.org -->
+	<software name="spacetax" supported="no">
+		<description>Space Taxi (cracked by Exodus)</description>
+		<year>1984</year>
+		<publisher>Muse Software</publisher>
+		<notes><![CDATA[
+LOAD "SPACE TAXI",8
+No [SID] sample voices
+Hi-score table is corrupt (dump really?)
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="space_taxi_1984_muse_software.d64" size="174848" crc="d7fcf1e9" sha1="9204ddb22ad961f19c795c19eb60d34bec966514" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Compilations -->
+
+<!-- !Applications -->
 
 	<software name="goliath">
 		<description>Goliath-Prommer (Ger)</description>
@@ -139,7 +220,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- Educational -->
+<!-- !Educational -->
 
 	<software name="kats1">
 		<description>KÄTS-opetuslevy 1 (Finland)</description>
@@ -323,7 +404,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- Test/Demo disks -->
+<!-- !Test/Demo disks -->
 
 	<software name="1541demo">
 		<description>Commodore 1541 Floppy Disk Drive Test/Demo Disk</description>
@@ -631,7 +712,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- Operating Systems -->
+<!-- !Operating Systems -->
 
 	<software name="contiki">
 		<description>Contiki Desktop OS 1.0</description>
@@ -725,7 +806,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- MIDI -->
+<!-- !MIDI -->
 
 	<software name="midiutil">
 		<description>Midi Utilities 02</description>
@@ -781,7 +862,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- Test -->
+<!-- !Test -->
 
 	<software name="tsuit215">
 		<description>C64 Emulator Test Suite (v2.15)</description>
@@ -859,12 +940,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- Demos -->
+<!-- !Demos -->
 
-	<software name="2ndreal">
+	<software name="2ndreal" supported="no">
 		<description>Second Reality</description>
 		<year>1997</year>
 		<publisher>Smash Designs &amp; The Obsessed Maniacs</publisher>
+		<notes><![CDATA[
+LOAD "SECOND REALITY*",8
+https://www.youtube.com/watch?v=HiWbKQ_gUKQ
+First screen has [VIC] background stripes, ship transition clips in between, bad transition to title screen, hangs or crash there
+]]></notes>
+		<info name="usage" value="Set SID as soundcard in selection screen (press right ctrl 3 times then enter key)" />
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">

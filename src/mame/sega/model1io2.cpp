@@ -180,7 +180,7 @@ void model1io2_device::device_add_mconfig(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, m_eeprom); // 93C45
 
-	MB3773(config, m_watchdog, 0);
+	MB3773(config, m_watchdog);
 
 	msm6253_device &adc(MSM6253(config, "adc", 32_MHz_XTAL / 16 / 4));
 	adc.set_input_cb<0>(FUNC(model1io2_device::analog0_r));
@@ -237,9 +237,6 @@ model1io2_device::model1io2_device(const machine_config &mconfig, const char *ta
 
 void model1io2_device::device_start()
 {
-	// resolve outputs
-	m_led_comm_err.resolve();
-
 	// register for save states
 	save_item(NAME(m_secondary_controls));
 	save_item(NAME(m_lcd_data));

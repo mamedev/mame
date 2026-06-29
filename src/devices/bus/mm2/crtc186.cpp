@@ -80,11 +80,11 @@ void crtc186_device::device_add_mconfig(machine_config &config)
 	m_vpac->sld_callback().set(FUNC(crtc186_device::vpac_sld_w));
 	m_vpac->set_screen(m_screen);
 
-	CRT9212(config, m_drb0, 0);
+	CRT9212(config, m_drb0);
 	m_drb0->set_wen2(1);
 	m_drb0->dout().set(FUNC(crtc186_device::vidla_w));
 
-	CRT9212(config, m_drb1, 0);
+	CRT9212(config, m_drb1);
 	m_drb1->set_wen2(1);
 	m_drb1->dout().set(FUNC(crtc186_device::drb_attr_w));
 
@@ -103,12 +103,12 @@ void crtc186_device::device_add_mconfig(machine_config &config)
 	sio_clock.signal_handler().set(m_sio, FUNC(i8251_device::write_txc));
 	sio_clock.signal_handler().append(m_sio, FUNC(i8251_device::write_rxc));
 
-	I8251(config, m_sio, 0);
+	I8251(config, m_sio);
 	m_sio->rxrdy_handler().set("irqs", FUNC(input_merger_device::in_w<1>));
 	m_sio->txrdy_handler().set("irqs", FUNC(input_merger_device::in_w<2>));
 	m_sio->txd_handler().set(m_kb, FUNC(mm2_keyboard_device::rxd_w));
 
-	NOKIA_MM2_KBD(config, m_kb, 0);
+	NOKIA_MM2_KBD(config, m_kb);
 	m_kb->txd_handler().set(m_sio, FUNC(i8251_device::write_rxd));
 }
 

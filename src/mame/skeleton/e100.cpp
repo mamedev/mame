@@ -488,7 +488,7 @@ void e100_state::e100(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &e100_state::e100_map);
 
 	/* Devices */
-	TTL74145(config, m_kbd_74145, 0);
+	TTL74145(config, m_kbd_74145);
 
 	/* --PIA inits----------------------- */
 	/* 0xF883 0xC818 (PIA1 DDR A)     = 0x00 - Port A all inputs */

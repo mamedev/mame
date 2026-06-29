@@ -22,7 +22,7 @@ class nmk_irq_device : public device_t, public device_video_interface
 {
 public:
 	// construction/destruction
-	nmk_irq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nmk_irq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
 	auto irq_callback() { return m_irq_cb.bind(); }

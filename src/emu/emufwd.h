@@ -248,7 +248,9 @@ class tilemap_t;
 class ui_manager;
 
 // declared in uiinput.h
+class ui_event_sink;
 class ui_input_manager;
+class ui_input_manager_impl;
 
 // declared in validity.h
 class validity_checker;

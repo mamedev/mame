@@ -1241,7 +1241,7 @@ bool cheat_manager::save_all(std::string const &filename)
 void cheat_manager::render_text(mame_ui_manager &mui, render_target &target)
 {
 	// render any text and free it along the way
-	if (!m_output.size())
+	if (!m_output.empty())
 	{
 		float const lineheight = mui.get_line_height(target);
 		for (int linenum = 0; linenum < m_output.size(); linenum++)

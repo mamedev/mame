@@ -3443,17 +3443,17 @@ device_memory_interface::space_config_vector psxcpu_device::memory_space_config(
 
 void psxcpu_device::device_add_mconfig(machine_config &config)
 {
-	auto &irq(PSX_IRQ(config, "irq", 0));
+	auto &irq(PSX_IRQ(config, "irq"));
 	irq.irq().set_inputline(DEVICE_SELF, PSXCPU_IRQ0);
 
-	auto &dma(PSX_DMA(config, "dma", 0));
+	auto &dma(PSX_DMA(config, "dma"));
 	dma.irq().set("irq", FUNC(psxirq_device::intin3));
 
-	auto &mdec(PSX_MDEC(config, "mdec", 0));
+	auto &mdec(PSX_MDEC(config, "mdec"));
 	dma.install_write_handler(0, psxdma_device::write_delegate(&psxmdec_device::dma_write, &mdec));
 	dma.install_read_handler(1, psxdma_device::write_delegate(&psxmdec_device::dma_read, &mdec));
 
-	auto &rcnt(PSX_RCNT(config, "rcnt", 0));
+	auto &rcnt(PSX_RCNT(config, "rcnt"));
 	rcnt.irq0().set("irq", FUNC(psxirq_device::intin4));
 	rcnt.irq1().set("irq", FUNC(psxirq_device::intin5));
 	rcnt.irq2().set("irq", FUNC(psxirq_device::intin6));

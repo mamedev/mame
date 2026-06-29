@@ -423,8 +423,8 @@ void lastfght_state::lastfght_map(address_map &map)
 	map(0x600000, 0x600001).w(FUNC(lastfght_state::hi_w));
 	map(0x600002, 0x600003).rw(FUNC(lastfght_state::sound_r), FUNC(lastfght_state::sound_w));
 	map(0x600006, 0x600007).w(FUNC(lastfght_state::blit_w));
-	map(0x600009, 0x600009).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x600008, 0x600008).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x600009, 0x600009).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x60000a, 0x60000a).w("ramdac", FUNC(ramdac_device::mask_w));
 
 	map(0x800000, 0x800001).w(FUNC(lastfght_state::sx_w));
@@ -560,7 +560,7 @@ void lastfght_state::lastfght(machine_config &config)
 	/* video hardware */
 	PALETTE(config, m_palette).set_entries(256);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
 	ramdac.set_addrmap(0, &lastfght_state::ramdac_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

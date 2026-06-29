@@ -153,6 +153,8 @@
 #include "speaker.h"
 #include "screen.h"
 
+#include "endianness.h"
+
 #include "beena.lh"
 #include "tvochken.lh"
 

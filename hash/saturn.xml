@@ -16238,6 +16238,7 @@ Opening FMV has visible screen tearing [CD-Block] (verify)
 		<info name="serial" value="T-7657G"/>
 		<info name="release" value="19980129"/>
 		<info name="alt_title" value="大航海時代外伝"/>
+		<info name="usage" value="Requires 349 free blocks, using a backup RAM cart is advised"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">

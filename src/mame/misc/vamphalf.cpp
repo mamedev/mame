@@ -63,6 +63,8 @@ TODO:
 
 #include "emu.h"
 
+#include "vamphalf_prot.h"
+
 #include "cpu/e132xs/e132xs.h"
 #include "cpu/mcs51/i8051.h"
 #include "machine/eepromser.h"
@@ -76,7 +78,8 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
-#include "vamphalf_prot.h"
+#include "endianness.h"
+
 
 namespace {
 
@@ -1215,7 +1218,7 @@ void vamphalf_qdsp_state::misncrft(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &vamphalf_qdsp_state::misncrft_io);
 	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq1_line_hold));
 
-	MISNCRFT_FPGA_PROT(config, "fpga", 0);
+	MISNCRFT_FPGA_PROT(config, "fpga");
 
 	sound_qs1000(config);
 }
@@ -1282,7 +1285,7 @@ void vamphalf_state::worldadv(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_IO, &vamphalf_state::worldadv_io);
 
-	WORLDADV_FPGA_PROT(config, "fpga", 0);
+	WORLDADV_FPGA_PROT(config, "fpga");
 
 	sound_ym_oki(config);
 }
@@ -1308,7 +1311,7 @@ void vamphalf_qdsp_state::wyvernwg(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &vamphalf_qdsp_state::wyvernwg_io);
 	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq1_line_hold));
 
-	WYVERNWG_FPGA_PROT(config, "fpga", 0);
+	WYVERNWG_FPGA_PROT(config, "fpga");
 
 	sound_qs1000(config);
 }

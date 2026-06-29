@@ -128,8 +128,8 @@ DEFINE_DEVICE_TYPE(DUSCC68C562,   duscc68c562_device, "duscc68c562",   "Philips 
 //-------------------------------------------------
 void duscc_device::device_add_mconfig(machine_config &config)
 {
-	DUSCC_CHANNEL(config, CHANA_TAG, 0);
-	DUSCC_CHANNEL(config, CHANB_TAG, 0);
+	DUSCC_CHANNEL(config, CHANA_TAG);
+	DUSCC_CHANNEL(config, CHANB_TAG);
 }
 
 //**************************************************************************

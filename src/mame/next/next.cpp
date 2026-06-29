@@ -1028,7 +1028,7 @@ void next_state::next_base(machine_config &config)
 	SCC8530(config, scc, XTAL(25'000'000));
 	scc->out_int_callback().set(FUNC(next_state::scc_irq));
 
-	NEXTKBD(config, keyboard, 0);
+	NEXTKBD(config, keyboard);
 	keyboard->int_change_wr_callback().set(FUNC(next_state::keyboard_irq));
 	keyboard->int_power_wr_callback().set(FUNC(next_state::power_irq));
 	keyboard->int_nmi_wr_callback().set(FUNC(next_state::nmi_irq));
@@ -1046,7 +1046,7 @@ void next_state::next_base(machine_config &config)
 	scsi->irq_handler_cb().set(DEVICE_SELF, FUNC(next_state::scsi_irq));
 	scsi->drq_handler_cb().set(DEVICE_SELF, FUNC(next_state::scsi_drq));
 
-	MB8795(config, net, 0);
+	MB8795(config, net);
 	net->tx_irq().set(FUNC(next_state::net_tx_irq));
 	net->rx_irq().set(FUNC(next_state::net_rx_irq));
 	net->tx_drq().set(FUNC(next_state::net_tx_drq));
@@ -1058,7 +1058,7 @@ void next_state::next_base(machine_config &config)
 
 void next_state::next_mo_config(machine_config &config)
 {
-	NEXTMO(config, mo, 0);
+	NEXTMO(config, mo);
 	mo->irq_wr_callback().set(FUNC(next_state::mo_irq));
 	mo->drq_wr_callback().set(FUNC(next_state::mo_drq));
 }

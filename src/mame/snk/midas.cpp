@@ -665,7 +665,7 @@ void midas_state::livequiz(machine_config &config)
 	m_screen->set_screen_update(FUNC(midas_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(midas_state::screen_vblank));
 
-	NEOGEO_SPRITE_MIDAS(config, m_sprgen, 0).set_screen(m_screen);
+	NEOGEO_SPRITE_MIDAS(config, m_sprgen).set_screen(m_screen);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_midas);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 0x10000);
@@ -700,7 +700,7 @@ void hammer_state::hammer(machine_config &config)
 	m_screen->set_screen_update(FUNC(hammer_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(hammer_state::screen_vblank));
 
-	NEOGEO_SPRITE_MIDAS(config, m_sprgen, 0).set_screen(m_screen);
+	NEOGEO_SPRITE_MIDAS(config, m_sprgen).set_screen(m_screen);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_midas);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 0x10000);

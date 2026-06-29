@@ -466,7 +466,7 @@ void sandscrp_state::sandscrp(machine_config &config)
 
 	KANEKO_HIT(config, "calc1").set_type(0);
 
-	KANEKO_PANDORA(config, m_pandora, 0, "palette", gfx_sandscrp_spr);
+	KANEKO_PANDORA(config, m_pandora, "palette", gfx_sandscrp_spr);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

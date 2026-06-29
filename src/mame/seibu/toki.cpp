@@ -919,7 +919,7 @@ void toki_state::toki(machine_config &config)
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(12'000'000) / 12, okim6295_device::PIN7_HIGH)); // verified on PCB
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	SEIBU_SOUND(config, m_seibu_sound, 0);
+	SEIBU_SOUND(config, m_seibu_sound);
 	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
 	m_seibu_sound->coin_io_callback().set_ioport("COIN");
 	m_seibu_sound->set_rom_tag(m_audiocpu_rom);

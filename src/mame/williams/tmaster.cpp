@@ -422,7 +422,7 @@ void tmaster_state::tmds1204(machine_config &config)
 {
 	tm(config);
 
-	DS1204(config, "ds1204", 0);
+	DS1204(config, "ds1204");
 }
 
 /***************************************************************************

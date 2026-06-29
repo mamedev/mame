@@ -243,8 +243,6 @@ ioport_value ld50_state::dial_r()
 
 void ld50_state::driver_start()
 {
-	m_led.resolve();
-
 	save_item(NAME(m_port));
 	save_item(NAME(m_rom_addr));
 	save_item(NAME(m_sound_data));

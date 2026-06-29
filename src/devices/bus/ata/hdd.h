@@ -27,7 +27,7 @@ class ide_hdd_device : public ide_hdd_device_base, public device_ata_interface
 {
 public:
 	// construction/destruction
-	ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device_ata_interface implementation
 	virtual uint16_t read_dma() override { return dma_r(); }

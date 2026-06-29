@@ -71,8 +71,6 @@ void mephisto_display3_device::device_add_mconfig(machine_config &config)
 
 void mephisto_display3_device::device_start()
 {
-	m_out_lcd.resolve();
-
 	// zerofill
 	m_clk = 0;
 	m_data = 0;

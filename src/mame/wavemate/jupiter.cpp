@@ -350,7 +350,7 @@ void jupiter3_state::jupiter3(machine_config &config)
 	FLOPPY_CONNECTOR(config, INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(jupiter3_state::kbd_put));
 
 	// internal ram

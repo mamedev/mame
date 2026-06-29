@@ -17,6 +17,8 @@
 
 #include "screen.h"
 
+#include "endianness.h"
+
 #include <algorithm>
 
 namespace {
@@ -77,9 +79,9 @@ void nubus_cb264se30_device::device_add_mconfig(machine_config &config)
 	m_screen->set_screen_update(FUNC(nubus_cb264se30_device::screen_update));
 	m_screen->set_raw(30.24_MHz_XTAL, 864, 0, 640, 525, 0, 480);
 
-	BT473(config, m_ramdac, 0);
+	BT473(config, m_ramdac);
 
-	TMS34061(config, m_tms34061, 0);
+	TMS34061(config, m_tms34061);
 	m_tms34061->set_rowshift(10); // VRAM address is (row << rowshift) | col
 	m_tms34061->set_vram_size(VRAM_SIZE);
 	m_tms34061->set_screen(m_screen);

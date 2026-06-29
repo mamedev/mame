@@ -312,7 +312,7 @@ void zorba_state::zorba(machine_config &config)
 	m_pia[1]->irqb_handler().set("irq1", FUNC(input_merger_device::in_w<1>));
 
 	// PIT
-	pit8254_device &pit(PIT8254(config, "pit", 0));
+	pit8254_device &pit(PIT8254(config, "pit"));
 	pit.set_clk<0>(24_MHz_XTAL / 3);
 	pit.set_clk<1>(24_MHz_XTAL / 3);
 	pit.set_clk<2>(24_MHz_XTAL / 3);

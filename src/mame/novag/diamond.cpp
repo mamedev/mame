@@ -134,8 +134,6 @@ private:
 
 void diamond_state::machine_start()
 {
-	m_out_lcd.resolve();
-
 	if (m_rombank)
 		m_rombank->configure_entries(0, 4, memregion("eprom")->base(), 0x8000);
 

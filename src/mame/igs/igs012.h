@@ -9,7 +9,7 @@
 class igs012_device : public device_t
 {
 public:
-	igs012_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	igs012_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void prot_reset_w(u16 data);
 

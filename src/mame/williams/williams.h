@@ -336,8 +336,6 @@ public:
 	template <int P> ioport_value gun_r();
 
 private:
-	virtual void machine_start() override ATTR_COLD;
-
 	void maxvol_w(int state);
 	void lamp_w(u8 data);
 

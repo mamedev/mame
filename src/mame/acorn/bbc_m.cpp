@@ -340,8 +340,6 @@ void bbc_state::setup_device_roms()
 
 void bbc_state::machine_start()
 {
-	m_motor_led.resolve();
-
 	setup_device_roms();
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x0000, 0xffff, "cpu_clock_tap",

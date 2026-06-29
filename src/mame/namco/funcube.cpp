@@ -352,8 +352,6 @@ INPUT_PORTS_END
 
 void funcube_state::machine_start()
 {
-	m_leds.resolve();
-
 	save_item(NAME(m_coin_start_cycles));
 	save_item(NAME(m_hopper_motor));
 	save_item(NAME(m_outputs));

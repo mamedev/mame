@@ -89,11 +89,10 @@ void ym7101_device::device_start()
 	m_tile_b_line = std::make_unique<u8[]>(320);
 
 	set_gfx(0, std::make_unique<gfx_element>(
-		m_palette,
-		layout_8x8x4,
-		(u8 *)(m_vram.target()),
-		0, 4, 0
-	));
+			m_palette,
+			layout_8x8x4,
+			(u8 *)(m_vram.target()),
+			0, 4, 0));
 
 	save_pointer(NAME(m_sprite_cache), 80 * 4);
 
@@ -183,11 +182,10 @@ void ym7101_device::device_add_mconfig(machine_config &config)
 device_memory_interface::space_config_vector ym7101_device::memory_space_config() const
 {
 	return space_config_vector {
-		std::make_pair(AS_VDP_VRAM, &m_space_vram_config),
-		std::make_pair(AS_VDP_CRAM, &m_space_cram_config),
-		std::make_pair(AS_VDP_VSRAM, &m_space_vsram_config),
-		std::make_pair(AS_VDP_IO,   &m_space_regs_config)
-	};
+			std::make_pair(AS_VDP_VRAM, &m_space_vram_config),
+			std::make_pair(AS_VDP_CRAM, &m_space_cram_config),
+			std::make_pair(AS_VDP_VSRAM, &m_space_vsram_config),
+			std::make_pair(AS_VDP_IO,   &m_space_regs_config) };
 }
 
 void ym7101_device::device_validity_check(validity_checker &valid) const
@@ -290,8 +288,7 @@ void ym7101_device::control_port_w(offs_t offset, u16 data, u16 mem_mask)
 					, m_dma.source_address
 					, m_command.address
 					, m_dma.length
-					, m_auto_increment
-				);
+					, m_auto_increment);
 				m_dma_timer->adjust(attotime::from_ticks(8, clock()));
 			}
 
@@ -321,14 +318,13 @@ void ym7101_device::control_port_w(offs_t offset, u16 data, u16 mem_mask)
 
 u16 ym7101_device::data_port_r(offs_t offset, u16 mem_mask)
 {
-	if (machine().side_effects_disabled())
-		return 0xffff;
-
-	m_command.write_state = command_write_state_t::FIRST_WORD;
+	if (!machine().side_effects_disabled())
+		m_command.write_state = command_write_state_t::FIRST_WORD;
 
 	if (BIT(m_command.code, 0))
 	{
-		LOG("data_port_r: illegal read on write code %d & %04x\n", m_command.code, mem_mask);
+		if (!machine().side_effects_disabled())
+			LOG("data_port_r: illegal read on write code %d & %04x\n", m_command.code, mem_mask);
 		return 0xffff;
 	}
 
@@ -354,8 +350,11 @@ u16 ym7101_device::data_port_r(offs_t offset, u16 mem_mask)
 			break;
 	}
 
-	m_command.address += m_auto_increment;
-	m_command.address &= m_vram_mask;
+	if (!machine().side_effects_disabled())
+	{
+		m_command.address += m_auto_increment;
+		m_command.address &= m_vram_mask;
+	}
 
 	return res;
 }
@@ -378,8 +377,7 @@ void ym7101_device::data_port_w(offs_t offset, u16 data, u16 mem_mask)
 			, m_dma.fill
 			, m_command.address
 			, m_dma.length
-			, m_auto_increment
-		);
+			, m_auto_increment);
 
 		// HACK: rewrite using a completely different path
 		m_dma.length += 1;
@@ -560,8 +558,7 @@ void ym7101_device::regs_map(address_map &map)
 			, m_ie1
 			, BIT(data, 2)
 			, m_m3
-			, BIT(data, 0)
-		);
+			, BIT(data, 0));
 	}));
 	map(1, 1).lw8(NAME([this] (u8 data) {
 		LOGREGS("#01: Mode Register 2 %02x\n", data);
@@ -591,36 +588,31 @@ void ym7101_device::regs_map(address_map &map)
 			, m_ie0
 			, m_m1
 			, m_m2
-			, m_m5
-		);
+			, m_m5);
 	}));
 	map(2, 2).lw8(NAME([this] (u8 data) {
 		m_plane_a_name_table = (data & 0x78) << 10;
 		LOGREGS("#02: Plane A Name Table %02x (%05x)\n"
 			, data
-			, m_plane_a_name_table
-		);
+			, m_plane_a_name_table);
 	}));
 	map(3, 3).lw8(NAME([this] (u8 data) {
 		m_window_name_table = (data & 0x7e) << 10;
 		LOGREGS("#03: Window Name Table %02x (%05x)\n"
 			, data
-			, m_window_name_table
-		);
+			, m_window_name_table);
 	}));
 	map(4, 4).lw8(NAME([this] (u8 data) {
 		m_plane_b_name_table = (data & 0xf) << 13;
 		LOGREGS("#04: Plane B Name Table %02x (%05x)\n"
 			, data
-			, m_plane_b_name_table
-		);
+			, m_plane_b_name_table);
 	}));
 	map(5, 5).lw8(NAME([this] (u8 data) {
 		m_sprite_attribute_table = data << 9;
 		LOGREGS("#05: Sprite Table %02x (%05x)\n"
 			, data
-			, data << 9
-		);
+			, data << 9);
 	}));
 	map(6, 6).lw8(NAME([this] (u8 data) {
 		// tile bank
@@ -666,8 +658,7 @@ void ym7101_device::regs_map(address_map &map)
 			, BIT(data, 5)
 			, BIT(data, 4)
 			, m_sh
-			, (data & 6) >> 1
-		);
+			, (data & 6) >> 1);
 	}));
 	map(13, 13).lw8(NAME([this] (u8 data) {
 		m_hscroll_address = (data & 0x7f) << 10;
@@ -689,8 +680,7 @@ void ym7101_device::regs_map(address_map &map)
 			, m_hsz
 			, size_names[m_hsz]
 			, m_vsz
-			, size_names[m_vsz]
-		);
+			, size_names[m_vsz]);
 
 		calculate_plane_sizes();
 	}));
@@ -700,8 +690,7 @@ void ym7101_device::regs_map(address_map &map)
 		LOGREGS("#17: Window Plane Horizontal position %02x\n", data);
 		LOGREGS("\tRIGT %d WHP %d\n"
 			, m_rigt
-			, m_whp
-		);
+			, m_whp);
 	}));
 	map(18, 18).lw8(NAME([this] (u8 data) {
 		m_down = !!BIT(data, 7);
@@ -709,8 +698,7 @@ void ym7101_device::regs_map(address_map &map)
 		LOGREGS("#18: Window Plane Vertical position %02x\n", data);
 		LOGREGS("\tDOWN %d WVP %d\n"
 			, m_down
-			, m_wvp
-		);
+			, m_wvp);
 	}));
 	map(19, 19).lw8(NAME([this] (u8 data) {
 		LOGREGSDMA("#19: DMA length low %02x\n", data);
@@ -810,7 +798,7 @@ void ym7101_device::prepare_sprite_line(int scanline)
 		y = (cache[0] & 0x1ff) - 128;
 		height = (((cache[1] >> 8) & 0x3) + 1) * 8;
 
-		entry_sprites --;
+		entry_sprites--;
 		if (scanline == std::clamp(scanline, y, y + height - 1))
 		{
 			width = (((cache[1] >> 10) & 0x3) + 1) * 8;
@@ -821,7 +809,7 @@ void ym7101_device::prepare_sprite_line(int scanline)
 			else if (sprite_mask_state == 1 && sprite_mask)
 				sprite_mask_state = 2;
 
-			num_sprites --;
+			num_sprites--;
 
 			const u16 id_flags = vram[2];
 			const u16 tile = id_flags & 0x7ff;
@@ -834,7 +822,7 @@ void ym7101_device::prepare_sprite_line(int scanline)
 
 			for (int xi = 0; xi < width; xi ++)
 			{
-				num_pixels --;
+				num_pixels--;
 
 				if (x + xi < 0 || x + xi >= line_width || num_pixels < 0)
 					continue;
@@ -882,7 +870,7 @@ void ym7101_device::prepare_sprite_line(int scanline)
 
 		offset = link * 4;
 
-	} while(num_sprites > 0 && num_pixels > 0 && entry_sprites > 0 && link != 0);
+	} while (num_sprites > 0 && num_pixels > 0 && entry_sprites > 0 && link != 0);
 
 	// m_sprite_overflow = num_pixels <= 0 || num_sprites <= 0 || sprite_mask_state == 2;
 }
@@ -951,7 +939,7 @@ void ym7101_device::prepare_tile_line(int scanline)
 	const u8 scroll_y_mask = m_vs ? 0x7e : 0;
 
 	// need to extend two tiles to ensure display on fractional X scrolling
-	for (int x = -1; x < char_num + 1; x ++)
+	for (int x = -1; x < char_num + 1; x++)
 	{
 		// TODO: prettify, shouldn't need scrolly in branch
 		u16 id_flags_a, tile_a;
@@ -1050,7 +1038,7 @@ bool ym7101_device::render_line(int scanline)
 	prepare_tile_line(scanline);
 	prepare_sprite_line(scanline);
 
-	for (int x = 0; x < line_width; x ++)
+	for (int x = 0; x < line_width; x++)
 	{
 		u8 dot_b = m_tile_b_line[x];
 		u8 dot_a = m_tile_a_line[x];
@@ -1072,7 +1060,7 @@ const ym7101_device::mix_func ym7101_device::mix_table[2] =
 u8 ym7101_device::mix_normal(u8 dot_a, u8 dot_b, u8 dot_sprite)
 {
 	u8 pen = m_background_color;
-	for (int pri = 0; pri < 2; pri ++)
+	for (int pri = 0; pri < 2; pri++)
 	{
 		if ((dot_b & 0xf) && BIT(dot_b, 6) == pri)
 			pen = dot_b & 0x3f;
@@ -1091,7 +1079,7 @@ u8 ym7101_device::mix_sh(u8 dot_a, u8 dot_b, u8 dot_sprite)
 {
 	u8 pen = m_background_color;
 
-	for (int pri = 0; pri < 2; pri ++)
+	for (int pri = 0; pri < 2; pri++)
 	{
 		if ((dot_b & 0xf) && BIT(dot_b, 6) == pri)
 			pen = dot_b & 0x3f;
@@ -1167,7 +1155,7 @@ TIMER_CALLBACK_MEMBER(ym7101_device::scan_timer_callback)
 	// broke on active_scan range from >= to >, which is a requirement for dashdes and shangon ...
 	if (active_scan)
 	{
-		m_vcounter --;
+		m_vcounter--;
 
 		if (m_vcounter <= 0)
 		{
@@ -1187,7 +1175,7 @@ TIMER_CALLBACK_MEMBER(ym7101_device::scan_timer_callback)
 		m_vcounter = m_hit;
 	}
 
-	scanline ++;
+	scanline++;
 	scanline %= screen().height();
 
 	m_scan_timer->adjust(screen().time_until_pos(scanline), scanline);
@@ -1236,7 +1224,7 @@ TIMER_CALLBACK_MEMBER(ym7101_device::dma_callback)
 	m_command.address += m_auto_increment;
 	m_command.address &= m_vram_mask;
 
-	m_dma.length --;
+	m_dma.length--;
 	if (m_dma.length == 0)
 	{
 		m_dtack_cb(0);

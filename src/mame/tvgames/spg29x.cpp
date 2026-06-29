@@ -365,8 +365,6 @@ INPUT_PORTS_END
 
 void spg29x_game_state::machine_start()
 {
-	m_leds.resolve();
-
 	save_item(NAME(m_tve_control));
 	save_item(NAME(m_tve_fade_offset));
 	save_item(NAME(m_timers_clk_sel));
@@ -490,10 +488,10 @@ void spg29x_game_state::hyperscan(machine_config &config)
 
 	CDROM(config, "cdrom").set_interface("cdrom");
 
-	HYPERSCAN_CTRL(config, m_hyperscan_ctrl[0], 0);
-	HYPERSCAN_CTRL(config, m_hyperscan_ctrl[1], 0);
+	HYPERSCAN_CTRL(config, m_hyperscan_ctrl[0]);
+	HYPERSCAN_CTRL(config, m_hyperscan_ctrl[1]);
 
-	HYPERSCAN_CARD(config, m_hyperscan_card, 0);
+	HYPERSCAN_CARD(config, m_hyperscan_card);
 
 	SOFTWARE_LIST(config, "cd_list").set_original("hyperscan");
 	SOFTWARE_LIST(config, "card_list").set_original("hyperscan_card");
@@ -591,6 +589,14 @@ ROM_START( zonefamf )
 	//has 1x 48LC8M16A2 (128Mbit/16MByte SDRAM) for loading game into
 ROM_END
 
+ROM_START( gameclik )
+	ROM_REGION( 0x8400000, "nand", 0 )
+	ROM_LOAD("k9f1g08u0b.u6", 0x000000, 0x8400000, CRC(4a02463d) SHA1(e21263dad17c83281bcbeac621b6e7bd6e161809) )
+
+	ROM_REGION( 0x008000, "spg290", ROMREGION_32BIT | ROMREGION_LE )
+	ROM_LOAD32_DWORD("internal.rom", 0x000000, 0x008000, NO_DUMP)
+ROM_END
+
 ROM_START( prail07 )
 	ROM_REGION( 0x8400000, "nand", 0 )
 	ROM_LOAD("hy27uf081g2a.u13", 0x000000, 0x8400000, CRC(2bbe73a7) SHA1(f6af701a372f2600ed4d7df957d8fcaf164bb61b) )
@@ -628,6 +634,9 @@ COMP( 201?, zonefamf,  0,      0,      spg29x, hyperscan, spg29x_zonefamf_game_s
 COMP( 2007, prail07,   0,      0,      spg29x, hyperscan, spg29x_zonefamf_game_state, nand_zonefamf,"Takara Tomy", "Boku wa Plarail Untenshi - Shinkansen de Ikou! (2007 version) (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 CONS( 2007, bratzlfe,  0,      0,      spg29x, hyperscan, spg29x_game_state, empty_init,  "MGA", "Bratz Life",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// looks like one of the mid-gen Compact Cyber Arcade units, but with a camera. Has SPG293 strings in the NAND
+COMP( 2010, gameclik,  0,      0,      spg29x, hyperscan, spg29x_zonefamf_game_state, nand_zonefamf,"Lexibook", "Gameclick (JL2400)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // the sets in spg29x_lexibook_jg7425.cpp probably also belong here, as they use an SPG293 which has the same peripheral mappings (but they make use of additional features)
 // see emu293 https://github.com/gatecat/emu293

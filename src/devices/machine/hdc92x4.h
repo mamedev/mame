@@ -462,7 +462,7 @@ private:
 class hdc9224_device : public hdc92x4_device
 {
 public:
-	hdc9224_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hdc9224_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual int step_time() override;
@@ -472,7 +472,7 @@ protected:
 class hdc9234_device : public hdc92x4_device
 {
 public:
-	hdc9234_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hdc9234_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual int step_time() override;

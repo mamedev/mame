@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "corefloat.h"
+
 #include <bit>
 
 

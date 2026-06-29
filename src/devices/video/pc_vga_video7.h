@@ -11,7 +11,7 @@
 class ht208_video7_vga_device :  public svga_device
 {
 public:
-	ht208_video7_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ht208_video7_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// black screen, several missing features
 	static constexpr feature_type unemulated_features() { return feature::GRAPHICS; }

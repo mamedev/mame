@@ -39,11 +39,6 @@ concept_keyboard_device::concept_keyboard_device(const machine_config &mconfig, 
 {
 }
 
-void concept_keyboard_device::device_resolve_objects()
-{
-	m_led.resolve();
-}
-
 void concept_keyboard_device::device_start()
 {
 	save_item(NAME(m_p2_output));

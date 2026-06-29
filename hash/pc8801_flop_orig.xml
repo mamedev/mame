@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="pc8801_flop_orig" description="NEC PC-8801 original disk images">
+
+	<software name="mariosp" supported="no">
+		<description>Mario Bros. Special</description>
+		<year>1984</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<notes><![CDATA[
+"hxchfe: Unsupported track encoding 0xff."
+Runs too fast
+]]></notes>
+		<!-- PC8801 -->
+		<info name="alt_title" value="マリオブラザーズ スペシャル"/>
+		<part name="flop1" interface="floppy_5_25">
+			<!-- .mfi format just "fail1" -->
+			<dataarea name="flop" size="1164800">
+				<rom name="mario bros. special.hfe" size="1164800" crc="97c5f901" sha1="411772e1dd1307b6c7675634d264e96b50f6448a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

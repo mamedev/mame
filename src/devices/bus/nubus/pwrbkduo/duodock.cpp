@@ -56,6 +56,8 @@
 #include "screen.h"
 #include "softlist_dev.h"
 
+#include "endianness.h"
+
 #define LOG_DRQ         (1U << 1)
 #define LOG_HANDSHAKE   (1U << 2)
 #define LOG_VIDEO       (1U << 3)
@@ -217,7 +219,7 @@ void duodock_device::device_add_mconfig(machine_config &config)
 	m_pvia->writevideo_handler().set(FUNC(duodock_device::vidhandler_w));
 	m_pvia->irq_callback().set(FUNC(duodock_device::dock_irq_w));
 
-	ARIEL(config, m_ramdac, 0);
+	ARIEL(config, m_ramdac);
 
 	ICD2053B(config, m_clockgen, 15.6672_MHz_XTAL);
 	m_clockgen->clkout_changed().set(FUNC(duodock_device::pclock_w));
@@ -259,7 +261,7 @@ void duodock_device::device_add_mconfig(machine_config &config)
 	applefdintf_device::add_35_hd(config, m_floppy[0]);
 	applefdintf_device::add_35_nc(config, m_floppy[1]);
 
-	nubus_device &nubus(NUBUS(config, "nubus", 0));
+	nubus_device &nubus(NUBUS(config, "nubus"));
 	if (((nubus_slot_device *)owner())->get_nubus_bustag() != nullptr)
 	{
 		m_fulltag = string_format(":%s", ((nubus_slot_device *)owner())->get_nubus_bustag());

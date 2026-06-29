@@ -102,7 +102,7 @@ public:
 	{
 	}
 
-	void dfs500(machine_config &config);
+	void dfs500(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -203,17 +203,6 @@ void dfs500_state::machine_start()
 	m_cpanel_serial->write_cts(0);
 	m_rombank1->configure_entries(0, 128, memregion("effectdata")->base(), 0x4000);
 	m_rombank2->configure_entries(0, 128, memregion("effectdata")->base(), 0x4000);
-
-	m_transition.resolve();
-	m_7seg_status.resolve();
-	m_7seg_edit.resolve();
-	m_7seg_trail_shadow_frames.resolve();
-	m_7seg_snapshot.resolve();
-	m_7seg_trans_rate.resolve();
-	m_7seg_pattern_number.resolve();
-	m_LD.resolve();
-	m_LD_effect_ctrl_shift.resolve();
-	m_LD_effect_ctrl_mask.resolve();
 }
 
 void dfs500_state::machine_reset()
@@ -582,8 +571,6 @@ void dfs500_state::cpanel_reg1_w(offs_t offset, uint8_t data)
 			// Here "data" holds the 8-bit value of the "interrupt vector number"
 						//  to be put on the data bus when the CPU asserts /INTAK (Interrupt Acknowledge)
 			m_int_vector = data;
-			// FIXME: Is this an alternative way of doing it?
-			//        m_cpanelcpu->set_input_line_and_vector(0, HOLD_LINE, data);
 			break;
 		default:
 			break;
@@ -940,7 +927,7 @@ void dfs500_state::dfs500(machine_config &config)
 	m_cpanelcpu->set_irq_acknowledge_callback(FUNC(dfs500_state::irq_callback));
 
 	// CXQ71054P at IC16 (Programmable Timer / Counter)
-	PIT8254(config, m_cpanel_pit, 0);
+	PIT8254(config, m_cpanel_pit);
 	m_cpanel_pit->set_clk<0>(8_MHz_XTAL);
 	m_cpanel_pit->set_clk<1>(8_MHz_XTAL/2);
 	m_cpanel_pit->out_handler<1>().set(m_cpanel_pit, FUNC(pit8254_device::write_clk2));
@@ -979,7 +966,7 @@ void dfs500_state::dfs500(machine_config &config)
 	m_effectcpu->set_addrmap(AS_PROGRAM, &dfs500_state::effectcpu_mem_map);
 
 	// CXQ71054P at IC51 (Programmable Timer / Counter)
-	PIT8254(config, m_pit, 0);
+	PIT8254(config, m_pit);
 	m_pit->set_clk<0>(8_MHz_XTAL);
 	m_pit->set_clk<1>(8_MHz_XTAL);
 	m_pit->out_handler<1>().set(m_pit, FUNC(pit8254_device::write_clk2));
@@ -989,7 +976,7 @@ void dfs500_state::dfs500(machine_config &config)
 	m_pit->out_handler<0>().append(m_serial2, FUNC(i8251_device::write_rxc));
 
 	// NEC D71059C at IC52 (Programmable Interruption Controller)
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	// CXQ71051P at IC53 (Serial Interface Unit)

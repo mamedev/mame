@@ -2007,7 +2007,7 @@ void lastmisn_state::lastmisn(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0, m_palette, gfx_shackled_spr);
+	DECO_KARNOVSPRITES(config, m_spritegen_krn, m_palette, gfx_shackled_spr);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	set_screen_raw_params(config);
@@ -2067,7 +2067,7 @@ void lastmisn_state::shackled(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0, m_palette, gfx_shackled_spr);
+	DECO_KARNOVSPRITES(config, m_spritegen_krn, m_palette, gfx_shackled_spr);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	set_screen_raw_params(config);
@@ -2122,7 +2122,7 @@ void gondo_state::gondo(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0, m_palette, gfx_gondo_spr);
+	DECO_KARNOVSPRITES(config, m_spritegen_krn, m_palette, gfx_gondo_spr);
 	m_spritegen_krn->set_colpri_callback(FUNC(gondo_state::gondo_colpri_cb));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2179,7 +2179,7 @@ void ghostb_state::garyoret(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0, m_palette, gfx_gondo_spr);
+	DECO_KARNOVSPRITES(config, m_spritegen_krn, m_palette, gfx_gondo_spr);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	set_screen_raw_params(config);
@@ -2237,11 +2237,11 @@ void ghostb_state::ghostb(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	DECO_BAC06(config, m_tilegen[0], 0);
+	DECO_BAC06(config, m_tilegen[0]);
 	m_tilegen[0]->set_gfx_region_wide(1, 1, 0);
 	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0, m_palette, gfx_shackled_spr);
+	DECO_KARNOVSPRITES(config, m_spritegen_krn, m_palette, gfx_shackled_spr);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	set_screen_raw_params(config);
@@ -2314,7 +2314,7 @@ void csilver_state::csilver(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0, m_palette, gfx_shackled_spr);
+	DECO_KARNOVSPRITES(config, m_spritegen_krn, m_palette, gfx_shackled_spr);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	set_screen_raw_params(config);
@@ -2367,12 +2367,12 @@ void oscar_state::oscar(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	DECO_BAC06(config, m_tilegen[0], 0);
+	DECO_BAC06(config, m_tilegen[0]);
 	m_tilegen[0]->set_gfx_region_wide(1, 1, 0);
 	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tilegen[0]->set_tile_callback(FUNC(oscar_state::oscar_tile_cb));
 
-	DECO_MXC06(config, m_spritegen_mxc, 0, m_palette, gfx_oscar_spr);
+	DECO_MXC06(config, m_spritegen_mxc, m_palette, gfx_oscar_spr);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	set_screen_raw_params(config);
@@ -2486,15 +2486,15 @@ void oscar_state::cobracom(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	DECO_BAC06(config, m_tilegen[0], 0);
+	DECO_BAC06(config, m_tilegen[0]);
 	m_tilegen[0]->set_gfx_region_wide(1, 1, 0);
 	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_BAC06(config, m_tilegen[1], 0);
+	DECO_BAC06(config, m_tilegen[1]);
 	m_tilegen[1]->set_gfx_region_wide(2, 2, 0);
 	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_MXC06(config, m_spritegen_mxc, 0, m_palette, gfx_cobracom_spr);
+	DECO_MXC06(config, m_spritegen_mxc, m_palette, gfx_cobracom_spr);
 	m_spritegen_mxc->set_colpri_callback(FUNC(oscar_state::cobracom_colpri_cb));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

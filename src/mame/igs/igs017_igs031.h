@@ -17,7 +17,7 @@ class igs017_igs031_device :
 public:
 	typedef device_delegate<u16 (u16)> palette_scramble_delegate;
 
-	igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	auto in_pa_callback() { return m_input_port_cb[0].bind(); }
 	auto in_pb_callback() { return m_input_port_cb[1].bind(); }

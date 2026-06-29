@@ -340,8 +340,6 @@ void sgi_ip4_device::device_add_mconfig(machine_config &config)
 
 void sgi_ip4_device::device_start()
 {
-	m_leds.resolve();
-
 	save_item(NAME(m_cpucfg));
 	save_item(NAME(m_dma_lo));
 	save_item(NAME(m_dma_hi));

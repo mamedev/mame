@@ -82,9 +82,9 @@ void neopcb_state::neopcb(machine_config &config)
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", true);
 
-	NG_CMC_PROT(config, m_cmc_prot, 0);
-	NG_PCM2_PROT(config, m_pcm2_prot, 0);
-	NG_PVC_PROT(config, m_pvc_prot, 0);
+	NG_CMC_PROT(config, m_cmc_prot);
+	NG_PCM2_PROT(config, m_pcm2_prot);
+	NG_PVC_PROT(config, m_pvc_prot);
 }
 
 

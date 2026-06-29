@@ -677,8 +677,6 @@ uint32_t pacland_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 // machine
 void pacland_state::machine_start()
 {
-	m_leds.resolve();
-
 	m_mainbank->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x2000);
 
 	save_item(NAME(m_main_irq_mask));

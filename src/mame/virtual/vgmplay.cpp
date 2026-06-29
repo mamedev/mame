@@ -81,7 +81,7 @@ public:
 
 enum vgm_chip
 {
-	CT_SN76489 = 0,
+	CT_SN76489= 0,
 	CT_YM2413,
 	CT_YM2612,
 	CT_YM2151,
@@ -444,7 +444,12 @@ public:
 	template<int Index> void scc_w(offs_t offset, uint8_t data);
 	template<int Index> void c140_c219_w(offs_t offset, uint8_t data);
 
-	void vgmplay(machine_config &config);
+	void vgmplay(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
 	void file_map(address_map &map) ATTR_COLD;
 	void soundchips_map(address_map &map) ATTR_COLD;
 	void soundchips16le_map(address_map &map) ATTR_COLD;
@@ -476,9 +481,6 @@ public:
 	template<int Index> void c352_map(address_map &map) ATTR_COLD;
 	template<int Index> void ga20_map(address_map &map) ATTR_COLD;
 
-private:
-	virtual void machine_start() override ATTR_COLD;
-
 	uint32_t m_held_clock = 0;
 	std::vector<uint8_t> m_file_data;
 	required_device<vgmplay_device> m_vgmplay;
@@ -488,7 +490,7 @@ private:
 	required_device_array<ym2413_device, 2> m_ym2413;
 	required_device_array<ym2612_device, 2> m_ym2612;
 	required_device_array<ym2151_device, 2> m_ym2151;
-	required_device_array<segapcm_device, 2> m_segapcm;
+	required_device_array<sega_315_5218_device, 2> m_segapcm;
 	required_device<rf5c68_device> m_rf5c68;
 	required_device_array<ym2203_device, 2> m_ym2203;
 	required_device_array<ym2608_device, 2> m_ym2608;
@@ -560,9 +562,6 @@ void vgmplay_device::device_start()
 	m_io16le = &space(AS_IO16LE);
 	m_io16be = &space(AS_IO16BE);
 
-	m_playing_led.resolve();
-	m_loop_led.resolve();
-	m_act_leds.resolve();
 	m_act_led_index = std::make_unique<led_expiry_iterator[]>(CT_COUNT);
 	for (vgm_chip led = vgm_chip(0); led != CT_COUNT; led = vgm_chip(led + 1))
 		m_act_led_index[led] = m_act_led_expiries.emplace(m_act_led_expiries.end(), led, attotime::never);
@@ -1771,11 +1770,19 @@ void vgmplay_device::execute_run()
 			case 0xc0:
 			{
 				pulse_act_led(CT_SEGAPCM);
-				uint16_t offset = m_file->read_word(m_pc + 1);
-				if (offset & 0x8000)
-					m_io->write_byte(A_SEGAPCM_1 + (offset & 0x7fff), m_file->read_byte(m_pc + 3));
+				const uint16_t offset = m_file->read_word(m_pc + 1);
+				const uint8_t data = m_file->read_byte(m_pc + 3);
+				if ((offset & 0x7ff) <= 0xff) // only low 11 bit of offset is checked
+				{
+					if (offset & 0x8000)
+						m_io->write_byte(A_SEGAPCM_1 + (offset & 0xff), data);
+					else
+						m_io->write_byte(A_SEGAPCM_0 + (offset & 0xff), data);
+				}
 				else
-					m_io->write_byte(A_SEGAPCM_0 + (offset & 0x7fff), m_file->read_byte(m_pc + 3));
+				{
+					logerror("%s: Unknown Sega PCM %d write %04x = %02x\n", machine().describe_context(), (offset & 0x8000) >> 15, offset & 0x7fff, data);
+				}
 				m_pc += 4;
 				break;
 			}
@@ -3372,8 +3379,8 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_YM2612_1, vgmplay_device::A_YM2612_1 + 3).w(m_ym2612[1], FUNC(ym2612_device::write));
 	map(vgmplay_device::A_YM2151_0, vgmplay_device::A_YM2151_0 + 1).w(m_ym2151[0], FUNC(ym2151_device::write));
 	map(vgmplay_device::A_YM2151_1, vgmplay_device::A_YM2151_1 + 1).w(m_ym2151[1], FUNC(ym2151_device::write));
-	map(vgmplay_device::A_SEGAPCM_0, vgmplay_device::A_SEGAPCM_0 + 0x7ff).w(m_segapcm[0], FUNC(segapcm_device::write));
-	map(vgmplay_device::A_SEGAPCM_1, vgmplay_device::A_SEGAPCM_1 + 0x7ff).w(m_segapcm[1], FUNC(segapcm_device::write));
+	map(vgmplay_device::A_SEGAPCM_0, vgmplay_device::A_SEGAPCM_0 + 0xff).m(m_segapcm[0], FUNC(sega_315_5218_device::map));
+	map(vgmplay_device::A_SEGAPCM_1, vgmplay_device::A_SEGAPCM_1 + 0xff).m(m_segapcm[1], FUNC(sega_315_5218_device::map));
 	map(vgmplay_device::A_RF5C68, vgmplay_device::A_RF5C68 + 0xf).w(m_rf5c68, FUNC(rf5c68_device::rf5c68_w));
 	map(vgmplay_device::A_RF5C68_RAM, vgmplay_device::A_RF5C68_RAM + 0xffff).w(m_rf5c68, FUNC(rf5c68_device::rf5c68_mem_w));
 	map(vgmplay_device::A_YM2203_0, vgmplay_device::A_YM2203_0 + 1).w(m_ym2203[0], FUNC(ym2203_device::write));
@@ -3667,11 +3674,11 @@ void vgmplay_state::vgmplay(machine_config &config)
 
 	config.set_default_layout(layout_vgmplay);
 
-	SN76489(config, m_sn76489[0], 0);
+	SN76489(config, m_sn76489[0]);
 	m_sn76489[0]->add_route(0, m_viz, 0.5, 0);
 	m_sn76489[0]->add_route(0, m_viz, 0.5, 1);
 
-	SN76489(config, m_sn76489[1], 0);
+	SN76489(config, m_sn76489[1]);
 	m_sn76489[1]->add_route(0, m_viz, 0.5, 0);
 	m_sn76489[1]->add_route(0, m_viz, 0.5, 1);
 
@@ -3699,12 +3706,12 @@ void vgmplay_state::vgmplay(machine_config &config)
 	m_ym2151[1]->add_route(0, m_viz, 1, 0);
 	m_ym2151[1]->add_route(1, m_viz, 1, 1);
 
-	SEGAPCM(config, m_segapcm[0], 0);
+	SEGA_315_5218(config, m_segapcm[0], 0);
 	m_segapcm[0]->set_addrmap(0, &vgmplay_state::segapcm_map<0>);
 	m_segapcm[0]->add_route(0, m_viz, 1, 0);
 	m_segapcm[0]->add_route(1, m_viz, 1, 1);
 
-	SEGAPCM(config, m_segapcm[1], 0);
+	SEGA_315_5218(config, m_segapcm[1], 0);
 	m_segapcm[1]->set_addrmap(0, &vgmplay_state::segapcm_map<1>);
 	m_segapcm[1]->add_route(0, m_viz, 1, 0);
 	m_segapcm[1]->add_route(1, m_viz, 1, 1);
@@ -3837,7 +3844,7 @@ void vgmplay_state::vgmplay(machine_config &config)
 	m_ymz280b[1]->add_route(0, m_viz, 0.50, 0);
 	m_ymz280b[1]->add_route(1, m_viz, 0.50, 1);
 
-	RF5C164(config, m_rf5c164, 0);
+	RF5C164(config, m_rf5c164);
 	m_rf5c164->set_addrmap(0, &vgmplay_state::rf5c164_map<0>);
 	m_rf5c164->add_route(0, m_viz, 1, 0);
 	m_rf5c164->add_route(1, m_viz, 1, 1);
@@ -3850,17 +3857,17 @@ void vgmplay_state::vgmplay(machine_config &config)
 	auto& sega32x_maincpu(M68000(config, "sega32x_maincpu", 0));
 	sega32x_maincpu.set_disable();
 
-	TIMER(config, "sega32x_scanline_timer", 0);
+	TIMER(config, "sega32x_scanline_timer");
 
 	m_sega32x->subdevice<cpu_device>("32x_master_sh2")->set_disable();
 	m_sega32x->subdevice<cpu_device>("32x_slave_sh2")->set_disable();
 
 	// TODO: prevent error.log spew
-	AY8910(config, m_ay8910[0], 0);
+	AY8910(config, m_ay8910[0]);
 	m_ay8910[0]->add_route(ALL_OUTPUTS, m_viz, 0.33, 0);
 	m_ay8910[0]->add_route(ALL_OUTPUTS, m_viz, 0.33, 1);
 
-	AY8910(config, m_ay8910[1], 0);
+	AY8910(config, m_ay8910[1]);
 	m_ay8910[1]->add_route(ALL_OUTPUTS, m_viz, 0.33, 0);
 	m_ay8910[1]->add_route(ALL_OUTPUTS, m_viz, 0.33, 1);
 
@@ -3894,13 +3901,13 @@ void vgmplay_state::vgmplay(machine_config &config)
 	m_multipcm[1]->add_route(0, m_viz, 1, 0);
 	m_multipcm[1]->add_route(1, m_viz, 1, 1);
 
-	UPD7759(config, m_upd7759[0], 0);
+	UPD7759(config, m_upd7759[0]);
 	m_upd7759[0]->drq().set(FUNC(vgmplay_state::upd7759_drq_w<0>));
 	m_upd7759[0]->set_addrmap(0, &vgmplay_state::upd7759_map<0>);
 	m_upd7759[0]->add_route(ALL_OUTPUTS, m_viz, 1.0, 0);
 	m_upd7759[0]->add_route(ALL_OUTPUTS, m_viz, 1.0, 1);
 
-	UPD7759(config, m_upd7759[1], 0);
+	UPD7759(config, m_upd7759[1]);
 	m_upd7759[1]->drq().set(FUNC(vgmplay_state::upd7759_drq_w<1>));
 	m_upd7759[1]->set_addrmap(0, &vgmplay_state::upd7759_map<1>);
 	m_upd7759[1]->add_route(ALL_OUTPUTS, m_viz, 1.0, 0);
@@ -3991,17 +3998,17 @@ void vgmplay_state::vgmplay(machine_config &config)
 	m_pokey[1]->add_route(ALL_OUTPUTS, m_viz, 0.5, 0);
 	m_pokey[1]->add_route(ALL_OUTPUTS, m_viz, 0.5, 1);
 
-	QSOUND(config, m_qsound, 0);
+	QSOUND(config, m_qsound);
 	m_qsound->set_addrmap(0, &vgmplay_state::qsound_map<0>);
 	m_qsound->add_route(0, m_viz, 1, 0);
 	m_qsound->add_route(1, m_viz, 1, 1);
 
-	SCSP(config, m_scsp[0], 0);
+	SCSP(config, m_scsp[0]);
 	m_scsp[0]->set_addrmap(0, &vgmplay_state::scsp_map<0>);
 	m_scsp[0]->add_route(0, m_viz, 1, 0);
 	m_scsp[0]->add_route(1, m_viz, 1, 1);
 
-	SCSP(config, m_scsp[1], 0);
+	SCSP(config, m_scsp[1]);
 	m_scsp[1]->set_addrmap(0, &vgmplay_state::scsp_map<1>);
 	m_scsp[1]->add_route(0, m_viz, 1, 0);
 	m_scsp[1]->add_route(1, m_viz, 1, 1);
@@ -4018,11 +4025,11 @@ void vgmplay_state::vgmplay(machine_config &config)
 	m_wswan[1]->add_route(0, m_viz, 0.50, 0);
 	m_wswan[1]->add_route(1, m_viz, 0.50, 1);
 
-	VBOYSND(config, m_vsu_vue[0], 0);
+	VBOYSND(config, m_vsu_vue[0]);
 	m_vsu_vue[0]->add_route(0, m_viz, 1.0, 0);
 	m_vsu_vue[0]->add_route(1, m_viz, 1.0, 1);
 
-	VBOYSND(config, m_vsu_vue[1], 0);
+	VBOYSND(config, m_vsu_vue[1]);
 	m_vsu_vue[1]->add_route(0, m_viz, 1.0, 0);
 	m_vsu_vue[1]->add_route(1, m_viz, 1.0, 1);
 

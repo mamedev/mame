@@ -4,6 +4,7 @@
 #include "emu.h"
 #include "pc88va.h"
 
+//#include "input.h"
 
 #define LOG_IDP     (1U << 1) // TSP data
 #define LOG_FB      (1U << 2) // framebuffer strips (verbose)
@@ -16,6 +17,8 @@
 
 #define VERBOSE (LOG_GENERAL | LOG_IDP)
 //#define LOG_OUTPUT_STREAM std::cout
+
+#define LIVE_PICTURE_MASK_VIEW (0)
 
 #include "logmacro.h"
 
@@ -38,21 +41,67 @@ void pc88va_state::video_start()
 	m_gfxdecode->gfx(3)->set_source(m_kanji_ram.get());
 	m_vrtc_irq_line = 432;
 
+	m_screen->register_screen_bitmap(m_text_bitmap);
+
 	for (int i = 0; i < 2; i++)
 		m_screen->register_screen_bitmap(m_graphic_bitmap[i]);
 
+	for (int i = 0; i < 6; i++)
+		m_screen->register_screen_bitmap(m_bitmap_screen[i]);
+
 	save_item(NAME(m_screen_ctrl_reg));
+	save_item(NAME(m_gden0));
+	save_item(NAME(m_ymmd));
+	save_item(NAME(m_dm));
+	save_item(NAME(m_vw));
 	save_item(NAME(m_gfx_ctrl_reg));
+	save_item(NAME(m_backdrop_color));
+	save_item(NAME(m_88md));
+	save_item(NAME(m_g3msk));
+	save_item(NAME(m_gnsw));
+	save_item(NAME(m_tscr));
+	save_item(NAME(m_gcf));
 	save_item(NAME(m_color_mode));
 	save_item(NAME(m_pltm));
 	save_item(NAME(m_pltp));
 
+	save_item(NAME(m_gntc));
+	save_item(NAME(m_gfx_transmask));
 	save_item(NAME(m_text_transpen));
+	save_item(NAME(m_text_transmask));
+	save_item(NAME(m_td));
 	save_pointer(NAME(m_video_pri_reg), 2);
 	save_pointer(NAME(m_gvram), gvram_size);
 	save_pointer(NAME(m_kanji_ram), kanjiram_size);
 
 	save_item(NAME(m_vrtc_irq_line));
+	save_item(NAME(m_vertical_magnify));
+
+	save_item(STRUCT_MEMBER(m_singleplane, rop));
+	save_item(STRUCT_MEMBER(m_singleplane, patr));
+	save_item(STRUCT_MEMBER(m_singleplane, wss));
+//  save_item(STRUCT_MEMBER(m_singleplane, rbusy));
+
+	save_item(STRUCT_MEMBER(m_multiplane, aacc));
+	save_item(STRUCT_MEMBER(m_multiplane, gmap));
+	save_item(STRUCT_MEMBER(m_multiplane, xrpm));
+	save_item(STRUCT_MEMBER(m_multiplane, xwpm));
+	save_item(STRUCT_MEMBER(m_multiplane, cmpen));
+	save_item(STRUCT_MEMBER(m_multiplane, wss));
+	save_item(STRUCT_MEMBER(m_multiplane, pmod));
+	save_item(STRUCT_MEMBER(m_multiplane, rop));
+	save_item(STRUCT_MEMBER(m_multiplane, cmpr));
+	save_item(STRUCT_MEMBER(m_multiplane, patr));
+	save_item(STRUCT_MEMBER(m_multiplane, prrp));
+	save_item(STRUCT_MEMBER(m_multiplane, prwp));
+//  save_item(STRUCT_MEMBER(m_multiplane, rbusy));
+
+	save_item(STRUCT_MEMBER(m_picture_mask, top));
+	save_item(STRUCT_MEMBER(m_picture_mask, bottom));
+	save_item(STRUCT_MEMBER(m_picture_mask, left));
+	save_item(STRUCT_MEMBER(m_picture_mask, right));
+	save_item(STRUCT_MEMBER(m_picture_mask, mkm));
+	save_item(STRUCT_MEMBER(m_picture_mask, gmp));
 }
 
 // TODO: all needs to be verified
@@ -65,6 +114,8 @@ void pc88va_state::video_reset()
 	m_pltm = 0;
 	m_pltp = 0;
 	m_video_pri_reg[0] = m_video_pri_reg[1] = 0;
+	m_vertical_magnify = 0x10000;
+	m_picture_mask.gmp = m_picture_mask.mkm[1] = m_picture_mask.mkm[0] = 0;
 }
 
 void pc88va_state::palette_init(palette_device &palette) const
@@ -85,18 +136,49 @@ void pc88va_state::palette_init(palette_device &palette) const
 	}
 }
 
+// outer = 1 examples:
+// - shinraba intro and start of level
+// - rtype intro
+// - shanghai winning animation (texture scissoring)
+// - fqueen (graphic layers being concealed on top/bottom)
+// - famista playfield (covers some lines at bottom)
+// inner = 0 examples:
+// - olteus intro and gameplay
+// - upo gameplay
+bool pc88va_state::is_layer_scissored(int pri, int which)
+{
+	const uint8_t actual_gmp = m_picture_mask.gmp + 1;
+	switch(m_picture_mask.mkm[which])
+	{
+		// Next layer
+		case 1:
+			return actual_gmp == pri;
+		// All higher layers (can't be current as per rtype)
+		case 2:
+			return actual_gmp > pri;
+		// All lower layers (+ current according to upo)
+		// TODO: boomer should also mask sprites, perhaps different between inner and outer?
+		case 3:
+			return actual_gmp <= pri;
+	}
+	// NOP
+	return false;
+}
+
 uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t pri, cur_pri_lv;
+	int pri;
+	uint8_t cur_pri_lv;
 	uint32_t screen_pri;
-	bitmap.fill(0, cliprect);
+	// shinraba opening and title relies on backdrop color
+	bitmap.fill(m_palette->pen(0x20), cliprect);
 
 	// don't bother if we are under DSPOFF command
 	if(m_tsp.disp_on == false)
 		return 0;
 
 	// rollback to V1/V2 mode
-	if (!BIT(m_pltm, 2))
+	if (!BIT(m_pltm, 2) /* && BIT(m_88md, 6) */)
 	{
 		// BIOS doesn't explicitly set a color mode for the V1/V2 Mode printout at POST
 		// pc8801_state::screen_update(bitmap, cliprect);
@@ -126,9 +208,13 @@ uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 	//popmessage("%08x", screen_pri);
 
+
 	for(pri = 0; pri < 6; pri++)
 	{
+		const u8 screen_num = 5 - pri;
 		cur_pri_lv = (screen_pri >> (pri * 4)) & 0xf;
+
+		m_bitmap_screen[screen_num].fill(0);
 
 		if(cur_pri_lv & 8) // enable layer
 		{
@@ -139,11 +225,11 @@ uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 				{
 					// 8 = graphic 0
 					case 0:
-						draw_graphic_layer(bitmap, cliprect, 0);
+						draw_graphic_layer(m_bitmap_screen[screen_num], cliprect, 0);
 						break;
 					// 9 = graphic 1
 					case 1:
-						draw_graphic_layer(bitmap, cliprect, 1);
+						draw_graphic_layer(m_bitmap_screen[screen_num], cliprect, 1);
 						break;
 					default:
 						popmessage("Undocumented pri level %d", cur_pri_lv);
@@ -153,19 +239,69 @@ uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 			{
 				switch(cur_pri_lv & 3) // (palette color mode)
 				{
-					case 0: draw_text(bitmap, cliprect); break;
-					case 1: draw_sprites(bitmap, cliprect); break;
+					case 0: draw_text(m_bitmap_screen[screen_num], cliprect); break;
+					case 1: draw_sprites(m_bitmap_screen[screen_num], cliprect); break;
 					/* A = graphic 0 */
 					case 2:
-						draw_graphic_layer(bitmap, cliprect, 0);
+						draw_graphic_layer(m_bitmap_screen[screen_num], cliprect, 0);
 						break;
 					/* B = graphic 1 */
 					case 3:
-						draw_graphic_layer(bitmap, cliprect, 1);
+						draw_graphic_layer(m_bitmap_screen[screen_num], cliprect, 1);
 						break;
 				}
 			}
 		}
+	}
+
+	// mix screens, apply per-screen picture mask here
+
+	// vertical values are doubled when in 400 mode
+	// FIXME: currently querying the screen dims rather than CRTC values for famista
+	// cfr. recompute_parameters fn
+	//const u8 in_line400 = !BIT(m_crtc_regs[0], 7);
+	const u8 in_line400 = m_screen->visible_area().height() >= 400;
+
+	rectangle picture_cliprect(m_picture_mask.left, m_picture_mask.right, m_picture_mask.top << in_line400,(m_picture_mask.bottom << in_line400) | in_line400);
+
+	for (pri = 5; pri >= 0; pri--)
+	{
+		rectangle screen_cliprect = cliprect;
+
+		// outer: just apply an intersection
+		if (is_layer_scissored(pri, 1))
+			screen_cliprect &= picture_cliprect;
+
+		// inner: we need to copy pixel by pixel and apply a set theory complement
+		// using both inner and outer is untested and guessed (should be very rare use)
+		if (is_layer_scissored(pri, 0))
+		{
+			for (int y = screen_cliprect.min_y; y <= screen_cliprect.max_y; y++)
+			{
+				bool y_cross = y >= picture_cliprect.min_y && y <= picture_cliprect.max_y;
+
+				for (int x = screen_cliprect.min_x; x <= screen_cliprect.max_x; x++)
+				{
+					if (y_cross && x >= picture_cliprect.min_x && x <= picture_cliprect.max_x)
+						continue;
+
+					u32 const pix = m_bitmap_screen[pri].pix(y, x);
+
+					if (pix)
+						bitmap.pix(y, x) = pix;
+				}
+			}
+		}
+		else
+			copybitmap_trans(bitmap, m_bitmap_screen[pri], 0,0,0,0, screen_cliprect, 0);
+	}
+
+	if ((m_picture_mask.mkm[0] || m_picture_mask.mkm[1]) && LIVE_PICTURE_MASK_VIEW)
+	{
+		const char* mkm_modes[] = {"NOP", "Next low", "All high", "All low"};
+		popmessage("GMP %d MKM1 outer %s MKM0 inner %s\nx0 %d y0 %d - x1 %d y1 %d",
+			m_picture_mask.gmp + 1, mkm_modes[m_picture_mask.mkm[1]], mkm_modes[m_picture_mask.mkm[0]],
+			m_picture_mask.left, m_picture_mask.top << in_line400, m_picture_mask.right, (m_picture_mask.bottom << in_line400) | 1);
 	}
 
 	return 0;
@@ -181,7 +317,7 @@ inline u8 pc88va_state::get_layer_pal_bank(u8 which)
 		return (m_pltm & 1) << 4;
 
 	// N/A for 32 color mode
-	if (m_pltm == 3)
+	if (m_pltm == 7)
 		return 0;
 
 	// HW quirk: text and sprites colors will be joined when either one is selected in PLTP
@@ -193,6 +329,7 @@ inline u8 pc88va_state::get_layer_pal_bank(u8 which)
 	return (m_pltp == which) << 4;
 }
 
+// TODO: sprite drawing looks delayed one frame (famista newspaper)
 void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// punt if we are under SPROFF
@@ -252,14 +389,22 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 			spr_count = 0;
 
+			// untested, assume same as below
+			if (yp + ysize > 511)
+			{
+				ysize -= (0x200 - yp);
+				yp = 0;
+			}
+
 			for(int y_i = 0; y_i < ysize; y_i++)
 			{
+				int res_y = ((yp + y_i) & 0x1ff) << m_tsp.spr_mg;
+
 				for(int x_i = 0; x_i < xsize; x_i+=16)
 				{
 					for(int x_s = 0; x_s < 16; x_s++)
 					{
 						int res_x = (xp + x_i + x_s) & 0x3ff;
-						int res_y = (yp + y_i) << m_tsp.spr_mg;
 
 						const u32 data_offset = ((spda + spr_count) & 0xffff) / 2;
 						u8 pen = (bitswap<16>(tvram[data_offset],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15 - x_s)) & 1;
@@ -289,23 +434,32 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 			spr_count = 0;
 
+			// Hitting Y limits acts in a fun way as a form of vertical wraparound
+			// moves the resulting sprite at top edge of screen
+			// - famista sprite face on win/lose at newspaper screen
+			// - hatisora enemies
+			if (yp + ysize > 511)
+			{
+				ysize -= (0x200 - yp);
+				yp = 0;
+			}
+
 			for(int y_i = 0; y_i < ysize; y_i++)
 			{
+				int res_y = ((yp + y_i) & 0x1ff) << m_tsp.spr_mg;
+
 				for(int x_i = 0; x_i < xsize; x_i += 4)
 				{
 					for(int x_s = 0; x_s < 4; x_s ++)
 					{
 						// - shinraba player touching left edge of screen requires X wraparound
-						// - olteus doesn't want Y wraparound
 						int res_x = (xp + x_i + x_s) & 0x3ff;
-						int res_y = (yp + y_i) << m_tsp.spr_mg;
 
 						const u32 data_offset = ((spda + spr_count) & 0xffff) / 2;
 
 						int pen = (bitswap<16>(tvram[data_offset],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8)) >> (12 - (x_s * 4)) & 0xf;
 
-						//if (pen != 0 && pen != m_text_transpen)
-						if (pen != 0)
+						if (!m_text_transmask[pen])
 						{
 							for (int mg = 0; mg < m_tsp.spr_mg + 1; mg ++)
 							{
@@ -321,6 +475,8 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			}
 		}
 	}
+
+	// TODO: verify if IDP global vertical magnify also affects sprites
 }
 
 // TODO: handcrafted kanji ROM causes this, should be simplified by a more accurate dump
@@ -370,10 +526,16 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	if(m_td == true)
 		return;
 
+	m_text_bitmap.fill(0x20, cliprect);
+
 	uint16_t const *const tvram = m_tvram;
 	uint8_t const *const kanji = memregion("kanji")->base();
 
 	LOGTEXT("=== Start TEXT frame\n");
+
+	// "the sum of the split screen height must match the height of the previous screen"
+	// - mightmag loads from PC Engine OS, disables split 1 by pushing a split 0 RH from 384 to 400
+	u32 rh_sum = 0;
 
 	// four layers
 	for (int layer_n = 0; layer_n < 4; layer_n ++)
@@ -396,17 +558,19 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		const u8 screen_fg_col = (tsp_regs[0xa / 2] & 0xf000) >> 12;
 		const u8 screen_bg_col = (tsp_regs[0xa / 2] & 0x0f00) >> 8;
 
-		// TODO: how even vh/vw can run have all these bytes?
-		const u8 vh = (tsp_regs[4 / 2] & 0x7ff);
+		// TODO: how even vh/vw can have all these bytes?
+		// shinraba sets VH 26 -> 416 text lines, which shouldn't have any effect
+		const u16 vh = (tsp_regs[4 / 2] & 0x7ff);
 		const u16 vw = (tsp_regs[8 / 2] & 0x3ff) / 2;
 
-
-		if (vh == 0 || vw == 0)
+		if (vh == 0 || vw == 0 || rh_sum > cliprect.max_y)
 		{
-			LOGTEXT("\t%d skip VW = %d VH = %d\n"
+			LOGTEXT("\t%d skip VW = %d VH = %d rh_sum %d cliprect.max_y %d\n"
 				, layer_n
 				, vw
 				, vh
+				, rh_sum
+				, cliprect.max_y
 			);
 			continue;
 		}
@@ -598,8 +762,8 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 							if(secret) { pen = 0; } //hide text
 
-							if(pen != 0 && pen != m_text_transpen)
-								bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
+							if (!m_text_transmask[pen])
+								m_text_bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
 						}
 					}
 				}
@@ -633,8 +797,8 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 							if(secret) { pen = 0; } //hide text
 
-							if(pen != 0 && pen != m_text_transpen)
-								bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
+							if (!m_text_transmask[pen])
+								m_text_bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
 						}
 					}
 				}
@@ -665,14 +829,23 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 							if(secret) { pen = 0; } //hide text
 
-							if(pen != 0)
-								bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
+							if (!m_text_transmask[pen])
+								m_text_bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
 						}
 					}
 				}
 			}
 		}
+
+		rh_sum += rh;
 	}
+
+	copyrozbitmap_trans(
+		bitmap, cliprect, m_text_bitmap,
+		0, 0,
+		0x10000, 0, 0, m_vertical_magnify,
+		false, 0x20
+	);
 }
 
 /*
@@ -729,14 +902,21 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 		, layer_pal_bank
 	);
 
-//  m_graphic_bitmap[which].fill(m_palette->pen(layer_pal_bank), cliprect);
-	m_graphic_bitmap[which].fill(0, cliprect);
+	// use the border color entry as a marker for not drawing
+	m_graphic_bitmap[which].fill(0x20, cliprect);
 
-	const int layer_inc = (!is_5bpp) + 1;
+//	const int layer_inc = (!is_5bpp) + 1;
 	const int layer_fixed = is_5bpp + 1;
 
-	for (int layer_n = which; layer_n < 4; layer_n += layer_inc)
+	for (int layer_n = which; layer_n < 4; layer_n ++)
 	{
+		// layer A: 0, 2, 3
+		// layer B: 1
+		// - olteus in particular wants to draw strip 3 (gameplay status bar) with
+		//   8bpp rather than 4bpp coming from layer B (for the foreground rocks)
+		if ((which & 1) ^ (layer_n == layer_fixed))
+			continue;
+
 		uint16_t const *const fb_strip_regs = &fb_regs[(layer_n * 0x20) / 2];
 		const u16 fbw = fb_strip_regs[0x04 / 2] & 0x7fc;
 
@@ -747,10 +927,11 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 			continue;
 		}
 
-		// on layer = 1 fsa is always 0x20000, cfr. shanghai
-		// (almost likely an HW quirk, described in the docs)
+		// On layer = 1 FSA is always 0x20000, cfr. shanghai
 		// also animefrm swaps this with layer 2 (main canvas)
-		const u32 fsa = (layer_n == layer_fixed) ? 0x20000
+		// We assume that lower part isn't ignored, cfr. DSA below.
+		const u32 fsa = (layer_n == layer_fixed)
+			? 0x20000 | (fb_strip_regs[0x00 / 2] & 0xfffc)
 			: (fb_strip_regs[0x00 / 2] & 0xfffc) | ((fb_strip_regs[0x02 / 2] & 0x3) << 16);
 
 		u16 fbl = (fb_strip_regs[0x06 / 2] & 0x3ff) + 1;
@@ -758,10 +939,19 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 		if (fbl == 1)
 			fbl = 0x400;
 
-		const u8 x_dot_offs = fb_strip_regs[0x08 / 2];
-		const u16 ofx = fb_strip_regs[0x0a / 2] & 0x7fc;
-		const u16 ofy = fb_strip_regs[0x0c / 2] & 0x3ff;
-		const u32 dsa = ((fb_strip_regs[0x0e / 2] & 0xfffc) | ((fb_strip_regs[0x10 / 2] & 0x3) << 16));
+		// NOTE: implementation defined, cfr. individual modes
+		const u8 x_dot_offs = fb_strip_regs[0x08 / 2] & 0x1f;
+
+		// olteus sets 0xffff to both ofx/ofy layer 1 in shop, those are ignored as well
+		const u16 ofx = layer_n == layer_fixed ? 0 : fb_strip_regs[0x0a / 2] & 0x7fc;
+		const u16 ofy = layer_n == layer_fixed ? 0 : fb_strip_regs[0x0c / 2] & 0x3ff;
+
+		// shanghai and olteus (title) wants DSA fixed at 0x2'**** for layer = 1 as well
+		// olteus is more picky in shop, and needs the lower part not being ignored
+		const u32 dsa = (layer_n == layer_fixed)
+			? 0x20000 | (fb_strip_regs[0x0e / 2] & 0xfffc)
+			: ((fb_strip_regs[0x0e / 2] & 0xfffc) | ((fb_strip_regs[0x10 / 2] & 0x3) << 16));
+
 		const u16 dsh = fb_strip_regs[0x12 / 2] & 0x1ff;
 		const u16 dsp = fb_strip_regs[0x16 / 2] & 0x1ff;
 
@@ -791,13 +981,21 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 		if (split_cliprect.empty())
 			continue;
 
-		// TODO: picture mask
+		layer_params_t params;
+		params.fsa = fsa;
+		params.dsa = dsa;
+		params.dsp = dsp;
+		params.ofx = ofx;
+		params.x_dot_offs = x_dot_offs;
+		params.ofy = ofy;
+		params.fbw = fbw;
+		params.fbl = fbl;
 
 		if (!m_dm)
 		{
 			switch(gfx_ctrl & 3)
 			{
-				case 1: draw_packed_gfx_4bpp(m_graphic_bitmap[which], split_cliprect, fsa, dsa, ofx, layer_pal_bank, fbw, fbl); break;
+				case 1: draw_packed_gfx_4bpp(m_graphic_bitmap[which], split_cliprect, params, layer_pal_bank, which); break;
 				default:
 					popmessage("pc88va_v.cpp: unhandled %d GFX mode DM = 0 (Multiplane)", which);
 					break;
@@ -808,16 +1006,16 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 			switch(gfx_ctrl & 3)
 			{
 				//case 0: draw_indexed_gfx_1bpp(bitmap, cliprect, dsa, layer_pal_bank); break;
-				case 1: draw_indexed_gfx_4bpp(m_graphic_bitmap[which], split_cliprect, fsa, dsa, dsp, ofx, layer_pal_bank, fbw, fbl); break;
+				case 1: draw_indexed_gfx_4bpp(m_graphic_bitmap[which], split_cliprect, params, layer_pal_bank, which); break;
 				case 2:
 					if (is_5bpp)
 					{
-						draw_packed_gfx_5bpp(m_graphic_bitmap[which], split_cliprect, fsa, dsa, dsp, ofx, layer_pal_bank, fbw, fbl);
+						draw_packed_gfx_5bpp(m_graphic_bitmap[which], split_cliprect, params, layer_pal_bank, which);
 					}
 					else
-						draw_direct_gfx_8bpp(m_graphic_bitmap[which], split_cliprect, fsa, dsa, dsp, ofx, fbw, fbl);
+						draw_direct_gfx_8bpp(m_graphic_bitmap[which], split_cliprect, params, which);
 					break;
-				case 3: draw_direct_gfx_rgb565(m_graphic_bitmap[which], split_cliprect, fsa, dsa, ofx, fbw, fbl); break;
+				case 3: draw_direct_gfx_rgb565(m_graphic_bitmap[which], split_cliprect, params, which); break;
 				default:
 					popmessage("pc88va_v.cpp: unhandled %d GFX mode DM = 1 (Singleplane)", which);
 					break;
@@ -825,21 +1023,23 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 		}
 	}
 
-	// TODO: primask_copyrozbitmap_trans
 	copyrozbitmap_trans(
 		bitmap, cliprect, m_graphic_bitmap[which],
 		0, 0,
 		pixel_size, 0, 0, line_size,
-		false, 0
+		false, 0x20
 	);
 }
 
-// TODO: incomplete
-void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u8 pal_base)
+// TODO: incomplete, no known cases yet
+void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which)
 {
+	// should use all the bits
+	// const u8 x_dot_offs = param.x_dot_offs & 0x1f;
+
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u32 line_offset = (((y * 640) / 8) + fb_start_offset) & 0x3ffff;
+		const u32 line_offset = (((y * 640) / 8) + param.fsa) & 0x3ffff;
 
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
 		{
@@ -851,148 +1051,176 @@ void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &
 				uint32_t color = (m_gvram[bitmap_offset] >> (7 - xi)) & 1;
 				int res_x = x + xi;
 
-				if(color && cliprect.contains(res_x, y))
+				if(!m_gfx_transmask[which][color] && cliprect.contains(res_x, y))
 					bitmap.pix(y, res_x) = m_palette->pen(color + pal_base);
 			}
 		}
 	}
 }
 
-void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 dsp_start_base, u16 scrollx, u8 pal_base, u16 fb_width, u16 fb_height)
+// famista
+void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which)
 {
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 
-	//printf("%d %d %d %08x %d\n", y_min, y_max, fb_width, start_offset, fb_height);
-
-	const u32 base_address = (fb_start_offset & 0x20000) | (display_start_offset & 0x1ffff);
+	const u32 base_address = param.dsa & 0x3ffff;
+	const u32 y_wrap = param.fbl - param.ofy;
+	// 0~3, 16~19 valid
+	const u8 x_dot_offs = bitswap<3>(param.x_dot_offs, 4, 1, 0) & 0x7;
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u32 line_offset = (((y - dsp_start_base) * fb_width) + base_address) & 0x3ffff;
+		const int y_latch = y - param.dsp;
+		const u32 latched_address = (y_latch >= y_wrap) ? (param.fsa + param.ofx - y_wrap * param.fbw) : base_address;
+		const u32 line_offset = (y_latch * param.fbw) + latched_address;
 
-		for(int x = cliprect.min_x; x <= cliprect.max_x; x += 2)
+		for(int x = cliprect.min_x; x <= cliprect.max_x + x_dot_offs; x += 2)
 		{
 			u16 x_char = (x >> 1);
-			u32 bitmap_offset = (line_offset + x_char - (scrollx >> 6)) & 0x3ffff;
+			u32 bitmap_offset = (line_offset + x_char - (param.ofx >> 6)) & 0x3ffff;
 
 			for (int xi = 0; xi < 2; xi ++)
 			{
 				u8 color = (m_gvram[bitmap_offset] >> (xi ? 0 : 4)) & 0xf;
+				int res_x = x + xi - x_dot_offs;
 
-				if(color && cliprect.contains(x + xi, y))
-					bitmap.pix(y, x + xi) = m_palette->pen(color + pal_base);
+				if(!m_gfx_transmask[which][color] && cliprect.contains(res_x, y))
+					bitmap.pix(y, res_x) = m_palette->pen(color + pal_base);
 			}
 		}
 	}
 }
 
-void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 dsp_start_base, u16 scrollx, u8 pal_base, u16 fb_width, u16 fb_height)
+// animefrm
+void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which)
 {
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 
 	//printf("%d %d %d %08x %d\n", y_min, y_max, fb_width, start_offset, fb_height);
-	const u32 base_address = (fb_start_offset & 0x20000) | (display_start_offset & 0x1ffff);
+	// TODO: fix scrolling, add x dot scroll
+	const u32 base_address = (param.fsa & 0x20000) | (param.dsa & 0x1ffff);
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u32 line_offset = (((y - dsp_start_base) * fb_width) + base_address) & 0x3ffff;
+		const u32 line_offset = (((y - param.dsp) * param.fbw) + base_address) & 0x3ffff;
 
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			u32 bitmap_offset = (line_offset + x - (scrollx >> 6)) & 0x3ffff;
+			u32 bitmap_offset = (line_offset + x - (param.ofx >> 6)) & 0x3ffff;
 
 			u8 color = m_gvram[bitmap_offset] & 0x1f;
 
+			// TODO: how transmask works with this?
 			if(color && cliprect.contains(x, y))
 				bitmap.pix(y, x) = m_palette->pen(color);
 		}
 	}
 }
 
-void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 dsp_start_base, u16 scrollx, u16 fb_width, u16 fb_height)
+// boomer gameplay
+void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 which)
 {
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
-	const u32 base_address = (fb_start_offset & 0x20000) | (display_start_offset & 0x1ffff);
+
+	const u32 base_address = param.dsa & 0x3ffff;
+	const u32 y_wrap = param.fbl - param.ofy;
+	// 0~1, 16~17 valid
+	const u8 x_dot_offs = bitswap<2>(param.x_dot_offs, 4, 0) & 0x3;
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u32 line_offset = (((y - dsp_start_base) * fb_width) + base_address) & 0x3ffff;
+		const int y_latch = y - param.dsp;
+		const u32 latched_address = (y_latch >= y_wrap) ? (param.fsa + param.ofx - y_wrap * param.fbw) : base_address;
+		const u32 line_offset = (y_latch * param.fbw) + latched_address;
 
-		for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for(int x = cliprect.min_x; x <= cliprect.max_x + x_dot_offs; x++)
 		{
-			u32 bitmap_offset = (line_offset + x - (scrollx >> 6)) & 0x3ffff;
+			u32 bitmap_offset = (line_offset + x - (param.ofx >> 6)) & 0x3ffff;
 
 			uint32_t color = (m_gvram[bitmap_offset] & 0xff);
+			const int res_x = x - x_dot_offs;
 
-			// boomer suggests that transparency is calculated over just color = 0, may be settable?
+			// TODO: how transmask works with this?
+			// boomer suggests that transparency is calculated over just color = 0, perhaps color & 0xf?
 			// TODO: may not be clamped to palNbit
-			if(color && cliprect.contains(x, y))
+			if(color && cliprect.contains(res_x, y))
 			{
 				u8 b = pal2bit(color & 0x03);
 				u8 r = pal3bit((color & 0x1c) >> 2);
 				u8 g = pal3bit((color & 0xe0) >> 5);
-				bitmap.pix(y, x) = (b) | (g << 8) | (r << 16);
+				bitmap.pix(y, res_x) = (b) | (g << 8) | (r << 16);
 			}
 		}
 	}
 }
 
-void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 scrollx, u16 fb_width, u16 fb_height)
+void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 which)
 {
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
-	const u32 base_address = (display_start_offset & 0x3ffff);
+	const u32 base_address = (param.dsa & 0x3ffff);
+	// 0 or 16 valid
+	const u8 x_dot_offs = BIT(param.x_dot_offs, 4);
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		// pc88vad requires halved pitch for first screen
-		const u32 line_offset = ((y * fb_width >> 1) + base_address) & 0x3ffff;
+		const u32 line_offset = ((y * param.fbw >> 1) + base_address) & 0x3ffff;
 
-		for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for(int x = cliprect.min_x; x <= cliprect.max_x + x_dot_offs; x++)
 		{
-			u32 bitmap_offset = ((line_offset + x - (scrollx >> 1)) << 1) & 0x3ffff;
+			u32 bitmap_offset = ((line_offset + x - (param.ofx >> 1)) << 1) & 0x3ffff;
 
 			uint16_t color = (m_gvram[bitmap_offset] & 0xff) | (m_gvram[bitmap_offset + 1] << 8);
+			const int res_x = x - x_dot_offs;
 
-			if(cliprect.contains(x, y))
+			// TODO: again transmask
+			if(cliprect.contains(res_x, y))
 			{
 				u8 b = pal5bit((color & 0x001f));
 				u8 r = pal5bit((color & 0x03e0) >> 5);
 				u8 g = pal6bit((color & 0xfc00) >> 10);
-				bitmap.pix(y, x) = (b) | (g << 8) | (r << 16);
+				bitmap.pix(y, res_x) = (b) | (g << 8) | (r << 16);
 			}
 		}
 	}
 }
 
-// famista, all inufuto games
-void pc88va_state::draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 scrollx, u8 pal_base, u16 fb_width, u16 fb_height)
+// all inufuto games, alantia
+// x dot offset used by aerial
+void pc88va_state::draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which)
 {
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 
-	const u32 base_offset = display_start_offset >> 2;
+	const u32 base_offset = param.dsa >> 2;
+	// 0~7 valid
+	const u8 x_dot_offs = param.x_dot_offs & 7;
+
+	// alantia disables 4th layer, uses it as local GFX storage
+	const u8 num_banks = m_g3msk + 3;
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u32 line_offset = ((y * (fb_width >> 2)) + base_offset) & 0x0ffff;
+		const u32 line_offset = ((y * (param.fbw >> 2)) + base_offset) & 0x0ffff;
 
-		for(int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
+		for(int x = cliprect.min_x; x <= cliprect.max_x + x_dot_offs; x += 8)
 		{
 			u16 x_char = (x >> 3);
-			u32 bitmap_offset = (line_offset + x_char - (scrollx >> 2)) & 0x0ffff;
+			u32 bitmap_offset = (line_offset + x_char - (param.ofx >> 2)) & 0x0ffff;
 
 			for (int xi = 0; xi < 8; xi ++)
 			{
 				u8 color = 0;
-				for (int bank_num = 0; bank_num < 4; bank_num ++)
+				for (int bank_num = 0; bank_num < num_banks; bank_num ++)
 					color |= ((m_gvram[bitmap_offset + bank_num * 0x10000] >> (7 - xi)) & 1) << bank_num;
+				int res_x = x + xi - x_dot_offs;
 
-				if(color && cliprect.contains(x + xi, y))
-					bitmap.pix(y, x + xi) = m_palette->pen(color + pal_base);
+				if(!m_gfx_transmask[which][color] && cliprect.contains(res_x, y))
+					bitmap.pix(y, res_x) = m_palette->pen(color + pal_base);
 			}
 		}
 	}
@@ -1261,10 +1489,12 @@ void pc88va_state::recompute_parameters()
 
 	visarea.set(0, h_vis_area - 1, 0, v_vis_area - 1);
 
-	// TODO: vertical global magnify at bit 7
+	// Global vertical magnify, used by setup menu in 24kHz
+	m_vertical_magnify = (m_crtc_regs[0x00] & 0xc0) == 0x80 ? 0x8000 : 0x10000;
 	// TODO: actual clock source must be external, assume known PC-88 XTALs
 	// TODO: a bit off compared to PC-88 equivalent with the configured values
 	// TODO: famista pukes a 31.2 Hz vertical in 24kHz mode
+	// (sets 0xc0 regardless of CRT Mode setting)
 	const int clock_speed = !!BIT(m_crtc_regs[0x00], 6) ? (31'948'800 / 4) : (28'636'363 / 2);
 
 	refresh = HZ_TO_ATTOSECONDS(clock_speed) * h_vis_area * v_vis_area;
@@ -1499,7 +1729,8 @@ void pc88va_state::idp_param_w(uint8_t data)
  ***************************************/
 
 /*
- * $100
+ * $100 Display Screen Control / 表示画面制御レジスタ
+ *
  * x--- ---- ---- ---- GDEN0 graphics display enable
  * -x-- ---- ---- ---- GVM superimpose if 1?
  * --x- ---- ---- ---- XVSP video signal output mode (0) inhibit scan signals
@@ -1531,6 +1762,7 @@ void pc88va_state::screen_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 	//                  YMMD           DM
 	// mightmag 0xb060  (0) screen 0  (0) multiplane
 	m_gden0 = !!(BIT(m_screen_ctrl_reg, 15));
+	// TODO: YMMD also acts as a page mask if enabled (& 0x1ffff rather than 0x3ffff)
 	m_ymmd = !!(BIT(m_screen_ctrl_reg, 11));
 	m_dm = !!(BIT(m_screen_ctrl_reg, 10));
 
@@ -1545,7 +1777,8 @@ u16 pc88va_state::screen_ctrl_r()
 }
 
 /*
- * $102
+ * $102 Graphics Screen Control / グラフィックススクリーン制御レジスタ
+ *
  * ---x --xx ---- ---- screen 1 regs
  * ---x ---- ---- ---- HW1 screen 1 hres (0) 640 dots (1) 320
  * ---- --xx ---- ---- PM1 screen 1 pixel mode
@@ -1568,13 +1801,14 @@ u16 pc88va_state::gfx_ctrl_r()
 }
 
 /*
- * $10c
+ * $10c Color Palette Mode Register / カラーパレットモードレジスタ
+ *
  * --xx ---- ---- ---- BDM1/BDM0 color backdrop mode #
- * --00 ---- ---- ---- inner background color, outer transparent
- * --01 ---- ---- ---- inner transparent, outer background
- * --10 ---- ---- ---- inside/outside background color
- * --11 ---- ---- ---- inside/outside transparent
- *                     \- mode 0 only available on 24.8KHz monitor
+ * --00 ---- ---- ---- display background color, border transparent
+ * --01 ---- ---- ---- display transparent, border background color
+ * --10 ---- ---- ---- display/border background color
+ * --11 ---- ---- ---- display/border transparent
+ *                     \- only mode 0 available on 24.8KHz monitor
  * ---- ---x xx-- ---- PLTM2/PLTM1/PLTM0 color palette mode
  * ---- ---0 xx-- ---- <V1/V2 Modes, cfr. pmode in $32 and pm00 in $31)>
  * ---- ---1 00-- ---- use palette bank 0
@@ -1630,40 +1864,132 @@ void pc88va_state::color_mode_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	//        0x01 (bank 1)   0x02 graphic 0 (left on for previous 0x02 - 0x02 mode)
 	// illcity, xak2 (pre-loading screens):
 	//        0x00 (bank 0)   0x00 text
-
 }
 
-void pc88va_state::palette_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(&m_palram[offset]);
-
-	const u16 color = m_palram[offset];
-	u8 b = pal5bit((color & 0x001f));
-	u8 r = pal5bit((color & 0x03e0) >> 5);
-	u8 g = pal6bit((color & 0xfc00) >> 10);
-
-	// TODO: docs suggests this arrangement but it's wrong
-	// may be just one bit always on?
-//  b = (m_palram[offset] & 0x001e) >> 1;
-//  r = (m_palram[offset] & 0x03c0) >> 6;
-//  g = (m_palram[offset] & 0x7800) >> 11;
-
-	m_palette->set_pen_color(offset, r, g, b);
-}
-
+/*
+ * $106 Palette Specification Screen Control / パレット指定画面制御レジスタ
+ * $108 Direct Color Specification Screen Control / 直接色指定画面制御レジスタ
+ *
+ */
 void pc88va_state::video_pri_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_video_pri_reg[offset]);
 }
 
+/*
+ * $10a Picture Mask Mode / 画面マスクモードレジスタ
+ *
+ * --xx ---- GMP Mask Insertion Position
+ * --00 ---- Between Display Screen 0 and 1
+ * --01 ---- Between Display Screen 1 and 2
+ * --10 ---- Between Display Screen 2 and 3
+ * --11 ---- Between Display Screen 3 and 4
+ * ---- xx-- MKM1 Mask Mode (outer)
+ * ---- 00-- NOP
+ * ---- 01-- Make the immediately following low-priority screen transparent
+ * ---- 10-- Make all high-priority screens transparent
+ * ---- 11-- Make all low-priority screens transparent
+ * ---- --xx MKM0 Mask Mode (inner). bitwise same as above
+ *
+ */
+void pc88va_state::picture_mask_mode_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		m_picture_mask.gmp = (data >> 4) & 3;
+		m_picture_mask.mkm[1] = (data >> 2) & 3;
+		m_picture_mask.mkm[0] = (data >> 0) & 3;
+	}
+}
+
+/*
+ * $10e Backdrop color / バックドロップカラーレジスタ
+ *
+ * GGGG**RRRR*BBBB* format
+ * [*] "set to '0' when all the upper bits of a gun are 0 and '1' otherwise" (?)
+ */
+void pc88va_state::backdrop_color_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_backdrop_color);
+	const u8 g = (m_backdrop_color >> 12) & 0xf;
+	const u8 r = (m_backdrop_color >> 6) & 0xf;
+	const u8 b = (m_backdrop_color >> 1) & 0xf;
+	m_palette->set_pen_color(0x20, pal4bit(r), pal4bit(g), pal4bit(b));
+}
+
+/*
+ * $110 Plain Mask / プレーンマスクレジスタ
+ *
+ * x--- ---- G3MSK Multiplane 4bpp plane 3 switch
+ * -x-- ---- 88MD N88 Graphic Mode
+ * -0-- ---- V3
+ * -1-- ---- V1/V2
+ * ---- xxxx GnSW Multiplane 1bpp plane n switch
+ */
+void pc88va_state::plain_mask_w(offs_t offset, u8 data)
+{
+	m_g3msk = BIT(data, 7);
+	m_88md = BIT(data, 6);
+	m_gnsw = data & 0xf;
+	LOG("I/O $110 Plain Mask %02x (G3MSK %d 88MD %d GNSW %d)\n", data, m_g3msk, m_88md, m_gnsw);
+}
+
+/*
+ * $111 Color Code / カラーコード
+ *
+ * xxxx ---- TSCR text/sprite color separation
+ *           1    ~ value: Sprite
+ *           value+1 ~ 15: Text
+ * ---- xxxx GCF Singleplane Graphic Foreground color for 1bpp mode
+ *
+ * TSCR is used for mixing IDP output with the two graphic layers.
+ * cfr. テキスト画面とスプライト画面の分離
+ */
+void pc88va_state::color_code_w(offs_t offset, u8 data)
+{
+	m_tscr = data >> 4;
+	m_gcf = data & 0xf;
+	LOG("I/O $111 Color Code %02x (TSCR %d GCF %d)\n", data, m_tscr, m_gcf);
+}
+
+/*
+ * $124 Graphics screen 0 Transparency / グラフィックススクリーン０の透明色レジスタ
+ * $126 Graphics screen 1 Transparency / グラフィックスクリーン１透明色レジスタ
+ *
+ * x--- ---- ---- ---- GnTC15 pen 15 (1) transparent (0) opaque
+ * -x-- ---- ---- ---- GnTC14 pen 14 ^
+ * ...
+ * ---- ---- ---- ---x GnTC1  pen 0 ^
+ */
+void pc88va_state::gfx_transpen_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	// - micromus wants pen 0x10 to be opaque (white sheet), sets 0 here
+	COMBINE_DATA(&m_gntc[offset]);
+	// cache
+	for (int i = 0; i < 16; i++)
+		m_gfx_transmask[offset][i] = BIT(m_gntc[offset], i);
+}
+
+
+/*
+ * $12e Text & Sprite Transparent Color /　テキスト／スプライト透明色レジスタ
+ *
+ * x--- ---- ---- ---- TSTC15 pen 15 (1) transparent (0) opaque
+ * -x-- ---- ---- ---- TSTC14 pen 14 ^
+ * ...
+ * ---- ---- ---- --x- TSTC1  pen 1 ^
+ * ---- ---- ---- ---x always 1 (pen 0 always transparent)
+ */
 void pc88va_state::text_transpen_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	// TODO: understand what these are for, docs blabbers about text/sprite color separation?
-	//  cfr. rogueall, olteus on disk swap screen
-	// shanghai on winning animation (flips 0xf801 / 0x07c1, intentional?)
+	// - shanghai on winning animation (flips 0xf801 / 0x07c1 for flame drawing in mesh pattern)
+	// - famista team letters on turn change scorecard
 	COMBINE_DATA(&m_text_transpen);
-	if (m_text_transpen & 0xfff0)
-		popmessage("text transpen > 15 (%04x)", m_text_transpen);
+	// bit 0 always on
+	m_text_transpen |= 1;
+	// cache
+	for (int i = 0; i < 16; i++)
+		m_text_transmask[i] = BIT(m_text_transpen, i);
 }
 
 void pc88va_state::picture_mask_w(offs_t offset, u16 data, u16 mem_mask)
@@ -1675,8 +2001,6 @@ void pc88va_state::picture_mask_w(offs_t offset, u16 data, u16 mem_mask)
 		case 2: COMBINE_DATA(&m_picture_mask.top);    m_picture_mask.top    &= 0xff;  break;
 		case 3: COMBINE_DATA(&m_picture_mask.bottom); m_picture_mask.bottom &= 0xff;  break;
 	}
-
-//  popmessage("x0 %d y0 %d - x1 %d y1 %d", m_picture_mask.left, m_picture_mask.top, m_picture_mask.right, m_picture_mask.bottom);
 }
 
 /*
@@ -1718,6 +2042,7 @@ void pc88va_state::kanji_cg_address_w(offs_t offset, u8 data)
 
 /*
  * $148 Text Control 1
+ *
  * x--- ---- TD Text Disable (1)
  * -xxx ---- VALT2/VALT1/VALT0 TVRAM access restriction (?)
  * -000 ---- No limit
@@ -1733,6 +2058,28 @@ void pc88va_state::text_control_1_w(u8 data)
 
 	if ((data & 0x7d) != 1)
 		LOG("I/O $148 write %02x\n", data);
+}
+
+/*
+ * $3xx Palette RAM
+ *
+ */
+void pc88va_state::palette_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_palram[offset]);
+
+	const u16 color = m_palram[offset];
+	u8 b = pal5bit((color & 0x001f));
+	u8 r = pal5bit((color & 0x03e0) >> 5);
+	u8 g = pal6bit((color & 0xfc00) >> 10);
+
+	// TODO: docs suggests this arrangement but it's wrong
+	// may be just one bit always on?
+//  b = (m_palram[offset] & 0x001e) >> 1;
+//  r = (m_palram[offset] & 0x03c0) >> 6;
+//  g = (m_palram[offset] & 0x7800) >> 11;
+
+	m_palette->set_pen_color(offset, r, g, b);
 }
 
 

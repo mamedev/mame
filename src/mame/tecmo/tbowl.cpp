@@ -615,7 +615,7 @@ void tbowl_state::tbowl(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024*2).set_endianness(ENDIANNESS_BIG);
 	config.set_default_layout(layout_dualhsxs);
 
-	TECMO_SPRITE(config, m_sprgen, 0, m_palette, gfx_tbowl_spr);
+	TECMO_SPRITE(config, m_sprgen, m_palette, gfx_tbowl_spr);
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);

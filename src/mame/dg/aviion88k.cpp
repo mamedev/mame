@@ -129,8 +129,6 @@ private:
 
 void aviion88k_state::machine_start()
 {
-	m_leds.resolve();
-
 	for (emu_timer *&pit : m_pit)
 		pit = timer_alloc(FUNC(aviion88k_state::pit_timer), this);
 }
@@ -235,7 +233,7 @@ void aviion88k_state::aviion_4600(machine_config &config)
 	MK48T12(config, m_novram);
 
 	// uart - keyboard interface
-	SCN2661A(config, m_uart, 0);
+	SCN2661A(config, m_uart);
 
 	// keyboard connector
 	PC_KBDC(config, m_kbdc, pc_at_keyboards, nullptr);

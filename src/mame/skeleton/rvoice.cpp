@@ -104,7 +104,7 @@ void rvoice_state::rvoicepc(machine_config &config)
 	//playercpu.set_addrmap(AS_PROGRAM, &rvoice_state::hd63701_slave_io);
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	mos6551_device &acia(MOS6551(config, "acia65c51", 0));
+	mos6551_device &acia(MOS6551(config, "acia65c51"));
 	acia.set_xtal(1.8432_MHz_XTAL);
 	acia.irq_handler().set_inputline(m_maincpu, HD6301_IRQ1_LINE);
 	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));

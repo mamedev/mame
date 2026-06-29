@@ -52,7 +52,7 @@ class a1bus_device : public device_t
 {
 public:
 	// construction/destruction
-	a1bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a1bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// inline configuration
 	template <typename T> void set_space(T &&tag, int spacenum) { m_space.set_tag(std::forward<T>(tag), spacenum); }

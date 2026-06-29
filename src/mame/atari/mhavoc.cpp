@@ -401,8 +401,6 @@ void mhavoc_state::gamma_irq_ack_w(uint8_t data)
 
 void alphaone_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_alpha_irq_clock));
 	save_item(NAME(m_alpha_irq_clock_enable));
 }
@@ -1007,7 +1005,7 @@ void alphaone_state::alphaone(machine_config &config)
 	screen.set_visarea(0, 580, 0, 500);
 	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
-	avg_device &avg(AVG_MHAVOC(config, "avg", 0));
+	avg_device &avg(AVG_MHAVOC(config, "avg"));
 	avg.set_vector("vector");
 	avg.set_memory(m_alpha, AS_PROGRAM, 0x4000);
 

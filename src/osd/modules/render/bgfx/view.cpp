@@ -14,8 +14,8 @@
 
 void bgfx_view::update() {
 	const uint32_t window_index = m_renderer->window().index();
-	const uint32_t width = m_renderer->get_window_width(window_index);
-	const uint32_t height = m_renderer->get_window_height(window_index);
+	const uint32_t width = m_renderer->get_window_width();
+	const uint32_t height = m_renderer->get_window_height();
 
 	if (window_index != m_window_index)
 		m_window_index = window_index;

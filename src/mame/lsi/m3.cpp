@@ -587,7 +587,7 @@ void m3_state::m3(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &m3_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
 
-	Z80CTC(config, m_ctc, 0); // unknown clock
+	Z80CTC(config, m_ctc); // unknown clock
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ctc->set_clk<0>(4.9152_MHz_XTAL / 4);
 	m_ctc->zc_callback<0>().set("usart", FUNC(i8251_device::write_txc));
@@ -599,7 +599,7 @@ void m3_state::m3(machine_config &config)
 	m_ppi[1]->out_pa_callback().set(FUNC(m3_state::ppi2_pa_w));
 	m_ppi[1]->in_pb_callback().set(FUNC(m3_state::ppi2_pb_r));
 
-	i8251_device &usart(I8251(config, "usart", 0)); // unknown clock
+	i8251_device &usart(I8251(config, "usart")); // unknown clock
 	usart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	usart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	usart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));

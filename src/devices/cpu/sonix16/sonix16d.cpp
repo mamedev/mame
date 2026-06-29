@@ -141,6 +141,9 @@ std::string sonix16_disassembler::ioreg(u8 reg)
 	case 0x23:
 		return "intcr";
 
+	case 0x29:
+		return "wdt";
+
 	case 0x3a:
 		return "iosw";
 

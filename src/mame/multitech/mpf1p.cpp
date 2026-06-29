@@ -329,8 +329,6 @@ uint8_t mpf1p_state::step_r(offs_t offset)
 
 void mpf1p_state::machine_start()
 {
-	m_leds.resolve();
-
 	// register for state saving */
 	save_item(NAME(m_break));
 	save_item(NAME(m_m1));

@@ -14,6 +14,7 @@
 #include "video/resnet.h"
 
 #include <cmath>
+#include <numbers>
 
 
 /*************************************
@@ -52,13 +53,6 @@ void demndrgn_state::machine_start()
 	astrocde_state::machine_start();
 
 	save_item(NAME(m_trackball_last));
-}
-
-void tenpindx_state::machine_start()
-{
-	astrocde_state::machine_start();
-
-	m_lamps.resolve();
 }
 
 
@@ -112,7 +106,7 @@ void astrocde_state::astrocade_palette(palette_device &palette) const
 	for (int color = 0; color < 32; color++)
 	{
 		// color 0 maps to ry = by = 0
-		double const angle = (color / 32.0) * (2.0 * M_PI);
+		double const angle = (color / 32.0) * (2.0 * std::numbers::pi);
 		float const ry = color ? (0.75 * std::sin(angle)) : 0;
 		float const by = color ? (1.15 * std::cos(angle)) : 0;
 

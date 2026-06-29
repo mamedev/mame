@@ -115,7 +115,7 @@ void lee1220_state::lee1220(machine_config &config)
 
 	//WD1933(config, m_sdlc); // WDC WD1933PL-11
 
-	i8251_device &usart(I8251(config, "usart", 0)); // NEC D8251AC
+	i8251_device &usart(I8251(config, "usart")); // NEC D8251AC
 	usart.rxrdy_handler().set_inputline(m_maincpu, I8085_RST55_LINE);
 
 	PIT8253(config, "pit"); // Intel D8253-5

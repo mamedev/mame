@@ -16,6 +16,7 @@
 #include "tms34010.h"
 #include "34010dsm.h"
 
+#include "input.h" // for video debug keys
 #include "screen.h"
 
 #include <bit>

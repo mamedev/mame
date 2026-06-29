@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "voodoo.h"
 
+#include "endianness.h"
+
 #include <bit>
 
 

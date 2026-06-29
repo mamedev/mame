@@ -7,6 +7,8 @@
 #include "k057714.h"
 #include "screen.h"
 
+#include "endianness.h"
+
 
 #define DUMP_VRAM 0
 

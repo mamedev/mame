@@ -21,6 +21,7 @@ public:
 	auto io_414a_write_callback() { return m_io_414a_write_callback.bind(); }
 	auto io_414b_read_callback() { return m_io_414b_read_callback.bind(); }
 	auto io_414b_write_callback() { return m_io_414b_write_callback.bind(); }
+	void enable_36pcase_gpio() { m_36pcase_gpio_enabled = true; }
 
 protected:
 	vt3xx_soc_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -34,7 +35,20 @@ protected:
 	u8 vt369_41bx_r(offs_t offset);
 	void vt369_41bx_w(offs_t offset, u8 data);
 
-	u8 vt369_414f_r();
+	u8 vt3xx_4144_latch_r(offs_t offset);
+	void vt3xx_4144_latch_w(offs_t offset, u8 data);
+	u8 vt3xx_414c_latch_r(offs_t offset);
+	void vt3xx_414c_latch_w(offs_t offset, u8 data);
+	u8 vt3xx_4155_latch_r(offs_t offset);
+	void vt3xx_4155_latch_w(offs_t offset, u8 data);
+	u8 vt3xx_415a_latch_r(offs_t offset);
+	void vt3xx_415a_latch_w(offs_t offset, u8 data);
+	u8 vt3xx_41e4_latch_r(offs_t offset);
+	void vt3xx_41e4_latch_w(offs_t offset, u8 data);
+	u8 vt3xx_41e6_latch_r();
+	void vt3xx_41e6_latch_w(u8 data);
+	u8 vt3xx_41e7_latch_r(offs_t offset);
+	void vt3xx_41e7_latch_w(offs_t offset, u8 data);
 
 	u8 vt_415x_port_direction_r();
 	u8 vt_4152_port_in_r();
@@ -49,8 +63,6 @@ protected:
 	u8 vt_414b_port_in_r();
 	void vt_414a_port_out_w(u8 data);
 	u8 vt_414a_port_in_r();
-
-	void extra_io_41e6_w(u8 data);
 
 	u8 vt369_415c_r();
 
@@ -67,11 +79,25 @@ protected:
 	void highres_sprite_dma_w(u8 data);
 
 	void vt369_soundcpu_control_w(u8 data);
+	u8 vt369_soundram_r(offs_t offset);
+	void vt369_soundram_w(offs_t offset, u8 data);
+	u8 vt369_ppu_nt_direct_r(offs_t offset);
+	void vt369_ppu_nt_direct_w(offs_t offset, u8 data);
 	void vt369_4112_bank6000_select_w(u8 data);
 	void vt369_411c_bank6000_enable_w(u8 data);
 	void vt369_411d_w(u8 data);
 	void vt369_411e_w(u8 data);
+	u8 vt3xx_411f_status_r();
+	void vt3xx_411f_w(u8 data);
+	void vt3xx_412d_w(u8 data);
+	void vt3xx_4158_w(u8 data);
+	void vt3xx_4165_w(u8 data);
+	void vt3xx_2102_w(u8 data);
+	void vt3xx_2050_w(u8 data);
+	void vt3xx_4304_w(u8 data);
 	void vt369_relative_w(offs_t offset, u8 data);
+	void ppu_nmi(int state);
+	TIMER_CALLBACK_MEMBER(flush_36pcase_deferred_oam_dma);
 
 	u8 read_internal(offs_t offset);
 
@@ -106,6 +132,7 @@ private:
 	void do_sound_adpcm_decode();
 
 	TIMER_CALLBACK_MEMBER(sound_timer_expired);
+	TIMER_CALLBACK_MEMBER(assert_36pcase_lcdc_nmi);
 	void update_timer();
 
 	required_device<cpu_device> m_soundcpu;
@@ -113,6 +140,7 @@ private:
 
 	u8 m_bank6000;
 	u8 m_bank6000_enable;
+	u8 m_411f;
 
 	u8 m_415x_port_direction;
 	u8 m_4152_port_data;
@@ -121,12 +149,27 @@ private:
 	u8 m_414x_port_direction;
 	u8 m_414a_port_data;
 	u8 m_414b_port_data;
+	u8 m_414x_gpio[0x10]{};
+	u8 m_415x_gpio[0x10]{};
+	u8 m_41ex_gpio[0x10]{};
+	bool m_36pcase_gpio_enabled = false;
+	u8 m_36pcase_gpio_write_history[2]{};
+	u8 m_36pcase_gpio_response[2]{};
+	u8 m_36pcase_gpio_response_pos = 0;
+	u8 m_36pcase_gpio_response_len = 0;
+	u16 m_36pcase_deferred_oam_dma_src[4]{};
+	u16 m_36pcase_deferred_oam_dma_dst[4]{};
+	u8 m_36pcase_deferred_oam_dma_len[4]{};
+	u8 m_36pcase_deferred_oam_dma_count = 0;
+	u16 m_36pcase_deferred_oam_dma_next = 0;
 
 	u16 m_timerperiod;
 	u8 m_timercontrol;
 	u8 m_alu_params[8];
 
 	emu_timer *m_sound_timer;
+	emu_timer *m_36pcase_lcdc_nmi_timer;
+	emu_timer *m_36pcase_deferred_oam_dma_timer;
 	u8 m_sound_adder_addr[2];
 	u8 m_sound_adpcm_addr[2];
 	u8 m_sound_adder_result[2];
@@ -146,6 +189,11 @@ private:
 	devcb_write8 m_io_414a_write_callback;
 	devcb_read8 m_io_414b_read_callback;
 	devcb_write8 m_io_414b_write_callback;
+
+	u8 vt3xx_36pcase_gpio_bus_r();
+	u8 vt3xx_36pcase_gpio_bus_latch() const;
+	void vt3xx_36pcase_gpio_bus_w();
+	void vt3xx_36pcase_gpio_advance_response();
 };
 
 class vt369_soc_introm_noswap_device : public vt3xx_soc_base_device

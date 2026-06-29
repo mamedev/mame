@@ -34,7 +34,7 @@ public:
 	typedef device_delegate<void (device_image_interface &)> unload_delegate;
 
 	// construction/destruction
-	diablo_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	diablo_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~diablo_image_device();
 
 	template <typename Object> void set_device_load(Object &&cb) { m_device_image_load = std::forward<Object>(cb); }

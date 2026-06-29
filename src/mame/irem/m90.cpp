@@ -741,16 +741,26 @@ INTERRUPT_GEN_MEMBER(m90_state::bomblord_fake_nmi)
 		m_audio->sample_w(sample);
 }
 
+IRQ_CALLBACK_MEMBER(m90_state::dynablsb_vector_r)
+{
+	return 0x60 / 4;
+}
+
 void m90_state::dynablsb_vblank_int_w(int state)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x60/4); // V30
+		m_maincpu->set_input_line(0, HOLD_LINE); // V30
+}
+
+IRQ_CALLBACK_MEMBER(m90_state::bomblord_vector_r)
+{
+	return 0x50 / 4;
 }
 
 void m90_state::bomblord_vblank_int_w(int state)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x50/4); // V30
+		m_maincpu->set_input_line(0, HOLD_LINE); // V30
 }
 
 
@@ -789,7 +799,7 @@ void m90_state::m90(machine_config &config)
 	soundlatch.data_pending_callback().set("soundirq", FUNC(rst_neg_buffer_device::rst18_w));
 	soundlatch.set_separate_acknowledge(true);
 
-	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline(m_soundcpu, 0);
+	RST_NEG_BUFFER(config, "soundirq").int_callback().set_inputline(m_soundcpu, 0);
 
 	IREM_M72_AUDIO(config, m_audio);
 	m_audio->set_dac_tag("dac");
@@ -853,22 +863,15 @@ void m90_state::bbmanw(machine_config &config)
 	m_soundcpu->set_periodic_int(FUNC(m90_state::fake_nmi), attotime::from_hz(128*60));
 }
 
-void m90_state::bomblord(machine_config &config)
+void m90_state::dicegame(machine_config &config)
 {
 	m90(config);
-	V30(config.replace(), m_maincpu, 32000000/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &m90_state::bomblord_main_cpu_map);
-	m_maincpu->set_addrmap(AS_IO, &m90_state::m90_main_cpu_io_map);
-
-	m_soundcpu->set_addrmap(AS_IO, &m90_state::m99_sound_cpu_io_map);
-	m_soundcpu->set_periodic_int(FUNC(m90_state::bomblord_fake_nmi), attotime::from_hz(128*60));
-
 	m_screen->set_visarea(10*8, 50*8-1, 17*8, 47*8-1);
-	m_screen->set_screen_update(FUNC(m90_state::screen_update_bomblord));
-	m_screen->screen_vblank().set(FUNC(m90_state::bomblord_vblank_int_w));
-
-	MCFG_VIDEO_START_OVERRIDE(m90_state,bomblord)
 }
+
+/*
+ * bootlegs
+ */
 
 void m90_state::dynablsb(machine_config &config)
 {
@@ -876,6 +879,7 @@ void m90_state::dynablsb(machine_config &config)
 	V30(config.replace(), m_maincpu, 32000000/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m90_state::dynablsb_main_cpu_map);
 	m_maincpu->set_addrmap(AS_IO, &m90_state::dynablsb_main_cpu_io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(m90_state::dynablsb_vector_r));
 
 	m_soundcpu->set_addrmap(AS_IO, &m90_state::dynablsb_sound_cpu_io_map);
 	m_soundcpu->set_periodic_int(FUNC(m90_state::irq0_line_hold), attotime::from_hz(64*60)); /* half the sample rate of the original */
@@ -898,12 +902,23 @@ void m90_state::dynablsb(machine_config &config)
 	subdevice<ym2151_device>("ymsnd")->irq_handler().set_nop(); /* this bootleg polls the YM2151 instead of taking interrupts from it */
 }
 
-void m90_state::dicegame(machine_config &config)
+void m90_state::bomblord(machine_config &config)
 {
 	m90(config);
-	m_screen->set_visarea(10*8, 50*8-1, 17*8, 47*8-1);
-}
+	V30(config.replace(), m_maincpu, 32000000/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m90_state::bomblord_main_cpu_map);
+	m_maincpu->set_addrmap(AS_IO, &m90_state::m90_main_cpu_io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(m90_state::bomblord_vector_r));
 
+	m_soundcpu->set_addrmap(AS_IO, &m90_state::m99_sound_cpu_io_map);
+	m_soundcpu->set_periodic_int(FUNC(m90_state::bomblord_fake_nmi), attotime::from_hz(128*60));
+
+	m_screen->set_visarea(10*8, 50*8-1, 17*8, 47*8-1);
+	m_screen->set_screen_update(FUNC(m90_state::screen_update_bomblord));
+	m_screen->screen_vblank().set(FUNC(m90_state::bomblord_vblank_int_w));
+
+	MCFG_VIDEO_START_OVERRIDE(m90_state,bomblord)
+}
 
 /***************************************************************************/
 

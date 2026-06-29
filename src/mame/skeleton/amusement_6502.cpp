@@ -109,7 +109,7 @@ void amusement_6502_state::amusement(machine_config &config)
 	ay.port_b_write_callback().set([this] (uint8_t data) { logerror("%s AY port B write: %02x\n", machine().describe_context(), data); });
 	ay.add_route(ALL_OUTPUTS, "mono", 0.60);
 
-	HC55516(config, "cvsd", 0).add_route(ALL_OUTPUTS, "mono", 0.60); // TODO: actually VP1000
+	HC55516(config, "cvsd").add_route(ALL_OUTPUTS, "mono", 0.60); // TODO: actually VP1000
 
 	TMS5220C(config, "tms", 640'000).add_route(ALL_OUTPUTS, "mono", 0.60); // TODO: verify clock
 }

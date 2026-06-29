@@ -83,7 +83,7 @@ public:
 		, m_led17(*this, "led17")
 	{ }
 
-	void ms0515(machine_config &config);
+	void ms0515(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -364,9 +364,7 @@ void ms0515_state::pit8253_out2_changed(int state)
 
 void ms0515_state::machine_start()
 {
-	m_led9.resolve();
-	m_led16.resolve();
-	m_led17.resolve();
+	// TODO: savestates
 }
 
 void ms0515_state::machine_reset()
@@ -567,7 +565,7 @@ void ms0515_state::ms0515(machine_config &config)
 	ppi.out_pc_callback().set(FUNC(ms0515_state::ms0515_portc_w));
 
 	// serial connection to printer
-	I8251(config, m_i8251line, 0);
+	I8251(config, m_i8251line);
 	m_i8251line->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
 	m_i8251line->rxrdy_handler().set(FUNC(ms0515_state::irq9_w));
 	m_i8251line->txrdy_handler().set(FUNC(ms0515_state::irq8_w));
@@ -578,18 +576,18 @@ void ms0515_state::ms0515(machine_config &config)
 	m_rs232->dsr_handler().set(m_i8251line, FUNC(i8251_device::write_dsr));
 
 	// serial connection to MS7004 keyboard
-	I8251(config, m_i8251kbd, 0);
+	I8251(config, m_i8251kbd);
 	m_i8251kbd->rxrdy_handler().set(FUNC(ms0515_state::irq5_w));
 	m_i8251kbd->txd_handler().set("ms7004", FUNC(ms7004_device::write_rxd));
 
-	MS7004(config, m_ms7004, 0);
+	MS7004(config, m_ms7004);
 	m_ms7004->tx_handler().set(m_i8251kbd, FUNC(i8251_device::write_rxd));
 	m_ms7004->rts_handler().set(m_i8251kbd, FUNC(i8251_device::write_cts));
 
 	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", 4800 * 16));
 	keyboard_clock.signal_handler().set(FUNC(ms0515_state::write_keyboard_clock));
 
-	PIT8253(config, m_pit8253, 0);
+	PIT8253(config, m_pit8253);
 	m_pit8253->set_clk<0>(XTAL(2'000'000));
 //  m_pit8253->out_handler<0>().set(FUNC(ms0515_state::write_keyboard_clock));
 	m_pit8253->set_clk<1>(XTAL(2'000'000));

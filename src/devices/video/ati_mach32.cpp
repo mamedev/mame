@@ -57,7 +57,7 @@ mach32_device::mach32_device(const machine_config &mconfig, device_type type, co
 
 void mach32_device::device_add_mconfig(machine_config &config)
 {
-	ATIMACH32_8514A(config, "8514a", 0).set_vga(DEVICE_SELF);
+	ATIMACH32_8514A(config, "8514a").set_vga(DEVICE_SELF);
 }
 
 void mach32_8514a_device::device_start()
@@ -390,7 +390,7 @@ mach64_device::mach64_device(const machine_config &mconfig, device_type type, co
 
 void mach64_device::device_add_mconfig(machine_config &config)
 {
-	ATIMACH64_8514A(config, "8514a", 0).set_vga(DEVICE_SELF);
+	ATIMACH64_8514A(config, "8514a").set_vga(DEVICE_SELF);
 }
 
 void mach64_8514a_device::device_start()

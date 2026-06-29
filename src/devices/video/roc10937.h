@@ -16,7 +16,7 @@ class rocvfd_device : public device_t
 {
 public:
 	// inline configuration helpers
-	void set_port_value(uint8_t val) { m_port_val = val; }
+	void set_port_value(uint8_t val) { m_outputs.set_names("vfd%u", unsigned(val * 16)); m_brightness.set_names("vfdduty%u", unsigned(val)); }
 
 	virtual void update_display();
 	void shift_clock(int data);
@@ -28,8 +28,8 @@ public:
 protected:
 	rocvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	std::unique_ptr<output_finder<16> > m_outputs;
-	std::unique_ptr<output_finder<1> > m_brightness;
+	output_finder<16> m_outputs;
+	output_finder<1> m_brightness;
 
 	int m_cursor_pos;
 	int m_window_size;
@@ -50,8 +50,6 @@ protected:
 
 private:
 	static uint32_t set_display(uint32_t segin);
-
-	uint8_t m_port_val;
 };
 
 

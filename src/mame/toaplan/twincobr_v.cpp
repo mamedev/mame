@@ -324,8 +324,7 @@ void twincobr_state::wardner_sprite_w(offs_t offset, u8 data)
 
 void twincobr_state::log_vram()
 {
-#ifdef MAME_DEBUG
-
+#if 0
 	if (machine().input().code_pressed(KEYCODE_M))
 	{
 		int tcode[4]{};

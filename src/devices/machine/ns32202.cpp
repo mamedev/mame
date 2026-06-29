@@ -326,12 +326,24 @@ u8 ns32202_device::interrupt_acknowledge(bool side_effects)
 	side_effects &= !machine().side_effects_disabled();
 	u8 vector = m_hvct | 0x0f;
 
+	// in fixed priority mode, an in-service interrupt blocks itself and
+	// all lower priorities (except an equal-priority cascade): such a
+	// pending interrupt must not be acknowledged
+	bool blocked = false;
+
 	if ((m_ipnd & ~m_imsk) && m_fprt)
 	{
 		// find highest priority unmasked pending interrupt
 		u16 mask = m_fprt;
 		for (unsigned i = 0; i < 16; i++)
 		{
+			if ((m_mctl & MCTL_NTAR) && (m_isrv & mask))
+			{
+				if (!((m_csrc & mask) && (m_ipnd & mask) && !(m_imsk & mask)))
+					blocked = true;
+				break;
+			}
+
 			if ((m_ipnd & mask) && !(m_imsk & mask))
 				break;
 
@@ -340,7 +352,7 @@ u8 ns32202_device::interrupt_acknowledge(bool side_effects)
 		}
 
 		unsigned const number = std::bit_width(mask) - 1;
-		if (side_effects)
+		if (side_effects && !blocked)
 		{
 			LOGMASKED(LOG_STATE, "acknowledge highest priority unmasked interrupt %d\n", number);
 
@@ -369,10 +381,13 @@ u8 ns32202_device::interrupt_acknowledge(bool side_effects)
 		}
 
 		// compute acknowledge vector
-		if (m_csrc & mask)
-			vector = 0xf0 | number;
-		else
-			vector = m_hvct | number;
+		if (!blocked)
+		{
+			if (m_csrc & mask)
+				vector = 0xf0 | number;
+			else
+				vector = m_hvct | number;
+		}
 	}
 	else if (side_effects)
 	{
@@ -392,9 +407,9 @@ u8 ns32202_device::interrupt_acknowledge(bool side_effects)
 
 	if (side_effects)
 	{
-		// clear interrupt output
-		if (!(m_ipnd & ~m_imsk & ~m_isrv) || !m_fprt)
-			set_int(false);
+		// re-evaluate the interrupt output: pending interrupts at or
+		// below an in-service priority no longer assert it
+		interrupt(0);
 	}
 
 	return vector;
@@ -476,8 +491,11 @@ void ns32202_device::interrupt_update()
 	if (m_mctl & MCTL_FRZ)
 		return;
 
-	// compute new pending state
-	u16 const ipnd = m_ipnd | (m_eltg & ~(m_line_state ^ m_tpl));
+	// level-triggered pending state continuously reflects the input
+	// lines: bits become pending when their line is active, and clear
+	// when it is not (edge-triggered bits latch until acknowledged)
+	u16 const active = ~(m_line_state ^ m_tpl);
+	u16 const ipnd = (m_ipnd & ~(m_eltg & ~active)) | (m_eltg & active);
 
 	// update and assert if state changed
 	if (ipnd ^ m_ipnd)

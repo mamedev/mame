@@ -121,7 +121,6 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	void irq_handler(int state);
 	void irq6_ack_w(uint16_t data);
 	void irq5_ack_w(uint16_t data);
 	void frontcolor_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -395,19 +394,6 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  Sound interface
- *
- *************************************/
-
-// handler called by the 2151 emulator when the internal timers cause an IRQ
-void blockout_state::irq_handler(int state)
-{
-	m_audiocpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff); // Z80
-}
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
@@ -462,7 +448,7 @@ void blockout_state::blockout(machine_config &config)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", AUDIO_CLOCK));
-	ymsnd.irq_handler().set(FUNC(blockout_state::irq_handler));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0); // IM 1
 	ymsnd.add_route(0, "speaker", 0.60, 0);
 	ymsnd.add_route(1, "speaker", 0.60, 1);
 

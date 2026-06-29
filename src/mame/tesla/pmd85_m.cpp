@@ -778,7 +778,6 @@ void pmd85_state::machine_reset()
 
 void pmd85_state::machine_start()
 {
-	m_leds.resolve();
 	save_item(NAME(m_txd));
 	save_item(NAME(m_rts));
 	save_item(NAME(m_rom_module_present));

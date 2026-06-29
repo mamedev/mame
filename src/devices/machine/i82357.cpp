@@ -41,7 +41,7 @@ i82357_device::i82357_device(const machine_config &mconfig, const char *tag, dev
 
 void i82357_device::device_add_mconfig(machine_config &config)
 {
-	PIC8259(config, m_pic[0], 0);
+	PIC8259(config, m_pic[0]);
 	m_pic[0]->in_sp_callback().set_constant(1);
 	m_pic[0]->read_slave_ack_callback().set(
 		[this](offs_t offset) -> u8
@@ -52,12 +52,12 @@ void i82357_device::device_add_mconfig(machine_config &config)
 			return 0;
 		});
 
-	PIC8259(config, m_pic[1], 0);
+	PIC8259(config, m_pic[1]);
 	m_pic[1]->out_int_callback().set(m_pic[0], FUNC(pic8259_device::ir2_w));
 	m_pic[1]->in_sp_callback().set_constant(0);
 
-	PIT8254(config, m_pit[0], 0);
-	PIT8254(config, m_pit[1], 0);
+	PIT8254(config, m_pit[0]);
+	PIT8254(config, m_pit[1]);
 
 	// timer 1 counter 0: system timer
 	m_pit[0]->set_clk<0>(clock() / 12);

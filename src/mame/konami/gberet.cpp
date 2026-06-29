@@ -738,7 +738,7 @@ void gberet_state::gberet(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	K005849(config, m_k005849, 0);
+	K005849(config, m_k005849);
 	m_k005849->set_irq_cb().set("mainirq", FUNC(input_merger_any_high_device::in_w<0>));
 	m_k005849->set_firq_cb().set("mainirq", FUNC(input_merger_any_high_device::in_w<1>));
 	m_k005849->set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);

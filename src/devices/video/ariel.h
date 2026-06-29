@@ -11,7 +11,7 @@ class ariel_device
 	, public device_palette_interface
 {
 public:
-	ariel_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	ariel_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);

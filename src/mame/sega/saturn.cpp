@@ -872,7 +872,7 @@ void sat_console_state::saturn(machine_config &config)
 	m_scsp->add_route(0, "speaker", 1.0, 0);
 	m_scsp->add_route(1, "speaker", 1.0, 1);
 
-	SATURN_CD_HLE(config, m_saturn_cd_hle, 0);
+	SATURN_CD_HLE(config, m_saturn_cd_hle);
 	m_saturn_cd_hle->add_route(0, "scsp", 1.0, 0);
 	m_saturn_cd_hle->add_route(1, "scsp", 1.0, 1);
 

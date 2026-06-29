@@ -1067,7 +1067,7 @@ inline a64::Mem drcbe_arm64::emit_loadstore_address_setup(a64::Assembler &a, con
 		const a64::Gp indreg = TEMP_REG3.x();
 		if (indp.is_int_register())
 			a.sxtw(indreg, indp.get_register_int(4));
-		else if ((util::endianness::native == util::endianness::big) && indp.is_cold_register())
+		else if ((std::endian::native == std::endian::big) && indp.is_cold_register())
 			emit_ldrsw_mem(a, indreg, reinterpret_cast<uint8_t *>(indp.memory()) + 4);
 		else
 			emit_ldrsw_mem(a, indreg, indp.memory());
@@ -1272,7 +1272,7 @@ void drcbe_arm64::mov_reg_param(a64::Assembler &a, uint32_t regsize, const a64::
 	}
 	else if (src.is_memory())
 	{
-		if ((util::endianness::native == util::endianness::big) && (regsize == 4) && src.is_cold_register())
+		if ((std::endian::native == std::endian::big) && (regsize == 4) && src.is_cold_register())
 			emit_ldr_mem(a, dstreg, reinterpret_cast<uint8_t *>(src.memory()) + 4);
 		else
 			emit_ldr_mem(a, dstreg, src.memory());
@@ -1371,7 +1371,7 @@ void drcbe_arm64::mov_mem_param(a64::Assembler &a, uint32_t regsize, void *dst, 
 	}
 	else if (src.is_memory())
 	{
-		if ((util::endianness::native == util::endianness::big) && (regsize == 4) && src.is_cold_register())
+		if ((std::endian::native == std::endian::big) && (regsize == 4) && src.is_cold_register())
 			emit_ldr_mem(a, scratch, reinterpret_cast<uint8_t *>(src.memory()) + 4);
 		else
 			emit_ldr_mem(a, scratch, src.memory());
@@ -3349,7 +3349,7 @@ void drcbe_arm64::op_sext(a64::Assembler &a, const uml::instruction &inst)
 		if (srcp.is_memory())
 		{
 			uintptr_t mem = uintptr_t(srcp.memory());
-			if (util::endianness::native == util::endianness::big)
+			if (std::endian::native == std::endian::big)
 				mem ^= (inst.size() - 1) & ~((1 << size) - 1);
 
 			if (size == SIZE_BYTE)
@@ -5253,7 +5253,7 @@ void drcbe_arm64::op_fload(a64::Assembler &a, const uml::instruction &inst)
 		const a64::Gp indreg = TEMP_REG1.x();
 		if (indp.is_int_register())
 			a.sxtw(indreg, indp.get_register_int(4));
-		else if ((util::endianness::native == util::endianness::big) && indp.is_cold_register())
+		else if ((std::endian::native == std::endian::big) && indp.is_cold_register())
 			emit_ldrsw_mem(a, indreg, reinterpret_cast<uint8_t *>(indp.memory()) + 4);
 		else
 			emit_ldrsw_mem(a, indreg, indp.memory());
@@ -5290,7 +5290,7 @@ void drcbe_arm64::op_fstore(a64::Assembler &a, const uml::instruction &inst)
 		const a64::Gp indreg = TEMP_REG1.x();
 		if (indp.is_int_register())
 			a.sxtw(indreg, indp.get_register_int(4));
-		else if ((util::endianness::native == util::endianness::big) && indp.is_cold_register())
+		else if ((std::endian::native == std::endian::big) && indp.is_cold_register())
 			emit_ldrsw_mem(a, indreg, reinterpret_cast<uint8_t *>(indp.memory()) + 4);
 		else
 			emit_ldrsw_mem(a, indreg, indp.memory());

@@ -61,9 +61,9 @@ public:
 	{ }
 
 	// machine configs
-	void smondial2(machine_config &config);
-	void mega4(machine_config &config);
-	void smondialb(machine_config &config);
+	void smondial2(machine_config &config) ATTR_COLD;
+	void mega4(machine_config &config) ATTR_COLD;
+	void smondialb(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -96,8 +96,6 @@ protected:
 
 void smondialb_state::machine_start()
 {
-	m_digits.resolve();
-
 	save_item(NAME(m_led_data));
 	save_item(NAME(m_board_mux));
 }

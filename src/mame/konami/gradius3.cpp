@@ -301,7 +301,7 @@ void gradius3_state::cpuB_irqtrigger_w(uint16_t data)
 
 void gradius3_state::sound_irq_w(uint16_t data)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 }
 
 void gradius3_state::sound_bank_w(uint8_t data)

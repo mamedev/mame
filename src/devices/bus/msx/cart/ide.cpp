@@ -106,8 +106,6 @@ const tiny_rom_entry *msx_cart_sunrise_ataide_device::device_rom_region() const
 
 void msx_cart_sunrise_ataide_device::device_start()
 {
-	m_activity_led.resolve();
-
 	save_item(NAME(m_control));
 	save_item(NAME(m_bank_base));
 	save_item(NAME(m_data));

@@ -140,7 +140,7 @@ void bk_state::bk0010(machine_config &config)
 
 	K1801VM1_TIMER(config, m_timer, 3000000);
 
-	K1801VP014(config, m_kbd, 0);
+	K1801VP014(config, m_kbd);
 	m_kbd->virq_wr_callback().set_inputline(m_maincpu, t11_device::VEC_LINE);
 	m_kbd->keydown_wr_callback().set(
 			[this] (int state)
@@ -158,7 +158,7 @@ void bk_state::bk0010(machine_config &config)
 	QBUS_SLOT(config, "qbus" ":1", qbus_cards, nullptr);
 	QBUS_SLOT(config, "qbus" ":2", qbus_cards, nullptr); // some cards have passthrough
 
-	BK_PARALLEL_SLOT(config, m_up, 0, bk_parallel_devices, nullptr);
+	BK_PARALLEL_SLOT(config, m_up, bk_parallel_devices, nullptr);
 	m_up->irq2_handler().set_inputline(m_maincpu, t11_device::CP2_LINE);
 	m_up->irq3_handler().set_inputline(m_maincpu, t11_device::CP3_LINE);
 

@@ -77,8 +77,6 @@ private:
 
 void mchess_state::machine_start()
 {
-	m_out_x.resolve();
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_lcd_control));

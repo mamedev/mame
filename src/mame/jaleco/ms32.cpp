@@ -1562,7 +1562,7 @@ GFXDECODE_END
 */
 
 
-IRQ_CALLBACK_MEMBER(ms32_base_state::irq_callback)
+u8 ms32_base_state::irq_callback()
 {
 	int i;
 	// TODO: confirm irq priority
@@ -1704,7 +1704,7 @@ void ms32_state::ms32(machine_config &config)
 	/* basic machine hardware */
 	V70(config, m_maincpu, XTAL(40'000'000) / 2); // D70632GD-20 20MHz (40MHz / 2)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ms32_state::ms32_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(ms32_state::irq_callback));
+	m_maincpu->irq_cycle_callback().set(FUNC(ms32_state::irq_callback));
 
 	Z80(config, m_audiocpu, 8000000); // Z0840008PSC, Clock from notes (40MHz / 5 or 48MHz / 6?)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ms32_state::ms32_sound_map);

@@ -174,9 +174,6 @@ public:
 
 	void mcr_90009_dp(machine_config &config);
 
-protected:
-	virtual void machine_start() override { mcr_state::machine_start(); m_lamps.resolve(); }
-
 private:
 	uint8_t m_coin_status;
 	uint8_t m_output;

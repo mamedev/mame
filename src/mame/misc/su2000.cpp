@@ -171,7 +171,7 @@ void su2000_state::su2000(machine_config &config)
 	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(vga_device::screen_update));
 
-	vga_device &vga(VGA(config, "vga", 0));
+	vga_device &vga(VGA(config, "vga"));
 	vga.set_screen("screen");
 	vga.set_vram_size(0x100000);
 

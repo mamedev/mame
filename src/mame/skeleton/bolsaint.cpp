@@ -95,7 +95,7 @@ void bolsaint_state::bolsaint(machine_config &config)
 	I8255A(config, m_ppi[1]); // OKI M82C55A-2, on CPU PCB
 
 	// TODO: route RSCLK
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 	m_uart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_uart->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	m_uart->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));

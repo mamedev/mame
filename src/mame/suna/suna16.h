@@ -25,12 +25,12 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
-	void uballoon(machine_config &config);
-	void sunaq(machine_config &config);
-	void bssoccer(machine_config &config);
-	void bestbest(machine_config &config);
+	void uballoon(machine_config &config) ATTR_COLD;
+	void sunaq(machine_config &config) ATTR_COLD;
+	void bssoccer(machine_config &config) ATTR_COLD;
+	void bestbest(machine_config &config) ATTR_COLD;
 
-	void init_uballoon();
+	void init_uballoon() ATTR_COLD;
 
 private:
 	// common

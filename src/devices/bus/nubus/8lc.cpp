@@ -41,6 +41,8 @@
 #include "emupal.h"
 #include "screen.h"
 
+#include "endianness.h"
+
 #define LOG_REGISTERS (1U << 1)
 #define LOG_RAMDAC (1U << 2)
 
@@ -112,7 +114,7 @@ void lcpds_cv8lc_device::device_add_mconfig(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(256);
 
-	TMS34061(config, m_tms34061, 0);
+	TMS34061(config, m_tms34061);
 	m_tms34061->set_rowshift(10); // VRAM address is (row << rowshift) | col
 	m_tms34061->set_vram_size(0xc0000);
 	m_tms34061->set_screen(m_screen);

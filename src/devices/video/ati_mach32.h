@@ -21,7 +21,7 @@ class mach32_8514a_device : public mach8_device
 {
 public:
 	// construction/destruction
-	mach32_8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mach32_8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint16_t mach32_chipid_r() { return m_chip_ID; }
 	uint16_t mach32_mem_boundary_r() { return m_membounds; }
@@ -53,7 +53,7 @@ public:
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
 	// construction/destruction
-	mach32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mach32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 	uint32_t draw_hw_cursor(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -198,7 +198,7 @@ class mach64_8514a_device : public mach32_8514a_device
 {
 public:
 	// construction/destruction
-	mach64_8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mach64_8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	mach64_8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -212,7 +212,7 @@ class mach64_device : public mach32_device
 {
 public:
 	// construction/destruction
-	mach64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mach64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void mach64_config1_w(uint16_t data) { }  // why does the mach64 BIOS write to these, they are read only on the mach32 and earlier
 	void mach64_config2_w(uint16_t data) { }

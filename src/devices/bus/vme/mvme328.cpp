@@ -133,9 +133,6 @@ ioport_constructor vme_mvme328_device::device_input_ports() const
 
 void vme_mvme328_device::device_start()
 {
-	m_led1.resolve();
-	m_led2.resolve();
-
 	m_timer = timer_alloc(FUNC(vme_mvme328_device::timer), this);
 
 	save_item(NAME(m_ctl));

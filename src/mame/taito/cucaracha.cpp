@@ -51,7 +51,7 @@ public:
 		, m_led_matrix(*this, "ledmatrix%u", 0U)
 	{ }
 
-	void cucaracha(machine_config &config);
+	void cucaracha(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -113,8 +113,6 @@ void cucaracha_state::led_transfer_w(offs_t offset, u8 data)
 
 void cucaracha_state::machine_start()
 {
-	m_led_matrix.resolve();
-
 	m_program_bank->configure_entries(0, 8, memregion("program_rom")->base(), 0x2000);
 
 	save_item(NAME(m_scrollx));
@@ -391,7 +389,7 @@ void cucaracha_state::cucaracha(machine_config &config)
 	z80_device &soundcpu(Z80(config, "soundcpu", 4000000));
 	soundcpu.set_addrmap(AS_PROGRAM, &cucaracha_state::sound_map);
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.nmi_callback().set_inputline("soundcpu", INPUT_LINE_NMI);
 	ciu.reset_callback().set_inputline("soundcpu", INPUT_LINE_RESET);
 

@@ -54,7 +54,7 @@ int get_number(const char *prompt)
 
 /* loopback test -- send/rcv from 2 to 1000 bytes of random midi data */
 /**/
-void loopback_test()
+void loopback_test(void)
 {
     int outp;
     int inp;
@@ -210,7 +210,7 @@ cleanup:
 
 /* send_multiple test -- send many sysex messages */
 /**/
-void send_multiple_test()
+void send_multiple_test(void)
 {
     int outp;
     int length;
@@ -341,7 +341,7 @@ void receive_poll(PtTimestamp timestamp, void *userData)
 
 /* receive_multiple_test -- send/rcv from 2 to 1000 bytes of random midi data */
 /**/
-void receive_multiple_test()
+void receive_multiple_test(void)
 {
     PmError err;
     int inp;
@@ -387,7 +387,7 @@ cleanup:
 #define is_real_time_msg(msg) ((0xF0 & Pm_MessageStatus(msg)) == 0xF8)
 
 
-void receive_sysex()
+void receive_sysex(void)
 {
     char line[80];
     FILE *f;
@@ -448,7 +448,7 @@ void receive_sysex()
 }
 
 
-void send_sysex()
+void send_sysex(void)
 {
     char line[80];
     FILE *f;
@@ -511,7 +511,7 @@ void send_sysex()
 }
 
 
-int main()
+int main(int argc, char *argv[])
 {
     int i;
     

@@ -315,7 +315,7 @@ void poly_state::poly(machine_config &config)
 	//m_kr2376->strobe().set("pia1", FUNC(pia6821_device::cb1_w));
 
 	/* generic keyboard until ROM in KR2376-12 is known */
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(poly_state::kbd_put));
 
 	/* video control */
@@ -332,7 +332,7 @@ void poly_state::poly(machine_config &config)
 	m_pia[1]->irqb_handler().set("irqs", FUNC(input_merger_device::in_w<5>));
 
 	/* optional rs232 interface */
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	//m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	//m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_acia->irq_handler().set("irqs", FUNC(input_merger_device::in_w<6>));

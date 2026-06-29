@@ -10,6 +10,8 @@
 #include "msm665xx.h"
 #include "nx8dasm.h"
 
+#include "endianness.h"
+
 // device type definition
 DEFINE_DEVICE_TYPE(MSM66573, msm66573_device, "msm66573", "Oki MSM66573")
 

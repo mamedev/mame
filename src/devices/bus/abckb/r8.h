@@ -23,7 +23,7 @@ class luxor_r8_device :  public device_t
 {
 public:
 	// construction/destruction
-	luxor_r8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	luxor_r8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	u8 read();
 

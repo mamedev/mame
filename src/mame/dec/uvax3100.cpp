@@ -151,7 +151,7 @@ void uvax3100_state::uvax3100(machine_config &config)
 	// MC146818(config, "rtc", ...)
 
 	// Video hardware
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 }
 
 ROM_START( mv3100m10 )

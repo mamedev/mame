@@ -101,12 +101,14 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 
-	void by133(machine_config &config);
-	void granny(machine_config &config);
+	void by133(machine_config &config) ATTR_COLD;
+	void granny(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+private:
 	u8 m_mpu_to_vid = 0U;
 	u8 m_vid_to_mpu = 0U;
 	u8 m_u7a = 0U;
@@ -738,7 +740,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( by133_state::u11_timer )
 void by133_state::machine_start()
 {
 	genpin_class::machine_start();
-	m_io_outputs.resolve();
 
 	save_item(NAME(m_mpu_to_vid));
 	save_item(NAME(m_vid_to_mpu));

@@ -183,21 +183,18 @@ TODO:
 - rallyx: Three things in the schematics that I haven't been able to trace:
   WR2, WR3 and RDSTB. Only WR3 is actually used by the game.
 
-- rallyx: emulate the explosion with discrete sound components. The schematics
-  are available so it should be possible eventually.
-
 - tactician: the bouncing bomb seems to show incorrect graphics when it's hit.
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "rallyx.h"
+#include "nl_rallyx.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "sound/samples.h"
 #include "speaker.h"
 
 static constexpr XTAL MASTER_CLOCK = 18.432_MHz_XTAL;
@@ -223,10 +220,7 @@ IRQ_CALLBACK_MEMBER(rallyx_state::interrupt_vector_r)
 
 void rallyx_state::bang_w(int state)
 {
-	if (state == 0 && m_last_bang != 0)
-		m_samples->start(0, 0);
-
-	m_last_bang = state;
+	m_bang->write_line(state);
 }
 
 
@@ -796,13 +790,6 @@ GFXDECODE_END
  *
  *************************************/
 
-static const char *const rallyx_sample_names[] =
-{
-	"*rallyx",
-	"bang",
-	nullptr   // end of array
-};
-
 /*************************************
  *
  *  Machine driver
@@ -813,7 +800,6 @@ void rallyx_state::machine_start()
 {
 	m_interrupt_vector = 0;
 
-	save_item(NAME(m_last_bang));
 	save_item(NAME(m_stars_enable));
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_interrupt_vector));
@@ -869,12 +855,24 @@ void rallyx_state::rallyx(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	NAMCO_WSG(config, m_namco_sound, MASTER_CLOCK/6/32); // 96 KHz
-	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
+	// The WSG ("software" music/effects) is not wired straight to the speaker:
+	// it feeds the AUDIO input of the discrete sound board, where it is mixed
+	// with the explosion ("BANG") channel and run through the MB3730 power amp.
+	m_namco_sound->add_route(0, "snd_nl", 1.0, 0);
 
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(1);
-	m_samples->set_samples_names(rallyx_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.80);
+	// Discrete sound board emulated as a netlist: explosion ("BANG") plus the
+	// WSG audio injected on I_AUDIO, all driving the bridged MB3730 power amp.
+	NETLIST_SOUND(config, "snd_nl", 48000)
+		.set_source(NETLIST_NAME(rallyx))
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	NETLIST_LOGIC_INPUT(config, m_bang, "I_BANG.IN", 0);
+
+	// WSG audio injection. mult is a calibration constant chosen to drive the
+	// (now low-gain) MB3730 as hot as possible without clipping the output.
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin0", 0, "I_AUDIO.IN").set_mult_offset(3.2, 0.0);
+
+	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "OUTPUT").set_mult_offset(0.1, 0.0);
 }
 
 void rallyx_state::jungler(machine_config &config)
@@ -1537,15 +1535,15 @@ ROM_END
  *************************************/
 
 //    YEAR  NAME       PARENT    MACHINE   INPUT     CLASS         INIT        ROT    COMPANY                               FULLNAME                             FLAGS
-GAME( 1980, rallyx,    0,        rallyx,   rallyx,   rallyx_state, empty_init, ROT0,  "Namco",                              "Rally-X (32k Ver.?)",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, rallyxa,   rallyx,   rallyx,   rallyx,   rallyx_state, empty_init, ROT0,  "Namco",                              "Rally-X",                           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, rallyxm,   rallyx,   rallyx,   rallyx,   rallyx_state, empty_init, ROT0,  "Namco (Midway license)",             "Rally-X (Midway)",                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, rallyxmr,  rallyx,   rallyx,   rallyx,   rallyx_state, empty_init, ROT0,  "bootleg (Model Racing)",             "Rally-X (Model Racing bootleg)",    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, rallyxeg,  rallyx,   rallyx,   rallyxeg, rallyx_state, empty_init, ROT90, "bootleg (Video Game / Electrogame)", "Rally-X (Video Game bootleg)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, rallyxtd,  rallyx,   rallyx,   rallyxeg, rallyx_state, empty_init, ROT90, "bootleg (Tecnidiver)",               "Rally-X (Tecnidiver bootleg)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, dngrtrck,  rallyx,   rallyx,   dngrtrck, rallyx_state, empty_init, ROT0,  "bootleg (Petaco)",                   "Danger Track (bootleg of Rally-X)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, nrallyx,   0,        rallyx,   nrallyx,  rallyx_state, empty_init, ROT0,  "Namco",                              "New Rally-X",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, nrallyxb,  nrallyx,  rallyx,   nrallyx,  rallyx_state, empty_init, ROT0,  "Namco",                              "New Rally-X (bootleg?)",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rallyx,    0,        rallyx,   rallyx,   rallyx_state, empty_init, ROT0,  "Namco",                              "Rally-X (32k Ver.?)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rallyxa,   rallyx,   rallyx,   rallyx,   rallyx_state, empty_init, ROT0,  "Namco",                              "Rally-X",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rallyxm,   rallyx,   rallyx,   rallyx,   rallyx_state, empty_init, ROT0,  "Namco (Midway license)",             "Rally-X (Midway)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rallyxmr,  rallyx,   rallyx,   rallyx,   rallyx_state, empty_init, ROT0,  "bootleg (Model Racing)",             "Rally-X (Model Racing bootleg)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1981, rallyxeg,  rallyx,   rallyx,   rallyxeg, rallyx_state, empty_init, ROT90, "bootleg (Video Game / Electrogame)", "Rally-X (Video Game bootleg)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1981, rallyxtd,  rallyx,   rallyx,   rallyxeg, rallyx_state, empty_init, ROT90, "bootleg (Tecnidiver)",               "Rally-X (Tecnidiver bootleg)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1980, dngrtrck,  rallyx,   rallyx,   dngrtrck, rallyx_state, empty_init, ROT0,  "bootleg (Petaco)",                   "Danger Track (bootleg of Rally-X)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, nrallyx,   0,        rallyx,   nrallyx,  rallyx_state, empty_init, ROT0,  "Namco",                              "New Rally-X",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1981, nrallyxb,  nrallyx,  rallyx,   nrallyx,  rallyx_state, empty_init, ROT0,  "Namco",                              "New Rally-X (bootleg?)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1981, jungler,   0,        jungler,  jungler,  rallyx_state, empty_init, ROT90, "Konami",                             "Jungler",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1981, junglers,  jungler,  jungler,  jungler,  rallyx_state, empty_init, ROT90, "Konami (Stern Electronics license)", "Jungler (Stern Electronics)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1981, junglero,  jungler,  jungler,  jungler,  rallyx_state, empty_init, ROT90, "Konami (Olympia license)",           "Jungler (Olympia)",                 MACHINE_SUPPORTS_SAVE )

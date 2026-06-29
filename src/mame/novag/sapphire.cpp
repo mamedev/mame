@@ -110,11 +110,11 @@ public:
 		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
-	void init_chesstea();
+	void init_chesstea() ATTR_COLD;
 
-	void sapphire(machine_config &config);
-	void sapphire2(machine_config &config);
-	void chesstea(machine_config &config);
+	void sapphire(machine_config &config) ATTR_COLD;
+	void sapphire2(machine_config &config) ATTR_COLD;
+	void chesstea(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_switch);
 
@@ -164,8 +164,6 @@ private:
 
 void sapphire_state::machine_start()
 {
-	m_out_lcd.resolve();
-
 	if (m_rombank)
 		m_rombank->configure_entries(0, 4, memregion("eprom")->base(), 0x8000);
 

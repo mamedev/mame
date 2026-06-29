@@ -82,7 +82,7 @@ public:
 		m_led(*this, "led")
 	{ }
 
-	void shtzone(machine_config &config);
+	void shtzone(machine_config &config) ATTR_COLD;
 
 	ioport_value gun_tl_p1_r();
 	ioport_value gun_tl_p2_r();
@@ -298,8 +298,6 @@ INPUT_PORTS_END
 void shtzone_state::machine_start()
 {
 	sms_state::machine_start();
-
-	m_led.resolve();
 
 	save_item(NAME(m_control));
 	save_item(NAME(m_selected_cart));

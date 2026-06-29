@@ -82,9 +82,9 @@ fe2010_pit_device::fe2010_pit_device(const machine_config &mconfig, const char *
 
 void pit8253_device::device_add_mconfig(machine_config &config)
 {
-	PIT_COUNTER(config, "counter0", 0);
-	PIT_COUNTER(config, "counter1", 0);
-	PIT_COUNTER(config, "counter2", 0);
+	PIT_COUNTER(config, "counter0");
+	PIT_COUNTER(config, "counter1");
+	PIT_COUNTER(config, "counter2");
 }
 
 

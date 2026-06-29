@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "cpu/v60/v60.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "jaleco_ms32_sysctrl.h"
@@ -27,7 +28,7 @@ public:
 	{ }
 
 protected:
-	required_device<cpu_device> m_maincpu;
+	required_device<v70_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_memory_bank_array<2> m_z80bank;
@@ -40,7 +41,7 @@ protected:
 	void sound_reset_line_w(int state);
 
 	void ms32_snd_bank_w(u8 data);
-	IRQ_CALLBACK_MEMBER(irq_callback);
+	u8 irq_callback();
 	void configure_banks();
 	u8 latch_r();
 	void to_main_w(u8 data);

@@ -21,6 +21,8 @@
 
 #include "cpu/drcumlsh.h"
 
+#include "endianness.h"
+
 #include <bit>
 
 //#define VERBOSE 1

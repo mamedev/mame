@@ -79,16 +79,17 @@ public:
 		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
-	template <typename T> void cpu_config(T &maincpu);
-	void shared(machine_config &config);
-	void emerclp(machine_config &config);
-	void obsidian(machine_config &config);
+	void emerclp(machine_config &config) ATTR_COLD;
+	void obsidian(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_switch);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD { set_power(true); }
+
+	template <typename T> void cpu_config(T &maincpu) ATTR_COLD;
+	void shared(machine_config &config) ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -123,8 +124,6 @@ private:
 
 void emerclp_state::machine_start()
 {
-	m_out_lcd.resolve();
-
 	// register for savestates
 	save_item(NAME(m_power));
 	save_item(NAME(m_inp_mux));

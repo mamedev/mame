@@ -126,6 +126,9 @@
 #include "screen.h"
 #include "video/rgbutil.h"
 
+#include "corefloat.h"
+#include "endianness.h"
+
 
 namespace {
 

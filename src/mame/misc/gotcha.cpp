@@ -97,7 +97,7 @@ public:
 	{
 	}
 
-	void gotcha(machine_config &config);
+	void gotcha(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -392,11 +392,6 @@ GFXDECODE_END
 
 void gotcha_state::machine_start()
 {
-	m_lamp_r.resolve();
-	m_lamp_g.resolve();
-	m_lamp_b.resolve();
-	m_lamp_s.resolve();
-
 	save_item(NAME(m_banksel));
 	save_item(NAME(m_gfxbank));
 	save_item(NAME(m_scroll));
@@ -435,7 +430,7 @@ void gotcha_state::gotcha(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_gotcha);
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 768);
 
-	DECO_SPRITE(config, m_sprgen, 0, "palette", gfx_gotcha_spr);
+	DECO_SPRITE(config, m_sprgen, "palette", gfx_gotcha_spr);
 	m_sprgen->set_is_bootleg(true);
 	m_sprgen->set_offsets(5, -1); // aligned to 2nd instruction screen in attract
 

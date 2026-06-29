@@ -50,12 +50,13 @@ namespace fs {
     * add_spin_sample(filename, type):
         For spinning motor samples. See the enum below for type values.
 
-    * add_step_sample(filename, start, end):
+    * add_step_sample(filename, start, end, dir):
         Stepper sound for single steps, used in the track range from start to
         end; when start and end are omitted, 0 and 99 are assumed, covering the
-        whole disk.
+        whole disk. The dir parameter can be used to distinguish between steps
+        towards the center or towards the rim.
 
-    * add_seek_sample(filename, nominal_rate, max_rate, start, end):
+    * add_seek_sample(filename, nominal_rate, max_rate, start, end, dir):
         Stepper sound for continuous movement for a rate not exceeding max_rate.
         The pitch is adjusted according to the ratio of the actual rate and
         the nominal rate, thus, the sample is played back at natural speed when
@@ -63,6 +64,8 @@ namespace fs {
         maximum rate is the minimum among those whose maximum rate is higher
         than the actual rate, and if its range contains the current track number.
         When not specified, the range covers the whole disk (0..99).
+        The dir parameter can be used to distinguish between seeks
+        towards the center or towards the rim.
 
     For an example, see the predefined sample list in the constructor of
     floppy_sound_device.
@@ -105,10 +108,19 @@ public:
 		END_LOADED              // Stop spinning with disk
 	};
 
+	enum // direction
+	{
+		BOTH=0,
+		IN,
+		OUT
+	};
+
 	/* Add spin, step, and seek samples. */
 	void add_spin_sample(const char* filename, int type);
-	void add_step_sample(const char* filename, int start=0, int end=99);
-	void add_seek_sample(const char* filename, int nominal_rate, int max_rate, int mintrack=0, int maxtrack=99);
+	void add_step_sample(const char* filename, int dir=BOTH);
+	void add_step_sample(const char* filename, int start, int end, int dir=BOTH);
+	void add_seek_sample(const char* filename, int nominal_rate, int max_rate, int dir=BOTH);
+	void add_seek_sample(const char* filename, int nominal_rate, int max_rate, int mintrack, int maxtrack, int dir=BOTH);
 
 	/* Deliver the list of names for the parent class samples_device. */
 	const char* const* get_names();
@@ -122,10 +134,10 @@ public:
 	int find_spin(int kind) const;
 
 	/* Search for a suitable step sample. */
-	int find_step(int track) const;
+	int find_step(int track, int dir) const;
 
 	/* Search for a suitable seek sample. */
-	int find_seek(double rate, int track, double& pitch) const;
+	int find_seek(double rate, int track, int dir, double& pitch) const;
 
 private:
 	enum
@@ -145,6 +157,7 @@ private:
 		int rate = 0;        // rate of the seek sample
 		int maxrate = 0;     // max rate for pitching up the seek sample
 		int spintype = 0;    // type for spin entries
+		int dir = BOTH;      // Direction of the seek or step
 		const char *directory;  // directory where the sample is stored
 		const char *filename;
 	};
@@ -163,11 +176,11 @@ class floppy_sound_device : public samples_device
 public:
 	floppy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void motor(bool on, bool withdisk);
-	void step(int track);
+	void step(int track, int subtrack=0);
 	void unload() { m_firstturn = true; }
 	bool samples_loaded() { return m_samples_available; }
 	void register_for_save_states();
-	void set_samples(floppy_sound_samples *samples, int form_factor);
+	void set_samples(floppy_sound_samples *samples, int form_factor, int maxtrack);
 
 protected:
 	void device_start() override ATTR_COLD;
@@ -179,6 +192,10 @@ private:
 
 	floppy_sound_samples* m_samplelist;
 	floppy_sound_samples m_default_samples;
+
+	int    m_max_track;
+	int    m_last_track;
+	int    m_last_subtrack;
 
 	bool   m_motor_on;
 	bool   m_with_disk;

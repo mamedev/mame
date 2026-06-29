@@ -913,18 +913,18 @@ void apc_state::apc(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &apc_state::apc_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(MAIN_CLOCK); // heartbeat IRQ
 	m_pit->out_handler<0>().set(m_i8259_m, FUNC(pic8259_device::ir3_w));
 	m_pit->set_clk<1>(MAIN_CLOCK); // Memory Refresh
 	m_pit->set_clk<2>(MAIN_CLOCK); // RS-232c
 
-	PIC8259(config, m_i8259_m, 0);
+	PIC8259(config, m_i8259_m);
 	m_i8259_m->out_int_callback().set_inputline(m_maincpu, 0);
 	m_i8259_m->in_sp_callback().set_constant(1);
 	m_i8259_m->read_slave_ack_callback().set(FUNC(apc_state::get_slave_ack));
 
-	PIC8259(config, m_i8259_s, 0);
+	PIC8259(config, m_i8259_s);
 	m_i8259_s->out_int_callback().set(m_i8259_m, FUNC(pic8259_device::ir7_w)); // TODO: check ir7_w
 	m_i8259_s->in_sp_callback().set_constant(0);
 

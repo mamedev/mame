@@ -74,6 +74,8 @@ private:
 	uint32_t screen_update_dynablsb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(fake_nmi);
 	INTERRUPT_GEN_MEMBER(bomblord_fake_nmi);
+	IRQ_CALLBACK_MEMBER(dynablsb_vector_r);
+	IRQ_CALLBACK_MEMBER(bomblord_vector_r);
 	void dynablsb_vblank_int_w(int state);
 	void bomblord_vblank_int_w(int state);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);

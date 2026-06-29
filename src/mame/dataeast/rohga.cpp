@@ -1368,7 +1368,7 @@ void rohga_state::rohga_base(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(2048);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
+	DECO16IC(config, m_deco_tilegen[0]);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x64);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
@@ -1381,7 +1381,7 @@ void rohga_state::rohga_base(machine_config &config)
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	DECO16IC(config, m_deco_tilegen[1], 0);
+	DECO16IC(config, m_deco_tilegen[1]);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
@@ -1396,7 +1396,7 @@ void rohga_state::rohga_base(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_rohga);
 
-	DECO104PROT(config, m_ioprot, 0);
+	DECO104PROT(config, m_ioprot);
 	m_ioprot->port_a_cb().set_ioport("INPUTS");
 	m_ioprot->port_b_cb().set_ioport("SYSTEM");
 	m_ioprot->port_c_cb().set_ioport("DSW");
@@ -1431,7 +1431,7 @@ void rohga_state::rohga(machine_config &config)
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(rohga_state::screen_update_rohga));
 	subdevice<screen_device>("screen")->set_palette(m_palette);
 
-	DECO_SPRITE(config, m_sprgen[0], 0, m_palette, gfx_rohga_spr);
+	DECO_SPRITE(config, m_sprgen[0], m_palette, gfx_rohga_spr);
 	m_sprgen[0]->set_pri_callback(FUNC(rohga_state::rohga_pri_callback));
 	m_sprgen[0]->set_col_callback(FUNC(rohga_state::rohga_col_callback));
 }
@@ -1450,8 +1450,8 @@ void rohga_state::wizdfire(machine_config &config)
 
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 
-	DECO_SPRITE(config, m_sprgen[0], 0, m_palette, gfx_wizdfire_spr1);
-	DECO_SPRITE(config, m_sprgen[1], 0, m_palette, gfx_wizdfire_spr2);
+	DECO_SPRITE(config, m_sprgen[0], m_palette, gfx_wizdfire_spr1);
+	DECO_SPRITE(config, m_sprgen[1], m_palette, gfx_wizdfire_spr2);
 
 	m_ioprot->set_interface_scramble_reverse();
 
@@ -1480,10 +1480,10 @@ void rohga_state::nitrobal(machine_config &config)
 	m_deco_tilegen[1]->set_pf1_col_mask(0);
 	m_deco_tilegen[1]->set_pf2_col_mask(0);
 
-	DECO_SPRITE(config, m_sprgen[0], 0, m_palette, gfx_wizdfire_spr1);
+	DECO_SPRITE(config, m_sprgen[0], m_palette, gfx_wizdfire_spr1);
 	m_sprgen[0]->set_alt_format(true);
 
-	DECO_SPRITE(config, m_sprgen[1], 0, m_palette, gfx_wizdfire_spr2);
+	DECO_SPRITE(config, m_sprgen[1], m_palette, gfx_wizdfire_spr2);
 	m_sprgen[1]->set_alt_format(true);
 
 	MCFG_VIDEO_START_OVERRIDE(rohga_state, wizdfire)
@@ -1508,7 +1508,7 @@ void rohga_state::schmeisr(machine_config &config)
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(rohga_state::screen_update_rohga));
 	subdevice<screen_device>("screen")->set_palette(m_palette);
 
-	DECO_SPRITE(config, m_sprgen[0], 0, m_palette, gfx_schmeisr_spr);
+	DECO_SPRITE(config, m_sprgen[0], m_palette, gfx_schmeisr_spr);
 	m_sprgen[0]->set_pri_callback(FUNC(rohga_state::rohga_pri_callback));
 	m_sprgen[0]->set_col_callback(FUNC(rohga_state::schmeisr_col_callback)); // wire mods on PCB...
 }

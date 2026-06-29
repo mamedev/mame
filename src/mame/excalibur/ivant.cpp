@@ -140,8 +140,6 @@ void ivant_state::init_ivant()
 
 void ivant_state::machine_start()
 {
-	m_out_lcd.resolve();
-
 	// periodically check for interrupts
 	m_irqtimer = timer_alloc(FUNC(ivant_state::update_irq), this);
 	attotime period = attotime::from_msec(1);

@@ -183,7 +183,7 @@ void wpc_flip1_state::wpc_flip1(machine_config &config)
 	M6809(config, m_maincpu, 2000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wpc_flip1_state::wpc_flip1_map);
 
-	WPCASIC(config, m_wpc, 0);
+	WPCASIC(config, m_wpc);
 	m_wpc->irq_callback().set(FUNC(wpc_flip1_state::irq_w));
 	m_wpc->firq_callback().set(FUNC(wpc_flip1_state::firq_w));
 	m_wpc->bank_write().set(FUNC(wpc_flip1_state::rombank_w));

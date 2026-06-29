@@ -25,6 +25,7 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
 #include "utf8.h"
 
 

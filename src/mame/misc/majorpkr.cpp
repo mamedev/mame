@@ -771,8 +771,6 @@ void majorpkr_state::pulses_w(uint8_t data)
 
 void majorpkr_state::machine_start()
 {
-	m_lamps.resolve();
-
 	uint8_t *rom = memregion("maincpu")->base();
 	m_rom_bank->configure_entries(0, 4, &rom[0xe000], 0x800);
 

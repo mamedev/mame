@@ -2805,7 +2805,7 @@ void taitof2_state::taito_f2(machine_config &config)
 	ymsnd.add_route(1, "speaker", 1.0, 0);
 	ymsnd.add_route(2, "speaker", 1.0, 1);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	tc0140syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -2816,7 +2816,7 @@ void taitof2_state::taito_f2_tc0220ioc(machine_config &config)
 
 	/* basic machine hardware */
 	config.device_remove("watchdog");
-	TC0220IOC(config, m_tc0220ioc, 0);
+	TC0220IOC(config, m_tc0220ioc);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
@@ -2831,7 +2831,7 @@ void taitof2_state::taito_f2_tc0510nio(machine_config &config)
 
 	/* basic machine hardware */
 	config.device_remove("watchdog");
-	TC0510NIO(config, m_tc0510nio, 0);
+	TC0510NIO(config, m_tc0510nio);
 	m_tc0510nio->read_0_callback().set_ioport("DSWA");
 	m_tc0510nio->read_1_callback().set_ioport("DSWB");
 	m_tc0510nio->read_2_callback().set_ioport("IN0");
@@ -2859,7 +2859,7 @@ void taitof2_state::taito_f2_te7750(machine_config &config)
 
 void taitof2_state::taito_f2_tc0110pcr(machine_config &config)
 {
-	TC0110PCR(config, m_tc0110pcr, 0);
+	TC0110PCR(config, m_tc0110pcr);
 	m_gfxdecode->set_palette(m_tc0110pcr);
 	m_screen->set_palette(m_tc0110pcr);
 }
@@ -2878,7 +2878,7 @@ void taitof2_state::finalb(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state, finalb)
 	m_screen->screen_vblank().set(FUNC(taitof2_state::screen_vblank_partial_buffer_delayed));
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(1, 0);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr);
 
@@ -2898,15 +2898,15 @@ void dondokod_state::dondokod(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(dondokod_state::screen_vblank_partial_buffer_delayed));
 	m_screen->set_screen_update(FUNC(dondokod_state::screen_update_pri_roz));
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(3, 0);
 	m_tc0100scn[0]->set_palette(m_palette);
 
-	TC0280GRD(config, m_tc0280grd, 0);
+	TC0280GRD(config, m_tc0280grd);
 	m_tc0280grd->set_color_base(0);
 	m_tc0280grd->set_palette(m_palette);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 }
 
 void megablst_state::megab(machine_config &config)
@@ -2927,11 +2927,11 @@ void megablst_state::megab(machine_config &config)
 	m_screen->set_screen_update(FUNC(megablst_state::screen_update_pri));
 	m_screen->screen_vblank().set(FUNC(megablst_state::screen_vblank_partial_buffer_delayed));
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(3, 0);
 	m_tc0100scn[0]->set_palette(m_palette);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 }
 
 void taitof2_state::thundfox(machine_config &config)
@@ -2946,13 +2946,13 @@ void taitof2_state::thundfox(machine_config &config)
 	m_screen->set_screen_update(FUNC(taitof2_state::screen_update_thundfox));
 	m_screen->screen_vblank().set(FUNC(taitof2_state::screen_vblank_partial_buffer_delayed_thundfox));
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(3, 0);
 	m_tc0100scn[0]->set_offsets_flip(5, 0);
 	m_tc0100scn[0]->set_offsets_fliptx(4, 1);
 	m_tc0100scn[0]->set_palette(m_palette);
 
-	TC0100SCN(config, m_tc0100scn[1], 0);
+	TC0100SCN(config, m_tc0100scn[1]);
 	m_tc0100scn[1]->set_offsets(3, 0);
 	m_tc0100scn[1]->set_offsets_flip(5, 0);
 	m_tc0100scn[1]->set_offsets_fliptx(4, 1);
@@ -2960,7 +2960,7 @@ void taitof2_state::thundfox(machine_config &config)
 	m_tc0100scn[1]->set_multiscr_hack(1);
 	m_tc0100scn[1]->set_palette(m_palette);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 }
 
 void cameltry_state::cameltry(machine_config &config)
@@ -2975,15 +2975,15 @@ void cameltry_state::cameltry(machine_config &config)
 	m_screen->set_screen_update(FUNC(cameltry_state::screen_update_pri_roz));
 	m_screen->screen_vblank().set(FUNC(cameltry_state::screen_vblank_partial_buffer_delayed));
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(3, 0);
 	m_tc0100scn[0]->set_palette(m_palette);
 
-	TC0280GRD(config, m_tc0280grd, 0);
+	TC0280GRD(config, m_tc0280grd);
 	m_tc0280grd->set_color_base(0);
 	m_tc0280grd->set_palette(m_palette);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 }
 
 void cameltry_state::driftoutct(machine_config &config)
@@ -3005,7 +3005,7 @@ void taitof2_state::qtorimon(machine_config &config)
 	/* video hardware */
 	m_screen->screen_vblank().set(FUNC(taitof2_state::screen_vblank_partial_buffer_delayed));
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_gfxlayout(TC0100SCN_LAYOUT_1BPP);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr);
 
@@ -3025,11 +3025,11 @@ void taitof2_state::liquidk(machine_config &config)
 	m_screen->set_screen_update(FUNC(taitof2_state::screen_update_pri));
 	m_screen->screen_vblank().set(FUNC(taitof2_state::screen_vblank_partial_buffer_delayed));
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(3, 0);
 	m_tc0100scn[0]->set_palette(m_palette);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 }
 
 void taitof2_state::quizhq(machine_config &config)
@@ -3044,7 +3044,7 @@ void taitof2_state::quizhq(machine_config &config)
 	/* video hardware */
 	m_screen->screen_vblank().set(FUNC(taitof2_state::screen_vblank_partial_buffer_delayed));
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_gfxlayout(TC0100SCN_LAYOUT_1BPP);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr);
 
@@ -3066,7 +3066,7 @@ void taitof2_state::ssi(machine_config &config)
 	m_screen->set_screen_update(FUNC(taitof2_state::screen_update_ssi));
 	m_screen->screen_vblank().set(FUNC(taitof2_state::screen_vblank_partial_buffer_delayed_thundfox));
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(3, 0);
 	m_tc0100scn[0]->set_palette(m_palette);
 }
@@ -3085,11 +3085,11 @@ void taitof2_state::gunfront(machine_config &config)
 	m_screen->set_screen_update(FUNC(taitof2_state::screen_update_pri));
 	m_screen->screen_vblank().set(FUNC(taitof2_state::screen_vblank_partial_buffer_delayed));
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(3, 0);
 	m_tc0100scn[0]->set_palette(m_palette);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 }
 
 void taitof2_state::growl(machine_config &config)
@@ -3105,11 +3105,11 @@ void taitof2_state::growl(machine_config &config)
 
 	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(3, 0);
 	m_tc0100scn[0]->set_palette(m_palette);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 }
 
 void mjnquest_state::mjnquest(machine_config &config)
@@ -3122,7 +3122,7 @@ void mjnquest_state::mjnquest(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mjnquest_state::mjnquest_map);
 
 	/* video hardware */
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr);
 	m_tc0100scn[0]->set_tile_callback(FUNC(mjnquest_state::tmap_cb));
 
@@ -3142,13 +3142,13 @@ void footchmp_state::footchmp(machine_config &config)
 	m_screen->set_screen_update(FUNC(footchmp_state::screen_update_deadconx));
 	m_screen->screen_vblank().set(FUNC(footchmp_state::screen_vblank_full_buffer_delayed));
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x1d + 3, 0x08);
 	m_tc0480scp->set_offsets_tx(-1, 0);
 	m_tc0480scp->set_offsets_flip(-1, 0);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 }
 
 void footchmp_state::footchmpbl(machine_config &config)
@@ -3179,12 +3179,12 @@ void taitof2_state::koshien(machine_config &config)
 
 	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(1, 0);
 	m_tc0100scn[0]->set_offsets_flip(2, 0);
 	m_tc0100scn[0]->set_palette(m_palette);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 }
 
 void taitof2_state::yuyugogo(machine_config &config)
@@ -3200,7 +3200,7 @@ void taitof2_state::yuyugogo(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state, yuyugogo)
 	m_screen->set_screen_update(FUNC(taitof2_state::screen_update_yesnoj));
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_gfxlayout(TC0100SCN_LAYOUT_1BPP);
 	m_tc0100scn[0]->set_offsets(3, 0);
 	m_tc0100scn[0]->set_palette(m_palette);
@@ -3227,11 +3227,11 @@ void taitof2_state::ninjak(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state, ninjak)
 	m_screen->set_screen_update(FUNC(taitof2_state::screen_update_pri));
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(1, 0);
 	m_tc0100scn[0]->set_palette(m_palette);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 }
 
 void taitof2_state::solfigtr(machine_config &config)
@@ -3245,13 +3245,13 @@ void taitof2_state::solfigtr(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state, solfigtr)
 	m_screen->set_screen_update(FUNC(taitof2_state::screen_update_pri));
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(3, 0);
 	m_tc0100scn[0]->set_offsets_flip(6, 0);
 	m_tc0100scn[0]->set_offsets_fliptx(6, 0);
 	m_tc0100scn[0]->set_palette(m_palette);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 }
 
 void taitof2_state::qzquest(machine_config &config)
@@ -3264,7 +3264,7 @@ void taitof2_state::qzquest(machine_config &config)
 	/* video hardware */
 	m_screen->screen_vblank().set(FUNC(taitof2_state::screen_vblank_partial_buffer_delayed));
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_palette(m_palette);
 }
 
@@ -3279,15 +3279,15 @@ void dondokod_state::pulirula(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(dondokod_state,pulirula)
 	m_screen->set_screen_update(FUNC(dondokod_state::screen_update_pri_roz));
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(3, 0);
 	m_tc0100scn[0]->set_palette(m_palette);
 
-	TC0430GRW(config, m_tc0430grw, 0);
+	TC0430GRW(config, m_tc0430grw);
 	m_tc0430grw->set_color_base(0);
 	m_tc0430grw->set_palette(m_palette);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 }
 
 void footchmp_state::metalb(machine_config &config)
@@ -3303,14 +3303,14 @@ void footchmp_state::metalb(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(footchmp_state,deadconx)
 	m_screen->set_screen_update(FUNC(footchmp_state::screen_update_metalb));
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x32 + 3, -0x04);
 	m_tc0480scp->set_offsets_tx(1, 0);
 	m_tc0480scp->set_offsets_flip(-1, 0);
 	m_tc0480scp->set_col_base(4096);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 }
 
 void taitof2_state::qzchikyu(machine_config &config)
@@ -3324,7 +3324,7 @@ void taitof2_state::qzchikyu(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state, qzchikyu)
 	m_screen->screen_vblank().set(FUNC(taitof2_state::screen_vblank_partial_buffer_delayed_qzchikyu));
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(0, 0);
 	m_tc0100scn[0]->set_offsets_flip(-4, 0);
 	m_tc0100scn[0]->set_offsets_fliptx(-11, 0);
@@ -3344,7 +3344,7 @@ void taitof2_state::yesnoj(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state, yesnoj)
 	m_screen->set_screen_update(FUNC(taitof2_state::screen_update_yesnoj));
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_gfxlayout(TC0100SCN_LAYOUT_1BPP);
 	m_tc0100scn[0]->set_offsets(3, 0);
 	m_tc0100scn[0]->set_palette(m_palette);
@@ -3365,13 +3365,13 @@ void footchmp_state::deadconx(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(footchmp_state,deadconx)
 	m_screen->set_screen_update(FUNC(footchmp_state::screen_update_deadconx));
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x1e + 3, 0x08);
 	m_tc0480scp->set_offsets_tx(-1, 0);
 	m_tc0480scp->set_offsets_flip(-1, 0);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 }
 
 void footchmp_state::deadconxj(machine_config &config)
@@ -3393,11 +3393,11 @@ void taitof2_state::dinorex(machine_config &config)
 
 	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(3, 0);
 	m_tc0100scn[0]->set_palette(m_palette);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 }
 
 void taitof2_state::qjinsei(machine_config &config)
@@ -3413,11 +3413,11 @@ void taitof2_state::qjinsei(machine_config &config)
 
 	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(3, 0);
 	m_tc0100scn[0]->set_palette(m_palette);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 }
 
 void taitof2_state::qcrayon(machine_config &config)
@@ -3433,11 +3433,11 @@ void taitof2_state::qcrayon(machine_config &config)
 
 	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(3, 0);
 	m_tc0100scn[0]->set_palette(m_palette);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 }
 
 void taitof2_state::qcrayon2(machine_config &config)
@@ -3453,11 +3453,11 @@ void taitof2_state::qcrayon2(machine_config &config)
 
 	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(3, 0);
 	m_tc0100scn[0]->set_palette(m_palette);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 }
 
 void dondokod_state::driftout(machine_config &config)
@@ -3471,15 +3471,15 @@ void dondokod_state::driftout(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(dondokod_state,driftout)
 	m_screen->set_screen_update(FUNC(dondokod_state::screen_update_pri_roz));
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(3, 0);
 	m_tc0100scn[0]->set_palette(m_palette);
 
-	TC0430GRW(config, m_tc0430grw, 0);
+	TC0430GRW(config, m_tc0430grw);
 	m_tc0430grw->set_color_base(0);
 	m_tc0430grw->set_palette(m_palette);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 }
 
 void cameltry_state::cameltrya(machine_config &config)
@@ -3492,7 +3492,7 @@ void cameltry_state::cameltrya(machine_config &config)
 	Z80(config, m_audiocpu, 24000000/4);    /* verifed on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cameltry_state::cameltrya_sound_map);
 
-	TC0220IOC(config, m_tc0220ioc, 0);
+	TC0220IOC(config, m_tc0220ioc);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
@@ -3515,15 +3515,15 @@ void cameltry_state::cameltrya(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(cameltry_state,dondokod)
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(3, 0);
 	m_tc0100scn[0]->set_palette(m_palette);
 
-	TC0280GRD(config, m_tc0280grd, 0);
+	TC0280GRD(config, m_tc0280grd);
 	m_tc0280grd->set_color_base(0);
 	m_tc0280grd->set_palette(m_palette);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3539,7 +3539,7 @@ void cameltry_state::cameltrya(machine_config &config)
 	OKIM6295(config, m_oki, XTAL(4'224'000)/4, okim6295_device::PIN7_HIGH); /* verified on pcb */
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -3554,7 +3554,7 @@ void driveout_state::driveout(machine_config &config)
 	Z80(config, m_audiocpu, 8_MHz_XTAL / 2); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &driveout_state::driveout_sound_map);
 
-	TC0510NIO(config, m_tc0510nio, 0);
+	TC0510NIO(config, m_tc0510nio);
 	m_tc0510nio->read_0_callback().set_ioport("DSWA");
 	m_tc0510nio->read_1_callback().set_ioport("DSWB");
 	m_tc0510nio->read_2_callback().set_ioport("IN0");
@@ -3577,15 +3577,15 @@ void driveout_state::driveout(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(driveout_state,driftout)
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(3, 0);
 	m_tc0100scn[0]->set_palette(m_palette);
 
-	TC0430GRW(config, m_tc0430grw, 0);
+	TC0430GRW(config, m_tc0430grw);
 	m_tc0430grw->set_color_base(0);
 	m_tc0430grw->set_palette(m_palette);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

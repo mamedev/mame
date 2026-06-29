@@ -207,7 +207,7 @@ void d6809_state::d6809(machine_config &config)
 	MOS6551(config, "acia2", XTAL(14'745'600) / 8); // uses Q clock
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 	m_terminal->set_keyboard_callback(FUNC(d6809_state::kbd_put));
 
 	// Floppy

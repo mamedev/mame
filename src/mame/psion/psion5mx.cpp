@@ -559,7 +559,7 @@ void psion5mx_state::psion5mx(machine_config &config)
 	m_windermere->set_screen_origin(45, 5);
 	m_windermere->set_screen("screen");
 
-	//ADS7843(config, "adc", 0);
+	//ADS7843(config, "adc");
 
 	RAM(config, m_ram).set_default_size("16M");
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);

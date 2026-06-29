@@ -377,7 +377,6 @@ INPUT_PORTS_END
 void bfm_cobra3_state::machine_start()
 {
 	m_active_strobe = 0;
-	m_lamps.resolve();
 	m_mainram = make_unique_clear<uint16_t[]>((1024 * 16) / 2);
 	m_nvram->set_base(m_mainram.get(), 1024 * 16);
 }
@@ -469,7 +468,7 @@ void bfm_cobra3_state::bfm_cobra3(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(256);
 
-	RAMDAC(config, m_ramdac, 0, m_palette); // MUSIC Semiconductor TR9C1710 RAMDAC
+	RAMDAC(config, m_ramdac, m_palette); // MUSIC Semiconductor TR9C1710 RAMDAC
 	m_ramdac->set_addrmap(0, &bfm_cobra3_state::ramdac_map);
 	m_ramdac->set_split_read(1);
 
@@ -494,7 +493,7 @@ void bfm_cobra3_state::bfm_cobra3(machine_config &config)
 	m_scsic->drq_handler().set(DEVICE_SELF, FUNC(bfm_cobra3_state::dma1_drq));
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9)); //TODO: Check timings
-	METERS(config, m_meters, 0).set_number(4);
+	METERS(config, m_meters).set_number(4);
 }
 
 ROM_START( c3_rtime )

@@ -578,7 +578,7 @@ void igt_gameking_state::igt_gameking(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(0x100);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &igt_gameking_state::ramdac_map);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_igt_gameking);

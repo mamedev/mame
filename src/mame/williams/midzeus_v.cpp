@@ -8,7 +8,11 @@
 
 #include "emu.h"
 #include "midzeus.h"
+
+#include "input.h" // for video debug keys
 #include "video/rgbutil.h"
+
+#include "endianness.h"
 
 
 #define LOG_ZEUS    (1U << 1)

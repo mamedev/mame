@@ -916,11 +916,6 @@ void x68k_state::machine_reset()
 
 void x68k_state::machine_start()
 {
-	// resolve outputs
-	m_eject_drv_out.resolve();
-	m_ctrl_drv_out.resolve();
-	m_access_drv_out.resolve();
-
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	// install RAM handlers
 	m_spriteram = (uint16_t*)(memregion("user1")->base());
@@ -1145,7 +1140,7 @@ void x68k_state::x68000(machine_config &config)
 	m_crtc->gvram_read_cb().set(FUNC(x68k_state::gvram_read));
 	m_crtc->gvram_write_cb().set(FUNC(x68k_state::gvram_write));
 
-	X68KHDC(config, "x68k_hdc", 0);
+	X68KHDC(config, "x68k_hdc");
 }
 
 static void scsi_devices(device_slot_interface &device)

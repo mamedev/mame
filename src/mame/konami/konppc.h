@@ -21,7 +21,7 @@ public:
 	static constexpr int MAX_CG_BOARDS        = 2;
 
 	// construction/destruction
-	konppc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	konppc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configurations
 	template <typename T> void set_dsp_tag(int which, T &&tag) { m_dsp[which].set_tag(std::forward<T>(tag)); }
@@ -33,7 +33,7 @@ public:
 	void set_cgboard_type(int cgtype) { m_cgboard_type = cgtype; }
 
 	void set_cgboard_id(int board_id);
-	int get_cgboard_id(void);
+	int get_cgboard_id();
 
 	bool output_3d_enabled();
 
@@ -56,7 +56,7 @@ public:
 	template <unsigned Board> void nwk_voodoo_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { voodoo_w(Board, offset, data, mem_mask); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 private:
@@ -71,7 +71,7 @@ private:
 	uint32_t m_dsp_comm_sharc[MAX_CG_BOARDS][2];
 	uint8_t m_dsp_shared_ram_bank[MAX_CG_BOARDS];
 
-	int32_t m_cgboard_id = 0;
+	int32_t m_cgboard_id;
 	int32_t m_cgboard_type;
 	int32_t m_num_cgboards;
 
@@ -80,10 +80,10 @@ private:
 	uint32_t m_dsp_state[MAX_CG_BOARDS]{};
 	uint32_t m_nwk_device_sel[MAX_CG_BOARDS]{};
 
-	int m_nwk_fifo_half_full_r = 0;
-	int m_nwk_fifo_half_full_w = 0;
-	int m_nwk_fifo_full = 0;
-	int m_nwk_fifo_mask = 0;
+	int m_nwk_fifo_half_full_r;
+	int m_nwk_fifo_half_full_w;
+	int m_nwk_fifo_full;
+	int m_nwk_fifo_mask;
 
 	bool m_enable_3d[MAX_CG_BOARDS]{};
 

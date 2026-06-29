@@ -1373,9 +1373,6 @@ void videopkr_state::machine_start()
 	m_videobank->set_entry(3);
 	m_colorbank->set_entry(3);
 
-	m_digits.resolve();
-	m_lamps.resolve();
-
 	m_vp_sound_p2 = 0xff;   // default P2 latch value
 	m_sound_latch = 0xff;   // default sound data latch value
 	m_p24_data = 0xff;
@@ -1394,8 +1391,6 @@ void babypkr_state::machine_start()
 	videopkr_state::machine_start();
 
 	m_p24_data = 0;
-
-	m_top_lamps.resolve();
 }
 
 

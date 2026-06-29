@@ -24,20 +24,20 @@
 
 ****************************************************************************
 
-    video-decoder proms added for Defender,Stargate,Robotron,Joust,Sinistar,
-    Bubbles, etc. by HIGHWAYMAN, all decoder proms are 512x8.
-    defender original pcb's used a single prom(decoder1).
-    newer defender pcb's used 2 proms(decoder2,decoder3) this was to allow
+    video-decoder PROMs added for Defender, Stargate, Robotron, Joust,
+    Sinistar, Bubbles, etc. by HIGHWAYMAN, all decoder PROMs are 512x8.
+    defender original PCBs used a single PROM (decoder1).
+    newer defender PCBs used 2 PROMs (decoder2, decoder3) this was to allow
     video inversion for the cocktail table, decoders 1 & 2 are the same code.
-    white was first romset, then green/blue the only difference was the chips used,
+    white was first ROM set, then green/blue the only difference was the chips used,
     the final version was red, only red can run in a cocktail table.
     (red also has *much* improved enemy AI and is harder to play)
-    Colony7 uses a different chip for decoder2(cs10), but decoder3 is the same.
-    early stargate pcb's used decoder4, and decoder5.
-    newer stargate pcb's and the other games on that hardware used decoder4 and decoder6
+    Colony7 uses a different chip for decoder2 (cs10), but decoder3 is the same.
+    early stargate PCBs used decoder4, and decoder5.
+    newer stargate PCBs and the other games on that hardware used decoder4 and decoder6
     this was probably just to fix a minor bug in decoder5.
-    Blaster uses decoder4 and decoder6 and 2 other proms.
-    if i could find more proms i would clean this up into a table - maybe later.
+    Blaster uses decoder4 and decoder6 and 2 other PROMs.
+    if I could find more PROMs I would clean this up into a table - maybe later.
 
 ****************************************************************************
 
@@ -81,9 +81,9 @@
                    Blaster only: bits 6-7 are for selecting the sound board
     c80f rom_pia_ctrlb
 
-    C900 rom_enable_scr_ctrl  Switch between video ram and rom at 0000-97FF
+    C900 rom_enable_scr_ctrl  Switch between video RAM and ROM at 0000-97FF
 
-    C940 Blaster only: Select bank in the color Prom for color remap
+    C940 Blaster only: Select bank in the color PROM for color remap
     C980 Blaster only: Select which ROM is at 0000-3FFF
     C9C0 Blaster only: bit 0 = enable the color 0 changing each lines
                        bit 1 = erase back each frame
@@ -338,7 +338,7 @@
 
     C3FC      WatchDog
 
-    C400-C4FF CMOS ram battery backed up
+    C400-C4FF CMOS RAM battery backed up
 
     C800      6 bits of the video counters bits 2-7
 
@@ -479,6 +479,7 @@ Reference videos: https://www.youtube.com/watch?v=R5OeC6Wc_yI
 #include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
+
 #include "speaker.h"
 
 
@@ -1643,11 +1644,11 @@ void williams_state::williams_muxed(machine_config &config)
 	m_pia[0]->cb2_handler().set("mux_0", FUNC(ls157_device::select_w));
 	m_pia[0]->cb2_handler().append("mux_1", FUNC(ls157_device::select_w));
 
-	ls157_device &mux0(LS157(config, "mux_0", 0)); // IC3 on interface board (actually LS257 with OC tied low)
+	ls157_device &mux0(LS157(config, "mux_0")); // IC3 on interface board (actually LS257 with OC tied low)
 	mux0.a_in_callback().set_ioport("INP2");
 	mux0.b_in_callback().set_ioport("INP1");
 
-	ls157_device &mux1(LS157(config, "mux_1", 0)); // IC4 on interface board (actually LS257 with OC tied low)
+	ls157_device &mux1(LS157(config, "mux_1")); // IC4 on interface board (actually LS257 with OC tied low)
 	mux1.a_in_callback().set_ioport("INP2A");
 	mux1.b_in_callback().set_ioport("INP1A");
 }
@@ -1698,7 +1699,7 @@ void williams_state::sinistar_upright(machine_config &config)
 	m_pia[2]->cb2_handler().set("cvsd", FUNC(hc55516_device::clock_w));
 
 	// sound hardware
-	HC55516(config, "cvsd", 0).add_route(ALL_OUTPUTS, "speaker", 0.8);
+	HC55516(config, "cvsd").add_route(ALL_OUTPUTS, "speaker", 0.8);
 }
 
 void williams_state::sinistar_cockpit(machine_config &config)
@@ -1732,7 +1733,7 @@ void williams_state::playball(machine_config &config)
 	m_screen->set_visarea(6, 298-1, 8, 240-1);
 
 	// sound hardware
-	HC55516(config, "cvsd", 0).add_route(ALL_OUTPUTS, "speaker", 0.8);
+	HC55516(config, "cvsd").add_route(ALL_OUTPUTS, "speaker", 0.8);
 
 	// pia
 	m_pia[1]->writepb_handler().set(FUNC(williams_state::playball_snd_cmd_w));
@@ -1781,7 +1782,7 @@ void blaster_state::blastkit(machine_config &config)
 	m_pia[0]->cb2_handler().set(m_muxa, FUNC(ls157_x2_device::select_w));
 
 	// All multiplexers on Blaster interface board are really LS257 with OC tied to GND (which is equivalent to LS157)
-	LS157_X2(config, m_muxa, 0);
+	LS157_X2(config, m_muxa);
 	m_muxa->a_in_callback().set_ioport("IN3");
 	m_muxa->b_in_callback().set(FUNC(blaster_state::port_0_49way_r));
 }
@@ -1803,7 +1804,7 @@ void blaster_state::blaster(machine_config &config)
 	m_muxa->a_in_callback().set(FUNC(blaster_state::port_0_49way_r));
 	m_muxa->b_in_callback().set_ioport("IN3");
 
-	ls157_device &muxb(LS157(config, "mux_b", 0)); // IC3
+	ls157_device &muxb(LS157(config, "mux_b")); // IC3
 	muxb.a_in_callback().set_ioport("INP1");
 	muxb.b_in_callback().set_ioport("INP2");
 
@@ -1896,7 +1897,7 @@ void williams2_state::inferno(machine_config &config)
 
 	m_pia[2]->set_port_a_input_overrides_output_mask(0xff);
 
-	ls157_x2_device &mux(LS157_X2(config, "mux", 0)); // IC45 (for PA4-PA7) + IC46 (for PA0-PA3) on CPU board
+	ls157_x2_device &mux(LS157_X2(config, "mux")); // IC45 (for PA4-PA7) + IC46 (for PA0-PA3) on CPU board
 	mux.a_in_callback().set_ioport("INP1");
 	mux.b_in_callback().set_ioport("INP2");
 }
@@ -1936,7 +1937,7 @@ void tshoot_state::tshoot(machine_config &config)
 
 	m_pia[2]->cb2_handler().set(FUNC(tshoot_state::maxvol_w));
 
-	LS157_X2(config, m_mux, 0); // U2 + U3 on interface board
+	LS157_X2(config, m_mux); // U2 + U3 on interface board
 	m_mux->a_in_callback().set_ioport("INP1");
 	m_mux->b_in_callback().set_ioport("INP2");
 }
@@ -1968,7 +1969,7 @@ void joust2_state::joust2(machine_config &config)
 	m_bg->cb2_cb().set(m_pia[2], FUNC(pia6821_device::cb1_w));
 	m_pia[2]->cb2_handler().set(m_bg, FUNC(s11_obg_device::resetq_w)); // inverted?
 
-	LS157(config, m_mux, 0);
+	LS157(config, m_mux);
 	m_mux->a_in_callback().set_ioport("INP1");
 	m_mux->b_in_callback().set_ioport("INP2");
 }
@@ -2710,8 +2711,22 @@ LED - 7Seg LED display
 
 Wired W1 & W3 with Zero Ohm resistors for 2732 ROMs
 
+In 2026, early prototype builds of Robotron were found in a 2004 backup made by Duncan Brown.  The backup was from the Vid Kidz
+GIMIX 6809 development system used to create Robotron and Blaster.  It was discovered that there were six "release" versions of the
+game and that Releases 4, 5, and 6 correspond with Yellow label, Blue label and the '87 patch by Christian Gingras respectively.
+
+Releases 1, 2, and 3 are early builds of Robotron used during field tests.  Release 3 is notable as it replaces the skull and
+crossbones graphic with an 'X' crossing out a generic human.  This censored image can be seen in a promo videotape (also preserved
+by Duncan):
+
+https://youtu.be/j0tqQryAmN0?t=209
+
+At the 2016 CAX show, Larry DeMar talked about Release 3 and revealed that Williams wanted to replace the art asset because they
+thought the violent imagery would negatively affect sales.  Right before Robotron entered production, Eugene Jarvis convinced
+Williams president Mike Stroll to revert back to the original skull graphic.
+
 */
-ROM_START( robotron ) // Solid Blue labels, "B" type ROMs labeled 3005-13 through 3005-24
+ROM_START( robotron ) // "Release 5" Solid Blue labels, "B" type ROMs labeled 3005-13 through 3005-24
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2084_rom_1b_3005-13.e4",  0x00000, 0x1000, CRC(66c7d3ef) SHA1(f6d60e26c209c1df2cc01ac07ad5559daa1b7118) ) // == 2084_rom_1b_3005-1.e4
 	ROM_LOAD( "2084_rom_2b_3005-14.c4",  0x01000, 0x1000, CRC(5bc6c614) SHA1(4d6e82bc29f49100f7751ccfc6a9ff35695b84b3) ) // == 2084_rom_2b_3005-2.c4
@@ -2734,7 +2749,7 @@ ROM_START( robotron ) // Solid Blue labels, "B" type ROMs labeled 3005-13 throug
 	ROM_LOAD( "decoder_rom_6.3c", 0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09821
 ROM_END
 
-ROM_START( robotronyo ) // Yellow label / Red stripe & Black print or Yellow label / Red stripe & Green print "B" type ROMs numbered 3005-13 through 3005-24
+ROM_START( robotronyo ) // "Release 4" Yellow label / Red stripe & Black print or Yellow label / Red stripe & Green print "B" type ROMs numbered 3005-13 through 3005-24
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2084_rom_1b_3005-1.e4",   0x00000, 0x1000, CRC(66c7d3ef) SHA1(f6d60e26c209c1df2cc01ac07ad5559daa1b7118) )
 	ROM_LOAD( "2084_rom_2b_3005-2.c4",   0x01000, 0x1000, CRC(5bc6c614) SHA1(4d6e82bc29f49100f7751ccfc6a9ff35695b84b3) )
@@ -2748,6 +2763,29 @@ ROM_START( robotronyo ) // Yellow label / Red stripe & Black print or Yellow lab
 	ROM_LOAD( "2084_rom_10b_3005-10.a7", 0x0d000, 0x1000, CRC(4a9d5f52) SHA1(d5ae801e60ed829e7ef5c54a18aefca54eae827f) ) // originally printed as "A" ROMs, the A is overwitten with "B"
 	ROM_LOAD( "2084_rom_11b_3005-11.c7", 0x0e000, 0x1000, CRC(2afc5e7f) SHA1(f3405be9ad2287f3921e7dbd9c5313c91fa7f8d6) )
 	ROM_LOAD( "2084_rom_12b_3005-12.e7", 0x0f000, 0x1000, CRC(45da9202) SHA1(81b3b2a72a3c871e8d7b9348056622c90a20d876) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "video_sound_rom_3_std_767.ic12", 0xf000, 0x1000, CRC(c56c1d28) SHA1(15afefef11bfc3ab78f61ab046701db78d160ec3) ) // P/N A-5342-09910
+
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
+	ROM_LOAD( "decoder_rom_6.3c", 0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09821
+ROM_END
+
+ROM_START( robotronr3 ) // "Release 3" Censored prototype seen in the Robotron promo videotape, recovered from the Vid Kidz dev system
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "r3_1.e4",                 0x00000, 0x1000, CRC(2e5433ee) SHA1(cee8701578889b62968d423f6ddb53f7afe0bdbb) )
+	ROM_LOAD( "r3_2.c4",                 0x01000, 0x1000, CRC(5bc6c614) SHA1(4d6e82bc29f49100f7751ccfc6a9ff35695b84b3) ) // == 2084_rom_2b_3005-2.c4
+	ROM_LOAD( "r3_3.a4",                 0x02000, 0x1000, CRC(37962af2) SHA1(6f9774b3ba9d9855b92b0be3eeaa2b631d0b5d4a) )
+	ROM_LOAD( "r3_4.e5",                 0x03000, 0x1000, CRC(9c140843) SHA1(14ebc056cde6cd9baf13199ab7ed76a8655dade4) )
+	ROM_LOAD( "r3_5.c5",                 0x04000, 0x1000, CRC(24726007) SHA1(8b4ed881f64e3ce73ac1a9ae2c184721c1ab37cc) )
+	ROM_LOAD( "r3_6.a5",                 0x05000, 0x1000, CRC(097e174d) SHA1(287b9a865806e4d47c172a458b0eb5a7fcdfc46b) )
+	ROM_LOAD( "r3_7.e6",                 0x06000, 0x1000, CRC(17a7ce34) SHA1(fe733128370e680655260671dc5ebec6a4a14795) )
+	ROM_LOAD( "r3_8.c6",                 0x07000, 0x1000, CRC(b6e8dbb9) SHA1(c92754816cd4a5c92a40055dde6d1e5820d72434) )
+	ROM_LOAD( "r3_9.a6",                 0x08000, 0x1000, CRC(e7b53345) SHA1(0abade37d956fe66f820c9ba15be009715f9c9e3) )
+	ROM_LOAD( "r3_10.a7",                0x0d000, 0x1000, CRC(1fb75828) SHA1(cf190089c7f32bca6d2f801bc539be22ad445f8e) )
+	ROM_LOAD( "r3_11.c7",                0x0e000, 0x1000, CRC(ccfaf7da) SHA1(172f9f24cc2099929021246b7109e03d7140367a) )
+	ROM_LOAD( "r3_12.e7",                0x0f000, 0x1000, CRC(cfdc9990) SHA1(ab6fad9211edf9f4ede933d9756348be11947a80) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "video_sound_rom_3_std_767.ic12", 0xf000, 0x1000, CRC(c56c1d28) SHA1(15afefef11bfc3ab78f61ab046701db78d160ec3) ) // P/N A-5342-09910
@@ -3962,14 +4000,15 @@ GAME( 1981, stargate,   0,        williams_base,    stargate, williams_state,  e
 
 GAME( 1982, conquest,   0,        williams_b1,      conquest, conquest_state,  empty_init,    ROT270, "Williams / Vid Kidz", "Conquest (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, robotron,   0,        williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz",                   "Robotron: 2084 (Solid Blue label)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1982, robotronyo, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz",                   "Robotron: 2084 (Yellow/Orange label)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, robotronun, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz (Unidesa license)", "Robotron: 2084 (Unidesa license)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1982, robotron,   0,        williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz",                   "Robotron: 2084 (Release 5, solid blue label)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, robotronyo, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz",                   "Robotron: 2084 (Release 4, yellow/orange label)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, robotronr3, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz",                   "Robotron: 2084 (Release 3, prototype)",           MACHINE_SUPPORTS_SAVE ) // censored prototype
+GAME( 1982, robotronun, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz (Unidesa license)", "Robotron: 2084 (Unidesa license)",                MACHINE_SUPPORTS_SAVE )
 
 // the 3 below are all noteworthy hacks of the Solid Blue set
-GAME( 1987, robotron87, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "hack", "Robotron: 2084 (1987 'shot-in-the-corner' bugfix)", MACHINE_SUPPORTS_SAVE ) // fixes a reset bug.
-GAME( 2012, robotron12, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "hack", "Robotron: 2084 (2012 'wave 201 start' hack)",       MACHINE_SUPPORTS_SAVE ) // includes sitc bug fix, used for competitive play.
-GAME( 2015, robotrontd, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "hack", "Robotron: 2084 (2015 'tie-die V2' hack)",           MACHINE_SUPPORTS_SAVE ) // inc. sitc fix, mods by some of the original developers, see backstory here http://www.robotron2084guidebook.com/gameplay/raceto100million/robo2k14_tie-die-romset/  (I guess there's a tie-die V1 before it was released to the public?)
+GAME( 1987, robotron87, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "hack", "Robotron: 2084 (1987 'shot-in-the-corner' bug fix)", MACHINE_SUPPORTS_SAVE ) // fixes a reset bug.  aka "Release 6"
+GAME( 2012, robotron12, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "hack", "Robotron: 2084 (2012 'wave 201 start' hack)",        MACHINE_SUPPORTS_SAVE ) // includes SitC bug fix, used for competitive play.
+GAME( 2015, robotrontd, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "hack", "Robotron: 2084 (2015 'tie-die V2' hack)",            MACHINE_SUPPORTS_SAVE ) // inc. SitC fix, mods by some of the original developers, see backstory here http://www.robotron2084guidebook.com/gameplay/raceto100million/robo2k14_tie-die-romset/  (I guess there's a tie-die V1 before it was released to the public?)
 
 GAME( 1982, joust,      0,        joust,            joust,    williams_state,  empty_init,    ROT0,   "Williams", "Joust (Green label)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1982, joustr,     joust,    joust,            joust,    williams_state,  empty_init,    ROT0,   "Williams", "Joust (Red label)",    MACHINE_SUPPORTS_SAVE )

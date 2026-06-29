@@ -695,7 +695,7 @@ void segaai_state::segaai(machine_config &config)
 	m_i8255->in_pc_callback().set(FUNC(segaai_state::i8255_portc_r));
 	m_i8255->out_pc_callback().set(FUNC(segaai_state::i8255_portc_w));
 
-	I8251(config, m_i8251, 0);
+	I8251(config, m_i8251);
 
 	SPEAKER(config, "mono").front_center();
 

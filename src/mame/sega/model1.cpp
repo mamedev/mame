@@ -804,7 +804,7 @@ void model1_state::irq_raise(int level)
 	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-IRQ_CALLBACK_MEMBER(model1_state::irq_callback)
+u8 model1_state::irq_callback()
 {
 	for (int i = 0; i < 8; i++)
 		if (BIT(m_irq_status, i))
@@ -912,7 +912,7 @@ void model1_state::model1_mem(address_map &map)
 
 	/* OBJ  */
 
-	/* COL  */ map(0x900000, 0x903fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	/* COL  */ map(0x900000, 0x903fff).ram().w(FUNC(model1_state::model1_paletteram_w)).share("palette");
 	/*      */ map(0x910000, 0x91bfff).ram().share("color_xlat");
 
 	/* EX0  */
@@ -1713,13 +1713,13 @@ void model1_state::model1(machine_config &config)
 	V60(config, m_maincpu, 32_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model1_state::model1_mem);
 	m_maincpu->set_addrmap(AS_IO, &model1_state::model1_io);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(model1_state::irq_callback));
+	m_maincpu->irq_cycle_callback().set(FUNC(model1_state::irq_callback));
 
 	// vf (at least) depends on default being 1-filled for ranking to initialize properly
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // 2x MB84256A-70LL + battery
 
-	GENERIC_FIFO_U32(config, "copro_fifo_in", 0);
-	GENERIC_FIFO_U32(config, "copro_fifo_out", 0);
+	GENERIC_FIFO_U32(config, "copro_fifo_in");
+	GENERIC_FIFO_U32(config, "copro_fifo_out");
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(model1_state::model1_interrupt), "screen", 0, 1);
 
@@ -1740,15 +1740,15 @@ void model1_state::model1(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 8192);
 
 	// create SEGA_MODEL1IO device *after* SCREEN device
-	model1io_device &ioboard(SEGA_MODEL1IO(config, "ioboard", 0));
+	model1io_device &ioboard(SEGA_MODEL1IO(config, "ioboard"));
 	ioboard.read_callback().set(m_dpram, FUNC(mb8421_device::left_r));
 	ioboard.write_callback().set(m_dpram, FUNC(mb8421_device::left_w));
 	ioboard.in_callback<0>().set_ioport("IN.0");
 	ioboard.in_callback<1>().set_ioport("IN.1");
 
-	MB8421(config, m_dpram, 0);
+	MB8421(config, m_dpram);
 
-	SEGAM1AUDIO(config, m_m1audio, 0);
+	SEGAM1AUDIO(config, m_m1audio);
 	m_m1audio->rxd_handler().set(m_m1uart, FUNC(i8251_device::write_rxd));
 
 	I8251(config, m_m1uart, 8000000); // uPD71051C, clock unknown
@@ -1784,7 +1784,7 @@ void model1_state::vr(machine_config &config)
 	ioboard.output_callback().set(FUNC(model1_state::vr_outputs_w));
 	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
-	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15112");
+	M1COMM(config, "m1comm").set_default_bios_tag("epr15112");
 }
 
 void model1_state::vformula(machine_config &config)
@@ -1801,7 +1801,7 @@ void model1_state::vformula(machine_config &config)
 	ioboard.output_callback().set(FUNC(model1_state::vr_outputs_w));
 	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
-	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15624");
+	M1COMM(config, "m1comm").set_default_bios_tag("epr15624");
 }
 
 void model1_state::swa(machine_config &config)
@@ -1819,7 +1819,7 @@ void model1_state::swa(machine_config &config)
 	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
 	SPEAKER(config, "mpeg", 2).front();
-	DSBZ80(config, m_dsbz80, 0);
+	DSBZ80(config, m_dsbz80);
 	m_dsbz80->add_route(0, "mpeg", 1.0, 0);
 	m_dsbz80->add_route(1, "mpeg", 1.0, 1);
 
@@ -1847,7 +1847,7 @@ void model1_state::wingwar(machine_config &config)
 
 	config.set_default_layout(layout_model1io2);
 
-	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15112");
+	M1COMM(config, "m1comm").set_default_bios_tag("epr15112");
 }
 
 void model1_state::wingwar360(machine_config &config)
@@ -1896,12 +1896,12 @@ void model1_state::netmerc(machine_config &config)
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT   MACHINE     INPUT       CLASS         INIT        ROTATION  COMPANY  FULLNAME              FLAGS
+//    YEAR  NAME        PARENT   MACHINE     INPUT       CLASS         INIT        ROTATION  COMPANY  FULLNAME                    FLAGS
 GAME( 1993, vf,         0,       vf,         vf,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Fighter",           MACHINE_NOT_WORKING )
 GAMEL(1992, vr,         0,       vr,         vr,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Racing",            0, layout_vr )
 GAME( 1993, vformula,   vr,      vformula,   vr,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Formula",           MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, swa,        0,       swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars Arcade (US)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
-GAME( 1993, swaj,       swa,     swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars Arcade (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1994, swa,        0,       swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars (Sega, US)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1994, swaj,       swa,     swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars (Sega, Japan)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
 GAME( 1994, wingwar,    0,       wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (World)",         0 )
 GAME( 1994, wingwaru,   wingwar, wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (US)",            0 )
 GAME( 1994, wingwarj,   wingwar, wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (Japan)",         0 )
