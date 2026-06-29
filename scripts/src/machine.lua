@@ -4336,6 +4336,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/z8010.h,MACHINES["Z8010"] = true
+---------------------------------------------------
+
+if (MACHINES["Z8010"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/z8010.cpp",
+		MAME_DIR .. "src/devices/machine/z8010.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/z8536.h,MACHINES["Z8536"] = true
 ---------------------------------------------------
 
