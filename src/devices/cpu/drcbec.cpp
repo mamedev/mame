@@ -223,7 +223,7 @@ template <typename T> constexpr uint8_t FLAGS_V_SUB(T r, T a, T b)     { return 
 template <typename T> constexpr uint8_t FLAGS_V_ADD(T r, T a, T b)     { return ((~(a ^ b) & (a ^ r)) >> ((sizeof(T) * 8) - FLAG_BIT_V - 1)) & FLAG_V; }
 
 // compute N and Z flags for operations
-template <typename T> constexpr uint8_t FLAGS_NZ(T v)                  { return ((v >> ((sizeof(T) * 8) - FLAG_BIT_S - 1)) & FLAG_S) | (!v ? FLAG_BIT_Z : 0); }
+template <typename T> constexpr uint8_t FLAGS_NZ(T v)                  { return ((v >> ((sizeof(T) * 8) - FLAG_BIT_S - 1)) & FLAG_S) | (!v ? FLAG_Z : 0); }
 template <typename T> constexpr uint8_t FLAGS_NZCV_ADD(T r, T a, T b)  { return FLAGS_NZ(r) | FLAGS_C_ADD(a, b) | FLAGS_V_ADD(r, a, b); }
 template <typename T> constexpr uint8_t FLAGS_NZCV_ADDC(T r, T a, T b) { return FLAGS_NZ(r) | FLAGS_C_ADDC(r, a, b) | FLAGS_V_ADD(r, a, b); }
 template <typename T> constexpr uint8_t FLAGS_NZCV_SUB(T r, T a, T b)  { return FLAGS_NZ(r) | FLAGS_C_SUB(a, b) | FLAGS_V_SUB(r, a, b); }
