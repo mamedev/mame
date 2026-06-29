@@ -263,6 +263,7 @@ private:
 		u32 fsa;
 		u32 dsa;
 		u16 dsp;
+		u8 x_dot_offs;
 		u16 ofx;
 		u16 ofy;
 		u16 fbw;

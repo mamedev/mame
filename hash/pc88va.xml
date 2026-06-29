@@ -90,7 +90,6 @@ Operating Systems
 		<year>19??</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
-1st sequence should [OFX/OFY] scroll
 3rd sequence looks slow, [SGP]?
 Transition fades out too late, sprite should supposedly fade out before reaching top of screen, requires [IDP] IBF flag
 Transition between 3rd and 4th sequences don't look right, [IDP]
@@ -423,9 +422,9 @@ Hangs on Utility menu, [FDC] chrn=(18, 0, 1, 256)
 		<publisher>ウインキーソフト (Winky Soft)</publisher>
 		<notes><![CDATA[
 Display off in places during intro
-[gfx] broken scroll bases for main menu
-[gfx] Requires fractional DOT scrolling (horizontal)
 [gfx] wrong draw mode for status bar in gameplay (currently concealed by picture mask)
+[gfx] scroll desyncs in places during gameplay
+[SGP] triggers SF = 1 draws with laser beams at stage 1-1 boss
 ]]></notes>
 		<info name="alt_title" value="オルテウス" />
 		<info name="usage" value="Kana Lock on pauses the game"/>
@@ -504,7 +503,6 @@ Display off in places during intro
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
 [SGP] extensive VD usage in gameplay
-[gfx] Requires fractional DOT scrolling (horizontal)
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1296112">
@@ -558,8 +556,7 @@ Burps on [FDC] access after disk swap with program and player disks, trying to s
 		<notes><![CDATA[
 [IDP] cursor blink present on title screen (verify)
 May crash with disk error when entering winning animation (verify, can't reproduce)
-[gfx] Winning animation a bit offset, requires fractional horizontal scrolling
-Winning animation uses [IDP] text transpen with upper bits set, unknown purpose
+[gfx] Winning animation a bit offset, not fractional horizontal scrolling?
 [OPNA] seems to cut off shortly on intro and winning screen compared to VAEG
 ]]></notes>
 		<info name="alt_title" value="上海" />
@@ -1254,7 +1251,6 @@ All disks fail initial bootstrap [FDC]
 [gfx] unhandled RGB565 transparency
 [gfx] Glitched screen right after selecting new game
 [gfx] Has badly colored sprites on character select, needs h/v scrolling for background
-[gfx] Requires fractional DOT scrolling (horizontal) starting from stage 2
 ]]></notes>
 		<info name="developer" value="Fredia" />
 		<info name="alt_title" value="ばる〜んぶ れ〜か〜" />
@@ -1270,7 +1266,7 @@ All disks fail initial bootstrap [FDC]
 		<year>1996</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-[gfx] requires h/v scrolling for background and gameplay
+[gfx] picture mask should cut off sprite layer too
 ]]></notes>
 		<info name="developer" value="Fredia" />
 		<part name="flop1" interface="floppy_5_25">
@@ -1286,8 +1282,8 @@ All disks fail initial bootstrap [FDC]
 		<year>2006</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-[gfx] uses various forms of picture mask
-Runs too slow?
+[gfx] slight offset for some layers, one section currently looks garbled
+Runs too slow
 ]]></notes>
 		<info name="developer" value="Shinra" />
 		<info name="alt_title" value="ハレ晴レユカイ" />
@@ -1311,8 +1307,6 @@ Runs too slow?
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-[gfx] Title screen doesn't show text layer? (verify)
-[IDP] sprites missing wraparound on top edge (verify)
 [IDP] sprites wobble when scrolling up/down (verify)
 Runs too slow
 Crashes after stage 1 (fixed, cfr. usage)
@@ -1359,10 +1353,9 @@ Crashes after stage 1 (fixed, cfr. usage)
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-[gfx] Gameplay don't mask bullets on right side, needs picture mask
-[gfx] background needs vertical scrolling
-Runs too slow
+Runs erratically (speed up when no enemies on screen, slowdown to a crawl when there are)
 Needs joystick in otherwise it loops on title screen
+Some [IDP] bullet sprites may go on top of status bar, check picture mask
 ]]></notes>
 		<info name="developer" value="Upyolic Soft" />
 		<info name="alt_title" value="最終平気UPOプレリリース" />
@@ -1380,8 +1373,6 @@ Needs joystick in otherwise it loops on title screen
 		<year>2023</year>
 		<publisher>Inufuto</publisher>
 		<notes><![CDATA[
-[gfx] Requires fractional DOT scrolling (horizontal)
-[gfx] Should require color primask for right panel score display
 [DE-9] keeps shooting when player press button first time around
 https://youtu.be/7ltdrUPz91w
 ]]></notes>
@@ -1496,7 +1487,7 @@ https://youtu.be/oJEUR7FhVlU
 		<year>2023</year>
 		<publisher>Inufuto</publisher>
 		<notes><![CDATA[
-Randomly draws with the wrong [gfx] wrong palette bank, [FDC]?
+Randomly draws with the wrong [gfx] palette bank, [FDC]?
 https://youtu.be/zMWhBRD8cdM
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
@@ -1526,7 +1517,7 @@ https://youtu.be/zxy8lTZ_w_k
 		<year>2023</year>
 		<publisher>Inufuto</publisher>
 		<notes><![CDATA[
-Randomly draws with the wrong [gfx] wrong palette bank, [FDC]?
+Randomly draws with the wrong [gfx] palette bank, [FDC]?
 https://youtu.be/JIK3ruhURG4
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
@@ -1583,7 +1574,7 @@ https://youtu.be/yLf945xs23Y
 		<year>2023</year>
 		<publisher>Inufuto</publisher>
 		<notes><![CDATA[
-Randomly draws with the wrong [gfx] wrong palette bank, [FDC]?
+Randomly draws with the wrong [gfx] palette bank, [FDC]?
 https://youtu.be/JtRkC5ffaYc
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
