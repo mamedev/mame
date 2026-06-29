@@ -93,6 +93,8 @@ protected:
 private:
 	u8 m_okidata = 0;
 	u16 m_service = 0;
+	bool m_topk = false;
+	bool m_botk = false;
 	required_device<v25_device> m_maincpu;
 	required_device<m48t58_device> m_rtc;
 	required_device<okim6376_device> m_oki;
@@ -175,9 +177,10 @@ void st25_state::p2_w(u8 data)
 void st25_state::service_strobe_w(u8 data)
 {
 	m_lcd->rs_w(BIT(m_service,8));
+	// 9 NC
+	m_botk = BIT(m_service, 10);
+	m_topk = BIT(m_service, 11);
 	m_lcd->e_w(BIT(m_service,12));
-	
-	// TODO: 0x04 and 0x08 control the top and bottom halves of the keyboard
 
 	m_lcd->db_w(m_service & 0xff);
 }
@@ -228,6 +231,8 @@ void st25_state::machine_start()
 {
 	save_item(NAME(m_okidata));
 	save_item(NAME(m_service));
+	save_item(NAME(m_topk));
+	save_item(NAME(m_botk));
 }
 
 void st25_state::st25_1(machine_config &config)
