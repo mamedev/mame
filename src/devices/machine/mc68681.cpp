@@ -1429,17 +1429,18 @@ void duart_channel::rx_fifo_push(uint8_t data, uint8_t errors)
 void duart_channel::tra_complete()
 {
 	// The transmit shift register has just emptied.  If another character is
-	// waiting in the THR, transfer it to the shift register and assert TxRDY:
-	// per the datasheet the THR->shift transfer is where the TxRDY conditions
-	// are re-asserted, providing "one full character time of buffering".  If the
-	// THR is empty the transmitter is now idle, so set TxEMT (TxRDY is already
-	// set from the previous transfer).
+	// waiting in the THR, transfer it to the shift register and assert TxRDY
+	// here: per the datasheet the THR->shift transfer is where the TxRDY
+	// conditions are re-asserted, providing "one full character time of
+	// buffering".  Firmware that pipelines on TxRDY (e.g. the Ensoniq VFX
+	// inter-board link and MIDI) depends on TxRDY appearing at this point rather
+	// than one character later.
 	//
-	// Asserting TxRDY here, at the transfer -- rather than in the idle branch --
-	// both prevents the transmitter from deadlocking when TxRDY would otherwise
-	// fail to re-assert on a CPU-write / final-bit-time race, and preserves the
-	// one-character buffering window that firmware polling or pipelining on TxRDY
-	// relies on.
+	// If the THR is empty the transmitter is now idle: assert both TxRDY (THR
+	// empty) and TxEMT (shift register empty).  Asserting TxRDY unconditionally
+	// when going idle is essential -- it guarantees a polled transmitter can
+	// never be left spinning with TxRDY clear and the transmit clock stopped
+	// (the pc532 console hang).
 	if (m_tx_data_in_buffer)
 	{
 		transmit_register_setup(m_tx_data);
@@ -1450,7 +1451,7 @@ void duart_channel::tra_complete()
 	}
 	else
 	{
-		SR |= STATUS_TRANSMITTER_EMPTY;
+		SR |= STATUS_TRANSMITTER_READY | STATUS_TRANSMITTER_EMPTY;
 		update_interrupts();
 	}
 }
