@@ -908,7 +908,11 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 //	const int layer_inc = (!is_5bpp) + 1;
 	const int layer_fixed = is_5bpp + 1;
 
-	for (int layer_n = which; layer_n < 4; layer_n ++)
+	const u8 start_layer = which ? 1 : 3;
+
+	// draw in reverse order, avoid garbage in olteus after game overs
+	// TODO: confirm me, may be actually using pdrawgfx or combined height disable?
+	for (int layer_n = start_layer; layer_n >= 0; layer_n --)
 	{
 		// layer A: 0, 2, 3
 		// layer B: 1
@@ -1497,7 +1501,7 @@ void pc88va_state::recompute_parameters()
 	m_vertical_magnify = (m_crtc_regs[0x00] & 0xc0) == 0x80 ? 0x8000 : 0x10000;
 	// TODO: actual clock source must be external, assume known PC-88 XTALs
 	// TODO: a bit off compared to PC-88 equivalent with the configured values
-	// TODO: famista pukes a 31.2 Hz vertical in 24kHz mode
+	// famista was puking a 31.2 Hz vertical in 24kHz mode, can't repro anymore (?)
 	// (sets 0xc0 regardless of CRT Mode setting)
 	const int clock_speed = !!BIT(m_crtc_regs[0x00], 6) ? (31'948'800 / 4) : (28'636'363 / 2);
 

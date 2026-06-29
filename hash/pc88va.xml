@@ -90,6 +90,7 @@ Operating Systems
 		<year>19??</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
+1st sequence now runs too slow (?)
 3rd sequence looks slow, [SGP]?
 Transition fades out too late, sprite should supposedly fade out before reaching top of screen, requires [IDP] IBF flag
 Transition between 3rd and 4th sequences don't look right, [IDP]
@@ -248,14 +249,17 @@ VIDEO.BAT has various superimpose effects, requires dedicated board
 
 	<software name="famista" supported="no">
 		<description>Family Stadium</description>
-		<year>19??</year>
+		<!-- newspaper/stadium has ads for pc8801_flop:veigues -->
+		<year>1988?</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<notes><![CDATA[
 [SGP] playfield artifacts (press button 2 from pitcher side in 2p play)
 Lists dual port 1/2 as a unsupported [DE-9] input method
 Win/Lose newspaper screen has [OFX/OFY] bug, and an [IDP] one frame of sprite lag
 [IDP] text draws below sprites (verify)
-How to exit from attract mode once game enters it?
+How to exit from attract mode (2 innings?) once game enters it?
+NOTE: famist89 has no attract mode, bad dump?
+Throws an "OUT" shout when selecting 3rd option "new pennant race", bad dump?
 ]]></notes>
 		<info name="alt_title" value="ファミリースタジアム" />
 		<info name="usage" value="Menuing works with keyboard only until game prompts you to use a joystick"/>
@@ -266,10 +270,12 @@ How to exit from attract mode once game enters it?
 			</dataarea>
 		</part>
 
+		<!-- baddump: allegedly, see above. -->
+		<!-- Alternatively this set is a demo, and the user disk is for the other set? -->
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1281968">
-				<rom name="famista_2.d88" size="1281968" crc="29cfa16a" sha1="2a343ef96852ae882730cfe340cb130d48f17bc5"/>
+				<rom name="famista_2.d88" size="1281968" crc="29cfa16a" sha1="2a343ef96852ae882730cfe340cb130d48f17bc5" status="baddump" />
 			</dataarea>
 		</part>
 
@@ -284,10 +290,11 @@ How to exit from attract mode once game enters it?
 	<!-- Mislabeled disk -->
 	<software name="famist89" cloneof="famista" supported="no">
 		<description>Family Stadium (alt)</description>
-		<year>19??</year>
+		<year>1988?</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<notes><![CDATA[
-(same as famista)
+(same as famista, except it allows for a new season and has no "attract mode")
+Untested user disk creation
 ]]></notes>
 		<info name="alt_title" value="ファミリースタジアム" />
 		<info name="usage" value="Menuing works with keyboard only until game prompts you to use a joystick"/>
@@ -311,11 +318,12 @@ How to exit from attract mode once game enters it?
 
 	<software name="famist89a" supported="no">
 		<description>Family Stadium '89 - Pennant Race Hen</description>
-		<year>19??</year>
+		<!-- newspaper has ads for pc8801_flop:harakiri -->
+		<year>1989?</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<notes><![CDATA[
-(same as famista)
-Runs slow in gameplay
+(same as famista, except it allows for a new season)
+Untested user disk creation
 ]]></notes>
 		<info name="alt_title" value="ファミリースタジアム'89ペナントレース編" />
 
@@ -384,7 +392,8 @@ This is a undumped coverdisk, pages 374~375 of Login 1987.10 mag, also cfr. http
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<notes><![CDATA[
 Burps on [FDC] access after disk swap with program and player disks, trying to scan chrn=(4, 0, 1, 256)
-Hangs on Utility menu, [FDC] chrn=(18, 0, 1, 256)
+Hangs on Utility menu, [FDC] chrn=(18, 0, 1, 256), very rarely manages to boot
+cfr. around PC=39ba1 where it tries to load sound data, issues brk 80h which never reaches the FDC
 ]]></notes>
 		<info name="alt_title" value="マイトアンドマジック2" />
 		<sharedfeat name="mouseport_default" value="mouse"/>
@@ -425,7 +434,8 @@ Hangs on Utility menu, [FDC] chrn=(18, 0, 1, 256)
 		<notes><![CDATA[
 [gfx] scroll desyncs in places during gameplay (one line off)
 [SGP] triggers SF = 1 draws with stage bosses
-Corrupts itself on prolonged playthrough (stage 2-1 boss, disk D)
+[IDP] sprite glitches towards the end of stage 1-2 and successive stages.
+Corrupts itself on prolonged playthrough (stage 2-1 boss, disk D, test me in olteusa)
 ]]></notes>
 		<info name="alt_title" value="オルテウス" />
 		<info name="usage" value="Kana Lock on pauses the game"/>
@@ -576,7 +586,8 @@ May crash with disk error when entering winning animation (verify, can't reprodu
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<notes><![CDATA[
 Runs at half speed
-[gfx] is white flash (backdrop) during maiden prayer in intro supposed to be full screen? (verify)
+[gfx] is white flash (backdrop) during maiden prayer in intro supposed to be full screen? (fixed)
+[gfx] corrupted layer after game over, in intro
 Omake: if sound irqs don't run then needs to press key 0 pad to move on
 Omake: CG intro scene with thunderstorm has a blurry signature concealed by picture mask
 [IDP] concealed text line after said scene (btanb)
