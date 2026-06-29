@@ -138,6 +138,7 @@ Transition between 3rd and 4th sequences don't look right, [IDP]
 	<software name="animefrm" supported="no">
 		<!-- PS88-VA101-HMW subtitle on cover -->
 		<description>Anime Framer (v1.0)</description>
+		<!-- 1988 according to about section -->
 		<year>1987</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
@@ -165,6 +166,7 @@ Transition between 3rd and 4th sequences don't look right, [IDP]
 
 	<software name="paint" cloneof="animefrm" supported="no">
 		<description>Anime Framer (v1.0 alt)</description>
+		<!-- 1988 according to about section -->
 		<year>1987</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
@@ -421,10 +423,9 @@ Hangs on Utility menu, [FDC] chrn=(18, 0, 1, 256)
 		<year>1987</year>
 		<publisher>ウインキーソフト (Winky Soft)</publisher>
 		<notes><![CDATA[
-Display off in places during intro
-[gfx] wrong draw mode for status bar in gameplay (currently concealed by picture mask)
-[gfx] scroll desyncs in places during gameplay
-[SGP] triggers SF = 1 draws with laser beams at stage 1-1 boss
+[gfx] scroll desyncs in places during gameplay (one line off)
+[SGP] triggers SF = 1 draws with stage bosses
+Corrupts itself on prolonged playthrough (stage 2-1 boss, disk D)
 ]]></notes>
 		<info name="alt_title" value="オルテウス" />
 		<info name="usage" value="Kana Lock on pauses the game"/>

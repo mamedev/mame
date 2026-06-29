@@ -1078,7 +1078,7 @@ void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &
 		for(int x = cliprect.min_x; x <= cliprect.max_x + x_dot_offs; x += 2)
 		{
 			u16 x_char = (x >> 1);
-			u32 bitmap_offset = (line_offset + x_char - (param.ofx >> 6)) & 0x3ffff;
+			u32 bitmap_offset = (line_offset + x_char) & 0x3ffff;
 
 			for (int xi = 0; xi < 2; xi ++)
 			{
@@ -1100,7 +1100,7 @@ void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &c
 
 	//printf("%d %d %d %08x %d\n", y_min, y_max, fb_width, start_offset, fb_height);
 	// TODO: fix scrolling, add x dot scroll
-	const u32 base_address = (param.fsa & 0x20000) | (param.dsa & 0x1ffff);
+	const u32 base_address = param.dsa & 0x3ffff;
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -1108,7 +1108,7 @@ void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &c
 
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			u32 bitmap_offset = (line_offset + x - (param.ofx >> 6)) & 0x3ffff;
+			u32 bitmap_offset = (line_offset + x) & 0x3ffff;
 
 			u8 color = m_gvram[bitmap_offset] & 0x1f;
 
@@ -1138,7 +1138,7 @@ void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &c
 
 		for(int x = cliprect.min_x; x <= cliprect.max_x + x_dot_offs; x++)
 		{
-			u32 bitmap_offset = (line_offset + x - (param.ofx >> 6)) & 0x3ffff;
+			u32 bitmap_offset = (line_offset + x) & 0x3ffff;
 
 			uint32_t color = (m_gvram[bitmap_offset] & 0xff);
 			const int res_x = x - x_dot_offs;
@@ -1157,22 +1157,25 @@ void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &c
 	}
 }
 
+// pc88vad
 void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 which)
 {
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 	const u32 base_address = (param.dsa & 0x3ffff);
+	const u32 y_wrap = param.fbl - param.ofy;
 	// 0 or 16 valid
 	const u8 x_dot_offs = BIT(param.x_dot_offs, 4);
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		// pc88vad requires halved pitch for first screen
-		const u32 line_offset = ((y * param.fbw >> 1) + base_address) & 0x3ffff;
+		const int y_latch = y - param.dsp;
+		const u32 latched_address = (y_latch >= y_wrap) ? (param.fsa + param.ofx - y_wrap * param.fbw) : base_address;
+		const u32 line_offset = (y_latch * param.fbw) + latched_address;
 
 		for(int x = cliprect.min_x; x <= cliprect.max_x + x_dot_offs; x++)
 		{
-			u32 bitmap_offset = ((line_offset + x - (param.ofx >> 1)) << 1) & 0x3ffff;
+			u32 bitmap_offset = (line_offset + (x << 1)) & 0x3fffe;
 
 			uint16_t color = (m_gvram[bitmap_offset] & 0xff) | (m_gvram[bitmap_offset + 1] << 8);
 			const int res_x = x - x_dot_offs;
@@ -1202,6 +1205,7 @@ void pc88va_state::draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &c
 
 	// alantia disables 4th layer, uses it as local GFX storage
 	const u8 num_banks = m_g3msk + 3;
+	// TODO: implement OFX/OFY (different than the other modes, unused by all known games)
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -1210,7 +1214,7 @@ void pc88va_state::draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &c
 		for(int x = cliprect.min_x; x <= cliprect.max_x + x_dot_offs; x += 8)
 		{
 			u16 x_char = (x >> 3);
-			u32 bitmap_offset = (line_offset + x_char - (param.ofx >> 2)) & 0x0ffff;
+			u32 bitmap_offset = (line_offset + x_char) & 0x0ffff;
 
 			for (int xi = 0; xi < 8; xi ++)
 			{
