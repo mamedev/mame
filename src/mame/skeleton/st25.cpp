@@ -172,9 +172,9 @@ void st25_state::p2_w(u8 data)
 
 void st25_state::service_strobe_w(u8 data)
 {
-	m_service = data;
-	m_lcd->e_w((m_service >> 8) & 0x01);
-	m_lcd->rs_w((m_service >> 8) & 0x10);
+	m_lcd->rs_w((m_service >> 8) & 0x01);
+	m_lcd->e_w((m_service >> 8) & 0x10);
+	
 	// TODO: 0x04 and 0x08 control the top and bottom halves of the keyboard
 
 	m_lcd->db_w(m_service & 0xff);
