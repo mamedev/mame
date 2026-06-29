@@ -100,12 +100,12 @@ private:
 	void io_map(address_map &map) ATTR_COLD;
 	void program_map_st25_1(address_map &map) ATTR_COLD;
 	void program_map_st25_3(address_map &map) ATTR_COLD;
-	
+
 	void io5_w(uint8_t data);
 	void p2_w(uint8_t data);
 	void service_strobe_w(uint8_t data);
 	//void txd0_w(uint8_t data);
-	
+
 };
 
 
@@ -186,9 +186,9 @@ void st25_state::service_strobe_w(uint8_t data)
 /*
 void st25_state::txd0_w(uint8_t data)
 {
-	// m_service is standing in for 2 HEF4094 shift registers
-	// TODO: shifting this by 8 or 1 bits depends on the serial implementation of the V25
-	m_service = m_service << 8 | data;
+    // m_service is standing in for 2 HEF4094 shift registers
+    // TODO: shifting this by 8 or 1 bits depends on the serial implementation of the V25
+    m_service = m_service << 8 | data;
 }
 */
 
@@ -239,7 +239,7 @@ void st25_state::st25_1(machine_config &config)
 	V25(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_IO, &st25_state::io_map);
 	m_maincpu->set_addrmap(AS_PROGRAM, &st25_state::program_map_st25_1);
-	
+
 	m_maincpu->p2_out_cb().set(FUNC(st25_state::p2_w));
 	//m_maincpu->txd0_cb().set(FUNC(st25_state::txd0_w)); // Service
 	//m_maincpu->txd1_cb().set(FUNC(st25_state::txd1_w)); // Money
@@ -540,7 +540,7 @@ ROM_END
 ROM_START(mtclssic)
 	ROM_REGION(0x20000, "coin", 0)
 	ROM_LOAD("w29ee011__191_043_v5.05_10.05.04__emp_nsm_euro", 0x00000, 0x20000, CRC(079de5e5) SHA1(7f634769a5d9f56d6dae7a66e21b155b21787c36))
-	
+
 	ROM_REGION(0x04000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
