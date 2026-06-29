@@ -195,6 +195,23 @@ void sonix16_device::inten_w(u16 data)
 	m_inten = data;
 }
 
+u16 sonix16_device::wdt_r()
+{
+	return m_wdt | 0x4000;
+}
+
+void sonix16_device::wdt_w(u16 data)
+{
+	// Watchdog timer (TODO)
+	if (!BIT(data, 14))
+		logerror("%s: WDT reset\n", machine().describe_context());
+	if (BIT(~data & m_wdt, 15))
+		logerror("%s: WDT disabled\n", machine().describe_context());
+	if (BIT(data & ~m_wdt, 15))
+		logerror("%s: WDT enabled\n", machine().describe_context());
+	m_wdt = data;
+}
+
 u16 sonix16_device::iosw_r()
 {
 	return m_iosw;
@@ -221,6 +238,7 @@ void sonix16_device::io_map(address_map &map)
 	map(0x1a, 0x1b).rw(FUNC(sonix16_device::iybk_r), FUNC(sonix16_device::iybk_w));
 	map(0x1c, 0x1d).rw(FUNC(sonix16_device::ixbkram_r), FUNC(sonix16_device::ixbkram_w));
 	map(0x20, 0x20).rw(FUNC(sonix16_device::inten_r), FUNC(sonix16_device::inten_w));
+	map(0x29, 0x29).rw(FUNC(sonix16_device::wdt_r), FUNC(sonix16_device::wdt_w));
 	map(0x3a, 0x3a).rw(FUNC(sonix16_device::iosw_r), FUNC(sonix16_device::iosw_w));
 }
 
@@ -271,6 +289,7 @@ void sonix16_device::device_start()
 	save_item(NAME(m_ixbkram));
 	save_item(NAME(m_sp));
 	save_item(NAME(m_inten));
+	save_item(NAME(m_wdt));
 	save_item(NAME(m_iosw));
 	save_item(NAME(m_pc));
 }
@@ -282,6 +301,7 @@ void sonix16_device::device_reset()
 	m_ssf = 0;
 	m_rambk = 0;
 	m_inten = 0;
+	m_wdt = 0x8000;
 }
 
 u16 sonix16_device::get_reg(unsigned r) const noexcept

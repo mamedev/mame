@@ -69,6 +69,8 @@ private:
 	void ixbkram_w(offs_t offset, u16 data);
 	u16 inten_r();
 	void inten_w(u16 data);
+	u16 wdt_r();
+	void wdt_w(u16 data);
 	u16 iosw_r();
 	void iosw_w(u16 data);
 
@@ -94,6 +96,7 @@ private:
 	u32 m_pc;
 	u16 m_sp;
 	u16 m_inten;
+	u16 m_wdt;
 	u16 m_iosw;
 	s32 m_icount;
 };
