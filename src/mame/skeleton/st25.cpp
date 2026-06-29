@@ -183,15 +183,6 @@ void st25_state::service_strobe_w(uint8_t data)
 	m_lcd->db_w(m_service & 0xff);
 }
 
-/*
-void st25_state::txd0_w(uint8_t data)
-{
-    // m_service is standing in for 2 HEF4094 shift registers
-    // TODO: shifting this by 8 or 1 bits depends on the serial implementation of the V25
-    m_service = m_service << 8 | data;
-}
-*/
-
 static INPUT_PORTS_START(st25)
 	PORT_START("SERVICE0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
