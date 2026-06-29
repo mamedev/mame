@@ -47,7 +47,7 @@ RAM: Mosel-Vitelic V62C518256LL-70P 32Kx8 SRAM
  |  TMS27C020   | // Sound ROM IC1
  |              |
  | [CONNECTOR]  |
- _______________
+ ________________
 
  Unimint Arena reference: https://www.youtube.com/watch?v=EEvGKFtBhi8
  Xeno reference: https://www.youtube.com/watch?v=EGBh0htXmbc
@@ -88,7 +88,8 @@ public:
 	void st25_3(machine_config &config) ATTR_COLD;
 
 private:
-	u16 m_service;
+	u8 m_okidata = 0;
+	u16 m_service = 0;
 	required_device<v25_device> m_maincpu;
 	required_device<m48t58_device> m_rtc;
 	required_device<okim6376_device> m_oki;
@@ -104,8 +105,6 @@ private:
 	void io5_w(u8 data);
 	void p2_w(u8 data);
 	void service_strobe_w(u8 data);
-	//void txd0_w(u8 data);
-
 };
 
 
@@ -163,14 +162,12 @@ void st25_state::program_map_st25_3(address_map &map)
 
 void st25_state::io5_w(u8 data)
 {
-	// pulse ST line
-	m_oki->st_w(1);
-	m_oki->st_w(0);
+	m_oki->write(m_okidata);
 }
 
 void st25_state::p2_w(u8 data)
 {
-	m_oki->write(data);
+	m_okidata = data;
 }
 
 void st25_state::service_strobe_w(u8 data)
