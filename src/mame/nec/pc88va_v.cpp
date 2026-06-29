@@ -918,10 +918,11 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 			continue;
 		}
 
-		// on layer = 1 fsa is always 0x20000, cfr. shanghai
-		// (HW quirk, described in the docs)
+		// On layer = 1 FSA is always 0x20000, cfr. shanghai
 		// also animefrm swaps this with layer 2 (main canvas)
-		const u32 fsa = (layer_n == layer_fixed) ? 0x20000
+		// We assume that lower part isn't ignored, cfr. DSA below.
+		const u32 fsa = (layer_n == layer_fixed)
+			? 0x20000 | (fb_strip_regs[0x00 / 2] & 0xfffc)
 			: (fb_strip_regs[0x00 / 2] & 0xfffc) | ((fb_strip_regs[0x02 / 2] & 0x3) << 16);
 
 		u16 fbl = (fb_strip_regs[0x06 / 2] & 0x3ff) + 1;
@@ -930,10 +931,15 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 			fbl = 0x400;
 
 		const u8 x_dot_offs = fb_strip_regs[0x08 / 2];
-		const u16 ofx = fb_strip_regs[0x0a / 2] & 0x7fc;
-		const u16 ofy = fb_strip_regs[0x0c / 2] & 0x3ff;
-		// ... shanghai and olteus (title) wants DSA fixed at 0x20000 for layer = 1 as well
-		const u32 dsa = (layer_n == layer_fixed) ? 0x20000
+
+		// olteus sets 0xffff to both ofx/ofy layer 1 in shop, those are ignored as well
+		const u16 ofx = layer_n == layer_fixed ? 0 : fb_strip_regs[0x0a / 2] & 0x7fc;
+		const u16 ofy = layer_n == layer_fixed ? 0 : fb_strip_regs[0x0c / 2] & 0x3ff;
+
+		// shanghai and olteus (title) wants DSA fixed at 0x2'**** for layer = 1 as well
+		// olteus is more picky in shop, and needs the lower part not being ignored
+		const u32 dsa = (layer_n == layer_fixed)
+			? 0x20000 | (fb_strip_regs[0x0e / 2] & 0xfffc)
 			: ((fb_strip_regs[0x0e / 2] & 0xfffc) | ((fb_strip_regs[0x10 / 2] & 0x3) << 16));
 
 		const u16 dsh = fb_strip_regs[0x12 / 2] & 0x1ff;
