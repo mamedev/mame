@@ -278,6 +278,12 @@ public:
 	sst_39vf020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class sst_39vf040_device : public intelfsh8_device
+{
+public:
+	sst_39vf040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 class sst_49lf020_device : public intelfsh8_device
 {
 public:
@@ -449,6 +455,7 @@ DECLARE_DEVICE_TYPE(SST_39SF010,             sst_39sf010_device)
 DECLARE_DEVICE_TYPE(SST_39SF020,             sst_39sf020_device)
 DECLARE_DEVICE_TYPE(SST_39SF040,             sst_39sf040_device)
 DECLARE_DEVICE_TYPE(SST_39VF020,             sst_39vf020_device)
+DECLARE_DEVICE_TYPE(SST_39VF040,             sst_39vf040_device)
 DECLARE_DEVICE_TYPE(SST_49LF020,             sst_49lf020_device)
 
 DECLARE_DEVICE_TYPE(SHARP_LH28F400,          sharp_lh28f400_device)
