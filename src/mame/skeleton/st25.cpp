@@ -268,7 +268,7 @@ void st25_state::st25_1(machine_config &config)
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
-	OKIM6376(config, m_oki, 128000).add_route(ALL_OUTPUTS, "mono", 0.8); // clock adjustable by a glued pot
+	OKIM6376(config, m_oki, 64000).add_route(ALL_OUTPUTS, "mono", 0.8); // clock adjustable by a glued pot
 }
 
 void st25_state::st25_2(machine_config &config)
