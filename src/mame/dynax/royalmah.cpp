@@ -4803,7 +4803,7 @@ ROM_START( suzume )
 	ROM_LOAD( "ic6k.bin",   0x0000, 0x0020, CRC(97e1defe) SHA1(b5002218b2292f7623dd9a205ce183dedeec03f1) )
 ROM_END
 
-ROM_START( jongshin )
+ROM_START( jongshin ) // standard Dyna base board + D8702158L1 sub board
 	ROM_REGION( 0x28000, "maincpu", 0 ) // all 2732
 	ROM_LOAD( "js1.p1",     0x00000, 0x1000, CRC(0c33eb1c) SHA1(4258f2df8e9d4d3fd3fd77c555bd36ced601c45f) )
 	ROM_LOAD( "js2.p2",     0x01000, 0x1000, CRC(a74bfa19) SHA1(378ec5dcddbe1c1e66b9ec0576b898442e3ba89c) )

@@ -18713,6 +18713,7 @@ pwrflip
 fever13
 goldstrk
 lastbank
+lastbank130j
 lpierrot
 mir7hg
 mir7hgt
@@ -43458,6 +43459,9 @@ caramball
 @source:skeleton/cardinal.cpp
 cardinal
 
+@source:skeleton/carnival37.cpp
+carniv37
+
 @source:skeleton/cbnt2039.cpp
 cbnt2039
 
@@ -43506,6 +43510,9 @@ cortex
 
 @source:skeleton/cosmicos.cpp
 cosmicos
+
+@source:skeleton/cosmo68k.cpp
+exfever
 
 @source:skeleton/cp1.cpp
 cp1
