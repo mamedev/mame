@@ -857,17 +857,23 @@ void sixtrak_state::sixtrak_common(machine_config &config, device_sound_interfac
 
 	for (int i = 0; i < 6; ++i)
 	{
-		noise.add_route(0, m_voices[i], 1.0, cem3394_device::AUDIO_INPUT);
-
 		VA_RC_EG(config, m_gain_rc[i]).set_r(RES_M(1));
-		m_gain_rc[i]->add_route(0, m_voices[i], 1.0, cem3394_device::FINAL_GAIN);
-
 		VA_RC_EG(config, m_freq_rc[i]).set_r(RES_M(1));
-		m_freq_rc[i]->add_route(0, m_voices[i], 1.0, cem3394_device::FILTER_FREQUENCY);
 
-		CEM3394(config, m_voices[i]);
-		const double c_vco = C_VCO + C_VCO * C_VCO_JITTER[i] * 0.025;  // +/- 2.5%.
-		m_voices[i]->configure(RES_K(301), c_vco, CAP_U(0.033), CAP_U(10));
+		cem3394_device::components comps =
+		{
+			.r_vco = RES_K(301),
+			.c_vco = C_VCO + C_VCO * C_VCO_JITTER[i] * 0.025,  // +/- 2.5%.
+			.c_vcf = CAP_U(0.033),
+			.c_ac = CAP_U(10),
+		};
+
+		cem3394_device::input_array voice_inputs{};
+		voice_inputs[cem3394_device::AUDIO_INPUT] = &noise;
+		voice_inputs[cem3394_device::FINAL_GAIN] = m_gain_rc[i].target();
+		voice_inputs[cem3394_device::FILTER_FREQUENCY] = m_freq_rc[i].target();
+
+		CEM3394(config, m_voices[i], comps, voice_inputs);
 		m_voices[i]->add_route(0, "voicemixer", CEM3394_IOUT_MAX);
 	}
 
