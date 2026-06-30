@@ -266,14 +266,15 @@ void pc88va_sgp_device::start_exec()
 			// CLS
 			case 0x000a:
 			{
-				const u32 src_address = (m_data->read_word(vdp_pointer + 2) & 0xfffe)
+				const u32 dst_address = (m_data->read_word(vdp_pointer + 2) & 0xfffe)
 					| (m_data->read_word(vdp_pointer + 4) << 16);
 				const u32 word_size = (m_data->read_word(vdp_pointer + 6))
 					| (m_data->read_word(vdp_pointer + 8) << 16);
 
+				execute_cls(dst_address, word_size);
 				LOGCOMMAND("SGP: (PC=%08x) CLS %08x %08x\n"
 					, vdp_pointer
-					, src_address
+					, dst_address
 					, word_size
 				);
 				next_pc += 8;
@@ -401,6 +402,7 @@ void pc88va_sgp_device::execute_blit(u16 draw_mode, bool is_patblt)
 	const bool hd = !!BIT(draw_mode, 10);
 	// TODO: rtype gameplay enables VD
 	const bool vd = !!BIT(draw_mode, 11);
+	// TODO: olteus triggers SF a lot on bosses
 	const bool sf = !!BIT(draw_mode, 12);
 
 	if (hd || vd || sf)
@@ -545,4 +547,11 @@ void pc88va_sgp_device::execute_blit(u16 draw_mode, bool is_patblt)
 			}
 		}
 	}
+}
+
+// olteus on stage to boss transitions
+void pc88va_sgp_device::execute_cls(u32 dst, u32 size)
+{
+	for (int i = 0; i < size; i++)
+		m_data->write_word(dst + (i << 1), m_color_code);
 }

@@ -48,7 +48,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_fdc(*this, "upd765")
 		, m_fdd(*this, "upd765:%u", 0U)
-		, m_pic2(*this, "pic8259_slave")
+		, m_pic2(*this, "pic2")
 		, m_rtc(*this, "rtc")
 		, m_cbus_root(*this, "cbus")
 		// labelled "マウス" (mouse) - can't use "mouse" because of core -mouse option
