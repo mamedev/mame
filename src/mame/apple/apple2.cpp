@@ -79,6 +79,8 @@ namespace {
 #define A2_UPPERBANK_TAG "inhbank"
 #define A2_VIDEO_TAG "a2video"
 
+static constexpr int CNXX_UNCLAIMED = -1;
+
 class apple2_state : public driver_device
 {
 public:
@@ -323,7 +325,7 @@ void apple2_state::machine_start()
 void apple2_state::machine_reset()
 {
 	// m_inh_slot is not reset here since bootable cards may want to override the monitor
-	m_cnxx_slot = -1;
+	m_cnxx_slot = CNXX_UNCLAIMED;
 	m_strobe = 0;
 	m_kbd->ack_w(0);
 }
@@ -510,12 +512,11 @@ void apple2_state::c080_w(offs_t offset, u8 data)
 
 u8 apple2_state::c100_r(offs_t offset)
 {
-	int slotnum;
-
-	slotnum = ((offset>>8) & 0xf) + 1;
+	const int slotnum = ((offset>>8) & 0xf) + 1;
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
+		// a bus fight here is resolved as "last-one-wins"
 		if ((m_slotdevice[slotnum]->take_c800()) && (!machine().side_effects_disabled()))
 		{
 			m_cnxx_slot = slotnum;
@@ -529,9 +530,7 @@ u8 apple2_state::c100_r(offs_t offset)
 
 void apple2_state::c100_w(offs_t offset, u8 data)
 {
-	int slotnum;
-
-	slotnum = ((offset>>8) & 0xf) + 1;
+	const int slotnum = ((offset>>8) & 0xf) + 1;
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
@@ -546,26 +545,16 @@ void apple2_state::c100_w(offs_t offset, u8 data)
 
 u8 apple2_state::c800_r(offs_t offset)
 {
-	if (offset == 0x7ff)
+	const int slot = m_cnxx_slot;
+
+	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
-		u8 rv = 0xff;
-
-		if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != nullptr))
-		{
-			rv = m_slotdevice[m_cnxx_slot]->read_c800(offset&0xfff);
-		}
-
-		if (!machine().side_effects_disabled())
-		{
-			m_cnxx_slot = -1;
-		}
-
-		return rv;
+		m_cnxx_slot = CNXX_UNCLAIMED;
 	}
 
-	if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != nullptr))
+	if ((slot != CNXX_UNCLAIMED) && (m_slotdevice[slot] != nullptr))
 	{
-		return m_slotdevice[m_cnxx_slot]->read_c800(offset&0xfff);
+		return m_slotdevice[slot]->read_c800(offset&0xfff);
 	}
 
 	return read_floatingbus();
@@ -573,19 +562,14 @@ u8 apple2_state::c800_r(offs_t offset)
 
 void apple2_state::c800_w(offs_t offset, u8 data)
 {
-	if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != nullptr))
+	if ((m_cnxx_slot != CNXX_UNCLAIMED) && (m_slotdevice[m_cnxx_slot] != nullptr))
 	{
 		m_slotdevice[m_cnxx_slot]->write_c800(offset&0xfff, data);
 	}
 
-	if (offset == 0x7ff)
+	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
-		if (!machine().side_effects_disabled())
-		{
-			m_cnxx_slot = -1;
-		}
-
-		return;
+		m_cnxx_slot = CNXX_UNCLAIMED;
 	}
 }
 
@@ -1042,7 +1026,6 @@ ROM_END
 /*
     J-Plus ROM numbers confirmed by:
     http://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Computers/Apple%20II/Apple%20II%20j-plus/Photos/Apple%20II%20j-plus%20-%20Motherboard.jpg
-
 */
 
 ROM_START(apple2jp)

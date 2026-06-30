@@ -204,8 +204,7 @@ namespace {
 #define MOUSE_XAXIS_TAG     "mse_x"
 #define MOUSE_YAXIS_TAG     "mse_y"
 
-#define CNXX_UNCLAIMED  -1
-#define CNXX_INTROM     -2
+static constexpr int CNXX_UNCLAIMED = -1;
 
 static constexpr int IRQ_SLOT = 0;
 static constexpr int IRQ_VBL = 1;
@@ -486,13 +485,13 @@ private:
 
 	bool m_intcxrom;
 	bool m_slotc3rom;
+	bool m_intc8rom;
 	bool m_altzp;
 	bool m_ramrd, m_ramwrt;
 	bool m_lcram, m_lcram2, m_lcprewrite, m_lcwriteenable;
 	bool m_ioudis;
 	bool m_romswitch;
 	bool m_mockingboard4c;
-	bool m_intc8rom;
 	bool m_reset_latch;
 
 	bool m_isiic, m_isiicplus, m_iscec, m_iscecm, m_iscec2000;
@@ -1146,6 +1145,7 @@ void apple2e_state::machine_start()
 	save_item(NAME(m_an3));
 	save_item(NAME(m_intcxrom));
 	save_item(NAME(m_slotc3rom));
+	save_item(NAME(m_intc8rom));
 	save_item(NAME(m_altzp));
 	save_item(NAME(m_ramrd));
 	save_item(NAME(m_ramwrt));
@@ -1181,7 +1181,6 @@ void apple2e_state::machine_start()
 	save_item(NAME(m_lcprewrite));
 	save_item(NAME(m_lcwriteenable));
 	save_item(NAME(m_mockingboard4c));
-	save_item(NAME(m_intc8rom));
 	save_item(NAME(m_cec_bank));
 	save_item(NAME(m_35sel));
 	save_item(NAME(m_hdsel));
@@ -2239,7 +2238,7 @@ u8 apple2e_state::c000_r(offs_t offset)
 
 			if (m_accel_unlocked) switch(offset)
 			{
-				case 0x58: return 0xC0; // undocumented, not floating bus
+				case 0x58: return 0xc0; // undocumented, not floating bus
 				case 0x59: return 0x20;
 				case 0x5a: return 0x00;
 				case 0x5d: return 0x00;
@@ -2963,10 +2962,11 @@ void apple2e_state::c080_w(offs_t offset, u8 data)
 
 u8 apple2e_state::read_slot_rom(int slotbias, int offset)
 {
-	int slotnum = ((offset>>8) & 0xf) + slotbias;
+	const int slotnum = ((offset>>8) & 0xf) + slotbias;
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
+		// a bus fight here is resolved as "first-one-wins"
 		if ((m_cnxx_slot == CNXX_UNCLAIMED) && (m_slotdevice[slotnum]->take_c800()) && (!machine().side_effects_disabled()))
 		{
 			m_cnxx_slot = slotnum;
@@ -2981,9 +2981,9 @@ u8 apple2e_state::read_slot_rom(int slotbias, int offset)
 
 void apple2e_state::write_slot_rom(int slotbias, int offset, u8 data)
 {
-	int slotnum = ((offset>>8) & 0xf) + slotbias;
+	const int slotnum = ((offset>>8) & 0xf) + slotbias;
 
-	if ((m_iscec) && (m_iscecm) && ( slotnum == 6 ) && (!m_intcxrom) )
+	if ((m_iscec) && (m_iscecm) && (slotnum == 6) && (!m_intcxrom))
 	{
 		if (data != m_cec_bank)
 		{
@@ -3017,7 +3017,7 @@ void apple2e_state::write_slot_rom(int slotbias, int offset, u8 data)
 
 u8 apple2e_state::read_int_rom(int slotbias, int offset)
 {
-	int slot = ((slotbias + offset) >> 8) & 0xf;
+	const int slot = ((slotbias + offset) >> 8) & 0xf;
 
 	// slot 4 can't remap because the IRQ handler is there
 	if ((m_isace500) && (m_ace_cnxx_bank) && (slot != 4))
@@ -3128,24 +3128,19 @@ void apple2e_state::c400_cec_w(offs_t offset, u8 data)
 
 u8 apple2e_state::c800_r(offs_t offset)
 {
+	const int slot = m_cnxx_slot;
+
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
-		u8 rv = 0xff;
-
-		if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
-		{
-			rv = m_slotdevice[m_cnxx_slot]->read_c800(offset&0xfff);
-		}
 		m_cnxx_slot = CNXX_UNCLAIMED;
 		m_intc8rom = false;
 		update_slotrom_banks();
-		return rv;
 	}
 
-	if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
+	if ((slot > 0) && (m_slotdevice[slot] != nullptr))
 	{
-		laser_slot(m_cnxx_slot);
-		return m_slotdevice[m_cnxx_slot]->read_c800(offset&0xfff);
+		laser_slot(slot);
+		return m_slotdevice[slot]->read_c800(offset&0xfff);
 	}
 
 	return read_floatingbus();
@@ -3217,6 +3212,8 @@ void apple2e_state::ace500_c0bx_w(offs_t offset, u8 data)
 
 u8 apple2e_state::c800_int_r(offs_t offset)
 {
+	const int slot = m_cnxx_slot;
+
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
 		m_cnxx_slot = CNXX_UNCLAIMED;
@@ -3234,8 +3231,8 @@ u8 apple2e_state::c800_int_r(offs_t offset)
 		return m_rom_ptr[m_ace500rombank + offset];
 	}
 
-	if (m_cnxx_slot > 0)
-		laser_slot(m_cnxx_slot);
+	if (slot > 0)
+		laser_slot(slot);
 	return m_rom_ptr[0x800 + offset];
 }
 
@@ -5540,7 +5537,7 @@ void apple2e_state::ace2200(machine_config &config)
 
 	// The Ace 2000 series has 3 physical slots, 2, 4/7, and 5.
 	// 4/7 can be slot 4 or 7 via a jumper; we fix it to slot 7 here
-	// because that's most useful (for e.g. cffa2).
+	// because that's most useful (for e.g. cffa202).
 	config.device_remove("sl1");
 	config.device_remove("sl2");
 	config.device_remove("sl3");
