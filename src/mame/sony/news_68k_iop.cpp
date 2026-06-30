@@ -1472,11 +1472,11 @@ namespace
 
 		// scc channel A
 		RS232_PORT(config, m_serial[0], default_rs232_devices, nullptr);//"terminal");
-		m_serial[0]->cts_handler().set(m_scc_peripheral, FUNC(z80scc_device::ctsa_w));
-		m_serial[0]->dcd_handler().set(m_scc_peripheral, FUNC(z80scc_device::dcda_w));
-		m_serial[0]->rxd_handler().set(m_scc_peripheral, FUNC(z80scc_device::rxa_w));
-		m_scc_peripheral->out_rtsa_callback().set(m_serial[0], FUNC(rs232_port_device::write_rts));
-		m_scc_peripheral->out_txda_callback().set(m_serial[0], FUNC(rs232_port_device::write_txd));
+		m_serial[0]->cts_handler().set(m_scc_external, FUNC(z80scc_device::ctsa_w));
+		m_serial[0]->dcd_handler().set(m_scc_external, FUNC(z80scc_device::dcda_w));
+		m_serial[0]->rxd_handler().set(m_scc_external, FUNC(z80scc_device::rxa_w));
+		m_scc_external->out_rtsa_callback().set(m_serial[0], FUNC(rs232_port_device::write_rts));
+		m_scc_external->out_txda_callback().set(m_serial[0], FUNC(rs232_port_device::write_txd));
 
 		// scc channel B
 		RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
