@@ -19061,7 +19061,7 @@ Black screen, incomplete dump? Has autoexec.bat without command.com, requires to
 	</software>
 
 	<software name="wwfmania">
-		<description>WWF Wrestlemania</description>
+		<description>WWF WrestleMania</description>
 		<year>1991</year>
 		<publisher>Ocean Software</publisher>
 		<info name="copy_protection" value="Copy Protection Card required" />

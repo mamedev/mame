@@ -6,6 +6,9 @@
 
     Common PowerPC definitions and functions
 
+    TODO: Separate out true common stuff from DRC-specific so it's actually
+          possible to have an interpreter.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -553,10 +556,14 @@ static inline int is_snan_double(double x)
 
 void ppc_device::device_start()
 {
-	/* allocate the core from the near cache */
+	// allocate the core from the near cache
 	m_cache.allocate_cache(mconfig().options().drc_rwx());
 	m_core = m_cache.alloc_near<internal_ppc_state>();
 	memset(m_core, 0, sizeof(internal_ppc_state));
+
+	// init bitmap of which logical pages have compiled code
+	m_codepage_bits.assign(0x100000 / 8, 0);    // 0x1'0000'0000 / 4096 = 0x10'0000, /8 bits per byte
+	m_codepage_any = 0;
 
 	m_entry = nullptr;
 	m_nocode = nullptr;
@@ -1559,6 +1566,9 @@ void ppc_device::ppccom_get_dsisr()
 void ppc_device::ppccom_execute_tlbie()
 {
 	vtlb_flush_address(m_core->param0);
+
+	// look up if this page contains a compiled code block
+	m_core->param1 = code_page_has_code(m_core->param0);
 }
 
 

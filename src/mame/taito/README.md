@@ -256,6 +256,7 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |E87 | Battle Gear 2 ||
 |E88 | Renda Fighter ||
 |E95 | Manpuku Hanten ||
+|E96 | Capriccio Sesame ||
 |E98 | Stunt Typhoon Plus ||
 |Exx | Twin Qix ||
 |Exx | Sonic Blast Man no Janken Battle | reuses E41 for plds |
@@ -263,6 +264,7 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |F14 | Raizin Ping Pong ||
 |F19 | Hello Kitty Koi no Shugoshin Uranai ||
 |F21 | Capriccio Move | カプリチオムーブ, undumped |
+|F26 | Capriccio Sesame 2 | also F25 (?) |
 |F30 | Capriccio G-One | カプリチオG-ONE, undumped |
 |F34 | Space Invaders / Qix Silver Anniversary Edition ||
 |F39 | Dinoking Kids ||
@@ -271,5 +273,5 @@ Useful for pinpointing SWs with no clear release date. Only the standard format 
 |F58 | Capriccio Star | カプリチオスター, undumped |
 |F?? | Hard Puncher Hajime no Ippo - The Fighting! | F06? In [namco/namcos10.cpp](../namco/namcos10.cpp) as `ippo` / `ippo2` |
 |F?? | Hard Puncher Hajime no Ippo 2 - The Fighting! - Ouja e no chousen | F06 as above? |
-|G05 | Capriccio Sesami W | カプリチオセサミW, undumped |
+|G05 | Capriccio Sesame W | カプリチオセサミW, undumped |
 |G16 | Nail Stage | ネイルステージ, undumped |

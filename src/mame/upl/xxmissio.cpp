@@ -8,6 +8,9 @@
 
     31/Mar/2001 -
 
+    TODO:
+    - convert irq system to input_merger;
+
 *****************************************************************************/
 
 #include "emu.h"
@@ -57,6 +60,7 @@ private:
 	void scroll_x_w(uint8_t data);
 	void scroll_y_w(uint8_t data);
 
+	IRQ_CALLBACK_MEMBER( vector_r );
 	void interrupt_m(int state);
 	INTERRUPT_GEN_MEMBER(interrupt_s);
 
@@ -254,7 +258,8 @@ void xxmissio_state::status_m_w(uint8_t data)
 
 		case 0x40:
 			m_status &= ~0x08;
-			m_subcpu->set_input_line_and_vector(0, HOLD_LINE, 0x10); // Z80
+			//m_subcpu->set_input_line_and_vector(0, HOLD_LINE, 0x10);
+			m_subcpu->set_input_line(0, HOLD_LINE);
 			break;
 
 		case 0x80:
@@ -277,9 +282,17 @@ void xxmissio_state::status_s_w(uint8_t data)
 
 		case 0x80:
 			m_status &= ~0x04;
-			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x10); // Z80
+			// m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x10);
+			m_maincpu->set_input_line(0, HOLD_LINE);
 			break;
 	}
+}
+
+IRQ_CALLBACK_MEMBER(xxmissio_state::vector_r)
+{
+	// TODO: both CPUs runs in IM 1, where is this coming from? Schematics or misunderstanding?
+	// cfr. the two commented out _vector calls above
+	return 0x10;
 }
 
 void xxmissio_state::interrupt_m(int state)
@@ -466,9 +479,11 @@ void xxmissio_state::xxmissio(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, 12_MHz_XTAL / 4); // 3.0MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &xxmissio_state::main_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(xxmissio_state::vector_r));
 
 	Z80(config, m_subcpu, 12_MHz_XTAL / 4); // 3.0MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &xxmissio_state::sub_map);
+	m_subcpu->set_irq_acknowledge_callback(FUNC(xxmissio_state::vector_r));
 	m_subcpu->set_periodic_int(FUNC(xxmissio_state::interrupt_s), attotime::from_hz(2*60));
 
 	config.set_maximum_quantum(attotime::from_hz(6000));

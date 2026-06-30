@@ -315,6 +315,7 @@ private:
 	// interrupt functions
 	u8 m_irq_cause = 0, m_irq_mask = 0;
 	void irq_check(u8 irq_type);
+	IRQ_CALLBACK_MEMBER( vector_r );
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -575,14 +576,19 @@ u32 gunpey_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	return 0;
 }
 
+IRQ_CALLBACK_MEMBER(gunpey_state::vector_r)
+{
+	return 0x200 / 4;
+}
+
 void gunpey_state::irq_check(u8 irq_type)
 {
 	m_irq_cause |= irq_type;
 
 	if (m_irq_cause & m_irq_mask)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x200/4); // V30
+		m_maincpu->set_input_line(0, HOLD_LINE); // V30
 	else
-		m_maincpu->set_input_line_and_vector(0, CLEAR_LINE, 0x200/4); // V30
+		m_maincpu->set_input_line(0, CLEAR_LINE); // V30
 }
 
 void gunpey_state::status_w(offs_t offset, u8 data)
@@ -1164,6 +1170,7 @@ void gunpey_state::gunpey(machine_config &config)
 	V30(config, m_maincpu, 57242400 / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gunpey_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &gunpey_state::io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(gunpey_state::vector_r));
 	TIMER(config, "scantimer").configure_scanline(FUNC(gunpey_state::scanline), "screen", 0, 1);
 
 	/* video hardware */

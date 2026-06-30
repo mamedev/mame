@@ -7,8 +7,7 @@
     Versions: TBBlue 1.2, Issue 0, Issue 1, Issue 2,
               Issue 2B (Kickstarter 1), Issue 2D, Issue 2E, Issue 2H,
               Issue 4 (Kickstarter 2), Issue 5 (Kickstarter 3)
-    Current implementation is based on Issue 4. Only limited difference
-    tracked through PORT_CONFIG
+    Current implementation is based on Issue 5.
 
     TODO:
     * contention
@@ -1051,7 +1050,6 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 		{
 			if (ula_en)
 			{
-				m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07, 1);
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 1);
 				else m_ula_scr->draw(screen, bitmap, clip256x192, 1);
 			}
@@ -1064,7 +1062,6 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 1);
 			if (ula_en)
 			{
-				m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07, 1);
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 1);
 				else m_ula_scr->draw(screen, bitmap, clip256x192, 1);
 			}
@@ -1077,7 +1074,6 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			if (layer2_en) m_layer2->draw_mix(screen, bitmap, m_blendprio_bitmap, clip320x256, m_nr_15_layer_priority & 1);
 			if (ula_en)
 			{
-				m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07);
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192);
 				else m_ula_scr->draw(screen, bitmap, clip256x192);
 			}
@@ -1088,12 +1084,12 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 2);
 			if (ula_en)
 			{
-				m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07);
+				m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07, 2);
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 2);
 				else m_ula_scr->draw(screen, bitmap, clip256x192, 2);
 			}
 			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 2);
-			if (layer2_en) m_layer2->draw_mix(screen, bitmap, bitmap, clip320x256, m_nr_15_layer_priority & 1);
+			if (layer2_en) m_layer2->draw(screen, bitmap, clip320x256, 1, 2);
 		}
 	}
 	// sprites below foreground
@@ -1532,6 +1528,8 @@ void specnext_state::update_dma_delay()
 	const u16 dma_int_mask = (m_nr_cc_dma_int_en_0_7 << INT_PRIORITY_NMI) | ((m_nr_cc_dma_int_en_0_10 & 1) << INT_PRIORITY_ULA)
 		| (m_nr_cd_dma_int_en_1 << INT_PRIORITY_CTC) | ((m_nr_cc_dma_int_en_0_10 >> 1) << INT_PRIORITY_LINE);
 	m_dma->dma_delay_w((m_nr_c0_int_mode_pulse_0_im2_1 && (dma_int_mask & m_im2_int_status)) ? 1 : 0);
+	if (m_nr_c0_int_mode_pulse_0_im2_1)
+		LOGINTVVV("DMA delay %d (int_status=%04x, int_mask=%04x)\n", (dma_int_mask & m_im2_int_status) ? 1 : 0, m_im2_int_status, dma_int_mask);
 }
 
 u8 specnext_state::reg_r(offs_t nr_register)
@@ -2744,19 +2742,44 @@ void specnext_state::irq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 
+	const std::array<int, 10> states =
+	{
+		m_im2_line->z80daisy_irq_state(),
+		m_im2_uart0_rx->z80daisy_irq_state(),
+		m_im2_uart1_rx->z80daisy_irq_state(),
+		m_ctc->z80daisy_chanel_irq_state(0),
+		m_ctc->z80daisy_chanel_irq_state(1),
+		m_ctc->z80daisy_chanel_irq_state(2),
+		m_ctc->z80daisy_chanel_irq_state(3),
+		m_im2_ula->z80daisy_irq_state(),
+		m_im2_uart0_tx->z80daisy_irq_state(),
+		m_im2_uart1_tx->z80daisy_irq_state()
+	};
+
+	const std::array<u16, 10> masks =
+	{
+		1 << INT_PRIORITY_LINE,
+		1 << INT_PRIORITY_UART0_RX,
+		1 << INT_PRIORITY_UART1_RX,
+		1 << (INT_PRIORITY_CTC + 0),
+		1 << (INT_PRIORITY_CTC + 1),
+		1 << (INT_PRIORITY_CTC + 2),
+		1 << (INT_PRIORITY_CTC + 3),
+		1 << INT_PRIORITY_ULA,
+		1 << INT_PRIORITY_UART0_TX,
+		1 << INT_PRIORITY_UART1_TX
+	};
+
 	const int tmp = m_im2_int_status;
-	m_im2_int_status &= 1 << INT_PRIORITY_NMI;
-	m_im2_int_status |= ((m_im2_uart0_tx->z80daisy_irq_state() & Z80_DAISY_IEO) != 0) << INT_PRIORITY_UART0_TX;
-	m_im2_int_status |= ((m_im2_uart1_tx->z80daisy_irq_state() & Z80_DAISY_IEO) != 0) << INT_PRIORITY_UART1_TX;
-	m_im2_int_status |= ((m_im2_ula->z80daisy_irq_state() & Z80_DAISY_IEO) != 0) << INT_PRIORITY_ULA;
-	m_im2_int_status |= ((m_ctc->z80daisy_chanel_irq_state(3) & Z80_DAISY_IEO) != 0) << (INT_PRIORITY_CTC + 3);
-	m_im2_int_status |= ((m_ctc->z80daisy_chanel_irq_state(2) & Z80_DAISY_IEO) != 0) << (INT_PRIORITY_CTC + 2);
-	m_im2_int_status |= ((m_ctc->z80daisy_chanel_irq_state(1) & Z80_DAISY_IEO) != 0) << (INT_PRIORITY_CTC + 1);
-	m_im2_int_status |= ((m_ctc->z80daisy_chanel_irq_state(0) & Z80_DAISY_IEO) != 0) << (INT_PRIORITY_CTC + 0);
-	m_im2_int_status |= ((m_im2_uart0_rx->z80daisy_irq_state() & Z80_DAISY_IEO) != 0) << INT_PRIORITY_UART0_RX;
-	m_im2_int_status |= ((m_im2_uart1_rx->z80daisy_irq_state() & Z80_DAISY_IEO) != 0) << INT_PRIORITY_UART1_RX;
-	m_im2_int_status |= ((m_im2_line->z80daisy_irq_state() & Z80_DAISY_IEO) != 0) << INT_PRIORITY_LINE;
-	LOGINTVVV("IRQ%s: %04x -> %04x\n", state ? "+" : "-", tmp, m_im2_int_status);
+	m_im2_int_status = 0;
+	for(int i = 0; i < states.size(); ++i)
+	{
+		m_im2_int_status |= (states[i] & Z80_DAISY_IEO) ? masks[i] : 0;
+		if ((states[i] & Z80_DAISY_INT) && !m_im2_int_status) // only highest priority IRQ
+			m_im2_int_status |= masks[i];
+	}
+	m_im2_int_status |= tmp & (1 << INT_PRIORITY_NMI);
+	LOGINTVVV("IRQs: %s %04x -> %04x\n", state ? "+" : "-", tmp, m_im2_int_status);
 
 	update_dma_delay();
 }

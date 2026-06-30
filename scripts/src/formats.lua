@@ -1859,6 +1859,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/scl_dsk.h,FORMATS["SCL_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "SCL_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/scl_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/scl_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/sdd_dsk.h,FORMATS["SDD_DSK"] = true
 --------------------------------------------------
 

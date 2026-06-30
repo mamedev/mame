@@ -76,6 +76,7 @@ private:
 	void ledcpu_map(address_map &map) ATTR_COLD;
 	void ledcpu_io(address_map &map) ATTR_COLD;
 	INTERRUPT_GEN_MEMBER(led_timer_irq);
+	IRQ_CALLBACK_MEMBER(led_vector_r);
 };
 
 
@@ -163,9 +164,15 @@ void sspanic_state::sspanic(machine_config &config)
 // [0x2c] reads I/O port $0c, comms?
 // [0x2e] writes a 0x30 to I/O port $0d and exit
 
+IRQ_CALLBACK_MEMBER(dangbar_state::led_vector_r)
+{
+	return 0x00;
+}
+
+// TODO: should need input_merger instead
 INTERRUPT_GEN_MEMBER(dangbar_state::led_timer_irq)
 {
-	m_ledcpu->set_input_line_and_vector(0, HOLD_LINE, 0x00);
+	m_ledcpu->set_input_line(0, HOLD_LINE);
 }
 
 void dangbar_state::dangbar(machine_config &config)
@@ -177,6 +184,7 @@ void dangbar_state::dangbar(machine_config &config)
 	m_ledcpu->set_addrmap(AS_PROGRAM, &dangbar_state::ledcpu_map);
 	m_ledcpu->set_addrmap(AS_IO, &dangbar_state::ledcpu_io);
 	m_ledcpu->set_periodic_int(FUNC(dangbar_state::led_timer_irq), attotime::from_hz(60));
+	m_ledcpu->set_irq_acknowledge_callback(FUNC(dangbar_state::led_vector_r));
 
 	// video hardware
 	// TODO: LED screen

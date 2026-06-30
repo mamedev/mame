@@ -195,7 +195,6 @@
 #include "emu.h"
 
 #include "cpu/h8/h83006.h"
-#include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/okim9810.h"
 

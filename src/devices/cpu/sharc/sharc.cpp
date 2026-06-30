@@ -565,7 +565,7 @@ void adsp21062_device::external_dma_write(uint32_t address, uint64_t data)
 void adsp21062_device::device_start()
 {
 	assert(m_blocks[0].length() == m_blocks[1].length());
-	assert(!(m_blocks[0].length() & (m_blocks[0].length() - 1)));
+	assert(std::has_single_bit(m_blocks[0].length()));
 
 	space(AS_PROGRAM).specific(m_program);
 	space(AS_DATA).specific(m_data);

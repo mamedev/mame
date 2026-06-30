@@ -34,6 +34,7 @@ public:
 	exechess_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_psu(*this, "psu"),
 		m_lcd1(*this, "lcd1"),
 		m_lcd2(*this, "lcd2"),
 		m_display(*this, "display"),
@@ -52,6 +53,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<f8_cpu_device> m_maincpu;
+	required_device<f38t56_device> m_psu;
 	required_device<hlcd0538_device> m_lcd1;
 	required_device<hlcd0539_device> m_lcd2;
 	required_device<pwm_display_device> m_display;
@@ -164,7 +166,7 @@ void exechess_state::main_io(address_map &map)
 {
 	map(0x00, 0x00).rw(FUNC(exechess_state::ram_address_r<0>), FUNC(exechess_state::ram_address_w<0>));
 	map(0x01, 0x01).rw(FUNC(exechess_state::ram_address_r<1>), FUNC(exechess_state::ram_address_w<1>));
-	map(0x04, 0x07).rw("psu", FUNC(f38t56_device::read), FUNC(f38t56_device::write));
+	map(0x04, 0x07).rw(m_psu, FUNC(f38t56_device::read), FUNC(f38t56_device::write));
 }
 
 
@@ -215,15 +217,15 @@ void exechess_state::exechess(machine_config &config)
 	F8(config, m_maincpu, 4'500'000/2); // measured
 	m_maincpu->set_addrmap(AS_PROGRAM, &exechess_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &exechess_state::main_io);
+	m_maincpu->int_cycle_callback().set(m_psu, FUNC(f38t56_device::int_acknowledge));
 
-	f38t56_device &psu(F38T56(config, "psu", 4'500'000/2));
-	m_maincpu->int_cycle_callback().set(psu, FUNC(f38t56_device::int_acknowledge));
-	psu.set_int_vector(0x0020);
-	psu.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
-	psu.read_a().set(FUNC(exechess_state::ram_data_r));
-	psu.write_a().set(FUNC(exechess_state::ram_data_w));
-	psu.write_a().append(FUNC(exechess_state::lcd_data_w));
-	psu.read_b().set_ioport("IN.1");
+	F38T56(config, m_psu, 4'500'000/2);
+	m_psu->set_int_vector(0x0020);
+	m_psu->int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
+	m_psu->read_a().set(FUNC(exechess_state::ram_data_r));
+	m_psu->write_a().set(FUNC(exechess_state::ram_data_w));
+	m_psu->write_a().append(FUNC(exechess_state::lcd_data_w));
+	m_psu->read_b().set_ioport("IN.1");
 
 	// video hardware
 	HLCD0538(config, m_lcd1, 310); // measured

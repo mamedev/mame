@@ -501,11 +501,7 @@ static const uint8_t cashcade_p[] ={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
 
 void aristmk4_state::video_start()
 {
-	int tile;
-	for (tile = 0; tile < m_gfxdecode->gfx(0)->elements(); tile++)
-	{
-		m_gfxdecode->gfx(0)->get_data(tile);
-	}
+	m_gfxdecode->gfx(0)->decode_all();
 }
 
 void aristmk4_state::uBackgroundColour()

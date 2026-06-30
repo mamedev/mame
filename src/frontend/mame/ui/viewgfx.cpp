@@ -1262,7 +1262,7 @@ uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_target &target)
 			util::stream_format(title_buf,
 					_("gfxview", " #%1$X:%2$X (%3$d %4$d) = %5$X"),
 					code, set.m_color,
-					xpixel, ypixel,
+					gfx.origin_x() + xpixel, gfx.origin_y() + ypixel,
 					gfx.colorbase() + (set.m_color * gfx.granularity()) + pixdata);
 
 			// keep touch pointer displayed after release so they know what it's pointing at
@@ -1273,8 +1273,11 @@ uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_target &target)
 	}
 	if (!found_pixel)
 		util::stream_format(title_buf,
-				_("gfxview", u8" %1$d\u00d7%2$d color %3$X/%4$X"),
-				gfx.width(), gfx.height(),
+				((gfx.source_width() == gfx.width()) && (gfx.source_height() == gfx.height())) ? 
+				_("gfxview", u8" %1$d\u00d7%2$d color %7$X/%8$X") :
+				_("gfxview", u8" %1$d\u00d7%2$d (clip: %3$d:%4$d\u00d7%5$d:%6$d) color %7$X/%8$X"),
+				gfx.source_width(), gfx.source_height(),
+				gfx.origin_x(), gfx.width(), gfx.origin_y(), gfx.height(),
 				set.m_color, set.m_color_count);
 
 	float x0, y0;
@@ -1412,7 +1415,7 @@ uint32_t gfx_viewer::handle_tilemap(mame_ui_manager &mui, render_target &target)
 	// figure out the title
 	std::ostringstream title_buf;
 	util::stream_format(title_buf,
-			(m_tilemap.flags() != TILEMAP_DRAW_ALL_CATEGORIES) ? _("gfxview", "Tilemap %1$d/%2$d category %3$u") : _("gfxview", "Tilemap %1$d/%2$d "),
+			(m_tilemap.flags() != TILEMAP_DRAW_ALL_CATEGORIES) ? _("gfxview", "Tilemap %1$d/%2$d category %3$u") : _("gfxview", "Tilemap %1$d/%2$d"),
 			m_tilemap.index() + 1, m_machine.tilemap().count(),
 			m_tilemap.flags());
 
@@ -1434,9 +1437,10 @@ uint32_t gfx_viewer::handle_tilemap(mame_ui_manager &mui, render_target &target)
 		uint32_t code, color;
 		tilemap.get_info_debug(col, row, gfxnum, code, color);
 		util::stream_format(title_buf,
-				_("gfxview", " (%1$u %2$u) = GFX%3$u #%4$X:%5$X"),
+				_("gfxview", " (%1$u %2$u) = GFX%3$u #%4$X:%5$X palette %6$X"),
 				col * tilemap.tilewidth(), row * tilemap.tileheight(),
-				gfxnum, code, color);
+				gfxnum, code, color,
+				tilemap.palette_offset());
 
 		// keep touch pointer displayed after release so they know what it's pointing at
 		mame_ui_manager::display_pointer pointers[1]{ { target, m_pointer_type, m_pointer_x, m_pointer_y } };

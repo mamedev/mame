@@ -1202,12 +1202,9 @@ void seibuspi_state::spi_ymf271_map(address_map &map)
 
 /*****************************************************************************/
 
-void seibuspi_z80_state::ymf_irqhandler(int state)
+IRQ_CALLBACK_MEMBER(seibuspi_z80_state::audio_vector_r)
 {
-	if (state)
-		m_audiocpu->set_input_line_and_vector(0, ASSERT_LINE, 0xd7); // Z80 - IRQ is RST10
-	else
-		m_audiocpu->set_input_line(0, CLEAR_LINE);
+	return 0xd7; // Z80 IM0, RST10
 }
 
 template <int N>
@@ -1813,6 +1810,7 @@ void seibuspi_state::spi(machine_config &config)
 
 	Z80(config, m_audiocpu, 28.636363_MHz_XTAL / 4); // Z84C0008PEC, 7.159MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &seibuspi_state::spi_soundmap);
+	m_audiocpu->set_irq_acknowledge_callback(FUNC(seibuspi_state::audio_vector_r));
 
 	config.set_maximum_quantum(attotime::from_hz(12000));
 
@@ -1833,7 +1831,7 @@ void seibuspi_state::spi(machine_config &config)
 	SPEAKER(config, "speaker", 2).front();
 
 	ymf271_device &ymf(YMF271(config, "ymf", 16.9344_MHz_XTAL));
-	ymf.irq_handler().set(FUNC(seibuspi_state::ymf_irqhandler));
+	ymf.irq_handler().set_inputline(m_audiocpu, 0);
 	ymf.set_addrmap(0, &seibuspi_state::spi_ymf271_map);
 
 	ymf.add_route(0, "speaker", 1.0, 0);
@@ -1869,6 +1867,7 @@ void seibuspi_z80_state::sxx2e(machine_config &config)
 
 	Z80(config, m_audiocpu, 28.636363_MHz_XTAL / 4); // Unknown part number and clock
 	m_audiocpu->set_addrmap(AS_PROGRAM, &seibuspi_z80_state::sxx2e_soundmap);
+	m_audiocpu->set_irq_acknowledge_callback(FUNC(seibuspi_z80_state::audio_vector_r));
 
 	config.set_maximum_quantum(attotime::from_hz(12000));
 
@@ -1886,7 +1885,7 @@ void seibuspi_z80_state::sxx2e(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	ymf271_device &ymf(YMF271(config, "ymf", 16.9344_MHz_XTAL));
-	ymf.irq_handler().set(FUNC(seibuspi_z80_state::ymf_irqhandler));
+	ymf.irq_handler().set_inputline(m_audiocpu, 0);
 	ymf.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -1915,7 +1914,7 @@ void seibuspi_z80_state::sxx2g(machine_config &config) // clocks differ, but oth
 
 	/* sound hardware */
 	ymf271_device &ymf(YMF271(config.replace(), "ymf", 16.384_MHz_XTAL)); // 16.384MHz(!)
-	ymf.irq_handler().set(FUNC(seibuspi_z80_state::ymf_irqhandler));
+	ymf.irq_handler().set_inputline(m_audiocpu, 0);
 	ymf.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 

@@ -144,6 +144,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	IRQ_CALLBACK_MEMBER(vector_r);
 	TIMER_CALLBACK_MEMBER(irq_callback);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	void vpos_to_vsync_chain_counter(int vpos, uint8_t *counter, uint8_t *v256);
@@ -275,6 +276,10 @@ void berzerk_state::irq_enable_w(uint8_t data)
 	m_irq_enabled = data & 0x01;
 }
 
+IRQ_CALLBACK_MEMBER(berzerk_state::vector_r)
+{
+	return 0xfc; // IM 2
+}
 
 TIMER_CALLBACK_MEMBER(berzerk_state::irq_callback)
 {
@@ -286,7 +291,7 @@ TIMER_CALLBACK_MEMBER(berzerk_state::irq_callback)
 
 	/* set the IRQ line if enabled */
 	if (m_irq_enabled)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfc); // Z80
+		m_maincpu->set_input_line(0, HOLD_LINE); // Z80
 
 	/* set up for next interrupt */
 	next_irq_number = (irq_number + 1) % IRQS_PER_FRAME;
@@ -1172,6 +1177,7 @@ void berzerk_state::berzerk(machine_config &config)
 	Z80(config, m_maincpu, MAIN_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &berzerk_state::berzerk_map);
 	m_maincpu->set_addrmap(AS_IO, &berzerk_state::berzerk_io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(berzerk_state::vector_r));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

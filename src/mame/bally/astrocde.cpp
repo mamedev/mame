@@ -26,6 +26,7 @@
     Game boards:
         90002 = Seawolf II Motherboard (seawolf2)
         90700 = Seawolf II Logic Board (seawolf2, ebases)
+        90708 = Game Board (spacezap, wow, gorf, robby)
         91312 = Characterization Card (seawolf2)
         91354 = CPU Board (ebases, spacezap, wow, gorf, robby)
         91355 = Pattern Board (spacezap, wow, gorf, robby)
@@ -52,7 +53,7 @@
         91356 = RAM Board
 
     Space Zap:
-        90706 = Space Zap Game Board
+        90708 = Game Board
         91354 = CPU Board
         91355 = Pattern Board
         91356 = RAM Board
@@ -87,7 +88,7 @@
         91846 = 640K EPROM board
 
     Ten Pin Deluxe:
-        91456 = 16 Color CPU Card
+        91465 = 16 Color CPU Card
         91466 = Screen RAM Board
         91467 = Super Game Memory
         91488 = Pattern Mover
@@ -1871,7 +1872,7 @@ GAMEL( 1978, seawolf2,  0,    seawolf2, seawolf2,  seawolf2_state, init_seawolf2
 // 91354 CPU board + 90700 game board + 91356 RAM board
 GAMEL( 1980, ebases,    0,    ebases,   ebases,    ebases_state,   init_ebases,   ROT0,   "Dave Nutting Associates / Midway", "Extra Bases", MACHINE_SUPPORTS_SAVE, layout_spacezap )
 
-// 91354 CPU board + 90706 game board + 91356 RAM board + 91355 pattern board
+// 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board
 GAMEL( 1980, spacezap,  0,    spacezap, spacezap,  astrocde_state, init_spacezap, ROT0,   "Midway", "Space Zap (Midway)", MACHINE_SUPPORTS_SAVE, layout_spacezap ) // there's also an older version by Game-A-Tron on different hardware
 
 // 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91397 memory board

@@ -153,14 +153,14 @@ private:
 	// but only 'synced' is used most of the time.
 	struct sync_event_t
 	{
-		bool synced;  // Did a sync event occur?
+		bool synced = false;            // Did a sync event occur?
 
 		// The variables below will only be initialized when synced == true.
-		float sync_ttr;  // time-to-reset (in samples) for the sync oscillator.
-		float sync_phase;  // Phase distance from sync discontinuity.
-		float synced_osc_phase;  // Post-sync oscillator phase at current sample.
-		float phase_at_sync;  // Oscillator phase at the instant the sync occurred.
-		float new_phase_at_sync;  // Post-sync oscillator phase at the instant the sync occurred.
+		float sync_ttr = 0.0F;          // time-to-reset (in samples) for the sync oscillator.
+		float sync_phase = 0.0F;        // Phase distance from sync discontinuity.
+		float synced_osc_phase = 0.0F;  // Post-sync oscillator phase at current sample.
+		float phase_at_sync = 0.0F;     // Oscillator phase at the instant the sync occurred.
+		float new_phase_at_sync = 0.0F; // Post-sync oscillator phase at the instant the sync occurred.
 	};
 
 	// Information about a waveform discontinuity, including interference by a sync.
@@ -168,8 +168,8 @@ private:
 	{
 		bool disc = false;
 		bool post_sync_disc = false;
-		float disc_phase = 0;
-		float post_sync_disc_phase = 0;
+		float disc_phase = 0.0F;
+		float post_sync_disc_phase = 0.0F;
 	};
 
 	void set_freq_ctrl_internal(float freq_cc);
@@ -228,6 +228,7 @@ private:
 	bool m_sync;
 	float m_sync_phase;  // 0-1
 	float m_sync_step;
+	attotime m_last_sample_time;
 };
 
 #endif  // MAME_SOUND_VA_VCO_H

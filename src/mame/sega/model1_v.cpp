@@ -106,7 +106,7 @@ void model1_state::draw_hline_moired(bitmap_rgb32 &bitmap, int x1, int x2, int y
 	uint32_t *const base = &bitmap.pix(y);
 	while(x1 <= x2)
 	{
-		if((x1^y) & 1)
+		if(!((x1^y) & 1))
 		{
 			base[x1] = color;
 		}
@@ -214,6 +214,29 @@ void model1_state::fill_line(bitmap_rgb32 &bitmap, view_t *view, int color, int3
 	}
 }
 
+// Draw a solid line between two screen points (integer Bresenham).  Wireframe
+// primitives reach the rasterizer as a degenerate quad with two coincident
+// vertex pairs (A,A,B,B); fill_quad only touches one pixel per scanline, so a
+// near-horizontal wire would collapse to a handful of dots.  Drawing the line
+// directly restores the full span (e.g. the Star Wars Arcade target box).
+static void draw_wireframe_line(bitmap_rgb32 &bitmap, int x1, int y1, int x2, int y2, uint32_t color, bool moire)
+{
+	int dx = std::abs(x2 - x1), dy = std::abs(y2 - y1);
+	int sx = x1 < x2 ? 1 : -1, sy = y1 < y2 ? 1 : -1;
+	int err = dx - dy;
+	for (;;)
+	{
+		if (x1 >= 0 && x1 < bitmap.width() && y1 >= 0 && y1 < bitmap.height())
+			if (!moire || !((x1 ^ y1) & 1))
+				bitmap.pix(y1, x1) = color;
+		if (x1 == x2 && y1 == y2)
+			break;
+		int e2 = 2 * err;
+		if (e2 > -dy) { err -= dy; x1 += sx; }
+		if (e2 < dx)  { err += dx; y1 += sy; }
+	}
+}
+
 void model1_state::fill_quad(bitmap_rgb32 &bitmap, view_t *view, const quad_t& q) const
 {
 	spoint_t p[8];
@@ -227,6 +250,36 @@ void model1_state::fill_quad(bitmap_rgb32 &bitmap, view_t *view, const quad_t& q
 					q.p[1]->s.x, q.p[1]->s.y,
 					q.p[2]->s.x, q.p[2]->s.y,
 					q.p[3]->s.x, q.p[3]->s.y);
+	}
+
+	// A wireframe primitive arrives as a degenerate quad with only two distinct
+	// screen vertices (A,A,B,B); rasterize it as a line so near-horizontal wires
+	// keep their full span instead of collapsing to one pixel per row.
+	{
+		int ax = q.p[0]->s.x, ay = q.p[0]->s.y;
+		int bx = ax, by = ay, ndist = 1;
+		for (int i = 1; i < 4; i++)
+		{
+			int vx = q.p[i]->s.x, vy = q.p[i]->s.y;
+			if (vx == ax && vy == ay)
+				continue;
+			if (ndist == 1)
+			{
+				bx = vx;
+				by = vy;
+				ndist = 2;
+			}
+			else if (vx != bx || vy != by)
+			{
+				ndist = 3;
+				break;
+			}
+		}
+		if (ndist == 2)
+		{
+			draw_wireframe_line(bitmap, ax, ay, bx, by, color & ~MOIRE, (color & MOIRE) != 0);
+			return;
+		}
 	}
 
 	for (int i = 0; i < 4; i++)
@@ -948,16 +1001,32 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 			float spec = compute_specular(vn, m_view->light, dif, lightmode);
 			float ln = m_view->lightparams[lightmode].a + m_view->lightparams[lightmode].d * std::max(0.0f, dif) + spec;
 			int lumval = 255.0f * std::min(1.0f, ln);
-			int color = m_paletteram16[0x1000 | (m_tgp_ram[tex_adr - 0x40000] & 0x3ff)];
+			// bits [11:10] of the tile word select a colour mode: bit 10 marks a
+			// flat UI element (radar blips, HUD text) drawn unlit, and mode 01
+			// additionally blinks by rotating the BGR channels on alternate frames.
+			uint16_t tex_data = m_tgp_ram[tex_adr - 0x40000];
+			int color = m_paletteram16[0x1000 | (tex_data & 0x3ff)];
 			int r = (color >> 0x0) & 0x1f;
 			int g = (color >> 0x5) & 0x1f;
 			int b = (color >> 0xA) & 0x1f;
+			if (((tex_data >> 10) & 3) == 1 && (m_screen->frame_number() & 1))
+			{
+				// rotate b -> g -> r -> b
+				int tmp = b;
+				b = r;
+				r = g;
+				g = tmp;
+			}
 
 			lumval >>= 2; //there must be a luma translation table somewhere
 			if (lumval > 0x3f)
 				lumval = 0x3f;
 			else if (lumval < 0)
 				lumval = 0;
+
+			// flat UI element: draw unlit at full intensity instead of shading it
+			if (tex_data & 0x400)
+				lumval = 0x3f;
 
 			r = (m_color_xlat[(r << 8) | lumval | 0x0] >> 3) & 0x1f;
 			g = (m_color_xlat[(g << 8) | lumval | 0x2000] >> 3) & 0x1f;
@@ -1009,25 +1078,13 @@ int model1_state::push_direct(int list_offset) {
 		old_p0->x, old_p0->y, old_p0->z,
 		old_p1->x, old_p1->y, old_p1->z);
 
-	//m_view-transform_point(old_p0);
-	//m_view->transform_point(old_p1);
-	if (old_p0->z > 0)
-	{
-		m_view->project_point_direct(old_p0);
-	}
-	else
-	{
-		old_p0->s.x = old_p0->s.y = 0;
-	}
-
-	if (old_p1->z > 0)
-	{
-		m_view->project_point_direct(old_p1);
-	}
-	else
-	{
-		old_p1->s.x = old_p1->s.y = 0;
-	}
+	// Direct (2D-projected) polys are screen-space: project_point_direct only
+	// offsets x/y by the viewport centre and ignores z, so project every vertex
+	// unconditionally.  Guarding on z > 0 and snapping behind-"camera" vertices
+	// to (0,0) spawns huge spurious triangles radiating from the screen origin
+	// (the bogus red cross over the SWA cockpit once direct polys draw on top).
+	m_view->project_point_direct(old_p0);
+	m_view->project_point_direct(old_p1);
 
 	list_offset += 18;
 
@@ -1084,14 +1141,8 @@ int model1_state::push_direct(int list_offset) {
 
 		//m_view->transform_point(p0);
 		//m_view->transform_point(p1);
-		if (p0->z > 0)
-		{
-			m_view->project_point_direct(p0);
-		}
-		if (p1->z > 0)
-		{
-			m_view->project_point_direct(p1);
-		}
+		m_view->project_point_direct(p0);
+		m_view->project_point_direct(p1);
 
 		if (old_p0 && old_p1)
 			LOGMASKED(LOG_TGP, "VIDEOD:     %08x (%d, %d) (%d, %d) (%d, %d) (%d, %d)\n",
@@ -1131,9 +1182,27 @@ int model1_state::push_direct(int list_offset) {
 		}
 		//cquad.col  = scale_color(machine().pens[0x1000|(m_tgp_ram[tex_adr-0x40000] & 0x3ff)],((float) (lum>>24)) / 128.0);
 		if (flags & 0x00002000)
+		{
 			cquad.col |= MOIRE;
+			// A moiré (stipple-translucent) direct poly whose flat colour resolves
+			// to the transparent texture pen (index 0x1000 -> black) is a "fade
+			// toward backdrop" overlay, not a black fill.  Painting the pen
+			// literally gives a black/scene checkerboard (the Star Wars Arcade
+			// gunner 2nd-viewport overlay); the arcade alternates backdrop/scene.
+			// Paint the backdrop pen (palette[0]) so the stipple reads
+			// backdrop/scene.
+			if ((m_tgp_ram[tex_adr - 0x40000] & 0x3ff) == 0)
+				cquad.col = MOIRE | (m_palette->pen(0) & 0xffffff);
+		}
 
-		fclip_push_quad(0, cquad);
+		// Direct polys are screen-space - project_point_direct only offsets x/y by
+		// the viewport centre and ignores z.  fclip_push_quad's frustum clip tests
+		// vertices against z-scaled planes (y > z*a_bottom, ...), which for a direct
+		// poly with small/zero z collapses every plane onto the origin and culls the
+		// whole poly (e.g. the SWA FIGHTER CONTROL console moiré rect, all z = 0).
+		// Skip the frustum clip and queue the quad directly; fill_quad still scissors
+		// it to the viewport rectangle.
+		*m_quadpt++ = cquad;
 
 	next:
 		switch (link) {
@@ -1240,6 +1309,26 @@ void model1_state::model1_listctl_w(offs_t offset, u16 data, u16 mem_mask)
 	LOGMASKED(LOG_TGP, "VIDEO: control=%08x\n", (m_listctl[1] << 16) | m_listctl[0]);
 }
 
+void model1_state::model1_paletteram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_paletteram16[offset]);
+	u16 const v = m_paletteram16[offset];
+	int r = pal5bit((v >> 0) & 0x1f);
+	int g = pal5bit((v >> 5) & 0x1f);
+	int b = pal5bit((v >> 10) & 0x1f);
+	// Bit 15 is an intensity/shade bit, not unused as the plain xBGR_555 decode
+	// assumes.  Almost every entry has it set (full brightness); a handful clear
+	// it to render dimmed (e.g. Star Wars Arcade's grey menu backdrop pen 0x7777).
+	// Halve the channels when it is clear so those pens stop reading too bright.
+	if (!BIT(v, 15))
+	{
+		r >>= 1;
+		g >>= 1;
+		b >>= 1;
+	}
+	m_palette->set_pen_color(offset, r, g, b);
+}
+
 void model1_state::view_t::init_translation_matrix()
 {
 	memset(translation, 0, sizeof(translation));
@@ -1299,13 +1388,12 @@ void model1_state::view_t::set_view_translation(float x, float y)
 
 
 
-void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect, render_pass pass)
 {
 	m_render_done = 1;
 	if ((m_listctl[1] & 0x1f) == 0x1f)
 	{
 		set_current_render_list();
-		int zz = 0;
 		LOGMASKED(LOG_TGP, "VIDEO: render list %d\n", get_list_number());
 
 		m_view->init_translation_matrix();
@@ -1320,21 +1408,25 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				list_offset += 2;
 				break;
 			case 1:
+				// command 0x01 = object drawn below the cat1 HUD tilemaps
+				if (pass == RENDER_BELOW_HUD)
+					push_object(readi(list_offset + 2), readi(list_offset + 4), readi(list_offset + 6));
+				list_offset += 8;
+				break;
 			case 0x41:
-				// 1 = plane 1
-				// 2 = ??  draw object (413d3, 17c4c, e)
-				// 3 = plane 2
-				// 4 = ??  draw object (408a8, a479, 9)
-				// 5 = decor
-				// 6 = ??  draw object (57bd4, 387460, 2ad)
-
-				if (true || zz >= 666)
+				// command 0x41 = object drawn above the HUD (e.g. SWA radar blips)
+				if (pass == RENDER_ABOVE_HUD)
 					push_object(readi(list_offset + 2), readi(list_offset + 4), readi(list_offset + 6));
 				list_offset += 8;
 				break;
 			case 2:
 			{
-				list_offset = draw_direct(bitmap, cliprect, list_offset);
+				// direct (2D-projected) polys; push them in the below-HUD pass so
+				// they share the per-viewport z-sort with the 0x01 objects
+				if (pass == RENDER_BELOW_HUD)
+					list_offset = push_direct(list_offset);
+				else
+					list_offset = skip_direct(list_offset);
 				break;
 			}
 			case 3:
@@ -1400,7 +1492,6 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			}
 			case 7:
 				LOGMASKED(LOG_TGP, "VIDEO:   code 7 (%d)\n", readi(list_offset + 2));
-				zz++;
 				list_offset += 4;
 				break;
 			case 8:
@@ -1571,6 +1662,10 @@ void model1_state::video_start()
 	m_pointdb = std::make_unique<point_t[]>(1000000*2);
 	m_quaddb  = std::make_unique<quad_t[]>(1000000);
 	m_quadind = make_unique_clear<quad_t *[]>(1000000);
+	m_overlay_stride = m_screen->width();
+	int overlay_pixels = m_overlay_stride * m_screen->height();
+	m_overlay_block = std::make_unique<uint8_t[]>(overlay_pixels);
+	m_overlay_hud_snapshot = std::make_unique<uint32_t[]>(overlay_pixels);
 
 	m_pointpt = &m_pointdb[0];
 	m_quadpt = &m_quaddb[0];
@@ -1588,6 +1683,42 @@ void model1_state::video_start()
 	save_pointer(NAME(m_tgp_ram), 0x100000-0x40000);
 	save_pointer(NAME(m_poly_ram), 0x40000);
 	save_item(NAME(m_listctl));
+}
+
+// Snapshot the HUD after the cat1 tilemaps are composited: a pixel is a bright
+// "feature" (grid lines, struts) when any channel rises above near-black,
+// otherwise it is transparent/screen background where the above-HUD blips show.
+void model1_state::build_overlay_mask(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	constexpr int feature_level = 8; // anything darker counts as HUD background
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		uint32_t const *const src = &bitmap.pix(y);
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			uint32_t argb = src[x];
+			int r = (argb >> 16) & 0xff, g = (argb >> 8) & 0xff, b = argb & 0xff;
+			int i = y * m_overlay_stride + x;
+			m_overlay_block[i] = (r > feature_level || g > feature_level || b > feature_level);
+			m_overlay_hud_snapshot[i] = argb;
+		}
+	}
+}
+
+// Restore the bright HUD features over the above-HUD blip pass, so blips only
+// remain where the HUD pixel was transparent / near-black.
+void model1_state::apply_overlay_stencil(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		uint32_t *const dst = &bitmap.pix(y);
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			int i = y * m_overlay_stride + x;
+			if (m_overlay_block[i])
+				dst[x] = m_overlay_hud_snapshot[i];
+		}
+	}
 }
 
 uint32_t model1_state::screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1657,12 +1788,22 @@ uint32_t model1_state::screen_update_model1(screen_device &screen, bitmap_rgb32 
 	m_tiles->draw(screen, bitmap, cliprect, 2, 0, 0);
 	m_tiles->draw(screen, bitmap, cliprect, 0, 0, 0);
 
-	tgp_render(bitmap, cliprect);
+	// 3D objects (0x01) and direct polys (0x02) render below the HUD tilemaps,
+	// sharing the per-viewport z-sort.
+	tgp_render(bitmap, cliprect, RENDER_BELOW_HUD);
 
+	// HUD tilemaps (cat1): cockpit struts, grid lines, radar screen background.
 	m_tiles->draw(screen, bitmap, cliprect, 7, 0, 0);
 	m_tiles->draw(screen, bitmap, cliprect, 5, 0, 0);
 	m_tiles->draw(screen, bitmap, cliprect, 3, 0, 0);
 	m_tiles->draw(screen, bitmap, cliprect, 1, 0, 0);
+
+	// 0x41 objects (e.g. radar blips) draw on top of the HUD, but the hardware
+	// only lets them through "background" HUD pixels. Snapshot the HUD, draw the
+	// above-HUD pass, then restore the bright HUD features over it.
+	build_overlay_mask(bitmap, cliprect);
+	tgp_render(bitmap, cliprect, RENDER_ABOVE_HUD);
+	apply_overlay_stencil(bitmap, cliprect);
 
 	return 0;
 }

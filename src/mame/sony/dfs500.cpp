@@ -571,8 +571,6 @@ void dfs500_state::cpanel_reg1_w(offs_t offset, uint8_t data)
 			// Here "data" holds the 8-bit value of the "interrupt vector number"
 						//  to be put on the data bus when the CPU asserts /INTAK (Interrupt Acknowledge)
 			m_int_vector = data;
-			// FIXME: Is this an alternative way of doing it?
-			//        m_cpanelcpu->set_input_line_and_vector(0, HOLD_LINE, data);
 			break;
 		default:
 			break;

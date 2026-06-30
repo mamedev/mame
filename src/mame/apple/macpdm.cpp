@@ -24,6 +24,18 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#define LOG_VIA2            (1U << 1)
+#define LOG_HMC             (1U << 2)
+#define LOG_SCC             (1U << 3)
+#define LOG_DMA             (1U << 4)
+#define LOG_IRQ             (1U << 5)
+#define LOG_MEMORY_SIZING   (1U << 6)
+
+#define VERBOSE (0)
+
+#define LOG_OUTPUT_FUNC osd_printf_info
+
+#include "logmacro.h"
 
 namespace {
 
@@ -34,12 +46,22 @@ static constexpr auto SOUND_CLOCK = 45.1584_MHz_XTAL;
 static constexpr u8 DMA2_IRQ_SND_IN             = 0x01;
 static constexpr u8 DMA2_IRQ_SND_OUT            = 0x02;
 
+static constexpr u8 SCCDMA_RESET                = 0x01;
+static constexpr u8 SCCDMA_RUN                  = 0x02;
+static constexpr u8 SCCDMA_CONTINUE             = 0x04;
+static constexpr u8 SCCDMA_IRQENABLE            = 0x08;
+static constexpr u8 SCCDMA_PAUSE                = 0x10;
+static constexpr u8 SCCDMA_FROZEN               = 0x20;
+static constexpr u8 SCCDMA_RELOAD               = 0x40;
+static constexpr u8 SCCDMA_IRQ                  = 0x80;
+static constexpr u8 SCCDMA_WRITE_MASK           = (SCCDMA_RELOAD|SCCDMA_PAUSE|SCCDMA_IRQENABLE|SCCDMA_CONTINUE|SCCDMA_RUN);
+
 class macpdm_state : public driver_device
 {
 public:
 	macpdm_state(const machine_config &mconfig, device_type type, const char *tag);
 
-	void macpdm(machine_config &config) ATTR_COLD;
+	void pmac6100(machine_config &config) ATTR_COLD;
 
 	void driver_init() ATTR_COLD;
 
@@ -396,7 +418,7 @@ void macpdm_state::irq_main_set(uint8_t mask, int state)
 		}
 	}
 
-	//  logerror("irq control %02x\n", m_irq_control);
+	LOGMASKED(LOG_IRQ, "irq control %02x\n", m_irq_control);
 }
 
 void macpdm_state::via2_irq_main_set(uint8_t mask, int state)
@@ -405,7 +427,7 @@ void macpdm_state::via2_irq_main_set(uint8_t mask, int state)
 		return;
 
 	m_via2_ifr ^= mask;
-	//  logerror("via2 main %02x / %02x -> %02x\n", m_via2_ifr, m_via2_ier, m_via2_ifr & m_via2_ier);
+	LOGMASKED(LOG_IRQ, "via2 main %02x / %02x -> %02x\n", m_via2_ifr, m_via2_ier, m_via2_ifr & m_via2_ier);
 
 	irq_main_set(0x02, (m_via2_ifr & m_via2_ier) != 0);
 }
@@ -496,7 +518,7 @@ void macpdm_state::via2_ier_w(uint8_t data)
 	else
 		m_via2_ier &= ~data;
 
-	logerror("via2 ier %s %s %s %s\n",
+	LOGMASKED(LOG_VIA2, "via2 ier %s %s %s %s\n",
 			 m_via2_ier & 0x20 ? "fdc" : "-",
 			 m_via2_ier & 0x10 ? "sound" : "-",
 			 m_via2_ier & 0x08 ? "scsi" : "-",
@@ -523,7 +545,7 @@ void macpdm_state::via2_sier_w(uint8_t data)
 	else
 		m_via2_sier &= ~data;
 
-	logerror("via2 sier %s %s %s %s\n",
+	LOGMASKED(LOG_VIA2, "via2 sier %s %s %s %s\n",
 			 m_via2_sier & 0x40 ? "vbl" : "-",
 			 m_via2_sier & 0x20 ? "slot2" : "-",
 			 m_via2_sier & 0x10 ? "slot1" : "-",
@@ -598,7 +620,7 @@ void macpdm_state::hmc_w(offs_t offset, uint8_t data)
 			m_hmc_reg = m_hmc_buffer & ~3; // csiz is readonly, we pretend there isn't a l2 cache
 			m_video->set_vram_offset(m_hmc_reg & 0x200000000 ? 0 : 0x100000);
 			ram_size();
-			logerror("HMC l2=%c%c%c%c%c vbase=%c%s mbram=%cM size=%x%s romd=%d refresh=%02x w=%c%c%c%c ras=%d%d%d%d\n",
+			LOGMASKED(LOG_HMC, "HMC l2=%c%c%c%c%c vbase=%c%s mbram=%cM size=%x%s romd=%d refresh=%02x w=%c%c%c%c ras=%d%d%d%d\n",
 					 m_hmc_reg & 0x008000000 ? '+' : '-',      // l2_en
 					 m_hmc_reg & 0x400000000 ? '3' : '2',      // l2_init
 					 m_hmc_reg & 0x004000000 ? '1' : '2',      // l2_brst
@@ -636,14 +658,15 @@ void macpdm_state::hmc_w(offs_t offset, uint8_t data)
 void macpdm_state::ram_size(){
 	static const uint32_t sizes[4] = { 128*1024*1024, 2*1024*1024, 8*1024*1024, 32*1024*1024 };
 	const u8 config = (m_hmc_reg >> 29) & 3;        // 0 = 128MiB, 1 = 2MiB, 2 = 8MiB, 3 = 32MiB
-	const u8 mb_size = (m_hmc_reg & 0x00800000) ? 1 : 0;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	const u32 total_ram = m_ram->size();
-	const u32 mb_ram_size = (mb_size ? 8*1024*1024 : 4*1024*1024);
+	const u32 mb_ram_size = (8*1024*1024);
 
 	// SIMMs must be in identical pairs, so any leftover RAM after the motherboard 8MiB is
 	// the number of slots times the SIMM size.
 	const u32 simm_size = (total_ram - mb_ram_size) / 2;
+
+	LOGMASKED(LOG_MEMORY_SIZING, "Total RAM: %08x, Motherboard RAM: %08x, SIMM size: %08x, config %d\n", total_ram, mb_ram_size, simm_size, config);
 
 	u8 *mb_ram = (u8 *)m_ram->pointer();
 	u8 *ram_a = mb_ram + mb_ram_size;
@@ -653,35 +676,36 @@ void macpdm_state::ram_size(){
 	space.unmap_readwrite(0x00000000, 0x3fffffff);
 
 	// map the motherboard 8MB
-	space.install_ram(0x00000000, 0x007fffff, 0, (void *)mb_ram);
+	space.install_ram(0x00000000, mb_ram_size - 1, 0, (void *)mb_ram);
 
 	// install RAM A
 	if (simm_size > 0)
 	{
-		if (simm_size <= 8*1024*1024)
+		if (simm_size < 128*1024*1024)
 		{
+			LOGMASKED(LOG_MEMORY_SIZING, "RAM A at %08x - %08x\n", mb_ram_size, mb_ram_size + simm_size - 1);
 			space.install_ram(mb_ram_size, mb_ram_size + simm_size - 1, 0, (void *)ram_a);
 		}
 		else
 		{
-			space.install_ram(mb_ram_size, sizes[config] - 1, 0, (void *)(ram_a + mb_ram_size));
+			LOGMASKED(LOG_MEMORY_SIZING, "RAM A' at %08x - %08x\n", mb_ram_size, simm_size - 1);
+			space.install_ram(mb_ram_size, simm_size - mb_ram_size - 1, 0, (void *)(ram_a + mb_ram_size));
 		}
 
 		// install a complete image of RAM A in the slot above the top of memory (which is actually where the ROM code looks for it)
 		const u32 alias_base = 0x10000000;
+		LOGMASKED(LOG_MEMORY_SIZING, "RAM A alias at %08x - %08x\n", alias_base, alias_base + simm_size - 1);
 		space.install_ram(alias_base, alias_base + simm_size - 1, 0, (void *)ram_a);
 
 		// install RAM B
-		const u32 b_base = (config != 0) ? (sizes[config] * 2) : 0x08000000;    // B base is 32 megs for config 0
-		if (b_base == alias_base)
-		{
-			space.unmap_readwrite(alias_base, alias_base + simm_size - 1);
-		}
+		const u32 b_base = (config != 0) ? (sizes[config] + mb_ram_size) : 0x08000000;    // B base is 32 megs for config 0
+		LOGMASKED(LOG_MEMORY_SIZING, "RAM B at %08x - %08x\n", b_base, b_base + simm_size - 1);
 		space.install_ram(b_base, b_base + simm_size - 1, 0, (void *)ram_b);
 
 		if (simm_size < 8*1024*1024)
 		{
 			const u32 alias_base_b = alias_base + simm_size - (8*1024*1024);
+			LOGMASKED(LOG_MEMORY_SIZING, "RAM B alias at %08x - %08x\n", alias_base_b, alias_base_b + simm_size - 1);
 			space.install_ram(alias_base_b, alias_base_b + simm_size - 1, 0, (void *)ram_b);
 		}
 	}
@@ -690,7 +714,7 @@ void macpdm_state::ram_size(){
 uint8_t macpdm_state::diag_r(offs_t offset)
 {
 	// returning 0 at address 0 gives the 'car crash' sound after the boot bong
-	logerror("diag_r %x\n", offset);
+	LOGMASKED(LOG_GENERAL, "diag_r %x\n", offset);
 	return offset ? 0 : 1;
 }
 
@@ -702,9 +726,9 @@ void macpdm_state::phases_w(uint8_t phases)
 
 void macpdm_state::sel35_w(int sel35)
 {
-	logerror("fdc mac sel35 %d\n", sel35);
-}
+	LOGMASKED(LOG_GENERAL, "fdc mac sel35 %d\n", sel35);
 
+}
 void macpdm_state::devsel_w(uint8_t devsel)
 {
 	if (devsel == 1)
@@ -737,7 +761,7 @@ uint32_t macpdm_state::id_r(offs_t offset, uint32_t mem_mask)
 
 void macpdm_state::scc_irq(int state)
 {
-	logerror("scc irq %d\n", state);
+	LOGMASKED(LOG_SCC, "scc irq %d\n", state);
 }
 
 void macpdm_state::via1_irq(int state)
@@ -806,7 +830,7 @@ void macpdm_state::dma_badr_w(offs_t, uint32_t data, uint32_t mem_mask)
 	COMBINE_DATA(&m_dma_badr);
 	m_dma_badr &= 0xfffc0000;
 
-	logerror("dma base address %08x\n", m_dma_badr);
+	LOGMASKED(LOG_DMA, "dma base address %08x\n", m_dma_badr);
 
 	m_dma_floppy_adr = (m_dma_badr | 0x10000) + (m_dma_floppy_adr & 0xffff);
 }
@@ -819,7 +843,7 @@ uint16_t macpdm_state::dma_berr_en_r()
 void macpdm_state::dma_berr_en_w(offs_t, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_dma_berr_en);
-	logerror("dma bus error enable %08x\n", m_dma_berr_en);
+	LOGMASKED(LOG_DMA, "dma bus error enable %08x\n", m_dma_berr_en);
 }
 
 uint16_t macpdm_state::dma_berr_flag_r()
@@ -830,7 +854,7 @@ uint16_t macpdm_state::dma_berr_flag_r()
 void macpdm_state::dma_berr_flag_w(offs_t, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_dma_berr_flag);
-	logerror("dma bus error flag %08x\n", m_dma_berr_flag);
+	LOGMASKED(LOG_DMA, "dma bus error flag %08x\n", m_dma_berr_flag);
 }
 
 
@@ -896,7 +920,7 @@ void macpdm_state::dma_scsi_a_base_adr_w(offs_t, uint32_t data, uint32_t mem_mas
 	m_dma_scsi_a_base_adr &= ~7;
 	m_dma_scsi_a_cur_offset = 0;
 	m_dma_scsi_buffer_word_count = 0;
-	logerror("dma_scsi_a_base_adr_w %08x\n", m_dma_scsi_a_base_adr);
+	LOGMASKED(LOG_DMA, "dma_scsi_a_base_adr_w %08x\n", m_dma_scsi_a_base_adr);
 }
 
 uint32_t macpdm_state::dma_scsi_b_base_adr_r()
@@ -909,7 +933,7 @@ void macpdm_state::dma_scsi_b_base_adr_w(offs_t, uint32_t data, uint32_t mem_mas
 	COMBINE_DATA(&m_dma_scsi_b_base_adr);
 	m_dma_scsi_b_base_adr &= ~7;
 	m_dma_scsi_a_cur_offset = 0;
-	logerror("dma_scsi_b_base_adr_w %08x\n", m_dma_scsi_b_base_adr);
+	LOGMASKED(LOG_DMA, "dma_scsi_b_base_adr_w %08x\n", m_dma_scsi_b_base_adr);
 }
 
 uint8_t macpdm_state::dma_scsi_a_ctrl_r()
@@ -951,7 +975,7 @@ void macpdm_state::dma_scsi_a_ctrl_w(uint8_t data)
 	if ((m_dma_scsi_a_ctrl & 0x02) && (m_via2_ifr & 0x01) && !m_dma_scsi_a_in_step)
 		dma_scsi_a_step();
 
-	logerror("dma_scsi_a_ctrl_w %02x\n", m_dma_scsi_a_ctrl);
+	LOGMASKED(LOG_DMA, "dma_scsi_a_ctrl_w %02x\n", m_dma_scsi_a_ctrl);
 }
 
 uint8_t macpdm_state::dma_scsi_b_ctrl_r()
@@ -968,7 +992,8 @@ void macpdm_state::dma_scsi_b_ctrl_w(uint8_t data)
 		m_dma_scsi_b_ctrl &= 0x40;
 		m_dma_scsi_b_cur_offset = 0;
 	}
-	logerror("dma_scsi_b_ctrl_w %02x\n", m_dma_scsi_b_ctrl);
+	LOGMASKED(LOG_DMA,
+		"dma_scsi_b_ctrl_w %02x\n", m_dma_scsi_b_ctrl);
 }
 
 uint32_t macpdm_state::dma_scsi_a_cur_adr_r()
@@ -1001,7 +1026,7 @@ void macpdm_state::dma_floppy_ctrl_w(uint8_t data)
 	if (data & 0x80)
 		m_dma_floppy_ctrl &= 0x7f;
 
-	logerror("dma floppy ctrl %02x\n", m_dma_floppy_ctrl);
+	LOGMASKED(LOG_DMA, "dma floppy ctrl %02x\n", m_dma_floppy_ctrl);
 }
 
 uint16_t macpdm_state::dma_floppy_byte_count_r()
@@ -1012,7 +1037,7 @@ uint16_t macpdm_state::dma_floppy_byte_count_r()
 void macpdm_state::dma_floppy_byte_count_w(offs_t, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_dma_floppy_byte_count);
-	logerror("dma floppy count %04x\n", m_dma_floppy_byte_count);
+	LOGMASKED(LOG_DMA, "dma floppy count %04x\n", m_dma_floppy_byte_count);
 }
 
 uint32_t macpdm_state::dma_floppy_adr_r()
@@ -1025,7 +1050,7 @@ void macpdm_state::dma_floppy_adr_w(offs_t, uint32_t data, uint32_t mem_mask)
 	COMBINE_DATA(&m_dma_floppy_adr);
 	m_dma_floppy_adr = (m_dma_badr | 0x10000) + (m_dma_floppy_adr & 0xffff);
 	m_dma_floppy_offset = 0;
-	logerror("dma floppy adr %08x\n", m_dma_floppy_adr);
+	LOGMASKED(LOG_DMA, "dma floppy adr %08x\n", m_dma_floppy_adr);
 }
 
 void macpdm_state::fdc_irq(int state)
@@ -1050,12 +1075,12 @@ void macpdm_state::dma_floppy_step()
 			m_maincpu->space().write_byte(m_dma_floppy_adr + m_dma_floppy_offset, r);
 			m_dma_floppy_offset ++;
 			m_dma_floppy_byte_count --;
-			//          logerror("dma_w %03x, %02x\n", m_dma_floppy_offset, r);
+			LOGMASKED(LOG_DMA, "dma_w %03x, %02x\n", m_dma_floppy_offset, r);
 			if (m_dma_floppy_byte_count == 0)
 			{
 				m_dma_floppy_ctrl &= ~0x02;
 				m_dma_floppy_ctrl |= 0x80;
-				logerror("dma floppy done\n");
+				LOGMASKED(LOG_DMA, "dma floppy done\n");
 				// todo irq dma
 				break;
 			}
@@ -1084,7 +1109,7 @@ uint8_t macpdm_state::dma_scc_txa_ctrl_r()
 void macpdm_state::dma_scc_txa_ctrl_w(uint8_t data)
 {
 	m_dma_scc_txa_ctrl = data;
-	logerror("dma_scc_txa_ctrl_w %02x\n", m_dma_scc_txa_ctrl);
+	LOGMASKED(LOG_DMA, "dma_scc_txa_ctrl_w %02x\n", m_dma_scc_txa_ctrl);
 }
 
 uint8_t macpdm_state::dma_scc_rxa_ctrl_r()
@@ -1094,8 +1119,26 @@ uint8_t macpdm_state::dma_scc_rxa_ctrl_r()
 
 void macpdm_state::dma_scc_rxa_ctrl_w(uint8_t data)
 {
-	m_dma_scc_rxa_ctrl = data;
-	logerror("dma_scc_rxa_ctrl_w %02x\n", m_dma_scc_rxa_ctrl);
+	LOGMASKED(LOG_DMA, "dma_scc_rxa_ctrl_w %02x\n", data);
+
+	// handle a channel reset
+	if (data & SCCDMA_RESET)
+	{
+		m_dma_scc_rxa_ctrl &= (SCCDMA_RELOAD|SCCDMA_FROZEN|SCCDMA_PAUSE|SCCDMA_IRQENABLE|SCCDMA_CONTINUE);
+	}
+
+	// handle an IRQ clear
+	if (data & SCCDMA_IRQ)
+	{
+		m_dma_scc_rxa_ctrl &= ~SCCDMA_IRQ;
+	}
+
+	// set FROZEN to the incoming PAUSE flag state
+	m_dma_scc_rxa_ctrl &= ~SCCDMA_FROZEN;
+	m_dma_scc_rxa_ctrl |= (data & SCCDMA_PAUSE) ? SCCDMA_FROZEN : 0x00;
+
+	// and apply the writable bits
+	m_dma_scc_rxa_ctrl = (m_dma_scc_rxa_ctrl & ~SCCDMA_WRITE_MASK) | (data & SCCDMA_WRITE_MASK);
 }
 
 uint8_t macpdm_state::dma_scc_txb_ctrl_r()
@@ -1106,7 +1149,7 @@ uint8_t macpdm_state::dma_scc_txb_ctrl_r()
 void macpdm_state::dma_scc_txb_ctrl_w(uint8_t data)
 {
 	m_dma_scc_txb_ctrl = data;
-	logerror("dma_scc_txb_ctrl_w %02x\n", m_dma_scc_txb_ctrl);
+	LOGMASKED(LOG_DMA, "dma_scc_txb_ctrl_w %02x\n", m_dma_scc_txb_ctrl);
 }
 
 uint8_t macpdm_state::dma_scc_rxb_ctrl_r()
@@ -1116,8 +1159,26 @@ uint8_t macpdm_state::dma_scc_rxb_ctrl_r()
 
 void macpdm_state::dma_scc_rxb_ctrl_w(uint8_t data)
 {
-	m_dma_scc_rxb_ctrl = data;
-	logerror("dma_scc_rxb_ctrl_w %02x\n", m_dma_scc_rxb_ctrl);
+	LOGMASKED(LOG_DMA, "dma_scc_rxb_ctrl_w %02x\n", data);
+
+	// handle a channel reset
+	if (data & SCCDMA_RESET)
+	{
+		m_dma_scc_rxb_ctrl &= (SCCDMA_RELOAD | SCCDMA_FROZEN | SCCDMA_PAUSE | SCCDMA_IRQENABLE | SCCDMA_CONTINUE);
+	}
+
+	// handle an IRQ clear
+	if (data & SCCDMA_IRQ)
+	{
+		m_dma_scc_rxb_ctrl &= ~SCCDMA_IRQ;
+	}
+
+	// set FROZEN to the incoming PAUSE flag state
+	m_dma_scc_rxb_ctrl &= ~SCCDMA_FROZEN;
+	m_dma_scc_rxb_ctrl |= (data & SCCDMA_PAUSE) ? SCCDMA_FROZEN : 0x00;
+
+	// and apply the writable bits
+	m_dma_scc_rxb_ctrl = (m_dma_scc_rxb_ctrl & ~SCCDMA_WRITE_MASK) | (data & SCCDMA_WRITE_MASK);
 }
 
 uint8_t macpdm_state::dma_enet_rx_ctrl_r()
@@ -1128,7 +1189,7 @@ uint8_t macpdm_state::dma_enet_rx_ctrl_r()
 void macpdm_state::dma_enet_rx_ctrl_w(uint8_t data)
 {
 	m_dma_enet_rx_ctrl = data;
-	logerror("dma_enet_rx_ctrl_w %02x\n", m_dma_enet_rx_ctrl);
+	LOGMASKED(LOG_DMA, "dma_enet_rx_ctrl_w %02x\n", m_dma_enet_rx_ctrl);
 }
 
 uint8_t macpdm_state::dma_enet_tx_ctrl_r()
@@ -1139,7 +1200,7 @@ uint8_t macpdm_state::dma_enet_tx_ctrl_r()
 void macpdm_state::dma_enet_tx_ctrl_w(uint8_t data)
 {
 	m_dma_enet_tx_ctrl = data;
-	logerror("dma_enet_tx_ctrl_w %02x\n", m_dma_enet_tx_ctrl);
+	LOGMASKED(LOG_DMA, "dma_enet_tx_ctrl_w %02x\n", m_dma_enet_tx_ctrl);
 }
 
 uint32_t macpdm_state::sound_dma_output(offs_t offset)
@@ -1163,8 +1224,9 @@ void macpdm_state::pdm_map(address_map &map)
 	map(0x50f04000, 0x50f04007).rw(m_scc, FUNC(z80scc_device::dc_ab_r), FUNC(z80scc_device::dc_ab_w)).umask64(0xff00ff00ff00ff00);
 	// 50f08000 = ethernet ID PROM
 	// 50f0a000 = MACE ethernet controller
-	map(0x50f10000, 0x50f10000).rw(FUNC(macpdm_state::scsi_r), FUNC(macpdm_state::scsi_w)).select(0xf0);
+	map(0x50f10000, 0x50f100ff).rw(FUNC(macpdm_state::scsi_r), FUNC(macpdm_state::scsi_w));
 	map(0x50f10100, 0x50f10101).rw(m_ncr53c94, FUNC(ncr53c94_device::dma16_swap_r), FUNC(ncr53c94_device::dma16_swap_w));
+	// 50f11000 = 53CF94 on 8100
 	map(0x50f14000, 0x50f1401f).rw(m_awacs, FUNC(awacs_device::read), FUNC(awacs_device::write));
 	map(0x50f16000, 0x50f16000).rw(FUNC(macpdm_state::fdc_r), FUNC(macpdm_state::fdc_w)).select(0x1e00);
 
@@ -1211,7 +1273,7 @@ void macpdm_state::pdm_map(address_map &map)
 	map(0xffc00000, 0xffffffff).rom().region("bootrom", 0);
 }
 
-void macpdm_state::macpdm(machine_config &config)
+void macpdm_state::pmac6100(machine_config &config)
 {
 	PPC601(config, m_maincpu, 60'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpdm_state::pdm_map);
@@ -1297,7 +1359,7 @@ void macpdm_state::macpdm(machine_config &config)
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("8M");
-	m_ram->set_extra_options("16M,24M,40M,136M");
+	m_ram->set_extra_options("16M,24M,40M,72M,136M");
 
 	nubus_device &nubus(NUBUS(config, "nubus"));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
@@ -1335,4 +1397,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1994, pmac6100,  0, 0, macpdm, macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 6100/60",  MACHINE_NOT_WORKING )
+COMP( 1994, pmac6100,  0,        0, pmac6100, macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 6100/60",  MACHINE_NOT_WORKING )

@@ -499,7 +499,7 @@ void champbas_state::irq_enable_w(int state)
 
 TIMER_DEVICE_CALLBACK_MEMBER(exctsccr_state::exctsccr_sound_irq)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM 1
 }
 
 void champbas_state::tilemap_w(offs_t offset, uint8_t data)

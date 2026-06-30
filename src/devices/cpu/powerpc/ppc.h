@@ -166,7 +166,7 @@ enum
 #define PPCDRC_STRICT_VERIFY        0x0001          /* verify all instructions */
 #define PPCDRC_FLUSH_PC             0x0002          /* flush the PC value before each memory access */
 #define PPCDRC_ACCURATE_SINGLES     0x0004          /* do excessive rounding to make single-precision results "accurate" */
-
+#define PPCDRC_FULL_CACHE_FLUSH     0x0008          /* completely flush the DRC cache on ICBI, otherwise just end the block early */
 
 // common sets of options
 #define PPCDRC_COMPATIBLE_OPTIONS   (PPCDRC_STRICT_VERIFY | PPCDRC_FLUSH_PC | PPCDRC_ACCURATE_SINGLES)
@@ -592,6 +592,12 @@ protected:
 	// internal stuff
 	uint8_t               m_cache_dirty;                // true if we need to flush the cache
 
+	// track what logical pages have compiled code
+	std::vector<uint8_t>  m_codepage_bits;              // 1 bit for each 4K page
+	uint32_t              m_codepage_any;               // nonzero if any page bit is set (UML-readable)
+	void note_code_page(uint32_t page) { m_codepage_bits[page >> 3] |= 1 << (page & 7); m_codepage_any = 1; }
+	bool code_page_has_code(offs_t addr) const { uint32_t const page = (addr >> 12) & 0xfffff; return BIT(m_codepage_bits[page >> 3], page & 7); }
+
 	// reservation granularity
 	uint32_t m_reservation_mask;
 
@@ -706,6 +712,7 @@ protected:
 	void generate_set_fmod(drcuml_block &block);
 	void generate_update_mode(drcuml_block &block);
 	void generate_update_cycles(drcuml_block &block, compiler_state *compiler, uml::parameter param, bool allow_exception);
+	void generate_recompile_if(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc, uml::parameter flag);
 	void generate_checksum_block(drcuml_block &block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
 	void generate_sequence_instruction(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc);
 	void generate_compute_flags(drcuml_block &block, const opcode_desc *desc, int updatecr, uint32_t xermask, int invertcarry);

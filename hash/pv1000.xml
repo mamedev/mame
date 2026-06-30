@@ -381,4 +381,15 @@ Undumped carts:
 		</part>
 	</software>
 
+	<software name="swordwrk">
+		<description>SwordWork</description>
+		<year>2026</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv1000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="sword.rom" size="0x4000" crc="5e36a9dc" sha1="d1537a9f15e0a9fd4f2b3d3228d9cf4f7bf5a28d" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

@@ -69,6 +69,7 @@ sample code that you can use as a starting point when writing your own plugins.
     gdbstub
     hiscore
     inputmacro
+    keypress
     layout
     offscreenreload
     timecode
