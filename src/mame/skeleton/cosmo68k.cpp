@@ -24,15 +24,15 @@ TODO:
 - visible area
 - missing tiles
 - video registers
-- remainings inputs (probably missing at least reels stop, payout and keyout)
-- DIPs (DIPs definitions in test mode)
-- outputs
+- remainings inputs (probably missing at least reels stop)
+- hopper doesn't work
 */
 
 
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
+#include "machine/ticket.h"
 #include "sound/ymopn.h"
 
 #include "emupal.h"
@@ -50,6 +50,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_hopper(*this, "hopper"),
 		m_fgtileram(*this, "fgtileram%u", 0U),
 		m_bgtileram(*this, "bgtileram%u", 0U)
 	{ }
@@ -63,6 +64,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<hopper_device> m_hopper;
 
 	required_shared_ptr_array<uint16_t, 2> m_fgtileram;
 	required_shared_ptr_array<uint16_t, 2> m_bgtileram;
@@ -70,7 +72,7 @@ private:
 	tilemap_t *m_fg_tilemap[2] {};
 	tilemap_t *m_bg_tilemap[2] {};
 
-	uint16_t m_display_ctrl = 0;
+	uint16_t m_control = 0;
 
 	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_fgtile_info);
 	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_bgtile_info);
@@ -78,6 +80,8 @@ private:
 	template <uint8_t Which> void fgtileram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	template <uint8_t Which> void bgtileram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void control_w(uint16_t data);
 
 	void program_map(address_map &map) ATTR_COLD;
 };
@@ -133,8 +137,8 @@ uint32_t cosmo68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 	// m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 	// m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-	if (BIT(m_display_ctrl, 11)) m_fg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
-	if (BIT(m_display_ctrl, 12)) m_fg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+	if (BIT(m_control, 11)) m_fg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	if (BIT(m_control, 12)) m_fg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -142,7 +146,30 @@ uint32_t cosmo68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 void cosmo68k_state::machine_start()
 {
-	save_item(NAME(m_display_ctrl));
+	save_item(NAME(m_control));
+}
+
+void cosmo68k_state::control_w(uint16_t data)
+{
+	m_control = data;
+
+	machine().bookkeeping().coin_counter_w(0, BIT(m_control, 0)); // CNT0 in test mode
+	machine().bookkeeping().coin_counter_w(1, BIT(m_control, 1)); // CNT1 in test mode
+	machine().bookkeeping().coin_counter_w(2, BIT(m_control, 2)); // CNT2 in test mode
+	machine().bookkeeping().coin_counter_w(3, BIT(m_control, 3)); // CNT3 in test mode
+	machine().bookkeeping().coin_counter_w(4, BIT(m_control, 4)); // CNT4 in test mode
+	machine().bookkeeping().coin_counter_w(5, BIT(m_control, 5)); // CNT5 in test mode
+	machine().bookkeeping().coin_counter_w(6, BIT(m_control, 6)); // CNT6 in test mode
+	machine().bookkeeping().coin_lockout_w(0, BIT(m_control, 7)); // LOC0 in test mode
+	machine().bookkeeping().coin_lockout_w(1, BIT(m_control, 8)); // LOC1 in test mode
+	machine().bookkeeping().coin_lockout_w(2, BIT(m_control, 9)); // LOC2 in test mode
+
+	m_hopper->motor_w(BIT(m_control, 10)); // HPM in test mode
+
+	// bits 11 and 12 are fg tilemaps enable?
+
+	if (m_control & 0xe000)
+		logerror("%s unknown display_ctrl_w bit: %02x\n", machine().describe_context(), m_control & 0xe000);
 }
 
 
@@ -153,13 +180,14 @@ void cosmo68k_state::program_map(address_map &map)
 	map(0x044000, 0x044001).portr("DSW1");
 	map(0x044002, 0x044003).portr("DSW2");
 	map(0x044004, 0x044005).portr("DSW3");
+	// map(0x044006, 0x044007).r // read during DIP test mode?
 	map(0x044008, 0x044009).portr("IN0");
 	map(0x04400a, 0x04400b).portr("IN1");
 	map(0x04400c, 0x04400d).portr("IN2");
-	map(0x044010, 0x044011).lw16(NAME([this] (uint16_t data) {  m_display_ctrl = data; if (data) logerror("%s display_ctrl_w: %02x\n", machine().describe_context(), data); }));
+	map(0x044010, 0x044011).w(FUNC(cosmo68k_state::control_w));
 	map(0x044020, 0x044023).rw("ym", FUNC(ym2203_device::read), FUNC(ym2203_device::write)).umask16(0x00ff);
 	map(0x046000, 0x046fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x047000, 0x047fff).ram(); // ??
+	map(0x047000, 0x047fff).ram(); // ?? written during test mode
 	map(0x048000, 0x049fff).ram().w(FUNC(cosmo68k_state::fgtileram_w<0>)).share(m_fgtileram[0]); // VRAM FRONT 0 in RAM test
 	map(0x04a000, 0x04bfff).ram().w(FUNC(cosmo68k_state::fgtileram_w<1>)).share(m_fgtileram[1]); // VRAM FRONT 1 in RAM test
 	map(0x04c000, 0x04dfff).ram().w(FUNC(cosmo68k_state::bgtileram_w<0>)).share(m_bgtileram[0]); // VRAM BACK 0 in RAM test
@@ -181,8 +209,8 @@ static INPUT_PORTS_START( exfever )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_GAMBLE_HIGH )
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_GAMBLE_HIGH )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
@@ -212,10 +240,10 @@ static INPUT_PORTS_START( exfever )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -223,125 +251,144 @@ static INPUT_PORTS_START( exfever )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:2")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x000f, 0x0000, "Payout Rate" ) PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPSETTING(      0x0000, "34%" )
+	PORT_DIPSETTING(      0x0001, "38%" )
+	PORT_DIPSETTING(      0x0002, "42%" )
+	PORT_DIPSETTING(      0x0003, "46%" )
+	PORT_DIPSETTING(      0x0004, "50%" )
+	PORT_DIPSETTING(      0x0005, "54%" )
+	PORT_DIPSETTING(      0x0006, "58%" )
+	PORT_DIPSETTING(      0x0007, "62%" )
+	PORT_DIPSETTING(      0x0008, "66%" )
+	PORT_DIPSETTING(      0x0009, "70%" )
+	PORT_DIPSETTING(      0x000a, "74%" )
+	PORT_DIPSETTING(      0x000b, "78%" )
+	PORT_DIPSETTING(      0x000c, "82%" )
+	PORT_DIPSETTING(      0x000d, "86%" )
+	PORT_DIPSETTING(      0x000e, "90%" )
+	PORT_DIPSETTING(      0x000f, "94%" )
+	PORT_DIPNAME( 0x00f0, 0x0000, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPSETTING(      0x0000, DEF_STR( 10C_1C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( 5C_2C ) )
+	PORT_DIPSETTING(      0x0030, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0050, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(      0x0060, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0070, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0090, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x00a0, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x00b0, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_20C ) )
+	PORT_DIPSETTING(      0x00d0, DEF_STR( 1C_25C ) )
+	PORT_DIPSETTING(      0x00e0, DEF_STR( 1C_50C ) )
+	PORT_DIPSETTING(      0x00f0, DEF_STR( 1C_100C ) )
+	PORT_DIPNAME( 0x0f00, 0x0000, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW2:1,2,3,4")
+	PORT_DIPSETTING(      0x0000, DEF_STR( 10C_1C ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( 5C_2C ) )
+	PORT_DIPSETTING(      0x0300, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0500, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(      0x0600, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0700, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0900, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0a00, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x0b00, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(      0x0c00, DEF_STR( 1C_20C ) )
+	PORT_DIPSETTING(      0x0d00, DEF_STR( 1C_25C ) )
+	PORT_DIPSETTING(      0x0e00, DEF_STR( 1C_50C ) )
+	PORT_DIPSETTING(      0x0f00, DEF_STR( 1C_100C ) )
+	PORT_DIPNAME( 0xf000, 0x0000, "Coin C" ) PORT_DIPLOCATION("SW2:5,6,7,8")
+	PORT_DIPSETTING(      0x0000, DEF_STR( 10C_1C ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( 5C_2C ) )
+	PORT_DIPSETTING(      0x3000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x5000, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(      0x6000, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x7000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x9000, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0xa000, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0xb000, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(      0xc000, DEF_STR( 1C_20C ) )
+	PORT_DIPSETTING(      0xd000, DEF_STR( 1C_25C ) )
+	PORT_DIPSETTING(      0xe000, DEF_STR( 1C_50C ) )
+	PORT_DIPSETTING(      0xf000, DEF_STR( 1C_100C ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:1")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:2")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:3")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:4")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:5")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:6")
+	PORT_DIPNAME( 0x0007, 0x0000, "Key-In Rate" ) PORT_DIPLOCATION("SW3:1,2,3")
+	PORT_DIPSETTING(      0x0000, "5" )
+	PORT_DIPSETTING(      0x0001, "10" )
+	PORT_DIPSETTING(      0x0002, "50" )
+	PORT_DIPSETTING(      0x0003, "100" )
+	PORT_DIPSETTING(      0x0004, "200" )
+	PORT_DIPSETTING(      0x0005, "300" )
+	PORT_DIPSETTING(      0x0006, "500" )
+	PORT_DIPSETTING(      0x0007, "1000" )
+	PORT_DIPNAME( 0x0018, 0x0000, "Maximum Bet" ) PORT_DIPLOCATION("SW3:4,5")
+	PORT_DIPSETTING(      0x0000, "5" )
+	PORT_DIPSETTING(      0x0008, "10" )
+	PORT_DIPSETTING(      0x0010, "25" )
+	PORT_DIPSETTING(      0x0018, "50" )
+	PORT_DIPNAME( 0x0020, 0x0000, "Payout" ) PORT_DIPLOCATION("SW3:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:7")
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:7") // no effect shown in DIP menu
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:8")
+	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:8") // no effect shown in DIP menu
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:1")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:2")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:3")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:4")
+	PORT_DIPNAME( 0x0100, 0x0000, "Double Up Kind" ) PORT_DIPLOCATION("SW4:1")
+	PORT_DIPSETTING(      0x0000, "Odd or Even" )
+	PORT_DIPSETTING(      0x0100, "High and Low" )
+	PORT_DIPNAME( 0x0200, 0x0000, "Double Up Even" ) PORT_DIPLOCATION("SW4:2")
+	PORT_DIPSETTING(      0x0000, "Even" )
+	PORT_DIPSETTING(      0x0200, "Lose" )
+	PORT_DIPNAME( 0x0400, 0x0000, "Double Up Count" ) PORT_DIPLOCATION("SW4:3")
+	PORT_DIPSETTING(      0x0000, "Unlimited" )
+	PORT_DIPSETTING(      0x0400, "5" )
+	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:4") // no effect shown in DIP menu
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:5")
+	PORT_DIPNAME( 0x1000, 0x0000, "Limit" ) PORT_DIPLOCATION("SW4:5")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:6")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:7")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:8")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
+	PORT_DIPNAME( 0xe000, 0x0000, "Limit Credit" ) PORT_DIPLOCATION("SW4:6,7,8")
+	PORT_DIPSETTING(      0x0000, "3000" )
+	PORT_DIPSETTING(      0x2000, "5000" )
+	PORT_DIPSETTING(      0x4000, "8000" )
+	PORT_DIPSETTING(      0x6000, "10000" )
+	PORT_DIPSETTING(      0x8000, "20000" )
+	PORT_DIPSETTING(      0xa000, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0xc000, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0xe000, "Unlimited" )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW5:1")
+	PORT_DIPNAME( 0x0001, 0x0000, "Flip Flop" ) PORT_DIPLOCATION("SW5:1")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW5:2")
+	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW5:2") // no effect shown in DIP menu
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW5:3")
+	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW5:3") // no effect shown in DIP menu
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW5:4")
+	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW5:4") // no effect shown in DIP menu
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW5:5")
+	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW5:5") // no effect shown in DIP menu
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW5:6")
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW5:6") // no effect shown in DIP menu
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW5:7")
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW5:7") // no effect shown in DIP menu
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Test ) ) PORT_DIPLOCATION("SW5:8")
@@ -362,6 +409,8 @@ void cosmo68k_state::exfever(machine_config &config)
 	M68000(config, m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cosmo68k_state::program_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cosmo68k_state::irq2_line_hold));
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -400,4 +449,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1993, exfever, 0, exfever, exfever, cosmo68k_state, empty_init, ROT0, "Cosmo", "Exciting Fever", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1993, exfever, 0, exfever, exfever, cosmo68k_state, empty_init, ROT0, "Cosmo", "Exciting Fever", MACHINE_NOT_WORKING )
