@@ -95,6 +95,7 @@
 #define LOG_AST (1U << 9)
 #define LOG_RTC (1U << 10)
 #define LOG_FB (1U << 11)
+#define LOG_FB_ROP (1U << 12)
 
 #define VERBOSE (LOG_FB)
 
@@ -276,7 +277,7 @@ namespace
 		required_device<ram_device> m_ram;
 		required_region_ptr<u32> m_eprom;
 		required_region_ptr<u32> m_idrom;
-		required_region_ptr<u16> m_krom;
+		required_region_ptr<u32> m_krom;
 
 		// Platform hardware
 		required_device<msm58321_device> m_rtc;
@@ -652,10 +653,22 @@ namespace
 			m_fb_busy = true;
 			m_fb_current_x = m_fb_destination_x;
 
-			// TODO: if this is FB -> FB op, start it here, because the host won't write anything
+			// TODO: This executes copies at once, faster than real hardware. Needs more work to be cycle-accurate.
+			// TODO: make m_fb_read only work
 			if (m_fb_read && m_fb_write)
 			{
-				// fatalerror("Yikes, fb copy isn't done yet\n");
+				const int dx = int(m_fb_source_x) - int(m_fb_destination_x);
+				const int dy = int(m_fb_source_y) - int(m_fb_destination_y);
+				m_fb_current_x = m_fb_destination_x;
+
+				while (m_fb_busy)
+				{
+					const uint16_t sx = m_fb_current_x + dx;
+					const uint16_t sy = m_fb_destination_y + dy;
+					const uint32_t byte_offset = sy * 128 + ((sx >> 4) << 1);
+					const uint16_t data = (m_vram->read(byte_offset) << 8) | m_vram->read(byte_offset + 1);
+					fb_rop_cycle(data); // When the ROP is done, this function will clear m_fb_busy
+				}
 			}
 		}
 	}
@@ -723,6 +736,11 @@ namespace
 	void news_iop_state::rop_config_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	{
 		check_mem_mask(mem_mask);
+
+		if (m_fb_busy)
+		{
+			fatalerror("IOP tried to reconfigure while op was in progress!");
+		}
 
 		LOGMASKED(LOG_FB, "rop_config_w(0x%x, 0x%x) = ", offset, data);
 
@@ -834,7 +852,7 @@ namespace
 				fatalerror("news_68k_iop: invalid ROP function code 0x%x", opcode);
 		}
 
-		// LOGMASKED(LOG_FB, "execute_rop(0x%x/%s, 0x%x, 0x%x) = 0x%x\n", opcode, op, source, destination, result);
+		LOGMASKED(LOG_FB_ROP, "execute_rop(0x%x/%s, 0x%x, 0x%x) = 0x%x\n", opcode, op, source, destination, result);
 		return result;
 	}
 
@@ -878,11 +896,12 @@ namespace
 
 		// TODO: writing a destination word should be in a helper, but that is far from the only thing wrong with this.
 		// If this is the last FIFO push of the row (we have leftover bits from the shift in the shifter), we need to apply them.
-		const uint16_t source_words = ((m_fb_source_x & 0xf) // Get the pixel offset within word
-											+ m_fb_limit_x - m_fb_destination_x + 0xf) // Add the width in pixels, rounded up
+		const uint16_t source_words = // ((m_fb_source_x & 0xf) + // Get the pixel offset within word
+											(m_fb_limit_x - m_fb_destination_x + 0xf) // Add the width in pixels, rounded up
 											>> 4; // Convert to word address
 		const uint16_t destination_words = ((m_fb_destination_x & 0xf) + m_fb_limit_x - m_fb_destination_x + 0xf) >> 4;
 		const uint16_t rel_word = (m_fb_current_x - m_fb_destination_x) >> 4;
+		LOGMASKED(LOG_FB, "Carryover calc: rel_word = 0x%x source_words = 0x%x, destination_words = 0x%x\n", rel_word, source_words, destination_words);
 		if (rel_word >= source_words - 1 && source_words < destination_words) {
 			// write last FIFO word of row as assembled above and prepare destination word with carry
 			m_vram->write(byte_offset, result >> 8 & 0xff);
@@ -953,63 +972,14 @@ namespace
 		}
 		else
 		{
-			// LOGMASKED(LOG_FB, "fb_fifo_w: pushing 0x%x to row 0x%x vs limit 0x%x!\n", data, m_fb_destination_y, m_fb_limit_y);
-
 			// Graphics ops are always word-aligned. However, mask1 and mask2 make non-aligned access work as expected.
-			const uint16_t word_count = (m_fb_limit_x >> 4) - (m_fb_current_x >> 4); // TODO: this doesn't work for single-transfers
+			// TODO: this needs more testing. The fact that one call to fb_rop_cycle can make two writes might break this
+			const uint16_t word_count = ((m_fb_limit_x + 0xf) >> 4) - (m_fb_destination_x >> 4); // +0xf is ceiling to prevent off-by-ones for unaligned ops
+			LOGMASKED(LOG_FB, "fb_fifo_w: pushing 0x%x %d times to row 0x%x vs limit 0x%x\n", data, word_count, m_fb_destination_y, m_fb_limit_y);
+
 			for (uint16_t i = 0; i < word_count; i++)
 			{
-				const uint32_t byte_offset = m_fb_destination_y * 128 + (m_fb_current_x >> 3); // Y: 1024 / 8 = 128 bytes per row
-
-				// Set word
-				const uint16_t destination = m_vram->read(byte_offset) << 8 | m_vram->read(byte_offset + 1);
-				// LOGMASKED(LOG_FB, "fb_fifo_w: destination (0x%x, 0x%x) => 0x%x = 0x%x\n", m_fb_destination_x, m_fb_destination_y, byte_offset, destination);
-				uint16_t result = execute_rop(m_fb_rop_func, data, destination); // TODO: apply shift here
-
-				if (m_fb_mask1_armed)
-				{
-					result &= ~m_fb_mask1; // Clear bits that need to be preserved
-					result |= destination & m_fb_mask1; // Unconditionally apply masked bits from destination
-					m_fb_mask1_armed = false;
-				}
-
-				// If we are setting the last word of the row, we need to apply mask2
-				// TODO: properly use direction: last_word needs to be m_fb_destination_x >> 4 when x_direction is false
-				//       and the advancing code needs to account for it as well.
-				const uint16_t last_word = (m_fb_limit_x - 1) >> 4;
-				const bool is_last_word = m_fb_current_x >> 4 == last_word;
-				if (is_last_word)
-				{
-					result &= ~m_fb_mask2;
-					result |= destination & m_fb_mask2;
-				}
-
-				// Write result back to VRAM
-				// LOGMASKED(LOG_FB, "fb_fifo_w: destination (0x%x, 0x%x) => 0x%x = 0x%x 0x%x\n", m_fb_destination_x, m_fb_destination_y, byte_offset, result >> 8 & 0xff, result & 0xff);
-				m_vram->write(byte_offset, result >> 8 & 0xff);
-				m_vram->write(byte_offset + 1, result & 0xff);
-
-				// Advance ROCC state
-				m_fb_current_x += 16;
-
-				// If we are now past the limit, that means we just finished a row and need to reset x and advance y
-				if (is_last_word)
-				{
-					// LOGMASKED(LOG_FB, "fb_fifo_w: done with row, advancing y\n");
-					m_fb_current_x = m_fb_destination_x;
-					m_fb_destination_y++;
-					m_fb_mask1_armed = true;
-
-					if (!m_fb_limit_y)
-					{
-						// LOGMASKED(LOG_FB, "fb_fifo_w: ROP done!\n");
-						m_fb_busy = false;
-					}
-					else
-					{
-						m_fb_limit_y--;
-					}
-				}
+				fb_rop_cycle(data);
 			}
 		}
 	}
@@ -1043,7 +1013,7 @@ namespace
 		map(0x20000000, 0x20efffff).rw(FUNC(news_iop_state::extio_bus_error_r),FUNC(news_iop_state::extio_bus_error_w)).mirror(0x1f000000);
 
 		// NWB-512 Monochrome Framebuffer (816x1024)
-		// TODO: convert ranges to use `select` where it makes sense
+		// TODO: convert ranges to use `select` where it makes sense?
 		map(0x20f02000, 0x20f02001).w(FUNC(news_iop_state::shift_w)); // shift count when only "load shift" is asserted
 		map(0x20f08000, 0x20f0ffff).w(FUNC(news_iop_state::destination_w)); // A13 = load shift, A14 = start execution
 		map(0x20f20000, 0x20f27fff).w(FUNC(news_iop_state::source_w)); // A13 = load shift, A14 = start execution
@@ -1075,13 +1045,7 @@ namespace
 			LOGMASKED(LOG_FB, "Write plane mask = 0x%x\n", data);
 		}, "plane_mask_w");
 
-		// map(0x20fc0000, 0x20ffffff).rom().region("krom", 0);
-		map(0x20fc0000, 0x20ffffff).lr16([this] (offs_t offset, uint16_t mem_mask) {
-			LOGMASKED(LOG_FB, "krom read offset 0x%x = 0x%x\n", offset, m_krom[offset]);
-			//machine().debug_break();
-			return m_krom[offset];
-			//return 0xffff;
-		}, "krom_r");   //.rom().region("krom", 0);
+		map(0x20fc0000, 0x20ffffff).rom().region("krom", 0);
 
 		// Expansion slot SCC (bus errors here kill iopboot, so the probe process may not use bus errors, at least not with the same setup as extio)
 		// TODO: Does the fact that NEWS-OS 4 poke at these addresses mean that something is not configured properly elsewhere?
@@ -1665,7 +1629,7 @@ namespace
 
 		// NWB-512 Kanji ROM
 		// TODO: this mapping should be set up by the graphics card instead when it is moved to a separate device
-		ROM_REGION16_BE(0x40000, "krom", 0)
+		ROM_REGION32_BE(0x40000, "krom", 0)
 		ROM_LOAD16_BYTE("nwb512-ic128-hn62301ap-aa1.bin", 0x0000, 0x20000, CRC(3eaa0dbc) SHA1(9c4e66cc122fd60963f51649c945cdfc39f230eb))
 		ROM_LOAD16_BYTE("nwb512-ic127-hn62301ap-aa2.bin", 0x0001, 0x20000, CRC(b8705af7) SHA1(915333f082ecbfee512f1166fc38d9dd29dcaf26))
 	ROM_END
