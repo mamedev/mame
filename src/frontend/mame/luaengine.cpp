@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "luaengine.ipp"
+#include "output.ipp"
 
 #include "mame.h"
 #include "pluginopts.h"
@@ -1567,7 +1568,14 @@ void lua_engine::initialize()
 	device_type.set_function("memshare", &device_t::memshare);
 	device_type.set_function("membank", &device_t::membank);
 	device_type.set_function("ioport", &device_t::ioport);
-	device_type.set_function("output", [] (device_t &d, std::string_view name) { return output_proxy(d, name); });
+	device_type.set_function("output", sol::overload(
+			[] (device_t &d, std::string_view name) { return output_proxy(d, name); },
+			[] (device_t &d, std::string_view name, int value) 
+			{ 
+				output_manager::item_creator_proxy creator;
+				creator.resolve(d, name);
+				creator = value;
+			}));
 	device_type.set_function("subdevice", static_cast<device_t *(device_t::*)(std::string_view) const>(&device_t::subdevice));
 	device_type.set_function("siblingdevice", static_cast<device_t *(device_t::*)(std::string_view) const>(&device_t::siblingdevice));
 	device_type.set_function("parameter", &device_t::parameter);

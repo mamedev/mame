@@ -33,6 +33,13 @@
 
 class output_manager
 {
+public:
+	// public proxy interfaces
+	template <typename X, unsigned... N> class output_finder;
+	template <typename X> class output_finder<X>;
+	class output_proxy;
+	class item_creator_proxy;
+
 private:
 	template <typename Input, std::make_unsigned_t<Input> DefaultMask> friend class devcb_write;
 
@@ -172,7 +179,6 @@ private:
 	using qualified_name_set = std::unordered_set<item_reference, qualified_name_hash, qualified_name_equal>;
 	using unqualified_name_set = std::unordered_set<item_reference, unqualified_name_hash, unqualified_name_equal>;
 
-	class item_creator_proxy;
 	template <unsigned M, unsigned... N> struct item_proxy_array { typedef typename item_proxy_array<N...>::type type[M]; };
 	template <unsigned N> struct item_proxy_array<N> { typedef item_creator_proxy type[N]; };
 	template <unsigned... N> using item_proxy_array_t = typename item_proxy_array<N...>::type;
@@ -196,10 +202,6 @@ private:
 	std::unique_ptr<s32 []>     m_save_data;
 
 public:
-	template <typename X, unsigned... N> class output_finder;
-	template <typename X> class output_finder<X>;
-	class output_proxy;
-
 	// construction/destruction
 	output_manager(running_machine &machine);
 
