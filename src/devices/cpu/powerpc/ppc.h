@@ -353,6 +353,8 @@ protected:
 
 		// FP save values
 		double fpscr_op[2];
+
+		uint32_t m_codepage_any;                    // nonzero if any page bit is set (UML-readable)
 	};
 
 	internal_ppc_state *m_core;
@@ -594,8 +596,7 @@ protected:
 
 	// track what logical pages have compiled code
 	std::vector<uint8_t>  m_codepage_bits;              // 1 bit for each 4K page
-	uint32_t              m_codepage_any;               // nonzero if any page bit is set (UML-readable)
-	void note_code_page(uint32_t page) { m_codepage_bits[page >> 3] |= 1 << (page & 7); m_codepage_any = 1; }
+	void note_code_page(uint32_t page) { m_codepage_bits[page >> 3] |= 1 << (page & 7); m_core->m_codepage_any = 1; }
 	bool code_page_has_code(offs_t addr) const { uint32_t const page = (addr >> 12) & 0xfffff; return BIT(m_codepage_bits[page >> 3], page & 7); }
 
 	// reservation granularity
