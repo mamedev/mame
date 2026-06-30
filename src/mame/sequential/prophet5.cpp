@@ -87,7 +87,9 @@ done, it will load bank 1 program 1.
 #define LOG_TUNE        (1U << 12)
 
 #define VERBOSE (LOG_CALIBRATION)
-//#define LOG_OUTPUT_FUNC osd_printf_info
+#define LOG_OUTPUT_FUNC osd_printf_info
+
+#define DEBUG_WAV 0
 
 #include "logmacro.h"
 
@@ -720,6 +722,9 @@ void prophet5_voice_device::device_add_mconfig(machine_config &config)
 	const double cf_a = jittered(CAP_P(1000), m_jitter[0], 5);  // C4119 (poly). Tolerance not documented. Assuming 5%.
 	const double rr_a = jittered(RES_M(2.21), m_jitter[1], 1);  // R4326 (1%)
 	CEM3340(config, m_osc_a, cf_a, rr_a)  // U454
+#if (DEBUG_WAV)
+		.add_route(cem3340_device::OUTPUT_PULSE, *this, 1.0)
+#endif
 		.add_route(cem3340_device::OUTPUT_RAMP, m_osc_a_mix, 0.0, ca3280_vca_device::INPUT_AUDIO)
 		.add_route(cem3340_device::OUTPUT_PULSE, m_osc_a_mix, 0.0, ca3280_vca_device::INPUT_AUDIO_INV);
 
@@ -828,7 +833,7 @@ void prophet5_voice_device::device_add_mconfig(machine_config &config)
 	CA3280_VCA_LIN(config, m_vca, RES_K(68), VPLUS, VMINUS)  // R4546
 		.set_rplus(RES_K(20))  // R4548
 		// r_minus is set in voice_update_balance_calibration().
-		.add_route(0, *this, 1.0);
+		.add_route(0, *this, DEBUG_WAV ? 0.0 : 1.0);
 }
 
 ioport_constructor prophet5_voice_device::device_input_ports() const
@@ -1468,7 +1473,6 @@ void prophet5_audio_device::device_add_mconfig(machine_config &config)
 		.add_route(cem3340_device::OUTPUT_TRIANGLE, m_lfo_tri_center, 1.0)
 		.add_route(cem3340_device::OUTPUT_RAMP, m_lfo_vca, 1.0)
 		.add_route(cem3340_device::OUTPUT_PULSE, m_lfo_vca, 1.0);
-	m_lfo->set_pw_ctrl(VPLUS * RES_VOLTAGE_DIVIDER(RES_K(10), RES_K(2)));  // R3110, R3111, 50% PW.
 	VA_SCALE_OFFSET(config, m_lfo_tri_center)  // U380B (TL082) and surrounding resistors.
 		.set_scale(0).set_offset(0)
 		.add_route(0, m_lfo_vca, 1.0);
@@ -1587,7 +1591,9 @@ void prophet5_audio_device::device_add_mconfig(machine_config &config)
 			.add_route(0, m_parasitic_filter, 1.0);
 		m_voices[i]->volume_changed_cb().set([this] (u8 data) { update_voice_volume(); });
 	}
-
+#if (DEBUG_WAV)
+	m_voices[0]->add_route(0, "audio_out", 1.0 / (15.0 * 3500 * 2));
+#endif
 	// A pair of MUXes can route each oscillator to a comparator. The comparator's
 	// output drives the CLK input of the tuning flipflop (see prophet5_state::prophet5rev30()).
 	// The two MUXes and comparator are emulated in PROPHET5_TUNING.
@@ -1621,7 +1627,7 @@ void prophet5_audio_device::device_add_mconfig(machine_config &config)
 		.configure_voltage_output(RES_K(20))  // R4562
 		.set_rplus(RES_K(15))  // R4564
 		.set_rminus(RES_K(15))  // R4563 - from parts list. Value in the schematic is unclear.
-		.add_route(0, "dcblock", 1.0);
+		.add_route(0, "dcblock", DEBUG_WAV ? 0 : 1.0);
 
 	// Output stage.
 	FILTER_RC(config, "dcblock")  // 0.7 Hz HPF
@@ -1647,6 +1653,9 @@ void prophet5_audio_device::device_start()
 		osc[2 * i + 1] = m_voices[i]->osc_b_for_tuning();
 	}
 	m_tune_cmp->set_oscillators(osc);
+
+	// The LFO has a hardcoded pulse width of 50%.
+	m_lfo->set_pw_ctrl(VPLUS * RES_VOLTAGE_DIVIDER(RES_K(10), RES_K(2)));  // R3110, R3111
 }
 
 void prophet5_audio_device::device_reset()

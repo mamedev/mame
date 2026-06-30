@@ -38,18 +38,26 @@ constexpr float PULSE_MAX = VCC - 1.5F;
 // section of the datasheet, if you need to make this configurable.
 constexpr float PULSE_MIN = 0;
 
+
+constexpr va_vco_config CEM3340_VCO_CONFIG
+{
+	.ramp_min = RAMP_MIN,
+	.ramp_max = RAMP_MAX,
+	.pulse_min = PULSE_MIN,
+	.pulse_max = PULSE_MAX,
+	.tri_min = TRIANGLE_MIN,
+	.tri_max = TRIANGLE_MAX,
+	.sync_type = va_vco_config::SYNC_TYPE_REVERSE,
+};
+
 }  // anonymous namespace
 
 
 cem3340_device::cem3340_device(const machine_config &mconfig, const char *tag, device_t *owner, float cf, float rr)
-	: va_vco_device(mconfig, CEM3340, tag, owner, 0)
+	: va_vco_device(mconfig, CEM3340, tag, owner, CEM3340_VCO_CONFIG)
 	, m_cf(cf)
 	, m_rr(rr)
 {
-	configure_ramp_range(RAMP_MIN, RAMP_MAX);
-	configure_pulse_range(PULSE_MIN, PULSE_MAX);
-	configure_triangle_range(TRIANGLE_MIN, TRIANGLE_MAX);
-	configure_sync_type(SYNC_TYPE_REVERSE);
 }
 
 cem3340_device::cem3340_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)

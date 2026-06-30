@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles,m1macrophage
 /***************************************************************************
 
     Curtis Electromusic Specialties CEM3394 µP-Controllable Synthesizer Voice
@@ -12,6 +12,7 @@
 #include "cem3394.h"
 
 #include <algorithm>
+#include <limits>
 
 
 #define ENABLE_FILTER       1
@@ -121,27 +122,30 @@ DEFINE_DEVICE_TYPE(CEM3394, cem3394_device, "cem3394", "CEM3394 Synthesizer Voic
 cem3394_device::cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, CEM3394, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
+	m_vco(*this, "vco"),
 	m_vcf(*this, "vcf"),
 	m_stream(nullptr),
-	m_inv_sample_rate(1.0 / 48000.0),
 	m_vco_zero_freq(500.0),
 	m_filter_zero_freq(1300.0),
+	m_c_ac(0),
 	m_hpf_k(0),
-	m_values{-1}, // will be initialized in device_start()
+	m_values(),
 	m_wave_select(0),
 	m_volume(0),
 	m_mixer_internal(0),
 	m_mixer_external(0),
-	m_vco_position(0),
-	m_vco_step(0),
+	m_vco_freq(0),
+	m_pulse_width(0),
 	m_filter_frequency(1300),
 	m_filter_modulation(0),
 	m_filter_resonance(0),
-	m_pulse_width(0),
 	m_hpf_mem(0)
 {
 	// configuring with the example values in the datasheet
 	configure(270E3, 2E-9, 33E-9, 4.7E-6);
+
+	for (int i = 0; i < INPUT_COUNT; ++i)
+		m_values[i] = std::numeric_limits<float>::quiet_NaN();
 }
 
 cem3394_device &cem3394_device::configure(double r_vco, double c_vco, double c_vcf, double c_ac)
@@ -149,21 +153,15 @@ cem3394_device &cem3394_device::configure(double r_vco, double c_vco, double c_v
 	// datasheet equation for Fout at CV = 0
 	m_vco_zero_freq = 1.3 / (5.0 * r_vco * c_vco);
 
-	// VCO can range up to pow(2, 4.0/.75) = ~40.3 * zero-voltage-freq
-	const double sample_rate = m_vco_zero_freq * pow(2, 4.0 / 0.75) * 5;
-	m_inv_sample_rate = 1.0 / sample_rate;
-
 	// datasheet equation for Pzcv
 	// Note that "4.3 x 10E-5" in the equation should be 4.3E-5. The surrounding
 	// text and the example walkthrough use the correct value.
 	m_filter_zero_freq = 4.3E-5 / c_vcf;
 
-	// See hpf() for more info
-	constexpr double R_AC = 11E3;  // internal AC coupling resistor
-	m_hpf_k = 1.0 - exp((-1 / (R_AC * c_ac)) * m_inv_sample_rate);
+	m_c_ac = c_ac;
 
-	LOGMASKED(LOG_CONFIG, "CEM3394 config - vco zero freq: %f, filter zero freq: %f, sample rate: %d\n",
-			  m_vco_zero_freq, m_filter_zero_freq, int(sample_rate));
+	LOGMASKED(LOG_CONFIG, "CEM3394 config - vco zero freq: %f, filter zero freq: %f\n",
+			  m_vco_zero_freq, m_filter_zero_freq);
 	return *this;
 }
 
@@ -217,45 +215,34 @@ void cem3394_device::sound_stream_update(sound_stream &stream)
 			}
 		}
 
-		// get the current VCO position and step it forward
-		double vco_position = m_vco_position;
-		m_vco_position += m_vco_step;
+		m_vco->set_freq(m_vco_freq);
+		m_vco->set_pw(m_pulse_width);
 
-		// clamp VCO position to a fraction
-		if (m_vco_position >= 1.0)
-			m_vco_position -= floor(m_vco_position);
+		const bool pulse_on = ENABLE_PULSE && (m_wave_select & WAVE_PULSE);
+		const bool saw_on = ENABLE_SAWTOOTH && (m_wave_select & WAVE_SAWTOOTH);
+		const bool triangle_on = ENABLE_TRIANGLE && (m_wave_select & WAVE_TRIANGLE);
+		const bool fm_on = ENABLE_FILTER && (m_filter_modulation > 0.0F);
+
+		float saw = 0, pulse = 0, triangle = 0;
+		m_vco->next_sample(
+			saw_on ? &saw : nullptr,
+			pulse_on ? &pulse : nullptr,
+			(triangle_on || fm_on) ? &triangle : nullptr);
 
 		// handle the pulse component
 		double result = 0;
-		if (ENABLE_PULSE && (m_wave_select & WAVE_PULSE))
-		{
-			// The datasheet mentions a "unique circuit [...] that keeps the
-			// average DC level [...] constant regardless of duty cycle". The
-			// block diagram shows the pulse signal being subtracted from the
-			// pulse width. Here, the pulse width is subtracted from the signal
-			// instead, to ensure a phase consistent with the rest of the signal.
-			if (vco_position < m_pulse_width)
-				result += (1 - m_pulse_width) * PULSE_VOLUME * m_mixer_internal;
-			else
-				result += (0 - m_pulse_width) * PULSE_VOLUME * m_mixer_internal;
-		}
+		if (pulse_on)
+			result += PULSE_VOLUME * pulse;
 
 		// handle the sawtooth component
-		if (ENABLE_SAWTOOTH && (m_wave_select & WAVE_SAWTOOTH))
-			result += SAWTOOTH_VOLUME * m_mixer_internal * (vco_position - 0.5);
-
-		// always compute the triangle waveform which is also used for filter modulation
-		double triangle = 2.0 * vco_position;
-		if (triangle > 1.0)
-			triangle = 2.0 - triangle;
-		triangle -= 0.5;
+		if (saw_on)
+			result += SAWTOOTH_VOLUME * saw;
 
 		// handle the triangle component
-		if (ENABLE_TRIANGLE && (m_wave_select & WAVE_TRIANGLE))
-			result += TRIANGLE_VOLUME * m_mixer_internal * triangle;
+		if (triangle_on)
+			result += TRIANGLE_VOLUME * triangle;
 
-		// convert from [-0.5, 0.5] to [-1, 1]
-		result *= 2;
+		result *= m_mixer_internal;
 
 		// compute extension input (for Bally/Sente this is the noise)
 		if (ENABLE_EXTERNAL && BIT(input_mask, AUDIO_INPUT))
@@ -265,7 +252,11 @@ void cem3394_device::sound_stream_update(sound_stream &stream)
 		// modulation tracks the VCO triangle
 		if (ENABLE_FILTER)
 		{
-			m_vcf->set_fixed_freq_cv(m_filter_frequency * (1 + m_filter_modulation * triangle));
+			double filter_freq = m_filter_frequency;
+			if (fm_on)
+				filter_freq *= 1.0 + m_filter_modulation * 0.5 * triangle;
+
+			m_vcf->set_fixed_freq_cv(filter_freq);
 			m_vcf->set_fixed_res_cv(m_filter_resonance);
 			result = m_vcf->process_sample(result);
 		}
@@ -286,6 +277,13 @@ void cem3394_device::sound_stream_update(sound_stream &stream)
 
 void cem3394_device::device_add_mconfig(machine_config &config)
 {
+	constexpr va_vco_config CEM3394_VCO_CONFIG =
+	{
+		.pulse_dc_comp = true,
+		.pulse_from_tri = true,
+	};
+	VA_VCO_STREAMLESS(config, m_vco, CEM3394_VCO_CONFIG);
+
 	VA_LPF4(config, m_vcf).configure_drive(1.0);
 
 	// According to the datasheet, the filter maintains the apparent loudness
@@ -297,8 +295,14 @@ void cem3394_device::device_add_mconfig(machine_config &config)
 void cem3394_device::device_start()
 {
 	// compute a sample rate
-	const int sample_rate = int(round(1.0 / m_inv_sample_rate));
+	// using a minimum of 96KHz to reduce aliasing from filter distortion.
+	const int sample_rate = std::max(machine().sample_rate(), 96000);
+	m_vco->configure_sample_rate(sample_rate);
 	m_vcf->configure_streamless(sample_rate);
+
+	// see hpf() for more info
+	constexpr double R_AC = 11E3;  // internal AC coupling resistor
+	m_hpf_k = 1.0 - exp((-1 / (R_AC * m_c_ac)) / double(sample_rate));
 
 	// allocate stream channels
 	m_stream = stream_alloc(get_sound_requested_inputs(), 1, sample_rate);
@@ -310,14 +314,12 @@ void cem3394_device::device_start()
 	save_item(NAME(m_mixer_internal));
 	save_item(NAME(m_mixer_external));
 
-	save_item(NAME(m_vco_position));
-	save_item(NAME(m_vco_step));
+	save_item(NAME(m_vco_freq));
+	save_item(NAME(m_pulse_width));
 
 	save_item(NAME(m_filter_frequency));
 	save_item(NAME(m_filter_modulation));
 	save_item(NAME(m_filter_resonance));
-
-	save_item(NAME(m_pulse_width));
 
 	save_item(NAME(m_hpf_mem));
 
@@ -364,8 +366,6 @@ sound_stream::sample_t cem3394_device::compute_db_volume(double voltage)
 
 void cem3394_device::set_voltage_internal(int input, double voltage)
 {
-	double temp;
-
 	// don't do anything if no change
 	if (voltage == m_values[input])
 		return;
@@ -376,9 +376,8 @@ void cem3394_device::set_voltage_internal(int input, double voltage)
 	{
 		// frequency varies from -4.0 to +4.0, at 0.75V/octave
 		case VCO_FREQUENCY:
-			temp = m_vco_zero_freq * pow(2.0, -voltage * (1.0 / 0.75));
-			m_vco_step = temp * m_inv_sample_rate;
-			LOGMASKED(LOG_CONTROL_CHANGES, "VCO_FREQ=%6.3fV -> freq=%f\n", voltage, temp);
+			m_vco_freq = m_vco_zero_freq * pow(2.0, -voltage * (1.0 / 0.75));
+			LOGMASKED(LOG_CONTROL_CHANGES, "VCO_FREQ=%6.3fV -> freq=%f\n", voltage, m_vco_freq);
 			break;
 
 		// Wave select chooses between triangle, sawtooth, both, or neither.
