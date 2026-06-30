@@ -13,10 +13,6 @@
 	- layouts
 	- software list
 	- formatting SCSI drives on S950 doesn't seem to work
-	- S900 1.2a firmware bug? recording a sample causes code in RAM to get trashed via
-	  uninitialized pointer, so further recording attempts will crash.
-	  Deleting/zeroing out the branch at address 04593 avoids the issue.
-	  The 2.1 and 4.0 OS disks don't have this issue; the (undumped) 1.2c ROM might not either
 	- RS232 port for S950 (shares 6850 w/ MIDI)
 ***************************************************************************/
 
@@ -932,8 +928,12 @@ INPUT_PORTS_END
 
 ROM_START( s900 )
 	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD16_BYTE("akai s900 v1.2a l.ic12", 0x0000, 0x4000, CRC(1077a91a) SHA1(0cb91474300f3dc090375e33ca73dd4d7a438f88))
-	ROM_LOAD16_BYTE("akai s900 v1.2a m.ic11", 0x0001, 0x4000, CRC(558e402d) SHA1(6dce63a2216c4d4b015e0abf9b9ea492e776b201))
+	ROM_SYSTEM_BIOS(0, "v12c", "Version 1.2c")
+	ROMX_LOAD("s900 v1.2c lsb.ic12", 0x0000, 0x4000, CRC(d0925ed4) SHA1(6c07a9baf4dfe59de5362e1f44e9a28e08c1b765), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("s900 v1.2c msb.ic11", 0x0001, 0x4000, CRC(24ccb3e0) SHA1(bcdbfb590f894849716e40722f82b4302de3366b), ROM_BIOS(0) | ROM_SKIP(1))
+	ROM_SYSTEM_BIOS(1, "v12a", "Version 1.2a")
+	ROMX_LOAD("akai s900 v1.2a l.ic12", 0x0000, 0x4000, CRC(1077a91a) SHA1(0cb91474300f3dc090375e33ca73dd4d7a438f88), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD("akai s900 v1.2a m.ic11", 0x0001, 0x4000, CRC(558e402d) SHA1(6dce63a2216c4d4b015e0abf9b9ea492e776b201), ROM_BIOS(1) | ROM_SKIP(1))
 
 	ROM_REGION(0x1000, "fadetbl", 0)
 	// 3 copies at IC73, IC74, IC75 used to calculate velocity crossfade (2764, A12 tied high)
