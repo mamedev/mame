@@ -1139,13 +1139,15 @@ void pc88va_state::pc88va_cbus(machine_config &config)
 
 void pc88va_state::pc88va(machine_config &config)
 {
-	V50(config, m_maincpu, MASTER_CLOCK); // μPD9002, aka V50 + μPD70008AC (for PC8801 compatibility mode) in place of 8080
+	// μPD9002, aka V50 + μPD70008AC (for PC8801 compatibility mode) in place of 8080
+	// HACK: bump by x2 for now to avoid slowdowns (shinraba, hatisora) to progressive corruption (olteus)
+	V50(config, m_maincpu, MASTER_CLOCK * 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc88va_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &pc88va_state::io_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(pc88va_state::vrtc_irq), "screen", 0, 1);
 	m_maincpu->icu_slave_ack_cb().set(m_pic2, FUNC(pic8259_device::acknowledge));
 	// beep and RS-232C runs at regular 3'993'600
-	m_maincpu->set_tclk(MASTER_CLOCK / 2);
+	m_maincpu->set_tclk((MASTER_CLOCK * 2) / 2);
 	// "timer 1"
 //  m_maincpu->tout0_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_maincpu->tout1_cb().set(m_dac1bit, FUNC(speaker_sound_device::level_w));
