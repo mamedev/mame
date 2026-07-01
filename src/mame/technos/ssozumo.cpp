@@ -66,7 +66,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	void palette(palette_device &palette) const;
+	void palette_init(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void main_map(address_map &map) ATTR_COLD;
@@ -93,7 +93,7 @@ private:
 
 /**************************************************************************/
 
-void ssozumo_state::palette(palette_device &palette) const
+void ssozumo_state::palette_init(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -431,7 +431,7 @@ void ssozumo_state::ssozumo(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ssozumo);
-	PALETTE(config, m_palette, FUNC(ssozumo_state::palette), 64 + 16);
+	PALETTE(config, m_palette, FUNC(ssozumo_state::palette_init), 64 + 16);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
