@@ -89,7 +89,8 @@ public:
 	virtual void address_w(uint8_t data);
 
 	/* read from the status register */
-	uint8_t status_r();
+	// NOTE: subclassed by mos8563
+	virtual uint8_t status_r();
 
 	/* read from the currently selected register */
 	virtual uint8_t register_r();
