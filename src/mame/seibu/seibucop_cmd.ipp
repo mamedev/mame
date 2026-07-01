@@ -198,7 +198,7 @@ void raiden2cop_device::execute_338e(int offset, uint16_t data, bool is_yflip)
 
 void raiden2cop_device::execute_3b30(int offset, uint16_t data)
 {
-	/* TODO: these are actually internally loaded via 0x130e command */
+	/* TODO: these are actually internally loaded via 0x330e/0x130e command */
 	int dx, dy;
 
 	dx = m_host_space->read_dword(cop_regs[1] + 4) - m_host_space->read_dword(cop_regs[0] + 4);
@@ -709,6 +709,28 @@ void raiden2cop_device::execute_f105(int offset, uint16_t data)
 {
 	// ...
 }
+
+
+void raiden2cop_device::execute_fc84(int offset, uint16_t data)
+{
+	// Destination is not certain but makes sense.  fc84 and f790 are called back-to-back
+	m_host_space->write_dword(cop_regs[4] + 8, m_host_space->read_dword(cop_regs[4] + 0) - m_host_space->read_dword(cop_regs[4] + 4));
+}
+
+void raiden2cop_device::execute_f790(int offset, uint16_t data)
+{
+	cop_dist = sqrt(m_host_space->read_dword(cop_regs[4] + 8));
+}
+
+void raiden2cop_device::execute_ede5(int offset, uint16_t data)
+{
+	s32 v1 = m_host_space->read_dword(cop_regs[4] + 8);
+	s32 v2 = m_host_space->read_dword(cop_regs[4] + 12);
+	s32 v3 = m_host_space->read_dword(cop_regs[4] + 16);
+	if(v3 != 0)
+		cop_write_word(cop_regs[4] + 22, (v1 + v2) / v3);
+}
+
 
 #ifdef UNUSED_COMMANDS
 

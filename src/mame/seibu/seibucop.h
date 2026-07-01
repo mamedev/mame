@@ -222,6 +222,10 @@ private:
 	void execute_b900(int offset, uint16_t data);
 	void execute_f105(int offset, uint16_t data);
 
+	void execute_ede5(int offset, uint16_t data);
+	void execute_f790(int offset, uint16_t data);
+	void execute_fc84(int offset, uint16_t data);
+
 	// TODO: remove/rename these
 	//void LEGACY_execute_130e(int offset, uint16_t data);
 	void LEGACY_execute_130e_cupsoc(int offset, uint16_t data);
