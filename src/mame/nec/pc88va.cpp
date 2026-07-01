@@ -787,23 +787,54 @@ void pc88va_state::io_map(address_map &map)
 			m_singleplane.wss = (data >> 3) & 3;
 		})
 	);
-	map(0x0590, 0x0593).umask16(0x00ff).lrw8(
+	// NOTE: Singleplane PATR and ROP allows word write (ballbrkr title screen, in RGB565)
+	// but anything else will byte write here, so propagate thru the mem_mask
+	map(0x0590, 0x0593).lrw16(
 		NAME([this] (offs_t offset) {
 			LOGGFXCTRL("Singleplane PATR%d R\n", offset);
-			return m_singleplane.patr[offset];
+			return m_singleplane.patr[offset << 1] | (m_singleplane.patr[(offset << 1) | 1] << 8);
 		}),
-		NAME([this] (offs_t offset, u8 data) {
-			LOGGFXCTRL("Singleplane PATR%d W %02x\n", offset, data);
-			m_singleplane.patr[offset] = data;
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			if (mem_mask == 0xffff)
+			{
+				m_singleplane.patr[(offset << 1) | 0] = data & 0xff;
+				m_singleplane.patr[(offset << 1) | 1] = data >> 8;
+			}
+			else if (mem_mask == 0x00ff)
+			{
+				m_singleplane.patr[(offset << 1) | 0] = data & 0xff;
+				m_singleplane.patr[(offset << 1) | 1] = data & 0xff;
+			}
+			else
+			{
+				m_singleplane.patr[(offset << 1) | 0] = data >> 8;
+				m_singleplane.patr[(offset << 1) | 1] = data >> 8;
+			}
+			LOGGFXCTRL("Singleplane PATR%d W %04x & %04x\n", offset, data, mem_mask);
 		})
 	);
-	map(0x05a0, 0x05a3).umask16(0x00ff).lrw8(
+	map(0x05a0, 0x05a3).lrw16(
 		NAME([this] (offs_t offset) {
-			return m_singleplane.rop[offset];
+			return m_singleplane.rop[offset << 1] | (m_singleplane.rop[(offset << 1) | 1] << 8);
 		}),
-		NAME([this] (offs_t offset, u8 data) {
-			LOGGFXCTRL("Singleplane ROP %d W %02x\n", offset, data);
-			m_singleplane.rop[offset] = data;
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			if (mem_mask == 0xffff)
+			{
+				m_singleplane.rop[(offset << 1) | 0] = data & 0xff;
+				m_singleplane.rop[(offset << 1) | 1] = data >> 8;
+			}
+			else if (mem_mask == 0x00ff)
+			{
+				m_singleplane.rop[(offset << 1) | 0] = data & 0xff;
+				m_singleplane.rop[(offset << 1) | 1] = data & 0xff;
+			}
+			else
+			{
+				m_singleplane.rop[(offset << 1) | 0] = data >> 8;
+				m_singleplane.rop[(offset << 1) | 1] = data >> 8;
+			}
+
+			LOGGFXCTRL("Singleplane ROP%d W %04x & %04x\n", offset, data, mem_mask);
 		})
 	);
 

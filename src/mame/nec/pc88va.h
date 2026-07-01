@@ -211,8 +211,8 @@ private:
 	struct {
 		//bool rbusy;
 		u8 wss;
-		u8 patr[2];
-		u8 rop[2];
+		u8 patr[4];
+		u8 rop[4];
 	} m_singleplane;
 
 	struct {

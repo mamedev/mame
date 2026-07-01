@@ -2214,7 +2214,7 @@ u8 pc88va_state::gvram_singleplane_r(offs_t offset)
 
 void pc88va_state::gvram_singleplane_w(offs_t offset, u8 data)
 {
-	const u8 page_bank = BIT(offset, 17);
+	const u8 page_bank = (BIT(offset, 17) << 1) | (offset & 1);
 	switch(m_singleplane.wss & 3)
 	{
 		// ROP
