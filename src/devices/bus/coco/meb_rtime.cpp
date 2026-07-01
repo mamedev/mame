@@ -15,7 +15,7 @@
 #include "machine/msm6242.h"
 #include "bus/centronics/ctronics.h"
 
-#define VERBOSE (LOG_GENERAL)
+//#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
 // ======================> disto_rtime_device
@@ -39,6 +39,7 @@ namespace
 
 		private:
 			void busy_w(int state);
+			static u8 translate_rtc_address(u8 software_addr);
 
 			required_device<msm6242_device> m_rtc;
 			u8 m_rtc_address;
@@ -87,13 +88,32 @@ namespace
 
 	void disto_rtime_device::device_add_mconfig(machine_config &config)
 	{
-		MSM6242(config, m_rtc, XTAL(32'768));
+		MSM6242(config, m_rtc, XTAL(32'768), false /* 12 hour time */);
 
 		CENTRONICS(config, m_centronics, centronics_devices, "printer");
 		m_centronics->busy_handler().set(FUNC(disto_rtime_device::busy_w));
 
 		OUTPUT_LATCH(config, m_latch);
 		m_centronics->set_output_latch(*m_latch);
+	}
+
+	//-------------------------------------------------
+	//  translate_rtc_address
+	//
+	//  The Disto RTIME board wires the MSM6242's date/calendar registers
+	//  (addresses 6-12) in a non-standard order: the block is rotated one
+	//  position left relative to the datasheet (SW addr 6=DOW, 7=D1, 8=D10,
+	//  9=MO1, 10=MO10, 11=Y1, 12=Y10). Time-of-day registers (0-5) are
+	//  unaffected. Confirmed by multiple independent contemporary software
+	//  titles.
+	//-------------------------------------------------
+
+	u8 disto_rtime_device::translate_rtc_address(u8 software_addr)
+	{
+		if (software_addr < 6 || software_addr > 12)
+			return software_addr;
+
+		return 6 + ((software_addr - 6 - 1 + 7) % 7);
 	}
 
 	//-------------------------------------------------
@@ -107,13 +127,15 @@ namespace
 		switch(offset)
 		{
 			case 0x00:  /* FF50 */
-				result = m_rtc->read(m_rtc_address & 0x0f);
+				result = m_rtc->read(translate_rtc_address(m_rtc_address & 0x0f));
 				break;
 
 			case 0x02:  /* FF52 */
 			case 0x03:  /* FF53 */
 				result = m_centronics_busy << 7;
 		}
+
+		LOG("%s meb read: %02x %02x\n", machine().describe_context(), offset, result);
 
 		return result;
 	}
@@ -125,12 +147,12 @@ namespace
 
 	void disto_rtime_device::meb_write(offs_t offset, u8 data)
 	{
-		LOG("meb write: %02x %02x\n", offset, data);
+		LOG("%s meb write: %02x %02x\n", machine().describe_context(), offset, data);
 
 		switch(offset)
 		{
 			case 0x00: /* FF50 */
-				m_rtc->write(m_rtc_address & 0x0f, data);
+				m_rtc->write(translate_rtc_address(m_rtc_address & 0x0f), data);
 				break;
 
 			case 0x01: /* FF51 */

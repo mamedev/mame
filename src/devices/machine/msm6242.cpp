@@ -75,14 +75,15 @@ DEFINE_DEVICE_TYPE(RTC72423, rtc72423_device, "rtc72423", "Epson RTC-72423 RTC")
 //  msm6242_device - constructor
 //-------------------------------------------------
 
-msm6242_device::msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msm6242_device(mconfig, MSM6242, tag, owner, clock)
+msm6242_device::msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, bool default_24h)
+	: msm6242_device(mconfig, MSM6242, tag, owner, clock, default_24h)
 {
 }
 
-msm6242_device::msm6242_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+msm6242_device::msm6242_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool default_24h)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_rtc_interface(mconfig, *this)
+	, m_default_24h(default_24h)
 	, m_out_int_handler(*this)
 {
 }
@@ -109,7 +110,9 @@ void msm6242_device::device_start()
 	// TODO: skns writes 0x4 to D then expects E == 6 and F == 4, perhaps those are actually saved in the RTC CMOS?
 	m_reg[0] = 0;
 	m_reg[1] = 0x6;
-	m_reg[2] = 0x4;
+
+	// Register F (m_reg[2]): bit 2 is 24/12 hour mode selection (1 = 24h, 0 = 12h)
+	m_reg[2] = m_default_24h ? 0x4 : 0x0;
 
 	// save states
 	save_item(NAME(m_reg));
@@ -117,6 +120,7 @@ void msm6242_device::device_start()
 	save_item(NAME(m_irq_type));
 	save_item(NAME(m_tick));
 	save_item(NAME(m_last_update_time));
+	save_item(NAME(m_default_24h));
 }
 
 
@@ -183,6 +187,7 @@ void msm6242_device::set_irq(bool active)
 		}
 	}
 }
+
 
 
 //-------------------------------------------------
@@ -525,8 +530,109 @@ u8 msm6242_device::read(offs_t offset)
 
 void msm6242_device::write(offs_t offset, u8 data)
 {
+	// update the registers so we are working with the current time values
+	update_rtc_registers();
+
+	int second = get_clock_register(RTC_SECOND);
+	int minute = get_clock_register(RTC_MINUTE);
+	int hour = get_clock_register(RTC_HOUR);
+	int day = get_clock_register(RTC_DAY);
+	int month = get_clock_register(RTC_MONTH);
+	int year = get_clock_register(RTC_YEAR);
+	int day_of_week = get_clock_register(RTC_DAY_OF_WEEK);
+	bool time_changed = false;
+
 	switch(offset)
 	{
+		case MSM6242_REG_S1:
+			second = (second / 10) * 10 + (data & 0x0f);
+			time_changed = true;
+			break;
+
+		case MSM6242_REG_S10:
+			second = (data & 0x0f) * 10 + (second % 10);
+			time_changed = true;
+			break;
+
+		case MSM6242_REG_MI1:
+			minute = (minute / 10) * 10 + (data & 0x0f);
+			time_changed = true;
+			break;
+
+		case MSM6242_REG_MI10:
+			minute = (data & 0x0f) * 10 + (minute % 10);
+			time_changed = true;
+			break;
+
+		case MSM6242_REG_H1:
+			if ((m_reg[2] & 0x04) == 0) // 12-hour mode
+			{
+				int pm = (hour >= 12) ? 1 : 0;
+				int h12 = hour % 12;
+				if (h12 == 0) h12 = 12;
+				h12 = (h12 / 10) * 10 + (data & 0x0f);
+				if (h12 == 12) h12 = 0;
+				hour = h12 + (pm ? 12 : 0);
+			}
+			else // 24-hour mode
+			{
+				hour = (hour / 10) * 10 + (data & 0x0f);
+			}
+			time_changed = true;
+			break;
+
+		case MSM6242_REG_H10:
+			if ((m_reg[2] & 0x04) == 0) // 12-hour mode
+			{
+				int pm = (data >> 2) & 1;
+				int h12 = hour % 12;
+				if (h12 == 0) h12 = 12;
+				h12 = ((data & 0x03) * 10) + (h12 % 10);
+				if (h12 == 12) h12 = 0;
+				hour = h12 + (pm ? 12 : 0);
+			}
+			else // 24-hour mode
+			{
+				hour = (data & 0x03) * 10 + (hour % 10);
+			}
+			time_changed = true;
+			break;
+
+		case MSM6242_REG_D1:
+			day = (day / 10) * 10 + (data & 0x0f);
+			time_changed = true;
+			break;
+
+		case MSM6242_REG_D10:
+			day = (data & 0x0f) * 10 + (day % 10);
+			time_changed = true;
+			break;
+
+		case MSM6242_REG_MO1:
+			month = (month / 10) * 10 + (data & 0x0f);
+			time_changed = true;
+			break;
+
+		case MSM6242_REG_MO10:
+			month = (data & 0x0f) * 10 + (month % 10);
+			time_changed = true;
+			break;
+
+		case MSM6242_REG_Y1:
+			year = (year / 10) * 10 + (data & 0x0f);
+			time_changed = true;
+			break;
+
+		case MSM6242_REG_Y10:
+			year = (data & 0x0f) * 10 + (year % 10);
+			time_changed = true;
+			break;
+
+		case MSM6242_REG_W:
+			day_of_week = (data & 0x07) + 1;
+			time_changed = true;
+			break;
+
 		case MSM6242_REG_CD:
 			//  x--- 30s ADJ
 			//  -x-- IRQ FLAG (software can only clear this)
@@ -580,6 +686,13 @@ void msm6242_device::write(offs_t offset, u8 data)
 			break;
 	}
 
+	if (time_changed)
+	{
+		set_time(false, year, month, day, day_of_week, hour, minute, second);
+		m_tick = 0; // Clear internal sub-second fraction ticks on host write
+		m_last_update_time = current_time();
+	}
+
 	// update the timer variable in response to potential changes
 	update_timer();
 }
@@ -589,8 +702,8 @@ void msm6242_device::write(offs_t offset, u8 data)
 //  rtc62421_device - constructor
 //-------------------------------------------------
 
-rtc62421_device::rtc62421_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msm6242_device(mconfig, RTC62421, tag, owner, clock)
+rtc62421_device::rtc62421_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, bool default_24h)
+	: msm6242_device(mconfig, RTC62421, tag, owner, clock, default_24h)
 {
 }
 
@@ -599,8 +712,8 @@ rtc62421_device::rtc62421_device(const machine_config &mconfig, const char *tag,
 //  rtc62423_device - constructor
 //-------------------------------------------------
 
-rtc62423_device::rtc62423_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msm6242_device(mconfig, RTC62423, tag, owner, clock)
+rtc62423_device::rtc62423_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, bool default_24h)
+	: msm6242_device(mconfig, RTC62423, tag, owner, clock, default_24h)
 {
 }
 
@@ -609,8 +722,8 @@ rtc62423_device::rtc62423_device(const machine_config &mconfig, const char *tag,
 //  rtc72421_device - constructor
 //-------------------------------------------------
 
-rtc72421_device::rtc72421_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msm6242_device(mconfig, RTC72421, tag, owner, clock)
+rtc72421_device::rtc72421_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, bool default_24h)
+	: msm6242_device(mconfig, RTC72421, tag, owner, clock, default_24h)
 {
 }
 
@@ -619,7 +732,7 @@ rtc72421_device::rtc72421_device(const machine_config &mconfig, const char *tag,
 //  rtc72423_device - constructor
 //-------------------------------------------------
 
-rtc72423_device::rtc72423_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msm6242_device(mconfig, RTC72423, tag, owner, clock)
+rtc72423_device::rtc72423_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, bool default_24h)
+	: msm6242_device(mconfig, RTC72423, tag, owner, clock, default_24h)
 {
 }
