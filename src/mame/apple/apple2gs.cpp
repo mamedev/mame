@@ -1715,7 +1715,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return m_speed;
 
 		case 0x3c:  // SOUNDCTL
-			return m_sndglu_ctrl;
+			return m_sndglu_ctrl | 0x1f;
 
 		case 0x3d:  // SOUNDDATA
 			ret = m_sndglu_dummy_read;
@@ -1966,7 +1966,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			}
 
 			m_vgcint &= 0xf0;
-			m_vgcint |= (data & 0x0f);
+			m_vgcint |= (data & 0x07);
 			//printf("%02x to VGCINT, now %02x\n", data, m_vgcint);
 			break;
 
@@ -1981,15 +1981,15 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x29:  // NEWVIDEO
-			m_video->set_newvideo(data);
+			m_video->set_newvideo(data & 0xe1);
 			break;
 
 		case 0x2b:  // LANGSEL
-			m_video->set_GS_langsel(data);
+			m_video->set_GS_langsel(data & 0xf8);
 			break;
 
 		case 0x2d:  // SLOTROMSEL
-			m_slotromsel = data;
+			m_slotromsel = data & 0xf6;
 			break;
 
 		case 0x31:  // DISKREG
@@ -2002,7 +2002,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			{
 				m_cur_floppy->ss_w(BIT(data, DISKREG_HDSEL));
 			}
-			m_diskreg = data;
+			m_diskreg = data & 0xc0;
 			break;
 
 		case 0x32:  // VGCINTCLEAR
@@ -2019,7 +2019,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			{
 				m_screen->update_now();
 			}
-			m_clock_control = data & 0x7f;
+			m_clock_control = data & 0x6f;
 			m_video->set_GS_border(data & 0xf);
 			m_rtc->ce_w(BIT(data, 7) ^ 1);
 			if (data & 0x80)
