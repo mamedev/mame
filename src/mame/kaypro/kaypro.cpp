@@ -129,41 +129,29 @@ void kaypro84_state::kaypro484_io(address_map &map)
 // sector through it with INIR/OTIR, then polls BUSY/DRQ at 0x87); 0x81-0x87
 // are the WD1010 task-file registers 1-7 (error/precomp, sector count, sector
 // number, cyl low, cyl high, SDH, status/command) -- see the V1.9E ROM source.
-void kaypro84_state::kaypro1084_io(address_map &map)
+void kaypro10_state::kaypro1084_io(address_map &map)
 {
 	kaypro484_io(map);
-	map(0x80, 0x87).rw(FUNC(kaypro84_state::hdc_r), FUNC(kaypro84_state::hdc_w));
+	map(0x80, 0x87).rw(FUNC(kaypro10_state::hdc_r), FUNC(kaypro10_state::hdc_w));
+	map(0x80, 0x80).rw(FUNC(kaypro10_state::hdc_data_r), FUNC(kaypro10_state::hdc_data_w));
 }
 
 // Kaypro 10 (1983, Bd. 81-180) with the WD1002-HD0 wired up.  Same controller
 // at the same ports as the '84, but on the simpler kaypro10_io (no z80pio/RTC).
-void kaypro84_state::kaypro10hd_io(address_map &map)
+void kaypro10_state::kaypro10hd_io(address_map &map)
 {
 	kaypro10_io(map);
-	map(0x80, 0x87).rw(FUNC(kaypro84_state::hdc_r), FUNC(kaypro84_state::hdc_w));
+	map(0x80, 0x87).rw(FUNC(kaypro10_state::hdc_r), FUNC(kaypro10_state::hdc_w));
+	map(0x80, 0x80).rw(FUNC(kaypro10_state::hdc_data_r), FUNC(kaypro10_state::hdc_data_w));
 }
 
-u8 kaypro84_state::hdc_r(offs_t offset)
+u8 kaypro10_state::hdc_r(offs_t offset)
 {
-	if (offset == 0)   // 0x80: host reads the buffered sector (data already in the buffer)
-	{
-		u8 const data = m_hdc_buf[m_hdc_ptr & 0x1ff];
-		if (!machine().side_effects_disabled())
-			m_hdc_ptr++;
-		return data;
-	}
-	return m_hdc->read(offset);   // 0x81-0x87 -> WD1010 task-file regs 1-7
+	return m_hdc->read(offset);   // 0x81-0x87 -> WD1010 task-file regs 1-7 (0x80 handled by hdc_data_r)
 }
 
-void kaypro84_state::hdc_w(offs_t offset, u8 data)
+void kaypro10_state::hdc_w(offs_t offset, u8 data)
 {
-	if (offset == 0)   // 0x80: WD1002 sector-buffer data port
-	{
-		m_hdc_buf[m_hdc_ptr & 0x1ff] = data;
-		if ((m_hdc_ptr++ & 0x1ff) == 0x1ff)
-			m_hdc->brdy_w(1);   // host has filled a full 512-byte sector
-		return;
-	}
 	if (offset == 6)   // SDH (Size/Drive/Head)
 	{
 		// Head select comes from SDH bits 0-2 (MAME's wd1010 takes head via head_w).
@@ -178,19 +166,36 @@ void kaypro84_state::hdc_w(offs_t offset, u8 data)
 		m_hdc->brdy_w(0);
 		m_hdc_ptr = 0;
 	}
-	m_hdc->write(offset, data);   // 0x81-0x87 -> WD1010 task-file regs 1-7
+	m_hdc->write(offset, data);   // 0x81-0x87 -> WD1010 task-file regs 1-7 (0x80 handled by hdc_data_w)
+}
+
+// 0x80: the WD1002 board's sector-buffer data port (host side), installed over the
+// main handler above.  The host bursts a 512-byte sector through here with INIR/OTIR.
+u8 kaypro10_state::hdc_data_r()
+{
+	u8 const data = m_hdc_buf[m_hdc_ptr & 0x1ff];
+	if (!machine().side_effects_disabled())
+		m_hdc_ptr++;
+	return data;
+}
+
+void kaypro10_state::hdc_data_w(u8 data)
+{
+	m_hdc_buf[m_hdc_ptr & 0x1ff] = data;
+	if ((m_hdc_ptr++ & 0x1ff) == 0x1ff)
+		m_hdc->brdy_w(1);   // host has filled a full 512-byte sector
 }
 
 // WD1010 <-> board sector buffer: the controller drains/fills the buffer here
 // (no host-side BRDY handshake on these accesses).
-u8 kaypro84_state::hdc_buf_in()
+u8 kaypro10_state::hdc_buf_in()
 {
 	u8 const data = m_hdc_buf[m_hdc_ptr & 0x1ff];
 	m_hdc_ptr++;
 	return data;
 }
 
-void kaypro84_state::hdc_buf_out(u8 data)
+void kaypro10_state::hdc_buf_out(u8 data)
 {
 	m_hdc_buf[m_hdc_ptr & 0x1ff] = data;
 	// once the controller has filled a whole sector, the board reports buffer-ready so the
@@ -200,7 +205,7 @@ void kaypro84_state::hdc_buf_out(u8 data)
 }
 
 // WD1010 buffer-counter reset (BCR): just rewind the pointer; BRDY is managed at command edges.
-void kaypro84_state::hdc_bcr_w(int state)
+void kaypro10_state::hdc_bcr_w(int state)
 {
 	if (state)
 		m_hdc_ptr = 0;
@@ -499,20 +504,20 @@ void kaypro84_state::kaypro1(machine_config &config)
 // exposed at I/O 0x80; the WD1010 task file at 0x81-0x87 (see the V1.9/V1.9E ROM
 // source).  Both Kaypro 10 boards (81-180 '83 and 81-181 '84) carry the same
 // controller -- only the surrounding I/O map differs -- so share the wiring here.
-void kaypro84_state::add_hdc(machine_config &config)
+void kaypro10_state::add_hdc(machine_config &config)
 {
 	config.device_remove("fdc:1");  // the HD models carry a single floppy drive
 	WD1010(config, m_hdc, 5'000'000);
-	m_hdc->out_bcr_callback().set(FUNC(kaypro84_state::hdc_bcr_w));
-	m_hdc->in_data_callback().set(FUNC(kaypro84_state::hdc_buf_in));
-	m_hdc->out_data_callback().set(FUNC(kaypro84_state::hdc_buf_out));
+	m_hdc->out_bcr_callback().set(FUNC(kaypro10_state::hdc_bcr_w));
+	m_hdc->in_data_callback().set(FUNC(kaypro10_state::hdc_buf_in));
+	m_hdc->out_data_callback().set(FUNC(kaypro10_state::hdc_buf_out));
 	HARDDISK(config, m_hdd, 0);
 }
 
-void kaypro84_state::kaypro10(machine_config &config)
+void kaypro10_state::kaypro10(machine_config &config)
 {
 	kaypro484(config);
-	m_maincpu->set_addrmap(AS_IO, &kaypro84_state::kaypro10hd_io);
+	m_maincpu->set_addrmap(AS_IO, &kaypro10_state::kaypro10hd_io);
 	m_maincpu->set_daisy_config(kaypro10_daisy_chain);
 	config.device_remove("z80pio");
 	config.device_remove("rtc");
@@ -520,10 +525,10 @@ void kaypro84_state::kaypro10(machine_config &config)
 	SOFTWARE_LIST(config.replace(), "flop_list").set_original("kaypro").set_filter("E");
 }
 
-void kaypro84_state::kaypro1084(machine_config &config)
+void kaypro10_state::kaypro1084(machine_config &config)
 {
 	kaypro484(config);
-	m_maincpu->set_addrmap(AS_IO, &kaypro84_state::kaypro1084_io);
+	m_maincpu->set_addrmap(AS_IO, &kaypro10_state::kaypro1084_io);
 	add_hdc(config);  // WD1002-HD0 + 10MB drive (also removes fdc:1)
 	SOFTWARE_LIST(config.replace(), "flop_list").set_original("kaypro").set_filter("E");
 }
@@ -807,12 +812,12 @@ ROM_END
 /*    YEAR  NAME          PARENT     COMPAT  MACHINE     INPUT   CLASS           INIT         COMPANY               FULLNAME */
 COMP( 1982, kayproii,     0,         0,      kayproii,   kaypro, kayproii_state, init_kaypro, "Non-Linear Systems", "Kaypro II - 2/83", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, kayproiv,     kayproii,  0,      kayproiv,   kaypro, kayproii_state, init_kaypro, "Non-Linear Systems", "Kaypro IV - 4/83", MACHINE_SUPPORTS_SAVE ) // model 81-004
-COMP( 1983, kaypro10,     0,         0,      kaypro10,   kaypro, kaypro84_state, init_kaypro, "Non-Linear Systems", "Kaypro 10 - 1983", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, kaypro10,     0,         0,      kaypro10,   kaypro, kaypro10_state, init_kaypro, "Non-Linear Systems", "Kaypro 10 - 1983", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, kayproiip88,  kayproii,  0,      kayproii,   kaypro, kayproii_state, init_kaypro, "Kaypro Corporation", "Kaypro 4 plus88 - 4/83" , MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // model 81-004 with an added 8088 daughterboard and rom
 COMP( 1984, kaypro484,    0,         0,      kaypro484,  kaypro, kaypro84_state, init_kaypro, "Kaypro Corporation", "Kaypro 4/84", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // model 81-015
 COMP( 1984, kaypro284,    kaypro484, 0,      kaypro284,  kaypro, kaypro84_state, init_kaypro, "Kaypro Corporation", "Kaypro 2/84", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // model 81-015
 COMP( 1984, kaypro484p88, kaypro484, 0,      kaypro484,  kaypro, kaypro84_state, init_kaypro, "Kaypro Corporation", "Kaypro 4/84 plus88", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // model 81-015 with an added 8088 daughterboard and rom
-COMP( 1984, kaypro1084,   kaypro10,  0,      kaypro1084, kaypro, kaypro84_state, init_kaypro, "Kaypro Corporation", "Kaypro 10", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // model 81-005
+COMP( 1984, kaypro1084,   kaypro10,  0,      kaypro1084, kaypro, kaypro10_state, init_kaypro, "Kaypro Corporation", "Kaypro 10", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // model 81-005
 COMP( 1984, robie,        0,         0,      kaypro4x,   kaypro, kaypro84_state, init_kaypro, "Kaypro Corporation", "Kaypro Robie", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1985, kaypro2x,     kaypro484, 0,      kaypro484,  kaypro, kaypro84_state, init_kaypro, "Kaypro Corporation", "Kaypro 2x", MACHINE_SUPPORTS_SAVE ) // model 81-025
 COMP( 1985, kaypronew2,   0,         0,      kaypronew2, kaypro, kaypro84_state, init_kaypro, "Kaypro Corporation", "Kaypro New 2", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
