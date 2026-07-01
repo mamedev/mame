@@ -268,6 +268,8 @@ private:
 		u16 ofy;
 		u16 fbw;
 		u16 fbl;
+		u32 layer_base;
+		u32 layer_mask;
 	};
 
 	void draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which);
