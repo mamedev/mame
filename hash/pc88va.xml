@@ -85,12 +85,12 @@ Operating Systems
 <!-- !Demos -->
 
 	<!-- These three demos all have the same sequences, mislabeled? -->
-	<software name="pc88vad" cloneof="88va2d" supported="no">
-		<description>PC88-VA Demo</description>
+	<software name="pc88vad" cloneof="88va2d" supported="partial">
+		<description>PC-88VA Tentou Demo (alt)</description>
 		<year>19??</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
-1st sequence now runs too slow (?)
+1st sequence now runs too slow (verify with ref)
 3rd sequence looks slow, [SGP]?
 Transition fades out too late, sprite should supposedly fade out before reaching top of screen, requires [IDP] IBF flag
 Transition between 3rd and 4th sequences don't look right, [IDP]
@@ -105,8 +105,8 @@ Transition between 3rd and 4th sequences don't look right, [IDP]
 
 <!-- These were in a folder called 基本システムセット, i.e. Kihon System Set (AKA Basic System Set) -->
 
-	<software name="88va1td" cloneof="88va2d" supported="no">
-		<description>88VA1 Tentou Demo</description>
+	<software name="88va1td" cloneof="88va2d" supported="partial">
+		<description>PC-88VA Tentou Demo (alt 2)</description>
 		<year>19??</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
@@ -120,8 +120,8 @@ Transition between 3rd and 4th sequences don't look right, [IDP]
 		</part>
 	</software>
 
-	<software name="88va2d" supported="no">
-		<description>88VA2 Demo</description>
+	<software name="88va2d" supported="partial">
+		<description>PC-88VA Tentou Demo</description>
 		<year>19??</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
@@ -137,13 +137,14 @@ Transition between 3rd and 4th sequences don't look right, [IDP]
 <!-- !Applications -->
 
 	<software name="animefrm" supported="no">
-		<!-- PS88-VA101-HMW subtitle on cover -->
+		<!-- PS88-VA101-HMW serial on cover -->
 		<description>Anime Framer (v1.0)</description>
 		<!-- 1988 according to about section -->
 		<year>1987</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
-[gfx] status bar has wrong colors [OFX/OFY]
+Line options doesn't work (verify, not from [SGP]?)
+Not extensively tested (has [scanner] options, user disk creation etc.)
 ]]></notes>
 		<info name="alt_title" value="アニメフレーマー" />
 		<sharedfeat name="mouseport_default" value="mouse"/>
@@ -206,15 +207,15 @@ Incomplete MIF-201 [MIDI] emulation
 
 <!-- !Operating Systems -->
 
-	<software name="pceva2tb" supported="no">
+	<software name="pceva2tb" supported="partial">
 		<description>PC-Engine (VA2 Tenpu-ban)</description>
 		<year>1988</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
-Has HDFORM.COM utility
+Has HDFORM.COM utility (requires working [C-Bus] PC-9801-27)
 JTERM.BAT is for connecting to a PC-VAN or ANSI [terminal]
-PCALC.BAT requires [keyboard] PC+V press to bring up
-SKYBD.BAT wants a radio cassette player and a PC-KD861 color monitor for audio sampling thru OPNA EOS
+PCALC.BAT requires [keyboard] PC+V press to bring up (fixed)
+SKYBD.BAT wants a radio cassette player and a PC-KD861 color monitor for audio sampling thru [OPNA] EOS
 VIDEO.BAT has various superimpose effects, requires dedicated board
 ]]></notes>
 		<info name="alt_title" value="PC-Engine(VA2添付版)" />
@@ -227,7 +228,7 @@ VIDEO.BAT has various superimpose effects, requires dedicated board
 		</part>
 	</software>
 
-	<software name="pce11" cloneof="pceva2tb" supported="no">
+	<software name="pce11" cloneof="pceva2tb" supported="partial">
 		<description>PC-Engine v1.1</description>
 		<year>1988</year>
 		<publisher>NEC</publisher>
@@ -254,8 +255,8 @@ VIDEO.BAT has various superimpose effects, requires dedicated board
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<notes><![CDATA[
 [SGP] playfield artifacts (press button 2 from pitcher side in 2p play)
-Lists dual port 1/2 as a unsupported [DE-9] input method
-Win/Lose newspaper screen has [OFX/OFY] bug, and an [IDP] one frame of sprite lag
+Lists dual port 1/2 as a unsupported [DE-9] input method, cursor abruptly cycles when 1 player or 2 players is selected
+Win/Lose newspaper screen has [IDP] one frame of sprite lag
 [IDP] text draws below sprites (verify)
 How to exit from attract mode (2 innings?) once game enters it?
 NOTE: famist89 has no attract mode, bad dump?
@@ -354,8 +355,9 @@ Untested user disk creation
 		<year>198?</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<notes><![CDATA[
-Randomly hangs with a "please wait" when exiting town
+Randomly hangs with a "please wait" when exiting town (verify, should be fixed by CPU clock bump)
 (character select: 3, 1, +, 1, CR, *. In dungeon go north, turn 6 when reaching wall, turn 6 at first split, go north until exit town screen reached and accept with 1)
+[IDP] blink currently too fast
 Actual user disk procedure is unknown
 Omake: Prompts for a いやどすえ PC-98 if YADOS.EXE is run from PC Engine OS.
 This is a undumped coverdisk, pages 374~375 of Login 1987.10 mag, also cfr. https://relaxwind.info/retrobooks/login/1987/1987.html
@@ -432,10 +434,11 @@ cfr. around PC=39ba1 where it tries to load sound data, issues brk 80h which nev
 		<year>1987</year>
 		<publisher>ウインキーソフト (Winky Soft)</publisher>
 		<notes><![CDATA[
+[gfx] intro glitches in places
 [gfx] scroll desyncs in places during gameplay (one line off)
 [SGP] triggers SF = 1 draws with stage bosses
-[IDP] sprite glitches towards the end of stage 1-2 and successive stages.
-Corrupts itself on prolonged playthrough (stage 2-1 boss, disk D, test me in olteusa)
+[IDP] sprite glitches towards the end of stage 1-2 and successive stages. Needs CPU clock bump.
+Corrupts itself on prolonged playthrough (stage 2-1 boss, disk D, test me again)
 ]]></notes>
 		<info name="alt_title" value="オルテウス" />
 		<info name="usage" value="Kana Lock on pauses the game"/>
@@ -469,12 +472,12 @@ Corrupts itself on prolonged playthrough (stage 2-1 boss, disk D, test me in olt
 	</software>
 
 <!-- First 4th disk in TOSEC has diff crc than the one above -->
-	<software name="olteusa" cloneof="olteus" supported="no">
+	<software name="olteusa" cloneof="olteus" supported="partial">
 		<description>Olteus (alt disk D)</description>
 		<year>1987</year>
 		<publisher>ウインキーソフト (Winky Soft)</publisher>
 		<notes><![CDATA[
-(same as olteus)
+(same as olteus except no confirmed crashes)
 ]]></notes>
 		<info name="alt_title" value="オルテウス" />
 		<info name="usage" value="Kana Lock on pauses the game"/>
@@ -560,15 +563,14 @@ Burps on [FDC] access after disk swap with program and player disks, trying to s
 		</part>
 	</software>
 
-	<software name="shanghai" supported="no">
+	<software name="shanghai" supported="partial">
 		<description>Shanghai</description>
 		<year>1986</year>
 		<publisher>システムソフト (System Soft)</publisher>
 		<notes><![CDATA[
 [IDP] cursor blink present on title screen (verify)
-May crash with disk error when entering winning animation (verify, can't reproduce)
 [gfx] Winning animation a bit offset, not fractional horizontal scrolling?
-[OPNA] seems to cut off shortly on intro and winning screen compared to VAEG
+[gfx] sometimes draws copyright screen background color to non-black
 ]]></notes>
 		<info name="alt_title" value="上海" />
 		<sharedfeat name="mouseport_default" value="mouse"/>
@@ -580,13 +582,13 @@ May crash with disk error when entering winning animation (verify, can't reprodu
 		</part>
 	</software>
 
-	<software name="shinraba" supported="no">
+	<software name="shinraba" supported="partial">
 		<description>Shinra Bansho</description>
 		<year>1987</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<notes><![CDATA[
-Runs at half speed
-[gfx] is white flash (backdrop) during maiden prayer in intro supposed to be full screen? (fixed)
+Runs at half speed, bumped CPU clock
+Not extensively tested
 [gfx] corrupted layer after game over, in intro
 Omake: if sound irqs don't run then needs to press key 0 pad to move on
 Omake: CG intro scene with thunderstorm has a blurry signature concealed by picture mask
@@ -819,12 +821,13 @@ Fails [floppy] copy protection, draws "TETRIS IS ONLY 6,800 YEN" on title screen
 <!-- Dual floppies, should work both on the PC88VA and on the PC98 (usually you just have to switch the first two disks depending on the system) -->
 	<!-- TODO: move to a shared SW list -->
 
-	<software name="illcity" supported="no">
+	<software name="illcity" supported="partial">
 		<description>Illusion City - Genei Toshi</description>
 		<year>1992</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<notes><![CDATA[
-Runs too slow
+Runs too slow, bumped CPU clock speed
+Not extensively tested
 Has unemulated [MIDI] options
 ]]></notes>
 		<info name="release" value="199201xx"/>
@@ -923,13 +926,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="fray" supported="no">
+	<software name="fray" supported="partial">
 		<description>Fray - In Magical Adventure</description>
 		<year>1991</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<notes><![CDATA[
-Runs too slow, [SGP]?
-Ugly pitch for [OPNA] voice samples on intro
+Runs too slow, bumped CPU clock
+Ugly pitch for [OPNA] voice samples on intro (verify)
 Not extensively tested
 ]]></notes>
 		<info name="release" value="19911220"/>
@@ -1255,14 +1258,13 @@ All disks fail initial bootstrap [FDC]
 
 <!-- !Doujinshi -->
 
-	<software name="ballbrkr" supported="no">
+	<software name="ballbrkr" supported="partial">
 		<description>Balloon Breaker</description>
 		<year>1996</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-[gfx] unhandled RGB565 transparency
-[gfx] Glitched screen right after selecting new game
-[gfx] Has badly colored sprites on character select, needs h/v scrolling for background
+Minor [gfx] scroll glitch at character select
+Not extensively tested
 ]]></notes>
 		<info name="developer" value="Fredia" />
 		<info name="alt_title" value="ばる〜んぶ れ〜か〜" />
@@ -1273,11 +1275,12 @@ All disks fail initial bootstrap [FDC]
 		</part>
 	</software>
 
-	<software name="boomer" supported="no">
+	<software name="boomer" supported="partial">
 		<description>Boomering</description>
 		<year>1996</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
+[gfx] minor scroll glitch at title screen
 [gfx] picture mask should cut off sprite layer too
 ]]></notes>
 		<info name="developer" value="Fredia" />
@@ -1288,14 +1291,14 @@ All disks fail initial bootstrap [FDC]
 		</part>
 	</software>
 
-	<software name="harehare" supported="no">
+	<software name="harehare" supported="partial">
 		<description>Hare Hare Yukai</description>
 		<!-- "PC88VA 20th Anniversary" -->
 		<year>2006</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-[gfx] slight offset for some layers, one section currently looks garbled
-Runs too slow
+[gfx] slight offset for some layers
+Runs too slow, bumped CPU clock speed
 ]]></notes>
 		<info name="developer" value="Shinra" />
 		<info name="alt_title" value="ハレ晴レユカイ" />
@@ -1320,7 +1323,7 @@ Runs too slow
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
 [IDP] sprites wobble when scrolling up/down (verify)
-Runs too slow
+May run too slow even after CPU speed bump (verify)
 Crashes after stage 1 (fixed, cfr. usage)
 ]]></notes>
 		<info name="developer" value="LOKAPALA" />
@@ -1509,12 +1512,13 @@ https://youtu.be/zMWhBRD8cdM
 		</part>
 	</software>
 
-	<software name="hopman" supported="no">
+	<software name="hopman" supported="partial">
 		<description>Hopman</description>
 		<year>2023</year>
 		<publisher>Inufuto</publisher>
 		<notes><![CDATA[
-Runs too slow
+Runs too slow, bumped CPU speed
+Doesn't picture mask sprites to the right side (btanb)
 https://youtu.be/zxy8lTZ_w_k
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
