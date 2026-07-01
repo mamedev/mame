@@ -1290,7 +1290,7 @@ void mc6845_device::device_reset()
 	m_light_pen_addr = 0;
 }
 
-
+// TODO: don't trampoline like this
 void r6545_1_device::device_reset() { mc6845_device::device_reset(); }
 void mc6845_1_device::device_reset() { mc6845_device::device_reset(); }
 void hd6845s_device::device_reset() { mc6845_device::device_reset(); }
@@ -1309,6 +1309,11 @@ void hd6345_device::device_reset()
 
 void ams40489_device::device_reset() { mc6845_device::device_reset(); }
 
+void mc6845_device::device_validity_check(validity_checker &valid) const
+{
+	if (!m_hpixels_per_column)
+		osd_printf_error("No hpixel per column defined!");
+}
 
 r6545_1_device::r6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6845_device(mconfig, R6545_1, tag, owner, clock)
