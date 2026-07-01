@@ -6,6 +6,7 @@
 #pragma once
 
 #include "sound/va_vcf.h"
+#include "sound/va_vco.h"
 
 class cem3394_device : public device_t, public device_sound_interface
 {
@@ -73,13 +74,14 @@ private:
 
 	double hpf(double input);
 
+	required_device<va_vco_streamless_device> m_vco;
 	required_device<va_lpf4_device> m_vcf;
 
 	// device configuration, not needed in save state
 	sound_stream *m_stream;           // our stream
-	double m_inv_sample_rate;         // 1/current sample rate
 	double m_vco_zero_freq;           // frequency of VCO at 0.0V
 	double m_filter_zero_freq;        // frequency of filter at 0.0V
+	double m_c_ac;                    // AC coupling capacitor on pin 17
 	double m_hpf_k;                   // RC filter coefficient for AC coupling
 
 	// device state
@@ -91,14 +93,12 @@ private:
 	double m_mixer_internal;          // linear internal volume (0-1)
 	double m_mixer_external;          // linear external volume (0-1)
 
-	double m_vco_position;            // current VCO frequency position (always < 1.0)
-	double m_vco_step;                // per-sample VCO step
+	double m_vco_freq;                // current VCO frequency
+	double m_pulse_width;             // fractional pulse width
 
 	double m_filter_frequency;        // baseline filter frequency
 	double m_filter_modulation;       // depth of modulation (up to 1.0)
 	double m_filter_resonance;        // depth of modulation (up to 1.0)
-
-	double m_pulse_width;             // fractional pulse width
 
 	double m_hpf_mem;                 // AC coupling filter memory
 };

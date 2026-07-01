@@ -1468,7 +1468,6 @@ void prophet5_audio_device::device_add_mconfig(machine_config &config)
 		.add_route(cem3340_device::OUTPUT_TRIANGLE, m_lfo_tri_center, 1.0)
 		.add_route(cem3340_device::OUTPUT_RAMP, m_lfo_vca, 1.0)
 		.add_route(cem3340_device::OUTPUT_PULSE, m_lfo_vca, 1.0);
-	m_lfo->set_pw_ctrl(VPLUS * RES_VOLTAGE_DIVIDER(RES_K(10), RES_K(2)));  // R3110, R3111, 50% PW.
 	VA_SCALE_OFFSET(config, m_lfo_tri_center)  // U380B (TL082) and surrounding resistors.
 		.set_scale(0).set_offset(0)
 		.add_route(0, m_lfo_vca, 1.0);
@@ -1647,6 +1646,9 @@ void prophet5_audio_device::device_start()
 		osc[2 * i + 1] = m_voices[i]->osc_b_for_tuning();
 	}
 	m_tune_cmp->set_oscillators(osc);
+
+	// The LFO has a hardcoded pulse width of 50%.
+	m_lfo->set_pw_ctrl(VPLUS * RES_VOLTAGE_DIVIDER(RES_K(10), RES_K(2)));  // R3110, R3111
 }
 
 void prophet5_audio_device::device_reset()

@@ -8,77 +8,28 @@
 #include <limits>
 
 
-va_vco_device::va_vco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: va_vco_device(mconfig, VA_VCO, tag, owner, clock)
+va_vco_device::va_vco_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: va_vco_device(mconfig, tag, owner, va_vco_config())
 {
 }
 
-va_vco_device::va_vco_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
+va_vco_device::va_vco_device(const machine_config &mconfig, const char *tag, device_t *owner, const va_vco_config &vco_config)
+	: va_vco_device(mconfig, VA_VCO, tag, owner, vco_config)
+{
+}
+
+va_vco_device::va_vco_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const va_vco_config &vco_config)
+	: device_t(mconfig, type, tag, owner, 0)
 	, device_sound_interface(mconfig, *this)
+	, m_config(vco_config)
+	, m_vco_core(*this, "vco_core")
 	, m_stream(nullptr)
-	, m_ramp_min(-1)
-	, m_ramp_max(1)
-	, m_pulse_min(-1)
-	, m_pulse_max(1)
-	, m_tri_min(-1)
-	, m_tri_max(1)
-	, m_pulse_dc_comp(false)
-	, m_pulse_tri(false)
-	, m_sync_type(SYNC_TYPE_NONE)
 	, m_freq_ctrl(std::numeric_limits<float>::quiet_NaN())
-	, m_freq(10.0F)
 	, m_pw_ctrl(std::numeric_limits<float>::quiet_NaN())
-	, m_pw(0.5F)
-	, m_step(0)
-	, m_phase(0)
-	, m_ramp_correction(0)
-	, m_pulse_correction(0)
-	, m_tri_correction(0)
 	, m_sync(false)
-	, m_sync_phase(0)
-	, m_sync_step(0)
+	, m_sync_freq(0)
 	, m_last_sample_time(attotime::zero)
 {
-}
-
-va_vco_device &va_vco_device::configure_ramp_range(float minval, float maxval)
-{
-	m_ramp_min = minval;
-	m_ramp_max = maxval;
-	return *this;
-}
-
-va_vco_device &va_vco_device::configure_pulse_range(float minval, float maxval)
-{
-	m_pulse_min = minval;
-	m_pulse_max = maxval;
-	return *this;
-}
-
-va_vco_device &va_vco_device::configure_triangle_range(float minval, float maxval)
-{
-	m_tri_min = minval;
-	m_tri_max = maxval;
-	return *this;
-}
-
-va_vco_device &va_vco_device::configure_pulse_dc_comp(bool enabled)
-{
-	m_pulse_dc_comp = enabled;
-	return *this;
-}
-
-va_vco_device &va_vco_device::configure_pulse_from_tri(bool tri_derived)
-{
-	m_pulse_tri = tri_derived;
-	return *this;
-}
-
-va_vco_device &va_vco_device::configure_sync_type(sync_type type)
-{
-	m_sync_type = type;
-	return *this;
 }
 
 float va_vco_device::ctrl2freq(float freq_ctrl) const
@@ -96,8 +47,7 @@ void va_vco_device::set_freq_ctrl_internal(float freq_ctrl)
 	if (freq_ctrl == m_freq_ctrl)
 		return;
 	m_freq_ctrl = freq_ctrl;
-	m_freq = ctrl2freq(freq_ctrl);
-	m_step = m_freq / float(m_stream->sample_rate());
+	m_vco_core->set_freq(ctrl2freq(freq_ctrl));
 }
 
 void va_vco_device::set_pw_ctrl_internal(float pw_ctrl)
@@ -105,16 +55,23 @@ void va_vco_device::set_pw_ctrl_internal(float pw_ctrl)
 	if (pw_ctrl == m_pw_ctrl)
 		return;
 	m_pw_ctrl = pw_ctrl;
-	m_pw = ctrl2pw(pw_ctrl);
+	m_vco_core->set_pw(ctrl2pw(pw_ctrl));
+}
+
+void va_vco_device::set_sync_freq_internal(float sync_freq)
+{
+	if (sync_freq == m_sync_freq)
+		return;
+	m_sync_freq = sync_freq;
+	m_vco_core->set_sync_freq(m_sync_freq);
 }
 
 void va_vco_device::set_freq_ctrl(float freq_ctrl)
 {
-	if (!m_stream)  // Need to know the sample rate.
-		fatalerror("%s: set_freq_ctrl() cannot be called before device_start().\n", tag());
 	if (freq_ctrl == m_freq_ctrl)
 		return;
-	m_stream->update();
+	if (m_stream)
+		m_stream->update();
 	set_freq_ctrl_internal(freq_ctrl);
 }
 
@@ -129,7 +86,9 @@ void va_vco_device::set_pw_ctrl(float pw_ctrl)
 
 void va_vco_device::set_sync_enabled(bool enabled)
 {
-	const bool valid_sync_type = (m_sync_type == SYNC_TYPE_RESET || m_sync_type == SYNC_TYPE_REVERSE);
+	const bool valid_sync_type =
+		m_config.sync_type == va_vco_config::SYNC_TYPE_RESET ||
+		m_config.sync_type == va_vco_config::SYNC_TYPE_REVERSE;
 	assert(valid_sync_type);
 	if (!valid_sync_type)
 		logerror("set_sync_enabled() called even though no sync type has been configured.\n");
@@ -138,13 +97,14 @@ void va_vco_device::set_sync_enabled(bool enabled)
 		return;
 	m_stream->update();
 	m_sync = enabled;
+	m_vco_core->set_sync_enabled(m_sync);
 }
 
 float va_vco_device::freq()
 {
 	if (BIT(get_sound_requested_inputs_mask(), INPUT_FREQ_CTRL))
 		m_stream->update();
-	return m_freq;
+	return m_vco_core->freq();
 }
 
 attotime va_vco_device::ramp_time_to_thresh(float threshold)
@@ -154,8 +114,9 @@ attotime va_vco_device::ramp_time_to_thresh(float threshold)
 	const float dt = float((machine().time() - m_last_sample_time).as_double());
 	assert(dt >= 0.0F);
 
-	const float osc_phase = fpmod1(m_phase + dt * m_freq);
-	const float thresh_phase = (threshold - m_ramp_min) / (m_ramp_max - m_ramp_min);
+	const float freq = m_vco_core->freq();
+	const float osc_phase = fpmod1(m_vco_core->phase() + dt * freq);
+	const float thresh_phase = (threshold - m_config.ramp_min) / (m_config.ramp_max - m_config.ramp_min);
 
 	float remaining = 0.0F;
 	if (osc_phase < thresh_phase)
@@ -163,15 +124,111 @@ attotime va_vco_device::ramp_time_to_thresh(float threshold)
 	else
 		remaining = 1.0F - osc_phase + thresh_phase;
 
-	return attotime::from_double(remaining / m_freq);
+	return attotime::from_double(remaining / freq);
+}
+
+void va_vco_device::device_add_mconfig(machine_config &config)
+{
+	VA_VCO_STREAMLESS(config, m_vco_core, m_config);
 }
 
 void va_vco_device::device_start()
 {
 	m_stream = stream_alloc(get_sound_requested_inputs(), get_sound_requested_outputs(), machine().sample_rate());
+	m_vco_core->configure_sample_rate(m_stream->sample_rate());
+
 	save_item(NAME(m_freq_ctrl));
-	save_item(NAME(m_freq));
 	save_item(NAME(m_pw_ctrl));
+	save_item(NAME(m_sync));
+	save_item(NAME(m_sync_freq));
+	save_item(NAME(m_last_sample_time));
+}
+
+void va_vco_device::sound_stream_update(sound_stream &stream)
+{
+	const bool streaming_freq = BIT(get_sound_requested_inputs_mask(), INPUT_FREQ_CTRL);
+	const bool streaming_pw = BIT(get_sound_requested_inputs_mask(), INPUT_PW_CTRL);
+	const bool streaming_sync = BIT(get_sound_requested_inputs_mask(), INPUT_SYNC_FREQ);
+	assert(!m_sync || streaming_sync);
+
+	const bool tri_out = BIT(get_sound_requested_outputs_mask(), OUTPUT_TRIANGLE);
+	const bool ramp_out = BIT(get_sound_requested_outputs_mask(), OUTPUT_RAMP);
+	const bool pulse_out = BIT(get_sound_requested_outputs_mask(), OUTPUT_PULSE);
+	const bool freq_out = BIT(get_sound_requested_outputs_mask(), OUTPUT_FREQ);
+
+	const int n = stream.samples();
+	for (int i = 0; i < n; ++i)
+	{
+		if (streaming_freq)
+			set_freq_ctrl_internal(stream.get(INPUT_FREQ_CTRL, i));
+		if (streaming_pw)
+			set_pw_ctrl_internal(stream.get(INPUT_PW_CTRL, i));
+		if (streaming_sync)
+			set_sync_freq_internal(stream.get(INPUT_SYNC_FREQ, i));
+
+		float ramp = 0, pulse = 0, triangle = 0;
+		m_vco_core->next_sample(
+			ramp_out  ? &ramp     : nullptr,
+			pulse_out ? &pulse    : nullptr,
+			tri_out   ? &triangle : nullptr);
+
+		if (ramp_out)
+			stream.put(OUTPUT_RAMP, i, ramp);
+		if (pulse_out)
+			stream.put(OUTPUT_PULSE, i, pulse);
+		if (tri_out)
+			stream.put(OUTPUT_TRIANGLE, i, triangle);
+		if (freq_out)
+			stream.put(OUTPUT_FREQ, i, m_vco_core->freq());
+	}
+
+	m_last_sample_time = stream.end_time() - stream.sample_period();
+}
+
+
+va_vco_streamless_device::va_vco_streamless_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: va_vco_streamless_device(mconfig, tag, owner, va_vco_config())
+{
+}
+
+va_vco_streamless_device::va_vco_streamless_device(const machine_config &mconfig, const char *tag, device_t *owner, const va_vco_config &vco_config)
+	: device_t(mconfig, VA_VCO_STREAMLESS, tag, owner, 0)
+	, m_config(vco_config)
+	, m_inv_sample_rate(0)
+	, m_freq(10.0F)
+	, m_pw(0.5F)
+	, m_step(0)
+	, m_phase(0)
+	, m_ramp_correction(0)
+	, m_pulse_correction(0)
+	, m_tri_correction(0)
+	, m_sync(false)
+	, m_sync_phase(0)
+	, m_sync_freq(0)
+	, m_sync_step(0)
+{
+}
+
+va_vco_streamless_device &va_vco_streamless_device::configure_sample_rate(u32 sample_rate)
+{
+	m_inv_sample_rate = 1.0F / float(sample_rate);
+	return *this;
+}
+
+void va_vco_streamless_device::set_sync_enabled(bool enabled)
+{
+	const bool valid_sync_type =
+		m_config.sync_type == va_vco_config::SYNC_TYPE_RESET ||
+		m_config.sync_type == va_vco_config::SYNC_TYPE_REVERSE;
+	assert(valid_sync_type);
+	if (!valid_sync_type)
+		logerror("set_sync_enabled() called even though no sync type has been configured.\n");
+	m_sync = enabled;
+}
+
+void va_vco_streamless_device::device_start()
+{
+	save_item(NAME(m_freq));
 	save_item(NAME(m_pw));
 	save_item(NAME(m_step));
 	save_item(NAME(m_phase));
@@ -180,14 +237,14 @@ void va_vco_device::device_start()
 	save_item(NAME(m_tri_correction));
 	save_item(NAME(m_sync));
 	save_item(NAME(m_sync_phase));
+	save_item(NAME(m_sync_freq));
 	save_item(NAME(m_sync_step));
-	save_item(NAME(m_last_sample_time));
 }
 
 // Implementation is based on:
 // https://www.martin-finke.de/articles/audio-plugins-018-polyblep-oscillator/
 // but a scaling of 2 is not baked into the calculations.
-float va_vco_device::poly_blep(float phase) const
+float va_vco_streamless_device::poly_blep(float phase) const
 {
 	float val = 0;
 	if (phase < m_step)
@@ -203,7 +260,7 @@ float va_vco_device::poly_blep(float phase) const
 	return val;
 }
 
-std::pair<float, float> va_vco_device::poly_blep_corrections(
+std::pair<float, float> va_vco_streamless_device::poly_blep_corrections(
 	const std::array<std::pair<float, float>, 5> &disc, int n) const
 {
 	assert(n <= disc.size());
@@ -222,7 +279,7 @@ std::pair<float, float> va_vco_device::poly_blep_corrections(
 
 // Implementation is based on:
 // https://dsp.stackexchange.com/questions/54790/polyblamp-anti-aliasing-in-c
-float va_vco_device::poly_blamp(float phase) const
+float va_vco_streamless_device::poly_blamp(float phase) const
 {
 	float y = 0.0F;
 	if (0.0F <= phase && phase < 2.0F * m_step)
@@ -241,7 +298,7 @@ float va_vco_device::poly_blamp(float phase) const
 	return y * m_step / 15.0F;
 }
 
-std::pair<float, float> va_vco_device::poly_blamp_corrections(
+std::pair<float, float> va_vco_streamless_device::poly_blamp_corrections(
 	const std::array<std::pair<float, float>, 5> &disc, int n) const
 {
 	// NOTE: Only applying a 1-sample correction: before and after the
@@ -270,7 +327,7 @@ std::pair<float, float> va_vco_device::poly_blamp_corrections(
 // Checks if an inherent (i.e. not sync) discontinuity will occur between the
 // current and next sample, taking into account interference by a sync event.
 template<auto DiscPhaseFn>
-va_vco_device::disc_event_t va_vco_device::check_disc(float osc_phase, const sync_event_t &sync_info) const
+va_vco_streamless_device::disc_event_t va_vco_streamless_device::check_disc(float osc_phase, const sync_event_t &sync_info) const
 {
 	disc_event_t disc;
 
@@ -297,46 +354,46 @@ va_vco_device::disc_event_t va_vco_device::check_disc(float osc_phase, const syn
 	return disc;
 }
 
-float va_vco_device::ramp_wave(float phase)
+float va_vco_streamless_device::ramp_wave(float phase)
 {
 	return 2.0F * phase - 1.0F;  // [-1, 1]
 }
 
-float va_vco_device::tri_wave(float phase)
+float va_vco_streamless_device::tri_wave(float phase)
 {
 	return 1.0F - 2.0F * fabsf(ramp_wave(phase));  // [-1, 1]
 }
 
-float va_vco_device::pulse_wave(float phase) const
+float va_vco_streamless_device::pulse_wave(float phase) const
 {
 	float wave = (phase < m_pw) ? 1.0F : -1.0F;  // [-1, 1]
-	if (m_pulse_dc_comp)
-		wave -= m_pw + m_pw - 1.0F;  // [-2, 2], see configure_pulse_dc_comp() usage doc.
+	if (m_config.pulse_dc_comp)
+		wave -= m_pw + m_pw - 1.0F;  // [-2, 2], see va_vco_config.pulse_dc_comp doc.
 	return wave;
 }
 
-float va_vco_device::tripulse_wave(float phase) const
+float va_vco_streamless_device::tripulse_wave(float phase) const
 {
-	// Either [-1, 1] or [-2, 2], depending on m_pulse_dc_comp.
+	// Either [-1, 1] or [-2, 2], depending on m_config.pulse_dc_comp.
 	return pulse_wave(tripulse_reset_phase(phase));
 }
 
-float va_vco_device::will_wrap(float phase, float step)
+float va_vco_streamless_device::will_wrap(float phase, float step)
 {
 	return phase > 1.0F - step;
 }
 
-float va_vco_device::will_wrap(float phase) const
+float va_vco_streamless_device::will_wrap(float phase) const
 {
 	return will_wrap(phase, m_step);
 }
 
-float va_vco_device::time_to_reset(float phase, float step)  // In number of samples.
+float va_vco_streamless_device::time_to_reset(float phase, float step)  // In number of samples.
 {
 	return (1.0F - phase) / step;
 }
 
-float va_vco_device::time_to_reset(float phase) const
+float va_vco_streamless_device::time_to_reset(float phase) const
 {
 	return time_to_reset(phase, m_step);
 }
@@ -349,31 +406,31 @@ float va_vco_device::time_to_reset(float phase) const
 
 // Phase distance from the oscillator's reset.
 // The identity function. Useful as a template argument to check_disc().
-float va_vco_device::reset_phase(float osc_phase) const
+float va_vco_streamless_device::reset_phase(float osc_phase) const
 {
 	return osc_phase;
 }
 
 // Phase distance from the top of the triangle.
-float va_vco_device::tritop_phase(float osc_phase) const
+float va_vco_streamless_device::tritop_phase(float osc_phase) const
 {
 	return fpmod1(osc_phase + 0.5F);
 }
 
 // Phase distance from the mid-pulse flip (downwards jump), for a ramp-derived pulse.
-float va_vco_device::pulse_flip_phase(float osc_phase) const
+float va_vco_streamless_device::pulse_flip_phase(float osc_phase) const
 {
 	return fpmod1(osc_phase + (1.0F - m_pw));
 }
 
 // Phase distance from the reset (upward jump), for a triangle-derived pulse.
-float va_vco_device::tripulse_reset_phase(float osc_phase) const
+float va_vco_streamless_device::tripulse_reset_phase(float osc_phase) const
 {
 	return fpmod1(osc_phase + 0.5F * m_pw);
 }
 
 // Phase distance from a flip (downwards jump), for a triangle-derived pulse.
-float va_vco_device::tripulse_flip_phase(float osc_phase) const
+float va_vco_streamless_device::tripulse_flip_phase(float osc_phase) const
 {
 	return fpmod1(osc_phase + 1.0F - 0.5F * m_pw);
 }
@@ -407,252 +464,228 @@ float va_vco_device::tripulse_flip_phase(float osc_phase) const
 // the same sample interval, and the oscillator could be placed right before
 // the reset and flip, for a total of 5 discontinuities to correct for.
 //
-void va_vco_device::sound_stream_update(sound_stream &stream)
+
+void va_vco_streamless_device::next_sample(float *ramp_ptr, float *pulse_ptr, float* tri_ptr)
 {
 	constexpr float RAMP_RESET_JUMP = -2.0F;  // Resets from 1 to -1.
 	constexpr float PULSE_RESET_JUMP = 2.0F;  // Resets from -1 to 1.
 	constexpr float PULSE_FLIP_JUMP = -2.0F;  // Flips from 1 to -1.
 
-	const bool streaming_freq = BIT(get_sound_requested_inputs_mask(), INPUT_FREQ_CTRL);
-	const bool streaming_pw = BIT(get_sound_requested_inputs_mask(), INPUT_PW_CTRL);
-	const bool streaming_sync = BIT(get_sound_requested_inputs_mask(), INPUT_SYNC_FREQ);
-	assert(!m_sync || streaming_sync);
+	// While there is a lot of logic here, the approach is simple at a high
+	// level. For each waveform:
+	// - Find all discontinuities occurring between the current and next sample,
+	//   and append them to the `disc` array.
+	// - Compute "naive" waveform.
+	// - Apply corrections to the current sample (if applicable).
+	// - Store corrections to be applied to the next sample (if applicable).
+	//
+	// The bulk of the code deals with tracking all possible discontinuities,
+	// which gets complicated with oscillator sync.
 
-	const bool tri_out = BIT(get_sound_requested_outputs_mask(), OUTPUT_TRIANGLE);
-	const bool ramp_out = BIT(get_sound_requested_outputs_mask(), OUTPUT_RAMP);
-	const bool pulse_out = BIT(get_sound_requested_outputs_mask(), OUTPUT_PULSE);
-	const bool freq_out = BIT(get_sound_requested_outputs_mask(), OUTPUT_FREQ);
+	// The code below assumes that discontinuities of the same type can occur up
+	// to once every 2 samples.
+	assert(m_step <= 0.5F && m_sync_step <= 0.5F);
 
-	const int n = stream.samples();
-	const float sample_rate_inv = 1.0F / float(m_stream->sample_rate());
 	std::array<std::pair<float, float>, 5> disc;  // Keeps track of discontinuities.
+	const float old_phase = m_phase;
 
-	for (int i = 0; i < n; ++i)
+	sync_event_t sync_event;
+	sync_event.synced = m_sync && will_wrap(m_sync_phase, m_sync_step);
+
+	if (sync_event.synced)
 	{
-		if (streaming_freq)
-			set_freq_ctrl_internal(stream.get(INPUT_FREQ_CTRL, i));
-		if (streaming_pw)
-			set_pw_ctrl_internal(stream.get(INPUT_PW_CTRL, i));
-		if (streaming_sync)
-			m_sync_step = sample_rate_inv * stream.get(INPUT_SYNC_FREQ, i);
-		if (freq_out)
-			stream.put(OUTPUT_FREQ, i, m_freq);
+		sync_event.sync_ttr = time_to_reset(m_sync_phase, m_sync_step);
+		sync_event.phase_at_sync = fpmod1(old_phase + sync_event.sync_ttr * m_step);
 
-		// While there is a lot of logic here, the approach is simple at a high
-		// level. For each waveform:
-		// - Find all discontinuities occurring between the current and next
-		//   sample, and append them to the `disc` array.
-		// - Compute "naive" waveform.
-		// - Apply corrections to the current sample (if applicable).
-		// - Store corrections to be applied to the next sample (if applicable).
-		//
-		// The bulk of the code deals with tracking all possible discontinuities,
-		// which gets complicated with oscillator sync.
+		if (m_config.sync_type == va_vco_config::SYNC_TYPE_REVERSE)
+			sync_event.new_phase_at_sync = 1.0F - sync_event.phase_at_sync;  // Triangle core reversed slope.
+		else  // m_config.sync_type == va_vco_config::SYNC_TYPE_RESET
+			sync_event.new_phase_at_sync = 0.0F;  // Saw or triangle core reset.
 
-		// The code below assumes that discontinuities of the same type can
-		// occur up to once every 2 samples.
-		assert(m_step <= 0.5F && m_sync_step <= 0.5F);
+		const float delta = fpmod1(sync_event.phase_at_sync - old_phase);
+		sync_event.sync_phase = 1.0F - delta;  // Distance from the sync discontinuity.
+		m_phase = fpmod1(sync_event.new_phase_at_sync - delta);  // Oscillator phase adjusted for sync.
+		sync_event.synced_osc_phase = m_phase;
+	}
 
-		const float old_phase = m_phase;
+	// Applies to multiple waveforms.
+	const disc_event_t reset = check_disc<&va_vco_streamless_device::reset_phase>(old_phase, sync_event);
 
-		sync_event_t sync_event;
-		sync_event.synced = m_sync && will_wrap(m_sync_phase, m_sync_step);
+	if (ramp_ptr)
+	{
+		// The ramp waveform has a single inherent discontinuity ("reset").
+
+		int nd = 0;
+
+		if (reset.disc)
+			disc[nd++] = std::make_pair(reset.disc_phase, RAMP_RESET_JUMP);
 
 		if (sync_event.synced)
 		{
-			sync_event.sync_ttr = time_to_reset(m_sync_phase, m_sync_step);
-			sync_event.phase_at_sync = fpmod1(old_phase + sync_event.sync_ttr * m_step);
-
-			if (m_sync_type == SYNC_TYPE_REVERSE)
-				sync_event.new_phase_at_sync = 1.0F - sync_event.phase_at_sync;  // Triangle core reversed slope.
-			else  // m_sync_type == SYNC_TYPE_RESET
-				sync_event.new_phase_at_sync = 0.0F;  // Saw or triangle core reset.
-
-			const float delta = fpmod1(sync_event.phase_at_sync - old_phase);
-			sync_event.sync_phase = 1.0F - delta;  // Distance from the sync discontinuity.
-			m_phase = fpmod1(sync_event.new_phase_at_sync - delta);  // Oscillator phase adjusted for sync.
-			sync_event.synced_osc_phase = m_phase;
+			const float sync_jump = ramp_wave(sync_event.new_phase_at_sync) - ramp_wave(sync_event.phase_at_sync);
+			disc[nd++] = std::make_pair(sync_event.sync_phase, sync_jump);
 		}
 
-		// Applies to multiple waveforms.
-		const disc_event_t reset = check_disc<&va_vco_device::reset_phase>(old_phase, sync_event);
+		if (reset.post_sync_disc)
+			disc[nd++] = std::make_pair(reset.post_sync_disc_phase, RAMP_RESET_JUMP);
 
-		if (ramp_out)
+		const auto [current_corr, next_corr] = poly_blep_corrections(disc, nd);
+		const float ramp = ramp_wave(old_phase) + m_ramp_correction + current_corr;
+		m_ramp_correction = next_corr;
+
+		*ramp_ptr = fmaprange(ramp, m_config.ramp_min, m_config.ramp_max);
+	}
+
+	if (pulse_ptr)
+	{
+		int nd = 0;
+		float pulse = 0;
+
+		if (m_config.pulse_from_tri)
 		{
-			// The ramp waveform has a single inherent discontinuity ("reset").
+			// A triangle-derived pulse waveform has two inherent discontinuities.
+			// One when the triangle passes the PW-dependent threshold in an
+			// upwards direction ("reset"), and one when it passes it in the
+			// downwards direction ("flip").
 
-			int nd = 0;
+			const disc_event_t reset = check_disc<&va_vco_streamless_device::tripulse_reset_phase>(old_phase, sync_event);
+			const disc_event_t flip = check_disc<&va_vco_streamless_device::tripulse_flip_phase>(old_phase, sync_event);
 
 			if (reset.disc)
-				disc[nd++] = std::make_pair(reset.disc_phase, RAMP_RESET_JUMP);
+				disc[nd++] = std::make_pair(reset.disc_phase, PULSE_RESET_JUMP);
 
-			if (sync_event.synced)
+			if (flip.disc)
+				disc[nd++] = std::make_pair(flip.disc_phase, PULSE_FLIP_JUMP);
+
+			// We only need to correct for a "reset" sync. A "reverse" sync
+			// reflects the phase around 0.5, which is where a triangle-derived
+			// pulse is centered. This means the pulse's value won't change when
+			// a "reverse" sync occurs.
+			if (sync_event.synced && m_config.sync_type == va_vco_config::SYNC_TYPE_RESET)
 			{
-				const float sync_jump = ramp_wave(sync_event.new_phase_at_sync) - ramp_wave(sync_event.phase_at_sync);
+				const float sync_jump = tripulse_wave(sync_event.new_phase_at_sync) - tripulse_wave(sync_event.phase_at_sync);
 				disc[nd++] = std::make_pair(sync_event.sync_phase, sync_jump);
 			}
 
 			if (reset.post_sync_disc)
-				disc[nd++] = std::make_pair(reset.post_sync_disc_phase, RAMP_RESET_JUMP);
-
-			const auto [current_corr, next_corr] = poly_blep_corrections(disc, nd);
-			const float ramp = ramp_wave(old_phase) + m_ramp_correction + current_corr;
-			m_ramp_correction = next_corr;
-
-			stream.put(OUTPUT_RAMP, i, fmaprange(ramp, m_ramp_min, m_ramp_max));
-		}
-
-		if (pulse_out)
-		{
-			int nd = 0;
-			float pulse = 0;
-
-			if (m_pulse_tri)
-			{
-				// A triangle-derived pulse waveform has two inherent discontinuities.
-				// One when the triangle passes the PW-dependent threshold in an
-				// upwards direction ("reset"), and one when it passes it in the
-				// downwards direction ("flip").
-
-				const disc_event_t reset = check_disc<&va_vco_device::tripulse_reset_phase>(old_phase, sync_event);
-				const disc_event_t flip = check_disc<&va_vco_device::tripulse_flip_phase>(old_phase, sync_event);
-
-				if (reset.disc)
-					disc[nd++] = std::make_pair(reset.disc_phase, PULSE_RESET_JUMP);
-
-				if (flip.disc)
-					disc[nd++] = std::make_pair(flip.disc_phase, PULSE_FLIP_JUMP);
-
-				// We only need to correct for a "reset" sync. A "reverse" sync
-				// reflects the phase around 0.5, which is where a
-				// triangle-derived pulse is centered. This means the pulse's
-				// value won't change when a "reverse" sync occurs.
-				if (sync_event.synced && m_sync_type == SYNC_TYPE_RESET)
-				{
-					const float sync_jump = tripulse_wave(sync_event.new_phase_at_sync) - tripulse_wave(sync_event.phase_at_sync);
-					disc[nd++] = std::make_pair(sync_event.sync_phase, sync_jump);
-				}
-
-				if (reset.post_sync_disc)
-					disc[nd++] = std::make_pair(reset.post_sync_disc_phase, PULSE_RESET_JUMP);
-
-				if (flip.post_sync_disc)
-					disc[nd++] = std::make_pair(flip.post_sync_disc_phase, PULSE_FLIP_JUMP);
-
-				pulse = tripulse_wave(old_phase);
-			}
-			else
-			{
-				// A ramp-derived pulse waveform has two inherent discontinuities.
-				// One when the underlying ramp resets ("reset"), and one when
-				// the PW-dependent threshold is exceeded ("flip").
-
-				const disc_event_t flip = check_disc<&va_vco_device::pulse_flip_phase>(old_phase, sync_event);
-
-				if (reset.disc)
-					disc[nd++] = std::make_pair(reset.disc_phase, PULSE_RESET_JUMP);
-
-				if (flip.disc)
-					disc[nd++] = std::make_pair(flip.disc_phase, PULSE_FLIP_JUMP);
-
-				if (sync_event.synced)
-				{
-					const float sync_jump = pulse_wave(sync_event.new_phase_at_sync) - pulse_wave(sync_event.phase_at_sync);
-					disc[nd++] = std::make_pair(sync_event.sync_phase, sync_jump);
-				}
-
-				if (reset.post_sync_disc)
-					disc[nd++] = std::make_pair(reset.post_sync_disc_phase, PULSE_RESET_JUMP);
-
-				if (flip.post_sync_disc)
-					disc[nd++] = std::make_pair(flip.post_sync_disc_phase, PULSE_FLIP_JUMP);
-
-				pulse = pulse_wave(old_phase);
-			}
-
-			const auto [current_corr, next_corr] = poly_blep_corrections(disc, nd);
-			pulse += m_pulse_correction + current_corr;
-			m_pulse_correction = next_corr;
-
-			stream.put(OUTPUT_PULSE, i, fmaprange(pulse, m_pulse_min, m_pulse_max));
-		}
-
-		if (tri_out)
-		{
-			// A triangle waveform has two inherent discontinuities. One at its
-			// min value ("reset") and one at its max value ("flip").
-
-			constexpr float TOP = 1.0F;
-			constexpr float BOTTOM = -1.0F;
-
-			const disc_event_t flip = check_disc<&va_vco_device::tritop_phase>(old_phase, sync_event);
-			int nd = 0;
-
-			if (reset.disc)
-				disc[nd++] = std::make_pair(reset.disc_phase, BOTTOM);
-
-			if (flip.disc)
-				disc[nd++] = std::make_pair(flip.disc_phase, TOP);
-
-			if (reset.post_sync_disc)
-				disc[nd++] = std::make_pair(reset.post_sync_disc_phase, BOTTOM);
+				disc[nd++] = std::make_pair(reset.post_sync_disc_phase, PULSE_RESET_JUMP);
 
 			if (flip.post_sync_disc)
-				disc[nd++] = std::make_pair(flip.post_sync_disc_phase, TOP);
+				disc[nd++] = std::make_pair(flip.post_sync_disc_phase, PULSE_FLIP_JUMP);
 
-			const auto [current_corr, next_corr] = poly_blamp_corrections(disc, nd);
-			float triangle = tri_wave(old_phase) + m_tri_correction + current_corr;
-			m_tri_correction = next_corr;
+			pulse = tripulse_wave(old_phase);
+		}
+		else
+		{
+			// A ramp-derived pulse waveform has two inherent discontinuities.
+			// One when the underlying ramp resets ("reset"), and one when the
+			// PW-dependent threshold is exceeded ("flip").
+
+			const disc_event_t flip = check_disc<&va_vco_streamless_device::pulse_flip_phase>(old_phase, sync_event);
+
+			if (reset.disc)
+				disc[nd++] = std::make_pair(reset.disc_phase, PULSE_RESET_JUMP);
+
+			if (flip.disc)
+				disc[nd++] = std::make_pair(flip.disc_phase, PULSE_FLIP_JUMP);
 
 			if (sync_event.synced)
 			{
-				if (m_sync_type == SYNC_TYPE_REVERSE)
-				{
-					// Determine if the sync will create a top or bottom corner.
-					assert(!reset.disc || !flip.disc);
-					float corner = 0;
-					if (reset.disc)
-					{
-						// The reset (bottom corner) occurs before the sync. So the
-						// sync will cause a top corner.
-						corner = TOP;
-					}
-					else if (flip.disc)
-					{
-						// The flip (top corner) occurs before the sync. So the sync
-						// will cause a bottom corner.
-						corner = BOTTOM;
-					}
-					else
-					{
-						// If the triangle is in the "moving upwards" phase, the
-						// sync will cause a top corner. Otherwise, a bottom one.
-						corner = (old_phase < 0.5F) ? TOP : BOTTOM;
-					}
-
-					// The sync caused the triangle to change direction.
-					// Need to apply a polyBLAMP correction.
-					triangle += corner * poly_blamp(1.0F - sync_event.sync_phase);
-					m_tri_correction += corner * poly_blamp(fpmod1(sync_event.sync_phase + m_step));
-				}
-				else  // m_sync_type == SYNC_TYPE_RESET
-				{
-					// The sync caused the triangle to reset to its min value.
-					// Need to apply a polyBLEP correction.
-					const float sync_jump = tri_wave(sync_event.new_phase_at_sync) - tri_wave(sync_event.phase_at_sync);
-					triangle += sync_jump * poly_blep(sync_event.sync_phase);
-					m_tri_correction += sync_jump * poly_blep(fpmod1(sync_event.sync_phase + m_step));
-				}
+				const float sync_jump = pulse_wave(sync_event.new_phase_at_sync) - pulse_wave(sync_event.phase_at_sync);
+				disc[nd++] = std::make_pair(sync_event.sync_phase, sync_jump);
 			}
 
-			stream.put(OUTPUT_TRIANGLE, i, fmaprange(triangle, m_tri_min, m_tri_max));
+			if (reset.post_sync_disc)
+				disc[nd++] = std::make_pair(reset.post_sync_disc_phase, PULSE_RESET_JUMP);
+
+			if (flip.post_sync_disc)
+				disc[nd++] = std::make_pair(flip.post_sync_disc_phase, PULSE_FLIP_JUMP);
+
+			pulse = pulse_wave(old_phase);
 		}
 
-		m_phase = fpmod1(m_phase + m_step);
-		m_sync_phase = fpmod1(m_sync_phase + m_sync_step);
+		const auto [current_corr, next_corr] = poly_blep_corrections(disc, nd);
+		pulse += m_pulse_correction + current_corr;
+		m_pulse_correction = next_corr;
+
+		*pulse_ptr = fmaprange(pulse, m_config.pulse_min, m_config.pulse_max);
 	}
 
-	m_last_sample_time = stream.end_time() - stream.sample_period();
+	if (tri_ptr)
+	{
+		// A triangle waveform has two inherent discontinuities. One at its min
+		// value ("reset") and one at its max value ("flip").
+
+		constexpr float TOP = 1.0F;
+		constexpr float BOTTOM = -1.0F;
+
+		const disc_event_t flip = check_disc<&va_vco_streamless_device::tritop_phase>(old_phase, sync_event);
+		int nd = 0;
+
+		if (reset.disc)
+			disc[nd++] = std::make_pair(reset.disc_phase, BOTTOM);
+
+		if (flip.disc)
+			disc[nd++] = std::make_pair(flip.disc_phase, TOP);
+
+		if (reset.post_sync_disc)
+			disc[nd++] = std::make_pair(reset.post_sync_disc_phase, BOTTOM);
+
+		if (flip.post_sync_disc)
+			disc[nd++] = std::make_pair(flip.post_sync_disc_phase, TOP);
+
+		const auto [current_corr, next_corr] = poly_blamp_corrections(disc, nd);
+		float triangle = tri_wave(old_phase) + m_tri_correction + current_corr;
+		m_tri_correction = next_corr;
+
+		if (sync_event.synced)
+		{
+			if (m_config.sync_type == va_vco_config::SYNC_TYPE_REVERSE)
+			{
+				// Determine if the sync will create a top or bottom corner.
+				assert(!reset.disc || !flip.disc);
+				float corner = 0;
+				if (reset.disc)
+				{
+					// The reset (bottom corner) occurs before the sync. So the
+					// sync will cause a top corner.
+					corner = TOP;
+				}
+				else if (flip.disc)
+				{
+					// The flip (top corner) occurs before the sync. So the sync
+					// will cause a bottom corner.
+					corner = BOTTOM;
+				}
+				else
+				{
+					// If the triangle is in the "moving upwards" phase, the
+					// sync will cause a top corner. Otherwise, a bottom one.
+					corner = (old_phase < 0.5F) ? TOP : BOTTOM;
+				}
+
+				// The sync caused the triangle to change direction.
+				// Need to apply a polyBLAMP correction.
+				triangle += corner * poly_blamp(1.0F - sync_event.sync_phase);
+				m_tri_correction += corner * poly_blamp(fpmod1(sync_event.sync_phase + m_step));
+			}
+			else  // m_config.sync_type == va_vco_config::SYNC_TYPE_RESET
+			{
+				// The sync caused the triangle to reset to its min value.
+				// Need to apply a polyBLEP correction.
+				const float sync_jump = tri_wave(sync_event.new_phase_at_sync) - tri_wave(sync_event.phase_at_sync);
+				triangle += sync_jump * poly_blep(sync_event.sync_phase);
+				m_tri_correction += sync_jump * poly_blep(fpmod1(sync_event.sync_phase + m_step));
+			}
+		}
+
+		*tri_ptr = fmaprange(triangle, m_config.tri_min, m_config.tri_max);
+	}
+
+	m_phase = fpmod1(m_phase + m_step);
+	m_sync_phase = fpmod1(m_sync_phase + m_sync_step);
 }
 
+
 DEFINE_DEVICE_TYPE(VA_VCO, va_vco_device, "va_vco", "Virtual Analog Oscillator")
+DEFINE_DEVICE_TYPE(VA_VCO_STREAMLESS, va_vco_streamless_device, "va_vco_streamless", "Virtual Analog Oscillator (Streamless)")
