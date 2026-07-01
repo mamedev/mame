@@ -972,7 +972,7 @@ private:
 			, m_ini(parent.m_ini)
 		{
 			set_process_flags(PROCESS_LR_REPEAT);
-			set_heading("Select Category");
+			set_heading(_("Select Category"));
 
 			inifile_manager const &mgr(mame_machine_manager::instance()->inifile());
 			for (size_t i = 0; mgr.get_file_count() > i; ++i)
