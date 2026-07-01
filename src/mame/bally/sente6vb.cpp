@@ -140,12 +140,21 @@ void sente6vb_device::device_add_mconfig(machine_config &config)
 	filter_rc_device &ac_noise(FILTER_RC(config, "ac_noise"));
 	ac_noise.set_rc(filter_rc_device::HIGHPASS, RES_K(68) + RES_K(1), 0, 0, CAP_U(2.2)); // R19, R20, C115
 
+	cem3394_device::components comps =
+	{
+		.r_vco = RES_K(301),   // R1
+		.c_vco = CAP_U(0.002), // C1
+		.c_vcf = CAP_U(0.033), // C11
+		.c_ac = CAP_U(10),     // C3
+	};
+
+	cem3394_device::input_array inputs{};
+	inputs[cem3394_device::AUDIO_INPUT] = &ac_noise;
+
 	for (auto &cem_device : m_cem_device)
 	{
-		CEM3394(config, cem_device);
-		cem_device->configure(RES_K(301), CAP_U(0.002), CAP_U(0.033), CAP_U(10)); // R1, C1, C11, C3 on voice 0 (U1)
+		CEM3394(config, cem_device, comps, inputs);
 		cem_device->add_route(ALL_OUTPUTS, "mono", 0.50);
-		ac_noise.add_route(0, *cem_device, 1.0);
 	}
 }
 
