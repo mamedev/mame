@@ -1635,8 +1635,8 @@ ROM_END
 
 
 /*
-Football Power has a small PCB inside the ball controller, very similar to the one found on
-Gaelco Football, with two accelerometers and a PIC.
+Football Power has a small PCB (labeled "ACEL-3") inside the ball controller, very similar to the 
+one found on Gaelco Football, with two accelerometers and a PIC.
    _________________
   |      ______    |
  _|     /     /    |
@@ -1653,6 +1653,13 @@ Gaelco Football, with two accelerometers and a PIC.
   | |_________|    |
   |                |
   |________________|
+ 
+  The dump included on the newer sets ("fop_621_pic16c710.u1", CRC(eee1d7b3)) was dumped from
+  a PIC provided by Gaelco from their backup archives, while the other dump, included on the
+  older set ("football_power_pic16c710.u3", CRC(9b68caa8)) was dumped from a development ball
+  controller found at Gaelco's offices. The second one is mostly empty, while the first one
+  uses the whole 0x400 ROM area (so, the one from the development controller may be a
+  prototype or an incomplete version).
 */
 ROM_START( footbpow ) // Version 4.6
 	ROM_REGION( 0x200000, "maincpu", 0 )    // 68020 code
@@ -1691,7 +1698,7 @@ ROM_START( footbpow ) // Version 4.6
 	       Watchdog Timer = Enabled
 	       Power-Up Timer = Disabled
 	       Brown Out = Enabled */
-	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
+	ROM_LOAD("fop_621_pic16c710.u3",   0x000, 0x400, CRC(eee1d7b3) SHA1(f63b3ad44992c5a9ed72f8bb1e5227bb30d8553d) ) // I/O for the ball controller
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
@@ -1736,7 +1743,7 @@ ROM_START( footbpow14 ) // Version 1.4
 	       Watchdog Timer = Enabled
 	       Power-Up Timer = Disabled
 	       Brown Out = Enabled */
-	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
+	ROM_LOAD("fop_621_pic16c710.u3",   0x000, 0x400, CRC(eee1d7b3) SHA1(f63b3ad44992c5a9ed72f8bb1e5227bb30d8553d) ) // I/O for the ball controller
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
@@ -1781,7 +1788,7 @@ ROM_START( footbpow12 ) // Version 1.2 - REF. 000208 ROM board
 	       Watchdog Timer = Enabled
 	       Power-Up Timer = Disabled
 	       Brown Out = Enabled */
-	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
+	ROM_LOAD("fop_621_pic16c710.u3",   0x000, 0x400, CRC(eee1d7b3) SHA1(f63b3ad44992c5a9ed72f8bb1e5227bb30d8553d) ) // I/O for the ball controller
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
@@ -1821,12 +1828,9 @@ ROM_START( footbpow11 ) // Version 1.1 - REF. 000208 ROM board
 //  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) ) // labeled FOP 27 in IC37 on the PCB
 
 	ROM_REGION( 0x4000, "io", ROMREGION_ERASEFF )
-	/* ID = 0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF
-	       Oscillator =  High Speed
-	       Watchdog Timer = Enabled
-	       Power-Up Timer = Disabled
-	       Brown Out = Enabled */
-	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
+	/* ID = 0x3F8B, 0x3F8B, 0x3F81, 0x3F8A
+	   Config Word (from bit 13 to bit 0: 11111110110001 */
+	ROM_LOAD("football_power_pic16c710.u3", 0x000, 0x400, CRC(9b68caa8) SHA1(cd9999fba4c1c70c2d28248ca9c7106f13226700) ) // I/O for the ball controller
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
