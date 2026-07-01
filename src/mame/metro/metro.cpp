@@ -4061,8 +4061,8 @@ Notes:
       D78C10 clock    - 12.000MHz [24/2]
       YM2151 clock    - 3.579545MHz
       Oki M6295 clock - 1.200MHz [24/20], sample rate = 1200000 / 132
-      VSync - 60Hz
-      HSync - 15.55kHz
+      VSync - 59.3517Hz
+      HSync - 15.4235kHz
 
 RAM - CY7C199 (x2), 6164 (x2), LH5168 (x2), 6116 (x1)
 ROMs 5+6 = Main Prg
