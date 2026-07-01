@@ -88,7 +88,7 @@ then it becomes (I suppose half) empty - SH4 IRL5 IRQ generated
 
 "control registers" (Smashing Drive)
 0 - read - various statuses, returning -1 is OK
-write - enable slave CPU, gpu, etc most of bits is unclear
+write - enable slave CPU, GPU, etc most of bits is unclear
 4 - w - RS422/485 communication port (for cabinet linking)
 
 SH4 XTAL is 33MHz, SH4 MD0-2 pins is 001 or 011 (CPU core clk = XTAL*6, preipheral clk = XTAL, bus clk is XTAL or XTAL*2)
@@ -399,7 +399,7 @@ void atvtrack_state::ioport_w(offs_t offset, u64 data)
 	// bit  0      O - unk (SD: FPGA config clock)
 	// ADC and DAC is 4-channel SPI devices
 	// Switch inputs is active low, *1 - game specific inputs
-	// All above IO multiplexing, ADC and DAC implemented in FPGA
+	// All above I/O multiplexing, ADC and DAC implemented in FPGA
 
 #ifdef SPECIALMODE
 	u64 d;
@@ -571,7 +571,7 @@ INPUT_PORTS_END
 
 void atvtrack_state::atvtrack(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	SH7750S(config, m_maincpu, ATV_CPU_CLOCK);
 	m_maincpu->set_md(0, 1);
 	m_maincpu->set_md(1, 1);
@@ -602,10 +602,10 @@ void atvtrack_state::atvtrack(machine_config &config)
 	m_subcpu->set_addrmap(AS_IO, &atvtrack_state::atvtrack_sub_port);
 	m_subcpu->set_force_no_drc(true);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));  /* not accurate */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));  // not accurate
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640-1, 0, 480-1);
 	screen.set_screen_update(FUNC(atvtrack_state::screen_update_atvtrack));
@@ -622,14 +622,14 @@ void smashdrv_state::smashdrv(machine_config &config)
 
 
 ROM_START( atvtrack )
-	ROM_REGION( 0x4200000, "nand", ROMREGION_ERASEFF) // NAND roms, contain additional data hence the sizes
+	ROM_REGION( 0x4200000, "nand", ROMREGION_ERASEFF) // NAND ROMs, contain additional data hence the sizes
 	ROM_LOAD32_BYTE("15.bin", 0x0000000, 0x1080000, CRC(84eaede7) SHA1(6e6230165c3bb35e49c660dfd0d07c132ed89e6a) )
 	ROM_LOAD32_BYTE("20.bin", 0x0000001, 0x1080000, CRC(649dc331) SHA1(0cac2d0c15dd564c7fdebdf4365422958f453d63) )
 	ROM_LOAD32_BYTE("14.bin", 0x0000002, 0x1080000, CRC(67983453) SHA1(05389a0ffc1a1bae9bac16a53a97d78b6eccc626) )
 	ROM_LOAD32_BYTE("19.bin", 0x0000003, 0x1080000, CRC(9fc5c579) SHA1(8829329ef229564952aea2108ef1750dc226cbac) )
 
 	ROM_REGION( 0x20000, "fpga", ROMREGION_ERASEFF)
-	ROM_LOAD("epc1pc8.ic23", 0x0000000, 0x1ff01, CRC(752444c7) SHA1(c77e8fcfcbe15b53eda25553763bdac45f0ef7df) ) // contains configuration data for the fpga
+	ROM_LOAD("epc1pc8.ic23", 0x0000000, 0x1ff01, CRC(752444c7) SHA1(c77e8fcfcbe15b53eda25553763bdac45f0ef7df) ) // contains configuration data for the FPGA
 ROM_END
 
 ROM_START( atvtracka )
@@ -640,15 +640,16 @@ ROM_START( atvtracka )
 	ROM_LOAD32_BYTE("k9f2808u0b.ic19", 0x0000003, 0x1080000, CRC(856c1e6a) SHA1(a6b2839120d61811c36cc6b4095de9cefceb394b) )
 
 	ROM_REGION( 0x20000, "fpga", ROMREGION_ERASEFF)
-	ROM_LOAD("epc1pc8.ic23", 0x0000000, 0x1ff01, CRC(752444c7) SHA1(c77e8fcfcbe15b53eda25553763bdac45f0ef7df) ) // contains configuration data for the fpga
+	ROM_LOAD("epc1pc8.ic23", 0x0000000, 0x1ff01, CRC(752444c7) SHA1(c77e8fcfcbe15b53eda25553763bdac45f0ef7df) ) // contains configuration data for the FPGA
 ROM_END
 
-/* Gaelco Football uses a small I/O PCB for connecting the balls (you control the game by kicking a real ball):
+/* Gaelco Football uses a small I/O PCB (labeled "AF-5") for connecting the balls (you control the game by kicking a real ball):
     -ADXL250JQC single/dual axis accelerometer.
     -PIC16C710.
     -8L05A linear voltage regulator.
     -UA741C single operational amplifier.
     -16 MHz osc.
+   The dumped PIC came from a development controller from Gaelco's offices, and it's mostly empty, so it may be incomplete or a prototype.
 */
 ROM_START( gfootbal )
 	ROM_REGION( 0x4200000, "nand", ROMREGION_ERASEFF) // NAND roms, contain additional data hence the sizes
@@ -658,10 +659,12 @@ ROM_START( gfootbal )
 	ROM_LOAD32_BYTE("k9f2808u0b.ic19",  0x00000003, 0x01080000, CRC(2db6c016) SHA1(490d23e338014b4e5f2f12dd04dfae2a93a15e11) )
 
 	ROM_REGION( 0x20000, "fpga", ROMREGION_ERASEFF)
-	ROM_LOAD("epc1pc8.ic23", 0x0000000, 0x1ff01, CRC(752444c7) SHA1(c77e8fcfcbe15b53eda25553763bdac45f0ef7df) ) // contains configuration data for the fpga
+	ROM_LOAD("epc1pc8.ic23", 0x0000000, 0x1ff01, CRC(752444c7) SHA1(c77e8fcfcbe15b53eda25553763bdac45f0ef7df) ) // contains configuration data for the FPGA
 
-	ROM_REGION( 0x20000, "io", ROMREGION_ERASEFF)
-	ROM_LOAD("4r_pic16c710.u1", 0x0000, 0x2000, NO_DUMP ) // I/O for the ball controller
+	ROM_REGION( 0x400, "io", ROMREGION_ERASEFF)
+	/* ID = 0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF
+	   Config Word (from bit 13 to bit 0: 11111110110001 */
+	ROM_LOAD("4r_pic16c710.u1", 0x000, 0x400, CRC(e827c7f8) SHA1(9ecd28850940c15d4a08cdf9446797ce6515683a) ) // I/O for the ball controller
 ROM_END
 
 /*
