@@ -191,6 +191,9 @@ void pc88va_sgp_device::start_exec()
 				ptr->vsize = m_data->read_word(vdp_pointer + 6) & 0x0fff;
 				// NOTE: & 0xfffc causes pitch issues in boomer intro/title text, shinraba gameplay
 				ptr->fb_pitch = (s16)(m_data->read_word(vdp_pointer + 8) & 0xfffe);
+				// rtype sets negative source pitch, needs rolling up by +2
+				if (ptr->fb_pitch < 0)
+					ptr->fb_pitch += 2;
 				ptr->address = (m_data->read_word(vdp_pointer + 10) & 0xfffe)
 					| (m_data->read_word(vdp_pointer + 12) << 16);
 
@@ -400,26 +403,21 @@ void pc88va_sgp_device::execute_blit(u16 draw_mode, bool is_patblt)
 	const u8 logical_op = draw_mode & 0xf;
 	const u8 tp_mod = (draw_mode >> 8) & 0x3;
 	const bool hd = !!BIT(draw_mode, 10);
-	// TODO: rtype gameplay enables VD
+	// rtype gameplay enables VD
 	const bool vd = !!BIT(draw_mode, 11);
 	// TODO: olteus triggers SF a lot on bosses
 	const bool sf = !!BIT(draw_mode, 12);
 
-	if (hd || vd || sf)
+	if (hd)
 	{
 		popmessage("SGP: Warning draw_mode = %04x (HD %d VD %d SF %d)", draw_mode, hd, vd, sf);
 	}
 
 	// boomer title screen just sets the same h/v size, irrelevant
-	if (is_patblt == true)
+	// HW quirk: BITBLT dst h/vsizes are ignored (picks up the ones in src)
+	if (is_patblt == true && (m_src.hsize != m_dst.hsize || m_src.vsize != m_dst.vsize))
 	{
-		LOG("PATBLT\n");
-	//  return;
-	}
-
-	if (m_src.hsize != m_dst.hsize || m_src.vsize != m_dst.vsize)
-	{
-		LOG("SGP: Warning BITBLT non-even sizes (%d x %d) x (%d x %d)\n", m_src.hsize, m_src.vsize, m_dst.hsize, m_dst.vsize);
+		LOG("SGP: Warning PATBLT non-even sizes (%d x %d) x (%d x %d)\n", m_src.hsize, m_src.vsize, m_dst.hsize, m_dst.vsize);
 		return;
 	}
 
@@ -433,8 +431,10 @@ void pc88va_sgp_device::execute_blit(u16 draw_mode, bool is_patblt)
 
 	for (int yi = 0; yi < m_src.vsize; yi ++)
 	{
-		u32 src_address = m_src.address + (yi * m_src.fb_pitch);
-		u32 dst_address = m_dst.address + (yi * m_dst.fb_pitch);
+		const s32 src_line = (vd) ? -(yi) * m_src.fb_pitch : yi * m_src.fb_pitch;
+		u32 src_address = m_src.address + src_line;
+		const s32 dst_line = (vd) ? -(yi) * m_dst.fb_pitch : yi * m_dst.fb_pitch;
+		u32 dst_address = m_dst.address + dst_line;
 
 		// TODO: should fetch on demand, depending on m_dst.pixel_mode etc.
 		// m_src.start_dot is used by famista (pitcher throws)
