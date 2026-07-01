@@ -908,7 +908,8 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 //	const int layer_inc = (!is_5bpp) + 1;
 	const int layer_fixed = is_5bpp + 1;
 
-	const u8 start_layer = which ? 1 : 3;
+	// layer 2 is implicitly skipped in animefrm
+	const u8 start_layer = which ? layer_fixed : 3;
 
 	// draw in reverse order, avoid garbage in olteus after game overs
 	// TODO: confirm me, may be actually using pdrawgfx or combined height disable?
@@ -1012,10 +1013,9 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 				//case 0: draw_indexed_gfx_1bpp(bitmap, cliprect, dsa, layer_pal_bank); break;
 				case 1: draw_indexed_gfx_4bpp(m_graphic_bitmap[which], split_cliprect, params, layer_pal_bank, which); break;
 				case 2:
-					if (is_5bpp)
-					{
-						draw_packed_gfx_5bpp(m_graphic_bitmap[which], split_cliprect, params, layer_pal_bank, which);
-					}
+					// animefrm: only layer 1 draws in 5bpp
+					if (is_5bpp && layer_n == 1)
+						draw_packed_gfx_5bpp(m_graphic_bitmap[which], split_cliprect, params, which);
 					else
 						draw_direct_gfx_8bpp(m_graphic_bitmap[which], split_cliprect, params, which);
 					break;
@@ -1097,7 +1097,7 @@ void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &
 }
 
 // animefrm
-void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which)
+void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 which)
 {
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
