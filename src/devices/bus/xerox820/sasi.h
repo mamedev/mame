@@ -71,8 +71,6 @@ public:
 	virtual void z80daisy_irq_reti() override;
 
 protected:
-	xerox820_sasi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool rgd5);
-
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -80,22 +78,10 @@ protected:
 	required_device<z80pio_device> m_pio;
 	required_device<x820_sasi_host_device> m_host;
 	required_device<nscsi_bus_device> m_sasibus;
-
-	const bool m_rgd5; // true = the 16/8 5.25" rigid disk unit's drive complement
-};
-
-
-// ======================> xerox820_sasi_rgd5_device (5.25" rigid disk unit)
-
-class xerox820_sasi_rgd5_device : public xerox820_sasi_device
-{
-public:
-	xerox820_sasi_rgd5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 
 // device type declarations
 DECLARE_DEVICE_TYPE(XEROX820_SASI, xerox820_sasi_device)
-DECLARE_DEVICE_TYPE(XEROX820_SASI_RGD5, xerox820_sasi_rgd5_device)
 
 #endif // MAME_BUS_XEROX820_SASI_H

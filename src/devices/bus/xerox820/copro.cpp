@@ -25,6 +25,12 @@ device_xerox820_copro_card_interface::device_xerox820_copro_card_interface(const
 {
 }
 
+// the card device types below are exposed only through this interface
+// (DEFINE_DEVICE_TYPE_PRIVATE), so the finder templates for the interface must
+// be instantiated exactly once for the project -- here
+template class device_finder<device_xerox820_copro_card_interface, false>;
+template class device_finder<device_xerox820_copro_card_interface, true>;
+
 xerox820_copro_slot_device::xerox820_copro_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, XEROX820_COPRO_SLOT, tag, owner, clock)
 	, device_single_card_slot_interface<device_xerox820_copro_card_interface>(mconfig, *this)
@@ -266,7 +272,7 @@ void xerox820_16_8_device::shared_ram_w(offs_t offset, uint8_t data)
 }
 
 
-DEFINE_DEVICE_TYPE(XEROX820_16_8, xerox820_16_8_device, "xerox820_16_8", "Xerox 16/8 8086 coprocessor board")
+DEFINE_DEVICE_TYPE_PRIVATE(XEROX820_16_8, device_xerox820_copro_card_interface, xerox820_16_8_device, "xerox820_16_8", "Xerox 16/8 8086 coprocessor board")
 
 
 //**************************************************************************
@@ -306,6 +312,7 @@ private:
 	uint8_t rom_r(offs_t offset);    // IN  B0-BF : paged box ROM (537p3682)
 
 	required_device<wd1002_05_device> m_wdc; // the WD1002-05 controller (host task file at A8-AF)
+	required_region_ptr<uint8_t> m_box_rom;  // the 537p3682 box ROM, paged at B0-BF
 
 	const uint8_t m_box_id;          // 0x21 rgd5 (rigid present) / 0x20 flpy5 (floppy only)
 };
@@ -330,6 +337,7 @@ public:
 xerox820_emii_device::xerox820_emii_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t box_id)
 	: xerox820_16_8_device(mconfig, type, tag, owner, clock)
 	, m_wdc(*this, "wdc")
+	, m_box_rom(*this, EMII_TAG)
 	, m_box_id(box_id)
 {
 }
@@ -360,11 +368,11 @@ void xerox820_emii_device::device_start()
 
 	// install the disk side into the host Z80 I/O space (A6 id, A8-AF task file, B0-BF box ROM)
 	address_space &io = m_slot->maincpu().space(AS_IO);
-	io.install_read_handler(0xa6, 0xa6, 0, 0xff00, 0, read8smo_delegate(*this, FUNC(xerox820_emii_device::box_id_r)));
+	io.install_read_handler(0xa6, 0xa6, 0, 0xff00, 0, emu::rw_delegate(*this, FUNC(xerox820_emii_device::box_id_r)));
 	io.install_readwrite_handler(0xa8, 0xaf, 0, 0xff00, 0,
-			read8sm_delegate(*m_wdc, FUNC(wd1002_05_device::read)),
-			write8sm_delegate(*m_wdc, FUNC(wd1002_05_device::write)));
-	io.install_read_handler(0xb0, 0xbf, 0, 0, 0xff00, read8sm_delegate(*this, FUNC(xerox820_emii_device::rom_r)));
+			emu::rw_delegate(*m_wdc, FUNC(wd1002_05_device::read)),
+			emu::rw_delegate(*m_wdc, FUNC(wd1002_05_device::write)));
+	io.install_read_handler(0xb0, 0xbf, 0, 0, 0xff00, emu::rw_delegate(*this, FUNC(xerox820_emii_device::rom_r)));
 }
 
 void xerox820_emii_device::device_reset()
@@ -383,9 +391,8 @@ uint8_t xerox820_emii_device::rom_r(offs_t offset)
 {
 	const uint8_t low = 0xb0 + (offset & 0x0f); // port low byte ($B0-$BF)
 	const uint8_t b   = (offset >> 8) & 0xff;    // B register = the ROM index ddskld walks
-	memory_region *const rom = memregion(EMII_TAG);
 	const unsigned idx = (low - 0xb0) * 256 + b;
-	return (rom && idx < rom->bytes()) ? rom->base()[idx] : 0xff;
+	return (idx < m_box_rom.bytes()) ? m_box_rom[idx] : 0xff;
 }
 
 // The host task file ($A8-$AF) is the WD1002-05 controller itself (machine/wd1002_05) --
@@ -393,8 +400,8 @@ uint8_t xerox820_emii_device::rom_r(offs_t offset)
 // the 5.25" floppy both hang off that device; the SDH register selects which.
 
 
-DEFINE_DEVICE_TYPE(XEROX820_EMII_RGD5,  xerox820_emii_rgd5_device,  "xerox820_emii_rgd5",  "Xerox 16/8 EM-II, rigid+floppy (8086 + WD1002-05)")
-DEFINE_DEVICE_TYPE(XEROX820_EMII_FLPY5, xerox820_emii_flpy5_device, "xerox820_emii_flpy5", "Xerox 16/8 EM-II, floppy only (8086 + WD1002-05)")
+DEFINE_DEVICE_TYPE_PRIVATE(XEROX820_EMII_RGD5,  device_xerox820_copro_card_interface, xerox820_emii_rgd5_device,  "xerox820_emii_rgd5",  "Xerox 16/8 EM-II, rigid+floppy (8086 + WD1002-05)")
+DEFINE_DEVICE_TYPE_PRIVATE(XEROX820_EMII_FLPY5, device_xerox820_copro_card_interface, xerox820_emii_flpy5_device, "xerox820_emii_flpy5", "Xerox 16/8 EM-II, floppy only (8086 + WD1002-05)")
 
 
 //**************************************************************************

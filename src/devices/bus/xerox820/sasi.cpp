@@ -10,7 +10,6 @@
 #include "sasi.h"
 
 #include "bus/nscsi/devices.h"
-#include "bus/nscsi/sa1403d.h"
 
 
 //**************************************************************************
@@ -19,7 +18,6 @@
 
 DEFINE_DEVICE_TYPE(X820_SASI_HOST, x820_sasi_host_device, "x820_sasi_host", "Xerox 820-II SASI host adapter")
 DEFINE_DEVICE_TYPE(XEROX820_SASI, xerox820_sasi_device, "xerox820_sasi", "Xerox 820-II SASI host adapter (8\" + ST-506)")
-DEFINE_DEVICE_TYPE(XEROX820_SASI_RGD5, xerox820_sasi_rgd5_device, "xerox820_sasi_rgd5", "Xerox 820-II SASI host adapter (5.25\" rigid disk unit)")
 
 
 //**************************************************************************
@@ -130,22 +128,11 @@ void x820_sasi_host_device::ctrl_w(uint8_t data)
 //**************************************************************************
 
 xerox820_sasi_device::xerox820_sasi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: xerox820_sasi_device(mconfig, XEROX820_SASI, tag, owner, clock, false)
-{
-}
-
-xerox820_sasi_device::xerox820_sasi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool rgd5)
-	: device_t(mconfig, type, tag, owner, clock)
+	: device_t(mconfig, XEROX820_SASI, tag, owner, clock)
 	, device_xerox820_dbslot_card_interface(mconfig, *this)
 	, m_pio(*this, "u8pio")
 	, m_host(*this, "host")
 	, m_sasibus(*this, "sasi")
-	, m_rgd5(rgd5)
-{
-}
-
-xerox820_sasi_rgd5_device::xerox820_sasi_rgd5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: xerox820_sasi_device(mconfig, XEROX820_SASI_RGD5, tag, owner, clock, true)
 {
 }
 
@@ -163,11 +150,7 @@ void xerox820_sasi_device::device_add_mconfig(machine_config &config)
 	// id), host adapter bridged through the u8 PIO.  Floppies on LUN 0-2 and
 	// the rigid disk on LUN 3, per the 9R80758 unit wiring.
 	NSCSI_BUS(config, m_sasibus);
-	if (m_rgd5)
-		NSCSI_CONNECTOR(config, "sasi:0",
-				[](device_slot_interface &d) { d.option_add("sa1403d_rgd5", SA1403D_RGD5); }, "sa1403d_rgd5");
-	else
-		NSCSI_CONNECTOR(config, "sasi:0", default_scsi_devices, "sa1403d");
+	NSCSI_CONNECTOR(config, "sasi:0", default_scsi_devices, "sa1403d");
 	X820_SASI_HOST(config, m_host);
 	m_sasibus->set_external_device(7, m_host);
 }

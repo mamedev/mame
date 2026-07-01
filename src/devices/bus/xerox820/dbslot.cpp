@@ -30,6 +30,12 @@ device_xerox820_dbslot_card_interface::device_xerox820_dbslot_card_interface(con
 {
 }
 
+// the FD1797 card device types are exposed only through this interface
+// (DEFINE_DEVICE_TYPE_PRIVATE), so the finder templates for the interface must
+// be instantiated exactly once for the project -- here
+template class device_finder<device_xerox820_dbslot_card_interface, false>;
+template class device_finder<device_xerox820_dbslot_card_interface, true>;
+
 
 //**************************************************************************
 //  xerox820_dbslot_device
@@ -62,5 +68,4 @@ void xerox820_dbslot_cards(device_slot_interface &device)
 	device.option_add("fdc5", XEROX820_FDC5);           // FD1797, 5.25" drives
 	device.option_add("fdcbox5", XEROX820_FDC_BOX5);    // FD1797 + 16/8 RX024 5.25" box
 	device.option_add("sasi", XEROX820_SASI);           // SA1403D, 8" floppies + ST-506 rigid
-	device.option_add("sasirgd5", XEROX820_SASI_RGD5);  // SA1403D, 16/8 5.25" rigid disk unit
 }

@@ -54,7 +54,7 @@ wd1002_hd0_device::wd1002_hd0_device(const machine_config &mconfig, device_type 
 void wd1002_hd0_device::device_add_mconfig(machine_config &config)
 {
 	WD1010(config, m_hdc, 5'000'000); // the WD1010 Winchester controller (5 MHz)
-	m_hdc->out_intrq_callback().set([this] (int state) { m_intrq_cb(state); });
+	m_hdc->out_intrq_callback().set(FUNC(wd1002_hd0_device::intrq_w));
 	m_hdc->out_bcr_callback().set(FUNC(wd1002_hd0_device::bcr_w));
 	m_hdc->in_data_callback().set(FUNC(wd1002_hd0_device::buf_in));
 	m_hdc->out_data_callback().set(FUNC(wd1002_hd0_device::buf_out));
@@ -141,6 +141,11 @@ void wd1002_hd0_device::buf_out(uint8_t data)
 	m_buf[m_ptr & (BUFFER_SIZE - 1)] = data;
 	if ((m_ptr++ & (m_sector_bytes - 1)) == (m_sector_bytes - 1))
 		m_hdc->brdy_w(1); // a full sector has been read off the disk
+}
+
+void wd1002_hd0_device::intrq_w(int state)
+{
+	m_intrq_cb(state);
 }
 
 void wd1002_hd0_device::bcr_w(int state)

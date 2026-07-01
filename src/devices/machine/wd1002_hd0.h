@@ -65,6 +65,7 @@ protected:
 	uint16_t m_ptr = 0;
 
 private:
+	void intrq_w(int state);      // WD1010 INTRQ, forwarded to the host callback
 	void bcr_w(int state);        // WD1010 buffer-counter reset: rewind the pointer
 
 	required_device<wd1010_device> m_hdc;

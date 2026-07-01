@@ -4147,7 +4147,6 @@ end
 ---------------------------------------------------
 
 if MACHINES["WD1002_HD0"] then
-	MACHINES["WD1010"] = true
 	files {
 		MAME_DIR .. "src/devices/machine/wd1002_hd0.cpp",
 		MAME_DIR .. "src/devices/machine/wd1002_hd0.h",
@@ -4160,9 +4159,6 @@ end
 ---------------------------------------------------
 
 if MACHINES["WD1002_05"] then
-	MACHINES["WD1002_HD0"] = true
-	MACHINES["WD1010"] = true
-	MACHINES["WD_FDC"] = true
 	files {
 		MAME_DIR .. "src/devices/machine/wd1002_05.cpp",
 		MAME_DIR .. "src/devices/machine/wd1002_05.h",

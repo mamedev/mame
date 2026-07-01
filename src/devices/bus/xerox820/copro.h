@@ -81,14 +81,12 @@ private:
 // device type declarations
 DECLARE_DEVICE_TYPE(XEROX820_COPRO_SLOT, xerox820_copro_slot_device)
 
-class xerox820_16_8_device;
-DECLARE_DEVICE_TYPE(XEROX820_16_8, xerox820_16_8_device) // the 16/8 8086 board (implementation private to copro.cpp)
-
-// the 16/8 EM-II (DEM): 8086 + WD1002-05 disk + 537p3682 box ROM (implementation private to copro.cpp)
-class xerox820_emii_rgd5_device;
-DECLARE_DEVICE_TYPE(XEROX820_EMII_RGD5,  xerox820_emii_rgd5_device)  // rigid + floppy (box id 0x21)
-class xerox820_emii_flpy5_device;
-DECLARE_DEVICE_TYPE(XEROX820_EMII_FLPY5, xerox820_emii_flpy5_device) // floppy only   (box id 0x20)
+// the 16/8 8086 board and the EM-II (DEM) variants are private to copro.cpp and
+// are exposed only through the card interface, so they are declared against it
+// (paired with DEFINE_DEVICE_TYPE_PRIVATE in the source file)
+DECLARE_DEVICE_TYPE(XEROX820_16_8,       device_xerox820_copro_card_interface) // the 16/8 8086 board
+DECLARE_DEVICE_TYPE(XEROX820_EMII_RGD5,  device_xerox820_copro_card_interface) // EM-II rigid + floppy (box id 0x21)
+DECLARE_DEVICE_TYPE(XEROX820_EMII_FLPY5, device_xerox820_copro_card_interface) // EM-II floppy only    (box id 0x20)
 
 
 // slot option registration

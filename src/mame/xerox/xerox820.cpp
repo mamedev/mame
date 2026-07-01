@@ -791,8 +791,8 @@ void bigboard_state::bigboard5(machine_config &config)
 
 // Shared 820-II hardware plus the disk-controller daughterboard slot.  disk_card
 // selects the personality: the FD1797 floppy controller ("fdc"/"fdc5") or the
-// Shugart SASI host adapter ("sasi"), with the 16/8 expansion-box variants
-// ("fdcbox5"/"sasirgd5").
+// Shugart SASI host adapter ("sasi"), with the 16/8 expansion-box variant
+// ("fdcbox5").
 void xerox820ii_state::common(machine_config &config, const char *disk_card)
 {
 	/* basic machine hardware */
