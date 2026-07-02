@@ -169,6 +169,7 @@ private:
 	int32_t   m_prefetch_count;
 	uint8_t   m_prefetch_reset;
 	uint32_t  m_chip_type;
+	bool      m_has_div_quirk;
 
 	uint32_t  m_prefix_base;    /* base address of the latest prefix segment */
 	uint8_t   m_seg_prefix;     /* prefix segment indicator */
