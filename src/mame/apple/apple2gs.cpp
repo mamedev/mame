@@ -1715,7 +1715,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return m_speed;
 
 		case 0x3c:  // SOUNDCTL
-			return m_sndglu_ctrl | 0x1f;
+			return m_sndglu_ctrl | 0x1f; // "write only" bits read as 1
 
 		case 0x3d:  // SOUNDDATA
 			ret = m_sndglu_dummy_read;
@@ -2029,7 +2029,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x35:  // SHADOW
-			m_shadow = data;
+			m_shadow = data; // bits 5,7 are not forced to zero
 
 			// handle I/O and language card inhibit bits here
 			if (m_shadow & SHAD_IOLC)
@@ -2045,7 +2045,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x36:  // SPEED
-			m_speed = data;
+			m_speed = data; // bits 5-6 are not forced to zero
 
 			if (m_speed & SPEED_ALLBANKS)
 			{
