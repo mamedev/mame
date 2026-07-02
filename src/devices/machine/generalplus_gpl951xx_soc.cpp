@@ -1774,7 +1774,6 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map &map)
 	map(0x007c00, 0x007dff).rw(m_spg_audio, FUNC(sunplus_gcm394_audio_device::audio_r), FUNC(sunplus_gcm394_audio_device::audio_w));
 	map(0x007e00, 0x007fff).rw(m_spg_audio, FUNC(sunplus_gcm394_audio_device::audio_phase_r), FUNC(sunplus_gcm394_audio_device::audio_phase_w));
 
-	// 8000 - 8fff internal boot ROM (same on all devices of the same type, not OTP)
 	map(0x008000, 0x008fff).rom().region("internal", 0);
 
 	map(0x009000, 0x1fffff).r(FUNC(generalplus_gpl951xx_device::spi_direct_r));
