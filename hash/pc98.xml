@@ -2623,6 +2623,29 @@ Not extensively tested
 
 <!-- !Generic Applications -->
 
+	<software name="98eiwa">
+		<!-- Origin: Neo Kobe Collection -->
+		<description>98 Eiwa Jiten</description>
+		<year>1987</year>
+		<publisher>ハイスコア (Hi-Score)</publisher>
+		<notes><![CDATA[
+English-Japanese Dictionary
+]]></notes>
+		<info name="alt_title" value="98英和辞典" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="98 eiwa jiten (disk 1).hdm" size="1261568" crc="3377cdc0" sha1="aef25da61971675ae5db6cd68ff8ecabc65e5225" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="98 eiwa jiten (disk 2).hdm" size="1261568" crc="61396602" sha1="9f7e01c08b477403d04f32a165cd38d25775c059" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="98lespro" supported="no">
 		<description>98 Lesson Pro</description>
 		<year>1990</year>
@@ -3636,26 +3659,6 @@ Throws a "excution file has been renamed" warning during MEGDOS boot
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="746496">
 				<rom name="98 note no hissu aminosan [b].img" size="746496" crc="ee60cb77" sha1="5540f386bb708cff61e41387c9760184083fcad8" offset="0" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="98eiwa">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>98 Eiwa Jiten</description>
-		<year>1987</year>
-		<publisher>ハイスコア (Hi-Score)</publisher>
-		<info name="alt_title" value="98英和辞典" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="98 eiwa jiten (disk 1).hdm" size="1261568" crc="3377cdc0" sha1="aef25da61971675ae5db6cd68ff8ecabc65e5225" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="98 eiwa jiten (disk 2).hdm" size="1261568" crc="61396602" sha1="9f7e01c08b477403d04f32a165cd38d25775c059" offset="0" />
 			</dataarea>
 		</part>
 	</software>
