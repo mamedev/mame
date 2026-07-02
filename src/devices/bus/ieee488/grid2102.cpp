@@ -55,9 +55,6 @@ static constexpr int STATUS_RESPONSE_LENGTH = 7;
 // GRiD GPIB disk devices always use 512-byte sectors, other sector sizes are not supported.
 static constexpr uint16_t SECTOR_SIZE = 512;
 
-static constexpr int GRID2101_HARDDISK_DEV_ADDR = 4;
-static constexpr int GRID2102_DEV_ADDR = 6;
-
 enum class grid210x_gpib_state
 {
 	idle,
@@ -402,7 +399,7 @@ void grid210x_device::accept_transfer() {
 		} // else something is wrong, ignore
 	} else if (m_floppy_loop_state == grid210x_state::writing_data) {
 		// write
-		if (floppy_sector_number < 0xfffF) {
+		if (floppy_sector_number < 0xffffF) {
 			fseek(floppy_sector_number * SECTOR_SIZE, SEEK_SET);
 			fwrite(m_data_buffer.data(), m_data_buffer.size());
 		} else {
