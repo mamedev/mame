@@ -30,12 +30,6 @@ device_xerox820_dbslot_card_interface::device_xerox820_dbslot_card_interface(con
 {
 }
 
-// the FD1797 card device types are exposed only through this interface
-// (DEFINE_DEVICE_TYPE_PRIVATE), so the finder templates for the interface must
-// be instantiated exactly once for the project -- here
-template class device_finder<device_xerox820_dbslot_card_interface, false>;
-template class device_finder<device_xerox820_dbslot_card_interface, true>;
-
 
 //**************************************************************************
 //  xerox820_dbslot_device

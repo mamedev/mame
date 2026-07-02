@@ -25,12 +25,6 @@ device_xerox820_copro_card_interface::device_xerox820_copro_card_interface(const
 {
 }
 
-// the card device types below are exposed only through this interface
-// (DEFINE_DEVICE_TYPE_PRIVATE), so the finder templates for the interface must
-// be instantiated exactly once for the project -- here
-template class device_finder<device_xerox820_copro_card_interface, false>;
-template class device_finder<device_xerox820_copro_card_interface, true>;
-
 xerox820_copro_slot_device::xerox820_copro_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, XEROX820_COPRO_SLOT, tag, owner, clock)
 	, device_single_card_slot_interface<device_xerox820_copro_card_interface>(mconfig, *this)
@@ -150,10 +144,10 @@ void xerox820_16_8_device::device_start()
 	//   OUT A1        -> Z80->8086 doorbell (counted INT, see dbell_w)
 	// A2/A3 are defined but unused by the loader/monitor; A4-AF are reserved.
 	address_space &io = m_slot->maincpu().space(AS_IO);
-	io.install_read_handler(0xa0, 0xa0, 0, 0xff00, 0, read8smo_delegate(*this, FUNC(xerox820_16_8_device::stop_r)));
-	io.install_write_handler(0xa0, 0xa0, 0, 0xff00, 0, write8smo_delegate(*this, FUNC(xerox820_16_8_device::lock_w)));
-	io.install_read_handler(0xa1, 0xa1, 0, 0xff00, 0, read8smo_delegate(*this, FUNC(xerox820_16_8_device::start_r)));
-	io.install_write_handler(0xa1, 0xa1, 0, 0xff00, 0, write8smo_delegate(*this, FUNC(xerox820_16_8_device::dbell_w)));
+	io.install_read_handler(0xa0, 0xa0, 0, 0xff00, 0, emu::rw_delegate(*this, FUNC(xerox820_16_8_device::stop_r)));
+	io.install_write_handler(0xa0, 0xa0, 0, 0xff00, 0, emu::rw_delegate(*this, FUNC(xerox820_16_8_device::lock_w)));
+	io.install_read_handler(0xa1, 0xa1, 0, 0xff00, 0, emu::rw_delegate(*this, FUNC(xerox820_16_8_device::start_r)));
+	io.install_write_handler(0xa1, 0xa1, 0, 0xff00, 0, emu::rw_delegate(*this, FUNC(xerox820_16_8_device::dbell_w)));
 
 	save_item(NAME(m_dbell_count));
 	save_item(NAME(m_rmw_addr));
@@ -303,7 +297,6 @@ protected:
 	xerox820_emii_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t box_id);
 
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
@@ -373,11 +366,6 @@ void xerox820_emii_device::device_start()
 			emu::rw_delegate(*m_wdc, FUNC(wd1002_05_device::read)),
 			emu::rw_delegate(*m_wdc, FUNC(wd1002_05_device::write)));
 	io.install_read_handler(0xb0, 0xbf, 0, 0, 0xff00, emu::rw_delegate(*this, FUNC(xerox820_emii_device::rom_r)));
-}
-
-void xerox820_emii_device::device_reset()
-{
-	xerox820_16_8_device::device_reset();
 }
 
 uint8_t xerox820_emii_device::box_id_r()
