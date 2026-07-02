@@ -185,6 +185,18 @@ static const grid210x_device::disk_status hdd_status
 };
 
 
+static constexpr uint8_t GPIB_CMD_GROUP_MASK = 0xe0;
+static constexpr uint8_t GPIB_CMD_ADDR_MASK = 0x1f;
+static constexpr uint8_t GPIB_CMD_DCL = 0x14;
+static constexpr uint8_t GPIB_CMD_SPE = 0x18;
+static constexpr uint8_t GPIB_CMD_SPD = 0x19;
+static constexpr uint8_t GPIB_CMD_MLA = 0x20;
+static constexpr uint8_t GPIB_CMD_MTA = 0x40;
+static constexpr uint8_t GPIB_CMD_UNL = 0x3f;
+static constexpr uint8_t GPIB_CMD_UNT = 0x5f;
+
+static constexpr uint8_t GPIB_STATUS_RQS = 0x40;
+
 #define GRID2101_HARDDISK_DEV_ADDR 4
 #define GRID2102_DEV_ADDR 6
 
@@ -350,7 +362,7 @@ void grid210x_device::start_talking_if_ready() {
 			has_srq = false;
 			m_bus->srq_w(this, 1);
 		}
-		m_byte_to_send = serial_poll_byte | (had_srq ? 0x40 : 0);
+		m_byte_to_send = serial_poll_byte | (had_srq ? GPIB_STATUS_RQS : 0);
 		serial_poll_byte = 0;
 		m_send_eoi = 1;
 		m_gpib_loop_state = GRID210X_GPIB_STATE_SEND_DATA_START;
@@ -390,48 +402,41 @@ void grid210x_device::ieee488_dav(int state) {
 		m_gpib_loop_state = GRID210X_GPIB_STATE_IDLE;
 
 		if (m_last_recv_atn) {
-			if ((m_last_recv_byte & 0xe0) == 0x20) {
-				if ((m_last_recv_byte & 0x1f) == bus_addr) {
-					// dev-id = 5
+			const uint8_t command_group = m_last_recv_byte & GPIB_CMD_GROUP_MASK;
+			const uint8_t command_addr = m_last_recv_byte & GPIB_CMD_ADDR_MASK;
+
+			if (command_group == GPIB_CMD_MLA) {
+				m_data_buffer.clear();
+				listening = false;
+				talking = false;
+				if (command_addr == bus_addr) {
 					listening = true;
-					talking = false;
-					m_data_buffer.clear();
 					m_ignore_state = GRID210X_IGNORE_STATE_NONE;
 					LOG_GPIB_STATE("grid210x_device now listening\n");
-				} else if((m_last_recv_byte & 0x1f) == 0x1f) {
-					// reset listen
-					listening = false;
-					m_data_buffer.clear();
+				} else if (m_last_recv_byte == GPIB_CMD_UNL) {
 					LOG_GPIB_STATE("grid210x_device now not listening\n");
 				} else {
-					listening = false;
-					m_data_buffer.clear();
 					m_ignore_state = GRID210X_IGNORE_STATE_WAIT_ATN_HIGH;
-					LOG_GPIB_STATE("grid210x_device ignoring transfer for listener %u\n", (unsigned)(m_last_recv_byte & 0x1f));
+					LOG_GPIB_STATE("grid210x_device ignoring transfer for listener %u\n", (unsigned)command_addr);
 				}
-			} else if ((m_last_recv_byte & 0xe0) == 0x40) {
-				if ((m_last_recv_byte & 0x1f) == bus_addr) {
-					// dev-id = 5
+			} else if (command_group == GPIB_CMD_MTA) {
+				m_data_buffer.clear();
+				talking = false;
+				listening = false;
+				if (command_addr == bus_addr) {
 					talking = true;
-					listening = false;
-					m_data_buffer.clear();
 					m_ignore_state = GRID210X_IGNORE_STATE_NONE;
 					LOG_GPIB_STATE("grid210x_device now talking\n");
-				} else if ((m_last_recv_byte & 0x1f) == 0x1f) {
-					// reset talk
-					talking = false;
+				} else if (m_last_recv_byte == GPIB_CMD_UNT) {
 					LOG_GPIB_STATE("grid210x_device now not talking\n");
 				} else {
-					// reset talk
-					talking = false;
-					LOG_GPIB_STATE("grid210x_device now not talking\n");
 					m_ignore_state = GRID210X_IGNORE_STATE_WAIT_ATN_HIGH;
-					LOG_GPIB_STATE("grid210x_device ignoring transfer for talker %u\n", (unsigned)(m_last_recv_byte & 0x1f));
+					LOG_GPIB_STATE("grid210x_device ignoring transfer for talker %u\n", (unsigned)command_addr);
 				}
-			} else if (m_last_recv_byte == 0x18) {
+			} else if (m_last_recv_byte == GPIB_CMD_SPE) {
 				// serial poll enable
 				serial_polling = true;
-			} else if (m_last_recv_byte == 0x19) {
+			} else if (m_last_recv_byte == GPIB_CMD_SPD) {
 				// serial poll disable
 				serial_polling = false;
 			}
