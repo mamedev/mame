@@ -89,12 +89,14 @@ protected:
 	virtual const char *image_brief_type_name() const noexcept override { return "flop"; }
 
 	void accept_transfer();
-	void update_ndac(int atn);
+	void start_talking_if_ready();
+	void update_handshake(int atn);
 
 	virtual disk_status get_status() = 0;
 
 private:
 	TIMER_CALLBACK_MEMBER(delay_tick);
+	TIMER_CALLBACK_MEMBER(talk_tick);
 
 	int m_gpib_loop_state;
 	int m_floppy_loop_state;
@@ -104,6 +106,7 @@ private:
 	uint8_t m_byte_to_send;
 	int m_send_eoi;
 	bool listening, talking, serial_polling;
+	int m_ignore_state;
 	bool has_srq;
 	uint8_t serial_poll_byte;
 	uint32_t floppy_sector_number;
@@ -112,6 +115,7 @@ private:
 	std::queue<uint8_t> m_output_data_buffer;
 	uint16_t io_size;
 	emu_timer *m_delay_timer;
+	emu_timer *m_talk_timer;
 
 protected:
 	attotime read_delay;
@@ -189,6 +193,10 @@ static const grid210x_device::disk_status hdd_status
 #define GRID210X_GPIB_STATE_SEND_DATA_START 2
 #define GRID210X_GPIB_STATE_WAIT_NDAC_FALSE 3
 
+#define GRID210X_IGNORE_STATE_NONE 0
+#define GRID210X_IGNORE_STATE_WAIT_ATN_HIGH 1
+#define GRID210X_IGNORE_STATE_WAIT_ATN_LOW 2
+
 #define GRID210X_STATE_IDLE 0
 #define GRID210X_STATE_READING_DATA 1
 #define GRID210X_STATE_WRITING_DATA 2
@@ -223,6 +231,7 @@ grid210x_device::grid210x_device(const machine_config &mconfig, device_type type
 	listening(false),
 	talking(false),
 	serial_polling(false),
+	m_ignore_state(GRID210X_IGNORE_STATE_NONE),
 	has_srq(false),
 	serial_poll_byte(0),
 	bus_addr(bus_addr),
@@ -235,6 +244,7 @@ void grid210x_device::device_start() {
 	m_bus->ndac_w(this, 1);
 	m_bus->nrfd_w(this, 1);
 	m_delay_timer = timer_alloc(FUNC(grid210x_device::delay_tick), this);
+	m_talk_timer = timer_alloc(FUNC(grid210x_device::talk_tick), this);
 }
 
 TIMER_CALLBACK_MEMBER(grid210x_device::delay_tick) {
@@ -272,6 +282,12 @@ TIMER_CALLBACK_MEMBER(grid210x_device::delay_tick) {
 	has_srq = true;
 	m_bus->srq_w(this, 0);
 	m_floppy_loop_state = GRID210X_STATE_IDLE;
+}
+
+TIMER_CALLBACK_MEMBER(grid210x_device::talk_tick) {
+	if (m_gpib_loop_state == GRID210X_GPIB_STATE_SEND_DATA_START) {
+		ieee488_nrfd(m_bus->nrfd_r());
+	}
 }
 
 void grid210x_device::ieee488_eoi(int state) {
@@ -323,7 +339,38 @@ void grid210x_device::accept_transfer() {
 	}
 }
 
+void grid210x_device::start_talking_if_ready() {
+	if (m_gpib_loop_state != GRID210X_GPIB_STATE_IDLE || m_ignore_state != GRID210X_IGNORE_STATE_NONE || !talking || !m_bus->atn_r()) {
+		return;
+	}
+
+	if (serial_polling) {
+		bool had_srq = has_srq;
+		if (has_srq) {
+			has_srq = false;
+			m_bus->srq_w(this, 1);
+		}
+		m_byte_to_send = serial_poll_byte | (had_srq ? 0x40 : 0);
+		serial_poll_byte = 0;
+		m_send_eoi = 1;
+		m_gpib_loop_state = GRID210X_GPIB_STATE_SEND_DATA_START;
+		m_talk_timer->adjust(attotime::zero);
+	} else if (!m_output_data_buffer.empty()) {
+		m_byte_to_send = m_output_data_buffer.front();
+		m_output_data_buffer.pop();
+		m_send_eoi = m_output_data_buffer.empty() ? 1 : 0;
+		m_gpib_loop_state = GRID210X_GPIB_STATE_SEND_DATA_START;
+		m_talk_timer->adjust(attotime::zero);
+	}
+}
+
 void grid210x_device::ieee488_dav(int state) {
+	if (m_ignore_state != GRID210X_IGNORE_STATE_NONE) {
+		m_bus->nrfd_w(this, 1);
+		m_bus->ndac_w(this, 1);
+		return;
+	}
+
 	if(state == 0 && m_gpib_loop_state == GRID210X_GPIB_STATE_IDLE) {
 		// read data and wait for transfer end
 		int atn = m_bus->atn_r() ^ 1;
@@ -341,28 +388,45 @@ void grid210x_device::ieee488_dav(int state) {
 		// m_bus->ndac_w(this, 0);
 		m_bus->nrfd_w(this, 1);
 		m_gpib_loop_state = GRID210X_GPIB_STATE_IDLE;
-		update_ndac(m_bus->atn_r() ^ 1);
 
 		if (m_last_recv_atn) {
 			if ((m_last_recv_byte & 0xe0) == 0x20) {
 				if ((m_last_recv_byte & 0x1f) == bus_addr) {
 					// dev-id = 5
 					listening = true;
+					talking = false;
+					m_data_buffer.clear();
+					m_ignore_state = GRID210X_IGNORE_STATE_NONE;
 					LOG_GPIB_STATE("grid210x_device now listening\n");
 				} else if((m_last_recv_byte & 0x1f) == 0x1f) {
 					// reset listen
 					listening = false;
+					m_data_buffer.clear();
 					LOG_GPIB_STATE("grid210x_device now not listening\n");
+				} else {
+					listening = false;
+					m_data_buffer.clear();
+					m_ignore_state = GRID210X_IGNORE_STATE_WAIT_ATN_HIGH;
+					LOG_GPIB_STATE("grid210x_device ignoring transfer for listener %u\n", (unsigned)(m_last_recv_byte & 0x1f));
 				}
 			} else if ((m_last_recv_byte & 0xe0) == 0x40) {
 				if ((m_last_recv_byte & 0x1f) == bus_addr) {
 					// dev-id = 5
 					talking = true;
+					listening = false;
+					m_data_buffer.clear();
+					m_ignore_state = GRID210X_IGNORE_STATE_NONE;
 					LOG_GPIB_STATE("grid210x_device now talking\n");
+				} else if ((m_last_recv_byte & 0x1f) == 0x1f) {
+					// reset talk
+					talking = false;
+					LOG_GPIB_STATE("grid210x_device now not talking\n");
 				} else {
 					// reset talk
 					talking = false;
 					LOG_GPIB_STATE("grid210x_device now not talking\n");
+					m_ignore_state = GRID210X_IGNORE_STATE_WAIT_ATN_HIGH;
+					LOG_GPIB_STATE("grid210x_device ignoring transfer for talker %u\n", (unsigned)(m_last_recv_byte & 0x1f));
 				}
 			} else if (m_last_recv_byte == 0x18) {
 				// serial poll enable
@@ -379,29 +443,13 @@ void grid210x_device::ieee488_dav(int state) {
 			}
 		}
 
-		if (talking) {
-			if (serial_polling) {
-				bool had_srq = has_srq;
-				if (has_srq) {
-					has_srq = false;
-					m_bus->srq_w(this, 1);
-				}
-				m_byte_to_send = serial_poll_byte | (had_srq ? 0x40 : 0);
-				serial_poll_byte = 0;
-				m_send_eoi = 1;
-				m_gpib_loop_state = GRID210X_GPIB_STATE_SEND_DATA_START;
-			} else if (!m_output_data_buffer.empty()) {
-				m_byte_to_send = m_output_data_buffer.front();
-				m_output_data_buffer.pop();
-				m_send_eoi = m_output_data_buffer.empty() ? 1 : 0;
-				m_gpib_loop_state = GRID210X_GPIB_STATE_SEND_DATA_START;
-			}
-		}
+		update_handshake(m_bus->atn_r() ^ 1);
+		start_talking_if_ready();
 	}
 }
 
 void grid210x_device::ieee488_nrfd(int state) {
-	if (state == 1 && m_gpib_loop_state == GRID210X_GPIB_STATE_SEND_DATA_START) {
+	if (state == 1 && m_gpib_loop_state == GRID210X_GPIB_STATE_SEND_DATA_START && m_bus->atn_r()) {
 		// set dio and assert dav
 		m_bus->host_dio_w(m_byte_to_send ^ 0xff);
 		m_bus->eoi_w(this, m_send_eoi ^ 1);
@@ -425,14 +473,8 @@ void grid210x_device::ieee488_ndac(int state) {
 		if (serial_polling) {
 			talking = false;
 		}
-		update_ndac(m_bus->atn_r() ^ 1);
-
-		if (!serial_polling && talking && !m_output_data_buffer.empty()) {
-			m_byte_to_send = m_output_data_buffer.front();
-			m_output_data_buffer.pop();
-			m_send_eoi = m_output_data_buffer.empty() ? 1 : 0;
-			m_gpib_loop_state = GRID210X_GPIB_STATE_SEND_DATA_START;
-		}
+		update_handshake(m_bus->atn_r() ^ 1);
+		start_talking_if_ready();
 	}
 	// logerror("grid210x_device ndac state set to %d\n", state);
 }
@@ -447,12 +489,27 @@ void grid210x_device::ieee488_srq(int state) {
 
 void grid210x_device::ieee488_atn(int state) {
 	// logerror("grid210x_device atn state set to %d\n", state);
-	update_ndac(state ^ 1);
+	if (m_ignore_state == GRID210X_IGNORE_STATE_WAIT_ATN_HIGH) {
+		if (state) {
+			m_ignore_state = GRID210X_IGNORE_STATE_WAIT_ATN_LOW;
+		}
+	} else if (m_ignore_state == GRID210X_IGNORE_STATE_WAIT_ATN_LOW) {
+		if (!state) {
+			m_ignore_state = GRID210X_IGNORE_STATE_NONE;
+		}
+	}
+	update_handshake(state ^ 1);
+	if (state) {
+		start_talking_if_ready();
+	}
 }
 
-void grid210x_device::update_ndac(int atn) {
+void grid210x_device::update_handshake(int atn) {
 	if (m_gpib_loop_state == GRID210X_GPIB_STATE_IDLE) {
-		if (atn) {
+		if (m_ignore_state != GRID210X_IGNORE_STATE_NONE) {
+			m_bus->nrfd_w(this, 1);
+			m_bus->ndac_w(this, 1);
+		} else if (atn) {
 			// pull NDAC low
 			m_bus->ndac_w(this, 0);
 		} else {
