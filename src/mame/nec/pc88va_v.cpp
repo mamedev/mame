@@ -494,7 +494,7 @@ uint32_t pc88va_state::calc_kanji_rom_addr(uint8_t jis1, uint8_t jis2, int x, in
 	if((jis1 & 0xf0) == 0x40)
 		return 0x4000 + ((jis2 & 0x60) << 10) + ((jis1 & 0x0f) << 10) + ((jis2 & 0x1f) << 5);
 
-	LOGKANJI("%d %d %02x %02x\n",x, y, jis1, jis2);
+	LOGKANJI("%d %d %02x %02x\n", x, y, jis1, jis2);
 
 	return 0;
 }
@@ -1067,14 +1067,12 @@ void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &
 	}
 }
 
-// famista
+// famista, shinraba
 void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which)
 {
-//  const u16 y_min = std::max(cliprect.min_y, y_start);
-//  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
-
 	const u32 base_address = param.dsa & 0x3ffff;
 	const u32 y_wrap = param.fbl - param.ofy;
+	const u32 x_wrap = param.fbw - param.ofx;
 	// 0~3, 16~19 valid
 	const u8 x_dot_offs = bitswap<3>(param.x_dot_offs, 4, 1, 0) & 0x7;
 
@@ -1082,12 +1080,16 @@ void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &
 	{
 		const int y_latch = y - param.dsp;
 		const u32 latched_address = (y_latch >= y_wrap) ? (param.fsa + param.ofx - y_wrap * param.fbw) : base_address;
-		const u32 line_offset = (y_latch * param.fbw) + latched_address;
+		u32 line_offset = (y_latch * param.fbw) + latched_address;
 
 		for(int x = cliprect.min_x; x <= cliprect.max_x + x_dot_offs; x += 2)
 		{
-			u16 x_char = (x >> 1);
-			u32 bitmap_offset = ((line_offset + x_char) & param.layer_mask) | param.layer_base;
+			s16 x_char = (x >> 1);
+			// Subtract one line if past the X wrap point
+			// cfr. famista side change screen for the easiest test case
+			if ((x >> 1) >= x_wrap)
+				x_char -= param.fbw;
+			const u32 bitmap_offset = ((line_offset + x_char) & param.layer_mask) | param.layer_base;
 
 			for (int xi = 0; xi < 2; xi ++)
 			{
@@ -1101,13 +1103,9 @@ void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &
 	}
 }
 
-// animefrm
+// animefrm draw area
 void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 which)
 {
-//  const u16 y_min = std::max(cliprect.min_y, y_start);
-//  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
-
-	//printf("%d %d %d %08x %d\n", y_min, y_max, fb_width, start_offset, fb_height);
 	// TODO: fix scrolling, add x dot scroll
 	const u32 base_address = param.dsa & 0x3ffff;
 
@@ -1128,14 +1126,12 @@ void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &c
 	}
 }
 
-// boomer gameplay
+// boomer gameplay, olteus, animefrm status bar
 void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 which)
 {
-//  const u16 y_min = std::max(cliprect.min_y, y_start);
-//  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
-
 	const u32 base_address = param.dsa & 0x3ffff;
 	const u32 y_wrap = param.fbl - param.ofy;
+	const u32 x_wrap = param.fbw - param.ofx;
 	// 0~1, 16~17 valid
 	const u8 x_dot_offs = bitswap<2>(param.x_dot_offs, 4, 0) & 0x3;
 
@@ -1147,16 +1143,19 @@ void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &c
 
 		for(int x = cliprect.min_x; x <= cliprect.max_x + x_dot_offs; x++)
 		{
-			u32 bitmap_offset = ((line_offset + x) & param.layer_mask) | param.layer_base;
+			s16 x_char = x;
+			if (x >= x_wrap)
+				x_char -= param.fbw;
+			u32 bitmap_offset = ((line_offset + x_char) & param.layer_mask) | param.layer_base;
 
 			uint32_t color = (m_gvram[bitmap_offset] & 0xff);
 			const int res_x = x - x_dot_offs;
 
 			// TODO: how transmask works with this?
 			// boomer suggests that transparency is calculated over just color = 0, perhaps color & 0xf?
-			// TODO: may not be clamped to palNbit
 			if(color && cliprect.contains(res_x, y))
 			{
+				// TODO: color ramps not known, may not use palNbit
 				u8 b = pal2bit(color & 0x03);
 				u8 r = pal3bit((color & 0x1c) >> 2);
 				u8 g = pal3bit((color & 0xe0) >> 5);
@@ -1166,11 +1165,9 @@ void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &c
 	}
 }
 
-// pc88vad
+// pc88vad, ballbrkr title screen
 void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 which)
 {
-//  const u16 y_min = std::max(cliprect.min_y, y_start);
-//  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 	const u32 base_address = (param.dsa & 0x3ffff);
 	const u32 y_wrap = param.fbl - param.ofy;
 	// 0 or 16 valid
@@ -1205,16 +1202,13 @@ void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle 
 // x dot offset used by aerial
 void pc88va_state::draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which)
 {
-//  const u16 y_min = std::max(cliprect.min_y, y_start);
-//  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
-
 	const u32 base_offset = param.dsa >> 2;
 	// 0~7 valid
 	const u8 x_dot_offs = param.x_dot_offs & 7;
 
 	// alantia disables 4th layer, uses it as local GFX storage
 	const u8 num_banks = m_g3msk + 3;
-	// TODO: implement OFX/OFY (different than the other modes, unused by all known games)
+	// TODO: implement OFX/OFY (different than the other modes, unused by all known SW dumps)
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{

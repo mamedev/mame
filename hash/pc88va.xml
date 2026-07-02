@@ -434,9 +434,8 @@ cfr. around PC=39ba1 where it tries to load sound data, issues brk 80h which nev
 		<year>1987</year>
 		<publisher>ウインキーソフト (Winky Soft)</publisher>
 		<notes><![CDATA[
-[gfx] intro glitches in places
-[gfx] scroll desyncs in places during gameplay (one line off)
-[SGP] triggers SF = 1 draws with stage bosses
+[gfx] intro title needs pdrawgfx
+[SGP] triggers SF = 1 draws with stage bosses (safe to ignore?)
 [IDP] sprite glitches towards the end of stage 1-2 and successive stages. Needs CPU clock bump.
 Corrupts itself on prolonged playthrough (stage 2-1 boss, disk D, test me again)
 ]]></notes>
@@ -511,12 +510,13 @@ Corrupts itself on prolonged playthrough (stage 2-1 boss, disk D, test me again)
 		</part>
 	</software>
 
-	<software name="rtype" supported="no">
+	<software name="rtype" supported="partial">
 		<description>R-Type</description>
 		<year>1988</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
-[SGP] extensive VD usage in gameplay
+May slowdown even more with [SGP] usage
+Sometimes [OPNA] throws a stuck note if skipping intro when BGM is playing (verify)
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1296112">
@@ -589,7 +589,7 @@ Burps on [FDC] access after disk swap with program and player disks, trying to s
 		<notes><![CDATA[
 Runs at half speed, bumped CPU clock
 Not extensively tested
-[gfx] corrupted layer after game over, in intro
+[gfx] corrupted layer after game over, in intro. pdrawgfx?
 Omake: if sound irqs don't run then needs to press key 0 pad to move on
 Omake: CG intro scene with thunderstorm has a blurry signature concealed by picture mask
 [IDP] concealed text line after said scene (btanb)
