@@ -38,6 +38,9 @@ public:
 	virtual ~microdrive_image_device();
 
 	auto comms_out_wr_callback() { return m_write_comms_out.bind(); }
+	auto data1_out_wr_callback() { return m_write_data1_out.bind(); }
+	auto data2_out_wr_callback() { return m_write_data2_out.bind(); }
+	auto gap_out_wr_callback() { return m_write_gap_out.bind(); }
 
 	// device_image_interface implementation
 	virtual std::pair<std::error_condition, std::string> call_load() override;
@@ -65,6 +68,9 @@ protected:
 
 private:
 	devcb_write_line m_write_comms_out;
+	devcb_write_line m_write_data1_out;
+	devcb_write_line m_write_data2_out;
+	devcb_write_line m_write_gap_out;
 
 	int m_clk;
 	int m_comms_in;
@@ -77,6 +83,7 @@ private:
 
 	int m_bit_offset;
 	int m_byte_offset;
+	int m_gap_ticks;
 
 	emu_timer *m_bit_timer;
 };

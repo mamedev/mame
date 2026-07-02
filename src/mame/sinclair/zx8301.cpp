@@ -27,6 +27,7 @@
 //**************************************************************************
 
 #define LOG 0
+#define LOG_RAM 1
 
 
 // low resolution palette
@@ -214,6 +215,9 @@ uint8_t zx8301_device::data_r(offs_t offset)
 		m_cpu->spin_until_time(screen().time_until_pos(256, 0));
 	}
 
+	if (LOG_RAM && offset == 0x91C3)
+		logerror("ZX8301 RAM Read md_estat: %02x\n", readbyte(offset));
+
 	return readbyte(offset);
 }
 
@@ -230,6 +234,9 @@ void zx8301_device::data_w(offs_t offset, uint8_t data)
 	{
 		m_cpu->spin_until_time(screen().time_until_pos(256, 0));
 	}
+
+	if (LOG_RAM && offset == 0x91C3)
+		logerror("ZX8301 RAM Write md_estat: %02x\n", data);
 
 	writebyte(offset, data);
 }

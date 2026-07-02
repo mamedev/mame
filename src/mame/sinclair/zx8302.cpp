@@ -31,7 +31,9 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 0
+#define LOG     1
+#define LOG_IPC 1
+#define LOG_CLK 0
 
 
 // Monday 1st January 1979 00:00:00 UTC
@@ -95,7 +97,7 @@ inline void zx8302_device::transmit_ipc_data()
 	switch (m_ipc_state)
 	{
 	case IPC_START:
-		if (LOG) logerror("ZX8302 '%s' COMDATA Start Bit\n", tag());
+		if (LOG_IPC) logerror("ZX8302 '%s' COMDATA Start Bit\n", tag());
 
 		m_out_comdata_cb(BIT(m_idr, 0));
 		m_ipc_busy = 1;
@@ -103,7 +105,7 @@ inline void zx8302_device::transmit_ipc_data()
 		break;
 
 	case IPC_DATA:
-		if (LOG) logerror("ZX8302 '%s' COMDATA Data Bit: %x\n", tag(), BIT(m_idr, 1));
+		if (LOG_IPC) logerror("ZX8302 '%s' COMDATA Data Bit: %x\n", tag(), BIT(m_idr, 1));
 
 		m_comdata_to_ipc = BIT(m_idr, 1);
 		m_out_comdata_cb(m_comdata_to_ipc);
@@ -111,7 +113,7 @@ inline void zx8302_device::transmit_ipc_data()
 		break;
 
 	case IPC_STOP:
-		if (LOG) logerror("ZX8302 '%s' COMDATA Stop Bit\n", tag());
+		if (LOG_IPC) logerror("ZX8302 '%s' COMDATA Stop Bit\n", tag());
 
 		m_out_comdata_cb(BIT(m_idr, 2));
 		m_ipc_busy = 0;
@@ -151,8 +153,9 @@ zx8302_device::zx8302_device(const machine_config &mconfig, const char *tag, dev
 		m_cts2(0),
 		m_idr(1),
 		m_irq(0),
+		m_irq_mask(0),
 		m_ctr(time(nullptr) + RTC_BASE_ADJUST),
-		m_status(0),
+		m_status(STATUS_MICRODRIVE_GAP),
 		m_comdata_from_ipc(1),
 		m_comdata_to_cpu(1),
 		m_comdata_to_ipc(1),
@@ -160,7 +163,9 @@ zx8302_device::zx8302_device(const machine_config &mconfig, const char *tag, dev
 		m_ipc_state(0),
 		m_ipc_busy(0),
 		m_baudx4(0),
-		m_track(0)
+		m_mdv_shift{0, 0},
+		m_mdv_bit_count(0),
+		m_mdv_sync_state(MDV_SYNC_IDLE)
 {
 }
 
@@ -174,10 +179,8 @@ void zx8302_device::device_start()
 	// allocate timers
 	m_baudx4_timer = timer_alloc(FUNC(zx8302_device::baudx4_tick), this);
 	m_rtc_timer = timer_alloc(FUNC(zx8302_device::rtc_tick), this);
-	m_gap_timer = timer_alloc(FUNC(zx8302_device::trigger_gap_int), this);
 
 	m_rtc_timer->adjust(attotime::zero, 0, attotime::from_hz(m_rtc_clock / 32768));
-	m_gap_timer->adjust(attotime::zero, 0, attotime::from_msec(31));
 
 	// register for state saving
 	save_item(NAME(m_dtr1));
@@ -186,6 +189,7 @@ void zx8302_device::device_start()
 	save_item(NAME(m_tcr));
 	save_item(NAME(m_tdr));
 	save_item(NAME(m_irq));
+	save_item(NAME(m_irq_mask));
 	save_item(NAME(m_ctr));
 	save_item(NAME(m_status));
 	save_item(NAME(m_comdata_from_ipc));
@@ -196,7 +200,9 @@ void zx8302_device::device_start()
 	save_item(NAME(m_ipc_busy));
 	save_item(NAME(m_baudx4));
 	save_item(NAME(m_mdv_data));
-	save_item(NAME(m_track));
+	save_item(NAME(m_mdv_shift));
+	save_item(NAME(m_mdv_bit_count));
+	save_item(NAME(m_mdv_sync_state));
 }
 
 
@@ -213,11 +219,6 @@ TIMER_CALLBACK_MEMBER(zx8302_device::baudx4_tick)
 TIMER_CALLBACK_MEMBER(zx8302_device::rtc_tick)
 {
 	m_ctr++;
-}
-
-TIMER_CALLBACK_MEMBER(zx8302_device::trigger_gap_int)
-{
-	trigger_interrupt(INT_GAP);
 }
 
 
@@ -347,13 +348,23 @@ void zx8302_device::control_w(uint8_t data)
 //  mdv_track_r - microdrive track data
 //-------------------------------------------------
 
-uint8_t zx8302_device::mdv_track_r()
+uint8_t zx8302_device::mdv_track_r(offs_t offset)
 {
-	if (LOG) logerror("ZX8302 '%s' Microdrive Track %u: %02x\n", tag(), m_track, m_mdv_data[m_track]);
+	int track = offset & 1;
+	uint8_t data = m_mdv_data[track];
 
-	uint8_t data = m_mdv_data[m_track];
+	if (LOG)
+	{
+		static int s_mdv_read_count = 0;
+		logerror("ZX8302 '%s' MDV Track %u #%d: %02x (rxfull=%d)\n",
+			tag(), track + 1, s_mdv_read_count, data,
+			(m_status & STATUS_RX_BUFFER_FULL) ? 1 : 0);
+		s_mdv_read_count++;
+	}
 
-	m_track = !m_track;
+	// reading track 2 (pc_trak2) releases the buffer for the next byte pair
+	if (track == 1)
+		m_status &= ~STATUS_RX_BUFFER_FULL;
 
 	return data;
 }
@@ -384,10 +395,8 @@ uint8_t zx8302_device::status_r()
 
 	// TODO network port
 
-	// serial status
+	// serial + MDV status
 	data |= m_status;
-
-	// TODO microdrive GAP
 
 	// data terminal ready
 	data |= m_dtr1 << 4;
@@ -401,7 +410,7 @@ uint8_t zx8302_device::status_r()
 	// COMDATA
 	data |= m_comdata_to_cpu << 7;
 
-	if (LOG) logerror("ZX8302 '%s' Status: %02x\n", tag(), data);
+	if (LOG_IPC) logerror("ZX8302 '%s' Read Status: %02x\n", tag(), data);
 
 	return data;
 }
@@ -423,7 +432,7 @@ uint8_t zx8302_device::status_r()
 
 void zx8302_device::ipc_command_w(uint8_t data)
 {
-	if (LOG) logerror("ZX8302 '%s' IPC Command: %02x\n", tag(), data);
+	if (LOG_IPC) logerror("ZX8302 '%s' IPC Command: %02x\n", tag(), data);
 
 	m_idr = data;
 	m_ipc_state = IPC_START;
@@ -453,7 +462,7 @@ void zx8302_device::mdv_control_w(uint8_t data)
 
 	*/
 
-	if (LOG) logerror("ZX8302 '%s' Microdrive Control: %02x\n", tag(), data);
+	if (LOG_CLK) logerror("ZX8302 '%s' Microdrive Control: %02x\n", tag(), data);
 
 	m_out_mdseld_cb(BIT(data, 0));
 	m_out_mdselck_cb(BIT(data, 1));
@@ -462,7 +471,15 @@ void zx8302_device::mdv_control_w(uint8_t data)
 
 	if (BIT(data, 1))
 	{
+		// MDSELCK: clears RX buffer and arms preamble sync search.
+		// The ZX8302 hardware then waits for 0xFF/0xFF in the bit stream
+		// before delivering bytes to the CPU.
 		m_status &= ~STATUS_RX_BUFFER_FULL;
+		m_mdv_sync_state = MDV_SYNC_SEARCH;
+		m_mdv_bit_count = 0;
+		m_mdv_shift[0] = 0;
+		m_mdv_shift[1] = 0;
+		if (LOG) logerror("ZX8302 '%s' MDV sync armed (MDSELCK)\n", tag());
 	}
 }
 
@@ -473,7 +490,7 @@ void zx8302_device::mdv_control_w(uint8_t data)
 
 uint8_t zx8302_device::irq_status_r()
 {
-	if (LOG) logerror("ZX8302 '%s' Interrupt Status: %02x\n", tag(), m_irq);
+	if (LOG_IPC) logerror("ZX8302 '%s' Interrupt Status: %02x\n", tag(), m_irq);
 
 	return m_irq;
 }
@@ -485,13 +502,22 @@ uint8_t zx8302_device::irq_status_r()
 
 void zx8302_device::irq_acknowledge_w(uint8_t data)
 {
-	if (LOG) logerror("ZX8302 '%s' Interrupt Acknowledge: %02x\n", tag(), data);
+	if (LOG_CLK) logerror("ZX8302 '%s' Interrupt Acknowledge: %02x\n", tag(), data);
 
-	m_irq &= ~data;
+	// bits 7-5 are the interrupt mask, bits 4-0 clear pending interrupts
+	m_irq_mask = data & 0xe0;
+	m_irq &= ~(data & 0x1f);
 
 	if (!m_irq)
 	{
 		m_out_ipl1l_cb(CLEAR_LINE);
+	}
+
+	// The gap interrupt regenerates as long as the gap level is present and
+	// the mask is enabled. Minerva relies on this.
+	if ((m_irq_mask & MASK_GAP) && (m_status & STATUS_MICRODRIVE_GAP))
+	{
+		trigger_interrupt(INT_GAP);
 	}
 }
 
@@ -517,7 +543,7 @@ void zx8302_device::vsync_w(int state)
 {
 	if (state)
 	{
-		if (LOG) logerror("ZX8302 '%s' Frame Interrupt\n", tag());
+		if (LOG_CLK) logerror("ZX8302 '%s' Frame Interrupt\n", tag());
 
 		trigger_interrupt(INT_FRAME);
 	}
@@ -530,7 +556,7 @@ void zx8302_device::vsync_w(int state)
 
 void zx8302_device::comctl_w(int state)
 {
-	if (LOG) logerror("ZX8302 '%s' COMCTL: %x\n", tag(), state);
+	if (LOG_IPC) logerror("ZX8302 '%s' COMCTL: %x\n", tag(), state);
 
 	if (state)
 	{
@@ -548,7 +574,7 @@ void zx8302_device::comctl_w(int state)
 
 void zx8302_device::comdata_w(int state)
 {
-	if (LOG) logerror("ZX8302 '%s' COMDATA->CPU(pending): %x\n", tag(), state);
+	if (LOG_IPC) logerror("ZX8302 '%s' COMDATA->CPU(pending): %x\n", tag(), state);
 
 	m_comdata_from_ipc = state;
 }
@@ -582,4 +608,80 @@ void zx8302_device::write_dtr1(int state)
 void zx8302_device::write_cts2(int state)
 {
 	m_cts2 = state;
+}
+
+
+//-------------------------------------------------
+//  raw1_w - receive bit from microdrive track 1
+//-------------------------------------------------
+
+void zx8302_device::raw1_w(int state)
+{
+	m_mdv_shift[0] = (m_mdv_shift[0] << 1) | (state & 1);
+}
+
+
+//-------------------------------------------------
+//  raw2_w - receive bit from microdrive track 2.
+//-------------------------------------------------
+
+void zx8302_device::raw2_w(int state)
+{
+	m_mdv_shift[1] = (m_mdv_shift[1] << 1) | (state & 1);
+
+	switch (m_mdv_sync_state)
+	{
+	case MDV_SYNC_IDLE:
+		return;
+
+	case MDV_SYNC_SEARCH:
+		// The preamble is consumed, never delivered to the CPU.
+		if (m_mdv_shift[0] == 0xFF && m_mdv_shift[1] == 0xFF)
+		{
+			m_mdv_sync_state = MDV_SYNC_DELIVER;
+			m_mdv_bit_count = 0;
+			if (LOG) logerror("ZX8302 '%s' MDV preamble sync found\n", tag());
+		}
+		return;
+
+	case MDV_SYNC_DELIVER:
+		m_mdv_bit_count++;
+		if (m_mdv_bit_count < 8)
+			return;
+
+		m_mdv_bit_count = 0;
+		m_mdv_data[0] = m_mdv_shift[0];
+		m_mdv_data[1] = m_mdv_shift[1];
+		m_status |= STATUS_RX_BUFFER_FULL;
+
+		if (LOG)
+		{
+			static int s_mdv_byte_count = 0;
+			logerror("ZX8302 '%s' MDV byte#%d: t1=%02x t2=%02x\n",
+				tag(), s_mdv_byte_count, m_mdv_data[0], m_mdv_data[1]);
+			s_mdv_byte_count++;
+		}
+		return;
+	}
+}
+
+
+//-------------------------------------------------
+//  gap_w - gap signal from microdrive
+//-------------------------------------------------
+
+void zx8302_device::gap_w(int state)
+{
+	if (state)
+	{
+		if (LOG) logerror("ZX8302 '%s' MDV gap HIGH\n", tag());
+		m_status |= STATUS_MICRODRIVE_GAP;
+		if (m_irq_mask & MASK_GAP)
+			trigger_interrupt(INT_GAP);
+	}
+	else
+	{
+		if (LOG) logerror("ZX8302 '%s' MDV gap LOW\n", tag());
+		m_status &= ~STATUS_MICRODRIVE_GAP;
+	}
 }
