@@ -64,14 +64,13 @@ DEFINE_DEVICE_TYPE(NSCSI_SA1403D, nscsi_sa1403d_device, "nscsi_sa1403d", "Shugar
 // types follow the same scheme scaled to the smaller track: FM 18 x 128,
 // MFM 17 x 256 (the native Xerox 5.25" layout; provisional for SASI use --
 // no later-firmware document has surfaced).
-const nscsi_sa1403d_device::drive_geom nscsi_sa1403d_device::s_geom[7] = {
+const nscsi_sa1403d_device::drive_geom nscsi_sa1403d_device::s_geom[6] = {
 	{ "SA1002", 2, 256, 32, 32, false },
 	{ "SA1004", 4, 256, 32, 32, false },
 	{ "SA800",  1,  77, 26, 26, true  },
 	{ "SA850",  2,  77, 26, 26, true  },
 	{ "SA400",  1,  35, 18, 17, true  },
 	{ "SA450",  2,  40, 18, 17, true  },
-	{ "RIGID5", 4, 256, 32, 32, false },
 };
 
 nscsi_sa1403d_device::nscsi_sa1403d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -99,6 +98,7 @@ nscsi_sa1403d_device::nscsi_sa1403d_device(const machine_config &mconfig, device
 	m_cfg_type[3] = SA1004;
 }
 
+
 static void sa1403d_floppies(device_slot_interface &device)
 {
 	device.option_add("sa400", FLOPPY_525_SSSD_35T);
@@ -118,7 +118,7 @@ void nscsi_sa1403d_device::device_add_mconfig(machine_config &config)
 	// per-LUN media, following the configured drive types (set_drive_type);
 	// a LUN left to the DIP gets both a rigid image and a floppy connector,
 	// with the Xerox 820-II rigid-disk unit complement as the floppy default
-	static const char *const floppy_option[7] = { nullptr, nullptr, "sa800", "sa850", "sa400", "sa450", nullptr };
+	static const char *const floppy_option[6] = { nullptr, nullptr, "sa800", "sa850", "sa400", "sa450" };
 	for (int lun = 0; lun < 4; lun++) {
 		const uint8_t t = m_cfg_type[lun];
 		const bool rigid  = (t == TYPE_FROM_DIP) || !s_geom[t].floppy;

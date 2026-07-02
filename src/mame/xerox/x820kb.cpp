@@ -60,6 +60,15 @@ Notes:
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(XEROX_820_KEYBOARD, xerox_820_keyboard_device, "x820kb", "Xerox 820 Keyboard")
+DEFINE_DEVICE_TYPE(XEROX_820II_KEYBOARD, xerox_820ii_keyboard_device, "x820iikb", "Xerox 820-II Keyboard")
+
+
+// abstract keyboard base (no device type of its own)
+xerox820_keyboard_device::xerox820_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	m_kbstb_cb(*this)
+{
+}
 
 
 //-------------------------------------------------
@@ -243,12 +252,16 @@ ioport_constructor xerox_820_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 xerox_820_keyboard_device::xerox_820_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, XEROX_820_KEYBOARD, tag, owner, clock),
+	xerox_820_keyboard_device(mconfig, XEROX_820_KEYBOARD, tag, owner, clock)
+{
+}
+
+xerox_820_keyboard_device::xerox_820_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	xerox820_keyboard_device(mconfig, type, tag, owner, clock),
+	m_bus(0xff),
 	m_maincpu(*this, I8748_TAG),
 	m_y(*this, "Y%u", 0),
-	m_kbstb_cb(*this),
-	m_p1(0xff),
-	m_bus(0xff)
+	m_p1(0xff)
 {
 }
 
@@ -310,9 +323,21 @@ void xerox_820_keyboard_device::kb_p1_w(uint8_t data)
 
 	*/
 
-	m_p1 = data;
+	// KBSTB (P1 bit4) is asserted LOW by the 8748 ($16C: anl p1,#$EF) once the
+	// key byte is on the bus, then released HIGH ($172: orl p1,#$10). MAME's
+	// z80pio MODE_INPUT SAMPLES the port while STB is low and triggers the IRQ
+	// on STB's rising edge -- so KBSTB-low maps to strobe LOW (CLEAR, latches
+	// the valid byte) and KBSTB-high to strobe HIGH (ASSERT, fires the IRQ).
+	// Drive the strobe only on an actual KBSTB transition: the 8748 holds bit4
+	// HIGH all through its idle column scan, and firing strobe() on every P1
+	// write would (a) at power-on present a spurious rising edge from the PIO's
+	// reset state -> a phantom keyboard IRQ that suppressed the boot banner,
+	// and (b) re-sample the port thousands of times per scan. (The earlier
+	// inverted mapping also delivered the PREVIOUS byte = a one-key lag.)
+	if (BIT(m_p1, 4) != BIT(data, 4))
+		m_kbstb_cb(BIT(data, 4) ? ASSERT_LINE : CLEAR_LINE);
 
-	m_kbstb_cb(BIT(data, 4) ? CLEAR_LINE : ASSERT_LINE);
+	m_p1 = data;
 }
 
 
@@ -336,8 +361,13 @@ int xerox_820_keyboard_device::kb_t0_r()
 
 	switch (m_p1 & 0x0f)
 	{
-		case 0xd: data = 1; break; // ??? if 0, return key data | 0x80
-		case 0xe: data = 1; break; // ??? if 0, set r6=1
+		case 0xd: data = 1; break; // announce is done at power-on (device_reset_after_children), not here
+		// Row 14 selects the keytop layout the 8748 decodes to.  HIGH = the
+		// standard US ASCII keyboard both the 820 and 820-II ship with (the
+		// plain translation tables).  LOW would set r6 and route every keycode
+		// through the 8748's alternate ($1FE) bit-paired/Teletype encoding for a
+		// different keyboard variant, which is not modelled here -- leave it high.
+		case 0xe: data = 1; break;
 	}
 
 	return data;
@@ -361,4 +391,66 @@ int xerox_820_keyboard_device::kb_t1_r()
 void xerox_820_keyboard_device::kb_bus_w(uint8_t data)
 {
 	m_bus = data;
+}
+
+
+
+//**************************************************************************
+//  XEROX 820-II KEYBOARD
+//**************************************************************************
+
+//-------------------------------------------------
+//  xerox_820ii_keyboard_device - constructor
+//-------------------------------------------------
+
+xerox_820ii_keyboard_device::xerox_820ii_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	xerox_820_keyboard_device(mconfig, XEROX_820II_KEYBOARD, tag, owner, clock)
+{
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void xerox_820ii_keyboard_device::device_start()
+{
+	xerox_820_keyboard_device::device_start();
+
+	m_announce_timer = timer_alloc(FUNC(xerox_820ii_keyboard_device::announce), this);
+}
+
+
+//-------------------------------------------------
+//  device_reset_after_children
+//-------------------------------------------------
+
+void xerox_820ii_keyboard_device::device_reset_after_children()
+{
+	xerox_820_keyboard_device::device_reset_after_children();
+
+	// announce "keyboard available" shortly after power-on (a high-bit byte
+	// that opens the monitor's $F977 gate) so no keystroke is consumed.
+	m_announce_timer->adjust(attotime::from_msec(500));
+}
+
+
+//-------------------------------------------------
+//  announce - power-on "keyboard available" greeting
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(xerox_820ii_keyboard_device::announce)
+{
+	// Strobe the keyboard's power-on "available" greeting to the host. The
+	// 820-II monitor's keyboard ISR ($F140) does `in a,($1E) / cpl` (the two
+	// data-bus inversions cancel, so internal A == the 8748 BUS value) then
+	// `cp $9E`: only the exact code 0x9E takes the gate-open branch ($F151,
+	// which enables keyboard input); every other value falls through to the
+	// FIFO enqueue at $F167 as a phantom character, putting the input stream
+	// permanently one byte behind. Drive 0x9E onto the bus, pulse KBSTB low
+	// (strobe low -> PIO samples the byte) then high (rising -> IRQ), the
+	// same order a real keystroke follows.
+	m_bus = 0x9e;
+	m_kbstb_cb(CLEAR_LINE);
+	m_kbstb_cb(ASSERT_LINE);
 }

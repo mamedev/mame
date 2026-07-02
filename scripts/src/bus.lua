@@ -6438,6 +6438,26 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/xerox820/dbslot.h,BUSES["XEROX820"] = true
+--@src/devices/bus/xerox820/copro.h,BUSES["XEROX820"] = true
+---------------------------------------------------
+
+if BUSES["XEROX820"] then
+	files {
+		MAME_DIR .. "src/devices/bus/xerox820/dbslot.cpp",
+		MAME_DIR .. "src/devices/bus/xerox820/dbslot.h",
+		MAME_DIR .. "src/devices/bus/xerox820/fdc.cpp",
+		MAME_DIR .. "src/devices/bus/xerox820/fdc.h",
+		MAME_DIR .. "src/devices/bus/xerox820/sasi.cpp",
+		MAME_DIR .. "src/devices/bus/xerox820/sasi.h",
+		MAME_DIR .. "src/devices/bus/xerox820/copro.cpp",
+		MAME_DIR .. "src/devices/bus/xerox820/copro.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/z29_kbd/keyboard.h,BUSES["Z29_KBD"] = true
 ---------------------------------------------------
 
