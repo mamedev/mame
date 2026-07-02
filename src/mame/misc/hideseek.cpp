@@ -102,7 +102,7 @@ void hideseek_state::mem_map(address_map &map)
 //      map(0x34, 0x3f) X/Y/width/height (word units)
 //      map(0x40, 0x40) flags?
 //      map(0x54, 0x5f) CRTC or global flags (vdisplay/hdisplay at $54)
-	map(0x00c1fc9c, 0x00c1fc9f).lr8(NAME([this] (offs_t offset) { return 0xff; })); // likely busy status
+	map(0x00c1fc9c, 0x00c1fc9f).lr8(NAME([] (offs_t offset) { return 0xff; })); // likely busy status
 
 	map(0x01000000, 0x01ffffff).ram(); // DRAM
 //  map(0x06000000, 0x07ffffff).rom().region("blit_data", 0);
