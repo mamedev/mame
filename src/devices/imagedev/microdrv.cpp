@@ -151,6 +151,12 @@ void microdrive_image_device::tape_from_image(const uint8_t *image)
 
 		// copy data
 		pos += MDV_PAIRS_BLOCK_GAP;
+
+		// a slot with a header but no block sync is header-only tape:
+		// keep the block region erased rather than loading dead zeros
+		if (sec[MDV_OFFSET_BLOCK_PREAMBLE + 10] != 0xff || sec[MDV_OFFSET_BLOCK_PREAMBLE + 11] != 0xff)
+			continue;
+
 		for (int i = 0; i < MDV_PAIRS_BLOCK; i++, pos++)
 		{
 			m_left[pos] = sec[MDV_OFFSET_BLOCK_PREAMBLE + 2 * i];
@@ -181,8 +187,20 @@ bool read_tape_record_header(uint8_t *image, const std::vector<uint8_t> &tape_da
 	return true;
 }
 
+void fill_image_data_record(uint8_t *image, const uint8_t *data_header, const uint8_t *data, int slot)
+{
+	uint8_t *sector = image + slot * MDV_SECTOR_LENGTH;
+	sector[MDV_OFFSET_BLOCK_PREAMBLE + 10] = 0xff;
+	sector[MDV_OFFSET_BLOCK_PREAMBLE + 11] = 0xff;
+	memcpy(sector + MDV_OFFSET_BLOCK_HEADER, data_header, 4);
+	sector[MDV_OFFSET_DATA_PREAMBLE + 6] = 0xff;
+	sector[MDV_OFFSET_DATA_PREAMBLE + 7] = 0xff;
+	memcpy(sector + MDV_OFFSET_DATA, data, 514);
+};
+
+
 bool read_tape_record_data(uint8_t *image, const std::vector<uint8_t> &tape_data,
-                           const int &slot, size_t &p)
+                           const int &slot, size_t &p, std::vector<uint8_t> &orphan)
 {
 	if (p + 4 > tape_data.size()) {
 		return false;
@@ -205,20 +223,18 @@ bool read_tape_record_data(uint8_t *image, const std::vector<uint8_t> &tape_data
 		if (d + payload_size > tape_data.size()) {
 			return true; // it seems ROM can produce header only sectors (orphans?)
 		}
-		if (slot >= 0) // if we see a data record before a header at start of tape, we skip it
+		if (slot >= 0)
 		{
-			uint8_t *sector = image + slot * MDV_SECTOR_LENGTH;
-
-			// first preamble + data header
-			sector[MDV_OFFSET_BLOCK_PREAMBLE + 10] = 0xff;
-			sector[MDV_OFFSET_BLOCK_PREAMBLE + 11] = 0xff;
-			memcpy(sector + MDV_OFFSET_BLOCK_HEADER, data_header, 4);
-
-			// inner smaller preamble, + payload
-			sector[MDV_OFFSET_DATA_PREAMBLE + 6] = 0xff;
-			sector[MDV_OFFSET_DATA_PREAMBLE + 7] = 0xff;
-			memcpy(sector + MDV_OFFSET_DATA, tape_data.data() + d, payload_size);
+			fill_image_data_record(image, data_header, tape_data.data() + d, slot);
 		}
+		else if (orphan.empty())
+		{
+			// a data record arrived before any header at start of tape
+			// keep it aside to pair it later with the last header on tape
+			orphan.assign(data_header, data_header + 4);
+			orphan.insert(orphan.end(), tape_data.data() + d, tape_data.data() + d + 514);
+		}
+
 		p = d + payload_size;
 	}
 	// no data record found: leave p after the block header
@@ -227,7 +243,7 @@ bool read_tape_record_data(uint8_t *image, const std::vector<uint8_t> &tape_data
 }
 
 bool read_tape_record(uint8_t *image, const std::vector<uint8_t> &tape_data,
-	int &slot, int &next_slot, size_t &p)
+	int &slot, int &next_slot, size_t &p, std::vector<uint8_t> &orphan)
 {
 	if (p >= tape_data.size())
 	{
@@ -241,7 +257,7 @@ bool read_tape_record(uint8_t *image, const std::vector<uint8_t> &tape_data,
 			return false;
 		}
 	}
-	else if (!read_tape_record_data(image, tape_data, slot, p))
+	else if (!read_tape_record_data(image, tape_data, slot, p, orphan))
 	{
 		return false;
 	}
@@ -275,6 +291,11 @@ void microdrive_image_device::tape_to_image(uint8_t *image) const
 	int slot = -1; // QLAY slot of the last sector header found (tape order)
 	int next_slot = 0;
 
+	// As the tape is circular, a data block might arrive before the first
+	// detected header. This data will be set into orphan and associated to
+	// the last header read.
+	std::vector<uint8_t> orphan;
+
 	int tape_index = 0;
 	while (tape_index < MDV_TAPE_PAIRS)
 	{
@@ -302,7 +323,7 @@ void microdrive_image_device::tape_to_image(uint8_t *image) const
 			if (flat_data[p] == 0x00 && flat_data[p + 1] == 0xff && flat_data[p + 2] == 0xff)
 			{
 				p += 3; // point to the record
-				if (read_tape_record(image, flat_data, slot, next_slot, p))
+				if (read_tape_record(image, flat_data, slot, next_slot, p, orphan))
 					break;
 			}
 			else
@@ -310,6 +331,11 @@ void microdrive_image_device::tape_to_image(uint8_t *image) const
 				p++;
 			}
 		}
+	}
+
+	if (!orphan.empty() && next_slot > 0)
+	{
+		fill_image_data_record(image, orphan.data(), orphan.data() + 4, next_slot - 1);
 	}
 }
 
