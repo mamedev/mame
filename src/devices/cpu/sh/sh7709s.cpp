@@ -38,6 +38,11 @@
 *   the register value is read, IRQ2 is masked out of that value, then that masked value is written back.
 *   Documentation does mention in an addendum that this behavior can lead to lost IRQ's but luckily these
 *   games don't seem to actually use them in the release versions.
+*
+* - A quirk according to the docs for the sh7709s is that all areas must have the same bus width to use
+*   bank active mode. The cv1k board uses a 16 bit rom in area 0 which means the SDRAM is now stuck
+*   using auto precharge mode that forces a row close after every access which leads to some extra
+*   delays when cache misses collide on the same bank back to back.
 */
 
 #include "emu.h"
@@ -64,7 +69,7 @@ void sh7709s_device::device_reset()
 	m_last_area_accessed = 0;
 	m_last_area_accessed_was_write = false;
 	m_wb_active_cycles = 0;
-	m_last_sdram_page = 0;
+	m_last_sdram_bank = 0;
 	m_precharge_remaining_cycles = 0;
 }
 
@@ -77,7 +82,7 @@ void sh7709s_device::device_start()
 	m_last_area_accessed = 0;
 	m_last_area_accessed_was_write = false;
 	m_wb_active_cycles = 0;
-	m_last_sdram_page = 0;
+	m_last_sdram_bank = 0;
 	m_precharge_remaining_cycles = 0;
 
 	for (int i = 0; i < SH7709S_CACHE_BLOCKS; i++)
@@ -92,10 +97,11 @@ void sh7709s_device::device_start()
 	save_item(NAME(m_last_area_accessed));
 	save_item(NAME(m_last_area_accessed_was_write));
 	save_item(NAME(m_wb_active_cycles));
-	save_item(NAME(m_last_sdram_page));
+	save_item(NAME(m_last_sdram_bank));
 	save_item(NAME(m_precharge_remaining_cycles));
 }
 
+// Top 3 region bits allow for aliasing cached/uncached pointers to the same physical address
 bool is_cacheable(uint32_t address)
 {
 	// 0x00000000 - 0x80000000 2GB cacheable virtual space
@@ -264,8 +270,27 @@ uint32_t sh7709s_device::get_wcr2_timing(uint32_t address)
 	return 2; // Unreachable
 }
 
-// TODO : Update tpc handling to use the address multiplexer bits in mcr
-// instead of the sdram page as the precharge command holds up the whole bank
+uint32_t sh7709s_device::sdram_bank(uint32_t address)
+{
+	uint32_t amx = (m_mcr >> 3) & 0xf;
+
+	switch (amx)
+	{
+	case 0x4: // row begins with A9: 1M x 16-bit x 4-bank
+	case 0x7: // row begins with A9: 512k x 32-bit x 4-bank
+		return (address >> 7) & 0x3;   // A8:A7
+
+	case 0x5: // row begins with A10: 2M x 8/16-bit x 4-bank
+	case 0xd: // row begins with A10: 4M x 16-bit x 4-bank
+		return (address >> 8) & 0x3;   // A9:A8
+
+	case 0xa: // row begins with A11: 8M x 16-bit x 4-bank
+		return (address >> 9) & 0x3;   // A10:A9
+	}
+
+	return 0;
+}
+
 uint32_t sh7709s_device::mcr_tpc()
 {
 	return ((m_mcr >> 14) & 0x3) + 1;
@@ -303,8 +328,6 @@ uint32_t sh7709s_device::cache_line_fetch_count(uint32_t address)
 	return SH7709S_CACHE_LINE_SIZE >> bcr2_val;
 }
 
-#define SDRAM_PAGE_SIZE (1024) // Hardcoded for cv1k
-
 // CPU cycles
 #define CACHE_MISS_STALL (1) // Miss detection in 1 cycle, the rest of the ops (wb buffer movement, etc..) happen in the background
 // Bus cycles
@@ -330,7 +353,7 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 	// Penalty calculations for SDRAM access
 	unsigned int bus_penalty = BUS_ACCESS_PENALTY + BURST_READ_WORD_PENALTY + mcr_rcd() + get_wcr2_timing(address);
 	unsigned int cpu_penalty = is_cacheable(address) ? CACHE_MISS_STALL : 0;
-	unsigned int page_read = address / SDRAM_PAGE_SIZE;
+	unsigned int bank_read = sdram_bank(address);
 
 	// Penalty calculations for non-sdram access
 	if (!is_sdram_region(address))
@@ -355,7 +378,7 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 	m_last_area_accessed = area;
 
 	// CPU is in auto precharge mode, since we hit a bank conflict and the last precharge isn't done we stall
-	if (is_sdram_region(address) && page_read == m_last_sdram_page && m_precharge_remaining_cycles > 0)
+	if (is_sdram_region(address) && bank_read == m_last_sdram_bank && m_precharge_remaining_cycles > 0)
 		cpu_penalty += m_precharge_remaining_cycles;
 
 	m_precharge_remaining_cycles = 0;
@@ -369,19 +392,19 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 	}
 
 	if (is_sdram_region(address))
-		m_last_sdram_page = page_read;
+		m_last_sdram_bank = bank_read;
 
 	// We had a dirty writeback eviction, total up the background cost penalty we'll pay on subsequent cycles
 	if (m_wb_address != 0)
 	{
 		if (is_sdram_region(address))
 		{
-			unsigned int page_write = m_wb_address / SDRAM_PAGE_SIZE;
+			uint32_t bank_write = sdram_bank(m_wb_address);
 			// Bank collision in auto precharge mode, we have to wait for precharge to finish before starting
-			if (page_read == page_write)
+			if (bank_read == bank_write)
 				m_wb_active_cycles += mcr_tpc() * 2;
 			m_wb_active_cycles += (BUS_ACCESS_PENALTY + get_wcr1_timing(address) + BURST_WRITE_WORD_PENALTY + mcr_rcd() + mcr_trwl()) * 2;
-			m_last_sdram_page = page_write;
+			m_last_sdram_bank = bank_write;
 		}
 		else
 		{
