@@ -55,9 +55,11 @@ private:
 	unsigned int m_wb_active_cycles; // Track any background cycles for writeback and precharge waits on the same bank
 	unsigned int m_last_sdram_bank; // Last accessed sdram bank, used to track when to have to pay tpc(precharge) cost
 	unsigned int m_precharge_remaining_cycles;
+	uint64_t m_last_op_cycle_count; // Track the last cycle we did a memory operation for background accounting
 
 	bool cache_access(uint32_t address, bool write);
 	unsigned int access_penalty(uint32_t address, bool write);
+	void update_access_cycles(uint32_t address, bool write);
 
 	// Timing calculation/decode related functions
 	uint32_t get_wcr1_timing(uint32_t address);
