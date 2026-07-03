@@ -905,16 +905,16 @@ end
 
 
 ---------------------------------------------------
--- QSound sample player
---@src/devices/sound/qsound.h,SOUNDS["QSOUND"] = true
+-- Capcom custom sound processors
+--@src/devices/sound/capcom_q1.h,SOUNDS["CAPCOM_Q1"] = true
 ---------------------------------------------------
 
-if SOUNDS["QSOUND"] then
+if SOUNDS["CAPCOM_Q1"] then
 	files {
-		MAME_DIR .. "src/devices/sound/qsound.cpp",
-		MAME_DIR .. "src/devices/sound/qsound.h",
-		MAME_DIR .. "src/devices/sound/qsoundhle.cpp",
-		MAME_DIR .. "src/devices/sound/qsoundhle.h",
+		MAME_DIR .. "src/devices/sound/capcom_q1.cpp",
+		MAME_DIR .. "src/devices/sound/capcom_q1.h",
+		MAME_DIR .. "src/devices/sound/capcom_q1_hle.cpp",
+		MAME_DIR .. "src/devices/sound/capcom_q1_hle.h",
 	}
 end
 
