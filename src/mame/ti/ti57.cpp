@@ -19,6 +19,7 @@
 
 #include "emu.h"
 #include "cpu/tmc1500/tmc1500.h"
+#include "ti57.lh"
 
 class ti57_state : public driver_device
 {
@@ -179,6 +180,8 @@ void ti57_state::ti57(machine_config &config)
 	m_maincpu->read_k().set(FUNC(ti57_state::read_k));
 	m_maincpu->write_o().set(FUNC(ti57_state::write_o));
 	m_maincpu->write_r().set(FUNC(ti57_state::write_r));
+
+	config.set_default_layout(layout_ti57);
 }
 
 ROM_START( ti57 )
