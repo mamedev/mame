@@ -47,6 +47,7 @@ public:
 		, m_display_list1(*this, "display_list1")
 		, m_color_xlat(*this, "color_xlat")
 		, m_paletteram16(*this, "palette")
+		, m_nvram(*this, "nvram")
 		, m_palette(*this, "palette")
 		, m_tiles(*this, "tile")
 		, m_digits(*this, "digit%u", 0U)
@@ -350,6 +351,7 @@ private:
 	void apply_overlay_stencil(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	optional_shared_ptr<uint16_t> m_paletteram16;
+	optional_shared_ptr<uint16_t> m_nvram;
 	required_device<palette_device> m_palette;
 	required_device<segas24_tile_device> m_tiles;
 

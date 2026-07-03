@@ -865,7 +865,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
 	}
 	else if(scanline == 384/2)
 	{
-		irq_raise(m_sound_irq);
+		if (m_sound_irq <= 7)
+			irq_raise(m_sound_irq);
 	}
 }
 
@@ -882,6 +883,31 @@ void model1_state::machine_reset()
 		!strcmp(machine().system().name, "swaj"))
 	{
 		m_sound_irq = 0;
+	}
+	else if (!strcmp(machine().system().name, "netmerc"))
+	{
+		m_sound_irq = 0xff; // Netmerc ignores midframe irq, avoid stomping pen 0
+		
+		if (m_nvram)
+		{
+			auto &space = m_maincpu->space(AS_PROGRAM);
+			if (space.read_byte(0x400038) == 0xFF && space.read_byte(0x40003c) == 0xFF &&
+				space.read_byte(0x400040) == 0xFF && space.read_byte(0x400044) == 0xFF)
+			{
+				space.write_byte(0x400038, 0x00);
+				space.write_byte(0x40003c, 0xFF);
+				space.write_byte(0x400040, 0x00);
+				space.write_byte(0x400044, 0xFF);
+				logerror("NetMerc: seeded default gun calibration\n");
+			}
+		}
+
+		int16_t pose[6] = {0, 0, 0, 12868, 25736, 12868};
+		for (int i = 0; i < 6; i++)
+		{
+			m_dpram->left_w(0x80 + i*2, pose[i] >> 8);
+			m_dpram->left_w(0x81 + i*2, pose[i] & 0xff);
+		}
 	}
 	else
 	{
