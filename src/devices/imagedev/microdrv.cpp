@@ -15,12 +15,14 @@
 
 #include <vector>
 
+#define LOG_COMMS (1U << 1)   // per-line chatter: CLK, COMMS IN, ERASE, READ/WRITE
+
+// #define VERBOSE (LOG_GENERAL | LOG_COMMS)
+#include "logmacro.h"
+
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
-
-#define LOG 1
-#define LOG_COMMS 0
 
 #define MDV_SECTOR_COUNT            255
 #define MDV_SECTOR_LENGTH           686
@@ -349,7 +351,7 @@ void microdrive_image_device::save_image()
 	tape_to_image(image.data());
 	fseek(0, SEEK_SET);
 	fwrite(image.data(), MDV_IMAGE_LENGTH);
-	if (LOG) logerror("Microdrive '%s' image saved\n", tag());
+	LOG("image saved\n");
 }
 
 std::pair<std::error_condition, std::string> microdrive_image_device::call_load()
@@ -482,28 +484,27 @@ TIMER_CALLBACK_MEMBER(microdrive_image_device::bit_timer)
 
 void microdrive_image_device::clk_w(int state)
 {
-	if (LOG_COMMS) logerror("Microdrive '%s' CLK: %u\n", tag(), state);
+	LOGMASKED(LOG_COMMS, "CLK: %u\n", state);
 
 	if (m_clk && !state) // Falling edge
 	{
 		m_comms_out = m_comms_in;
-		if (LOG) logerror("Microdrive '%s' COMMS OUT: %u\n", tag(), m_comms_out);
-		m_write_comms_out(m_comms_out); // daisy chain for drive selection
-
+		LOG("COMMS OUT: %u\n", m_comms_out);
+		m_write_comms_out(m_comms_out);
 		if (m_comms_out && is_loaded())
 		{
-			if (LOG) logerror("Microdrive '%s' motor ON\n", tag());
+			LOG("motor ON\n");
 			m_gap_level = -1; // force a gap emission on the first tick
 			m_bit_timer->enable(true);
 		}
 		else if (m_comms_out && !is_loaded())
 		{
 			// no cartridge: the head sees a gap
-			if (LOG) logerror("Microdrive '%s' selected, no cartridge, gap set\n", tag());
+			LOG("selected, no cartridge, gap set\n");
 			m_write_gap_out(1);
 		}
 		else if (!m_comms_out && is_loaded()) {
-			if (LOG) logerror("Microdrive '%s' motor OFF\n", tag());
+			LOG("motor OFF\n");
 			m_bit_timer->enable(false);
 		}
 	}
@@ -512,19 +513,19 @@ void microdrive_image_device::clk_w(int state)
 
 void microdrive_image_device::comms_in_w(int state)
 {
-	if (LOG_COMMS) logerror("Microdrive '%s' COMMS IN: %u\n", tag(), state);
+	LOGMASKED(LOG_COMMS, "COMMS IN: %u\n", state);
 	m_comms_in = state;
 }
 
 void microdrive_image_device::erase_w(int state)
 {
-	if (LOG_COMMS) logerror("Microdrive '%s' ERASE: %u\n", tag(), state);
+	LOGMASKED(LOG_COMMS, "ERASE: %u\n", state);
 	m_erase = state;
 }
 
 void microdrive_image_device::read_write_w(int state)
 {
-	if (LOG_COMMS) logerror("Microdrive '%s' READ/WRITE: %u (1=write)\n", tag(), state);
+	LOGMASKED(LOG_COMMS, "READ/WRITE: %u (1=write)\n", state);
 	m_read_write = state;
 }
 

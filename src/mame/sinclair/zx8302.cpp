@@ -29,7 +29,12 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 1
+#define LOG_MDV (1U << 1)   // microdrive path
+#define LOG_IPC (1U << 2)   // IPC link per-bit (very high frequency)
+#define LOG_IRQ (1U << 3)   // Interrupts
+
+// #define VERBOSE (LOG_GENERAL | LOG_MDV)
+#include "logmacro.h"
 
 
 // Monday 1st January 1979 00:00:00 UTC
@@ -93,7 +98,7 @@ inline void zx8302_device::transmit_ipc_data()
 	switch (m_ipc_state)
 	{
 	case IPC_START:
-		if (LOG) logerror("ZX8302 '%s' COMDATA Start Bit\n", tag());
+		LOGMASKED(LOG_IPC, "COMDATA Start Bit\n");
 
 		m_out_comdata_cb(BIT(m_idr, 0));
 		m_ipc_busy = 1;
@@ -101,7 +106,7 @@ inline void zx8302_device::transmit_ipc_data()
 		break;
 
 	case IPC_DATA:
-		if (LOG) logerror("ZX8302 '%s' COMDATA Data Bit: %x\n", tag(), BIT(m_idr, 1));
+		LOGMASKED(LOG_IPC, "COMDATA Data Bit: %x\n", BIT(m_idr, 1));
 
 		m_comdata_to_ipc = BIT(m_idr, 1);
 		m_out_comdata_cb(m_comdata_to_ipc);
@@ -109,7 +114,7 @@ inline void zx8302_device::transmit_ipc_data()
 		break;
 
 	case IPC_STOP:
-		if (LOG) logerror("ZX8302 '%s' COMDATA Stop Bit\n", tag());
+		LOGMASKED(LOG_IPC, "COMDATA Stop Bit\n");
 
 		m_out_comdata_cb(BIT(m_idr, 2));
 		m_ipc_busy = 0;
@@ -320,7 +325,7 @@ uint8_t zx8302_device::rtc_r(offs_t offset)
 
 void zx8302_device::rtc_w(uint8_t data)
 {
-	if (LOG) logerror("ZX8302 '%s' Set Real Time Clock: %02x\n", tag(), data);
+	LOG("Set Real Time Clock: %02x\n", data);
 }
 
 
@@ -330,7 +335,7 @@ void zx8302_device::rtc_w(uint8_t data)
 
 void zx8302_device::control_w(uint8_t data)
 {
-	if (LOG) logerror("ZX8302 '%s' Transmit Control: %02x\n", tag(), data);
+	LOG("Transmit Control: %02x\n", data);
 
 	int baud = (19200 >> (data & BAUD_MASK));
 	int baudx4 = baud * 4;
@@ -353,12 +358,8 @@ uint8_t zx8302_device::mdv_track_r(offs_t offset)
 	const int track = offset & 1;
 	uint8_t data = m_mdv_data[track];
 
-	if (LOG)
-	{
-		logerror("ZX8302 '%s' MDV Track %u: %02x (rxfull=%d)\n",
-			tag(), track + 1, data,
-			(m_status & STATUS_RX_BUFFER_FULL) ? 1 : 0);
-	}
+	LOGMASKED(LOG_MDV, "MDV Track %u: %02x (rxfull=%d)\n",
+		track + 1, data, (m_status & STATUS_RX_BUFFER_FULL) ? 1 : 0);
 
 	if (!machine().side_effects_disabled())
 	{
@@ -413,7 +414,7 @@ uint8_t zx8302_device::status_r()
 	// COMDATA
 	data |= m_comdata_to_cpu << 7;
 
-	if (LOG) logerror("ZX8302 '%s' Read Status: %02x\n", tag(), data);
+	LOGMASKED(LOG_IPC, "Read Status: %02x\n", data);
 
 	return data;
 }
@@ -435,7 +436,7 @@ uint8_t zx8302_device::status_r()
 
 void zx8302_device::ipc_command_w(uint8_t data)
 {
-	if (LOG) logerror("ZX8302 '%s' IPC Command: %02x\n", tag(), data);
+	LOGMASKED(LOG_IPC, "IPC Command: %02x\n", data);
 
 	m_idr = data;
 	m_ipc_state = IPC_START;
@@ -465,7 +466,7 @@ void zx8302_device::mdv_control_w(uint8_t data)
 
 	*/
 
-	if (LOG) logerror("ZX8302 '%s' Microdrive Control: %02x\n", tag(), data);
+	LOGMASKED(LOG_MDV, "Microdrive Control: %02x\n", data);
 
 	m_out_mdseld_cb(BIT(data, 0));
 	m_out_mdselck_cb(BIT(data, 1));
@@ -482,7 +483,7 @@ void zx8302_device::mdv_control_w(uint8_t data)
 		m_mdv_bit_count = 0;
 		m_mdv_shift[0] = 0;
 		m_mdv_shift[1] = 0;
-		if (LOG) logerror("ZX8302 '%s' MDV sync armed (MDSELCK)\n", tag());
+		LOGMASKED(LOG_MDV, "MDV sync armed (MDSELCK)\n");
 	}
 
 	if (!BIT(data, 2))
@@ -522,7 +523,7 @@ uint16_t zx8302_device::mdv_tx_pop()
 
 uint8_t zx8302_device::irq_status_r()
 {
-	if (LOG) logerror("ZX8302 '%s' Interrupt Status: %02x\n", tag(), m_irq);
+	LOGMASKED(LOG_IRQ, "Interrupt Status: %02x\n", m_irq);
 
 	return m_irq;
 }
@@ -534,7 +535,7 @@ uint8_t zx8302_device::irq_status_r()
 
 void zx8302_device::irq_acknowledge_w(uint8_t data)
 {
-	if (LOG) logerror("ZX8302 '%s' Interrupt Acknowledge: %02x\n", tag(), data);
+	LOGMASKED(LOG_IRQ, "Interrupt Acknowledge: %02x\n", data);
 
 	// bits 7-5 are the interrupt mask, bits 4-0 clear pending interrupts
 	m_irq_mask = data & 0xe0;
@@ -560,7 +561,7 @@ void zx8302_device::irq_acknowledge_w(uint8_t data)
 
 void zx8302_device::data_w(uint8_t data)
 {
-	if (LOG) logerror("ZX8302 '%s' Data Register: %02x\n", tag(), data);
+	LOGMASKED(LOG_MDV, "Data Register: %02x\n", data);
 
 	if ((m_tcr & MODE_MASK) == MODE_MDV)
 	{
@@ -571,7 +572,7 @@ void zx8302_device::data_w(uint8_t data)
 		}
 		else
 		{
-			logerror("ZX8302 '%s' MDV TX overflow, byte %02x lost\n", tag(), data);
+			logerror("MDV TX overflow, byte %02x lost\n", data);
 		}
 
 		if (m_mdv_tx_count == 2)
@@ -596,7 +597,7 @@ void zx8302_device::vsync_w(int state)
 {
 	if (state)
 	{
-		if (LOG) logerror("ZX8302 '%s' Frame Interrupt\n", tag());
+		LOGMASKED(LOG_IRQ, "Frame Interrupt\n");
 
 		trigger_interrupt(INT_FRAME);
 	}
@@ -609,7 +610,7 @@ void zx8302_device::vsync_w(int state)
 
 void zx8302_device::comctl_w(int state)
 {
-	if (LOG) logerror("ZX8302 '%s' COMCTL: %x\n", tag(), state);
+	LOGMASKED(LOG_IPC, "COMCTL: %x\n", state);
 
 	if (state)
 	{
@@ -627,7 +628,7 @@ void zx8302_device::comctl_w(int state)
 
 void zx8302_device::comdata_w(int state)
 {
-	if (LOG) logerror("ZX8302 '%s' COMDATA->CPU(pending): %x\n", tag(), state);
+	LOGMASKED(LOG_IPC, "COMDATA->CPU(pending): %x\n", state);
 
 	m_comdata_from_ipc = state;
 }
@@ -639,7 +640,7 @@ void zx8302_device::comdata_w(int state)
 
 void zx8302_device::extint_w(int state)
 {
-	if (LOG) logerror("ZX8302 '%s' EXTINT: %x\n", tag(), state);
+	LOGMASKED(LOG_IRQ, "EXTINT: %x\n", state);
 
 	if (state == ASSERT_LINE)
 	{
@@ -693,7 +694,7 @@ void zx8302_device::raw2_w(int state)
 		{
 			m_mdv_sync_state = MDV_SYNC_DELIVER;
 			m_mdv_bit_count = 0;
-			if (LOG) logerror("ZX8302 '%s' MDV preamble sync found\n", tag());
+			LOGMASKED(LOG_MDV, "MDV preamble sync found\n");
 		}
 		return;
 
@@ -707,11 +708,7 @@ void zx8302_device::raw2_w(int state)
 		m_mdv_data[1] = m_mdv_shift[1];
 		m_status |= STATUS_RX_BUFFER_FULL;
 
-		if (LOG)
-		{
-			logerror("ZX8302 '%s' MDV byte: t1=%02x t2=%02x\n",
-				tag(), m_mdv_data[0], m_mdv_data[1]);
-		}
+		LOGMASKED(LOG_MDV, "MDV byte: t1=%02x t2=%02x\n", m_mdv_data[0], m_mdv_data[1]);
 	}
 }
 
@@ -724,14 +721,14 @@ void zx8302_device::gap_w(int state)
 {
 	if (state)
 	{
-		if (LOG) logerror("ZX8302 '%s' MDV gap HIGH\n", tag());
+		LOGMASKED(LOG_MDV, "MDV gap HIGH\n");
 		m_status |= STATUS_MICRODRIVE_GAP;
 		if (m_irq_mask & MASK_GAP)
 			trigger_interrupt(INT_GAP);
 	}
 	else
 	{
-		if (LOG) logerror("ZX8302 '%s' MDV gap LOW\n", tag());
+		LOGMASKED(LOG_MDV, "MDV gap LOW\n");
 		m_status &= ~STATUS_MICRODRIVE_GAP;
 	}
 }
