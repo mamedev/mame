@@ -13,6 +13,8 @@
 #include "emu.h"
 #include "microdrv.h"
 
+#include <vector>
+
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -24,20 +26,29 @@
 #define MDV_SECTOR_LENGTH           686
 #define MDV_IMAGE_LENGTH            (MDV_SECTOR_COUNT * MDV_SECTOR_LENGTH)
 
-#define MDV_OFFSET_HEADER_PREAMBLE  0
-#define MDV_OFFSET_HEADER           MDV_OFFSET_HEADER_PREAMBLE + MDV_PREAMBLE_LENGTH
-#define MDV_OFFSET_DATA_PREAMBLE    28
-#define MDV_OFFSET_DATA             MDV_OFFSET_DATA_PREAMBLE + MDV_PREAMBLE_LENGTH
-#define MDV_OFFSET_FILLER           566
+// QLAY image format: sector byte layout
+#define MDV_OFFSET_HEADER_PREAMBLE  0   // 10x00 + 2xFF (unused, only for reference)
+#define MDV_OFFSET_HEADER           12  // sflag, sno, name[10], rand[2], csum[2]
+#define MDV_OFFSET_BLOCK_PREAMBLE   28  // 10x00 + 2xFF
+#define MDV_OFFSET_BLOCK_HEADER     40  // fno, bno, csum[2]
+#define MDV_OFFSET_DATA_PREAMBLE    44  // 6x00 + 2xFF
+#define MDV_OFFSET_DATA             52  // 512 data + csum[2]
+#define MDV_OFFSET_FILLER           566 // (unused, only for reference)
 
-// 40us/byte from Minerva sources; both tracks shift one bit per tick, so a
-// byte pair (two stream bytes) takes 8 ticks = 80us -> 100kHz per track
+// 40us/byte deduced from Minerva ROM sources
+// Both tracks shift one bit per tick, so a byte pair takes 8 ticks
+// 80us -> 100kHz per track
 #define MDV_BITRATE                 100000
 
-// Physical gaps (erased tape regions) are not stored in QLAY images, they
-// have to be synthesized. Durations are in bit ticks (10us each).
-#define MDV_GAP_SECTOR_TICKS        480 // 4.8ms inter-sector gap
-#define MDV_GAP_BLOCK_TICKS         280 // 2.8ms gap between sector header and block preamble
+// Tape timeline in byte-pair positions.
+// QLAY images store no erased regions, they have to be reconstructed
+// One byte pair is 80us
+#define MDV_PAIRS_HEADER            14  // QLAY bytes 0-27
+#define MDV_PAIRS_BLOCK_GAP         35  // 2.8ms erased gap between header and block
+#define MDV_PAIRS_BLOCK             269 // QLAY bytes 28-565
+#define MDV_PAIRS_SECTOR_GAP        60  // 4.8ms erased gap (filler)
+#define MDV_PAIRS_PER_SECTOR        (MDV_PAIRS_HEADER + MDV_PAIRS_BLOCK_GAP + MDV_PAIRS_BLOCK + MDV_PAIRS_SECTOR_GAP)
+#define MDV_TAPE_PAIRS              (MDV_SECTOR_COUNT * MDV_PAIRS_PER_SECTOR)
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -55,7 +66,8 @@ microdrive_image_device::microdrive_image_device(const machine_config &mconfig, 
 	m_write_comms_out(*this),
 	m_write_data1_out(*this),
 	m_write_data2_out(*this),
-	m_write_gap_out(*this)
+	m_write_gap_out(*this),
+	m_read_tx_pair(*this, 0)
 {
 }
 
@@ -70,44 +82,290 @@ microdrive_image_device::~microdrive_image_device()
 
 void microdrive_image_device::device_start()
 {
-	// allocate track buffers
-	m_left = std::make_unique<uint8_t[]>(MDV_IMAGE_LENGTH / 2);
-	m_right = std::make_unique<uint8_t[]>(MDV_IMAGE_LENGTH / 2);
+	// allocate the tape timeline
+	m_left = std::make_unique<uint8_t[]>(MDV_TAPE_PAIRS);
+	m_right = std::make_unique<uint8_t[]>(MDV_TAPE_PAIRS);
+	m_erased = std::make_unique<uint8_t[]>(MDV_TAPE_PAIRS);
+	memset(m_erased.get(), 1, MDV_TAPE_PAIRS); // no tape == all erased
 
 	// allocate timers
 	m_bit_timer = timer_alloc(FUNC(microdrive_image_device::bit_timer), this);
 	m_bit_timer->adjust(attotime::zero, 0, attotime::from_hz(MDV_BITRATE));
-	m_bit_timer->enable(0);
+	m_bit_timer->enable(false);
 
 	m_clk = 0;
 	m_comms_in = 0;
 	m_comms_out = 0;
-	m_gap_ticks = 0;
+	m_erase = 0;
+	m_read_write = 0;
+	m_bit_offset = 0;
+	m_byte_offset = 0;
+	m_gap_level = -1;
+	m_dirty = 0;
 
 	// register for state saving
 	save_item(NAME(m_clk));
 	save_item(NAME(m_comms_in));
 	save_item(NAME(m_comms_out));
+	save_item(NAME(m_erase));
+	save_item(NAME(m_read_write));
 	save_item(NAME(m_bit_offset));
 	save_item(NAME(m_byte_offset));
-	save_item(NAME(m_gap_ticks));
+	save_item(NAME(m_gap_level));
+	save_item(NAME(m_dirty));
+	save_pointer(NAME(m_left), MDV_TAPE_PAIRS);
+	save_pointer(NAME(m_right), MDV_TAPE_PAIRS);
+	save_pointer(NAME(m_erased), MDV_TAPE_PAIRS);
+}
+
+//-------------------------------------------------
+//  tape_from_image
+//  Loads a QLAY format image on a internal tape timeline
+//  Reconstructs the GAPs
+//-------------------------------------------------
+
+void microdrive_image_device::tape_from_image(const uint8_t *image)
+{
+	for (int sector = 0; sector < MDV_SECTOR_COUNT; sector++)
+	{
+		const uint8_t *sec = image + sector * MDV_SECTOR_LENGTH;
+		const int base = sector * MDV_PAIRS_PER_SECTOR;
+
+		// sector is unformatted/no data by default
+		memset(m_left.get() + base, 0, MDV_PAIRS_PER_SECTOR);
+		memset(m_right.get() + base, 0, MDV_PAIRS_PER_SECTOR);
+		memset(m_erased.get() + base, 1, MDV_PAIRS_PER_SECTOR);
+
+		// if no preamble on the header, it's considered unformatted
+		if (sec[10] != 0xff || sec[11] != 0xff)
+			continue;
+
+		// copy header
+		int pos = base;
+		for (int i = 0; i < MDV_PAIRS_HEADER; i++, pos++)
+		{
+			m_left[pos] = sec[2 * i];
+			m_right[pos] = sec[2 * i + 1];
+			m_erased[pos] = 0;
+		}
+
+		// copy data
+		pos += MDV_PAIRS_BLOCK_GAP;
+		for (int i = 0; i < MDV_PAIRS_BLOCK; i++, pos++)
+		{
+			m_left[pos] = sec[MDV_OFFSET_BLOCK_PREAMBLE + 2 * i];
+			m_right[pos] = sec[MDV_OFFSET_BLOCK_PREAMBLE + 2 * i + 1];
+			m_erased[pos] = 0;
+		}
+	}
+}
+
+// Helper functions for tape_to_image
+
+bool read_tape_record_header(uint8_t *image, const std::vector<uint8_t> &tape_data,
+	int &slot, int &next_slot, size_t &p)
+{
+	if (p + 16 > tape_data.size() || next_slot >= MDV_SECTOR_COUNT) {
+	    return false;
+	}
+
+	slot = next_slot;
+	next_slot += 1;
+
+	uint8_t *sector = image + slot * MDV_SECTOR_LENGTH;
+	sector[10] = 0xff;
+	sector[11] = 0xff;
+	memcpy(sector + MDV_OFFSET_HEADER, tape_data.data() + p, 16);
+	p += 16;
+
+	return true;
+}
+
+bool read_tape_record_data(uint8_t *image, const std::vector<uint8_t> &tape_data,
+                           const int &slot, size_t &p)
+{
+	if (p + 4 > tape_data.size()) {
+		return false;
+	}
+
+	// keep data header pointer, it's copied only if a valid data is found
+	const uint8_t *data_header = tape_data.data() + p;
+	p += 4;
+
+	// sync on the inner (smaller) preamble
+	size_t d = p;
+	while (d + 1 < tape_data.size() && tape_data[d] == 0x00) {
+		d++;
+	}
+
+	constexpr size_t payload_size = 514;
+	if (d + 1 < tape_data.size() && tape_data[d] == 0xff && tape_data[d + 1] == 0xff)
+	{
+		d += 2;
+		if (d + payload_size > tape_data.size()) {
+			return true; // it seems ROM can produce header only sectors (orphans?)
+		}
+		if (slot >= 0) // if we see a data record before a header at start of tape, we skip it
+		{
+			uint8_t *sector = image + slot * MDV_SECTOR_LENGTH;
+
+			// first preamble + data header
+			sector[MDV_OFFSET_BLOCK_PREAMBLE + 10] = 0xff;
+			sector[MDV_OFFSET_BLOCK_PREAMBLE + 11] = 0xff;
+			memcpy(sector + MDV_OFFSET_BLOCK_HEADER, data_header, 4);
+
+			// inner smaller preamble, + payload
+			sector[MDV_OFFSET_DATA_PREAMBLE + 6] = 0xff;
+			sector[MDV_OFFSET_DATA_PREAMBLE + 7] = 0xff;
+			memcpy(sector + MDV_OFFSET_DATA, tape_data.data() + d, payload_size);
+		}
+		p = d + payload_size;
+	}
+	// no data record found: leave p after the block header
+	// and resync on the next preamble
+	return true;
+}
+
+bool read_tape_record(uint8_t *image, const std::vector<uint8_t> &tape_data,
+	int &slot, int &next_slot, size_t &p)
+{
+	if (p >= tape_data.size())
+	{
+		return false;
+	}
+
+	if (tape_data[p] == 0xff)
+	{
+		if (!read_tape_record_header(image, tape_data, slot, next_slot, p))
+		{
+			return false;
+		}
+	}
+	else if (!read_tape_record_data(image, tape_data, slot, p))
+	{
+		return false;
+	}
+	return true;
+}
+
+//-------------------------------------------------
+//  tape_to_image
+//  Reconstruct a QLAY format image from the internal tape timeline
+//  Data written by the ROM are not at specific positions on the tape
+//  So the tape is scanned, mimicking the way the ROM finds the data
+//  (using the erased parts (GAPs) and preambles.
+//-------------------------------------------------
+
+void microdrive_image_device::tape_to_image(uint8_t *image) const
+{
+	memset(image, 0, MDV_IMAGE_LENGTH);
+
+	// synchronize on the first not erased part and store the origin
+	// (because it's an infinite tape)
+	int origin_on_tape = 0;
+	for (int i = 0; i < MDV_TAPE_PAIRS; i++)
+	{
+		if (m_erased[i])
+		{
+			origin_on_tape = i;
+			break;
+		}
+	}
+
+	int slot = -1; // QLAY slot of the last sector header found (tape order)
+	int next_slot = 0;
+
+	int tape_index = 0;
+	while (tape_index < MDV_TAPE_PAIRS)
+	{
+		// forward to the next non-erased run
+		while (tape_index < MDV_TAPE_PAIRS && m_erased[(origin_on_tape + tape_index) % MDV_TAPE_PAIRS])
+		{
+			tape_index++;
+		}
+
+		// read the bytes from the two tracks into a flat buffer
+		std::vector<uint8_t> flat_data;
+		while (tape_index < MDV_TAPE_PAIRS && !m_erased[(origin_on_tape + tape_index) % MDV_TAPE_PAIRS])
+		{
+			const int pos = (origin_on_tape + tape_index) % MDV_TAPE_PAIRS;
+			flat_data.push_back(m_left[pos]);
+			flat_data.push_back(m_right[pos]);
+			tape_index++;
+		}
+
+		// parse the records from the flat data buffer
+		size_t p = 0;
+		while (p + 2 < flat_data.size())
+		{
+			// search preamble: zeros then the FF/FF sync pair
+			if (flat_data[p] == 0x00 && flat_data[p + 1] == 0xff && flat_data[p + 2] == 0xff)
+			{
+				p += 3; // point to the record
+				if (read_tape_record(image, flat_data, slot, next_slot, p))
+					break;
+			}
+			else
+			{
+				p++;
+			}
+		}
+	}
+}
+
+//-------------------------------------------------
+//  save_image - write the tape back to the file
+//-------------------------------------------------
+
+void microdrive_image_device::save_image()
+{
+	std::vector<uint8_t> image(MDV_IMAGE_LENGTH);
+	tape_to_image(image.data());
+	fseek(0, SEEK_SET);
+	fwrite(image.data(), MDV_IMAGE_LENGTH);
+	if (LOG) logerror("Microdrive '%s' image saved\n", tag());
 }
 
 std::pair<std::error_condition, std::string> microdrive_image_device::call_load()
 {
 	if (length() != MDV_IMAGE_LENGTH)
-		return std::make_pair(image_error::INVALIDLENGTH, std::string());
-
-	for (int i = 0; i < MDV_IMAGE_LENGTH / 2; i++)
 	{
-		fread(m_left.get() + i, 1);
-		fread(m_right.get() + i, 1);
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 	}
+
+	std::vector<uint8_t> image(MDV_IMAGE_LENGTH);
+	if (fread(image.data(), MDV_IMAGE_LENGTH) != MDV_IMAGE_LENGTH)
+	{
+		return std::make_pair(std::errc::io_error, std::string());
+	}
+
+	tape_from_image(image.data());
 
 	m_bit_offset = 0;
 	m_byte_offset = 0;
 	m_clk = 0;
-	m_gap_ticks = 0;
+	m_gap_level = -1;
+	m_dirty = 0;
+
+	return std::make_pair(std::error_condition(), std::string());
+}
+
+std::pair<std::error_condition, std::string> microdrive_image_device::call_create(int format_type, util::option_resolution *format_options)
+{
+	const std::vector<uint8_t> image(MDV_IMAGE_LENGTH, 0);
+	if (fwrite(image.data(), MDV_IMAGE_LENGTH) != MDV_IMAGE_LENGTH)
+	{
+		return std::make_pair(std::errc::io_error, std::string());
+	}
+
+	// a blank image loads as a fully unformatted tape
+	tape_from_image(image.data());
+
+	m_bit_offset = 0;
+	m_byte_offset = 0;
+	m_clk = 0;
+	m_gap_level = -1;
+	m_dirty = 0;
 
 	return std::make_pair(std::error_condition(), std::string());
 }
@@ -116,30 +374,72 @@ void microdrive_image_device::call_unload()
 {
 	m_bit_timer->enable(false);
 
+	if (m_dirty && !is_readonly())
+	{
+		save_image();
+	}
+	m_dirty = 0;
+
 	// ejecting while the drive is selected leaves the head over nothing
 	if (m_comms_out)
+	{
 		m_write_gap_out(1);
+	}
 
-	if (m_left.get())
-		memset(m_left.get(), 0, MDV_IMAGE_LENGTH / 2);
-
-	if (m_right.get())
-		memset(m_right.get(), 0, MDV_IMAGE_LENGTH / 2);
+	if (m_erased)
+	{
+		memset(m_erased.get(), 1, MDV_TAPE_PAIRS);
+	}
+	if (m_left)
+	{
+		memset(m_left.get(), 0, MDV_TAPE_PAIRS);
+	}
+	if (m_right)
+	{
+		memset(m_right.get(), 0, MDV_TAPE_PAIRS);
+	}
 }
 
 TIMER_CALLBACK_MEMBER(microdrive_image_device::bit_timer)
 {
-	// Synthesized gap: the head is over an erased region
-	if (m_gap_ticks > 0)
+	if (m_read_write)
 	{
-		m_gap_ticks--;
-		if (m_gap_ticks == 0)
-			m_write_gap_out(0); // End of gap, preamble will follow
-		return;
+		// write (technically, it's erase + write because the erase
+		// head is ahead of writing head, here we don't care)
+		// every 8 bits, gets a byte paire from zx8302 and write
+		// it on tape.
+		if (m_bit_offset == 0)
+		{
+			const uint16_t pair = m_read_tx_pair();
+			m_left[m_byte_offset] = pair >> 8;
+			m_right[m_byte_offset] = pair & 0xff;
+			m_erased[m_byte_offset] = 0;
+			m_dirty = 1;
+		}
 	}
-
-	m_write_data1_out(BIT(m_left[m_byte_offset], 7 - m_bit_offset));
-	m_write_data2_out(BIT(m_right[m_byte_offset], 7 - m_bit_offset));
+	else if (m_erase)
+	{
+		// erase-only
+		m_left[m_byte_offset] = 0;
+		m_right[m_byte_offset] = 0;
+		m_erased[m_byte_offset] = 1;
+		m_dirty = 1;
+	}
+	else
+	{
+		// read mode
+		const int gap = m_erased[m_byte_offset] ? 1 : 0;
+		if (gap != m_gap_level)
+		{
+			m_gap_level = gap;
+			m_write_gap_out(gap);
+		}
+		if (!gap)
+		{
+			m_write_data1_out(BIT(m_left[m_byte_offset], 7 - m_bit_offset));
+			m_write_data2_out(BIT(m_right[m_byte_offset], 7 - m_bit_offset));
+		}
+	}
 
 	m_bit_offset++;
 
@@ -149,27 +449,8 @@ TIMER_CALLBACK_MEMBER(microdrive_image_device::bit_timer)
 		m_byte_offset++;
 
 		// Infinite loop of the tape
-		if (m_byte_offset == MDV_IMAGE_LENGTH / 2)
+		if (m_byte_offset == MDV_TAPE_PAIRS)
 			m_byte_offset = 0;
-
-		int sector_offset = m_byte_offset % (MDV_SECTOR_LENGTH / 2);
-
-		if (sector_offset == MDV_OFFSET_DATA_PREAMBLE / 2)
-		{
-			// Gap between the sector header and the block preamble
-			m_write_gap_out(1);
-			m_gap_ticks = MDV_GAP_BLOCK_TICKS;
-		}
-		else if (sector_offset == MDV_OFFSET_FILLER / 2)
-		{
-			// The QLAY filler replaces the erased part between sectors
-			// skip it and emit a gap
-			m_byte_offset += (MDV_SECTOR_LENGTH - MDV_OFFSET_FILLER) / 2;
-			if (m_byte_offset >= MDV_IMAGE_LENGTH / 2)
-				m_byte_offset = 0;
-			m_write_gap_out(1);
-			m_gap_ticks = MDV_GAP_SECTOR_TICKS;
-		}
 	}
 }
 
@@ -186,6 +467,7 @@ void microdrive_image_device::clk_w(int state)
 		if (m_comms_out && is_loaded())
 		{
 			if (LOG) logerror("Microdrive '%s' motor ON\n", tag());
+			m_gap_level = -1; // force a gap emission on the first tick
 			m_bit_timer->enable(true);
 		}
 		else if (m_comms_out && !is_loaded())
@@ -216,40 +498,34 @@ void microdrive_image_device::erase_w(int state)
 
 void microdrive_image_device::read_write_w(int state)
 {
-	if (LOG_COMMS) logerror("Microdrive '%s' READ/WRITE: %u (1=read)\n", tag(), state);
+	if (LOG_COMMS) logerror("Microdrive '%s' READ/WRITE: %u (1=write)\n", tag(), state);
 	m_read_write = state;
 }
 
 void microdrive_image_device::data1_w(int state)
 {
-	if (m_comms_out && !m_read_write)
-	{
-		// TODO
-	}
+	// unused: data goes through the bit timer, to remove
 }
 
 void microdrive_image_device::data2_w(int state)
 {
-	if (m_comms_out && !m_read_write)
-	{
-		// TODO
-	}
+	// unused: data goes through the bit timer, to remove
 }
 
-int microdrive_image_device::data1_r()
+int microdrive_image_device::data1_r() const
 {
 	int data = 0;
-	if (m_comms_out && m_read_write)
+	if (m_comms_out && !m_read_write && !m_erased[m_byte_offset])
 	{
 		data = BIT(m_left[m_byte_offset], 7 - m_bit_offset);
 	}
 	return data;
 }
 
-int microdrive_image_device::data2_r()
+int microdrive_image_device::data2_r() const
 {
 	int data = 0;
-	if (m_comms_out && m_read_write)
+	if (m_comms_out && !m_read_write && !m_erased[m_byte_offset])
 	{
 		data = BIT(m_right[m_byte_offset], 7 - m_bit_offset);
 	}

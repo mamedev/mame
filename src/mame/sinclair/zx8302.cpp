@@ -165,7 +165,9 @@ zx8302_device::zx8302_device(const machine_config &mconfig, const char *tag, dev
 		m_baudx4(0),
 		m_mdv_shift{0, 0},
 		m_mdv_bit_count(0),
-		m_mdv_sync_state(MDV_SYNC_IDLE)
+		m_mdv_sync_state(MDV_SYNC_IDLE),
+		m_mdv_tx_buffer{0, 0},
+		m_mdv_tx_count(0)
 {
 }
 
@@ -203,6 +205,8 @@ void zx8302_device::device_start()
 	save_item(NAME(m_mdv_shift));
 	save_item(NAME(m_mdv_bit_count));
 	save_item(NAME(m_mdv_sync_state));
+	save_item(NAME(m_mdv_tx_buffer));
+	save_item(NAME(m_mdv_tx_count));
 }
 
 
@@ -481,6 +485,35 @@ void zx8302_device::mdv_control_w(uint8_t data)
 		m_mdv_shift[1] = 0;
 		if (LOG) logerror("ZX8302 '%s' MDV sync armed (MDSELCK)\n", tag());
 	}
+
+	if (!BIT(data, 2))
+	{
+		// write line dropped: drop current data
+		m_mdv_tx_count = 0;
+		m_status &= ~STATUS_TX_BUFFER_FULL;
+	}
+}
+
+
+//-------------------------------------------------
+//  mdv_tx_pop
+//
+//  gets the current written pair (or 0 if not entirely pushed yet)
+//  also resets the buffer
+//-------------------------------------------------
+
+uint16_t zx8302_device::mdv_tx_pop()
+{
+	uint16_t pair = 0;
+
+	if (m_mdv_tx_count == 2)
+	{
+		pair = (m_mdv_tx_buffer[0] << 8) | m_mdv_tx_buffer[1];
+		m_mdv_tx_count = 0;
+		m_status &= ~STATUS_TX_BUFFER_FULL;
+	}
+
+	return pair;
 }
 
 
@@ -530,6 +563,27 @@ void zx8302_device::data_w(uint8_t data)
 {
 	if (LOG) logerror("ZX8302 '%s' Data Register: %02x\n", tag(), data);
 
+	if ((m_tcr & MODE_MASK) == MODE_MDV)
+	{
+		// fills the write buffer for the microdrive
+		if (m_mdv_tx_count < 2)
+		{
+			m_mdv_tx_buffer[m_mdv_tx_count++] = data;
+		}
+		else
+		{
+			logerror("ZX8302 '%s' MDV TX overflow, byte %02x lost\n", tag(), data);
+		}
+
+		if (m_mdv_tx_count == 2)
+		{
+			m_status |= STATUS_TX_BUFFER_FULL;
+		}
+
+		return;
+	}
+
+	// previous code for other modes than microdrive
 	m_tdr = data;
 	m_status |= STATUS_TX_BUFFER_FULL;
 }

@@ -71,6 +71,7 @@ public:
 	void rtc_w(uint8_t data);
 	void control_w(uint8_t data);
 	uint8_t mdv_track_r(offs_t offset);
+	uint16_t mdv_tx_pop();
 	uint8_t status_r();
 	void ipc_command_w(uint8_t data);
 	void mdv_control_w(uint8_t data);
@@ -213,6 +214,8 @@ private:
 	uint8_t m_mdv_shift[2];         // bit shift registers for assembling bytes
 	int m_mdv_bit_count;            // bits received so far in current byte (DELIVER mode)
 	int m_mdv_sync_state;           // preamble sync state machine
+	uint8_t m_mdv_tx_buffer[2];     // microdrive transmit buffer (one byte pair)
+	int m_mdv_tx_count;             // bytes pending in the transmit buffer
 
 	// timers
 	emu_timer *m_baudx4_timer;      // baud x4 timer

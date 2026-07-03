@@ -956,10 +956,12 @@ void ql_state::ql(machine_config &config)
 	m_mdv1->data1_out_wr_callback().set(m_zx8302, FUNC(zx8302_device::raw1_w));
 	m_mdv1->data2_out_wr_callback().set(m_zx8302, FUNC(zx8302_device::raw2_w));
 	m_mdv1->gap_out_wr_callback().set(m_zx8302, FUNC(zx8302_device::gap_w));
+	m_mdv1->tx_pair_rd_callback().set(m_zx8302, FUNC(zx8302_device::mdv_tx_pop));
 	MICRODRIVE(config, m_mdv2);
 	m_mdv2->data1_out_wr_callback().set(m_zx8302, FUNC(zx8302_device::raw1_w));
 	m_mdv2->data2_out_wr_callback().set(m_zx8302, FUNC(zx8302_device::raw2_w));
 	m_mdv2->gap_out_wr_callback().set(m_zx8302, FUNC(zx8302_device::gap_w));
+	m_mdv2->tx_pair_rd_callback().set(m_zx8302, FUNC(zx8302_device::mdv_tx_pop));
 
 	RS232_PORT(config, m_ser1, default_rs232_devices, nullptr); // wired as DCE
 	RS232_PORT(config, m_ser2, default_rs232_devices, nullptr); // wired as DTE

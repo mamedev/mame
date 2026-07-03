@@ -41,12 +41,14 @@ public:
 	auto data1_out_wr_callback() { return m_write_data1_out.bind(); }
 	auto data2_out_wr_callback() { return m_write_data2_out.bind(); }
 	auto gap_out_wr_callback() { return m_write_gap_out.bind(); }
+	auto tx_pair_rd_callback() { return m_read_tx_pair.bind(); }
 
 	// device_image_interface implementation
 	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) override;
 
-	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool is_creatable() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "ql_cass"; }
 	virtual const char *file_extensions() const noexcept override { return "mdv,mdr"; }
 
@@ -57,8 +59,8 @@ public:
 	void read_write_w(int state);
 	void data1_w(int state);
 	void data2_w(int state);
-	int data1_r();
-	int data2_r();
+	int data1_r() const;
+	int data2_r() const;
 
 protected:
 	// device_t implementation
@@ -67,10 +69,15 @@ protected:
 	TIMER_CALLBACK_MEMBER(bit_timer);
 
 private:
+	void tape_from_image(const uint8_t *image);
+	void tape_to_image(uint8_t *image) const;
+	void save_image();
+
 	devcb_write_line m_write_comms_out;
 	devcb_write_line m_write_data1_out;
 	devcb_write_line m_write_data2_out;
 	devcb_write_line m_write_gap_out;
+	devcb_read16 m_read_tx_pair;
 
 	int m_clk;
 	int m_comms_in;
@@ -78,12 +85,15 @@ private:
 	int m_erase;
 	int m_read_write;
 
+	// tape timeline: one entry per byte pair position
 	std::unique_ptr<uint8_t[]> m_left;
 	std::unique_ptr<uint8_t[]> m_right;
+	std::unique_ptr<uint8_t[]> m_erased;
 
 	int m_bit_offset;
 	int m_byte_offset;
-	int m_gap_ticks;
+	int m_gap_level;
+	int m_dirty;
 
 	emu_timer *m_bit_timer;
 };
