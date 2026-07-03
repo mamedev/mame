@@ -25,6 +25,7 @@
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NEWS_HID_HLE, news_hid_hle_device, "news_hid_hle", "Sony NEWS Keyboard and Mouse (HLE)")
+DEFINE_DEVICE_TYPE(NEWS_HID_SERIAL_HLE, news_hid_hle_serial_device, "news_hid_serial_hle", "Sony NEWS Serial Keyboard and Mouse (HLE)")
 
 news_hid_hle_device::news_hid_hle_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, NEWS_HID_HLE, tag, owner, clock)
@@ -267,6 +268,59 @@ u8 news_hid_hle_device::status_68k_r()
 	return data;
 }
 
+news_hid_hle_serial_device::news_hid_hle_serial_device(
+	machine_config const &mconfig, char const *tag, device_t *owner, u32 const clock)
+	: device_t(mconfig, NEWS_HID_SERIAL_HLE, tag, owner, clock)
+	, device_buffered_serial_interface(mconfig, *this)
+	, device_matrix_keyboard_interface(mconfig, *this, "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7")
+	, m_write_txd(*this)
+{
+}
+
+void news_hid_hle_serial_device::device_start()
+{
+}
+
+void news_hid_hle_serial_device::device_reset()
+{
+	// Keyboard is always 8N1 serial @ 9600 baud
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+	set_tra_rate(9600);
+	set_rcv_rate(9600);
+
+	receive_register_reset();
+	transmit_register_reset();
+	clear_fifo();
+	reset_key_state();
+	start_processing(attotime::from_hz(9600));
+}
+
+void news_hid_hle_serial_device::key_make(u8 row, u8 column)
+{
+	LOG("key_make row %d col %d\n", row, column);
+
+	push_key((row << 4) | column);
+}
+
+void news_hid_hle_serial_device::key_break(u8 row, u8 column)
+{
+	LOG("key_break row %d col %d\n", row, column);
+
+	push_key(0x80 | (row << 4) | column);
+}
+
+void news_hid_hle_serial_device::push_key(const u8 code)
+{
+	LOG("push_key(0x%x)\n", code);
+	transmit_byte(code);
+}
+
+void news_hid_hle_serial_device::received_byte(uint8_t byte)
+{
+	// TODO: keyboard bell and anything else that the keyboard can do
+	LOG("received_byte(0x%x)\n", byte);
+}
+
 INPUT_PORTS_START(news_hid_hle_device)
 	PORT_START("ROW0")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -426,6 +480,11 @@ INPUT_PORTS_START(news_hid_hle_device)
 INPUT_PORTS_END
 
 ioport_constructor news_hid_hle_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(news_hid_hle_device);
+}
+
+ioport_constructor news_hid_hle_serial_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(news_hid_hle_device);
 }

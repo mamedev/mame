@@ -7,6 +7,7 @@
 #pragma once
 
 #include "machine/keyboard.h"
+#include "bus/rs232/keyboard.h"
 
 class news_hid_hle_device
 	: public device_t
@@ -68,6 +69,36 @@ private:
 	u8 m_mouse_b;
 };
 
+class news_hid_hle_serial_device
+	: public device_t
+	, public device_buffered_serial_interface<16U>
+	, protected device_matrix_keyboard_interface<8U>
+{
+public:
+	news_hid_hle_serial_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+
+	auto txd_handler() { return m_write_txd.bind(); }
+	void rxd_w(int const state) { rx_w(state); }
+
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	// device_matrix_keyboard_interface overrides
+	virtual void key_make(u8 row, u8 column) override;
+	virtual void key_break(u8 row, u8 column) override;
+	virtual void tra_callback() override { m_write_txd(transmit_register_get_data_bit()); }
+
+private:
+	virtual void received_byte(uint8_t byte) override;
+	void push_key(u8 code);
+
+	devcb_write_line m_write_txd;
+};
+
 DECLARE_DEVICE_TYPE(NEWS_HID_HLE, news_hid_hle_device)
+DECLARE_DEVICE_TYPE(NEWS_HID_SERIAL_HLE, news_hid_hle_serial_device)
 
 #endif // MAME_SONY_NEWS_HID_H

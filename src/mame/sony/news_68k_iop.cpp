@@ -16,7 +16,7 @@
  * The CPU and IOP interrupt each other whenever they need to communicate, after populating main memory with whatever data is needed.
  * The CPU delegates almost all I/O to the IOP (as the DMA controller), only handling I/O for some VME bus peripherals.
  * The CPU bus (on the NWS-800, this is routed through the MMU) is often called the Hyperbus. The NWS-1800/1900/3800 series and the single-CPU
- * 68k and R3000 models explictly call this the Hyperbus, but it is unclear if the NWS-800's CPU bus was only referred to that retroactively or not.
+ * 68k and R3000 models explicitly call this the Hyperbus, but it is unclear if the NWS-800's CPU bus was only referred to that retroactively or not.
  * There are a couple of mentions of the Hyperbus in NEWS-OS 4 related to even the NWS-800, but the NWS-1xxx/3xxx series were already released by the time NEWS-OS 4 was.
  * So, for clarity due to the number of busses on this system, the Hyperbus term is used throughout this code, but it may or may not be a 100% accurate description.
  * The Hyperbus is directly connected to main memory, the system ROM, and the VME bus interface. Everything else is connected to the I/O
@@ -63,6 +63,7 @@
 
 #include "news_020_mmu.h"
 #include "news_iop_scsi.h"
+#include "news_hid.h"
 
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
@@ -97,7 +98,7 @@
 #define LOG_FB (1U << 11)
 #define LOG_FB_ROP (1U << 12)
 
-#define VERBOSE (LOG_FB)
+#define VERBOSE 0
 
 #include "logmacro.h"
 
@@ -129,6 +130,7 @@ namespace
 			m_scsi_dma(*this, "scsi_dma"),
 			m_dip_switch(*this, "FRONT_PANEL"),
 			m_serial(*this, "serial%u", 0U),
+			m_keyboard(*this, "nwp411"),
 			m_screen(*this, "nwp512d"),
 			m_vram(*this, "vram"),
 			iop_irq_line_map({
@@ -182,7 +184,7 @@ namespace
 			FDCDRQ          // DRQ from FDC
 		};
 		static constexpr std::array iop_irq_names = {"CPIRQ"sv, "SCSI_IRQ"sv, "SCSI_DRQ"sv, "LANCE"sv, "CPU"sv, "SCC"sv, "SCC_PERIPHERAL"sv, "TIMEOUT"sv, "FDCIRQ"sv, "FDCDRQ"sv};
-		static constexpr uint32_t iop_nmi_mask = (1 << SCSI_IRQ) | (1 << SCC) | (1 << LANCE) | (1 << FDCIRQ) | (1 << FDCDRQ);
+		static constexpr uint32_t iop_nmi_mask = (1 << SCSI_IRQ) | (1 << SCC) | (1 << SCC_PERIPHERAL) | (1 << LANCE) | (1 << FDCIRQ) | (1 << FDCDRQ);
 
 		template <iop_irq_number Number>
 		void iop_irq_w(int state);
@@ -290,6 +292,7 @@ namespace
 		required_device<news_iop_scsi_helper_device> m_scsi_dma;
 		required_ioport m_dip_switch;
 		required_device_array<rs232_port_device, 2> m_serial;
+		required_device<news_hid_hle_serial_device> m_keyboard;
 		std::unique_ptr<u16[]> m_net_ram;
 
 		// Framebuffer and CRT
@@ -684,6 +687,7 @@ namespace
 		{
 			// how much do we need to shift source by to align it with destination?
 			m_fb_shift = m_fb_destination_x % 16 - m_fb_source_x % 16;
+			LOGMASKED(LOG_FB, "destination_w: Calculated shift: 0x%x % 16 - 0x%x % 16 = 0x%x\n", m_fb_destination_x, m_fb_source_x, m_fb_shift);
 		}
 
 		// Compute first mask
@@ -696,6 +700,7 @@ namespace
 
 	void news_iop_state::source_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	{
+		LOGMASKED(LOG_FB, "source_w(0x%x, 0x%x, 0x%x)\n", offset, data, mem_mask);
 		check_mem_mask(mem_mask);
 
 		m_fb_source_x = x_address(data);
@@ -705,6 +710,7 @@ namespace
 		{
 			// how much do we need to shift source by to align it with destination?
 			m_fb_shift = m_fb_destination_x % 16 - m_fb_source_x % 16; // direction determined by x direction
+			LOGMASKED(LOG_FB, "source_w: Calculated shift: 0x%x % 16 - 0x%x % 16 = 0x%x\n", m_fb_destination_x, m_fb_source_x, m_fb_shift);
 		}
 
 		LOGMASKED(LOG_FB, "Source set to (0x%x, 0x%x)\n", m_fb_source_x, m_fb_source_y);
@@ -834,7 +840,7 @@ namespace
 				break;
 			case 0xc:
 				op = "1";
-				result = 1;
+				result = 0xff;
 				break;
 			case 0xd:
 				op = "S | ~D";
@@ -944,6 +950,8 @@ namespace
 			{
 				LOGMASKED(LOG_FB, "\tROP done!\n");
 				m_fb_busy = false;
+				m_fb_source_x = 0;
+				m_fb_destination_x = 0;
 			}
 			else
 			{
@@ -960,7 +968,9 @@ namespace
 
 		if (!m_fb_busy)
 		{
-			fatalerror("IOP tried to push data without starting an op!");
+			LOGMASKED(LOG_FB, "fb_fifo_w: IOP tried to push data without starting an op!\n");
+			machine().debug_break();
+			// fatalerror("IOP tried to push data without starting an op!");
 		}
 
 		// TODO: validate offset versus the setup in the ROP reg
@@ -1217,12 +1227,12 @@ namespace
 
 	void news_iop_state::int_check_iop()
 	{
-	   const int active_irq = m_iop_intst & (m_iop_inten | iop_nmi_mask);
-	   for (auto irq : iop_irq_line_map)
-	   {
+		const int active_irq = m_iop_intst & (m_iop_inten | iop_nmi_mask);
+		for (auto irq : iop_irq_line_map)
+		{
 			// Calculate state of input pin (logical OR of all attached inputs)
 			bool state = false;
-			for (auto irq_input : irq.second)
+			for (const auto irq_input : irq.second)
 			{
 				state |= active_irq & (1 << irq_input);
 			}
@@ -1236,7 +1246,7 @@ namespace
 
 				m_iop->set_input_line(irq.first, state ? 1 : 0);
 			}
-	   }
+		}
 	}
 
 	template <news_iop_state::cpu_irq_number Number>
@@ -1465,6 +1475,11 @@ namespace
 		SCC8530(config, m_scc_peripheral, (16_MHz_XTAL / 4));
 		m_scc_external->out_int_callback().set(FUNC(news_iop_state::iop_irq_w<SCC>));
 		m_scc_peripheral->out_int_callback().set(FUNC(news_iop_state::iop_irq_w<SCC_PERIPHERAL>));
+
+		// Keyboard and mouse (kb only for now)
+		NEWS_HID_SERIAL_HLE(config, m_keyboard);
+		m_keyboard->txd_handler().set(m_scc_peripheral, FUNC(z80scc_device::rxa_w));
+		m_scc_peripheral->out_txda_callback().set(m_keyboard, FUNC(news_hid_hle_serial_device::rxd_w));
 
 		// The monitor ROM repurposes the status pins as a serial interface to read the front panel switches and IDROM data
 		m_scc_peripheral->out_dtrb_callback().set(FUNC(news_iop_state::handle_dtr));
