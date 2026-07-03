@@ -71,6 +71,7 @@ void sh7709s_device::device_reset()
 	m_wb_active_cycles = 0;
 	m_last_sdram_bank = 0;
 	m_precharge_remaining_cycles = 0;
+	m_last_op_cycle_count = 0;
 }
 
 void sh7709s_device::device_start()
@@ -84,6 +85,7 @@ void sh7709s_device::device_start()
 	m_wb_active_cycles = 0;
 	m_last_sdram_bank = 0;
 	m_precharge_remaining_cycles = 0;
+	m_last_op_cycle_count = 0;
 
 	for (int i = 0; i < SH7709S_CACHE_BLOCKS; i++)
 		for (int j = 0; j < SH7709S_CACHE_ASSOCIATIVITY; j++)
@@ -99,6 +101,7 @@ void sh7709s_device::device_start()
 	save_item(NAME(m_wb_active_cycles));
 	save_item(NAME(m_last_sdram_bank));
 	save_item(NAME(m_precharge_remaining_cycles));
+	save_item(NAME(m_last_op_cycle_count));
 }
 
 // Top 3 region bits allow for aliasing cached/uncached pointers to the same physical address
@@ -341,11 +344,17 @@ uint32_t sh7709s_device::cache_line_fetch_count(uint32_t address)
 #define BURST_READ_WORD_PENALTY (3)
 #define BURST_WRITE_WORD_PENALTY (3)
 
+static uint64_t remaining_cycles(uint64_t elapsed, uint64_t cycles)
+{
+	return (elapsed < cycles) ? (cycles - elapsed) : 0;
+}
+
 // cpu->bus cycle conversion hardcoded to 2x as cv1k sh3 runs the bus at 50mhz
 unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 {
 	uint32_t area = get_area(address);
 	bool is_in_cache = cache_access(address, write);
+	uint64_t elapsed_cycles = total_cycles() - m_last_op_cycle_count;
 
 	if (is_in_cache)
 		return 0;
@@ -377,17 +386,23 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 
 	m_last_area_accessed = area;
 
-	// CPU is in auto precharge mode, since we hit a bank conflict and the last precharge isn't done we stall
+	// CPU is in auto precharge mode, check how many cycles to stall if not enough time has elapsed on a bank conflict
 	if (is_sdram_region(address) && bank_read == m_last_sdram_bank && m_precharge_remaining_cycles > 0)
-		cpu_penalty += m_precharge_remaining_cycles;
+		cpu_penalty += remaining_cycles(elapsed_cycles, m_precharge_remaining_cycles);
 
 	m_precharge_remaining_cycles = 0;
 
-	// We hit another bus operation before a writeback eviction finished, stall until that's done
-	// We already account for the precharge bank conflict above
+	// We hit another bus operation before a writeback eviction finished, calculate remaining stall time
 	if (m_wb_active_cycles > 0)
 	{
-		cpu_penalty += m_wb_active_cycles;
+		uint64_t wb_cycles_left = remaining_cycles(elapsed_cycles, m_wb_active_cycles);
+		cpu_penalty += wb_cycles_left;
+		// If there was a bank conflict also calculate remaining cycles for the precharge
+		if (m_last_sdram_bank == bank_read)
+		{
+			uint64_t tpc_cycles_left = (wb_cycles_left == 0) ? elapsed_cycles - m_wb_active_cycles : 0;
+			cpu_penalty += remaining_cycles(tpc_cycles_left, mcr_tpc() * 2);
+		}
 		m_wb_active_cycles = 0;
 	}
 
@@ -420,34 +435,31 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 	return cpu_penalty + (bus_penalty * 2);
 }
 
+void sh7709s_device::update_access_cycles(uint32_t address, bool write)
+{
+	m_sh2_state->icount -= access_penalty(address, write);
+	m_last_op_cycle_count = total_cycles();
+}
+
 void sh7709s_device::drc_memory_access_read()
 {
 	uint32_t address = m_sh2_state->arg0;
-	m_sh2_state->icount -= access_penalty(address, false);
+	update_access_cycles(address, false);
 }
 
 void sh7709s_device::drc_memory_access_write()
 {
 	uint32_t address = m_sh2_state->arg0;
-	m_sh2_state->icount -= access_penalty(address, true);
+	update_access_cycles(address, true);
 }
 
 void sh7709s_device::drc_update_icache()
 {
-	if (m_wb_active_cycles > 0)
-	{
-		m_wb_active_cycles--;
-		// If we had an active wb complete set the remaining precharge cycles in case of bank conflict
-		if (m_wb_active_cycles == 0)
-			m_precharge_remaining_cycles = mcr_tpc() * 2;
-	}
-	else if (m_precharge_remaining_cycles > 0)
-		m_precharge_remaining_cycles--;
 	// Assume the instruction prefetch is perfect for now
 	// we'll still pay a bit of penalty for the access and
 	// handle cache writeback when the icache fetch causes
 	// a dirty line eviction
-	m_sh2_state->icount -= access_penalty(m_sh2_state->pc, false);
+	update_access_cycles(m_sh2_state->pc, false);
 }
 
 static void cfunc_drc_memory_access_read(void *param)
