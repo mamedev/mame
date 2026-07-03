@@ -20,6 +20,7 @@
 
 #include "../screen_ula.h"
 #include "../spec128.h"
+#include "snapshot_nex.h"
 #include "specnext_copper.h"
 #include "specnext_ctc.h"
 #include "specnext_divmmc.h"
@@ -31,6 +32,7 @@
 #include "specnext_sprites.h"
 #include "specnext_tiles.h"
 #include "specnext_uart.h"
+#include "specnext_vtest.h"
 
 #include "bus/midi/midi.h"
 #include "bus/rs232/rs232.h"
@@ -144,6 +146,7 @@ public:
 		, m_layer2(*this, "layer2")
 		, m_lores(*this, "lores")
 		, m_sprites(*this, "sprites")
+		, m_vtest(*this, "vtest")
 		, m_io_video(*this, "VIDEO")
 		, m_io_layers(*this, "LYRS")
 		, m_io_mouse(*this, "mouse_input%u", 0U)
@@ -157,6 +160,7 @@ public:
 	void ks3(machine_config &config);
 
 	INPUT_CHANGED_MEMBER(on_nmi_button);
+	DECLARE_SNAPSHOT_LOAD_MEMBER(nex_snapshot_cb);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -218,7 +222,7 @@ private:
 
 	virtual TIMER_CALLBACK_MEMBER(irq_off) override;
 	virtual TIMER_CALLBACK_MEMBER(irq_on) override;
-	INTERRUPT_GEN_MEMBER(specnext_interrupt);
+	INTERRUPT_GEN_MEMBER(on_vblank);
 	TIMER_CALLBACK_MEMBER(line_irq_on);
 	INTERRUPT_GEN_MEMBER(line_interrupt);
 	TIMER_CALLBACK_MEMBER(spi_clock);
@@ -388,8 +392,10 @@ private:
 	required_device<specnext_layer2_device> m_layer2;
 	required_device<specnext_lores_device> m_lores;
 	required_device<specnext_sprites_device> m_sprites;
+	required_device<specnext_vtest_device> m_vtest;
 	optional_ioport m_io_video;
 	optional_ioport m_io_layers;
+	bool m_video_test_pattern_active = false;
 	required_ioport_array<4> m_io_mouse;
 	required_ioport m_io_joy_left;
 	required_ioport m_io_joy_right;
@@ -634,6 +640,33 @@ private:
 	bool m_i2c_scl_data;
 	bool m_i2c_sda_data;
 };
+
+SNAPSHOT_LOAD_MEMBER(specnext_state::nex_snapshot_cb)
+{
+	nex_file::hooks h;
+	h.reg_w = [this](u8 reg, u8 data) { m_next_regs.write_byte(reg, data); };
+	h.reg_r = [this](u8 reg) { return m_next_regs.read_byte(reg); };
+	h.poke  = [this](u16 addr, u8 data) { m_program.write_byte(addr, data); };
+
+	nex_file::init_defaults(h);
+
+	if (image.is_filetype("nex"))
+	{
+		image.fseek(0, SEEK_SET);
+
+		nex_file nex;
+		nex_file::result r = nex.load(image, h);
+		if (!r.loaded)
+			return std::make_pair(image_error::INVALIDIMAGE, "Invalid .NEX file");
+
+		m_port_fe_data = (m_port_fe_data & 0xf8) | (r.border_color & 0x07);
+		m_maincpu->set_state_int(Z80_SP, r.sp);
+		m_maincpu->set_state_int(Z80_PC, r.pc);
+
+		return std::make_pair(std::error_condition(), std::string());
+	}
+	return spectrum_state::snapshot_cb(image);
+}
 
 void specnext_state::bank_update(u8 bank, u8 count)
 {
@@ -996,6 +1029,7 @@ void specnext_state::update_video_mode()
 	m_tiles->set_raster_offset(left, top);
 	m_layer2->set_raster_offset(left, top);
 	m_sprites->set_raster_offset(left, top);
+	m_vtest->set_raster_offset(left, top);
 
 	m_eff_nr_03_machine_timing = m_nr_03_machine_timing;
 	m_eff_nr_05_5060 = m_nr_05_5060;
@@ -1004,6 +1038,12 @@ void specnext_state::update_video_mode()
 
 u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	if (m_video_test_pattern_active)
+	{
+		m_vtest->draw(bitmap, cliprect);
+		return 0;
+	}
+
 	rectangle clip256x192 = m_clip256x192;
 	clip256x192 &= cliprect;
 	rectangle clip320x256 = m_clip320x256;
@@ -2784,7 +2824,7 @@ void specnext_state::irq_w(int state)
 	update_dma_delay();
 }
 
-INTERRUPT_GEN_MEMBER(specnext_state::specnext_interrupt)
+INTERRUPT_GEN_MEMBER(specnext_state::on_vblank)
 {
 	m_tiles->control_w(m_nr_6b_tm_control); // TODO (1): Santa's Pressie, The Next War
 
@@ -2794,6 +2834,8 @@ INTERRUPT_GEN_MEMBER(specnext_state::specnext_interrupt)
 		m_video_output_hdmi = tmp;
 		update_video_mode();
 	}
+
+	m_video_test_pattern_active = ((m_io_joy_left->read() & 0x700) == 0x700) || ((m_io_joy_right->read() & 0x700) == 0x700);
 
 	line_irq_adjust();
 	if (!port_ff_interrupt_disable())
@@ -3314,7 +3356,6 @@ INPUT_PORTS_START(specnext)
 	PORT_CONFSETTING(0x00, "360x288 (HDMI)" )
 	PORT_CONFSETTING(0x01, "320x256 (VGA)" )
 	PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
-
 	PORT_START("mouse_input0")
 	PORT_BIT(0x7ff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(100)
 
@@ -3411,6 +3452,7 @@ void specnext_state::machine_start()
 	// Save
 	save_item(NAME(m_page_shadow));
 	save_item(NAME(m_bootrom_en));
+	save_item(NAME(m_video_test_pattern_active));
 	save_item(NAME(m_port_ff_data));
 	save_item(NAME(m_port_1ffd_special_old));
 	save_item(NAME(m_port_1ffd_data));
@@ -3656,6 +3698,7 @@ void specnext_state::reset_hard()
 {
 	m_nr_02_hard_reset = 0;
 	m_bootrom_en = 1;
+	m_video_test_pattern_active = 0;
 
 	m_dma->dma_mode_w(0);
 	// nmi_mf = 0;
@@ -4084,7 +4127,7 @@ void specnext_state::tbblue(machine_config &config)
 	m_maincpu->set_m1_map(&specnext_state::map_fetch);
 	m_maincpu->set_memory_map(&specnext_state::map_mem);
 	m_maincpu->set_io_map(&specnext_state::map_io);
-	m_maincpu->set_vblank_int("screen", FUNC(specnext_state::specnext_interrupt));
+	m_maincpu->set_vblank_int("screen", FUNC(specnext_state::on_vblank));
 	m_maincpu->set_irq_acknowledge_callback(NAME([](device_t &, int){ return 0xff; }));
 	m_maincpu->out_nextreg_cb().set([this](offs_t offset, u8 data) { m_next_regs.write_byte(offset, data); });
 	m_maincpu->in_nextreg_cb().set([this](offs_t offset) { return m_next_regs.read_byte(offset); });
@@ -4202,6 +4245,7 @@ void specnext_state::tbblue(machine_config &config)
 	// drawgfx doesn't allow to mask palette access and in case of 256-color sprite does use offset, the index overflow palette boundries.
 	// We are duplicating palletes to imitate mask on palette index which required by sprites device.
 	SPECNEXT_SPRITES(config, m_sprites).set_palette(m_palette->device().tag(), 0x600, 0x800);
+	SPECNEXT_VTEST(config, m_vtest);
 
 	SPECNEXT_COPPER(config, m_copper, 28_MHz_XTAL);
 	m_copper->out_nextreg_cb().set([this](offs_t offset, u8 data) { m_next_regs.write_byte(offset, data); });
@@ -4209,7 +4253,9 @@ void specnext_state::tbblue(machine_config &config)
 
 	SOFTWARE_LIST(config, "sd_list").set_original("specnext_sd");
 
-	config.device_remove("snapshot");
+	snapshot_image_device &snapshot(SNAPSHOT(config.replace(), "snapshot", "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,spg,z80,zx,nex"));
+	snapshot.set_load_callback(FUNC(specnext_state::nex_snapshot_cb));
+	snapshot.set_interface("spectrum_snapshot");
 
 	m_machine_id = 0x08;
 	m_board_issue = 0;

@@ -48,7 +48,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_fdc(*this, "upd765")
 		, m_fdd(*this, "upd765:%u", 0U)
-		, m_pic2(*this, "pic8259_slave")
+		, m_pic2(*this, "pic2")
 		, m_rtc(*this, "rtc")
 		, m_cbus_root(*this, "cbus")
 		// labelled "マウス" (mouse) - can't use "mouse" because of core -mouse option
@@ -211,8 +211,8 @@ private:
 	struct {
 		//bool rbusy;
 		u8 wss;
-		u8 patr[2];
-		u8 rop[2];
+		u8 patr[4];
+		u8 rop[4];
 	} m_singleplane;
 
 	struct {
@@ -268,15 +268,17 @@ private:
 		u16 ofy;
 		u16 fbw;
 		u16 fbl;
+		u32 layer_base;
+		u32 layer_mask;
 	};
 
-	void draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which);
-	void draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which);
-	void draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 which);
-	void draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 which);
+	void draw_plane_single_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which);
+	void draw_plane_single_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which);
+	void draw_plane_single_5bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 which);
+	void draw_plane_single_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 which);
+	void draw_plane_single_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 which);
 
-	void draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which);
-	void draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which);
+	void draw_plane_multi_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which);
 
 	uint32_t calc_kanji_rom_addr(uint8_t jis1, uint8_t jis2, int x, int y);
 	void draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);

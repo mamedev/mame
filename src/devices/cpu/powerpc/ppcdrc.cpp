@@ -315,7 +315,7 @@ void ppc_device::code_flush_cache()
 
 	// no compiled code remains, so forget which pages held it
 	std::fill(m_codepage_bits.begin(), m_codepage_bits.end(), 0);
-	m_codepage_any = false;
+	m_core->m_codepage_any = false;
 }
 
 
@@ -3890,7 +3890,7 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 		case 0x172:  // TLBIA
 			UML_CALLC(block, cfunc_ppccom_execute_tlbia, this);                // callc   ppccom_execute_tlbia,ppc
 			// a full TLB flush could remap every page; recompile if any code is compiled
-			generate_recompile_if(block, compiler, desc, uml::mem(&m_codepage_any));
+			generate_recompile_if(block, compiler, desc, uml::mem(&m_core->m_codepage_any));
 			return true;
 
 		case 0x3d2:  // TLBLD
@@ -4029,7 +4029,7 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 				// Writing SDR1 or a BAT register remaps memory without a tlbie, so
 				// flush if any code is compiled.
 				if (spr == SPROEA_SDR1 || (spr >= SPROEA_IBAT0U && spr <= SPROEA_DBAT3L))
-					generate_recompile_if(block, compiler, desc, uml::mem(&m_codepage_any));
+					generate_recompile_if(block, compiler, desc, uml::mem(&m_core->m_codepage_any));
 			}
 			return true;
 		}
@@ -4039,14 +4039,14 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 			UML_CALLC(block, cfunc_ppccom_tlb_flush, this);                                        // callc   ppccom_tlb_flush,ppc
 			// a segment register write remaps a 256 MiB region without a tlbie; recompile
 			// if any code is compiled
-			generate_recompile_if(block, compiler, desc, uml::mem(&m_codepage_any));
+			generate_recompile_if(block, compiler, desc, uml::mem(&m_core->m_codepage_any));
 			return true;
 
 		case 0x0f2:  // MTSRIN
 			UML_SHR(block, I0, R32(G_RB(op)), 28);                              // shr     i0,G_RB,28
 			UML_STORE(block, &m_core->sr[0], I0, R32(G_RS(op)), SIZE_DWORD, SCALE_x4); // store   sr,i0,rs,dword
 			UML_CALLC(block, cfunc_ppccom_tlb_flush, this);                            // callc   ppccom_tlb_flush,ppc
-			generate_recompile_if(block, compiler, desc, uml::mem(&m_codepage_any));
+			generate_recompile_if(block, compiler, desc, uml::mem(&m_core->m_codepage_any));
 			return true;
 
 		case 0x200:  // MCRXR

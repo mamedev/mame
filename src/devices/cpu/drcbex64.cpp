@@ -385,6 +385,7 @@ public:
 	virtual int execute(uml::code_handle &entry) override;
 	virtual void generate(drcuml_block &block, const uml::instruction *instlist, u32 numinst) override;
 	virtual bool hash_exists(u32 mode, u32 pc) const noexcept override;
+	virtual void hash_invalidate_range(u32 pcstart, u32 pcend) noexcept override;
 	virtual void get_info(drcbe_info &info) const noexcept override;
 	virtual bool logging() const noexcept override { return bool(m_log); }
 
@@ -1426,6 +1427,17 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, u32 n
 bool drcbe_x64::hash_exists(u32 mode, u32 pc) const noexcept
 {
 	return m_hash.code_exists(mode, pc);
+}
+
+
+//-------------------------------------------------
+//  hash_invalidate_range - invalidate all hash
+//  entries in the given PC range
+//-------------------------------------------------
+
+void drcbe_x64::hash_invalidate_range(u32 pcstart, u32 pcend) noexcept
+{
+	m_hash.invalidate_range(pcstart, pcend);
 }
 
 

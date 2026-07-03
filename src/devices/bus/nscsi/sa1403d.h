@@ -51,7 +51,6 @@ public:
 		SA850  = 3,     // 8" floppy, 2 heads, 77 cylinders
 		SA400  = 4,     // 5.25" floppy, 1 head, 35 cylinders
 		SA450  = 5,     // 5.25" floppy, 2 heads, 40 cylinders
-		RIGID5 = 6,     // 5.25" rigid, SA1004-compatible logical space (Xerox rgd5 box)
 		TYPE_FROM_DIP = 0xff
 	};
 
@@ -125,7 +124,7 @@ private:
 		uint8_t spt_mfm;        // sectors/track, double-density format (rigid: 32/32)
 		bool floppy;
 	};
-	static const drive_geom s_geom[7];
+	static const drive_geom s_geom[6];
 
 	// per-LUN media subdevices: only the ones matching the configured drive
 	// types are instantiated (a LUN left on TYPE_FROM_DIP gets both, since the

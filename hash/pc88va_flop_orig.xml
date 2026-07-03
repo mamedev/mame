@@ -12,6 +12,7 @@ license:CC0-1.0
 		<notes><![CDATA[
 Garbage layer covering title and gameplay (fixed)
 [FDC] randomly doesn't boot
+[keyboard] or [joystick] cannot stop input movement in gameplay (verify, part of the "Special" arrange?)
 ]]></notes>
 		<info name="alt_title" value="アランティアＶＡスペシャル" />
 		<info name="developer" value="Cross Media Soft" />
@@ -37,13 +38,12 @@ Garbage layer covering title and gameplay (fixed)
 		</part>
 	</software>
 
-	<software name="fqueen" supported="no">
+	<software name="fqueen" supported="partial">
 		<description>First Queen</description>
 		<year>1989</year>
 		<publisher>呉ソフトウェア工房 (Kure Software Koubou)</publisher>
 		<notes><![CDATA[
-[gfx] Text boxes often don't draw properly, making readability hard. Comes from graphic layer not IDP.
-[gfx] bitmap draws desynced when scrolling up for a bit, OFY wrap?
+Not extensively tested
 ]]></notes>
 		<info name="alt_title" value="ファーストクイーン" />
 		<info name="release" value="198901xx" />
@@ -53,10 +53,11 @@ Garbage layer covering title and gameplay (fixed)
 				<rom name="firstqueen (disk a).mfi" size="5469380" crc="d6a94fd1" sha1="a11abc42dfa99d45ed4c843efa1eb3b30b6ec8fc" offset="0" />
 			</dataarea>
 		</part>
+		<!-- baddump: contains non-factory save (LV 15, "decisive battlefield"?) -->
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="5842664">
-				<rom name="firstqueen (disk b).mfi" size="5842664" crc="1f89112e" sha1="cadc1dfca83cdcbdb13e82a4f01a5c1ebf54bda3" offset="0" />
+				<rom name="firstqueen (disk b).mfi" size="5842664" crc="1f89112e" sha1="cadc1dfca83cdcbdb13e82a4f01a5c1ebf54bda3" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -66,7 +67,7 @@ Garbage layer covering title and gameplay (fixed)
 		<year>1987</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<notes><![CDATA[
-[FDC] DISK ERROR at startup
+[FDC] DISK ERROR at startup, scans for CHRN=(0, 0, 2, 1024) then R=6 and R=7 in Disk B
 ]]></notes>
 		<info name="alt_title" value="かわいそう物語" />
 		<info name="release" value="198712xx" />

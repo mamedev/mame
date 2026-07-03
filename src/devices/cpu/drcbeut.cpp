@@ -291,6 +291,46 @@ bool drc_hash_table::set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code) no
 }
 
 
+//-------------------------------------------------
+//  invalidate_range - force all blocks in the
+//  given PC range to recompile on their next entry
+//-------------------------------------------------
+
+void drc_hash_table::invalidate_range(uint32_t pcstart, uint32_t pcend) noexcept
+{
+	for (uint32_t mode = 0; mode < m_modes; mode++)
+	{
+		if (m_base[mode] == m_emptyl1)
+		{
+			continue;
+		}
+
+		uint32_t pc = pcstart;
+		while (true)
+		{
+			const uint32_t slotend = std::min<uint64_t>(uint64_t(pc) | ((uint32_t(1) << m_l1shift) - 1), pcend);
+			drccodeptr *const l2 = m_base[mode][(pc >> m_l1shift) & m_l1mask];
+			if (l2 != m_emptyl2)
+			{
+				for (uint32_t p = pc; p <= slotend; p += uint32_t(1) << m_l2shift)
+				{
+					l2[(p >> m_l2shift) & m_l2mask] = m_nocodeptr;
+					if (p > 0xffff'ffff - (uint32_t(1) << m_l2shift))
+						break;
+				}
+			}
+
+			if (slotend >= pcend)
+			{
+				break;
+			}
+
+			pc = slotend + 1;
+		}
+	}
+}
+
+
 
 //**************************************************************************
 //  DRC MAP VARIABLES

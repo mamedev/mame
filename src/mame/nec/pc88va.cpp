@@ -510,13 +510,12 @@ void pc88va_state::misc_ctrl_w(uint8_t data)
 
 void pc88va_state::main_map(address_map &map)
 {
-	map(0x00000, 0x7ffff).ram().share("workram");
+	map(0x00000, 0x9ffff).ram().share("workram");
 //  map(0x80000, 0x9ffff).ram(); // EMM
 	// TODO: no idea how EMM works yet
 	// - Regular V1/V2 should use ports $e2/$e3 like base
 	// - Guess it's not C-Bus compatible but rather PC-88VA-01/-02 doing the trick for all modes.
 	// - hatisora wants the segment populated otherwise it crashes after stage 1
-	map(0x80000, 0x9ffff).ram();
 	map(0xa0000, 0xdffff).m(m_sysbank, FUNC(address_map_bank_device::amap16));
 	map(0xe0000, 0xeffff).bankr("rom00_bank");
 	map(0xf0000, 0xfffff).bankr("rom10_bank");
@@ -548,7 +547,7 @@ void pc88va_state::sysbank_map(address_map &map)
 // SGP has its own window space about how and what it can see on RMW
 void pc88va_state::sgp_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).ram().share("workram");
+	map(0x000000, 0x09ffff).ram().share("workram");
 //  map(0x080000, 0x09ffff) more main RAM or EMM
 //  map(0x0a0000, 0x0fffff) EMM $a0000 to $fffff (?)
 	map(0x100000, 0x13ffff).rom().region("kanji", 0x00000);
@@ -627,8 +626,10 @@ void pc88va_state::io_map(address_map &map)
 //  map(0x0158, 0x0159) Interruption Mode Modification (strobe), changes i8214 mode to i8259, cannot be changed back
 //  map(0x015c, 0x015f) NMI mask port (strobe port)
 //  map(0x0160, 0x016f) V50 DMAC
-//  map(0x0180, 0x0180) read by olteus and micromus (?)
-	map(0x0184, 0x0187).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+//  map(0x0180, 0x0180) read by olteus and micromus
+//  causes extra GFX corruption in former if high (?)
+	map(0x0180, 0x0181).lr8(NAME([] () { return 0; }));
+	map(0x0184, 0x0187).rw("pic2", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 //  map(0x0188, 0x018b) V50 ICU
 //  map(0x0190, 0x0191) System Port 5
 	map(0x0190, 0x0190).rw(FUNC(pc88va_state::sys_port5_r), FUNC(pc88va_state::sys_port5_w));
@@ -786,23 +787,54 @@ void pc88va_state::io_map(address_map &map)
 			m_singleplane.wss = (data >> 3) & 3;
 		})
 	);
-	map(0x0590, 0x0593).umask16(0x00ff).lrw8(
+	// NOTE: Singleplane PATR and ROP allows word write (ballbrkr title screen, in RGB565)
+	// but anything else will byte write here, so propagate thru the mem_mask
+	map(0x0590, 0x0593).lrw16(
 		NAME([this] (offs_t offset) {
 			LOGGFXCTRL("Singleplane PATR%d R\n", offset);
-			return m_singleplane.patr[offset];
+			return m_singleplane.patr[offset << 1] | (m_singleplane.patr[(offset << 1) | 1] << 8);
 		}),
-		NAME([this] (offs_t offset, u8 data) {
-			LOGGFXCTRL("Singleplane PATR%d W %02x\n", offset, data);
-			m_singleplane.patr[offset] = data;
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			if (mem_mask == 0xffff)
+			{
+				m_singleplane.patr[(offset << 1) | 0] = data & 0xff;
+				m_singleplane.patr[(offset << 1) | 1] = data >> 8;
+			}
+			else if (mem_mask == 0x00ff)
+			{
+				m_singleplane.patr[(offset << 1) | 0] = data & 0xff;
+				m_singleplane.patr[(offset << 1) | 1] = data & 0xff;
+			}
+			else
+			{
+				m_singleplane.patr[(offset << 1) | 0] = data >> 8;
+				m_singleplane.patr[(offset << 1) | 1] = data >> 8;
+			}
+			LOGGFXCTRL("Singleplane PATR%d W %04x & %04x\n", offset, data, mem_mask);
 		})
 	);
-	map(0x05a0, 0x05a3).umask16(0x00ff).lrw8(
+	map(0x05a0, 0x05a3).lrw16(
 		NAME([this] (offs_t offset) {
-			return m_singleplane.rop[offset];
+			return m_singleplane.rop[offset << 1] | (m_singleplane.rop[(offset << 1) | 1] << 8);
 		}),
-		NAME([this] (offs_t offset, u8 data) {
-			LOGGFXCTRL("Singleplane ROP %d W %02x\n", offset, data);
-			m_singleplane.rop[offset] = data;
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			if (mem_mask == 0xffff)
+			{
+				m_singleplane.rop[(offset << 1) | 0] = data & 0xff;
+				m_singleplane.rop[(offset << 1) | 1] = data >> 8;
+			}
+			else if (mem_mask == 0x00ff)
+			{
+				m_singleplane.rop[(offset << 1) | 0] = data & 0xff;
+				m_singleplane.rop[(offset << 1) | 1] = data & 0xff;
+			}
+			else
+			{
+				m_singleplane.rop[(offset << 1) | 0] = data >> 8;
+				m_singleplane.rop[(offset << 1) | 1] = data >> 8;
+			}
+
+			LOGGFXCTRL("Singleplane ROP%d W %04x & %04x\n", offset, data, mem_mask);
 		})
 	);
 
@@ -1122,9 +1154,9 @@ void pc88va_state::pc88va_cbus(machine_config &config)
 	m_cbus_root->int_cb<0>().set_inputline(m_maincpu, INPUT_LINE_IRQ3);
 	m_cbus_root->int_cb<1>().set_inputline(m_maincpu, INPUT_LINE_IRQ5);
 	m_cbus_root->int_cb<2>().set_inputline(m_maincpu, INPUT_LINE_IRQ6);
-	m_cbus_root->int_cb<3>().set("pic8259_slave", FUNC(pic8259_device::ir1_w));
+	m_cbus_root->int_cb<3>().set("pic2", FUNC(pic8259_device::ir1_w));
 	// TODO: or ir3_w?
-	m_cbus_root->int_cb<4>().set("pic8259_slave", FUNC(pic8259_device::ir2_w));
+	m_cbus_root->int_cb<4>().set("pic2", FUNC(pic8259_device::ir2_w));
 	m_cbus_root->drq_cb<0>().set(m_maincpu, FUNC(v50_device::dreq_w<0>)).invert();
 	m_maincpu->in_ior_cb<0>().set([this] () { return m_cbus_root->dack_r(0); });
 	m_maincpu->out_iow_cb<0>().set([this] (u8 data) { m_cbus_root->dack_w(0, data); });
@@ -1138,19 +1170,22 @@ void pc88va_state::pc88va_cbus(machine_config &config)
 
 void pc88va_state::pc88va(machine_config &config)
 {
-	V50(config, m_maincpu, MASTER_CLOCK); // μPD9002, aka V50 + μPD70008AC (for PC8801 compatibility mode) in place of 8080
+	// μPD9002, aka V50 + μPD70008AC (for PC8801 compatibility mode) in place of 8080
+	// HACK: bump by x2 for now to avoid slowdowns (shinraba, hatisora) to progressive corruption (olteus)
+	V50(config, m_maincpu, MASTER_CLOCK * 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc88va_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &pc88va_state::io_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(pc88va_state::vrtc_irq), "screen", 0, 1);
 	m_maincpu->icu_slave_ack_cb().set(m_pic2, FUNC(pic8259_device::acknowledge));
 	// beep and RS-232C runs at regular 3'993'600
-	m_maincpu->set_tclk(MASTER_CLOCK / 2);
+	m_maincpu->set_tclk((MASTER_CLOCK * 2) / 2);
 	// "timer 1"
 //  m_maincpu->tout0_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_maincpu->tout1_cb().set(m_dac1bit, FUNC(speaker_sound_device::level_w));
 //  m_maincpu->tout2_cb().set RS-232C Baud Rate Setting
 	// ch2 is FDC, ch0/3 are "user". ch1 is unused
-	m_maincpu->out_hreq_cb().set(m_maincpu, FUNC(v50_device::hack_w));
+	m_maincpu->out_hreq_cb().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_maincpu->out_hreq_cb().append(m_maincpu, FUNC(v50_device::hack_w));
 	m_maincpu->out_eop_cb().set(FUNC(pc88va_state::tc_w));
 	m_maincpu->in_ior_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_r));
 	m_maincpu->out_iow_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_w));
@@ -1175,6 +1210,7 @@ void pc88va_state::pc88va(machine_config &config)
 
 	PC88VA_SGP(config, m_sgp);
 	m_sgp->set_map(&pc88va_state::sgp_map);
+//  m_sgp->irq_cb().set("pic2", FUNC(pic8259_device::ir0_w));
 
 	i8255_device &d8255_3(I8255(config, "d8255_3"));
 	d8255_3.in_pa_callback().set(FUNC(pc88va_state::r232_ctrl_porta_r));
