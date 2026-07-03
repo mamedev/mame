@@ -53,7 +53,7 @@ private:
 	uint8_t m_last_area_accessed; // last memory area accessed for WCR1 timing purposes
 	bool m_last_area_accessed_was_write; // last memory area accessed operation also for WCR1 timing purposes
 	unsigned int m_wb_active_cycles; // Track any background cycles for writeback and precharge waits on the same bank
-	unsigned int m_last_sdram_page; // Last accessed sdram page, used to track when to have to pay tpc(precharge) cost
+	unsigned int m_last_sdram_bank; // Last accessed sdram bank, used to track when to have to pay tpc(precharge) cost
 	unsigned int m_precharge_remaining_cycles;
 
 	bool cache_access(uint32_t address, bool write);
@@ -67,6 +67,7 @@ private:
 	uint32_t mcr_trwl();
 	uint32_t mcr_tras();
 	uint32_t cache_line_fetch_count(uint32_t address);
+	uint32_t sdram_bank(uint32_t address);
 };
 
 DECLARE_DEVICE_TYPE(SH7709S, sh7709s_device)
