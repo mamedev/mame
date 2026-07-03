@@ -46,6 +46,17 @@
 				]]></data>
 		</image>
 	</element>
+	<element name="multipage_4_29775_x_4_44107">
+		<image>
+			<bounds x="0" y="0" width="6.81056" height="5.12263" />
+			<data>
+				<![CDATA[
+					<svg x="0" y="0" width="6.81056" height="5.12263" viewBox="0 0 6.81056 5.12263">
+						<path d="M 1 0.125 l 5.68556 0 -0.77001 3.62263 M 0 1.125 l 5.473 0 -0.77001 3.62263" fill="none" stroke="#ffffff" stroke-width="0.25" />
+					</svg>
+				]]></data>
+		</image>
+	</element>
 	<element name="media_cartridge">
 		<image state="0">
 			<data>
@@ -465,67 +476,43 @@
 	</element>
 	<!-- Button shapes -->
 	<element name="button_15_8x5_dark">
-		<image state="0">
-			<color red="0.06667" green="0.06667" blue="0.06667" />
+		<image>
 			<data>
 				<![CDATA[
 					<svg width="15.8" height="5" viewBox="0 0 15.8 5"><rect x="0.25" y="0.25" width="15.3" height="4.5" rx="1.25" fill="white" stroke="none" /></svg>
 				]]></data>
-		</image>
-		<image state="1">
-			<color red="1" green="1" blue="1" />
-			<data>
-				<![CDATA[
-					<svg width="15.8" height="5" viewBox="0 0 15.8 5"><rect x="0.25" y="0.25" width="15.3" height="4.5" rx="1.25" fill="white" stroke="none" /></svg>
-				]]></data>
+			<color state="0" red="0.06667" green="0.06667" blue="0.06667" />
+			<color state="1" red="1" green="1" blue="1" />
 		</image>
 	</element>
 	<element name="button_15_8x5_screen">
-		<image state="0">
-			<color red="0.16471" green="0.16471" blue="0.16471" />
+		<image>
 			<data>
 				<![CDATA[
 					<svg width="15.8" height="5" viewBox="0 0 15.8 5"><rect x="0.25" y="0.25" width="15.3" height="4.5" rx="1.25" fill="white" stroke="none" /></svg>
 				]]></data>
-		</image>
-		<image state="1">
-			<color red="1" green="1" blue="1" />
-			<data>
-				<![CDATA[
-					<svg width="15.8" height="5" viewBox="0 0 15.8 5"><rect x="0.25" y="0.25" width="15.3" height="4.5" rx="1.25" fill="white" stroke="none" /></svg>
-				]]></data>
+			<color state="0" red="0.16471" green="0.16471" blue="0.16471" />
+			<color state="1" red="1" green="1" blue="1" />
 		</image>
 	</element>
 	<element name="button_15_8x10_light">
-		<image state="0">
-			<color red="0.73333" green="0.73333" blue="0.73333" />
+		<image>
 			<data>
 				<![CDATA[
 					<svg width="15.8" height="10" viewBox="0 0 15.8 10"><rect x="0.25" y="0.25" width="15.3" height="9.5" rx="1.25" fill="white" stroke="none" /></svg>
 				]]></data>
-		</image>
-		<image state="1">
-			<color red="1" green="1" blue="1" />
-			<data>
-				<![CDATA[
-					<svg width="15.8" height="10" viewBox="0 0 15.8 10"><rect x="0.25" y="0.25" width="15.3" height="9.5" rx="1.25" fill="white" stroke="none" /></svg>
-				]]></data>
+			<color state="0" red="0.73333" green="0.73333" blue="0.73333" />
+			<color state="1" red="1" green="1" blue="1" />
 		</image>
 	</element>
 	<element name="button_15_8x10_medium">
-		<image state="0">
-			<color red="0.46667" green="0.46667" blue="0.46667" />
+		<image>
 			<data>
 				<![CDATA[
 					<svg width="15.8" height="10" viewBox="0 0 15.8 10"><rect x="0.25" y="0.25" width="15.3" height="9.5" rx="1.25" fill="white" stroke="none" /></svg>
 				]]></data>
-		</image>
-		<image state="1">
-			<color red="1" green="1" blue="1" />
-			<data>
-				<![CDATA[
-					<svg width="15.8" height="10" viewBox="0 0 15.8 10"><rect x="0.25" y="0.25" width="15.3" height="9.5" rx="1.25" fill="white" stroke="none" /></svg>
-				]]></data>
+			<color state="0" red="0.46667" green="0.46667" blue="0.46667" />
+			<color state="1" red="1" green="1" blue="1" />
 		</image>
 	</element>
 	<element name="psel_9x12">
@@ -542,6 +529,32 @@
 				<![CDATA[
 					<svg width="9" height="12" viewBox="0 0 9 12"><rect x="0" y="0" width="9" height="12" rx="0" fill="white" stroke="none" /></svg>
 				]]></data>
+		</image>
+	</element>
+	<element name="fs_right">
+		<image>
+			<data>
+				<![CDATA[
+					<svg width="45" height="100" viewBox="0 0 45 100"><svg x="0" y="0" width="45" height="100" viewBox="0 0 45 100">
+						<path d="M0,0V70C0,90 15,100 25,100 36,100 45,92 45,82 45,63 25,50 25,20V0Z" fill="#878787" stroke="none" />
+						<path d="M3.5,0V70C3.5,88.25 17.33333,96.5 25,96.5 34.30303,96.5 41.5,89.9 41.5,82 41.5,73.72807 36.97898,66.27187 31.91211,56.77148 26.84524,47.2711 21.5,35.77778 21.5,20V0Z" fill="#bbbbbb" stroke="none" />
+					</svg></svg>
+				]]></data>
+			<color state="0" red="1" green="1" blue="1" />
+			<color state="1" red="0.78431" green="0.78431" blue="0.78431" />
+		</image>
+	</element>
+	<element name="fs_left">
+		<image>
+			<data>
+				<![CDATA[
+					<svg width="45" height="100" viewBox="0 0 45 100"><svg x="0" y="0" width="45" height="100" viewBox="0 0 45 100">
+						<path d="M45,0V70C45,90 30,100 20,100 9,100 0,92 0,82 0,63 20,50 20,20V0Z" fill="#878787" stroke="none" />
+						<path d="M41.5,0V70C41.5,88.25 27.66667,96.5 20,96.5 10.69697,96.5 3.5,89.9 3.5,82 3.5,73.72807 8.02102,66.27187 13.08789,56.77148 18.15476,47.2711 23.5,35.77778 23.5,20V0Z" fill="#bbbbbb" stroke="none" />
+					</svg></svg>
+				]]></data>
+			<color state="0" red="1" green="1" blue="1" />
+			<color state="1" red="0.78431" green="0.78431" blue="0.78431" />
 		</image>
 	</element>
 
@@ -1098,6 +1111,12 @@
 		</element>
 		<element ref="rect_white">
 			<bounds x="35.82074" y="75.47244" width="11.57926" height="0.25" />
+		</element>
+		<element ref="multipage_7_x_4_44107">
+			<bounds x="65.30325" y="75.3" width="9.51281" height="5.12263" />
+		</element>
+		<element ref="multipage_4_29775_x_4_44107">
+			<bounds x="100.25233" y="75.3" width="6.81056" height="5.12263" />
 		</element>
 		<element ref="rect_vfx">
 			<bounds x="0" y="102" width="58.5" height="1.2" />
@@ -2365,6 +2384,17 @@
 	</group>
 
 	<view name="Full">
+		<collection name="Pedals" visible="no">
+			<element ref="rect_black">
+				<bounds x="-156" y="302.5" width="1023" height="100" />
+			</element>
+			<element ref="fs_right" inputtag="panel:buttons_0" inputmask="0x00000001">
+				<bounds x="379" y="302.5" width="45" height="100" />
+			</element>
+			<element ref="fs_left" inputtag="panel:buttons_0" inputmask="0x00000002">
+				<bounds x="287" y="302.5" width="45" height="100" />
+			</element>
+		</collection>
 		<element ref="rect_black">
 			<bounds x="-156" y="-32" width="1023" height="334.5" />
 		</element>
@@ -2445,6 +2475,20 @@
 		</element>
 	</view>
 	<view name="Compact">
+		<collection name="Pedals" visible="no">
+			<element ref="rect_black">
+				<bounds x="-95" y="254.2" width="578.2" height="60" />
+			</element>
+			<element ref="fs_right" inputtag="panel:buttons_0" inputmask="0x00000001">
+				<bounds x="217.6" y="214.2" width="45" height="100" />
+			</element>
+			<element ref="fs_left" inputtag="panel:buttons_0" inputmask="0x00000002">
+				<bounds x="125.6" y="214.2" width="45" height="100" />
+			</element>
+			<element ref="rect_black" clickthrough="no">
+				<bounds x="125.6" y="214.2" width="137" height="40" />
+			</element>
+		</collection>
 		<element ref="rect_panel">
 			<bounds x="-95" y="-11.94107" width="578.2" height="107.14107" />
 		</element>
