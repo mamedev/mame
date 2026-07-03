@@ -316,7 +316,7 @@ uint32_t sh7709s_device::cache_line_fetch_count(uint32_t address)
 // can amortize a couple of the remaining cyles of the read. These don't amount to too much for
 // now though
 #define BURST_READ_WORD_PENALTY (3)
-#define BURST_WRITE_WORD_PENALTY (4)
+#define BURST_WRITE_WORD_PENALTY (3)
 
 // cpu->bus cycle conversion hardcoded to 2x as cv1k sh3 runs the bus at 50mhz
 unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
