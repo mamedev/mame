@@ -1184,7 +1184,8 @@ void pc88va_state::pc88va(machine_config &config)
 	m_maincpu->tout1_cb().set(m_dac1bit, FUNC(speaker_sound_device::level_w));
 //  m_maincpu->tout2_cb().set RS-232C Baud Rate Setting
 	// ch2 is FDC, ch0/3 are "user". ch1 is unused
-	m_maincpu->out_hreq_cb().set(m_maincpu, FUNC(v50_device::hack_w));
+	m_maincpu->out_hreq_cb().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_maincpu->out_hreq_cb().append(m_maincpu, FUNC(v50_device::hack_w));
 	m_maincpu->out_eop_cb().set(FUNC(pc88va_state::tc_w));
 	m_maincpu->in_ior_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_r));
 	m_maincpu->out_iow_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_w));
