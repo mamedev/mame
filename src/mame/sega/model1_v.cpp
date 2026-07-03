@@ -904,7 +904,9 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 
 		if (flags & 0x00001000)
 			tex_adr++;
-		int lightmode = (flags >> 17) & 15;
+		int lightmode = ((flags >> 17) & 15) | m_view->light_bank;
+		if (!m_view->lightparam_set[lightmode] && m_view->lightparam_set[lightmode | 0x80])
+			lightmode |= 0x80;
 
 		point_t *p0 = m_pointpt++;
 		point_t *p1 = m_pointpt++;
@@ -1351,6 +1353,9 @@ void model1_state::view_t::set_viewport(float xcenter, float ycenter, float xl, 
 
 void model1_state::view_t::set_lightparam(int index, float diffuse, float ambient, float specular, int power)
 {
+	if (index >= 0x80)
+		lightparams_hi_seen = true;
+	lightparam_set[index] = true;
 	lightparams[index].d = diffuse;
 	lightparams[index].a = ambient;
 	lightparams[index].s = specular;
@@ -1397,6 +1402,7 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect, r
 		LOGMASKED(LOG_TGP, "VIDEO: render list %d\n", get_list_number());
 
 		m_view->init_translation_matrix();
+		m_view->light_bank = 0;
 
 		int list_offset = 0;
 		for (;;) {
@@ -1492,6 +1498,7 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect, r
 			}
 			case 7:
 				LOGMASKED(LOG_TGP, "VIDEO:   code 7 (%d)\n", readi(list_offset + 2));
+				m_view->light_bank = (readi(list_offset + 2) == 0 && m_view->lightparams_hi_seen) ? 0x80 : 0;
 				list_offset += 4;
 				break;
 			case 8:
@@ -1780,7 +1787,7 @@ uint32_t model1_state::screen_update_model1(screen_device &screen, bitmap_rgb32 
 	view->ayys = sin(view->ayy);
 
 	screen.priority().fill(0);
-	bitmap.fill(m_palette->pen(0x400), cliprect);
+	bitmap.fill(m_palette->pen(0), cliprect);
 
 	// draw tilemap B as opaque
 	m_tiles->draw(screen, bitmap, cliprect, 6, 0, TILEMAP_DRAW_OPAQUE);

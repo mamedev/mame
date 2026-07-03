@@ -191,7 +191,10 @@ private:
 		float vxx = 0, vyy = 0, vzz = 0, ayy = 0, ayyc = 0, ayys = 0;
 		float translation[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 		glm::vec3 light;
-		lightparam_t lightparams[32];
+		lightparam_t lightparams[256];
+		bool lightparam_set[256]{};
+		int light_bank = 0;
+		bool lightparams_hi_seen = false;
 	};
 
 	void model1_io(address_map &map) ATTR_COLD;
