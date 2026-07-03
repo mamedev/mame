@@ -97,14 +97,13 @@ For all other functionality, see the owner's manual.
 
 #include "sequential_sixtrak.lh"
 
-#define LOG_CV              (1U << 1)
-#define LOG_KEYS            (1U << 2)
-#define LOG_ADC_VALUE_KNOB  (1U << 3)
-#define LOG_ADC_PITCH_WHEEL (1U << 4)
-#define LOG_VOLUME          (1U << 5)
-#define LOG_AUTOTUNE        (1U << 6)
-#define LOG_CALIBRATION     (1U << 7)
-#define LOG_WHEEL_RC        (1U << 8)
+#define LOG_KEYS            (1U << 1)
+#define LOG_ADC_VALUE_KNOB  (1U << 2)
+#define LOG_ADC_PITCH_WHEEL (1U << 3)
+#define LOG_VOLUME          (1U << 4)
+#define LOG_AUTOTUNE        (1U << 5)
+#define LOG_CALIBRATION     (1U << 6)
+#define LOG_WHEEL_RC        (1U << 7)
 
 #define VERBOSE (LOG_CALIBRATION)
 //#define LOG_OUTPUT_FUNC osd_printf_info
