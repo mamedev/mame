@@ -10,7 +10,6 @@
 
     TODO:
 
-    - microdrive
     - ZX8301 memory access slowdown
     - use resnet.h to create palette
     - Tyche bios is broken

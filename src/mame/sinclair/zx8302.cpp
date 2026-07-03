@@ -11,8 +11,6 @@
     TODO:
 
     - set time
-    - read from microdrive
-    - write to microdrive
     - DTR/CTS handling
     - network
 
@@ -31,9 +29,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG     1
-#define LOG_IPC 1
-#define LOG_CLK 0
+#define LOG 1
 
 
 // Monday 1st January 1979 00:00:00 UTC
@@ -97,7 +93,7 @@ inline void zx8302_device::transmit_ipc_data()
 	switch (m_ipc_state)
 	{
 	case IPC_START:
-		if (LOG_IPC) logerror("ZX8302 '%s' COMDATA Start Bit\n", tag());
+		if (LOG) logerror("ZX8302 '%s' COMDATA Start Bit\n", tag());
 
 		m_out_comdata_cb(BIT(m_idr, 0));
 		m_ipc_busy = 1;
@@ -105,7 +101,7 @@ inline void zx8302_device::transmit_ipc_data()
 		break;
 
 	case IPC_DATA:
-		if (LOG_IPC) logerror("ZX8302 '%s' COMDATA Data Bit: %x\n", tag(), BIT(m_idr, 1));
+		if (LOG) logerror("ZX8302 '%s' COMDATA Data Bit: %x\n", tag(), BIT(m_idr, 1));
 
 		m_comdata_to_ipc = BIT(m_idr, 1);
 		m_out_comdata_cb(m_comdata_to_ipc);
@@ -113,7 +109,7 @@ inline void zx8302_device::transmit_ipc_data()
 		break;
 
 	case IPC_STOP:
-		if (LOG_IPC) logerror("ZX8302 '%s' COMDATA Stop Bit\n", tag());
+		if (LOG) logerror("ZX8302 '%s' COMDATA Stop Bit\n", tag());
 
 		m_out_comdata_cb(BIT(m_idr, 2));
 		m_ipc_busy = 0;
@@ -354,21 +350,24 @@ void zx8302_device::control_w(uint8_t data)
 
 uint8_t zx8302_device::mdv_track_r(offs_t offset)
 {
-	int track = offset & 1;
+	const int track = offset & 1;
 	uint8_t data = m_mdv_data[track];
 
 	if (LOG)
 	{
-		static int s_mdv_read_count = 0;
-		logerror("ZX8302 '%s' MDV Track %u #%d: %02x (rxfull=%d)\n",
-			tag(), track + 1, s_mdv_read_count, data,
+		logerror("ZX8302 '%s' MDV Track %u: %02x (rxfull=%d)\n",
+			tag(), track + 1, data,
 			(m_status & STATUS_RX_BUFFER_FULL) ? 1 : 0);
-		s_mdv_read_count++;
 	}
 
-	// reading track 2 (pc_trak2) releases the buffer for the next byte pair
-	if (track == 1)
-		m_status &= ~STATUS_RX_BUFFER_FULL;
+	if (!machine().side_effects_disabled())
+	{
+		if (track == 1)
+		{
+			// reading track 2 (pc_trak2) releases the buffer for the next byte pair
+			m_status &= ~STATUS_RX_BUFFER_FULL;
+		}
+	}
 
 	return data;
 }
@@ -414,7 +413,7 @@ uint8_t zx8302_device::status_r()
 	// COMDATA
 	data |= m_comdata_to_cpu << 7;
 
-	if (LOG_IPC) logerror("ZX8302 '%s' Read Status: %02x\n", tag(), data);
+	if (LOG) logerror("ZX8302 '%s' Read Status: %02x\n", tag(), data);
 
 	return data;
 }
@@ -436,7 +435,7 @@ uint8_t zx8302_device::status_r()
 
 void zx8302_device::ipc_command_w(uint8_t data)
 {
-	if (LOG_IPC) logerror("ZX8302 '%s' IPC Command: %02x\n", tag(), data);
+	if (LOG) logerror("ZX8302 '%s' IPC Command: %02x\n", tag(), data);
 
 	m_idr = data;
 	m_ipc_state = IPC_START;
@@ -466,7 +465,7 @@ void zx8302_device::mdv_control_w(uint8_t data)
 
 	*/
 
-	if (LOG_CLK) logerror("ZX8302 '%s' Microdrive Control: %02x\n", tag(), data);
+	if (LOG) logerror("ZX8302 '%s' Microdrive Control: %02x\n", tag(), data);
 
 	m_out_mdseld_cb(BIT(data, 0));
 	m_out_mdselck_cb(BIT(data, 1));
@@ -523,7 +522,7 @@ uint16_t zx8302_device::mdv_tx_pop()
 
 uint8_t zx8302_device::irq_status_r()
 {
-	if (LOG_IPC) logerror("ZX8302 '%s' Interrupt Status: %02x\n", tag(), m_irq);
+	if (LOG) logerror("ZX8302 '%s' Interrupt Status: %02x\n", tag(), m_irq);
 
 	return m_irq;
 }
@@ -535,7 +534,7 @@ uint8_t zx8302_device::irq_status_r()
 
 void zx8302_device::irq_acknowledge_w(uint8_t data)
 {
-	if (LOG_CLK) logerror("ZX8302 '%s' Interrupt Acknowledge: %02x\n", tag(), data);
+	if (LOG) logerror("ZX8302 '%s' Interrupt Acknowledge: %02x\n", tag(), data);
 
 	// bits 7-5 are the interrupt mask, bits 4-0 clear pending interrupts
 	m_irq_mask = data & 0xe0;
@@ -597,7 +596,7 @@ void zx8302_device::vsync_w(int state)
 {
 	if (state)
 	{
-		if (LOG_CLK) logerror("ZX8302 '%s' Frame Interrupt\n", tag());
+		if (LOG) logerror("ZX8302 '%s' Frame Interrupt\n", tag());
 
 		trigger_interrupt(INT_FRAME);
 	}
@@ -610,7 +609,7 @@ void zx8302_device::vsync_w(int state)
 
 void zx8302_device::comctl_w(int state)
 {
-	if (LOG_IPC) logerror("ZX8302 '%s' COMCTL: %x\n", tag(), state);
+	if (LOG) logerror("ZX8302 '%s' COMCTL: %x\n", tag(), state);
 
 	if (state)
 	{
@@ -628,7 +627,7 @@ void zx8302_device::comctl_w(int state)
 
 void zx8302_device::comdata_w(int state)
 {
-	if (LOG_IPC) logerror("ZX8302 '%s' COMDATA->CPU(pending): %x\n", tag(), state);
+	if (LOG) logerror("ZX8302 '%s' COMDATA->CPU(pending): %x\n", tag(), state);
 
 	m_comdata_from_ipc = state;
 }
@@ -710,12 +709,9 @@ void zx8302_device::raw2_w(int state)
 
 		if (LOG)
 		{
-			static int s_mdv_byte_count = 0;
-			logerror("ZX8302 '%s' MDV byte#%d: t1=%02x t2=%02x\n",
-				tag(), s_mdv_byte_count, m_mdv_data[0], m_mdv_data[1]);
-			s_mdv_byte_count++;
+			logerror("ZX8302 '%s' MDV byte: t1=%02x t2=%02x\n",
+				tag(), m_mdv_data[0], m_mdv_data[1]);
 		}
-		return;
 	}
 }
 
