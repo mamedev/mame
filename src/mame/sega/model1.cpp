@@ -902,11 +902,14 @@ void model1_state::machine_reset()
 			}
 		}
 
-		int16_t pose[6] = {0, 0, 0, 12868, 25736, 12868};
-		for (int i = 0; i < 6; i++)
+		if (m_dpram)
 		{
-			m_dpram->left_w(0x80 + i*2, pose[i] >> 8);
-			m_dpram->left_w(0x81 + i*2, pose[i] & 0xff);
+			int16_t pose[6] = {0, 0, 0, 12868, 25736, 12868};
+			for (int i = 0; i < 6; i++)
+			{
+				m_dpram->left_w(0x80 + i*2, pose[i] & 0xff);
+				m_dpram->left_w(0x81 + i*2, (pose[i] >> 8) & 0xff);
+			}
 		}
 	}
 	else
@@ -1182,7 +1185,7 @@ static INPUT_PORTS_START( netmerc )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("STICKX")
-	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 
 	PORT_START("STICKY")
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
