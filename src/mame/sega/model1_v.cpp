@@ -919,6 +919,13 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 		p1->y = poly_data[poly_adr + 8];
 		p1->z = poly_data[poly_adr + 9];
 
+		if (type == 2)
+		{
+			p1->x = p0->x;
+			p1->y = p0->y;
+			p1->z = p0->z;
+		}
+
 		int link = (flags >> 8) & 3;
 
 		m_view->transform_vector(vn);
