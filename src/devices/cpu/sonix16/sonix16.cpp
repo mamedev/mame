@@ -197,13 +197,13 @@ void sonix16_device::inten_w(u16 data)
 
 u16 sonix16_device::wdt_r()
 {
-	return m_wdt | 0x4000;
+	return m_wdt;
 }
 
 void sonix16_device::wdt_w(u16 data)
 {
 	// Watchdog timer (TODO)
-	if (!BIT(data, 14))
+	if (BIT(data, 14))
 		logerror("%s: WDT reset\n", machine().describe_context());
 	if (BIT(~data & m_wdt, 15))
 		logerror("%s: WDT disabled\n", machine().describe_context());
@@ -503,12 +503,12 @@ void sonix16_device::execute_run()
 			u16 op = m_r[BIT(inst, 0, 2) + (BIT(inst, 1) ? 0 : 4)];
 			switch (BIT(inst, 3, 2))
 			{
-			case 0: // BSET
-				op |= 1 << bit;
+			case 0: // BCLR
+				op &= ~(1 << bit);
 				break;
 
-			case 1: // BCLR
-				op &= ~(1 << bit);
+			case 1: // BSET
+				op |= 1 << bit;
 				break;
 
 			case 2: // BTOG
