@@ -67,6 +67,7 @@ public:
 	bool set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code) noexcept;
 	drccodeptr get_codeptr(uint32_t mode, uint32_t pc) const noexcept { assert(mode < m_modes); return m_base[mode][(pc >> m_l1shift) & m_l1mask][(pc >> m_l2shift) & m_l2mask]; }
 	bool code_exists(uint32_t mode, uint32_t pc) const noexcept { return get_codeptr(mode, pc) != m_nocodeptr; }
+	void invalidate_range(uint32_t pcstart, uint32_t pcend) noexcept;
 
 private:
 	static constexpr unsigned L1_ALLOCATION = 2;

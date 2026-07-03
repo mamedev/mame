@@ -152,6 +152,7 @@ public:
 	virtual int execute(uml::code_handle &entry) = 0;
 	virtual void generate(drcuml_block &block, uml::instruction const *instlist, u32 numinst) = 0;
 	virtual bool hash_exists(u32 mode, u32 pc) const noexcept = 0;
+	virtual void hash_invalidate_range(u32 pcstart, u32 pcend) noexcept = 0;
 	virtual void get_info(drcbe_info &info) const noexcept = 0;
 	virtual bool logging() const noexcept { return false; }
 
@@ -191,6 +192,7 @@ public:
 	// back-end interface
 	void get_backend_info(drcbe_info &info) const { m_beintf->get_info(info); }
 	bool hash_exists(u32 mode, u32 pc) const { return m_beintf->hash_exists(mode, pc); }
+	void hash_invalidate_range(u32 pcstart, u32 pcend) { m_beintf->hash_invalidate_range(pcstart, pcend); }
 	void generate(drcuml_block &block, uml::instruction *instructions, u32 count) { m_beintf->generate(block, instructions, count); }
 
 	// handle management
