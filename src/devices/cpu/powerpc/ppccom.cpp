@@ -855,7 +855,7 @@ void ppc_device::device_start()
 
 	uint32_t flags = 0;
 	/* initialize the UML generator */
-	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 8, 32, 2);
+	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 8, 32, 2, COMPILE_FORWARDS_BYTES);
 
 	/* add symbols for our stuff */
 	m_drcuml->symbol_add(&m_core->pc, sizeof(m_core->pc), "pc");

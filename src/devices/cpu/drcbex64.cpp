@@ -1018,7 +1018,7 @@ void drcbe_x64::emit_memaccess_setup(Assembler &a, const memory_accessors &acces
 
 drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u32 flags, int modes, int addrbits, int ignorebits)
 	: drcbe_interface(drcuml, cache, device)
-	, m_hash(cache, modes, addrbits, ignorebits)
+	, m_hash(cache, modes, addrbits, ignorebits, drcuml.max_sequence_length())
 	, m_map(cache, 0xaaaaaaaa5555)
 	, m_log_asmjit(nullptr)
 	, m_lzcnt(false)

@@ -129,7 +129,7 @@ void sh_common_execution::drc_start()
 
 	/* initialize the UML generator */
 	uint32_t flags = 0;
-	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 1, 32, 1);
+	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 1, 32, 1, COMPILE_FORWARDS_BYTES);
 
 	/* add symbols for our stuff */
 	m_drcuml->symbol_add(&m_sh2_state->pc, sizeof(m_sh2_state->pc), "pc");

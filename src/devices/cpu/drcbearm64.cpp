@@ -1557,7 +1557,7 @@ inline void drcbe_arm64::calculate_carry_shift_right_imm(a64::Assembler &a, cons
 
 drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits)
 	: drcbe_interface(drcuml, cache, device)
-	, m_hash(cache, modes, addrbits, ignorebits, std::align_val_t(1 << 12), std::align_val_t(1 << 12))
+	, m_hash(cache, modes, addrbits, ignorebits, drcuml.max_sequence_length(), std::align_val_t(1 << 12), std::align_val_t(1 << 12))
 	, m_map(cache, 0xaaaaaaaa5555)
 	, m_log_asmjit(nullptr)
 	, m_carry_state(carry_state::POISON)

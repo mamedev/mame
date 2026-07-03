@@ -1567,7 +1567,7 @@ void hyperstone_device::device_start()
 	if (m_enable_drc)
 	{
 		const uint32_t umlflags = 0;
-		m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 4, 32, 1);
+		m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 4, 32, 1, COMPILE_FORWARDS_BYTES);
 
 		// add UML symbols
 		m_drcuml->symbol_add(&m_core->global_regs[PC_REGISTER],  sizeof(m_core->global_regs[PC_REGISTER]),  "pc");

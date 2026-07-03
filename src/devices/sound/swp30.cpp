@@ -1736,7 +1736,9 @@ void swp30_device::device_start()
 	for(int i=1; i != 0x40; i++)
 		state_add(i+1, util::string_format("m%02x", i).c_str(), m_meg->m_m[i]);
 
-	m_drcuml = std::make_unique<drcuml_state>(*this, m_drccache, 0, 1, 9, 0);
+	// SWP30 compiles the entire MEG program as one block, so the max sequence length is
+	// passed as 0 bytes.  In the unlikely event that changes, this should be updated.
+	m_drcuml = std::make_unique<drcuml_state>(*this, m_drccache, 0, 1, 9, 0, 0);
 	m_drcuml->symbol_add(&m_meg->m_pc,          sizeof(m_meg->m_pc),          "pc");
 	m_drcuml->symbol_add(&m_meg->m_icount,      sizeof(m_meg->m_icount),      "icount");
 	m_drcuml->symbol_add(&m_meg->m_program,     sizeof(m_meg->m_program),     "program");

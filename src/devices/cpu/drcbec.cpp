@@ -441,7 +441,7 @@ const uint32_t drcbe_c::s_condition_map[] =
 
 drcbe_c::drcbe_c(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits) :
 	drcbe_interface(drcuml, cache, device),
-	m_hash(cache, modes, addrbits, ignorebits),
+	m_hash(cache, modes, addrbits, ignorebits, drcuml.max_sequence_length()),
 	m_map(cache, 0xaaaaaaaa55555555),
 	m_fixup_delegate(&drcbe_c::fixup_label, this)
 {
