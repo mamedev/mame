@@ -25,6 +25,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
+#include "machine/neo_zmc.h"
 #include "machine/nvram.h"
 #include "machine/upd1990a.h"
 #include "sound/ymopn.h"
@@ -45,16 +46,18 @@ public:
 
 	neoprint_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_npvidram(*this, "npvidram"),
-		m_npvidregs(*this, "npvidregs"),
+		m_vram(*this, "vram"),
+		m_vregs(*this, "vregs"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_neo_zmc(*this, "neo_zmc"),
 		m_upd4990a(*this, "upd4990a"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_generic_paletteram_16(*this, "paletteram")
+		m_maincpu_region(*this, "maincpu"),
+		m_paletteram(*this, "paletteram")
 	{ }
 
 	void neoprint(machine_config &config) ATTR_COLD;
@@ -87,7 +90,11 @@ private:
 	void nprsp_palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void nprsp_bank_w(uint8_t data);
 	uint16_t rom_window_r(offs_t offset);
+	void audio_cpu_assert_nmi();
+
 	DECLARE_MACHINE_RESET(nprsp);
+
+	void draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect,int layer,int data_shift);
 	uint32_t screen_update_neoprint(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_nprsp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -96,22 +103,22 @@ private:
 	void neoprint_map(address_map &map) ATTR_COLD;
 	void nprsp_map(address_map &map) ATTR_COLD;
 
-	required_shared_ptr<uint16_t> m_npvidram;
-	required_shared_ptr<uint16_t> m_npvidregs;
+	required_shared_ptr<uint16_t> m_vram;
+	required_shared_ptr<uint16_t> m_vregs;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<neo_zmc_device> m_neo_zmc;
 	required_device<upd4990a_device> m_upd4990a;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	optional_shared_ptr<uint16_t> m_generic_paletteram_16;
+	required_region_ptr<uint16_t> m_maincpu_region;
+	optional_shared_ptr<uint16_t> m_paletteram;
 
 	uint8_t m_audio_result = 0;
 	uint8_t m_bank_val = 0;
 	uint8_t m_vblank = 0;
-	void draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect,int layer,int data_shift);
-	void audio_cpu_assert_nmi();
 };
 
 
@@ -128,39 +135,37 @@ xxxx xxxx xxxx xxxx [2] scroll Y, signed
 ---- ---- --?? ??xx [6] map register
 */
 
-void neoprint_state::draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect,int layer,int data_shift)
+void neoprint_state::draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int data_shift)
 {
-	int i, y, x;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	int16_t scrollx, scrolly;
 
-	i = (m_npvidregs[((layer*8)+0x06)/2] & 7) * 0x1000/4;
-	scrollx = ((m_npvidregs[((layer*8)+0x00)/2] - (0xd8 + layer*4)) & 0x03ff);
-	scrolly = ((m_npvidregs[((layer*8)+0x02)/2] - 0xffeb) & 0x03ff);
+	int i = (m_vregs[((layer * 8) + 0x06) / 2] & 7) * 0x1000/4;
+	int16_t scrollx = ((m_vregs[((layer * 8) + 0x00) / 2] - (0xd8 + layer * 4)) & 0x03ff);
+	int16_t scrolly = ((m_vregs[((layer * 8) + 0x02) / 2] - 0xffeb) & 0x03ff);
 
-	scrollx/=2;
-	scrolly/=2;
+	scrollx /= 2;
+	scrolly /= 2;
 
-	for (y=0;y<32;y++)
+	for (int y = 0; y < 32; y++)
 	{
-		for (x=0;x<32;x++)
+		for (int x = 0; x < 32; x++)
 		{
-			uint16_t dat = m_npvidram[i*2] >> data_shift; // a video register?
+			const uint16_t dat = m_vram[i * 2] >> data_shift; // a video register?
 			uint16_t color;
-			if(m_npvidram[i*2+1] & 0x0020) // TODO: 8bpp switch?
-				color = ((m_npvidram[i*2+1] & 0x8000) << 1) | 0x200 | ((m_npvidram[i*2+1] & 0xff00) >> 7);
+			if (BIT(m_vram[i * 2 + 1], 5)) // TODO: 8bpp switch?
+				color = ((m_vram[i * 2 + 1] & 0x8000) << 1) | 0x200 | ((m_vram[i * 2 + 1] & 0xff00) >> 7);
 			else
-				color = ((m_npvidram[i*2+1] & 0xff00) >> 8) | ((m_npvidram[i*2+1] & 0x0010) << 4);
-			uint8_t fx = (m_npvidram[i*2+1] & 0x0040);
-			uint8_t fy = (m_npvidram[i*2+1] & 0x0080);
+				color = ((m_vram[i * 2 + 1] & 0xff00) >> 8) | ((m_vram[i * 2 + 1] & 0x0010) << 4);
+			const bool fx = BIT(m_vram[i * 2 + 1], 6);
+			const bool fy = BIT(m_vram[i * 2 + 1], 7);
 
-			gfx->transpen(bitmap,cliprect,dat,color,fx,fy,x*16+scrollx,y*16-scrolly,0);
-			gfx->transpen(bitmap,cliprect,dat,color,fx,fy,x*16+scrollx-512,y*16-scrolly,0);
-			gfx->transpen(bitmap,cliprect,dat,color,fx,fy,x*16+scrollx,y*16-scrolly-512,0);
-			gfx->transpen(bitmap,cliprect,dat,color,fx,fy,x*16+scrollx-512,y*16-scrolly-512,0);
+			gfx->transpen(bitmap, cliprect, dat, color, fx, fy, x * 16 + scrollx, y * 16 - scrolly, 0);
+			gfx->transpen(bitmap, cliprect, dat, color, fx, fy, x * 16 + scrollx - 512, y * 16 - scrolly, 0);
+			gfx->transpen(bitmap, cliprect, dat, color, fx, fy, x * 16 + scrollx, y * 16 - scrolly - 512, 0);
+			gfx->transpen(bitmap, cliprect, dat, color, fx, fy, x * 16 + scrollx - 512, y * 16 - scrolly - 512, 0);
 
 			i++;
-			//i&=0x3ff;
+			//i &= 0x3ff;
 		}
 	}
 }
@@ -169,8 +174,8 @@ uint32_t neoprint_state::screen_update_neoprint(screen_device &screen, bitmap_in
 {
 	bitmap.fill(0, cliprect);
 
-	draw_layer(bitmap,cliprect,1,2);
-	draw_layer(bitmap,cliprect,0,2);
+	draw_layer(bitmap, cliprect, 1, 2);
+	draw_layer(bitmap, cliprect, 0, 2);
 
 	return 0;
 }
@@ -179,9 +184,9 @@ uint32_t neoprint_state::screen_update_nprsp(screen_device &screen, bitmap_ind16
 {
 	bitmap.fill(0, cliprect);
 
-	draw_layer(bitmap,cliprect,1,0);
-	draw_layer(bitmap,cliprect,2,0);
-	draw_layer(bitmap,cliprect,0,0);
+	draw_layer(bitmap, cliprect, 1, 0);
+	draw_layer(bitmap, cliprect, 2, 0);
+	draw_layer(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -194,9 +199,9 @@ uint8_t neoprint_state::calendar_r()
 
 void neoprint_state::calendar_w(uint8_t data)
 {
-	m_upd4990a->data_in_w(data >> 0 & 1);
-	m_upd4990a->clk_w(data >> 1 & 1);
-	m_upd4990a->stb_w(data >> 2 & 1);
+	m_upd4990a->data_in_w(BIT(data, 0));
+	m_upd4990a->clk_w(BIT(data, 1));
+	m_upd4990a->stb_w(BIT(data, 2));
 }
 
 uint8_t neoprint_state::unk_r()
@@ -205,9 +210,10 @@ uint8_t neoprint_state::unk_r()
 	/* ---- xx-- one of these two must be high */
 	/* ---- --xx checked right before entering into attract mode, presumably printer/camera related */
 
-	m_vblank = (m_screen->frame_number() & 0x1) ? 0x10 : 0x00;
+	if (!machine().side_effects_disabled())
+		m_vblank = (m_screen->frame_number() & 0x1) ? 0x10 : 0x00;
 
-	//if(m_maincpu->pc() != 0x1504 && m_maincpu->pc() != 0x5f86 && m_maincpu->pc() != 0x5f90)
+	//if (m_maincpu->pc() != 0x1504 && m_maincpu->pc() != 0x5f86 && m_maincpu->pc() != 0x5f90)
 	//  printf("%08x\n",m_maincpu->pc());
 
 	return m_vblank| 4 | 3;
@@ -244,12 +250,13 @@ void neoprint_state::audio_command_w(offs_t offset, uint8_t data, uint8_t mem_ma
 
 uint8_t neoprint_state::audio_command_r()
 {
-	uint8_t ret = m_soundlatch->read();
+	const uint8_t ret = m_soundlatch->read();
 
 	//if (LOG_CPU_COMM) logerror(" AUD CPU PC   %04x: audio_command_r %02x\n", m_audiocpu->pc(), ret);
 
 	/* this is a guess */
-	audio_cpu_clear_nmi_w(0);
+	if (!machine().side_effects_disabled())
+		audio_cpu_clear_nmi_w(0);
 
 	return ret;
 }
@@ -269,7 +276,7 @@ void neoprint_state::neoprint_map(address_map &map)
 /*  map(0x100000, 0x17ffff) multi-cart or banking, some writes points here if anything lies there too */
 	map(0x200000, 0x20ffff).ram();
 	map(0x300000, 0x30ffff).ram().share("nvram");
-	map(0x400000, 0x43ffff).ram().share("npvidram");
+	map(0x400000, 0x43ffff).ram().share(m_vram);
 	map(0x500000, 0x51ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x600000, 0x600000).rw(FUNC(neoprint_state::audio_result_r), FUNC(neoprint_state::audio_command_w));
 	map(0x600002, 0x600002).rw(FUNC(neoprint_state::calendar_r), FUNC(neoprint_state::calendar_w));
@@ -280,56 +287,48 @@ void neoprint_state::neoprint_map(address_map &map)
 	map(0x60000c, 0x60000d).portr("DSW2");
 	map(0x60000e, 0x60000f).nopw();
 
-	map(0x700000, 0x70001b).ram().share("npvidregs");
+	map(0x700000, 0x70001b).ram().share(m_vregs);
 
 	map(0x70001e, 0x70001f).nopw(); //watchdog
 }
 
 void neoprint_state::nprsp_palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	uint8_t r,g,b,i;
+	COMBINE_DATA(&m_paletteram[offset]);
 
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-
-	g = (m_generic_paletteram_16[offset & ~1] & 0xf800) >> 8;
-	r = (m_generic_paletteram_16[offset & ~1] & 0x00f8) >> 0;
-	i = (m_generic_paletteram_16[offset | 1] & 0x1c00) >> 10;
-	b = (m_generic_paletteram_16[offset | 1] & 0x00f8) >> 0;
+	uint8_t g = (m_paletteram[offset & ~1] & 0xf800) >> 8;
+	uint8_t r = (m_paletteram[offset & ~1] & 0x00f8) >> 0;
+	const uint8_t i = (m_paletteram[offset | 1] & 0x1c00) >> 10;
+	uint8_t b = (m_paletteram[offset | 1] & 0x00f8) >> 0;
 	r |= i;
 	g |= i;
 	b |= i;
 
 	/* hack: bypass MAME 65536 palette entries limit */
-	if(offset & 0x10000)
+	if (offset & 0x10000)
 		return;
 
-	{
-		uint32_t pal_entry;
+	const uint32_t pal_entry = ((offset & 0xfffe) >> 1) + ((offset & 0x20000) ? 0x8000 : 0);
 
-		pal_entry = ((offset & 0xfffe) >> 1) + ((offset & 0x20000) ? 0x8000 : 0);
-
-		m_palette->set_pen_color(pal_entry, rgb_t(r,g,b));
-	}
+	m_palette->set_pen_color(pal_entry, rgb_t(r, g, b));
 }
 
 void neoprint_state::nprsp_bank_w(uint8_t data)
 {
 	/* this register seems flip-flop based ... */
 
-	if((data & 0xf0) == 0x20)
+	if ((data & 0xf0) == 0x20)
 	{
-		if((data & 0xf) == 0x1)
+		if ((data & 0xf) == 0x1)
 			m_bank_val = 1;
-		if((data & 0xf) == 0x2)
+		if ((data & 0xf) == 0x2)
 			m_bank_val = 0;
 	}
 }
 
 uint16_t neoprint_state::rom_window_r(offs_t offset)
 {
-	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
-
-	return rom[offset | 0x80000/2 | m_bank_val*0x40000/2];
+	return m_maincpu_region[offset | (0x80000 / 2) | (m_bank_val * (0x40000 / 2))];
 }
 
 void neoprint_state::nprsp_map(address_map &map)
@@ -346,13 +345,13 @@ void neoprint_state::nprsp_map(address_map &map)
 	map(0x20000c, 0x20000d).portr("DSW2");
 	map(0x20000e, 0x20000f).nopw();
 
-	map(0x240000, 0x24001b).ram().share("npvidregs");
+	map(0x240000, 0x24001b).ram().share(m_vregs);
 	map(0x24001e, 0x24001f).nopw(); //watchdog
 
 	map(0x300000, 0x33ffff).ram().share("nvram");
 	map(0x380000, 0x38ffff).ram();
-	map(0x400000, 0x43ffff).ram().share("npvidram");
-	map(0x500000, 0x57ffff).ram().w(FUNC(neoprint_state::nprsp_palette_w)).share("paletteram");
+	map(0x400000, 0x43ffff).ram().share(m_vram);
+	map(0x500000, 0x57ffff).ram().w(FUNC(neoprint_state::nprsp_palette_w)).share(m_paletteram);
 }
 
 /*************************************
@@ -363,11 +362,7 @@ void neoprint_state::nprsp_map(address_map &map)
 
 void neoprint_state::audio_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();//.bankr(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK);
-//  map(0x8000, 0xbfff).bankr(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 3);
-//  map(0xc000, 0xdfff).bankr(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 2);
-//  map(0xe000, 0xefff).bankr(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 1);
-//  map(0xf000, 0xf7ff).bankr(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 0);
+	map(0x0000, 0xffff).m(m_neo_zmc, FUNC(neo_zmc_device::bank_map));
 	map(0xf800, 0xffff).ram();
 }
 
@@ -385,10 +380,7 @@ void neoprint_state::audio_io_map(address_map &map)
 	map(0x00, 0x00).mirror(0xff00).r(FUNC(neoprint_state::audio_command_r)).nopw();
 	map(0x04, 0x07).mirror(0xff00).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 //  map(0x08, 0x08).mirror(0xff00); /* write - NMI enable / acknowledge? (the data written doesn't matter) */
-//  map(0x08, 0x08).select(0xfff0).r(FUNC(neoprint_state::audio_cpu_bank_select_f000_f7ff_r));
-//  map(0x09, 0x09).select(0xfff0).r(FUNC(neoprint_state::audio_cpu_bank_select_e000_efff_r));
-//  map(0x0a, 0x0a).select(0xfff0).r(FUNC(neoprint_state::audio_cpu_bank_select_c000_dfff_r));
-//  map(0x0b, 0x0b).select(0xfff0).r(FUNC(neoprint_state::audio_cpu_bank_select_8000_bfff_r));
+	map(0x08, 0x0b).select(0xff00).r(m_neo_zmc, FUNC(neo_zmc_device::bank_r));
 	map(0x0c, 0x0c).mirror(0xff00).w(FUNC(neoprint_state::audio_result_w));
 //  map(0x18, 0x18).mirror(0xff00); /* write - NMI disable? (the data written doesn't matter) */
 }
@@ -498,7 +490,7 @@ static const gfx_layout neoprint_layout =
 };
 
 static GFXDECODE_START( gfx_neoprint )
-	GFXDECODE_ENTRY( "gfx1", 0, neoprint_layout,   0x0, 0x1000 )
+	GFXDECODE_ENTRY( "gfx1", 0, neoprint_layout, 0x0, 0x1000 )
 GFXDECODE_END
 
 void neoprint_state::machine_start()
@@ -521,6 +513,9 @@ void neoprint_state::neoprint(machine_config &config)
 	Z80(config, m_audiocpu, 4000000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &neoprint_state::audio_map);
 	m_audiocpu->set_addrmap(AS_IO, &neoprint_state::audio_io_map);
+
+	NEO_ZMC(config, m_neo_zmc);
+	m_neo_zmc->set_device_rom_tag("audiocpu");
 
 	UPD4990A(config, m_upd4990a);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -565,6 +560,9 @@ void neoprint_state::nprsp(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &neoprint_state::audio_map);
 	m_audiocpu->set_addrmap(AS_IO, &neoprint_state::audio_io_map);
 
+	NEO_ZMC(config, m_neo_zmc);
+	m_neo_zmc->set_device_rom_tag("audiocpu");
+
 	UPD4990A(config, m_upd4990a);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -598,7 +596,7 @@ void neoprint_state::nprsp(machine_config &config)
 // uses NEO-MVS PROGBK1 (Same as NeoGeo MVS cart)
 // and PSTM-ROMC (unique to NeoPrint) (has ZMC chip)
 ROM_START( neoprint ) // NP 1.21 19961210 string
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "ep1.bin", 0x000000, 0x80000, CRC(271da3ee) SHA1(50132d2ac5524e880ec0c2ba3617bf516fd36e7d) )
 //  ROM_RELOAD(                      0x100000, 0x80000 ) /* checks the same string from above to be present there? Why? */
 
@@ -616,7 +614,7 @@ ROM_START( neoprint ) // NP 1.21 19961210 string
 ROM_END
 
 ROM_START( npcartv1 ) // NP 1.11 19961018 string
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "ep1.bin", 0x000000, 0x80000, CRC(18606198) SHA1(d968e09131c22769e22c7310aca1f02e739f38f1) )
 //  ROM_RELOAD(                      0x100000, 0x80000 ) /* checks the same string from above to be present there? Why? */
 
@@ -632,7 +630,7 @@ ROM_START( npcartv1 ) // NP 1.11 19961018 string
 ROM_END
 
 ROM_START( npsprgv4 ) // NP 1.30 19970228 string
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "p004-ep1 neo-mvs progbk1.ep1", 0x000000, 0x80000, CRC(4a322439) SHA1(4478f0e20d2c892a2c8e67ccc1173fd5edaa42e3) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
@@ -652,7 +650,7 @@ ROM_END
 	title: '98 NeoPri Best 44 version */
 
 ROM_START( 98best44 ) // NP 1.30 19970430 string
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "p060-ep1", 0x000000, 0x080000, CRC(d42e505d) SHA1(0ad6b0288f36c339832730a03e53cbc07dab4f82))
 //  ROM_RELOAD(                      0x100000, 0x80000 ) /* checks the same string from above to be present there? Why? */
 
@@ -668,7 +666,7 @@ ROM_START( 98best44 ) // NP 1.30 19970430 string
 ROM_END
 
 ROM_START( npsprg98 ) // NP 1.30 19970430 string
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "p042-p1 neo-mvs progbk1.p1", 0x000000, 0x100000, CRC(c0621456) SHA1(eb615a11f909a680aed2d99c641b3c47be4fc56e) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
@@ -683,7 +681,7 @@ ROM_START( npsprg98 ) // NP 1.30 19970430 string
 ROM_END
 
 ROM_START( npskv ) // NP 1.30 19970430 string
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "p012-p1 neo-mvs progbk1.p1", 0x000000, 0x100000, CRC(de8996f6) SHA1(8fb2bc78206ec543148740f94c19bcdb50ad3271) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
@@ -698,7 +696,7 @@ ROM_START( npskv ) // NP 1.30 19970430 string
 ROM_END
 
 ROM_START( npusagif ) // NP 1.30 19970430 string
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "p061-ep1 neo-mvs progbk1.ep1", 0x000000, 0x080000, CRC(ec6d7fda) SHA1(f219f8a9763f92ef952236ea3e01fe9b684823df) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
@@ -713,7 +711,7 @@ ROM_START( npusagif ) // NP 1.30 19970430 string
 ROM_END
 
 ROM_START( npotogib ) // NP 1.30 19970430 string
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "p0025-ep1 neo-mvs progbk1.ep1", 0x000000, 0x080000, CRC(eaefe748) SHA1(9facab7e70901a9030d40b823473e46cfa5389ad) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
@@ -730,7 +728,7 @@ ROM_START( npotogib ) // NP 1.30 19970430 string
 ROM_END
 
 ROM_START( npfpit ) // NP 1.30 19990225 string
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "po97-ep1 neo-mvs progbk1.ep1", 0x000000, 0x080000, CRC(d2940f25) SHA1(d65e719d9df993e1433e580797bf0580d564c9a2) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
@@ -747,7 +745,7 @@ ROM_START( npfpit ) // NP 1.30 19990225 string
 ROM_END
 
 ROM_START( nprsp ) // STAFYAMA19980925 string
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "s038a-ep1.bin", 0x000000, 0x080000, CRC(529fb4fa) SHA1(f31ba8998bb01458f43df1934222995f22d590a1) ) // program ROM
 	ROM_LOAD16_WORD_SWAP( "s046-ep2.bin",  0x080000, 0x080000, CRC(846ae929) SHA1(e5544cde32794865e17d7dffd4e603ad5418d91e) ) // data ROM
 
@@ -765,7 +763,7 @@ ROM_START( nprsp ) // STAFYAMA19980925 string
 ROM_END
 
 ROM_START( npssr2 ) // STAFYAMA19980925 string
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "s038a-ep1 nps-prg1.ep1", 0x000000, 0x080000, CRC(529fb4fa) SHA1(f31ba8998bb01458f43df1934222995f22d590a1) ) // program ROM, same as nprsp
 	ROM_LOAD16_WORD_SWAP( "s072-ep2 nps-prg1.ep2",  0x080000, 0x080000, CRC(5514e29f) SHA1(fd508b6b4b2ed587b5dfd4a186865c72181612e6) ) // data ROM
 
@@ -785,7 +783,7 @@ ROM_START( npssr2 ) // STAFYAMA19980925 string
 ROM_END
 
 ROM_START( npspscv ) // STAFYAMA19970717 string
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "s005-ep1.ep1", 0x000000, 0x080000, CRC(4b280134) SHA1(6cd1517c2f15dcb6ad4eb4384b9b4fa1b1723747) )
 	ROM_LOAD16_WORD_SWAP( "s005-p2.p2",   0x080000, 0x080000, CRC(93f618c2) SHA1(3e4b018095ee1c17dfaefb85e8bcc683bb77e93a) )
 	ROM_IGNORE(                                     0x180000 ) // BADADDR   --xxxxxxxxxxxxxxxxxxx
@@ -804,7 +802,7 @@ ROM_START( npspscv ) // STAFYAMA19970717 string
 ROM_END
 
 ROM_START( npmillen ) // NP 1.30 19990225 string
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "p093-ep1.bin", 0x000000, 0x080000, CRC(47783f56) SHA1(1845e90b05a58010054c4158ef08e167e61ea370) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )
@@ -821,7 +819,7 @@ ROM_START( npmillen ) // NP 1.30 19990225 string
 ROM_END
 
 ROM_START( npscv1 ) // NP 1.10 19961015 string
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "np-jp1 neo-mvs progbk1.ep1", 0x000000, 0x080000, CRC(c4648dfa) SHA1(ca7770f363027e3fe2f47d77085464486c024d2a) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
@@ -836,7 +834,7 @@ ROM_START( npscv1 ) // NP 1.10 19961015 string
 ROM_END
 
 ROM_START( npcramen ) // ? string
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "l009-ep1 neo-mvs progbk1.ep1", 0x000000, 0x080000, BAD_DUMP CRC(ff470ded) SHA1(d33dd90f9ac1cc7f2dcadb6a855d9cd5f3260d00) ) // 111111111xxxxxxxxxx = 0xFF, reads were consistent, but..
 
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* Z80 program */
@@ -851,7 +849,7 @@ ROM_START( npcramen ) // ? string
 ROM_END
 
 ROM_START( npft ) // NP 1.30 19970430 string
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "ft_ep1.ep1", 0x000000, 0x080000, CRC(870d6e77) SHA1(651958d5254763f308e53ab46c4c70694e57acd7) ) // hand-written label
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
@@ -868,7 +866,7 @@ ROM_START( npft ) // NP 1.30 19970430 string
 ROM_END
 
 ROM_START( nppopeye ) // NP 1.30 19970430 string
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "p027-ep1", 0x000000, 0x080000, CRC(f928ad2e) SHA1(a958b2d357af6daf2bde6d5b8874963c9c4130c3))
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
@@ -885,7 +883,7 @@ ROM_START( nppopeye ) // NP 1.30 19970430 string
 ROM_END
 
 ROM_START( npeurver ) // NP 1.30 19970430 string
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "p016-1-ep1", 0x000000, 0x080000, CRC(941af83b) SHA1(c385164f2671e183fbcec543d738463c03f1829a) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )
@@ -902,7 +900,7 @@ ROM_START( npeurver ) // NP 1.30 19970430 string
 ROM_END
 
 ROM_START( npeurver2 ) // NP 1.30 19970430 string
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "p040-ep1.ep1", 0x000000, 0x080000, CRC(225216fc) SHA1(fbe8bd228b39ccde9d1f670d4e85b25dc3144bc0) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )
@@ -922,7 +920,7 @@ ROM_END
 /* FIXME: get rid of these two, probably something to do with irq3 and camera / printer devices */
 void neoprint_state::init_npcartv1()
 {
-	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
 	ROM[0x1260/2] = 0x4e71;
 
@@ -932,14 +930,14 @@ void neoprint_state::init_npcartv1()
 
 void neoprint_state::init_98best44()
 {
-	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
 	ROM[0x1312/2] = 0x4e71;
 }
 
 void neoprint_state::init_npmillen()
 {
-	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
 	ROM[0x1312/2] = 0x4e71;
 
@@ -948,7 +946,7 @@ void neoprint_state::init_npmillen()
 
 void neoprint_state::init_npsprgv4()
 {
-	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
 	ROM[0x12e8/2] = 0x4e71;
 
@@ -957,7 +955,7 @@ void neoprint_state::init_npsprgv4()
 
 void neoprint_state::init_npskv()
 {
-	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
 	ROM[0x130a/2] = 0x4e71;
 
@@ -966,7 +964,7 @@ void neoprint_state::init_npskv()
 
 void neoprint_state::init_nprsp()
 {
-	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
 	ROM[0x13a4/2] = 0x4e71;
 	ROM[0x13bc/2] = 0x4e71;
@@ -978,7 +976,7 @@ void neoprint_state::init_nprsp()
 
 void neoprint_state::init_npspscv()
 {
-	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
 	ROM[0x13a4/2] = 0x4e71;
 	ROM[0x13bc/2] = 0x4e71;
@@ -990,13 +988,13 @@ void neoprint_state::init_npspscv()
 
 void neoprint_state::init_unkneo()
 {
-	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 	ROM[0x12c2/2] = 0x4e71;
 }
 
 void neoprint_state::init_npscv1()
 {
-	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 	ROM[0x1242/2] = 0x4e71;
 
 	ROM[0x4390/2] = 0x4e71; //ROM checksum
@@ -1004,7 +1002,7 @@ void neoprint_state::init_npscv1()
 
 void neoprint_state::init_npotogib()
 {
-	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 	ROM[0x1312/2] = 0x4e71;
 
 	ROM[0x3f4e/2] = 0x4e71; //ROM checksum
