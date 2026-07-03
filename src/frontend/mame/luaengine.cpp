@@ -641,6 +641,11 @@ void lua_engine::on_machine_prestart()
 	execute_function("LUA_ON_PRESTART");
 }
 
+void lua_engine::on_machine_devices_started()
+{
+	m_notifiers->on_devices_started();
+}
+
 void lua_engine::on_machine_reset()
 {
 	m_notifiers->on_reset();
@@ -754,6 +759,7 @@ bool lua_engine::on_missing_mandatory_image(const std::string &instance_name)
 
 void lua_engine::attach_notifiers()
 {
+	machine().add_notifier(MACHINE_NOTIFY_DEVICES_STARTED, machine_notify_delegate(&lua_engine::on_machine_devices_started, this));
 	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&lua_engine::on_machine_prestart, this), true);
 	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&lua_engine::on_machine_reset, this));
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&lua_engine::on_machine_stop, this));
@@ -877,6 +883,7 @@ void lua_engine::initialize()
 				m_frame_tasks.emplace_back(luaL_ref(s, LUA_REGISTRYINDEX));
 				return sol::variadic_results(args.begin(), args.end());
 			});
+	emu.set_function("add_machine_devices_started_notifier", make_notifier_adder(m_notifiers->on_devices_started, "devices started"));
 	emu.set_function("add_machine_reset_notifier", make_notifier_adder(m_notifiers->on_reset, "machine reset"));
 	emu.set_function("add_machine_stop_notifier", make_notifier_adder(m_notifiers->on_stop, "machine stop"));
 	emu.set_function("add_machine_pause_notifier", make_notifier_adder(m_notifiers->on_pause, "machine pause"));
@@ -1568,6 +1575,16 @@ void lua_engine::initialize()
 	device_type.set_function("membank", &device_t::membank);
 	device_type.set_function("ioport", &device_t::ioport);
 	device_type.set_function("output", [] (device_t &d, std::string_view name) { return output_proxy(d, name); });
+	device_type.set_function("register_output",
+			[] (device_t &d, std::string_view name) -> bool
+			{
+				if (d.machine().output().locked())
+				{
+					osd_printf_error("[LUA ERROR] register_output('%s'): output table is already locked for save states; create outputs from an emu.add_machine_devices_started_notifier callback instead.\n", std::string(name).c_str());
+					return false;
+				}
+				return d.machine().output().create_item(d, name);
+			});
 	device_type.set_function("subdevice", static_cast<device_t *(device_t::*)(std::string_view) const>(&device_t::subdevice));
 	device_type.set_function("siblingdevice", static_cast<device_t *(device_t::*)(std::string_view) const>(&device_t::siblingdevice));
 	device_type.set_function("parameter", &device_t::parameter);

@@ -274,6 +274,27 @@ output_manager::item_impl const &output_manager::find_or_create_item(device_t &d
 
 
 /*-------------------------------------------------
+    create_item - create an output before the set
+    is fixed for save states
+-------------------------------------------------*/
+
+bool output_manager::create_item(device_t &device, std::string_view name)
+{
+	if (locked())
+	{
+		osd_printf_error("Cannot create output %s:%s after output values have been registered for saving state\n", device.tag() + 1, name);
+		return false;
+	}
+
+	if (!validate_name(device, name))
+		return false;
+
+	find_or_create_item(device, name);
+	return true;
+}
+
+
+/*-------------------------------------------------
     presave - prepare data for save state
 -------------------------------------------------*/
 

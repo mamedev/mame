@@ -225,9 +225,6 @@ void running_machine::start()
 	m_sound->after_devices_init();
 	save().register_postload(save_prepost_delegate(FUNC(running_machine::postload_all_devices), this));
 
-	// save outputs created before start time
-	output().register_save();
-
 	m_render->resolve_tags();
 
 	// load cheat files
@@ -265,7 +262,17 @@ void running_machine::start()
 			schedule_load("auto");
 	}
 
+	// attach lua/plugins to this machine now that devices, cheats, and any
+	// pending state load have all been set up
 	manager().update_machine();
+
+	// notify listeners that all devices have started - this is the last
+	// point at which outputs can be created, as the set of outputs is
+	// fixed when output values are registered for saving state below
+	call_notifiers(MACHINE_NOTIFY_DEVICES_STARTED);
+
+	// save outputs created before start time
+	output().register_save();
 }
 
 

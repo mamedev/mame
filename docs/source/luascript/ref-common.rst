@@ -75,6 +75,14 @@ emu.wait_next_frame(…)
     Yields until the next emulated frame completes.  Any arguments are returned
     from the coroutine.  Calling this function from callbacks that are not run as
     coroutines will raise an error.
+emu.add_machine_devices_started_notifier(callback)
+    Add a callback to receive notification when an emulation session is
+    starting, after all devices have started but before output values are
+    registered for saving state.  This is the only point at which outputs can
+    be created from a script (see the ``register_output`` method on
+    :ref:`devices <luascript-ref-device>`), as the set of outputs is fixed
+    once output values are registered for saving state.  Returns a
+    :ref:`notifier subscription <luascript-ref-notifiersub>`.
 emu.add_machine_reset_notifier(callback)
     Add a callback to receive notifications when the emulated system is reset.
     Returns a :ref:`notifier subscription <luascript-ref-notifiersub>`.

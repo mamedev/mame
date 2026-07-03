@@ -143,6 +143,7 @@ public:
 private:
 	struct notifiers
 	{
+		util::notifier<> on_devices_started;
 		util::notifier<> on_reset;
 		util::notifier<> on_stop;
 		util::notifier<> on_pause;
@@ -189,6 +190,7 @@ private:
 
 	running_machine &machine() const { return *m_machine; }
 
+	void on_machine_devices_started();
 	void on_machine_prestart();
 	void on_machine_reset();
 	void on_machine_stop();

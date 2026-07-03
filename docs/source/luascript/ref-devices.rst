@@ -156,6 +156,17 @@ device:output(name)
     Gets an :ref:`output proxy <luascript-ref-outputproxy>` for the output with
     the specified name relative to the device.  Note that the output will not be
     created if it does not exist.
+device:register_output(name)
+    Creates the output with the specified name relative to the device if it
+    does not already exist, so that it will be included in saved states and
+    can be set using an :ref:`output proxy <luascript-ref-outputproxy>`.
+    Returns a Boolean indicating whether the output exists.  Outputs must be
+    created before output values are registered for saving state, which
+    happens after all devices have started and before the system is reset for
+    the first time (see
+    :ref:`emu.add_machine_devices_started_notifier <luascript-ref-emu>`).
+    Returns ``false`` and logs an error if called after output values have
+    been registered for saving state, or if the output name is invalid.
 device:subdevice(tag)
     Gets a device by tag relative to the device.
 device:siblingdevice(tag)

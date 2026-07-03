@@ -206,6 +206,14 @@ public:
 	// register for save states
 	void register_save() ATTR_COLD;
 
+	// true once register_save() has fixed the output table for save states;
+	// no further outputs may be created after this point
+	bool locked() const { return bool(m_save_data); }
+
+	// create an output before the set is fixed for save states, so that it
+	// can be found later; returns false and logs the reason on failure
+	bool create_item(device_t &device, std::string_view name) ATTR_COLD;
+
 	// getters
 	running_machine &machine() const { return m_machine; }
 
