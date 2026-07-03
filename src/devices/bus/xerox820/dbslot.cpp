@@ -30,6 +30,13 @@ device_xerox820_dbslot_card_interface::device_xerox820_dbslot_card_interface(con
 {
 }
 
+// the card device types are exposed through this interface via
+// DEFINE_DEVICE_TYPE_PRIVATE, which does not instantiate the device_finder
+// templates; instantiate them here so required_device/optional_device of the
+// interface resolve rather than producing undefined symbol errors
+template class device_finder<device_xerox820_dbslot_card_interface, false>;
+template class device_finder<device_xerox820_dbslot_card_interface, true>;
+
 
 //**************************************************************************
 //  xerox820_dbslot_device

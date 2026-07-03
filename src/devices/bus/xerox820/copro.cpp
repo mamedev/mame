@@ -25,6 +25,13 @@ device_xerox820_copro_card_interface::device_xerox820_copro_card_interface(const
 {
 }
 
+// the card device types are exposed through this interface via
+// DEFINE_DEVICE_TYPE_PRIVATE, which does not instantiate the device_finder
+// templates; instantiate them here so required_device/optional_device of the
+// interface resolve rather than producing undefined symbol errors
+template class device_finder<device_xerox820_copro_card_interface, false>;
+template class device_finder<device_xerox820_copro_card_interface, true>;
+
 xerox820_copro_slot_device::xerox820_copro_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, XEROX820_COPRO_SLOT, tag, owner, clock)
 	, device_single_card_slot_interface<device_xerox820_copro_card_interface>(mconfig, *this)
