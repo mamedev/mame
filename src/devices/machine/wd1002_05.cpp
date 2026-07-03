@@ -68,6 +68,13 @@ wd1002_05_device::wd1002_05_device(const machine_config &mconfig, const char *ta
 	: wd1002_hd0_device(mconfig, WD1002_05, tag, owner, clock)
 	, m_fdc(*this, "fdc")
 	, m_floppy(*this, "fd%u", 0U)
+	, m_secno(0), m_cyllo(0), m_cylhi(0), m_sdh(0)
+	, m_fop(FOP_IDLE)
+	, m_f_write(false)
+	, m_f_wr_pending(false)
+	, m_f_cyl(0), m_f_head(0), m_f_sec(0), m_f_drive(0)
+	, m_floppy_cyl{ 0xff, 0xff }
+	, m_f_err(0)
 {
 }
 

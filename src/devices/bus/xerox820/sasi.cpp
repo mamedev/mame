@@ -27,6 +27,7 @@ DEFINE_DEVICE_TYPE(XEROX820_SASI, xerox820_sasi_device, "xerox820_sasi", "Xerox 
 x820_sasi_host_device::x820_sasi_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, X820_SASI_HOST, tag, owner, clock)
 	, nscsi_device_interface(mconfig, *this)
+	, m_ack_timer(nullptr)
 {
 }
 

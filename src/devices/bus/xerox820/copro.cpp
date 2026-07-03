@@ -13,31 +13,7 @@
 #include "machine/wd1002_05.h"
 
 
-//**************************************************************************
-//  SLOT
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(XEROX820_COPRO_SLOT, xerox820_copro_slot_device, "xerox820_copro_slot", "Xerox 820-II coprocessor slot")
-
-device_xerox820_copro_card_interface::device_xerox820_copro_card_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device, "xerox820copro")
-	, m_slot(dynamic_cast<xerox820_copro_slot_device *>(device.owner()))
-{
-}
-
-xerox820_copro_slot_device::xerox820_copro_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, XEROX820_COPRO_SLOT, tag, owner, clock)
-	, device_single_card_slot_interface<device_xerox820_copro_card_interface>(mconfig, *this)
-	, m_maincpu(*this, finder_base::DUMMY_TAG)
-	, m_card(nullptr)
-{
-}
-
-void xerox820_copro_slot_device::device_start()
-{
-	m_card = get_card_device();
-}
-
+namespace {
 
 //**************************************************************************
 //  16/8 8086 BOARD
@@ -266,9 +242,6 @@ void xerox820_16_8_device::shared_ram_w(offs_t offset, uint8_t data)
 }
 
 
-DEFINE_DEVICE_TYPE_PRIVATE(XEROX820_16_8, device_xerox820_copro_card_interface, xerox820_16_8_device, "xerox820_16_8", "Xerox 16/8 8086 coprocessor board")
-
-
 //**************************************************************************
 //  EM-II / DISK EXPANSION MODULE (WD1002-05) CARD
 //**************************************************************************
@@ -387,6 +360,36 @@ uint8_t xerox820_emii_device::rom_r(offs_t offset)
 // the card just maps the Z80 I/O ports onto m_wdc->read/write.  The rigid (ST-506 CHD) and
 // the 5.25" floppy both hang off that device; the SDH register selects which.
 
+} // anonymous namespace
+
+
+//**************************************************************************
+//  SLOT
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(XEROX820_COPRO_SLOT, xerox820_copro_slot_device, "xerox820_copro_slot", "Xerox 820-II coprocessor slot")
+
+device_xerox820_copro_card_interface::device_xerox820_copro_card_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device, "xerox820copro")
+	, m_slot(dynamic_cast<xerox820_copro_slot_device *>(device.owner()))
+{
+}
+
+xerox820_copro_slot_device::xerox820_copro_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, XEROX820_COPRO_SLOT, tag, owner, clock)
+	, device_single_card_slot_interface<device_xerox820_copro_card_interface>(mconfig, *this)
+	, m_maincpu(*this, finder_base::DUMMY_TAG)
+	, m_card(nullptr)
+{
+}
+
+void xerox820_copro_slot_device::device_start()
+{
+	m_card = get_card_device();
+}
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(XEROX820_16_8, device_xerox820_copro_card_interface, xerox820_16_8_device, "xerox820_16_8", "Xerox 16/8 8086 coprocessor board")
 
 DEFINE_DEVICE_TYPE_PRIVATE(XEROX820_EMII_RGD5,  device_xerox820_copro_card_interface, xerox820_emii_rgd5_device,  "xerox820_emii_rgd5",  "Xerox 16/8 EM-II, rigid+floppy (8086 + WD1002-05)")
 DEFINE_DEVICE_TYPE_PRIVATE(XEROX820_EMII_FLPY5, device_xerox820_copro_card_interface, xerox820_emii_flpy5_device, "xerox820_emii_flpy5", "Xerox 16/8 EM-II, floppy only (8086 + WD1002-05)")

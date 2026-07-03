@@ -19,6 +19,7 @@
 #pragma once
 
 #include "dbslot.h"
+
 #include "machine/nscsi_bus.h"
 #include "machine/z80pio.h"
 
@@ -48,7 +49,7 @@ private:
 
 	static constexpr attotime SASI_PULSE = attotime::from_nsec(500);
 
-	emu_timer *m_ack_timer = nullptr;
+	emu_timer *m_ack_timer;
 };
 
 DECLARE_DEVICE_TYPE(X820_SASI_HOST, x820_sasi_host_device)

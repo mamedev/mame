@@ -592,6 +592,8 @@ void xerox820_state::machine_start()
 
 void xerox820_state::machine_reset()
 {
+	xerox820_base_state::machine_reset();
+
 	m_view.select(1);
 
 	m_fdc->reset();
@@ -599,6 +601,8 @@ void xerox820_state::machine_reset()
 
 void bigboard_state::machine_reset()
 {
+	xerox820_base_state::machine_reset();
+
 	m_view.select(1);
 
 	/* bigboard has a one-pulse output to drive a user-supplied beeper */
@@ -623,6 +627,8 @@ void xerox820ii_state::machine_start()
 
 void xerox820ii_state::machine_reset()
 {
+	xerox820_base_state::machine_reset();
+
 	m_view.select(1);
 
 	// The disk daughterboard (FD1797 or SASI) and the coprocessor card each reset
@@ -1124,18 +1130,18 @@ ROM_START( x168s ) ROM_X168_CONTENTS ROM_END // 16/8, SASI hard disk
 
 /* System Drivers */
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT     CLASS             INIT        COMPANY                       FULLNAME                          FLAGS
-COMP( 1980, bigboard, 0,        0,      bigboard,    xerox820, bigboard_state,   empty_init, "Digital Research Computers", "Big Board",                      0 )
-COMP( 1980, bigboard5,bigboard, 0,      bigboard5,   xerox820, bigboard_state,   empty_init, "Digital Research Computers", "Big Board (5.25\" drives)",      MACHINE_NOT_WORKING )
-COMP( 1981, x820,     bigboard, 0,      xerox820,    xerox820, xerox820_state,   empty_init, "Xerox",                      "Xerox 820",                      MACHINE_NO_SOUND_HW )
-COMP( 1982, mk82,     bigboard, 0,      bigboard,    xerox820, bigboard_state,   empty_init, "Scomar",                     "MK-82",                          0 )
-COMP( 1983, x820ii,   0,        0,      xerox820ii,  xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 820-II (8\" floppy)",      0 )
-COMP( 1983, x820iilp, x820ii,   0,      xerox820iilp, xerox820, xerox820ii_state, empty_init, "Xerox",                     "Xerox 820-II (low profile keyboard)", 0 )
-COMP( 1983, x820ii5,  x820ii,   0,      xerox820ii5, xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 820-II (5.25\" floppy)",   0 )
-COMP( 1983, x820iis,  x820ii,   0,      xerox820iis, xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 820-II (SASI hard disk)",  0 )
-COMP( 1983, x168,     x820ii,   0,      xerox168,    xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8 (8\" floppy)",        0 )
-COMP( 1983, x1685,    x820ii,   0,      xerox1685,   xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8 (5.25\" floppy)",     0 ) // FD1797 5.25" daughterboard (mixed SD/DD); the EM-II 5.25" box is x168em
-COMP( 1983, x168em,   x820ii,   0,      xerox168em,  xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8 (Expansion Module II)", 0 ) // EM-II (DEM): slot-connected WD1002-05 + the genuine 537p3682 box ROM, 5.25" ST-506 rigid + floppy
-COMP( 1983, x168s,    x820ii,   0,      xerox168s,   xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8 (SASI hard disk)",    0 )
-COMP( 1983, mk83,     bigboard, 0,      mk83,        xerox820, xerox820_state,   empty_init, "Scomar",                     "MK-83",                          MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1985, mojmikro, bigboard, 0,      bigboard,    xerox820, bigboard_state,   empty_init, "<unknown>",                  "Moj mikro Slovenija",            0 )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE       INPUT     CLASS             INIT        COMPANY                       FULLNAME                          FLAGS
+COMP( 1980, bigboard, 0,        0,      bigboard,     xerox820, bigboard_state,   empty_init, "Digital Research Computers", "Big Board",                      0 )
+COMP( 1980, bigboard5,bigboard, 0,      bigboard5,    xerox820, bigboard_state,   empty_init, "Digital Research Computers", "Big Board (5.25\" drives)",      MACHINE_NOT_WORKING )
+COMP( 1981, x820,     bigboard, 0,      xerox820,     xerox820, xerox820_state,   empty_init, "Xerox",                      "Xerox 820",                      MACHINE_NO_SOUND_HW )
+COMP( 1982, mk82,     bigboard, 0,      bigboard,     xerox820, bigboard_state,   empty_init, "Scomar",                     "MK-82",                          0 )
+COMP( 1983, x820ii,   0,        0,      xerox820ii,   xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 820-II (8\" floppy)",      0 )
+COMP( 1983, x820iilp, x820ii,   0,      xerox820iilp, xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 820-II (low profile keyboard)", 0 )
+COMP( 1983, x820ii5,  x820ii,   0,      xerox820ii5,  xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 820-II (5.25\" floppy)",   0 )
+COMP( 1983, x820iis,  x820ii,   0,      xerox820iis,  xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 820-II (SASI hard disk)",  0 )
+COMP( 1983, x168,     x820ii,   0,      xerox168,     xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8 (8\" floppy)",        0 )
+COMP( 1983, x1685,    x820ii,   0,      xerox1685,    xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8 (5.25\" floppy)",     0 ) // FD1797 5.25" daughterboard (mixed SD/DD); the EM-II 5.25" box is x168em
+COMP( 1983, x168em,   x820ii,   0,      xerox168em,   xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8 (Expansion Module II)", 0 ) // EM-II (DEM): slot-connected WD1002-05 + the genuine 537p3682 box ROM, 5.25" ST-506 rigid + floppy
+COMP( 1983, x168s,    x820ii,   0,      xerox168s,    xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8 (SASI hard disk)",    0 )
+COMP( 1983, mk83,     bigboard, 0,      mk83,         xerox820, xerox820_state,   empty_init, "Scomar",                     "MK-83",                          MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1985, mojmikro, bigboard, 0,      bigboard,     xerox820, bigboard_state,   empty_init, "<unknown>",                  "Moj mikro Slovenija",            0 )
