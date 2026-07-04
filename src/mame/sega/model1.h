@@ -16,6 +16,7 @@
 #include "machine/i8251.h"
 #include "machine/gen_fifo.h"
 #include "machine/mb8421.h"
+#include "machine/nvram.h"
 #include "machine/timer.h"
 
 #include "emupal.h"
@@ -358,7 +359,7 @@ private:
 	void apply_overlay_stencil(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	optional_shared_ptr<uint16_t> m_paletteram16;
-	optional_shared_ptr<uint16_t> m_nvram;
+	required_device<nvram_device> m_nvram;
 	required_device<palette_device> m_palette;
 	required_device<segas24_tile_device> m_tiles;
 

@@ -918,20 +918,6 @@ void model1_state::machine_reset()
 
 	if (!strcmp(machine().system().name, "netmerc"))
 	{
-		if (m_nvram)
-		{
-			auto &space = m_maincpu->space(AS_PROGRAM);
-			if (space.read_byte(0x400038) == 0xFF && space.read_byte(0x40003c) == 0xFF &&
-				space.read_byte(0x400040) == 0xFF && space.read_byte(0x400044) == 0xFF)
-			{
-				space.write_byte(0x400038, 0x00);
-				space.write_byte(0x40003c, 0xFF);
-				space.write_byte(0x400040, 0x00);
-				space.write_byte(0x400044, 0xFF);
-				logerror("NetMerc: seeded default gun calibration\n");
-			}
-		}
-
 		if (m_dpram)
 		{
 			int16_t pose[6] = {0, 0, 0, 12868, 25736, 12868};
@@ -1762,6 +1748,9 @@ ROM_START( netmerc )
 	ROM_REGION( 0x8000, "polhemus", 0 ) /* POLHEMUS board */
 	ROM_LOAD16_BYTE( "u1", 0x0000, 0x4000, CRC(7073a312) SHA1(d2582f9520b8c8c051708dd372633112af59206e) )
 	ROM_LOAD16_BYTE( "u2", 0x0001, 0x4000, CRC(c589f428) SHA1(98dc0114a5f89636b4e237ed954e19f1cfd186ab) )
+
+	ROM_REGION( 0x10000, "nvram", 0 ) /* default NVRAM */
+	ROM_LOAD( "netmerc_nvram.bin", 0, 0x10000, CRC(09866826) SHA1(411134c1e6307f2e32c3b4b372597b45b14a9834) )
 ROM_END
 
 void model1_state::model1(machine_config &config)
