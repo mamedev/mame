@@ -149,13 +149,11 @@ protected:
 
 private:
 	// Information about an oscillator sync event.
-	// Intentionally left uninitialized, since it is instantiated frequently
-	// but only 'synced' is used most of the time.
 	struct sync_event_t
 	{
 		bool synced = false;            // Did a sync event occur?
 
-		// The variables below will only be initialized when synced == true.
+		// The variables below are only relevant when synced == true.
 		float sync_ttr = 0.0F;          // time-to-reset (in samples) for the sync oscillator.
 		float sync_phase = 0.0F;        // Phase distance from sync discontinuity.
 		float synced_osc_phase = 0.0F;  // Post-sync oscillator phase at current sample.
