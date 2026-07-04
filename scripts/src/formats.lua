@@ -1616,19 +1616,6 @@ if opt_tool(FORMATS, "P2000T_CAS") then
 	}
 end
 
-
---------------------------------------------------
---
---@src/lib/formats/p6001_cas.h,FORMATS["P6001_CAS"] = true
---------------------------------------------------
-
-if opt_tool(FORMATS, "P6001_CAS") then
-	files {
-		MAME_DIR.. "src/lib/formats/p6001_cas.cpp",
-		MAME_DIR.. "src/lib/formats/p6001_cas.h",
-	}
-end
-
 --------------------------------------------------
 --
 --@src/lib/formats/pasti_dsk.h,FORMATS["PASTI_DSK"] = true
