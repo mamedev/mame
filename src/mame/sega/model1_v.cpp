@@ -883,7 +883,7 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 		old_p1->s.x = old_p1->s.y = 0;
 	}
 
-	float old_z = 0;
+	float old_z = m_dl_old_z; // persists across objects within a DL walk
 
 	poly_adr += 6;
 
@@ -997,6 +997,7 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 				cquad.z = 0.0;
 				break;
 		}
+		m_dl_old_z = old_z;
 
 		{
 #if 0
@@ -1410,6 +1411,7 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect, r
 
 		m_view->init_translation_matrix();
 		m_view->light_bank = 0;
+		m_dl_old_z = 0;
 
 		int list_offset = 0;
 		for (;;) {
