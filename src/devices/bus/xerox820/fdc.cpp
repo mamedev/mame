@@ -21,6 +21,7 @@
 
 #include "formats/flopimg.h"
 
+namespace {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -81,15 +82,6 @@ class xerox820_fdc_box5_device : public xerox820_fdc_device
 public:
 	xerox820_fdc_box5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
-
-
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE_PRIVATE(XEROX820_FDC, device_xerox820_dbslot_card_interface, xerox820_fdc_device, "xerox820_fdc", "Xerox 820-II FD1797 floppy controller (8\")")
-DEFINE_DEVICE_TYPE_PRIVATE(XEROX820_FDC5, device_xerox820_dbslot_card_interface, xerox820_fdc5_device, "xerox820_fdc5", "Xerox 820-II FD1797 floppy controller (5.25\")")
-DEFINE_DEVICE_TYPE_PRIVATE(XEROX820_FDC_BOX5, device_xerox820_dbslot_card_interface, xerox820_fdc_box5_device, "xerox820_fdc_box5", "Xerox 16/8 RX024 5.25\" floppy box")
 
 
 static void xerox820_floppies(device_slot_interface &device)
@@ -284,4 +276,14 @@ void xerox820_fdc_device::box_select_w(uint8_t data)
 	}
 }
 
+} // anonymous namespace
 
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(XEROX820_FDC,      device_xerox820_dbslot_card_interface, xerox820_fdc_device,      "xerox820_fdc",      "Xerox 820-II FD1797 floppy controller (8\")")
+DEFINE_DEVICE_TYPE_PRIVATE(XEROX820_FDC5,     device_xerox820_dbslot_card_interface, xerox820_fdc5_device,     "xerox820_fdc5",     "Xerox 820-II FD1797 floppy controller (5.25\")")
+DEFINE_DEVICE_TYPE_PRIVATE(XEROX820_FDC_BOX5, device_xerox820_dbslot_card_interface, xerox820_fdc_box5_device, "xerox820_fdc_box5", "Xerox 16/8 RX024 5.25\" floppy box")

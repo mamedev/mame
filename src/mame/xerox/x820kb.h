@@ -54,12 +54,10 @@ public:
 protected:
 	xerox_820_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual void device_reset_after_children() override;
-
-	// optional information overrides
+	virtual void device_reset_after_children() override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
@@ -67,17 +65,17 @@ protected:
 	uint8_t m_bus;
 
 private:
-	required_device<i8048_device> m_maincpu;
-	required_ioport_array<16> m_y;
-
-	uint8_t m_p1;
-
 	uint8_t kb_p1_r();
 	void kb_p1_w(uint8_t data);
 	uint8_t kb_p2_r();
 	int kb_t0_r();
 	int kb_t1_r();
 	void kb_bus_w(uint8_t data);
+
+	required_device<i8048_device> m_maincpu;
+	required_ioport_array<16> m_y;
+
+	uint8_t m_p1;
 };
 
 
@@ -94,14 +92,14 @@ public:
 	xerox_820ii_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset_after_children() override;
 
 private:
 	TIMER_CALLBACK_MEMBER(announce);
 
-	emu_timer *m_announce_timer = nullptr;
+	emu_timer *m_announce_timer;
 };
 
 

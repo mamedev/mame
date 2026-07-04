@@ -5,23 +5,25 @@
 
 #pragma once
 
+#include "x820kb.h"
+#include "xerox_lpk.h"
+
 #include "bus/rs232/rs232.h"
-#include "bus/xerox820/dbslot.h"
 #include "bus/xerox820/copro.h"
+#include "bus/xerox820/dbslot.h"
 #include "cpu/z80/z80.h"
-#include "machine/z80daisy.h"
+#include "imagedev/floppy.h"
+#include "imagedev/snapquik.h"
 #include "machine/com8116.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
-#include "machine/z80pio.h"
 #include "machine/z80ctc.h"
+#include "machine/z80daisy.h"
+#include "machine/z80pio.h"
 #include "machine/z80sio.h"
-#include "x820kb.h"
-#include "xerox_lpk.h"
-#include "sound/spkrdev.h"
 #include "sound/beep.h"
-#include "imagedev/floppy.h"
-#include "imagedev/snapquik.h"
+#include "sound/spkrdev.h"
+
 #include "emupal.h"
 
 #define SCREEN_TAG      "screen"
@@ -53,7 +55,7 @@
 
 class xerox820_base_state : public driver_device
 {
-public:
+protected:
 	xerox820_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
@@ -70,7 +72,6 @@ public:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
-protected:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);

@@ -404,7 +404,8 @@ void xerox_820_keyboard_device::kb_bus_w(uint8_t data)
 //-------------------------------------------------
 
 xerox_820ii_keyboard_device::xerox_820ii_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	xerox_820_keyboard_device(mconfig, XEROX_820II_KEYBOARD, tag, owner, clock)
+	xerox_820_keyboard_device(mconfig, XEROX_820II_KEYBOARD, tag, owner, clock),
+	m_announce_timer(nullptr)
 {
 }
 

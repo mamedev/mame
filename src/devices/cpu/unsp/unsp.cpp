@@ -66,6 +66,7 @@ unsp_device::unsp_device(const machine_config &mconfig, device_type type, const 
 	, m_mem_write(nullptr)
 	, m_enable_drc(false)
 	, m_vectorbase(0xfff0)
+	, m_bootvectorbase(0xfff0)
 {
 	m_iso = 10;
 	m_numregs = 8;
@@ -231,7 +232,7 @@ void unsp_device::device_start()
 	if (m_enable_drc)
 	{
 		uint32_t umlflags = 0;
-		m_drcuml = std::make_unique<drcuml_state>(*this, m_drccache, umlflags, 1, 23, 0);
+		m_drcuml = std::make_unique<drcuml_state>(*this, m_drccache, umlflags, 1, 23, 0, COMPILE_FORWARDS_BYTES);
 
 		// add UML symbols-
 		m_drcuml->symbol_add(&m_core->m_r[REG_SP], sizeof(uint32_t), "SP");
@@ -335,7 +336,7 @@ void unsp_device::device_reset()
 			m_core->m_r[i] = 0xdeadbeef;
 	}
 
-	m_core->m_r[REG_PC] = read16(m_vectorbase + 0x7);
+	m_core->m_r[REG_PC] = read16(m_bootvectorbase + 0x7);
 	m_core->m_enable_irq = 0;
 	m_core->m_enable_fiq = 0;
 	m_core->m_fir_move = 1;

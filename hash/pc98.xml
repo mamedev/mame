@@ -27938,6 +27938,9 @@ Hangs after Game Arts logo, expects buffer at $27a50 to be 0
 		<description>Kawaisou Monogatari</description>
 		<year>1988</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
+		<notes><![CDATA[
+Throws [FDC] DISK ERROR when clicking GAME START, CHRN=(0, 0, 3, 1024) and R=5 for Disk B
+]]></notes>
 		<info name="alt_title" value="かわいそう物語" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>

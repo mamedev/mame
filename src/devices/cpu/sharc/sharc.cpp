@@ -586,7 +586,7 @@ void adsp21062_device::device_start()
 
 		// init UML generator
 		uint32_t umlflags = 0;
-		m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 1, 24, 0);
+		m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 1, 24, 0, COMPILE_FORWARDS_BYTES);
 
 		// add UML symbols
 		m_drcuml->symbol_add(&m_core->pc, sizeof(m_core->pc), "pc");

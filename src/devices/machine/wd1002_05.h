@@ -19,9 +19,9 @@
 
 #pragma once
 
+#include "imagedev/floppy.h"
 #include "machine/wd1002_hd0.h"
 #include "machine/wd_fdc.h"
-#include "imagedev/floppy.h"
 
 
 class wd1002_05_device : public wd1002_hd0_device
@@ -52,14 +52,14 @@ private:
 	required_device_array<floppy_connector, 2> m_floppy; // two 5.25" drives (A: and B:)
 
 	// task-file shadow needed for the floppy path (the base keeps the rigid copy)
-	uint8_t m_secno = 0, m_cyllo = 0, m_cylhi = 0, m_sdh = 0;
+	uint8_t m_secno, m_cyllo, m_cylhi, m_sdh;
 
-	uint8_t  m_fop = FOP_IDLE;
-	bool     m_f_write = false;
-	bool     m_f_wr_pending = false; // a floppy write command is buffering host data
-	int      m_f_cyl = 0, m_f_head = 0, m_f_sec = 0, m_f_drive = 0;
-	uint8_t  m_floppy_cyl[2] = { 0xff, 0xff }; // per-drive head position (0xff = unknown -> restore)
-	uint8_t  m_f_err = 0;            // floppy error register (WD1015 front-end status)
+	uint8_t  m_fop;
+	bool     m_f_write;
+	bool     m_f_wr_pending; // a floppy write command is buffering host data
+	int      m_f_cyl, m_f_head, m_f_sec, m_f_drive;
+	uint8_t  m_floppy_cyl[2]; // per-drive head position (0xff = unknown -> restore)
+	uint8_t  m_f_err;            // floppy error register (WD1015 front-end status)
 };
 
 DECLARE_DEVICE_TYPE(WD1002_05, wd1002_05_device)

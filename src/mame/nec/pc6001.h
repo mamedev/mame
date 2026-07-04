@@ -9,6 +9,7 @@
 #include "bus/nec_fdd/pc80s31k.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "imagedev/floppy.h"
 #include "machine/74157.h"
 #include "machine/bankdev.h"
@@ -46,7 +47,7 @@ public:
 		, m_joy(*this, "joy%u", 1U)
 		, m_joymux(*this, "joymux")
 		, m_cassette(*this, "cassette")
-		, m_cas_hack(*this, "cas_hack")
+		//, m_cas_hack(*this, "cas_hack")
 		, m_cart(*this, "cartslot")
 		, m_ay(*this, "aysnd")
 		, m_centronics(*this, "centronics")
@@ -97,7 +98,7 @@ protected:
 	required_device_array<msx_general_purpose_port_device, 2> m_joy;
 	required_device<ls157_x2_device> m_joymux;
 	optional_device<cassette_image_device> m_cassette;
-	optional_device<generic_slot_device> m_cas_hack;
+//	optional_device<generic_slot_device> m_cas_hack;
 	required_device<generic_slot_device> m_cart;
 	optional_device<ay8910_device> m_ay;
 	required_device<centronics_device> m_centronics;
@@ -119,7 +120,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 	void default_cartridge_reset();
-	void default_cassette_hack_reset();
+//	void default_cassette_hack_reset();
 	void default_keyboard_hle_reset();
 	void irq_reset(u8 timer_default_setting);
 
@@ -137,6 +138,12 @@ protected:
 	inline void set_videoram_bank(uint32_t offs);
 	void write_centronics_busy(int state);
 
+	// snapshot handling
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
+	uint32_t m_cas_offset = 0;
+	uint32_t m_cas_maxsize = 0;
+	uint8_t m_cas_data[0x18000];
+
 	// video functions
 	void draw_gfx_mode4(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr);
 	void draw_bitmap_2bpp(bitmap_ind16 &bitmap,const rectangle &cliprect, int attr);
@@ -150,8 +157,6 @@ protected:
 	std::unique_ptr<uint8_t[]> m_video_ram;
 	uint8_t m_cas_switch = 0;
 	uint8_t m_sys_latch = 0;
-	uint32_t m_cas_offset = 0;
-	uint32_t m_cas_maxsize = 0;
 	uint8_t m_bank_opt = 0;
 	bool m_timer_enable = false;
 	bool m_timer_irq_mask = false;

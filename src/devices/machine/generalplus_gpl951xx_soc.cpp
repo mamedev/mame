@@ -406,6 +406,9 @@ void generalplus_gpl951xx_device::device_start()
 	save_item(NAME(m_tft_rgb_ctrl));
 	save_item(NAME(m_madc_ctrl));
 	save_item(NAME(m_madc_data));
+
+	//set_vectorbase(0x8ff8); // uses vectors in the SPI space for IRQs
+	set_bootvectorbase(0x8ff8); // uses vector in internal ROM for boot
 }
 
 void generalplus_gpl951xx_device::device_reset()
@@ -1771,7 +1774,7 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map &map)
 	map(0x007c00, 0x007dff).rw(m_spg_audio, FUNC(sunplus_gcm394_audio_device::audio_r), FUNC(sunplus_gcm394_audio_device::audio_w));
 	map(0x007e00, 0x007fff).rw(m_spg_audio, FUNC(sunplus_gcm394_audio_device::audio_phase_r), FUNC(sunplus_gcm394_audio_device::audio_phase_w));
 
-	// 8000 - 8fff internal boot ROM (same on all devices of the same type, not OTP)
+	map(0x008000, 0x008fff).rom().region("internal", 0);
 
 	map(0x009000, 0x1fffff).r(FUNC(generalplus_gpl951xx_device::spi_direct_r));
 	map(0x200000, 0x3fffff).r(FUNC(generalplus_gpl951xx_device::spi_direct_bank_r));
@@ -1899,6 +1902,17 @@ void generalplus_gpl951xx_device::device_add_mconfig(machine_config &config)
 	TIMER(config, m_adc_timer).configure_generic(FUNC(generalplus_gpl951xx_device::adc_timer_cb));
 
 	GPL951XX_RTC(config, m_rtc);
+}
+
+// it is not currently confirmed that this is the same for all GPL951xx chips, but it has been verified across multiple devices
+ROM_START( gpl951xx )
+	ROM_REGION16_BE( 0x2000, "internal", 0 )
+	ROM_LOAD16_WORD_SWAP( "gpl951.bin", 0x00000, 0x2000, CRC(2872d489) SHA1(01752267b404d1bd3a61efa928223eb9e147faa3) )
+ROM_END
+
+const tiny_rom_entry *generalplus_gpl951xx_device::device_rom_region() const
+{
+	return ROM_NAME( gpl951xx );
 }
 
 DEFINE_DEVICE_TYPE(GPL951XX, generalplus_gpl951xx_device, "gpl951xx", "GeneralPlus GPL951xx")

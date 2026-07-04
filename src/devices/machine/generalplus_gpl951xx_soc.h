@@ -74,6 +74,7 @@ protected:
 	generalplus_gpl951xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal);
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	void gpspi_direct_internal_map(address_map &map) ATTR_COLD;
 	template<int Port> void add_port(address_map& map, u32 base) ATTR_COLD;

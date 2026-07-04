@@ -174,12 +174,13 @@ class drcuml_state
 {
 public:
 	// construction/destruction
-	drcuml_state(device_t &device, drc_cache &cache, u32 flags, int modes, int addrbits, int ignorebits);
+	drcuml_state(device_t &device, drc_cache &cache, u32 flags, int modes, int addrbits, int ignorebits, u32 max_sequence_length);
 	~drcuml_state();
 
 	// getters
 	device_t &device() const { return m_device; }
 	drc_cache &cache() const { return m_cache; }
+	u32 max_sequence_length() const { return m_max_sequence_length; }
 
 	// reset the state
 	void reset();
@@ -251,6 +252,7 @@ private:
 	// internal state
 	device_t &                              m_device;           // CPU device we are associated with
 	drc_cache &                             m_cache;            // pointer to the codegen cache
+	u32 const                               m_max_sequence_length; // maximum length in bytes of a generated sequence
 	std::unique_ptr<drcbe_interface> const  m_beintf;           // backend interface pointer
 	std::unique_ptr<std::ostream> const     m_umllog;           // handle to the UML logfile
 	std::list<block_impl>                   m_blocklist;        // list of active blocks

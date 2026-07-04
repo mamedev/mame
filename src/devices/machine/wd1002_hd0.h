@@ -62,7 +62,7 @@ protected:
 	void buf_out(uint8_t data);   // controller -> host buffer (filled on a read-from-media)
 
 	std::unique_ptr<uint8_t[]> m_buf;
-	uint16_t m_ptr = 0;
+	uint16_t m_ptr;
 
 private:
 	void intrq_w(int state);      // WD1010 INTRQ, forwarded to the host callback
@@ -72,7 +72,7 @@ private:
 	required_device<harddisk_image_device> m_hdd; // the fixed drive (its CHD may or may not be mounted)
 	devcb_write_line m_intrq_cb;
 
-	uint16_t m_sector_bytes = BUFFER_SIZE; // sector size taken from the mounted drive (128/256/512)
+	uint16_t m_sector_bytes; // sector size taken from the mounted drive (128/256/512)
 };
 
 DECLARE_DEVICE_TYPE(WD1002_HD0, wd1002_hd0_device)

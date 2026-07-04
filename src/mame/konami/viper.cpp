@@ -86,9 +86,6 @@
     - hookup adc0838, reads from i2c;
     - convert epic to be a device, make it input_merger/irq_callback compliant;
     - (more intermediate steps for proper PCI conversions here)
-    - jpark3: attract mode demo play acts weird, the dinosaur gets submerged
-      and camera doesn't really know what to do, CPU core bug?
-    - jpark3: crashes during second attract cycle;
     - sscopex: attract mode black screens (coin still works), sogeki/sscopefh are unaffected;
     - mocapglf, sscopefh, sscopex: implement 2nd screen output, controlled by IP90C63A;
     \- sscopex/sogeki desyncs during gameplay intro, leaves heavy trails in gameplay;

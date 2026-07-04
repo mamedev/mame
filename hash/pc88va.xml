@@ -437,6 +437,7 @@ cfr. around PC=39ba1 where it tries to load sound data, issues brk 80h which nev
 [gfx] intro title needs pdrawgfx
 [SGP] triggers SF = 1 draws with stage bosses (safe to ignore?)
 [IDP] sprite glitches towards the end of stage 1-2 and successive stages. Needs CPU clock bump.
+[Clock HACK] Currently plays the wrong BGM when clearing a stage.
 Corrupts itself on prolonged playthrough (stage 2-1 boss, disk D, test me again)
 ]]></notes>
 		<info name="alt_title" value="オルテウス" />
@@ -571,6 +572,7 @@ Burps on [FDC] access after disk swap with program and player disks, trying to s
 [IDP] cursor blink present on title screen (verify)
 [gfx] Winning animation a bit offset, not fractional horizontal scrolling?
 [gfx] sometimes draws copyright screen background color to non-black
+[DAC1BIT] currently plays too fast due of the [Clock HACK]
 ]]></notes>
 		<info name="alt_title" value="上海" />
 		<sharedfeat name="mouseport_default" value="mouse"/>

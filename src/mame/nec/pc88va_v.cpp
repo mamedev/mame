@@ -997,7 +997,7 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 		// - olteus is more picky in shop, and needs the lower part not being ignored
 		// - boomer top left corner of stage one corrupts if we don't do this here
 
-		// TODO: YMMD also acts as a page mask if enabled (& 0x1ffff rather than 0x3ffff)
+		// TODO: YMMD also acts as a page mask if enabled (& 0x1ffff rather than 0x3ffff in single plane mode)
 		params.layer_base = layer_n == layer_fixed ? 0x20000 : 0;
 		params.layer_mask = layer_n == layer_fixed ? 0x1ffff : 0x3ffff;
 
@@ -1005,8 +1005,9 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 		{
 			switch(gfx_ctrl & 3)
 			{
-				case 1: draw_packed_gfx_4bpp(m_graphic_bitmap[which], split_cliprect, params, layer_pal_bank, which); break;
+				case 1: draw_plane_multi_4bpp(m_graphic_bitmap[which], split_cliprect, params, layer_pal_bank, which); break;
 				default:
+					// should just draw black
 					popmessage("pc88va_v.cpp: unhandled %d GFX mode DM = 0 (Multiplane)", which);
 					break;
 			}
@@ -1015,16 +1016,16 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 		{
 			switch(gfx_ctrl & 3)
 			{
-				//case 0: draw_indexed_gfx_1bpp(bitmap, cliprect, dsa, layer_pal_bank); break;
-				case 1: draw_indexed_gfx_4bpp(m_graphic_bitmap[which], split_cliprect, params, layer_pal_bank, which); break;
+				//case 0: draw_plane_single_1bpp(bitmap, cliprect, dsa, layer_pal_bank); break;
+				case 1: draw_plane_single_4bpp(m_graphic_bitmap[which], split_cliprect, params, layer_pal_bank, which); break;
 				case 2:
 					// animefrm: only layer 1 draws in 5bpp
 					if (is_5bpp && layer_n == 1)
-						draw_packed_gfx_5bpp(m_graphic_bitmap[which], split_cliprect, params, which);
+						draw_plane_single_5bpp(m_graphic_bitmap[which], split_cliprect, params, which);
 					else
-						draw_direct_gfx_8bpp(m_graphic_bitmap[which], split_cliprect, params, which);
+						draw_plane_single_8bpp(m_graphic_bitmap[which], split_cliprect, params, which);
 					break;
-				case 3: draw_direct_gfx_rgb565(m_graphic_bitmap[which], split_cliprect, params, which); break;
+				case 3: draw_plane_single_rgb565(m_graphic_bitmap[which], split_cliprect, params, which); break;
 				default:
 					popmessage("pc88va_v.cpp: unhandled %d GFX mode DM = 1 (Singleplane)", which);
 					break;
@@ -1041,7 +1042,7 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 }
 
 // TODO: incomplete, no known cases yet
-void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which)
+void pc88va_state::draw_plane_single_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which)
 {
 	// should use all the bits
 	// const u8 x_dot_offs = param.x_dot_offs & 0x1f;
@@ -1068,7 +1069,7 @@ void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &
 }
 
 // famista, shinraba
-void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which)
+void pc88va_state::draw_plane_single_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which)
 {
 	const u32 base_address = param.dsa & 0x3ffff;
 	const u32 y_wrap = param.fbl - param.ofy;
@@ -1104,7 +1105,7 @@ void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &
 }
 
 // animefrm draw area
-void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 which)
+void pc88va_state::draw_plane_single_5bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 which)
 {
 	// TODO: fix scrolling, add x dot scroll
 	const u32 base_address = param.dsa & 0x3ffff;
@@ -1127,7 +1128,7 @@ void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &c
 }
 
 // boomer gameplay, olteus, animefrm status bar
-void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 which)
+void pc88va_state::draw_plane_single_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 which)
 {
 	const u32 base_address = param.dsa & 0x3ffff;
 	const u32 y_wrap = param.fbl - param.ofy;
@@ -1166,10 +1167,11 @@ void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &c
 }
 
 // pc88vad, ballbrkr title screen
-void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 which)
+void pc88va_state::draw_plane_single_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 which)
 {
 	const u32 base_address = (param.dsa & 0x3ffff);
 	const u32 y_wrap = param.fbl - param.ofy;
+	// TODO: x_wrap
 	// 0 or 16 valid
 	const u8 x_dot_offs = BIT(param.x_dot_offs, 4);
 
@@ -1198,26 +1200,47 @@ void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle 
 	}
 }
 
-// all inufuto games, alantia
+// all inufuto games, alantia, fqueen
 // x dot offset used by aerial
-void pc88va_state::draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which)
+void pc88va_state::draw_plane_multi_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, const layer_params_t &param, u8 pal_base, u8 which)
 {
-	const u32 base_offset = param.dsa >> 2;
+	// Multiplane is special: shifts down most parameters by 2 ...
+	const u16 fbw = param.fbw >> 2;
+
+	const u32 fsa = param.fsa >> 2;
+	const u32 dsa = param.dsa >> 2;
+
+	// OFY is (allegedly) used by fqueen in gameplay (FBL=256, DSH=400, OFY=0~64)
+	// NOTE: it never hits a wrap (?)
+	const u32 y_wrap = param.fbl - param.ofy;
+	// TODO: implement OFX (different than the other modes, unused by all known SW dumps)
+
 	// 0~7 valid
 	const u8 x_dot_offs = param.x_dot_offs & 7;
 
+	// multiplane masks at 0x7fff, ignores DSA upper bit and actually banks thru FSA bit 17 alone
+	// - fqueen double buffering, particularly for status menu solid boxes at specific OFY positions
+	const u32 layer_mask = param.layer_mask >> 3;
+	const u32 base_offset = (fsa & 0x8000); // | (param.layer_base >> 2);
+
+	// TODO: enabling graphic B in multiplane is untested
+	// (and sure will give unexpected results if anything does)
+	if (which == 1)
+		popmessage("pc88va_v.cpp: multiplane Graphic B enable");
+
 	// alantia disables 4th layer, uses it as local GFX storage
 	const u8 num_banks = m_g3msk + 3;
-	// TODO: implement OFX/OFY (different than the other modes, unused by all known SW dumps)
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u32 line_offset = ((y * (param.fbw >> 2)) + base_offset) & 0x0ffff;
+		const int y_latch = y - param.dsp;
+		const u32 latched_address = (y_latch >= y_wrap) ? (fsa - y_wrap * fbw) : dsa;
+		const u32 line_offset = (y_latch * fbw) + latched_address;
 
 		for(int x = cliprect.min_x; x <= cliprect.max_x + x_dot_offs; x += 8)
 		{
 			u16 x_char = (x >> 3);
-			u32 bitmap_offset = (line_offset + x_char) & 0x0ffff;
+			u32 bitmap_offset = ((line_offset + x_char) & layer_mask) | base_offset;
 
 			for (int xi = 0; xi < 8; xi ++)
 			{

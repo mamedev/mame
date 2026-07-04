@@ -2,64 +2,68 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-    PC-6001 series (c) 1981 NEC
+PC-6001 series (c) 1981 NEC
 
-    driver by Angelo Salese
+TODO:
+- Move MCU HLE simulation in a device;
+- Remove the 8255 hacks;
+- Proper support for .wav/.p6t file formats used by the cassette interface;
+- Make FDC to actually load images, also fix .dsk identification;
+- Confirm irq model daisy chain behaviour, and add missing irqs and features
+  (namely the irq dispatch for SR mode should really honor I/O $fb and fallback to legacy
+   behaviour if masked);
+- Several games are decidedly too fast, down to missing waitstates, no screen raw
+  parameters, crtkill signal and bus request;
+- Merge PC-6001 video emulation with MC6847 (is it really one or rather a M5C6847P-1?);
+- Pinpoint what VDG supersets PC-6001mkII and SR models really uses;
+- upd7752 voice speech device needs to be properly emulated (device is currently a skeleton),
+  pc6001mk2_cass:chrith is a good test case, it's supposed to talk before title screen;
 
-    TODO:
-    - Move MCU HLE simulation in a device or even make an handcrafted LLE version
-      (assuming we'll never get the MCS48 dump). Additionally remove the 8255 hacks;
-    - Proper support for .cas/.wav/.p6/.p6t file formats used by the cassette interface;
-    - Make FDC to actually load images, also fix .dsk identification;
-    - Confirm irq model daisy chain behaviour, and add missing irqs and features
-      (namely the irq dispatch for SR mode should really honor I/O $fb and fallback to legacy
-       behaviour if masked);
-    - Several games are decidedly too fast, down to missing waitstates, no screen raw
-      parameters, crtkill signal and bus request;
-    - PC-6001mkII: refactor memory model to use address_map_bank_device;
-    - PC-6001mkII: confirm optional FDC used mapped at 0xd0-0xd3
-      (PC-6031? It looks like a 5'25 single drive with 8255 protocol, presumably earlier revision
-      of PC-80S31 with no dump available);
-    - PC-6601: current regression caused by an internal FDC sense interrupt status that expects a
-      DIO high that never occurs;
-    - PC-6601: mon r-0 type games doesn't seem to work at all on this system?
-    - PC-6001SR: Implement MK-2 compatibility mode via view handler(s)
-      (it changes the memory map to behave like the older versions);
-    - Merge PC-6001 video emulation with MC6847 (is it really one or rather a M5C6847P-1?);
-    - Pinpoint what VDG supersets PC-6001mkII and SR models really uses;
-    - upd7752 voice speech device needs to be properly emulated (device is currently a skeleton),
-      Chrith game is a good test case, it's supposed to talk before title screen;
-    - Video Telopper (superimposer) & TV tuner functions for later machines;
+TODO (pc6001mk2):
+- refactor memory model to use address_map_bank_device;
+- confirm optional FDC used mapped at 0xd0-0xd3
+\- PC-6031? It looks like a 5'25 single drive with 8255 protocol, presumably earlier revision
+   of PC-80S31 with no dump available;
 
-    TODO (game specific):
-    - (several AX* games, namely Galaxy Mission Part 1/2 and others): inputs doesn't work;
-    - AX6 - Demo: When AY-based speech talks, other emus emulates the screen drawing to be
-       a solid green (plain PC-6001) or solid white (Mk2 version), but according to an
-       original video reference, that screen should actually some kind of weird garbage on it;
-    - AX6 - Powered Knight: doesn't work too well, according to the asm code it asks the
-       player to press either 'B' or 'C' then a number but nothing is shown on screen,
-       other emus behaves the same, bad dump?
-    (Mk2 mode 5 games)
-    - 3D Golf Simulation Super Version: gameplay / inputs seems broken;
-    - American Truck: Screen is offset at the loading screen, loading bug?
-    - Castle Excellent: copyright text drawing is quite bogus, scans text in vertical
-       instead of horizontal?
-    - Dezeni Land (ALL versions) / Hurry Fox 1/2: asks you to "load something", can't do it
-       with current cassette kludge, also, for Dezeni Land(s) keyboard irqs doesn't seem to
-       work too well with halt opcode execution?
-    - Dezeni Land 1/4: dies after loading of main program;
-    - Dezeni Land 2: dies at the "load something" screen with presumably wrong stack opcodes
-    - (MyCom BASIC games with multiple files): most of them refuses to run ... how to load them?
-    - Grobda: when "get ready" speech plays, screen should be full white but instead it's all
-       black, same issue as AX-6 Demo?
-    - Pac-Man / Tiny Xevious 2: gameplay is too fast (unrelated with timer irq);
-    - Salad no Kunino Tomato-Hime: can't start a play;
-    - Space Harrier: very sensitive with sub irq triggers, keyboard joy triggers doesn't work
-      properly (select F1 after loading), draws garbage on vanilla pc6001 and eventually crashes
-      MAME;
-    - The Black Onyx: dies when it attempts to save the character, that obviously means saving
-       on the tape;
-    - Yakyukyo / Punchball Mario: waits for an irq (fixed, wrong timer enable behaviour);
+TODO (pc6601):
+- current regression caused by an internal FDC sense interrupt status that expects a
+  DIO high that never occurs;
+- mon r-0 type games doesn't seem to work at all on this system?
+
+TODO (pc6601mk2sr):
+- Implement MK-2 compatibility mode via view handler(s)
+  (it changes the memory map to behave like the older versions);
+- Video Telopper (superimposer) & TV tuner functions for later machines;
+- pc6001mk2sr/pc6601sr: currently doesn't work without -debug enabled (?), has serious keyboard
+  issues.
+
+TODO (game specific, move in SW lists):
+- (several AX* games, namely Galaxy Mission Part 1/2 and others): inputs doesn't work;
+- AX6 - Demo: When AY-based speech talks, other emus emulates the screen drawing to be
+   a solid green (plain PC-6001) or solid white (Mk2 version), but according to an
+   original video reference, that screen should actually some kind of weird garbage on it;
+- AX6 - Powered Knight: doesn't work too well, according to the asm code it asks the
+   player to press either 'B' or 'C' then a number but nothing is shown on screen,
+   other emus behaves the same, bad dump?
+(Mk2 mode 5 games)
+- 3D Golf Simulation Super Version: gameplay / inputs seems broken;
+- American Truck: Screen is offset at the loading screen, loading bug?
+- Dezeni Land (ALL versions) / Hurry Fox 1/2: asks you to "load something", can't do it
+   with current cassette kludge, also, for Dezeni Land(s) keyboard irqs doesn't seem to
+   work too well with halt opcode execution?
+- Dezeni Land 1/4: dies after loading of main program;
+- Dezeni Land 2: dies at the "load something" screen with presumably wrong stack opcodes
+- (MyCom BASIC games with multiple files): most of them refuses to run ... how to load them?
+- Grobda: when "get ready" speech plays, screen should be full white but instead it's all
+   black, same issue as AX-6 Demo?
+- Pac-Man / Tiny Xevious 2: gameplay is too fast (unrelated with timer irq);
+- Salad no Kunino Tomato-Hime: can't start a play;
+- Space Harrier: very sensitive with sub irq triggers, keyboard joy triggers doesn't work
+  properly (select F1 after loading), draws garbage on vanilla pc6001 and eventually crashes
+  MAME;
+- The Black Onyx: dies when it attempts to save the character, that obviously means saving
+   on the tape;
+- Yakyukyo / Punchball Mario: waits for an irq (fixed, wrong timer enable behaviour);
 
 ===================================================================================================
 
@@ -1491,7 +1495,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::cassette_callback)
 			else
 				cas_data_i>>=1;
 		#else
-			m_cur_keycode = m_cas_hack->read_rom(m_cas_offset++);
+			m_cur_keycode = m_cas_data[m_cas_offset++];
 			popmessage("%04x %04x", m_cas_offset, m_cas_maxsize);
 			if(m_cas_offset > m_cas_maxsize)
 			{
@@ -1536,6 +1540,10 @@ void pc6001_state::machine_start()
 {
 	m_timer_irq_timer = timer_alloc(FUNC(pc6001_state::audio_callback), this);
 	m_sub_trig_timer = timer_alloc(FUNC(pc6001_state::sub_trig_callback), this);
+
+	save_item(NAME(m_cas_data));
+	save_item(NAME(m_cas_offset));
+	save_item(NAME(m_cas_maxsize));
 }
 
 inline void pc6001_state::set_videoram_bank(uint32_t offs)
@@ -1554,11 +1562,26 @@ inline void pc6001_state::default_cartridge_reset()
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 }
 
-inline void pc6001_state::default_cassette_hack_reset()
+SNAPSHOT_LOAD_MEMBER(pc6001_state::snapshot_cb)
 {
+	/* get file size */
+	uint64_t snapsize = image.length();
+
+	// biggest file seen in the wild is 0x1478d
+	if (snapsize > 0x18000)
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
+
+	auto data = std::make_unique<uint8_t []>(snapsize);
+	if (image.fread(data.get(), snapsize) != snapsize)
+		return std::make_pair(image_error::UNSPECIFIED, "Internal error loading snapshot");
+
+	memcpy(m_cas_data, &data[0], snapsize);
+
 	m_cas_switch = 0;
 	m_cas_offset = 0;
-	m_cas_maxsize = (m_cas_hack->exists()) ? m_cas_hack->get_rom_size() : 0;
+	m_cas_maxsize = snapsize;
+
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 inline void pc6001_state::default_keyboard_hle_reset()
@@ -1584,7 +1607,8 @@ void pc6001_state::machine_reset()
 	set_videoram_bank(0xc000);
 
 	default_cartridge_reset();
-	default_cassette_hack_reset();
+	//default_cassette_hack_reset();
+	m_cas_offset = 0;
 	irq_reset(3);
 	default_keyboard_hle_reset();
 }
@@ -1599,7 +1623,8 @@ void pc6001mk2_state::machine_reset()
 	if (m_cart->exists())
 		memcpy(m_region_maincpu->base() + 0x48000, m_cart_rom->base(), 0x4000);
 
-	default_cassette_hack_reset();
+	//default_cassette_hack_reset();
+	m_cas_offset = 0;
 	irq_reset(3);
 	default_keyboard_hle_reset();
 
@@ -1637,7 +1662,6 @@ void pc6601_state::machine_start()
 void pc6001mk2sr_state::machine_reset()
 {
 //  pc6001_state::machine_reset();
-	default_cassette_hack_reset();
 
 //  set_videoram_bank(0x70000);
 	m_video_base = &m_ram[0];
@@ -1648,9 +1672,10 @@ void pc6001mk2sr_state::machine_reset()
 	// hard to tell without an actual SR cart dump
 //  std::string region_tag;
 //  m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-	default_cassette_hack_reset();
+	//default_cassette_hack_reset();
 	irq_reset(0x7f);
 	default_keyboard_hle_reset();
+	m_cas_offset = 0;
 
 	// default to text mode
 	m_sr_text_mode = true;
@@ -1755,14 +1780,16 @@ void pc6001_state::pc6001(machine_config &config)
 	m_joymux->b_in_callback().set(m_joy[0], FUNC(msx_general_purpose_port_device::read));
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "pc6001_cart");
-	SOFTWARE_LIST(config, "cart_list_pc6001").set_original("pc6001_cart");
-	SOFTWARE_LIST(config, "cass_list_pc6001").set_original("pc6001_cass");
 
 //  CASSETTE(config, m_cassette);
 //  m_cassette->set_formats(pc6001_cassette_formats);
 //  m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 //  m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
-	GENERIC_CARTSLOT(config, m_cas_hack, generic_plain_slot, "pc6001_cass", "cas,p6");
+
+	// cas and p6 are raw binary files with no tape markers
+	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "cas,p6"));
+	snapshot.set_interface("pc6001_snap");
+	snapshot.set_load_callback(FUNC(pc6001_state::snapshot_cb));
 
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, m_ay, PC6001_MAIN_CLOCK/4);
@@ -1780,6 +1807,9 @@ void pc6001_state::pc6001(machine_config &config)
 	// TODO: accurate timing on this
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(pc6001_state::keyboard_callback), attotime::from_hz(250));
 	TIMER(config, "cassette_timer").configure_periodic(FUNC(pc6001_state::cassette_callback), attotime::from_hz(1200/12));
+
+	SOFTWARE_LIST(config, "cart_list_pc6001").set_original("pc6001_cart");
+	SOFTWARE_LIST(config, "cass_list_pc6001").set_original("pc6001_cass");
 }
 
 void pc6001mk2_state::pc6001mk2(machine_config &config)

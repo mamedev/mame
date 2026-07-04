@@ -18,15 +18,15 @@ The Page value should be entered at the 'How Many Pages?' prompt in all versions
 
 Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading completes.
 -->
-<softwarelist name="pc6001_cass" description="NEC PC-6001 cassettes">
+<softwarelist name="pc6001_cass" description="NEC PC-6001 cassette snapshots">
 
 	<software name="amazon" supported="partial">
 		<description>The Amazon</description>
 		<year>19??</year>
 		<publisher>T. Katayama</publisher>
 		<info name="usage" value="Mode 2, Page 3" />
-		<part name="cart" interface="pc6001_cass">
-			<dataarea name="rom" size="15260">
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="15260">
 				<rom name="amazon.cas" size="15260" crc="0b154850" sha1="a616b6d8852bea0fae27241ab7a0d5c81014e0e0"/>
 			</dataarea>
 		</part>
@@ -37,8 +37,8 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Mode 1, Page 2" />
-		<part name="cart" interface="pc6001_cass">
-			<dataarea name="rom" size="2755">
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="2755">
 				<rom name="amita.cas" size="2755" crc="fbb5ec19" sha1="dc49c616fb7822f21ca895bbb5f3b16924d306d8"/>
 			</dataarea>
 		</part>
@@ -49,8 +49,8 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Mode 1, Page 2" />
-		<part name="cart" interface="pc6001_cass">
-			<dataarea name="rom" size="4837">
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="4837">
 				<rom name="block.cas" size="4837" crc="b0bad3d9" sha1="01b2da04a6d8c5766dcd765994d142bd18dcce73"/>
 			</dataarea>
 		</part>
@@ -62,8 +62,8 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		<publisher>Compac</publisher>
 		<info name="usage" value="Mode 2, Page 2" />
 		<info name="alt_title" value="ブレイク・スルー"/>
-		<part name="cart" interface="pc6001_cass">
-			<dataarea name="rom" size="24029">
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="24029">
 				<rom name="break through.cas" size="24029" crc="929dd694" sha1="8e9d3d90a0c506cfcde12139258050cd8608bc5d"/>
 			</dataarea>
 		</part>
@@ -75,8 +75,8 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		<publisher>Enix</publisher>
 		<info name="usage" value="Mode 2, Page 2" />
 		<info name="alt_title" value="ドアドア"/>
-		<part name="cart" interface="pc6001_cass">
-			<dataarea name="rom" size="32221">
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="32221">
 				<rom name="door door.p6" size="32221" crc="3bc496a3" sha1="f89c8ab94cf0004303714f605739efc0abf2a608"/>
 			</dataarea>
 		</part>
@@ -88,8 +88,8 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		<publisher>Xtal Soft</publisher>
 		<info name="usage" value="Mode 2, Page 2" />
 		<info name="alt_title" value="アースバウンド"/>
-		<part name="cart" interface="pc6001_cass">
-			<dataarea name="rom" size="41241">
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="41241">
 				<rom name="earth bound.cas" size="41241" crc="1c4cafba" sha1="d9d8b4088e1bc2cd3d7df9f238215f41bc4ae065"/>
 			</dataarea>
 		</part>
@@ -101,8 +101,8 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		<publisher>Bothtec</publisher>
 		<info name="usage" value="Mode 2, Page 1" />
 		<info name="alt_title" value="エギー"/>
-		<part name="cart" interface="pc6001_cass">
-			<dataarea name="rom" size="22307">
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="22307">
 				<rom name="eggy.cas" size="22307" crc="3c9e47d2" sha1="885c4964480dfcd12164a1ebab0f95aecd06cf2d"/>
 			</dataarea>
 		</part>
@@ -114,8 +114,8 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		<publisher>ASCII</publisher>
 		<info name="usage" value="Mode 1, Page 1" />
 		<info name="alt_title" value="ヘッド・オン"/>
-		<part name="cart" interface="pc6001_cass">
-			<dataarea name="rom" size="5711">
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="5711">
 				<rom name="head on.cas" size="5711" crc="91f7d594" sha1="e64442f2c32f0a7b6c62e1adcc4555fcc8149b66"/>
 			</dataarea>
 		</part>
@@ -126,8 +126,8 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		<year>19??</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="usage" value="Mode 1, Page 2" />
-		<part name="cart" interface="pc6001_cass">
-			<dataarea name="rom" size="1766">
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="1766">
 				<rom name="jintori game.cas" size="1766" crc="34f9764d" sha1="2b3e72cb3ac41fb8de50111a9fe78797b1628ae1"/>
 			</dataarea>
 		</part>
@@ -138,8 +138,8 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Mode 1, Page 1" />
-		<part name="cart" interface="pc6001_cass">
-			<dataarea name="rom" size="13612">
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="13612">
 				<rom name="power.cas" size="13612" crc="9252969e" sha1="e0e3b0582c8c17d7f738dd2f61a9933420435283"/>
 			</dataarea>
 		</part>
@@ -150,8 +150,8 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		<year>19??</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="usage" value="Mode 1, Page 2" />
-		<part name="cart" interface="pc6001_cass">
-			<dataarea name="rom" size="8504">
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="8504">
 				<rom name="pro racer.cas" size="8504" crc="52624dc8" sha1="9e0c8c59f583b4204d52514fc3bbbd2dfb765b8c"/>
 			</dataarea>
 		</part>
@@ -163,8 +163,8 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		<publisher>Magic Soft</publisher>
 		<info name="usage" value="Mode 2, Page 1" />
 		<info name="alt_title" value="ピラミッド"/>
-		<part name="cart" interface="pc6001_cass">
-			<dataarea name="rom" size="15263">
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="15263">
 				<rom name="pyramid.cas" size="15263" crc="7d3b4628" sha1="e1be45b435d599d3f7444f159c538e093ba63f3f"/>
 			</dataarea>
 		</part>
@@ -177,8 +177,8 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		<info name="usage" value="Mode 4, Page 3 - PC-6001 requires N60 Extended BASIC cartridge" />
 		<info name="alt_title" value="スペース・エネミー"/>
 		<sharedfeat name="requirement" value="pc6001_cart:n60basic"/>
-		<part name="cart" interface="pc6001_cass">
-			<dataarea name="rom" size="5579">
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="5579">
 				<rom name="space enemy.cas" size="5579" crc="6601f428" sha1="4d922cef648f9efe001f25920bf1874ca5cbde52"/>
 			</dataarea>
 		</part>
@@ -189,8 +189,8 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Mode 2, Page 2" />
-		<part name="cart" interface="pc6001_cass">
-			<dataarea name="rom" size="18114">
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="18114">
 				<rom name="super ball.p6" size="18114" crc="a7923430" sha1="01cb476f5e127176290949ff273cac0c6ffe5c49"/>
 			</dataarea>
 		</part>
@@ -202,8 +202,8 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		<publisher>T&amp;E Soft</publisher>
 		<info name="usage" value="Mode 2, Page 2" />
 		<info name="alt_title" value="トリックボーイ"/>
-		<part name="cart" interface="pc6001_cass">
-			<dataarea name="rom" size="25800">
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="25800">
 				<rom name="trick boy.cas" size="25800" crc="dfad3c61" sha1="39798e7f7cb2802d977f5124dd053a0d85d4c018"/>
 			</dataarea>
 		</part>
@@ -216,8 +216,8 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		<info name="usage" value="Mode 4, Page 2 - PC-6001 requires N60 Extended BASIC cartridge" />
 		<info name="alt_title" value="タイニーゼビウス"/>
 		<sharedfeat name="requirement" value="pc6001_cart:n60basic"/>
-		<part name="cart" interface="pc6001_cass">
-			<dataarea name="rom" size="17741">
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="17741">
 				<rom name="tiny xevious.cas" size="17741" crc="5e9e2dbf" sha1="90e2b187f3b042ef1883105a34e83fe69a58e38f"/>
 			</dataarea>
 		</part>
