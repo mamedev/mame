@@ -208,10 +208,6 @@ void s8k_state::machine_start()
 	m_normal_timer = timer_alloc(FUNC(s8k_state::normal_led_delay), this);
 	m_busack_timer = timer_alloc(FUNC(s8k_state::busack_led_delay), this);
 
-	m_power_led.resolve();
-	m_normal_led.resolve();
-	m_busack_led.resolve();
-
 	m_power_led = 0;
 	m_normal_led = 0;
 	m_busack_led = 0;
