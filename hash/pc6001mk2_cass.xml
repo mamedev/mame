@@ -10,6 +10,7 @@ Mode 2: N60 BASIC (32K)
 Mode 3: N60 EXTENDED BASIC (16K)
 Mode 4: N60 EXTENDED BASIC (32K)
 Mode 5: N60m BASIC (64K)
+Mode 6: N66SR BASIC (pc6001mk2sr/pc6601sr, separate SW list)
 
 This software list should ONLY be used for Mk II specific software which will require mode 5.
 Any software requiring modes 1-4 should be listed in the pc6001_cass.xml software list.
@@ -27,6 +28,38 @@ If usage specifies MONITOR:
 
 -->
 <softwarelist name="pc6001mk2_cass" description="NEC PC-6001mkII cassette snapshots">
+
+	<software name="3dgolfsv" supported="no">
+		<description>3D Golf Simulation: Super Version</description>
+		<year>1984?</year>
+		<publisher>T&amp;E Soft</publisher>
+		<notes><![CDATA[
+Requires [keyboard] key repeat
+]]></notes>
+		<info name="usage" value="Mode 5, Page 3, BASIC"/>
+		<info name="alt_title" value="3Dゴルフシミュレーションスーパーバージョン"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="51682">
+				<rom name="3d golf simulation super version.cas" size="51682" crc="e3e0e241" sha1="2b58d5405a96fdd393e42cad288601f4b3495007" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amtruck" supported="no">
+		<description>American Truck</description>
+		<year>1985?</year>
+		<publisher>Telenet Japan</publisher>
+		<notes><![CDATA[
+Runs too fast
+]]></notes>
+		<info name="usage" value="Mode 5, Page 4, MONITOR"/>
+		<info name="alt_title" value="アメリカントラック"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="43303">
+				<rom name="american truck.cas" size="43303" crc="8b50ad46" sha1="aec8ba495b058f775b5f7bb418d430bd4ad7e0da" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="bokosuka" supported="partial">
 		<description>Bokosuka Wars</description>
@@ -200,6 +233,23 @@ If usage specifies MONITOR:
 		</part>
 	</software>
 
+	<software name="pacman" supported="no">
+		<description>Pac-Man</description>
+		<year>198?</year>
+		<publisher>Dempa</publisher>
+		<notes><![CDATA[
+Runs too fast
+]]></notes>
+		<info name="usage" value="Mode 5, Page 2, MONITOR R-0 then GDD74"/>
+		<info name="developer" value="H. Yomoda"/>
+		<info name="alt_title" value="パックマン"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="57671">
+				<rom name="pac-man.cas" size="57671" crc="8bdb45fa" sha1="0eb2130b65116a923a386c2d5066d40868db9536" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pascom" supported="partial">
 		<description>Pascom Tower</description>
 		<year>1984</year>
@@ -226,8 +276,8 @@ If usage specifies MONITOR:
 		</part>
 	</software>
 
-	<software name="pbmario" supported="partial">
-		<description>Punchball Mario</description>
+	<software name="punchbal" supported="partial">
+		<description>Punch Ball Mario Bros.</description>
 		<year>1983</year>
 		<publisher>Nintendo / Hudson Soft</publisher>
 		<info name="usage" value="Mode 5, Page 4, MONITOR" />
@@ -239,7 +289,23 @@ If usage specifies MONITOR:
 		</part>
 	</software>
 
-	<software name="thunder" supported="partial">
+	<software name="tomathim" supported="no">
+		<description>Salad no Kuni no Tomato-hime</description>
+		<year>1984</year>
+		<publisher>Hudson Soft</publisher>
+		<notes><![CDATA[
+May require [keyboard] kana lock to work properly
+]]></notes>
+		<info name="usage" value="Mode 5, Page 3, MONITOR"/>
+		<info name="alt_title" value="サラダの国のトマト姫"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="42062">
+				<rom name="salad no kuni no tomato-hime.cas" size="42062" crc="65329b4d" sha1="30488c62f3b1ebaf0c5ecb81b52e9ef721b001c8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tforce" supported="partial">
 		<description>Thunder Force</description>
 		<year>1985</year>
 		<publisher>Techno Soft</publisher>
@@ -261,6 +327,19 @@ If usage specifies MONITOR:
 		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="11027">
 				<rom name="vegetable crash.cas" size="11027" crc="7a0569d1" sha1="932d219a2eae516d57575511a0bdb2a96bd8fa6d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yakyukyo" supported="partial">
+		<description>Yakyuu Kyou</description>
+		<year>1984</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="usage" value="Mode 5, Page 4, MONITOR" />
+		<info name="alt_title" value="野球狂" />
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="41941">
+				<rom name="yakyuukyou.cas" size="41941" crc="566b0e1c" sha1="bbbb5bfd6ccefb2f01682842c68d528f76f7b8f7" offset="0" />
 			</dataarea>
 		</part>
 	</software>

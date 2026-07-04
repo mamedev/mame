@@ -46,8 +46,6 @@ TODO (game specific, move in SW lists):
    player to press either 'B' or 'C' then a number but nothing is shown on screen,
    other emus behaves the same, bad dump?
 (Mk2 mode 5 games)
-- 3D Golf Simulation Super Version: gameplay / inputs seems broken;
-- American Truck: Screen is offset at the loading screen, loading bug?
 - Dezeni Land (ALL versions) / Hurry Fox 1/2: asks you to "load something", can't do it
    with current cassette kludge, also, for Dezeni Land(s) keyboard irqs doesn't seem to
    work too well with halt opcode execution?
@@ -56,14 +54,8 @@ TODO (game specific, move in SW lists):
 - (MyCom BASIC games with multiple files): most of them refuses to run ... how to load them?
 - Grobda: when "get ready" speech plays, screen should be full white but instead it's all
    black, same issue as AX-6 Demo?
-- Pac-Man / Tiny Xevious 2: gameplay is too fast (unrelated with timer irq);
-- Salad no Kunino Tomato-Hime: can't start a play;
-- Space Harrier: very sensitive with sub irq triggers, keyboard joy triggers doesn't work
-  properly (select F1 after loading), draws garbage on vanilla pc6001 and eventually crashes
-  MAME;
 - The Black Onyx: dies when it attempts to save the character, that obviously means saving
    on the tape;
-- Yakyukyo / Punchball Mario: waits for an irq (fixed, wrong timer enable behaviour);
 
 ===================================================================================================
 
@@ -1832,7 +1824,6 @@ void pc6001mk2_state::pc6001mk2(machine_config &config)
 	UPD7752(config, "upd7752", PC6001_MAIN_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	SOFTWARE_LIST(config, "cass_list_pc6001mk2").set_original("pc6001mk2_cass");
-
 }
 
 void pc6601_state::floppy_formats(format_registration &fr)
