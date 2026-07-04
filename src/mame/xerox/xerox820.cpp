@@ -987,60 +987,61 @@ ROM_END
 
 // The base 820-II boot ROM set, shared by the FD1797 floppy (5.25"/8") and the SASI
 // disk-board variants (the ROM auto-detects the daughterboard via the PA bits).
-#define ROM_X820II_CONTENTS \
-	ROM_REGION( 0x2000, Z80_TAG, 0 ) \
-	ROM_DEFAULT_BIOS( "v50" ) /* the standard keyboard and the in-ROM SASI driver both live in u33-u35 (the missing v500.u36 is not needed for floppy or SASI operation).  The v50v018 "Typewriter" build gates keyboard input differently (no echo from the standard keyboard). */ \
-	/* v4.00/v4.01 u33-u35 and v4.04 u36 are not chip reads: they are ROM images recovered from Balcones/Xerox distribution master disks in the Don Maslin 820-II archive (bitsavers 820ii_images) and functionally validated by booting.  Images + recovered source: https://github.com/davidlrand/mame-system-media (Xerox-820-line-roms) */ \
-	ROM_SYSTEM_BIOS( 0, "v400", "Balcones Operating System v4.00" ) /* u33-u35 split from ROM400.COM, master disk B16D35 */ \
-	ROMX_LOAD( "v400.u33", 0x0000, 0x0800, CRC(0d1bcaa8) SHA1(a6ac83f8584d19f7a08e666cb5d4b62620d7d3c0), ROM_BIOS(0) ) \
-	ROMX_LOAD( "v400.u34", 0x0800, 0x0800, CRC(f1df9e29) SHA1(79f38880c3aed9ddf2ccba4ddb11128586dc9c25), ROM_BIOS(0) ) \
-	ROMX_LOAD( "v400.u35", 0x1000, 0x0800, CRC(68357ed7) SHA1(78498542f4d8506edf5f2b3b9ed0fde3fd72f85b), ROM_BIOS(0) ) \
-	ROM_SYSTEM_BIOS( 1, "v401", "Balcones Operating System v4.01" ) /* u33-u35 decoded from U3x.HEX, "820-II ROM IMAGES MASTER" disk B17D7 */ \
-	ROMX_LOAD( "v401.u33", 0x0000, 0x0800, CRC(fe9fa596) SHA1(194162b3d063b2d1bcad03d0bee51dabce2d1985), ROM_BIOS(1) ) \
-	ROMX_LOAD( "v401.u34", 0x0800, 0x0800, CRC(d3137de3) SHA1(d1de4e11f29799b2024af0412415a07984e58f3a), ROM_BIOS(1) ) \
-	ROMX_LOAD( "v401.u35", 0x1000, 0x0800, CRC(bf3096fb) SHA1(136f6b1cf2cd93f0b908688394675ef69883f47b), ROM_BIOS(1) ) \
-	ROM_SYSTEM_BIOS( 2, "v402", "Balcones Operating System v4.02" ) \
-	ROMX_LOAD( "u33.4.02.rom", 0x0000, 0x0800, CRC(d9eb668e) SHA1(6acbef96e4e6526c58e068b7849fb9cce2ea2a10), ROM_BIOS(2) ) \
-	ROMX_LOAD( "u34.4.02.rom", 0x0800, 0x0800, CRC(62181209) SHA1(2238aec096d19af9307bb294532f66f53dd7dfc3), ROM_BIOS(2) ) \
-	ROMX_LOAD( "u35.4.02.rom", 0x1000, 0x0800, CRC(e22fbf6d) SHA1(6c162f79d42611176b0f1c0e8a4eeb07492beca1), ROM_BIOS(2) ) \
-	ROMX_LOAD( "u36.rx11.4.02.rom", 0x1800, 0x0800, CRC(b6a239ce) SHA1(330d28fa8ec006d48d948b1c5e714ffced88fe90), ROM_BIOS(2) ) \
-	ROM_SYSTEM_BIOS( 3, "v403", "Balcones Operating System v4.03" ) \
-	ROMX_LOAD( "v403.u33", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(3) ) \
-	ROMX_LOAD( "v403.u34", 0x0800, 0x0800, NO_DUMP, ROM_BIOS(3) ) \
-	ROMX_LOAD( "v403.u35", 0x1000, 0x0800, NO_DUMP, ROM_BIOS(3) ) \
-	ROMX_LOAD( "v403.u36", 0x1800, 0x0800, NO_DUMP, ROM_BIOS(3) ) \
-	ROM_SYSTEM_BIOS( 4, "v404", "Balcones Operating System v4.04" ) \
-	ROMX_LOAD( "537p3652.u33", 0x0000, 0x0800, CRC(7807cfbb) SHA1(bd3cc5cc5c59c84a50747aae5c17eb4617b0dbc3), ROM_BIOS(4) ) \
-	ROMX_LOAD( "537p3653.u34", 0x0800, 0x0800, CRC(a9c6c0c3) SHA1(c2da9d1bf0da96e6b8bfa722783e411d2fe6deb9), ROM_BIOS(4) ) \
-	ROMX_LOAD( "537p3654.u35", 0x1000, 0x0800, CRC(a8a07223) SHA1(e8ae1ebf2d7caf76771205f577b88ae493836ac9), ROM_BIOS(4) ) \
-	ROMX_LOAD( "v404.u36", 0x1800, 0x0800, CRC(97047d38) SHA1(f36506635653736b8d754d2c04f608180602b5a2), ROM_BIOS(4) ) /* RX ver 016 (27-Sep-83), best-available pair for v4.04, functionally validated; decoded from U36.ROM, master disk B17D7 */ \
-	ROM_SYSTEM_BIOS( 5, "v50", "Balcones Operating System v5.0" ) \
-	ROMX_LOAD( "u33.5.0_537p10828.bin", 0x0000, 0x0800, CRC(a17af0f1) SHA1(b1d9a151ed4558f49b3cdc1adbf348b54da48877), ROM_BIOS(5) ) \
-	ROMX_LOAD( "u34.5.0_537p10829.bin", 0x0800, 0x0800, CRC(c9f5182e) SHA1(ac830848614cea984c849a42687ea2944d6765d9), ROM_BIOS(5) ) \
-	ROMX_LOAD( "u35.5.0_537p10830.bin", 0x1000, 0x0800, CRC(278fa75f) SHA1(f47cf9eb30366211280f93a8460523fcc53eebe9), ROM_BIOS(5) ) \
-	ROMX_LOAD( "v500.u36", 0x1800, 0x0800, NO_DUMP, ROM_BIOS(5) ) \
-	ROM_SYSTEM_BIOS( 6, "v50v018", "Balcones Operating System v5.0 v018" ) \
-	ROMX_LOAD( "537p10828.u33.5.0.bin", 0x0000, 0x0800, CRC(a17af0f1) SHA1(b1d9a151ed4558f49b3cdc1adbf348b54da48877), ROM_BIOS(6) ) \
-	ROMX_LOAD( "537p10829.u34.5.0.bin", 0x0800, 0x0800, CRC(c9f5182e) SHA1(ac830848614cea984c849a42687ea2944d6765d9), ROM_BIOS(6) ) \
-	ROMX_LOAD( "u35.5.0_537p10830.bin", 0x1000, 0x0800, CRC(278fa75f) SHA1(f47cf9eb30366211280f93a8460523fcc53eebe9), ROM_BIOS(6) ) /* good dump from Balcones v5.0 source disk B23D13; was BAD_DUMP cc4e1c2b */ \
-	ROMX_LOAD( "537p10831.u36.5.0.bin", 0x1800, 0x0800, CRC(cda7f598) SHA1(08ffd18959e1708136076c82486b8d121a04fa23), ROM_BIOS(6) ) \
-	ROM_REGION( 0x1000, "chargen", 0 ) \
-	ROMX_LOAD( "x820ii.u57", 0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(0) ) \
-	ROMX_LOAD( "x820ii.u58", 0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(0) ) \
-	ROMX_LOAD( "x820ii.u57", 0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(1) ) \
-	ROMX_LOAD( "x820ii.u58", 0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(1) ) \
-	ROMX_LOAD( "u57.04.north.rom", 0x0000, 0x0800, CRC(eda727a2) SHA1(292cd8a0dc6699c3a2091b20c0fc63d97a266fbf), ROM_BIOS(2) ) \
-	ROMX_LOAD( "u58.03.north.rom", 0x0800, 0x0800, CRC(a2e514f3) SHA1(8ac22dd0cf0324a857718adf67b41912864893a3), ROM_BIOS(2)  ) \
-	ROMX_LOAD( "x820ii.u57", 0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(3) ) \
-	ROMX_LOAD( "x820ii.u58", 0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(3) ) \
-	ROMX_LOAD( "x820ii.u57", 0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(4) ) \
-	ROMX_LOAD( "x820ii.u58", 0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(4) ) \
-	ROMX_LOAD( "x820ii.u57", 0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(5) ) \
-	ROMX_LOAD( "x820ii.u58", 0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(5) ) \
-	ROMX_LOAD( "x820ii.u57", 0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(6) ) \
-	ROMX_LOAD( "x820ii.u58", 0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(6) )
+ROM_START( x820ii ) // 820-II, 8" floppy
+	ROM_DEFAULT_BIOS( "v50" ) // the standard keyboard and the in-ROM SASI driver both live in u33-u35 (the missing v500.u36 is not needed for floppy or SASI operation).  The v50v018 "Typewriter" build gates keyboard input differently (no echo from the standard keyboard).
+	// v4.00/v4.01 u33-u35 and v4.04 u36 are not chip reads: they are ROM images recovered from Balcones/Xerox distribution master disks in the Don Maslin 820-II archive (bitsavers 820ii_images) and functionally validated by booting.  Images + recovered source: https://github.com/davidlrand/mame-system-media (Xerox-820-line-roms)
+	ROM_SYSTEM_BIOS( 0, "v400",    "Balcones Operating System v4.00" ) // u33-u35 split from ROM400.COM, master disk B16D35
+	ROM_SYSTEM_BIOS( 1, "v401",    "Balcones Operating System v4.01" ) // u33-u35 decoded from U3x.HEX, "820-II ROM IMAGES MASTER" disk B17D7
+	ROM_SYSTEM_BIOS( 2, "v402",    "Balcones Operating System v4.02" )
+	ROM_SYSTEM_BIOS( 3, "v403",    "Balcones Operating System v4.03" )
+	ROM_SYSTEM_BIOS( 4, "v404",    "Balcones Operating System v4.04" )
+	ROM_SYSTEM_BIOS( 5, "v50",     "Balcones Operating System v5.0" )
+	ROM_SYSTEM_BIOS( 6, "v50v018", "Balcones Operating System v5.0 v018" )
 
-ROM_START( x820ii )  ROM_X820II_CONTENTS ROM_END // 820-II, 8" floppy
+	ROM_REGION( 0x2000, Z80_TAG, 0 )
+	ROMX_LOAD( "v400.u33",              0x0000, 0x0800, CRC(0d1bcaa8) SHA1(a6ac83f8584d19f7a08e666cb5d4b62620d7d3c0), ROM_BIOS(0) )
+	ROMX_LOAD( "v400.u34",              0x0800, 0x0800, CRC(f1df9e29) SHA1(79f38880c3aed9ddf2ccba4ddb11128586dc9c25), ROM_BIOS(0) )
+	ROMX_LOAD( "v400.u35",              0x1000, 0x0800, CRC(68357ed7) SHA1(78498542f4d8506edf5f2b3b9ed0fde3fd72f85b), ROM_BIOS(0) )
+	ROMX_LOAD( "v401.u33",              0x0000, 0x0800, CRC(fe9fa596) SHA1(194162b3d063b2d1bcad03d0bee51dabce2d1985), ROM_BIOS(1) )
+	ROMX_LOAD( "v401.u34",              0x0800, 0x0800, CRC(d3137de3) SHA1(d1de4e11f29799b2024af0412415a07984e58f3a), ROM_BIOS(1) )
+	ROMX_LOAD( "v401.u35",              0x1000, 0x0800, CRC(bf3096fb) SHA1(136f6b1cf2cd93f0b908688394675ef69883f47b), ROM_BIOS(1) )
+	ROMX_LOAD( "u33.4.02.rom",          0x0000, 0x0800, CRC(d9eb668e) SHA1(6acbef96e4e6526c58e068b7849fb9cce2ea2a10), ROM_BIOS(2) )
+	ROMX_LOAD( "u34.4.02.rom",          0x0800, 0x0800, CRC(62181209) SHA1(2238aec096d19af9307bb294532f66f53dd7dfc3), ROM_BIOS(2) )
+	ROMX_LOAD( "u35.4.02.rom",          0x1000, 0x0800, CRC(e22fbf6d) SHA1(6c162f79d42611176b0f1c0e8a4eeb07492beca1), ROM_BIOS(2) )
+	ROMX_LOAD( "u36.rx11.4.02.rom",     0x1800, 0x0800, CRC(b6a239ce) SHA1(330d28fa8ec006d48d948b1c5e714ffced88fe90), ROM_BIOS(2) )
+	ROMX_LOAD( "v403.u33",              0x0000, 0x0800, NO_DUMP,                                                      ROM_BIOS(3) )
+	ROMX_LOAD( "v403.u34",              0x0800, 0x0800, NO_DUMP,                                                      ROM_BIOS(3) )
+	ROMX_LOAD( "v403.u35",              0x1000, 0x0800, NO_DUMP,                                                      ROM_BIOS(3) )
+	ROMX_LOAD( "v403.u36",              0x1800, 0x0800, NO_DUMP,                                                      ROM_BIOS(3) )
+	ROMX_LOAD( "537p3652.u33",          0x0000, 0x0800, CRC(7807cfbb) SHA1(bd3cc5cc5c59c84a50747aae5c17eb4617b0dbc3), ROM_BIOS(4) )
+	ROMX_LOAD( "537p3653.u34",          0x0800, 0x0800, CRC(a9c6c0c3) SHA1(c2da9d1bf0da96e6b8bfa722783e411d2fe6deb9), ROM_BIOS(4) )
+	ROMX_LOAD( "537p3654.u35",          0x1000, 0x0800, CRC(a8a07223) SHA1(e8ae1ebf2d7caf76771205f577b88ae493836ac9), ROM_BIOS(4) )
+	ROMX_LOAD( "v404.u36",              0x1800, 0x0800, CRC(97047d38) SHA1(f36506635653736b8d754d2c04f608180602b5a2), ROM_BIOS(4) ) // RX ver 016 (27-Sep-83), best-available pair for v4.04, functionally validated; decoded from U36.ROM, master disk B17D7
+	ROMX_LOAD( "u33.5.0_537p10828.bin", 0x0000, 0x0800, CRC(a17af0f1) SHA1(b1d9a151ed4558f49b3cdc1adbf348b54da48877), ROM_BIOS(5) )
+	ROMX_LOAD( "u34.5.0_537p10829.bin", 0x0800, 0x0800, CRC(c9f5182e) SHA1(ac830848614cea984c849a42687ea2944d6765d9), ROM_BIOS(5) )
+	ROMX_LOAD( "u35.5.0_537p10830.bin", 0x1000, 0x0800, CRC(278fa75f) SHA1(f47cf9eb30366211280f93a8460523fcc53eebe9), ROM_BIOS(5) )
+	ROMX_LOAD( "v500.u36",              0x1800, 0x0800, NO_DUMP,                                                      ROM_BIOS(5) )
+	ROMX_LOAD( "537p10828.u33.5.0.bin", 0x0000, 0x0800, CRC(a17af0f1) SHA1(b1d9a151ed4558f49b3cdc1adbf348b54da48877), ROM_BIOS(6) )
+	ROMX_LOAD( "537p10829.u34.5.0.bin", 0x0800, 0x0800, CRC(c9f5182e) SHA1(ac830848614cea984c849a42687ea2944d6765d9), ROM_BIOS(6) )
+	ROMX_LOAD( "u35.5.0_537p10830.bin", 0x1000, 0x0800, CRC(278fa75f) SHA1(f47cf9eb30366211280f93a8460523fcc53eebe9), ROM_BIOS(6) ) // good dump from Balcones v5.0 source disk B23D13; was BAD_DUMP cc4e1c2b
+	ROMX_LOAD( "537p10831.u36.5.0.bin", 0x1800, 0x0800, CRC(cda7f598) SHA1(08ffd18959e1708136076c82486b8d121a04fa23), ROM_BIOS(6) )
+
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROMX_LOAD( "x820ii.u57",       0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(0) )
+	ROMX_LOAD( "x820ii.u58",       0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(0) )
+	ROMX_LOAD( "x820ii.u57",       0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(1) )
+	ROMX_LOAD( "x820ii.u58",       0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(1) )
+	ROMX_LOAD( "u57.04.north.rom", 0x0000, 0x0800, CRC(eda727a2) SHA1(292cd8a0dc6699c3a2091b20c0fc63d97a266fbf), ROM_BIOS(2) )
+	ROMX_LOAD( "u58.03.north.rom", 0x0800, 0x0800, CRC(a2e514f3) SHA1(8ac22dd0cf0324a857718adf67b41912864893a3), ROM_BIOS(2) )
+	ROMX_LOAD( "x820ii.u57",       0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(3) )
+	ROMX_LOAD( "x820ii.u58",       0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(3) )
+	ROMX_LOAD( "x820ii.u57",       0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(4) )
+	ROMX_LOAD( "x820ii.u58",       0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(4) )
+	ROMX_LOAD( "x820ii.u57",       0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(5) )
+	ROMX_LOAD( "x820ii.u58",       0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(5) )
+	ROMX_LOAD( "x820ii.u57",       0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(6) )
+	ROMX_LOAD( "x820ii.u58",       0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(6) )
+ROM_END
 
 // the 5.25" floppy, SASI hard disk and low-profile-keyboard variants use the
 // identical 820-II ROM set; alias their rom_* symbols to x820ii's
@@ -1098,38 +1099,36 @@ ROM_END
 // outright dead, because EM-II/DEM support is monitor rev 500 ("Expansion Box II") which
 // v4.04 predates -- under v4.04 ddskld never runs and the WD1002-05 disk is invisible.
 // Always run the 16/8 on v5.0.
-#define ROM_X168_CONTENTS \
-	ROM_REGION( 0x2000, Z80_TAG, 0 ) \
-	ROM_DEFAULT_BIOS( "v50" ) \
-	ROM_SYSTEM_BIOS( 0, "v404", "Balcones Operating System v4.04" ) \
-	ROMX_LOAD( "537p3652.u33", 0x0000, 0x0800, CRC(7807cfbb) SHA1(bd3cc5cc5c59c84a50747aae5c17eb4617b0dbc3), ROM_BIOS(0) ) \
-	ROMX_LOAD( "537p3653.u34", 0x0800, 0x0800, CRC(a9c6c0c3) SHA1(c2da9d1bf0da96e6b8bfa722783e411d2fe6deb9), ROM_BIOS(0) ) \
-	ROMX_LOAD( "537p3654.u35", 0x1000, 0x0800, CRC(a8a07223) SHA1(e8ae1ebf2d7caf76771205f577b88ae493836ac9), ROM_BIOS(0) ) \
-	ROMX_LOAD( "v404.u36", 0x1800, 0x0800, CRC(97047d38) SHA1(f36506635653736b8d754d2c04f608180602b5a2), ROM_BIOS(0) ) /* RX ver 016, recovered from master disk B17D7 (see x820ii) */ \
-	ROM_SYSTEM_BIOS( 1, "v50", "Balcones Operating System v5.0" ) \
-	ROMX_LOAD( "l5.u33.rom", 0x0000, 0x0800, CRC(a17af0f1) SHA1(b1d9a151ed4558f49b3cdc1adbf348b54da48877), ROM_BIOS(1) ) \
-	ROMX_LOAD( "l5.u34.rom", 0x0800, 0x0800, CRC(c9f5182e) SHA1(ac830848614cea984c849a42687ea2944d6765d9), ROM_BIOS(1) ) \
-	ROMX_LOAD( "u35.5.0_537p10830.bin", 0x1000, 0x0800, CRC(278fa75f) SHA1(f47cf9eb30366211280f93a8460523fcc53eebe9), ROM_BIOS(1) ) \
-	ROMX_LOAD( "u36.rx024.rom", 0x1800, 0x0800, CRC(a7f1d677) SHA1(8c2a442f3a691f2e181a640d65f767ce3b51d711), ROM_BIOS(1) ) \
-	ROM_REGION( 0x1000, "chargen", 0 ) \
-	ROMX_LOAD( "x820ii.u57", 0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(0) ) \
-	ROMX_LOAD( "x820ii.u58", 0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(0) ) \
-	ROMX_LOAD( "u57.04.north.rom", 0x0000, 0x0800, CRC(eda727a2) SHA1(292cd8a0dc6699c3a2091b20c0fc63d97a266fbf), ROM_BIOS(1) ) \
-	ROMX_LOAD( "u58.03.north.rom", 0x0800, 0x0800, CRC(a2e514f3) SHA1(8ac22dd0cf0324a857718adf67b41912864893a3), ROM_BIOS(1) )
 
 // 16/8, 5.25" floppy on the FD1797 daughterboard (the standard non-EM-II 5.25" path;
 // mixed SD/DD media).  The 8086 ROM comes from the 16/8 copro card.
 ROM_START( x1685 )
-	ROM_X168_CONTENTS
+	ROM_DEFAULT_BIOS( "v50" )
+	ROM_SYSTEM_BIOS( 0, "v404", "Balcones Operating System v4.04" )
+	ROM_SYSTEM_BIOS( 1, "v50",  "Balcones Operating System v5.0" )
+
+	ROM_REGION( 0x2000, Z80_TAG, 0 )
+	ROMX_LOAD( "537p3652.u33",          0x0000, 0x0800, CRC(7807cfbb) SHA1(bd3cc5cc5c59c84a50747aae5c17eb4617b0dbc3), ROM_BIOS(0) )
+	ROMX_LOAD( "537p3653.u34",          0x0800, 0x0800, CRC(a9c6c0c3) SHA1(c2da9d1bf0da96e6b8bfa722783e411d2fe6deb9), ROM_BIOS(0) )
+	ROMX_LOAD( "537p3654.u35",          0x1000, 0x0800, CRC(a8a07223) SHA1(e8ae1ebf2d7caf76771205f577b88ae493836ac9), ROM_BIOS(0) )
+	ROMX_LOAD( "v404.u36",              0x1800, 0x0800, CRC(97047d38) SHA1(f36506635653736b8d754d2c04f608180602b5a2), ROM_BIOS(0) ) // RX ver 016, recovered from master disk B17D7 (see x820ii)
+	ROMX_LOAD( "l5.u33.rom",            0x0000, 0x0800, CRC(a17af0f1) SHA1(b1d9a151ed4558f49b3cdc1adbf348b54da48877), ROM_BIOS(1) )
+	ROMX_LOAD( "l5.u34.rom",            0x0800, 0x0800, CRC(c9f5182e) SHA1(ac830848614cea984c849a42687ea2944d6765d9), ROM_BIOS(1) )
+	ROMX_LOAD( "u35.5.0_537p10830.bin", 0x1000, 0x0800, CRC(278fa75f) SHA1(f47cf9eb30366211280f93a8460523fcc53eebe9), ROM_BIOS(1) )
+	ROMX_LOAD( "u36.rx024.rom",         0x1800, 0x0800, CRC(a7f1d677) SHA1(8c2a442f3a691f2e181a640d65f767ce3b51d711), ROM_BIOS(1) )
+
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROMX_LOAD( "x820ii.u57",       0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(0) )
+	ROMX_LOAD( "x820ii.u58",       0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(0) )
+	ROMX_LOAD( "u57.04.north.rom", 0x0000, 0x0800, CRC(eda727a2) SHA1(292cd8a0dc6699c3a2091b20c0fc63d97a266fbf), ROM_BIOS(1) )
+	ROMX_LOAD( "u58.03.north.rom", 0x0800, 0x0800, CRC(a2e514f3) SHA1(8ac22dd0cf0324a857718adf67b41912864893a3), ROM_BIOS(1) )
 ROM_END
 
 // 16/8 + Expansion Module II (the slot-connected EM-II).  The genuine box ROM (537p3682)
 // and the 8086 ROM come from the EM-II copro card; the 5.25" disks are all-DD WD1002-05 media.
-ROM_START( x168em )
-	ROM_X168_CONTENTS
-ROM_END
+#define rom_x168em rom_x1685
 
-ROM_START( x168s ) ROM_X168_CONTENTS ROM_END // 16/8, SASI hard disk
+#define rom_x168s rom_x1685 // 16/8, SASI hard disk
 
 /* System Drivers */
 
