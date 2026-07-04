@@ -388,6 +388,13 @@ void xerox820_copro_slot_device::device_start()
 	m_card = get_card_device();
 }
 
+// the card device types are exposed through this interface via
+// DEFINE_DEVICE_TYPE_PRIVATE, which does not instantiate the device_finder
+// templates; instantiate them here so required_device/optional_device of the
+// interface resolve rather than producing undefined symbol errors
+template class device_finder<device_xerox820_copro_card_interface, false>;
+template class device_finder<device_xerox820_copro_card_interface, true>;
+
 
 DEFINE_DEVICE_TYPE_PRIVATE(XEROX820_16_8, device_xerox820_copro_card_interface, xerox820_16_8_device, "xerox820_16_8", "Xerox 16/8 8086 coprocessor board")
 

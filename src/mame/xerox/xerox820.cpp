@@ -1041,9 +1041,12 @@ ROM_END
 	ROMX_LOAD( "x820ii.u58", 0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(6) )
 
 ROM_START( x820ii )  ROM_X820II_CONTENTS ROM_END // 820-II, 8" floppy
-ROM_START( x820ii5 ) ROM_X820II_CONTENTS ROM_END // 820-II, 5.25" floppy
-ROM_START( x820iis ) ROM_X820II_CONTENTS ROM_END // 820-II, SASI hard disk
-ROM_START( x820iilp ) ROM_X820II_CONTENTS ROM_END // 820-II, low-profile keyboard
+
+// the 5.25" floppy, SASI hard disk and low-profile-keyboard variants use the
+// identical 820-II ROM set; alias their rom_* symbols to x820ii's
+#define rom_x820ii5  rom_x820ii // 820-II, 5.25" floppy
+#define rom_x820iis  rom_x820ii // 820-II, SASI hard disk
+#define rom_x820iilp rom_x820ii // 820-II, low-profile keyboard
 
 ROM_START( x168 )
 	ROM_REGION( 0x2000, Z80_TAG, 0 )
