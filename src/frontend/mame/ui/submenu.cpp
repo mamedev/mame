@@ -15,7 +15,7 @@
 #include "ui/ui.h"
 #include "ui/utils.h"
 
-#if defined(UI_WINDOWS) && !defined(UI_SDL)
+#if defined(UI_WINDOWS)
 #include "../osd/windows/winmain.h"
 #else
 #include "../osd/modules/lib/osdobj_common.h"
@@ -33,19 +33,21 @@ std::vector<submenu::option> submenu::misc_options()
 {
 	return std::vector<option>{
 			{ option_type::HEAD, N_("Miscellaneous Options") },
-			{ option_type::UI,   N_("Skip imperfect emulation warnings"),       OPTION_SKIP_WARNINGS },
-			{ option_type::UI,   N_("Re-select last system launched"),          OPTION_REMEMBER_LAST },
-			{ option_type::UI,   N_("Enlarge images in the right panel"),       OPTION_ENLARGE_SNAPS },
-			{ option_type::EMU,  N_("Cheats"),                                  OPTION_CHEAT },
-			{ option_type::EMU,  N_("Show mouse pointer"),                      OPTION_UI_MOUSE },
-			{ option_type::EMU,  N_("Confirm quit from emulation"),             OPTION_CONFIRM_QUIT },
-			{ option_type::EMU,  N_("Skip system information screen"),          OPTION_SKIP_GAMEINFO },
-			{ option_type::UI,   N_("Force 4:3 aspect for snapshot display"),   OPTION_FORCED4X3 },
-			{ option_type::UI,   N_("Use image as background"),                 OPTION_USE_BACKGROUND },
-			{ option_type::UI,   N_("Skip BIOS selection menu"),                OPTION_SKIP_BIOS_MENU },
-			{ option_type::UI,   N_("Skip software part selection menu"),       OPTION_SKIP_PARTS_MENU },
-			{ option_type::UI,   N_("Info auto audit"),                         OPTION_INFO_AUTO_AUDIT },
-			{ option_type::UI,   N_("Hide romless machine from available list"),OPTION_HIDE_ROMLESS } };
+			{ option_type::UI,   N_("Automatically pause when showing menus"),                   OPTION_MENU_PAUSE },
+			{ option_type::UI,   N_("Open menus in the active window"),                          OPTION_UI_FOLLOW_FOCUS },
+			{ option_type::UI,   N_("Skip imperfect emulation warnings"),                        OPTION_SKIP_WARNINGS },
+			{ option_type::UI,   N_("Re-select last system launched"),                           OPTION_REMEMBER_LAST },
+			{ option_type::UI,   N_("Enlarge images in the right panel"),                        OPTION_ENLARGE_SNAPS },
+			{ option_type::EMU,  N_("Cheats"),                                                   OPTION_CHEAT },
+			{ option_type::EMU,  N_("Show mouse pointer"),                                       OPTION_UI_MOUSE },
+			{ option_type::EMU,  N_("Confirm quit from emulation"),                              OPTION_CONFIRM_QUIT },
+			{ option_type::EMU,  N_("Skip system information screen"),                           OPTION_SKIP_GAMEINFO },
+			{ option_type::UI,   N_("Force 4:3 aspect for snapshot display"),                    OPTION_FORCED4X3 },
+			{ option_type::UI,   N_("Use image as background"),                                  OPTION_USE_BACKGROUND },
+			{ option_type::UI,   N_("Skip BIOS selection menu"),                                 OPTION_SKIP_BIOS_MENU },
+			{ option_type::UI,   N_("Skip software part selection menu"),                        OPTION_SKIP_PARTS_MENU },
+			{ option_type::UI,   N_("Info auto audit"),                                          OPTION_INFO_AUTO_AUDIT },
+			{ option_type::UI,   N_("Hide systems that don't require ROMs in available filter"), OPTION_HIDE_ROMLESS } };
 }
 
 std::vector<submenu::option> submenu::advanced_options()
@@ -123,7 +125,7 @@ std::vector<submenu::option> submenu::video_options()
 			{ option_type::HEAD, N_("Video Options") },
 			{ option_type::OSD,  N_("Video Mode"),                              OSDOPTION_VIDEO },
 			{ option_type::OSD,  N_("Number Of Screens"),                       OSDOPTION_NUMSCREENS },
-#if defined(UI_WINDOWS) && !defined(UI_SDL)
+#if defined(UI_WINDOWS)
 			{ option_type::OSD,  N_("Triple Buffering"),                        WINOPTION_TRIPLEBUFFER },
 			{ option_type::OSD,  N_("HLSL"),                                    WINOPTION_HLSL_ENABLE },
 #endif
@@ -149,13 +151,13 @@ std::vector<submenu::option> submenu::video_options()
 //  ctor / dtor
 //-------------------------------------------------
 
-submenu::submenu(mame_ui_manager &mui, render_container &container, std::vector<option> const &suboptions, const game_driver *drv, emu_options *options)
-	: submenu(mui, container, std::vector<option>(suboptions), drv, options)
+submenu::submenu(mame_ui_manager &mui, render_target &target, std::vector<option> const &suboptions, const game_driver *drv, emu_options *options)
+	: submenu(mui, target, std::vector<option>(suboptions), drv, options)
 {
 }
 
-submenu::submenu(mame_ui_manager &mui, render_container &container, std::vector<option> &&suboptions, const game_driver *drv, emu_options *options)
-	: menu(mui, container)
+submenu::submenu(mame_ui_manager &mui, render_target &target, std::vector<option> &&suboptions, const game_driver *drv, emu_options *options)
+	: menu(mui, target)
 	, m_options(std::move(suboptions))
 	, m_driver(drv)
 {
@@ -168,17 +170,17 @@ submenu::submenu(mame_ui_manager &mui, render_container &container, std::vector<
 	else
 		opts = dynamic_cast<core_options *>(options);
 
-	for (option &sm_option : m_options)
+	for (auto sm_option = m_options.begin(); sm_option != m_options.end(); )
 	{
-		switch (sm_option.type)
+		switch (sm_option->type)
 		{
 		case option_type::EMU:
-			sm_option.entry = opts->get_entry(sm_option.name);
-			sm_option.options = opts;
-			if ((sm_option.entry->type() == core_options::option_type::STRING) || (sm_option.entry->type() == core_options::option_type::PATH) || (sm_option.entry->type() == core_options::option_type::MULTIPATH))
+			sm_option->entry = opts->get_entry(sm_option->name);
+			sm_option->options = opts;
+			if ((sm_option->entry->type() == core_options::option_type::STRING) || (sm_option->entry->type() == core_options::option_type::PATH) || (sm_option->entry->type() == core_options::option_type::MULTIPATH))
 			{
-				sm_option.value.clear();
-				std::string namestr(sm_option.entry->description());
+				sm_option->value.clear();
+				std::string namestr(sm_option->entry->description());
 				int lparen = namestr.find_first_of('(', 0);
 				int vslash = namestr.find_first_of('|', lparen + 1);
 				int rparen = namestr.find_first_of(')', vslash + 1);
@@ -189,23 +191,28 @@ submenu::submenu(mame_ui_manager &mui, render_container &container, std::vector<
 					namestr.erase(0, lparen + 1);
 					while ((semi = namestr.find_first_of('|')) != -1)
 					{
-						sm_option.value.emplace_back(namestr.substr(0, semi));
+						sm_option->value.emplace_back(namestr.substr(0, semi));
 						namestr.erase(0, semi + 1);
 					}
-					sm_option.value.emplace_back(namestr);
+					sm_option->value.emplace_back(namestr);
 				}
 			}
 			break;
 		case option_type::OSD:
-			sm_option.entry = opts->get_entry(sm_option.name);
-			sm_option.options = opts;
-			if ((sm_option.entry->type() == core_options::option_type::STRING) || (sm_option.entry->type() == core_options::option_type::PATH) || (sm_option.entry->type() == core_options::option_type::MULTIPATH))
+			sm_option->entry = opts->get_entry(sm_option->name);
+			if (!sm_option->entry)
 			{
-				sm_option.value.clear();
-				std::string descr(machine().options().get_entry(sm_option.name)->description()), delim(", ");
+				sm_option = m_options.erase(sm_option);
+				continue;
+			}
+			sm_option->options = opts;
+			if ((sm_option->entry->type() == core_options::option_type::STRING) || (sm_option->entry->type() == core_options::option_type::PATH) || (sm_option->entry->type() == core_options::option_type::MULTIPATH))
+			{
+				sm_option->value.clear();
+				std::string descr(machine().options().get_entry(sm_option->name)->description()), delim(", ");
 				descr.erase(0, descr.find(":") + 2);
 
-				std::string default_value(sm_option.entry->default_value());
+				std::string default_value(sm_option->entry->default_value());
 				std::string auto_value(OSDOPTVAL_AUTO);
 				if (default_value == auto_value)
 					descr = auto_value + delim + descr;
@@ -218,23 +225,24 @@ submenu::submenu(mame_ui_manager &mui, render_container &container, std::vector<
 					{
 						std::string txt(descr.substr(p1, p2 - p1));
 						if (txt != "or")
-							sm_option.value.push_back(txt);
+							sm_option->value.push_back(txt);
 					}
 					else
 					{
-						sm_option.value.push_back(descr.substr(p1));
+						sm_option->value.push_back(descr.substr(p1));
 						break;
 					}
 				}
 			}
 			break;
 		case option_type::UI:
-			sm_option.entry = mui.options().get_entry(sm_option.name);
-			sm_option.options = dynamic_cast<core_options*>(&mui.options());
+			sm_option->entry = mui.options().get_entry(sm_option->name);
+			sm_option->options = dynamic_cast<core_options *>(&mui.options());
 			break;
 		default:
 			break;
 		}
+		++sm_option;
 	}
 }
 

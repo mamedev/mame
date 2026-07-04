@@ -14,12 +14,13 @@
     VSync is low for 4095 master cycles (3 lines).
     VSync changes 30 master cycles after HSync would go low.
 
+    TODO:
+    - any differences between battlera VCE and HuC6260?
+
 **********************************************************************/
 
 #include "emu.h"
 #include "huc6260.h"
-
-#include "screen.h"
 
 #include <algorithm>
 
@@ -27,8 +28,8 @@
 #include "logmacro.h"
 
 
-#define HUC6260_HSYNC_LENGTH    237
-#define HUC6260_HSYNC_START     (huc6260_device::WPF - HUC6260_HSYNC_LENGTH)
+static constexpr unsigned HUC6260_HSYNC_LENGTH = 237;
+static constexpr unsigned HUC6260_HSYNC_START  = (huc6260_device::WPF - HUC6260_HSYNC_LENGTH);
 
 
 constexpr unsigned huc6260_device::PALETTE_SIZE;
@@ -50,17 +51,39 @@ void huc6260_device::palette_init()
 }
 
 
-DEFINE_DEVICE_TYPE(HUC6260, huc6260_device, "huc6260", "Hudson HuC6260 VCE")
+DEFINE_DEVICE_TYPE(HUC6260,      huc6260_device,      "huc6260",      "Hudson HuC6260 VCE")
+DEFINE_DEVICE_TYPE(BATTLERA_VCE, battlera_vce_device, "battlera_vce", "Data East Battle Rangers VCE")
 
 
-huc6260_device::huc6260_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, HUC6260, tag, owner, clock),
+huc6260_device::huc6260_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	huc6260_device(mconfig, HUC6260, tag, owner, clock)
+{
+}
+
+huc6260_device::huc6260_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_palette_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_next_pixel_data_cb(*this, 0),
 	m_time_til_next_event_cb(*this, 1),
 	m_vsync_changed_cb(*this),
-	m_hsync_changed_cb(*this)
+	m_hsync_changed_cb(*this),
+	m_last_h(0),
+	m_last_v(0),
+	m_height(0),
+	m_palette{0},
+	m_address(0),
+	m_greyscales(0),
+	m_blur(false),
+	m_pixels_per_clock(0),
+	m_pixel_data(0),
+	m_pixel_clock(0),
+	m_timer(nullptr)
+{
+}
+
+battlera_vce_device::battlera_vce_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	huc6260_device(mconfig, BATTLERA_VCE, tag, owner, clock)
 {
 }
 
@@ -71,7 +94,7 @@ TIMER_CALLBACK_MEMBER(huc6260_device::update_events)
 	int const hpos = screen().hpos();
 	int h = m_last_h;
 	int v = m_last_v;
-	uint16_t *bitmap_line = &m_bmp.pix(v);
+	u16 *bitmap_line = &m_bmp.pix(v);
 
 	while (h != hpos || v != vpos)
 	{
@@ -90,23 +113,25 @@ TIMER_CALLBACK_MEMBER(huc6260_device::update_events)
 		{
 		case HUC6260_HSYNC_START:       /* Start of HSync */
 			m_hsync_changed_cb(0);
-//          if (v == 0)
-//          {
-//              /* Check if the screen should be resized */
-//              m_height = LPF - (m_blur ? 1 : 0);
-//              if (m_height != video_screen_get_height(m_screen))
-//              {
-//                  rectangle visible_area;
-//
-//                  /* TODO: Set proper visible area parameters */
-//                  visible_area.min_x = 64;
-//                  visible_area.min_y = 18;
-//                  visible_area.max_x = 64 + 1024 + 64 - 1;
-//                  visible_area.max_y = 18 + 242 - 1;
-//
-//                  video_screen_configure(m_screen, WPF, m_height, &visible_area, HZ_TO_ATTOSECONDS(device->clock / (WPF * m_height)));
-//              }
-//          }
+#if 0
+			if (v == 0)
+			{
+				/* Check if the screen should be resized */
+				m_height = LPF - (m_blur ? 1 : 0);
+				if (m_height != video_screen_get_height(m_screen))
+				{
+					rectangle visible_area;
+
+					/* TODO: Set proper visible area parameters */
+					visible_area.min_x = 64;
+					visible_area.min_y = 18;
+					visible_area.max_x = 64 + 1024 + 64 - 1;
+					visible_area.max_y = 18 + 242 - 1;
+
+					video_screen_configure(m_screen, WPF, m_height, &visible_area, HZ_TO_ATTOSECONDS(device->clock / (WPF * m_height)));
+				}
+			}
+#endif
 			break;
 
 		case 0:     /* End of HSync */
@@ -150,7 +175,7 @@ TIMER_CALLBACK_MEMBER(huc6260_device::update_events)
 
 	/* Ask our slave device for time until next possible event */
 	{
-		uint16_t next_event_clocks = m_time_til_next_event_cb();
+		u16 next_event_clocks = m_time_til_next_event_cb();
 
 		/* Adjust for pixel clocks per pixel */
 		next_event_clocks *= m_pixels_per_clock;
@@ -180,28 +205,29 @@ TIMER_CALLBACK_MEMBER(huc6260_device::update_events)
 }
 
 
-void huc6260_device::video_update(bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 huc6260_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bmp, 0, 0, 0, 0, cliprect);
+	return 0;
 }
 
 
 // the battlera arcade board reads/writes the palette directly
-uint8_t huc6260_device::palette_direct_read(offs_t offset)
+u8 battlera_vce_device::palette_direct_read(offs_t offset)
 {
-	if (BIT(~offset, 0)) return m_palette[offset >> 1];
-	else return m_palette[offset >> 1] >> 8;
+	const u8 shift = BIT(offset, 0) << 3;
+	return m_palette[offset >> 1] >> shift;
 }
 
-void huc6260_device::palette_direct_write(offs_t offset, uint8_t data)
+void battlera_vce_device::palette_direct_write(offs_t offset, u8 data)
 {
-	if (BIT(~offset, 0)) m_palette[offset >> 1] = (m_palette[offset >> 1] & 0xff00) | data;
-	else m_palette[offset >> 1] = (m_palette[offset >> 1] & 0x00ff) | (data << 8);
+	const u8 shift = BIT(offset, 0) << 3;
+	m_palette[offset >> 1] = (m_palette[offset >> 1] & ~(0xff << shift)) | (u32(data & 0xff) << shift);
 }
 
-uint8_t huc6260_device::read(offs_t offset)
+u8 huc6260_device::read(offs_t offset)
 {
-	uint8_t data = 0xff;
+	u8 data = 0xff;
 
 	switch (offset & 7)
 	{
@@ -221,7 +247,7 @@ uint8_t huc6260_device::read(offs_t offset)
 }
 
 
-void huc6260_device::write(offs_t offset, uint8_t data)
+void huc6260_device::write(offs_t offset, u8 data)
 {
 	switch (offset & 7)
 	{
@@ -232,19 +258,19 @@ void huc6260_device::write(offs_t offset, uint8_t data)
 			break;
 
 		case 0x02:  /* Color table address LSB */
-			m_address = ((m_address & 0xff00) | data) & 0x1ff;
+			m_address = (m_address & 0x100) | u16(data);
 			break;
 
 		case 0x03:  /* Color table address MSB */
-			m_address = ((m_address & 0x00ff) | (data << 8)) & 0x1ff;
+			m_address = (m_address & 0x0ff) | (u16(BIT(data, 0)) << 8);
 			break;
 
 		case 0x04:  /* Color table data LSB */
-			m_palette[m_address] = ((m_palette[m_address] & 0xff00) | data) & 0x1ff;
+			m_palette[m_address] = (m_palette[m_address] & 0x100) | u16(data);
 			break;
 
 		case 0x05:  /* Color table data MSB */
-			m_palette[m_address] = ((m_palette[m_address] & 0x00ff) | (data << 8)) & 0x1ff;
+			m_palette[m_address] = (m_palette[m_address] & 0x0ff) | (u16(BIT(data, 0)) << 8);
 
 			/* Increment internal address */
 			m_address = (m_address + 1) & 0x1ff;

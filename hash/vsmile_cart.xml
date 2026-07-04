@@ -319,7 +319,7 @@ Regular game cartridges
 |        | 80-092255(NO)     | Cinderella - Askepotts magiske ønsker                                                          |
 |        |          (FI)     | Cinderella - Tuhkimon Taikatoiveet                                                             |
 +========+===================+================================================================================================+
-|        | 80-092260(US)     | Elmo's World - Elmo's Big Discoveries                                                          |
+|   XX   | 80-092260(US)     | Elmo's World - Elmo's Big Discoveries                                                          |
 |   XX   | 80-092264(GE)     | Elmos großes Abenteuer                                                                         |
 |   XX   | 80-092265(FR)     | Le Monde d'Elmo - Les Grandes Découvertes D'Elmo                                               |
 |   XX   | 80-092267(SP)     | Mundo Elmo - Grandes descubrimientos de Elmo (52-92267(SP) on back label)                      |
@@ -2075,7 +2075,24 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="elmoge">
+	<software name="elmo">
+		<description>Elmo's World - Elmo's Big Discoveries (USA)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="52-92260(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="706714" />
+			<feature name="pcb_model" value="706714-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x800000">
+				<rom name="92260.u1" size="0x800000" crc="1b4c8e92" sha1="8b5d2240c39adfc96c451114f8efbdfb434b307b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elmoge" cloneof="elmo">
 		<description>Elmos großes Abenteuer (Germany)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
@@ -2092,7 +2109,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="elmofr" cloneof="elmoge">
+	<software name="elmofr" cloneof="elmo">
 		<description>Le Monde d'Elmo - Les Grandes Découvertes D'Elmo (France)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
@@ -2109,7 +2126,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="elmosp" cloneof="elmoge">
+	<software name="elmosp" cloneof="elmo">
 		<description>El Mundo de Elmo - Grandes descubrimientos de Elmo (Spain)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>

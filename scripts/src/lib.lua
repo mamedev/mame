@@ -26,7 +26,7 @@ project "utils"
 		ext_includedir("utf8proc"),
 	}
 
-if not _OPTIONS["with-system-utf8proc"] then
+if _OPTIONS["with-system-utf8proc"] ~= "1" then
 	defines {
 		"UTF8PROC_STATIC",
 	}
@@ -58,6 +58,7 @@ end
 		MAME_DIR .. "src/lib/util/corealloc.h",
 		MAME_DIR .. "src/lib/util/corefile.cpp",
 		MAME_DIR .. "src/lib/util/corefile.h",
+		MAME_DIR .. "src/lib/util/corefloat.h",
 		MAME_DIR .. "src/lib/util/corestr.cpp",
 		MAME_DIR .. "src/lib/util/corestr.h",
 		MAME_DIR .. "src/lib/util/coretmpl.h",

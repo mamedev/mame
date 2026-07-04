@@ -1486,7 +1486,7 @@ static INPUT_PORTS_START( bfcobra )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("STROBE3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_INTERLOCK) PORT_NAME("Cash box door") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_DOOR) PORT_NAME("Cash box door") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Front Door? (resets)") PORT_CODE(KEYCODE_T) PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1599,7 +1599,7 @@ static INPUT_PORTS_START( brainbox2 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Hopper Fitted") PORT_CODE(KEYCODE_H) PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_INTERLOCK ) PORT_NAME("Cash box door") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_DOOR ) PORT_NAME("Cash box door") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Front Door") PORT_CODE(KEYCODE_T) PORT_TOGGLE
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1798,7 +1798,7 @@ void bfcobra_state::bfcobra(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(256);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette)); // MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
 	ramdac.set_addrmap(0, &bfcobra_state::ramdac_map);
 	ramdac.set_split_read(1);
 
@@ -1809,21 +1809,21 @@ void bfcobra_state::bfcobra(machine_config &config)
 	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	/* ACIAs */
-	ACIA6850(config, m_acia6850_0, 0);
+	ACIA6850(config, m_acia6850_0);
 	m_acia6850_0->txd_handler().set(m_acia6850_1, FUNC(acia6850_device::write_rxd));
 	m_acia6850_0->irq_handler().set(FUNC(bfcobra_state::z80_acia_irq));
 
-	ACIA6850(config, m_acia6850_1, 0);
+	ACIA6850(config, m_acia6850_1);
 	m_acia6850_1->txd_handler().set(m_acia6850_0, FUNC(acia6850_device::write_rxd));
 
-	ACIA6850(config, m_acia6850_2, 0);
+	ACIA6850(config, m_acia6850_2);
 	m_acia6850_2->txd_handler().set(FUNC(bfcobra_state::data_acia_tx_w));
 	m_acia6850_2->irq_handler().set(FUNC(bfcobra_state::m6809_data_irq));
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16)); // What are the correct ACIA clocks ?
 	acia_clock.signal_handler().set(FUNC(bfcobra_state::write_acia_clock));
 
-	METERS(config, m_meters, 0).set_number(8);
+	METERS(config, m_meters).set_number(8);
 }
 
 /***************************************************************************
@@ -2875,7 +2875,7 @@ void bfcobjam_state::bfcobjam(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(256);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette)); // MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
 	ramdac.set_addrmap(0, &bfcobjam_state::ramdac_map);
 	ramdac.set_split_read(1);
 
@@ -2889,7 +2889,7 @@ void bfcobjam_state::bfcobjam(machine_config &config)
 
 
 	/* ACIAs */
-	ACIA6850(config, m_acia6850_0, 0);
+	ACIA6850(config, m_acia6850_0);
 	m_acia6850_0->irq_handler().set(FUNC(bfcobjam_state::z8s180_acia_irq));
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16)); // What are the correct ACIA clocks ?
@@ -2905,7 +2905,7 @@ void bfcobjam_state::bfcobjam_with_dmd(machine_config &config)
 	UPD7759(config, m_aux_upd7759);
 	m_aux_upd7759->add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	BFM_DM01(config, m_dm01, 0);
+	BFM_DM01(config, m_dm01);
 }
 
 /***************************************************************************

@@ -10,14 +10,10 @@
 
 #include "util/xmlfile.h"
 
+#include <QtGui/QActionGroup>
 #include <QtGui/QClipboard>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QMouseEvent>
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-#include <QtGui/QActionGroup>
-#else
-#include <QtWidgets/QActionGroup>
-#endif
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QMenu>
@@ -221,6 +217,36 @@ MemoryWindow::MemoryWindow(DebuggerQt &debugger, QWidget *parent) :
 
 MemoryWindow::~MemoryWindow()
 {
+}
+
+
+bool MemoryWindow::selectSpace(address_space &space)
+{
+	auto *const view = m_memTable->view<debug_view_memory>();
+	std::size_t i = 0;
+	for (auto &ptr : view->source_list())
+	{
+		auto const *const source = downcast<debug_view_memory_source const *>(ptr.get());
+		auto const [mintf, spacenum] = source->space();
+		assert(!mintf || ((0 <= spacenum) && mintf->has_space(spacenum)));
+		if (mintf && (&mintf->space(spacenum) == &space))
+		{
+			if (view->source() != source)
+				m_memoryComboBox->setCurrentIndex(i);
+			return true;
+		}
+		++i;
+	}
+	return false;
+}
+
+
+void MemoryWindow::debugActOpenMemory()
+{
+	MemoryWindow *foo = new MemoryWindow(m_debugger, this);
+	foo->m_memoryComboBox->setCurrentIndex(m_memTable->sourceIndex());
+	foo->m_inputEdit->setText(QString::fromUtf8(m_memTable->view<debug_view_memory>()->expression()));
+	foo->expressionSubmitted();
 }
 
 
@@ -489,7 +515,8 @@ void DebuggerMemView::addItemsToContextMenu(QMenu *menu)
 	{
 		debug_view_memory &memView = *view<debug_view_memory>();
 		debug_view_memory_source const &source = downcast<debug_view_memory_source const &>(*memView.source());
-		auto [mintf, spacenum] = source.space();
+		auto const [mintf, spacenum] = source.space();
+		assert(!mintf || ((0 <= spacenum) && mintf->has_space(spacenum)));
 		if (mintf)
 		{
 			const address_space_config *config = mintf->logical_space_config(spacenum);

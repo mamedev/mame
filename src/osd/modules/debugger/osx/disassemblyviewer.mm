@@ -142,7 +142,10 @@
 
 - (IBAction)debugNewMemoryWindow:(id)sender {
 	debug_view_disasm_source const *source = [dasmView source];
-	auto [mintf, spacenum] = source->space();
+	auto const [mintf, spacenum] = source->space();
+	assert(mintf);
+	assert(0 <= spacenum);
+	assert(mintf->has_space(spacenum));
 	[console debugNewMemoryWindowForSpace:&mintf->space(spacenum)
 								   device:source->device()
 							   expression:nil];
@@ -151,7 +154,10 @@
 
 - (IBAction)debugNewDisassemblyWindow:(id)sender {
 	debug_view_disasm_source const *source = [dasmView source];
-	auto [mintf, spacenum] = source->space();
+	auto const [mintf, spacenum] = source->space();
+	assert(mintf);
+	assert(0 <= spacenum);
+	assert(mintf->has_space(spacenum));
 	[console debugNewDisassemblyWindowForSpace:&mintf->space(spacenum)
 										device:source->device()
 									expression:[dasmView expression]];

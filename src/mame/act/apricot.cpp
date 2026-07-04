@@ -20,6 +20,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "cpu/i8089/i8089.h"
+#include "formats/apricotpc_dsk.h"
 #include "formats/apridisk.h"
 #include "imagedev/floppy.h"
 #include "machine/clock.h"
@@ -257,6 +258,7 @@ void apricot_state::fdc_intrq_w(int state)
 void apricot_state::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
+	fr.add(FLOPPY_APRICOTPC_FORMAT);
 	fr.add(FLOPPY_APRIDISK_FORMAT);
 }
 
@@ -412,10 +414,10 @@ void apricot_state::apricot(machine_config &config)
 	m_ppi->in_pc_callback().set(FUNC(apricot_state::i8255_portc_r));
 	m_ppi->out_pc_callback().set(FUNC(apricot_state::i8255_portc_w));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_cpu, 0);
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(4_MHz_XTAL / 16);
 	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir6_w));
 	m_pit->set_clk<1>(4_MHz_XTAL / 2);
@@ -477,7 +479,7 @@ void apricot_state::apricot(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_original("apricot_flop");
 
 	// expansion bus
-	APRICOT_EXPANSION_BUS(config, m_exp, 0);
+	APRICOT_EXPANSION_BUS(config, m_exp);
 	m_exp->set_program_space(m_cpu, AS_PROGRAM);
 	m_exp->set_io_space(m_cpu, AS_IO);
 	m_exp->set_program_iop_space(m_iop, AS_PROGRAM);

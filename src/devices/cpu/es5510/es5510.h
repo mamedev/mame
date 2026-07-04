@@ -155,7 +155,7 @@ private:
 	int16_t ser3l;
 	int64_t machl;        // 48 bits, right justified and sign extended
 	bool mac_overflow;  // whether reading the MAC register should return a saturated replacement value
-	int32_t dil;
+	int16_t dil;
 	int32_t memsiz;
 	int32_t memmask;
 	int32_t memincrement;
@@ -168,7 +168,7 @@ private:
 	int mulshift;
 	int8_t ccr;           // really, 5 bits, left justified
 	int8_t cmr;           // really, 6 bits, left justified
-	int32_t dol[2];
+	int16_t dol[2];
 	int dol_count;
 
 	std::unique_ptr<uint64_t[]> instr;

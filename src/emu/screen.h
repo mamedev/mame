@@ -213,7 +213,7 @@ public:
 	///   horizontal blanking period.
 	/// \param [in] hbend Index of first visible pixel after horizontal
 	///   blanking period ends.
-	/// \param [in] hbstart Index of first pixel in horzontal blanking
+	/// \param [in] hbstart Index of first pixel in horizontal blanking
 	///   period after visible pixels.
 	/// \param [in] vtotal Total lines per frame, including vertical
 	///   blanking period.
@@ -228,6 +228,7 @@ public:
 		set_clock(pixclock);
 		m_refresh = HZ_TO_ATTOSECONDS(pixclock) * htotal * vtotal;
 		m_vblank = m_refresh / vtotal * (vtotal - (vbstart - vbend));
+		m_oldstyle_vblank_supplied = false;
 		m_width = htotal;
 		m_height = vtotal;
 		m_visarea.set(hbend, hbstart ? hbstart - 1 : htotal - 1, vbend, vbstart - 1);
@@ -337,25 +338,25 @@ public:
 	}
 
 	template <typename F>
-	std::enable_if_t<screen_update_ind16_delegate::supports_callback<F>::value> set_screen_update(F &&callback, const char *name)
+	void set_screen_update(F &&callback, const char *name) requires screen_update_ind16_delegate::supports_callback<F>::value
 	{
 		m_screen_update_ind16.set(std::forward<F>(callback), name);
 		m_screen_update_rgb32 = screen_update_rgb32_delegate(*this);
 	}
 	template <typename F>
-	std::enable_if_t<screen_update_rgb32_delegate::supports_callback<F>::value> set_screen_update(F &&callback, const char *name)
+	void set_screen_update(F &&callback, const char *name) requires screen_update_rgb32_delegate::supports_callback<F>::value
 	{
 		m_screen_update_ind16 = screen_update_ind16_delegate(*this);
 		m_screen_update_rgb32.set(std::forward<F>(callback), name);
 	}
 	template <typename T, typename F>
-	std::enable_if_t<screen_update_ind16_delegate::supports_callback<F>::value> set_screen_update(T &&target, F &&callback, const char *name)
+	void set_screen_update(T &&target, F &&callback, const char *name) requires screen_update_ind16_delegate::supports_callback<F>::value
 	{
 		m_screen_update_ind16.set(std::forward<T>(target), std::forward<F>(callback), name);
 		m_screen_update_rgb32 = screen_update_rgb32_delegate(*this);
 	}
 	template <typename T, typename F>
-	std::enable_if_t<screen_update_rgb32_delegate::supports_callback<F>::value> set_screen_update(T &&target, F &&callback, const char *name)
+	void set_screen_update(T &&target, F &&callback, const char *name) requires screen_update_rgb32_delegate::supports_callback<F>::value
 	{
 		m_screen_update_ind16 = screen_update_ind16_delegate(*this);
 		m_screen_update_rgb32.set(std::forward<T>(target), std::forward<F>(callback), name);
@@ -406,7 +407,8 @@ public:
 	int partial_updates() const { return m_partial_updates_this_frame; }
 	int partial_scan_hpos() const { return m_partial_scan_hpos; }
 	bool update_partial(int scanline);
-	void update_now();
+	bool update_partial(int vpos, int hpos);
+	bool update_now() { return update_partial(vpos(), hpos()); }
 	void reset_partial_updates();
 
 	// additional helpers

@@ -196,7 +196,7 @@ private:
 	uint8_t ppi_port_b_r();
 	void ppi_port_a_w(uint8_t data);
 	void ppi_port_c_w(uint8_t data);
-	void irqhandler(int state);
+	IRQ_CALLBACK_MEMBER(sound_vector_r);
 	void sfkick_io_map(address_map &map) ATTR_COLD;
 	void sfkick_map(address_map &map) ATTR_COLD;
 	void sfkick_sound_io_map(address_map &map) ATTR_COLD;
@@ -401,9 +401,10 @@ void sfkick_state::machine_reset()
 		m_bank[i]->set_entry(i);
 }
 
-void sfkick_state::irqhandler(int state)
+IRQ_CALLBACK_MEMBER(sfkick_state::sound_vector_r)
 {
-	m_soundcpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff); // Z80
+	// IM0
+	return 0xff;
 }
 
 void sfkick_state::sfkick(machine_config &config)
@@ -417,6 +418,7 @@ void sfkick_state::sfkick(machine_config &config)
 	Z80(config, m_soundcpu, MASTER_CLOCK/6);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &sfkick_state::sfkick_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &sfkick_state::sfkick_sound_io_map);
+	m_soundcpu->set_irq_acknowledge_callback(FUNC(sfkick_state::sound_vector_r));
 
 	ADDRESS_MAP_BANK(config, m_page[0]).set_map(&sfkick_state::bank_mem).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 	ADDRESS_MAP_BANK(config, m_page[1]).set_map(&sfkick_state::bank_mem).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
@@ -439,7 +441,7 @@ void sfkick_state::sfkick(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch");
 
 	ym2203_device &ym1(YM2203(config, "ym1", MASTER_CLOCK/6));
-	ym1.irq_handler().set(FUNC(sfkick_state::irqhandler));
+	ym1.irq_handler().set_inputline(m_soundcpu, 0);
 	ym1.add_route(0, "mono", 0.25);
 	ym1.add_route(1, "mono", 0.25);
 	ym1.add_route(2, "mono", 0.25);

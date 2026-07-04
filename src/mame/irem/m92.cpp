@@ -130,7 +130,7 @@ M92-A-B   05C04170B1
 |                                                      |
 |J      CN6                           |-------|        |
 |                      D71059C        |NEC    |        |
-|A              6264                  |D71036L|        |
+|A              6264                  |D70136L|        |
 |                      62256   18MHz  |V33    |        |
 |M                                    |-------|        |
 |               6264   62256                           |
@@ -922,7 +922,7 @@ void m92_state::m92(machine_config &config)
 	V35(config, m_soundcpu, 14.318181_MHz_XTAL);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &m92_state::sound_map);
 
-	PIC8259(config, m_upd71059c, 0);
+	PIC8259(config, m_upd71059c);
 	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(m92_state::scanline_interrupt), "screen", 0, 1);

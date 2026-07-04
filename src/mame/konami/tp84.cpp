@@ -430,7 +430,7 @@ void tp84_state::filter_w(offs_t offset, uint8_t data)
 
 void tp84_state::sh_irqtrigger_w(uint8_t data)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 }
 
 
@@ -606,7 +606,7 @@ void tp84_state::tp84(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));  /* 100 CPU slices per frame - a high value to ensure proper
 	                                                         synchronization of the CPUs */
 
-	ls259_device &mainlatch(LS259(config, "mainlatch", 0)); // 3B
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 3B
 	mainlatch.q_out_cb<0>().set(FUNC(tp84_state::irq_enable_w));
 	mainlatch.q_out_cb<1>().set(FUNC(tp84_state::coin_counter_w<1>));
 	mainlatch.q_out_cb<2>().set(FUNC(tp84_state::coin_counter_w<0>));

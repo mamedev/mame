@@ -17,8 +17,7 @@ they run fine on the older B&W video hardware. For example, doing a ROM swap
 on the older Space Fever.
 
 TODO:
-- spacefev sound pitch for laser fire and enemy explosion is wrong, see:
-  https://www.youtube.com/watch?v=mGMUPNqlyuw
+- spacefev sound pitch for laser fire and enemy explosion is wrong
 
 ----------------------------------------------------------------------------
 

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli
 /********************************************************************
- Hyperstone cpu emulator
+ Hyperstone E1 CPU emulator
  written by Pierpaolo Prazzoli
 
  Hyperstone models:
@@ -91,13 +91,14 @@
 
 #include "emu.h"
 #include "e132xs.h"
-#include "e132xsfe.h"
 
-#include "32xsdefs.h"
+#include "e1defs.h"
+#include "e1fe.h"
 
 #include "emuopts.h"
 
 #include <algorithm>
+#include <bit>
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -160,6 +161,7 @@ hyperstone_device::hyperstone_device(
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, prg_data_width, 32, 0, internal_map)
 	, m_io_config("io", ENDIANNESS_BIG, io_data_width, io_addr_bits, (io_data_width == 16) ? -1 : -2)
+	, m_disassembler(nullptr) // for logging - pass nullptr so output doesn't depend on state
 	, m_cache(CACHE_SIZE + sizeof(internal_hyperstone_state))
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
@@ -1565,7 +1567,7 @@ void hyperstone_device::device_start()
 	if (m_enable_drc)
 	{
 		const uint32_t umlflags = 0;
-		m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 4, 32, 1);
+		m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 4, 32, 1, COMPILE_FORWARDS_BYTES);
 
 		// add UML symbols
 		m_drcuml->symbol_add(&m_core->global_regs[PC_REGISTER],  sizeof(m_core->global_regs[PC_REGISTER]),  "pc");
@@ -1619,10 +1621,13 @@ void hyperstone_device::device_start()
 		m_drcuml->symbol_add(&m_core->arg0, sizeof(uint32_t), "arg0");
 		m_drcuml->symbol_add(&m_core->arg1, sizeof(uint32_t), "arg1");
 
-		/* initialize the front-end helper */
-		m_drcfe = std::make_unique<e132xs_frontend>(*this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, m_single_instruction_mode ? 1 : COMPILE_MAX_SEQUENCE);
+		// initialize the front-end helper
+		m_drcfe = std::make_unique<frontend>(*this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, m_single_instruction_mode ? 1 : COMPILE_MAX_SEQUENCE);
 
-		/* mark the cache dirty so it is updated on next execute */
+		// generate invariant code
+		generate_invariant();
+
+		// mark the cache dirty so it is updated on next execute
 		m_cache_dirty = true;
 	}
 
@@ -1783,7 +1788,7 @@ void gms30c2132_device::device_start()
 
 void hyperstone_device::device_reset()
 {
-	//TODO: Add different reset initializations for BCR, MCR, FCR, TPR
+	// TODO: Add different reset initializations for BCR, MCR, FCR, TPR
 
 	m_core->tr_clocks_per_tick = 2;
 

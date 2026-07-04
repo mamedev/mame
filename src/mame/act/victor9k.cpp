@@ -109,7 +109,7 @@ public:
 		m_kb(*this, KB_TAG),
 		m_fdc(*this, "fdc"),
 		m_scsibus(*this, "scsi"),
-		m_hdc(*this, "scsi:7:v9kdmaib"),
+		m_hdc(*this, "v9kdmaib"),
 		m_centronics(*this, "centronics"),
 		m_rs232a(*this, RS232_A_TAG),
 		m_rs232b(*this, RS232_B_TAG),
@@ -763,13 +763,13 @@ void victor9k_state::victor9k(machine_config &config)
 	// sound hardware
 	FILTER_BIQUAD(config, m_cvsd_filter2).opamp_mfb_lowpass_setup(RES_K(27), RES_K(15), RES_K(27), CAP_P(4700), CAP_P(1200));
 	FILTER_BIQUAD(config, m_cvsd_filter).opamp_mfb_lowpass_setup(RES_K(43), RES_K(36), RES_K(180), CAP_P(1800), CAP_P(180));
-	HC55516(config, m_cvsd, 0).add_route(ALL_OUTPUTS, m_cvsd_filter, 1.0);
+	HC55516(config, m_cvsd).add_route(ALL_OUTPUTS, m_cvsd_filter, 1.0);
 	m_cvsd_filter->add_route(ALL_OUTPUTS, m_cvsd_filter2, 1.0);
 	m_cvsd_filter2->add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER(config, "mono").front_center();
 
 	// devices
-	IEEE488(config, m_ieee488, 0);
+	IEEE488(config, m_ieee488);
 
 	m_ieee488->dav_callback().set(M6522_1_TAG, FUNC(via6522_device::write_pb0));
 	m_ieee488->eoi_callback().set(M6522_1_TAG, FUNC(via6522_device::write_pb1));
@@ -780,10 +780,10 @@ void victor9k_state::victor9k(machine_config &config)
 	m_ieee488->nrfd_callback().set(FUNC(victor9k_state::write_nfrd));
 	m_ieee488->ndac_callback().set(FUNC(victor9k_state::write_ndac));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(15_MHz_XTAL / 12);
 	m_pit->out_handler<0>().set(m_upd7201, FUNC(upd7201_device::rxca_w));
 	m_pit->out_handler<0>().append(m_upd7201, FUNC(upd7201_device::txca_w));
@@ -842,11 +842,11 @@ void victor9k_state::victor9k(machine_config &config)
 	m_rs232b->cts_handler().set(m_upd7201, FUNC(upd7201_device::ctsb_w));
 	m_rs232b->dsr_handler().set(m_via2, FUNC(via6522_device::write_pa5));
 
-	VICTOR9K_KEYBOARD(config, m_kb, 0);
+	VICTOR9K_KEYBOARD(config, m_kb);
 	m_kb->kbrdy_handler().set(FUNC(victor9k_state::kbrdy_w));
 	m_kb->kbdata_handler().set(FUNC(victor9k_state::kbdata_w));
 
-	VICTOR_9000_FDC(config, m_fdc, 0);
+	VICTOR_9000_FDC(config, m_fdc);
 	m_fdc->irq_wr_callback().set(FUNC(victor9k_state::fdc_irq_w));
 	m_fdc->syn_wr_callback().set(I8259A_TAG, FUNC(pic8259_device::ir0_w)).invert();
 	m_fdc->lbrdy_wr_callback().set_inputline(I8088_TAG, INPUT_LINE_TEST).invert();
@@ -859,16 +859,12 @@ void victor9k_state::victor9k(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("v9kdmaib", VICTOR_9000_HDC).machine_config(
-		[this](device_t *device)
-		{
-			victor_9000_hdc_device &victor9k_hdc(downcast<victor_9000_hdc_device &>(*device));
 
-			device->set_clock(15_MHz_XTAL / 3);
-			victor9k_hdc.irq_handler().append(m_pic, FUNC(pic8259_device::ir4_w));
-			victor9k_hdc.dma_read().set(*this, FUNC(victor9k_state::hd_dma_r));
-			victor9k_hdc.dma_write().set(*this, FUNC(victor9k_state::hd_dma_w));
-		});
+	VICTOR_9000_HDC(config, m_hdc, 15_MHz_XTAL / 3);
+	m_scsibus->set_external_device(7, m_hdc);
+	m_hdc->irq_handler().append(m_pic, FUNC(pic8259_device::ir4_w));
+	m_hdc->dma_read().set(DEVICE_SELF, FUNC(victor9k_state::hd_dma_r));
+	m_hdc->dma_write().set(DEVICE_SELF, FUNC(victor9k_state::hd_dma_w));
 
 	RAM(config, m_ram).set_default_size("128K").set_extra_options("128K,256K,512K,640K,768K,896K");
 

@@ -147,7 +147,7 @@ void  model1io_device::device_add_mconfig(machine_config &config)
 	io.out_pf_callback().set(FUNC(model1io_device::io_pf_w));
 	io.in_pg_callback().set(FUNC(model1io_device::io_pg_r));
 
-	msm6253_device &adc(MSM6253(config, "adc", 0));
+	msm6253_device &adc(MSM6253(config, "adc"));
 	adc.set_input_cb<0>(FUNC(model1io_device::analog0_r));
 	adc.set_input_cb<1>(FUNC(model1io_device::analog1_r));
 	adc.set_input_cb<2>(FUNC(model1io_device::analog2_r));

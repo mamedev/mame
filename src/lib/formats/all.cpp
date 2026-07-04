@@ -94,6 +94,10 @@
 #include "applix_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_APRICOTPC_DSK
+#include "apricotpc_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_APRIDISK
 #include "apridisk.h"
 #endif
@@ -518,9 +522,9 @@
 #include "p2000t_cas.h"
 #endif
 
-#ifdef HAS_FORMATS_P6001_CAS
-#include "p6001_cas.h"
-#endif
+//#ifdef HAS_FORMATS_P6001_CAS
+//#include "p6001_cas.h"
+//#endif
 
 #ifdef HAS_FORMATS_PASTI_DSK
 #include "pasti_dsk.h"
@@ -580,6 +584,10 @@
 
 #ifdef HAS_FORMATS_RX50_DSK
 #include "rx50_dsk.h"
+#endif
+
+#ifdef HAS_FORMATS_S900_DSK
+#include "s900_dsk.h"
 #endif
 
 #ifdef HAS_FORMATS_SAP_DSK
@@ -835,6 +843,7 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("Sharp");
 #ifdef HAS_FORMATS_MZ_CAS
 	en.add(mz700_cassette_formats); // mz_cas.h
+	en.add(mz80b_cassette_formats); // mz_cas.h
 #endif
 #ifdef HAS_FORMATS_X1_TAP
 	en.add(x1_cassette_formats); // x1_tap.h
@@ -935,6 +944,9 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #endif
 
 	en.category("Apricot");
+#ifdef HAS_FORMATS_APRICOTPC_DSK
+	en.add(FLOPPY_APRICOTPC_FORMAT); // apricotpc_dsk.h
+#endif
 #ifdef HAS_FORMATS_APRIDISK
 	en.add(FLOPPY_APRIDISK_FORMAT); // apridisk.h
 #endif
@@ -1458,6 +1470,11 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(FLOPPY_VGI_FORMAT); // vgi_dsk.h
 #endif
 
+//	en.category("NEC");
+//#ifdef HAS_FORMATS_P6001_CAS
+//	en.add(pc6001_cassette_formats); // p6001_cas.h
+//#endif
+
 	en.category("Orao");
 #ifdef HAS_FORMATS_ORAO_CAS
 	en.add(orao_cassette_formats); // orao_cas.h
@@ -1469,11 +1486,6 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #endif
 #ifdef HAS_FORMATS_P2000T_CAS
 	en.add(p2000t_cassette_formats); // p2000t_cas.h
-#endif
-
-	en.category("NEC");
-#ifdef HAS_FORMATS_P6001_CAS
-	en.add(pc6001_cassette_formats); // p6001_cas.h
 #endif
 
 	en.category("Sanyo");
@@ -1555,5 +1567,10 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("Wren");
 #ifdef HAS_FORMATS_WREN_DSK
 	en.add(FLOPPY_WREN_FORMAT); // wren_dsk.h
+#endif
+
+	en.category("Akai");
+#ifdef HAS_FORMATS_S900_DSK
+	en.add(FLOPPY_S900_FORMAT); // s900_dsk.h
 #endif
 }

@@ -332,17 +332,9 @@ void pico_base_state::pico_68k_io_write(offs_t offset, uint16_t data, uint16_t m
 				// value 4000 maps to the uPD7759's start line (0->1 = start)
 				m_sega_315_5641_pcm->fifo_reset_w(BIT(data, 15));
 				m_sega_315_5641_pcm->reset_w(BIT(data, 11));
+				m_sega_315_5641_pcm->md_w(BIT(~data, 11));
 				m_sega_315_5641_pcm->start_w(BIT(data, 14));
 			}
-
-
-			/*m_sega_315_5641_pcm->reset_w(0);
-			m_sega_315_5641_pcm->start_w(0);
-			m_sega_315_5641_pcm->reset_w(1);
-			m_sega_315_5641_pcm->start_w(1);
-
-			if (ACCESSING_BITS_0_7) m_sega_315_5641_pcm->port_w(space,0,data&0xff);
-			if (ACCESSING_BITS_8_15) m_sega_315_5641_pcm->port_w(space,0,(data>>8)&0xff);*/
 
 			break;
 	}
@@ -644,11 +636,6 @@ void copera_state::machine_start()
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a13)), write16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a13)));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a15)), write16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a15)));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_tmss_bank)));
-
-	m_sega_315_5641_pcm->reset_w(0);
-	m_sega_315_5641_pcm->start_w(0);
-	m_sega_315_5641_pcm->reset_w(1);
-	m_sega_315_5641_pcm->start_w(1);
 
 	m_vdp->stop_timers();
 

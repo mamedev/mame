@@ -175,9 +175,9 @@ public:
 		m_towerlamps(*this, "towerlamp%u", 0U)
 	{ }
 
-	void jwildb52(machine_config &config);
+	void jwildb52(machine_config &config) ATTR_COLD;
 
-	void init_jwildb52();
+	void init_jwildb52() ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
 
@@ -461,10 +461,10 @@ static INPUT_PORTS_START( jwildb52 )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Meter")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Meter")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_NAME("Reset")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("Last")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Machine Door")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_DOOR ) PORT_NAME("Machine Door")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper Weight Switch")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )  // Hold 1
@@ -599,8 +599,6 @@ INPUT_PORTS_END
 void sigmab52_state::machine_start()
 {
 	m_bank1->configure_entries(0, 2, memregion("maincpu")->base(), 0x4000);
-	m_lamps.resolve();
-	m_towerlamps.resolve();
 }
 
 void sigmab52_state::machine_reset()

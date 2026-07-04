@@ -45,7 +45,6 @@ private:
 	void snookr10_map(address_map &map) ATTR_COLD;
 	void tenballs_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override ATTR_COLD;
 
 	int m_outportl = 0;

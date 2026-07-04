@@ -55,9 +55,13 @@ public:
 		, m_digits(*this, "digit%d", 0U)
 		, m_leds(*this, "led%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
-		{ }
+	{ }
 
-	void spirit76(machine_config &config);
+	void spirit76(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
@@ -71,8 +75,6 @@ private:
 	u8 m_strobe = 0U;
 	u8 m_segment = 0U;
 	u8 m_last_solenoid[2]{ };
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<16> m_io_keyboard;
 	output_finder<16> m_digits;
@@ -325,9 +327,6 @@ u8 spirit76_state::sw_r()
 
 void spirit76_state::machine_start()
 {
-	m_digits.resolve();
-	m_leds.resolve();
-	m_io_outputs.resolve();
 	save_item(NAME(m_t_c));
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_segment));

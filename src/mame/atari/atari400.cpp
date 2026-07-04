@@ -83,8 +83,9 @@
 
     ***************** read access *******************
     range     short   description
-    0000-9FFF RAM     main memory
-    A000-BFFF RAM/ROM RAM or (banked) ROM cartridges
+    0000-7FFF RAM     main memory
+    8000-9FFF RAM/ROM RAM or (right/banked) ROM cartridges
+    A000-BFFF RAM/ROM RAM or (left/banked) ROM cartridges
     C000-CFFF ROM     unused or monitor ROM
 
     ********* GTIA    ********************************
@@ -528,6 +529,7 @@ void a400_state::area_8000_map(address_map &map)
 	map(0x8000, 0x9fff).view(m_cart_rd4_view);
 	m_cart_rd4_view[0](0x8000, 0x9fff).rw(FUNC(a400_state::ram_r<0x8000>), FUNC(a400_state::ram_w<0x8000>));
 	m_cart_rd4_view[1](0x8000, 0x9fff).rw(m_cartleft, FUNC(a800_cart_slot_device::read_cart<0>), FUNC(a800_cart_slot_device::write_cart<0>));
+	// Right cartridge (a800 specific) is also mapped at 0x8000-0x9fff
 }
 
 void a400_state::area_a000_map(address_map &map)
@@ -2040,12 +2042,12 @@ void a400_state::atari_common(machine_config &config)
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("48K");
 
-	ATARI_GTIA(config, m_gtia, 0);
+	ATARI_GTIA(config, m_gtia);
 	m_gtia->read_callback().set_ioport("console");
 	m_gtia->write_callback().set(FUNC(a400_state::gtia_cb));
 	m_gtia->trigger_callback().set(FUNC(a400_state::djoy_b_r));
 
-	ATARI_ANTIC(config, m_antic, 0);
+	ATARI_ANTIC(config, m_antic);
 	m_antic->set_gtia_tag(m_gtia);
 
 	/* devices */
@@ -2257,10 +2259,10 @@ void a5200_state::a5200(machine_config &config)
 	m_pokey->set_keyboard_callback(FUNC(a5200_state::a5200_keypads));
 	m_pokey->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	ATARI_GTIA(config, m_gtia, 0);
+	ATARI_GTIA(config, m_gtia);
 	m_gtia->trigger_callback().set_ioport("djoy_b");
 
-	ATARI_ANTIC(config, m_antic, 0);
+	ATARI_ANTIC(config, m_antic);
 	m_antic->set_gtia_tag(m_gtia);
 
 	config_ntsc_screen(config);

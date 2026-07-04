@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "gt913_io.h"
-#include "cpu/h8/h8.h"
+#include "cpu/h8/h8_cpu_base.h"
 
 
 //**************************************************************************

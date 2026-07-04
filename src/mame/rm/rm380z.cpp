@@ -208,6 +208,9 @@ void rm380z_state::base_configure(machine_config &config)
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rm380z_state::rm380z_mem);
 	m_maincpu->set_addrmap(AS_IO, &rm380z_state::rm380z_io);
+	m_maincpu->z80_set_m1_cycles(4+1);   // 1 wait state per M1 cycle
+	m_maincpu->z80_set_mreq_cycles(3+1); // and also 1 wait state for each MREQ
+	m_maincpu->refresh_cb().set(FUNC(rm380z_state::z80_m1_w));
 
 	/* video hardware */
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
@@ -226,7 +229,7 @@ void rm380z_state::base_configure(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy1, rm380z_floppies, "mds", floppy_image_device::default_mfm_floppy_formats).set_fixed(true);
 
 	/* keyboard */
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(rm380z_state::keyboard_put));
 }
 
@@ -251,7 +254,7 @@ void rm380z_state_cos34::rm380z34e(machine_config &config)
 
 	m_screen->set_raw(8_MHz_XTAL, 512, 0, 320, 312, 0, 240);
 
-	SN74S262(config, m_rocg, 0);
+	SN74S262(config, m_rocg);
 	m_rocg->set_palette(m_palette);
 }
 

@@ -134,7 +134,7 @@ class s100_bus_device : public device_t
 {
 public:
 	// construction/destruction
-	s100_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	s100_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	~s100_bus_device();
 
 	auto irq() { return m_write_irq.bind(); }
@@ -221,17 +221,14 @@ public:
 	s100_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
 		: s100_slot_device(mconfig, tag, owner, DERIVED_CLOCK(1, 1))
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
-	s100_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	s100_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename T> void set_bus(T &&tag) { m_bus.set_tag(std::forward<T>(tag)); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 private:
@@ -240,7 +237,7 @@ private:
 
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(S100_BUS,  s100_bus_device)
 DECLARE_DEVICE_TYPE(S100_SLOT, s100_slot_device)
 

@@ -183,7 +183,7 @@ public:
 	virtual ~dynamic_module() { }
 
 	template <typename T>
-	typename std::enable_if_t<std::is_pointer_v<T>, T> bind(char const *symbol)
+	T bind(char const *symbol) requires std::is_pointer_v<T>
 	{
 		return reinterpret_cast<T>(get_symbol_address(symbol));
 	}

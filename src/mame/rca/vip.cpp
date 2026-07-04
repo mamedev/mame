@@ -620,8 +620,6 @@ void vip_state::machine_start()
 		ram[addr] = machine().rand() & 0xff;
 	}
 
-	m_leds.resolve();
-
 	// turn on power LED
 	m_leds[LED_POWER] = 1;
 

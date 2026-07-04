@@ -201,13 +201,14 @@ void photoply_state::photoply(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &photoply_state::main_io);
 	m_maincpu->set_irq_acknowledge_callback("pci:05.0:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	SIS85C496_HOST(config, "pci:05.0", 0, "maincpu", 32*1024*1024);
 
+	// FIXME: determine ISA bus clock
 	ISA16_SLOT(config, "superio", 0, "pci:05.0:isabus", isa_internal_devices, "w83787f", true).set_option_machine_config("w83787f", winbond_superio_config);
-	ISA16_SLOT(config, "isa1", 0, "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa2", 0, "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", 0, "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa1",    0, "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2",    0, "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3",    0, "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
 
 	// TODO: convert to Microtouch
 	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, "logitech_mouse"));
@@ -233,7 +234,7 @@ void photoply_state::photoply(machine_config &config)
 //      .erase_all_time(attotime::from_usec(10));
 }
 
-// We asume that every Photo Play from 1999 onwards use a DX4 100MHz instead of a 75MHz one (both were compatible, the latter were recommended)
+// We assume that every Photo Play from 1999 onwards use a DX4 100MHz instead of a 75MHz one (both were compatible, the latter were recommended)
 void photoply_state::photoply_dx4_100(machine_config &config)
 {
 	photoply(config);
@@ -522,7 +523,7 @@ GAME( 1998, photoply98sp,    0,             photoply,         photoply, photoply
 GAME( 1999, photoply99sp,    0,             photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 1999 (Spain)",               MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION ) // "CON device not opened. System halted" before PTS-DOS
 GAME( 1999, photoply99nl,    photoply99sp,  photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 1999 (Netherlands)",         MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION ) // Boots to funworld logo, goes to touchscreen calibration menu
 GAME( 2000, photoply2k,      0,             photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2000 (v2.01)",               MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION ) // Fails PTS-DOS bootstrap around PC=7dc5, likely bad dump
-GAME( 2000, photoply2ksp,    photoply2k,    photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2000 (Spain)",               MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION ) // Attract mode
+GAME( 2000, photoply2ksp,    photoply2k,    photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld (Comatel license)", "Photo Play 2000 (Spain)",               MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION ) // Attract mode
 GAME( 2000, photoply2knl,    photoply2k,    photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2000 (Netherlands)",         MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION ) // Punts in PTS-DOS after failing ES1868/microtouch detection, has diag inside for latter
 GAME( 2001, photoply2k1it,   0,             photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2001 (Italy)",               MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION ) // Attract mode
 GAME( 2001, photoply2k1nl,   photoply2k1it, photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2001 (Netherlands)",         MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION ) // "Non system disk or I/O error"

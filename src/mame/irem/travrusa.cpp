@@ -718,7 +718,7 @@ void travrusa_state::travrusa(machine_config &config)
 	PALETTE(config, m_palette, FUNC(travrusa_state::travrusa_palette), 16*8+16*8, 128+16);
 
 	// sound hardware
-	IREM_M52_SOUNDC_AUDIO(config, "irem_audio", 0);
+	IREM_M52_SOUNDC_AUDIO(config, "irem_audio");
 }
 
 void travrusa_state::shtrider(machine_config &config)

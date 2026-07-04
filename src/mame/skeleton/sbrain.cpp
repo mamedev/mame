@@ -351,7 +351,7 @@ void sbrain_state::ppi_pc_w(u8 data)
 	m_fdc->mr_w(!BIT(data, 3));
 	if (BIT(data, 3))
 		disk_select_w(0);
-	m_subcpu->set_input_line(Z80_INPUT_LINE_BUSRQ, BIT(data, 5) ? CLEAR_LINE : ASSERT_LINE);
+	m_subcpu->set_input_line(Z80_INPUT_LINE_BUSREQ, BIT(data, 5) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void sbrain_state::external_txc_w(int state)
@@ -748,7 +748,7 @@ void sbrain_state::sbrain(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:2", sbrain_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:3", sbrain_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
-	TIMER(config, "timer_a", 0).configure_periodic(FUNC(sbrain_state::kbd_scan), attotime::from_hz(15));
+	TIMER(config, "timer_a").configure_periodic(FUNC(sbrain_state::kbd_scan), attotime::from_hz(15));
 
 	SOFTWARE_LIST(config, "flop_list").set_original("sbrain");
 }

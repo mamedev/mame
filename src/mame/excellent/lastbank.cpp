@@ -257,7 +257,7 @@ static INPUT_PORTS_START( lastbank )
 
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_DIPNAME( 0x08, 0x08, "Hopper Empty" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
@@ -860,7 +860,7 @@ void lastbank_state::lastbank(machine_config &config)
 
 	OKIM6295(config, m_oki, 1_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	ES8712(config, m_essnd, 0);
+	ES8712(config, m_essnd);
 	m_essnd->msm_write_handler().set("msm", FUNC(msm6585_device::data_w));
 	m_essnd->set_msm_tag("msm");
 
@@ -883,6 +883,24 @@ void lastbank_state::lastbank(machine_config &config)
 ROM_START( lastbank )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "3.u9", 0x00000, 0x40000, CRC(f430e1f0) SHA1(dd5b697f5c2250d98911f4c7d3e7d4cc16b0b40f) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "8.u48", 0x00000, 0x10000, CRC(3a7bfe10) SHA1(7dc543e11d3c0b9872fcc622339ade25383a1eb3) )
+
+	ROM_REGION( 0x200000, "maincpu:gfx", ROMREGION_ERASEFF )
+	ROM_LOAD( "u11",   0x000000, 0x100000, CRC(2588d82d) SHA1(426f6821862d54123e53410e2776586ddf6b21e7) )
+	ROM_LOAD( "5.u10", 0x100000, 0x020000, CRC(51f3c5a7) SHA1(73d4c8817fe96d75be32c43e816e93c52b5d2b27) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "6.u55", 0x00000, 0x40000, CRC(9e78e234) SHA1(031f93e4bc338d0257fa673da7ce656bb1cda5fb) )
+
+	ROM_REGION( 0x80000, "essnd", 0 ) // Samples
+	ROM_LOAD( "7.u60", 0x00000, 0x80000, CRC(41be7146) SHA1(00f1c0d5809efccf888e27518a2a5876c4b633d8) )
+ROM_END
+
+ROM_START( lastbank130j ) // ES-9402
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "last_bank_ver1.30j.u9", 0x00000, 0x40000, CRC(7ffdeecf) SHA1(6df378bc475088b8ebd38ad22e842a820bd194b2) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "8.u48", 0x00000, 0x10000, CRC(3a7bfe10) SHA1(7dc543e11d3c0b9872fcc622339ade25383a1eb3) )
@@ -1054,12 +1072,13 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1994, lastbank, 0,        lastbank, lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Last Bank (v1.16)",                                   MACHINE_SUPPORTS_SAVE )
-GAME( 1995, fever13,  0,        lastbank, fever13,  fever13_state,  empty_init, ROT0, "Excellent System", "Fever 13 (Japan, v1.3)",                              MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1995, ukiyobox, fever13,  lastbank, ukiyobox, fever13_state,  empty_init, ROT0, "Excellent System", "Ukiyo Box (Japan, v1.3.7)",                           MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1996, mir7hg,   0,        lastbank, mir7hg,   fever13_state,  empty_init, ROT0, "Excellent System", "Miracle Seven - Heaven's Gate (Japan, v1.0.2)",       MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1996, mir7hgt,  0,        lastbank, mir7hgt,  fever13_state,  empty_init, ROT0, "Excellent System", "Miracle Seven - Heaven's Gate Turbo (Japan, v2.0.0)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 199?, wcircus,  0,        lastbank, wcircus,  wcircus_state,  empty_init, ROT0, "Cobra",            "Wonder Circus (Japan, v1.1.1)",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 199?, lpierrot, 0,        lastbank, lpierrot, wcircus_state,  empty_init, ROT0, "Cobra",            "Lucky Pierrot (Japan, v1.1.0B)",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 199?, goldstrk, 0,        lastbank, goldstrk, wcircus_state,  empty_init, ROT0, "Cobra",            "Gold Strike (Japan, v1.1.1 - location test)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 199?, sparkle,  goldstrk, lastbank, sparkle,  fever13_state,  empty_init, ROT0, "Cobra",            "Sparkle (v1.1.3)",                                    MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1994, lastbank,     0,        lastbank, lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Last Bank (v1.16)",                                   MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lastbank130j, lastbank, lastbank, lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Last Bank (Japan, v1.30J)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1995, fever13,      0,        lastbank, fever13,  fever13_state,  empty_init, ROT0, "Excellent System", "Fever 13 (Japan, v1.3)",                              MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1995, ukiyobox,     fever13,  lastbank, ukiyobox, fever13_state,  empty_init, ROT0, "Excellent System", "Ukiyo Box (Japan, v1.3.7)",                           MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1996, mir7hg,       0,        lastbank, mir7hg,   fever13_state,  empty_init, ROT0, "Excellent System", "Miracle Seven - Heaven's Gate (Japan, v1.0.2)",       MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1996, mir7hgt,      0,        lastbank, mir7hgt,  fever13_state,  empty_init, ROT0, "Excellent System", "Miracle Seven - Heaven's Gate Turbo (Japan, v2.0.0)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 199?, wcircus,      0,        lastbank, wcircus,  wcircus_state,  empty_init, ROT0, "Cobra",            "Wonder Circus (Japan, v1.1.1)",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 199?, lpierrot,     0,        lastbank, lpierrot, wcircus_state,  empty_init, ROT0, "Cobra",            "Lucky Pierrot (Japan, v1.1.0B)",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 199?, goldstrk,     0,        lastbank, goldstrk, wcircus_state,  empty_init, ROT0, "Cobra",            "Gold Strike (Japan, v1.1.1 - location test)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 199?, sparkle,      goldstrk, lastbank, sparkle,  fever13_state,  empty_init, ROT0, "Cobra",            "Sparkle (v1.1.3)",                                    MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

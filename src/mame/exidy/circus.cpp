@@ -39,9 +39,19 @@ D000      Paddle Position and Interrupt Reset (where applicable)
 NOTES:
 - Circus: Taito licensed and released the game as "Acrobat TV"
 
+Trapeze and Rip Cord are very picky about initial RAM contents.
+
+Trapeze locks up generating random numbers if both 0x0e and 0x0f are zero. Rip
+Cord can have minor issues like tile glitches, or the parachutist refusing to
+jump during attract mode. Or it can get very confused (eg. filling RAM with 0x55).
+The current fill pattern of 0x00, 0xf0 works around both issues.
+
+On Circus and Robot Bowl, it affects attract mode main character initial position.
+
 TODO:
-- circus: use PROM data to draw framing box and diving boards
-- circus/ripcord collision detection is accurate?
+- circus, robotbwl, ripcord: use PROM data to draw foreground lines
+- ripcord: parachutist 1st jump always fails after cold boot, unless you let attract
+  mode run until it does the 1st (failed) jump there, maybe BTANB?
 - crash: irq timing
 - improve discrete sound
 
@@ -65,8 +75,9 @@ TODO:
 
 void circus_state::machine_start()
 {
-	// trapeze locks up generating random numbers if both 0x0e and 0x0f are zero
-	std::fill(m_ram.begin(), m_ram.end(), 0xff);
+	// some games rely on initial RAM contents, see driver notes
+	for (int i = 0; i < m_ram.bytes() / 2; i++)
+		m_ram[i * 2 + 1] = 0xf0;
 
 	save_item(NAME(m_clown_x));
 	save_item(NAME(m_clown_y));
@@ -363,7 +374,7 @@ void circus_state::base_mcfg(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE); // needed for proper hardware collisions
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE | VIDEO_UPDATE_SCANLINE); // needed for proper hardware collisions
 	m_screen->set_raw(11.289_MHz_XTAL / 2, 42*8, 0, 31*8, 280, 0, 256);
 	m_screen->set_screen_update(FUNC(circus_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -470,9 +481,9 @@ ROM_START( circus )
 	ROM_REGION( 0x0200, "gfx2", 0 ) // clown sprite
 	ROM_LOAD( "9012.14d",   0x0000, 0x0200, CRC(2fde3930) SHA1(a21e2d342f16a39a07edf4bea8d698a52216ecba) )
 
-	ROM_REGION( 0x400, "proms", 0 ) // line drawing; not used by the emulation, dumped for the circusb bootleg but might match
-	ROM_LOAD( "dm74s570-d4.4d", 0x000, 0x200, BAD_DUMP CRC(aad8da33) SHA1(1d60a6b75b94f5be5bad190ef56e9e3da20bf81a) )
-	ROM_LOAD( "dm74s570-d5.5d", 0x200, 0x200, BAD_DUMP CRC(ed2493fa) SHA1(57ee357b68383b0880bfa385820605bede500747) )
+	ROM_REGION( 0x0400, "proms", 0 ) // line drawing; not used by the emulation, dumped for the circusb bootleg but might match
+	ROM_LOAD( "dm74s570-d4.4d", 0x0000, 0x0200, BAD_DUMP CRC(aad8da33) SHA1(1d60a6b75b94f5be5bad190ef56e9e3da20bf81a) )
+	ROM_LOAD( "dm74s570-d5.5d", 0x0200, 0x0200, BAD_DUMP CRC(ed2493fa) SHA1(57ee357b68383b0880bfa385820605bede500747) )
 ROM_END
 
 ROM_START( circuso ) // older set, there exist several bootlegs identical to this set with unlabeled roms/proms; as a bootleg this was found both on a PCB and a PROMs blister, labeled 'Circus - punteggio basso' ('Circus - low scoring')
@@ -495,9 +506,9 @@ ROM_START( circuso ) // older set, there exist several bootlegs identical to thi
 	ROM_REGION( 0x0200, "gfx2", 0 ) // clown sprite
 	ROM_LOAD( "9012.14d",   0x0000, 0x0200, CRC(2fde3930) SHA1(a21e2d342f16a39a07edf4bea8d698a52216ecba) )
 
-	ROM_REGION( 0x400, "proms", 0 ) // line drawing; not used by the emulation, dumped for the circusb bootleg but might match
-	ROM_LOAD( "dm74s570-d4.4d", 0x000, 0x200, BAD_DUMP CRC(aad8da33) SHA1(1d60a6b75b94f5be5bad190ef56e9e3da20bf81a) )
-	ROM_LOAD( "dm74s570-d5.5d", 0x200, 0x200, BAD_DUMP CRC(ed2493fa) SHA1(57ee357b68383b0880bfa385820605bede500747) )
+	ROM_REGION( 0x0400, "proms", 0 ) // line drawing; not used by the emulation, dumped for the circusb bootleg but might match
+	ROM_LOAD( "dm74s570-d4.4d", 0x0000, 0x0200, BAD_DUMP CRC(aad8da33) SHA1(1d60a6b75b94f5be5bad190ef56e9e3da20bf81a) )
+	ROM_LOAD( "dm74s570-d5.5d", 0x0200, 0x0200, BAD_DUMP CRC(ed2493fa) SHA1(57ee357b68383b0880bfa385820605bede500747) )
 ROM_END
 
 ROM_START( springbd )
@@ -520,9 +531,9 @@ ROM_START( springbd )
 	ROM_REGION( 0x0200, "gfx2", 0 ) // clown sprite
 	ROM_LOAD( "93448.14d",  0x0000, 0x0200, CRC(2fde3930) SHA1(a21e2d342f16a39a07edf4bea8d698a52216ecba) )
 
-	ROM_REGION( 0x400, "proms", 0 ) // line drawing; not used by the emulation, dumped for the circusb bootleg but should match
-	ROM_LOAD( "dm74s570-d4.4d", 0x000, 0x200, BAD_DUMP CRC(aad8da33) SHA1(1d60a6b75b94f5be5bad190ef56e9e3da20bf81a) )
-	ROM_LOAD( "dm74s570-d5.5d", 0x200, 0x200, BAD_DUMP CRC(ed2493fa) SHA1(57ee357b68383b0880bfa385820605bede500747) )
+	ROM_REGION( 0x0400, "proms", 0 ) // line drawing; not used by the emulation, dumped for the circusb bootleg but should match
+	ROM_LOAD( "dm74s570-d4.4d", 0x0000, 0x0200, BAD_DUMP CRC(aad8da33) SHA1(1d60a6b75b94f5be5bad190ef56e9e3da20bf81a) )
+	ROM_LOAD( "dm74s570-d5.5d", 0x0200, 0x0200, BAD_DUMP CRC(ed2493fa) SHA1(57ee357b68383b0880bfa385820605bede500747) )
 ROM_END
 
 ROM_START( robotbwl )
@@ -545,9 +556,9 @@ ROM_START( robotbwl )
 	ROM_REGION( 0x0020, "gfx2", ROMREGION_INVERT ) // ball sprite
 	ROM_LOAD( "6000.14d", 0x0000, 0x0020, CRC(a402ac06) SHA1(3bd75630786bcc86d9e9fbc826adc909eef9b41f) )
 
-	ROM_REGION( 0x0100, "proms", 0 ) // line drawing; not used by the emulation
-	ROM_LOAD( "5000.4d",  0x0000, 0x0020, NO_DUMP ) // both of these are MMI6306-1J (N82S131 equivalent) BPROMs
-	ROM_LOAD( "5001.5d",  0x0020, 0x0020, NO_DUMP )
+	ROM_REGION( 0x0400, "proms", 0 ) // line drawing; not used by the emulation
+	ROM_LOAD( "5000.4d",  0x0000, 0x0200, NO_DUMP ) // both of these are MMI6306-1J (N82S131 equivalent) BPROMs
+	ROM_LOAD( "5001.5d",  0x0200, 0x0200, NO_DUMP )
 ROM_END
 
 ROM_START( trapeze ) // loose roms labelled with pencil
@@ -569,10 +580,6 @@ ROM_START( trapeze ) // loose roms labelled with pencil
 
 	ROM_REGION( 0x0200, "gfx2", 0 ) // clown sprite
 	ROM_LOAD( "9012.14d",   0x0000, 0x0200, CRC(2fde3930) SHA1(a21e2d342f16a39a07edf4bea8d698a52216ecba) )
-
-	ROM_REGION( 0x400, "proms", 0 ) // line drawing; not used by the emulation, dumped for the circusb bootleg but might match
-	ROM_LOAD( "dm74s570-d4.4d", 0x000, 0x200, BAD_DUMP CRC(aad8da33) SHA1(1d60a6b75b94f5be5bad190ef56e9e3da20bf81a) )
-	ROM_LOAD( "dm74s570-d5.5d", 0x200, 0x200, BAD_DUMP CRC(ed2493fa) SHA1(57ee357b68383b0880bfa385820605bede500747) )
 ROM_END
 
 ROM_START( crash )
@@ -648,6 +655,10 @@ ROM_START( ripcord )
 
 	ROM_REGION( 0x0200, "gfx2", 0 ) // skydiver sprite
 	ROM_LOAD( "9035.14d",   0x0000, 0x0200, CRC(c9979802) SHA1(cf6dfad0821fa736c8fcf8735792054858232806) )
+
+	ROM_REGION( 0x0400, "proms", 0 ) // line drawing; not used by the emulation
+	ROM_LOAD( "82s131.4d",  0x0000, 0x0200, NO_DUMP )
+	ROM_LOAD( "82s131.5d",  0x0200, 0x0200, NO_DUMP )
 ROM_END
 
 
@@ -662,7 +673,7 @@ GAMEL( 1977, springbd, circus, circus,   circus,   circus_state,   empty_init, R
 
 GAME(  1977, robotbwl, 0,      robotbwl, robotbwl, robotbwl_state, empty_init, ROT0, "Exidy", "Robot Bowl", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME(  1978, trapeze,  0,      circus,   trapeze,  ripcord_state,  empty_init, ROT0, "Exidy / Taito", "Trapeze / Trampoline", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // named Trampoline when Taito published it in Japan
+GAME(  1978, trapeze,  0,      circus,   trapeze,  trapeze_state,  empty_init, ROT0, "Exidy / Taito", "Trapeze / Trampoline", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // named Trampoline when Taito published it in Japan
 
 GAMEL( 1979, crash,    0,      crash,    crash,    crash_state,    empty_init, ROT0, "Exidy", "Crash (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_crash )
 GAMEL( 1979, crasha,   crash,  crash,    crash,    crash_state,    empty_init, ROT0, "Exidy", "Crash (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_crasha )

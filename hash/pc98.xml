@@ -1270,6 +1270,28 @@ Utility disk file "BMENU." sports ugly GFX cyan fills (especially noticeable whe
 		</part>
 	</software>
 
+	<software name="win95bem">
+		<description>Windows 95 OSR2 (Emergency Boot Disk)</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="microsoft windows 95 osr2 (emergency boot disk).hdm" size="1261568" crc="d4e9cccb" sha1="e8c0c231435c0602dbf111342d041d66d004fab9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win98sem">
+		<description>Windows 98 Second Edition (Emergency Boot Disk)</description>
+		<year>1999</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="microsoft windows 98se (emergency boot disk).hdm" size="1261568" crc="a4ea5398" sha1="0f70dc3683ca0d84ea97a06ca6addf1d31a3d3c8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- !Programming IDEs -->
 
 	<software name="cobol">
@@ -1856,6 +1878,40 @@ Moans while executing ISD.EXE, r/w I/O ports $d0, expecting a device to be conne
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- "Multi Paint System: Otonoshimi Set 1" known to exist, possibly very similar to this -->
+	<software name="mpssfsp" supported="partial">
+		<description>Multi Paint System: Secret Fun Set Plus</description>
+		<year>1995</year>
+		<publisher>シーラボ (C-lab)</publisher>
+		<notes><![CDATA[
+Expansion disk for pc98_flop_orig:mps
+Has [EGC] issues during auto demo: leaves trails when kanji drawing, some closing windows fails to clear completely.
+Teal Disk unchecked: has various drivers for printers and Wacom serial tablets cfr. DOC folder
+]]></notes>
+		<info name="alt_title" value="マルチペイントシステム マル秘お楽しみセット" />
+		<info name="usage" value="Requires HDD DOS install. Auto Demo disk: run demo.bat" />
+		<!-- TODO: can't load as 3.5", looks suspicious -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Pink Disk (Auto Demo)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="mpspink.hdm" size="1261568" crc="30e9c621" sha1="6690ee1f6f8af3fa40c29bd86ebed90b9a827a50" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Blue Disk (Art/CG)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="mpsblue.hdm" size="1261568" crc="4a2c117f" sha1="352f03bd0f01d55b6b5c5684db2a90991884aca7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Teal Disk (Expansion/Install)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="mpsteal.hdm" size="1261568" crc="66e1987f" sha1="fe268885ccc9c16cd5fe94bd7d4a61ff6e537968" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 
 <!-- !Sound players/makers (MIDI Applications et al.) -->
 
@@ -2567,6 +2623,29 @@ Not extensively tested
 
 <!-- !Generic Applications -->
 
+	<software name="98eiwa">
+		<!-- Origin: Neo Kobe Collection -->
+		<description>98 Eiwa Jiten</description>
+		<year>1987</year>
+		<publisher>ハイスコア (Hi-Score)</publisher>
+		<notes><![CDATA[
+English-Japanese Dictionary
+]]></notes>
+		<info name="alt_title" value="98英和辞典" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="98 eiwa jiten (disk 1).hdm" size="1261568" crc="3377cdc0" sha1="aef25da61971675ae5db6cd68ff8ecabc65e5225" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="98 eiwa jiten (disk 2).hdm" size="1261568" crc="61396602" sha1="9f7e01c08b477403d04f32a165cd38d25775c059" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="98lespro" supported="no">
 		<description>98 Lesson Pro</description>
 		<year>1990</year>
@@ -3070,7 +3149,7 @@ double height bitmap on non-interlace mode
 		<publisher>ラブ・ガン (Love Gun)</publisher>
 		<info name="alt_title" value="デンジャラス トイズ" />
 		<info name="release" value="19961213" />
-		<info name="usage" value="Required HDD install from DOS, requires 520K minimum of conventional memory" />
+		<info name="usage" value="Requires HDD install from DOS, requires 520K minimum of conventional memory" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1261568">
@@ -3580,26 +3659,6 @@ Throws a "excution file has been renamed" warning during MEGDOS boot
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="746496">
 				<rom name="98 note no hissu aminosan [b].img" size="746496" crc="ee60cb77" sha1="5540f386bb708cff61e41387c9760184083fcad8" offset="0" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="98eiwa">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>98 Eiwa Jiten</description>
-		<year>1987</year>
-		<publisher>ハイスコア (Hi-Score)</publisher>
-		<info name="alt_title" value="98英和辞典" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="98 eiwa jiten (disk 1).hdm" size="1261568" crc="3377cdc0" sha1="aef25da61971675ae5db6cd68ff8ecabc65e5225" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="98 eiwa jiten (disk 2).hdm" size="1261568" crc="61396602" sha1="9f7e01c08b477403d04f32a165cd38d25775c059" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4152,7 +4211,7 @@ Hangs after entering name on VM class
 	</software>
 
 	<software name="poolrad">
-		<description>Advanced Dungeons &amp; Dragons - Pool of Radiance</description>
+		<description>Advanced Dungeons &amp; Dragons: Pool of Radiance</description>
 		<year>1989</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ プール オブ レイディアンス" />
@@ -20918,12 +20977,11 @@ Black screen [FDC] keeps reading chrn=(0, 0, 3, 256) in 2dd mode
 		</part>
 	</software>
 
-	<software name="flashb" supported="no">
+	<software name="flashb" supported="partial">
 		<description>Flashback</description>
 		<year>1994</year>
 		<publisher>ビクターエンタテインメント (Victor Entertainment)</publisher>
 		<notes><![CDATA[
-Black screen, around PC=1fc76. Extensively uses 9821 [PEGC] MMIO.
 16 color mode has a column to the right shifted by one pixel on intro and gameplay
 Optional support for unsupported [graphic] and [sound] options
 ]]></notes>
@@ -20932,8 +20990,8 @@ Optional support for unsupported [graphic] and [sound] options
 		<info name="usage" value="Requires HDD DOS install" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1329680">
-				<rom name="flashback_1.nfd" size="1329680" crc="bb415b0a" sha1="b42641e175060840c0df43e2319bc4ea75d29d89" offset="0" />
+			<dataarea name="flop" size="3444545">
+				<rom name="Flashback (Disk A).mfm" size="3444545" crc="d1a3f821" sha1="d330ccb373b16e8df662791427e265dad1693025" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
@@ -26242,7 +26300,7 @@ Hangs on [MIDI] detection
 	</software>
 
 	<software name="inindo">
-		<description>Inindou - Datou Nobunaga</description>
+		<description>Inindou: Datou Nobunaga</description>
 		<year>1991</year>
 		<publisher>光栄 (Koei)</publisher>
 		<info name="alt_title" value="伊忍道 打倒信長" />
@@ -27880,6 +27938,9 @@ Hangs after Game Arts logo, expects buffer at $27a50 to be 0
 		<description>Kawaisou Monogatari</description>
 		<year>1988</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
+		<notes><![CDATA[
+Throws [FDC] DISK ERROR when clicking GAME START, CHRN=(0, 0, 3, 1024) and R=5 for Disk B
+]]></notes>
 		<info name="alt_title" value="かわいそう物語" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
@@ -32620,7 +32681,7 @@ Optional [AMD-98] support, needs PIT for BGM
 		<description>Mario Bros. Special</description>
 		<year>1985</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="alt_title" value="マリオブラザーズスペシャル" />
+		<info name="alt_title" value="マリオブラザーズ スペシャル" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1086448">
 				<rom name="mariosp.d88" size="1086448" crc="2992943f" sha1="735f2bd8127c08ced963071d071634b7df61e13e" offset="0" />
@@ -69083,6 +69144,24 @@ pc9821: runs too fast
 		</part>
 	</software>
 
+	<!-- alt .2hd format known to exist, assume same but raw -->
+	<software name="sgunyan" supported="yes">
+		<description>Steel Gun Nyan</description>
+		<year>1992</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Uses [DAC1BIT] for speech, controlled thru CPU frequency
+]]></notes>
+		<info name="alt_title" value="鋼鉄銃娘" /> <!-- with furigana スティールガンにゃん -->
+		<info name="author" value="Studio 玄米茶" />
+		<info name="usage" value="Boot from msdos50a floppy, insert a blank disk in drive B: and format /s B:. Once done do format a second time then insert this disk in drive A: and follow instructions. Game controls thru mouse." />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="921600">
+				<rom name="steel_gun_nyan.fdi" size="921600" crc="acca23b9" sha1="01a74a18216823009d0c14888f052e8566f3ab05" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="studiopl" supported="yes">
 		<!-- year assumed by DOS dir contents -->
 		<description>Studio Pal CG Shuu</description>
@@ -69268,7 +69347,7 @@ Eventually crashes with an out of heap memory, wants 550k minimum?
 ]]></notes>
 		<info name="author" value="ZUN" />
 		<info name="alt_title" value="東方靈異伝 ～ The Highly Responsive to Prayers" />
-		<info name="usage" value="Required HDD install from DOS" />
+		<info name="usage" value="Requires HDD install from DOS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1265664">
 				<rom name="thdisk1.fdi" size="1265664" crc="19d4e3ee" sha1="9f3045f9d039176b0b0ece2b5cf1f15a2e8693a2" offset="0" />

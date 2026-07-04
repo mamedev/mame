@@ -8,7 +8,6 @@
 
     H8/300H-based mcu.
 
-
 ***************************************************************************/
 
 #ifndef MAME_CPU_H8_H83008_H
@@ -76,6 +75,7 @@ protected:
 	virtual int trapa_setup() override;
 	virtual void irq_setup() override;
 	virtual void internal_update(u64 current_time) override;
+	using h8_device::internal_update;
 	virtual void notify_standby(int state) override;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	void map(address_map &map) ATTR_COLD;

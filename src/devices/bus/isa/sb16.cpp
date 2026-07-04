@@ -369,7 +369,7 @@ uint8_t sb16_lle_device::adc_data_ready_r()
 
 uint8_t sb16_lle_device::dma8_cnt_lo_r()
 {
-	u8 res = m_dma8_cnt;
+	u16 res = m_dma8_cnt;
 	if (!(BIT(m_mode, 6)))
 		res <<= 1;
 	res --;
@@ -379,7 +379,7 @@ uint8_t sb16_lle_device::dma8_cnt_lo_r()
 
 uint8_t sb16_lle_device::dma8_cnt_hi_r()
 {
-	u8 res = m_dma8_cnt;
+	u16 res = m_dma8_cnt;
 	if (!(BIT(m_mode, 6)))
 		res <<= 1;
 	res --;

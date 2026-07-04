@@ -7658,7 +7658,7 @@ void galaxian_state::galaxian(machine_config &config)
 {
 	galaxian_base(config);
 
-	GALAXIAN_SOUND(config, "cust", 0);
+	GALAXIAN_SOUND(config, "cust");
 }
 
 void galaxian_state::galartic(machine_config &config)
@@ -7790,7 +7790,7 @@ void galaxian_state::mooncrst(machine_config &config)
 	// alternate memory map
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::mooncrst_map);
 
-	MOONCRST_SOUND(config, "cust", 0);
+	MOONCRST_SOUND(config, "cust");
 }
 
 void galaxian_state::eagle(machine_config &config)
@@ -7858,7 +7858,7 @@ void galaxian_state::bongog(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::bongog_map);
 
 	// sound hardware
-	BONGO_SOUND(config, "cust", 0);
+	BONGO_SOUND(config, "cust");
 }
 
 void bmxstunts_state::bmxstunts(machine_config &config)
@@ -8434,7 +8434,7 @@ void sbhoei_state::sbhoei(machine_config &config)
 
 	SP0250(config, m_sp0250, 3.12_MHz_XTAL).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	SBHOEI_SOUND(config, "cust", 0);
+	SBHOEI_SOUND(config, "cust");
 }
 
 
@@ -10507,6 +10507,35 @@ ROM_START( galaxianbl3 ) // many similarities with zerotimemc
 	ROM_LOAD( "im8610.6l", 0x0000, 0x0020, CRC(4a3c88a5) SHA1(a7730b287c3f7b198722438db40722c78cccf845) )
 ROM_END
 
+/*
+10-50051 PCB
+
+Dumper's notes:
+Gameplay is identical to "Galaxian".
+No game name in attract mode, "OLYMPIA" instead.
+Slightly more difficult in the first 2 levels, no extra ship at 7000 (only from 10000 upward).
+*/
+ROM_START( galaxianoly )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "20.bin", 0x0000, 0x0400, CRC(164b5c73) SHA1(7d02ecbe5f9a3b19c6b53b5ad29f31d17d4a71fd) )
+	ROM_LOAD( "21.bin", 0x0400, 0x0400, CRC(cad1e702) SHA1(379a70c8e9ad1ac6212ed7644dc59db284d1d6c8) )
+	ROM_LOAD( "22.bin", 0x0800, 0x0400, CRC(30e28016) SHA1(07a621e5061d85a9559a920d76716ea4db61b674) )
+	ROM_LOAD( "23.bin", 0x0c00, 0x0400, CRC(de7e7770) SHA1(b06043a1d898eb323ddabffd3d2a3b1f63df0e5e) )
+	ROM_LOAD( "24.bin", 0x1000, 0x0400, CRC(a916c919) SHA1(b3e264ff92687022a0f2f551d5df36db848b48eb) )
+	ROM_LOAD( "25.bin", 0x1400, 0x0400, CRC(9175882b) SHA1(d9943efcb9245af7f01aecc533a699bdefc7d283) )
+	ROM_LOAD( "26.bin", 0x1800, 0x0400, CRC(5af35f13) SHA1(fcd7710d75753b8bab6ef6901433307d20b6175c) )
+	ROM_LOAD( "27.bin", 0x1c00, 0x0400, CRC(47f0d18a) SHA1(7635fee926d26d14e62387e31745a98128cb4f1b) )
+	ROM_LOAD( "28.bin", 0x2000, 0x0400, CRC(44b93d2e) SHA1(6606030990a02da9f8d81e98217a357e8e13417e) )
+	ROM_LOAD( "29.bin", 0x2400, 0x0400, CRC(ad127c30) SHA1(c7f093b98ce1b77ff6ef01acfb83c52a2080ccbf) ) // 1xxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "1h.bin", 0x0000, 0x0800, CRC(724a2044) SHA1(025ed6d44edee941ed428a09a485ef7b19a41ad0) )
+	ROM_LOAD( "1k.bin", 0x0800, 0x0800, CRC(656000a7) SHA1(0c2c2a6c7b727e39e76c45f38ac448aef60e9228) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "6l.bpr", 0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) BAD_DUMP ) // not dumped yet, taken from galaxianbl for now
+ROM_END
+
 ROM_START( supergx )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sg1",          0x0000, 0x0800, CRC(b83f4578) SHA1(9a5d5fc291839f7f1e0a52cca7bea29e99c13315) )
@@ -11746,6 +11775,31 @@ ROM_START( pacmanblci ) // Cirsa bootleg (not Artic Multi-System)
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "sn74s288n.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
+
+/* Cocamatic bootleg on Videogame Electrogame PCB, not Artic Multi-System.
+   Game on real hardware, for colors reference: https://youtube.com/shorts/tU5qrcJb0Lg  */
+ROM_START( pacmanblco )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "co01.bin",  0x0000, 0x0800, CRC(6718df42) SHA1(ee15c3f583d381fba4878f824f83d04479a0cee5) )
+	ROM_LOAD( "co02.bin",  0x0800, 0x0800, CRC(3954e41c) SHA1(4b3f838d55ab4b5b93e1bcb26b3661f090a9124f) )
+	ROM_LOAD( "co03.bin",  0x1000, 0x0800, CRC(f98c0ceb) SHA1(4faf8b2fb3f109d1196a9ea256328485074a31b9) )
+	ROM_LOAD( "co04.bin",  0x1800, 0x0800, BAD_DUMP CRC(a9cd0082) SHA1(f44ff1ad15d5ee3096f8f44f9c605f32ae2737d9) ) // ROM didn't read correctly, taken from pacmanbl for now
+	ROM_LOAD( "co05.bin",  0x2000, 0x0800, CRC(6d475afc) SHA1(4fe6bde352c7dd9572fefaae4b59640b4f4eb8ba) )
+	ROM_LOAD( "co06.bin",  0x2800, 0x0800, CRC(cbe863d3) SHA1(97a2ffa6ab33e6061c664dcd1ee57c86a456782f) )
+	ROM_LOAD( "co07.bin",  0x3000, 0x0800, CRC(9b6ee47a) SHA1(a8d74433e92b4e8a6350c7387147474a582850f6) )
+	//                     0x3800, 0x0800 not populated
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "co10.bin",  0x0000, 0x0800, CRC(b2ed320b) SHA1(680a6fdcb65cc2d88d10bc85e0b2628f43375c5c) )
+	ROM_LOAD( "co09.bin",  0x0800, 0x0800, CRC(ab88b2c4) SHA1(d0c829ea8021eae81a2b82d36c35ad8258b115e0) )
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "co11.bin",  0x0000, 0x0800, CRC(44a45b72) SHA1(8abd0684a01d6c23ef5cf5f0765458f982316acf) )
+	ROM_LOAD( "co12.bin",  0x0800, 0x0800, CRC(fa84659f) SHA1(20c212723f9062f052539190dfe3fc41577543eb) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "cocamatic_prom.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 ROM_START( komemokos ) // Hack of the Cirsa bootleg (pacmanblci) titled Komemokos (not Artic Multi-System)
@@ -16576,7 +16630,7 @@ ROM_START( jungsub )
 
 	/* There is twice as much GFX data here as an original 'Jungler'
 
-	   This appears to be because the Rally X / Jungler hardware supports both X and Y tile flipping, a feature
+	   This appears to be because the Rally-X / Jungler hardware supports both X and Y tile flipping, a feature
 	   which Jungler needs.  Galaxian / Scramble hardware does not support tile flipping.
 
 	   Adding flipped copies of all the tiles would require 4x ROM capacity (normal, Flip X, Flip Y, Flip XY)
@@ -16798,6 +16852,7 @@ GAME( 1979, galaxbsf2,   galaxian, galaxian,   galaxian,   galaxian_state, init_
 GAME( 1979, galaxiamv,   galaxian, galaxian,   galaxian,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Multivideo)",                       "Diviertate Galaxia (Multivideo, Spanish bootleg of Galaxian)",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxianbl2, galaxian, galaxian,   galaxianbl, galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Galaxian (bootleg, set 4)",                                                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxianbl3, galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Galaxian (Spanish bootleg)",                                                                   MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // unique color PROM that gives strange colors. Unfortunately PCB doesn't work so it cannot be verified
+GAME( 1979, galaxianoly, galaxian, galaxian,   galaxianbl, galaxian_state, init_galaxian,   ROT90,  "bootleg (Olympia)",                          "Galaxian (Olympia bootleg)",                                                                   MACHINE_SUPPORTS_SAVE )
 GAME( 1980, galaxianem,  galaxian, galaxian,   galaxrf,    galaxian_state, init_galaxian,   ROT90,  "bootleg (Electromar)",                       "Galaxian (Electromar Spanish bootleg)",                                                        MACHINE_SUPPORTS_SAVE )
 GAME( 1980, galaxrf,     galaxian, galaxian,   galaxrf,    galaxian_state, init_galaxian,   ROT90,  "bootleg (Recreativos Franco S.A.)",          "Galaxian (Recreativos Franco S.A. Spanish bootleg)",                                           MACHINE_SUPPORTS_SAVE )
 GAME( 1980, galaxrfgg,   galaxian, galaxian,   galaxrf,    galaxian_state, init_galaxian,   ROT90,  "bootleg (Recreativos Franco S.A.)",          "Galaxian Growing Galaxip / Galaxian Nave Creciente (Recreativos Franco S.A. Spanish bootleg)", MACHINE_SUPPORTS_SAVE )
@@ -16891,6 +16946,7 @@ GAME( 1981, pacmanbla,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_
 GAME( 1981, pacmanblb,   puckman,  pacmanbl,   pacmanblb,  galaxian_state, init_pacmanbl,   ROT90,  "bootleg",                      "Pac-Man (bootleg on Moon Alien 'AL-10A1' hardware)",                MACHINE_SUPPORTS_SAVE ) // Doesn't have separate tile / sprite roms, probably should move it
 GAME( 1981, pacmanblc,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg (Calfesa)",            "Pac-Man (Calfesa, Spanish bootleg on Galaxian hardware)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )  // same PROM as Moon Cresta, gives very strange colors and sprites get cut
 GAME( 1981, pacmanblci,  puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg (Cirsa)",              "Pac-Man (Cirsa, Spanish bootleg on Galaxian hardware)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pacmanblco,  puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg (Cocamatic)",          "Pac-Man (Cocamatic, Spanish bootleg on Galaxian hardware)",         MACHINE_SUPPORTS_SAVE )
 GAME( 199?, komemokos,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "hack",                         "Komemokos (hack of 'Pac-Man (Cirsa, Spanish bootleg)')",            MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pacmanblv,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg (Video Dens)",         "Pac-Man (Video Dens, Spanish bootleg on Galaxian hardware, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pacmanblva,  puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg (Video Dens)",         "Pac-Man (Video Dens, Spanish bootleg on Galaxian hardware, set 2)", MACHINE_SUPPORTS_SAVE )

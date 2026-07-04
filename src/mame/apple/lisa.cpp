@@ -90,7 +90,7 @@ private:
 	bool m_power_button_forced_pressed, m_power_on, m_crdy, m_iocop_g3_forced_low;
 	bool m_kbd, m_iocop_kbd, m_kbcop_kbd, m_kbcop_so;
 	u8 m_iocop_select, m_kbcop_d;
-	
+
 	void lisa_ram_map(address_map &map) ATTR_COLD;
 	void lisa_io_map(address_map &map) ATTR_COLD;
 	void lisa_special_io_map(address_map &map) ATTR_COLD;
@@ -316,7 +316,7 @@ void lisa_state::machine_start()
 	m_iocop_select = 0;
 	m_iocop_kbd = false;
 	m_kbcop_kbd = false;
-	m_kbd = true;	
+	m_kbd = true;
 	m_kbcop_so = false;
 	m_kbcop_d = 0;
 }
@@ -362,7 +362,7 @@ u8 lisa_state::iocop_g_r()
 		g |= 2 | (m_kbd ? 1 : 0);
 	}
 
-	//	logerror("iocop g read %d\n", (machine().time().as_ticks(3932160*2)+1)/2);
+	//  logerror("iocop g read %d\n", (machine().time().as_ticks(3932160*2)+1)/2);
 
 	return g;
 }
@@ -371,7 +371,7 @@ u8 lisa_state::kbcop_g_r()
 {
 	if(m_kbcop_so) {
 		u32 pc = m_kbcop->pcbase();
-		//		logerror("kbcop g read %d (%x)\n", (machine().time().as_ticks(3932160*2)+1)/2, m_kbcop->pcbase());
+		//      logerror("kbcop g read %d (%x)\n", (machine().time().as_ticks(3932160*2)+1)/2, m_kbcop->pcbase());
 		// bit3=0 seems to mean reset?
 		return 0xe | (m_kbd  && (pc != 0xb2000) ? 0 : 1);
 
@@ -389,7 +389,7 @@ void lisa_state::iocop_kbd_w(int state)
 
 void lisa_state::kbcop_kbd_w(int state)
 {
-	//	logerror("kbcop sk %d\n", state);
+	//  logerror("kbcop sk %d\n", state);
 	m_kbcop_kbd = state;
 	kbd_update();
 }
@@ -413,7 +413,7 @@ u8 lisa_state::kbcop_l_r()
 void lisa_state::kbcop_d_w(u8 data)
 {
 	m_kbcop_d = data;
-	//	logerror("kbcop_d_w %x (%03x)\n", data, m_kbcop->pcbase());
+	//  logerror("kbcop_d_w %x (%03x)\n", data, m_kbcop->pcbase());
 }
 
 void lisa_state::iocop_d_w(u8 data)
@@ -726,7 +726,7 @@ ROM_START( lisa ) /* with twiggy drives, io40 i/o rom; technically any of the bo
 	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
 	ROM_REGION(0x4000,"profile", 0)     // Profile/5 HDD
-	ROM_LOAD_OPTIONAL("341-0080-b", 0x0000, 0x800, CRC(26df0b8d) SHA1(08f6689afb517e0a2bdaa48433003e62a66ae3c7)) // 341-0080-B z8 MCU piggyback ROM
+	ROM_LOAD("341-0080-b", 0x0000, 0x800, CRC(26df0b8d) SHA1(08f6689afb517e0a2bdaa48433003e62a66ae3c7)) // 341-0080-B z8 MCU piggyback ROM (optional)
 
 	// TODO: the 341-0193-A parallel interface card rom should be loaded here as well for the lisa 1 and 2/5?
 ROM_END
@@ -762,7 +762,7 @@ ROM_START( lisa2 ) /* internal apple codename was 'pepsi'; has one SSDD 400K dri
 	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
 	ROM_REGION(0x4000,"profile", 0)     // Profile/5 HDD
-	ROM_LOAD_OPTIONAL("341-0080-b", 0x0000, 0x800, CRC(26df0b8d) SHA1(08f6689afb517e0a2bdaa48433003e62a66ae3c7)) // 341-0080-B z8 MCU piggyback ROM
+	ROM_LOAD("341-0080-b", 0x0000, 0x800, CRC(26df0b8d) SHA1(08f6689afb517e0a2bdaa48433003e62a66ae3c7)) // 341-0080-B z8 MCU piggyback ROM (optional)
 
 	// TODO: the 341-0193-A parallel interface card rom should be loaded here as well for the lisa 1 and 2/5?
 ROM_END

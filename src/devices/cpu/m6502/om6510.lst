@@ -2,54 +2,54 @@
 # copyright-holders:Olivier Galibert
 # 6510 undocumented instructions in a C64 context
 anc_10_imm
-	TMP2 = read_pc();
-	PC++;
-	A &= TMP2;
-	set_nz(A);
-	if(A & 0x80)
-		P |= F_C;
+	m_TMP2 = read_pc();
+	m_PC++;
+	m_A &= m_TMP2;
+	set_nz(m_A);
+	if(m_A & 0x80)
+		m_P |= F_C;
 	else
-		P &= ~F_C;
+		m_P &= ~F_C;
 	prefetch();
 
 ane_10_imm
-	TMP2 = read_pc();
-	PC++;
-	A = (A | 0xee) & TMP2 & X;
-	set_nz(A);
+	m_TMP2 = read_pc();
+	m_PC++;
+	m_A = (m_A | 0xee) & m_TMP2 & m_X;
+	set_nz(m_A);
 	prefetch();
 
 asr_10_imm
-	TMP2 = read_pc();
-	PC++;
-	A = do_lsr(A & TMP2);
-	set_nz(A);
+	m_TMP2 = read_pc();
+	m_PC++;
+	m_A = do_lsr(m_A & m_TMP2);
+	set_nz(m_A);
 	prefetch();
 
 arr_10_imm
-	TMP2 = read_pc();
-	PC++;
-	A &= TMP2;
+	m_TMP2 = read_pc();
+	m_PC++;
+	m_A &= m_TMP2;
 	do_arr();
 	prefetch();
 
 las_10_aby
-	TMP = read_pc();
-	PC++;
-	TMP = set_h(TMP, read_pc());
-	PC++;
-	if(page_changing(TMP, Y)) {
-		read(set_l(TMP, TMP+Y));
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	if(page_changing(m_TMP, m_Y)) {
+		read(set_l(m_TMP, m_TMP+m_Y));
 	}
-	TMP2 = read(TMP+Y);
-	A = X = TMP2 & SP;
-	SP = set_l(SP, A);
-	set_nz(A);
+	m_TMP2 = read(m_TMP+m_Y);
+	m_A = m_X = m_TMP2 & m_SP;
+	m_SP = set_l(m_SP, m_A);
+	set_nz(m_A);
 	prefetch();
 
 lxa_10_imm
-	TMP2 = read_pc();
-	PC++;
-	A = X = (A | 0xee) & TMP2;
-	set_nz(A);
+	m_TMP2 = read_pc();
+	m_PC++;
+	m_A = m_X = (m_A | 0xee) & m_TMP2;
+	set_nz(m_A);
 	prefetch();

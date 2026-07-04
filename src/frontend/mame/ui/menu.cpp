@@ -12,8 +12,6 @@
 #include "ui/menu.h"
 
 #include "ui/ui.h"
-#include "ui/mainmenu.h"
-#include "ui/miscmenu.h"
 
 #include "cheat.h"
 #include "mame.h"
@@ -77,6 +75,7 @@ menu::global_state::global_state(mame_ui_manager &ui)
 	, m_stack()
 	, m_free()
 	, m_hide(false)
+	, m_target(nullptr)
 	, m_current_pointer(-1)
 	, m_pointer_type(ui_event::pointer::UNKNOWN)
 	, m_pointer_buttons(0U)
@@ -137,7 +136,7 @@ void menu::global_state::stack_push(std::unique_ptr<menu> &&menu)
 		case ui_event::type::POINTER_UPDATE:
 		case ui_event::type::POINTER_LEAVE:
 		case ui_event::type::POINTER_ABORT:
-			use_pointer(m_stack->machine().render().ui_target(), m_stack->container(), uievt);
+			use_pointer(m_stack->target(), m_stack->container(), uievt);
 			break;
 		default:
 			break;
@@ -172,7 +171,7 @@ void menu::global_state::stack_pop()
 			case ui_event::type::POINTER_UPDATE:
 			case ui_event::type::POINTER_LEAVE:
 			case ui_event::type::POINTER_ABORT:
-				use_pointer(m_free->machine().render().ui_target(), m_free->container(), uievt);
+				use_pointer(m_free->target(), m_free->container(), uievt);
 				break;
 			default:
 				break;
@@ -217,18 +216,15 @@ bool menu::global_state::stack_has_special_main_menu() const
 }
 
 
-uint32_t menu::global_state::ui_handler(render_container &container)
+uint32_t menu::global_state::ui_handler()
 {
-	// if we have no menus stacked up, start with the main menu
-	if (!m_stack)
-		stack_push(std::make_unique<menu_main>(m_ui, container));
-
 	while (true)
 	{
 		// ensure topmost menu is active - need a loop because it could push another menu
 		while (m_stack && !m_stack->is_active())
 		{
-			m_stack->activate_menu();
+			assert(m_target);
+			m_stack->activate_menu(*m_target);
 			if (m_stack && m_stack->is_active())
 			{
 				// menu activated - draw it to ensure it's on-screen before it can process input
@@ -240,7 +236,7 @@ uint32_t menu::global_state::ui_handler(render_container &container)
 				assert(m_stack->is_active());
 
 				// display pointer if appropriate
-				mame_ui_manager::display_pointer pointers[1]{ { m_stack->machine().render().ui_target(), m_pointer_type, m_pointer_x, m_pointer_y } };
+				mame_ui_manager::display_pointer pointers[1]{ { m_stack->target(), m_pointer_type, m_pointer_x, m_pointer_y } };
 				if ((0 <= m_current_pointer) && (ui_event::pointer::TOUCH != m_pointer_type))
 					m_ui.set_pointers(std::begin(pointers), std::end(pointers));
 				else
@@ -290,7 +286,7 @@ uint32_t menu::global_state::ui_handler(render_container &container)
 			m_stack->do_draw_menu();
 
 			// display pointer if appropriate
-			mame_ui_manager::display_pointer pointers[1]{ { m_stack->machine().render().ui_target(), m_pointer_type, m_pointer_x, m_pointer_y } };
+			mame_ui_manager::display_pointer pointers[1]{ { m_stack->target(), m_pointer_type, m_pointer_x, m_pointer_y } };
 			if ((0 <= m_current_pointer) && (ui_event::pointer::TOUCH != m_pointer_type))
 				m_ui.set_pointers(std::begin(pointers), std::end(pointers));
 			else
@@ -381,10 +377,10 @@ std::pair<bool, bool> menu::global_state::use_pointer(render_target &target, ren
 //  menu - menu constructor
 //-------------------------------------------------
 
-menu::menu(mame_ui_manager &mui, render_container &container)
+menu::menu(mame_ui_manager &mui, render_target &target)
 	: m_global_state(get_global_state(mui))
 	, m_ui(mui)
-	, m_container(container)
+	, m_target(&target)
 	, m_parent()
 	, m_heading()
 	, m_items()
@@ -424,6 +420,8 @@ menu::menu(mame_ui_manager &mui, render_container &container)
 	, m_resetpos(0)
 	, m_resetref(nullptr)
 {
+	assert(target.ui_container());
+
 	reset(reset_options::SELECT_FIRST);
 
 	top_line = 0;
@@ -449,7 +447,8 @@ void menu::reset(reset_options options)
 {
 	// don't accept pointer input until the menu has been redrawn
 	m_items_drawn = false;
-	m_pointer_state = track_pointer::IDLE;
+	if (track_pointer::IDLE != m_pointer_state)
+		m_pointer_state = track_pointer::COMPLETED;
 
 	// based on the reset option, set the reset info
 	m_resetpos = 0;
@@ -617,7 +616,7 @@ void menu::draw(uint32_t flags)
 
 	// compute the width and height of the full menu
 	float visible_width = 0;
-	float visible_main_menu_height = 0;
+	float visible_main_menu_height = line_height() * m_items.size();
 	for (auto const &pitem : m_items)
 	{
 		// compute width of left hand side
@@ -631,9 +630,6 @@ void menu::draw(uint32_t flags)
 
 		// track the maximum
 		visible_width = std::max(total_width, visible_width);
-
-		// track the height as well
-		visible_main_menu_height += line_height();
 	}
 
 	// lay out the heading if present
@@ -757,6 +753,7 @@ void menu::draw(uint32_t flags)
 			// work out what we're dealing with
 			bool const uparrow = !linenum && m_show_up_arrow;
 			bool const downarrow = (linenum == (m_visible_lines - 1)) && m_show_down_arrow;
+			bool const hovered = have_pointer() && pointer_in_rect(m_items_left, line_y0, m_items_right, line_y1);
 
 			// highlight if necessary
 			if (is_selected(itemnum))
@@ -774,7 +771,7 @@ void menu::draw(uint32_t flags)
 					fgcolor = fgcolor2 = fgcolor3 = ui().colors().mouseover_color();
 					bgcolor = ui().colors().mouseover_bg_color();
 				}
-				else if (have_pointer() && pointer_in_rect(m_items_left, line_y0, m_items_right, line_y1))
+				else if (hovered)
 				{
 					if ((track_pointer::TRACK_LINE == m_pointer_state) && pointerline)
 					{
@@ -820,6 +817,7 @@ void menu::draw(uint32_t flags)
 			else if (pitem.subtext().empty())
 			{
 				// if we don't have a subitem, just draw the string centered
+				bool const item_deemphasize(pitem.flags() & FLAG_DEEMPHASIZE);
 				if (pitem.flags() & FLAG_UI_HEADING)
 				{
 					float heading_width = get_string_width(itemtext);
@@ -827,27 +825,28 @@ void menu::draw(uint32_t flags)
 					container().add_line(visible_left + visible_width - ((visible_width - heading_width) / 2) + lr_border(), line_y0 + 0.5F * line_height(), visible_left + visible_width, line_y0 + 0.5F * line_height(), UI_LINE_WIDTH, ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 				}
 				ui().draw_text_full(
-						container(),
+						target(),
 						itemtext,
 						effective_left, line_y0, effective_width,
 						text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE,
-						mame_ui_manager::NORMAL, fgcolor, bgcolor,
+						mame_ui_manager::NORMAL, item_deemphasize ? fgcolor3 : fgcolor, bgcolor,
 						nullptr, nullptr,
 						line_height());
 			}
 			else
 			{
 				// otherwise, draw the item on the left and the subitem text on the right
-				bool const subitem_invert(pitem.flags() & FLAG_INVERT);
+				bool const subitem_deemphasize(pitem.flags() & FLAG_DEEMPHASIZE);
+				bool const item_deemphasize(subitem_deemphasize && (pitem.flags() & FLAG_DISABLE));
 				float item_width, subitem_width;
 
 				// draw the left-side text
 				ui().draw_text_full(
-						container(),
+						target(),
 						itemtext,
 						effective_left, line_y0, effective_width,
 						text_layout::text_justify::LEFT, text_layout::word_wrapping::TRUNCATE,
-						mame_ui_manager::NORMAL, fgcolor, bgcolor,
+						mame_ui_manager::NORMAL, item_deemphasize ? fgcolor3 : fgcolor, bgcolor,
 						&item_width, nullptr,
 						line_height());
 
@@ -881,41 +880,49 @@ void menu::draw(uint32_t flags)
 
 					// customize subitem text color
 					if (!core_stricmp(pitem.subtext(), _("On")))
-						fgcolor2 = rgb_t(0x00,0xff,0x00);
-
-					if (!core_stricmp(pitem.subtext(), _("Off")))
-						fgcolor2 = rgb_t(0xff,0x00,0x00);
-
-					if (!core_stricmp(pitem.subtext(), _("Auto")))
-						fgcolor2 = rgb_t(0xff,0xff,0x00);
+						fgcolor2 = rgb_t(0x00, 0xff, 0x00);
+					else if (!core_stricmp(pitem.subtext(), _("Off")))
+						fgcolor2 = rgb_t(0xff, 0x00, 0x00);
+					else if (!core_stricmp(pitem.subtext(), _("Auto")))
+						fgcolor2 = rgb_t(0xff, 0xff, 0x00);
 
 					// draw the subitem right-justified
 					ui().draw_text_full(
-							container(),
+							target(),
 							subitem_text,
 							effective_left + item_width, line_y0, effective_width - item_width,
 							text_layout::text_justify::RIGHT, text_layout::word_wrapping::TRUNCATE,
-							mame_ui_manager::NORMAL, subitem_invert ? fgcolor3 : fgcolor2, bgcolor,
+							mame_ui_manager::NORMAL, subitem_deemphasize ? fgcolor3 : fgcolor2, bgcolor,
 							&subitem_width, nullptr,
 							line_height());
 				}
 
 				// apply arrows
-				if (is_selected(itemnum) && (pitem.flags() & (FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW)))
+				bool const adjustarrows = is_selectable(pitem) && (pitem.flags() & (FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW));
+				if (adjustarrows && (is_selected(itemnum) || (hovered && (track_pointer::IDLE == m_pointer_state))))
 				{
-					m_adjust_top = line_y0 + (0.1F * line_height());
-					m_adjust_bottom = line_y0 + (0.9F * line_height());
+					float const t = line_y0 + (0.1F * line_height());
+					float const b = line_y0 + (0.9F * line_height());
+					if (hovered)
+					{
+						m_adjust_top = t;
+						m_adjust_bottom = b;
+					}
 					if (pitem.flags() & FLAG_LEFT_ARROW)
 					{
-						m_decrease_left = effective_left + effective_width - subitem_width - gutter_width();
-						float const r = m_decrease_left + lr_arrow_width();
-						draw_arrow(m_decrease_left, m_adjust_top, r, m_adjust_bottom, fgcolor, ROT90 ^ ORIENTATION_FLIP_X);
+						float const l = effective_left + effective_width - subitem_width - gutter_width();
+						float const r = l + lr_arrow_width();
+						draw_arrow(l, t, r, b, fgcolor, ROT90 ^ ORIENTATION_FLIP_X);
+						if (hovered)
+							m_decrease_left = l;
 					}
 					if (pitem.flags() & FLAG_RIGHT_ARROW)
 					{
 						float const r = effective_left + effective_width + gutter_width();
-						m_increase_left = r - lr_arrow_width();
-						draw_arrow(m_increase_left, m_adjust_top, r, m_adjust_bottom, fgcolor, ROT90);
+						float const l = r - lr_arrow_width();
+						draw_arrow(l, t, r, b, fgcolor, ROT90);
+						if (hovered)
+							m_increase_left = l;
 					}
 				}
 			}
@@ -926,7 +933,7 @@ void menu::draw(uint32_t flags)
 	if (selected_subitem_too_big)
 	{
 		menu_item const &pitem = selected_item();
-		bool const subitem_invert(pitem.flags() & FLAG_INVERT);
+		bool const subitem_deemphasize(pitem.flags() & FLAG_DEEMPHASIZE);
 		auto const linenum = m_selected - top_line;
 		float const line_y = m_items_top + float(linenum) * line_height();
 
@@ -947,10 +954,10 @@ void menu::draw(uint32_t flags)
 				container(),
 				target_x - lr_border(), target_y - tb_border(),
 				target_x + target_width + lr_border(), target_y + target_height + tb_border(),
-				subitem_invert ? ui().colors().selected_bg_color() : ui().colors().background_color());
+				subitem_deemphasize ? ui().colors().selected_bg_color() : ui().colors().background_color());
 
 		ui().draw_text_full(
-				container(),
+				target(),
 				pitem.subtext(),
 				target_x, target_y, target_width,
 				text_layout::text_justify::RIGHT, text_layout::word_wrapping::WORD,
@@ -964,7 +971,7 @@ void menu::draw(uint32_t flags)
 
 void menu::recompute_metrics(uint32_t width, uint32_t height, float aspect)
 {
-	float const ui_line_height = ui().get_line_height();
+	float const ui_line_height = ui().get_line_height(target());
 
 	// force whole pixels for line height, gutters and borders
 	m_line_height = std::floor(ui_line_height * float(height)) / float(height);
@@ -1147,8 +1154,7 @@ bool menu::handle_events(uint32_t flags, event &ev)
 std::pair<int, bool> menu::handle_pointer_update(uint32_t flags, ui_event const &uievt)
 {
 	// decide whether to make this our current pointer
-	render_target &target(machine().render().ui_target());
-	auto const [ours, changed] = m_global_state.use_pointer(target, container(), uievt);
+	auto const [ours, changed] = m_global_state.use_pointer(target(), container(), uievt);
 	if (!ours)
 	{
 		return std::make_pair(IPT_INVALID, false);
@@ -1285,8 +1291,7 @@ std::pair<int, bool> menu::handle_pointer_update(uint32_t flags, ui_event const 
 std::pair<int, bool> menu::handle_pointer_leave(uint32_t flags, ui_event const &uievt)
 {
 	// ignore pointer input in windows other than the one that displays the UI
-	render_target &target(machine().render().ui_target());
-	auto const [ours, changed] = m_global_state.use_pointer(target, container(), uievt);
+	auto const [ours, changed] = m_global_state.use_pointer(target(), container(), uievt);
 	assert(!changed);
 	if (!ours)
 		return std::make_pair(IPT_INVALID, false);
@@ -1330,8 +1335,7 @@ std::pair<int, bool> menu::handle_pointer_leave(uint32_t flags, ui_event const &
 std::pair<int, bool> menu::handle_pointer_abort(uint32_t flags, ui_event const &uievt)
 {
 	// ignore pointer input in windows other than the one that displays the UI
-	render_target &target(machine().render().ui_target());
-	auto const [ours, changed] = m_global_state.use_pointer(target, container(), uievt);
+	auto const [ours, changed] = m_global_state.use_pointer(target(), container(), uievt);
 	assert(!changed);
 	if (!ours)
 		return std::make_pair(IPT_INVALID, false);
@@ -1362,13 +1366,23 @@ std::pair<int, bool> menu::handle_primary_down(uint32_t flags, ui_event const &u
 	// FIXME: should repeat if appropriate
 	if (!is_touch && (y >= m_adjust_top) && (y < m_adjust_bottom))
 	{
+		// work out which line/item it is
+		auto const lineno(int((y - m_items_top) / line_height()));
+		int const itemno(lineno + top_line);
+		assert(lineno >= 0);
+		assert(lineno < m_visible_lines);
+		assert(itemno < m_items.size());
+		assert(is_selectable(m_items[itemno]));
+
 		if ((x >= m_decrease_left) && (x < (m_decrease_left + lr_arrow_width())))
 		{
+			m_selected = itemno;
 			m_pointer_state = track_pointer::COMPLETED;
 			return std::make_pair(IPT_UI_LEFT, false);
 		}
 		else if ((x >= m_increase_left) && (x < (m_increase_left + lr_arrow_width())))
 		{
+			m_selected = itemno;
 			m_pointer_state = track_pointer::COMPLETED;
 			return std::make_pair(IPT_UI_RIGHT, false);
 		}
@@ -1573,19 +1587,19 @@ std::pair<int, bool> menu::update_drag_adjust(ui_event const &uievt)
 	// this is ugly because adjustment is implemented by faking keystrokes - can't give a count/distance
 
 	// set thresholds depending on the direction for hysteresis
-	int const target(drag_scroll(
+	int const targetdelta(drag_scroll(
 			pointer_location().first, m_pointer_updated.first, m_pointer_updated.first, line_height() * x_aspect(),
 			0, std::numeric_limits<int>::min(), std::numeric_limits<int>::max()));
 
 	// ensure the item under the pointer is selected and adjustable
 	if ((top_line + m_pointer_line) == m_selected)
 	{
-		if (0 < target)
+		if (0 < targetdelta)
 		{
 			if (m_items[m_selected].flags() & FLAG_RIGHT_ARROW)
 				return std::make_pair(IPT_UI_RIGHT, true);
 		}
-		else if (0 > target)
+		else if (0 > targetdelta)
 		{
 			if (m_items[m_selected].flags() & FLAG_LEFT_ARROW)
 				return std::make_pair(IPT_UI_LEFT, true);
@@ -1912,8 +1926,14 @@ void menu::validate_selection(int scandir)
 //  menu stack
 //-------------------------------------------------
 
-void menu::activate_menu()
+void menu::activate_menu(render_target &target)
 {
+	if (&target != m_target)
+	{
+		assert(target.ui_container());
+		m_target = &target;
+		m_last_aspect = 0.0F;
+	}
 	m_items_drawn = false;
 	m_pointer_state = track_pointer::IDLE;
 	m_accumulated_wheel = 0;
@@ -1929,10 +1949,8 @@ void menu::activate_menu()
 
 bool menu::check_metrics()
 {
-	render_manager &render(machine().render());
-	render_target &target(render.ui_target());
-	std::pair<uint32_t, uint32_t> const uisize(target.width(), target.height());
-	float const aspect = render.ui_aspect(&container());
+	std::pair<uint32_t, uint32_t> const uisize(target().width(), target().height());
+	float const aspect = machine().render().ui_aspect(target());
 	if ((uisize == m_last_size) && (std::fabs(1.0F - (aspect / m_last_aspect)) < 1e-6F))
 		return false;
 
@@ -2095,10 +2113,11 @@ bool menu::do_handle()
 //  and calls the menu handler
 //-------------------------------------------------
 
-delegate<uint32_t (render_container &)> menu::get_ui_handler(mame_ui_manager &mui)
+delegate<uint32_t ()> menu::get_ui_handler(mame_ui_manager &mui, render_target &target)
 {
 	global_state &state(get_global_state(mui));
-	return delegate<uint32_t (render_container &)>(&global_state::ui_handler, &state);
+	state.set_target(target);
+	return delegate<uint32_t ()>(&global_state::ui_handler, &state);
 }
 
 /***************************************************************************

@@ -455,7 +455,7 @@ void superxavix_state::xavix2002(machine_config &config)
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 
-	XAVIX2002IO(config, m_xavix2002io, 0);
+	XAVIX2002IO(config, m_xavix2002io);
 
 	m_xavix2002io->read_0_callback().set(FUNC(superxavix_state::superxavix_read_extended_io0));
 	m_xavix2002io->write_0_callback().set(FUNC(superxavix_state::superxavix_write_extended_io0));
@@ -606,28 +606,28 @@ void superxavix_i2c_state::superxavix_i2c_24c64(machine_config &config)
 {
 	xavix2002(config);
 
-	I2C_24C64(config, "i2cmem", 0);
+	I2C_24C64(config, "i2cmem");
 }
 
 void superxavix_i2c_state::superxavix_i2c_24c16(machine_config &config)
 {
 	xavix2002(config);
 
-	I2C_24C16(config, "i2cmem", 0);
+	I2C_24C16(config, "i2cmem");
 }
 
 void superxavix_i2c_state::superxavix_i2c_24c08(machine_config &config)
 {
 	xavix2002(config);
 
-	I2C_24C08(config, "i2cmem", 0);
+	I2C_24C08(config, "i2cmem");
 }
 
 void superxavix_i2c_state::superxavix_i2c_24c04(machine_config &config)
 {
 	xavix2002(config);
 
-	I2C_24C04(config, "i2cmem", 0);
+	I2C_24C04(config, "i2cmem");
 }
 
 void superxavix_i2c_state::superxavix_i2c_24c04_4mb(machine_config &config)
@@ -640,7 +640,7 @@ void superxavix_i2c_state::superxavix_i2c_24c02(machine_config &config)
 {
 	xavix2002(config);
 
-	I2C_24C02(config, "i2cmem", 0);
+	I2C_24C02(config, "i2cmem");
 }
 
 void superxavix_i2c_state::superxavix_i2c_24c02_4mb(machine_config &config)
@@ -657,7 +657,7 @@ void superxavix_i2c_state::superxavix_i2c_mrangbat(machine_config &config)
 
 	m_maincpu->set_addrmap(6, &superxavix_i2c_state::xavix_4mb_extbus_map);
 
-	I2C_24C02(config, "i2cmem", 0); // 24C02?
+	I2C_24C02(config, "i2cmem"); // 24C02?
 
 	m_xavix2002io->read_0_callback().set_ioport("EX0");
 	m_xavix2002io->read_1_callback().set_ioport("EX1");
@@ -835,6 +835,18 @@ ROM_START( xavpkjr )
 	ROM_REGION( 0x2000, "i2cmem", ROMREGION_ERASE00 )
 	ROM_LOAD( "s-24cs64a.u1", 0x0000, 0x2000, CRC(3a7637f7) SHA1(df5b5903900ae8488a44e3449dd2757d1dc35bc2) )
 ROM_END
+
+ROM_START( xavpowrk )
+	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "tc58fvm6b5b.u2", 0x0000000, 0x0800000, CRC(5fb55dba) SHA1(0c4d370d258a15712dd323739fe23106d00bc04a) )
+
+	ROM_REGION( 0x0800000, "extra", ROMREGION_ERASE00 )
+	ROM_LOAD( "tc58fvm6b5b.u3", 0x0000000, 0x0800000, CRC(4d8dd940) SHA1(5816ecf14771afb5d41e18042cd72ef5cdcfb95f) )
+
+	ROM_REGION( 0x2000, "i2cmem", ROMREGION_ERASE00 )
+	ROM_LOAD( "s-24cs64a.u1", 0x0000, 0x2000, CRC(23b77570) SHA1(9e1d5b266a884791bcc56d2700b6cbb162d20d53) )
+ROM_END
+
 
 // Domyos DiS (XaviX 2002 based titles)
 ROM_START( domfitex )
@@ -1093,7 +1105,7 @@ CONS( 2004, xavboxj,  xavbox,  0, superxavix_i2c_jmat,  xavix_box,  superxavix_i
 // Bass Fishing PCB is just like Tennis except with an RF daughterboard.
 CONS( 2004, xavbassf, 0,       0, superxavix_i2c_24c08, xavix_i2c,  superxavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Bass Fishing (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-// TODO: check SEEPROM type and hookup, banking!
+// TODO: check SEEPROM type and hookup
 CONS( 2005, xavjmat,  0,       0, superxavix_i2c_jmat_24c64,  xavix_jmat, superxavix_i2c_jmat_state, init_xavmusic, "SSD Company LTD",         "Jackie Chan J-Mat Fitness (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2005, xavaero,  xavjmat, 0, superxavix_i2c_jmat_24c64,  xavix_jmat, superxavix_i2c_jmat_state, init_xavmusic, "SSD Company LTD",         "XaviX Aerostep J-Mat (XaviXPORT, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2007, xavmusic, 0,       0, superxavix_i2c_jmat_24c64,  xavix,      superxavix_i2c_jmat_state, init_xavmusic, "SSD Company LTD",         "XaviX Music & Circuit (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -1101,6 +1113,7 @@ CONS( 2007, xavmusicj,xavmusic,0, superxavix_i2c_jmat_24c64,  xavix,      superx
 CONS( 2006, xavcheck, 0,       0, superxavix_i2c_jmat_24c64,  xavix_jmat, superxavix_i2c_jmat_state, init_xavmusic, "SSD Company LTD",         "XaviX Aero Check & Balance (XaviXPORT, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // xavpkjr has U6 = S-35390A REAL-TIME CLOCK
 CONS( 2007, xavpkjr,  0, 0, superxavix_i2c_jmat_24c64, xavix, superxavix_i2c_jmat_state,      init_xavix,    "SSD Company LTD",         "PowerKIDS Jr. (XaviXPORT, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, xavpowrk, 0, 0, superxavix_i2c_jmat_24c64, xavix, superxavix_i2c_jmat_state,      init_xavix,    "SSD Company LTD",         "PowerKIDS (XaviXPORT, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // https://arnaudmeyer.wordpress.com/domyos-interactive-system/
 // Domyos Fitness Adventure

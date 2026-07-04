@@ -313,9 +313,10 @@ void device_sound_interface::sound_before_devices_init()
 	for(sound_route &route : routes()) {
 		device_t *dev = route.m_base.get().subdevice(route.m_target);
 		dev->interface(route.m_interface);
-		if(route.m_output != ALL_OUTPUTS && m_sound_requested_outputs <= route.m_output) {
+		if(route.m_output != ALL_OUTPUTS) {
 			m_sound_requested_outputs_mask |= u64(1) << route.m_output;
-			m_sound_requested_outputs = route.m_output + 1;
+			if(m_sound_requested_outputs <= route.m_output)
+				m_sound_requested_outputs = route.m_output + 1;
 		}
 		route.m_interface->sound_request_input(route.m_input);
 	}

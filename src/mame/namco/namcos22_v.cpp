@@ -85,10 +85,8 @@ void namcos22_renderer::renderscanline_poly(int32_t scanline, const extent_t &ex
 			const int ty = (int(v * ooz) & 0xfff) | bn;
 			const int to = (ty << 4 & 0xfff00) | (tx >> 4);
 			pen = ttdata[(ttmap[to] << 8) | tt_ayx_to_pixel[(ttattr[to] << 8) | (ty << 4 & 0xf0) | (tx & 0xf)]];
-			rgb.set(pens[pen >> penshift & penmask]);
 		}
-		else
-			rgb.set(0, 0xff, 0xff, 0xff);
+		rgb.set(pens[pen >> penshift & penmask]);
 
 		// poly fog
 		if (fogfactor != 0xff)
@@ -178,10 +176,8 @@ void namcos22_renderer::renderscanline_poly_ss22(int32_t scanline, const extent_
 			const int ty = (int(v * ooz) & 0xfff) | bn;
 			const int to = (ty << 4 & 0xfff00) | (tx >> 4);
 			pen = ttdata[(ttmap[to] << 8) | tt_ayx_to_pixel[(ttattr[to] << 8) | (ty << 4 & 0xf0) | (tx & 0xf)]];
-			rgb.set(pens[pen >> penshift & penmask]);
 		}
-		else
-			rgb.set(0, 0xff, 0xff, 0xff);
+		rgb.set(pens[pen >> penshift & penmask]);
 
 		// shading before fog
 		if (shade_enabled)
@@ -429,17 +425,22 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 	}
 
 	// disable textures, shading (and maybe more)
-	if (objectflags & 0xc00000)
+	if (objectflags)
 	{
-		extra.shade_enabled = false;
 		extra.texture_enabled = false;
-	}
+		extra.cmode = 0;
 
-	if (BIT(objectflags, 21))
-	{
-		// disable textures?
-		if ((cz_adjust & 0x7f0000) == 0x3a0000)
-			extra.texture_enabled = false;
+		if (objectflags & 6)
+		{
+			// absolute pen from cz_adjust, and shading is disabled
+			extra.pens = &m_state.m_palette->pen(cz_adjust & 0x7fff);
+			extra.shade_enabled = false;
+		}
+		else
+		{
+			// unknown masking? timecris sets pen to 0x3a at the helicopter when it definitely wants 0x1a
+			extra.pens += (cz_adjust >> 16 & 0x7f) & (color | 0x1f);
+		}
 	}
 
 	// disable poly fog
@@ -1255,8 +1256,8 @@ void namcos22_state::blit_polyobject(int code, float m[4][4])
 		blit_quads(object_addr, chunklength, m);
 	}
 
-	// flag applies to single object (see timecris stage 1-3 car)
-	m_objectflags &= ~0x400000;
+	// flag applies to single object (see timecris stage 1-3 car bonnet)
+	m_objectflags &= ~2;
 }
 
 
@@ -1327,6 +1328,12 @@ void namcos22_state::slavesim_handle_bb0003(const s32 *src)
 	m_viewmatrix[2][2] = dspfixed_to_nativefloat(src[0x14]);
 
 	matrix3d_apply_reflection(m_viewmatrix);
+
+	// clear model rendering options (see acedrive name entry screen)
+	m_cz_adjust = 0;
+	m_objectshift = 0;
+	m_objectflags = 0;
+
 }
 
 void namcos22_state::slavesim_handle_200002(const s32 *src, int code)
@@ -1402,25 +1409,28 @@ void namcos22_state::slavesim_handle_233002(const s32 *src)
 
 	    cz_adjust:
 	    00000000: common
-	    00020000: adillor arrows on level select screen (no effect?)
-	    00310000: propcycl attract mode particles when Solitar rises (unknown effect)
-	    00390000: "
-	    003d0000: "
-	    003a0000: timecris shoot helicopter (white, but shading enabled)
 	    00800000: alpinr2b cancel fogging on selection screen
 	    00800000: raverace cancel fogging on sky in attract mode
+	    --xx----: pen when textures are disabled with objectflags 003fffff
+	    ----xxxx: pen when textures are disabled with objectflags 005fffff / 009fffff
+
+	    objectshift:
+	    00800000: set at same time as objectflags 009fffff
+	    --xxxxxx: low 22 bits: object z bias adjust (see blit_single_quad)
 
 	    objectflags:
 	    001fffff: common
-	    003fffff: adillor arrows on level select screen
-	    003fffff: propcycl attract mode particles when Solitar rises
-	    003fffff: timecris shoot helicopter
+	    003fffff: alpinerd distant scenery ground level when reaching finish (white)
+	    003fffff: adillor arrows on level select screen (no effect?)
+	    003fffff: propcycl attract mode particles when Solitar rises (unknown effect)
+	    003fffff: timecris shoot helicopter (white, but shading enabled)
 	    005fffff: timecris shoot other destructible object (opaque white, 1 object)
 	    009fffff: cybrcomm shoot enemy with machine gun (opaque white)
+	    009fffff: acedrive/victlap name entry screen (opaque color from cz_adjust lower bits)
 	*/
-	m_cz_adjust = src[1];
-	m_objectshift = src[2];
-	m_objectflags = src[3];
+	m_cz_adjust = src[1] & 0xffffff;
+	m_objectshift = src[2] & 0xffffff;
+	m_objectflags = src[3] >> 21 & 7;
 }
 
 void namcos22_state::simulate_slavedsp()
@@ -2605,8 +2615,7 @@ void namcos22_state::init_tables()
 	save_pointer(NAME(m_pointram), 0x20000);
 
 	// force all texture tiles to be decoded now
-	for (int i = 0; i < m_gfxdecode->gfx(1)->elements(); i++)
-		m_gfxdecode->gfx(1)->get_data(i);
+	m_gfxdecode->gfx(1)->decode_all();
 
 	m_texture_tilemap = (u16 *)memregion("textilemap")->base();
 	m_texture_tiledata = (u8 *)m_gfxdecode->gfx(1)->get_data(0);

@@ -10,7 +10,7 @@ class tc0110pcr_device : public device_t, public device_palette_interface
 {
 public:
 	using color_delegate = device_delegate<rgb_t (uint16_t data)>;
-	tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// configurations
 	void set_shift(uint8_t shift) { m_shift = shift; }

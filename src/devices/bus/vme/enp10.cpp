@@ -114,8 +114,6 @@ ioport_constructor vme_enp10_card_device::device_input_ports() const
 
 void vme_enp10_card_device::device_start()
 {
-	m_led.resolve();
-
 	save_item(NAME(m_ivr));
 	save_item(NAME(m_csr));
 	save_item(NAME(m_obr));

@@ -648,7 +648,7 @@ void pmd85_state::pmd85(machine_config &config, bool with_uart)
 
 *******************************************************************************/
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(0);
 	m_pit->set_clk<1>(XTAL(18'432'000)/9);
 	m_pit->set_clk<2>(1);
@@ -683,7 +683,7 @@ void pmd85_state::pmd85(machine_config &config, bool with_uart)
 	/* uart */
 	if (with_uart)
 	{
-		I8251(config, m_uart, 0);
+		I8251(config, m_uart);
 		m_uart->txd_handler().set([this] (bool state) { m_txd = state; });
 		m_uart->rts_handler().set([this] (bool state) { m_uart->write_cts(state); });
 	}
@@ -696,7 +696,7 @@ void pmd85_state::pmd851(machine_config &config)
 {
 	pmd85(config);
 
-	I8255(config, m_ppi0, 0);
+	I8255(config, m_ppi0);
 	m_ppi0->in_pa_callback().set(FUNC(pmd85_state::ppi0_porta_r));
 	m_ppi0->in_pb_callback().set(FUNC(pmd85_state::ppi0_portb_r));
 	m_ppi0->in_pc_callback().set(FUNC(pmd85_state::ppi0_portc_r));
@@ -704,7 +704,7 @@ void pmd85_state::pmd851(machine_config &config)
 	m_ppi0->out_pb_callback().set(FUNC(pmd85_state::ppi0_portb_w));
 	m_ppi0->out_pc_callback().set(FUNC(pmd85_state::ppi0_portc_w));
 
-	I8255(config, m_ppi1, 0);
+	I8255(config, m_ppi1);
 	m_ppi1->in_pa_callback().set(FUNC(pmd85_state::ppi1_porta_r));
 	m_ppi1->in_pb_callback().set(FUNC(pmd85_state::ppi1_portb_r));
 	m_ppi1->in_pc_callback().set(FUNC(pmd85_state::ppi1_portc_r));
@@ -712,7 +712,7 @@ void pmd85_state::pmd851(machine_config &config)
 	m_ppi1->out_pb_callback().set(FUNC(pmd85_state::ppi1_portb_w));
 	m_ppi1->out_pc_callback().set(FUNC(pmd85_state::ppi1_portc_w));
 
-	I8255(config, m_ppi2, 0);
+	I8255(config, m_ppi2);
 	m_ppi2->in_pa_callback().set(FUNC(pmd85_state::ppi2_porta_r));
 	m_ppi2->in_pb_callback().set(FUNC(pmd85_state::ppi2_portb_r));
 	m_ppi2->in_pc_callback().set(FUNC(pmd85_state::ppi2_portc_r));
@@ -720,7 +720,7 @@ void pmd85_state::pmd851(machine_config &config)
 	m_ppi2->out_pb_callback().set(FUNC(pmd85_state::ppi2_portb_w));
 	m_ppi2->out_pc_callback().set(FUNC(pmd85_state::ppi2_portc_w));
 
-	I8255(config, m_ppi3, 0);
+	I8255(config, m_ppi3);
 	m_ppi3->in_pa_callback().set(FUNC(pmd85_state::ppi3_porta_r));
 	m_ppi3->in_pb_callback().set(FUNC(pmd85_state::ppi3_portb_r));
 	m_ppi3->in_pc_callback().set(FUNC(pmd85_state::ppi3_portc_r));
@@ -746,7 +746,7 @@ void pmd85_state::alfa(machine_config &config)
 	pmd85(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pmd85_state::alfa_mem);
 
-	I8255(config, m_ppi0, 0);
+	I8255(config, m_ppi0);
 	m_ppi0->in_pa_callback().set(FUNC(pmd85_state::ppi0_porta_r));
 	m_ppi0->in_pb_callback().set(FUNC(pmd85_state::ppi0_portb_r));
 	m_ppi0->in_pc_callback().set(FUNC(pmd85_state::ppi0_portc_r));
@@ -754,7 +754,7 @@ void pmd85_state::alfa(machine_config &config)
 	m_ppi0->out_pb_callback().set(FUNC(pmd85_state::ppi0_portb_w));
 	m_ppi0->out_pc_callback().set(FUNC(pmd85_state::ppi0_portc_w));
 
-	I8255(config, m_ppi1, 0);
+	I8255(config, m_ppi1);
 	m_ppi1->in_pa_callback().set(FUNC(pmd85_state::ppi1_porta_r));
 	m_ppi1->in_pb_callback().set(FUNC(pmd85_state::ppi1_portb_r));
 	m_ppi1->in_pc_callback().set(FUNC(pmd85_state::ppi1_portc_r));
@@ -762,7 +762,7 @@ void pmd85_state::alfa(machine_config &config)
 	m_ppi1->out_pb_callback().set(FUNC(pmd85_state::ppi1_portb_w));
 	m_ppi1->out_pc_callback().set(FUNC(pmd85_state::ppi1_portc_w));
 
-	I8255(config, m_ppi2, 0);
+	I8255(config, m_ppi2);
 	m_ppi2->in_pa_callback().set(FUNC(pmd85_state::ppi2_porta_r));
 	m_ppi2->in_pb_callback().set(FUNC(pmd85_state::ppi2_portb_r));
 	m_ppi2->in_pc_callback().set(FUNC(pmd85_state::ppi2_portc_r));
@@ -777,7 +777,7 @@ void pmd85_state::mato(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pmd85_state::mato_mem);
 	m_maincpu->set_addrmap(AS_IO, &pmd85_state::mato_io);
 
-	I8255(config, m_ppi0, 0);
+	I8255(config, m_ppi0);
 	m_ppi0->in_pa_callback().set(FUNC(pmd85_state::ppi0_porta_r));
 	m_ppi0->out_pa_callback().set(FUNC(pmd85_state::ppi0_porta_w));
 	m_ppi0->in_pb_callback().set(FUNC(pmd85_state::mato_ppi0_portb_r));

@@ -854,6 +854,11 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ekara )
 	PORT_INCLUDE(xavix)
 
+	PORT_MODIFY("IN0")
+	PORT_DIPNAME( 0x80, 0x00, "Alternate Input Mapping" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_ekara_state::ekara_multi0_r))
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_ekara_state::ekara_multi1_r))
@@ -861,18 +866,26 @@ static INPUT_PORTS_START( ekara )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
 
 	PORT_START("EXTRA0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Echo")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Effects")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("Key Down")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("Key Up")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("BGM Down")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("BGM Up")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Tempo Down")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Tempo Up")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 )       PORT_NAME("Echo")       PORT_CONDITION("IN0", 0x80, EQUALS, 0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 )       PORT_NAME("Effects")    PORT_CONDITION("IN0", 0x80, EQUALS, 0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("Key Down")   PORT_CONDITION("IN0", 0x80, EQUALS, 0x00)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )   PORT_NAME("Key Up")     PORT_CONDITION("IN0", 0x80, EQUALS, 0x00)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )       PORT_NAME("Select")     PORT_CONDITION("IN0", 0x80, EQUALS, 0x80)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )       PORT_NAME("Cancel")     PORT_CONDITION("IN0", 0x80, EQUALS, 0x80)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON7 )       PORT_NAME("Tempo Down") PORT_CONDITION("IN0", 0x80, EQUALS, 0x80)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON8 )       PORT_NAME("Tempo Up")   PORT_CONDITION("IN0", 0x80, EQUALS, 0x80)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 )       PORT_NAME("BGM Down")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 )       PORT_NAME("BGM Up")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON7 )       PORT_NAME("Tempo Down") PORT_CONDITION("IN0", 0x80, EQUALS, 0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON8 )       PORT_NAME("Tempo Up")   PORT_CONDITION("IN0", 0x80, EQUALS, 0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("Key Down")   PORT_CONDITION("IN0", 0x80, EQUALS, 0x80)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )   PORT_NAME("Key Up")     PORT_CONDITION("IN0", 0x80, EQUALS, 0x80)
 
 	PORT_START("EXTRA1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Select")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Cancel")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )       PORT_NAME("Select")     PORT_CONDITION("IN0", 0x80, EQUALS, 0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )       PORT_NAME("Cancel")     PORT_CONDITION("IN0", 0x80, EQUALS, 0x00)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 )       PORT_NAME("Echo")       PORT_CONDITION("IN0", 0x80, EQUALS, 0x80)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 )       PORT_NAME("Effects")    PORT_CONDITION("IN0", 0x80, EQUALS, 0x80)
 	PORT_BIT( 0x3c, IP_ACTIVE_HIGH, IPT_UNUSED )
 	// no 40/80 due to multiplexer code
 INPUT_PORTS_END
@@ -1455,6 +1468,25 @@ static INPUT_PORTS_START( jarajal )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( multiplt )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	// TODO: steering inputs appear to use multiple bits
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // DOWN
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // UP
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Horn")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 ) // holding this keeps wheel in center
+
+	PORT_MODIFY("IN1")
+	PORT_DIPNAME( 0x02, 0x02, "Output Mode" )
+	PORT_DIPSETTING(    0x00, "Audio Only")
+	PORT_DIPSETTING(    0x02, "TV Output")
+INPUT_PORTS_END
+
+
 
 static INPUT_PORTS_START( tcarnavi )
 	PORT_INCLUDE(xavix)
@@ -1583,7 +1615,7 @@ void xavix_state::xavix(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(xavix_state::scanline_cb), "screen", 0, 1);
 
-	XAVIX_ADC(config, m_adc, 0);
+	XAVIX_ADC(config, m_adc);
 	m_adc->read_0_callback().set_ioport("AN0");
 	m_adc->read_1_callback().set_ioport("AN1");
 	m_adc->read_2_callback().set_ioport("AN2");
@@ -1593,13 +1625,13 @@ void xavix_state::xavix(machine_config &config)
 	m_adc->read_6_callback().set_ioport("AN6");
 	m_adc->read_7_callback().set_ioport("AN7");
 
-	XAVIX_ANPORT(config, m_anport, 0);
+	XAVIX_ANPORT(config, m_anport);
 	m_anport->read_0_callback().set(FUNC(xavix_state::anport0_r));
 	m_anport->read_1_callback().set(FUNC(xavix_state::anport1_r));
 	m_anport->read_2_callback().set(FUNC(xavix_state::anport2_r));
 	m_anport->read_3_callback().set(FUNC(xavix_state::anport3_r));
 
-	XAVIX_MATH(config, m_math, 0);
+	XAVIX_MATH(config, m_math);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1659,7 +1691,7 @@ void xavix_i2c_state::xavix_i2c_24c02(machine_config &config)
 {
 	xavix(config);
 
-	I2C_24C02(config, "i2cmem", 0);
+	I2C_24C02(config, "i2cmem");
 }
 
 void xavix_i2c_state::xavix_i2c_24c02_4mb(machine_config &config)
@@ -1700,7 +1732,7 @@ void xavix_i2c_state::xavix_i2c_24lc04(machine_config &config)
 {
 	xavix(config);
 
-	I2C_24C04(config, "i2cmem", 0); // 24LC04 on Nostalgia games, 24C04 on others
+	I2C_24C04(config, "i2cmem"); // 24LC04 on Nostalgia games, 24C04 on others
 }
 
 void xavix_i2c_state::xavix_i2c_24lc04_4mb(machine_config &config)
@@ -1756,7 +1788,7 @@ void xavix_i2c_state::xavix_i2c_24c08(machine_config &config)
 {
 	xavix(config);
 
-	I2C_24C08(config, "i2cmem", 0);
+	I2C_24C08(config, "i2cmem");
 }
 
 void xavix_i2c_state::xavix_i2c_24c08_4mb(machine_config &config)
@@ -1769,7 +1801,7 @@ void xavix_i2c_state::xavix_i2c_24c16(machine_config& config)
 {
 	xavix(config);
 
-	I2C_24C16(config, "i2cmem", 0);
+	I2C_24C16(config, "i2cmem");
 }
 
 void xavix_i2c_state::xavix_i2c_24c16_4mb(machine_config& config)
@@ -1846,7 +1878,7 @@ void xavix_mtrk_state::xavix_mtrk(machine_config &config)
 {
 	xavix_4mb(config);
 
-	XAVIX_MTRK_WHEEL(config, m_wheel, 0);
+	XAVIX_MTRK_WHEEL(config, m_wheel);
 	m_wheel->event_out_cb().set(FUNC(xavix_state::ioevent_trg08));
 }
 
@@ -1861,7 +1893,7 @@ void xavix_madfb_state::xavix_madfb(machine_config &config)
 {
 	xavix_4mb(config);
 
-	XAVIX_MADFB_BALL(config, m_ball, 0);
+	XAVIX_MADFB_BALL(config, m_ball);
 	m_ball->event_out_cb().set(FUNC(xavix_state::ioevent_trg01));
 }
 
@@ -1870,14 +1902,14 @@ void xavix_cart_state::xavix_cart(machine_config &config)
 {
 	xavix(config);
 
-	EKARA_CART_SLOT(config, m_cartslot, 0, ekara_cart, nullptr);
+	EKARA_CART_SLOT(config, m_cartslot, ekara_cart, nullptr);
 }
 
 void xavix_i2c_cart_state::xavix_i2c_taiko(machine_config &config)
 {
 	xavix_cart(config);
 
-	I2C_24C02(config, "i2cmem", 0); // 24LC02
+	I2C_24C02(config, "i2cmem"); // 24LC02
 
 	SOFTWARE_LIST(config, "cart_list").set_original("ekara_cart").set_filter("TAIKO");
 }
@@ -1888,7 +1920,7 @@ void xavix_i2c_cart_state::xavix_i2c_jpopira(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	I2C_24C02(config, "i2cmem", 0); // 24LC02
+	I2C_24C02(config, "i2cmem"); // 24LC02
 
 	SOFTWARE_LIST(config, "cart_list").set_original("ekara_cart").set_filter("JPOPIRA");
 }
@@ -2649,6 +2681,11 @@ ROM_START( hippofr )
 	ROM_LOAD( "54-6447-010.u3", 0x000000, 0x200000, CRC(1fb15364) SHA1(ff2bb54f7d6ccd3c83e722599c6f2b213bf35df8) )
 ROM_END
 
+ROM_START( multiplt )
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "2en1multipilotefr.u2", 0x000000, 0x200000, CRC(77f2ebf6) SHA1(0181bc7d3b6ea5a4a247ffe02fee2cb4942c1623) )
+ROM_END
+
 /* XaviX hardware titles (1st Generation)
 
     These use
@@ -2666,7 +2703,9 @@ ROM_END
 // Also exists as
 // 80-32703 Hippo's Alphabet Adventure (UK)
 // 80-32700 ABC Jungle Fun (US?)
-CONS( 1999, hippofr,  0,          0,  xavix_2mb, xavix,xavix_state,      init_xavix,    "VTech",             "Hippo: et la formidable aventure des lettres (France)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // needs keyboard emulating
+CONS( 1999, hippofr,  0,          0,  xavix_2mb, xavix,xavix_state,      init_xavix,    "VTech",             "2 en 1 Hippo: et la formidable aventure des lettres (France)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // needs keyboard emulating
+
+CONS( 1999?, multiplt, 0,         0,  xavix_2mb, multiplt,xavix_state,      init_xavix,    "VTech",             "2 en 1 Multi'Pilote (France)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイCLASSIC タイトーノスタルジア1
 CONS( 2006, taitons1,  0,          0,  xavix_i2c_24lc04_2mb, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Taito",             "Let's! TV Play Classic - Taito Nostalgia 1 (Japan)", MACHINE_IMPERFECT_SOUND )

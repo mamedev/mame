@@ -58,11 +58,8 @@ public:
 		, m_leds(*this, "led_%u", 0U)
 	{ }
 
-	void kingpin(machine_config &config);
-	void dealracl(machine_config &config);
-
-protected:
-	virtual void machine_start() override ATTR_COLD;
+	void kingpin(machine_config &config) ATTR_COLD;
+	void dealracl(machine_config &config) ATTR_COLD;
 
 private:
 	void sound_nmi_w(uint8_t data);
@@ -81,11 +78,6 @@ private:
 	void output1_w(uint8_t data);
 	void output2_w(uint8_t data);
 };
-
-void kingpin_state::machine_start()
-{
-	m_leds.resolve();
-}
 
 void kingpin_state::output1_w(uint8_t data)
 {
@@ -181,7 +173,7 @@ static INPUT_PORTS_START( kingpin )
 	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) // switches to next screen in attract mode
+	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) // switches to next screen in attract mode
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "Setup (1 of 4)" ) PORT_DIPLOCATION("S1:1")

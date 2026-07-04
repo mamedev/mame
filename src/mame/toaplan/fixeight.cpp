@@ -20,6 +20,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 /*
 Name        Board No      Maker         Game name
 ----------------------------------------------------------------------------
@@ -107,7 +109,6 @@ protected:
 	required_device<toaplan_txtilemap_device> m_tx_tilemap;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	bitmap_ind8 m_custom_priority_bitmap;
 };
 
 class fixeight_bootleg_state : public fixeight_state
@@ -164,17 +165,14 @@ void fixeight_state::screen_vblank(int state)
 u32 fixeight_bootleg_state::screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	m_custom_priority_bitmap.fill(0, cliprect);
-	m_vdp->render_vdp(bitmap, cliprect);
+	screen.priority().fill(0, cliprect);
+	m_vdp->render_vdp(bitmap, cliprect, screen.priority());
 	m_tx_tilemap->draw_tilemap_bootleg(screen, bitmap, cliprect);
 	return 0;
 }
 
 void fixeight_bootleg_state::video_start()
 {
-	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
-	m_vdp->custom_priority_bitmap = &m_custom_priority_bitmap;
-
 	/* This bootleg has additional layer offsets on the VDP */
 	m_vdp->set_tm_extra_offsets(0, -0x1d6 - 26, -0x1ef - 15, 0, 0);
 	m_vdp->set_tm_extra_offsets(1, -0x1d8 - 22, -0x1ef - 15, 0, 0);
@@ -187,9 +185,6 @@ void fixeight_bootleg_state::video_start()
 
 void fixeight_state::video_start()
 {
-	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
-	m_vdp->custom_priority_bitmap = &m_custom_priority_bitmap;
-
 	m_tx_tilemap->gfx(0)->set_source(reinterpret_cast<u8 *>(m_tx_gfxram.target()));
 }
 
@@ -197,8 +192,8 @@ void fixeight_state::video_start()
 u32 fixeight_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	m_custom_priority_bitmap.fill(0, cliprect);
-	m_vdp->render_vdp(bitmap, cliprect);
+	screen.priority().fill(0, cliprect);
+	m_vdp->render_vdp(bitmap, cliprect, screen.priority());
 	m_tx_tilemap->draw_tilemap(screen, bitmap, cliprect);
 	return 0;
 }
@@ -458,7 +453,7 @@ void fixeight_state::fixeight(machine_config &config)
 	audiocpu.p0_in_cb().set_ioport("EEPROM");
 	audiocpu.p0_out_cb().set_ioport("EEPROM");
 
-	TOAPLAN_COINCOUNTER(config, "coincounter", 0);
+	TOAPLAN_COINCOUNTER(config, "coincounter");
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
@@ -501,7 +496,7 @@ void fixeight_bootleg_state::fixeightbl(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &fixeight_bootleg_state::fixeightbl_68k_mem);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &fixeight_bootleg_state::cpu_space_fixeightbl_map);
 
-	TOAPLAN_COINCOUNTER(config, "coincounter", 0);
+	TOAPLAN_COINCOUNTER(config, "coincounter");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

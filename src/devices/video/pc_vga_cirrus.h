@@ -12,6 +12,15 @@
 
 #include "video/pc_vga.h"
 
+class cirrus_gd5401_vga_device : public vga_device
+{
+public:
+	cirrus_gd5401_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	virtual void recompute_params() override;
+};
+
 class cirrus_gd5428_vga_device :  public svga_device
 {
 public:
@@ -19,7 +28,7 @@ public:
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
 	// construction/destruction
-	cirrus_gd5428_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cirrus_gd5428_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual uint8_t mem_r(offs_t offset) override;
 	virtual void mem_w(offs_t offset, uint8_t data) override;
@@ -115,7 +124,7 @@ private:
 class cirrus_gd5430_vga_device :  public cirrus_gd5428_vga_device
 {
 public:
-	cirrus_gd5430_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cirrus_gd5430_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	cirrus_gd5430_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -132,7 +141,7 @@ private:
 class cirrus_gd5446_vga_device :  public cirrus_gd5430_vga_device
 {
 public:
-	cirrus_gd5446_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cirrus_gd5446_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -144,6 +153,7 @@ protected:
 
 
 // device type definition
+DECLARE_DEVICE_TYPE(CIRRUS_GD5401_VGA, cirrus_gd5401_vga_device)
 DECLARE_DEVICE_TYPE(CIRRUS_GD5428_VGA, cirrus_gd5428_vga_device)
 DECLARE_DEVICE_TYPE(CIRRUS_GD5430_VGA, cirrus_gd5430_vga_device)
 DECLARE_DEVICE_TYPE(CIRRUS_GD5446_VGA, cirrus_gd5446_vga_device)

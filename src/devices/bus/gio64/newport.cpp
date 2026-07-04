@@ -1706,7 +1706,7 @@ void newport_base_device::vrint_w(int state)
 	}
 }
 
-// TOOD: Figure out a better way of doing this
+// TODO: Figure out a better way of doing this
 void newport_base_device::update_screen_size(int state)
 {
 	const int x_start = m_vc2->readout_x0();
@@ -4467,7 +4467,7 @@ void newport_base_device::rex3_w(offs_t offset, uint64_t data, uint64_t mem_mask
 
 void newport_base_device::device_add_mconfig(machine_config &config)
 {
-	VC2(config, m_vc2, 0);
+	VC2(config, m_vc2);
 	m_vc2->vert_int().set(FUNC(newport_base_device::vrint_w));
 	m_vc2->screen_timing_changed().set(FUNC(newport_base_device::update_screen_size));
 
@@ -4487,11 +4487,11 @@ void newport_base_device::device_add_mconfig(machine_config &config, uint32_t xm
 {
 	newport_base_device::device_add_mconfig(config);
 
-	XMAP9(config, m_xmap[0], 0, xmap_revision);
-	XMAP9(config, m_xmap[1], 0, xmap_revision);
-	CMAP(config, m_cmap[0], 0, cmap_revision);
-	CMAP(config, m_cmap[1], 0, cmap_revision);
-	RB2(config, m_rb2, 0, global_mask);
+	XMAP9(config, m_xmap[0], xmap_revision);
+	XMAP9(config, m_xmap[1], xmap_revision);
+	CMAP(config, m_cmap[0], cmap_revision);
+	CMAP(config, m_cmap[1], cmap_revision);
+	RB2(config, m_rb2, global_mask);
 	write_mask().set(m_rb2, FUNC(rb2_device::set_write_mask));
 	draw_flags().set(m_rb2, FUNC(rb2_device::set_flags));
 	pixel_address().set(m_rb2, FUNC(rb2_device::set_address));

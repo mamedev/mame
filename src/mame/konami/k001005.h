@@ -100,10 +100,15 @@ private:
 class k001005_device : public device_t, public device_video_interface
 {
 public:
-	k001005_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k001005_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename T> k001005_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&texel_tag)
 		: k001005_device(mconfig, tag, owner, clock)
+	{
+		set_texel_tag(std::forward<T>(texel_tag));
+	}
+	template <typename T> k001005_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&texel_tag)
+		: k001005_device(mconfig, tag, owner, 0, std::forward<T>(texel_tag))
 	{
 		set_texel_tag(std::forward<T>(texel_tag));
 	}

@@ -107,8 +107,12 @@ Rz          Rudder
 #include "util/corestr.h"
 
 #ifdef SDLMAME_WIN32
+#ifdef SDLMAME_SDL3
+#include <SDL3/SDL.h>
+#else
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_syswm.h>
+#endif
 #endif
 
 #include <algorithm>
@@ -194,7 +198,7 @@ void dinput_keyboard_device::configure(input_device &device)
 {
 	// populate it
 	char defname[20];
-	for (unsigned keynum = 0; keynum < MAX_KEYS; keynum++)
+	for (unsigned keynum = 0; keynum < m_keyboard.MAX_KEYS; keynum++)
 	{
 		input_item_id itemid = keyboard_trans_table::instance().map_di_scancode_to_itemid(keynum);
 
@@ -1272,11 +1276,17 @@ std::pair<Microsoft::WRL::ComPtr<IDirectInputDevice8>, LPCDIDATAFORMAT> dinput_a
 		window_handle = window.platform_window();
 #elif defined(SDLMAME_WIN32)
 		auto const sdlwindow = window.platform_window();
+#if SDL_VERSION_ATLEAST(3, 0, 0)
+		window_handle = reinterpret_cast<HWND>(SDL_GetPointerProperty(SDL_GetWindowProperties(sdlwindow), SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr));
+		if (!window_handle)
+			return std::make_pair(nullptr, nullptr);
+#else
 		SDL_SysWMinfo info;
 		SDL_VERSION(&info.version);
 		if (!SDL_GetWindowWMInfo(sdlwindow, &info))
 			return std::make_pair(nullptr, nullptr);
 		window_handle = info.info.win.window;
+#endif
 #endif
 		switch (cooperative_level)
 		{

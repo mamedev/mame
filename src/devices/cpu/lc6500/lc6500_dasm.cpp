@@ -113,7 +113,7 @@ const lc6500_disassembler::instruction lc6500_disassembler::s_instructions[]
 
 	{ 0xe0, 0xf3, [](P) -> uint32_t { util::stream_format(stream, "xa%x", (opcode >> 2) & 3); return 1; } },
 
-	{ 0x68, 0xf8, [](P) -> uint32_t { uint16_t p = ((opcode & 0x07) << 8) | opcodes.r8(pc + 1); util::stream_format(stream, "jmp $%03x", p); return 2; } },
+	{ 0x68, 0xf8, [](P) -> uint32_t { uint16_t p = (pc & 0x800) | ((opcode & 0x07) << 8) | opcodes.r8(pc + 1); util::stream_format(stream, "jmp $%03x", p); return 2; } },
 
 	{ 0xa0, 0xf8, [](P) -> uint32_t { util::stream_format(stream, "xm #$%x", opcode & 7); return 1; } },
 

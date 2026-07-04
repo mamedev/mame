@@ -404,7 +404,7 @@ void jakks_state::base_config(machine_config& config)
 	m_maincpu->portc_in().set_ioport("P3");
 	m_maincpu->portc_out().set(FUNC(jakks_state::portc_w));
 
-	I2C_24C04(config, m_i2cmem, 0);
+	I2C_24C04(config, m_i2cmem);
 }
 
 void jakks_state::spg2xx_jakks(machine_config &config)
@@ -479,7 +479,7 @@ void jakks_state::spg2xx_hmbb(machine_config &config)
 	m_maincpu->portc_in().set_ioport("P3");
 	m_maincpu->portc_out().set(FUNC(jakks_state::portc_w));
 
-	I2C_24C16(config, m_i2cmem, 0);
+	I2C_24C16(config, m_i2cmem);
 }
 
 
@@ -501,7 +501,7 @@ void jakks_state::jakks_mpaco(machine_config &config)
 void jakks_state::jakks_mpac(machine_config &config)
 {
 	jakks_mpaco(config);
-	I2C_24C04(config, m_i2cmem, 0);
+	I2C_24C04(config, m_i2cmem);
 	m_maincpu->adc_in<0>().set_ioport("DIALX");
 }
 
@@ -804,7 +804,7 @@ CONS( 2007, jak_5thg, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_ini
 
 CONS( 2006, jak_jpdy, 0, 0, spg2xx_jakks,  spg2xx_jpdy,   jakks_state, empty_init, "JAKKS Pacific Inc / 5000ft, Inc",  "Jeopardy! (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2006, jak_gdg,  0, 0, spg2xx_dpma,   spg2xx_gdg,    jakks_state, empty_init, "JAKKS Pacific Inc / 1st Playable Productions",  "Go Diego Go! (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006, jak_gdg,  0, 0, spg2xx_dpma,   spg2xx_gdg,    jakks_state, empty_init, "JAKKS Pacific Inc / 1st Playable Productions",  "Go, Diego, Go! Rainforest Animal Rescue (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2006, jak_dond, 0, 0, spg2xx_jakks,  jak_dond,      jakks_state, init_crc,   "JAKKS Pacific Inc / Pronto Games",    "Deal or No Deal (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 

@@ -142,11 +142,11 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void greatgun(machine_config &config);
-	void mazerbla(machine_config &config);
+	void greatgun(machine_config &config) ATTR_COLD;
+	void mazerbla(machine_config &config) ATTR_COLD;
 
-	void init_mazerbla();
-	void init_greatgun();
+	void init_mazerbla() ATTR_COLD;
+	void init_greatgun() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -893,9 +893,6 @@ INTERRUPT_GEN_MEMBER(mazerbla_state::sound_interrupt)
 
 void mazerbla_state::machine_start()
 {
-	m_leds.resolve();
-	m_lamps.resolve();
-
 	m_gfx_bank->configure_entries(0, 256, memregion("sub2")->base() + 0x10000, 0x2000);
 
 	save_item(NAME(m_port02_status));

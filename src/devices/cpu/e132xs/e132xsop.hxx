@@ -1459,7 +1459,7 @@ void hyperstone_device::hyperstone_testlz()
 
 	const uint32_t fp = GET_FP;
 	const uint32_t sreg = m_core->local_regs[(SRC_CODE + fp) & 0x3f];
-	const uint32_t zeros = count_leading_zeros_32(sreg);
+	const uint32_t zeros = std::countl_zero(sreg);
 
 	m_core->local_regs[(DST_CODE + fp) & 0x3f] = zeros;
 

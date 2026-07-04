@@ -85,12 +85,12 @@ Operating Systems
 <!-- !Demos -->
 
 	<!-- These three demos all have the same sequences, mislabeled? -->
-	<software name="pc88vad" cloneof="88va2d" supported="no">
-		<description>PC88-VA Demo</description>
+	<software name="pc88vad" cloneof="88va2d" supported="partial">
+		<description>PC-88VA Tentou Demo (alt)</description>
 		<year>19??</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
-1st sequence should [OFX/OFY] scroll
+1st sequence now runs too slow (verify with ref)
 3rd sequence looks slow, [SGP]?
 Transition fades out too late, sprite should supposedly fade out before reaching top of screen, requires [IDP] IBF flag
 Transition between 3rd and 4th sequences don't look right, [IDP]
@@ -105,8 +105,8 @@ Transition between 3rd and 4th sequences don't look right, [IDP]
 
 <!-- These were in a folder called 基本システムセット, i.e. Kihon System Set (AKA Basic System Set) -->
 
-	<software name="88va1td" cloneof="88va2d" supported="no">
-		<description>88VA1 Tentou Demo</description>
+	<software name="88va1td" cloneof="88va2d" supported="partial">
+		<description>PC-88VA Tentou Demo (alt 2)</description>
 		<year>19??</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
@@ -120,8 +120,8 @@ Transition between 3rd and 4th sequences don't look right, [IDP]
 		</part>
 	</software>
 
-	<software name="88va2d" supported="no">
-		<description>88VA2 Demo</description>
+	<software name="88va2d" supported="partial">
+		<description>PC-88VA Tentou Demo</description>
 		<year>19??</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
@@ -137,12 +137,14 @@ Transition between 3rd and 4th sequences don't look right, [IDP]
 <!-- !Applications -->
 
 	<software name="animefrm" supported="no">
-		<!-- PS88-VA101-HMW subtitle on cover -->
+		<!-- PS88-VA101-HMW serial on cover -->
 		<description>Anime Framer (v1.0)</description>
+		<!-- 1988 according to about section -->
 		<year>1987</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
-[gfx] status bar has wrong colors [OFX/OFY]
+Line options doesn't work (verify, not from [SGP]?)
+Not extensively tested (has [scanner] options, user disk creation etc.)
 ]]></notes>
 		<info name="alt_title" value="アニメフレーマー" />
 		<sharedfeat name="mouseport_default" value="mouse"/>
@@ -166,10 +168,11 @@ Transition between 3rd and 4th sequences don't look right, [IDP]
 
 	<software name="paint" cloneof="animefrm" supported="no">
 		<description>Anime Framer (v1.0 alt)</description>
+		<!-- 1988 according to about section -->
 		<year>1987</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
-[gfx] status bar has wrong colors [OFX/OFY]
+(same as animefrm)
 ]]></notes>
 		<sharedfeat name="mouseport_default" value="mouse"/>
 		<!-- labels were swapped -->
@@ -193,7 +196,6 @@ Transition between 3rd and 4th sequences don't look right, [IDP]
 		<year>1989</year>
 		<publisher>Music Network</publisher>
 		<notes><![CDATA[
-Uses opaque pen for [gfx] layer (white on black)
 Incomplete MIF-201 [MIDI] emulation
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
@@ -205,15 +207,15 @@ Incomplete MIF-201 [MIDI] emulation
 
 <!-- !Operating Systems -->
 
-	<software name="pceva2tb" supported="no">
+	<software name="pceva2tb" supported="partial">
 		<description>PC-Engine (VA2 Tenpu-ban)</description>
 		<year>1988</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
-Has HDFORM.COM utility
+Has HDFORM.COM utility (requires working [C-Bus] PC-9801-27)
 JTERM.BAT is for connecting to a PC-VAN or ANSI [terminal]
-PCALC.BAT requires [keyboard] PC+V press to bring up
-SKYBD.BAT wants a radio cassette player and a PC-KD861 color monitor for audio sampling thru OPNA EOS
+PCALC.BAT requires [keyboard] PC+V press to bring up (fixed)
+SKYBD.BAT wants a radio cassette player and a PC-KD861 color monitor for audio sampling thru [OPNA] EOS
 VIDEO.BAT has various superimpose effects, requires dedicated board
 ]]></notes>
 		<info name="alt_title" value="PC-Engine(VA2添付版)" />
@@ -226,7 +228,7 @@ VIDEO.BAT has various superimpose effects, requires dedicated board
 		</part>
 	</software>
 
-	<software name="pce11" cloneof="pceva2tb" supported="no">
+	<software name="pce11" cloneof="pceva2tb" supported="partial">
 		<description>PC-Engine v1.1</description>
 		<year>1988</year>
 		<publisher>NEC</publisher>
@@ -248,13 +250,17 @@ VIDEO.BAT has various superimpose effects, requires dedicated board
 
 	<software name="famista" supported="no">
 		<description>Family Stadium</description>
-		<year>19??</year>
+		<!-- newspaper/stadium has ads for pc8801_flop:veigues -->
+		<year>1988?</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<notes><![CDATA[
 [SGP] playfield artifacts (press button 2 from pitcher side in 2p play)
-Lists dual port 1/2 as a unsupported [DE-9] input method
-Winning newspaper screen has [OFX/OFY] bug
-How to exit from attract mode once you enter it?
+Lists dual port 1/2 as a unsupported [DE-9] input method, cursor abruptly cycles when 1 player or 2 players is selected
+Win/Lose newspaper screen has [IDP] one frame of sprite lag
+[IDP] text draws below sprites (verify)
+How to exit from attract mode (2 innings?) once game enters it?
+NOTE: famist89 has no attract mode, bad dump?
+Throws an "OUT" shout when selecting 3rd option "new pennant race", bad dump?
 ]]></notes>
 		<info name="alt_title" value="ファミリースタジアム" />
 		<info name="usage" value="Menuing works with keyboard only until game prompts you to use a joystick"/>
@@ -265,10 +271,12 @@ How to exit from attract mode once you enter it?
 			</dataarea>
 		</part>
 
+		<!-- baddump: allegedly, see above. -->
+		<!-- Alternatively this set is a demo, and the user disk is for the other set? -->
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1281968">
-				<rom name="famista_2.d88" size="1281968" crc="29cfa16a" sha1="2a343ef96852ae882730cfe340cb130d48f17bc5"/>
+				<rom name="famista_2.d88" size="1281968" crc="29cfa16a" sha1="2a343ef96852ae882730cfe340cb130d48f17bc5" status="baddump" />
 			</dataarea>
 		</part>
 
@@ -283,10 +291,11 @@ How to exit from attract mode once you enter it?
 	<!-- Mislabeled disk -->
 	<software name="famist89" cloneof="famista" supported="no">
 		<description>Family Stadium (alt)</description>
-		<year>19??</year>
+		<year>1988?</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<notes><![CDATA[
-(same as famista)
+(same as famista, except it allows for a new season and has no "attract mode")
+Untested user disk creation
 ]]></notes>
 		<info name="alt_title" value="ファミリースタジアム" />
 		<info name="usage" value="Menuing works with keyboard only until game prompts you to use a joystick"/>
@@ -310,11 +319,12 @@ How to exit from attract mode once you enter it?
 
 	<software name="famist89a" supported="no">
 		<description>Family Stadium '89 - Pennant Race Hen</description>
-		<year>19??</year>
+		<!-- newspaper has ads for pc8801_flop:harakiri -->
+		<year>1989?</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<notes><![CDATA[
-(same as famista)
-Runs slow in gameplay
+(same as famista, except it allows for a new season)
+Untested user disk creation
 ]]></notes>
 		<info name="alt_title" value="ファミリースタジアム'89ペナントレース編" />
 
@@ -345,7 +355,12 @@ Runs slow in gameplay
 		<year>198?</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<notes><![CDATA[
-Needs [IDP] text display to go off for bottommost row (bumps strip 1 height from 384 to 400)
+Randomly hangs with a "please wait" when exiting town (verify, should be fixed by CPU clock bump)
+(character select: 3, 1, +, 1, CR, *. In dungeon go north, turn 6 when reaching wall, turn 6 at first split, go north until exit town screen reached and accept with 1)
+[IDP] blink currently too fast
+Actual user disk procedure is unknown
+Omake: Prompts for a いやどすえ PC-98 if YADOS.EXE is run from PC Engine OS.
+This is a undumped coverdisk, pages 374~375 of Login 1987.10 mag, also cfr. https://relaxwind.info/retrobooks/login/1987/1987.html
 ]]></notes>
 		<info name="alt_title" value="マイトアンドマジック" />
 		<info name="usage" value="Boot with Disk C in drive 1"/>
@@ -364,10 +379,11 @@ Needs [IDP] text display to go off for bottommost row (bumps strip 1 height from
 			</dataarea>
 		</part>
 
+		<!-- baddump: non-factory save (characters at LV200!) -->
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A - User" />
 			<dataarea name="flop" size="1094592">
-				<rom name="might &amp; magic(diska_userdisk) (star craft).d88" size="1094592" crc="de68bba5" sha1="d6be57c867a3cca8b694bc2b129705c653ae44da"/>
+				<rom name="might &amp; magic(diska_userdisk) (star craft).d88" size="1094592" crc="de68bba5" sha1="d6be57c867a3cca8b694bc2b129705c653ae44da" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -378,6 +394,8 @@ Needs [IDP] text display to go off for bottommost row (bumps strip 1 height from
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<notes><![CDATA[
 Burps on [FDC] access after disk swap with program and player disks, trying to scan chrn=(4, 0, 1, 256)
+Hangs on Utility menu, [FDC] chrn=(18, 0, 1, 256), very rarely manages to boot
+cfr. around PC=39ba1 where it tries to load sound data, issues brk 80h which never reaches the FDC
 ]]></notes>
 		<info name="alt_title" value="マイトアンドマジック2" />
 		<sharedfeat name="mouseport_default" value="mouse"/>
@@ -416,12 +434,11 @@ Burps on [FDC] access after disk swap with program and player disks, trying to s
 		<year>1987</year>
 		<publisher>ウインキーソフト (Winky Soft)</publisher>
 		<notes><![CDATA[
-Display off in places during intro
-[gfx] broken scroll bases for main menu
-[gfx] Requires fractional DOT scrolling (horizontal)
-[gfx] wrong draw mode for status bar in gameplay
-[gfx] needs cliprect at gameplay startup
-Unplayable with [keyboard]
+[gfx] intro title needs pdrawgfx
+[SGP] triggers SF = 1 draws with stage bosses (safe to ignore?)
+[IDP] sprite glitches towards the end of stage 1-2 and successive stages. Needs CPU clock bump.
+[Clock HACK] Currently plays the wrong BGM when clearing a stage.
+Corrupts itself on prolonged playthrough (stage 2-1 boss, disk D, test me again)
 ]]></notes>
 		<info name="alt_title" value="オルテウス" />
 		<info name="usage" value="Kana Lock on pauses the game"/>
@@ -455,12 +472,12 @@ Unplayable with [keyboard]
 	</software>
 
 <!-- First 4th disk in TOSEC has diff crc than the one above -->
-	<software name="olteusa" cloneof="olteus" supported="no">
+	<software name="olteusa" cloneof="olteus" supported="partial">
 		<description>Olteus (alt disk D)</description>
 		<year>1987</year>
 		<publisher>ウインキーソフト (Winky Soft)</publisher>
 		<notes><![CDATA[
-(same as olteus)
+(same as olteus except no confirmed crashes)
 ]]></notes>
 		<info name="alt_title" value="オルテウス" />
 		<info name="usage" value="Kana Lock on pauses the game"/>
@@ -494,14 +511,13 @@ Unplayable with [keyboard]
 		</part>
 	</software>
 
-	<software name="rtype" supported="no">
+	<software name="rtype" supported="partial">
 		<description>R-Type</description>
 		<year>1988</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
-[SGP] extensive VD usage in gameplay
-[gfx] intro uses cliprect
-[gfx] Requires fractional DOT scrolling (horizontal)
+May slowdown even more with [SGP] usage
+Sometimes [OPNA] throws a stuck note if skipping intro when BGM is playing (verify)
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1296112">
@@ -548,15 +564,15 @@ Burps on [FDC] access after disk swap with program and player disks, trying to s
 		</part>
 	</software>
 
-	<software name="shanghai" supported="no">
+	<software name="shanghai" supported="partial">
 		<description>Shanghai</description>
 		<year>1986</year>
 		<publisher>システムソフト (System Soft)</publisher>
 		<notes><![CDATA[
-Needs [dac1bit] clicks on gameplay
-May crash with disk error when entering winning animation (verify)
-Winning animation is glitchy [OFX/OFY]?, uses [IDP] text transpen with upper bits set (for flame effect?), press mouse left button to return to game
-[OPNA] seems to cut off shortly on intro and winning screen compared to VAEG
+[IDP] cursor blink present on title screen (verify)
+[gfx] Winning animation a bit offset, not fractional horizontal scrolling?
+[gfx] sometimes draws copyright screen background color to non-black
+[DAC1BIT] currently plays too fast due of the [Clock HACK]
 ]]></notes>
 		<info name="alt_title" value="上海" />
 		<sharedfeat name="mouseport_default" value="mouse"/>
@@ -568,20 +584,21 @@ Winning animation is glitchy [OFX/OFY]?, uses [IDP] text transpen with upper bit
 		</part>
 	</software>
 
-	<software name="shinraba" supported="no">
+	<software name="shinraba" supported="partial">
 		<description>Shinra Bansho</description>
 		<year>1987</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<notes><![CDATA[
-[gfx] needs cliprect and primask pen during intro
-Runs at half speed
-[IDP] sprites wraparound on left edge
+Runs at half speed, bumped CPU clock
+Not extensively tested
+[gfx] corrupted layer after game over, in intro. pdrawgfx?
 Omake: if sound irqs don't run then needs to press key 0 pad to move on
+Omake: CG intro scene with thunderstorm has a blurry signature concealed by picture mask
+[IDP] concealed text line after said scene (btanb)
 ]]></notes>
 		<info name="alt_title" value="神羅万象"/>
-		<info name="usage" value="Hold enter at boot to skip intro, press F2 on title screen to load a game, press F5 for sound test" />
+		<info name="usage" value="Intro requires 25 text lines set in PC-88VA setup menu. Hold enter at boot to skip intro, press F2 on title screen to load a game, press F5 for sound test" />
 
-		<!-- baddump: non-factory save -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1331888">
@@ -589,6 +606,7 @@ Omake: if sound irqs don't run then needs to press key 0 pad to move on
 			</dataarea>
 		</part>
 
+		<!-- baddump: non-factory save -->
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1296112">
@@ -805,65 +823,73 @@ Fails [floppy] copy protection, draws "TETRIS IS ONLY 6,800 YEN" on title screen
 <!-- Dual floppies, should work both on the PC88VA and on the PC98 (usually you just have to switch the first two disks depending on the system) -->
 	<!-- TODO: move to a shared SW list -->
 
-	<software name="illcity" supported="no">
+	<software name="illcity" supported="partial">
 		<description>Illusion City - Genei Toshi</description>
 		<year>1992</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<notes><![CDATA[
-[IDP] doesn't disable PC-Engine OS function strip during intro (same as mightmag?)
-Runs too slow
-Black screen if directly selecting new game or after intro
+Runs too slow, bumped CPU clock speed
+Not extensively tested
 Has unemulated [MIDI] options
 ]]></notes>
 		<info name="release" value="199201xx"/>
 		<info name="alt_title" value="幻影都市 ～イリュージョンシティ～"/>
+		<info name="usage" value="Boot game with user disk in drive B:"/>
+		<sharedfeat name="mouseport_default" value="mouse"/>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk 1.fdi" size="1265664" crc="6c28f456" sha1="b9595c3798b0faf5152df79f1ea1c74ce3a07672"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="User Disk" />
+			<dataarea name="flop" size="1265664">
+				<rom name="user disk.fdi" size="1265664" crc="c1c566df" sha1="0211d36ee53453122d6e2df604d5fdf6c9bfba3a"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk 2.fdi" size="1265664" crc="408aba76" sha1="5770ff0dc637776d6cb5e30cd4a128fb783befa3"/>
 			</dataarea>
 		</part>
 
-		<part name="flop3" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk 3.fdi" size="1265664" crc="da57a623" sha1="3fbd4cdeccf99e531b34dfe5a3fe890966307fa8"/>
 			</dataarea>
 		</part>
 
-		<part name="flop4" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk 4.fdi" size="1265664" crc="cfb2c03b" sha1="b7397ef886811f71927d53c6d940167f01147b9d"/>
 			</dataarea>
 		</part>
 
-		<part name="flop5" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk 5.fdi" size="1265664" crc="1187eea4" sha1="7ad2a757460adaff37d73c59287b941241d1e160"/>
 			</dataarea>
 		</part>
 
-		<part name="flop6" interface="floppy_5_25">
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk 6.fdi" size="1265664" crc="3256197f" sha1="26a46c2f6124c569b3586e6b9dd97e521460bc0e"/>
 			</dataarea>
 		</part>
 
-		<part name="flop7" interface="floppy_5_25">
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 7"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk 7.fdi" size="1265664" crc="2b71cca8" sha1="60b32fe6816be8a9b0b35d9b779ab5baa2fac8af"/>
-			</dataarea>
-		</part>
-
-		<part name="flop8" interface="floppy_5_25">
-			<feature name="part_id" value="User Disk" />
-			<dataarea name="flop" size="1265664">
-				<rom name="user disk.fdi" size="1265664" crc="c1c566df" sha1="0211d36ee53453122d6e2df604d5fdf6c9bfba3a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -873,7 +899,6 @@ Has unemulated [MIDI] options
 		<year>1990</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<notes><![CDATA[
-[IDP] doesn't disable PC-Engine OS function strip until after few moments in intro (same as mightmag?)
 Optionally wants kana lock enabled for entering a name for new game [keyboard] irq
 Not extensively tested
 ]]></notes>
@@ -903,13 +928,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="fray" supported="no">
+	<software name="fray" supported="partial">
 		<description>Fray - In Magical Adventure</description>
 		<year>1991</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<notes><![CDATA[
-Runs too slow, [SGP]?
-Ugly pitch for [OPNA] voice samples on intro
+Runs too slow, bumped CPU clock
+Ugly pitch for [OPNA] voice samples on intro (verify)
 Not extensively tested
 ]]></notes>
 		<info name="release" value="19911220"/>
@@ -1235,15 +1260,13 @@ All disks fail initial bootstrap [FDC]
 
 <!-- !Doujinshi -->
 
-	<software name="ballbrkr" supported="no">
+	<software name="ballbrkr" supported="partial">
 		<description>Balloon Breaker</description>
 		<year>1996</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-[gfx] unhandled RGB565 transparency
-[gfx] Glitched screen right after selecting new game
-[gfx] Has badly colored sprites on character select, needs h/v scrolling for background
-[gfx] Requires fractional DOT scrolling (horizontal) starting from stage 2
+Minor [gfx] scroll glitch at character select
+Not extensively tested
 ]]></notes>
 		<info name="developer" value="Fredia" />
 		<info name="alt_title" value="ばる〜んぶ れ〜か〜" />
@@ -1254,12 +1277,13 @@ All disks fail initial bootstrap [FDC]
 		</part>
 	</software>
 
-	<software name="boomer" supported="no">
+	<software name="boomer" supported="partial">
 		<description>Boomering</description>
 		<year>1996</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-[gfx] requires h/v scrolling for background and gameplay
+[gfx] minor scroll glitch at title screen
+[gfx] picture mask should cut off sprite layer too
 ]]></notes>
 		<info name="developer" value="Fredia" />
 		<part name="flop1" interface="floppy_5_25">
@@ -1269,18 +1293,18 @@ All disks fail initial bootstrap [FDC]
 		</part>
 	</software>
 
-	<software name="harehare" supported="no">
+	<software name="harehare" supported="partial">
 		<description>Hare Hare Yukai</description>
 		<!-- "PC88VA 20th Anniversary" -->
 		<year>2006</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-[gfx] uses various forms of cliprect mask
-[IDP] doesn't disable PC-Engine OS function strip (same as mightmag?)
-Runs too slow, no sound?
+[gfx] slight offset for some layers
+Runs too slow, bumped CPU clock speed
 ]]></notes>
 		<info name="developer" value="Shinra" />
 		<info name="alt_title" value="ハレ晴レユカイ" />
+		<info name="usage" value="Requires 640KB RAM set in setup menu for BGM"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
 				<rom name="harehare1.d88" size="1331888" crc="1488f784" sha1="96f93801318ed850f1074fb5f050420d098d85b5"/>
@@ -1300,13 +1324,13 @@ Runs too slow, no sound?
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-[gfx] Title screen doesn't show text layer? (verify)
-[IDP] sprites wraparound on left edge
-Runs too slow
-Crashes after stage 1
+[IDP] sprites wobble when scrolling up/down (verify)
+May run too slow even after CPU speed bump (verify)
+Crashes after stage 1 (fixed, cfr. usage)
 ]]></notes>
 		<info name="developer" value="LOKAPALA" />
 		<info name="alt_title" value="ハティの空で" />
+		<info name="usage" value="Requires 640KB of RAM" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1298608">
 				<rom name="hati sora.d88" size="1298608" crc="bdee6770" sha1="445ba8da78cce7fd3c4d1bce263d8c8edd88849d"/>
@@ -1346,10 +1370,9 @@ Crashes after stage 1
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-[gfx] Gameplay don't mask bullets on right side
-[gfx] background needs vertical scrolling
-Runs too slow
+Runs erratically (speed up when no enemies on screen, slowdown to a crawl when there are)
 Needs joystick in otherwise it loops on title screen
+Some [IDP] bullet sprites may go on top of status bar, check picture mask
 ]]></notes>
 		<info name="developer" value="Upyolic Soft" />
 		<info name="alt_title" value="最終平気UPOプレリリース" />
@@ -1367,8 +1390,6 @@ Needs joystick in otherwise it loops on title screen
 		<year>2023</year>
 		<publisher>Inufuto</publisher>
 		<notes><![CDATA[
-[gfx] Requires fractional DOT scrolling (horizontal)
-[gfx] Should require color primask for right panel score display
 [DE-9] keeps shooting when player press button first time around
 https://youtu.be/7ltdrUPz91w
 ]]></notes>
@@ -1483,7 +1504,7 @@ https://youtu.be/oJEUR7FhVlU
 		<year>2023</year>
 		<publisher>Inufuto</publisher>
 		<notes><![CDATA[
-Randomly draws with the wrong [gfx] wrong palette bank, [FDC]?
+Randomly draws with the wrong [gfx] palette bank, [FDC]?
 https://youtu.be/zMWhBRD8cdM
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
@@ -1493,12 +1514,13 @@ https://youtu.be/zMWhBRD8cdM
 		</part>
 	</software>
 
-	<software name="hopman" supported="no">
+	<software name="hopman" supported="partial">
 		<description>Hopman</description>
 		<year>2023</year>
 		<publisher>Inufuto</publisher>
 		<notes><![CDATA[
-Runs too slow
+Runs too slow, bumped CPU speed
+Doesn't picture mask sprites to the right side (btanb)
 https://youtu.be/zxy8lTZ_w_k
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
@@ -1513,7 +1535,7 @@ https://youtu.be/zxy8lTZ_w_k
 		<year>2023</year>
 		<publisher>Inufuto</publisher>
 		<notes><![CDATA[
-Randomly draws with the wrong [gfx] wrong palette bank, [FDC]?
+Randomly draws with the wrong [gfx] palette bank, [FDC]?
 https://youtu.be/JIK3ruhURG4
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
@@ -1570,7 +1592,7 @@ https://youtu.be/yLf945xs23Y
 		<year>2023</year>
 		<publisher>Inufuto</publisher>
 		<notes><![CDATA[
-Randomly draws with the wrong [gfx] wrong palette bank, [FDC]?
+Randomly draws with the wrong [gfx] palette bank, [FDC]?
 https://youtu.be/JtRkC5ffaYc
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">

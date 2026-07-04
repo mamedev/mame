@@ -356,7 +356,7 @@ void vendetta_state::z80_nmi_w(int state)
 
 void vendetta_state::z80_irq_w(uint8_t data)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 }
 
 uint8_t vendetta_state::z80_irq_r()
@@ -607,7 +607,6 @@ void vendetta_state::machine_reset()
 
 	// Z80 _NMI goes low at same time as reset
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 void vendetta_state::banking_callback(uint8_t data)
@@ -652,8 +651,8 @@ void vendetta_state::vendetta(machine_config &config)
 	m_k053246->set_config(NORMAL_PLANE_ORDER, -43, 6);
 	m_k053246->set_palette(m_palette);
 
-	K053251(config, m_k053251, 0);
-	K054000(config, m_k054000, 0);
+	K053251(config, m_k053251);
+	K054000(config, m_k054000);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();

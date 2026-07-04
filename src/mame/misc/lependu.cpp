@@ -164,10 +164,10 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void lependu(machine_config &config);
-	void codemagik(machine_config &config);
+	void lependu(machine_config &config) ATTR_COLD;
+	void codemagik(machine_config &config) ATTR_COLD;
 
-	void init_lependu();
+	void init_lependu() ATTR_COLD;
 
 	void lamps_w(uint8_t data);
 	void lamps_cm_w(uint8_t data);
@@ -645,8 +645,6 @@ DISCRETE_SOUND_END
 
 void lependu_state::machine_start()
 {
-	m_lamps.resolve();
-
 	uint8_t *ROM1 = memregion("data1")->base();
 	uint8_t *ROM2 = memregion("data2")->base();
 	m_bank[0]->configure_entries(0, 4, &ROM1[0], 0x2000);

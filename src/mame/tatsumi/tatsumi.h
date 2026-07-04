@@ -53,7 +53,7 @@ protected:
 	static constexpr int CLOCK_1 = 16'000'000;
 	static constexpr int CLOCK_2 = 50'000'000;
 
-	INTERRUPT_GEN_MEMBER(v30_interrupt);
+	IRQ_CALLBACK_MEMBER(v30_vector_r);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 
 	void hd6445_crt_w(offs_t offset, uint8_t data);

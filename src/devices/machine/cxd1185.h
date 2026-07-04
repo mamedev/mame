@@ -9,8 +9,8 @@
 #include "machine/nscsi_bus.h"
 
 class cxd1185_device
-	: public nscsi_device
-	, public nscsi_slot_card_interface
+	: public device_t
+	, public nscsi_device_interface
 {
 public:
 	cxd1185_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
@@ -41,7 +41,7 @@ protected:
 	template <unsigned Register> u8 int_req_r();
 	u8 scsi_ctrl_monitor_r();
 	u8 fifo_status_r();
-	u8 scsi_id_r() { return m_scsi_id; }
+	u8 scsi_idr_r() { return m_scsi_idr; }
 	template <unsigned Byte> u8 count_r() { return u8(m_count >> (Byte * 8)); }
 	template <unsigned Register> u8 int_auth_r() { return m_int_auth[Register]; }
 	u8 mode_r() { return m_mode; }
@@ -53,7 +53,7 @@ protected:
 	void scsi_data_w(u8 data);
 	void environ_w(u8 data);
 	void timer_w(u8 data);
-	void scsi_id_w(u8 data) { m_scsi_id = data; }
+	void scsi_idr_w(u8 data) { m_scsi_idr = data; }
 	template <unsigned Byte> void count_w(u8 data) { m_count &= ~(0xffU << (Byte * 8)); m_count |= u32(data) << (Byte * 8); }
 	template <unsigned Register> void int_auth_w(u8 data);
 	void mode_w(u8 data) { m_mode = data; }
@@ -197,7 +197,7 @@ private:
 		MSEL = 0x40,
 		MBSY = 0x80,
 	};
-	enum scsi_id_mask : u8
+	enum scsi_idr_mask : u8
 	{
 		OID  = 0x07, // owner id
 		SMOD = 0x10, // single initiator mode
@@ -243,7 +243,7 @@ private:
 	u8 m_environ;
 	unsigned m_sel_time;
 	unsigned m_rst_time;
-	u8 m_scsi_id;
+	u8 m_scsi_idr;
 	u8 m_int_auth[2];
 	u8 m_mode;
 	u32 m_count;

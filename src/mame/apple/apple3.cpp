@@ -61,7 +61,7 @@ void apple3_state::apple3(machine_config &config)
 	PALETTE(config, m_palette, FUNC(apple3_state::palette_init), 32);
 
 	/* keyboard controller */
-	AY3600(config, m_ay3600, 0);
+	AY3600(config, m_ay3600);
 	m_ay3600->x0().set_ioport("X0");
 	m_ay3600->x1().set_ioport("X1");
 	m_ay3600->x2().set_ioport("X2");
@@ -80,7 +80,7 @@ void apple3_state::apple3(machine_config &config)
 	TIMER(config, m_repttimer).configure_generic(FUNC(apple3_state::ay3600_repeat));
 
 	/* slot bus */
-	A2BUS(config, m_a2bus, 0);
+	A2BUS(config, m_a2bus);
 	m_a2bus->set_space(m_maincpu, AS_PROGRAM);
 	m_a2bus->irq_w().set(FUNC(apple3_state::a2bus_irq_w));
 	m_a2bus->nmi_w().set(FUNC(apple3_state::a2bus_nmi_w));
@@ -102,7 +102,7 @@ void apple3_state::apple3(machine_config &config)
 	SOFTWARE_LIST(config, "flop525_list").set_original("apple3");
 
 	/* acia */
-	MOS6551(config, m_acia, 0);
+	MOS6551(config, m_acia);
 	m_acia->set_xtal(XTAL(1'843'200)); // HACK: The schematic shows an external clock generator but using a XTAL is faster to emulate.
 	m_acia->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -335,7 +335,7 @@ INPUT_PORTS_END
 ROM_START(apple3)
 	ROM_REGION(0x1000,"maincpu",0)
 	ROM_SYSTEM_BIOS(0, "original", "Apple /// boot ROM")
-	ROMX_LOAD( "apple3.rom", 0x0000, 0x1000, CRC(55e8eec9) SHA1(579ee4cd2b208d62915a0aa482ddc2744ff5e967), ROM_BIOS(0))
+	ROMX_LOAD( "apple3.rom", 0x0000, 0x1000, CRC(1af7ec42) SHA1(8043f914ebdcdab9838dbb78f8a2ee3867d210d2), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "soshd", "Rob Justice SOSHDBOOT")
 	ROMX_LOAD( "soshdboot.bin", 0x000000, 0x001000, CRC(fd5ac9e2) SHA1(ba466a54ddb7f618c4f18f344754343c5945b417), ROM_BIOS(1))

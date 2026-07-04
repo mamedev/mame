@@ -477,8 +477,16 @@ void via6522_device::shift_in()
 		if (m_shift_counter == 0 && !SR_DISABLED(m_acr))
 		{
 			LOGINT("SHIFT in INT request ");
-//            set_int(INT_SR);// TODO: this interrupt is 1-2 clock cycles too early
-			m_shift_irq_timer->adjust(clocks_to_attotime(2)/2); // Delay IRQ 2 edges for all shift INs (mode 1-3)
+			if (SI_EXT_CONTROL(m_acr))
+			{
+				// Set IRQ immediately for external shifter clock.  PCI PowerMacs rely on this timing,
+				// including the Pippin.
+				set_int(INT_SR);
+			}
+			else
+			{
+				m_shift_irq_timer->adjust(clocks_to_attotime(2)/2); // Delay IRQ 2 edges for internal shift INs (mode 1-2)
+			}
 		}
 	}
 	m_shift_counter = (m_shift_counter - 1) & 0x0f; // Count all edges

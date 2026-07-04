@@ -219,14 +219,14 @@ void rockrage_state::bankswitch_w(uint8_t data)
 
 uint8_t rockrage_state::vlm5030_busy_r()
 {
-	return (m_vlm->bsy() ? 1 : 0);
+	return m_vlm->bsy_r();
 }
 
 void rockrage_state::speech_w(uint8_t data)
 {
 	// bit2 = data bus enable
-	m_vlm->rst((data >> 1) & 0x01);
-	m_vlm->st((data >> 0) & 0x01);
+	m_vlm->rst_w(BIT(data, 1));
+	m_vlm->st_w(BIT(data, 0));
 }
 
 void rockrage_state::main_map(address_map &map)

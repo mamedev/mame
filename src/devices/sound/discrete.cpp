@@ -41,8 +41,9 @@
 #include "wavwrite.h"
 
 #include <atomic>
-#include <cstdarg>
+#include <fstream>
 #include <iostream>
+#include <locale>
 
 
 // device type definition
@@ -471,21 +472,15 @@ const double *discrete_device::node_output_ptr(int onode)
 //  discrete_log: Debug logging
 //-------------------------------------------------
 
-void CLIB_DECL discrete_device::discrete_log(const char *text, ...) const
+void discrete_device::discrete_vlog(util::format_argument_pack<char> &&args)
 {
 	if (DISCRETE_DEBUGLOG)
 	{
-		va_list arg;
-		va_start(arg, text);
-
-		if(m_disclogfile)
+		if (m_disclogfile)
 		{
-			vfprintf(m_disclogfile, text, arg);
-			fprintf(m_disclogfile, "\n");
-			fflush(m_disclogfile);
+			util::stream_format(*m_disclogfile, std::move(args));
+			*m_disclogfile << std::endl;
 		}
-
-		va_end(arg);
 	}
 }
 
@@ -825,7 +820,6 @@ discrete_device::discrete_device(const machine_config &mconfig, device_type type
 		m_sample_time(0),
 		m_neg_sample_time(0),
 		m_indexed_node(nullptr),
-		m_disclogfile(nullptr),
 		m_queue(nullptr),
 		m_profiling(0),
 		m_total_samples(0),
@@ -865,7 +859,16 @@ void discrete_device::device_start()
 
 	/* create the logfile */
 	if (DISCRETE_DEBUGLOG)
-		m_disclogfile = fopen(util::string_format("discrete%s.log", this->tag()).c_str(), "w");
+	{
+		std::string fname = util::string_format("discrete%s.log", tag());
+		for (char &ch : fname)
+		{
+			if (ch == ':')
+				ch = '_';
+		}
+		m_disclogfile = std::make_unique<std::ofstream>(fname.c_str());
+		m_disclogfile->imbue(std::locale::classic());
+	}
 
 	/* enable profiling */
 	m_profiling = 0;
@@ -933,13 +936,8 @@ void discrete_device::device_stop()
 		node->stop();
 	}
 
-	if (DISCRETE_DEBUGLOG)
-	{
-		/* close the debug log */
-		if (m_disclogfile)
-			fclose(m_disclogfile);
-		m_disclogfile = nullptr;
-	}
+	/* close the debug log */
+	m_disclogfile.reset();
 }
 
 //-------------------------------------------------

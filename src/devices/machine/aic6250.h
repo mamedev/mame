@@ -8,7 +8,7 @@
 
 #include "machine/nscsi_bus.h"
 
-class aic6250_device : public nscsi_device, public nscsi_slot_card_interface
+class aic6250_device : public device_t, public nscsi_device_interface
 {
 public:
 	aic6250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

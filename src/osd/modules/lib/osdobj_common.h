@@ -16,7 +16,6 @@
 #include "osdepend.h"
 
 #include "modules/osdmodule.h"
-#include "modules/output/output_module.h"
 
 #include "emuopts.h"
 
@@ -80,9 +79,6 @@
 
 #define OSDOPTION_SOUND                 "sound"
 #define OSDOPTION_AUDIO_LATENCY         "audio_latency"
-
-#define OSDOPTION_AUDIO_OUTPUT          "audio_output"
-#define OSDOPTION_AUDIO_EFFECT          "audio_effect"
 
 #define OSDOPTION_MIDI_PROVIDER         "midiprovider"
 
@@ -164,10 +160,6 @@ public:
 	// sound options
 	const char *sound() const { return value(OSDOPTION_SOUND); }
 	float audio_latency() const { return float_value(OSDOPTION_AUDIO_LATENCY); }
-
-	// CoreAudio specific options
-	const char *audio_output() const { return value(OSDOPTION_AUDIO_OUTPUT); }
-	const char *audio_effect(int index) const { return value(util::string_format("%s%d", OSDOPTION_AUDIO_EFFECT, index)); }
 
 	// BGFX specific options
 	const char *bgfx_path() const { return value(OSDOPTION_BGFX_PATH); }
@@ -277,8 +269,6 @@ public:
 	virtual void output_callback(osd_output_channel channel, const util::format_argument_pack<char> &args)  override;
 	bool verbose() const { return m_print_verbose; }
 	virtual void set_verbose(bool print_verbose) override { m_print_verbose = print_verbose; }
-
-	void notify(const char *outname, int32_t value) const { m_output->notify(outname, value); }
 
 	virtual void process_events() = 0;
 	virtual bool has_focus() const = 0;

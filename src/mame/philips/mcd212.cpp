@@ -350,22 +350,22 @@ void mcd212_device::process_ica()
 				break;
 			case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27: // RELOAD DCP
 			case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
-				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD DCP: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x001fffff);
+				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD DCP: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x003fffff);
 				set_dcp<Path>(cmd & 0x003ffffc);
 				break;
 			case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37: // RELOAD DCP and STOP
 			case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
-				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD DCP and STOP: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x001fffff);
+				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD DCP and STOP: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x003fffff);
 				set_dcp<Path>(cmd & 0x003ffffc);
 				return;
 			case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45: case 0x46: case 0x47: // RELOAD VSR (ICA)
 			case 0x48: case 0x49: case 0x4a: case 0x4b: case 0x4c: case 0x4d: case 0x4e: case 0x4f:
-				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD VSR: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x001fffff);
+				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD VSR: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x003fffff);
 				addr = (cmd & 0x0007ffff) / 2;
 				break;
 			case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57: // RELOAD VSR and STOP
 			case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f:
-				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD VSR and STOP: VSR = %05x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x001fffff);
+				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD VSR and STOP: VSR = %05x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x003fffff);
 				set_vsr<Path>(cmd & 0x003fffff);
 				return;
 			case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67: // INTERRUPT
@@ -667,9 +667,11 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 		mosaic_count_b >>= 1;
 
 	// If PAL and 'Standard' bit set, insert a 24px border on the left/right
-	uint32_t offset = (!BIT(m_dcr[0], DCR_CF_BIT) || BIT(m_csrw[0], CSR1W_ST_BIT)) ? 24 : 0;
-	std::fill_n(out, offset, s_4bpp_color[0]);
-	out += offset;
+	if (border_width)
+	{
+		std::fill_n(out, border_width, s_4bpp_color[0]);
+		out += border_width;
+	}
 
 	for (int x = 0; x < width; x++)
 	{
@@ -743,7 +745,7 @@ void mcd212_device::draw_cursor(uint32_t *scanline)
 
 	const uint16_t cursor_x = m_cursor_position & 0x3ff;
 	const uint16_t cursor_y = ((m_cursor_position >> 12) & 0x3ff) + m_ica_height;
-	const int32_t y = screen().vpos() - cursor_y;
+	const int32_t y = screen().vpos() / 2 - cursor_y;
 	const int width = get_screen_width();
 
 	if ((0 <= y) && (y < 16))
@@ -954,11 +956,11 @@ TIMER_CALLBACK_MEMBER(mcd212_device::dca_tick)
 	if (BIT(m_dcr[1], DCR_DCA_BIT))
 		process_dca<1>();
 
-	int scanline = screen().vpos();
+	int scanline = screen().vpos() / 2;
 	if (scanline == m_total_height - 1)
-		m_dca_timer->adjust(screen().time_until_pos(m_ica_height, 784));
+		m_dca_timer->adjust(screen().time_until_pos(m_ica_height * 2, 784));
 	else
-		m_dca_timer->adjust(screen().time_until_pos(scanline + 1, 784));
+		m_dca_timer->adjust(screen().time_until_pos((scanline + 1) * 2, 784));
 }
 
 uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -968,20 +970,18 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	bool transparent_a[768];
 	bool transparent_b[768];
 
-	if (screen.vpos() >= m_total_height)
-	{
-		return 0; // Do nothing on the extended rows.
-	}
+	// It updates 2 bitmap lines each time
+	if (screen.vpos() & 1)
+		return 0;
 
 	// FIXME this should use the clipping rectangle to determine which lines need drawing
-	int scanline = screen.vpos();
+	int scanline = screen.vpos() / 2;
 
 	// Process VSR and mix if we're in the visible region
 	if (scanline >= m_ica_height)
 	{
-		uint32_t const bitmap_line = ((scanline - m_ica_height) << 1) + m_ica_height;
-		uint32_t *const out = &bitmap.pix(bitmap_line + BIT(~m_csrr[0], CSR1R_PA_BIT));
-		uint32_t *const out2 = &bitmap.pix(bitmap_line + BIT(m_csrr[0], CSR1R_PA_BIT));
+		uint32_t *const out = &bitmap.pix(scanline * 2 + BIT(~m_csrr[0], CSR1R_PA_BIT));
+		uint32_t *const out2 = &bitmap.pix(scanline * 2 + BIT(m_csrr[0], CSR1R_PA_BIT));
 
 		bool draw_line = true;
 		if (!BIT(m_dcr[0], DCR_FD_BIT) && BIT(m_csrw[0], CSR1W_ST_BIT))
@@ -998,7 +998,6 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 		if (draw_line)
 		{
-
 			process_vsr<0>(plane_a, transparent_a);
 			process_vsr<1>(plane_b, transparent_b);
 
@@ -1075,7 +1074,7 @@ int mcd212_device::ram_dtack_cycle_count()
 		return 2;
 
 	const int x = screen().hpos();
-	const int y = screen().vpos();
+	const int y = screen().vpos() / 2;
 	const bool x_outside_active_display = (x >= 408);
 
 	// No contending for Ch.1/Ch.2 timing slots during the final 8-pixel area on all lines
@@ -1137,13 +1136,15 @@ void mcd212_device::device_reset()
 	m_ica_height = 32;
 	m_total_height = 312;
 	m_blink_time = 0;
-	for (int i = 0; i < 312; i++)
+	for (int i = 0; i < m_total_height; i++)
+	{
 		std::fill_n(m_interlace_field[i], 768, 0);
+	}
 
 	m_int_callback(CLEAR_LINE);
 
-	m_dca_timer->adjust(screen().time_until_pos(m_ica_height, 784));
-	m_ica_timer->adjust(screen().time_until_pos(m_ica_height, 0));
+	m_dca_timer->adjust(screen().time_until_pos(m_ica_height * 2, 784));
+	m_ica_timer->adjust(screen().time_until_pos(m_ica_height * 2, 0));
 }
 
 //-------------------------------------------------

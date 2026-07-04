@@ -31,11 +31,6 @@ starting point.
 `IV/Play <https://john-iv.github.io/iv-play/>`__ (Microsoft Windows)
     IV/Play has a customisable interface designed to be navigated with a
     keyboard.  It supports software lists and has flexible filtering.
-`Emu Loader <http://emuloader.mameworld.info/>`__ (Microsoft Windows)
-    Emu Loader provides a Windows interface for launching systems in multiple
-    emulators, including MAME, Supermodel and DEMUL.  Written in Delphi Pascal,
-    the source code is available
-    `on the download page <https://emuloader.mameworld.info/downloads.htm>`__.
 `Retrofire <https://e2j.net/downloads/>`__ (Japanese, Microsoft Windows)
     Provides a Japanese-language graphical interface for launching systems or
     software in MAME.

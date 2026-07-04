@@ -644,7 +644,7 @@ void mappy_state::superpac_main_map(address_map &map)
 	map(0x0000, 0x07ff).ram().w(FUNC(mappy_state::superpac_videoram_w)).share(m_videoram);
 	map(0x0800, 0x1fff).ram().share(m_spriteram);   // work RAM with embedded sprite RAM
 	map(0x2000, 0x2000).rw(FUNC(mappy_state::flipscreen_r), FUNC(mappy_state::flipscreen_w));
-	map(0x4000, 0x43ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));   // shared RAM with the sound CPU
+	map(0x4000, 0x43ff).m(m_namco_15xx, FUNC(namco_15xx_device::amap));   // shared RAM with the sound CPU
 	map(0x4800, 0x480f).rw(m_namcoio[0], FUNC(namcoio_device::read), FUNC(namcoio_device::write));   // custom I/O chips interface
 	map(0x4810, 0x481f).rw(m_namcoio[1], FUNC(namcoio_device::read), FUNC(namcoio_device::write));   // custom I/O chips interface
 	map(0x5000, 0x500f).w("mainlatch", FUNC(ls259_device::write_a0));   // various control bits
@@ -656,7 +656,7 @@ void phozon_state::main_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().w(FUNC(phozon_state::superpac_videoram_w)).share(m_videoram);  // video RAM
 	map(0x0800, 0x1fff).ram().share(m_spriteram);   // shared RAM with CPU #2/sprite RAM
-	map(0x4000, 0x43ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));   // shared RAM with the sound CPU
+	map(0x4000, 0x43ff).m(m_namco_15xx, FUNC(namco_15xx_device::amap));   // shared RAM with the sound CPU
 	map(0x4800, 0x480f).rw(m_namcoio[0], FUNC(namcoio_device::read), FUNC(namcoio_device::write));   // custom I/O chips interface
 	map(0x4810, 0x481f).rw(m_namcoio[1], FUNC(namcoio_device::read), FUNC(namcoio_device::write));   // custom I/O chips interface
 	map(0x5000, 0x500f).w("mainlatch", FUNC(ls259_device::write_a0));   // various control bits
@@ -669,7 +669,7 @@ void mappy_state::mappy_main_map(address_map &map)
 	map(0x0000, 0x0fff).ram().w(FUNC(mappy_state::mappy_videoram_w)).share(m_videoram);
 	map(0x1000, 0x27ff).ram().share(m_spriteram);   // work RAM with embedded sprite RAM
 	map(0x3800, 0x3fff).w(FUNC(mappy_state::mappy_scroll_w));   // scroll
-	map(0x4000, 0x43ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));   // shared RAM with the sound CPU
+	map(0x4000, 0x43ff).m(m_namco_15xx, FUNC(namco_15xx_device::amap));   // shared RAM with the sound CPU
 	map(0x4800, 0x480f).rw(m_namcoio[0], FUNC(namcoio_device::read), FUNC(namcoio_device::write));   // custom I/O chips interface
 	map(0x4810, 0x481f).rw(m_namcoio[1], FUNC(namcoio_device::read), FUNC(namcoio_device::write));   // custom I/O chips interface
 	map(0x5000, 0x500f).w("mainlatch", FUNC(ls259_device::write_a0));   // various control bits
@@ -679,14 +679,14 @@ void mappy_state::mappy_main_map(address_map &map)
 
 void mappy_state::superpac_sub_map(address_map &map)
 {
-	map(0x0000, 0x03ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));   // shared RAM with the main CPU (also sound registers)
+	map(0x0000, 0x03ff).m(m_namco_15xx, FUNC(namco_15xx_device::amap));   // shared RAM with the main CPU (also sound registers)
 	map(0x2000, 0x200f).w("mainlatch", FUNC(ls259_device::write_a0));   // various control bits
 	map(0xe000, 0xffff).rom();
 }
 
 void phozon_state::sub_map(address_map &map)
 {
-	map(0x0000, 0x03ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));   // shared RAM with the main CPU + sound registers
+	map(0x0000, 0x03ff).m(m_namco_15xx, FUNC(namco_15xx_device::amap));   // shared RAM with the main CPU + sound registers
 	map(0xe000, 0xffff).rom();
 }
 
@@ -696,7 +696,7 @@ void phozon_state::sub2_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().w(FUNC(phozon_state::superpac_videoram_w)).share(m_videoram);
 	map(0x0800, 0x1fff).ram().share(m_spriteram);   // shared RAM with CPU #2/sprite RAM
-	map(0x4000, 0x43ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));   // shared RAM with CPU #2
+	map(0x4000, 0x43ff).m(m_namco_15xx, FUNC(namco_15xx_device::amap));   // shared RAM with CPU #2
 	map(0xa000, 0xa7ff).ram();
 	map(0xe000, 0xffff).rom();
 }
@@ -1298,8 +1298,6 @@ void mappy_state::out_lamps(uint8_t data)
 
 void mappy_state::machine_start()
 {
-	m_leds.resolve();
-
 	m_namcoio_run_timer[0] = timer_alloc(FUNC(mappy_state::namcoio_run_timer<0>), this);
 	m_namcoio_run_timer[1] = timer_alloc(FUNC(mappy_state::namcoio_run_timer<1>), this);
 
@@ -1356,7 +1354,6 @@ void mappy_state::superpac_common(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	NAMCO_15XX(config, m_namco_15xx, MASTER_CLOCK/768);
-	m_namco_15xx->set_voices(8);
 	m_namco_15xx->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
@@ -1364,13 +1361,13 @@ void mappy_state::superpac(machine_config &config)
 {
 	superpac_common(config);
 
-	NAMCO_56XX(config, m_namcoio[0], 0);
+	NAMCO_56XX(config, m_namcoio[0]);
 	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
 	m_namcoio[0]->in_callback<1>().set_ioport("P1");
 	m_namcoio[0]->in_callback<2>().set_ioport("P2");
 	m_namcoio[0]->in_callback<3>().set_ioport("BUTTONS");
 
-	NAMCO_56XX(config, m_namcoio[1], 0);
+	NAMCO_56XX(config, m_namcoio[1]);
 	m_namcoio[1]->in_callback<0>().set("dipmux", FUNC(ls157_device::output_r));
 	m_namcoio[1]->in_callback<1>().set_ioport("DSW1");
 	m_namcoio[1]->in_callback<2>().set_ioport("DSW1").rshift(4);
@@ -1382,14 +1379,14 @@ void mappy_state::pacnpal(machine_config &config)
 {
 	superpac_common(config);
 
-	NAMCO_56XX(config, m_namcoio[0], 0);
+	NAMCO_56XX(config, m_namcoio[0]);
 	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
 	m_namcoio[0]->in_callback<1>().set_ioport("P1");
 	m_namcoio[0]->in_callback<2>().set_ioport("P2");
 	m_namcoio[0]->in_callback<3>().set_ioport("BUTTONS");
 	m_namcoio[0]->out_callback<0>().set(FUNC(mappy_state::out_lamps));
 
-	NAMCO_59XX(config, m_namcoio[1], 0);
+	NAMCO_59XX(config, m_namcoio[1]);
 	m_namcoio[1]->in_callback<0>().set("dipmux", FUNC(ls157_device::output_r));
 	m_namcoio[1]->in_callback<1>().set_ioport("DSW1");
 	m_namcoio[1]->in_callback<2>().set_ioport("DSW1").rshift(4);
@@ -1401,13 +1398,13 @@ void mappy_state::grobda(machine_config &config)
 {
 	superpac_common(config);
 
-	NAMCO_58XX(config, m_namcoio[0], 0);
+	NAMCO_58XX(config, m_namcoio[0]);
 	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
 	m_namcoio[0]->in_callback<1>().set_ioport("P1");
 	m_namcoio[0]->in_callback<2>().set_ioport("P2");
 	m_namcoio[0]->in_callback<3>().set_ioport("BUTTONS");
 
-	NAMCO_56XX(config, m_namcoio[1], 0);
+	NAMCO_56XX(config, m_namcoio[1]);
 	m_namcoio[1]->in_callback<0>().set("dipmux", FUNC(ls157_device::output_r));
 	m_namcoio[1]->in_callback<1>().set_ioport("DSW1");
 	m_namcoio[1]->in_callback<2>().set_ioport("DSW1").rshift(4);
@@ -1441,13 +1438,13 @@ void phozon_state::phozon(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));    // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
-	NAMCO_58XX(config, m_namcoio[0], 0);
+	NAMCO_58XX(config, m_namcoio[0]);
 	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
 	m_namcoio[0]->in_callback<1>().set_ioport("P1");
 	m_namcoio[0]->in_callback<2>().set_ioport("P2");
 	m_namcoio[0]->in_callback<3>().set_ioport("BUTTONS");
 
-	NAMCO_56XX(config, m_namcoio[1], 0);
+	NAMCO_56XX(config, m_namcoio[1]);
 	m_namcoio[1]->in_callback<0>().set("dipmux", FUNC(ls157_device::output_r));
 	m_namcoio[1]->in_callback<1>().set_ioport("DSW1");
 	m_namcoio[1]->in_callback<2>().set_ioport("DSW1").rshift(4);
@@ -1472,7 +1469,6 @@ void phozon_state::phozon(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	NAMCO_15XX(config, m_namco_15xx, MASTER_CLOCK/768);
-	m_namco_15xx->set_voices(8);
 	m_namco_15xx->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
@@ -1518,7 +1514,6 @@ void mappy_state::mappy_common(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	NAMCO_15XX(config, m_namco_15xx, MASTER_CLOCK/768);
-	m_namco_15xx->set_voices(8);
 	m_namco_15xx->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
@@ -1526,13 +1521,13 @@ void mappy_state::mappy(machine_config &config)
 {
 	mappy_common(config);
 
-	NAMCO_58XX(config, m_namcoio[0], 0);
+	NAMCO_58XX(config, m_namcoio[0]);
 	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
 	m_namcoio[0]->in_callback<1>().set_ioport("P1");
 	m_namcoio[0]->in_callback<2>().set_ioport("P2");
 	m_namcoio[0]->in_callback<3>().set_ioport("BUTTONS");
 
-	NAMCO_58XX(config, m_namcoio[1], 0);
+	NAMCO_58XX(config, m_namcoio[1]);
 	m_namcoio[1]->in_callback<0>().set("dipmux", FUNC(ls157_device::output_r));
 	m_namcoio[1]->in_callback<1>().set_ioport("DSW1");
 	m_namcoio[1]->in_callback<2>().set_ioport("DSW1").rshift(4);
@@ -1546,13 +1541,13 @@ void mappy_state::digdug2(machine_config &config)
 
 	subdevice<watchdog_timer_device>("watchdog")->set_vblank_count("screen", 0);
 
-	NAMCO_58XX(config, m_namcoio[0], 0);
+	NAMCO_58XX(config, m_namcoio[0]);
 	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
 	m_namcoio[0]->in_callback<1>().set_ioport("P1");
 	m_namcoio[0]->in_callback<2>().set_ioport("P2");
 	m_namcoio[0]->in_callback<3>().set_ioport("BUTTONS");
 
-	NAMCO_56XX(config, m_namcoio[1], 0);
+	NAMCO_56XX(config, m_namcoio[1]);
 	m_namcoio[1]->in_callback<0>().set("dipmux", FUNC(ls157_device::output_r));
 	m_namcoio[1]->in_callback<1>().set_ioport("DSW1");
 	m_namcoio[1]->in_callback<2>().set_ioport("DSW1").rshift(4);
@@ -1573,14 +1568,14 @@ void mappy_state::motos(machine_config &config)
 {
 	mappy_common(config);
 
-	NAMCO_56XX(config, m_namcoio[0], 0);
+	NAMCO_56XX(config, m_namcoio[0]);
 	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
 	m_namcoio[0]->in_callback<1>().set_ioport("P1");
 	m_namcoio[0]->in_callback<2>().set_ioport("P2");
 	m_namcoio[0]->in_callback<3>().set_ioport("BUTTONS");
 	m_namcoio[0]->out_callback<0>().set(FUNC(mappy_state::out_lamps));
 
-	NAMCO_56XX(config, m_namcoio[1], 0);
+	NAMCO_56XX(config, m_namcoio[1]);
 	m_namcoio[1]->in_callback<0>().set("dipmux", FUNC(ls157_device::output_r));
 	m_namcoio[1]->in_callback<1>().set_ioport("DSW1");
 	m_namcoio[1]->in_callback<2>().set_ioport("DSW1").rshift(4);

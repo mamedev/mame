@@ -50,6 +50,8 @@
 
 #include <cfloat>
 #include <cmath>
+#include <locale>
+#include <sstream>
 
 
 // This array *must* stay in order, it's binary-searched
@@ -176,6 +178,7 @@ const double XTAL::known_xtals[] = {
 	  9'600'000, // 9.6_MHz_XTAL           WD37C65 second clock (for 300 KB/sec rate)
 	  9'732'000, // 9.732_MHz_XTAL         CTA Invader
 	  9'828'000, // 9.828_MHz_XTAL         Universal PCBs
+	  9'830'000, // 9.83_MHz_XTAL          Luna 68k timer/serial
 	  9'830'400, // 9.8304_MHz_XTAL        Epson PX-8
 	  9'832'000, // 9.832_MHz_XTAL         Robotron A7150
 	  9'877'680, // 9.87768_MHz_XTAL       Microterm 420
@@ -219,6 +222,7 @@ const double XTAL::known_xtals[] = {
 	 12'292'000, // 12.292_MHz_XTAL        Northwest Digitial Systems GP-19
 	 12'324'000, // 12.324_MHz_XTAL        Otrona Attache
 	 12'335'600, // 12.3356_MHz_XTAL       RasterOps ColorBoard 264 (~784x NTSC line rate)
+	 12'440'000, // 12.44_MHz_XTAL         Status casino / trivia games
 	 12'472'500, // 12.4725_MHz_XTAL       Bonanza's Mini Boy 7
 	 12'480'000, // 12.48_MHz_XTAL         TRS-80 Model II
 	 12'500'000, // 12.5_MHz_XTAL          Red Alert audio board
@@ -458,7 +462,8 @@ const double XTAL::known_xtals[] = {
 	 36'000'000, // 36_MHz_XTAL            Sega Model 1 video board
 	 36'864'000, // 36.864_MHz_XTAL        Unidesa Cirsa Rock 'n' Roll
 	 37'980'000, // 37.98_MHz_XTAL         Falco 5220
-	 38'769'220, // 38.76922_MHz_XTAL      Namco System 21 video board
+	 38'769'220, // 38.76922_MHz_XTAL      Namco System 21 video board (C67 / Driver's Eyes)
+	 38'808'000, // 38.808_MHz_XTAL        Namco System 21 video board (Winning Run)
 	 38'863'630, // 38.86363_MHz_XTAL      Sharp X68000 15.98kHz video
 	 39'321'600, // 39.3216_MHz_XTAL       Sun 2/120
 	 39'710'000, // 39.71_MHz_XTAL         Wyse WY-60 132-column display clock
@@ -472,6 +477,7 @@ const double XTAL::known_xtals[] = {
 	 44'000'000, // 44_MHz_XTAL            VGame slots
 	 44'100'000, // 44.1_MHz_XTAL          Subsino's Bishou Jan
 	 44'236'800, // 44.2368_MHz_XTAL       ReCo6502, Fortune 32:16
+	 44'444'000, // 44.444_MHz_XTAL        Zilog System 8000 CPU boards
 	 44'452'800, // 44.4528_MHz_XTAL       TeleVideo 965
 	 44'900'000, // 44.9_MHz_XTAL          IBM 8514 1024x768 43.5Hz graphics
 	 45'000'000, // 45_MHz_XTAL            Eolith with Hyperstone CPUs
@@ -595,25 +601,21 @@ bool XTAL::validate(double base_clock)
 	return false;
 }
 
-void XTAL::validate(const char *message) const
+void XTAL::validate(std::string_view message) const
 {
 	if(!validate(m_base_clock))
 		fail(m_base_clock, message);
 }
 
-void XTAL::validate(const std::string &message) const
+void XTAL::fail(double base_clock, std::string_view message)
 {
-	if(!validate(m_base_clock))
-		fail(m_base_clock, message);
-}
-
-void XTAL::fail(double base_clock, const std::string &message)
-{
-	std::string full_message = util::string_format("Unknown crystal value %.0f. ", base_clock);
+	std::ostringstream full_message;
+	full_message.imbue(std::locale::classic());
+	util::stream_format(full_message, "Unknown crystal value %.0f. ", base_clock);
 	if(xtal_error_low && xtal_error_high)
-		full_message += util::string_format(" Did you mean %.0f or %.0f?", xtal_error_low, xtal_error_high);
+		util::stream_format(full_message, " Did you mean %.0f or %.0f?", xtal_error_low, xtal_error_high);
 	else
-		full_message += util::string_format(" Did you mean %.0f?", xtal_error_low ? xtal_error_low : xtal_error_high);
-	full_message += util::string_format(" Context: %s\n", message);
-	fatalerror("%s\n", full_message);
+		util::stream_format(full_message, " Did you mean %.0f?", xtal_error_low ? xtal_error_low : xtal_error_high);
+	util::stream_format(full_message, " Context: %s\n", message);
+	fatalerror("%s", std::move(full_message).str());
 }

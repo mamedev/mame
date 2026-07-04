@@ -19,8 +19,10 @@
 #include "scsi_acorn.h"
 
 #include "bus/nscsi/devices.h"
-#include "machine/upd71071.h"
+#include "machine/am9517a.h"
 #include "machine/wd33c9x.h"
+
+#include "endianness.h"
 
 
 namespace {
@@ -42,7 +44,7 @@ protected:
 	arc_scsi_aka30_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 		: device_t(mconfig, type, tag, owner, clock)
 		, device_archimedes_podule_interface(mconfig, *this)
-		, m_wd33c93(*this, "scsi:7:wd33c93a")
+		, m_wd33c93(*this, "wd33c93a")
 		, m_dmac(*this, "dma")
 		, m_podule_rom(*this, "podule_rom")
 		, m_memory_page(0)
@@ -68,6 +70,9 @@ private:
 	required_device<wd33c93a_device> m_wd33c93;
 	required_device<upd71071_device> m_dmac;
 	required_memory_region m_podule_rom;
+
+	u8 dma_ram_r(offs_t offset);
+	void dma_ram_w(offs_t offset, u8 data);
 
 	void update_interrupts();
 
@@ -171,13 +176,24 @@ const tiny_rom_entry *arc_scsi_aka32_device::device_rom_region() const
 }
 
 
+u8 arc_scsi_aka30_device::dma_ram_r(offs_t offset)
+{
+	return util::little_endian_cast<u8>(m_podule_ram.get())[offset & 0xffff];
+}
+
+void arc_scsi_aka30_device::dma_ram_w(offs_t offset, u8 data)
+{
+	util::little_endian_cast<u8>(m_podule_ram.get())[offset & 0xffff] = data;
+}
+
+
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 void arc_scsi_aka30_device::device_add_mconfig(machine_config &config)
 {
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr, false);
@@ -185,20 +201,19 @@ void arc_scsi_aka30_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("wd33c93a", WD33C93A).clock(DERIVED_CLOCK(1, 1))
-		.machine_config([this](device_t *device)
-		{
-			wd33c93a_device &wd33c93(downcast<wd33c93a_device &>(*device));
-			wd33c93.irq_cb().set([this](int state) { m_sbic_int = state; update_interrupts(); });
-			wd33c93.drq_cb().set([this](int state) { m_dmac->dmarq(state, 0); });
-		});
 
-	UPD71071(config, m_dmac, 0);
-	m_dmac->set_cpu_tag(":maincpu");
-	m_dmac->set_clock(DERIVED_CLOCK(1, 1));
+	WD33C93A(config, m_wd33c93, DERIVED_CLOCK(1, 1));
+	scsi.set_external_device(7, m_wd33c93);
+	m_wd33c93->irq_cb().set([this](int state) { m_sbic_int = state; update_interrupts(); });
+	m_wd33c93->drq_cb().set(m_dmac, FUNC(upd71071_device::dreq0_w));
+
+	UPD71071(config, m_dmac, DERIVED_CLOCK(1, 1));
+	m_dmac->in_memr_callback().set(FUNC(arc_scsi_aka30_device::dma_ram_r));
+	m_dmac->out_memw_callback().set(FUNC(arc_scsi_aka30_device::dma_ram_w));
 	m_dmac->out_eop_callback().set([this](int state) { m_dmac_int = state; update_interrupts(); });
-	m_dmac->dma_read_callback<0>().set(m_wd33c93, FUNC(wd33c93a_device::dma_r));
-	m_dmac->dma_write_callback<0>().set(m_wd33c93, FUNC(wd33c93a_device::dma_w));
+	m_dmac->in_ior_callback<0>().set(m_wd33c93, FUNC(wd33c93a_device::dma_r));
+	m_dmac->out_iow_callback<0>().set(m_wd33c93, FUNC(wd33c93a_device::dma_w));
+	m_dmac->out_hreq_callback().set(m_dmac, FUNC(upd71071_device::hack_w));
 }
 
 

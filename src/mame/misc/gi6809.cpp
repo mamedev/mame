@@ -119,16 +119,17 @@ public:
 		m_sound_bit3(*this, "sound_nl:bit3")
 	{ }
 
-	void castawayt(machine_config &config);
-	void glck6809(machine_config &config);
-	void jesterch(machine_config &config);
-	void init_cast();
+	void castawayt(machine_config &config) ATTR_COLD;
+	void glck6809(machine_config &config) ATTR_COLD;
+	void jesterch(machine_config &config) ATTR_COLD;
+
+	void init_cast() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void gi6809_base(machine_config &config);
+	void gi6809_base(machine_config &config) ATTR_COLD;
 
 private:
 
@@ -437,7 +438,7 @@ static INPUT_PORTS_START( glck6809 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 )     PORT_NAME("Supervisor Key")  PORT_TOGGLE  // Full Menu.
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )     PORT_NAME("Attendant Key")   PORT_TOGGLE  // Partial Menu.
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve Machine") PORT_CODE(KEYCODE_8)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR ) PORT_NAME("Door - Att Menu") PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_DOOR )        PORT_NAME("Door - Att Menu") PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -491,9 +492,9 @@ static INPUT_PORTS_START( castawayt )
 	PORT_INCLUDE( glck6809 )
 
 	PORT_MODIFY("IN0-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 )      PORT_NAME("Accountancy Key")  PORT_TOGGLE
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )         PORT_NAME("Reserve / Test Menu (Accountancy) / Back (Test Menu)") PORT_CODE(KEYCODE_8)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR )  PORT_NAME("Door - Test Menu")  PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Accountancy Key")  PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )    PORT_NAME("Reserve / Test Menu (Accountancy) / Back (Test Menu)") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_DOOR )    PORT_NAME("Door - Test Menu")  PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("IN0-1")
@@ -595,7 +596,6 @@ GFXDECODE_END
 void gi6809_state::machine_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gi6809_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_lamps.resolve();
 }
 
 /*********************************************
@@ -654,13 +654,13 @@ void gi6809_state::glck6809(machine_config &config)
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 
-	PIA6821(config, m_pia[0], 0);  // controlled by slave
+	PIA6821(config, m_pia[0]);  // controlled by slave
 	m_pia[0]->readpa_handler().set_ioport("PIA0_A");
 	m_pia[0]->writepb_handler().set(FUNC(gi6809_state::lamps5_w));
 	m_pia[0]->ca2_handler().set_nop();
 	m_pia[0]->cb2_handler().set_nop();
 
-	PIA6821(config, m_pia[1], 0);  // controlled by master
+	PIA6821(config, m_pia[1]);  // controlled by master
 	m_pia[1]->writepa_handler().set(FUNC(gi6809_state::snd_mux_w));
 	m_pia[1]->readpb_handler().set(FUNC(gi6809_state::gi6809_mux_port_r));
 	m_pia[1]->writepb_handler().set(FUNC(gi6809_state::lamps3_w));
@@ -688,13 +688,13 @@ void gi6809_state::castawayt(machine_config &config)
 	m_crtc->out_vsync_callback().set(m_pia[1], FUNC(pia6821_device::cb1_w));
 	m_crtc->out_vsync_callback().append([this](u8 state) { m_pia[1]->read(1); });
 
-	PIA6821(config, m_pia[0], 0);  // DDRA:00 (All In) - DDRB:FF (All Out)
+	PIA6821(config, m_pia[0]);  // DDRA:00 (All In) - DDRB:FF (All Out)
 	m_pia[0]->readpa_handler().set_ioport("PIA0_A");
 	m_pia[0]->writepb_handler().set(FUNC(gi6809_state::lamps8_w));
 	m_pia[0]->readca1_handler().set(m_crtc, FUNC(mc6845_device::vsync_r));
 	m_pia[0]->ca2_handler().set_nop();
 
-	PIA6821(config, m_pia[1], 0);  // DDRA:FF (All Out) - DDRB:EO (OOOI-IIII)
+	PIA6821(config, m_pia[1]);  // DDRA:FF (All Out) - DDRB:EO (OOOI-IIII)
 	m_pia[1]->writepa_handler().set(FUNC(gi6809_state::snd_mux_w));
 	m_pia[1]->readpb_handler().set(FUNC(gi6809_state::gi6809_mux_port_r));
 	m_pia[1]->writepb_handler().set(FUNC(gi6809_state::lamps3h_w));
@@ -727,14 +727,14 @@ void gi6809_state::jesterch(machine_config &config)
 	m_crtc->out_vsync_callback().append(m_pia[0], FUNC(pia6821_device::ca1_w));
 	m_crtc->out_vsync_callback().append([this](u8 state) { m_pia[1]->ca1_w(!state); });
 
-	PIA6821(config, m_pia[0], 0);  // DDRA:00 (All In) - DDRB:1F (IIIO-OOOO)
+	PIA6821(config, m_pia[0]);  // DDRA:00 (All In) - DDRB:1F (IIIO-OOOO)
 	m_pia[0]->readpa_handler().set_ioport("PIA0_A");
 	m_pia[0]->writepb_handler().set(FUNC(gi6809_state::lamps5_w));
 	m_pia[0]->irqa_handler().set_inputline(m_slavecpu, M6809_IRQ_LINE);
 	m_pia[0]->ca2_handler().set_nop();
 	m_pia[0]->cb2_handler().set_nop();
 
-	PIA6821(config, m_pia[1], 0);  // DDRA:FF (All Out) - DDRB:EO (OOOI-IIII)
+	PIA6821(config, m_pia[1]);  // DDRA:FF (All Out) - DDRB:EO (OOOI-IIII)
 	m_pia[1]->writepa_handler().set(FUNC(gi6809_state::snd_mux_w));
 	m_pia[1]->readpb_handler().set(FUNC(gi6809_state::gi6809_mux_port_r));
 	m_pia[1]->writepb_handler().set(FUNC(gi6809_state::lamps3_w));

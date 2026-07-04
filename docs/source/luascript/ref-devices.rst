@@ -152,6 +152,10 @@ device:memregion(tag)
 device:ioport(tag)
     Gets an :ref:`I/O port <luascript-ref-ioport>` by tag relative to the
     device, or ``nil`` if no such I/O port exists.
+device:output(name)
+    Gets an :ref:`output proxy <luascript-ref-outputproxy>` for the output with
+    the specified name relative to the device.  Note that the output will not be
+    created if it does not exist.
 device:subdevice(tag)
     Gets a device by tag relative to the device.
 device:siblingdevice(tag)
@@ -457,6 +461,67 @@ screen.palette (read-only)
     The :ref:`palette device <luascript-ref-dipalette>` used to translate pixel
     values to colours, or ``nil`` if the screen uses a direct colour pixel
     format.
+
+
+.. _luascript-ref-vectordev:
+
+Vector device
+-------------
+
+Wraps MAME’s ``vector_device`` class, which represents an emulated X/Y vector display.
+
+Instantiation
+~~~~~~~~~~~~~
+
+manager.machine.vector_devices[tag]
+    Gets a vector device by tag relative to the root machine device, or ``nil``
+    if no such device exists or it is not a vector device.
+
+Base classes
+~~~~~~~~~~~~
+
+* :ref:`luascript-ref-device`
+
+Methods
+~~~~~~~
+
+vector:add_frame_begin_notifier(callback)
+    Add a callback to receive notifications when the processing of vectors
+    begins.  The callback is not passed any arguments.
+    Returns a :ref:`notifier subscription <luascript-ref-notifiersub>`.
+vector:add_frame_end_notifier(callback)
+    Add a callback to receive notifications when the processing of vectors
+    begins.  The callback is not passed any arguments.
+    Returns a :ref:`notifier subscription <luascript-ref-notifiersub>`.
+vector:add_line_notifier(callback)
+    Add a callback to receive notifications when the vector beam moves
+    between two points with a non-zero beam intensity.  The callback is
+    passed the following arguments, in order:  
+    
+    - **lastx:** The old horizontal beam position.
+    - **lasty:** The old vertical beam position.
+    - **x:** The current horizontal beam position.
+    - **y:** The current vertical beam position.
+    - **color:** The beam color, as a 24-bit RGB value.
+    - **intensity:** The beam intensity, as an 8-bit value.
+    - **width:** The configured pixel width of the virtual vector display.
+    - **height:** The configured pixel width of the virtual vector display.
+    
+    Returns a :ref:`notifier subscription <luascript-ref-notifiersub>`.
+vector:add_move_notifier(callback)
+    Add a callback to receive notifications when the vector beam moves
+    with an intensity of zero.  Provided as a convenience feature as
+    the previous position and intensity of the beam is not meaningful
+    when "jumping" the vector beam.  The callback is passed the following
+    arguments, in order:  
+    
+    - **x:** The current horizontal beam position.
+    - **y:** The current vertical beam position.
+    - **color:** The beam color, as a 24-bit RGB value.
+    - **width:** The configured pixel width of the virtual vector display.
+    - **height:** The configured pixel width of the virtual vector display.
+    
+    Returns a :ref:`notifier subscription <luascript-ref-notifiersub>`.
 
 
 .. _luascript-ref-cassdev:

@@ -478,7 +478,7 @@ void okean240_state::okean240t(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &okean240_state::okean240_io);
 	m_maincpu->in_inta_func().set("pic", FUNC(pic8259_device::acknowledge));
 
-	i8251_device &uart(I8251(config, "uart", 0));
+	i8251_device &uart(I8251(config, "uart"));
 	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	uart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -499,12 +499,12 @@ void okean240_state::okean240t(machine_config &config)
 	i8255_device &ppie(I8255(config, "ppie"));
 	ppie.out_pc_callback().set(FUNC(okean240_state::okean240_porte2_w));
 
-	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit8253_device &pit(PIT8253(config, "pit"));
 	pit.set_clk<1>(3072000); // artificial rate
 	pit.out_handler<1>().set("uart", FUNC(i8251_device::write_txc));
 	pit.out_handler<1>().append("uart", FUNC(i8251_device::write_rxc));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	/* video hardware */
@@ -538,7 +538,7 @@ void okean240_state::okean240(machine_config &config)
 	okean240t(config);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_okean240);
 	subdevice<rs232_port_device>("rs232")->set_default_option(nullptr); // not used for keyboard
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(okean240_state::kbd_put));
 }
 

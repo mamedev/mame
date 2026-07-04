@@ -1135,7 +1135,7 @@ void bullet_state::bullet(machine_config &config)
 	m_dart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	Z80DMA(config, m_dmac, 16_MHz_XTAL / 4);
-	m_dmac->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dmac->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_dmac->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_dmac->in_mreq_callback().set(FUNC(bullet_state::dma_mreq_r));
 	m_dmac->out_mreq_callback().set(FUNC(bullet_state::dma_mreq_w));
@@ -1217,7 +1217,7 @@ void bulletf_state::bulletf(machine_config &config)
 	m_dart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	Z80DMA(config, m_dmac, 16_MHz_XTAL / 4);
-	m_dmac->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dmac->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_dmac->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_dmac->in_mreq_callback().set(FUNC(bullet_state::dma_mreq_r));
 	m_dmac->out_mreq_callback().set(FUNC(bullet_state::dma_mreq_w));
@@ -1258,7 +1258,7 @@ void bulletf_state::bulletf(machine_config &config)
 	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
 	rs232b.rxd_handler().set(m_dart, FUNC(z80dart_device::rxb_w));
 
-	SCSI_PORT(config, m_scsibus, 0);
+	SCSI_PORT(config, m_scsibus);
 	m_scsibus->bsy_handler().set(m_scsi_ctrl_in, FUNC(input_buffer_device::write_bit3));
 	m_scsibus->msg_handler().set(m_scsi_ctrl_in, FUNC(input_buffer_device::write_bit4));
 	m_scsibus->cd_handler().set(m_scsi_ctrl_in, FUNC(input_buffer_device::write_bit5));

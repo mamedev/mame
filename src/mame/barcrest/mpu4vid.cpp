@@ -199,6 +199,8 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 #include "crmaze2p.lh"
 #include "crmaze4p.lh"
 #include "v4addlad.lh"
@@ -612,7 +614,7 @@ INPUT_PORTS_START( mpu4vid )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER)   PORT_NAME("20")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox (Back) Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_DOOR)    PORT_NAME("Cashbox (Back) Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
 
 	PORT_START("BLACK2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("24")
@@ -931,7 +933,7 @@ static INPUT_PORTS_START( bwbvid )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_CUSTOM)  // Prize Shelf Opto
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox (Back) Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_DOOR)    PORT_NAME("Cashbox (Back) Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
 
 	PORT_START("BLACK2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Button 1")
@@ -1200,7 +1202,7 @@ static INPUT_PORTS_START( v4big40 )
 	PORT_BIT(0x10, IP_ACTIVE_LOW,  IPT_CUSTOM)  // Prize Shelf Opto
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox (Back) Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_DOOR) PORT_NAME("Cashbox (Back) Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
 
 	PORT_MODIFY("BLACK2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Cancel/Collect")
@@ -1799,7 +1801,7 @@ static INPUT_PORTS_START( v4timebn )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_CUSTOM)  // Prize Shelf Opto
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox (Back) Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_DOOR) PORT_NAME("Cashbox (Back) Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
 
 	PORT_MODIFY("BLACK2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Collect")
@@ -2131,12 +2133,12 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 	saa.add_route(0, "speaker", 0.5, 0);
 	saa.add_route(1, "speaker", 0.5, 1);
 
-	ACIA6850(config, m_acia_0, 0);
+	ACIA6850(config, m_acia_0);
 	m_acia_0->txd_handler().set("acia6850_1", FUNC(acia6850_device::write_rxd));
 	m_acia_0->rts_handler().set("acia6850_1", FUNC(acia6850_device::write_dcd));
 	m_acia_0->irq_handler().set(FUNC(mpu4vid_state::m6809_acia_irq));
 
-	ACIA6850(config, m_acia_1, 0);
+	ACIA6850(config, m_acia_1);
 	m_acia_1->txd_handler().set("acia6850_0", FUNC(acia6850_device::write_rxd));
 	m_acia_1->rts_handler().set("acia6850_0", FUNC(acia6850_device::write_dcd));
 	m_acia_1->irq_handler().set(FUNC(mpu4vid_state::m68k_acia_irq));
@@ -2145,7 +2147,7 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 void mpu4vid_state::mpu4_vid_cheatchr(machine_config &config)
 {
 	mpu4_vid(config);
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser);
 	m_characteriser->set_cpu_tag("video");
 	m_characteriser->set_allow_68k_cheat(true);
 }
@@ -2155,7 +2157,7 @@ void mpu4vid_state::mpu4_vid_strike(machine_config& config)
 	mpu4_vid(config);
 	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4_68k_map_strike);
 
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser);
 	m_characteriser->set_use_4k_table_sim(true);
 }
 
@@ -2174,7 +2176,7 @@ void mpu4vid_state::crmaze_base(machine_config &config)
 void mpu4vid_state::crmaze(machine_config& config)
 {
 	crmaze_base(config);
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser);
 	m_characteriser->set_cpu_tag("video");
 	m_characteriser->set_allow_68k_cheat(true);
 

@@ -24,7 +24,9 @@
 
 #include <algorithm>
 #include <cstdarg>
+#include <cstdio>
 #include <set>
+#include <span>
 
 
 #define LOG_LOAD 0
@@ -154,9 +156,10 @@ std::vector<std::string> make_software_searchpath(software_list_device &swlist, 
 }
 
 
+template <typename T>
 std::error_condition do_open_disk(
 		emu_options const &options,
-		std::initializer_list<std::reference_wrapper<std::vector<std::string> const> > searchpath,
+		T &&searchpath,
 		rom_entry const *romp,
 		chd_file &chd,
 		std::function<rom_entry const * ()> next_parent,
@@ -179,7 +182,7 @@ std::error_condition do_open_disk(
 			{
 				imgfile.reset(new emu_file(options.media_path(), paths, OPEN_FLAG_READ));
 				imgfile->set_restrict_to_mediapath(1);
-				std::error_condition const filerr(imgfile->open(filename, OPEN_FLAG_READ));
+				std::error_condition const filerr(imgfile->open(filename));
 				if (!filerr)
 					break;
 				else
@@ -241,7 +244,7 @@ auto open_parent_disk(
 		std::function<rom_entry const * ()> const &next_parent)
 {
 	return
-			[&options, searchpath, next_parent] (util::sha1_t const &sha1) -> std::unique_ptr<chd_file>
+			[&options, sp = std::vector(searchpath), next_parent] (util::sha1_t const &sha1) -> std::unique_ptr<chd_file>
 			{
 				util::hash_collection hashes;
 				hashes.add_sha1(sha1);
@@ -261,7 +264,7 @@ auto open_parent_disk(
 								if (util::hash_collection(romp->hashdata()) == hashes)
 								{
 									std::unique_ptr<chd_file> chd(new chd_file);
-									if (!do_open_disk(options, searchpath, romp, *chd, next_parent, nullptr))
+									if (!do_open_disk(options, sp, romp, *chd, next_parent, nullptr))
 										return chd;
 								}
 								romp = rom_next_file(romp);
@@ -948,7 +951,7 @@ void rom_load_manager::fill_rom_data(memory_region &region, const rom_entry *rom
 	u8 fill_byte = u8(strtol(romp->hashdata().c_str(), nullptr, 0));
 
 	// fill the data (filling value is stored in place of the hashdata)
-	if(skip != 0)
+	if (skip != 0)
 	{
 		for (int i = 0; i < numbytes; i+= skip + 1)
 			base[i] = fill_byte;
@@ -1272,9 +1275,9 @@ std::error_condition rom_load_manager::open_disk_image(
 		next_parent = next_parent_system(driver->system());
 	else
 		next_parent = next_parent_device(device, options);
-	chd_file::open_parent_func open_parent(open_parent_disk(options, { searchpath }, next_parent));
+	chd_file::open_parent_func open_parent(open_parent_disk(options, { std::cref(searchpath) }, next_parent));
 	std::error_condition const err(
-			do_open_disk(options, { searchpath }, romp, image_chd, std::move(next_parent), open_parent));
+			do_open_disk(options, std::span(&searchpath, 1), romp, image_chd, std::move(next_parent), open_parent));
 	if (!err && image_chd.parent_missing())
 		return chd_file::error::REQUIRES_PARENT;
 	else
@@ -1298,9 +1301,9 @@ std::error_condition rom_load_manager::open_disk_image(
 	std::vector<std::string> searchpath(make_software_searchpath(swlist, swinfo, parents));
 	searchpath.emplace_back(swlist.list_name()); // look for loose disk images in software list directory
 	std::function<const rom_entry * ()> next_parent(next_parent_software(parents));
-	chd_file::open_parent_func open_parent(open_parent_disk(options, { searchpath }, next_parent));
+	chd_file::open_parent_func open_parent(open_parent_disk(options, { std::cref(searchpath) }, next_parent));
 	std::error_condition const err(
-			do_open_disk(options, { searchpath }, romp, image_chd, std::move(next_parent), open_parent));
+			do_open_disk(options, std::span(&searchpath, 1), romp, image_chd, std::move(next_parent), open_parent));
 	if (!err && image_chd.parent_missing())
 		return chd_file::error::REQUIRES_PARENT;
 	else
@@ -1365,7 +1368,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 
 	std::vector<const software_info *> parents;
 	std::vector<std::string> swsearch, disksearch;
-	const software_info *const swinfo = swlist.find(std::string(swname));
+	const software_info *const swinfo = swlist.find(swname);
 	if (swinfo)
 	{
 		// display a warning for unsupported software
@@ -1451,9 +1454,9 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 					next_parent = next_parent_software(parents);
 				else
 					next_parent = [] () { return nullptr; };
-				open_parent = open_parent_disk(machine().options(), { swsearch, disksearch }, next_parent);
+				open_parent = open_parent_disk(machine().options(), { std::cref(swsearch), std::cref(disksearch) }, next_parent);
 			}
-			process_disk_entries({ swsearch, disksearch }, regiontag, region + 1, next_parent, open_parent);
+			process_disk_entries({ std::cref(swsearch), std::cref(disksearch) }, regiontag, region + 1, next_parent, open_parent);
 		}
 	}
 
@@ -1528,9 +1531,9 @@ void rom_load_manager::process_region_list()
 						next_parent = next_parent_system(driver->system());
 					else
 						next_parent = next_parent_device(device, machine().options());
-					open_parent = open_parent_disk(machine().options(), { searchpath }, next_parent);
+					open_parent = open_parent_disk(machine().options(), { std::cref(searchpath) }, next_parent);
 				}
-				process_disk_entries({ searchpath }, regiontag, region + 1, next_parent, open_parent);
+				process_disk_entries({ std::cref(searchpath) }, regiontag, region + 1, next_parent, open_parent);
 			}
 		}
 	}

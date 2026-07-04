@@ -6,6 +6,8 @@
 
 #include "elan_eu3a05_soc.h"
 
+#include "multibyte.h"
+
 // DMA size and destination are 16-bit here, they're 24-bit on EU3A14
 
 DEFINE_DEVICE_TYPE(ELAN_EU3A05_SYS, elan_eu3a05sys_device, "elan_eu3a05sys", "Elan EU3A05 System")
@@ -88,9 +90,9 @@ void elan_eu3a05sys_device::elan_eu3a05_dmatrg_w(uint8_t data)
 
 	if (data)
 	{
-		int src = (m_dmaparams[0]) | (m_dmaparams[1] << 8) | (m_dmaparams[2] << 16);
-		uint16_t dest = m_dmaparams[3] | (m_dmaparams[4] << 8);
-		uint16_t size = m_dmaparams[5] | (m_dmaparams[6] << 8);
+		unsigned src = get_u24le(&m_dmaparams[0]);
+		uint16_t dest = get_u16le(&m_dmaparams[3]);
+		uint16_t size = get_u16le(&m_dmaparams[5]);
 
 		logerror(" Doing DMA %06x to %04x size %04x\n", src, dest, size);
 

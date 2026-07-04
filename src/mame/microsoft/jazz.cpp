@@ -111,7 +111,7 @@ public:
 		, m_vram(*this, "vram")
 		, m_mct_adr(*this, "mct_adr")
 		, m_scsibus(*this, "scsi")
-		, m_scsi(*this, "scsi:7:ncr53cf94")
+		, m_scsi(*this, "ncr53cf94")
 		, m_fdc(*this, "fdc")
 		, m_rtc(*this, "rtc")
 		, m_nvram(*this, "nvram")
@@ -131,7 +131,6 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 	// address maps
@@ -139,15 +138,15 @@ protected:
 	void mct_map(address_map &map) ATTR_COLD;
 
 	// machine config
-	void jazz(machine_config &config);
+	void jazz(machine_config &config) ATTR_COLD;
 
 	void led_w(u8 data);
 
 public:
-	void mmr4000be(machine_config &config);
-	void mmr4000le(machine_config &config);
+	void mmr4000be(machine_config &config) ATTR_COLD;
+	void mmr4000le(machine_config &config) ATTR_COLD;
 
-	void init_common();
+	void init_common() ATTR_COLD;
 
 protected:
 	// devices
@@ -173,11 +172,6 @@ protected:
 
 	output_finder<> m_led;
 };
-
-void jazz_state::machine_start()
-{
-	m_led.resolve();
-}
 
 void jazz_state::machine_reset()
 {
@@ -293,7 +287,7 @@ void jazz_state::jazz(machine_config &config)
 	m_vram->set_default_value(0);
 
 	// local bus dma, timer and interrupt controller
-	MCT_ADR(config, m_mct_adr, 0);
+	MCT_ADR(config, m_mct_adr);
 	m_mct_adr->set_addrmap(0, &jazz_state::mct_map);
 	m_mct_adr->out_int_dma_cb().set_inputline(m_cpu, INPUT_LINE_IRQ0);
 	m_mct_adr->out_int_device_cb().set_inputline(m_cpu, INPUT_LINE_IRQ1);
@@ -311,17 +305,12 @@ void jazz_state::jazz(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:6", jazz_scsi_devices, "cdrom");
 
 	// scsi host adapter
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53cf94", NCR53CF94).clock(40000000).machine_config(
-		[this] (device_t *device)
-		{
-			ncr53cf94_device &adapter = downcast<ncr53cf94_device &>(*device);
-
-			adapter.irq_handler_cb().set(m_mct_adr, FUNC(mct_adr_device::irq<5>));
-			adapter.drq_handler_cb().set(m_mct_adr, FUNC(mct_adr_device::drq<0>));
-
-			subdevice<mct_adr_device>(":mct_adr")->dma_r_cb<0>().set(adapter, FUNC(ncr53cf94_device::dma_r));
-			subdevice<mct_adr_device>(":mct_adr")->dma_w_cb<0>().set(adapter, FUNC(ncr53cf94_device::dma_w));
-		});
+	NCR53CF94(config, m_scsi, 40000000);
+	m_scsibus->set_external_device(7, m_scsi);
+	m_scsi->irq_handler_cb().set(m_mct_adr, FUNC(mct_adr_device::irq<5>));
+	m_scsi->drq_handler_cb().set(m_mct_adr, FUNC(mct_adr_device::drq<0>));
+	m_mct_adr->dma_r_cb<0>().set(m_scsi, FUNC(ncr53cf94_device::dma_r));
+	m_mct_adr->dma_w_cb<0>().set(m_scsi, FUNC(ncr53cf94_device::dma_w));
 
 	// floppy controller and drive
 	N82077AA(config, m_fdc, 24_MHz_XTAL);
@@ -398,7 +387,7 @@ void jazz_state::jazz(machine_config &config)
 	serial1.ri_handler().set(m_ace[1], FUNC(ns16550_device::ri_w));
 	serial1.rxd_handler().set(m_ace[1], FUNC(ns16550_device::rx_w));
 
-	PC_LPT(config, m_lpt, 0);
+	PC_LPT(config, m_lpt);
 	m_lpt->irq_handler().set(m_mct_adr, FUNC(mct_adr_device::irq<0>));
 
 	// TODO: sound, interrupt 2, drq 2(l) & 3(r)
@@ -493,7 +482,7 @@ ROM_START(mmr4000le)
 	ROM_LOAD64_BYTE("mips_g364.bin", 0x000000, 0x020000, CRC(be6a726e) SHA1(225c198f6a7f8445dac3de052ecceecbb5be6bc7) BAD_DUMP)
 ROM_END
 
-}
+} // anonymous namespace
 
 /*   YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS       INIT         COMPANY  FULLNAME             FLAGS */
 COMP(1992,  mmr4000be, 0,      0,      mmr4000be, 0,     jazz_state, init_common, "MIPS",  "Magnum R4000 (be)", MACHINE_NO_SOUND)

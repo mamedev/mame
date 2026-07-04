@@ -183,21 +183,20 @@ bool floppy_image_format_t::supports_save() const noexcept
 	return false;
 }
 
-bool floppy_image_format_t::extension_matches(const char *file_name) const
+bool floppy_image_format_t::extension_matches(std::string_view file_name) const noexcept
 {
-	const char *ext = strrchr(file_name, '.');
-	if(!ext)
+	auto const sep = file_name.rfind('.');
+	if(std::string_view::npos == sep)
 		return false;
-	ext++;
-	int elen = strlen(ext);
-	const char *rext = extensions();
+	auto const ext = file_name.substr(sep + 1);
+	char const *rext = extensions();
 	for(;;) {
-		const char *next_ext = strchr(rext, ',');
-		int rlen = next_ext ? next_ext - rext : strlen(rext);
-		if(rlen == elen && !memcmp(ext, rext, rlen))
+		char const *next_ext = strchr(rext, ',');
+		int const rlen = next_ext ? (next_ext - rext) : strlen(rext);
+		if(std::string_view(rext, rlen) == ext)
 			return true;
 		if(next_ext)
-			rext = next_ext +1;
+			rext = next_ext + 1;
 		else
 			break;
 	}
@@ -1715,12 +1714,12 @@ void floppy_image_format_t::get_geometry_mfm_pc(const floppy_image &image, int c
 }
 
 
-void floppy_image_format_t::get_track_data_mfm_pc(int track, int head, const floppy_image &image, int cell_size, int sector_size, int sector_count, uint8_t *sectdata)
+void floppy_image_format_t::get_track_data_mfm_pc_sectors(int track, int head, const floppy_image &image, int cell_size, int sector_size, int start_sector, int end_sector, uint8_t *sectdata)
 {
 	auto bitstream = generate_bitstream_from_track(track, head, cell_size, image);
 	auto sectors = extract_sectors_from_bitstream_mfm_pc(bitstream);
-	for(int sector=1; sector <= sector_count; sector++) {
-		uint8_t *sd = sectdata + (sector-1)*sector_size;
+	for(int sector = start_sector; sector <= end_sector; sector++) {
+		uint8_t *sd = sectdata + (sector - start_sector) * sector_size;
 		if(sector < sectors.size() && !sectors[sector].empty()) {
 			unsigned int asize = sectors[sector].size();
 			if(asize > sector_size)
@@ -1731,6 +1730,12 @@ void floppy_image_format_t::get_track_data_mfm_pc(int track, int head, const flo
 		} else
 			memset(sd, 0, sector_size);
 	}
+}
+
+
+void floppy_image_format_t::get_track_data_mfm_pc(int track, int head, const floppy_image &image, int cell_size, int sector_size, int sector_count, uint8_t *sectdata)
+{
+	get_track_data_mfm_pc_sectors(track, head, image, cell_size, sector_size, 1, sector_count, sectdata);
 }
 
 

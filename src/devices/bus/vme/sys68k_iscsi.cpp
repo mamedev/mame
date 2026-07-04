@@ -276,7 +276,7 @@ void vme_sys68k_iscsi1_card_device::device_add_mconfig(machine_config &config)
 	m_pit->pb_out_callback().set(FUNC(vme_sys68k_iscsi1_card_device::led_w));
 
 	/* DMAC it is really a M68450 but the HD63850 is upwards compatible */
-	HD63450(config, m_dmac, CPU_CRYSTAL / 2, "maincpu");   // MC68450 compatible
+	HD63450(config, m_dmac, CPU_CRYSTAL / 2, m_maincpu, AS_PROGRAM);   // MC68450 compatible
 	m_dmac->set_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2));
 	m_dmac->set_burst_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50));
 	m_dmac->irq_callback().set(FUNC(vme_sys68k_iscsi1_card_device::dma_irq));

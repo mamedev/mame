@@ -7,6 +7,8 @@
 **************************************************************************/
 #include "emu.h"
 #include "zeus2.h"
+
+#include "input.h" // for video debug keys
 #include "screen.h"
 
 #include <algorithm>
@@ -86,17 +88,6 @@ void zeus2_device::device_start()
 	vblank_timer = timer_alloc(FUNC(zeus2_device::display_irq), this);
 	vblank_off_timer = timer_alloc(FUNC(zeus2_device::display_irq_off), this);
 
-	//printf("%s\n", machine().system().name);
-	// Set system type
-	if (strcmp(machine().system().name, "thegrid") == 0 || strcmp(machine().system().name, "thegrida") == 0) {
-		m_system = THEGRID;
-	}
-	else if (strcmp(machine().system().name, "crusnexo") == 0) {
-		m_system = CRUSNEXO;
-	}
-	else {
-		m_system = MWSKINS;
-	}
 
 	/* save states */
 	save_item(NAME(m_atlantis));
@@ -127,7 +118,7 @@ void zeus2_device::device_start()
 	// yoffs
 	// texel_width
 	// zbase
-	save_item(NAME(m_system));
+//  save_item(NAME(m_system));
 	save_item(NAME(zeus_fifo));
 	save_item(NAME(zeus_fifo_words));
 	save_item(NAME(m_fill_color));
@@ -227,20 +218,19 @@ uint32_t zeus2_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	//if (machine().input().code_pressed(KEYCODE_DOWN)) { zbase += machine().input().code_pressed(KEYCODE_LSHIFT) ? 0x10 : 1; popmessage("Zbase = %f", (double)zbase); }
 	//if (machine().input().code_pressed(KEYCODE_UP)) { zbase -= machine().input().code_pressed(KEYCODE_LSHIFT) ? 0x10 : 1; popmessage("Zbase = %f", (double)zbase); }
 
-	/* normal update case */
 	//if (!machine().input().code_pressed(KEYCODE_W))
 	if (1)
 	{
+		/* normal update case */
 		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			uint32_t *colorptr = &m_frameColor[frame_addr_from_xy(0, y, false)];
 			std::copy(colorptr + cliprect.min_x, colorptr + cliprect.max_x + 1, &bitmap.pix(y, cliprect.min_x));
 		}
 	}
-
-	/* waveram drawing case */
 	else
 	{
+		/* waveram drawing case */
 		const void *base;
 
 		if (machine().input().code_pressed(KEYCODE_DOWN)) yoffs += machine().input().code_pressed(KEYCODE_LSHIFT) ? 0x1000 : 40;

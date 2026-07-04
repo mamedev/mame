@@ -31,27 +31,27 @@
 #include "generalplus_gpl16250_nand.h"
 #include "softlist_dev.h"
 
-uint16_t generalplus_gpac800_game_state::cs0_r(offs_t offset)
+u16 generalplus_gpac800_game_state::cs0_r(offs_t offset)
 {
 	return m_sdram2[offset & 0xffff];
 }
 
-void generalplus_gpac800_game_state::cs0_w(offs_t offset, uint16_t data)
+void generalplus_gpac800_game_state::cs0_w(offs_t offset, u16 data)
 {
 	m_sdram2[offset & 0xffff] = data;
 }
 
-uint16_t generalplus_gpac800_game_state::cs1_r(offs_t offset)
+u16 generalplus_gpac800_game_state::cs1_r(offs_t offset)
 {
 	return m_sdram[offset & (m_sdram_kwords-1)];
 }
 
-void generalplus_gpac800_game_state::cs1_w(offs_t offset, uint16_t data)
+void generalplus_gpac800_game_state::cs1_w(offs_t offset, u16 data)
 {
 	m_sdram[offset & (m_sdram_kwords-1)] = data;
 }
 
-uint8_t generalplus_gpac800_game_state::read_nand(offs_t offset)
+u8 generalplus_gpac800_game_state::read_nand(offs_t offset)
 {
 	if (!m_nandregion)
 		return 0x0000;
@@ -74,7 +74,7 @@ void generalplus_gpac800_game_state::dma_complete_hacks(int state)
 
 	// note, these patch the code copied to SRAM so the 'PROGRAM ROM' check fails (it passes otherwise)
 
-	address_space& mem = m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 
 	//if (mem.read_word(0x4368c) == 0x4846)
 	//  mem.write_word(0x4368c, 0x4840);    // cars 2 force service mode
@@ -132,7 +132,7 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 
 DEVICE_IMAGE_LOAD_MEMBER(generalplus_gpac800_vbaby_game_state::cart_load)
 {
-	uint32_t const size = m_cart->common_get_size("rom");
+	u32 const size = m_cart->common_get_size("rom");
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
@@ -689,6 +689,15 @@ ROM_START( vbaby )
 	ROM_LOAD( "vbaby.bin", 0x0000, 0x8400000, CRC(d904441b) SHA1(3742bc4e1e403f061ce2813ecfafc6f30a44d287) )
 ROM_END
 
+ROM_START( tiviboo )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+
+	ROM_REGION( 0x8400000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "hy27uf081g2a.u3", 0x0000, 0x8400000, CRC(69d08014) SHA1(d290c646c8223b3a47c0579e19d15a6717c7e4a8) )
+ROM_END
+
+
 ROM_START( mgtfit )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
@@ -715,7 +724,7 @@ void generalplus_gpac800_game_state::machine_start()
 
 void generalplus_gpac800_game_state::nand_create_stripped_region()
 {
-	uint8_t* rom = m_nandregion;
+	u8 *rom = m_nandregion;
 	int size = memregion("nandrom")->bytes();
 	m_size = size;
 
@@ -750,7 +759,7 @@ void generalplus_gpac800_game_state::nand_create_stripped_region()
 void generalplus_gpac800_game_state::machine_reset()
 {
 	// configure CS defaults
-	address_space& mem = m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	mem.write_word(0x007820, 0x0047);
 	mem.write_word(0x007821, 0xff47);
 	mem.write_word(0x007822, 0x00c7);
@@ -767,7 +776,7 @@ void generalplus_gpac800_game_state::machine_reset()
 
 		// simulate bootstrap / internal ROM
 
-		address_space& mem = m_maincpu->space(AS_PROGRAM);
+		address_space &mem = m_maincpu->space(AS_PROGRAM);
 
 		/* Offset(h) 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
 		   00000000 (50 47 61 6E 64 6E 61 6E 64 6E)-- -- -- -- -- --  PGandnandn------
@@ -786,7 +795,7 @@ void generalplus_gpac800_game_state::machine_reset()
 		// copy a block of code from the NAND to RAM
 		for (int i = 0; i < m_initial_copy_words; i++)
 		{
-			uint16_t word = m_strippedrom[(i * 2) + 0] | (m_strippedrom[(i * 2) + 1] << 8);
+			u16 word = m_strippedrom[(i * 2) + 0] | (m_strippedrom[(i * 2) + 1] << 8);
 
 			mem.write_word(dest + i, word);
 		}
@@ -797,7 +806,7 @@ void generalplus_gpac800_game_state::machine_reset()
 		   so these must trampoline (although 20xxx currently isn't handled as RAM, so that needs more
 		   thought anyway
 		*/
-		uint16_t* internal = (uint16_t*)memregion("maincpu:internal")->base();
+		u16 *internal = (u16*)memregion("maincpu:internal")->base();
 
 		int addr;
 		addr = (m_vectorbase + 0x0a) & 0x000fffff;
@@ -939,6 +948,7 @@ CONS(2010, wlsair60,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gp
 CONS(200?, beambox,    0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_beambox,       "Hasbro",                                   "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, mgtfit,     0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60,      "MGT",                                      "Fitness Konsole (NC1470)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // probably has other names in English too? menus don't appear to be in German
 CONS(200?, vbaby,      0, 0, generalplus_gpac800_vbaby, jak_car2, generalplus_gpac800_vbaby_game_state, nand_vbaby,         "VTech",                                    "V.Baby", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, tiviboo,    0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_vbaby,         "VTech",                                    "Tivi Boo (France)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, kiugames,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_kiugames,      "VideoJet",                                 "Kiu Games",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // probably has other names in English too? menus don't appear to be in German
 
 CONS(2011, jak_gtg,    0, 0, generalplus_gpac800,       jak_gtg,  generalplus_gpac800_game_state,       nand_init210,       "JAKKS Pacific Inc / HotGen Ltd",           "Golden Tee Golf (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

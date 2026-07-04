@@ -224,6 +224,10 @@ void mg1_kbd_device::device_add_mconfig(machine_config &config)
 	m_mcu->p2_in_cb().set([this]() { return m_w->read(); });
 }
 
+void mg1_kbd_device::device_start()
+{
+}
+
 void mg1_kbd_device::map_mem(address_map &map)
 {
 	map(0x000, 0x7ff).rom().region("mcu", 0);
@@ -232,11 +236,6 @@ void mg1_kbd_device::map_mem(address_map &map)
 void mg1_kbd_device::map_pio(address_map &map)
 {
 	map(0x30, 0x3f).nopw().lr8([this](offs_t offset) { return u8(m_matrix[offset]->read()); }, "matrix_r");
-}
-
-void mg1_kbd_device::device_start()
-{
-	m_led.resolve();
 }
 
 ioport_constructor mg1_kbd_device::device_input_ports() const

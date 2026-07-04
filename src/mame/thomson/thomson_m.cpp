@@ -450,8 +450,6 @@ void thomson_state::video_start()
 	m_thom_mode_point = 0;
 	save_item(NAME(m_thom_mode_point));
 	m_vrambank->set_entry( 0 );
-
-	m_caps_led.resolve();
 }
 
 
@@ -3018,6 +3016,8 @@ MACHINE_RESET_MEMBER( mo5nr_state, mo5nr )
 	m_old_cart_bank = -1;
 	m_to8_cart_vpage = 0;
 	m_to8_data_vpage = 0;
+	mo6_update_ram_bank();
+	mo6_update_cart_bank();
 	/* mo5_reg_cart not reset */
 	/* thom_cart_bank not reset */
 }

@@ -284,21 +284,21 @@ OP( 0x0f, i_pre_nec  ) { uint32_t ModRM, tmp, tmp2;
 	}
 }
 
-OP( 0x10, i_adc_br8  ) { DEF_br8;   src+=CF;    ADDB;   PutbackRMByte(ModRM,dst);   CLKM(2,2,2,16,16,7);        }
-OP( 0x11, i_adc_wr16 ) { DEF_wr16;  src+=CF;    ADDW;   PutbackRMWord(ModRM,dst);   CLKR(24,24,11,24,16,7,2,m_EA);}
-OP( 0x12, i_adc_r8b  ) { DEF_r8b;   src+=CF;    ADDB;   RegByte(ModRM)=dst;         CLKM(2,2,2,11,11,6);        }
-OP( 0x13, i_adc_r16w ) { DEF_r16w;  src+=CF;    ADDW;   RegWord(ModRM)=dst;         CLKR(15,15,8,15,11,6,2,m_EA); }
-OP( 0x14, i_adc_ald8 ) { DEF_ald8;  src+=CF;    ADDB;   Breg(AL)=dst;           CLKS(4,4,2);                }
-OP( 0x15, i_adc_axd16) { DEF_axd16; src+=CF;    ADDW;   Wreg(AW)=dst;           CLKS(4,4,2);                }
+OP( 0x10, i_adc_br8  ) { DEF_br8;   ADDCB;   PutbackRMByte(ModRM,dst);   CLKM(2,2,2,16,16,7);        }
+OP( 0x11, i_adc_wr16 ) { DEF_wr16;  ADDCW;   PutbackRMWord(ModRM,dst);   CLKR(24,24,11,24,16,7,2,m_EA);}
+OP( 0x12, i_adc_r8b  ) { DEF_r8b;   ADDCB;   RegByte(ModRM)=dst;         CLKM(2,2,2,11,11,6);        }
+OP( 0x13, i_adc_r16w ) { DEF_r16w;  ADDCW;   RegWord(ModRM)=dst;         CLKR(15,15,8,15,11,6,2,m_EA); }
+OP( 0x14, i_adc_ald8 ) { DEF_ald8;  ADDCB;   Breg(AL)=dst;           CLKS(4,4,2);                }
+OP( 0x15, i_adc_axd16) { DEF_axd16; ADDCW;   Wreg(AW)=dst;           CLKS(4,4,2);                }
 OP( 0x16, i_push_ss  ) { PUSH(Sreg(SS));        CLKS(12,8,3);   }
 OP( 0x17, i_pop_ss   ) { POP(Sreg(SS));     CLKS(12,8,5);   m_no_interrupt=1; }
 
-OP( 0x18, i_sbb_br8  ) { DEF_br8;   src+=CF;    SUBB;   PutbackRMByte(ModRM,dst);   CLKM(2,2,2,16,16,7);        }
-OP( 0x19, i_sbb_wr16 ) { DEF_wr16;  src+=CF;    SUBW;   PutbackRMWord(ModRM,dst);   CLKR(24,24,11,24,16,7,2,m_EA);}
-OP( 0x1a, i_sbb_r8b  ) { DEF_r8b;   src+=CF;    SUBB;   RegByte(ModRM)=dst;         CLKM(2,2,2,11,11,6);        }
-OP( 0x1b, i_sbb_r16w ) { DEF_r16w;  src+=CF;    SUBW;   RegWord(ModRM)=dst;         CLKR(15,15,8,15,11,6,2,m_EA); }
-OP( 0x1c, i_sbb_ald8 ) { DEF_ald8;  src+=CF;    SUBB;   Breg(AL)=dst;           CLKS(4,4,2);                }
-OP( 0x1d, i_sbb_axd16) { DEF_axd16; src+=CF;    SUBW;   Wreg(AW)=dst;           CLKS(4,4,2);    }
+OP( 0x18, i_sbb_br8  ) { DEF_br8;   SUBCB;   PutbackRMByte(ModRM,dst);   CLKM(2,2,2,16,16,7);        }
+OP( 0x19, i_sbb_wr16 ) { DEF_wr16;  SUBCW;   PutbackRMWord(ModRM,dst);   CLKR(24,24,11,24,16,7,2,m_EA);}
+OP( 0x1a, i_sbb_r8b  ) { DEF_r8b;   SUBCB;   RegByte(ModRM)=dst;         CLKM(2,2,2,11,11,6);        }
+OP( 0x1b, i_sbb_r16w ) { DEF_r16w;  SUBCW;   RegWord(ModRM)=dst;         CLKR(15,15,8,15,11,6,2,m_EA); }
+OP( 0x1c, i_sbb_ald8 ) { DEF_ald8;  SUBCB;   Breg(AL)=dst;           CLKS(4,4,2);                }
+OP( 0x1d, i_sbb_axd16) { DEF_axd16; SUBCW;   Wreg(AW)=dst;           CLKS(4,4,2);    }
 OP( 0x1e, i_push_ds  ) { PUSH(Sreg(DS0));       CLKS(12,8,3);   }
 OP( 0x1f, i_pop_ds   ) { POP(Sreg(DS0));        CLKS(12,8,5);   }
 
@@ -443,8 +443,8 @@ OP( 0x80, i_80pre   ) { uint32_t dst, src; GetModRM; dst = GetRMByte(ModRM); src
 	switch (ModRM & 0x38) {
 		case 0x00: ADDB;            PutbackRMByte(ModRM,dst);   break;
 		case 0x08: ORB;             PutbackRMByte(ModRM,dst);   break;
-		case 0x10: src+=CF; ADDB;   PutbackRMByte(ModRM,dst);   break;
-		case 0x18: src+=CF; SUBB;   PutbackRMByte(ModRM,dst);   break;
+		case 0x10: ADDCB;           PutbackRMByte(ModRM,dst);   break;
+		case 0x18: SUBCB;           PutbackRMByte(ModRM,dst);   break;
 		case 0x20: ANDB;            PutbackRMByte(ModRM,dst);   break;
 		case 0x28: SUBB;            PutbackRMByte(ModRM,dst);   break;
 		case 0x30: XORB;            PutbackRMByte(ModRM,dst);   break;
@@ -457,8 +457,8 @@ OP( 0x81, i_81pre   ) { uint32_t dst, src; GetModRM; dst = GetRMWord(ModRM); src
 	switch (ModRM & 0x38) {
 		case 0x00: ADDW;            PutbackRMWord(ModRM,dst);   break;
 		case 0x08: ORW;             PutbackRMWord(ModRM,dst);   break;
-		case 0x10: src+=CF; ADDW;   PutbackRMWord(ModRM,dst);   break;
-		case 0x18: src+=CF; SUBW;   PutbackRMWord(ModRM,dst);   break;
+		case 0x10: ADDCW;           PutbackRMWord(ModRM,dst);   break;
+		case 0x18: SUBCW;           PutbackRMWord(ModRM,dst);   break;
 		case 0x20: ANDW;            PutbackRMWord(ModRM,dst);   break;
 		case 0x28: SUBW;            PutbackRMWord(ModRM,dst);   break;
 		case 0x30: XORW;            PutbackRMWord(ModRM,dst);   break;
@@ -471,8 +471,8 @@ OP( 0x82, i_82pre   ) { uint32_t dst, src; GetModRM; dst = GetRMByte(ModRM); src
 	switch (ModRM & 0x38) {
 		case 0x00: ADDB;            PutbackRMByte(ModRM,dst);   break;
 		case 0x08: ORB;             PutbackRMByte(ModRM,dst);   break;
-		case 0x10: src+=CF; ADDB;   PutbackRMByte(ModRM,dst);   break;
-		case 0x18: src+=CF; SUBB;   PutbackRMByte(ModRM,dst);   break;
+		case 0x10: ADDCB;           PutbackRMByte(ModRM,dst);   break;
+		case 0x18: SUBCB;           PutbackRMByte(ModRM,dst);   break;
 		case 0x20: ANDB;            PutbackRMByte(ModRM,dst);   break;
 		case 0x28: SUBB;            PutbackRMByte(ModRM,dst);   break;
 		case 0x30: XORB;            PutbackRMByte(ModRM,dst);   break;
@@ -485,8 +485,8 @@ OP( 0x83, i_83pre   ) { uint32_t dst, src; GetModRM; dst = GetRMWord(ModRM); src
 	switch (ModRM & 0x38) {
 		case 0x00: ADDW;            PutbackRMWord(ModRM,dst);   break;
 		case 0x08: ORW;             PutbackRMWord(ModRM,dst);   break;
-		case 0x10: src+=CF; ADDW;   PutbackRMWord(ModRM,dst);   break;
-		case 0x18: src+=CF; SUBW;   PutbackRMWord(ModRM,dst);   break;
+		case 0x10: ADDCW;           PutbackRMWord(ModRM,dst);   break;
+		case 0x18: SUBCW;           PutbackRMWord(ModRM,dst);   break;
 		case 0x20: ANDW;            PutbackRMWord(ModRM,dst);   break;
 		case 0x28: SUBW;            PutbackRMWord(ModRM,dst);   break;
 		case 0x30: XORW;            PutbackRMWord(ModRM,dst);   break;
@@ -747,8 +747,28 @@ OP( 0xf6, i_f6pre ) { uint32_t tmp; uint32_t uresult,uresult2; int32_t result,re
 		case 0x18: m_CarryVal=(tmp!=0); tmp=(~tmp)+1; SetSZPF_Byte(tmp); PutbackRMByte(ModRM,tmp&0xff); CLK((ModRM >= 0xc0) ? 2 : 16); break; /* NEG */
 		case 0x20: uresult = Breg(AL)*tmp; Wreg(AW)=(WORD)uresult; m_CarryVal=m_OverVal=(Breg(AH)!=0); CLKM(30,30,8,36,36,12); break; /* MULU */
 		case 0x28: result = (int16_t)((int8_t)Breg(AL))*(int16_t)((int8_t)tmp); Wreg(AW)=(WORD)result; m_CarryVal=m_OverVal=(Breg(AH)!=0); CLKM(47,47,8,57,53,12); break; /* MUL */
-		case 0x30: if (tmp) DIVUB else nec_interrupt(NEC_DIVIDE_VECTOR, BRK); CLKM(25,25,11,35,31,15); break;
-		case 0x38: if (tmp) DIVB else nec_interrupt(NEC_DIVIDE_VECTOR, BRK); CLKM(43,43,17,53,49,20); break;
+		case 0x30:
+			if (tmp)
+				DIVUB
+			else
+			{
+				m_CarryVal = m_OverVal = 0;
+				nec_interrupt(NEC_DIVIDE_VECTOR, BRK);
+			}
+
+			CLKM(25,25,11,35,31,15);
+			break;
+		case 0x38:
+			if (tmp)
+				DIVB
+			else
+			{
+				m_CarryVal = m_OverVal = 0;
+				nec_interrupt(NEC_DIVIDE_VECTOR, BRK);
+			}
+
+			CLKM(43,43,17,53,49,20);
+			break;
 	}
 }
 
@@ -761,8 +781,27 @@ OP( 0xf7, i_f7pre   ) { uint32_t tmp,tmp2; uint32_t uresult,uresult2; int32_t re
 		case 0x18: m_CarryVal=(tmp!=0); tmp=(~tmp)+1; SetSZPF_Word(tmp); PutbackRMWord(ModRM,tmp&0xffff); CLK((ModRM >= 0xc0) ? 2 : 16); break; /* NEG */
 		case 0x20: uresult = Wreg(AW)*tmp; Wreg(AW)=uresult&0xffff; Wreg(DW)=((uint32_t)uresult)>>16; m_CarryVal=m_OverVal=(Wreg(DW)!=0); CLKM(30,30,12,36,36,16); break; /* MULU */
 		case 0x28: result = (int32_t)((int16_t)Wreg(AW))*(int32_t)((int16_t)tmp); Wreg(AW)=result&0xffff; Wreg(DW)=result>>16; m_CarryVal=m_OverVal=(Wreg(DW)!=0); CLKM(47,47,12,57,53,16); break; /* MUL */
-		case 0x30: if (tmp) DIVUW else nec_interrupt(NEC_DIVIDE_VECTOR, BRK); CLKM(25,25,19,35,31,23); break;
-		case 0x38: if (tmp) DIVW else nec_interrupt(NEC_DIVIDE_VECTOR, BRK); CLKM(43,43,24,53,49,28); break;
+		case 0x30:
+			if (tmp)
+				DIVUW
+			else
+			{
+				m_CarryVal = m_OverVal = 0;
+				nec_interrupt(NEC_DIVIDE_VECTOR, BRK);
+			}
+
+			CLKM(25,25,19,35,31,23);
+			break;
+		case 0x38:
+			if (tmp)
+				DIVW
+			else
+			{
+				m_CarryVal = m_OverVal = 0;
+				nec_interrupt(NEC_DIVIDE_VECTOR, BRK);
+			}
+			CLKM(43,43,24,53,49,28);
+			break;
 	}
 }
 

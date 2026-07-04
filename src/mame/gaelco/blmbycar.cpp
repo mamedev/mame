@@ -603,7 +603,7 @@ void base_state::base(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 0x2000);
 
-	BLMBYCAR_SPRITES(config, m_sprites, 0, m_palette, gfx_blmbycar);
+	BLMBYCAR_SPRITES(config, m_sprites, m_palette, gfx_blmbycar);
 	m_sprites->set_screen("screen");
 
 	// sound hardware

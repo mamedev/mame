@@ -459,7 +459,7 @@ void hhtiger_state::hhtiger(machine_config &config)
 
 	Z80DMA(config, m_dma, 16_MHz_XTAL / 4);
 	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_dma->in_mreq_callback().set(FUNC(hhtiger_state::memory_read_byte));
 	m_dma->out_mreq_callback().set(FUNC(hhtiger_state::memory_write_byte));
 	m_dma->in_iorq_callback().set(FUNC(hhtiger_state::io_read_byte));
@@ -534,7 +534,7 @@ void hhtiger_state::hhtiger(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_STOPPED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	MOS6551(config, m_acia, 0);
+	MOS6551(config, m_acia);
 	m_acia->set_xtal(1.8432_MHz_XTAL);
 	m_acia->irq_handler().set("irqs", FUNC(input_merger_device::in_w<3>));
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));

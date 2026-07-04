@@ -72,4 +72,248 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- Homebrew-->
+
+	<software name="aerial">
+		<description>Aerial</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="myvision_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="aerial.rom" size="0x4000" crc="3e29d056" sha1="b0ecadfc46695eaf5d0e7e116880cb4293c4c9f1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="antiair">
+		<description>AntiAir</description>
+		<year>2024</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="myvision_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="antiair.rom" size="0x4000" crc="ab48634d" sha1="e0ed7f43dbb710f812268c584769337f5bd24d44" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ascend">
+		<description>Ascend</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="myvision_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="ascend.rom" size="0x4000" crc="d2682f92" sha1="800642e0f6a9df0c8a357f3de16b44b40c49835e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="awass">
+		<description>Awass</description>
+		<year>2025</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="myvision_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="awass.rom" size="0x4000" crc="4c295948" sha1="a6baafb33b1adffd6d97565b4cfb46df196d02f3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="battlot">
+		<description>Battlot</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="myvision_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="battlot.rom" size="0x4000" crc="8fd4ba27" sha1="77d9a8059a0762adf4a230ffc3f4026bd69b22d4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bootskel">
+		<description>Bootskell</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="myvision_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="bootskell.rom" size="0x4000" crc="1784995a" sha1="3565dc277eec77298869290d75a76415d6c63c7f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cacorm">
+		<description>Cacorm</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="myvision_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cacorm.rom" size="0x4000" crc="725f8a53" sha1="07e24679f97f3928646f0882d4a24db21a85f774" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavit">
+		<description>Cavit</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="myvision_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cavit.rom" size="0x4000" crc="bb71a320" sha1="dac8ce71e4532d026532ad88da1bd1f1646a8ecc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cracky">
+		<description>Cracky</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="myvision_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cracky.rom" size="0x4000" crc="d1441d28" sha1="2692ac5802db55b3ef869a9175f836b202b0f2e4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guntus">
+		<description>Guntus</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="myvision_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="guntus.rom" size="0x4000" crc="8cb2fbb1" sha1="25f5e8f89300c7dbc87ff5f421417978d529c026" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hopman">
+		<description>Hopman</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="myvision_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="hopman.rom" size="0x4000" crc="c9b03cf7" sha1="af55672cec69f2d931f7c070bab3c453ae5de370" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impetus">
+		<description>Impetus</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="myvision_cart">
+			<dataarea name="rom" size="0x8000">
+				<rom name="impetus.rom" size="0x4000" crc="1fccbedf" sha1="4a1f65c6497f9d9a941d9972bfb5b71a9681a973" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lift">
+		<description>Lift</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="myvision_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="lift.rom" size="0x4000" crc="909f8656" sha1="17e4d065547253de5edd280735ce5375c21aa6c3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazy">
+		<description>Mazy</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="myvision_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="mazy.rom" size="0x4000" crc="af7cf89a" sha1="01f8354d4e8cf2107e17d8f161b4b63db4ffb39c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazy2">
+		<description>Mazy 2</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="myvision_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="mazy2.rom" size="0x4000" crc="a8410312" sha1="4d12f403af1e5d13631850c54df07914a39ed855" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mieyen">
+		<description>Mieyen</description>
+		<year>2025</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="myvision_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="mieyen.rom" size="0x4000" crc="06368339" sha1="c1fa652eff56ad6b0223d329b0e12f778326510b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neuras">
+		<description>Neuras</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="myvision_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="neuras.rom" size="0x4000" crc="c01591cf" sha1="89ba45e0df8fd883b9dbd89b63ea5f50b1dbf81a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="osotos">
+		<description>Osotos</description>
+		<year>2024</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="myvision_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="osotos.rom" size="0x4000" crc="65343513" sha1="590ed2adc45b6fffca5c0c2aa474bc33a4ee689c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ruptus">
+		<description>Ruptus</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="myvision_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="ruptus.rom" size="0x4000" crc="d5cc11ce" sha1="5a62638fde9e8da62afe8d2eff82a353a1579083" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="svellas">
+		<description>Svellas</description>
+		<year>2025</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="myvision_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="svellas.rom" size="0x4000" crc="d347aff9" sha1="41e46af4796d0ef709b7c81b4528e90e0700f004" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swordwrk">
+		<description>SwordWork</description>
+		<year>2026</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="myvision_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="sword.rom" size="0x4000" crc="5b70d276" sha1="4424f9b94adb7fb7014637e84e7c2e125e459bf7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yewdow">
+		<description>Yewdow</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="myvision_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="yewdow.rom" size="0x4000" crc="e24d681d" sha1="61a5fdc45a76dbf2585990260ee3acb46ae686c7" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

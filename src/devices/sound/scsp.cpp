@@ -146,8 +146,10 @@ scsp_device::scsp_device(const machine_config &mconfig, const char *tag, device_
 	: device_t(mconfig, SCSP, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		device_rom_interface(mconfig, *this),
+		device_serial_interface(mconfig, *this),
 		m_irq_cb(*this),
 		m_main_irq_cb(*this),
+		m_midi_out_cb(*this),
 		m_BUFPTR(0),
 		m_stream(nullptr),
 		m_IrqTimA(0),
@@ -276,6 +278,16 @@ void scsp_device::device_start()
 	save_item(NAME(m_DSP.EFREG));
 	save_item(NAME(m_DSP.Stopped));
 	save_item(NAME(m_DSP.LastStep));
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void scsp_device::device_reset()
+{
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+	set_rate(31250);
 }
 
 //-------------------------------------------------
@@ -734,7 +746,16 @@ void scsp_device::UpdateReg(int reg)
 			break;
 		case 0x6:
 		case 0x7:
-			midi_out_w(m_udata.data[0x6/2] & 0xff);
+			{
+				u8 data = m_udata.data[0x6 / 2] & 0xff;
+				if (m_MidiOutR == m_MidiOutW)
+				{
+					// not busy, so start transmission
+					transmit_register_setup(data);
+				}
+				m_MidiOutStack[m_MidiOutW++] = data;
+				m_MidiOutW &= 31;
+			}
 			break;
 		case 8:
 		case 9:
@@ -1093,7 +1114,7 @@ u16 scsp_device::r16(u32 addr)
 			    004CB0: 4CDF 0002                  movem.l (A7)+, D1
 			    004CB4: 4E75                       rts
 			*/
-			logerror("SCSP: Reading from EXTS register %08x\n", addr);
+			logerror("%s: SCSP Reading from EXTS register %08x\n", machine().describe_context(), addr);
 			if (addr < 0xEE4)
 				v = *((u16 *) (m_DSP.EXTS + (addr - 0xee0) / 2));
 		}
@@ -1447,29 +1468,30 @@ void scsp_device::write(offs_t offset, u16 data, u16 mem_mask)
 	w16(offset * 2, tmp);
 }
 
-void scsp_device::midi_in(u8 data)
+void scsp_device::tra_callback()
 {
-	//    printf("scsp_midi_in: %02x\n", data);
+	m_midi_out_cb(transmit_register_get_data_bit());
+}
 
-	m_MidiStack[m_MidiW++] = data;
+void scsp_device::tra_complete()
+{
+	m_MidiOutR++;
+	m_MidiOutR &= 31;
+
+	// if buffer not empty, transmit next byte
+	if (m_MidiOutR != m_MidiOutW)
+	{
+		transmit_register_setup(m_MidiOutStack[m_MidiOutR]);
+	}
+}
+
+void scsp_device::rcv_complete()
+{
+	receive_register_extract();
+	m_MidiStack[m_MidiW++] = get_received_char();
 	m_MidiW &= 31;
 
 	CheckPendingIRQ();
-}
-
-u16 scsp_device::midi_out_r()
-{
-	u8 val = m_MidiOutStack[m_MidiOutR++];
-	m_MidiOutR &= 31;
-	return val;
-}
-
-void scsp_device::midi_out_w(u8 data)
-{
-	m_MidiOutStack[m_MidiOutW++] = data;
-	m_MidiOutW &= 31;
-
-	//CheckPendingIRQ();
 }
 
 //LFO handling

@@ -98,6 +98,8 @@ TODO (socrates):
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include "corefloat.h"
+
 
 namespace {
 
@@ -742,20 +744,17 @@ rgb_t socrates_state::create_color(uint8_t color)
 	int const chromaindex = color&0x0F;
 	int const swappedcolor = ((color&0xf0)>>4)|((color&0x0f)<<4);
 	double finalY = (1/LUMAMAX) * lumatable[swappedcolor];
-	double const finalI = (M_I * (cos((phaseangle[chromaindex]/180)*M_PI)))* ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
-	double const finalQ = (M_Q * (sin((phaseangle[chromaindex]/180)*M_PI)))* ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
+	double const finalI = (M_I * cos(DEGREE_TO_RADIAN(phaseangle[chromaindex]))) * ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
+	double const finalQ = (M_Q * sin(DEGREE_TO_RADIAN(phaseangle[chromaindex]))) * ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
 	if (finalY > 1) finalY = 1; // clamp luma
 	// calculate the R, G and B values here, neato matrix math
 	double finalR = (finalY*1)+(finalI*0.9563)+(finalQ*0.6210);
 	double finalG = (finalY*1)+(finalI*-0.2721)+(finalQ*-0.6474);
 	double finalB = (finalY*1)+(finalI*-1.1070)+(finalQ*1.7046);
 	// scale/clamp to 0-255 range
-	if (finalR<0) finalR = 0;
-	if (finalR>1) finalR = 1;
-	if (finalG<0) finalG = 0;
-	if (finalG>1) finalG = 1;
-	if (finalB<0) finalB = 0;
-	if (finalB>1) finalB = 1;
+	finalR = std::clamp(finalR, 0.0, 1.0);
+	finalG = std::clamp(finalG, 0.0, 1.0);
+	finalB = std::clamp(finalB, 0.0, 1.0);
 	// gamma correction: 1.0 to GAMMA:
 	finalR = pow(finalR, 1/GAMMA)*255;
 	finalG = pow(finalG, 1/GAMMA)*255;
@@ -1586,12 +1585,12 @@ ROM_START(socrates)
 
 	/* english speech cart has a green QC sticker */
 	ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
-	ROM_LOAD_OPTIONAL("speech_eng_internal.bin", 0x0000, 0x2000, CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58)) // 8k on the speech chip itself
+	ROM_LOAD("speech_eng_internal.bin", 0x0000, 0x2000, CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58)) // 8k on the speech chip itself
 
 	ROM_REGION(0x10000, "speechext", ROMREGION_ERASE00) // speech serial modules outside of the speech chip but still on speech cart
-	ROM_LOAD_OPTIONAL("speech_eng_vsm1.bin", 0x0000, 0x4000, CRC(888e3ddd) SHA1(33af6a21ba6d826071c9d48557b1c9012752570b)) // 16k in serial rom
-	ROM_LOAD_OPTIONAL("speech_eng_vsm2.bin", 0x4000, 0x4000, CRC(de4ac89d) SHA1(3dfa853b02df756a9b72def94a39310992ee11c7)) // 16k in serial rom
-	ROM_LOAD_OPTIONAL("speech_eng_vsm3.bin", 0x8000, 0x4000, CRC(972384aa) SHA1(ffcb1d633ca6bffc7f481ec505da447e5b847f16)) // 16k in serial rom
+	ROM_LOAD("speech_eng_vsm1.bin", 0x0000, 0x4000, CRC(888e3ddd) SHA1(33af6a21ba6d826071c9d48557b1c9012752570b)) // 16k in serial rom
+	ROM_LOAD("speech_eng_vsm2.bin", 0x4000, 0x4000, CRC(de4ac89d) SHA1(3dfa853b02df756a9b72def94a39310992ee11c7)) // 16k in serial rom
+	ROM_LOAD("speech_eng_vsm3.bin", 0x8000, 0x4000, CRC(972384aa) SHA1(ffcb1d633ca6bffc7f481ec505da447e5b847f16)) // 16k in serial rom
 	ROM_FILL(0xC000, 0x4000, 0xff) // last vsm isn't present, FF fill
 ROM_END
 
@@ -1604,12 +1603,12 @@ ROM_START(socratfc)
 	ROM_LOAD("tmp42c40p1844.u6", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
 
 	ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
-	ROM_LOAD_OPTIONAL("speech_fra_internal.bin", 0x0000, 0x2000, NO_DUMP)
+	ROM_LOAD("speech_fra_internal.bin", 0x0000, 0x2000, NO_DUMP)
 
 	ROM_REGION(0x10000, "speechext", ROMREGION_ERASE00) // speech serial modules outside of the speech chip but still on speech cart
-	ROM_LOAD_OPTIONAL("speech_fra_vsm1.bin", 0x0000, 0x4000, NO_DUMP) // 16k in serial rom
-	ROM_LOAD_OPTIONAL("speech_fra_vsm2.bin", 0x4000, 0x4000, NO_DUMP) // 16k in serial rom
-	ROM_LOAD_OPTIONAL("speech_fra_vsm3.bin", 0x8000, 0x4000, NO_DUMP) // 16k in serial rom
+	ROM_LOAD("speech_fra_vsm1.bin", 0x0000, 0x4000, NO_DUMP) // 16k in serial rom
+	ROM_LOAD("speech_fra_vsm2.bin", 0x4000, 0x4000, NO_DUMP) // 16k in serial rom
+	ROM_LOAD("speech_fra_vsm3.bin", 0x8000, 0x4000, NO_DUMP) // 16k in serial rom
 	ROM_FILL(0xC000, 0x4000, 0xff) // last vsm isn't present, FF fill
 ROM_END
 
@@ -1625,10 +1624,10 @@ ROM_START(profweis)
 	ROM_LOAD("tmp42c40p1844.u6", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
 
 	ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
-	ROM_LOAD_OPTIONAL("speech_ger_internal.bin", 0x0000, 0x2000, CRC(5ff0fdc6) SHA1(8ef128561a846762a20e3fe9513a4a22aaadc7f6))
+	ROM_LOAD("speech_ger_internal.bin", 0x0000, 0x2000, CRC(5ff0fdc6) SHA1(8ef128561a846762a20e3fe9513a4a22aaadc7f6))
 
 	ROM_REGION(0x10000, "speechext", ROMREGION_ERASE00) // speech serial modules outside of the speech chip but still on speech cart
-	ROM_LOAD_OPTIONAL("speech_ger_vsm1.bin", 0x0000, 0x4000, CRC(a979a00b) SHA1(0290844619dbdf336757003aaab3ffd0a75b7ee9)) // 16k in serial rom
+	ROM_LOAD("speech_ger_vsm1.bin", 0x0000, 0x4000, CRC(a979a00b) SHA1(0290844619dbdf336757003aaab3ffd0a75b7ee9)) // 16k in serial rom
 	ROM_FILL(0x4000, 0xc000, 0xff) // last 3 vsms aren't present, FF fill
 ROM_END
 

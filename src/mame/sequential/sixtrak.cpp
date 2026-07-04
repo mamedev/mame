@@ -40,7 +40,6 @@ Known hardware revisions:
   Contrast sixtrak_rev_a() and sixtrak_rev_b() for the differences. In summary:
     * MM5837 noise generator replaced with a transistor-based noise source.
     * Improved autotune circuit.
-
  - Model 610 Rev C: serial numbers ?-?.
     * No known differences.
 
@@ -188,7 +187,6 @@ private:
 
 	void tuning_counter_gate_w(int state);
 	void tuning_counter_out_changed(int state);
-	void tuning_ff_comp_out_changed(int state);
 	void update_tuning_timer();
 	TIMER_CALLBACK_MEMBER(tuning_timer_tick);
 
@@ -228,8 +226,6 @@ private:
 	output_finder<2> m_digits;
 
 	emu_timer *m_tuning_timer = nullptr;
-	bool m_tuning_counter_clock_started = false;
-	u8 m_tuning_counter_gate = 0;
 	u8 m_tuning_counter_out = 0;
 
 	u8 m_key_row = 0;
@@ -396,9 +392,6 @@ void sixtrak_state::update_cvs()
 		"pitch", "gain", "resonance", "cutoff", "mixer", "mod", "PW", "waveform"
 	};
 
-	if ((m_sh_voices & 0x3f) == 0x3f)
-		return;  // Exit early if no voice S&Hs are activated.
-
 	assert(m_sh_param < 8);
 	const int cv_input = PARAM2CVIN[m_sh_param];
 	const double cv = get_voltage_mux_out();
@@ -511,13 +504,9 @@ void sixtrak_state::update_master_volume()
 
 void sixtrak_state::tuning_counter_gate_w(int state)
 {
-	m_tuning_counter_gate = state;
-	if (!m_tuning_counter_gate)
-		m_tuning_counter_clock_started = false;
+	m_pit->write_gate0(state);
 
-	m_pit->write_gate0(m_tuning_counter_gate);
-
-	if (m_tuning_counter_gate)
+	if (state)
 	{
 		LOGMASKED(LOG_AUTOTUNE, "Autotune routine started.\n");
 		update_tuning_timer();
@@ -534,29 +523,6 @@ void sixtrak_state::tuning_counter_out_changed(int state)
 		m_tuning_timer->reset();
 		LOGMASKED(LOG_AUTOTUNE, "Autotune routine ended.\n");
 	}
-}
-
-void sixtrak_state::tuning_ff_comp_out_changed(int state)
-{
-	// The autotune implementation on the Six-Trak depends on behavior of the
-	// 8253 that does not seem to be accurately emulated in pit8253.cpp.
-	// Specifically, the Six-Trak expects that:
-	// - The counter is incremented on the negative-going edge of the clock.
-	// - In mode 1, counting will start after the first *full* clock cycle
-	//   (positive-going edge followed by negative-going) after the gate is
-	//   enabled.
-
-	// This implementation works around those issues as follows:
-	// - The signal to the CLK0 PIT input is inverted.
-	// - Using `m_tuning_counter_clock_started` to detect the first positive-
-	//   going clock edge after the gate is enabled, and only clocking the PIT
-	//   after this has occurred.
-
-	if (m_tuning_counter_gate && state)
-		m_tuning_counter_clock_started = true;
-
-	if (m_tuning_counter_clock_started)
-		m_pit->write_clk0(!state);
 }
 
 void sixtrak_state::update_tuning_timer()
@@ -775,8 +741,6 @@ void sixtrak_state::io_map(address_map &map)
 
 void sixtrak_state::machine_start()
 {
-	save_item(NAME(m_tuning_counter_clock_started));
-	save_item(NAME(m_tuning_counter_gate));
 	save_item(NAME(m_tuning_counter_out));
 	save_item(NAME(m_key_row));
 	save_item(NAME(m_dac_value));
@@ -785,8 +749,6 @@ void sixtrak_state::machine_start()
 	save_item(NAME(m_voltage_mux_input));
 	save_item(NAME(m_sampling_gain));
 	save_item(NAME(m_sampling_freq));
-
-	m_digits.resolve();
 
 	m_maincpu->space(AS_IO).install_readwrite_before_time(
 		0x00, 0xff, ws_time_delegate(*this, FUNC(sixtrak_state::iorq_wait_state)));
@@ -821,16 +783,16 @@ void sixtrak_state::sixtrak_common(machine_config &config, device_sound_interfac
 	aciaclock.signal_handler().append("midiacia", FUNC(acia6850_device::write_rxc));
 	aciaclock.signal_handler().append("nmiff", FUNC(ttl7474_device::clock_w));
 
-	auto &acia = ACIA6850(config, "midiacia", 0);  // U137 (or is it U157?)
+	auto &acia = ACIA6850(config, "midiacia");  // U137 (or is it U157?)
 	acia.txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 	acia.irq_handler().set("nmiff", FUNC(ttl7474_device::d_w)).invert();
 	acia.write_dcd(0);
 	acia.write_cts(0);
 
-	TTL7474(config, "nmiff", 0).output_cb().set_inputline(m_maincpu, INPUT_LINE_NMI).invert();  // U146B
+	TTL7474(config, "nmiff").output_cb().set_inputline(m_maincpu, INPUT_LINE_NMI).invert();  // U146B
 
-	TTL7474(config, m_tuning_ff, 0);
-	m_tuning_ff->comp_output_cb().set(FUNC(sixtrak_state::tuning_ff_comp_out_changed));
+	TTL7474(config, m_tuning_ff);
+	m_tuning_ff->comp_output_cb().set(m_pit, FUNC(pit8253_device::write_clk0));
 
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set("midiacia", FUNC(acia6850_device::write_rxd));
 	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
@@ -842,7 +804,7 @@ void sixtrak_state::sixtrak_common(machine_config &config, device_sound_interfac
 	m_tune_control->bit_handler<1>().set(FUNC(sixtrak_state::tuning_counter_gate_w));
 	m_tune_control->bit_handler<2>().set(m_tuning_ff, FUNC(ttl7474_device::preset_w));
 	m_tune_control->bit_handler<4>().set(m_tuning_ff, FUNC(ttl7474_device::clear_w));
-	m_tune_control->bit_handler<5>().set("nmiff", FUNC(ttl7474_device::preset_w));
+	m_tune_control->bit_handler<5>().set("nmiff", FUNC(ttl7474_device::preset_w));  // NMI disable.
 
 	auto &u102 = OUTPUT_LATCH(config, "led_latch_0");  // 74LS174
 	u102.bit_handler<0>().set_output("led_track_1").invert();
@@ -895,17 +857,23 @@ void sixtrak_state::sixtrak_common(machine_config &config, device_sound_interfac
 
 	for (int i = 0; i < 6; ++i)
 	{
-		noise.add_route(0, m_voices[i], 1.0, cem3394_device::AUDIO_INPUT);
-
 		VA_RC_EG(config, m_gain_rc[i]).set_r(RES_M(1));
-		m_gain_rc[i]->add_route(0, m_voices[i], 1.0, cem3394_device::FINAL_GAIN);
-
 		VA_RC_EG(config, m_freq_rc[i]).set_r(RES_M(1));
-		m_freq_rc[i]->add_route(0, m_voices[i], 1.0, cem3394_device::FILTER_FREQUENCY);
 
-		CEM3394(config, m_voices[i]);
-		const double c_vco = C_VCO + C_VCO * C_VCO_JITTER[i] * 0.025;  // +/- 2.5%.
-		m_voices[i]->configure(RES_K(301), c_vco, CAP_U(0.033), CAP_U(10));
+		cem3394_device::components comps =
+		{
+			.r_vco = RES_K(301),
+			.c_vco = C_VCO + C_VCO * C_VCO_JITTER[i] * 0.025,  // +/- 2.5%.
+			.c_vcf = CAP_U(0.033),
+			.c_ac = CAP_U(10),
+		};
+
+		cem3394_device::input_array voice_inputs{};
+		voice_inputs[cem3394_device::AUDIO_INPUT] = &noise;
+		voice_inputs[cem3394_device::FINAL_GAIN] = m_gain_rc[i].target();
+		voice_inputs[cem3394_device::FILTER_FREQUENCY] = m_freq_rc[i].target();
+
+		CEM3394(config, m_voices[i], comps, voice_inputs);
 		m_voices[i]->add_route(0, "voicemixer", CEM3394_IOUT_MAX);
 	}
 
@@ -941,7 +909,7 @@ void sixtrak_state::sixtrak_rev_a(machine_config &config)
 	// component values from the Sente voice board, which is based on the
 	// Six-Trak.
 
-	auto &noise = MM5837_STREAM(config, "noise", 0);
+	auto &noise = MM5837_STREAM(config, "noise");
 	// The actual VDD is -6.5. But according to comments on sente6vb.cpp, that
 	// sounds too low, and it is possible the mapping in mm5837 is wrong. Using
 	// -8.0 as per sente6vb.cpp.

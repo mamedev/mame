@@ -1,13 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Devin Acker
 /*
-	Casio Digital Guitars (DG-10 / DG-20)
+    Casio Digital Guitars (DG-10 / DG-20)
 
-	TODO:
-	- PCM drums (MSM6294)
-	- effects section (chorus, flanger, distortion)
-	- implement uPD931 vibrato register
-	- reasonable controls/layout somehow
+    TODO:
+    - PCM drums (MSM6294)
+    - effects section (chorus, flanger, distortion)
+    - implement uPD931 vibrato register
+    - reasonable controls/layout somehow
 */
 
 #include "emu.h"

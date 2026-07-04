@@ -24,10 +24,7 @@ TODO:
 - PC=0x7dd reads from FDC bit 3 in ST3 (twosid_r fn),
   expecting a bit 3 high for all the PC8001 games otherwise keeps looping and eventually dies.
   Are those incorrectly identified as 2DD? Hacked to work for now;
-- set_input_line_vector fn doesn't work properly when issued from a device_reset,
-  we currently just implement the irq_callback instead;
-- pc80s31k: verify that irq vector write (I/O port $f0) belongs here or just
-  whatever PC88VA uses.
+- pc80s31k: verify that irq vector write (I/O port $f0) belongs here or applies to PC-88VA only.
 - printer interface (used for debugging? 4-bit serial?)
 - Pinpoint what host I/O ports $f6, $f7 truly are
   (direct FDC access from this device or a different beast? cfr. play6lim with pc8001mk2)
@@ -36,7 +33,7 @@ TODO:
   \- It then tries to read at memory [0xc0ff], set the value read in [0xf012];
   \- Expects that ROM [0x0000] is not equal to 0xc3;
   Bottom line: Is it trying to access some custom HW?
-- Hookup a bridge for internal BIOSes (later PC8801 models);
+- Hookup a bridge for internal BIOSes (later PC-8801 models);
 - Save state support (resuming fails latch hookups here);
 - pc88va2_fd_if_device: currently not hooked up to pc88va2, deasserts DRQ too fast, sub CPU
   incorrectly tells to master that floppies aren't 2HD?
@@ -159,7 +156,7 @@ Used as a communication protocol flags
 //#define VERBOSE 1
 #include "logmacro.h"
 
-//#include "formats/hxchfe_dsk.h"
+#include "formats/hxchfe_dsk.h"
 #include "formats/pc98fdi_dsk.h"
 #include "formats/xdf_dsk.h"
 
@@ -270,8 +267,13 @@ static void pc88_floppy_formats(format_registration &fr)
 	// need FDI and XDF for PC-88VA
 	fr.add(FLOPPY_XDF_FORMAT);
 	fr.add(FLOPPY_PC98FDI_FORMAT);
-	// eventually ...
-//  fr.add(FLOPPY_HFE_FORMAT);
+	// preliminary, HFE needs double head support (i.e. won't work with pc8801ma)
+	fr.add(FLOPPY_HFE_FORMAT);
+}
+
+IRQ_CALLBACK_MEMBER(pc80s31_device::vector_r)
+{
+	return m_irq_vector;
 }
 
 void pc80s31_device::device_add_mconfig(machine_config &config)
@@ -360,8 +362,7 @@ void pc80s31_device::device_reset()
 	m_floppy[1]->get_device()->set_rpm(300);
 	m_fdc->set_rate(250000);
 
-	// TODO: doesn't seem to work for devices?
-	m_fdc_cpu->set_input_line_vector(0, 0);
+	// zero for regular and read only (NOP), PC-88VA controller can write on it instead
 	m_irq_vector = 0;
 
 	m_tc_zero_timer->adjust(attotime::never);
@@ -546,6 +547,11 @@ void pc88va2_fd_if_device::device_start()
 	floppy = m_floppy[1]->get_device();
 	if(floppy)
 		floppy->setup_ready_cb(floppy_image_device::ready_cb(&pc88va2_fd_if_device::fdc_update_ready, this));
+
+	save_item(NAME(m_fdc_ctrl_2));
+	save_item(NAME(m_fdc_mode));
+	save_item(NAME(m_xtmask));
+	save_item(NAME(m_dmae));
 }
 
 void pc88va2_fd_if_device::device_reset()
@@ -553,7 +559,7 @@ void pc88va2_fd_if_device::device_reset()
 	pc80s31k_device::device_reset();
 
 	m_fdc_mode = 0;
-//  m_fdc_irq_opcode = 0x00; //0x7f ld a,a !
+	m_irq_vector = 0x7f; // ld a,a as default
 	m_xtmask = false;
 	m_dmae = false;
 	m_fdc->set_unscaled_clock(4'792'320);

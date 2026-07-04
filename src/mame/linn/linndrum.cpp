@@ -86,6 +86,8 @@ Example:
 #include "machine/output_latch.h"
 #include "machine/rescap.h"
 #include "machine/timer.h"
+#include "sound/cem3320.h"
+#include "sound/cem3360.h"
 #include "sound/dac76.h"
 #include "sound/flt_biquad.h"
 #include "sound/flt_rc.h"
@@ -93,9 +95,9 @@ Example:
 #include "sound/mixer.h"
 #include "sound/spkrdev.h"
 #include "sound/va_eg.h"
-#include "sound/va_vca.h"
-#include "sound/va_vcf.h"
 #include "speaker.h"
+
+#include <numbers>
 
 #include "linn_linndrum.lh"
 
@@ -748,7 +750,7 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 	// instead.
 	for (int voice = 0; voice < NUM_MUX_VOICES; ++voice)
 	{
-		DAC76(config, m_mux_dac[voice], 0);  // AM6070 (U88).
+		DAC76(config, m_mux_dac[voice]);  // AM6070 (U88).
 		m_mux_dac[voice]->configure_voltage_output(R_DAC_I2V, R_DAC_I2V);  // R58, R59.
 		m_mux_dac[voice]->set_fixed_iref(MUX_DAC_IREF);
 		FILTER_VOLUME(config, m_mux_volume[voice]);  // CD4053 (U90), R60, R62 (see mux_drum_w()).
@@ -758,7 +760,8 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 	// The bass VCF has a cutoff frequency of ~1.4KHz, which transiently
 	// increases to ~100KHz when the voice triggers.
 	LINNDRUM_VCF_EG(config, m_bass_eg, ":trimmer_bass_freq_cv_offset", RES_K(18), RES_K(5.1));  // R135, R133.
-	auto &bass_vcf = CEM3320_LPF4(config, "bass_vcf", CAP_P(150), RES_K(100));
+	auto &bass_vcf = CEM3320_LPF4(config, "bass_vcf", CAP_P(150));
+	bass_vcf.configure_voltage_input(RES_K(91));  // R87.
 	m_mux_volume[MV_BASS]->add_route(0, bass_vcf, 1.0, cem3320_lpf4_device::INPUT_AUDIO);
 	m_bass_eg->add_route(0, bass_vcf, 1.0, cem3320_lpf4_device::INPUT_FREQ);
 
@@ -771,7 +774,7 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 	// *** Snare / sidestick section.
 
 	TIMER(config, m_snare_timer).configure_generic(FUNC(linndrum_audio_device::snare_timer_tick));  // 74LS627 (U80A).
-	DAC76(config, m_snare_dac, 0);  // AM6070 (U92)
+	DAC76(config, m_snare_dac);  // AM6070 (U92)
 	m_snare_dac->configure_voltage_output(R_DAC_I2V, R_DAC_I2V);  // R127, R126.
 
 	// The DAC's current outputs are processed by a current-to-voltage converter
@@ -797,7 +800,7 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 	// components.
 
 	TIMER(config, m_tom_timer).configure_generic(FUNC(linndrum_audio_device::tom_timer_tick));  // 74LS627 (U77B).
-	DAC76(config, m_tom_dac, 0);  // AM6070 (U82).
+	DAC76(config, m_tom_dac);  // AM6070 (U82).
 	// Schematic is missing the second resistor, but that's almost certainly an error.
 	m_tom_dac->configure_voltage_output(R_DAC_I2V, R_DAC_I2V);
 	m_tom_dac->set_fixed_iref(TOM_DAC_IREF);
@@ -805,7 +808,8 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 	// The tom VCF has a cutoff frequency of ~650Hz, which transiently
 	// increases to ~46KHz when the voice triggers.
 	LINNDRUM_VCF_EG(config, m_tom_eg, ":trimmer_tom_freq_cv_offset", RES_K(10), RES_K(10));
-	auto &tom_vcf = CEM3320_LPF4(config, "tom_conga_vcf", CAP_P(330), RES_K(100));
+	auto &tom_vcf = CEM3320_LPF4(config, "tom_conga_vcf", CAP_P(330));
+	tom_vcf.configure_voltage_input(RES_K(91));
 	m_tom_dac->add_route(0, tom_vcf, 1.0, cem3320_lpf4_device::INPUT_AUDIO);
 	m_tom_eg->add_route(0, tom_vcf, 1.0, cem3320_lpf4_device::INPUT_FREQ);
 
@@ -1137,7 +1141,7 @@ void linndrum_audio_device::update_volume_and_pan(int channel)
 			// HPF transfer function: H(s) = (g * s) / (s + w) where
 			//   g = C1 / (C1 + C2)
 			//   w = 1 / (R * (C1 + C2))
-			const float fc = 1.0F / (2 * float(M_PI) * r_voice_gnd * (C_CLICK_DCBLOCK + C_CLICK_WIPER));
+			const float fc = 1.0F / (2 * std::numbers::pi_v<float> * r_voice_gnd * (C_CLICK_DCBLOCK + C_CLICK_WIPER));
 			const float gain = C_CLICK_DCBLOCK / (C_CLICK_DCBLOCK + C_CLICK_WIPER);
 			m_click_bpf->modify(filter_biquad_device::biquad_type::HIGHPASS1P1Z, fc, 1, gain * CLICK_GAIN_CORRECTION);
 			LOGMASKED(LOG_MIX, "- HPF cutoff: %.2f Hz, Gain: %.3f\n", fc, gain);
@@ -1161,7 +1165,7 @@ void linndrum_audio_device::update_volume_and_pan(int channel)
 		// The rest of the voices just have a DC-blocking filter. Its exact cutoff
 		// will depend on the volume and pan settings, but it won't be audible.
 		m_voice_hpf[channel]->filter_rc_set_RC(filter_rc_device::HIGHPASS, r_voice_gnd, 0, 0, C_VOICE);
-		LOGMASKED(LOG_MIX, "- HPF cutoff: %.2f Hz\n", 1.0F / (2 * float(M_PI) * r_voice_gnd * C_VOICE));
+		LOGMASKED(LOG_MIX, "- HPF cutoff: %.2f Hz\n", 1.0F / (2 * std::numbers::pi_v<float> * r_voice_gnd * C_VOICE));
 	}
 }
 
@@ -1570,10 +1574,6 @@ void linndrum_state::io_map(address_map &map)
 
 void linndrum_state::machine_start()
 {
-	m_step_display.resolve();
-	m_pattern_display.resolve();
-	m_tape_sync_out.resolve();
-
 	save_item(NAME(m_debouncing));
 	save_item(NAME(m_tempo_state));
 	save_item(NAME(m_tape_sync_enabled));

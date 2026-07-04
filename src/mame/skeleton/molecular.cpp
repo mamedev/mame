@@ -155,7 +155,7 @@ void molecula_state::file_output_w(offs_t offset, uint8_t data)
 		file_ram_enable = (data & 0x80) >> 7;
 
 	if(data & 0x7f || offset)
-		printf("FILE output -> %02x %02x\n",data,offset);
+		logerror("FILE output -> %02x %02x\n", data, offset);
 }
 
 
@@ -164,7 +164,7 @@ void molecula_state::app_output_w(uint8_t data)
 	app_ram_enable = (data & 0x80) >> 7;
 
 	if(data & 0x7f)
-		printf("APP 0x10 -> %02x\n",data);
+		logerror("APP 0x10 -> %02x\n", data);
 }
 
 uint8_t molecula_state::sio_r(offs_t offset)
@@ -178,7 +178,7 @@ uint8_t molecula_state::sio_r(offs_t offset)
 void molecula_state::sio_w(offs_t offset, uint8_t data)
 {
 	if(offset == 0)
-		printf("%c\n",data);
+		logerror("%c\n", data);
 }
 
 void molecula_state::molecula_file_map(address_map &map)

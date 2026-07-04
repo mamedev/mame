@@ -85,11 +85,9 @@ public:
 
 	{ }
 
-	void taitoo(machine_config &config);
-	DECLARE_INPUT_CHANGED_MEMBER(all_clear_cb);
+	void taitoo(machine_config &config) ATTR_COLD;
 
-protected:
-	virtual void machine_start() override { m_lamps.resolve(); };
+	DECLARE_INPUT_CHANGED_MEMBER(all_clear_cb);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -276,7 +274,7 @@ static INPUT_PORTS_START( parentj )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER )         PORT_NAME("Hopper Over")  // hopper overload sensor to activate diverter coil
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto2", FUNC(taitoio_opto_device::opto_h_r))
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto2", FUNC(taitoio_opto_device::opto_l_r))
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )   PORT_NAME("All Clear SW")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MEMORY_RESET )     PORT_NAME("All Clear SW")
 	PORT_SERVICE_NO_TOGGLE(0x0010, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // battery error if '1'
@@ -344,7 +342,7 @@ static INPUT_PORTS_START( eibise )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER )         PORT_NAME("Hopper Over")  // hopper overload sensor to activate diverter coil
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto2", FUNC(taitoio_opto_device::opto_h_r))
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto2", FUNC(taitoio_opto_device::opto_l_r))
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )   PORT_NAME("All Clear SW")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MEMORY_RESET )     PORT_NAME("All Clear SW")
 	PORT_SERVICE_NO_TOGGLE(0x0010, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // battery error if '1'
@@ -438,7 +436,7 @@ void taitoo_state::taitoo(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	for (auto &opto : m_opto)
-		TAITOIO_OPTO(config, opto, 0);
+		TAITOIO_OPTO(config, opto);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -450,7 +448,7 @@ void taitoo_state::taitoo(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 33*16);
 
-	TC0080VCO(config, m_tc0080vco, 0);
+	TC0080VCO(config, m_tc0080vco);
 	m_tc0080vco->set_offsets(1, 1);
 	m_tc0080vco->set_bgflip_yoffs(-2);
 	m_tc0080vco->set_palette(m_palette);

@@ -40,10 +40,10 @@ TODO:
 #define LOG_TODO   (1U << 2) // log unimplemented registers
 #define LOG_MAP    (1U << 3) // log full remaps
 #define LOG_LPC    (1U << 4) // log LPC legacy regs
-#define LOG_IRQ    (1U << 5) // log IRQ remaps
+#define LOG_IRQ    (1U << 5) // log IRQ remaps and state
 
 #define VERBOSE (LOG_GENERAL | LOG_IO | LOG_TODO | LOG_IRQ)
-//#define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
@@ -74,6 +74,14 @@ sis950_lpc_device::sis950_lpc_device(const machine_config &mconfig, const char *
 	, m_smbus(*this, "smbus")
 	, m_fast_reset_cb(*this)
 {
+}
+
+void sis950_lpc_device::device_start()
+{
+	pci_device::device_start();
+
+	m_pci_root->set_pin_mapper(pci_pin_mapper(*this, FUNC(sis950_lpc_device::pin_mapper)));
+	m_pci_root->set_irq_handler(pci_irq_handler(*this, FUNC(sis950_lpc_device::irq_handler)));
 }
 
 void sis950_lpc_device::device_reset()
@@ -118,7 +126,7 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 	constexpr XTAL lpc_pit_clock = XTAL(14'318'181);
 
 	// confirmed 82C54
-	PIT8254(config, m_pit, 0);
+	PIT8254(config, m_pit);
 	// heartbeat IRQ
 	m_pit->set_clk<0>(lpc_pit_clock / 12);
 	m_pit->out_handler<0>().set(FUNC(sis950_lpc_device::pit_out0));
@@ -129,7 +137,7 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 	m_pit->set_clk<2>(lpc_pit_clock / 12);
 	m_pit->out_handler<2>().set(FUNC(sis950_lpc_device::pit_out2));
 
-	// TODO: unknown part #
+	// TODO: unknown part # and clock (perhaps too fast?)
 	AM9517A(config, m_dmac_master, lpc_pit_clock / 3);
 	m_dmac_master->out_hreq_callback().set(m_dmac_slave, FUNC(am9517a_device::dreq0_w));
 	m_dmac_master->out_eop_callback().set(FUNC(sis950_lpc_device::at_dma8237_out_eop));
@@ -164,7 +172,7 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 	m_dmac_slave->out_dack_callback<3>().set(FUNC(sis950_lpc_device::pc_dack7_w));
 
 	// Confirmed 82C59s
-	PIC8259(config, m_pic_master, 0);
+	PIC8259(config, m_pic_master);
 	m_pic_master->out_int_callback().set_inputline(m_host_cpu, 0);
 	m_pic_master->in_sp_callback().set_constant(1);
 	m_pic_master->read_slave_ack_callback().set(
@@ -176,7 +184,7 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 			return 0;
 		});
 
-	PIC8259(config, m_pic_slave, 0);
+	PIC8259(config, m_pic_slave);
 	m_pic_slave->out_int_callback().set(m_pic_master, FUNC(pic8259_device::ir2_w));
 	m_pic_slave->in_sp_callback().set_constant(0);
 
@@ -213,7 +221,7 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->irq3_callback().set(FUNC(sis950_lpc_device::pc_irq3_w));
 	m_isabus->irq4_callback().set(FUNC(sis950_lpc_device::pc_irq4_w));
 	m_isabus->irq5_callback().set(FUNC(sis950_lpc_device::pc_irq5_w));
@@ -476,6 +484,7 @@ void sis950_lpc_device::io_map(address_map &map)
 
 	// map(0x00e0, 0x00ef) MCA bus (cfr. Bochs) or PnP
 	map(0x00eb, 0x00eb).lw8(NAME([] (offs_t offset, u8 data) { }));
+	map(0x00ed, 0x00ed).lw8(NAME([] (offs_t offset, u8 data) { }));
 
 	// map(0x00f0, 0x00f0) COPRO error
 	// map(0x0480, 0x048f) DMA high page registers
@@ -549,7 +558,7 @@ void sis950_lpc_device::map_extra(uint64_t memory_window_start, uint64_t memory_
 	if (BIT(m_bios_control, 7))
 	{
 		LOGMAP("- ACPI enable (%02x) %04x-%04x\n", m_bios_control, m_acpi_base, m_acpi_base + 0xff);
-		// shutms11 BIOS POST maps this at $5000
+		// shutms11 BIOS POST maps this at $5000, gamecstl at $8000
 		m_acpi->map_device(memory_window_start, memory_window_end, 0, memory_space, io_window_start, io_window_end, m_acpi_base, io_space);
 		io_space->install_device(m_acpi_base | 0x80, m_acpi_base | 0xff, *m_smbus, &sis950_smbus_device::map);
 	}
@@ -689,7 +698,7 @@ void sis950_lpc_device::nmi_control_w(uint8_t data)
 void sis950_lpc_device::rtc_index_w(uint8_t data)
 {
 	m_rtc_index = data & 0x7f;
-	// bit 7: NMI enable
+	// TODO: bit 7: NMI enable
 }
 
 u8 sis950_lpc_device::rtc_data_r()
@@ -862,4 +871,98 @@ void sis950_lpc_device::pc_dack5_w(int state) { pc_select_dma_channel(5, state);
 void sis950_lpc_device::pc_dack6_w(int state) { pc_select_dma_channel(6, state); }
 void sis950_lpc_device::pc_dack7_w(int state) { pc_select_dma_channel(7, state); }
 
+/*
+ * Pin Mapper
+ */
 
+void sis950_lpc_device::redirect_irq(int irq, int state)
+{
+	switch (irq)
+	{
+	case 0:
+	case 1:
+	case 2:
+	case 8:
+	case 13:
+		break;
+	case 3:
+		m_pic_master->ir3_w(state);
+		break;
+	case 4:
+		m_pic_master->ir4_w(state);
+		break;
+	case 5:
+		m_pic_master->ir5_w(state);
+		break;
+	case 6:
+		m_pic_master->ir6_w(state);
+		break;
+	case 7:
+		m_pic_master->ir7_w(state);
+		break;
+	case 9:
+		m_pic_slave->ir1_w(state);
+		break;
+	case 10:
+		m_pic_slave->ir2_w(state);
+		break;
+	case 11:
+		m_pic_slave->ir3_w(state);
+		break;
+	case 12:
+		m_pic_slave->ir4_w(state);
+		break;
+	case 14:
+		m_pic_slave->ir6_w(state);
+		break;
+	case 15:
+		m_pic_slave->ir7_w(state);
+		break;
+	}
+}
+
+
+int sis950_lpc_device::pin_mapper(int pin)
+{
+	if(pin < 0 || pin >= 4 || BIT(m_irq_remap[pin], 7))
+		return -1;
+	return m_irq_remap[pin];
+}
+
+void sis950_lpc_device::irq_handler(int line, int state)
+{
+	if(line < 0 || line >= 16)
+		return;
+
+	LOGIRQ("irq_handler %d %d\n", line, state);
+	redirect_irq(line, state);
+}
+
+// IDE can only redirect one IRQ, bit 4 select between Primary (0) or Secondary (1)
+void sis950_lpc_device::pc_iirqa_w(int state)
+{
+	u8 setting = m_irq_remap[IRQ_IDE];
+
+	if (BIT(setting, 7) || BIT(setting, 4))
+	{
+		redirect_irq(14, state);
+		return;
+	}
+
+	redirect_irq(setting & 0xf, state);
+}
+
+void sis950_lpc_device::pc_iirqb_w(int state)
+{
+	u8 setting = m_irq_remap[IRQ_IDE];
+
+	if (BIT(setting, 7) || !BIT(setting, 4))
+	{
+		redirect_irq(15, state);
+		return;
+	}
+
+	redirect_irq(setting & 0xf, state);
+}
+
+// TODO: public setter for remaining connections (cfr. table in irq_remap_w)

@@ -289,8 +289,6 @@ INPUT_CHANGED_MEMBER(mmd1_state::reset_button)
 
 void mmd1_state::machine_start()
 {
-	m_digits.resolve();
-	m_p.resolve();
 	save_item(NAME(m_cass_data));
 	save_item(NAME(m_cassinbit));
 	save_item(NAME(m_cassoutbit));

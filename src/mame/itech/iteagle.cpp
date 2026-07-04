@@ -102,13 +102,15 @@ www.multitech.com
 */
 
 #include "emu.h"
+
 #include "cpu/mips/mips3.h"
 #include "machine/pci.h"
-#include "machine/vrc4373.h"
-#include "video/voodoo_pci.h"
-#include "sound/es1373.h"
-#include "iteagle_fpga.h"
 #include "machine/pci-ide.h"
+#include "machine/vrc4373.h"
+#include "sound/es1373.h"
+#include "video/voodoo_pci.h"
+
+#include "iteagle_fpga.h"
 #include "screen.h"
 
 
@@ -175,17 +177,18 @@ void iteagle_state::iteagle(machine_config &config)
 	m_maincpu->set_dcache_size(8192);
 	m_maincpu->set_system_clock(66'666'666);
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 
-	vrc4373_device &vrc4373(VRC4373(config, PCI_ID_NILE, 0, m_maincpu));
+	vrc4373_device &vrc4373(VRC4373(config, PCI_ID_NILE, m_maincpu));
 	vrc4373.set_ram_size(0x00800000);
 	vrc4373.set_simm0_size(0x02000000);
 
-	ITEAGLE_PERIPH(config, PCI_ID_PERIPH, 0);
-	IDE_PCI(config, PCI_ID_IDE, 0, 0x1080C693, 0x00, 0x0)
+	ITEAGLE_PERIPH(config, PCI_ID_PERIPH);
+	// Contaq Microsystems 82c693
+	IDE_PCI(config, PCI_ID_IDE, 0, 0x1080c693, 0x00, 0x0)
 		.irq_handler().set_inputline(m_maincpu, MIPS3_IRQ2);
 
-	ITEAGLE_FPGA(config, m_fpga, 0, "screen", m_maincpu, MIPS3_IRQ1, MIPS3_IRQ4);
+	ITEAGLE_FPGA(config, m_fpga, "screen", m_maincpu, MIPS3_IRQ1, MIPS3_IRQ4);
 	m_fpga->in_callback<iteagle_fpga_device::IO_SW5>().set_ioport("SW5");
 	m_fpga->in_callback<iteagle_fpga_device::IO_IN1>().set_ioport("IN1");
 	m_fpga->in_callback<iteagle_fpga_device::IO_SYSTEM>().set_ioport("SYSTEM");
@@ -194,16 +197,16 @@ void iteagle_state::iteagle(machine_config &config)
 	m_fpga->gunx_callback().set_ioport("GUNX1");
 	m_fpga->guny_callback().set_ioport("GUNY1");
 
-	es1373_device &pci_sound(ES1373(config, PCI_ID_SOUND, 0));
+	es1373_device &pci_sound(ES1373(config, PCI_ID_SOUND));
 	pci_sound.add_route(0, PCI_ID_SOUND":speaker", 1.0, 0).add_route(1, PCI_ID_SOUND":speaker", 1.0, 1);
 	pci_sound.irq_handler().set_inputline(m_maincpu, MIPS3_IRQ3);
 
-	voodoo_3_pci_device &voodoo(VOODOO_3_PCI(config, PCI_ID_VIDEO, 0, m_maincpu, "screen"));
+	voodoo_3_pci_device &voodoo(VOODOO_3_PCI(config, PCI_ID_VIDEO, m_maincpu, "screen"));
 	voodoo.set_fbmem(16);
 	voodoo.set_status_cycles(1000); // optimization to consume extra cycles when polling status
 	subdevice<generic_voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(m_fpga, FUNC(iteagle_fpga_device::vblank_update));
 
-	ITEAGLE_EEPROM(config, m_eeprom, 0);
+	ITEAGLE_EEPROM(config, m_eeprom);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);

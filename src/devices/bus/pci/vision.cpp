@@ -71,7 +71,7 @@ void vision864_pci_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(s3vision864_vga_device::screen_update));
 
-	S3_VISION864_VGA(config, m_vga, 0);
+	S3_VISION864_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	// 1MB, option for 2MB
 	m_vga->set_vram_size(2*1024*1024);
@@ -102,11 +102,6 @@ void vision864_pci_device::device_reset()
 	remap_cb();
 }
 
-void vision864_pci_device::legacy_io_map(address_map &map)
-{
-	map(0, 0x02f).m(m_vga, FUNC(s3vision864_vga_device::io_map));
-}
-
 uint8_t vision864_pci_device::vram_r(offs_t offset)
 {
 	return downcast<s3vision864_vga_device *>(m_vga.target())->mem_r(offset);
@@ -115,6 +110,11 @@ uint8_t vision864_pci_device::vram_r(offs_t offset)
 void vision864_pci_device::vram_w(offs_t offset, uint8_t data)
 {
 	downcast<s3vision864_vga_device *>(m_vga.target())->mem_w(offset, data);
+}
+
+void vision864_pci_device::legacy_io_map(address_map &map)
+{
+	map(0x03b0, 0x03df).m(m_vga, FUNC(s3vision864_vga_device::io_map));
 }
 
 void vision864_pci_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -127,7 +127,7 @@ void vision864_pci_device::map_extra(uint64_t memory_window_start, uint64_t memo
 
 	if (BIT(command, 0))
 	{
-		io_space->install_device(0x03b0, 0x03df, *this, &vision864_pci_device::legacy_io_map);
+		io_space->install_device(0x0000, 0xffff, *this, &vision864_pci_device::legacy_io_map);
 	}
 }
 
@@ -171,7 +171,7 @@ void vision964_pci_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(s3vision964_vga_device::screen_update));
 
-	S3_VISION964_VGA(config, m_vga, 0);
+	S3_VISION964_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	// 2MB/4MB/8MB
 	m_vga->set_vram_size(4*1024*1024);
@@ -221,7 +221,7 @@ void vision968_pci_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(s3vision968_vga_device::screen_update));
 
-	S3_VISION968_VGA(config, m_vga, 0);
+	S3_VISION968_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	// 2MB/4MB/8MB
 	m_vga->set_vram_size(4*1024*1024);

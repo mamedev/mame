@@ -586,11 +586,11 @@ void excali64_state::excali64(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &excali64_state::io_map);
 	m_maincpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
-	I8251(config, "uart", 0);
+	I8251(config, "uart");
 	//uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	//uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit8253_device &pit(PIT8253(config, "pit"));
 	pit.set_clk<0>(16_MHz_XTAL / 16); /* Timer 0: tone gen for speaker */
 	pit.out_handler<0>().set("speaker", FUNC(speaker_sound_device::level_w));
 	//pit.set_clk<1>(16_MHz_XTAL / 16); /* Timer 1: baud rate gen for 8251 */
@@ -637,13 +637,13 @@ void excali64_state::excali64(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:1", excali64_floppies, "525qd", excali64_state::floppy_formats).enable_sound(true);
 
 	Z80DMA(config, m_dma, 16_MHz_XTAL / 4);
-	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_dma->in_mreq_callback().set(FUNC(excali64_state::memory_read_byte));
 	m_dma->out_mreq_callback().set(FUNC(excali64_state::memory_write_byte));
 	m_dma->in_iorq_callback().set(FUNC(excali64_state::io_read_byte));
 	m_dma->out_iorq_callback().set(FUNC(excali64_state::io_write_byte));
 
-	TTL74123(config, m_u12, 0);
+	TTL74123(config, m_u12);
 	m_u12->set_connection_type(TTL74123_GROUNDED);  /* Hook up type (no idea what this means) */
 	m_u12->set_resistor_value(RES_K(100));          /* resistor connected between RCext & 5v */
 	m_u12->set_capacitor_value(CAP_U(100));         /* capacitor connected between Cext and RCext */

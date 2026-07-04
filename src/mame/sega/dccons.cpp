@@ -403,7 +403,7 @@ void dc_cons_state::dc_base(machine_config &config)
 
 	FUJITSU_29LV002TC(config, "dcflash");
 
-	MAPLE_DC(config, m_maple, 0, m_maincpu);
+	MAPLE_DC(config, m_maple, m_maincpu);
 	m_maple->irq_callback().set(FUNC(dc_state::maple_irq));
 
 	/* video hardware */
@@ -412,7 +412,7 @@ void dc_cons_state::dc_base(machine_config &config)
 	screen.set_raw(13458568*2, 857, 0, 640, 524, 0, 480);
 	screen.set_screen_update("powervr2", FUNC(powervr2_device::screen_update));
 
-	POWERVR2(config, m_powervr2, 0);
+	POWERVR2(config, m_powervr2, 0); // FIXME: set clock so we can have a change of implementing proper timings
 	m_powervr2->set_cpu(m_maincpu);
 	m_powervr2->set_texture_ram(dc_texture_ram);
 	m_powervr2->set_framebuffer_ram(dc_framebuffer_ram);
@@ -431,7 +431,7 @@ void dc_cons_state::dc_base(machine_config &config)
 
 	AICARTC(config, "aicartc", XTAL(32'768));
 
-	ATA_INTERFACE(config, m_ata, 0);
+	ATA_INTERFACE(config, m_ata);
 	m_ata->irq_handler().set(FUNC(dc_cons_state::ata_interrupt));
 
 	ata_slot_device &ata_0(*subdevice<ata_slot_device>("ata:0"));
@@ -444,13 +444,13 @@ void dc_cons_state::dc(machine_config &config)
 {
 	dc_base(config);
 
-	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
+	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", m_maple, 0));
 	dcctrl0.set_port_tags("P1:0", "P1:1", "P1:A0", "P1:A1", "P1:A2", "P1:A3", "P1:A4", "P1:A5");
-	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
+	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", m_maple, 1));
 	dcctrl1.set_port_tags("P2:0", "P2:1", "P2:A0", "P2:A1", "P2:A2", "P2:A3", "P2:A4", "P2:A5");
-	dc_controller_device &dcctrl2(DC_CONTROLLER(config, "dcctrl2", 0, m_maple, 2));
+	dc_controller_device &dcctrl2(DC_CONTROLLER(config, "dcctrl2", m_maple, 2));
 	dcctrl2.set_port_tags("P3:0", "P3:1", "P3:A0", "P3:A1", "P3:A2", "P3:A3", "P3:A4", "P3:A5");
-	dc_controller_device &dcctrl3(DC_CONTROLLER(config, "dcctrl3", 0, m_maple, 3));
+	dc_controller_device &dcctrl3(DC_CONTROLLER(config, "dcctrl3", m_maple, 3));
 	dcctrl3.set_port_tags("P4:0", "P4:1", "P4:A0", "P4:A1", "P4:A2", "P4:A3", "P4:A4", "P4:A5");
 
 	SOFTWARE_LIST(config, "gdrom_list").set_original("dc");
@@ -462,7 +462,7 @@ void dc_cons_state::dc_fish(machine_config &config)
 {
 	dc_base(config);
 
-	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
+	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", m_maple, 0));
 	dcctrl0.set_port_tag<0>("P1:0");
 }
 
@@ -570,6 +570,22 @@ ROM_START( dcjp )
 	ROM_LOAD( "dcjp_ntsc.bin", 0x020000, 0x020000, CRC(306023ab) SHA1(5fb66adb6d1b54a552fe9c2bb736e4c6960e447d) ) // from refurbished VA0 with 1.004 BIOS
 ROM_END
 
+// VA0 motherboard, case internal marks: 8/98 MULTI
+// doesn't boot regular retail GD-ROMs
+// use a bit different game header format, for Katana SDK made games require Katana/WinCE flag (offset 0x3e) to be space (0x20), not '0'(0x30)
+ROM_START( dcproto )
+	ROM_REGION(0x200000, "maincpu", 0)
+	// M27C160-100M6 EEPROM
+	// printed label:
+	// BTR
+	// 0.822
+	// 9160
+	ROM_LOAD( "btr_0822.ic501", 0x000000, 0x200000, CRC(543fc14f) SHA1(c55242a444137d38059579f495a9d0b1be7ea41a) )
+
+	ROM_REGION64_LE(0x040000, "dcflash", ROMREGION_ERASEFF)
+	ROM_LOAD( "dc_flash.bin", 0x020000, 0x020000, CRC(97ae2693) SHA1(f009353e75d0832383d33d706775e5eaa1593753) ) // VA0
+ROM_END
+
 // unauthorised portable modification
 ROM_START( dctream )
 	ROM_REGION(0x200000, "maincpu", 0)
@@ -593,15 +609,15 @@ ROM_START( dcdev )
 	ROM_SYSTEM_BIOS(3, "0972", "Katana Set5 v0.972 (Japan)")    // BOOT flash rom update from Katana SDK 1.00b2
 	ROM_LOAD_BIOS(3, "set5v0.972.ic507", 0x000000, 0x200000, CRC(1a2f2a91) SHA1(08df891f02cf959189bc9b7c4ac1a4e6a4475b50) )
 
-	// 27C160 EPROM (DIP42) IC??? labeled
+	// 27C160 EPROM (DIP42) IC503 labeled
 	// SET5 7676
 	// V0.71 98/11/13
 	ROM_SYSTEM_BIOS(4, "071", "Katana Set5 Checker v0.71")
-	ROM_LOAD_BIOS(4, "set5v0.71.bin", 0x000000, 0x200000, CRC(52d01969) SHA1(28aec4a01419d2d2a664c540bef30ea289ca0644) )
+	ROM_LOAD_BIOS(4, "set5v0.71.ic503", 0x000000, 0x200000, CRC(52d01969) SHA1(28aec4a01419d2d2a664c540bef30ea289ca0644) )
 	// SET5 FC52
 	// V0.41 98/08/27
 	ROM_SYSTEM_BIOS(5, "041", "Katana Set5 Checker v0.41")
-	ROM_LOAD_BIOS(5, "set5v0.41.bin", 0x000000, 0x200000, CRC(485877bd) SHA1(dc1af1f1248ffa87d57bc5ef2ea41aac95ecfc5e) )
+	ROM_LOAD_BIOS(5, "set5v0.41.ic503", 0x000000, 0x200000, CRC(485877bd) SHA1(dc1af1f1248ffa87d57bc5ef2ea41aac95ecfc5e) )
 
 	ROM_REGION64_LE(0x040000, "dcflash", ROMREGION_ERASEFF)
 	// Dev.Boxes have empty (FF filled) flash ROM
@@ -611,6 +627,7 @@ ROM_END
 CONS( 1999, dc,      dcjp,   0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "Dreamcast (USA, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1998, dcjp,    0,      0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "Dreamcast (Japan, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1999, dceu,    dcjp,   0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "Dreamcast (Europe, PAL)", MACHINE_NOT_WORKING )
+CONS( 1998, dcproto, dcjp,   0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "Dreamcast (prototype)", MACHINE_NOT_WORKING )
 CONS( 200?, dctream, dcjp,   0,      dc,      dc,    dc_cons_state, init_tream,"<unknown>", "Treamcast", MACHINE_NOT_WORKING )
 CONS( 1998, dcdev,   0,      0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "HKT-0120 Sega Dreamcast Development Box", MACHINE_NOT_WORKING )
 

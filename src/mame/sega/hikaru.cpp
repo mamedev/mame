@@ -1033,18 +1033,18 @@ void hikaru_state::hikaru(machine_config &config)
 	m_slave->set_addrmap(AS_IO, &hikaru_state::sh4_io_slave);
 //  m_slave->set_force_no_drc(true);
 
-	PCI_ROOT(config, "pci0", 0);
-	SEGA315_6154(config, m_315_6154, 0);
+	PCI_ROOT(config, "pci0");
+	SEGA315_6154(config, m_315_6154);
 	m_315_6154->set_addrmap(sega_315_6154_device::AS_PCI_MEMORY, &hikaru_state::localbus_map);
 	m_315_6154->set_mode(sega_315_6154_device::MODE_MASTER);
 	m_315_6154->irq1_callback().set_inputline(m_maincpu, SH4_IRL1);
-	PCI_ROOT(config, "pci1", 0);
-	SEGA315_6154(config, s_315_6154, 0);
+	PCI_ROOT(config, "pci1");
+	SEGA315_6154(config, s_315_6154);
 	s_315_6154->set_addrmap(sega_315_6154_device::AS_PCI_MEMORY, &hikaru_state::localbus_map);
 	s_315_6154->set_mode(sega_315_6154_device::MODE_SLAVE);
 	s_315_6154->irq1_callback().set_inputline(m_slave, SH4_IRL1);
 
-	MAPLE_DC(config, "maple", 0, m_maincpu); // TODO: get rid of this, there is no any Maple-host in Hikaru
+	MAPLE_DC(config, "maple", m_maincpu); // TODO: get rid of this, there is no any Maple-host in Hikaru
 
 	MIE(config, m_mie, 16000000, "maple", 0, "jvs");
 	m_mie->set_gpio_name<0>("MIE.0");
@@ -1054,7 +1054,7 @@ void hikaru_state::hikaru(machine_config &config)
 	m_mie->set_gpio_name<6>("MIE.6");
 	MIE_JVS(config, "jvs", 16000000);
 
-	sega_837_13551_device& sega837(SEGA_837_13551(config, "837_13551", 0, "jvs"));
+	sega_837_13551_device& sega837(SEGA_837_13551(config, "837_13551", "jvs"));
 	sega837.set_port_tags("TILT", "P1", "P2", "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "OUTPUT");
 
 	EEPROM_93C46_8BIT(config, m_eeprom);
@@ -1101,7 +1101,7 @@ void hikaru_state::hikaru_5881(machine_config& config)
 	m_315_6154->set_addrmap(sega_315_6154_device::AS_PCI_MEMORY, &hikaru_state::localbus_map_5881);
 	s_315_6154->set_addrmap(sega_315_6154_device::AS_PCI_MEMORY, &hikaru_state::localbus_map_5881);
 
-	SEGA315_5881_CRYPT(config, m_crypt, 0);
+	SEGA315_5881_CRYPT(config, m_crypt);
 	m_crypt->set_read_cb(FUNC(hikaru_state::prot_ram_r));
 }
 
@@ -1406,6 +1406,10 @@ ROM_START( sgnascaro )
 	// ID 0x4252
 	ROM_PARAMETER( ":rom_board:key", "56dedf33" )
 ROM_END
+
+// known to exists
+// factory release v7.5: Rev C ic29/30 and no rev ic31/32
+// v7.6 update: Rev D ic29/30 and ??? ic31/32
 
 // ROM board: 834-14247, main board: 833-14246-01 VOF
 ROM_START( von4 )

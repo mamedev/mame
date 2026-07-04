@@ -35,11 +35,6 @@ inline void dspp_device::alloc_handle(code_handle **handleptr, const char *name)
 		*handleptr = m_drcuml->handle_alloc(name);
 }
 
-static inline uint32_t epc(const opcode_desc *desc)
-{
-	return desc->pc;
-}
-
 
 #if 0
 static void cfunc_unimplemented(void *param)
@@ -210,7 +205,7 @@ void dspp_device::compile_block(offs_t pc)
 
 				/* determine the last instruction in this sequence */
 				for (seqlast = seqhead; seqlast != nullptr; seqlast = seqlast->next())
-					if (seqlast->flags & OPFLAG_END_SEQUENCE)
+					if (seqlast->end_sequence())
 						break;
 				assert(seqlast != nullptr);
 
@@ -238,7 +233,7 @@ void dspp_device::compile_block(offs_t pc)
 				generate_checksum_block(block, &compiler, seqhead, seqlast);
 
 				/* label this instruction, if it may be jumped to locally */
-				if (seqhead->flags & OPFLAG_IS_BRANCH_TARGET)
+				if (seqhead->is_branch_target())
 					UML_LABEL(block, seqhead->pc | 0x80000000);                             // label   seqhead->pc
 
 				compiler.abortlabel = compiler.labelnum++;
@@ -249,7 +244,7 @@ void dspp_device::compile_block(offs_t pc)
 				UML_LABEL(block, compiler.abortlabel);
 
 				/* if we need to return to the start, do it */
-				if (seqlast->flags & OPFLAG_RETURN_TO_START)
+				if (seqlast->return_to_start())
 					nextpc = pc;
 
 				/* otherwise we just go to the next instruction */
@@ -281,13 +276,13 @@ void dspp_device::generate_checksum_block(drcuml_block &block, compiler_state *c
 	if (m_drcuml->logging())
 		block.append_comment("[Validation for %08X]", seqhead->pc);                // comment
 
-	/* loose verify or single instruction: just compare and fail */
 	if (false/*!(m_drcoptions & DSPPDRC_STRICT_VERIFY)*/ || seqhead->next() == nullptr)
 	{
-		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
+		// loose verify or single instruction: just compare and fail
+		if (!seqhead->virtual_noop())
 		{
-			uint32_t sum = seqhead->opptr.w[0];
-			uint32_t addr = seqhead->physpc;
+			uint32_t sum = seqhead->opptr[0];
+			uint32_t addr = seqhead->pc;
 			const void *base = m_code_cache.read_ptr(addr);
 			UML_MOV(block, I0, 0);
 			UML_LOAD(block, I0, base, 0, SIZE_WORD, SCALE_x2);         // load    i0,base,0,word
@@ -296,27 +291,28 @@ void dspp_device::generate_checksum_block(drcuml_block &block, compiler_state *c
 			UML_EXHc(block, COND_NE, *m_nocode, seqhead->pc);           // exne    nocode,seqhead->pc
 		}
 	}
-
-	/* full verification; sum up everything */
 	else
 	{
+		// full verification; sum up everything
 		uint32_t sum = 0;
-		uint32_t addr = seqhead->physpc;
+		uint32_t addr = seqhead->pc;
 		const void *base = m_code_cache.read_ptr(addr);
 		UML_LOAD(block, I0, base, 0, SIZE_WORD, SCALE_x2);              // load    i0,base,0,dword
-		sum += seqhead->opptr.w[0];
+		sum += seqhead->opptr[0];
 		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
-			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
+		{
+			if (!curdesc->virtual_noop())
 			{
-				addr = curdesc->physpc;
+				addr = curdesc->pc;
 				base = m_code_cache.read_ptr(addr);
 				assert(base != nullptr);
 				UML_LOAD(block, I1, base, 0, SIZE_WORD, SCALE_x2);      // load    i1,base,dword
 				UML_ADD(block, I0, I0, I1);                             // add     i0,i0,i1
-				sum += curdesc->opptr.w[0];
+				sum += curdesc->opptr[0];
 			}
+		}
 		UML_CMP(block, I0, sum);                                        // cmp     i0,sum
-		UML_EXHc(block, COND_NE, *m_nocode, epc(seqhead));              // exne    nocode,seqhead->pc
+		UML_EXHc(block, COND_NE, *m_nocode, seqhead->epc());            // exne    nocode,seqhead->pc
 	}
 }
 
@@ -414,16 +410,8 @@ void dspp_device::generate_sequence_instruction(drcuml_block &block, compiler_st
 		UML_DEBUG(block, desc->pc);                                                         // debug   desc->pc
 	}
 
-	/* if we hit an unmapped address, fatal error */
-	if (desc->flags & OPFLAG_COMPILER_UNMAPPED)
-	{
-		UML_MOV(block, mem(&m_core->m_pc), desc->pc);                                       // mov     [pc],desc->pc
-		save_fast_iregs(block);                                                             // <save fastregs>
-		UML_EXIT(block, EXECUTE_UNMAPPED_CODE);                                             // exit    EXECUTE_UNMAPPED_CODE
-	}
-
 	/* unless this is a virtual no-op, it's a regular instruction */
-	if (!(desc->flags & OPFLAG_VIRTUAL_NOOP))
+	if (!desc->virtual_noop())
 	{
 		generate_opcode(block, compiler, desc);
 	}
@@ -443,7 +431,7 @@ void dspp_device::generate_update_cycles(drcuml_block &block, compiler_state *co
 
 void dspp_device::generate_opcode(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc)
 {
-	uint16_t op = desc->opptr.w[0];
+	uint16_t op = desc->opptr[0];
 
 	UML_SUB(block, mem(&m_core->m_tclock), mem(&m_core->m_tclock), 1);
 	UML_CALLC(block, cfunc_update_fifo_dma, this);
@@ -457,7 +445,7 @@ void dspp_device::generate_opcode(drcuml_block &block, compiler_state *compiler,
 	//UML_TEST(block, mem(&m_core->m_flag_sleep), 1);
 	//UML_JMPc(block, COND_NZ, compiler->abortlabel);
 
-	//UML_MOV(block, mem(&m_core->m_arg0), desc->physpc);
+	//UML_MOV(block, mem(&m_core->m_arg0), desc->pc);
 	//UML_MOV(block, mem(&m_core->m_arg1), op);
 	//UML_CALLC(block, cfunc_print_sums, this);
 
@@ -509,7 +497,7 @@ void dspp_device::generate_set_rbase(drcuml_block &block, compiler_state *compil
 
 void dspp_device::generate_super_special(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc)
 {
-	uint16_t op = desc->opptr.w[0];
+	uint16_t op = desc->opptr[0];
 	uint32_t sel = (op >> 7) & 7;
 
 	switch (sel)
@@ -560,7 +548,7 @@ void dspp_device::generate_super_special(drcuml_block &block, compiler_state *co
 
 void dspp_device::generate_special_opcode(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc)
 {
-	uint16_t op = desc->opptr.w[0];
+	uint16_t op = desc->opptr[0];
 
 	switch ((op >> 10) & 7)
 	{
@@ -666,7 +654,7 @@ void dspp_device::generate_branch(drcuml_block &block, compiler_state *compiler,
 	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
 	{
 		generate_update_cycles(block, &compiler_temp, desc->targetpc);  // <subtract cycles>
-		if (desc->flags & OPFLAG_INTRABLOCK_BRANCH)
+		if (desc->intrablock_branch())
 			UML_JMP(block, desc->targetpc | 0x80000000);                // jmp     desc->targetpc | 0x80000000
 		else
 			UML_HASHJMP(block, 0, desc->targetpc, *m_nocode);           // hashjmp <mode>,desc->targetpc,nocode
@@ -686,7 +674,7 @@ void dspp_device::generate_branch(drcuml_block &block, compiler_state *compiler,
 
 void dspp_device::generate_branch_opcode(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc)
 {
-	uint16_t op = desc->opptr.w[0];
+	uint16_t op = desc->opptr[0];
 
 	if (m_drcuml->logging())
 		block.append_comment("branch_opcode");
@@ -734,7 +722,7 @@ void dspp_device::generate_branch_opcode(drcuml_block &block, compiler_state *co
 
 void dspp_device::generate_complex_branch_opcode(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc)
 {
-	uint16_t op = desc->opptr.w[0];
+	uint16_t op = desc->opptr[0];
 
 	switch ((op >> 10) & 7)
 	{
@@ -929,7 +917,7 @@ void dspp_device::generate_parse_operands(drcuml_block &block, compiler_state *c
 
 void dspp_device::generate_read_next_operand(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc)
 {
-	//uint16_t op = (uint16_t)desc->opptr.w[0];
+	//uint16_t op = desc->opptr[0];
 
 	code_label no_load;
 	if (m_drcuml->logging())
@@ -977,7 +965,7 @@ void dspp_device::generate_write_next_operand(drcuml_block &block, compiler_stat
 
 void dspp_device::generate_arithmetic_opcode(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc)
 {
-	uint16_t op = (uint16_t)desc->opptr.w[0];
+	uint16_t op = desc->opptr[0];
 	uint32_t numops = (op >> 13) & 3;
 	uint32_t muxa = (op >> 10) & 3;
 	uint32_t muxb = (op >> 8) & 3;

@@ -126,7 +126,7 @@ void megacrane_state::megacrane(machine_config &config)
 	m_maincpu->in_pd_callback().set_ioport("IN2");
 	m_maincpu->in_pe_callback().set_ioport("SW1");
 
-	GENERIC_SPI_FLASH(config, m_spi, 0);
+	GENERIC_SPI_FLASH(config, m_spi);
 
 	SPEAKER(config, "mono").front_center();
 

@@ -14,6 +14,8 @@
 
 #include "layout/generic.h"
 
+#include "endianness.h"
+
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
@@ -59,7 +61,7 @@ void rbv_device::device_add_mconfig(machine_config &config)
 	m_screen->screen_vblank().set(m_pseudovia, FUNC(pseudovia_device::slot_irq_w<0x40>));
 	config.set_default_layout(layout_monitors);
 
-	BT478(config, m_bt478, 0);
+	BT478(config, m_bt478);
 
 	APPLE_PSEUDOVIA(config, m_pseudovia, DERIVED_CLOCK(1, 2));
 	m_pseudovia->readvideo_handler().set(FUNC(rbv_device::via2_video_config_r));

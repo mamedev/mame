@@ -1778,7 +1778,7 @@ void dkong_state::dkong_base(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,dkong)
 
 	I8257(config, m_dma8257, CLOCK_1H);
-	m_dma8257->out_hrq_cb().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dma8257->out_hrq_cb().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_dma8257->in_memr_cb().set(FUNC(dkong_state::memory_read_byte));
 	m_dma8257->out_memw_cb().set(FUNC(dkong_state::memory_write_byte));
 	m_dma8257->in_ior_cb<1>().set(FUNC(dkong_state::p8257_ctl_r));
@@ -1896,7 +1896,7 @@ void dkong_state::dkong3(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(dkong_state, dkong3)
 
 	Z80DMA(config, m_z80dma, CLOCK_1H);
-	m_z80dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_z80dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_z80dma->in_mreq_callback().set(FUNC(dkong_state::memory_read_byte));
 	m_z80dma->out_mreq_callback().set(FUNC(dkong_state::memory_write_byte));
 
@@ -3959,4 +3959,4 @@ GAME( 1985, strtheat,  0,        strtheat,  strtheat, dkong_state, init_strtheat
 GAME( 1985, strtheata, strtheat, strtheat,  strtheat, dkong_state, init_strtheat, ROT270, "Epos Corporation", "Street Heat (set 2, older?)", MACHINE_SUPPORTS_SAVE ) // distributed by Cardinal Amusements Products (a division of Epos Corporation)
 
 /* Atari */
-GAME( 1985, jammin,  0,    jammin, jammin,  jammin_state, empty_init, ROT270, "Atari Games", "Jammin' (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, jammin,    0,        jammin,    jammin,   jammin_state,empty_init,    ROT270, "Atari Games", "Jammin' (prototype)", MACHINE_SUPPORTS_SAVE )

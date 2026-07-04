@@ -56,7 +56,10 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
-	void thedealr(machine_config &config);
+	void thedealr(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// IOX
@@ -80,8 +83,6 @@ private:
 
 	void thedealr_main(address_map &map) ATTR_COLD;
 	void thedealr_sub(address_map &map) ATTR_COLD;
-
-	virtual void machine_start() override ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -270,7 +271,7 @@ static INPUT_PORTS_START( thedealr )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5   ) // HL5 (hold 5)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HALF   ) // 1/2 (half gamble)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW    ) PORT_NAME("Small") // SML (small)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Attendant Reset") // RST (reset: clears tilt condition)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1      ) PORT_NAME("Attendant Reset") // RST (reset: clears tilt condition)
 
 	PORT_START("IOX1")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED        )
@@ -447,7 +448,6 @@ GFXDECODE_END
 
 void thedealr_state::machine_start()
 {
-	m_leds.resolve();
 	m_led_timer = timer_alloc(FUNC(thedealr_state::update_leds), this);
 
 	m_iox_p1 = 0xff;

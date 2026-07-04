@@ -24,20 +24,20 @@ rp2a03_vtscr::rp2a03_vtscr(const machine_config &mconfig, const char *tag, devic
 
 void rp2a03_vtscr::device_start()
 {
-	mintf = std::make_unique<mi_decrypt>();
+	m_mintf = std::make_unique<mi_decrypt>();
 	set_scramble(0x00);
 	init();
 }
 
 void rp2a03_vtscr::set_next_scramble(uint8_t scr)
 {
-	downcast<mi_decrypt &>(*mintf).m_next_scramble = scr;
+	downcast<mi_decrypt &>(*m_mintf).m_next_scramble = scr;
 }
 
 void rp2a03_vtscr::set_scramble(uint8_t scr)
 {
-	downcast<mi_decrypt &>(*mintf).m_next_scramble = scr;
-	downcast<mi_decrypt &>(*mintf).m_scramble_en = scr;
+	downcast<mi_decrypt &>(*m_mintf).m_next_scramble = scr;
+	downcast<mi_decrypt &>(*m_mintf).m_scramble_en = scr;
 }
 
 
@@ -54,7 +54,7 @@ bool rp2a03_vtscr::mi_decrypt::toggle_scramble(uint8_t op) {
 
 uint8_t rp2a03_vtscr::mi_decrypt::read_sync(uint16_t adr)
 {
-	uint8_t res = cprogram.read_byte(adr);
+	uint8_t res = m_cprogram.read_byte(adr);
 	if(m_scramble_en)
 	{
 		res = descramble(res);
@@ -74,10 +74,10 @@ uint8_t rp2a03_vtscr::mi_decrypt::descramble(uint8_t op)
 
 std::unique_ptr<util::disasm_interface> rp2a03_vtscr::create_disassembler()
 {
-	return std::make_unique<disassembler>(downcast<mi_decrypt *>(mintf.get()));
+	return std::make_unique<disassembler>(downcast<mi_decrypt *>(m_mintf.get()));
 }
 
-rp2a03_vtscr::disassembler::disassembler(mi_decrypt *mi) : mintf(mi)
+rp2a03_vtscr::disassembler::disassembler(mi_decrypt *mi) : m_mintf(mi)
 {
 }
 
@@ -88,5 +88,5 @@ u32 rp2a03_vtscr::disassembler::interface_flags() const
 
 u8 rp2a03_vtscr::disassembler::decrypt8(u8 value, offs_t pc, bool opcode) const
 {
-	return opcode && mintf->m_scramble_en ? mintf->descramble(value) : value;
+	return opcode && m_mintf->m_scramble_en ? m_mintf->descramble(value) : value;
 }

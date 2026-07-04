@@ -840,7 +840,7 @@ void alphatro_state::alphatro(machine_config &config)
 	m_dmac->out_iow_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_w));
 	m_dmac->out_tc_cb().set(m_fdc, FUNC(upd765a_device::tc_line_w));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->in_sp_callback().set_constant(1);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
@@ -859,11 +859,13 @@ void alphatro_state::alphatro(machine_config &config)
 	m_usart->rxrdy_handler().set(m_pic, FUNC(pic8259_device::ir1_w));
 	m_usart->txrdy_handler().set(m_pic, FUNC(pic8259_device::ir2_w));
 
-	clock_device &cass_clock(CLOCK(config, "cass_clock", 16_MHz_XTAL / 4 / 13 / 16)); // 19.2 kHz
+	clock_device &cass_clock(CLOCK(config, "cass_clock"));
+	cass_clock.set_period(attotime::from_hz(16_MHz_XTAL / 4 / 13 / 16)); // 19.2 kHz
 	cass_clock.signal_handler().set(FUNC(alphatro_state::kansas_w));
 	cass_clock.signal_handler().append(FUNC(alphatro_state::kansas_r));
 
-	clock_device &serial_clock(CLOCK(config, "serial_clock", 16_MHz_XTAL / 4 / 13 / 4)); // 76.8 kHz 4800 baud (can be set with jumpers)
+	clock_device &serial_clock(CLOCK(config, "serial_clock"));
+	serial_clock.set_period(attotime::from_hz(16_MHz_XTAL / 4 / 13 / 4)); // 76.8 kHz 4800 baud (can be set with jumpers)
 	serial_clock.signal_handler().append(m_usart, FUNC(i8251_device::write_txc));
 	serial_clock.signal_handler().append(m_usart, FUNC(i8251_device::write_rxc));
 

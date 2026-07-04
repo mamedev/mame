@@ -29,16 +29,13 @@ class gromport_device : public device_t, public device_single_card_slot_interfac
 {
 public:
 	template <typename U>
-	gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, U &&opts, const char *dflt)
-		: gromport_device(mconfig, tag, owner, clock)
+	gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, U &&opts, const char *dflt)
+		: gromport_device(mconfig, tag, owner)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<U>(opts), dflt, false);
 	}
 
-	gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void readz(offs_t offset, uint8_t *value);
 	void write(offs_t offset, uint8_t data);

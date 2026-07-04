@@ -767,7 +767,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="inindo">
-		<description>Inindou - Datou Nobunaga (Japan)</description>
+		<description>Inindou: Datou Nobunaga (Japan)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="伊忍道 打倒信長" />

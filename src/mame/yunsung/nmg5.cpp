@@ -1009,7 +1009,7 @@ void nmg5_state::nmg5(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_nmg5);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 0x400);
 
-	DECO_SPRITE(config, m_sprgen, 0, "palette", gfx_nmg5_spr);
+	DECO_SPRITE(config, m_sprgen, "palette", gfx_nmg5_spr);
 	m_sprgen->set_is_bootleg(true);
 	m_sprgen->set_flipallx(1);
 	m_sprgen->set_offsets(0, 8);

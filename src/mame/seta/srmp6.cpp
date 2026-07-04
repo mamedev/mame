@@ -71,9 +71,13 @@ Dumped 06/15/2000
 
 
 #include "emu.h"
+
+#include "mahjong.h"
+
 #include "cpu/m68000/m68000.h"
 #include "video/bufsprite.h"
 #include "sound/setapcm.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -98,7 +102,7 @@ public:
 		m_sprram(*this, "sprram")
 	{ }
 
-	void srmp6(machine_config &config);
+	void srmp6(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -208,127 +212,69 @@ void srmp6_state::video_start()
 	save_item(NAME(m_lastb2));
 }
 
-#if 0
-static int xixi = 0;
-#endif
-
 u32 srmp6_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int alpha;
-	int x,y,tileno,height,width,xw,yw,sprite,xb,yb;
-	u16 *sprite_list = m_sprram->buffer();
-	u16 mainlist_offset = 0;
-
-	union
-	{
-		s16 a;
-		u16 b;
-	} temp;
+	u16 const *const sprite_list = m_sprram->buffer();
 
 	bitmap.fill(0, cliprect);
 
-#if 0
-	//debug
-	if (machine().input().code_pressed_once(KEYCODE_Q))
-	{
-		++xixi;
-		logerror("%x\n",xixi);
-	}
-
-	if (machine().input().code_pressed_once(KEYCODE_W))
-	{
-		--xixi;
-		logerror("%x\n",xixi);
-	}
-#endif
-
 	// Main spritelist is 0x0000 - 0x1fff in spriteram, sublists follow
-	while (mainlist_offset<0x2000/2)
+	u16 mainlist_offset = 0;
+	while (mainlist_offset < 0x2000/2)
 	{
-		u16 *sprite_sublist = &sprite_list[sprite_list[mainlist_offset+1]<<3];
-		u16 sublist_length=sprite_list[mainlist_offset+0] & 0x7fff; //+1 ?
-		s16 global_x,global_y, flip_x, flip_y;
-		u16 global_pal;
+		u16 const *sprite_sublist = &sprite_list[sprite_list[mainlist_offset+1]<<3];
+		u16 sublist_length = sprite_list[mainlist_offset+0] & 0x7fff; //+1 ?
 
 		// end of list marker
-		if (sprite_list[mainlist_offset+0] == 0x8000)
+		if (sprite_list[mainlist_offset + 0] == 0x8000)
 			break;
 
-		if (sprite_list[mainlist_offset+0] != 0)
+		if (sprite_list[mainlist_offset + 0] != 0)
 		{
-			temp.b=sprite_list[mainlist_offset+2];
-			global_x=temp.a;
-			temp.b=sprite_list[mainlist_offset+3];
-			global_y=temp.a;
+			s16 const global_x = s16(sprite_list[mainlist_offset + 2]);
+			s16 const global_y = s16(sprite_list[mainlist_offset + 3]);
 
-			global_pal = sprite_list[mainlist_offset+4] & 0x7;
+			u16 const global_pal = sprite_list[mainlist_offset + 4] & 0x7;
 
-			if ((sprite_list[mainlist_offset+5] & 0x700) == 0x700)
-			{
-				alpha = pal5bit(sprite_list[mainlist_offset+5] & 0x1f);
-			}
-			else
-			{
-				alpha = 255;
-			}
-			//  logerror("%x %x \n",sprite_list[mainlist_offset+1],sublist_length);
+			int const alpha = ((sprite_list[mainlist_offset + 5] & 0x700) == 0x700)
+					? pal5bit(sprite_list[mainlist_offset + 5] & 0x1f)
+					: 255;
+			//logerror("%x %x \n", sprite_list[mainlist_offset + 1], sublist_length);
 
 			while (sublist_length)
 			{
-				sprite=sprite_sublist[0] & 0x7fff;
-				flip_x=sprite_sublist[1]>>8&1;
-				flip_y=sprite_sublist[1]>>9&1;
-				temp.b=sprite_sublist[2];
-				x=temp.a;
-				temp.b=sprite_sublist[3];
-				y=temp.a;
-				//x+=global_x;
-				//y+=global_y;
+				int const sprite = sprite_sublist[0] & 0x7fff;
+				u16 const flip_x = BIT(sprite_sublist[1], 8);
+				u16 const flip_y = BIT(sprite_sublist[1], 9);
+				int x = s16(sprite_sublist[2]);
+				int y = s16(sprite_sublist[3]);
 
-				width=((sprite_sublist[1]) & 0x3);
-				height=((sprite_sublist[1]>>2) & 0x3);
+				int const width = 1 << ((sprite_sublist[1]) & 0x3);
+				int const height = 1 << ((sprite_sublist[1]>>2) & 0x3);
 
-				height = 1 << height;
-				width = 1 << width;
-
-				y-=height*8;
-				tileno = sprite;
+				y -= height*8;
+				int tileno = sprite;
 				//tileno += (sprite_list[4] & 0xf)*0x4000; // this makes things worse in places (title screen for example)
 
-				for (xw = 0; xw < width; xw++)
+				for (int xw = 0; xw < width; xw++)
 				{
-					for (yw = 0; yw < height; yw++)
+					for (int yw = 0; yw < height; yw++)
 					{
-						if (!flip_x)
-							xb=x+xw*8+global_x;
-						else
-							xb=x+(width-xw-1)*8+global_x;
+						int const xb = x + global_x + ((!flip_x ? xw : (width - xw - 1)) * 8);
+						int const yb = y + global_y + ((!flip_y ? yw : (height - yw - 1)) * 8);
 
-						if (!flip_y)
-							yb=y+yw*8+global_y;
-						else
-							yb=y+(height-yw-1)*8+global_y;
-
-						m_gfxdecode->gfx(0)->alpha(bitmap,cliprect,tileno,global_pal,flip_x,flip_y,xb,yb,0,alpha);
+						m_gfxdecode->gfx(0)->alpha(bitmap, cliprect, tileno, global_pal, flip_x, flip_y, xb, yb, 0, alpha);
 						tileno++;
 					}
 				}
-				sprite_sublist+=8;
+				sprite_sublist += 8;
 				--sublist_length;
 			}
 		}
-		mainlist_offset+=8;
+		mainlist_offset += 8;
 	}
 
 	m_sprram->copy();
-
-	if (machine().input().code_pressed_once(KEYCODE_Q))
-	{
-		FILE *p=fopen("tileram.bin","wb");
-		fwrite(m_tileram.get(), 1, 0x100000*16, p);
-		fclose(p);
-	}
-
 
 	return 0;
 }
@@ -350,15 +296,14 @@ void srmp6_state::input_select_w(u16 data)
 
 u16 srmp6_state::inputs_r()
 {
-	switch (m_input_select) // inputs
+	uint16_t ret = 0xffff;
+	for (unsigned i = 0; m_key_io.size() > i; ++i)
 	{
-		case 1<<0: return m_key_io[0]->read();
-		case 1<<1: return m_key_io[1]->read();
-		case 1<<2: return m_key_io[2]->read();
-		case 1<<3: return m_key_io[3]->read();
+		if (BIT(m_input_select, i))
+			ret &= m_key_io[i]->read();
 	}
 
-	return 0;
+	return ((ret << 1) | (ret >> 15)) & 0xffff;
 }
 
 
@@ -592,43 +537,24 @@ void srmp6_state::srmp6_map(address_map &map)
 ***************************************************************************/
 
 static INPUT_PORTS_START( srmp6 )
+	PORT_INCLUDE(mahjong_matrix_1p)
 
-	PORT_START("KEY0")
-	PORT_BIT( 0xfe01, IP_ACTIVE_LOW, IPT_UNUSED ) // explicitly discarded
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
-	PORT_SERVICE_NO_TOGGLE( 0x0100, IP_ACTIVE_LOW )
+	PORT_MODIFY("KEY0")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_SERVICE_NO_TOGGLE( 0x0080, IP_ACTIVE_LOW )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED ) // explicitly discarded
 
-	PORT_START("KEY1")
-	PORT_BIT( 0xfe41, IP_ACTIVE_LOW, IPT_UNUSED ) // explicitly discarded
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x0180, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("KEY1")
+	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xff20, IP_ACTIVE_LOW, IPT_UNUSED ) // explicitly discarded
 
-	PORT_START("KEY2")
-	PORT_BIT( 0xfe41, IP_ACTIVE_LOW, IPT_UNUSED ) // explicitly discarded
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x0180, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("KEY2")
+	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xff20, IP_ACTIVE_LOW, IPT_UNUSED ) // explicitly discarded
 
-	PORT_START("KEY3")
-	PORT_BIT( 0xfe61, IP_ACTIVE_LOW, IPT_UNUSED ) // explicitly discarded
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x0180, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("KEY3")
+	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xff30, IP_ACTIVE_LOW, IPT_UNUSED ) // explicitly discarded
 
 	PORT_START("DSW")   // 16-bit DSW1 (0x0000) +DSW2 (0x0700)
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )      PORT_DIPLOCATION("DSW1:1,2,3")

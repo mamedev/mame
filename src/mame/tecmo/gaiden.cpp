@@ -1339,9 +1339,9 @@ void gaiden_state::shadoww(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaiden);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 4096);
 
-	TECMO_SPRITE(config, m_sprgen, 0, m_palette, gfx_gaiden_spr);
+	TECMO_SPRITE(config, m_sprgen, m_palette, gfx_gaiden_spr);
 
-	TECMO_MIXER(config, m_mixer, 0);
+	TECMO_MIXER(config, m_mixer);
 	m_mixer->set_mixer_shifts(10,9,4);
 	m_mixer->set_blendcols(   0x0400 + 0x300, 0x0400 + 0x200, 0x0400 + 0x100, 0x0400 + 0x000 );
 	m_mixer->set_regularcols( 0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 );
@@ -1586,10 +1586,10 @@ void mastninj_state::mastninj(machine_config &config)
 	ym2.add_route(2, "mono", 0.15);
 	ym2.add_route(3, "mono", 0.60);
 
-	LS157(config, m_adpcm_select[0], 0);
+	LS157(config, m_adpcm_select[0]);
 	m_adpcm_select[0]->out_callback().set("msm1", FUNC(msm5205_device::data_w));
 
-	LS157(config, m_adpcm_select[1], 0);
+	LS157(config, m_adpcm_select[1]);
 	m_adpcm_select[1]->out_callback().set("msm2", FUNC(msm5205_device::data_w));
 
 	MSM5205(config, m_msm[0], 400_kHz_XTAL);
@@ -1751,19 +1751,53 @@ ROM_START( ryukendn )
 	ROM_LOAD( "4.4a",     0x0000, 0x20000, CRC(b0e0faf9) SHA1(2275d2ef5eee356ccf80b9e9644d16fc30a4d107) )
 ROM_END
 
+ROM_START( ryukendna )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "1.3s",  0x00000, 0x20000, CRC(5532e302) SHA1(8ce48963ba737890d1a46c42a113d9419a3c174c) )
+	ROM_LOAD16_BYTE( "2.4s",  0x00001, 0x20000, CRC(a93a8256) SHA1(6bf6c189f82cb9341d3427a822de83cbaed27bc0) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "3.4b",   0x0000, 0x10000, CRC(6b686b69) SHA1(f0fa553acb3945f8dbbf466073c8bae35a0375ef) )   // Audio CPU is a Z80
+
+	ROM_REGION( 0x010000, "txtiles", 0 )
+	ROM_LOAD( "hn27512p.7a",   0x000000, 0x10000, CRC(765e7baa) SHA1(4d0a50f091b284739b6d9a8ceb4f81999da445fc) )    // 8x8 tiles
+
+	ROM_REGION( 0x080000, "bgtiles", 0 )
+	ROM_LOAD( "14.3a", 0x000000, 0x20000, CRC(1ecfddaa) SHA1(e71d60ae1a98fe8512498f91cce01c16be9f0871) )
+	ROM_LOAD( "15.3b", 0x020000, 0x20000, CRC(1291a696) SHA1(023b05260214adc39bdba81d5e2aa246b6d74a6a) )
+	ROM_LOAD( "16.1a", 0x040000, 0x20000, CRC(140b47ca) SHA1(6ffd9b7116658a46a124f9085602d88aa143d829) )
+	ROM_LOAD( "17.1b", 0x060000, 0x20000, CRC(7638cccb) SHA1(780d47d3aa248346e0e7abc6e6284542e7392919) )
+
+	ROM_REGION( 0x080000, "fgtiles", 0 )
+	ROM_LOAD( "18.6a", 0x000000, 0x20000, CRC(3fadafd6) SHA1(0cb5387a354c631d5c6aca8f77ecbbc0d175a574) )
+	ROM_LOAD( "19.6b", 0x020000, 0x20000, CRC(ddae9d5b) SHA1(108b202ae7ae124a32400a0a404c7d2b614c60bd) )
+	ROM_LOAD( "20.4b", 0x040000, 0x20000, CRC(08cf7a93) SHA1(fd3278c3fb3ef30ed03c8a95656d86ba82a163d8) )
+	ROM_LOAD( "21.4b", 0x060000, 0x20000, CRC(1ac892f5) SHA1(28364266ca9d1955fb7953f5c2d6f35e114beec6) )
+
+	ROM_REGION( 0x100000, "sprites", 0 ) // sprite ROMs also seen on daughterboard "4M512" with 16 0x10000-sized ROMs
+	ROM_LOAD16_BYTE( "6.3m",  0x000000, 0x20000, CRC(e7ccdf9f) SHA1(80ffcefc95660471124898a9c2bee55df36bda13) ) // sprites A1
+	ROM_LOAD16_BYTE( "7.1m",  0x000001, 0x20000, CRC(016bec95) SHA1(6a6757c52ca9a2398ea43d1af4a8d5adde6f4cd2) ) // sprites A2
+	ROM_LOAD16_BYTE( "8.3n",  0x040000, 0x20000, CRC(7ef7f880) SHA1(26ba9a76adce24beea3cffa1cb95aeafe6f82f96) ) // sprites B1
+	ROM_LOAD16_BYTE( "9.1n",  0x040001, 0x20000, CRC(6e9b7fd3) SHA1(c86ff61844fc94c02625bb812b9062d0649c8fdf) ) // sprites B2
+	ROM_LOAD16_BYTE( "10.3r", 0x080000, 0x20000, CRC(a6451dec) SHA1(553e7a1453b59055fa0b10ca04125543d9f8987c) ) // sprites C1
+	ROM_LOAD16_BYTE( "11.1r", 0x080001, 0x20000, CRC(7fbfdf5e) SHA1(ab67b72dcadb5f2236d29de751de5bf890a9e423) ) // sprites C2
+	ROM_LOAD16_BYTE( "12.3s", 0x0c0000, 0x20000, CRC(277204f0) SHA1(918e05f10959f2b50c16b6e0dc62e3076c99250e) ) // sprites D1
+	ROM_LOAD16_BYTE( "13.1s", 0x0c0001, 0x20000, CRC(4e56a508) SHA1(f89a6037e602b26d6ce11859e0b43a602b50d985) ) // sprites D2
+
+	ROM_REGION( 0x40000, "oki", 0 ) // ADPCM samples - sound chip is OKIM6295
+	ROM_LOAD( "4.4a",     0x0000, 0x20000, CRC(b0e0faf9) SHA1(2275d2ef5eee356ccf80b9e9644d16fc30a4d107) )
+ROM_END
+
 /*
 
 Ninja Ryukenden (Japan) (Tecmo 1989)
 Dumped from an original Tecmo board. Board No. 6215-A. Serial A-59488.
 
--------------------------------------------------------------------------------------
-
 */
 
-ROM_START( ryukendna )
+ROM_START( ryukendnb )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_BYTE( "1.3s",  0x00000, 0x20000, CRC(5532e302) SHA1(8ce48963ba737890d1a46c42a113d9419a3c174c) ) // found on 2 PCBs
-//  ROM_LOAD16_BYTE( "1.3s",  0x00000, 0x20000, CRC(0ed5464c) SHA1(2eab6650ad1c38cd560ec3d084f47156756c97a4) ) 2 bytes different ( 022a : 50 instead of 51, 12f9 : 6b instead of 6a) - possible bad ROM
+	ROM_LOAD16_BYTE( "1.3s",  0x00000, 0x20000, CRC(0ed5464c) SHA1(2eab6650ad1c38cd560ec3d084f47156756c97a4) ) // 2 bytes different (022a: 50 instead of 51, 12f9: 6b instead of 6a)
 	ROM_LOAD16_BYTE( "2.4s",  0x00001, 0x20000, CRC(a93a8256) SHA1(6bf6c189f82cb9341d3427a822de83cbaed27bc0) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
@@ -2001,6 +2035,46 @@ ROM_START( raiga )
 	ROM_LOAD( "a-4a.4",           0x00000, 0x20000, CRC(ef9acdcf) SHA1(8d62a666843f0cb22e8926ae18a961052d4f9ed5) )
 ROM_END
 
+ROM_START( raigaa )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "6299-a.3s", 0x00000, 0x20000, CRC(20d00c38) SHA1(ef4e11309d7478ad7c4048efa4ddedcecc11c59a) )
+	ROM_LOAD16_BYTE( "6299-a.4s", 0x00001, 0x20000, CRC(6f129e5f) SHA1(8fe8bb2b82897da02fa31044e0e19f8ce37bd969) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "6299-a.4b",        0x00000, 0x10000, CRC(18655c95) SHA1(8357e0520565a201bb930cadffc759463931ec41) )
+
+	ROM_REGION( 0x0800, "mcu", 0 )  // protection NEC D8749
+	ROM_LOAD( "6299-a.6v",        0x00000, 0x00800, NO_DUMP )
+
+	ROM_REGION( 0x10000, "txtiles", 0 )
+	ROM_LOAD( "6299-b.7a",        0x00000, 0x10000, CRC(6d2e4bf1) SHA1(edcf96bbcc109da71e3adbb37d119254d3873b29) )
+
+	ROM_REGION( 0x100000, "bgtiles", 0 )
+	ROM_LOAD( "6299-b.3a",        0x00000, 0x20000, CRC(41fee9a9) SHA1(6560c1981553f3f777ce7445404d73a6ceaebcbb) )
+	ROM_LOAD( "6299-b.3c",        0x20000, 0x20000, CRC(365ac6e9) SHA1(bd4d89d6abcf81612842ed171026e29f8c4ae798) )
+	ROM_LOAD( "6299-b.1a",        0x40000, 0x20000, CRC(70939226) SHA1(fb99f7e9aab9b3755b618e31c951c930046550dd) )
+	ROM_LOAD( "6299-b.1c",        0x60000, 0x20000, CRC(118adc77) SHA1(4e9aae117b398f93fc1db6017d4af2ef66e1cca0) )
+
+	ROM_REGION( 0x80000, "fgtiles", 0 )
+	ROM_LOAD( "6299-b.6a",        0x00000, 0x20000, CRC(23531bf0) SHA1(d156e5a56816efa003534ecd74de9a38d56b510b) )
+	ROM_LOAD( "6299-b.6c",        0x20000, 0x20000, CRC(59a1a0ca) SHA1(022a0a9d9dc015cb3cb63b1b518c560e0f557a69) )
+	ROM_LOAD( "6299-b.4a",        0x40000, 0x20000, CRC(1651cf8d) SHA1(7178868f945dc4f113a735a61d63a1e6987a6063) )
+	ROM_LOAD( "6299-b.4c",        0x60000, 0x20000, CRC(bbb38435) SHA1(2850d874bf283a2a08153ea563dfbec5f5f66765) )
+
+	ROM_REGION( 0x100000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "6299-b.3m", 0x00000, 0x20000, CRC(1cc5f809) SHA1(38d89cac6962d235f4145e117b2029bce7160d4e) )
+	ROM_LOAD16_BYTE( "6299-b.3p", 0x40000, 0x20000, CRC(2f38d008) SHA1(2ab0b0e7a346d8fca39e5d9280501760bfe1f74d) )
+	ROM_LOAD16_BYTE( "6299-b.3r", 0x80000, 0x20000, CRC(1fbe9e5f) SHA1(eb27433384584a1d1f7c5462077c245671ee4e15) )
+	ROM_LOAD16_BYTE( "6299-b.3t", 0xC0000, 0x20000, CRC(e6c88497) SHA1(047057200aa3df6fc5d17ce5b4cc2aa0ab0e909c) )
+	ROM_LOAD16_BYTE( "6299-b.1m", 0x00001, 0x20000, CRC(a31e251d) SHA1(5ea99292df8a0029075a4bd22ec734a5b0f3c6a8) )
+	ROM_LOAD16_BYTE( "6299-b.1p", 0x40001, 0x20000, CRC(c0d2cf20) SHA1(0d90a910cd76f32bbed33bf98e4089dca111dad3) )
+	ROM_LOAD16_BYTE( "6299-b.1r", 0x80001, 0x20000, CRC(b3ede4fd) SHA1(1e66f4ee961d4c9b605a24faf0fbb047e6f43156) )
+	ROM_LOAD16_BYTE( "6299-b.1t", 0xC0001, 0x20000, CRC(f2480160) SHA1(e95828f99ba1355d77f9c75a057d79209f6669db) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "6299-a.4a",        0x00000, 0x20000, CRC(ef9acdcf) SHA1(8d62a666843f0cb22e8926ae18a961052d4f9ed5) )
+ROM_END
+
 /*
 Dragon Bowl
 Nics, 1992
@@ -2189,16 +2263,7 @@ void mastninj_state::descramble_gfx(uint8_t* src)
 		std::vector<uint8_t> buffer(len);
 		for (int i = 0;i < len; i++)
 		{
-			buffer[i] = src[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 5, 14, 13, 12, 11, 10, 9, 8, 7, 6, 4, 3, 2, 1, 0)];
-		}
-		std::copy(buffer.begin(), buffer.end(), &src[0]);
-	}
-
-	{
-		std::vector<uint8_t> buffer(len);
-		for (int i = 0; i < len; i++)
-		{
-			buffer[i] = src[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 6, 14, 13, 12, 11, 10, 9, 8, 7, 5, 4, 3, 2, 1, 0)];
+			buffer[i] = src[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 5, 6, 14, 13, 12, 11, 10, 9, 8, 7, 4, 3, 2, 1, 0)];
 		}
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
@@ -2222,6 +2287,7 @@ GAME( 1988, shadowwa,  shadoww,  shadoww,  common,   gaiden_state,   init_shadow
 GAME( 1988, gaiden,    shadoww,  shadoww,  common,   gaiden_state,   init_shadoww,   ROT0,   "Tecmo",   "Ninja Gaiden (US)",                                        MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ryukendn,  shadoww,  shadoww,  common,   gaiden_state,   init_shadoww,   ROT0,   "Tecmo",   "Ninja Ryukenden (Japan, set 1)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ryukendna, shadoww,  shadoww,  common,   gaiden_state,   init_shadoww,   ROT0,   "Tecmo",   "Ninja Ryukenden (Japan, set 2)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ryukendnb, shadoww,  shadoww,  common,   gaiden_state,   init_shadoww,   ROT0,   "Tecmo",   "Ninja Ryukenden (Japan, set 3)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mastninj,  shadoww,  mastninj, common,   mastninj_state, init_mastninj,  ROT0,   "bootleg", "Master Ninja (bootleg of Shadow Warriors / Ninja Gaiden)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // sprites need fixing, sound and yscroll too. - it is confirmed the curtains don't scroll on the pcb
 GAME( 1992, drgnbowl,  0,        drgnbowl, drgnbowl, drgnbowl_state, init_drgnbowl,  ROT0,   "Nics",    "Dragon Bowl (set 1, encrypted program)",                   MACHINE_SUPPORTS_SAVE ) // Dragon Bowl is based on Ninja Gaiden code
 GAME( 1992, drgnbowla, drgnbowl, drgnbowl, drgnbowl, drgnbowl_state, init_drgnbowla, ROT0,   "Nics",    "Dragon Bowl (set 2, unencrypted program)",                 MACHINE_SUPPORTS_SAVE )
@@ -2231,4 +2297,5 @@ GAME( 1989, wildfangs, wildfang, wildfang, tknight,  wildfang_state, init_wildfa
 GAME( 1989, tknight,   wildfang, wildfang, tknight,  wildfang_state, init_wildfang,  ROT0,   "Tecmo",   "Tecmo Knight (US)",                                        MACHINE_SUPPORTS_SAVE ) // has WDUD screen during attract, promotional material is in English
 
 GAME( 1991, stratof,   0,        raiga,    raiga,    raiga_state,    init_raiga,     ROT0,   "Tecmo",   "Raiga - Strato Fighter (US)",                              MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, raiga,     stratof,  raiga,    raiga,    raiga_state,    init_raiga,     ROT0,   "Tecmo",   "Raiga - Strato Fighter (Japan)",                           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, raiga,     stratof,  raiga,    raiga,    raiga_state,    init_raiga,     ROT0,   "Tecmo",   "Raiga - Strato Fighter (Japan, set 1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, raigaa,    stratof,  raiga,    raiga,    raiga_state,    init_raiga,     ROT0,   "Tecmo",   "Raiga - Strato Fighter (Japan, set 2)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

@@ -74,9 +74,10 @@ class rcorsair_state : public driver_device
 {
 public:
 	rcorsair_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_subcpu(*this, "subcpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_subcpu(*this, "subcpu")
+		, m_crtc(*this, "crtc")
 	{ }
 
 	void rcorsair(machine_config &config);
@@ -89,13 +90,51 @@ private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<hd6845s_device> m_crtc;
 
+	void palette_init(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void rcorsair_main_map(address_map &map) ATTR_COLD;
 	void rcorsair_sub_io_map(address_map &map) ATTR_COLD;
 	void rcorsair_sub_map(address_map &map) ATTR_COLD;
 };
+
+void rcorsair_state::video_start()
+{
+}
+
+uint32_t rcorsair_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	return 0;
+}
+
+void rcorsair_state::palette_init(palette_device &palette) const
+{
+	const uint8_t *color_prom = memregion("proms")->base();
+
+	// TODO: hookup unconfirmed
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		int bit0, bit1, bit2;
+
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i | 0x100], 0);
+		bit2 = BIT(color_prom[i | 0x100], 1);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		bit0 = BIT(color_prom[i | 0x100], 2);
+		bit1 = BIT(color_prom[i | 0x100], 3);
+		int const b = 0x52 * bit0 + 0xad * bit1;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
 
 
 void rcorsair_state::rcorsair_main_map(address_map &map)
@@ -113,7 +152,7 @@ void rcorsair_state::rcorsair_sub_io_map(address_map &map)
 {
 }
 
-static INPUT_PORTS_START( inports )
+static INPUT_PORTS_START( rcorsair )
 	PORT_START("IN0")
 	PORT_DIPNAME(   0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
@@ -153,27 +192,20 @@ static const gfx_layout tiles8x8_layout =
 };
 
 static GFXDECODE_START( gfx_rcorsair )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 32 )
 GFXDECODE_END
 
-void rcorsair_state::video_start()
-{
-}
-
-uint32_t rcorsair_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
 
 void rcorsair_state::rcorsair(machine_config &config)
 {
 	// Main CPU is probably inside Custom Block with program code, unknown type
 
-	Z80(config, m_maincpu, 8000000);
+	// TODO: clocks (was 8 MHz for both, very unlikely)
+	Z80(config, m_maincpu, 8000000 / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rcorsair_state::rcorsair_main_map);
 	//m_maincpu->set_vblank_int("screen", FUNC(rcorsair_state::irq0_line_hold));
 
-	I8035(config, m_subcpu, 8000000);
+	I8035(config, m_subcpu, 8000000 / 2);
 	m_subcpu->set_addrmap(AS_PROGRAM, &rcorsair_state::rcorsair_sub_map);
 	m_subcpu->set_addrmap(AS_IO, &rcorsair_state::rcorsair_sub_io_map);
 
@@ -188,9 +220,12 @@ void rcorsair_state::rcorsair(machine_config &config)
 	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_rcorsair);
-	PALETTE(config, "palette").set_entries(0x100);
+	PALETTE(config, "palette", FUNC(rcorsair_state::palette_init)).set_entries(0x100);
 
-	HD6845S(config, "crtc", 8000000 / 8).set_screen("screen");
+	HD6845S(config, m_crtc, 8000000 / 16);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8); // assumed from GFXs
 
 	SPEAKER(config, "speaker").front_center();
 
@@ -213,12 +248,12 @@ ROM_START( rcorsair )
 	ROM_LOAD( "rcd1_2c.bin", 0x2000, 0x2000, CRC(9ec5dd51) SHA1(84939799f64d9d3e9a67b51046dd0c3403904d97) )
 	ROM_LOAD( "rcd0_2d.bin", 0x4000, 0x2000, CRC(b86fe547) SHA1(30dc51f65d2bd807d2498829087ba1a8eaa2e146) )
 
-	ROM_REGION( 0x40000, "proms", 0 )
-	ROM_LOAD( "prom_3d.bin", 0x00000, 0x100, CRC(fd8bc85b) SHA1(79324a6cecea652bc920ec762e7a30044003ed3f) ) // ?
-	ROM_LOAD( "prom_3c.bin", 0x00000, 0x100, CRC(edca1d4a) SHA1(a5ff659cffcd09cc161960da8f5cdd234e0db92c) ) // ?
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "prom_3d.bin", 0x000, 0x100, CRC(fd8bc85b) SHA1(79324a6cecea652bc920ec762e7a30044003ed3f) ) // ?
+	ROM_LOAD( "prom_3c.bin", 0x100, 0x100, CRC(edca1d4a) SHA1(a5ff659cffcd09cc161960da8f5cdd234e0db92c) ) // ?
 ROM_END
 
 } // anonymous namespace
 
 
-GAME( 1984, rcorsair,  0,    rcorsair, inports, rcorsair_state, empty_init, ROT90, "Nakasawa", "Red Corsair", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1984, rcorsair,  0,    rcorsair, rcorsair, rcorsair_state, empty_init, ROT90, "Nakasawa", "Red Corsair", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

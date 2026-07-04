@@ -383,7 +383,6 @@ void asterix_state::machine_reset()
 
 	// Z80 _NMI goes low at same time as reset
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 void asterix_state::asterix(machine_config &config)
@@ -411,11 +410,11 @@ void asterix_state::asterix(machine_config &config)
 	m_k056832->set_config(K056832_BPP_4, 1, 1);
 	m_k056832->set_palette("palette");
 
-	K053244(config, m_k053244, 0);
+	K053244(config, m_k053244);
 	m_k053244->set_palette("palette");
 	m_k053244->set_sprite_callback(FUNC(asterix_state::sprite_callback));
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();

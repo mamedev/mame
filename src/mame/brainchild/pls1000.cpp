@@ -47,7 +47,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_lcdctrl(*this, "lcdctrl")
 		, m_screen(*this, "screen")
-		, m_cart(*this, "cart")
+		, m_cart(*this, "cartslot")
 		, m_nvram(*this, "nvram")
 		, m_in_kbd(*this, { "RIGHT", "LEFT" })
 	{ }
@@ -177,7 +177,7 @@ void pls1000_state::pls1000(machine_config &config)
 	m_screen->set_visarea(0, 240 - 1, 0, 128 - 1);
 	m_screen->set_screen_update(FUNC(pls1000_state::screen_update));
 
-	MC68328_LCD(config, m_lcdctrl, 0);
+	MC68328_LCD(config, m_lcdctrl);
 
 	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "bin");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);

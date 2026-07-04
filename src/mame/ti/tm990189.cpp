@@ -177,6 +177,7 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 
+private:
 	uint8_t video_vdp_r(offs_t offset);
 	void video_vdp_w(offs_t offset, uint8_t data);
 	uint8_t video_joy_r();
@@ -201,8 +202,6 @@ protected:
 
 void tm990189_state::machine_start()
 {
-	m_digits.resolve();
-	m_leds.resolve();
 	m_displayena_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 
 	m_digitsel = 0;
@@ -409,8 +408,13 @@ public:
 	{
 		m_tms9902.set_tag(std::forward<T>(tms_tag));
 	}
+	template <typename T> tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&tms_tag)
+		: tm990_189_rs232_image_device(mconfig, tag, owner, 0, std::forward<T>(tms_tag))
+	{
+		m_tms9902.set_tag(std::forward<T>(tms_tag));
+	}
 
-	tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device_image_interface implementation
 	virtual bool is_readable()  const noexcept override { return true; }
@@ -787,7 +791,7 @@ void tm990189_state::tm990_189(machine_config &config)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "mono", 0.25);
+	CASSETTE(config, "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	TMS9901(config, m_tms9901_usr, 8_MHz_XTAL / 4);
 	m_tms9901_usr->p_out_cb(0).set(FUNC(tm990189_state::usr9901_led_w<0>));
@@ -818,7 +822,7 @@ void tm990189_state::tm990_189(machine_config &config)
 
 	TMS9902(config, m_tms9902, 8_MHz_XTAL / 4);
 	m_tms9902->xmit_cb().set(FUNC(tm990189_state::xmit_callback)); // called when a character is transmitted
-	TM990_189_RS232(config, "rs232", 0, m_tms9902);
+	TM990_189_RS232(config, "rs232", m_tms9902);
 
 	timer_device &display_timer(TIMER(config, "display_timer"));
 	display_timer.configure_periodic(FUNC(tm990189_state::display_callback), attotime::from_hz(30));
@@ -864,16 +868,16 @@ ROM_START(990189v)
 	ROM_REGION(0x4000, "maincpu", 0 )
 
 	/* extra ROM */
-	ROM_LOAD("990-469.u32", 0x0800, 0x0800, CRC(08df7edb) SHA1(fa9751fd2e3e5d7ae03819fc9c7099e2ddd9fb53))
+	ROM_LOAD("990-469.u32",  0x0800, 0x0800, CRC(08df7edb) SHA1(fa9751fd2e3e5d7ae03819fc9c7099e2ddd9fb53))
 
 	/* extension ROM */
-	ROM_LOAD_OPTIONAL("demo1000.u13", 0x1000, 0x0800, CRC(c0e16685) SHA1(d0d314134c42fa4682aafbace67f539f67f6ba65))
+	ROM_LOAD("demo1000.u13", 0x1000, 0x0800, CRC(c0e16685) SHA1(d0d314134c42fa4682aafbace67f539f67f6ba65))
 
 	/* extension ROM */
-	ROM_LOAD_OPTIONAL("demo1800.u11", 0x1800, 0x0800, CRC(8737dc4b) SHA1(b87da7aa4d3f909e70f885c4b36999cc1abf5764))
+	ROM_LOAD("demo1800.u11", 0x1800, 0x0800, CRC(8737dc4b) SHA1(b87da7aa4d3f909e70f885c4b36999cc1abf5764))
 
 	/* boot ROM */
-	ROM_LOAD("990-469.u33", 0x3000, 0x1000, CRC(e9b4ac1b) SHA1(96e88f4cb7a374033cdf3af0dc26ca5b1d55b9f9))
+	ROM_LOAD("990-469.u33",  0x3000, 0x1000, CRC(e9b4ac1b) SHA1(96e88f4cb7a374033cdf3af0dc26ca5b1d55b9f9))
 	/*ROM_LOAD("unibasic.bin", 0x3000, 0x1000, CRC(de4d9744) SHA1(47afe7f6b04b564d2f30f21461e0ed7ea97fba4c) )*/ /* older, partial dump of university BASIC */
 ROM_END
 

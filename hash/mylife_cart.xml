@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<!-- multiple cartridge types exist, some with ROM, some with only SEEPROM (for settings?)
+
+    NO ROM:
+    Revista - SEEPROM only (was blank)
+	
+	the ROM cartridges appear to be data only
+-->
+
+<!--
+
+ NC|01|VCC
+CEi|02|WE (Internal ROM)
+A00|03|NC
+A01|04|D01
+A02|05|NC
+A03|06|NC
+A04|07|NC
+A05|08|SDA(24c02)
+A06|09|NC
+A07|10|D03
+===|==|===
+A08|11|NC
+A09|12|NC
+A10|13|NC
+A11|14|NC
+A12|15|NC
+A13|16|Pin13 74ac00
+A14|17|Pin09 74ac00
+A15|18|Pin12 74ac00
+A16|19|D15
+A17|20|D14
+A18|21|D13
+A19|22|D12
+A20|23|D11
+A21|24|D10
+ OE|25|D09
+D08|26|SCL(24c02)
+D00|27|D07
+D06|28|NC
+D02|29|D05
+D04|30|GND
+
+CEi = CE Internal ROM! (set to VCC in Cartridge-PCB)
+
+-->
+
+<softwarelist name="mylife_cart" description="Giochi Preziosi / Playmates My Life cartridges">
+
+	<software name="hannah" supported="no">
+		<description>Hannah Montana (Italy)</description>
+		<year>200?</year>
+		<publisher>Giochi Preziosi</publisher>
+		<part name="cart" interface="mylife_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="hannah.bin" size="0x800000" crc="f695fe8e" sha1="b5db32e659a35b6ce6d7f633cecf073e028dd45b"/>
+			</dataarea>
+			<!-- blank -->
+			<!--
+			<dataarea name="seeprom" size="0x100">
+			    <rom name="af24bc02.bin" size="0x100" crc="fea8a821" sha1="c744cac6af7621524fc3a2b0a9a135a32b33c81b"/>
+			</dataarea>
+			-->
+		</part>
+	</software>
+
+	<software name="summer" supported="no">
+		<description>Summer Party (Italy)</description>
+		<year>200?</year>
+		<publisher>Giochi Preziosi</publisher>
+		<part name="cart" interface="mylife_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="summerparty.bin" size="0x800000" crc="24ee4969" sha1="9252f77fd8ff60d1e0cd68cfe363b0ee846343f2"/>
+			</dataarea>
+			<!-- blank -->
+			<!--
+			<dataarea name="seeprom" size="0x100">
+			    <rom name="af24bc02.bin" size="0x100" crc="fea8a821" sha1="c744cac6af7621524fc3a2b0a9a135a32b33c81b"/>
+			</dataarea>
+			-->
+		</part>
+	</software>
+	
+	<software name="cdisco" supported="no">
+		<description>Club Disco (Italy)</description>
+		<year>200?</year>
+		<publisher>Giochi Preziosi</publisher>
+		<part name="cart" interface="mylife_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="clubdisco.bin" size="0x800000" crc="d18006e7" sha1="ad2282766899610dc7fb32118b2eb7b434d01d01"/>
+			</dataarea>
+			<!-- blank -->
+			<!--
+			<dataarea name="seeprom" size="0x100">
+			    <rom name="af24bc02.bin" size="0x100" crc="fea8a821" sha1="c744cac6af7621524fc3a2b0a9a135a32b33c81b"/>
+			</dataarea>
+			-->
+		</part>
+	</software>
+	
+	<software name="cdiscos" cloneof="cdisco" supported="no">
+		<description>Club Disco (Spain)</description>
+		<year>200?</year>
+		<publisher>Giochi Preziosi</publisher>
+		<part name="cart" interface="mylife_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="clubdisco_spain.bin" size="0x800000" crc="8f200051" sha1="253a7bf48908eee8084c01fcc22b07db729d4714"/>
+			</dataarea>
+		</part>
+	</software>		
+
+</softwarelist>

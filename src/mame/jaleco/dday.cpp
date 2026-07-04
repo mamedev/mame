@@ -610,7 +610,7 @@ void dday_state::dday(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dday_state::sound_map);
 
 	I8257(config, m_dma, 12_MHz_XTAL / 4);
-	m_dma->out_hrq_cb().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dma->out_hrq_cb().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_dma->in_memr_cb().set(FUNC(dday_state::dma_mem_r));
 	m_dma->out_memw_cb().set(FUNC(dday_state::dma_mem_w));
 	m_dma->in_ior_cb<1>().set(FUNC(dday_state::dma_r));

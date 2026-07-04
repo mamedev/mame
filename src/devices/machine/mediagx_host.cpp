@@ -12,7 +12,7 @@ MediaGX host implementation (northbridge)
 #define LOG_MAP    (1U << 1) // log full remaps
 
 #define VERBOSE (LOG_GENERAL)
-//#define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
@@ -142,7 +142,7 @@ void mediagx_host_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(mediagx_vga_device::screen_update));
 
-	MEDIAGX_VGA(config, m_vga, 0);
+	MEDIAGX_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(4*1024*1024);
 }

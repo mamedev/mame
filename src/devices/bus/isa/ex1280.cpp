@@ -82,7 +82,7 @@ void isa16_ex1280_device::device_add_mconfig(machine_config &config)
 	m_screen->set_screen_update(m_cpu, FUNC(tms34010_device::tms340x0_rgb32));
 	m_screen->screen_vblank().set(FUNC(isa16_ex1280_device::vblank_w));
 
-	BT451(config, m_ramdac, 0);
+	BT451(config, m_ramdac);
 }
 
 
@@ -167,7 +167,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(isa16_ex1280_device::scanline_update)
 
 TMS340X0_TO_SHIFTREG_CB_MEMBER(isa16_ex1280_device::to_shiftreg)
 {
-	printf("address to shiftreg: %08x\n", address);
+	logerror("address to shiftreg: %08x\n", address);
 	if (address < 0xa00000)
 	{
 		memcpy(shiftreg, &m_vram[address >> 4], 0x400);
@@ -181,7 +181,7 @@ TMS340X0_TO_SHIFTREG_CB_MEMBER(isa16_ex1280_device::to_shiftreg)
 
 TMS340X0_FROM_SHIFTREG_CB_MEMBER(isa16_ex1280_device::from_shiftreg)
 {
-	printf("address from shiftreg: %08x\n", address);
+	logerror("address from shiftreg: %08x\n", address);
 	if (address < 0xa00000)
 	{
 		memcpy(&m_vram[address >> 4], shiftreg, 0x400);

@@ -10,13 +10,13 @@ class k057714_device : public device_t, public device_video_interface
 {
 public:
 	// construction/destruction
-	k057714_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k057714_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto irq_callback() { return m_irq.bind(); }
 
 	void set_pixclock(const XTAL &xtal);
 
-	int draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint32_t read(offs_t offset);
 	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

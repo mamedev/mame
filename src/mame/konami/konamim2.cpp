@@ -233,6 +233,8 @@ Notes:
 
 #include "cdrom.h"
 
+#include <sstream>
+
 
 namespace {
 
@@ -1158,7 +1160,7 @@ void konamim2_state::konamim2(machine_config &config)
 	// Common devices
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	ATA_INTERFACE(config, m_ata, 0);
+	ATA_INTERFACE(config, m_ata);
 	m_ata->irq_handler().set(FUNC(konamim2_state::ata_int));
 
 	m_ata->slot(0).option_add("cr589", CR589);
@@ -1500,11 +1502,19 @@ void konamim2_state::debug_commands(const std::vector<std::string_view> &params)
 		return;
 
 	if (params[0] == "help")
+	{
 		debug_help_command(params);
+	}
 	else if (params[0] == "dump_task")
+	{
 		dump_task_command(params);
+	}
 	else if (params[0] == "dump_dspp")
-		subdevice<dspp_device>("bda:dspp")->dump_state();
+	{
+		std::ostringstream str;
+		subdevice<dspp_device>("bda:dspp")->dump_state(str);
+		machine().debugger().console().printf("%s", std::move(str).str());
+	}
 }
 
 void konamim2_state::dump_task_command(const std::vector<std::string_view> &params)

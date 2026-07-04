@@ -75,6 +75,7 @@ Secret menu hack [totmejan only] (I couldn't find official way to enter, so it's
 #include "sei021x_sei0220_spr.h"
 #include "seibu_crtc.h"
 
+#include "mahjong.h"
 #include "seibusound.h"
 
 #include "cpu/nec/nec.h"
@@ -155,6 +156,7 @@ private:
 	TILE_GET_INFO_MEMBER(seibucrtc_sc2_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc3_tile_info);
 
+	IRQ_CALLBACK_MEMBER( vector_r );
 	void vblank_irq(int state);
 
 	uint32_t pri_cb(uint8_t pri, uint8_t ext);
@@ -336,7 +338,7 @@ void goodejan_state::gfxbank_w(uint16_t data)
 /* Multiplexer device for the mahjong panel */
 uint16_t goodejan_state::mahjong_panel_r()
 {
-	u16 ret = 0xffff;
+	u16 ret = 0x003f;
 
 	for (int i = 0; i < 5; i++)
 	{
@@ -344,7 +346,7 @@ uint16_t goodejan_state::mahjong_panel_r()
 			ret &= m_key[i]->read();
 	}
 
-	return ret;
+	return 0xffc0 | ret;
 }
 
 void goodejan_state::mahjong_panel_w(uint16_t data)
@@ -399,55 +401,7 @@ void goodejan_state::goodejan_io_map(address_map &map)
 static INPUT_PORTS_START( goodejan )
 	SEIBU_COIN_INPUTS   /* coin inputs read through sound cpu */
 
-	PORT_START("KEY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_INCLUDE(mahjong_matrix_1p_bet_wup)
 
 /*  These games seems have 2 DIP Switches, DIPSW-A and DIPSW-B
     Game reads these switches at port C000h (16 bit) with two calls (subroutine 0EF522h [totmejan])
@@ -552,11 +506,16 @@ static GFXDECODE_START( gfx_goodejan_spr )
 	GFXDECODE_ENTRY( "spr_gfx", 0, tilelayout, 0x200, 0x40 ) /* Sprites */
 GFXDECODE_END
 
+IRQ_CALLBACK_MEMBER(goodejan_state::vector_r)
+{
+	/* vector 0x00c is just a reti */
+	return 0x208 / 4;
+}
+
 void goodejan_state::vblank_irq(int state)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x208/4); // V30
-/* vector 0x00c is just a reti */
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 void goodejan_state::layer_en_w(uint16_t data)
@@ -579,6 +538,7 @@ void goodejan_state::goodejan(machine_config &config)
 	V30(config, m_maincpu, GOODEJAN_MHZ2/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &goodejan_state::goodejan_map);
 	m_maincpu->set_addrmap(AS_IO, &goodejan_state::goodejan_io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(goodejan_state::vector_r));
 
 	z80_device &audiocpu(Z80(config, "audiocpu", GOODEJAN_MHZ1/2));
 	audiocpu.set_addrmap(AS_PROGRAM, &goodejan_state::seibu_sound_map);
@@ -593,7 +553,7 @@ void goodejan_state::goodejan(machine_config &config)
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(goodejan_state::vblank_irq));
 
-	SEIBU_CRTC(config, m_crtc, 0);
+	SEIBU_CRTC(config, m_crtc);
 	m_crtc->layer_en_callback().set(FUNC(goodejan_state::layer_en_w));
 	m_crtc->layer_scroll_callback().set(FUNC(goodejan_state::layer_scroll_w));
 
@@ -613,7 +573,7 @@ void goodejan_state::goodejan(machine_config &config)
 	okim6295_device &oki(OKIM6295(config, "oki", GOODEJAN_MHZ2/16, okim6295_device::PIN7_HIGH));
 	oki.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound"));
 	seibu_sound.coin_io_callback().set_ioport("COIN");
 	seibu_sound.int_callback().set_inputline("audiocpu", 0);
 	seibu_sound.set_rom_tag("audiocpu");

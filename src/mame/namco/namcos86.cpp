@@ -117,13 +117,15 @@ Address          Dir Data     Name      Description
 
 Notes:
 -----
-- we are using an unusually high CPU interleave factor (800) to avoid hangs
-  in rthunder. The two 6809 in this game synchronize using a semaphore at
-  5606/5607 (CPU1) 1606/1607 (CPU2). CPU1 clears 5606, does some quick things,
-  and then increments 5606. While it does its quick things (which require
-  about 40 clock cycles) it expects CPU2 to clear 5607.
-  Raising the interleave factor to 1000 makes wndrmomo crash during attract
-  mode. I haven't investigated on the cause.
+- We are using an unusually tight CPU quantum to avoid hangs in rthunder.
+  The two 6809 in this game synchronize using a semaphore at CPU1:5606/5607 /
+  CPU2:1606/1607. CPU1 clears 5606, does some quick things, and then increments
+  5606. While it does its quick things (which require about 40 clock cycles)
+  it expects CPU2 to clear 5607.
+  If the quantum is not tight enough, CPU1 will crash in wndrmomo after 10
+  attract mode loops, and there are similar soft crashes in rthunder0 and
+  rthunder1 attract mode. For some reason, if quantum is set to perfect,
+  rthunder1 will still crash (the current quantum of clock/4 works ok).
 
 - There are two watchdogs, one per CPU (or maybe three). Handling them
   separately is necessary to allow entering service mode without manually
@@ -317,8 +319,6 @@ void namcos86_state::machine_start()
 	if (m_subbank)
 		m_subbank->configure_entries(0, 4, memregion("cpu2")->base(), 0x2000);
 
-	m_leds.resolve();
-
 	save_item(NAME(m_wdog));
 }
 
@@ -331,7 +331,7 @@ void namcos86_state::cpu1_map(address_map &map)
 	map(0x4000, 0x57ff).ram().share("sharedram");
 	map(0x5800, 0x5fff).m(m_spritegen, FUNC(namcos1_sprite_device::spriteram_map));
 
-	map(0x4000, 0x43ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)); // PSG device, shared RAM
+	map(0x4000, 0x43ff).m(m_cus30, FUNC(namco_cus30_device::amap)); // PSG device, shared RAM
 
 	// ROM & Voice expansion board - only some games have it
 	map(0x6000, 0x7fff).bankr(m_mainbank);
@@ -414,7 +414,7 @@ void namcos86_state::wndrmomo_cpu2_map(address_map &map)
 
 void namcos86_state::common_mcu_map(address_map &map)
 {
-	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));
+	map(0x1000, 0x13ff).m(m_cus30, FUNC(namco_cus30_device::amap));
 	map(0x1400, 0x1fff).ram();
 }
 
@@ -1046,7 +1046,7 @@ void namcos86_state::hopmappy(machine_config &config)
 	m_mcu->out_p2_cb().set(FUNC(namcos86_state::led_w));
 	m_mcu->set_vblank_int("screen", FUNC(namcos86_state::irq0_line_hold)); // ???
 
-	config.set_maximum_quantum(attotime::from_hz(48000)); // heavy interleaving needed to avoid hangs in rthunder
+	config.set_maximum_quantum(attotime::from_hz(m_cpu1->clock() / 4)); // heavy interleaving needed to avoid hangs in rthunder
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -1062,11 +1062,11 @@ void namcos86_state::hopmappy(machine_config &config)
 	m_spritegen->set_gfxbank_callback(FUNC(namcos86_state::sprite_bank_cb));
 	m_spritegen->flip_callback().set(FUNC(namcos86_state::flip_screen_set));
 
-	NAMCO_CUS4XTMAP(config, m_tilegen[0], 0, m_palette, gfx_namcos86_tile_0);
+	NAMCO_CUS4XTMAP(config, m_tilegen[0], m_palette, gfx_namcos86_tile_0);
 	m_tilegen[0]->set_offset(47, 422, -9, 9);
 	m_tilegen[0]->set_tile_callback(FUNC(namcos86_state::tile_cb_0));
 
-	NAMCO_CUS4XTMAP(config, m_tilegen[1], 0, m_palette, gfx_namcos86_tile_1);
+	NAMCO_CUS4XTMAP(config, m_tilegen[1], m_palette, gfx_namcos86_tile_1);
 	m_tilegen[1]->set_offset(46, 422, -9, 9);
 	m_tilegen[1]->set_tile_callback(FUNC(namcos86_state::tile_cb_1));
 
@@ -1079,7 +1079,6 @@ void namcos86_state::hopmappy(machine_config &config)
 	ymsnd.add_route(0, "mono", 0.0).add_route(1, "mono", 0.60); // only right channel is connected
 
 	NAMCO_CUS30(config, m_cus30, 49.152_MHz_XTAL/2048);
-	m_cus30->set_voices(8);
 	m_cus30->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 

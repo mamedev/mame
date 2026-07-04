@@ -1,0 +1,2257 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+TODO:
+- fill metadata blanks (break thru NMI then issue a LIST command);
+
+Notes:
+- Metadata is usually picked up at the start or end of BASIC listings (if available);
+
+-->
+<softwarelist name="p2000_cass" description="Philips P2000T/P2000M Mini cassettes">
+
+<!-- !Graphic Demos / Grafische Demo's -->
+
+	<software name="kaartned">
+		<description>Kaart van Nederland</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1400">
+				<rom name="Kaart van Nederland.cas" size="0x1400" crc="79fab347" sha1="07f4fc1055b91600d612ea0a2a29cc118918b95a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kameleon">
+		<description>Kameleon</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0f00">
+				<rom name="Kameleon.cas" size="0x0f00" crc="052df35d" sha1="271d3ee8cb42f6966ea429b83a914e8a40f530e6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kleurgr">
+		<!-- "Philips P2000 Computer Club" -->
+		<!-- "Programma nr 2" -->
+		<description>Kleuren Demonstraties (version N3.9)</description>
+		<year>1983</year>
+		<!-- "Copyright: Klaas H.J. Robers" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3c00">
+				<rom name="Kleurengrafiek-demonstraties.cas" size="0x3c00" crc="45dd7e0f" sha1="f75ea81dd6c355c4ed0fd7a1b32374a5f2c00661" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mondrian">
+		<!-- "P2C2" -->
+		<!-- "Programma nr. 94" -->
+		<description>Mondriaan (version N3.3)</description>
+		<year>1984</year>
+		<!-- "Copyright: W.F.K. van den Eijnde" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0f00">
+				<rom name="Mondriaan.cas" size="0x0f00" crc="7bde4fc2" sha1="60a3b301885d394913c9a5627f36f20aae6c6e57" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="patronen">
+		<description>Patronen</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1400">
+				<rom name="Patronen.cas" size="0x1400" crc="1a7ba083" sha1="60396800fa1d5f22d0016e63945fa70d20099d41" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="saatst">
+		<description>Teletekst Ceefax Testpagina</description>
+		<year>2023</year>
+		<!-- "Martijn Koch" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1400">
+				<rom name="SAA5050 Test Page.cas" size="0x1400" crc="1239b07b" sha1="619d715414e5d9b9d3609d5cc3d409fe3a8e197c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sterren">
+		<description>Sterren</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0500">
+				<rom name="Sterren.cas" size="0x0500" crc="11a96a2a" sha1="1e0c0a7486f5a4d9070597d13de9dfac0db3fd9a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="verkeer">
+		<description>Verkeerslichten</description>
+		<year>1985</year>
+		<!-- "Albert de Visser en Henri Faber IV b" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1400">
+				<rom name="Verkeerslichten.cas" size="0x1400" crc="6c7bfd74" sha1="afcb42684c5628482925832f4b89d5c29f738734" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picart">
+		<description>Art Gallery (pic2cas)</description>
+		<year>2022</year>
+		<publisher>Squirrel Monkey</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x4100">
+				<rom name="pic2cas Art gallery.cas" size="0x4100" crc="509e7f21" sha1="9f42dcb51b9e71e7686d9f13523c40586da617bc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picshin">
+		<description>Shining (pic2cas)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1900">
+				<rom name="pic2cas Shining.cas" size="0x1900" crc="594222a8" sha1="bf709437b9e2b2a6df0d30c2119d7aacefb6db22" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picskull" supported="partial">
+		<description>Skull (pic2cas)</description>
+		<year>2022</year>
+		<publisher>Squirrel Monkey</publisher>
+		<notes><![CDATA[
+Runs too fast? (verify)
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1900">
+				<rom name="pic2cas Skull.cas" size="0x1900" crc="d62248f7" sha1="a766f4d8f8934ae8f00323b8275b4dc92f9e1ac9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picgfx">
+		<description>Graphics (pic2cas)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2d00">
+				<rom name="pic2cas graphics.cas" size="0x2d00" crc="0a8ef15c" sha1="dbb4b435ab0d7bc4ffd197b6d671ee6b3245e382" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Games / Spelletjes -->
+
+	<software name="4x4">
+		<description>4 x 4</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0f00">
+				<rom name="4 x 4.cas" size="0x0f00" crc="2e76b755" sha1="2e16444ed25e1c710e613bd447846bc30e4011c9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alggrot">
+		<description>Alggrot</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0a00">
+				<rom name="Alggrot.cas" size="0x0a00" crc="5924e52a" sha1="420cfa138199e21e86dadd4e571063e9fde3fd13" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alice" supported="no">
+		<description>Alice's Wonderland</description>
+		<year>1988?</year>
+		<publisher>Peter's Data Productions</publisher>
+		<notes><![CDATA[
+Stuck on title screen, [CTC]?
+]]></notes>
+		<info name="required_ram" value="32KB" />
+		<info name="usage" value="Press # to start game" />
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x5a00">
+				<rom name="Alice's wonderland.cas" size="0x5a00" crc="10de5417" sha1="8f33c6c5cc71519dce74560d5644a3230a6a6811" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="andronim">
+		<!-- "P2C2 nr 71" -->
+		<description>Androiden Nim</description>
+		<year>1983</year>
+		<!-- oorsprong: Leo Christopherson -->
+		<!-- bewerking: J.H.van der Veer -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3700">
+				<rom name="Androiden Nim.cas" size="0x3700" crc="1bfca74e" sha1="b782342120dd2f4154fc81c3197006dec506bc6a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="azuda">
+		<description>Azuda</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3c00">
+				<rom name="Azuda.cas" size="0x3c00" crc="22a77e1b" sha1="41670db017745acc5e3ce3432780cc0e15697453" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baba">
+		<description>BABA</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0500">
+				<rom name="BABA.cas" size="0x0500" crc="83c4ff97" sha1="2e350660f5273cfba50ff2ef0b7c549fc0798d86" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batstar" supported="no">
+		<description>Battlestar</description>
+		<year>198?</year>
+		<!-- "Produced by Robert Aan De Stegge" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+[keyboard] doesn't seem to work properly in game
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<!-- TODO: Gather side order -->
+		<part name="cass1" interface="p2000_cass">
+			<dataarea name="cass" size="0x1e00">
+				<rom name="Battlestar.cas" size="0x1e00" crc="7d0afacf" sha1="ea1360c1fe918f3bb8deb4e175c316c258ec15cb" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="p2000_cass">
+			<dataarea name="cass" size="0x1900">
+				<rom name="Battlestar (info).cas" size="0x1900" crc="d24f6d18" sha1="46d2ffe571333df90f081997f558588552e1294c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beurspel">
+		<description>Beursspel</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1e00">
+				<rom name="Beursspel.cas" size="0x1e00" crc="829f36b8" sha1="cacf048b3dc527d11bbad1e79b89ffaa811901dc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bingo">
+		<!-- "Nat.Lab. P2000 Computer Club" -->
+		<!-- "Programma nr 9" -->
+		<!-- "Versie U3.0" -->
+		<description>P2000 Bingo (version U3.0)</description>
+		<year>1983</year>
+		<!-- "Copyright John Compter" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1e00">
+				<rom name="Bingo.cas" size="0x1e00" crc="95c25c88" sha1="3c773e93efb0fd3630d3c2a687468de4bd67ad2f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bjack">
+		<description>Black Jack (version 1.1)</description>
+		<year>1982</year>
+		<!-- "Made by TH.Draat" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2800">
+				<rom name="Black Jack.cas" size="0x2800" crc="d9e98a4f" sha1="7b039aff42b485366aa926a9b8c216fe863a0da3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bomwers">
+		<description>Bommenwerpers</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1400">
+				<rom name="Bommenwerpers.cas" size="0x1400" crc="bdd95543" sha1="6aa453ef0d0c068a09b7bac22adc62433f3d6e81" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bkeneie">
+		<description>Boter-Kaas-En-Eieren</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0a00">
+				<rom name="Boter-kaas-en-eieren.cas" size="0x0a00" crc="68ca5ca2" sha1="332e36ad5dcc5df9d3a4b77d3af06e0e54a4cc3a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brkwall" supported="partial">
+		<!-- "Nat.Lab. P2000 Computer Club" -->
+		<!-- "programma Nr. 62" -->
+		<description>Brick-Wall (version Nr. 3.0)</description>
+		<year>1982</year>
+		<!-- "copyright: <blank>" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Optional [joystick] support
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x4600">
+				<rom name="Brick-Wall.cas" size="0x4600" crc="d68c25e9" sha1="7f7e7372a4a999257183920bc4a690d0c35eac38" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bugsspc">
+		<description>Bugs From Space</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2800">
+				<rom name="Bugs From Space.cas" size="0x2800" crc="1b45e0c5" sha1="2074dce8ff5ec6999e23b2ae93fcd4c1679eb1b2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="canyonkl">
+		<description>Canyon Killers (version N2.0)</description>
+		<year>1985</year>
+		<!-- "by Peter Grünwald" -->
+		<publisher>Software Superlativus</publisher>
+		<notes><![CDATA[
+Prompts for showing info at title, doesn't seem to work (verify, missing tape part?)
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2800">
+				<rom name="Canyon Killers.cas" size="0x2800" crc="49475caf" sha1="ef79c8a7576982dc0c4e0f255f5f87411f7719bc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carrace" supported="no">
+		<description>Car Race</description>
+		<year>198?</year>
+		<!-- "Written on BASIS 108 by: Dirk Bolte" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+[keyboard] claims to use IJKM for movement but none do work
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2300">
+				<rom name="Car Race.cas" size="0x2300" crc="f5a4014a" sha1="e1d1c963c3440ce9bfe42937e8debdf23ef1c68a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cashend" supported="no">
+		<description>Casino Hendriks</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Stuck on title, [CTC]?
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3c00">
+				<rom name="Casino Hendriks.cas" size="0x3c00" crc="9db02a89" sha1="75d0c2d42437b123e343716eab1d19fbb6448320" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavein">
+		<description>Cave In</description>
+		<year>198?</year>
+		<publisher>Ralph &amp; Freakysoft</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1900">
+				<rom name="Cave In.cas" size="0x1900" crc="d5408b11" sha1="3c85c04f1e562fb26122f48fe7685851e77b0c09" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="centkwes">
+		<description>Centenkwestie</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x4600">
+				<rom name="Centenkwestie.cas" size="0x4600" crc="78bdd5cd" sha1="a3e2445ccf59302ffb088fdd06ab38208e425880" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chess">
+		<!-- "P2C2 P2000 Computer Club" -->
+		<!-- "programma nr 59" -->
+		<description>Chess (version U6)</description>
+		<year>1983</year>
+		<!-- "copyright Hans Pennings" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<!-- TODO: Gather side order -->
+		<part name="cass1" interface="p2000_cass">
+			<dataarea name="cass" size="0x4b00">
+				<rom name="Chess.cas" size="0x4b00" crc="b7e16688" sha1="ce5fd3cb95b5ff0308ca044920ae47607cd148b9" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="p2000_cass">
+			<dataarea name="cass" size="0x0a00">
+				<rom name="Chess (info).cas" size="0x0a00" crc="68b5e74b" sha1="9d3be170ce2c85d02c710377b25e243657ed46f6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chuckegg">
+		<description>Chuckie Egg</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0a00">
+				<rom name="Chuckie Egg.cas" size="0x0a00" crc="b0dd6f25" sha1="3005265e137285e280ee48caf8c18e3f5e3ad2bc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cijfer">
+		<description>Cijferdans</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1900">
+				<rom name="Cijferdans.cas" size="0x1900" crc="168f72a0" sha1="1a9c75ef68668cedc40bb42a25a7d12777fad7f9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="codekrak">
+		<description>Code Kraker</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2800">
+				<rom name="Code Kraker.cas" size="0x2800" crc="ad3536c4" sha1="86bd0cd8d2820a2660d5c6d0247a965a3ded1a9c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="compjack">
+		<description>Computer Jackpot</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2d00">
+				<rom name="Computer Jackpot.cas" size="0x2d00" crc="55fe6dbd" sha1="4bbf1779af39af29cc8b80d95ac5e752cd9a014a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dampuzl">
+		<description>Dam-Puzzel</description>
+		<year>1980</year>
+		<publisher>Ordina Nederland</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0f00">
+				<rom name="Dam-Puzzel.cas" size="0x0f00" crc="bd98cf18" sha1="03fc6cff4c02a99367111a05c33c262da61e3655" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="descinca">
+		<description>De schat van de Inca's</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3700">
+				<rom name="De schat van de Inca's.cas" size="0x3700" crc="c080ff56" sha1="cf2eaaa863b397afba4e5a2e5d8f6bdf688283ed" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doolhof">
+		<description>Doolhof</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2d00">
+				<rom name="Doolhof.cas" size="0x2d00" crc="2edbd4e7" sha1="f7a25fd67976dc19db47ac3d2850dd9e4035a0de" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doolhofs">
+		<description>Doolhofspel</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2800">
+				<rom name="Doolhofspel.cas" size="0x2800" crc="40f01845" sha1="e49b41248886b7e6ded4ff01abccd304b9641603" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="draaiku">
+		<!-- "P2000 Computer Club" -->
+		<!-- "Programma nr. 26" -->
+		<description>Draaikubus (version U4.3)</description>
+		<year>1983</year>
+		<!-- "H.M.J. Timmermans" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3700">
+				<rom name="Draaikubus.cas" size="0x3700" crc="cb7d165e" sha1="4d872a06caa187edff61113eb7377eadc4129eaa" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="draknhof">
+		<description>Drakendoolhof (version 3.0)</description>
+		<year>198?</year>
+		<!-- L. Somers -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1900">
+				<rom name="Drakendoolhof.cas" size="0x1900" crc="41cb1877" sha1="02fdb2b3681b67a084bd01e2bfb0bdb29d539096" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eetwingn">
+		<description>Een-en-twintigen</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2800">
+				<rom name="Een-en-twintigen.cas" size="0x2800" crc="74bb80d2" sha1="39c36d814fcd3bc53eb46c6444368285ac094cde" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eenjacht">
+		<description>Eendenjacht</description>
+		<year>198?</year>
+		<!-- J. Haubrich -->
+		<publisher>Hobbyscoop</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1400">
+				<rom name="Eendenjacht.cas" size="0x1400" crc="43013ed0" sha1="b3acbbcb967e20c0d8e58971b4b59361d29c4e7a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elevatie">
+		<!-- "P2C2 P2000 Computer Club" -->
+		<!-- "Programma nr P23" -->
+		<description>Elevatie (version N2.1)</description>
+		<year>1983</year>
+		<!-- "Copyright Bart Eversdijk" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1900">
+				<rom name="Elevatie.cas" size="0x1900" crc="04b673e6" sha1="e7b685c2f9fa1871639d1fb737c67f150113f172" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elevhump">
+		<description>Elevator Humpie</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1e00">
+				<rom name="Elevator Humpie.cas" size="0x1e00" crc="5b030f9c" sha1="52a013fcb186f94d9d69ed14f9d59a7f587b7fb3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- alt levels -->
+	<software name="liftjong" cloneof="elevhump">
+		<description>Liftjongen</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1e00">
+				<rom name="Liftjongen.cas" size="0x1e00" crc="a8354cca" sha1="e9affa246caa88664fe46548294b2cec720124a0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eliza" supported="partial">
+		<!-- "P2C2" -->
+		<!-- "Programma NR P##" -->
+		<description>Eliza &amp; Killer Cars (version 2.0)</description>
+		<year>1984</year>
+		<!-- "<blank copyright>" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+[tape] randomly fails if INFO menu is loaded
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x7800">
+				<rom name="Eliza.cas" size="0x7800" crc="eebcdb21" sha1="f5222ed73606d9d9c48ebf79dd306c7d7f0ea8b3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="explosie">
+		<description>Explosie</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0f00">
+				<rom name="Explosie.cas" size="0x0f00" crc="028c3663" sha1="cadc181c9d486f011a1089be7a3a05ecccbacc6c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fantuper">
+		<!-- "FANTUPER (c) EGR 870729" -->
+		<description>Fantuper</description>
+		<year>1987</year>
+		<publisher>EGR</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0500">
+				<rom name="Fantuper.cas" size="0x0500" crc="7576549d" sha1="346fb0415eabfbe39aaf302b2f36e887ce521847" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flisim">
+		<description>Flight Simulator</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="required_ram" value="32KB" />
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x9100">
+				<rom name="Flight Simulator.cas" size="0x9100" crc="8be1ed10" sha1="55e6a7d19235df157a708a3540a46acb54ee9ee3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Assume info portion available on both sets -->
+	<!-- TODO: Gather side order -->
+	<software name="fraxxon" supported="partial">
+		<description>Fraxxon: Space Fight II (joystick)</description>
+		<year>198?</year>
+		<publisher>LBK Production</publisher>
+		<notes><![CDATA[
+Optional [joystick] support
+]]></notes>
+		<info name="required_ram" value="32KB" />
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass1" interface="p2000_cass">
+			<dataarea name="cass" size="0x9b00">
+				<rom name="Fraxxon-joystick.cas" size="0x9b00" crc="26b5b2ca" sha1="eb2100f15cdda2067ac6c30582544d15e13f9fd4" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="p2000_cass">
+			<dataarea name="cass" size="0x2300">
+				<rom name="Fraxxon (info).cas" size="0x2300" crc="622175df" sha1="b0376bc05044f364d46bd54118ac6e36376470b4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fraxxono" cloneof="fraxxon">
+		<description>Fraxxon: Space Fight II (non-joystick)</description>
+		<year>198?</year>
+		<publisher>LBK Production</publisher>
+		<notes><![CDATA[
+Maps right movement to up key (verify)
+]]></notes>
+		<info name="required_ram" value="32KB" />
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass1" interface="p2000_cass">
+			<dataarea name="cass" size="0x7800">
+				<rom name="Fraxxon.cas" size="0x7800" crc="7612e962" sha1="91d8a7a42927d3212b4e21fa73eb05905858fed2" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="p2000_cass">
+			<dataarea name="cass" size="0x2300">
+				<rom name="Fraxxon (info).cas" size="0x2300" crc="622175df" sha1="b0376bc05044f364d46bd54118ac6e36376470b4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fruitaut" supported="no">
+		<description>Jackpot: Fruitautomaat</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Seems non-functional
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2300">
+				<rom name="Fruitautomaat.cas" size="0x2300" crc="e359dd18" sha1="ce748a24e1856490294b455dd820ba6358a21d31" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ganzenbo">
+		<description>Ganzenbord</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0500">
+				<rom name="Ganzenbord.cas" size="0x0500" crc="97631d05" sha1="a95fec26bffd7d5846da94f755c0ea1b2a0f5516" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gebochde">
+		<description>De Gebochelde</description>
+		<year>198?</year>
+		<!-- "Idee Ralph Hofman" -->
+		<!-- "Beweking Gerard v.d. Hoek" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1900">
+				<rom name="Gebochelde.cas" size="0x1900" crc="a3594936" sha1="5f3dd6e72ce90b80325057661236e2c81ac507b5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TODO: may be later release -->
+	<software name="humpbman" cloneof="gebochde">
+		<description>The Humpbacked Man</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1e00">
+				<rom name="The Humpbacked Man.cas" size="0x1e00" crc="2a40f5cf" sha1="1e79ec77a0a3e9f262fea2ea7b44983457b6bc3b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gehetest">
+		<description>Geheugentest</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0a00">
+				<rom name="Geheugentest.cas" size="0x0a00" crc="ceee1548" sha1="32a6da537864cd1fb1267a19b77f5bf605a6dff1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ghosthnt" supported="no">
+		<description>Ghosthunt</description>
+		<year>198?</year>
+		<publisher>Errorsoft</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x4b00">
+				<rom name="Ghosthunt.cas" size="0x4b00" crc="5b5bbece" sha1="e081599bf3673666e8992b084d38f81d82ce2f41" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gobang">
+		<description>Go Bang</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1900">
+				<rom name="Go Bang.cas" size="0x1900" crc="4ef2a827" sha1="4a8918b0d0b15cf9c0127db9931b7d26d233145d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gospel">
+		<description>Go spel</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="required_ram" value="32KB" />
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2d00">
+				<rom name="Go spel.cas" size="0x2d00" crc="d904cfb5" sha1="a343508725ed684795f5299675cc03061ab192f2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grotvlig">
+		<!-- "STUURELLENDE (c) EGR 870731" -->
+		<description>Grotvliegers</description>
+		<year>1987</year>
+		<publisher>EGR</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0500">
+				<rom name="Grotvliegers.cas" size="0x0500" crc="f250fe69" sha1="7262ed40edaac4caeb48bf21f86c8f311be12ee4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="haasjeov">
+		<description>Haasje-over</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1900">
+				<rom name="Haasje-over.cas" size="0x1900" crc="5679a25f" sha1="6978021df9b0cdefc0f1b9286cdfac69267d243e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="handrace">
+		<description>Handicap Race</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1400">
+				<rom name="Handicap race.cas" size="0x1400" crc="10bf24ac" sha1="8499220fa09b5aea9b48cc354b50196bd3582ed4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hexapawn">
+		<description>Hexapawn</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1e00">
+				<rom name="Hexapawn.cas" size="0x1e00" crc="230a265f" sha1="ebbd6fc30668e2c6e0f75c6be215426ad1cad39f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hussel">
+		<!-- "Programma -7-" -->
+		<description>Hussel</description>
+		<year>1982</year>
+		<!-- "Door S.V. Dillen" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2800">
+				<rom name="Hussel.cas" size="0x2800" crc="568be4f8" sha1="0a1f7d9a6d2fd7903f7b216129c3f91d1cd20cac" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jackpot">
+		<description>Jackpot Rowa</description>
+		<year>198?</year>
+		<!-- Ronald Van Der Wal -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x4100">
+				<rom name="JACKPOT.cas" size="0x4100" crc="7e2d165a" sha1="c3b55e4336f51805c2e89467a7a8182d842c17f1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jachtsc">
+		<!-- "Schatzoeken (c) EGR 870729" -->
+		<description>Jacht op de Schat</description>
+		<year>1987</year>
+		<publisher>EGR</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0a00">
+				<rom name="Jacht op de Schat.cas" size="0x0a00" crc="61dd5597" sha1="39cb2bae0c936fe88ecd6b0e9b08a6a6e132be5e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kanonnen">
+		<description>Kanonnen</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0f00">
+				<rom name="Kanonnen.cas" size="0x0f00" crc="01f3b972" sha1="1e1457636f0de3725ff7131c0a976ca2590abb2e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kleischn">
+		<description>Klei-duiven Schieten</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1900">
+				<rom name="Kleiduiven schieten.cas" size="0x1900" crc="3605d215" sha1="b4f15860434b479ecf396323421cf149cab51b7e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="klemvast">
+		<description>Klemvast</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x4100">
+				<rom name="Klemvast.cas" size="0x4100" crc="7bc04490" sha1="0987fb4833f18249e52e26995b9fb5a89ba7b7d1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="klibcast">
+		<description>Klibberdrath Castle</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1e00">
+				<rom name="Klibberdrath Castle.cas" size="0x1e00" crc="b851ec83" sha1="1d229578453603c8ec0da9d7d63cfa66b23f801e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="klimop">
+		<description>Klimop</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1400">
+				<rom name="Klimop.cas" size="0x1400" crc="ebc57a42" sha1="dfc2b46821ba0b58daffa2ccebbe0abc831dce41" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kogelawn">
+		<description>Kogel-lawine</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2800">
+				<rom name="Kogel-lawine.cas" size="0x2800" crc="b5639d91" sha1="6489b21b448027a25949ebb48d2db0c46e86ce93" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kohinoor">
+		<description>Koh-i-noor</description>
+		<year>1986</year>
+		<!-- P. Hoogendijk / J. Nieuwenhuizen -->
+		<publisher>Flower Soft</publisher>
+		<info name="required_ram" value="32KB" />
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x7800">
+				<rom name="Koh-i-noor.cas" size="0x7800" crc="93d3310e" sha1="c7f79bc7910e5ef3b974f2f3f72d4c413c2b8025" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="korenvlt">
+		<description>Korenvliet</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x4100">
+				<rom name="Korenvliet.cas" size="0x4100" crc="6cdde313" sha1="da9f6dbe81ff2346c0ccbb7044c13e3b1cdca001" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kralesch">
+		<description>Kralen &amp; Schalen</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x4b00">
+				<rom name="Kralen &amp; Schalen.cas" size="0x4b00" crc="5db47e5c" sha1="9dd9f66c10e8d8c0aba53694b77477cbec5acca0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="laddadd">
+		<!-- "P2C2 nr. <empty>" -->
+		<!-- "not yet released" (?) -->
+		<description>Ladders en Adders (version 1.3)</description>
+		<year>1984</year>
+		<!-- "copyright <empty>" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1900">
+				<rom name="Ladders en Adders.cas" size="0x1900" crc="3c782111" sha1="9dcd4aae08ecb5207db6cc06cec33d8aaeb1d088" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lazybug">
+		<description>Lazy Bug</description>
+		<year>1984</year>
+		<publisher>Double Brain!</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3200">
+				<rom name="Lazy Bug.cas" size="0x3200" crc="24b8da04" sha1="0f2d94c0805b8e34f109dc40fde54b25a16b7131" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Looks an earlier version -->
+	<software name="ladybug" cloneof="lazybug">
+		<description>Lady Bug</description>
+		<year>198?</year>
+		<publisher>Double Brain</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3200">
+				<rom name="Lady Bug.cas" size="0x3200" crc="62eb1301" sha1="a4a9d536c9ce66f9a305366e4957e11e2b8899c5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="letttst">
+		<description>LetterReactieTest</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0f00">
+				<rom name="LetterReactieTest.cas" size="0x0f00" crc="2e92168b" sha1="f4260893b0ff06fd60037911da58fca112785d0d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lettbord" supported="no">
+		<description>Letterbord</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+[keyboard] inputs stop working at game rules screen ("spelregels")
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3700">
+				<rom name="Letterbord.cas" size="0x3700" crc="ac4f52c8" sha1="6e0e30035f9d423c25e9cc58554e0b6716688e14" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lettdans" supported="no">
+		<description>Letterdans</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+[SAA5050] scrolling looks quite off
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1e00">
+				<rom name="Letterdans.cas" size="0x1e00" crc="2153a728" sha1="056abd3cf62e0b861e21204d67cf48e130080ee4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="life" supported="no">
+		<description>Life</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Black screen, [CTC]?
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3c00">
+				<rom name="Life.cas" size="0x3c00" crc="35a87a9e" sha1="5dfa49fece660e823d94f5e92cbce92c125d1d15" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lucifers">
+		<!-- "Basicode-2-BASIC" -->
+		<description>Lucifers (version 2)</description>
+		<year>1984</year>
+		<!-- "Develop: Projectgroep Burgerinformatica" -->
+		<!-- "Hans Stolk / Ard Hartsuijker" -->
+		<publisher>SLO Enschedemaart</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2800">
+				<rom name="Lucifers.cas" size="0x2800" crc="37528c0b" sha1="449073a26c86746763d779707f90c3d7c3aaf94e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maanlan2" supported="no">
+		<description>Maanlander 2</description>
+		<year>198?</year>
+		<!-- A.E. van der Most -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+[keyboard] looks unresponsive on gameplay, assume key digits are required
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2d00">
+				<rom name="Maanlander 2.cas" size="0x2d00" crc="9039555d" sha1="543c89c3c797b4f54c1a3cc0568347b5e9d2fc61" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TODO: may be an earlier version of maanlan2 -->
+	<software name="maanland" supported="no">
+		<description>Maanlander</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+[keyboard] doesn't respond on instruction prompt
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2d00">
+				<rom name="Maanlander.cas" size="0x2d00" crc="c6b4a451" sha1="23dd6810bae804a8271b6efd7e4fc1ad4704468c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="machoman">
+		<description>Macho Man</description>
+		<year>198?</year>
+		<!-- J. Nieuwenhuizen / P. Hoogendijk -->
+		<publisher>Flower Soft</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2d00">
+				<rom name="Macho Man.cas" size="0x2d00" crc="8c28d365" sha1="e220434e79a13c1945bffa92a620dc67fa5beac1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marcopljr">
+		<description>Marco Polo Jr</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x4100">
+				<rom name="Marco Polo Jr.cas" size="0x4100" crc="bec49242" sha1="5810ffab2ac53bc2e0d25f75d81d1acb43cf7ac9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="memory" supported="no">
+		<description>Memory</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Wants [display] 80 width support or scrolling during gameplay
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2300">
+				<rom name="Memory.cas" size="0x2300" crc="bf64b1de" sha1="d37b792090601e4f3671fc6ea9464cd13c05c3f5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mensniet">
+		<description>Mens erger je niet</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3700">
+				<rom name="Mens erger je niet.cas" size="0x3700" crc="47b46fbe" sha1="a0fb32a1b3a806b60750f17d533167fc07e9245a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monkong">
+		<description>Monkey Kong</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2d00">
+				<rom name="Monkey Kong.cas" size="0x2d00" crc="40e138b6" sha1="043d87db3414d5337a85c3ef8933b58b30bea400" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mulpede">
+		<description>Multipede</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2300">
+				<rom name="Multipede.cas" size="0x2300" crc="b56efce4" sha1="64658a08d5339aacbb8565e7dd4da0d8809daa84" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oliedrup">
+		<description>Oliedruppels</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0500">
+				<rom name="Oliedruppels.cas" size="0x0500" crc="7c578530" sha1="cf9f50b188a748d4a676416f13c6b504654e49d2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oregontr">
+		<description>Oregon Trail</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x4100">
+				<rom name="Oregon Trail.cas" size="0x4100" crc="5e6a4ad3" sha1="67554026436a355b17fca87e98b6ea298ba7f561" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="othello">
+		<description>Othello-1 (version N2.8)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3700">
+				<rom name="Othello.cas" size="0x3700" crc="a578845c" sha1="5002f1b49f685c82a6f63794bb50cfd7f7b64b64" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Actually newer version? -->
+	<software name="sluitin" cloneof="othello">
+		<description>Sluit-In (version 3.0)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3700">
+				<rom name="Sluit-In.cas" size="0x3700" crc="8cf2d1fe" sha1="56edcd7a70c6be5d63c209f494d69c367a32f654" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="overlev">
+		<description>Overleven</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<!-- TODO: Gather side order -->
+		<part name="cass1" interface="p2000_cass">
+			<dataarea name="cass" size="0x4100">
+				<rom name="Overleven.cas" size="0x4100" crc="89557691" sha1="254413c69fbf037d4897dec861b90d951c8632b3" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="p2000_cass">
+			<dataarea name="cass" size="0x1900">
+				<rom name="Overleven (info).cas" size="0x1900" crc="b83cca53" sha1="7713f237653d27bef6c1df65de2057d5da249375" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacific">
+		<description>Pacific</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x4b00">
+				<rom name="Pacific.cas" size="0x4b00" crc="c55d35e5" sha1="ccef78ff47f2639804d54490bf19ae1423be8a90" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacman">
+		<description>Pacman</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1900">
+				<rom name="Pacman.cas" size="0x1900" crc="bdf86d07" sha1="2fdecfc43370fa2c8f1c71649d4f454e2267155e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pakmuis">
+		<!-- "Nat. Lab. P2000 Computer Club" -->
+		<!-- "Porgramma nr 51" -->
+		<description>Pak de muis (version U7)</description>
+		<year>1983</year>
+		<!-- "copyright R.K. Eynthoven" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2800">
+				<rom name="Pak de muis.cas" size="0x2800" crc="c56cd8a1" sha1="fdee0f9e1baf02182db6ed9e1a1b1672b5818b07" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="patience">
+		<description>Patience</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3200">
+				<rom name="Patience.cas" size="0x3200" crc="b125fb45" sha1="3700c496470dd6d3865a048c0128f661aa2f9bd6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pelever">
+		<description>Peleton verkenning</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2300">
+				<rom name="Peleton verkenning.cas" size="0x2300" crc="a73389bd" sha1="2728275e48a53246ed1bf845ef814a82598b5df3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="piratadv">
+		<description>Pirate's adventure (English)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x4b00">
+				<rom name="Pirate's adventure.cas" size="0x4b00" crc="c02d860a" sha1="c8c224a6b63ec02267e50c304ee530b68952fbdb" />
+			</dataarea>
+		</part>
+		<!-- TODO: no info side, common with the piratav set? -->
+	</software>
+
+	<software name="piratav" cloneof="piratadv">
+		<description>Piraten avontuur (Dutch)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<!-- TODO: Gather side order -->
+		<part name="cass1" interface="p2000_cass">
+			<dataarea name="cass" size="0x4b00">
+				<rom name="Piraten avontuur.cas" size="0x4b00" crc="c49ba203" sha1="a5d8696051522f8ee37b4653561c953efca652f3" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="p2000_cass">
+			<dataarea name="cass" size="0x0f00">
+				<rom name="Piraten avontuur (info).cas" size="0x0f00" crc="3d494eb3" sha1="08d8ee23ae9609332021a535669ed6f9830a7dcf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puzzelen" supported="no">
+		<!-- "Nat.Lab. P2000 Computer Club" -->
+		<!-- "Programma Nr. 55" -->
+		<description>Puzzelen (version U3.6)</description>
+		<year>1983</year>
+		<!-- "Copyright: Jan Gieles" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Asks for CODE and STOP that aren't mapped on [keyboard]
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x4100">
+				<rom name="Puzzelen.cas" size="0x4100" crc="cffe8cd3" sha1="da9fa92b28bc1643924840cd987554192d594b53" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qubic">
+		<description>Qubic</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1900">
+				<rom name="Qubic.cas" size="0x1900" crc="863479a3" sha1="01309d45604c2164d0a8c17e0376969889afbe52" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quest">
+		<description>Quest</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3200">
+				<rom name="Quest.cas" size="0x3200" crc="3153db5a" sha1="3de4d22b5cc9b549644bc3f620e9e12373fabb72" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="racirc" supported="no">
+		<description>Race Circuit</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Requires [display] scroll
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0f00">
+				<rom name="Race Circuit.cas" size="0x0f00" crc="b300fe8c" sha1="415df60cbf59db77e75fa2b4302552113c9efc7c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="racen21">
+		<description>Racen (version 2.1 LH)</description>
+		<year>198?</year>
+		<!-- "Written by: Loek Hilgersom / Ralph Moonen" -->
+		<publisher>Errorsoft</publisher>
+		<info name="usage" value="Press M or Z if wanting borders or not" />
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1400">
+				<rom name="Racen 2.1.cas" size="0x1400" crc="a22319b7" sha1="daed0f25b75aae795a94f737cbc64f8c95d66b51"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="racen2" cloneof="racen21">
+		<description>Racen (version 2.0)</description>
+		<year>198?</year>
+		<publisher>Errorsoft</publisher>
+		<info name="usage" value="Press M or Z if wanting borders or not"/>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1400">
+				<rom name="Racen 2.0.cas" size="0x1400" crc="b48dc30d" sha1="90e777f96d527334b4831a591769580ecb35fe0c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="racen" cloneof="racen21">
+		<description>Racen (version 1)</description>
+		<year>198?</year>
+		<publisher>Errorsoft</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0a00">
+				<rom name="Racen.cas" size="0x0a00" crc="a167d5ae" sha1="902d96a9092dd7c34deae9b9131dcb42366d3627"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Different title screen, otherwise same-ish as Racen but organized in stages rather than endless -->
+	<!-- Clone? Newer version? Hack? -->
+	<software name="wegversm">
+		<description>Wegversmalling</description>
+		<year>1984</year>
+		<publisher>Software Superlativus</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3200">
+				<rom name="Wegversmalling.cas" size="0x3200" crc="c6e8bb4a" sha1="18ffa0eb85be4aafb2b5da29ff60a7f78512e8ea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="racetrk">
+		<description>Racetrack</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0f00">
+				<rom name="Racetrack.cas" size="0x0f00" crc="6935dc54" sha1="af0dbe0e412819e881d6f6ea7762d3bf38150c1b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="redmuis" supported="no">
+		<description>Red de muis!</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Unresponsive [keyboard] on instruction screens
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1900">
+				<rom name="Red de muis.cas" size="0x1900" crc="b0ada1cb" sha1="3f14100dd8bdf224d6155e536583c11deed90260"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rijsim">
+		<!-- "Distributed via Simpeltel" -->
+		<description>Rijsimulator</description>
+		<year>198?</year>
+		<!-- "by Rob Masseurs / Adri Gabriëls" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="required_ram" value="32KB"/>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x7300">
+				<rom name="Rijsimulator.cas" size="0x7300" crc="2895e48f" sha1="9113073dfe7b69ceae484c807fa5041a9c86bc0c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="risk">
+		<!-- "P.T.C. nr. ###" -->
+		<description>Risk (version 1.1)</description>
+		<year>198?</year>
+		<!-- "not yet released" -->
+		<!-- "copyright: <empty string>" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3c00">
+				<rom name="Risk.cas" size="0x3c00" crc="cddd9bcc" sha1="2d08541ec4edea4711eeddbb181e70dad0ceda20" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ruimtem">
+		<!-- "Space-Gnat" -->
+		<!-- "key-control" -->
+		<description>Ruimte-mug (version 5.3)</description>
+		<year>1982</year>
+		<!-- "H. Boons" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2300">
+				<rom name="Ruimtemug.cas" size="0x2300" crc="2e0875b0" sha1="2e9fd33f5f07884f83eecf79f65563e9c27b74b1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="schaland">
+		<description>Schateiland</description>
+		<year>1983</year>
+		<publisher>Educaboek</publisher>
+		<info name="usage" value="Use lijs as codeword"/>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3700">
+				<rom name="Schateiland.cas" size="0x3700" crc="37f2c05b" sha1="3b915130d784bb64db30758a8c96bc41dcaa64f5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="schazoe">
+		<!-- "Nat.Lab. P2000 Computer Club" -->
+		<!-- "Programma nr 28" -->
+		<description>Schatzoeken (version U5)</description>
+		<year>1983</year>
+		<!-- "copyright Hans Pennings" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3c00">
+				<rom name="Schatzoeken.cas" size="0x3c00" crc="6f25c087" sha1="f5ababadc035c92b0b409e3d8ce02580e188634a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="schieten" supported="no">
+		<description>Schieten</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Unsure how to play (no instructions)
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0a00">
+				<rom name="Schieten.cas" size="0x0a00" crc="b99acd4f" sha1="7c71da1d0cca50d46879f5d8d74dde2570a3c128" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skien">
+		<!-- "SKIEN (c) EGR 870729" -->
+		<description>Skien</description>
+		<year>1987</year>
+		<publisher>EGR</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0500">
+				<rom name="Skien.cas" size="0x0500" crc="08491e66" sha1="4e5772377b7e1c85bc01356970b398ae4e80e008" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snake" supported="no">
+		<description>Snake</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Black screen, [CTC]?
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0a00">
+				<rom name="Snake.cas" size="0x0a00" crc="9e11f8a9" sha1="8b4d101f46aa0792dbdab385e05dc2517fb74ed5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snakeygm">
+		<description>The Snakeygame</description>
+		<year>198?</year>
+		<!-- "Programmed by Thomas Hofmeister" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="required_ram" value="32KB" />
+		<info name="usage" value="Need to set screen to a meaningful value (like 20 lines, 40 characters)" />
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1e00">
+				<rom name="Snakeygame.cas" size="0x1e00" crc="785427a5" sha1="4cf81ea3257f1b8a9affbcfbafe5be429ad84a72" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snellet">
+		<!-- "SNELLETTERLAND (c) EGR 870731" -->
+		<description>Snelletterland</description>
+		<year>1987</year>
+		<publisher>EGR</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0a00">
+				<rom name="Snelletterland.cas" size="0x0a00" crc="6adeae76" sha1="cf2596c313a442d3a3e365608659868f4d30cfeb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snorkel">
+		<!-- "Distributed via Simpeltel" -->
+		<description>Snorkel (version N1.0)</description>
+		<year>1987</year>
+		<!-- "Authors: Geert-Jan v. Glabbeek / Rob Meulendijks" -->
+		<publisher>SGP / Soft 2000</publisher>
+		<info name="required_ram" value="32KB" />
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x6900">
+				<rom name="Snorkel.cas" size="0x6900" crc="c5589e0f" sha1="ecaf5eab3c955bee43abd2f62eddcc57986b4037" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcatk">
+		<description>Space Attack</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3700">
+				<rom name="Space Attack.cas" size="0x3700" crc="b959a12b" sha1="f6f971f2205743a71ebfc4e6360ade64511a83c5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcfight">
+		<description>Space Fight</description>
+		<year>198?</year>
+		<!-- Lucas Benjamin Kruijswijk -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3700">
+				<rom name="Space Fight.cas" size="0x3700" crc="d8c6358f" sha1="b8ea43e32d2df5843c92258d69b7ab03252b37a3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcmis">
+		<description>Space-Mission</description>
+		<year>1984</year>
+		<publisher>PvH</publisher>
+		<info name="required_ram" value="32KB" />
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x5a00">
+				<rom name="Space-mission.cas" size="0x5a00" crc="c1a0d513" sha1="f73ccc0020ec65122f1f503e4026b525eabd225c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="speelis" supported="no">
+		<description>Speelpaleis</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Requires 2x [paddle], hangs once ball goes at edge
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3c00">
+				<rom name="Speelpaleis.cas" size="0x3c00" crc="ff3d03e9" sha1="0f3977ad9df189ef407d7768b9b5365b3e02206b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spider">
+		<description>Spider</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2300">
+				<rom name="Spider.cas" size="0x2300" crc="7cca17bb" sha1="3027af2bf6c5a5752c3daa55912334fb3381a1e3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="splitsen">
+		<description>Splitsen</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0f00">
+				<rom name="Splitsen.cas" size="0x0f00" crc="41ec6e38" sha1="8d484121c59e0d3e3f9e5cf7c1a226a6c85a0486" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="squadro">
+		<!-- "SQUADROTRONIE (c) EGR 870729" -->
+		<description>Squadrotronie</description>
+		<year>1987</year>
+		<publisher>EGR</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0500">
+				<rom name="Squadrotronie.cas" size="0x0500" crc="853eb00f" sha1="f56f917a49fcec29f49a18facce4550482ea0faa" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Later version? Has "REM SQUADROTONIE" with blanked copyright at 10 -->
+	<software name="ufos" cloneof="squadro">
+		<description>Ufo's</description>
+		<year>1987?</year>
+		<publisher>EGR?</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0a00">
+				<rom name="Ufo's.cas" size="0x0a00" crc="d6d9b988" sha1="397750ca6e10d9e693bb9ed190a46638f19b3e92" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starkwak" supported="no">
+		<description>Star-kwak</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Unresponsive [keyboard]
+]]></notes>
+		<info name="required_ram" value="32KB" />
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<!-- TODO: Gather side order -->
+		<part name="cass1" interface="p2000_cass">
+			<dataarea name="cass" size="0x1e00">
+				<rom name="Star-kwak.cas" size="0x1e00" crc="790a3c5b" sha1="c322768f60845dcc78338c2e8bcfc30dc54b36a0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="p2000_cass">
+			<dataarea name="cass" size="0x0f00">
+				<rom name="Star-Kwak (info).cas" size="0x0f00" crc="fc4b90d0" sha1="fff3a577ed754105a2fb21d063db10b6409aad59" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="startrek">
+		<description>StarTrek</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x4600">
+				<rom name="StarTrek.cas" size="0x4600" crc="5e1daea6" sha1="3720ee995fb27f985faee6d09dfe2782462c7681" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stockrac">
+		<description>Stock Car Race</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0a00">
+				<rom name="Stock Car Race.cas" size="0x0a00" crc="e3ba17d6" sha1="eb24bfad8005702f8cd85ce6b297c6c4d3d20f7a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supbrein">
+		<!-- "Nat.Lab. P2000 Computer Club" -->
+		<!-- "Programma nr 40" -->
+		<description>Superbrein (version U6.9)</description>
+		<year>1983</year>
+		<!-- "Copyright: P.D. Rinkel" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2800">
+				<rom name="Superbrein.cas" size="0x2800" crc="e5581bea" sha1="7ce0f6b393bdea8ab0b4de1a4e7b1a9139e6b697" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suplazer">
+		<description>Superlazer</description>
+		<year>1984</year>
+		<!-- "(c) S.Renzen maart '84" -->
+		<!-- "programmanummer 1" -->
+		<!-- "P2000gg Regio Rotterdam" (a magazine?) -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0f00">
+				<rom name="Superlazer.cas" size="0x0f00" crc="3cb728c2" sha1="dc40cfd03c76bece55e111fd8b9bdf799e5697e1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="surround" supported="partial">
+		<!-- "Programma Nr.4" -->
+		<description>Surround (version 2.1)</description>
+		<year>1984</year>
+		<!-- "Copyright Rob Nauta" -->
+		<publisher>Fidelio Software</publisher>
+		<notes><![CDATA[
+Black screen after title, press any key to proceed (verify)
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1e00">
+				<rom name="Surround.cas" size="0x1e00" crc="43f1009a" sha1="0e8bccbc121b196771c4267e4b6643ed4728065b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swdrace">
+		<description>Swoppers Drag Racing</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1e00">
+				<rom name="Swoppers Drag Racing.cas" size="0x1e00" crc="ffeb7052" sha1="0deb05642ce53814d48274f8fe6a68bbc90b3309" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tankbtl">
+		<description>TankBattle</description>
+		<year>1985</year>
+		<!-- P. Hoogendijk / J. Nieuwenhuizen -->
+		<publisher>Flower Soft</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3700">
+				<rom name="TankBattle.cas" size="0x3700" crc="2dfa90e7" sha1="af357b0c92e1199d479ceddc51e448d5edd5c9a9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tankslag">
+		<description>Tankslag</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1400">
+				<rom name="Tankslag.cas" size="0x1400" crc="a8c83f25" sha1="cdf03b306573da03dd7f791770a9fe31ec154c10" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="target" supported="partial">
+		<description>Target</description>
+		<year>198?</year>
+		<!-- "Cassette editing" J. Carton -->
+		<publisher>Rooij</publisher>
+		<notes><![CDATA[
+Optional [joystick] support
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1900">
+				<rom name="Target.cas" size="0x1900" crc="af366d41" sha1="053b051dfe724a72b12c2db2be67fecbdb9c17a2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tempotyp">
+		<description>Tempo Typen</description>
+		<year>198?</year>
+		<!-- "Created by: Ferry Spiering" -->
+		<!-- "Released thru Simpeltel" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2800">
+				<rom name="Tempo Typen.cas" size="0x2800" crc="70ce8071" sha1="0d7105f336be2fcf5d6ab8960ec0384f72c932ca" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tennis">
+		<description>Tennis</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+2 players game
+Left paddle moves with left shift and left arrow
+Right paddle moves with right shift and right arrow
+Starts with keypad 3 (START)
+All of the above doesn't translate well with the actual p2000 keyboard but btanb
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2300">
+				<rom name="Tennis.cas" size="0x2300" crc="f00236cf" sha1="fa698f5119dc845c74b171ca74f31b168fd1dc47" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris">
+		<description>Tetris</description>
+		<year>198?</year>
+		<publisher>B.&amp; E. Soft</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2300">
+				<rom name="Tetris.cas" size="0x2300" crc="347d62dd" sha1="fbf340c6a1262bada09d04e17ba73e54c0600526" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toernooi" supported="no">
+		<description>Toernooi</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Unresponsive [keyboard] during gameplay
+]]></notes>
+		<info name="required_ram" value="32KB" />
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x5f00">
+				<rom name="Toernooi.cas" size="0x5f00" crc="17e2c1d8" sha1="d7b9878709ac0b937b18aee80631f8ba435f0ef8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="triffla">
+		<description>Triffids in LA</description>
+		<year>198?</year>
+		<!-- "Made by Ralph Hofman" -->
+		<publisher>Ralph &amp; Freakysoft</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2300">
+				<rom name="Triffids in LA.cas" size="0x2300" crc="b8df9ae3" sha1="92528e5961d5a400ad933c85027a8e63bd477404" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trucker">
+		<description>Trucker</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<!-- TODO: Gather side order -->
+		<part name="cass1" interface="p2000_cass">
+			<dataarea name="cass" size="0x4100">
+				<rom name="Trucker.cas" size="0x4100" crc="7d324b53" sha1="9d7c180abb9ccb6635834fcb4ee0a74c5b212055" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="p2000_cass">
+			<dataarea name="cass" size="0x0f00">
+				<rom name="Trucker (info).cas" size="0x0f00" crc="58d0f7ce" sha1="dd2816f200167ea0c021777c8df5b58da80a9e7b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uhangt">
+		<!-- "Nat.Lab. P2000 Computer Club" -->
+		<!-- "Programma nr 21" -->
+		<description>U Hangt (version U2.6)</description>
+		<year>1983</year>
+		<!-- "Copyright: J. Crombeen" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3200">
+				<rom name="U Hangt.cas" size="0x3200" crc="f827ab7b" sha1="fa17732f53c10a72f0083d4d3c4e823f596ccfce" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="utopia">
+		<!-- "P2000 THUISCOMPUTERCLUB" (sic) -->
+		<!-- "Programma 013" -->
+		<description>Utopia</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x4100">
+				<rom name="Utopia.cas" size="0x4100" crc="442723eb" sha1="5e9897c987322da0287739d560d4872a6972fa16" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="valbal">
+		<description>Valbal</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1900">
+				<rom name="Valbal.cas" size="0x1900" crc="07b4be7f" sha1="2fd1f4905f4166f28e0237c4d4edff2d43b0336d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vierij">
+		<!-- "P2C2 P2000 Computer Club" -->
+		<!-- "Programma nr 03" -->
+		<description>Vier op een rij (version U6)</description>
+		<year>1983</year>
+		<!-- "Copyright Hans Pennings" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3200">
+				<rom name="Vier op een rij.cas" size="0x3200" crc="10cb3ef6" sha1="8a57e48166c62292e230df9e72c800bf9109ed29" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vliegen" supported="no">
+		<description>P2000 Vliegroutine</description>
+		<year>1983</year>
+		<!-- (c) H. Boons -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Wants [display] 80 width support?
+Green plane take off over green layer? (verify)
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2300">
+				<rom name="Vliegen.cas" size="0x2300" crc="7304c699" sha1="9f898c5bf40285e7a41132617856acbe2df36125" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="warspc" supported="no">
+		<description>War in Space</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Unresponsive [keyboard] for startup (wants CODE press)
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1e00">
+				<rom name="War in Space.cas" size="0x1e00" crc="68e98d7c" sha1="a37ed0ed45a96ad633843aa2fa619658cb9427c5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="woordsp" supported="no">
+		<description>Woord-spel</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Unresponsive [keyboard] on prompt
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2800">
+				<rom name="Woord-spel.cas" size="0x2800" crc="86e5c8df" sha1="4864188aa65ce39accd505a220fd1b93c8a9d4ee" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wurm">
+		<description>Wurm</description>
+		<year>198?</year>
+		<!-- "Michael Graner" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0a00">
+				<rom name="Wurm.cas" size="0x0a00" crc="4b2466f4" sha1="b3128484da49679948129857082b981923c6362a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yahtzee" supported="no">
+		<description>Yahtzee</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Requesting instructions at startup will puke back to BASIC prompt, bad dump?
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2d00">
+				<rom name="Yahtzee.cas" size="0x2d00" crc="32355453" sha1="3d42f99fc0fdd380d32c414eb4ad5c27be507943" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeeslag">
+		<description>Zee-slag (shoot'em up)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x4600">
+				<rom name="Zee-slag.cas" size="0x4600" crc="d7143791" sha1="d2e8a38b0f03cb4c21fd8970f5ed005cd830c98f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Entirely different game than zeeslag -->
+	<software name="zeeslagt">
+		<description>Zeeslag (tabletop)</description>
+		<year>1982</year>
+		<!-- "W V/D Plicht" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3200">
+				<rom name="Zeeslag.cas" size="0x3200" crc="28c7a1a4" sha1="b40b96147b6470da4cc9f9a3c2ec1779d661fb09" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Earlier version? -->
+	<software name="zeeslagta" cloneof="zeeslagt">
+		<description>Zeeslag (tabletop, alt?)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1900">
+				<rom name="Zeeslag2.cas" size="0x1900" crc="3d92d6e0" sha1="c990fae05223b693dfdba0dc7e929d865648f90c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zipprups">
+		<description>Zipp de rups</description>
+		<year>198?</year>
+		<publisher>Double Brain!</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2300">
+				<rom name="Zipp de rups.cas" size="0x2300" crc="1e91e1fd" sha1="517103ee9b43c3201eb62792eb304f74b8257023" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

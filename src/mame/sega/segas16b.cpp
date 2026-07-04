@@ -1250,7 +1250,7 @@ void segas16b_state::upd7759_generate_nmi(int state)
 //  state if we have a handler
 //-------------------------------------------------
 
-INTERRUPT_GEN_MEMBER( segas16b_state::i8751_main_cpu_vblank )
+INTERRUPT_GEN_MEMBER(segas16b_state::i8751_main_cpu_vblank)
 {
 	// if we have a fake 8751 handler, call it on VBLANK
 	if (!m_i8751_vblank_hook.isnull())
@@ -1265,8 +1265,6 @@ INTERRUPT_GEN_MEMBER( segas16b_state::i8751_main_cpu_vblank )
 
 void segas16b_state::machine_start()
 {
-	m_lamps.resolve();
-
 	m_i8751_sync_timer = timer_alloc(FUNC(segas16b_state::i8751_sync), this);
 }
 
@@ -2419,23 +2417,24 @@ INPUT_PORTS_START( dddoor ) // port names are taken from test mode
 	PORT_MODIFY("SERVICE")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("D. HAND") // this is Doraemon's hand on the control panel
 
+	// control panel has 12 pictographic buttons: 4 each line, 3 each row
 	PORT_MODIFY("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("L.P.SRV") // no idea what this is.. Large Prize Service?
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("SWT. 01") // this and the following are 12 buttons on the control panel (4 each line, 3 each row)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("SWT. 03")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("SWT. 05")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("SWT. 07")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("SWT. 01 (Makai)") // まかい
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("SWT. 03 (Chitei)") // ちてい
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("SWT. 05 (Uchuusen)") // うちゅうせん
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("SWT. 07 (Kumo no Sekai)") // くものせかい
 
 	PORT_MODIFY("UNUSED")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("SWT. 09")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("SWT. 11")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("SWT. 09 (Kyouryuu)") // きょうりゅう
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("SWT. 11 (Jungle)") // ジャングル
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("SWT. 10")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("SWT. 12")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("SWT. 10 (Yuuenchi)") // ゆうえんち
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("SWT. 12 (Edo)") // えど
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -2444,10 +2443,10 @@ INPUT_PORTS_START( dddoor ) // port names are taken from test mode
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("SWT. 02")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("SWT. 04")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("SWT. 06")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("SWT. 08")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("SWT. 02 (Kaitei)") // かいてい
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("SWT. 04 (Omocha no Kuni)") // おもちゃのくに
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("SWT. 06 (Mirai)") // みらい
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("SWT. 08 (Okashi no Kuni)") // おかしのくに
 
 	PORT_MODIFY("DSW2") // rest unused according to test mode
 	PORT_DIPNAME( 0x03, 0x03, "Advertising Interval" ) PORT_DIPLOCATION("SW2:1,2")
@@ -4110,8 +4109,8 @@ void segas16b_state::system16b(machine_config &config)
 	m_screen->set_screen_update(FUNC(segas16b_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
-	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
+	SEGAIC16VID(config, m_segaic16vid, m_gfxdecode);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -4201,7 +4200,7 @@ void segas16b_state::aceattacb_fd1094(machine_config &config)
 void segas16b_state::hwchamp(machine_config &config)
 {
 	system16b(config);
-	MSM6253(config, m_adc, 0);
+	MSM6253(config, m_adc);
 	m_adc->set_input_tag<0>("MONITOR");
 	// TODO: order of these two flipped when returning a status of 0xf0 instead of open bus in r 0x30?
 	m_adc->set_input_tag<1>("RIGHT");
@@ -4211,7 +4210,7 @@ void segas16b_state::hwchamp(machine_config &config)
 void segas16b_state::hwchamp_fd1094(machine_config &config)
 {
 	system16b_fd1094(config);
-	MSM6253(config, m_adc, 0);
+	MSM6253(config, m_adc);
 	m_adc->set_input_tag<0>("MONITOR");
 	// TODO: order of these two flipped when returning a status of 0xf0 instead of open bus in r 0x30?
 	m_adc->set_input_tag<1>("RIGHT");
@@ -4237,9 +4236,9 @@ void segas16b_state::system16b_i8751(machine_config &config)
 
 void segas16b_state::rom_5797_fragment(machine_config &config)
 {
-	SEGA_315_5248_MULTIPLIER(config, m_multiplier, 0);
-	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_1, 0);
-	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_2, 0);
+	SEGA_315_5248_MULTIPLIER(config, m_multiplier);
+	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_1);
+	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_2);
 }
 
 void segas16b_state::system16b_5797(machine_config &config)
@@ -4316,7 +4315,7 @@ void segas16b_state::fpointbl(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, 0);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(75); // these align the pieces with the playfield
 	m_sprites->set_local_originy(-2); // some other gfx don't have identical alignment to original tho (flickey character over 'good luck')
 
@@ -4356,8 +4355,8 @@ void segas16b_state::lockonph(machine_config &config)
 	m_screen->set_screen_update(FUNC(segas16b_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
-	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
+	SEGAIC16VID(config, m_segaic16vid, m_gfxdecode);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -4403,24 +4402,24 @@ void segas16b_state::atomicp(machine_config &config) // 10MHz CPU Clock verified
 
 INTERRUPT_GEN_MEMBER(dfjail_state::soundirq_cb)
 {
-	if (m_nmi_enable == true)
-	{
+	if (m_nmi_enable)
 		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-	}
 }
 
 void dfjail_state::machine_start()
 {
 	segas16b_state::machine_start();
+
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_dac_data));
 }
 
 void dfjail_state::machine_reset()
 {
+	segas16b_state::machine_reset();
+
 	m_nmi_enable = false;
 	m_dac_data = 0;
-	segas16b_state::machine_reset();
 }
 
 void dfjail_state::dfjail(machine_config &config)
@@ -6234,7 +6233,7 @@ ROM_END
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
-//  Doraemon no Dokodemo Door, Sega System 16B
+//  Doraemon no Dokodemo Door (ドラえもんのどこでもドア), Sega System 16B
 //  CPU: 68000
 //  ROM Board type: 171-5797
 //  Sega game ID: 834-11170-91 DOKODEMO DOOR
@@ -8895,7 +8894,7 @@ ROM_END
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
-//  Sukeban Jansi Ryuko (JPN Ver.)
+//  Sukeban Jansi Ryuko (JPN Ver.) (スケバン雀士竜子)
 //  CPU: FD1089B 317-5021 (16A/16B) (version uses i8751(317-5019) known to be exist)
 //  ROM Board type: 171-???
 //
@@ -9181,7 +9180,7 @@ ROM_END
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
-//  Toryumon, Sega System 16B
+//  Toryumon (登龍門), Sega System 16B
 //  CPU: 68000
 //  ROM Board type: 171-5797
 //
@@ -9246,7 +9245,7 @@ ROM_END
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
-//  Waku Waku Ultraman Racing, Sega System 16B
+//  Waku Waku Ultraman Racing (わくわくウルトラマンレーシング), Sega System 16B
 //  CPU: 68000
 //  ROM Board type: 171-5797
 //
@@ -9993,11 +9992,6 @@ void segas16b_state::init_generic(segas16b_rom_board rom_board)
 	// create default read/write handlers
 	m_custom_io_r = read16_delegate(*this, FUNC(segas16b_state::standard_io_r));
 	m_custom_io_w = write16_delegate(*this, FUNC(segas16b_state::standard_io_w));
-
-	// save state
-	save_item(NAME(m_atomicp_sound_count));
-	save_item(NAME(m_mj_input_num));
-	save_item(NAME(m_mj_last_val));
 }
 
 
@@ -10011,6 +10005,7 @@ void segas16b_state::init_generic_5358() { init_generic(ROM_BOARD_171_5358); }
 void segas16b_state::init_generic_5521() { init_generic(ROM_BOARD_171_5521); }
 void segas16b_state::init_generic_5704() { init_generic(ROM_BOARD_171_5704); }
 void segas16b_state::init_generic_5797() { init_generic(ROM_BOARD_171_5797); }
+
 void segas16b_state::init_generic_korean()
 {
 	init_generic(ROM_BOARD_KOREAN);
@@ -10020,24 +10015,28 @@ void segas16b_state::init_generic_korean()
 	m_atomicp_sound_divisor = 1;
 	m_segaic16vid->m_display_enable = 1;
 
+	save_item(NAME(m_atomicp_sound_count));
+
 	// allocate a sound timer
 	emu_timer *timer = timer_alloc(FUNC(segas16b_state::atomicp_sound_irq), this);
 	timer->adjust(attotime::from_hz(10000), 0, attotime::from_hz(10000));
 }
+
 void segas16b_state::init_lockonph()
 {
 	init_generic(ROM_BOARD_KOREAN);
 
 	// configure special behaviors for the Korean boards
 	m_disable_screen_blanking = true;
-	m_atomicp_sound_divisor = 1;
 	m_segaic16vid->m_display_enable = 1;
 
 	m_spritepalbase = 0x800; // tiles are 4bpp so sprite base is 0x800 instead of 0x400
 }
+
 void segas16b_state::init_generic_bootleg()
 {
 	init_generic(ROM_BOARD_KOREAN);
+
 	m_disable_screen_blanking = true;
 	m_segaic16vid->m_display_enable = 1;
 }
@@ -10146,6 +10145,9 @@ void segas16b_state::init_sjryuko_5358_small()
 	m_custom_io_r = read16_delegate(*this, FUNC(segas16b_state::sjryuko_custom_io_r));
 	m_custom_io_w = write16_delegate(*this, FUNC(segas16b_state::sjryuko_custom_io_w));
 	m_tilemap_type = segaic16_video_device::TILEMAP_16B_ALT;
+
+	save_item(NAME(m_mj_input_num));
+	save_item(NAME(m_mj_last_val));
 }
 
 void segas16b_state::init_timescan_5358_small()

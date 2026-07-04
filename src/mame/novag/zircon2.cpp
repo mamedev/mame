@@ -38,6 +38,8 @@ TODO:
 
 #include "speaker.h"
 
+#include <bit>
+
 // internal artwork
 #include "novag_zircon2.lh"
 
@@ -59,7 +61,7 @@ public:
 		m_out_digit(*this, "digit%u", 0U)
 	{ }
 
-	void zircon2(machine_config &config);
+	void zircon2(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_switch);
 
@@ -102,9 +104,6 @@ private:
 
 void zircon2_state::machine_start()
 {
-	m_out_lcd.resolve();
-	m_out_digit.resolve();
-
 	// register for savestates
 	save_item(NAME(m_power));
 	save_item(NAME(m_inp_mux));
@@ -170,7 +169,7 @@ void zircon2_state::update_lcd()
 		for (int i = 0; i < 4; i++)
 		{
 			// 4 commons per digit, 2 output pins per common (analog voltage level)
-			const u8 com = population_count_32(m_lcd_com >> (i * 2) & 3);
+			const u8 com = std::popcount(m_lcd_com >> (i * 2) & 3U);
 			const u16 segs = (com == 0) ? m_lcd_segs : (com == 2) ? ~m_lcd_segs : 0;
 			data = data << 2 | (segs >> (digit * 2) & 3);
 		}

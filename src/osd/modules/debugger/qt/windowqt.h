@@ -5,6 +5,10 @@
 
 #include "../xmlconfig.h"
 
+#ifdef __aarch64__
+#include <arm_acle.h> // QtCore/qyieldcpu.h uses __yield() without #including this, causing an error
+#endif
+
 #include <QtWidgets/QMainWindow>
 
 #include <deque>
@@ -48,8 +52,8 @@ public:
 	virtual void restoreConfiguration(util::xml::data_node const &node);
 
 protected slots:
-	void debugActOpenMemory();
-	void debugActOpenDasm();
+	virtual void debugActOpenMemory();
+	virtual void debugActOpenDasm();
 	void debugActOpenLog();
 	void debugActOpenPoints();
 	void debugActOpenDevices();

@@ -56,6 +56,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 
 // configurable logging
 #define LOG_PROT (1U << 1)
@@ -427,7 +429,7 @@ void cbuster_state::twocrude(machine_config &config)
 
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
+	DECO16IC(config, m_deco_tilegen[0]);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
@@ -440,7 +442,7 @@ void cbuster_state::twocrude(machine_config &config)
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	DECO16IC(config, m_deco_tilegen[1], 0);
+	DECO16IC(config, m_deco_tilegen[1]);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x30);
@@ -453,7 +455,7 @@ void cbuster_state::twocrude(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen, 0, m_palette, gfx_cbuster_spr);
+	DECO_SPRITE(config, m_sprgen, m_palette, gfx_cbuster_spr);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

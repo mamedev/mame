@@ -67,7 +67,7 @@ public:
 		, m_lamp(*this, "lamp0")
 	{ }
 
-	void kopunch(machine_config &config);
+	void kopunch(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
@@ -399,8 +399,6 @@ GFXDECODE_END
 
 void kopunch_state::machine_start()
 {
-	m_lamp.resolve();
-
 	// zerofill
 	m_gfxbank = 0;
 	m_scrollx = 0;

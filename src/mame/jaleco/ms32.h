@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "cpu/v60/v60.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "jaleco_ms32_sysctrl.h"
@@ -27,7 +28,7 @@ public:
 	{ }
 
 protected:
-	required_device<cpu_device> m_maincpu;
+	required_device<v70_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_memory_bank_array<2> m_z80bank;
@@ -40,7 +41,7 @@ protected:
 	void sound_reset_line_w(int state);
 
 	void ms32_snd_bank_w(u8 data);
-	IRQ_CALLBACK_MEMBER(irq_callback);
+	u8 irq_callback();
 	void configure_banks();
 	u8 latch_r();
 	void to_main_w(u8 data);
@@ -83,16 +84,13 @@ public:
 		, m_io_mj(*this, "KEY%u", 0U)
 	{ }
 
-	void ms32(machine_config &config);
-	void ms32_invert_lines(machine_config &config);
+	void ms32(machine_config &config) ATTR_COLD;
+	void ms32_invert_lines(machine_config &config) ATTR_COLD;
 
-	void init_ss92047_01();
-	void init_ss91022_10();
-	void init_kirarast();
-	void init_suchie2();
-	void init_ss92048_01();
-	void init_bnstars();
-	void init_ss92046_01();
+	void init_ss92047_01() ATTR_COLD;
+	void init_ss91022_10() ATTR_COLD;
+	void init_ss92048_01() ATTR_COLD;
+	void init_ss92046_01() ATTR_COLD;
 
 	ioport_value mahjong_ctrl_r();
 
@@ -184,8 +182,8 @@ public:
 		// TODO: COPROs
 	{}
 
-	void f1superb(machine_config &config);
-	void init_f1superb();
+	void f1superb(machine_config &config) ATTR_COLD;
+	void init_f1superb() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;

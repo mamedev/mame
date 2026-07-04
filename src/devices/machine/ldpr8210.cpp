@@ -171,34 +171,34 @@ ROM_END
 //  pioneer_pr8210_device - constructor
 //-------------------------------------------------
 
-pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pioneer_pr8210_device(mconfig, PIONEER_PR8210, tag, owner, clock)
+pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pioneer_pr8210_device(mconfig, PIONEER_PR8210, tag, owner, clock)
 {
 }
 
-pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: laserdisc_device(mconfig, type, tag, owner, clock),
-		m_audio1(*this, "pr8210_audio1"),
-		m_audio2(*this, "pr8210_audio2"),
-		m_clv(*this, "pr8210_clv"),
-		m_cav(*this, "pr8210_cav"),
-		m_srev(*this, "pr8210_srev"),
-		m_sfwd(*this, "pr8210_sfwd"),
-		m_play(*this, "pr8210_play"),
-		m_step(*this, "pr8210_step"),
-		m_pause(*this, "pr8210_pause"),
-		m_standby(*this, "pr8210_standby"),
-		m_control(0),
-		m_lastcommand(0),
-		m_accumulator(0),
-		m_lastcommandtime(attotime::zero),
-		m_lastbittime(attotime::zero),
-		m_firstbittime(attotime::zero),
-		m_i8049_cpu(*this, "pr8210"),
-		m_slowtrg(attotime::zero),
-		m_vsync(false),
-		m_i8049_port1(0),
-		m_i8049_port2(0)
+pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	laserdisc_device(mconfig, type, tag, owner, clock),
+	m_audio1(*this, "pr8210_audio1"),
+	m_audio2(*this, "pr8210_audio2"),
+	m_clv(*this, "pr8210_clv"),
+	m_cav(*this, "pr8210_cav"),
+	m_srev(*this, "pr8210_srev"),
+	m_sfwd(*this, "pr8210_sfwd"),
+	m_play(*this, "pr8210_play"),
+	m_step(*this, "pr8210_step"),
+	m_pause(*this, "pr8210_pause"),
+	m_standby(*this, "pr8210_standby"),
+	m_control(0),
+	m_lastcommand(0),
+	m_accumulator(0),
+	m_lastcommandtime(attotime::zero),
+	m_lastbittime(attotime::zero),
+	m_firstbittime(attotime::zero),
+	m_i8049_cpu(*this, "pr8210"),
+	m_slowtrg(attotime::zero),
+	m_vsync(false),
+	m_i8049_port1(0),
+	m_i8049_port2(0)
 {
 }
 
@@ -276,18 +276,6 @@ void pioneer_pr8210_device::device_start()
 	// alocate timers
 	m_process_vbi_timer = timer_alloc(FUNC(pioneer_pr8210_device::process_vbi_data), this);
 	m_vsync_off_timer = timer_alloc(FUNC(pioneer_pr8210_device::vsync_off), this);
-
-	// resolve outputs
-	m_audio1.resolve();
-	m_audio2.resolve();
-	m_clv.resolve();
-	m_cav.resolve();
-	m_srev.resolve();
-	m_sfwd.resolve();
-	m_play.resolve();
-	m_step.resolve();
-	m_pause.resolve();
-	m_standby.resolve();
 
 	// pass through to the parent
 	laserdisc_device::device_start();
@@ -873,15 +861,15 @@ ROM_END
 // simutrek_special_device - constructor
 //-------------------------------------------------
 
-simutrek_special_device::simutrek_special_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pioneer_pr8210_device(mconfig, SIMUTREK_SPECIAL, tag, owner, clock),
-		m_i8748_cpu(*this, "simutrek"),
-		m_audio_squelch(0),
-		m_data(0),
-		m_data_ready(false),
-		m_i8748_port2(0),
-		m_controlnext(0),
-		m_controlthis(0)
+simutrek_special_device::simutrek_special_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pioneer_pr8210_device(mconfig, SIMUTREK_SPECIAL, tag, owner, clock),
+	m_i8748_cpu(*this, "simutrek"),
+	m_audio_squelch(0),
+	m_data(0),
+	m_data_ready(false),
+	m_i8748_port2(0),
+	m_controlnext(0),
+	m_controlthis(0)
 {
 }
 

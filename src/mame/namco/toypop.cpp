@@ -401,7 +401,7 @@ void namcos16_state::main_base_map(address_map &map)
 void namcos16_state::liblrabl_main_map(address_map &map)
 {
 	main_base_map(map);
-	map(0x6000, 0x63ff).rw(m_namco15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));
+	map(0x6000, 0x63ff).m(m_namco15xx, FUNC(namco_15xx_device::amap));
 	map(0x6800, 0x680f).rw(m_namco58xx, FUNC(namco58xx_device::read), FUNC(namco58xx_device::write));
 	map(0x6810, 0x681f).rw(m_namco56xx_1, FUNC(namco56xx_device::read), FUNC(namco56xx_device::write));
 	map(0x6820, 0x682f).rw(m_namco56xx_2, FUNC(namco56xx_device::read), FUNC(namco56xx_device::write));
@@ -414,7 +414,7 @@ void namcos16_state::toypop_main_map(address_map &map)
 	map(0x6000, 0x600f).rw(m_namco58xx, FUNC(namco58xx_device::read), FUNC(namco58xx_device::write));
 	map(0x6010, 0x601f).rw(m_namco56xx_1, FUNC(namco56xx_device::read), FUNC(namco56xx_device::write));
 	map(0x6020, 0x602f).rw(m_namco56xx_2, FUNC(namco56xx_device::read), FUNC(namco56xx_device::write));
-	map(0x6800, 0x6bff).rw(m_namco15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));
+	map(0x6800, 0x6bff).m(m_namco15xx, FUNC(namco_15xx_device::amap));
 	map(0x7000, 0x7000).rw(FUNC(namcos16_state::irq_enable_r), FUNC(namcos16_state::irq_disable_w));
 }
 
@@ -430,7 +430,7 @@ void namcos16_state::sub_map(address_map &map)
 
 void namcos16_state::sound_map(address_map &map)
 {
-	map(0x0000, 0x03ff).rw(m_namco15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));
+	map(0x0000, 0x03ff).m(m_namco15xx, FUNC(namco_15xx_device::amap));
 	map(0xe000, 0xffff).rom().region("soundcpu", 0);
 }
 
@@ -711,20 +711,20 @@ void namcos16_state::liblrabl(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &namcos16_state::sound_map);
 	m_soundcpu->set_periodic_int(FUNC(namcos16_state::irq0_line_hold), attotime::from_hz(60));
 
-	NAMCO_58XX(config, m_namco58xx, 0);
+	NAMCO_58XX(config, m_namco58xx);
 	m_namco58xx->in_callback<0>().set_ioport("COINS");
 	m_namco58xx->in_callback<1>().set_ioport("P1_RIGHT");
 	m_namco58xx->in_callback<2>().set_ioport("P2_RIGHT");
 	m_namco58xx->in_callback<3>().set_ioport("BUTTONS");
 
-	NAMCO_56XX(config, m_namco56xx_1, 0);
+	NAMCO_56XX(config, m_namco56xx_1);
 	m_namco56xx_1->in_callback<0>().set(FUNC(namcos16_state::dip_h<0>));
 	m_namco56xx_1->in_callback<1>().set(FUNC(namcos16_state::dip_l<1>));
 	m_namco56xx_1->in_callback<2>().set(FUNC(namcos16_state::dip_h<1>));
 	m_namco56xx_1->in_callback<3>().set(FUNC(namcos16_state::dip_l<0>));
 	m_namco56xx_1->out_callback<0>().set(FUNC(namcos16_state::flip));
 
-	NAMCO_56XX(config, m_namco56xx_2, 0);
+	NAMCO_56XX(config, m_namco56xx_2);
 	m_namco56xx_2->in_callback<1>().set_ioport("P1_LEFT");
 	m_namco56xx_2->in_callback<2>().set_ioport("P2_LEFT");
 	m_namco56xx_2->in_callback<3>().set_ioport("SERVICE");
@@ -741,7 +741,6 @@ void namcos16_state::liblrabl(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	NAMCO_15XX(config, m_namco15xx, MASTER_CLOCK / 256);
-	m_namco15xx->set_voices(8);
 	m_namco15xx->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 

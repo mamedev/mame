@@ -239,7 +239,7 @@ static INPUT_PORTS_START( segajw )
 	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Meter")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    PORT_NAME("Meter")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("Last Game")   PORT_CODE(KEYCODE_T)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("M-Door")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("D-Door")
@@ -351,9 +351,6 @@ INPUT_PORTS_END
 
 void segajw_state::machine_start()
 {
-	m_lamps.resolve();
-	m_towerlamps.resolve();
-
 	m_coin_start_cycles = 0;
 	m_hopper_start_cycles = 0;
 
@@ -388,14 +385,14 @@ void segajw_state::segajw(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
-	sega_315_5296_device &io1a(SEGA_315_5296(config, "io1a", 0)); // unknown clock
+	sega_315_5296_device &io1a(SEGA_315_5296(config, "io1a")); // unknown clock
 	io1a.out_pa_callback().set(FUNC(segajw_state::coin_counter_w));
 	io1a.out_pb_callback().set(FUNC(segajw_state::lamps1_w));
 	io1a.out_pc_callback().set(FUNC(segajw_state::lamps2_w));
 	io1a.out_pd_callback().set(FUNC(segajw_state::hopper_w));
 	io1a.in_pf_callback().set(FUNC(segajw_state::coin_counter_r));
 
-	sega_315_5296_device &io1c(SEGA_315_5296(config, "io1c", 0)); // unknown clock
+	sega_315_5296_device &io1c(SEGA_315_5296(config, "io1c")); // unknown clock
 	io1c.in_pa_callback().set_ioport("IN0");
 	io1c.in_pb_callback().set_ioport("IN1");
 	io1c.in_pc_callback().set_ioport("IN2");
@@ -412,7 +409,7 @@ void segajw_state::segajw(machine_config &config)
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_entries(16);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", "palette"));
 	ramdac.set_addrmap(0, &segajw_state::ramdac_map);
 
 	hd63484_device &hd63484(HD63484(config, "hd63484", 8000000));

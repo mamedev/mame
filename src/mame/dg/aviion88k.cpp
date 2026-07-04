@@ -58,7 +58,7 @@ public:
 		, m_async(*this, { "console_port", "seriala", "mouse_port", "serialb" })
 		, m_duscc(*this, "duscc")
 		, m_scsibus(*this, "scsi")
-		, m_scsi(*this, "scsi:7:ncr53c700")
+		, m_scsi(*this, "ncr53c700")
 		, m_speaker(*this, "speaker")
 		, m_leds(*this, "CR%u", 1U)
 		, m_mbus(*this, "mbus")
@@ -129,8 +129,6 @@ private:
 
 void aviion88k_state::machine_start()
 {
-	m_leds.resolve();
-
 	for (emu_timer *&pit : m_pit)
 		pit = timer_alloc(FUNC(aviion88k_state::pit_timer), this);
 }
@@ -235,7 +233,7 @@ void aviion88k_state::aviion_4600(machine_config &config)
 	MK48T12(config, m_novram);
 
 	// uart - keyboard interface
-	SCN2661A(config, m_uart, 0);
+	SCN2661A(config, m_uart);
 
 	// keyboard connector
 	PC_KBDC(config, m_kbdc, pc_at_keyboards, nullptr);
@@ -276,7 +274,8 @@ void aviion88k_state::aviion_4600(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:6", aviion88k_scsi_devices, nullptr);
 
 	// scsi host adapter (NCR53C700)
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53c700", NCR53C7XX).clock(66'000'000);
+	NCR53C7XX(config, m_scsi, 66'000'000);
+	m_scsibus->set_external_device(7, m_scsi);
 
 	// TODO: ethernet (AM79C900)
 

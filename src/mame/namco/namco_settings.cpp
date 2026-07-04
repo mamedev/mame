@@ -3,6 +3,9 @@
 #include "emu.h"
 #include "namco_settings.h"
 
+#define VERBOSE ( 0 )
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE(NAMCO_SETTINGS, namco_settings_device, "namco_settings", "Namco Settings")
 
 namco_settings_device::namco_settings_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -31,7 +34,7 @@ void namco_settings_device::clk_w(int state)
 			cur_bit++;
 			if(cur_bit == 16) {
 				cur_bit = 0;
-				logerror("%s: %02x = %02x\n", tag(), adr, value);
+				LOG("%s: %02x = %02x\n", tag(), adr, value);
 			}
 		}
 	}

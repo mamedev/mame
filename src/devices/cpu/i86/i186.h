@@ -105,45 +105,45 @@ private:
 
 	struct mem_state
 	{
-		uint16_t      lower;
-		uint16_t      upper;
-		uint16_t      middle;
-		uint16_t      middle_size;
-		uint16_t      peripheral;
+		uint16_t    lower;
+		uint16_t    upper;
+		uint16_t    middle;
+		uint16_t    middle_size;
+		uint16_t    peripheral;
 	};
 
 	struct timer_state
 	{
-		uint16_t      control;
-		uint16_t      maxA;
-		uint16_t      maxB;
-		uint16_t      count;
+		uint16_t    control;
+		uint16_t    maxA;
+		uint16_t    maxB;
+		uint16_t    count;
 		emu_timer   *int_timer;
 	};
 
 	struct dma_state
 	{
 		bool        drq_state;
-		uint32_t      source;
-		uint32_t      dest;
-		uint16_t      count;
-		uint16_t      control;
+		uint32_t    source;
+		uint32_t    dest;
+		uint16_t    count;
+		uint16_t    control;
 	};
 
 	struct intr_state
 	{
-		uint8_t       vector;
-		uint8_t       pending;
-		uint16_t      ack_mask;
-		uint16_t      priority_mask;
-		uint16_t      in_service;
-		uint16_t      request;
-		uint16_t      status;
-		uint16_t      poll_status;
-		uint16_t      timer[3];
-		uint16_t      dma[2];
-		uint16_t      ext[4];
-		uint8_t       ext_state;
+		uint8_t     vector;
+		uint8_t     pending;
+		uint16_t    ack_mask;
+		uint16_t    priority_mask;
+		uint16_t    in_service;
+		uint16_t    request;
+		uint16_t    status;
+		uint16_t    poll_status;
+		uint16_t    timer[3];
+		uint16_t    dma[2];
+		uint16_t    ext[4];
+		uint8_t     ext_state;
 	};
 
 	timer_state     m_timer[3];

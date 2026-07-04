@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "softfloat3/bochs_ext/softfloat-extra.h"
 #include <cmath>
 
 
@@ -78,19 +79,18 @@
    *
    *************************************/
 
-static const floatx80 fx80_zero = { 0x0000, 0x0000000000000000U };
-static const floatx80 fx80_one = { 0x3fff, 0x8000000000000000U };
-
-static const floatx80 fx80_ninf = { 0xffff, 0x8000000000000000U };
-static const floatx80 fx80_inan = { 0xffff, 0xc000000000000000U };
+static const extFloat80_t fx80_zero = packToExtF80(0, 0x0000, 0x0000000000000000ULL);
+static const extFloat80_t fx80_one  = packToExtF80(0, 0x3fff, 0x8000000000000000ULL);
+static const extFloat80_t fx80_ninf = packToExtF80(1, 0x7fff, 0x8000000000000000ULL);
+static const extFloat80_t fx80_inan = packToExtF80(1, 0x7fff, 0xC000000000000000ULL);
 
 /* Maps x87 round modes to SoftFloat round modes */
 static const int x87_to_sf_rc[4] =
 {
-	float_round_nearest_even,
-	float_round_down,
-	float_round_up,
-	float_round_to_zero,
+	softfloat_round_near_even,
+	softfloat_round_min,
+	softfloat_round_max,
+	softfloat_round_minMag,
 };
 
 
@@ -100,69 +100,60 @@ static const int x87_to_sf_rc[4] =
  *
  *************************************/
 
-extern flag floatx80_is_nan(floatx80 a);
-
-extern flag floatx80_is_signaling_nan(floatx80 a);
-
-static inline flag floatx80_is_quiet_nan(floatx80 a)
+static inline bool floatx80_is_quiet_nan(extFloat80_t a)
 {
-	bits64 aLow;
+	uint64_t aLow;
 
-	aLow = a.low & ~LIT64(0x4000000000000000);
+	aLow = a.signif & ~(0x4000000000000000ULL);
 	return
-		((a.high & 0x7FFF) == 0x7FFF)
-		&& (bits64)(aLow << 1)
-		&& (a.low != aLow);
+		((a.signExp & 0x7FFF) == 0x7FFF)
+		&& (uint64_t)(aLow << 1)
+		&& (a.signif != aLow);
 }
 
-static inline int floatx80_is_zero(floatx80 fx)
+static inline int floatx80_is_zero(extFloat80_t fx)
 {
-	return (((fx.high & 0x7fff) == 0) && ((fx.low << 1) == 0));
+	return (((fx.signExp & 0x7fff) == 0) && ((fx.signif << 1) == 0));
 }
 
-static inline int floatx80_is_inf(floatx80 fx)
+static inline int floatx80_is_inf(extFloat80_t fx)
 {
-	return (((fx.high & 0x7fff) == 0x7fff) && ((fx.low << 1) == 0));
+	return (((fx.signExp & 0x7fff) == 0x7fff) && ((fx.signif << 1) == 0));
 }
 
-static inline int floatx80_is_denormal(floatx80 fx)
+static inline int floatx80_is_denormal(extFloat80_t fx)
 {
-	return (((fx.high & 0x7fff) == 0) &&
-		((fx.low & 0x8000000000000000U) == 0) &&
-		((fx.low << 1) != 0));
+	return (((fx.signExp & 0x7fff) == 0) &&
+		((fx.signif & 0x8000000000000000U) == 0) &&
+		((fx.signif << 1) != 0));
 }
 
-static inline floatx80 floatx80_abs(floatx80 fx)
+static inline extFloat80_t floatx80_abs(extFloat80_t fx)
 {
-	fx.high &= 0x7fff;
+	fx.signExp &= 0x7fff;
 	return fx;
 }
 
-static inline double fx80_to_double(floatx80 fx)
+static inline double fx80_to_double(extFloat80_t fx)
 {
-	uint64_t d = floatx80_to_float64(fx);
+	float64_t d = extF80_to_f64(fx);
 	return *(double*)&d;
 }
 
-static inline floatx80 double_to_fx80(double in)
+extFloat80_t i386_device::READ80(uint32_t ea)
 {
-	return float64_to_floatx80(*(uint64_t*)&in);
-}
+	extFloat80_t t;
 
-floatx80 i386_device::READ80(uint32_t ea)
-{
-	floatx80 t;
-
-	t.low = READ64(ea);
-	t.high = READ16(ea + 8);
+	t.signif = READ64(ea);
+	t.signExp = READ16(ea + 8);
 
 	return t;
 }
 
-void i386_device::WRITE80(uint32_t ea, floatx80 t)
+void i386_device::WRITE80(uint32_t ea, extFloat80_t t)
 {
-	WRITE64(ea, t.low);
-	WRITE16(ea + 8, t.high);
+	WRITE64(ea, t.signif);
+	WRITE16(ea + 8, t.signExp);
 }
 
 #endif // MAME_CPU_I386_X87PRIV_H

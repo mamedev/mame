@@ -513,16 +513,18 @@ void hrdvd_state::hrdvd(machine_config &config)
 	ZR36110(config, m_mpeg, 27_MHz_XTAL/2);
 	m_mpeg->drq_w().set(FUNC(hrdvd_state::mpeg_dreq_w));
 
-	NN71003F(config, m_mpega, 0);
+	NN71003F(config, m_mpega);
 	m_mpega->add_route(0, m_speaker, 1.0, 0);
 	m_mpega->add_route(1, m_speaker, 1.0, 1);
 	m_mpeg->sp2_frm_w().set(m_mpega, FUNC(nn71003f_device::frm_w));
 	m_mpeg->sp2_clk_w().set(m_mpega, FUNC(nn71003f_device::clk_w));
 	m_mpeg->sp2_dat_w().set(m_mpega, FUNC(nn71003f_device::dat_w));
 
-	NICHISND(config, m_nichisnd, 0);
-
 	SPEAKER(config, m_speaker, 2).front();
+
+	NICHISND(config, m_nichisnd);
+	m_nichisnd->add_route(ALL_OUTPUTS, m_speaker, 1.0, 0);
+	m_nichisnd->add_route(ALL_OUTPUTS, m_speaker, 1.0, 1);
 }
 
 

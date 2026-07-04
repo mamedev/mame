@@ -13732,7 +13732,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Inindou - Datou Nobunaga (Japan) (Track 16).bin" size="42924000" crc="ea801aa4" sha1="95081b5ad296d079d1c2600216333c5bac5fcc12"/>
 		<rom name="Inindou - Datou Nobunaga (Japan).cue" size="1922" crc="2ca391fc" sha1="8f1d334d4ea21e50ab231cdd7b6d6c6908f1c3ff"/>
 		-->
-		<description>Inindou - Datou Nobunaga</description>
+		<description>Inindou: Datou Nobunaga</description>
 		<year>1992</year>
 		<publisher>光栄 (Koei)</publisher>
 		<info name="serial" value="HMC-188"/>

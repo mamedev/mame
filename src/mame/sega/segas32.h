@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "cpu/v60/v60.h"
 #include "sound/multipcm.h"
 #include "s32comm.h"
 #include "machine/timer.h"
@@ -21,10 +22,12 @@
 class segas32_state : public device_t
 {
 public:
-	segas32_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segas32_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
 	void init_alien3();
-	void init_arescue(int m_hasdsp);
+	void init_arescue(bool hasdsp);
 	void init_arabfgt();
 	void init_brival();
 	void init_darkedge();
@@ -69,6 +72,10 @@ protected:
 	segas32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_multi32);
 
 	typedef void (segas32_state::*sys32_output_callback)(int which, uint16_t data);
+
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	struct layer_info
 	{
@@ -130,6 +137,7 @@ protected:
 	void scross_bank_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	TILE_GET_INFO_MEMBER(get_text_tile_info);
 
 	TIMER_CALLBACK_MEMBER(end_of_vblank_int);
 	TIMER_CALLBACK_MEMBER(update_sprites);
@@ -151,28 +159,29 @@ protected:
 	void mix_all_layers(int which, int xoffs, bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t enablemask);
 	void print_mixer_data(int which);
 	uint32_t multi32_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index);
+	u8 irq_callback();
 	void update_irq_state();
 	void signal_v60_irq(int which);
 	void update_sound_irq_state();
 	void segas32_common_init();
-	void radm_sw1_output( int which, uint16_t data );
-	void radm_sw2_output( int which, uint16_t data );
-	void radr_sw2_output( int which, uint16_t data );
-	void alien3_sw1_output( int which, uint16_t data );
-	void arescue_sw1_output( int which, uint16_t data );
-	void f1lap_sw1_output( int which, uint16_t data );
-	void jpark_sw1_output( int which, uint16_t data );
-	void orunners_sw1_output( int which, uint16_t data );
-	void orunners_sw2_output( int which, uint16_t data );
-	void harddunk_sw1_output( int which, uint16_t data );
-	void harddunk_sw2_output( int which, uint16_t data );
-	void harddunk_sw3_output( int which, uint16_t data );
-	void titlef_sw1_output( int which, uint16_t data );
-	void titlef_sw2_output( int which, uint16_t data );
-	void scross_sw1_output( int which, uint16_t data );
-	void scross_sw2_output( int which, uint16_t data );
-	int compute_clipping_extents(screen_device &screen, int enable, int clipout, int clipmask, const rectangle &cliprect, extents_list *list);
-	void compute_tilemap_flips(int bgnum, int &flipx, int &flipy);
+	void radm_sw1_output(int which, uint16_t data);
+	void radm_sw2_output(int which, uint16_t data);
+	void radr_sw2_output(int which, uint16_t data);
+	void alien3_sw1_output(int which, uint16_t data);
+	void arescue_sw1_output(int which, uint16_t data);
+	void f1lap_sw1_output(int which, uint16_t data);
+	void jpark_sw1_output(int which, uint16_t data);
+	void orunners_sw1_output(int which, uint16_t data);
+	void orunners_sw2_output(int which, uint16_t data);
+	void harddunk_sw1_output(int which, uint16_t data);
+	void harddunk_sw2_output(int which, uint16_t data);
+	void harddunk_sw3_output(int which, uint16_t data);
+	void titlef_sw1_output(int which, uint16_t data);
+	void titlef_sw2_output(int which, uint16_t data);
+	void scross_sw1_output(int which, uint16_t data);
+	void scross_sw2_output(int which, uint16_t data);
+	bool compute_clipping_extents(screen_device &screen, bool enable, bool clipout, int clipmask, const rectangle &cliprect, extents_list *list);
+	void compute_tilemap_flips(int bgnum, bool &flipx, bool &flipy);
 	void update_tilemap_zoom(screen_device &screen, layer_info &layer, const rectangle &cliprect, int bgnum);
 	void update_tilemap_rowscroll(screen_device &screen, layer_info &layer, const rectangle &cliprect, int bgnum);
 	void update_tilemap_text(screen_device &screen, layer_info &layer, const rectangle &cliprect);
@@ -201,10 +210,6 @@ protected:
 	void upd7725_prg_map(address_map &map) ATTR_COLD;
 	void v25_map(address_map &map) ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-
 	required_shared_ptr<uint8_t> m_z80_shared_ram;
 	optional_shared_ptr<uint16_t> m_system32_workram;
 	memory_share_creator<uint16_t> m_videoram;
@@ -212,7 +217,7 @@ protected:
 	optional_shared_ptr<uint8_t> m_soundram;
 	memory_share_array_creator<uint16_t, 2> m_paletteram;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<v60_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<multipcm_device> m_multipcm;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -249,6 +254,7 @@ protected:
 	// video-related
 	uint16_t m_system32_displayenable[2]{};
 	uint16_t m_system32_tilebank_external = 0;
+	tilemap_t *m_text_tilemap = nullptr;
 	std::unique_ptr<cache_entry[]> m_tmap_cache;
 	cache_entry *m_cache_head = nullptr;
 	layer_info m_layer_data[11];
@@ -267,21 +273,49 @@ protected:
 	int m_print_count = 0;
 	emu_timer *m_vblank_end_int_timer = nullptr;
 	emu_timer *m_update_sprites_timer = nullptr;
+
+	// Binary outputs
+	// FIXME: split this up into derived classes so games only show the outputs they actually have
+	output_finder<> m_output_back_lamp;
+	output_finder<2> m_output_blue_button;
+	output_finder<> m_output_blue_corner_lamp;
+	output_finder<> m_output_entry_lamp;
+	output_finder<6> m_output_p_start;
+	output_finder<> m_output_lamp0;
+	output_finder<> m_output_lamp1;
+	output_finder<> m_output_left_lamp;
+	output_finder<> m_output_left_winner_lamp;
+	output_finder<> m_output_lights_lamp;
+	output_finder<2> m_output_monitor_check_point_lamp;
+	output_finder<2> m_output_monitor_dj_music_lamp;
+	output_finder<2> m_output_monitor_digit;
+	output_finder<2> m_output_monitor_arrow_lamp;
+	output_finder<2> m_output_monitor_race_leader_lamp;
+	output_finder<2> m_output_monitor_start_lamp;
+	output_finder<2> m_output_monitor_steering_wheel_motor;
+	output_finder<> m_output_start_lamp;
+	output_finder<> m_output_winner_lamp;
+	output_finder<2> m_output_player_gun_recoil;
+	output_finder<2> m_output_red_button;
+	output_finder<> m_output_red_corner_lamp;
+	output_finder<> m_output_right_lamp;
+	output_finder<> m_output_right_winner_lamp;
+	output_finder<> m_output_wiper_lamp;
 };
 
 class segas32_regular_state : public segas32_state
 {
 public:
-	segas32_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segas32_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class segas32_analog_state : public segas32_state
 {
 public:
-	segas32_analog_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segas32_analog_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	segas32_analog_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	segas32_analog_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
@@ -289,7 +323,7 @@ protected:
 class segas32_trackball_state : public segas32_state
 {
 public:
-	segas32_trackball_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segas32_trackball_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void system32_trackball_map(address_map &map) ATTR_COLD;
 protected:
@@ -299,10 +333,10 @@ protected:
 class segas32_4player_state : public segas32_state
 {
 public:
-	segas32_4player_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segas32_4player_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	segas32_4player_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	segas32_4player_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
@@ -310,7 +344,7 @@ protected:
 class segas32_v25_state : public segas32_4player_state
 {
 public:
-	segas32_v25_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segas32_v25_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	static const uint8_t arf_opcode_table[256];
 	static const uint8_t ga2_opcode_table[256];
@@ -326,7 +360,7 @@ private:
 class segas32_upd7725_state : public segas32_analog_state
 {
 public:
-	segas32_upd7725_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segas32_upd7725_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -335,17 +369,17 @@ protected:
 class segas32_cd_state : public segas32_state
 {
 public:
-	segas32_cd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segas32_cd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void lamps1_w(uint8_t data);
 	void lamps2_w(uint8_t data);
 	void scsi_irq_w(int state);
-	void scsi_drq_w(int state);
 
-	static void cdrom_config(device_t *device);
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual void device_start() override ATTR_COLD;
+	void scsi_drq_w(int state);
+
+	static void cdrom_config(device_t *device) ATTR_COLD;
 
 private:
 	output_finder<16> m_lamps;
@@ -354,10 +388,10 @@ private:
 class sega_multi32_state : public segas32_state
 {
 public:
-	sega_multi32_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_multi32_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	sega_multi32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sega_multi32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
@@ -365,7 +399,7 @@ protected:
 class sega_multi32_analog_state : public sega_multi32_state
 {
 public:
-	sega_multi32_analog_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_multi32_analog_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	ioport_value in2_analog_read();
 	ioport_value in3_analog_read();
@@ -384,7 +418,7 @@ private:
 class sega_multi32_6player_state : public sega_multi32_state
 {
 public:
-	sega_multi32_6player_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_multi32_6player_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;

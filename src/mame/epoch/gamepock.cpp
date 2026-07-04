@@ -7,8 +7,8 @@ Japanese LCD handheld console
 
 Hardware notes:
 - NEC uPD78C06AG (4KB internal ROM), 6MHz XTAL
-- 2KB external RAM(HM6116P-4), up to 28KB external ROM on cartridge
-  (28KB in theory, actually the largest game is 16KB)
+- 2KB external RAM(HM6116P-4), up to 32KB external ROM on cartridge (actually the
+  largest official game is 16KB)
 - 3*HD44102CH, 75*64 1bpp LCD screen
 - 1-bit sound
 
@@ -167,8 +167,10 @@ u8 gamepock_state::input_r()
 
 void gamepock_state::main_map(address_map &map)
 {
+	map.unmap_value_high();
+
 	// 0x0000-0x0fff is internal ROM
-	map(0x0000, 0x7fff).r("cartslot", FUNC(generic_slot_device::read_rom));
+	map(0x4000, 0xbfff).r("cartslot", FUNC(generic_slot_device::read_rom));
 	map(0xc000, 0xc7ff).mirror(0x0800).ram();
 	// 0xff80-0xffff is internal RAM
 }
@@ -233,7 +235,7 @@ void gamepock_state::gamepock(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	// cartridge
-	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "gamepock_cart");
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "gamepock_cart");
 	SOFTWARE_LIST(config, "cart_list").set_original("gamepock");
 }
 

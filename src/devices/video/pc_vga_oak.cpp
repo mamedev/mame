@@ -25,7 +25,7 @@ oak_oti111_vga_device::oak_oti111_vga_device(const machine_config &mconfig, cons
 
 void oak_oti111_vga_device::device_add_mconfig(machine_config &config)
 {
-	XGA_COPRO(config, m_xga, 0);
+	XGA_COPRO(config, m_xga);
 	m_xga->mem_read_callback().set(FUNC(oak_oti111_vga_device::mem_linear_r));
 	m_xga->mem_write_callback().set(FUNC(oak_oti111_vga_device::mem_linear_w));
 	m_xga->set_type(xga_copro_device::TYPE::OTI111);
@@ -222,7 +222,7 @@ void oak_oti111_vga_device::oak_map(address_map &map)
 	//map(0x26, 0x26) RASn Control
 	//map(0x27, 0x27) CASn Control
 	//map(0x28, 0x28) Refresh Control
-	//map(0x29, 0x29) Hardware Window Aribtration
+	//map(0x29, 0x29) Hardware Window Arbitration
 
 	//map(0x30, 0x30) OTI CRT Overflow
 	//map(0x31, 0x31) CRT Start Address

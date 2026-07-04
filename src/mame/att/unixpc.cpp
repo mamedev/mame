@@ -422,7 +422,7 @@ void unixpc_state::unixpc(machine_config &config)
 	mpsc.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 	mpsc.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_4);
 
-	acia6850_device &kbc(ACIA6850(config, "kbc", 0));
+	acia6850_device &kbc(ACIA6850(config, "kbc"));
 	kbc.irq_handler().set_inputline(m_maincpu, M68K_IRQ_3);
 
 	// TODO: RTC

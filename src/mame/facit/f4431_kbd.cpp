@@ -4,7 +4,7 @@
 
     Facit F4431 keyboard
 
-    TOOD:
+    TODO:
     - Speaker sounds weird
     - Verify country codes
 
@@ -255,9 +255,6 @@ f4431_kbd_device::f4431_kbd_device(const machine_config &mconfig, const char *ta
 
 void f4431_kbd_device::device_start()
 {
-	// resolve artwork callback
-	m_leds.resolve();
-
 	// register for save states
 	save_item(NAME(m_rx));
 	save_item(NAME(m_kbd_p2));

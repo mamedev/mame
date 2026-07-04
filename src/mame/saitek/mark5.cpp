@@ -77,8 +77,8 @@ public:
 	{ }
 
 	// machine configs
-	void mark5(machine_config &config);
-	void mark6(machine_config &config);
+	void mark5(machine_config &config) ATTR_COLD;
+	void mark6(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(cb_enable) { if (!newval) m_display[3]->clear(); }
 
@@ -141,7 +141,6 @@ private:
 
 void mark5_state::machine_start()
 {
-	m_out_x.resolve();
 	m_irqtimer = timer_alloc(FUNC(mark5_state::interrupt), this);
 
 	// register for savestates

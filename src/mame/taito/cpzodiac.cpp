@@ -26,6 +26,9 @@ Display PCB:
 TODO:
 - everything
 
+NOTES:
+- Hold 9 and F2 at any time for test mode;
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -34,6 +37,9 @@ TODO:
 #include "machine/te7750.h"
 #include "machine/z80ctc.h"
 #include "sound/ymopn.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 
 
@@ -46,10 +52,16 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_bank(*this, "databank")
+		m_bank(*this, "databank"),
+		m_vram(*this, "vram"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette")
 	{ }
 
 	void cpzodiac(machine_config &config);
+
+protected:
+	void palette_init(palette_device &palette) const;
 
 private:
 	virtual void machine_start() override ATTR_COLD;
@@ -57,12 +69,50 @@ private:
 	required_device<z80_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_memory_bank m_bank;
+	required_shared_ptr<uint8_t> m_vram;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 	void main_map(address_map &map) ATTR_COLD;
 	void main_io_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
+
+void cpzodiac_state::palette_init(palette_device &palette) const
+{
+	// TODO: improve, may really be b&w with red bezel?
+	for (int idx = 0; idx < 4; idx++)
+	{
+		// TODO: may not be correct ("L" in test mode has a higher brightness than "H")
+		const u8 color_ramp = 3 ^ idx;
+		palette.set_pen_color(idx, 0x55 * color_ramp, 0x19 * color_ramp, 0x26 * color_ramp);
+	}
+}
+
+// TODO: scrolling thru SED1351F device
+// NOTE: "speed test" has two lines cutoff at bottom
+uint32_t cpzodiac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		const u32 base_address = y * 152;
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x+= 4)
+		{
+			const u32 x_address = base_address + (x >> 2);
+			for(int xi = 0; xi < 4; xi++)
+			{
+				int pen = (m_vram[x_address & 0x1fff] >> ((3 - xi) * 2)) & 3;
+
+				bitmap.pix(y, x + xi) = m_palette->pen(pen);
+			}
+		}
+	}
+
+	return 0;
+}
 
 void cpzodiac_state::machine_start()
 {
@@ -82,8 +132,9 @@ void cpzodiac_state::main_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr("databank");
 	map(0xa000, 0xbfff).ram();
-	map(0xc000, 0xdfff).ram(); // video?
+	map(0xc000, 0xdfff).ram().share("vram"); // video?
 	map(0xe000, 0xe00f).rw("io", FUNC(te7750_device::read), FUNC(te7750_device::write));
+//	map(0xe016, 0xe017).ram(); SED1351F data/address lines, r/w?
 	map(0xe020, 0xe020).w("syt", FUNC(tc0140syt_device::master_port_w));
 	map(0xe021, 0xe021).rw("syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 }
@@ -113,40 +164,54 @@ void cpzodiac_state::sound_map(address_map &map)
 ***************************************************************************/
 
 static INPUT_PORTS_START( cpzodiac )
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW:!1,!2,!3,!4")
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 3C_4C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 4C_5C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_2C ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW:!5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	// TODO: what this really does?
+	PORT_DIPNAME( 0x20, 0x20, "Skeleton Error Detection" ) PORT_DIPLOCATION("SW:!6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW:!7,!8")
+	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) ) // -5 Kg
+	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Difficult ) ) // +5Kg
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) ) // +10Kg
+
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P10") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P11") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P12") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P13") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P14") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P15") PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P16") PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P17") PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P20") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P21") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P22") PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P23") PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P24") PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P25") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P26") PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P27") PORT_CODE(KEYCODE_K)
+	// "Gaikotsu", actually ACTIVE_HIGH but moans in attract
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P30") PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P31") PORT_CODE(KEYCODE_2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P32") PORT_CODE(KEYCODE_3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P33") PORT_CODE(KEYCODE_4)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P34") PORT_CODE(KEYCODE_5)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P35") PORT_CODE(KEYCODE_6)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P36") PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P37") PORT_CODE(KEYCODE_8)
-
-	PORT_START("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P40") PORT_CODE(KEYCODE_9)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P41") PORT_CODE(KEYCODE_0)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P42") PORT_CODE(KEYCODE_MINUS)
+	// "Speed" -> punch sensor?
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -173,10 +238,10 @@ void cpzodiac_state::cpzodiac(machine_config &config)
 
 	te7750_device &io(TE7750(config, "io"));
 	io.ios_cb().set_constant(4);
-	io.in_port1_cb().set_ioport("IN1");
-	io.in_port2_cb().set_ioport("IN2");
-	io.in_port3_cb().set_ioport("IN3");
-	io.in_port4_cb().set_ioport("IN4");
+	io.in_port1_cb().set_ioport("DSW");
+	io.in_port2_cb().set_ioport("IN1");
+	io.in_port3_cb().set_ioport("IN2");
+	io.in_port4_cb().set_ioport("IN3");
 	io.out_port8_cb().set_membank(m_bank).rshift(4);
 	// Code initializes Port 3 and 4 latches to 0 by mistake?
 
@@ -188,6 +253,15 @@ void cpzodiac_state::cpzodiac(machine_config &config)
 
 	/* video hardware */
 	// TODO
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64, 32);
+	m_screen->set_visarea(0, 64 - 1, 0, 16 - 1);
+	m_screen->set_screen_update(FUNC(cpzodiac_state::screen_update));
+	m_screen->set_palette(m_palette);
+
+	PALETTE(config, m_palette, FUNC(cpzodiac_state::palette_init), 4);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
@@ -199,7 +273,7 @@ void cpzodiac_state::cpzodiac(machine_config &config)
 	ymsnd.add_route(1, "speaker", 1.0, 0);
 	ymsnd.add_route(2, "speaker", 1.0, 1);
 
-	tc0140syt_device &syt(TC0140SYT(config, "syt", 0));
+	tc0140syt_device &syt(TC0140SYT(config, "syt"));
 	syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }

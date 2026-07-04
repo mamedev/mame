@@ -317,7 +317,7 @@ void palmz22_state::palmz22(machine_config &config)
 	m_s3c2410->nand_data_r_callback().set(FUNC(palmz22_state::s3c2410_nand_data_r));
 	m_s3c2410->nand_data_w_callback().set(FUNC(palmz22_state::s3c2410_nand_data_w));
 
-	SAMSUNG_K9F5608U0DJ(config, m_nand, 0);
+	SAMSUNG_K9F5608U0DJ(config, m_nand);
 	m_nand->rnb_wr_callback().set(m_s3c2410, FUNC(s3c2410_device::frnb_w));
 }
 

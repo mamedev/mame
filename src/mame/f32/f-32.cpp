@@ -303,7 +303,7 @@ static INPUT_PORTS_START( royalpk2 )
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Credit Pay Out") PORT_CODE(KEYCODE_E)
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Income") PORT_CODE(KEYCODE_R)
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Income Clear") PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -380,8 +380,6 @@ void royalpk2_state::machine_start()
 	save_item(NAME(m_protection_index));
 	save_item(NAME(m_protection_response_byte));
 	save_item(NAME(m_protection_response_bit));
-
-	m_lamps.resolve();
 
 	for (int i = 0; i < 31; i++)
 		m_lamps[i] = 0;

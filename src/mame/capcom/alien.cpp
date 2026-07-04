@@ -416,7 +416,7 @@ void alien_state::alien(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	// YMZ770B on all games but wontame (YMZ770C), TBD
-	YMZ770(config, m_ymz, 16.384_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
+	YMZ770(config, m_ymz, 16.9344_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	M48T35(config, "m48t35");
 }

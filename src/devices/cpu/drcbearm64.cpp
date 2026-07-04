@@ -29,7 +29,7 @@ r21     callee-saved        UML register I2
 r22     callee-saved        UML register I3
 r23     callee-saved        UML register I4
 r24     callee-saved        UML register I5
-r35     callee-saved        UML register I6
+r25     callee-saved        UML register I6
 r26     callee-saved        UML register I7
 r27     callee-saved        near cache pointer
 r28     callee-saved        emulated flags
@@ -121,12 +121,17 @@ TODO:
 
 #include "mfpresolve.h"
 
-#include "asmjit/src/asmjit/a64.h"
+#include "asmjit/asmjit/a64.h"
 
+#include <bit>
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
+#include <locale>
+#include <string>
+#include <sstream>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 
@@ -281,10 +286,17 @@ inline bool is_valid_immediate_mask(uint64_t val, size_t bytes)
 		width <<= 1;
 	}
 
-	// check check that set bits are contiguous
-	const auto lz = count_leading_zeros_64(val & make_bitmask<uint64_t>(width));
+	// check if set bits are contiguous
+	const auto lz = std::countl_zero(val & make_bitmask<uint64_t>(width));
 	const uint64_t invleftaligned = ~(val << lz);
-	return !(invleftaligned & (invleftaligned + 1));
+	if (!(invleftaligned & (invleftaligned + 1)))
+		return true;
+
+	// what about unset bits?
+	val = ~val;
+	const auto ls = std::countl_zero(val & make_bitmask<uint64_t>(width));
+	const uint64_t inv2leftaligned = ~(val << ls);
+	return !(inv2leftaligned & (inv2leftaligned + 1));
 }
 
 inline bool is_valid_immediate(uint64_t val, size_t bits)
@@ -427,6 +439,7 @@ public:
 	virtual int execute(uml::code_handle &entry) override;
 	virtual void generate(drcuml_block &block, const uml::instruction *instlist, uint32_t numinst) override;
 	virtual bool hash_exists(uint32_t mode, uint32_t pc) const noexcept override;
+	virtual void hash_invalidate_range(uint32_t pcstart, uint32_t pcend) noexcept override;
 	virtual void get_info(drcbe_info &info) const noexcept override;
 	virtual bool logging() const noexcept override { return false; }
 
@@ -499,6 +512,8 @@ private:
 	struct near_state
 	{
 		uint64_t saved_fpcr;
+		uint8_t nominal_fmod;
+		uint8_t fmod_changed;
 	};
 
 	struct memory_accessors
@@ -593,7 +608,7 @@ private:
 	template <a64::Inst::Id Opcode> void op_float_alu(a64::Assembler &a, const uml::instruction &inst);
 	template <a64::Inst::Id Opcode> void op_float_alu2(a64::Assembler &a, const uml::instruction &inst);
 
-	size_t emit(CodeHolder &ch);
+	size_t emit(CodeHolder &ch, bool invariant);
 
 
 	// helper functions
@@ -651,6 +666,7 @@ private:
 	drc_map_variables m_map;
 	FILE *m_log_asmjit;
 	carry_state m_carry_state;
+	bool m_invariant_block;
 
 	arm64_entry_point_func m_entry;
 	drccodeptr m_exit;
@@ -984,14 +1000,14 @@ inline void drcbe_arm64::emit_ldr_str_base_mem(a64::Assembler &a, a64::Inst::Id 
 }
 
 void drcbe_arm64::emit_ldr_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdr, reg, reg.is_gp32() ? 2 : 3, ptr); }
-void drcbe_arm64::emit_ldrb_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrb, reg, 0, ptr); }
-void drcbe_arm64::emit_ldrh_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrh, reg, 1, ptr); }
+void drcbe_arm64::emit_ldrb_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrb, reg.w(), 0, ptr); }
+void drcbe_arm64::emit_ldrh_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrh, reg.w(), 1, ptr); }
 void drcbe_arm64::emit_ldrsb_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrsb, reg, 0, ptr); }
 void drcbe_arm64::emit_ldrsh_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrsh, reg, 1, ptr); }
 void drcbe_arm64::emit_ldrsw_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrsw, reg, 2, ptr); }
 void drcbe_arm64::emit_str_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdStr, reg, reg.is_gp32() ? 2 : 3, ptr); }
-void drcbe_arm64::emit_strb_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdStrb, reg, 0, ptr); }
-void drcbe_arm64::emit_strh_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdStrh, reg, 1, ptr); }
+void drcbe_arm64::emit_strb_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdStrb, reg.w(), 0, ptr); }
+void drcbe_arm64::emit_strh_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdStrh, reg.w(), 1, ptr); }
 
 void drcbe_arm64::emit_float_ldr_mem(a64::Assembler &a, const a64::Vec &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdr_v, reg, reg.is_vec32() ? 2 : 3, ptr); }
 void drcbe_arm64::emit_float_str_mem(a64::Assembler &a, const a64::Vec &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdStr_v, reg, reg.is_vec32() ? 2 : 3, ptr); }
@@ -1052,7 +1068,7 @@ inline a64::Mem drcbe_arm64::emit_loadstore_address_setup(a64::Assembler &a, con
 		const a64::Gp indreg = TEMP_REG3.x();
 		if (indp.is_int_register())
 			a.sxtw(indreg, indp.get_register_int(4));
-		else if ((util::endianness::native == util::endianness::big) && indp.is_cold_register())
+		else if ((std::endian::native == std::endian::big) && indp.is_cold_register())
 			emit_ldrsw_mem(a, indreg, reinterpret_cast<uint8_t *>(indp.memory()) + 4);
 		else
 			emit_ldrsw_mem(a, indreg, indp.memory());
@@ -1219,6 +1235,7 @@ void drcbe_arm64::emit_narrow_memread(a64::Assembler &a, const be_parameter &add
 		a.lsr(REG_PARAM1.w(), REG_PARAM1.w(), FLAGS_REG.w());
 	else
 		a.lsr(REG_PARAM1, REG_PARAM1, FLAGS_REG);
+	a.mov(FLAGS_REG, a64::xzr);
 }
 
 void drcbe_arm64::emit_narrow_memwrite(a64::Assembler &a, const be_parameter &addrp, const parameter &spacesizep, const memory_accessors &accessors) const
@@ -1256,7 +1273,7 @@ void drcbe_arm64::mov_reg_param(a64::Assembler &a, uint32_t regsize, const a64::
 	}
 	else if (src.is_memory())
 	{
-		if ((util::endianness::native == util::endianness::big) && (regsize == 4) && src.is_cold_register())
+		if ((std::endian::native == std::endian::big) && (regsize == 4) && src.is_cold_register())
 			emit_ldr_mem(a, dstreg, reinterpret_cast<uint8_t *>(src.memory()) + 4);
 		else
 			emit_ldr_mem(a, dstreg, src.memory());
@@ -1355,7 +1372,7 @@ void drcbe_arm64::mov_mem_param(a64::Assembler &a, uint32_t regsize, void *dst, 
 	}
 	else if (src.is_memory())
 	{
-		if ((util::endianness::native == util::endianness::big) && (regsize == 4) && src.is_cold_register())
+		if ((std::endian::native == std::endian::big) && (regsize == 4) && src.is_cold_register())
 			emit_ldr_mem(a, scratch, reinterpret_cast<uint8_t *>(src.memory()) + 4);
 		else
 			emit_ldr_mem(a, scratch, src.memory());
@@ -1540,10 +1557,11 @@ inline void drcbe_arm64::calculate_carry_shift_right_imm(a64::Assembler &a, cons
 
 drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits)
 	: drcbe_interface(drcuml, cache, device)
-	, m_hash(cache, modes, addrbits, ignorebits, std::align_val_t(1 << 12), std::align_val_t(1 << 12))
+	, m_hash(cache, modes, addrbits, ignorebits, drcuml.max_sequence_length(), std::align_val_t(1 << 12), std::align_val_t(1 << 12))
 	, m_map(cache, 0xaaaaaaaa5555)
 	, m_log_asmjit(nullptr)
 	, m_carry_state(carry_state::POISON)
+	, m_invariant_block(false)
 	, m_entry(nullptr)
 	, m_exit(nullptr)
 	, m_nocode(nullptr)
@@ -1554,7 +1572,19 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 	// create the log
 	if (device.machine().options().drc_log_native())
 	{
-		m_log_asmjit = fopen(std::string("drcbearm64_asmjit_").append(device.shortname()).append(".asm").c_str(), "w");
+		std::string tag = device.tag();
+		for (auto &ch : tag)
+		{
+			if (':' == ch)
+				ch = '_';
+		}
+		std::ostringstream str;
+		str.imbue(std::locale::classic());
+		str << "drcbearm64_asmjit_" << device.shortname();
+		if ('_' != tag[0])
+			str << '_';
+		str << tag << ".asm";
+		m_log_asmjit = fopen(std::move(str).str().c_str(), "w");
 	}
 
 	// resolve the actual addresses of member functions we need to call
@@ -1572,45 +1602,14 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 			accessors.address_mask = m_space[space]->addrmask() & make_bitmask<offs_t>(accessors.specific.address_width) & ~make_bitmask<offs_t>(accessors.specific.native_mask_bits);
 			offs_t const shiftedmask = accessors.address_mask >> accessors.specific.low_bits;
 			offs_t const nomask = ~offs_t(0);
-			accessors.high_bits = 32 - count_leading_zeros_32(shiftedmask);
+			accessors.high_bits = std::bit_width(shiftedmask);
 			accessors.no_mask = nomask == accessors.address_mask;
 			accessors.mask_simple = !accessors.no_mask && is_valid_immediate_mask(accessors.address_mask, 4);
 			accessors.mask_high_bits = (shiftedmask & (shiftedmask + 1)) != 0;
 		}
 	}
-}
 
-drcbe_arm64::~drcbe_arm64()
-{
-	if (m_log_asmjit)
-		fclose(m_log_asmjit);
-}
-
-size_t drcbe_arm64::emit(CodeHolder &ch)
-{
-	Error err;
-
-	size_t const alignment = ch.base_address() - uint64_t(m_cache.top());
-	size_t const code_size = ch.code_size();
-
-	// test if enough room remains in the DRC cache
-	drccodeptr *cachetop = m_cache.begin_codegen(alignment + code_size);
-	if (!cachetop)
-		return 0;
-
-	err = ch.copy_flattened_data(drccodeptr(ch.base_address()), code_size, CopySectionFlags::kPadTargetBuffer);
-	if (err != kErrorOk)
-		throw emu_fatalerror("CodeHolder::copy_flattened_data() error %u", std::underlying_type_t<Error>(err));
-
-	// update the drc cache and end codegen
-	*cachetop += alignment + code_size;
-	m_cache.end_codegen();
-
-	return code_size;
-}
-
-void drcbe_arm64::reset()
-{
+	// generate invariant code
 	uint8_t *dst = (uint8_t *)m_cache.top();
 
 	CodeHolder ch;
@@ -1653,17 +1652,26 @@ void drcbe_arm64::reset()
 	a.mrs(SCRATCH_REG1, a64::Predicate::SysReg::kFPCR);
 	a.mov(FLAGS_REG, 0);
 	emit_str_mem(a, SCRATCH_REG1, &m_near.saved_fpcr);
+	a.add(SCRATCH_REG1, SCRATCH_REG1, 1 << 22);
+	a.ubfx(SCRATCH_REG1, SCRATCH_REG1, 22, 2);
+	emit_strb_mem(a, SCRATCH_REG1, &m_state.fmod);
+	emit_strb_mem(a, SCRATCH_REG1, &m_near.nominal_fmod);
+	emit_strb_mem(a, a64::xzr, &m_near.fmod_changed);
 
 	a.emit_args_assignment(frame, args);
 
-	a.br(REG_PARAM1);
+	a.blr(REG_PARAM1);
 
 	// generate exit point
 	m_exit = dst + a.offset();
 	a.bind(a.new_named_label("exit_point"));
 
+	Label const skip = a.new_label();
+	emit_ldrb_mem(a, SCRATCH_REG1, &m_near.fmod_changed);
+	a.tbz(SCRATCH_REG1.w(), 0, skip);
 	emit_ldr_mem(a, SCRATCH_REG1, &m_near.saved_fpcr);
 	a.msr(a64::Predicate::SysReg::kFPCR, SCRATCH_REG1);
+	a.bind(skip);
 
 	a.mov(a64::sp, a64::x29);
 
@@ -1683,13 +1691,46 @@ void drcbe_arm64::reset()
 	call_arm_addr(a, (const void *)entrypoint);
 
 	// emit the generated code
-	emit(ch);
+	emit(ch, true);
+
+	// set the "no code" pointer
+	m_hash.set_default_codeptr(m_nocode);
+}
+
+drcbe_arm64::~drcbe_arm64()
+{
+	if (m_log_asmjit)
+		fclose(m_log_asmjit);
+}
+
+size_t drcbe_arm64::emit(CodeHolder &ch, bool invariant)
+{
+	size_t const alignment = ch.base_address() - uint64_t(m_cache.top());
+	size_t const code_size = ch.code_size();
+
+	// try to allocate space from the DRC cache
+	auto space = invariant
+			? m_cache.alloc_invariant(alignment + code_size, std::align_val_t(1))
+			: m_cache.alloc_transient(alignment + code_size, std::align_val_t(1));
+	if (!space)
+		return 0;
+
+	assert(uintptr_t(space) <= ch.base_address());
+	Error const err = ch.copy_flattened_data(drccodeptr(ch.base_address()), code_size, CopySectionFlags::kPadTargetBuffer);
+	if (err != kErrorOk)
+		throw emu_fatalerror("CodeHolder::copy_flattened_data() error %u", std::underlying_type_t<Error>(err));
+
+	osd::invalidate_instruction_cache(drccodeptr(ch.base_address()), code_size);
+
+	return code_size;
+}
+
+void drcbe_arm64::reset()
+{
+	m_carry_state = carry_state::POISON;
 
 	// reset our hash tables
 	m_hash.reset();
-	m_hash.set_default_codeptr(m_nocode);
-
-	m_carry_state = carry_state::POISON;
 }
 
 int drcbe_arm64::execute(code_handle &entry)
@@ -1701,7 +1742,7 @@ int drcbe_arm64::execute(code_handle &entry)
 void drcbe_arm64::generate(drcuml_block &block, const instruction *instlist, uint32_t numinst)
 {
 	// do this here because device.debug() isn't initialised at construction time
-	if (!m_debug_cpu_instruction_hook && (m_device.machine().debug_flags & DEBUG_FLAG_ENABLED))
+	if (!m_debug_cpu_instruction_hook && (m_device.machine().debug_flags & DEBUG_FLAG_ENABLED) && m_device.debug())
 	{
 		m_debug_cpu_instruction_hook.set(*m_device.debug(), &device_debug::instruction_hook);
 		if (!m_debug_cpu_instruction_hook)
@@ -1712,13 +1753,14 @@ void drcbe_arm64::generate(drcuml_block &block, const instruction *instlist, uin
 	m_hash.block_begin(block, instlist, numinst);
 	m_map.block_begin(block);
 	m_carry_state = carry_state::POISON;
+	m_invariant_block = block.invariant();
 
 	// compute the base by aligning the cache top to a cache line
 	auto [err, linesize] = osd_get_cache_line_size();
 	uintptr_t linemask = 63;
 	if (err)
 	{
-		osd_printf_verbose("Error getting cache line size (%s:%d %s), assuming 64 bytes\n", err.category().name(), err.value(), err.message());
+		osd_printf_verbose("drcbe_arm64(%s): Error getting cache line size (%s:%d %s), assuming 64 bytes\n", m_device.tag(), err.category().name(), err.value(), err.message());
 	}
 	else
 	{
@@ -1771,7 +1813,7 @@ void drcbe_arm64::generate(drcuml_block &block, const instruction *instlist, uin
 	a.b(m_endofblock);
 
 	// emit the generated code
-	if (!emit(ch))
+	if (!emit(ch, block.invariant()))
 		block.abort();
 
 	// tell all of our utility objects that the block is finished
@@ -1782,6 +1824,11 @@ void drcbe_arm64::generate(drcuml_block &block, const instruction *instlist, uin
 bool drcbe_arm64::hash_exists(uint32_t mode, uint32_t pc) const noexcept
 {
 	return m_hash.code_exists(mode, pc);
+}
+
+void drcbe_arm64::hash_invalidate_range(uint32_t pcstart, uint32_t pcend) noexcept
+{
+	m_hash.invalidate_range(pcstart, pcend);
 }
 
 void drcbe_arm64::get_info(drcbe_info &info) const noexcept
@@ -1802,7 +1849,7 @@ void drcbe_arm64::get_info(drcbe_info &info) const noexcept
 
 [[noreturn]] void drcbe_arm64::end_of_block() const
 {
-	osd_printf_error("drcbe_arm64(%s): fell off the end of a generated code block!\n", m_device.tag());
+	osd_printf_error("drcbe_arm64(%s): Fell off the end of a generated code block!\n", m_device.tag());
 	std::fflush(stdout);
 	std::fflush(stderr);
 	std::abort();
@@ -1823,7 +1870,7 @@ void drcbe_arm64::op_handle(a64::Assembler &a, const uml::instruction &inst)
 	a.bind(handle);
 
 	// emit a jump around the stack adjust in case code falls through here
-	Label skip = a.new_label();
+	Label const skip = a.new_label();
 	a.b(skip);
 
 	// register the current pointer for the handle
@@ -1922,17 +1969,30 @@ void drcbe_arm64::op_debug(a64::Assembler &a, const uml::instruction &inst)
 
 		be_parameter pcp(*this, inst.param(0), PTYPE_MRI);
 
-		Label skip = a.new_label();
+		Label const nosave = a.new_label();
+		Label const done = a.new_label();
 
 		emit_ldr_mem(a, temp, &m_device.machine().debug_flags);
-		a.tbz(temp, 1, skip); // DEBUG_FLAG_CALL_HOOK
+		a.tbz(temp, 1, done); // DEBUG_FLAG_CALL_HOOK
+
+		emit_ldrb_mem(a, SCRATCH_REG1, &m_near.fmod_changed);
+		a.tbz(SCRATCH_REG1.w(), 0, nosave);
+		emit_ldr_mem(a, SCRATCH_REG1, &m_near.saved_fpcr);
+		a.mrs(FLAGS_REG, a64::Predicate::SysReg::kFPCR); // flags are clobbered anyway - save FP control here
+		a.msr(a64::Predicate::SysReg::kFPCR, SCRATCH_REG1);
+		a.bind(nosave);
 
 		get_imm_relative(a, REG_PARAM1, m_debug_cpu_instruction_hook.obj);
 		mov_reg_param(a, 4, REG_PARAM2, pcp);
 
 		call_arm_addr(a, m_debug_cpu_instruction_hook.func);
 
-		a.bind(skip);
+		emit_ldrb_mem(a, SCRATCH_REG1, &m_near.fmod_changed);
+		a.tbz(SCRATCH_REG1.w(), 0, done);
+		a.msr(a64::Predicate::SysReg::kFPCR, FLAGS_REG);
+		a.mov(FLAGS_REG, a64::xzr);
+
+		a.bind(done);
 	}
 }
 
@@ -1975,7 +2035,7 @@ void drcbe_arm64::op_hashjmp(a64::Assembler &a, const uml::instruction &inst)
 
 	if (modep.is_immediate() && m_hash.populate_mode(modep.immediate()))
 	{
-		if (pcp.is_immediate())
+		if (pcp.is_immediate() && !m_invariant_block)
 		{
 			const uint32_t l1val = (pcp.immediate() >> m_hash.l1shift()) & m_hash.l1mask();
 			const uint32_t l2val = (pcp.immediate() >> m_hash.l2shift()) & m_hash.l2mask();
@@ -2211,12 +2271,27 @@ void drcbe_arm64::op_callc(a64::Assembler &a, const uml::instruction &inst)
 	assert(funcp.is_c_function());
 	be_parameter paramp(*this, inst.param(1), PTYPE_M);
 
+	Label const nosave = a.new_label();
+	Label const norestore = a.new_label();
 	Label skip;
 	emit_skip(a, inst.condition(), skip);
+
+	emit_ldrb_mem(a, SCRATCH_REG1, &m_near.fmod_changed);
+	a.tbz(SCRATCH_REG1.w(), 0, nosave);
+	emit_ldr_mem(a, SCRATCH_REG1, &m_near.saved_fpcr);
+	a.mrs(FLAGS_REG, a64::Predicate::SysReg::kFPCR); // flags are clobbered anyway - save FP control here
+	a.msr(a64::Predicate::SysReg::kFPCR, SCRATCH_REG1);
+	a.bind(nosave);
 
 	get_imm_relative(a, REG_PARAM1, (uintptr_t)paramp.memory());
 	get_imm_relative(a, TEMP_REG1, (uintptr_t)funcp.cfunc());
 	a.blr(TEMP_REG1);
+
+	emit_ldrb_mem(a, SCRATCH_REG1, &m_near.fmod_changed);
+	a.tbz(SCRATCH_REG1.w(), 0, norestore);
+	a.msr(a64::Predicate::SysReg::kFPCR, FLAGS_REG);
+	a.mov(FLAGS_REG, a64::xzr);
+	a.bind(norestore);
 
 	if (inst.condition() != uml::COND_ALWAYS)
 		a.bind(skip);
@@ -2251,7 +2326,9 @@ void drcbe_arm64::op_setfmod(a64::Assembler &a, const uml::instruction &inst)
 	assert_no_flags(inst);
 
 	be_parameter srcp(*this, inst.param(0), PTYPE_MRI);
-	const a64::Gp scratch = select_register(TEMP_REG1, inst.size());
+	a64::Gp const scratch = select_register(TEMP_REG1, inst.size());
+
+	emit_ldrb_mem(a, TEMP_REG2, &m_state.fmod);
 
 	if (srcp.is_immediate())
 	{
@@ -2259,17 +2336,29 @@ void drcbe_arm64::op_setfmod(a64::Assembler &a, const uml::instruction &inst)
 	}
 	else
 	{
-		const a64::Gp src = srcp.select_register(scratch, inst.size());
+		a64::Gp const src = srcp.select_register(scratch, inst.size());
 
 		mov_reg_param(a, inst.size(), src, srcp);
 		a.and_(scratch, src, 3);
 	}
 
+	Label const skip = a.new_label();
+	a.cmp(TEMP_REG2.w(), scratch.w());
+	a.b_eq(skip);
+
+	emit_ldrb_mem(a, TEMP_REG2, &m_near.nominal_fmod);
+	emit_strb_mem(a, scratch, &m_state.fmod);
+
+	a.cmp(TEMP_REG2.w(), scratch.w());
+	a.cset(TEMP_REG2.w(), a64::CondCode::kNE);
+	emit_strb_mem(a, TEMP_REG2, &m_near.fmod_changed);
+
 	a.mrs(TEMP_REG2, a64::Predicate::SysReg::kFPCR);
-	emit_strb_mem(a, scratch.w(), &m_state.fmod);
 	a.sub(scratch.w(), scratch.w(), 1);
 	a.bfi(TEMP_REG2, scratch.x(), 22, 2);
 	a.msr(a64::Predicate::SysReg::kFPCR, TEMP_REG2);
+
+	a.bind(skip);
 }
 
 void drcbe_arm64::op_getfmod(a64::Assembler &a, const uml::instruction &inst)
@@ -2281,7 +2370,7 @@ void drcbe_arm64::op_getfmod(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 	const a64::Gp dst = dstp.select_register(TEMP_REG1, inst.size());
 
-	emit_ldrb_mem(a, dst.w(), &m_state.fmod);
+	emit_ldrb_mem(a, dst, &m_state.fmod);
 	mov_param_reg(a, inst.size(), dstp, dst);
 }
 
@@ -2418,7 +2507,7 @@ void drcbe_arm64::op_save(a64::Assembler &a, const uml::instruction &inst)
 
 	a.strb(TEMP_REG2.w(), a64::Mem(membase, offsetof(drcuml_machine_state, flags)));
 
-	emit_ldrb_mem(a, TEMP_REG1.w(), &m_state.fmod);
+	emit_ldrb_mem(a, TEMP_REG1, &m_state.fmod);
 	a.strb(TEMP_REG1.w(), a64::Mem(membase, offsetof(drcuml_machine_state, fmod)));
 
 	emit_ldr_mem(a, TEMP_REG1.w(), &m_state.exp);
@@ -2493,9 +2582,13 @@ void drcbe_arm64::op_restore(a64::Assembler &a, const uml::instruction &inst)
 	}
 
 	a.ldrb(TEMP_REG1.w(), a64::Mem(membase, offsetof(drcuml_machine_state, fmod)));
+	emit_ldrb_mem(a, TEMP_REG2, &m_near.nominal_fmod);
 	a.and_(TEMP_REG1.w(), TEMP_REG1.w(), 3);
+	a.cmp(TEMP_REG2.w(), TEMP_REG1.w());
+	a.cset(TEMP_REG2.w(), a64::CondCode::kNE);
+	emit_strb_mem(a, TEMP_REG2, &m_near.fmod_changed);
 	a.mrs(TEMP_REG2, a64::Predicate::SysReg::kFPCR);
-	emit_strb_mem(a, TEMP_REG1.w(), &m_state.fmod);
+	emit_strb_mem(a, TEMP_REG1, &m_state.fmod);
 	a.sub(TEMP_REG1.w(), TEMP_REG1.w(), 1);
 	a.bfi(TEMP_REG2, TEMP_REG1, 22, 2);
 	a.msr(a64::Predicate::SysReg::kFPCR, TEMP_REG2);
@@ -2529,9 +2622,9 @@ void drcbe_arm64::op_load(a64::Assembler &a, const uml::instruction &inst)
 
 		// immediate index
 		if (size == SIZE_BYTE)
-			emit_ldrb_mem(a, dstreg.w(), memptr);
+			emit_ldrb_mem(a, dstreg, memptr);
 		else if (size == SIZE_WORD)
-			emit_ldrh_mem(a, dstreg.w(), memptr);
+			emit_ldrh_mem(a, dstreg, memptr);
 		else if (size == SIZE_DWORD)
 			emit_ldr_mem(a, dstreg.w(), memptr);
 		else
@@ -2628,9 +2721,9 @@ void drcbe_arm64::op_store(a64::Assembler &a, const uml::instruction &inst)
 		mov_reg_param(a, inst.size(), srcreg, srcp);
 
 		if (size == SIZE_BYTE)
-			emit_strb_mem(a, srcreg.w(), memptr);
+			emit_strb_mem(a, srcreg, memptr);
 		else if (size == SIZE_WORD)
-			emit_strh_mem(a, srcreg.w(), memptr);
+			emit_strh_mem(a, srcreg, memptr);
 		else if (size == SIZE_DWORD)
 			emit_str_mem(a, srcreg.w(), memptr);
 		else
@@ -2671,6 +2764,15 @@ void drcbe_arm64::op_read(a64::Assembler &a, const uml::instruction &inst)
 
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
 	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.read.function) || accessors.specific.read.is_virtual;
+
+	Label const nosave = a.new_label();
+	emit_ldrb_mem(a, SCRATCH_REG1, &m_near.fmod_changed);
+	a.tbz(SCRATCH_REG1.w(), 0, nosave);
+	emit_ldr_mem(a, SCRATCH_REG1, &m_near.saved_fpcr);
+	if (!have_specific || ((1 << spacesizep.size()) >= accessors.specific.native_bytes))
+		a.mrs(FLAGS_REG, a64::Predicate::SysReg::kFPCR); // flags are clobbered anyway - save FP control here
+	a.msr(a64::Predicate::SysReg::kFPCR, SCRATCH_REG1);
+	a.bind(nosave);
 
 	if (have_specific && ((1 << spacesizep.size()) == accessors.specific.native_bytes))
 	{
@@ -2737,6 +2839,24 @@ void drcbe_arm64::op_read(a64::Assembler &a, const uml::instruction &inst)
 	{
 		mov_param_reg(a, inst.size(), dstp, REG_PARAM1);
 	}
+
+	Label const done = a.new_label();
+	emit_ldrb_mem(a, SCRATCH_REG1, &m_near.fmod_changed);
+	a.tbz(SCRATCH_REG1.w(), 0, done);
+	if (!have_specific || ((1 << spacesizep.size()) >= accessors.specific.native_bytes))
+	{
+		a.msr(a64::Predicate::SysReg::kFPCR, FLAGS_REG);
+		a.mov(FLAGS_REG, a64::xzr);
+	}
+	else
+	{
+		emit_ldrb_mem(a, SCRATCH_REG1, &m_state.fmod);
+		a.mrs(SCRATCH_REG2, a64::Predicate::SysReg::kFPCR);
+		a.sub(SCRATCH_REG1.w(), SCRATCH_REG1.w(), 1);
+		a.bfi(SCRATCH_REG2, SCRATCH_REG1, 22, 2);
+		a.msr(a64::Predicate::SysReg::kFPCR, SCRATCH_REG2);
+	}
+	a.bind(done);
 }
 
 void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
@@ -2755,6 +2875,15 @@ void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
 
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
 	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.read.function) || accessors.specific.read.is_virtual;
+
+	Label const nosave = a.new_label();
+	emit_ldrb_mem(a, SCRATCH_REG1, &m_near.fmod_changed);
+	a.tbz(SCRATCH_REG1.w(), 0, nosave);
+	emit_ldr_mem(a, SCRATCH_REG1, &m_near.saved_fpcr);
+	if (!have_specific || ((1 << spacesizep.size()) >= accessors.specific.native_bytes))
+		a.mrs(FLAGS_REG, a64::Predicate::SysReg::kFPCR); // flags are clobbered anyway - save FP control here
+	a.msr(a64::Predicate::SysReg::kFPCR, SCRATCH_REG1);
+	a.bind(nosave);
 
 	if (have_specific && ((1 << spacesizep.size()) == accessors.specific.native_bytes))
 	{
@@ -2823,6 +2952,24 @@ void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
 	{
 		mov_param_reg(a, inst.size(), dstp, REG_PARAM1);
 	}
+
+	Label const done = a.new_label();
+	emit_ldrb_mem(a, SCRATCH_REG1, &m_near.fmod_changed);
+	a.tbz(SCRATCH_REG1.w(), 0, done);
+	if (!have_specific || ((1 << spacesizep.size()) >= accessors.specific.native_bytes))
+	{
+		a.msr(a64::Predicate::SysReg::kFPCR, FLAGS_REG);
+		a.mov(FLAGS_REG, a64::xzr);
+	}
+	else
+	{
+		emit_ldrb_mem(a, SCRATCH_REG1, &m_state.fmod);
+		a.mrs(SCRATCH_REG2, a64::Predicate::SysReg::kFPCR);
+		a.sub(SCRATCH_REG1.w(), SCRATCH_REG1.w(), 1);
+		a.bfi(SCRATCH_REG2, SCRATCH_REG1, 22, 2);
+		a.msr(a64::Predicate::SysReg::kFPCR, SCRATCH_REG2);
+	}
+	a.bind(done);
 }
 
 void drcbe_arm64::op_write(a64::Assembler &a, const uml::instruction &inst)
@@ -2840,6 +2987,14 @@ void drcbe_arm64::op_write(a64::Assembler &a, const uml::instruction &inst)
 
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
 	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.write.function) || accessors.specific.write.is_virtual;
+
+	Label const nosave = a.new_label();
+	emit_ldrb_mem(a, SCRATCH_REG1, &m_near.fmod_changed);
+	a.tbz(SCRATCH_REG1.w(), 0, nosave);
+	emit_ldr_mem(a, SCRATCH_REG1, &m_near.saved_fpcr);
+	a.mrs(FLAGS_REG, a64::Predicate::SysReg::kFPCR); // flags are clobbered anyway - save FP control here
+	a.msr(a64::Predicate::SysReg::kFPCR, SCRATCH_REG1);
+	a.bind(nosave);
 
 	if (have_specific && ((1 << spacesizep.size()) == accessors.specific.native_bytes))
 	{
@@ -2888,6 +3043,13 @@ void drcbe_arm64::op_write(a64::Assembler &a, const uml::instruction &inst)
 			call_arm_addr(a, accessors.resolved.write_qword.func);
 		}
 	}
+
+	Label const done = a.new_label();
+	emit_ldrb_mem(a, SCRATCH_REG1, &m_near.fmod_changed);
+	a.tbz(SCRATCH_REG1.w(), 0, done);
+	a.msr(a64::Predicate::SysReg::kFPCR, FLAGS_REG);
+	a.mov(FLAGS_REG, a64::xzr);
+	a.bind(done);
 }
 
 void drcbe_arm64::op_writem(a64::Assembler &a, const uml::instruction &inst)
@@ -2907,6 +3069,14 @@ void drcbe_arm64::op_writem(a64::Assembler &a, const uml::instruction &inst)
 	// set up a call to the write handler
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
 	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.write.function) || accessors.specific.write.is_virtual;
+
+	Label const nosave = a.new_label();
+	emit_ldrb_mem(a, SCRATCH_REG1, &m_near.fmod_changed);
+	a.tbz(SCRATCH_REG1.w(), 0, nosave);
+	emit_ldr_mem(a, SCRATCH_REG1, &m_near.saved_fpcr);
+	a.mrs(FLAGS_REG, a64::Predicate::SysReg::kFPCR); // flags are clobbered anyway - save FP control here
+	a.msr(a64::Predicate::SysReg::kFPCR, SCRATCH_REG1);
+	a.bind(nosave);
 
 	if (have_specific && ((1 << spacesizep.size()) == accessors.specific.native_bytes))
 	{
@@ -2956,6 +3126,13 @@ void drcbe_arm64::op_writem(a64::Assembler &a, const uml::instruction &inst)
 			call_arm_addr(a, accessors.resolved.write_qword_masked.func);
 		}
 	}
+
+	Label const done = a.new_label();
+	emit_ldrb_mem(a, SCRATCH_REG1, &m_near.fmod_changed);
+	a.tbz(SCRATCH_REG1.w(), 0, done);
+	a.msr(a64::Predicate::SysReg::kFPCR, FLAGS_REG);
+	a.mov(FLAGS_REG, a64::xzr);
+	a.bind(done);
 }
 
 void drcbe_arm64::op_carry(a64::Assembler &a, const uml::instruction &inst)
@@ -3178,7 +3355,7 @@ void drcbe_arm64::op_sext(a64::Assembler &a, const uml::instruction &inst)
 		if (srcp.is_memory())
 		{
 			uintptr_t mem = uintptr_t(srcp.memory());
-			if (util::endianness::native == util::endianness::big)
+			if (std::endian::native == std::endian::big)
 				mem ^= (inst.size() - 1) & ~((1 << size) - 1);
 
 			if (size == SIZE_BYTE)
@@ -3400,8 +3577,8 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 	if (maskp.is_immediate() && shiftp.is_immediate() && !maskp.is_immediate_value(util::make_bitmask<uint64_t>(instbits)))
 	{
 		// A mask of all 1s will be handled efficiently in the unoptimized path, so only optimize for the other cases if possible
-		const auto pop = population_count_64(maskp.immediate());
-		const auto lz = count_leading_zeros_64(maskp.immediate()) & (instbits - 1);
+		const auto pop = std::popcount(maskp.immediate());
+		const auto lz = std::countl_zero(maskp.immediate()) & (instbits - 1);
 		const auto invlamask = ~(maskp.immediate() << lz) & instmask;
 		const bool is_contiguous = (invlamask & (invlamask + 1)) == 0;
 		const auto s = shiftp.immediate() & (instbits - 1);
@@ -3508,8 +3685,8 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 	bool optimized = false;
 	if (maskp.is_immediate() && shiftp.is_immediate())
 	{
-		const auto pop = population_count_64(maskp.immediate());
-		const auto lz = count_leading_zeros_64(maskp.immediate()) & (instbits - 1);
+		const auto pop = std::popcount(maskp.immediate());
+		const auto lz = std::countl_zero(maskp.immediate()) & (instbits - 1);
 		const auto invlamask = ~(maskp.immediate() << lz) & util::make_bitmask<uint64_t>(instbits);
 		const bool is_right_aligned = (maskp.immediate() & (maskp.immediate() + 1)) == 0;
 		const bool is_contiguous = (invlamask & (invlamask + 1)) == 0;
@@ -5082,7 +5259,7 @@ void drcbe_arm64::op_fload(a64::Assembler &a, const uml::instruction &inst)
 		const a64::Gp indreg = TEMP_REG1.x();
 		if (indp.is_int_register())
 			a.sxtw(indreg, indp.get_register_int(4));
-		else if ((util::endianness::native == util::endianness::big) && indp.is_cold_register())
+		else if ((std::endian::native == std::endian::big) && indp.is_cold_register())
 			emit_ldrsw_mem(a, indreg, reinterpret_cast<uint8_t *>(indp.memory()) + 4);
 		else
 			emit_ldrsw_mem(a, indreg, indp.memory());
@@ -5119,7 +5296,7 @@ void drcbe_arm64::op_fstore(a64::Assembler &a, const uml::instruction &inst)
 		const a64::Gp indreg = TEMP_REG1.x();
 		if (indp.is_int_register())
 			a.sxtw(indreg, indp.get_register_int(4));
-		else if ((util::endianness::native == util::endianness::big) && indp.is_cold_register())
+		else if ((std::endian::native == std::endian::big) && indp.is_cold_register())
 			emit_ldrsw_mem(a, indreg, reinterpret_cast<uint8_t *>(indp.memory()) + 4);
 		else
 			emit_ldrsw_mem(a, indreg, indp.memory());
@@ -5144,6 +5321,14 @@ void drcbe_arm64::op_fread(a64::Assembler &a, const uml::instruction &inst)
 
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
 
+	Label const nosave = a.new_label();
+	emit_ldrb_mem(a, SCRATCH_REG1, &m_near.fmod_changed);
+	a.tbz(SCRATCH_REG1.w(), 0, nosave);
+	emit_ldr_mem(a, SCRATCH_REG1, &m_near.saved_fpcr);
+	a.mrs(FLAGS_REG, a64::Predicate::SysReg::kFPCR); // flags are clobbered anyway - save FP control here
+	a.msr(a64::Predicate::SysReg::kFPCR, SCRATCH_REG1);
+	a.bind(nosave);
+
 	mov_reg_param(a, 4, REG_PARAM2, addrp);
 
 	if (inst.size() == 4)
@@ -5160,6 +5345,13 @@ void drcbe_arm64::op_fread(a64::Assembler &a, const uml::instruction &inst)
 
 		mov_float_param_int_reg(a, inst.size(), dstp, REG_PARAM1);
 	}
+
+	Label const done = a.new_label();
+	emit_ldrb_mem(a, SCRATCH_REG1, &m_near.fmod_changed);
+	a.tbz(SCRATCH_REG1.w(), 0, done);
+	a.msr(a64::Predicate::SysReg::kFPCR, FLAGS_REG);
+	a.mov(FLAGS_REG, a64::xzr);
+	a.bind(done);
 }
 
 void drcbe_arm64::op_fwrite(a64::Assembler &a, const uml::instruction &inst)
@@ -5178,6 +5370,14 @@ void drcbe_arm64::op_fwrite(a64::Assembler &a, const uml::instruction &inst)
 
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
 
+	Label const nosave = a.new_label();
+	emit_ldrb_mem(a, SCRATCH_REG1, &m_near.fmod_changed);
+	a.tbz(SCRATCH_REG1.w(), 0, nosave);
+	emit_ldr_mem(a, SCRATCH_REG1, &m_near.saved_fpcr);
+	a.mrs(FLAGS_REG, a64::Predicate::SysReg::kFPCR); // flags are clobbered anyway - save FP control here
+	a.msr(a64::Predicate::SysReg::kFPCR, SCRATCH_REG1);
+	a.bind(nosave);
+
 	mov_reg_param(a, 4, REG_PARAM2, addrp);
 	mov_float_reg_param(a, inst.size(), TEMPF_REG1, srcp);
 
@@ -5193,6 +5393,13 @@ void drcbe_arm64::op_fwrite(a64::Assembler &a, const uml::instruction &inst)
 		get_imm_relative(a, REG_PARAM1, accessors.resolved.write_qword.obj);
 		call_arm_addr(a, accessors.resolved.write_qword.func);
 	}
+
+	Label const done = a.new_label();
+	emit_ldrb_mem(a, SCRATCH_REG1, &m_near.fmod_changed);
+	a.tbz(SCRATCH_REG1.w(), 0, done);
+	a.msr(a64::Predicate::SysReg::kFPCR, FLAGS_REG);
+	a.mov(FLAGS_REG, a64::xzr);
+	a.bind(done);
 }
 
 void drcbe_arm64::op_fmov(a64::Assembler &a, const uml::instruction &inst)
@@ -5311,7 +5518,7 @@ void drcbe_arm64::op_ftoint(a64::Assembler &a, const uml::instruction &inst)
 				Label done = a.new_label();
 
 				// this depends on each case being two instructions
-				emit_ldrb_mem(a, TEMP_REG1.w(), &m_state.fmod);
+				emit_ldrb_mem(a, TEMP_REG1, &m_state.fmod);
 				a.adr(TEMP_REG2, base);
 				a.add(TEMP_REG2, TEMP_REG2, TEMP_REG1, a64::lsl(3));
 				a.br(TEMP_REG2);

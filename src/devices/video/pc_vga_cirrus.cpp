@@ -28,11 +28,42 @@
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
+// NOTE: use gd54xx shortname here, clgd54xx for ISA16 cards to avoid validation clashing
+DEFINE_DEVICE_TYPE(CIRRUS_GD5401_VGA, cirrus_gd5401_vga_device, "gd5401", "Cirrus Logic GD5401 / Acumos AVGA1 i/f")
+DEFINE_DEVICE_TYPE(CIRRUS_GD5428_VGA, cirrus_gd5428_vga_device, "gd5428", "Cirrus Logic GD5428 VGA i/f")
+DEFINE_DEVICE_TYPE(CIRRUS_GD5430_VGA, cirrus_gd5430_vga_device, "gd5430", "Cirrus Logic GD5430 VGA i/f")
+DEFINE_DEVICE_TYPE(CIRRUS_GD5446_VGA, cirrus_gd5446_vga_device, "gd5446", "Cirrus Logic GD5446 VGA i/f")
 
-DEFINE_DEVICE_TYPE(CIRRUS_GD5428_VGA, cirrus_gd5428_vga_device, "clgd5428", "Cirrus Logic GD5428 VGA i/f")
-DEFINE_DEVICE_TYPE(CIRRUS_GD5430_VGA, cirrus_gd5430_vga_device, "clgd5430", "Cirrus Logic GD5430 VGA i/f")
-DEFINE_DEVICE_TYPE(CIRRUS_GD5446_VGA, cirrus_gd5446_vga_device, "clgd5446", "Cirrus Logic GD5446 VGA i/f")
+/*
+ * Acumos AVGA1
+ *
+ * Bog standard VGA interface, with 132-char text mode (cfr. page 64),
+ * provision to feature connector and actually defined external video clocks.
+ *
+ */
 
+cirrus_gd5401_vga_device::cirrus_gd5401_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: vga_device(mconfig, CIRRUS_GD5401_VGA, tag, owner, clock)
+{
+}
+
+// TODO: also can select external video clock modes thru strapped CF(5) = 0
+// cfr. page 63
+void cirrus_gd5401_vga_device::recompute_params()
+{
+	u8 xtal_select = (vga.miscellaneous_output & 0x0c) >> 2;
+	int xtal;
+
+	switch(xtal_select & 3)
+	{
+		case 0: xtal = XTAL(25'174'800).value(); break;
+		case 1: xtal = XTAL(28'636'363).value(); break;
+		case 2: xtal = XTAL(41'164'000).value(); break;
+		case 3: xtal = XTAL(35'795'000).value(); break;
+	}
+
+	recompute_params_clock(1, xtal);
+}
 
 
 cirrus_gd5428_vga_device::cirrus_gd5428_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -481,7 +512,7 @@ void cirrus_gd5428_vga_device::gc_map(address_map &map)
 		})
 	);
 	// BitBLT Transparent Colour Mask 0
-	map(0x36, 0x36).lrw8(
+	map(0x38, 0x38).lrw8(
 		NAME([this](offs_t offset) {
 			return m_blt_trans_colour_mask & 0xff;
 		}),
@@ -490,7 +521,7 @@ void cirrus_gd5428_vga_device::gc_map(address_map &map)
 		})
 	);
 	// BitBLT Transparent Colour Mask 1
-	map(0x37, 0x37).lrw8(
+	map(0x39, 0x39).lrw8(
 		NAME([this](offs_t offset) {
 			return m_blt_trans_colour_mask >> 8;
 		}),
@@ -513,15 +544,14 @@ void cirrus_gd5428_vga_device::sequencer_map(address_map &map)
 	);
 	map(0x06, 0x06).lrw8(
 		NAME([this] (offs_t offset) {
-			return (gc_locked) ? 0x0f : m_lock_reg;
+			return m_lock_reg;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			// TODO: extensions are always enabled on the GD5429
 			// bits 3,5,6,7 ignored
-
-			gc_locked = (data & 0x17) != 0x12;
+			m_lock_reg = ((data & 0x17) == 0x12) ? 0x12 : 0x0f;
+			if (m_chip_id < 0x9c)
+				gc_locked = (m_lock_reg != 0x12);
 			LOG("Cirrus register extensions %s\n", gc_locked ? "unlocked" : "locked");
-			m_lock_reg = data & 0x17;
 			recompute_params();
 		})
 	);
@@ -569,9 +599,16 @@ void cirrus_gd5428_vga_device::sequencer_map(address_map &map)
 	);
 	map(0x0f, 0x0f).lrw8(
 		NAME([this] (offs_t offset) {
-			u8 res = vga.sequencer.data[0x0f] & 0xe7;
-			// 32-bit DRAM data bus width (1MB-2MB)
-			res |= 0x18;
+			u8 res = vga.sequencer.data[0x0f] & ~0x98;
+			u32 vram_k = vga.svga_intf.vram_size >> 10;
+			if (vram_k == 512)
+				res |= 0x08; // 16-bit DRAM
+			else if (vram_k == 1024)
+				res |= 0x10; // 32-bit DRAM (1MB)
+			else if (vram_k == 2048)
+				res |= 0x18; // 32-bit DRAM (2MB)
+			else if (vram_k == 4096)
+				res |= 0x98; // 64-bit DRAM (4MB)
 			return res;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
@@ -626,6 +663,7 @@ void cirrus_gd5428_vga_device::sequencer_map(address_map &map)
 			m_scratchpad3 = data;
 		})
 	);
+	//TODO: SR17: Configuration Readback and Extended Control Register (Except CL-GD5420)
 	map(0x1b, 0x1e).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_vclk_denom[offset];
@@ -675,17 +713,17 @@ void cirrus_gd5430_vga_device::device_start()
 void cirrus_gd5446_vga_device::device_start()
 {
 	cirrus_gd5428_vga_device::device_start();
-	m_chip_id = 0x80 | 0x39;  // GD5446
+	m_chip_id = 0xb8;  // GD5446
 }
 
 
 void cirrus_gd5428_vga_device::device_reset()
 {
 	svga_device::device_reset();
-	gc_locked = true;
+	gc_locked = (m_chip_id < 0x9c);
 	gc_mode_ext = 0;
 	gc_bank[0] = gc_bank[1] = 0;
-	m_lock_reg = 0;
+	m_lock_reg = 0x0f;
 	m_blt_status = 0;
 	m_cursor_attr = 0x00;  // disable hardware cursor and extra palette
 	m_cursor_x = m_cursor_y = 0;
@@ -840,7 +878,8 @@ void cirrus_gd5428_vga_device::recompute_params()
 					break;
 				default:
 					// TODO: 0xff in pciagp (alias for a DAC power down?)
-					popmessage("pc_vga_cirrus: reserved mode selected %02x", m_hidden_dac_mode);
+					if (m_hidden_dac_mode != 0xff)
+						popmessage("pc_vga_cirrus: reserved mode selected %02x", m_hidden_dac_mode);
 					break;
 			}
 		}

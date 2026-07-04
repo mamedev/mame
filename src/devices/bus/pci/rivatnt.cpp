@@ -52,7 +52,7 @@ rivatnt_device::rivatnt_device(const machine_config &mconfig, const char *tag, d
 }
 
 ROM_START( rivatnt )
-	ROM_REGION32_LE( 0x8800, "vga_rom", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x8800, "bios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "creative", "Creative Graphics Blaster RIVA TNT (V2.04.6.18)" )
 	ROMX_LOAD( "nv4_creative.rom", 0x0000, 0x8000, CRC(fe527a82) SHA1(2bb22bbaa7d2b61bce403f3163197abef85abdaa), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "stb", "STB Velocity 4400 (ver. 1.01)" )
@@ -76,7 +76,7 @@ void rivatnt_device::device_start()
 	add_map( 16*1024*1024, M_MEM, FUNC(rivatnt_device::mmio_map));
 	add_map(128*1024*1024, M_MEM, FUNC(rivatnt_device::vram_aperture_map));
 
-	add_rom((u8 *)m_vga_rom->base(), 0x8000);
+	add_rom((u8 *)m_bios->base(), 0x8000);
 	expansion_rom_base = 0xc0000;
 
 	// INTA#
@@ -103,7 +103,7 @@ rivatnt2_device::rivatnt2_device(const machine_config &mconfig, const char *tag,
 }
 
 ROM_START( rivatnt2 )
-	ROM_REGION32_LE( 0x10000, "vga_rom", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x10000, "bios", ROMREGION_ERASEFF )
 	// Despite the versioning it claims to be (C) 1999-2001
 	ROM_SYSTEM_BIOS( 0, "leadtek",  "Leadtek WinFast 3D S320 II (V99.04.12)" )
 	ROMX_LOAD( "rivatnt2leadteks320ii.bin", 0x000000, 0x010000, CRC(f1379a55) SHA1(1ea0216df1fee9ee1bcd66c26adafbbdb6a0f1f1), ROM_BIOS(0) )
@@ -124,7 +124,7 @@ void rivatnt2_device::device_start()
 	add_map( 16*1024*1024, M_MEM, FUNC(rivatnt2_device::mmio_map));
 	add_map(128*1024*1024, M_MEM, FUNC(rivatnt2_device::vram_aperture_map));
 
-	add_rom((u8 *)m_vga_rom->base(), 0x10000);
+	add_rom((u8 *)m_bios->base(), 0x10000);
 	expansion_rom_base = 0xc0000;
 
 	// INTA#
@@ -142,7 +142,7 @@ rivatnt2_ultra_device::rivatnt2_ultra_device(const machine_config &mconfig, cons
 }
 
 ROM_START( rivatnt2_ultra )
-	ROM_REGION32_LE( 0x10000, "vga_rom", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x10000, "bios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "creative",  "Creative 3D Blaster RIVA TNT2 Ultra AGP" )
 	ROMX_LOAD( "creative.bin", 0x000000, 0x010000, CRC(cf3828ce) SHA1(733d8c3f179f89f0e238ffb95717c0fafd1053aa), ROM_BIOS(0) )
 ROM_END
@@ -163,7 +163,7 @@ vanta_device::vanta_device(const machine_config &mconfig, const char *tag, devic
 
 // TODO: None of the Vanta BIOSes returns a real vendor inside, confirm OEM card names
 ROM_START( vanta )
-	ROM_REGION32_LE( 0x10000, "vga_rom", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x10000, "bios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "inno3d",  "InnoVISION Inno3D Vanta (V2.05.13)" )
 	ROMX_LOAD( "inno3d_nv5.bin", 0x000000, 0x00a800, CRC(9574114f) SHA1(f0e684bca6cc9c1e51a91dccdd5f216b16ea4fe1), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "pine",    "Pine Vanta (V2.05.17.04.00)" )
@@ -188,7 +188,7 @@ rivatnt2_model64_device::rivatnt2_model64_device(const machine_config &mconfig, 
 }
 
 ROM_START( rivatnt2_m64 )
-	ROM_REGION32_LE( 0x20000, "vga_rom", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x20000, "bios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "asus",     "ASUS AGP-V3800M (V3.05.00.10.31)" )
 	ROMX_LOAD( "asus_125-143mhz32mb.rom", 0x000000, 0x00b000, CRC(be95dc0c) SHA1(35c367b4f9d2db1bfca6d829744d9ffbd2db6e8a), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "ct6980",  "Creative CT6984 AGP (V2.05.4.17.03)" )

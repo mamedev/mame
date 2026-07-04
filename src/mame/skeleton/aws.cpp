@@ -7,15 +7,18 @@
  */
 
 #include "emu.h"
+
+#include "aws_kb.h"
+
+#include "cpu/i86/i86.h"
+#include "machine/clock.h"
+#include "machine/i8257.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/upd765.h"
-#include "machine/i8257.h"
-#include "video/i8275.h"
 #include "machine/z80sio.h"
-#include "cpu/i86/i86.h"
-#include "machine/clock.h"
-#include "aws_kb.h"
+#include "video/i8275.h"
+
 #include "screen.h"
 
 
@@ -37,18 +40,19 @@ public:
 		m_fdc(*this, "fdc"),
 		m_fdc_serial(*this, "fdc_serial"),
 		m_fdc_pit(*this, "fdc_pit")
-		{}
+	{
+	}
 
-	void aws200(machine_config &config);
-	void aws220(machine_config &config);
-	void aws_base(machine_config &config);
-	void fdc_board(machine_config &config);
+	void aws200(machine_config &config) ATTR_COLD;
+	void aws220(machine_config &config) ATTR_COLD;
+	void aws_base(machine_config &config) ATTR_COLD;
+	void fdc_board(machine_config &config) ATTR_COLD;
 
 protected:
-	void aws_mem(address_map &map);
-	void aws_io(address_map &map);
-	void aws220_mem(address_map &map);
-	void aws220_io(address_map &map);
+	void aws_mem(address_map &map) ATTR_COLD;
+	void aws_io(address_map &map) ATTR_COLD;
+	void aws220_mem(address_map &map) ATTR_COLD;
+	void aws220_io(address_map &map) ATTR_COLD;
 
 private:
 	required_device<i8086_cpu_device> m_maincpu;
@@ -92,9 +96,9 @@ void aws_state::pit_out2_w(int state)
 I8275_DRAW_CHARACTER_MEMBER(aws_state::display_pixels)
 {
 //  using namespace i8275_attributes;
-	for(int i=0;i<9;i++)
+	for (int i = 0; i < 9; i++)
 	{
-		if(i>=7)
+		if (i >= 7)
 			bitmap.pix(y, x + i) = rgb_t::black();
 		else
 			bitmap.pix(y, x + i) = BIT(m_fontrom[((linecount & 0x0f) << 7) | (charcode & 0x7f)],i) ? rgb_t::white() : rgb_t::black();
@@ -137,9 +141,9 @@ void aws_state::aws220_mem(address_map &map)
 void aws_state::aws_io(address_map &map)
 {
 	map(0x0000, 0x000f).rw(m_dmac, FUNC(i8257_device::read), FUNC(i8257_device::write));
-	map(0x0020, 0x0023).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write)).umask16(0x00ff);
-	map(0x0040, 0x0047).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0x0060, 0x0067).rw(m_serial, FUNC(upd7201_device::ba_cd_r), FUNC(upd7201_device::ba_cd_w)).umask16(0x00ff);
+	map(0x0020, 0x0023).umask16(0x00ff).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
+	map(0x0040, 0x0047).umask16(0x00ff).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x0060, 0x0067).umask16(0x00ff).rw(m_serial, FUNC(upd7201_device::ba_cd_r), FUNC(upd7201_device::ba_cd_w));
 }
 
 void aws_state::aws220_io(address_map &map)
@@ -179,7 +183,7 @@ void aws_state::aws_base(machine_config &config)
 	m_dmac->out_memw_cb().set(FUNC(aws_state::ram_w));
 	m_dmac->out_iow_cb<2>().set(m_crtc,FUNC(i8275_device::dack_w));
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(19.6608_MHz_XTAL / 16);  // 1.23 MHz
 	m_pit->out_handler<0>().set(FUNC(aws_state::pit_out0_w));  // Tone generator
 	m_pit->set_clk<1>(19.6608_MHz_XTAL / 16);  // 1.23 MHz
@@ -207,8 +211,8 @@ void aws_state::aws_base(machine_config &config)
 void aws_state::fdc_board(machine_config &config)
 {
 	I8272A(config, m_fdc, 0);
-	PIC8259(config, m_pic, 0);
-	PIT8253(config, m_fdc_pit, 0);
+	PIC8259(config, m_pic);
+	PIT8253(config, m_fdc_pit);
 	m_fdc_pit->set_clk<0>(19.6608_MHz_XTAL / 16);  // 1.23 MHz
 //  m_fdc_pit->out_handler<0>().set(FUNC(aws_state::pit_out0_w));  // INT5
 	m_fdc_pit->set_clk<1>(19.6608_MHz_XTAL / 16);  // 1.23 MHz

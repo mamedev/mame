@@ -51,7 +51,7 @@
 #include "taitosnd.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/tms32025/tms32025.h"
+#include "cpu/tms320c2x/tms320c2x.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "taitoio_yoke.h"
@@ -61,6 +61,8 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "endianness.h"
 
 
 namespace {
@@ -963,13 +965,13 @@ void mlanding_state::mlanding(machine_config &config)
 	Z80CTC(config, m_ctc, 16_MHz_XTAL / 4);
 	m_ctc->zc_callback<0>().set(FUNC(mlanding_state::z80ctc_to0));
 
-	pc060ha_device& ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device& ciu(PC060HA(config, "ciu"));
 	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	TAITOIO_YOKE(config, m_yoke, 0);
+	TAITOIO_YOKE(config, m_yoke);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

@@ -3936,7 +3936,7 @@ static INPUT_PORTS_START( mjvegasa )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                         // 有り
 	PORT_DIPNAME( 0x40, 0x00, "Time Service Frequency" )        PORT_DIPLOCATION("DIP-SW 4:7")      // タイム・サービスの頻度
 	PORT_DIPSETTING(    0x00, DEF_STR(Normal) )                                                     // 普通
-	PORT_DIPSETTING(    0x80, DEF_STR(High) )                                                       // 多い
+	PORT_DIPSETTING(    0x40, DEF_STR(High) )                                                       // 多い
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DIP-SW 4:8")                                                // ＯＦＦ固定
 
 	PORT_START("DSWTOP")    // 6814
@@ -4803,7 +4803,7 @@ ROM_START( suzume )
 	ROM_LOAD( "ic6k.bin",   0x0000, 0x0020, CRC(97e1defe) SHA1(b5002218b2292f7623dd9a205ce183dedeec03f1) )
 ROM_END
 
-ROM_START( jongshin )
+ROM_START( jongshin ) // standard Dyna base board + D8702158L1 sub board
 	ROM_REGION( 0x28000, "maincpu", 0 ) // all 2732
 	ROM_LOAD( "js1.p1",     0x00000, 0x1000, CRC(0c33eb1c) SHA1(4258f2df8e9d4d3fd3fd77c555bd36ced601c45f) )
 	ROM_LOAD( "js2.p2",     0x01000, 0x1000, CRC(a74bfa19) SHA1(378ec5dcddbe1c1e66b9ec0576b898442e3ba89c) )
@@ -4836,6 +4836,19 @@ ROM_END
 ROM_START( mjdiplob )
 	ROM_REGION( 0x90000, "maincpu", 0 )
 	ROM_LOAD( "071.4l",     0x00000, 0x10000, CRC(81a6d6b0) SHA1(c6169e6d5f35304a0c3efcc2175c3213650f179c) )
+	// bank switched ROMs follow
+	ROM_RELOAD(             0x10000, 0x10000 )              // 0,1
+	ROM_LOAD( "072.4k",     0x20000, 0x10000, CRC(a992bb85) SHA1(e60231e04831dac122d1d49a68641ee47b57faaf) )    // 2,3
+	ROM_LOAD( "073.4j",     0x30000, 0x10000, CRC(562ed64f) SHA1(42b4a7e5a8de4dde83c12d7b9facf561bc872978) )    // 4,5
+	ROM_LOAD( "074.4h",     0x40000, 0x10000, CRC(1eba0140) SHA1(0d0b95be338d7450ad3b24cc47e24e94f86dcefe) )    // 6,7
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "ic6k.bin",   0x0000, 0x0020, CRC(c1e427df) SHA1(9a9980d93dff4b87a940398b18277acaf946eeab) )
+ROM_END
+
+ROM_START( mjdiploba )
+	ROM_REGION( 0x90000, "maincpu", 0 )
+	ROM_LOAD( "071.4l",     0x00000, 0x10000, CRC(3f2a4d81) SHA1(046ac1908c5a796ba49d3e9d6e263d4e61c6f870) )
 	// bank switched ROMs follow
 	ROM_RELOAD(             0x10000, 0x10000 )              // 0,1
 	ROM_LOAD( "072.4k",     0x20000, 0x10000, CRC(a992bb85) SHA1(e60231e04831dac122d1d49a68641ee47b57faaf) )    // 2,3
@@ -5320,12 +5333,13 @@ ROM_END
 
 ROM_START( majrjh ) // ROM test gives all ok
 	ROM_REGION( 0x290000, "maincpu", 0 )
-	ROM_LOAD( "1051d.5e",         0x000000, 0x80000, CRC(5fdc5f9e) SHA1(4a599f83ee1c8ae41a44e98694b6d5515a29b813) ) // 1ST AND 2ND HALF IDENTICAL, tested as 2MB anyway
+	ROM_LOAD( "1051.5e",         0x000000, 0x80000, CRC(5fdc5f9e) SHA1(4a599f83ee1c8ae41a44e98694b6d5515a29b813) ) // 1ST AND 2ND HALF IDENTICAL, tested as 2MB anyway
+	// also seen with correctly sized ROM with hashes CRC(e87a77cb) SHA1(3480116e016c9c1d76e41113d585ef159204ad67)
 	ROM_LOAD( "tmp91p640n-10.3c", 0x000000, 0x04000, CRC(129a11c7) SHA1(450a6a7da29c9206937a16701b34075cda338147) ) // MCU has pins 9 to 10 & 12 to 15 stripped out
 	ROM_COPY( "maincpu", 0x00000, 0x010000, 0x80000 )
 	ROM_COPY( "maincpu", 0x00000, 0x090000, 0x80000 )
-	ROM_LOAD( "1053d.3e",         0x110000, 0x80000, CRC(e5abd309) SHA1(7d80ab9f7bcc66d7332c60a0d02c123582c31a34) )
-	ROM_LOAD( "1052d.4e",         0x210000, 0x80000, CRC(7200599c) SHA1(32e7caad9a9ea756b699f601fab90a419a437f57) )
+	ROM_LOAD( "1053.3e",         0x110000, 0x80000, CRC(e5abd309) SHA1(7d80ab9f7bcc66d7332c60a0d02c123582c31a34) )
+	ROM_LOAD( "1052.4e",         0x210000, 0x80000, CRC(7200599c) SHA1(32e7caad9a9ea756b699f601fab90a419a437f57) )
 
 	ROM_REGION( 0x400, "proms", 0 ) // Color PROMs
 	ROM_LOAD( "d105-2.7e", 0x000, 0x200, CRC(587bca5a) SHA1(327f7bfa035f652bbbfba3f74715515236322c09) )
@@ -5543,11 +5557,11 @@ ROM_END
 
 ROM_START( cafedollg ) // カフェドール グレート (Cafe Doll Great) sticker on PCB, G appended to the main program ROM, but still boots as standard Cafe Doll?
 	ROM_REGION( 0x190000, "maincpu", 0 )
-	ROM_LOAD( "7601g",             0x000000, 0x080000, CRC(e42779bf) SHA1(0a0d8f74da8c0d3b6349f3528b008642aa3efe9c) )
+	ROM_LOAD( "76016.2e",          0x000000, 0x080000, CRC(e42779bf) SHA1(0a0d8f74da8c0d3b6349f3528b008642aa3efe9c) )
 	ROM_LOAD( "76xx.tmp90840",     0x000000, 0x002000, BAD_DUMP CRC(091a85dc) SHA1(964ccbc13466464c2feee10f807078ec517bed5c) ) // internal ROM, MCU has pins 10 & 12 to 16 stripped out, not dumped for this set but verified on PCB that it works
 	// bank switched ROMs follow
 	ROM_COPY( "maincpu", 0x000000, 0x010000, 0x080000 )
-	ROM_LOAD( "7602",              0x090000, 0x100000, CRC(23fd53c4) SHA1(af75b6e9bf5efe77574861bfc0595824abe99d18) ) // same data of 7602 + 7603 of the parent set
+	ROM_LOAD( "7602.3e",           0x090000, 0x100000, CRC(23fd53c4) SHA1(af75b6e9bf5efe77574861bfc0595824abe99d18) ) // same data of 7602 + 7603 of the parent set
 
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "d76-2_82s147.9f", 0x000, 0x200, CRC(9c1d0512) SHA1(3ca82d4271badc890701ecc76b97e80b16509b50) )
@@ -5694,6 +5708,24 @@ ROM_START( mjvegasb )
 	ROM_COPY( "maincpu", 0x000000, 0x070000, 0x020000 )   // 0c-0f
 	ROM_LOAD( "5002.1d",           0x210000, 0x80000, CRC(016c0a32) SHA1(5c5fdd631eacb36a0ee7dba9e070c2d3d3d8fd5b) ) // 40-4f
 	ROM_LOAD( "5003.1e",           0x2f0000, 0x20000, CRC(5323cc85) SHA1(58b75ba560f05a0568024f52ee89f54713219452) ) // 5c-5f
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "d50-2_82s147.4h", 0x000, 0x200, CRC(3c960ea2) SHA1(65e05e3f129e9e6fcb14b7d44a75a76919c54d52) )
+	ROM_LOAD( "d50-1_82s147.4g", 0x200, 0x200, CRC(50c0d0ec) SHA1(222899456cd2e15391d8d0f771bbd5e5333d6ba3) )
+ROM_END
+
+ROM_START( mjvegasc ) // D5011308L1 PCB
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF  )
+	ROM_LOAD( "5001c.1b",          0x00000, 0x20000, CRC(d6bbe416) SHA1(a4dcd14a1b805f039bd3f94bc6fd7c0db98b81fe) ) // external ROM with first 0x2000 empty
+	ROM_LOAD( "50xx.tmp90840",     0x00000, 0x02000, CRC(091a85dc) SHA1(964ccbc13466464c2feee10f807078ec517bed5c) ) // internal ROM, MCU has pins 9 to 14 stripped out
+
+	// bank switched ROMs follow (same data as the other sets, just smaller size ROMs)
+	ROM_COPY( "maincpu", 0x000000, 0x070000, 0x20000 )
+	ROM_LOAD( "5006b.1h",          0x0f0000, 0x20000, CRC(c2a5f354) SHA1(4e17994721ca038c77a80acbe3c41492f0d5983c) )
+	ROM_LOAD( "5005b.1g",          0x170000, 0x20000, CRC(7abd7eec) SHA1(af479dab5bd28706649eb440a8a004e033c37856) )
+	ROM_LOAD( "5002b.1c",          0x1f0000, 0x20000, CRC(387ab936) SHA1(507d5070ce6622fe5d1f79552c6924feadcc79c3) )
+	ROM_LOAD( "5003b.1d",          0x270000, 0x20000, CRC(e68d3fd5) SHA1(9eb8b74628e4849d6afabc09f799523b56ed54b1) )
+	ROM_LOAD( "5004b.1e",          0x2f0000, 0x20000, CRC(5323cc85) SHA1(58b75ba560f05a0568024f52ee89f54713219452) )
 
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "d50-2_82s147.4h", 0x000, 0x200, CRC(3c960ea2) SHA1(65e05e3f129e9e6fcb14b7d44a75a76919c54d52) )
@@ -6617,7 +6649,8 @@ GAME( 1986,  mjsenka,     0,        mjsenka,  mjyarou,    royalmah_prgbank_state
 GAME( 1986,  mjyarou,     0,        mjyarou,  mjyarou,    royalmah_prgbank_state, init_chalgirl, ROT0,   "Visco / Video System",       "Mahjong Yarou (Japan, set 1)",          MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS ) // never seems to set the palette bank?
 GAME( 1986,  mjyarou2,    mjyarou,  mjyarou,  mjyarou,    royalmah_prgbank_state, init_chalgirl, ROT0,   "Visco / Video System",       "Mahjong Yarou (Japan, set 2)",          MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS ) // never seems to set the palette bank?
 GAME( 1986?, mjclub,      0,        mjclub,   mjclub,     royalmah_prgbank_state, init_tontonb,  ROT0,   "Xex",                        "Mahjong Club (Japan)",                  0 )
-GAME( 1987,  mjdiplob,    0,        mjdiplob, mjdiplob,   royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Mahjong Diplomat (Japan)",              0 )
+GAME( 1987,  mjdiplob,    0,        mjdiplob, mjdiplob,   royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Mahjong Diplomat (Japan, V2)",          0 )
+GAME( 1987,  mjdiploba,   mjdiplob, mjdiplob, mjdiplob,   royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Mahjong Diplomat (Japan)",              0 )
 GAME( 1987,  tontonb,     0,        tontonb,  tontonb,    royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Tonton (Japan, set 1)",                 0 )
 GAME( 1987,  tontonba,    tontonb,  tontonb,  tontonb,    royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Tonton (Japan, ver. 1.00)",             MACHINE_NOT_WORKING ) // hangs when entering bookkeeping, works after reset
 GAME( 1987,  makaijan,    0,        makaijan, makaijan,   royalmah_prgbank_state, init_dynax,    ROT0,   "Dynax",                      "Makaijan (Japan)",                      0 )
@@ -6633,6 +6666,7 @@ GAME( 1990,  mjifb3,      mjifb,    mjifb,    mjifb,      royalmah_prgbank_state
 GAME( 1991,  mjvegasa,    0,        mjvegasa, mjvegasa,   royalmah_prgbank_state, init_mjvegasa, ROT0,   "Dynax",                      "Mahjong Vegas (Japan, unprotected)",    0 )
 GAME( 1991,  mjvegas,     mjvegasa, mjvegas,  mjvegasa,   royalmah_prgbank_state, init_mjvegas,  ROT0,   "Dynax",                      "Mahjong Vegas (Japan, set 1)",          0 )
 GAME( 1991,  mjvegasb,    mjvegasa, mjvegas,  mjvegasa,   royalmah_prgbank_state, init_mjvegas,  ROT0,   "Dynax",                      "Mahjong Vegas (Japan, set 2)",          0 )
+GAME( 1991,  mjvegasc,    mjvegasa, mjvegas,  mjvegasa,   royalmah_prgbank_state, init_mjvegas,  ROT0,   "Dynax",                      "Mahjong Vegas (Japan, set 3)",          0 )
 GAME( 1992,  cafetime,    0,        cafetime, cafetime,   royalmah_prgbank_state, init_cafetime, ROT0,   "Dynax",                      "Mahjong Cafe Time",                     0 )
 GAME( 1993,  cafedoll,    0,        cafedoll, cafedoll,   royalmah_prgbank_state, init_cafedoll, ROT0,   "Dynax",                      "Mahjong Cafe Doll (Japan, Ver. 1.00)",  MACHINE_NOT_WORKING ) // fails protection check (at 0x178 it puts 0x55 in 0xFFBF instead of 0x56 like the code expects and chaos ensues)
 GAME( 1993,  cafedollg,   cafedoll, cafedoll, cafedoll,   royalmah_prgbank_state, init_cafedoll, ROT0,   "Dynax",                      "Mahjong Cafe Doll Great (Japan, Ver. 1.00)", MACHINE_NOT_WORKING ) // fails protection check (at 0x178 it puts 0x55 in 0xFFBF instead of 0x56 like the code expects and chaos ensues)

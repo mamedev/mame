@@ -300,7 +300,8 @@ void mbc55x_state::mbc55x(machine_config &config)
 	m_pit->out_handler<2>().append("sio", FUNC(i8251_device::write_rxc));
 	m_pit->out_handler<2>().append("line", FUNC(rs232_port_device::write_etc));
 
-	clock_device &clk_78_6khz(CLOCK(config, "clk_78.6khz", 14.318181_MHz_XTAL / 14 / 13));
+	clock_device &clk_78_6khz(CLOCK(config, "clk_78.6khz"));
+	clk_78_6khz.set_period(attotime::from_hz(14.318181_MHz_XTAL / 14 / 13));
 	clk_78_6khz.signal_handler().set(m_pit, FUNC(pit8253_device::write_clk0));
 	clk_78_6khz.signal_handler().append(m_kb_uart, FUNC(i8251_device::write_txc));
 	clk_78_6khz.signal_handler().append(m_kb_uart, FUNC(i8251_device::write_rxc));
@@ -340,7 +341,7 @@ void mbc55x_state::mbc55x(machine_config &config)
 	isa.irq7_callback().set(m_pic, FUNC(pic8259_device::ir7_w)); // all other IRQ and DRQ lines are NC
 	isa.iochck_callback().set_inputline(m_maincpu, INPUT_LINE_NMI).invert();
 
-	ISA8_SLOT(config, "external", 0, "isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "external", 0, "isa", pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
 
 	i8251_device &sio(I8251(config, "sio", 14.318181_MHz_XTAL / 8)); // on separate board, through 20-pin header
 	sio.dtr_handler().set("line", FUNC(rs232_port_device::write_dtr));
@@ -357,7 +358,7 @@ void mbc55x_state::mbc55x(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, "sioint").output_handler().set(m_pic, FUNC(pic8259_device::ir2_w));
 
 	APPLE2_GAMEIO(config, m_gameio, apple2_gameio_device::default_options, nullptr);
-	m_gameio->set_sw_pullups(true); // 3300 ohm pullups to 5.0V on pins 2-4 and 16
+	// 3300 ohm pullups to 5.0V on pins 2-4 and 16
 
 	CENTRONICS(config, m_printer, centronics_devices, nullptr);
 	m_printer->busy_handler().set(FUNC(mbc55x_state::printer_busy_w)).invert(); // LS14 Schmitt trigger

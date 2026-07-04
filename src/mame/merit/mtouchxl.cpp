@@ -210,17 +210,13 @@ static void mt6k_ata_devices(device_slot_interface &device)
 void mtxl_state::cdrom(device_t *device)
 {
 	auto ide0 = dynamic_cast<device_slot_interface *>(device->subdevice("ide:0"));
-	ide0->option_reset();
-	mt6k_ata_devices(*ide0);
-	ide0->set_default_option("cdrom");
+	ide0->set_options(mt6k_ata_devices, "cdrom", true);
 }
 
 void mtxl_state::hdd(device_t *device)
 {
 	auto ide0 = dynamic_cast<device_slot_interface *>(device->subdevice("ide:0"));
-	ide0->option_reset();
-	mt6k_ata_devices(*ide0);
-	ide0->set_default_option("hdd");
+	ide0->set_options(mt6k_ata_devices, "hdd", true);
 }
 #endif
 
@@ -246,7 +242,7 @@ void mtxl_state::at486(machine_config &config)
 
 	MICROTOUCH(config, "microtouch", 9600).stx().set(uart, FUNC(ins8250_uart_device::rx_w));
 
-	ad1848_device &cs4231(AD1848(config, "cs4231", 0));
+	ad1848_device &cs4231(AD1848(config, "cs4231"));
 	cs4231.irq().set("mb:pic8259_master", FUNC(pic8259_device::ir5_w));
 	cs4231.drq().set("mb:dma8237_1", FUNC(am9517a_device::dreq1_w));
 
@@ -299,7 +295,7 @@ void mtxl_state::at486hd(machine_config &config)
 
 	// on board devices
 	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "ide", true).set_option_machine_config("ide", hdd); // FIXME: determine ISA bus clock
-	ISA16_SLOT(config, "isa1", 0, "mb:isabus", pc_isa16_cards, "svga_dm", true); // original is a gd-5440
+	ISA16_SLOT(config, "isa1",   0, "mb:isabus", pc_isa16_cards, "svga_dm", true); // original is a gd-5440
 
 	ns16550_device &uart(NS16550(config, "ns16550", XTAL(1'843'200)));
 	uart.out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
@@ -307,7 +303,7 @@ void mtxl_state::at486hd(machine_config &config)
 
 	MICROTOUCH(config, "microtouch", 9600).stx().set(uart, FUNC(ins8250_uart_device::rx_w));
 
-	ad1848_device &cs4231(AD1848(config, "cs4231", 0));
+	ad1848_device &cs4231(AD1848(config, "cs4231"));
 	cs4231.irq().set("mb:pic8259_master", FUNC(pic8259_device::ir5_w));
 	cs4231.drq().set("mb:dma8237_1", FUNC(am9517a_device::dreq1_w));
 

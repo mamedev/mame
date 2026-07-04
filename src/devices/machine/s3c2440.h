@@ -146,7 +146,7 @@ enum
 
 #define S3C24XX_BASE_SDI 0x5A000000
 
-/* AC97 Interface */
+/* AC'97 Interface */
 
 #define S3C24XX_BASE_AC97 0x5B000000
 

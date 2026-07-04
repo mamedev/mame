@@ -10,11 +10,12 @@
 
 #include "emu.h"
 
-#include "machine/mos6530.h"
+#include "tia.h"
+
 #include "cpu/m6502/m6507.h"
+#include "machine/mos6530.h"
 #include "machine/watchdog.h"
 #include "sound/tiaintf.h"
-#include "tia.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -35,10 +36,7 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
-	void tourtabl(machine_config &config);
-
-protected:
-	virtual void machine_start() override { m_leds.resolve(); }
+	void tourtabl(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -171,7 +169,7 @@ void tourtabl_state::tourtabl(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	TIA_NTSC_VIDEO(config, m_tia, 0, "tia");
+	TIA_NTSC_VIDEO(config, m_tia, "tia");
 	m_tia->read_input_port_callback().set(FUNC(tourtabl_state::tourtabl_read_input_port));
 	m_tia->databus_contents_callback().set(FUNC(tourtabl_state::tourtabl_get_databus_contents));
 

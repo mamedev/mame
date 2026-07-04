@@ -5,6 +5,38 @@ license:CC0-1.0
 -->
 <softwarelist name="sony_news" description="Sony NEWS software">
 
+	<software name="nwu_671ca" supported="no">
+		<description>NEWS-OS Release 4.1CA Install Kit</description>
+		<year>1991</year>
+		<publisher>Sony</publisher>
+		<notes>The second tape is damaged, and there is no known-good dump of the installer floppy. However, the NWF-672RB installation floppy supports both RISC and CISC machines and works with this tape set.</notes>
+		<sharedfeat name="compatibility" value="CISC" />
+
+		<!--
+		Source: bitsavers.org
+		The volume markers all list the build date as 07/15/91.
+		The markers also identify the kit as NWF-671C. The NWU prefix on the tape label, used above, is specific to
+		the US release. Each tape is still marked with their original NWF volume names in the data.
+		-->
+		<part name="install_tape_1" interface="tape">
+			<feature name="part_id" value="NWU-671CA NEWS OS Release 4.1CA (CISC) Tape 1 of 2" />
+			<!-- This tape contains NWF-671C Vol.1 alone -->
+			<dataarea name="tape" size="30979140">
+				<rom name="4.1CA_1.tap" size="30979140" crc="4e5c7e10" sha1="c977e9ab5ad75691e1d8570b636601a6e8c57ca5" />
+			</dataarea>
+		</part>
+		<part name="install_tape_2" interface="tape">
+			<feature name="part_id" value="NWU-671CA NEWS OS Release 4.1CA (CISC) Tape 2 of 2" />
+			<!--
+			This tape contains NWF-671C Vol.2-4 and is damaged. The installation will stop and the SCSI tape driver
+			will throw a fatal error if you select anything past `lbpfil` on the feature select screen.
+			-->
+			<dataarea name="tape" size="74870912">
+				<rom name="4.1CA_2.tap" status="baddump" size="74870912" crc="d495d3bd" sha1="b9b14151e417f4989e08efc296181ac1ff2048ca" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nwf_672rb" supported="partial">
 		<description>NEWS-OS Release 4.1R Version Up Kit</description>
 		<year>1991</year>

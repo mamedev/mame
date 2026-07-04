@@ -46,6 +46,7 @@
 #define LOG_SETUP   (1U << 1)
 #define LOG_REGS    (1U << 2)
 #define LOG_CONF    (1U << 3)
+#define LOG_RAW     (1U << 4) // a set_raw friendly version of CONF
 
 //#define VERBOSE (LOG_SETUP|LOG_CONF|LOG_REGS)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -55,22 +56,23 @@
 #define LOGSETUP(...)   LOGMASKED(LOG_SETUP,  __VA_ARGS__)
 #define LOGREGS(...)    LOGMASKED(LOG_REGS,  __VA_ARGS__)
 #define LOGCONF(...)    LOGMASKED(LOG_CONF,  __VA_ARGS__)
+#define LOGRAW(...)     LOGMASKED(LOG_RAW,  __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(MC6845,   mc6845_device,   "mc6845",   "Motorola MC6845 CRTC")
 DEFINE_DEVICE_TYPE(MC6845_1, mc6845_1_device, "mc6845_1", "Motorola MC6845-1 CRTC")
 DEFINE_DEVICE_TYPE(R6545_1,  r6545_1_device,  "r6545_1",  "Rockwell R6545-1 CRTC")
 DEFINE_DEVICE_TYPE(C6545_1,  c6545_1_device,  "c6545_1",  "C6545-1 CRTC")
-DEFINE_DEVICE_TYPE(HD6845S,  hd6845s_device,  "hd6845s",  "Hitachi HD6845S CRTC") // same as HD46505S
 DEFINE_DEVICE_TYPE(SY6545_1, sy6545_1_device, "sy6545_1", "Synertek SY6545-1 CRTC")
 DEFINE_DEVICE_TYPE(SY6845E,  sy6845e_device,  "sy6845e",  "Synertek SY6845E CRTC")
-DEFINE_DEVICE_TYPE(HD6345,   hd6345_device,   "hd6345",   "Hitachi HD6345 CRTC-II")
 DEFINE_DEVICE_TYPE(AMS40489, ams40489_device, "ams40489", "AMS40489 ASIC (CRTC)")
+DEFINE_DEVICE_TYPE(HD6845S,  hd6845s_device,  "hd6845s",  "Hitachi HD6845S CRTC") // same as HD46505S
+DEFINE_DEVICE_TYPE(HD6345,   hd6345_device,   "hd6345",   "Hitachi HD6345 CRTC-II")
 
 
 /* mode macros */
 #define MODE_TRANSPARENT            ((m_mode_control & 0x08) != 0)
 #define MODE_TRANSPARENT_PHI2       ((m_mode_control & 0x88) == 0x88)
-/* FIXME: not supported yet */
+// TODO: not supported yet
 #define MODE_TRANSPARENT_BLANK      ((m_mode_control & 0x88) == 0x08)
 #define MODE_UPDATE_STROBE          ((m_mode_control & 0x40) != 0)
 #define MODE_CURSOR_SKEW            ((m_mode_control & 0x20) != 0)
@@ -268,119 +270,6 @@ void mc6845_device::register_w(uint8_t data)
 }
 
 
-void hd6345_device::address_w(uint8_t data)
-{
-	m_register_address_latch = data & 0x3f;
-}
-
-
-uint8_t hd6345_device::register_r()
-{
-	uint8_t ret = 0;
-
-	switch (m_register_address_latch)
-	{
-		case 0x0c:  ret = (m_disp_start_addr  >> 8) & 0xff; break;
-		case 0x0d:  ret = (m_disp_start_addr  >> 0) & 0xff; break;
-		case 0x0e:  ret = (m_cursor_addr      >> 8) & 0xff; break;
-		case 0x0f:  ret = (m_cursor_addr      >> 0) & 0xff; break;
-		case 0x10:  ret = (m_light_pen_addr   >> 8) & 0xff; m_light_pen_latched = false; break;
-		case 0x11:  ret = (m_light_pen_addr   >> 0) & 0xff; m_light_pen_latched = false; break;
-		case 0x12:  ret = m_disp2_pos; break;
-		case 0x13:  ret = (m_disp2_start_addr >> 8) & 0xff; break;
-		case 0x14:  ret = (m_disp2_start_addr >> 0) & 0xff; break;
-		case 0x15:  ret = m_disp3_pos; break;
-		case 0x16:  ret = (m_disp3_start_addr >> 8) & 0xff; break;
-		case 0x17:  ret = (m_disp3_start_addr >> 0) & 0xff; break;
-		case 0x18:  ret = m_disp4_pos; break;
-		case 0x19:  ret = (m_disp4_start_addr >> 8) & 0xff; break;
-		case 0x1a:  ret = (m_disp4_start_addr >> 0) & 0xff; break;
-		case 0x1b:  ret = m_vert_sync_pos_adj; break;
-		case 0x1c: /* TODO: light pen raster */ break;
-		case 0x1d:  ret = m_smooth_scroll_ras; break;
-		case 0x1f: /* TODO: status */ break;
-		case 0x21:  ret = m_mem_width_offs; break;
-		case 0x24:  ret = (m_cursor2_addr     >> 8) & 0xff; break;
-		case 0x25:  ret = (m_cursor2_addr     >> 0) & 0xff; break;
-		case 0x26:  ret = m_cursor_width; break;
-		case 0x27:  ret = m_cursor2_width; break;
-	}
-
-	return ret;
-}
-
-void hd6345_device::register_w(uint8_t data)
-{
-	LOGREGS("%s:HD6345 reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
-
-	/* Omits LOGSETUP logs of cursor registers as they tend to be spammy */
-	if (m_register_address_latch < 0x28 &&
-		m_register_address_latch != 0x0a && m_register_address_latch != 0x0a &&
-		m_register_address_latch != 0x0e && m_register_address_latch != 0x0f)
-		LOGSETUP(" * %02x <= %3u [%02x] %s\n", m_register_address_latch, data, data, std::array<char const *, 40>
-		 {{ "R0 - Horizontal Total",            "R1 - Horizontal Displayed",        "R2 - Horizontal Sync Position",
-			"R3 - Sync Width",                  "R4 - Vertical Total",              "R5 - Vertical Total Adjust",
-			"R6 - Vertical Displayed",          "R7 - Vertical Sync Position",      "R8 - Interlace Mode & Skew",
-			"R9 - Maximum Raster Address",      "R10 - Cursor 1 Start",             "R11 - Cursor 1 End",
-			"R12 - Screen 1 Start Address (H)", "R13 - Screen 1 Start Address (L)", "R14 - Cursor 1 Address (H)",
-			"R15 - Cursor 1 Address (L)",       "R16 - Light Pen (H)",              "R17 - Light Pen (L)",
-			"R18 - Screen 2 Start Position",    "R19 - Screen 2 Start Address (H)", "R20 - Screen 2 Start Address (L)",
-			"R21 - Screen 3 Start Position",    "R22 - Screen 3 Start Address (H)", "R23 - Screen 3 Start Address (L)",
-			"R24 - Screen 4 Start Position",    "R25 - Screen 4 Start Address (H)", "R26 - Screen 4 Start Address (L)",
-			"R27 - Vertical Sync Position Adj", "R28 - Light Pen Raster",           "R29 - Smooth Scrolling",
-			"R30 - Control 1",                  "R31 - Control 2",                  "R32 - Control 3",
-			"R33 - Memory Width Offset",        "R34 - Cursor 2 Start",             "R35 - Cursor 2 End",
-			"R36 - Cursor 2 Address (H)",       "R37 - Cursor 2 Address (L)",       "R38 - Cursor 1 Width",
-			"R39 - Cursor 2 Width" }}[(m_register_address_latch & 0x3f)]);
-
-	switch (m_register_address_latch)
-	{
-		case 0x00:  m_horiz_char_total =   data & 0xff; break;
-		case 0x01:  m_horiz_disp       =   data & 0xff; break;
-		case 0x02:  m_horiz_sync_pos   =   data & 0xff; break;
-		case 0x03:  m_sync_width       =   data & 0xff; break;
-		case 0x04:  m_vert_char_total  =   data & 0xff; break;
-		case 0x05:  m_vert_total_adj   =   data & 0x1f; break;
-		case 0x06:  m_vert_disp        =   data & 0xff; break;
-		case 0x07:  m_vert_sync_pos    =   data & 0xff; break;
-		case 0x08:  m_mode_control     =   data & 0xf3; break;
-		case 0x09:  m_max_ras_addr     =   data & 0x1f; break;
-		case 0x0a:  m_cursor_start_ras =   data & 0x7f; break;
-		case 0x0b:  m_cursor_end_ras   =   data & 0x1f; break;
-		case 0x0c:  m_disp_start_addr  = ((data & 0x3f) << 8) | (m_disp_start_addr & 0x00ff); break;
-		case 0x0d:  m_disp_start_addr  = ((data & 0xff) << 0) | (m_disp_start_addr & 0xff00); break;
-		case 0x0e:  m_cursor_addr      = ((data & 0x3f) << 8) | (m_cursor_addr & 0x00ff); break;
-		case 0x0f:  m_cursor_addr      = ((data & 0xff) << 0) | (m_cursor_addr & 0xff00); break;
-		case 0x10: /* read-only */ break;
-		case 0x11: /* read-only */ break;
-		case 0x12:  m_disp2_pos         =   data & 0xff; break;
-		case 0x13:  m_disp2_start_addr  = ((data & 0x3f) << 8) | (m_disp2_start_addr & 0x00ff); break;
-		case 0x14:  m_disp2_start_addr  = ((data & 0xff) << 0) | (m_disp2_start_addr & 0xff00); break;
-		case 0x15:  m_disp3_pos         =   data & 0xff; break;
-		case 0x16:  m_disp3_start_addr  = ((data & 0x3f) << 8) | (m_disp3_start_addr & 0x00ff); break;
-		case 0x17:  m_disp3_start_addr  = ((data & 0xff) << 0) | (m_disp3_start_addr & 0xff00); break;
-		case 0x18:  m_disp4_pos         =   data & 0xff; break;
-		case 0x19:  m_disp4_start_addr  = ((data & 0x3f) << 8) | (m_disp4_start_addr & 0x00ff); break;
-		case 0x1a:  m_disp4_start_addr  = ((data & 0xff) << 0) | (m_disp4_start_addr & 0xff00); break;
-		case 0x1b:  m_vert_sync_pos_adj =   data & 0x1f; break;
-		case 0x1c: /* read-only */ break;
-		case 0x1d:  m_smooth_scroll_ras =   data & 0x1f; break;
-		case 0x1e:  m_control1          =   data & 0xff; break;
-		case 0x1f:  m_control2          =   data & 0xf8; break;
-		case 0x20:  m_control3          =   data & 0xfe; break;
-		case 0x21:  m_mem_width_offs    =   data & 0xff; break;
-		case 0x22:  m_cursor2_start_ras =   data & 0x7f; break;
-		case 0x23:  m_cursor2_end_ras   =   data & 0x1f; break;
-		case 0x24:  m_cursor2_addr      = ((data & 0x3f) << 8) | (m_cursor2_addr & 0x00ff); break;
-		case 0x25:  m_cursor2_addr      = ((data & 0xff) << 0) | (m_cursor2_addr & 0xff00); break;
-		case 0x26:  m_cursor_width      =   data & 0xff; break;
-		case 0x27:  m_cursor2_width     =   data & 0xff; break;
-	}
-
-	recompute_parameters(false);
-}
-
-
 int mc6845_device::de_r()
 {
 	return m_de;
@@ -485,6 +374,7 @@ void mc6845_device::recompute_parameters(bool postload)
 
 			LOGCONF("M6845 config screen: HTOTAL: %d  VTOTAL: %d  MAX_X: %d  MAX_Y: %d  HSYNC: %d-%d  VSYNC: %d-%d  Freq: %ffps\n",
 				horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, refresh.as_hz());
+			LOGRAW("screen.set_raw(%lu, %d, 0, %d, %d, 0, %d);\n", this->clock() * m_hpixels_per_column, horiz_pix_total, max_visible_x + 1, vert_pix_total, max_visible_y + 1);
 
 			if (has_screen())
 				screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh.as_attoseconds());
@@ -1127,6 +1017,50 @@ void mc6845_device::device_start()
 }
 
 
+void mc6845_device::device_reset()
+{
+	/* internal registers other than status remain unchanged, all outputs go low */
+	m_out_de_cb(false);
+
+	m_out_hsync_cb(false);
+
+	m_out_vsync_cb(false);
+
+	if (!m_line_timer->enabled() && m_has_valid_parameters)
+	{
+		m_line_timer->adjust(cclks_to_attotime(m_horiz_char_total + 1));
+	}
+
+	m_light_pen_latched = false;
+
+	// TODO: as per the note above, none of these should reset unless otherwise proven.
+	m_cursor_addr = 0;
+	m_line_address = 0;
+	// bml3 in particular disagrees with these two.
+	//m_horiz_disp = 0;
+	//m_mode_control = 0;
+	m_cursor_x = 0;
+	m_register_address_latch = 0;
+	m_update_addr = 0;
+	m_light_pen_addr = 0;
+}
+
+void mc6845_device::device_validity_check(validity_checker &valid) const
+{
+	if (!m_hpixels_per_column)
+		osd_printf_error("No hpixel per column defined!");
+}
+
+/*
+ * Motorola MC6845-1
+ *
+ */
+
+mc6845_1_device::mc6845_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc6845_device(mconfig, MC6845_1, tag, owner, clock)
+{
+}
+
 void mc6845_1_device::device_start()
 {
 	mc6845_device::device_start();
@@ -1139,19 +1073,15 @@ void mc6845_1_device::device_start()
 	m_supports_transparent = false;
 }
 
+/*
+ * Rockwell R6545-1
+ *
+ */
 
-void c6545_1_device::device_start()
+r6545_1_device::r6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc6845_device(mconfig, R6545_1, tag, owner, clock)
 {
-	mc6845_device::device_start();
-
-	m_supports_disp_start_addr_r = false;
-	m_supports_vert_sync_width = true;
-	m_supports_status_reg_d5 = true;
-	m_supports_status_reg_d6 = true;
-	m_supports_status_reg_d7 = false;
-	m_supports_transparent = false;
 }
-
 
 void r6545_1_device::device_start()
 {
@@ -1165,6 +1095,108 @@ void r6545_1_device::device_start()
 	m_supports_transparent = true;
 }
 
+/*
+ * C6545-1
+ *
+ */
+
+c6545_1_device::c6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc6845_device(mconfig, C6545_1, tag, owner, clock)
+{
+}
+
+void c6545_1_device::device_start()
+{
+	mc6845_device::device_start();
+
+	m_supports_disp_start_addr_r = false;
+	m_supports_vert_sync_width = true;
+	m_supports_status_reg_d5 = true;
+	m_supports_status_reg_d6 = true;
+	m_supports_status_reg_d7 = false;
+	m_supports_transparent = false;
+}
+
+/*
+ * Synertek SY6545-1
+ *
+ */
+
+sy6545_1_device::sy6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc6845_device(mconfig, SY6545_1, tag, owner, clock)
+{
+}
+
+void sy6545_1_device::device_start()
+{
+	mc6845_device::device_start();
+
+	m_supports_disp_start_addr_r = false;
+	m_supports_vert_sync_width = true;
+	m_supports_status_reg_d5 = true;
+	m_supports_status_reg_d6 = true;
+	m_supports_status_reg_d7 = true;
+	m_supports_transparent = true;
+}
+
+/*
+ * Synertek SY6845E
+ *
+ */
+
+sy6845e_device::sy6845e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc6845_device(mconfig, SY6845E, tag, owner, clock)
+{
+}
+
+void sy6845e_device::device_start()
+{
+	mc6845_device::device_start();
+
+	m_supports_disp_start_addr_r = false;
+	m_supports_vert_sync_width = true;
+	m_supports_status_reg_d5 = true;
+	m_supports_status_reg_d6 = true;
+	m_supports_status_reg_d7 = true;
+	m_supports_transparent = true;
+}
+
+/*
+ * AMS40489 ASIC
+ *
+ */
+
+ams40489_device::ams40489_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc6845_device(mconfig, AMS40489, tag, owner, clock)
+{
+}
+
+void ams40489_device::device_start()
+{
+	mc6845_device::device_start();
+
+	m_supports_disp_start_addr_r = true;
+	m_supports_vert_sync_width = false;
+	m_supports_status_reg_d5 = false;
+	m_supports_status_reg_d6 = false;
+	m_supports_status_reg_d7 = false;
+	m_supports_transparent = false;
+}
+
+/*
+ * Hitachi HD6845S / HD46505S
+ *
+ */
+
+hd6845s_device::hd6845s_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: mc6845_device(mconfig, type, tag, owner, clock)
+{
+}
+
+hd6845s_device::hd6845s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc6845_device(mconfig, HD6845S, tag, owner, clock)
+{
+}
 
 void hd6845s_device::device_start()
 {
@@ -1183,32 +1215,15 @@ void hd6845s_device::device_start()
 	m_interlace_adjust = 2;
 }
 
+/*
+ * Hitachi HD6345 / HD6445 "CRTC-II"
+ *
+ */
 
-void sy6545_1_device::device_start()
+hd6345_device::hd6345_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hd6845s_device(mconfig, HD6345, tag, owner, clock)
 {
-	mc6845_device::device_start();
-
-	m_supports_disp_start_addr_r = false;
-	m_supports_vert_sync_width = true;
-	m_supports_status_reg_d5 = true;
-	m_supports_status_reg_d6 = true;
-	m_supports_status_reg_d7 = true;
-	m_supports_transparent = true;
 }
-
-
-void sy6845e_device::device_start()
-{
-	mc6845_device::device_start();
-
-	m_supports_disp_start_addr_r = false;
-	m_supports_vert_sync_width = true;
-	m_supports_status_reg_d5 = true;
-	m_supports_status_reg_d6 = true;
-	m_supports_status_reg_d7 = true;
-	m_supports_transparent = true;
-}
-
 
 void hd6345_device::device_start()
 {
@@ -1248,56 +1263,6 @@ void hd6345_device::device_start()
 	save_item(NAME(m_cursor2_width));
 }
 
-
-void ams40489_device::device_start()
-{
-	mc6845_device::device_start();
-
-	m_supports_disp_start_addr_r = true;
-	m_supports_vert_sync_width = false;
-	m_supports_status_reg_d5 = false;
-	m_supports_status_reg_d6 = false;
-	m_supports_status_reg_d7 = false;
-	m_supports_transparent = false;
-}
-
-
-void mc6845_device::device_reset()
-{
-	/* internal registers other than status remain unchanged, all outputs go low */
-	m_out_de_cb(false);
-
-	m_out_hsync_cb(false);
-
-	m_out_vsync_cb(false);
-
-	if (!m_line_timer->enabled() && m_has_valid_parameters)
-	{
-		m_line_timer->adjust(cclks_to_attotime(m_horiz_char_total + 1));
-	}
-
-	m_light_pen_latched = false;
-
-	// TODO: as per the note above, none of these should reset unless otherwise proven.
-	m_cursor_addr = 0;
-	m_line_address = 0;
-	// bml3 in particular disagrees with these two.
-	//m_horiz_disp = 0;
-	//m_mode_control = 0;
-	m_cursor_x = 0;
-	m_register_address_latch = 0;
-	m_update_addr = 0;
-	m_light_pen_addr = 0;
-}
-
-
-void r6545_1_device::device_reset() { mc6845_device::device_reset(); }
-void mc6845_1_device::device_reset() { mc6845_device::device_reset(); }
-void hd6845s_device::device_reset() { mc6845_device::device_reset(); }
-void c6545_1_device::device_reset() { mc6845_device::device_reset(); }
-void sy6545_1_device::device_reset() { mc6845_device::device_reset(); }
-void sy6845e_device::device_reset() { mc6845_device::device_reset(); }
-
 void hd6345_device::device_reset()
 {
 	hd6845s_device::device_reset();
@@ -1307,58 +1272,114 @@ void hd6345_device::device_reset()
 	m_control3 = 0;
 }
 
-void ams40489_device::device_reset() { mc6845_device::device_reset(); }
-
-
-r6545_1_device::r6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, R6545_1, tag, owner, clock)
+void hd6345_device::address_w(uint8_t data)
 {
+	m_register_address_latch = data & 0x3f;
 }
 
-
-mc6845_1_device::mc6845_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, MC6845_1, tag, owner, clock)
+uint8_t hd6345_device::register_r()
 {
+	uint8_t ret = 0;
+
+	switch (m_register_address_latch)
+	{
+		case 0x0c:  ret = (m_disp_start_addr  >> 8) & 0xff; break;
+		case 0x0d:  ret = (m_disp_start_addr  >> 0) & 0xff; break;
+		case 0x0e:  ret = (m_cursor_addr      >> 8) & 0xff; break;
+		case 0x0f:  ret = (m_cursor_addr      >> 0) & 0xff; break;
+		case 0x10:  ret = (m_light_pen_addr   >> 8) & 0xff; m_light_pen_latched = false; break;
+		case 0x11:  ret = (m_light_pen_addr   >> 0) & 0xff; m_light_pen_latched = false; break;
+		case 0x12:  ret = m_disp2_pos; break;
+		case 0x13:  ret = (m_disp2_start_addr >> 8) & 0xff; break;
+		case 0x14:  ret = (m_disp2_start_addr >> 0) & 0xff; break;
+		case 0x15:  ret = m_disp3_pos; break;
+		case 0x16:  ret = (m_disp3_start_addr >> 8) & 0xff; break;
+		case 0x17:  ret = (m_disp3_start_addr >> 0) & 0xff; break;
+		case 0x18:  ret = m_disp4_pos; break;
+		case 0x19:  ret = (m_disp4_start_addr >> 8) & 0xff; break;
+		case 0x1a:  ret = (m_disp4_start_addr >> 0) & 0xff; break;
+		case 0x1b:  ret = m_vert_sync_pos_adj; break;
+		case 0x1c: /* TODO: light pen raster */ break;
+		case 0x1d:  ret = m_smooth_scroll_ras; break;
+		case 0x1f: /* TODO: status */ break;
+		case 0x21:  ret = m_mem_width_offs; break;
+		case 0x24:  ret = (m_cursor2_addr     >> 8) & 0xff; break;
+		case 0x25:  ret = (m_cursor2_addr     >> 0) & 0xff; break;
+		case 0x26:  ret = m_cursor_width; break;
+		case 0x27:  ret = m_cursor2_width; break;
+	}
+
+	return ret;
 }
 
-
-hd6845s_device::hd6845s_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, type, tag, owner, clock)
+void hd6345_device::register_w(uint8_t data)
 {
+	LOGREGS("%s:HD6345 reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
+
+	/* Omits LOGSETUP logs of cursor registers as they tend to be spammy */
+	if (m_register_address_latch < 0x28 &&
+		m_register_address_latch != 0x0a && m_register_address_latch != 0x0a &&
+		m_register_address_latch != 0x0e && m_register_address_latch != 0x0f)
+		LOGSETUP(" * %02x <= %3u [%02x] %s\n", m_register_address_latch, data, data, std::array<char const *, 40>
+		 {{ "R0 - Horizontal Total",            "R1 - Horizontal Displayed",        "R2 - Horizontal Sync Position",
+			"R3 - Sync Width",                  "R4 - Vertical Total",              "R5 - Vertical Total Adjust",
+			"R6 - Vertical Displayed",          "R7 - Vertical Sync Position",      "R8 - Interlace Mode & Skew",
+			"R9 - Maximum Raster Address",      "R10 - Cursor 1 Start",             "R11 - Cursor 1 End",
+			"R12 - Screen 1 Start Address (H)", "R13 - Screen 1 Start Address (L)", "R14 - Cursor 1 Address (H)",
+			"R15 - Cursor 1 Address (L)",       "R16 - Light Pen (H)",              "R17 - Light Pen (L)",
+			"R18 - Screen 2 Start Position",    "R19 - Screen 2 Start Address (H)", "R20 - Screen 2 Start Address (L)",
+			"R21 - Screen 3 Start Position",    "R22 - Screen 3 Start Address (H)", "R23 - Screen 3 Start Address (L)",
+			"R24 - Screen 4 Start Position",    "R25 - Screen 4 Start Address (H)", "R26 - Screen 4 Start Address (L)",
+			"R27 - Vertical Sync Position Adj", "R28 - Light Pen Raster",           "R29 - Smooth Scrolling",
+			"R30 - Control 1",                  "R31 - Control 2",                  "R32 - Control 3",
+			"R33 - Memory Width Offset",        "R34 - Cursor 2 Start",             "R35 - Cursor 2 End",
+			"R36 - Cursor 2 Address (H)",       "R37 - Cursor 2 Address (L)",       "R38 - Cursor 1 Width",
+			"R39 - Cursor 2 Width" }}[(m_register_address_latch & 0x3f)]);
+
+	switch (m_register_address_latch)
+	{
+		case 0x00:  m_horiz_char_total =   data & 0xff; break;
+		case 0x01:  m_horiz_disp       =   data & 0xff; break;
+		case 0x02:  m_horiz_sync_pos   =   data & 0xff; break;
+		case 0x03:  m_sync_width       =   data & 0xff; break;
+		case 0x04:  m_vert_char_total  =   data & 0xff; break;
+		case 0x05:  m_vert_total_adj   =   data & 0x1f; break;
+		case 0x06:  m_vert_disp        =   data & 0xff; break;
+		case 0x07:  m_vert_sync_pos    =   data & 0xff; break;
+		case 0x08:  m_mode_control     =   data & 0xf3; break;
+		case 0x09:  m_max_ras_addr     =   data & 0x1f; break;
+		case 0x0a:  m_cursor_start_ras =   data & 0x7f; break;
+		case 0x0b:  m_cursor_end_ras   =   data & 0x1f; break;
+		case 0x0c:  m_disp_start_addr  = ((data & 0x3f) << 8) | (m_disp_start_addr & 0x00ff); break;
+		case 0x0d:  m_disp_start_addr  = ((data & 0xff) << 0) | (m_disp_start_addr & 0xff00); break;
+		case 0x0e:  m_cursor_addr      = ((data & 0x3f) << 8) | (m_cursor_addr & 0x00ff); break;
+		case 0x0f:  m_cursor_addr      = ((data & 0xff) << 0) | (m_cursor_addr & 0xff00); break;
+		case 0x10: /* read-only */ break;
+		case 0x11: /* read-only */ break;
+		case 0x12:  m_disp2_pos         =   data & 0xff; break;
+		case 0x13:  m_disp2_start_addr  = ((data & 0x3f) << 8) | (m_disp2_start_addr & 0x00ff); break;
+		case 0x14:  m_disp2_start_addr  = ((data & 0xff) << 0) | (m_disp2_start_addr & 0xff00); break;
+		case 0x15:  m_disp3_pos         =   data & 0xff; break;
+		case 0x16:  m_disp3_start_addr  = ((data & 0x3f) << 8) | (m_disp3_start_addr & 0x00ff); break;
+		case 0x17:  m_disp3_start_addr  = ((data & 0xff) << 0) | (m_disp3_start_addr & 0xff00); break;
+		case 0x18:  m_disp4_pos         =   data & 0xff; break;
+		case 0x19:  m_disp4_start_addr  = ((data & 0x3f) << 8) | (m_disp4_start_addr & 0x00ff); break;
+		case 0x1a:  m_disp4_start_addr  = ((data & 0xff) << 0) | (m_disp4_start_addr & 0xff00); break;
+		case 0x1b:  m_vert_sync_pos_adj =   data & 0x1f; break;
+		case 0x1c: /* read-only */ break;
+		case 0x1d:  m_smooth_scroll_ras =   data & 0x1f; break;
+		case 0x1e:  m_control1          =   data & 0xff; break;
+		case 0x1f:  m_control2          =   data & 0xf8; break;
+		case 0x20:  m_control3          =   data & 0xfe; break;
+		case 0x21:  m_mem_width_offs    =   data & 0xff; break;
+		case 0x22:  m_cursor2_start_ras =   data & 0x7f; break;
+		case 0x23:  m_cursor2_end_ras   =   data & 0x1f; break;
+		case 0x24:  m_cursor2_addr      = ((data & 0x3f) << 8) | (m_cursor2_addr & 0x00ff); break;
+		case 0x25:  m_cursor2_addr      = ((data & 0xff) << 0) | (m_cursor2_addr & 0xff00); break;
+		case 0x26:  m_cursor_width      =   data & 0xff; break;
+		case 0x27:  m_cursor2_width     =   data & 0xff; break;
+	}
+
+	recompute_parameters(false);
 }
 
-
-hd6845s_device::hd6845s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, HD6845S, tag, owner, clock)
-{
-}
-
-
-c6545_1_device::c6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, C6545_1, tag, owner, clock)
-{
-}
-
-
-sy6545_1_device::sy6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, SY6545_1, tag, owner, clock)
-{
-}
-
-
-sy6845e_device::sy6845e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, SY6845E, tag, owner, clock)
-{
-}
-
-
-hd6345_device::hd6345_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hd6845s_device(mconfig, HD6345, tag, owner, clock)
-{
-}
-
-
-ams40489_device::ams40489_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, AMS40489, tag, owner, clock)
-{
-}

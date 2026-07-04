@@ -72,12 +72,12 @@ void merlin_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(33_MHz_XTAL, 900, 0, 640, 526, 0, 480); // TODO
 	screen.set_screen_update(FUNC(merlin_device::screen_update));
 
-	ET4KW32I_VGA(config, m_vga, 0); // should be ET4000W32
+	ET4KW32I_VGA(config, m_vga); // should be ET4000W32
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x200000);
 	m_vga->vsync_cb().set([this](int state) { m_zorro->int6_w(state); });
 
-	BT482(config, m_ramdac, 0);
+	BT482(config, m_ramdac);
 }
 
 

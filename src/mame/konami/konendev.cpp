@@ -111,17 +111,11 @@ private:
 
 	void gcu_interrupt(int state);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	void main_map(address_map &map) ATTR_COLD;
 	void ifu_map(address_map &map) ATTR_COLD;
 	void ymz280b_map(address_map &map) ATTR_COLD;
 };
 
-uint32_t konendev_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return m_gcu->draw(screen, bitmap, cliprect);
-}
 
 uint32_t konendev_state::mcu2_r(offs_t offset, uint32_t mem_mask)
 {
@@ -280,7 +274,7 @@ Play 30 Lines: 2/4/6 (2:1 odds), black
 static INPUT_PORTS_START( konendev )
 	PORT_START("IN0")
 	PORT_BIT( 0x000000ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_CODE(KEYCODE_3) PORT_NAME("Help")
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CODE(KEYCODE_3) PORT_NAME("Help")
 	PORT_BIT( 0x0000fe00, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Q) PORT_NAME("Bet 1 Credit")
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_W) PORT_NAME("Bet 2 Credits")
@@ -289,7 +283,7 @@ static INPUT_PORTS_START( konendev )
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_T) PORT_NAME("Bet 10 Credits")
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 20 Credits")
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_1) PORT_NAME("Collect")
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_CODE(KEYCODE_2) PORT_NAME("Reserve")
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CODE(KEYCODE_2) PORT_NAME("Reserve")
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_CODE(KEYCODE_A) PORT_NAME("Play 1 Line / Red")
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_CODE(KEYCODE_S) PORT_NAME("Play 5 Lines")
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_CODE(KEYCODE_D) PORT_NAME("Play 10 Lines")
@@ -318,7 +312,7 @@ static INPUT_PORTS_START( konendev )
 	PORT_DIPNAME( 0x04000000, 0x00000000, "Cashbox Door" )
 	PORT_DIPSETTING( 0x04000000, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_CODE(KEYCODE_M) PORT_TOGGLE PORT_NAME("Main Door")
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_DOOR ) PORT_CODE(KEYCODE_M) PORT_TOGGLE PORT_NAME("Main Door")
 	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_CODE(KEYCODE_F1) PORT_NAME("Reset Key")
 	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_CODE(KEYCODE_F2) PORT_TOGGLE PORT_NAME("Audit Key")
 	PORT_BIT( 0xc0000000, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -340,7 +334,7 @@ static INPUT_PORTS_START( konendev )
 
 	PORT_START("IN3")
 	PORT_BIT( 0x00ffffff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR ) PORT_CODE(KEYCODE_M) PORT_TOGGLE PORT_NAME("Main Door Optic")
+	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_DOOR ) PORT_CODE(KEYCODE_M) PORT_TOGGLE PORT_NAME("Main Door Optic")
 	PORT_BIT( 0xfe000000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW")
@@ -388,11 +382,12 @@ void konendev_state::konendev(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 525, 0, 480); // Based on Firebeat settings
-	screen.set_screen_update(FUNC(konendev_state::screen_update));
+	screen.set_screen_update(m_gcu, FUNC(k057714_device::draw));
 	screen.set_palette("palette");
 	screen.screen_vblank().set(m_gcu, FUNC(k057714_device::vblank_w));
 
-	K057714(config, m_gcu, 0).set_screen("screen");
+	K057714(config, m_gcu);
+	m_gcu->set_screen("screen");
 	m_gcu->irq_callback().set(FUNC(konendev_state::gcu_interrupt));
 
 	RTC62423(config, "rtc", XTAL(32'768));

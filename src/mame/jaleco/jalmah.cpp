@@ -1245,7 +1245,7 @@ ROM_START( daireika )
 	ROM_RELOAD(                 0x40000, 0x20000 )
 
 	ROM_REGION( 0x2000, "mcu", 0 ) /* M50747 MCU Code */
-	ROM_LOAD( "m50747-a46sp.bin", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "mo-88015_m50747-a46sp.2c", 0x0000, 0x2000, NO_DUMP )
 
 	LOAD_FAKE_MCU_ROM
 
@@ -1291,7 +1291,7 @@ ROM_START( mjzoomin )
 	ROM_RELOAD(                      0x40000, 0x20000 )
 
 	ROM_REGION( 0x2000, "mcu", 0 ) /* M50747 MCU Code */
-	ROM_LOAD( "m50747", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "rf16_m50747esp.2c", 0x0000, 0x2000, NO_DUMP )
 
 	LOAD_FAKE_MCU_ROM
 
@@ -1335,7 +1335,7 @@ ROM_START( kakumei )
 	ROM_RELOAD(                     0x40000, 0x20000 )
 
 	ROM_REGION( 0x2000, "mcu", 0 ) /* M50747 MCU Code */
-	ROM_LOAD( "m50747-b84sp.bin", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "m50747-b84sp.2c", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x140000, "oki", ROMREGION_ERASEFF ) /* Samples */
 	ROM_LOAD( "rom3.bin", 0x00000, 0x40000, CRC(c9b7a526) SHA1(edec57e66d4ff601c8fdef7b1405af84a3f3d883) )
@@ -1374,7 +1374,7 @@ ROM_START( kakumei2 )
 	ROM_LOAD16_BYTE( "mj-8956.2", 0x00000, 0x40000, CRC(0f942507) SHA1(7ec2fbeb9a34dfc80c4df3de8397388db13f5c7c) )
 
 	ROM_REGION( 0x2000, "mcu", 0 ) /* M50747 MCU Code */
-	ROM_LOAD( "m50747", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "mo-92000_m50747.2c", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x140000, "oki", ROMREGION_ERASEFF ) /* Samples */
 	ROM_LOAD( "92000-01.3", 0x040000, 0x80000, CRC(4b0ed440) SHA1(11961d217a41f92b60d5083a5e346c245f7db620) )
@@ -1449,7 +1449,7 @@ ROM_START( suchiesp )
 	ROM_LOAD16_BYTE( "2.bin", 0x00000, 0x40000, CRC(42ecf88a) SHA1(7bb85470bc9f94c867646afeb91c4730599ea299) )
 
 	ROM_REGION( 0x2000, "mcu", 0 ) /* M50747 MCU Code */
-	ROM_LOAD( "m50747", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "mo-92000_m50747.2c", 0x0000, 0x2000, NO_DUMP ) /* Same label on kamukei2 MCU but not sure if same internal ROM */
 
 	ROM_REGION( 0x100000, "oki_data", ROMREGION_ERASEFF ) /* Samples */
 	ROM_LOAD( "3.bin", 0x00000, 0x80000, CRC(691b5387) SHA1(b8bc9f904eab7653566042b18d89276d537ba586) )

@@ -206,12 +206,16 @@
 
 #include "mfpresolve.h"
 
-#include "asmjit/src/asmjit/x86.h"
+#include "asmjit/asmjit/x86.h"
 
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
+#include <locale>
+#include <string>
+#include <sstream>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 
@@ -381,6 +385,7 @@ public:
 	virtual int execute(uml::code_handle &entry) override;
 	virtual void generate(drcuml_block &block, const uml::instruction *instlist, u32 numinst) override;
 	virtual bool hash_exists(u32 mode, u32 pc) const noexcept override;
+	virtual void hash_invalidate_range(u32 pcstart, u32 pcend) noexcept override;
 	virtual void get_info(drcbe_info &info) const noexcept override;
 	virtual bool logging() const noexcept override { return bool(m_log); }
 
@@ -462,8 +467,10 @@ private:
 		x86code *           debug_log_hashjmp;      // hashjmp debugging
 		x86code *           debug_log_hashjmp_fail; // hashjmp debugging
 
-		u32                 ssemode;                // saved SSE mode
-		u32                 ssemodesave;            // temporary location for saving
+		u32                 ssemode;                // saved SSE mode on entry
+		u32                 ssemodesave;            // temporary location for saving SSE mode across calls
+		u8                  nominalfmod;            // FMOD equivalent to SSE mode on entry or 0xff
+
 		u32                 ssecontrol[4];          // copy of the sse_control array
 		float               single1;                // 1.0 in single-precision
 		double              double1;                // 1.0 in double-precision
@@ -497,7 +504,7 @@ private:
 	void emit_memaccess_setup(Assembler &a, const memory_accessors &accessors, const address_space::specific_access_info::side &side) const;
 
 	[[noreturn]] void end_of_block() const;
-	static void debug_log_hashjmp(offs_t pc, int mode);
+	static void debug_log_hashjmp(char const *tag, offs_t pc, int mode);
 	static void debug_log_hashjmp_fail();
 
 	void generate_one(Assembler &a, const uml::instruction &inst);
@@ -610,7 +617,7 @@ private:
 	void calculate_status_flags_mul(Assembler &a, const uml::instruction &inst, Gp const &lo, Gp const &hi);
 	void calculate_status_flags_mullw(Assembler &a, const uml::instruction &inst, Gp const &lo, Gp const &hi);
 
-	size_t emit(CodeHolder &ch);
+	size_t emit(CodeHolder &ch, bool invariant);
 
 	// internal state
 	drc_hash_table          m_hash;                 // hash table state
@@ -630,6 +637,8 @@ private:
 	x86code *               m_endofblock;           // end of block handler
 
 	near_state &            m_near;
+
+	bool                    m_invariant_block;      // are we generating an invariant block?
 
 	resolved_member_function m_debug_cpu_instruction_hook;
 	resolved_member_function m_drcmap_get_value;
@@ -1009,7 +1018,7 @@ void drcbe_x64::emit_memaccess_setup(Assembler &a, const memory_accessors &acces
 
 drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u32 flags, int modes, int addrbits, int ignorebits)
 	: drcbe_interface(drcuml, cache, device)
-	, m_hash(cache, modes, addrbits, ignorebits)
+	, m_hash(cache, modes, addrbits, ignorebits, drcuml.max_sequence_length())
 	, m_map(cache, 0xaaaaaaaa5555)
 	, m_log_asmjit(nullptr)
 	, m_lzcnt(false)
@@ -1022,6 +1031,7 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	, m_nocode(nullptr)
 	, m_endofblock(nullptr)
 	, m_near(*cache.alloc_near<near_state>())
+	, m_invariant_block(false)
 {
 	// check for optional CPU features
 	const auto &x86_features = CpuInfo::host().features().x86();
@@ -1031,10 +1041,10 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	// build up necessary arrays
 	constexpr u32 sse_control[4] =
 	{
-		0xff80,     // ROUND_TRUNC
-		0x9f80,     // ROUND_ROUND
-		0xdf80,     // ROUND_CEIL
-		0xbf80      // ROUND_FLOOR
+		0x7f80,     // ROUND_TRUNC
+		0x1f80,     // ROUND_ROUND
+		0x5f80,     // ROUND_CEIL
+		0x3f80      // ROUND_FLOOR
 	};
 	memcpy(m_near.ssecontrol, sse_control, sizeof(m_near.ssecontrol));
 	m_near.single1 = 1.0F;
@@ -1099,75 +1109,22 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	// create the log
 	if (device.machine().options().drc_log_native())
 	{
-		std::string filename = std::string("drcbex64_").append(device.shortname()).append(".asm");
-		m_log = x86log_context::create(filename);
-		m_log_asmjit = fopen(std::string("drcbex64_asmjit_").append(device.shortname()).append(".asm").c_str(), "w");
+		std::string filename = device.tag();
+		for (auto &ch : filename)
+		{
+			if (':' == ch)
+				ch = '_';
+		}
+		std::ostringstream str;
+		str.imbue(std::locale::classic());
+		str << device.shortname();
+		if ('_' != filename[0])
+			str << '_';
+		str << filename << ".asm";
+		filename = std::move(str).str();
+		m_log = x86log_context::create("drcbex64_" + filename);
+		m_log_asmjit = fopen(("drcbex64_asmjit_" + filename).c_str(), "w");
 	}
-}
-
-
-//-------------------------------------------------
-//  ~drcbe_x64 - destructor
-//-------------------------------------------------
-
-drcbe_x64::~drcbe_x64()
-{
-	// free the log context
-	m_log.reset();
-
-	if (m_log_asmjit)
-		fclose(m_log_asmjit);
-}
-
-size_t drcbe_x64::emit(CodeHolder &ch)
-{
-	Error err;
-
-	// the following three calls aren't currently required, but may be if
-	// other asmjist features are used in future
-	if (false)
-	{
-		err = ch.flatten();
-		if (err != kErrorOk)
-			throw emu_fatalerror("asmjit::CodeHolder::flatten() error %u", std::underlying_type_t<Error>(err));
-
-		err = ch.resolve_cross_section_fixups();
-		if (err != kErrorOk)
-			throw emu_fatalerror("asmjit::CodeHolder::resolve_cross_section_fixups() error %u", std::underlying_type_t<Error>(err));
-
-		err = ch.relocate_to_base(ch.base_address());
-		if (err != kErrorOk)
-			throw emu_fatalerror("asmjit::CodeHolder::relocate_to_base() error %u", std::underlying_type_t<Error>(err));
-	}
-
-	size_t const alignment = ch.base_address() - uintptr_t(m_cache.top());
-	size_t const code_size = ch.code_size();
-
-	// test if enough room remains in drc cache
-	drccodeptr *cachetop = m_cache.begin_codegen(alignment + code_size);
-	if (!cachetop)
-		return 0;
-
-	err = ch.copy_flattened_data(drccodeptr(ch.base_address()), code_size, CopySectionFlags::kPadTargetBuffer);
-	if (err != kErrorOk)
-		throw emu_fatalerror("asmjit::CodeHolder::copy_flattened_data() error %u", std::underlying_type_t<Error>(err));
-
-	// update the drc cache and end codegen
-	*cachetop += alignment + code_size;
-	m_cache.end_codegen();
-
-	return code_size;
-}
-
-//-------------------------------------------------
-//  reset - reset back-end specific state
-//-------------------------------------------------
-
-void drcbe_x64::reset()
-{
-	// output a note to the log
-	if (m_log)
-		m_log->printf("%s", "\n\n===========\nCACHE RESET\n===========\n\n");
 
 	// generate a little bit of glue code to set up the environment
 	x86code *dst = (x86code *)m_cache.top();
@@ -1207,13 +1164,40 @@ void drcbe_x64::reset()
 
 	a.sub(rsp, 40);
 	a.mov(MABS(&m_near.stacksave), rsp);
+
+	// save MXCSR with flags masked out
 	a.stmxcsr(MABS(&m_near.ssemode));
-	a.jmp(gpq(REG_PARAM2));
+	a.mov(eax, MABS(&m_near.ssemode));
+	a.and_(eax, 0xffffffc0);
+	a.mov(MABS(&m_near.ssemode), eax);
+
+	// convert rounding mode from MXCSR to equivalent FMOD value
+	a.mov(gpd(REG_PARAM1), eax);
+	a.shr(gpd(REG_PARAM1), 13);
+	a.add(gpd(REG_PARAM1), 1);
+	a.and_(gpd(REG_PARAM1), 3);
+	a.mov(gpd(REG_PARAM3), gpd(REG_PARAM1));
+	a.shr(gpd(REG_PARAM3), 1);
+	a.xor_(gpd(REG_PARAM1), gpd(REG_PARAM3));
+
+	// see if the saved MXCSR value matches what we'd set
+	a.mov(gpd(REG_PARAM3), ptr(rbp, gpq(REG_PARAM1), 2, offset_from_rbp(&m_near.ssecontrol[0])));
+	a.cmp(eax, gpd(REG_PARAM3));
+	a.mov(gpd(REG_PARAM3), 0xff);
+	a.cmovne(gpd(REG_PARAM1), gpd(REG_PARAM3));
+	a.mov(MABS(&m_near.nominalfmod), gpb_lo(REG_PARAM1));
+
+	a.call(gpq(REG_PARAM2));
 
 	// generate an exit point
+	Label const norestore = a.new_label();
 	m_exit = dst + a.offset();
 	a.bind(a.new_named_label("exit_point"));
+	a.movzx(gpd(REG_PARAM1), MABS(&m_state.fmod, 1));
+	a.cmp(gpb_lo(REG_PARAM1), MABS(&m_near.nominalfmod));
+	a.short_().je(norestore);
 	a.ldmxcsr(MABS(&m_near.ssemode));
+	a.bind(norestore);
 	a.mov(rsp, MABS(&m_near.stacksave));
 	a.add(rsp, 40);
 	a.emit_epilog(frame);
@@ -1231,7 +1215,7 @@ void drcbe_x64::reset()
 	smart_call_r64(a, (x86code *)entrypoint, rax);
 
 	// emit the generated code
-	const size_t bytes = emit(ch);
+	const size_t bytes = emit(ch, true);
 
 	if (m_log)
 	{
@@ -1241,9 +1225,77 @@ void drcbe_x64::reset()
 		m_log->disasm_code_range("end_of_block", m_endofblock, dst + bytes);
 	}
 
+	// set the "no code" pointer
+	m_hash.set_default_codeptr(m_nocode);
+}
+
+
+//-------------------------------------------------
+//  ~drcbe_x64 - destructor
+//-------------------------------------------------
+
+drcbe_x64::~drcbe_x64()
+{
+	// free the log context
+	m_log.reset();
+
+	if (m_log_asmjit)
+		fclose(m_log_asmjit);
+}
+
+size_t drcbe_x64::emit(CodeHolder &ch, bool invariant)
+{
+	Error err;
+
+	// the following three calls aren't currently required, but may be if
+	// other asmjit features are used in future
+	if (false)
+	{
+		err = ch.flatten();
+		if (err != kErrorOk)
+			throw emu_fatalerror("asmjit::CodeHolder::flatten() error %u", std::underlying_type_t<Error>(err));
+
+		err = ch.resolve_cross_section_fixups();
+		if (err != kErrorOk)
+			throw emu_fatalerror("asmjit::CodeHolder::resolve_cross_section_fixups() error %u", std::underlying_type_t<Error>(err));
+
+		err = ch.relocate_to_base(ch.base_address());
+		if (err != kErrorOk)
+			throw emu_fatalerror("asmjit::CodeHolder::relocate_to_base() error %u", std::underlying_type_t<Error>(err));
+	}
+
+	size_t const alignment = ch.base_address() - uintptr_t(m_cache.top());
+	size_t const code_size = ch.code_size();
+
+	// try to allocate space from the DRC cache
+	auto space = invariant
+			? m_cache.alloc_invariant(alignment + code_size, std::align_val_t(1))
+			: m_cache.alloc_transient(alignment + code_size, std::align_val_t(1));
+	if (!space)
+		return 0;
+
+	assert(uintptr_t(space) <= ch.base_address());
+	err = ch.copy_flattened_data(drccodeptr(ch.base_address()), code_size, CopySectionFlags::kPadTargetBuffer);
+	if (err != kErrorOk)
+		throw emu_fatalerror("asmjit::CodeHolder::copy_flattened_data() error %u", std::underlying_type_t<Error>(err));
+
+	osd::invalidate_instruction_cache(drccodeptr(ch.base_address()), code_size);
+
+	return code_size;
+}
+
+//-------------------------------------------------
+//  reset - reset back-end specific state
+//-------------------------------------------------
+
+void drcbe_x64::reset()
+{
+	// output a note to the log
+	if (m_log)
+		m_log->printf("%s", "\n\n===========\nCACHE RESET\n===========\n\n");
+
 	// reset our hash tables
 	m_hash.reset();
-	m_hash.set_default_codeptr(m_nocode);
 }
 
 
@@ -1267,7 +1319,7 @@ int drcbe_x64::execute(code_handle &entry)
 void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, u32 numinst)
 {
 	// do this here because device.debug() isn't initialised at construction time
-	if (!m_debug_cpu_instruction_hook && (m_device.machine().debug_flags & DEBUG_FLAG_ENABLED))
+	if (!m_debug_cpu_instruction_hook && (m_device.machine().debug_flags & DEBUG_FLAG_ENABLED) && m_device.debug())
 	{
 		m_debug_cpu_instruction_hook.set(*m_device.debug(), &device_debug::instruction_hook);
 		if (!m_debug_cpu_instruction_hook)
@@ -1277,13 +1329,14 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, u32 n
 	// tell all of our utility objects that a block is beginning
 	m_hash.block_begin(block, instlist, numinst);
 	m_map.block_begin(block);
+	m_invariant_block = block.invariant();
 
 	// compute the base by aligning the cache top to a cache line
 	auto [err, linesize] = osd_get_cache_line_size();
 	uintptr_t linemask = 63;
 	if (err)
 	{
-		osd_printf_verbose("Error getting cache line size (%s:%d %s), assuming 64 bytes\n", err.category().name(), err.value(), err.message());
+		osd_printf_verbose("drcbe_x64(%s): Error getting cache line size (%s:%d %s), assuming 64 bytes\n", m_device.tag(), err.category().name(), err.value(), err.message());
 	}
 	else
 	{
@@ -1352,7 +1405,7 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, u32 n
 	a.jmp(imm(m_endofblock));
 
 	// emit the generated code
-	size_t const bytes = emit(ch);
+	size_t const bytes = emit(ch, block.invariant());
 	if (!bytes)
 		block.abort();
 
@@ -1374,6 +1427,17 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, u32 n
 bool drcbe_x64::hash_exists(u32 mode, u32 pc) const noexcept
 {
 	return m_hash.code_exists(mode, pc);
+}
+
+
+//-------------------------------------------------
+//  hash_invalidate_range - invalidate all hash
+//  entries in the given PC range
+//-------------------------------------------------
+
+void drcbe_x64::hash_invalidate_range(u32 pcstart, u32 pcend) noexcept
+{
+	m_hash.invalidate_range(pcstart, pcend);
 }
 
 
@@ -1802,7 +1866,7 @@ void drcbe_x64::movsd_p64_r128(Assembler &a, be_parameter const &param, Vec cons
 
 [[noreturn]] void drcbe_x64::end_of_block() const
 {
-	osd_printf_error("drcbe_x64(%s): fell off the end of a generated code block!\n", m_device.tag());
+	osd_printf_error("drcbe_x64(%s): Fell off the end of a generated code block!\n", m_device.tag());
 	std::fflush(stdout);
 	std::fflush(stderr);
 	std::abort();
@@ -1814,9 +1878,9 @@ void drcbe_x64::movsd_p64_r128(Assembler &a, be_parameter const &param, Vec cons
 //  logging of hashjmps
 //-------------------------------------------------
 
-void drcbe_x64::debug_log_hashjmp(offs_t pc, int mode)
+void drcbe_x64::debug_log_hashjmp(char const *tag, offs_t pc, int mode)
 {
-	std::printf("mode=%d PC=%08X\n", mode, pc);
+	osd_printf_info("drcbe_x64(%s): HASHJMP mode=%d PC=%08X\n", tag, mode, pc);
 }
 
 
@@ -1827,7 +1891,7 @@ void drcbe_x64::debug_log_hashjmp(offs_t pc, int mode)
 
 void drcbe_x64::debug_log_hashjmp_fail()
 {
-	std::printf("  (FAIL)\n");
+	osd_printf_info("  (FAIL)\n");
 }
 
 
@@ -1977,15 +2041,18 @@ void drcbe_x64::op_debug(Assembler &a, const instruction &inst)
 		be_parameter pcp(*this, inst.param(0), PTYPE_MRI);
 
 		// test and branch
-		mov_r64_imm(a, rax, (uintptr_t)&m_device.machine().debug_flags);                // mov   rax,&debug_flags
-		a.test(dword_ptr(rax), DEBUG_FLAG_CALL_HOOK);                                   // test  [debug_flags],DEBUG_FLAG_CALL_HOOK
-		Label skip = a.new_label();
+		mov_r64_imm(a, rax, uintptr_t(&m_device.machine().debug_flags));
+		a.test(dword_ptr(rax), DEBUG_FLAG_CALL_HOOK);
+		Label const skip = a.new_label();
 		a.short_().jz(skip);
 
-		// push the parameter
-		mov_r64_imm(a, gpq(REG_PARAM1), m_debug_cpu_instruction_hook.obj);              // mov   param1,device.debug
-		mov_reg_param(a, gpd(REG_PARAM2), pcp);                                         // mov   param2,pcp
-		smart_call_r64(a, m_debug_cpu_instruction_hook.func, rax);                      // call  debug_cpu_instruction_hook
+		// perform the call
+		a.ldmxcsr(MABS(&m_near.ssemode));
+		mov_r64_imm(a, gpq(REG_PARAM1), m_debug_cpu_instruction_hook.obj);
+		mov_reg_param(a, gpd(REG_PARAM2), pcp);
+		smart_call_r64(a, m_debug_cpu_instruction_hook.func, rax);
+		a.movzx(ecx, byte_ptr(rbp, offset_from_rbp(&m_state.fmod)));
+		a.ldmxcsr(ptr(rbp, rcx, 2, offset_from_rbp(&m_near.ssecontrol[0])));
 
 		a.bind(skip);
 	}
@@ -2034,65 +2101,65 @@ void drcbe_x64::op_hashjmp(Assembler &a, const instruction &inst)
 
 	if (LOG_HASHJMPS)
 	{
-		mov_reg_param(a, gpd(REG_PARAM1), pcp);
-		mov_reg_param(a, gpd(REG_PARAM2), modep);
+		mov_r64_imm(a, gpq(REG_PARAM1), uintptr_t(m_device.tag()));
+		mov_reg_param(a, gpd(REG_PARAM2), pcp);
+		mov_reg_param(a, gpd(REG_PARAM3), modep);
 		smart_call_m64(a, &m_near.debug_log_hashjmp);
 	}
 
 	// load the stack base
 	Label nocode = a.new_label();
-	a.mov(rsp, MABS(&m_near.stacksave));                                            // mov   rsp,[stacksave]
+	a.mov(rsp, MABS(&m_near.stacksave));
 
 	// fixed mode cases
 	if (modep.is_immediate() && m_hash.populate_mode(modep.immediate()))
 	{
-		if (pcp.is_immediate())
+		if (pcp.is_immediate() && !m_invariant_block)
 		{
 			// a straight immediate jump is direct, though we need the PC in EAX in case of failure
-			u32 l1val = (pcp.immediate() >> m_hash.l1shift()) & m_hash.l1mask();
-			u32 l2val = (pcp.immediate() >> m_hash.l2shift()) & m_hash.l2mask();
-			a.short_().lea(gpq(REG_PARAM1), ptr(nocode));                               // lea   rcx,[rip+nocode]
-			a.jmp(MABS(&m_hash.base()[modep.immediate()][l1val][l2val]));               // jmp   hash[modep][l1val][l2val]
+			const u32 l1val = (pcp.immediate() >> m_hash.l1shift()) & m_hash.l1mask();
+			const u32 l2val = (pcp.immediate() >> m_hash.l2shift()) & m_hash.l2mask();
+			a.short_().lea(gpq(REG_PARAM1), ptr(nocode));
+			a.jmp(MABS(&m_hash.base()[modep.immediate()][l1val][l2val]));
 		}
 		else
 		{
 			// a fixed mode but variable PC
-			mov_reg_param(a, eax, pcp);                                                 // mov   eax,pcp
-			a.mov(edx, eax);                                                            // mov   edx,eax
-			a.shr(edx, m_hash.l1shift());                                               // shr   edx,l1shift
-			a.and_(eax, m_hash.l2mask() << m_hash.l2shift());                           // and  eax,l2mask << l2shift
+			mov_reg_param(a, eax, pcp);
+			a.mov(edx, eax);
+			a.shr(edx, m_hash.l1shift());
+			a.and_(eax, m_hash.l2mask() << m_hash.l2shift());
 			a.mov(rdx, ptr(rbp, rdx, 3, offset_from_rbp(&m_hash.base()[modep.immediate()][0])));
-																						// mov   rdx,hash[modep+edx*8]
-			a.short_().lea(gpq(REG_PARAM1), ptr(nocode));                               // lea   rcx,[rip+nocode]
-			a.jmp(ptr(rdx, rax, 3 - m_hash.l2shift()));                                 // jmp   [rdx+rax*shift]
+			a.short_().lea(gpq(REG_PARAM1), ptr(nocode));
+			a.jmp(ptr(rdx, rax, 3 - m_hash.l2shift()));
 		}
 	}
 	else
 	{
 		// variable mode
-		Gp modereg = modep.select_register(ecx);
-		mov_reg_param(a, modereg, modep);                                               // mov   modereg,modep
-		a.mov(rcx, ptr(rbp, modereg, 3, offset_from_rbp(m_hash.base())));               // mov   rcx,hash[modereg*8]
+		const Gp modereg = modep.select_register(ecx);
+		mov_reg_param(a, modereg, modep);
+		a.mov(rcx, ptr(rbp, modereg, 3, offset_from_rbp(m_hash.base())));
 
 		if (pcp.is_immediate())
 		{
 			// fixed PC
-			u32 l1val = (pcp.immediate() >> m_hash.l1shift()) & m_hash.l1mask();
-			u32 l2val = (pcp.immediate() >> m_hash.l2shift()) & m_hash.l2mask();
-			a.mov(rdx, ptr(rcx, l1val * 8));                                            // mov   rdx,[rcx+l1val*8]
-			a.short_().lea(gpq(REG_PARAM1), ptr(nocode));                               // lea   rcx,[rip+nocode]
-			a.jmp(ptr(rdx, l2val * 8));                                                 // jmp   [l2val*8]
+			const u32 l1val = (pcp.immediate() >> m_hash.l1shift()) & m_hash.l1mask();
+			const u32 l2val = (pcp.immediate() >> m_hash.l2shift()) & m_hash.l2mask();
+			a.mov(rdx, ptr(rcx, l1val * 8));
+			a.short_().lea(gpq(REG_PARAM1), ptr(nocode));
+			a.jmp(ptr(rdx, l2val * 8));
 		}
 		else
 		{
 			// variable PC
-			mov_reg_param(a, eax, pcp);                                                 // mov   eax,pcp
-			a.mov(edx, eax);                                                            // mov   edx,eax
-			a.shr(edx, m_hash.l1shift());                                               // shr   edx,l1shift
-			a.mov(rdx, ptr(rcx, rdx, 3));                                               // mov   rdx,[rcx+rdx*8]
-			a.and_(eax, m_hash.l2mask() << m_hash.l2shift());                           // and   eax,l2mask << l2shift
-			a.short_().lea(gpq(REG_PARAM1), ptr(nocode));                               // lea   rcx,[rip+nocode]
-			a.jmp(ptr(rdx, rax, 3 - m_hash.l2shift()));                                 // jmp   [rdx+rax*shift]
+			mov_reg_param(a, eax, pcp);
+			a.mov(edx, eax);
+			a.shr(edx, m_hash.l1shift());
+			a.mov(rdx, ptr(rcx, rdx, 3));
+			a.and_(eax, m_hash.l2mask() << m_hash.l2shift());
+			a.short_().lea(gpq(REG_PARAM1), ptr(nocode));
+			a.jmp(ptr(rdx, rax, 3 - m_hash.l2shift()));
 		}
 	}
 
@@ -2101,8 +2168,8 @@ void drcbe_x64::op_hashjmp(Assembler &a, const instruction &inst)
 	if (LOG_HASHJMPS)
 		smart_call_m64(a, &m_near.debug_log_hashjmp_fail);
 
-	mov_mem_param(a, MABS(&m_state.exp, 4), pcp);                                       // mov   [exp],param
-	a.call(MABS(exp.handle().codeptr_addr()));                                          // call  [exp]
+	mov_mem_param(a, MABS(&m_state.exp, 4), pcp);
+	a.call(MABS(exp.handle().codeptr_addr()));
 }
 
 
@@ -2258,16 +2325,19 @@ void drcbe_x64::op_callc(Assembler &a, const instruction &inst)
 	if (inst.condition() != uml::COND_ALWAYS)
 	{
 		skip = a.new_label();
-		a.short_().j(X86_NOT_CONDITION(inst.condition()), skip);                        // jcc   skip
+		a.short_().j(X86_NOT_CONDITION(inst.condition()), skip);
 	}
 
 	// perform the call
-	mov_r64_imm(a, gpq(REG_PARAM1), (uintptr_t)paramp.memory());                        // mov   param1,paramp
-	smart_call_r64(a, (x86code *)(uintptr_t)funcp.cfunc(), rax);                        // call  funcp
+	a.ldmxcsr(MABS(&m_near.ssemode));
+	mov_r64_imm(a, gpq(REG_PARAM1), (uintptr_t)paramp.memory());
+	smart_call_r64(a, (x86code *)(uintptr_t)funcp.cfunc(), rax);
+	a.movzx(ecx, byte_ptr(rbp, offset_from_rbp(&m_state.fmod)));
+	a.ldmxcsr(ptr(rbp, rcx, 2, offset_from_rbp(&m_near.ssecontrol[0])));
 
 	// resolve the conditional link
 	if (inst.condition() != uml::COND_ALWAYS)
-		a.bind(skip);                                                               // skip:
+		a.bind(skip);
 }
 
 
@@ -2315,21 +2385,30 @@ void drcbe_x64::op_setfmod(Assembler &a, const instruction &inst)
 	// normalize parameters
 	be_parameter srcp(*this, inst.param(0), PTYPE_MRI);
 
+	Label const skip = a.new_label();
+
 	if (srcp.is_immediate())
 	{
 		// immediate case
-		int value = srcp.immediate() & 3;
-		a.mov(MABS(&m_state.fmod, 1), value);                                           // mov   [fmod],srcp
-		a.ldmxcsr(MABS(&m_near.ssecontrol[value]));                                     // ldmxcsr fp_control[srcp]
+		int const value = srcp.immediate() & 3;
+		a.mov(eax, value);
+		a.cmp(MABS(&m_state.fmod), al);
+		a.short_().je(skip);
+		a.mov(MABS(&m_state.fmod), al);
+		a.ldmxcsr(MABS(&m_near.ssecontrol[value]));
 	}
 	else
 	{
 		// register/memory case
-		mov_reg_param(a, eax, srcp);                                                    // mov   eax,srcp
-		a.and_(eax, 3);                                                                 // and   eax,3
-		a.mov(MABS(&m_state.fmod), al);                                                 // mov   [fmod],al
-		a.ldmxcsr(ptr(rbp, rax, 2, offset_from_rbp(&m_near.ssecontrol[0])));            // ldmxcsr fp_control[eax]
+		mov_reg_param(a, eax, srcp);
+		a.and_(eax, 3);
+		a.cmp(MABS(&m_state.fmod), al);
+		a.short_().je(skip);
+		a.mov(MABS(&m_state.fmod), al);
+		a.ldmxcsr(ptr(rbp, rax, 2, offset_from_rbp(&m_near.ssecontrol[0])));
 	}
+
+	a.bind(skip);
 }
 
 
@@ -2347,16 +2426,17 @@ void drcbe_x64::op_getfmod(Assembler &a, const instruction &inst)
 	// normalize parameters
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 
-	Mem fmod = MABS(&m_state.fmod);
-	fmod.set_size(1);
+	Mem const fmod = MABS(&m_state.fmod, 1);
 
 	// fetch the current mode and store to the destination
 	if (dstp.is_int_register())
-		a.movzx(gpd(dstp.ireg()), fmod);                                                // movzx reg,[fmod]
+	{
+		a.movzx(gpd(dstp.ireg()), fmod);
+	}
 	else
 	{
-		a.movzx(eax, fmod);                                                             // movzx eax,[fmod]
-		a.mov(MABS(dstp.memory()), eax);                                                // mov   [dstp],eax
+		a.movzx(eax, fmod);
+		a.mov(MABS(dstp.memory()), eax);
 	}
 }
 
@@ -3001,6 +3081,9 @@ void drcbe_x64::op_read(Assembler &a, const instruction &inst)
 	// pick a target register for the general case
 	Gp dstreg = dstp.select_register(eax);
 
+	// restore caller's floating point environment
+	a.ldmxcsr(MABS(&m_near.ssemode));
+
 	// set up a call to the read handler
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
 	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.read.function) || accessors.specific.read.is_virtual;
@@ -3121,6 +3204,10 @@ void drcbe_x64::op_read(Assembler &a, const instruction &inst)
 		smart_call_r64(a, accessors.resolved.read_qword.func, rax);
 	}
 
+	// restore our rounding mode
+	a.movzx(ecx, byte_ptr(rbp, offset_from_rbp(&m_state.fmod)));
+	a.ldmxcsr(ptr(rbp, rcx, 2, offset_from_rbp(&m_near.ssecontrol[0])));
+
 	// move or zero-extend result if necessary
 	if (spacesizep.size() == SIZE_BYTE)
 	{
@@ -3169,6 +3256,9 @@ void drcbe_x64::op_readm(Assembler &a, const instruction &inst)
 
 	// pick a target register for the general case
 	Gp dstreg = dstp.select_register(eax);
+
+	// restore caller's floating point environment
+	a.ldmxcsr(MABS(&m_near.ssemode));
 
 	// set up a call to the read handler
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
@@ -3283,6 +3373,10 @@ void drcbe_x64::op_readm(Assembler &a, const instruction &inst)
 		smart_call_r64(a, accessors.resolved.read_qword_masked.func, rax);
 	}
 
+	// restore our rounding mode
+	a.movzx(ecx, byte_ptr(rbp, offset_from_rbp(&m_state.fmod)));
+	a.ldmxcsr(ptr(rbp, rcx, 2, offset_from_rbp(&m_near.ssecontrol[0])));
+
 	// move or zero-extend result if necessary
 	if (spacesizep.size() == SIZE_BYTE)
 	{
@@ -3327,6 +3421,9 @@ void drcbe_x64::op_write(Assembler &a, const instruction &inst)
 	be_parameter srcp(*this, inst.param(1), PTYPE_MRI);
 	const parameter &spacesizep = inst.param(2);
 	assert(spacesizep.is_size_space());
+
+	// restore caller's floating point environment
+	a.ldmxcsr(MABS(&m_near.ssemode));
 
 	// set up a call to the write handler
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
@@ -3437,6 +3534,10 @@ void drcbe_x64::op_write(Assembler &a, const instruction &inst)
 		mov_r64_imm(a, gpq(REG_PARAM1), accessors.resolved.write_qword.obj);
 		smart_call_r64(a, accessors.resolved.write_qword.func, rax);
 	}
+
+	// restore our rounding mode
+	a.movzx(ecx, byte_ptr(rbp, offset_from_rbp(&m_state.fmod)));
+	a.ldmxcsr(ptr(rbp, rcx, 2, offset_from_rbp(&m_near.ssecontrol[0])));
 }
 
 
@@ -3457,6 +3558,9 @@ void drcbe_x64::op_writem(Assembler &a, const instruction &inst)
 	be_parameter maskp(*this, inst.param(2), PTYPE_MRI);
 	const parameter &spacesizep = inst.param(3);
 	assert(spacesizep.is_size_space());
+
+	// restore caller's floating point environment
+	a.ldmxcsr(MABS(&m_near.ssemode));
 
 	// set up a call to the write handler
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
@@ -3570,6 +3674,10 @@ void drcbe_x64::op_writem(Assembler &a, const instruction &inst)
 		mov_r64_imm(a, gpq(REG_PARAM1), accessors.resolved.write_qword_masked.obj);
 		smart_call_r64(a, accessors.resolved.write_qword_masked.func, rax);
 	}
+
+	// restore our rounding mode
+	a.movzx(ecx, byte_ptr(rbp, offset_from_rbp(&m_state.fmod)));
+	a.ldmxcsr(ptr(rbp, rcx, 2, offset_from_rbp(&m_near.ssecontrol[0])));
 }
 
 
@@ -5516,12 +5624,19 @@ void drcbe_x64::op_fread(Assembler &a, const instruction &inst)
 	assert(spacep.is_size_space());
 	assert((1 << spacep.size()) == inst.size());
 
+	// restore caller's floating point environment
+	a.ldmxcsr(MABS(&m_near.ssemode));
+
 	// set up a call to the read dword/qword handler
 	auto const &accessors = m_memory_accessors[spacep.space()];
 	auto const &accessor = (inst.size() == 4) ? accessors.resolved.read_dword : accessors.resolved.read_qword;
 	mov_reg_param(a, gpd(REG_PARAM2), addrp);
 	mov_r64_imm(a, gpq(REG_PARAM1), accessor.obj);
 	smart_call_r64(a, accessor.func, rax);
+
+	// restore our rounding mode
+	a.movzx(ecx, byte_ptr(rbp, offset_from_rbp(&m_state.fmod)));
+	a.ldmxcsr(ptr(rbp, rcx, 2, offset_from_rbp(&m_near.ssecontrol[0])));
 
 	// store result
 	if (inst.size() == 4)
@@ -5559,6 +5674,9 @@ void drcbe_x64::op_fwrite(Assembler &a, const instruction &inst)
 	assert(spacep.is_size_space());
 	assert((1 << spacep.size()) == inst.size());
 
+	// restore caller's floating point environment
+	a.ldmxcsr(MABS(&m_near.ssemode));
+
 	// general case
 	auto const &accessors = m_memory_accessors[spacep.space()];
 	auto const &accessor = (inst.size() == 4) ? accessors.resolved.write_dword : accessors.resolved.write_qword;
@@ -5582,6 +5700,10 @@ void drcbe_x64::op_fwrite(Assembler &a, const instruction &inst)
 	}
 	mov_r64_imm(a, gpq(REG_PARAM1), accessor.obj);
 	smart_call_r64(a, accessor.func, rax);
+
+	// restore our rounding mode
+	a.movzx(ecx, byte_ptr(rbp, offset_from_rbp(&m_state.fmod)));
+	a.ldmxcsr(ptr(rbp, rcx, 2, offset_from_rbp(&m_near.ssecontrol[0])));
 }
 
 

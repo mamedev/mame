@@ -46,7 +46,6 @@ public:
 	void pipibibs(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void video_start() override ATTR_COLD;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 
@@ -62,7 +61,6 @@ protected:
 	required_device<gp9001vdp_device> m_vdp;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	bitmap_ind8 m_custom_priority_bitmap;
 };
 
 class pipibibi_bootleg_state : public pipibibi_state
@@ -81,18 +79,12 @@ private:
 	void pipibibi_bootleg_68k_mem(address_map &map) ATTR_COLD;
 };
 
-void pipibibi_state::video_start()
-{
-	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
-	m_vdp->custom_priority_bitmap = &m_custom_priority_bitmap;
-}
-
 
 u32 pipibibi_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	m_custom_priority_bitmap.fill(0, cliprect);
-	m_vdp->render_vdp(bitmap, cliprect);
+	screen.priority().fill(0, cliprect);
+	m_vdp->render_vdp(bitmap, cliprect, screen.priority());
 	return 0;
 }
 
@@ -279,7 +271,7 @@ void pipibibi_state::pipibibs(machine_config &config)
 	Z80(config, m_audiocpu, 27_MHz_XTAL/8);         // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &pipibibi_state::pipibibs_sound_z80_mem);
 
-	TOAPLAN_COINCOUNTER(config, "coincounter", 0);
+	TOAPLAN_COINCOUNTER(config, "coincounter");
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
@@ -317,7 +309,7 @@ void pipibibi_bootleg_state::pipibibsbl(machine_config &config)
 	Z80(config, m_audiocpu, 12_MHz_XTAL / 2); // GoldStar Z8400B; clock source and divider unknown
 	m_audiocpu->set_addrmap(AS_PROGRAM, &pipibibi_bootleg_state::pipibibs_sound_z80_mem);
 
-	TOAPLAN_COINCOUNTER(config, "coincounter", 0);
+	TOAPLAN_COINCOUNTER(config, "coincounter");
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 

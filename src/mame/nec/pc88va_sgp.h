@@ -51,6 +51,7 @@ private:
 	void start_exec();
 
 	void execute_blit(u16 draw_mode, bool is_patblt);
+	void execute_cls(u32 dst, u32 size);
 
 	typedef u16 (pc88va_sgp_device::*rop_func)(u16 src, u16 dst);
 

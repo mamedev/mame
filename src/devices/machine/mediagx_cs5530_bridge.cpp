@@ -14,7 +14,7 @@
 #define LOG_MAP    (1U << 1) // log full remaps
 
 #define VERBOSE (LOG_GENERAL | LOG_MAP)
-//#define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
@@ -102,7 +102,7 @@ void mediagx_cs5530_bridge_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->irq3_callback().set(FUNC(mediagx_cs5530_bridge_device::pc_irq3_w));
 	m_isabus->irq4_callback().set(FUNC(mediagx_cs5530_bridge_device::pc_irq4_w));
 	m_isabus->irq5_callback().set(FUNC(mediagx_cs5530_bridge_device::pc_irq5_w));

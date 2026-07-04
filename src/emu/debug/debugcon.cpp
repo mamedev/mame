@@ -24,6 +24,7 @@
 #include <cctype>
 #include <fstream>
 #include <iterator>
+#include <locale>
 #include <regex>
 
 
@@ -489,6 +490,7 @@ void debugger_console::source_script(const char *file)
 		}
 		else
 		{
+			source_file->imbue(std::locale::classic());
 			m_source_file = std::move(source_file);
 		}
 	}
@@ -554,7 +556,7 @@ std::string debugger_console::cmderr_to_string(CMDERR error)
 		case CMDERR::UNBALANCED_QUOTES:     return "unbalanced quotes";
 		case CMDERR::NOT_ENOUGH_PARAMS:     return "not enough parameters for command";
 		case CMDERR::TOO_MANY_PARAMS:       return "too many parameters for command";
-		case CMDERR::EXPRESSION_ERROR:      return string_format("error in assignment expression: %s",
+		case CMDERR::EXPRESSION_ERROR:      return string_format(std::locale::classic(), "error in assignment expression: %s",
 																 expression_error(static_cast<expression_error::error_code>(offset)).code_string());
 		default:                            return "unknown error";
 	}
@@ -1155,7 +1157,7 @@ void debugger_console::print_core_wrap(std::string_view text, int wrapcol)
 
 void debugger_console::vprintf(util::format_argument_pack<char> const &args)
 {
-	print_core(util::string_format(args));
+	print_core(util::string_format(std::locale::classic(), args));
 
 	// force an update of any console views
 	m_machine.debug_view().update_all(DVT_CONSOLE);
@@ -1163,7 +1165,7 @@ void debugger_console::vprintf(util::format_argument_pack<char> const &args)
 
 void debugger_console::vprintf(util::format_argument_pack<char> &&args)
 {
-	print_core(util::string_format(std::move(args)));
+	print_core(util::string_format(std::locale::classic(), std::move(args)));
 
 	// force an update of any console views
 	m_machine.debug_view().update_all(DVT_CONSOLE);
@@ -1177,7 +1179,7 @@ void debugger_console::vprintf(util::format_argument_pack<char> &&args)
 
 void debugger_console::vprintf_wrap(int wrapcol, util::format_argument_pack<char> const &args)
 {
-	print_core_wrap(util::string_format(args), wrapcol);
+	print_core_wrap(util::string_format(std::locale::classic(), args), wrapcol);
 
 	// force an update of any console views
 	m_machine.debug_view().update_all(DVT_CONSOLE);
@@ -1185,7 +1187,7 @@ void debugger_console::vprintf_wrap(int wrapcol, util::format_argument_pack<char
 
 void debugger_console::vprintf_wrap(int wrapcol, util::format_argument_pack<char> &&args)
 {
-	print_core_wrap(util::string_format(std::move(args)), wrapcol);
+	print_core_wrap(util::string_format(std::locale::classic(), std::move(args)), wrapcol);
 
 	// force an update of any console views
 	m_machine.debug_view().update_all(DVT_CONSOLE);

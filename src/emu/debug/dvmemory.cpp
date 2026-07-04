@@ -13,8 +13,12 @@
 
 #include "debugcpu.h"
 
+#include "corefloat.h"
+
 #include <algorithm>
 #include <cctype>
+#include <cstdio>
+#include <locale>
 #include <tuple>
 
 
@@ -172,7 +176,7 @@ void debug_view_memory::enumerate_sources()
 				const address_space_config *config(memintf.logical_space_config(spacenum));
 				m_source_list.emplace_back(
 						std::make_unique<debug_view_memory_source>(
-							util::string_format("%s '%s' %s space memory", memintf.device().name(), memintf.device().tag(), config->name()),
+							util::string_format(std::locale::classic(), "%s '%s' %s space memory", memintf.device().name(), memintf.device().tag(), config->name()),
 							&memintf, spacenum));
 			}
 		}
@@ -265,38 +269,6 @@ void debug_view_memory::view_notify(debug_view_notification type)
 
 
 //-------------------------------------------------
-//  u32_to_float - return a floating point number
-//  whose 32 bit representation is value
-//-------------------------------------------------
-
-static inline float u32_to_float(u32 value)
-{
-	union {
-		float f;
-		u32 i;
-	} v;
-
-	v.i = value;
-	return v.f;
-}
-
-//-------------------------------------------------
-//  u64_to_double - return a floating point number
-//  whose 64 bit representation is value
-//-------------------------------------------------
-
-static inline float u64_to_double(u64 value)
-{
-	union {
-		double f;
-		u64 i;
-	} v;
-
-	v.i = value;
-	return v.f;
-}
-
-//-------------------------------------------------
 //  generate_row - read one row of data and make a
 //  text representation of the chunks
 //-------------------------------------------------
@@ -359,15 +331,15 @@ void debug_view_memory::generate_row(debug_view_char *destmin, debug_view_char *
 				switch (m_data_format)
 				{
 				case data_format::FLOAT_32BIT:
-					snprintf(valuetext, 64, "%.8g", u32_to_float(u32(chunkdata)));
+					snprintf(valuetext, 64, "%.8g", u2f(chunkdata));
 					break;
 				case data_format::FLOAT_64BIT:
-					snprintf(valuetext, 64, "%.24g", u64_to_double(chunkdata));
+					snprintf(valuetext, 64, "%.24g", u2d(chunkdata));
 					break;
 				case data_format::FLOAT_80BIT:
 				{
 					float64_t f64 = extF80M_to_f64(&chunkdata80);
-					snprintf(valuetext, 64, "%.24g", u64_to_double(f64.v));
+					snprintf(valuetext, 64, "%.24g", u2d(f64.v));
 					break;
 				}
 				default:
@@ -630,9 +602,9 @@ void debug_view_memory::recompute()
 	{
 		maxbyte = m_maxaddr = (source.m_blocklength * source.m_numblocks) - 1;
 		if (m_address_radix == 8)
-			addrchars = string_format("%o", m_maxaddr).size();
+			addrchars = string_format(std::locale::classic(), "%o", m_maxaddr).size();
 		else
-			addrchars = string_format("%X", m_maxaddr).size();
+			addrchars = string_format(std::locale::classic(), "%X", m_maxaddr).size();
 	}
 
 	// generate an 8-byte aligned format for the address
@@ -640,9 +612,9 @@ void debug_view_memory::recompute()
 	{
 	case 8:
 		if (!m_reverse_view)
-			m_addrformat = string_format("%*s%%0%do", 11 - addrchars, "", addrchars);
+			m_addrformat = string_format(std::locale::classic(), "%*s%%0%do", 11 - addrchars, "", addrchars);
 		else
-			m_addrformat = string_format("%%0%do%*s", addrchars, 11 - addrchars, "");
+			m_addrformat = string_format(std::locale::classic(), "%%0%do%*s", addrchars, 11 - addrchars, "");
 		break;
 
 	case 10:
@@ -652,9 +624,9 @@ void debug_view_memory::recompute()
 
 	case 16:
 		if (!m_reverse_view)
-			m_addrformat = string_format("%*s%%0%dX", 8 - addrchars, "", addrchars);
+			m_addrformat = string_format(std::locale::classic(), "%*s%%0%dX", 8 - addrchars, "", addrchars);
 		else
-			m_addrformat = string_format("%%0%dX%*s", addrchars, 8 - addrchars, "");
+			m_addrformat = string_format(std::locale::classic(), "%%0%dX%*s", addrchars, 8 - addrchars, "");
 		break;
 	}
 
@@ -717,10 +689,10 @@ bool debug_view_memory::needs_recompute()
 	bool recompute = m_recompute;
 
 	// handle expression changes
-	if (m_expression.dirty())
+	if (m_expression.recompute())
 	{
 		const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
-		offs_t val = m_expression.value();
+		offs_t val = m_expression.last_value();
 		if (source.m_memintf)
 		{
 			const address_space_config *config = m_no_translation ? source.m_memintf->space_config(source.m_spacenum) : source.m_memintf->logical_space_config(source.m_spacenum);

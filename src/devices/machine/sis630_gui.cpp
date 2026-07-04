@@ -95,7 +95,7 @@ void sis630_gui_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(sis630_vga_device::screen_update));
 
-	SIS630_VGA(config, m_vga, 0);
+	SIS630_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	// 64MB according to POST
 	// documentation claims 128MB, assume being wrong
@@ -187,11 +187,16 @@ void sis630_gui_device::subvendor_w(offs_t offset, u32 data, u32 mem_mask)
 			, data
 			, mem_mask
 		);
+		return;
 	}
 	m_subsystem_logger_mask |= mem_mask;
 
 	COMBINE_DATA(&subsystem_id);
 	LOGIO("subsystem ID write [$2c] %08x & %08x (%08x)\n", data, mem_mask, subsystem_id);
+	// if we have a complete subvendor rewrite the subsystem_id
+	// NOTE: it actually expects swapped words (vendor at 15:0, device at 31:16), cfr. pci.exe
+	if (m_subsystem_logger_mask == 0xffff'ffff)
+		subsystem_id = (subsystem_id >> 16) | ((subsystem_id & 0xffff) << 16);
 }
 
 void sis630_gui_device::memory_map(address_map &map)
@@ -319,6 +324,11 @@ void sis630_bridge_device::bridge_control_w(offs_t offset, uint16_t data, uint16
 void sis630_bridge_device::device_start()
 {
 	pci_bridge_device::device_start();
+
+	command = 0;
+	command_mask = 0x27;
+	// <reserved>, status in actual bridge device
+	status = 0;
 }
 
 void sis630_bridge_device::device_reset()

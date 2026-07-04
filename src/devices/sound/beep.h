@@ -18,7 +18,7 @@
 class beep_device : public device_t, public device_sound_interface
 {
 public:
-	beep_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	beep_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_state(int state);          // enable/disable sound output
 	void set_clock(uint32_t frequency); // output frequency

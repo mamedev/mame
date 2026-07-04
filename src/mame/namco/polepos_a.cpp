@@ -12,6 +12,8 @@
 
 #include "machine/rescap.h"
 
+#include <numbers>
+
 
 #define OUTPUT_RATE         24000
 
@@ -86,8 +88,8 @@ void polepos_sound_device::filter2_context::setup(device_t *device, int type, do
 
 	/* calculate digital filter coefficents */
 	/* cutoff freq, in radians/sec */
-	/*w = 2.0*M_PI*fc; no pre-warping */
-	double const w = sample_rate*2.0*tan(M_PI*fc/sample_rate); /* pre-warping */
+	/*w = 2.0*PI*fc; no pre-warping */
+	double const w = sample_rate * 2.0 * tan(std::numbers::pi * fc / sample_rate); /* pre-warping */
 	double const w_squared = w*w;
 
 	/* temp variable */
@@ -187,7 +189,7 @@ void polepos_sound_device::filter2_context::opamp_m_bandpass_setup(device_t *dev
 		r_in = 1.0 / (1.0/r1 + 1.0/r2);
 	}
 
-	double const fc = 1.0 / (2 * M_PI * sqrt(r_in * r3 * c1 * c2));
+	double const fc = 1.0 / (2 * std::numbers::pi * sqrt(r_in * r3 * c1 * c2));
 	double const d = (c1 + c2) / sqrt(r3 / r_in * c1 * c2);
 	gain *= -r3 / r_in * c2 / (c1 + c2);
 

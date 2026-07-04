@@ -1,13 +1,16 @@
 // license:LGPL-2.1+
 // copyright-holders:Olivier Galibert, Angelo Salese, David Haywood, Tomasz Slanina
-/********************************************************************************************************
+/**************************************************************************************************
 
     Seibu Protected 1993-94 era hardware, V30 based (sequel to the SYS68C hardware)
 
-********************************************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "raiden2.h"
+
+#include "input.h" // for COP debug keys
+
 
 #define DUMP_COP (0)
 
@@ -249,7 +252,7 @@ u32 xsedae_state::pri_callback(u8 pri)
 		case 2: return GFX_PMASK_8;
 		// above everything
 		case 3:
-		default: return 0; 
+		default: return 0;
 	}
 }
 

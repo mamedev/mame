@@ -25,7 +25,7 @@ const int menu_sound_options::m_sound_rate[] = { 11025, 22050, 44100, 48000 };
 //  ctor
 //-------------------------------------------------
 
-menu_sound_options::menu_sound_options(mame_ui_manager &mui, render_container &container) : menu(mui, container)
+menu_sound_options::menu_sound_options(mame_ui_manager &mui, render_target &target) : menu(mui, target)
 {
 	set_heading(_("Sound Options"));
 
@@ -98,7 +98,7 @@ bool menu_sound_options::handle(event const *ev)
 					s_sel[index] = std::to_string(m_sound_rate[index]);
 
 				menu::stack_push<menu_selector>(
-						ui(), container(), _("Sample Rate"), std::move(s_sel), m_cur_rates,
+						ui(), target(), _("Sample Rate"), std::move(s_sel), m_cur_rates,
 						[this] (int selection)
 						{
 							m_cur_rates = selection;

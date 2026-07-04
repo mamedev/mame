@@ -19,7 +19,7 @@ class i8251_device : public device_t, public device_serial_interface
 {
 public:
 	// construction/destruction
-	i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration helpers
 	auto txd_handler() { return m_txd_handler.bind(); }
@@ -104,19 +104,16 @@ private:
 	void sync1_rxc();
 	void sync2_rxc();
 	void update_syndet(bool voltage);
+	void sync1_w(uint8_t data);
+	void sync2_w(uint8_t data);
 
-	/* flags controlling how i8251_control_w operates */
-	uint8_t m_flags;
-	/* number of sync bytes programmed for sync mode (1 or 2) ; 0 = async mode */
-	uint8_t m_sync_byte_count;
-	/* the sync bytes written */
-	u8 m_sync1;
-	u16 m_sync2;
-	/* status of i8251 */
-	uint8_t m_status;
+	uint8_t m_flags;           // flags controlling how i8251_control_w operates
+	uint8_t m_sync_byte_count; // number of sync bytes programmed for sync mode (1 or 2) ; 0 = async mode
+	uint8_t m_sync1;           // the sync bytes written
+	uint16_t m_sync2;
+	uint8_t m_status;          // status of i8251
 	uint8_t m_command;
-	/* mode byte - bit definitions depend on mode - e.g. synchronous, asynchronous */
-	uint8_t m_mode_byte;
+	uint8_t m_mode_byte;       // mode byte - bit definitions depend on mode - e.g. synchronous, asynchronous
 	bool m_delayed_tx_en;
 
 	int32_t m_cts;
@@ -128,29 +125,23 @@ private:
 	int m_txc_count;
 	int m_br_factor;
 
-	/* data being received */
-	uint8_t m_rx_data;
-	/* tx buffer */
-	uint8_t m_tx_data;
-	void sync1_w(uint8_t data);
-	void sync2_w(uint8_t data);
+	uint8_t m_rx_data;         // data being received
+	uint8_t m_tx_data;         // tx buffer
 	uint8_t m_sync8;
 	uint16_t m_sync16;
-	// 1 = ext sync enabled via command
-	bool m_syndet_pin;
+	uint8_t m_tx_sync_shift;   // alternates between 8 and 0 for 2-byte sync idle transmission
+	bool m_syndet_pin;         // 1 = ext sync enabled via command
 	bool m_hunt_on;
-	// 1 = ext syndet pin has been set high; 0 = hunt mode activated
-	bool m_ext_syn_set;
-	// count of rxd bits
-	u8 m_rxd_bits;
-	u8 m_data_bits_count;
+	bool m_ext_syn_set;        // 1 = ext syndet pin has been set high; 0 = hunt mode activated
+	uint8_t m_rxd_bits;        // count of rxd bits
+	uint8_t m_data_bits_count;
 };
 
 class v5x_scu_device : public i8251_device
 {
 public:
 	// construction/destruction
-	v5x_scu_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock);
+	v5x_scu_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto sint_handler() { return m_sint_handler.bind(); }
 
@@ -176,16 +167,16 @@ protected:
 		update_sint();
 	}
 
-	u8 simk_r() { return m_simk; }
-	void simk_w(u8 data) { m_simk = data; update_sint(); }
+	uint8_t simk_r() { return m_simk; }
+	void simk_w(uint8_t data) { m_simk = data; update_sint(); }
 
 private:
 	void update_sint();
 
 	devcb_write_line m_sint_handler;
 
-	u8 m_sint;
-	u8 m_simk;
+	uint8_t m_sint;
+	uint8_t m_simk;
 };
 
 

@@ -63,6 +63,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/interface/midiport.h",
 		MAME_DIR .. "src/osd/interface/nethandler.cpp",
 		MAME_DIR .. "src/osd/interface/nethandler.h",
+		MAME_DIR .. "src/osd/interface/output.h",
 		MAME_DIR .. "src/osd/interface/uievents.h",
 		MAME_DIR .. "src/osd/modules/debugger/debug_module.h",
 		MAME_DIR .. "src/osd/modules/debugger/debuggdbstub.cpp",
@@ -79,6 +80,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/font/font_none.cpp",
 		MAME_DIR .. "src/osd/modules/font/font_osx.cpp",
 		MAME_DIR .. "src/osd/modules/font/font_sdl.cpp",
+		MAME_DIR .. "src/osd/modules/font/font_sdl3.cpp",
 		MAME_DIR .. "src/osd/modules/font/font_windows.cpp",
 		MAME_DIR .. "src/osd/modules/input/assignmenthelper.cpp",
 		MAME_DIR .. "src/osd/modules/input/assignmenthelper.h",
@@ -91,11 +93,15 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/input/input_none.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_rawinput.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_sdl.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_sdl3.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_sdlcommon.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_sdlcommon.h",
 		MAME_DIR .. "src/osd/modules/input/input_win32.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_wincommon.h",
 		MAME_DIR .. "src/osd/modules/input/input_windows.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_windows.h",
 		MAME_DIR .. "src/osd/modules/input/input_winhybrid.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_winsdl.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_x11.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_xinput.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_xinput.h",
@@ -129,6 +135,8 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/render/drawnone.cpp",
 		MAME_DIR .. "src/osd/modules/render/drawogl.cpp",
 		MAME_DIR .. "src/osd/modules/render/drawsdl.cpp",
+		MAME_DIR .. "src/osd/modules/render/drawsdl3accel.cpp",
+		MAME_DIR .. "src/osd/modules/render/drawsdl3soft.cpp",
 		MAME_DIR .. "src/osd/modules/render/render_module.h",
 		MAME_DIR .. "src/osd/modules/sound/coreaudio_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/js_sound.cpp",
@@ -139,6 +147,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/sound/pulse_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/pipewire_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/sdl_sound.cpp",
+		MAME_DIR .. "src/osd/modules/sound/sdl3_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/sound_module.cpp",
 		MAME_DIR .. "src/osd/modules/sound/sound_module.h",
 		MAME_DIR .. "src/osd/modules/sound/wasapi_sound.cpp",
@@ -148,12 +157,6 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd",
 		ext_includedir("asio"),
 	}
-
-	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
-		buildoptions {
-			"-Wno-unused-private-field",
-		}
-	end
 
 	if _OPTIONS["targetos"]=="windows" then
 		includedirs {
@@ -359,6 +362,11 @@ function qtdebuggerbuild()
 			buildoptions {
 				"-Wno-error=inconsistent-missing-override",
 			}
+			if _OPTIONS["targetos"]=="windows" then
+				buildoptions {
+					"-Wno-ignored-attributes",
+				}
+			end
 		configuration { }
 	end
 
@@ -402,7 +410,19 @@ function qtdebuggerbuild()
 
 		local MOC = ""
 		if (os.is("windows")) then
-			MOC = "moc"
+			local qt_host_libexecs
+			if _OPTIONS["QT_HOME"]~=nil then
+				qt_host_libexecs = backtick(_OPTIONS["QT_HOME"] .. "/bin/qmake -query QT_HOST_LIBEXECS")
+			else
+				qt_host_libexecs = backtick("qmake6 -query QT_HOST_LIBEXECS")
+			end
+			local MOCTST = backtick(qt_host_libexecs .. "/moc --version")
+			if MOCTST=='' then
+				print("Qt's Meta Object Compiler (moc) wasn't found!")
+				os.exit(1)
+			else
+				MOC = qt_host_libexecs .. "/moc"
+			end
 		else
 			if _OPTIONS["QT_HOME"]~=nil then
 				local MOCTST = backtick(_OPTIONS["QT_HOME"] .. "/bin/moc --version 2>/dev/null")
@@ -422,15 +442,14 @@ function qtdebuggerbuild()
 					MOC = _OPTIONS["QT_HOME"] .. "/bin/moc"
 				end
 			else
-				local MOCTST = backtick("which moc-qt5 2>/dev/null")
-				if MOCTST=='' then
-					MOCTST = backtick("which moc 2>/dev/null")
-				end
+				local qt_host_libexecs = backtick("qmake6 -query QT_HOST_LIBEXECS")
+				MOCTST = backtick(qt_host_libexecs .. "/moc --version 2>/dev/null")
 				if MOCTST=='' then
 					print("Qt's Meta Object Compiler (moc) wasn't found!")
 					os.exit(1)
+				else
+					MOC = qt_host_libexecs .. "/moc"
 				end
-				MOC = MOCTST
 			end
 		end
 
@@ -451,7 +470,7 @@ function qtdebuggerbuild()
 		if _OPTIONS["targetos"]=="windows" then
 			configuration { "mingw*" }
 				buildoptions {
-					"-I$(shell qmake -query QT_INSTALL_HEADERS)",
+					"-I$(shell qmake6 -query QT_INSTALL_HEADERS)",
 				}
 			configuration { }
 		elseif _OPTIONS["targetos"]=="macosx" then
@@ -465,7 +484,7 @@ function qtdebuggerbuild()
 				}
 			else
 				buildoptions {
-					backtick(pkgconfigcmd() .. " --cflags Qt5Widgets"),
+					"-I$(shell qmake6 -query QT_INSTALL_HEADERS)",
 				}
 			end
 		end
@@ -513,55 +532,37 @@ function osdmodulestargetconf()
 	if _OPTIONS["USE_QTDEBUG"]=="1" then
 		if _OPTIONS["targetos"]=="windows" then
 			linkoptions {
-				"-L$(shell qmake -query QT_INSTALL_LIBS)",
+				"-L$(shell qmake6 -query QT_INSTALL_LIBS)",
 			}
 			links {
-				"Qt5Core.dll",
-				"Qt5Gui.dll",
-				"Qt5Widgets.dll",
+				"Qt6Core.dll",
+				"Qt6Gui.dll",
+				"Qt6Widgets.dll",
 			}
 		elseif _OPTIONS["targetos"]=="macosx" then
-			local qt_version = str_to_version(backtick("qmake -query QT_VERSION"))
 			linkoptions {
 				"-F" .. backtick("qmake -query QT_INSTALL_LIBS"),
 			}
-			if qt_version < 60000 then
-				links {
-					"Qt5Core.framework",
-					"Qt5Gui.framework",
-					"Qt5Widgets.framework",
-				}
-			else
-				links {
-					"QtCore.framework",
-					"QtGui.framework",
-					"QtWidgets.framework",
-				}
-			end
+			links {
+				"QtCore.framework",
+				"QtGui.framework",
+				"QtWidgets.framework",
+			}
 		else
 			if _OPTIONS["QT_HOME"]~=nil then
-				local qt_version = str_to_version(backtick(_OPTIONS["QT_HOME"] .. "/bin/qmake -query QT_VERSION"))
 				linkoptions {
 					"-L" .. backtick(_OPTIONS["QT_HOME"] .. "/bin/qmake -query QT_INSTALL_LIBS"),
 				}
-				if qt_version < 60000 then
-					links {
-						"Qt5Core",
-						"Qt5Gui",
-						"Qt5Widgets",
-					}
-				else
-					links {
-						"Qt6Core",
-						"Qt6Gui",
-						"Qt6Widgets",
-					}
-				end
 			else
-				local str = backtick(pkgconfigcmd() .. " --libs Qt5Widgets")
-				addlibfromstring(str)
-				addoptionsfromstring(str)
+				linkoptions {
+					"-L$(shell qmake6 -query QT_INSTALL_LIBS)",
+				}
 			end
+			links {
+				"Qt6Core",
+				"Qt6Gui",
+				"Qt6Widgets",
+			}
 		end
 	end
 
@@ -711,15 +712,6 @@ if not _OPTIONS["NO_USE_PIPEWIRE"] then
 		_OPTIONS["NO_USE_PIPEWIRE"] = "1"
 	end
 end
-
-newoption {
-	trigger = "MODERN_WIN_API",
-	description = "Use Modern Windows APIs",
-	allowed = {
-		{ "0",  "Use classic Windows APIs - allows support for XP and later"   },
-		{ "1",  "Use Modern Windows APIs - support for Windows 8.1 and later"  },
-	},
-}
 
 newoption {
 	trigger = "USE_QTDEBUG",

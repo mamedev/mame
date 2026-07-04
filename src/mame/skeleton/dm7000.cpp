@@ -355,7 +355,7 @@ uint32_t dm7000_state::screen_update_dm7000(screen_device &screen, bitmap_rgb32 
 uint32_t dm7000_state::dcr_r(offs_t offset)
 {
 	osd_printf_debug("DCR %03X read\n", offset);
-	if(offset>=1024) {printf("get %04X\n", offset); return 0;} else
+	if(offset>=1024) {logerror("get %04X\n", offset); return 0;} else
 	switch(offset) {
 		case DCRSTB045_CMD_STAT:
 			return 0; // assume that video dev is always ready
@@ -368,7 +368,7 @@ uint32_t dm7000_state::dcr_r(offs_t offset)
 void dm7000_state::dcr_w(offs_t offset, uint32_t data)
 {
 	osd_printf_debug("DCR %03X write = %08X\n", offset, data);
-	if(offset>=1024) {printf("get %04X\n", offset); } else
+	if(offset>=1024) {logerror("get %04X\n", offset); } else
 	dcr[offset] = data;
 }
 
@@ -395,7 +395,7 @@ void dm7000_state::dm7000(machine_config &config)
 	screen.set_visarea(0, 640-1, 0, 480-1);
 	screen.set_screen_update(FUNC(dm7000_state::screen_update_dm7000));
 
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 	m_terminal->set_keyboard_callback(FUNC(dm7000_state::kbd_put));
 }
 

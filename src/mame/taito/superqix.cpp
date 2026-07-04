@@ -1538,150 +1538,149 @@ void superqix_state::sqix_nomcu(machine_config &config)
 
 ***************************************************************************/
 
-/* Prebillian pcbs do not have the usual Taito letter-number pair code on the
-labels on the roms/MCU, they only have the mitsubishi electric logo and a
-single number.
-The PCB has a label which says "M6100211A // プレビリアン" (PuReBiRiAN)
+/* Prebillian PCBs do not have the usual Taito letter-number pair code on the labels
+   on the ROMs/MCU, they only have the mitsubishi electric logo and a single number.
+   The PCB has a label which says "M6100211A // プレビリアン" (PuReBiRiAN)
 */
-ROM_START( pbillian )
+ROM_START( pbillian ) // M6100211A PCB
 	ROM_REGION( 0x018000, "maincpu", 0 )
-	ROM_LOAD( "mitsubishi__electric__1.m5l27256k.6bc",  0x00000, 0x08000, CRC(d379fe23) SHA1(e147a9151b1cdeacb126d9713687bd0aa92980ac) )
+	ROM_LOAD( "mitsubishi__electric__1.m5l27256k.6bc", 0x00000, 0x08000, CRC(d379fe23) SHA1(e147a9151b1cdeacb126d9713687bd0aa92980ac) )
 	ROM_LOAD( "mitsubishi__electric__2.m5l27128k.6d",  0x14000, 0x04000, CRC(1af522bc) SHA1(83e002dc831bfcedbd7096b350c9b34418b79674) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )
-	ROM_LOAD( "mitsubishi__electric__7.mc68705p5s.7k", 0x0000, 0x0800, CRC(03de0c74) SHA1(ee2bc8be9bab9557c6776b996b85ed6f32300b47) )
+	ROM_REGION( 0x0800, "mcu", 0 ) // internal 68705P5 MCU code
+	ROM_LOAD( "mitsubishi__electric__7.mc68705p5s.7k", 0x0000, 0x0800, CRC(03de0c74) SHA1(ee2bc8be9bab9557c6776b996b85ed6f32300b47) ) // dumped from actual decapped MCU
 
 	ROM_REGION( 0x8000, "samples", 0 )
-	ROM_LOAD( "mitsubishi__electric__3.m5l27256k.7h",  0x0000, 0x08000, CRC(3f9bc7f1) SHA1(0b0c2ec3bea6a7f3fc6c0c8b750318f3f9ec3d1f) )
+	ROM_LOAD( "mitsubishi__electric__3.m5l27256k.7h", 0x0000, 0x08000, CRC(3f9bc7f1) SHA1(0b0c2ec3bea6a7f3fc6c0c8b750318f3f9ec3d1f) )
 
 	ROM_REGION( 0x018000, "gfx1", 0 )
-	ROM_LOAD( "mitsubishi__electric__4.m5l27256k.1n",  0x00000, 0x08000, CRC(9c08a072) SHA1(25f31fcf72216cf42528b07ad8c09113aa69861a) )
-	ROM_LOAD( "mitsubishi__electric__5.m5l27256k.1r",  0x08000, 0x08000, CRC(2dd5b83f) SHA1(b05e3a008050359d0207757b9cbd8cee87abc697) )
-	ROM_LOAD( "mitsubishi__electric__6.m5l27256k.1t",  0x10000, 0x08000, CRC(33b855b0) SHA1(5a1df4f82fc0d6f78883b759fd61f395942645eb) )
+	ROM_LOAD( "mitsubishi__electric__4.m5l27256k.1n", 0x00000, 0x08000, CRC(9c08a072) SHA1(25f31fcf72216cf42528b07ad8c09113aa69861a) )
+	ROM_LOAD( "mitsubishi__electric__5.m5l27256k.1r", 0x08000, 0x08000, CRC(2dd5b83f) SHA1(b05e3a008050359d0207757b9cbd8cee87abc697) )
+	ROM_LOAD( "mitsubishi__electric__6.m5l27256k.1t", 0x10000, 0x08000, CRC(33b855b0) SHA1(5a1df4f82fc0d6f78883b759fd61f395942645eb) )
 ROM_END
 
 ROM_START( pbillianb ) // EV-97 PCB
 	ROM_REGION( 0x018000, "maincpu", 0 )
-	ROM_LOAD( "1",  0x00000, 0x08000, CRC(cd8e34f0) SHA1(6598a594b4e305a6139d03e6d1d564c093da713a) ) // different
-	ROM_LOAD( "2",  0x10000, 0x08000, CRC(e60a2cb0) SHA1(949bb7ff5df36ee10d910a33f595e6a90350304e) ) // 2nd half identical to the corresponding ROM of the parent
+	ROM_LOAD( "1", 0x00000, 0x08000, CRC(cd8e34f0) SHA1(6598a594b4e305a6139d03e6d1d564c093da713a) ) // different
+	ROM_LOAD( "2", 0x10000, 0x08000, CRC(e60a2cb0) SHA1(949bb7ff5df36ee10d910a33f595e6a90350304e) ) // 2nd half identical to the corresponding ROM of the parent
 
 	ROM_REGION( 0x8000, "samples", 0 ) // identical to the parent
-	ROM_LOAD( "3",  0x0000, 0x08000, CRC(3f9bc7f1) SHA1(0b0c2ec3bea6a7f3fc6c0c8b750318f3f9ec3d1f) )
-
-	ROM_REGION( 0x018000, "gfx1", 0 ) // only 5 differs from the parent
-	ROM_LOAD( "4",  0x00000, 0x08000, CRC(9c08a072) SHA1(25f31fcf72216cf42528b07ad8c09113aa69861a) )
-	ROM_LOAD( "5",  0x08000, 0x08000, CRC(63f3437b) SHA1(a2234019bac27256692d4b059d39caaddfb9fb08) )
-	ROM_LOAD( "6",  0x10000, 0x08000, CRC(33b855b0) SHA1(5a1df4f82fc0d6f78883b759fd61f395942645eb) )
-ROM_END
-
-ROM_START( hotsmash )
-	ROM_REGION( 0x018000, "maincpu", 0 )
-	ROM_LOAD( "b18-04",  0x00000, 0x08000, CRC(981bde2c) SHA1(ebcc901a036cde16b33d534d423500d74523b781) )
-
-	ROM_REGION( 0x0800, "mcu", 0 )
-	ROM_LOAD( "b18-06.mcu", 0x0000, 0x0800, CRC(67c0920a) SHA1(23a294892823d1d9216ea8ddfa9df1c8af149477) ) // has valid reset vector and int vector in it, SWI and TIMER vectors are NOPs
-
-	ROM_REGION( 0x8000, "samples", 0 )
-	ROM_LOAD( "b18-05",  0x0000, 0x08000, CRC(dab5e718) SHA1(6cf6486f283f5177dfdc657b1627fbfa3f0743e8) )
+	ROM_LOAD( "3", 0x0000, 0x08000, CRC(3f9bc7f1) SHA1(0b0c2ec3bea6a7f3fc6c0c8b750318f3f9ec3d1f) ) // == mitsubishi__electric__3.m5l27256k.7h
 
 	ROM_REGION( 0x018000, "gfx1", 0 )
-	ROM_LOAD( "b18-01",  0x00000, 0x08000, CRC(870a4c04) SHA1(a029108bcda40755c8320d2ee297f42d816aa7c0) )
-	ROM_LOAD( "b18-02",  0x08000, 0x08000, CRC(4e625cac) SHA1(2c21b32240eaada9a5f909a2ec5b335372c8c994) )
-	ROM_LOAD( "b18-03",  0x14000, 0x04000, CRC(1c82717d) SHA1(6942c8877e24ac51ed71036e771a1655d82f3491) )
+	ROM_LOAD( "4", 0x00000, 0x08000, CRC(9c08a072) SHA1(25f31fcf72216cf42528b07ad8c09113aa69861a) ) // == mitsubishi__electric__4.m5l27256k.1n
+	ROM_LOAD( "5", 0x08000, 0x08000, CRC(63f3437b) SHA1(a2234019bac27256692d4b059d39caaddfb9fb08) ) // 5 bytes different compared to mitsubishi__electric__5.m5l27256k.1r
+	ROM_LOAD( "6", 0x10000, 0x08000, CRC(33b855b0) SHA1(5a1df4f82fc0d6f78883b759fd61f395942645eb) ) // == mitsubishi__electric__6.m5l27256k.1t
+ROM_END
+
+ROM_START( hotsmash ) // M6100211A PCB
+	ROM_REGION( 0x018000, "maincpu", 0 )
+	ROM_LOAD( "b18-04.6bc", 0x00000, 0x08000, CRC(981bde2c) SHA1(ebcc901a036cde16b33d534d423500d74523b781) )
+
+	ROM_REGION( 0x0800, "mcu", 0 ) // internal 68705P5 MCU code
+	ROM_LOAD( "b18-06.7k", 0x0000, 0x0800, CRC(67c0920a) SHA1(23a294892823d1d9216ea8ddfa9df1c8af149477) ) // dumped from actual decapped MCU, contains valid RESET & INT vectors, SWI & TIMER vectors are NOPs
+
+	ROM_REGION( 0x8000, "samples", 0 )
+	ROM_LOAD( "b18-05.7h", 0x0000, 0x08000, CRC(dab5e718) SHA1(6cf6486f283f5177dfdc657b1627fbfa3f0743e8) )
+
+	ROM_REGION( 0x018000, "gfx1", 0 )
+	ROM_LOAD( "b18-01.1n", 0x00000, 0x08000, CRC(870a4c04) SHA1(a029108bcda40755c8320d2ee297f42d816aa7c0) )
+	ROM_LOAD( "b18-02.1r", 0x08000, 0x08000, CRC(4e625cac) SHA1(2c21b32240eaada9a5f909a2ec5b335372c8c994) )
+	ROM_LOAD( "b18-03.1t", 0x14000, 0x04000, CRC(1c82717d) SHA1(6942c8877e24ac51ed71036e771a1655d82f3491) )
 ROM_END
 
 ROM_START( sqix ) // It is unclear what this set fixes vs 1.1 below, but the 'rug pattern' on the bitmap test during POST has the left edge entirely black, unlike v1.0 or v1.1, but like sqixu
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "b03__01-2.ef3",  0x00000, 0x08000, CRC(5ded636b) SHA1(827954001b4617b3bd439be75094d8dca06ea32b) )
-	ROM_LOAD( "b03__02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
+	ROM_LOAD( "b03__01-2.ef3", 0x00000, 0x08000, CRC(5ded636b) SHA1(827954001b4617b3bd439be75094d8dca06ea32b) )
+	ROM_LOAD( "b03__02.h3",    0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* I8751 code */
-	ROM_LOAD( "b03__03.l2",     0x00000, 0x1000, CRC(f0c3af2b) SHA1(6dce2175011b5c8d0f1bce433c53979841d5d1a4) ) /* B03 // 03 C8751-88 MCU, verified from deprotected part */
+	ROM_REGION( 0x1000, "mcu", 0 ) // internal I8751 MCU code
+	ROM_LOAD( "b03__03.l2", 0x00000, 0x1000, CRC(f0c3af2b) SHA1(6dce2175011b5c8d0f1bce433c53979841d5d1a4) ) // B03  03 C8751-88 MCU, dumped from actual decapped MCU
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "b03__04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
+	ROM_LOAD( "b03__04.s8", 0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "taito_sq-iu3__lh231041__sharp_japan__8709_d.p8",    0x00000, 0x20000, CRC(b8d0c493) SHA1(ef5d62ef3835c7ae088a7aa98945f747130fe0ec) ) /* Sharp LH231041 28 pin 128K x 8bit mask rom */
+	ROM_LOAD( "taito_sq-iu3__lh231041__sharp_japan__8709_d.p8", 0x00000, 0x20000, CRC(b8d0c493) SHA1(ef5d62ef3835c7ae088a7aa98945f747130fe0ec) ) // Sharp LH231041 28 pin 128K x 8bit mask ROM
 
 	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "b03__05.t8",    0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
+	ROM_LOAD( "b03__05.t8", 0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
 ROM_END
 
 ROM_START( sqixr1 ) // This set has the coin lockout polarity inverted, and also fixes the 10 vs 9 lockout bug
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "b03__01-1.ef3",  0x00000, 0x08000, CRC(ad614117) SHA1(c461f00a2aecde1bc3860c15a3c31091b14665a2) )
-	ROM_LOAD( "b03__02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
+	ROM_LOAD( "b03__01-1.ef3", 0x00000, 0x08000, CRC(ad614117) SHA1(c461f00a2aecde1bc3860c15a3c31091b14665a2) )
+	ROM_LOAD( "b03__02.h3",    0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* I8751 code */
-	ROM_LOAD( "b03__03.l2",     0x00000, 0x1000, CRC(f0c3af2b) SHA1(6dce2175011b5c8d0f1bce433c53979841d5d1a4) ) /* B03 // 03 C8751-88 MCU, verified from deprotected part */
+	ROM_REGION( 0x1000, "mcu", 0 ) // internal I8751 MCU code
+	ROM_LOAD( "b03__03.l2", 0x00000, 0x1000, CRC(f0c3af2b) SHA1(6dce2175011b5c8d0f1bce433c53979841d5d1a4) ) // B03  03 C8751-88 MCU, dumped from actual decapped MCU
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "b03__04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
+	ROM_LOAD( "b03__04.s8", 0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "taito_sq-iu3__lh231041__sharp_japan__8709_d.p8",    0x00000, 0x20000, CRC(b8d0c493) SHA1(ef5d62ef3835c7ae088a7aa98945f747130fe0ec) ) /* Sharp LH231041 28 pin 128K x 8bit mask rom */
+	ROM_LOAD( "taito_sq-iu3__lh231041__sharp_japan__8709_d.p8", 0x00000, 0x20000, CRC(b8d0c493) SHA1(ef5d62ef3835c7ae088a7aa98945f747130fe0ec) ) // Sharp LH231041 28 pin 128K x 8bit mask ROM
 
 	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "b03__05.t8",    0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
+	ROM_LOAD( "b03__05.t8", 0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
 ROM_END
 
 ROM_START( sqixr0 ) // This set is older than the above two: it has the coin lockout only trigger after 10 coins (causing the last coin to be lost), and the coin lockout polarity is not inverted
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "b03__01.ef3",    0x00000, 0x08000, CRC(0888b7de) SHA1(de3e4637436de185f43d2ad4186d4cfdcd4d33d9) )
-	ROM_LOAD( "b03__02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
+	ROM_LOAD( "b03__01.ef3", 0x00000, 0x08000, CRC(0888b7de) SHA1(de3e4637436de185f43d2ad4186d4cfdcd4d33d9) )
+	ROM_LOAD( "b03__02.h3",  0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* I8751 code */
-	ROM_LOAD( "b03__03.l2",     0x00000, 0x1000, CRC(f0c3af2b) SHA1(6dce2175011b5c8d0f1bce433c53979841d5d1a4) ) /* B03 // 03 C8751-88 MCU, verified from deprotected part */
+	ROM_REGION( 0x1000, "mcu", 0 ) // internal I8751 MCU code
+	ROM_LOAD( "b03__03.l2", 0x00000, 0x1000, CRC(f0c3af2b) SHA1(6dce2175011b5c8d0f1bce433c53979841d5d1a4) ) // B03 03 C8751-88 MCU, dumped from actual decapped MCU
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "b03__04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
+	ROM_LOAD( "b03__04.s8", 0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "taito_sq-iu3__lh231041__sharp_japan__8709_d.p8",    0x00000, 0x20000, CRC(b8d0c493) SHA1(ef5d62ef3835c7ae088a7aa98945f747130fe0ec) ) /* Sharp LH231041 28 pin 128K x 8bit mask rom */
+	ROM_LOAD( "taito_sq-iu3__lh231041__sharp_japan__8709_d.p8", 0x00000, 0x20000, CRC(b8d0c493) SHA1(ef5d62ef3835c7ae088a7aa98945f747130fe0ec) ) // Sharp LH231041 28 pin 128K x 8bit mask ROM
 
 	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "b03__05.t8",    0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
+	ROM_LOAD( "b03__05.t8", 0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
 ROM_END
 
 ROM_START( sqixu )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "b03__06.ef3",   0x00000, 0x08000, CRC(4f59f7af) SHA1(6ea627ea8505cf8d1a5a1350258180c61fbd1ed9) )
-	ROM_LOAD( "b03__07.h3",    0x10000, 0x10000, CRC(4c417d4a) SHA1(de46551da1b27312dca40240a210e77595cf9dbd) )
+	ROM_LOAD( "b03__06.ef3", 0x00000, 0x08000, CRC(4f59f7af) SHA1(6ea627ea8505cf8d1a5a1350258180c61fbd1ed9) )
+	ROM_LOAD( "b03__07.h3",  0x10000, 0x10000, CRC(4c417d4a) SHA1(de46551da1b27312dca40240a210e77595cf9dbd) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* I8751 code */
-	ROM_LOAD( "b03__08.l2",    0x00000, 0x01000, CRC(7c338c0f) SHA1(b91468c881641f807067835b2dd490cd3e3c577e) ) /* B03 // 08 C8751-88 MCU, verified from deprotected part, 3 bytes different from B03 // 03 */
+	ROM_REGION( 0x1000, "mcu", 0 ) // internal I8751 MCU code
+	ROM_LOAD( "b03__08.l2", 0x00000, 0x01000, CRC(7c338c0f) SHA1(b91468c881641f807067835b2dd490cd3e3c577e) ) // B03 08 C8751-88 MCU, dumped from actual decapped MCU, 3 bytes different from B03 03
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "b03__04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
+	ROM_LOAD( "b03__04.s8", 0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "taito_sq-iu3__lh231041__sharp_japan__8709_d.p8",    0x00000, 0x20000, CRC(b8d0c493) SHA1(ef5d62ef3835c7ae088a7aa98945f747130fe0ec) ) /* Sharp LH231041 28 pin 128K x 8bit mask rom */
+	ROM_LOAD( "taito_sq-iu3__lh231041__sharp_japan__8709_d.p8", 0x00000, 0x20000, CRC(b8d0c493) SHA1(ef5d62ef3835c7ae088a7aa98945f747130fe0ec) ) // Sharp LH231041 28 pin 128K x 8bit mask ROM
 
 	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "b03__09.t8",    0x00000, 0x10000, CRC(69d2a84a) SHA1(b461d8a01f73c6aaa4aac85602c688c111bdca5d) )
+	ROM_LOAD( "b03__09.t8", 0x00000, 0x10000, CRC(69d2a84a) SHA1(b461d8a01f73c6aaa4aac85602c688c111bdca5d) )
 ROM_END
 
-/* this is a bootleg with an 8031+external rom in place of the 8751 of the
+/* this is a bootleg with an 8031+external ROM in place of the 8751 of the
    original board; The MCU code is extensively hacked to avoid use of ports 0
-   and 2, which are used as the rom data and address buses, using a multiplexed
+   and 2, which are used as the ROM data and address buses, using a multiplexed
    latch on the other ports instead. This bootleg MCU is based on a dump of the
    original b03__03.l2 code, obtained by the pirates through unknown means.
-   Barring the bootleg MCU, the actual rom set is an exact copy of sqixr0 above. */
+   Barring the bootleg MCU, the actual ROM set is an exact copy of sqixr0 above. */
 ROM_START( sqixb1 ) // formerly 'sqixa'
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "sq01.97",       0x00000, 0x08000, CRC(0888b7de) SHA1(de3e4637436de185f43d2ad4186d4cfdcd4d33d9) ) // == b03__01.ef3
-	ROM_LOAD( "b03__02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) ) // actual label is something different on the bootleg
+	ROM_LOAD( "sq01.97",    0x00000, 0x08000, CRC(0888b7de) SHA1(de3e4637436de185f43d2ad4186d4cfdcd4d33d9) ) // == b03__01.ef3
+	ROM_LOAD( "b03__02.h3", 0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) ) // actual label is something different on the bootleg
 
-	ROM_REGION( 0x01000, "mcu", 0 ) /* I8031 code */
-	ROM_LOAD( "sq07.ic108",     0x00000, 0x1000, CRC(d11411fb) SHA1(31183f433596c4d2503c01f6dc8d91024f2cf5de) ) // actual label is something different on the bootleg
+	ROM_REGION( 0x01000, "mcu", 0 ) // external I8031 MCU code
+	ROM_LOAD( "sq07.ic108", 0x00000, 0x1000, CRC(d11411fb) SHA1(31183f433596c4d2503c01f6dc8d91024f2cf5de) ) // actual label is something different on the bootleg
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "b03__04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) ) // actual label is something different on the bootleg
+	ROM_LOAD( "b03__04.s8", 0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) ) // actual label is something different on the bootleg
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "b03-03",       0x00000, 0x10000, CRC(6e8b6a67) SHA1(c71117cc880a124c46397c446d1edc1cbf681200) ) /* == 1st half of taito_sq-iu3__lh231041__sharp_japan__8709_d.p8, fake label */
-	ROM_LOAD( "b03-06",       0x10000, 0x10000, CRC(38154517) SHA1(703ad4cfe54a4786c67aedcca5998b57f39fd857) ) /* == 2nd half of taito_sq-iu3__lh231041__sharp_japan__8709_d.p8, fake label */
+	ROM_LOAD( "b03-03", 0x00000, 0x10000, CRC(6e8b6a67) SHA1(c71117cc880a124c46397c446d1edc1cbf681200) ) // == 1st half of taito_sq-iu3__lh231041__sharp_japan__8709_d.p8, fake label
+	ROM_LOAD( "b03-06", 0x10000, 0x10000, CRC(38154517) SHA1(703ad4cfe54a4786c67aedcca5998b57f39fd857) ) // == 2nd half of taito_sq-iu3__lh231041__sharp_japan__8709_d.p8, fake label
 
 	ROM_REGION( 0x10000, "gfx3", 0 )
 	ROM_LOAD( "b03__05.t8",    0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) ) // actual label is something different on the bootleg
@@ -1689,48 +1688,46 @@ ROM_END
 
 ROM_START( sqixb2 ) // this bootleg set has been extensively hacked to avoid using the MCU at all, though a few checks for the semaphore flags were never patched out
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "cpu.2",         0x00000, 0x08000, CRC(682e28e3) SHA1(fe9221d26d7397be5a0fc8fdc51672b5924f3cf2) )
-	ROM_LOAD( "b03__02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) ) // actual label is something different on the bootleg
+	ROM_LOAD( "cpu.2",      0x00000, 0x08000, CRC(682e28e3) SHA1(fe9221d26d7397be5a0fc8fdc51672b5924f3cf2) )
+	ROM_LOAD( "b03__02.h3", 0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) ) // actual label is something different on the bootleg
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "b03__04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) ) // actual label is something different on the bootleg
+	ROM_LOAD( "b03__04.s8", 0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) ) // actual label is something different on the bootleg
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "b03-03",       0x00000, 0x10000, CRC(6e8b6a67) SHA1(c71117cc880a124c46397c446d1edc1cbf681200) ) /* == 1st half of taito_sq-iu3__lh231041__sharp_japan__8709_d.p8, fake label */
-	ROM_LOAD( "b03-06",       0x10000, 0x10000, CRC(38154517) SHA1(703ad4cfe54a4786c67aedcca5998b57f39fd857) ) /* == 2nd half of taito_sq-iu3__lh231041__sharp_japan__8709_d.p8, fake label */
+	ROM_LOAD( "b03-03", 0x00000, 0x10000, CRC(6e8b6a67) SHA1(c71117cc880a124c46397c446d1edc1cbf681200) ) // == 1st half of taito_sq-iu3__lh231041__sharp_japan__8709_d.p8, fake label
+	ROM_LOAD( "b03-06", 0x10000, 0x10000, CRC(38154517) SHA1(703ad4cfe54a4786c67aedcca5998b57f39fd857) ) // == 2nd half of taito_sq-iu3__lh231041__sharp_japan__8709_d.p8, fake label
 
 	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "b03__05.t8",    0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) ) // actual label is something different on the bootleg
+	ROM_LOAD( "b03__05.t8", 0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) ) // actual label is something different on the bootleg
 ROM_END
 
 ROM_START( perestrof )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	/* 0x8000 - 0x10000 in the rom is empty anyway */
-	ROM_LOAD( "rom1.bin",        0x00000, 0x20000, CRC(0cbf96c1) SHA1(cf2b1367887d1b8812a56aa55593e742578f220c) )
+	ROM_LOAD( "rom1.bin", 0x00000, 0x20000, CRC(0cbf96c1) SHA1(cf2b1367887d1b8812a56aa55593e742578f220c) ) // 0x8000 - 0x10000 in the ROM is empty
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "rom4.bin",       0x00000, 0x10000, CRC(c56122a8) SHA1(1d24b2f0358e14aca5681f92175869224584a6ea) ) /* both halves identical */
+	ROM_LOAD( "rom4.bin", 0x00000, 0x10000, CRC(c56122a8) SHA1(1d24b2f0358e14aca5681f92175869224584a6ea) ) // both halves identical
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "rom2.bin",       0x00000, 0x20000, CRC(36f93701) SHA1(452cb23efd955c6c155cef2b1b650e253e195738) )
+	ROM_LOAD( "rom2.bin", 0x00000, 0x20000, CRC(36f93701) SHA1(452cb23efd955c6c155cef2b1b650e253e195738) )
 
 	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "rom3.bin",       0x00000, 0x10000, CRC(00c91d5a) SHA1(fdde56d3689a47e6bfb296e442207b93b887ec7a) )
+	ROM_LOAD( "rom3.bin", 0x00000, 0x10000, CRC(00c91d5a) SHA1(fdde56d3689a47e6bfb296e442207b93b887ec7a) )
 ROM_END
 
 ROM_START( perestro )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	/* 0x8000 - 0x10000 in the rom is empty anyway */
-	ROM_LOAD( "rom1.bin",        0x00000, 0x20000, CRC(0cbf96c1) SHA1(cf2b1367887d1b8812a56aa55593e742578f220c) )
+	ROM_LOAD( "rom1.bin", 0x00000, 0x20000, CRC(0cbf96c1) SHA1(cf2b1367887d1b8812a56aa55593e742578f220c) ) // 0x8000 - 0x10000 in the ROM is empty
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "rom4.bin",       0x00000, 0x10000, CRC(c56122a8) SHA1(1d24b2f0358e14aca5681f92175869224584a6ea) ) /* both halves identical */
+	ROM_LOAD( "rom4.bin", 0x00000, 0x10000, CRC(c56122a8) SHA1(1d24b2f0358e14aca5681f92175869224584a6ea) ) // both halves identical
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "rom2.bin",       0x00000, 0x20000, CRC(36f93701) SHA1(452cb23efd955c6c155cef2b1b650e253e195738) )
+	ROM_LOAD( "rom2.bin", 0x00000, 0x20000, CRC(36f93701) SHA1(452cb23efd955c6c155cef2b1b650e253e195738) )
 
 	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "rom3a.bin",       0x00000, 0x10000, CRC(7a2a563f) SHA1(e3654091b858cc80ec1991281447fc3622a0d4f9) )
+	ROM_LOAD( "rom3a.bin", 0x00000, 0x10000, CRC(7a2a563f) SHA1(e3654091b858cc80ec1991281447fc3622a0d4f9) )
 ROM_END
 
 void superqix_state::init_sqix()

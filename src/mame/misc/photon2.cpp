@@ -370,7 +370,7 @@ void photon2_state::photon2(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(photon2_state::spec_interrupt_hack), "screen", 0, 1);
 
-	I8255(config, m_ppi, 0);
+	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set_ioport("JOY");
 	m_ppi->in_pc_callback().set_ioport("COIN");
 	m_ppi->out_pc_callback().set(FUNC(photon2_state::misc_w));

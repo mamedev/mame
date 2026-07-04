@@ -72,7 +72,7 @@ void a2bus_midi_device::device_add_mconfig(machine_config &config)
 	m_ptm->set_external_clocks(1021800.0f, 1021800.0f, 1021800.0f);
 	m_ptm->irq_callback().set(FUNC(a2bus_midi_device::ptm_irq_w));
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 	m_acia->irq_handler().set(FUNC(a2bus_midi_device::acia_irq_w));
 

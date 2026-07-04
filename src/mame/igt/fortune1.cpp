@@ -603,7 +603,6 @@ VIDEO_START_MEMBER(videopkr_state,vidadcba)
 
 uint32_t videopkr_state::screen_update_videopkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->mark_all_dirty();
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -913,6 +912,9 @@ void babypkr_state::bpoker_p1_data_w(uint8_t data)
 {
 	m_p1 = data;
 
+	m_videobank->set_entry((data >> 6) & 0x03);
+	m_colorbank->set_entry((data >> 6) & 0x03);
+
 	m_lamps[8] = BIT(data, 0);    // Aux_0 - Jackpot mechanical counter (Baby Games)
 	m_lamps[9] = BIT(data, 1);    // Aux_1 -
 	m_lamps[10] = BIT(data, 2);   // Aux_2 -
@@ -1121,7 +1123,7 @@ void babypkr_state::i8751_data_port(address_map &map)
 
 static INPUT_PORTS_START( videopkr )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_DOOR )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )         PORT_IMPULSE(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )        PORT_NAME("Start")
@@ -1146,7 +1148,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( blckjack )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_DOOR )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )         PORT_IMPULSE(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )        PORT_NAME("Deal")
@@ -1171,7 +1173,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( videodad )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_DOOR )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )         PORT_IMPULSE(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_GAMBLE_TAKE )
@@ -1196,7 +1198,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( videocba )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_DOOR )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )         PORT_IMPULSE(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )        PORT_NAME("Start")
@@ -1221,7 +1223,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( babypkr )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_DOOR )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )         PORT_IMPULSE(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )        PORT_NAME("Start")
@@ -1248,7 +1250,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( babydad )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_DOOR )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )         PORT_IMPULSE(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_GAMBLE_TAKE )
@@ -1273,7 +1275,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( bpoker )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_DOOR )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )         PORT_IMPULSE(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )        PORT_NAME("Start")
@@ -1371,9 +1373,6 @@ void videopkr_state::machine_start()
 	m_videobank->set_entry(3);
 	m_colorbank->set_entry(3);
 
-	m_digits.resolve();
-	m_lamps.resolve();
-
 	m_vp_sound_p2 = 0xff;   // default P2 latch value
 	m_sound_latch = 0xff;   // default sound data latch value
 	m_p24_data = 0xff;
@@ -1392,8 +1391,6 @@ void babypkr_state::machine_start()
 	videopkr_state::machine_start();
 
 	m_p24_data = 0;
-
-	m_top_lamps.resolve();
 }
 
 

@@ -352,10 +352,9 @@ void gberet_base_state::palette(palette_device &palette) const
 		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		// blue component
-		bit0 = 0;
-		bit1 = BIT(color_prom[i], 6);
-		bit2 = BIT(color_prom[i], 7);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
@@ -739,7 +738,7 @@ void gberet_state::gberet(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	K005849(config, m_k005849, 0);
+	K005849(config, m_k005849);
 	m_k005849->set_irq_cb().set("mainirq", FUNC(input_merger_any_high_device::in_w<0>));
 	m_k005849->set_firq_cb().set("mainirq", FUNC(input_merger_any_high_device::in_w<1>));
 	m_k005849->set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);

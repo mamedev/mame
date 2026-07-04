@@ -9116,7 +9116,7 @@ Corrupt graphics on [CGA]
 	</software>
 
 	<software name="poolrad">
-		<description>Advanced Dungeons &amp; Dragons - Pool of Radiance (5.25")</description>
+		<description>Advanced Dungeons &amp; Dragons: Pool of Radiance (5.25")</description>
 		<year>1988</year>
 		<publisher>SSI</publisher>
 		<info name="copy_protection" value="Codewheel required" />
@@ -9139,7 +9139,7 @@ Corrupt graphics on [CGA]
 	</software>
 
 	<software name="poolrad35" cloneof="poolrad">
-		<description>Advanced Dungeons &amp; Dragons - Pool of Radiance (3.5")</description>
+		<description>Advanced Dungeons &amp; Dragons: Pool of Radiance (3.5")</description>
 		<year>1988</year>
 		<publisher>SSI</publisher>
 		<info name="copy_protection" value="Codewheel required" />
@@ -19061,7 +19061,7 @@ Black screen, incomplete dump? Has autoexec.bat without command.com, requires to
 	</software>
 
 	<software name="wwfmania">
-		<description>WWF Wrestlemania</description>
+		<description>WWF WrestleMania</description>
 		<year>1991</year>
 		<publisher>Ocean Software</publisher>
 		<info name="copy_protection" value="Copy Protection Card required" />

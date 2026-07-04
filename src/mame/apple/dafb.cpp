@@ -49,6 +49,8 @@
 #include "emu.h"
 #include "dafb.h"
 
+#include "endianness.h"
+
 #define LOG_SWATCH      (1U << 1)
 #define LOG_CLOCKGEN    (1U << 2)
 #define LOG_MONSENSE    (1U << 3)

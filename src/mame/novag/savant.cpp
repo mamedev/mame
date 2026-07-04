@@ -70,7 +70,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
+	required_device<f8_cpu_device> m_mcu;
 	required_device<f38t56_device> m_psu;
 	required_device<hlcd0538_device> m_lcd1;
 	required_device<hlcd0539_device> m_lcd2;
@@ -146,13 +146,13 @@ u8 savant_state::nvram_r(offs_t offset)
 
 void savant_state::stall_w(offs_t offset, u8 data)
 {
-	// any access to port C0 puts the Z80 into WAIT, sets BUSRQ, and sets MCU EXT INT
+	// any access to port C0 puts the Z80 into WAIT, sets BUSREQ, and sets MCU EXT INT
 	if (!m_z80_wait)
 	{
 		m_databus = offset >> 8;
 		m_psu->ext_int_w(1);
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
-		m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, ASSERT_LINE);
+		m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, ASSERT_LINE);
 		m_maincpu->retry_access();
 	}
 
@@ -213,9 +213,9 @@ void savant_state::control_w(u8 data)
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 	}
 
-	// d1: clear Z80 BUSRQ
+	// d1: clear Z80 BUSREQ
 	if (data & ~m_control & 2)
-		m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, CLEAR_LINE);
+		m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, CLEAR_LINE);
 
 	// d2: return data for Z80
 
@@ -357,7 +357,7 @@ void savant_state::savant(machine_config &config)
 	F8(config, m_mcu, 4_MHz_XTAL/2);
 	m_mcu->set_addrmap(AS_PROGRAM, &savant_state::mcu_map);
 	m_mcu->set_addrmap(AS_IO, &savant_state::mcu_io);
-	m_mcu->set_irq_acknowledge_callback("psu", FUNC(f38t56_device::int_acknowledge));
+	m_mcu->int_cycle_callback().set(m_psu, FUNC(f38t56_device::int_acknowledge));
 
 	F38T56(config, m_psu, 4_MHz_XTAL/2);
 	m_psu->set_int_vector(0x0020);

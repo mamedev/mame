@@ -69,7 +69,6 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -78,7 +77,7 @@ private:
 	void seabattl_colorram_w(offs_t offset, uint8_t data);
 	void seabattl_control_w(uint8_t data);
 	uint8_t seabattl_collision_r();
-	void seabattl_collision_clear_w(uint8_t data);
+	void seabattl_collision_clear_w(uint8_t data = 0);
 	uint8_t seabattl_collision_clear_r();
 	void sound_w(uint8_t data);
 	void sound2_w(uint8_t data);
@@ -315,8 +314,8 @@ void seabattl_state::seabattl_control_w(uint8_t data)
 
 uint8_t seabattl_state::seabattl_collision_clear_r()
 {
-	m_screen->update_partial(m_screen->vpos());
-	m_collision = 0;
+	if (!machine().side_effects_disabled())
+		seabattl_collision_clear_w();
 	return 0;
 }
 
@@ -455,11 +454,8 @@ INPUT_PORTS_END
 
 void seabattl_state::machine_start()
 {
-	m_lamp.resolve();
-}
-
-void seabattl_state::machine_reset()
-{
+	save_item(NAME(m_waveenable));
+	save_item(NAME(m_collision));
 }
 
 static const gfx_layout tiles32x16x3_layout =
@@ -488,7 +484,7 @@ void seabattl_state::seabattl(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &seabattl_state::seabattl_data_map);
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
 	m_maincpu->intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
-	S2636(config, m_s2636, 0);
+	S2636(config, m_s2636);
 	m_s2636->set_offsets(-13, -29);
 	m_s2636->add_route(ALL_OUTPUTS, "mono", 0.10);
 

@@ -407,7 +407,7 @@ void pntnpuzl_state::pntnpuzl(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "mcu_eeprom").do_callback().set_inputline("mcu", i8x9x_device::HSI3_LINE);
 
-	TVGA9000_VGA(config, m_svga, 0);
+	TVGA9000_VGA(config, m_svga);
 	m_svga->set_screen(m_screen);
 	m_svga->set_vram_size(0x100000);
 

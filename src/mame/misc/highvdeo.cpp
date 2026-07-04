@@ -220,8 +220,6 @@ private:
 
 void highvdeo_state::machine_start()
 {
-	m_lamps.resolve();
-
 	if (m_mainbank.found()) /*bankaddress might be incorrect at brasil/fasion/grancapi/magicbom*/
 	{
 		uint32_t max = memregion("maincpu")->bytes() / 0x40000;
@@ -1237,7 +1235,7 @@ void highvdeo_state::tv_vcf(machine_config &config)
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 
 	PALETTE(config, m_palette).set_entries(0x100);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &highvdeo_state::ramdac_map);
 
 	/* sound hardware */
@@ -1390,7 +1388,7 @@ void highvdeo_state::magicbom(machine_config &config)
 	PALETTE(config, m_palette).set_entries(0x100);
 	m_palette->set_format(palette_device::RGB_565, 0x100);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &highvdeo_state::ramdac_map);
 
 	/* sound hardware */

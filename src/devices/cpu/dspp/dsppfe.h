@@ -14,51 +14,81 @@
 #pragma once
 
 #include "dspp.h"
+
 #include "cpu/drcfe.h"
 
-
-//**************************************************************************
-//  MACROS
-//**************************************************************************
-
-// register flags 0
-#define REGFLAG_R(n)                    (1 << (n))
-#define REGFLAG_RZ(n)                   (((n) == 0) ? 0 : REGFLAG_R(n))
-
-// register flags 1
-#define REGFLAG_FR(n)                   (1 << (n))
-
-// register flags 2
-#define REGFLAG_CR(n)                   (0xf0000000 >> (4 * (n)))
-#define REGFLAG_CR_BIT(n)               (0x80000000 >> (n))
-
-// register flags 3
-#define REGFLAG_XER_CA                  (1 << 0)
-#define REGFLAG_XER_OV                  (1 << 1)
-#define REGFLAG_XER_SO                  (1 << 2)
-#define REGFLAG_XER_COUNT               (1 << 3)
-#define REGFLAG_CTR                     (1 << 4)
-#define REGFLAG_LR                      (1 << 5)
-#define REGFLAG_FPSCR(n)                (1 << (6 + (n)))
-
+#include <cassert>
+#include <algorithm>
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class dspp_frontend : public drc_frontend
+class dspp_device::opcode_desc : public opcode_desc_base<opcode_desc, 16>
+{
+public:
+	uint16_t        opptr[6];               // copy of opcode and operands
+
+	uint32_t        cycles;                 // number of cycles needed to execute
+
+	void set_cc_c_used() { regin.set(REG_CC_C); }
+	void set_cc_c_modified() { regout.set(REG_CC_C); }
+	void set_cc_z_used() { regin.set(REG_CC_Z); }
+	void set_cc_z_modified() { regout.set(REG_CC_Z); }
+	void set_cc_n_used() { regin.set(REG_CC_N); }
+	void set_cc_n_modified() { regout.set(REG_CC_N); }
+	void set_cc_v_used() { regin.set(REG_CC_V); }
+	void set_cc_v_modified() { regout.set(REG_CC_V); }
+	void set_cc_x_used() { regin.set(REG_CC_X); }
+	void set_cc_x_modified() { regout.set(REG_CC_X); }
+
+	void set_reads_memory() { m_reads_memory = true; }
+	void set_writes_memory() { m_writes_memory = true; }
+
+	bool reads_memory() const { return m_reads_memory; }
+	bool writes_memory() const { return m_writes_memory; }
+
+	uint32_t epc() const { return pc; }
+
+	void reset(offs_t curpc, bool in_delay_slot)
+	{
+		static_assert(REG_COUNT <= 16);
+
+		opcode_desc_base::reset(curpc, in_delay_slot);
+
+		std::fill(std::begin(opptr), std::end(opptr), 0);
+		cycles = 0;
+	}
+
+private:
+	enum
+	{
+		REG_CC_C = 0,
+		REG_CC_Z,
+		REG_CC_N,
+		REG_CC_V,
+		REG_CC_X,
+
+		REG_COUNT
+	};
+
+	bool m_reads_memory;
+	bool m_writes_memory;
+};
+
+
+class dspp_device::frontend : public drc_frontend_base<opcode_desc>
 {
 public:
 	// construction/destruction
-	dspp_frontend(dspp_device *dspp, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
+	frontend(dspp_device *dspp, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
+	~frontend();
 
-protected:
-	// required overrides
-	virtual bool describe(opcode_desc &desc, const opcode_desc *prev) override;
+	opcode_desc const *describe_code(offs_t startpc);
 
 private:
-	// inlines
+	bool describe(opcode_desc &desc, opcode_desc const *prev);
 
 	// internal helpers
 	void describe_special(uint16_t op, opcode_desc &desc);

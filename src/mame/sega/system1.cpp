@@ -419,8 +419,6 @@ void shtngmst_state::machine_start()
 {
 	system1_state::machine_start();
 
-	m_gun_solenoid.resolve();
-
 	save_item(NAME(m_gun_output));
 	save_item(NAME(m_gun_trigger));
 }
@@ -570,7 +568,7 @@ void system1_state::mcu_control_w(u8 data)
 {
 	/*
 	    Bit 7 -> connects to TD62003 pins 5 & 6 @ IC151
-	    Bit 6 -> via PLS153, when high, asserts the BUSRQ signal, halting the Z80
+	    Bit 6 -> via PLS153, when high, asserts the BUSREQ signal, halting the Z80
 	    Bit 5 -> n/c
 	    Bit 4 -> (with bit 3) Memory select: 0=Z80 program space, 1=banked ROM, 2=Z80 I/O space, 3=watchdog?
 	    Bit 3 ->
@@ -579,12 +577,12 @@ void system1_state::mcu_control_w(u8 data)
 	    Bit 0 -> Directly connected to Z80 /INT line
 	*/
 
-	// boost interleave to ensure that the MCU can break the Z80 out of BUSRQ
+	// boost interleave to ensure that the MCU can break the Z80 out of BUSREQ
 	if (!BIT(m_mcu_control, 6) && BIT(data, 6))
 		machine().scheduler().perfect_quantum(attotime::from_usec(10));
 
 	m_mcu_control = data;
-	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -2202,13 +2200,12 @@ void system1_state::sys1ppi(machine_config &config)
 	Z80(config, m_maincpu, MASTER_CLOCK/5);
 	m_maincpu->set_addrmap(AS_PROGRAM, &system1_state::system1_map);
 	m_maincpu->set_addrmap(AS_IO, &system1_state::system1_ppi_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(system1_state::irq0_line_hold));
 	m_maincpu->refresh_cb().set(FUNC(system1_state::adjust_cycles));
 
 	Z80(config, m_soundcpu, SOUND_CLOCK/2);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &system1_state::sound_map);
 
-	TIMER(config, "soundirq", 0).configure_scanline(FUNC(system1_state::soundirq_gen), "screen", 32, 64);
+	TIMER(config, "soundirq").configure_scanline(FUNC(system1_state::soundirq_gen), "screen", 32, 64);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
@@ -2226,6 +2223,7 @@ void system1_state::sys1ppi(machine_config &config)
 	m_screen->set_raw(MASTER_CLOCK/2, 640, 0, 512, 260, 0, 224);
 	m_screen->set_screen_update(FUNC(system1_state::screen_update_system1));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_system1);
 	PALETTE(config, m_palette, FUNC(system1_state::system1_palette)).set_entries(2048, 256);
@@ -2282,8 +2280,6 @@ void system1_state::sys1pios(machine_config &config)
 void system1_state::mcu(machine_config &config)
 {
 	// basic machine hardware
-	m_maincpu->remove_vblank_int();
-
 	I8751(config, m_mcu, SOUND_CLOCK);
 	m_mcu->set_addrmap(AS_DATA, &system1_state::mcu_data_map);
 	m_mcu->port_out_cb<1>().set(FUNC(system1_state::mcu_control_w));
@@ -2330,7 +2326,6 @@ void system1_state::encrypted_sys1ppi_maps(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &system1_state::system1_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &system1_state::decrypted_opcodes_map);
 	m_maincpu->set_addrmap(AS_IO, &system1_state::system1_ppi_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(system1_state::irq0_line_hold));
 	m_maincpu->refresh_cb().set(FUNC(system1_state::adjust_cycles));
 }
 
@@ -2339,7 +2334,6 @@ void system1_state::encrypted_sys1pio_maps(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &system1_state::system1_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &system1_state::decrypted_opcodes_map);
 	m_maincpu->set_addrmap(AS_IO, &system1_state::system1_pio_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(system1_state::irq0_line_hold));
 	m_maincpu->refresh_cb().set(FUNC(system1_state::adjust_cycles));
 }
 
@@ -2348,7 +2342,6 @@ void system1_state::encrypted_sys2_mc8123_maps(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &system1_state::system1_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &system1_state::banked_decrypted_opcodes_map);
 	m_maincpu->set_addrmap(AS_IO, &system1_state::system1_ppi_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(system1_state::irq0_line_hold));
 	m_maincpu->refresh_cb().set(FUNC(system1_state::adjust_cycles));
 }
 
@@ -2498,6 +2491,7 @@ void system1_state::spattera(machine_config &config)
 	encrypted_sys1pio_maps(config);
 	z80.set_decrypted_tag(":decrypted_opcodes");
 }
+
 void system1_state::pitfall2(machine_config &config)
 {
 	sys1pio(config);

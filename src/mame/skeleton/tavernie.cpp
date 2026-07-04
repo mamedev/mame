@@ -418,7 +418,7 @@ void cpu09_state::cpu09(machine_config &config)
 	m_ptm->o2_callback().set_inputline("maincpu", INPUT_LINE_NMI);
 	m_ptm->irq_callback().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
@@ -450,7 +450,7 @@ void ivg09_state::ivg09(machine_config &config)
 	/* Devices */
 	subdevice<rs232_port_device>("rs232")->set_default_option(nullptr);
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(ivg09_state::kbd_put));
 
 	MC6845(config, m_crtc, 1008000); // unknown clock
@@ -478,8 +478,8 @@ ROM_START( ivg09 )
 	ROM_REGION( 0x19f0, "roms", 0 )
 	ROM_LOAD( "tavbug.bin",   0x0000, 0x1000, CRC(77945cae) SHA1(d89b577bc0b4e15e9a49a849998681bdc6cf5fbe) )
 	// these 2 are not used. Boottav is copied to ram at c100
-	ROM_LOAD_OPTIONAL( "promon.bin",   0x1000, 0x0800, CRC(43256bf2) SHA1(e81acb5b659d50d7b019b97ad5d2a8f129da39f6) )
-	ROM_LOAD_OPTIONAL( "boottav.bin",  0x1800, 0x01f0, CRC(ae1a858d) SHA1(ab2144a00afd5b75c6dcb15c2c3f9d6910a159ae) )
+	ROM_LOAD( "promon.bin",   0x1000, 0x0800, CRC(43256bf2) SHA1(e81acb5b659d50d7b019b97ad5d2a8f129da39f6) )
+	ROM_LOAD( "boottav.bin",  0x1800, 0x01f0, CRC(ae1a858d) SHA1(ab2144a00afd5b75c6dcb15c2c3f9d6910a159ae) )
 
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "big.bin",   0x0000, 0x1000, CRC(f27f6bfe) SHA1(d9509c6e1d10e042ad3cdfaec31114148dee9ff4)) // first half is rubbish

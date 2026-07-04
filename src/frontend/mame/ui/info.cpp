@@ -509,7 +509,7 @@ std::string machine_info::game_info_string() const
 		util::stream_format(buf,
 				(count > 1)
 					? ((clock != 0) ? u8"%1$d×%2$s %3$s\u00a0%4$s\n" : u8"%1$d×%2$s\n")
-					: ((clock != 0) ? u8"%2$s %3$s\u00a0%4$s\n" : "%2$s\n"),
+					: ((clock != 0) ? u8"%2$s %3$s\u00a0%4$s\n" : u8"%2$s\n"),
 				count, name, hz,
 				(d == 9) ? _("GHz") : (d == 6) ? _("MHz") : (d == 3) ? _("kHz") : _("Hz"));
 	}
@@ -565,7 +565,7 @@ std::string machine_info::game_info_string() const
 		util::stream_format(buf,
 				(count > 1)
 					? ((clock != 0) ? u8"%1$d×%2$s %3$s\u00a0%4$s" : u8"%1$d×%2$s")
-					: ((clock != 0) ? u8"%2$s %3$s\u00a0%4$s" : "%2$s"),
+					: ((clock != 0) ? u8"%2$s %3$s\u00a0%4$s" : u8"%2$s"),
 				count, sound.device().name(), hz,
 				(d == 9) ? _("GHz") : (d == 6) ? _("MHz") : (d == 3) ? _("kHz") : _("Hz"));
 
@@ -649,9 +649,15 @@ std::string machine_info::get_screen_desc(screen_device &screen) const
   menu_game_info - handle the game information menu
 -------------------------------------------------*/
 
-menu_game_info::menu_game_info(mame_ui_manager &mui, render_container &container) : menu_textbox(mui, container)
+menu_game_info::menu_game_info(mame_ui_manager &mui, render_target &target) : menu_textbox(mui, target)
 {
 	set_process_flags(PROCESS_CUSTOM_NAV);
+
+	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
+	{
+		if (image.user_loadable() || image.has_preset_images_selection())
+			m_notifiers.emplace_back(image.add_media_change_notifier(delegate(&menu_game_info::reload, this)));
+	}
 }
 
 menu_game_info::~menu_game_info()
@@ -670,7 +676,85 @@ void menu_game_info::populate_text(std::optional<text_layout> &layout, float &wi
 	{
 		rgb_t const color = ui().colors().text_color();
 		layout.emplace(create_layout(width));
+
+		// add the system info text
 		layout->add_text(ui().machine_info().game_info_string(), color);
+
+		// add media information
+		std::ostringstream mediainfo;
+		device_t *prev_parent = nullptr;
+		for (device_t &parent : device_enumerator(machine().root_device()))
+		{
+			for (device_image_interface &image : image_interface_enumerator(parent, 1))
+			{
+				if ((&image.device() != &parent) && (image.user_loadable() || image.has_preset_images_selection()))
+				{
+					if (&parent != prev_parent)
+					{
+						prev_parent = &parent;
+						util::stream_format(mediainfo, _("\nMedia: [root%1$s]\n"), parent.tag());
+					}
+					if (image.user_loadable())
+					{
+						if (!image.exists())
+						{
+							util::stream_format( mediainfo, _("%1$s (%2$s): [no media]\n"),
+										image.instance_name(),
+										image.brief_instance_name());
+						}
+						else if (!image.loaded_through_softlist())
+						{
+							util::stream_format(mediainfo, _("%1$s (%2$s): %3$s\n"),
+										image.instance_name(),
+										image.brief_instance_name(),
+										image.filename());
+						}
+						else
+						{
+							software_info const &swinfo(*image.software_entry());
+							auto const partid = image.get_feature("part_id");
+							char const *fmt;
+							if (partid)
+							{
+								if (swinfo.supported() == software_support::UNSUPPORTED)
+									fmt = _("%1$s (%2$s): %3$s:%4$s %5$s (not supported)\n%6$s\n%7$s, %8$s\n");
+								else if (swinfo.supported() == software_support::UNSUPPORTED)
+									fmt = _("%1$s (%2$s): %3$s:%4$s %5$s (partially supported)\n%6$s\n%7$s, %8$s\n");
+								else
+									fmt = _("%1$s (%2$s): %3$s:%4$s %5$s\n%6$s\n%7$s, %8$s\n");
+							}
+							else
+							{
+								if (swinfo.supported() == software_support::UNSUPPORTED)
+									fmt = _("%1$s (%2$s): %3$s:%4$s (not supported)\n%6$s\n%7$s, %8$s\n");
+								else if (swinfo.supported() == software_support::UNSUPPORTED)
+									fmt = _("%1$s (%2$s): %3$s:%4$s (partially supported)\n%6$s\n%7$s, %8$s\n");
+								else
+									fmt = _("%1$s (%2$s): %3$s:%4$s\n%6$s\n%7$s, %8$s\n");
+							}
+							util::stream_format(mediainfo, fmt,
+									image.instance_name(),
+									image.brief_instance_name(),
+									image.basename(),
+									image.part_entry()->name(),
+									partid,
+									swinfo.longname(),
+									swinfo.publisher(),
+									swinfo.year());
+						}
+					}
+					else if (image.has_preset_images_selection())
+					{
+						util::stream_format(mediainfo, _("%1$s (%2$s preset %u)\n"),
+								image.preset_images_list()[image.current_preset_image_id()],
+								image.filename(),
+								image.current_preset_image_id() + 1);
+					}
+				}
+			}
+		}
+		layout->add_text(std::move(mediainfo).str(), color);
+
 		lines = layout->lines();
 	}
 	width = layout->actual_width();
@@ -680,12 +764,17 @@ void menu_game_info::populate()
 {
 }
 
+void menu_game_info::reload(device_image_interface::media_change_event ev)
+{
+	reset_layout();
+}
+
 
 /*-------------------------------------------------
   menu_warn_info - handle the emulation warnings menu
 -------------------------------------------------*/
 
-menu_warn_info::menu_warn_info(mame_ui_manager &mui, render_container &container) : menu_textbox(mui, container)
+menu_warn_info::menu_warn_info(mame_ui_manager &mui, render_target &target) : menu_textbox(mui, target)
 {
 	set_process_flags(PROCESS_CUSTOM_NAV);
 }
@@ -737,95 +826,6 @@ void menu_warn_info::populate_text(std::optional<text_layout> &layout, float &wi
 
 void menu_warn_info::populate()
 {
-}
-
-
-/*-------------------------------------------------
-  menu_image_info - handle the image information menu
--------------------------------------------------*/
-
-menu_image_info::menu_image_info(mame_ui_manager &mui, render_container &container) : menu(mui, container)
-{
-	set_heading(_("Media Image Information"));
-}
-
-menu_image_info::~menu_image_info()
-{
-}
-
-void menu_image_info::menu_activated()
-{
-	reset(reset_options::REMEMBER_POSITION);
-}
-
-void menu_image_info::populate()
-{
-	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
-		image_info(image);
-}
-
-bool menu_image_info::handle(event const *ev)
-{
-	return false;
-}
-
-
-/*-------------------------------------------------
-  image_info - display image info for a specific
-  image interface device
--------------------------------------------------*/
-
-void menu_image_info::image_info(device_image_interface &image)
-{
-	if (!image.user_loadable())
-		return;
-
-	m_notifiers.emplace_back(image.add_media_change_notifier(delegate(&menu_image_info::reload, this)));
-
-	if (image.exists())
-	{
-		// display device type and filename
-		item_append(image.brief_instance_name(), image.basename(), 0, &image);
-
-		// if image has been loaded through softlist, let's add some more info
-		if (image.loaded_through_softlist())
-		{
-			software_info const &swinfo(*image.software_entry());
-
-			// display full name, publisher and year
-			item_append(swinfo.longname(), FLAG_DISABLE, nullptr);
-			item_append(string_format("%1$s, %2$s", swinfo.publisher(), swinfo.year()), FLAG_DISABLE, nullptr);
-
-			// display supported information, if available
-			switch (swinfo.supported())
-			{
-			case software_support::UNSUPPORTED:
-				item_append(_("Not supported"), FLAG_DISABLE, nullptr);
-				break;
-			case software_support::PARTIALLY_SUPPORTED:
-				item_append(_("Partially supported"), FLAG_DISABLE, nullptr);
-				break;
-			case software_support::SUPPORTED:
-				break;
-			}
-		}
-	}
-	else
-	{
-		item_append(image.brief_instance_name(), _("[empty]"), 0, &image);
-	}
-	item_append(menu_item_type::SEPARATOR);
-}
-
-
-/*-------------------------------------------------
-  reload - refresh the menu after a media change
--------------------------------------------------*/
-
-void menu_image_info::reload(device_image_interface::media_change_event ev)
-{
-	m_notifiers.clear();
-	reset(reset_options::REMEMBER_REF);
 }
 
 } // namespace ui

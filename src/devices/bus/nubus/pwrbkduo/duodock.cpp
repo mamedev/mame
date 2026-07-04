@@ -56,6 +56,8 @@
 #include "screen.h"
 #include "softlist_dev.h"
 
+#include "endianness.h"
+
 #define LOG_DRQ         (1U << 1)
 #define LOG_HANDSHAKE   (1U << 2)
 #define LOG_VIDEO       (1U << 3)
@@ -212,13 +214,12 @@ ioport_constructor duodock_device::device_input_ports() const
 void duodock_device::device_add_mconfig(machine_config &config)
 {
 	APPLE_PSEUDOVIA(config, m_pvia, 15.6672_MHz_XTAL);
-	m_pvia->set_is_aiv3();          // AIV3 is a "pure" pseudovia that doesn't use the 6522 back-compatible IER
 	m_pvia->readmsc_handler().set(FUNC(duodock_device::vsc_r));
 	m_pvia->writemsc_handler().set(FUNC(duodock_device::vsc_w));
 	m_pvia->writevideo_handler().set(FUNC(duodock_device::vidhandler_w));
 	m_pvia->irq_callback().set(FUNC(duodock_device::dock_irq_w));
 
-	ARIEL(config, m_ramdac, 0);
+	ARIEL(config, m_ramdac);
 
 	ICD2053B(config, m_clockgen, 15.6672_MHz_XTAL);
 	m_clockgen->clkout_changed().set(FUNC(duodock_device::pclock_w));
@@ -246,12 +247,11 @@ void duodock_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "dscsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "dscsi:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "dscsi:6", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "dscsi:7").option_set("ncr53c80", NCR53C80).machine_config([this](device_t *device)
-	{
-		ncr5380_device &adapter = downcast<ncr5380_device &>(*device);
-		adapter.irq_handler().set(*this, FUNC(duodock_device::scsi_irq_w));
-		adapter.drq_handler().set(*this, FUNC(duodock_device::scsi_drq_w));
-	});
+
+	NCR53C80(config, m_ncr);
+	m_scsibus->set_external_device(7, m_ncr);
+	m_ncr->irq_handler().set(DEVICE_SELF, FUNC(duodock_device::scsi_irq_w));
+	m_ncr->drq_handler().set(DEVICE_SELF, FUNC(duodock_device::scsi_drq_w));
 
 	SWIM2(config, m_fdc, 15.6672_MHz_XTAL);
 	m_fdc->devsel_cb().set(FUNC(duodock_device::devsel_w));
@@ -261,7 +261,7 @@ void duodock_device::device_add_mconfig(machine_config &config)
 	applefdintf_device::add_35_hd(config, m_floppy[0]);
 	applefdintf_device::add_35_nc(config, m_floppy[1]);
 
-	nubus_device &nubus(NUBUS(config, "nubus", 0));
+	nubus_device &nubus(NUBUS(config, "nubus"));
 	if (((nubus_slot_device *)owner())->get_nubus_bustag() != nullptr)
 	{
 		m_fulltag = string_format(":%s", ((nubus_slot_device *)owner())->get_nubus_bustag());
@@ -289,7 +289,7 @@ duodock_device::duodock_device(const machine_config &mconfig, device_type type, 
 	m_scc(*this, "scc"),
 	m_rom(*this, "dock"),
 	m_scsibus(*this, "dscsi"),
-	m_ncr(*this, "dscsi:7:ncr53c80"),
+	m_ncr(*this, "ncr53c80"),
 	m_fdc(*this, "fdc"),
 	m_floppy(*this, "fdc:%d", 0U),
 	m_monitor_config(*this, "monitor"),

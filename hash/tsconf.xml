@@ -1,0 +1,461 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="tsconf" description="TS-Configuration (All Formats)">
+
+<!-- !Snapshots -->
+
+	<software name="alterego">
+		<description>Alter Ego</description>
+		<year>2011</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Blade"/>
+		<info name="developer" value="Shiru"/>
+		<info name="developer" value="brightentayle"/>
+		<part name="dump" interface="spectrum_snapshot">
+			<dataarea name="dump" size="32256">
+				<rom name="alteregobeta.spg" size="32256" crc="5645820c" sha1="957b66480d513bb8a34187326cb8b1824925bbc3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bomberman">
+		<description>Bomberman</description>
+		<year>2012</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Budder"/>
+		<info name="developer" value="Wizart"/>
+		<info name="developer" value="Crash"/>
+		<info name="developer" value="Breeze"/>
+		<part name="dump" interface="spectrum_snapshot">
+			<dataarea name="dump" size="102400">
+				<rom name="bomber.spg" size="102400" crc="16601e87" sha1="7bc8bf23ffba2e8177485303ba0879bb26ac4453" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brucelee">
+		<description>Bruce Lee</description>
+		<year>2015</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Blade"/>
+		<part name="dump" interface="spectrum_snapshot">
+			<dataarea name="dump" size="71680">
+				<rom name="brucelee.spg" size="71680" crc="a86875e1" sha1="475732defc8d88ad0160b071ad5a6535cb220ff5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chase">
+		<description>Chase</description>
+		<year>2012</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Blade"/>
+		<info name="developer" value="Shiru"/>
+		<part name="dump" interface="spectrum_snapshot">
+			<dataarea name="dump" size="13824">
+				<rom name="chase.spg" size="13824" crc="0b8b82fe" sha1="79a26756345f9178adb1305dbd5c31ea87d9f252" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digger">
+		<description>Digger</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Hacker VBI"/>
+		<info name="developer" value="Er"/>
+		<info name="developer" value="n1k-o"/>
+		<part name="dump" interface="spectrum_snapshot">
+			<dataarea name="dump" size="411648">
+				<rom name="Digger.spg" size="411648" crc="f6c1de1b" sha1="d2d85cefd758832dfb89abb24b672e1a05eef009" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="edgegrinder">
+		<description>Edge Grinder v1.01</description>
+		<year>2018</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Blade"/>
+		<info name="developer" value="Trevor Smila Storey"/>
+		<info name="developer" value="Tom+Jerry"/>
+		<part name="dump" interface="spectrum_snapshot">
+			<dataarea name="dump" size="43520">
+				<rom name="edge_grinder.spg" size="43520" crc="dfbce1ca" sha1="932a8627cd2a69392d7b6eb2995ab52d9ca60288" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jptst">
+		<description>Jim Power Test</description>
+		<year>201?</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Blade"/>
+		<part name="dump" interface="spectrum_snapshot">
+			<dataarea name="dump" size="60928">
+				<rom name="jptst.spg" size="60928" crc="f12f6921" sha1="4f1b2efc14ae006cb574bfa109e30680a96fbe18" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lirus">
+		<description>Lirus</description>
+		<year>201?</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Denis Grachev"/>
+		<info name="developer" value="nodeus"/>
+		<info name="developer" value="Oleg Nikitin"/>
+		<info name="developer" value="Alex Lobov"/>
+		<info name="developer" value="Alex Semenov"/>
+		<info name="developer" value="Hacker VBI"/>
+		<part name="dump" interface="spectrum_snapshot">
+			<dataarea name="dump" size="323072">
+				<rom name="Lirus.spg" size="323072" crc="5c081bd8" sha1="abec5973471697b82f36bdfe6cbc71498892a945" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lost">
+		<description>Touhou Zero. Lost Donation Box Incident</description>
+		<year>201?</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Nihirash"/>
+		<info name="developer" value="Hina"/>
+		<info name="developer" value="EA"/>
+		<info name="developer" value="Gogin"/>
+		<info name="developer" value="Scalesmann"/>
+		<info name="developer" value="wbc"/>
+		<part name="dump" interface="spectrum_snapshot">
+			<dataarea name="dump" size="1901568">
+				<rom name="lost-ts.spg" size="1901568" crc="d2322d8b" sha1="8176b473d3be34543be1e35749b1c6e4baa5db61" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="multidude">
+		<description>MultiDude</description>
+		<year>2014</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Denis Grachev"/>
+		<info name="developer" value="Hacker VBI"/>
+		<info name="developer" value="brightentayle"/>
+		<info name="developer" value="MMCM"/>
+		<part name="dump" interface="spectrum_snapshot">
+			<dataarea name="dump" size="26624">
+				<rom name="MultiDude.spg" size="26624" crc="c3e10b45" sha1="e2046de86f546db2a8d95244d3c703358f5e1655" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ninjagarden">
+		<description>Ninja Gaiden</description>
+		<year>201?</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Blade"/>
+		<part name="dump" interface="spectrum_snapshot">
+			<dataarea name="dump" size="173056">
+				<rom name="NinjaGaiden.spg" size="173056" crc="10fca9ba" sha1="398eeb975604b1f75c36d750539f248e1aab114d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="otterandsmoker">
+		<description>Otter &amp; Smoker</description>
+		<year>201?</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Black Cat"/>
+		<info name="developer" value="Hacker VBI"/>
+		<info name="developer" value="Marie Slip"/>
+		<info name="developer" value="Mike Gamaev"/>
+		<info name="developer" value="Colorizator"/>
+		<info name="developer" value="Joe Vondayl"/>
+		<info name="developer" value="Mister Robin"/>
+		<info name="developer" value="Fatalsnipe"/>
+		<info name="developer" value="Alex Mart"/>
+		<part name="v1_6_neogs" interface="spectrum_snapshot">
+			<dataarea name="dump" size="1703424">
+				<rom name="Otter&amp;Smocker v1.6 (NEOGS).spg" size="1703424" crc="b069bff4" sha1="b28ac7a9afcb11d7cbfc6392df601e3b6473d9b1" />
+			</dataarea>
+		</part>
+		<part name="v1_6_turbosound" interface="spectrum_snapshot">
+			<dataarea name="dump" size="1703424">
+				<rom name="Otter&amp;Smocker v1.6 (TAY).spg" size="1703424" crc="7539f2ca" sha1="e7c85f002e31b0ef4fe02c6565e8552ef528778b" />
+			</dataarea>
+		</part>
+		<part name="v1_6_nofx" interface="spectrum_snapshot">
+			<dataarea name="dump" size="1703424">
+				<rom name="Otter&amp;Smocker v1.6 (NoFX).spg" size="1703424" crc="a76b1815" sha1="063d1d0922bc1c70f0832c3ba17d35f413bb10b2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ottifants">
+		<description>Ottifants</description>
+		<year>201?</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Dr.Max"/>
+		<info name="developer" value="EA"/>
+		<info name="developer" value="Fatalsnipe"/>
+		<info name="developer" value="Gogin"/>
+		<info name="developer" value="MR287CC"/>
+		<info name="developer" value="n1k-o"/>
+		<info name="developer" value="Quiet"/>
+		<info name="developer" value="Hacker VBI"/>
+		<part name="dump" interface="spectrum_snapshot">
+			<dataarea name="dump" size="358912">
+				<rom name="Ottifants.spg" size="358912" crc="103cd3f2" sha1="159a7679873c6293f67740a0aa8c65924cdccac5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacpack">
+		<description>PacPack</description>
+		<year>2018</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Hacker VBI"/>
+		<part name="dump" interface="spectrum_snapshot">
+			<dataarea name="dump" size="297472">
+				<rom name="PacPack.spg" size="297472" crc="a3918598" sha1="4d1497a8774c50ea962290078e1a2f2931a44f3b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="parallax">
+		<description>Cannon Fodder Parallax</description>
+		<year>201?</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Blade"/>
+		<part name="dump" interface="spectrum_snapshot">
+			<dataarea name="dump" size="20480">
+				<rom name="cfparallax.spg" size="20480" crc="4e500604" sha1="8e11d90a0bb72ec408dfc212f9fa01ce5acc7186" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sirababol">
+		<description>Sir Ababol</description>
+		<year>201?</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Blade"/>
+		<info name="developer" value="n1k-o"/>
+		<info name="developer" value="na_th_an"/>
+		<part name="dump" interface="spectrum_snapshot">
+			<dataarea name="dump" size="36864">
+				<rom name="sirababol.spg" size="36864" crc="a8158028" sha1="83997cbc28a16670ab0a1cdb470f2b7624062353" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="socoban">
+		<description>Socoban</description>
+		<year>2015</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="g0blinish"/>
+		<part name="dump" interface="spectrum_snapshot">
+			<dataarea name="dump" size="24064">
+				<rom name="soco.spg" size="24064" crc="c5b5179c" sha1="3518bbc1145e4941c08703084d52b4ba4ea53272" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonicthehedgehog">
+		<description>Sonic the Hedgehog</description>
+		<year>201?</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="n1k-o"/>
+		<info name="developer" value="Hacker VBI"/>
+		<part name="dump" interface="spectrum_snapshot">
+			<dataarea name="dump" size="320512">
+				<rom name="Sonic.spg" size="320512" crc="84abf16d" sha1="8cd8b3083e3143d26262116bb07646f69c462909" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="streetfighter2">
+		<description>Street Fighter 2 (v1.1)</description>
+		<year>2023</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Black Cat"/>
+		<info name="developer" value="Marie Slip"/>
+		<info name="developer" value="n1k-o"/>
+		<part name="dump" interface="spectrum_snapshot">
+			<dataarea name="dump" size="3172352">
+				<rom name="SFv1.1.spg" size="3172352" crc="a46029fc" sha1="10a65e1ea8d1f756edfd670820afcb3f7a81f9dd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tcircles">
+		<description>T-circles</description>
+		<year>201?</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Buyan"/>
+		<part name="dump" interface="spectrum_snapshot">
+			<dataarea name="dump" size="22528">
+				<rom name="Tcircles.spg" size="22528" crc="ac5c5b9b" sha1="13102d62ba48c45d77fbeb9e953c122fc8f6c8b2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris">
+		<description>Tetris</description>
+		<year>201?</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="denpopov"/>
+		<part name="dump" interface="spectrum_snapshot">
+			<dataarea name="dump" size="3584">
+				<rom name="tetris.spg" size="3584" crc="335c998d" sha1="f730ea4eabb1b301bf8b8e2713bbf0ae2d3745fe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uwol">
+		<description>Uwol - Quest for Money</description>
+		<year>2012</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Blade"/>
+		<info name="developer" value="Shiru"/>
+		<part name="dump" interface="spectrum_snapshot">
+			<dataarea name="dump" size="53760">
+				<rom name="uwol_1.0.spg" size="53760" crc="768fc5ca" sha1="78c8c63ce896d03f620c03269d73ff018563f885" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wonderboy">
+		<description>Wonder Boy</description>
+		<year>201?</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Blade"/>
+		<part name="dump" interface="spectrum_snapshot">
+			<dataarea name="dump" size="84992">
+				<rom name="WonderBoy.spg" size="84992" crc="f6fcc4cd" sha1="fd0ba88a6f521a664e70995188102c77e8cd8331" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xonix">
+		<description>Xonix</description>
+		<year>2012</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Shiru"/>
+		<part name="dump" interface="spectrum_snapshot">
+			<dataarea name="dump" size="224256">
+				<rom name="xnx.spg" size="224256" crc="b6da5a5d" sha1="a3ec74ce8bb239565fac7425283cd0c4adcc0d13" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zenloops">
+		<description>Zen Loops</description>
+		<year>201?</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="g0blinish"/>
+		<part name="dump" interface="spectrum_snapshot">
+			<dataarea name="dump" size="18432">
+				<rom name="zenloops.spg" size="18432" crc="50f3a0e4" sha1="6a99fdac432f5467dc16bbb7374a7455eca9df19" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- !Floppies -->
+
+	<software name="copter">
+		<description>Copter v0.1</description>
+		<year>2012</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Wizart"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="COPTER.trd" size="655360" crc="43236562" sha1="c4e3a9bcfd2387e954372a633f7415db368dbd4b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ouk">
+		<description>Once Upon a Time in a Kingdom</description>
+		<year>201?</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Marie Slip"/>
+		<info name="developer" value="Colorizator"/>
+		<info name="developer" value="Devstratum, Graf Cherry"/>
+		<info name="developer" value="Mister Robin"/>
+		<info name="developer" value="Fatalsnipe"/>
+		<info name="developer" value="Karbafos"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="O.U.K (AY) last-cat.trd" size="655360" crc="5f84d0f7" sha1="c4e061dde0b4cc3244e994b51b1ed02ef8b56fbc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="synchronization">
+		<description>Synchronization</description>
+		<year>201?</year>
+		<publisher>Robus</publisher>
+		<info name="developer" value="Hacker VBI"/>
+		<info name="developer" value="Robus"/>
+		<info name="developer" value="Mellona"/>
+		<info name="developer" value="n1k-o"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="SYNCHRO.TRD" size="655360" crc="8b99764d" sha1="022ea81b2f3e2154ee0fdd733dbe6ddc8a020ca6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tsdemo">
+		<description>TS-TechDemo</description>
+		<year>2013</year>
+		<publisher>Wizart/DT</publisher>
+		<info name="developer" value="Wizart"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="TSDemo.trd" size="655360" crc="c2e72fe4" sha1="fe99a846c9702c3c424daa8b6509458853bcf5ff" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tsolitaire">
+		<description>TSolitaire</description>
+		<year>201?</year>
+		<publisher>ERA Creative Group (Multinational)</publisher>
+		<info name="developer" value="Marie Slip"/>
+		<info name="developer" value="n1k-o"/>
+		<info name="developer" value="Black Cat"/>
+		<info name="developer" value="Inside"/>
+		<part name="v2_0_turbosound" interface="floppy_5_25">
+			<dataarea name="flop1" size="655360">
+				<rom name="TS v2.0(TFM)_edited.trd" size="655360" crc="05cf31ef" sha1="6a25e71b805c21410607f8c62a62198333ced2fd" />
+			</dataarea>
+		</part>
+		<part name="v2_0" interface="floppy_5_25">
+			<dataarea name="flop1" size="655360">
+				<rom name="TS v2.0_edited.trd" size="655360" crc="e4d026bb" sha1="a8bbb38f301cc588f3af0f8ed01f0822c7b38ab3" />
+			</dataarea>
+		</part>
+		<part name="v1_1" interface="floppy_5_25">
+			<dataarea name="flop1" size="655360">
+				<rom name="TSolv1.1.trd" size="655360" crc="0ec1c4da" sha1="5c0a0cb8c8043748b582750d0171d68d9ac4d6c7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zxbatlecity">
+		<description>ZX Battle City v1.4 (NoVDAC)</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Marie Slip"/>
+		<info name="developer" value="n1k-o"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="zxbattlecity_1_4_novdac.trd" size="655360" crc="0a2bfb45" sha1="21747a464db723d934ec2fa8a398b212344f6c1e" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

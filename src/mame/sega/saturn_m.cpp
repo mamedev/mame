@@ -225,7 +225,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 	if(scanline == (vblank_line+1) * y_step)
 	{
 		/* docs mentions that VBE happens one line after vblank-in. */
-		if(VDP1_VBE)
+		if(VDP1_VBE())
 			m_vdp1.framebuffer_clear_on_next_frame = 1;
 	}
 

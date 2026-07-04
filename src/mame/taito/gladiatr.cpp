@@ -496,7 +496,7 @@ u8 ppking_state::ppking_qx0_r(offs_t offset)
 			m_mcu[0].rxd |= 0x40;
 	}
 
-	//printf("%04x rst %d\n",m_maincpu->pc(),m_mcu[0].rst);
+	//logerror("%04x rst %d\n", m_maincpu->pc(),m_mcu[0].rst);
 
 	return m_mcu[0].rxd;
 }
@@ -536,8 +536,7 @@ void ppking_state::ppking_qx0_w(offs_t offset, u8 data)
 				break;
 
 			default:
-				printf("%02x %02x\n",offset,data);
-				break;
+				logerror("ppking_qx0_w: %02x %02x\n", offset, data);
 		}
 	}
 	else
@@ -1073,7 +1072,7 @@ void gladiatr_state::gladiatr(machine_config &config)
 	m_msm->set_prescaler_selector(msm5205_device::SEX_4B);  /* vclk input mode */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.60);
 
-	LS259(config, "filtlatch", 0); // 9R - filters on sound output
+	LS259(config, "filtlatch"); // 9R - filters on sound output
 }
 
 void gladiatr_state::greatgur(machine_config &config)

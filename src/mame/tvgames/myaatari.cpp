@@ -79,19 +79,27 @@ void myaatari_state::myaatari(machine_config &config)
 
 ROM_START( myaatari )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "atariarcade_s29gl128p11tfi02_0001227e.bin", 0x000000, 0x1000000, CRC(c838563c) SHA1(7b3a76d29556f5c30679efcece50e31ae5a5d489) )
-	ROM_IGNORE(0x100)
+	ROM_LOAD( "atariarcade_s29gl128p11tfi02_0001227e.bin", 0x000000, 0x1000000, CRC(ac6997bb) SHA1(9571e22181d8b838e223a4ef993c28425a5f0024) )
 ROM_END
 
 ROM_START( kuniotv )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "s29gl064n90tfi04.u2", 0x000000, 0x0800000, CRC(f26cd4a2) SHA1(92b7af5ecb8b58065cfa39cac77e32242383af78) )
-	ROM_IGNORE(0x100)
+	ROM_LOAD( "s29gl064n90tfi04.u2", 0x000000, 0x0800000, CRC(08556ac5) SHA1(2761481c0318ba9202ae57b33b8c521512ac787a) )
 ROM_END
 
 ROM_START( pachdmi )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "mx29lb160db.u2", 0x000000, 0x200000, CRC(b7d361b5) SHA1(92c20c58db24cc16f8c393334055a34cd35c720e) )
+ROM_END
+
+ROM_START( galghdmi )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "s29al016d70tfi02.u2", 0x000000, 0x200000, CRC(6d390962) SHA1(7825baf0e0cf16be1c7130bfae2dbb40379c4693) )
+ROM_END
+
+ROM_START( tetrhdmi )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "mbm29lv800be.u2", 0x000000, 0x100000, CRC(e82215e8) SHA1(810e0e4cc2c76e81a22085a27014d8fac5790662) )
 ROM_END
 
 } // anonymous namespace
@@ -103,3 +111,6 @@ CONS( 2021, kuniotv,       0,              0,      myaatari, myaatari, myaatari_
 
 // unbranded box, generic looking Pac-Man logo, runs arcade version with copyrights stripped out
 CONS( 2021, pachdmi,       0,              0,      myaatari, myaatari, myaatari_state, empty_init, "<unknown>", "Pac-Man HDMI TV Plug & Play", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+// similar to the Pac-Man, generic looking HDMI sticks
+CONS( 2021, galghdmi,      0,              0,      myaatari, myaatari, myaatari_state, empty_init, "<unknown>", "Galaga HDMI TV Plug & Play", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2021, tetrhdmi,      0,              0,      myaatari, myaatari, myaatari_state, empty_init, "<unknown>", "Tetris HDMI TV Plug & Play", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -64,7 +64,7 @@ protected:
 
 protected:
 	// devices/pointers
-	required_device<cpu_device> m_maincpu;
+	required_device<f8_cpu_device> m_maincpu;
 	required_device<f38t56_device> m_psu;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_1bit_device> m_dac;
@@ -312,7 +312,7 @@ void omar_state::omar1(machine_config &config)
 	F8(config, m_maincpu, 2700000/2); // approximation
 	m_maincpu->set_addrmap(AS_PROGRAM, &omar_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &omar_state::main_io);
-	m_maincpu->set_irq_acknowledge_callback(m_psu, FUNC(f38t56_device::int_acknowledge));
+	m_maincpu->int_cycle_callback().set(m_psu, FUNC(f38t56_device::int_acknowledge));
 
 	F38T56(config, m_psu, 2700000/2);
 	m_psu->set_int_vector(0x20);

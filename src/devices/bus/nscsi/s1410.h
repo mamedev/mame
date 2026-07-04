@@ -13,6 +13,17 @@ class nscsi_s1410_device : public nscsi_harddisk_device
 public:
 	nscsi_s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// The opt-in cylinder-aware seek-timing model lives in nscsi_harddisk_device;
+	// set_seek_timing() is inherited.  With no call this controller keeps its
+	// legacy flat 85 ms per-command delay (see scsi_data_command_delay()), so
+	// existing users (victor9k, mikromik, x37_sasi, db4105, idpartner_sasi) are
+	// unchanged.  Example -- a Seagate ST-506/ST-412 (ST412 OEM manual, April
+	// 1982: 3600 RPM, track-to-track 3 ms, average 85 ms, full-stroke 205 ms),
+	// media formatted 1:1; configure once attached, e.g. from machine_start():
+	//
+	//     if (auto *s = dynamic_cast<nscsi_s1410_device *>(subdevice("sasi:0:s1410")))
+	//         s->set_seek_timing(3000, 85000, 205000, 3600, 1);
+
 protected:
 	// SCSI status returns
 	enum {

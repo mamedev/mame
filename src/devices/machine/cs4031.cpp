@@ -128,16 +128,16 @@ void cs4031_device::device_add_mconfig(machine_config &config)
 	m_dma2->out_dack_callback<2>().set(FUNC(cs4031_device::dma2_dack2_w));
 	m_dma2->out_dack_callback<3>().set(FUNC(cs4031_device::dma2_dack3_w));
 
-	PIC8259(config, m_intc1, 0);
+	PIC8259(config, m_intc1);
 	m_intc1->out_int_callback().set(FUNC(cs4031_device::intc1_int_w));
 	m_intc1->in_sp_callback().set_constant(1);
 	m_intc1->read_slave_ack_callback().set(FUNC(cs4031_device::intc1_slave_ack_r));
 
-	PIC8259(config, m_intc2, 0);
+	PIC8259(config, m_intc2);
 	m_intc2->out_int_callback().set(m_intc1, FUNC(pic8259_device::ir2_w));
 	m_intc2->in_sp_callback().set_constant(0);
 
-	PIT8254(config, m_ctc, 0);
+	PIT8254(config, m_ctc);
 	m_ctc->set_clk<0>(XTAL(14'318'181) / 12.0);
 	m_ctc->out_handler<0>().set(m_intc1, FUNC(pic8259_device::ir0_w));
 	m_ctc->set_clk<1>(XTAL(14'318'181) / 12.0);
@@ -159,7 +159,7 @@ void cs4031_device::device_add_mconfig(machine_config &config)
 //  cs4031_device - constructor
 //-------------------------------------------------
 
-cs4031_device::cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cs4031_device::cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, CS4031, tag, owner, clock),
 	m_read_ior(*this, 0),
 	m_write_iow(*this),
@@ -172,7 +172,6 @@ cs4031_device::cs4031_device(const machine_config &mconfig, const char *tag, dev
 	m_write_spkr(*this),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_keybc(*this, finder_base::DUMMY_TAG),
-	m_isa(*this, finder_base::DUMMY_TAG),
 	m_bios(*this, finder_base::DUMMY_TAG),
 	m_space(nullptr),
 	m_space_io(nullptr),
@@ -235,7 +234,7 @@ void cs4031_device::device_start()
 	m_space_io = &m_cpu->memory().space(AS_IO);
 
 	m_ram = m_ram_dev->pointer();
-	uint32_t ram_size = m_ram_dev->size();
+	u32 ram_size = m_ram_dev->size();
 
 	// install base memory
 	m_space->install_ram(0x000000, 0x09ffff, m_ram);
@@ -314,7 +313,7 @@ offs_t cs4031_device::page_offset()
 	return 0xff0000;
 }
 
-uint8_t cs4031_device::dma_read_byte(offs_t offset)
+u8 cs4031_device::dma_read_byte(offs_t offset)
 {
 	if (m_dma_channel == -1)
 		return 0xff;
@@ -322,7 +321,7 @@ uint8_t cs4031_device::dma_read_byte(offs_t offset)
 	return m_space->read_byte(page_offset() + offset);
 }
 
-void cs4031_device::dma_write_byte(offs_t offset, uint8_t data)
+void cs4031_device::dma_write_byte(offs_t offset, u8 data)
 {
 	if (m_dma_channel == -1)
 		return;
@@ -330,18 +329,18 @@ void cs4031_device::dma_write_byte(offs_t offset, uint8_t data)
 	m_space->write_byte(page_offset() + offset, data);
 }
 
-uint8_t cs4031_device::dma_read_word(offs_t offset)
+u8 cs4031_device::dma_read_word(offs_t offset)
 {
 	if (m_dma_channel == -1)
 		return 0xff;
 
-	uint16_t result = m_space->read_word((page_offset() & 0xfe0000) | (offset << 1));
+	u16 result = m_space->read_word((page_offset() & 0xfe0000) | (offset << 1));
 	m_dma_high_byte = result >> 8;
 
 	return result;
 }
 
-void cs4031_device::dma_write_word(offs_t offset, uint8_t data)
+void cs4031_device::dma_write_word(offs_t offset, u8 data)
 {
 	if (m_dma_channel == -1)
 		return;
@@ -386,7 +385,7 @@ void cs4031_device::update_dma_clock()
 {
 	if (m_dma_clock_divider[m_registers[DMA_CLOCK] & 0x0f] != 0)
 	{
-		uint32_t dma_clock = clock() / m_dma_clock_divider[m_registers[DMA_CLOCK] & 0x0f];
+		u32 dma_clock = clock() / m_dma_clock_divider[m_registers[DMA_CLOCK] & 0x0f];
 
 		if (!BIT(m_registers[DMA_WAIT_STATE], 0))
 			dma_clock /= 2;
@@ -417,7 +416,7 @@ void cs4031_device::trigger_nmi()
 	}
 }
 
-uint8_t cs4031_device::intc1_slave_ack_r(offs_t offset)
+u8 cs4031_device::intc1_slave_ack_r(offs_t offset)
 {
 	if (offset == 2) // IRQ 2
 		return m_intc2->acknowledge();
@@ -464,15 +463,15 @@ void cs4031_device::ctc_out2_w(int state)
 //  CHIPSET CONFIGURATION
 //**************************************************************************
 
-void cs4031_device::config_address_w(uint8_t data)
+void cs4031_device::config_address_w(u8 data)
 {
 	m_address = data;
 	m_address_valid = (m_address < 0x20) ? true : false;
 }
 
-uint8_t cs4031_device::config_data_r()
+u8 cs4031_device::config_data_r()
 {
-	uint8_t result = 0xff;
+	u8 result = 0xff;
 
 	if (m_address_valid)
 	{
@@ -487,7 +486,7 @@ uint8_t cs4031_device::config_data_r()
 	return result;
 }
 
-void cs4031_device::config_data_w(uint8_t data)
+void cs4031_device::config_data_w(u8 data)
 {
 	if (m_address_valid)
 	{
@@ -556,26 +555,17 @@ void cs4031_device::update_read_region(int index, offs_t start, offs_t end)
 	if (!BIT(m_registers[SHADOW_READ], index) && BIT(m_registers[ROMCS], index))
 	{
 		LOGMEMORY("ROM read from %x to %x\n", start, end);
-
 		m_space->install_rom(start, end, m_bios + start);
 	}
 	else if (!BIT(m_registers[SHADOW_READ], index) && !BIT(m_registers[ROMCS], index))
 	{
 		LOGMEMORY("ISA read from %x to %x\n", start, end);
-
-		m_space->install_rom(start, end, m_isa + start - 0xc0000);
+		// no need to do anything here
 	}
 	else if (BIT(m_registers[SHADOW_READ], index))
 	{
 		LOGMEMORY("RAM read from %x to %x\n", start, end);
-
 		m_space->install_rom(start, end, m_ram + start);
-	}
-	else
-	{
-		LOGMEMORY("NOP read from %x to %x\n", start, end);
-
-		m_space->nop_read(start, end);
 	}
 }
 
@@ -584,25 +574,21 @@ void cs4031_device::update_write_region(int index, offs_t start, offs_t end)
 	if (!BIT(m_registers[SHADOW_WRITE], index) && BIT(m_registers[ROMCS], index) && BIT(m_registers[ROMCS], 7))
 	{
 		LOGMEMORY("ROM write from %x to %x\n", start, end);
-
 		m_space->install_writeonly(start, end, m_bios + start);
 	}
 	else if (!BIT(m_registers[SHADOW_WRITE], index) && !BIT(m_registers[ROMCS], index))
 	{
 		LOGMEMORY("ISA write from %x to %x\n", start, end);
-
-		m_space->install_writeonly(start, end, m_isa + start - 0xc0000);
+		// no need to do anything here
 	}
 	else if (BIT(m_registers[SHADOW_WRITE], index))
 	{
 		LOGMEMORY("RAM write from %x to %x\n", start, end);
-
 		m_space->install_writeonly(start, end, m_ram + start);
 	}
 	else
 	{
 		LOGMEMORY("NOP write from %x to %x\n", start, end);
-
 		m_space->nop_write(start, end);
 	}
 }
@@ -674,21 +660,21 @@ void cs4031_device::keyboard_gatea20(int state)
 	update_a20m();
 }
 
-uint8_t cs4031_device::keyb_status_r()
+u8 cs4031_device::keyb_status_r()
 {
 	LOGKEYBOARD("cs4031_device::keyb_status_r\n");
 
 	return m_keybc->status_r();
 }
 
-void cs4031_device::keyb_command_blocked_w(uint8_t data)
+void cs4031_device::keyb_command_blocked_w(u8 data)
 {
 	// command is optionally blocked
 	if (!BIT(m_registers[SOFT_RESET_AND_GATEA20], 7))
 		m_keybc->command_w(data);
 }
 
-void cs4031_device::keyb_command_w(uint8_t data)
+void cs4031_device::keyb_command_w(u8 data)
 {
 	LOGKEYBOARD("cs4031_device::keyb_command_w: %02x\n", data);
 
@@ -759,14 +745,14 @@ void cs4031_device::keyb_command_w(uint8_t data)
 	}
 }
 
-uint8_t cs4031_device::keyb_data_r()
+u8 cs4031_device::keyb_data_r()
 {
 	LOGKEYBOARD("cs4031_device::keyb_data_r\n");
 
 	return m_keybc->data_r();
 }
 
-void cs4031_device::keyb_data_w(uint8_t data)
+void cs4031_device::keyb_data_w(u8 data)
 {
 	LOGKEYBOARD("cs4031_device::keyb_data_w: %02x\n", data);
 
@@ -774,6 +760,7 @@ void cs4031_device::keyb_data_w(uint8_t data)
 	if (BIT(m_registers[SOFT_RESET_AND_GATEA20], 7) && m_keybc_d1_written)
 	{
 		m_keybc_data_blocked = true;
+		m_keybc_d1_written = false;
 		emulated_kbreset(BIT(data, 0));
 		emulated_gatea20(BIT(data, 1));
 	}
@@ -795,7 +782,7 @@ void cs4031_device::kbrst_w(int state)
 {
 	LOGKEYBOARD("cs4031_device::kbrst_w: %u\n", state);
 
-	// convert to active low signal (gets inverted in at_keybc.c)
+	// convert to active low signal (gets inverted in at_keybc.cpp)
 	state = (state == ASSERT_LINE ? 0 : 1);
 
 	// external kbreset is ignored when emulation enabled
@@ -819,7 +806,7 @@ void cs4031_device::kbrst_w(int state)
     1 - Fast Gate A20
 
  */
-void cs4031_device::sysctrl_w(uint8_t data)
+void cs4031_device::sysctrl_w(u8 data)
 {
 	LOGIO("cs4031_device::sysctrl_w: %u\n", data);
 
@@ -835,9 +822,9 @@ void cs4031_device::sysctrl_w(uint8_t data)
 	m_cpureset = BIT(data, 0);
 }
 
-uint8_t cs4031_device::sysctrl_r()
+u8 cs4031_device::sysctrl_r()
 {
-	uint8_t result = 0; // reserved bits read as 0?
+	u8 result = 0; // reserved bits read as 0?
 
 	result |= m_cpureset << 0;
 	result |= m_fast_gatea20 << 1;
@@ -865,7 +852,7 @@ uint8_t cs4031_device::sysctrl_r()
     7 - Parity check latch (r) [not emulated]
 */
 
-uint8_t cs4031_device::portb_r()
+u8 cs4031_device::portb_r()
 {
 	if (0)
 		logerror("cs4031_device::portb_r: %02x\n", m_portb);
@@ -873,7 +860,7 @@ uint8_t cs4031_device::portb_r()
 	return m_portb;
 }
 
-void cs4031_device::portb_w(uint8_t data)
+void cs4031_device::portb_w(u8 data)
 {
 	if (0)
 		logerror("cs4031_device::portb_w: %02x\n", data);
@@ -899,7 +886,7 @@ void cs4031_device::portb_w(uint8_t data)
     7   - NMI mask
     6:0 - RTC address
  */
-void cs4031_device::rtc_nmi_w(uint8_t data)
+void cs4031_device::rtc_nmi_w(u8 data)
 {
 	if (0)
 		logerror("cs4031_device::rtc_nmi_w: %02x\n", data);

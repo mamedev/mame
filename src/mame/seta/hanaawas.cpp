@@ -28,6 +28,7 @@
 
 TODO:
 - hanaawasa reads inputs differently. Not implemented yet.
+- hanaawmh probably works, but needs verifying
 ***************************************************************************/
 
 #include "emu.h"
@@ -61,6 +62,7 @@ public:
 
 	void hanaawas(machine_config &config) ATTR_COLD;
 	void hanaawasa(machine_config &config) ATTR_COLD;
+	void hanaawmh(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -260,7 +262,7 @@ TILE_GET_INFO_MEMBER(hanaawas_state::get_bg_tile_info)
 	int offset = (tile_index + (flip_screen() ? 1 : -1)) & 0x3ff;
 	int attr = m_colorram[offset];
 	int gfxbank = (attr & 0x40) >> 6;
-	int code = m_videoram[tile_index] + ((attr & 0x20) << 3);
+	int code = m_videoram[tile_index] + ((attr & 0x20) << 3) + ((attr & 0x80) << 2); // bit 7 is used by the Dyna subboard, via flying wire, for the girls' GFX
 	int color = m_colorram[tile_index] & 0x1f;
 
 	tileinfo.set(gfxbank, code, color, 0);
@@ -279,9 +281,7 @@ uint32_t hanaawas_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void hanaawas_state::prg_map(address_map &map)
 {
-	map(0x0000, 0x2fff).rom();
-	map(0x4000, 0x4fff).rom();
-	map(0x6000, 0x6fff).rom();
+	map(0x0000, 0x6fff).rom();
 	map(0x8000, 0x83ff).ram().w(FUNC(hanaawas_state::videoram_w)).share(m_videoram);
 	map(0x8400, 0x87ff).ram().w(FUNC(hanaawas_state::colorram_w)).share(m_colorram);
 	map(0x8800, 0x8bff).ram();
@@ -409,6 +409,27 @@ static GFXDECODE_START( gfx_hanaawas )
 GFXDECODE_END
 
 
+#define MH_GFX(name, offs1, offs2, offs3)              \
+static const gfx_layout name =                      \
+{                                                   \
+	8,8,    /* 8*8 chars */                         \
+	1024,    /* 1024 characters */                    \
+	3,      /* 3 bits per pixel */                  \
+	{ offs1, offs2, offs3 },  /* bitplanes */       \
+	{ 8*8+0, 8*8+1, 8*8+2, 8*8+3, 0, 1, 2, 3 },     \
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },     \
+	8*16     /* every char takes 16 consecutive bytes */    \
+};
+
+MH_GFX( mh_charlayout_1bpp, 0x4000*8+4, 0x4000*8+4, 0x4000*8+4 )
+MH_GFX( mh_charlayout_3bpp, 0x4000*8,   0,          4          )
+
+static GFXDECODE_START( gfx_hanaawmh )
+	GFXDECODE_ENTRY( "tiles", 0, mh_charlayout_1bpp, 0, 32 )
+	GFXDECODE_ENTRY( "tiles", 0, mh_charlayout_3bpp, 0, 32 )
+GFXDECODE_END
+
+
 void hanaawas_state::machine_start()
 {
 	save_item(NAME(m_mux));
@@ -467,6 +488,12 @@ void hanaawas_state::hanaawasa(machine_config &config)
 	ppi.out_pc_callback().set(FUNC(hanaawas_state::inputs_mux_w));
 }
 
+void hanaawas_state::hanaawmh(machine_config &config)
+{
+	hanaawas(config);
+
+	m_gfxdecode->set_info(gfx_hanaawmh);
+}
 
 /***************************************************************************
 
@@ -474,6 +501,9 @@ void hanaawas_state::hanaawasa(machine_config &config)
 
 ***************************************************************************/
 
+// also seen on a HF-922 PCB with a G.G.I. Corporation sticker
+// only difference is in the first ROM where the copyright has been blanked out
+// CRC(f282dc49) SHA1(15788576af8142c14c4407b114c44a8b1a5babbd)
 ROM_START( hanaawas ) // PC0-017-11 PCB?
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "1.1e",       0x0000, 0x2000, CRC(618dc1e3) SHA1(31817f256512352db0d27322998d9dcf95a993cf) )
@@ -515,9 +545,34 @@ ROM_START( hanaawasa ) // PC0-017-41 PCB
 	ROM_LOAD( "6g.bpr", 0x0120, 0x0100, BAD_DUMP CRC(4d94fed5) SHA1(3ea8e6fb95d5677991dc90fe7435f91e5320bb16) )  // not dumped for this set
 ROM_END
 
+// HF-1108 PCB + DYNA riser PCB with Visco sticker + flying wires
+// PCB is mostly similar to the hanaawas' one
+ROM_START( hanaawmh )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "1.1e",       0x0000, 0x2000, CRC(218c8d28) SHA1(784a34ec560d99ca54b96e2466e4a162e93441b7) )
+	ROM_LOAD( "2.3e",       0x2000, 0x1000, CRC(cedadc9c) SHA1(3d7041ec8f862d901cd9929f6ba3fb0352122bdf) )
+	ROM_LOAD( "3.4e",       0x4000, 0x1000, CRC(03c0cdb7) SHA1(ba01ad34f340836101123c37d0e3fe9914350ce8) )
+	ROM_LOAD( "4.sub",      0x5000, 0x1000, CRC(c2840865) SHA1(3c4b52e53d8f87ae4afd4c7c1a2cd4a4388a9ee4) )
+	ROM_CONTINUE(           0x3000, 0x1000 )
+
+	ROM_REGION( 0x0400, "iomcu", 0 )
+	ROM_LOAD( "d8741ad.3j",  0x0000, 0x0400, NO_DUMP )
+
+	ROM_REGION( 0x8000, "tiles", 0 )
+	ROM_LOAD( "5.9a",       0x0000, 0x4000, CRC(c0cedc6e) SHA1(8c28e2a4a15a87ca19302d9592e363b561347695) )
+	// socket at 10a empty
+	ROM_LOAD( "7.12a",      0x4000, 0x4000, CRC(ec7a7fd0) SHA1(ce582b38133a65e706dd172f0120c1c50b6e1353) )
+	// socket at 13a empty
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "13j.bpr",    0x0000, 0x0020, CRC(99300d85) SHA1(dd383db1f3c8c6d784121d32f20ffed3d83e2278) ) // colors
+	ROM_LOAD( "2a.bpr",     0x0020, 0x0100, CRC(e26f21a2) SHA1(d0df06f833e0f97872d9d2ffeb7feef94aaaa02a) ) // lookup table
+ROM_END
+
 } // anonymous namespace
 
 
 GAME( 1982, hanaawas,  0,        hanaawas,  hanaawas,  hanaawas_state, empty_init, ROT0, "Seta Kikaku", "Hana Awase (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, hanaawasa, hanaawas, hanaawasa, hanaawasa, hanaawas_state, empty_init, ROT0, "Seta Kikaku", "Hana Awase (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hanaawmh,  0,        hanaawmh,  hanaawas,  hanaawas_state, empty_init, ROT0, "Dyna",        "Hana Awase Maihime", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 

@@ -30,7 +30,7 @@ The palette generator is 8 bits per color gun like the Taito F3 system.
 Like Metal Black the palette space is doubled, and the first half used
 for sprites only so the second half can be devoted to tilemaps.
 
-The main cpu is a 68000.
+The main CPU is a 68000.
 
 There is a slave Z80 which interfaces with a YM2610B for sound.
 Commands are written to it by the 68000 (as in the Taito F2 games).
@@ -407,7 +407,7 @@ void slapshot_state::slapshot(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	TC0640FIO(config, m_tc0640fio, 0);
+	TC0640FIO(config, m_tc0640fio);
 	m_tc0640fio->read_1_callback().set_ioport("COINS");
 	m_tc0640fio->read_2_callback().set_ioport("BUTTONS");
 	m_tc0640fio->read_3_callback().set_ioport("SYSTEM");
@@ -427,14 +427,14 @@ void slapshot_state::slapshot(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_slapshot);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 8192);
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(30 + 3, 9);
 	m_tc0480scp->set_offsets_tx(-1, -1);
 	m_tc0480scp->set_offsets_flip(0, 2);
 	m_tc0480scp->set_col_base(4096);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
@@ -446,9 +446,9 @@ void slapshot_state::slapshot(machine_config &config)
 	ymsnd.add_route(1, "speaker", 1.0, 0);
 	ymsnd.add_route(2, "speaker", 1.0, 1);
 
-	MK48T08(config, "mk48t08", 0);
+	MK48T08(config, "mk48t08");
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->nmi_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
 	m_tc0140syt->reset_callback().set_inputline("audiocpu", INPUT_LINE_RESET);
 }
@@ -472,7 +472,7 @@ void slapshot_state::opwolf3(machine_config &config)
 	adc.in_callback<2>().set_ioport("GUN2X");
 	adc.in_callback<3>().set_ioport("GUN2Y");
 
-	TC0640FIO(config, m_tc0640fio, 0);
+	TC0640FIO(config, m_tc0640fio);
 	m_tc0640fio->read_1_callback().set_ioport("COINS");
 	m_tc0640fio->read_2_callback().set_ioport("BUTTONS");
 	m_tc0640fio->read_3_callback().set_ioport("SYSTEM");
@@ -492,14 +492,14 @@ void slapshot_state::opwolf3(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_slapshot);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 8192);
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(30 + 3, 9);
 	m_tc0480scp->set_offsets_tx(-1, -1);
 	m_tc0480scp->set_offsets_flip(0, 2);
 	m_tc0480scp->set_col_base(4096);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
@@ -511,9 +511,9 @@ void slapshot_state::opwolf3(machine_config &config)
 	ymsnd.add_route(1, "speaker", 1.0, 0);
 	ymsnd.add_route(2, "speaker", 1.0, 1);
 
-	MK48T08(config, "mk48t08", 0);
+	MK48T08(config, "mk48t08");
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->nmi_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
 	m_tc0140syt->reset_callback().set_inputline("audiocpu", INPUT_LINE_RESET);
 }

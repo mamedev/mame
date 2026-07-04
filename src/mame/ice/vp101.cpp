@@ -60,12 +60,12 @@
         Standard JAMMA I/O interface, including player 3 and 4 connectors
         4 channel general purpose A to D interface (steering wheel and control pedals)
         100baseT Ethernet interface for debugging and/or inter game communications
-        Forced-feedback “Wheel Driver Interface” for driving games
+        Force-feedback “Wheel Driver Interface” for driving games
         High-current drivers for lamps or solenoids
         Gun interface I/O tightly coupled to the CRT controller
 
     Sound System
-        AC97 codec for low cost of implementation and development
+        AC'97 codec for low cost of implementation and development
         TDA7375 40 Watt Integrated Amplifier
         Codec fed from the DDR bank via a 16 channel (8 channels of stereo) DMA engine.
 
@@ -100,10 +100,13 @@ Small outline design for easy kit retrofitting of existing cabinets.
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/mips/mips3.h"
+
 #include "bus/ata/ataintf.h"
-#include "machine/nvram.h"
+#include "cpu/mips/mips3.h"
 #include "imagedev/harddriv.h"
+#include "machine/nvram.h"
+
+#include "input.h" // for keys to manually generate interrupts
 #include "screen.h"
 
 #define VERBOSE (0)

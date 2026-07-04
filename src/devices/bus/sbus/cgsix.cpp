@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "cgsix.h"
 
+#include "endianness.h"
+
 DEFINE_DEVICE_TYPE(SBUS_TURBOGX, sbus_turbogx_device, "turbogx", "Sun TurboGX SBus Video")
 DEFINE_DEVICE_TYPE(SBUS_TURBOGXP, sbus_turbogxp_device, "turbogxp", "Sun TurboGX+ SBus Video")
 
@@ -154,7 +156,7 @@ void sbus_cgsix_device::device_start()
 	save_item(NAME(m_fbc.m_vertex_count));
 
 	m_fbc.m_prim_buf = std::make_unique<vertex[]>(0x1000); // Unknown size on hardware
-	save_pointer(NAME(reinterpret_cast<uint8_t*>(m_fbc.m_prim_buf.get())), sizeof(vertex) * 0x1000);
+	save_pointer(reinterpret_cast<uint8_t*>(m_fbc.m_prim_buf.get()), "m_fbc.m_prim_buf", sizeof(vertex) * 0x1000);
 
 	save_item(NAME(m_fbc.m_curr_prim_type));
 
@@ -1322,7 +1324,7 @@ void sbus_turbogx_device::device_add_mconfig(machine_config &config)
 	m_screen->set_raw(105.561_MHz_XTAL, 1472, 0, 1152, 943, 0, 900);
 	m_screen->screen_vblank().set(FUNC(sbus_turbogx_device::vblank_w));
 
-	BT458(config, m_ramdac, 0);
+	BT458(config, m_ramdac);
 }
 
 sbus_turbogx_device::sbus_turbogx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -1364,7 +1366,7 @@ void sbus_turbogxp_device::device_add_mconfig(machine_config &config)
 	m_screen->set_refresh_hz(72);
 	m_screen->screen_vblank().set(FUNC(sbus_turbogxp_device::vblank_w));
 
-	BT467(config, m_ramdac, 0);
+	BT467(config, m_ramdac);
 }
 
 sbus_turbogxp_device::sbus_turbogxp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

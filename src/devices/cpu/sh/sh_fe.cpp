@@ -4,23 +4,149 @@
 
     sh_fe.cpp
 
-    Front end for SH recompiler
+    Front end for SuperH recompiler
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "sh2.h"
-#include "cpu/drcfe.h"
+#include "sh_fe.h"
+
+#include "cpu/drcfe.ipp"
+
+#include <iostream>
+
+
+
+/*-------------------------------------------------
+    log_flags - log the instruction description to
+    a stream
+-------------------------------------------------*/
+
+void sh_common_execution::opcode_desc::log_flags(std::ostream &stream) const
+{
+	// branches
+	if (is_unconditional_branch())
+		stream << 'U';
+	else if (is_conditional_branch())
+		stream << 'C';
+	else
+		stream << '.';
+
+	// intrablock branches
+	stream << (intrablock_branch() ? 'i' : '.');
+
+	// branch targets
+	stream << (is_branch_target() ? 'B' : '.');
+
+	// delay slots
+	stream << (in_delay_slot() ? 'D' : '.');
+
+	// exceptions
+	if (will_cause_exception())
+		stream << 'E';
+	else if (can_cause_exception())
+		stream << 'e';
+	else
+		stream << '.';
+
+	// read/write
+	if (reads_memory())
+		stream << (writes_memory() ? '+' : 'R');
+	else if (writes_memory())
+		stream << 'W';
+	else
+		stream << '.';
+
+	// TLB validation
+	stream << (validate_tlb() ? 'V' : '.');
+
+	// redispatch
+	stream << (redispatch() ? 'R' : '.');
+}
+
+
+/*-------------------------------------------------
+    log_register_list - log a list of registers
+-------------------------------------------------*/
+
+void sh_common_execution::opcode_desc::log_registers_used(std::ostream &stream) const
+{
+	stream << "[use:";
+	log_register_list(stream, regin, nullptr);
+	stream << ']';
+}
+
+void sh_common_execution::opcode_desc::log_registers_modified(std::ostream &stream) const
+{
+	stream << "[mod:";
+	log_register_list(stream, regout, &regreq);
+	stream << ']';
+}
+
+void sh_common_execution::opcode_desc::log_register_list(std::ostream &stream, const regmask &reglist, const regmask *regnostarlist)
+{
+	int count = 0;
+
+	for (int regnum = 0; regnum < 16; regnum++)
+	{
+		if (reglist[REG_R0 + regnum])
+		{
+			if (count++)
+				stream << ',';
+			stream << 'r' << regnum;
+			if (regnostarlist && !(*regnostarlist)[REG_R0 + regnum])
+				stream << '*';
+		}
+	}
+
+	const auto log_bit =
+			[&stream, &count, &reglist, &regnostarlist] (size_t bit, const char *name)
+			{
+				if (reglist[bit])
+				{
+					if (count++)
+						stream << ',';
+					stream << name;
+					if (regnostarlist && !(*regnostarlist)[bit])
+						stream << '*';
+				}
+			};
+
+	log_bit(REG_PR,   "pr");
+	log_bit(REG_SR,   "sr");
+	log_bit(REG_MACL, "macl");
+	log_bit(REG_MACH, "mach");
+	log_bit(REG_GBR,  "gbr");
+	log_bit(REG_VBR,  "vbr");
+}
+
 
 
 /***************************************************************************
     INSTRUCTION PARSERS
 ***************************************************************************/
 
-sh_frontend::sh_frontend(sh_common_execution *device, uint32_t window_start, uint32_t window_end, uint32_t max_sequence)
-	: drc_frontend(*device, window_start, window_end, max_sequence)
+sh_common_execution::frontend::frontend(sh_common_execution *device, uint32_t window_start, uint32_t window_end, uint32_t max_sequence)
+	: drc_frontend_base(device->space_config(AS_PROGRAM)->page_shift(), window_start, window_end, max_sequence)
 	, m_sh(device)
 {
+}
+
+sh_common_execution::frontend::~frontend()
+{
+}
+
+sh_common_execution::opcode_desc const *sh_common_execution::frontend::describe_code(offs_t startpc)
+{
+	return do_describe_code(
+			[this] (opcode_desc &desc, opcode_desc const *prev) { return describe(desc, prev); },
+			startpc);
+}
+
+
+inline uint16_t sh_common_execution::frontend::read_word(opcode_desc &desc)
+{
+	return m_sh->m_pr16(desc.physpc);
 }
 
 /*-------------------------------------------------
@@ -28,17 +154,10 @@ sh_frontend::sh_frontend(sh_common_execution *device, uint32_t window_start, uin
     of a single instruction
 -------------------------------------------------*/
 
-inline uint16_t sh_frontend::read_word(opcode_desc &desc)
+bool sh_common_execution::frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 {
-	return m_sh->m_pr16(desc.physpc);
-}
-
-bool sh_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
-{
-	uint16_t opcode;
-
 	/* fetch the opcode */
-	opcode = desc.opptr.w[0] = read_word(desc);
+	const uint16_t opcode = desc.opptr = read_word(desc);
 
 	/* all instructions are 2 bytes and most are a single cycle */
 	desc.length = 2;
@@ -46,88 +165,91 @@ bool sh_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 	switch (opcode>>12)
 	{
-		case  0:
-			return describe_group_0(desc, prev, opcode);
+	case  0:
+		return describe_group_0(desc, prev, opcode);
 
-		case  1:    // MOVLS4
-			desc.regin[0] |= REGFLAG_R(REG_N) | REGFLAG_R(REG_M);
-			desc.flags |= OPFLAG_WRITES_MEMORY;
+	case  1:    // MOVLS4
+		desc.set_r_used(REG_M);
+		desc.set_r_used(REG_N);
+		desc.set_writes_memory();
+		return true;
+
+	case  2:
+		return describe_group_2(desc, prev, opcode);
+
+	case  3:
+		return describe_group_3(desc, prev, opcode);
+
+	case  4:
+		return describe_group_4(desc, prev, opcode);
+
+	case  5:    // MOVLL4
+		desc.set_r_used(REG_M);
+		desc.set_r_modified(REG_N);
+		desc.set_reads_memory();
+		return true;
+
+	case  6:
+		return describe_group_6(desc, prev, opcode);
+
+	case  7:    // ADDI
+		desc.set_r_used(REG_N);
+		desc.set_r_modified(REG_N);
+		return true;
+
+	case  8:
+		return describe_group_8(desc, prev, opcode);
+
+	case  9:    // MOVWI
+		desc.set_r_modified(REG_N);
+		desc.set_reads_memory();
+		return true;
+
+	case 11:    // BSR
+		desc.set_pr_modified();
+		[[fallthrough]]; // BSR is BRA with the addition of PR = the return address
+	case 10:    // BRA
+		{
+			int32_t disp = util::sext(opcode, 12);
+
+			desc.set_is_unconditional_branch();
+			desc.set_end_sequence();
+			desc.targetpc = (desc.pc + 2) + disp * 2 + 2;
+			desc.delayslots = 1;
+			desc.cycles = 2;
 			return true;
+		}
 
-		case  2:
-			return describe_group_2(desc, prev, opcode);
+	case 12:
+		return describe_group_12(desc, prev, opcode);
 
-		case  3:
-			return describe_group_3(desc, prev, opcode);
+	case 13:    // MOVLI
+		desc.set_r_modified(REG_N);
+		desc.set_reads_memory();
+		return true;
 
-		case  4:
-			return describe_group_4(desc, prev, opcode);
+	case 14:    // MOVI
+		desc.set_r_modified(REG_N);
+		return true;
 
-		case  5:    // MOVLL4
-			desc.regin[0] |= REGFLAG_R(REG_M);
-			desc.regout[0] |= REGFLAG_R(REG_N);
-			desc.flags |= OPFLAG_READS_MEMORY;
-			return true;
-
-		case  6:
-			return describe_group_6(desc, prev, opcode);
-
-		case  7:    // ADDI
-			desc.regin[0] |= REGFLAG_R(REG_N);
-			desc.regout[0] |= REGFLAG_R(REG_N);
-			return true;
-
-		case  8:
-			return describe_group_8(desc, prev, opcode);
-
-		case  9:    // MOVWI
-			desc.regout[0] |= REGFLAG_R(REG_N);
-			desc.flags |= OPFLAG_READS_MEMORY;
-			return true;
-
-		case 11:    // BSR
-			desc.regout[1] |= REGFLAG_PR;
-			[[fallthrough]]; // BSR is BRA with the addition of PR = the return address
-		case 10:    // BRA
-			{
-				int32_t disp = util::sext(opcode, 12);
-
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-				desc.targetpc = (desc.pc + 2) + disp * 2 + 2;
-				desc.delayslots = 1;
-				desc.cycles = 2;
-				return true;
-			}
-
-		case 12:
-			return describe_group_12(desc, prev, opcode);
-
-		case 13:    // MOVLI
-			desc.regout[0] |= REGFLAG_R(REG_N);
-			desc.flags |= OPFLAG_READS_MEMORY;
-			return true;
-
-		case 14:    // MOVI
-			desc.regout[0] |= REGFLAG_R(REG_N);
-			return true;
-
-		case 15:    // NOP
-			return describe_group_15(desc, prev, opcode);
+	case 15:    // NOP
+		return describe_group_15(desc, prev, opcode);
 	}
 
 	return false;
 }
 
 
-bool sh_frontend::describe_group_2(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
+bool sh_common_execution::frontend::describe_group_2(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
 {
 	switch (opcode & 15)
 	{
 	case  0: // MOVBS(Rm, Rn);
 	case  1: // MOVWS(Rm, Rn);
 	case  2: // MOVLS(Rm, Rn);
-		desc.regin[0] |= REGFLAG_R(REG_M) | REGFLAG_R(REG_N);
-		desc.flags |= OPFLAG_WRITES_MEMORY;
+		desc.set_r_used(REG_M);
+		desc.set_r_used(REG_N);
+		desc.set_writes_memory();
 		return true;
 
 	case  3: // NOP();
@@ -137,29 +259,33 @@ bool sh_frontend::describe_group_2(opcode_desc &desc, const opcode_desc *prev, u
 	case  5: // MOVWM(Rm, Rn);
 	case  6: // MOVLM(Rm, Rn);
 	case 13: // XTRCT(Rm, Rn);
-		desc.regin[0] |= REGFLAG_R(REG_M) | REGFLAG_R(REG_N);
-		desc.regout[0] |= REGFLAG_R(REG_N);
-		desc.flags |= OPFLAG_WRITES_MEMORY;
+		desc.set_r_used(REG_M);
+		desc.set_r_used(REG_N);
+		desc.set_r_modified(REG_N);
+		desc.set_writes_memory();
 		return true;
 
 	case  7: // DIV0S(Rm, Rn);
 	case  8: // TST(Rm, Rn);
 	case 12: // CMPSTR(Rm, Rn);
-		desc.regin[0] |= REGFLAG_R(REG_M) | REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_SR;
+		desc.set_r_used(REG_M);
+		desc.set_r_used(REG_N);
+		desc.set_sr_modified();
 		return true;
 
 	case  9: // AND(Rm, Rn);
 	case 10: // XOR(Rm, Rn);
 	case 11: // OR(Rm, Rn);
-		desc.regin[0] |= REGFLAG_R(REG_M) | REGFLAG_R(REG_N);
-		desc.regout[0] |= REGFLAG_R(REG_N);
+		desc.set_r_used(REG_M);
+		desc.set_r_used(REG_N);
+		desc.set_r_modified(REG_N);
 		return true;
 
 	case 14: // MULU(Rm, Rn);
 	case 15: // MULS(Rm, Rn);
-		desc.regin[0] |= REGFLAG_R(REG_M) | REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_MACL | REGFLAG_MACH;
+		desc.set_r_used(REG_M);
+		desc.set_r_used(REG_N);
+		desc.set_mac_modified();
 		desc.cycles = 2;
 		return true;
 	}
@@ -167,7 +293,7 @@ bool sh_frontend::describe_group_2(opcode_desc &desc, const opcode_desc *prev, u
 	return false;
 }
 
-bool sh_frontend::describe_group_3(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
+bool sh_common_execution::frontend::describe_group_3(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
 {
 	switch (opcode & 15)
 	{
@@ -176,8 +302,9 @@ bool sh_frontend::describe_group_3(opcode_desc &desc, const opcode_desc *prev, u
 	case  3: // CMPGE(Rm, Rn);
 	case  6: // CMPHI(Rm, Rn);
 	case  7: // CMPGT(Rm, Rn);
-		desc.regin[0] |= REGFLAG_R(REG_M) | REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_SR;
+		desc.set_r_used(REG_M);
+		desc.set_r_used(REG_N);
+		desc.set_sr_modified();
 		return true;
 
 	case  1: // NOP();
@@ -185,39 +312,43 @@ bool sh_frontend::describe_group_3(opcode_desc &desc, const opcode_desc *prev, u
 		return true;
 
 	case  4: // DIV1(Rm, Rn);
-		desc.regin[0] |= REGFLAG_R(REG_M) | REGFLAG_R(REG_N);
-		desc.regout[0] |= REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_SR;
+		desc.set_r_used(REG_M);
+		desc.set_r_used(REG_N);
+		desc.set_r_modified(REG_N);
+		desc.set_sr_modified();
 		return true;
 
 	case  5: // DMULU(Rm, Rn);
 	case 13: // DMULS(Rm, Rn);
-		desc.regin[0] |= REGFLAG_R(REG_M) | REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_MACL | REGFLAG_MACH;
+		desc.set_r_used(REG_M);
+		desc.set_r_used(REG_N);
+		desc.set_mac_modified();
 		desc.cycles = 2;
 		return true;
 
 	case  8: // SUB(Rm, Rn);
 	case 12: // ADD(Rm, Rn);
-		desc.regin[0] |= REGFLAG_R(REG_M) | REGFLAG_R(REG_N);
-		desc.regout[0] |= REGFLAG_R(REG_N);
+		desc.set_r_used(REG_M);
+		desc.set_r_used(REG_N);
+		desc.set_r_modified(REG_N);
 		return true;
 
 	case 10: // SUBC(Rm, Rn);
 	case 11: // SUBV(Rm, Rn);
 	case 14: // ADDC(Rm, Rn);
 	case 15: // ADDV(Rm, Rn);
-		desc.regin[0] |= REGFLAG_R(REG_M) | REGFLAG_R(REG_N);
-		desc.regin[1] |= REGFLAG_SR;
-		desc.regout[0] |= REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_SR;
+		desc.set_r_used(REG_M);
+		desc.set_r_used(REG_N);
+		desc.set_sr_used();
+		desc.set_r_modified(REG_N);
+		desc.set_sr_modified();
 		return true;
 	}
 	return false;
 }
 
 
-bool sh_frontend::describe_group_6(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
+bool sh_common_execution::frontend::describe_group_6(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
 {
 	switch (opcode & 15)
 	{
@@ -232,33 +363,35 @@ bool sh_frontend::describe_group_6(opcode_desc &desc, const opcode_desc *prev, u
 	case 13: // EXTUW(Rm, Rn);
 	case 14: // EXTSB(Rm, Rn);
 	case 15: // EXTSW(Rm, Rn);
-		desc.regin[0] |= REGFLAG_R(REG_M);
-		desc.regout[0] |= REGFLAG_R(REG_N);
+		desc.set_r_used(REG_M);
+		desc.set_r_modified(REG_N);
 		return true;
 
 	case  4: // MOVBP(Rm, Rn);
 	case  5: // MOVWP(Rm, Rn);
 	case  6: // MOVLP(Rm, Rn);
-		desc.regin[0] |= REGFLAG_R(REG_M) | REGFLAG_R(REG_N);
-		desc.regout[0] |= REGFLAG_R(REG_N);
-		desc.flags |= OPFLAG_READS_MEMORY;
+		desc.set_r_used(REG_M);
+		desc.set_r_modified(REG_M);
+		desc.set_r_modified(REG_N);
+		desc.set_reads_memory();
 		return true;
 
 	case  8: // SWAPB(Rm, Rn);
-		desc.regin[0] |= REGFLAG_R(REG_M) | REGFLAG_R(REG_N);
-		desc.regout[0] |= REGFLAG_R(REG_N);
+		desc.set_r_used(REG_M);
+		desc.set_r_used(REG_N);
+		desc.set_r_modified(REG_N);
 		return true;
 
 	case 10: // NEGC(Rm, Rn);
-		desc.regin[0] |= REGFLAG_R(REG_M);
-		desc.regout[0] |= REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_SR;
+		desc.set_r_used(REG_M);
+		desc.set_r_modified(REG_N);
+		desc.set_sr_modified();
 		return true;
 	}
 	return false;
 }
 
-bool sh_frontend::describe_group_8(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
+bool sh_common_execution::frontend::describe_group_8(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
 {
 	int32_t disp;
 
@@ -266,8 +399,9 @@ bool sh_frontend::describe_group_8(opcode_desc &desc, const opcode_desc *prev, u
 	{
 	case  0 << 8: // MOVBS4(opcode & 0x0f, Rm);
 	case  1 << 8: // MOVWS4(opcode & 0x0f, Rm);
-		desc.regin[0] |= REGFLAG_R(REG_M) | REGFLAG_R(0);
-		desc.flags |= OPFLAG_WRITES_MEMORY;
+		desc.set_r_used(REG_M);
+		desc.set_r_used(0);
+		desc.set_writes_memory();
 		return true;
 
 	case  2 << 8: // NOP();
@@ -281,20 +415,20 @@ bool sh_frontend::describe_group_8(opcode_desc &desc, const opcode_desc *prev, u
 
 	case  4 << 8: // MOVBL4(Rm, opcode & 0x0f);
 	case  5 << 8: // MOVWL4(Rm, opcode & 0x0f);
-		desc.regin[0] |= REGFLAG_R(REG_M);
-		desc.regout[0] |= REGFLAG_R(0);
-		desc.flags |= OPFLAG_READS_MEMORY;
+		desc.set_r_used(REG_M);
+		desc.set_r_modified(0);
+		desc.set_reads_memory();
 		return true;
 
 	case  8 << 8: // CMPIM(opcode & 0xff);
-		desc.regin[0] |= REGFLAG_R(REG_M);
-		desc.regin[1] |= REGFLAG_SR;
-		desc.regout[1] |= REGFLAG_SR;
+		desc.set_r_used(REG_M);
+		desc.set_sr_used();
+		desc.set_sr_modified();
 		return true;
 
 	case  9 << 8: // BT(opcode & 0xff);
 	case 11 << 8: // BF(opcode & 0xff);
-		desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
+		desc.set_is_conditional_branch();
 		desc.cycles = 3;
 		disp = util::sext(opcode, 8);
 		desc.targetpc = (desc.pc + 2) + disp * 2 + 2;
@@ -302,7 +436,7 @@ bool sh_frontend::describe_group_8(opcode_desc &desc, const opcode_desc *prev, u
 
 	case 13 << 8: // BTS(opcode & 0xff);
 	case 15 << 8: // BFS(opcode & 0xff);
-		desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
+		desc.set_is_conditional_branch();
 		desc.cycles = 2;
 		disp = util::sext(opcode, 8);
 		desc.targetpc = (desc.pc + 2) + disp * 2 + 2;
@@ -313,55 +447,58 @@ bool sh_frontend::describe_group_8(opcode_desc &desc, const opcode_desc *prev, u
 	return false;
 }
 
-bool sh_frontend::describe_group_12(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
+bool sh_common_execution::frontend::describe_group_12(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
 {
 	switch (opcode & (15<<8))
 	{
 	case  0 << 8: // MOVBSG(opcode & 0xff);
 	case  1 << 8: // MOVWSG(opcode & 0xff);
 	case  2 << 8: // MOVLSG(opcode & 0xff);
-		desc.regin[0] |= REGFLAG_R(0);
-		desc.flags |= OPFLAG_WRITES_MEMORY;
+		desc.set_r_used(0);
+		desc.set_writes_memory();
 		return true;
 
 	case  3 << 8: // TRAPA(opcode & 0xff);
-		desc.regin[0] |= REGFLAG_R(15);
-		desc.regin[1] |= REGFLAG_VBR;
-		desc.regout[0] |= REGFLAG_R(15);
+		desc.set_r_used(15);
+		desc.set_vbr_used();
+		desc.set_r_modified(15);
 		desc.cycles = 8;
 		desc.targetpc = BRANCH_TARGET_DYNAMIC;
-		desc.flags |= OPFLAG_READS_MEMORY | OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+		desc.set_is_unconditional_branch();
+		desc.set_end_sequence();
+		desc.set_reads_memory();
 		return true;
 
 	case  4 << 8: // MOVBLG(opcode & 0xff);
 	case  5 << 8: // MOVWLG(opcode & 0xff);
 	case  6 << 8: // MOVLLG(opcode & 0xff);
 	case  7 << 8: // MOVA(opcode & 0xff);
-		desc.regout[0] |= REGFLAG_R(0);
-		desc.flags |= OPFLAG_READS_MEMORY;
+		desc.set_r_modified(0);
+		desc.set_reads_memory();
 		return true;
 
 	case  8 << 8: // TSTI(opcode & 0xff);
-		desc.regin[0] |= REGFLAG_R(0);
-		desc.regin[1] |= REGFLAG_SR;
-		desc.regout[1] |= REGFLAG_SR;
+		desc.set_r_used(0);
+		desc.set_sr_used();
+		desc.set_sr_modified();
 		return true;
 
 	case  9 << 8: // ANDI(opcode & 0xff);
 	case 10 << 8: // XORI(opcode & 0xff);
 	case 11 << 8: // ORI(opcode & 0xff);
-		desc.regin[0] |= REGFLAG_R(0);
-		desc.regout[0] |= REGFLAG_R(0);
+		desc.set_r_used(0);
+		desc.set_r_modified(0);
 		return true;
 
 	case 12 << 8: // TSTM(opcode & 0xff);
 	case 13 << 8: // ANDM(opcode & 0xff);
 	case 14 << 8: // XORM(opcode & 0xff);
 	case 15 << 8: // ORM(opcode & 0xff);
-		desc.regin[0] |= REGFLAG_R(0);
-		desc.regin[1] |= REGFLAG_SR | REGFLAG_GBR;
-		desc.regout[1] |= REGFLAG_SR;
-		desc.flags |= OPFLAG_READS_MEMORY;
+		desc.set_r_used(0);
+		desc.set_sr_used();
+		desc.set_gbr_used();
+		desc.set_sr_modified();
+		desc.set_reads_memory();
 		return true;
 	}
 
@@ -370,9 +507,9 @@ bool sh_frontend::describe_group_12(opcode_desc &desc, const opcode_desc *prev, 
 
 
 
-bool sh_frontend::describe_group_0(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
+bool sh_common_execution::frontend::describe_group_0(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
 {
-	switch (opcode & 0x3F)
+	switch (opcode & 0x3f)
 	{
 	case 0x00: // NOP();
 	case 0x01: // NOP();
@@ -393,13 +530,14 @@ bool sh_frontend::describe_group_0(opcode_desc &desc, const opcode_desc *prev, u
 		return true;
 
 	case 0x02: // STCSR(Rn);
-		desc.regout[0] |= REGFLAG_R(REG_N);
+		desc.set_r_modified(REG_N);
 		return true;
 
 	case 0x03: // BSRF(Rn);
-		desc.regout[1] |= REGFLAG_PR;
+		desc.set_pr_modified();
 
-		desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+		desc.set_is_unconditional_branch();
+		desc.set_end_sequence();
 		desc.targetpc = BRANCH_TARGET_DYNAMIC;
 		desc.delayslots = 1;
 
@@ -417,32 +555,36 @@ bool sh_frontend::describe_group_0(opcode_desc &desc, const opcode_desc *prev, u
 	case 0x34: // MOVBS0(Rm, Rn);
 	case 0x35: // MOVWS0(Rm, Rn);
 	case 0x36: // MOVLS0(Rm, Rn);
-		desc.regin[0] |= REGFLAG_R(REG_M) | REGFLAG_R(REG_N) | REGFLAG_R(0);
-		desc.flags |= OPFLAG_READS_MEMORY;
+		desc.set_r_used(REG_M);
+		desc.set_r_used(REG_N);
+		desc.set_r_used(0);
+		desc.set_writes_memory();
 		return true;
 
 	case 0x07: // MULL(Rm, Rn);
 	case 0x17: // MULL(Rm, Rn);
 	case 0x27: // MULL(Rm, Rn);
 	case 0x37: // MULL(Rm, Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N) | REGFLAG_R(REG_M);
-		desc.regout[1] |= REGFLAG_MACL;
+		desc.set_r_used(REG_M);
+		desc.set_r_used(REG_N);
+		desc.set_macl_modified();
 		desc.cycles = 2;
 		return true;
 
 	case 0x08: // CLRT();
-		desc.regout[1] |= REGFLAG_SR;
+		desc.set_sr_modified();
 		return true;
 
 	case 0x0a: // STSMACH(Rn);
-		desc.regout[0] |= REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_MACH;
+		desc.set_r_modified(REG_N);
+		desc.set_mach_modified();
 		return true;
 
 	case 0x0b: // RTS();
-		desc.regin[1] |= REGFLAG_PR;
+		desc.set_pr_used();
 
-		desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+		desc.set_is_unconditional_branch();
+		desc.set_end_sequence();
 		desc.targetpc = BRANCH_TARGET_DYNAMIC;
 		desc.delayslots = 1;
 		desc.cycles = 2;
@@ -461,36 +603,38 @@ bool sh_frontend::describe_group_0(opcode_desc &desc, const opcode_desc *prev, u
 	case 0x3c: // MOVBL0(Rm, Rn);
 	case 0x3d: // MOVWL0(Rm, Rn);
 	case 0x3e: // MOVLL0(Rm, Rn);
-		desc.regin[0] |= REGFLAG_R(REG_M) | REGFLAG_R(0);
-		desc.regout[0] |= REGFLAG_R(REG_N);
-		desc.flags |= OPFLAG_READS_MEMORY;
+		desc.set_r_used(REG_M);
+		desc.set_r_used(0);
+		desc.set_r_modified(REG_N);
+		desc.set_reads_memory();
 		return true;
 
 	case 0x0f: // MAC_L(Rm, Rn);
 	case 0x1f: // MAC_L(Rm, Rn);
 	case 0x2f: // MAC_L(Rm, Rn);
 	case 0x3f: // MAC_L(Rm, Rn);
-		desc.regin[0] |= REGFLAG_R(REG_M) | REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_MACL | REGFLAG_MACH;
+		desc.set_r_used(REG_M);
+		desc.set_r_used(REG_N);
+		desc.set_mac_modified();
 		desc.cycles = 3;
 		return true;
 
 	case 0x12: // STCGBR(Rn);
-		desc.regout[0] |= REGFLAG_R(REG_N);
-		desc.regin[1] |= REGFLAG_GBR;
+		desc.set_r_modified(REG_N);
+		desc.set_gbr_used();
 		return true;
 
 	case 0x18: // SETT();
-		desc.regout[1] |= REGFLAG_SR;
+		desc.set_sr_modified();
 		return true;
 
 	case 0x19: // DIV0U();
-		desc.regout[1] |= REGFLAG_SR;
+		desc.set_sr_modified();
 		return true;
 
 	case 0x1a: // STSMACL(Rn);
-		desc.regin[1] |= REGFLAG_MACL;
-		desc.regout[0] |= REGFLAG_R(REG_N);
+		desc.set_macl_used();
+		desc.set_r_modified(REG_N);
 		return true;
 
 	case 0x1b: // SLEEP();
@@ -498,37 +642,40 @@ bool sh_frontend::describe_group_0(opcode_desc &desc, const opcode_desc *prev, u
 		return true;
 
 	case 0x22: // STCVBR(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_VBR;
+		desc.set_r_used(REG_N);
+		desc.set_vbr_modified();
 		return true;
 
 	case 0x23: // BRAF(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_M);
-		desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+		desc.set_r_used(REG_M);
+		desc.set_is_unconditional_branch();
+		desc.set_end_sequence();
 		desc.targetpc = BRANCH_TARGET_DYNAMIC;
 		desc.delayslots = 1;
 		desc.cycles = 2;
 		return true;
 
 	case 0x28: // CLRMAC();
-		desc.regout[1] |= REGFLAG_MACL | REGFLAG_MACH;
+		desc.set_mac_modified();
 		return true;
 
 	case 0x29: // MOVT(Rn);
-		desc.regin[1] |= REGFLAG_SR;
-		desc.regout[0] |= REGFLAG_R(REG_N);
+		desc.set_sr_used();
+		desc.set_r_modified(REG_N);
 		return true;
 
 	case 0x2a: // STSPR(Rn);
-		desc.regin[1] |= REGFLAG_PR;
-		desc.regout[0] |= REGFLAG_R(REG_N);
+		desc.set_pr_used();
+		desc.set_r_modified(REG_N);
 		return true;
 
 	case 0x2b: // RTE();
-		desc.regin[0] |= REGFLAG_R(15);
-		desc.regout[0] |= REGFLAG_R(15);
+		desc.set_r_used(15);
+		desc.set_r_modified(15);
 
-		desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE | OPFLAG_CAN_EXPOSE_EXTERNAL_INT;
+		desc.set_is_unconditional_branch();
+		desc.set_end_sequence();
+		desc.set_can_expose_external_int();
 		desc.targetpc = BRANCH_TARGET_DYNAMIC;
 		desc.delayslots = 1;
 		desc.cycles = 4;
@@ -540,46 +687,48 @@ bool sh_frontend::describe_group_0(opcode_desc &desc, const opcode_desc *prev, u
 }
 
 
-bool sh_frontend::describe_group_4(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
+bool sh_common_execution::frontend::describe_group_4(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
 {
-	switch (opcode & 0x3F)
+	switch (opcode & 0x3f)
 	{
 	case 0x00: // SHLL(Rn);
 	case 0x01: // SHLR(Rn);
 	case 0x04: // ROTL(Rn);
 	case 0x05: // ROTR(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N);
-		desc.regout[0] |= REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_SR;
+		desc.set_r_used(REG_N);
+		desc.set_r_modified(REG_N);
+		desc.set_sr_modified();
 		return true;
 
 	case 0x02: // STSMMACH(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N);
-		desc.regin[1] |= REGFLAG_MACH;
-		desc.regout[0] |= REGFLAG_R(REG_N);
-		desc.flags |= OPFLAG_WRITES_MEMORY;
+		desc.set_r_used(REG_N);
+		desc.set_mach_used();
+		desc.set_r_modified(REG_N);
+		desc.set_writes_memory();
 		return true;
 
 	case 0x03: // STCMSR(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N);
-		desc.regout[0] |= REGFLAG_R(REG_N);
+		desc.set_r_used(REG_N);
+		desc.set_r_modified(REG_N);
 		desc.cycles = 2;
-		desc.flags |= OPFLAG_WRITES_MEMORY;
+		desc.set_writes_memory();
 		return true;
 
 	case 0x06: // LDSMMACH(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N);
-		desc.regout[0] |= REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_MACH;
-		desc.flags |= OPFLAG_READS_MEMORY;
+		desc.set_r_used(REG_N);
+		desc.set_r_modified(REG_N);
+		desc.set_mach_modified();
+		desc.set_reads_memory();
 		return true;
 
 	case 0x07: // LDCMSR(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N);
-		desc.regout[0] |= REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_SR;
+		desc.set_r_used(REG_N);
+		desc.set_r_modified(REG_N);
+		desc.set_sr_modified();
 		desc.cycles = 3;
-		desc.flags |= OPFLAG_READS_MEMORY | OPFLAG_CAN_EXPOSE_EXTERNAL_INT | OPFLAG_END_SEQUENCE;
+		desc.set_end_sequence();
+		desc.set_reads_memory();
+		desc.set_can_expose_external_int();
 		return true;
 
 	case 0x08: // SHLL2(Rn);
@@ -588,158 +737,166 @@ bool sh_frontend::describe_group_4(opcode_desc &desc, const opcode_desc *prev, u
 	case 0x19: // SHLR8(Rn);
 	case 0x28: // SHLL16(Rn);
 	case 0x29: // SHLR16(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N);
-		desc.regout[0] |= REGFLAG_R(REG_N);
+		desc.set_r_used(REG_N);
+		desc.set_r_modified(REG_N);
 		return true;
 
 	case 0x0a: // LDSMACH(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_MACH;
+		desc.set_r_used(REG_N);
+		desc.set_mach_modified();
 		return true;
 
 	case 0x0b: // JSR(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_PR;
-		desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+		desc.set_r_used(REG_N);
+		desc.set_pr_modified();
+		desc.set_is_unconditional_branch();
+		desc.set_end_sequence();
 		desc.targetpc = BRANCH_TARGET_DYNAMIC;
 		desc.delayslots = 1;
 		return true;
 
 	case 0x0e: // LDCSR(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_SR;
-		desc.flags |= OPFLAG_CAN_EXPOSE_EXTERNAL_INT | OPFLAG_END_SEQUENCE;
+		desc.set_r_used(REG_N);
+		desc.set_sr_modified();
+		desc.set_end_sequence();
+		desc.set_can_expose_external_int();
 		return true;
 
 	case 0x0f: // MAC_W(Rm, Rn);
 	case 0x1f: // MAC_W(Rm, Rn);
 	case 0x2f: // MAC_W(Rm, Rn);
 	case 0x3f: // MAC_W(Rm, Rn);
-		desc.regin[0] |= REGFLAG_R(REG_M) | REGFLAG_R(REG_N);
-		desc.regin[1] |= REGFLAG_MACL | REGFLAG_MACH;
-		desc.regout[0] |= REGFLAG_R(REG_M) | REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_MACL | REGFLAG_MACH;
+		desc.set_r_used(REG_M);
+		desc.set_r_used(REG_N);
+		desc.set_mac_used();
+		desc.set_r_modified(REG_M);
+		desc.set_r_modified(REG_N);
+		desc.set_mac_modified();
 		desc.cycles = 3;
 		return true;
 
 	case 0x10: // DT(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N);
-		desc.regin[1] |= REGFLAG_SR;
-		desc.regout[0] |= REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_SR;
+		desc.set_r_used(REG_N);
+		desc.set_sr_used();
+		desc.set_r_modified(REG_N);
+		desc.set_sr_modified();
 		return true;
 
 	case 0x11: // CMPPZ(Rn);
 	case 0x15: // CMPPL(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N);
-		desc.regin[1] |= REGFLAG_SR;
-		desc.regout[1] |= REGFLAG_SR;
+		desc.set_r_used(REG_N);
+		desc.set_sr_used();
+		desc.set_sr_modified();
 		return true;
 
 	case 0x12: // STSMMACL(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N);
-		desc.regin[1] |= REGFLAG_MACL;
-		desc.regout[0] |= REGFLAG_R(REG_N);
-		desc.flags |= OPFLAG_WRITES_MEMORY;
+		desc.set_r_used(REG_N);
+		desc.set_macl_used();
+		desc.set_r_modified(REG_N);
+		desc.set_writes_memory();
 		return true;
 
 	case 0x13: // STCMGBR(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N);
-		desc.regin[1] |= REGFLAG_GBR;
-		desc.regout[0] |= REGFLAG_R(REG_N);
-		desc.flags |= OPFLAG_WRITES_MEMORY;
+		desc.set_r_used(REG_N);
+		desc.set_gbr_used();
+		desc.set_r_modified(REG_N);
+		desc.set_writes_memory();
 		return true;
 
 	case 0x16: // LDSMMACL(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_M) | REGFLAG_R(REG_N);
-		desc.regout[0] |= REGFLAG_R(REG_M) | REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_MACL;
-		desc.flags |= OPFLAG_READS_MEMORY;
+		desc.set_r_used(REG_M);
+		desc.set_r_used(REG_N);
+		desc.set_r_modified(REG_M);
+		desc.set_r_modified(REG_N);
+		desc.set_macl_modified();
+		desc.set_reads_memory();
 		return true;
 
 	case 0x17: // LDCMGBR(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N);
-		desc.regout[0] |= REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_GBR;
-		desc.flags |= OPFLAG_READS_MEMORY;
+		desc.set_r_used(REG_N);
+		desc.set_r_modified(REG_N);
+		desc.set_gbr_modified();
+		desc.set_reads_memory();
 		return true;
 
 	case 0x1a: // LDSMACL(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_MACL;
+		desc.set_r_used(REG_N);
+		desc.set_macl_modified();
 		return true;
 
 	case 0x1b: // TAS(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N);
-		desc.regin[1] |= REGFLAG_SR;
-		desc.regout[1] |= REGFLAG_SR;
+		desc.set_r_used(REG_N);
+		desc.set_sr_used();
+		desc.set_sr_modified();
 		desc.cycles = 4;
-		desc.flags |= OPFLAG_READS_MEMORY | OPFLAG_WRITES_MEMORY;
+		desc.set_reads_memory();
+		desc.set_writes_memory();
 		return true;
 
 	case 0x1e: // LDCGBR(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_GBR;
+		desc.set_r_used(REG_N);
+		desc.set_gbr_modified();
 		return true;
 
 	case 0x20: // SHAL(Rn);
 	case 0x21: // SHAR(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N);
-		desc.regout[0] |= REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_SR;
+		desc.set_r_used(REG_N);
+		desc.set_r_modified(REG_N);
+		desc.set_sr_modified();
 		return true;
 
 	case 0x22: // STSMPR(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N);
-		desc.regin[1] |= REGFLAG_PR;
-		desc.regout[0] |= REGFLAG_R(REG_N);
-		desc.flags |= OPFLAG_WRITES_MEMORY;
+		desc.set_r_used(REG_N);
+		desc.set_pr_used();
+		desc.set_r_modified(REG_N);
+		desc.set_writes_memory();
 		return true;
 
 	case 0x23: // STCMVBR(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N);
-		desc.regin[1] |= REGFLAG_VBR;
-		desc.regout[0] |= REGFLAG_R(REG_N);
-		desc.flags |= OPFLAG_WRITES_MEMORY;
+		desc.set_r_used(REG_N);
+		desc.set_vbr_used();
+		desc.set_r_modified(REG_N);
+		desc.set_writes_memory();
 		return true;
 
 	case 0x24: // ROTCL(Rn);
 	case 0x25: // ROTCR(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N);
-		desc.regin[1] |= REGFLAG_SR;
-		desc.regout[0] |= REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_SR;
+		desc.set_r_used(REG_N);
+		desc.set_sr_used();
+		desc.set_r_modified(REG_N);
+		desc.set_sr_modified();
 		return true;
 
 	case 0x26: // LDSMPR(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N);
-		desc.regout[0] |= REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_PR;
-		desc.flags |= OPFLAG_READS_MEMORY;
+		desc.set_r_used(REG_N);
+		desc.set_r_modified(REG_N);
+		desc.set_pr_modified();
+		desc.set_reads_memory();
 		return true;
 
 	case 0x27: // LDCMVBR(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N);
-		desc.regout[0] |= REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_VBR;
-		desc.flags |= OPFLAG_READS_MEMORY;
+		desc.set_r_used(REG_N);
+		desc.set_r_modified(REG_N);
+		desc.set_vbr_modified();
+		desc.set_reads_memory();
 		return true;
 
 	case 0x2a: // LDSPR(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_PR;
+		desc.set_r_used(REG_N);
+		desc.set_pr_modified();
 		return true;
 
 	case 0x2b: // JMP(Rm);
-		desc.regin[0] |= REGFLAG_R(REG_M);
-		desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+		desc.set_r_used(REG_M);
+		desc.set_is_unconditional_branch();
+		desc.set_end_sequence();
 		desc.targetpc = BRANCH_TARGET_DYNAMIC;
 		desc.delayslots = 1;
 		return true;
 
 	case 0x2e: // LDCVBR(Rn);
-		desc.regin[0] |= REGFLAG_R(REG_N);
-		desc.regout[1] |= REGFLAG_VBR;
+		desc.set_r_used(REG_N);
+		desc.set_vbr_modified();
 		return true;
 
 	case 0x0c: // NOP();

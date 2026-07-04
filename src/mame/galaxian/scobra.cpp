@@ -935,7 +935,7 @@ void scobra_state::type1(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &scobra_state::scobra_sound_io_map);
 	m_audiocpu->set_irq_acknowledge_callback(FUNC(scramble_state::scramble_sh_irq_callback));
 
-	ttl7474_device &konami_7474(TTL7474(config, "konami_7474", 0));
+	ttl7474_device &konami_7474(TTL7474(config, "konami_7474"));
 	konami_7474.comp_output_cb().set(FUNC(scobra_state::scramble_sh_7474_q_callback));
 
 	MCFG_MACHINE_RESET_OVERRIDE(scobra_state,scramble)
@@ -949,10 +949,10 @@ void scobra_state::type1(machine_config &config)
 	m_ppi8255_1->out_pa_callback().set(m_soundlatch, FUNC(generic_latch_8_device::write));
 	m_ppi8255_1->out_pb_callback().set(FUNC(scramble_state::scramble_sh_irqtrigger_w));
 
-	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1", 0));
+	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1"));
 	ttl7474_9m_1.output_cb().set(FUNC(scobra_state::galaxold_7474_9m_1_callback));
 
-	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2", 0));
+	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2"));
 	ttl7474_9m_2.comp_output_cb().set(FUNC(scobra_state::galaxold_7474_9m_2_q_callback));
 
 	TIMER(config, "int_timer").configure_generic(FUNC(scobra_state::galaxold_interrupt_timer));
@@ -1041,10 +1041,10 @@ void scobra_state::mimonkeyug(machine_config &config)
 
 	MCFG_MACHINE_RESET_OVERRIDE(scobra_state,scramble)
 
-	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1", 0));
+	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1"));
 	ttl7474_9m_1.output_cb().set(FUNC(scobra_state::galaxold_7474_9m_1_callback));
 
-	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2", 0));
+	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2"));
 	ttl7474_9m_2.comp_output_cb().set(FUNC(scobra_state::galaxold_7474_9m_2_q_callback));
 
 	TIMER(config, "int_timer").configure_generic(FUNC(scobra_state::galaxold_interrupt_timer));
@@ -1128,15 +1128,15 @@ void scobra_state::hustler(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &scobra_state::hustler_sound_io_map);
 	m_audiocpu->set_irq_acknowledge_callback(FUNC(scramble_state::scramble_sh_irq_callback));
 
-	ttl7474_device &konami_7474(TTL7474(config, "konami_7474", 0));
+	ttl7474_device &konami_7474(TTL7474(config, "konami_7474"));
 	konami_7474.comp_output_cb().set(FUNC(scobra_state::scramble_sh_7474_q_callback));
 
 	MCFG_MACHINE_RESET_OVERRIDE(scobra_state,scramble)
 
-	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1", 0));
+	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1"));
 	ttl7474_9m_1.output_cb().set(FUNC(scobra_state::galaxold_7474_9m_1_callback));
 
-	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2", 0));
+	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2"));
 	ttl7474_9m_2.comp_output_cb().set(FUNC(scobra_state::galaxold_7474_9m_2_q_callback));
 
 	TIMER(config, "int_timer").configure_generic(FUNC(scobra_state::galaxold_interrupt_timer));

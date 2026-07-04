@@ -94,6 +94,7 @@
 #include "emu.h"
 #include "pgm2.h"
 
+
 // checked on startup, or doesn't boot
 u32 pgm2_state::unk_startup_r()
 {
@@ -754,9 +755,9 @@ void pgm2_state::pgm2(machine_config &config)
 	IGS036(config, m_maincpu, 100000000); // Unknown clock / divider
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm2_state::pgm2_rom_map);
 
-	TIMER(config, m_mcu_timer, 0).configure_generic(FUNC(pgm2_state::mcu_interrupt));
+	TIMER(config, m_mcu_timer).configure_generic(FUNC(pgm2_state::mcu_interrupt));
 
-	ARM_AIC(config, m_arm_aic, 0).irq_callback().set(FUNC(pgm2_state::irq));
+	ARM_AIC(config, m_arm_aic).irq_callback().set(FUNC(pgm2_state::irq));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -778,14 +779,14 @@ void pgm2_state::pgm2(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	ymz774_device &ymz774(YMZ774(config, "ymz774", 16384000)); // is clock correct ?
+	ymz774_device &ymz774(YMZ774(config, "ymz774", 22.5792_MHz_XTAL));
 	ymz774.add_route(0, "speaker", 1.0, 0);
 	ymz774.add_route(1, "speaker", 1.0, 1);
 
-	PGM2_MEMCARD(config, m_memcard[0], 0);
-	PGM2_MEMCARD(config, m_memcard[1], 0);
-	PGM2_MEMCARD(config, m_memcard[2], 0);
-	PGM2_MEMCARD(config, m_memcard[3], 0);
+	PGM2_MEMCARD(config, m_memcard[0]);
+	PGM2_MEMCARD(config, m_memcard[1]);
+	PGM2_MEMCARD(config, m_memcard[2]);
+	PGM2_MEMCARD(config, m_memcard[3]);
 }
 
 // not strictly needed as the video code supports changing on the fly, but makes recording easier etc.

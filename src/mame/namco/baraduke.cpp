@@ -497,7 +497,7 @@ void baraduke_state::main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().w(FUNC(baraduke_state::spriteram_w)).share(m_spriteram);
 	map(0x2000, 0x3fff).rw(m_tilegen, FUNC(namco_cus4xtmap_device::vram_r), FUNC(namco_cus4xtmap_device::vram_w));
-	map(0x4000, 0x43ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)); // PSG device, shared RAM
+	map(0x4000, 0x43ff).m(m_cus30, FUNC(namco_cus30_device::amap)); // PSG device, shared RAM
 	map(0x4800, 0x4fff).ram().w(FUNC(baraduke_state::textram_w)).share(m_textram);
 	map(0x6000, 0xffff).rom();
 	map(0x8000, 0x8000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
@@ -508,7 +508,7 @@ void baraduke_state::main_map(address_map &map)
 
 void baraduke_state::mcu_map(address_map &map)
 {
-	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)); // PSG device, shared RAM
+	map(0x1000, 0x13ff).m(m_cus30, FUNC(namco_cus30_device::amap)); // PSG device, shared RAM
 	map(0x8000, 0xbfff).rom().region("mcusub", 0);  // MCU external ROM
 	map(0x8000, 0x8000).nopw(); // watchdog reset?
 	map(0x8800, 0x8800).nopw(); // IRQ acknowledge?
@@ -669,8 +669,6 @@ GFXDECODE_END
 
 void baraduke_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_inputport_selected));
 }
 
@@ -699,7 +697,7 @@ void baraduke_state::baraduke(machine_config &config)
 	screen.screen_vblank().set(FUNC(baraduke_state::screen_vblank));
 	screen.set_palette(m_palette);
 
-	NAMCO_CUS4XTMAP(config, m_tilegen, 0, m_palette, gfx_baraduke_tile);
+	NAMCO_CUS4XTMAP(config, m_tilegen, m_palette, gfx_baraduke_tile);
 	m_tilegen->set_offset(-26, -227, -9, 9);
 	m_tilegen->set_tile_callback(FUNC(baraduke_state::tile_cb));
 
@@ -710,7 +708,6 @@ void baraduke_state::baraduke(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	NAMCO_CUS30(config, m_cus30, XTAL(49'152'000) / 2048);
-	m_cus30->set_voices(8);
 	m_cus30->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 

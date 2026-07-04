@@ -244,6 +244,7 @@ Notes:
 #define LOG_SYS        (1U << 1)
 #define LOG_CD         (1U << 2)
 #define LOG_CD_UNKNOWN (1U << 3)
+#define LOG_IRQ        (1U << 4)
 
 #define VERBOSE (LOG_GENERAL | LOG_CD_UNKNOWN)
 #include "logmacro.h"
@@ -475,6 +476,9 @@ template<int Chip>
 uint8_t towns_state::towns_dma_r(offs_t offset)
 {
 	logerror("DMA#%01x: read register %i\n",Chip,offset);
+	if (offset == 7)
+		return m_dma_msb[Chip];
+
 	return m_dma[Chip]->read(offset);
 }
 
@@ -482,7 +486,22 @@ template<int Chip>
 void towns_state::towns_dma_w(offs_t offset, uint8_t data)
 {
 	logerror("DMA#%01x: wrote 0x%02x to register %i\n",Chip,data,offset);
+	if (offset == 7)
+		m_dma_msb[Chip] = data;
+
 	m_dma[Chip]->write(offset, data);
+}
+
+template<int Chip>
+uint8_t towns_state::towns_dma_mem_r(offs_t offset)
+{
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset | (offs_t(m_dma_msb[Chip]) << 24));
+}
+
+template<int Chip>
+void towns_state::towns_dma_mem_w(offs_t offset, uint8_t data)
+{
+	m_maincpu->space(AS_PROGRAM).write_byte(offset | (offs_t(m_dma_msb[Chip]) << 24), data);
 }
 
 /*
@@ -494,12 +513,12 @@ void towns_state::mb8877a_irq_w(int state)
 	if(m_towns_fdc_irq6mask == 0)
 		state = 0;
 	m_pic_master->ir6_w(state);  // IRQ6 = FDC
-	if(IRQ_LOG) logerror("PIC: IRQ6 (FDC) set to %i\n",state);
+	LOGMASKED(LOG_IRQ,"PIC: IRQ6 (FDC) set to %i\n",state);
 }
 
 void towns_state::mb8877a_drq_w(int state)
 {
-	m_dma[0]->dmarq(state, 0);
+	m_dma[0]->dreq0_w(state);
 }
 
 uint8_t towns_state::towns_floppy_r(offs_t offset)
@@ -633,16 +652,6 @@ void towns_state::towns_floppy_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint16_t towns_state::towns_fdc_dma_r()
-{   uint16_t data = m_fdc->data_r();
-	return data;
-}
-
-void towns_state::towns_fdc_dma_w(uint16_t data)
-{
-	m_fdc->data_w(data);
-}
-
 /*
  *  Port 0x600-0x607 - Keyboard controller (8042 MCU)
  *
@@ -695,7 +704,7 @@ void towns_state::kb_sendcode(uint8_t scancode, int release)
 	if(m_towns_kb_irq1_enable)
 	{
 		m_pic_master->ir1_w(1);
-		if(IRQ_LOG) logerror("PIC: IRQ1 (keyboard) set high\n");
+		LOGMASKED(LOG_IRQ,"PIC: IRQ1 (keyboard) set high\n");
 	}
 	//logerror("KB: sending scancode 0x%02x\n",scancode);
 }
@@ -731,7 +740,7 @@ uint8_t towns_state::towns_keyboard_r(offs_t offset)
 			ret = m_towns_kb_output;
 			//logerror("KB: read keyboard output port, returning %02x\n",ret);
 			m_pic_master->ir1_w(0);
-			if(IRQ_LOG) logerror("PIC: IRQ1 (keyboard) set low\n");
+			LOGMASKED(LOG_IRQ,"PIC: IRQ1 (keyboard) set low\n");
 			if(m_towns_kb_extend != 0xff)
 			{
 				kb_sendcode(m_towns_kb_extend,2);
@@ -876,7 +885,7 @@ uint8_t towns_state::towns_sound_ctrl_r(offs_t offset)
 			if(m_towns_fm_irq_flag == 0)
 			{
 				m_pic_slave->ir5_w(0);
-				if(IRQ_LOG) logerror("PIC: IRQ13 (PCM) set low\n");
+				LOGMASKED(LOG_IRQ,"PIC: IRQ13 (PCM) set low\n");
 			}
 			break;
 //      default:
@@ -1101,7 +1110,7 @@ void towns_state::towns_cdrom_set_irq(int line,int state)
 					{
 						m_towns_cd.status |= 0x80;
 						m_pic_slave->ir1_w(1);
-						if(IRQ_LOG) logerror("PIC: IRQ9 (CD-ROM) set high\n");
+						LOGMASKED(LOG_IRQ,"PIC: IRQ9 (CD-ROM) set high\n");
 					}
 				}
 				else
@@ -1111,7 +1120,7 @@ void towns_state::towns_cdrom_set_irq(int line,int state)
 			{
 				m_towns_cd.status &= ~0x80;
 				m_pic_slave->ir1_w(0);
-				if(IRQ_LOG) logerror("PIC: IRQ9 (CD-ROM) set low\n");
+				LOGMASKED(LOG_IRQ,"PIC: IRQ9 (CD-ROM) set low\n");
 			}
 			break;
 		case TOWNS_CD_IRQ_DMA:
@@ -1123,7 +1132,7 @@ void towns_state::towns_cdrom_set_irq(int line,int state)
 					{
 						m_towns_cd.status |= 0x40;
 						m_pic_slave->ir1_w(1);
-						if(IRQ_LOG) logerror("PIC: IRQ9 (CD-ROM DMA) set high\n");
+						LOGMASKED(LOG_IRQ,"PIC: IRQ9 (CD-ROM DMA) set high\n");
 					}
 				}
 				else
@@ -1133,7 +1142,7 @@ void towns_state::towns_cdrom_set_irq(int line,int state)
 			{
 				m_towns_cd.status &= ~0x40;
 				m_pic_slave->ir1_w(0);
-				if(IRQ_LOG) logerror("PIC: IRQ9 (CD-ROM DMA) set low\n");
+				LOGMASKED(LOG_IRQ,"PIC: IRQ9 (CD-ROM DMA) set low\n");
 			}
 			break;
 	}
@@ -1173,28 +1182,21 @@ uint8_t towns_state::towns_cd_get_track()
 
 TIMER_CALLBACK_MEMBER(towns_state::towns_cdrom_read_byte)
 {
-	upd71071_device* device = m_dma_1.target();
-	int masked;
 	// TODO: support software transfers, for now DMA is assumed.
 
 	if(m_towns_cd.buffer_ptr < 0) // transfer has ended
 		return;
 
-	masked = device->dmarq(param, 3);  // CD-ROM controller uses DMA1 channel 3
-//  logerror("DMARQ: param=%i ret=%i bufferptr=%i\n",param,masked,m_towns_cd.buffer_ptr);
+//  logerror("DMARQ: param=%i bufferptr=%i\n",param,m_towns_cd.buffer_ptr);
 	if(param != 0)
 	{
-		m_towns_cd.read_timer->adjust(attotime::from_hz(300000));
+		m_dma_1->dreq3_w(1);  // CD-ROM controller uses DMA1 channel 3
+		m_towns_cd.read_timer->adjust(attotime::from_hz(300'000));
 	}
 	else
 	{
-		if(masked != 0)  // check if the DMA channel is masked
-		{
-			m_towns_cd.read_timer->adjust(attotime::from_hz(300000),1);
-			return;
-		}
 		if(m_towns_cd.buffer_ptr < 2048)
-			m_towns_cd.read_timer->adjust(attotime::from_hz(300000),1);
+			m_towns_cd.read_timer->adjust(attotime::from_hz(300'000), 1);
 		else
 		{  // end of transfer
 			m_towns_cd.status &= ~0x10;  // no longer transferring by DMA
@@ -1214,7 +1216,7 @@ TIMER_CALLBACK_MEMBER(towns_state::towns_cdrom_read_byte)
 				towns_cd_set_status(0x22,0x00,0x00,0x00);
 				towns_cdrom_set_irq(TOWNS_CD_IRQ_DMA,1);
 				m_cdrom->read_data(++m_towns_cd.lba_current,m_towns_cd.buffer,cdrom_file::CD_TRACK_MODE1);
-				m_towns_cd.read_timer->adjust(attotime::from_hz(300000),1);
+				m_towns_cd.read_timer->adjust(attotime::from_hz(300'000), 1);
 				m_towns_cd.buffer_ptr = -1;
 			}
 		}
@@ -1304,7 +1306,7 @@ void towns_state::towns_cdrom_read(cdrom_image_device* device)
 			m_towns_cd.status &= ~0x20;  // not a software transfer
 		}
 //      m_towns_cd.buffer_ptr = 0;
-//      m_towns_cd.read_timer->adjust(attotime::from_hz(300000),1);
+//      m_towns_cd.read_timer->adjust(attotime::from_hz(300'000), 1);
 		if(m_towns_cd.command & 0x20)
 		{
 			m_towns_cd.extra_status = 2;
@@ -1480,11 +1482,17 @@ void towns_state::towns_cdrom_execute_command(cdrom_image_device* device)
 	}
 }
 
-uint16_t towns_state::towns_cdrom_dma_r()
+uint8_t towns_state::towns_cdrom_dma_r()
 {
 	if(m_towns_cd.buffer_ptr >= 2048)
 		return 0x00;
 	return m_towns_cd.buffer[m_towns_cd.buffer_ptr++];
+}
+
+void towns_state::towns_cdrom_dack_w(int state)
+{
+	if (!state)
+		m_dma_1->dreq3_w(0);
 }
 
 uint8_t towns_state::towns_cdrom_r(offs_t offset)
@@ -1693,7 +1701,7 @@ void towns_state::towns_cdrom_w(offs_t offset, uint8_t data)
 				if(m_towns_cd.buffer_ptr < 0)
 				{
 					m_towns_cd.buffer_ptr = 0;
-					m_towns_cd.read_timer->adjust(attotime::from_hz(300000),1);
+					m_towns_cd.read_timer->adjust(attotime::from_hz(300'000), 1);
 				}
 			}
 			LOGMASKED(LOG_CD, "CD: transfer mode write %02x\n",data);
@@ -1761,13 +1769,12 @@ void towns_state::rtc_busy_w(int state)
 void towns_state::towns_scsi_irq(int state)
 {
 	m_pic_slave->ir0_w(state);
-	if(IRQ_LOG)
-		logerror("PIC: IRQ8 (SCSI) set to %i\n",state);
+	LOGMASKED(LOG_IRQ,"PIC: IRQ8 (SCSI) set to %i\n",state);
 }
 
 void towns_state::towns_scsi_drq(int state)
 {
-	m_dma[0]->dmarq(state, 1);  // SCSI HDs use channel 1
+	m_dma[0]->dreq1_w(state); // SCSI HDs use channel 1
 }
 
 
@@ -1849,7 +1856,7 @@ void towns_state::towns_fm_irq(int state)
 	{
 		m_towns_fm_irq_flag = 1;
 		m_pic_slave->ir5_w(1);
-		if(IRQ_LOG) logerror("PIC: IRQ13 (FM) set high\n");
+		LOGMASKED(LOG_IRQ,"PIC: IRQ13 (FM) set high\n");
 	}
 	else
 	{
@@ -1857,7 +1864,7 @@ void towns_state::towns_fm_irq(int state)
 		if(m_towns_pcm_irq_flag == 0)
 		{
 			m_pic_slave->ir5_w(0);
-			if(IRQ_LOG) logerror("PIC: IRQ13 (FM) set low\n");
+			LOGMASKED(LOG_IRQ,"PIC: IRQ13 (FM) set low\n");
 		}
 	}
 }
@@ -1870,7 +1877,7 @@ RF5C68_SAMPLE_END_CB_MEMBER(towns_state::towns_pcm_irq)
 		m_towns_pcm_irq_flag = 1;
 		m_towns_pcm_channel_flag |= (1 << channel);
 		m_pic_slave->ir5_w(1);
-		if(IRQ_LOG) logerror("PIC: IRQ13 (PCM) set high (channel %i)\n",channel);
+		LOGMASKED(LOG_IRQ,"PIC: IRQ13 (PCM) set high (channel %i)\n",channel);
 	}
 }
 
@@ -1881,7 +1888,7 @@ void towns_state::towns_pit_out0_changed(int state)
 	if(m_towns_timer_mask & 0x01)
 	{
 		m_timer0 = state;
-		if(IRQ_LOG) logerror("PIC: IRQ0 (PIT Timer ch0) set to %i\n",state);
+		LOGMASKED(LOG_IRQ,"PIC: IRQ0 (PIT Timer ch0) set to %i\n",state);
 	}
 	else
 		m_timer0 = 0;
@@ -1896,7 +1903,7 @@ void towns_state::towns_pit_out1_changed(int state)
 	if(m_towns_timer_mask & 0x02)
 	{
 		m_timer1 = state;
-		if(IRQ_LOG) logerror("PIC: IRQ0 (PIT Timer ch1) set to %i\n",state);
+		LOGMASKED(LOG_IRQ,"PIC: IRQ0 (PIT Timer ch1) set to %i\n",state);
 	}
 	else
 		m_timer1 = 0;
@@ -1926,6 +1933,7 @@ void towns_state::towns_serial_w(offs_t offset, uint8_t data)
 			break;
 		case 4:
 			m_serial_irq_enable = data;
+			// TODO: should this trigger a previously masked serial IRQ, or drop a newly masked one?
 			break;
 		default:
 			logerror("Invalid or unimplemented serial port write [offset=%02x, data=%02x]\n",offset,data);
@@ -1949,27 +1957,45 @@ uint8_t towns_state::towns_serial_r(offs_t offset)
 
 void towns_state::towns_serial_irq(int state)
 {
-	m_serial_irq_source = state ? 0x01 : 0x00;
-	m_pic_master->ir2_w(state);
-	popmessage("Serial IRQ state: %i\n",state);
+	if((state ? 0x01 : 0x00) != m_serial_irq_source)
+	{
+		m_serial_irq_source = state ? 0x01 : 0x00;
+		m_pic_master->ir2_w(state);
+		popmessage("Serial IRQ state: %i\n",state);
+	}
 }
 
 void towns_state::towns_rxrdy_irq(int state)
 {
+	if(state)
+		m_serial_irq_state |= RXRDY_IRQ_ENABLE;
+	else
+		m_serial_irq_enable &= ~RXRDY_IRQ_ENABLE;
+
 	if(m_serial_irq_enable & RXRDY_IRQ_ENABLE)
-		towns_serial_irq(state);
+		towns_serial_irq((m_serial_irq_enable & m_serial_irq_state) ? 1 : 0);
 }
 
 void towns_state::towns_txrdy_irq(int state)
 {
+	if(state)
+		m_serial_irq_state |= TXRDY_IRQ_ENABLE;
+	else
+		m_serial_irq_enable &= ~TXRDY_IRQ_ENABLE;
+
 	if(m_serial_irq_enable & TXRDY_IRQ_ENABLE)
-		towns_serial_irq(state);
+		towns_serial_irq((m_serial_irq_enable & m_serial_irq_state) ? 1 : 0);
 }
 
 void towns_state::towns_syndet_irq(int state)
 {
+	if(state)
+		m_serial_irq_state |= SYNDET_IRQ_ENABLE;
+	else
+		m_serial_irq_enable &= ~SYNDET_IRQ_ENABLE;
+
 	if(m_serial_irq_enable & SYNDET_IRQ_ENABLE)
-		towns_serial_irq(state);
+		towns_serial_irq((m_serial_irq_enable & m_serial_irq_state) ? 1 : 0);
 }
 
 
@@ -2409,7 +2435,11 @@ void towns_state::driver_start()
 	save_item(NAME(m_pit_out0));
 	save_item(NAME(m_pit_out1));
 	save_item(NAME(m_pit_out2));
+	save_item(NAME(m_timer0));
+	save_item(NAME(m_timer1));
 	save_item(NAME(m_serial_irq_source));
+	save_item(NAME(m_serial_irq_enable));
+	save_item(NAME(m_serial_irq_state));
 
 	save_item(NAME(m_kb_prev));
 	save_item(NAME(m_prev_pad_mask));
@@ -2419,6 +2449,7 @@ void towns_state::driver_start()
 	save_item(NAME(m_rtc_busy));
 	save_item(NAME(m_vram_mask));
 	save_item(NAME(m_vram_mask_addr));
+	save_item(NAME(m_dma_msb));
 
 	save_item(STRUCT_MEMBER(m_towns_cd, command));
 	save_item(STRUCT_MEMBER(m_towns_cd, status));
@@ -2499,7 +2530,9 @@ void towns_state::machine_start()
 
 	m_timer0 = 0;
 	m_timer1 = 0;
+	m_serial_irq_source = 0;
 	m_serial_irq_enable = 0;
+	m_serial_irq_state = 0;
 }
 
 void towns_state::machine_reset()
@@ -2523,7 +2556,6 @@ void towns_state::machine_reset()
 	m_intervaltimer2_irqmask = 1;  // masked
 	m_towns_kb_timer->adjust(attotime::zero,0,attotime::from_msec(10));
 	m_towns_freerun_counter->adjust(attotime::zero,0,attotime::from_usec(1));
-	m_serial_irq_source = 0;
 	m_rtc_d = 0;
 	m_rtc_busy = false;
 	m_vram_mask_addr = 0;
@@ -2531,6 +2563,7 @@ void towns_state::machine_reset()
 	m_towns_pcm_channel_mask = 0xff;
 	m_towns_pcm_irq_flag = 0;
 	m_towns_fm_irq_flag = 0;
+	m_dma_msb[0] = m_dma_msb[1] = 0;
 }
 
 uint8_t towns_state::get_slave_ack(offs_t offset)
@@ -2582,7 +2615,7 @@ GFXDECODE_END
 void towns_state::towns_base(machine_config &config)
 {
 	/* basic machine hardware */
-	I386(config, m_maincpu, 16000000);
+	I386(config, m_maincpu, 16'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &towns_state::towns_mem);
 	m_maincpu->set_addrmap(AS_IO, &towns_state::towns_1g_io);
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
@@ -2608,20 +2641,20 @@ void towns_state::towns_base(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
 
-	ym3438_device &fm(YM3438(config, "fm", 16000000 / 2)); // actual clock speed unknown
+	ym3438_device &fm(YM3438(config, "fm", 16'000'000 / 2)); // actual clock speed unknown
 	fm.irq_handler().set(FUNC(towns_state::towns_fm_irq));
 	fm.add_route(0, "speaker", 1.00, 0);
 	fm.add_route(1, "speaker", 1.00, 1);
 
-/*
-    // Later model uses YMF276 for FM
-    ymf276_device &fm(YMF276(config, "fm", 16000000 / 2)); // actual clock speed unknown
-    fm.irq_handler().set(FUNC(towns_state::towns_fm_irq));
-    fm.add_route(0, "speaker", 1.00);
-    fm.add_route(1, "speaker", 1.00);
-*/
+#if 0
+	// Later model uses YMF276 for FM
+	ymf276_device &fm(YMF276(config, "fm", 16'000'000 / 2)); // actual clock speed unknown
+	fm.irq_handler().set(FUNC(towns_state::towns_fm_irq));
+	fm.add_route(0, "speaker", 1.00);
+	fm.add_route(1, "speaker", 1.00);
+#endif
 
-	rf5c68_device &pcm(RF5C68(config, "pcm", 16000000 / 2));  // actual clock speed unknown
+	rf5c68_device &pcm(RF5C68(config, "pcm", 16'000'000 / 2));  // actual clock speed unknown
 	pcm.set_end_callback(FUNC(towns_state::towns_pcm_irq));
 	pcm.set_addrmap(0, &towns_state::pcm_mem);
 	pcm.add_route(0, "speaker", 1.00, 0);
@@ -2634,26 +2667,26 @@ void towns_state::towns_base(machine_config &config)
 	m_speaker->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
 	m_speaker->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
-	PIT8253(config, m_pit, 0);
-	m_pit->set_clk<0>(307200);
+	PIT8253(config, m_pit);
+	m_pit->set_clk<0>(307'200);
 	m_pit->out_handler<0>().set(FUNC(towns_state::towns_pit_out0_changed));
-	m_pit->set_clk<1>(307200);
+	m_pit->set_clk<1>(307'200);
 	m_pit->out_handler<1>().set(FUNC(towns_state::towns_pit_out1_changed));
-	m_pit->set_clk<2>(307200);
+	m_pit->set_clk<2>(307'200);
 	m_pit->out_handler<2>().set(FUNC(towns_state::pit_out2_changed));
 
-	pit8253_device &pit2(PIT8253(config, "pit2", 0));
-	pit2.set_clk<0>(307200); // reserved
-	pit2.set_clk<1>(1228800); // RS-232
+	pit8253_device &pit2(PIT8253(config, "pit2"));
+	pit2.set_clk<0>(307'200); // reserved
+	pit2.set_clk<1>(1'228'800); // RS-232
 	pit2.out_handler<1>().set(FUNC(towns_state::pit2_out1_changed));
-	pit2.set_clk<2>(307200); // reserved
+	pit2.set_clk<2>(307'200); // reserved
 
-	PIC8259(config, m_pic_master, 0);
+	PIC8259(config, m_pic_master);
 	m_pic_master->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic_master->in_sp_callback().set_constant(1);
 	m_pic_master->read_slave_ack_callback().set(FUNC(towns_state::get_slave_ack));
 
-	PIC8259(config, m_pic_slave, 0);
+	PIC8259(config, m_pic_slave);
 	m_pic_slave->out_int_callback().set(m_pic_master, FUNC(pic8259_device::ir7_w));
 	m_pic_slave->in_sp_callback().set_constant(0);
 
@@ -2671,20 +2704,21 @@ void towns_state::towns_base(machine_config &config)
 	SOFTWARE_LIST(config, "cd_list").set_original("fmtowns_cd");
 //  SOFTWARE_LIST(config, "win_cd_list").set_original("generic_cdrom");
 
-	UPD71071(config, m_dma[0], 0);
-	m_dma[0]->set_cpu_tag("maincpu");
-	m_dma[0]->set_clock(4000000);
-	m_dma[0]->dma_read_callback<0>().set(FUNC(towns_state::towns_fdc_dma_r));
-	m_dma[0]->dma_read_callback<3>().set(FUNC(towns_state::towns_state::towns_cdrom_dma_r));
-	m_dma[0]->dma_write_callback<0>().set(FUNC(towns_state::towns_fdc_dma_w));
-	UPD71071(config, m_dma[1], 0);
-	m_dma[1]->set_cpu_tag("maincpu");
-	m_dma[1]->set_clock(4000000);
-	m_dma[1]->dma_read_callback<0>().set(FUNC(towns_state::towns_fdc_dma_r));
-	m_dma[1]->dma_read_callback<3>().set(FUNC(towns_state::towns_state::towns_cdrom_dma_r));
-	m_dma[1]->dma_write_callback<0>().set(FUNC(towns_state::towns_fdc_dma_w));
+	for (int i = 0; i < 2; i++)
+	{
+		UPD71071(config, m_dma[i], 4'000'000);
+		m_dma[i]->in_ior_callback<0>().set(m_fdc, FUNC(mb8877_device::data_r));
+		m_dma[i]->out_iow_callback<0>().set(m_fdc, FUNC(mb8877_device::data_w));
+		m_dma[i]->out_hreq_callback().set(m_dma[i], FUNC(upd71071_device::hack_w)); // fixme
+	}
+	m_dma[0]->in_memr_callback().set(FUNC(towns_state::towns_dma_mem_r<0>));
+	m_dma[0]->out_memw_callback().set(FUNC(towns_state::towns_dma_mem_w<0>));
+	m_dma[1]->in_memr_callback().set(FUNC(towns_state::towns_dma_mem_r<1>));
+	m_dma[1]->out_memw_callback().set(FUNC(towns_state::towns_dma_mem_w<1>));
+	m_dma[0]->in_ior_callback<3>().set(FUNC(towns_state::towns_cdrom_dma_r));
+	m_dma[0]->out_dack_callback<3>().set(FUNC(towns_state::towns_cdrom_dack_w));
 
-	I8251(config, m_i8251, 0);
+	I8251(config, m_i8251);
 	m_i8251->rxrdy_handler().set(FUNC(towns_state::towns_rxrdy_irq));
 	m_i8251->txrdy_handler().set(FUNC(towns_state::towns_txrdy_irq));
 	m_i8251->syndet_handler().set(FUNC(towns_state::towns_syndet_irq));
@@ -2697,13 +2731,13 @@ void towns_state::towns_base(machine_config &config)
 	rs232c.dsr_handler().set(m_i8251, FUNC(i8251_device::write_dsr));
 	rs232c.cts_handler().set(m_i8251, FUNC(i8251_device::write_cts));
 
-	FMT_ICMEM(config, m_icmemcard, 0);
+	FMT_ICMEM(config, m_icmemcard);
 
 	/* First-generation models: 1 MB onboard, 3 SIMM slots with 1 or 2 MB each, except slot 1 (limited to 1 MB).
 	   Model 2 comes with a 1 MB SIMM preinstalled on slot 1, Model 1 doesn't. */
 	RAM(config, m_ram).set_default_size("2M").set_extra_options("1M,3M,4M,5M,6M");
 
-	MSM58321(config, m_rtc, 32768_Hz_XTAL);
+	MSM58321(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->d0_handler().set(FUNC(towns_state::rtc_d0_w));
 	m_rtc->d1_handler().set(FUNC(towns_state::rtc_d1_w));
 	m_rtc->d2_handler().set(FUNC(towns_state::rtc_d2_w));
@@ -2722,38 +2756,38 @@ void towns_state::towns(machine_config &config)
 	m_scsi_slot->irq_handler().set(FUNC(towns_state::towns_scsi_irq));
 	m_scsi_slot->drq_handler().set(FUNC(towns_state::towns_scsi_drq));
 
-	m_dma[0]->dma_read_callback<1>().set(m_scsi_slot, FUNC(fmt_scsi_slot_device::data_read));
-	m_dma[0]->dma_write_callback<1>().set(m_scsi_slot, FUNC(fmt_scsi_slot_device::data_write));
-	m_dma[1]->dma_read_callback<1>().set(m_scsi_slot, FUNC(fmt_scsi_slot_device::data_read));
-	m_dma[1]->dma_write_callback<1>().set(m_scsi_slot, FUNC(fmt_scsi_slot_device::data_write));
+	m_dma[0]->in_ior_callback<1>().set(m_scsi_slot, FUNC(fmt_scsi_slot_device::data_read));
+	m_dma[0]->out_iow_callback<1>().set(m_scsi_slot, FUNC(fmt_scsi_slot_device::data_write));
+	m_dma[1]->in_ior_callback<1>().set(m_scsi_slot, FUNC(fmt_scsi_slot_device::data_read));
+	m_dma[1]->out_iow_callback<1>().set(m_scsi_slot, FUNC(fmt_scsi_slot_device::data_write));
 }
 
 void towns16_state::townsux(machine_config &config)
 {
 	towns_base(config);
 
-	I386SX(config.replace(), m_maincpu, 16000000);
+	I386SX(config.replace(), m_maincpu, 16'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &towns16_state::ux_mem);
 	m_maincpu->set_addrmap(AS_IO, &towns16_state::townsux_io);
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	scsi_port_device &scsi(SCSI_PORT(config, "scsi", 0));
+	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
 	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 	scsi.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
 	scsi.set_slot_device(3, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_2));
 	scsi.set_slot_device(4, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_3));
 	scsi.set_slot_device(5, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
 
-	FMSCSI(config, m_scsi, 0);
+	FMSCSI(config, m_scsi);
 	m_scsi->set_scsi_port("scsi");
 	m_scsi->irq_handler().set(FUNC(towns16_state::towns_scsi_irq));
 	m_scsi->drq_handler().set(FUNC(towns16_state::towns_scsi_drq));
 
-	m_dma[0]->dma_read_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_r));
-	m_dma[0]->dma_write_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_w));
-	m_dma[1]->dma_read_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_r));
-	m_dma[1]->dma_write_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_w));
+	m_dma[0]->in_ior_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_r));
+	m_dma[0]->out_iow_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_w));
+	m_dma[1]->in_ior_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_r));
+	m_dma[1]->out_iow_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_w));
 
 	// 2 MB onboard, one SIMM slot with 2-8 MB
 	m_ram->set_default_size("2M").set_extra_options("4M,6M,10M");
@@ -2765,28 +2799,28 @@ void towns_state::townssj(machine_config &config)
 {
 	towns_base(config);
 
-	I486(config.replace(), m_maincpu, 66000000);
+	I486(config.replace(), m_maincpu, 66'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &towns_state::towns_mem);
 	m_maincpu->set_addrmap(AS_IO, &towns_state::towns2_io);
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	scsi_port_device &scsi(SCSI_PORT(config, "scsi", 0));
+	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
 	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 	scsi.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
 	scsi.set_slot_device(3, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_2));
 	scsi.set_slot_device(4, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_3));
 	scsi.set_slot_device(5, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
 
-	FMSCSI(config, m_scsi, 0);
+	FMSCSI(config, m_scsi);
 	m_scsi->set_scsi_port("scsi");
 	m_scsi->irq_handler().set(FUNC(towns_state::towns_scsi_irq));
 	m_scsi->drq_handler().set(FUNC(towns_state::towns_scsi_drq));
 
-	m_dma[0]->dma_read_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_r));
-	m_dma[0]->dma_write_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_w));
-	m_dma[1]->dma_read_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_r));
-	m_dma[1]->dma_write_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_w));
+	m_dma[0]->in_ior_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_r));
+	m_dma[0]->out_iow_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_w));
+	m_dma[1]->in_ior_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_r));
+	m_dma[1]->out_iow_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_w));
 
 	// 4 MB (SJ2/SJ2A) or 8 MB (SJ26/SJ53) onboard, 2 SIMM slots with 4-32 MB each
 	m_ram->set_default_size("8M").set_extra_options("4M,12M,16M,20M,24M,28M,32M,36M,40M,44M,48M,52M,56M,68M,72M");
@@ -2797,7 +2831,7 @@ void towns_state::townssj(machine_config &config)
 void towns_state::townshr(machine_config &config)
 {
 	townssj(config);
-	I486(config.replace(), m_maincpu, 20000000);
+	I486(config.replace(), m_maincpu, 20'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &towns_state::towns_mem);
 	m_maincpu->set_addrmap(AS_IO, &towns_state::towns2_io);
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
@@ -2818,7 +2852,7 @@ void towns_state::townsmx(machine_config &config)
 void towns_state::townsftv(machine_config &config)
 {
 	townssj(config);
-	I486(config.replace(), m_maincpu, 33000000);
+	I486(config.replace(), m_maincpu, 33'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &towns_state::towns_mem);
 	m_maincpu->set_addrmap(AS_IO, &towns_state::towns2_io);
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
@@ -2832,7 +2866,7 @@ void marty_state::marty(machine_config &config)
 {
 	towns_base(config);
 
-	I386SX(config.replace(), m_maincpu, 16000000);
+	I386SX(config.replace(), m_maincpu, 16'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &marty_state::marty_mem);
 	m_maincpu->set_addrmap(AS_IO, &marty_state::towns16_io);
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));

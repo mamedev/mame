@@ -24,7 +24,17 @@ function maintargetosdoptions(_target,_subtarget)
 
 	if _OPTIONS["USE_SDL"] == "1" then
 		links {
-			"SDL2.dll",
+			"SDL2",
+			"imm32",
+			"version",
+		}
+	end
+
+	if _OPTIONS["USE_SDL3"] == "1" then
+		links {
+			"SDL3",
+			"imm32",
+			"version",
 		}
 	end
 
@@ -34,6 +44,7 @@ function maintargetosdoptions(_target,_subtarget)
 		"dinput8",
 		"ole32",
 		"psapi",
+		"shcore",
 		"shlwapi",
 		"uuid",
 	}
@@ -42,15 +53,28 @@ end
 
 newoption {
 	trigger = "USE_SDL",
-	description = "Enable SDL sound output",
+	description = "Enable SDL2 sound output and joystick input",
 	allowed = {
-		{ "0",  "Disable SDL sound output"  },
-		{ "1",  "Enable SDL sound output"   },
+		{ "0",  "Disable SDL2 sound/joystick"  },
+		{ "1",  "Enable SDL2 sound/joystick"   },
 	},
 }
 
 if not _OPTIONS["USE_SDL"] then
 	_OPTIONS["USE_SDL"] = "0"
+end
+
+newoption {
+	trigger = "USE_SDL3",
+	description = "Enable SDL3 sound output and joystick input",
+	allowed = {
+		{ "0",  "Disable SDL3 sound/joystick"  },
+		{ "1",  "Enable SDL3 sound/joystick"   },
+	},
+}
+
+if not _OPTIONS["USE_SDL3"] then
+	_OPTIONS["USE_SDL3"] = "0"
 end
 
 newoption {
@@ -147,6 +171,8 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/debugger/win/consolewininfo.h",
 		MAME_DIR .. "src/osd/modules/debugger/win/debugbaseinfo.cpp",
 		MAME_DIR .. "src/osd/modules/debugger/win/debugbaseinfo.h",
+		MAME_DIR .. "src/osd/modules/debugger/win/debuggerprefs.cpp",
+		MAME_DIR .. "src/osd/modules/debugger/win/debuggerprefs.h",
 		MAME_DIR .. "src/osd/modules/debugger/win/debugviewinfo.cpp",
 		MAME_DIR .. "src/osd/modules/debugger/win/debugviewinfo.h",
 		MAME_DIR .. "src/osd/modules/debugger/win/debugwininfo.cpp",

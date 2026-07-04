@@ -139,7 +139,7 @@ void abc99_device::mouse_mem(address_map &map)
 void abc99_device::device_add_mconfig(machine_config &config)
 {
 	// keyboard CPU
-	I8035(config, m_maincpu, 0); // from Z5 T0 output
+	I8035(config, m_maincpu, 0); // clock comes from Z5 T0 output
 	m_maincpu->set_addrmap(AS_PROGRAM, &abc99_device::keyboard_mem);
 	m_maincpu->set_addrmap(AS_IO, &abc99_device::keyboard_io);
 	m_maincpu->p1_out_cb().set(FUNC(abc99_device::z2_p1_w));
@@ -159,11 +159,11 @@ void abc99_device::device_add_mconfig(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_hz(0));
 
 	// mouse
-	LUXOR_R8(config, m_mouse, 0);
+	LUXOR_R8(config, m_mouse);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 
@@ -438,8 +438,8 @@ void abc99_device::serial_input()
 
 TIMER_CALLBACK_MEMBER(abc99_device::serial_clock)
 {
-	m_slot->trxc_w(1);
-	m_slot->trxc_w(0);
+	m_slot->trxc_w(m_rxtxc);
+	m_rxtxc = !m_rxtxc;
 }
 
 
@@ -483,11 +483,9 @@ abc99_device::abc99_device(const machine_config &mconfig, const char *tag, devic
 
 void abc99_device::device_start()
 {
-	m_leds.resolve();
-
 	// allocate timers
 	m_serial_timer = timer_alloc(FUNC(abc99_device::serial_clock), this);
-	attotime serial_clock = MCS48_ALE_CLOCK(m_mousecpu->get_t0_clock()); // 8333 bps
+	attotime serial_clock = MCS48_ALE_CLOCK(m_mousecpu->get_t0_clock() * 2); // 8333 bps x16
 	m_serial_timer->adjust(serial_clock, 0, serial_clock);
 
 	// state saving
@@ -500,6 +498,7 @@ void abc99_device::device_start()
 	save_item(NAME(m_t1_z5));
 	save_item(NAME(m_led_en));
 	save_item(NAME(m_reset));
+	save_item(NAME(m_rxtxc));
 }
 
 
@@ -514,6 +513,7 @@ void abc99_device::device_reset()
 	m_mousecpu->set_input_line(MCS48_INPUT_EA, ASSERT_LINE);
 
 	m_slot->write_rx(1);
+	m_rxtxc = 0;
 }
 
 

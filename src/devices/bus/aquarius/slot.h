@@ -32,10 +32,7 @@ public:
 	aquarius_cartridge_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&slot_options, const char *default_option)
 		: aquarius_cartridge_slot_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		slot_options(*this);
-		set_default_option(default_option);
-		set_fixed(false);
+		set_options(std::forward<T>(slot_options), default_option, false);
 	}
 
 	aquarius_cartridge_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
@@ -107,7 +104,7 @@ private:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(AQUARIUS_CARTRIDGE_SLOT, aquarius_cartridge_slot_device)
 
 void aquarius_cartridge_devices(device_slot_interface &device);

@@ -70,7 +70,7 @@ enum register_addresses_e : uint8_t {
 // Own ID Register (0x00) fields and values
 enum own_id_e : uint8_t {
 	// Reset Command
-	OWN_ID_SCSI_ID  = 0x07, // SCSI ID Bits
+	OWN_ID_M_SCSI_ID  = 0x07, // SCSI ID Bits
 	OWN_ID_EAF      = 0x08, // Enable Advanced Features (33C93A and 33C93B only)
 	OWN_ID_EHP      = 0x10, // Enable Host Parity (33C93A and 33C93B only)
 	OWN_ID_RAF      = 0x20, // Really Advanced Features (33C93B only)
@@ -358,8 +358,8 @@ DEFINE_DEVICE_TYPE(WD33C93B, wd33c93b_device, "wd33c93b", "Western Digital WD33C
 //-------------------------------------------------
 
 wd33c9x_base_device::wd33c9x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: nscsi_device{ mconfig, type, tag, owner, clock }
-	, nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
+	: device_t(mconfig, type, tag, owner, clock)
+	, nscsi_device_interface(mconfig, *this)
 	, m_addr{ 0 }
 	, m_regs{ 0 }
 	, m_command_length{ 0 }
@@ -415,8 +415,8 @@ void wd33c9x_base_device::device_reset()
 {
 	// This is a hardware reset.  Software reset is handled
 	// under COMMAND_CC_RESET.
-	scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
-	scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
+	m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ALL);
+	m_scsi_bus->ctrl_wait(m_scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
 	m_addr = 0;
 	for (uint8_t reg = 0; reg < NUM_REGS; ++reg) {
 		// FIXME - QUEUE_TAG is a valid register for 93B only
@@ -456,7 +456,7 @@ TIMER_CALLBACK_MEMBER(wd33c9x_base_device::update_step)
 
 void wd33c9x_base_device::scsi_ctrl_changed()
 {
-	const uint32_t ctrl = scsi_bus->ctrl_r();
+	const uint32_t ctrl = m_scsi_bus->ctrl_r();
 	if (ctrl & S_RST) {
 		LOG("scsi bus reset\n");
 		// FIXME - Do something...
@@ -737,8 +737,8 @@ void wd33c9x_base_device::start_command()
 	switch (cc) {
 	case COMMAND_CC_RESET:
 		LOGMASKED(LOG_COMMANDS, "Reset Command\n");
-		scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
-		scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
+		m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ALL);
+		m_scsi_bus->ctrl_wait(m_scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
 		m_regs[OWN_ID] = m_command_length;
 		memset(&m_regs[CONTROL], 0, SOURCE_ID - CONTROL);
 		m_regs[COMMAND] = 0;
@@ -749,7 +749,7 @@ void wd33c9x_base_device::start_command()
 		update_irq();
 		set_scsi_state(FINISHED);
 		irq_fifo_push((m_regs[OWN_ID] & OWN_ID_EAF) ? SCSI_STATUS_RESET_EAF : SCSI_STATUS_RESET);
-		scsi_id = (m_regs[OWN_ID] & OWN_ID_SCSI_ID);
+		m_scsi_id = (m_regs[OWN_ID] & OWN_ID_M_SCSI_ID);
 		step(false);
 		break;
 
@@ -765,7 +765,7 @@ void wd33c9x_base_device::start_command()
 		if (m_mode != MODE_I) {
 			fatalerror("%s: ASSERT_ATN command only valid in the Initiator state.", shortname());
 		}
-		scsi_bus->ctrl_w(scsi_refid, S_ATN, S_ATN);
+		m_scsi_bus->ctrl_w(m_scsi_refid, S_ATN, S_ATN);
 		return;
 
 	case COMMAND_CC_NEGATE_ACK:
@@ -778,13 +778,13 @@ void wd33c9x_base_device::start_command()
 
 			update_irq();
 		}
-		scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+		m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 		return;
 
 	case COMMAND_CC_DISCONNECT:
 		LOGMASKED(LOG_COMMANDS, "Disconnect Command\n");
-		scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
-		scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
+		m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ALL);
+		m_scsi_bus->ctrl_wait(m_scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
 		m_mode = MODE_D;
 		set_scsi_state(IDLE);
 		m_regs[AUXILIARY_STATUS] &= ~(AUXILIARY_STATUS_CIP | AUXILIARY_STATUS_BSY);
@@ -859,7 +859,7 @@ void wd33c9x_base_device::start_command()
 		set_scsi_state(INIT_XFR);
 		set_command_length(COMMAND_CC_TRANSFER_INFO);
 		load_transfer_count();
-		m_xfr_phase = (scsi_bus->ctrl_r() & S_PHASE_MASK);
+		m_xfr_phase = (m_scsi_bus->ctrl_r() & S_PHASE_MASK);
 		step(false);
 		return;
 
@@ -891,8 +891,8 @@ void wd33c9x_base_device::step(bool timeout)
 	const uint8_t cc = (m_regs[COMMAND] & COMMAND_CC);
 	const bool sat = (cc == COMMAND_CC_SELECT_TRANSFER || cc == COMMAND_CC_SELECT_ATN_TRANSFER);
 
-	const uint32_t ctrl = scsi_bus->ctrl_r();
-	const uint32_t data = scsi_bus->data_r();
+	const uint32_t ctrl = m_scsi_bus->ctrl_r();
+	const uint32_t data = m_scsi_bus->data_r();
 
 	LOGMASKED(LOG_STEP,
 			  "%s: step - PHASE:%s BSY:%x SEL:%x REQ:%x ACK:%x ATN:%x RST:%x DATA:%02x (%s.%s) %s\n",
@@ -956,8 +956,8 @@ void wd33c9x_base_device::step(bool timeout)
 				irq_fifo_push(SCSI_STATUS_DISCONNECT);
 			}
 			m_mode = MODE_D;
-			scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
-			scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
+			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ALL);
+			m_scsi_bus->ctrl_wait(m_scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
 		}
 	}
 
@@ -984,8 +984,8 @@ void wd33c9x_base_device::step(bool timeout)
 			break;
 		}
 		if (timeout) {
-			scsi_bus->data_w(scsi_refid, 1 << scsi_id);
-			scsi_bus->ctrl_w(scsi_refid, S_BSY, S_BSY);
+			m_scsi_bus->data_w(m_scsi_refid, 1 << m_scsi_id);
+			m_scsi_bus->ctrl_w(m_scsi_refid, S_BSY, S_BSY);
 			set_scsi_state_sub(ARB_EXAMINE_BUS);
 			delay(1);
 		}
@@ -994,19 +994,19 @@ void wd33c9x_base_device::step(bool timeout)
 	case ARB_EXAMINE_BUS << SUB_SHIFT:
 		if (timeout) {
 			if (ctrl & S_SEL) {
-				scsi_bus->ctrl_w(scsi_refid, 0, S_BSY);
-				scsi_bus->data_w(scsi_refid, 0);
+				m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_BSY);
+				m_scsi_bus->data_w(m_scsi_refid, 0);
 				set_scsi_state_sub(ARB_WAIT_BUS_FREE);
 			} else {
 				int win;
 				for (win = 7; win >=0 && !(data & (1 << win)); win--);
-				if (win == scsi_id) {
-					scsi_bus->ctrl_w(scsi_refid, S_SEL, S_SEL);
+				if (win == m_scsi_id) {
+					m_scsi_bus->ctrl_w(m_scsi_refid, S_SEL, S_SEL);
 					set_scsi_state_sub(ARB_ASSERT_SEL);
 					delay(1);
 				} else {
-					scsi_bus->data_w(scsi_refid, 0);
-					scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
+					m_scsi_bus->data_w(m_scsi_refid, 0);
+					m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ALL);
 					set_scsi_state_sub(ARB_CHECK_FREE);
 				}
 			}
@@ -1015,7 +1015,7 @@ void wd33c9x_base_device::step(bool timeout)
 
 	case ARB_ASSERT_SEL << SUB_SHIFT:
 		if (timeout) {
-			scsi_bus->data_w(scsi_refid, (1 << scsi_id) | (1 << (m_regs[DESTINATION_ID] & DESTINATION_ID_DI)));
+			m_scsi_bus->data_w(m_scsi_refid, (1 << m_scsi_id) | (1 << (m_regs[DESTINATION_ID] & DESTINATION_ID_DI)));
 			set_scsi_state_sub(ARB_SET_DEST);
 			delay(1);
 		}
@@ -1023,7 +1023,7 @@ void wd33c9x_base_device::step(bool timeout)
 
 	case ARB_SET_DEST << SUB_SHIFT:
 		if (timeout) {
-			scsi_bus->ctrl_w(scsi_refid, (cc == COMMAND_CC_SELECT_ATN || cc == COMMAND_CC_SELECT_ATN_TRANSFER) ? S_ATN : 0, S_ATN | S_BSY);
+			m_scsi_bus->ctrl_w(m_scsi_refid, (cc == COMMAND_CC_SELECT_ATN || cc == COMMAND_CC_SELECT_ATN_TRANSFER) ? S_ATN : 0, S_ATN | S_BSY);
 			set_scsi_state_sub(ARB_RELEASE_BUSY);
 			delay(1);
 		}
@@ -1034,7 +1034,7 @@ void wd33c9x_base_device::step(bool timeout)
 			if (ctrl & S_BSY) {
 				set_scsi_state_sub(ARB_DESKEW_WAIT);
 				if (cc == COMMAND_CC_RESELECT) {
-					scsi_bus->ctrl_w(scsi_refid, S_BSY, S_BSY);
+					m_scsi_bus->ctrl_w(m_scsi_refid, S_BSY, S_BSY);
 				}
 				delay(1);
 			} else {
@@ -1046,8 +1046,8 @@ void wd33c9x_base_device::step(bool timeout)
 
 	case ARB_DESKEW_WAIT << SUB_SHIFT:
 		if (timeout) {
-			scsi_bus->data_w(scsi_refid, 0);
-			scsi_bus->ctrl_w(scsi_refid, 0, S_SEL);
+			m_scsi_bus->data_w(m_scsi_refid, 0);
+			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_SEL);
 			m_mode = (cc == COMMAND_CC_RESELECT) ? MODE_T : MODE_I;
 			set_scsi_state_sub(0);
 			step(true);
@@ -1056,13 +1056,13 @@ void wd33c9x_base_device::step(bool timeout)
 
 	case ARB_TIMEOUT_BUSY << SUB_SHIFT:
 		if (timeout) {
-			scsi_bus->data_w(scsi_refid, 0);
+			m_scsi_bus->data_w(m_scsi_refid, 0);
 			set_scsi_state_sub(ARB_TIMEOUT_ABORT);
 			delay(1000);
 		} else if (ctrl & S_BSY) {
 			set_scsi_state_sub(ARB_DESKEW_WAIT);
 			if (cc == COMMAND_CC_RESELECT) {
-				scsi_bus->ctrl_w(scsi_refid, S_BSY, S_BSY);
+				m_scsi_bus->ctrl_w(m_scsi_refid, S_BSY, S_BSY);
 			}
 			delay(1);
 		}
@@ -1073,12 +1073,12 @@ void wd33c9x_base_device::step(bool timeout)
 			if (ctrl & S_BSY) {
 				set_scsi_state_sub(ARB_DESKEW_WAIT);
 				if (cc == COMMAND_CC_RESELECT) {
-					scsi_bus->ctrl_w(scsi_refid, S_BSY, S_BSY);
+					m_scsi_bus->ctrl_w(m_scsi_refid, S_BSY, S_BSY);
 				}
 				delay(1);
 			} else {
-				scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
-				scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
+				m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ALL);
+				m_scsi_bus->ctrl_wait(m_scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
 				m_regs[AUXILIARY_STATUS] &= ~(AUXILIARY_STATUS_CIP | AUXILIARY_STATUS_BSY);
 				m_mode = MODE_D;
 				set_scsi_state(IDLE);
@@ -1098,8 +1098,8 @@ void wd33c9x_base_device::step(bool timeout)
 	case SEND_WAIT_REQ_0 << SUB_SHIFT:
 		if (!(ctrl & S_REQ)) {
 			set_scsi_state_sub(0);
-			scsi_bus->data_w(scsi_refid, 0);
-			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+			m_scsi_bus->data_w(m_scsi_refid, 0);
+			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 			if (sat) {
 				switch (m_xfr_phase) {
 				case S_PHASE_COMMAND:
@@ -1155,7 +1155,7 @@ void wd33c9x_base_device::step(bool timeout)
 				}
 			}
 			set_scsi_state_sub(RECV_WAIT_REQ_0);
-			scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
+			m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK, S_ACK);
 			step(false);
 		}
 		break;
@@ -1168,7 +1168,7 @@ void wd33c9x_base_device::step(bool timeout)
 		break;
 
 	case DISC_SEL_ARBITRATION:
-		scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
+		m_scsi_bus->ctrl_wait(m_scsi_refid, S_REQ, S_REQ);
 		if (cc == COMMAND_CC_SELECT || cc == COMMAND_CC_SELECT_ATN) {
 			set_scsi_state(FINISHED);
 			irq_fifo_push(SCSI_STATUS_SELECT_SUCCESS);
@@ -1254,7 +1254,7 @@ void wd33c9x_base_device::step(bool timeout)
 					if (m_drq_state) {
 						delay(1);
 					} else {
-						scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
+						m_scsi_bus->ctrl_wait(m_scsi_refid, S_REQ, S_REQ);
 						set_scsi_state((RECV_WAIT_REQ_1 << SUB_SHIFT) | INIT_XFR_RECV_BYTE_ACK);
 						step(false);
 					}
@@ -1414,7 +1414,7 @@ void wd33c9x_base_device::step(bool timeout)
 		} else {
 			set_scsi_state(INIT_XFR_WAIT_REQ);
 		}
-		scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+		m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 		step(false);
 		break;
 
@@ -1540,9 +1540,9 @@ void wd33c9x_base_device::data_fifo_reset()
 uint32_t wd33c9x_base_device::send_byte(const uint32_t value, const uint32_t mask)
 {
 	set_scsi_state_sub(SEND_WAIT_SETTLE);
-	scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
-	scsi_bus->data_w(scsi_refid, data_fifo_pop());
-	scsi_bus->ctrl_w(scsi_refid, S_ACK | value, S_ACK | mask);
+	m_scsi_bus->ctrl_wait(m_scsi_refid, S_REQ, S_REQ);
+	m_scsi_bus->data_w(m_scsi_refid, data_fifo_pop());
+	m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK | value, S_ACK | mask);
 	return 1;
 }
 

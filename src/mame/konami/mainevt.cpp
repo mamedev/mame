@@ -255,7 +255,7 @@ void base_state::coin_w(uint8_t data)
 
 void base_state::sh_irqtrigger_w(uint8_t data)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 }
 
 uint8_t mainevt_state::sh_busy_r()
@@ -559,7 +559,6 @@ void base_state::volume_callback(uint8_t data)
 
 void base_state::machine_start()
 {
-	m_leds.resolve();
 	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x2000);
 
 	save_item(NAME(m_sound_irq_mask));
@@ -646,6 +645,9 @@ void devstors_state::devstors(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
+	k051733_device &k051733(K051733(config, "k051733", 24_MHz_XTAL / 2));
+	k051733.set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
+
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0+24, 320-8, 264, 16, 240); // measured 59.17
@@ -665,9 +667,6 @@ void devstors_state::devstors(machine_config &config)
 	m_k051960->set_palette("palette");
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(devstors_state::sprite_callback));
-
-	k051733_device &k051733(K051733(config, "k051733", 24_MHz_XTAL / 2));
-	k051733.set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

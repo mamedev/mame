@@ -2,14 +2,13 @@
 // copyright-holders:hap
 /***************************************************************************
 
-    Car Jamboree
+    Car Jamboree 『カージャンボリー』
     Omori Electric CAD (OEC) 1983
 
     TODO:
     - colors are probably wrong
-    - sprite priorities? (eg. player car jumping on the ramp, 1 part disappears)
     - first 2 letters on titlescreen look misaligned with the tilemap
-    - The spriteram holds 2 sprite lists (00-7f and 80-ff), they are identical.
+    - The spriteram holds 2 sprite lists (00-5f and 80-df), they are identical.
       Is it an unused feature? Or a RAM access speed workaround?
 
 ----------------------------------------------------------------------------
@@ -44,6 +43,7 @@
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
@@ -63,10 +63,11 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_videoram(*this, "videoram"),
-		m_spriteram(*this, "spriteram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram")
 	{ }
 
 	void carjmbre(machine_config &config);
@@ -79,19 +80,19 @@ private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	bool m_nmi_enabled = false;
 	uint8_t m_bgcolor = 0;
 	tilemap_t *m_tilemap = nullptr;
 
-	void bgcolor_w(uint8_t data);
+	template<int N> void bgcolor_w(int state);
 	void videoram_w(offs_t offset, uint8_t data);
-	void nmi_enable_w(uint8_t data);
-	void flipscreen_w(uint8_t data);
+	void nmi_enable_w(int state);
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
 
 	void carjmbre_palette(palette_device &palette) const;
@@ -149,10 +150,12 @@ void carjmbre_state::carjmbre_palette(palette_device &palette) const
 	palette.palette()->normalize_range(0, 63);
 }
 
-void carjmbre_state::bgcolor_w(uint8_t data)
+template<int N>
+void carjmbre_state::bgcolor_w(int state)
 {
 	// guessed, seems to match with flyer
-	m_bgcolor = ~data & 0x3f;
+	const uint8_t mask = 1 << N;
+	m_bgcolor = (m_bgcolor & ~mask) | (state ? 0 : mask);
 }
 
 
@@ -168,7 +171,9 @@ TILE_GET_INFO_MEMBER(carjmbre_state::get_tile_info)
 {
 	int attr = m_videoram[tile_index | 0x400];
 	int code = (m_videoram[tile_index] & 0xff) | (attr << 1 & 0x100);
+
 	tileinfo.set(0, code, attr & 0xf, 0);
+	tileinfo.category = code >> 6 & 3;
 }
 
 void carjmbre_state::video_start()
@@ -181,8 +186,12 @@ void carjmbre_state::video_start()
 uint32_t carjmbre_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_bgcolor, cliprect);
-	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap->draw(screen, bitmap, cliprect);
 	draw_sprites(bitmap, cliprect);
+
+	// draw high priority tiles (eg. score panel, high score entry)
+	m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0);
+
 	return 0;
 }
 
@@ -191,13 +200,17 @@ uint32_t carjmbre_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void carjmbre_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int offs = 0x80 - 4; offs >= 0; offs -= 4)
+	for (int i = 0x60 - 4; i >= 0; i -= 4)
 	{
+		// before copying the sprites to spriteram the game reorders the first
+		// sprite to last, sprite ordering is incorrect if this isn't undone
+		int offs = (i - 4 + 0x60) % 0x60;
+
 		int sy = m_spriteram[offs];
 		int code = m_spriteram[offs + 1];
 		int color = m_spriteram[offs + 2] & 0xf;
-		int flipx = m_spriteram[offs + 2] >> 6 & 1;
-		int flipy = m_spriteram[offs + 2] >> 7 & 1;
+		int flipx = BIT(m_spriteram[offs + 2], 6);
+		int flipy = BIT(m_spriteram[offs + 2], 7);
 		int sx = m_spriteram[offs + 3];
 
 		// align to tilemap
@@ -231,29 +244,20 @@ void carjmbre_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 INTERRUPT_GEN_MEMBER(carjmbre_state::vblank_nmi)
 {
 	if (m_nmi_enabled)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-void carjmbre_state::nmi_enable_w(uint8_t data)
+void carjmbre_state::nmi_enable_w(int state)
 {
-	// d0: enable/clear vblank nmi
-	m_nmi_enabled = bool(data & 1);
-	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-}
-
-void carjmbre_state::flipscreen_w(uint8_t data)
-{
-	// d0: flip screen (cocktail mode)
-	flip_screen_set(data & 1);
+	m_nmi_enabled = bool(state);
 }
 
 void carjmbre_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8803, 0x8803).w(FUNC(carjmbre_state::nmi_enable_w));
-	map(0x8805, 0x8805).w(FUNC(carjmbre_state::bgcolor_w));
-	map(0x8807, 0x8807).w(FUNC(carjmbre_state::flipscreen_w));
 	map(0x8000, 0x87ff).ram(); // 6116
+	map(0x8800, 0x8800).nopr(); // watchdog?
+	map(0x8800, 0x8807).w("outlatch", FUNC(addressable_latch_device::write_d0));
 	map(0x9000, 0x97ff).ram().w(FUNC(carjmbre_state::videoram_w)).share("videoram"); // 2114*4
 	map(0x9800, 0x98ff).ram().share("spriteram"); // 5101*2
 	map(0xa000, 0xa000).portr("IN1");
@@ -372,14 +376,20 @@ void carjmbre_state::carjmbre(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &carjmbre_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &carjmbre_state::sound_io_map);
 
+	ls259_device &outlatch(LS259(config, "outlatch"));
+	outlatch.q_out_cb<3>().set(FUNC(carjmbre_state::nmi_enable_w));
+	outlatch.q_out_cb<5>().set(FUNC(carjmbre_state::bgcolor_w<0>));
+	outlatch.q_out_cb<6>().set(FUNC(carjmbre_state::bgcolor_w<1>));
+	outlatch.q_out_cb<7>().set(FUNC(carjmbre_state::flip_screen_set));
+
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(carjmbre_state::screen_update));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(carjmbre_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_carjmbre);
 	PALETTE(config, m_palette, FUNC(carjmbre_state::carjmbre_palette), 64);
@@ -390,7 +400,6 @@ void carjmbre_state::carjmbre(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch");
 
 	AY8910(config, "ay1", XTAL(18'432'000)/6/2).add_route(ALL_OUTPUTS, "mono", 0.25);
-
 	AY8910(config, "ay2", XTAL(18'432'000)/6/2).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -398,7 +407,7 @@ void carjmbre_state::carjmbre(machine_config &config)
 
 /***************************************************************************
 
-  Game drivers
+  ROM definitions
 
 ***************************************************************************/
 

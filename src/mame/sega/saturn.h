@@ -129,6 +129,17 @@ protected:
 	required_device<palette_device> m_palette;
 
 	bitmap_rgb32 m_tmpbitmap;
+
+	int m_scsp_last_line = 0;
+
+	void CEF_1() { m_vdp1_regs[0x010/2] |= 0x0002; }
+	void CEF_0() { m_vdp1_regs[0x010/2] &= ~0x0002; }
+	void BEF_1() { m_vdp1_regs[0x010/2] |= 0x0001; }
+	void BEF_0() { m_vdp1_regs[0x010/2] &= ~0x0001; }
+	uint16_t VDP1_TVMR() const { return m_vdp1_regs[0x000/2] & 0xffff; }
+	uint16_t VDP1_VBE() const { return (VDP1_TVMR() & 0x0008) >> 3; }
+	uint16_t VDP1_TVM() const { return (VDP1_TVMR() & 0x0007) >> 0; }
+
 	DECLARE_VIDEO_START(vdp2_video_start);
 	uint32_t screen_update_vdp2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(saturn_scanline);
@@ -144,8 +155,6 @@ protected:
 	void saturn_sinit_w(uint32_t data);
 	uint8_t backupram_r(offs_t offset);
 	void backupram_w(offs_t offset, uint8_t data);
-
-	int m_scsp_last_line = 0;
 
 	uint16_t vdp1_regs_r(offs_t offset);
 	uint32_t vdp1_vram_r(offs_t offset);
@@ -444,13 +453,6 @@ protected:
 // These two clocks are synthesized by the 315-5746
 #define MASTER_CLOCK_352 XTAL(14'318'181)*4
 #define MASTER_CLOCK_320 XTAL(14'318'181)*3.75
-#define CEF_1   m_vdp1_regs[0x010/2]|=0x0002
-#define CEF_0   m_vdp1_regs[0x010/2]&=~0x0002
-#define BEF_1   m_vdp1_regs[0x010/2]|=0x0001
-#define BEF_0   m_vdp1_regs[0x010/2]&=~0x0001
-#define VDP1_TVMR ((m_vdp1_regs[0x000/2])&0xffff)
-#define VDP1_VBE  ((VDP1_TVMR & 0x0008) >> 3)
-#define VDP1_TVM  ((VDP1_TVMR & 0x0007) >> 0)
 
 
 extern gfx_decode_entry const gfx_stv[];

@@ -7,6 +7,13 @@
 // This is probably impossible on the single button units using real hardware as the 'B' input isn't connected
 // Currently these checksums fail in MAME due to the interrupt hack mapping over ROM, if you remove that hack they pass
 
+// as with other ELAN drivers the clock speed is a bit of a mystery, and actual execution rate may depend on
+// many other bus related factors.
+
+// for Lexibook IG10 Glyptics will crash at even slightly lower clock speeds, while Moto Racing is far too fast
+// (Moto Racing might be missing raster effects)
+// The game mechanics in Racket are also unclear, seems impossible to hit the ball back?
+
 #include "emu.h"
 
 #include "screen.h"
@@ -26,6 +33,7 @@ public:
 
 	void elan_ep3a19a(machine_config &config) ATTR_COLD;
 	void elan_ep3a19a_1mb(machine_config &config) ATTR_COLD;
+	void elan_ep3a19a_2mb_pal_fast(machine_config &config) ATTR_COLD;
 
 	void init_tvbg() ATTR_COLD;
 
@@ -88,6 +96,14 @@ static INPUT_PORTS_START( tvbg_2button )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Boggle uses 2 buttons for gameplay, other units do read this to enter secret test mode, but none of the games need it?
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( lexiig10 )
+	PORT_INCLUDE( tvbg_2button )
+
+	PORT_MODIFY("IN2")
+	// there are 4 buttons on the device (although 2 of them could just be turbo buttons, unconfirmed)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )
+INPUT_PORTS_END
 
 void elan_ep3a19a_state::machine_start()
 {
@@ -104,7 +120,7 @@ INTERRUPT_GEN_MEMBER(elan_ep3a19a_state::interrupt)
 
 void elan_ep3a19a_state::elan_ep3a19a(machine_config &config)
 {
-	ELAN_EP3A19A_SOC(config, m_maincpu, XTAL(21'477'272)/8);
+	ELAN_EP3A19A_SOC(config, m_maincpu, XTAL(21'477'272) / 8); // very unlikely to be /8
 	m_maincpu->set_addrmap(elan_ep3a19a_soc_device::AS_EXTERNAL, &elan_ep3a19a_state::elan_ep3a19a_extmap_2mb);
 	m_maincpu->set_vblank_int("screen", FUNC(elan_ep3a19a_state::interrupt));
 	m_maincpu->read_callback<0>().set_ioport("IN0");
@@ -123,6 +139,17 @@ void elan_ep3a19a_state::elan_ep3a19a_1mb(machine_config &config)
 {
 	elan_ep3a19a(config);
 	m_maincpu->set_addrmap(elan_ep3a19a_soc_device::AS_EXTERNAL, &elan_ep3a19a_state::elan_ep3a19a_extmap_1mb);
+}
+
+void elan_ep3a19a_state::elan_ep3a19a_2mb_pal_fast(machine_config &config)
+{
+	elan_ep3a19a(config);
+
+	m_maincpu->set_addrmap(elan_ep3a19a_soc_device::AS_EXTERNAL, &elan_ep3a19a_state::elan_ep3a19a_extmap_2mb);
+
+	// even slightly lower clocks causes Glyptics (the Columns clone) to crashes when dropping pieces
+	m_maincpu->set_clock(XTAL(26'601'712)); // same as a PAL NES
+	m_screen->set_refresh_hz(50);
 }
 
 ROM_START( tvbg6a )
@@ -150,6 +177,13 @@ ROM_START( tvbg3c )
 	ROM_LOAD( "boggle_connect4.bin", 0x00000, 0x100000, CRC(c2374eea) SHA1(c6971cb5108828bc72fd1cf7edeb53915d196db7) )
 ROM_END
 
+ROM_START( lexiig10 )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
+	// VIM??016  A116 99DD printed on ROM glob, if it's a checksum it's unclear how to calculate it
+	// ROM read consistently
+	ROM_LOAD( "ig10.bin", 0x00000, 0x200000, CRC(f2eadf9b) SHA1(c8af9355bcd5704255e554f1358f59277b6b9339) )
+ROM_END
+
 void elan_ep3a19a_state::init_tvbg()
 {
 	// is this swapping internal to the ep3a19a type ELAN, or external; ROM glob had standard TSOP pinout pads that were used for dumping.
@@ -173,3 +207,10 @@ CONS( 2007, tvbg3b, 0, 0, elan_ep3a19a_1mb, tvbg_2button, elan_ep3a19a_state, in
 CONS( 2007, tvbg3c, 0, 0, elan_ep3a19a_1mb, tvbg_2button, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 3-in-1: Boggle, Connect 4, Roll Over", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=SoKKIKSDGhY
 
 // The back of the Silly 6 Pins 3-in-1 packaging suggests a Monopoly TV Board Game device was planned, but this does not appear to have been released.
+
+// exact SoC type not verified for below sets
+
+// hybrid system with an LCD game on the controller (uses a separate MCU glob, not emulated)
+// "Credit:XiAn Hummer Software Studio(CHINA) Tel:86-29-84270600 Email:HummerSoft@126.com Http://www.hummersoft.com" string in ROM
+CONS( 2006, lexiig10, 0, 0, elan_ep3a19a_2mb_pal_fast, lexiig10, elan_ep3a19a_state, empty_init, "Lexibook", "Color Console IG10 (DualMax 20 in 1 TV part)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// Sunnyflyer 30-in-1 looks similar to lexiig10 (especially the Bomberman clone) so probably fits here too ( https://blog.12bit.club/?post=6 )

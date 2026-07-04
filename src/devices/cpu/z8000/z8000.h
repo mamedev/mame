@@ -62,10 +62,33 @@ protected:
 	static constexpr uint8_t Z8000_RESET   = 0x01;  /* reset flag  */
 
 public:
+	/* CPU status codes */
+	enum
+	{
+		ST_INTERNAL = 0,	/* internal operation */
+		ST_MEM_REFRESH,		/* memory refresh */
+		ST_REF_IO,			/* I/O reference */
+		ST_REF_SIO,			/* special I/O reference */
+		ST_SEGT_ACK,		/* segment trap acknowledge */
+		ST_NMI_ACK,			/* nonmaskable interrupt acknowledge */
+		ST_NVI_ACK,			/* nonvectored interrupt acknowledge */
+		ST_VI_ACK,			/* vectored interrupt acknowledge */
+		ST_REQ_DATA,		/* data memory request */
+		ST_REQ_STACK,		/* stack memory request */
+		ST_EREQ_DATA,		/* data memory request (EPU) */
+		ST_EREQ_STACK,		/* stack memory request (EPU) */
+		ST_IFETCH_N,		/* instruction fetch, nth word */
+		ST_IFETCH_1,		/* instruction fetch, first word */
+		ST_EPU_TRF,			/* extension processor transfer */
+		ST_BUS_LOCK			/* bus lock, data memory request (not used) */
+	};
+
 	enum
 	{
 		NVI_LINE = 0,
 		VI_LINE = 1,
+		SEGT_LINE = 2,
+		BUSREQ_LINE = 3,
 		NMI_LINE = INPUT_LINE_NMI
 	};
 
@@ -83,8 +106,13 @@ public:
 	auto nmiack() { return m_iack_in[1].bind(); }
 	auto nviack() { return m_iack_in[2].bind(); }
 	auto viack() { return m_iack_in[3].bind(); }
+	auto busack() { return m_busack_out.bind(); }
 	auto mo() { return m_mo_out.bind(); }
 	void mi_w(int state) { m_mi = state; } // XXX: this has to apply in the middle of an insn for now
+	auto ns() { return m_ns_out.bind(); }
+
+	bool is_ifetch1() const noexcept { return (m_op_valid == 0); }
+	void set_m20_hack(bool is_hack) { m_m20_hack = is_hack; }
 
 protected:
 	z8002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits, int vecmult);
@@ -94,6 +122,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
+	virtual bool cpu_is_interruptible() const override { return true; }
 	virtual uint32_t execute_min_cycles() const noexcept override { return 2; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 744; }
 	virtual uint32_t execute_default_irq_vector(int inputnum) const noexcept override { return 0xff; }
@@ -121,6 +150,8 @@ protected:
 	address_space_config m_sio_config;
 	devcb_read16::array<4> m_iack_in;
 	devcb_write_line m_mo_out;
+	devcb_write_line m_ns_out;
+	devcb_write_line m_busack_out;
 
 	uint32_t  m_op[4];      /* opcodes/data of current instruction */
 	uint32_t  m_ppc;        /* previous program counter */
@@ -142,7 +173,9 @@ protected:
 		uint64_t  Q[4];  /* RQ0,RQ4,..RQ12 */
 	} m_regs;             /* registers */
 	int m_nmi_state;      /* NMI line state */
-	int m_irq_state[2];   /* IRQ line states (NVI, VI) */
+	int m_irq_state[3];   /* IRQ line states (NVI, VI, SEGT) */
+	int m_busreq_state;   /* bus request pin state */
+	int m_busack_state;   /* bus acknowledge pin state */
 	int m_mi;
 	bool m_halt;
 	memory_access<23, 1, 0, ENDIANNESS_BIG>::cache m_cache;
@@ -154,6 +187,7 @@ protected:
 	memory_access<16, 1, 0, ENDIANNESS_BIG>::specific m_sio;
 	int m_icount;
 	const int m_vector_mult;
+	bool m_m20_hack;
 
 	void clear_internal_state();
 	void register_debug_state();

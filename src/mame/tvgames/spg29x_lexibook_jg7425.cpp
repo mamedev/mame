@@ -205,11 +205,22 @@ ROM_END
 
 ROM_START( ubox30 )
 	ROM_REGION( 0x200000, "extrom", 0 ) // SPI ROM in this case
-	ROM_LOAD("ubox_xm25qe16bzig_204015.bin", 0x000000, 0x200000, CRC(f8135947) SHA1(f2a075ae2b0bae186202f1019b566ffc411742bb) )
-	ROM_IGNORE(0x300)
+	ROM_LOAD("ubox_xm25qe16bzig_204015.bin", 0x000000, 0x200000, CRC(3c6f348b) SHA1(06f22a9b4c6b8f0133d3cf549e7b2acfa01577d2) )
 
 	DISK_REGION( "cfcard" )
 	DISK_IMAGE( "ubox_sd_512", 0, SHA1(99f2f1437d644a5e1fe48ce1445acf48fb8b0359) )
+
+	ROM_REGION( 0x008000, "spg290", ROMREGION_32BIT | ROMREGION_LE )
+	ROM_LOAD32_DWORD("internal.rom", 0x000000, 0x008000, NO_DUMP)
+ROM_END
+
+
+ROM_START( dancef2p )
+	ROM_REGION(  0x100000, "extrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "sy25q80.bin", 0x0000, 0x100000, CRC(eca3cc26) SHA1(7f4b811677fe0da27cfa7eb5827a59c023bfc984) )
+
+	DISK_REGION( "sdcard" ) // 16GB SD Card
+	DISK_IMAGE( "dance_factory_2p", 0, SHA1(369c822213a2e702493d54e87ef6f4b2560a0466) )
 
 	ROM_REGION( 0x008000, "spg290", ROMREGION_32BIT | ROMREGION_LE )
 	ROM_LOAD32_DWORD("internal.rom", 0x000000, 0x008000, NO_DUMP)
@@ -225,6 +236,8 @@ CONS( 2016, lx_frozen,   0,         0,     lexibook_jg7425,   lexibook_jg7425, l
 
 // slightly different, but same basic structure of the external ROM
 COMP( 201?, zone3d,      0,         0,      lexibook_jg7425,  lexibook_jg7425, lexibook_jg7425_state, empty_init,"Zone", "Zone 3D", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+CONS( 202?, dancef2p,    0,         0,      lexibook_jg7425,  lexibook_jg7425, lexibook_jg7425_state, empty_init,  "<unknown>", "Dance Factory 2 Player Dance Mat",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // Unknown hardware, HDMI dongle with wireless pads.
 // Uses standard chips, not globs, but surface details on CPU/SoC have been erased.

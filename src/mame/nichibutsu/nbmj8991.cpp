@@ -1325,7 +1325,7 @@ void nbmj8991_state::nbmjdrv1(machine_config &config) // galkoku
 	m_maincpu->set_addrmap(AS_IO, &nbmj8991_state::galkoku_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(nbmj8991_state::irq0_line_hold));
 
-	NB1413M3(config, m_nb1413m3, 0);
+	NB1413M3(config, m_nb1413m3);
 	m_nb1413m3->set_blitter_rom_tag("gfx1");
 
 	/* video hardware */
@@ -1355,7 +1355,7 @@ void nbmj8991_state::nbmjdrv2(machine_config &config) // pstadium
 	m_maincpu->set_addrmap(AS_IO, &nbmj8991_state::pstadium_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(nbmj8991_state::irq0_line_hold));
 
-	NB1413M3(config, m_nb1413m3, 0);
+	NB1413M3(config, m_nb1413m3);
 	m_nb1413m3->set_blitter_rom_tag("gfx1");
 
 	Z80(config, m_audiocpu, 4000000);                  /* 4.00 MHz */

@@ -5,6 +5,7 @@
     1942
 
 ***************************************************************************/
+
 #ifndef MAME_CAPCOM_1942_H
 #define MAME_CAPCOM_1942_H
 
@@ -12,6 +13,7 @@
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
+
 #include "emupal.h"
 #include "tilemap.h"
 #include "screen.h"
@@ -26,7 +28,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
-		, m_soundlatch(*this, "soundlatch")
+		, m_soundlatch(*this, "soundlatch%u", 0)
 		, m_spriteram(*this, "spriteram")
 		, m_fg_videoram(*this, "fg_videoram")
 		, m_bg_videoram(*this, "bg_videoram")
@@ -65,7 +67,7 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
-	required_device<generic_latch_8_device> m_soundlatch;
+	optional_device_array<generic_latch_8_device, 2> m_soundlatch;
 
 	// memory pointers
 	required_shared_ptr<uint8_t> m_spriteram;

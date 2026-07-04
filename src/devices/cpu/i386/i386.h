@@ -5,16 +5,9 @@
 
 #pragma once
 
-// SoftFloat 2 lacks an include guard
-#ifndef softfloat2_h
-#define softfloat2_h 1
-#include "softfloat/milieu.h"
-#include "softfloat/softfloat.h"
-#endif
-
-#include "divtlb.h"
-
 #include "i386dasm.h"
+#include "divtlb.h"
+#include "softfloat3/source/include/softfloat.h"
 #include <algorithm>
 
 #define INPUT_LINE_A20      1
@@ -347,19 +340,20 @@ protected:
 	uint8_t m_irq_state;
 	address_space *m_program;
 	address_space *m_io;
-	uint32_t m_a20_mask;
+	offs_t m_a20_mask;
 	memory_access<32, 1, 0, ENDIANNESS_LITTLE>::cache macache16;
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache macache32;
 
 	int m_cpuid_max_input_value_eax; // Highest CPUID standard function available
 	uint32_t m_cpuid_id0, m_cpuid_id1, m_cpuid_id2;
 	uint32_t m_cpu_version;
+	uint32_t m_brand_id;
 	uint32_t m_feature_flags;
 	uint64_t m_tsc;
 	uint64_t m_perfctr[2];
 
 	// FPU
-	floatx80 m_x87_reg[8];
+	extFloat80_t m_x87_reg[8];
 
 	uint16_t m_x87_cw;
 	uint16_t m_x87_sw;
@@ -438,7 +432,7 @@ protected:
 	uint32_t i386_translate(int segment, uint32_t ip, int rwn, int size = 1);
 	inline vtlb_entry get_permissions(uint32_t pte, int wp);
 	bool i386_translate_address(int intention, bool debug, offs_t *address, vtlb_entry *entry);
-	bool translate_address(int pl, int type, uint32_t *address, uint32_t *error);
+	bool translate_address(int pl, int type, offs_t *address, uint32_t *error);
 	void CHANGE_PC(uint32_t pc);
 	inline void NEAR_BRANCH(int32_t offs);
 	inline uint8_t FETCH();
@@ -1391,11 +1385,11 @@ protected:
 	inline void sse_predicate_compare_double(uint8_t imm8, XMM_REG d, XMM_REG s);
 	inline void sse_predicate_compare_single_scalar(uint8_t imm8, XMM_REG d, XMM_REG s);
 	inline void sse_predicate_compare_double_scalar(uint8_t imm8, XMM_REG d, XMM_REG s);
-	inline floatx80 READ80(uint32_t ea);
-	inline void WRITE80(uint32_t ea, floatx80 t);
+	inline extFloat80_t READ80(uint32_t ea);
+	inline void WRITE80(uint32_t ea, extFloat80_t t);
 	inline void x87_set_stack_top(int top);
 	inline void x87_set_tag(int reg, int tag);
-	void x87_write_stack(int i, floatx80 value, bool update_tag);
+	void x87_write_stack(int i, extFloat80_t value, bool update_tag);
 	inline void x87_set_stack_underflow();
 	inline void x87_set_stack_overflow();
 	int x87_inc_stack();
@@ -1405,10 +1399,10 @@ protected:
 	int x87_mf_fault();
 	inline void x87_write_cw(uint16_t cw);
 	void x87_reset();
-	floatx80 x87_add(floatx80 a, floatx80 b);
-	floatx80 x87_sub(floatx80 a, floatx80 b);
-	floatx80 x87_mul(floatx80 a, floatx80 b);
-	floatx80 x87_div(floatx80 a, floatx80 b);
+	extFloat80_t x87_add(extFloat80_t a, extFloat80_t b);
+	extFloat80_t x87_sub(extFloat80_t a, extFloat80_t b);
+	extFloat80_t x87_mul(extFloat80_t a, extFloat80_t b);
+	extFloat80_t x87_div(extFloat80_t a, extFloat80_t b);
 	void x87_fadd_m32real(uint8_t modrm);
 	void x87_fadd_m64real(uint8_t modrm);
 	void x87_fadd_st_sti(uint8_t modrm);

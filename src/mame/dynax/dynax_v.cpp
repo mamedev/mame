@@ -22,6 +22,8 @@
 #include "emu.h"
 #include "dynax.h"
 
+#include "input.h" // for video debug keys
+
 // Log Blitter
 //#define VERBOSE 1
 #include "logmacro.h"

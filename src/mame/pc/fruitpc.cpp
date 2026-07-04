@@ -12,6 +12,8 @@
     PCI shadow RAM handling (which causes BIOS to boot in legacy mode);
   - Handle STPCD0166BTC3 SoC properly, including PCI devices connected and SVGA
     mods (wrongly draws only top screen with 640x200 with at486 -isa1 svga_s3);
+  - Pinpoint what VGA core this really uses (some STPC boards uses Chips & Technologies
+    2nd gen family, may be same here)
 
   Hardware:
   - ST STPCD0166BTC3 486/66 + PC + VGA all on one chip
@@ -143,16 +145,17 @@ void fruitpc_state::fruitpc(machine_config &config)
 	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(vga_device::screen_update));
 
-	vga_device &vga(VGA(config, "vga", 0));
+	vga_device &vga(VGA(config, "vga"));
 	vga.set_screen("screen");
 	vga.set_vram_size(0x100000);
 
 	m_dma8237_1->out_iow_callback<1>().set(FUNC(fruitpc_state::dma8237_1_dack_w));
 
-	PCI_ROOT(config, m_pciroot, 0);
+	PCI_ROOT(config, m_pciroot);
 	// TODO: STPCD0166BTC3 host PCI
 
-	ISA8(config, m_isabus, 0);
+	// TODO: should really be ISA16
+	ISA8(config, m_isabus);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
 	m_isabus->irq2_callback().set("pic8259_2", FUNC(pic8259_device::ir1_w));
@@ -182,4 +185,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2006, fruitpc, 0, fruitpc, fruitpc, fruitpc_state, empty_init, ROT0, "<unknown>", "Fruit Land", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2006, fruitpc, 0, fruitpc, fruitpc, fruitpc_state, empty_init, ROT0, "<unknown>", "Fruit Land", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

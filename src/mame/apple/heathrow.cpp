@@ -26,6 +26,7 @@
 #include "formats/ap_dsk35.h"
 
 #define LOG_IRQ     (1U << 1)
+#define LOG_MACIO   (1U << 2)
 
 #define VERBOSE (0)
 #include "logmacro.h"
@@ -89,6 +90,8 @@ void grandcentral_device::map(address_map &map)
 {
 	base_map(map);
 	map(0x08a00, 0x08a1f).m(m_dma_scsi1, FUNC(dbdma_device::map));
+	map(0x10000, 0x100ff).rw(FUNC(grandcentral_device::scsi0_r), FUNC(grandcentral_device::scsi0_w));
+	map(0x18000, 0x180ff).rw(FUNC(grandcentral_device::scsi1_r), FUNC(grandcentral_device::scsi1_w));
 }
 
 void ohare_device::map(address_map &map)
@@ -204,6 +207,10 @@ macio_device::macio_device(const machine_config &mconfig, device_type type, cons
 	read_pb3(*this, 0),
 	read_codec(*this, 0),
 	write_codec(*this),
+	read_scsi0(*this, 0),
+	read_scsi1(*this, 0),
+	write_scsi0(*this),
+	write_scsi1(*this),
 	m_maincpu(*this, finder_base::DUMMY_TAG),
 	m_via1(*this, "via1"),
 	m_fdc(*this, "fdc"),
@@ -295,7 +302,8 @@ void grandcentral_device::device_start()
 {
 	common_init();
 	add_map(0x20000, M_MEM, FUNC(grandcentral_device::map));    // Grand Central only has 128K of BAR space, the others have 512K
-	set_ids(0x106b0002, 0x01, 0xff000001, 0x000000);
+	set_ids(0x106b0002, 0x02, 0xff0000, 0x000000);
+	status = 0x0200;
 
 	m_dma_scsi1->set_address_space(get_pci_busmaster_space());
 }
@@ -431,24 +439,6 @@ void macio_device::via_sync()
 	m_maincpu->adjust_icount(-int(main_cycle - cycle));
 }
 
-u16 macio_device::swim_r(offs_t offset, u16 mem_mask)
-{
-	if (!machine().side_effects_disabled())
-	{
-		m_maincpu->adjust_icount(-5);
-	}
-
-	u16 result = m_fdc->read((offset >> 8) & 0xf);
-	return result << 8;
-}
-void macio_device::swim_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-		m_fdc->write((offset >> 8) & 0xf, data & 0xff);
-	else
-		m_fdc->write((offset >> 8) & 0xf, data >> 8);
-}
-
 void macio_device::phases_w(u8 phases)
 {
 	if (m_cur_floppy)
@@ -474,30 +464,28 @@ u32 macio_device::macio_r(offs_t offset)
 	// InterruptLevels = live status of all interrupt lines
 	// InterruptMask = mask to determine which bits of InterruptLevels matter
 	// InterruptEvents = interrupts allowed to fire by InterruptMask
-//  printf("macio_r: offset %x (%x)\n", offset, offset*4);
+	LOGMASKED(LOG_MACIO, "macio_r: offset %x (%x)\n", offset, offset*4);
 	switch (offset << 2)
 	{
 		case 0x10:
-			return swapendian_int32(m_InterruptEvents2 & m_InterruptMask2);
+			return m_InterruptEvents2 & m_InterruptMask2;
 		case 0x14:
-			return swapendian_int32(m_InterruptMask2);
+			return m_InterruptMask2;
 		case 0x1c:
-			return swapendian_int32(m_InterruptLevels2);
+			return m_InterruptLevels2;
 		case 0x20:
-			return swapendian_int32(m_InterruptEvents & m_InterruptMask);
+			return m_InterruptEvents & m_InterruptMask;
 		case 0x24:
-			return swapendian_int32(m_InterruptMask);
+			return m_InterruptMask;
 		case 0x2c:
-			return swapendian_int32(m_InterruptLevels);
+			return m_InterruptLevels;
 	}
 	return 0;
 }
 
 void macio_device::macio_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	data = swapendian_int32(data);
-	mem_mask = swapendian_int32(mem_mask);
-//  printf("macio_w: offset %x (%x) data %08x mask %08x\n", offset, offset*4, data, mem_mask);
+	LOGMASKED(LOG_MACIO, "macio_w: offset %x (%x) data %08x mask %08x\n", offset, offset*4, data, mem_mask);
 	switch (offset << 2)
 	{
 		case 0x14:
@@ -555,10 +543,8 @@ void macio_device::macio_w(offs_t offset, u32 data, u32 mem_mask)
 
 void macio_device::recalc_irqs()
 {
-	LOGMASKED(LOG_IRQ, "%s recalc_irqs: events %08x levels %08x mask %08x\n", tag(), m_InterruptEvents, m_InterruptLevels, m_InterruptMask);
-	m_InterruptEvents = m_InterruptLevels & m_InterruptMask;
-	m_InterruptEvents2 = m_InterruptLevels2 & m_InterruptMask2;
-	if (m_InterruptEvents || m_InterruptEvents2)
+	// IRQs are raised by latched events, not live levels.
+	if ((m_InterruptEvents & m_InterruptMask) || (m_InterruptEvents2 & m_InterruptMask2))
 	{
 		write_irq(ASSERT_LINE);
 	}
@@ -572,24 +558,46 @@ template<int bit> void macio_device::set_irq_line(int state)
 {
 	if (bit < 32)
 	{
-		if (state == ASSERT_LINE)
+		const u32 id = (1 << bit);
+		// In emulation mode every transition latches an event.  In native mode
+		// only a rising edge does.
+		if ((m_InterruptMask & 0x80000000) || (state && !(m_InterruptLevels & id)))
 		{
-			m_InterruptLevels |= (1 << bit);
+			m_InterruptEvents |= id;
 		}
 		else
 		{
-			m_InterruptLevels &= ((1 << bit) ^ 0xffffffff);
+			m_InterruptEvents &= ~id;
+		}
+
+		if (state == ASSERT_LINE)
+		{
+			m_InterruptLevels |= id;
+		}
+		else
+		{
+			m_InterruptLevels &= ~id;
 		}
 	}
 	else
 	{
-		if (state == ASSERT_LINE)
+		const u32 id = (1 << (bit - 32));
+		if ((m_InterruptMask2 & 0x80000000) || (state && !(m_InterruptLevels2 & id)))
 		{
-			m_InterruptLevels2 |= (1 << (bit-32));
+			m_InterruptEvents2 |= id;
 		}
 		else
 		{
-			m_InterruptLevels2 &= ((1 << (bit-32)) ^ 0xffffffff);
+			m_InterruptEvents2 &= ~id;
+		}
+
+		if (state == ASSERT_LINE)
+		{
+			m_InterruptLevels2 |= id;
+		}
+		else
+		{
+			m_InterruptLevels2 &= ~id;
 		}
 	}
 	recalc_irqs();
@@ -597,12 +605,12 @@ template<int bit> void macio_device::set_irq_line(int state)
 
 u8 macio_device::fdc_r(offs_t offset)
 {
-	return m_fdc->read(offset >> 9);
+	return m_fdc->read(offset >> 4);
 }
 
 void macio_device::fdc_w(offs_t offset, u8 data)
 {
-	m_fdc->write(offset >> 9, data);
+	m_fdc->write(offset >> 4, data);
 }
 
 u16 macio_device::scc_r(offs_t offset)
@@ -690,22 +698,42 @@ bool ohare_device::nvram_write(util::write_stream &file)
 }
 
 // Audio support
-uint32_t macio_device::codec_r(offs_t offset)
+uint32_t macio_device::codec_r(offs_t offset, uint32_t mem_mask)
 {
 	return read_codec(offset);
 }
 
-void macio_device::codec_w(offs_t offset, uint32_t data)
+void macio_device::codec_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	write_codec(offset, data);
 }
 
-u32 macio_device::codec_dma_read(u32 offset)
+u32 macio_device::codec_dma_read(offs_t offset)
 {
 	return m_dma_audio_out->dma_read(offset);
 }
 
-void macio_device::codec_dma_write(u32 offset, u32 data)
+void macio_device::codec_dma_write(offs_t offset, u32 data)
 {
 	m_dma_audio_in->dma_write(offset, data);
+}
+
+u8 macio_device::scsi0_r(offs_t offset)
+{
+	return read_scsi0(offset);
+}
+
+void macio_device::scsi0_w(offs_t offset, u8 data)
+{
+	write_scsi0(offset, data);
+}
+
+u8 macio_device::scsi1_r(offs_t offset)
+{
+	return read_scsi1(offset);
+}
+
+void macio_device::scsi1_w(offs_t offset, u8 data)
+{
+	write_scsi1(offset, data);
 }

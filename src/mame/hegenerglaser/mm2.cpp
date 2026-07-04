@@ -53,7 +53,7 @@ http://chesseval.com/ChessEvalJournal/PrototypeMMV.htm (mistakenly claims it's M
 
 MM VI was announced in 1994, and was going to be on similar hardware with a program
 by Ed Schröder. After H+G was bought by Saitek, it was released in 1996 on H8 CPU
-hardware with a program by Frans Morsch.
+hardware with a program by Frans Morsch (see mm6.cpp).
 
 ================================================================================
 
@@ -111,8 +111,8 @@ $8000-$FFFF ROM
 
 #include "emu.h"
 
-#include "mmboard.h"
-#include "mmdisplay1.h"
+#include "mboard.h"
+#include "mdisplay1.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"

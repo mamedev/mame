@@ -8,7 +8,7 @@
         * Battlezone
         * Bradley Trainer
         * Red Baron
-        * Desert Wars (Spanish bootleg of Battle Zone)
+        * Desert Wars (Spanish bootleg of Battlezone)
 
     Known bugs:
         * None at this time on the Atari sets (Desert Wars isn't working)
@@ -232,19 +232,21 @@
 void bzone_state::machine_start()
 {
 	save_item(NAME(m_analog_data));
-	m_startled.resolve();
 }
 
 
 void redbaron_state::machine_start()
 {
 	bzone_state::machine_start();
+
 	save_item(NAME(m_rb_input_select));
 }
 
 
 void redbaron_state::machine_reset()
 {
+	bzone_state::machine_reset();
+
 	earom_control_w(0);
 }
 
@@ -620,12 +622,12 @@ void bzone_state::bzone_base(machine_config &config)
 	m_screen->set_visarea(0, 580, 0, 400);
 	m_screen->set_screen_update("vector", FUNC(vector_device::screen_update));
 
-	avg_device &avg(AVG_BZONE(config, "avg", 0));
+	avg_device &avg(AVG_BZONE(config, "avg"));
 	avg.set_vector("vector");
 	avg.set_memory(m_maincpu, AS_PROGRAM, 0x2000);
 
 	// Drivers
-	MATHBOX(config, m_mathbox, 0);
+	MATHBOX(config, m_mathbox);
 }
 
 void bzone_state::bzone(machine_config &config)
@@ -675,7 +677,7 @@ void redbaron_state::redbaron(machine_config &config)
 	pokey.allpot_r().set(FUNC(redbaron_state::redbaron_joy_r));
 	pokey.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	REDBARON(config, m_redbaronsound, 0);
+	REDBARON(config, m_redbaronsound);
 	m_redbaronsound->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
@@ -687,7 +689,7 @@ void redbaron_state::redbaron(machine_config &config)
  *
  *************************************/
 
-/* Battle Zone
+/* Battlezone
 
 For the Analog Vec Gen A035742 PCB:
 
@@ -1007,13 +1009,14 @@ void bzone_state::analog_select_w(offs_t offset, uint8_t data)
  *  Game drivers
  *
  *************************************/
+
 //    YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT        ROT   COMPANY  FULLNAME                        FLAGS                                        LAYOUT
-GAMEL(1980, bzone,     0,        bzone,    bzone,    bzone_state,    empty_init, ROT0, "Atari", "Battle Zone (rev 2)",          MACHINE_SUPPORTS_SAVE,                       layout_bzone )
-GAMEL(1980, bzonea,    bzone,    bzone,    bzone,    bzone_state,    empty_init, ROT0, "Atari", "Battle Zone (rev 1)",          MACHINE_SUPPORTS_SAVE,                       layout_bzone )
-GAMEL(1980, bzonec,    bzone,    bzone,    bzone,    bzone_state,    empty_init, ROT0, "Atari", "Battle Zone (cocktail)",       MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL, layout_bzone )
+GAMEL(1980, bzone,     0,        bzone,    bzone,    bzone_state,    empty_init, ROT0, "Atari", "Battlezone (rev 2)",           MACHINE_SUPPORTS_SAVE,                       layout_bzone ) // "Battle Zone" on titlescreen
+GAMEL(1980, bzonea,    bzone,    bzone,    bzone,    bzone_state,    empty_init, ROT0, "Atari", "Battlezone (rev 1)",           MACHINE_SUPPORTS_SAVE,                       layout_bzone )
+GAMEL(1980, bzonec,    bzone,    bzone,    bzone,    bzone_state,    empty_init, ROT0, "Atari", "Battlezone (cocktail)",        MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL, layout_bzone )
 GAME( 1980, bradley,   0,        bradley,  bradley,  bzone_state,    empty_init, ROT0, "Atari", "Bradley Trainer",              MACHINE_SUPPORTS_SAVE )
 GAMEL(1980, redbaron,  0,        redbaron, redbaron, redbaron_state, empty_init, ROT0, "Atari", "Red Baron (revised hardware)", MACHINE_SUPPORTS_SAVE,                       layout_redbaron )
 GAMEL(1980, redbarona, redbaron, redbaron, redbaron, redbaron_state, empty_init, ROT0, "Atari", "Red Baron",                    MACHINE_SUPPORTS_SAVE,                       layout_redbaron )
 
 // Not from Atari
-GAMEL(1981, dsrtwars,  bzone,    dsrtwars, bzone,    bzone_state,    empty_init, ROT0, "bootleg (Andra S.A.)", "Desert Wars (bootleg of Battle Zone)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING, layout_bzone )
+GAMEL(1981, dsrtwars,  bzone,    dsrtwars, bzone,    bzone_state,    empty_init, ROT0, "bootleg (Andra S.A.)", "Desert Wars (bootleg of Battlezone)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING, layout_bzone )

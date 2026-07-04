@@ -331,7 +331,7 @@ void spectrum_state::spectrum_rom_w(offs_t offset, uint8_t data)
 
 uint8_t spectrum_state::spectrum_rom_r(offs_t offset)
 {
-	return m_exp->romcs()
+	return (m_exp && m_exp->romcs())
 		? m_exp->mreq_r(offset)
 		: m_rom[offset];
 }
@@ -775,14 +775,16 @@ void spectrum_state::spectrum_common(machine_config &config)
 
 	dma_slot_device &dma(DMA_SLOT(config, "dma", X1 / 4, default_dma_slot_devices, nullptr));
 	dma.set_io_space(m_maincpu, AS_IO);
-	dma.out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	dma.out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	dma.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	dma.in_mreq_callback().set([this](offs_t offset) { return m_program.read_byte(offset); });
 	dma.out_mreq_callback().set([this](offs_t offset, u8 data) { m_program.write_byte(offset, data); });
 	dma.in_iorq_callback().set([this](offs_t offset) { return m_io.read_byte(offset); });
 	dma.out_iorq_callback().set([this](offs_t offset, u8 data) { m_io.write_byte(offset, data); });
 
-	SNAPSHOT(config, "snapshot", "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx").set_load_callback(FUNC(spectrum_state::snapshot_cb));
+	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,spg,z80,zx"));
+	snapshot.set_load_callback(FUNC(spectrum_state::snapshot_cb));
+	snapshot.set_interface("spectrum_snapshot");
 	QUICKLOAD(config, "quickload", "raw,scr", attotime::from_seconds(2)).set_load_callback(FUNC(spectrum_state::quickload_cb)); // The delay prevents the screen from being cleared by the RAM test at boot
 
 	CASSETTE(config, m_cassette);
@@ -952,12 +954,13 @@ ROM_START(hc2000)
 	ROM_SYSTEM_BIOS( 1, "basicv2", "BASIC v2" )
 	ROMX_LOAD("hc2000.v2",  0x0000,0x4000, CRC(65d90464) SHA1(5e2096e6460ff2120c8ada97579fdf82c1199c09), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "cpmv1", "CP/M v1" )  // not working
-	ROMX_LOAD("hc2000c.v1",  0x0000,0x4000, CRC(aaa373fe) SHA1(55a30d99c37c86c55ce6c8ecbe593b81d9819e90), ROM_BIOS(2))
+	ROMX_LOAD("hc2000c.v1", 0x0000,0x4000, CRC(aaa373fe) SHA1(55a30d99c37c86c55ce6c8ecbe593b81d9819e90), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 3, "cpmv2", "CP/M v2" )  // not working, data arranged differently to v1
-	ROMX_LOAD("hc2000c.v2",  0x0000,0x2000, CRC(69c757fe) SHA1(c2bcab2398fb493a31cf6c18ff1e4e9f55690d41), ROM_BIOS(3))
+	ROMX_LOAD("hc2000c.v2", 0x0000,0x2000, CRC(69c757fe) SHA1(c2bcab2398fb493a31cf6c18ff1e4e9f55690d41), ROM_BIOS(3))
+
 	ROM_REGION(0x8000,"opt",0)  // Interface 1 roms
-	ROM_LOAD_OPTIONAL("hc2000i.v12", 0x4000, 0x4000, CRC(182d5c0c) SHA1(b76d2bebcd938238f790e395859d0d237637d33e))  // 190892 v1, v2 pcb
-	ROM_LOAD_OPTIONAL("hc2000i.vx", 0x0000, 0x4000, CRC(39967a21) SHA1(e190001ae318982ed31f6c02b4201ca9126a739a))   // 221191 unknown pcb ver
+	ROM_LOAD("hc2000i.vx",  0x0000, 0x4000, CRC(39967a21) SHA1(e190001ae318982ed31f6c02b4201ca9126a739a)) // 221191 unknown pcb ver
+	ROM_LOAD("hc2000i.v12", 0x4000, 0x4000, CRC(182d5c0c) SHA1(b76d2bebcd938238f790e395859d0d237637d33e)) // 190892 v1, v2 pcb
 ROM_END
 
 ROM_START(cip03)

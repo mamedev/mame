@@ -829,7 +829,7 @@ void cyberbal2p_state::cyberbal2p(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ATARI_JSA_II(config, m_jsa, 0);
+	ATARI_JSA_II(config, m_jsa);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_3);
 	m_jsa->test_read_cb().set_ioport("IN2").bit(15);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);

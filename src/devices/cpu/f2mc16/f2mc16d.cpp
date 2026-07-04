@@ -66,7 +66,7 @@ const std::string_view f2mc16_disassembler::s_bcc_ops[16] =
 	"BLS", "BHI"
 };
 
-offs_t f2mc16_disassembler::opcode_alignment() const
+u32 f2mc16_disassembler::opcode_alignment() const
 {
 	return 1;
 }

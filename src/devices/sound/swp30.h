@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
+
 
 class swp30_disassembler : public util::disasm_interface
 {

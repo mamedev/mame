@@ -393,8 +393,6 @@ void chqflag_state::machine_start()
 {
 	m_rombank->configure_entries(0, 0x50000 / 0x4000, memregion("maincpu")->base(), 0x4000);
 
-	m_start_lamp.resolve();
-
 	save_item(NAME(m_k051316_readroms));
 	save_item(NAME(m_last_vreg));
 	save_item(NAME(m_analog_ctrl));
@@ -420,6 +418,8 @@ void chqflag_state::chqflag(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(600));
 
 	WATCHDOG_TIMER(config, "watchdog");
+
+	K051733(config, "k051733", 24_MHz_XTAL / 2);
 
 	ADC0804(config, "adc", RES_K(10), CAP_P(150)).vin_callback().set(FUNC(chqflag_state::analog_read_r));
 
@@ -454,8 +454,6 @@ void chqflag_state::chqflag(machine_config &config)
 	m_k051316[1]->set_layermask(0xc0);
 	m_k051316[1]->set_wrap(1);
 	m_k051316[1]->set_zoom_callback(FUNC(chqflag_state::zoom_callback_2));
-
-	K051733(config, "k051733", 24_MHz_XTAL / 2);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();

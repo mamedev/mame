@@ -99,13 +99,10 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void re900(machine_config &config);
-	void bs94(machine_config &config);
+	void re900(machine_config &config) ATTR_COLD;
+	void bs94(machine_config &config) ATTR_COLD;
 
-	void init_re900();
-
-protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
+	void init_re900() ATTR_COLD;
 
 private:
 	// common

@@ -43,17 +43,22 @@
 
 DEFINE_DEVICE_TYPE(UPD765A,        upd765a_device,        "upd765a",        "NEC uPD765A FDC")
 DEFINE_DEVICE_TYPE(UPD765B,        upd765b_device,        "upd765b",        "NEC uPD765B FDC")
+DEFINE_DEVICE_TYPE(UPD7265,        upd7265_device,        "upd7265",        "NEC uPD7265 FDC")
 DEFINE_DEVICE_TYPE(I8272A,         i8272a_device,         "i8272a",         "Intel 8272A FDC")
 DEFINE_DEVICE_TYPE(UPD72065,       upd72065_device,       "upd72065",       "NEC uPD72065 FDC")
+DEFINE_DEVICE_TYPE(UPD72066,       upd72066_device,       "upd72066",       "NEC uPD72066 FDC")
 DEFINE_DEVICE_TYPE(UPD72067,       upd72067_device,       "upd72067",       "NEC uPD72067 FDC")
 DEFINE_DEVICE_TYPE(UPD72069,       upd72069_device,       "upd72069",       "NEC uPD72069 FDC")
 DEFINE_DEVICE_TYPE(I82072,         i82072_device,         "i82072",         "Intel 82072 FDC")
+DEFINE_DEVICE_TYPE(FDC9266,        fdc9266_device,        "fdc9266",        "SMC FDC9266 FDC")
 DEFINE_DEVICE_TYPE(SMC37C78,       smc37c78_device,       "smc37c78",       "SMC FDC37C78 FDC")
 DEFINE_DEVICE_TYPE(N82077AA,       n82077aa_device,       "n82077aa",       "Intel N82077AA FDC")
 DEFINE_DEVICE_TYPE(PC_FDC_SUPERIO, pc_fdc_superio_device, "pc_fdc_superio", "Winbond PC FDC Super I/O")
 DEFINE_DEVICE_TYPE(DP8473,         dp8473_device,         "dp8473",         "National Semiconductor DP8473 FDC")
 DEFINE_DEVICE_TYPE(PC8477A,        pc8477a_device,        "pc8477a",        "National Semiconductor PC8477A FDC")
 DEFINE_DEVICE_TYPE(PC8477B,        pc8477b_device,        "pc8477b",        "National Semiconductor PC8477B FDC")
+DEFINE_DEVICE_TYPE(WD37C65,        wd37c65_device,        "wd37c65",        "Western Digital WD37C65 FDC")
+DEFINE_DEVICE_TYPE(WD37C65B,       wd37c65b_device,       "wd37c65b",       "Western Digital WD37C65B FDC")
 DEFINE_DEVICE_TYPE(WD37C65C,       wd37c65c_device,       "wd37c65c",       "Western Digital WD37C65C FDC")
 DEFINE_DEVICE_TYPE(MCS3201,        mcs3201_device,        "mcs3201",        "Motorola MCS3201 FDC")
 DEFINE_DEVICE_TYPE(TC8566AF,       tc8566af_device,       "tc8566af",       "Toshiba TC8566AF FDC")
@@ -69,6 +74,12 @@ void upd765b_device::map(address_map &map)
 {
 	map(0x0, 0x0).r(FUNC(upd765b_device::msr_r));
 	map(0x1, 0x1).rw(FUNC(upd765b_device::fifo_r), FUNC(upd765b_device::fifo_w));
+}
+
+void upd7265_device::map(address_map &map)
+{
+	map(0x0, 0x0).r(FUNC(upd7265_device::msr_r));
+	map(0x1, 0x1).rw(FUNC(upd7265_device::fifo_r), FUNC(upd7265_device::fifo_w));
 }
 
 void i8272a_device::map(address_map &map)
@@ -87,6 +98,12 @@ void i82072_device::map(address_map &map)
 {
 	map(0x0, 0x0).rw(FUNC(i82072_device::msr_r), FUNC(i82072_device::dsr_w));
 	map(0x1, 0x1).rw(FUNC(i82072_device::fifo_r), FUNC(i82072_device::fifo_w));
+}
+
+void fdc9266_device::map(address_map &map)
+{
+	map(0x0, 0x0).r(FUNC(fdc9266_device::msr_r));
+	map(0x1, 0x1).rw(FUNC(fdc9266_device::fifo_r), FUNC(fdc9266_device::fifo_w));
 }
 
 void smc37c78_device::map(address_map &map)
@@ -154,13 +171,13 @@ void pc8477b_device::map(address_map &map)
 	map(0x7, 0x7).rw(FUNC(pc8477b_device::dir_r), FUNC(pc8477b_device::ccr_w));
 }
 
-void wd37c65c_device::map(address_map &map)
+void wd37c65_device::map(address_map &map)
 {
 	// NOTE: this map only covers registers defined by CS.
 	// LDOR and LDCR must be mapped separately, since their addresses are
 	// defined only by external decoding circuits. LDIR (optional) is also separate.
-	map(0x0, 0x0).r(FUNC(wd37c65c_device::msr_r));
-	map(0x1, 0x1).rw(FUNC(wd37c65c_device::fifo_r), FUNC(wd37c65c_device::fifo_w));
+	map(0x0, 0x0).r(FUNC(wd37c65_device::msr_r));
+	map(0x1, 0x1).rw(FUNC(wd37c65_device::fifo_r), FUNC(wd37c65_device::fifo_w));
 }
 
 void mcs3201_device::map(address_map &map)
@@ -225,6 +242,71 @@ void ps2_fdc_device::set_mode(mode_t _mode)
 
 void upd765_family_device::device_start()
 {
+	save_item(STRUCT_MEMBER(flopi, main_state));
+	save_item(STRUCT_MEMBER(flopi, sub_state));
+	save_item(STRUCT_MEMBER(flopi, dir));
+	save_item(STRUCT_MEMBER(flopi, counter));
+	save_item(STRUCT_MEMBER(flopi, pcn));
+	save_item(STRUCT_MEMBER(flopi, st0));
+	save_item(STRUCT_MEMBER(flopi, st0_filled));
+	save_item(STRUCT_MEMBER(flopi, live));
+	save_item(STRUCT_MEMBER(flopi, index));
+	save_item(STRUCT_MEMBER(flopi, ready));
+	//save_item(STRUCT_MEMBER(cur_live, tm));
+	//save_item(STRUCT_MEMBER(checkpoint_live, tm));
+	//save_item(STRUCT_MEMBER(cur_live, state));
+	//save_item(STRUCT_MEMBER(checkpoint_live, state));
+	//save_item(STRUCT_MEMBER(cur_live, next_state));
+	//save_item(STRUCT_MEMBER(checkpoint_live, next_state));
+	//save_item(STRUCT_MEMBER(cur_live, shift_reg));
+	//save_item(STRUCT_MEMBER(checkpoint_live, shift_reg));
+	//save_item(STRUCT_MEMBER(cur_live, crc));
+	//save_item(STRUCT_MEMBER(checkpoint_live, crc));
+	//save_item(STRUCT_MEMBER(cur_live, bit_counter));
+	//save_item(STRUCT_MEMBER(checkpoint_live, bit_counter));
+	//save_item(STRUCT_MEMBER(cur_live, byte_counter));
+	//save_item(STRUCT_MEMBER(checkpoint_live, byte_counter));
+	//save_item(STRUCT_MEMBER(cur_live, previous_type));
+	//save_item(STRUCT_MEMBER(checkpoint_live, previous_type));
+	//save_item(STRUCT_MEMBER(cur_live, data_separator_phase));
+	//save_item(STRUCT_MEMBER(checkpoint_live, data_separator_phase));
+	//save_item(STRUCT_MEMBER(cur_live, data_bit_context));
+	//save_item(STRUCT_MEMBER(checkpoint_live, data_bit_context));
+	//save_item(STRUCT_MEMBER(cur_live, data_reg));
+	//save_item(STRUCT_MEMBER(checkpoint_live, data_reg));
+	//save_item(STRUCT_MEMBER(cur_live, idbuf));
+	//save_item(STRUCT_MEMBER(checkpoint_live, idbuf));
+	save_item(NAME(external_ready));
+	//save_item(NAME(mode));
+	save_item(NAME(main_phase));
+	save_item(NAME(cur_irq));
+	save_item(NAME(irq));
+	save_item(NAME(drq));
+	save_item(NAME(internal_drq));
+	save_item(NAME(tc));
+	save_item(NAME(tc_done));
+	save_item(NAME(locked));
+	save_item(NAME(mfm));
+	save_item(NAME(scan_done));
+	save_item(NAME(fifo_write));
+	save_item(NAME(fifo_pos));
+	save_item(NAME(fifo_expected));
+	save_item(NAME(command_pos));
+	save_item(NAME(result_pos));
+	save_item(NAME(sectors_read));
+	save_item(NAME(dor));
+	save_item(NAME(dsr));
+	save_item(NAME(fifo));
+	save_item(NAME(command));
+	save_item(NAME(result));
+	save_item(NAME(st1));
+	save_item(NAME(st2));
+	save_item(NAME(st3));
+	save_item(NAME(fifocfg));
+	save_item(NAME(precomp));
+	save_item(NAME(spec));
+	save_item(NAME(sector_size));
+	save_item(NAME(cur_rate));
 	save_item(NAME(selected_drive));
 	save_item(NAME(drive_busy));
 
@@ -290,7 +372,7 @@ void upd765_family_device::device_reset()
 
 void upd765_family_device::soft_reset()
 {
-	main_phase = PHASE_CMD;
+	main_phase = PHASE_IDLE;
 	for(int i=0; i<4; i++) {
 		flopi[i].main_state = IDLE;
 		flopi[i].sub_state = IDLE;
@@ -327,6 +409,7 @@ void upd765_family_device::soft_reset()
 
 void upd765_family_device::end_reset()
 {
+	main_phase = PHASE_CMD;
 	if(ready_polled)
 		poll_timer->adjust(attotime::from_usec(100), 0, attotime::from_usec(1024));
 }
@@ -700,7 +783,7 @@ void upd765_family_device::fifo_push(uint8_t data, bool internal)
 	int thr = (fifocfg & FIF_THR)+1;
 	if(!fifo_write && (!fifo_expected || fifo_pos >= thr || (fifocfg & FIF_DIS)))
 		enable_transfer();
-	if(fifo_write && (fifo_pos == 16 || !fifo_expected))
+	if(fifo_write && (fifo_pos == 16 || !fifo_expected || (fifocfg & FIF_DIS)))
 		disable_transfer();
 }
 
@@ -1199,8 +1282,7 @@ void upd765_family_device::live_run(attotime limit)
 		case WRITE_TRACK_SECTOR:
 			if(!cur_live.byte_counter) {
 				command[3]--;
-				if(command[3])
-					fifo_expect(4, true);
+				fifo_expect(4, true);
 			}
 			if(mfm) {
 				if(cur_live.byte_counter < 12)
@@ -1964,6 +2046,8 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 				if(command[0] & 0x80) {
 					command[3] = command[3] ^ 1;
 					command[4] = 1;
+					if((command[3] & 1) && !done)
+						fi.st0 |= 4;
 					if(fi.dev)
 						fi.dev->ss_w(command[3] & 1);
 				}
@@ -2115,6 +2199,8 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 				if(command[0] & 0x80) {
 					command[3] = command[3] ^ 1;
 					command[4] = 1;
+					if((command[3] & 1) && !done)
+						fi.st0 |= 4;
 					if(fi.dev)
 						fi.dev->ss_w(command[3] & 1);
 				}
@@ -2795,6 +2881,11 @@ upd765b_device::upd765b_device(const machine_config &mconfig, const char *tag, d
 	has_dor = false;
 }
 
+upd7265_device::upd7265_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, UPD7265, tag, owner, clock)
+{
+	has_dor = false;
+}
+
 i8272a_device::i8272a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, I8272A, tag, owner, clock)
 {
 	has_dor = false;
@@ -2808,6 +2899,10 @@ upd72065_device::upd72065_device(const machine_config &mconfig, device_type type
 {
 	has_dor = false;
 	recalibrate_steps = 255;
+}
+
+upd72066_device::upd72066_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd72065_device(mconfig, UPD72066, tag, owner, clock)
+{
 }
 
 upd72067_device::upd72067_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd72065_device(mconfig, UPD72067, tag, owner, clock)
@@ -3095,6 +3190,11 @@ void i82072_device::index_callback(floppy_image_device *floppy, int state)
 	upd765_family_device::index_callback(floppy, state);
 }
 
+fdc9266_device::fdc9266_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, FDC9266, tag, owner, clock)
+{
+	has_dor = false;
+}
+
 ps2_fdc_device::ps2_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, type, tag, owner, clock)
 {
 }
@@ -3179,8 +3279,8 @@ pc8477b_device::pc8477b_device(const machine_config &mconfig, const char *tag, d
 	recalibrate_steps = 85; // TODO: may also be programmed as 255, 3925 or 4095 by (unemulated) mode command
 }
 
-wd37c65c_device::wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	upd765_family_device(mconfig, WD37C65C, tag, owner, clock),
+wd37c65_device::wd37c65_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	upd765_family_device(mconfig, type, tag, owner, clock),
 	m_clock2(0)
 {
 	ready_polled = true;
@@ -3191,7 +3291,23 @@ wd37c65c_device::wd37c65c_device(const machine_config &mconfig, const char *tag,
 	(void)m_clock2; // TODO
 }
 
-uint8_t wd37c65c_device::get_st3(floppy_info &fi)
+wd37c65_device::wd37c65_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	wd37c65_device(mconfig, WD37C65, tag, owner, clock)
+{
+	recalibrate_steps = 255;
+}
+
+wd37c65b_device::wd37c65b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	wd37c65_device(mconfig, WD37C65B, tag, owner, clock)
+{
+}
+
+wd37c65c_device::wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	wd37c65_device(mconfig, WD37C65C, tag, owner, clock)
+{
+}
+
+uint8_t wd37c65_device::get_st3(floppy_info &fi)
 {
 	uint8_t st3 = command[1] & 7;
 	st3 |= 0x20;
@@ -3537,4 +3653,3 @@ void hd63266f_device::index_callback(floppy_image_device *floppy, int state)
 	}
 	upd765_family_device::index_callback(floppy, state);
 }
-

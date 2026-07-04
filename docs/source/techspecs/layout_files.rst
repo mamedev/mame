@@ -1391,8 +1391,8 @@ layouts, MAME automatically generates views based on the machine configuration.
 The following views will be automatically generated:
 
 * If the system has no screens and no viable views were found in the internal
-  and external layouts, MAME will load a view that shows the message “No screens
-  attached to the system”.
+  and external layouts, MAME will load a view that shows the message “No visual
+  output.”
 * For each emulated screen, MAME will generate a view showing the screen at its
   physical aspect ratio with rotation applied.
 * For each emulated screen where the configured pixel aspect ratio doesn’t match

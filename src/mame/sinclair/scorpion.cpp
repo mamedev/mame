@@ -457,6 +457,10 @@ rectangle scorpion_state::get_screen_area()
 INPUT_PORTS_START( scorpion )
 	PORT_INCLUDE( spec_plus )
 
+	PORT_MODIFY("CONFIG")
+	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+
 	PORT_MODIFY("NMI")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("NMI") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(scorpion_state::on_nmi), 0)
 
@@ -502,13 +506,13 @@ void scorpion_state::scorpion(machine_config &config)
 		.add_route(0, "speakers", 0.25, 1)
 		.add_route(2, "speakers", 0.50, 1);
 
-	BETA_DISK(config, m_beta, 0);
+	BETA_DISK(config, m_beta);
 
 	config.device_remove("exp");
 
-	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
-	ZXBUS_SLOT(config, "zxbus:1", 0, zxbus, zxbus_gmx_cards, nullptr);
-	ZXBUS_SLOT(config, "zxbus:2", 0, zxbus, zxbus_gmx_cards, nullptr);
+	zxbus_device &zxbus(ZXBUS(config, "zxbus"));
+	ZXBUS_SLOT(config, "zxbus:1", X1 / 4, zxbus, zxbus_gmx_cards, nullptr);
+	ZXBUS_SLOT(config, "zxbus:2", X1 / 4, zxbus, zxbus_gmx_cards, nullptr);
 }
 
 void scorpion_state::profi(machine_config &config)

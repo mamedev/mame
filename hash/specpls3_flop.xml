@@ -990,7 +990,7 @@ Disk 2 - Side B - Game 5: Star Warrior (Visions Software Factory)
 	</software>
 
 	<software name="aburner">
-		<description>Afterburner</description>
+		<description>After Burner</description>
 		<year>1988</year>
 		<publisher>Activision</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -1006,7 +1006,7 @@ Disk 2 - Side B - Game 5: Star Warrior (Visions Software Factory)
 	</software>
 
 	<software name="aburnera" cloneof="aburner">
-		<description>Afterburner (alt)</description>
+		<description>After Burner (alt)</description>
 		<year>1988</year>
 		<publisher>Activision</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -14098,7 +14098,7 @@ This dump of Side A has been manually fixed, a new untampered one may be needed 
 	</software>
 
 	<software name="usagiyoj">
-		<description>Samurai Warrior - The Battles of... Usagi Yojimbo</description>
+		<description>Samurai Warrior: The Battles of... Usagi Yojimbo</description>
 		<year>1988</year>
 		<publisher>Firebird Software</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -18433,7 +18433,7 @@ Disk 3 - Side A: Vindicators (Domark)
 
 	<software name="thdrcats">
 		<!-- SPS dump 3624 -->
-		<description>Thundercats</description>
+		<description>ThunderCats</description>
 		<year>1987</year>
 		<publisher>Elite Systems</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -18445,7 +18445,7 @@ Disk 3 - Side A: Vindicators (Domark)
 
 	<software name="thdrcatsa" cloneof="thdrcats">
 		<!-- May be the same edition as the IPF dump. -->
-		<description>Thundercats (alt)</description>
+		<description>ThunderCats (alt)</description>
 		<year>1987</year>
 		<publisher>Elite Systems</publisher>
 		<part name="flop1" interface="floppy_3">

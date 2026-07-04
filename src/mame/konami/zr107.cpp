@@ -7,7 +7,7 @@
     Driver by Ville Linde
 
     TODO:
-    - segfaults on soft reset;
+    - SHARC PC stack underflow on soft reset;
     - jetwave motors/sensors
 
     Hardware overview:
@@ -211,6 +211,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_dsp(*this, "dsp"),
 		m_watchdog(*this, "watchdog"),
+		m_eeprom(*this, "eeprom"),
 		m_k056230(*this, "k056230"),
 		m_k056800(*this, "k056800"),
 		m_workram(*this, "workram"),
@@ -220,45 +221,18 @@ public:
 		m_palette(*this, "palette"),
 		m_sharc_dataram(*this, "sharc_dataram"),
 		m_konppc(*this, "konppc"),
+		m_adc(*this, "adc0838"),
 		m_in(*this, "IN%u", 0U),
-		m_out4(*this, "OUT4"),
-		m_eepromout(*this, "EEPROMOUT"),
 		m_analog(*this, "ANALOG%u", 1U),
 		m_pcb_digit(*this, "pcbdigit%u", 0U),
 		m_wheel_motor(*this, "wheel_motor")
 	{ }
 
-	void zr107(machine_config &config);
-
-	void driver_init();
-
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	required_device<ppc_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<adsp21062_device> m_dsp;
-	required_device<watchdog_timer_device> m_watchdog;
-	required_device<k056230_device> m_k056230;
-	required_device<k056800_device> m_k056800;
-	required_shared_ptr<uint32_t> m_workram;
-	required_device<k001005_device> m_k001005;
-	required_device<k001006_device> m_k001006_1;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	required_shared_ptr<uint32_t> m_sharc_dataram;
-	required_device<konppc_device> m_konppc;
-	required_ioport_array<5> m_in;
-	required_ioport m_out4, m_eepromout;
-	optional_ioport_array<3> m_analog;
-	output_finder<2> m_pcb_digit;
-	output_finder<> m_wheel_motor;
-
-	int32_t m_ccu_vcth = 0;
-	int32_t m_ccu_vctl = 0;
-	uint8_t m_sound_ctrl = 0;
-	uint8_t m_sound_intck = 0;
+	void zr107(machine_config &config) ATTR_COLD;
 
 	uint8_t sysreg_r(offs_t offset);
 	void sysreg_w(offs_t offset, uint8_t data);
@@ -270,8 +244,34 @@ protected:
 	void k054539_irq_gen(int state);
 	double adc0838_callback(uint8_t input);
 
-	void sharc_memmap(address_map &map) ATTR_COLD;
+	void base_memmap(address_map &map) ATTR_COLD;
 	void sound_memmap(address_map &map) ATTR_COLD;
+	void sharc_memmap(address_map &map) ATTR_COLD;
+
+	required_device<ppc_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<adsp21062_device> m_dsp;
+	required_device<watchdog_timer_device> m_watchdog;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<k056230_device> m_k056230;
+	required_device<k056800_device> m_k056800;
+	required_shared_ptr<uint32_t> m_workram;
+	required_device<k001005_device> m_k001005;
+	required_device<k001006_device> m_k001006_1;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_shared_ptr<uint32_t> m_sharc_dataram;
+	required_device<konppc_device> m_konppc;
+	required_device<adc0838_device> m_adc;
+	required_ioport_array<5> m_in;
+	optional_ioport_array<3> m_analog;
+	output_finder<2> m_pcb_digit;
+	output_finder<> m_wheel_motor;
+
+	int32_t m_ccu_vcth = 0;
+	int32_t m_ccu_vctl = 0;
+	uint8_t m_sound_ctrl = 0;
+	uint8_t m_sound_intck = 0;
 };
 
 class midnrun_state : public zr107_state
@@ -282,7 +282,7 @@ public:
 		m_k056832(*this, "k056832")
 	{ }
 
-	void midnrun(machine_config &config);
+	void midnrun(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -306,7 +306,7 @@ public:
 		m_k001006_2(*this, "k001006_2")
 	{ }
 
-	void jetwave(machine_config &config);
+	void jetwave(machine_config &config) ATTR_COLD;
 
 private:
 	void main_memmap(address_map &map) ATTR_COLD;
@@ -420,8 +420,10 @@ void zr107_state::sysreg_w(offs_t offset, uint8_t data)
 			    0x02 = EEPCLK
 			    0x01 = EEPDI
 			*/
-			m_eepromout->write(data & 0x07, 0xff);
-			m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+			m_audiocpu->set_input_line(INPUT_LINE_RESET, BIT(~data, 4));
+			m_eeprom->cs_write(BIT(data, 2));
+			m_eeprom->clk_write(BIT(data, 1));
+			m_eeprom->di_write(BIT(data, 0));
 			LOGSYSREG("System register 0 = %02X\n", data);
 			break;
 
@@ -441,7 +443,9 @@ void zr107_state::sysreg_w(offs_t offset, uint8_t data)
 			if (BIT(data, 6))    // CG Board 0 IRQ Ack
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 			m_konppc->set_cgboard_id((data >> 4) & 3);
-			m_out4->write(data, 0xff);
+			m_adc->cs_write(BIT(data, 2));
+			m_adc->di_write(BIT(data, 1));
+			m_adc->clk_write(BIT(data, 0));
 			LOGSYSREG("System register 1 = %02X\n", data);
 			break;
 
@@ -493,9 +497,6 @@ void zr107_state::ccu_w(uint32_t data)
 
 void zr107_state::machine_start()
 {
-	m_pcb_digit.resolve();
-	m_wheel_motor.resolve();
-
 	// set conservative DRC options
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
@@ -510,46 +511,53 @@ void zr107_state::machine_start()
 	save_item(NAME(m_sound_intck));
 }
 
-void midnrun_state::main_memmap(address_map &map)
+
+void zr107_state::base_memmap(address_map &map)
 {
 	map(0x00000000, 0x000fffff).ram().share(m_workram);
-	map(0x74000000, 0x74001fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)).mirror(0x2000);
-	map(0x74020000, 0x7402003f).rw(m_k056832, FUNC(k056832_device::word_r), FUNC(k056832_device::word_w));
-	map(0x74060000, 0x7406003f).rw(FUNC(midnrun_state::ccu_r), FUNC(midnrun_state::ccu_w));
-	map(0x74080000, 0x74081fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0x740a0000, 0x740a3fff).r(m_k056832, FUNC(k056832_device::rom_word_r));
+	map(0x00000000, 0x000fffff).ram().share(m_workram);
+
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc)); // 21N 21K 23N 23K
 	map(0x78010000, 0x7801ffff).w(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
 	map(0x78040000, 0x7804000f).rw(m_k001006_1, FUNC(k001006_device::read), FUNC(k001006_device::write));
 	map(0x780c0000, 0x780c0007).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
-	map(0x7e000000, 0x7e003fff).rw(FUNC(midnrun_state::sysreg_r), FUNC(midnrun_state::sysreg_w));
+
+	map(0x7e000000, 0x7e003fff).rw(FUNC(zr107_state::sysreg_r), FUNC(zr107_state::sysreg_w));
 	map(0x7e008000, 0x7e009fff).m(m_k056230, FUNC(k056230_device::regs_map));  // LANC registers
 	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::ram_r), FUNC(k056230_device::ram_w)); // LANC Buffer RAM (27E)
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
+
 	map(0x7f800000, 0x7f9fffff).rom().region("prgrom", 0);
 	map(0x7fe00000, 0x7fffffff).rom().region("prgrom", 0);
 }
 
 
+void midnrun_state::main_memmap(address_map &map)
+{
+	base_memmap(map);
+
+	map(0x74000000, 0x74001fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)).mirror(0x2000);
+	map(0x74020000, 0x7402003f).rw(m_k056832, FUNC(k056832_device::word_r), FUNC(k056832_device::word_w));
+	map(0x74060000, 0x7406003f).rw(FUNC(midnrun_state::ccu_r), FUNC(midnrun_state::ccu_w));
+	map(0x74080000, 0x74081fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x740a0000, 0x740a3fff).r(m_k056832, FUNC(k056832_device::rom_word_r));
+
+	//map(0x78080000, 0x780bffff) TODO 4X 8X 11X 15X 4Y 8Y 11Y 15Y
+}
+
+
 void jetwave_state::main_memmap(address_map &map)
 {
-	map(0x00000000, 0x000fffff).ram().share(m_workram);
+	base_memmap(map);
+
 	map(0x74000000, 0x740000ff).rw(m_k001604, FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w));
 	map(0x74010000, 0x7401ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x74020000, 0x7403ffff).rw(m_k001604, FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));
 	map(0x74040000, 0x7407ffff).rw(m_k001604, FUNC(k001604_device::char_r), FUNC(k001604_device::char_w));
-	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc)); // 21N 21K 23N 23K
-	map(0x78010000, 0x7801ffff).w(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
-	map(0x78040000, 0x7804000f).rw(m_k001006_1, FUNC(k001006_device::read), FUNC(k001006_device::write));
+
 	map(0x78080000, 0x7808000f).rw(m_k001006_2, FUNC(k001006_device::read), FUNC(k001006_device::write));
-	map(0x780c0000, 0x780c0007).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
-	map(0x7e000000, 0x7e003fff).rw(FUNC(jetwave_state::sysreg_r), FUNC(jetwave_state::sysreg_w));
-	map(0x7e008000, 0x7e009fff).m(m_k056230, FUNC(k056230_device::regs_map));  // LANC registers
-	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::ram_r), FUNC(k056230_device::ram_w)); // LANC Buffer RAM (27E)
-	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
+
 	map(0x7f000000, 0x7f3fffff).rom().region("datarom", 0);
-	map(0x7f800000, 0x7f9fffff).rom().region("prgrom", 0);
-	map(0x7fe00000, 0x7fffffff).rom().region("prgrom", 0);
 }
 
 
@@ -601,16 +609,6 @@ static INPUT_PORTS_START( zr107 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc0838", FUNC(adc083x_device::sars_read))
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
-
-	PORT_START("EEPROMOUT")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::di_write))
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write))
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
-
-	PORT_START("OUT4")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0838", FUNC(adc083x_device::cs_write))
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0838", FUNC(adc083x_device::di_write))
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0838", FUNC(adc083x_device::clk_write))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( midnrun )
@@ -757,10 +755,11 @@ void zr107_state::zr107(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &zr107_state::sound_memmap);
 
 	ADSP21062(config, m_dsp, XTAL(36'000'000));
+	m_dsp->enable_recompiler();
 	m_dsp->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
 	m_dsp->set_addrmap(AS_DATA, &zr107_state::sharc_memmap);
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	K056230(config, m_k056230);
 	m_k056230->irq_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
@@ -776,9 +775,9 @@ void zr107_state::zr107(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 4096);
 
-	K001005(config, m_k001005, 0, m_k001006_1);
+	K001005(config, m_k001005, m_k001006_1);
 
-	K001006(config, m_k001006_1, 0);
+	K001006(config, m_k001006_1);
 	m_k001006_1->set_gfx_region("textures");
 
 	K056800(config, m_k056800, XTAL(18'432'000));
@@ -797,10 +796,10 @@ void zr107_state::zr107(machine_config &config)
 	k054539_2.add_route(0, "speaker", 0.75, 0);
 	k054539_2.add_route(1, "speaker", 0.75, 1);
 
-	adc0838_device &adc(ADC0838(config, "adc0838"));
-	adc.set_input_callback(FUNC(zr107_state::adc0838_callback));
+	ADC0838(config, m_adc);
+	m_adc->set_input_callback(FUNC(zr107_state::adc0838_callback));
 
-	KONPPC(config, m_konppc, 0);
+	KONPPC(config, m_konppc);
 	m_konppc->set_dsp_tag(0, m_dsp);
 	m_konppc->set_num_boards(1);
 	m_konppc->set_cgboard_type(konppc_device::CGBOARD_TYPE_ZR107);
@@ -836,12 +835,12 @@ void jetwave_state::jetwave(machine_config &config)
 
 	m_palette->set_format(4, raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>, 16384);
 
-	K001604(config, m_k001604, 0);
+	K001604(config, m_k001604);
 	m_k001604->set_palette(m_palette);
 
 	// The second K001006 chip connects to the second K001005 chip.
 	// Hook this up when the K001005 separation is understood (seems the load balancing is done on hardware).
-	K001006(config, m_k001006_2, 0);
+	K001006(config, m_k001006_2);
 	m_k001006_2->set_gfx_region("textures");
 
 	m_konppc->set_cgboard_type(konppc_device::CGBOARD_TYPE_GTICLUB);
@@ -849,15 +848,8 @@ void jetwave_state::jetwave(machine_config &config)
 
 /*****************************************************************************/
 
-void zr107_state::driver_init()
-{
-	m_dsp->enable_recompiler();
-}
-
-/*****************************************************************************/
-
 ROM_START( midnrun )
-	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program ROMs
 	ROM_LOAD32_BYTE( "476ea1a01.20u", 0x000000, 0x80000, CRC(ea70edf2) SHA1(51c882383a150ba118ccd39eb869525fcf5eee3c) ) // Program version EAA, v1.11 (EUR)
 	ROM_LOAD32_BYTE( "476ea1a02.17u", 0x000001, 0x80000, CRC(1462994f) SHA1(c8614c6c416f81737cc77c46eea6d8d440bc8cf3) )
 	ROM_LOAD32_BYTE( "476ea1a03.15u", 0x000002, 0x80000, CRC(b770ae46) SHA1(c61daa8353802957eb1c2e2c6204c3a98569627e) )
@@ -883,7 +875,7 @@ ROM_START( midnrun )
 ROM_END
 
 ROM_START( midnrunj )
-	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program ROMs
 	ROM_LOAD32_BYTE( "476ja1d01.20u", 0x000000, 0x80000, CRC(68d05950) SHA1(d0ff9b9b628563e18a3eaa7b96b7e9e442c001a9) ) // Program version JAD, v1.10 (JPN)
 	ROM_LOAD32_BYTE( "476ja1d02.17u", 0x000001, 0x80000, CRC(b12a14be) SHA1(d65281791874b90351442b94173d96582cfacd10) )
 	ROM_LOAD32_BYTE( "476ja1d03.15u", 0x000002, 0x80000, CRC(f768c8f1) SHA1(b8242995bdb4f9ac078fd59ffc70c31014396c92) )
@@ -909,7 +901,7 @@ ROM_START( midnrunj )
 ROM_END
 
 ROM_START( midnruna )
-	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program ROMs
 	ROM_LOAD32_BYTE( "477aaa01.20u", 0x000000, 0x80000, CRC(3aa31517) SHA1(315d9c3c930493e39bc497ceafa0c4ef6fa64e4d) ) // Program version AAA, v1.10 (ASA)
 	ROM_LOAD32_BYTE( "477aaa02.17u", 0x000001, 0x80000, CRC(c506bd3d) SHA1(d44ed2cb39f0da44f681190132c7603dfca813d9) )
 	ROM_LOAD32_BYTE( "477aaa03.15u", 0x000002, 0x80000, CRC(53f8e898) SHA1(ba83a60a411bb307cb0e424099716ccf888a4f39) )
@@ -935,7 +927,7 @@ ROM_START( midnruna )
 ROM_END
 
 ROM_START( midnruna2 )
-	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program ROMs
 	ROM_LOAD32_BYTE( "477ab1d01.20u", 0x000000, 0x80000, CRC(3aa31517) SHA1(315d9c3c930493e39bc497ceafa0c4ef6fa64e4d) ) // labeled AB1, but still program version AAA, v1.10 (ASA)
 	ROM_LOAD32_BYTE( "477ab1d02.17u", 0x000001, 0x80000, CRC(c506bd3d) SHA1(d44ed2cb39f0da44f681190132c7603dfca813d9) )
 	ROM_LOAD32_BYTE( "477ab1d03.15u", 0x000002, 0x80000, CRC(53f8e898) SHA1(ba83a60a411bb307cb0e424099716ccf888a4f39) )
@@ -961,7 +953,7 @@ ROM_START( midnruna2 )
 ROM_END
 
 ROM_START( windheat )
-	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program ROMs
 	ROM_LOAD32_BYTE( "677eaa01.20u", 0x000000, 0x080000, CRC(500b61f4) SHA1(ec39165412978c0dbd3cbf1f7b6989b5d7ba20a0) ) // Program version EAA, v2.11 (EUR)
 	ROM_LOAD32_BYTE( "677eaa02.17u", 0x000001, 0x080000, CRC(99f9fd3b) SHA1(aaec5d7f4e46648aab3738ab09e46b312caee58f) )
 	ROM_LOAD32_BYTE( "677eaa03.15u", 0x000002, 0x080000, CRC(c46eba6b) SHA1(80fea082d09071875d30a6a838736cf3a3e4501d) )
@@ -987,7 +979,7 @@ ROM_START( windheat )
 ROM_END
 
 ROM_START( windheatu )
-	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program ROMs
 	ROM_LOAD32_BYTE( "677ubc01.20u", 0x000000, 0x080000, CRC(63198721) SHA1(7f34131bf51d573d0c683b28df2567a0b911c98c) ) // Program version UBC, v2.22 (USA)
 	ROM_LOAD32_BYTE( "677ubc02.17u", 0x000001, 0x080000, CRC(bdb00e2d) SHA1(c54b2250047576e12e9936300989e40494b4659d) )
 	ROM_LOAD32_BYTE( "677ubc03.15u", 0x000002, 0x080000, CRC(0f7d8c1f) SHA1(63de03c7be794b6dae8d0af69e894ac573dbbc11) )
@@ -1013,7 +1005,7 @@ ROM_START( windheatu )
 ROM_END
 
 ROM_START( windheatj )
-	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program ROMs
 	ROM_LOAD32_BYTE( "677jaa01.20u", 0x000000, 0x080000, CRC(559b8def) SHA1(6f2e8f29b0d9a950e71015270560813adc20b689) ) // Program version JAA, v2.11 (JPN)
 	ROM_LOAD32_BYTE( "677jaa02.17u", 0x000001, 0x080000, CRC(cc230575) SHA1(be2da67600ab5edad2e8b7711c4cf985befe28bf) )
 	ROM_LOAD32_BYTE( "677jaa03.15u", 0x000002, 0x080000, CRC(20b04701) SHA1(463be36c7f65b4aa3c3f2b1f37d1e6c1f5106cbb) )
@@ -1039,7 +1031,7 @@ ROM_START( windheatj )
 ROM_END
 
 ROM_START( windheata )
-	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program ROMs
 	ROM_LOAD32_BYTE( "677aaa01.20u", 0x000000, 0x080000, CRC(0d88d0e2) SHA1(93da258bfdb2baa1796916ea8350fff521d43373) ) // Program version AAA, 2.11 (ASA)
 	ROM_LOAD32_BYTE( "677aaa02.17u", 0x000001, 0x080000, CRC(f71044a3) SHA1(a88990d4a65b610f695f4a6ff42868d04f6ba1b3) )
 	ROM_LOAD32_BYTE( "677aaa03.15u", 0x000002, 0x080000, CRC(3c897588) SHA1(718b0eb57f23a3117d2ad3c58e53196f72fc61bf) )
@@ -1065,7 +1057,7 @@ ROM_START( windheata )
 ROM_END
 
 ROM_START( jetwave )
-	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program ROMs
 	ROM_LOAD32_BYTE( "678eab01.20u", 0x000000, 0x080000, CRC(bc657198) SHA1(e521bb2c1b1a3ae934c98ce1656d35821fc287c9) ) // Program version EAB, EUR v1.04
 	ROM_LOAD32_BYTE( "678eab02.17u", 0x000001, 0x080000, CRC(a9a57090) SHA1(ae0273b00c64687f8f835aba531580654edd1097) )
 	ROM_LOAD32_BYTE( "678eab03.15u", 0x000002, 0x080000, CRC(483aaff0) SHA1(86e011337532f6ff0174393758784b276143ba10) )
@@ -1074,7 +1066,7 @@ ROM_START( jetwave )
 	ROM_REGION(0x20000, "audiocpu", 0)      // M68K program
 	ROM_LOAD16_WORD_SWAP( "678a07.19l", 0x000000, 0x020000, CRC(bb3f5875) SHA1(97f80d9b55d4177217b7cd1ba14e8ed2d64376bb) )
 
-	ROM_REGION32_BE(0x400000, "datarom", 0)   // data roms
+	ROM_REGION32_BE(0x400000, "datarom", 0)   // data ROMs
 	ROM_LOAD32_WORD_SWAP( "685a05.10u", 0x000000, 0x200000, CRC(00e59741) SHA1(d799910d4e85482b0e92a3cc9043f81d97b2fb02) )
 	ROM_LOAD32_WORD_SWAP( "685a06.8u",  0x000002, 0x200000, CRC(fc98c6a5) SHA1(a84583bb7296fa9e0c284b2ac59e2dc7b2689eee) )
 
@@ -1091,7 +1083,7 @@ ROM_START( jetwave )
 ROM_END
 
 ROM_START( waveshrk )
-	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program ROMs
 	ROM_LOAD32_BYTE( "678uab01.20u", 0x000000, 0x080000, CRC(a9b9ceed) SHA1(36f0d18481d7c3e7358e02473e54bc6b52d5c26b) ) // Program version UAB, USA v1.04
 	ROM_LOAD32_BYTE( "678uab02.17u", 0x000001, 0x080000, CRC(5ed24ac8) SHA1(d659c751558d4f8d89314466a37c04ac2df46879) )
 	ROM_LOAD32_BYTE( "678uab03.15u", 0x000002, 0x080000, CRC(f4a595e7) SHA1(e05e7ea6613ecf70d8470af5fe0c6a7274c6e45b) )
@@ -1100,7 +1092,7 @@ ROM_START( waveshrk )
 	ROM_REGION(0x20000, "audiocpu", 0)      // M68K program
 	ROM_LOAD16_WORD_SWAP( "678a07.19l", 0x000000, 0x020000, CRC(bb3f5875) SHA1(97f80d9b55d4177217b7cd1ba14e8ed2d64376bb) )
 
-	ROM_REGION32_BE(0x400000, "datarom", 0)   // data roms
+	ROM_REGION32_BE(0x400000, "datarom", 0)   // data ROMs
 	ROM_LOAD32_WORD_SWAP( "685a05.10u", 0x000000, 0x200000, CRC(00e59741) SHA1(d799910d4e85482b0e92a3cc9043f81d97b2fb02) )
 	ROM_LOAD32_WORD_SWAP( "685a06.8u",  0x000002, 0x200000, CRC(fc98c6a5) SHA1(a84583bb7296fa9e0c284b2ac59e2dc7b2689eee) )
 
@@ -1117,7 +1109,7 @@ ROM_START( waveshrk )
 ROM_END
 
 ROM_START( jetwavej )
-	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program ROMs
 	ROM_LOAD32_BYTE( "678jab01.20u", 0x000000, 0x080000, CRC(fa3da5cc) SHA1(33307e701e6eb28d44e0653ac3f1de47fc17779d) ) // Program version JAB, JPN v1.04
 	ROM_LOAD32_BYTE( "678jab02.17u", 0x000001, 0x080000, CRC(01c6713e) SHA1(68e27c018f974e820ba2e99d89a743e53faf1e65) )
 	ROM_LOAD32_BYTE( "678jab03.15u", 0x000002, 0x080000, CRC(21c757cb) SHA1(1de6df8e4c52d40882cbf771ff7215ed7b53f251) )
@@ -1126,7 +1118,7 @@ ROM_START( jetwavej )
 	ROM_REGION(0x20000, "audiocpu", 0)      // M68K program
 	ROM_LOAD16_WORD_SWAP( "678a07.19l", 0x000000, 0x020000, CRC(bb3f5875) SHA1(97f80d9b55d4177217b7cd1ba14e8ed2d64376bb) )
 
-	ROM_REGION32_BE(0x400000, "datarom", 0)   // data roms
+	ROM_REGION32_BE(0x400000, "datarom", 0)   // data ROMs
 	ROM_LOAD32_WORD_SWAP( "685a05.10u", 0x000000, 0x200000, CRC(00e59741) SHA1(d799910d4e85482b0e92a3cc9043f81d97b2fb02) )
 	ROM_LOAD32_WORD_SWAP( "685a06.8u",  0x000002, 0x200000, CRC(fc98c6a5) SHA1(a84583bb7296fa9e0c284b2ac59e2dc7b2689eee) )
 
@@ -1142,19 +1134,19 @@ ROM_START( jetwavej )
 	ROM_LOAD( "678a10.5n", 0x400000, 0x200000, CRC(0508280e) SHA1(a36c5dc377b0ba597f131bd9dfc6019e7fc2d243) )
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 /*****************************************************************************/
 
-GAME( 1995, midnrun,   0,        midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (EAA, Euro v1.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1995, midnrunj,  midnrun,  midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (JAD, Japan v1.10)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1995, midnruna,  midnrun,  midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (AAA, Asia v1.10, older sound program)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1995, midnruna2, midnrun,  midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (AAA, Asia v1.10, newer sound program)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, windheat,  0,        midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (EAA, Euro v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, windheatu, windheat, midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (UBC, USA v2.22)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, windheatj, windheat, midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (JAA, Japan v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, windheata, windheat, midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (AAA, Asia v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, jetwave,   0,        jetwave, jetwave,  jetwave_state, driver_init,  ROT0, "Konami", "Jet Wave (EAB, Euro v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, waveshrk,  jetwave,  jetwave, jetwave,  jetwave_state, driver_init,  ROT0, "Konami", "Wave Shark (UAB, USA v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, jetwavej,  jetwave,  jetwave, jetwave,  jetwave_state, driver_init,  ROT0, "Konami", "Jet Wave (JAB, Japan v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1995, midnrun,   0,        midnrun, midnrun,  midnrun_state, empty_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (EAA, Euro v1.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1995, midnrunj,  midnrun,  midnrun, midnrun,  midnrun_state, empty_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (JAD, Japan v1.10)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1995, midnruna,  midnrun,  midnrun, midnrun,  midnrun_state, empty_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (AAA, Asia v1.10, older sound program)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1995, midnruna2, midnrun,  midnrun, midnrun,  midnrun_state, empty_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (AAA, Asia v1.10, newer sound program)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, windheat,  0,        midnrun, midnrun,  midnrun_state, empty_init,  ROT0, "Konami", "Winding Heat (EAA, Euro v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, windheatu, windheat, midnrun, midnrun,  midnrun_state, empty_init,  ROT0, "Konami", "Winding Heat (UBC, USA v2.22)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, windheatj, windheat, midnrun, midnrun,  midnrun_state, empty_init,  ROT0, "Konami", "Winding Heat (JAA, Japan v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, windheata, windheat, midnrun, midnrun,  midnrun_state, empty_init,  ROT0, "Konami", "Winding Heat (AAA, Asia v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, jetwave,   0,        jetwave, jetwave,  jetwave_state, empty_init,  ROT0, "Konami", "Jet Wave (EAB, Euro v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, waveshrk,  jetwave,  jetwave, jetwave,  jetwave_state, empty_init,  ROT0, "Konami", "Wave Shark (UAB, USA v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, jetwavej,  jetwave,  jetwave, jetwave,  jetwave_state, empty_init,  ROT0, "Konami", "Jet Wave (JAB, Japan v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )

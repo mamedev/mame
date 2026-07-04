@@ -16,7 +16,6 @@ This document covers all the known Namco System 10 games, including....
 *Aim For Cash (AFC2 Ver.A)                                                    (C) Namco, 2004
 Ball Pom Line  (no sticker, ROM VER. B0 FEB 09 2005 15:29:02)                 (C) Namco, 2005
 *Dice ROM                                                                     (C) Namco, 2004
-*Dokidoki! Flower                                                             (C) Namco, 2004
 ***Drum Master                                                                (C) Namco, 2001
 ***Drum Master 2                                                              (C) Namco, 2001
 ***Drum Master 3                                                              (C) Namco, 2002
@@ -34,7 +33,7 @@ Hard Puncher Hajime no Ippo: The Fighting (VER.2.02J)                         (C
 Hard Puncher Hajime no Ippo 2 - The Fighting! - Ouja e no chousen (VER.2.00J) (C) Namco/Taito, 2002
 *Honne Hakkenki                                                               (C) Namco, 2001
 Keroro Gunsou Pekopon Shinryaku Shirei De Arimasu! (KRG1 Ver.A)               (C) Namco, 2006
-**Knock Down 2001 / KO2001 (KD11 Ver.B)                                       (C) Namco, 2001
+Knock Down 2001 / KO2001 (KD11 Ver.B)                                         (C) Namco, 2001
 Kono e Tako (RAN Ver.A, 10021 Ver.A reprogrammed Gamshara PCB)                (C) Mitchell 2003
 Kotoba no Puzzle Mojipittan (KPM1 Ver.A)                                      (C) Namco, 2001
 Medal no Tatsujin (MTL1 SPR0B)                                                (C) Namco, 2005
@@ -679,6 +678,8 @@ User data note:
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 
 namespace {
 
@@ -707,7 +708,6 @@ protected:
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void device_resolve_objects() override ATTR_COLD;
 
 	void namcos10_base(machine_config &config) ATTR_COLD;
 	void namcos10_exio(machine_config &config) ATTR_COLD;
@@ -1079,11 +1079,6 @@ void namcos10_state::machine_reset()
 	std::fill(std::begin(m_mgexio_coin_start_time), std::end(m_mgexio_coin_start_time), attotime::never);
 }
 
-void namcos10_state::device_resolve_objects()
-{
-	m_mgexio_outputs.resolve();
-}
-
 TIMER_DEVICE_CALLBACK_MEMBER(namcos10_state::io_update_interrupt_callback)
 {
 	m_int |= 8; // I/O interrupt
@@ -1316,7 +1311,7 @@ void namcos10_state::i2c_update()
 
 void namcos10_state::namcos10_exio(machine_config &config)
 {
-	namcos10_exio_device &exio(NAMCOS10_EXIO(config, m_exio, 0));
+	namcos10_exio_device &exio(NAMCOS10_EXIO(config, m_exio));
 
 	exio.analog_callback().set([this] (offs_t offset) {
 		return m_exio_analog[offset].read_safe(0);
@@ -1384,7 +1379,7 @@ void namcos10_state::namcos10_mgexio(machine_config &config)
 
 	// TODO: puzzball wants to see IRQ 2 triggering. Where from MGEXIO does that come? Probably a port
 
-	namcos10_mgexio_device &mgexio(NAMCOS10_MGEXIO(config, m_exio, 0));
+	namcos10_mgexio_device &mgexio(NAMCOS10_MGEXIO(config, m_exio));
 
 	HOPPER(config, m_mgexio_hopper[0], attotime::from_msec(100));
 	HOPPER(config, m_mgexio_hopper[1], attotime::from_msec(100));
@@ -1646,7 +1641,7 @@ void namcos10_memm_state::ns10_mrdrilr2(machine_config &config)
 {
 	namcos10_memm(config);
 	/* decrypter device (CPLD in hardware?) */
-	MRDRILR2_DECRYPTER(config, m_decrypter, 0);
+	MRDRILR2_DECRYPTER(config, m_decrypter);
 }
 
 
@@ -1870,7 +1865,7 @@ void namcos10_memn_state::memn_driver_init()
 void namcos10_memn_state::namcos10_nand_k9f2808u0b(machine_config &config, int nand_count)
 {
 	for (int i = 0; i < nand_count; i++) {
-		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
+		SAMSUNG_K9F2808U0B(config, m_nand[i]);
 		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
 	}
 }
@@ -1878,7 +1873,7 @@ void namcos10_memn_state::namcos10_nand_k9f2808u0b(machine_config &config, int n
 void namcos10_memn_state::namcos10_nand_k9f5608u0d(machine_config &config, int nand_count)
 {
 	for (int i = 0; i < nand_count; i++) {
-		SAMSUNG_K9F5608U0D(config, m_nand[i], 0);
+		SAMSUNG_K9F5608U0D(config, m_nand[i]);
 		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
 	}
 }
@@ -1895,7 +1890,7 @@ void namcos10_memn_state::ns10_ballpom(machine_config &config)
 	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xe, 0xf, 0xa, 0xb, 0x8, 0x9, 0x5, 0x4, 0x6, 0x7, 0x1, 0x3, 0x0, 0x2); };
 
 	/* decrypter device (CPLD in hardware?) */
-	// BALLPOM_DECRYPTER(config, m_decrypter, 0);
+	// BALLPOM_DECRYPTER(config, m_decrypter);
 }
 
 void namcos10_memn_state::ns10_chocovdr(machine_config &config)
@@ -2016,7 +2011,7 @@ void namcos10_memn_state::ns10_gegemdb(machine_config &config)
 	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xf, 0xc, 0xe, 0x9, 0x8, 0xb, 0xa, 0x4, 0x5, 0x7, 0x6, 0x1, 0x3, 0x0, 0x2); };
 
 	/* decrypter device (CPLD in hardware?) */
-	// GEGEMDB_DECRYPTER(config, m_decrypter, 0);
+	// GEGEMDB_DECRYPTER(config, m_decrypter);
 }
 
 void namcos10_memn_state::ns10_gjspace(machine_config &config)
@@ -3062,7 +3057,7 @@ void namcos10_memio_state::namcos10_memio_map(address_map &map)
 void namcos10_memio_state::namcos10_nand_tc58256aft(machine_config &config, int nand_count)
 {
 	for (int i = 0; i < nand_count; i++) {
-		TOSHIBA_TC58256AFT(config, m_nand[i], 0);
+		TOSHIBA_TC58256AFT(config, m_nand[i]);
 		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
 	}
 }
@@ -3185,6 +3180,9 @@ static INPUT_PORTS_START( gamshara )
 	PORT_DIPNAME( 0x7f, 0x7f, DEF_STR( Region ) ) PORT_DIPLOCATION("SW1:8,7,6,5,4,3,2")
 	PORT_DIPSETTING(0x7f, DEF_STR( Japan ) ) // JPN
 	PORT_DIPSETTING(0x6e, DEF_STR( World ) ) // ETC
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW1:1") // read on boot / restart only, but if turned you can exit through menu selection (6: Exit Test) - using F2 don't allow this option
+	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( startrgn )
@@ -3445,6 +3443,11 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ptblank3 )
 	PORT_INCLUDE(namcos10)
+
+	PORT_MODIFY("SYSTEM")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0fff6f6f, IP_ACTIVE_LOW, IPT_UNUSED )

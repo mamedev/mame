@@ -675,7 +675,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( tiki100_state::tape_tick )
 void tiki100_state::busrq_w(int state)
 {
 	// since our Z80 has no support for BUSACK, we assume it is granted immediately
-	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, state);
 	m_exp->busak_w(state);
 }
 
@@ -683,8 +683,6 @@ void tiki100_state::busrq_w(int state)
 
 void tiki100_state::machine_start()
 {
-	m_leds.resolve();
-
 	/* register for state saving */
 	save_item(NAME(m_rome));
 	save_item(NAME(m_vire));
@@ -722,7 +720,7 @@ void tiki100_state::tiki100(machine_config &config)
 	m_screen->set_screen_update(FUNC(tiki100_state::screen_update));
 	PALETTE(config, m_palette).set_entries(16);
 
-	TIKI100_BUS(config, m_exp, 0);
+	TIKI100_BUS(config, m_exp);
 	m_exp->irq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_exp->nmi_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_exp->busrq_wr_callback().set(FUNC(tiki100_state::busrq_w));

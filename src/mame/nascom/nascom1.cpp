@@ -816,7 +816,8 @@ void nascom1_state::nascom1(machine_config &config)
 	// software
 	SOFTWARE_LIST(config, "snap_list").set_original("nascom_snap").set_filter("NASCOM1");
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", (16_MHz_XTAL / 16) / 256));
+	clock_device &uart_clock(CLOCK(config, "uart_clock"));
+	uart_clock.set_period(attotime::from_hz(16_MHz_XTAL / 16 / 256));
 	uart_clock.signal_handler().set(FUNC(nascom1_state::nascom1_kansas_w));
 	uart_clock.signal_handler().append(m_hd6402, FUNC(ay31015_device::write_rcp));
 	TIMER(config, "kansas_r").configure_periodic(FUNC(nascom1_state::nascom1_kansas_r), attotime::from_hz(40000));
@@ -858,7 +859,7 @@ void nascom2_state::nascom2(machine_config &config)
 	SOFTWARE_LIST(config, "socket_list").set_original("nascom_socket");
 	SOFTWARE_LIST(config, "floppy_list").set_original("nascom_flop");
 
-	CLOCK(config, m_clock, (16_MHz_XTAL / 32) / 26);
+	CLOCK(config, m_clock).set_period(attotime::from_hz(16_MHz_XTAL / 32 / 26));
 	m_clock->signal_handler().set(FUNC(nascom2_state::nascom2_kansas_w));
 	TIMER(config, "kansas_r").configure_periodic(FUNC(nascom2_state::nascom2_kansas_r), attotime::from_hz(40000));
 }

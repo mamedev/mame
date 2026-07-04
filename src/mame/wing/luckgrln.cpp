@@ -105,15 +105,15 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_palette_ram(*this, "palette", 0x1000, ENDIANNESS_LITTLE),
-		m_lamps(*this, "lamp%u", 0U) { }
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
-	void init_luckgrln();
+	void init_luckgrln() ATTR_COLD;
 
-	void _7smash(machine_config &config);
-	void luckgrln(machine_config &config);
+	void _7smash(machine_config &config) ATTR_COLD;
+	void luckgrln(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -152,11 +152,6 @@ private:
 	void mainmap(address_map &map) ATTR_COLD;
 };
 
-
-void luckgrln_state::machine_start()
-{
-	m_lamps.resolve();
-}
 
 template<uint8_t Reel>
 void luckgrln_state::reel_ram_w(offs_t offset, uint8_t data)
@@ -737,7 +732,8 @@ static INPUT_PORTS_START( _7smash )
 	PORT_DIPSETTING(    0x00, "D" )
 	PORT_DIPSETTING(    0x20, "C" )
 	PORT_DIPSETTING(    0x40, "B" )
-	PORT_DIPSETTING(    0x60, "A" ) // inputs and layout are for this Panel Type only, ToDo: expand with conditional inputs
+	PORT_DIPSETTING(    0x60, "A" ) // inputs and layout are for this Panel Type only
+	// TODO: expand with conditional inputs
 	PORT_DIPNAME( 0x80, 0x80, "Alt. Test" )       PORT_DIPLOCATION("DSW2:8") // not shown on test screen
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -847,7 +843,7 @@ void luckgrln_state::luckgrln(machine_config &config)
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 
-	MSM6242(config, "rtc", 0);
+	MSM6242(config, "rtc");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(12_MHz_XTAL, 752, 0, 512, 274, 0, 256);

@@ -15,7 +15,8 @@
     Step 2.1: 166 MHz PPC, same 3D engine as 2.0, differences unknown
 
     Game status:
-    vf3/vf3a/vf3tb - crashes
+    vf3/vf3a/vf3tb - crashes sometimes, performance dips at startup (illegal polygons filling the
+                     pipeline?), runs too slow during gameplay
     getbassur - works
     basssdx/getbass/getbassdx - I/O board error (?)
 
@@ -32,7 +33,7 @@
     skichamp - boots after skipping the drive board errors, massive slowdowns
     srally2 - works, uses JTAG patch, draws no polygon if coin is inserted at Sega logo
     srally2p/srally2pa/sraly2dx - needs specific JTAG patch / bypass
-    von2/von2a/von2o/von254g - works
+    von2/von2a/von2o/von254g - works, corrupted robot textures (mip mapping?)
     fvipers2 - crashes after player selection
     vs298 - hangs with an onscreen "unknown error code" during attract, polygon covers most of the 3d.
     vs299/vs2v991 - works, polygon covers most of the 3d.
@@ -1344,8 +1345,7 @@ void model3_state::model3_init(int step)
 {
 	m_step = step;
 
-	if (m_uart.found())
-		m_uart->write_cts(0);
+	m_uart->write_cts(0);
 
 	m_sound_irq_enable = 0;
 	m_sound_timer->adjust(attotime::never);
@@ -1596,32 +1596,6 @@ uint64_t model3_state::real3d_status_r(offs_t offset)
 }
 
 /* SCSP interface */
-uint8_t model3_state::model3_sound_r(offs_t offset)
-{
-	switch (offset)
-	{
-		case 0:
-		{
-			if (m_uart.found())
-				return m_uart->data_r();
-
-			break;
-		}
-
-		case 4:
-		{
-			if (m_uart.found())
-				return m_uart->status_r();
-
-			uint8_t res = 0;
-			res |= 1;
-			res |= 0x2;     // magtruck country check
-			return res;
-		}
-	}
-	return 0;
-}
-
 void model3_state::model3_sound_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
@@ -1630,17 +1604,13 @@ void model3_state::model3_sound_w(offs_t offset, uint8_t data)
 			// clear the interrupt
 			set_irq_line(0x40, CLEAR_LINE);
 
-			if (m_uart.found())
-				m_uart->data_w(data);
-
 			// send to the sound board
-			m_scsp1->midi_in(data);
+			m_uart->data_w(data);
 
 			break;
 
 		case 4:
-			if (m_uart.found())
-				m_uart->control_w(data);
+			m_uart->control_w(data);
 
 			// HACK: MIDI comms thru SCSP MCIEB?
 			if (data & 0x20)
@@ -1679,7 +1649,7 @@ void model3_state::model3_10_mem(address_map &map)
 	map(0x98000000, 0x980fffff).w(FUNC(model3_state::real3d_polygon_ram_w));
 
 	map(0xf0040000, 0xf004003f).mirror(0x0e000000).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask64(0xff000000ff000000);
-	map(0xf0080000, 0xf008ffff).mirror(0x0e000000).rw(FUNC(model3_state::model3_sound_r), FUNC(model3_state::model3_sound_w));
+	map(0xf0080000, 0xf008ffff).mirror(0x0e000000).r(m_uart, FUNC(i8251_device::read)).w(FUNC(model3_state::model3_sound_w));
 	map(0xf00c0000, 0xf00dffff).mirror(0x0e000000).ram().share("backup");    /* backup SRAM */
 	map(0xf0100000, 0xf010003f).mirror(0x0e000000).rw(FUNC(model3_state::model3_sys_r), FUNC(model3_state::model3_sys_w));
 	map(0xf0140000, 0xf014003f).mirror(0x0e000000).rw(FUNC(model3_state::model3_rtc_r), FUNC(model3_state::model3_rtc_w));
@@ -6347,16 +6317,11 @@ void model3_state::add_cpu_166mhz(machine_config &config)
 
 void model3_state::dsb2_config(machine_config &config)
 {
-	DSB2(config, m_dsb2, 0);
+	DSB2(config, m_dsb2);
 	m_dsb2->add_route(0, "speaker", 1.0, 0);
 	m_dsb2->add_route(1, "speaker", 1.0, 1);
 
-	I8251(config, m_uart, 8000000); // uPD71051
-	m_uart->txd_handler().set(m_dsb2, FUNC(dsb2_device::write_txd));
-
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 500000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
-	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
-	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
+	m_uart->txd_handler().append(m_dsb2, FUNC(dsb2_device::write_txd));
 }
 
 void model3_state::add_base_devices(machine_config &config)
@@ -6368,7 +6333,7 @@ void model3_state::add_base_devices(machine_config &config)
 	NVRAM(config, "backup", nvram_device::DEFAULT_ALL_1);
 	RTC72421(config, m_rtc, XTAL(32'768)); // internal oscillator
 
-	SEGA_315_5649(config, m_io, 0);
+	SEGA_315_5649(config, m_io);
 	m_io->out_pa_callback().set(FUNC(model3_state::eeprom_w));
 	m_io->in_pb_callback().set(FUNC(model3_state::input_r));
 	m_io->in_pc_callback().set_ioport("IN2");
@@ -6398,6 +6363,7 @@ void model3_state::add_base_devices(machine_config &config)
 	SCSP(config, m_scsp1, 45.1584_MHz_XTAL / 2); // 45.158 MHz XTAL
 	m_scsp1->set_addrmap(0, &model3_state::scsp1_map);
 	m_scsp1->irq_cb().set(FUNC(model3_state::scsp_irq));
+	m_scsp1->midi_out_cb().set(m_uart, FUNC(i8251_device::write_rxd));
 	m_scsp1->add_route(0, "speaker", 1.0, 0);
 	m_scsp1->add_route(1, "speaker", 1.0, 1);
 
@@ -6406,16 +6372,23 @@ void model3_state::add_base_devices(machine_config &config)
 	scsp2.add_route(0, "speaker", 1.0, 0);
 	scsp2.add_route(1, "speaker", 1.0, 1);
 
-	SEGA_BILLBOARD(config, m_billboard, 0);
+	I8251(config, m_uart, 8000000); // uPD71051
+	m_uart->txd_handler().set(m_scsp1, FUNC(scsp_device::midi_in));
+
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 500000)); // 16 times 31.25kHz (standard Sega/MIDI sound data rate)
+	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
+
+	SEGA_BILLBOARD(config, m_billboard);
 
 	config.set_default_layout(layout_segabill);
 }
 
 void model3_state::add_scsi_devices(machine_config &config)
 {
-	SCSI_PORT(config, "scsi", 0);
+	SCSI_PORT(config, "scsi");
 
-	LSI53C810(config, m_lsi53c810, 0);
+	LSI53C810(config, m_lsi53c810);
 	m_lsi53c810->set_irq_callback(FUNC(model3_state::scsi_irq_callback));
 	m_lsi53c810->set_dma_callback(FUNC(model3_state::real3d_dma_callback));
 	m_lsi53c810->set_fetch_callback(FUNC(model3_state::scsi_fetch));
@@ -6426,7 +6399,7 @@ void model3_state::add_crypt_devices(machine_config &config)
 {
 	m_maincpu->set_addrmap(AS_PROGRAM, &model3_state::model3_5881_mem);
 
-	SEGA315_5881_CRYPT(config, m_cryptdevice, 0);
+	SEGA315_5881_CRYPT(config, m_cryptdevice);
 	m_cryptdevice->set_read_cb(FUNC(model3_state::crypt_read_callback));
 }
 
@@ -6469,7 +6442,7 @@ void model3_state::getbass(machine_config &config)
 	iocpu.out_p2_callback().set("ioeeprom", FUNC(eeprom_serial_93cxx_device::cs_write)).bit(6);
 
 	SEGA_315_5296(config, "io60", 32_MHz_XTAL);
-	SEGA_315_5649(config, "io70", 0);
+	SEGA_315_5649(config, "io70");
 
 	EEPROM_93C46_16BIT(config, "ioeeprom"); // AK93C45
 
@@ -6485,23 +6458,18 @@ void model3_state::model3_15(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_15)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_15)
 
-	M3COMM(config, "comm_board", 0);
+	M3COMM(config, "comm_board");
 }
 
 void model3_state::scud(machine_config &config)
 {
 	model3_15(config);
 
-	DSBZ80(config, m_dsbz80, 0);
+	DSBZ80(config, m_dsbz80);
 	m_dsbz80->add_route(0, "speaker", 1.0, 0);
 	m_dsbz80->add_route(1, "speaker", 1.0, 1);
 
-	I8251(config, m_uart, 8000000); // uPD71051
-	m_uart->txd_handler().set(m_dsbz80, FUNC(dsbz80_device::write_txd));
-
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 500000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
-	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
-	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
+	m_uart->txd_handler().append(m_dsbz80, FUNC(dsbz80_device::write_txd));
 }
 
 void model3_state::lostwsga(machine_config &config)
@@ -6525,7 +6493,7 @@ void model3_state::model3_20(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(model3_state, model3_20)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state, model3_20)
 
-	M3COMM(config, "comm_board", 0);
+	M3COMM(config, "comm_board");
 }
 
 void model3_state::model3_20_5881(machine_config &config)
@@ -6548,7 +6516,7 @@ void model3_state::model3_21(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(model3_state, model3_21)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state, model3_21)
 
-	M3COMM(config, "comm_board", 0);
+	M3COMM(config, "comm_board");
 }
 
 void model3_state::swtrilgyp(machine_config &config)

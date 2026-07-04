@@ -188,6 +188,11 @@
 #include <cstdarg>
 #include <cstdio>
 
+#include "sd1.lh"
+#include "sd132.lh"
+#include "vfx.lh"
+#include "vfxsd.lh"
+
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -240,10 +245,10 @@ public:
 		, m_seqram_nvram(*this, "seqram")
 	{ }
 
-	void vfx(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::VFX) ATTR_COLD;
-	void vfxsd(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::VFX_SD) ATTR_COLD;
-	void sd1(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::SD_1) ATTR_COLD;
-	void sd132(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::SD_1_32) ATTR_COLD;
+	void vfx(machine_config &config) ATTR_COLD;
+	void vfxsd(machine_config &config) ATTR_COLD;
+	void sd1(machine_config &config) ATTR_COLD;
+	void sd132(machine_config &config) ATTR_COLD;
 	void eps(machine_config &config) ATTR_COLD;
 	void sq1(machine_config &config) ATTR_COLD;
 	void ks32(machine_config &config) ATTR_COLD;
@@ -775,7 +780,7 @@ void esq5505_state::common(machine_config &config)
 
 	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);
-	mdin.rxd_handler().set(m_duart, FUNC(scn2681_device::rx_a_w)); // route MIDI Tx send directly to 68681 channel A Rx
+	mdin.rxd_handler().set(m_duart, FUNC(mc68681_device::rx_a_w)); // route MIDI Tx send directly to 68681 channel A Rx
 
 	midiout_slot(MIDI_PORT(config, "mdout"));
 
@@ -803,17 +808,19 @@ void esq5505_state::common(machine_config &config)
 	m_otis->add_route(7, "pump", 1.0, 7);
 }
 
-void esq5505_state::vfx(machine_config &config, int panel_type)
+void esq5505_state::vfx(machine_config &config)
 {
 	common(config);
 
 	ENSONIQ_VFX_CARTRIDGE(config, m_cart);
 
-	ESQPANEL2X40_VFX(config, m_panel, panel_type);
+	ESQPANEL2X40_VFX(config, m_panel);
 	m_panel->write_tx().set(m_duart, FUNC(mc68681_device::rx_b_w));
 	m_panel->write_analog().set(FUNC(esq5505_state::analog_w));
 
 	NVRAM(config, m_osram_nvram, nvram_device::DEFAULT_NONE);
+
+	config.set_default_layout(layout_vfx);
 }
 
 void esq5505_state::eps(machine_config &config)
@@ -831,8 +838,7 @@ void esq5505_state::eps(machine_config &config)
 	WD1772(config, m_fdc, 8_MHz_XTAL);
 	FLOPPY_CONNECTOR(config, m_floppy_connector, esq5505_state::floppy_drives, "35dd", esq5505_state::floppy_formats, true);//.enable_sound(true);
 
-	HD63450(config, m_dmac, 10_MHz_XTAL);   // MC68450 compatible
-	m_dmac->set_cpu_tag(m_maincpu);
+	HD63450(config, m_dmac, 10_MHz_XTAL, m_maincpu, AS_PROGRAM);   // MC68450 compatible
 	m_dmac->set_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2));
 	m_dmac->set_burst_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50));
 	m_dmac->irq_callback().set_inputline(m_maincpu, M68K_IRQ_2);
@@ -840,9 +846,9 @@ void esq5505_state::eps(machine_config &config)
 	m_dmac->dma8_write<0>().set(m_fdc, FUNC(wd1772_device::data_w));
 }
 
-void esq5505_state::vfxsd(machine_config &config, int panel_type)
+void esq5505_state::vfxsd(machine_config &config)
 {
-	vfx(config, panel_type);
+	vfx(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::vfxsd_map);
 	// and nvram for the sequencer RAM as well
 	NVRAM(config, m_seqram_nvram, nvram_device::DEFAULT_NONE);
@@ -856,24 +862,28 @@ void esq5505_state::vfxsd(machine_config &config, int panel_type)
 
 	// software list
 	SOFTWARE_LIST(config, "vfxsd_flop").set_original("vfxsd_flop");
+
+	config.set_default_layout(layout_vfxsd);
 }
 
-void esq5505_state::sd1(machine_config &config, int panel_type)
+void esq5505_state::sd1(machine_config &config)
 {
-	// Like the VFX-SD but with its own panel type
-	vfxsd(config, panel_type);
+	// Like the VFX-SD but with its own software list and layout
+	vfxsd(config);
 
 	// software list
 	SOFTWARE_LIST(config, "sd1_flop").set_original("sd1_flop");
+
+	config.set_default_layout(layout_sd1);
 }
 
 // Like the sd1, but with some clock speeds faster.
-void esq5505_state::sd132(machine_config &config, int panel_type)
+void esq5505_state::sd132(machine_config &config)
 {
 	auto clock = 30.47618_MHz_XTAL / 2;
 
-	// Like the SD-1 but with its own panel type
-	sd1(config, panel_type);
+	// Like the SD-1 but with different clocks, software and layout
+	sd1(config);
 	m_duart->set_clock(4'000'000);
 
 	m_maincpu->set_clock(clock);
@@ -882,6 +892,8 @@ void esq5505_state::sd132(machine_config &config, int panel_type)
 
 	// software list
 	SOFTWARE_LIST(config, "sd132_flop").set_original("sd132_flop");
+
+	config.set_default_layout(layout_sd132);
 }
 
 // 32-voice machines with the VFX-SD type config
@@ -907,7 +919,7 @@ void esq5505_state::common32(machine_config &config)
 
 	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);
-	mdin.rxd_handler().set(m_duart, FUNC(scn2681_device::rx_a_w)); // route MIDI Tx send directly to 68681 channel A Rx
+	mdin.rxd_handler().set(m_duart, FUNC(mc68681_device::rx_a_w)); // route MIDI Tx send directly to 68681 channel A Rx
 
 	midiout_slot(MIDI_PORT(config, "mdout"));
 
@@ -1063,8 +1075,12 @@ INPUT_PORTS_END
 
 ROM_START( vfx )
 	ROM_REGION16_BE(0x40000, "osrom", 0)
-	ROM_LOAD16_BYTE( "vfx210b-low.bin",  0x000001, 0x010000, CRC(c51b19cd) SHA1(2a125b92ffa02ae9d7fb88118d525491d785e87e) )
-	ROM_LOAD16_BYTE( "vfx210b-high.bin", 0x000000, 0x010000, CRC(59853be8) SHA1(8e07f69d53f80885d15f624e0b912aeaf3212ee4) )
+	ROM_SYSTEM_BIOS( 0, "v230", "V230" )
+	ROM_LOAD16_BYTE_BIOS( 0, "vfx230-low.bin",  0x000001, 0x010000, CRC(6a93f5b4) SHA1(dea208b182be71da973a2e4867944cf7e2958df6) )
+	ROM_LOAD16_BYTE_BIOS( 0, "vfx230-high.bin", 0x000000, 0x010000, CRC(86994661) SHA1(2efb52f6d51625c9be545d5cd018dc7b24f25ac7) )
+	ROM_SYSTEM_BIOS( 1, "v210b", "V210b" )
+	ROM_LOAD16_BYTE_BIOS( 1, "vfx210b-low.bin",  0x000001, 0x010000, CRC(c51b19cd) SHA1(2a125b92ffa02ae9d7fb88118d525491d785e87e) )
+	ROM_LOAD16_BYTE_BIOS( 1, "vfx210b-high.bin", 0x000000, 0x010000, CRC(59853be8) SHA1(8e07f69d53f80885d15f624e0b912aeaf3212ee4) )
 
 	ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
 	ROM_LOAD16_BYTE( "u14.bin", 0x000001, 0x080000, CRC(85592299) SHA1(1aa7cf612f91972baeba15991d9686ccde01599c) )

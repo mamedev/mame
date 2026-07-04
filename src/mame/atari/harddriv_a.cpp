@@ -9,7 +9,6 @@
 #include "emu.h"
 #include "harddriv.h"
 
-#include "cpu/tms32010/tms32010.h"
 #include "speaker.h"
 
 
@@ -246,7 +245,7 @@ void harddriv_sound_board_device::hdsnd68k_irqclr_w(uint16_t data)
 
 /*************************************
  *
- *  TMS32010 access
+ *  TMS320C10 access
  *
  *************************************/
 
@@ -296,7 +295,7 @@ void harddriv_sound_board_device::hdsnd68k_320com_w(offs_t offset, uint16_t data
 
 /*************************************
  *
- *  TMS32010 interrupts
+ *  TMS320C10 interrupts
  *
  *************************************/
 
@@ -320,7 +319,7 @@ int harddriv_sound_board_device::hdsnddsp_get_bio()
 
 /*************************************
  *
- *  TMS32010 ports
+ *  TMS320C10 ports
  *
  *************************************/
 
@@ -411,7 +410,7 @@ void harddriv_sound_board_device::driversnd_dsp_program_map(address_map &map)
 }
 
 
-/* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
+/* $000 - 08F  TMS320C10 Internal Data RAM in Data Address Space */
 
 void harddriv_sound_board_device::driversnd_dsp_io_map(address_map &map)
 {
@@ -436,7 +435,7 @@ void harddriv_sound_board_device::device_add_mconfig(machine_config &config)
 	M68000(config, m_soundcpu, 16_MHz_XTAL/2);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &harddriv_sound_board_device::driversnd_68k_map);
 
-	LS259(config, m_latch, 0); // 80R
+	LS259(config, m_latch); // 80R
 	m_latch->q_out_cb<0>().set(FUNC(harddriv_sound_board_device::speech_write_w)); // SPWR - 5220 write strobe
 	m_latch->q_out_cb<1>().set(FUNC(harddriv_sound_board_device::speech_reset_w)); // SPRES - 5220 hard reset
 	m_latch->q_out_cb<2>().set(FUNC(harddriv_sound_board_device::speech_rate_w)); // SPRATE
@@ -444,7 +443,7 @@ void harddriv_sound_board_device::device_add_mconfig(machine_config &config)
 	m_latch->q_out_cb<4>().set_inputline(m_sounddsp, INPUT_LINE_HALT).invert(); // RES320
 	m_latch->q_out_cb<7>().set(FUNC(harddriv_sound_board_device::led_w));
 
-	TMS32010(config, m_sounddsp, XTAL(20'000'000));
+	TMS320C10(config, m_sounddsp, XTAL(20'000'000));
 	m_sounddsp->set_addrmap(AS_PROGRAM, &harddriv_sound_board_device::driversnd_dsp_program_map);
 	/* Data Map is internal to the CPU */
 	m_sounddsp->set_addrmap(AS_IO, &harddriv_sound_board_device::driversnd_dsp_io_map);

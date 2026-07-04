@@ -80,39 +80,33 @@ uint32_t tx0_state::screen_update_tx0(screen_device &screen, bitmap_ind16 &bitma
     Operator control panel code
 */
 
-enum
-{
-	x_panel_col1a_offset = 0,
-	x_panel_col1b_offset = 24,
-	x_panel_col2_offset = x_panel_col1a_offset+184+8
-};
+constexpr int x_panel_col1a_offset = 0;
+constexpr int x_panel_col1b_offset = 24;
+constexpr int x_panel_col2_offset = x_panel_col1a_offset+184+8;
 
-enum
-{
-	/* column 1: registers, test accumulator, test buffer, toggle switch storage */
-	y_panel_pc_offset = 0,
-	y_panel_mar_offset = y_panel_pc_offset+2*8,
-	y_panel_mbr_offset = y_panel_mar_offset+2*8,
-	y_panel_ac_offset = y_panel_mbr_offset+2*8,
-	y_panel_lr_offset = y_panel_ac_offset+2*8,
-	y_panel_xr_offset = y_panel_lr_offset+2*8,
-	y_panel_tbr_offset = y_panel_xr_offset+2*8,
-	y_panel_tac_offset = y_panel_tbr_offset+2*8,
-	y_panel_tss_offset = y_panel_tac_offset+2*8,
+/* column 1: registers, test accumulator, test buffer, toggle switch storage */
+constexpr int y_panel_pc_offset = 0;
+constexpr int y_panel_mar_offset = y_panel_pc_offset+2*8;
+constexpr int y_panel_mbr_offset = y_panel_mar_offset+2*8;
+constexpr int y_panel_ac_offset = y_panel_mbr_offset+2*8;
+constexpr int y_panel_lr_offset = y_panel_ac_offset+2*8;
+constexpr int y_panel_xr_offset = y_panel_lr_offset+2*8;
+constexpr int y_panel_tbr_offset = y_panel_xr_offset+2*8;
+constexpr int y_panel_tac_offset = y_panel_tbr_offset+2*8;
+constexpr int y_panel_tss_offset = y_panel_tac_offset+2*8;
 
-	/* column 2: stop c0, stop c1, cm sel, 1-bit indicators, instr, flags */
-	y_panel_stop_c0_offset = 8,
-	y_panel_stop_c1_offset = y_panel_stop_c0_offset+8,
-	y_panel_gbl_cm_sel_offset = y_panel_stop_c1_offset+8,
-	y_panel_run_offset = y_panel_gbl_cm_sel_offset+8,
-	y_panel_cycle1_offset = y_panel_run_offset+8,
-	y_panel_cycle2_offset = y_panel_cycle1_offset+8,
-	y_panel_rim_offset = y_panel_cycle2_offset+8,
-	y_panel_ioh_offset = y_panel_rim_offset+8,
-	y_panel_ios_offset = y_panel_ioh_offset+8,
-	y_panel_ir_offset = y_panel_ios_offset+8,
-	y_panel_pf_offset = y_panel_ir_offset+2*8
-};
+/* column 2: stop c0, stop c1, cm sel, 1-bit indicators, instr, flags */
+constexpr int y_panel_stop_c0_offset = 8;
+constexpr int y_panel_stop_c1_offset = y_panel_stop_c0_offset+8;
+constexpr int y_panel_gbl_cm_sel_offset = y_panel_stop_c1_offset+8;
+constexpr int y_panel_run_offset = y_panel_gbl_cm_sel_offset+8;
+constexpr int y_panel_cycle1_offset = y_panel_run_offset+8;
+constexpr int y_panel_cycle2_offset = y_panel_cycle1_offset+8;
+constexpr int y_panel_rim_offset = y_panel_cycle2_offset+8;
+constexpr int y_panel_ioh_offset = y_panel_rim_offset+8;
+constexpr int y_panel_ios_offset = y_panel_ioh_offset+8;
+constexpr int y_panel_ir_offset = y_panel_ios_offset+8;
+constexpr int y_panel_pf_offset = y_panel_ir_offset+2*8;
 
 /* draw a small 8*8 LED (or is this a lamp? ) */
 void tx0_state::tx0_draw_led(bitmap_ind16 &bitmap, int x, int y, int state)
@@ -319,20 +313,11 @@ void tx0_state::tx0_draw_panel(bitmap_ind16 &bitmap)
 */
 
 
+constexpr int typewriter_line_height = 8;
+constexpr int typewriter_write_offset_y = typewriter_window_height-typewriter_line_height;
+constexpr int typewriter_scroll_step = typewriter_line_height;
 
-
-
-enum
-{
-	typewriter_line_height = 8,
-	typewriter_write_offset_y = typewriter_window_height-typewriter_line_height,
-	typewriter_scroll_step = typewriter_line_height
-};
-
-enum
-{
-	tab_step = 8
-};
+constexpr int tab_step = 8;
 
 
 void tx0_state::tx0_typewriter_linefeed()

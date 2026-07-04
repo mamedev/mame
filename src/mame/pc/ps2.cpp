@@ -48,7 +48,7 @@ void ps2_state::at_softlists(machine_config &config)
 	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
 	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");
 	SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
-//	SOFTWARE_LIST(config, "win_cdrom_list").set_original("generic_cdrom").set_filter("ibmpc");
+//  SOFTWARE_LIST(config, "win_cdrom_list").set_original("generic_cdrom").set_filter("ibmpc");
 	SOFTWARE_LIST(config, "at_hdd_list").set_original("ibm5170_hdd");
 	SOFTWARE_LIST(config, "midi_disk_list").set_compatible("midi_flop");
 	// TODO: verify thru Windows 3.1
@@ -100,7 +100,7 @@ void ps2_state::machine_start()
 void ps2_state::ps2m30286(machine_config &config)
 {
 	/* basic machine hardware */
-	i80286_cpu_device &maincpu(I80286(config, m_maincpu, 10000000));
+	i80286_cpu_device &maincpu(I80286(config, m_maincpu, 10'000'000));
 	maincpu.set_addrmap(AS_PROGRAM, &ps2_state::ps2_16_map);
 	maincpu.set_addrmap(AS_IO, &ps2_state::ps2_16_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
@@ -130,7 +130,7 @@ void ps2_state::ps2m30286(machine_config &config)
 
 void ps2_state::ps2386(machine_config &config)
 {
-	I386(config, m_maincpu, 12000000);
+	I386(config, m_maincpu, 12'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ps2_state::ps2_32_map);
 	m_maincpu->set_addrmap(AS_IO, &ps2_state::ps2_32_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));

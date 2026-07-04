@@ -13,6 +13,7 @@
 
 #include "corestr.h"
 #include "emuopts.h"
+#include "input.h"
 #include "unicode.h"
 
 // FIXME: allow OSD module headers to be included in a less ugly way

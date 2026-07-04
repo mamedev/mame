@@ -186,7 +186,7 @@ DECLARE_DEVICE_TYPE(KONAMI_FIREBEAT_EXTEND_SPECTRUM_ANALYZER, firebeat_extend_sp
 class firebeat_extend_spectrum_analyzer_device : public device_t, public device_mixer_interface
 {
 public:
-	firebeat_extend_spectrum_analyzer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	firebeat_extend_spectrum_analyzer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint8_t read(offs_t offset);
 
@@ -199,13 +199,11 @@ protected:
 	void sound_stream_update(sound_stream &stream) override;
 
 private:
-	enum {
-		TOTAL_BUFFERS = 2,
-		TOTAL_CHANNELS = 2,
-		TOTAL_BARS = 6,
+	static constexpr int TOTAL_BUFFERS = 2;
+	static constexpr int TOTAL_CHANNELS = 2;
+	static constexpr int TOTAL_BARS = 6;
 
-		FFT_LENGTH = 512
-	};
+	static constexpr int FFT_LENGTH = 512;
 
 	void update_fft();
 	void apply_fft(uint32_t buf_index);
@@ -275,8 +273,9 @@ void firebeat_extend_spectrum_analyzer_device::sound_stream_update(sound_stream 
 		double notch_max[TOTAL_BARS] = { -1, -1, -1, -1, -1, -1 };
 		int cur_notch = 0;
 
-		for (int i = 0; i <= FFT_LENGTH / 2; i++) {
-			const double freq = (double)i / FFT_LENGTH * srate;
+		for (int i = 0; i <= FFT_LENGTH / 2; i++)
+		{
+			const double freq = double(i) / FFT_LENGTH * srate;
 
 			if (freq < NOTCHES[cur_notch])
 				continue;
@@ -414,21 +413,17 @@ public:
 		m_io_inputs(*this, "IN%u", 0U)
 	{ }
 
-	void firebeat(machine_config &config);
-
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void device_resolve_objects() override ATTR_COLD;
 
-	uint32_t screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void firebeat(machine_config &config) ATTR_COLD;
 
-	void init_firebeat();
+	void init_firebeat() ATTR_COLD;
 
 	void firebeat_map(address_map &map) ATTR_COLD;
 	void ymz280b_map(address_map &map) ATTR_COLD;
 
-	void init_lights(write32s_delegate out1, write32s_delegate out2, write32s_delegate out3);
 	void lamp_output_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void lamp_output2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void lamp_output3_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -495,9 +490,8 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void device_resolve_objects() override ATTR_COLD;
 
-	void firebeat_spu_base(machine_config &config);
+	void firebeat_spu_base(machine_config &config) ATTR_COLD;
 	void firebeat_spu_map(address_map &map) ATTR_COLD;
 	void spu_map(address_map &map) ATTR_COLD;
 	void rf5c400_map(address_map &map) ATTR_COLD;
@@ -552,14 +546,14 @@ public:
 	{ }
 
 	void firebeat_ppp(machine_config &config);
-	void init_ppp_base();
-	void init_ppp_jp();
-	void init_ppp_overseas();
+
+	void init_ppp_jp() ATTR_COLD;
+	void init_ppp_overseas() ATTR_COLD;
 
 private:
-	virtual void device_resolve_objects() override ATTR_COLD;
-
 	void firebeat_ppp_map(address_map &map) ATTR_COLD;
+
+	void init_ppp_base() ATTR_COLD;
 
 	uint16_t sensor_r(offs_t offset);
 
@@ -594,19 +588,16 @@ public:
 		m_io_wheels(*this, "WHEEL_P%u", 1U)
 	{ }
 
-	uint32_t screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void firebeat_kbm(machine_config &config) ATTR_COLD;
 
-	void init_kbm_base();
-	void init_kbm_jp();
-	void init_kbm_overseas();
-	void firebeat_kbm(machine_config &config);
+	void init_kbm_jp() ATTR_COLD;
+	void init_kbm_overseas() ATTR_COLD;
 
 private:
-	virtual void device_resolve_objects() override ATTR_COLD;
-
 	void firebeat_kbm_map(address_map &map) ATTR_COLD;
 
-	void init_keyboard();
+	void init_kbm_base() ATTR_COLD;
+	void init_keyboard() ATTR_COLD;
 
 	uint8_t keyboard_wheel_r(offs_t offset);
 
@@ -649,7 +640,8 @@ public:
 	{ }
 
 	void firebeat_bm3(machine_config &config);
-	void init_bm3();
+
+	void init_bm3() ATTR_COLD;
 
 private:
 	void firebeat_bm3_map(address_map &map) ATTR_COLD;
@@ -662,6 +654,8 @@ private:
 
 	void midi_st224_irq_callback(int state);
 
+	void floppy_irq_callback(int state);
+
 	required_device<fdc37c665gt_device> m_fdc;
 	required_device<floppy_connector> m_floppy;
 	required_device<firebeat_extend_spectrum_analyzer_device> m_spectrum_analyzer;
@@ -670,27 +664,36 @@ private:
 	required_ioport_array<4> m_io;
 	required_ioport_array<2> m_io_turntables;
 	required_ioport_array<7> m_io_effects;
-
-	void floppy_irq_callback(int state);
 };
 
 class firebeat_popn_state : public firebeat_spu_state
 {
 public:
 	firebeat_popn_state(const machine_config &mconfig, device_type type, const char *tag) :
-		firebeat_spu_state(mconfig, type, tag)
+		firebeat_spu_state(mconfig, type, tag),
+		m_button_leds(*this, "button_led_%u", 0U),
+		m_side_leds(*this, "side_led_%u", 0U),
+		m_top_leds(*this, "top_led_%u", 0U)
 	{ }
 
-	void firebeat_popn(machine_config &config);
-	void init_popn_base();
-	void init_popn_jp();
-	void init_popn_rental();
+	void firebeat_popn(machine_config &config) ATTR_COLD;
+
+	void init_popn_jp() ATTR_COLD;
+	void init_popn_rental() ATTR_COLD;
+
+private:
+	void firebeat_popn_map(address_map &map) ATTR_COLD;
+
+	void init_popn_base() ATTR_COLD;
+
+	void lamp_output_popn_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+
+	output_finder<9> m_button_leds;
+	output_finder<4> m_side_leds;
+	output_finder<5> m_top_leds;
 };
 
 /*****************************************************************************/
-
-uint32_t firebeat_state::screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return m_gcu->draw(screen, bitmap, cliprect); }
-uint32_t firebeat_kbm_state::screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return m_gcu_sub->draw(screen, bitmap, cliprect); }
 
 void firebeat_state::machine_start()
 {
@@ -706,11 +709,6 @@ void firebeat_state::machine_reset()
 	m_extend_board_irq_enable = 0x3f;
 	m_extend_board_irq_active = 0x00;
 	m_control = 0;
-}
-
-void firebeat_state::device_resolve_objects()
-{
-	m_status_leds.resolve();
 }
 
 void firebeat_state::init_firebeat()
@@ -729,8 +727,6 @@ void firebeat_state::init_firebeat()
 	m_cabinet_info = 0;
 
 	m_maincpu->ppc4xx_spu_set_tx_handler(write8smo_delegate(*this, FUNC(firebeat_state::security_w)));
-
-	init_lights(write32s_delegate(*this), write32s_delegate(*this), write32s_delegate(*this));
 }
 
 void firebeat_state::firebeat(machine_config &config)
@@ -739,7 +735,7 @@ void firebeat_state::firebeat(machine_config &config)
 	PPC403GCX(config, m_maincpu, XTAL(66'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &firebeat_state::firebeat_map);
 
-	RTC65271(config, "rtc", 0);
+	RTC65271(config, "rtc");
 
 	FUJITSU_29F016A(config, "flash_main");
 	FUJITSU_29F016A(config, "flash_snd1");
@@ -754,11 +750,11 @@ void firebeat_state::firebeat(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 525, 0, 480);
-	screen.set_screen_update(FUNC(firebeat_state::screen_update_firebeat_0));
+	screen.set_screen_update(m_gcu, FUNC(k057714_device::draw));
 	screen.set_palette("palette");
 	screen.screen_vblank().set(m_gcu, FUNC(k057714_device::vblank_w));
 
-	K057714(config, m_gcu, 0).set_screen("screen");
+	K057714(config, m_gcu).set_screen("screen");
 	m_gcu->irq_callback().set(FUNC(firebeat_state::gcu_interrupt));
 
 	/* sound hardware */
@@ -770,7 +766,7 @@ void firebeat_state::firebeat(machine_config &config)
 	ymz.add_route(1, "speaker", 1.0, 0);
 	ymz.add_route(0, "speaker", 1.0, 1);
 
-	PC16552D(config, "duart_com", 0);
+	PC16552D(config, "duart_com");
 	NS16550(config, "duart_com:chan0", XTAL(19'660'800));
 	NS16550(config, "duart_com:chan1", XTAL(19'660'800));
 }
@@ -782,9 +778,12 @@ void firebeat_state::firebeat_map(address_map &map)
 	map(0x7000a000, 0x7000a003).r(FUNC(firebeat_state::extend_board_irq_r));
 	map(0x74000000, 0x740003ff).noprw(); // SPU shared RAM
 	map(0x7d000200, 0x7d00021f).r(FUNC(firebeat_state::cabinet_r));
+	map(0x7d000320, 0x7d000323).w(FUNC(firebeat_state::lamp_output2_w));
+	map(0x7d000324, 0x7d000327).w(FUNC(firebeat_state::lamp_output3_w));
 	map(0x7d000400, 0x7d000401).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
 	map(0x7d000500, 0x7d000501).w(FUNC(firebeat_state::control_w));
 	map(0x7d000800, 0x7d000803).r(FUNC(firebeat_state::input_r));
+	map(0x7d000804, 0x7d000807).w(FUNC(firebeat_state::lamp_output_w));
 	map(0x7d400000, 0x7d5fffff).rw("flash_main", FUNC(fujitsu_29f016a_device::read), FUNC(fujitsu_29f016a_device::write));
 	map(0x7d800000, 0x7d9fffff).rw("flash_snd1", FUNC(fujitsu_29f016a_device::read), FUNC(fujitsu_29f016a_device::write));
 	map(0x7da00000, 0x7dbfffff).rw("flash_snd2", FUNC(fujitsu_29f016a_device::read), FUNC(fujitsu_29f016a_device::write));
@@ -1116,17 +1115,6 @@ static void comm_uart_irq_callback(running_machine &machine, int channel, int va
 
 /*****************************************************************************/
 
-void firebeat_state::init_lights(write32s_delegate out1, write32s_delegate out2, write32s_delegate out3)
-{
-	if (out1.isnull()) out1 = write32s_delegate(*this, FUNC(firebeat_state::lamp_output_w));
-	if (out2.isnull()) out2 = write32s_delegate(*this, FUNC(firebeat_state::lamp_output2_w));
-	if (out3.isnull()) out3 = write32s_delegate(*this, FUNC(firebeat_state::lamp_output3_w));
-
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x7d000804, 0x7d000807, out1);
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x7d000320, 0x7d000323, out2);
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x7d000324, 0x7d000327, out3);
-}
-
 void firebeat_state::lamp_output_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// -------- -------- -------- xxxxxxxx   Status LEDs (active low)
@@ -1186,12 +1174,6 @@ void firebeat_spu_state::machine_reset()
 	m_spu_ata_dmarq = 0;
 	m_wave_bank = 0;
 	m_sync_ata_irq = 0;
-}
-
-void firebeat_spu_state::device_resolve_objects()
-{
-	firebeat_state::device_resolve_objects();
-	m_spu_status_leds.resolve();
 }
 
 void firebeat_spu_state::firebeat_spu_base(machine_config &config)
@@ -1446,7 +1428,7 @@ void firebeat_bm3_state::firebeat_bm3(machine_config &config)
 
 	FLOPPY_CONNECTOR(config, m_floppy, pc_hd_floppies, "35hd", floppy_image_device::default_pc_floppy_formats);
 
-	PC16552D(config, m_duart_midi, 0);
+	PC16552D(config, m_duart_midi);
 	NS16550(config, "duart_midi:chan0", XTAL(24'000'000));
 	NS16550(config, "duart_midi:chan1", XTAL(24'000'000)).out_int_callback().set(FUNC(firebeat_bm3_state::midi_st224_irq_callback));
 
@@ -1454,7 +1436,7 @@ void firebeat_bm3_state::firebeat_bm3(machine_config &config)
 	m_rf5c400->add_route(2, "speaker", 0.5, 0);
 	m_rf5c400->add_route(3, "speaker", 0.5, 1);
 
-	KONAMI_FIREBEAT_EXTEND_SPECTRUM_ANALYZER(config, m_spectrum_analyzer, 0);
+	KONAMI_FIREBEAT_EXTEND_SPECTRUM_ANALYZER(config, m_spectrum_analyzer);
 	m_rf5c400->add_route(0, m_spectrum_analyzer, 0.5, 0);
 	m_rf5c400->add_route(1, m_spectrum_analyzer, 0.5, 1);
 	m_rf5c400->add_route(2, m_spectrum_analyzer, 0.5, 0);
@@ -1464,7 +1446,6 @@ void firebeat_bm3_state::firebeat_bm3(machine_config &config)
 void firebeat_bm3_state::init_bm3()
 {
 	init_firebeat();
-	init_lights(write32s_delegate(*this), write32s_delegate(*this), write32s_delegate(*this));
 
 	// No cabinet info changes for BMIII are needed at this point. All sourced data is for JP region
 	// non-rental firebeat stacks. So, no region-specific overrides are present for BMIII. If we
@@ -1535,6 +1516,8 @@ void firebeat_popn_state::firebeat_popn(machine_config &config)
 {
 	firebeat_spu_base(config);
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &firebeat_popn_state::firebeat_popn_map);
+
 	ATA_INTERFACE(config, m_spuata).options(firebeat_ata_devices, "dvdrom", nullptr, true);
 	m_spuata->irq_handler().set(FUNC(firebeat_popn_state::spu_ata_interrupt));
 	m_spuata->dmarq_handler().set(FUNC(firebeat_popn_state::spu_ata_dmarq));
@@ -1554,7 +1537,6 @@ void firebeat_popn_state::firebeat_popn(machine_config &config)
 void firebeat_popn_state::init_popn_base()
 {
 	init_firebeat();
-	init_lights(write32s_delegate(*this), write32s_delegate(*this), write32s_delegate(*this));
 }
 
 void firebeat_popn_state::init_popn_jp()
@@ -1575,33 +1557,78 @@ void firebeat_popn_state::init_popn_rental()
 	m_cabinet_info = 0x6;
 }
 
+void firebeat_popn_state::firebeat_popn_map(address_map &map)
+{
+	firebeat_spu_map(map);
+	map(0x7d000804, 0x7d000807).w(FUNC(firebeat_popn_state::lamp_output_popn_w));
+}
+
+void firebeat_popn_state::lamp_output_popn_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	lamp_output_w(offset, data, mem_mask);
+
+	// 0x00010000 Marquee Lamp?
+	// 0x00080000 Top Led 0 (Topmost)
+	// 0x00100000 Top Led 1
+	// 0x00200000 Top Led 2
+	// 0x00400000 Top Led 3
+	// 0x00800000 Top Led 4
+	// 0x08000000 Pillar Lamp 0 (Left Red?)
+	// 0x10000000 Pillar Lamp 1 (Left Blue?)
+	// 0x20000000 Pillar Lamp 2 (Right Blue?)
+	// 0x40000000 Pillar Lamp 3 (Right Red?)
+	// 0x00000100 Button LED 0
+	// 0x00000200 Button LED 1
+	// 0x00000400 Button LED 2
+	// 0x00000800 Button LED 3
+	// 0x00001000 Button LED 4
+	// 0x00002000 Button LED 5
+	// 0x00004000 Button LED 6
+	// 0x00008000 Button LED 7
+	// 0x80000000 Button LED 8
+	if (ACCESSING_BITS_8_15)
+	{
+		m_button_leds[0] = BIT(data, 8);
+		m_button_leds[1] = BIT(data, 9);
+		m_button_leds[2] = BIT(data, 10);
+		m_button_leds[3] = BIT(data, 11);
+		m_button_leds[4] = BIT(data, 12);
+		m_button_leds[5] = BIT(data, 13);
+		m_button_leds[6] = BIT(data, 14);
+		m_button_leds[7] = BIT(data, 15);
+	}
+	if (ACCESSING_BITS_16_23)
+	{
+		m_top_leds[0] = BIT(data, 19);
+		m_top_leds[1] = BIT(data, 20);
+		m_top_leds[2] = BIT(data, 21);
+		m_top_leds[3] = BIT(data, 22);
+		m_top_leds[4] = BIT(data, 23);
+	}
+	if (ACCESSING_BITS_24_31)
+	{
+		m_side_leds[0] = BIT(data, 27);
+		m_side_leds[1] = BIT(data, 28);
+		m_side_leds[2] = BIT(data, 29);
+		m_side_leds[3] = BIT(data, 30);
+		m_button_leds[8] = BIT(data, 31);
+	}
+}
+
 
 /*****************************************************************************
 * ParaParaParadise / ParaParaDancing
 ******************************************************************************/
-void firebeat_ppp_state::device_resolve_objects()
-{
-	firebeat_state::device_resolve_objects();
-	m_stage_leds.resolve();
-	m_top_leds.resolve();
-	m_lamps.resolve();
-	m_cab_led_left.resolve();
-	m_cab_led_right.resolve();
-	m_cab_led_door_lamp.resolve();
-	m_cab_led_ok.resolve();
-	m_cab_led_slim.resolve();
-}
-
 void firebeat_ppp_state::firebeat_ppp(machine_config &config)
 {
 	firebeat(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &firebeat_ppp_state::firebeat_ppp_map);
 }
 
 void firebeat_ppp_state::init_ppp_base()
 {
 	init_firebeat();
-	init_lights(write32s_delegate(*this, FUNC(firebeat_ppp_state::lamp_output_ppp_w)), write32s_delegate(*this, FUNC(firebeat_ppp_state::lamp_output2_ppp_w)), write32s_delegate(*this, FUNC(firebeat_ppp_state::lamp_output3_ppp_w)));
 }
 
 void firebeat_ppp_state::init_ppp_jp()
@@ -1625,7 +1652,11 @@ void firebeat_ppp_state::init_ppp_overseas()
 void firebeat_ppp_state::firebeat_ppp_map(address_map &map)
 {
 	firebeat_map(map);
+
+	map(0x7d000320, 0x7d000323).w(FUNC(firebeat_ppp_state::lamp_output2_ppp_w));
+	map(0x7d000324, 0x7d000327).w(FUNC(firebeat_ppp_state::lamp_output3_ppp_w));
 	map(0x7d000340, 0x7d00035f).r(FUNC(firebeat_ppp_state::sensor_r));
+	map(0x7d000804, 0x7d000807).w(FUNC(firebeat_ppp_state::lamp_output_ppp_w));
 }
 
 uint16_t firebeat_ppp_state::sensor_r(offs_t offset)
@@ -1734,20 +1765,9 @@ void firebeat_ppp_state::lamp_output3_ppp_w(offs_t offset, uint32_t data, uint32
 /*****************************************************************************
 * Keyboardmania
 ******************************************************************************/
-void firebeat_kbm_state::device_resolve_objects()
-{
-	firebeat_state::device_resolve_objects();
-	m_lamps.resolve();
-	m_cab_led_door_lamp.resolve();
-	m_cab_led_start1p.resolve();
-	m_cab_led_start2p.resolve();
-	m_lamp_neon.resolve();
-}
-
 void firebeat_kbm_state::init_kbm_base()
 {
 	init_firebeat();
-	init_lights(write32s_delegate(*this, FUNC(firebeat_kbm_state::lamp_output_kbm_w)), write32s_delegate(*this), write32s_delegate(*this));
 	init_keyboard();
 
 //  pc16552d_init(machine(), 1, 24000000, midi_uart_irq_callback, 0);     // MIDI UART
@@ -1784,7 +1804,7 @@ void firebeat_kbm_state::firebeat_kbm(machine_config &config)
 	PPC403GCX(config, m_maincpu, XTAL(66'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &firebeat_kbm_state::firebeat_kbm_map);
 
-	RTC65271(config, "rtc", 0);
+	RTC65271(config, "rtc");
 
 	FUJITSU_29F016A(config, "flash_main");
 	FUJITSU_29F016A(config, "flash_snd1");
@@ -1800,19 +1820,19 @@ void firebeat_kbm_state::firebeat_kbm(machine_config &config)
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 525, 0, 480);
-	lscreen.set_screen_update(FUNC(firebeat_kbm_state::screen_update_firebeat_0));
+	lscreen.set_screen_update(m_gcu, FUNC(k057714_device::draw));
 	lscreen.set_palette("palette");
 	lscreen.screen_vblank().set(m_gcu, FUNC(k057714_device::vblank_w));
 
-	K057714(config, m_gcu, 0).set_screen("lscreen");
+	K057714(config, m_gcu).set_screen("lscreen");
 	m_gcu->irq_callback().set(FUNC(firebeat_kbm_state::gcu_interrupt));
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	rscreen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 525, 0, 480);
-	rscreen.set_screen_update(FUNC(firebeat_kbm_state::screen_update_firebeat_1));
+	rscreen.set_screen_update(m_gcu_sub, FUNC(k057714_device::draw));
 	rscreen.set_palette("palette");
 
-	K057714(config, m_gcu_sub, 0).set_screen("rscreen");
+	K057714(config, m_gcu_sub).set_screen("rscreen");
 	m_gcu_sub->irq_callback().set(FUNC(firebeat_kbm_state::gcu_interrupt));
 
 	/* sound hardware */
@@ -1825,12 +1845,12 @@ void firebeat_kbm_state::firebeat_kbm(machine_config &config)
 	ymz.add_route(0, "speaker", 1.0, 1);
 
 	// On the main PCB
-	PC16552D(config, "duart_com", 0);
+	PC16552D(config, "duart_com");
 	NS16550(config, "duart_com:chan0", XTAL(19'660'800));
 	NS16550(config, "duart_com:chan1", XTAL(19'660'800));
 
 	// On the extend board
-	PC16552D(config, m_duart_midi, 0);
+	PC16552D(config, m_duart_midi);
 	auto &midi_chan1(NS16550(config, "duart_midi:chan1", XTAL(24'000'000)));
 	MIDI_KBD(config, m_kbd[0], 31250).tx_callback().set(midi_chan1, FUNC(ins8250_uart_device::rx_w));
 	midi_chan1.out_int_callback().set(FUNC(firebeat_kbm_state::midi_keyboard_left_irq_callback));
@@ -1851,6 +1871,7 @@ void firebeat_kbm_state::firebeat_kbm_map(address_map &map)
 	firebeat_map(map);
 	map(0x70000000, 0x70000fff).rw(FUNC(firebeat_kbm_state::midi_uart_r), FUNC(firebeat_kbm_state::midi_uart_w)).umask32(0xff000000);
 	map(0x70008000, 0x7000800f).r(FUNC(firebeat_kbm_state::keyboard_wheel_r));
+	map(0x7d000804, 0x7d000807).w(FUNC(firebeat_kbm_state::lamp_output_kbm_w));
 	map(0x7e800100, 0x7e8001ff).rw(m_gcu_sub, FUNC(k057714_device::read), FUNC(k057714_device::write));
 }
 

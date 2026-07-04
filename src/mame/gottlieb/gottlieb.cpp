@@ -210,6 +210,7 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 #include "video/resnet.h"
 
 #include "emupal.h"
+#include "input.h" // for LaserDisc debug keys
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
@@ -272,7 +273,6 @@ protected:
 	static inline constexpr unsigned GOTTLIEB_VIDEO_VBLANK = 240;
 
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 	void analog_reset_w(u8 data);
@@ -406,9 +406,6 @@ private:
 
 void gottlieb_state::machine_start()
 {
-	m_leds.resolve();
-	m_knockers.resolve();
-
 	// register for save states
 	save_item(NAME(m_joystick_select));
 	save_item(NAME(m_track));
@@ -445,13 +442,6 @@ void gottlieb_ld_state::machine_start()
 	save_item(NAME(m_laserdisc_zero_seen));
 	save_item(NAME(m_laserdisc_audio_bits));
 	save_item(NAME(m_laserdisc_audio_bit_count));
-}
-
-
-void gottlieb_state::machine_reset()
-{
-	// HACK: prevent NMI immediately after soft reset
-	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 
@@ -2228,7 +2218,7 @@ void gottlieb_ld_state::g2laser(machine_config &config)
 
 	GOTTLIEB_SOUND_REV2(config, m_r2_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	PIONEER_PR8210(config, m_laserdisc, 0);
+	PIONEER_PR8210(config, m_laserdisc);
 	m_laserdisc->set_audio(FUNC(gottlieb_ld_state::laserdisc_audio_process));
 	m_laserdisc->set_overlay(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, FUNC(gottlieb_ld_state::screen_update));
 	m_laserdisc->set_overlay_clip(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8);
@@ -2286,7 +2276,7 @@ void gottlieb_ld_state::cobram3(machine_config &config)
 	GOTTLIEB_SOUND_REV2(config, m_r2_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
 	m_r2_sound->enable_cobram3_mods();
 
-	PIONEER_PR8210(config, m_laserdisc, 0);
+	PIONEER_PR8210(config, m_laserdisc);
 	m_laserdisc->set_audio(FUNC(gottlieb_ld_state::laserdisc_audio_process));
 	m_laserdisc->set_overlay(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, FUNC(gottlieb_ld_state::screen_update));
 	m_laserdisc->set_overlay_clip(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8);

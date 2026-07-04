@@ -31,8 +31,6 @@ when actually playing the games because otherwise you'll be sending inputs to th
 #include "emu.h"
 #include "jaleco_vj_pc.h"
 
-#include "jaleco_vj_ups.h"
-
 #include "bus/isa/isa_cards.h"
 #include "bus/pci/virge_pci.h"
 #include "bus/rs232/rs232.h"
@@ -40,8 +38,9 @@ when actually playing the games because otherwise you'll be sending inputs to th
 #include "machine/i82371sb.h"
 #include "machine/i82439hx.h"
 #include "machine/i82439tx.h"
-#include "machine/pci-ide.h"
 #include "machine/pci.h"
+
+#include "jaleco_vj_ups.h"
 
 
 jaleco_vj_pc_device::jaleco_vj_pc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -111,30 +110,31 @@ void jaleco_vj_pc_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
 	m_maincpu->smiact().set("pci:00.0", FUNC(i82439hx_host_device::smi_act_w));
 
-	PCI_ROOT(config, "pci", 0);
-	I82439HX(config, "pci:00.0", 0, m_maincpu, 256*1024*1024); // TODO: Should be 0x05851106 VIA VT82C585 Apollo VP,VPX,VPX-97 System Controller
+	PCI_ROOT(config, "pci");
+	I82439HX(config, "pci:00.0", m_maincpu, 256*1024*1024); // TODO: Should be 0x11060585 VIA VT82C585VPX Apollo System Controller
 
-	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", 0, m_maincpu));
-	// isa.set_ids(0x05861106, 0x23, 0x060100, 0x00000000); // TODO: Should be VIA VT82C586B, PCI-to-ISA Bridge
+	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", m_maincpu));
+	// isa.set_ids(0x11060586, 0x23, 0x060100, 0x00000000); // TODO: Should be VIA VT82C586B, PCI-to-ISA Bridge
 	isa.boot_state_hook().set(FUNC(jaleco_vj_pc_device::boot_state_w));
 	isa.smi().set_inputline(m_maincpu, INPUT_LINE_SMI);
 
-	i82371sb_ide_device &ide(I82371SB_IDE(config, "pci:07.1", 0, m_maincpu));
-	// ide.set_ids(0x05711106, 0x06, 0x01018a, 0x00000000); // TODO: Should be VIA VT82C586B, IDE Controller
+	i82371sb_ide_device &ide(I82371SB_IDE(config, "pci:07.1", m_maincpu));
+	// ide.set_ids(0x11060571, 0x06, 0x01018a, 0x00000000); // TODO: Should be VIA VT82C586B, IDE Controller
 	ide.irq_pri().set("pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
 	ide.irq_sec().set("pci:07.0", FUNC(i82371sb_isa_device::pc_mirq0_w));
 
-	// TODO: pci:07.3 0x30401106 VIA VT83C572, VT86C586/A/B Power Management Controller
+	// TODO: pci:07.3 0x11063040 VIA VT83C572, VT86C586/A/B Power Management Controller
 
-	JALECO_VJ_KING_QTARO(config, m_king_qtaro, 0);
+	JALECO_VJ_KING_QTARO(config, m_king_qtaro);
 
 	// TODO: Should actually be pci:0a.0 but it only shows a black screen
 	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, "virgedx").set_fixed(true);
 
+	// FIXME: determine ISA bus clock
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", [this] (device_t *device) { superio_config(*device); });
-	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", isa_cards, "vj_sound", true).set_option_machine_config("vj_sound", [this] (device_t *device) { sound_config(*device); });
-	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", isa_cards, nullptr, true);
-	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", isa_cards, nullptr, true);
+	ISA16_SLOT(config, "isa1",   0, "pci:07.0:isabus", isa_cards, "vj_sound", true).set_option_machine_config("vj_sound", [this] (device_t *device) { sound_config(*device); });
+	ISA16_SLOT(config, "isa2",   0, "pci:07.0:isabus", isa_cards, nullptr, true);
+	ISA16_SLOT(config, "isa3",   0, "pci:07.0:isabus", isa_cards, nullptr, true);
 
 	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, "vj_ups"));
 	serport0.rxd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::rxd1_w));

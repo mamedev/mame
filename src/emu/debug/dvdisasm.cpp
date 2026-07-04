@@ -14,6 +14,8 @@
 #include "debugbuf.h"
 #include "debugcpu.h"
 
+#include <locale>
+
 
 //**************************************************************************
 //  DEBUG VIEW DISASM SOURCE
@@ -98,7 +100,7 @@ void debug_view_disasm::enumerate_sources()
 		{
 			m_source_list.emplace_back(
 					std::make_unique<debug_view_disasm_source>(
-						util::string_format("%s '%s'", dasm.device().name(), dasm.device().tag()),
+						util::string_format(std::locale::classic(), "%s '%s'", dasm.device().name(), dasm.device().tag()),
 						dasm.device()));
 		}
 	}

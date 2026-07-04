@@ -101,7 +101,7 @@ void psion3_state::io_map(address_map &map)
 	map(0x0000, 0x001f).rw(m_asic1, FUNC(psion_asic1_device::io_r), FUNC(psion_asic1_device::io_w));
 	map(0x0080, 0x008f).rw(m_asic2, FUNC(psion_asic2_device::io_r), FUNC(psion_asic2_device::io_w)).umask16(0x00ff);
 	//map(0x0100, 0x01ff).lr8(NAME([]() { return 0xff; })); // w: enable Vcc lines?
-	map(0x0200, 0x02ff).w(m_dtmf, FUNC(pcd3311_device::write));
+	map(0x0200, 0x02ff).w(m_dtmf, FUNC(pcd3311_device::write_direct));
 }
 
 void psion3_state::asic1_map(address_map &map)
@@ -322,7 +322,7 @@ void psion3_state::psion3(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00); // Piezo buzzer
 
-	PCD3311(config, m_dtmf, 3'580'000).add_route(ALL_OUTPUTS, "mono", 0.25); // PCD3311CT
+	PCD3311(config, m_dtmf, 3.58_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.25); // PCD3311CT
 
 	PSION_SSD(config, m_ssd[0]);
 	m_ssd[0]->door_cb().set(m_asic2, FUNC(psion_asic2_device::dnmi_w));
@@ -374,6 +374,6 @@ ROM_END
 
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT      CLASS          INIT         COMPANY             FULLNAME           FLAGS
-COMP( 1991, psion3,    0,       0,      psion3,   psion3,    psion3_state,  empty_init,  "Psion",            "Series 3",        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1992, pocketbk,  psion3,  0,      psion3s,  pocketbk,  psion3_state,  empty_init,  "Acorn Computers",  "Pocket Book",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1994, psion3s,   psion3,  0,      psion3s,  psion3s,   psion3_state,  empty_init,  "Psion",            "Series 3s",       MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1991, psion3,    0,       0,      psion3,   psion3,    psion3_state,  empty_init,  "Psion",            "Series 3",        MACHINE_SUPPORTS_SAVE )
+COMP( 1992, pocketbk,  psion3,  0,      psion3s,  pocketbk,  psion3_state,  empty_init,  "Acorn Computers",  "Pocket Book",     MACHINE_SUPPORTS_SAVE )
+COMP( 1994, psion3s,   psion3,  0,      psion3s,  psion3s,   psion3_state,  empty_init,  "Psion",            "Series 3s",       MACHINE_SUPPORTS_SAVE )

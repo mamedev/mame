@@ -267,7 +267,7 @@ void gaplus_base_state::cpu1_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().w(FUNC(gaplus_base_state::videoram_w)).share("videoram");        /* tilemap RAM (shared with CPU #2) */
 	map(0x0800, 0x1fff).ram().share("spriteram"); /* shared RAM with CPU #2 (includes sprite RAM) */
-	map(0x6000, 0x63ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));                                      /* shared RAM with CPU #3 */
+	map(0x6000, 0x63ff).m(m_namco_15xx, FUNC(namco_15xx_device::amap));                                      /* shared RAM with CPU #3 */
 	map(0x6800, 0x680f).rw("namcoio_1", FUNC(namcoio_device::read), FUNC(namcoio_device::write));                                                   /* custom I/O chips interface */
 	map(0x6810, 0x681f).rw("namcoio_2", FUNC(namcoio_device::read), FUNC(namcoio_device::write));                                                   /* custom I/O chips interface */
 	map(0x6820, 0x682f).rw(FUNC(gaplus_base_state::customio_3_r), FUNC(gaplus_base_state::customio_3_w)).share("customio_3");  /* custom I/O chip #3 interface */
@@ -290,7 +290,7 @@ void gaplus_base_state::cpu2_map(address_map &map)
 
 void gaplus_base_state::cpu3_map(address_map &map)
 {
-	map(0x0000, 0x03ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));  /* shared RAM with the main CPU + sound registers */
+	map(0x0000, 0x03ff).m(m_namco_15xx, FUNC(namco_15xx_device::amap));  /* shared RAM with the main CPU + sound registers */
 	map(0x2000, 0x3fff).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));  /* watchdog? */
 	map(0x4000, 0x7fff).w(FUNC(gaplus_base_state::irq_3_ctrl_w));                                          /* interrupt enable/disable */
 	map(0xe000, 0xffff).rom();                                                                 /* ROM */
@@ -492,13 +492,6 @@ void gaplus_base_state::machine_start()
 	save_item(NAME(m_sub2_irq_mask));
 }
 
-void gaplus_state::machine_start()
-{
-	gaplus_base_state::machine_start();
-
-	m_lamps.resolve();
-}
-
 void gaplus_base_state::gaplus_base(machine_config &config)
 {
 	/* basic machine hardware */
@@ -541,7 +534,6 @@ void gaplus_base_state::gaplus_base(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	NAMCO_15XX(config, m_namco_15xx, XTAL(24'576'000) / 1024);
-	m_namco_15xx->set_voices(8);
 	m_namco_15xx->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	SAMPLES(config, m_samples);
@@ -554,7 +546,7 @@ void gaplus_state::gaplus(machine_config &config)
 {
 	gaplus_base(config);
 
-	NAMCO_56XX(config, m_namco56xx, 0);
+	NAMCO_56XX(config, m_namco56xx);
 	m_namco56xx->in_callback<0>().set_ioport("COINS");
 	m_namco56xx->in_callback<1>().set_ioport("P1");
 	m_namco56xx->in_callback<2>().set_ioport("P2");
@@ -562,7 +554,7 @@ void gaplus_state::gaplus(machine_config &config)
 	m_namco56xx->out_callback<0>().set(FUNC(gaplus_state::out_lamps0));
 	m_namco56xx->out_callback<1>().set(FUNC(gaplus_state::out_lamps1));
 
-	NAMCO_58XX(config, m_namco58xx, 0);
+	NAMCO_58XX(config, m_namco58xx);
 	m_namco58xx->in_callback<0>().set_ioport("DSWA_HIGH");
 	m_namco58xx->in_callback<1>().set_ioport("DSWB_LOW");
 	m_namco58xx->in_callback<2>().set_ioport("DSWB_HIGH");
@@ -573,13 +565,13 @@ void gaplusd_state::gaplusd(machine_config &config)
 {
 	gaplus_base(config);
 
-	NAMCO_58XX(config, m_namco58xx, 0);
+	NAMCO_58XX(config, m_namco58xx);
 	m_namco58xx->in_callback<0>().set_ioport("COINS");
 	m_namco58xx->in_callback<1>().set_ioport("P1");
 	m_namco58xx->in_callback<2>().set_ioport("P2");
 	m_namco58xx->in_callback<3>().set_ioport("BUTTONS");
 
-	NAMCO_56XX(config, m_namco56xx, 0);
+	NAMCO_56XX(config, m_namco56xx);
 	m_namco56xx->in_callback<0>().set_ioport("DSWA_HIGH");
 	m_namco56xx->in_callback<1>().set_ioport("DSWB_LOW");
 	m_namco56xx->in_callback<2>().set_ioport("DSWB_HIGH");
@@ -594,13 +586,13 @@ void gapluso_state::gapluso(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(gaplus_base_state::screen_vblank));
 	m_screen->screen_vblank().append(FUNC(gapluso_state::vblank_irq));
 
-	NAMCO_56XX(config, m_namco56xx, 0);
+	NAMCO_56XX(config, m_namco56xx);
 	m_namco56xx->in_callback<0>().set_ioport("COINS");
 	m_namco56xx->in_callback<1>().set_ioport("P1");
 	m_namco56xx->in_callback<2>().set_ioport("P2");
 	m_namco56xx->in_callback<3>().set_ioport("BUTTONS");
 
-	NAMCO_58XX(config, m_namco58xx, 0);
+	NAMCO_58XX(config, m_namco58xx);
 	m_namco58xx->in_callback<0>().set_ioport("DSWA_HIGH");
 	m_namco58xx->in_callback<1>().set_ioport("DSWB_LOW");
 	m_namco58xx->in_callback<2>().set_ioport("DSWB_HIGH");

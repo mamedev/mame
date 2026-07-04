@@ -47,8 +47,8 @@ static char const *const nscsi_phase[] = { "DATA OUT", "DATA IN", "COMMAND", "ST
 static char const *const aic6250_phase[] = { "DATA OUT", "*", "DATA IN", "*", "COMMAND", "MESSAGE OUT", "STATUS", "MESSAGE IN" };
 
 aic6250_device::aic6250_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: nscsi_device(mconfig, type, tag, owner, clock)
-	, nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
+	: device_t(mconfig, type, tag, owner, clock)
+	, nscsi_device_interface(mconfig, *this)
 	, m_int_cb(*this)
 	, m_breq_cb(*this)
 	, m_port_a_r_cb(*this, 0xff)
@@ -179,7 +179,7 @@ void aic6250_device::device_start()
 	m_int_asserted = false;
 
 	// FIXME: for now, let's just look at everything
-	scsi_bus->ctrl_wait(scsi_refid, S_ALL, S_ALL);
+	m_scsi_bus->ctrl_wait(m_scsi_refid, S_ALL, S_ALL);
 }
 
 /*
@@ -457,7 +457,7 @@ void aic6250_device::control_reg_1_w(u8 data)
 
 u8 aic6250_device::scsi_signal_reg_r()
 {
-	u32 const ctrl = scsi_bus->ctrl_r();
+	u32 const ctrl = m_scsi_bus->ctrl_r();
 
 	u8 const data =
 		((ctrl & S_ACK) ? R09R_SCSI_ACK_IN : 0) |
@@ -479,7 +479,7 @@ void aic6250_device::scsi_signal_reg_w(u8 data)
 	LOGMASKED(LOG_REG, "scsi_signal_reg_w 0x%02x\n", data);
 
 	if (m_control_reg_0 & R07W_TARGET_MODE)
-		scsi_bus->ctrl_w(scsi_refid,
+		m_scsi_bus->ctrl_w(m_scsi_refid,
 			((data & R09W_SCSI_REQ_OUT) ? S_REQ : 0) |
 			((data & R09W_SCSI_BSY_OUT) ? S_BSY : 0) |
 			((data & R09W_SCSI_SEL_OUT) ? S_SEL : 0) |
@@ -487,7 +487,7 @@ void aic6250_device::scsi_signal_reg_w(u8 data)
 			((data & R09W_SCSI_IO_OUT) ? S_INP : 0) |
 			((data & R09W_SCSI_CD_OUT) ? S_CTL : 0), S_REQ | S_BSY | S_SEL | S_MSG | S_INP | S_CTL);
 	else
-		scsi_bus->ctrl_w(scsi_refid,
+		m_scsi_bus->ctrl_w(m_scsi_refid,
 			((data & R09W_SCSI_ACK_OUT) ? S_ACK : 0) |
 			((data & R09W_SCSI_BSY_OUT) ? S_BSY : 0) |
 			((data & R09W_SCSI_SEL_OUT) ? S_SEL : 0) |
@@ -496,7 +496,7 @@ void aic6250_device::scsi_signal_reg_w(u8 data)
 	if ((data ^ m_scsi_signal_reg) & R09R_PHASE_MASK)
 		LOGMASKED(LOG_SCSI, "expecting phase %s\n", aic6250_phase[data >> 5]);
 
-	if (!(m_control_reg_0 & R07W_TARGET_MODE) && phase_match(data, scsi_bus->ctrl_r()))
+	if (!(m_control_reg_0 & R07W_TARGET_MODE) && phase_match(data, m_scsi_bus->ctrl_r()))
 		m_status_reg_0 &= ~R07R_PHASE_MISMATCH_ERR;
 
 	if (!(m_control_reg_0 & R07W_TARGET_MODE) && (data & R09W_SCSI_ACK_OUT))
@@ -511,7 +511,7 @@ void aic6250_device::scsi_signal_reg_w(u8 data)
 u8 aic6250_device::scsi_id_data_r()
 {
 	// TODO: selection/reselection phase
-	u8 const data = scsi_bus->data_r();
+	u8 const data = m_scsi_bus->data_r();
 
 	LOGMASKED(LOG_REG, "scsi_id_data_r 0x%02x\n", data);
 
@@ -522,7 +522,7 @@ void aic6250_device::scsi_id_data_w(u8 data)
 {
 	LOGMASKED(LOG_REG, "scsi_id_data_w 0x%02x\n", data);
 
-	scsi_bus->data_w(scsi_refid, data);
+	m_scsi_bus->data_w(m_scsi_refid, data);
 
 	m_scsi_id_data = data;
 }
@@ -585,7 +585,7 @@ void aic6250_device::port_b_w(u8 data)
 
 void aic6250_device::scsi_ctrl_changed()
 {
-	u32 const control = scsi_bus->ctrl_r();
+	u32 const control = m_scsi_bus->ctrl_r();
 
 	if ((control & S_BSY) && !(control & S_SEL))
 		LOGMASKED(LOG_SCSI, "scsi_ctrl_changed 0x%08x phase %s%s%s\n", control, nscsi_phase[control & S_PHASE_MASK],
@@ -645,8 +645,8 @@ void aic6250_device::scsi_ctrl_changed()
 
 		m_status_reg_0 |= R07R_SCSI_RST_OCCURRED;
 
-		scsi_bus->data_w(scsi_refid, 0);
-		scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
+		m_scsi_bus->data_w(m_scsi_refid, 0);
+		m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ALL);
 	}
 
 	// record new state
@@ -695,7 +695,7 @@ int aic6250_device::state_step()
 
 	case ARB_BUS_FREE:
 		LOGMASKED(LOG_STATE, "arbitration: waiting for bus free\n");
-		if (!(scsi_bus->ctrl_r() & (S_SEL | S_BSY | S_RST)))
+		if (!(m_scsi_bus->ctrl_r() & (S_SEL | S_BSY | S_RST)))
 		{
 			m_state = ARB_START;
 			delay = 16; // 800ns
@@ -707,19 +707,19 @@ int aic6250_device::state_step()
 		m_state = ARB_EVALUATE;
 
 		// drive our SCSI ID and assert BSY
-		scsi_bus->data_w(scsi_refid, scsi_id);
-		scsi_bus->ctrl_w(scsi_refid, S_BSY, S_BSY);
+		m_scsi_bus->data_w(m_scsi_refid, scsi_id);
+		m_scsi_bus->ctrl_w(m_scsi_refid, S_BSY, S_BSY);
 
 		delay = 56; // 2800ns
 		break;
 
 	case ARB_EVALUATE:
 		// check if SEL asserted, or if there's a higher ID on the bus
-		if ((scsi_bus->ctrl_r() & S_SEL) || (scsi_bus->data_r() & ~((scsi_id - 1) | scsi_id)))
+		if ((m_scsi_bus->ctrl_r() & S_SEL) || (m_scsi_bus->data_r() & ~((scsi_id - 1) | scsi_id)))
 		{
 			LOGMASKED(LOG_STATE, "arbitration: lost\n");
 			m_state = ARB_BUS_FREE;
-			scsi_bus->ctrl_w(scsi_refid, 0, S_BSY);
+			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_BSY);
 			break;
 		}
 
@@ -737,8 +737,8 @@ int aic6250_device::state_step()
 		delay = 2; // 100ns
 
 		// drive both SCSI IDs and assert SEL
-		scsi_bus->data_w(scsi_refid, m_scsi_id_data);
-		scsi_bus->ctrl_w(scsi_refid, S_SEL, S_SEL);
+		m_scsi_bus->data_w(m_scsi_refid, m_scsi_id_data);
+		m_scsi_bus->ctrl_w(m_scsi_refid, S_SEL, S_SEL);
 		break;
 
 	case SEL_DELAY:
@@ -749,13 +749,13 @@ int aic6250_device::state_step()
 
 		// clear BSY, optionally assert ATN
 		if (m_int_msk_reg_0 & R03W_EN_AUTO_ATN)
-			scsi_bus->ctrl_w(scsi_refid, S_ATN, S_BSY | S_ATN);
+			m_scsi_bus->ctrl_w(m_scsi_refid, S_ATN, S_BSY | S_ATN);
 		else
-			scsi_bus->ctrl_w(scsi_refid, 0, S_BSY);
+			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_BSY);
 		break;
 
 	case SEL_WAIT_BSY:
-		if (scsi_bus->ctrl_r() & S_BSY)
+		if (m_scsi_bus->ctrl_r() & S_BSY)
 		{
 			LOGMASKED(LOG_STATE, "selection: BSY asserted by target\n");
 
@@ -778,15 +778,15 @@ int aic6250_device::state_step()
 
 		// clear data and SEL
 		// FIXME: should not clear ATN
-		scsi_bus->data_w(scsi_refid, 0);
-		scsi_bus->ctrl_w(scsi_refid, 0, S_SEL | S_ATN);
+		m_scsi_bus->data_w(m_scsi_refid, 0);
+		m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_SEL | S_ATN);
 		break;
 
 	case DMA_IN:
 		// FIXME: assert ack when: req asserted && phase match && count not zero && fifo not full
 		if (!m_fifo.full())
 		{
-			u8 const data = scsi_bus->data_r();
+			u8 const data = m_scsi_bus->data_r();
 			LOGMASKED(LOG_STATE, "dma in 0x%02x\n", data);
 
 			m_status_reg_0 &= ~R07R_SCSI_REQ_ON;
@@ -795,7 +795,7 @@ int aic6250_device::state_step()
 
 			m_state = DMA_IN_NEXT;
 
-			scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
+			m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK, S_ACK);
 		}
 		else
 		{
@@ -805,17 +805,17 @@ int aic6250_device::state_step()
 		break;
 
 	case DMA_IN_NEXT:
-		if (!(scsi_bus->ctrl_r() & S_REQ))
+		if (!(m_scsi_bus->ctrl_r() & S_REQ))
 		{
 			LOGMASKED(LOG_STATE, "dma in next count %d\n", m_dma_count);
 			m_state = m_dma_count ? DMA_IN_REQ : DMA_IN_DRAIN;
 
-			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 		}
 		break;
 
 	case DMA_IN_REQ:
-		if (scsi_bus->ctrl_r() & S_REQ)
+		if (m_scsi_bus->ctrl_r() & S_REQ)
 			m_state = DMA_IN;
 		break;
 
@@ -849,8 +849,8 @@ int aic6250_device::state_step()
 			m_state = DMA_OUT_NEXT;
 
 			// drive data, assert ACK
-			scsi_bus->data_w(scsi_refid, data);
-			scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
+			m_scsi_bus->data_w(m_scsi_refid, data);
+			m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK, S_ACK);
 		}
 		else
 		{
@@ -860,18 +860,18 @@ int aic6250_device::state_step()
 		break;
 
 	case DMA_OUT_NEXT:
-		if (!(scsi_bus->ctrl_r() & S_REQ))
+		if (!(m_scsi_bus->ctrl_r() & S_REQ))
 		{
 			LOGMASKED(LOG_STATE, "dma out next count %d\n", m_dma_count);
 			m_state = m_dma_count ? DMA_OUT_REQ : DMA_OUT_DONE;
 
-			scsi_bus->data_w(scsi_refid, 0);
-			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+			m_scsi_bus->data_w(m_scsi_refid, 0);
+			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 		}
 		break;
 
 	case DMA_OUT_REQ:
-		if (scsi_bus->ctrl_r() & S_REQ)
+		if (m_scsi_bus->ctrl_r() & S_REQ)
 			m_state = DMA_OUT;
 		break;
 
@@ -886,7 +886,7 @@ int aic6250_device::state_step()
 	case AUTO_PIO:
 		// TODO: test expected phase
 		// out: wait for req, check phase match, ack
-		if (scsi_bus->ctrl_r() & S_REQ)
+		if (m_scsi_bus->ctrl_r() & S_REQ)
 		{
 			LOGMASKED(LOG_STATE, "auto pio\n");
 
@@ -898,10 +898,10 @@ int aic6250_device::state_step()
 		m_state = AUTO_PIO_DONE;
 
 		m_status_reg_0 &= ~R07R_SCSI_REQ_ON;
-		m_scsi_latch_data = scsi_bus->data_r();
+		m_scsi_latch_data = m_scsi_bus->data_r();
 
 		LOGMASKED(LOG_STATE, "auto pio in 0x%02x\n", m_scsi_latch_data);
-		scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
+		m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK, S_ACK);
 		break;
 
 	case AUTO_PIO_OUT:
@@ -910,12 +910,12 @@ int aic6250_device::state_step()
 
 		m_state = AUTO_PIO_DONE;
 
-		scsi_bus->data_w(scsi_refid, m_scsi_id_data);
-		scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
+		m_scsi_bus->data_w(m_scsi_refid, m_scsi_id_data);
+		m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK, S_ACK);
 		break;
 
 	case AUTO_PIO_DONE:
-		if (!(scsi_bus->ctrl_r() & S_REQ))
+		if (!(m_scsi_bus->ctrl_r() & S_REQ))
 		{
 			LOGMASKED(LOG_STATE, "auto pio done\n");
 
@@ -923,8 +923,8 @@ int aic6250_device::state_step()
 			m_control_reg_1 &= ~R08W_AUTO_SCSI_PIO_REQ;
 			m_state = IDLE;
 
-			scsi_bus->data_w(scsi_refid, 0);
-			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+			m_scsi_bus->data_w(m_scsi_refid, 0);
+			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 		}
 		break;
 	}
