@@ -89,9 +89,11 @@ PCB silkscreened: "MADE IN TAIWAN YONSHI PCB NO-006F"
 
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -126,6 +128,7 @@ public:
 
 	void init_frtgenie() ATTR_COLD;
 	void init_jungleyo() ATTR_COLD;
+	void init_jungleyoa() ATTR_COLD;
 	void init_kingfrt() ATTR_COLD;
 	template <uint16_t Reset_addr> void init_magjack() ATTR_COLD;
 
@@ -441,6 +444,121 @@ static INPUT_PORTS_START( jungleyo )
 	PORT_DIPSETTING(      0x0000, "Fast" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "DSW4:7" ) // no effect in system settings
 	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "DSW4:8" ) // no effect in system settings
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( jungleyoa )
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SLOT_STOP4 ) PORT_NAME("Play / Stop 4")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("Ticket Sw.")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in input test
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Take / Stop3 / Hold")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Double Up / Stop1")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) // bookkeeping
+	PORT_SERVICE( 0x100, IP_ACTIVE_LOW ) // if active high at boot the game shows the input test, if switched to input high after boot it shows system settings
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL ) PORT_NAME("Big / StopAll")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Small / Stop2")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in input test
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in input test
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) // 'key down' in input test. Are they the same thing?
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+
+	PORT_START("DSW12")
+	PORT_DIPNAME( 0x0007, 0x0007, "Main Game Rate" ) PORT_DIPLOCATION("DSW1:1,2,3")
+	PORT_DIPSETTING(      0x0000, "55%" )
+	PORT_DIPSETTING(      0x0004, "60%" )
+	PORT_DIPSETTING(      0x0002, "65%" )
+	PORT_DIPSETTING(      0x0006, "70%" )
+	PORT_DIPSETTING(      0x0001, "75%" )
+	PORT_DIPSETTING(      0x0005, "80%" )
+	PORT_DIPSETTING(      0x0003, "85%" )
+	PORT_DIPSETTING(      0x0007, "90%" )
+	PORT_DIPNAME( 0x0018, 0x0018, "Minimum Bet" ) PORT_DIPLOCATION("DSW1:4,5")
+	PORT_DIPSETTING(      0x0018, "1" )
+	PORT_DIPSETTING(      0x0008, "10" )
+	PORT_DIPSETTING(      0x0010, "20" )
+	PORT_DIPSETTING(      0x0000, "30" )
+	PORT_DIPNAME( 0x0060, 0x0060, "Maximum Bet" ) PORT_DIPLOCATION("DSW1:6,7")
+	PORT_DIPSETTING(      0x0060, "15" )
+	PORT_DIPSETTING(      0x0020, "30" )
+	PORT_DIPSETTING(      0x0040, "60" )
+	PORT_DIPSETTING(      0x0000, "100" )
+	PORT_DIPNAME( 0x0080, 0x0080, "Win Points to Score" ) PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0700, 0x0700, "Coin In" ) PORT_DIPLOCATION("DSW2:1,2,3")
+	PORT_DIPSETTING(      0x0700, "1" )
+	PORT_DIPSETTING(      0x0300, "2" )
+	PORT_DIPSETTING(      0x0500, "5" )
+	PORT_DIPSETTING(      0x0100, "10" )
+	PORT_DIPSETTING(      0x0600, "20" )
+	PORT_DIPSETTING(      0x0200, "25" )
+	PORT_DIPSETTING(      0x0400, "50" )
+	PORT_DIPSETTING(      0x0000, "100" )
+	PORT_DIPNAME( 0x3800, 0x3800, "Keyin" ) PORT_DIPLOCATION("DSW2:4,5,6" )
+	PORT_DIPSETTING(      0x3800, "1" )
+	PORT_DIPSETTING(      0x1800, "5" )
+	PORT_DIPSETTING(      0x2800, "10" )
+	PORT_DIPSETTING(      0x0800, "30" )
+	PORT_DIPSETTING(      0x3000, "50" )
+	PORT_DIPSETTING(      0x1000, "100" )
+	PORT_DIPSETTING(      0x2000, "200" )
+	PORT_DIPSETTING(      0x0000, "500" )
+	PORT_DIPNAME( 0xc000, 0xc000, "Payout" ) PORT_DIPLOCATION("DSW2:7,8" )
+	PORT_DIPSETTING(      0x0000, "1" )
+	PORT_DIPSETTING(      0xc000, "10" )
+	PORT_DIPSETTING(      0x4000, "20" )
+	PORT_DIPSETTING(      0x8000, "50" )
+
+	PORT_START("DSW34")
+	PORT_DIPNAME( 0x0003, 0x0003, "Game Limit" ) PORT_DIPLOCATION("DSW3:1,2")
+	PORT_DIPSETTING(      0x0003, "10000" )
+	PORT_DIPSETTING(      0x0001, "50000" )
+	PORT_DIPSETTING(      0x0002, "100000" )
+	PORT_DIPSETTING(      0x0000, "200000" )
+	PORT_DIPNAME( 0x0004, 0x0004, "Credit Limit" ) PORT_DIPLOCATION("DSW3:3")
+	PORT_DIPSETTING(      0x0004, "5000" )
+	PORT_DIPSETTING(      0x0000, "10000" )
+	PORT_DIPNAME( 0x0008, 0x0008, "Display Rate Table" ) PORT_DIPLOCATION("DSW3:4")
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0010, 0x0010, "Reel Auto Stop" ) PORT_DIPLOCATION("DSW3:5")
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "Game Count Mode" ) PORT_DIPLOCATION("DSW3:6")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0000, "Count" )
+	PORT_DIPNAME( 0x0040, 0x0040, "Reel Speed" ) PORT_DIPLOCATION("DSW3:7")
+	PORT_DIPSETTING(      0x0040, "Slow" )
+	PORT_DIPSETTING(      0x0000, "Fast" )
+	PORT_DIPNAME( 0x0080, 0x0080, "Fever Minimum Bet" ) PORT_DIPLOCATION("DSW3:8")
+	PORT_DIPSETTING(      0x0080, "10" )
+	PORT_DIPSETTING(      0x0000, "20" )
+	PORT_DIPNAME( 0x0300, 0x0300, "Double Up Rate" ) PORT_DIPLOCATION("DSW4:1,2")
+	PORT_DIPSETTING(      0x0000, "92%" )
+	PORT_DIPSETTING(      0x0200, "94%" )
+	PORT_DIPSETTING(      0x0100, "96%" )
+	PORT_DIPSETTING(      0x0300, "98%" )
+	PORT_DIPNAME( 0x0400, 0x0400, "Payout Mode" ) PORT_DIPLOCATION("DSW4:3")
+	PORT_DIPSETTING(      0x0400, "Manual" )
+	PORT_DIPSETTING(      0x0000, "Auto" )
+	PORT_DIPNAME( 0x0800, 0x0800, "Double Up Game" ) PORT_DIPLOCATION("DSW4:4")
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x1000, 0x1000, "Strip Girl Available" ) PORT_DIPLOCATION("DSW4:5")
+	PORT_DIPSETTING(      0x1000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0xe000, 0xe000, "Take Score Speed" ) PORT_DIPLOCATION("DSW4:6,7,8")
+	PORT_DIPSETTING(      0xe000, "1" )
+	PORT_DIPSETTING(      0x6000, "2" )
+	PORT_DIPSETTING(      0xa000, "5" )
+	PORT_DIPSETTING(      0x2000, "10" )
+	PORT_DIPSETTING(      0xc000, "20" )
+	PORT_DIPSETTING(      0x4000, "40" )
+	PORT_DIPSETTING(      0x8000, "100" )
+	PORT_DIPSETTING(      0x0000, "500" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( frtgenie )
@@ -955,6 +1073,27 @@ ROM_START( jungleyo ) // MADE IN TAIWAN YONSHI PCB NO-006F
 	ROM_LOAD( "atf20v8b.u37", 0x000, 0x157, NO_DUMP )
 ROM_END
 
+ROM_START( jungleyoa ) // MADE IN TAIWAN YONSHI PCB NO-006E
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 ) // 68000 code, encrypted
+	ROM_LOAD16_BYTE( "jungle_rom3_va1.05.u15", 0x00000, 0x20000, CRC(f2d0f94b) SHA1(2fb542c0a08c7f0c91a9948f7180c61416b1f03e) )
+	ROM_LOAD16_BYTE( "jungle_rom2_va1.05.u14", 0x00001, 0x20000, CRC(6f335cfb) SHA1(75201479c6c672af77537fc74bef70f0239d6fcd) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "jungle_rom1.u99", 0x00000, 0x40000, CRC(05ef5b85) SHA1(ca7584646271c6adc7880eca5cf43a412340c522) )
+
+	ROM_REGION( 0x80000, "reelgfx", 0 )
+	ROM_LOAD( "jungle_rom4.u58", 0x000000, 0x80000, CRC(4d850c2c) SHA1(b4ee261a07ca89b0ccdc421e5d0c60fea0e41d8a) ) // SLDH
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "jungle_rom5.u59", 0x000000, 0x80000, CRC(5c4d54de) SHA1(dbe768d1627c9d94a2762f00c9416ebf47b75301) ) // SLDH
+
+	ROM_REGION( 0x80000, "gfx3", 0 )
+	ROM_LOAD( "jungle_rom6.u60", 0x000000, 0x80000, CRC(b42a2956) SHA1(a71ef6b8f7f3025c54e9341e9996284b0cc0737e) ) // SLDH
+
+	ROM_REGION( 0x157, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "atf20v8b.u37", 0x000, 0x157, NO_DUMP )
+ROM_END
+
 // first half is version 1-1-03, with copyright both for Yonshi and Global in strings, second half is version VA1.0 2001/08/15 with copyright both for Yonshi and Global in strings
 ROM_START( frtgenie ) // MADE IN TAIWAN YONSHI PCB NO-006E
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code, encrypted
@@ -1235,6 +1374,30 @@ void jungleyo_state::init_jungleyo()
 	src[0x006 / 2] = 0x01f8; // reset opcode
 }
 
+void jungleyo_state::init_jungleyoa()
+{
+	u16 *src = &memregion("maincpu")->as_u16();
+
+	for (int i = 0x00000; i < 0x10000 / 2; i++)
+		src[i] = bitswap<16>(src[i] ^ 0xffff, 8, 11, 15, 9, 10, 12, 14, 13, 4, 2, 7, 0, 1, 5, 6, 3);
+
+	for (int i = 0x10000 / 2; i < 0x20000 / 2; i++)
+		src[i] = bitswap<16>(src[i] ^ 0x00ff, 14, 9, 10, 13, 15, 11, 8, 12, 1, 3, 6, 2, 4, 7, 0, 5);
+
+	for (int i = 0x20000 / 2; i < 0x30000 / 2; i++)
+		src[i] = bitswap<16>(src[i] ^ 0xff00, 9, 15, 11, 8, 12, 14, 13, 10, 6, 0, 4, 3, 7, 5, 2, 1);
+
+	for (int i = 0x30000 / 2; i < 0x40000 / 2; i++)
+		src[i] = bitswap<16>(src[i] ^ 0x00ff, 13, 10, 12, 14, 9, 8, 15, 11, 2, 7, 1, 5, 0, 4, 3, 6);
+
+	// TODO: Stack Pointer/Initial PC settings don't seem to decrypt correctly
+	// hack these until better understood (still wrong values)
+	src[0x000 / 2] = 0x0000;
+	src[0x002 / 2] = 0x0000;
+	src[0x004 / 2] = 0x0000;
+	src[0x006 / 2] = 0x01f8; // reset opcode
+}
+
 void jungleyo_state::init_frtgenie()
 {
 	u16 *src = &memregion("maincpu")->as_u16();
@@ -1314,7 +1477,8 @@ void jungleyo_state::init_magjack()
 } // anonymous namespace
 
 
-GAME( 2001, jungleyo,  0,        jungleyo, jungleyo,  jungleyo_state, init_jungleyo,       ROT0, "Yonshi",       "Jungle (Italy VI3.02)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, jungleyo,  0,        jungleyo, jungleyo,  jungleyo_state, init_jungleyo,       ROT0, "Yonshi",       "Jungle (Italy VI3.02)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2001/02/09
+GAME( 2001, jungleyoa, jungleyo, jungleyo, jungleyoa, jungleyo_state, init_jungleyoa,      ROT0, "Yonshi",       "Jungle (USA, VA 1.05)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2001/03/14
 
 GAME( 2003, frtgenie,  0,        jungleyo, frtgenie,  jungleyo_state, init_frtgenie,       ROT0, "Global",       "Fruit Genie (Version 1-1-03, set 1)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2003, frtgeniea, frtgenie, jungleyo, frtgeniea, jungleyo_state, init_frtgenie,       ROT0, "Global",       "Fruit Genie (Version 1-1-03, set 2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
