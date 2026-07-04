@@ -96,7 +96,7 @@ public:
 		int col = 0;
 	};
 
-private:
+protected:
 	// Machine
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -376,6 +376,18 @@ private:
 	void wingwar360_outputs_w(uint8_t data);
 	void netmerc_outputs_w(uint8_t data);
 	void drive_board_w(uint8_t data);
+};
+
+class netmerc_state : public model1_state
+{
+public:
+	netmerc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: model1_state(mconfig, type, tag)
+	{
+	}
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 #endif // MAME_SEGA_MODEL1_H

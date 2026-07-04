@@ -915,17 +915,19 @@ void model1_state::machine_reset()
 	m_irq_status = 0;
 	m_last_irq = 0;
 	m_irq_mask = 0xff;
+}
 
-	if (!strcmp(machine().system().name, "netmerc"))
+void netmerc_state::machine_reset()
+{
+	model1_state::machine_reset();
+
+	if (m_dpram)
 	{
-		if (m_dpram)
+		int16_t pose[6] = {0, 0, 0, 12868, 25736, 12868};
+		for (int i = 0; i < 6; i++)
 		{
-			int16_t pose[6] = {0, 0, 0, 12868, 25736, 12868};
-			for (int i = 0; i < 6; i++)
-			{
-				m_dpram->left_w(0x80 + i*2, pose[i] & 0xff);
-				m_dpram->left_w(0x81 + i*2, (pose[i] >> 8) & 0xff);
-			}
+			m_dpram->left_w(0x80 + i*2, pose[i] & 0xff);
+			m_dpram->left_w(0x81 + i*2, (pose[i] >> 8) & 0xff);
 		}
 	}
 }
@@ -1951,4 +1953,4 @@ GAME( 1994, wingwar,    0,       wingwar,    wingwar,    model1_state, empty_ini
 GAME( 1994, wingwaru,   wingwar, wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (US)",            0 )
 GAME( 1994, wingwarj,   wingwar, wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (Japan)",         0 )
 GAME( 1994, wingwar360, wingwar, wingwar360, wingwar360, model1_state, empty_init, ROT0,     "Sega",  "Wing War R360 (US)",       0 )
-GAME( 1993, netmerc,    0,       netmerc,    netmerc,    model1_state, empty_init, ROT0,     "Sega",  "Sega NetMerc",             MACHINE_NOT_WORKING )
+GAME( 1993, netmerc,    0,       netmerc,    netmerc,    netmerc_state, empty_init, ROT0,     "Sega",  "Sega NetMerc",             MACHINE_NOT_WORKING )
