@@ -62,10 +62,6 @@ public:
 	auto out_mdseld_callback() { return m_out_mdseld_cb.bind(); }
 	auto out_mdrdw_callback() { return m_out_mdrdw_cb.bind(); }
 	auto out_erase_callback() { return m_out_erase_cb.bind(); }
-	auto out_raw1_callback() { return m_out_raw1_cb.bind(); }
-	auto in_raw1_callback() { return m_in_raw1_cb.bind(); }
-	auto out_raw2_callback() { return m_out_raw2_cb.bind(); }
-	auto in_raw2_callback() { return m_in_raw2_cb.bind(); }
 
 	uint8_t rtc_r(offs_t offset);
 	void rtc_w(uint8_t data);
@@ -92,13 +88,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override ATTR_COLD;
+	void device_start() override ATTR_COLD;
 
 	// device_serial_interface overrides
-	virtual void tra_callback() override;
-	virtual void tra_complete() override;
-	virtual void rcv_callback() override;
-	virtual void rcv_complete() override;
+	void tra_callback() override;
+	void tra_complete() override;
+	void rcv_callback() override;
+	void rcv_complete() override;
 
 	TIMER_CALLBACK_MEMBER(baudx4_tick);
 	TIMER_CALLBACK_MEMBER(rtc_tick);
@@ -182,10 +178,6 @@ private:
 	devcb_write_line    m_out_mdseld_cb;
 	devcb_write_line    m_out_mdrdw_cb;
 	devcb_write_line    m_out_erase_cb;
-	devcb_write_line    m_out_raw1_cb;
-	devcb_read_line     m_in_raw1_cb;
-	devcb_write_line    m_out_raw2_cb;
-	devcb_read_line     m_in_raw2_cb;
 
 	int m_rs232_rx;
 	int m_dtr1;

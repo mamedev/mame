@@ -16,14 +16,6 @@
 #include "magtape.h"
 
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MDV_1 "mdv1"
-#define MDV_2 "mdv2"
-
-
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -35,7 +27,7 @@ class microdrive_image_device : public microtape_image_device
 public:
 	// construction/destruction
 	microdrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-	virtual ~microdrive_image_device();
+	~microdrive_image_device() override = default;
 
 	auto comms_out_wr_callback() { return m_write_comms_out.bind(); }
 	auto data1_out_wr_callback() { return m_write_data1_out.bind(); }
@@ -44,27 +36,25 @@ public:
 	auto tx_pair_rd_callback() { return m_read_tx_pair.bind(); }
 
 	// device_image_interface implementation
-	virtual std::pair<std::error_condition, std::string> call_load() override;
-	virtual void call_unload() override;
-	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) override;
+	std::pair<std::error_condition, std::string> call_load() override;
+	void call_unload() override;
+	std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) override;
 
-	virtual bool is_creatable() const noexcept override { return true; }
-	virtual const char *image_interface() const noexcept override { return "ql_cass"; }
-	virtual const char *file_extensions() const noexcept override { return "mdv,mdr"; }
+	bool is_creatable() const noexcept override { return true; }
+	const char *image_interface() const noexcept override { return "ql_cass"; }
+	const char *file_extensions() const noexcept override { return "mdv,mdr"; }
 
 	// specific implementation
 	void clk_w(int state);
 	void comms_in_w(int state);
 	void erase_w(int state);
 	void read_write_w(int state);
-	void data1_w(int state);
-	void data2_w(int state);
 	int data1_r() const;
 	int data2_r() const;
 
 protected:
 	// device_t implementation
-	virtual void device_start() override ATTR_COLD;
+	void device_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(bit_timer);
 
@@ -91,9 +81,9 @@ private:
 	std::unique_ptr<uint8_t[]> m_erased;
 
 	int m_bit_offset;
-	int m_byte_offset;
+	int m_byte_pair_offset;
 	int m_gap_level;
-	int m_dirty;
+	bool m_dirty;
 
 	emu_timer *m_bit_timer;
 };

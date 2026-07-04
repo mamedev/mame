@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, Sylvain Glaize
 /**********************************************************************
 
     Sinclair ZX8302 emulation
@@ -18,8 +18,6 @@
 
 #include "emu.h"
 #include "zx8302.h"
-
-#include "imagedev/microdrv.h"
 
 #include <ctime>
 
@@ -146,10 +144,6 @@ zx8302_device::zx8302_device(const machine_config &mconfig, const char *tag, dev
 		m_out_mdseld_cb(*this),
 		m_out_mdrdw_cb(*this),
 		m_out_erase_cb(*this),
-		m_out_raw1_cb(*this),
-		m_in_raw1_cb(*this, 0),
-		m_out_raw2_cb(*this),
-		m_in_raw2_cb(*this, 0),
 		m_dtr1(0),
 		m_cts2(0),
 		m_idr(1),

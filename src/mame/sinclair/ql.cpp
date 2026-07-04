@@ -106,7 +106,6 @@ namespace {
 
 #define X1 XTAL(15'000'000)
 #define X2 XTAL(32'768)
-#define X3 XTAL_4_436MHz
 #define X4 XTAL(11'000'000)
 
 class ql_state : public driver_device
@@ -119,8 +118,8 @@ public:
 		m_zx8301(*this, ZX8301_TAG),
 		m_zx8302(*this, ZX8302_TAG),
 		m_speaker(*this, "speaker"),
-		m_mdv1(*this, MDV_1),
-		m_mdv2(*this, MDV_2),
+		m_mdv1(*this, "mdv1"),
+		m_mdv2(*this, "mdv2"),
 		m_ser1(*this, RS232_A_TAG),
 		m_ser2(*this, RS232_B_TAG),
 		m_ram(*this, RAM_TAG),
@@ -180,10 +179,6 @@ private:
 	void zx8302_mdselck_w(int state);
 	void zx8302_mdrdw_w(int state);
 	void zx8302_erase_w(int state);
-	void zx8302_raw1_w(int state);
-	int zx8302_raw1_r();
-	void zx8302_raw2_w(int state);
-	int zx8302_raw2_r();
 	void exp_extintl_w(int state);
 	void qimi_extintl_w(int state);
 
@@ -829,28 +824,6 @@ void ql_state::zx8302_erase_w(int state)
 	m_mdv2->erase_w(state);
 }
 
-void ql_state::zx8302_raw1_w(int state)
-{
-	m_mdv1->data1_w(state);
-	m_mdv2->data1_w(state);
-}
-
-int ql_state::zx8302_raw1_r()
-{
-	return m_mdv1->data1_r() | m_mdv2->data1_r();
-}
-
-void ql_state::zx8302_raw2_w(int state)
-{
-	m_mdv1->data2_w(state);
-	m_mdv2->data2_w(state);
-}
-
-int ql_state::zx8302_raw2_r()
-{
-	return m_mdv1->data2_r() | m_mdv2->data2_r();
-}
-
 void ql_state::update_interrupt()
 {
 	m_zx8302->extint_w(m_extintl || m_qimi_extint);
@@ -945,10 +918,6 @@ void ql_state::ql(machine_config &config)
 	m_zx8302->out_mdseld_callback().set(m_mdv1, FUNC(microdrive_image_device::comms_in_w));
 	m_zx8302->out_mdrdw_callback().set(FUNC(ql_state::zx8302_mdrdw_w));
 	m_zx8302->out_erase_callback().set(FUNC(ql_state::zx8302_erase_w));
-	m_zx8302->out_raw1_callback().set(FUNC(ql_state::zx8302_raw1_w));
-	m_zx8302->in_raw1_callback().set(FUNC(ql_state::zx8302_raw1_r));
-	m_zx8302->out_raw2_callback().set(FUNC(ql_state::zx8302_raw2_w));
-	m_zx8302->in_raw2_callback().set(FUNC(ql_state::zx8302_raw2_r));
 
 	MICRODRIVE(config, m_mdv1);
 	m_mdv1->comms_out_wr_callback().set(m_mdv2, FUNC(microdrive_image_device::comms_in_w)); // Select daisy chain mdv1 -> mdv2
