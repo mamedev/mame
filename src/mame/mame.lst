@@ -49679,6 +49679,11 @@ monymony
 monymony2
 monymony3
 
+@source:zilog/s8k.cpp
+s8000
+s8000v1
+s8000s2
+
 @source:zpa/iq151.cpp
 iq151
 
