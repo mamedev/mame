@@ -3,13 +3,9 @@
 
 /* Hide & Seek
 
-the AG-2 AX51201 should be the follow-up to the AG-1 AX51101 in gunpey.cpp
+"Augus Gaming System" (AGS series, Augus being the devs?)
 
-AS:
-Current ROM code barely contains some valid SH-2 opcodes but not enough for a HD64F7045F28. i.e. It doesn't contain VBR set-up, valid irq routines,
-a valid irq table and no internal SH-2 i/o set-up. sub-routine at 0xe0 also points to 0x4b0, which is full of illegal opcodes with current ROM.
-The HD64F7045F28 manual says that there's an on-chip ROM at 0-0x3ffff (page 168), meaning that this one definitely needs a trojan/decap (and also an SH-2 core
-that supports the very different i/o map ;-)
+the AG-2 AX51201 should be the follow-up to the AG-1 AX51101 in gunpey.cpp
 
 Guru:
 It's called Hide and Seek. I don't know the manufacturer.
@@ -196,4 +192,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 200?, hideseek, 0, hideseek, hideseek, hideseek_state, empty_init, ROT0, "<unknown>", "Hide & Seek", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, hideseek, 0, hideseek, hideseek, hideseek_state, empty_init, ROT0, "Appli", "Hide & Seek", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
