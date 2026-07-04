@@ -32,7 +32,7 @@
 
 #include "formats/dsk_dsk.h"
 #include "formats/msx_dsk.h"
-#include "formats/p6001_cas.h"
+//#include "formats/p6001_cas.h"
 
 
 class pc6001_state : public driver_device

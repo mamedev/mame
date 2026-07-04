@@ -522,9 +522,9 @@
 #include "p2000t_cas.h"
 #endif
 
-#ifdef HAS_FORMATS_P6001_CAS
-#include "p6001_cas.h"
-#endif
+//#ifdef HAS_FORMATS_P6001_CAS
+//#include "p6001_cas.h"
+//#endif
 
 #ifdef HAS_FORMATS_PASTI_DSK
 #include "pasti_dsk.h"
@@ -1470,6 +1470,11 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(FLOPPY_VGI_FORMAT); // vgi_dsk.h
 #endif
 
+//	en.category("NEC");
+//#ifdef HAS_FORMATS_P6001_CAS
+//	en.add(pc6001_cassette_formats); // p6001_cas.h
+//#endif
+
 	en.category("Orao");
 #ifdef HAS_FORMATS_ORAO_CAS
 	en.add(orao_cassette_formats); // orao_cas.h
@@ -1481,11 +1486,6 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #endif
 #ifdef HAS_FORMATS_P2000T_CAS
 	en.add(p2000t_cassette_formats); // p2000t_cas.h
-#endif
-
-	en.category("NEC");
-#ifdef HAS_FORMATS_P6001_CAS
-	en.add(pc6001_cassette_formats); // p6001_cas.h
 #endif
 
 	en.category("Sanyo");
