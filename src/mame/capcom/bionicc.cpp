@@ -48,6 +48,10 @@
     is using 384*260 instead like tigeroad, which nearly matches an older
     Bionic Commando measurement of H=15.625kHz, V=60.093Hz.
 
+    TODO:
+    - reading paletteram returns open bus
+    - sprite DMA and palette writes only work inside vblank
+
     BTANB [MT00209] (verified on real PCB):
     - misplaced sprites (see beginning of level 1 or 2 for example)
     - sprite / sprite priority (see level 2 the reflectors)
@@ -200,12 +204,12 @@ void bionicc_state::main_map(address_map &map)
 	map(0xe4002, 0xe4002).mirror(0x3ffc).w(FUNC(bionicc_state::audiocpu_nmi_w));
 	map(0xe4002, 0xe4003).mirror(0x3ffc).portr("DSW");
 	map(0xe8010, 0xe8017).w(FUNC(bionicc_state::scroll_w));
-	map(0xe8018, 0xe8019).w(m_spriteram, FUNC(buffered_spriteram16_device::write)); // should only work in vblank?
+	map(0xe8018, 0xe8019).w(m_spriteram, FUNC(buffered_spriteram16_device::write)); // should only work in vblank
 	map(0xe801a, 0xe801b).w(FUNC(bionicc_state::dmaon_w));
 	map(0xec000, 0xecfff).mirror(0x3000).ram().w(FUNC(bionicc_state::txvideoram_w)).share("txvideoram");
 	map(0xf0000, 0xf3fff).ram().w(FUNC(bionicc_state::fgvideoram_w)).share("fgvideoram");
 	map(0xf4000, 0xf7fff).ram().w(FUNC(bionicc_state::bgvideoram_w)).share("bgvideoram");
-	map(0xf8000, 0xf87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xf8000, 0xf87ff).writeonly().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xfc000, 0xfffff).ram(); // WRAM
 }
 
@@ -308,9 +312,10 @@ rgb_t bionicc_state::RRRRGGGGBBBBIIII(uint32_t raw)
 
 	if ((bright & 0x08) == 0)
 	{
-		r = r * (0x07 + bright) / 0x0e;
-		g = g * (0x07 + bright) / 0x0e;
-		b = b * (0x07 + bright) / 0x0e;
+		// scale brightness to 0x00-0x7f
+		r = r / 2 + bright * 18.15;
+		g = g / 2 + bright * 18.15;
+		b = b / 2 + bright * 18.15;
 	}
 
 	return rgb_t(r, g, b);
@@ -450,20 +455,23 @@ static const gfx_layout scroll1layout=
 };
 
 static GFXDECODE_START( gfx_bionicc )
-	GFXDECODE_ENTRY( "gfx1", 0, vramlayout,    768, 64 )    /* colors 768-1023 */
-	GFXDECODE_ENTRY( "gfx2", 0, scroll2layout,   0,  8 )    /* colors   0- 127 */
-	GFXDECODE_ENTRY( "gfx3", 0, scroll1layout, 256,  4 )    /* colors 256- 319 */
+	GFXDECODE_ENTRY( "gfx1", 0, vramlayout,    768, 16 )    /* colors 768-832 */
+	GFXDECODE_ENTRY( "gfx2", 0, scroll2layout,   0,  8 )    /* colors   0-127 */
+	GFXDECODE_ENTRY( "gfx3", 0, scroll1layout, 256,  4 )    /* colors 256-319 */
 GFXDECODE_END
 
 TILE_GET_INFO_MEMBER(bionicc_state::get_tx_tile_info)
 {
 	// 76------  tile code high bits
-	// --543210  color
+	// --5-----  tile flip y
+	// ---4----  tile flip x
+	// ----3210  color
 
 	int attr = m_txvideoram[tile_index + 0x400];
 	int code = m_txvideoram[tile_index] & 0xff;
+	int flag = TILE_FLIPYX((attr & 0x30) >> 4);
 
-	tileinfo.set(0, ((attr & 0xc0) << 2) | code, attr & 0x3f, 0);
+	tileinfo.set(0, ((attr & 0xc0) << 2) | code, attr & 0xf, flag);
 }
 
 TILE_GET_INFO_MEMBER(bionicc_state::get_fg_tile_info)
