@@ -29,6 +29,8 @@ If usage specifies MONITOR:
 -->
 <softwarelist name="pc6001mk2_cass" description="NEC PC-6001mkII cassette snapshots">
 
+<!-- !Games -->
+
 	<software name="3dgolfsv" supported="no">
 		<description>3D Golf Simulation: Super Version</description>
 		<year>1984?</year>
@@ -74,6 +76,23 @@ Not extensively tested (language barrier)
 		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="23440">
 				<rom name="attack hiroko chan.cas" size="23440" crc="076760d3" sha1="e8a7c8ecfac69e597ddd9cb68b0dd94cc93cffe0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blckonyx" supported="no">
+		<description>The Black Onyx</description>
+		<year>1984?</year>
+		<!-- TODO: may just be an ASCII published game, where BPS is credited just for "original game" -->
+		<publisher>ASCII / BPS</publisher>
+		<notes><![CDATA[
+Requires user [tape] saving, prompts user after character creation
+]]></notes>
+		<info name="usage" value="Mode 5, Page 2"/>
+		<info name="alt_title" value="ブラックオニキス" />
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="45426">
+				<rom name="the black onyx.cas" size="45426" crc="661407f3" sha1="68f52272bddc4f74ffd565397fc2b86b19e2aa98" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -171,36 +190,36 @@ Requires better [keyboard] handling
 ]]></notes>
 		<info name="usage" value="Mode 5, Page 4, MONITOR. Choose N at startup to start a new game"/>
 		<info name="alt_title" value="デゼニランド"/>
-        <part name="snap1" interface="pc6001_snap">
-            <feature name="part_id" value="Chapter 1"/>
-            <dataarea name="snap" size="39484">
-                <rom name="dezeni land (chapter 1).cas" size="39484" crc="d50d079c" sha1="a2f66fbb79c07602fc8564d3a28aea168052ddff" offset="0" />
-            </dataarea>
-        </part>
-        <part name="snap2" interface="pc6001_snap">
-            <feature name="part_id" value="Chapter 2"/>
-            <dataarea name="snap" size="25092">
-                <rom name="dezeni land (chapter 2).cas" size="25092" crc="c21bd420" sha1="dcd3f2730b03a2122058627149a5ab3f18dc6c53" offset="0" />
-            </dataarea>
-        </part>
-        <part name="snap3" interface="pc6001_snap">
-            <feature name="part_id" value="Chapter 3"/>
-            <dataarea name="snap" size="26102">
-                <rom name="dezeni land (chapter 3).cas" size="26102" crc="0a49d031" sha1="7f9aa1f8bc70ded09a977bccb982bfb3f6332602" offset="0" />
-            </dataarea>
-        </part>
-        <part name="snap4" interface="pc6001_snap">
-            <feature name="part_id" value="Chapter 4"/>
-            <dataarea name="snap" size="18572">
-                <rom name="dezeni land (chapter 4).cas" size="18572" crc="5964f330" sha1="a0f0f81f19fabc5929e2cdada72f15a874dc18a4" offset="0" />
-            </dataarea>
-        </part>
-        <part name="snap5" interface="pc6001_snap">
-            <feature name="part_id" value="Chapter 5"/>
-            <dataarea name="snap" size="27901">
-                <rom name="dezeni land (chapter 5).cas" size="27901" crc="925026a3" sha1="85d7b831ea98be5c10ac192b427cc130022fee1d" offset="0" />
-            </dataarea>
-        </part>
+		<part name="snap1" interface="pc6001_snap">
+			<feature name="part_id" value="Chapter 1"/>
+			<dataarea name="snap" size="39484">
+				<rom name="dezeni land (chapter 1).cas" size="39484" crc="d50d079c" sha1="a2f66fbb79c07602fc8564d3a28aea168052ddff" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap2" interface="pc6001_snap">
+			<feature name="part_id" value="Chapter 2"/>
+			<dataarea name="snap" size="25092">
+				<rom name="dezeni land (chapter 2).cas" size="25092" crc="c21bd420" sha1="dcd3f2730b03a2122058627149a5ab3f18dc6c53" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap3" interface="pc6001_snap">
+			<feature name="part_id" value="Chapter 3"/>
+			<dataarea name="snap" size="26102">
+				<rom name="dezeni land (chapter 3).cas" size="26102" crc="0a49d031" sha1="7f9aa1f8bc70ded09a977bccb982bfb3f6332602" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap4" interface="pc6001_snap">
+			<feature name="part_id" value="Chapter 4"/>
+			<dataarea name="snap" size="18572">
+				<rom name="dezeni land (chapter 4).cas" size="18572" crc="5964f330" sha1="a0f0f81f19fabc5929e2cdada72f15a874dc18a4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap5" interface="pc6001_snap">
+			<feature name="part_id" value="Chapter 5"/>
+			<dataarea name="snap" size="27901">
+				<rom name="dezeni land (chapter 5).cas" size="27901" crc="925026a3" sha1="85d7b831ea98be5c10ac192b427cc130022fee1d" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="digdug" supported="partial">
@@ -255,6 +274,23 @@ Requires better [keyboard] handling
 		</part>
 	</software>
 
+	<software name="grobda" supported="partial">
+		<description>Grobda</description>
+		<year>198?</year>
+		<publisher>Dempa</publisher>
+		<notes><![CDATA[
+[timing] According to HW refs, when "get ready" speech plays, screen should be full white but instead it's black
+]]></notes>
+		<info name="usage" value="Mode 5, Page 3, BASIC"/>
+		<info name="developer" value="T. Matsushima"/>
+		<info name="alt_title" value="グロブダー"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="42801">
+				<rom name="grobda.cas" size="42801" crc="85d9f580" sha1="86fcb03187700a1ebb00f68bfcef7eec3903c9da" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hisya" supported="partial">
 		<description>Hisya</description>
 		<year>19??</year>
@@ -263,6 +299,57 @@ Requires better [keyboard] handling
 		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="30124">
 				<rom name="hisya.cas" size="30124" crc="c3d88ac6" sha1="c6a857cf88f1205b4dfff00e063739752992a7fc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hfox" supported="no">
+		<description>Hurry Fox</description>
+		<year>1985</year>
+		<publisher>Micro Cabin</publisher>
+		<notes><![CDATA[
+Prompts for a [tape] save at startup
+]]></notes>
+		<info name="usage" value="Mode 5, Page 3, BASIC"/>
+		<info name="developer" value="Arrow Soft"/>
+		<info name="alt_title" value="はーりぃふぉっくす"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="60911">
+				<rom name="hurry fox.cas" size="60911" crc="2bd8a5c1" sha1="d619aba6783b1bb846c5277af2ac8a61af2cf39e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hfox2" supported="no">
+		<description>Hurry Fox: Yuki no Maou hen</description>
+		<year>1986</year>
+		<publisher>Micro Cabin</publisher>
+		<notes><![CDATA[
+Prompts for a [tape] save at startup
+]]></notes>
+		<info name="usage" value="Mode 5, Page 3, BASIC"/>
+		<info name="developer" value="Arrow Soft"/>
+		<info name="alt_title" value="は～りぃふぉっくす雪の魔王編" />
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="58962">
+				<rom name="hurry fox 2 - yuki no maou-hen.cas" size="58962" crc="84faa166" sha1="1fb694ec67d35e0ce0964870366663f104db7a1a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hydlide" supported="no">
+		<description>Hydlide</description>
+		<year>198?</year>
+		<publisher>T&amp;E Soft</publisher>
+		<notes><![CDATA[
+Unsupported [tape] save
+[keyboard] arrow keys doesn't work
+]]></notes>
+		<info name="usage" value="Mode 5, Page 2, BASIC. Use joystick in port 2."/>
+		<info name="alt_title" value="ハイドライド"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="44791">
+				<rom name="hydlide.cas" size="44791" crc="a2f16f83" sha1="f4b85b3d7d06e91112fe3950d9d65cd9f0f0ad3e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -276,6 +363,25 @@ Requires better [keyboard] handling
 		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="28708">
 				<rom name="ice block.cas" size="28708" crc="90b5276e" sha1="422d51cf71113c29e40acf362104602728ed409c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Original fanfun in pc8001_flop / pc8801_cass -->
+	<software name="nfanfun" supported="no">
+		<description>New Fan Fun</description>
+		<year>1984</year>
+		<publisher>Enix</publisher>
+		<notes><![CDATA[
+[keyboard] arrow keys doesn't work
+[timing] may run too fast (verify)
+]]></notes>
+		<info name="usage" value="Mode 5, Page 3, BASIC"/>
+		<info name="developer" value="Miyata"/>
+		<info name="alt_title" value="ニューファンファン"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="33114">
+				<rom name="new fan fun.cas" size="33114" crc="f210fb11" sha1="26402cd8aa8a9e4c8731028fa44c21b74218f119" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -298,7 +404,7 @@ Requires better [keyboard] handling
 		<year>198?</year>
 		<publisher>Dempa</publisher>
 		<notes><![CDATA[
-Runs too fast
+[timing] Runs too fast
 ]]></notes>
 		<info name="usage" value="Mode 5, Page 2, MONITOR R-0 then GDD74"/>
 		<info name="developer" value="H. Yomoda"/>
@@ -400,6 +506,21 @@ May require [keyboard] kana lock to work properly
 		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="41941">
 				<rom name="yakyuukyou.cas" size="41941" crc="566b0e1c" sha1="bbbb5bfd6ccefb2f01682842c68d528f76f7b8f7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Covermount -->
+
+	<software name="vitalamp" supported="partial">
+		<description>Vital Lamp</description>
+		<year>198?</year>
+		<publisher>MyCom BASIC</publisher>
+		<info name="usage" value="Mode 5, Page 2, BASIC"/>
+		<info name="developer" value="Kazuhisa Honda"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="11651">
+				<rom name="vital lamp.cas" size="11651" crc="233234b8" sha1="7e20c5c9a1cfd78c8ba152a5d417dd6976d5695d" offset="0" />
 			</dataarea>
 		</part>
 	</software>

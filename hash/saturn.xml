@@ -6490,7 +6490,7 @@ Black screen, fnum reject in [CD-Block]
 	<software name="noon" supported="no">
 		<description>Noon (Japan, rev. A)</description>
 		<year>1998</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="T-5206G"/>
 		<info name="release" value="19980129"/>
 		<info name="alt_title" value="ヌーン"/>
@@ -8767,7 +8767,7 @@ TODO: test Sonic 2, 3 and Knuckles
 	<software name="swordsor" supported="no">
 		<description>Sword &amp; Sorcery (Japan, 2M)</description>
 		<year>1996</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<notes><![CDATA[
 Crashes after now loading screen, [CD-Block]
 ]]></notes>
@@ -17014,7 +17014,7 @@ TODO: how to reload with [mouse]?
 	<software name="gahero" supported="no">
 		<description>Eiyuu Shigan - Gal Act Heroism (Japan)</description>
 		<year>1998</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="T-5204G"/>
 		<info name="release" value="19980416"/>
 		<info name="alt_title" value="英雄志願 ～Gal Act Heroism～"/>
@@ -20166,7 +20166,7 @@ Glitchy Tecnosoft logo, [SCUDSP]
 	<software name="savaki" supported="no">
 		<description>Savaki (Japan)</description>
 		<year>1998</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="T-5208G"/>
 		<info name="release" value="19980416"/>
 		<info name="alt_title" value="サバキ"/>
@@ -25283,7 +25283,7 @@ Glitchy [VDP1] sprites during gameplay
 	<software name="prinmak2" supported="no">
 		<description>Princess Maker 2 (Japan)</description>
 		<year>1995</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="T-5201G"/>
 		<info name="release" value="19951027"/>
 		<info name="alt_title" value="プリンセスメーカー2"/>
@@ -25299,7 +25299,7 @@ Glitchy [VDP1] sprites during gameplay
 	<software name="prinmak2sa" cloneof="prinmak2" supported="no">
 		<description>Princess Maker 2 (Japan, Satakore)</description>
 		<year>1997</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="T-5203G"/>
 		<info name="release" value="19970620"/>
 		<info name="alt_title" value="プリンセスメーカー2 (サタコレ)"/>
@@ -26375,7 +26375,7 @@ Not extensively tested
 	<software name="swordsora" cloneof="swordsor" supported="no">
 		<description>Sword &amp; Sorcery (Japan)</description>
 		<year>1996</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="T-5202G"/>
 		<info name="release" value="19960531"/>
 		<info name="alt_title" value="ソード&amp;ソーサリー"/>
@@ -26391,7 +26391,7 @@ Not extensively tested
 	<software name="swordsorsa" cloneof="swordsor" supported="no">
 		<description>Sword &amp; Sorcery (Japan, Satakore)</description>
 		<year>1997</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="T-5207G"/>
 		<info name="release" value="19971211"/>
 		<info name="alt_title" value="ソード&amp;ソーサリー (サタコレ)"/>
@@ -28839,7 +28839,7 @@ Not extensively tested
 	<software name="gaheroa" cloneof="gahero" supported="no">
 		<description>Eiyuu Shigan - Gal Act Heroism (Japan, alt)</description>
 		<year>1998</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="T-5204G"/>
 		<info name="release" value="19980416"/>
 		<info name="alt_title" value="英雄志願 ～Gal Act Heroism～"/>

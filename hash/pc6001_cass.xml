@@ -52,8 +52,8 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		<year>1982</year>
 		<publisher>ASCII</publisher>
 		<notes><![CDATA[
-Demo: should corrupt video when AY-based speech plays back (cfr. real HW refs)
-Space Enemy, Head-On: runs too fast
+Demo: [timing] should corrupt video when AY-based speech plays back (cfr. real HW refs)
+Space Enemy, Head-On: [timing] runs too fast
 ]]></notes>
 		<info name="usage" value="Mode 1, Page 1 for all but for Powered Knight (Mode 2, Page 1)"/>
 		<!-- All from Side A -->
@@ -85,6 +85,31 @@ Space Enemy, Head-On: runs too fast
 			<feature name="part_id" value="Space Enemy"/>
 			<dataarea name="snap" size="5579">
 				<rom name="ax-6 (space enemy).cas" size="5579" crc="6601f428" sha1="4d922cef648f9efe001f25920bf1874ca5cbde52" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ax8" supported="no">
+		<description>AX-8</description>
+		<!-- Year from tape printout -->
+		<year>1984</year>
+		<publisher>ASCII</publisher>
+		<notes><![CDATA[
+Cannot start a game, requires [keyboard] stop key
+]]></notes>
+		<info name="usage" value="Mode 2, Page 1"/>
+		<info name="alt_title" value="ギャラクシーミッション"/>
+		<!-- both from side A -->
+		<part name="snap1" interface="pc6001_snap">
+			<feature name="part_id" value="Part 1"/>
+			<dataarea name="snap" size="23444">
+				<rom name="ax-8 (galaxy mission) (part 1).cas" size="23444" crc="e6a91fd9" sha1="ed46535f9fc21a7a1753c7b8011e33bf84cc31b7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap2" interface="pc6001_snap">
+			<feature name="part_id" value="Part 2"/>
+			<dataarea name="snap" size="25764">
+				<rom name="ax-8 (galaxy mission) (part 2).cas" size="25764" crc="049fbe65" sha1="7cfae929b6cf0c8511d59e86c15a18548686e20b" offset="0" />
 			</dataarea>
 		</part>
 	</software>

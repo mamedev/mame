@@ -37,69 +37,58 @@ TODO (pc6601mk2sr):
 - pc6001mk2sr/pc6601sr: currently doesn't work without -debug enabled (?), has serious keyboard
   issues.
 
-TODO (game specific, move in SW lists):
-- (several AX* games, namely Galaxy Mission Part 1/2 and others): inputs doesn't work;
-(Mk2 mode 5 games)
-- Hurry Fox 1/2: asks you to "load something", can't do it
-   with current cassette kludge;
-- (MyCom BASIC games with multiple files): most of them refuses to run ... how to load them?
-- Grobda: when "get ready" speech plays, screen should be full white but instead it's all
-   black, same issue as AX-6 Demo?
-- The Black Onyx: dies when it attempts to save the character, that obviously means saving
-   on the tape;
-
 ===================================================================================================
 
-    PC-6001 (1981-09):
+PC-6001 (1981-09):
 
-     * CPU: Z80A @ 4 MHz
-     * ROM: 16KB + 4KB (chargen) - no kanji
-     * RAM: 16KB, it can be expanded to 32KB
-     * Text Mode: 32x16 and 2 colors
-     * Graphic Modes: 64x48 (9 colors), 128x192 (4 colors), 256x192 (2 colors)
-     * Sound: BEEP + PSG - Optional Voice Synth Cart
-     * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
-            HOME/CLR key, INS key, DEL key, GRAPH key, Japanese syllabary
-            key, page key, STOP key, and cursor key (4 directions)
-     * 1 cartslot, optional floppy drive, optional serial 232 port, 2
-            joystick ports
-
-
-    PC-6001 mkII (1983-07):
-
-     * CPU: Z80A @ 4 MHz
-     * ROM: 32KB + 16KB (chargen) + 32KB (kanji) + 16KB (Voice Synth)
-     * RAM: 64KB
-     * Text Mode: same as PC-6001 with N60-BASIC; 40x20 and 15 colors with
-            N60M-BASIC
-     * Graphic Modes: same as PC-6001 with N60-BASIC; 80x40 (15 colors),
-            160x200 (15 colors), 320x200 (4 colors) with N60M-BASIC
-     * Sound: BEEP + PSG
-     * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
-            HOME/CLR key, INS key, DEL key, CAPS key, GRAPH key, Japanese
-            syllabary key, page key, mode key, STOP key, and cursor key (4
-            directions)
-     * 1 cartslot, floppy drive, optional serial 232 port, 2 joystick ports
+ * CPU: Z80A @ 4 MHz
+ * ROM: 16KB + 4KB (chargen) - no kanji
+ * RAM: 16KB, it can be expanded to 32KB
+ * Text Mode: 32x16 and 2 colors
+ * Graphic Modes: 64x48 (9 colors), 128x192 (4 colors), 256x192 (2 colors)
+ * Sound: BEEP + PSG - Optional Voice Synth Cart
+ * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
+        HOME/CLR key, INS key, DEL key, GRAPH key, Japanese syllabary
+        key, page key, STOP key, and cursor key (4 directions)
+ * 1 cartslot, optional floppy drive, optional serial 232 port, 2
+        joystick ports
 
 
-    PC-6001 mkIISR (1984-12):
+PC-6001 mkII (1983-07):
 
-     * CPU: Z80A @ 3.58 MHz
-     * ROM: 64KB + 16KB (chargen) + 32KB (kanji) + 32KB (Voice Synth)
-     * RAM: 64KB
-     * Text Mode: same as PC-6001/PC-6001mkII with N60-BASIC; 40x20, 40x25,
-            80x20, 80x25 and 15 colors with N66SR-BASIC
-     * Graphic Modes: same as PC-6001/PC-6001mkII with N60-BASIC; 80x40 (15 colors),
-            320x200 (15 colors), 640x200 (15 colors) with N66SR-BASIC
-     * Sound: BEEP + PSG + FM
-     * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
-            HOME/CLR key, INS key, DEL key, CAPS key, GRAPH key, Japanese
-            syllabary key, page key, mode key, STOP key, and cursor key (4
-            directions)
-     * 1 cartslot, floppy drive, optional serial 232 port, 2 joystick ports
+ * CPU: Z80A @ 4 MHz
+ * ROM: 32KB + 16KB (chargen) + 32KB (kanji) + 16KB (Voice Synth)
+ * RAM: 64KB
+ * Text Mode: same as PC-6001 with N60-BASIC; 40x20 and 15 colors with
+        N60M-BASIC
+ * Graphic Modes: same as PC-6001 with N60-BASIC; 80x40 (15 colors),
+        160x200 (15 colors), 320x200 (4 colors) with N60M-BASIC
+ * Sound: BEEP + PSG
+ * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
+        HOME/CLR key, INS key, DEL key, CAPS key, GRAPH key, Japanese
+        syllabary key, page key, mode key, STOP key, and cursor key (4
+        directions)
+ * 1 cartslot, floppy drive, optional serial 232 port, 2 joystick ports
 
 
-    info from http://www.geocities.jp/retro_zzz/machines/nec/6001/spc60.html
+PC-6001 mkIISR (1984-12):
+
+ * CPU: Z80A @ 3.58 MHz
+ * ROM: 64KB + 16KB (chargen) + 32KB (kanji) + 32KB (Voice Synth)
+ * RAM: 64KB
+ * Text Mode: same as PC-6001/PC-6001mkII with N60-BASIC; 40x20, 40x25,
+        80x20, 80x25 and 15 colors with N66SR-BASIC
+ * Graphic Modes: same as PC-6001/PC-6001mkII with N60-BASIC; 80x40 (15 colors),
+        320x200 (15 colors), 640x200 (15 colors) with N66SR-BASIC
+ * Sound: BEEP + PSG + FM
+ * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
+        HOME/CLR key, INS key, DEL key, CAPS key, GRAPH key, Japanese
+        syllabary key, page key, mode key, STOP key, and cursor key (4
+        directions)
+ * 1 cartslot, floppy drive, optional serial 232 port, 2 joystick ports
+
+
+ info from http://www.geocities.jp/retro_zzz/machines/nec/6001/spc60.html
 
 ===================================================================================================
 
