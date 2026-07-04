@@ -1277,7 +1277,7 @@ void macpdm_state::pmac6100(machine_config &config)
 {
 	PPC601(config, m_maincpu, 60'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpdm_state::pdm_map);
-	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
+	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS | PPCDRC_STRICT_601_SELF_MODIFY);
 
 	MAC_VIDEO_SONORA(config, m_video);
 	m_video->set_PDM();

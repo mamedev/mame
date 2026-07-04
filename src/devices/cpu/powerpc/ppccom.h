@@ -31,8 +31,9 @@
     CONSTANTS
 ***************************************************************************/
 
-// size of the execution code cache
-#define CACHE_SIZE                      (32 * 1024 * 1024)
+// Size of the DRC's code cache.  Mac OS 9's idle working set alone is
+// over 32MiB of compiled code, so at 32MiB of cache the DRC was thrashing.
+#define CACHE_SIZE                      (128 * 1024 * 1024)
 
 // compilation boundaries -- how far back/forward does the analysis extend?
 #define COMPILE_BACKWARDS_BYTES         128

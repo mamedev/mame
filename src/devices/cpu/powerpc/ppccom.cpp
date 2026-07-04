@@ -808,6 +808,7 @@ void ppc_device::device_start()
 	save_item(NAME(m_core->reserve_address));
 
 	save_item(NAME(m_core->m_codepage_any));
+	save_item(NAME(m_core->m_translation_generation));
 	save_pointer(NAME(&m_codepage_bits[0]), CODEPAGE_SIZE);
 
 	// Register debugger state
@@ -946,6 +947,11 @@ void ppc_device::device_start()
 		static_generate_nocode_handler();
 		static_generate_out_of_cycles();
 		static_generate_tlb_mismatch();
+		// 601 has a unified cache, so code can self-modify without icbi.
+		// PPCDRC_STRICT_601_SELF_MODIFY causes the write accessors to watch for stores
+		// to compiled code pages.
+		if (m_flavor == PPC_MODEL_601 && (m_drcoptions & PPCDRC_STRICT_601_SELF_MODIFY))
+			static_generate_code_write_reset();
 		if (m_cap & PPCCAP_603_MMU)
 			static_generate_swap_tgpr();
 
@@ -1544,6 +1550,150 @@ void ppc_device::ppccom_tlb_flush()
 }
 
 
+/*-------------------------------------------------
+    ppc_check_translation - re-verify a compiled
+    block's effective-to-physical mapping after
+    the MMU has been touched.  Called from the
+    block entry check when the block's cached
+    translation generation is out of date.
+-------------------------------------------------*/
+
+void ppc_device::ppc_check_translation(ppc_entry_check *chk)
+{
+	offs_t addr = chk->pc;
+	if (ppccom_translate_address_internal(TR_FETCH, false, addr) <= 1 && addr == chk->physpc)
+	{
+		// mapping unchanged; the block stays valid for the current generation
+		chk->generation = m_core->m_translation_generation;
+		m_core->param1 = 0;
+	}
+	else
+	{
+		// the code moved (or is no longer mapped); recompile at next entry
+		m_core->param1 = 1;
+	}
+}
+
+
+/*-------------------------------------------------
+    invalidate_code_range - invalidate the hash
+    entries of every code page in an effective
+    address range whose translation changed, so
+    stale blocks are recompiled at next entry
+    instead of flushing the whole cache.  Returns
+    true if anything was invalidated.
+-------------------------------------------------*/
+
+bool ppc_device::invalidate_code_range(offs_t start, offs_t end)
+{
+	// A sequence starting on an earlier page can extend into this range, but
+	// invalidate_range() backs the start up by the maximum sequence length to
+	// catch those, so only the pages actually touched need to be considered.
+	uint32_t page = start >> 12;
+	uint32_t const lastpage = end >> 12;
+	bool invalidated = false;
+
+	while (page <= lastpage)
+	{
+		// Skip empty stretches of the bitmap a byte (8 pages) at a time
+		if ((page & 7) == 0 && m_codepage_bits[page >> 3] == 0)
+		{
+			page += 8;
+			continue;
+		}
+
+		if (BIT(m_codepage_bits[page >> 3], page & 7))
+		{
+			m_drcuml->hash_invalidate_range(page << 12, (page << 12) | 0xfff);
+			invalidated = true;
+		}
+		page++;
+	}
+	return invalidated;
+}
+
+
+/*-------------------------------------------------
+    ppccom_execute_mtsr - execute an MTSR or
+    MTSRIN instruction (param0 = segment number,
+    param1 = new value)
+-------------------------------------------------*/
+
+void ppc_device::ppccom_execute_mtsr()
+{
+	const uint32_t seg = m_core->param0 & 15;
+	const uint32_t newval = m_core->param1;
+	const uint32_t oldval = m_core->sr[seg];
+
+	// Mac OS 9.x writes the same segment values thousands of times a second,
+	// so checking if the value actually changed is important.
+	if (oldval != newval)
+	{
+		m_core->sr[seg] = newval;
+		vtlb_flush_dynamic();
+
+		// Only a change to the VSID (or the T bit) actually remaps the segment.
+		// If that happens, bump the translation generation.
+		if (((oldval ^ newval) & 0x80ff'ffff) != 0)
+		{
+			m_core->m_translation_generation++;
+		}
+	}
+}
+
+
+/*-------------------------------------------------
+    ppccom_invalidate_codepage - invalidate the
+    compiled code on the page containing param0
+    (used by the 601 write-watch for self-modifying
+    code that doesn't icbi)
+-------------------------------------------------*/
+
+void ppc_device::ppccom_invalidate_codepage()
+{
+	offs_t const page = m_core->param0 & 0xfffff000;   // page of the effective store address
+	uint32_t const pg = (page >> 12) & 0xfffff;
+
+	// Invalidate the compiled code on the modified page so it recompiles from the
+	// new bytes on its next entry
+	invalidate_code_range(page, page | 0xfff);
+
+	// Clear the page's code bit and hold it clear across the immediate recompile
+	// (see note_code_page).  The store is resumed by re-executing it, and with the
+	// bit clear it completes instead of re-triggering the write watcher.  Any further
+	// stores in the same self-modifying burst also see the bit clear so unnecessary
+	// invalidates are avoided.  param1 already holds the PC of the store to resume at
+	m_codepage_bits[pg >> 3] &= ~(1 << (pg & 7));
+	m_codewrite_skip_page = pg;
+}
+
+
+/*-------------------------------------------------
+    ppccom_execute_icbi - execute an ICBI
+    instruction (param0 = effective address of
+    the invalidated line, param1 = PC of the icbi)
+-------------------------------------------------*/
+
+void ppc_device::ppccom_execute_icbi()
+{
+	const offs_t page = m_core->param0 & 0xfffff000;
+	const offs_t pcpage = m_core->param1 & 0xfffff000;
+	int hit = 0;
+
+	if (code_page_has_code(page))
+	{
+		// The invalidated line falls in a page with compiled code; point the page's
+		// hash entries back at "no code present" so any modified block is recompiled.
+		invalidate_code_range(page, page | 0xfff);
+		hit = 1;
+	}
+
+	// Only exit the current block if it could extend into the invalidated page.
+	offs_t const pagedelta = (page > pcpage) ? (page - pcpage) : (pcpage - page);
+	m_core->param1 = (hit && pagedelta <= 0x1000) ? 1 : 0;
+}
+
+
 
 /***************************************************************************
     OPCODE HANDLING
@@ -1572,8 +1722,12 @@ void ppc_device::ppccom_execute_tlbie()
 {
 	vtlb_flush_address(m_core->param0);
 
-	// look up if this page contains a compiled code block
-	m_core->param1 = code_page_has_code(m_core->param0);
+	// A page table entry for this page may have changed; if code was compiled
+	// from it, make blocks re-check their mappings on the next entry.
+	if (code_page_has_code(m_core->param0))
+	{
+		m_core->m_translation_generation++;
+	}
 }
 
 
@@ -1585,6 +1739,13 @@ void ppc_device::ppccom_execute_tlbie()
 void ppc_device::ppccom_execute_tlbia()
 {
 	vtlb_flush_dynamic();
+
+	// Any page's translation may be changing.  If any code is compiled, make
+	// blocks re-check their mappings on the next entry.
+	if (m_core->m_codepage_any)
+	{
+		m_core->m_translation_generation++;
+	}
 }
 
 
@@ -1819,7 +1980,7 @@ void ppc_device::ppccom_execute_mtspr()
 				m_core->spr[m_core->param0] = m_core->param1;
 				return;
 
-			/* registers that affect the memory map */
+			// registers that affect the memory map
 			case SPROEA_SDR1:
 			case SPROEA_IBAT0L:
 			case SPROEA_IBAT0U:
@@ -1837,8 +1998,44 @@ void ppc_device::ppccom_execute_mtspr()
 			case SPROEA_DBAT2U:
 			case SPROEA_DBAT3L:
 			case SPROEA_DBAT3U:
-				m_core->spr[m_core->param0] = m_core->param1;
-				ppccom_tlb_flush();
+				if (m_core->spr[m_core->param0] != m_core->param1)
+				{
+					// Only a change to the instruction-side translation can invalidate
+					// compiled code, meaning SDR1 (page tables) or an IBAT slot (which
+					// on the 601 holds the unified BATs).
+					//
+					// For a BAT, only a change to the mapping fields matters.  The
+					// privilege key and PP bits toggle on user/kernel transitions
+					// without remapping anything.  Bump the translation generation
+					// and each block will re-check its own mapping at next entry.
+					const bool is_ibat = (m_core->param0 >= SPROEA_IBAT0U && m_core->param0 <= SPROEA_IBAT3L);
+					bool remapped = (m_core->param0 == SPROEA_SDR1);
+
+					if (is_ibat)
+					{
+						const uint32_t pairbase = m_core->param0 & ~1;
+						const uint32_t oldupper = m_core->spr[pairbase], oldlower = m_core->spr[pairbase | 1];
+						const uint32_t newupper = (m_core->param0 & 1) ? oldupper : m_core->param1;
+						const uint32_t newlower = (m_core->param0 & 1) ? m_core->param1 : oldlower;
+
+						if (m_cap & PPCCAP_601BAT)
+						{
+							remapped = (((oldupper ^ newupper) & 0xfffe'0000) | ((oldlower ^ newlower) & 0xfffe'007f)) != 0;
+						}
+						else
+						{
+							remapped = (((oldupper ^ newupper) & 0xfffe'1fff) | ((oldlower ^ newlower) & 0xfffe'0000)) != 0;
+						}
+					}
+
+					m_core->spr[m_core->param0] = m_core->param1;
+					ppccom_tlb_flush();
+
+					if (remapped)
+					{
+						m_core->m_translation_generation++;
+					}
+				}
 				return;
 
 			/* decrementer */
