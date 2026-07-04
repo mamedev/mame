@@ -50,6 +50,7 @@ drc_hash_table::drc_hash_table(
 		uint32_t modes,
 		uint8_t addrbits,
 		uint8_t ignorebits,
+		uint32_t max_sequence_length,
 		std::align_val_t modealign,
 		std::align_val_t l1align,
 		std::align_val_t l2align) :
@@ -63,6 +64,7 @@ drc_hash_table::drc_hash_table(
 	m_l2align(std::align_val_t(std::lcm(std::size_t(l2align), alignof(drccodeptr)))),
 	m_nocodeptr(nullptr),
 	m_modes(modes),
+	m_max_sequence_length(max_sequence_length),
 	m_l1bits((addrbits - ignorebits) / 2),
 	m_l2bits((addrbits - ignorebits) - m_l1bits),
 	m_l1shift(ignorebits + m_l2bits),
@@ -294,10 +296,19 @@ bool drc_hash_table::set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code) no
 //-------------------------------------------------
 //  invalidate_range - force all blocks in the
 //  given PC range to recompile on their next entry
+//
+//  TODO: Will need to reconsider this in the future
+//  when the DRC system is expanded to handle 64-bit
+//  program counters.
 //-------------------------------------------------
 
 void drc_hash_table::invalidate_range(uint32_t pcstart, uint32_t pcend) noexcept
 {
+	// Sequences are hashed on their starting address, so a sequence at the start of this
+	// block may have crossed over from a previous block.  Back up the starting address by
+	// the maximum size (in bytes) of a generated sequence for this DRC.
+	pcstart -= std::min(pcstart, m_max_sequence_length);
+
 	for (uint32_t mode = 0; mode < m_modes; mode++)
 	{
 		if (m_base[mode] == m_emptyl1)
@@ -316,7 +327,9 @@ void drc_hash_table::invalidate_range(uint32_t pcstart, uint32_t pcend) noexcept
 				{
 					l2[(p >> m_l2shift) & m_l2mask] = m_nocodeptr;
 					if (p > 0xffff'ffff - (uint32_t(1) << m_l2shift))
+					{
 						break;
+					}
 				}
 			}
 

@@ -231,7 +231,7 @@ void unsp_device::device_start()
 	if (m_enable_drc)
 	{
 		uint32_t umlflags = 0;
-		m_drcuml = std::make_unique<drcuml_state>(*this, m_drccache, umlflags, 1, 23, 0);
+		m_drcuml = std::make_unique<drcuml_state>(*this, m_drccache, umlflags, 1, 23, 0, COMPILE_FORWARDS_BYTES);
 
 		// add UML symbols-
 		m_drcuml->symbol_add(&m_core->m_r[REG_SP], sizeof(uint32_t), "SP");
