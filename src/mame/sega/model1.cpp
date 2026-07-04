@@ -833,19 +833,50 @@ void model1_state::irq_control_w(u8 data)
 	}
 }
 
+// E00002: per-level IRQ mask, active low (bit n set = IRQ level n masked).
+// Assumed to power up with all levels masked; every game programs it before
+// enabling interrupts in the PSW, so the reset value is not observable
+// (swa/wingwar write it in the instruction immediately preceding
+// updpsw #0x40000, the others earlier in their init).
+//
+// - vf/vr:   write 0xff then 0xfd at init - vblank only. vf additionally
+//            unmasks level 3 ("and.b #0xf7") while its sound queue is
+//            non-empty and masks it again ("or.b #8") once it drains - its
+//            level 3 handler pumps the queue to the uart.
+// - swa:     writes 0x3c - unmasks levels 0/1; level 0 is its uart pump.
+// - wingwar: writes 0x3d - unmasks level 1 only.
+// - netmerc: writes 0xff at boot, then "and.b #0xfd" - unmasks level 1 only.
+//            All its other vectors point to a debug routine that cycles the
+//            backdrop colour, which must never run.
+u8 model1_state::irq_mask_r()
+{
+	return m_irq_mask;
+}
+
+void model1_state::irq_mask_w(u8 data)
+{
+	m_irq_mask = data;
+}
+
+// IRQ vectors in use:
 // vf
-// 1 = fe3ed4
-// 3 = fe3f5c
+// 1 = fe3ed4 (vblank)
+// 3 = fe3f5c (uart queue pump)
 // other = fe3ec8 / fe3ebc
 
 // vr
-// 1 = fe02bc
-// other = f302a4 / fe02b0
+// 1 = fe02bc (vblank)
+// other = fe02a4 / fe02b0
 
 // swa
-// 1 = ff504
+// 0 = ff558 (uart queue pump)
+// 1 = ff504 (vblank)
 // 3 = ff54c
 // other = ff568/ff574
+
+// netmerc
+// 1 = ffe000 (vblank)
+// other = ffe10c (debug backdrop cycler, always masked)
 
 void model1_state::irq_init()
 {
@@ -861,12 +892,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
 	{
 		if (m_m1comm != nullptr)
 			m_m1comm->check_vint_irq();
-		irq_raise(1);
+		if (!BIT(m_irq_mask, 1))
+			irq_raise(1);
 	}
 	else if(scanline == 384/2)
 	{
-		if (m_sound_irq <= 7)
-			irq_raise(m_sound_irq);
+		// Periodic (timer?) source, wired to levels 0 and 3; each game
+		// unmasks at most one of them for its uart/sound queue pump.
+		if (!BIT(m_irq_mask, 0))
+			irq_raise(0);
+		if (!BIT(m_irq_mask, 3))
+			irq_raise(3);
 	}
 }
 
@@ -878,16 +914,10 @@ void model1_state::machine_reset()
 
 	m_irq_status = 0;
 	m_last_irq = 0;
+	m_irq_mask = 0xff;
 
-	if (!strcmp(machine().system().name, "swa") ||
-		!strcmp(machine().system().name, "swaj"))
+	if (!strcmp(machine().system().name, "netmerc"))
 	{
-		m_sound_irq = 0;
-	}
-	else if (!strcmp(machine().system().name, "netmerc"))
-	{
-		m_sound_irq = 0xff; // Netmerc ignores midframe irq, avoid stomping pen 0
-		
 		if (m_nvram)
 		{
 			auto &space = m_maincpu->space(AS_PROGRAM);
@@ -911,10 +941,6 @@ void model1_state::machine_reset()
 				m_dpram->left_w(0x81 + i*2, (pose[i] >> 8) & 0xff);
 			}
 		}
-	}
-	else
-	{
-		m_sound_irq = 3;
 	}
 }
 
@@ -956,8 +982,9 @@ void model1_state::model1_mem(address_map &map)
 	/*      */ map(0xdc0000, 0xdc0003).r(FUNC(model1_state::fifoin_status_r)).mirror(0x1fffc);
 
 	/* GLUE */ map(0xe00000, 0xe00000).w(FUNC(model1_state::irq_control_w));
+	/*      */ map(0xe00002, 0xe00002).rw(FUNC(model1_state::irq_mask_r), FUNC(model1_state::irq_mask_w));
 	/*      */ map(0xe00004, 0xe00005).w(FUNC(model1_state::bank_w));
-	/*      */ map(0xe0000c, 0xe0000f).nopw();
+	/*      */ map(0xe00006, 0xe0000f).nopw(); // Unemulated timer? (E0000A: period, E0000C: free-running count, also read back; E0000E: unknown)
 
 	/* ROM0 */ map(0xf80000, 0xffffff).rom();
 }

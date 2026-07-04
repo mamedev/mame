@@ -214,8 +214,11 @@ private:
 	void irq_raise(int level);
 	void irq_init();
 	void irq_control_w(u8 data);
+	u8 irq_mask_r();
+	void irq_mask_w(u8 data);
 
 	uint8_t m_irq_status = 0;
+	uint8_t m_irq_mask = 0xff;
 	int m_last_irq = 0;
 
 	// Devices
@@ -236,9 +239,6 @@ private:
 	required_shared_ptr<uint16_t> m_display_list0;
 	required_shared_ptr<uint16_t> m_display_list1;
 	required_shared_ptr<uint16_t> m_color_xlat;
-
-	// Sound
-	int m_sound_irq = 0;
 
 	// TGP FIFO
 	void    fifoout_push(uint32_t data);
