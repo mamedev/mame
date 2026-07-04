@@ -16,7 +16,6 @@ va_lpf4_device::va_lpf4_device(const machine_config &mconfig, device_type type, 
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
-	, m_streamless_sample_rate(0)
 	, m_input_gain(1)
 	, m_gain_comp(0)
 	, m_drive(1)
@@ -27,12 +26,6 @@ va_lpf4_device::va_lpf4_device(const machine_config &mconfig, device_type type, 
 	, m_G4(1)
 	, m_gain_comp_scale(1)
 {
-}
-
-va_lpf4_device &va_lpf4_device::configure_streamless(u32 sample_rate)
-{
-	m_streamless_sample_rate = sample_rate;
-	return *this;
 }
 
 va_lpf4_device &va_lpf4_device::configure_input_gain(float gain)
@@ -111,25 +104,13 @@ float va_lpf4_device::cv_to_res(float res_cv) const
 
 void va_lpf4_device::device_start()
 {
-	if (get_sound_requested_outputs() > 0)
-	{
-		if (!BIT(get_sound_requested_inputs_mask(), INPUT_AUDIO))
-			fatalerror("%s: requires input 0 to be connected.\n", tag());
-		if (get_sound_requested_inputs_mask() & ~u64(7))
-			fatalerror("%s: can only have inputs 0-2 connected.\n", tag());
-		if (m_streamless_sample_rate > 0)
-			fatalerror("%s: configured as streamless, but the output stream is connected.\n", tag());
+	if (!BIT(get_sound_requested_inputs_mask(), INPUT_AUDIO))
+		fatalerror("%s: requires input 0 to be connected.\n", tag());
+	if (get_sound_requested_inputs_mask() & ~u64(7))
+		fatalerror("%s: can only have inputs 0-2 connected.\n", tag());
 
-		// Using a minimum of 96KHz to reduce aliasing due to distortion.
-		m_stream = stream_alloc(get_sound_requested_inputs(), 1, std::max(96000, machine().sample_rate()));
-	}
-	else if (m_streamless_sample_rate == 0)
-	{
-		fatalerror(
-				"%s: not configured properly. Should either have streams connected, "
-				"or be configured as streamless.\n",
-				tag());
-	}
+	// Using a minimum of 96KHz to reduce aliasing due to distortion.
+	m_stream = stream_alloc(get_sound_requested_inputs(), 1, std::max(96000, machine().sample_rate()));
 
 	save_item(NAME(m_fc));
 	save_item(NAME(m_res));
@@ -170,7 +151,7 @@ void va_lpf4_device::device_start()
         in his book: "Designing Software Synthesizer Plugins in C++")
     [3] "The Art of VA Filter Design", V Zavalishin, Chapter 5.3.
 */
-sound_stream::sample_t va_lpf4_device::process_sample_internal(sound_stream::sample_t s)
+sound_stream::sample_t va_lpf4_device::process_sample(sound_stream::sample_t s)
 {
 	// The chapter references below are for the book "The Art of VA Filter Design".
 	// Most of the implementation below is based on Chapter 5.3.
@@ -218,13 +199,6 @@ sound_stream::sample_t va_lpf4_device::process_sample_internal(sound_stream::sam
 	return u / m_drive;
 }
 
-sound_stream::sample_t va_lpf4_device::process_sample(sound_stream::sample_t s)
-{
-	if (get_sound_requested_outputs() > 0)
-		fatalerror("%s: process_sample() can only be used when in streamless mode.\n", tag());
-	return process_sample_internal(s);
-}
-
 void va_lpf4_device::sound_stream_update(sound_stream &stream)
 {
 	const bool streaming_freq = BIT(get_sound_requested_inputs_mask(), INPUT_FREQ);
@@ -251,16 +225,8 @@ void va_lpf4_device::sound_stream_update(sound_stream &stream)
 				recalc_res();
 			}
 		}
-		stream.put(0, i, process_sample_internal(stream.get(INPUT_AUDIO, i)));
+		stream.put(0, i, process_sample(stream.get(INPUT_AUDIO, i)));
 	}
-}
-
-u32 va_lpf4_device::sample_rate() const
-{
-	if (m_stream)
-		return m_stream->sample_rate();
-	else
-		return m_streamless_sample_rate;
 }
 
 void va_lpf4_device::recalc_res()
@@ -271,7 +237,8 @@ void va_lpf4_device::recalc_res()
 
 void va_lpf4_device::recalc_filter()
 {
-	const float T = 1.0F / sample_rate();
+	const float sample_rate = m_stream->sample_rate();
+	const float T = 1.0F / sample_rate;
 	const float w = 2 * std::numbers::pi_v<float> * m_fc;
 
 	// Using the "bounded cutoff prewarping" strategy described in Zavalishin's
@@ -284,7 +251,7 @@ void va_lpf4_device::recalc_filter()
 	// does not work well with standard cutoff prewarping.
 	// Here, we set the max at 16KHz (same as in the book). But for low sample
 	// rates, we use a fraction of Nyquist instead.
-	const float w_max = 2 * std::numbers::pi_v<float> * std::min(0.75F * sample_rate() / 2, 16'000.0F);
+	const float w_max = 2 * std::numbers::pi_v<float> * std::min(0.75F * sample_rate / 2.0F, 16'000.0F);
 	float g = 0;
 	if (w <= w_max)
 		g = tanf(w * T / 2);
