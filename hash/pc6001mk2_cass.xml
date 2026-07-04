@@ -61,6 +61,23 @@ Runs too fast
 		</part>
 	</software>
 
+	<software name="attack" supported="no">
+		<description>Attack!! Hiroko-chan</description>
+		<year>198?</year>
+		<publisher>Champion Soft</publisher>
+		<notes><![CDATA[
+Not extensively tested (language barrier)
+]]></notes>
+		<info name="usage" value="Mode 5, Page 3, BASIC"/>
+		<info name="developer" value="M. Biccs"/>
+		<info name="alt_title" value="アタック!! ひろ子ちゃん"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="23440">
+				<rom name="attack hiroko chan.cas" size="23440" crc="076760d3" sha1="e8a7c8ecfac69e597ddd9cb68b0dd94cc93cffe0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bokosuka" supported="partial">
 		<description>Bokosuka Wars</description>
 		<year>1985</year>
@@ -92,13 +109,14 @@ Runs too fast
 		<year>1986?</year>
 		<publisher>ASCII</publisher>
 		<notes><![CDATA[
-[gfx] wrong scan draw for title screen copyright text
+[gfx] wrong scan draw for title screen copyright text, bad dump?
 ]]></notes>
 		<info name="usage" value="Mode 5, Page 2, BASIC" />
 		<info name="alt_title" value="キャッスルエクセレント"/>
+		<!-- baddump: Neo Kobe set originally had a "[b]" flag -->
 		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="32980">
-				<rom name="castle excellent.cas" size="32980" crc="dc356757" sha1="2d33d6d3274370aae8052dee29bac993c369b4e5"/>
+				<rom name="castle excellent.cas" size="32980" crc="dc356757" sha1="2d33d6d3274370aae8052dee29bac993c369b4e5" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -143,6 +161,48 @@ Runs too fast
 		</part>
 	</software>
 
+	<software name="dezeni" supported="no">
+		<description>Dezeni Land</description>
+		<year>198?</year>
+		<publisher>Hudson Soft</publisher>
+		<notes><![CDATA[
+Unsupported [tape] saving, other chapters requires an user tape
+Requires better [keyboard] handling
+]]></notes>
+		<info name="usage" value="Mode 5, Page 4, MONITOR. Choose N at startup to start a new game"/>
+		<info name="alt_title" value="デゼニランド"/>
+        <part name="snap1" interface="pc6001_snap">
+            <feature name="part_id" value="Chapter 1"/>
+            <dataarea name="snap" size="39484">
+                <rom name="dezeni land (chapter 1).cas" size="39484" crc="d50d079c" sha1="a2f66fbb79c07602fc8564d3a28aea168052ddff" offset="0" />
+            </dataarea>
+        </part>
+        <part name="snap2" interface="pc6001_snap">
+            <feature name="part_id" value="Chapter 2"/>
+            <dataarea name="snap" size="25092">
+                <rom name="dezeni land (chapter 2).cas" size="25092" crc="c21bd420" sha1="dcd3f2730b03a2122058627149a5ab3f18dc6c53" offset="0" />
+            </dataarea>
+        </part>
+        <part name="snap3" interface="pc6001_snap">
+            <feature name="part_id" value="Chapter 3"/>
+            <dataarea name="snap" size="26102">
+                <rom name="dezeni land (chapter 3).cas" size="26102" crc="0a49d031" sha1="7f9aa1f8bc70ded09a977bccb982bfb3f6332602" offset="0" />
+            </dataarea>
+        </part>
+        <part name="snap4" interface="pc6001_snap">
+            <feature name="part_id" value="Chapter 4"/>
+            <dataarea name="snap" size="18572">
+                <rom name="dezeni land (chapter 4).cas" size="18572" crc="5964f330" sha1="a0f0f81f19fabc5929e2cdada72f15a874dc18a4" offset="0" />
+            </dataarea>
+        </part>
+        <part name="snap5" interface="pc6001_snap">
+            <feature name="part_id" value="Chapter 5"/>
+            <dataarea name="snap" size="27901">
+                <rom name="dezeni land (chapter 5).cas" size="27901" crc="925026a3" sha1="85d7b831ea98be5c10ac192b427cc130022fee1d" offset="0" />
+            </dataarea>
+        </part>
+	</software>
+
 	<software name="digdug" supported="partial">
 		<description>Dig Dug</description>
 		<year>19??</year>
@@ -156,19 +216,6 @@ Runs too fast
 		</part>
 	</software>
 
-	<software name="dsbubble" supported="partial">
-		<description>Dr. Slump Bubble Daisakusen</description>
-		<year>1984</year>
-		<publisher>Enix</publisher>
-		<info name="usage" value="Mode 5, Page 3, MONITOR" />
-		<info name="alt_title" value="スランプ バブル大作戦"/>
-		<part name="snap" interface="pc6001_snap">
-			<dataarea name="snap" size="28455">
-				<rom name="dr slump bubble daisakusen.cas" size="28455" crc="10529edc" sha1="9fadb778ef869a147956e3d8004cc84574e34bd6"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="doordoor" supported="partial">
 		<description>Door Door Mk. II</description>
 		<year>1984</year>
@@ -178,6 +225,19 @@ Runs too fast
 		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="71593">
 				<rom name="door door.p6" size="71593" crc="567f4190" sha1="4c82a9e4b939962a1fc703a5611f59b3f18118bb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dsbubble" supported="partial">
+		<description>Dr. Slump Bubble Daisakusen</description>
+		<year>1984</year>
+		<publisher>Enix</publisher>
+		<info name="usage" value="Mode 5, Page 3, MONITOR" />
+		<info name="alt_title" value="スランプ バブル大作戦"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="28455">
+				<rom name="dr slump bubble daisakusen.cas" size="28455" crc="10529edc" sha1="9fadb778ef869a147956e3d8004cc84574e34bd6"/>
 			</dataarea>
 		</part>
 	</software>

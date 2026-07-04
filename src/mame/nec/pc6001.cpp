@@ -39,18 +39,9 @@ TODO (pc6601mk2sr):
 
 TODO (game specific, move in SW lists):
 - (several AX* games, namely Galaxy Mission Part 1/2 and others): inputs doesn't work;
-- AX6 - Demo: When AY-based speech talks, other emus emulates the screen drawing to be
-   a solid green (plain PC-6001) or solid white (Mk2 version), but according to an
-   original video reference, that screen should actually some kind of weird garbage on it;
-- AX6 - Powered Knight: doesn't work too well, according to the asm code it asks the
-   player to press either 'B' or 'C' then a number but nothing is shown on screen,
-   other emus behaves the same, bad dump?
 (Mk2 mode 5 games)
-- Dezeni Land (ALL versions) / Hurry Fox 1/2: asks you to "load something", can't do it
-   with current cassette kludge, also, for Dezeni Land(s) keyboard irqs doesn't seem to
-   work too well with halt opcode execution?
-- Dezeni Land 1/4: dies after loading of main program;
-- Dezeni Land 2: dies at the "load something" screen with presumably wrong stack opcodes
+- Hurry Fox 1/2: asks you to "load something", can't do it
+   with current cassette kludge;
 - (MyCom BASIC games with multiple files): most of them refuses to run ... how to load them?
 - Grobda: when "get ready" speech plays, screen should be full white but instead it's all
    black, same issue as AX-6 Demo?

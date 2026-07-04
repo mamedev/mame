@@ -20,6 +20,8 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 -->
 <softwarelist name="pc6001_cass" description="NEC PC-6001 cassette snapshots">
 
+<!-- !Games -->
+
 	<software name="amazon" supported="partial">
 		<description>The Amazon</description>
 		<year>19??</year>
@@ -40,6 +42,49 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="2755">
 				<rom name="amita.cas" size="2755" crc="fbb5ec19" sha1="dc49c616fb7822f21ca895bbb5f3b16924d306d8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ax6" supported="no">
+		<description>AX-6</description>
+		<!-- Year from tape printout -->
+		<year>1982</year>
+		<publisher>ASCII</publisher>
+		<notes><![CDATA[
+Demo: should corrupt video when AY-based speech plays back (cfr. real HW refs)
+Space Enemy, Head-On: runs too fast
+]]></notes>
+		<info name="usage" value="Mode 1, Page 1 for all but for Powered Knight (Mode 2, Page 1)"/>
+		<!-- All from Side A -->
+		<part name="snap1" interface="pc6001_snap">
+			<feature name="part_id" value="Demonstration"/>
+			<dataarea name="snap" size="11407">
+				<rom name="ax-6 (demo).cas" size="11407" crc="535a388c" sha1="a08ed50e4f66fcdabce019ac2c644b321d5f667e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap2" interface="pc6001_snap">
+			<feature name="part_id" value="Powered Knight"/>
+			<dataarea name="snap" size="13612">
+				<rom name="ax-6 (powered knight).cas" size="13612" crc="9252969e" sha1="e0e3b0582c8c17d7f738dd2f61a9933420435283" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap3" interface="pc6001_snap">
+			<feature name="part_id" value="Mastermind"/>
+			<dataarea name="snap" size="6841">
+				<rom name="ax-6 (mastermind).cas" size="6841" crc="074faa75" sha1="ab0cfe272400c493d8fc563ce7d9f0f62d34ba99" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap4" interface="pc6001_snap">
+			<feature name="part_id" value="Head-On"/>
+			<dataarea name="snap" size="5711">
+				<rom name="ax-6 (head-on).cas" size="5711" crc="91f7d594" sha1="e64442f2c32f0a7b6c62e1adcc4555fcc8149b66" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap5" interface="pc6001_snap">
+			<feature name="part_id" value="Space Enemy"/>
+			<dataarea name="snap" size="5579">
+				<rom name="ax-6 (space enemy).cas" size="5579" crc="6601f428" sha1="4d922cef648f9efe001f25920bf1874ca5cbde52" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -133,18 +178,6 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		</part>
 	</software>
 
-	<software name="power" supported="partial">
-		<description>Power Knight</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Mode 1, Page 1" />
-		<part name="snap" interface="pc6001_snap">
-			<dataarea name="snap" size="13612">
-				<rom name="power.cas" size="13612" crc="9252969e" sha1="e0e3b0582c8c17d7f738dd2f61a9933420435283"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="proracer" supported="partial">
 		<description>Pro Racer</description>
 		<year>19??</year>
@@ -170,6 +203,7 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		</part>
 	</software>
 
+	<!-- TODO: did ASCII really released this in standalone form? -->
 	<software name="spcenemy" supported="partial">
 		<description>Space Enemy</description>
 		<year>1982</year>
@@ -265,5 +299,6 @@ Gameplay is too fast
 			</dataarea>
 		</part>
 	</software>
+
 
 </softwarelist>
