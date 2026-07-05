@@ -29,13 +29,14 @@ TODO (pc6601):
 - current regression caused by an internal FDC sense interrupt status that expects a
   DIO high that never occurs;
 - mon r-0 type games doesn't seem to work at all on this system?
+  Update: tries to autoload cassette at startup for some reason.
 
 TODO (pc6601mk2sr):
 - Implement MK-2 compatibility mode via view handler(s)
   (it changes the memory map to behave like the older versions);
 - Video Telopper (superimposer) & TV tuner functions for later machines;
 - pc6001mk2sr/pc6601sr: currently doesn't work without -debug enabled (?), has serious keyboard
-  issues.
+  issues, BASIC based programs hangs at a $e6bb check (irq not fired regression? bp 102c,1,{pc+=2;g})
 
 ===================================================================================================
 
@@ -795,7 +796,7 @@ void pc6001mk2_state::pc6001mk2_io(address_map &map)
 
 /*****************************************
  *
- * PC-6601 specific i/o
+ * PC-6601 specific I/O
  *
  ****************************************/
 
@@ -1780,8 +1781,8 @@ void pc6001_state::pc6001(machine_config &config)
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(pc6001_state::keyboard_callback), attotime::from_hz(250));
 	TIMER(config, "cassette_timer").configure_periodic(FUNC(pc6001_state::cassette_callback), attotime::from_hz(1200/12));
 
-	SOFTWARE_LIST(config, "cart_list_pc6001").set_original("pc6001_cart");
-	SOFTWARE_LIST(config, "cass_list_pc6001").set_original("pc6001_cass");
+	SOFTWARE_LIST(config, "cart_list").set_original("pc6001_cart");
+	SOFTWARE_LIST(config, "cass_list").set_original("pc6001_cass");
 }
 
 void pc6001mk2_state::pc6001mk2(machine_config &config)
@@ -1803,7 +1804,7 @@ void pc6001mk2_state::pc6001mk2(machine_config &config)
 
 	UPD7752(config, "upd7752", PC6001_MAIN_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	SOFTWARE_LIST(config, "cass_list_pc6001mk2").set_original("pc6001mk2_cass");
+	SOFTWARE_LIST(config, "cass_list_mk2").set_original("pc6001mk2_cass");
 }
 
 void pc6601_state::floppy_formats(format_registration &fr)
@@ -1845,6 +1846,9 @@ void pc6601_state::pc6601(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(pc6601_state::irq_callback));
 
 	pc6601_fdc_config(config);
+
+	// TODO: move this option to both regular mk2 and mk2sr
+	SOFTWARE_LIST(config, "flop_list_pc6001mk2").set_original("pc6001mk2_flop");
 }
 
 void pc6001mk2sr_state::pc6001mk2sr(machine_config &config)
@@ -1877,8 +1881,11 @@ void pc6001mk2sr_state::pc6001mk2sr(machine_config &config)
 	m_ym->port_b_write_callback().set(FUNC(pc6001mk2sr_state::joystick_out_w));
 	m_ym->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	// TODO: 1D 3'5" floppy drive
 	// TODO: telopper board (system explicitly asks for missing tape dump tho)
+
+	SOFTWARE_LIST(config, "cass_list_mk2sr").set_original("pc6001mk2sr_cass");
+	// TODO: specific option for 3.5"
+//	SOFTWARE_LIST(config, "flop_list_mk2sr").set_original("pc6001mk2sr_flop");
 }
 
 void pc6601sr_state::pc6601sr(machine_config &config)
@@ -2013,9 +2020,9 @@ ROM_START( pc6601sr )
 	ROM_COPY( "sr_sysrom", 0x18000, 0x00000, 0x8000 )
 ROM_END
 
-COMP( 1981, pc6001,       0,      0,        pc6001,      pc6001, pc6001_state,       empty_init, "NEC",   "PC-6001 (Japan)",              MACHINE_NOT_WORKING )
-COMP( 1981, pc6001a,      pc6001, 0,        pc6001,      pc6001, pc6001_state,       empty_init, "NEC",   "PC-6001A \"NEC Trek\" (US)",   MACHINE_NOT_WORKING )
-COMP( 1983, pc6001mk2,    0,      0,        pc6001mk2,   pc6001, pc6001mk2_state,    empty_init, "NEC",   "PC-6001mkII (Japan)",          MACHINE_NOT_WORKING )
-COMP( 1983, pc6601,       pc6001, 0,        pc6601,      pc6001, pc6601_state,       empty_init, "NEC",   "PC-6601 (Japan)",              MACHINE_NOT_WORKING )
-COMP( 1984, pc6001mk2sr,  0,      0,        pc6001mk2sr, pc6001, pc6001mk2sr_state,  empty_init, "NEC",   "PC-6001mkIISR (Japan)",        MACHINE_NOT_WORKING )
-COMP( 1984, pc6601sr,     pc6001, 0,        pc6601sr,    pc6001, pc6601sr_state,     empty_init, "NEC",   "PC-6601SR \"Mr. PC\" (Japan)", MACHINE_NOT_WORKING )
+COMP( 1981, pc6001,       0,           0,        pc6001,      pc6001, pc6001_state,       empty_init, "NEC",   "PC-6001 (Japan)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+COMP( 1981, pc6001a,      pc6001,      0,        pc6001,      pc6001, pc6001_state,       empty_init, "NEC",   "PC-6001A \"NEC Trek\" (US)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+COMP( 1983, pc6001mk2,    0,           0,        pc6001mk2,   pc6001, pc6001mk2_state,    empty_init, "NEC",   "PC-6001mkII (Japan)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+COMP( 1983, pc6601,       pc6001mk2,   0,        pc6601,      pc6001, pc6601_state,       empty_init, "NEC",   "PC-6601 (Japan)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+COMP( 1984, pc6001mk2sr,  0,           0,        pc6001mk2sr, pc6001, pc6001mk2sr_state,  empty_init, "NEC",   "PC-6001mkIISR (Japan)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+COMP( 1984, pc6601sr,     pc6001mk2sr, 0,        pc6601sr,    pc6001, pc6601sr_state,     empty_init, "NEC",   "PC-6601SR \"Mr. PC\" (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )

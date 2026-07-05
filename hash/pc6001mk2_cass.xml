@@ -10,7 +10,7 @@ Mode 2: N60 BASIC (32K)
 Mode 3: N60 EXTENDED BASIC (16K)
 Mode 4: N60 EXTENDED BASIC (32K)
 Mode 5: N60m BASIC (64K)
-Mode 6: N66SR BASIC (pc6001mk2sr/pc6601sr, separate SW list)
+Mode 6: N66SR BASIC (pc6001mk2sr/pc6601sr, cfr. pc6001mk2sr_cass.xml)
 
 This software list should ONLY be used for Mk II specific software which will require mode 5.
 Any software requiring modes 1-4 should be listed in the pc6001_cass.xml software list.
@@ -253,6 +253,7 @@ Requires better [keyboard] handling
 		<year>1984</year>
 		<publisher>Enix</publisher>
 		<info name="usage" value="Mode 5, Page 3, MONITOR" />
+		<info name="developer" value="K. Okamoto" />
 		<info name="alt_title" value="スランプ バブル大作戦"/>
 		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="28455">

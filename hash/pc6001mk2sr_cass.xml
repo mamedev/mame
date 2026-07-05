@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+Mode 6 PC-6001mkIISR/PC-6601SR cassette disks. They specifically needs N66SR BASIC
+-->
+<softwarelist name="pc6001mk2sr_cass" description="NEC PC-6001mkIISR/PC-6601SR cassette snapshots">
+
+<!-- !Covermount -->
+
+	<software name="jewels" supported="no">
+		<description>Jewels</description>
+		<!-- "1987/4/12" according to LIST -->
+		<year>1987</year>
+		<publisher>MyCom BASIC</publisher>
+		<info name="usage" value="Mode 6"/>
+		<info name="developer" value="Hiroshi Hashizume"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="6258">
+				<rom name="jewels.cas" size="6258" crc="db580f1c" sha1="5c864eb364178a616a88bd5ec04145417b34d1d0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="livarmor" supported="no">
+		<description>Living Armor</description>
+		<!-- according to LIST -->
+		<year>1992</year>
+		<publisher>MyCom BASIC</publisher>
+		<notes><![CDATA[
+Doesn't boot, throws a ?SN Error at 37376 when loading part 2 (should be at 10)
+]]></notes>
+		<info name="usage" value="Mode 6"/>
+		<info name="developer" value="M-P6"/>
+
+		<part name="snap1" interface="pc6001_snap">
+			<feature name="part_id" value="Part 1"/>
+			<dataarea name="snap" size="4060">
+				<rom name="living armor (part 1).cas" size="4060" crc="29c329c8" sha1="194d92ffa469bc3dc9bffc1e8b5c34379c39dbdd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap2" interface="pc6001_snap">
+			<feature name="part_id" value="Part 2"/>
+			<dataarea name="snap" size="9834">
+				<rom name="living armor (part 2).cas" size="9834" crc="dc7795ea" sha1="d159951a1b42db7ce7d609b003d46f498555cec3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pakuri" supported="no">
+		<description>Pakuridius: '88 Dragon Breath</description>
+		<!-- According to LIST -->
+		<year>1988</year>
+		<publisher>MyCom BASIC</publisher>
+		<notes><![CDATA[
+[VDG] Horizontal scrolling is non-functional (regression?)
+]]></notes>
+		<info name="usage" value="Mode 6"/>
+		<info name="developer" value="Hingo"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="6595">
+				<rom name="pakuridius.cas" size="6595" crc="d9243f9d" sha1="53543b3d88c66ae81a10106fe233ab855fc5f644" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="satan" supported="no">
+		<description>Satan</description>
+		<!-- BasicMagazine 1988.12 -->
+		<year>1988</year>
+		<publisher>MyCom BASIC</publisher>
+		<notes><![CDATA[
+Oddly scrolls horizontally during fights (verify)
+]]></notes>
+		<info name="usage" value="Mode 6"/>
+		<info name="developer" value="S.Y"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="16131">
+				<rom name="satan.cas" size="16131" crc="5e794cb2" sha1="318e84f8444522b3a52a3c369636d80e29f009d6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
