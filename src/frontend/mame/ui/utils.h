@@ -483,6 +483,14 @@ bool paste_text(std::string &buffer, F &&filter)
 	return paste_text(buffer, size, std::forward<F>(filter));
 }
 
+
+//-------------------------------------------------
+//  subsequence_rank - rank a name against a query
+//  returns 0 = no match, 1 = prefix, 2 = subsequence
+//-------------------------------------------------
+
+int subsequence_rank(std::string_view name, std::string_view query);
+
 } // namespace ui
 
 #endif // MAME_FRONTEND_UI_UTILS_H

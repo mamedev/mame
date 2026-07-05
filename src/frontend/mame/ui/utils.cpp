@@ -1980,6 +1980,25 @@ software_filter::ptr software_filter::create(util::core_file &file, software_fil
 	return nullptr;
 }
 
+int subsequence_rank(std::string_view name, std::string_view query)
+{
+	if (query.empty())
+		return 1;
+
+	// prefix match (case-insensitive) -> top group
+	if (name.size() >= query.size() && !core_strnicmp(name.data(), query.data(), query.size()))
+		return 1;
+
+	// subsequence match (ordered, case-insensitive) -> bottom group
+	size_t qi = 0;
+	for (size_t ni = 0; ni < name.size() && qi < query.size(); ++ni)
+	{
+		if (tolower(name[ni]) == tolower(query[qi]))
+			++qi;
+	}
+	return (qi == query.size()) ? 2 : 0;
+}
+
 } // namesapce ui
 
 
