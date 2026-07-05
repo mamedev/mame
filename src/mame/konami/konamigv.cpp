@@ -260,9 +260,9 @@ public:
 	{
 	}
 
-	void kdeadeye(machine_config &config);
-	void btchamp(machine_config &config);
-	void konamigv(machine_config &config);
+	void kdeadeye(machine_config &config) ATTR_COLD;
+	void btchamp(machine_config &config) ATTR_COLD;
+	void konamigv(machine_config &config) ATTR_COLD;
 
 protected:
 	void konamigv_map(address_map &map) ATTR_COLD;
@@ -307,7 +307,7 @@ public:
 	{
 	}
 
-	void simpbowl(machine_config &config);
+	void simpbowl(machine_config &config) ATTR_COLD;
 
 private:
 	virtual void machine_start() override ATTR_COLD;
@@ -335,10 +335,10 @@ public:
 	{
 	}
 
-	void tmosh(machine_config &config);
+	void tmosh(machine_config &config) ATTR_COLD;
 
-	void tmoshs_init();
-	void tmoshsp_init();
+	void tmoshs_init() ATTR_COLD;
+	void tmoshsp_init() ATTR_COLD;
 
 	void heartbeat_pulse_w(int state);
 	uint16_t tokimeki_serial_r();
@@ -1371,6 +1371,9 @@ ROM_START( kdeadeye )
 
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "kdeadeye.25c", 0x000000, 0x000080, CRC(3935d2df) SHA1(cbb855c475269077803c380dbc3621e522efe51e) )
+
+	ROM_REGION16_BE( 0x0080000, "flash", 0 ) // default Flash
+	ROM_LOAD( "kdeadeye.flash", 0x0000000, 0x0080000, CRC(f87f18cf) SHA1(67e5f76eb2b938942bd67dbb30508d4603e35f15) )
 
 	// constructed from six reads of the same disc using two drives, 80 sectors have Q subcode CRC errors
 	DISK_REGION( "cdrom" )
