@@ -1985,18 +1985,28 @@ int subsequence_rank(std::string_view name, std::string_view query)
 	if (query.empty())
 		return 1;
 
-	// prefix match (case-insensitive) -> top group
+	// prefix match (case-insensitive) -> best
 	if (name.size() >= query.size() && !core_strnicmp(name.data(), query.data(), query.size()))
 		return 1;
 
-	// subsequence match (ordered, case-insensitive) -> bottom group
+	// contiguous substring match (case-insensitive) -> good
+	if (name.size() >= query.size())
+	{
+		for (size_t i = 0; i + query.size() <= name.size(); ++i)
+		{
+			if (!core_strnicmp(name.data() + i, query.data(), query.size()))
+				return 2;
+		}
+	}
+
+	// subsequence match (ordered, case-insensitive) -> weakest
 	size_t qi = 0;
 	for (size_t ni = 0; ni < name.size() && qi < query.size(); ++ni)
 	{
 		if (tolower(name[ni]) == tolower(query[qi]))
 			++qi;
 	}
-	return (qi == query.size()) ? 2 : 0;
+	return (qi == query.size()) ? 3 : 0;
 }
 
 } // namesapce ui

@@ -486,7 +486,7 @@ bool paste_text(std::string &buffer, F &&filter)
 
 //-------------------------------------------------
 //  subsequence_rank - rank a name against a query
-//  returns 0 = no match, 1 = prefix, 2 = subsequence
+//  returns 0 = no match, 1 = prefix, 2 = substring, 3 = subsequence
 //-------------------------------------------------
 
 int subsequence_rank(std::string_view name, std::string_view query);
