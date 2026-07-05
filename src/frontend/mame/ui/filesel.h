@@ -69,6 +69,7 @@ private:
 		SELECTOR_ENTRY_TYPE_CREATE,
 		SELECTOR_ENTRY_TYPE_SOFTWARE_LIST,
 		SELECTOR_ENTRY_TYPE_DRIVE,
+		SELECTOR_ENTRY_TYPE_HOME,
 		SELECTOR_ENTRY_TYPE_DIRECTORY,
 		SELECTOR_ENTRY_TYPE_FILE
 	};
@@ -96,10 +97,30 @@ private:
 	bool const                          m_is_midi;
 	std::vector<file_selector_entry>    m_entrylist;
 	std::string                         m_filename;
+
+	std::string                         m_file_extensions;          // comma-separated, e.g. "tap,tzx,wav"
+	bool                                m_filter_extensions = true; // toggle with CLEAR (Del) key
 	std::pair<size_t, size_t>           m_clicked_directory;
+	std::string                         m_prev_directory;
+
+	struct shortcut_entry
+	{
+		file_selector_entry_type type;
+		std::string              label;
+		std::string              fullpath;
+	};
+	std::vector<shortcut_entry>            m_shortcuts;
+	int                                    m_shortcut_focus = 0;     // index of highlighted shortcut
+	bool                                   m_shortcut_mode = false;  // true when focus is on shortcut bar (line 0)
+	bool                                   m_shortcut_armed = false; // true when SELECT should activate shortcut
+	std::vector<std::pair<size_t, size_t>> m_shortcut_offsets;       // char ranges in combined text
+	std::pair<float, float>                m_shortcut_position;      // where shortcut text starts (x, y)
+	std::optional<text_layout>             m_shortcut_layout;        // persistent shortcut bar layout for hit testing
+	int                                    m_clicked_shortcut = -1;  // index of shortcut being clicked
 
 	virtual void populate() override;
 	virtual bool handle(event const *ev) override;
+	virtual bool handle_keys(uint32_t flags, int &iptkey) override;
 
 	// methods
 	file_selector_entry &append_entry(file_selector_entry_type entry_type, const std::string &entry_basename, const std::string &entry_fullpath);
@@ -107,8 +128,16 @@ private:
 	file_selector_entry *append_dirent_entry(const osd::directory::entry *dirent);
 	void append_entry_menu_item(const file_selector_entry *entry);
 	void select_item(const file_selector_entry &entry);
-	void update_search();
 	std::pair<size_t, size_t> get_directory_range(float x, float y);
+	int get_shortcut_at(float x, float y);
+	void update_search();
+	bool extension_matches(std::string_view filename) const;
+	static bool is_archive(std::string_view filename);
+	bool is_volume_root(std::string_view path) const;
+	static int search_rank(std::string_view name, std::string_view query);
+	static constexpr int DIR_CHECK_MAX_DEPTH = 3;
+	bool directory_has_matching_files(std::string_view path, int depth) const;
+	bool auto_descend();
 };
 
 
