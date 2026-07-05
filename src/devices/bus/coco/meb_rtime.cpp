@@ -12,7 +12,7 @@
 
 #include "emu.h"
 #include "meb_rtime.h"
-#include "machine/msm6242.h"
+#include "machine/rp5c15.h"
 #include "bus/centronics/ctronics.h"
 
 //#define VERBOSE (LOG_GENERAL)
@@ -41,7 +41,7 @@ namespace
 			void busy_w(int state);
 			static u8 translate_rtc_address(u8 software_addr);
 
-			required_device<msm6242_device> m_rtc;
+			required_device<rp5c15_device> m_rtc;
 			u8 m_rtc_address;
 			u8 m_double_write;
 			required_device<centronics_device> m_centronics;
@@ -88,7 +88,8 @@ namespace
 
 	void disto_rtime_device::device_add_mconfig(machine_config &config)
 	{
-		MSM6242(config, m_rtc, XTAL(32'768), false /* 12 hour time */);
+// 		MSM6242(config, m_rtc, XTAL(32'768), false /* 12 hour time */);
+ 		RP5C15(config, m_rtc,  XTAL(32'768));
 
 		CENTRONICS(config, m_centronics, centronics_devices, "printer");
 		m_centronics->busy_handler().set(FUNC(disto_rtime_device::busy_w));
@@ -110,6 +111,8 @@ namespace
 
 	u8 disto_rtime_device::translate_rtc_address(u8 software_addr)
 	{
+		return software_addr;
+
 		if (software_addr < 6 || software_addr > 12)
 			return software_addr;
 
