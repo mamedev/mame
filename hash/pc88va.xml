@@ -1343,6 +1343,9 @@ Crashes after stage 1 (fixed, cfr. usage)
 		<description>Pac-Man</description>
 		<year>2006?</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+[Clock HACK] Cannot be played, player dies when starting a life (regression)
+]]></notes>
 		<info name="developer" value="Shinra" />
 		<info name="usage" value="Boot a PC-Engine OS disk, then swap with this disk and type BASIC PACMAN.BAS to load" />
 		<part name="flop1" interface="floppy_5_25">
@@ -1357,6 +1360,9 @@ Crashes after stage 1 (fixed, cfr. usage)
 		<description>Pac-Man (auto-bootable)</description>
 		<year>2011?</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+(Same as pacman)
+]]></notes>
 		<info name="developer" value="Shinra" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">

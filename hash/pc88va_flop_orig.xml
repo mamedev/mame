@@ -13,6 +13,7 @@ license:CC0-1.0
 Garbage layer covering title and gameplay (fixed)
 [FDC] randomly doesn't boot
 [keyboard] or [joystick] cannot stop input movement in gameplay (verify, part of the "Special" arrange?)
+Emulation takes a while to close off with this SW, why?
 ]]></notes>
 		<info name="alt_title" value="アランティアＶＡスペシャル" />
 		<info name="developer" value="Cross Media Soft" />

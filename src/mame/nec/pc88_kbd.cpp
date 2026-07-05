@@ -21,6 +21,14 @@ TODO:
 
 #include "utf8.h"
 
+//#include "iostream.h"
+
+#define VERBOSE (LOG_GENERAL)
+//#define LOG_OUTPUT_STREAM std::cout
+
+#include "logmacro.h"
+
+
 DEFINE_DEVICE_TYPE(PC8001_KBD,   pc8001_kbd_device,   "pc8001_kbd",     "NEC PC-8001 Keyboard")
 DEFINE_DEVICE_TYPE(PC8801_KBD,   pc8801_kbd_device,   "pc8801_kbd",     "NEC PC-8801 Keyboard")
 DEFINE_DEVICE_TYPE(PC8801FH_KBD, pc8801fh_kbd_device, "pc8801fh_kbd",   "NEC PC-8801FH Keyboard")
@@ -374,6 +382,7 @@ void pc88va_kbd_device::key_make(uint8_t row, uint8_t column)
 void pc88va_kbd_device::key_break(uint8_t row, uint8_t column)
 {
 	// TODO: eventually thrown away by the MCU after set time
+	// is it also supposed to send scancode |= 0x80 to the host like PC-98?
 	m_scan_code = 0xff;
 	m_irq_cb(0);
 }
@@ -381,5 +390,27 @@ void pc88va_kbd_device::key_break(uint8_t row, uint8_t column)
 void pc88va_kbd_device::key_repeat(uint8_t row, uint8_t column)
 {
 	// ...
+}
+
+/*
+ * 10-- -1-- FCLR FIFO clear
+ * 10-- --1- PTRY/RTRY (*) Retransmission Request
+ * 10-- ---1 RESET Sub CPU reset
+ * 11-x ---- KTARY/KTRAY (*) JIS Layout (0) <prohibited> (1)
+ * 11-- x--- KCIFE Key Code Interface Operation Mode (1) Use Matrix only (0)
+ * 11-- -1-- AREP Auto Repeat Operation
+ * 11-- --1- PRIK Priority Key Pre-transmission
+ * 11-- ---1 FCTRL FIFO Control
+ *
+ * (*) TODO: doc mistake, define actual shortnames
+ */
+void pc88va_kbd_device::write_command(offs_t offset, u8 data)
+{
+	LOG("command_w: %02x\n", data);
+	// TODO: all SWs just calls here with either 0x81 or 0x4d
+	// the mildly special cases are shanghai and lodoss, which calls an extra 0x4d along the way.
+	// Also: isn't supposed to be 0xcd according to documentation?
+	if (data != 0x81 && data != 0x4d)
+		popmessage("pc88_kbd.cpp: warning write_command %02x", data);
 }
 
