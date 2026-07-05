@@ -932,9 +932,9 @@ void xerox820ii_state::add_8086(machine_config &config)
 }
 
 // the 16/8 machines: 820-II hardware + the 8086 coprocessor card + the LP keyboard
-void xerox820ii_state::xerox168(machine_config &config)  { common(config, "fdc");    add_8086(config); add_lpk(config); } // 16/8, 8" floppy
-void xerox820ii_state::xerox1685(machine_config &config) { common(config, "fdc5");   add_8086(config); add_lpk(config); } // 16/8, 5.25" floppy (FD1797 daughterboard; mixed SD/DD)
-void xerox820ii_state::xerox168s(machine_config &config) { common(config, "sasi");   add_8086(config); add_lpk(config); } // 16/8, SASI
+void xerox820ii_state::xerox168(machine_config &config)  { common(config, "fdc");    add_8086(config); add_820ii_kbd(config); } // 16/8, 8" floppy (X928 ASCII keyboard)
+void xerox820ii_state::xerox1685(machine_config &config) { common(config, "fdc5");   add_8086(config); add_820ii_kbd(config); } // 16/8, 5.25" floppy (FD1797 daughterboard; mixed SD/DD; X928 ASCII keyboard)
+void xerox820ii_state::xerox168s(machine_config &config) { common(config, "sasi");   add_8086(config); add_820ii_kbd(config); } // 16/8, SASI (X928 ASCII keyboard)
 void xerox820ii_state::xerox168em(machine_config &config) // 16/8 + Expansion Module II (EM-II / WD1002-05)
 {
 	// The EM-II is a slot-connected expansion: the copro/8086-slot card owns
@@ -988,7 +988,7 @@ ROM_END
 // The base 820-II boot ROM set, shared by the FD1797 floppy (5.25"/8") and the SASI
 // disk-board variants (the ROM auto-detects the daughterboard via the PA bits).
 ROM_START( x820ii ) // 820-II, 8" floppy
-	ROM_DEFAULT_BIOS( "v50" ) // the standard keyboard and the in-ROM SASI driver both live in u33-u35 (the missing v500.u36 is not needed for floppy or SASI operation).  The v50v018 "Typewriter" build gates keyboard input differently (no echo from the standard keyboard).
+	ROM_DEFAULT_BIOS( "v50" ) // the X928 keyboard and the in-ROM SASI driver live in u33-u35; u36 carries the position-encoded low-profile (G25) keyboard decode table.
 	// v4.00/v4.01 u33-u35 and v4.04 u36 are not chip reads: they are ROM images recovered from Balcones/Xerox distribution master disks in the Don Maslin 820-II archive (bitsavers 820ii_images) and functionally validated by booting.  Images + recovered source: https://github.com/davidlrand/mame-system-media (Xerox-820-line-roms)
 	ROM_SYSTEM_BIOS( 0, "v400",    "Balcones Operating System v4.00" ) // u33-u35 split from ROM400.COM, master disk B16D35
 	ROM_SYSTEM_BIOS( 1, "v401",    "Balcones Operating System v4.01" ) // u33-u35 decoded from U3x.HEX, "820-II ROM IMAGES MASTER" disk B17D7
@@ -996,7 +996,6 @@ ROM_START( x820ii ) // 820-II, 8" floppy
 	ROM_SYSTEM_BIOS( 3, "v403",    "Balcones Operating System v4.03" )
 	ROM_SYSTEM_BIOS( 4, "v404",    "Balcones Operating System v4.04" )
 	ROM_SYSTEM_BIOS( 5, "v50",     "Balcones Operating System v5.0" )
-	ROM_SYSTEM_BIOS( 6, "v50v018", "Balcones Operating System v5.0 v018" )
 
 	ROM_REGION( 0x2000, Z80_TAG, 0 )
 	ROMX_LOAD( "v400.u33",              0x0000, 0x0800, CRC(0d1bcaa8) SHA1(a6ac83f8584d19f7a08e666cb5d4b62620d7d3c0), ROM_BIOS(0) )
@@ -1019,12 +1018,8 @@ ROM_START( x820ii ) // 820-II, 8" floppy
 	ROMX_LOAD( "v404.u36",              0x1800, 0x0800, CRC(97047d38) SHA1(f36506635653736b8d754d2c04f608180602b5a2), ROM_BIOS(4) ) // RX ver 016 (27-Sep-83), best-available pair for v4.04, functionally validated; decoded from U36.ROM, master disk B17D7
 	ROMX_LOAD( "u33.5.0_537p10828.bin", 0x0000, 0x0800, CRC(a17af0f1) SHA1(b1d9a151ed4558f49b3cdc1adbf348b54da48877), ROM_BIOS(5) )
 	ROMX_LOAD( "u34.5.0_537p10829.bin", 0x0800, 0x0800, CRC(c9f5182e) SHA1(ac830848614cea984c849a42687ea2944d6765d9), ROM_BIOS(5) )
-	ROMX_LOAD( "u35.5.0_537p10830.bin", 0x1000, 0x0800, CRC(278fa75f) SHA1(f47cf9eb30366211280f93a8460523fcc53eebe9), ROM_BIOS(5) )
-	ROMX_LOAD( "v500.u36",              0x1800, 0x0800, NO_DUMP,                                                      ROM_BIOS(5) )
-	ROMX_LOAD( "537p10828.u33.5.0.bin", 0x0000, 0x0800, CRC(a17af0f1) SHA1(b1d9a151ed4558f49b3cdc1adbf348b54da48877), ROM_BIOS(6) )
-	ROMX_LOAD( "537p10829.u34.5.0.bin", 0x0800, 0x0800, CRC(c9f5182e) SHA1(ac830848614cea984c849a42687ea2944d6765d9), ROM_BIOS(6) )
-	ROMX_LOAD( "u35.5.0_537p10830.bin", 0x1000, 0x0800, CRC(278fa75f) SHA1(f47cf9eb30366211280f93a8460523fcc53eebe9), ROM_BIOS(6) ) // good dump from Balcones v5.0 source disk B23D13; was BAD_DUMP cc4e1c2b
-	ROMX_LOAD( "537p10831.u36.5.0.bin", 0x1800, 0x0800, CRC(cda7f598) SHA1(08ffd18959e1708136076c82486b8d121a04fa23), ROM_BIOS(6) )
+	ROMX_LOAD( "u35.5.0_537p10830.bin", 0x1000, 0x0800, CRC(278fa75f) SHA1(f47cf9eb30366211280f93a8460523fcc53eebe9), ROM_BIOS(5) ) // good dump from Balcones v5.0 source disk B23D13; was BAD_DUMP cc4e1c2b
+	ROMX_LOAD( "537p10831.u36.5.0.bin", 0x1800, 0x0800, CRC(cda7f598) SHA1(08ffd18959e1708136076c82486b8d121a04fa23), ROM_BIOS(5) ) // recovered from Balcones v5.0 source disk B23D13 (U36-V18.ROM); that disk carries u33-u35 matching this set and only this one u36
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROMX_LOAD( "x820ii.u57",       0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(0) )
@@ -1039,8 +1034,6 @@ ROM_START( x820ii ) // 820-II, 8" floppy
 	ROMX_LOAD( "x820ii.u58",       0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(4) )
 	ROMX_LOAD( "x820ii.u57",       0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(5) )
 	ROMX_LOAD( "x820ii.u58",       0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(5) )
-	ROMX_LOAD( "x820ii.u57",       0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(6) )
-	ROMX_LOAD( "x820ii.u58",       0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(6) )
 ROM_END
 
 // the 5.25" floppy, SASI hard disk and low-profile-keyboard variants use the
