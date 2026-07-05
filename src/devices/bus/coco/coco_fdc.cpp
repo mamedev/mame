@@ -477,8 +477,8 @@ ROM_START(coco_scii)
 	ROMX_LOAD("cdos 1_2 3-30-89 cc3.bin", 0x0000, 0x4000, CRC(891c0094) SHA1(c1fa0fcbf1202a9b63aafd98dce777b502584230), ROM_BIOS(1))
 	ROM_RELOAD(0x4000,0x4000)
 
-	ROM_SYSTEM_BIOS(2, "eados3-103-drt", "Extended A-DOS 3 1.03 for the CoCo 3 with Disto real time board")
-	ROMX_LOAD("e-ados3-40-drt.bin", 0x0000, 0x4000, CRC(e28dce92) SHA1(3cbfe1ff3d062c1955f621b0304aa926087e5c71), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "eados3-102-drt", "Extended A-DOS 3 1.03 for the CoCo 3 with Disto real time board")
+	ROMX_LOAD("e-ados3-102-40-drt.bin", 0x0000, 0x4000, CRC(682bbd9b) SHA1(da773c566368f6094d3c8901bfb29a445bc7e84e), ROM_BIOS(2))
 	ROM_RELOAD(0x4000,0x4000)
 ROM_END
 
