@@ -921,14 +921,13 @@ void netmerc_state::machine_reset()
 {
 	model1_state::machine_reset();
 
-	if (m_dpram)
+	// Initial HMD (VR glasses) pose: camera orientation vector
+	// 12868 ≈ 90°, 25736 ≈ 180° — points the camera forward
+	constexpr int16_t pose[6] = {0, 0, 0, 12868, 25736, 12868};
+	for (int i = 0; i < 6; i++)
 	{
-		int16_t pose[6] = {0, 0, 0, 12868, 25736, 12868};
-		for (int i = 0; i < 6; i++)
-		{
-			m_dpram->left_w(0x80 + i*2, pose[i] & 0xff);
-			m_dpram->left_w(0x81 + i*2, (pose[i] >> 8) & 0xff);
-		}
+		m_dpram->left_w(0x80 + i * 2, pose[i] & 0xff);
+		m_dpram->left_w(0x81 + i * 2, (pose[i] >> 8) & 0xff);
 	}
 }
 
