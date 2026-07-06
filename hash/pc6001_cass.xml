@@ -630,5 +630,42 @@ Gameplay is too fast
 		</part>
 	</software>
 
+<!-- !Covermount -->
+
+	<software name="takeoff" supported="no">
+		<description>Take Off 6000</description>
+		<!-- BasicMagazine 1989.10 -->
+		<year>1989</year>
+		<publisher>MyCom BASIC</publisher>
+		<notes><![CDATA[
+[VDG] doesn't show avoidable objects in pc6001
+]]></notes>
+		<info name="usage" value="Mode 1, Page 1"/>
+		<info name="developer" value="Keisuke Ikeda"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="996">
+				<rom name="take off 6000.cas" size="996" crc="86f45f12" sha1="2478f8a396ef60aad73c4e1a589baa2227a17529" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Homebrew -->
+
+	<!-- original as MyCom BASIC release -->
+	<!-- preview version known to exist -->
+	<software name="fdot2" supported="partial">
+		<description>F-Dot 2</description>
+		<!-- 2011/09/21 in LIST header -->
+		<year>2011</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="usage" value="Mode 2, Page 2"/>
+		<info name="developer" value="Kaw"/>
+
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="4880">
+				<rom name="f-dot 2.p6" size="4880" crc="3e4655dd" sha1="c3bffcb6419ec79398d4e0f6e1ba0aae5d934ba9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>

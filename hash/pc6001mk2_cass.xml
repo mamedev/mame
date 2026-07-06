@@ -123,12 +123,31 @@ Requires user [tape] saving, prompts user after character creation
 		</part>
 	</software>
 
-	<software name="castleex" supported="partial">
+	<software name="castle" supported="no">
+		<description>The Castle</description>
+		<year>1986</year>
+		<publisher>ASCII</publisher>
+		<notes><![CDATA[
+[timing] runs too fast
+]]></notes>
+		<info name="usage" value="Mode 5, Page 2, BASIC"/>
+		<info name="alt_title" value="ザ・キャッスル"/>
+
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="32980">
+				<rom name="the castle.cas" size="32980" crc="a0dbd3ff" sha1="8a2bfd8f7adf7bee454b7d1636eceb6f1fb46c39" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="castleex" supported="no">
 		<description>Castle Excellent</description>
 		<year>1986?</year>
 		<publisher>ASCII</publisher>
 		<notes><![CDATA[
 [gfx] wrong scan draw for title screen copyright text, bad dump?
+[timing] runs too fast
+[keyboard] has input problems, keeps going to the left
 ]]></notes>
 		<info name="usage" value="Mode 5, Page 2, BASIC" />
 		<info name="alt_title" value="キャッスルエクセレント"/>
@@ -498,6 +517,22 @@ May require [keyboard] kana lock to work properly
 		</part>
 	</software>
 
+	<software name="volguard" supported="no">
+		<description>Volguard</description>
+		<year>1985</year>
+		<publisher>dB-Soft</publisher>
+		<notes><![CDATA[
+[timing] runs too fast
+]]></notes>
+		<info name="usage" value="Mode 5, Page 2, BASIC"/>
+		<info name="alt_title" value="ヴォルガード"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="48365">
+				<rom name="volguard.cas" size="48365" crc="05451d36" sha1="d57543793db9c5222aa286bf55c9fc5413f87b80" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="yakyukyo" supported="partial">
 		<description>Yakyuu Kyou</description>
 		<year>1984</year>
@@ -522,6 +557,27 @@ May require [keyboard] kana lock to work properly
 		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="11651">
 				<rom name="vital lamp.cas" size="11651" crc="233234b8" sha1="7e20c5c9a1cfd78c8ba152a5d417dd6976d5695d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Homebrew -->
+
+	<software name="mandelbr" supported="no">
+		<description>Mandelbrot demo</description>
+		<!-- Source code timestamps: 05/10/2012 -->
+		<year>2012?</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Verify produced shape
+Takes 1h30m to complete (verify)
+]]></notes>
+		<info name="usage" value="Mode 5, Page 3"/>
+		<info name="developer" value="Bookworm"/>
+
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="4774">
+				<rom name="mandelbrot demo.p6" size="4774" crc="58858b7e" sha1="cb776144d9265be69589a6e00a38286d26942430" offset="0" />
 			</dataarea>
 		</part>
 	</software>
