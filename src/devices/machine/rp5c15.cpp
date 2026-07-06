@@ -66,7 +66,7 @@ enum
 // register write mask
 static const int register_write_mask[2][16] =
 {
-	{ 0xf, 0x7, 0xf, 0x7, 0xf, 0x7, 0x7, 0xf, 0x3, 0xf, 0x1, 0xf, 0xf, 0xf, 0xf, 0xf },
+	{ 0xf, 0x7, 0xf, 0x7, 0xf, 0x3, 0x7, 0xf, 0x3, 0xf, 0x1, 0xf, 0xf, 0xf, 0xf, 0xf },
 	{ 0x3, 0x1, 0xf, 0x7, 0xf, 0x3, 0x7, 0xf, 0x3, 0x0, 0x1, 0x3, 0x0, 0xf, 0xf, 0xf }
 };
 
@@ -299,7 +299,7 @@ void rp5c15_device::rtc_clock_updated(int year, int month, int day, int day_of_w
 			hour = 12;
 
 		m_reg[MODE00][REGISTER_1_HOUR] = hour % 10;
-		m_reg[MODE00][REGISTER_10_HOUR] = (hour / 10) | (pm << 2);
+		m_reg[MODE00][REGISTER_10_HOUR] = (hour / 10) | (pm << 1);
 	}
 	else // 24-hour mode
 	{
@@ -420,8 +420,8 @@ void rp5c15_device::write(offs_t offset, uint8_t data)
 			int hour;
 			if ((m_reg[MODE01][REGISTER_12_24_SELECT] & 0x01) == 0) // 12-hour mode
 			{
-				int pm = (m_reg[MODE00][REGISTER_10_HOUR] >> 2) & 1;
-				int h12 = (m_reg[MODE00][REGISTER_10_HOUR] & 0x03) * 10 + m_reg[MODE00][REGISTER_1_HOUR];
+				int pm = (m_reg[MODE00][REGISTER_10_HOUR] >> 1) & 1;
+				int h12 = (m_reg[MODE00][REGISTER_10_HOUR] & 0x01) * 10 + m_reg[MODE00][REGISTER_1_HOUR];
 				if (h12 == 12) h12 = 0;
 				hour = h12 + (pm ? 12 : 0);
 			}
