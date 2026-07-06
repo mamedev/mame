@@ -417,13 +417,15 @@ uint16_t sega_32x_device::dreq_common_r(address_space &space, offs_t offset)
 		case 0x0a/2: // a15112 / 4012
 			if (&space == &_68kspace)
 			{
-				logerror("attempting to READ FIFO with 68k!\n");
+				if (!machine().side_effects_disabled())
+					logerror("attempting to READ FIFO with 68k!\n");
 				return 0xffff;
 			}
 
 			if (m_fifo[m_fifo_read_block].empty())
 			{
-				logerror("Attempt to read FIFO while empty %c!\n", m_fifo_read_block ? 'B' : 'A');
+				if (!machine().side_effects_disabled())
+					logerror("Attempt to read FIFO while empty %c!\n", m_fifo_read_block ? 'B' : 'A');
 				return 0xffff;
 			}
 
@@ -846,7 +848,8 @@ uint16_t sega_32x_device::pwm_r(offs_t offset)
 		case 0x08/2: return m_lch_fifo_state & m_rch_fifo_state; // mono ch
 	}
 
-	logerror("Read at undefined PWM register %02x\n",offset);
+	if (!machine().side_effects_disabled())
+		logerror("Read at undefined PWM register %02x\n",offset);
 	return 0xffff;
 }
 
