@@ -2560,7 +2560,7 @@ void towns_state::machine_reset()
 	m_rtc_busy = false;
 	m_vram_mask_addr = 0;
 	m_towns_pcm_channel_flag = 0;
-	m_towns_pcm_channel_mask = 0xff;
+	m_towns_pcm_channel_mask = 0;
 	m_towns_pcm_irq_flag = 0;
 	m_towns_fm_irq_flag = 0;
 	m_dma_msb[0] = m_dma_msb[1] = 0;
