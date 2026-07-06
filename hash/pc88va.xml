@@ -255,7 +255,6 @@ VIDEO.BAT has various superimpose effects, requires dedicated board
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<notes><![CDATA[
 [SGP] playfield artifacts (press button 2 from pitcher side in 2p play)
-[DE-9] optional Dual Joyport input method (Game Arts デュアル ジョイポート, manual wanted)
 Cursor abruptly cycles when 1 player or 2 players is selected (btanb, same as fmtowns:famist90)
 Win/Lose newspaper screen has [IDP] one frame of sprite lag
 [IDP] text draws below sprites (verify)
@@ -265,6 +264,8 @@ Throws an "OUT" shout when selecting 3rd option "new pennant race", bad dump?
 ]]></notes>
 		<info name="alt_title" value="ファミリースタジアム" />
 		<info name="usage" value="Menuing works with keyboard only until game prompts you to use a joystick"/>
+		<sharedfeat name="mouseport_default" value="dual_joyport"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1281968">
@@ -302,6 +303,7 @@ Untested user disk creation
 		<info name="usage" value="Menuing works with keyboard only until game prompts you to use a joystick"/>
 		<!--combined image-->
 		<!--rom name="family stadium pennant race ban (va).d88" size="2563936" crc="91d95d8e" sha1="3d31ab00a0be2f792d2bcb031afd065d138c747a"/-->
+		<sharedfeat name="mouseport_default" value="dual_joyport"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
@@ -328,6 +330,7 @@ Untested user disk creation
 Untested user disk creation
 ]]></notes>
 		<info name="alt_title" value="ファミリースタジアム'89ペナントレース編" />
+		<sharedfeat name="mouseport_default" value="dual_joyport"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />

@@ -8707,7 +8707,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="famist90" supported="no">
+	<software name="famist90" supported="partial">
 		<!--
 		Origin: redump.org
 		<rom name="Pro Yakyuu Family Stadium - 90-nendo Pennant Race-ban (Japan) (Track 01).bin" size="9532656" crc="195eda5e" sha1="104ec7347d3e9aac9dd4a0700025dfe4f54edf39"/>
@@ -8726,7 +8726,8 @@ User/save disks that can be created from the game itself are not included.
 		<year>1990</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<notes><![CDATA[
-Hangs after getting a strike/ball, including CPU vs. CPU games
+Sometimes scorecard glitches out in between innings (i.e. crowd GFX overriding scorecard)
+Unlike pc88va versions newspaper doesn't scroll down at end of match, player face sprite also flickers a bit (verify)
 ]]></notes>
 		<info name="serial" value="HMB-135"/>
 		<info name="alt_title" value="プロ野球ファミリー・スタジアム　９０年度　ペナント・レース版" />

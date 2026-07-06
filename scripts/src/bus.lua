@@ -3413,6 +3413,8 @@ if BUSES["MSX_CTRL"] then
 	files {
 		MAME_DIR .. "src/devices/bus/msx/ctrl/ctrl.cpp",
 		MAME_DIR .. "src/devices/bus/msx/ctrl/ctrl.h",
+		MAME_DIR .. "src/devices/bus/msx/ctrl/dual_joyport.cpp",
+		MAME_DIR .. "src/devices/bus/msx/ctrl/dual_joyport.h",
 		MAME_DIR .. "src/devices/bus/msx/ctrl/hypershot.cpp",
 		MAME_DIR .. "src/devices/bus/msx/ctrl/hypershot.h",
 		MAME_DIR .. "src/devices/bus/msx/ctrl/joystick.cpp",
