@@ -52,7 +52,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer_cb);
 
-	uint32_t screen_update_segapm(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -61,7 +61,7 @@ void segapm_state::video_start()
 	m_screen->register_screen_bitmap(m_bitmap);
 }
 
-uint32_t segapm_state::screen_update_segapm(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t segapm_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
@@ -153,7 +153,7 @@ void segapm_state::segapm(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK_NTSC / 8, 427, 0, 320, 262, 0, 224);
-	m_screen->set_screen_update(FUNC(segapm_state::screen_update_segapm));
+	m_screen->set_screen_update(FUNC(segapm_state::screen_update));
 
 	SPEAKER(config, "speaker", 2).front();
 }
