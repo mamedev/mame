@@ -67,12 +67,6 @@ private:
 	int m_sdram_kwords;
 	int m_initial_copy_words;
 	int m_vectorbase = 0;
-
-	u8 nand_data_in(offs_t offset);
-	void nand_data_out(offs_t offset, u8 data);
-	void nand_address_out(offs_t offset, u8 data);
-	void nand_command_out(offs_t offset, u8 data);
-
 };
 
 

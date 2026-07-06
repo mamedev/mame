@@ -51,27 +51,6 @@ void generalplus_gpac800_game_state::cs1_w(offs_t offset, u16 data)
 	m_sdram[offset & (m_sdram_kwords-1)] = data;
 }
 
-
-u8 generalplus_gpac800_game_state::nand_data_in(offs_t offset)
-{
-	return m_nand->data_r();
-}
-
-void generalplus_gpac800_game_state::nand_data_out(offs_t offset, u8 data)
-{
-	logerror("nand_data_out %02x\n", data);
-}
-
-void generalplus_gpac800_game_state::nand_address_out(offs_t offset, u8 data)
-{
-	m_nand->address_w(data);
-}
-
-void generalplus_gpac800_game_state::nand_command_out(offs_t offset, u8 data)
-{
-	m_nand->command_w(data);
-}
-
 void generalplus_gpac800_game_state::dma_complete_hacks(int state)
 {
 	// HACKS to get into service mode for debugging (needed for testing as many of these require input sequences on the not yet emulated custom controls)
@@ -121,10 +100,10 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 	m_maincpu->set_cs_config_callback(FUNC(gcm394_game_state::cs_callback));
 	m_maincpu->set_cs_space(DEVICE_SELF, 0);
 	m_maincpu->dma_complete_callback().set(FUNC(generalplus_gpac800_game_state::dma_complete_hacks));
-	m_maincpu->nand_command_out().set(FUNC(generalplus_gpac800_game_state::nand_command_out));
-	m_maincpu->nand_address_out().set(FUNC(generalplus_gpac800_game_state::nand_address_out));
-	m_maincpu->nand_data_out().set(FUNC(generalplus_gpac800_game_state::nand_data_out));
-	m_maincpu->nand_data_in().set(FUNC(generalplus_gpac800_game_state::nand_data_in));
+	m_maincpu->nand_command_out().set(m_nand, FUNC(nand_device::command_w));
+	m_maincpu->nand_address_out().set(m_nand, FUNC(nand_device::address_w));
+	m_maincpu->nand_data_out().set(m_nand, FUNC(nand_device::data_w));
+	m_maincpu->nand_data_in().set(m_nand, FUNC(nand_device::data_r));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);

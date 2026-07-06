@@ -34,6 +34,7 @@ protected:
 private:
 	u16 nand_7850_status_r();
 	u16 nand_data_r();
+	void nand_data_w(u16 data);
 	void nand_dma_ctrl_w(u16 data);
 	void nand_7850_w(u16 data);
 	void nand_command_w(u16 data);

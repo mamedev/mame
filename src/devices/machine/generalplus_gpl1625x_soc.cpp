@@ -5,7 +5,7 @@
 #include "generalplus_gpl1625x_soc.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// GPL16250A register list
+// GPL16250 register list
 //
 // 7000 - Tx3_X_Position
 // 7001 - Tx3_Y_Position
@@ -585,6 +585,11 @@ u16 generalplus_gpac800_device::nand_data_r()
 	return m_nand_data_in();
 }
 
+void generalplus_gpac800_device::nand_data_w(u16 data)
+{
+	m_nand_data_out(data & 0xff);
+}
+
 // 7998
 
 void generalplus_gpac800_device::nand_command_w(u16 data)
@@ -607,6 +612,11 @@ void generalplus_gpac800_device::nand_addr_high_w(u16 data)
 
 	// documentation indicates that the NAND Interface won't write the address to the NAND, even if only 2 bytes are needed
 	// unless this address is written, so presumably all 4 address bytes get sent after the write here
+
+	// m_nand_dma_ctrl is 8600 when this is written, which would indicate the 4th byte isn't used
+	// but it's needed? (eg. jak_gtg going to title screen) so maybe doesn't realte to these bytes
+
+	// the timing of these writes on hardware is unclear
 	m_nand_address_out(m_nand_addr_low & 0xff);
 	m_nand_address_out(m_nand_addr_low >> 8);
 	m_nand_address_out(m_nand_addr_high & 0xff);
@@ -827,11 +837,14 @@ void generalplus_gpac800_device::gpac800_internal_map(address_map &map)
 	map(0x007851, 0x007851).w(FUNC(generalplus_gpac800_device::nand_command_w)); // NAND Command Reg
 	map(0x007852, 0x007852).w(FUNC(generalplus_gpac800_device::nand_addr_low_w)); // NAND Low Address Reg
 	map(0x007853, 0x007853).w(FUNC(generalplus_gpac800_device::nand_addr_high_w)); // NAND High Address Reg
-	map(0x007854, 0x007854).r(FUNC(generalplus_gpac800_device::nand_data_r)); // NAND Data Reg
+	map(0x007854, 0x007854).rw(FUNC(generalplus_gpac800_device::nand_data_r), FUNC(generalplus_gpac800_device::nand_data_w)); // NAND Data Reg
 	map(0x007855, 0x007855).w(FUNC(generalplus_gpac800_device::nand_dma_ctrl_w)); // NAND DMA / INT Control
 	map(0x007856, 0x007856).w(FUNC(generalplus_gpac800_device::nand_bch_ctrl_w)); // usually 0x0021?
 
 	map(0x007857, 0x007857).w(FUNC(generalplus_gpac800_device::nand_ecc_ctrl_w));
+
+	// 7858 - 785f can have a different meaning if nand_bch_ctrl bit 0 is set!
+	
 	// 7858 - ECC_LPRL_LB
 	// 7859 - ECC_LPRH_LB
 	// 785a - ECC_CPR_LB
@@ -843,7 +856,7 @@ void generalplus_gpac800_device::gpac800_internal_map(address_map &map)
 
 	map(0x007943, 0x007943).r(FUNC(generalplus_gpac800_device::spi_rxstatus_r));
 
-	map(0x007ae2, 0x007ae2).r(FUNC(generalplus_gpac800_device::efuse2_r));
+	map(0x007ae2, 0x007ae2).r(FUNC(generalplus_gpac800_device::efuse2_r)); // checked by the internal boot ROM
 
 	// 128kwords internal ROM
 	//map(0x08000, 0x0ffff).rom().region("internal", 0); // lower 32kwords of internal ROM is visible / shadowed depending on boot pins and register

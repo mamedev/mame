@@ -35,7 +35,6 @@ DEFINE_DEVICE_TYPE(SANDISK_NAND_256MB_512_DEVICE,  sandisk_nand_256mb_512_device
 DEFINE_DEVICE_TYPE(HYNIX_HY27UF084G2M,  hynix_hy27uf084g2m_device,  "hynix_hy27uf084g2m",  "Hynix HY27UF084G2M")
 
 
-
 nand_device::nand_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nand_device(mconfig, NAND, tag, owner, clock)
 {
@@ -206,7 +205,6 @@ hynix_hy27uf084g2m_device::hynix_hy27uf084g2m_device(const machine_config &mconf
 	m_sequential_row_read = 1; // uncertain
 }
 
-
 toshiba_tc58256aft_device::toshiba_tc58256aft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nand_device(mconfig, TOSHIBA_TC58256AFT, tag, owner, clock)
 {
@@ -266,7 +264,6 @@ sandisk_nand_256mb_512_device::sandisk_nand_256mb_512_device(const machine_confi
 	m_row_address_cycles = 3;
 	m_sequential_row_read = 1; // uncertain
 }
-
 
 
 void nand_device::device_start()
