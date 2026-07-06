@@ -222,7 +222,7 @@
 // 7854 - NF_Data
 // 7855 - NF_INT_Ctrl
 
-// 7856 - P_BCH_Control 
+// 7856 - P_BCH_Control
 // 7857 - ECC_Ctrl
 
 // 7858 - ECC_LPRL_LB or BCH Error Flag Register
@@ -655,7 +655,7 @@ void generalplus_gpac800_device::nand_dma_ctrl_w(u16 data)
 //
 // 15  NFBF - Read Back Busy Status (1 = Ready) (RO)
 // 14
-// 13  OLDTYPE - Old-Type NAND Flash Read Support 
+// 13  OLDTYPE - Old-Type NAND Flash Read Support
 // 12
 //
 // 11
@@ -688,7 +688,7 @@ void generalplus_gpac800_device::nand_7850_w(u16 data)
 }
 
 // 0x7856 - P_BCH_Control ( BCH Control Register )
-// 
+//
 // 15
 // 14
 // 13
@@ -698,7 +698,7 @@ void generalplus_gpac800_device::nand_7850_w(u16 data)
 // 10  PAGE_SEL [2] - Read parity page selection (R/W)
 //  9  PAGE_SEL [1]
 //  8  PAGE_SEL [0]
-// 
+//
 //  7
 //  6
 //  5  PARITY_CLR - Write pairy clear flag (WO)
@@ -844,7 +844,7 @@ void generalplus_gpac800_device::gpac800_internal_map(address_map &map)
 	map(0x007857, 0x007857).w(FUNC(generalplus_gpac800_device::nand_ecc_ctrl_w));
 
 	// 7858 - 785f can have a different meaning if nand_bch_ctrl bit 0 is set!
-	
+
 	// 7858 - ECC_LPRL_LB
 	// 7859 - ECC_LPRH_LB
 	// 785a - ECC_CPR_LB

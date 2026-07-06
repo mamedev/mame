@@ -120,65 +120,41 @@ void generalplus_gpspispi_bkrankp_game_state::generalplus_gpspispi_bkrankp(machi
 
 
 ROM_START( bkrankp )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
-
 	ROM_REGION(0x400000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP( "unit_mx25l3206e_c22016.bin", 0x0000, 0x400000, CRC(7efad116) SHA1(427d707e97586ae6ab5fe08f29ca450ddc7ad36e) )
 ROM_END
 
 ROM_START( prailpls )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
-
 	ROM_REGION(0x2000000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP( "mx25l25635f.u9", 0x0000, 0x2000000, CRC(17faefb0) SHA1(1d31c5aa1a37882f74c08414f69c4285149352b7) )
 ROM_END
 
 ROM_START( vmastspi )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
-
 	ROM_REGION(0x2000000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP( "mx25l25635f.sfrom1", 0x0000, 0x2000000, CRC(f30af4a2) SHA1(99526156c6e72eda9ea1ef93b9e825da069e050f) )
 ROM_END
 
 ROM_START( anpanbd )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
-
 	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP( "mx25l12835f.u2", 0x0000, 0x1000000, CRC(c4be09d7) SHA1(c9098d0c1c9db649a010f67469f500b69407372f) )
 ROM_END
 
 ROM_START( anpanm15 )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
-
 	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP( "mx25l12835f.ic3", 0x0000, 0x1000000, CRC(47c36cbd) SHA1(f1cae506e21c1795401004d79f6bb1b1d982d657) )
 ROM_END
 
 ROM_START( anpaneng )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
-
 	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP( "w25q128fv.u11", 0x0000, 0x1000000, CRC(d204d646) SHA1(0b2f9f2d91a078b5fba687d73079b2b5665b33d4) )
 ROM_END
 
 ROM_START( jspodred )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
-
 	ROM_REGION(0x400000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP( "gpr5l322.sfrom1", 0x0000, 0x400000, CRC(5bd08294) SHA1(3a4a76b7b30c0dcf8184cb94d75819c382c1c668) )
 ROM_END
 
 ROM_START( wildking )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
-
 	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP( "mx25l12835f.sfrom1", 0x0000, 0x1000000, CRC(bc4cace6) SHA1(1fc2e28b194a59ddb1ed9a63978064d2d0a6ab8c) )
 
@@ -189,17 +165,11 @@ ROM_END
 
 
 ROM_START( pokegach )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
-
 	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP( "mx25l12835f.u4", 0x0000, 0x1000000, CRC(85bc9716) SHA1(3de7f0fd92e8f6084eb0b82ec293be3166c800ac) )
 ROM_END
 
 ROM_START( pokegac2 )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
-
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP( "red_mx25l6445e.u4", 0x0000, 0x800000, CRC(f20bb213) SHA1(787ae27e36352525e6ffebe25da4329cb156b219) )
 
@@ -208,9 +178,6 @@ ROM_START( pokegac2 )
 ROM_END
 
 ROM_START( pokegac2y )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
-
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP( "yellow_mx25l6445e.u4", 0x0000, 0x800000, CRC(587310fa) SHA1(4334b91b7f9f599bc21b354b267b132fd470f53c) )
 
@@ -220,57 +187,36 @@ ROM_END
 
 
 ROM_START( bk139in1 )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
-
 	ROM_REGION(0x4000000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD( "25q512.bin", 0x0000, 0x4000000, CRC(0cd111a4) SHA1(70553a44c3d946e5d23c09f04e0627a5dbaa3e4d) )
 ROM_END
 
 ROM_START( lxcyrace )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
-
 	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD( "25q128.u2", 0x0000, 0x1000000, CRC(4489c99d) SHA1(792d6d224584fe1f3349c64a59aa79a587dd8c17) )
 ROM_END
 
 ROM_START( lxcymsm )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
-
 	ROM_REGION(0x2000000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD( "25q256.bin", 0x0000, 0x2000000, CRC(96b3ee5c) SHA1(f1e6bf46a4503877074310506d1acc4607dac331) )
 ROM_END
 
 ROM_START( lxcympp )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
-
 	ROM_REGION(0x2000000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD( "25q256.bin", 0x0000, 0x2000000, CRC(570b669c) SHA1(e7fcae662c8c8cae18cf1151d6caefacfe1e9fda) )
 ROM_END
 
 ROM_START( lxcymls )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
-
 	ROM_REGION(0x2000000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD( "25q256.bin", 0x0000, 0x2000000, CRC(76c89fe5) SHA1(99668cbce2ace6ec972ee4e72fec8b93862a0ef4) )
 ROM_END
 
 ROM_START( dgun3944 )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
-
 	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD( "by25q128as.bin", 0x0000, 0x1000000, CRC(cf2bfc98) SHA1(f8c984f0278506d74b0b6337d2e96bb9d3a58148) )
 ROM_END
 
 ROM_START( starbuck )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
-
 	ROM_REGION(0x200000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD( "by25q16est.bin", 0x0000, 0x200000,  CRC(926c1499) SHA1(edd88b11f350e0016ee7dc76e872f9ae8c00aa6c) )
 ROM_END
