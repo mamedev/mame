@@ -3076,18 +3076,14 @@ void specnext_state::map_mem(address_map &map)
 		views[i].get()[1](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).bankr(m_bank_ram[i]);
 
 		// bank5
-		views[i].get()[0x02a](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).lrw8(
-			NAME([this](offs_t offset) { return m_bram_bank5[offset & 0x1fff]; }),
+		views[i].get()[0x02a](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).ram().share(m_bram_bank5).lw8(
 			NAME([this](offs_t offset, u8 data) { m_screen->update_now(); m_bram_bank5[offset & 0x1fff] = data; })
 		);
-		views[i].get()[0x12a](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).lr8(
-			NAME([this](offs_t offset) { return m_bram_bank5[offset & 0x1fff]; }));
-		views[i].get()[0x02b](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).lrw8(
-			NAME([this](offs_t offset) { return m_bram_bank5[0x2000 + (offset & 0x1fff)]; }),
+		views[i].get()[0x12a](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).readonly().share(m_bram_bank5);
+		views[i].get()[0x02b](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).ram().share(m_bram_bank5, 0x2000).lw8(
 			NAME([this](offs_t offset, u8 data) { m_screen->update_now(); m_bram_bank5[0x2000 + (offset & 0x1fff)] = data; })
 		);
-		views[i].get()[0x12b](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).lr8(
-			NAME([this](offs_t offset) { return m_bram_bank5[0x2000 + (offset & 0x1fff)]; }));
+		views[i].get()[0x12b](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).readonly().share(m_bram_bank5, 0x2000);
 		// bank7
 		views[i].get()[0x02e](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).ram().share(m_bram_bank7).lw8(
 			NAME([this](offs_t offset, u8 data) { m_screen->update_now(); m_bram_bank7[offset & 0x1fff] = data; })
