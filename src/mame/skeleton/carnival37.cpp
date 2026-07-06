@@ -68,15 +68,15 @@ private:
 	required_device<hd6345_device> m_crtc;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<ramdac_device> m_ramdac;
-	required_shared_ptr<uint8_t> m_tileram;
-	required_shared_ptr<uint8_t> m_attrram;
+	required_shared_ptr<u8> m_tileram;
+	required_shared_ptr<u8> m_attrram;
 
 	tilemap_t *m_tilemap = nullptr;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	void tileram_w(offs_t offset, uint8_t data);
-	void attrram_w(offs_t offset, uint8_t data);
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void tileram_w(offs_t offset, u8 data);
+	void attrram_w(offs_t offset, u8 data);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void program_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
@@ -91,24 +91,24 @@ void carnival37_state::video_start()
 
 TILE_GET_INFO_MEMBER(carnival37_state::get_tile_info)
 {
-	uint16_t const tile = m_tileram[tile_index] | (m_attrram[tile_index] << 8);
+	u16 const tile = m_tileram[tile_index] | (m_attrram[tile_index] << 8);
 
 	tileinfo.set(0, tile, 0, 0);
 }
 
-void carnival37_state::tileram_w(offs_t offset, uint8_t data)
+void carnival37_state::tileram_w(offs_t offset, u8 data)
 {
 	m_tileram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-void carnival37_state::attrram_w(offs_t offset, uint8_t data)
+void carnival37_state::attrram_w(offs_t offset, u8 data)
 {
 	m_attrram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-uint32_t carnival37_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 carnival37_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -247,7 +247,7 @@ void carnival37_state::carniv37(machine_config &config)
 	m_maincpu->in_pa_callback().set_ioport("IN0");
 	m_maincpu->in_pb_callback().set_ioport("IN1");
 	m_maincpu->in_pc_callback().set_ioport("IN2");
-	m_maincpu->out_pd_callback().set([this] (uint8_t data) {
+	m_maincpu->out_pd_callback().set([this] (u8 data) {
 		machine().bookkeeping().coin_counter_w(2, BIT(~data, 0));
 		machine().bookkeeping().coin_counter_w(0, BIT(~data, 1));
 		machine().bookkeeping().coin_counter_w(1, BIT(~data, 2));
@@ -312,13 +312,12 @@ ROM_START( carniv37 )
 
 	ROM_REGION( 0x10000, "tiles", 0 )
 	ROM_LOAD( "512.ic40", 0x0000, 0x10000, CRC(789a2336) SHA1(3f441f063c113b787aff919259ae974b3b4e4a62) ) // handwritten label
+	// ic41 not populated
 
 	ROM_REGION( 0x10000, "decoded_tiles", ROMREGION_ERASEFF)
-
-	// ic41 not populated
 ROM_END
 
 } // anonymous namespace
 
 
-GAME( 1992, carniv37, 0, carniv37, carniv37, carnival37_state, init_gfx, ROT0, "Able", "Carnival 37", 0 )
+GAME( 1992, carniv37, 0, carniv37, carniv37, carnival37_state, init_gfx, ROT0, "Able", "Carnival 37", MACHINE_SUPPORTS_SAVE )

@@ -272,15 +272,384 @@ GFX:                Custom 145     ( 80 pin PQFP)
                     Custom 169     (120 pin PQFP)
 */
 #include "emu.h"
-#include "namconb1.h"
+
+#include "namco_c116.h"
+#include "namco_c123tmap.h"
+#include "namco_c169roz.h"
+#include "namco_c355spr.h"
+#include "namcomcu.h"
 
 #include "cpu/m68000/m68020.h"
+#include "machine/eeprompar.h"
+#include "machine/timer.h"
 #include "sound/c352.h"
 
+#include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
 
-#define ENABLE_LOGGING (0)
+
+// configurable logging
+#define LOG_CPUREG     (1U << 1)
+#define LOG_KEYCUS     (1U << 2)
+
+//#define VERBOSE (LOG_GENERAL | LOG_CPUREG | LOG_KEYCUS)
+
+#include "logmacro.h"
+
+#define LOGCPUREG(...)     LOGMASKED(LOG_CPUREG,     __VA_ARGS__)
+#define LOGKEYCUS(...)     LOGMASKED(LOG_KEYCUS,     __VA_ARGS__)
+
+
+namespace {
+
+class namconb1_state : public driver_device
+{
+public:
+	namconb1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_gametype(0),
+		m_maincpu(*this, "maincpu"),
+		m_c116(*this, "c116"),
+		m_c123tmap(*this, "c123tmap"),
+		m_c355spr(*this, "c355spr"),
+		m_screen(*this, "screen"),
+		m_mcu(*this, "mcu"),
+		m_eeprom(*this, "eeprom"),
+		m_p1(*this, "P1"),
+		m_p2(*this, "P2"),
+		m_p3(*this, "P3"),
+		m_p4(*this, "P4"),
+		m_misc(*this, "MISC"),
+		m_spritebank32(*this, "spritebank32"),
+		m_namconb_shareram(*this, "namconb_share"),
+		m_update_to_line_before_posirq(false)
+	{ }
+
+	void namconb1(machine_config &config) ATTR_COLD;
+
+	void init_sws95() ATTR_COLD;
+	void init_sws97() ATTR_COLD;
+	void init_sws96() ATTR_COLD;
+	void init_vshoot() ATTR_COLD;
+	void init_nebulray() ATTR_COLD;
+	void init_gslgr94j() ATTR_COLD;
+	void init_gslgr94u() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+	int m_gametype = 0;
+
+	enum
+	{
+		// Namco NB1
+		NAMCONB1_NEBULRAY = 1,
+		NAMCONB1_GUNBULET,
+		NAMCONB1_GSLGR94U,
+		NAMCONB1_GSLGR94J,
+		NAMCONB1_SWS95,
+		NAMCONB1_SWS96,
+		NAMCONB1_SWS97,
+		NAMCONB1_VSHOOT,
+
+		// Namco NB2
+		NAMCONB2_OUTFOXIES,
+		NAMCONB2_MACH_BREAKERS,
+	};
+
+	required_device<cpu_device> m_maincpu;
+	required_device<namco_c116_device> m_c116;
+	required_device<namco_c123tmap_device> m_c123tmap;
+	required_device<namco_c355spr_device> m_c355spr;
+	required_device<screen_device> m_screen;
+	required_device<m37710_cpu_device> m_mcu;
+	required_device<eeprom_parallel_28xx_device> m_eeprom;
+	required_ioport m_p1;
+	required_ioport m_p2;
+	optional_ioport m_p3;
+	optional_ioport m_p4;
+	required_ioport m_misc;
+	required_shared_ptr<u32> m_spritebank32;
+	required_shared_ptr<u16> m_namconb_shareram;
+
+	u8 m_vbl_irq_level = 0;
+	u8 m_pos_irq_level = 0;
+	u8 m_unk_irq_level = 0;
+	u16 m_count = 0;
+	u8 m_port6 = 0;
+	std::unique_ptr<u32[]> m_spritebank32_delayed;
+	bool m_update_to_line_before_posirq;
+
+	u32 randgen_r();
+	void srand_w(u32 data);
+	void cpureg_w(offs_t offset, u8 data);
+	u8 cpureg_r(offs_t offset);
+	u32 custom_key_r(offs_t offset);
+	u32 share_r(offs_t offset);
+	void share_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void mcu_shared_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u8 port6_r();
+	void port6_w(u8 data);
+	u8 port7_r();
+	template <int Bit> u16 dac_bit_r();
+
+	bool sprite_mix_callback(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_vblank(int state);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(scantimer);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
+
+	int objcode2tile_cb(int code);
+	void tilemap_cb(u16 code, int &tile, int &mask);
+	void namcoc75_am(address_map &map) ATTR_COLD;
+	void maincpu_am(address_map &map) ATTR_COLD;
+};
+
+class gunbulet_state : public namconb1_state
+{
+public:
+	gunbulet_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namconb1_state(mconfig, type, tag),
+		m_light_x(*this, "LIGHT%u_X", 0U),
+		m_light_y(*this, "LIGHT%u_Y", 0U)
+	{ }
+
+	void gunbulet(machine_config &config) ATTR_COLD;
+
+	void init_gunbulet() ATTR_COLD;
+
+private:
+	required_ioport_array<2> m_light_x;
+	required_ioport_array<2> m_light_y;
+
+	u32 gun_r(offs_t offset);
+
+	void maincpu_am(address_map &map) ATTR_COLD;
+};
+
+class namconb2_state : public namconb1_state
+{
+public:
+	namconb2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namconb1_state(mconfig, type, tag),
+		m_c169roz(*this, "c169roz"),
+		m_tilebank32(*this, "tilebank32"),
+		m_rozbank32(*this, "rozbank32")
+	{ }
+
+	void namconb2(machine_config &config) ATTR_COLD;
+	void outfxies(machine_config &config) ATTR_COLD;
+	void machbrkr(machine_config &config) ATTR_COLD;
+
+	void init_machbrkr() ATTR_COLD;
+	void init_outfxies() ATTR_COLD;
+
+protected:
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	required_device<namco_c169roz_device> m_c169roz; // NB2 only, not NB1
+	required_shared_ptr<u32> m_tilebank32;
+	required_shared_ptr<u32> m_rozbank32;
+
+	u32 m_tilemap_tile_bank[4]{};
+
+	void cpureg_w(offs_t offset, u8 data);
+	u8 cpureg_r(offs_t offset);
+
+	void rozbank32_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 screen_update_namconb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	int machbrkr_objcode2tile_cb(int code);
+	int outfxies_objcode2tile_cb(int code);
+	void machbrkr_tilemap_cb(u16 code, int &tile, int &mask);
+	void outfxies_tilemap_cb(u16 code, int &tile, int &mask);
+	void machbrkr_roz_cb(u16 code, int &tile, int &mask, int which);
+	void outfxies_roz_cb(u16 code, int &tile, int &mask, int which);
+	void maincpu_am(address_map &map) ATTR_COLD;
+};
+
+
+void namconb1_state::tilemap_cb(u16 code, int &tile, int &mask)
+{
+	tile = code;
+	mask = code;
+}
+
+void namconb2_state::machbrkr_tilemap_cb(u16 code, int &tile, int &mask)
+{
+	//  00010203 04050607 00010203 04050607 (normal)
+	//  00010718 191a1b07 00010708 090a0b07 (alt bank)
+	const int bank = util::big_endian_cast<u8>(&m_tilebank32[0])[(code >> 13) + 8];
+	const int mangle = (code & 0x1fff) | (bank << 13);
+	tile = mangle;
+	mask = mangle;
+}
+
+void namconb2_state::outfxies_tilemap_cb(u16 code, int &tile, int &mask)
+{
+	// the pixmap index is mangled, the transparency bitmask index is not
+	tile = bitswap<16>(code, 15, 14, 13, 12, 11, 10, 9, 6, 7, 8, 5, 4, 3, 2, 1, 0);
+	mask = code;
+}
+
+void namconb2_state::machbrkr_roz_cb(u16 code, int &tile, int &mask, int which)
+{
+	const int bank = util::big_endian_cast<u8>(&m_rozbank32[which * 8 / 4])[(code >> 11) & 0x7];
+	const int mangle = (code & 0x7ff) | (bank << 11);
+	tile = mangle;
+	mask = mangle;
+}
+
+void namconb2_state::outfxies_roz_cb(u16 code, int &tile, int &mask, int which)
+{
+	// the pixmap index is mangled, the transparency bitmask index is not
+	const int bank = util::big_endian_cast<u8>(&m_rozbank32[which * 8 / 4])[(code >> 11) & 0x7];
+	int mangle = (code & 0x7ff) | (bank << 11);
+	mask = mangle;
+	mangle = bitswap<19>(mangle & 0x7ffff, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 4, 5, 6, 3, 2, 1, 0);
+	tile = mangle;
+}
+
+void namconb1_state::screen_vblank(int state)
+{
+	m_c355spr->vblank(state);
+	if (state)
+	{
+		const u32 size = m_spritebank32.bytes() / 4;
+		std::copy_n(&m_spritebank32[0], size, &m_spritebank32_delayed[0]);
+	}
+}
+
+bool namconb1_state::sprite_mix_callback(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri)
+{
+	if (srcpri >= destpri)
+	{
+		if ((src & 0xff) != 0xff)
+		{
+			if (src == 0xffe)
+			{
+				dest |= 0x800;
+			}
+			else
+			{
+				dest = colbase + src;
+			}
+			destpri = srcpri;
+			return true;
+		}
+	}
+	return false;
+}
+
+/************************************************************************************************/
+
+u32 namconb1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// compute window for custom screen blanking
+	rectangle clip;
+	//004a 016a 0021 0101 0144 0020 (nebulas ray)
+	clip.min_x = s16(m_c116->get_reg(0)) - 0x4a;
+	clip.max_x = s16(m_c116->get_reg(1)) - 0x4a - 1;
+	clip.min_y = s16(m_c116->get_reg(2)) - 0x21;
+	clip.max_y = s16(m_c116->get_reg(3)) - 0x21 - 1;
+
+	// intersect with master clip rectangle
+	clip &= cliprect;
+
+	bitmap.fill(m_c116->black_pen(), cliprect);
+	screen.priority().fill(0, cliprect);
+
+	for (int pri = 0; pri < 8; pri++)
+		m_c123tmap->draw(screen, bitmap, clip, pri, pri, 0);
+
+	m_c355spr->draw(screen, bitmap, clip);
+
+	return 0;
+}
+
+int namconb1_state::objcode2tile_cb(int code)
+{
+	const int bank = util::big_endian_cast<u16>(m_spritebank32_delayed.get())[code >> 11];
+	return (code & 0x7ff) | (bank << 11);
+}
+
+void namconb1_state::video_start()
+{
+	const u32 size = m_spritebank32.bytes() / 4;
+	m_spritebank32_delayed = make_unique_clear<u32[]>(size);
+	save_pointer(NAME(m_spritebank32_delayed), size);
+}
+
+/****************************************************************************************************/
+
+void namconb2_state::rozbank32_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	const u32 old_data = m_rozbank32[offset];
+	COMBINE_DATA(&m_rozbank32[offset]);
+	if (m_rozbank32[offset] != old_data)
+		m_c169roz->mark_all_dirty();
+}
+
+u32 namconb2_state::screen_update_namconb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// compute window for custom screen blanking
+	rectangle clip;
+	//004a016a 00210101 01440020
+	clip.min_x = m_c116->get_reg(0) - 0x4b;
+	clip.max_x = m_c116->get_reg(1) - 0x4b - 1;
+	clip.min_y = m_c116->get_reg(2) - 0x21;
+	clip.max_y = m_c116->get_reg(3) - 0x21 - 1;
+	/* intersect with master clip rectangle */
+	clip &= cliprect;
+
+	bitmap.fill(m_c116->black_pen(), cliprect);
+	screen.priority().fill(0, cliprect);
+
+	if (memcmp(m_tilemap_tile_bank, m_tilebank32, sizeof(m_tilemap_tile_bank)) != 0)
+	{
+		m_c123tmap->mark_all_dirty();
+		memcpy(m_tilemap_tile_bank, m_tilebank32, sizeof(m_tilemap_tile_bank));
+	}
+	for (int pri = 0; pri < 16; pri++)
+	{
+		m_c169roz->draw(screen, bitmap, clip, pri, pri, 0);
+		if ((pri & 1) == 0)
+		{
+			m_c123tmap->draw(screen, bitmap, clip, pri >> 1, pri, 0);
+		}
+	}
+	m_c355spr->draw(screen, bitmap, clip);
+	return 0;
+}
+
+int namconb2_state::machbrkr_objcode2tile_cb(int code)
+{
+	const int bank = util::big_endian_cast<u8>(m_spritebank32_delayed.get())[(code >> 11) & 0xf];
+	code &= 0x7ff;
+	code |= bitswap<6>(bank & 0x5f, 6, 4, 3, 2, 1, 0) << 11;
+	return code;
+}
+
+int namconb2_state::outfxies_objcode2tile_cb(int code)
+{
+	const int bank = util::big_endian_cast<u8>(m_spritebank32_delayed.get())[(code >> 11) & 0xf];
+	code &= 0x7ff;
+	code |= bitswap<6>(bank & 0x5f, 6, 4, 3, 1, 2, 0) << 11;
+	return code;
+}
+
+void namconb2_state::video_start()
+{
+	namconb1_state::video_start();
+	save_item(NAME(m_tilemap_tile_bank));
+}
 
 
 void namconb1_state::machine_start()
@@ -338,7 +707,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::mcu_irq2_cb)
 
 /****************************************************************************/
 
-void namconb1_state::namconb1_cpureg_w(offs_t offset, u8 data)
+void namconb1_state::cpureg_w(offs_t offset, u8 data)
 {
 	/**
 	 * 400000 0x00
@@ -419,13 +788,12 @@ void namconb1_state::namconb1_cpureg_w(offs_t offset, u8 data)
 			break;
 
 		default:
-			if (ENABLE_LOGGING)
-				logerror("Unhandled CPU reg write to [0x%.2x] with 0x%.2x (PC=0x%x)\n", offset, data, m_maincpu->pc());
+			LOGCPUREG("Unhandled CPU reg write to [0x%.2x] with 0x%.2x (PC=0x%x)\n", offset, data, m_maincpu->pc());
 	}
 }
 
 
-void namconb2_state::namconb2_cpureg_w(offs_t offset, u8 data)
+void namconb2_state::cpureg_w(offs_t offset, u8 data)
 {
 	/**
 	 * f00000 VBL IRQ enable/level
@@ -507,33 +875,26 @@ void namconb2_state::namconb2_cpureg_w(offs_t offset, u8 data)
 			break;
 
 		default:
-			if (ENABLE_LOGGING)
-				logerror("Unhandled CPU reg write to [0x%.2x] with 0x%.2x (PC=0x%x)\n", offset, data, m_maincpu->pc());
+			LOGCPUREG("Unhandled CPU reg write to [0x%.2x] with 0x%.2x (PC=0x%x)\n", offset, data, m_maincpu->pc());
 	}
 }
 
 
-u8 namconb1_state::namconb1_cpureg_r(offs_t offset)
+u8 namconb1_state::cpureg_r(offs_t offset)
 {
 	// 16: Watchdog
-	if (ENABLE_LOGGING)
-	{
-		if (offset != 0x16)
-			logerror("Unhandled CPU reg read from [0x%.2x] (PC=0x%x)\n", offset, m_maincpu->pc());
-	}
+	if (offset != 0x16)
+		LOGCPUREG("Unhandled CPU reg read from [0x%.2x] (PC=0x%x)\n", offset, m_maincpu->pc());
 
 	return 0xff;
 }
 
 
-u8 namconb2_state::namconb2_cpureg_r(offs_t offset)
+u8 namconb2_state::cpureg_r(offs_t offset)
 {
 	// 14: Watchdog
-	if (ENABLE_LOGGING)
-	{
-		if (offset != 0x14)
-			logerror("Unhandled CPU reg read from [0x%.2x] (PC=0x%x)\n", offset, m_maincpu->pc());
-	}
+	if (offset != 0x14)
+		LOGCPUREG("Unhandled CPU reg read from [0x%.2x] (PC=0x%x)\n", offset, m_maincpu->pc());
 
 	return 0xff;
 }
@@ -548,7 +909,7 @@ u32 namconb1_state::custom_key_r(offs_t offset)
 	if (!machine().side_effects_disabled())
 	{
 		do
-		{ /* pick a random number, but don't pick the same twice in a row */
+		{ // pick a random number, but don't pick the same twice in a row
 			m_count = machine().rand();
 		} while (m_count == old_count);
 	}
@@ -635,12 +996,11 @@ u32 namconb1_state::custom_key_r(offs_t offset)
 		break;
 
 	case NAMCONB2_MACH_BREAKERS:
-		break; /* no protection? */
+		break; // no protection?
 	}
-	if (ENABLE_LOGGING)
-		logerror( "custom_key_r(%d); pc=%08x\n", offset, m_maincpu->pc() );
+	LOGKEYCUS( "custom_key_r(%d); pc=%08x\n", offset, m_maincpu->pc() );
 	return 0;
-} /* custom_key_r */
+}
 
 /***************************************************************/
 
@@ -651,18 +1011,18 @@ u32 gunbulet_state::gun_r(offs_t offset)
 
 	switch (offset)
 	{
-		case 0: case 1: result = (u8)(0x0f + m_light_y[1]->read() * 224/255); break; /* Y (p2) */
-		case 2: case 3: result = (u8)(0x26 + m_light_x[1]->read() * 288/314); break; /* X (p2) */
-		case 4: case 5: result = (u8)(0x0f + m_light_y[0]->read() * 224/255); break; /* Y (p1) */
-		case 6: case 7: result = (u8)(0x26 + m_light_x[0]->read() * 288/314); break; /* X (p1) */
+		case 0: case 1: result = (u8)(0x0f + m_light_y[1]->read() * 224 / 255); break; // Y (p2)
+		case 2: case 3: result = (u8)(0x26 + m_light_x[1]->read() * 288 / 314); break; // X (p2)
+		case 4: case 5: result = (u8)(0x0f + m_light_y[0]->read() * 224 / 255); break; // Y (p1)
+		case 6: case 7: result = (u8)(0x26 + m_light_x[0]->read() * 288 / 314); break; // X (p1)
 	}
 	return result << 24;
-} /* gun_r */
+}
 
 u32 namconb1_state::randgen_r()
 {
 	return machine().rand();
-} /* randgen_r */
+}
 
 void namconb1_state::srand_w(u32 data)
 {
@@ -670,7 +1030,7 @@ void namconb1_state::srand_w(u32 data)
 	 * Used to seed the hardware random number generator.
 	 * We don't yet know the algorithm that is used, so for now this is a NOP.
 	 */
-} /* srand_w */
+}
 
 u32 namconb1_state::share_r(offs_t offset)
 {
@@ -682,17 +1042,17 @@ void namconb1_state::share_w(offs_t offset, u32 data, u32 mem_mask)
 	COMBINE_DATA(m_namconb_shareram + offset * 2 + 1);
 	data >>= 16;
 	mem_mask >>= 16;
-	COMBINE_DATA(m_namconb_shareram + offset  *2);
+	COMBINE_DATA(m_namconb_shareram + offset  * 2);
 }
 
-void namconb1_state::namconb1_am(address_map &map)
+void namconb1_state::maincpu_am(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x1c0000, 0x1cffff).ram();
 	map(0x1e4000, 0x1e4003).rw(FUNC(namconb1_state::randgen_r), FUNC(namconb1_state::srand_w));
 	map(0x200000, 0x207fff).rw(FUNC(namconb1_state::share_r), FUNC(namconb1_state::share_w));
 	map(0x208000, 0x2fffff).ram();
-	map(0x400000, 0x40001f).rw(FUNC(namconb1_state::namconb1_cpureg_r), FUNC(namconb1_state::namconb1_cpureg_w));
+	map(0x400000, 0x40001f).rw(FUNC(namconb1_state::cpureg_r), FUNC(namconb1_state::cpureg_w));
 	map(0x580000, 0x5807ff).rw(m_eeprom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
 	map(0x600000, 0x61ffff).rw(m_c355spr, FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w)).share("objram");
 	map(0x620000, 0x620007).rw(m_c355spr, FUNC(namco_c355spr_device::position_r), FUNC(namco_c355spr_device::position_w));
@@ -703,13 +1063,13 @@ void namconb1_state::namconb1_am(address_map &map)
 	map(0x700000, 0x707fff).rw(m_c116, FUNC(namco_c116_device::read), FUNC(namco_c116_device::write));
 }
 
-void gunbulet_state::gunbulet_am(address_map &map)
+void gunbulet_state::maincpu_am(address_map &map)
 {
-	namconb1_am(map);
+	namconb1_state::maincpu_am(map);
 	map(0x100000, 0x10001f).r(FUNC(gunbulet_state::gun_r));
 }
 
-void namconb2_state::namconb2_am(address_map &map)
+void namconb2_state::maincpu_am(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x1c0000, 0x1cffff).ram();
@@ -719,7 +1079,7 @@ void namconb2_state::namconb2_am(address_map &map)
 	map(0x400000, 0x4fffff).rom().region("data", 0);
 	map(0x600000, 0x61ffff).rw(m_c355spr, FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w)).share("objram");
 	map(0x620000, 0x620007).rw(m_c355spr, FUNC(namco_c355spr_device::position_r), FUNC(namco_c355spr_device::position_w));
-	map(0x640000, 0x64000f).ram(); /* unknown xy offset */
+	map(0x640000, 0x64000f).ram(); // unknown xy offset
 	map(0x680000, 0x68ffff).rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram16_r), FUNC(namco_c123tmap_device::videoram16_w));
 	map(0x6c0000, 0x6c003f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control16_r), FUNC(namco_c123tmap_device::control16_w));
 	map(0x700000, 0x71ffff).rw(m_c169roz, FUNC(namco_c169roz_device::videoram_r), FUNC(namco_c169roz_device::videoram_w));
@@ -730,7 +1090,7 @@ void namconb2_state::namconb2_am(address_map &map)
 	map(0x980000, 0x98000f).ram().w(FUNC(namconb2_state::rozbank32_w)).share(m_rozbank32);
 	map(0xa00000, 0xa007ff).rw(m_eeprom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
 	map(0xc00000, 0xc0001f).r(FUNC(namconb2_state::custom_key_r)).nopw();
-	map(0xf00000, 0xf0001f).rw(FUNC(namconb2_state::namconb2_cpureg_r), FUNC(namconb2_state::namconb2_cpureg_w));
+	map(0xf00000, 0xf0001f).rw(FUNC(namconb2_state::cpureg_r), FUNC(namconb2_state::cpureg_w));
 }
 
 void namconb1_state::mcu_shared_w(offs_t offset, u16 data, u16 mem_mask)
@@ -739,7 +1099,7 @@ void namconb1_state::mcu_shared_w(offs_t offset, u16 data, u16 mem_mask)
 	// This needs more investigation.  nebulray and vshoot do NOT do this.
 	// Timers A2 and A3 are set up in "external input counter" mode, this may be related.
 #if 0
-	if ((offset == 0x647c/2) && (data != 0))
+	if ((offset == 0x647c / 2) && (data != 0))
 	{
 		data = 0xd2f6;
 	}
@@ -748,7 +1108,7 @@ void namconb1_state::mcu_shared_w(offs_t offset, u16 data, u16 mem_mask)
 	COMBINE_DATA(&m_namconb_shareram[offset]);
 
 	// C74 BIOS has a very short window on the CPU sync signal, so immediately let the '020 at it
-	if ((offset == 0x6000/2) && (data & 0x80))
+	if ((offset == 0x6000 / 2) && (data & 0x80))
 	{
 		m_mcu->spin_until_time(m_mcu->cycles_to_attotime(300)); // was 300
 	}
@@ -902,42 +1262,42 @@ void namconb1_state::init_nebulray()
 {
 	m_gametype = NAMCONB1_NEBULRAY;
 	m_update_to_line_before_posirq = true; // needed or there is a bad line on the right of the screen, and some stars don't scroll correctly
-} /* nebulray */
+}
 
 void namconb1_state::init_gslgr94u()
 {
 	m_gametype = NAMCONB1_GSLGR94U;
-} /* gslgr94u */
+}
 
 void namconb1_state::init_gslgr94j()
 {
 	m_gametype = NAMCONB1_GSLGR94J;
-} /* gslgr94j */
+}
 
 void namconb1_state::init_sws95()
 {
 	m_gametype = NAMCONB1_SWS95;
-} /* sws95 */
+}
 
 void namconb1_state::init_sws96()
 {
 	m_gametype = NAMCONB1_SWS96;
-} /* sws96 */
+}
 
 void namconb1_state::init_sws97()
 {
 	m_gametype = NAMCONB1_SWS97;
-} /* sws97 */
+}
 
 void gunbulet_state::init_gunbulet()
 {
 	m_gametype = NAMCONB1_GUNBULET;
-} /* gunbulet */
+}
 
 void namconb1_state::init_vshoot()
 {
 	m_gametype = NAMCONB1_VSHOOT;
-} /* vshoot */
+}
 
 void namconb2_state::init_machbrkr()
 {
@@ -963,10 +1323,10 @@ void namconb1_state::machine_reset()
 
 void namconb1_state::namconb1(machine_config &config)
 {
-	M68EC020(config, m_maincpu, XTAL(48'384'000) / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &namconb1_state::namconb1_am);
+	M68EC020(config, m_maincpu, 48.384_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &namconb1_state::maincpu_am);
 
-	NAMCO_C75(config, m_mcu, XTAL(48'384'000) / 3);
+	NAMCO_C75(config, m_mcu, 48.384_MHz_XTAL / 3);
 	m_mcu->set_addrmap(AS_PROGRAM, &namconb1_state::namcoc75_am);
 	m_mcu->p6_in_cb().set(FUNC(namconb1_state::port6_r));
 	m_mcu->p6_out_cb().set(FUNC(namconb1_state::port6_w));
@@ -989,8 +1349,8 @@ void namconb1_state::namconb1(machine_config &config)
 	TIMER(config, "mcu_irq2").configure_periodic(FUNC(namconb1_state::mcu_irq2_cb), attotime::from_hz(60));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(48'384'000) / 8, 384, 0, 288, 264, 0, 224);
-	m_screen->set_screen_update(FUNC(namconb1_state::screen_update_namconb1));
+	m_screen->set_raw(48.384_MHz_XTAL / 8, 384, 0, 288, 264, 0, 224);
+	m_screen->set_screen_update(FUNC(namconb1_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(namconb1_state::screen_vblank));
 	m_screen->set_palette(m_c116);
 
@@ -998,14 +1358,14 @@ void namconb1_state::namconb1(machine_config &config)
 	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_palette(m_c116);
 	m_c355spr->set_scroll_offsets(0x26, 0x19);
-	m_c355spr->set_tile_callback(FUNC(namconb1_state::NB1objcode2tile));
+	m_c355spr->set_tile_callback(FUNC(namconb1_state::objcode2tile_cb));
 	m_c355spr->set_mix_callback(FUNC(namconb1_state::sprite_mix_callback));
 	m_c355spr->set_buffer(2); // triple buffered
 	m_c355spr->set_color_base(0);
 
 	NAMCO_C123TMAP(config, m_c123tmap);
 	m_c123tmap->set_palette(m_c116);
-	m_c123tmap->set_tile_callback(FUNC(namconb1_state::NB1TilemapCB));
+	m_c123tmap->set_tile_callback(FUNC(namconb1_state::tilemap_cb));
 	m_c123tmap->set_color_base(0x1000);
 
 	NAMCO_C116(config, m_c116);
@@ -1013,7 +1373,7 @@ void namconb1_state::namconb1(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	c352_device &c352(C352(config, "c352", XTAL(48'384'000) / 2, 288));
+	c352_device &c352(C352(config, "c352", 48.384_MHz_XTAL / 2, 288));
 	c352.add_route(0, "speaker", 1.00, 0);
 	c352.add_route(1, "speaker", 1.00, 1);
 	//c352.add_route(2, "speaker", 1.00); // Second DAC not present.
@@ -1023,14 +1383,14 @@ void namconb1_state::namconb1(machine_config &config)
 void gunbulet_state::gunbulet(machine_config &config)
 {
 	namconb1(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gunbulet_state::gunbulet_am);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gunbulet_state::maincpu_am);
 }
 
 void namconb2_state::namconb2(machine_config &config)
 {
 	namconb1(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &namconb2_state::namconb2_am);
+	m_maincpu->set_addrmap(AS_PROGRAM, &namconb2_state::maincpu_am);
 
 	m_screen->set_screen_update(FUNC(namconb2_state::screen_update_namconb2));
 
@@ -1045,41 +1405,41 @@ void namconb2_state::machbrkr(machine_config &config)
 {
 	namconb2(config);
 
-	m_c123tmap->set_tile_callback(FUNC(namconb2_state::NB2TilemapCB_machbrkr));
+	m_c123tmap->set_tile_callback(FUNC(namconb2_state::machbrkr_tilemap_cb));
 
-	m_c169roz->set_tile_callback(FUNC(namconb2_state::NB2RozCB_machbrkr));
+	m_c169roz->set_tile_callback(FUNC(namconb2_state::machbrkr_roz_cb));
 
-	m_c355spr->set_tile_callback(FUNC(namconb2_state::NB2objcode2tile_machbrkr));
+	m_c355spr->set_tile_callback(FUNC(namconb2_state::machbrkr_objcode2tile_cb));
 }
 
 void namconb2_state::outfxies(machine_config &config)
 {
 	namconb2(config);
 
-	m_c123tmap->set_tile_callback(FUNC(namconb2_state::NB2TilemapCB_outfxies));
+	m_c123tmap->set_tile_callback(FUNC(namconb2_state::outfxies_tilemap_cb));
 
-	m_c169roz->set_tile_callback(FUNC(namconb2_state::NB2RozCB_outfxies));
+	m_c169roz->set_tile_callback(FUNC(namconb2_state::outfxies_roz_cb));
 
-	m_c355spr->set_tile_callback(FUNC(namconb2_state::NB2objcode2tile_outfxies));
+	m_c355spr->set_tile_callback(FUNC(namconb2_state::outfxies_objcode2tile_cb));
 }
 
 
 /***************************************************************/
 
-ROM_START( ptblank ) /* World set using 4Mb sound data ROM (verified) */
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
+ROM_START( ptblank ) // World set using 4Mb sound data ROM (verified)
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD32_WORD( "gn2_mprlb.15b", 0x00002, 0x80000, CRC(fe2d9425) SHA1(51b166a629cbb522720d63720558816b496b6b76) )
 	ROM_LOAD32_WORD( "gn2_mprub.13b", 0x00000, 0x80000, CRC(3bf4985a) SHA1(f559e0d5f55d23d886fe61bd7d5ca556acc7f87c) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either ROM is correct */
-//  ROM_LOAD( "gn1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb ROM at 0x00000-0x1ffff */
-	ROM_LOAD( "gn1-spr0.5b", 0, 0x80000, CRC(71773811) SHA1(e482784d9b9ebf8c2e4a2a3f6f6c4dc8304d2251) ) /* 4Megabit, same data at 0x00000-0x1ffff, 0x20000-0x7ffff is 0xff filled */
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either ROM is correct
+//  ROM_LOAD( "gn1_spr0.5b", 0x00000, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) // 1Megabit, same data as the 4Mb ROM at 0x00000-0x1ffff
+	ROM_LOAD( "gn1-spr0.5b", 0x00000, 0x80000, CRC(71773811) SHA1(e482784d9b9ebf8c2e4a2a3f6f6c4dc8304d2251) ) // 4Megabit, same data at 0x00000-0x1ffff, 0x20000-0x7ffff is 0xff filled
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
-	ROM_LOAD( "gn1-voi0.5j", 0, 0x200000, CRC(05477eb7) SHA1(f2eaacb5dbac06c37c56b9b131230c9cf6602221) )
+	ROM_LOAD( "gn1-voi0.5j", 0x000000, 0x200000, CRC(05477eb7) SHA1(f2eaacb5dbac06c37c56b9b131230c9cf6602221) )
 
 	ROM_REGION( 0x800000, "c355spr", 0 )
-	ROM_LOAD32_WORD( "gn1obj0l.ic1", 0x000000, 0x200000, CRC(06722dc8) SHA1(56fee4e17ed707fa6dbc6bad0d0281fc8cdf72d1) ) /* These four located on MEMEXT OBJ8 PCB daughter-card */
+	ROM_LOAD32_WORD( "gn1obj0l.ic1", 0x000000, 0x200000, CRC(06722dc8) SHA1(56fee4e17ed707fa6dbc6bad0d0281fc8cdf72d1) ) // These four located on MEMEXT OBJ8 PCB daughter-card
 	ROM_LOAD32_WORD( "gn1obj0u.ic2", 0x000002, 0x200000, CRC(fcefc909) SHA1(48c19b6032096dd80777aa6d5eb5f90463095cbe) )
 	ROM_LOAD32_WORD( "gn1obj1l.ic3", 0x400000, 0x200000, CRC(48468df7) SHA1(c5fb9082c84ac2ffceb6f5f4cbc1d40047c55e3d) )
 	ROM_LOAD32_WORD( "gn1obj1u.ic4", 0x400002, 0x200000, CRC(3109a071) SHA1(4bb16df5a3aecdf37baf843edfc82952d46f5227) )
@@ -1091,26 +1451,26 @@ ROM_START( ptblank ) /* World set using 4Mb sound data ROM (verified) */
 	ROM_LOAD( "gn1-chr3.11j", 0x300000, 0x100000, CRC(4352c308) SHA1(785c13df219dceac2f940519141665b630a29f86) )
 
 	ROM_REGION( 0x80000, "c123tmap:mask", 0 )
-	ROM_LOAD( "gn1-sha0.5m", 0, 0x80000, CRC(86d4ff85) SHA1(a71056b2bcbba50c834fe28269ebda9719df354a) )
+	ROM_LOAD( "gn1-sha0.5m", 0x00000, 0x80000, CRC(86d4ff85) SHA1(a71056b2bcbba50c834fe28269ebda9719df354a) )
 
 	ROM_REGION( 0x0800, "eeprom", 0 ) // default gun calibration and settings
 	ROM_LOAD( "eeprom", 0x0000, 0x0800, CRC(95760d0f) SHA1(94ac5a261d9afc77c2a163a50950b0e86b1f8041) )
 ROM_END
 
-ROM_START( ptblanka ) /* World set using non standard ROM labels (NR is Namco's prefix for Nebulas Ray, but NOT here!!), verified on 2 separate PCBs */
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
+ROM_START( ptblanka ) // World set using non standard ROM labels (NR is Namco's prefix for Nebulas Ray, but NOT here!!), verified on 2 separate PCBs
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD32_WORD( "nr3_spr0.15b", 0x00002, 0x80000, CRC(fe2d9425) SHA1(51b166a629cbb522720d63720558816b496b6b76) ) // == gn2_mprlb.15b
 	ROM_LOAD32_WORD( "nr2_spr0.13b", 0x00000, 0x80000, CRC(3bf4985a) SHA1(f559e0d5f55d23d886fe61bd7d5ca556acc7f87c) ) // == gn2_mprub.12b
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either ROM is correct */
-//  ROM_LOAD( "nr1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb ROM at 0x00000-0x1ffff */
-	ROM_LOAD( "nr1_spr0.5b", 0, 0x80000, CRC(a0bde3fb) SHA1(b5fac1d0339b1df6b8880fcd7aa2725a774765a4) ) /* 4Megabit, same data at 0x00000-0x1ffff repeated 4 time */
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either ROM is correct
+//  ROM_LOAD( "nr1_spr0.5b", 0x00000, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) // 1Megabit, same data as the 4Mb ROM at 0x00000-0x1ffff
+	ROM_LOAD( "nr1_spr0.5b", 0x00000, 0x80000, CRC(a0bde3fb) SHA1(b5fac1d0339b1df6b8880fcd7aa2725a774765a4) ) // 4Megabit, same data at 0x00000-0x1ffff repeated 4 times
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
-	ROM_LOAD( "nr4_spr0.5j", 0, 0x200000, CRC(05477eb7) SHA1(f2eaacb5dbac06c37c56b9b131230c9cf6602221) ) // == gn1-voi0.5j
+	ROM_LOAD( "nr4_spr0.5j", 0x000000, 0x200000, CRC(05477eb7) SHA1(f2eaacb5dbac06c37c56b9b131230c9cf6602221) ) // == gn1-voi0.5j
 
 	ROM_REGION( 0x800000, "c355spr", 0 )
-	ROM_LOAD32_WORD( "gn1obj0l.ic1", 0x000000, 0x200000, CRC(06722dc8) SHA1(56fee4e17ed707fa6dbc6bad0d0281fc8cdf72d1) ) /* These four located on MEMEXT OBJ8 PCB daughter-card */
+	ROM_LOAD32_WORD( "gn1obj0l.ic1", 0x000000, 0x200000, CRC(06722dc8) SHA1(56fee4e17ed707fa6dbc6bad0d0281fc8cdf72d1) ) // These four located on MEMEXT OBJ8 PCB daughter-card
 	ROM_LOAD32_WORD( "gn1obj0u.ic2", 0x000002, 0x200000, CRC(fcefc909) SHA1(48c19b6032096dd80777aa6d5eb5f90463095cbe) )
 	ROM_LOAD32_WORD( "gn1obj1l.ic3", 0x400000, 0x200000, CRC(48468df7) SHA1(c5fb9082c84ac2ffceb6f5f4cbc1d40047c55e3d) )
 	ROM_LOAD32_WORD( "gn1obj1u.ic4", 0x400002, 0x200000, CRC(3109a071) SHA1(4bb16df5a3aecdf37baf843edfc82952d46f5227) )
@@ -1122,26 +1482,26 @@ ROM_START( ptblanka ) /* World set using non standard ROM labels (NR is Namco's 
 	ROM_LOAD( "nr8_spr0.11j", 0x300000, 0x100000, CRC(4352c308) SHA1(785c13df219dceac2f940519141665b630a29f86) ) // == gn1_chr3.11j
 
 	ROM_REGION( 0x80000, "c123tmap:mask", 0 )
-	ROM_LOAD( "nr9_spr0.5m", 0, 0x80000, CRC(86d4ff85) SHA1(a71056b2bcbba50c834fe28269ebda9719df354a) ) // == gn1-sha0.5m
+	ROM_LOAD( "nr9_spr0.5m", 0x00000, 0x80000, CRC(86d4ff85) SHA1(a71056b2bcbba50c834fe28269ebda9719df354a) ) // == gn1-sha0.5m
 
 	ROM_REGION( 0x0800, "eeprom", 0 ) // default gun calibration and settings
 	ROM_LOAD( "eeprom", 0x0000, 0x0800, CRC(95760d0f) SHA1(94ac5a261d9afc77c2a163a50950b0e86b1f8041) )
 ROM_END
 
-ROM_START( gunbuletw ) /* World set using 4Mb sound data ROM (verified) */
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
+ROM_START( gunbuletw ) // World set using 4Mb sound data ROM (verified)
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD32_WORD( "gn3_mprlb.15b", 0x00002, 0x80000, CRC(9260fce5) SHA1(064579be1ac90e04082a8b403c6adf35dbb46a7e) )
 	ROM_LOAD32_WORD( "gn3_mprub.13b", 0x00000, 0x80000, CRC(6c1ac697) SHA1(7b52b5ef8154a5d741ac24673f3e6bbfa246a494) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either ROM is correct */
-//  ROM_LOAD( "gn1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb ROM at 0x00000-0x1ffff */
-	ROM_LOAD( "gn1-spr0.5b", 0, 0x80000, CRC(71773811) SHA1(e482784d9b9ebf8c2e4a2a3f6f6c4dc8304d2251) ) /* 4Megabit, same data at 0x00000-0x1ffff, 0x20000-0x7ffff is 0xff filled */
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either ROM is correct
+//  ROM_LOAD( "gn1_spr0.5b", 0x00000, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) // 1Megabit, same data as the 4Mb ROM at 0x00000-0x1ffff
+	ROM_LOAD( "gn1-spr0.5b", 0x00000, 0x80000, CRC(71773811) SHA1(e482784d9b9ebf8c2e4a2a3f6f6c4dc8304d2251) ) // 4Megabit, same data at 0x00000-0x1ffff, 0x20000-0x7ffff is 0xff filled
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
-	ROM_LOAD( "gn1-voi0.5j", 0, 0x200000, CRC(05477eb7) SHA1(f2eaacb5dbac06c37c56b9b131230c9cf6602221) )
+	ROM_LOAD( "gn1-voi0.5j", 0x000000, 0x200000, CRC(05477eb7) SHA1(f2eaacb5dbac06c37c56b9b131230c9cf6602221) )
 
 	ROM_REGION( 0x800000, "c355spr", 0 )
-	ROM_LOAD32_WORD( "gn1obj0l.ic1", 0x000000, 0x200000, CRC(06722dc8) SHA1(56fee4e17ed707fa6dbc6bad0d0281fc8cdf72d1) ) /* These four located on MEMEXT OBJ8 PCB daughter-card */
+	ROM_LOAD32_WORD( "gn1obj0l.ic1", 0x000000, 0x200000, CRC(06722dc8) SHA1(56fee4e17ed707fa6dbc6bad0d0281fc8cdf72d1) ) // These four located on MEMEXT OBJ8 PCB daughter-card
 	ROM_LOAD32_WORD( "gn1obj0u.ic2", 0x000002, 0x200000, CRC(fcefc909) SHA1(48c19b6032096dd80777aa6d5eb5f90463095cbe) )
 	ROM_LOAD32_WORD( "gn1obj1l.ic3", 0x400000, 0x200000, CRC(48468df7) SHA1(c5fb9082c84ac2ffceb6f5f4cbc1d40047c55e3d) )
 	ROM_LOAD32_WORD( "gn1obj1u.ic4", 0x400002, 0x200000, CRC(3109a071) SHA1(4bb16df5a3aecdf37baf843edfc82952d46f5227) )
@@ -1153,26 +1513,26 @@ ROM_START( gunbuletw ) /* World set using 4Mb sound data ROM (verified) */
 	ROM_LOAD( "gn1-chr3.11j", 0x300000, 0x100000, CRC(4352c308) SHA1(785c13df219dceac2f940519141665b630a29f86) )
 
 	ROM_REGION( 0x80000, "c123tmap:mask", 0 )
-	ROM_LOAD( "gn1-sha0.5m", 0, 0x80000, CRC(86d4ff85) SHA1(a71056b2bcbba50c834fe28269ebda9719df354a) )
+	ROM_LOAD( "gn1-sha0.5m", 0x00000, 0x80000, CRC(86d4ff85) SHA1(a71056b2bcbba50c834fe28269ebda9719df354a) )
 
 	ROM_REGION( 0x0800, "eeprom", 0 ) // default gun calibration and settings
 	ROM_LOAD( "eeprom", 0x0000, 0x0800, CRC(95760d0f) SHA1(94ac5a261d9afc77c2a163a50950b0e86b1f8041) )
 ROM_END
 
-ROM_START( gunbuletj ) /* Japanese set using 1Mb sound data ROM (verified) */
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
+ROM_START( gunbuletj ) // Japanese set using 1Mb sound data ROM (verified)
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD32_WORD( "gn1_mprl.15b", 0x00002, 0x80000, CRC(f99e309e) SHA1(3fe0ddf756e6849f8effc7672456cbe32f65c98a) )
 	ROM_LOAD32_WORD( "gn1_mpru.13b", 0x00000, 0x80000, CRC(72a4db07) SHA1(8c5e1e51cd961b311d03f7b21f36a5bd5e8e9104) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either ROM is correct */
-	ROM_LOAD( "gn1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb ROM at 0x00000-0x1ffff */
-//  ROM_LOAD( "gn1-spr0.5b", 0, 0x80000, CRC(71773811) SHA1(e482784d9b9ebf8c2e4a2a3f6f6c4dc8304d2251) ) /* 4Megabit, same data at 0x00000-0x1ffff, 0x20000-0x7ffff is 0xff filled */
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either ROM is correct
+	ROM_LOAD( "gn1_spr0.5b", 0x00000, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) // 1Megabit, same data as the 4Mb ROM at 0x00000-0x1ffff
+//  ROM_LOAD( "gn1-spr0.5b", 0x00000, 0x80000, CRC(71773811) SHA1(e482784d9b9ebf8c2e4a2a3f6f6c4dc8304d2251) ) // 4Megabit, same data at 0x00000-0x1ffff, 0x20000-0x7ffff is 0xff filled
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
-	ROM_LOAD( "gn1-voi0.5j", 0, 0x200000, CRC(05477eb7) SHA1(f2eaacb5dbac06c37c56b9b131230c9cf6602221) )
+	ROM_LOAD( "gn1-voi0.5j", 0x000000, 0x200000, CRC(05477eb7) SHA1(f2eaacb5dbac06c37c56b9b131230c9cf6602221) )
 
 	ROM_REGION( 0x800000, "c355spr", 0 )
-	ROM_LOAD32_WORD( "gn1obj0l.ic1", 0x000000, 0x200000, CRC(06722dc8) SHA1(56fee4e17ed707fa6dbc6bad0d0281fc8cdf72d1) ) /* These four located on MEMEXT OBJ8 PCB daughter-card */
+	ROM_LOAD32_WORD( "gn1obj0l.ic1", 0x000000, 0x200000, CRC(06722dc8) SHA1(56fee4e17ed707fa6dbc6bad0d0281fc8cdf72d1) ) // These four located on MEMEXT OBJ8 PCB daughter-card
 	ROM_LOAD32_WORD( "gn1obj0u.ic2", 0x000002, 0x200000, CRC(fcefc909) SHA1(48c19b6032096dd80777aa6d5eb5f90463095cbe) )
 	ROM_LOAD32_WORD( "gn1obj1l.ic3", 0x400000, 0x200000, CRC(48468df7) SHA1(c5fb9082c84ac2ffceb6f5f4cbc1d40047c55e3d) )
 	ROM_LOAD32_WORD( "gn1obj1u.ic4", 0x400002, 0x200000, CRC(3109a071) SHA1(4bb16df5a3aecdf37baf843edfc82952d46f5227) )
@@ -1184,22 +1544,22 @@ ROM_START( gunbuletj ) /* Japanese set using 1Mb sound data ROM (verified) */
 	ROM_LOAD( "gn1-chr3.11j", 0x300000, 0x100000, CRC(4352c308) SHA1(785c13df219dceac2f940519141665b630a29f86) )
 
 	ROM_REGION( 0x80000, "c123tmap:mask", 0 )
-	ROM_LOAD( "gn1-sha0.5m", 0, 0x80000, CRC(86d4ff85) SHA1(a71056b2bcbba50c834fe28269ebda9719df354a) )
+	ROM_LOAD( "gn1-sha0.5m", 0x00000, 0x80000, CRC(86d4ff85) SHA1(a71056b2bcbba50c834fe28269ebda9719df354a) )
 
 	ROM_REGION( 0x0800, "eeprom", 0 ) // default gun calibration and settings
 	ROM_LOAD( "eeprom", 0x0000, 0x0800, CRC(95760d0f) SHA1(94ac5a261d9afc77c2a163a50950b0e86b1f8041) )
 ROM_END
 
 ROM_START( nebulray )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD32_WORD( "nr2_mprl.15b", 0x00002, 0x80000, CRC(0431b6d4) SHA1(54c96e8ac9e753956c31bdef79d390f1c20e10ff) )
 	ROM_LOAD32_WORD( "nr2_mpru.13b", 0x00000, 0x80000, CRC(049b97cb) SHA1(0e344b29a4d4bdc854fa9849589772df2eeb0a05) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
-	ROM_LOAD( "nr1-spr0", 0, 0x20000, CRC(1cc2b44b) SHA1(161f4ed39fabe89d7ee1d539f8b9f08cd0ff3111) )
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // sound data
+	ROM_LOAD( "nr1-spr0", 0x00000, 0x20000, CRC(1cc2b44b) SHA1(161f4ed39fabe89d7ee1d539f8b9f08cd0ff3111) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
-	ROM_LOAD( "nr1-voi0", 0, 0x200000, CRC(332d5e26) SHA1(9daddac3fbe0709e25ed8e0b456bac15bfae20d7) )
+	ROM_LOAD( "nr1-voi0", 0x000000, 0x200000, CRC(332d5e26) SHA1(9daddac3fbe0709e25ed8e0b456bac15bfae20d7) )
 
 	ROM_REGION( 0x1000000, "c355spr", 0 )
 	ROM_LOAD32_WORD( "nr1obj0l", 0x000000, 0x200000, CRC(0e99ef46) SHA1(450fe61e448270b633f312361bd5ca89bb9684dd) )
@@ -1218,22 +1578,22 @@ ROM_START( nebulray )
 	ROM_LOAD( "nr1-chr3", 0x300000, 0x100000,CRC(8f4b1d51) SHA1(b48fb2c8ccd9105a5b48be44dd3fe4309769efa4) )
 
 	ROM_REGION( 0x80000, "c123tmap:mask", 0 )
-	ROM_LOAD( "nr1-sha0", 0, 0x80000,CRC(ca667e13) SHA1(685032603224cb81bcb85361921477caec570d5e) )
+	ROM_LOAD( "nr1-sha0", 0x00000, 0x80000,CRC(ca667e13) SHA1(685032603224cb81bcb85361921477caec570d5e) )
 
-	ROM_REGION( 0x20, "proms", 0 ) /* custom key data? */
-	ROM_LOAD( "c366.bin", 0, 0x20, CRC(8c96f31d) SHA1(d186859cfc19a63266084372080d0a5bee687ae2) )
+	ROM_REGION( 0x20, "proms", 0 ) // custom key data?
+	ROM_LOAD( "c366.bin", 0x00, 0x20, CRC(8c96f31d) SHA1(d186859cfc19a63266084372080d0a5bee687ae2) )
 ROM_END
 
 ROM_START( nebulrayj )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD32_WORD( "nr1_mprl.15b", 0x00002, 0x80000, CRC(fae5f62c) SHA1(143d716abbc834aac6270db3bbb89ec71ea3804d) )
 	ROM_LOAD32_WORD( "nr1_mpru.13b", 0x00000, 0x80000, CRC(42ef71f9) SHA1(20e3cb63e1fde293c60c404b378d901d635c4b79) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
-	ROM_LOAD( "nr1-spr0", 0, 0x20000, CRC(1cc2b44b) SHA1(161f4ed39fabe89d7ee1d539f8b9f08cd0ff3111) )
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // sound data
+	ROM_LOAD( "nr1-spr0", 0x00000, 0x20000, CRC(1cc2b44b) SHA1(161f4ed39fabe89d7ee1d539f8b9f08cd0ff3111) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
-	ROM_LOAD( "nr1-voi0", 0, 0x200000, CRC(332d5e26) SHA1(9daddac3fbe0709e25ed8e0b456bac15bfae20d7) )
+	ROM_LOAD( "nr1-voi0", 0x000000, 0x200000, CRC(332d5e26) SHA1(9daddac3fbe0709e25ed8e0b456bac15bfae20d7) )
 
 	ROM_REGION( 0x1000000, "c355spr", 0 )
 	ROM_LOAD32_WORD( "nr1obj0l", 0x000000, 0x200000, CRC(0e99ef46) SHA1(450fe61e448270b633f312361bd5ca89bb9684dd) )
@@ -1252,10 +1612,10 @@ ROM_START( nebulrayj )
 	ROM_LOAD( "nr1-chr3", 0x300000, 0x100000,CRC(8f4b1d51) SHA1(b48fb2c8ccd9105a5b48be44dd3fe4309769efa4) )
 
 	ROM_REGION( 0x80000, "c123tmap:mask", 0 )
-	ROM_LOAD( "nr1-sha0", 0, 0x80000,CRC(ca667e13) SHA1(685032603224cb81bcb85361921477caec570d5e) )
+	ROM_LOAD( "nr1-sha0", 0x00000, 0x80000,CRC(ca667e13) SHA1(685032603224cb81bcb85361921477caec570d5e) )
 
-	ROM_REGION( 0x20, "proms", 0 ) /* custom key data? */
-	ROM_LOAD( "c366.bin", 0, 0x20, CRC(8c96f31d) SHA1(d186859cfc19a63266084372080d0a5bee687ae2) )
+	ROM_REGION( 0x20, "proms", 0 ) // custom key data?
+	ROM_LOAD( "c366.bin", 0x00, 0x20, CRC(8c96f31d) SHA1(d186859cfc19a63266084372080d0a5bee687ae2) )
 ROM_END
 
 ROM_START( nebulrayp ) // every label handwritten
@@ -1313,22 +1673,22 @@ ROM_START( nebulrayp ) // every label handwritten
 	ROM_LOAD( "nr1-chr3", 0x300000, 0x100000,CRC(8f4b1d51) SHA1(b48fb2c8ccd9105a5b48be44dd3fe4309769efa4) )
 
 	ROM_REGION( 0x80000, "c123tmap:mask", 0 ) // same as the other sets
-	ROM_LOAD( "nr1-sha0", 0, 0x80000,CRC(ca667e13) SHA1(685032603224cb81bcb85361921477caec570d5e) )
+	ROM_LOAD( "nr1-sha0", 0x00000, 0x80000,CRC(ca667e13) SHA1(685032603224cb81bcb85361921477caec570d5e) )
 
 	ROM_REGION( 0x20, "proms", 0 ) // custom key data?
-	ROM_LOAD( "c366.bin", 0, 0x20, CRC(8c96f31d) SHA1(d186859cfc19a63266084372080d0a5bee687ae2) )
+	ROM_LOAD( "c366.bin", 0x00, 0x20, CRC(8c96f31d) SHA1(d186859cfc19a63266084372080d0a5bee687ae2) )
 ROM_END
 
 ROM_START( gslgr94u )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD32_WORD( "gse2mprl.15b", 0x00002, 0x80000, CRC(a514349c) SHA1(1f7ec81cd6193410d2f01e6f0f84878561fc8035) )
 	ROM_LOAD32_WORD( "gse2mpru.13b", 0x00000, 0x80000, CRC(b6afd238) SHA1(438a3411ac8ce3d22d5da8c0800738cb8d2994a9) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
-	ROM_LOAD( "gse2spr0.bin", 0, 0x20000, CRC(17e87cfc) SHA1(9cbeadb6dfcb736e8c80eab344f70fc2f58469d6) )
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // sound data
+	ROM_LOAD( "gse2spr0.bin", 0x00000, 0x20000, CRC(17e87cfc) SHA1(9cbeadb6dfcb736e8c80eab344f70fc2f58469d6) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
-	ROM_LOAD( "gse-voi0.bin", 0, 0x200000, CRC(d3480574) SHA1(0c468ed060769b36b7e41cf4919cb6d8691d64f6) )
+	ROM_LOAD( "gse-voi0.bin", 0x000000, 0x200000, CRC(d3480574) SHA1(0c468ed060769b36b7e41cf4919cb6d8691d64f6) )
 
 	ROM_REGION( 0x400000, "c355spr", 0 )
 	ROM_LOAD32_WORD( "gseobj0l.bin", 0x000000, 0x200000, CRC(531520ca) SHA1(2a1a5282549c6f7a37d5fb8c0b342edb9dc45315) )
@@ -1341,19 +1701,50 @@ ROM_START( gslgr94u )
 	ROM_LOAD( "gse-chr3.bin", 0x300000, 0x100000, CRC(adbd1f88) SHA1(3c7bb1a9a398412bd3c98cadf8ce63a16e2bfed5) )
 
 	ROM_REGION( 0x80000, "c123tmap:mask", 0 )
-	ROM_LOAD( "gse-sha0.bin", 0, 0x80000, CRC(6b2beabb) SHA1(815f7aef44735584edd4a9ca7e672471d07f225e) )
+	ROM_LOAD( "gse-sha0.bin", 0x00000, 0x80000, CRC(6b2beabb) SHA1(815f7aef44735584edd4a9ca7e672471d07f225e) )
+ROM_END
+
+ROM_START( gslgr94ua ) // all labels handwritten, said to use the Outfoxies' Keycus, but actually checks for gslgr94j's one?
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD32_WORD( "prg_l.15b", 0x00002, 0x80000, CRC(d41b1692) SHA1(4790df8fb2ffd796d375e4092de848da091adfa5) )
+	ROM_LOAD32_WORD( "prg_u.13b", 0x00000, 0x80000, CRC(798276a0) SHA1(cc062427cbbee66c61a6e321bfec3995bb43a909) )
+
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // sound data
+	ROM_LOAD( "snd_prg_3.bin", 0x00000, 0x80000, CRC(d9871f03) SHA1(203085c979ca3104179db0841c2ca91fed4590dd) ) // 11xxxxxxxxxxxxxxxxx = 0xFF, real data is identical to the parent
+
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples, identical to the parent
+	ROM_LOAD( "voice_3.bin", 0x000000, 0x200000, CRC(d3480574) SHA1(0c468ed060769b36b7e41cf4919cb6d8691d64f6) )
+
+	ROM_REGION( 0x400000, "c355spr", 0 ) // split differently, but data is identical to the parent
+	ROM_LOAD32_BYTE( "obj_a1_3.1a", 0x000000, 0x080000, CRC(19cb42a0) SHA1(27a6f42de6426912c2d5cc166a5654010bd40e9f) )
+	ROM_LOAD32_BYTE( "obj_b1_3.1b", 0x000001, 0x080000, CRC(3d179f07) SHA1(9debb31c2c782293c3ff673b05691bf81fb955ea) )
+	ROM_LOAD32_BYTE( "obj_c1_3.1c", 0x000002, 0x080000, CRC(90922cb0) SHA1(a8feaf7a45c9e783dd04792a5b304eaeb70a7268) )
+	ROM_LOAD32_BYTE( "obj_d1_3.1d", 0x000003, 0x080000, CRC(5ffbd032) SHA1(78dc529b47822eeb1320fa2561005e718df53c8c) )
+	ROM_LOAD32_BYTE( "obj_a2_3.2a", 0x200000, 0x080000, CRC(9de63c10) SHA1(731e90db98c66d034e12dc783f297992ae65c6f8) )
+	ROM_LOAD32_BYTE( "obj_b2_3.2b", 0x200001, 0x080000, CRC(563548a0) SHA1(44f19e4841a8a71a14dc976c66d37fcbd575536a) )
+	ROM_LOAD32_BYTE( "obj_c2.2c", 0x200002, 0x080000, CRC(022c2101) SHA1(8345be95f5d51f200b214954cfcb2efed5aeac46) )
+	ROM_LOAD32_BYTE( "obj_d2.2d", 0x200003, 0x080000, CRC(1d84f241) SHA1(1a291a12534da239889881f02645c3fe5bce9d77) )
+
+	ROM_REGION( 0x400000, "c123tmap", 0 ) // identical to the parent
+	ROM_LOAD( "chr0.bin", 0x000000, 0x100000, CRC(9314085d) SHA1(150e8ea908861337f9be2749aa7f9e1d52570586) )
+	ROM_LOAD( "chr1.bin", 0x100000, 0x100000, CRC(c128a887) SHA1(4faf78064dd48ec50684a7dc8d120f8c5985bf2a) )
+	ROM_LOAD( "chr2.bin", 0x200000, 0x100000, CRC(48f0a311) SHA1(e39adcce835542e64ca87f6019d4a85fcbe388c2) )
+	ROM_LOAD( "chr3.bin", 0x300000, 0x100000, CRC(adbd1f88) SHA1(3c7bb1a9a398412bd3c98cadf8ce63a16e2bfed5) )
+
+	ROM_REGION( 0x80000, "c123tmap:mask", 0 ) // identical to the parent
+	ROM_LOAD( "shape_3", 0x00000, 0x80000, CRC(6b2beabb) SHA1(815f7aef44735584edd4a9ca7e672471d07f225e) )
 ROM_END
 
 ROM_START( gslgr94j )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD32_WORD( "gs41mprl.15b", 0x00002, 0x80000, CRC(5759bdb5) SHA1(a0fb332c484e168369a69cd9dd8ea72e5f4565df) )
 	ROM_LOAD32_WORD( "gs41mpru.13b", 0x00000, 0x80000, CRC(78bde1e7) SHA1(911d33897f03c59c6505f5f755d80471ff019812) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
-	ROM_LOAD( "gs41spr0.5b", 0, 0x80000, CRC(3e2b6d55) SHA1(f6a1ecaee3a9a7a535850084e469aa7f873f301e) )
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // sound data
+	ROM_LOAD( "gs41spr0.5b", 0x00000, 0x80000, CRC(3e2b6d55) SHA1(f6a1ecaee3a9a7a535850084e469aa7f873f301e) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
-	ROM_LOAD( "gs4voi0.5j", 0, 0x200000, CRC(c3053a90) SHA1(e76799b33b2457421255b03786bc24266d59c7dd) )
+	ROM_LOAD( "gs4voi0.5j", 0x000000, 0x200000, CRC(c3053a90) SHA1(e76799b33b2457421255b03786bc24266d59c7dd) )
 
 	ROM_REGION( 0x800000, "c355spr", 0 )
 	ROM_LOAD32_WORD( "gs4obj0l.bin", 0x000000, 0x200000, CRC(3b499da0) SHA1(91ad5f68dbda64dd07e1133eb09ee69da3da3103) )
@@ -1368,7 +1759,7 @@ ROM_START( gslgr94j )
 	ROM_LOAD( "gs4chr3.11j", 0x300000, 0x100000, CRC(73ca58f6) SHA1(44bdc943fb10dc53279662cd528169a27d57e478) )
 
 	ROM_REGION( 0x80000, "c123tmap:mask", 0 )
-	ROM_LOAD( "gs4sha0.5m", 0, 0x80000, CRC(40e7e6a5) SHA1(70af76b6034e0d6e1b96bf54c973ab411e5907ab) )
+	ROM_LOAD( "gs4sha0.5m", 0x00000, 0x80000, CRC(40e7e6a5) SHA1(70af76b6034e0d6e1b96bf54c973ab411e5907ab) )
 ROM_END
 
 /*
@@ -1497,12 +1888,12 @@ Note! All ROMs are different to the Great Sluggers '94 set.
 */
 
 ROM_START( gslugrsj )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD32_WORD( "gs1mprl.15b", 0x00002, 0x80000, CRC(1e6c3626) SHA1(56abe21884fd87df10996db19c49ce14214d4b73) )
 	ROM_LOAD32_WORD( "gs1mpru.13b", 0x00000, 0x80000, CRC(ef355179) SHA1(0ab0ef4301a318681bb5827d35734a0732b35484) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
-	ROM_LOAD( "gs1spr0.5b", 0, 0x80000, CRC(561ea20f) SHA1(adac6b77effc3a82079a9b228bafca0fcef72ba5) )
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // sound data
+	ROM_LOAD( "gs1spr0.5b", 0x00000, 0x80000, CRC(561ea20f) SHA1(adac6b77effc3a82079a9b228bafca0fcef72ba5) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "gs1voi-0.5j", 0, 0x200000, CRC(6f8262aa) SHA1(beea98d9f8b927a572eb0bfcf678e9d6e40fc68d) )
@@ -1518,19 +1909,19 @@ ROM_START( gslugrsj )
 	ROM_LOAD( "gs1chr-3.11j", 0x300000, 0x100000, CRC(b149d7da) SHA1(d50c6258db0ccdd69b563e880d1711aae811fbe3) )
 
 	ROM_REGION( 0x80000, "c123tmap:mask", 0 )
-	ROM_LOAD( "gs1sha-0.5m", 0, 0x80000, CRC(8a2832fe) SHA1(a1f54754fb01bbbc87274b1a0a4127fa9296ad1a) )
+	ROM_LOAD( "gs1sha-0.5m", 0x00000, 0x80000, CRC(8a2832fe) SHA1(a1f54754fb01bbbc87274b1a0a4127fa9296ad1a) )
 ROM_END
 
 ROM_START( sws95 )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD32_WORD( "ss51mprl.bin", 0x00002, 0x80000, CRC(c9e0107d) SHA1(0f10582416023a86ea1ef2679f3f06016c086e08) )
 	ROM_LOAD32_WORD( "ss51mpru.bin", 0x00000, 0x80000, CRC(0d93d261) SHA1(5edef26e2c86dbc09727d910af92747d022e4fed) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
-	ROM_LOAD( "ss51spr0.bin", 0, 0x80000, CRC(71cb12f5) SHA1(6e13bd16a5ba14d6e47a21875db3663ada3c06a5) )
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // sound data
+	ROM_LOAD( "ss51spr0.bin", 0x00000, 0x80000, CRC(71cb12f5) SHA1(6e13bd16a5ba14d6e47a21875db3663ada3c06a5) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
-	ROM_LOAD( "ss51voi0.bin", 0, 0x200000, CRC(2740ec72) SHA1(9694a7378ea72771d2b1d43db6d74ed347ba27d3) )
+	ROM_LOAD( "ss51voi0.bin", 0x000000, 0x200000, CRC(2740ec72) SHA1(9694a7378ea72771d2b1d43db6d74ed347ba27d3) )
 
 	ROM_REGION( 0x400000, "c355spr", 0 )
 	ROM_LOAD32_WORD( "ss51ob0l.bin", 0x000000, 0x200000, CRC(e0395694) SHA1(e52045a7af4c4b0f9935695cfc5ff729bf9bd7c1) )
@@ -1543,19 +1934,19 @@ ROM_START( sws95 )
 	ROM_LOAD( "ss51chr3.bin", 0x300000, 0x100000, CRC(73ca58f6) SHA1(44bdc943fb10dc53279662cd528169a27d57e478) )
 
 	ROM_REGION( 0x80000, "c123tmap:mask", 0 )
-	ROM_LOAD( "ss51sha0.bin", 0, 0x80000, CRC(3bf4d081) SHA1(7b07b86f753ea6bcd90eb7d152c12884a6fe785a) )
+	ROM_LOAD( "ss51sha0.bin", 0x00000, 0x80000, CRC(3bf4d081) SHA1(7b07b86f753ea6bcd90eb7d152c12884a6fe785a) )
 ROM_END
 
 ROM_START( sws96 )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD32_WORD( "ss61mprl.bin", 0x00002, 0x80000, CRC(06f55e73) SHA1(6be26f8a2ef600bf07c580f210d7b265ac464002) )
 	ROM_LOAD32_WORD( "ss61mpru.bin", 0x00000, 0x80000, CRC(0abdbb83) SHA1(67e8b712291f9bcf2c3a52fbc451fad54679cab8) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
-	ROM_LOAD( "ss61spr0.bin", 0, 0x80000, CRC(71cb12f5) SHA1(6e13bd16a5ba14d6e47a21875db3663ada3c06a5) )
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // sound data
+	ROM_LOAD( "ss61spr0.bin", 0x00000, 0x80000, CRC(71cb12f5) SHA1(6e13bd16a5ba14d6e47a21875db3663ada3c06a5) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
-	ROM_LOAD( "ss61voi0.bin", 0, 0x200000, CRC(2740ec72) SHA1(9694a7378ea72771d2b1d43db6d74ed347ba27d3) )
+	ROM_LOAD( "ss61voi0.bin", 0x000000, 0x200000, CRC(2740ec72) SHA1(9694a7378ea72771d2b1d43db6d74ed347ba27d3) )
 
 	ROM_REGION( 0x400000, "c355spr", 0 )
 	ROM_LOAD32_WORD( "ss61ob0l.bin", 0x000000, 0x200000, CRC(579b19d4) SHA1(7f18097c683d2b1c532f54ee514dd499f5965165) )
@@ -1568,19 +1959,19 @@ ROM_START( sws96 )
 	ROM_LOAD( "ss61chr3.bin", 0x300000, 0x100000, CRC(066581d4) SHA1(999cd478d9da452bb57793cd276c6c0d87e2825e) )
 
 	ROM_REGION( 0x80000, "c123tmap:mask", 0 )
-	ROM_LOAD( "ss61sha0.bin", 0, 0x80000, CRC(fceaa19c) SHA1(c9303a755ac7af19c4804a264d1a09d987f39e74) )
+	ROM_LOAD( "ss61sha0.bin", 0x00000, 0x80000, CRC(fceaa19c) SHA1(c9303a755ac7af19c4804a264d1a09d987f39e74) )
 ROM_END
 
 ROM_START( sws97 )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD32_WORD( "ss71mprl.bin", 0x00002, 0x80000, CRC(bd60b50e) SHA1(9e00bacd506182ab2af2c0efdd5cc401b3e46485) )
 	ROM_LOAD32_WORD( "ss71mpru.bin", 0x00000, 0x80000, CRC(3444f5a8) SHA1(8d0f35b3ba8f65dbc67c3b2d273833227a8b8b2a) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
-	ROM_LOAD( "ss71spr0.bin", 0, 0x80000, CRC(71cb12f5) SHA1(6e13bd16a5ba14d6e47a21875db3663ada3c06a5) )
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // sound data
+	ROM_LOAD( "ss71spr0.bin", 0x00000, 0x80000, CRC(71cb12f5) SHA1(6e13bd16a5ba14d6e47a21875db3663ada3c06a5) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
-	ROM_LOAD( "ss71voi0.bin", 0, 0x200000, CRC(2740ec72) SHA1(9694a7378ea72771d2b1d43db6d74ed347ba27d3) )
+	ROM_LOAD( "ss71voi0.bin", 0x000000, 0x200000, CRC(2740ec72) SHA1(9694a7378ea72771d2b1d43db6d74ed347ba27d3) )
 
 	ROM_REGION( 0x400000, "c355spr", 0 )
 	ROM_LOAD32_WORD( "ss71ob0l.bin", 0x000000, 0x200000, CRC(9559ad44) SHA1(fd56a8620f6958cc090f783d74cb38bba46d2423) )
@@ -1593,22 +1984,22 @@ ROM_START( sws97 )
 	ROM_LOAD( "ss71chr3.bin", 0x300000, 0x100000, CRC(066581d4) SHA1(999cd478d9da452bb57793cd276c6c0d87e2825e) )
 
 	ROM_REGION( 0x80000, "c123tmap:mask", 0 )
-	ROM_LOAD( "ss71sha0.bin", 0, 0x80000, CRC(be8c2758) SHA1(0a1b6c03cdaec6103ae8483b67faf3840234f825) )
+	ROM_LOAD( "ss71sha0.bin", 0x00000, 0x80000, CRC(be8c2758) SHA1(0a1b6c03cdaec6103ae8483b67faf3840234f825) )
 ROM_END
 
 ROM_START( vshoot )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD32_WORD( "vsj1mprl.15b", 0x00002, 0x80000, CRC(83a60d92) SHA1(c3db0c79f772a79418914353a3d6ecc4883ea54e) )
 	ROM_LOAD32_WORD( "vsj1mpru.13b", 0x00000, 0x80000, CRC(c63eb92d) SHA1(f93bd4b91daee645677955020dc8df14dc9bfd27) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
-	ROM_LOAD( "vsj1spr0.5b", 0, 0x80000, CRC(b0c71aa6) SHA1(a94fae02b46a645ff728d2f98827c85ff155892b) )
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // sound data
+	ROM_LOAD( "vsj1spr0.5b", 0x00000, 0x80000, CRC(b0c71aa6) SHA1(a94fae02b46a645ff728d2f98827c85ff155892b) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
-	ROM_LOAD( "vsjvoi-0.5j", 0, 0x200000, CRC(0528c9ed) SHA1(52b67978fdeb97b77065575774a7ddeb49fe1d81) )
+	ROM_LOAD( "vsjvoi-0.5j", 0x000000, 0x200000, CRC(0528c9ed) SHA1(52b67978fdeb97b77065575774a7ddeb49fe1d81) )
 
 	ROM_REGION( 0x800000, "c355spr", 0 )
-	ROM_LOAD32_WORD( "vsjobj0l.ic1", 0x000000, 0x200000, CRC(e134faa7) SHA1(a844c8a5bd6d8907f9e5c7ba9e2ee8e9a886cd1e) ) /* These four located on MEMEXT OBJ8 PCB daughter-card */
+	ROM_LOAD32_WORD( "vsjobj0l.ic1", 0x000000, 0x200000, CRC(e134faa7) SHA1(a844c8a5bd6d8907f9e5c7ba9e2ee8e9a886cd1e) ) // These four located on MEMEXT OBJ8 PCB daughter-card
 	ROM_LOAD32_WORD( "vsjobj0u.ic2", 0x000002, 0x200000, CRC(974d0714) SHA1(976050eaf82d4b66e13c1c579e5521eb867527fb) )
 	ROM_LOAD32_WORD( "vsjobj1l.ic3", 0x400000, 0x200000, CRC(ba46f967) SHA1(ddfb0ac7fba7369869e4df9a66d465a662eba2e6) )
 	ROM_LOAD32_WORD( "vsjobj1u.ic4", 0x400002, 0x200000, CRC(09da7e9c) SHA1(e98e07a886a4fe369748fc97f3cee6a4bb668385) )
@@ -1620,7 +2011,7 @@ ROM_START( vshoot )
 	ROM_LOAD( "vsjchr-3.11j", 0x300000, 0x100000, CRC(73ca58f6) SHA1(44bdc943fb10dc53279662cd528169a27d57e478) )
 
 	ROM_REGION( 0x80000, "c123tmap:mask", 0 )
-	ROM_LOAD( "vsjsha-0.5m", 0, 0x80000, CRC(78335ea4) SHA1(d4b9f179b1b456a866354ea308664c036de6414d) )
+	ROM_LOAD( "vsjsha-0.5m", 0x00000, 0x80000, CRC(78335ea4) SHA1(d4b9f179b1b456a866354ea308664c036de6414d) )
 ROM_END
 
 /*
@@ -1782,21 +2173,21 @@ ou1obj4u.9b     OBJ4U     MB8316200B (16M SOP44)
 */
 
 ROM_START( outfxies )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD32_WORD( "ou2_mprl.11c", 0x00002, 0x80000, CRC(f414a32e) SHA1(9733ab087cfde1b8fb5b676d8a2eb5325ebdbb56) )
 	ROM_LOAD32_WORD( "ou2_mpru.11d", 0x00000, 0x80000, CRC(ab5083fb) SHA1(cb2e7a4838c2b80057edb83ea63116bccb1394d3) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
-	ROM_LOAD( "ou1spr0.5b", 0, 0x80000, CRC(60cee566) SHA1(2f3b96793816d90011586e0f9f71c58b636b6d4c) )
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // sound data
+	ROM_LOAD( "ou1spr0.5b", 0x00000, 0x80000, CRC(60cee566) SHA1(2f3b96793816d90011586e0f9f71c58b636b6d4c) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
-	ROM_LOAD( "ou1voi0.6n", 0, 0x200000, CRC(2d8fb271) SHA1(bde9d45979728f5a2cd8ec89f5f81bf16b694cc2) )
+	ROM_LOAD( "ou1voi0.6n", 0x000000, 0x200000, CRC(2d8fb271) SHA1(bde9d45979728f5a2cd8ec89f5f81bf16b694cc2) )
 
 	ROM_REGION( 0x200000, "c123tmap:mask", 0 )
-	ROM_LOAD( "ou1shas.12s", 0, 0x200000,CRC(9bcb0397) SHA1(54a32b6394d0e6f51bfd281f8a4bafce6ddf6246) )
+	ROM_LOAD( "ou1shas.12s", 0x000000, 0x200000, CRC(9bcb0397) SHA1(54a32b6394d0e6f51bfd281f8a4bafce6ddf6246) )
 
 	ROM_REGION( 0x200000, "c169roz:mask", 0 )
-	ROM_LOAD( "ou1shar.18s", 0, 0x200000,   CRC(fbb48194) SHA1(2d3ec5bc519fad2b755018f83fadfe0cba13c292) )
+	ROM_LOAD( "ou1shar.18s", 0x000000, 0x200000, CRC(fbb48194) SHA1(2d3ec5bc519fad2b755018f83fadfe0cba13c292) )
 
 	ROM_REGION( 0x2000000, "c355spr", 0 )
 	ROM_LOAD32_WORD( "ou1obj0l.4c", 0x0000000, 0x200000, CRC(1b4f7184) SHA1(a05d67842fce92f321d1fdd3bd30aa3427775a0c) )
@@ -1824,21 +2215,21 @@ ROM_START( outfxies )
 ROM_END
 
 ROM_START( outfxiesj )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD32_WORD( "ou1_mprl.11c", 0x00002, 0x80000, CRC(d3b9e530) SHA1(3f5fe5eea817a23dfe42e76f32912ce94d4c49c9) )
 	ROM_LOAD32_WORD( "ou1_mpru.11d", 0x00000, 0x80000, CRC(d98308fb) SHA1(fdefeebf56464a20e3aaefd88df4eee9f7b5c4f3) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
-	ROM_LOAD( "ou1spr0.5b", 0, 0x80000, CRC(60cee566) SHA1(2f3b96793816d90011586e0f9f71c58b636b6d4c) )
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // sound data
+	ROM_LOAD( "ou1spr0.5b", 0x00000, 0x80000, CRC(60cee566) SHA1(2f3b96793816d90011586e0f9f71c58b636b6d4c) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
-	ROM_LOAD( "ou1voi0.6n", 0, 0x200000, CRC(2d8fb271) SHA1(bde9d45979728f5a2cd8ec89f5f81bf16b694cc2) )
+	ROM_LOAD( "ou1voi0.6n", 0x000000, 0x200000, CRC(2d8fb271) SHA1(bde9d45979728f5a2cd8ec89f5f81bf16b694cc2) )
 
 	ROM_REGION( 0x200000, "c123tmap:mask", 0 )
-	ROM_LOAD( "ou1shas.12s", 0, 0x200000,CRC(9bcb0397) SHA1(54a32b6394d0e6f51bfd281f8a4bafce6ddf6246) )
+	ROM_LOAD( "ou1shas.12s", 0x000000, 0x200000, CRC(9bcb0397) SHA1(54a32b6394d0e6f51bfd281f8a4bafce6ddf6246) )
 
 	ROM_REGION( 0x200000, "c169roz:mask", 0 )
-	ROM_LOAD( "ou1shar.18s", 0, 0x200000,   CRC(fbb48194) SHA1(2d3ec5bc519fad2b755018f83fadfe0cba13c292) )
+	ROM_LOAD( "ou1shar.18s", 0x000000, 0x200000, CRC(fbb48194) SHA1(2d3ec5bc519fad2b755018f83fadfe0cba13c292) )
 
 	ROM_REGION( 0x2000000, "c355spr", 0 )
 	ROM_LOAD32_WORD( "ou1obj0l.4c", 0x0000000, 0x200000, CRC(1b4f7184) SHA1(a05d67842fce92f321d1fdd3bd30aa3427775a0c) )
@@ -1871,16 +2262,16 @@ ROM_START( outfxiesja ) // this set uses different "c355spr", "c169roz" and "c12
 	ROM_LOAD32_WORD( "ou1_mpru.11d", 0x00000, 0x80000, CRC(d98308fb) SHA1(fdefeebf56464a20e3aaefd88df4eee9f7b5c4f3) )
 
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // sound data
-	ROM_LOAD( "ou1spr0.5b", 0, 0x80000, CRC(60cee566) SHA1(2f3b96793816d90011586e0f9f71c58b636b6d4c) )
+	ROM_LOAD( "ou1spr0.5b", 0x00000, 0x80000, CRC(60cee566) SHA1(2f3b96793816d90011586e0f9f71c58b636b6d4c) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // samples
-	ROM_LOAD( "ou1voi0.6n", 0, 0x200000, CRC(2d8fb271) SHA1(bde9d45979728f5a2cd8ec89f5f81bf16b694cc2) )
+	ROM_LOAD( "ou1voi0.6n", 0x000000, 0x200000, CRC(2d8fb271) SHA1(bde9d45979728f5a2cd8ec89f5f81bf16b694cc2) )
 
 	ROM_REGION( 0x200000, "c123tmap:mask", 0 )
-	ROM_LOAD( "ou1shas.12s", 0, 0x200000,CRC(9bcb0397) SHA1(54a32b6394d0e6f51bfd281f8a4bafce6ddf6246) )
+	ROM_LOAD( "ou1shas.12s", 0x000000, 0x200000, CRC(9bcb0397) SHA1(54a32b6394d0e6f51bfd281f8a4bafce6ddf6246) )
 
 	ROM_REGION( 0x200000, "c169roz:mask", 0 )
-	ROM_LOAD( "ou1shar.18s", 0, 0x200000,   CRC(fbb48194) SHA1(2d3ec5bc519fad2b755018f83fadfe0cba13c292) )
+	ROM_LOAD( "ou1shar.18s", 0x000000, 0x200000, CRC(fbb48194) SHA1(2d3ec5bc519fad2b755018f83fadfe0cba13c292) )
 
 	ROM_REGION( 0x2000000, "c355spr", 0 ) // all sldh
 	ROM_LOAD32_WORD( "ou1obj0l.4c", 0x0000000, 0x200000, CRC(ecf135e4) SHA1(f88924bf4528845c6d178abf0c0d71e3030d6823) )
@@ -1907,22 +2298,22 @@ ROM_START( outfxiesja ) // this set uses different "c355spr", "c169roz" and "c12
 	ROM_LOAD16_WORD_SWAP( "ou1dat1.20b", 0x80000, 0x80000, CRC(63bb119d) SHA1(d4c2820243b84c3f5cdf7f9e66bb50f53d0efed2) )
 ROM_END
 
-ROM_START( outfxiesa ) /* briefly shows "For use in Japan" notice, but Japanese text removed from game play. A Korean version? */
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
+ROM_START( outfxiesa ) // briefly shows "For use in Japan" notice, but Japanese text removed from game play. A Korean version?
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD32_WORD( "mprl.11c", 0x00002, 0x80000, CRC(22cd638d) SHA1(7b11ded9f2265678bb96b3fb706ed5fa37745511) ) // no label on ROM
 	ROM_LOAD32_WORD( "mpru.11d", 0x00000, 0x80000, CRC(a50f1cf9) SHA1(1c07c7e1ff2bb621c6fb249ae2e650097ce53aea) ) // no label on ROM
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
-	ROM_LOAD( "ou1spr0.5b", 0, 0x80000, CRC(60cee566) SHA1(2f3b96793816d90011586e0f9f71c58b636b6d4c) )
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // sound data
+	ROM_LOAD( "ou1spr0.5b", 0x00000, 0x80000, CRC(60cee566) SHA1(2f3b96793816d90011586e0f9f71c58b636b6d4c) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
-	ROM_LOAD( "ou1voi0.6n", 0, 0x200000, CRC(2d8fb271) SHA1(bde9d45979728f5a2cd8ec89f5f81bf16b694cc2) )
+	ROM_LOAD( "ou1voi0.6n", 0x000000, 0x200000, CRC(2d8fb271) SHA1(bde9d45979728f5a2cd8ec89f5f81bf16b694cc2) )
 
 	ROM_REGION( 0x200000, "c123tmap:mask", 0 )
-	ROM_LOAD( "ou1shas.12s", 0, 0x200000,CRC(9bcb0397) SHA1(54a32b6394d0e6f51bfd281f8a4bafce6ddf6246) )
+	ROM_LOAD( "ou1shas.12s", 0x000000, 0x200000, CRC(9bcb0397) SHA1(54a32b6394d0e6f51bfd281f8a4bafce6ddf6246) )
 
 	ROM_REGION( 0x200000, "c169roz:mask", 0 )
-	ROM_LOAD( "ou1shar.18s", 0, 0x200000,   CRC(fbb48194) SHA1(2d3ec5bc519fad2b755018f83fadfe0cba13c292) )
+	ROM_LOAD( "ou1shar.18s", 0x000000, 0x200000, CRC(fbb48194) SHA1(2d3ec5bc519fad2b755018f83fadfe0cba13c292) )
 
 	ROM_REGION( 0x2000000, "c355spr", 0 )
 	ROM_LOAD32_WORD( "ou1obj0l.4c", 0x0000000, 0x200000, CRC(1b4f7184) SHA1(a05d67842fce92f321d1fdd3bd30aa3427775a0c) )
@@ -1949,25 +2340,25 @@ ROM_START( outfxiesa ) /* briefly shows "For use in Japan" notice, but Japanese 
 	ROM_LOAD16_WORD_SWAP( "ou1dat1.20b", 0x80000, 0x80000, CRC(63bb119d) SHA1(d4c2820243b84c3f5cdf7f9e66bb50f53d0efed2) )
 ROM_END
 
-ROM_START( machbrkr ) /* Defaults to Asia / 4 Player cabinet */
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
+ROM_START( machbrkr ) // Defaults to Asia / 4 Player cabinet
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD32_WORD( "mb2_mprl.11c", 0x00002, 0x80000, CRC(81e2c566) SHA1(e4553938114581ccdedc09309c646144300039ed) )
 	ROM_LOAD32_WORD( "mb2_mpru.11d", 0x00000, 0x80000, CRC(e8ccec89) SHA1(495be58a18e9122c0fa44bac409ef14b588387e7) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
-	ROM_LOAD( "mb1_spr0.5b", 0, 0x80000, CRC(d10f6272) SHA1(cb99e06e050dbf86998ea51ef2ca130b2acfb2f6) )
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // sound data
+	ROM_LOAD( "mb1_spr0.5b", 0x00000, 0x80000, CRC(d10f6272) SHA1(cb99e06e050dbf86998ea51ef2ca130b2acfb2f6) )
 
 	ROM_REGION( 0x1000000, "c352", 0 )
 	ROM_LOAD( "mb1_voi0.6n", 0x000000, 0x200000, CRC(d363ca3b) SHA1(71650b66ca3eb00f6ad7d3f1df0f37210b77b942) )
-	ROM_RELOAD( 0x400000, 0x200000)
+	ROM_RELOAD(              0x400000, 0x200000)
 	ROM_LOAD( "mb1_voi1.6p", 0x800000, 0x200000, CRC(7e1c2603) SHA1(533098a54fb897931f1d75be9e69a5c047e4c446) )
-	ROM_RELOAD( 0xc00000, 0x200000)
+	ROM_RELOAD(              0xc00000, 0x200000)
 
 	ROM_REGION( 0x200000, "c123tmap:mask", 0 )
-	ROM_LOAD( "mb1_shas.12s", 0, 0x100000, CRC(c51c614b) SHA1(519ecad2e4543c05ec35a727f4c875ab006291af) )
+	ROM_LOAD( "mb1_shas.12s", 0x000000, 0x100000, CRC(c51c614b) SHA1(519ecad2e4543c05ec35a727f4c875ab006291af) )
 
 	ROM_REGION( 0x200000, "c169roz:mask", 0 )
-	ROM_LOAD( "mb1_shar.18s", 0, 0x080000, CRC(d9329b10) SHA1(149c8804c07350f47af36bc7902371f1dfbed272) )
+	ROM_LOAD( "mb1_shar.18s", 0x000000, 0x080000, CRC(d9329b10) SHA1(149c8804c07350f47af36bc7902371f1dfbed272) )
 
 	ROM_REGION( 0x2000000, "c355spr", 0 )
 	ROM_LOAD32_WORD( "mb1obj0l.4c", 0x0000000, 0x200000, CRC(056e6b1c) SHA1(44e49de80c925c8fbe04bf9328a77a50a305a5a7) )
@@ -1995,24 +2386,24 @@ ROM_START( machbrkr ) /* Defaults to Asia / 4 Player cabinet */
 ROM_END
 
 ROM_START( machbrkrj )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD32_WORD( "mb1_mprl.11c", 0x00002, 0x80000, CRC(86cf0644) SHA1(07eeadda1d94c9be2f882edb6f2eb0b98292e500) )
 	ROM_LOAD32_WORD( "mb1_mpru.11d", 0x00000, 0x80000, CRC(fb1ff916) SHA1(e0ba96c1f26a60f87d8050e582e164d91e132183) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
-	ROM_LOAD( "mb1_spr0.5b", 0, 0x80000, CRC(d10f6272) SHA1(cb99e06e050dbf86998ea51ef2ca130b2acfb2f6) )
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // sound data
+	ROM_LOAD( "mb1_spr0.5b", 0x00000, 0x80000, CRC(d10f6272) SHA1(cb99e06e050dbf86998ea51ef2ca130b2acfb2f6) )
 
 	ROM_REGION( 0x1000000, "c352", 0 )
 	ROM_LOAD( "mb1_voi0.6n", 0x000000, 0x200000, CRC(d363ca3b) SHA1(71650b66ca3eb00f6ad7d3f1df0f37210b77b942) )
-	ROM_RELOAD( 0x400000, 0x200000)
+	ROM_RELOAD(              0x400000, 0x200000)
 	ROM_LOAD( "mb1_voi1.6p", 0x800000, 0x200000, CRC(7e1c2603) SHA1(533098a54fb897931f1d75be9e69a5c047e4c446) )
-	ROM_RELOAD( 0xc00000, 0x200000)
+	ROM_RELOAD(              0xc00000, 0x200000)
 
 	ROM_REGION( 0x200000, "c123tmap:mask", 0 )
-	ROM_LOAD( "mb1_shas.12s", 0, 0x100000, CRC(c51c614b) SHA1(519ecad2e4543c05ec35a727f4c875ab006291af) )
+	ROM_LOAD( "mb1_shas.12s", 0x000000, 0x100000, CRC(c51c614b) SHA1(519ecad2e4543c05ec35a727f4c875ab006291af) )
 
 	ROM_REGION( 0x200000, "c169roz:mask", 0 )
-	ROM_LOAD( "mb1_shar.18s", 0, 0x080000, CRC(d9329b10) SHA1(149c8804c07350f47af36bc7902371f1dfbed272) )
+	ROM_LOAD( "mb1_shar.18s", 0x000000, 0x080000, CRC(d9329b10) SHA1(149c8804c07350f47af36bc7902371f1dfbed272) )
 
 	ROM_REGION( 0x2000000, "c355spr", 0 )
 	ROM_LOAD32_WORD( "mb1obj0l.4c", 0x0000000, 0x200000, CRC(056e6b1c) SHA1(44e49de80c925c8fbe04bf9328a77a50a305a5a7) )
@@ -2039,28 +2430,31 @@ ROM_START( machbrkrj )
 	ROM_LOAD16_WORD_SWAP( "mb1_dat0.20a", 0x00000, 0x80000, CRC(fb2e3cd1) SHA1(019b1d645a07619036522f42e0b9a537f39b6b93) )
 ROM_END
 
+} // anonymous namespace
+
 
 /***************************************************************/
 
-/*    YEAR, NAME,       PARENT,   MACHINE,  INPUT,    CLASS,          INIT,          MONITOR,COMPANY,FULLNAME,                   FLAGS */
-GAME( 1994, nebulray,   0,        namconb1, namconb1, namconb1_state, init_nebulray, ROT90, "Namco", "Nebulas Ray (World, NR2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, nebulrayj,  nebulray, namconb1, namconb1, namconb1_state, init_nebulray, ROT90, "Namco", "Nebulas Ray (Japan, NR1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, nebulrayp,  nebulray, namconb1, namconb1, namconb1_state, init_nebulray, ROT90, "Namco", "Nebulas Ray (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, ptblank,    0,        gunbulet, gunbulet, gunbulet_state, init_gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, ptblanka,   ptblank,  gunbulet, gunbulet, gunbulet_state, init_gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gunbuletj,  ptblank,  gunbulet, gunbulet, gunbulet_state, init_gunbulet, ROT0,  "Namco", "Gun Bullet (Japan, GN1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gunbuletw,  ptblank,  gunbulet, gunbulet, gunbulet_state, init_gunbulet, ROT0,  "Namco", "Gun Bullet (World, GN3 Rev B)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, gslugrsj,   0,        namconb1, namconb1, namconb1_state, init_gslgr94u, ROT0,  "Namco", "Great Sluggers (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gslgr94u,   0,        namconb1, namconb1, namconb1_state, init_gslgr94u, ROT0,  "Namco", "Great Sluggers '94", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gslgr94j,   gslgr94u, namconb1, namconb1, namconb1_state, init_gslgr94j, ROT0,  "Namco", "Great Sluggers '94 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sws95,      0,        namconb1, namconb1, namconb1_state, init_sws95,    ROT0,  "Namco", "Super World Stadium '95 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, sws96,      0,        namconb1, namconb1, namconb1_state, init_sws96,    ROT0,  "Namco", "Super World Stadium '96 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, sws97,      0,        namconb1, namconb1, namconb1_state, init_sws97,    ROT0,  "Namco", "Super World Stadium '97 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, vshoot,     0,        namconb1, namconb1, namconb1_state, init_vshoot,   ROT0,  "Namco", "J-League Soccer V-Shoot (Japan)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,       PARENT,   MACHINE,  INPUT,    CLASS,          INIT,          MONITOR,COMPANY,FULLNAME,                                         FLAGS
+GAME( 1994, nebulray,   0,        namconb1, namconb1, namconb1_state, init_nebulray, ROT90, "Namco", "Nebulas Ray (World, NR2)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nebulrayj,  nebulray, namconb1, namconb1, namconb1_state, init_nebulray, ROT90, "Namco", "Nebulas Ray (Japan, NR1)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nebulrayp,  nebulray, namconb1, namconb1, namconb1_state, init_nebulray, ROT90, "Namco", "Nebulas Ray (prototype)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1994, ptblank,    0,        gunbulet, gunbulet, gunbulet_state, init_gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 1)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1994, ptblanka,   ptblank,  gunbulet, gunbulet, gunbulet_state, init_gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 2)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gunbuletj,  ptblank,  gunbulet, gunbulet, gunbulet_state, init_gunbulet, ROT0,  "Namco", "Gun Bullet (Japan, GN1)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gunbuletw,  ptblank,  gunbulet, gunbulet, gunbulet_state, init_gunbulet, ROT0,  "Namco", "Gun Bullet (World, GN3 Rev B)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gslugrsj,   0,        namconb1, namconb1, namconb1_state, init_gslgr94u, ROT0,  "Namco", "Great Sluggers (Japan)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gslgr94u,   0,        namconb1, namconb1, namconb1_state, init_gslgr94u, ROT0,  "Namco", "Great Sluggers '94",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gslgr94ua,  gslgr94u, namconb1, namconb1, namconb1_state, init_gslgr94j, ROT0,  "Namco", "Great Sluggers '94 (prototype?)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gslgr94j,   gslgr94u, namconb1, namconb1, namconb1_state, init_gslgr94j, ROT0,  "Namco", "Great Sluggers '94 (Japan)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sws95,      0,        namconb1, namconb1, namconb1_state, init_sws95,    ROT0,  "Namco", "Super World Stadium '95 (Japan)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1996, sws96,      0,        namconb1, namconb1, namconb1_state, init_sws96,    ROT0,  "Namco", "Super World Stadium '96 (Japan)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1997, sws97,      0,        namconb1, namconb1, namconb1_state, init_sws97,    ROT0,  "Namco", "Super World Stadium '97 (Japan)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1994, vshoot,     0,        namconb1, namconb1, namconb1_state, init_vshoot,   ROT0,  "Namco", "J-League Soccer V-Shoot (Japan)",                MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, outfxies,   0,        outfxies, namconb1, namconb2_state, init_outfxies, ROT0,  "Namco", "The Outfoxies (World, OU2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, outfxiesj,  outfxies, outfxies, namconb1, namconb2_state, init_outfxies, ROT0,  "Namco", "The Outfoxies (Japan, OU1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, outfxies,   0,        outfxies, namconb1, namconb2_state, init_outfxies, ROT0,  "Namco", "The Outfoxies (World, OU2)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1994, outfxiesj,  outfxies, outfxies, namconb1, namconb2_state, init_outfxies, ROT0,  "Namco", "The Outfoxies (Japan, OU1)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1994, outfxiesja, outfxies, machbrkr, namconb1, namconb2_state, init_outfxies, ROT0,  "Namco", "The Outfoxies (Japan, OU1, alternate GFX ROMs)", MACHINE_SUPPORTS_SAVE ) // GFX ROMs are different and are in the same format as the Mach Breakers ones
-GAME( 1994, outfxiesa,  outfxies, outfxies, namconb1, namconb2_state, init_outfxies, ROT0,  "Namco", "The Outfoxies (Korea?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, machbrkr,   0,        machbrkr, namconb1, namconb2_state, init_machbrkr, ROT0,  "Namco", "Mach Breakers (World, MB2)", MACHINE_SUPPORTS_SAVE ) // Title screen doesn't show subtitle "Numan Athletics 2"
+GAME( 1994, outfxiesa,  outfxies, outfxies, namconb1, namconb2_state, init_outfxies, ROT0,  "Namco", "The Outfoxies (Korea?)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1995, machbrkr,   0,        machbrkr, namconb1, namconb2_state, init_machbrkr, ROT0,  "Namco", "Mach Breakers (World, MB2)",                     MACHINE_SUPPORTS_SAVE ) // Title screen doesn't show subtitle "Numan Athletics 2"
 GAME( 1995, machbrkrj,  machbrkr, machbrkr, namconb1, namconb2_state, init_machbrkr, ROT0,  "Namco", "Mach Breakers - Numan Athletics 2 (Japan, MB1)", MACHINE_SUPPORTS_SAVE )
