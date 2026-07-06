@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+Mode 5 PC-6001mkII/PC-6601 floppy disks. They autoboot at startup.
+-->
+<softwarelist name="pc6001mk2_flop" description="NEC PC-6001mkII/PC-6601 disk images">
+
+	<!-- v1.0 known to exist (same with no sound) -->
+	<software name="asalt" supported="yes">
+		<description>Asalt (v1.1, prototype)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Looks a tech demo (time doesn't run down, has no enemies, has 1 stage)
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="153008">
+				<rom name="asalt (v1.1).d88" size="153008" crc="5649ace5" sha1="4e972be3d60979d1d6c27fb1dc83b623d8157c8b"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

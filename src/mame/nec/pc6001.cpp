@@ -29,94 +29,67 @@ TODO (pc6601):
 - current regression caused by an internal FDC sense interrupt status that expects a
   DIO high that never occurs;
 - mon r-0 type games doesn't seem to work at all on this system?
+  Update: tries to autoload cassette at startup for some reason.
 
 TODO (pc6601mk2sr):
 - Implement MK-2 compatibility mode via view handler(s)
   (it changes the memory map to behave like the older versions);
 - Video Telopper (superimposer) & TV tuner functions for later machines;
 - pc6001mk2sr/pc6601sr: currently doesn't work without -debug enabled (?), has serious keyboard
-  issues.
-
-TODO (game specific, move in SW lists):
-- (several AX* games, namely Galaxy Mission Part 1/2 and others): inputs doesn't work;
-- AX6 - Demo: When AY-based speech talks, other emus emulates the screen drawing to be
-   a solid green (plain PC-6001) or solid white (Mk2 version), but according to an
-   original video reference, that screen should actually some kind of weird garbage on it;
-- AX6 - Powered Knight: doesn't work too well, according to the asm code it asks the
-   player to press either 'B' or 'C' then a number but nothing is shown on screen,
-   other emus behaves the same, bad dump?
-(Mk2 mode 5 games)
-- 3D Golf Simulation Super Version: gameplay / inputs seems broken;
-- American Truck: Screen is offset at the loading screen, loading bug?
-- Dezeni Land (ALL versions) / Hurry Fox 1/2: asks you to "load something", can't do it
-   with current cassette kludge, also, for Dezeni Land(s) keyboard irqs doesn't seem to
-   work too well with halt opcode execution?
-- Dezeni Land 1/4: dies after loading of main program;
-- Dezeni Land 2: dies at the "load something" screen with presumably wrong stack opcodes
-- (MyCom BASIC games with multiple files): most of them refuses to run ... how to load them?
-- Grobda: when "get ready" speech plays, screen should be full white but instead it's all
-   black, same issue as AX-6 Demo?
-- Pac-Man / Tiny Xevious 2: gameplay is too fast (unrelated with timer irq);
-- Salad no Kunino Tomato-Hime: can't start a play;
-- Space Harrier: very sensitive with sub irq triggers, keyboard joy triggers doesn't work
-  properly (select F1 after loading), draws garbage on vanilla pc6001 and eventually crashes
-  MAME;
-- The Black Onyx: dies when it attempts to save the character, that obviously means saving
-   on the tape;
-- Yakyukyo / Punchball Mario: waits for an irq (fixed, wrong timer enable behaviour);
+  issues, BASIC based programs hangs at a $e6bb check (irq not fired regression? bp 102c,1,{pc+=2;g})
 
 ===================================================================================================
 
-    PC-6001 (1981-09):
+PC-6001 (1981-09):
 
-     * CPU: Z80A @ 4 MHz
-     * ROM: 16KB + 4KB (chargen) - no kanji
-     * RAM: 16KB, it can be expanded to 32KB
-     * Text Mode: 32x16 and 2 colors
-     * Graphic Modes: 64x48 (9 colors), 128x192 (4 colors), 256x192 (2 colors)
-     * Sound: BEEP + PSG - Optional Voice Synth Cart
-     * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
-            HOME/CLR key, INS key, DEL key, GRAPH key, Japanese syllabary
-            key, page key, STOP key, and cursor key (4 directions)
-     * 1 cartslot, optional floppy drive, optional serial 232 port, 2
-            joystick ports
-
-
-    PC-6001 mkII (1983-07):
-
-     * CPU: Z80A @ 4 MHz
-     * ROM: 32KB + 16KB (chargen) + 32KB (kanji) + 16KB (Voice Synth)
-     * RAM: 64KB
-     * Text Mode: same as PC-6001 with N60-BASIC; 40x20 and 15 colors with
-            N60M-BASIC
-     * Graphic Modes: same as PC-6001 with N60-BASIC; 80x40 (15 colors),
-            160x200 (15 colors), 320x200 (4 colors) with N60M-BASIC
-     * Sound: BEEP + PSG
-     * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
-            HOME/CLR key, INS key, DEL key, CAPS key, GRAPH key, Japanese
-            syllabary key, page key, mode key, STOP key, and cursor key (4
-            directions)
-     * 1 cartslot, floppy drive, optional serial 232 port, 2 joystick ports
+ * CPU: Z80A @ 4 MHz
+ * ROM: 16KB + 4KB (chargen) - no kanji
+ * RAM: 16KB, it can be expanded to 32KB
+ * Text Mode: 32x16 and 2 colors
+ * Graphic Modes: 64x48 (9 colors), 128x192 (4 colors), 256x192 (2 colors)
+ * Sound: BEEP + PSG - Optional Voice Synth Cart
+ * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
+        HOME/CLR key, INS key, DEL key, GRAPH key, Japanese syllabary
+        key, page key, STOP key, and cursor key (4 directions)
+ * 1 cartslot, optional floppy drive, optional serial 232 port, 2
+        joystick ports
 
 
-    PC-6001 mkIISR (1984-12):
+PC-6001 mkII (1983-07):
 
-     * CPU: Z80A @ 3.58 MHz
-     * ROM: 64KB + 16KB (chargen) + 32KB (kanji) + 32KB (Voice Synth)
-     * RAM: 64KB
-     * Text Mode: same as PC-6001/PC-6001mkII with N60-BASIC; 40x20, 40x25,
-            80x20, 80x25 and 15 colors with N66SR-BASIC
-     * Graphic Modes: same as PC-6001/PC-6001mkII with N60-BASIC; 80x40 (15 colors),
-            320x200 (15 colors), 640x200 (15 colors) with N66SR-BASIC
-     * Sound: BEEP + PSG + FM
-     * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
-            HOME/CLR key, INS key, DEL key, CAPS key, GRAPH key, Japanese
-            syllabary key, page key, mode key, STOP key, and cursor key (4
-            directions)
-     * 1 cartslot, floppy drive, optional serial 232 port, 2 joystick ports
+ * CPU: Z80A @ 4 MHz
+ * ROM: 32KB + 16KB (chargen) + 32KB (kanji) + 16KB (Voice Synth)
+ * RAM: 64KB
+ * Text Mode: same as PC-6001 with N60-BASIC; 40x20 and 15 colors with
+        N60M-BASIC
+ * Graphic Modes: same as PC-6001 with N60-BASIC; 80x40 (15 colors),
+        160x200 (15 colors), 320x200 (4 colors) with N60M-BASIC
+ * Sound: BEEP + PSG
+ * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
+        HOME/CLR key, INS key, DEL key, CAPS key, GRAPH key, Japanese
+        syllabary key, page key, mode key, STOP key, and cursor key (4
+        directions)
+ * 1 cartslot, floppy drive, optional serial 232 port, 2 joystick ports
 
 
-    info from http://www.geocities.jp/retro_zzz/machines/nec/6001/spc60.html
+PC-6001 mkIISR (1984-12):
+
+ * CPU: Z80A @ 3.58 MHz
+ * ROM: 64KB + 16KB (chargen) + 32KB (kanji) + 32KB (Voice Synth)
+ * RAM: 64KB
+ * Text Mode: same as PC-6001/PC-6001mkII with N60-BASIC; 40x20, 40x25,
+        80x20, 80x25 and 15 colors with N66SR-BASIC
+ * Graphic Modes: same as PC-6001/PC-6001mkII with N60-BASIC; 80x40 (15 colors),
+        320x200 (15 colors), 640x200 (15 colors) with N66SR-BASIC
+ * Sound: BEEP + PSG + FM
+ * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
+        HOME/CLR key, INS key, DEL key, CAPS key, GRAPH key, Japanese
+        syllabary key, page key, mode key, STOP key, and cursor key (4
+        directions)
+ * 1 cartslot, floppy drive, optional serial 232 port, 2 joystick ports
+
+
+ info from http://www.geocities.jp/retro_zzz/machines/nec/6001/spc60.html
 
 ===================================================================================================
 
@@ -823,7 +796,7 @@ void pc6001mk2_state::pc6001mk2_io(address_map &map)
 
 /*****************************************
  *
- * PC-6601 specific i/o
+ * PC-6601 specific I/O
  *
  ****************************************/
 
@@ -1808,8 +1781,8 @@ void pc6001_state::pc6001(machine_config &config)
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(pc6001_state::keyboard_callback), attotime::from_hz(250));
 	TIMER(config, "cassette_timer").configure_periodic(FUNC(pc6001_state::cassette_callback), attotime::from_hz(1200/12));
 
-	SOFTWARE_LIST(config, "cart_list_pc6001").set_original("pc6001_cart");
-	SOFTWARE_LIST(config, "cass_list_pc6001").set_original("pc6001_cass");
+	SOFTWARE_LIST(config, "cart_list").set_original("pc6001_cart");
+	SOFTWARE_LIST(config, "cass_list").set_original("pc6001_cass");
 }
 
 void pc6001mk2_state::pc6001mk2(machine_config &config)
@@ -1831,8 +1804,7 @@ void pc6001mk2_state::pc6001mk2(machine_config &config)
 
 	UPD7752(config, "upd7752", PC6001_MAIN_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	SOFTWARE_LIST(config, "cass_list_pc6001mk2").set_original("pc6001mk2_cass");
-
+	SOFTWARE_LIST(config, "cass_list_mk2").set_original("pc6001mk2_cass");
 }
 
 void pc6601_state::floppy_formats(format_registration &fr)
@@ -1874,6 +1846,9 @@ void pc6601_state::pc6601(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(pc6601_state::irq_callback));
 
 	pc6601_fdc_config(config);
+
+	// TODO: move this option to both regular mk2 and mk2sr
+	SOFTWARE_LIST(config, "flop_list_pc6001mk2").set_original("pc6001mk2_flop");
 }
 
 void pc6001mk2sr_state::pc6001mk2sr(machine_config &config)
@@ -1906,8 +1881,11 @@ void pc6001mk2sr_state::pc6001mk2sr(machine_config &config)
 	m_ym->port_b_write_callback().set(FUNC(pc6001mk2sr_state::joystick_out_w));
 	m_ym->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	// TODO: 1D 3'5" floppy drive
 	// TODO: telopper board (system explicitly asks for missing tape dump tho)
+
+	SOFTWARE_LIST(config, "cass_list_mk2sr").set_original("pc6001mk2sr_cass");
+	// TODO: specific option for 3.5"
+//	SOFTWARE_LIST(config, "flop_list_mk2sr").set_original("pc6001mk2sr_flop");
 }
 
 void pc6601sr_state::pc6601sr(machine_config &config)
@@ -2042,9 +2020,9 @@ ROM_START( pc6601sr )
 	ROM_COPY( "sr_sysrom", 0x18000, 0x00000, 0x8000 )
 ROM_END
 
-COMP( 1981, pc6001,       0,      0,        pc6001,      pc6001, pc6001_state,       empty_init, "NEC",   "PC-6001 (Japan)",              MACHINE_NOT_WORKING )
-COMP( 1981, pc6001a,      pc6001, 0,        pc6001,      pc6001, pc6001_state,       empty_init, "NEC",   "PC-6001A \"NEC Trek\" (US)",   MACHINE_NOT_WORKING )
-COMP( 1983, pc6001mk2,    0,      0,        pc6001mk2,   pc6001, pc6001mk2_state,    empty_init, "NEC",   "PC-6001mkII (Japan)",          MACHINE_NOT_WORKING )
-COMP( 1983, pc6601,       pc6001, 0,        pc6601,      pc6001, pc6601_state,       empty_init, "NEC",   "PC-6601 (Japan)",              MACHINE_NOT_WORKING )
-COMP( 1984, pc6001mk2sr,  0,      0,        pc6001mk2sr, pc6001, pc6001mk2sr_state,  empty_init, "NEC",   "PC-6001mkIISR (Japan)",        MACHINE_NOT_WORKING )
-COMP( 1984, pc6601sr,     pc6001, 0,        pc6601sr,    pc6001, pc6601sr_state,     empty_init, "NEC",   "PC-6601SR \"Mr. PC\" (Japan)", MACHINE_NOT_WORKING )
+COMP( 1981, pc6001,       0,           0,        pc6001,      pc6001, pc6001_state,       empty_init, "NEC",   "PC-6001 (Japan)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+COMP( 1981, pc6001a,      pc6001,      0,        pc6001,      pc6001, pc6001_state,       empty_init, "NEC",   "PC-6001A \"NEC Trek\" (US)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+COMP( 1983, pc6001mk2,    0,           0,        pc6001mk2,   pc6001, pc6001mk2_state,    empty_init, "NEC",   "PC-6001mkII (Japan)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+COMP( 1983, pc6601,       pc6001mk2,   0,        pc6601,      pc6001, pc6601_state,       empty_init, "NEC",   "PC-6601 (Japan)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+COMP( 1984, pc6001mk2sr,  0,           0,        pc6001mk2sr, pc6001, pc6001mk2sr_state,  empty_init, "NEC",   "PC-6001mkIISR (Japan)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+COMP( 1984, pc6601sr,     pc6001mk2sr, 0,        pc6601sr,    pc6001, pc6601sr_state,     empty_init, "NEC",   "PC-6601SR \"Mr. PC\" (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )

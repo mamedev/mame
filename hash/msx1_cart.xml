@@ -2584,7 +2584,7 @@ kept for now until finding out what those bytes affect...
 	<software name="blagger" supported="partial">
 		<description>Blagger MSX (Japan)</description>
 		<year>1984</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="ブラッガー" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
@@ -7054,7 +7054,7 @@ kept for now until finding out what those bytes affect...
 	<software name="hisha">
 		<description>Hisha (Japan)</description>
 		<year>1985</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="飛車" />
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="cart" interface="msx_cart">
@@ -7250,7 +7250,7 @@ kept for now until finding out what those bytes affect...
 	<software name="hfox">
 		<description>Hurry Fox MSX Special (Japan)</description>
 		<year>1986</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="44780" />
 		<info name="alt_title" value="は～りぃふぉっくすＭＳＸスペシャル" />
 		<info name="gtin" value="04988608447808"/>
@@ -7268,9 +7268,9 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<software name="hfox2">
-		<description>Hurry Fox - Yuki no Maou hen (Japan)</description>
+		<description>Hurry Fox: Yuki no Maou hen (Japan)</description>
 		<year>1985</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="は～りぃふぉっくす雪の魔王編" />
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="cart" interface="msx_cart">
@@ -10920,7 +10920,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 	<software name="picopico">
 		<description>Pico Pico (Japan)</description>
 		<year>1983</year>
-		<publisher>Microcabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="ピコピコ" />
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="cart" interface="msx_cart">
@@ -12155,7 +12155,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 	<software name="shogimc">
 		<description>Shougi (Japan, MicroCabin)</description>
 		<year>1985</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="将棋" />
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="cart" interface="msx_cart">

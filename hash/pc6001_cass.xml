@@ -20,6 +20,8 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 -->
 <softwarelist name="pc6001_cass" description="NEC PC-6001 cassette snapshots">
 
+<!-- !Games -->
+
 	<software name="amazon" supported="partial">
 		<description>The Amazon</description>
 		<year>19??</year>
@@ -44,14 +46,387 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		</part>
 	</software>
 
-	<software name="block" supported="partial">
-		<description>Block</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Mode 1, Page 2" />
-		<part name="snap" interface="pc6001_snap">
+	<!-- All AX entries release dates and order from tape printouts -->
+	<!-- Side B should be identical from side A -->
+
+	<software name="ax1" supported="partial">
+		<description>AX-1</description>
+		<year>1982</year>
+		<publisher>ASCII</publisher>
+		<notes><![CDATA[
+Arabian Rhapsody: pc6001mk2 draws without border colors (verify)
+]]></notes>
+		<info name="usage" value="Mode 1, Page 2 for all but Demo (Mode 1, Page 1)"/>
+
+		<part name="snap1" interface="pc6001_snap">
+			<feature name="part_id" value="Demonstration"/>
+			<dataarea name="snap" size="13510">
+				<rom name="ax-1 (demo) {m1p1}.cas" size="13510" crc="5a7a7321" sha1="1086d76df3e03427b0181e704186f827828ab011" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap2" interface="pc6001_snap">
+			<feature name="part_id" value="Arabian Rhapsody"/>
+			<dataarea name="snap" size="6301">
+				<rom name="ax-1 (arabian rhapsody).cas" size="6301" crc="e650de95" sha1="7bdb3586335c349230fd62a44806bb201a49c119" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap3" interface="pc6001_snap">
+			<feature name="part_id" value="Break Out L"/>
 			<dataarea name="snap" size="4837">
-				<rom name="block.cas" size="4837" crc="b0bad3d9" sha1="01b2da04a6d8c5766dcd765994d142bd18dcce73"/>
+				<rom name="ax-1 (break out) {m1p2}.cas" size="4837" crc="b0bad3d9" sha1="01b2da04a6d8c5766dcd765994d142bd18dcce73" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap4" interface="pc6001_snap">
+			<feature name="part_id" value="High Speed Barricade"/>
+			<dataarea name="snap" size="4167">
+				<rom name="ax-1 (barricade) {m1p2}.cas" size="4167" crc="a991614f" sha1="a87cac3e53fcdbf1c78ff90097b54e19b06b0512" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap5" interface="pc6001_snap">
+			<feature name="part_id" value="Simon"/>
+			<dataarea name="snap" size="4526">
+				<rom name="ax-1 (simon) {m1p2}.cas" size="4526" crc="4241fc84" sha1="91684c965e7dfd2ebf81746dce45cdc1cb7cf561" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ax2" supported="no">
+		<description>AX-2</description>
+		<year>1982</year>
+		<publisher>ASCII</publisher>
+		<notes><![CDATA[
+Nostromo, Dual Alien: MAME crash with pc6001
+Steal Alien: returns back to BASIC in pc6001
+]]></notes>
+		<info name="usage" value="Mode 1, Page 1 for Demonstration, Nostromo and Steal Alien. Mode 1, Page 2 for Dual Alien and In the Woods"/>
+
+		<part name="snap1" interface="pc6001_snap">
+			<feature name="part_id" value="Demonstration"/>
+			<dataarea name="snap" size="13510">
+				<rom name="ax-2 (demo).cas" size="13510" crc="6ec7beb5" sha1="1fe5b673aa916778fbd865b72fe95bc58582f832" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap2" interface="pc6001_snap">
+			<feature name="part_id" value="Nostromo"/>
+			<dataarea name="snap" size="8843">
+				<rom name="ax-2 (nostromo).cas" size="8843" crc="917001da" sha1="1728f1aafccb7e97141ffc143cb23004105bd421" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap3" interface="pc6001_snap">
+			<feature name="part_id" value="Steal Alien"/>
+			<dataarea name="snap" size="6378">
+				<rom name="ax-2 (steal alien).cas" size="6378" crc="0c3903fe" sha1="a1f7cfbb805f1d176395e4509180d959830ce3fa" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap4" interface="pc6001_snap">
+			<feature name="part_id" value="In the Woods"/>
+			<dataarea name="snap" size="3611">
+				<rom name="ax-2 (in the woods).cas" size="3611" crc="b4e6d9c3" sha1="7c813d25edd6ae3a2a3999414f3dc3623d9e8523" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap5" interface="pc6001_snap">
+			<feature name="part_id" value="Dual Alien"/>
+			<dataarea name="snap" size="6414">
+				<rom name="ax-2 (dual alien).cas" size="6414" crc="8a1557ab" sha1="dfbeab5d3f781b62d8be4e1d7b8a7774569001c3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ax3" supported="no">
+		<description>AX-3</description>
+		<year>1982</year>
+		<publisher>ASCII</publisher>
+		<notes><![CDATA[
+All games but Demo: punts back to How Many Pages in pc6001 (and crashes MAME with ram 64K)
+Cosmic Revo: invisible charset in pc6001
+]]></notes>
+		<info name="usage" value="Mode 1, Page 1 for Demo, Cosmic Revo, Micro Othello and Slot Poker. Mode 1, Page 2 for Inter-Fight"/>
+
+		<part name="snap1" interface="pc6001_snap">
+			<feature name="part_id" value="Demonstration"/>
+			<dataarea name="snap" size="13510">
+				<rom name="ax-3 (demo).cas" size="13510" crc="2b1cc972" sha1="b3c7b28f63bba39ced7274d409f394032a4e810d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap2" interface="pc6001_snap">
+			<feature name="part_id" value="Micro Othello"/>
+			<dataarea name="snap" size="9085">
+				<rom name="ax-3 (micro othello).cas" size="9085" crc="577acfd4" sha1="b6b4a3136fbd033d90121302213518c886799c75" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap3" interface="pc6001_snap">
+			<feature name="part_id" value="Inter-Fight"/>
+			<dataarea name="snap" size="5950">
+				<rom name="ax-3 (inter-fight).cas" size="5950" crc="342f9e2a" sha1="649fe00137eb057232485998ddbb196689a2190d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap4" interface="pc6001_snap">
+			<feature name="part_id" value="Cosmic Revo"/>
+			<dataarea name="snap" size="3426">
+				<rom name="ax-3 (cosmic revo).cas" size="3426" crc="c7f58d20" sha1="887296d1e41ea5a32587c92c345e07d10b9816a0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap5" interface="pc6001_snap">
+			<feature name="part_id" value="Slot Poker"/>
+			<dataarea name="snap" size="5429">
+				<rom name="ax-3 (slot poker).cas" size="5429" crc="e4cdd54a" sha1="dabdc23c6b85efb8a693ef800b56f18a52de21a0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ax4" supported="no">
+		<description>AX-4</description>
+		<year>1982</year>
+		<publisher>ASCII</publisher>
+		<notes><![CDATA[
+Black Hole: non-functional [keyboard] and [joystick] inputs in pc6001
+]]></notes>
+		<info name="usage" value="Mode 1, Page 1 for Demo, American Football, Black Hole and Shut the Box. Mode 1, Page 2 for Car Race"/>
+
+		<part name="snap1" interface="pc6001_snap">
+			<feature name="part_id" value="Demonstration"/>
+			<dataarea name="snap" size="13510">
+				<rom name="ax-4 (demo).cas" size="13510" crc="7bd36d87" sha1="596d339f76a1ea14fc6e79cf9c4e539dbaf9b11d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap2" interface="pc6001_snap">
+			<feature name="part_id" value="Black Hole"/>
+			<dataarea name="snap" size="6084">
+				<rom name="ax-4 (black hole).cas" size="6084" crc="81936ff9" sha1="05a22e03f53142905fae6b615f69d20a88c3420e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap3" interface="pc6001_snap">
+			<feature name="part_id" value="Car Race"/>
+			<dataarea name="snap" size="5717">
+				<rom name="ax-4 (car race).cas" size="5717" crc="a101aa0b" sha1="261cb2567546e800b3af4e3fa4bd0226198d29fd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap4" interface="pc6001_snap">
+			<feature name="part_id" value="American Football"/>
+			<dataarea name="snap" size="6840">
+				<rom name="ax-4 (american football).cas" size="6840" crc="fcba84bb" sha1="9dfd29f4026f28fbada54bec16d49615697d679c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap5" interface="pc6001_snap">
+			<feature name="part_id" value="Shut the Box"/>
+			<dataarea name="snap" size="5863">
+				<rom name="ax-4 (shut the box).cas" size="5863" crc="2f137847" sha1="9996049a4f7f0820cd754ae2a743dbed85996273" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ax5" supported="no">
+		<description>AX-5</description>
+		<year>1982</year>
+		<publisher>ASCII</publisher>
+		<notes><![CDATA[
+Olion: crashes MAME when pressing 'S' key in pc6001
+]]></notes>
+		<info name="usage" value="Mode 2, Page 2 for Olion. Mode 2, Page 1 for Quest"/>
+
+		<!-- Mode refers to the *GFX* mode -->
+		<part name="snap1" interface="pc6001_snap">
+			<feature name="part_id" value="Olion (Mode 4)"/>
+			<dataarea name="snap" size="16417">
+				<rom name="ax-5 (olion 4) {m2p2}.cas" size="16417" crc="acd6e7b6" sha1="b869eecc191e21441ccfca38c5c1049248fe3af4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap2" interface="pc6001_snap">
+			<feature name="part_id" value="Quest (Mode 4)"/>
+			<dataarea name="snap" size="29730">
+				<rom name="ax-5 (quest 4) {m2p1}.cas" size="29730" crc="2b735197" sha1="2837386bd00b9b7a9c342f53fdacdbea514a2d0f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap3" interface="pc6001_snap">
+			<feature name="part_id" value="Olion (Mode 3)"/>
+			<dataarea name="snap" size="16923">
+				<rom name="ax-5 (olion 3).cas" size="16923" crc="35cb7301" sha1="2c0328a65e6825ba30ce28354bbd938d6629d53b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap4" interface="pc6001_snap">
+			<feature name="part_id" value="Quest (Mode 3)"/>
+			<dataarea name="snap" size="29730">
+				<rom name="ax-5 (quest 3) {m2p1}.cas" size="29730" crc="45d891e4" sha1="46a8a7ee404751c1466a1519aa19b60dcb203f56" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ax6" supported="no">
+		<description>AX-6</description>
+		<year>1982</year>
+		<publisher>ASCII</publisher>
+		<notes><![CDATA[
+Demo: [timing] should corrupt video when AY-based speech plays back (cfr. real HW refs)
+Space Enemy, Head-On: [timing] runs too fast
+]]></notes>
+		<info name="usage" value="Mode 1, Page 1 for all but for Powered Knight (Mode 2, Page 1)"/>
+
+		<part name="snap1" interface="pc6001_snap">
+			<feature name="part_id" value="Demonstration"/>
+			<dataarea name="snap" size="11407">
+				<rom name="ax-6 (demo).cas" size="11407" crc="535a388c" sha1="a08ed50e4f66fcdabce019ac2c644b321d5f667e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap2" interface="pc6001_snap">
+			<feature name="part_id" value="Powered Knight"/>
+			<dataarea name="snap" size="13612">
+				<rom name="ax-6 (powered knight).cas" size="13612" crc="9252969e" sha1="e0e3b0582c8c17d7f738dd2f61a9933420435283" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap3" interface="pc6001_snap">
+			<feature name="part_id" value="Mastermind"/>
+			<dataarea name="snap" size="6841">
+				<rom name="ax-6 (mastermind).cas" size="6841" crc="074faa75" sha1="ab0cfe272400c493d8fc563ce7d9f0f62d34ba99" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap4" interface="pc6001_snap">
+			<feature name="part_id" value="Head-On"/>
+			<dataarea name="snap" size="5711">
+				<rom name="ax-6 (head-on).cas" size="5711" crc="91f7d594" sha1="e64442f2c32f0a7b6c62e1adcc4555fcc8149b66" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap5" interface="pc6001_snap">
+			<feature name="part_id" value="Space Enemy"/>
+			<dataarea name="snap" size="5579">
+				<rom name="ax-6 (space enemy).cas" size="5579" crc="6601f428" sha1="4d922cef648f9efe001f25920bf1874ca5cbde52" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ax7" supported="no">
+		<description>AX-7</description>
+		<year>1983</year>
+		<publisher>ASCII</publisher>
+		<notes><![CDATA[
+Demonstration: [timing] may be running too fast
+Police and Gang: [timing] runs too fast
+The Asterodian: [VDG] glitch for ASCII text in title (verify)
+]]></notes>
+		<info name="usage" value="Mode 1, Page 1 for all programs. The Asterodian uses joystick in port 2"/>
+
+		<part name="snap1" interface="pc6001_snap">
+			<feature name="part_id" value="Demonstration"/>
+			<dataarea name="snap" size="12017">
+				<rom name="ax-7 (demo).cas" size="12017" crc="8f8bec1b" sha1="e27570d787ca206a1972cc574a49314d37207ae3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap2" interface="pc6001_snap">
+			<feature name="part_id" value="Police &amp; Gang"/>
+			<dataarea name="snap" size="6163">
+				<rom name="ax-7 (police &amp; gang).cas" size="6163" crc="6beb7e0f" sha1="284a11789e69e2ca2c78d58f781a16412eb753b3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap3" interface="pc6001_snap">
+			<feature name="part_id" value="The Asterodian"/>
+			<dataarea name="snap" size="5477">
+				<rom name="ax-7 (the asterodian).cas" size="5477" crc="8a6ba775" sha1="4dc310922c6c20daa79f324bd2f6a1334e09d886" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap4" interface="pc6001_snap">
+			<feature name="part_id" value="Galaxy Fight"/>
+			<dataarea name="snap" size="6801">
+				<rom name="ax-7 (galaxy fight).cas" size="6801" crc="2fbfa59f" sha1="563db18352ccc6fc9b8c2cd1e26ae2045799b972" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap5" interface="pc6001_snap">
+			<feature name="part_id" value="God Hurricane"/>
+			<dataarea name="snap" size="6944">
+				<rom name="ax-7 (god hurricane).cas" size="6944" crc="acac3902" sha1="c66bfaf5956d5ca5fb69403de7fdfe321009e79a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ax8" supported="no">
+		<description>AX-8</description>
+		<year>1984</year>
+		<publisher>ASCII</publisher>
+		<notes><![CDATA[
+Cannot start a game, requires [keyboard] stop key
+]]></notes>
+		<info name="usage" value="Mode 2, Page 1"/>
+		<info name="alt_title" value="ギャラクシーミッション"/>
+
+		<part name="snap1" interface="pc6001_snap">
+			<feature name="part_id" value="Part 1"/>
+			<dataarea name="snap" size="23444">
+				<rom name="ax-8 (galaxy mission) (part 1).cas" size="23444" crc="e6a91fd9" sha1="ed46535f9fc21a7a1753c7b8011e33bf84cc31b7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap2" interface="pc6001_snap">
+			<feature name="part_id" value="Part 2"/>
+			<dataarea name="snap" size="25764">
+				<rom name="ax-8 (galaxy mission) (part 2).cas" size="25764" crc="049fbe65" sha1="7cfae929b6cf0c8511d59e86c15a18548686e20b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ax9" supported="no">
+		<description>AX-9</description>
+		<year>1984</year>
+		<publisher>ASCII</publisher>
+		<notes><![CDATA[
+3D Flight Simulator: non-functional [keyboard] in gameplay
+Blue Sky: [VDG] ground cursor leaves trails when moved
+]]></notes>
+		<info name="usage" value="Mode 2, Page 1 for 3D Flight Simulator, Bounder Robo and Demonstration. Mode 2, Page 2 for Blue Sky"/>
+
+		<part name="snap1" interface="pc6001_snap">
+			<feature name="part_id" value="Demonstration"/>
+			<dataarea name="snap" size="23001">
+				<rom name="ax-9 (demo).cas" size="23001" crc="116056a3" sha1="d66d0c9fa5fab3b5372057e933d012d1b13e6eed" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap2" interface="pc6001_snap">
+			<feature name="part_id" value="3D Flight Simulator"/>
+			<dataarea name="snap" size="10818">
+				<rom name="ax-9 (3d flight simulator).cas" size="10818" crc="102c36fe" sha1="02e6f5889d9a90c12cd4f5c18a029d07ea4f075e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap3" interface="pc6001_snap">
+			<feature name="part_id" value="Blue Sky"/>
+			<dataarea name="snap" size="13609">
+				<rom name="ax-9 (blue sky).cas" size="13609" crc="afc8448f" sha1="a1a86fcdb9d166b4598f9fa7b613240a396a0649" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap4" interface="pc6001_snap">
+			<feature name="part_id" value="Bounder Robo"/>
+			<dataarea name="snap" size="22441">
+				<rom name="ax-9 (bounder robo).cas" size="22441" crc="ac0bb163" sha1="bb86e25ef84fcdaadad3a48c7409cf4d678d39eb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ax10" supported="partial">
+		<description>AX-10</description>
+		<year>1985</year>
+		<publisher>ASCII</publisher>
+		<notes><![CDATA[
+Outlaw: [timing] runs too fast
+]]></notes>
+		<info name="usage" value="Mode 2, Page 1 for Outlaw and The Seven Bibles, Mode 2, Page 2 for Pop Hand and Risuning"/>
+
+		<part name="snap1" interface="pc6001_snap">
+			<feature name="part_id" value="Outlaw"/>
+			<dataarea name="snap" size="27138">
+				<rom name="ax-10 (outlaw).cas" size="27138" crc="a43a5369" sha1="29e11c2bb5b04b3fc1028cbb042e24e0ee7c611c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap2" interface="pc6001_snap">
+			<feature name="part_id" value="The Seven Bibles"/>
+			<dataarea name="snap" size="15107">
+				<rom name="ax-10 (the seven bibles).cas" size="15107" crc="2a155bac" sha1="9c3df6d1890a5b287d3691f1fc1c4dca0c58cfc6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap3" interface="pc6001_snap">
+			<feature name="part_id" value="Pop Hand"/>
+			<dataarea name="snap" size="17696">
+				<rom name="ax-10 (pop hand).cas" size="17696" crc="fa49df9b" sha1="25d7c570f21aeee2745c74cdb0b0388e941690a5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap4" interface="pc6001_snap">
+			<feature name="part_id" value="Risuning"/>
+			<dataarea name="snap" size="23387">
+				<rom name="ax-10 (risuning).cas" size="23387" crc="e5194e79" sha1="b55f98de74291cb59b4b98a1fd6b22096a9aa376" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -133,18 +508,6 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		</part>
 	</software>
 
-	<software name="power" supported="partial">
-		<description>Power Knight</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Mode 1, Page 1" />
-		<part name="snap" interface="pc6001_snap">
-			<dataarea name="snap" size="13612">
-				<rom name="power.cas" size="13612" crc="9252969e" sha1="e0e3b0582c8c17d7f738dd2f61a9933420435283"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="proracer" supported="partial">
 		<description>Pro Racer</description>
 		<year>19??</year>
@@ -170,6 +533,7 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		</part>
 	</software>
 
+	<!-- TODO: did ASCII really released this in standalone form? -->
 	<software name="spcenemy" supported="partial">
 		<description>Space Enemy</description>
 		<year>1982</year>
@@ -180,6 +544,26 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="5579">
 				<rom name="space enemy.cas" size="5579" crc="6601f428" sha1="4d922cef648f9efe001f25920bf1874ca5cbde52"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sharrier" supported="no">
+		<description>Space Harrier</description>
+		<year>198?</year>
+		<publisher>Dempa</publisher>
+		<notes><![CDATA[
+Very sensitive with [sub] irq triggers
+[keyboard] joy triggers doesn't work properly (select F1 after loading), cannot move down
+[gfx] draws garbage on vanilla pc6001 and eventually crashes MAME
+]]></notes>
+		<info name="usage" value="Mode 2, Page 2"/>
+		<info name="developer" value="T. Matsushima"/>
+		<info name="developer" value="Yet"/>
+		<info name="alt_title" value="スペースハリアー"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="43681">
+				<rom name="space harrier.cas" size="43681" crc="56319bd8" sha1="15e6ef72b233da81dbba4d096937fc18de6ffca3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -215,6 +599,7 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		<publisher>Dempa Micomsoft</publisher>
 		<info name="usage" value="Mode 4, Page 2 - PC-6001 requires N60 Extended BASIC cartridge" />
 		<info name="alt_title" value="タイニーゼビウス"/>
+		<info name="developer" value="T. Matsushima"/>
 		<sharedfeat name="requirement" value="pc6001_cart:n60basic"/>
 		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="17741">
@@ -222,5 +607,28 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="txevious2" supported="no">
+		<description>Tiny Xevious 2</description>
+		<!-- 1984 08. -->
+		<year>1984</year>
+		<publisher>Dempa Micomsoft</publisher>
+		<notes><![CDATA[
+Currently crashes MAME with no expansion ROM attached
+pc6001: Heavy [VDG] issues (regression? works in pc6001mk2)
+Gameplay is too fast
+]]></notes>
+		<info name="usage" value="Mode 2, Page 2, has optional support for Mode 4" />
+		<info name="alt_title" value="タイニーゼビウス2"/>
+		<info name="developer" value="T. Matsushima"/>
+		<!-- <sharedfeat name="requirement" value="pc6001_cart:n60basic"/> -->
+
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="41774">
+				<rom name="tiny xevious 2.cas" size="41774" crc="966c3a54" sha1="b69d633c7fa4b81c6b3113c2118ce1ffc83f050c"/>
+			</dataarea>
+		</part>
+	</software>
+
 
 </softwarelist>

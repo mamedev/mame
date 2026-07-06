@@ -1115,6 +1115,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<description>Pac-Mania (Japan)</description>
 		<year>1989</year>
 		<publisher>Namco</publisher>
+		<info name="alt_title" value="パックマニア"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M016-03M" />
 			<feature name="slot" value="ascii8" />

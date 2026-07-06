@@ -758,7 +758,7 @@ Gameplay speed is erratic (especially noticeable on vanilla PC8801)
 	</software>
 
 	<software name="3dgolfsv">
-		<description>3D Golf Simulation - Super Version</description>
+		<description>3D Golf Simulation: Super Version</description>
 		<year>1985</year>
 		<publisher>T&amp;E Soft</publisher>
 		<!-- PC8801mk2SR -->
@@ -3973,7 +3973,7 @@ TODO: understand how to create an user disk
 	</software>
 
 	<software name="attack">
-		<description>Attack!! Hiroko Chan</description>
+		<description>Attack!! Hiroko-chan</description>
 		<!-- 1983.9.1 -->
 		<year>1983</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
@@ -5079,10 +5079,11 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		<description>Bokosuka Wars</description>
 		<year>1984</year>
 		<publisher>アスキー (ASCII)</publisher>
-		<!-- PC8801 -->
+		<!-- PC8801mk2SR -->
 		<info name="release" value="198406xx"/>
 		<info name="alt_title" value="ボコスカウォーズ"/>
-		<info name="usage" value="Needs V2 BASIC on machines equipped with it"/>
+		<info name="usage" value="Needs BASIC V2"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="57264">
 				<rom name="bokosuka wars.d88" size="57264" crc="410d9bb7" sha1="fa83f0e5d393c82b928180fb8cb4c2e1b3a321fb"/>
@@ -14656,14 +14657,14 @@ ExtractDisk  [02]"Gradius改       " -> "gradius kai_02.d88"
 		</part>
 	</software>
 
-	<!-- Requires OPN equipped machine (verify) -->
-	<!-- palette is ugly (parent pc8801 only, verify) -->
-	<software name="grodba" supported="partial">
+	<software name="grobda" supported="yes">
 		<description>Grobda</description>
 		<year>1986</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
-		<!-- PC8801 -->
+		<!-- PC8801mk2SR -->
 		<info name="alt_title" value="グロブダー"/>
+		<info name="usage" value="Needs BASIC V2"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
 				<rom name="grodba.d88" size="348832" crc="a84c8166" sha1="98c4b6f1dc50d29877ed25797488c3544deaeab3"/>
@@ -14671,14 +14672,14 @@ ExtractDisk  [02]"Gradius改       " -> "gradius kai_02.d88"
 		</part>
 	</software>
 
-	<!-- Requires OPN equipped machine (verify) -->
-	<!-- palette is ugly (parent pc8801 only, verify) -->
-	<software name="grodbaa" cloneof="grodba" supported="partial">
+	<software name="grobdaa" cloneof="grobda" supported="yes">
 		<description>Grobda (alt)</description>
 		<year>1986</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
-		<!-- PC8801 -->
+		<!-- PC8801mk2SR -->
 		<info name="alt_title" value="グロブダー"/>
+		<info name="usage" value="Needs BASIC V2"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348560">
 				<rom name="grobda.d88" size="348560" crc="0667fbf5" sha1="d0a6c8fe16b4e9d652ffebc9a5417a330e92b7a4"/>
@@ -16437,7 +16438,7 @@ Converted to .mfm from original .hfe
 	</software>
 
 	<software name="hfox2">
-		<description>Hurry Fox - Yuki no Maou hen</description>
+		<description>Hurry Fox: Yuki no Maou hen</description>
 		<year>1986</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<!-- PC8801 -->
