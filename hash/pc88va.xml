@@ -249,13 +249,14 @@ VIDEO.BAT has various superimpose effects, requires dedicated board
 <!-- !Games -->
 
 	<software name="famista" supported="no">
-		<description>Family Stadium</description>
+		<description>Pro Yakyuu Family Stadium</description>
 		<!-- newspaper/stadium has ads for pc8801_flop:veigues -->
 		<year>1988?</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<notes><![CDATA[
 [SGP] playfield artifacts (press button 2 from pitcher side in 2p play)
-Lists dual port 1/2 as a unsupported [DE-9] input method, cursor abruptly cycles when 1 player or 2 players is selected
+[DE-9] optional Dual Joyport input method (Game Arts デュアル ジョイポート, manual wanted)
+Cursor abruptly cycles when 1 player or 2 players is selected (btanb, same as fmtowns:famist90)
 Win/Lose newspaper screen has [IDP] one frame of sprite lag
 [IDP] text draws below sprites (verify)
 How to exit from attract mode (2 innings?) once game enters it?
@@ -290,7 +291,7 @@ Throws an "OUT" shout when selecting 3rd option "new pennant race", bad dump?
 
 	<!-- Mislabeled disk -->
 	<software name="famist89" cloneof="famista" supported="no">
-		<description>Family Stadium (alt)</description>
+		<description>Pro Yakyuu Family Stadium (alt)</description>
 		<year>1988?</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<notes><![CDATA[
@@ -318,9 +319,9 @@ Untested user disk creation
 	</software>
 
 	<software name="famist89a" supported="no">
-		<description>Family Stadium '89 - Pennant Race Hen</description>
+		<description>Pro Yakyuu Family Stadium - '89 Pennant Race-ban</description>
 		<!-- newspaper has ads for pc8801_flop:harakiri -->
-		<year>1989?</year>
+		<year>1989</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<notes><![CDATA[
 (same as famista, except it allows for a new season)

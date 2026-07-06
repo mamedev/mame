@@ -8707,7 +8707,6 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Hangs after getting a strike -->
 	<software name="famist90" supported="no">
 		<!--
 		Origin: redump.org
@@ -8723,9 +8722,12 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Pro Yakyuu Family Stadium - 90-nendo Pennant Race-ban (Japan) (Track 10).bin" size="1159536" crc="c8c61b2f" sha1="4079226c26ae3482ceaf3ce2162dbfacda112a40"/>
 		<rom name="Pro Yakyuu Family Stadium - 90-nendo Pennant Race-ban (Japan).cue" size="1542" crc="7029a486" sha1="f7074a2e602c1d835eddc87bc650f98e321c7b72"/>
 		-->
-		<description>Pro Yakyuu Family Stadium - 90-nendo Pennant Race-ban</description>
+		<description>Pro Yakyuu Family Stadium - '90 Pennant Race-ban</description>
 		<year>1990</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
+		<notes><![CDATA[
+Hangs after getting a strike/ball, including CPU vs. CPU games
+]]></notes>
 		<info name="serial" value="HMB-135"/>
 		<info name="alt_title" value="プロ野球ファミリー・スタジアム　９０年度　ペナント・レース版" />
 		<info name="release" value="199009xx" />

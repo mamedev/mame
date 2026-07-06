@@ -23,6 +23,7 @@ TODO:
 
 //#include "iostream.h"
 
+// pc88va_kbd_device only
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_STREAM std::cout
 
@@ -394,15 +395,14 @@ void pc88va_kbd_device::key_repeat(uint8_t row, uint8_t column)
 
 /*
  * 10-- -1-- FCLR FIFO clear
- * 10-- --1- PTRY/RTRY (*) Retransmission Request
+ * 10-- --1- RTRY Retransmission Request
  * 10-- ---1 RESET Sub CPU reset
- * 11-x ---- KTARY/KTRAY (*) JIS Layout (0) <prohibited> (1)
+ * 11-x ---- KTARY JIS Layout (0) <prohibited> (1)
  * 11-- x--- KCIFE Key Code Interface Operation Mode (1) Use Matrix only (0)
  * 11-- -1-- AREP Auto Repeat Operation
  * 11-- --1- PRIK Priority Key Pre-transmission
  * 11-- ---1 FCTRL FIFO Control
  *
- * (*) TODO: doc mistake, define actual shortnames
  */
 void pc88va_kbd_device::write_command(offs_t offset, u8 data)
 {
