@@ -67,15 +67,11 @@ private:
 
 		attotime delays[38];
 
-		attotime write_start_time;
-		attotime write_buffer[32];
-		int write_position;
-
 		void set_clock(const attotime &period);
 		void reset(const attotime &when);
 		int get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit);
 		bool write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, const attotime &limit);
-		void start_writing(const attotime &tm);
+		void start_writing(const attotime &tm, floppy_image_device *floppy);
 		void commit(floppy_image_device *floppy, const attotime &tm);
 		void stop_writing(floppy_image_device *floppy, const attotime &tm);
 	};

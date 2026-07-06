@@ -1197,6 +1197,7 @@ void upd765_family_device::live_run(attotime limit)
 			return;
 
 		case WRITE_SECTOR_DATA:
+			cur_live.pll.start_writing(cur_live.tm, cur_live.fi->dev);
 			if(mfm) {
 				if(cur_live.byte_counter < 12)
 					live_write_mfm(0x00);
@@ -2495,7 +2496,7 @@ void upd765_family_device::format_track_continue(floppy_info &fi)
 		case WAIT_INDEX_DONE:
 			LOGSTATE("WAIT_INDEX_DONE\n");
 			fi.sub_state = TRACK_DONE;
-			cur_live.pll.start_writing(machine().time());
+			cur_live.pll.start_writing(machine().time(), cur_live.fi->dev);
 			LOGSTATE("WRITE_TRACK_PRE_SECTORS\n");
 			live_start(fi, WRITE_TRACK_PRE_SECTORS);
 			return;
