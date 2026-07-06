@@ -225,10 +225,13 @@ void pc6001_state::nec_ppi8255_w(offs_t offset, uint8_t data)
 		ppi_control_hack_w(data);
 		//printf("%02x\n",data);
 
-		if ((data & 0x0f) == 0x05 && m_cart_rom)
-			m_bank1->set_base(m_cart_rom->base() + 0x2000);
-		if ((data & 0x0f) == 0x04)
-			m_bank1->set_base(m_region_gfx1->base());
+		if ((data & 0x0e) == 0x04)
+			m_cart_bank->set_bank(data & 1);
+
+//		if ((data & 0x0f) == 0x05 && m_cart_rom)
+//			m_bank1->set_base(m_cart_rom->base() + 0x2000);
+//		if ((data & 0x0f) == 0x04)
+//			m_bank1->set_base(m_region_gfx1->base());
 	}
 
 	m_ppi->write(offset,data);
@@ -285,8 +288,7 @@ void pc6001_state::pc6001_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom().nopw();
-	map(0x4000, 0x5fff).r(m_cart, FUNC(generic_slot_device::read_rom));
-	map(0x6000, 0x7fff).bankr("bank1");
+	map(0x4000, 0x7fff).m(m_cart_bank, FUNC(address_map_bank_device::amap8));
 	map(0x8000, 0xffff).ram().share("ram");
 }
 
@@ -302,6 +304,16 @@ void pc6001_state::pc6001_io(address_map &map)
 	map(0xa3, 0xa3).mirror(0x0c).nopw();
 	map(0xb0, 0xb0).mirror(0x0f).w(FUNC(pc6001_state::system_latch_w));
 	map(0xc0, 0xc0).mirror(0x0f).r(FUNC(pc6001_state::portc0_r));
+}
+
+// TODO: sharrier (at least) pretends to use this as writable work RAM
+// it also pretends to act as a mk2 machine, judging at $f0 writes.
+// Does it fail an identifier check?
+// There's really a work RAM when cart not inserted, or it actually wants a RAM cart?
+void pc6001_state::cart_map(address_map &map)
+{
+	map(0x2000, 0x3fff).rom().region("gfx1", 0);
+	map(0x4000, 0x7fff).r(m_cart, FUNC(generic_slot_device::read_rom));
 }
 
 /*****************************************
@@ -1742,6 +1754,8 @@ void pc6001_state::pc6001(machine_config &config)
 	m_ppi->in_pc_callback().set(FUNC(pc6001_state::ppi_portc_r));
 	m_ppi->out_pc_callback().set(FUNC(pc6001_state::ppi_portc_w));
 
+	ADDRESS_MAP_BANK(config, m_cart_bank).set_map(&pc6001_state::cart_map).set_options(ENDIANNESS_LITTLE, 8, 13 + 2, 0x4000);
+
 	/* uart */
 	I8251(config, "uart");
 
@@ -1794,6 +1808,8 @@ void pc6001mk2_state::pc6001mk2(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(pc6001mk2_state::irq_callback));
 
 //  MCFG_MACHINE_RESET_OVERRIDE(pc6001mk2_state,pc6001mk2)
+
+	config.device_remove("cart_bank");
 
 	m_screen->set_screen_update(FUNC(pc6001mk2_state::screen_update));
 
@@ -1921,8 +1937,9 @@ ROM_START( pc6001a )
 	ROM_REGION( 0x800, "mcu", 0 )
 	ROM_LOAD( "upd8049.ic17", 0x000, 0x800, CRC(6682ec41) SHA1(ea739be6178c0f2ef48a3a33a3f2a3438ed2ca61) BAD_DUMP ) // about 60% of bytes are bad
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "cgrom60.60a", 0x0000, 0x1000, CRC(49c21d08) SHA1(9454d6e2066abcbd051bad9a29a5ca27b12ec897) )
+	ROM_RELOAD(              0x1000, 0x1000 )
 
 	ROM_REGION( 0x8000, "gfx2", ROMREGION_ERASEFF )
 ROM_END

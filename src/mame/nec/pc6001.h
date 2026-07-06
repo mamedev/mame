@@ -58,7 +58,7 @@ public:
 		, m_io_keys(*this, "key%u", 1U)
 		, m_io_fn_keys(*this, "key_fn")
 		, m_io_key_modifiers(*this, "key_modifiers")
-		, m_bank1(*this, "bank1")
+		, m_cart_bank(*this, "cart_bank")
 		, m_palette(*this, "palette")
 	{ }
 
@@ -109,7 +109,7 @@ protected:
 	required_ioport_array<3> m_io_keys;
 	required_ioport m_io_fn_keys;
 	required_ioport m_io_key_modifiers;
-	optional_memory_bank m_bank1;
+	optional_device<address_map_bank_device> m_cart_bank;
 	required_device<palette_device> m_palette;
 
 	memory_region *m_cart_rom = nullptr;
@@ -164,6 +164,8 @@ protected:
 	uint8_t m_cur_keycode = 0;
 	uint8_t m_centronics_busy = 0;
 
+	void cart_map(address_map &map);
+
 private:
 	uint32_t m_old_key1 = 0;
 	uint32_t m_old_key2 = 0;
@@ -209,6 +211,7 @@ class pc6001mk2_state : public pc6001_state
 public:
 	pc6001mk2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc6001_state(mconfig, type, tag)
+		, m_bank1(*this, "bank1")
 		, m_bank2(*this, "bank2")
 		, m_bank3(*this, "bank3")
 		, m_bank4(*this, "bank4")
@@ -252,6 +255,7 @@ protected:
 
 	uint8_t m_bgcol_bank = 0;
 	uint8_t m_gfx_bank_on = 0;
+	optional_memory_bank m_bank1;
 	optional_memory_bank m_bank2;
 	optional_memory_bank m_bank3;
 	optional_memory_bank m_bank4;
