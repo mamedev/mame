@@ -123,7 +123,9 @@ void pc6001_state::video_start()
 
 void pc6001mk2_state::video_start()
 {
-	// ...
+	save_item(NAME(m_exgfx_2bpp_mode));
+	save_item(NAME(m_exgfx_bitmap_mode));
+	save_item(NAME(m_exgfx_text_mode));
 }
 
 void pc6001mk2sr_state::video_start()
@@ -383,7 +385,8 @@ uint32_t pc6001_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 uint32_t pc6001mk2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	/* note: bitmap mode have priority over everything else, check American Truck */
+	// bitmap mode have priority over everything else, amtruck
+	// TODO: hudson3 contradicts with it, why?
 	if(m_exgfx_bitmap_mode)
 	{
 		int count = 0;

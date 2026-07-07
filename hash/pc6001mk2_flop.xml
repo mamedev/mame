@@ -5,11 +5,35 @@ Mode 5 PC-6001mkII/PC-6601 floppy disks. They autoboot at startup.
 -->
 <softwarelist name="pc6001mk2_flop" description="NEC PC-6001mkII/PC-6601 disk images">
 
+<!-- !Games -->
+
+	<software name="hudson3" supported="no">
+		<description>Hudson Soft Best Hit Game Pack 3</description>
+		<year>1984</year>
+		<publisher>Hudson Soft</publisher>
+		<notes><![CDATA[
+Contains Bomber Man, Zero Fighter and Hiyoko Fighter
+[FDC] Doesn't boot, with 5.25" interface will set the wrong GFX mode then it access 3.5" anyway
+[gfx] sets mk2 bitmap, wants mk2 text. Also wants 240 lines vertical (copyright part at bottom).
+pc6601: "d88: Floppy disk has excess of heads for this drive that will be discarded (floppy heads=2, drive heads=1)." (safe to ignore?)
+]]></notes>
+		<!-- TODO: may be a bad dump -->
+		<!-- cfr. https://www.leadedsolder.com/2021/05/18/mr-pc-pickup-floppy-drive-fix.html#a-flashfloppy-intermezzo -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="177888">
+				<rom name="hudson soft best hit game pack 3 (6601).d88" size="177888" crc="29e87cef" sha1="2fad4e7785570c25036f1f3c3ceed3a743c54d1c"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- !homebrew -->
+
 	<!-- v1.0 known to exist (same with no sound) -->
 	<software name="asalt" supported="yes">
 		<description>Asalt (v1.1, prototype)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
 		<notes><![CDATA[
 Looks a tech demo (time doesn't run down, has no enemies, has 1 stage)
 ]]></notes>

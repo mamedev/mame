@@ -667,6 +667,7 @@ inline void pc6001mk2_state::refresh_crtc_params()
 	rectangle visarea = m_screen->visible_area();
 	int y_height;
 
+	// TODO: probably needs the *actual* mode used to fix hudson3 bottom part
 	y_height = (m_exgfx_bitmap_mode || m_exgfx_2bpp_mode) ? 200 : 240;
 
 	visarea.set(0, (320) - 1, 0, (y_height) - 1);
