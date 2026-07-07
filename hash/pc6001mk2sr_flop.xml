@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+Mode 6 PC-6001mkIISR/PC-6601SR floppy disks. They autoboot at startup.
+-->
+<softwarelist name="pc6001mk2sr_flop" description="NEC PC-6001mkIISR/PC-6601SR disk images">
+
+<!-- !Utilities -->
+
+<!--
+David's Midnight Magic by SystemSoft/Broderbund
+Crying Program (sound synthesis)
+MusiWriter by Rittor Music Inc (music synthesis)
+Format disk
+Backup disk
+Convert disk from 1D (40 track) to 1DD (80 track)
+Transfer files
+Autoboot program
+Autoboot program menu
+Japanese word processor example sentences
+
+Acts as a Disk BIOS for further loading
+-->
+	<software name="sruty" supported="no">
+		<description>PC-6601SR Utility Disk</description>
+		<year>1984</year>
+		<publisher>NEC</publisher>
+		<notes><![CDATA[
+[FDC] should autoboot from pc6601sr
+]]></notes>
+		<info name="alt_title" value="PC-6601SR ユーティリティディスク"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="353200">
+				<rom name="pc6601sr_utility.d88" size="353200" crc="eb381ba7" sha1="0757f9f5f8b84d2a05e5cbf57b68498b6311f8c2"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

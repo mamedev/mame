@@ -123,7 +123,9 @@ void pc6001_state::video_start()
 
 void pc6001mk2_state::video_start()
 {
-	// ...
+	save_item(NAME(m_exgfx_2bpp_mode));
+	save_item(NAME(m_exgfx_bitmap_mode));
+	save_item(NAME(m_exgfx_text_mode));
 }
 
 void pc6001mk2sr_state::video_start()
@@ -132,6 +134,14 @@ void pc6001mk2sr_state::video_start()
 	m_gvram = std::make_unique<uint8_t []>(320*256*8); // TODO: size
 	std::fill_n(m_gvram.get(), 320*256*8, 0);
 	save_pointer(NAME(m_gvram), 320*256*8);
+
+	// SR text mode CLUT colors
+	// [0f]-[0b]-[0e]-[0a] are modifiable thru respective $40~$43 ports,
+	// remaining entries are fixed.
+	for (int i = 0; i < 0x10; i++)
+		m_sr_clut[i] = i;
+
+	save_item(NAME(m_sr_clut));
 }
 
 void pc6001_state::draw_gfx_mode4(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr)
@@ -375,7 +385,8 @@ uint32_t pc6001_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 uint32_t pc6001mk2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	/* note: bitmap mode have priority over everything else, check American Truck */
+	// bitmap mode have priority over everything else, amtruck
+	// TODO: hudson3 contradicts with it, why?
 	if(m_exgfx_bitmap_mode)
 	{
 		int count = 0;
@@ -536,10 +547,8 @@ uint32_t pc6001mk2sr_state::screen_update(screen_device &screen, bitmap_ind16 &b
 
 						int pen = gfx_data[(tile * 0x10) + yi] >> (7 - xi) & 1;
 
-						int fgcol = (attr & 0x0f) + 0x10;
-						// TODO: definitely wants bright colors for N66SR BASIC, but quite won't work for "PC-6*01 World" screens
-						// (can't pinpoint banking on this HW, or maybe it's side effect of CLUT?)
-						int bgcol = ((attr & 0x70) >> 4) + 0x18; //+ m_bgcol_bank;
+						int fgcol = m_sr_clut[(attr & 0x0f)] + 0x10;
+						int bgcol = m_sr_clut[((attr & 0x70) >> 4) | 8] + 0x10; //+ m_bgcol_bank;
 
 						int color = pen ? fgcol : bgcol;
 
