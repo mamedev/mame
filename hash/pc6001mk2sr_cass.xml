@@ -7,6 +7,72 @@ Mode 6 PC-6001mkIISR/PC-6601SR cassette disks. They specifically needs N66SR BAS
 
 <!-- !Covermount -->
 
+	<software name="9michi" supported="no">
+		<description>9-gyou no Michi</description>
+		<!-- BasicMagazine 1992.2 -->
+		<year>1992</year>
+		<publisher>MyCom BASIC</publisher>
+		<info name="usage" value="Mode 6"/>
+		<info name="developer" value="Hiroshi Hashizume"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="625">
+				<rom name="9-gyou no michi.cas" size="625" crc="09b64651" sha1="62b517b86359a2b25c534adc4cea27a2ed6bb45e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="akunin" supported="no">
+		<description>The Akunin</description>
+		<!-- Beep 1985.10 -->
+		<year>1985</year>
+		<publisher>Beep</publisher>
+		<notes><![CDATA[
+Prompts for a [tape] save at startup
+]]></notes>
+		<info name="usage" value="Mode 6"/>
+		<info name="developer" value="Tinyan"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="19530">
+				<rom name="the akunin.cas" size="19530" crc="462d4879" sha1="6f77bf04846e68baaebcea16db3a050e33eee1c8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="akunin2" supported="no">
+		<description>The Akunin 2</description>
+		<!-- Beep 1985.11 -->
+		<year>1985</year>
+		<publisher>Beep</publisher>
+		<notes><![CDATA[
+Prompts for a [tape] save at startup
+]]></notes>
+		<info name="usage" value="Mode 6"/>
+		<info name="developer" value="Tinyan"/>
+
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="18592">
+				<rom name="the akunin 2.cas" size="18592" crc="6c1899cc" sha1="316b52a5ba9570549d37c5ee857bb26383c29e18" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="akunin3" supported="no">
+		<description>The Akunin 3</description>
+		<!-- Beep 1985.12 -->
+		<year>1985</year>
+		<publisher>Beep</publisher>
+		<notes><![CDATA[
+Doesn't draw any GFX just [VDG] if pressing any [keyboard] input, in turn received scancodes are all wrong
+]]></notes>
+		<info name="usage" value="Mode 6"/>
+		<info name="developer" value="Tinyan"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="18098">
+				<rom name="the akunin 3.cas" size="18098" crc="89f7c023" sha1="23c52093526fa11277f808ad1e2e9e5a510aef89" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jewels" supported="no">
 		<description>Jewels</description>
 		<!-- "1987/4/12" according to LIST -->
@@ -46,13 +112,90 @@ Doesn't boot, throws a ?SN Error at 37376 when loading part 2 (should be at 10)
 		</part>
 	</software>
 
+	<software name="lizquest" supported="no">
+		<description>Lizard Quest</description>
+		<!-- BasicMagazine 1987.4 -->
+		<year>1987</year>
+		<publisher>MyCom BASIC</publisher>
+		<info name="usage" value="Mode 6"/>
+		<info name="developer" value="Taro Kondo"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="11792">
+				<rom name="lizard quest.cas" size="11792" crc="6bfb15a3" sha1="b6486977d8de4acfcceb46ae42f2bc77f067dd47" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lizquest2" supported="no">
+		<description>Lizard Quest II: Shitennou no Houfuku</description>
+		<!-- BasicMagazine 1987.10 -->
+		<year>1987</year>
+		<publisher>MyCom BASIC</publisher>
+		<info name="usage" value="Mode 6"/>
+		<info name="developer" value="Taro Kondo"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="11322">
+				<rom name="lizard quest ii - shitennou no houfuku.p6" size="11322" crc="f26c6ad3" sha1="5bc729ce77bca8a3c2212b45337cb42fd9a71fc5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lizquest3" supported="no">
+		<description>Lizard Quest III: Shi no Kami Gaabarian</description>
+		<!-- BasicMagazine 1988.4 -->
+		<year>1988</year>
+		<publisher>MyCom BASIC</publisher>
+		<notes><![CDATA[
+]]></notes>
+		<info name="usage" value="Mode 6"/>
+		<info name="developer" value="Taro Kondo"/>
+
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="12574">
+				<rom name="lizard quest iii - shi no kami gaabarian.cas" size="12574" crc="a0a2133a" sha1="d106d968c38fccb19ba954220905b5c05e390f26" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lizquest4" supported="no">
+		<description>Lizard Quest IV: Gold Lizard</description>
+		<!-- BasicMagazine 1988.11 -->
+		<year>1988</year>
+		<publisher>MyCom BASIC</publisher>
+		<info name="usage" value="Mode 6"/>
+		<info name="developer" value="Taro Kondo"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="16846">
+				<rom name="lizard quest iv - gold lizard.cas" size="16846" crc="aeaeb305" sha1="fa8df7fea0444537c005dc994a3af5f78df8fde5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="order" supported="no">
+		<description>The Order</description>
+		<!-- BasicMagazine 1991.1 -->
+		<year>1991</year>
+		<publisher>MyCom BASIC</publisher>
+		<notes><![CDATA[
+Timer looks off (verify)
+Unclear about how to win at game.
+]]></notes>
+		<info name="usage" value="Mode 6"/>
+		<info name="developer" value="Tsunayuki Ouchi"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="3632">
+				<rom name="the order.cas" size="3632" crc="75e58cc3" sha1="0e8456b303d63bf604fa74c509175548c8f01647" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pakuri" supported="no">
 		<description>Pakuridius: '88 Dragon Breath</description>
 		<!-- According to LIST -->
 		<year>1988</year>
 		<publisher>MyCom BASIC</publisher>
 		<notes><![CDATA[
-[VDG] Horizontal scrolling is non-functional (regression?)
+[VDG] title screen scrolling is weird (verify)
 ]]></notes>
 		<info name="usage" value="Mode 6"/>
 		<info name="developer" value="Hingo"/>
@@ -79,5 +222,24 @@ Oddly scrolls horizontally during fights (verify)
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="wumwaka" supported="no">
+		<description>Wu-m Wakarannou</description>
+		<!-- BasicMagazine 1988.1 -->
+		<year>1988</year>
+		<publisher>MyCom BASIC</publisher>
+		<notes><![CDATA[
+Unclear how to win, [keyboard] missing inputs?
+]]></notes>
+		<info name="usage" value="Mode 6"/>
+		<info name="developer" value="Hingo"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="8450">
+				<rom name="wu-m wakarannou.cas" size="8450" crc="5b466e94" sha1="52212e402f1ca51336e6e28e5ad4b5ac8df217dc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Homebrew -->
 
 </softwarelist>
