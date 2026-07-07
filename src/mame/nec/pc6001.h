@@ -354,6 +354,7 @@ private:
 	std::unique_ptr<u8 []> m_gvram;
 	u8 m_bitmap_yoffs = 0, m_bitmap_xoffs = 0;
 	u8 m_width80 = 0;
+	u8 m_sr_clut[16];
 
 //  memory_view m_gvram_view;
 

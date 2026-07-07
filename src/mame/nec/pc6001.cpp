@@ -1065,7 +1065,14 @@ void pc6001mk2sr_state::pc6001mk2sr_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x40, 0x43).nopw(); // palette CLUTs
+	map(0x40, 0x43).lw8(NAME([this] (offs_t offset, u8 data) {
+		// CLUT used by text mode for N66SR BASIC (default [0~3]) vs.
+		// "PC-6*01 World" (sets [0x0, 0xd, 0xa, 0xc]) screens.
+		// Use pc6601sr for both.
+		const u8 clut_entry = bitswap<4>(0xf - offset, 3, 0, 2, 1);
+		const u8 color_entry = bitswap<4>(0xf - (data & 0xf), 3, 0, 2, 1);
+		m_sr_clut[clut_entry] = color_entry;
+	}));
 	map(0x60, 0x6f).rw(FUNC(pc6001mk2sr_state::sr_bank_reg_r), FUNC(pc6001mk2sr_state::sr_bank_reg_w));
 
 	map(0x80, 0x81).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
