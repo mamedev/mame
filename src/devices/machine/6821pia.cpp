@@ -858,6 +858,17 @@ void pia6821_device::set_a_input(uint8_t data)
 
 
 //-------------------------------------------------
+//  set_a_input
+//-------------------------------------------------
+
+void pia6821_device::set_a_input(uint8_t data, uint8_t mask)
+{
+	uint8_t combined_data = (m_in_a & ~mask) | (data & mask);
+	set_a_input(combined_data);
+}
+
+
+//-------------------------------------------------
 //  porta_w
 //-------------------------------------------------
 
@@ -1003,6 +1014,26 @@ void pia6821_device::write_portb_line(int line, bool state)
 		portb_w(m_in_b | mask);
 	else
 		portb_w(m_in_b & ~mask);
+}
+
+
+//-------------------------------------------------
+//  set_b_input
+//-------------------------------------------------
+
+void pia6821_device::set_b_input(uint8_t data)
+{
+	portb_w(data);
+}
+
+//-------------------------------------------------
+//  set_b_input
+//-------------------------------------------------
+
+void pia6821_device::set_b_input(uint8_t data, uint8_t mask)
+{
+	uint8_t new_in_b = (m_in_b & ~mask) | (data & mask);
+	set_b_input(new_in_b);
 }
 
 

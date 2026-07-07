@@ -60,6 +60,7 @@ public:
 	void porta_w(uint8_t data);
 	void write_porta_line(int line, bool state);
 	void set_a_input(uint8_t data);
+	void set_a_input(uint8_t data, uint8_t mask);
 	uint8_t a_output();
 	void set_port_a_input_overrides_output_mask(uint8_t mask) { m_a_input_overrides_output_mask = mask; }
 
@@ -80,6 +81,8 @@ public:
 
 	void portb_w(uint8_t data);
 	void write_portb_line(int line, bool state);
+	void set_b_input(uint8_t data);
+	void set_b_input(uint8_t data, uint8_t mask);
 	uint8_t b_output();
 
 	void pb0_w(int state) { write_portb_line(0, state); }
