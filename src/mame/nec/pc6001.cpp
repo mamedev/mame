@@ -124,8 +124,9 @@ irq vector 0x26:                                                                
 
 #define LOG_IRQ    (1U << 1)
 
-//#define VERBOSE (LOG_IRQ)
 #define VERBOSE (0)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+
 #include "logmacro.h"
 
 #define LOGIRQ(...)     LOGMASKED(LOG_IRQ, __VA_ARGS__)
@@ -242,11 +243,13 @@ uint8_t pc6001_state::joystick_r()
 	uint8_t data = m_joymux->output_r();
 
 	// FIXME: bits 6 and 7 are supposed to be nHSYNC and nVSYNC
-	if (m_screen->hblank())
+	// mk2SR vrtc irq expects VSYNC bit to be high (at line 240 essentially),
+	// otherwise it refuses to clear the $e6bb blank buffer.
+	if (!m_screen->hblank())
 		data &= 0xbf;
 	else
 		data |= 0x40;
-	if (m_screen->vblank())
+	if (!m_screen->vblank())
 		data &= 0x7f;
 	else
 		data |= 0x80;
@@ -1633,6 +1636,7 @@ void pc6001mk2_state::machine_reset()
 		m_bgcol_bank = 0;
 	}
 
+	m_timer_irq_mask = false;
 //  refresh_crtc_params();
 }
 
@@ -1688,6 +1692,9 @@ void pc6001mk2sr_state::machine_reset()
 		}
 //      m_gfx_bank_on = 0;
 	}
+
+	// jewels and satan (at least) definitely expects timer irq implicitly enabled
+	m_timer_irq_mask = false;
 }
 
 
@@ -1740,8 +1747,10 @@ void pc6001_state::pc6001(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_screen_update(FUNC(pc6001_state::screen_update));
+	// FIXME: actual parameters, particularly for later iterations
 	m_screen->set_size(320, 25+192+26);
 	m_screen->set_visarea(0, 319, 0, 239);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(pc6001_state::pc6001_palette), 16+4);
