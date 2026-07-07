@@ -1169,8 +1169,13 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::execute
 
 						if (!(m_cfg & CFG_DE))
 						{
-							m_mod = mem_read<u16>(ns32000::ST_ODT, SP() + 4);
-							tex = top(SIZE_D, SP()) + top(SIZE_W, SP()) * 2 + top(SIZE_D, m_mod) + 35;
+							u16 const mod = mem_read<u16>(ns32000::ST_ODT, SP() + 4);
+							u32 const sb = mem_read<u32>(ns32000::ST_ODT, mod);
+
+							m_mod = mod;
+							m_sb = sb;
+
+							tex = top(SIZE_D, SP()) + top(SIZE_W, SP()) * 2 + top(SIZE_D, mod) + 35;
 						}
 						else
 							tex = top(SIZE_D, SP()) + top(SIZE_W, SP()) + 35;
@@ -1179,13 +1184,6 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::execute
 
 						m_pc = pc;
 						m_psr = psr;
-
-						// the static base is fetched from the module table AFTER the PSR is
-						// restored: a return to user mode reads the USER address space's module
-						// table (dual-space translation), not the supervisor's
-						if (!(m_cfg & CFG_DE))
-							m_sb = mem_read<u32>(ns32000::ST_ODT, m_mod);
-
 						SP() += constant;
 
 						m_sequential = false;
@@ -1217,7 +1215,12 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::execute
 
 						if (!(m_cfg & CFG_DE))
 						{
-							m_mod = mem_read<u16>(ns32000::ST_ODT, SP() + 4);
+							u16 const mod = mem_read<u16>(ns32000::ST_ODT, SP() + 4);
+							u32 const sb = mem_read<u32>(ns32000::ST_ODT, mod);
+
+							m_mod = mod;
+							m_sb = sb;
+
 							tex = top(SIZE_B) + top(SIZE_W, SP()) * 3 + top(SIZE_D) * 3 + 39;
 						}
 						else
@@ -1227,12 +1230,6 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::execute
 
 						m_pc = pc;
 						m_psr = psr;
-
-						// as with RETT: the static base is fetched from the module table AFTER the
-						// PSR is restored, so a return to user mode reads the USER address space's
-						// module table under dual-space translation
-						if (!(m_cfg & CFG_DE))
-							m_sb = mem_read<u32>(ns32000::ST_ODT, m_mod);
 
 						m_sequential = false;
 					}
