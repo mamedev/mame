@@ -6,51 +6,55 @@
 
 #pragma once
 
-// used to connect the 022
-typedef device_delegate<void (void)> igs025_execute_external;
-
 class igs025_device : public device_t
 {
 public:
 	igs025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	uint16_t killbld_igs025_prot_r(offs_t offset);
-	// use setters instead of making public?
-	const uint8_t (*m_kb_source_data)[0xec]{};
-	uint32_t m_kb_game_id = 0;
-	uint32_t m_kb_region = 0;
-
+	// configurations
+	// used to connect the 022
+	using igs025_execute_external = device_delegate<void ()>;
 	template <typename... T> void set_external_cb(T &&... args) { m_execute_external.set(std::forward<T>(args)...); }
 
-	void olds_w(offs_t offset, uint16_t data);
-	void drgw2_d80000_protection_w(offs_t offset, uint16_t data);
-	void killbld_igs025_prot_w(offs_t offset, uint16_t data);
+	using igs025_source_read_delegate = device_delegate<uint8_t (uint32_t region, uint8_t addr)>;
+	template <typename... T> void set_source_cb(T &&... args) { m_source_cb.set(std::forward<T>(args)...); }
 
+	void set_game_id(uint32_t id) { m_game_id = id; }
+	void set_region(uint32_t region) { m_region = region; }
+
+	uint16_t prot_r(offs_t offset);
+
+	void olds_w(offs_t offset, uint16_t data);
+	void drgw2_prot_w(offs_t offset, uint16_t data);
+	void killbld_igs025_prot_w(offs_t offset, uint16_t data);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
+private:
+	void protection_calculate_hilo();
+	void protection_calculate_hold(int y, int z);
+
+	void no_callback_setup();
+
 	igs025_execute_external m_execute_external;
+	igs025_source_read_delegate m_source_cb;
 
-	uint16_t        m_kb_prot_hold = 0;
-	uint16_t        m_kb_prot_hilo = 0;
-	uint16_t        m_kb_prot_hilo_select = 0;
+	uint32_t m_game_id;
+	uint32_t m_region;
 
-	int           m_kb_cmd = 0;
-	int           m_kb_reg = 0;
-	int           m_kb_ptr = 0;
-	uint8_t         m_kb_swap = 0;
+	uint16_t m_prot_hold;
+	uint16_t m_prot_hilo;
+	uint16_t m_prot_hilo_select;
 
-	void killbld_protection_calculate_hilo();
-	void killbld_protection_calculate_hold(int y, int z);
+	int32_t m_prot_cmd;
+	int32_t m_prot_reg;
+	int32_t m_prot_ptr;
+	uint8_t m_prot_swap;
 
-	void no_callback_setup(void);
-
-
-	uint16_t        m_olds_bs = 0;
-	uint16_t        m_kb_cmd3 = 0;
-
+	uint16_t m_prot_bs;
+	uint16_t m_prot_cmd3;
 };
 
 

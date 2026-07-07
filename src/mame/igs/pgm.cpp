@@ -2755,9 +2755,9 @@ ROM_START( olds )
 	ROM_LOAD16_BYTE( "sp_v101_u3.u3",      0x100000, 0x080000,   CRC(0a358c1e) SHA1(95c7c3f069c5d05001e22535750f6b3cd7de105f) )
 	ROM_LOAD16_BYTE( "sp_v101_u4.u4",      0x200001, 0x080000,   CRC(766570e0) SHA1(e7c3f5664ec69b662b82c2e1375555db7305390c) )
 	ROM_LOAD16_BYTE( "sp_v101_u5.u5",      0x200000, 0x080000,   CRC(58662e12) SHA1(2b39bd847e9c4968a8e77a2f3cec77cf323ceee3) )
-	ROM_LOAD16_WORD_SWAP( "sp_v101_u1.u1", 0x300000, 0x080000,    CRC(2b2f4f1e) SHA1(67b97cf8cc7f517d67cd45588addd2ad8e24612a) )
+	ROM_LOAD16_WORD_SWAP( "sp_v101_u1.u1", 0x300000, 0x080000,   CRC(2b2f4f1e) SHA1(67b97cf8cc7f517d67cd45588addd2ad8e24612a) )
 
-	ROM_REGION32_LE( 0x010000, "user1", 0 ) /* IGS028 Protection Data */
+	ROM_REGION32_LE( 0x010000, "igs028", 0 ) /* IGS028 Protection Data */
 	ROM_LOAD( "sp_v101_u6.u6", 0x000000, 0x010000,  CRC(097046bc) SHA1(6d75db85cf4c79b63e837897785c253014b2126d) )
 
 	ROM_REGION( 0x4000, "user2", ROMREGION_ERASEFF ) /* its a dump of the shared protection ROM/RAM from PCB. */
@@ -2802,7 +2802,7 @@ ROM_START( olds100 )
 	// used to simulate encrypted DMA protection device for now ..
 	ROM_LOAD( "ram_dump", 0x000000, 0x04000, CRC(280cfb4e) SHA1(cd2bdcaa21347952c2bf38b105a204d327fde39e) )
 
-	ROM_REGION32_LE( 0x010000, "user1", 0 ) /* IGS028 Protection Data */
+	ROM_REGION32_LE( 0x010000, "igs028", 0 ) /* IGS028 Protection Data */
 	ROM_LOAD( "sp_v100_u6.u6", 0x000000, 0x010000,  CRC(e7613dda) SHA1(0d7c043b90e2f9a36a45066f22e3e305dc716676) )
 
 	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -2838,7 +2838,7 @@ ROM_START( olds100a )
 	ROM_LOAD16_WORD_SWAP( "pgm_p0500_v100.u24",    0x100000, 0x400000, CRC(8981fc87) SHA1(678d6705d06b99bca5951ff77708adadc4c4396b) )
 
 	/* ROM label SP 西遊記 DATA on sticker */
-	ROM_REGION32_LE( 0x010000, "user1", 0 ) /* IGS028 Protection Data */
+	ROM_REGION32_LE( 0x010000, "igs028", 0 ) /* IGS028 Protection Data */
 	ROM_LOAD( "sp_data.u6", 0x000000, 0x010000,  CRC(e7613dda) SHA1(0d7c043b90e2f9a36a45066f22e3e305dc716676) )
 
 	ROM_REGION( 0x4000, "user2", ROMREGION_ERASEFF ) /* its a dump of the shared protection ROM/RAM from PCB. */
@@ -5564,12 +5564,12 @@ GAME( 1997, orlegend105k, orlegend,  pgm_asic3,              orlegendk, pgm_asic
 //Dragon World II
 //中國龍II/Zhōngguó lóng II (China, Taiwan, Japan; Traditional Chinese only in title screen)
 //東方之珠II/Dung1Fong1 Zi1 Zyu1 II (Hong Kong)/dongbang jiju II (Korea(undumped))
-GAME( 1997, drgw2,        pgm,       pgm_012_025_drgw2,      pgm,       pgm_012_025_state, init_drgw2,    ROT0,   "IGS", "Dragon World II (ver. 110X, Export)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, drgw2100x,    drgw2,     pgm_012_025_drgw2,      pgm,       pgm_012_025_state, init_dw2v100x, ROT0,   "IGS", "Dragon World II (ver. 100X, Export)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, drgw2100j,    drgw2,     pgm_012_025_drgw2,      pgm,       pgm_012_025_state, init_drgw2j,   ROT0,   "IGS (Alta license)", "Chuugokuryuu II (ver. 100J, Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, drgw2101c,    drgw2,     pgm_012_025_drgw2,      pgm,       pgm_012_025_state, init_drgw2c101,ROT0,   "IGS", "Zhongguo Long II (ver. 101C, China)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, drgw2100c,    drgw2,     pgm_012_025_drgw2,      pgm,       pgm_012_025_state, init_drgw2c,   ROT0,   "IGS", "Zhongguo Long II (ver. 100C, China)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, drgw2100hk,   drgw2,     pgm_012_025_drgw2,      pgm,       pgm_012_025_state, init_drgw2hk,  ROT0,   "IGS", "Dungfong Zi Zyu II (ver. 100H, Hong Kong)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // (region is shown as Hokg Kong, Dragon World 3 is the same)
+GAME( 1997, drgw2,        pgm,       pgm_012_025_drgw2,      pgm,       pgm_012_025_state, init_drgw2,    ROT0,   "IGS", "Dragon World II (ver. 110X, Export)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, drgw2100x,    drgw2,     pgm_012_025_drgw2,      pgm,       pgm_012_025_state, init_dw2v100x, ROT0,   "IGS", "Dragon World II (ver. 100X, Export)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, drgw2100j,    drgw2,     pgm_012_025_drgw2,      pgm,       pgm_012_025_state, init_drgw2j,   ROT0,   "IGS (Alta license)", "Chuugokuryuu II (ver. 100J, Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, drgw2101c,    drgw2,     pgm_012_025_drgw2,      pgm,       pgm_012_025_state, init_drgw2c101,ROT0,   "IGS", "Zhongguo Long II (ver. 101C, China)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, drgw2100c,    drgw2,     pgm_012_025_drgw2,      pgm,       pgm_012_025_state, init_drgw2c,   ROT0,   "IGS", "Zhongguo Long II (ver. 100C, China)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, drgw2100hk,   drgw2,     pgm_012_025_drgw2,      pgm,       pgm_012_025_state, init_drgw2hk,  ROT0,   "IGS", "Dungfong Zi Zyu II (ver. 100H, Hong Kong)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // (region is shown as Hokg Kong, Dragon World 3 is the same)
 
 //The Killing Blade
 //傲剑狂刀/Ào jiàn kuáng dāo (China, Hong Kong; Simplified Chinese)
