@@ -173,7 +173,12 @@ private:
 	u32 m_scsi_ctrl;
 	bool m_irq_state;
 	bool m_drq_state;
+	bool m_rst_out;   // chip is driving R̅S̅T̅ (self bus-reset detection)
+
 	bool const m_has_lbs;
+
+protected:
+	bool m_rst_self_irq;   // base 5380: IRQ on any R̅S̅T̅ incl. self (SP-1051 8.3); DP8490 EASI: external only
 };
 
 class ncr53c80_device : public ncr5380_device
