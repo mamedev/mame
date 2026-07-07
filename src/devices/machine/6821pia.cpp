@@ -861,7 +861,7 @@ void pia6821_device::set_a_input(uint8_t data)
 //  set_a_input
 //-------------------------------------------------
 
-void pia6821_device::set_a_input(uint8_t data, uint8_t mask)
+void pia6821_device::set_a_input_mask(uint8_t data, uint8_t mask)
 {
 	uint8_t combined_data = (m_in_a & ~mask) | (data & mask);
 	set_a_input(combined_data);
