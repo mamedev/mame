@@ -229,10 +229,10 @@ void pc6001_state::nec_ppi8255_w(offs_t offset, uint8_t data)
 		if ((data & 0x0e) == 0x04)
 			m_cart_bank->set_bank(data & 1);
 
-//		if ((data & 0x0f) == 0x05 && m_cart_rom)
-//			m_bank1->set_base(m_cart_rom->base() + 0x2000);
-//		if ((data & 0x0f) == 0x04)
-//			m_bank1->set_base(m_region_gfx1->base());
+//      if ((data & 0x0f) == 0x05 && m_cart_rom)
+//          m_bank1->set_base(m_cart_rom->base() + 0x2000);
+//      if ((data & 0x0f) == 0x04)
+//          m_bank1->set_base(m_region_gfx1->base());
 	}
 
 	m_ppi->write(offset,data);
@@ -1916,8 +1916,7 @@ void pc6001mk2sr_state::pc6001mk2sr(machine_config &config)
 	// TODO: telopper board (system explicitly asks for missing tape dump tho)
 
 	SOFTWARE_LIST(config, "cass_list_mk2sr").set_original("pc6001mk2sr_cass");
-	// TODO: specific option for 3.5"
-//	SOFTWARE_LIST(config, "flop_list_mk2sr").set_original("pc6001mk2sr_flop");
+	SOFTWARE_LIST(config, "flop_list_mk2sr").set_original("pc6001mk2sr_flop");
 }
 
 void pc6601sr_state::pc6601sr(machine_config &config)
