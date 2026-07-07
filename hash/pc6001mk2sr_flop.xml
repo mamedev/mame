@@ -3,7 +3,7 @@
 <!--
 Mode 6 PC-6001mkIISR/PC-6601SR floppy disks. They autoboot at startup.
 -->
-<softwarelist name="pc6001mk2_flop" description="NEC PC-6001mkIISR/PC-6601SR disk images">
+<softwarelist name="pc6001mk2sr_flop" description="NEC PC-6001mkIISR/PC-6601SR disk images">
 
 <!-- !Utilities -->
 
