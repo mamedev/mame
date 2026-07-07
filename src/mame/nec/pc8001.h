@@ -144,8 +144,9 @@ protected:
 
 	required_memory_region m_kanji_rom;
 	required_ioport_array<2> m_dsw;
+
+	virtual void port31_w(uint8_t data);
 private:
-	void port31_w(uint8_t data);
 };
 
 class pc8001mk2sr_state : public pc8001mk2_state
@@ -165,11 +166,17 @@ private:
 
 	required_memory_region m_n80sr_rom;
 
+	virtual void port31_w(uint8_t data) override;
+
+	u8 port33_r();
 	void port33_w(u8 data);
 	u8 port71_r();
 	void port71_w(u8 data);
 
 	u8 m_n80sr_bank = 0;
+	u8 m_port31;
+	u8 m_port33;
+	void update_low_bank();
 };
 
 #endif // MAME_NEC_PC8001_H

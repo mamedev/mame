@@ -22,8 +22,10 @@ References:
     - PC-8011 (expansion unit)
     - PC-8021;
     - PC-8031 (mini disk unit, in progress)
+	- pc8001mk2: implement 1 layer GVRAM;
     - pc8001mk2sr: verify how much needs to be ported from pc8801.cpp code
-      (Has 3 bitplane GVRAM like PC-8801 V1 mode);
+      (Has 3 bitplane GVRAM like PC-8801 V1 mode + ALU + few unique modes eventually ditched,
+	  mapped at $8000 rather than $c000);
     - waitstates & DMA penalty (some games are suspciously fast);
     - buzzer has pretty ugly aliasing in places;
 
@@ -398,21 +400,41 @@ void pc8001mk2_state::pc8001mk2_io(address_map &map)
 //  map(0xfb, 0xfb) DMA type 5 inch FDC data register
 }
 
-void pc8001mk2sr_state::port33_w(u8 data)
+/*
+ *
+ * PC-8001mkIISR
+ *
+ */
+
+void pc8001mk2sr_state::update_low_bank()
 {
-	// TODO: needs progressive flush
-#ifdef UNUSED_FUNCTION
-	if (data & 0x80)
+	if (BIT(m_port33, 7))
 	{
 		membank("bank1")->set_entry(2);
 		membank("bank2")->set_entry(2 | (m_n80sr_bank & 1));
 	}
 	else
 	{
-		membank("bank1")->set_entry(0);
-		membank("bank2")->set_entry(0);
+		membank("bank1")->set_entry(1);
+		membank("bank2")->set_entry(m_port31 & 1);
 	}
-#endif
+}
+
+void pc8001mk2sr_state::port31_w(uint8_t data)
+{
+	m_port31 = data;
+	update_low_bank();
+}
+
+u8 pc8001mk2sr_state::port33_r()
+{
+	return m_port33;
+}
+
+void pc8001mk2sr_state::port33_w(u8 data)
+{
+	m_port33 = data;
+	update_low_bank();
 }
 
 u8 pc8001mk2sr_state::port71_r()
@@ -423,12 +445,14 @@ u8 pc8001mk2sr_state::port71_r()
 void pc8001mk2sr_state::port71_w(u8 data)
 {
 	m_n80sr_bank = data;
+	update_low_bank();
 }
 
 void pc8001mk2sr_state::pc8001mk2sr_io(address_map &map)
 {
 	pc8001mk2_io(map);
-	map(0x33, 0x33).w(FUNC(pc8001mk2sr_state::port33_w));
+	// TODO: port 32 (also readable here)
+	map(0x33, 0x33).rw(FUNC(pc8001mk2sr_state::port33_r), FUNC(pc8001mk2sr_state::port33_w));
 	map(0x71, 0x71).rw(FUNC(pc8001mk2sr_state::port71_r), FUNC(pc8001mk2sr_state::port71_w));
 }
 
@@ -599,21 +623,26 @@ void pc8001_state::machine_reset()
 
 void pc8001mk2sr_state::machine_start()
 {
-	pc8001_state::machine_start();
+	pc8001mk2_state::machine_start();
 
 	membank("bank1")->configure_entry(2, m_n80sr_rom->base());
-	membank("bank2")->configure_entry(2, m_n80sr_rom->base() + 0x6000);
-	membank("bank2")->configure_entry(3, m_n80sr_rom->base() + 0x8000);
+	membank("bank2")->configure_entry(2, m_n80sr_rom->base() + 0x8000);
+	membank("bank2")->configure_entry(3, m_n80sr_rom->base() + 0x6000);
 
 	save_item(NAME(m_n80sr_bank));
+	save_item(NAME(m_port31));
+	save_item(NAME(m_port33));
 }
 
 void pc8001mk2sr_state::machine_reset()
 {
-	pc8001_state::machine_reset();
+	pc8001mk2_state::machine_reset();
 
-	//membank("bank1")->set_entry(2);
-	//membank("bank2")->set_entry(2);
+	m_port31 = 0;
+	// SR BIOS doesn't check DSW1 for non-SR modes
+	m_port33 = BIT(m_dsw[0]->read(), 1) ? 0 : 0x80;
+	m_n80sr_bank = 1;
+	update_low_bank();
 }
 
 /* Snapquik */

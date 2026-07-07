@@ -23,7 +23,7 @@ EGGY, Eggy, Bothtec, Jul 85, (cassette only?)
 
 <!-- Games -->
 
-	<software name="mappysr">
+	<software name="mappysr" supported="no">
 		<description>Mappy (mkIISR)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -34,16 +34,21 @@ EGGY, Eggy, Bothtec, Jul 85, (cassette only?)
 		</part>
 	</software>
 
-	<software name="xanadusr">
+	<software name="xanadusr" supported="no">
 		<description>Xanadu (mkIISR)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+"Incorrect layout on track 0 head 0, expected_size=100000, current_size=135872" on Disk A
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="418960">
 				<rom name="xanadu (mkiisr) (disk a).d88" size="418960" crc="00e5127b" sha1="bbc366072a338deb48da8b460912bf9241689e3e"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="415840">
 				<rom name="xanadu (mkiisr) (disk b).d88" size="415840" crc="b64f896a" sha1="2138091d56e3d9f6f3ff20df57eebf8552f488d8"/>
 			</dataarea>
@@ -52,10 +57,13 @@ EGGY, Eggy, Bothtec, Jul 85, (cassette only?)
 
 <!-- Operating Systems -->
 
-	<software name="n80srbas">
+	<software name="n80srbas" supported="no">
 		<description>N80SR BASIC system disk (PC-8037SR)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Loading stuff fails one way or another
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="353200">
 				<rom name="[os] n80sr basic system disk (pc-8037sr) (pc-8001mkiisr).d88" size="353200" crc="68cf9f52" sha1="298f01130e5d79e058f650975086bc8902da63db"/>
@@ -66,7 +74,7 @@ EGGY, Eggy, Bothtec, Jul 85, (cassette only?)
 <!-- Compilations -->
 
 	<!-- TODO: verify this, each disk seems standalone (and Disk 2 is mkII not mkIISR) -->
-	<software name="pc8001mk">
+	<software name="pc8001mk" supported="no">
 		<description>PC-8001mkIISR Game Pack (Compilation)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
