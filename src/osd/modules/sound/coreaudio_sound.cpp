@@ -1183,8 +1183,9 @@ void sound_coreaudio::coreaudio_stream::close()
 {
 	if (m_graph)
 	{
-		std::lock_guard<std::mutex> steam_guard(m_stream_mutex);
+		// stop the graph before locking m_stream_mutex, else AUGraphStop deadlocks against the render callback that also takes it
 		AUGraphStop(m_graph);
+		std::lock_guard<std::mutex> steam_guard(m_stream_mutex);
 		AUGraphUninitialize(m_graph);
 		DisposeAUGraph(m_graph);
 		m_graph = nullptr;
