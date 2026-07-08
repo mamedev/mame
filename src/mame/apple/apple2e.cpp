@@ -274,6 +274,7 @@ public:
 		m_isace500 = false;
 		m_isace2200 = false;
 		m_ace2200_axxx_bank = false;
+		m_isspectred = false;
 		m_pal = false;
 		m_cur_floppy = nullptr;
 		m_devsel = 0;
@@ -6125,7 +6126,7 @@ ROM_END
 
 ROM_START(laser128o)
 	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD("laser 128 video rom vt27-0706-0.bin", 0x0800, 0x0800, CRC(7884cc0f) SHA1(693a0a66191465825b8f7b5e746b463f3000e9cc))
+	ROM_LOAD("vt27-0430-0.bin", 0x0800, 0x0800, BAD_DUMP CRC(7884cc0f) SHA1(693a0a66191465825b8f7b5e746b463f3000e9cc)) // need to dump actual part
 	ROM_CONTINUE(0x0000, 0x0800) // international character set (how is this selected?)
 	ROM_CONTINUE(0x1000, 0x1000) // lo-res patterns, twice
 
@@ -6146,7 +6147,7 @@ ROM_START(laser128o)
 	ROMX_LOAD( "laser 128 860801.bin", 0x000000, 0x008000, CRC(a88c2fcf) SHA1(ec163bb6e7e07cb256e0ed0f8d148cf85313e9f9), ROM_BIOS(4) )
 
 	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // need to dump real laser rom
+	ROM_LOAD( "vt27-0431-0.bin", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // need to dump real laser rom
 ROM_END
 
 ROM_START(las128ex)
