@@ -13,8 +13,6 @@
 
 #include "pc8001.h"
 
-#include "pc88_sdip.h"
-
 #include "bus/centronics/ctronics.h"
 #include "bus/msx/ctrl/ctrl.h"
 #include "bus/nec_fdd/pc80s31k.h"
@@ -31,6 +29,9 @@
 #include "machine/upd1990a.h"
 #include "sound/beep.h"
 #include "sound/ymopn.h"
+
+#include "pc88_alu.h"
+#include "pc88_sdip.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -220,6 +221,7 @@ class pc8801mk2sr_state : public pc8801_state
 public:
 	pc8801mk2sr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc8801_state(mconfig, type, tag)
+		, m_alu(*this, "alu")
 		, m_opn(*this, "opn")
 		, m_alu_view(*this, "alu_view")
 	{ }
@@ -238,19 +240,14 @@ protected:
 	uint8_t opn_portb_r();
 	void opn_portb_w(uint8_t data);
 
-	void alu_ctrl1_w(uint8_t data);
 	void alu_ctrl2_w(uint8_t data);
 
+	required_device<pc88_alu_device> m_alu;
 private:
 	optional_device<ym2203_device> m_opn;
 	memory_view m_alu_view;
 
-	uint8_t m_alu_reg[3]{};
-	uint8_t m_alu_ctrl1 = 0;
-	uint8_t m_alu_ctrl2 = 0;
-
-	uint8_t alu_r(offs_t offset);
-	void alu_w(offs_t offset, uint8_t data);
+	u8 m_alu_gam;
 
 	virtual void flush_gvram_access() override;
 };

@@ -433,10 +433,11 @@ void pc8001mk2sr_state::flush_low_bank()
 
 void pc8001mk2sr_state::flush_gvram_access()
 {
+	// NOTE: different than the equivalent pc88 access ($32 vs. $33)
 	//if (BIT(m_misc_ctrl, 6))
 	if (BIT(m_port33, 6))
 	{
-		if (BIT(m_alu_ctrl2, 7))
+		if (m_alu_gam)
 		{
 			m_alu_view.select(0);
 		}
@@ -473,14 +474,10 @@ void pc8001mk2sr_state::port33_w(u8 data)
 	flush_low_bank();
 }
 
-void pc8001mk2sr_state::alu_ctrl1_w(u8 data)
-{
-	m_alu_ctrl1 = data;
-}
-
 void pc8001mk2sr_state::alu_ctrl2_w(u8 data)
 {
-	m_alu_ctrl2 = data;
+	m_alu->ctrl2_w(data);
+	m_alu_gam = BIT(data, 7);
 	flush_gvram_access();
 }
 
@@ -504,20 +501,24 @@ void pc8001mk2sr_state::pc8001mk2sr_map(address_map &map)
 	m_exp_view[3](0x6000, 0x7fff).rom().region(N80SR_ROM_TAG, 0x6000);
 
 	map(0x8000, 0xbfff).view(m_alu_view);
-	m_alu_view[0](0x8000, 0xbfff).unmaprw(); // TBD
+	m_alu_view[0](0x8000, 0xbfff).rw(m_alu, FUNC(pc88_alu_device::alu_r), FUNC(pc88_alu_device::alu_w));
 }
 
 void pc8001mk2sr_state::pc8001mk2sr_io(address_map &map)
 {
 	pc8001mk2_io(map);
-	// TODO: port 32 (also readable here)
+	// latch for mkIISR (pc8001mk Burger Time cares)
+	map(0x32, 0x32).lrw8(
+		NAME([this] () { return m_port32; }),
+		NAME([this] (u8 data) { m_port32 = data; })
+	);
 	map(0x33, 0x33).rw(FUNC(pc8001mk2sr_state::port33_r), FUNC(pc8001mk2sr_state::port33_w));
-	map(0x34, 0x34).w(FUNC(pc8001mk2sr_state::alu_ctrl1_w));
+	map(0x34, 0x34).w(m_alu, FUNC(pc88_alu_device::ctrl1_w));
 	map(0x35, 0x35).w(FUNC(pc8001mk2sr_state::alu_ctrl2_w));
 	map(0x41, 0x4f).unmaprw();
 	map(0x44, 0x45).rw(m_opn, FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 
-	map(0x70, 0x70).ram(); // latch for PC-8001mkIISR detection
+	map(0x70, 0x70).ram(); // latch for mkIISR detection
 	map(0x71, 0x71).rw(FUNC(pc8001mk2sr_state::port71_r), FUNC(pc8001mk2sr_state::port71_w));
 }
 
@@ -655,7 +656,9 @@ void pc8001mk2sr_state::machine_start()
 
 	save_item(NAME(m_n80sr_bank));
 	save_item(NAME(m_port31));
+	save_item(NAME(m_port32));
 	save_item(NAME(m_port33));
+	save_item(NAME(m_alu_gam));
 }
 
 void pc8001mk2sr_state::machine_reset()
@@ -663,10 +666,14 @@ void pc8001mk2sr_state::machine_reset()
 	pc8001mk2_state::machine_reset();
 
 	m_port31 = 0;
+	m_port32 = 0x98;
 	// SR BIOS doesn't check DSW1 for non-SR modes
 	m_port33 = BIT(m_dsw[0]->read(), 1) ? 0 : 0x80;
 	m_n80sr_bank = 1;
 	flush_low_bank();
+
+	m_alu_gam = 0;
+	flush_gvram_access();
 }
 
 /* Snapquik */
@@ -784,6 +791,9 @@ void pc8001mk2sr_state::pc8001mk2sr(machine_config &config)
 	PC8801_KBD(config.replace(), "kbd");
 
 	// TODO: mods for SR mode support
+	PC88_ALU(config, m_alu, 0);
+//	m_alu->gvram_read_cb().set([this] (offs_t offset) { return m_gvram[offset]; });
+//	m_alu->gvram_write_cb().set([this] (offs_t offset, u8 data) { m_gvram[offset] = data; });
 
 	YM2203(config, m_opn, XTAL(4'000'000));
 //	m_opn->irq_handler().set(FUNC(pc8801mk2sr_state::int4_irq_w));

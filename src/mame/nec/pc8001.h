@@ -20,6 +20,8 @@
 #include "sound/ymopn.h"
 #include "video/upd3301.h"
 
+#include "pc88_alu.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -181,6 +183,7 @@ public:
 	pc8001mk2sr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc8001mk2_state(mconfig, type, tag)
 		, m_n80sr_rom(*this, N80SR_ROM_TAG)
+		, m_alu(*this, "alu")
 		, m_opn(*this, "opn")
 		, m_alu_view(*this, "alu_view")
 	{ }
@@ -194,6 +197,7 @@ private:
 	void pc8001mk2sr_io(address_map &map) ATTR_COLD;
 
 	required_memory_region m_n80sr_rom;
+	required_device<pc88_alu_device> m_alu;
 	required_device<ym2203_device> m_opn;
 	memory_view m_alu_view;
 
@@ -201,12 +205,12 @@ private:
 	void port33_w(u8 data);
 	u8 port71_r();
 	void port71_w(u8 data);
-	void alu_ctrl1_w(u8 data);
 	void alu_ctrl2_w(u8 data);
 
 	u8 m_n80sr_bank = 0;
+	u8 m_port32;
 	u8 m_port33;
-	u8 m_alu_ctrl1, m_alu_ctrl2;
+	u8 m_alu_gam;
 	virtual void flush_low_bank() override;
 	void flush_gvram_access();
 };

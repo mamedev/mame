@@ -869,87 +869,10 @@ void pc8801_state::main_io(address_map &map)
  * PC-8801mkIISR overrides (ALU)
  */
 
-uint8_t pc8801mk2sr_state::alu_r(offs_t offset)
-{
-	uint8_t b, r, g;
-
-	// ignore for debugger, wouldn't make sense anyway
-	if (machine().side_effects_disabled())
-		return 0xff;
-
-	offset &= 0x3fff;
-
-	/* store data to ALU regs */
-	for(int i = 0; i < 3; i++)
-		m_alu_reg[i] = m_gvram[i*0x4000 + offset];
-
-	b = m_alu_reg[0];
-	r = m_alu_reg[1];
-	g = m_alu_reg[2];
-	if(!(m_alu_ctrl2 & 1)) { b^=0xff; }
-	if(!(m_alu_ctrl2 & 2)) { r^=0xff; }
-	if(!(m_alu_ctrl2 & 4)) { g^=0xff; }
-
-	return b & r & g;
-}
-
-void pc8801mk2sr_state::alu_w(offs_t offset, uint8_t data)
-{
-	int i;
-
-	offset &= 0x3fff;
-
-	// ALU write mode
-	switch(m_alu_ctrl2 & 0x30)
-	{
-		// logic operation
-		case 0x00:
-		{
-			uint8_t logic_op;
-
-			for(i = 0; i < 3; i++)
-			{
-				logic_op = (m_alu_ctrl1 & (0x11 << i)) >> i;
-
-				switch(logic_op)
-				{
-					case 0x00: { m_gvram[i*0x4000 + offset] &= ~data; } break;
-					case 0x01: { m_gvram[i*0x4000 + offset] |= data; } break;
-					case 0x10: { m_gvram[i*0x4000 + offset] ^= data; } break;
-					case 0x11: break; // NOP
-				}
-			}
-		}
-		break;
-
-		// restore data from ALU regs
-		case 0x10:
-		{
-			for(i = 0; i < 3; i++)
-				m_gvram[i*0x4000 + offset] = m_alu_reg[i];
-		}
-		break;
-
-		// swap ALU reg 1 into R GVRAM
-		case 0x20:
-			m_gvram[0x0000 + offset] = m_alu_reg[1];
-			break;
-
-		// swap ALU reg 0 into B GVRAM
-		case 0x30:
-			m_gvram[0x4000 + offset] = m_alu_reg[0];
-			break;
-	}
-}
-
-void pc8801mk2sr_state::alu_ctrl1_w(uint8_t data)
-{
-	m_alu_ctrl1 = data;
-}
-
 void pc8801mk2sr_state::alu_ctrl2_w(uint8_t data)
 {
-	m_alu_ctrl2 = data;
+	m_alu->ctrl2_w(data);
+	m_alu_gam = BIT(data, 7);
 	flush_gvram_access();
 }
 
@@ -957,7 +880,7 @@ void pc8801mk2sr_state::flush_gvram_access()
 {
 	if (BIT(m_misc_ctrl, 6))
 	{
-		if (BIT(m_alu_ctrl2, 7))
+		if (m_alu_gam)
 		{
 			m_alu_view.select(0);
 		}
@@ -980,13 +903,13 @@ void pc8801mk2sr_state::main_map(address_map &map)
 {
 	pc8801_state::main_map(map);
 	map(0xc000, 0xffff).view(m_alu_view);
-	m_alu_view[0](0xc000, 0xffff).rw(FUNC(pc8801mk2sr_state::alu_r), FUNC(pc8801mk2sr_state::alu_w));
+	m_alu_view[0](0xc000, 0xffff).rw(m_alu, FUNC(pc88_alu_device::alu_r), FUNC(pc88_alu_device::alu_w));
 }
 
 void pc8801mk2sr_state::main_io(address_map &map)
 {
 	pc8801_state::main_io(map);
-	map(0x34, 0x34).w(FUNC(pc8801mk2sr_state::alu_ctrl1_w));
+	map(0x34, 0x34).w(m_alu, FUNC(pc88_alu_device::ctrl1_w));
 	map(0x35, 0x35).w(FUNC(pc8801mk2sr_state::alu_ctrl2_w));
 
 	map(0x44, 0x45).rw(m_opn, FUNC(ym2203_device::read), FUNC(ym2203_device::write));
@@ -1052,7 +975,7 @@ void pc8801fh_state::main_io(address_map &map)
 		m_eeprom->cs_write(BIT(data, 2));
 	}));
 	m_setup_io_view[0](0x15, 0x15).lw8(NAME([this] (offs_t offset, u8 data) { m_setup_mem_view.disable(); m_setup_io_view.disable(); }));
-	map(0x34, 0x34).w(FUNC(pc8801fh_state::alu_ctrl1_w));
+	map(0x34, 0x34).w(m_alu, FUNC(pc88_alu_device::ctrl1_w));
 	map(0x35, 0x35).w(FUNC(pc8801fh_state::alu_ctrl2_w));
 
 	map(0x44, 0x47).rw(m_opna, FUNC(ym2608_device::read), FUNC(ym2608_device::write));
@@ -1439,9 +1362,7 @@ void pc8801mk2sr_state::machine_start()
 {
 	pc8801_state::machine_start();
 
-	save_pointer(NAME(m_alu_reg), 3);
-	save_item(NAME(m_alu_ctrl1));
-	save_item(NAME(m_alu_ctrl2));
+	save_item(NAME(m_alu_gam));
 }
 
 void pc8801mk2sr_state::machine_reset()
@@ -1449,9 +1370,7 @@ void pc8801mk2sr_state::machine_reset()
 	pc8801_state::machine_reset();
 
 	// initialize ALU, assume disabled by default
-	for(int i = 0; i < 3; i++)
-		m_alu_reg[i] = 0x00;
-	m_alu_ctrl1 = m_alu_ctrl2 = 0;
+	m_alu_gam = 0;
 
 	m_alu_view.disable();
 }
@@ -1740,6 +1659,10 @@ void pc8801_state::pc8801(machine_config &config)
 void pc8801mk2sr_state::pc8801mk2sr(machine_config &config)
 {
 	pc8801(config);
+
+	PC88_ALU(config, m_alu, 0);
+	m_alu->gvram_read_cb().set([this] (offs_t offset) { return m_gvram[offset]; });
+	m_alu->gvram_write_cb().set([this] (offs_t offset, u8 data) { m_gvram[offset] = data; });
 
 	YM2203(config, m_opn, MASTER_CLOCK);
 	m_opn->irq_handler().set(FUNC(pc8801mk2sr_state::int4_irq_w));
