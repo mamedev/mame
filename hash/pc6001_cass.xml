@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
+license:CC0-1.0
+
 Usage details:
 
 Mode refers to the BASIC version the software requires on Mk II machines:
@@ -8,7 +10,8 @@ Mode 1: N60 BASIC (16K)
 Mode 2: N60 BASIC (32K)
 Mode 3: N60 EXTENDED BASIC (16K)
 Mode 4: N60 EXTENDED BASIC (32K)
-Mode 5: N60m BASIC (64K)
+Mode 5: N60m BASIC (64K) (pc6001mk2/pc6601, cfr. pc6001mk2_cass.xml)
+Mode 6: N66SR BASIC (pc6001mk2sr/pc6601sr, cfr. pc6001mk2sr_cass.xml)
 
 Modes 1 & 2 correspond to the original PC-6001 BASIC versions.
 Modes 3 & 4 correspond to the original PC-6001 running the N60 Extended BASIC cartridge.

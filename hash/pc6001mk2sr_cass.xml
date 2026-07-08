@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
+license:CC0-1.0
+
 Mode 6 PC-6001mkIISR/PC-6601SR cassette snapshots. They specifically needs N66SR BASIC
 -->
 <softwarelist name="pc6001mk2sr_cass" description="NEC PC-6001mkIISR/PC-6601SR cassette snapshots">
