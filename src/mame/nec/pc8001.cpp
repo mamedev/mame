@@ -453,6 +453,7 @@ void pc8001mk2sr_state::pc8001mk2sr_io(address_map &map)
 	pc8001mk2_io(map);
 	// TODO: port 32 (also readable here)
 	map(0x33, 0x33).rw(FUNC(pc8001mk2sr_state::port33_r), FUNC(pc8001mk2sr_state::port33_w));
+	map(0x70, 0x70).ram(); // latch for PC-8001mkIISR detection
 	map(0x71, 0x71).rw(FUNC(pc8001mk2sr_state::port71_r), FUNC(pc8001mk2sr_state::port71_w));
 }
 
