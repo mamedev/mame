@@ -753,7 +753,7 @@ SNAPSHOT_LOAD_MEMBER(pc8001_state::snapshot_cb)
 	if (m_ram->size() < 0x10000)
 		return std::make_pair(image_error::UNSUPPORTED, std::string("Configured RAM size must be 64K"));
 
-	if (image.length() > 0x8000)
+	if (image.length() < 0x7f40 || image.length() > 0x8000)
 		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 
 	uint8_t *ram = m_ram->pointer();
@@ -761,8 +761,14 @@ SNAPSHOT_LOAD_MEMBER(pc8001_state::snapshot_cb)
 	std::vector<u8> snapshot(image.length());
 	image.fread(&snapshot[0], image.length());
 
-	std::copy(std::begin(snapshot), std::end(snapshot), &ram[0x8000]);
-	m_maincpu->set_state_int(Z80_SP, ram[0xff3e] | (ram[0xff3f] << 8));
+	std::copy_n(&snapshot[0x0000], 0x4000, &ram[0x4000]);
+	const s32 load_size = image.length() - 0x4000;
+	if (load_size > 0)
+	{
+		std::copy_n(&snapshot[0x4000], load_size, &ram[0x0000]);
+	}
+
+	m_maincpu->set_state_int(Z80_SP, snapshot[0x7f3e] | (snapshot[0x7f3f] << 8));
 	m_maincpu->set_pc(0xff3d);
 
 	//m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
