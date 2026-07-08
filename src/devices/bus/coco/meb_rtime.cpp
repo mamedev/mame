@@ -39,7 +39,6 @@ namespace
 
 		private:
 			void busy_w(int state);
-			static u8 translate_rtc_address(u8 software_addr);
 
 			required_device<rp5c15_device> m_rtc;
 			u8 m_rtc_address;
@@ -88,7 +87,6 @@ namespace
 
 	void disto_rtime_device::device_add_mconfig(machine_config &config)
 	{
-// 		MSM6242(config, m_rtc, XTAL(32'768), false /* 12 hour time */);
  		RP5C15(config, m_rtc,  XTAL(32'768));
 
 		CENTRONICS(config, m_centronics, centronics_devices, "printer");
@@ -96,27 +94,6 @@ namespace
 
 		OUTPUT_LATCH(config, m_latch);
 		m_centronics->set_output_latch(*m_latch);
-	}
-
-	//-------------------------------------------------
-	//  translate_rtc_address
-	//
-	//  The Disto RTIME board wires the MSM6242's date/calendar registers
-	//  (addresses 6-12) in a non-standard order: the block is rotated one
-	//  position left relative to the datasheet (SW addr 6=DOW, 7=D1, 8=D10,
-	//  9=MO1, 10=MO10, 11=Y1, 12=Y10). Time-of-day registers (0-5) are
-	//  unaffected. Confirmed by multiple independent contemporary software
-	//  titles.
-	//-------------------------------------------------
-
-	u8 disto_rtime_device::translate_rtc_address(u8 software_addr)
-	{
-		return software_addr;
-
-		if (software_addr < 6 || software_addr > 12)
-			return software_addr;
-
-		return 6 + ((software_addr - 6 - 1 + 7) % 7);
 	}
 
 	//-------------------------------------------------
@@ -130,7 +107,7 @@ namespace
 		switch(offset)
 		{
 			case 0x00:  /* FF50 */
-				result = m_rtc->read(translate_rtc_address(m_rtc_address & 0x0f));
+				result = m_rtc->read(m_rtc_address);
 				break;
 
 			case 0x02:  /* FF52 */
@@ -155,7 +132,7 @@ namespace
 		switch(offset)
 		{
 			case 0x00: /* FF50 */
-				m_rtc->write(translate_rtc_address(m_rtc_address & 0x0f), data);
+				m_rtc->write(m_rtc_address & 0x0f, data);
 				break;
 
 			case 0x01: /* FF51 */
