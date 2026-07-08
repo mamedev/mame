@@ -10,6 +10,7 @@
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
+#include "machine/bankdev.h"
 #include "machine/buffer.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
@@ -116,7 +117,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<pc80s31_device> m_pc80s31;
 	required_device<screen_device> m_screen;
@@ -157,6 +158,7 @@ class pc8001mk2_state : public pc8001_state
 public:
 	pc8001mk2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc8001_state(mconfig, type, tag)
+		, m_gvram_bank(*this, "gvram_bank")
 		, m_kanji_rom(*this, "kanji")
 		, m_dsw(*this, "DSW%d", 1U)
 	{ }
@@ -164,15 +166,29 @@ public:
 	void pc8001mk2(machine_config &config);
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 	void pc8001mk2_io(address_map &map) ATTR_COLD;
 	void pc8001mk2_map(address_map &map) ATTR_COLD;
 
+	required_device<address_map_bank_device> m_gvram_bank;
 	required_memory_region m_kanji_rom;
 	required_ioport_array<2> m_dsw;
 
+	std::unique_ptr<uint8_t[]> m_gvram;
 	u8 m_port31;
+	u8 m_vram_sel;
+
 	void port31_w(uint8_t data);
 	virtual void flush_low_bank();
+	virtual void flush_gvram_access();
+
+	virtual void gvram_map(address_map &map);
+	u8 gvram_r(offs_t offset);
+	void gvram_w(offs_t offset, u8 data);
+
+//	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 private:
 };
@@ -193,6 +209,7 @@ public:
 private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
 	void pc8001mk2sr_map(address_map &map) ATTR_COLD;
 	void pc8001mk2sr_io(address_map &map) ATTR_COLD;
 
@@ -212,7 +229,11 @@ private:
 	u8 m_port33;
 	u8 m_alu_gam;
 	virtual void flush_low_bank() override;
-	void flush_gvram_access();
+	virtual void flush_gvram_access() override;
+
+	virtual void gvram_map(address_map &map) override;
+
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 };
 
 #endif // MAME_NEC_PC8001_H

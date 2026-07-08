@@ -204,6 +204,16 @@ uint32_t pc8001_state::screen_update( screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
+// TODO: placeholder
+uint32_t pc8001mk2sr_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(0, cliprect);
+
+	m_crtc->screen_update(screen, bitmap, cliprect);
+	return 0;
+}
+
+
 /* Read/Write Handlers */
 
 /*
@@ -380,9 +390,37 @@ void pc8001_state::pc8001_io(address_map &map)
 	map(0xfc, 0xff).m(m_pc80s31, FUNC(pc80s31_device::host_map));
 }
 
+/*
+ *
+ * mkII (GVRAM)
+ *
+ */
+
+void pc8001mk2_state::flush_gvram_access()
+{
+	m_gvram_bank->set_bank(m_vram_sel);
+}
+
+uint8_t pc8001mk2_state::gvram_r(offs_t offset)
+{
+	return m_gvram[offset];
+}
+
+void pc8001mk2_state::gvram_w(offs_t offset, uint8_t data)
+{
+	m_gvram[offset] = data;
+}
+
+void pc8001mk2_state::gvram_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rw(FUNC(pc8001mk2_state::gvram_r), FUNC(pc8001mk2_state::gvram_w));
+	map(0xc000, 0xffff).rw(FUNC(pc8001mk2_state::ram_r<0x4000>), FUNC(pc8001mk2_state::ram_w<0x4000>));
+}
+
 void pc8001mk2_state::pc8001mk2_map(address_map &map)
 {
 	pc8001_map(map);
+	map(0x8000, 0xbfff).m(m_gvram_bank, FUNC(address_map_bank_device::amap8));
 }
 
 void pc8001mk2_state::pc8001mk2_io(address_map &map)
@@ -392,6 +430,8 @@ void pc8001mk2_state::pc8001mk2_io(address_map &map)
 	map(0x31, 0x31).portr("DSW2").w(FUNC(pc8001mk2_state::port31_w));
 //  map(0x5c, 0x5c).w(FUNC(pc8001mk2_state::gvram_on_w));
 //  map(0x5f, 0x5f).w(FUNC(pc8001mk2_state::gvram_off_w));
+	map(0x5c, 0x5c).lw8(NAME([this] (offs_t offset, u8 data) { (void)data; m_vram_sel = 0; flush_gvram_access(); }));
+	map(0x5f, 0x5f).lw8(NAME([this] (offs_t offset, u8 data) { (void)data; m_vram_sel = 3; flush_gvram_access(); }));
 //  map(0xe8, 0xe8) kanji_address_lo_w, kanji_data_lo_r
 //  map(0xe9, 0xe9) kanji_address_hi_w, kanji_data_hi_r
 //  map(0xea, 0xea) kanji_readout_start_w
@@ -409,9 +449,15 @@ void pc8001mk2_state::pc8001mk2_io(address_map &map)
 
 /*
  *
- * PC-8001mkIISR
+ * PC-8001mkIISR (ALU, bumped GVRAM)
  *
  */
+
+void pc8001mk2sr_state::gvram_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rw(FUNC(pc8001mk2sr_state::gvram_r), FUNC(pc8001mk2sr_state::gvram_w));
+	map(0xc000, 0xffff).rw(FUNC(pc8001mk2sr_state::ram_r<0x4000>), FUNC(pc8001mk2sr_state::ram_w<0x4000>));
+}
 
 void pc8001mk2sr_state::flush_low_bank()
 {
@@ -447,12 +493,12 @@ void pc8001mk2sr_state::flush_gvram_access()
 		}
 
 		// NOTE: ALU enabled wins over GVRAM, to the point of disabling its latch when setting changes
-		//m_vram_sel = 3;
+		m_vram_sel = 3;
 	}
 	else
 		m_alu_view.disable();
 
-	//pc8801_state::flush_gvram_access();
+	pc8001mk2_state::flush_gvram_access();
 }
 
 u8 pc8001mk2sr_state::port33_r()
@@ -517,6 +563,10 @@ void pc8001mk2sr_state::pc8001mk2sr_io(address_map &map)
 	map(0x35, 0x35).w(FUNC(pc8001mk2sr_state::alu_ctrl2_w));
 	map(0x41, 0x4f).unmaprw();
 	map(0x44, 0x45).rw(m_opn, FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x5c, 0x5c).lr8(NAME([this] () {
+		return 0xf8 | ((m_vram_sel == 3) ? 0 : (1 << m_vram_sel));
+	}));
+	map(0x5c, 0x5f).lw8(NAME([this] (offs_t offset, u8 data) { (void)data; m_vram_sel = offset & 3; flush_gvram_access(); }));
 
 	map(0x70, 0x70).ram(); // latch for mkIISR detection
 	map(0x71, 0x71).rw(FUNC(pc8001mk2sr_state::port71_r), FUNC(pc8001mk2sr_state::port71_w));
@@ -650,6 +700,26 @@ void pc8001_state::machine_reset()
 	m_exp_view.select(1);
 }
 
+void pc8001mk2_state::machine_start()
+{
+	pc8001_state::machine_start();
+
+	// NOTE: regular mk2 has 0x4000 only of GVRAM
+	m_gvram = make_unique_clear<uint8_t[]>(0xc000);
+
+	save_pointer(NAME(m_gvram), 0xc000);
+	save_item(NAME(m_vram_sel));
+}
+
+void pc8001mk2_state::machine_reset()
+{
+	pc8001_state::machine_reset();
+
+	m_vram_sel = 3;
+	flush_gvram_access();
+}
+
+
 void pc8001mk2sr_state::machine_start()
 {
 	pc8001mk2_state::machine_start();
@@ -775,7 +845,7 @@ void pc8001mk2_state::pc8001mk2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc8001mk2_state::pc8001mk2_map);
 	m_maincpu->set_addrmap(AS_IO, &pc8001mk2_state::pc8001mk2_io);
 
-	// TODO: video HW has extra GVRAM setup
+	ADDRESS_MAP_BANK(config, m_gvram_bank).set_map(&pc8001mk2_state::gvram_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x4000);
 
 	RAM(config.replace(), RAM_TAG).set_default_size("64K");
 
@@ -790,17 +860,18 @@ void pc8001mk2sr_state::pc8001mk2sr(machine_config &config)
 
 	PC8801_KBD(config.replace(), "kbd");
 
-	// TODO: mods for SR mode support
+//	m_gvram_bank->set_map(&pc8001mk2sr_state::gvram_map);
+
 	PC88_ALU(config, m_alu, 0);
-//	m_alu->gvram_read_cb().set([this] (offs_t offset) { return m_gvram[offset]; });
-//	m_alu->gvram_write_cb().set([this] (offs_t offset, u8 data) { m_gvram[offset] = data; });
+	m_alu->gvram_read_cb().set(FUNC(pc8001mk2sr_state::gvram_r));
+	m_alu->gvram_write_cb().set(FUNC(pc8001mk2sr_state::gvram_w));
 
 	YM2203(config, m_opn, XTAL(4'000'000));
 //	m_opn->irq_handler().set(FUNC(pc8801mk2sr_state::int4_irq_w));
 //	m_opn->port_a_read_callback().set(FUNC(pc8801mk2sr_state::opn_porta_r));
 //	m_opn->port_b_read_callback().set(FUNC(pc8801mk2sr_state::opn_portb_r));
 //	m_opn->port_b_write_callback().set(FUNC(pc8801mk2sr_state::opn_portb_w));
-
+	m_opn->add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	SOFTWARE_LIST(config, "disk_n80sr_list").set_original("pc8001mk2sr_flop");
 }

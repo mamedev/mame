@@ -73,7 +73,7 @@ Loading stuff fails one way or another
 
 <!-- Compilations -->
 
-	<!-- TODO: verify this, each disk seems standalone (and Disk 2 is mkII not mkIISR) -->
+	<!-- TODO: verify this, Disk 2 in particular looks standalone -->
 	<software name="pc8001mk" supported="no">
 		<description>PC-8001mkIISR Game Pack (Compilation)</description>
 		<year>19??</year>
