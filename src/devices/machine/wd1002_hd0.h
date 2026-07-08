@@ -55,7 +55,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	static constexpr unsigned BUFFER_SIZE = 0x200; // 512-byte board sector buffer (TMM2016 SRAM)
+	static constexpr unsigned BUFFER_SIZE = 0x400; // 1K board sector buffer (WD1015 SRAM); holds one 128/256/512/1024-byte sector
 
 	// shared sector buffer (the WD1002-05 floppy section fills/drains it the same way)
 	uint8_t buf_in();             // controller -> host buffer (drained on a write-to-media)
