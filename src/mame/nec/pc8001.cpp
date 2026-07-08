@@ -260,10 +260,10 @@ void pc8001_base_state::port30_w(uint8_t data)
 void pc8001mk2_state::port31_w(uint8_t data)
 {
 	m_port31 = data;
-	update_low_bank();
+	flush_low_bank();
 }
 
-void pc8001mk2_state::update_low_bank()
+void pc8001mk2_state::flush_low_bank()
 {
 	// enable 64K work RAM
 	if (BIT(m_port31, 1))
@@ -413,9 +413,9 @@ void pc8001mk2_state::pc8001mk2_io(address_map &map)
  *
  */
 
-void pc8001mk2sr_state::update_low_bank()
+void pc8001mk2sr_state::flush_low_bank()
 {
-	// work RAM enable has priority over BIOS
+	// work RAM enable has priority over any BIOS
 	if (BIT(m_port31, 1))
 	{
 		m_exp_view.disable();
@@ -431,15 +431,57 @@ void pc8001mk2sr_state::update_low_bank()
 	}
 }
 
+void pc8001mk2sr_state::flush_gvram_access()
+{
+	//if (BIT(m_misc_ctrl, 6))
+	if (BIT(m_port33, 6))
+	{
+		if (BIT(m_alu_ctrl2, 7))
+		{
+			m_alu_view.select(0);
+		}
+		else
+		{
+			m_alu_view.disable();
+		}
+
+		// NOTE: ALU enabled wins over GVRAM, to the point of disabling its latch when setting changes
+		//m_vram_sel = 3;
+	}
+	else
+		m_alu_view.disable();
+
+	//pc8801_state::flush_gvram_access();
+}
+
 u8 pc8001mk2sr_state::port33_r()
 {
 	return m_port33;
 }
 
+/*
+ * x--- ---- N80SR enable SR specific BIOS
+ * -x-- ---- GVAM ALU enable
+ * ---x ---- HIRA hiragana enable
+ * ---- x--- PR2 graphic priority over text
+ * ---- -x-- PR1 swap bank 0 and bank 1 in 320x200 graphic mode
+ * ---- --x- SINTM sound irq mask
+ */
 void pc8001mk2sr_state::port33_w(u8 data)
 {
 	m_port33 = data;
-	update_low_bank();
+	flush_low_bank();
+}
+
+void pc8001mk2sr_state::alu_ctrl1_w(u8 data)
+{
+	m_alu_ctrl1 = data;
+}
+
+void pc8001mk2sr_state::alu_ctrl2_w(u8 data)
+{
+	m_alu_ctrl2 = data;
+	flush_gvram_access();
 }
 
 u8 pc8001mk2sr_state::port71_r()
@@ -450,7 +492,7 @@ u8 pc8001mk2sr_state::port71_r()
 void pc8001mk2sr_state::port71_w(u8 data)
 {
 	m_n80sr_bank = data;
-	update_low_bank();
+	flush_low_bank();
 }
 
 void pc8001mk2sr_state::pc8001mk2sr_map(address_map &map)
@@ -460,6 +502,9 @@ void pc8001mk2sr_state::pc8001mk2sr_map(address_map &map)
 	m_exp_view[2](0x6000, 0x7fff).rom().region(N80SR_ROM_TAG, 0x8000);
 	m_exp_view[3](0x0000, 0x5fff).rom().region(N80SR_ROM_TAG, 0x0000);
 	m_exp_view[3](0x6000, 0x7fff).rom().region(N80SR_ROM_TAG, 0x6000);
+
+	map(0x8000, 0xbfff).view(m_alu_view);
+	m_alu_view[0](0x8000, 0xbfff).unmaprw(); // TBD
 }
 
 void pc8001mk2sr_state::pc8001mk2sr_io(address_map &map)
@@ -467,6 +512,11 @@ void pc8001mk2sr_state::pc8001mk2sr_io(address_map &map)
 	pc8001mk2_io(map);
 	// TODO: port 32 (also readable here)
 	map(0x33, 0x33).rw(FUNC(pc8001mk2sr_state::port33_r), FUNC(pc8001mk2sr_state::port33_w));
+	map(0x34, 0x34).w(FUNC(pc8001mk2sr_state::alu_ctrl1_w));
+	map(0x35, 0x35).w(FUNC(pc8001mk2sr_state::alu_ctrl2_w));
+	map(0x41, 0x4f).unmaprw();
+	map(0x44, 0x45).rw(m_opn, FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+
 	map(0x70, 0x70).ram(); // latch for PC-8001mkIISR detection
 	map(0x71, 0x71).rw(FUNC(pc8001mk2sr_state::port71_r), FUNC(pc8001mk2sr_state::port71_w));
 }
@@ -616,7 +666,7 @@ void pc8001mk2sr_state::machine_reset()
 	// SR BIOS doesn't check DSW1 for non-SR modes
 	m_port33 = BIT(m_dsw[0]->read(), 1) ? 0 : 0x80;
 	m_n80sr_bank = 1;
-	update_low_bank();
+	flush_low_bank();
 }
 
 /* Snapquik */
@@ -734,6 +784,13 @@ void pc8001mk2sr_state::pc8001mk2sr(machine_config &config)
 	PC8801_KBD(config.replace(), "kbd");
 
 	// TODO: mods for SR mode support
+
+	YM2203(config, m_opn, XTAL(4'000'000));
+//	m_opn->irq_handler().set(FUNC(pc8801mk2sr_state::int4_irq_w));
+//	m_opn->port_a_read_callback().set(FUNC(pc8801mk2sr_state::opn_porta_r));
+//	m_opn->port_b_read_callback().set(FUNC(pc8801mk2sr_state::opn_portb_r));
+//	m_opn->port_b_write_callback().set(FUNC(pc8801mk2sr_state::opn_portb_w));
+
 
 	SOFTWARE_LIST(config, "disk_n80sr_list").set_original("pc8001mk2sr_flop");
 }

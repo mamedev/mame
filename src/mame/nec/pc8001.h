@@ -17,6 +17,7 @@
 #include "machine/ram.h"
 #include "machine/upd1990a.h"
 #include "sound/beep.h"
+#include "sound/ymopn.h"
 #include "video/upd3301.h"
 
 #include "emupal.h"
@@ -169,7 +170,7 @@ protected:
 
 	u8 m_port31;
 	void port31_w(uint8_t data);
-	virtual void update_low_bank();
+	virtual void flush_low_bank();
 
 private:
 };
@@ -180,6 +181,8 @@ public:
 	pc8001mk2sr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc8001mk2_state(mconfig, type, tag)
 		, m_n80sr_rom(*this, N80SR_ROM_TAG)
+		, m_opn(*this, "opn")
+		, m_alu_view(*this, "alu_view")
 	{ }
 
 	void pc8001mk2sr(machine_config &config);
@@ -191,15 +194,21 @@ private:
 	void pc8001mk2sr_io(address_map &map) ATTR_COLD;
 
 	required_memory_region m_n80sr_rom;
+	required_device<ym2203_device> m_opn;
+	memory_view m_alu_view;
 
 	u8 port33_r();
 	void port33_w(u8 data);
 	u8 port71_r();
 	void port71_w(u8 data);
+	void alu_ctrl1_w(u8 data);
+	void alu_ctrl2_w(u8 data);
 
 	u8 m_n80sr_bank = 0;
 	u8 m_port33;
-	virtual void update_low_bank() override;
+	u8 m_alu_ctrl1, m_alu_ctrl2;
+	virtual void flush_low_bank() override;
+	void flush_gvram_access();
 };
 
 #endif // MAME_NEC_PC8001_H
