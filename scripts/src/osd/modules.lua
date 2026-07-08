@@ -170,7 +170,7 @@ function osdmodulesbuild()
 		}
 	end
 
-	if _OPTIONS["NO_OPENGL"]=="1" or _OPTIONS["targetos"]=="asmjs" then
+	if _OPTIONS["NO_OPENGL"]=="1" then
 		defines {
 			"USE_OPENGL=0",
 		}
@@ -625,7 +625,7 @@ newoption {
 }
 
 if not _OPTIONS["NO_OPENGL"] then
-	if _OPTIONS["targetos"] == "android" then
+	if _OPTIONS["targetos"] == "android" or _OPTIONS["targetos"]=="asmjs" then
 		_OPTIONS["NO_OPENGL"] = "1"
 	else
 		_OPTIONS["NO_OPENGL"] = "0"

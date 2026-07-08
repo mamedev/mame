@@ -1099,10 +1099,11 @@ configuration { "asmjs" }
 	}
 	buildoptions_cpp {
 		"-std=c++20",
-		"-s EXCEPTION_CATCHING_ALLOWED=\"['_ZN15running_machine17start_all_devicesEv','_ZN12cli_frontend7executeEiPPc','_ZN8chd_file11open_commonEb','_ZN8chd_file13read_metadataEjjRNSt3__212basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE','_ZN8chd_file13read_metadataEjjRNSt3__26vectorIhNS0_9allocatorIhEEEE','_ZNK19netlist_mame_device19base_validity_checkER16validity_checker']\"",
+		"-s EXCEPTION_CATCHING_ALLOWED=\"['_ZN15running_machine3runEb','_ZN15running_machine17start_all_devicesEv','_ZN12cli_frontend7executeERNSt3__26vectorINS0_12basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEENS5_IS7_EEEE','_ZN8chd_file11open_commonEb','_ZN8chd_file13read_metadataEjjRNSt3__212basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE','_ZN8chd_file13read_metadataEjjRNSt3__26vectorIhNS0_9allocatorIhEEEE','_ZNK19netlist_mame_device19base_validity_checkER16validity_checker']\"",
 	}
 	defines {
 		"ASIO_HAS_PTHREADS",
+		"SOUND_DISABLE_THREADING",
 	}
 	linkoptions {
 		"-Wl,--start-group",
@@ -1114,9 +1115,7 @@ configuration { "asmjs" }
 		"-s ERROR_ON_UNDEFINED_SYMBOLS=0",
 		"-s STACK_SIZE=5MB",
 		"-s MAX_WEBGL_VERSION=2",
-		-- MAME device-start rescheduling throws/catches device_missing_dependencies
-		-- across many frames; the emscripten default (whitelist-only catching)
-		"-s DISABLE_EXCEPTION_CATCHING=0",
+		"-s EXCEPTION_CATCHING_ALLOWED=\"['_ZN15running_machine3runEb','_ZN15running_machine17start_all_devicesEv','_ZN12cli_frontend7executeERNSt3__26vectorINS0_12basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEENS5_IS7_EEEE','_ZN8chd_file11open_commonEb','_ZN8chd_file13read_metadataEjjRNSt3__212basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE','_ZN8chd_file13read_metadataEjjRNSt3__26vectorIhNS0_9allocatorIhEEEE','_ZNK19netlist_mame_device19base_validity_checkER16validity_checker']\"",
 		"--pre-js " .. _MAKE.esc(MAME_DIR) .. "src/osd/modules/sound/js_sound.js",
 		"--post-js " .. _MAKE.esc(MAME_DIR) .. "scripts/resources/emscripten/emscripten_post.js",
 		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/chains@bgfx/chains",
@@ -1153,13 +1152,18 @@ configuration { "asmjs" }
 			"-s WASM=1",
 		}
 	end
-
-	-- define a fixed memory size because allowing memory growth disables asm.js optimizations
-	linkoptions {
-		"-s ALLOW_MEMORY_GROWTH=0",
-		"-s INITIAL_MEMORY=256MB",
-	}
-
+	if _OPTIONS["WEBASSEMBLY"]~=nil and _OPTIONS["WEBASSEMBLY"]=="0" then
+		-- asm.js: fixed memory (growth disables asm.js optimizations)
+		linkoptions {
+			"-s ALLOW_MEMORY_GROWTH=0",
+			"-s INITIAL_MEMORY=256MB",
+		}
+	else
+		linkoptions {
+			"-s ALLOW_MEMORY_GROWTH=1",
+			"-s INITIAL_MEMORY=24MB",
+		}
+	end
 	archivesplit_size "20"
 
 configuration { "android*" }
