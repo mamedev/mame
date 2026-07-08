@@ -98,7 +98,7 @@
 #define LOG_FB (1U << 11)
 #define LOG_FB_ROP (1U << 12)
 
-#define VERBOSE 0
+#define VERBOSE LOG_FB
 
 #include "logmacro.h"
 
@@ -650,6 +650,8 @@ namespace
 
 	void news_iop_state::check_operation_start(offs_t offset)
 	{
+		m_fb_read = (offset << 1) & 0x100;
+		m_fb_write = (offset << 1) & 0x200;
 		if (offset & (0x4000 >> 1)) // word offset
 		{
 			LOGMASKED(LOG_FB, "Operation started\n");
@@ -748,7 +750,7 @@ namespace
 			fatalerror("IOP tried to reconfigure while op was in progress!");
 		}
 
-		LOGMASKED(LOG_FB, "rop_config_w(0x%x, 0x%x) = ", offset, data);
+		LOGMASKED(LOG_FB, "(%s) rop_config_w(0x%x, 0x%x) = ", machine().describe_context(), offset, data);
 
 		// These mappings are an educated guess based on NWS-1500 service manual and IOP behavior
 		offset <<= 1; // use byte offset
@@ -766,7 +768,7 @@ namespace
 			m_fb_x_direction ? "xfwd " : "xrev ",
 			m_fb_suppress_advance ? "supadv " : "");
 
-		if (offset & 400) // If set, load ROP function
+		if (offset & 0x400) // If set, load ROP function
 		{
 			m_fb_rop_func = data & 0xf;
 			LOGMASKED(LOG_FB, "func=0x%x ", m_fb_rop_func);
@@ -902,8 +904,8 @@ namespace
 
 		// TODO: writing a destination word should be in a helper, but that is far from the only thing wrong with this.
 		// If this is the last FIFO push of the row (we have leftover bits from the shift in the shifter), we need to apply them.
-		const uint16_t source_words = // ((m_fb_source_x & 0xf) + // Get the pixel offset within word
-											(m_fb_limit_x - m_fb_destination_x + 0xf) // Add the width in pixels, rounded up
+		const uint16_t source_words = ((m_fb_source_x & 0xf) + // Get the pixel offset within word
+											(m_fb_limit_x - m_fb_destination_x + 0xf)) // Add the width in pixels, rounded up
 											>> 4; // Convert to word address
 		const uint16_t destination_words = ((m_fb_destination_x & 0xf) + m_fb_limit_x - m_fb_destination_x + 0xf) >> 4;
 		const uint16_t rel_word = (m_fb_current_x - m_fb_destination_x) >> 4;
@@ -968,9 +970,9 @@ namespace
 
 		if (!m_fb_busy)
 		{
-			LOGMASKED(LOG_FB, "fb_fifo_w: IOP tried to push data without starting an op!\n");
-			machine().debug_break();
-			// fatalerror("IOP tried to push data without starting an op!");
+			// LOGMASKED(LOG_FB, "fb_fifo_w: IOP tried to push data without starting an op!\n");
+			// machine().debug_break();
+			fatalerror("IOP tried to push data without starting an op!");
 		}
 
 		// TODO: validate offset versus the setup in the ROP reg
