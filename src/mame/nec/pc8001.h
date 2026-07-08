@@ -200,8 +200,10 @@ public:
 		: pc8001mk2_state(mconfig, type, tag)
 		, m_n80sr_rom(*this, N80SR_ROM_TAG)
 		, m_alu(*this, "alu")
+		, m_palette(*this, "palette")
 		, m_opn(*this, "opn")
 		, m_alu_view(*this, "alu_view")
+		, m_extram_view(*this, "extram_view")
 	{ }
 
 	void pc8001mk2sr(machine_config &config);
@@ -209,14 +211,18 @@ public:
 private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 
 	void pc8001mk2sr_map(address_map &map) ATTR_COLD;
 	void pc8001mk2sr_io(address_map &map) ATTR_COLD;
 
 	required_memory_region m_n80sr_rom;
 	required_device<pc88_alu_device> m_alu;
+	required_device<palette_device> m_palette;
 	required_device<ym2203_device> m_opn;
 	memory_view m_alu_view;
+	memory_view m_extram_view;
 
 	u8 port33_r();
 	void port33_w(u8 data);
@@ -228,10 +234,16 @@ private:
 	u8 m_port32;
 	u8 m_port33;
 	u8 m_alu_gam;
+	u8 m_extram_mode;
+	struct { uint8_t r = 0, g = 0, b = 0; } m_palram[8];
+	bitmap_rgb32 m_text_bitmap;
+
 	virtual void flush_low_bank() override;
 	virtual void flush_gvram_access() override;
 
 	virtual void gvram_map(address_map &map) override;
+
+	void draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(u32 bitmap_offset, int y, int x, int xi)> dot_func);
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 };

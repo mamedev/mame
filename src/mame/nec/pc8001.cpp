@@ -204,12 +204,90 @@ uint32_t pc8001_state::screen_update( screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-// TODO: placeholder
+void pc8001mk2sr_state::video_start()
+{
+	m_screen->register_screen_bitmap(m_text_bitmap);
+
+	save_item(STRUCT_MEMBER(m_palram, r));
+	save_item(STRUCT_MEMBER(m_palram, g));
+	save_item(STRUCT_MEMBER(m_palram, b));
+}
+
+void pc8001mk2sr_state::video_reset()
+{
+	for (int i = 0; i < 8; i ++)
+	{
+		m_palram[i].b = i & 1 ? 7 : 0;
+		m_palram[i].r = i & 2 ? 7 : 0;
+		m_palram[i].g = i & 4 ? 7 : 0;
+		m_palette->set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+	}
+}
+
+// TODO: has extra modes vs. PC-8801 ...
+void pc8001mk2sr_state::draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(u32 bitmap_offset, int y, int x, int xi)> dot_func)
+{
+	uint16_t y_double = get_screen_frequency();
+	if ((m_port31 & 0x11) == 0)
+		y_double = 0;
+	int32_t y_line_size = y_double + 1;
+
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y += y_line_size)
+	{
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
+		{
+			u8 x_char = (x >> 3);
+			u32 bitmap_offset = (y >> y_double) * 80 + x_char;
+			for(int xi = 0; xi < 8; xi++)
+			{
+				u8 pen_dot = dot_func(bitmap_offset, y, x_char, 7 - xi);
+
+				if (pen_dot == 0)
+					continue;
+
+				// TODO: some real HW snaps implies that output is only even or odd line when in 3bpp mode, verify
+				// 3301 skip line? interlace artifact? other?
+				for (int yi = 0; yi < y_line_size; yi ++)
+				{
+					int res_x = x + xi;
+					int res_y = y + yi;
+					// still need to check against cliprect,
+					// in the rare case that 3301 CRTC is set to non-canon values (such as any width != 640).
+					if (cliprect.contains(res_x, res_y))
+						bitmap.pix(res_y, res_x) = palette->pen(pen_dot);
+				}
+			}
+		}
+	}
+}
+
+
+// TODO: ... and can change priority of the GVRAM layer
 uint32_t pc8001mk2sr_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(0, cliprect);
+	if (BIT(m_port31, 3))
+	{
+		bitmap.fill(m_palette->pen(0), cliprect);
 
-	m_crtc->screen_update(screen, bitmap, cliprect);
+		draw_bitmap(bitmap, cliprect, m_palette, [&](u32 bitmap_offset, int y, int x, int xi){
+			u8 res = 0;
+
+			// note: layer masking doesn't occur in 3bpp mode, bugattac relies on this
+			for (int plane = 0; plane < 3; plane ++)
+				res |= ((m_gvram[bitmap_offset + plane * 0x4000] >> xi) & 1) << plane;
+
+			return res;
+		});
+	}
+	else
+		bitmap.fill(0, cliprect);
+
+	//if(!m_text_layer_mask)
+	{
+		m_text_bitmap.fill(0, cliprect);
+		m_crtc->screen_update(screen, m_text_bitmap, cliprect);
+		copybitmap_trans(bitmap, m_text_bitmap, 0, 0, 0, 0, cliprect, 0);
+	}
 	return 0;
 }
 
@@ -467,6 +545,16 @@ void pc8001mk2sr_state::flush_low_bank()
 		m_exp_view.disable();
 		return;
 	}
+
+	// $e2 individual work RAM select works similarly to PC-8801,
+	// except it has just one register and can only bank to 64K
+	if (m_extram_mode & 0x11)
+	{
+		m_extram_view.select(m_extram_mode);
+	}
+	else
+		m_extram_view.disable();
+
 	if (BIT(m_port33, 7))
 	{
 		m_exp_view.select(2 | (m_n80sr_bank & 1));
@@ -545,6 +633,10 @@ void pc8001mk2sr_state::pc8001mk2sr_map(address_map &map)
 	m_exp_view[2](0x6000, 0x7fff).rom().region(N80SR_ROM_TAG, 0x8000);
 	m_exp_view[3](0x0000, 0x5fff).rom().region(N80SR_ROM_TAG, 0x0000);
 	m_exp_view[3](0x6000, 0x7fff).rom().region(N80SR_ROM_TAG, 0x6000);
+	map(0x0000, 0x7fff).view(m_extram_view);
+	m_extram_view[0x01](0x0000, 0x7fff).r(FUNC(pc8001mk2_state::ram_r<0x8000>));
+	m_extram_view[0x10](0x0000, 0x7fff).w(FUNC(pc8001mk2_state::ram_w<0x8000>));
+	m_extram_view[0x11](0x0000, 0x7fff).rw(FUNC(pc8001mk2_state::ram_r<0x8000>), FUNC(pc8001mk2_state::ram_w<0x8000>));
 
 	map(0x8000, 0xbfff).view(m_alu_view);
 	m_alu_view[0](0x8000, 0xbfff).rw(m_alu, FUNC(pc88_alu_device::alu_r), FUNC(pc88_alu_device::alu_w));
@@ -563,6 +655,15 @@ void pc8001mk2sr_state::pc8001mk2sr_io(address_map &map)
 	map(0x35, 0x35).w(FUNC(pc8001mk2sr_state::alu_ctrl2_w));
 	map(0x41, 0x4f).unmaprw();
 	map(0x44, 0x45).rw(m_opn, FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x54, 0x5b).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			m_palram[offset].b = data & 1 ? 7 : 0;
+			m_palram[offset].r = data & 2 ? 7 : 0;
+			m_palram[offset].g = data & 4 ? 7 : 0;
+
+			m_palette->set_pen_color(offset, pal3bit(m_palram[offset].r), pal3bit(m_palram[offset].g), pal3bit(m_palram[offset].b));
+		})
+	);
 	map(0x5c, 0x5c).lr8(NAME([this] () {
 		return 0xf8 | ((m_vram_sel == 3) ? 0 : (1 << m_vram_sel));
 	}));
@@ -570,6 +671,16 @@ void pc8001mk2sr_state::pc8001mk2sr_io(address_map &map)
 
 	map(0x70, 0x70).ram(); // latch for mkIISR detection
 	map(0x71, 0x71).rw(FUNC(pc8001mk2sr_state::port71_r), FUNC(pc8001mk2sr_state::port71_w));
+
+	map(0xe2, 0xe2).lrw8(
+		NAME([this] () {
+			return (m_extram_mode ^ 0x11) | 0xee;
+		}),
+		NAME([this] (u8 data) {
+			m_extram_mode = data & 0x11;
+			flush_low_bank();
+		})
+	);
 }
 
 /* Input Ports */
@@ -729,6 +840,7 @@ void pc8001mk2sr_state::machine_start()
 	save_item(NAME(m_port32));
 	save_item(NAME(m_port33));
 	save_item(NAME(m_alu_gam));
+	save_item(NAME(m_extram_mode));
 }
 
 void pc8001mk2sr_state::machine_reset()
@@ -740,6 +852,7 @@ void pc8001mk2sr_state::machine_reset()
 	// SR BIOS doesn't check DSW1 for non-SR modes
 	m_port33 = BIT(m_dsw[0]->read(), 1) ? 0 : 0x80;
 	m_n80sr_bank = 1;
+	m_extram_mode = 0;
 	flush_low_bank();
 
 	m_alu_gam = 0;
@@ -867,6 +980,7 @@ void pc8001mk2sr_state::pc8001mk2sr(machine_config &config)
 	PC8801_KBD(config.replace(), "kbd");
 
 //	m_gvram_bank->set_map(&pc8001mk2sr_state::gvram_map);
+	PALETTE(config, m_palette, palette_device::BLACK, 0x8);
 
 	PC88_ALU(config, m_alu, 0);
 	m_alu->gvram_read_cb().set(FUNC(pc8001mk2sr_state::gvram_r));
