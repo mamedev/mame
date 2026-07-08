@@ -2584,7 +2584,13 @@ std::error_condition chd_file::open_common(bool writeable, const open_parent_fun
 			m_allow_writes = false;
 
 		if (UNEXPECTED(writeable && !m_allow_writes))
-			throw std::error_condition(error::FILE_NOT_WRITEABLE);
+		{
+			// emscripten's exception handling does not reliably catch a
+			// std::error_condition thrown and caught within the same function,
+			// so return the error directly instead of throwing.
+			close();
+			return std::error_condition(error::FILE_NOT_WRITEABLE);
+		}
 
 		// make sure we have a parent if we need one (and don't if we don't)
 		if (parentsha1 != util::sha1_t::null)
