@@ -101,6 +101,7 @@ public:
 		, m_beep(*this, "beeper")
 		, m_ram(*this, RAM_TAG)
 		, m_rom(*this, Z80_TAG)
+		, m_exp_view(*this, "exp_view")
 	{ }
 
 	void pc8001(machine_config &config);
@@ -119,8 +120,29 @@ protected:
 	required_device<beep_device> m_beep;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
+	memory_view m_exp_view;
 
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
+
+	// TODO: these two should really be inside ram_device instead
+	template <unsigned StartBase> uint8_t ram_r(address_space &space, offs_t offset)
+	{
+		const offs_t memory_offset = StartBase + offset;
+
+		if (memory_offset < m_ram->size())
+			return m_ram->pointer()[memory_offset];
+
+		// TODO: verify what happens on unmapped access
+		return space.unmap();
+	}
+
+	template <unsigned StartBase> void ram_w(offs_t offset, uint8_t data)
+	{
+		const offs_t memory_offset = StartBase + offset;
+
+		if (memory_offset < m_ram->size())
+			m_ram->pointer()[memory_offset] = data;
+	}
 
 private:
 	uint8_t port40_r();
@@ -145,7 +167,10 @@ protected:
 	required_memory_region m_kanji_rom;
 	required_ioport_array<2> m_dsw;
 
-	virtual void port31_w(uint8_t data);
+	u8 m_port31;
+	void port31_w(uint8_t data);
+	virtual void update_low_bank();
+
 private:
 };
 
@@ -162,11 +187,10 @@ public:
 private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	void pc8001mk2sr_map(address_map &map) ATTR_COLD;
 	void pc8001mk2sr_io(address_map &map) ATTR_COLD;
 
 	required_memory_region m_n80sr_rom;
-
-	virtual void port31_w(uint8_t data) override;
 
 	u8 port33_r();
 	void port33_w(u8 data);
@@ -174,9 +198,8 @@ private:
 	void port71_w(u8 data);
 
 	u8 m_n80sr_bank = 0;
-	u8 m_port31;
 	u8 m_port33;
-	void update_low_bank();
+	virtual void update_low_bank() override;
 };
 
 #endif // MAME_NEC_PC8001_H

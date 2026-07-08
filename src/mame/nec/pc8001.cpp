@@ -249,23 +249,27 @@ void pc8001_base_state::port30_w(uint8_t data)
 	m_cassette->change_state(BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
+/*
+ * xxx- ---- background color
+ * ---x ---- resolution (0=640x200, 1=320x200)
+ * ---- x--- graphics enable
+ * ---- -x-- color mode (0=attribute, 1=B&W)
+ * ---- --x- memory mode (0=ROM, 1=RAM)
+ * ---- ---x expansion ROM (0=expansion, 1=N80)
+ */
 void pc8001mk2_state::port31_w(uint8_t data)
 {
-	/*
+	m_port31 = data;
+	update_low_bank();
+}
 
-	    bit     description
-
-	    0       expansion ROM (0=expansion, 1=N80)
-	    1       memory mode (0=ROM, 1=RAM)
-	    2       color mode (0=attribute, 1=B&W)
-	    3       graphics enable
-	    4       resolution (0=640x200, 1=320x200)
-	    5       background color
-	    6       background color
-	    7       background color
-
-	*/
-	membank("bank2")->set_entry(data & 1);
+void pc8001mk2_state::update_low_bank()
+{
+	// enable 64K work RAM
+	if (BIT(m_port31, 1))
+		m_exp_view.disable();
+	else
+		m_exp_view.select(m_port31 & 1);
 }
 
 void pc8001_base_state::write_centronics_busy(int state)
@@ -327,9 +331,15 @@ void pc8001_state::port40_w(uint8_t data)
 
 void pc8001_state::pc8001_map(address_map &map)
 {
-	map(0x0000, 0x5fff).bankrw("bank1");
-	map(0x6000, 0x7fff).bankrw("bank2");
-	map(0x8000, 0xffff).bankrw("bank3");
+	map(0x0000, 0x7fff).rw(FUNC(pc8001_state::ram_r<0x8000>), FUNC(pc8001_state::ram_w<0x8000>));
+	map(0x0000, 0x7fff).view(m_exp_view);
+	m_exp_view[0](0x0000, 0x5fff).rom().region("maincpu", 0x0000);
+	// TODO: hookup expansion ROM
+	m_exp_view[0](0x6000, 0x7fff).lr8(NAME([] (offs_t offset) { return 0xff; }));
+	m_exp_view[1](0x0000, 0x5fff).rom().region("maincpu", 0x0000);
+	m_exp_view[1](0x6000, 0x7fff).rom().region("maincpu", 0x6000);
+	map(0x8000, 0xbfff).rw(FUNC(pc8001_state::ram_r<0x4000>), FUNC(pc8001_state::ram_w<0x4000>));
+	map(0xc000, 0xffff).rw(FUNC(pc8001_state::ram_r<0x0000>), FUNC(pc8001_state::ram_w<0x0000>));
 }
 
 void pc8001_state::pc8001_io(address_map &map)
@@ -372,10 +382,7 @@ void pc8001_state::pc8001_io(address_map &map)
 
 void pc8001mk2_state::pc8001mk2_map(address_map &map)
 {
-	map(0x0000, 0x5fff).bankrw("bank1");
-	map(0x6000, 0x7fff).bankrw("bank2");
-	map(0x8000, 0xbfff).bankrw("bank3");
-	map(0xc000, 0xffff).bankrw("bank4");
+	pc8001_map(map);
 }
 
 void pc8001mk2_state::pc8001mk2_io(address_map &map)
@@ -383,8 +390,8 @@ void pc8001mk2_state::pc8001mk2_io(address_map &map)
 	pc8001_io(map);
 	map(0x30, 0x30).portr("DSW1").w(FUNC(pc8001mk2_state::port30_w));
 	map(0x31, 0x31).portr("DSW2").w(FUNC(pc8001mk2_state::port31_w));
-//  map(0x5c, 0x5c).w(FUNC(pc8001mk2_state::gram_on_w));
-//  map(0x5f, 0x5f).w(FUNC(pc8001mk2_state::gram_off_w));
+//  map(0x5c, 0x5c).w(FUNC(pc8001mk2_state::gvram_on_w));
+//  map(0x5f, 0x5f).w(FUNC(pc8001mk2_state::gvram_off_w));
 //  map(0xe8, 0xe8) kanji_address_lo_w, kanji_data_lo_r
 //  map(0xe9, 0xe9) kanji_address_hi_w, kanji_data_hi_r
 //  map(0xea, 0xea) kanji_readout_start_w
@@ -408,22 +415,20 @@ void pc8001mk2_state::pc8001mk2_io(address_map &map)
 
 void pc8001mk2sr_state::update_low_bank()
 {
+	// work RAM enable has priority over BIOS
+	if (BIT(m_port31, 1))
+	{
+		m_exp_view.disable();
+		return;
+	}
 	if (BIT(m_port33, 7))
 	{
-		membank("bank1")->set_entry(2);
-		membank("bank2")->set_entry(2 | (m_n80sr_bank & 1));
+		m_exp_view.select(2 | (m_n80sr_bank & 1));
 	}
 	else
 	{
-		membank("bank1")->set_entry(1);
-		membank("bank2")->set_entry(m_port31 & 1);
+		m_exp_view.select(0 | (m_port31 & 1));
 	}
-}
-
-void pc8001mk2sr_state::port31_w(uint8_t data)
-{
-	m_port31 = data;
-	update_low_bank();
 }
 
 u8 pc8001mk2sr_state::port33_r()
@@ -446,6 +451,15 @@ void pc8001mk2sr_state::port71_w(u8 data)
 {
 	m_n80sr_bank = data;
 	update_low_bank();
+}
+
+void pc8001mk2sr_state::pc8001mk2sr_map(address_map &map)
+{
+	pc8001mk2_map(map);
+	m_exp_view[2](0x0000, 0x5fff).rom().region(N80SR_ROM_TAG, 0x0000);
+	m_exp_view[2](0x6000, 0x7fff).rom().region(N80SR_ROM_TAG, 0x8000);
+	m_exp_view[3](0x0000, 0x5fff).rom().region(N80SR_ROM_TAG, 0x0000);
+	m_exp_view[3](0x6000, 0x7fff).rom().region(N80SR_ROM_TAG, 0x6000);
 }
 
 void pc8001mk2sr_state::pc8001mk2sr_io(address_map &map)
@@ -573,43 +587,8 @@ void pc8001_state::machine_start()
 {
 	pc8001_base_state::machine_start();
 
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
 	/* initialize DMA */
 	m_dma->ready_w(1);
-
-	/* setup memory banking */
-	uint8_t *ram = m_ram->pointer();
-
-	membank("bank1")->configure_entry(1, m_rom->base());
-	program.install_read_bank(0x0000, 0x5fff, membank("bank1"));
-	program.unmap_write(0x0000, 0x5fff);
-	membank("bank2")->configure_entry(1, m_rom->base() + 0x6000);
-
-	switch (m_ram->size())
-	{
-	case 16*1024:
-		membank("bank3")->configure_entry(0, ram);
-		program.unmap_readwrite(0x8000, 0xbfff);
-		program.install_readwrite_bank(0xc000, 0xffff, membank("bank3"));
-		break;
-
-	case 32*1024:
-		membank("bank3")->configure_entry(0, ram);
-		program.unmap_readwrite(0x8000, 0xbfff);
-		program.install_readwrite_bank(0x8000, 0xffff, membank("bank3"));
-		break;
-
-	case 64*1024:
-		membank("bank1")->configure_entry(0, ram);
-		membank("bank2")->configure_entry(0, ram + 0x6000);
-		membank("bank3")->configure_entry(0, ram + 0x8000);
-		program.install_readwrite_bank(0x0000, 0x5fff, membank("bank1"));
-		program.install_readwrite_bank(0x6000, 0xbfff, membank("bank2"));
-		program.install_readwrite_bank(0x8000, 0xffff, membank("bank3"));
-//      membank("bank2")->set_entry(0);
-		break;
-	}
 
 	// PC8001 is 15KHz only
 	set_screen_frequency(false);
@@ -617,18 +596,12 @@ void pc8001_state::machine_start()
 
 void pc8001_state::machine_reset()
 {
-	membank("bank1")->set_entry(1);
-	membank("bank2")->set_entry(1);
-	membank("bank3")->set_entry(0);
+	m_exp_view.select(1);
 }
 
 void pc8001mk2sr_state::machine_start()
 {
 	pc8001mk2_state::machine_start();
-
-	membank("bank1")->configure_entry(2, m_n80sr_rom->base());
-	membank("bank2")->configure_entry(2, m_n80sr_rom->base() + 0x8000);
-	membank("bank2")->configure_entry(3, m_n80sr_rom->base() + 0x6000);
 
 	save_item(NAME(m_n80sr_bank));
 	save_item(NAME(m_port31));
@@ -755,6 +728,7 @@ void pc8001mk2_state::pc8001mk2(machine_config &config)
 void pc8001mk2sr_state::pc8001mk2sr(machine_config &config)
 {
 	pc8001mk2(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc8001mk2sr_state::pc8001mk2sr_map);
 	m_maincpu->set_addrmap(AS_IO, &pc8001mk2sr_state::pc8001mk2sr_io);
 
 	PC8801_KBD(config.replace(), "kbd");
