@@ -10,6 +10,8 @@
 #include "emu.h"
 #include "igs028.h"
 
+#include "multibyte.h"
+
 
 igs028_device::igs028_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, IGS028, tag, owner, clock)
@@ -74,7 +76,6 @@ void igs028_device::write_reg(uint16_t addr, uint32_t val)
 void igs028_device::do_dma(uint16_t src, uint16_t dst, uint16_t size, uint16_t mode)
 {
 	const uint16_t param = mode >> 8;
-	const uint16_t *const PROTROM = (uint16_t*)m_rom->base();
 
 //  logerror("%s: mode: %2.2x, src: %4.4x, dst: %4.4x, size: %4.4x, data: %4.4x\n", machine().describe_context(), (mode &0xf), src, dst, size, mode);
 
@@ -87,14 +88,13 @@ void igs028_device::do_dma(uint16_t src, uint16_t dst, uint16_t size, uint16_t m
 	}
 
 	const uint8_t extraoffset = param & 0xff;
-	const uint8_t *const dectable = (uint8_t *)(PROTROM + (0x100 / 2));
 
 	for (uint32_t x = 0; x < size; x++)
 	{
-		uint16_t dat2 = PROTROM[src + x];
+		uint16_t dat2 = get_u16le(&m_rom[(src + x) << 1]);
 
 		const offs_t taboff = ((x * 2) + extraoffset) & 0xff; // must allow for overflow in instances of odd offsets
-		const uint16_t extraxor = ((dectable[taboff + 0]) << 0) | (dectable[taboff + 1] << 8);
+		const uint16_t extraxor = get_u16le(&m_rom[0x100 + taboff]);
 
 		switch (mode & 0x7)
 		{

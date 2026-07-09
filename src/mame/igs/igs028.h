@@ -20,7 +20,7 @@ protected:
 
 private:
 	optional_shared_ptr<uint16_t> m_sharedprotram;
-	required_memory_region m_rom;
+	required_region_ptr<uint8_t> m_rom;
 
 	uint32_t prot_addr(uint16_t addr);
 	uint32_t read_reg(uint16_t addr);
