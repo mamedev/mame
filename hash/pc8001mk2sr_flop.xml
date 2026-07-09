@@ -24,13 +24,27 @@ EGGY, Eggy, Bothtec, Jul 85, (cassette only?)
 <!-- !Games -->
 
 	<software name="mappysr" supported="yes">
-		<description>Mappy (mkIISR)</description>
+		<description>Mappy (PC-8001mkIISR)</description>
 		<year>198?</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="alt_title" value="マッピー"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="353200">
 				<rom name="mappy (mkiisr).d88" size="353200" crc="0152ccd0" sha1="e000b25a2ec4232fd2c62c4bf427270715977e3c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mappya" cloneof="mappysr" supported="yes">
+		<description>Mappy (PC-8001mkIISR, alt)</description>
+		<year>198?</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="alt_title" value="マッピー"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="353200">
+				<rom name="mappy_v80.d88" size="353200" crc="a9978924" sha1="0bf806b8f1ef54960d855c62af367dd2e1ff2351"/>
 			</dataarea>
 		</part>
 	</software>
