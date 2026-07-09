@@ -169,7 +169,9 @@ void running_machine::start()
 	// initialize the base time (needed for doing record/playback)
 	::time(&m_base_time);
 
-	// check for input playback files (highest precedence)
+	// initialize the input system and input ports for the game
+	// this must be done before memory_init in order to allow specifying
+	// callbacks based on input port tags
 	time_t newbase = m_ioport.initialize();
 	if (newbase != 0)
 	{
