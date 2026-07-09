@@ -17,6 +17,7 @@ public:
 	evolution_handheldgame_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_program_ram(*this, "program_ram"),
 		m_dmac_params(*this, "dmac_params")
 	{ }
 
@@ -34,6 +35,7 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<sonix16_device> m_maincpu;
+	optional_shared_ptr<u16> m_program_ram;
 	optional_shared_ptr<u16> m_dmac_params;
 
 	u16 dma_status_r();
@@ -55,6 +57,12 @@ void evolution_handheldgame_state::machine_start()
 
 void evolution_handheldgame_state::machine_reset()
 {
+	if (m_program_ram.found())
+	{
+		address_space &space = m_maincpu->space(AS_PROGRAM);
+		for (unsigned i = 0; i < m_program_ram.length(); i++)
+			m_program_ram[i] = space.read_word(0x400000 + i);
+	}
 }
 
 u16 evolution_handheldgame_state::dma_status_r()
@@ -67,8 +75,7 @@ void evolution_handheldgame_state::dma_control_w(u16 data)
 {
 	if (BIT(data, 0))
 	{
-		address_space &srcspace = m_maincpu->space(AS_PROGRAM);
-		address_space &dstspace = m_maincpu->space(AS_DATA);
+		address_space &space = m_maincpu->space(AS_PROGRAM);
 
 		u32 src = u32(m_dmac_params[0]) << 16 | m_dmac_params[1];
 		u32 dst = u32(m_dmac_params[2]) << 16 | m_dmac_params[3];
@@ -78,7 +85,7 @@ void evolution_handheldgame_state::dma_control_w(u16 data)
 
 		do
 		{
-			dstspace.write_word(dst++, srcspace.read_word(0x400000 | src++));
+			space.write_word(dst++, space.read_word(0x400000 + src++));
 		} while (count-- != 0);
 	}
 }
@@ -108,23 +115,23 @@ void evolution_handheldgame_state::evolution_ram_map(address_map &map)
 
 void evolution_handheldgame_state::snc7001a_map(address_map &map)
 {
-	map(0x000000, 0x007fff).rom().region("maincpu", 0); // supposedly RAM, "boot from external flash, only one time after IC reset"
-	map(0x200000, 0x201fff).ram().share("program_ram"); // supposedly RAM, "boot from external flash, update anytime by user program" (tomyspt, hoppech)
+	map(0x000000, 0x007fff).ram().share(m_program_ram); // "boot from external flash, only one time after IC reset"
+	map(0x200000, 0x201fff).ram(); // "boot from external flash, update anytime by user program" (tomyspt, hoppech)
 	map(0x400000, 0x7fffff).rom().region("maincpu", 0);
 }
 
 void evolution_handheldgame_state::smkatsum_ram_map(address_map &map)
 {
 	map(0x000000, 0x003fff).ram();
+	map(0x00f900, 0x00f902).noprw();
 	map(0x00fe27, 0x00fe2b).writeonly().share(m_dmac_params);
 	map(0x00fe2c, 0x00fe2c).rw(FUNC(evolution_handheldgame_state::dma_status_r), FUNC(evolution_handheldgame_state::dma_control_w));
-	map(0x200000, 0x201fff).ram().share("program_ram");
 }
 
 void evolution_handheldgame_state::snc7648s_map(address_map &map)
 {
-	map(0x000000, 0x00bfff).rom().region("maincpu", 0); // supposedly RAM, "boot from external flash, only one time after IC reset"
-	map(0x200000, 0x2007ff).ram().share("program_ram");
+	map(0x000000, 0x00bfff).ram().share(m_program_ram); // "boot from external flash, only one time after IC reset"
+	map(0x200000, 0x2007ff).ram();
 	map(0x400000, 0x7fffff).rom().region("maincpu", 0);
 }
 
@@ -133,7 +140,6 @@ void evolution_handheldgame_state::yuleyuan_ram_map(address_map &map)
 	map(0x000000, 0x001fff).ram();
 	map(0x00fe27, 0x00fe2b).writeonly().share(m_dmac_params);
 	map(0x00fe2c, 0x00fe2c).rw(FUNC(evolution_handheldgame_state::dma_status_r), FUNC(evolution_handheldgame_state::dma_control_w));
-	map(0x200000, 0x2007ff).ram().share("program_ram");
 }
 
 void evolution_handheldgame_state::udrive_map(address_map &map)
@@ -197,7 +203,7 @@ void evolution_handheldgame_state::udrive(machine_config &config)
 
 ROM_START( evolhh )
 	ROM_REGION16_LE( 0x20000, "bootstrap", 0 )
-	ROM_LOAD( "snl320_internal.bin", 0x00000, 0x20000, NO_DUMP )
+	ROM_LOAD( "snl320_inter_prog.bin", 0x00000, 0x20000, NO_DUMP ) // probably the "SONIX standard code" mentioned in an application note
 	ROM_FILL( 0x00000, 1, 0x40 )
 	ROM_FILL( 0x00001, 1, 0xfe )
 	ROM_FILL( 0x00002, 1, 0x04 )
