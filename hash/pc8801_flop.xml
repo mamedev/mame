@@ -56360,40 +56360,6 @@ Sends a 0xff to I/O port $e6, flip that to 0x00 to make it boot
 		</part>
 	</software>
 
-	<software name="pack1">
-		<description>Dig Dug / Xevious / Nintendo no Golf / Nuts &amp; Milk</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="353200">
-				<rom name="dig dug - xevious - nintendo no golf - nuts&amp;milk.d88" size="353200" crc="1e6c02fe" sha1="039c2e1831f8f4d0ca4ca2d9bc8ad857cf4bade2"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pack2">
-		<description>Dragon Slayer / Burger Time / Excite Bike / Dig Dug / Xevious</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="dragon slayer - burger time - excite bike - dig dug - xevious.d88" size="348848" crc="143636e6" sha1="077a419dac5c1562a04e6a8467cf8ecd7a590427"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pack3">
-		<description>Video-kun / F2 Grand Prix / Eggy</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="video-kun - f2 grand prix - eggy.d88" size="348848" crc="45d3515f" sha1="5d6def548da8f943eebdf7f524bea58ed1dab456"/>
-			</dataarea>
-		</part>
-	</software>
-
-
 <!-- SORTED UTILS -->
 
 	<software name="newtype">
