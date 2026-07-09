@@ -91,6 +91,12 @@ float va_vco_device::ctrl2pw(float pw_ctrl) const
 	return pw_ctrl;
 }
 
+void va_vco_device::update_stream()
+{
+	if (m_stream)
+		m_stream->update();
+}
+
 void va_vco_device::set_freq_ctrl_internal(float freq_ctrl)
 {
 	if (freq_ctrl == m_freq_ctrl)

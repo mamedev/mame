@@ -29,8 +29,7 @@ DECLARE_DEVICE_TYPE(CEM3340, cem3340_device)
 // - Other types of sync.
 // - Linear FM input.
 // - High frequency tracking input.
-// - A lot of external components are hardcoded to the recommended values. Make
-//   them configurable as needed.
+// - Configurable range of pulse waveform.
 class cem3340_device : public va_vco_device
 {
 public:
@@ -38,6 +37,15 @@ public:
 	// rr - reference current resistor between pin 13 and V+.
 	cem3340_device(const machine_config &mconfig, const char *tag, device_t *owner, float cf, float rr) ATTR_COLD;
 	cem3340_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) ATTR_COLD;
+
+	// rz - total resistance between pin 1 and pin 3 (RZ in the datasheet).
+	// rt - total resistance between pin 2 and pin 3 (RT in the datasheet).
+	// By default, `rt` will be the recommended value in the datasheet, and `rz`
+	// will be perfectly trimmed as per instructions in the datasheet.
+	cem3340_device &set_tempco_gen_res(float rz, float rt);
+
+	// Returns the optimally trimmed RZ, given RT.
+	static float rz_optimal(float rt);
 
 protected:
 	void device_start() override ATTR_COLD;
@@ -49,8 +57,11 @@ protected:
 	float ctrl2pw(float pw_ctrl) const override;
 
 private:
-	const float m_cf;
-	const float m_rr;
+	const float m_cf;  // Timing capacitor between pin 11 and GND.
+	const float m_rr;  // Reference current resistor between pin 13 and V+.
+
+	float m_rz;  // Total resistance between pin 1 and pin 3.
+	float m_rt;  // Total resistance between pin 2 and pin 3.
 };
 
 #endif  // MAME_SOUND_CEM3340_H
