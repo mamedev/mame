@@ -22,10 +22,8 @@
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
 #include "machine/bankdev.h"
-#include "machine/i8214.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "machine/timer.h"
 #include "machine/upd1990a.h"
 #include "sound/beep.h"
 #include "sound/ymopn.h"
@@ -39,8 +37,6 @@
 #include "speaker.h"
 
 
-#define I8214_TAG       "i8214"
-
 class pc8801_state : public pc8001_base_state
 {
 public:
@@ -49,7 +45,6 @@ public:
 //      , m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_pc80s31(*this, "pc80s31")
-		, m_pic(*this, I8214_TAG)
 		, m_usart(*this, "usart")
 //      , m_cassette(*this, "cassette")
 		, m_beeper(*this, "beeper")
@@ -89,7 +84,6 @@ protected:
 //  required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<pc80s31_device> m_pc80s31;
-	optional_device<i8214_device> m_pic;
 //  required_device<upd1990a_device> m_rtc;
 	required_device<i8251_device> m_usart;
 //  required_device<cassette_image_device> m_cassette;
@@ -105,8 +99,6 @@ protected:
 	required_device<pc8801_exp_slot_device> m_exp;
 	memory_view m_window_view;
 	required_device<address_map_bank_device> m_gvram_bank;
-
-	void int4_irq_w(int state);
 
 	std::unique_ptr<uint8_t[]> m_gvram;
 	uint8_t m_gfx_ctrl = 0;
@@ -160,8 +152,6 @@ private:
 	void port40_w(uint8_t data);
 	uint8_t vram_select_r();
 	void vram_select_w(offs_t offset, uint8_t data);
-	void irq_level_w(uint8_t data);
-	void irq_mask_w(uint8_t data);
 	uint8_t window_bank_r();
 	void window_bank_w(uint8_t data);
 	void window_bank_inc_w(uint8_t data);
@@ -186,34 +176,6 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void palette_reset();
 	bitmap_rgb32 m_text_bitmap;
-
-	// irq section
-	void rxrdy_irq_w(int state);
-	void vrtc_irq_w(int state);
-	TIMER_DEVICE_CALLBACK_MEMBER(clock_irq_w);
-	IRQ_CALLBACK_MEMBER(int_ack_cb);
-	void irq_w(int state);
-
-	struct {
-		u8 enable = 0, pending = 0;
-	} m_irq_state;
-
-	bool m_sound_irq_enable = false;
-	bool m_sound_irq_pending = false;
-
-	enum {
-		RXRDY_IRQ_LEVEL = 0,
-		VRTC_IRQ_LEVEL,
-		CLOCK_IRQ_LEVEL,
-		INT3_IRQ_LEVEL,
-		INT4_IRQ_LEVEL,
-		INT5_IRQ_LEVEL,
-		FDCINT1_IRQ_LEVEL,
-		FDCINT2_IRQ_LEVEL
-	};
-
-	void assert_irq(u8 level);
-	void check_irq(u8 level);
 };
 
 class pc8801mk2sr_state : public pc8801_state

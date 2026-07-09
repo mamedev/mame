@@ -25,8 +25,12 @@ EGGY, Eggy, Bothtec, Jul 85, (cassette only?)
 
 	<software name="mappysr" supported="no">
 		<description>Mappy (mkIISR)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>198?</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<notes><![CDATA[
+Crashes as soon as player moves left, [ALU] shenanigans when in 320x200 mode?
+]]></notes>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="353200">
 				<rom name="mappy (mkiisr).d88" size="353200" crc="0152ccd0" sha1="e000b25a2ec4232fd2c62c4bf427270715977e3c"/>
@@ -82,7 +86,7 @@ Loading stuff fails one way or another
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
 Boots in N-80 BASIC
-Dig Dug: sets [gfx] PR2 (gfx over tvram), black screen [i8214]?
+Dig Dug: sets [gfx] PR2 (gfx over tvram), hangs with garbage on screen, [ALU]?
 Xevious: title screen [gfx] looks wrong, hangs when starting a play [i8214]
 Nintendo Golf:
 Nuts and Milk: unemulated mkII mono [gfx] mode
@@ -115,7 +119,7 @@ Nuts and Milk: unemulated mkII mono [gfx] mode
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
 Dragon Slayer:
-Burger Time: hangs when starting a play, [i8214]
+Burger Time:
 Excite Bike:
 Dig Dug: hangs at startup, [i8214]
 Xevious: title screen [gfx] looks wrong, hangs when starting a play [i8214]

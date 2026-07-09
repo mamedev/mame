@@ -44,6 +44,7 @@ References:
 #include "emu.h"
 #include "pc88_kbd.h"
 #include "pc8001.h"
+
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -474,6 +475,116 @@ void pc8001_state::port40_w(uint8_t data)
 	m_beep->set_state(BIT(data, 5));
 }
 
+/* i8214 PICU section */
+
+void pc8001_base_state::irq_level_w(uint8_t data)
+{
+	m_picu->b_sgs_w(~data);
+}
+
+/*
+ * ---- -x-- /RXMF RXRDY irq mask
+ * ---- --x- /VRMF VRTC irq mask
+ * ---- ---x /RTMF Real-time clock irq mask
+ *
+ */
+void pc8001_base_state::irq_mask_w(uint8_t data)
+{
+	m_irq_state.enable &= ~7;
+	// mapping reversed to the correlated irq levels
+	m_irq_state.enable |= bitswap<3>(data & 7, 0, 1, 2);
+
+	check_irq(RXRDY_IRQ_LEVEL);
+	check_irq(VRTC_IRQ_LEVEL);
+	check_irq(CLOCK_IRQ_LEVEL);
+}
+
+void pc8001_base_state::rxrdy_irq_w(int state)
+{
+	if (state)
+		assert_irq(RXRDY_IRQ_LEVEL);
+}
+
+/*
+ * 0 RXRDY
+ * 1 VRTC
+ * 2 CLOCK
+ * 3 INT3 (GSX-8800)
+ * 4 INT4 (any OPN, external boards included with different irq mask at $aa)
+ * 5 INT5
+ * 6 FDCINT1
+ * 7 FDCINT2
+ *
+ */
+IRQ_CALLBACK_MEMBER(pc8001_base_state::int_ack_cb)
+{
+	// TODO: schematics sports a μPB8212 too, with DI2-DI4 connected to 8214 A0-A2
+	// Seems just an intermediate bridge for translating raw levels to vectors
+	// with no access from outside world?
+	u8 level = m_picu->a_r();
+	m_picu->r_w(level, 1);
+
+	return (7 - level) * 2;
+}
+
+void pc8001_base_state::int4_irq_w(int state)
+{
+	bool irq_state = m_sound_irq_enable & state;
+
+	// remember current setting so that an enable reg variation will pick up
+	// particularly needed by PC-88 Telenet games (xzr2, valis2)
+	// TODO: understand how exactly the external irq source works out (Sound Board II)
+	// has a separate irq mask for secondary OPNA but still sends INT4s,
+	// we separate the logic from the others since this exact function needs templatized array for enable and pending anyway
+	// (and won't otherwise work for xzr2 anyway).
+	m_picu->r_w(7 ^ INT4_IRQ_LEVEL, !irq_state);
+	m_sound_irq_pending = state;
+}
+
+// FIXME: convert to pure write-line-style member
+// Works with 0 -> 1 F/F transitions
+TIMER_DEVICE_CALLBACK_MEMBER(pc8001_base_state::clock_irq_w)
+{
+	// NOTE: pc8801:castlex uses this rather than dedicated OPN INT4 for BGM tempo
+	assert_irq(CLOCK_IRQ_LEVEL);
+}
+
+void pc8001_base_state::check_irq(u8 level)
+{
+	u8 mask = 1 << level;
+
+	// pc8801:megamit and pc8801:babylon are particularly fussy if the VRTC irq isn't disabled when requested
+	// - megamit jumps to PC=0
+	// - babylon has just a ret coded in the VRTC irq, so accepting that will wreck the program flow and hang at title screen with no sound (because it expects INT4s)
+	if (!(m_irq_state.enable & mask))
+		m_picu->r_w(7 ^ level, 1);
+	else if (m_irq_state.enable & m_irq_state.pending & mask)
+		assert_irq(level);
+}
+
+void pc8001_base_state::assert_irq(u8 level)
+{
+	u8 mask = 1 << level;
+
+	if (mask & m_irq_state.enable)
+	{
+		m_irq_state.pending &= ~mask;
+		m_picu->r_w(7 ^ level, 0);
+	}
+	else
+		m_irq_state.pending |= mask;
+}
+
+void pc8001_base_state::vrtc_irq_w(int state)
+{
+//  bool irq_state = m_vrtc_irq_enable & state;
+	if (state)
+	{
+		assert_irq(VRTC_IRQ_LEVEL);
+	}
+}
+
+
 /* Memory Maps */
 
 void pc8001_state::pc8001_map(address_map &map)
@@ -520,8 +631,8 @@ void pc8001_state::pc8001_io(address_map &map)
 //  map(0xdc, 0xdc).w(FUNC(pc8001_state::pc8011_ieee488_nrfd_w));
 //  map(0xde, 0xde).w(FUNC(pc8001_state::pc8011_ieee488_bus_mode_control_w));
 //  map(0xe0, 0xe3).w(FUNC(pc8001_state::expansion_storage_mode_w));
-//  map(0xe4, 0xe4).mirror(0x01).w(FUNC(pc8001_state::irq_level_w));
-//  map(0xe6, 0xe6).w(FUNC(pc8001_state::irq_mask_w));
+	map(0xe4, 0xe4).w(FUNC(pc8001_state::irq_level_w));
+	map(0xe6, 0xe6).w(FUNC(pc8001_state::irq_mask_w));
 //  map(0xe7, 0xe7).w(FUNC(pc8001_state::pc8012_memory_mode_w));
 //  map(0xe8, 0xfb) unused
 	map(0xfc, 0xff).m(m_pc80s31, FUNC(pc80s31_device::host_map));
@@ -664,9 +775,16 @@ u8 pc8001mk2sr_state::port33_r()
 void pc8001mk2sr_state::port33_w(u8 data)
 {
 	m_port33 = data;
+
 	if (data & 0x0c)
 		popmessage("pc8001.cpp: port33_w PR %02x", data);
 	flush_low_bank();
+
+	m_sound_irq_enable = !!BIT(~data, 1);
+
+	if (m_sound_irq_enable)
+		int4_irq_w(m_sound_irq_pending);
+
 }
 
 void pc8001mk2sr_state::alu_ctrl2_w(u8 data)
@@ -861,6 +979,12 @@ void pc8001_base_state::machine_start()
 	save_item(NAME(m_color));
 	save_item(NAME(m_screen_reverse));
 	save_item(NAME(m_screen_is_24KHz));
+
+	// PICU init
+	save_item(STRUCT_MEMBER(m_irq_state, enable));
+	save_item(STRUCT_MEMBER(m_irq_state, pending));
+	save_item(NAME(m_sound_irq_enable));
+	save_item(NAME(m_sound_irq_pending));
 }
 
 void pc8001_state::machine_start()
@@ -874,9 +998,20 @@ void pc8001_state::machine_start()
 	set_screen_frequency(false);
 }
 
+void pc8001_base_state::picu_reset()
+{
+	m_picu->etlg_w(1);
+	m_picu->inte_w(1);
+	m_irq_state.pending = 0;
+	m_irq_state.enable = 0;
+	m_sound_irq_enable = false;
+	m_sound_irq_pending = false;
+}
+
 void pc8001_state::machine_reset()
 {
 	m_exp_view.select(1);
+	picu_reset();
 }
 
 void pc8001mk2_state::machine_start()
@@ -971,9 +1106,14 @@ void pc8001_state::pc8001(machine_config &config)
 	Z80(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc8001_state::pc8001_map);
 	m_maincpu->set_addrmap(AS_IO, &pc8001_state::pc8001_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(pc8001_state::int_ack_cb));
+
+	I8214(config, m_picu, MASTER_CLOCK);
+	m_picu->int_wr_callback().set_inputline(m_maincpu, 0);
+	m_picu->set_int_dis_hack(true);
 
 	PC80S31(config, m_pc80s31, MASTER_CLOCK);
-	config.set_perfect_quantum(m_maincpu);
+	// TODO: get rid of this
 	config.set_perfect_quantum("pc80s31:fdc_cpu");
 
 	/* video hardware */
@@ -990,6 +1130,7 @@ void pc8001_state::pc8001(machine_config &config)
 	m_crtc->set_attribute_fetch_callback(FUNC(pc8001_state::attr_fetch));
 	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 	m_crtc->rvv_wr_callback().set(FUNC(pc8001_state::crtc_reverse_w));
+	m_crtc->vrtc_wr_callback().set(FUNC(pc8001_state::vrtc_irq_w));
 	m_crtc->set_screen(m_screen);
 
 	I8257(config, m_dma, MASTER_CLOCK);
@@ -998,6 +1139,8 @@ void pc8001_state::pc8001(machine_config &config)
 	m_dma->out_iow_cb<2>().set(m_crtc, FUNC(upd3301_device::dack_w));
 
 	/* devices */
+	TIMER(config, "rtc_timer").configure_periodic(FUNC(pc8001_state::clock_irq_w), attotime::from_hz(600));
+
 	I8251(config, I8251_TAG);
 
 	UPD1990A(config, m_rtc);
@@ -1057,7 +1200,7 @@ void pc8001mk2sr_state::pc8001mk2sr(machine_config &config)
 	m_alu->gvram_write_cb().set(FUNC(pc8001mk2sr_state::gvram_w));
 
 	YM2203(config, m_opn, XTAL(4'000'000));
-//	m_opn->irq_handler().set(FUNC(pc8801mk2sr_state::int4_irq_w));
+	m_opn->irq_handler().set(FUNC(pc8001mk2sr_state::int4_irq_w));
 //	m_opn->port_a_read_callback().set(FUNC(pc8801mk2sr_state::opn_porta_r));
 //	m_opn->port_b_read_callback().set(FUNC(pc8801mk2sr_state::opn_portb_r));
 //	m_opn->port_b_write_callback().set(FUNC(pc8801mk2sr_state::opn_portb_w));

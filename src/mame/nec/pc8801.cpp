@@ -606,29 +606,6 @@ void pc8801_state::flush_gvram_access()
 	m_gvram_bank->set_bank(m_vram_sel);
 }
 
-void pc8801_state::irq_level_w(uint8_t data)
-{
-	m_pic->b_sgs_w(~data);
-}
-
-/*
- * ---- -x-- /RXMF RXRDY irq mask
- * ---- --x- /VRMF VRTC irq mask
- * ---- ---x /RTMF Real-time clock irq mask
- *
- */
-void pc8801_state::irq_mask_w(uint8_t data)
-{
-	m_irq_state.enable &= ~7;
-	// mapping reversed to the correlated irq levels
-	m_irq_state.enable |= bitswap<3>(data & 7, 0, 1, 2);
-
-	check_irq(RXRDY_IRQ_LEVEL);
-	check_irq(VRTC_IRQ_LEVEL);
-	check_irq(CLOCK_IRQ_LEVEL);
-}
-
-
 uint8_t pc8801_state::window_bank_r()
 {
 	return m_window_offset_bank;
@@ -1306,10 +1283,6 @@ void pc8801_state::machine_start()
 	save_item(STRUCT_MEMBER(m_palram, r));
 	save_item(STRUCT_MEMBER(m_palram, g));
 	save_item(STRUCT_MEMBER(m_palram, b));
-	save_item(STRUCT_MEMBER(m_irq_state, enable));
-	save_item(STRUCT_MEMBER(m_irq_state, pending));
-	save_item(NAME(m_sound_irq_enable));
-	save_item(NAME(m_sound_irq_pending));
 }
 
 void pc8801_state::machine_reset()
@@ -1333,15 +1306,7 @@ void pc8801_state::machine_reset()
 
 	m_beeper->set_state(0);
 
-	// initialize irq section
-	{
-		m_pic->etlg_w(1);
-		m_pic->inte_w(1);
-		m_irq_state.pending = 0;
-		m_irq_state.enable = 0;
-		m_sound_irq_enable = false;
-		m_sound_irq_pending = false;
-	}
+	picu_reset();
 
 	{
 		m_extram_bank = 0;
@@ -1463,98 +1428,6 @@ void pc8801_state::txdata_callback(int state)
 	//m_cassette->output( (state) ? 1.0 : -1.0);
 }
 
-void pc8801_state::rxrdy_irq_w(int state)
-{
-	if (state)
-		assert_irq(RXRDY_IRQ_LEVEL);
-}
-
-/*
- * 0 RXRDY
- * 1 VRTC
- * 2 CLOCK
- * 3 INT3 (GSX-8800)
- * 4 INT4 (any OPN, external boards included with different irq mask at $aa)
- * 5 INT5
- * 6 FDCINT1
- * 7 FDCINT2
- *
- */
-IRQ_CALLBACK_MEMBER(pc8801_state::int_ack_cb)
-{
-	// TODO: schematics sports a μPB8212 too, with DI2-DI4 connected to 8214 A0-A2
-	// Seems just an intermediate bridge for translating raw levels to vectors
-	// with no access from outside world?
-	u8 level = m_pic->a_r();
-	m_pic->r_w(level, 1);
-
-	return (7 - level) * 2;
-}
-
-void pc8801_state::int4_irq_w(int state)
-{
-	bool irq_state = m_sound_irq_enable & state;
-
-	// remember current setting so that an enable reg variation will pick up
-	// particularly needed by Telenet games (xzr2, valis2)
-	// TODO: understand how exactly the external irq source works out (Sound Board II)
-	// has a separate irq mask for secondary OPNA but still sends INT4s,
-	// we separate the logic from the others since this exact function needs templatized array for enable and pending anyway
-	// (and won't otherwise work for xzr2 anyway).
-	m_pic->r_w(7 ^ INT4_IRQ_LEVEL, !irq_state);
-	m_sound_irq_pending = state;
-}
-
-// FIXME: convert to pure write-line-style member
-// Works with 0 -> 1 F/F transitions
-TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::clock_irq_w)
-{
-	// TODO: castlex sound notes in BGM loop are pretty erratic
-	// (uses clock irq instead of the dedicated INT4, started happening on last OPN rewrite, is it just missing some interpolation in the sound core?
-	assert_irq(CLOCK_IRQ_LEVEL);
-}
-
-void pc8801_state::check_irq(u8 level)
-{
-	u8 mask = 1 << level;
-
-	// megamit and babylon are particularly fussy if the VRTC irq isn't disabled when requested
-	// - megamit jumps to PC=0
-	// - babylon has just a ret coded in the VRTC irq, so accepting that will wreck the program flow and hang at title screen with no sound (because it expects INT4s)
-	if (!(m_irq_state.enable & mask))
-		m_pic->r_w(7 ^ level, 1);
-	else if (m_irq_state.enable & m_irq_state.pending & mask)
-		assert_irq(level);
-}
-
-void pc8801_state::assert_irq(u8 level)
-{
-	u8 mask = 1 << level;
-
-	if (mask & m_irq_state.enable)
-	{
-		m_irq_state.pending &= ~mask;
-		m_pic->r_w(7 ^ level, 0);
-	}
-	else
-		m_irq_state.pending |= mask;
-}
-
-void pc8801_state::vrtc_irq_w(int state)
-{
-//  bool irq_state = m_vrtc_irq_enable & state;
-	if (state)
-	{
-		assert_irq(VRTC_IRQ_LEVEL);
-	}
-}
-
-void pc8801_state::irq_w(int state)
-{
-	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
 void pc8801_state::pc8801(machine_config &config)
 {
 	Z80(config, m_maincpu, MASTER_CLOCK); // ~4 MHz, selectable to ~8 MHz on late models
@@ -1563,15 +1436,14 @@ void pc8801_state::pc8801(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(pc8801_state::int_ack_cb));
 
 	PC80S31(config, m_pc80s31, MASTER_CLOCK);
-//  config.set_perfect_quantum(m_maincpu);
 	// TODO: get rid of this
 	config.set_perfect_quantum("pc80s31:fdc_cpu");
 
 //  config.set_maximum_quantum(attotime::from_hz(MASTER_CLOCK/1024));
 
-	I8214(config, m_pic, MASTER_CLOCK);
-	m_pic->int_wr_callback().set(FUNC(pc8801_state::irq_w));
-	m_pic->set_int_dis_hack(true);
+	I8214(config, m_picu, MASTER_CLOCK);
+	m_picu->int_wr_callback().set_inputline(m_maincpu, 0);
+	m_picu->set_int_dis_hack(true);
 
 	UPD1990A(config, m_rtc);
 
@@ -1608,7 +1480,7 @@ void pc8801_state::pc8801(machine_config &config)
 	m_crtc->set_attribute_fetch_callback(FUNC(pc8801_state::attr_fetch));
 	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 	m_crtc->rvv_wr_callback().set(FUNC(pc8801_state::crtc_reverse_w));
-//  Note: 3301 isn't actually connected to INT so its internal irq mask doesn't have any effect in PC88
+//  Note: 3301 isn't actually connected to INT so its internal irq mask doesn't have any effect in PC-88
 	m_crtc->vrtc_wr_callback().set(FUNC(pc8801_state::vrtc_irq_w));
 	m_crtc->set_screen(m_screen);
 
@@ -1645,9 +1517,9 @@ void pc8801_state::pc8801(machine_config &config)
 
 	PC8801_EXP_SLOT(config, m_exp, pc8801_exp_devices, nullptr);
 	m_exp->set_iospace(m_maincpu, AS_IO);
-	m_exp->int3_callback().set([this] (bool state) { m_pic->r_w(7 ^ INT3_IRQ_LEVEL, !state); });
-	m_exp->int4_callback().set([this] (bool state) { m_pic->r_w(7 ^ INT4_IRQ_LEVEL, !state); });
-	m_exp->int5_callback().set([this] (bool state) { m_pic->r_w(7 ^ INT5_IRQ_LEVEL, !state); });
+	m_exp->int3_callback().set([this] (bool state) { m_picu->r_w(7 ^ INT3_IRQ_LEVEL, !state); });
+	m_exp->int4_callback().set([this] (bool state) { m_picu->r_w(7 ^ INT4_IRQ_LEVEL, !state); });
+	m_exp->int5_callback().set([this] (bool state) { m_picu->r_w(7 ^ INT5_IRQ_LEVEL, !state); });
 
 	SOFTWARE_LIST(config, "tape_list").set_original("pc8801_cass");
 	SOFTWARE_LIST(config, "disk_n88_list").set_original("pc8801_flop");
