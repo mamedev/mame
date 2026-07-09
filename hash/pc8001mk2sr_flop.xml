@@ -72,19 +72,28 @@ EGGY, Eggy, Bothtec, Jul 85, (cassette only?)
 
 <!-- !Operating Systems -->
 
-	<software name="n80srbas" supported="no">
+	<software name="n80srbas" supported="yes">
 		<description>N80SR BASIC system disk (PC-8037SR)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<notes><![CDATA[
-Loading stuff fails one way or another
-]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="353200">
 				<rom name="[os] n80sr basic system disk (pc-8037sr) (pc-8001mkiisr).d88" size="353200" crc="68cf9f52" sha1="298f01130e5d79e058f650975086bc8902da63db"/>
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="pc8037sr" cloneof="n80srbas">
+		<description>N80SR BASIC system disk (PC-8037SR, alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="353200">
+				<rom name="pc-8037sr.d88" size="353200" crc="b7448e78" sha1="00b3942080e6b3729bcf23270ef20face4c872e8"/>
+			</dataarea>
+		</part>
+	</software>
+
 
 <!-- !Compilations -->
 

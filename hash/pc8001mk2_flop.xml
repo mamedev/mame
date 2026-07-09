@@ -98,8 +98,11 @@ Not extensively tested (katakana language barrier)
 		<year>1983</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<notes><![CDATA[
+Randomly throws "Bad drive number in 2010" when booting
 Not extensively tested (katakana language barrier)
 ]]></notes>
+		<info name="release" value="198312xx"/>
+		<info name="alt_title" value="ユリシーズ"/>
 		<info name="usage" value="Load a N-80 Disk BASIC then once in prompt swap with these two disks and run &quot;MK2&quot; (case sensitive)"/>
 
 		<info name="alt_title" value="ユリシーズ"/>
@@ -114,6 +117,74 @@ Not extensively tested (katakana language barrier)
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="ulyssesa" cloneof="ulyssesmk2" supported="no">
+		<description>Ulysses and the Golden Fleece (alt)</description>
+		<year>1983</year>
+		<publisher>スタークラフト (Starcraft)</publisher>
+		<notes><![CDATA[
+(same as ulyssesmk2)
+]]></notes>
+		<info name="release" value="198312xx"/>
+		<info name="alt_title" value="ユリシーズ"/>
+		<info name="usage" value="Load a N-80 Disk BASIC then once in prompt swap with these two disks and run &quot;MK2&quot; (case sensitive)"/>
+		<!--combined image-->
+		<!--rom name="ulysses and the golden fleece(8001mkii).d88" size="693344" crc="c7888134" sha1="ea781898977ba7396cb91ba7a6ba1fec5db6184a"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="344496">
+				<rom name="ulysses and the golden fleece(8001mkii) (disk 1).d88" size="344496" crc="2333d50c" sha1="c1a940c985624a4c7794d880c5d28e79c7f6ebbd"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="348848">
+				<rom name="ulysses and the golden fleece(8001mkii) (disk 2).d88" size="348848" crc="4264b445" sha1="82594d02f0a135125d7e1423c57c72709718efa2"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+ExtractDisk  [01]"N80 BASIC    " -> "ulysses_v80_01.d88"
+ExtractDisk  [02]"Ulysses_Disk2   " -> "ulysses_v80_02.d88" (same as ulyssesa)
+ExtractDisk  [03]"Ulysses_Disk1   " -> "ulysses_v80_03.d88" (same as ulyssesa)
+-->
+	<software name="ulyssesb" cloneof="ulyssesmk2" supported="no">
+		<description>Ulysses and the Golden Fleece (alt 2)</description>
+		<year>1983</year>
+		<publisher>スタークラフト (Starcraft)</publisher>
+		<notes><![CDATA[
+(same as ulyssesmk2)
+]]></notes>
+		<info name="release" value="198312xx"/>
+		<info name="alt_title" value="ユリシーズ"/>
+		<info name="usage" value="Load a N-80 Disk BASIC then once in prompt swap with these two disks and run &quot;MK2&quot; (case sensitive)"/>
+		<!--combined image-->
+		<!--rom name="ulysses_v80.d88" size="1042192" crc="b4ee359c" sha1="4cb6a4a69b942184d43e639ec7ae9c20c1c5c20c"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="ulysses_v80_01.d88" size="348848" crc="6494d82f" sha1="7a409c2e68668e3443639e0f55e2e0c92efa2721"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="348848">
+				<rom name="ulysses and the golden fleece(8001mkii) (disk 2).d88" size="348848" crc="4264b445" sha1="82594d02f0a135125d7e1423c57c72709718efa2"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="344496">
+				<rom name="ulysses and the golden fleece(8001mkii) (disk 1).d88" size="344496" crc="2333d50c" sha1="c1a940c985624a4c7794d880c5d28e79c7f6ebbd"/>
+			</dataarea>
+		</part>
+	</software>
+
 
 <!-- !Collections -->
 
