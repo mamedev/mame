@@ -4116,6 +4116,22 @@ Core Misc Options
 
             mame galaga88 -nonvram_save
 
+.. _mame-commandline-rtc:
+
+**-rtc <value>**
+
+    Specifies a fixed baseline time to initialize the real-time clock (RTC) chips
+    emulated by MAME. By default, MAME initializes RTC chips using your host
+    computer's current system time.
+
+    The option accepts a 14-digit formatted date and time string for `<value>`
+    in the format **YYYYMMDDhhmmss** (e.g., ``20260709070000`` for July 9, 2026,
+    at 07:00:00).
+
+.. Tip:: If an input macro playback file (such as with **-playback**) is active,
+         it takes absolute precedence to prevent input desynchronization. The
+         **-rtc** command-line option will be ignored, and a warning will be
+         displayed in the console.
 
 .. _mame-commandline-scripting:
 

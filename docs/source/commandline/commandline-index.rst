@@ -331,6 +331,7 @@ Core Misc Options
 | :ref:`[no]ui_mouse <mame-commandline-uimouse>`
 | :ref:`language <mame-commandline-language>`
 | :ref:`[no]nvram_save <mame-commandline-nvramsave>`
+| :ref:`rtc <mame-commandline-rtc>`
 
 
 Scripting Options
