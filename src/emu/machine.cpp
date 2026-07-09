@@ -166,6 +166,7 @@ void running_machine::start()
 	m_ui = manager().create_ui(*this);
 	m_ui->set_startup_text("Initializing...", true);
 
+	// initialize the base time (needed for doing record/playback)
 	::time(&m_base_time);
 
 	// check for input playback files (highest precedence)
