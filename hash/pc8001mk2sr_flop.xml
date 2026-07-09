@@ -23,13 +23,10 @@ EGGY, Eggy, Bothtec, Jul 85, (cassette only?)
 
 <!-- !Games -->
 
-	<software name="mappysr" supported="no">
+	<software name="mappysr" supported="yes">
 		<description>Mappy (mkIISR)</description>
 		<year>198?</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
-		<notes><![CDATA[
-Crashes as soon as player moves left, [ALU] shenanigans when in 320x200 mode?
-]]></notes>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="353200">
@@ -80,14 +77,14 @@ Loading stuff fails one way or another
 	<!-- the original pc8001mk has been split in clones of the individual pack1/2/3 sets -->
 	<!-- it is unknown if they really released as 3 disks set (and near impossible to know) -->
 
-	<software name="pack1" supported="no">
+	<software name="pack1" supported="partial">
 		<description>Super Version (compilation, ver 1.1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
 Boots in N-80 BASIC
-Dig Dug: sets [gfx] PR2 (gfx over tvram), hangs with garbage on screen, [ALU]?
-Xevious: title screen [gfx] looks wrong, hangs when starting a play [i8214]
+Dig Dug:
+Xevious:
 Nintendo Golf:
 Nuts and Milk: unemulated mkII mono [gfx] mode
 ]]></notes>
@@ -99,7 +96,7 @@ Nuts and Milk: unemulated mkII mono [gfx] mode
 	</software>
 
 	<!-- pc8001mk:flop2 -->
-	<software name="pack1a" cloneof="pack1" supported="no">
+	<software name="pack1a" cloneof="pack1" supported="partial">
 		<description>Super Version (compilation, ver 1.1, alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -113,16 +110,16 @@ Nuts and Milk: unemulated mkII mono [gfx] mode
 		</part>
 	</software>
 
-	<software name="pack2" supported="no">
+	<software name="pack2" supported="yes">
 		<description>Game DOS (compilation, ver 1.0)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
-Dragon Slayer:
-Burger Time:
-Excite Bike:
-Dig Dug: hangs at startup, [i8214]
-Xevious: title screen [gfx] looks wrong, hangs when starting a play [i8214]
+Dragon Slayer
+Burger Time
+Excite Bike
+Dig Dug
+Xevious
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">

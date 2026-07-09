@@ -208,6 +208,7 @@ uint32_t pc8001_state::screen_update( screen_device &screen, bitmap_rgb32 &bitma
 void pc8001mk2sr_state::video_start()
 {
 	m_screen->register_screen_bitmap(m_text_bitmap);
+	m_screen->register_screen_bitmap(m_graph_bitmap);
 
 	save_item(STRUCT_MEMBER(m_palram, r));
 	save_item(STRUCT_MEMBER(m_palram, g));
@@ -297,8 +298,11 @@ void pc8001mk2sr_state::draw_bitmap_w40(bitmap_rgb32 &bitmap, const rectangle &c
 // TODO: ... and can change priority of the GVRAM layer
 uint32_t pc8001mk2sr_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	m_graph_bitmap.fill(0, cliprect);
+
 	if (BIT(m_port31, 3))
 	{
+		// pack2:"Dragon Slayer"
 		bitmap.fill(m_palette->pen(0), cliprect);
 
 		// TODO: mkII fallback modes
@@ -310,7 +314,7 @@ uint32_t pc8001mk2sr_state::screen_update( screen_device &screen, bitmap_rgb32 &
 		// 2 planes width 40
 		if (BIT(m_port31, 2))
 		{
-			draw_bitmap_w40(bitmap, cliprect, m_palette, [&](int layer_n, u32 bitmap_offset, int y, int x, int xi){
+			draw_bitmap_w40(m_graph_bitmap, cliprect, m_palette, [&](int layer_n, u32 bitmap_offset, int y, int x, int xi){
 				u8 res = 0;
 				if (!BIT(m_bitmap_layer_mask, layer_n))
 					return res;
@@ -328,7 +332,7 @@ uint32_t pc8001mk2sr_state::screen_update( screen_device &screen, bitmap_rgb32 &
 			// NOTE: unlike pc8801 port $53 actually allows disabling the single plane
 			if (BIT(m_bitmap_layer_mask, 0))
 			{
-				draw_bitmap_w80(bitmap, cliprect, m_palette, [&](u32 bitmap_offset, int y, int x, int xi){
+				draw_bitmap_w80(m_graph_bitmap, cliprect, m_palette, [&](u32 bitmap_offset, int y, int x, int xi){
 					u8 res = 0;
 
 					for (int plane = 0; plane < 3; plane ++)
@@ -342,12 +346,23 @@ uint32_t pc8001mk2sr_state::screen_update( screen_device &screen, bitmap_rgb32 &
 	else
 		bitmap.fill(0, cliprect);
 
+	m_text_bitmap.fill(0, cliprect);
 	if(m_text_layer_mask)
-	{
-		m_text_bitmap.fill(0, cliprect);
 		m_crtc->screen_update(screen, m_text_bitmap, cliprect);
+
+	// PR2 makes graph to be higher priority than text layer
+	// - pack2:"Burger Time" depends on this
+	if (BIT(m_port33, 3))
+	{
+		copybitmap_trans(bitmap, m_text_bitmap, 0, 0, 0, 0, cliprect, 0);
+		copybitmap_trans(bitmap, m_graph_bitmap, 0, 0, 0, 0, cliprect, 0);
+	}
+	else
+	{
+		copybitmap_trans(bitmap, m_graph_bitmap, 0, 0, 0, 0, cliprect, 0);
 		copybitmap_trans(bitmap, m_text_bitmap, 0, 0, 0, 0, cliprect, 0);
 	}
+
 	return 0;
 }
 
@@ -776,9 +791,11 @@ void pc8001mk2sr_state::port33_w(u8 data)
 {
 	m_port33 = data;
 
-	if (data & 0x0c)
+	// PR1 should be trivial to implement, check what triggers this first
+	if (data & 0x04)
 		popmessage("pc8001.cpp: port33_w PR %02x", data);
 	flush_low_bank();
+	flush_gvram_access();
 
 	m_sound_irq_enable = !!BIT(~data, 1);
 
@@ -879,7 +896,7 @@ static INPUT_PORTS_START( pc8001mk2 )
 	PORT_INCLUDE( pc8001 )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "Boot Mode" )
+	PORT_DIPNAME( 0x01, 0x01, "Boot Mode" )
 	PORT_DIPSETTING(    0x00, "N-BASIC" )
 	PORT_DIPSETTING(    0x01, "N80-BASIC" )
 	PORT_DIPNAME( 0x02, 0x02, "DSW1" )
@@ -937,7 +954,7 @@ static INPUT_PORTS_START( pc8001mk2sr )
 	PORT_MODIFY("DSW1")
 	// This is really a tri-state dip on front panel
 	// BIOS just expects bit 1 to be off for SR mode
-	PORT_DIPNAME( 0x03, 0x02, "Boot Mode" )
+	PORT_DIPNAME( 0x03, 0x01, "Boot Mode" )
 	PORT_DIPSETTING(    0x00, "N80SR-BASIC (duplicate)")
 	PORT_DIPSETTING(    0x01, "N80SR-BASIC" )
 	PORT_DIPSETTING(    0x02, "N-BASIC" )
@@ -1201,8 +1218,10 @@ void pc8001mk2sr_state::pc8001mk2sr(machine_config &config)
 
 	YM2203(config, m_opn, XTAL(4'000'000));
 	m_opn->irq_handler().set(FUNC(pc8001mk2sr_state::int4_irq_w));
-//	m_opn->port_a_read_callback().set(FUNC(pc8801mk2sr_state::opn_porta_r));
-//	m_opn->port_b_read_callback().set(FUNC(pc8801mk2sr_state::opn_portb_r));
+	// TODO: pull high for now (pack2:"Dig Dug")
+	// OPN/OPNA needs to be moved in a common internal expansion slot
+	m_opn->port_a_read_callback().set([] () { return 0xff; });
+	m_opn->port_b_read_callback().set([] () { return 0xff; });
 //	m_opn->port_b_write_callback().set(FUNC(pc8801mk2sr_state::opn_portb_w));
 	m_opn->add_route(ALL_OUTPUTS, "mono", 0.5);
 

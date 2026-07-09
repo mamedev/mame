@@ -278,6 +278,7 @@ private:
 	u8 m_bitmap_layer_mask;
 	struct { uint8_t r, g, b; } m_palram[8];
 	bitmap_rgb32 m_text_bitmap;
+	bitmap_rgb32 m_graph_bitmap;
 
 	virtual void flush_low_bank() override;
 	virtual void flush_gvram_access() override;
