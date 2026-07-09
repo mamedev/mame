@@ -230,12 +230,14 @@ private:
 	void port71_w(u8 data);
 	void alu_ctrl2_w(u8 data);
 
-	u8 m_n80sr_bank = 0;
+	u8 m_n80sr_bank;
 	u8 m_port32;
 	u8 m_port33;
 	u8 m_alu_gam;
 	u8 m_extram_mode;
-	struct { uint8_t r = 0, g = 0, b = 0; } m_palram[8];
+	bool m_text_layer_mask;
+	u8 m_bitmap_layer_mask;
+	struct { uint8_t r, g, b; } m_palram[8];
 	bitmap_rgb32 m_text_bitmap;
 
 	virtual void flush_low_bank() override;
@@ -243,7 +245,8 @@ private:
 
 	virtual void gvram_map(address_map &map) override;
 
-	void draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(u32 bitmap_offset, int y, int x, int xi)> dot_func);
+	void draw_bitmap_w80(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(u32 bitmap_offset, int y, int x, int xi)> dot_func);
+	void draw_bitmap_w40(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(int layer_n, u32 bitmap_offset, int y, int x, int xi)> dot_func);
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 };

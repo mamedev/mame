@@ -222,14 +222,15 @@ void pc8001mk2sr_state::video_reset()
 		m_palram[i].g = i & 4 ? 7 : 0;
 		m_palette->set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 	}
+
+	m_text_layer_mask = true;
+	m_bitmap_layer_mask = 0x7;
 }
 
 // TODO: has extra modes vs. PC-8801 ...
-void pc8001mk2sr_state::draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(u32 bitmap_offset, int y, int x, int xi)> dot_func)
+void pc8001mk2sr_state::draw_bitmap_w80(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(u32 bitmap_offset, int y, int x, int xi)> dot_func)
 {
-	uint16_t y_double = get_screen_frequency();
-	if ((m_port31 & 0x11) == 0)
-		y_double = 0;
+	const uint16_t y_double = 0;
 	int32_t y_line_size = y_double + 1;
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y += y_line_size)
@@ -245,16 +246,46 @@ void pc8001mk2sr_state::draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &clipr
 				if (pen_dot == 0)
 					continue;
 
-				// TODO: some real HW snaps implies that output is only even or odd line when in 3bpp mode, verify
-				// 3301 skip line? interlace artifact? other?
 				for (int yi = 0; yi < y_line_size; yi ++)
 				{
 					int res_x = x + xi;
 					int res_y = y + yi;
-					// still need to check against cliprect,
-					// in the rare case that 3301 CRTC is set to non-canon values (such as any width != 640).
 					if (cliprect.contains(res_x, res_y))
 						bitmap.pix(res_y, res_x) = palette->pen(pen_dot);
+				}
+			}
+		}
+	}
+}
+
+void pc8001mk2sr_state::draw_bitmap_w40(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(int layer_n, u32 bitmap_offset, int y, int x, int xi)> dot_func)
+{
+	const uint16_t y_double = 0;
+	int32_t y_line_size = y_double + 1;
+
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y += y_line_size)
+	{
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x += 16)
+		{
+			u8 x_char = (x >> 4);
+			u32 bitmap_offset = (y >> y_double) * 40 + x_char;
+			for(int xi = 0; xi < 16; xi++)
+			{
+				u8 pen_dot[2];
+				pen_dot[0] = dot_func(0, bitmap_offset + 0x0000, y, x_char, 7 - (xi >> 1));
+				pen_dot[1] = dot_func(1, bitmap_offset + 0x2000, y, x_char, 7 - (xi >> 1));
+
+				for (int yi = 0; yi < y_line_size; yi ++)
+				{
+					int res_x = x + xi;
+					int res_y = y + yi;
+					if (cliprect.contains(res_x, res_y))
+					{
+						if (pen_dot[1])
+							bitmap.pix(res_y, res_x) = palette->pen(pen_dot[1]);
+						if (pen_dot[0])
+							bitmap.pix(res_y, res_x) = palette->pen(pen_dot[0]);
+					}
 				}
 			}
 		}
@@ -269,20 +300,48 @@ uint32_t pc8001mk2sr_state::screen_update( screen_device &screen, bitmap_rgb32 &
 	{
 		bitmap.fill(m_palette->pen(0), cliprect);
 
-		draw_bitmap(bitmap, cliprect, m_palette, [&](u32 bitmap_offset, int y, int x, int xi){
-			u8 res = 0;
+		// TODO: mkII fallback modes
+		// 1bpp, SR GVRAM banks actually OR-ed like pc8801 -> mirror on write access.
+		// Also Spectrum-like colors from text attribute (verify if regular mk2 can do it as well).
 
-			// note: layer masking doesn't occur in 3bpp mode, bugattac relies on this
-			for (int plane = 0; plane < 3; plane ++)
-				res |= ((m_gvram[bitmap_offset + plane * 0x4000] >> xi) & 1) << plane;
+		// TODO: pack1:"Nuts & Milk" sets 0xfe to port $31, wants 640 width in mono sets 320 in color
 
-			return res;
-		});
+		// 2 planes width 40
+		if (BIT(m_port31, 2))
+		{
+			draw_bitmap_w40(bitmap, cliprect, m_palette, [&](int layer_n, u32 bitmap_offset, int y, int x, int xi){
+				u8 res = 0;
+				if (!BIT(m_bitmap_layer_mask, layer_n))
+					return res;
+
+				for (int plane = 0; plane < 3; plane ++)
+					res |= ((m_gvram[bitmap_offset + plane * 0x4000] >> xi) & 1) << plane;
+
+				return res;
+			});
+		}
+		else
+		{
+			// 1 plane width 80
+
+			// NOTE: unlike pc8801 port $53 actually allows disabling the single plane
+			if (BIT(m_bitmap_layer_mask, 0))
+			{
+				draw_bitmap_w80(bitmap, cliprect, m_palette, [&](u32 bitmap_offset, int y, int x, int xi){
+					u8 res = 0;
+
+					for (int plane = 0; plane < 3; plane ++)
+						res |= ((m_gvram[bitmap_offset + plane * 0x4000] >> xi) & 1) << plane;
+
+					return res;
+				});
+			}
+		}
 	}
 	else
 		bitmap.fill(0, cliprect);
 
-	//if(!m_text_layer_mask)
+	if(m_text_layer_mask)
 	{
 		m_text_bitmap.fill(0, cliprect);
 		m_crtc->screen_update(screen, m_text_bitmap, cliprect);
@@ -605,6 +664,8 @@ u8 pc8001mk2sr_state::port33_r()
 void pc8001mk2sr_state::port33_w(u8 data)
 {
 	m_port33 = data;
+	if (data & 0x0c)
+		popmessage("pc8001.cpp: port33_w PR %02x", data);
 	flush_low_bank();
 }
 
@@ -645,7 +706,7 @@ void pc8001mk2sr_state::pc8001mk2sr_map(address_map &map)
 void pc8001mk2sr_state::pc8001mk2sr_io(address_map &map)
 {
 	pc8001mk2_io(map);
-	// latch for mkIISR (pc8001mk Burger Time cares)
+	// latch for mkIISR (pack2:"Burger Time" cares)
 	map(0x32, 0x32).lrw8(
 		NAME([this] () { return m_port32; }),
 		NAME([this] (u8 data) { m_port32 = data; })
@@ -655,6 +716,13 @@ void pc8001mk2sr_state::pc8001mk2sr_io(address_map &map)
 	map(0x35, 0x35).w(FUNC(pc8001mk2sr_state::alu_ctrl2_w));
 	map(0x41, 0x4f).unmaprw();
 	map(0x44, 0x45).rw(m_opn, FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x53, 0x53).lw8(
+		NAME([this] (u8 data) {
+			m_text_layer_mask = !!(BIT(~data, 0));
+			// NOTE: more bits vs. pc8801
+			m_bitmap_layer_mask = ((data & 0x7e) >> 1) ^ 0x3f;
+		})
+	);
 	map(0x54, 0x5b).lw8(
 		NAME([this] (offs_t offset, u8 data) {
 			m_palram[offset].b = data & 1 ? 7 : 0;
@@ -841,6 +909,8 @@ void pc8001mk2sr_state::machine_start()
 	save_item(NAME(m_port33));
 	save_item(NAME(m_alu_gam));
 	save_item(NAME(m_extram_mode));
+	save_item(NAME(m_text_layer_mask));
+	save_item(NAME(m_bitmap_layer_mask));
 }
 
 void pc8001mk2sr_state::machine_reset()
