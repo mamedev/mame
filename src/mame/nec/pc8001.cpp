@@ -634,9 +634,9 @@ void pc8001mk2sr_state::pc8001mk2sr_map(address_map &map)
 	m_exp_view[3](0x0000, 0x5fff).rom().region(N80SR_ROM_TAG, 0x0000);
 	m_exp_view[3](0x6000, 0x7fff).rom().region(N80SR_ROM_TAG, 0x6000);
 	map(0x0000, 0x7fff).view(m_extram_view);
-	m_extram_view[0x01](0x0000, 0x7fff).r(FUNC(pc8001mk2_state::ram_r<0x8000>));
-	m_extram_view[0x10](0x0000, 0x7fff).w(FUNC(pc8001mk2_state::ram_w<0x8000>));
-	m_extram_view[0x11](0x0000, 0x7fff).rw(FUNC(pc8001mk2_state::ram_r<0x8000>), FUNC(pc8001mk2_state::ram_w<0x8000>));
+	m_extram_view[0x01](0x0000, 0x7fff).r(FUNC(pc8001mk2sr_state::ram_r<0x8000>));
+	m_extram_view[0x10](0x0000, 0x7fff).w(FUNC(pc8001mk2sr_state::ram_w<0x8000>));
+	m_extram_view[0x11](0x0000, 0x7fff).rw(FUNC(pc8001mk2sr_state::ram_r<0x8000>), FUNC(pc8001mk2sr_state::ram_w<0x8000>));
 
 	map(0x8000, 0xbfff).view(m_alu_view);
 	m_alu_view[0](0x8000, 0xbfff).rw(m_alu, FUNC(pc88_alu_device::alu_r), FUNC(pc88_alu_device::alu_w));
