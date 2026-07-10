@@ -207,6 +207,8 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 
 	void pc8001mk2_io(address_map &map) ATTR_COLD;
 	void pc8001mk2_map(address_map &map) ATTR_COLD;
@@ -218,6 +220,9 @@ protected:
 	std::unique_ptr<uint8_t[]> m_gvram;
 	u8 m_port31;
 	u8 m_vram_sel;
+	bool m_text_layer_mask;
+	u8 m_bitmap_layer_mask;
+	bitmap_rgb32 m_text_bitmap;
 
 	void port31_w(uint8_t data);
 	virtual void flush_low_bank();
@@ -227,7 +232,9 @@ protected:
 	u8 gvram_r(offs_t offset);
 	void gvram_w(offs_t offset, u8 data);
 
-//	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+	void draw_bitmap_2bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(u32 bitmap_offset, int y, int x, int xi)> dot_func);
+
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 private:
 };
@@ -274,10 +281,7 @@ private:
 	u8 m_port33;
 	u8 m_alu_gam;
 	u8 m_extram_mode;
-	bool m_text_layer_mask;
-	u8 m_bitmap_layer_mask;
 	struct { uint8_t r, g, b; } m_palram[8];
-	bitmap_rgb32 m_text_bitmap;
 	bitmap_rgb32 m_graph_bitmap;
 
 	virtual void flush_low_bank() override;
@@ -287,7 +291,6 @@ private:
 
 	void draw_bitmap_w80(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(u32 bitmap_offset, int y, int x, int xi)> dot_func);
 	void draw_bitmap_w40(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(int layer_n, u32 bitmap_offset, int y, int x, int xi)> dot_func);
-	void draw_bitmap_2bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(u32 bitmap_offset, int y, int x, int xi)> dot_func);
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 };
