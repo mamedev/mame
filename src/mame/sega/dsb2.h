@@ -17,7 +17,7 @@ class dsb2_device : public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
-	dsb2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	dsb2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
 	auto rxd_handler() { return m_rxd_handler.bind(); }
@@ -44,6 +44,7 @@ private:
 	std::unique_ptr<mpeg_audio> m_decoder;
 	int16_t m_audio_buf[1152*2];
 	uint32_t m_mp_start, m_mp_end, m_mp_vol, m_mp_pan, m_lp_start, m_lp_end, m_start, m_end;
+	uint32_t m_rom_bank;
 	int32_t m_mp_pos, m_audio_pos, m_audio_avail;
 
 	emu_timer *m_timer_1kHz;
