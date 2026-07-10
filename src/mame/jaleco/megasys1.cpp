@@ -2731,7 +2731,7 @@ ROM_START( avspirit )
 	ROM_LOAD16_BYTE( "spirit02.rom",  0x000001, 0x020000, CRC(30213390) SHA1(9334978d3568b36215ed29789501f7cbaf6651ea) )
 
 	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code */
-	ROM_LOAD( "avspirit.mcu", 0x00000, 0x04000, NO_DUMP )
+	ROM_LOAD( "avspirit.mcu", 0x00000, 0x04000, CRC(d9b2eb1a) SHA1(6e0ec065a46b5c5352a3228e6de46b7d60bc393a) )
 
 	ROM_REGION( 0x80000, "scroll1", 0 ) /* Scroll 0 */
 	ROM_LOAD( "spirit12.rom",  0x000000, 0x080000, CRC(728335d4) SHA1(bbf13378ac0bff5e732eb30081b421ed89d12fa2) )
@@ -5260,12 +5260,6 @@ void megasys1_typea_state::init_lordofkbp()
 	}
 }
 
-
-void megasys1_bc_iosim_state::init_avspirit() // Type B
-{
-	m_ip_select_values = avspirit_seq;
-}
-
 void megasys1_bc_iosim_state::init_hayaosi1() // Type B
 {
 	m_ip_select_values = hayaosi1_seq;
@@ -5355,7 +5349,7 @@ GAME( 1992, soldam,     0,        system_A_d65006_soldam,   soldam,   megasys1_t
 GAME( 1992, soldamj,    soldam,   system_A_gs88000_soldam,  soldam,   megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "Soldam (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Type B
-GAME( 1991, avspirit,   0,        system_B_iosim,           avspirit, megasys1_bc_iosim_state,     init_avspirit,     ROT0,   "Jaleco", "Avenging Spirit", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, avspirit,   0,        system_B_iomcu,           avspirit, megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "Avenging Spirit", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, monkelf,    avspirit, system_B_monkelf,         avspirit, megasys1_state,              init_monkelf,      ROT0,   "bootleg","Monky Elf (Korean bootleg of Avenging Spirit)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, edf,        0,        system_B_iomcu,           edf,      megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "E.D.F.: Earth Defense Force (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, edfa,       edf,      system_B_iomcu,           edf,      megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "E.D.F.: Earth Defense Force (set 2)", MACHINE_SUPPORTS_SAVE )
