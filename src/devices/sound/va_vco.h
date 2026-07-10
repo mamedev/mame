@@ -147,6 +147,8 @@ protected:
 	virtual float ctrl2freq(float freq_ctrl) const;
 	virtual float ctrl2pw(float pw_ctrl) const;
 
+	void update_stream();
+
 private:
 	// Information about an oscillator sync event.
 	struct sync_event_t

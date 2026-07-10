@@ -196,7 +196,7 @@ UPD3301_DRAW_CHARACTER_MEMBER( pc8001_base_state::draw_text )
 	}
 }
 
-uint32_t pc8001_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t pc8001_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	// TODO: superimposing
@@ -264,6 +264,11 @@ void pc8001mk2sr_state::draw_bitmap_w40(bitmap_rgb32 &bitmap, const rectangle &c
 {
 	const uint16_t y_double = 0;
 	int32_t y_line_size = y_double + 1;
+	// n80srbas "demo2/3/4.nsr"
+	// normally priority is 0 > 1, bit enabled makes it 0 < 1
+	const u8 pr1 = BIT(m_port33, 2);
+	const u8 pri0 = 0 ^ pr1;
+	const u8 pri1 = 1 ^ pr1;
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y += y_line_size)
 	{
@@ -283,11 +288,43 @@ void pc8001mk2sr_state::draw_bitmap_w40(bitmap_rgb32 &bitmap, const rectangle &c
 					int res_y = y + yi;
 					if (cliprect.contains(res_x, res_y))
 					{
-						if (pen_dot[1])
-							bitmap.pix(res_y, res_x) = palette->pen(pen_dot[1]);
-						if (pen_dot[0])
-							bitmap.pix(res_y, res_x) = palette->pen(pen_dot[0]);
+						if (pen_dot[pri1])
+							bitmap.pix(res_y, res_x) = palette->pen(pen_dot[pri1]);
+						if (pen_dot[pri0])
+							bitmap.pix(res_y, res_x) = palette->pen(pen_dot[pri0]);
 					}
+				}
+			}
+		}
+	}
+}
+
+void pc8001mk2sr_state::draw_bitmap_2bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(u32 bitmap_offset, int y, int x, int xi)> dot_func)
+{
+	const uint16_t y_double = 0;
+	int32_t y_line_size = y_double + 1;
+
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y += y_line_size)
+	{
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
+		{
+			u8 x_char = (x >> 3);
+			u32 bitmap_offset = (y >> y_double) * 80 + x_char;
+			for(int xi = 0; xi < 4; xi ++)
+			{
+				u8 pen_dot = dot_func(bitmap_offset, y, x_char, 6 - (xi * 2));
+
+				if (pen_dot == 0)
+					continue;
+
+				for (int yi = 0; yi < y_line_size; yi ++)
+				{
+					int res_x = x + xi * 2;
+					int res_y = y + yi;
+					if (cliprect.contains(res_x, res_y))
+						bitmap.pix(res_y, res_x) = palette->pen(pen_dot);
+					if (cliprect.contains(res_x + 1, res_y))
+						bitmap.pix(res_y, res_x + 1) = palette->pen(pen_dot);
 				}
 			}
 		}
@@ -296,7 +333,7 @@ void pc8001mk2sr_state::draw_bitmap_w40(bitmap_rgb32 &bitmap, const rectangle &c
 
 
 // TODO: ... and can change priority of the GVRAM layer
-uint32_t pc8001mk2sr_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t pc8001mk2sr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_graph_bitmap.fill(0, cliprect);
 
@@ -305,15 +342,44 @@ uint32_t pc8001mk2sr_state::screen_update( screen_device &screen, bitmap_rgb32 &
 		// pack2:"Dragon Slayer"
 		bitmap.fill(m_palette->pen(0), cliprect);
 
-		// TODO: mkII fallback modes
-		// 1bpp, SR GVRAM banks actually OR-ed like pc8801 -> mirror on write access.
+		// TODO: mkII compatible mono mode
+		// 640x200x1bpp, SR GVRAM banks actually OR-ed like pc8801 -> mirror on write access.
 		// Also Spectrum-like colors from text attribute (verify if regular mk2 can do it as well).
 
-		// TODO: pack1:"Nuts & Milk" sets 0xfe to port $31, wants 640 width in mono sets 320 in color
-
-		// 2 planes width 40
-		if (BIT(m_port31, 2))
+		if (BIT(m_port31, 5))
 		{
+			// 2bpp color
+			// The goofy one out, OR-es in planar like other 1bpp modes but also draws in packed
+			// - pack1 game list,
+			// - pack1:"Nuts & Milk"
+			// - any mk2 SW
+			// TODO: enable guessed
+			// m_port31 & 0xe0 may be border color really?
+			// m_port31 & 0x30 == 0x20 should give mono mode instead
+			// n80diskb "mark2" demo plays with this a ton
+
+			draw_bitmap_2bpp(m_graph_bitmap, cliprect, m_palette, [&](u32 bitmap_offset, int y, int x, int xi){
+				const u8 color_table[8] = { 0x00, 0x02, 0x04, 0x03, 0x00, 0x02, 0x04, 0x07 };
+
+				u8 res = 0;
+
+				for (int plane = 0; plane < 3; plane ++)
+				{
+					u8 mask = BIT(m_bitmap_layer_mask, plane) * 3;
+					res |= (m_gvram[bitmap_offset + plane * 0x4000] >> xi) & mask;
+				}
+
+				if (!res)
+					return (u8)0;
+
+				return color_table[res | BIT(m_port31, 2) << 2];
+				//return m_crtc->is_gfx_color_mode() ? (m_attr_info[y][x] >> 13) & 7 : 7;
+			});
+		}
+		else if (BIT(m_port31, 2))
+		{
+			// 2 planes width 40
+
 			draw_bitmap_w40(m_graph_bitmap, cliprect, m_palette, [&](int layer_n, u32 bitmap_offset, int y, int x, int xi){
 				u8 res = 0;
 				if (!BIT(m_bitmap_layer_mask, layer_n))
@@ -791,9 +857,8 @@ void pc8001mk2sr_state::port33_w(u8 data)
 {
 	m_port33 = data;
 
-	// PR1 should be trivial to implement, check what triggers this first
-	if (data & 0x04)
-		popmessage("pc8001.cpp: port33_w PR %02x", data);
+	if (data & 0x10)
+		popmessage("pc8001.cpp: port33_w HIRA %02x", data);
 	flush_low_bank();
 	flush_gvram_access();
 

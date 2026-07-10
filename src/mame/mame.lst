@@ -44162,6 +44162,32 @@ sols5e
 @source:skeleton/squale.cpp
 squale
 
+@source:skeleton/st25.cpp
+alphar
+amarillo
+arenau
+avanti
+ballermn
+bgaction
+bigkick
+blizzard
+boosters
+colossos
+cttower
+galaktca
+jamaica
+macaor
+majesto
+matrixx
+mtclssic
+purpurr
+robin
+spasch
+stakeoff
+tango
+tobago
+xeno
+
 @source:skeleton/sterz80.cpp
 tongzi
 
@@ -48764,6 +48790,7 @@ spinlbrku
 spinlbrkup
 svolly91
 turbofrc
+turbofrcj
 turbofrco
 turbofrcu
 turbofrcua
