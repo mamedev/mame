@@ -738,6 +738,7 @@ void m20_state::machine_reset()
 
 	memcpy(RAM, ROM, 8);  // we need only the reset vector
 	m_kbdi8251->write_cts(0);
+	m_ttyi8251->write_cts(0);
 	if (m_apb)
 		m_apb->halt();
 }
