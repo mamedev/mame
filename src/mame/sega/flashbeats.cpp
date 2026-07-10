@@ -463,13 +463,7 @@ void flashbeats_state::main_scsp_map(address_map &map)
 
 void flashbeats_state::scsp_mem(address_map &map)
 {
-	// SCSP wave/DSP address space -- this is DRAM, NOT ROM: the SCSP DSP both reads
-	// AND writes it (scspdsp.cpp space->read_word/write_word for the effect ring
-	// buffer), so it must stay RAM. The sound-68000 stages PCM sample data into this
-	// RAM from the rom3 window it sees at 0x800000 (main_scsp_map), so voices whose
-	// SA lands here (e.g. SA=0x6e000) find their waveform while the DSP keeps its
-	// writable work area. (Mapping rom3 as .rom() here made the DSP read ROM as
-	// effect input -> a constant drone from boot; hence the space must remain RAM.)
+	// SCSP wave/DSP address space
 	map(0x000000, 0x0fffff).ram().share("sound_ram");
 }
 
