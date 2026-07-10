@@ -728,7 +728,23 @@
 ***********************************************************************************/
 
 #include "emu.h"
-#include "calomega.h"
+
+#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/r65c02.h"
+#include "cpu/mcs48/mcs48.h"
+#include "machine/6821pia.h"
+#include "machine/6850acia.h"
+#include "machine/clock.h"
+#include "machine/i8251.h"
+#include "machine/nvram.h"
+#include "machine/ticket.h"
+#include "machine/timer.h"
+#include "sound/ay8910.h"
+#include "video/mc6845.h"
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
 
 #include "kenokb.lh"
 
@@ -736,6 +752,232 @@
 #define CPU_CLOCK           (MASTER_CLOCK/16)
 #define UART_CLOCK          (MASTER_CLOCK/16)
 #define SND_CLOCK           (MASTER_CLOCK/8)
+
+namespace {
+
+class calomega_state : public driver_device
+{
+public:
+	calomega_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_pia(*this, "pia%u", 0U),
+		m_maincpu(*this, "maincpu"),
+		m_kstec(*this, "kstec"),
+		m_uart(*this, "uart"),
+		m_key_row(*this, "KB_%u", 0),
+		m_acia6850(*this, "acia6850_%u", 0U),
+		m_aciabaud(*this, "aciabaud"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_hopper(*this, "hopper"),
+		m_in0(*this, "IN0"),
+		m_in0_0(*this, "IN0-0"),
+		m_in0_1(*this, "IN0-1"),
+		m_in0_2(*this, "IN0-2"),
+		m_in0_3(*this, "IN0-3"),
+		m_frq(*this, "FRQ"),
+		m_sw2(*this, "SW2"),
+		m_lamps(*this, "lamp%u", 1U),
+		m_red(*this, "POT1_RED"),
+		m_grn(*this, "POT2_GREEN"),
+		m_blu(*this, "POT3_BLUE")
+
+	{
+	}
+
+	void init_comg079() ATTR_COLD;
+	void init_comg080() ATTR_COLD;
+	void init_comg145() ATTR_COLD;
+	void init_comg176() ATTR_COLD;
+	void init_any() ATTR_COLD;
+
+	void sys903(machine_config &config) ATTR_COLD;
+	void s903mod(machine_config &config) ATTR_COLD;
+	void sys903kb(machine_config &config) ATTR_COLD;
+	void sys905(machine_config &config) ATTR_COLD;
+	void sys906(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	void calomega_videoram_w(offs_t offset, uint8_t data);
+	void calomega_colorram_w(offs_t offset, uint8_t data);
+	uint8_t s903_mux_port_r();
+	void s903_mux_w(uint8_t data);
+	uint8_t s905_mux_port_r();
+	void s905_mux_w(uint8_t data);
+	uint8_t pia0_bin_r();
+	void pia0_aout_w(uint8_t data);
+	void pia0_bout_w(uint8_t data);
+	uint8_t pia1_ain_r();
+	uint8_t pia1_bin_r();
+	uint8_t dummy_pia_r();
+	void pia1_aout_w(uint8_t data);
+	void pia1_bout_w(uint8_t data);
+	void lamps_903a_w(uint8_t data);
+	void lamps_903b_w(uint8_t data);
+	void lamps_905_w(uint8_t data);
+	void dummy_pia_w(uint8_t data);
+	uint8_t keyb_903_r();
+
+	void pia1_cb2_w(int state);
+	void vblank0_w(int state);
+	void vblank1_w(int state);
+	void vblank2_w(int state);
+	void dummy_pia_line_w(int state);
+	void write_acia_clock(int state);
+	void w_903kb_acia_clock(int state);
+	void update_aciabaud_scale(int state);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_0);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_1);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_2);
+
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
+	uint32_t screen_update_calomega(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void calomega_palette(palette_device &palette) const;
+
+	void sys903_map(address_map &map) ATTR_COLD;
+	void s903mod_map(address_map &map) ATTR_COLD;
+	void sys905_map(address_map &map) ATTR_COLD;
+	void sys906_map(address_map &map) ATTR_COLD;
+	void kstec_mem_map(address_map &map) ATTR_COLD;
+	void kstec_io_map(address_map &map) ATTR_COLD;
+
+	optional_device_array<pia6821_device, 2> m_pia;
+	required_device<m6502_device> m_maincpu;
+	optional_device<i8035_device> m_kstec;
+	optional_device<i8251_device> m_uart;
+	optional_ioport_array<16> m_key_row;
+	optional_device_array<acia6850_device, 1> m_acia6850;  // keep array mode for future implementations
+	optional_device<clock_device> m_aciabaud;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+
+	required_device<ticket_dispenser_device> m_hopper;
+
+	optional_ioport m_in0;
+	optional_ioport m_in0_0;
+	optional_ioport m_in0_1;
+	optional_ioport m_in0_2;
+	optional_ioport m_in0_3;
+
+	optional_ioport m_frq;
+	optional_ioport m_sw2;
+
+	output_finder<9> m_lamps;
+	required_ioport m_red;
+	required_ioport m_grn;
+	required_ioport m_blu;
+
+	uint8_t m_timer = 0U;
+	int m_s903_mux_data = 0;
+	int m_s905_mux_data = 0;
+	int m_pia_data = 0;
+	bool m_lockout = false;
+	bool m_diverter = false;
+	int m_kbscan = 0;
+	int m_rxrdy = 0;
+	int r_pot = 0;
+	int g_pot = 0;
+	int b_pot = 0;
+
+	tilemap_t *m_bg_tilemap = nullptr;
+};
+
+
+/**************************************************
+*                Video Hardware                   *
+**************************************************/
+
+void calomega_state::calomega_videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void calomega_state::calomega_colorram_w(offs_t offset, uint8_t data)
+{
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+TILE_GET_INFO_MEMBER(calomega_state::get_bg_tile_info)
+{
+/*  - bits -
+    7654 3210
+    --xx xx--   tiles color.
+    ---- --x-   tiles bank.
+    x--- ---x   extended tiles addressing.
+    -x-- ----   seems unused.
+*/
+	int attr = m_colorram[tile_index];
+	int code = ((attr & 1) << 8) | m_videoram[tile_index];  // bit 0 extends the the tiles addressing.
+	int bank = (attr & 0x02) >> 1;                          // bit 1 switch the gfx banks.
+	int color = (attr & 0x3c) >> 2;                         // bits 2-3-4-5 for color.
+
+	tileinfo.set(bank, code, color, 0);
+}
+
+void calomega_state::video_start()
+{
+	m_gfxdecode->gfx(0)->set_granularity(8);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(calomega_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 31);
+}
+
+uint32_t calomega_state::screen_update_calomega(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	if(r_pot != m_red->read()) { r_pot = m_red->read() * 2.55; calomega_palette(*m_palette);}
+	if(g_pot != m_grn->read()) { g_pot = m_grn->read() * 2.55; calomega_palette(*m_palette);}
+	if(b_pot != m_blu->read()) { b_pot = m_blu->read() * 2.55; calomega_palette(*m_palette);}
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
+
+void calomega_state::calomega_palette(palette_device &palette) const
+{
+/*  The proms are 256 x 4 bits, but the games only seem to need the first 128 entries,
+    and the rest of the PROM data looks like junk rather than valid colors
+
+    prom bits
+    3210
+    ---x   red component
+    --x-   green component
+    -x--   blue component
+    x---   foreground (colors with this bit set are full brightness,
+           colors with it clear are attenuated by the analogic color pots)
+*/
+
+	uint8_t const *const color_prom = memregion("proms")->base();
+	if (!color_prom)
+		return;
+
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		int const nibble = color_prom[i];
+
+		int const fg = BIT(nibble, 3);
+
+		// red component
+		int const r = BIT(nibble, 0) * (fg ? 0xff : r_pot);
+
+		// green component
+		int const g = BIT(nibble, 1) * (fg ? 0xff : g_pot);
+
+		// blue component
+		int const b = BIT(nibble, 2) * (fg ? 0xff : b_pot);
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
 
 
 /**************************************************
@@ -6258,6 +6500,8 @@ void calomega_state::init_any()
 	PRGROM[0x0000] = 0x00;
 
 }
+
+} // anonymous namespace
 
 /*************************************************
 *                  Game Drivers                  *
