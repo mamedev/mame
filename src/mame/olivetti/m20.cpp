@@ -719,6 +719,9 @@ void m20_state::machine_start()
 			m_maincpu->space(AS_IO).install_readwrite_handler(0x1c0, 0x1cf, read8sm_delegate(*m_hdc, FUNC(wd1000_device::read)), write8sm_delegate(*m_hdc, FUNC(wd1000_device::write)), 0x00ff);
 		}
 	}
+
+	save_item(NAME(m_memsize));
+	save_item(NAME(m_port21));
 }
 
 void m20_state::machine_reset()
@@ -879,6 +882,6 @@ ROM_END
 
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY     FULLNAME           FLAGS
-COMP( 1981, m20,  0,      0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1981, m20,  0,      0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 COMP( 1981, m40,  m20,    0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M40", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1986, m44,  0,      0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M44", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
