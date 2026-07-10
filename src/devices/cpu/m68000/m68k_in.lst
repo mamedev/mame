@@ -59,17 +59,147 @@ f000 f000 1111     . .          071234fc:4
 	m68ki_exception_1111();
 
 
-f200 ff00 040fpu0  l .          234f:0
+f200 ffc0 fpgen    l .          234f:0
 	if(m_has_fpu) {
-		m68040_fpu_op0();
+		m_fpu_just_reset = 0;
+		const u16 w2 = OPER_I_16();
+		switch((w2 >> 13) & 0x7)
+		{
+			case 0x0:   // FPU ALU FP, FP
+			case 0x2:   // FPU ALU ea, FP
+				fpgen_rm_reg(w2);
+				break;
+			case 0x3:   // FMOVE FP, ea
+				fmove_reg_mem(w2);
+				break;
+			case 0x4:   // FMOVEM ea, FPCR
+			case 0x5:   // FMOVEM FPCR, ea
+				fmove_fpcr(w2);
+				break;
+			case 0x6:   // FMOVEM ea, list
+			case 0x7:   // FMOVEM list, ea
+				fmovem(w2);
+				break;
+			default:
+				m68ki_exception_1111();
+				break;
+		}
 	} else {
 		m68ki_exception_1111();
 	}
 
 
-f300 ff00 040fpu1  l .          234f:0
+f240 fff8 fscc_d   b .          234f:4
 	if(m_has_fpu) {
-		m68040_fpu_op1();
+		m_fpu_just_reset = 0;
+		const u32 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
+		DY() = (DY() & 0xffffff00) | v;
+	} else {
+		m68ki_exception_1111();
+	}
+
+
+f240 ffc0 fscc     b A+-DXWL    234f:6
+	if(m_has_fpu) {
+		m_fpu_just_reset = 0;
+		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
+		m68ki_write_8(M68KMAKE_GET_EA_AY_8, v);
+	} else {
+		m68ki_exception_1111();
+	}
+
+
+f248 fff8 fdbcc    l .          234f:4
+	if(m_has_fpu) {
+		fdbcc();
+	} else {
+		m68ki_exception_1111();
+	}
+
+
+f27a ffff ftrap_w  l .          234f:4
+	if(m_has_fpu) {
+		m68881_ftrap();
+	} else {
+		m68ki_exception_1111();
+	}
+
+
+f27b ffff ftrap_l  l .          234f:4
+	if(m_has_fpu) {
+		m68881_ftrap();
+	} else {
+		m68ki_exception_1111();
+	}
+
+
+f27c ffff ftrap    l .          234f:4
+	if(m_has_fpu) {
+		m68881_ftrap();
+	} else {
+		m68ki_exception_1111();
+	}
+
+
+f280 ffc0 fbcc_w   w .          234f:4
+	if(m_has_fpu) {
+		fbcc16();
+	} else {
+		m68ki_exception_1111();
+	}
+
+
+f2c0 ffc0 fbcc_l   l .          234f:4
+	if(m_has_fpu) {
+		fbcc32();
+	} else {
+		m68ki_exception_1111();
+	}
+
+
+f300 ffc0 fsave    l ADXWL      234f:4
+	if(m_has_fpu) {
+		if(m_s_flag) {
+			m68040_do_fsave(M68KMAKE_GET_EA_AY_32, -1, 1);
+		} else {
+			m68ki_exception_privilege_violation();
+		}
+	} else {
+		m68ki_exception_1111();
+	}
+
+
+f320 fff8 fsave_pd l .          234f:4
+	if(m_has_fpu) {
+		if(m_s_flag) {
+			m68040_do_fsave(REG_A()[m_ir & 7], m_ir & 7, 0);
+		} else {
+			m68ki_exception_privilege_violation();
+		}
+	} else {
+		m68ki_exception_1111();
+	}
+
+
+f340 ffc0 frestore l ADXWLdx    234f:4
+	if(m_has_fpu) {
+		if(m_s_flag) {
+			m68040_do_frestore(M68KMAKE_GET_EA_AY_32, -1);
+		} else {
+			m68ki_exception_privilege_violation();
+		}
+	} else {
+		m68ki_exception_1111();
+	}
+
+
+f358 fff8 frestore_pi l .       234f:4
+	if(m_has_fpu) {
+		if(m_s_flag) {
+			m68040_do_frestore(EA_AY_PI_32(), m_ir & 7);
+		} else {
+			m68ki_exception_privilege_violation();
+		}
 	} else {
 		m68ki_exception_1111();
 	}
@@ -2933,14 +3063,6 @@ f078 f1f8 cptrapcc l .          23:4
 	logerror("%s at %08x: called unimplemented instruction %04x (cptrapcc)\n",
 					tag(), m_ppc, m_ir);
 
-
-f278 fff8 ftrapcc  l .          23:4
-	if(m_has_fpu)
-	{
-		m68881_ftrap();
-	} else {
-		m68ki_exception_1111();
-	}
 
 50c8 fff8 dbt      w .          01:12 7:14 234fc:6
 	m_pc += 2;

@@ -9,6 +9,7 @@
       for SANE to calculate square roots.
 */
 
+#include <bit>
 #include <cstdint>
 
 #include "emu.h"
@@ -36,32 +37,21 @@ static constexpr u32 FPES_OVERFLOW      = 0x00000800;
 static constexpr u32 FPES_UNDERFLOW     = 0x00001000;
 static constexpr u32 FPES_OPERR         = 0x00002000;
 static constexpr u32 FPES_SNAN          = 0x00004000;
+static constexpr u32 FPES_BSUN          = 0x00008000;
 
 static constexpr u32 FPAE_INEXACT       = 0x00000008;
 static constexpr u32 FPAE_DIVZERO       = 0x00000010;
-static constexpr u32 FPAE_OVERFLOW      = 0x00000020;
-static constexpr u32 FPAE_UNDERFLOW     = 0x00000040;
-static constexpr u32 FPAE_OPERR         = 0x00000010;
+static constexpr u32 FPAE_UNDERFLOW     = 0x00000020;
+static constexpr u32 FPAE_OVERFLOW      = 0x00000040;
+static constexpr u32 FPAE_IOP           = 0x00000080;
+
+// writable bits of the control and status registers; the rest read as zero
+static constexpr u32 FPCR_WRITE_MASK    = 0x0000fff0;
+static constexpr u32 FPSR_WRITE_MASK    = 0x0ffffff8;
 
 static constexpr u32 EXC_ENB_INEXACT    = 0x00000001;
 static constexpr u32 EXC_ENB_UNDFLOW    = 0x00000002;
 static constexpr u32 EXC_ENB_OVRFLOW    = 0x00000004;
-
-// masks for packed dwords, positive k-factor
-const u32 m68000_musashi_device::pkmask2[18] =
-{
-	0xffffffff, 0, 0xf0000000, 0xff000000, 0xfff00000, 0xffff0000,
-	0xfffff000, 0xffffff00, 0xfffffff0, 0xffffffff,
-	0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
-	0xffffffff, 0xffffffff, 0xffffffff
-};
-
-const u32 m68000_musashi_device::pkmask3[18] =
-{
-	0xffffffff, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0xf0000000, 0xff000000, 0xfff00000, 0xffff0000,
-	0xfffff000, 0xffffff00, 0xfffffff0, 0xffffffff,
-};
 
 inline extFloat80_t m68000_musashi_device::load_extended_float80(u32 ea)
 {
@@ -87,182 +77,312 @@ inline void m68000_musashi_device::store_extended_float80(u32 ea, extFloat80_t f
 	m68ki_write_32(ea+8, fpr.signif&0xffffffff);
 }
 
+// 10^n as a 64-bit integer
+static const u64 pow10_u64[20] =
+{
+	1U, 10U, 100U, 1000U, 10000U, 100000U, 1000000U, 10000000U,
+	100000000U, 1000000000U, 10000000000U, 100000000000U, 1000000000000U,
+	10000000000000U, 100000000000000U, 1000000000000000U, 10000000000000000U,
+	100000000000000000U, 1000000000000000000U, 10000000000000000000U
+};
+
+// 10^n in binary128 by squaring; the error is a few ulps of the 113-bit
+// significand, far below what survives rounding to extended precision
+static float128_t f128_pow10(int n)
+{
+	float128_t r = i32_to_f128(1);
+	float128_t p = i32_to_f128(10);
+
+	while (n != 0)
+	{
+		if (n & 1)
+		{
+			r = f128_mul(r, p);
+		}
+		n >>= 1;
+		if (n != 0)
+		{
+			p = f128_mul(p, p);
+		}
+	}
+
+	return r;
+}
+
+// x * 10^n in binary128; scale in pieces when the power alone would
+// overflow the binary128 range (denormal extended values need this)
+static float128_t f128_scale_pow10(float128_t x, int n)
+{
+	while (n > 4900)
+	{
+		x = f128_mul(x, f128_pow10(4900));
+		n -= 4900;
+	}
+
+	while (n < -4900)
+	{
+		x = f128_div(x, f128_pow10(4900));
+		n += 4900;
+	}
+
+	if (n >= 0)
+	{
+		return f128_mul(x, f128_pow10(n));
+	}
+	else
+	{
+		return f128_div(x, f128_pow10(-n));
+	}
+}
+
+// The sin/cos/tan helpers give up on arguments of 2^63 and larger; reduce
+// by the period (with the accuracy loss the hardware also suffers on huge
+// arguments) so they always produce an in-range result.
+static void reduce_trig_argument(extFloat80_t &a)
+{
+	extFloat80_t twopi;
+	twopi.signExp = 0x4001;
+	twopi.signif = 0xc90fdaa22168c235U;
+
+	// the remainder is partial (x87 style) when the exponents differ by 64
+	// or more; iterate until the reduction is complete
+	uint64_t quotient;
+	while (extFloat80_ieee754_remainder(a, twopi, a, quotient) > 0)
+	{
+	}
+}
+
+// directed rounding follows the value's sign, but the packed conversions
+// work on the magnitude, so the directed modes swap for negative values
+static uint_fast8_t rounding_mode_for_sign(uint_fast8_t mode, bool sign)
+{
+	if (sign)
+	{
+		if (mode == softfloat_round_min)
+		{
+			return softfloat_round_max;
+		}
+		if (mode == softfloat_round_max)
+		{
+			return softfloat_round_min;
+		}
+	}
+	return mode;
+}
+
 inline extFloat80_t m68000_musashi_device::load_pack_float80(u32 ea)
 {
-	u32 dw1, dw2, dw3;
+	const u32 dw1 = m68ki_read_32(ea);
+	const u32 dw2 = m68ki_read_32(ea+4);
+	const u32 dw3 = m68ki_read_32(ea+8);
 	extFloat80_t result;
-	double tmp;
-	char str[128], *ch;
 
-	dw1 = m68ki_read_32(ea);
-	dw2 = m68ki_read_32(ea+4);
-	dw3 = m68ki_read_32(ea+8);
+	const u16 sign = BIT(dw1, 31) ? 0x8000 : 0;
 
-	ch = &str[0];
-	if (dw1 & 0x80000000)   // mantissa sign
+	// infinities and NaNs have all ones in the exponent digits; a zero
+	// mantissa is an infinity, anything else keeps its NaN payload
+	if ((dw1 & 0x7fff0000) == 0x7fff0000)
 	{
-		*ch++ = '-';
+		result.signExp = sign | 0x7fff;
+		result.signif = 0x8000000000000000U | (((u64)dw2 << 32) | dw3);
+		return result;
 	}
-	*ch++ = (char)((dw1 & 0xf) + '0');
-	*ch++ = '.';
-	*ch++ = (char)(((dw2 >> 28) & 0xf) + '0');
-	*ch++ = (char)(((dw2 >> 24) & 0xf) + '0');
-	*ch++ = (char)(((dw2 >> 20) & 0xf) + '0');
-	*ch++ = (char)(((dw2 >> 16) & 0xf) + '0');
-	*ch++ = (char)(((dw2 >> 12) & 0xf) + '0');
-	*ch++ = (char)(((dw2 >> 8)  & 0xf) + '0');
-	*ch++ = (char)(((dw2 >> 4)  & 0xf) + '0');
-	*ch++ = (char)(((dw2 >> 0)  & 0xf) + '0');
-	*ch++ = (char)(((dw3 >> 28) & 0xf) + '0');
-	*ch++ = (char)(((dw3 >> 24) & 0xf) + '0');
-	*ch++ = (char)(((dw3 >> 20) & 0xf) + '0');
-	*ch++ = (char)(((dw3 >> 16) & 0xf) + '0');
-	*ch++ = (char)(((dw3 >> 12) & 0xf) + '0');
-	*ch++ = (char)(((dw3 >> 8)  & 0xf) + '0');
-	*ch++ = (char)(((dw3 >> 4)  & 0xf) + '0');
-	*ch++ = (char)(((dw3 >> 0)  & 0xf) + '0');
-	*ch++ = 'E';
-	if (dw1 & 0x40000000)   // exponent sign
+
+	// gather the 17 mantissa digits into an integer (exact: 10^17 < 2^63)
+	u64 mantissa = dw1 & 0xf;
+	for (int i = 7; i >= 0; i--)
 	{
-		*ch++ = '-';
+		mantissa = mantissa * 10 + ((dw2 >> (4 * i)) & 0xf);
 	}
-	*ch++ = (char)(((dw1 >> 24) & 0xf) + '0');
-	*ch++ = (char)(((dw1 >> 20) & 0xf) + '0');
-	*ch++ = (char)(((dw1 >> 16) & 0xf) + '0');
-	*ch = '\0';
+	for (int i = 7; i >= 0; i--)
+	{
+		mantissa = mantissa * 10 + ((dw3 >> (4 * i)) & 0xf);
+	}
 
-	sscanf(str, "%le", &tmp);
+	if (mantissa == 0)
+	{
+		result.signExp = sign;
+		result.signif = 0;
+		return result;
+	}
 
-	result = double_to_fx80(tmp);
+	int exponent = ((dw1 >> 24) & 0xf) * 100 + ((dw1 >> 20) & 0xf) * 10 + ((dw1 >> 16) & 0xf);
+	if (BIT(dw1, 30))
+	{
+		exponent = -exponent;
+	}
 
+	// value = mantissa * 10^(exponent - 16), scaled in binary128 so all
+	// 17 digits survive; only the final conversion rounds to extended,
+	// honoring the FPCR rounding mode
+	const uint_fast8_t mode = softfloat_roundingMode;
+	softfloat_roundingMode = softfloat_round_near_even;
+	const float128_t x = f128_scale_pow10(ui64_to_f128(mantissa), exponent - 16);
+	softfloat_roundingMode = rounding_mode_for_sign(mode, sign != 0);
+	result = f128_to_extF80(x);
+	softfloat_roundingMode = mode;
+
+	result.signExp |= sign;
 	return result;
 }
 
 inline void m68000_musashi_device::store_pack_float80(u32 ea, int k, extFloat80_t fpr)
 {
-	u32 dw1, dw2, dw3;
-	char str[128], *ch;
-	int i, j, exp;
+	u32 dw1 = 0, dw2 = 0, dw3 = 0;
+	const bool sign = BIT(fpr.signExp, 15);
+	const int exp = fpr.signExp & 0x7fff;
 
-	dw1 = dw2 = dw3 = 0;
-	ch = &str[0];
-
-	snprintf(str, sizeof(str), "%.16e", fx80_to_double(fpr));
-
-	if (*ch == '-')
+	if (sign)
 	{
-		ch++;
 		dw1 = 0x80000000;
 	}
 
-	if (*ch == '+')
+	if (exp == 0x7fff)
 	{
-		ch++;
-	}
-
-	dw1 |= (*ch++ - '0');
-
-	if (*ch == '.')
-	{
-		ch++;
-	}
-
-	// handle negative k-factor here
-	if ((k <= 0) && (k >= -13))
-	{
-		exp = 0;
-		for (i = 0; i < 3; i++)
+		// infinities and NaNs: all ones exponent, NaNs keep their payload
+		dw1 |= 0x7fff0000;
+		if ((fpr.signif << 1) != 0)
 		{
-			if (ch[18+i] >= '0' && ch[18+i] <= '9')
+			dw2 = (u32)(fpr.signif >> 32);
+			dw3 = (u32)fpr.signif;
+		}
+	}
+	else if (fpr.signif != 0)
+	{
+		// a positive k is the number of significant digits to produce;
+		// k <= 0 puts the rounding point at 10^k (fixed-point notation)
+		if (k > 17)
+		{
+			k = 17;
+			m_fpsr |= FPES_OPERR | FPAE_IOP;
+		}
+
+		// first estimate of floor(log10(magnitude)) from the binary exponent
+		const int e2 = (exp != 0 ? exp : 1) - 16383 - std::countl_zero(fpr.signif);
+		int decexp = (int)(((s64)e2 * 30103) / 100000);
+
+		extFloat80_t mag = fpr;
+		mag.signExp &= 0x7fff;
+
+		// scale the magnitude to an 18 digit integer, correcting the
+		// exponent estimate as needed; this stage truncates but keeps a
+		// sticky bit so a value just above a tie at the requested digit is
+		// distinguishable from the exact tie, and the requested rounding
+		// mode is applied in the exact integer arithmetic below
+		const uint_fast8_t mode = softfloat_roundingMode;
+		softfloat_roundingMode = softfloat_round_near_even;
+		const float128_t x = extF80_to_f128(mag);
+		u64 t = 0;
+		bool sticky = false;
+		for (int tries = 0; tries < 8; tries++)
+		{
+			const float128_t q = f128_scale_pow10(x, 17 - decexp);
+			t = f128_to_ui64(q, softfloat_round_minMag, false);
+			if (t >= pow10_u64[18])
 			{
-				exp = (exp << 4) | (ch[18+i] - '0');
+				decexp++;
+			}
+			else if (t < pow10_u64[17])
+			{
+				decexp--;
+			}
+			else
+			{
+				const float128_t back = ui64_to_f128(t);
+				sticky = (back.v[0] != q.v[0]) || (back.v[1] != q.v[1]);
+				break;
 			}
 		}
+		softfloat_roundingMode = mode;
 
-		if (ch[17] == '-')
+		// position of the least significant digit to keep
+		const uint_fast8_t rmode = rounding_mode_for_sign(mode, sign);
+		int lsd = (k > 0) ? (decexp - k + 1) : k;
+		int ndigits = decexp - lsd + 1;
+		if (ndigits > 17)
 		{
-			exp = -exp;
+			// fixed-point request for more digits than the format holds
+			ndigits = 17;
+			lsd = decexp - 16;
+			m_fpsr |= FPES_OPERR | FPAE_IOP;
 		}
 
-		k = -k;
-		// last digit is (k + exponent - 1)
-		k += (exp - 1);
-
-		// round up the last significant mantissa digit
-		if (ch[k+1] >= '5')
+		u64 quot = 0;
+		if (ndigits < 0)
 		{
-			ch[k]++;
-		}
-
-		// zero out the rest of the mantissa digits
-		for (j = (k+1); j < 16; j++)
-		{
-			ch[j] = '0';
-		}
-
-		// now zero out K to avoid tripping the positive K detection below
-		k = 0;
-	}
-
-	// crack 8 digits of the mantissa
-	for (i = 0; i < 8; i++)
-	{
-		dw2 <<= 4;
-		if (*ch >= '0' && *ch <= '9')
-		{
-			dw2 |= *ch++ - '0';
-		}
-	}
-
-	// next 8 digits of the mantissa
-	for (i = 0; i < 8; i++)
-	{
-		dw3 <<= 4;
-		if (*ch >= '0' && *ch <= '9')
-		dw3 |= *ch++ - '0';
-	}
-
-	// handle masking if k is positive
-	if (k >= 1)
-	{
-		if (k <= 17)
-		{
-			dw2 &= pkmask2[k];
-			dw3 &= pkmask3[k];
+			// the entire value is below the rounding point
+			if (rmode == softfloat_round_max)
+			{
+				quot = 1;
+			}
 		}
 		else
 		{
-			dw2 &= pkmask2[17];
-			dw3 &= pkmask3[17];
-//          m_fpcr |=  (need to set OPERR bit)
-		}
-	}
-
-	// finally, crack the exponent
-	if (*ch == 'e' || *ch == 'E')
-	{
-		ch++;
-		if (*ch == '-')
-		{
-			ch++;
-			dw1 |= 0x40000000;
-		}
-
-		if (*ch == '+')
-		{
-			ch++;
-		}
-
-		j = 0;
-		for (i = 0; i < 3; i++)
-		{
-			if (*ch >= '0' && *ch <= '9')
+			const u64 div = pow10_u64[18 - ndigits];
+			const u64 rem = t % div;
+			quot = t / div;
+			switch (rmode)
 			{
-				j = (j << 4) | (*ch++ - '0');
+			case softfloat_round_near_even:
+				if (rem > div / 2 || (rem == div / 2 && (sticky || (quot & 1) != 0)))
+				{
+					quot++;
+				}
+				break;
+			case softfloat_round_max:
+				if (rem != 0 || sticky)
+				{
+					quot++;
+				}
+				break;
+			default:    // round_minMag, round_min: truncate
+				break;
 			}
 		}
 
-		dw1 |= (j << 16);
+		if (quot != 0)
+		{
+			// a carry out of the top digit leaves an 18 digit result with
+			// only trailing zeros to drop
+			if (quot == pow10_u64[17])
+			{
+				quot = pow10_u64[16];
+				lsd++;
+			}
+
+			int digits = 1;
+			while (quot >= pow10_u64[digits])
+			{
+				digits++;
+			}
+			decexp = lsd + digits - 1;
+
+			const int aexp = (decexp < 0) ? -decexp : decexp;
+			if (decexp < 0)
+			{
+				dw1 |= 0x40000000;
+			}
+			// a fourth exponent digit only occurs for huge magnitudes and
+			// goes in bits 15-12, as the 68040 FPSP does
+			dw1 |= ((aexp / 1000) % 10) << 12;
+			dw1 |= ((aexp / 100) % 10) << 24;
+			dw1 |= ((aexp / 10) % 10) << 20;
+			dw1 |= (aexp % 10) << 16;
+			dw1 |= (u32)(quot / pow10_u64[digits - 1]);
+
+			for (int j = 1; j < digits; j++)
+			{
+				const u32 digit = (u32)((quot / pow10_u64[digits - 1 - j]) % 10);
+				if (j <= 8)
+				{
+					dw2 |= digit << (4 * (8 - j));
+				}
+				else
+				{
+					dw3 |= digit << (4 * (16 - j));
+				}
+			}
+		}
 	}
 
 	m68ki_write_32(ea, dw1);
@@ -302,30 +422,67 @@ void m68000_musashi_device::set_condition_codes(extFloat80_t reg)
 void m68000_musashi_device::clear_exception_flags()
 {
 	softfloat_exceptionFlags = 0;
-	m_fpsr &= ~(FPES_SNAN | FPES_OPERR | FPES_OVERFLOW | FPES_UNDERFLOW | FPES_DIVZERO | FPAE_DIVZERO | FPAE_INEXACT | FPAE_OPERR | FPAE_OVERFLOW | FPAE_UNDERFLOW | FPES_INEXDEC);
+	// only the exception status byte clears at the start of an operation;
+	// the accrued byte is sticky until the FPSR is written directly
+	m_fpsr &= ~(FPES_BSUN | FPES_SNAN | FPES_OPERR | FPES_OVERFLOW | FPES_UNDERFLOW | FPES_DIVZERO | FPES_INEXACT | FPES_INEXDEC);
+}
+
+// fold the exception status byte into the sticky accrued exception byte
+// using the 68881/68882 mapping
+void m68000_musashi_device::update_accrued_exceptions()
+{
+	if (m_fpsr & (FPES_BSUN | FPES_SNAN | FPES_OPERR))
+	{
+		m_fpsr |= FPAE_IOP;
+	}
+	if (m_fpsr & FPES_OVERFLOW)
+	{
+		m_fpsr |= FPAE_OVERFLOW;
+	}
+	if ((m_fpsr & FPES_UNDERFLOW) && (m_fpsr & FPES_INEXACT))
+	{
+		m_fpsr |= FPAE_UNDERFLOW;
+	}
+	if (m_fpsr & FPES_DIVZERO)
+	{
+		m_fpsr |= FPAE_DIVZERO;
+	}
+	if (m_fpsr & (FPES_INEXACT | FPES_INEXDEC | FPES_OVERFLOW))
+	{
+		m_fpsr |= FPAE_INEXACT;
+	}
 }
 
 void m68000_musashi_device::sync_exception_flags(extFloat80_t op1, extFloat80_t op2, u32 enables)
 {
-	if (extF80_isSignalingNaN(op1) || extF80_isSignalingNaN(op2))
+	const bool snan = extF80_isSignalingNaN(op1) || extF80_isSignalingNaN(op2);
+	if (snan)
 	{
 		m_fpsr |= FPES_SNAN;
 	}
 
+	// an invalid operation that isn't a signaling NaN is an operand error
+	if ((softfloat_exceptionFlags & softfloat_flag_invalid) && !snan)
+	{
+		m_fpsr |= FPES_OPERR;
+	}
+
 	if ((enables & EXC_ENB_INEXACT) && (softfloat_exceptionFlags & softfloat_flag_inexact))
 	{
-		m_fpsr |= FPES_INEXACT | FPAE_INEXACT;
+		m_fpsr |= FPES_INEXACT;
 	}
 
 	if ((enables & EXC_ENB_UNDFLOW) && (softfloat_exceptionFlags & softfloat_flag_underflow))
 	{
-		m_fpsr |= FPES_UNDERFLOW | FPAE_UNDERFLOW;
+		m_fpsr |= FPES_UNDERFLOW;
 	}
 
 	if ((enables & EXC_ENB_OVRFLOW) && (softfloat_exceptionFlags & softfloat_flag_overflow))
 	{
-		m_fpsr |= FPES_OVERFLOW | FPAE_OVERFLOW;
+		m_fpsr |= FPES_OVERFLOW;
 	}
+
+	update_accrued_exceptions();
 }
 
 int m68000_musashi_device::test_condition(int condition)
@@ -334,6 +491,12 @@ int m68000_musashi_device::test_condition(int condition)
 	int z = (m_fpsr & FPCC_Z) != 0;
 	int nan = (m_fpsr & FPCC_NAN) != 0;
 	int r = 0;
+
+	// the IEEE-nonaware predicates signal BSUN on an unordered condition
+	if ((condition & 0x10) && nan)
+	{
+		m_fpsr |= FPES_BSUN | FPAE_IOP;
+	}
 	switch (condition)
 	{
 		case 0x10:
@@ -394,16 +557,22 @@ s32 m68000_musashi_device::convert_to_int(extFloat80_t source, s32 lowerLimit, s
 {
 	clear_exception_flags();
 	s32 result = extF80_to_i32(source, softfloat_roundingMode, true);
+	if (softfloat_exceptionFlags & softfloat_flag_invalid)
+	{
+		// overflow or NaN: the library's saturation value is x86 flavored,
+		// the hardware stores the largest value of the source's sign
+		result = BIT(source.signExp, 15) ? lowerLimit : upperLimit;
+	}
 	sync_exception_flags(source, source, EXC_ENB_INEXACT);
 	if (result < lowerLimit)
 	{
 		result = lowerLimit;
-		m_fpsr |= FPES_INEXACT | FPAE_INEXACT;
+		m_fpsr |= FPES_OPERR | FPAE_IOP;
 	}
 	else if (result > upperLimit)
 	{
 		result = upperLimit;
-		m_fpsr |= FPES_INEXACT | FPAE_INEXACT;
+		m_fpsr |= FPES_OPERR | FPAE_IOP;
 	}
 
 	return result;
@@ -451,7 +620,7 @@ u8 m68000_musashi_device::READ_EA_8(int ea)
 			{
 				case 0:     // (xxx).W
 				{
-					u32 ea = OPER_I_16();
+					u32 ea = EA_AW_8();
 					return m68ki_read_8(ea);
 				}
 				case 1:     // (xxx).L
@@ -527,7 +696,7 @@ u16 m68000_musashi_device::READ_EA_16(int ea)
 			{
 				case 0:     // (xxx).W
 				{
-					u32 ea = OPER_I_16();
+					u32 ea = EA_AW_16();
 					return m68ki_read_16(ea);
 				}
 				case 1:     // (xxx).L
@@ -608,7 +777,7 @@ u32 m68000_musashi_device::READ_EA_32(int ea)
 			{
 				case 0:     // (xxx).W
 				{
-					u32 ea = OPER_I_16();
+					u32 ea = EA_AW_32();
 					return m68ki_read_32(ea);
 				}
 				case 1:     // (xxx).L
@@ -690,6 +859,13 @@ u64 m68000_musashi_device::READ_EA_64(int ea)
 		{
 			switch (reg)
 			{
+				case 0:     // (xxx).W
+				{
+					u32 ea = EA_AW_32();
+					h1 = m68ki_read_32(ea+0);
+					h2 = m68ki_read_32(ea+4);
+					return  (u64)(h1) << 32 | (u64)(h2);
+				}
 				case 1:     // (xxx).L
 				{
 					u32 d1 = OPER_I_16();
@@ -727,16 +903,66 @@ u64 m68000_musashi_device::READ_EA_64(int ea)
 	return 0;
 }
 
-extFloat80_t m68000_musashi_device::READ_EA_FPE(int mode, int reg, uint32_t offset)
+// Compute the address for a control-mode <ea>, reading any extension words.
+// This must happen exactly once per instruction, before FMOVEM's register
+// loop; the loop then advances the returned address itself.  (An)+, -(An)
+// and #<data> have per-transfer side effects instead and are resolved by
+// READ_EA_FPE/WRITE_EA_FPE.
+u32 m68000_musashi_device::GET_EA_FPE(int mode, int reg)
+{
+	switch (mode)
+	{
+		case 2:     // (An)
+			return REG_A()[reg];
+
+		case 3:     // (An)+
+		case 4:     // -(An)
+			return 0;
+
+		case 5:     // (d16, An)
+			return EA_AY_DI_32();
+
+		case 6:     // (An) + (Xn) + d8
+			return EA_AY_IX_32();
+
+		case 7:
+			switch (reg)
+			{
+				case 0:     // (xxx).W
+					return EA_AW_32();
+
+				case 1:     // (xxx).L
+					return EA_AL_32();
+
+				case 2:     // (d16, PC)
+					return EA_PCDI_32();
+
+				case 3:     // (d8, PC, Xn)
+					return EA_PCIX_32();
+
+				case 4:     // #<data>
+					return 0;
+			}
+			break;
+
+		default:
+			break;
+	}
+
+	fatalerror("M68kFPU: GET_EA_FPE: unhandled mode %d, reg %d at %08X\n", mode, reg, m_pc);
+}
+
+extFloat80_t m68000_musashi_device::READ_EA_FPE(int mode, int reg, u32 address)
 {
 	extFloat80_t fpr;
 
 	switch (mode)
 	{
 		case 2:     // (An)
+		case 5:     // (d16, An)
+		case 6:     // (An) + (Xn) + d8
 		{
-			u32 ea = REG_A()[reg];
-			fpr = load_extended_float80(ea + offset);
+			fpr = load_extended_float80(address);
 			break;
 		}
 
@@ -749,53 +975,20 @@ extFloat80_t m68000_musashi_device::READ_EA_FPE(int mode, int reg, uint32_t offs
 		}
 		case 4:     // -(An)
 		{
-			u32 ea = REG_A()[reg]-12;
 			REG_A()[reg] -= 12;
-			fpr = load_extended_float80(ea);
+			fpr = load_extended_float80(REG_A()[reg]);
 			break;
 		}
-		case 5:     // (d16, An)
-		{
-			u32 ea = REG_A()[reg];
-			fpr = load_extended_float80(ea + offset);
-			break;
-		}
-#if 0
-		// FIXME: this addressing mode is broken, and fixing it so it works properly
-		// for FMOVEM is quite challenging; disabling it for now.
-		case 6:     // (An) + (Xn) + d8
-		{
-			u32 ea = REG_A()[reg];
-			fpr = load_extended_float80(ea + offset);
-			break;
-		}
-#endif
 
 		case 7: // extended modes
 		{
 			switch (reg)
 			{
-				case 1:     // (xxx)
-					{
-						u32 d1 = OPER_I_16();
-						u32 d2 = OPER_I_16();
-						u32 ea = (d1 << 16) | d2;
-						fpr = load_extended_float80(ea);
-					}
-					break;
-
-				case 2: // (d16, PC)
-					{
-						u32 ea = EA_PCDI_32();
-						fpr = load_extended_float80(ea);
-					}
-					break;
-
-				case 3: // (d16,PC,Dx.w)
-					{
-						u32 ea = EA_PCIX_32();
-						fpr = load_extended_float80(ea);
-					}
+				case 0:     // (xxx).W
+				case 1:     // (xxx).L
+				case 2:     // (d16, PC)
+				case 3:     // (d8, PC, Xn)
+					fpr = load_extended_float80(address);
 					break;
 
 				case 4:     // #<data>
@@ -816,18 +1009,17 @@ extFloat80_t m68000_musashi_device::READ_EA_FPE(int mode, int reg, uint32_t offs
 	return fpr;
 }
 
-extFloat80_t m68000_musashi_device::READ_EA_PACK(int ea)
+extFloat80_t m68000_musashi_device::READ_EA_PACK(int mode, int reg, u32 address)
 {
 	extFloat80_t fpr;
-	int mode = (ea >> 3) & 0x7;
-	int reg = (ea & 0x7);
 
 	switch (mode)
 	{
 		case 2:     // (An)
+		case 5:     // (d16, An)
+		case 6:     // (An) + (Xn) + d8
 		{
-			u32 ea = REG_A()[reg];
-			fpr = load_pack_float80(ea);
+			fpr = load_pack_float80(address);
 			break;
 		}
 
@@ -838,16 +1030,27 @@ extFloat80_t m68000_musashi_device::READ_EA_PACK(int ea)
 			fpr = load_pack_float80(ea);
 			break;
 		}
+		case 4:     // -(An)
+		{
+			REG_A()[reg] -= 12;
+			fpr = load_pack_float80(REG_A()[reg]);
+			break;
+		}
 
 		case 7: // extended modes
 		{
 			switch (reg)
 			{
-				case 3: // (d16,PC,Dx.w)
-					{
-						u32 ea = EA_PCIX_32();
-						fpr = load_pack_float80(ea);
-					}
+				case 0:     // (xxx).W
+				case 1:     // (xxx).L
+				case 2:     // (d16, PC)
+				case 3:     // (d8, PC, Xn)
+					fpr = load_pack_float80(address);
+					break;
+
+				case 4:     // #<data>
+					fpr = load_pack_float80(m_pc);
+					m_pc += 12;
 					break;
 
 				default:
@@ -910,7 +1113,13 @@ void m68000_musashi_device::WRITE_EA_8(int ea, u8 data)
 		{
 			switch (reg)
 			{
-				case 1:     // (xxx).B
+				case 0:     // (xxx).W
+				{
+					u32 ea = EA_AW_8();
+					m68ki_write_8(ea, data);
+					break;
+				}
+				case 1:     // (xxx).L
 				{
 					u32 d1 = OPER_I_16();
 					u32 d2 = OPER_I_16();
@@ -979,7 +1188,13 @@ void m68000_musashi_device::WRITE_EA_16(int ea, u16 data)
 		{
 			switch (reg)
 			{
-				case 1:     // (xxx).W
+				case 0:     // (xxx).W
+				{
+					u32 ea = EA_AW_16();
+					m68ki_write_16(ea, data);
+					break;
+				}
+				case 1:     // (xxx).L
 				{
 					u32 d1 = OPER_I_16();
 					u32 d2 = OPER_I_16();
@@ -1054,7 +1269,7 @@ void m68000_musashi_device::WRITE_EA_32(int ea, u32 data)
 			{
 				case 0:     // (xxx).W
 				{
-					u32 ea = OPER_I_16();
+					u32 ea = EA_AW_32();
 					m68ki_write_32(ea, data);
 					break;
 				}
@@ -1129,6 +1344,13 @@ void m68000_musashi_device::WRITE_EA_64(int ea, u64 data)
 		{
 			switch (reg)
 			{
+				case 0:     // (xxx).W
+				{
+					u32 ea = EA_AW_32();
+					m68ki_write_32(ea+0, (u32)(data >> 32));
+					m68ki_write_32(ea+4, (u32)(data));
+					break;
+				}
 				case 1:     // (xxx).L
 				{
 					u32 d1 = OPER_I_16();
@@ -1153,14 +1375,15 @@ void m68000_musashi_device::WRITE_EA_64(int ea, u64 data)
 	}
 }
 
-void m68000_musashi_device::WRITE_EA_FPE(int mode, int reg, extFloat80_t fpr, uint32_t offset)
+void m68000_musashi_device::WRITE_EA_FPE(int mode, int reg, extFloat80_t fpr, u32 address)
 {
 	switch (mode)
 	{
 		case 2:     // (An)
+		case 5:     // (d16,An)
+		case 6:     // (An) + (Xn) + d8
 		{
-			u32 ea = REG_A()[reg];
-			store_extended_float80(ea + offset, fpr);
+			store_extended_float80(address, fpr);
 			break;
 		}
 
@@ -1180,54 +1403,47 @@ void m68000_musashi_device::WRITE_EA_FPE(int mode, int reg, extFloat80_t fpr, ui
 			break;
 		}
 
-		case 5:     // (d16,An)
-		{
-			u32 ea = REG_A()[reg];
-			store_extended_float80(ea + offset, fpr);
-			break;
-		}
-
 		case 7:
 		{
 			switch (reg)
 			{
+				case 0:     // (xxx).W
+				case 1:     // (xxx).L
+					store_extended_float80(address, fpr);
+					break;
+
+				// PC-relative and immediate destinations are illegal
 				default:    fatalerror("M68kFPU: WRITE_EA_FPE: unhandled mode %d, reg %d, at %08X\n", mode, reg, m_pc);
 			}
+			break;
 		}
 		default:    fatalerror("M68kFPU: WRITE_EA_FPE: unhandled mode %d, reg %d, at %08X\n", mode, reg, m_pc);
 	}
 }
 
-void m68000_musashi_device::WRITE_EA_PACK(int ea, int k, extFloat80_t fpr)
+void m68000_musashi_device::WRITE_EA_PACK(int mode, int reg, int k, extFloat80_t fpr, u32 address)
 {
-	int mode = (ea >> 3) & 0x7;
-	int reg = (ea & 0x7);
-
 	switch (mode)
 	{
 		case 2:     // (An)
+		case 5:     // (d16,An)
+		case 6:     // (An) + (Xn) + d8
 		{
-			u32 ea;
-			ea = REG_A()[reg];
-			store_pack_float80(ea, k, fpr);
+			store_pack_float80(address, k, fpr);
 			break;
 		}
 
 		case 3:     // (An)+
 		{
-			u32 ea;
-			ea = REG_A()[reg];
-			store_pack_float80(ea, k, fpr);
+			store_pack_float80(REG_A()[reg], k, fpr);
 			REG_A()[reg] += 12;
 			break;
 		}
 
 		case 4:     // -(An)
 		{
-			u32 ea;
 			REG_A()[reg] -= 12;
-			ea = REG_A()[reg];
-			store_pack_float80(ea, k, fpr);
+			store_pack_float80(REG_A()[reg], k, fpr);
 			break;
 		}
 
@@ -1235,8 +1451,15 @@ void m68000_musashi_device::WRITE_EA_PACK(int ea, int k, extFloat80_t fpr)
 		{
 			switch (reg)
 			{
+				case 0:     // (xxx).W
+				case 1:     // (xxx).L
+					store_pack_float80(address, k, fpr);
+					break;
+
+				// PC-relative and immediate destinations are illegal
 				default:    fatalerror("M68kFPU: WRITE_EA_PACK: unhandled mode %d, reg %d, at %08X\n", mode, reg, m_pc);
 			}
+			break;
 		}
 		default:    fatalerror("M68kFPU: WRITE_EA_PACK: unhandled mode %d, reg %d, at %08X\n", mode, reg, m_pc);
 	}
@@ -1244,6 +1467,9 @@ void m68000_musashi_device::WRITE_EA_PACK(int ea, int k, extFloat80_t fpr)
 
 void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 {
+	// arithmetic instructions record their address for exception handlers
+	m_fpiar = m_ppc;
+
 	int ea = m_ir & 0x3f;
 	int rm = (w2 >> 14) & 0x1;
 	int src = (w2 >> 10) & 0x7;
@@ -1265,22 +1491,23 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 			}
 			case 1:     // Single-precision Real
 			{
-				u32 d = READ_EA_32(ea);
-				float32_t *pF = (float32_t *)&d;
-				source = f32_to_extF80(*pF);
+				source = f32_to_extF80(std::bit_cast<float32_t>(READ_EA_32(ea)));
 				break;
 			}
 			case 2:     // Extended-precision Real
 			{
 				int imode = (ea >> 3) & 0x7;
 				int reg = (ea & 0x7);
-				uint32_t offset = (imode == 5) ? MAKE_INT_16(m68ki_read_imm_16()) : 0;
-				source = READ_EA_FPE(imode, reg, offset);
+				u32 address = GET_EA_FPE(imode, reg);
+				source = READ_EA_FPE(imode, reg, address);
 				break;
 			}
 			case 3:     // Packed-decimal Real
 			{
-				source = READ_EA_PACK(ea);
+				int imode = (ea >> 3) & 0x7;
+				int reg = (ea & 0x7);
+				u32 address = GET_EA_FPE(imode, reg);
+				source = READ_EA_PACK(imode, reg, address);
 				break;
 			}
 			case 4:     // Word Integer
@@ -1291,9 +1518,7 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 			}
 			case 5:     // Double-precision Real
 			{
-				u64 d = READ_EA_64(ea);
-				float64_t *pF = (float64_t *)&d;
-				source = f64_to_extF80(*pF);
+				source = f64_to_extF80(std::bit_cast<float64_t>(READ_EA_64(ea)));
 				break;
 			}
 			case 6:     // Byte Integer
@@ -1450,8 +1675,7 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 		}
 		case 0x01:      // FINT
 		{
-			s32 temp = convert_to_int(source, INT32_MIN, INT32_MAX);
-			m_fpr[dst] = i32_to_extF80(temp);
+			m_fpr[dst] = extF80_roundToInt(source, softfloat_roundingMode, true);
 			set_condition_codes(m_fpr[dst]);
 			sync_exception_flags(source, source, EXC_ENB_INEXACT);
 			m_icount -= 78;
@@ -1459,10 +1683,9 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 		}
 		case 0x03:      // FINTRZ
 		{
-			s32 temp = extF80_to_i32_r_minMag(source, true);
-			m_fpr[dst] = i32_to_extF80(temp);
+			m_fpr[dst] = extF80_roundToInt(source, softfloat_round_minMag, true);
 			set_condition_codes(m_fpr[dst]);
-			sync_exception_flags(source, source, 0);
+			sync_exception_flags(source, source, EXC_ENB_INEXACT);
 			m_icount -= 78;
 			break;
 		}
@@ -1494,7 +1717,11 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 		case 0x0e:      // FSIN
 		{
 			m_fpr[dst] = source;
-			extFloat80_sin(m_fpr[dst]);
+			if (extFloat80_sin(m_fpr[dst]) == -1)
+			{
+				reduce_trig_argument(m_fpr[dst]);
+				extFloat80_sin(m_fpr[dst]);
+			}
 			set_condition_codes(m_fpr[dst]);
 			sync_exception_flags(source, source, EXC_ENB_INEXACT | EXC_ENB_UNDFLOW);
 			m_icount -= 414;
@@ -1503,7 +1730,11 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 		case 0x0f:      // FTAN
 		{
 			m_fpr[dst] = source;
-			extFloat80_tan(m_fpr[dst]);
+			if (extFloat80_tan(m_fpr[dst]) == -1)
+			{
+				reduce_trig_argument(m_fpr[dst]);
+				extFloat80_tan(m_fpr[dst]);
+			}
 			set_condition_codes(m_fpr[dst]);
 			sync_exception_flags(source, source, EXC_ENB_INEXACT | EXC_ENB_OVRFLOW | EXC_ENB_UNDFLOW);
 			m_icount -= 496;
@@ -1552,7 +1783,11 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 		case 0x1d:      // FCOS
 		{
 			m_fpr[dst] = source;
-			extFloat80_cos(m_fpr[dst]);
+			if (extFloat80_cos(m_fpr[dst]) == -1)
+			{
+				reduce_trig_argument(m_fpr[dst]);
+				extFloat80_cos(m_fpr[dst]);
+			}
 			set_condition_codes(m_fpr[dst]);
 			sync_exception_flags(source, source, EXC_ENB_INEXACT);
 			m_icount -= 414;
@@ -1560,11 +1795,33 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 		}
 		case 0x1e:      // FGETEXP
 		{
-			s16 temp2;
-
-			temp2 = source.signExp;    // get the exponent
-			temp2 -= 0x3fff;    // take off the bias
-			m_fpr[dst] = double_to_fx80((double)temp2);
+			const int exp = source.signExp & 0x7fff;
+			if (exp == 0x7fff)
+			{
+				// infinity is an operand error; NaNs propagate quieted
+				if ((source.signif << 1) == 0)
+				{
+					m_fpr[dst].signExp = 0x7fff;
+					m_fpr[dst].signif = 0xffffffffffffffffU;
+					m_fpsr |= FPES_OPERR | FPAE_IOP;
+				}
+				else
+				{
+					m_fpr[dst] = source;
+					m_fpr[dst].signif |= 0x4000000000000000U;
+				}
+			}
+			else if (source.signif == 0 && exp == 0)
+			{
+				// zero returns zero with the source sign
+				m_fpr[dst] = source;
+			}
+			else
+			{
+				// remove the bias; denormals count their leading zeroes
+				const s32 temp2 = (s32)(exp != 0 ? exp : 1) - 0x3fff - std::countl_zero(source.signif);
+				m_fpr[dst] = double_to_fx80((double)temp2);
+			}
 			LOGMASKED(LOG_INSTRUCTIONS_VERBOSE, "FGETEXP: %f\n", fx80_to_double(m_fpr[dst]));
 			set_condition_codes(m_fpr[dst]);
 			sync_exception_flags(source, source, 0); // only NaNs can raise an exception here
@@ -1592,7 +1849,7 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 			sngDst = f32_div(sngDst, sngSrc);
 			m_fpr[dst] = f32_to_extF80(sngDst);
 			set_condition_codes(m_fpr[dst]);
-			sync_exception_flags(source, dstCopy, EXC_ENB_OVRFLOW | EXC_ENB_UNDFLOW);
+			sync_exception_flags(source, dstCopy, EXC_ENB_INEXACT | EXC_ENB_OVRFLOW | EXC_ENB_UNDFLOW);
 			m_icount -= 124;
 			break;
 		}
@@ -1608,7 +1865,7 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 			sngDst = f64_div(sngDst, sngSrc);
 			m_fpr[dst] = f64_to_extF80(sngDst);
 			set_condition_codes(m_fpr[dst]);
-			sync_exception_flags(source, dstCopy, EXC_ENB_OVRFLOW | EXC_ENB_UNDFLOW);
+			sync_exception_flags(source, dstCopy, EXC_ENB_INEXACT | EXC_ENB_OVRFLOW | EXC_ENB_UNDFLOW);
 			m_icount -= 130;
 			break;
 		}
@@ -1620,7 +1877,7 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 			}
 			m_fpr[dst] = extF80_div(m_fpr[dst], source);
 			set_condition_codes(m_fpr[dst]);
-			sync_exception_flags(source, dstCopy, EXC_ENB_OVRFLOW|EXC_ENB_UNDFLOW);
+			sync_exception_flags(source, dstCopy, EXC_ENB_INEXACT|EXC_ENB_OVRFLOW|EXC_ENB_UNDFLOW);
 			m_icount -= 128;
 			break;
 		}
@@ -1634,7 +1891,8 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 			softfloat_roundingMode = mode;
 			m_fpsr &= 0xff00ffff;
 			m_fpsr |= (quotient & 0x7f) << 16;
-			if (m_fpr[dst].signExp & 0x8000)
+			// the sign bit is the quotient's sign, not the remainder's
+			if ((dstCopy.signExp ^ source.signExp) & 0x8000)
 			{
 				m_fpsr |= 0x00800000;
 			}
@@ -1645,7 +1903,7 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 		{
 			m_fpr[dst] = extF80_add(m_fpr[dst], source);
 			set_condition_codes(m_fpr[dst]);
-			sync_exception_flags(source, dstCopy, EXC_ENB_OVRFLOW|EXC_ENB_UNDFLOW);
+			sync_exception_flags(source, dstCopy, EXC_ENB_INEXACT|EXC_ENB_OVRFLOW|EXC_ENB_UNDFLOW);
 			LOGMASKED(LOG_INSTRUCTIONS_VERBOSE, "FADD: %f + %f = %f\n", fx80_to_double(dstCopy), fx80_to_double(source), fx80_to_double(m_fpr[dst]));
 			m_icount -= 76;
 			break;
@@ -1655,7 +1913,7 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 		{
 			m_fpr[dst] = extF80_mul(m_fpr[dst], source);
 			set_condition_codes(m_fpr[dst]);
-			sync_exception_flags(source, dstCopy, EXC_ENB_UNDFLOW);
+			sync_exception_flags(source, dstCopy, EXC_ENB_INEXACT|EXC_ENB_OVRFLOW|EXC_ENB_UNDFLOW);
 			LOGMASKED(LOG_INSTRUCTIONS_VERBOSE, "FMUL: %f * %f = %f\n", fx80_to_double(dstCopy), fx80_to_double(source), fx80_to_double(m_fpr[dst]));
 			m_icount -= 96;
 			break;
@@ -1681,7 +1939,8 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 			softfloat_roundingMode = mode;
 			m_fpsr &= 0xff00ffff;
 			m_fpsr |= (quotient & 0x7f) << 16;
-			if (m_fpr[dst].signExp & 0x8000)
+			// the sign bit is the quotient's sign, not the remainder's
+			if ((dstCopy.signExp ^ source.signExp) & 0x8000)
 			{
 				m_fpsr |= 0x00800000;
 			}
@@ -1692,7 +1951,7 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 		{
 			m_fpr[dst] = extFloat80_scale(m_fpr[dst], source);
 			set_condition_codes(m_fpr[dst]);
-			sync_exception_flags(source, dstCopy, EXC_ENB_OVRFLOW | EXC_ENB_UNDFLOW);
+			sync_exception_flags(source, dstCopy, EXC_ENB_INEXACT | EXC_ENB_OVRFLOW | EXC_ENB_UNDFLOW);
 			m_icount -= 66;
 			break;
 		}
@@ -1720,7 +1979,16 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 		case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35:
 		case 0x36: case 0x37: // FSINCOS
 		{
-			extFloat80_sincos(source, &m_fpr[dst], &m_fpr[w2 & 7]);
+			extFloat80_t sine, cosine;
+			if (extFloat80_sincos(source, &sine, &cosine) == -1)
+			{
+				extFloat80_t reduced = source;
+				reduce_trig_argument(reduced);
+				extFloat80_sincos(reduced, &sine, &cosine);
+			}
+			// the sine result wins when FPs and FPc name the same register
+			m_fpr[w2 & 7] = cosine;
+			m_fpr[dst] = sine;
 			set_condition_codes(m_fpr[dst]);    // CCs are set on the sin result
 			sync_exception_flags(source, dstCopy, EXC_ENB_INEXACT | EXC_ENB_UNDFLOW);
 			m_icount -= 474;
@@ -1729,11 +1997,31 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 
 		case 0x38: case 0x39: case 0x3c: case 0x3d:      // FCMP
 		{
-			const extFloat80_t res = extF80_sub(m_fpr[dst], source);
-			set_condition_codes(res);
+			// a true comparison, not a subtraction: equal infinities are
+			// equal, and quiet NaNs do not signal operand errors.  the
+			// infinity bit is always cleared by FCMP, and on equality N
+			// reflects the destination's sign (the operation table sets
+			// N|Z for -0 vs +0 and -inf vs -inf)
+			m_fpsr &= ~(FPCC_N | FPCC_Z | FPCC_I | FPCC_NAN);
+			if (extFloat80_is_nan(m_fpr[dst]) || extFloat80_is_nan(source))
+			{
+				m_fpsr |= FPCC_NAN;
+			}
+			else if (extF80_eq(m_fpr[dst], source))
+			{
+				m_fpsr |= FPCC_Z;
+				if (BIT(m_fpr[dst].signExp, 15))
+				{
+					m_fpsr |= FPCC_N;
+				}
+			}
+			else if (extF80_lt(m_fpr[dst], source))
+			{
+				m_fpsr |= FPCC_N;
+			}
 			sync_exception_flags(source, dstCopy, 0);
 
-			LOGMASKED(LOG_INSTRUCTIONS_VERBOSE, "FCMP: %f - %f = %f\n", fx80_to_double(dstCopy), fx80_to_double(source), fx80_to_double(res));
+			LOGMASKED(LOG_INSTRUCTIONS_VERBOSE, "FCMP: %f vs %f\n", fx80_to_double(dstCopy), fx80_to_double(source));
 			m_icount -= 58;
 			break;
 		}
@@ -1767,7 +2055,7 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 			m_fpr[dst] = extFloat80_2tox(source);
 			set_condition_codes(m_fpr[dst]);
 			sync_exception_flags(source, dstCopy, EXC_ENB_UNDFLOW);
-			printf("FTWOTOX: 2 ** %f = %f\n", fx80_to_double(source), fx80_to_double(m_fpr[dst]));
+			LOGMASKED(LOG_INSTRUCTIONS_VERBOSE, "FTWOTOX: 2 ** %f = %f\n", fx80_to_double(source), fx80_to_double(m_fpr[dst]));
 			m_icount -= 590;
 			break;
 		}
@@ -1787,6 +2075,9 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 
 void m68000_musashi_device::fmove_reg_mem(u16 w2)
 {
+	// arithmetic instructions record their address for exception handlers
+	m_fpiar = m_ppc;
+
 	int ea = m_ir & 0x3f;
 	int src = (w2 >>  7) & 0x7;
 	int dst = (w2 >> 10) & 0x7;
@@ -1802,9 +2093,9 @@ void m68000_musashi_device::fmove_reg_mem(u16 w2)
 		}
 		case 1:     // Single-precision Real
 		{
-			u32 d;
-			float32_t *pF = (float32_t *)&d;
-			*pF = extF80_to_f32(m_fpr[src]);
+			clear_exception_flags();
+			const u32 d = std::bit_cast<u32>(extF80_to_f32(m_fpr[src]));
+			sync_exception_flags(m_fpr[src], m_fpr[src], EXC_ENB_INEXACT | EXC_ENB_OVRFLOW | EXC_ENB_UNDFLOW);
 			WRITE_EA_32(ea, d);
 			break;
 		}
@@ -1812,16 +2103,17 @@ void m68000_musashi_device::fmove_reg_mem(u16 w2)
 		{
 			int mode = (ea >> 3) & 0x7;
 			int reg = (ea & 0x7);
-			uint32_t offset = (mode == 5) ? MAKE_INT_16(m68ki_read_imm_16()) : 0;
+			u32 address = GET_EA_FPE(mode, reg);
 
-			WRITE_EA_FPE(mode, reg, m_fpr[src], offset);
+			WRITE_EA_FPE(mode, reg, m_fpr[src], address);
 			break;
 		}
 		case 3:     // Packed-decimal Real with Static K-factor
 		{
-			// sign-extend k
-			k = (k & 0x40) ? (k | 0xffffff80) : (k & 0x7f);
-			WRITE_EA_PACK(ea, k, m_fpr[src]);
+			int mode = (ea >> 3) & 0x7;
+			int reg = (ea & 0x7);
+			u32 address = GET_EA_FPE(mode, reg);
+			WRITE_EA_PACK(mode, reg, util::sext(k, 7), m_fpr[src], address);
 			break;
 		}
 		case 4:     // Word Integer
@@ -1833,11 +2125,9 @@ void m68000_musashi_device::fmove_reg_mem(u16 w2)
 		}
 		case 5:     // Double-precision Real
 		{
-			u64 d;
-			float64_t *pF = (float64_t *)&d;
 			clear_exception_flags();
-			*pF = extF80_to_f64(m_fpr[src]);
-			sync_exception_flags(m_fpr[src], m_fpr[src], 0);
+			const u64 d = std::bit_cast<u64>(extF80_to_f64(m_fpr[src]));
+			sync_exception_flags(m_fpr[src], m_fpr[src], EXC_ENB_INEXACT | EXC_ENB_OVRFLOW | EXC_ENB_UNDFLOW);
 			WRITE_EA_64(ea, d);
 			break;
 		}
@@ -1849,12 +2139,51 @@ void m68000_musashi_device::fmove_reg_mem(u16 w2)
 		}
 		case 7:     // Packed-decimal Real with Dynamic K-factor
 		{
-			WRITE_EA_PACK(ea, REG_D()[k>>4], m_fpr[src]);
+			int mode = (ea >> 3) & 0x7;
+			int reg = (ea & 0x7);
+			u32 address = GET_EA_FPE(mode, reg);
+			// the k-factor is the low 7 bits of the data register, sign-extended
+			WRITE_EA_PACK(mode, reg, util::sext(REG_D()[(k >> 4) & 7], 7), m_fpr[src], address);
 			break;
 		}
 	}
 
 	m_icount -= 12;
+}
+
+void m68000_musashi_device::apply_fpcr_rounding()
+{
+	switch ((m_fpcr >> 6) & 3)
+	{
+	case 0: // Extend (X)
+		extF80_roundingPrecision = 80;
+		break;
+	case 1: // Single (S)
+		extF80_roundingPrecision = 32;
+		break;
+	case 2: // Double (D)
+		extF80_roundingPrecision = 64;
+		break;
+	case 3: // Undefined
+		extF80_roundingPrecision = 80;
+		break;
+	}
+
+	switch ((m_fpcr >> 4) & 3)
+	{
+	case 0: // To Nearest (RN)
+		softfloat_roundingMode = softfloat_round_near_even;
+		break;
+	case 1: // To Zero (RZ)
+		softfloat_roundingMode = softfloat_round_minMag;
+		break;
+	case 2: // To Minus Infinitiy (RM)
+		softfloat_roundingMode = softfloat_round_min;
+		break;
+	case 3: // To Plus Infinitiy (RP)
+		softfloat_roundingMode = softfloat_round_max;
+		break;
+	}
 }
 
 void m68000_musashi_device::fmove_fpcr(u16 w2)
@@ -1879,7 +2208,13 @@ void m68000_musashi_device::fmove_fpcr(u16 w2)
 		break;
 
 	case 3: // (An)+
+		break;
+
 	case 4: // -(An)
+		// An is decremented by the total size first, then the registers are
+		// transferred at ascending addresses.  FPCR is always lowest.
+		REG_A()[reg] -= 4 * std::popcount(u32(regsel));
+		address = REG_A()[reg];
 		break;
 
 	case 5: // (d16, An)
@@ -1895,7 +2230,7 @@ void m68000_musashi_device::fmove_fpcr(u16 w2)
 		switch (reg)
 		{
 		case 0: // (xxx).W
-			address = OPER_I_16();
+			address = EA_AW_32();
 			break;
 
 		case 1: // (xxx).L
@@ -1915,9 +2250,14 @@ void m68000_musashi_device::fmove_fpcr(u16 w2)
 
 		case 4: // #<data>
 		{
-			if (regsel & 4) m_fpcr = READ_EA_32(ea);
-			else if (regsel & 2) m_fpsr = READ_EA_32(ea);
-			else if (regsel & 1) m_fpiar = READ_EA_32(ea);
+			if (regsel & 4)
+			{
+				m_fpcr = OPER_I_32() & FPCR_WRITE_MASK;
+				apply_fpcr_rounding();
+			}
+			if (regsel & 2) m_fpsr = OPER_I_32() & FPSR_WRITE_MASK;
+			if (regsel & 1) m_fpiar = OPER_I_32();
+			m_icount -= 30;
 			return;
 		}
 
@@ -1938,7 +2278,6 @@ void m68000_musashi_device::fmove_fpcr(u16 w2)
 	case 0: // Dn
 	case 1: // An
 	case 3: // (An)+
-	case 4: // -(An)
 		if (dir)    // From system control reg to <ea>
 		{
 			if (regsel & 4) WRITE_EA_32(ea, m_fpcr);
@@ -1947,8 +2286,8 @@ void m68000_musashi_device::fmove_fpcr(u16 w2)
 		}
 		else        // From <ea> to system control reg
 		{
-			if (regsel & 4) m_fpcr = READ_EA_32(ea);
-			if (regsel & 2) m_fpsr = READ_EA_32(ea);
+			if (regsel & 4) m_fpcr = READ_EA_32(ea) & FPCR_WRITE_MASK;
+			if (regsel & 2) m_fpsr = READ_EA_32(ea) & FPSR_WRITE_MASK;
 			if (regsel & 1) m_fpiar = READ_EA_32(ea);
 		}
 		break;
@@ -1976,12 +2315,12 @@ void m68000_musashi_device::fmove_fpcr(u16 w2)
 		{
 			if (regsel & 4)
 			{
-				m_fpcr = m68ki_read_32(address);
+				m_fpcr = m68ki_read_32(address) & FPCR_WRITE_MASK;
 				address += 4;
 			}
 			if (regsel & 2)
 			{
-				m_fpsr = m68ki_read_32(address);
+				m_fpsr = m68ki_read_32(address) & FPSR_WRITE_MASK;
 				address += 4;
 			}
 			if (regsel & 1)
@@ -1993,50 +2332,9 @@ void m68000_musashi_device::fmove_fpcr(u16 w2)
 		break;
 	}
 
-	// FIXME: (2011-12-18 ost)
-	// rounding_mode and rounding_precision of softfloat.c should be set according to current fpcr
-	// but:  with this code on Apollo the following programs in /systest/fptest will fail:
-	// 1. Single Precision Whetstone will return wrong results never the less
-	// 2. Vector Test will fault with 00040004: reference to illegal address
-
 	if ((regsel & 4) && dir == 0)
 	{
-		int rnd = (m_fpcr >> 4) & 3;
-		int prec = (m_fpcr >> 6) & 3;
-
-		//      logerror("fmove_fpcr: fpcr=%04x prec=%d rnd=%d\n", m_fpcr, prec, rnd);
-
-		switch (prec)
-		{
-		case 0: // Extend (X)
-			extF80_roundingPrecision = 80;
-			break;
-		case 1: // Single (S)
-			extF80_roundingPrecision = 32;
-			break;
-		case 2: // Double (D)
-			extF80_roundingPrecision = 64;
-			break;
-		case 3: // Undefined
-			extF80_roundingPrecision = 80;
-			break;
-		}
-
-		switch (rnd)
-		{
-		case 0: // To Nearest (RN)
-			softfloat_roundingMode = softfloat_round_near_even;
-			break;
-		case 1: // To Zero (RZ)
-			softfloat_roundingMode = softfloat_round_minMag;
-			break;
-		case 2: // To Minus Infinitiy (RM)
-			softfloat_roundingMode = softfloat_round_min;
-			break;
-		case 3: // To Plus Infinitiy (RP)
-			softfloat_roundingMode = softfloat_round_max;
-			break;
-		}
+		apply_fpcr_rounding();
 	}
 
 	m_icount -= 30;
@@ -2059,20 +2357,19 @@ void m68000_musashi_device::fmovem(u16 w2)
 				[[fallthrough]];
 			case 0: // static register list, predecrement addressing mode
 			{
-				// the "di_mode_ea" parameter kludge is required here else WRITE_EA_FPE would have
-				// to call EA_AY_DI_32() (that advances PC & reads displacement) each time
-				// when the proper behaviour is 1) read once, 2) increment ea for each matching register
-				// this forces to pre-read the mode (named "imode") so we can decide to read displacement, only once
 				int imode = (ea >> 3) & 0x7;
 				int reg = (ea & 0x7);
-				uint32_t offset = (imode == 5) ? MAKE_INT_16(m68ki_read_imm_16()) : 0;
+				u32 address = GET_EA_FPE(imode, reg);
 
-				for (i=0; i < 8; i++)
+				// the predecrement list has FP0 at bit 0; the transfer order is
+				// FP7 first at descending addresses, so FP0 ends up at the
+				// lowest address
+				for (i = 7; i >= 0; i--)
 				{
 					if (reglist & (1 << i))
 					{
-						WRITE_EA_FPE(imode, reg, m_fpr[i], offset);
-						offset += 12;
+						WRITE_EA_FPE(imode, reg, m_fpr[i], address);
+						address += 12;
 
 						m_icount -= 2;
 					}
@@ -2087,14 +2384,16 @@ void m68000_musashi_device::fmovem(u16 w2)
 			{
 				int imode = (ea >> 3) & 0x7;
 				int reg = (ea & 0x7);
-				uint32_t offset = (imode == 5) ? MAKE_INT_16(m68ki_read_imm_16()) : 0;
+				u32 address = GET_EA_FPE(imode, reg);
 
-				for (i=0; i < 8; i++)
+				// the postincrement/control list has FP0 at bit 7; the transfer
+				// order is FP0 first at ascending addresses
+				for (i = 0; i < 8; i++)
 				{
-					if (reglist & (1 << i))
+					if (reglist & (0x80 >> i))
 					{
-						WRITE_EA_FPE(imode, reg, m_fpr[7 - i], offset);
-						offset += 12;
+						WRITE_EA_FPE(imode, reg, m_fpr[i], address);
+						address += 12;
 
 						m_icount -= 2;
 					}
@@ -2117,14 +2416,16 @@ void m68000_musashi_device::fmovem(u16 w2)
 			{
 				int imode = (ea >> 3) & 0x7;
 				int reg = (ea & 0x7);
-				uint32_t offset = (imode == 5) ? MAKE_INT_16(m68ki_read_imm_16()) : 0;
+				u32 address = GET_EA_FPE(imode, reg);
 
-				for (i=0; i < 8; i++)
+				// the postincrement/control list has FP0 at bit 7; the transfer
+				// order is FP0 first at ascending addresses
+				for (i = 0; i < 8; i++)
 				{
-					if (reglist & (1 << i))
+					if (reglist & (0x80 >> i))
 					{
-						m_fpr[7 - i] = READ_EA_FPE(imode, reg, offset);
-						offset += 12;
+						m_fpr[i] = READ_EA_FPE(imode, reg, address);
+						address += 12;
 
 						m_icount -= 2;
 					}
@@ -2137,31 +2438,42 @@ void m68000_musashi_device::fmovem(u16 w2)
 	}
 }
 
-void m68000_musashi_device::fscc()
+void m68000_musashi_device::fdbcc()
 {
-	const int mode = (m_ir & 0x38) >> 3;
+	m_fpu_just_reset = 0;
+
 	const int condition = OPER_I_16() & 0x3f;
-	const int v = (test_condition(condition) ? 0xff : 0x00);
 
-	switch (mode)
+	if (!test_condition(condition))
 	{
-		case 0: // Dx (handled specially because it only changes the low byte of Dx)
-			{
-				const int reg = m_ir & 7;
-				REG_D()[reg] = (REG_D()[reg] & 0xffffff00) | v;
-			}
-			break;
+		u32 *r_dst = &REG_D()[m_ir & 7];
+		const u32 res = MASK_OUT_ABOVE_16(*r_dst - 1);
 
-		default:
-			WRITE_EA_8(m_ir & 0x3f, v);
-			break;
+		*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+		if (res != 0xffff)
+		{
+			const u32 offset = OPER_I_16();
+			m_pc -= 2;
+			m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+			m68ki_branch_16(offset);
+		}
+		else
+		{
+			m_pc += 2;
+		}
+	}
+	else
+	{
+		m_pc += 2;
 	}
 
-	m_icount -= 7; // ???
+	m_icount -= 7;
 }
 
 void m68000_musashi_device::fbcc16()
 {
+	m_fpu_just_reset = 0;
+
 	s32 offset;
 	int condition = m_ir & 0x3f;
 
@@ -2179,6 +2491,8 @@ void m68000_musashi_device::fbcc16()
 
 void m68000_musashi_device::fbcc32()
 {
+	m_fpu_just_reset = 0;
+
 	s32 offset;
 	int condition = m_ir & 0x3f;
 
@@ -2192,77 +2506,6 @@ void m68000_musashi_device::fbcc32()
 	}
 
 	m_icount -= 7;
-}
-
-void m68000_musashi_device::m68040_fpu_op0()
-{
-	m_fpu_just_reset = 0;
-
-	switch ((m_ir >> 6) & 0x3)
-	{
-		case 0:
-		{
-			u16 w2 = OPER_I_16();
-			switch ((w2 >> 13) & 0x7)
-			{
-				case 0x0:   // FPU ALU FP, FP
-				case 0x2:   // FPU ALU ea, FP
-				{
-					fpgen_rm_reg(w2);
-					break;
-				}
-
-				case 0x3:   // FMOVE FP, ea
-				{
-					fmove_reg_mem(w2);
-					break;
-				}
-
-				case 0x4:   // FMOVEM ea, FPCR
-				case 0x5:   // FMOVEM FPCR, ea
-				{
-					fmove_fpcr(w2);
-					break;
-				}
-
-				case 0x6:   // FMOVEM ea, list
-				case 0x7:   // FMOVEM list, ea
-				{
-					fmovem(w2);
-					break;
-				}
-
-				default:    fatalerror("M68kFPU: unimplemented subop %d at %08X\n", (w2 >> 13) & 0x7, m_pc-4);
-			}
-			break;
-		}
-
-		case 1:     // FBcc disp16
-		{
-			switch ((m_ir >> 3) & 0x7) {
-			case 1: // FDBcc
-				// TODO:
-				break;
-			default: // FScc (?)
-				fscc();
-				return;
-			}
-			fatalerror("M68kFPU: unimplemented main op %d with mode %d at %08X\n", (m_ir >> 6) & 0x3, (m_ir >> 3) & 0x7, m_ppc);
-		}
-
-		case 2:     // FBcc disp16
-		{
-			fbcc16();
-			break;
-		}
-		case 3:     // FBcc disp32
-		{
-			fbcc32();
-			break;
-		}
-
-		default:    fatalerror("M68kFPU: unimplemented main op %d\n", (m_ir >> 6)   & 0x3);
-	}
 }
 
 int m68000_musashi_device::perform_fsave(u32 addr, int inc)
@@ -2314,6 +2557,7 @@ void m68000_musashi_device::do_frestore_null()
 	m_fpcr = 0;
 	m_fpsr = 0;
 	m_fpiar = 0;
+	apply_fpcr_rounding();
 	for (i = 0; i < 8; i++)
 	{
 		m_fpr[i].signExp = 0x7fff;
@@ -2329,7 +2573,23 @@ void m68000_musashi_device::m68040_do_fsave(u32 addr, int reg, int inc)
 {
 	if (m_fpu_just_reset)
 	{
-		m68ki_write_32(addr, 0);
+		// a NULL frame is a single format longword
+		if (inc)
+		{
+			m68ki_write_32(addr, 0);
+			if (reg != -1)
+			{
+				REG_A()[reg] += 4;
+			}
+		}
+		else
+		{
+			m68ki_write_32(addr - 4, 0);
+			if (reg != -1)
+			{
+				REG_A()[reg] -= 4;
+			}
+		}
 	}
 	else
 	{
@@ -2353,14 +2613,15 @@ void m68000_musashi_device::m68040_do_frestore(u32 addr, int reg)
 
 		if (reg != -1)
 		{
-			// how about an IDLE frame?
+			// how about an IDLE frame?  (the postincrement above already
+			// consumed the 4 byte format longword)
 			if (!m40 && ((temp & 0x00ff0000) == 0x00180000))
 			{
-				REG_A()[reg] += 7*4;
+				REG_A()[reg] += 6*4;
 			}
 			else if (m40 && ((temp & 0xffff0000) == 0x41000000))
 			{
-				REG_A()[reg] += 4;
+				// the format longword is the whole frame
 			} // check UNIMP
 			else if ((temp & 0x00ff0000) == 0x00380000)
 			{
@@ -2378,153 +2639,31 @@ void m68000_musashi_device::m68040_do_frestore(u32 addr, int reg)
 	}
 }
 
-void m68000_musashi_device::m68040_fpu_op1()
-{
-	int ea = m_ir & 0x3f;
-	int mode = (ea >> 3) & 0x7;
-	int reg = (ea & 0x7);
-	u32 addr;
-
-	switch ((m_ir >> 6) & 0x3)
-	{
-		case 0:     // FSAVE <ea>
-		{
-			switch (mode)
-			{
-			case 2: // (An)
-				addr = REG_A()[reg];
-				m68040_do_fsave(addr, -1, 1);
-				break;
-
-			case 3: // (An)+
-				addr = EA_AY_PI_32();
-				m68040_do_fsave(addr, reg, 1);
-				break;
-
-			case 4: // -(An)
-				addr = EA_AY_PD_32();
-				m68040_do_fsave(addr, reg, 0);
-				break;
-
-			case 5: // (D16, An)
-				addr = EA_AY_DI_16();
-				m68040_do_fsave(addr, -1, 1);
-				break;
-
-			case 6: // (An) + (Xn) + d8
-				addr = EA_AY_IX_16();
-				m68040_do_fsave(addr, -1, 1);
-				break;
-
-			case 7: //
-				switch (reg)
-				{
-					case 1:     // (abs32)
-					{
-						addr = EA_AL_32();
-						m68040_do_fsave(addr, -1, 1);
-						break;
-					}
-					case 2:     // (d16, PC)
-					{
-						addr = EA_PCDI_16();
-						m68040_do_fsave(addr, -1, 1);
-						break;
-					}
-					default:
-						fatalerror("M68kFPU: FSAVE unhandled mode %d reg %d at %x\n", mode, reg, m_pc);
-				}
-
-				break;
-
-			default:
-				fatalerror("M68kFPU: FSAVE unhandled mode %d reg %d at %x\n", mode, reg, m_pc);
-			}
-			break;
-		}
-		break;
-
-		case 1:     // FRESTORE <ea>
-		{
-			switch (mode)
-			{
-			case 2: // (An)
-				addr = REG_A()[reg];
-				m68040_do_frestore(addr, -1);
-				break;
-
-			case 3: // (An)+
-				addr = EA_AY_PI_32();
-				m68040_do_frestore(addr, reg);
-				break;
-
-			case 5: // (D16, An)
-				addr = EA_AY_DI_16();
-				m68040_do_frestore(addr, -1);
-				break;
-
-			case 6: // (An) + (Xn) + d8
-				addr = EA_AY_IX_16();
-				m68040_do_frestore(addr, -1);
-				break;
-
-			case 7: //
-				switch (reg)
-				{
-					case 1:     // (abs32)
-					{
-						addr = EA_AL_32();
-						m68040_do_frestore(addr, -1);
-						break;
-					}
-					case 2:     // (d16, PC)
-					{
-						addr = EA_PCDI_16();
-						m68040_do_frestore(addr, -1);
-						break;
-					}
-					default:
-						fatalerror("M68kFPU: FRESTORE unhandled mode %d reg %d at %x\n", mode, reg, m_pc);
-				}
-
-				break;
-
-			default:
-				fatalerror("M68kFPU: FRESTORE unhandled mode %d reg %d at %x\n", mode, reg, m_pc);
-			}
-			break;
-		}
-		break;
-
-		default:    fatalerror("m68040_fpu_op1: unimplemented op %d at %08X\n", (m_ir >> 6) & 0x3, m_pc-2);
-	}
-}
-
 void m68000_musashi_device::m68881_ftrap()
 {
-	u16 w2  = OPER_I_16();
+	m_fpu_just_reset = 0;
 
-	// now check the condition
+	const u16 w2 = OPER_I_16();
+
+	// consume the operand before testing so a taken trap stacks the
+	// address of the next instruction
+	switch (m_ir & 0x7)
+	{
+		case 2: // word operand
+			OPER_I_16();
+			break;
+
+		case 3: // long word operand
+			OPER_I_32();
+			break;
+
+		default: // no operand
+			break;
+	}
+
 	if (test_condition(w2 & 0x3f))
 	{
-		// trap here
 		m68ki_exception_trap(EXCEPTION_TRAPV);
-	}
-	else    // fall through, requires eating the operand
-	{
-		switch (m_ir & 0x7)
-		{
-			case 2: // word operand
-				OPER_I_16();
-				break;
-
-			case 3: // long word operand
-				OPER_I_32();
-				break;
-
-			case 4: // no operand
-				break;
-		}
 	}
 }
 
