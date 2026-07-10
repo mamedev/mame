@@ -182,6 +182,17 @@ void gaelco3d_state::gaelco3d_renderer::render_poly(screen_device &screen, uint3
 	/* if we have a valid number of verts, render them */
 	if (vertnum >= 3)
 	{
+		/* Prevent poly.h down-rounding from discarding the outermost vert coord */
+		float const maxx = float(screen.width());
+		float const maxy = float(screen.height());
+		for (int i = 0; i < vertnum; i++)
+		{
+			if (vert[i].x > maxx - 1.0f && vert[i].x < maxx)
+				vert[i].x = maxx;
+			if (vert[i].y > maxy - 1.0f && vert[i].y < maxy)
+				vert[i].y = maxy;
+		}
+
 		const rectangle &visarea = screen.visible_area();
 
 		/* special case: no Z buffering and no perspective correction */
