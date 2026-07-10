@@ -97,14 +97,13 @@ For all other functionality, see the owner's manual.
 
 #include "sequential_sixtrak.lh"
 
-#define LOG_CV              (1U << 1)
-#define LOG_KEYS            (1U << 2)
-#define LOG_ADC_VALUE_KNOB  (1U << 3)
-#define LOG_ADC_PITCH_WHEEL (1U << 4)
-#define LOG_VOLUME          (1U << 5)
-#define LOG_AUTOTUNE        (1U << 6)
-#define LOG_CALIBRATION     (1U << 7)
-#define LOG_WHEEL_RC        (1U << 8)
+#define LOG_KEYS            (1U << 1)
+#define LOG_ADC_VALUE_KNOB  (1U << 2)
+#define LOG_ADC_PITCH_WHEEL (1U << 3)
+#define LOG_VOLUME          (1U << 4)
+#define LOG_AUTOTUNE        (1U << 5)
+#define LOG_CALIBRATION     (1U << 6)
+#define LOG_WHEEL_RC        (1U << 7)
 
 #define VERBOSE (LOG_CALIBRATION)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -375,25 +374,7 @@ void sixtrak_state::update_sh_rc(bool sampling, double cv, va_rc_eg_device &rc)
 
 void sixtrak_state::update_cvs()
 {
-	constexpr int PARAM2CVIN[8] =
-	{
-		cem3394_device::VCO_FREQUENCY,
-		cem3394_device::FINAL_GAIN,
-		cem3394_device::FILTER_RESONANCE,
-		cem3394_device::FILTER_FREQUENCY,
-		cem3394_device::MIXER_BALANCE,
-		cem3394_device::MODULATION_AMOUNT,
-		cem3394_device::PULSE_WIDTH,
-		cem3394_device::WAVE_SELECT,
-	};
-
-	constexpr const char *PARAMNAMES[8] =
-	{
-		"pitch", "gain", "resonance", "cutoff", "mixer", "mod", "PW", "waveform"
-	};
-
 	assert(m_sh_param < 8);
-	const int cv_input = PARAM2CVIN[m_sh_param];
 	const double cv = get_voltage_mux_out();
 
 	for (int voice = 0; voice < 6; ++voice)
@@ -418,14 +399,19 @@ void sixtrak_state::update_cvs()
 			continue;
 
 		cem3394_device *v = m_voices[voice];
-		if (v->get_voltage(cv_input) == cv)
-			continue;
-
-		v->set_voltage(cv_input, cv);
-		LOGMASKED(LOG_CV, "CV - voice: %u, param: %u (%s), cv: %f - %03x - %x\n",
-				  voice, m_sh_param, PARAMNAMES[m_sh_param], cv, m_dac_value, m_voltage_mux_input);
-		if (m_sh_param == 0)
-			LOGMASKED(LOG_CV, "Pitch %d: %f\n", voice, v->get_parameter(cem3394_device::VCO_FREQUENCY));
+		switch (m_sh_param)
+		{
+			// Parameters 1 (final gain) and 3 (filter frequency) are streaming
+			// inputs and are handled above.
+			case 0: v->set_vco_freq_cv(cv);      break;
+			case 2: v->set_filt_res_cv(cv);      break;
+			case 4: v->set_mixer_balance_cv(cv); break;
+			case 5: v->set_mod_amount_cv(cv);    break;
+			case 6: v->set_pulse_width_cv(cv);   break;
+			case 7: v->set_wave_select_cv(cv);   break;
+			default:
+				fatalerror("Invalid CEM3394 fixed CV address: %d\n", m_sh_param);
+		}
 	}
 }
 
@@ -546,15 +532,15 @@ void sixtrak_state::update_tuning_timer()
 
 	int active_voices = 0;
 	int loudest_voice = -1;
-	double max_gain_cv = -1;
+	double max_gain = -1;
 	for (int voice = 0; voice < m_voices.size(); ++voice)
 	{
-		const double gain_cv = m_voices[voice]->get_voltage(cem3394_device::FINAL_GAIN);
-		if (gain_cv > 0.1)
+		const double gain = m_voices[voice]->final_gain();
+		if (gain > 0.1)
 			++active_voices;
-		if (gain_cv > max_gain_cv)
+		if (gain > max_gain)
 		{
-			max_gain_cv = gain_cv;
+			max_gain = gain;
 			loudest_voice = voice;
 		}
 	}
@@ -573,14 +559,14 @@ void sixtrak_state::update_tuning_timer()
 	cem3394_device *voice = m_voices[loudest_voice];
 	double freq = 0;
 	bool tuning_filter = false;
-	if (voice->get_parameter(cem3394_device::FILTER_RESONANCE) > 0.9)
+	if (voice->filt_res() > 3)
 	{
-		freq = voice->get_parameter(cem3394_device::FILTER_FREQUENCY);
+		freq = voice->filt_freq();
 		tuning_filter = true;
 	}
 	else
 	{
-		freq = voice->get_parameter(cem3394_device::VCO_FREQUENCY);
+		freq = voice->vco_freq();
 		tuning_filter = false;
 	}
 
@@ -868,10 +854,10 @@ void sixtrak_state::sixtrak_common(machine_config &config, device_sound_interfac
 			.c_ac = CAP_U(10),
 		};
 
-		cem3394_device::input_array voice_inputs{};
-		voice_inputs[cem3394_device::AUDIO_INPUT] = &noise;
-		voice_inputs[cem3394_device::FINAL_GAIN] = m_gain_rc[i].target();
-		voice_inputs[cem3394_device::FILTER_FREQUENCY] = m_freq_rc[i].target();
+		cem3394_device::stream_inputs voice_inputs;
+		voice_inputs.ext_input = &noise;
+		voice_inputs.final_gain_cv = m_gain_rc[i].target();
+		voice_inputs.filt_freq_cv = m_freq_rc[i].target();
 
 		CEM3394(config, m_voices[i], comps, voice_inputs);
 		m_voices[i]->add_route(0, "voicemixer", CEM3394_IOUT_MAX);
