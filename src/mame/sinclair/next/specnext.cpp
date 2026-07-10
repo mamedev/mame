@@ -3823,6 +3823,13 @@ void specnext_state::machine_reset()
 	if (m_nr_02_hard_reset)
 		reset_hard();
 
+	// FPGA ym2149.vhd resets R07 to 0xFF (all tone/noise disabled); ay8910_reset_ym sets 0x00.
+	for (auto &ay : m_ay)
+	{
+		ay->address_w(0x07);
+		ay->data_w(0xff);
+	}
+
 	m_spi_clock->reset();
 	m_spi_clock_cycles = 0;
 	m_spi_clock_state = false;
