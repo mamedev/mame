@@ -753,8 +753,8 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1987, wardner,   0,       wardner, wardner,   wardner_state, empty_init, ROT0, "Toaplan / Taito Corporation Japan",   "Wardner (World)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wardnerb,  wardner, wardner, wardner,   wardner_state, empty_init, ROT0, "bootleg",                             "Wardner (World, bootleg)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, pyros,     wardner, wardner, pyros,     wardner_state, empty_init, ROT0, "Toaplan / Taito America Corporation", "Pyros (US)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wardnerj,  wardner, wardner, wardnerj,  wardner_state, empty_init, ROT0, "Toaplan / Taito Corporation",         "Wardner no Mori (Japan)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wardnerjb, wardner, wardner, wardnerjb, wardner_state, empty_init, ROT0, "bootleg",                             "Wardner no Mori (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wardner,   0,       wardner, wardner,   wardner_state, empty_init, ROT0, "Toaplan / Taito",         "Wardner (World)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wardnerb,  wardner, wardner, wardner,   wardner_state, empty_init, ROT0, "bootleg",                 "Wardner (World, bootleg)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, pyros,     wardner, wardner, pyros,     wardner_state, empty_init, ROT0, "Toaplan / Taito America", "Pyros (US)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wardnerj,  wardner, wardner, wardnerj,  wardner_state, empty_init, ROT0, "Toaplan / Taito",         "Wardner no Mori (Japan)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wardnerjb, wardner, wardner, wardnerjb, wardner_state, empty_init, ROT0, "bootleg",                 "Wardner no Mori (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )

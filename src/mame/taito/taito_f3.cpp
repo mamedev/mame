@@ -4634,23 +4634,23 @@ void taito_f3_state::init_commandw()
 
 /******************************************************************************/
 
-GAME( 1992, ringrage,   0,        f3_224a, f3, taito_f3_state, init_ringrage, ROT0,   "Taito",                "Ring Rage (Ver 2.3O 1992/08/09)", 0 )
-GAME( 1992, ringragej,  ringrage, f3_224a, f3, taito_f3_state, init_ringrage, ROT0,   "Taito",                "Ring Rage (Ver 2.3J 1992/08/09)", 0 )
-GAME( 1992, ringrageu,  ringrage, f3_224a, f3, taito_f3_state, init_ringrage, ROT0,   "Taito America",        "Ring Rage (Ver 2.3A 1992/08/09)", 0 )
+GAME( 1992, ringrage,   0,        f3_224a, f3, taito_f3_state, init_ringrage, ROT0,   "Taito",                  "Ring Rage (Ver 2.3O 1992/08/09)", 0 )
+GAME( 1992, ringragej,  ringrage, f3_224a, f3, taito_f3_state, init_ringrage, ROT0,   "Taito",                  "Ring Rage (Ver 2.3J 1992/08/09)", 0 )
+GAME( 1992, ringrageu,  ringrage, f3_224a, f3, taito_f3_state, init_ringrage, ROT0,   "Taito America",          "Ring Rage (Ver 2.3A 1992/08/09)", 0 )
 
-GAME( 1992, arabianm,   0,        f3_224a, f3, taito_f3_state, init_arabianm, ROT0,   "Taito",                "Arabian Magic (Ver 1.0O 1992/07/06)", 0 )
-GAME( 1992, arabianmj,  arabianm, f3_224a, f3, taito_f3_state, init_arabianm, ROT0,   "Taito",                "Arabian Magic (Ver 1.0J 1992/07/06)", 0 )
-GAME( 1992, arabianmu,  arabianm, f3_224a, f3, taito_f3_state, init_arabianm, ROT0,   "Taito America",        "Arabian Magic (Ver 1.0A 1992/07/06)", 0 )
+GAME( 1992, arabianm,   0,        f3_224a, f3, taito_f3_state, init_arabianm, ROT0,   "Taito",                  "Arabian Magic (Ver 1.0O 1992/07/06)", 0 )
+GAME( 1992, arabianmj,  arabianm, f3_224a, f3, taito_f3_state, init_arabianm, ROT0,   "Taito",                  "Arabian Magic (Ver 1.0J 1992/07/06)", 0 )
+GAME( 1992, arabianmu,  arabianm, f3_224a, f3, taito_f3_state, init_arabianm, ROT0,   "Taito America",          "Arabian Magic (Ver 1.0A 1992/07/06)", 0 )
 
-GAME( 1992, ridingf,    0,        f3_224b, f3, taito_f3_state, init_ridingf,  ROT0,   "Taito",                "Riding Fight (Ver 1.0O)", 0 )
-GAME( 1992, ridingfj,   ridingf,  f3_224b, f3, taito_f3_state, init_ridingf,  ROT0,   "Taito",                "Riding Fight (Ver 1.0J)", 0 )
-GAME( 1992, ridingfu,   ridingf,  f3_224b, f3, taito_f3_state, init_ridingf,  ROT0,   "Taito America",        "Riding Fight (Ver 1.0A)", 0 )
+GAME( 1992, ridingf,    0,        f3_224b, f3, taito_f3_state, init_ridingf,  ROT0,   "Taito",                  "Riding Fight (Ver 1.0O)", 0 )
+GAME( 1992, ridingfj,   ridingf,  f3_224b, f3, taito_f3_state, init_ridingf,  ROT0,   "Taito",                  "Riding Fight (Ver 1.0J)", 0 )
+GAME( 1992, ridingfu,   ridingf,  f3_224b, f3, taito_f3_state, init_ridingf,  ROT0,   "Taito America",          "Riding Fight (Ver 1.0A)", 0 )
 
-GAME( 1992, gseeker,    0,        f3_224b, f3, taito_f3_state, init_gseeker,  ROT90,  "Taito",                "Grid Seeker: Project Storm Hammer (Ver 1.3O)", 0 )
-GAME( 1992, gseekerj,   gseeker,  f3_224b, f3, taito_f3_state, init_gseeker,  ROT90,  "Taito",                "Grid Seeker: Project Storm Hammer (Ver 1.3J)", 0 )
-GAME( 1992, gseekeru,   gseeker,  f3_224b, f3, taito_f3_state, init_gseeker,  ROT90,  "Taito America",        "Grid Seeker: Project Storm Hammer (Ver 1.3A)", 0 )
+GAME( 1992, gseeker,    0,        f3_224b, f3, taito_f3_state, init_gseeker,  ROT90,  "Taito",                  "Grid Seeker: Project Storm Hammer (Ver 1.3O)", 0 )
+GAME( 1992, gseekerj,   gseeker,  f3_224b, f3, taito_f3_state, init_gseeker,  ROT90,  "Taito",                  "Grid Seeker: Project Storm Hammer (Ver 1.3J)", 0 )
+GAME( 1992, gseekeru,   gseeker,  f3_224b, f3, taito_f3_state, init_gseeker,  ROT90,  "Taito America",          "Grid Seeker: Project Storm Hammer (Ver 1.3A)", 0 )
 
-GAME( 1992, commandw,   0,        f3_224b, f3, taito_f3_state, init_commandw, ROT0,   "Taito",                "Command War - Super Special Battle & War Game (Ver 0.0J, prototype)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, commandw,   0,        f3_224b, f3, taito_f3_state, init_commandw, ROT0,   "Taito",                  "Command War - Super Special Battle & War Game (Ver 0.0J, prototype)", MACHINE_IMPERFECT_GRAPHICS )
 
 // Most of the football games share some GFX roms but shouldn't be considered clones unless they have the same Taito game code for the program roms
 GAME( 1993, cupfinal,   0,        f3_224a, f3, taito_f3_state, init_cupfinal, ROT0,   "Taito",                  "Taito Cup Finals (Ver 1.0O 1993/02/28)",   0 )
