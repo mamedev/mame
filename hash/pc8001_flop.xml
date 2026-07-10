@@ -1466,7 +1466,7 @@ Prompts for a [COMMUNICATER], RS-232C connection?
 	</software>
 
 	<software name="kenmaho" cloneof="kentomah">
-		<description>Ken to Maho</description>
+		<description>Ken to Mahou (alt 2)</description>
 		<year>1983</year>
 		<publisher>光栄 (Koei)</publisher>
 		<info name="release" value="198308xx"/>

@@ -783,7 +783,6 @@ public:
 		m_red(*this, "POT1_RED"),
 		m_grn(*this, "POT2_GREEN"),
 		m_blu(*this, "POT3_BLUE")
-
 	{
 	}
 
@@ -791,7 +790,7 @@ public:
 	void init_comg080() ATTR_COLD;
 	void init_comg145() ATTR_COLD;
 	void init_comg176() ATTR_COLD;
-	void init_any() ATTR_COLD;
+	[[maybe_unused]] void init_any() ATTR_COLD;
 
 	void sys903(machine_config &config) ATTR_COLD;
 	void s903mod(machine_config &config) ATTR_COLD;
@@ -809,7 +808,7 @@ private:
 	void s903_mux_w(uint8_t data);
 	uint8_t s905_mux_port_r();
 	void s905_mux_w(uint8_t data);
-	uint8_t pia0_bin_r();
+	[[maybe_unused]] uint8_t pia0_bin_r();
 	void pia0_aout_w(uint8_t data);
 	void pia0_bout_w(uint8_t data);
 	uint8_t pia1_ain_r();
