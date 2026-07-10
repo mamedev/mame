@@ -168,11 +168,11 @@ void st25_state::p2_w(u8 data)
 
 void st25_state::service_strobe_w(u8 data)
 {
-	m_lcd->rs_w(BIT(m_service,8));
+	m_lcd->rs_w(BIT(m_service, 8));
 	// 9 NC
 	m_botk = BIT(m_service, 10);
 	m_topk = BIT(m_service, 11);
-	m_lcd->e_w(BIT(m_service,12));
+	m_lcd->e_w(BIT(m_service, 12));
 
 	m_lcd->db_w(m_service & 0xff);
 }
