@@ -41,6 +41,8 @@ E I1     Vectored interrupt error
 #include "m20_kbd.h"
 
 #include "bus/rs232/rs232.h"
+#include "imagedev/harddriv.h"
+#include "machine/wd1000.h"
 #include "cpu/i86/i86.h"
 #include "cpu/z8000/z8000.h"
 #include "imagedev/floppy.h"
@@ -76,6 +78,7 @@ public:
 		m_floppy0(*this, "fd1797:0:5dd"),
 		m_floppy1(*this, "fd1797:1:5dd"),
 		m_apb(*this, "apb"),
+		m_hdc(*this, "hdc"),
 		m_palette(*this, "palette")
 	{
 	}
@@ -93,6 +96,7 @@ private:
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
 	optional_device<m20_8086_device> m_apb;
+	optional_device<wd1000_device> m_hdc;
 
 	required_device<palette_device> m_palette;
 
@@ -704,6 +708,17 @@ void m20_state::int_w(int state)
 void m20_state::machine_start()
 {
 	install_memory();
+
+	// Only install WD1000 HD controller I/O if a hard disk image is mounted
+	if (m_hdc)
+	{
+		harddisk_image_device *hd0 = m_hdc->subdevice<harddisk_image_device>("0");
+		harddisk_image_device *hd1 = m_hdc->subdevice<harddisk_image_device>("1");
+		if ((hd0 && hd0->exists()) || (hd1 && hd1->exists()))
+		{
+			m_maincpu->space(AS_IO).install_readwrite_handler(0x1c0, 0x1cf, read8sm_delegate(*m_hdc, FUNC(wd1000_device::read)), write8sm_delegate(*m_hdc, FUNC(wd1000_device::write)), 0x00ff);
+		}
+	}
 }
 
 void m20_state::machine_reset()
@@ -806,6 +821,19 @@ void m20_state::m20(machine_config &config)
 	rs232.rxd_handler().set(m_ttyi8251, FUNC(i8251_device::write_rxd));
 
 	M20_8086(config, m_apb, m_maincpu, m_i8259, RAM_TAG);
+
+	/*
+	 default hard drive is 9Mb (180,6,33), 256 bytes per sector
+	 Bad block table at CHS 0 0 1
+	 Format:
+	    1st byte = number of bad blocks
+	    2nd byte = 0xff
+	    List of Bad blocks (4 bytes per block) follows
+	    | CYL L | CYL H| x x x S1 S0 S4 S3 S2  |  HEAD |
+	*/
+	WD1000(config, m_hdc, 20_MHz_XTAL / 4);
+	HARDDISK(config, "hdc:0", 0);
+	HARDDISK(config, "hdc:1", 0);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("m20");
 }
