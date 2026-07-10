@@ -276,11 +276,11 @@ void ds5000_state::ds5000(machine_config &config)
 	// TODO: DSPs
 
 	// TODO: Namco customs
-	NAMCO_C148(config, m_sub_intc, 0, m_subcpu, true);
+	NAMCO_C148(config, m_sub_intc, m_subcpu, true);
 	m_sub_intc->out_ext1_callback().set_nop(); //(FUNC(namcos2_base_state::sound_reset_w));
 	m_sub_intc->out_ext2_callback().set_nop(); //(FUNC(namcos2_base_state::system_reset_w));
 
-	NAMCO_C355SPR(config, m_c355spr, 0);
+	NAMCO_C355SPR(config, m_c355spr);
 	m_c355spr->set_screen("screen");
 	m_c355spr->set_palette("palette");
 	m_c355spr->set_scroll_offsets(0, 0x20);

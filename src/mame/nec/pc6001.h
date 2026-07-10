@@ -9,6 +9,7 @@
 #include "bus/nec_fdd/pc80s31k.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "imagedev/floppy.h"
 #include "machine/74157.h"
 #include "machine/bankdev.h"
@@ -31,7 +32,7 @@
 
 #include "formats/dsk_dsk.h"
 #include "formats/msx_dsk.h"
-#include "formats/p6001_cas.h"
+//#include "formats/p6001_cas.h"
 
 
 class pc6001_state : public driver_device
@@ -46,7 +47,7 @@ public:
 		, m_joy(*this, "joy%u", 1U)
 		, m_joymux(*this, "joymux")
 		, m_cassette(*this, "cassette")
-		, m_cas_hack(*this, "cas_hack")
+		//, m_cas_hack(*this, "cas_hack")
 		, m_cart(*this, "cartslot")
 		, m_ay(*this, "aysnd")
 		, m_centronics(*this, "centronics")
@@ -57,7 +58,7 @@ public:
 		, m_io_keys(*this, "key%u", 1U)
 		, m_io_fn_keys(*this, "key_fn")
 		, m_io_key_modifiers(*this, "key_modifiers")
-		, m_bank1(*this, "bank1")
+		, m_cart_bank(*this, "cart_bank")
 		, m_palette(*this, "palette")
 	{ }
 
@@ -97,7 +98,7 @@ protected:
 	required_device_array<msx_general_purpose_port_device, 2> m_joy;
 	required_device<ls157_x2_device> m_joymux;
 	optional_device<cassette_image_device> m_cassette;
-	optional_device<generic_slot_device> m_cas_hack;
+//	optional_device<generic_slot_device> m_cas_hack;
 	required_device<generic_slot_device> m_cart;
 	optional_device<ay8910_device> m_ay;
 	required_device<centronics_device> m_centronics;
@@ -108,7 +109,7 @@ protected:
 	required_ioport_array<3> m_io_keys;
 	required_ioport m_io_fn_keys;
 	required_ioport m_io_key_modifiers;
-	optional_memory_bank m_bank1;
+	optional_device<address_map_bank_device> m_cart_bank;
 	required_device<palette_device> m_palette;
 
 	memory_region *m_cart_rom = nullptr;
@@ -119,7 +120,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 	void default_cartridge_reset();
-	void default_cassette_hack_reset();
+//	void default_cassette_hack_reset();
 	void default_keyboard_hle_reset();
 	void irq_reset(u8 timer_default_setting);
 
@@ -137,6 +138,12 @@ protected:
 	inline void set_videoram_bank(uint32_t offs);
 	void write_centronics_busy(int state);
 
+	// snapshot handling
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
+	uint32_t m_cas_offset = 0;
+	uint32_t m_cas_maxsize = 0;
+	uint8_t m_cas_data[0x18000];
+
 	// video functions
 	void draw_gfx_mode4(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr);
 	void draw_bitmap_2bpp(bitmap_ind16 &bitmap,const rectangle &cliprect, int attr);
@@ -150,14 +157,14 @@ protected:
 	std::unique_ptr<uint8_t[]> m_video_ram;
 	uint8_t m_cas_switch = 0;
 	uint8_t m_sys_latch = 0;
-	uint32_t m_cas_offset = 0;
-	uint32_t m_cas_maxsize = 0;
 	uint8_t m_bank_opt = 0;
 	bool m_timer_enable = false;
 	bool m_timer_irq_mask = false;
 	uint8_t m_port_c_8255 = 0;
 	uint8_t m_cur_keycode = 0;
 	uint8_t m_centronics_busy = 0;
+
+	void cart_map(address_map &map);
 
 private:
 	uint32_t m_old_key1 = 0;
@@ -204,6 +211,7 @@ class pc6001mk2_state : public pc6001_state
 public:
 	pc6001mk2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc6001_state(mconfig, type, tag)
+		, m_bank1(*this, "bank1")
 		, m_bank2(*this, "bank2")
 		, m_bank3(*this, "bank3")
 		, m_bank4(*this, "bank4")
@@ -247,6 +255,7 @@ protected:
 
 	uint8_t m_bgcol_bank = 0;
 	uint8_t m_gfx_bank_on = 0;
+	optional_memory_bank m_bank1;
 	optional_memory_bank m_bank2;
 	optional_memory_bank m_bank3;
 	optional_memory_bank m_bank4;
@@ -345,6 +354,7 @@ private:
 	std::unique_ptr<u8 []> m_gvram;
 	u8 m_bitmap_yoffs = 0, m_bitmap_xoffs = 0;
 	u8 m_width80 = 0;
+	u8 m_sr_clut[16];
 
 //  memory_view m_gvram_view;
 

@@ -2,117 +2,94 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-    PC-6001 series (c) 1981 NEC
+PC-6001 series (c) 1981 NEC
 
-    driver by Angelo Salese
+TODO:
+- Move MCU HLE simulation in a device;
+- Remove the 8255 hacks;
+- Proper support for .wav/.p6t file formats used by the cassette interface;
+- Make FDC to actually load images, also fix .dsk identification;
+- Confirm irq model daisy chain behaviour, and add missing irqs and features
+  (namely the irq dispatch for SR mode should really honor I/O $fb and fallback to legacy
+   behaviour if masked);
+- Several games are decidedly too fast, down to missing waitstates, no screen raw
+  parameters, crtkill signal and bus request;
+- Merge PC-6001 video emulation with MC6847 (is it really one or rather a M5C6847P-1?);
+- Pinpoint what VDG supersets PC-6001mkII and SR models really uses;
+- upd7752 voice speech device needs to be properly emulated (device is currently a skeleton),
+  pc6001mk2_cass:chrith is a good test case, it's supposed to talk before title screen;
 
-    TODO:
-    - Move MCU HLE simulation in a device or even make an handcrafted LLE version
-      (assuming we'll never get the MCS48 dump). Additionally remove the 8255 hacks;
-    - Proper support for .cas/.wav/.p6/.p6t file formats used by the cassette interface;
-    - Make FDC to actually load images, also fix .dsk identification;
-    - Confirm irq model daisy chain behaviour, and add missing irqs and features
-      (namely the irq dispatch for SR mode should really honor I/O $fb and fallback to legacy
-       behaviour if masked);
-    - Several games are decidedly too fast, down to missing waitstates, no screen raw
-      parameters, crtkill signal and bus request;
-    - PC-6001mkII: refactor memory model to use address_map_bank_device;
-    - PC-6001mkII: confirm optional FDC used mapped at 0xd0-0xd3
-      (PC-6031? It looks like a 5'25 single drive with 8255 protocol, presumably earlier revision
-      of PC-80S31 with no dump available);
-    - PC-6601: current regression caused by an internal FDC sense interrupt status that expects a
-      DIO high that never occurs;
-    - PC-6601: mon r-0 type games doesn't seem to work at all on this system?
-    - PC-6001SR: Implement MK-2 compatibility mode via view handler(s)
-      (it changes the memory map to behave like the older versions);
-    - Merge PC-6001 video emulation with MC6847 (is it really one or rather a M5C6847P-1?);
-    - Pinpoint what VDG supersets PC-6001mkII and SR models really uses;
-    - upd7752 voice speech device needs to be properly emulated (device is currently a skeleton),
-      Chrith game is a good test case, it's supposed to talk before title screen;
-    - Video Telopper (superimposer) & TV tuner functions for later machines;
+TODO (pc6001mk2):
+- refactor memory model to use address_map_bank_device;
+- confirm optional FDC used mapped at 0xd0-0xd3
+\- PC-6031? It looks like a 5'25 single drive with 8255 protocol, presumably earlier revision
+   of PC-80S31 with no dump available;
 
-    TODO (game specific):
-    - (several AX* games, namely Galaxy Mission Part 1/2 and others): inputs doesn't work;
-    - AX6 - Demo: When AY-based speech talks, other emus emulates the screen drawing to be
-       a solid green (plain PC-6001) or solid white (Mk2 version), but according to an
-       original video reference, that screen should actually some kind of weird garbage on it;
-    - AX6 - Powered Knight: doesn't work too well, according to the asm code it asks the
-       player to press either 'B' or 'C' then a number but nothing is shown on screen,
-       other emus behaves the same, bad dump?
-    (Mk2 mode 5 games)
-    - 3D Golf Simulation Super Version: gameplay / inputs seems broken;
-    - American Truck: Screen is offset at the loading screen, loading bug?
-    - Castle Excellent: copyright text drawing is quite bogus, scans text in vertical
-       instead of horizontal?
-    - Dezeni Land (ALL versions) / Hurry Fox 1/2: asks you to "load something", can't do it
-       with current cassette kludge, also, for Dezeni Land(s) keyboard irqs doesn't seem to
-       work too well with halt opcode execution?
-    - Dezeni Land 1/4: dies after loading of main program;
-    - Dezeni Land 2: dies at the "load something" screen with presumably wrong stack opcodes
-    - (MyCom BASIC games with multiple files): most of them refuses to run ... how to load them?
-    - Grobda: when "get ready" speech plays, screen should be full white but instead it's all
-       black, same issue as AX-6 Demo?
-    - Pac-Man / Tiny Xevious 2: gameplay is too fast (unrelated with timer irq);
-    - Salad no Kunino Tomato-Hime: can't start a play;
-    - Space Harrier: very sensitive with sub irq triggers, keyboard joy triggers doesn't work
-      properly (select F1 after loading), draws garbage on vanilla pc6001 and eventually crashes
-      MAME;
-    - The Black Onyx: dies when it attempts to save the character, that obviously means saving
-       on the tape;
-    - Yakyukyo / Punchball Mario: waits for an irq (fixed, wrong timer enable behaviour);
+TODO (pc6601):
+- current regression caused by an internal FDC sense interrupt status that expects a
+  DIO high that never occurs;
+- mon r-0 type games doesn't seem to work at all on this system?
+  Update: tries to autoload cassette at startup for some reason.
+
+TODO (pc6601mk2sr):
+- Implement MK-2 compatibility mode via view handler(s)
+  (it changes the memory map to behave like the older versions);
+- Video Telopper (superimposer) & TV tuner functions for later machines;
+- pc6001mk2sr/pc6601sr: currently doesn't work without -debug enabled (?), has serious keyboard
+  issues, BASIC based programs hangs at a $e6bb check (irq not fired regression? bp 102c,1,{pc+=2;g})
 
 ===================================================================================================
 
-    PC-6001 (1981-09):
+PC-6001 (1981-09):
 
-     * CPU: Z80A @ 4 MHz
-     * ROM: 16KB + 4KB (chargen) - no kanji
-     * RAM: 16KB, it can be expanded to 32KB
-     * Text Mode: 32x16 and 2 colors
-     * Graphic Modes: 64x48 (9 colors), 128x192 (4 colors), 256x192 (2 colors)
-     * Sound: BEEP + PSG - Optional Voice Synth Cart
-     * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
-            HOME/CLR key, INS key, DEL key, GRAPH key, Japanese syllabary
-            key, page key, STOP key, and cursor key (4 directions)
-     * 1 cartslot, optional floppy drive, optional serial 232 port, 2
-            joystick ports
-
-
-    PC-6001 mkII (1983-07):
-
-     * CPU: Z80A @ 4 MHz
-     * ROM: 32KB + 16KB (chargen) + 32KB (kanji) + 16KB (Voice Synth)
-     * RAM: 64KB
-     * Text Mode: same as PC-6001 with N60-BASIC; 40x20 and 15 colors with
-            N60M-BASIC
-     * Graphic Modes: same as PC-6001 with N60-BASIC; 80x40 (15 colors),
-            160x200 (15 colors), 320x200 (4 colors) with N60M-BASIC
-     * Sound: BEEP + PSG
-     * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
-            HOME/CLR key, INS key, DEL key, CAPS key, GRAPH key, Japanese
-            syllabary key, page key, mode key, STOP key, and cursor key (4
-            directions)
-     * 1 cartslot, floppy drive, optional serial 232 port, 2 joystick ports
+ * CPU: Z80A @ 4 MHz
+ * ROM: 16KB + 4KB (chargen) - no kanji
+ * RAM: 16KB, it can be expanded to 32KB
+ * Text Mode: 32x16 and 2 colors
+ * Graphic Modes: 64x48 (9 colors), 128x192 (4 colors), 256x192 (2 colors)
+ * Sound: BEEP + PSG - Optional Voice Synth Cart
+ * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
+        HOME/CLR key, INS key, DEL key, GRAPH key, Japanese syllabary
+        key, page key, STOP key, and cursor key (4 directions)
+ * 1 cartslot, optional floppy drive, optional serial 232 port, 2
+        joystick ports
 
 
-    PC-6001 mkIISR (1984-12):
+PC-6001 mkII (1983-07):
 
-     * CPU: Z80A @ 3.58 MHz
-     * ROM: 64KB + 16KB (chargen) + 32KB (kanji) + 32KB (Voice Synth)
-     * RAM: 64KB
-     * Text Mode: same as PC-6001/PC-6001mkII with N60-BASIC; 40x20, 40x25,
-            80x20, 80x25 and 15 colors with N66SR-BASIC
-     * Graphic Modes: same as PC-6001/PC-6001mkII with N60-BASIC; 80x40 (15 colors),
-            320x200 (15 colors), 640x200 (15 colors) with N66SR-BASIC
-     * Sound: BEEP + PSG + FM
-     * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
-            HOME/CLR key, INS key, DEL key, CAPS key, GRAPH key, Japanese
-            syllabary key, page key, mode key, STOP key, and cursor key (4
-            directions)
-     * 1 cartslot, floppy drive, optional serial 232 port, 2 joystick ports
+ * CPU: Z80A @ 4 MHz
+ * ROM: 32KB + 16KB (chargen) + 32KB (kanji) + 16KB (Voice Synth)
+ * RAM: 64KB
+ * Text Mode: same as PC-6001 with N60-BASIC; 40x20 and 15 colors with
+        N60M-BASIC
+ * Graphic Modes: same as PC-6001 with N60-BASIC; 80x40 (15 colors),
+        160x200 (15 colors), 320x200 (4 colors) with N60M-BASIC
+ * Sound: BEEP + PSG
+ * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
+        HOME/CLR key, INS key, DEL key, CAPS key, GRAPH key, Japanese
+        syllabary key, page key, mode key, STOP key, and cursor key (4
+        directions)
+ * 1 cartslot, floppy drive, optional serial 232 port, 2 joystick ports
 
 
-    info from http://www.geocities.jp/retro_zzz/machines/nec/6001/spc60.html
+PC-6001 mkIISR (1984-12):
+
+ * CPU: Z80A @ 3.58 MHz
+ * ROM: 64KB + 16KB (chargen) + 32KB (kanji) + 32KB (Voice Synth)
+ * RAM: 64KB
+ * Text Mode: same as PC-6001/PC-6001mkII with N60-BASIC; 40x20, 40x25,
+        80x20, 80x25 and 15 colors with N66SR-BASIC
+ * Graphic Modes: same as PC-6001/PC-6001mkII with N60-BASIC; 80x40 (15 colors),
+        320x200 (15 colors), 640x200 (15 colors) with N66SR-BASIC
+ * Sound: BEEP + PSG + FM
+ * Keyboard: JIS Keyboard with 5 function keys, control key, TAB key,
+        HOME/CLR key, INS key, DEL key, CAPS key, GRAPH key, Japanese
+        syllabary key, page key, mode key, STOP key, and cursor key (4
+        directions)
+ * 1 cartslot, floppy drive, optional serial 232 port, 2 joystick ports
+
+
+ info from http://www.geocities.jp/retro_zzz/machines/nec/6001/spc60.html
 
 ===================================================================================================
 
@@ -147,8 +124,9 @@ irq vector 0x26:                                                                
 
 #define LOG_IRQ    (1U << 1)
 
-//#define VERBOSE (LOG_IRQ)
 #define VERBOSE (0)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+
 #include "logmacro.h"
 
 #define LOGIRQ(...)     LOGMASKED(LOG_IRQ, __VA_ARGS__)
@@ -248,10 +226,13 @@ void pc6001_state::nec_ppi8255_w(offs_t offset, uint8_t data)
 		ppi_control_hack_w(data);
 		//printf("%02x\n",data);
 
-		if ((data & 0x0f) == 0x05 && m_cart_rom)
-			m_bank1->set_base(m_cart_rom->base() + 0x2000);
-		if ((data & 0x0f) == 0x04)
-			m_bank1->set_base(m_region_gfx1->base());
+		if ((data & 0x0e) == 0x04)
+			m_cart_bank->set_bank(data & 1);
+
+//      if ((data & 0x0f) == 0x05 && m_cart_rom)
+//          m_bank1->set_base(m_cart_rom->base() + 0x2000);
+//      if ((data & 0x0f) == 0x04)
+//          m_bank1->set_base(m_region_gfx1->base());
 	}
 
 	m_ppi->write(offset,data);
@@ -262,11 +243,13 @@ uint8_t pc6001_state::joystick_r()
 	uint8_t data = m_joymux->output_r();
 
 	// FIXME: bits 6 and 7 are supposed to be nHSYNC and nVSYNC
-	if (m_screen->hblank())
+	// mk2SR vrtc irq expects VSYNC bit to be high (at line 240 essentially),
+	// otherwise it refuses to clear the $e6bb blank buffer.
+	if (!m_screen->hblank())
 		data &= 0xbf;
 	else
 		data |= 0x40;
-	if (m_screen->vblank())
+	if (!m_screen->vblank())
 		data &= 0x7f;
 	else
 		data |= 0x80;
@@ -308,8 +291,7 @@ void pc6001_state::pc6001_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom().nopw();
-	map(0x4000, 0x5fff).r(m_cart, FUNC(generic_slot_device::read_rom));
-	map(0x6000, 0x7fff).bankr("bank1");
+	map(0x4000, 0x7fff).m(m_cart_bank, FUNC(address_map_bank_device::amap8));
 	map(0x8000, 0xffff).ram().share("ram");
 }
 
@@ -325,6 +307,16 @@ void pc6001_state::pc6001_io(address_map &map)
 	map(0xa3, 0xa3).mirror(0x0c).nopw();
 	map(0xb0, 0xb0).mirror(0x0f).w(FUNC(pc6001_state::system_latch_w));
 	map(0xc0, 0xc0).mirror(0x0f).r(FUNC(pc6001_state::portc0_r));
+}
+
+// TODO: sharrier (at least) pretends to use this as writable work RAM
+// it also pretends to act as a mk2 machine, judging at $f0 writes.
+// Does it fail an identifier check?
+// There's really a work RAM when cart not inserted, or it actually wants a RAM cart?
+void pc6001_state::cart_map(address_map &map)
+{
+	map(0x2000, 0x3fff).rom().region("gfx1", 0);
+	map(0x4000, 0x7fff).r(m_cart, FUNC(generic_slot_device::read_rom));
 }
 
 /*****************************************
@@ -675,6 +667,7 @@ inline void pc6001mk2_state::refresh_crtc_params()
 	rectangle visarea = m_screen->visible_area();
 	int y_height;
 
+	// TODO: probably needs the *actual* mode used to fix hudson3 bottom part
 	y_height = (m_exgfx_bitmap_mode || m_exgfx_2bpp_mode) ? 200 : 240;
 
 	visarea.set(0, (320) - 1, 0, (y_height) - 1);
@@ -819,7 +812,7 @@ void pc6001mk2_state::pc6001mk2_io(address_map &map)
 
 /*****************************************
  *
- * PC-6601 specific i/o
+ * PC-6601 specific I/O
  *
  ****************************************/
 
@@ -1073,7 +1066,14 @@ void pc6001mk2sr_state::pc6001mk2sr_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x40, 0x43).nopw(); // palette CLUTs
+	map(0x40, 0x43).lw8(NAME([this] (offs_t offset, u8 data) {
+		// CLUT used by text mode for N66SR BASIC (default [0~3]) vs.
+		// "PC-6*01 World" (sets [0x0, 0xd, 0xa, 0xc]) screens.
+		// Use pc6601sr for both.
+		const u8 clut_entry = bitswap<4>(0xf - offset, 3, 0, 2, 1);
+		const u8 color_entry = bitswap<4>(0xf - (data & 0xf), 3, 0, 2, 1);
+		m_sr_clut[clut_entry] = color_entry;
+	}));
 	map(0x60, 0x6f).rw(FUNC(pc6001mk2sr_state::sr_bank_reg_r), FUNC(pc6001mk2sr_state::sr_bank_reg_w));
 
 	map(0x80, 0x81).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
@@ -1491,7 +1491,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::cassette_callback)
 			else
 				cas_data_i>>=1;
 		#else
-			m_cur_keycode = m_cas_hack->read_rom(m_cas_offset++);
+			m_cur_keycode = m_cas_data[m_cas_offset++];
 			popmessage("%04x %04x", m_cas_offset, m_cas_maxsize);
 			if(m_cas_offset > m_cas_maxsize)
 			{
@@ -1536,6 +1536,10 @@ void pc6001_state::machine_start()
 {
 	m_timer_irq_timer = timer_alloc(FUNC(pc6001_state::audio_callback), this);
 	m_sub_trig_timer = timer_alloc(FUNC(pc6001_state::sub_trig_callback), this);
+
+	save_item(NAME(m_cas_data));
+	save_item(NAME(m_cas_offset));
+	save_item(NAME(m_cas_maxsize));
 }
 
 inline void pc6001_state::set_videoram_bank(uint32_t offs)
@@ -1554,11 +1558,26 @@ inline void pc6001_state::default_cartridge_reset()
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 }
 
-inline void pc6001_state::default_cassette_hack_reset()
+SNAPSHOT_LOAD_MEMBER(pc6001_state::snapshot_cb)
 {
+	/* get file size */
+	uint64_t snapsize = image.length();
+
+	// biggest file seen in the wild is 0x1478d
+	if (snapsize > 0x18000)
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
+
+	auto data = std::make_unique<uint8_t []>(snapsize);
+	if (image.fread(data.get(), snapsize) != snapsize)
+		return std::make_pair(image_error::UNSPECIFIED, "Internal error loading snapshot");
+
+	memcpy(m_cas_data, &data[0], snapsize);
+
 	m_cas_switch = 0;
 	m_cas_offset = 0;
-	m_cas_maxsize = (m_cas_hack->exists()) ? m_cas_hack->get_rom_size() : 0;
+	m_cas_maxsize = snapsize;
+
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 inline void pc6001_state::default_keyboard_hle_reset()
@@ -1584,7 +1603,8 @@ void pc6001_state::machine_reset()
 	set_videoram_bank(0xc000);
 
 	default_cartridge_reset();
-	default_cassette_hack_reset();
+	//default_cassette_hack_reset();
+	m_cas_offset = 0;
 	irq_reset(3);
 	default_keyboard_hle_reset();
 }
@@ -1599,7 +1619,8 @@ void pc6001mk2_state::machine_reset()
 	if (m_cart->exists())
 		memcpy(m_region_maincpu->base() + 0x48000, m_cart_rom->base(), 0x4000);
 
-	default_cassette_hack_reset();
+	//default_cassette_hack_reset();
+	m_cas_offset = 0;
 	irq_reset(3);
 	default_keyboard_hle_reset();
 
@@ -1623,6 +1644,7 @@ void pc6001mk2_state::machine_reset()
 		m_bgcol_bank = 0;
 	}
 
+	m_timer_irq_mask = false;
 //  refresh_crtc_params();
 }
 
@@ -1637,7 +1659,6 @@ void pc6601_state::machine_start()
 void pc6001mk2sr_state::machine_reset()
 {
 //  pc6001_state::machine_reset();
-	default_cassette_hack_reset();
 
 //  set_videoram_bank(0x70000);
 	m_video_base = &m_ram[0];
@@ -1648,9 +1669,10 @@ void pc6001mk2sr_state::machine_reset()
 	// hard to tell without an actual SR cart dump
 //  std::string region_tag;
 //  m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-	default_cassette_hack_reset();
+	//default_cassette_hack_reset();
 	irq_reset(0x7f);
 	default_keyboard_hle_reset();
+	m_cas_offset = 0;
 
 	// default to text mode
 	m_sr_text_mode = true;
@@ -1678,6 +1700,9 @@ void pc6001mk2sr_state::machine_reset()
 		}
 //      m_gfx_bank_on = 0;
 	}
+
+	// jewels and satan (at least) definitely expects timer irq implicitly enabled
+	m_timer_irq_mask = false;
 }
 
 
@@ -1730,8 +1755,10 @@ void pc6001_state::pc6001(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_screen_update(FUNC(pc6001_state::screen_update));
+	// FIXME: actual parameters, particularly for later iterations
 	m_screen->set_size(320, 25+192+26);
 	m_screen->set_visarea(0, 319, 0, 239);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(pc6001_state::pc6001_palette), 16+4);
@@ -1744,8 +1771,10 @@ void pc6001_state::pc6001(machine_config &config)
 	m_ppi->in_pc_callback().set(FUNC(pc6001_state::ppi_portc_r));
 	m_ppi->out_pc_callback().set(FUNC(pc6001_state::ppi_portc_w));
 
+	ADDRESS_MAP_BANK(config, m_cart_bank).set_map(&pc6001_state::cart_map).set_options(ENDIANNESS_LITTLE, 8, 13 + 2, 0x4000);
+
 	/* uart */
-	I8251(config, "uart", 0);
+	I8251(config, "uart");
 
 	MSX_GENERAL_PURPOSE_PORT(config, m_joy[0], msx_general_purpose_port_devices, "joystick");
 	MSX_GENERAL_PURPOSE_PORT(config, m_joy[1], msx_general_purpose_port_devices, "joystick");
@@ -1755,14 +1784,16 @@ void pc6001_state::pc6001(machine_config &config)
 	m_joymux->b_in_callback().set(m_joy[0], FUNC(msx_general_purpose_port_device::read));
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "pc6001_cart");
-	SOFTWARE_LIST(config, "cart_list_pc6001").set_original("pc6001_cart");
-	SOFTWARE_LIST(config, "cass_list_pc6001").set_original("pc6001_cass");
 
 //  CASSETTE(config, m_cassette);
 //  m_cassette->set_formats(pc6001_cassette_formats);
 //  m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 //  m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
-	GENERIC_CARTSLOT(config, m_cas_hack, generic_plain_slot, "pc6001_cass", "cas,p6");
+
+	// cas and p6 are raw binary files with no tape markers
+	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "cas,p6"));
+	snapshot.set_interface("pc6001_snap");
+	snapshot.set_load_callback(FUNC(pc6001_state::snapshot_cb));
 
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, m_ay, PC6001_MAIN_CLOCK/4);
@@ -1780,6 +1811,9 @@ void pc6001_state::pc6001(machine_config &config)
 	// TODO: accurate timing on this
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(pc6001_state::keyboard_callback), attotime::from_hz(250));
 	TIMER(config, "cassette_timer").configure_periodic(FUNC(pc6001_state::cassette_callback), attotime::from_hz(1200/12));
+
+	SOFTWARE_LIST(config, "cart_list").set_original("pc6001_cart");
+	SOFTWARE_LIST(config, "cass_list").set_original("pc6001_cass");
 }
 
 void pc6001mk2_state::pc6001mk2(machine_config &config)
@@ -1792,6 +1826,8 @@ void pc6001mk2_state::pc6001mk2(machine_config &config)
 
 //  MCFG_MACHINE_RESET_OVERRIDE(pc6001mk2_state,pc6001mk2)
 
+	config.device_remove("cart_bank");
+
 	m_screen->set_screen_update(FUNC(pc6001mk2_state::screen_update));
 
 	m_palette->set_entries(16+16);
@@ -1801,8 +1837,7 @@ void pc6001mk2_state::pc6001mk2(machine_config &config)
 
 	UPD7752(config, "upd7752", PC6001_MAIN_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	SOFTWARE_LIST(config, "cass_list_pc6001mk2").set_original("pc6001mk2_cass");
-
+	SOFTWARE_LIST(config, "cass_list_mk2").set_original("pc6001mk2_cass");
 }
 
 void pc6601_state::floppy_formats(format_registration &fr)
@@ -1844,6 +1879,9 @@ void pc6601_state::pc6601(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(pc6601_state::irq_callback));
 
 	pc6601_fdc_config(config);
+
+	// TODO: move this option to both regular mk2 and mk2sr
+	SOFTWARE_LIST(config, "flop_list_pc6001mk2").set_original("pc6001mk2_flop");
 }
 
 void pc6001mk2sr_state::pc6001mk2sr(machine_config &config)
@@ -1876,8 +1914,10 @@ void pc6001mk2sr_state::pc6001mk2sr(machine_config &config)
 	m_ym->port_b_write_callback().set(FUNC(pc6001mk2sr_state::joystick_out_w));
 	m_ym->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	// TODO: 1D 3'5" floppy drive
 	// TODO: telopper board (system explicitly asks for missing tape dump tho)
+
+	SOFTWARE_LIST(config, "cass_list_mk2sr").set_original("pc6001mk2sr_cass");
+	SOFTWARE_LIST(config, "flop_list_mk2sr").set_original("pc6001mk2sr_flop");
 }
 
 void pc6601sr_state::pc6601sr(machine_config &config)
@@ -1913,8 +1953,9 @@ ROM_START( pc6001a )
 	ROM_REGION( 0x800, "mcu", 0 )
 	ROM_LOAD( "upd8049.ic17", 0x000, 0x800, CRC(6682ec41) SHA1(ea739be6178c0f2ef48a3a33a3f2a3438ed2ca61) BAD_DUMP ) // about 60% of bytes are bad
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "cgrom60.60a", 0x0000, 0x1000, CRC(49c21d08) SHA1(9454d6e2066abcbd051bad9a29a5ca27b12ec897) )
+	ROM_RELOAD(              0x1000, 0x1000 )
 
 	ROM_REGION( 0x8000, "gfx2", ROMREGION_ERASEFF )
 ROM_END
@@ -2012,9 +2053,9 @@ ROM_START( pc6601sr )
 	ROM_COPY( "sr_sysrom", 0x18000, 0x00000, 0x8000 )
 ROM_END
 
-COMP( 1981, pc6001,       0,      0,        pc6001,      pc6001, pc6001_state,       empty_init, "NEC",   "PC-6001 (Japan)",              MACHINE_NOT_WORKING )
-COMP( 1981, pc6001a,      pc6001, 0,        pc6001,      pc6001, pc6001_state,       empty_init, "NEC",   "PC-6001A \"NEC Trek\" (US)",   MACHINE_NOT_WORKING )
-COMP( 1983, pc6001mk2,    0,      0,        pc6001mk2,   pc6001, pc6001mk2_state,    empty_init, "NEC",   "PC-6001mkII (Japan)",          MACHINE_NOT_WORKING )
-COMP( 1983, pc6601,       pc6001, 0,        pc6601,      pc6001, pc6601_state,       empty_init, "NEC",   "PC-6601 (Japan)",              MACHINE_NOT_WORKING )
-COMP( 1984, pc6001mk2sr,  0,      0,        pc6001mk2sr, pc6001, pc6001mk2sr_state,  empty_init, "NEC",   "PC-6001mkIISR (Japan)",        MACHINE_NOT_WORKING )
-COMP( 1984, pc6601sr,     pc6001, 0,        pc6601sr,    pc6001, pc6601sr_state,     empty_init, "NEC",   "PC-6601SR \"Mr. PC\" (Japan)", MACHINE_NOT_WORKING )
+COMP( 1981, pc6001,       0,           0,        pc6001,      pc6001, pc6001_state,       empty_init, "NEC",   "PC-6001 (Japan)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+COMP( 1981, pc6001a,      pc6001,      0,        pc6001,      pc6001, pc6001_state,       empty_init, "NEC",   "PC-6001A \"NEC Trek\" (US)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+COMP( 1983, pc6001mk2,    0,           0,        pc6001mk2,   pc6001, pc6001mk2_state,    empty_init, "NEC",   "PC-6001mkII (Japan)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+COMP( 1983, pc6601,       pc6001mk2,   0,        pc6601,      pc6001, pc6601_state,       empty_init, "NEC",   "PC-6601 (Japan)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+COMP( 1984, pc6001mk2sr,  0,           0,        pc6001mk2sr, pc6001, pc6001mk2sr_state,  empty_init, "NEC",   "PC-6001mkIISR (Japan)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+COMP( 1984, pc6601sr,     pc6001mk2sr, 0,        pc6601sr,    pc6001, pc6601sr_state,     empty_init, "NEC",   "PC-6601SR \"Mr. PC\" (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )

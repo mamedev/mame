@@ -31,7 +31,7 @@ void specnext_layer2_device::draw_mix(screen_device &screen, bitmap_rgb32 &bitma
 
 	const rgb_t gt0 = rgbexpand<3,3,3>((m_global_transparent << 1) | 0, 6, 3, 0);
 	const rgb_t gt1 = rgbexpand<3,3,3>((m_global_transparent << 1) | 1, 6, 3, 0);
-	const rgb_t fb = palette().pen_color(0x800);
+	const rgb_t fb = palette().pen_color(0xa00);
 	auto blend_op = [gt0, gt1, fb, mixer](u8 &prio, u32 &target, u32 &priotarget, const rgb_t pen, bool is_prio_color)
 	{
 		if ((pen == gt0) || (pen == gt1))
@@ -126,16 +126,24 @@ void specnext_layer2_device::draw_256(screen_device &screen, bitmap_rgb32 &bitma
 			screen, bitmap, blendprio, clip, info, offset_h, offset_v,
 			[this, &blend_op] (u16 pen_base, const u8 *scr, u32 *pix, u8 *prio, u32 *bprio, u16 &hpos, u16 &vpos, bool skip_second)
 			{
-				const u16 idx = pen_base + ((*scr + (m_palette_offset << 4)) % 0x100);
+				const u16 idx = (hpos & 1 && m_pixel_latch_idx != ~u16(0))
+					? m_pixel_latch_idx
+					: pen_base + ((*scr + (m_palette_offset << 4)) % 0x100);
 				const rgb_t pen = palette().pen_color(idx);
 				const bool is_prio_color = m_pen_priority[idx];
+
 				if (hpos & 1)
+				{
 					hpos ^= 1;
+					m_pixel_latch_idx = ~u16(0);
+				}
 				else
 					blend_op(prio[0], pix[0], bprio[0], pen, is_prio_color);
 
 				if (!skip_second)
 					blend_op(prio[1], pix[1], bprio[1], pen, is_prio_color);
+				else
+					m_pixel_latch_idx = idx;
 			});
 }
 
@@ -247,11 +255,13 @@ void specnext_layer2_device::device_start()
 	save_item(NAME(m_clip_x2));
 	save_item(NAME(m_clip_y1));
 	save_item(NAME(m_clip_y2));
+	save_item(NAME(m_pixel_latch_idx));
 }
 
 void specnext_layer2_device::device_reset()
 {
 	memset(m_pen_priority, 0, 512 * 4);
+	m_pixel_latch_idx = ~u16(0);
 }
 
 // device type definition

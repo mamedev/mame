@@ -444,7 +444,7 @@ void supduck_state::supduck(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_supduck);
 
-	TIGEROAD_SPRITE(config, m_spritegen, 0);
+	TIGEROAD_SPRITE(config, m_spritegen);
 	m_spritegen->set_palette(m_palette);
 	m_spritegen->set_color_base(512);    // colors 512- 767
 

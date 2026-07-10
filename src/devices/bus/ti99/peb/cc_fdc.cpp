@@ -495,7 +495,7 @@ void corcomp_fdc_device::common_config(machine_config& config)
 	m_wdc->drq_wr_callback().set(FUNC(corcomp_fdc_device::fdc_drq_w));
 	m_wdc->hld_wr_callback().set(FUNC(corcomp_fdc_device::fdc_hld_w));
 
-	TMS9901(config, m_tms9901, 0);
+	TMS9901(config, m_tms9901);
 	m_tms9901->read_cb().set(FUNC(corcomp_fdc_device::tms9901_input));
 
 	// Outputs
@@ -524,7 +524,7 @@ void corcomp_fdc_device::common_config(machine_config& config)
 	m_tms9901->p_out_cb(11).set(FUNC(corcomp_fdc_device::select_bank));
 
 	// Motor monoflop
-	TTL74123(config, m_motormf, 0);
+	TTL74123(config, m_motormf);
 	m_motormf->set_connection_type(TTL74123_GROUNDED);
 	m_motormf->set_resistor_value(RES_K(100));
 	m_motormf->set_capacitor_value(CAP_U(47));

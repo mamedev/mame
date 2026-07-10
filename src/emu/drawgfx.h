@@ -166,6 +166,12 @@ public:
 	bool has_pen_usage() const { return !m_pen_usage.empty(); }
 	bool has_palette() const { return m_palette; }
 
+	// used by gfx viewer, get original size regardless source clip
+	u16 source_width() const { return m_origwidth; }
+	u16 source_height() const { return m_origheight; }
+	u16 origin_x() const { return m_startx; }
+	u16 origin_y() const { return m_starty; }
+
 	// used by tilemaps
 	u32 dirtyseq() const { return m_dirtyseq; }
 
@@ -197,6 +203,14 @@ public:
 		assert(code < m_pen_usage.size());
 		if (m_dirty[code]) decode(code);
 		return m_pen_usage[code];
+	}
+
+	void decode_all()
+	{
+		for (int i = 0; i < elements(); i++)
+		{
+			get_data(i);
+		}
 	}
 
 	// ----- core graphics drawing -----

@@ -927,7 +927,7 @@ void gaelco3d_state::gaelco3d(machine_config &config)
 
 	TIMER(config, m_adsp_autobuffer_timer).configure_generic(FUNC(gaelco3d_state::adsp_autobuffer_irq));
 
-	GAELCO_SERIAL(config, m_serial, 0);
+	GAELCO_SERIAL(config, m_serial);
 	m_serial->irq_handler().set(FUNC(gaelco3d_state::ser_irq));
 
 	LS259(config, m_mainlatch); // IC5 on bottom board next to EEPROM

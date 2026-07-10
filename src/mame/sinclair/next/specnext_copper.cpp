@@ -2,12 +2,20 @@
 // copyright-holders:Andrei I. Holub
 /**********************************************************************
     Spectrum Next Copper
+
+Instruction format (16-bit, stored in even/odd byte pairs):
+  WAIT: bit15=1, bits14:9=H column (units of 8), bits8:0=V line
+  MOVE: bit15=0, bits14:8=nextreg address, bits7:0=value
+  NOOP: MOVE with address 0 and value 0 (hardware suppresses write pulse)
+  HALT: WAIT 63,511 ($ffff) - line never reached, copper stops
+
 Refs:
     https://gitlab.com/thesmog358/tbblue/-/raw/master/docs/extra-hw/copper/COPPER-v0.1c.TXT
 **********************************************************************/
 
 #include "emu.h"
 #include "specnext_copper.h"
+#include "specnext_copper_dasm.h"
 
 #include <cassert>
 
@@ -30,9 +38,12 @@ DEFINE_DEVICE_TYPE(SPECNEXT_COPPER, specnext_copper_device, "specnext_copper", "
 
 specnext_copper_device::specnext_copper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SPECNEXT_COPPER, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, device_disasm_interface(mconfig, *this)
+	, m_space_config("program", ENDIANNESS_BIG, 8, 11, 0, address_map_constructor(FUNC(specnext_copper_device::copper_map), this))
 	, m_timer(nullptr)
 	, m_frame_timer(nullptr)
-	, m_listram(*this, "listram", 0x400 * 2, ENDIANNESS_LITTLE)
+	, m_listram(*this, "listram", 0x400 * 2, ENDIANNESS_BIG)
 	, m_out_nextreg_cb(*this)
 	, m_in_until_pos_cb(*this)
 {
@@ -43,8 +54,6 @@ void specnext_copper_device::copper_en_w(u8 data)
 	if (m_copper_en != data)
 	{
 		m_copper_en = data;
-		if ((m_copper_en == 0b01) || (m_copper_en == 0b11))
-			m_copper_list_addr = 0;
 		m_copper_dout = 0;
 
 		switch(m_copper_en)
@@ -56,6 +65,7 @@ void specnext_copper_device::copper_en_w(u8 data)
 			break;
 		case 0b01:
 			LOGCTRL("RESET\n");
+			m_copper_list_addr = 0;
 			m_timer->adjust(attotime::zero);
 			break;
 		case 0b10:
@@ -64,6 +74,7 @@ void specnext_copper_device::copper_en_w(u8 data)
 			break;
 		case 0b11:
 			LOGCTRL("FRAME\n");
+			m_copper_list_addr = 0;
 			m_frame_timer->adjust(m_in_until_pos_cb(0x0000));
 			break;
 		}
@@ -100,7 +111,7 @@ TIMER_CALLBACK_MEMBER(specnext_copper_device::timer_callback)
 		}
 		else // command MOVE
 		{
-			if (BIT(m_copper_list_data, 8, 7) != 0) // dont generate the write pulse if its a NOP (MOVE 0,0)
+			if (BIT(m_copper_list_data, 8, 7) != 0) // dont generate the write pulse if its a NOOP (MOVE 0,0)
 				m_copper_dout = 1;
 			++m_copper_list_addr;
 		};
@@ -130,6 +141,22 @@ TIMER_CALLBACK_MEMBER(specnext_copper_device::frame_timer_callback)
 		m_frame_timer->reset();
 }
 
+void specnext_copper_device::copper_map(address_map &map)
+{
+	map(0x000, 0x7ff).ram().share(m_listram);
+}
+
+device_memory_interface::space_config_vector specnext_copper_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_space_config)
+	};
+}
+
+std::unique_ptr<util::disasm_interface> specnext_copper_device::create_disassembler()
+{
+	return std::make_unique<specnext_copper_disassembler>();
+}
 
 void specnext_copper_device::device_start()
 {

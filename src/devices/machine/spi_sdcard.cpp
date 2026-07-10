@@ -205,7 +205,7 @@ std::error_condition spi_sdcard_device::image_loaded(device_image_interface &ima
 	}
 
 	// ensure block size can be expressed in the CSD
-	if ((info.sectorbytes & (info.sectorbytes - 1)) || !info.sectorbytes || (512 > info.sectorbytes) || (2048 < info.sectorbytes))
+	if (!std::has_single_bit(info.sectorbytes) || (512 > info.sectorbytes) || (2048 < info.sectorbytes))
 	{
 		osd_printf_error("%s: SD Card cannot use sector size %u (must be a power of 2 from 512 to 2048)\n", tag());
 		return image_error::INVALIDIMAGE;

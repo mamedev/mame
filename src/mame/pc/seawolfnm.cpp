@@ -65,7 +65,7 @@ void seawolfnm_state::seawolfnm(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &seawolfnm_state::seawolfnm_map);
 	m_maincpu->set_addrmap(AS_IO, &seawolfnm_state::seawolfnm_io);
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 

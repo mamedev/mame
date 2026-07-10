@@ -231,7 +231,7 @@ void sunplus_gcm394_base_device::chipselect_csx_memory_device_control_w(offs_t o
 	m_782x[offset] = data;
 
 
-	static const char* const md[] =
+	static char const *const md[] =
 	{
 		"(00) ROM / SRAM",
 		"(01) ROM / SRAM",
@@ -1990,12 +1990,12 @@ void sunplus_gcm394_base_device::device_add_mconfig(machine_config &config)
 	m_spg_audio->add_route(0, *this, 1.0, 0);
 	m_spg_audio->add_route(1, *this, 1.0, 1);
 
-	GPL_DMA(config, m_gpl_dma, 0);
+	GPL_DMA(config, m_gpl_dma);
 	m_gpl_dma->space_read_callback().set(FUNC(sunplus_gcm394_base_device::read_space));
 	m_gpl_dma->space_write_callback().set(FUNC(sunplus_gcm394_base_device::write_space));
 	m_gpl_dma->dma_complete_callback().set(FUNC(sunplus_gcm394_base_device::dma_complete));
 
-	GPL_TIMEBASE(config, m_gpl_timebase, 0);
+	GPL_TIMEBASE(config, m_gpl_timebase);
 	m_gpl_timebase->updateirqs_callback().set(FUNC(sunplus_gcm394_base_device::update_interrupts));
 
 	GCM394_VIDEO(config, m_spg_video, DERIVED_CLOCK(1, 1), DEVICE_SELF, m_screen);
@@ -2003,14 +2003,14 @@ void sunplus_gcm394_base_device::device_add_mconfig(machine_config &config)
 	m_spg_video->space_read_callback().set(FUNC(sunplus_gcm394_base_device::read_space));
 	m_spg_video->set_video_space(DEVICE_SELF, AS_PROGRAM);
 
-	TIMER(config, "timer_a").configure_generic(FUNC(sunplus_gcm394_base_device::timer_a_cb));
-	TIMER(config, "timer_b").configure_generic(FUNC(sunplus_gcm394_base_device::timer_b_cb));
-	TIMER(config, "timer_c").configure_generic(FUNC(sunplus_gcm394_base_device::timer_c_cb));
-	TIMER(config, "timer_d").configure_generic(FUNC(sunplus_gcm394_base_device::timer_d_cb));
-	TIMER(config, "timer_e").configure_generic(FUNC(sunplus_gcm394_base_device::timer_e_cb));
-	TIMER(config, "timer_f").configure_generic(FUNC(sunplus_gcm394_base_device::timer_f_cb));
+	TIMER(config, m_timer_a).configure_generic(FUNC(sunplus_gcm394_base_device::timer_a_cb));
+	TIMER(config, m_timer_b).configure_generic(FUNC(sunplus_gcm394_base_device::timer_b_cb));
+	TIMER(config, m_timer_c).configure_generic(FUNC(sunplus_gcm394_base_device::timer_c_cb));
+	TIMER(config, m_timer_d).configure_generic(FUNC(sunplus_gcm394_base_device::timer_d_cb));
+	TIMER(config, m_timer_e).configure_generic(FUNC(sunplus_gcm394_base_device::timer_e_cb));
+	TIMER(config, m_timer_f).configure_generic(FUNC(sunplus_gcm394_base_device::timer_f_cb));
 
-	TIMER(config, "scheduler").configure_generic(FUNC(sunplus_gcm394_base_device::scheduler_cb));
+	TIMER(config, m_scheduler).configure_generic(FUNC(sunplus_gcm394_base_device::scheduler_cb));
 }
 
 

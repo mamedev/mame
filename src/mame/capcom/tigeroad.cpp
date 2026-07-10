@@ -668,7 +668,7 @@ void tigeroad_state::tigeroad(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tigeroad);
 
-	TIGEROAD_SPRITE(config, m_spritegen, 0);
+	TIGEROAD_SPRITE(config, m_spritegen);
 	m_spritegen->set_palette(m_palette);
 	m_spritegen->set_color_base(0x200);
 
@@ -747,7 +747,7 @@ void tigeroad_state::f1dream_comad(machine_config &config) // COMAD-01 PCB with 
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tigeroad);
 
-	TIGEROAD_SPRITE(config, m_spritegen, 0);
+	TIGEROAD_SPRITE(config, m_spritegen);
 	m_spritegen->set_palette(m_palette);
 	m_spritegen->set_color_base(0x200);
 

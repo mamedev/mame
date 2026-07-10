@@ -19,12 +19,14 @@ TODO:
 ****************************************************************************/
 
 #include "emu.h"
+
+#include "bus/rs232/rs232.h"
 #include "cpu/t11/t11.h"
+#include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "bus/rs232/rs232.h"
-#include "machine/clock.h"
 #include "machine/terminal.h"
+
 #include "dct11em.lh"
 
 
@@ -204,9 +206,6 @@ void dct11em_state::machine_reset()
 
 void dct11em_state::machine_start()
 {
-	m_digits.resolve();
-	m_led.resolve();
-
 	save_item(NAME(m_seg_lower));
 	save_item(NAME(m_seg_upper));
 	save_item(NAME(m_portc));
@@ -300,7 +299,7 @@ void dct11em_state::dct11em(machine_config &config)
 	rs232.dsr_handler().set(m_uart, FUNC(i8251_device::write_dsr));
 	rs232.cts_handler().set(m_uart, FUNC(i8251_device::write_cts));
 
-	GENERIC_TERMINAL(config, m_terminal, 0); // Main terminal for now
+	GENERIC_TERMINAL(config, m_terminal); // Main terminal for now
 	m_terminal->set_keyboard_callback(FUNC(dct11em_state::kbd_put));
 }
 

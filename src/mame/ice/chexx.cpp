@@ -362,10 +362,6 @@ INPUT_PORTS_END
 
 void chexx_state::machine_start()
 {
-	m_digits.resolve();
-	m_leds.resolve();
-	m_lamps.resolve();
-
 	m_update_timer = timer_alloc(FUNC(chexx_state::update), this);
 }
 

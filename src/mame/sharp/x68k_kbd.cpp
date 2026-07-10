@@ -273,14 +273,6 @@ void x68k_keyboard_device::device_start()
 {
 	buffered_rs232_device::device_start();
 
-	m_led_kana.resolve();
-	m_led_romaji.resolve();
-	m_led_code.resolve();
-	m_led_caps.resolve();
-	m_led_insert.resolve();
-	m_led_hiragana.resolve();
-	m_led_fullsize.resolve();
-
 	save_item(NAME(m_delay));
 	save_item(NAME(m_repeat));
 	save_item(NAME(m_enabled));

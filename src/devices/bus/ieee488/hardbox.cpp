@@ -338,7 +338,7 @@ void hardbox_device::device_add_mconfig(machine_config &config)
 	ppi1.in_pc_callback().set(FUNC(hardbox_device::ppi1_pc_r));
 	ppi1.out_pc_callback().set(FUNC(hardbox_device::ppi1_pc_w));
 
-	CORVUS_HDC(config, m_hdc, 0);
+	CORVUS_HDC(config, m_hdc);
 	HARDDISK(config, "harddisk1", "corvus_hdd");
 	HARDDISK(config, "harddisk2", "corvus_hdd");
 	HARDDISK(config, "harddisk3", "corvus_hdd");
@@ -405,7 +405,7 @@ hardbox_device::hardbox_device(const machine_config &mconfig, const char *tag, d
 
 void hardbox_device::device_start()
 {
-	m_leds.resolve();
+	save_item(NAME(m_ifc));
 }
 
 

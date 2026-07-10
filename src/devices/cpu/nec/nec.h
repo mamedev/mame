@@ -28,7 +28,7 @@ class nec_common_device : public cpu_device, public nec_disassembler::config
 
 protected:
 	// construction/destruction
-	nec_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type, address_map_constructor internal_port_map = address_map_constructor());
+	nec_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type, bool has_div_quirk, address_map_constructor internal_port_map = address_map_constructor());
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -116,6 +116,8 @@ private:
 	int32_t   m_prefetch_count;
 	uint8_t   m_prefetch_reset;
 	const uint32_t m_chip_type;
+	// https://github.com/mamedev/mame/pull/15620
+	bool      m_has_div_quirk;
 
 	uint32_t  m_prefix_base;    /* base address of the latest prefix segment */
 	uint8_t   m_seg_prefix;     /* prefix segment indicator */

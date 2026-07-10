@@ -5,6 +5,94 @@ license:CC0-1.0
 -->
 <softwarelist name="leapfrog_leappad_cart" description="LeapFrog LeapPad / CocoPad / Benesse Qpad cartridges">
 
+	<software name="ratfr" supported="no">
+		<description>Ratatouille (France)</description>
+		<year>2007</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12681"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="335-13545-41G"/>
+			<feature name="u1" value="MR27V1602L(WE)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-12681 - Ratatouille (France).bin" size="0x200000" crc="c9225047" sha1="0051cab32f2e24d2fa94d73a0190864f04526732" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="intsci" supported="no"> <!-- no serial or date printed anywhere -->
+		<description>Interactif Sciences - Extraordinaires mammiferes! (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-2911"/>
+			<feature name="pcb_rev" value="REV.01"/>
+			<feature name="u1" value="Sunplus32m"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="LeapPad - Interactif Sciences - Extraordinaires mammiferes (France).bin" size="0x400000" crc="33d35d7d" sha1="d40c6506a7c1c908a89a45d30a9ccd4f17824c4f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winniefr" supported="no">
+		<description>Winnie et les pots de miel (France)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="UBL 500-10820"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-3317"/>
+			<feature name="pcb_rev" value="REV.03"/>
+			<feature name="u1" value="HY23V16202"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="UBL 500-10820 - Winnie et les pots de miel (France).bin" size="0x200000" crc="7389d0b3" sha1="70ecd4279c0e919fea50cfd9af9a28829847e628" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nemofr" supported="no">
+		<description>Le Monde De Nemo (France)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="UBL 500-10839"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7210"/>
+			<feature name="pcb_rev" value="REV.00"/>
+			<feature name="u1" value="Oki 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="UBL 500-10839 - Le Monde De Nemo (France).bin" size="0x200000" crc="80bf1e33" sha1="2e5cd191f611456e59ce4836abf3524a8346cda2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="koafait" supported="no">
+		<description>Koa fait les courses (France)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="UBL 500-10868"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-2612"/>
+			<feature name="pcb_rev" value="REV.01"/>
+			<feature name="u1" value="Sunplus16m-b"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="UBL 500-10868 - Koa fait les courses (France).bin" size="0x200000" crc="42fb0d7a" sha1="8593ae140a0130ee9a4e878b2d9c035d5b70852c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="surflop" supported="no">
+		<description>On Peut Compter Sur Flop! (France)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="UBL 500-10869"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7211"/>
+			<feature name="pcb_rev" value="REV.01"/>
+			<feature name="u1" value="OKi 16M(F)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="UBL 500-10869 - On Peut Compter Sur Flop (France).bin" size="0x200000" crc="debafd59" sha1="cc1e903e60121a58ba773a35c9e75df14e6000d6" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tiggerbnca" cloneof="tiggerbnc" supported="no">
 		<description>Disney's Bounce, Tigger, Bounce (UK)</description>
 		<year>200?</year>
@@ -71,6 +159,21 @@ license:CC0-1.0
 			<feature name="u1" value="MX23L3211B"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
 				<rom name="500-00090 RVB - Music - Hit it, Maestro.bin" size="0x400000" crc="a2770684" sha1="4f389c6dbcd3ff2a647a6d18df86c472444074e4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musique" cloneof="hititmstro" supported="no">
+		<description>Musique, Maestro! (France)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-01357"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-3326"/>
+			<feature name="pcb_rev" value="REV:00"/>
+			<feature name="u1" value="HY32M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-01357 - Musique, Maestro (France).bin" size="0x400000" crc="e77d1e3d" sha1="f418febc05305afb79521f536598bdac7e95d2e8" />
 			</dataarea>
 		</part>
 	</software>
@@ -257,6 +360,21 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="scoobfr" cloneof="scoobydonut" supported="no">
+		<description>Scooby-Doo et le mystere des beignets (France)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="UBL 500-10819"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000+003+7211"/>
+			<feature name="pcb_rev" value="REV.00"/>
+			<feature name="u1" value="OKi 16M(F)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="UBL 500-10819 - Scooby-Doo et le mystere des beignets (France).bin" size="0x200000" crc="f7e5eb54" sha1="71314f89ab4cca4f95743bd9d10812ca6cb1a49c" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dinobdark" supported="no">
 		<description>- Great Reader Series - Dinosaurs Before Dark (UK)</description>
 		<year>2002</year>
@@ -346,6 +464,21 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="lionfr" cloneof="lionking" supported="no">
+		<description>Le Roi Lion (France)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="UBL 500-10341"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7021"/>
+			<feature name="pcb_rev" value="REV.01"/>
+			<feature name="u1" value="Matronix 32m"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="UBL 500-10341 - Le Roi Lion (France).bin" size="0x400000" crc="65d294ed" sha1="b217757ce332b7a8645b51d38dc38a8d929f9279" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="findnemoa" supported="no">
 		<description>Leap 1 - Reading - Disney/Pixar Finding Nemo (UK)</description>
 		<year>2003</year>
@@ -429,6 +562,21 @@ license:CC0-1.0
 			<feature name="u1" value="OKI 32M(L)-XXWE"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
 				<rom name="500-10478 UBL - LeapPad - Libro Interactivo (SP).bin" size="0x400000" crc="6a85ec74" sha1="024927d8eae8c4327079dd7d752f483445b51f3e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="livreint" cloneof="lpbook" supported="no">
+		<description>Livre interactif (France)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-01369 UBL"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="335-13545-30"/>
+			<feature name="pcb_rev" value="V00"/>
+			<feature name="u1" value="MX27V3202F"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-01369 UBL - Livre interactif (France).bin" size="0x400000" crc="364852a1" sha1="c84bf9b5b2752f416a9dcff4138e070a1c0b4c6a" />
 			</dataarea>
 		</part>
 	</software>
@@ -629,6 +777,21 @@ license:CC0-1.0
 			<feature name="u1" value="Matronix 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
 				<rom name="500-10848 UBL - Cuentos de las Princesas (SP).bin" size="0x200000" crc="fc6ed25b" sha1="6bd357dca86a37fe1646d010d8bcf150e8d0a95e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="histprinc" cloneof="princess" supported="no">
+		<description>Disney Princesse - Histoires de princesses (France)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="UBL 500-10818"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7011"/>
+			<feature name="pcb_rev" value="REV.01"/>
+			<feature name="u1" value="Matronix 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="UBL 500-10818 - Histoires de princesses (France).bin" size="0x200000" crc="4d4537f1" sha1="6b4093ad64e4c4662522906309b7a61d345b0e6f" />
 			</dataarea>
 		</part>
 	</software>
@@ -1061,6 +1224,21 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="minnatanb" cloneof="minnatan"  supported="no">
+		<description>Minna de tanoshiku! CoCoPad (Japan)</description>
+		<year>2003</year>
+		<publisher>LeapFrog / Sega Toys</publisher>
+		<info name="alt_title" value="みんなでたのしく! ココパッド!" />
+		<info name="serial" value="500-10176"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7123"/>
+			<feature name="u1" value="OKi 32m REV.01"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-10176.bin" size="0x400000" crc="47df0443" sha1="e25337d9810c4922875d7fa5f40e834ed7c05d9e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bennyeng2" supported="no">
 		<description>Benny and Friends English Book Vol. 2 -Majo to taiketsu! Daibouken- (Japan)</description>
 		<year>2002</year>
@@ -1303,6 +1481,21 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="oshaberi" supported="no">
+		<description>Oshaberi CoCoPad Mic (Japan)</description>
+		<year>2006</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="おしゃべりココパッドマイク" />
+		<info name="serial" value="500-11720"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7234"/>
+			<feature name="u1" value="OKI 32M(L)-XXWE REV:00"/> <!-- ROM under epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-11720.bin" size="0x400000" crc="c4c71c9d" sha1="1d7933d95bde0247690c2e8e4d5c8374ecb4c0c5" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="oej1ggdni" supported="no">
 		<description>Oyako Eigo Step 1-gatsu gou - Doubutsuen ni Ikou! (Japan)</description>
 		<year>2003</year>
@@ -1313,6 +1506,66 @@ license:CC0-1.0
 			<feature name="pcb" value="57000-003-7118"/>
 			<dataarea name="rom" size="0x200000">
 				<rom name="500-00854.bin" size="0x200000" crc="2be805d4" sha1="67eed8451c913af274246b4f825eb01913e2cea0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oes9ggsno" supported="no">
+		<description>Oyako Eigo Step 9-gatsu gou - Shimajirou no Otetsudaiyasan (Japan)</description>
+		<year>2004</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="おやこえいご すてっぷ 9がつごう しまじろうのおてつだいやさん" />
+		<info name="serial" value="500-10691"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="000-835040-101005V1"/>
+			<feature name="u1" value="MR27V1602E"/> <!-- ROM under epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-10691.bin" size="0x200000" crc="ab13077a" sha1="93a8a3be44ac90eae4256dd44693617d814b0bab" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oes579gg" supported="no">
+		<description>Oyako Eigo Step - 2005 nen 5, 7, 9 gatsu gou (Japan)</description>
+		<year>2005</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="おやこえいご すてっぷ 2005ねん5, 7, 9がつごう" />
+		<info name="serial" value="500-11398"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7218"/>
+			<feature name="u1" value="OKi 16M REV.01"/> <!-- ROM under epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-11398.bin" size="0x200000" crc="244bc839" sha1="26e17782868e47c58b09c0489603231ee1b491d9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oes1113gg" supported="no">
+		<description>Oyako Eigo Step - 2005 nen 11 gatsu gou / 2006 nen 1, 3 gatsu gou (Japan)</description>
+		<year>2005</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="おやこえいご すてっぷ 2005ねん11がつごう / 2006ねん1, 3がつごう" />
+		<info name="serial" value="500-11401"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7228"/>
+			<feature name="u1" value="OKI 32(J) REV:00"/> <!-- ROM under epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-11401.bin" size="0x400000" crc="ce0cf7ba" sha1="86d6d0794596e3210809bb67b856068ec7968730" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oes3gwg" supported="no">
+		<description>Oyako Eigo Step - 2005 nen 3 gatsu Welcome gou (Japan)</description>
+		<year>2005</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="おやこえいご すてっぷ 2005ねん3がつウェルカムごう - しまじろうとえいごにちょうせん!" />
+		<info name="serial" value="500-11409"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="000-835040-101040V1"/>
+			<feature name="u1" value="5124K"/> <!-- ROM under epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-11409.bin" size="0x200000" crc="86bd2bf0" sha1="17855b265ecce83d4d29a923fa63c6672aca0039" />
 			</dataarea>
 		</part>
 	</software>
@@ -1331,6 +1584,21 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="oej5ggabc" supported="no">
+		<description>Oyako Eigo Jump 5-gatsu gou - Shimajirou to ABC / 7 gatsu gou - The Three Little Pigs (Japan)</description>
+		<year>2005</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="おやこえいご じゃんぷ 5がつごう - しまじろうと ABC / 7がつごう THE THREE LITTLE PIGS" />
+		<info name="serial" value="500-11744"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7228"/>
+			<feature name="u1" value="OKI 32(J) REV:00"/> <!-- ROM under epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-11744.bin" size="0x400000" crc="e3995d9b" sha1="0cef61e46c40aac657dd1cd772efac0170a88dd5" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="oej9gg" supported="no">
 		<description>Oyako Eigo Jump 9-gatsu gou - Monjaa Gou de Tankenja! (Japan)</description>
 		<year>2003</year>
@@ -1345,6 +1613,36 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="oej9ggsrej" supported="no">
+		<description>Oyako Eigo Jump 9-gatsu gou - Shiamjirou to Ribby no Eigo Jiten (Japan)</description>
+		<year>2005</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="おやこえいご じゃんぷ 9がつごう - しまじろうとリビーの えいごえじてん" />
+		<info name="serial" value="500-11733"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7218"/>
+			<feature name="u1" value="OKi 16M REV.01"/> <!-- ROM under epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-11733.bin" size="0x200000" crc="b671fcf7" sha1="753e3b2400804381d408e8a0fe5129637f480693" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oej111gg" supported="no">
+		<description>Oyako Eigo Jump 11-gatsu gou - Shimajirou to Ribby no CoCoPad Eigo party / 1-gatsu gou - Shimajirou to Ribby no Shougakkou Tanken (Japan)</description>
+		<year>2006</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="おやこえいご じゃんぷ 11がつごう - しまじろうとリビーのココパッドえいごパーティー / 1がつごう - しまじろうとリビーのしょうがっこうたんけん" />
+		<info name="serial" value="500-12451"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7228"/>
+			<feature name="u1" value="OKI 32(J) REV:00"/> <!-- ROM under epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-12451.bin" size="0x400000" crc="689101ad" sha1="b4aa797eddf3d690ae551a795250ca449cf6fbbd" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="oej1ggstr" supported="no">
 		<description>Oyako Eigo Jump 1-gatsu gou - Shougakkou Taiken Report (Japan)</description>
 		<year>2004</year>
@@ -1355,6 +1653,21 @@ license:CC0-1.0
 			<feature name="pcb" value="57000-003-7218"/>
 			<dataarea name="rom" size="0x200000">
 				<rom name="500-01011.bin" size="0x200000" crc="f76f85df" sha1="41470aa545fb501c43bd485335a51f376a0851d5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oej1ggsrst" supported="no">
+		<description>Oyako Eigo Jump 1 gatsu gou - Shimajirou to Ribby no Shougakkou Tanken (Japan)</description>
+		<year>2006</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="おやこえいご じゃんぷ 1がつごう - しまじろうとリビーの しょうがっこうたんけん" />
+		<info name="serial" value="500-11412"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7218"/>
+			<feature name="u1" value="OKi 16M REV.01"/> <!-- ROM under epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-11412.bin" size="0x200000" crc="b606fc7c" sha1="9246725af5eb9e2991d72c96cda17c2952276a5e" />
 			</dataarea>
 		</part>
 	</software>
@@ -1514,6 +1827,21 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="ribbytmd08" cloneof="ribbytmd" supported="no">
+		<description>2008 July Shimajirou to Ribby no Eigo Jiten / 2008 September Onahashi CoCoPad Time Machine de Daibouken! (Japan)</description>
+		<year>2008</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="2008 July しまじろうトリビーのえいごえじてん / 2008 September しまじろうとりびーのおはなしココパッド タイムマシーンでだいぼうけん!" />
+		<info name="serial" value="500-13254"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7234"/>
+			<feature name="u1" value="OKI 32M(L)-XXWE REV:00"/> <!-- ROM under epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-113254.bin" size="0x400000" crc="47cd11fe" sha1="48efe795b2ac151f63678d09bbb5d0102cdc3b59" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ribbyst" supported="no">
 		<description>Shimajirou to Ribby no CoCoPad Game Party / Shougakkou Tanken (Japan)</description>
 		<year>2007</year> <!-- title has 2008, but copyright on cartridge is still 2007 -->
@@ -1524,6 +1852,21 @@ license:CC0-1.0
 			<feature name="pcb" value="57000+003+7238"/>
 			<dataarea name="rom" size="0x400000">
 				<rom name="500-12814.bin" size="0x400000" crc="2707fd55" sha1="e73e5d551c7a8e29e1aa49b968c4de142b72aa25" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ribbyst08" cloneof="ribbyst" supported="no">
+		<description>2008 November Shimajirou to Ribby no CoCoPad Game Party / 2009 January Shimajirou to Ribby Shougakkou Tanken (Japan)</description>
+		<year>2008</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="2008 November しまじろうとリビーのココパッドゲームパーティ / 2009 January しまじろうとリビーのしょうがっこうたんけん" />
+		<info name="serial" value="500-13237"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7234"/>
+			<feature name="u1" value="OKI 32M(L)-XXWE REV:00"/> <!-- ROM under epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-13237.bin" size="0x400000" crc="d6427414" sha1="e4fd7f72f48aa764cb6c882df7678dcff307c1e6" />
 			</dataarea>
 		</part>
 	</software>

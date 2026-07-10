@@ -59,6 +59,8 @@ sensor state instead.
 #include "emu.h"
 #include "sensorboard.h"
 
+#include <bit>
+
 
 DEFINE_DEVICE_TYPE(SENSORBOARD, sensorboard_device, "sensorboard", "Sensorboard")
 
@@ -69,9 +71,9 @@ DEFINE_DEVICE_TYPE(SENSORBOARD, sensorboard_device, "sensorboard", "Sensorboard"
 sensorboard_device::sensorboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SENSORBOARD, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
-	m_out_piece(*this, "piece_%c%u", unsigned('a'), 1U),
-	m_out_pui(*this, "piece_ui%u", 0U),
-	m_out_count(*this, "count_ui%u", 0U),
+	m_out_piece(),
+	m_out_pui(),
+	m_out_count(),
 	m_inp_rank(*this, "RANK.%u", 1),
 	m_inp_spawn(*this, "SPAWN"),
 	m_inp_ui(*this, "UI"),
@@ -99,18 +101,31 @@ sensorboard_device::sensorboard_device(const machine_config &mconfig, const char
 
 
 //-------------------------------------------------
+//  device_config_complete
+//-------------------------------------------------
+
+void sensorboard_device::device_config_complete()
+{
+	if (m_output_cb.isunset())
+	{
+		// resolve optional output handlers
+		if (!m_out_piece)
+			m_out_piece.emplace(*this, "piece_%c%u", unsigned('a'), 1U);
+		if (!m_out_pui)
+			m_out_pui.emplace(*this, "piece_ui%u", 0U);
+		if (!m_out_count)
+			m_out_count.emplace(*this, "count_ui%u", 0U);
+	}
+}
+
+
+
+//-------------------------------------------------
 //  device_start / reset
 //-------------------------------------------------
 
 void sensorboard_device::device_start()
 {
-	if (m_output_cb.isunset())
-	{
-		m_out_piece.resolve();
-		m_out_pui.resolve();
-		m_out_count.resolve();
-	}
-
 	m_undotimer = timer_alloc(FUNC(sensorboard_device::undo_tick), this);
 	m_sensortimer = timer_alloc(FUNC(sensorboard_device::sensor_off), this);
 	cancel_sensor();
@@ -327,14 +342,14 @@ void sensorboard_device::refresh()
 		if (custom_out)
 			m_output_cb(i + 0x101, i + 1);
 		else
-			m_out_pui[i + 1] = i + 1;
+			(*m_out_pui)[i + 1] = i + 1;
 	}
 
 	// output hand piece
 	if (custom_out)
 		m_output_cb(0x100, m_hand);
 	else
-		m_out_pui[0] = m_hand;
+		(*m_out_pui)[0] = m_hand;
 
 	// output board state
 	for (int x = 0; x < m_width; x++)
@@ -350,7 +365,7 @@ void sensorboard_device::refresh()
 			if (custom_out)
 				m_output_cb(pos, piece);
 			else
-				m_out_piece[x][y] = piece;
+				(*m_out_piece)[x][y] = piece;
 		}
 
 	// set new move on board state change
@@ -384,8 +399,8 @@ void sensorboard_device::refresh()
 	}
 	else
 	{
-		m_out_count[0] = c0;
-		m_out_count[1] = c1;
+		(*m_out_count)[0] = c0;
+		(*m_out_count)[1] = c1;
 	}
 }
 
@@ -501,7 +516,7 @@ INPUT_CHANGED_MEMBER(sensorboard_device::sensor)
 
 INPUT_CHANGED_MEMBER(sensorboard_device::ui_spawn)
 {
-	u8 pos = (newval) ? (u8)param : 32 - count_leading_zeros_32(m_inp_spawn->read());
+	u8 pos = newval ? u8(param) : std::bit_width(m_inp_spawn->read());
 	if (pos == 0 || pos > m_maxspawn)
 		return;
 

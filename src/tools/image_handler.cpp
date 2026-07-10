@@ -16,6 +16,7 @@
 #include "strformat.h"
 
 #include <algorithm>
+#include <cstring>
 
 
 // Format enumeration

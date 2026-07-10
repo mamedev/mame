@@ -254,7 +254,7 @@ uint8_t combatsc_state::trackball_r(offs_t offset)
 
 void combatsc_state::sh_irqtrigger_w(uint8_t data)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 }
 
 uint8_t combatsc_state::busy_r()
@@ -676,12 +676,12 @@ void combatsc_state::combatsc(machine_config &config)
 	m_palette->set_format(palette_device::xBGR_555, 8 * 16 * 16, 128);
 	m_palette->set_endianness(ENDIANNESS_LITTLE);
 
-	K007121(config, m_k007121[0], 0, gfx_combatsc_1, m_palette, m_screen);
+	K007121(config, m_k007121[0], gfx_combatsc_1, m_palette, m_screen);
 	m_k007121[0]->set_irq_cb().set_inputline(m_maincpu, HD6309_IRQ_LINE);
 	m_k007121[0]->set_flipscreen_cb().set(FUNC(combatsc_state::flipscreen_w<0>));
 	m_k007121[0]->set_sprite_callback(FUNC(combatsc_state::sprite_callback<0>));
 
-	K007121(config, m_k007121[1], 0, gfx_combatsc_2, m_palette, m_screen);
+	K007121(config, m_k007121[1], gfx_combatsc_2, m_palette, m_screen);
 	m_k007121[1]->set_flipscreen_cb().set(FUNC(combatsc_state::flipscreen_w<1>));
 	m_k007121[1]->set_sprite_callback(FUNC(combatsc_state::sprite_callback<1>));
 

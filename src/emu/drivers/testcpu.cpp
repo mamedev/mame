@@ -93,7 +93,7 @@ private:
 			for (int regnum = 0; regnum < 32; regnum++)
 			{
 				double value = double(regnum | (regnum << 8) | (regnum << 16) | (regnum << 24));
-				m_cpu->set_state_int(PPC_F0 + regnum, d2u(value));
+				m_cpu->set_state_int(PPC_F0 + regnum, std::bit_cast<u64>(value));
 			}
 
 			// output initial state

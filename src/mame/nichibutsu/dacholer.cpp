@@ -589,8 +589,6 @@ void dacholer_state::adpcm_int(int state)
 
 void dacholer_state::machine_start()
 {
-	m_leds.resolve();
-
 	save_item(NAME(m_bg_bank));
 	save_item(NAME(m_msm_data));
 	save_item(NAME(m_msm_toggle));

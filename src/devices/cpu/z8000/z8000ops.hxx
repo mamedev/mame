@@ -24,6 +24,7 @@ void z8002_device::CHANGE_FCW(uint16_t fcw)
 		tmp = RW(15);
 		RW(15) = m_nspoff;
 		m_nspoff = tmp;
+		m_ns_out((fcw & F_S_N) ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	fcw &= ~F_SEG;  /* never set segmented mode bit on Z8002 */
@@ -47,6 +48,7 @@ void z8001_device::CHANGE_FCW(uint16_t fcw)
 		tmp = RW(15);
 		RW(15) = m_nspoff;
 		m_nspoff = tmp;
+		m_ns_out((fcw & F_S_N) ? CLEAR_LINE : ASSERT_LINE);
 	}
 	/* User mode R14 is used in user mode and non-segmented system mode.
 	   System mode R14 is only used in segmented system mode.
@@ -195,12 +197,14 @@ void z8002_device::WRBX_L(uint8_t reg, uint16_t idx, uint32_t value)
 	WRMEM_L(reg == SP ? m_stack : m_data, addr_add(addr_from_reg(reg), idx), value);
 }
 
+#define ADD_ALIGNED16(x, value) (x) += (value) - ((x) & 1)
+
 void z8002_device::PUSHW(uint8_t dst, uint16_t value)
 {
 	if (get_segmented_mode())
-		RW(dst | 1) -= 2;
+		ADD_ALIGNED16(RW(dst | 1), -2);
 	else
-		RW(dst) -= 2;
+		ADD_ALIGNED16(RW(dst), -2);
 	WRIR_W(dst, value);
 }
 
@@ -208,18 +212,18 @@ uint16_t z8002_device::POPW(uint8_t src)
 {
 	uint16_t result = RDIR_W(src);
 	if (get_segmented_mode())
-		RW(src | 1) += 2;
+		ADD_ALIGNED16(RW(src | 1), 2);
 	else
-		RW(src) += 2;
+		ADD_ALIGNED16(RW(src), 2);
 	return result;
 }
 
 void z8002_device::PUSHL(uint8_t dst, uint32_t value)
 {
 	if (get_segmented_mode())
-		RW(dst | 1) -= 4;
+		ADD_ALIGNED16(RW(dst | 1), -4);
 	else
-		RW(dst) -= 4;
+		ADD_ALIGNED16(RW(dst), -4);
 	WRIR_L(dst, value);
 }
 
@@ -227,9 +231,9 @@ uint32_t z8002_device::POPL(uint8_t src)
 {
 	uint32_t result = RDIR_L(src);
 	if (get_segmented_mode())
-		RW(src | 1) += 4;
+		ADD_ALIGNED16(RW(src | 1), 4);
 	else
-		RW(src) += 4;
+		ADD_ALIGNED16(RW(src), 4);
 	return result;
 }
 
@@ -2552,7 +2556,8 @@ void z8002_device::Z39_ssN0_0000()
 }
 
 /******************************************
- inib(r) @rd,@rs,ra
+ inib    @rd,@rs,ra
+ inirb   @rd,@rs,ra
  flags:  ---V--
  ******************************************/
 void z8002_device::Z3A_ssss_0000_0000_aaaa_dddd_x000()
@@ -2569,7 +2574,7 @@ void z8002_device::Z3A_ssss_0000_0000_aaaa_dddd_x000()
 
 /******************************************
  sinib   @rd,@rs,ra
- sinibr  @rd,@rs,ra
+ sinirb  @rd,@rs,ra
  flags:  ------
  ******************************************/
 void z8002_device::Z3A_ssss_0001_0000_aaaa_dddd_x000()
@@ -2581,13 +2586,12 @@ void z8002_device::Z3A_ssss_0001_0000_aaaa_dddd_x000()
 	GET_CCC(OP1,NIB3);
 	WRIR_B(dst, RDPORT_B( 1, RW(src)));
 	RW(dst)++;
-	RW(src)++;
 	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
  outib   @rd,@rs,ra
- outibr  @rd,@rs,ra
+ otirb   @rd,@rs,ra
  flags:  ---V--
  ******************************************/
 void z8002_device::Z3A_ssss_0010_0000_aaaa_dddd_x000()
@@ -2604,7 +2608,7 @@ void z8002_device::Z3A_ssss_0010_0000_aaaa_dddd_x000()
 
 /******************************************
  soutib  @rd,@rs,ra
- soutibr @rd,@rs,ra
+ sotirb  @rd,@rs,ra
  flags:  ------
  ******************************************/
 void z8002_device::Z3A_ssss_0011_0000_aaaa_dddd_x000()
@@ -2614,8 +2618,7 @@ void z8002_device::Z3A_ssss_0011_0000_aaaa_dddd_x000()
 	GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
-	WRPORT_B( 1, RW(dst), RDIR_W(src));
-	RW(dst)++;
+	WRPORT_B( 1, RW(dst), RDIR_B(src));
 	RW(src)++;
 	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
@@ -2682,13 +2685,12 @@ void z8002_device::Z3A_ssss_1000_0000_aaaa_dddd_x000()
 	GET_CCC(OP1,NIB3);
 	WRIR_B(dst, RDPORT_B( 0, RW(src)));
 	RW(dst)--;
-	RW(src)--;
 	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
  sindb   @rd,@rs,rba
- sindbr  @rd,@rs,rba
+ sindrb  @rd,@rs,rba
  flags:  ------
  ******************************************/
 void z8002_device::Z3A_ssss_1001_0000_aaaa_dddd_x000()
@@ -2700,13 +2702,12 @@ void z8002_device::Z3A_ssss_1001_0000_aaaa_dddd_x000()
 	GET_CCC(OP1,NIB3);
 	WRIR_B(dst, RDPORT_B( 1, RW(src)));
 	RW(dst)--;
-	RW(src)--;
 	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
  outdb   @rd,@rs,rba
- outdbr  @rd,@rs,rba
+ otdrb   @rd,@rs,rba
  flags:  ---V--
  ******************************************/
 void z8002_device::Z3A_ssss_1010_0000_aaaa_dddd_x000()
@@ -2717,14 +2718,13 @@ void z8002_device::Z3A_ssss_1010_0000_aaaa_dddd_x000()
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
 	WRPORT_B( 0, RW(dst), RDIR_B(src));
-	RW(dst)--;
 	RW(src)--;
 	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
  soutdb  @rd,@rs,rba
- soutdbr @rd,@rs,rba
+ sotdbr  @rd,@rs,rba
  flags:  ------
  ******************************************/
 void z8002_device::Z3A_ssss_1011_0000_aaaa_dddd_x000()
@@ -2735,7 +2735,6 @@ void z8002_device::Z3A_ssss_1011_0000_aaaa_dddd_x000()
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
 	WRPORT_B( 1, RW(dst), RDIR_B(src));
-	RW(dst)--;
 	RW(src)--;
 	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
@@ -2754,7 +2753,6 @@ void z8002_device::Z3B_ssss_0000_0000_aaaa_dddd_x000()
 	GET_CCC(OP1,NIB3);
 	WRIR_W(dst, RDPORT_W( 0, RW(src)));
 	RW(dst) += 2;
-	RW(src) += 2;
 	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
@@ -2772,13 +2770,12 @@ void z8002_device::Z3B_ssss_0001_0000_aaaa_dddd_x000()
 	GET_CCC(OP1,NIB3);
 	WRIR_W(dst, RDPORT_W( 1, RW(src)));
 	RW(dst) += 2;
-	RW(src) += 2;
 	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
  outi    @rd,@rs,ra
- outir   @rd,@rs,ra
+ otir    @rd,@rs,ra
  flags:  ---V--
  ******************************************/
 void z8002_device::Z3B_ssss_0010_0000_aaaa_dddd_x000()
@@ -2789,14 +2786,13 @@ void z8002_device::Z3B_ssss_0010_0000_aaaa_dddd_x000()
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
 	WRPORT_W( 0, RW(dst), RDIR_W(src));
-	RW(dst) += 2;
 	RW(src) += 2;
 	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
  souti   @rd,@rs,ra
- soutir  @rd,@rs,ra
+ sotir   @rd,@rs,ra
  flags:  ------
  ******************************************/
 void z8002_device::Z3B_ssss_0011_0000_aaaa_dddd_x000()
@@ -2807,7 +2803,6 @@ void z8002_device::Z3B_ssss_0011_0000_aaaa_dddd_x000()
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
 	WRPORT_W( 1, RW(dst), RDIR_W(src));
-	RW(dst) += 2;
 	RW(src) += 2;
 	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
@@ -2874,7 +2869,6 @@ void z8002_device::Z3B_ssss_1000_0000_aaaa_dddd_x000()
 	GET_CCC(OP1,NIB3);
 	WRIR_W(dst, RDPORT_W( 0, RW(src)));
 	RW(dst) -= 2;
-	RW(src) -= 2;
 	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
@@ -2892,13 +2886,12 @@ void z8002_device::Z3B_ssss_1001_0000_aaaa_dddd_x000()
 	GET_CCC(OP1,NIB3);
 	WRIR_W(dst, RDPORT_W( 1, RW(src)));
 	RW(dst) -= 2;
-	RW(src) -= 2;
 	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
  outd    @rd,@rs,ra
- outdr   @rd,@rs,ra
+ otdr    @rd,@rs,ra
  flags:  ---V--
  ******************************************/
 void z8002_device::Z3B_ssss_1010_0000_aaaa_dddd_x000()
@@ -2909,14 +2902,13 @@ void z8002_device::Z3B_ssss_1010_0000_aaaa_dddd_x000()
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
 	WRPORT_W( 0, RW(dst), RDIR_W(src));
-	RW(dst) -= 2;
 	RW(src) -= 2;
 	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
  soutd   @rd,@rs,ra
- soutdr  @rd,@rs,ra
+ sotdr   @rd,@rs,ra
  flags:  ------
  ******************************************/
 void z8002_device::Z3B_ssss_1011_0000_aaaa_dddd_x000()
@@ -2927,7 +2919,6 @@ void z8002_device::Z3B_ssss_1011_0000_aaaa_dddd_x000()
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
 	WRPORT_W( 1, RW(dst), RDIR_W(src));
-	RW(dst) -= 2;
 	RW(src) -= 2;
 	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
@@ -4797,10 +4788,10 @@ void z8002_device::Z7D_dddd_0ccc()
 			RW(dst) = m_refresh;
 			break;
 		case 4:
-			RW(dst) = m_psapseg;
+			RW(dst) = m_psapseg & 0x7f00;
 			break;
 		case 5:
-			RW(dst) = m_psapoff;
+			RW(dst) = m_psapoff & 0xff00;
 			break;
 		case 6:
 			RW(dst) = m_nspseg;
@@ -4826,7 +4817,7 @@ void z8002_device::Z7D_ssss_1ccc()
 		case 2:
 			{
 				uint16_t fcw;
-				fcw = RW(src);
+				fcw = RW(src) & 0xd8fc;
 				CHANGE_FCW(fcw); /* check for user/system mode change */
 			}
 			break;
@@ -4834,10 +4825,12 @@ void z8002_device::Z7D_ssss_1ccc()
 			m_refresh = RW(src);
 			break;
 		case 4:
-			m_psapseg = RW(src);
+			m_psapseg &= ~0x7f00;
+			m_psapseg |= RW(src) & 0x7f00;
 			break;
 		case 5:
-			m_psapoff = RW(src);
+			m_psapoff &= ~0xff00;
+			m_psapoff |= RW(src) & 0xff00;
 			break;
 		case 6:
 			m_nspseg = RW(src);

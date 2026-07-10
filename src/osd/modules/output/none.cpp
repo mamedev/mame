@@ -28,9 +28,10 @@ public:
 	virtual void exit() override { }
 
 	// output_module
-
-	virtual void notify(const char *outname, int32_t value) override { }
-
+	virtual void notify(const output_item &item, std::int32_t seconds, std::int64_t attoseconds) override { }
+	virtual void pause() override { }
+	virtual void resume() override { }
+	virtual void update() override { }
 };
 
 } // anonymous namespace

@@ -52,6 +52,7 @@ using util::BIT;
 #include "cpu/dspp/dsppdasm.h"
 #include "cpu/e0c6200/e0c6200d.h"
 #include "cpu/e132xs/e1dasm.h"
+#include "cpu/edsp/edspdasm.h"
 #include "cpu/es5510/es5510d.h"
 #include "cpu/esrip/esripdsm.h"
 #include "cpu/f2mc16/f2mc16d.h"
@@ -447,6 +448,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "dsp563xx",        le, -2, []() -> util::disasm_interface * { return new dsp563xx_disassembler; } },
 	{ "dspp",            be, -1, []() -> util::disasm_interface * { return new dspp_disassembler; } },
 	{ "e0c6200",         be, -1, []() -> util::disasm_interface * { return new e0c6200_disassembler; } },
+	{ "edsp",            le, -1, []() -> util::disasm_interface * { return new edsp_disassembler; } },
 	{ "epg3231",         le, -1, []() -> util::disasm_interface * { return new epg3231_disassembler; } },
 //  { "es5510",          be,  0, []() -> util::disasm_interface * { return new es5510_disassembler; } }, // Currently does nothing
 	{ "esrip",           be,  0, []() -> util::disasm_interface * { return new esrip_disassembler; } },
@@ -567,6 +569,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "nios2",           le,  0, []() -> util::disasm_interface * { return new nios2_disassembler; } },
 	{ "nova",            be, -1, []() -> util::disasm_interface * { return new nova_disassembler; } },
 	{ "ns32000",         le,  0, []() -> util::disasm_interface * { return new ns32000_disassembler; } },
+	{ "ns32532",         le,  0, []() -> util::disasm_interface * { return new ns32000_disassembler(ns32000_disassembler::model::ns32532); } },
 	{ "nuon",            be,  0, []() -> util::disasm_interface * { return new nuon_disassembler; } },
 	{ "nsc8105",         be,  0, []() -> util::disasm_interface * { return new m680x_disassembler(8105); } },
 	{ "nx8_500s",        le,  0, []() -> util::disasm_interface * { return new nx8_500s_disassembler; } },
@@ -631,6 +634,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "sparcv9vis3",     be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, sparc_disassembler::v9, sparc_disassembler::vis_3); } },
 	{ "sparcv9vis3b",    be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, sparc_disassembler::v9, sparc_disassembler::vis_3b); } },
 	{ "spc700",          le,  0, []() -> util::disasm_interface * { return new spc700_disassembler; } },
+	//{ "specnextcopper",  be,  0, []() -> util::disasm_interface * { return new specnext_copper_disassembler; } },
 	{ "ssem",            le,  0, []() -> util::disasm_interface * { return new ssem_disassembler; } },
 	{ "ssp1601",         be, -1, []() -> util::disasm_interface * { return new ssp1601_disassembler; } },
 	{ "st62xx",          le,  0, []() -> util::disasm_interface * { return new st62xx_disassembler; } },

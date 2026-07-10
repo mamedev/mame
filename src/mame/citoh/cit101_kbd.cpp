@@ -84,11 +84,6 @@ cit101e_keyboard_device::cit101e_keyboard_device(const machine_config &mconfig, 
 {
 }
 
-void cit101_keyboard_device::device_resolve_objects()
-{
-	m_leds.resolve();
-}
-
 void cit101_keyboard_device::device_start()
 {
 	save_item(NAME(m_kbid_enabled));

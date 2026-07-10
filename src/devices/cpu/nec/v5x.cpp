@@ -252,14 +252,14 @@ void device_v5x_interface::v5x_add_mconfig(machine_config &config)
 
 	V5X_DMAU(config, m_dmau, DERIVED_CLOCK(1, 4));
 
-	V5X_ICU(config, m_icu, 0);
+	V5X_ICU(config, m_icu);
 	m_icu->out_int_callback().set(FUNC(device_v5x_interface::internal_irq_w));
 	m_icu->in_sp_callback().set_constant(1);
 	m_icu->read_slave_ack_callback().set(FUNC(device_v5x_interface::get_pic_ack));
 
-	V5X_SCU(config, m_scu, 0);
+	V5X_SCU(config, m_scu);
 
-	TIMER(config, m_brc_timer, 0);
+	TIMER(config, m_brc_timer);
 	m_brc_timer->set_callback(FUNC(device_v5x_interface::brc_timer_tick));
 }
 
@@ -569,7 +569,7 @@ device_memory_interface::space_config_vector v50_base_device::memory_space_confi
 }
 
 v50_base_device::v50_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool is_16bit, u8 prefetch_size, u8 prefetch_cycles, u32 chip_type)
-	: nec_common_device(mconfig, type, tag, owner, clock, is_16bit, prefetch_size, prefetch_cycles, chip_type, address_map_constructor(FUNC(v50_base_device::internal_port_map), this))
+	: nec_common_device(mconfig, type, tag, owner, clock, is_16bit, prefetch_size, prefetch_cycles, chip_type, false, address_map_constructor(FUNC(v50_base_device::internal_port_map), this))
 	, device_v5x_interface(mconfig, *this, clock, is_16bit)
 	, m_tout1_callback(*this)
 	, m_icu_slave_ack(*this, 0)

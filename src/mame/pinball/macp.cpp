@@ -48,16 +48,20 @@ public:
 		, m_io_keyboard(*this, "X%d", 0U)
 		, m_digits(*this, "digit%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
-		{ }
+	{ }
 
-	void mac16k(machine_config &config);
-	void mac32k(machine_config &config);
+	void mac16k(machine_config &config) ATTR_COLD;
+	void mac32k(machine_config &config) ATTR_COLD;
 	void mem16k_map(address_map &map) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
 	void io16k_map(address_map &map) ATTR_COLD;
 	void mem32k_map(address_map &map) ATTR_COLD;
 	void io32k_map(address_map &map) ATTR_COLD;
-
-private:
 	void clock_tick(int state);
 	void irq_w(int state);
 	void scanlines_w(u8);
@@ -73,8 +77,6 @@ private:
 	u8 m_ay1_b = 0U;
 	u8 m_ay1_a = 0U;
 	u8 m_relay_ctrl = 0U;
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	required_device<z80_device> m_maincpu;
 	required_device_array<ay8910_device, 2> m_ay8910;
 	required_ioport_array<8> m_io_keyboard;
@@ -317,9 +319,6 @@ void macp_state::clock_tick(int state)
 void macp_state::machine_start()
 {
 	genpin_class::machine_start();
-
-	m_digits.resolve();
-	m_io_outputs.resolve();
 
 	save_item(NAME(m_digit));
 	save_item(NAME(m_t_c));

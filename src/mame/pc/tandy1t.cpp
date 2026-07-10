@@ -87,7 +87,7 @@ DECLARE_DEVICE_TYPE(T1000_MOTHERBOARD, t1000_mb_device)
 class t1000_mb_device : public pc_noppi_mb_device
 {
 public:
-	t1000_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	t1000_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0)
 		: pc_noppi_mb_device(mconfig, T1000_MOTHERBOARD, tag, owner, clock)
 	{ }
 
@@ -638,7 +638,7 @@ void tandy1000_state::machine_start()
 				0xffff);
 	}
 
-	if ((mem_space.data_width() == vram_space.data_width()) || (util::endianness::native == util::endianness::little))
+	if ((mem_space.data_width() == vram_space.data_width()) || (std::endian::native == std::endian::little))
 	{
 		m_video->space(0).install_ram(0, (128 * 1024) - 1, &m_ram->pointer()[0]);
 	}
@@ -849,7 +849,7 @@ void tandy1000_state::tandy1000_common(machine_config &config)
 {
 	// FIXME: pass correct clocks in
 
-	T1000_MOTHERBOARD(config, m_mb, 0);
+	T1000_MOTHERBOARD(config, m_mb);
 	m_mb->set_cputag(m_maincpu);
 	m_mb->int_callback().set_inputline(m_maincpu, 0);
 	m_mb->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
@@ -890,7 +890,7 @@ void tandy1000_state::t1000x(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &tandy1000_state::tandy1000x_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	PCVIDEO_T1000X(config, m_video, 0);
+	PCVIDEO_T1000X(config, m_video);
 	m_video->set_screen("pcvideo_t1000:screen");
 
 	tandy1000_common(config);
@@ -906,7 +906,7 @@ void tandy1000_state::t1000(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &tandy1000_state::tandy1000_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	PCVIDEO_T1000(config, m_video, 0);
+	PCVIDEO_T1000(config, m_video);
 	m_video->set_screen("pcvideo_t1000:screen");
 
 	tandy1000_common(config);
@@ -962,7 +962,7 @@ void tandy1000_state::t1000rl(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &tandy1000_state::tandy1000_bank_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	PCVIDEO_T1000X(config, m_video, 0);
+	PCVIDEO_T1000X(config, m_video);
 	m_video->set_screen("pcvideo_t1000:screen");
 
 	tandy1000_common(config);
@@ -974,7 +974,7 @@ void tandy1000_state::t1000rl(machine_config &config)
 
 	MCFG_MACHINE_RESET_OVERRIDE(tandy1000_state,tandy1000rl)
 
-	ISA8_SLOT(config, "isa_com", 0, "mb:isa", pc_isa8_cards, "com", true);
+	ISA8_SLOT(config, "isa_com", 0, "mb:isa", pc_isa8_cards, "com", true); // FIXME: determine ISA bus clock
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
@@ -998,7 +998,7 @@ void tandy1000_state::t1000tl2(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &tandy1000_state::tandy1000_16_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	PCVIDEO_T1000X(config, m_video, 0);
+	PCVIDEO_T1000X(config, m_video);
 	m_video->set_screen("pcvideo_t1000:screen");
 
 	tandy1000_common(config);

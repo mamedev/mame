@@ -1173,7 +1173,7 @@ void mac128_state::mac512ke(machine_config &config)
 	m_volfilter->add_route(ALL_OUTPUTS, m_outfilter, 0.195);                                                                             // this filter has a max gain of ~5.126, so we diminish it by the inverse of that (0.195)
 	FILTER_BIQUAD(config, m_filter).opamp_sk_lowpass_setup(RES_K(47), RES_K(47), RES_M(999.99), RES_R(0.001), CAP_U(0.001), CAP_P(470)); // R18, R14, absent, short, C18, C19
 	m_filter->add_route(ALL_OUTPUTS, m_volfilter, 1.0);
-	SPEAKER_SOUND(config, m_dac, 0).add_route(ALL_OUTPUTS, m_filter, 1.839); // speaker_filtered_1bit_pwm has an effective gain of 0.54375 so invert that
+	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, m_filter, 1.839); // speaker_filtered_1bit_pwm has an effective gain of 0.54375 so invert that
 	TIMER(config, m_dac_timer).configure_generic(FUNC(mac128_state::mac_dac));
 	/* devices */
 	RTC3430042(config, m_rtc, 32.768_kHz_XTAL);

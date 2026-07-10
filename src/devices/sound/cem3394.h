@@ -5,7 +5,10 @@
 
 #pragma once
 
+#include "sound/va_ops.h"
+#include "sound/va_vca.h"
 #include "sound/va_vcf.h"
+#include "sound/va_vco.h"
 
 class cem3394_device : public device_t, public device_sound_interface
 {
@@ -27,20 +30,30 @@ public:
 		INPUT_COUNT
 	};
 
-	cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0) ATTR_COLD;
+	// external component values
+	struct components
+	{
+		// The default values below are the ones used in the datasheet.
+		// Pin 1 - Resistor to VEE. Sets reference current for the VCO internals.
+		double r_vco = 270E3;
+		// Pin 4 - VCO timing capacitor.
+		double c_vco = 2E-9;
+		// Pin 12 (or 13, or 14, they should be equal) - VCF capacitor.
+		double c_vcf = 33E-9;
+		// Pin 17 - AC-coupling capacitor on the VCF output.
+		double c_ac = 4.7E-6;
+	};
 
-	// The constructor will initialize components values to those recommended
-	// in the datasheet. configure() can be used to change those.
-	// r_vco: Pin 1 - Resistor to VEE. Sets reference current for the VCO internals.
-	// c_vco: Pin 4 - VCO timing capacitor.
-	// c_vcf: Pin 12 (or 13, or 14, they should be equal) - VCF capacitor.
-	// c_ac: Pin 17 - AC-coupling capacitor on the VCF output.
-	cem3394_device &configure(double r_vco, double c_vco, double c_vcf, double c_ac) ATTR_COLD;
+	using input_array = std::array<device_sound_interface *, INPUT_COUNT>;
+
+	cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0) ATTR_COLD;
+	cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, const components &comps, const input_array& inputs) ATTR_COLD;
 
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream) override;
@@ -70,37 +83,39 @@ private:
 	sound_stream::sample_t compute_db_volume(double voltage);
 
 	void set_voltage_internal(int input, double voltage);
+	void update_mix();
 
-	double hpf(double input);
-
-	required_device<va_lpf4_device> m_vcf;
+	float stream_op_filter_freq(float voltage);
+	float stream_op_amp_gain(float voltage);
 
 	// device configuration, not needed in save state
+	const input_array m_stream_inputs;// streaming inputs
+	const components m_components;    // external components
+	const double m_vco_zero_freq;     // frequency of VCO at 0.0V
+	const double m_filter_zero_freq;  // frequency of filter at 0.0V
 	sound_stream *m_stream;           // our stream
-	double m_inv_sample_rate;         // 1/current sample rate
-	double m_vco_zero_freq;           // frequency of VCO at 0.0V
-	double m_filter_zero_freq;        // frequency of filter at 0.0V
-	double m_hpf_k;                   // RC filter coefficient for AC coupling
+
+	required_device<va_vco_device> m_vco;
+	optional_device<va_const_device> m_filt_freq;
+	required_device<va_vca_device> m_filt_fm;
+	required_device<va_lpf4_device> m_vcf;
+	required_device<va_vca_device> m_vca;
 
 	// device state
 
 	double m_values[INPUT_COUNT];     // raw values of registers
+
 	u8 m_wave_select;                 // flags which waveforms are enabled
+	double m_vco_frequency;           // current VCO frequency
+	double m_pulse_width;             // fractional pulse width
 
 	double m_volume;                  // linear overall volume (0-1)
 	double m_mixer_internal;          // linear internal volume (0-1)
 	double m_mixer_external;          // linear external volume (0-1)
 
-	double m_vco_position;            // current VCO frequency position (always < 1.0)
-	double m_vco_step;                // per-sample VCO step
-
 	double m_filter_frequency;        // baseline filter frequency
 	double m_filter_modulation;       // depth of modulation (up to 1.0)
 	double m_filter_resonance;        // depth of modulation (up to 1.0)
-
-	double m_pulse_width;             // fractional pulse width
-
-	double m_hpf_mem;                 // AC coupling filter memory
 };
 
 DECLARE_DEVICE_TYPE(CEM3394, cem3394_device)

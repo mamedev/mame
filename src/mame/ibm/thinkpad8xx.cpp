@@ -36,7 +36,7 @@ Hardware for the 850 model:
 -Intel S82378ZB PCIset.
 -National Semiconductor DP87322VF (SuperI/O III, Floppy Disk Controller with Dual UARTs,
  Enhanced Parallel Port, and IDE Interface).
--Motorola XPC105ARX66CD (PowerPC PCI Bridge/Memory Controller).
+-Motorola XPC105ARX66CD (PowerPC PCI Bridge/Memory Controller MPC105).
 -Other ICs: S-MOS 85G7814, S-MOS 85G2680
 
 More info: http://oldcomputer.info/portables/tp850/ibm_ppc_thinkpad_redbook.pdf

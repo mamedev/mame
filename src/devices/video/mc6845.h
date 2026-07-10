@@ -86,16 +86,17 @@ public:
 	auto out_vsync_callback() { return m_out_vsync_cb.bind(); }
 
 	/* select one of the registers for reading or writing */
-	void address_w(uint8_t data);
+	virtual void address_w(uint8_t data);
 
 	/* read from the status register */
-	uint8_t status_r();
+	// NOTE: subclassed by mos8563
+	virtual uint8_t status_r();
 
 	/* read from the currently selected register */
-	uint8_t register_r();
+	virtual uint8_t register_r();
 
 	/* write to the currently selected register */
-	void register_w(uint8_t data);
+	virtual void register_w(uint8_t data);
 
 	// read display enable line state
 	int de_r();
@@ -135,6 +136,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 	virtual void device_clock_changed() override;
+	virtual void device_validity_check(validity_checker &valid) const override;
 
 	attotime cclks_to_attotime(uint64_t clocks) const { return clocks_to_attotime(clocks * m_clk_scale); }
 	uint64_t attotime_to_cclks(const attotime &duration) const { return attotime_to_clocks(duration) / m_clk_scale; }
@@ -301,7 +303,7 @@ public:
 
 protected:
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
+//	virtual void device_reset() override ATTR_COLD;
 };
 
 class r6545_1_device : public mc6845_device
@@ -311,7 +313,7 @@ public:
 
 protected:
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
+//	virtual void device_reset() override ATTR_COLD;
 };
 
 class c6545_1_device : public mc6845_device
@@ -321,7 +323,37 @@ public:
 
 protected:
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
+//	virtual void device_reset() override ATTR_COLD;
+};
+
+class sy6545_1_device : public mc6845_device
+{
+public:
+	sy6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+//	virtual void device_reset() override ATTR_COLD;
+};
+
+class sy6845e_device : public mc6845_device
+{
+public:
+	sy6845e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+//	virtual void device_reset() override ATTR_COLD;
+};
+
+class ams40489_device : public mc6845_device
+{
+public:
+	ams40489_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+//	virtual void device_reset() override ATTR_COLD;
 };
 
 class hd6845s_device : public mc6845_device
@@ -333,28 +365,8 @@ protected:
 	hd6845s_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
+//	virtual void device_reset() override ATTR_COLD;
 	virtual bool check_cursor_visible(uint16_t ra, uint16_t line_addr) override;
-};
-
-class sy6545_1_device : public mc6845_device
-{
-public:
-	sy6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-};
-
-class sy6845e_device : public mc6845_device
-{
-public:
-	sy6845e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 };
 
 class hd6345_device : public hd6845s_device
@@ -362,9 +374,9 @@ class hd6345_device : public hd6845s_device
 public:
 	hd6345_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void address_w(uint8_t data);
-	uint8_t register_r();
-	void register_w(uint8_t data);
+	virtual void address_w(uint8_t data) override;
+	virtual uint8_t register_r() override;
+	virtual void register_w(uint8_t data) override;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -392,25 +404,14 @@ protected:
 	virtual uint8_t draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 };
 
-class ams40489_device : public mc6845_device
-{
-public:
-	ams40489_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-};
-
-
 DECLARE_DEVICE_TYPE(MC6845,   mc6845_device)
 DECLARE_DEVICE_TYPE(MC6845_1, mc6845_1_device)
 DECLARE_DEVICE_TYPE(R6545_1,  r6545_1_device)
 DECLARE_DEVICE_TYPE(C6545_1,  c6545_1_device)
-DECLARE_DEVICE_TYPE(HD6845S,  hd6845s_device)
 DECLARE_DEVICE_TYPE(SY6545_1, sy6545_1_device)
 DECLARE_DEVICE_TYPE(SY6845E,  sy6845e_device)
-DECLARE_DEVICE_TYPE(HD6345,   hd6345_device)
 DECLARE_DEVICE_TYPE(AMS40489, ams40489_device)
+DECLARE_DEVICE_TYPE(HD6845S,  hd6845s_device)
+DECLARE_DEVICE_TYPE(HD6345,   hd6345_device)
 
 #endif // MAME_VIDEO_MC6845_H

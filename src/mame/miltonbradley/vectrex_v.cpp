@@ -1,19 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Mathis Rosenhauer
 
-#include <cmath>
 #include "emu.h"
 #include "vectrex.h"
 #include "cpu/m6809/m6809.h"
+
+#include <cmath>
+#include <numbers>
 
 
 #define ANALOG_DELAY 8500
 
 #define INT_PER_CLOCK 550
-
-#ifndef M_SQRT1_2
-#define M_SQRT1_2 0.70710678118654752440
-#endif
 
 /*********************************************************************
 
@@ -165,10 +163,12 @@ void vectrex_base_state::add_point(int x, int y, rgb_t color, int intensity)
 
 void vectrex_base_state::add_point_stereo(int x, int y, rgb_t color, int intensity)
 {
+	constexpr double SQRT1_2 = std::numbers::sqrt2 / 2.0;
+
 	if (m_imager_status == 2) /* left = 1, right = 2 */
-		add_point((int)(y * M_SQRT1_2)+ m_x_center, (int)(((m_x_max - x) * M_SQRT1_2)), color, intensity);
+		add_point((int)(y * SQRT1_2)+ m_x_center, (int)(((m_x_max - x) * SQRT1_2)), color, intensity);
 	else
-		add_point((int)(y * M_SQRT1_2), (int)((m_x_max - x) * M_SQRT1_2), color, intensity);
+		add_point((int)(y * SQRT1_2), (int)((m_x_max - x) * SQRT1_2), color, intensity);
 }
 
 

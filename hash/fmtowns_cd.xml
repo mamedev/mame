@@ -8707,8 +8707,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Hangs after getting a strike -->
-	<software name="famist90" supported="no">
+	<software name="famist90" supported="partial">
 		<!--
 		Origin: redump.org
 		<rom name="Pro Yakyuu Family Stadium - 90-nendo Pennant Race-ban (Japan) (Track 01).bin" size="9532656" crc="195eda5e" sha1="104ec7347d3e9aac9dd4a0700025dfe4f54edf39"/>
@@ -8723,9 +8722,13 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Pro Yakyuu Family Stadium - 90-nendo Pennant Race-ban (Japan) (Track 10).bin" size="1159536" crc="c8c61b2f" sha1="4079226c26ae3482ceaf3ce2162dbfacda112a40"/>
 		<rom name="Pro Yakyuu Family Stadium - 90-nendo Pennant Race-ban (Japan).cue" size="1542" crc="7029a486" sha1="f7074a2e602c1d835eddc87bc650f98e321c7b72"/>
 		-->
-		<description>Pro Yakyuu Family Stadium - 90-nendo Pennant Race-ban</description>
+		<description>Pro Yakyuu Family Stadium - '90 Pennant Race-ban</description>
 		<year>1990</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
+		<notes><![CDATA[
+Sometimes scorecard glitches out in between innings (i.e. crowd GFX overriding scorecard)
+Unlike pc88va versions newspaper doesn't scroll down at end of match, player face sprite also flickers a bit (verify)
+]]></notes>
 		<info name="serial" value="HMB-135"/>
 		<info name="alt_title" value="プロ野球ファミリー・スタジアム　９０年度　ペナント・レース版" />
 		<info name="release" value="199009xx" />
@@ -13732,7 +13735,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Inindou - Datou Nobunaga (Japan) (Track 16).bin" size="42924000" crc="ea801aa4" sha1="95081b5ad296d079d1c2600216333c5bac5fcc12"/>
 		<rom name="Inindou - Datou Nobunaga (Japan).cue" size="1922" crc="2ca391fc" sha1="8f1d334d4ea21e50ab231cdd7b6d6c6908f1c3ff"/>
 		-->
-		<description>Inindou - Datou Nobunaga</description>
+		<description>Inindou: Datou Nobunaga</description>
 		<year>1992</year>
 		<publisher>光栄 (Koei)</publisher>
 		<info name="serial" value="HMC-188"/>

@@ -59,8 +59,8 @@ public:
 		, m_config(*this, "CONFIG")
 	{ }
 
-	void triton1(machine_config &config);
-	void triton2(machine_config &config);
+	void triton1(machine_config &config) ATTR_COLD;
+	void triton2(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(pushbutton_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(charset_changed);
@@ -389,8 +389,6 @@ void triton_state::machine_start()
 	}
 
 	m_exp_ram = make_unique_clear<uint8_t[]>(0xe000);
-
-	m_led.resolve();
 
 	save_pointer(NAME(m_exp_ram), 0xe000);
 }

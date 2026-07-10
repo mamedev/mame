@@ -75,10 +75,7 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
-	void quantum(machine_config &config);
-
-protected:
-	virtual void machine_start() override { m_leds.resolve(); }
+	void quantum(machine_config &config) ATTR_COLD;
 
 private:
 	uint16_t trackball_r();
@@ -310,7 +307,7 @@ void quantum_state::quantum(machine_config &config)
 	screen.set_visarea(0, 900, 0, 600);
 	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
-	AVG_QUANTUM(config, m_avg, 0);
+	AVG_QUANTUM(config, m_avg);
 	m_avg->set_vector("vector");
 	m_avg->set_memory(m_maincpu, AS_PROGRAM, 0x800000);
 

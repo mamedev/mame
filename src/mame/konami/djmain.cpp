@@ -1739,15 +1739,6 @@ void djmain_state::machine_start()
 	if (m_ata_user_password != nullptr)
 		hdd->set_user_password(m_ata_user_password);
 
-	m_pcb_leds.resolve();
-	m_button_leds.resolve();
-	m_right_red_hlt.resolve();
-	m_left_red_hlt.resolve();
-	m_right_blue_hlt.resolve();
-	m_left_blue_hlt.resolve();
-	m_right_ssr.resolve();
-	m_left_ssr.resolve();
-
 	save_item(NAME(m_sndram_bank));
 	save_item(NAME(m_turntable_select));
 	//save_item(NAME(m_turntable_last_pos));
@@ -1795,7 +1786,7 @@ void djmain_state::djmainj(machine_config &config)
 	m_k056832->set_config(K056832_BPP_4dj, 1, 1);
 	m_k056832->set_palette(m_palette);
 
-	K055555(config, m_k055555, 0);
+	K055555(config, m_k055555);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();

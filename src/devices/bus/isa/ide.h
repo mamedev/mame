@@ -32,6 +32,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 private:
 	void ide_interrupt(int state);
 	uint8_t ide16_alt_r();

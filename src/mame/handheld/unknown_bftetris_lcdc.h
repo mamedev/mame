@@ -6,13 +6,14 @@
 
 #pragma once
 
-DECLARE_DEVICE_TYPE(UNKNOWN_BFTETRIS_LCDC, bftetris_lcdc_device)
+#include <memory>
+
 
 class bftetris_lcdc_device : public device_t
 {
 public:
 	// construction/destruction
-	bftetris_lcdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bftetris_lcdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void lcdc_command_w(u16 data);
 	u16 lcdc_data_r();
@@ -25,7 +26,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	u16 m_displaybuffer[512 * 256];
+	std::unique_ptr<u16 []> m_displaybuffer;
 	u16 m_posx, m_posy;
 	u16 m_posminx, m_posmaxx;
 	u16 m_posminy, m_posmaxy;
@@ -34,5 +35,7 @@ private:
 	u8 m_displayon;
 	u8 m_sleep;
 };
+
+DECLARE_DEVICE_TYPE(UNKNOWN_BFTETRIS_LCDC, bftetris_lcdc_device)
 
 #endif // MAME_HANDHELD_UNKNOWN_BFTETRIS_LCDC_H

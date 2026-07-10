@@ -1192,11 +1192,16 @@ template <u8 Bank> void sprinter_state::ram_w(offs_t offset, u8 data)
 
 	if ((page & 0xf0) == 0x50)
 	{
+		const bool transparent = BIT(page, 3);
+		if (transparent && (data == 0xff))
+			return;
+
 		const u32 vaddr = m_port_y * 1024 + (offset & 0x3ff);
-		if (BIT(~page, 2))
+		const bool vram_only = BIT(page, 2);
+		if (!vram_only)
 			m_ram->pointer()[(0x50 << 14) + vaddr] = data;
-		if (!(BIT(page, 3) && (data == 0xff)))
-			vram_w(vaddr, data);
+
+		vram_w(vaddr, data);
 	}
 	else
 	{
@@ -1459,8 +1464,6 @@ void sprinter_state::machine_start()
 	m_isa[1]->space(isa8_device::AS_ISA_IO).unmap_value_high();
 
 	spectrum_128_state::machine_start();
-
-	m_turbo_led.resolve();
 
 	save_item(NAME(m_ram_pages));
 	save_item(NAME(m_pages));
@@ -1965,15 +1968,15 @@ void sprinter_state::sprinter(machine_config &config)
 	m_ata[0]->slot(1).set_option_machine_config("cdrom", cdrom_config);
 	ATA_INTERFACE(config, m_ata[1]).options(sprinter_ata_devices, "hdd", "hdd", false);
 
-	BETA_DISK(config, m_beta, 0);
+	BETA_DISK(config, m_beta);
 
 	ISA8(config, m_isa[0], X_SP / 5);
 	m_isa[0]->set_custom_spaces();
-	ISA8_SLOT(config, "isa0", 0, m_isa[0], pc_isa8_cards, "zxbus_adapter", false);
+	ISA8_SLOT(config, "isa0", 0, m_isa[0], pc_isa8_cards, "zxbus_adapter", false); // FIXME: determine ISA bus clock
 
 	ISA8(config, m_isa[1], X_SP / 5);
 	m_isa[1]->set_custom_spaces();
-	ISA8_SLOT(config, "isa1", 0, m_isa[1], pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", 0, m_isa[1], pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
 
 	m_screen->set_raw(X_SP / 3, SPRINT_WIDTH, SPRINT_HEIGHT, { 0, SPRINT_XVIS - 1, 0, SPRINT_YVIS - 1 });
 	m_screen->set_screen_update(FUNC(sprinter_state::screen_update));

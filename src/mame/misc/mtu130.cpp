@@ -390,7 +390,7 @@ void mtu130_state::machine_start()
 	m_rom_view.disable();
 	m_rof_view.disable();
 
-	for(auto e : m_ext)
+	for (auto &e : m_ext)
 		e->map_io(m_io_view[1]);
 }
 

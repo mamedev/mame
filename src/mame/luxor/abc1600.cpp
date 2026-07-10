@@ -1136,7 +1136,7 @@ void abc1600_state::abc1600(machine_config &config)
 	m_cio->pc_rd_cb().set(FUNC(abc1600_state::cio_pc_r));
 	m_cio->pc_wr_cb().set(FUNC(abc1600_state::cio_pc_w));
 
-	NMC9306(config, m_nvram, 0);
+	NMC9306(config, m_nvram);
 
 	E0516(config, m_rtc, XTAL(32'768));
 	m_rtc->outsel_rd_cb().set_constant(0);

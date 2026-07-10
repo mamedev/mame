@@ -83,7 +83,6 @@ private:
 
 void minicom_state::machine_start()
 {
-	m_digits.resolve();
 	// zerofill
 	memset(m_p, 0, 4);
 	m_digit_index = 0;

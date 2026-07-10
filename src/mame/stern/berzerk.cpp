@@ -88,10 +88,10 @@ public:
 		m_led(*this, "led0")
 	{ }
 
-	void berzerk(machine_config &config);
-	void frenzy(machine_config &config);
+	void berzerk(machine_config &config) ATTR_COLD;
+	void frenzy(machine_config &config) ATTR_COLD;
 
-	void init_moonwarp();
+	void init_moonwarp() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -144,6 +144,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	IRQ_CALLBACK_MEMBER(vector_r);
 	TIMER_CALLBACK_MEMBER(irq_callback);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	void vpos_to_vsync_chain_counter(int vpos, uint8_t *counter, uint8_t *v256);
@@ -275,6 +276,10 @@ void berzerk_state::irq_enable_w(uint8_t data)
 	m_irq_enabled = data & 0x01;
 }
 
+IRQ_CALLBACK_MEMBER(berzerk_state::vector_r)
+{
+	return 0xfc; // IM 2
+}
 
 TIMER_CALLBACK_MEMBER(berzerk_state::irq_callback)
 {
@@ -286,7 +291,7 @@ TIMER_CALLBACK_MEMBER(berzerk_state::irq_callback)
 
 	/* set the IRQ line if enabled */
 	if (m_irq_enabled)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfc); // Z80
+		m_maincpu->set_input_line(0, HOLD_LINE); // Z80
 
 	/* set up for next interrupt */
 	next_irq_number = (irq_number + 1) % IRQS_PER_FRAME;
@@ -399,8 +404,6 @@ void berzerk_state::machine_start()
 {
 	create_irq_timer();
 	create_nmi_timer();
-
-	m_led.resolve();
 
 	/* register for state saving */
 	save_item(NAME(m_magicram_control));
@@ -1174,6 +1177,7 @@ void berzerk_state::berzerk(machine_config &config)
 	Z80(config, m_maincpu, MAIN_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &berzerk_state::berzerk_map);
 	m_maincpu->set_addrmap(AS_IO, &berzerk_state::berzerk_io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(berzerk_state::vector_r));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1192,7 +1196,7 @@ void berzerk_state::berzerk(machine_config &config)
 	m_s14001a->add_route(ALL_OUTPUTS, "s14001a_volume", 0.5);
 	FILTER_VOLUME(config, m_s14001a_volume).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	EXIDY(config, m_custom, 0).add_route(ALL_OUTPUTS, "mono", 0.33);
+	EXIDY(config, m_custom).add_route(ALL_OUTPUTS, "mono", 0.33);
 }
 
 

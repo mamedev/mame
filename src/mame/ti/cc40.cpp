@@ -122,8 +122,8 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(sysram_size_changed);
 
-	void cc40(machine_config &config);
-	void cc40p(machine_config &config);
+	void cc40(machine_config &config) ATTR_COLD;
+	void cc40p(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
@@ -215,7 +215,6 @@ void cc40_state::device_post_load()
 void cc40_state::machine_start()
 {
 	// init
-	m_segs.resolve();
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 

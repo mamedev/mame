@@ -70,11 +70,6 @@ gmboard_device::gmboard_device(const machine_config &mconfig, const char *tag, d
 
 void gmboard_device::device_start()
 {
-	// resolve outputs
-	m_piece_hand.resolve();
-	m_out_motor.resolve();
-	m_out_pos.resolve();
-
 	// zerofill
 	m_magnet = 0;
 	memset(m_pieces_map, 0, sizeof(m_pieces_map));

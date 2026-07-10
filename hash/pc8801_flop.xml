@@ -631,11 +631,13 @@ INVESTIGATE
 		</part>
 	</software>
 
-	<!-- Gameplay speed is erratic (especially noticeable on vanilla PC8801) -->
 	<software name="177" supported="partial">
 		<description>177</description>
 		<year>1986</year>
 		<publisher>マカダミアソフト (Macadamia Soft)</publisher>
+		<notes><![CDATA[
+Gameplay speed is erratic (especially noticeable on vanilla PC8801)
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198609xx"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -645,11 +647,14 @@ INVESTIGATE
 		</part>
 	</software>
 
-	<!-- Gameplay speed is erratic (especially noticeable on vanilla PC8801) -->
 	<software name="177a" cloneof="177" supported="partial">
 		<description>177 (alt)</description>
 		<year>1986</year>
 		<publisher>マカダミアソフト (Macadamia Soft)</publisher>
+		<notes><![CDATA[
+(same as parent)
+]]></notes>
+
 		<!-- PC8801 -->
 		<info name="release" value="198609xx"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -659,11 +664,14 @@ INVESTIGATE
 		</part>
 	</software>
 
-	<!-- Gameplay speed is erratic (especially noticeable on vanilla PC8801) -->
 	<software name="177b" cloneof="177" supported="partial">
 		<description>177 (alt 2)</description>
 		<year>1986</year>
 		<publisher>マカダミアソフト (Macadamia Soft)</publisher>
+		<notes><![CDATA[
+(same as parent)
+]]></notes>
+
 		<!-- PC8801 -->
 		<info name="release" value="198609xx"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -673,11 +681,14 @@ INVESTIGATE
 		</part>
 	</software>
 
-	<!-- Gameplay speed is erratic (especially noticeable on vanilla PC8801) -->
 	<software name="177c" cloneof="177" supported="partial">
 		<description>177 (alt 3)</description>
 		<year>1986</year>
 		<publisher>マカダミアソフト (Macadamia Soft)</publisher>
+		<notes><![CDATA[
+(same as parent)
+]]></notes>
+
 		<!-- PC8801 -->
 		<info name="release" value="198609xx"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -687,11 +698,14 @@ INVESTIGATE
 		</part>
 	</software>
 
-	<!-- Gameplay speed is erratic (especially noticeable on vanilla PC8801) -->
 	<software name="177d" cloneof="177" supported="partial">
 		<description>177 (alt 4)</description>
 		<year>1986</year>
 		<publisher>マカダミアソフト (Macadamia Soft)</publisher>
+		<notes><![CDATA[
+(same as parent)
+]]></notes>
+
 		<!-- PC8801 -->
 		<info name="release" value="198609xx"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -744,7 +758,7 @@ INVESTIGATE
 	</software>
 
 	<software name="3dgolfsv">
-		<description>3D Golf Simulation - Super Version</description>
+		<description>3D Golf Simulation: Super Version</description>
 		<year>1985</year>
 		<publisher>T&amp;E Soft</publisher>
 		<!-- PC8801mk2SR -->
@@ -1580,12 +1594,14 @@ ExtractDisk  [02]"SAGA#1          " -> "adventure land_02.d88"
 		</part>
 	</software>
 
-	<!-- Opening movie hangs at the title screen, FDC stalls [Missing CHRN=(00 00 01 03)] -->
-	<!-- TODO: Game is otherwise working if you skip that, may have further stalls -->
-	<software name="agnishi" supported="partial">
+	<software name="agnishi" supported="no">
 		<description>Agni no Ishi - The Stone of Agni</description>
 		<year>1988</year>
 		<publisher>ハミングバード (HummingBird)</publisher>
+		<notes><![CDATA[
+Opening movie hangs at the title screen, FDC stalls [Missing CHRN=(00 00 01 03)]
+TODO: Game is otherwise working if you skip that, may have further stalls
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198803xx"/>
 		<info name="alt_title" value="アグニの石"/>
@@ -1615,12 +1631,13 @@ ExtractDisk  [02]"SAGA#1          " -> "adventure land_02.d88"
 		</part>
 	</software>
 
-	<!-- Opening movie hangs at the title screen, FDC stalls [Missing CHRN=(00 00 01 03)] -->
-	<!-- TODO: Game is otherwise working if you skip that, may have further stalls -->
-	<software name="agnishia" cloneof="agnishi" supported="partial">
+	<software name="agnishia" cloneof="agnishi" supported="no">
 		<description>Agni no Ishi - The Stone of Agni (Mad?)</description>
 		<year>1988</year>
 		<publisher>ハミングバード (HummingBird)</publisher>
+		<notes><![CDATA[
+(same as parent)
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198803xx"/>
 		<info name="alt_title" value="アグニの石"/>
@@ -1685,17 +1702,6 @@ ExtractDisk  [02]"SAGA#1          " -> "adventure land_02.d88"
 			<feature name="part_id" value="Adventure Disk 3" />
 			<dataarea name="flop" size="416688">    <!-- Data CRC16: 8309 -->
 				<rom name="akazukin-chan (adventure disk 3).d88" size="416688" crc="d98ddbea" sha1="9fee2b853d2892ed1d5d17631f7bfe7d68b6933c"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="akazukind" cloneof="akazukin">
-		<description>Akazukin-chan (Demo)</description>
-		<year>1990</year>
-		<publisher>システムデルタ (System Delta)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348832">    <!-- Data CRC16: 65074 -->
-				<rom name="akazukin chan demo.d88" size="348832" crc="13aee247" sha1="7a3050082e252d9733b170a51087d1b110d24f5c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2507,11 +2513,13 @@ Fails boot [underlying data is corrupt, error reading in HxC / winimage etc.]
 		</part>
 	</software>
 
-	<!-- reads the light pen? -->
-	<software name="amerisuc" supported="partial">
+	<software name="amerisuc" supported="yes">
 		<description>American Success</description>
 		<year>1988</year>
 		<publisher>ウィンキーソフト (Winky Soft)</publisher>
+		<notes><![CDATA[
+[7220] reads the light pen? TODO: add steps to reproduce
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198811xx"/>
 		<info name="alt_title" value="アメリカン・サクセス"/>
@@ -2522,11 +2530,13 @@ Fails boot [underlying data is corrupt, error reading in HxC / winimage etc.]
 		</part>
 	</software>
 
-	<!-- reads the light pen? -->
-	<software name="amerisuca" cloneof="amerisuc" supported="partial">
+	<software name="amerisuca" cloneof="amerisuc" supported="yes">
 		<description>American Success (alt)</description>
 		<year>1988</year>
 		<publisher>ウィンキーソフト (Winky Soft)</publisher>
+		<notes><![CDATA[
+[7220] reads the light pen? TODO: add steps to reproduce
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198811xx"/>
 		<info name="alt_title" value="アメリカン・サクセス"/>
@@ -2839,12 +2849,13 @@ Unemulated optional [GSX8800] sound board support
 		</part>
 	</software>
 
-	<software name="genchohi" supported="no">
+	<software name="genchohi" supported="partial">
 		<description>Aoki Ookami to Shiroki Mejika - Genchou Hishi</description>
 		<year>1992</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19920730"/>
@@ -2888,12 +2899,12 @@ Unemulated optional [GSX8800] sound board support
 		</part>
 	</software>
 
-	<software name="genghis" supported="no">
+	<software name="genghis" supported="yes">
 		<description>Aoki Ookami to Shiroki Mejika - Genghis Khan</description>
 		<year>1988</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198801xx"/>
@@ -2930,13 +2941,14 @@ Unemulated optional [GSX8800] sound board support
 		</part>
 	</software>
 
-	<software name="genghisa" cloneof="genghis" supported="no">
+	<software name="genghisa" cloneof="genghis" supported="partial">
 		<!-- "soundware?" -->
 		<description>Aoki Ookami to Shiroki Mejika - Genghis Khan (soundware maybe)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Investigate what's this soundware thing
 ]]></notes>
 		<!--combined image-->
 		<!--rom name="aoki ookami to shiroki mejika genghis khan(soundware maybe).d88" size="1523408" crc="ae73482b" sha1="113ef542a74152928e34adf899a8e9e7e8e7c720"/-->
@@ -3397,11 +3409,13 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88" [a9f8422b]
 		</part>
 	</software>
 
-	<!-- Gameplay speed is erratic (especially noticeable on vanilla PC8801) -->
 	<software name="apploon" supported="partial">
 		<description>Apploon</description>
 		<year>1984</year>
 		<publisher>タカラ (Takara)</publisher>
+		<notes><![CDATA[
+Runs too fast, wants [V1S]
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198402xx"/>
 		<info name="alt_title" value="アップルーン"/>
@@ -3414,11 +3428,13 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88" [a9f8422b]
 		</part>
 	</software>
 
-	<!-- Uses BG Pal color -->
 	<software name="archon" supported="partial">
 		<description>Archon</description>
 		<year>1986</year>
 		<publisher>B·P·S (Bullet-Proof Software)</publisher>
+		<notes><![CDATA[
+Runs too fast, requires [V1S]
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198606xx"/>
 		<info name="alt_title" value="アーコン"/>
@@ -3946,7 +3962,7 @@ TODO: understand how to create an user disk
 	</software>
 
 	<software name="attack">
-		<description>Attack!! Hiroko Chan</description>
+		<description>Attack!! Hiroko-chan</description>
 		<!-- 1983.9.1 -->
 		<year>1983</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
@@ -4165,16 +4181,20 @@ A few kanji drawings in gameplay are odd to look at (cfr. signs, sports as full 
 		</part>
 	</software>
 
-	<!-- TODO: investigate over [SIO] usage -->
-	<!-- Requires floppies to not be write protected -->
 	<software name="balpower" supported="partial">
 		<description>Balance of Power</description>
 		<year>1989</year>
 		<publisher>アスキー (ASCII)</publisher>
+		<notes><![CDATA[
+TODO: investigate over [SIO] usage
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198907xx"/>
 		<info name="alt_title" value="バランスオブパワー"/>
 		<info name="usage" value="Set 8MHz mode on a PC8801MA+"/>
+		<sharedfeat name="mouseport_default" value="mouse" />
+		<!-- will throw an "error -4" otherwise -->
+		<sharedfeat name="write_protected" value="false" />
 		<!--combined image-->
 		<!--rom name="ballance of power.d88" size="762128" crc="09d9686f" sha1="0d54291a8d835cdd63d7351d68c1be7cb20a4f4f"/-->
 
@@ -4198,12 +4218,12 @@ A few kanji drawings in gameplay are odd to look at (cfr. signs, sports as full 
 		<year>1984</year>
 		<publisher>ポニカ (PonyCa)</publisher>
 		<notes><![CDATA[
-Should be supported by [PC8001mkIISR] too
+Confirm being supported by [PC8001mkIISR] too
 ]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198404xx"/>
 		<info name="alt_title" value="ボールパニカー"/>
-		<info name="usage" value="Needs N[80SR] BASIC"/>
+		<info name="usage" value="Needs N BASIC"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -4228,11 +4248,13 @@ Should be supported by [PC8001mkIISR] too
 		</part>
 	</software>
 
-	<!-- TODO: flaky disk swaps (investigate) -->
 	<software name="barbatus" supported="partial">
 		<description>Barbatus no Majo</description>
 		<year>1990</year>
 		<publisher>アーテック (Artec)</publisher>
+		<notes><![CDATA[
+TODO: flaky disk swaps (investigate)
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19900309"/>
 		<info name="alt_title" value="バルバドゥスの魔女"/>
@@ -4478,10 +4500,13 @@ All weapons GFX displays are garbled in this version, is the dump right?
 		</part>
 	</software>
 
-	<software name="batlskin">
+	<software name="batlskin" supported="no">
 		<description>Battle Skin Panic - Zenra Senshi</description>
 		<year>1990</year>
 		<publisher>タケル (Takeru)</publisher>
+		<notes><![CDATA[
+Black screen, keeps spinning [FDC] motor in an awkward way
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19901215"/>
 		<info name="alt_title" value="バトルスキンパニック -全裸戦士-"/>
@@ -4510,11 +4535,13 @@ All weapons GFX displays are garbled in this version, is the dump right?
 		</part>
 	</software>
 
-	<!-- Not extensively tested -->
 	<software name="bellonch" supported="partial">
 		<description>Belloncho Series 1 - Belloncho Shintai Kensa</description>
 		<year>1990</year>
 		<publisher>ハード (Hard)</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19900329"/>
 		<info name="alt_title" value="べろんちょ身体検査"/>
@@ -4574,11 +4601,13 @@ All weapons GFX displays are garbled in this version, is the dump right?
 		</part>
 	</software>
 
-	<!-- Not extensively tested -->
 	<software name="bishojbg" supported="partial">
 		<description>Bishoujo Baseball Gakuen</description>
 		<year>1989</year>
 		<publisher>パソケット (Pasoket)</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198910xx"/>
 		<info name="alt_title" value="美少女ベースボール学園"/>
@@ -4950,12 +4979,14 @@ Note: cannot mix party from disk 1 and 2
 		</part>
 	</software>
 
-	<!-- Not extensively tested -->
-	<!-- Tests [Sound Board 2] -->
 	<software name="blassty" supported="partial">
 		<description>Cruise Chaser - Blassty</description>
 		<year>1986</year>
 		<publisher>スクウェア (Square)</publisher>
+		<notes><![CDATA[
+Not extensively tested
+Tests [Sound Board 2]
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198604xx"/>
 		<info name="alt_title" value="ブラスティ"/>
@@ -5040,10 +5071,11 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		<description>Bokosuka Wars</description>
 		<year>1984</year>
 		<publisher>アスキー (ASCII)</publisher>
-		<!-- PC8801 -->
+		<!-- PC8801mk2SR -->
 		<info name="release" value="198406xx"/>
 		<info name="alt_title" value="ボコスカウォーズ"/>
-		<info name="usage" value="Needs V2 BASIC on machines equipped with it"/>
+		<info name="usage" value="Needs BASIC V2"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="57264">
 				<rom name="bokosuka wars.d88" size="57264" crc="410d9bb7" sha1="fa83f0e5d393c82b928180fb8cb4c2e1b3a321fb"/>
@@ -7979,61 +8011,64 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="daikokai" supported="no">
+	<software name="daikokai" supported="partial">
 		<description>Daikoukai Jidai</description>
 		<year>1990</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"CANNOT LOAD YSHELL.COM" [PC=0xe200, PC=0xe297, CHRN=(0, 0, 2, 512)]
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199005xx"/>
 		<info name="alt_title" value="大航海時代"/>
+		<info name="usage" value="Insert Umi (sea) disk after opening, boot with Main and Umi to skip opening. Insert Minato (port) disk after character creation."/>
 		<!--combined image-->
 		<!--rom name="daikokai jidai.d88" size="2049184" crc="5e5a4cae" sha1="aabf20b93ea0f9df313d9108243867beac150c41"/-->
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Main" />
+			<feature name="part_id" value="Main Disk" />
 			<dataarea name="flop" size="391264">
 				<rom name="daikokai jidai (main).d88" size="391264" crc="81aefc07" sha1="c0f65e64650f2c2a76a3c9bc02981f80729874ac"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Opening" />
+			<feature name="part_id" value="Opening Disk" />
 			<dataarea name="flop" size="391248">
 				<rom name="daikokai jidai (opening).d88" size="391248" crc="8a6dc0fb" sha1="ad12633699fa601f805792cfd2282ecb0ea4829f"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Minato" />
+			<feature name="part_id" value="Minato Disk (Port)" />
 			<dataarea name="flop" size="391248">
 				<rom name="daikokai jidai (minato).d88" size="391248" crc="8e44caf0" sha1="d1065dc73dd9cfba8be35e25db5d2d0c3e3b50f6"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Umi" />
+			<feature name="part_id" value="Umi Disk (Sea)" />
 			<dataarea name="flop" size="401648">
 				<rom name="daikokai jidai (umi).d88" size="401648" crc="64183ca9" sha1="4599b0dd421dfe578f0ecf78f04e425a6c30f9a1"/>
 			</dataarea>
 		</part>
 
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="User" />
+			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="473776">
 				<rom name="daikokai jidai (user).d88" size="473776" crc="c245da03" sha1="ccae6359126a9f645ffc546c5d9eff261ce2201d"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="daikokaia" cloneof="daikokai" supported="no">
+	<software name="daikokaia" cloneof="daikokai" supported="partial">
 		<description>Daikoukai Jidai (alt?)</description>
 		<year>1990</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199005xx"/>
@@ -8042,35 +8077,35 @@ Not extensively tested
 		<!--rom name="daikokai jidai.d88" size="1936000" crc="29319bf5" sha1="197f0a4d1f267f0be95cb80d8f167e6969761fab"/-->
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Main" />
+			<feature name="part_id" value="Main Disk" />
 			<dataarea name="flop" size="391808">
 				<rom name="daikokai jidai (a) (main).d88" size="391808" crc="adccaf27" sha1="36b5dcef73781916cf67e8a98b22102c310a4a6b"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Umi" />
-			<dataarea name="flop" size="386048">
-				<rom name="daikokai jidai (a) (umi).d88" size="386048" crc="6b866afe" sha1="d24e3a820cb7a0881dc0f99ff469fd57bd0b0ade"/>
-			</dataarea>
-		</part>
-
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Opening" />
+			<feature name="part_id" value="Opening Disk" />
 			<dataarea name="flop" size="391248">
 				<rom name="daikokai jidai (a) (opening).d88" size="391248" crc="70d1596c" sha1="4abd7509f63e8dbd4f44fcc3119ea78c352ad0c9"/>
 			</dataarea>
 		</part>
 
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Umi Disk" />
+			<dataarea name="flop" size="386048">
+				<rom name="daikokai jidai (a) (umi).d88" size="386048" crc="6b866afe" sha1="d24e3a820cb7a0881dc0f99ff469fd57bd0b0ade"/>
+			</dataarea>
+		</part>
+
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Minato" />
+			<feature name="part_id" value="Minato Disk" />
 			<dataarea name="flop" size="386048">
 				<rom name="daikokai jidai (a) (minato).d88" size="386048" crc="9c36851f" sha1="95e34f979522896d79e29c3707c7b8f5e4753e35"/>
 			</dataarea>
 		</part>
 
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="User" />
+			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="380848">
 				<rom name="daikokai jidai (a) (user).d88" size="380848" crc="f53f1e13" sha1="fc8a8454adb556d3ca597abd08a8394031974b1a"/>
 			</dataarea>
@@ -10576,8 +10611,6 @@ Optional [redbook] audio CD on PC-8801MC, requires dump of the actual OST to fix
 		</part>
 	</software>
 
-	<!-- Hangs when selecting any option -->
-	<!-- FDC stalls [Tries to read CHR=(0b 00 01) with N=6, existing ones have R=8x N=3] -->
 	<software name="dslayed2" supported="no">
 <!--
 ExtractDisk  [01]"START DISK      " -> "dragon slayer eiyu densetsu 2_01.d88"
@@ -10592,6 +10625,11 @@ ExtractDisk  [08]"SCENARIO DISK 4 " -> "dragon slayer eiyu densetsu 2_08.d88"
 		<description>Dragon Slayer - Eiyuu Densetsu 2</description>
 		<year>1992</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<notes><![CDATA[
+Hangs when selecting any option (TODO: retest me)
+FDC stalls [Tries to read CHR=(0b 00 01) with N=6, existing ones have R=8x N=3]
+Optional [redbook] audio CD on PC-8801MC, requires dump of the actual OST to fix playback there
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19920319"/>
 		<info name="alt_title" value="ドラゴンスレイヤー英雄伝説2"/>
@@ -10656,10 +10694,13 @@ ExtractDisk  [08]"SCENARIO DISK 4 " -> "dragon slayer eiyu densetsu 2_08.d88"
 		</part>
 	</software>
 
-	<software name="dslayed2a" cloneof="dslayed2">
+	<software name="dslayed2a" cloneof="dslayed2" supported="no">
 		<description>Dragon Slayer - Eiyuu Densetsu 2 (alt Program Disk)</description>
 		<year>1992</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<notes><![CDATA[
+(Same as dslayed2)
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19920319"/>
 		<info name="alt_title" value="ドラゴンスレイヤー英雄伝説2"/>
@@ -10741,6 +10782,9 @@ but in different order
 		<description>Dragon Slayer - Eiyuu Densetsu 2 (alt Program Disk 2)</description>
 		<year>1992</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<notes><![CDATA[
+Doesn't boot, needs floppy order to be fixed
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19920319"/>
 		<info name="alt_title" value="ドラゴンスレイヤー英雄伝説2"/>
@@ -10749,6 +10793,7 @@ but in different order
 		<!-- Only disks 1 and 8 diff, and disks are shifted -> check! -->
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="427088">
 				<rom name="eiyu densetsu ii_01.d88" size="427088" crc="c6aad443" sha1="4745e436a0c4e66da2b50c2d0cfc6217cc292827"/>
 			</dataarea>
@@ -10796,6 +10841,7 @@ but in different order
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Start Disk" />
 			<dataarea name="flop" size="414992">
 				<rom name="eiyu densetsu ii_08.d88" size="414992" crc="8fde9837" sha1="7a7c05c202f15386339a50112609b1fdbb29e012"/>
 			</dataarea>
@@ -11618,36 +11664,6 @@ FDC stalls [Tries to find a missing CHRN=(00 00 01 01)]
 		</part>
 	</software>
 
-	<!-- TODO: N-BASIC game, move to pc8001_flop -->
-	<software name="emmy">
-		<description>Emmy</description>
-		<year>1984</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<!-- PC8801 -->
-		<info name="release" value="198408xx"/>
-		<info name="alt_title" value="エミー"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="emmy.d88" size="348848" crc="48a9bf12" sha1="02912a40b505b55e3b81bbb56ea74fa0a999821e"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- TODO: N-BASIC game, move to pc8001_flop -->
-	<software name="emmya" cloneof="emmy">
-		<description>Emmy (alt)</description>
-		<year>1984</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<!-- PC8801 -->
-		<info name="release" value="198408xx"/>
-		<info name="alt_title" value="エミー"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="emmy (a).d88" size="348848" crc="1c232736" sha1="3ffab093339f53c4d8340fc8a18228fd885298f7"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="emmy2">
 		<description>Emmy II</description>
 		<year>1984</year>
@@ -11758,12 +11774,14 @@ FDC stalls [Tries to find a missing CHRN=(00 00 01 01)]
 		</part>
 	</software>
 
-	<software name="eurosens" supported="no">
+	<software name="eurosens" supported="partial">
 		<description>Europa Sensen</description>
 		<year>1991</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
+[timing] One line off in places during intro
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19911221"/>
@@ -11800,12 +11818,14 @@ FDC stalls [Tries to find a missing CHRN=(00 00 01 01)]
 		</part>
 	</software>
 
-	<software name="eurosensa" cloneof="eurosens" supported="no">
+	<software name="eurosensa" cloneof="eurosens" supported="partial">
 		<description>Europa Sensen (alt?)</description>
 		<year>1991</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
+[timing] One line off in places during intro
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19911221"/>
@@ -12313,19 +12333,6 @@ FDC stalls [Tries to find a missing CHRN=(00 00 01 01)]
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="348848">
 				<rom name="fantasy lope (disk c).d88" size="348848" crc="6cc02c78" sha1="4785f65bcaabd6e11b35fc61b07180e9efa9c599"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="thefarwa">
-		<description>The Farway</description>
-		<year>1983</year>
-		<publisher>ブレーンメディア (Brain Media)</publisher>
-		<!-- PC8801 -->
-		<info name="release" value="198310xx"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="35776">
-				<rom name="the farway.d88" size="35776" crc="f376b81b" sha1="b96a37d6d3d429ac3ef8364c28f7641abd84d916"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13611,11 +13618,13 @@ ExtractDisk  [04]"Data Disk    " -> "formula cms_04.d88"
 		</part>
 	</software>
 
-	<!-- Hangs after Game Arts logo animation, [i8214] spurious irqs -->
 	<software name="gamblerpd" cloneof="gamblerp" supported="no">
 		<description>Gambler Jikochuushinha Mahjong Puzzle Collection Demo</description>
 		<year>1989</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
+		<notes><![CDATA[
+Hangs after Game Arts logo animation, [i8214] spurious irqs
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="392368">
 				<rom name="gambler jikochushin-ha mahjong puzzle demo.d88" size="392368" crc="8a5e4dc6" sha1="e6339abe5cf5cc2f0c774227cb6ce23bcc8b6830"/>
@@ -14597,14 +14606,14 @@ ExtractDisk  [02]"Gradius改       " -> "gradius kai_02.d88"
 		</part>
 	</software>
 
-	<!-- Requires OPN equipped machine (verify) -->
-	<!-- palette is ugly (parent pc8801 only, verify) -->
-	<software name="grodba" supported="partial">
+	<software name="grobda" supported="yes">
 		<description>Grobda</description>
 		<year>1986</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
-		<!-- PC8801 -->
+		<!-- PC8801mk2SR -->
 		<info name="alt_title" value="グロブダー"/>
+		<info name="usage" value="Needs BASIC V2"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
 				<rom name="grodba.d88" size="348832" crc="a84c8166" sha1="98c4b6f1dc50d29877ed25797488c3544deaeab3"/>
@@ -14612,14 +14621,14 @@ ExtractDisk  [02]"Gradius改       " -> "gradius kai_02.d88"
 		</part>
 	</software>
 
-	<!-- Requires OPN equipped machine (verify) -->
-	<!-- palette is ugly (parent pc8801 only, verify) -->
-	<software name="grodbaa" cloneof="grodba" supported="partial">
+	<software name="grobdaa" cloneof="grobda" supported="yes">
 		<description>Grobda (alt)</description>
 		<year>1986</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
-		<!-- PC8801 -->
+		<!-- PC8801mk2SR -->
 		<info name="alt_title" value="グロブダー"/>
+		<info name="usage" value="Needs BASIC V2"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348560">
 				<rom name="grobda.d88" size="348560" crc="0667fbf5" sha1="d0a6c8fe16b4e9d652ffebc9a5417a330e92b7a4"/>
@@ -16378,7 +16387,7 @@ Converted to .mfm from original .hfe
 	</software>
 
 	<software name="hfox2">
-		<description>Hurry Fox - Yuki no Maou hen</description>
+		<description>Hurry Fox: Yuki no Maou hen</description>
 		<year>1986</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<!-- PC8801 -->
@@ -16913,16 +16922,18 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="inindo" supported="no">
-		<description>Inindo</description>
+	<software name="inindo" supported="partial">
+		<description>Inindou: Datou Nobunaga</description>
 		<year>1991</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19910719"/>
-		<info name="alt_title" value="伊忍道"/>
+		<info name="alt_title" value="伊忍道 打倒信長"/>
+		<info name="usage" value="Boot with disks A and D for opening"/>
 		<!--combined image-->
 		<!--rom name="inindo.d88" size="1978192" crc="bfebfab5" sha1="c947f2e7bb82e0b0b421af4a409a26fc351d36b8"/-->
 
@@ -16962,16 +16973,18 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="inindoa" cloneof="inindo" supported="no">
-		<description>Inindo (alt?)</description>
+	<software name="inindoa" cloneof="inindo" supported="partial">
+		<description>Inindou: Datou Nobunaga (alt?)</description>
 		<year>1991</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19910719"/>
-		<info name="alt_title" value="伊忍道"/>
+		<info name="alt_title" value="伊忍道 打倒信長"/>
+		<info name="usage" value="Boot with disks A and D for opening"/>
 		<!--combined image-->
 		<!--rom name="inindo.d88" size="1930272" crc="2237c01b" sha1="02f13c7d481ece86919944e9a91b11c551a91c36"/-->
 
@@ -17111,12 +17124,12 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="ishinara" supported="no">
+	<software name="ishinara" supported="yes">
 		<description>Ishin no Arashi</description>
 		<year>1989</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198904xx"/>
@@ -17153,12 +17166,12 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="ishinaraa" cloneof="ishinara" supported="no">
+	<software name="ishinaraa" cloneof="ishinara" supported="yes">
 		<description>Ishin no Arashi (alt?)</description>
 		<year>1989</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198904xx"/>
@@ -17195,12 +17208,12 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="ishinarab" cloneof="ishinara" supported="no">
+	<software name="ishinarab" cloneof="ishinara" supported="yes">
 		<description>Ishin no Arashi (alt User Disk)</description>
 		<year>1989</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198904xx"/>
@@ -18581,20 +18594,6 @@ Has serious [3301] corruption in gameplay
 		</part>
 	</software>
 
-	<software name="kenmaho">
-		<description>Ken to Maho</description>
-		<year>1983</year>
-		<publisher>光栄 (Koei)</publisher>
-		<!-- PC8801 -->
-		<info name="release" value="198308xx"/>
-		<info name="alt_title" value="剣と魔法"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="ken to maho.d88" size="348848" crc="836ad094" sha1="ea9bc7afcbacc0dcfff28089df3c09d2c7bdc327"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="kibunpas">
 		<description>Kibun wa Pastel Touch!</description>
 		<year>1989</year>
@@ -19815,11 +19814,14 @@ ExtractDisk  [04]"D_USER          " -> "kon'yamo asamade powerful mahjong 2_04.d
 		<year>1990</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Throws a "DISK I/O ERROR" after opening at disk swap time (works standalone)
+Optional [redbook] audio CD on PC-8801MC
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19900723"/>
 		<info name="alt_title" value="ランペルール"/>
+		<info name="usage" value="Boot A and C to skip opening" />
 		<!--combined image-->
 		<!--rom name="l'empereur.d88" size="1611616" crc="e21aaca9" sha1="f9a1eb1a7f3a8919e991ed5454bc9aced84169ef"/-->
 
@@ -20851,7 +20853,6 @@ ExtractDisk  [02]"LAGRANGE      " -> "lagrange l-2_02.d88"
 		</part>
 	</software>
 
-	<!-- [Tries to scan a missing CHRN=(0c 00 00 01), doesn't seem to have any effect?] -->
 	<software name="lolita2" supported="yes">
 		<description>Lolita 2 - Geko Chess</description>
 		<year>1983</year>
@@ -20859,6 +20860,7 @@ ExtractDisk  [02]"LAGRANGE      " -> "lagrange l-2_02.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198305xx"/>
 		<info name="alt_title" value="ロリータ Ⅱ -下校チェイス-"/>
+		<info name="usage" value="Requires N-Basic"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="lolita 2(geko chess).d88" size="348848" crc="6f809a69" sha1="93d5a820eb330e3349beb3faacbe64ed008dd709"/>
@@ -21124,6 +21126,7 @@ ExtractDisk  [02]"LAGRANGE      " -> "lagrange l-2_02.d88"
 		<info name="release" value="198506xx"/>
 		<info name="alt_title" value="ルナーボール"/>
 		<info name="usage" value="Needs BASIC V1"/>
+		<info name="developer" value="Compile"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -21133,13 +21136,14 @@ ExtractDisk  [02]"LAGRANGE      " -> "lagrange l-2_02.d88"
 	</software>
 
 	<software name="lunarbala" cloneof="lunarbal">
-		<description>Lunar Ball (alt?)</description>
+		<description>Lunar Ball (newer?)</description>
 		<year>1985</year>
 		<publisher>ポニカ (PonyCa)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198506xx"/>
 		<info name="alt_title" value="ルナーボール"/>
 		<info name="usage" value="Needs BASIC V1"/>
+		<info name="developer" value="Compile"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -22316,7 +22320,7 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 	</software>
 
 	<software name="mappy">
-		<description>Mappy</description>
+		<description>Mappy (PC-8801)</description>
 		<year>1986</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<!-- PC8801 -->
@@ -22325,26 +22329,6 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
 				<rom name="mappy.d88" size="348832" crc="214be053" sha1="79ff516b202523c9895b387b31fb0276191be653"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mappya" cloneof="mappy" supported="no">
-		<description>Mappy (alt?)</description>
-		<year>1986</year>
-		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
-		<notes><![CDATA[
-Doesn't boot
-TODO: belongs to [PC8001mkIISR]
-]]></notes>
-		<!-- PC8801 -->
-		<info name="release" value="198605xx"/>
-		<info name="alt_title" value="マッピー"/>
-		<info name="usage" value="Needs N[80SR] BASIC"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="353200">
-				<rom name="mappy_v80.d88" size="353200" crc="a9978924" sha1="0bf806b8f1ef54960d855c62af367dd2e1ff2351"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24794,12 +24778,13 @@ Gameplay is too fast, requires [V1S] support
 		</part>
 	</software>
 
-	<software name="nobubufu" supported="no">
+	<software name="nobubufu" supported="partial">
 		<description>Nobunaga no Yabou - Bushou Fuunroku</description>
 		<year>1990</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19901212"/>
@@ -24836,12 +24821,13 @@ Gameplay is too fast, requires [V1S] support
 		</part>
 	</software>
 
-	<software name="nobubufua" cloneof="nobubufu" supported="no">
+	<software name="nobubufua" cloneof="nobubufu" supported="partial">
 		<description>Nobunaga no Yabou - Bushou Fuunroku (alt)</description>
 		<year>1990</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19901212"/>
@@ -24878,12 +24864,12 @@ Gameplay is too fast, requires [V1S] support
 		</part>
 	</software>
 
-	<software name="nobuseng" supported="no">
+	<software name="nobuseng" supported="yes">
 		<description>Nobunaga no Yabou - Sengoku Gunyuuden</description>
 		<year>1988</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198812xx"/>
@@ -24913,12 +24899,12 @@ Gameplay is too fast, requires [V1S] support
 		</part>
 	</software>
 
-	<software name="nobusenga" cloneof="nobuseng" supported="no">
+	<software name="nobusenga" cloneof="nobuseng" supported="yes">
 		<description>Nobunaga no Yabou - Sengoku Gunyuuden (alt)</description>
 		<year>1988</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198812xx"/>
@@ -24963,12 +24949,12 @@ ExtractDisk  [04]"DATAディスク  " -> "Nobunaga no Yabo Sengokugun'yuden 04.d
 
 -->
 
-	<software name="nobusengb" cloneof="nobuseng" supported="no">
+	<software name="nobusengb" cloneof="nobuseng" supported="yes">
 		<description>Nobunaga no Yabou - Sengoku Gunyuuden (alt 2)</description>
 		<year>1988</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198812xx"/>
@@ -26873,13 +26859,17 @@ ExtractDisk  [03]"ｼﾅﾘｵ2        " -> "phantasie iv the birth of heroes_03
 		</part>
 	</software>
 
-	<software name="popful">
+	<software name="popful" supported="partial">
 		<description>Popful Mail</description>
 		<year>1991</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<notes><![CDATA[
+Optional [redbook] audio CD on PC-8801MC, requires dump of the actual OST to fix playback there
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19911220"/>
 		<info name="alt_title" value="ぽっぷるめいる"/>
+		<!-- TODO: pinpoint disk combinations for skipping opening -->
 		<!--combined image-->
 		<!--rom name="popful mail.d88" size="2496656" crc="acbb1bc0" sha1="3ef2dea25b96c478469e60fefaad9c083255e6d6"/-->
 
@@ -26926,10 +26916,13 @@ ExtractDisk  [03]"ｼﾅﾘｵ2        " -> "phantasie iv the birth of heroes_03
 		</part>
 	</software>
 
-	<software name="popfula" cloneof="popful">
+	<software name="popfula" cloneof="popful" supported="partial">
 		<description>Popful Mail (alt Program Disk)</description>
 		<year>1991</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<notes><![CDATA[
+Optional [redbook] audio CD on PC-8801MC, requires dump of the actual OST to fix playback there
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19911220"/>
 		<info name="alt_title" value="ぽっぷるめいる"/>
@@ -28874,16 +28867,18 @@ Crashes after title screen
 		</part>
 	</software>
 
-	<software name="royalbld" supported="no">
+	<software name="royalbld" supported="partial">
 		<description>Royal Blood</description>
 		<year>1991</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19910927"/>
 		<info name="alt_title" value="ロイヤルブラッド"/>
+		<info name="usage" value="Boot with disks A and C to skip opening"/>
 		<!--combined image-->
 		<!--rom name="royal blood.d88" size="1523408" crc="acfd4828" sha1="38e763712c321f980872944ec7f5f10f7fc7b91c"/-->
 
@@ -28966,6 +28961,9 @@ Crashes after title screen
 		<description>Rune Worth</description>
 		<year>1990</year>
 		<publisher>T&amp;E Soft</publisher>
+		<notes><![CDATA[
+Hangs after PCM check (pc8801ma) or at title screen (pc8801mk2sr), spurious [i8214] sound irqs (regression, related to gamblerpd)
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199001xx"/>
 		<info name="alt_title" value="ルーンワース"/>
@@ -29420,15 +29418,17 @@ ExtractDisk  [02]"ｻﾝｺﾞｸｼ B      " -> "Sangokushi 02.d88"
 		</part>
 	</software>
 
-	<software name="sangokub" cloneof="sangoku" supported="no">
-		<description>Sangokushi (19861210, SR Ban?)</description>
-		<year>1985</year>
+	<!-- These sets are later rereleases supporting PC-8801mk2SR OPN -->
+	<!-- and running on YDOS like all later Koei later releases -->
+	<software name="sangokub" supported="yes">
+		<description>Sangokushi (SR Ban)</description>
+		<year>1986</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
 ]]></notes>
-		<!-- PC8801 -->
-		<info name="release" value="198512xx"/>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="19861210"/>
 		<info name="alt_title" value="三国志"/>
 		<!--combined image-->
 		<!--rom name="sangokushi ver.1.2(sr ver).d88" size="1114048" crc="56c09cfb" sha1="2af41af6b2c1846dcca1452d6f4b7b463d8b8b94"/-->
@@ -29455,16 +29455,15 @@ ExtractDisk  [02]"ｻﾝｺﾞｸｼ B      " -> "Sangokushi 02.d88"
 		</part>
 	</software>
 
-	<!-- TODO: shouldn't be a clone of sangoku? -->
-	<software name="sangokuc" cloneof="sangoku" supported="no">
-		<description>Sangokushi (19861210, SR Ban?, alt)</description>
-		<year>1985</year>
+	<software name="sangokuc" cloneof="sangokub" supported="yes">
+		<description>Sangokushi (SR Ban, alt)</description>
+		<year>1986</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
 ]]></notes>
-		<!-- PC8801 -->
-		<info name="release" value="198512xx"/>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="19861210"/>
 		<info name="alt_title" value="三国志"/>
 		<!--combined image-->
 		<!--rom name="sangokushi 86-10-10.d88" size="1114048" crc="77b4251d" sha1="059941439a1888111e150afa9987335a76f312be"/-->
@@ -29491,16 +29490,16 @@ ExtractDisk  [02]"ｻﾝｺﾞｸｼ B      " -> "Sangokushi 02.d88"
 		</part>
 	</software>
 
-	<!-- TODO: shouldn't be a clone of sangoku? -->
-	<software name="sangokud" cloneof="sangoku" supported="no">
-		<description>Sangokushi (SR Ban?)</description>
+	<software name="sangokud" cloneof="sangokub" supported="yes">
+		<description>Sangokushi (SR Ban, alt 2)</description>
 		<year>1987</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
 ]]></notes>
 		<!-- PC8801mk2SR -->
-		<info name="release" value="198704xx"/>
+		<!-- was 198704xx (?) -->
+		<info name="release" value="19861210"/>
 		<info name="alt_title" value="三国志SR版"/>
 		<!--combined image-->
 		<!--rom name="sangokushi sr.d88" size="1142832" crc="adb97e00" sha1="60c074525d555efabc480ccafb19aa454a4b2178"/-->
@@ -29552,12 +29551,13 @@ ExtractDisk  [02]"ｻﾝｺﾞｸｼ B      " -> "Sangokushi 02.d88"
 		</part>
 	</software>
 
-	<software name="sangoku2" supported="no">
+	<software name="sangoku2" supported="partial">
 		<description>Sangokushi II</description>
 		<year>1989</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198912xx"/>
@@ -29601,12 +29601,13 @@ ExtractDisk  [02]"ｻﾝｺﾞｸｼ B      " -> "Sangokushi 02.d88"
 		</part>
 	</software>
 
-	<software name="sangoku2a" cloneof="sangoku2" supported="no">
+	<software name="sangoku2a" cloneof="sangoku2" supported="partial">
 		<description>Sangokushi II (alt)</description>
 		<year>1989</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198912xx"/>
@@ -29650,12 +29651,13 @@ ExtractDisk  [02]"ｻﾝｺﾞｸｼ B      " -> "Sangokushi 02.d88"
 		</part>
 	</software>
 
-	<software name="sangoku2b" cloneof="sangoku2" supported="no">
+	<software name="sangoku2b" cloneof="sangoku2" supported="partial">
 		<description>Sangokushi II (alt 2)</description>
 		<year>1989</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198912xx"/>
@@ -29704,7 +29706,9 @@ ExtractDisk  [02]"ｻﾝｺﾞｸｼ B      " -> "Sangokushi 02.d88"
 		<year>1989</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Optional [redbook] audio CD on PC-8801MC
+Throws "DISK I/O ERROR" on data disk creation
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198912xx"/>
@@ -30555,7 +30559,7 @@ Kinda ugly to look at without a shader
 	</software>
 
 	<software name="xabungle">
-		<description>Sento Mecha Xabungle - Blue Gale</description>
+		<description>Sento Mecha Xabungle - Blue Gale (PC-8801)</description>
 		<year>1983</year>
 		<publisher>ポニカ (PonyCa)</publisher>
 		<!-- PC8801 -->
@@ -30564,20 +30568,6 @@ Kinda ugly to look at without a shader
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="sento mecha xabungle.d88" size="348848" crc="bfcfdae4" sha1="efcacb4a5a30002257efe7af3f608e9c17e989af"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="xabunglea" cloneof="xabungle">
-		<description>Sento Mecha Xabungle - Blue Gale (alt)</description>
-		<year>1983</year>
-		<publisher>ポニカ (PonyCa)</publisher>
-		<!-- PC8801 -->
-		<info name="release" value="198309xx"/>
-		<info name="alt_title" value="戦闘メカ ザブングル -ブルーゲール PART 1-"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="35776">
-				<rom name="blue gale sento mecha xabungle.d88" size="35776" crc="6cb8d117" sha1="93f1a41a1d7f2c9607f0d1f37b5aaf9ce8607dea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -33149,15 +33139,20 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Hangs after Cross Media Soft animation -->
-	<!-- FDC stalls [Tries to read a missing CHRN=(01 01 00 01)] -->
-	<software name="starsymp" supported="no">
+	<software name="starsymp" supported="partial">
 		<description>Star Symphony</description>
 		<year>1986</year>
 		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
+		<notes><![CDATA[
+FDC stalls [Tries to read a missing CHRN=(01 01 00 01)] (fixed?)
+Fails to load on PC-8801, needs OPN range to return open bus
+Not extensively tested
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198609xx"/>
 		<info name="alt_title" value="スターシンフォニー"/>
+		<!-- NOTE: works with disk A as well, game is bundled with 1 disk -->
+		<info name="usage" value="Copy disk B as a .mfi container, then mount it in second drive with r/w permissions then follow English instructions."/>
 		<!--combined image-->
 		<!--rom name="star symphony.d88" size="698512" crc="d79e7454" sha1="515f5acfb2f8c8939fdc42b031f4027785c25206"/-->
 
@@ -33177,6 +33172,7 @@ Not extensively tested
 		</part>
 	</software>
 
+	<!-- TODO: probably same as above -->
 	<!-- Hangs after Cross Media Soft animation -->
 	<!-- FDC stalls [Tries to read a missing CHRN=(01 01 00 01)] -->
 	<software name="starsympa" cloneof="starsymp" supported="no">
@@ -33397,7 +33393,7 @@ Not extensively tested
 	</software>
 
 	<software name="storm">
-		<description>Storm</description>
+		<description>Storm: Neo Strategic Simulation</description>
 		<year>1988</year>
 		<publisher>マイクロネット (Micronet)</publisher>
 		<!-- PC8801 -->
@@ -33457,48 +33453,6 @@ Not extensively tested
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="348848">
 				<rom name="sugoroku yakyu-do (disk 2).d88" size="348848" crc="32437caf" sha1="bdde88d102d0e8cbdd6a114f7ea701bfecf01c75"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="suikodtc" supported="no">
-		<description>Suikoden - Tenmei no Chikai</description>
-		<year>1989</year>
-		<publisher>光栄 (Koei)</publisher>
-		<notes><![CDATA[
-"Cannot load YSHELL.COM"
-]]></notes>
-		<!-- PC8801mk2SR -->
-		<info name="release" value="198903xx"/>
-		<info name="alt_title" value="水滸伝・天命の誓い"/>
-		<!--combined image-->
-		<!--rom name="suikoden tenmei no chikai.d88" size="1523984" crc="47b7691a" sha1="d1ba54fdbc752de8f6e55cae1f4c1625b7fa4d22"/-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A" />
-			<dataarea name="flop" size="381408">
-				<rom name="suikoden tenmei no chikai (disk a).d88" size="381408" crc="967ec064" sha1="c939f4ecf8a4745d98195b3cf89d7685030f7fb5"/>
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B" />
-			<dataarea name="flop" size="380864">
-				<rom name="suikoden tenmei no chikai (disk b).d88" size="380864" crc="e09e4658" sha1="a429d6240af414351d2c2aacad6d9628434d8825"/>
-			</dataarea>
-		</part>
-
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C" />
-			<dataarea name="flop" size="380864">
-				<rom name="suikoden tenmei no chikai (disk c).d88" size="380864" crc="402fe23b" sha1="630dbac8448c68a74e4b67876cf4cb6c2e4ad0f5"/>
-			</dataarea>
-		</part>
-
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="User" />
-			<dataarea name="flop" size="380848">
-				<rom name="suikoden tenmei no chikai (user).d88" size="380848" crc="dd27714b" sha1="bd6b68c84d5f599f9bdefc4b85da084d4b0afc61"/>
 			</dataarea>
 		</part>
 	</software>
@@ -34179,11 +34133,14 @@ FDC stalls [Tries to read a missing CHRN=(00 00 f7 01)]
 		<year>1990</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
+Throws a DISK I/O ERROR:2B:RENMAIN.OVL at disk swap time or with direct A and C loading
+Optional [redbook] audio CD on PC-8801MC
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199011xx"/>
 		<info name="alt_title" value="提督の決断"/>
+		<info name="usage" value="Boot with disks A and C to skip opening"/>
 		<!--combined image-->
 		<!--rom name="teitoku no ketsudan.d88" size="1518656" crc="008dada3" sha1="648a1f274f4ef5a8f0adb52055a39879c7fd4a6a"/-->
 
@@ -34216,10 +34173,15 @@ FDC stalls [Tries to read a missing CHRN=(00 00 f7 01)]
 		</part>
 	</software>
 
-	<software name="teiketsua" cloneof="teiketsu">
+	<software name="teiketsua" cloneof="teiketsu" supported="no">
 		<description>Teitoku no Ketsudan (alt)</description>
 		<year>1990</year>
 		<publisher>光栄 (Koei)</publisher>
+		<notes><![CDATA[
+"Cannot load YSHELL.COM" (fixed)
+Throws a DISK I/O ERROR:2B:RENMAIN.OVL at disk swap time or with direct A and C loading
+Optional [redbook] audio CD on PC-8801MC
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199011xx"/>
 		<info name="alt_title" value="提督の決断"/>
@@ -36899,9 +36861,9 @@ ExtractDisk  [03]"ﾕｰｻﾞｰｼｽﾃﾑﾃﾞｨｽｸ  " -> "ultima 3(pon
 		</part>
 	</software>
 
-	<!-- TODO: all these most likely belongs to PC-8001mkII -->
-	<software name="ulysses">
-		<description>Ulysses and the Golden Fleece</description>
+	<!-- This is the native PC-8801 version -->
+	<software name="ulysses" >
+		<description>Ulysses and the Golden Fleece (PC-8801)</description>
 		<year>1983</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<!-- PC8801 -->
@@ -36928,64 +36890,6 @@ ExtractDisk  [03]"ﾕｰｻﾞｰｼｽﾃﾑﾃﾞｨｽｸ  " -> "ultima 3(pon
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="348848">
 				<rom name="ulysses and the golden fleece (disk 2).d88" size="348848" crc="8ba18bf0" sha1="537d9f8f823cc300e323e66a1083552c75aa6baa"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ulyssesa" cloneof="ulysses">
-		<description>Ulysses and the Golden Fleece (8001mkII)</description>
-		<year>1983</year>
-		<publisher>スタークラフト (Starcraft)</publisher>
-		<!-- PC8801 -->
-		<info name="release" value="198312xx"/>
-		<info name="alt_title" value="ユリシーズ"/>
-		<!--combined image-->
-		<!--rom name="ulysses and the golden fleece(8001mkii).d88" size="693344" crc="c7888134" sha1="ea781898977ba7396cb91ba7a6ba1fec5db6184a"/-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="344496">
-				<rom name="ulysses and the golden fleece(8001mkii) (disk 1).d88" size="344496" crc="2333d50c" sha1="c1a940c985624a4c7794d880c5d28e79c7f6ebbd"/>
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="348848">
-				<rom name="ulysses and the golden fleece(8001mkii) (disk 2).d88" size="348848" crc="4264b445" sha1="82594d02f0a135125d7e1423c57c72709718efa2"/>
-			</dataarea>
-		</part>
-	</software>
-
-<!--
-ExtractDisk  [01]"N80 BASIC    " -> "ulysses_v80_01.d88"
-ExtractDisk  [02]"Ulysses_Disk2   " -> "ulysses_v80_02.d88" (same as ulyssesa)
-ExtractDisk  [03]"Ulysses_Disk1   " -> "ulysses_v80_03.d88" (same as ulyssesa)
--->
-	<software name="ulyssesb" cloneof="ulysses">
-		<description>Ulysses (alt BASIC Disk)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<!--combined image-->
-		<!--rom name="ulysses_v80.d88" size="1042192" crc="b4ee359c" sha1="4cb6a4a69b942184d43e639ec7ae9c20c1c5c20c"/-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="ulysses_v80_01.d88" size="348848" crc="6494d82f" sha1="7a409c2e68668e3443639e0f55e2e0c92efa2721"/>
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="348848">
-				<rom name="ulysses and the golden fleece(8001mkii) (disk 2).d88" size="348848" crc="4264b445" sha1="82594d02f0a135125d7e1423c57c72709718efa2"/>
-			</dataarea>
-		</part>
-
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="344496">
-				<rom name="ulysses and the golden fleece(8001mkii) (disk 1).d88" size="344496" crc="2333d50c" sha1="c1a940c985624a4c7794d880c5d28e79c7f6ebbd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -39887,7 +39791,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 -->
 	<software name="yajiuma2">
 		<description>Yajiuma Pennant Race 2</description>
-		<year>1991</year>
+		<year>1990</year>
 		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199102xx"/>
@@ -48177,7 +48081,7 @@ ExtractDisk  [09]"第4集 B     " -> "jam vol.1 (alt)_09.d88"
 Not extensively tested
 ]]></notes>
 
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="353184">    <!-- Data CRC16: 19900 -->
 				<rom name="pc-8801fh_systemdisk.d88" size="353184" crc="155e38a2" sha1="dd310bf1a7c95a805999ac0a697fefc666b0fc32"/>
 			</dataarea>
@@ -48253,7 +48157,7 @@ Not extensively tested
 		<notes><![CDATA[
 [SIGSEGV in d88 loading]
 ]]></notes>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1128864">   <!-- Data CRC16: 64726 -->
 				<rom name="pc-8801mh_systemdisk.d88" size="1128864" crc="f8b5d2f5" sha1="3ea0b6b574f8df2da597eff19796b8d0181ab2c8"/>
 			</dataarea>
@@ -48536,18 +48440,6 @@ Not extensively tested
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 19585 -->
 				<rom name="acchi muite hoi (a2)(disk b).d88" size="348848" crc="a460a808" sha1="3a036ab8350419a0cdbd0e5eb89dcddd506932f1"/>
-			</dataarea>
-		</part>
-	</software>
-
-<!-- was this released only as a tape? was it for pc8001? -->
-	<software name="advent1">
-		<description>Adventure 1</description>
-		<year>19??</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="31424">
-				<rom name="adventure 1.d88" size="31424" crc="a2acf8c6" sha1="07747878c7b45af4a50fbf51b6167fa639775264"/>
 			</dataarea>
 		</part>
 	</software>
@@ -49033,30 +48925,26 @@ TODO: verify if it really works on BASIC 1.0 only
 		</part>
 	</software>
 
-	<software name="fanteatr" supported="no">
+	<software name="fanteatr" supported="yes">
 		<description>Fantastic Eaters</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<notes><![CDATA[
-Doesn't load, throws "Bad allocation table" with a Disk Basic FILES command, is the dump right?
-]]></notes>
+		<year>1982</year>
+		<publisher>パソコンショップ高知 (PSK)</publisher>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="52912">
-				<rom name="fantastic eaters.d88" size="52912" crc="58f02ffc" sha1="e347ecbefd6248902cca5900a508dfd482b5e555" status="baddump"/>
+				<rom name="fantastic eaters.d88" size="52912" crc="58f02ffc" sha1="e347ecbefd6248902cca5900a508dfd482b5e555"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="fanteatra" cloneof="fanteatr" supported="no">
+	<software name="fanteatra" cloneof="fanteatr" supported="yes">
 		<description>Fantastic Eaters (alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<notes><![CDATA[
-Doesn't load, throws "Bad allocation table" with a Disk Basic FILES command, is the dump right?
-]]></notes>
+		<year>1982</year>
+		<publisher>パソコンショップ高知 (PSK)</publisher>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="52912">
-				<rom name="fantastic eaters(a).d88" size="52912" crc="4d556b50" sha1="338f5e63319dcdbb2b9b41d65cbdb982bf9a224d" status="baddump"/>
+				<rom name="fantastic eaters(a).d88" size="52912" crc="4d556b50" sha1="338f5e63319dcdbb2b9b41d65cbdb982bf9a224d" />
 			</dataarea>
 		</part>
 	</software>
@@ -49096,19 +48984,6 @@ Doesn't load, throws "Bad allocation table" with a Disk Basic FILES command, is 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="fire ball.d88" size="348848" crc="32aa56c2" sha1="d828fb7468141d6f0930648e275662c1c0ff2ace"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="funokoko">
-		<description>Fu no Kokoro</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="歩の心"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="31424">
-				<rom name="fu no kokoro.d88" size="31424" crc="dc92ec87" sha1="b059edc4d0208c2530221516f738f904f07cb022" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -49300,9 +49175,11 @@ Doesn't load, throws "Bad allocation table" with a Disk Basic FILES command, is 
 
 	<software name="hardrank">
 		<description>Hard Rank</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1990</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<!-- PC-8801FA/MA/FE/VA -->
 		<info name="alt_title" value="ハードランク"/>
+		<info name="developer" value="NOP Software"/>
 		<!--combined image-->
 		<!--rom name="hard rank.d88" size="697696" crc="570abb24" sha1="a0bafb4e3c44083a92dc2a34ba129088962676e0"/-->
 
@@ -50152,17 +50029,6 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="olion80">
-		<description>Olion80</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="31424">
-				<rom name="olion80.d88" size="31424" crc="7a011e34" sha1="b07caec699203b488ee0ea9d11a4b9d94e9edbe5"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pachislo">
 		<description>Pachislot Party</description>
 		<year>19??</year>
@@ -50816,12 +50682,12 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="suikoden" supported="no">
-		<description>Suikoden</description>
+	<software name="suikoden" supported="yes">
+		<description>Suikoden: Tenmei no Chikai</description>
 		<year>19??</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
 ]]></notes>
 		<!--combined image-->
 		<!--rom name="suikoden.d88" size="1549440" crc="bd419395" sha1="f7fa63af86bc7f04c14226c6170d70035c2ef64a"/-->
@@ -50855,12 +50721,12 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="suikodena" cloneof="suikoden" supported="no">
-		<description>Suikoden (alt)</description>
+	<software name="suikodena" cloneof="suikoden" supported="yes">
+		<description>Suikoden: Tenmei no Chikai (alt)</description>
 		<year>19??</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
-"Cannot load YSHELL.COM"
+"Cannot load YSHELL.COM" (fixed)
 ]]></notes>
 		<!--combined image-->
 		<!--rom name="suikoden.d88" size="1142544" crc="b1d19804" sha1="b903317939ab88fb89c30bb2da35c999a60396ab"/-->
@@ -50887,9 +50753,54 @@ Not extensively tested
 		</part>
 	</software>
 
+	<software name="suikodtc" cloneof="suikoden" supported="yes">
+		<description>Suikoden: Tenmei no Chikai (alt 2)</description>
+		<year>1989</year>
+		<publisher>光栄 (Koei)</publisher>
+		<notes><![CDATA[
+"Cannot load YSHELL.COM" (fixed)
+]]></notes>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198903xx"/>
+		<info name="alt_title" value="水滸伝・天命の誓い"/>
+		<info name="usage" value="Boot with disks A and C to skip opening"/>
+		<!--combined image-->
+		<!--rom name="suikoden tenmei no chikai.d88" size="1523984" crc="47b7691a" sha1="d1ba54fdbc752de8f6e55cae1f4c1625b7fa4d22"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="381408">
+				<rom name="suikoden tenmei no chikai (disk a).d88" size="381408" crc="967ec064" sha1="c939f4ecf8a4745d98195b3cf89d7685030f7fb5"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="380864">
+				<rom name="suikoden tenmei no chikai (disk b).d88" size="380864" crc="e09e4658" sha1="a429d6240af414351d2c2aacad6d9628434d8825"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="380864">
+				<rom name="suikoden tenmei no chikai (disk c).d88" size="380864" crc="402fe23b" sha1="630dbac8448c68a74e4b67876cf4cb6c2e4ad0f5"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="User" />
+			<dataarea name="flop" size="380848">
+				<rom name="suikoden tenmei no chikai (user).d88" size="380848" crc="dd27714b" sha1="bd6b68c84d5f599f9bdefc4b85da084d4b0afc61"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Looks too old to be an actual floppy release? -->
 	<software name="superbas">
 		<description>Super Baseball</description>
-		<year>19??</year>
+		<year>1982</year>
+		<!-- Tinysoft / Sawaji Sawada -->
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Needs BASIC V1"/>
 
@@ -50914,10 +50825,14 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="swordleg">
+	<software name="swordleg" supported="no">
 		<description>The Sword of Legend</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Crashes at startup
+]]></notes>
+		<!-- PC-8801mkIISR -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348592">
 				<rom name="the sword of legend.d88" size="348592" crc="923a730f" sha1="ae19540af0ebfa7e4d537ad21e236463d1af7886"/>
@@ -51675,11 +51590,15 @@ Not extensively tested (language barrier, draws in katakana)
 		</part>
 	</software>
 
-	<!-- Not extensively tested -->
 	<software name="arthemis" supported="partial">
 		<description>Arthemis 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+		<!-- PC-8801mk2SR -->
+		<info name="usage" value="Requires a Sound Board II" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="arthemis 2.d88" size="348848" crc="51272f5e" sha1="eaf5c0fc576d510bad384a4a2cb3c8b2cc78c5e9"/>
@@ -52178,7 +52097,7 @@ Tests [Sound Board 2]
 		<description>Dark Dungeon</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V2, on prompt type load &quot;MADDD.M88&quot; then run"/>
+		<info name="usage" value="Needs BASIC V2, on prompt type load &quot;MADDD.M88&quot; then run. Looks incompatible with PC8801MA+ (throws bad allocation table on disk reading)"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -53397,11 +53316,13 @@ ExtractDisk  [04]"game_2          " -> "loginsoft game create system - mamirin_0
 		</part>
 	</software>
 
+	<!-- TODO: actual name of this package? -->
 	<software name="nopsoftw">
-		<description>NOP Software</description>
+		<description>NOP Software (Game collection)</description>
 		<year>1989</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;doujin&gt;</publisher>
 		<info name="usage" value="Needs BASIC V2"/>
+		<info name="developer" value="NOP Software"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -53646,9 +53567,10 @@ Has hidden [3301] header on top "HIGE MAHJONG (c) 1998 CDL" (btanb)
 		</part>
 	</software>
 
+	<!-- MCMXC for all Pretty Girl sets -->
 	<software name="prettygi">
 		<description>Pretty Girl 2</description>
-		<year>19??</year>
+		<year>1990</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -53659,7 +53581,7 @@ Has hidden [3301] header on top "HIGE MAHJONG (c) 1998 CDL" (btanb)
 
 	<software name="prettyg1">
 		<description>Pretty Girl 3</description>
-		<year>19??</year>
+		<year>1990</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -53670,7 +53592,7 @@ Has hidden [3301] header on top "HIGE MAHJONG (c) 1998 CDL" (btanb)
 
 	<software name="prettyg2">
 		<description>Pretty Girl A</description>
-		<year>19??</year>
+		<year>1990</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -53681,7 +53603,7 @@ Has hidden [3301] header on top "HIGE MAHJONG (c) 1998 CDL" (btanb)
 
 	<software name="prettyg3">
 		<description>Pretty Girl B</description>
-		<year>19??</year>
+		<year>1990</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -54790,17 +54712,6 @@ Reports "ADPCM ???K" size after loading
 		</part>
 	</software>
 
-	<software name="gamepac7">
-		<description>Game Pack 20</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348832">
-				<rom name="game pack 20.d88" size="348832" crc="c2425df4" sha1="18cd05e45bd01e521cdae51da58c7486fdb4b81a"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="gamepac8">
 		<description>Game Pack 200</description>
 		<year>19??</year>
@@ -55528,10 +55439,13 @@ ExtractDisk  [02]"vol 14          " -> "memories 14(disk magazine)_02.d88"
 		</part>
 	</software>
 
-	<software name="pack14d8">
+	<software name="pack14d8" supported="no">
 		<description>PACK14</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Doesn't boot
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="pack14.d88" size="348848" crc="9fbe9409" sha1="e8506d2a851c1d25c9fdd34a400b17a1d6d04166"/>
@@ -55817,9 +55731,12 @@ ExtractDisk  [02]"Hit88 Data      " -> "hit-88_assembler_02.d88"
 	<!-- TODO: these P1 disks seems to be part of the same package, identify how to load them all -->
 
 	<software name="p1cold88">
-		<description>P1 col</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>P1 Graphic Editor (ver. 1.00)</description>
+		<year>1987</year>
+		<publisher>デービーソフト (dB-Soft)</publisher>
+		<info name="usage" value="pc8801mk2sr minimum" />
+		<sharedfeat name="mouseport_default" value="mouse" />
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="352928">
 				<rom name="p1 col.d88" size="352928" crc="dd58383c" sha1="d2330bed238ae43375072286893bfb32ee3b296f"/>
@@ -55900,100 +55817,6 @@ ExtractDisk  [02]"Hit88 Data      " -> "hit-88_assembler_02.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
 				<rom name="nintendo pack.d88" size="348832" crc="d6ed902f" sha1="f282f508322a66795fc77b2af49e0bbc4a74e06d"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mdb">
-		<description>Micro Disk Basic</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="micro disk basic.d88" size="348848" crc="aecb7002" sha1="c4e4ab157bf063b09df5b83b17dac4d938ae5af4"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mdb1d88">
-		<description>MDB 1</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="mdb 1.d88" size="348848" crc="e9bf17d4" sha1="39e34af98686e490099d64b23c4c91feb020aadd"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mdb2d88">
-		<description>MDB 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="mdb 2.d88" size="348848" crc="f7e6e73c" sha1="2b94934fae1186c88310f89e01563ce3181c2e01"/>
-			</dataarea>
-		</part>
-	</software>
-
-
-<!-- AKA PC-8001_Game_Pack_vol.3
-BUGFIRE
-CHECK POINT
-EUROPE(?)  (タイトル不明、ヨーロッパ戦線的なゲームです)
-GALAXY FIGHTER
-KEMIGAWA TREK !!!
-THE PLANET MINERS
-THE RACER
-アルフガルド
-キシャポッポ
-スパイ大作戦
-スラバヤ沖海戦
-将棋
-聖剣伝説
-幽霊船
--->
-	<software name="mdb3d88">
-		<description>MDB 3</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="mdb 3.d88" size="348848" crc="f8058a0b" sha1="38d8ca89a8dabe502253f60cf554d545d37a5bc0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mdb4d88">
-		<description>MDB 4</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="mdb 4.d88" size="348848" crc="3da26f16" sha1="b89579514a519c5503859ad46ba0b3eafdacf85d"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mdb5d88">
-		<description>MDB 5</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="mdb 5.d88" size="348848" crc="f13e6986" sha1="7a236045ab355303e78ab74ca342df6445416f95"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mdb6d88">
-		<description>MDB 6</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="mdb 6.d88" size="348848" crc="8771f8d2" sha1="c12d0371fb615c8f27d5252a9b6a35d35953baa7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -56108,11 +55931,12 @@ THE RACER
 		</part>
 	</software>
 
-	<!-- TODO: N80SR collection? -->
 	<software name="pskactio">
 		<description>PSK Action Game Pack</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>パソコンショップ高知 (PSK)</publisher>
+		<!-- PC-8801 -->
+		<info name="usage" value="Requires N-Basic boot"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="250928">
 				<rom name="psk action game pack.d88" size="250928" crc="6f88a9ec" sha1="9d366c3604cfb709c070e6d960ec3db33fb512b8"/>
@@ -56255,40 +56079,6 @@ Sends a 0xff to I/O port $e6, flip that to 0x00 to make it boot
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="pack1">
-		<description>Dig Dug / Xevious / Nintendo no Golf / Nuts &amp; Milk</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="353200">
-				<rom name="dig dug - xevious - nintendo no golf - nuts&amp;milk.d88" size="353200" crc="1e6c02fe" sha1="039c2e1831f8f4d0ca4ca2d9bc8ad857cf4bade2"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pack2">
-		<description>Dragon Slayer / Burger Time / Excite Bike / Dig Dug / Xevious</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="dragon slayer - burger time - excite bike - dig dug - xevious.d88" size="348848" crc="143636e6" sha1="077a419dac5c1562a04e6a8467cf8ecd7a590427"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pack3">
-		<description>Video-kun / F2 Grand Prix / Eggy</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="video-kun - f2 grand prix - eggy.d88" size="348848" crc="45d3515f" sha1="5d6def548da8f943eebdf7f524bea58ed1dab456"/>
-			</dataarea>
-		</part>
-	</software>
-
 
 <!-- SORTED UTILS -->
 
@@ -56485,7 +56275,7 @@ Sends a 0xff to I/O port $e6, flip that to 0x00 to make it boot
 		<description>Wizard88 Report Vol 90.1-3 (alt)</description>
 		<year>1990</year>
 		<publisher>Westside Softhouse</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 1388 -->
 				<rom name="wizard 88 report 90013.d88" size="348848" crc="6338716c" sha1="9e66db0f006ac122cc43f6067349dfc91964d4dd"/>
 			</dataarea>
@@ -56551,7 +56341,7 @@ Sends a 0xff to I/O port $e6, flip that to 0x00 to make it boot
 		<description>Wizard88 Report Vol 90.11-3 (alt)</description>
 		<year>1990</year>
 		<publisher>Westside Softhouse</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 44550 -->
 				<rom name="wizard 88 report 90113.d88" size="348848" crc="0a6599dc" sha1="80c781db6af8090623cb5bfcaee8b299eb37604c"/>
 			</dataarea>
@@ -56584,7 +56374,7 @@ Sends a 0xff to I/O port $e6, flip that to 0x00 to make it boot
 		<description>Wizard88 Report Vol 91.3-1 (alt)</description>
 		<year>1991</year>
 		<publisher>Westside Softhouse</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 51695 -->
 				<rom name="wizard 88 report 91031 (a).d88" size="348848" crc="72c8df04" sha1="90ec298c3a936ed5ca9f7fb3f509e34cf0815bd6"/>
 			</dataarea>
@@ -56981,22 +56771,23 @@ ExtractDisk  [02]"文字パターン    " -> "jet-8801a print studio_02.d88"
 		</part>
 	</software>
 
-	<software name="jet88011">
-		<description>JET-8801A v1 10 Dictionary</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="jet88012" supported="partial">
+		<!-- "rel. '85.01.18" -->
+		<description>JET-8801A (v1.10)</description>
+		<year>1985</year>
+		<publisher>キャリーラボ (Carry Lab)</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+		<!-- PC-8801mkIISR -->
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Jisho (辞書) Disk" />
 			<dataarea name="flop" size="349376">
 				<rom name="jet-8801a v1 10 dictionary.d88" size="349376" crc="6a9559eb" sha1="46e01cbbbf4ffb46aacc3680e89baf0e8ed4244b"/>
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="jet88012">
-		<description>JET-8801A v1 10 System</description>
-		<year>1984</year>
-		<publisher>キャリーラボ (Carry Lab)</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="349376">
 				<rom name="jet-8801a v1 10 system.d88" size="349376" crc="c5c28d2a" sha1="29b4762a0fbf8279a09d6c8515467c6ba505566f"/>
 			</dataarea>
@@ -57009,19 +56800,22 @@ ExtractDisk  [02]"System Disk    " -> "jet-8801a v2.00_02.d88"
 
 -->
 	<software name="jet88013">
-		<description>JET-8801A v2.00</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<!-- "Rel 86/06/10" -->
+		<description>JET-8801A (v2.00)</description>
+		<year>1986</year>
+		<publisher>キャリーラボ (Carry Lab)</publisher>
 		<!--combined image-->
 		<!--rom name="jet-8801a v2.00.d88" size="763840" crc="88acc236" sha1="010551d7eaf809e1faf4da3a4fe9d58a4ffe8449"/-->
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Jisho (辞書) Disk" />
 			<dataarea name="flop" size="414992">
 				<rom name="jet-8801a v2.00_01.d88" size="414992" crc="5f13a792" sha1="f87374a97759f155bed066972a5ad1afa8abeacf"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="348848">
 				<rom name="jet-8801a v2.00_02.d88" size="348848" crc="c65bfdb4" sha1="3b31c2cc57329ebc0221da48463e47cc8b948f67"/>
 			</dataarea>
@@ -57396,7 +57190,9 @@ ExtractDisk  [04]"D DISK          " -> "musium sound board ii_04.d88"
 		<notes><![CDATA[
 Boots with a "Caramity Boy" screen and hangs there
 "第二回作品制作快調!" -> "Sequel being worked on, everything is fine" (wtf?)
+Doesn't seem to have a path for ignoring this screen, incomplete dump?
 ]]></notes>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="425392">
 				<rom name="nformat disk.d88" size="425392" crc="30965674" sha1="eb378b400433b15b3e4c66e1a27615f04056ce60"/>
@@ -57501,18 +57297,6 @@ ExtractDisk  [06]"COLOR        " -> "p1 ver.1.00_06.d88"        dd58383c
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="360912">
 				<rom name="pattern editor 88.d88" size="360912" crc="75fa3ed8" sha1="d0486e4ded3ff6e81d80b7646a8e256b7462fd2f"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- TODO: needs N80[SR] BASIC, belongs to pc8001mk2 -->
-	<software name="pc8037sr">
-		<description>PC-8037SR</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="353200">
-				<rom name="pc-8037sr.d88" size="353200" crc="b7448e78" sha1="00b3942080e6b3729bcf23270ef20face4c872e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -57739,10 +57523,12 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
+	<!-- TODO: boots in pc8001mk2 too, not in pc8001 (wants N-BASIC >= v1.2?) -->
 	<software name="tfdos21">
 		<description>TF-DOS V2.1 (R3)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Toshio Fukui"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="tfds218r.d88" size="348848" crc="9e4244fd" sha1="3a186164730f2c010f95690e0caf59994353b4e3"/>
@@ -58044,7 +57830,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 v1.1 (alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 15844 -->
 				<rom name="the file master 88 v1.1.d88" size="348832" crc="0a9a01ce" sha1="81b22e780e2dd4d59ffa66ee12a1db6fb42c1485"/>
 			</dataarea>
@@ -58055,7 +57841,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 Filer 1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 7523 -->
 				<rom name="the file master 88 filer 1.d88" size="348832" crc="1a162902" sha1="0c606bde18e5286583654afbdddeba19cbd0e9d9"/>
 			</dataarea>
@@ -58066,7 +57852,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 Filer 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 7297 -->
 				<rom name="the file master 88 filer 2.d88" size="348832" crc="9edeaded" sha1="74c7e70da1df786fc5f02494dec4162dac3f0fa7"/>
 			</dataarea>
@@ -58077,7 +57863,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 Filer 3</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 32108 -->
 				<rom name="the file master 88 filer 3.d88" size="348832" crc="4eba4a40" sha1="170e6b7cace9f26e898e8480b23cc798225696a9"/>
 			</dataarea>
@@ -58088,7 +57874,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 Filer 4</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 53590 -->
 				<rom name="the file master 88 filer 4.d88" size="348832" crc="486511d3" sha1="8e6380949d7af11fbd29f692edd828334659ab47"/>
 			</dataarea>
@@ -58099,7 +57885,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 Filer 5</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 16173 -->
 				<rom name="the file master 88 filer 5.d88" size="348832" crc="e15e8501" sha1="05b196fa628a9c19b1903fa351ef11677185ec5d"/>
 			</dataarea>
@@ -58110,7 +57896,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 Filer 6</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 25652 -->
 				<rom name="the file master 88 filer 6.d88" size="348832" crc="295c4b09" sha1="e54ae35b2dc0921b1c851e484ce97dbfb6b2342e"/>
 			</dataarea>
@@ -58121,7 +57907,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 Filer 7</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 23836 -->
 				<rom name="the file master 88 filer 7.d88" size="348832" crc="2a9dd41a" sha1="5f870b6e379b465496f9c42b324c76ebf63280ba"/>
 			</dataarea>
@@ -58132,7 +57918,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 Filer 8</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 7009 -->
 				<rom name="the file master 88 filer 8.d88" size="348832" crc="d2c283c4" sha1="aeb973e875ea162bfb52484869027c3b19d44a77"/>
 			</dataarea>
@@ -58143,7 +57929,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 Filer 9</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 3292 -->
 				<rom name="the file master 88 filer 9.d88" size="348832" crc="76619253" sha1="f51eebdfd9913c2130e2b15e7b7966e8ffa90324"/>
 			</dataarea>
@@ -58154,7 +57940,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 Filer 10</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 49902 -->
 				<rom name="the file master 88 filer 10.d88" size="348832" crc="590a91dd" sha1="f5c6e912fac8892376dcd8c7a2ffd16edbfefcb4"/>
 			</dataarea>
@@ -58165,7 +57951,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 Filer 11</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 31309 -->
 				<rom name="the file master 88 filer 11.d88" size="348832" crc="6b64e91f" sha1="b9c7702786dfd6a8c07e8d21bfc8ca3b434e1261"/>
 			</dataarea>
@@ -58176,7 +57962,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 Filer 12</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 63750 -->
 				<rom name="the file master 88 filer 12.d88" size="348832" crc="a51ab073" sha1="cd061f8cb171ef4a126bb44a3da167c49a6cd25a"/>
 			</dataarea>
@@ -58188,7 +57974,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
         <description>The File Master 88 Filer 13</description>
         <year>19??</year>
         <publisher>&lt;unknown&gt;</publisher>
-        <part name="disk" interface="floppy_5_25">
+        <part name="flop1" interface="floppy_5_25">
             <dataarea name="flop" size="349504">
                 <rom name="the file master 88 filer 13.d88" size="349504" crc="9864dfa4" sha1="f862fea04211612e7719b58e8a389a4a9589a5c0"/>
             </dataarea>
@@ -58200,7 +57986,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		<description>The File Master 88 Filer 14</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 20467 -->
 				<rom name="the file master 88 filer 14.d88" size="348832" crc="93f493f7" sha1="3fe93a20002e7aa4101c8b77cd102b6e7d9828dc"/>
 			</dataarea>
@@ -58736,18 +58522,6 @@ ExtractDisk  [14]"EXPRESS 14      " -> "hot file_14.d88"
 		</part>
 	</software>
 
-	<software name="voguepas">
-		<description>Vogue(Pascal)</description>
-		<!-- Or only Pascal? -->
-		<year>19??</year>
-		<publisher>パスカル2 (Pascal2)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="vogue(pascal).d88" size="348848" crc="4f237d34" sha1="d64446186204b0912d8c687937ef01b1a85dacdf"/>
-			</dataarea>
-		</part>
-	</software>
-
 <!--
 ExtractDisk  [01]"ﾕｰｶﾗCARD SYSTEM " -> "yukar card_01.d88"
 ExtractDisk  [02]"ﾕｰｶﾗCARD DATA   " -> "yukar card_02.d88"
@@ -58838,7 +58612,7 @@ ExtractDisk  [03]"backup          " -> "z's staff kid88_03.d88"
 		<description>PC-8801mkIISR System Disk</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 14462 -->
 				<rom name="pc-8801mkiisr_systemdisk.d88" size="348832" crc="a2d55405" sha1="d54ed934c0b5563f827000945cfe9b809cc985a7"/>
 			</dataarea>

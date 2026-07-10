@@ -1160,7 +1160,7 @@ void konamim2_state::konamim2(machine_config &config)
 	// Common devices
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	ATA_INTERFACE(config, m_ata, 0);
+	ATA_INTERFACE(config, m_ata);
 	m_ata->irq_handler().set(FUNC(konamim2_state::ata_int));
 
 	m_ata->slot(0).option_add("cr589", CR589);

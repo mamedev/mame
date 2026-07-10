@@ -555,7 +555,7 @@ void groundfx_state::groundfx(machine_config &config)
 	adc.in_callback<2>().set_ioport("WHEEL");
 	adc.in_callback<3>().set_ioport("ACCEL");
 
-	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio"));
 	tc0510nio.read_2_callback().set_ioport("BUTTONS");
 	tc0510nio.read_3_callback().set("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)).lshift(7);
 	tc0510nio.read_3_callback().append(FUNC(groundfx_state::frame_counter_r)).lshift(0);
@@ -577,11 +577,11 @@ void groundfx_state::groundfx(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_groundfx);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 16384);
 
-	TC0620SCC(config, m_tc0620scc, 0);
+	TC0620SCC(config, m_tc0620scc);
 	m_tc0620scc->set_offsets(50, 8);
 	m_tc0620scc->set_palette(m_palette);
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x24, 0);
 	m_tc0480scp->set_offsets_tx(-1, 0);
@@ -589,7 +589,7 @@ void groundfx_state::groundfx(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
+	taito_en_device &taito_en(TAITO_EN(config, "taito_en"));
 	taito_en.add_route(0, "speaker", 1.0, 0);
 	taito_en.add_route(1, "speaker", 1.0, 1);
 }

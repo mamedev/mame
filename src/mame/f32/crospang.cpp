@@ -681,7 +681,7 @@ void crospang_state::crospang(machine_config &config)
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x300);
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_crospang);
 
-	DECO_SPRITE(config, m_sprgen, 0, "palette", gfx_crospang_spr);
+	DECO_SPRITE(config, m_sprgen, "palette", gfx_crospang_spr);
 	m_sprgen->set_is_bootleg(true);
 	m_sprgen->set_offsets(5, 7);
 

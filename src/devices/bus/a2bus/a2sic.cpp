@@ -13,6 +13,9 @@
     processing each received character that continuous reception of
     any data stream tends to fail even at low baud rates.)
 
+    The P8A PROM implements the ETX/ACK handshake protocol used by
+    Qume Sprint 5 and similar daisy wheel printers.
+
 **********************************************************************/
 
 #include "emu.h"
@@ -184,8 +187,9 @@ void a2sic_device::device_add_mconfig(machine_config &config)
 }
 
 ROM_START(a2sic)
-	ROM_SYSTEM_BIOS(0, "r4", "Revision 4")
+	ROM_SYSTEM_BIOS(0, "r4a", "Revision 4 (with P8A PROM)")
 	ROM_SYSTEM_BIOS(1, "r3", "Revision 3")
+	ROM_DEFAULT_BIOS("r3")
 
 	ROM_REGION(0x100, "p7", 0)
 	ROMX_LOAD("341-0017.p7", 0x000, 0x100, CRC(5be57c50) SHA1(897c92517566f74b179165b8c7b1c9a9df89f014), ROM_BIOS(0)) // probably 317-0017-04 (P7-04)

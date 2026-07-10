@@ -64,7 +64,7 @@ class gba_lcd_device
 		, protected gba_registers<0x060 / 4, 0x000>
 {
 public:
-	gba_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gba_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint32_t video_r(offs_t offset, uint32_t mem_mask = ~0);
 	void video_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

@@ -15,7 +15,7 @@
 
 #include "h8_intc.h"
 
-class h8_device;
+class h8_cpu_base;
 
 class h8_sci_device : public device_t {
 public:
@@ -105,8 +105,8 @@ protected:
 		SSR_MPBT = 0x01
 	};
 
-	required_device<h8_device> m_cpu;
-	required_device<h8_intc_device> m_intc;
+	required_device<h8_cpu_base> m_cpu;
+	required_device<h8_intc_base> m_intc;
 	attotime m_external_clock_period;
 	double m_external_to_internal_ratio, m_internal_to_external_ratio;
 	emu_timer *m_sync_timer;

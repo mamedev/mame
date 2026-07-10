@@ -50,7 +50,7 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void meyc8088(machine_config &config);
+	void meyc8088(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -294,8 +294,6 @@ void meyc8088_state::common_w(uint8_t data)
 
 void meyc8088_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_status));
 	save_item(NAME(m_common));
 }

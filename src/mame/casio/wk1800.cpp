@@ -252,10 +252,6 @@ void wk1800_state::wk1800_map(address_map &map)
 /**************************************************************************/
 void wk1600_state::driver_start()
 {
-	m_led.resolve();
-	m_led_power.resolve();
-	m_outputs.resolve();
-
 	m_nmi_timer = timer_alloc(FUNC(wk1600_state::nmi_clear), this);
 
 	std::fill(std::begin(m_sound_regs), std::end(m_sound_regs), 0);

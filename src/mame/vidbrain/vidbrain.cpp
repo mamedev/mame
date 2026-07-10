@@ -111,7 +111,7 @@ private:
 	void hblank_w(int state);
 	uint8_t memory_read_byte(offs_t offset);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<f8_cpu_device> m_maincpu;
 	required_device<f3853_device> m_smi;
 	required_device<uv201_device> m_uv;
 	required_device<dac_byte_interface> m_dac;
@@ -474,7 +474,7 @@ void vidbrain_state::vidbrain(machine_config &config)
 	F8(config, m_maincpu, XTAL(4'000'000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vidbrain_state::vidbrain_mem);
 	m_maincpu->set_addrmap(AS_IO, &vidbrain_state::vidbrain_io);
-	m_maincpu->set_irq_acknowledge_callback(m_smi, FUNC(f3853_device::int_acknowledge));
+	m_maincpu->int_cycle_callback().set(m_smi, FUNC(f3853_device::int_acknowledge));
 
 	// video hardware
 	UV201(config, m_uv, 3636363);

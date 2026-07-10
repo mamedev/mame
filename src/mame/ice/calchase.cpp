@@ -687,7 +687,7 @@ void calchase_state::calchase(machine_config &config)
 	pcibus.set_device(7, FUNC(calchase_state::intel82371ab_pci_r), FUNC(calchase_state::intel82371ab_pci_w));
 
 	// FIXME: determine ISA bus clock
-	isa16_device &isa(ISA16(config, "isa", 0));
+	isa16_device &isa(ISA16(config, "isa"));
 	isa.set_memspace("maincpu", AS_PROGRAM);
 	isa.set_iospace("maincpu", AS_IO);
 	ISA16_SLOT(config, "isa1", 0, "isa", calchase_isa16_cards, "calchase_jamma_if", true);
@@ -717,7 +717,7 @@ void calchase_state::hostinv(machine_config &config)
 	pcibus.set_device(7, FUNC(calchase_state::intel82371ab_pci_r), FUNC(calchase_state::intel82371ab_pci_w));
 
 	// TODO: determine isa bus clock
-	isa16_device &isa(ISA16(config, "isa", 0));
+	isa16_device &isa(ISA16(config, "isa"));
 	isa.set_memspace("maincpu", AS_PROGRAM);
 	isa.set_iospace("maincpu", AS_IO);
 	ISA16_SLOT(config, "isa1", 0, "isa", calchase_isa16_cards, "calchase_jamma_if", true);

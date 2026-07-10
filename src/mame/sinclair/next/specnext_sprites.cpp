@@ -311,7 +311,7 @@ void specnext_sprites_device::mirror_data_w(u8 mirror_data)
 	if (m_mirror_index <= 0b100)
 	{
 		m_sprites_cache.clear();
-		m_sprite_attr_ram[(m_mirror_sprite_q << 3) | m_mirror_index] = mirror_data;
+		m_sprite_attr_ram[(BIT(m_mirror_sprite_q, 0, TOTAL_SPRITES_BITS) << 3) | m_mirror_index] = mirror_data;
 	}
 
 	bool mirror_num_change = 0;
@@ -363,8 +363,6 @@ void specnext_sprites_device::device_start()
 	save_item(NAME(m_attr_index));
 	save_item(NAME(m_pattern_index));
 	save_item(NAME(m_mirror_sprite_q));
-
-	update_config();
 }
 
 void specnext_sprites_device::device_reset()
@@ -381,6 +379,7 @@ void specnext_sprites_device::device_reset()
 void specnext_sprites_device::device_post_load()
 {
 	m_sprites_cache.clear();
+	update_config();
 }
 
 

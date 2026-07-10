@@ -4516,6 +4516,7 @@ license:CC0-1.0
 		<description>Dezeni Land (Japan)</description>
 		<year>1984</year>
 		<publisher>Hudson Soft</publisher>
+		<info name="alt_title" value="デゼニランド"/>
 		<info name="serial" value="MX-2003"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
@@ -8033,7 +8034,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="hfox">
-		<description>Hurry Fox - Yuki no Maou hen (Japan)</description>
+		<description>Hurry Fox: Yuki no Maou hen (Japan)</description>
 		<year>1985</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R. Requires a Japanese system."/>
@@ -17047,6 +17048,7 @@ Side B
 		</part>
 	</software>
 
+	<!-- TODO: rename to tomathim -->
 	<software name="tmtprncs">
 		<description>Salad no Kuni no Tomato-hime (Japan)</description>
 		<year>1985</year>

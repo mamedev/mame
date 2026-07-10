@@ -135,16 +135,6 @@ if _OPTIONS["targetos"]=="windows" then
 
 	configuration { }
 
-elseif _OPTIONS["targetos"]=="linux" then
-	if _OPTIONS["QT_HOME"]~=nil then
-		buildoptions {
-			"-I" .. backtick(_OPTIONS["QT_HOME"] .. "/bin/qmake -query QT_INSTALL_HEADERS"),
-		}
-	else
-		buildoptions {
-			"-I$(shell qmake6 -query QT_INSTALL_HEADERS)",
-		}
-	end
 elseif _OPTIONS["targetos"]=="macosx" then
 	defines {
 		"SDLMAME_MACOSX",

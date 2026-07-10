@@ -292,7 +292,7 @@ uint32_t sbasketb_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void sbasketb_state::sh_irqtrigger_w(uint8_t data)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 }
 
 template <uint8_t Which>
@@ -435,7 +435,7 @@ void sbasketb_state::sbasketb(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	TRACKFLD_AUDIO(config, "soundbrd", 0, m_audiocpu, m_vlm);
+	TRACKFLD_AUDIO(config, "soundbrd", m_audiocpu, m_vlm);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
 

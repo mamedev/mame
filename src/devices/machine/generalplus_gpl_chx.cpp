@@ -136,7 +136,6 @@ void gpl_chx_device::cha_data_w(u16 data)
 	{
 		// trying to overflow the FIFO
 	}
-
 }
 
 // P_CHA_FIFO
@@ -348,8 +347,4 @@ void gpl_chx_device::process_chb_fifo()
 	}
 
 	check_chb_fifo_empty();
-}
-
-void gpl_chx_device::device_add_mconfig(machine_config &config)
-{
 }

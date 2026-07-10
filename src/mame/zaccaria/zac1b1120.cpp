@@ -523,7 +523,7 @@ void zac1b1120_state::tinvader(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	S2636(config, m_s2636, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
+	S2636(config, m_s2636).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 void zac1b1120_state::dodgem(machine_config &config)

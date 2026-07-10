@@ -36,6 +36,8 @@
 #include "emu.h"
 #include "x68k.h"
 
+#include "input.h" // for sprite debug keys
+
 //#define VERBOSE 0
 #include "logmacro.h"
 

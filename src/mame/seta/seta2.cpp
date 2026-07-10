@@ -83,7 +83,6 @@ blnctry:
 
 #include "mahjong.h"
 
-#include "cpu/m68000/mcf5206e.h"
 #include "cpu/m68000/tmp68301.h"
 #include "machine/eepromser.h"
 #include "machine/intelfsh.h"
@@ -328,9 +327,6 @@ void seta2_state::machine_start()
 			}
 		}
 	}
-
-	m_leds.resolve();
-	m_lamps.resolve();
 }
 
 void seta2_state::sound_bank_w(offs_t offset, uint8_t data)

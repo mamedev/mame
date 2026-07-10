@@ -310,7 +310,7 @@ void patapata_state::patapata(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0)); // or 212? difficult to read (maybe 212 is 2* 112?)
+	nmk112_device &nmk112(NMK112(config, "nmk112")); // or 212? difficult to read (maybe 212 is 2* 112?)
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 

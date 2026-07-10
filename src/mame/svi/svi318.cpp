@@ -75,11 +75,15 @@ public:
 		m_keyboard_row(0)
 	{}
 
-	void svi318(machine_config &config);
-	void svi328n(machine_config &config);
-	void svi318p(machine_config &config);
-	void svi318n(machine_config &config);
-	void svi328p(machine_config &config);
+	void svi318(machine_config &config) ATTR_COLD;
+	void svi328n(machine_config &config) ATTR_COLD;
+	void svi318p(machine_config &config) ATTR_COLD;
+	void svi318n(machine_config &config) ATTR_COLD;
+	void svi328p(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t ppi_port_a_r();
@@ -102,9 +106,6 @@ private:
 	void svi3x8_io(address_map &map) ATTR_COLD;
 	void svi3x8_io_bank(address_map &map) ATTR_COLD;
 	void svi3x8_mem(address_map &map) ATTR_COLD;
-
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -342,8 +343,6 @@ void svi3x8_state::intvdp_w(int state)
 
 void svi3x8_state::machine_start()
 {
-	m_led_caps_lock.resolve();
-
 	// register for save states
 	save_item(NAME(m_intvdp));
 	save_item(NAME(m_intexp));

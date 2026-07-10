@@ -86,9 +86,6 @@
     - hookup adc0838, reads from i2c;
     - convert epic to be a device, make it input_merger/irq_callback compliant;
     - (more intermediate steps for proper PCI conversions here)
-    - jpark3: attract mode demo play acts weird, the dinosaur gets submerged
-      and camera doesn't really know what to do, CPU core bug?
-    - jpark3: crashes during second attract cycle;
     - sscopex: attract mode black screens (coin still works), sogeki/sscopefh are unaffected;
     - mocapglf, sscopefh, sscopex: implement 2nd screen output, controlled by IP90C63A;
     \- sscopex/sogeki desyncs during gameplay intro, leaves heavy trails in gameplay;
@@ -2576,7 +2573,7 @@ void viper_state::viper(machine_config &config)
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 
-	PC16552D(config, "duart_com", 0);
+	PC16552D(config, "duart_com");
 	// TODO: unverified clocks and channel types, likely connects to sensor motion based games
 	NS16550(config, "duart_com:chan0", XTAL(19'660'800));
 	NS16550(config, "duart_com:chan1", XTAL(19'660'800)).out_int_callback().set(FUNC(viper_state::uart_int));
@@ -2607,7 +2604,7 @@ void viper_state::viper(machine_config &config)
 	DMADAC(config, "dacl").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 	DMADAC(config, "dacr").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	M48T58(config, "m48t58", 0);
+	M48T58(config, "m48t58");
 
 	// Each IRQ3 will update the data buffers with 256 samples, and the playback rate is always 44100hz.
 	// The frequency is picked such that the DMADAC buffer should never overflow or underflow.

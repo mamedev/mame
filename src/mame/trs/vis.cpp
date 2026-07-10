@@ -1108,7 +1108,7 @@ void vis_state::vis(machine_config &config)
 
 	SOFTWARE_LIST(config, "cd_list").set_original("vis");
 
-	DS6417(config, m_card, 0);
+	DS6417(config, m_card);
 }
 
 ROM_START(vis)

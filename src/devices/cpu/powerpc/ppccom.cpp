@@ -1,10 +1,13 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, R. Belmont
 /***************************************************************************
 
-    ppccom.c
+    ppccom.cpp
 
     Common PowerPC definitions and functions
+
+    TODO: Separate out true common stuff from DRC-specific so it's actually
+          possible to have an interpreter.
 
 ***************************************************************************/
 
@@ -15,6 +18,12 @@
 #include "ppc_dasm.h"
 
 #include "emuopts.h"
+
+#include "endianness.h"
+
+#include <algorithm>
+#include <bit>
+#include <cstring>
 
 
 /***************************************************************************
@@ -30,12 +39,12 @@
     CONSTANTS
 ***************************************************************************/
 
-#define DOUBLE_SIGN     (0x8000000000000000U)
-#define DOUBLE_EXP      (0x7ff0000000000000U)
-#define DOUBLE_FRAC     (0x000fffffffffffffU)
-#define DOUBLE_ZERO     (0)
+static constexpr uint64_t DOUBLE_SIGN = 0x8000000000000000U;
+static constexpr uint64_t DOUBLE_EXP  = 0x7ff0000000000000U;
+static constexpr uint64_t DOUBLE_FRAC = 0x000fffffffffffffU;
+static constexpr uint64_t DOUBLE_ZERO = 0;
 
-
+static constexpr uint32_t CODEPAGE_SIZE = 0x1'0000'0000ULL / 4096 / 8;
 
 /***************************************************************************
     PRIVATE GLOBAL VARIABLES
@@ -213,7 +222,12 @@ DEFINE_DEVICE_TYPE(PPC740,    ppc740_device,    "ppc740",     "IBM PowerPC 740")
 DEFINE_DEVICE_TYPE(PPC750,    ppc750_device,    "ppc750",     "IBM PowerPC 750")
 
 
-ppc_device::ppc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int address_bits, int data_bits, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor, address_map_constructor internal_map)
+ppc_device::ppc_device(
+		const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock,
+		int address_bits, int data_bits,
+		powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor,
+		address_map_constructor internal_map,
+		uint32_t reservation_size)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
 	, m_program_config("program", ENDIANNESS_BIG, data_bits, address_bits, 0, internal_map)
@@ -234,8 +248,11 @@ ppc_device::ppc_device(const machine_config &mconfig, device_type type, const ch
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
 	, m_drcoptions(0)
+	, m_reservation_mask(~uint32_t(reservation_size - 1))
 	, m_dasm(powerpc_disassembler())
 {
+	assert(std::has_single_bit(reservation_size));
+
 	m_program_config.m_logaddr_width = 32;
 	m_program_config.m_page_shift = POWERPC_MIN_PAGE_SHIFT;
 
@@ -249,43 +266,33 @@ ppc_device::~ppc_device()
 {
 }
 
-//ppc403_device::ppc403_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-//  : ppc_device(mconfig, PPC403, "PPC403", tag, owner, clock, "ppc403", 32?, 64?)
-//{
-//}
-//
-//ppc405_device::ppc405_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-//  : ppc_device(mconfig, PPC405, "PPC405", tag, owner, clock, "ppc405", 32?, 64?)
-//{
-//}
-
 ppc603_device::ppc603_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc_device(mconfig, PPC603, tag, owner, clock, 32, 64, PPC_MODEL_603, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, address_map_constructor())
+	: ppc_device(mconfig, PPC603, tag, owner, clock, 32, 64, PPC_MODEL_603, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, address_map_constructor(), 32)
 {
 }
 
 ppc603e_device::ppc603e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc_device(mconfig, PPC603E, tag, owner, clock, 32, 64, PPC_MODEL_603E, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, address_map_constructor())
+	: ppc_device(mconfig, PPC603E, tag, owner, clock, 32, 64, PPC_MODEL_603E, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, address_map_constructor(), 32)
 {
 }
 
 ppc603r_device::ppc603r_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc_device(mconfig, PPC603R, tag, owner, clock, 32, 64, PPC_MODEL_603R, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, address_map_constructor())
+	: ppc_device(mconfig, PPC603R, tag, owner, clock, 32, 64, PPC_MODEL_603R, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, address_map_constructor(), 32)
 {
 }
 
 ppc602_device::ppc602_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc_device(mconfig, PPC602, tag, owner, clock, 32, 64, PPC_MODEL_602, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, address_map_constructor())
+	: ppc_device(mconfig, PPC602, tag, owner, clock, 32, 64, PPC_MODEL_602, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, address_map_constructor(), 32)
 {
 }
 
 mpc8240_device::mpc8240_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc_device(mconfig, MPC8240, tag, owner, clock, 32, 64, PPC_MODEL_MPC8240, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4/* unknown */, address_map_constructor())
+	: ppc_device(mconfig, MPC8240, tag, owner, clock, 32, 64, PPC_MODEL_MPC8240, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4/* unknown */, address_map_constructor(), 32)
 {
 }
 
 ppc601_device::ppc601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc_device(mconfig, PPC601, tag, owner, clock, 32, 64, PPC_MODEL_601, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_MFIOC | PPCCAP_601BAT | PPCCAP_LEGACY_POWER, 0 /* no TB */, address_map_constructor())
+	: ppc_device(mconfig, PPC601, tag, owner, clock, 32, 64, PPC_MODEL_601, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_MFIOC | PPCCAP_601BAT | PPCCAP_LEGACY_POWER, 0 /* no TB */, address_map_constructor(), 32)
 {
 }
 
@@ -296,17 +303,17 @@ std::unique_ptr<util::disasm_interface> ppc601_device::create_disassembler()
 }
 
 ppc604_device::ppc604_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc_device(mconfig, PPC604, tag, owner, clock, 32, 64, PPC_MODEL_604, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_604_MMU, 4, address_map_constructor())
+	: ppc_device(mconfig, PPC604, tag, owner, clock, 32, 64, PPC_MODEL_604, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_604_MMU, 4, address_map_constructor(), 32)
 {
 }
 
 ppc740_device::ppc740_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc_device(mconfig, PPC740, tag, owner, clock, 32, 64, PPC_MODEL_740, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_604_MMU | PPCCAP_750_TLB , 4, address_map_constructor())
+	: ppc_device(mconfig, PPC740, tag, owner, clock, 32, 64, PPC_MODEL_740, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_604_MMU | PPCCAP_750_TLB , 4, address_map_constructor(), 32)
 {
 }
 
 ppc750_device::ppc750_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc_device(mconfig, PPC750, tag, owner, clock, 32, 64, PPC_MODEL_750, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_604_MMU | PPCCAP_750_TLB, 4, address_map_constructor())
+	: ppc_device(mconfig, PPC750, tag, owner, clock, 32, 64, PPC_MODEL_750, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_604_MMU | PPCCAP_750_TLB, 4, address_map_constructor(), 32)
 {
 }
 
@@ -315,23 +322,23 @@ void ppc4xx_device::internal_ppc4xx(address_map &map)
 	map(0x40000000, 0x4000000f).rw(FUNC(ppc4xx_device::ppc4xx_spu_r), FUNC(ppc4xx_device::ppc4xx_spu_w));
 }
 
-ppc4xx_device::ppc4xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor)
-	: ppc_device(mconfig, type, tag, owner, clock, 31, 32, flavor, cap, tb_divisor, address_map_constructor(FUNC(ppc4xx_device::internal_ppc4xx), this))
+ppc4xx_device::ppc4xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor, uint32_t reservation_size)
+	: ppc_device(mconfig, type, tag, owner, clock, 31, 32, flavor, cap, tb_divisor, address_map_constructor(FUNC(ppc4xx_device::internal_ppc4xx), this), reservation_size)
 {
 }
 
 ppc403ga_device::ppc403ga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc4xx_device(mconfig, PPC403GA, tag, owner, clock, PPC_MODEL_403GA, PPCCAP_4XX, 1)
+	: ppc4xx_device(mconfig, PPC403GA, tag, owner, clock, PPC_MODEL_403GA, PPCCAP_4XX, 1, 16)
 {
 }
 
 ppc403gcx_device::ppc403gcx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc4xx_device(mconfig, PPC403GCX, tag, owner, clock, PPC_MODEL_403GCX, PPCCAP_4XX, 1)
+	: ppc4xx_device(mconfig, PPC403GCX, tag, owner, clock, PPC_MODEL_403GCX, PPCCAP_4XX, 1, 16)
 {
 }
 
 ppc405gp_device::ppc405gp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc4xx_device(mconfig, PPC405GP, tag, owner, clock, PPC_MODEL_405GP, PPCCAP_4XX | PPCCAP_VEA, 1)
+	: ppc4xx_device(mconfig, PPC405GP, tag, owner, clock, PPC_MODEL_405GP, PPCCAP_4XX | PPCCAP_VEA, 1, 32)
 {
 }
 
@@ -448,7 +455,7 @@ inline void ppc_device::set_timebase(uint64_t newtb)
     decrementer value
 -------------------------------------------------*/
 
-inline uint32_t ppc_device::get_decrementer()
+uint32_t ppc_device::get_decrementer()
 {
 	int64_t cycles_until_zero = m_dec_zero_cycles - total_cycles();
 	cycles_until_zero = std::max<int64_t>(cycles_until_zero, 0);
@@ -466,7 +473,7 @@ inline uint32_t ppc_device::get_decrementer()
     set_decrementer - set the decremeter
 -------------------------------------------------*/
 
-inline void ppc_device::set_decrementer(uint32_t newdec)
+void ppc_device::set_decrementer(uint32_t newdec)
 {
 	uint64_t cycles_until_done = ((uint64_t)newdec + 1) * m_tb_divisor;
 	uint32_t curdec = get_decrementer();
@@ -492,34 +499,37 @@ inline void ppc_device::set_decrementer(uint32_t newdec)
 }
 
 
-#if 0
 /*-------------------------------------------------
-    is_nan_double - is a double value a NaN
+    The 601's decrementer, like the 601-specific
+    RTC mechanism, counts nanoseconds, not bus
+    clocks.  This implementation allows pmac6100
+    to Gestalt itself properly (the boot ROM counts
+    decrementer ticks vs. instruction execution).
 -------------------------------------------------*/
 
-static inline int is_nan_double(double x)
+uint32_t ppc601_device::get_decrementer()
 {
-	uint64_t xi = *(uint64_t*)&x;
-	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
-			((xi & DOUBLE_FRAC) != DOUBLE_ZERO) );
-}
-#endif
-
-
-/*-------------------------------------------------
-    is_qnan_double - is a double value a
-    quiet NaN
--------------------------------------------------*/
-
-static inline int is_qnan_double(double x)
-{
-	uint64_t xi = *(uint64_t*)&x;
-	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
-			((xi & 0x0008000000000000U) == 0x0008000000000000U) );
+	const int64_t cycles_until_zero = (int64_t)m_dec_zero_cycles - (int64_t)total_cycles();
+	return (uint32_t)(cycles_until_zero * 1'000'000'000LL / clock());
 }
 
+void ppc601_device::set_decrementer(uint32_t newdec)
+{
+	m_dec_zero_cycles = total_cycles() + (uint64_t)newdec * clock() / 1'000'000'000;
+	m_decrementer_int_timer->adjust(cycles_to_attotime(m_dec_zero_cycles - total_cycles()));
+}
 
-#if 0
+TIMER_CALLBACK_MEMBER(ppc601_device::decrementer_int_callback)
+{
+	// set the decrementer IRQ state
+	m_core->irq_pending |= 0x02;
+
+	// advance by another full tick
+	m_dec_zero_cycles += ((uint64_t)1 << 32) * clock() / 1'000'000'000;
+	m_decrementer_int_timer->adjust(cycles_to_attotime(m_dec_zero_cycles - total_cycles()));
+}
+
+
 /*-------------------------------------------------
     is_snan_double - is a double value a
     signaling NaN
@@ -531,59 +541,6 @@ static inline int is_snan_double(double x)
 	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
 			((xi & DOUBLE_FRAC) != DOUBLE_ZERO) &&
 			((xi & 0x0008000000000000U) == DOUBLE_ZERO) );
-}
-#endif
-
-
-/*-------------------------------------------------
-    is_infinity_double - is a double value
-    infinity
--------------------------------------------------*/
-
-static inline int is_infinity_double(double x)
-{
-	uint64_t xi = *(uint64_t*)&x;
-	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
-			((xi & DOUBLE_FRAC) == DOUBLE_ZERO) );
-}
-
-
-/*-------------------------------------------------
-    is_normalized_double - is a double value
-    normalized
--------------------------------------------------*/
-
-static inline int is_normalized_double(double x)
-{
-	uint64_t exp;
-	uint64_t xi = *(uint64_t*)&x;
-	exp = (xi & DOUBLE_EXP) >> 52;
-
-	return (exp >= 1) && (exp <= 2046);
-}
-
-
-/*-------------------------------------------------
-    is_denormalized_double - is a double value
-    denormalized
--------------------------------------------------*/
-
-static inline int is_denormalized_double(double x)
-{
-	uint64_t xi = *(uint64_t*)&x;
-	return( ((xi & DOUBLE_EXP) == 0) &&
-			((xi & DOUBLE_FRAC) != DOUBLE_ZERO) );
-}
-
-
-/*-------------------------------------------------
-    sign_double - return sign of a double value
--------------------------------------------------*/
-
-static inline int sign_double(double x)
-{
-	uint64_t xi = *(uint64_t*)&x;
-	return ((xi & DOUBLE_SIGN) != 0);
 }
 
 
@@ -599,36 +556,44 @@ static inline int sign_double(double x)
 
 void ppc_device::device_start()
 {
-	/* allocate the core from the near cache */
+	// allocate the core from the near cache
 	m_cache.allocate_cache(mconfig().options().drc_rwx());
 	m_core = m_cache.alloc_near<internal_ppc_state>();
 	memset(m_core, 0, sizeof(internal_ppc_state));
+
+	// init bitmap of which logical pages have compiled code
+	m_codepage_bits.assign(CODEPAGE_SIZE, 0);    // 0x1'0000'0000 / 4096 = 0x10'0000
 
 	m_entry = nullptr;
 	m_nocode = nullptr;
 	m_out_of_cycles = nullptr;
 	m_tlb_mismatch = nullptr;
 	m_swap_tgpr = nullptr;
-	memset(m_lsw, 0, sizeof(m_lsw));
-	memset(m_stsw, 0, sizeof(m_stsw));
-	memset(m_read8, 0, sizeof(m_read8));
-	memset(m_write8, 0, sizeof(m_write8));
-	memset(m_read16, 0, sizeof(m_read16));
-	memset(m_read16mask, 0, sizeof(m_read16mask));
-	memset(m_write16, 0, sizeof(m_write16));
-	memset(m_write16mask, 0, sizeof(m_write16mask));
-	memset(m_read32, 0, sizeof(m_read32));
-	memset(m_read32align, 0, sizeof(m_read32align));
-	memset(m_read32mask, 0, sizeof(m_read32mask));
-	memset(m_write32, 0, sizeof(m_write32));
-	memset(m_write32align, 0, sizeof(m_write32align));
-	memset(m_write32mask, 0, sizeof(m_write32mask));
-	memset(m_read64, 0, sizeof(m_read64));
-	memset(m_read64mask, 0, sizeof(m_read64mask));
-	memset(m_write64, 0, sizeof(m_write64));
-	memset(m_write64mask, 0, sizeof(m_write64mask));
-	memset(m_exception, 0, sizeof(m_exception));
-	memset(m_exception_norecover, 0, sizeof(m_exception_norecover));
+	for (auto &lsw : m_lsw)
+		std::fill(std::begin(lsw), std::end(lsw), nullptr);
+	for (auto &stsw : m_stsw)
+		std::fill(std::begin(stsw), std::end(stsw), nullptr);
+	std::fill(std::begin(m_read8), std::end(m_read8), nullptr);
+	std::fill(std::begin(m_write8), std::end(m_write8), nullptr);
+	std::fill(std::begin(m_read16), std::end(m_read16), nullptr);
+	std::fill(std::begin(m_read16mask), std::end(m_read16mask), nullptr);
+	std::fill(std::begin(m_write16), std::end(m_write16), nullptr);
+	std::fill(std::begin(m_write16mask), std::end(m_write16mask), nullptr);
+	std::fill(std::begin(m_read32), std::end(m_read32), nullptr);
+	std::fill(std::begin(m_read32align), std::end(m_read32align), nullptr);
+	std::fill(std::begin(m_read32mask), std::end(m_read32mask), nullptr);
+	std::fill(std::begin(m_read32reserve), std::end(m_read32reserve), nullptr);
+	std::fill(std::begin(m_write32), std::end(m_write32), nullptr);
+	std::fill(std::begin(m_write32align), std::end(m_write32align), nullptr);
+	std::fill(std::begin(m_write32mask), std::end(m_write32mask), nullptr);
+	std::fill(std::begin(m_write32reserve), std::end(m_write32reserve), nullptr);
+	std::fill(std::begin(m_read64), std::end(m_read64), nullptr);
+	std::fill(std::begin(m_read64mask), std::end(m_read64mask), nullptr);
+	std::fill(std::begin(m_write64), std::end(m_write64), nullptr);
+	std::fill(std::begin(m_write64mask), std::end(m_write64mask), nullptr);
+	std::fill(std::begin(m_exception), std::end(m_exception), nullptr);
+	std::fill(std::begin(m_exception_norecover), std::end(m_exception_norecover), nullptr);
+	m_fpscr_finish = nullptr;
 
 	/* initialize the implementation state tables */
 	memcpy(m_fpmode, fpmode_source, sizeof(fpmode_source));
@@ -783,7 +748,7 @@ void ppc_device::device_start()
 		fatalerror("%s: PPC: serial clock (%d) must not be more than half of the system clock (%d)\n", tag(), m_serial_clock, m_system_clock);
 
 	/* allocate a timer for the compare interrupt */
-	if ((m_cap & PPCCAP_OEA) && (m_tb_divisor))
+	if ((m_cap & PPCCAP_OEA) && (m_tb_divisor || (m_flavor == PPC_MODEL_601)))
 		m_decrementer_int_timer = timer_alloc(FUNC(ppc_device::decrementer_int_callback), this);
 
 	/* and for the 4XX interrupts if needed */
@@ -839,6 +804,13 @@ void ppc_device::device_start()
 	save_item(NAME(m_tb_zero_cycles));
 	save_item(NAME(m_dec_zero_cycles));
 
+	save_item(NAME(m_core->reserve));
+	save_item(NAME(m_core->reserve_address));
+
+	save_item(NAME(m_core->m_codepage_any));
+	save_item(NAME(m_core->m_translation_generation));
+	save_pointer(NAME(&m_codepage_bits[0]), CODEPAGE_SIZE);
+
 	// Register debugger state
 	state_add(PPC_PC,    "PC", m_core->pc).formatstr("%08X");
 	state_add(PPC_MSR,   "MSR", m_core->msr).formatstr("%08X");
@@ -884,7 +856,7 @@ void ppc_device::device_start()
 
 	uint32_t flags = 0;
 	/* initialize the UML generator */
-	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 8, 32, 2);
+	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 8, 32, 2, COMPILE_FORWARDS_BYTES);
 
 	/* add symbols for our stuff */
 	m_drcuml->symbol_add(&m_core->pc, sizeof(m_core->pc), "pc");
@@ -928,6 +900,8 @@ void ppc_device::device_start()
 	m_drcuml->symbol_add(&m_cmp_cr_table, sizeof(m_cmp_cr_table), "cmp_cr_table");
 	m_drcuml->symbol_add(&m_cmpl_cr_table, sizeof(m_cmpl_cr_table), "cmpl_cr_table");
 	m_drcuml->symbol_add(&m_fcmp_cr_table, sizeof(m_fcmp_cr_table), "fcmp_cr_table");
+	m_drcuml->symbol_add(&m_core->reserve, sizeof(m_core->reserve), "reserve");
+	m_drcuml->symbol_add(&m_core->reserve_address, sizeof(m_core->reserve_address), "reserve_address");
 
 	/* initialize the front-end helper */
 	m_drcfe = std::make_unique<frontend>(*this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
@@ -973,6 +947,11 @@ void ppc_device::device_start()
 		static_generate_nocode_handler();
 		static_generate_out_of_cycles();
 		static_generate_tlb_mismatch();
+		// 601 has a unified cache, so code can self-modify without icbi.
+		// PPCDRC_STRICT_601_SELF_MODIFY causes the write accessors to watch for stores
+		// to compiled code pages.
+		if (m_flavor == PPC_MODEL_601 && (m_drcoptions & PPCDRC_STRICT_601_SELF_MODIFY))
+			static_generate_code_write_reset();
 		if (m_cap & PPCCAP_603_MMU)
 			static_generate_swap_tgpr();
 
@@ -997,25 +976,30 @@ void ppc_device::device_start()
 			static_generate_exception(EXCEPTION_DTLBMISSS, true,  "exception_dtlb_miss_store");
 		}
 
+		// add the shared floating-point status-flag finalizer
+		static_generate_fpscr_finish();
+
 		/* add subroutines for memory accesses */
 		for (int mode = 0; mode < 8; mode++)
 		{
-			static_generate_memory_accessor(mode, 1, false, false, "read8",       m_read8[mode],       nullptr);
-			static_generate_memory_accessor(mode, 1, true,  false, "write8",      m_write8[mode],      nullptr);
-			static_generate_memory_accessor(mode, 2, false, true,  "read16mask",  m_read16mask[mode],  nullptr);
-			static_generate_memory_accessor(mode, 2, false, false, "read16",      m_read16[mode],      m_read16mask[mode]);
-			static_generate_memory_accessor(mode, 2, true,  true,  "write16mask", m_write16mask[mode], nullptr);
-			static_generate_memory_accessor(mode, 2, true,  false, "write16",     m_write16[mode],     m_write16mask[mode]);
-			static_generate_memory_accessor(mode, 4, false, true,  "read32mask",  m_read32mask[mode],  nullptr);
-			static_generate_memory_accessor(mode, 4, false, false, "read32align", m_read32align[mode], nullptr);
-			static_generate_memory_accessor(mode, 4, false, false, "read32",      m_read32[mode],      m_read32mask[mode]);
-			static_generate_memory_accessor(mode, 4, true,  true,  "write32mask", m_write32mask[mode], nullptr);
-			static_generate_memory_accessor(mode, 4, true,  false, "write32align",m_write32align[mode],nullptr);
-			static_generate_memory_accessor(mode, 4, true,  false, "write32",     m_write32[mode],     m_write32mask[mode]);
-			static_generate_memory_accessor(mode, 8, false, true,  "read64mask",  m_read64mask[mode],  nullptr);
-			static_generate_memory_accessor(mode, 8, false, false, "read64",      m_read64[mode],      m_read64mask[mode]);
-			static_generate_memory_accessor(mode, 8, true,  true,  "write64mask", m_write64mask[mode], nullptr);
-			static_generate_memory_accessor(mode, 8, true,  false, "write64",     m_write64[mode],     m_write64mask[mode]);
+			static_generate_memory_accessor(mode, 1, false, false, false, "read8", m_read8[mode], nullptr);
+			static_generate_memory_accessor(mode, 1, true, false, false, "write8", m_write8[mode], nullptr);
+			static_generate_memory_accessor(mode, 2, false, true, false, "read16mask", m_read16mask[mode], nullptr);
+			static_generate_memory_accessor(mode, 2, false, false, false, "read16", m_read16[mode], m_read16mask[mode]);
+			static_generate_memory_accessor(mode, 2, true, true, false, "write16mask", m_write16mask[mode], nullptr);
+			static_generate_memory_accessor(mode, 2, true, false, false, "write16", m_write16[mode], m_write16mask[mode]);
+			static_generate_memory_accessor(mode, 4, false, true, false, "read32mask", m_read32mask[mode], nullptr);
+			static_generate_memory_accessor(mode, 4, false, false, false, "read32align", m_read32align[mode], nullptr);
+			static_generate_memory_accessor(mode, 4, false, false, true, "read32reserve", m_read32reserve[mode], nullptr);
+			static_generate_memory_accessor(mode, 4, false, false, false, "read32", m_read32[mode], m_read32mask[mode]);
+			static_generate_memory_accessor(mode, 4, true, true, false, "write32mask", m_write32mask[mode], nullptr);
+			static_generate_memory_accessor(mode, 4, true, false, false, "write32align", m_write32align[mode], nullptr);
+			static_generate_memory_accessor(mode, 4, true, false, true, "write32reserve", m_write32reserve[mode], nullptr);
+			static_generate_memory_accessor(mode, 4, true, false, false, "write32", m_write32[mode], m_write32mask[mode]);
+			static_generate_memory_accessor(mode, 8, false, true, false, "read64mask", m_read64mask[mode], nullptr);
+			static_generate_memory_accessor(mode, 8, false, false, false, "read64", m_read64[mode], m_read64mask[mode]);
+			static_generate_memory_accessor(mode, 8, true, true, false, "write64mask", m_write64mask[mode], nullptr);
+			static_generate_memory_accessor(mode, 8, true, false, false, "write64", m_write64[mode], m_write64mask[mode]);
 			static_generate_lsw_entries(mode);
 			static_generate_stsw_entries(mode);
 		}
@@ -1242,7 +1226,7 @@ void ppc_device::device_reset()
 
 		/* reset the decrementer */
 		m_dec_zero_cycles = total_cycles();
-		if (m_tb_divisor)
+		if (m_tb_divisor || (m_flavor == PPC_MODEL_601))
 		{
 			decrementer_int_callback(0);
 		}
@@ -1272,6 +1256,9 @@ void ppc_device::device_reset()
 
 	/* clear interrupts */
 	m_core->irq_pending = 0;
+
+	// clear the "any page has code" flag
+	m_core->m_codepage_any = 0;
 
 	/* flush the TLB */
 	if (m_cap & PPCCAP_603_MMU)
@@ -1563,6 +1550,150 @@ void ppc_device::ppccom_tlb_flush()
 }
 
 
+/*-------------------------------------------------
+    ppc_check_translation - re-verify a compiled
+    block's effective-to-physical mapping after
+    the MMU has been touched.  Called from the
+    block entry check when the block's cached
+    translation generation is out of date.
+-------------------------------------------------*/
+
+void ppc_device::ppc_check_translation(ppc_entry_check *chk)
+{
+	offs_t addr = chk->pc;
+	if (ppccom_translate_address_internal(TR_FETCH, false, addr) <= 1 && addr == chk->physpc)
+	{
+		// mapping unchanged; the block stays valid for the current generation
+		chk->generation = m_core->m_translation_generation;
+		m_core->param1 = 0;
+	}
+	else
+	{
+		// the code moved (or is no longer mapped); recompile at next entry
+		m_core->param1 = 1;
+	}
+}
+
+
+/*-------------------------------------------------
+    invalidate_code_range - invalidate the hash
+    entries of every code page in an effective
+    address range whose translation changed, so
+    stale blocks are recompiled at next entry
+    instead of flushing the whole cache.  Returns
+    true if anything was invalidated.
+-------------------------------------------------*/
+
+bool ppc_device::invalidate_code_range(offs_t start, offs_t end)
+{
+	// A sequence starting on an earlier page can extend into this range, but
+	// invalidate_range() backs the start up by the maximum sequence length to
+	// catch those, so only the pages actually touched need to be considered.
+	uint32_t page = start >> 12;
+	uint32_t const lastpage = end >> 12;
+	bool invalidated = false;
+
+	while (page <= lastpage)
+	{
+		// Skip empty stretches of the bitmap a byte (8 pages) at a time
+		if ((page & 7) == 0 && m_codepage_bits[page >> 3] == 0)
+		{
+			page += 8;
+			continue;
+		}
+
+		if (BIT(m_codepage_bits[page >> 3], page & 7))
+		{
+			m_drcuml->hash_invalidate_range(page << 12, (page << 12) | 0xfff);
+			invalidated = true;
+		}
+		page++;
+	}
+	return invalidated;
+}
+
+
+/*-------------------------------------------------
+    ppccom_execute_mtsr - execute an MTSR or
+    MTSRIN instruction (param0 = segment number,
+    param1 = new value)
+-------------------------------------------------*/
+
+void ppc_device::ppccom_execute_mtsr()
+{
+	const uint32_t seg = m_core->param0 & 15;
+	const uint32_t newval = m_core->param1;
+	const uint32_t oldval = m_core->sr[seg];
+
+	// Mac OS 9.x writes the same segment values thousands of times a second,
+	// so checking if the value actually changed is important.
+	if (oldval != newval)
+	{
+		m_core->sr[seg] = newval;
+		vtlb_flush_dynamic();
+
+		// Only a change to the VSID (or the T bit) actually remaps the segment.
+		// If that happens, bump the translation generation.
+		if (((oldval ^ newval) & 0x80ff'ffff) != 0)
+		{
+			m_core->m_translation_generation++;
+		}
+	}
+}
+
+
+/*-------------------------------------------------
+    ppccom_invalidate_codepage - invalidate the
+    compiled code on the page containing param0
+    (used by the 601 write-watch for self-modifying
+    code that doesn't icbi)
+-------------------------------------------------*/
+
+void ppc_device::ppccom_invalidate_codepage()
+{
+	offs_t const page = m_core->param0 & 0xfffff000;   // page of the effective store address
+	uint32_t const pg = (page >> 12) & 0xfffff;
+
+	// Invalidate the compiled code on the modified page so it recompiles from the
+	// new bytes on its next entry
+	invalidate_code_range(page, page | 0xfff);
+
+	// Clear the page's code bit and hold it clear across the immediate recompile
+	// (see note_code_page).  The store is resumed by re-executing it, and with the
+	// bit clear it completes instead of re-triggering the write watcher.  Any further
+	// stores in the same self-modifying burst also see the bit clear so unnecessary
+	// invalidates are avoided.  param1 already holds the PC of the store to resume at
+	m_codepage_bits[pg >> 3] &= ~(1 << (pg & 7));
+	m_codewrite_skip_page = pg;
+}
+
+
+/*-------------------------------------------------
+    ppccom_execute_icbi - execute an ICBI
+    instruction (param0 = effective address of
+    the invalidated line, param1 = PC of the icbi)
+-------------------------------------------------*/
+
+void ppc_device::ppccom_execute_icbi()
+{
+	const offs_t page = m_core->param0 & 0xfffff000;
+	const offs_t pcpage = m_core->param1 & 0xfffff000;
+	int hit = 0;
+
+	if (code_page_has_code(page))
+	{
+		// The invalidated line falls in a page with compiled code; point the page's
+		// hash entries back at "no code present" so any modified block is recompiled.
+		invalidate_code_range(page, page | 0xfff);
+		hit = 1;
+	}
+
+	// Only exit the current block if it could extend into the invalidated page.
+	offs_t const pagedelta = (page > pcpage) ? (page - pcpage) : (pcpage - page);
+	m_core->param1 = (hit && pagedelta <= 0x1000) ? 1 : 0;
+}
+
+
 
 /***************************************************************************
     OPCODE HANDLING
@@ -1590,6 +1721,13 @@ void ppc_device::ppccom_get_dsisr()
 void ppc_device::ppccom_execute_tlbie()
 {
 	vtlb_flush_address(m_core->param0);
+
+	// A page table entry for this page may have changed; if code was compiled
+	// from it, make blocks re-check their mappings on the next entry.
+	if (code_page_has_code(m_core->param0))
+	{
+		m_core->m_translation_generation++;
+	}
 }
 
 
@@ -1601,6 +1739,13 @@ void ppc_device::ppccom_execute_tlbie()
 void ppc_device::ppccom_execute_tlbia()
 {
 	vtlb_flush_dynamic();
+
+	// Any page's translation may be changing.  If any code is compiled, make
+	// blocks re-check their mappings on the next entry.
+	if (m_core->m_codepage_any)
+	{
+		m_core->m_translation_generation++;
+	}
 }
 
 
@@ -1619,17 +1764,15 @@ void ppc_device::ppccom_execute_tlbl()
 	if (m_flavor == PPC_MODEL_602) // TODO
 		return;
 
-	/* determine entry number; we use machine().rand() for associativity */
+	// determine entry number; we use machine().rand() for associativity
 	entrynum = ((address >> 12) & 0x1f) | (machine().rand() & 0x20) | (isitlb ? 0x40 : 0);
 
-	/* determine the flags */
-	flags = FLAG_VALID | READ_ALLOWED | FETCH_ALLOWED;
+	// Determine the access flags, for both supervisor and user modes.
+	flags = FLAG_VALID | READ_ALLOWED | FETCH_ALLOWED | USER_READ_ALLOWED | USER_FETCH_ALLOWED;
 	if (m_core->spr[SPR603_RPA] & 0x80)
-		flags |= WRITE_ALLOWED;
-	if (isitlb)
-		flags |= FETCH_ALLOWED;
+		flags |= WRITE_ALLOWED | USER_WRITE_ALLOWED;
 
-	/* load the entry */
+	// load the entry
 	vtlb_load(entrynum, 1, address, (m_core->spr[SPR603_RPA] & 0xfffff000) | flags);
 }
 
@@ -1715,9 +1858,9 @@ void ppc_device::ppccom_execute_mfspr()
 
 			case SPR601_RTCLR_PWR:
 				{
+					// get fractional seconds and convert to nanoseconds
 					const uint64_t remainder = (total_cycles() - m_rtc_zero_cycles) % clock();
-					const double seconds = remainder / clock();             // get fractional seconds
-					m_core->param1 = (uint64_t)(seconds * 1'000'000'000);   // and convert to nanoseconds
+					m_core->param1 = (remainder * 1'000'000'000ULL) / clock();
 				}
 				return;
 		}
@@ -1837,7 +1980,7 @@ void ppc_device::ppccom_execute_mtspr()
 				m_core->spr[m_core->param0] = m_core->param1;
 				return;
 
-			/* registers that affect the memory map */
+			// registers that affect the memory map
 			case SPROEA_SDR1:
 			case SPROEA_IBAT0L:
 			case SPROEA_IBAT0U:
@@ -1855,8 +1998,44 @@ void ppc_device::ppccom_execute_mtspr()
 			case SPROEA_DBAT2U:
 			case SPROEA_DBAT3L:
 			case SPROEA_DBAT3U:
-				m_core->spr[m_core->param0] = m_core->param1;
-				ppccom_tlb_flush();
+				if (m_core->spr[m_core->param0] != m_core->param1)
+				{
+					// Only a change to the instruction-side translation can invalidate
+					// compiled code, meaning SDR1 (page tables) or an IBAT slot (which
+					// on the 601 holds the unified BATs).
+					//
+					// For a BAT, only a change to the mapping fields matters.  The
+					// privilege key and PP bits toggle on user/kernel transitions
+					// without remapping anything.  Bump the translation generation
+					// and each block will re-check its own mapping at next entry.
+					const bool is_ibat = (m_core->param0 >= SPROEA_IBAT0U && m_core->param0 <= SPROEA_IBAT3L);
+					bool remapped = (m_core->param0 == SPROEA_SDR1);
+
+					if (is_ibat)
+					{
+						const uint32_t pairbase = m_core->param0 & ~1;
+						const uint32_t oldupper = m_core->spr[pairbase], oldlower = m_core->spr[pairbase | 1];
+						const uint32_t newupper = (m_core->param0 & 1) ? oldupper : m_core->param1;
+						const uint32_t newlower = (m_core->param0 & 1) ? m_core->param1 : oldlower;
+
+						if (m_cap & PPCCAP_601BAT)
+						{
+							remapped = (((oldupper ^ newupper) & 0xfffe'0000) | ((oldlower ^ newlower) & 0xfffe'007f)) != 0;
+						}
+						else
+						{
+							remapped = (((oldupper ^ newupper) & 0xfffe'1fff) | ((oldlower ^ newlower) & 0xfffe'0000)) != 0;
+						}
+					}
+
+					m_core->spr[m_core->param0] = m_core->param1;
+					ppccom_tlb_flush();
+
+					if (remapped)
+					{
+						m_core->m_translation_generation++;
+					}
+				}
 				return;
 
 			/* decrementer */
@@ -2153,50 +2332,66 @@ void ppc_device::ppccom_execute_mtdcr()
 ***************************************************************************/
 
 /*-------------------------------------------------
-    ppccom_update_fprf - update the FPRF field
-    of the FPSCR register
+    ppccom_fcmp_vx - raise the invalid-operation
+    FPSCR bits for an fcmpu/fcmpo of a NaN operand
 -------------------------------------------------*/
 
-void ppc_device::ppccom_update_fprf()
+void ppc_device::ppccom_fcmp_vx()
 {
-	uint32_t fprf;
-	double f = m_core->f[m_core->param0];
+	uint32_t op = m_core->param0;
+	const double a = m_core->fpscr_op[0];
+	const double b = m_core->fpscr_op[1];
 
-	if (is_qnan_double(f))
+	uint32_t fpscr = m_core->fpscr;
+	const uint32_t oldfpscr = fpscr;
+	uint32_t newexc = 0;
+
+	const bool snan = is_snan_double(a) || is_snan_double(b);
+	const bool fcmpo = (((op >> 1) & 0x3ff) == 0x020);
+
+	if (snan)
 	{
-		fprf = 0x11;
+		newexc |= FPSCR_VXSNAN;
+		if (fcmpo && !(fpscr & FPSCR_VE))
+		{
+			newexc |= FPSCR_VXVC;
+		}
 	}
-	else if (is_infinity_double(f))
+	else if (fcmpo)
 	{
-		if (sign_double(f))     /* -Infinity */
-			fprf = 0x09;
-		else                    /* +Infinity */
-			fprf = 0x05;
+		// unordered without an SNaN case, such as QNaN
+		newexc |= FPSCR_VXVC;
 	}
-	else if (is_normalized_double(f))
+
+	fpscr |= newexc;
+	if (newexc & ~oldfpscr)
 	{
-		if (sign_double(f))     /* -Normalized */
-			fprf = 0x08;
-		else                    /* +Normalized */
-			fprf = 0x04;
+		fpscr |= FPSCR_FX;
 	}
-	else if (is_denormalized_double(f))
+
+	// now update the derived VX and FEX bits
+	if (fpscr & FPSCR_VX_ANY)
 	{
-		if (sign_double(f))     /* -Denormalized */
-			fprf = 0x18;
-		else                    /* +Denormalized */
-			fprf = 0x14;
+		fpscr |= FPSCR_VX;
 	}
 	else
 	{
-		if (sign_double(f))     /* -Zero */
-			fprf = 0x12;
-		else                    /* +Zero */
-			fprf = 0x02;
+		fpscr &= ~FPSCR_VX;
 	}
 
-	m_core->fpscr &= ~0x0001f000;
-	m_core->fpscr |= fprf << 12;
+	const bool fex = ((fpscr & FPSCR_VX) && (fpscr & FPSCR_VE)) ||
+			   ((fpscr & FPSCR_OX) && (fpscr & FPSCR_OE)) ||
+			   ((fpscr & FPSCR_UX) && (fpscr & FPSCR_UE)) ||
+			   ((fpscr & FPSCR_ZX) && (fpscr & FPSCR_ZE)) ||
+			   ((fpscr & FPSCR_XX) && (fpscr & FPSCR_XE));
+	if (fex)
+	{
+		fpscr |= FPSCR_FEX;
+	}
+	else
+	{
+		fpscr &= ~FPSCR_FEX;
+	}
 }
 
 
@@ -2209,14 +2404,14 @@ void ppc_device::ppccom_update_fprf()
     whenever a decrementer interrupt is generated
 -------------------------------------------------*/
 
-TIMER_CALLBACK_MEMBER( ppc_device::decrementer_int_callback )
+TIMER_CALLBACK_MEMBER(ppc_device::decrementer_int_callback)
 {
 	uint64_t cycles_until_next;
 
-	/* set the decrementer IRQ state */
+	// set the decrementer IRQ state
 	m_core->irq_pending |= 0x02;
 
-	/* advance by another full rev */
+	// advance by another full tick
 	m_dec_zero_cycles += (uint64_t)m_tb_divisor << 32;
 	cycles_until_next = m_dec_zero_cycles - total_cycles();
 	m_decrementer_int_timer->adjust(cycles_to_attotime(cycles_until_next));

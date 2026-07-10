@@ -9454,12 +9454,12 @@ void upd7810_device::SKIT_F0()
 {
 	if (IRR & INTF0)
 		PSW |= SK;
-	IRR &= ~INTF0;
 }
 
 void upd7810_device::SKNIT_F0()
 {
-	logerror("unimplemented instruction: SKNIT_F0\n");
+	if (0 == (IRR & INTF0))
+		PSW |= SK;
 }
 
 void upd7810_device::STM()

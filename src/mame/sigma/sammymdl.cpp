@@ -106,7 +106,7 @@ ST M27C4001-10F1 EPROM.
 
 --------------------------------------------------------------------------------------
 
-To Do:
+TODO:
 
 - Consolidate the sammymdl games in one memory map and run the BIOS without ROM patches
 - pyenaget intro: when the theater scrolls out to the left, the train should scroll in from the right,
@@ -132,6 +132,7 @@ Notes:
 #include "video/ky3211_ky10510.h"
 
 #include "emupal.h"
+#include "input.h" // for video debug keys
 #include "screen.h"
 #include "speaker.h"
 
@@ -170,9 +171,6 @@ public:
 	void init_itazuram() ATTR_COLD;
 	void init_animalc() ATTR_COLD;
 	void init_haekaka() ATTR_COLD;
-
-protected:
-	virtual void machine_start() override ATTR_COLD { m_leds.resolve(); }
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(gocowboy_int);
@@ -641,7 +639,7 @@ void sammymdl_state::sammymdl(machine_config &config)
 	m_palette->set_endianness(ENDIANNESS_BIG);
 
 	//BUFFERED_SPRITERAM8(config, m_buffered_spriteram); // not on sammymdl?
-	KY3211(config, m_spritegen, 0, m_palette);
+	KY3211(config, m_spritegen, m_palette);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();

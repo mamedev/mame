@@ -11,11 +11,12 @@ class lh79524_timer_device : public device_t
 {
 public:
 	lh79524_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void set_timer_index(int index);
 
-	void write(offs_t offset, uint32_t data, uint32_t mem_mask);
-	uint32_t read(offs_t offset, uint32_t mem_mask);
+	void set_timer_index(int index);
 	auto irq_cb() { return m_irq_cb.bind(); }
+
+	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0U);
+	uint32_t read(offs_t offset, uint32_t mem_mask = ~0U);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -31,7 +32,7 @@ private:
 
 	emu_timer *m_tick_timer;
 
-	int timer_index;
+	int m_timer_index;
 
 	uint32_t m_control;
 	uint32_t m_cap_control;

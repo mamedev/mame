@@ -1532,7 +1532,7 @@ void fhawk_state::fhawk(machine_config &config)
 
 	config.set_perfect_quantum(m_maincpu);
 
-	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc", 0));
+	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc"));
 	tc0220ioc.read_0_callback().set_ioport("DSWA");
 	tc0220ioc.read_1_callback().set_ioport("DSWB");
 	tc0220ioc.read_2_callback().set_ioport("IN0");
@@ -1554,7 +1554,7 @@ void fhawk_state::fhawk(machine_config &config)
 	ymsnd.add_route(2, "mono", 0.20);
 	ymsnd.add_route(3, "mono", 0.80);
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -1594,7 +1594,7 @@ void taitol_2cpu_state::raimais(machine_config &config)
 
 	config.set_perfect_quantum(m_maincpu);
 
-	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
+	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc"));
 	tc0040ioc.read_0_callback().set_ioport("DSWA");
 	tc0040ioc.read_1_callback().set_ioport("DSWB");
 	tc0040ioc.read_2_callback().set_ioport("IN0");
@@ -1616,7 +1616,7 @@ void taitol_2cpu_state::raimais(machine_config &config)
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	tc0140syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -1634,7 +1634,7 @@ void taitol_2cpu_state::kurikint(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
+	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc"));
 	tc0040ioc.read_0_callback().set_ioport("DSWA");
 	tc0040ioc.read_1_callback().set_ioport("DSWB");
 	tc0040ioc.read_2_callback().set_ioport("IN0");
@@ -1659,11 +1659,11 @@ void taitol_2cpu_state::kurikint(machine_config &config)
 
 void taitol_1cpu_state::add_muxes(machine_config &config)
 {
-	LS157_X2(config, m_mux[0], 0);
+	LS157_X2(config, m_mux[0]);
 	m_mux[0]->a_in_callback().set_ioport("DSWA");
 	m_mux[0]->b_in_callback().set_ioport("DSWB");
 
-	LS157_X2(config, m_mux[1], 0);
+	LS157_X2(config, m_mux[1]);
 	m_mux[1]->a_in_callback().set_ioport("IN0");
 	m_mux[1]->b_in_callback().set_ioport("IN1");
 }
@@ -1734,7 +1734,7 @@ void horshoes_state::horshoes(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &horshoes_state::horshoes_map);
 	m_maincpu->set_tile_callback(FUNC(horshoes_state::horshoes_tile_cb));
 
-	UPD4701A(config, m_upd4701, 0);
+	UPD4701A(config, m_upd4701);
 	m_upd4701->set_portx_tag("AN0");
 	m_upd4701->set_porty_tag("AN1");
 }
@@ -1747,7 +1747,7 @@ void taitol_1cpu_state::palamed(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitol_1cpu_state::palamed_map);
 
-	i8255_device &ppi(I8255(config, "ppi", 0)); // Toshiba TMP8255AP-5
+	i8255_device &ppi(I8255(config, "ppi")); // Toshiba TMP8255AP-5
 	ppi.in_pa_callback().set_ioport("IN0");
 	ppi.in_pb_callback().set_ioport("IN1");
 	ppi.in_pc_callback().set_ioport("IN2");
@@ -1777,7 +1777,7 @@ void taitol_2cpu_state::evilston(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio"));
 	tc0510nio.read_0_callback().set_ioport("DSWA");
 	tc0510nio.read_1_callback().set_ioport("DSWB");
 	tc0510nio.read_2_callback().set_ioport("IN0");
@@ -2410,6 +2410,15 @@ ROM_END
 
 ROM_START( plgirls2 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "pg2_1e.ic6", 0x00000, 0x40000, CRC(b279990b) SHA1(b3e67599b114c03a6894200a34eb67bca1810c70) )
+
+	ROM_REGION( 0x100000, "maincpu:gfx", 0 )
+	ROM_LOAD16_BYTE( "cho-l.ic9",  0x00000, 0x80000, CRC(956384ec) SHA1(94a2b95f340e96bdccbeafd373f0dea90b8328dd) )
+	ROM_LOAD16_BYTE( "cho-h.ic7",  0x00001, 0x80000, CRC(992f99b1) SHA1(c79f1014d73654740f7823812f92376d65d6b15d) )
+ROM_END
+
+ROM_START( plgirls2j )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "pg2_1j.ic6", 0x00000, 0x40000, CRC(f924197a) SHA1(ecaaefd1b3715ba60608e05d58be67e3c71f653a) )
 
 	ROM_REGION( 0x100000, "maincpu:gfx", 0 )
@@ -2417,7 +2426,7 @@ ROM_START( plgirls2 )
 	ROM_LOAD16_BYTE( "cho-h.ic7",  0x00001, 0x80000, CRC(992f99b1) SHA1(c79f1014d73654740f7823812f92376d65d6b15d) )
 ROM_END
 
-ROM_START( plgirls2b )
+ROM_START( plgirls2b ) // bootleg based on Europe version
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "playgirls2b.d1", 0x00000, 0x40000, CRC(d58159fa) SHA1(541c6ca5f12c38b5a08f90048f52c31d27bb9233) )
 
@@ -2551,7 +2560,8 @@ GAME( 199?, cubybop,   0,        cachat,    cubybop,   taitol_1cpu_state, empty_
 GAME( 1992, plgirls,   0,        cachat,    plgirls,   taitol_1cpu_state, empty_init,     ROT270, "Hot-B Co., Ltd.", "Play Girls", 0 )
 GAME( 1992, lagirl,    plgirls,  cachat,    plgirls,   taitol_1cpu_state, empty_init,     ROT270, "bootleg", "LA Girl", 0 ) // bootleg hardware with changed title & backgrounds
 
-GAME( 1993, plgirls2,  0,        cachat,    plgirls2,  taitol_1cpu_state, empty_init,     ROT270, "Hot-B Co., Ltd.", "Play Girls 2", 0 )
+GAME( 1993, plgirls2,  0,        cachat,    plgirls2,  taitol_1cpu_state, empty_init,     ROT270, "Hot-B Co., Ltd.", "Play Girls 2 (Europe)", 0 )
+GAME( 1993, plgirls2j, plgirls2, cachat,    plgirls2,  taitol_1cpu_state, empty_init,     ROT270, "Hot-B Co., Ltd.", "Play Girls 2 (Japan)", 0 )
 GAME( 1993, plgirls2b, plgirls2, cachat,    plgirls2,  taitol_1cpu_state, empty_init,     ROT270, "bootleg", "Play Girls 2 (bootleg)", MACHINE_IMPERFECT_GRAPHICS ) // bootleg hardware (regular Z80 etc. instead of TC0090LVC, but acts almost the same - scroll offset problems)
 
 GAME( 1990, evilston,  0,        evilston,  evilston,  taitol_2cpu_state, empty_init,     ROT270, "Spacy Industrial, Ltd.", "Evil Stone", 0 ) // Taiwanese publisher, unknown Japanese developer

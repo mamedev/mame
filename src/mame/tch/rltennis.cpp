@@ -485,7 +485,7 @@ void rltennis_state::rltennis(machine_config &config)
 
 	EEPROM_2864(config, "eeprom");
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", "palette"));
 	ramdac.set_addrmap(0, &rltennis_state::ramdac_map);
 	ramdac.set_split_read(1);
 

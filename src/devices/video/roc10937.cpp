@@ -131,21 +131,15 @@ static const int roc10937poslut[]=
 
 rocvfd_device::rocvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_outputs(),
-	m_cursor_pos(0),
-	m_port_val(0)
+	m_outputs(*this, "vfd%u", 0U),
+	m_brightness(*this, "vfdduty%u", 0U),
+	m_cursor_pos(0)
 {
 }
 
 
 void rocvfd_device::device_start()
 {
-	m_outputs = std::make_unique<output_finder<16> >(*this, "vfd%u", unsigned(m_port_val * 16));
-	m_outputs->resolve();
-
-	m_brightness = std::make_unique<output_finder<1> >(*this, "vfdduty%u", unsigned(m_port_val));
-	m_brightness->resolve();
-
 	m_sclk = 0;
 	m_data = 0;
 	m_por = 0;
@@ -163,7 +157,7 @@ void rocvfd_device::device_start()
 	save_item(NAME(m_duty));
 
 	std::fill(std::begin(m_chars), std::end(m_chars), 0);
-	std::fill(std::begin(*m_outputs), std::end(*m_outputs), 0);
+	std::fill(std::begin(m_outputs), std::end(m_outputs), 0);
 
 }
 
@@ -179,7 +173,7 @@ void rocvfd_device::device_reset()
 	m_count = 0;
 	m_duty = 0;
 
-	(*m_brightness)[0] = 0;
+	m_brightness[0] = 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -196,8 +190,8 @@ void rocvfd_device::device_post_load()
 
 void rocvfd_device::update_display()
 {
-	std::transform(std::begin(m_chars), std::end(m_chars), std::begin(*m_outputs), set_display);
-	(*m_brightness)[0] = m_duty;
+	std::transform(std::begin(m_chars), std::end(m_chars), std::begin(m_outputs), set_display);
+	m_brightness[0] = m_duty;
 }
 
 void rocvfd_device::sclk(int state)

@@ -181,21 +181,21 @@ bool ekara_rom_i2c_24c08_epitch_device::is_write_access_not_rom(void)
 
 void ekara_rom_i2c_24c08_epitch_device::device_add_mconfig(machine_config &config)
 {
-	I2C_24C08(config, "i2cmem", 0);
+	I2C_24C08(config, "i2cmem");
 }
 
 // i2c 24lc04
 
 void ekara_rom_i2c_24lc04_device::device_add_mconfig(machine_config &config)
 {
-	I2C_24C04(config, "i2cmem", 0); // 24LC04
+	I2C_24C04(config, "i2cmem"); // 24LC04
 }
 
 // i2c 24lc02
 
 void ekara_rom_i2c_24lc02_device::device_add_mconfig(machine_config &config)
 {
-	I2C_24C02(config, "i2cmem", 0); // 24LC02
+	I2C_24C02(config, "i2cmem"); // 24LC02
 }
 
 // i2c 24lc02 with direct IO port access
@@ -239,13 +239,13 @@ int ekara_rom_i2c_24lc02_gc0010_device::read_sda()
 
 void ekara_rom_i2c_24lc02_gc0010_device::device_add_mconfig(machine_config &config)
 {
-	I2C_24C02(config, "i2cmem", 0); // 24LC02
+	I2C_24C02(config, "i2cmem"); // 24LC02
 }
 
 
 void ekara_rom_i2c_24lc08_evio_device::device_add_mconfig(machine_config &config)
 {
-	I2C_24C08(config, "i2cmem", 0);
+	I2C_24C08(config, "i2cmem");
 }
 
 /*-------------------------------------------------

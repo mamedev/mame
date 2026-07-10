@@ -50,7 +50,7 @@ public:
 	{
 	}
 
-	void thayers(machine_config &config);
+	void thayers(machine_config &config) ATTR_COLD;
 
 private:
 	virtual void machine_start() override ATTR_COLD;
@@ -125,8 +125,6 @@ private:
 
 void thayers_state::machine_start()
 {
-	m_digits.resolve();
-
 	m_intrq_timer = timer_alloc(FUNC(thayers_state::intrq_tick), this);
 
 	save_item(NAME(m_laserdisc_data));
@@ -671,7 +669,7 @@ void thayers_state::thayers(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(262));
 
 	// video hardware
-	PIONEER_LDV1000HLE(config, m_player, 0);
+	PIONEER_LDV1000HLE(config, m_player);
 	m_player->set_screen("screen");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

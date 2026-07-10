@@ -38,6 +38,8 @@
 
 #include "screen.h"
 
+#include "endianness.h"
+
 #define LOG_REGISTERS   (1U << 1)
 #define LOG_CRTC        (1U << 2)
 
@@ -474,7 +476,7 @@ void nubus_xceed30hr_device::device_add_mconfig(machine_config &config)
 	m_screen->set_screen_update(FUNC(nubus_xceed30hr_device::screen_update));
 	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
 
-	BT478(config, m_ramdac, 0);
+	BT478(config, m_ramdac);
 }
 
 nubus_xceed30hr_device::nubus_xceed30hr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -532,7 +534,7 @@ void nubus_xceed30hr_internal_device::card_map(address_map &map)
 
 void nubus_xceed30hr_internal_device::device_add_mconfig(machine_config &config)
 {
-	BT478(config, m_ramdac, 0);
+	BT478(config, m_ramdac);
 }
 
 ROM_START(xceed30hr)
@@ -616,7 +618,7 @@ void nubus_xceedmc30_device::device_add_mconfig(machine_config &config)
 	m_screen->set_screen_update(FUNC(nubus_xceedmc30_device::screen_update));
 	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
 
-	BT473(config, m_ramdac, 0);
+	BT473(config, m_ramdac);
 }
 
 void nubus_xceedmc30_device::card_map(address_map &map)
@@ -698,7 +700,7 @@ const tiny_rom_entry *nubus_xceedmc30_internal_device::device_rom_region() const
 
 void nubus_xceedmc30_internal_device::device_add_mconfig(machine_config &config)
 {
-	BT473(config, m_ramdac, 0);
+	BT473(config, m_ramdac);
 }
 
 void nubus_xceedmc30_internal_device::card_map(address_map &map)

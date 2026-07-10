@@ -584,7 +584,7 @@ void optomaxv_state::optomaxv(machine_config &config)
 	M68000(config, m_maincpu, 32_MHz_XTAL / 4); // Signetics SCN68000
 	m_maincpu->set_addrmap(AS_PROGRAM, &optomaxv_state::mem_map);
 
-	ACIA6850(config, m_b4_acia[0], 0); // Hitachi HD46850P (Host)
+	ACIA6850(config, m_b4_acia[0]); // Hitachi HD46850P (Host)
 	m_b4_acia[0]->txd_handler().set("rs232host", FUNC(rs232_port_device::write_txd));
 	m_b4_acia[0]->rts_handler().set("rs232host", FUNC(rs232_port_device::write_rts));
 	m_b4_acia[0]->irq_handler().set_inputline(m_maincpu, M68K_IRQ_2);
@@ -593,7 +593,7 @@ void optomaxv_state::optomaxv(machine_config &config)
 	rs232host.rxd_handler().set(m_b4_acia[0], FUNC(acia6850_device::write_rxd));
 	rs232host.cts_handler().set(m_b4_acia[0], FUNC(acia6850_device::write_cts));
 
-	ACIA6850(config, m_b4_acia[1], 0); // Hitachi HD46850P (Terminal)
+	ACIA6850(config, m_b4_acia[1]); // Hitachi HD46850P (Terminal)
 	m_b4_acia[1]->txd_handler().set("rs232term", FUNC(rs232_port_device::write_txd));
 	m_b4_acia[1]->rts_handler().set("rs232term", FUNC(rs232_port_device::write_rts));
 	m_b4_acia[1]->irq_handler().set_inputline(m_maincpu, M68K_IRQ_4);
@@ -603,7 +603,7 @@ void optomaxv_state::optomaxv(machine_config &config)
 	rs232term.cts_handler().set(m_b4_acia[1], FUNC(acia6850_device::write_cts));
 	rs232term.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
-	ACIA6850(config, m_b4_acia[2], 0); // Hitachi HD46850P (Remote)
+	ACIA6850(config, m_b4_acia[2]); // Hitachi HD46850P (Remote)
 	m_b4_acia[2]->txd_handler().set("rs232remt", FUNC(rs232_port_device::write_txd));
 	m_b4_acia[2]->rts_handler().set("rs232remt", FUNC(rs232_port_device::write_rts));
 	m_b4_acia[2]->irq_handler().set_inputline(m_maincpu, M68K_IRQ_3);
@@ -638,7 +638,7 @@ void optomaxv_state::optomaxv(machine_config &config)
 	MOS6522(config, m_b6_via, 2'000'000); // Rockwell R6522AP
 	m_b6_via->irq_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
 
-	MOS6551(config, m_b6_acia, 0); // Rockwell R6551AP
+	MOS6551(config, m_b6_acia); // Rockwell R6551AP
 	m_b6_acia->set_xtal(1.8432_MHz_XTAL);
 	m_b6_acia->irq_handler().set("irqs", FUNC(input_merger_device::in_w<1>));
 	m_b6_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -681,7 +681,7 @@ void optomaxv_state::optomaxv(machine_config &config)
 
 	PIT68230(config, m_b1_pit, 32_MHz_XTAL / 4); // Motorola MC68230P8, unknown xtal
 
-	ZN449(config, "adc", 0); // ZN448
+	ZN449(config, "adc"); // ZN448
 }
 
 

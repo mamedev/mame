@@ -232,7 +232,7 @@ void segag80r_state::sega005_sound_board(machine_config &config)
 	m_samples->set_samples_names(sega005_sample_names);
 	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	auto &custom(SEGA005(config, "005", 0));
+	auto &custom(SEGA005(config, "005"));
 	custom.set_sound_region("005");
 	custom.set_proms_region("proms");
 	custom.add_route(ALL_OUTPUTS, "speaker", 0.25);
@@ -1082,8 +1082,8 @@ void segag80r_state::astrob(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	/* sound boards */
-	ASTRO_BLASTER_AUDIO(config, m_g80_audio, 0).add_route(ALL_OUTPUTS, "speech", 1.0, 1);
-	SEGA_SPEECH_BOARD(config, "speech", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	ASTRO_BLASTER_AUDIO(config, m_g80_audio).add_route(ALL_OUTPUTS, "speech", 1.0, 1);
+	SEGA_SPEECH_BOARD(config, "speech").add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 
@@ -1164,7 +1164,7 @@ void segag80r_state::pignewt(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	/* sound boards */
-	SEGAUSB(config, m_usbsnd, 0, m_maincpu).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	SEGAUSB(config, m_usbsnd, m_maincpu).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 

@@ -124,16 +124,6 @@ copyright-holders:m1macrophage
 			<color red="0.90" green="0.90" blue="0.90"/>
 		</text>
 	</element>
-	<element name="txt_not_working">
-		<text state="1" string="NOT">
-			<bounds x="0.0" y="0.0" width="1.0" height="0.5"/>
-			<color red="0.71" green="0.46" blue="0.28"/>
-		</text>
-		<text state="1" string="WORKING">
-			<bounds x="0.0" y="0.5" width="1.0" height="0.5"/>
-			<color red="0.71" green="0.46" blue="0.28"/>
-		</text>
-	</element>
 
 	<!-- display elements -->
 	<element name="display"><rect><color red="0.15" green="0.08" blue="0.06"/></rect></element>
@@ -564,7 +554,6 @@ copyright-holders:m1macrophage
 		<element ref="line"><bounds x="283" y="42" width="2" height="224"/></element>
 
 		<collection name="warnings">
-			<element ref="txt_not_working" name="led_osc_a_sync"><bounds x="519" y="45" width="38" height="16"/></element>
 			<element ref="script_warning" id="warning"><bounds x="300" y="324" width="800" height="18"/></element>
 		</collection>
 

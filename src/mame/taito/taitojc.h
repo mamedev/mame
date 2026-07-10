@@ -162,9 +162,6 @@ public:
 
 	void init_dendego2() ATTR_COLD;
 
-protected:
-	virtual void machine_start() override ATTR_COLD;
-
 private:
 	output_finder<6> m_counters;
 

@@ -68,7 +68,7 @@ void ec7915_state::ec7915(machine_config &config)
 
 	//I8214(config, "picu", 2000000); // CEMI UCY74S414
 
-	PIT8253(config, "pit", 0); // КР580ВИ53
+	PIT8253(config, "pit"); // КР580ВИ53
 
 	I8251(config, "usart", 2000000); // КР580ВВ51А
 	// 8251 usage appears to prefer synchronous communications

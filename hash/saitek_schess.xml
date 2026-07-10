@@ -18,13 +18,24 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="csss">
+	<software name="classic">
 		<description>Classical Style Super Strong</description>
 		<year>1982</year>
 		<publisher>SciSys</publisher>
 		<part name="cart" interface="schess_cart">
 			<dataarea name="rom" size="0x1000">
 				<rom name="c45046_y02_mb" size="0x1000" crc="caff380d" sha1="5b227f0d9e457c56642bd217192744f8df60e685" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hyper">
+		<description>Hyper Modern Super Strong</description>
+		<year>1982</year>
+		<publisher>SciSys</publisher>
+		<part name="cart" interface="schess_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="y02_mc" size="0x1000" crc="ee761d96" sha1="9c85398ae5ceec72c1a648baf39d1aa7bc315163" />
 			</dataarea>
 		</part>
 	</software>

@@ -528,7 +528,6 @@ void midiverb_state::configure_audio(machine_config &config)
 
 void midiverb_state::machine_start()
 {
-	m_digit_out.resolve();
 	save_item(NAME(m_midi_rxd_bit));
 }
 

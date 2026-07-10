@@ -477,6 +477,7 @@ const double XTAL::known_xtals[] = {
 	 44'000'000, // 44_MHz_XTAL            VGame slots
 	 44'100'000, // 44.1_MHz_XTAL          Subsino's Bishou Jan
 	 44'236'800, // 44.2368_MHz_XTAL       ReCo6502, Fortune 32:16
+	 44'444'000, // 44.444_MHz_XTAL        Zilog System 8000 CPU boards
 	 44'452'800, // 44.4528_MHz_XTAL       TeleVideo 965
 	 44'900'000, // 44.9_MHz_XTAL          IBM 8514 1024x768 43.5Hz graphics
 	 45'000'000, // 45_MHz_XTAL            Eolith with Hyperstone CPUs

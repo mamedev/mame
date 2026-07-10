@@ -62,7 +62,7 @@ void neon250_device::device_add_mconfig(machine_config &config)
 	screen.set_screen_update(m_vga, FUNC(vga_device::screen_update));
 
 	// TODO: PVR "VGA Emulator"
-	VGA(config, m_vga, 0);
+	VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(32*1024*1024);
 }

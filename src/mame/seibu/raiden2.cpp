@@ -183,6 +183,8 @@ Protection Notes:
 #include "debugger.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 
 #define LOG_SPRCRPT (1 << 1)
 #define LOG_BANK    (1 << 2)
@@ -259,9 +261,9 @@ void xsedae_state::combine32(u32 *val, offs_t offset, u16 data, u16 mem_mask)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(xsedae_state::interrupt)
+IRQ_CALLBACK_MEMBER(xsedae_state::vector_r)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc0 / 4);   /* V30 - VBL */
+	return 0xc0 / 4;
 }
 
 
@@ -1060,7 +1062,7 @@ GFXDECODE_END
 /* MACHINE DRIVERS */
 void xsedae_state::base_cop(machine_config &config)
 {
-	RAIDEN2COP(config, m_raiden2cop, 0);
+	RAIDEN2COP(config, m_raiden2cop);
 	m_raiden2cop->videoramout_cb().set(FUNC(xsedae_state::m_videoram_private_w));
 	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
 	m_raiden2cop->set_host_cpu_tag(m_maincpu);
@@ -1071,13 +1073,13 @@ void xsedae_state::base_video(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, xsedae_state::gfx_raiden2);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
-	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc"));
 	crtc.layer_en_callback().set(FUNC(xsedae_state::tilemap_enable_w));
 	crtc.layer_scroll_callback().set(FUNC(xsedae_state::tile_scroll_w));
 
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	SEI25X_RISE1X(config, m_spritegen, 0, m_palette, xsedae_state::gfx_raiden2_spr);
+	SEI25X_RISE1X(config, m_spritegen, m_palette, xsedae_state::gfx_raiden2_spr);
 	m_spritegen->set_screen("screen");
 	m_spritegen->set_pix_raw_shift(4);
 	m_spritegen->set_pri_raw_shift(14);
@@ -1089,7 +1091,7 @@ void xsedae_state::base_sound(machine_config &config)
 	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(28'636'363)/8));
 	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	SEIBU_SOUND(config, m_seibu_sound, 0);
+	SEIBU_SOUND(config, m_seibu_sound);
 	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
 	m_seibu_sound->coin_io_callback().set_ioport("COIN");
 	m_seibu_sound->set_rom_tag("audiocpu");
@@ -1121,7 +1123,8 @@ void raiden2_state::raiden2(machine_config &config)
 	/* basic machine hardware */
 	V30(config, m_maincpu, XTAL(32'000'000)/2); /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &raiden2_state::raiden2_mem);
-	m_maincpu->set_vblank_int("screen", FUNC(raiden2_state::interrupt));
+	m_maincpu->set_vblank_int("screen", FUNC(raiden2_state::irq0_line_hold));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(raiden2_state::vector_r));
 
 	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state, raiden2)
 
@@ -1161,7 +1164,8 @@ void xsedae_state::zeroteam_base(machine_config &config)
 {
 	/* basic machine hardware */
 	V30(config, m_maincpu, XTAL(32'000'000)/2); /* verified on pcb */
-	m_maincpu->set_vblank_int("screen", FUNC(xsedae_state::interrupt));
+	m_maincpu->set_vblank_int("screen", FUNC(raiden2_state::irq0_line_hold));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(raiden2_state::vector_r));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

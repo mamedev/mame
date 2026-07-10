@@ -61,7 +61,7 @@ void oti64111_pci_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(oak_oti111_vga_device::screen_update));
 
-	OTI111(config, m_vga, 0);
+	OTI111(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(4*1024*1024);
 }

@@ -271,7 +271,7 @@ void pipibibi_state::pipibibs(machine_config &config)
 	Z80(config, m_audiocpu, 27_MHz_XTAL/8);         // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &pipibibi_state::pipibibs_sound_z80_mem);
 
-	TOAPLAN_COINCOUNTER(config, "coincounter", 0);
+	TOAPLAN_COINCOUNTER(config, "coincounter");
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
@@ -309,7 +309,7 @@ void pipibibi_bootleg_state::pipibibsbl(machine_config &config)
 	Z80(config, m_audiocpu, 12_MHz_XTAL / 2); // GoldStar Z8400B; clock source and divider unknown
 	m_audiocpu->set_addrmap(AS_PROGRAM, &pipibibi_bootleg_state::pipibibs_sound_z80_mem);
 
-	TOAPLAN_COINCOUNTER(config, "coincounter", 0);
+	TOAPLAN_COINCOUNTER(config, "coincounter");
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 

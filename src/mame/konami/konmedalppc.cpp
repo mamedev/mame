@@ -139,7 +139,7 @@ void konmedalppc_state::konmedalppc(machine_config &config)
 	screen.set_screen_update(m_gcu, FUNC(k057714_device::draw));
 	screen.set_palette("palette");
 
-	K057714(config, m_gcu, 0).set_screen("screen");
+	K057714(config, m_gcu).set_screen("screen");
 
 	SPEAKER(config, "speaker", 2).front();
 

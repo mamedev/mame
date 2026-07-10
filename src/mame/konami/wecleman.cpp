@@ -1034,11 +1034,6 @@ void wecleman_state::machine_reset()
 	m_k007232[0]->set_bank( 0, 1 );
 }
 
-void wecleman_state::machine_start()
-{
-	m_led.resolve();
-}
-
 void wecleman_state::wecleman(machine_config &config)
 {
 	/* basic machine hardware */
@@ -1138,13 +1133,13 @@ void hotchase_state::hotchase(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hotchase);
 	PALETTE(config, m_palette).set_entries(8192);
 
-	K051316(config, m_k051316[0], 0);
+	K051316(config, m_k051316[0]);
 	m_k051316[0]->set_palette(m_palette);
 	m_k051316[0]->set_offsets(8, -16);
 	m_k051316[0]->set_wrap(1);
 	m_k051316[0]->set_zoom_callback(FUNC(hotchase_state::hotchase_zoom_callback_1));
 
-	K051316(config, m_k051316[1], 0);
+	K051316(config, m_k051316[1]);
 	m_k051316[1]->set_palette(m_palette);
 	m_k051316[1]->set_offsets(8, -16);
 	m_k051316[1]->set_zoom_callback(FUNC(hotchase_state::hotchase_zoom_callback_2));

@@ -57,7 +57,7 @@ void trident_4dwavedx_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "speaker", 2).front();
 
-	T4DWAVE_PCM(config, m_pcm, 0);
+	T4DWAVE_PCM(config, m_pcm);
 	m_pcm->datain_cb().set([this] (offs_t offset) {
 		address_space &dma_space = *get_pci_busmaster_space();
 		return dma_space.read_dword(offset);

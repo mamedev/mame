@@ -271,7 +271,7 @@ ioport_constructor apricorn_ssi_device::device_input_ports() const
 
 void a2bus_ssc_device::device_add_mconfig(machine_config &config)
 {
-	MOS6551(config, m_acia, 0);
+	MOS6551(config, m_acia);
 	m_acia->set_xtal(1.8432_MHz_XTAL);
 	m_acia->irq_handler().set(FUNC(a2bus_ssc_device::acia_irq_w));
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));

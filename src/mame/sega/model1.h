@@ -102,7 +102,7 @@ private:
 	void bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(model1_interrupt);
-	IRQ_CALLBACK_MEMBER(irq_callback);
+	u8 irq_callback();
 
 	// TGP
 	u16 fifoin_status_r();
@@ -146,6 +146,7 @@ private:
 	virtual void video_start() override ATTR_COLD;
 	u16 model1_listctl_r(offs_t offset);
 	void model1_listctl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void model1_paletteram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	uint32_t screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_vblank_model1(int state);
@@ -299,7 +300,8 @@ private:
 	static void fclip_clip_right(view_t*, point_t*, point_t*, point_t*);
 
 	// Rendering
-	void    tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	enum render_pass { RENDER_BELOW_HUD, RENDER_ABOVE_HUD };
+	void    tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect, render_pass pass);
 	void    tgp_scan();
 
 	void        sort_quads() const;
@@ -333,6 +335,16 @@ private:
 
 	// run-time rendering
 	uint16_t* m_display_list_current = nullptr;
+
+	// 0x41 objects (e.g. the Star Wars Arcade radar blips) draw on top of the
+	// cat1 HUD tilemaps, but only through "background" HUD pixels (transparent or
+	// near-black); bright HUD features still occlude them.  Snapshot the HUD
+	// before the above-HUD pass and restore the feature pixels afterwards.
+	int m_overlay_stride = 0;
+	std::unique_ptr<uint8_t[]>  m_overlay_block;
+	std::unique_ptr<uint32_t[]> m_overlay_hud_snapshot;
+	void build_overlay_mask(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void apply_overlay_stencil(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	optional_shared_ptr<uint16_t> m_paletteram16;
 	required_device<palette_device> m_palette;

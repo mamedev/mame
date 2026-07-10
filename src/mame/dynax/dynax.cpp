@@ -3758,7 +3758,7 @@ void cdracula_state::cdracula(machine_config &config)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);    // no battery
 
-	RST_POS_BUFFER(config, m_mainirq, 0).int_callback().set_inputline(m_maincpu, 0);
+	RST_POS_BUFFER(config, m_mainirq).int_callback().set_inputline(m_maincpu, 0);
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<1>().set(FUNC(cdracula_state::flipscreen_w));       // Flip Screen
@@ -3775,7 +3775,7 @@ void cdracula_state::cdracula(machine_config &config)
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(cdracula_state::sprtmtch_vblank_w));
 
-	cdracula_blitter_device &blitter(CDRACULA_BLITTER(config, m_blitter, 0));
+	cdracula_blitter_device &blitter(CDRACULA_BLITTER(config, m_blitter));
 	blitter.vram_out_cb().set(FUNC(cdracula_state::cdracula_blit_pixel_w));
 	blitter.scrollx_cb().set(FUNC(cdracula_state::dynax_blit_scrollx_w));
 	blitter.scrolly_cb().set(FUNC(cdracula_state::dynax_blit_scrolly_w));
@@ -3809,7 +3809,7 @@ void dynax_adpcm_state::hanamai(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	RST_POS_BUFFER(config, m_mainirq, 0).int_callback().set_inputline(m_maincpu, 0);
+	RST_POS_BUFFER(config, m_mainirq).int_callback().set_inputline(m_maincpu, 0);
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(m_msm, FUNC(msm5205_device::reset_w)).invert();  // MSM5205 reset
@@ -3831,7 +3831,7 @@ void dynax_adpcm_state::hanamai(machine_config &config)
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(dynax_adpcm_state::sprtmtch_vblank_w));
 
-	DYNAX_BLITTER_REV2(config, m_blitter, 0);
+	DYNAX_BLITTER_REV2(config, m_blitter);
 	m_blitter->vram_out_cb().set(FUNC(dynax_adpcm_state::hanamai_blit_pixel_w));
 	m_blitter->scrollx_cb().set(FUNC(dynax_adpcm_state::dynax_blit_scrollx_w));
 	m_blitter->scrolly_cb().set(FUNC(dynax_adpcm_state::dynax_blit_scrolly_w));
@@ -3878,7 +3878,7 @@ void dynax_adpcm_state::hnoridur(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	RST_POS_BUFFER(config, m_mainirq, 0).int_callback().set_inputline(m_maincpu, 0);
+	RST_POS_BUFFER(config, m_mainirq).int_callback().set_inputline(m_maincpu, 0);
 
 	LS259(config, m_mainlatch); // IC25
 	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_adpcm_state::flipscreen_w));
@@ -3900,7 +3900,7 @@ void dynax_adpcm_state::hnoridur(machine_config &config)
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(dynax_adpcm_state::sprtmtch_vblank_w));
 
-	DYNAX_BLITTER_REV2(config, m_blitter, 0);
+	DYNAX_BLITTER_REV2(config, m_blitter);
 	m_blitter->vram_out_cb().set(FUNC(dynax_adpcm_state::hnoridur_blit_pixel_w));
 	m_blitter->scrollx_cb().set(FUNC(dynax_adpcm_state::dynax_blit_scrollx_w));
 	m_blitter->scrolly_cb().set(FUNC(dynax_adpcm_state::dynax_blit_scrolly_w));
@@ -3944,7 +3944,7 @@ void dynax_adpcm_state::hjingi(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	RST_POS_BUFFER(config, m_mainirq, 0).int_callback().set_inputline(m_maincpu, 0);
+	RST_POS_BUFFER(config, m_mainirq).int_callback().set_inputline(m_maincpu, 0);
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_adpcm_state::flipscreen_w));
@@ -3970,7 +3970,7 @@ void dynax_adpcm_state::hjingi(machine_config &config)
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(dynax_adpcm_state::sprtmtch_vblank_w));
 
-	DYNAX_BLITTER_REV2(config, m_blitter, 0);
+	DYNAX_BLITTER_REV2(config, m_blitter);
 	m_blitter->vram_out_cb().set(FUNC(dynax_adpcm_state::hnoridur_blit_pixel_w));
 	m_blitter->scrollx_cb().set(FUNC(dynax_adpcm_state::dynax_blit_scrollx_w));
 	m_blitter->scrolly_cb().set(FUNC(dynax_adpcm_state::dynax_blit_scrolly_w));
@@ -4012,7 +4012,7 @@ void dynax_state::sprtmtch(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	RST_POS_BUFFER(config, m_mainirq, 0).int_callback().set_inputline(m_maincpu, 0);
+	RST_POS_BUFFER(config, m_mainirq).int_callback().set_inputline(m_maincpu, 0);
 
 	LS259(config, m_mainlatch); // UF12 on Intergirl
 	m_mainlatch->q_out_cb<1>().set(FUNC(dynax_state::flipscreen_w));
@@ -4031,7 +4031,7 @@ void dynax_state::sprtmtch(machine_config &config)
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(dynax_state::sprtmtch_vblank_w));
 
-	DYNAX_BLITTER_REV2(config, m_blitter, 0);
+	DYNAX_BLITTER_REV2(config, m_blitter);
 	m_blitter->vram_out_cb().set(FUNC(dynax_state::drgpunch_blit_pixel_w));
 	m_blitter->scrollx_cb().set(FUNC(dynax_state::dynax_blit_scrollx_w));
 	m_blitter->scrolly_cb().set(FUNC(dynax_state::dynax_blit_scrolly_w));
@@ -4095,7 +4095,7 @@ void dynax_state::mjfriday(machine_config &config)
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(dynax_state::mjfriday_vblank_w));
 
-	DYNAX_BLITTER_REV2(config, m_blitter, 0);
+	DYNAX_BLITTER_REV2(config, m_blitter);
 	m_blitter->vram_out_cb().set(FUNC(dynax_state::mjdialq2_blit_pixel_w));
 	m_blitter->scrollx_cb().set(FUNC(dynax_state::dynax_blit_scrollx_w));
 	m_blitter->scrolly_cb().set(FUNC(dynax_state::dynax_blit_scrolly_w));
@@ -4208,8 +4208,6 @@ void jantouki_state::machine_start()
 
 	dynax_adpcm_state::machine_start();
 
-	m_led.resolve();
-
 	m_blitter2_irq_mask = 1;
 
 	save_item(NAME(m_blitter2_irq_mask));
@@ -4240,8 +4238,8 @@ void jantouki_state::jantouki(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	RST_POS_BUFFER(config, m_mainirq, 0).int_callback().set_inputline(m_maincpu, 0);
-	RST_POS_BUFFER(config, m_soundirq, 0).int_callback().set_inputline(m_soundcpu, 0);
+	RST_POS_BUFFER(config, m_mainirq).int_callback().set_inputline(m_maincpu, 0);
+	RST_POS_BUFFER(config, m_soundirq).int_callback().set_inputline(m_soundcpu, 0);
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(jantouki_state::coincounter_0_w));  // Coin Counter
@@ -4267,7 +4265,7 @@ void jantouki_state::jantouki(machine_config &config)
 	top.set_palette(m_palette);
 	top.screen_vblank().set(FUNC(jantouki_state::jantouki_vblank_w));
 
-	DYNAX_BLITTER_REV2(config, m_blitter, 0);
+	DYNAX_BLITTER_REV2(config, m_blitter);
 	m_blitter->vram_out_cb().set(FUNC(jantouki_state::jantouki_blit_pixel_w));
 	m_blitter->scrollx_cb().set(FUNC(jantouki_state::dynax_blit_scrollx_w));
 	m_blitter->scrolly_cb().set(FUNC(jantouki_state::dynax_blit_scrolly_w));
@@ -4281,7 +4279,7 @@ void jantouki_state::jantouki(machine_config &config)
 	bottom.set_screen_update(FUNC(jantouki_state::screen_update_jantouki_bottom));
 	bottom.set_palette(m_palette);
 
-	DYNAX_BLITTER_REV2(config, m_blitter2, 0);
+	DYNAX_BLITTER_REV2(config, m_blitter2);
 	m_blitter2->vram_out_cb().set(FUNC(jantouki_state::jantouki_blit2_pixel_w));
 	m_blitter2->scrollx_cb().set(FUNC(jantouki_state::dynax_blit2_scrollx_w));
 	m_blitter2->scrolly_cb().set(FUNC(jantouki_state::dynax_blit2_scrolly_w));
@@ -4408,7 +4406,7 @@ void dynax_state::qyjdzjp(machine_config &config)
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0)).invert();
 
-	DYNAX_BLITTER_REV2(config, m_blitter, 0);
+	DYNAX_BLITTER_REV2(config, m_blitter);
 	m_blitter->vram_out_cb().set(FUNC(dynax_state::hnoridur_blit_pixel_w));
 	m_blitter->scrollx_cb().set(FUNC(dynax_state::dynax_blit_scrollx_w));
 	m_blitter->scrolly_cb().set(FUNC(dynax_state::dynax_blit_scrolly_w));
@@ -4525,7 +4523,7 @@ void dynax_state::tenkai(machine_config &config)
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 
-	DYNAX_BLITTER_REV2(config, m_blitter, 0);
+	DYNAX_BLITTER_REV2(config, m_blitter);
 	m_blitter->vram_out_cb().set(FUNC(dynax_state::hnoridur_blit_pixel_w));
 	m_blitter->scrollx_cb().set(FUNC(dynax_state::tenkai_blit_scrollx_w));
 	m_blitter->scrolly_cb().set(FUNC(dynax_state::tenkai_blit_scrolly_w));
@@ -4632,7 +4630,7 @@ void dynax_state::gekisha(machine_config &config)
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	DYNAX_BLITTER_REV2(config, m_blitter, 0);
+	DYNAX_BLITTER_REV2(config, m_blitter);
 	m_blitter->vram_out_cb().set(FUNC(dynax_state::mjdialq2_blit_pixel_w));
 	m_blitter->scrollx_cb().set(FUNC(dynax_state::dynax_blit_scrollx_w));
 	m_blitter->scrolly_cb().set(FUNC(dynax_state::dynax_blit_scrolly_w));

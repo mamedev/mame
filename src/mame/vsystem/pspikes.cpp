@@ -2301,7 +2301,7 @@ void pspikes_banked_sound_state::pspikes(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pspikes);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	VSYSTEM_SPR2(config, m_spr[0], 0, m_palette, gfx_pspikes_spr);
+	VSYSTEM_SPR2(config, m_spr[0], m_palette, gfx_pspikes_spr);
 	m_spr[0]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::pspikes_tile_callback));
 
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
@@ -2348,7 +2348,7 @@ void spikes91_state::spikes91(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spikes91);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	//VSYSTEM_GGA(config, "gga", 0);
+	//VSYSTEM_GGA(config, "gga");
 
 	SPEAKER(config, "mono").front_center();
 
@@ -2377,7 +2377,7 @@ void pspikes_base_state::pspikesb(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pspikesb);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	//VSYSTEM_GGA(config, "gga", 0);
+	//VSYSTEM_GGA(config, "gga");
 
 	MCFG_VIDEO_START_OVERRIDE(pspikes_base_state,pspikes)
 
@@ -2419,10 +2419,10 @@ void pspikes_sound_cpu_state::kickball(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pspikes);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	VSYSTEM_SPR2(config, m_spr[0], 0, m_palette, gfx_kickball_spr);
+	VSYSTEM_SPR2(config, m_spr[0], m_palette, gfx_kickball_spr);
 	m_spr[0]->set_tile_indirect_cb(FUNC(pspikes_sound_cpu_state::pspikes_tile_callback));
 
-	//VSYSTEM_GGA(config, "gga", 0); // still accessed as if it exists, in clone hardware?
+	//VSYSTEM_GGA(config, "gga"); // still accessed as if it exists, in clone hardware?
 
 	MCFG_VIDEO_START_OVERRIDE(pspikes_sound_cpu_state,pspikes)
 
@@ -2460,9 +2460,9 @@ void pspikes_base_state::pspikesc(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pspikes);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	//VSYSTEM_GGA(config, "gga", 0);
+	//VSYSTEM_GGA(config, "gga");
 
-	VSYSTEM_SPR2(config, m_spr[0], 0, m_palette, gfx_pspikes_spr);
+	VSYSTEM_SPR2(config, m_spr[0], m_palette, gfx_pspikes_spr);
 	m_spr[0]->set_tile_indirect_cb(FUNC(pspikes_base_state::pspikes_tile_callback));
 
 	MCFG_VIDEO_START_OVERRIDE(pspikes_base_state,pspikes)
@@ -2500,10 +2500,10 @@ void pspikes_banked_sound_state::karatblz(machine_config &config)
 
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
-	VSYSTEM_SPR2(config, m_spr[0], 0, m_palette, gfx_turbofrc_spr1);
+	VSYSTEM_SPR2(config, m_spr[0], m_palette, gfx_turbofrc_spr1);
 	m_spr[0]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::pspikes_tile_callback));
 
-	VSYSTEM_SPR2(config, m_spr[1], 0, m_palette, gfx_turbofrc_spr2);
+	VSYSTEM_SPR2(config, m_spr[1], m_palette, gfx_turbofrc_spr2);
 	m_spr[1]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::pspikes_tile2_callback));
 
 	MCFG_VIDEO_START_OVERRIDE(pspikes_banked_sound_state,karatblz)
@@ -2546,13 +2546,13 @@ void karatblzbl_state::karatblzbl(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_turbofrc);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
-	VSYSTEM_SPR2(config, m_spr[0], 0, m_palette, gfx_turbofrc_spr1);
+	VSYSTEM_SPR2(config, m_spr[0], m_palette, gfx_turbofrc_spr1);
 	m_spr[0]->set_tile_indirect_cb(FUNC(karatblzbl_state::pspikes_tile_callback));
 
-	VSYSTEM_SPR2(config, m_spr[1], 0, m_palette, gfx_turbofrc_spr2);
+	VSYSTEM_SPR2(config, m_spr[1], m_palette, gfx_turbofrc_spr2);
 	m_spr[1]->set_tile_indirect_cb(FUNC(karatblzbl_state::pspikes_tile2_callback));
 
-	//VSYSTEM_GGA(config, "gga", 0);
+	//VSYSTEM_GGA(config, "gga");
 
 	MCFG_VIDEO_START_OVERRIDE(karatblzbl_state,karatblz)
 
@@ -2596,10 +2596,10 @@ void pspikes_banked_sound_state::spinlbrk(machine_config &config)
 
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
-	VSYSTEM_SPR2(config, m_spr[0], 0, m_palette, gfx_turbofrc_spr1);
+	VSYSTEM_SPR2(config, m_spr[0], m_palette, gfx_turbofrc_spr1);
 	m_spr[0]->set_pritype(1);
 
-	VSYSTEM_SPR2(config, m_spr[1], 0, m_palette, gfx_turbofrc_spr2);
+	VSYSTEM_SPR2(config, m_spr[1], m_palette, gfx_turbofrc_spr2);
 	m_spr[1]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::spinbrk_tile_callback)); // rom lookup
 	m_spr[1]->set_pritype(1);
 
@@ -2645,10 +2645,10 @@ void pspikes_banked_sound_state::turbofrc(machine_config &config)
 
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
-	VSYSTEM_SPR2(config, m_spr[0], 0, m_palette, gfx_turbofrc_spr1);
+	VSYSTEM_SPR2(config, m_spr[0], m_palette, gfx_turbofrc_spr1);
 	m_spr[0]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::pspikes_tile_callback));
 
-	VSYSTEM_SPR2(config, m_spr[1], 0, m_palette, gfx_turbofrc_spr2);
+	VSYSTEM_SPR2(config, m_spr[1], m_palette, gfx_turbofrc_spr2);
 	m_spr[1]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::pspikes_tile2_callback));
 
 	MCFG_VIDEO_START_OVERRIDE(pspikes_banked_sound_state,turbofrc)
@@ -2693,11 +2693,11 @@ void pspikes_banked_sound_state::aerofgtb(machine_config &config)
 
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
-	VSYSTEM_SPR2(config, m_spr[0], 0, m_palette, gfx_turbofrc_spr1);
+	VSYSTEM_SPR2(config, m_spr[0], m_palette, gfx_turbofrc_spr1);
 	m_spr[0]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::pspikes_tile_callback));
 	m_spr[0]->set_offsets(3, -1);
 
-	VSYSTEM_SPR2(config, m_spr[1], 0, m_palette, gfx_turbofrc_spr2);
+	VSYSTEM_SPR2(config, m_spr[1], m_palette, gfx_turbofrc_spr2);
 	m_spr[1]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::pspikes_tile2_callback));
 	m_spr[1]->set_offsets(3, -1);
 
@@ -2740,7 +2740,7 @@ void pspikes_sound_cpu_state::aerfboot(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aerfboot);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
-	//VSYSTEM_GGA(config, "gga", 0);
+	//VSYSTEM_GGA(config, "gga");
 
 	MCFG_VIDEO_START_OVERRIDE(pspikes_sound_cpu_state,turbofrc)
 
@@ -2774,7 +2774,7 @@ void pspikes_base_state::aerfboo2(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aerfboo2);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
-	//VSYSTEM_GGA(config, "gga", 0);
+	//VSYSTEM_GGA(config, "gga");
 
 	MCFG_VIDEO_START_OVERRIDE(pspikes_base_state,turbofrc)
 
@@ -2806,9 +2806,9 @@ void wbbc97_state::wbbc97(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pspikes);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	//VSYSTEM_GGA(config, "gga", 0);
+	//VSYSTEM_GGA(config, "gga");
 
-	VSYSTEM_SPR2(config, m_spr[0], 0, m_palette, gfx_pspikes_spr);
+	VSYSTEM_SPR2(config, m_spr[0], m_palette, gfx_pspikes_spr);
 	m_spr[0]->set_tile_indirect_cb(FUNC(wbbc97_state::pspikes_tile_callback));
 
 	// sound hardware
@@ -3578,14 +3578,16 @@ Turbo Force
 
  Program ROM comparision by region code:
 
-              Region Code 3  Region Code 4  Region Code 7  Region Code 8
-              ----------------------------------------------------------
-   SUBPCB U2   0x721300ee     0x721300ee     0x721300ee    0x721300ee  <-- Same data all sets
-   SUBPCB U1   0x71b6431b     0x6cd5312b     0xcc324da6    0xd1513f96  <-- Each set unique
-Main PCB U14   0x63f50557     0x63f50557     0xc0a15480    0x63f50557  <-- Only turbofrcu differs by 1 byte:  0x240B:3C (vs 0x25 for other sets)
+              Japan Region  Region Code 3  Region Code 4  Region Code 7  Region Code 8
+              ------------------------------------------------------------------------
+   SUBPCB U2   0xc2134480    0x721300ee     0x721300ee     0x721300ee     0x721300ee   <-- Same data all sets
+   SUBPCB U1   0x8d45f43d    0x71b6431b     0x6cd5312b     0xcc324da6     0xd1513f96   <-- Each set unique
+Main PCB U14   0xc06d57ec    0x63f50557     0x63f50557     0x63f50557     0xc0a15480   <-- See notes below about the U14 ROMs
 
-NOTE: Swapping in a 0x63f50557 ROM in turbofrcu in place of 8v3.u14 does NOT trigger a "PROGRAM ROM AREA" error.
-      Is 8v3.u14 a bad dump?, need to get it redumped to verify if it should indeed be different.
+NOTE: The Japanese U14 is very different from the other sets as is SUBPCB U2, maybe a newer code revision? ROMs were clearly marked with a red dot.
+      turbofrcu's 8v3.u14 differs by 1 byte (0x240B:3C vs 0x25) when compared to the other non Japanese sets. Swapping in the 0x63f50557 ROM
+      for the turbofrcu set in place of 8v3.u14 does NOT trigger a "PROGRAM ROM AREA" error.  Is 8v3.u14 a bad dump?, need to get it redumped
+      to verify if it should indeed be different.
 
 */
 ROM_START( turbofrc ) // World version with no copyright notice
@@ -3704,6 +3706,43 @@ ROM_START( turbofrcua ) // US version
 	ROM_LOAD16_WORD_SWAP( "7v2.subpcb.u2", 0x00000, 0x40000, CRC(721300ee) SHA1(79ab32fdfd377592a0bdbd1c4794cfd529a3eb7b) ) // 27c2048 - located on a OR-10 SUB BOARD - 7 stamped on chip with VideoSystem logo V
 	ROM_LOAD16_WORD_SWAP( "7v1.subpcb.u1", 0x40000, 0x40000, CRC(d1513f96) SHA1(7acb96a44f661cd9c7561dfab0d60c993942d669) ) // 27c2048 - located on a OR-10 SUB BOARD - 7 stamped on chip with VideoSystem logo V
 	ROM_LOAD16_WORD_SWAP( "7v3.u14",       0x80000, 0x40000, CRC(63f50557) SHA1(f8dba8c9ba412c9a67457ec31a804c57593ab20b) ) // 27c2048 - 7 stamped on chip with VideoSystem logo V
+
+	ROM_REGION( 0x20000, "soundbank", 0 )    // 128k for the audio CPU + banks
+	ROM_LOAD( "6.u166", 0x00000, 0x20000, CRC(2ca14a65) SHA1(95f6e7b4fa7ca26872ff472d7e6fb75fd4f281d5) ) // 27c1001
+
+	ROM_REGION( 0x08000, "audiocpu", 0 )    // 32k for the audio CPU
+	ROM_COPY( "soundbank", 0x00000, 0x00000, 0x08000 )
+
+	ROM_REGION( 0x0a0000, "gfx1", 0 )
+	ROM_LOAD( "lh534ggs.u94", 0x000000, 0x80000, CRC(baa53978) SHA1(7f103122dd0bf675226ccf309fba73f645e0c79b) ) // mask rom
+	ROM_LOAD( "7.u95",        0x080000, 0x20000, CRC(71a6c573) SHA1(f14ebca676d85fabcde27631145933abc376dd12) ) // 27c1001a
+
+	ROM_REGION( 0x0a0000, "gfx2", 0 )
+	ROM_LOAD( "lh534ggy.u105", 0x000000, 0x80000, CRC(4de4e59e) SHA1(571396dadb8aac043319cabe24e629210e442d57) ) // mask rom
+	ROM_LOAD( "8.u106",        0x080000, 0x20000, CRC(c6479eb5) SHA1(47a58f082c73bc9dae3970e760ba46478ce6a190) ) // 27c1001a
+
+	ROM_REGION( 0x200000, "spritegfx", 0 )
+	ROM_LOAD32_WORD( "lh534gh2.u116", 0x000000, 0x80000, CRC(df210f3b) SHA1(990ac43e4a46fee6b929c5b27d317cdadf179b8b) ) // mask rom
+	ROM_LOAD32_WORD( "5.u118",        0x100000, 0x40000, CRC(f61d1d79) SHA1(2b8e33912c05c26170afd2fced0ff06cb7a097fa) ) // 27c2048
+	ROM_LOAD32_WORD( "lh534gh1.u117", 0x000002, 0x80000, CRC(f70812fd) SHA1(1964e1134940825211cd4825fdd3f13b8242192d) ) // mask rom
+	ROM_LOAD32_WORD( "4.u119",        0x100002, 0x40000, CRC(474ea716) SHA1(67753e96fa4fc8cd689a8bddeb60dbde259cacaa) ) // 27c2048
+
+	ROM_REGION( 0x080000, "gfx4", 0 )
+	ROM_LOAD32_WORD( "lh532a52.u134", 0x000000, 0x40000, CRC(3c725a48) SHA1(120e62b2ef911bfa0f8a1468966ff70fab2d7582) ) // mask rom
+	ROM_LOAD32_WORD( "lh532a51.u135", 0x000002, 0x40000, CRC(95c63559) SHA1(5f77bd22dce1ac4aa7291e5c3c3c358e2f066e8c) ) // mask rom
+
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 ) // sound samples
+	ROM_LOAD( "lh532h74.u180", 0x00000, 0x40000, CRC(a3d43254) SHA1(d0225d6cf9299ecc39d8e3f64f48cf80d554a67f) ) // mask rom
+
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) // sound samples
+	ROM_LOAD( "lh538o7j.u179", 0x000000, 0x100000, CRC(60ca0333) SHA1(28b94edc98d360386759780ccd1122d43ffa5279) ) // mask rom
+ROM_END
+
+ROM_START( turbofrcj ) // Japan version
+	ROM_REGION( 0xc0000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_WORD_SWAP( "2.subpcb.u2", 0x00000, 0x40000, CRC(c2134480) SHA1(04d555544a1cb1bda811b26ed065bb95a5ccbbc8) ) // 27c2048 - located on a OR-10 SUB BOARD - ROM label clearly marked with a red dot, newer code base?
+	ROM_LOAD16_WORD_SWAP( "1.subpcb.u1", 0x40000, 0x40000, CRC(8d45f43d) SHA1(78e8f02b402ff82a97ae6cd6de70f164ed368f28) ) // 27c2048 - located on a OR-10 SUB BOARD - ROM label clearly marked with a red dot, newer code base?
+	ROM_LOAD16_WORD_SWAP( "3.u14",       0x80000, 0x40000, CRC(c06d57ec) SHA1(aa1d2fe750eda02380357844b5b774e59c12d63d) ) // 27c2048 - ROM label clearly marked with a red dot, newer version?
 
 	ROM_REGION( 0x20000, "soundbank", 0 )    // 128k for the audio CPU + banks
 	ROM_LOAD( "6.u166", 0x00000, 0x20000, CRC(2ca14a65) SHA1(95f6e7b4fa7ca26872ff472d7e6fb75fd4f281d5) ) // 27c1001
@@ -3993,6 +4032,7 @@ GAME( 1991, turbofrc,   0,        turbofrc,   turbofrc,  pspikes_banked_sound_st
 GAME( 1991, turbofrco,  turbofrc, turbofrc,   turbofrc,  pspikes_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (World, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // region code 3
 GAME( 1991, turbofrcu,  turbofrc, turbofrc,   turbofrc,  pspikes_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (US, set 1)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // region code 8
 GAME( 1991, turbofrcua, turbofrc, turbofrc,   turbofrc,  pspikes_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (US, set 2)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // region code 7
+GAME( 1991, turbofrcj,  turbofrc, turbofrc,   turbofrc,  pspikes_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (Japan)",        MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // no region code, program ROMs marked with a red dot
 
 // the tiles on these also contain an alt title 'The Final War' for both the title screen and attract logo was it ever used?
 // sonicwi looks oldest set, aerofgt is slightly easier, aerofgtb/aerofgtc are noticeably harder

@@ -386,7 +386,7 @@ void konendev_state::konendev(machine_config &config)
 	screen.set_palette("palette");
 	screen.screen_vblank().set(m_gcu, FUNC(k057714_device::vblank_w));
 
-	K057714(config, m_gcu, 0);
+	K057714(config, m_gcu);
 	m_gcu->set_screen("screen");
 	m_gcu->irq_callback().set(FUNC(konendev_state::gcu_interrupt));
 

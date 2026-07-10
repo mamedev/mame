@@ -27,15 +27,6 @@
 #include "bus/nscsi/devices.h"
 #include "cpu/i86/i186.h"
 #include "cpu/upd7810/upd7810.h"
-#include "formats/dfi_dsk.h"
-#include "formats/dsk_dsk.h"
-#include "formats/hxchfe_dsk.h"
-#include "formats/hxcmfm_dsk.h"
-#include "formats/imd_dsk.h"
-#include "formats/ipf_dsk.h"
-#include "formats/mfi_dsk.h"
-#include "formats/pc_dsk.h"
-#include "formats/td0_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/74259.h"
 #include "machine/clock.h"
@@ -54,12 +45,23 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include "formats/dfi_dsk.h"
+#include "formats/dsk_dsk.h"
+#include "formats/hxchfe_dsk.h"
+#include "formats/hxcmfm_dsk.h"
+#include "formats/imd_dsk.h"
+#include "formats/ipf_dsk.h"
+#include "formats/mfi_dsk.h"
+#include "formats/pc_dsk.h"
+#include "formats/td0_dsk.h"
+
 #include "mpc60.lh"
 
 namespace {
 
 static constexpr uint8_t BIT4 = (1 << 4);
 static constexpr uint8_t BIT5 = (1 << 5);
+
 class mpc60_state : public driver_device
 {
 public:
@@ -132,7 +134,7 @@ private:
 
 	required_device<upd7810_device> m_panelcpu;
 	required_device<l4003_sound_device> m_dsp;
-	required_device<upd72065_device> m_fdc;
+	required_device<upd72066_device> m_fdc;
 	required_device<floppy_connector> m_floppy;
 	required_device<i8255_device> m_ppi;
 	required_device_array<mb89371_device, 2> m_sio;
@@ -215,9 +217,9 @@ void mpc60_state::mem_map(address_map &map)
 void mpc60_state::io_map(address_map &map)
 {
 	map(0x0000, 0x0003).m(m_dsp, FUNC(l4003_sound_device::map));
-	map(0x0080, 0x0083).m(m_fdc, FUNC(upd72065_device::map)).umask16(0x00ff);
+	map(0x0080, 0x0083).m(m_fdc, FUNC(upd72066_device::map)).umask16(0x00ff);
 	map(0x0090, 0x0090).w(FUNC(mpc60_state::fdc_tc_w));
-	map(0x00a0, 0x00a0).rw(m_fdc, FUNC(upd72065_device::dma_r), FUNC(upd72065_device::dma_w));
+	map(0x00a0, 0x00a0).rw(m_fdc, FUNC(upd72066_device::dma_r), FUNC(upd72066_device::dma_w));
 	map(0x00b0, 0x00b0).r("lcdc", FUNC(hd61830_device::status_r));
 	map(0x00b2, 0x00b2).r("lcdc", FUNC(hd61830_device::data_r));
 	map(0x00b4, 0x00b4).w("lcdc", FUNC(hd61830_device::control_w));
@@ -272,7 +274,13 @@ uint8_t mpc60_state::subcpu_pa_r()
 
 uint8_t mpc60_state::subcpu_pb_r()
 {
-	return m_drums[m_drum_scan_row]->read();
+	unsigned hit = 0;
+	for (unsigned i = 0; 4 > i; ++i)
+	{
+		if (!BIT(m_drum_scan_row, 3 - i))
+			hit |= m_drums[i]->read();
+	}
+	return hit;
 }
 
 uint8_t mpc60_state::subcpu_pc_r()
@@ -301,19 +309,22 @@ uint8_t mpc60_state::subcpu_pc_r()
 			rv = 0;
 			break;
 		}
-		m_quadrature_phase++;
-		m_quadrature_phase &= 7;
-
-		// generate a complete 4-part pulse train for each single change in the position
-		if (m_quadrature_phase == 0)
+		if (!machine().side_effects_disabled())
 		{
-			if (m_count_dial < 0)
+			m_quadrature_phase++;
+			m_quadrature_phase &= 7;
+
+			// generate a complete 4-part pulse train for each single change in the position
+			if (m_quadrature_phase == 0)
 			{
-				m_count_dial++;
-			}
-			else
-			{
-				m_count_dial--;
+				if (m_count_dial < 0)
+				{
+					m_count_dial++;
+				}
+				else
+				{
+					m_count_dial--;
+				}
 			}
 		}
 	}
@@ -345,12 +356,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mpc60_state::dial_timer_tick)
 // drum pad row select, active low
 void mpc60_state::subcpu_pb_w(uint8_t data)
 {
-	m_drum_scan_row = (data & 0xf) ^ 0xf;
-	if (m_drum_scan_row != 0)
-	{
-		// get a row number 0-3
-		m_drum_scan_row = count_leading_zeros_32(m_drum_scan_row) - 28;
-	}
+	m_drum_scan_row = data;
 }
 
 uint8_t mpc60_state::an0_r()
@@ -638,7 +644,7 @@ void mpc60_state::mpc60(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "drq1").output_handler().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
 
-	UPD72065(config, m_fdc, 16_MHz_XTAL / 4); // μPD72066C (clocked by SED9420CAC)
+	UPD72066(config, m_fdc, 16_MHz_XTAL / 4); // μPD72066C (clocked by SED9420CAC)
 	m_fdc->set_ready_line_connected(false); // RDY tied to VDD
 	m_fdc->set_select_lines_connected(false);
 	m_fdc->intrq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
@@ -646,7 +652,7 @@ void mpc60_state::mpc60(machine_config &config)
 
 	FLOPPY_CONNECTOR(config, m_floppy, mpc60_state::floppies, "35dd", add_formats).enable_sound(true);
 
-	hd61830_device &lcdc(HD61830(config, "lcdc", 0)); // LC7981
+	hd61830_device &lcdc(HD61830(config, "lcdc")); // LC7981
 	lcdc.set_addrmap(0, &mpc60_state::lcd_map);
 	lcdc.set_screen("screen");
 
@@ -711,7 +717,7 @@ void mpc60_scsi_state::mpc60_scsi(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr, false);
 
-	NCR5380(config, m_ncr5380, 16_MHz_XTAL / 2);
+	NCR5380(config, m_ncr5380);
 	m_scsibus->set_external_device(7, m_ncr5380);
 }
 

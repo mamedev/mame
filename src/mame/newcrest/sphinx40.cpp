@@ -117,9 +117,6 @@ private:
 
 void sphinx40_state::machine_start()
 {
-	m_out_digit.resolve();
-	m_out_lcd.resolve();
-
 	// register for savestates
 	save_item(NAME(m_cb_mux));
 	save_item(NAME(m_led_data));
@@ -285,7 +282,7 @@ void sphinx40_state::sphinx40(machine_config &config)
 	m_board->set_nvram_enable(true);
 
 	// video hardware
-	HD61603(config, m_lcd, 0);
+	HD61603(config, m_lcd);
 	m_lcd->write_segs().set(FUNC(sphinx40_state::lcd_seg_w));
 
 	PWM_DISPLAY(config, m_display).set_size(8, 8);

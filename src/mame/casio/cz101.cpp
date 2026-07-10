@@ -420,10 +420,6 @@ void cz101_state::port_c_w(uint8_t data)
 
 void cz101_state::machine_start()
 {
-	m_leds.resolve();
-	m_led_env.resolve();
-	m_led_tone.resolve();
-
 	// register for save states
 	save_item(NAME(m_power));
 	save_item(NAME(m_port_b));

@@ -12,6 +12,8 @@
 #include "antic.h"
 #include "screen.h"
 
+#include "endianness.h"
+
 //#define VERBOSE 1
 #include "logmacro.h"
 

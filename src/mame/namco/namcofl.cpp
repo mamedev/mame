@@ -715,14 +715,14 @@ void namcofl_state::namcofl(machine_config &config)
 	m_screen->screen_vblank().set(m_c355spr, FUNC(namco_c355spr_device::vblank));
 	m_screen->set_palette(m_c116);
 
-	NAMCO_C169ROZ(config, m_c169roz, 0);
+	NAMCO_C169ROZ(config, m_c169roz);
 	m_c169roz->set_palette(m_c116);
 	m_c169roz->set_is_namcofl(true);
 	m_c169roz->set_ram_words(0x20000 / 2);
 	m_c169roz->set_tile_callback(FUNC(namcofl_state::roz_cb));
 	m_c169roz->set_color_base(0x1800);
 
-	NAMCO_C355SPR(config, m_c355spr, 0);
+	NAMCO_C355SPR(config, m_c355spr);
 	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_palette(m_c116);
 	m_c355spr->set_scroll_offsets(0, 0);
@@ -731,12 +731,12 @@ void namcofl_state::namcofl(machine_config &config)
 	m_c355spr->set_color_base(0);
 	m_c355spr->set_buffer(1);
 
-	NAMCO_C123TMAP(config, m_c123tmap, 0);
+	NAMCO_C123TMAP(config, m_c123tmap);
 	m_c123tmap->set_palette(m_c116);
 	m_c123tmap->set_tile_callback(FUNC(namcofl_state::tilemap_cb));
 	m_c123tmap->set_color_base(0x1000);
 
-	NAMCO_C116(config, m_c116, 0);
+	NAMCO_C116(config, m_c116);
 	m_c116->enable_shadows();
 
 	SPEAKER(config, "speaker", 2).front();

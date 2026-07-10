@@ -89,7 +89,7 @@ void aha1740_device::device_add_mconfig(machine_config &config)
 	m_busaic->hrst_callback().set_inputline(m_hpc, INPUT_LINE_RESET);
 	//m_busaic->srst_callback().set_inputline(m_hpc, hpc_device::EI_LINE);
 
-	I82355(config, "bmic", 0);
+	I82355(config, "bmic");
 	//bmic.lint_callback().set_inputline(m_hpc, hpc_device::I2_LINE);
 
 	IDT7201(config, m_fifo[0]);
@@ -117,7 +117,7 @@ void aha1742a_device::device_add_mconfig(machine_config &config)
 	m_busaic->hrst_callback().set_inputline(m_hpc, INPUT_LINE_RESET);
 	//m_busaic->srst_callback().set_inputline(m_hpc, hpc_device::EI_LINE);
 
-	I82355(config, "bmic", 0);
+	I82355(config, "bmic");
 	//bmic.lint_callback().set_inputline(m_hpc, hpc_device::I2_LINE);
 
 	IDT7201(config, m_fifo[0]);

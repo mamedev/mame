@@ -62,7 +62,7 @@ public:
 		, m_rv(*this, "RV")
 	{ }
 
-	void fireball(machine_config &config);
+	void fireball(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -443,16 +443,7 @@ INPUT_PORTS_END
 
 void fireball_state::machine_start()
 {
-	m_digits.resolve();
-	m_hopper.resolve();
-	m_gameover.resolve();
-	m_title.resolve();
-	m_credit.resolve();
-	m_ss.resolve();
-	m_c_lock.resolve();
-	m_sv.resolve();
-	m_fbv.resolve();
-	m_rv.resolve();
+	// TODO: savestates
 }
 
 void fireball_state::machine_reset()
@@ -517,7 +508,7 @@ void fireball_state::fireball(machine_config &config)
 	m_maincpu->port_out_cb<3>().set(FUNC(fireball_state::p3_w));
 
 	// 9ms from scope reading 111Hz take care of this in the handler
-	TIMER(config, "int_0", 0).configure_periodic(FUNC(fireball_state::int_0), attotime::from_hz(555));
+	TIMER(config, "int_0").configure_periodic(FUNC(fireball_state::int_0), attotime::from_hz(555));
 
 	EEPROM_X24C44_16BIT(config, "eeprom");
 

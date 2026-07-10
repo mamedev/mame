@@ -4,9 +4,10 @@
 #include "emu.h"
 #include "nes_vt4ffx_soc.h"
 
+#include "m6502_swap_op_d5_d6.h"
+
 #include "cpu/m6502/rp2a03.h"
 #include "sound/nes_apu_vt.h"
-#include "m6502_swap_op_d5_d6.h"
 #include "video/ppu2c0x_vt.h"
 
 
@@ -19,6 +20,8 @@ DEFINE_DEVICE_TYPE(VT4FFX_SOC_RSPS300SWAP,vt4ffx_soc_rsps300swap_device,"vt4ffx_
 
 vt4ffx_soc_base_device::vt4ffx_soc_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	nes_vt02_vt03_soc_device(mconfig, type, tag, owner, clock),
+	m_bank6000(0),
+	m_bank6000_enable(0),
 	m_io_413x_write_callback(*this),
 	m_io_413x_read_callback(*this, 0xff)
 {

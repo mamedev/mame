@@ -292,19 +292,6 @@ void validate_inlines()
 	if (fabsf(recip_approx(100.0f) - 0.01f) > 0.0001f)
 		osd_printf_error("Error testing recip_approx\n");
 
-	for (int i = 0; i <= 32; i++)
-	{
-		u32 t = i < 32 ? (1 << (31 - i) | testu32a >> i) : 0;
-		u8 resultu8 = count_leading_zeros_32(t);
-		if (resultu8 != i)
-			osd_printf_error("Error testing count_leading_zeros_32 %08x=%02x (expected %02x)\n", t, resultu8, i);
-
-		t ^= 0xffffffff;
-		resultu8 = count_leading_ones_32(t);
-		if (resultu8 != i)
-			osd_printf_error("Error testing count_leading_ones_32 %08x=%02x (expected %02x)\n", t, resultu8, i);
-	}
-
 	u32 expected32 = testu32a << 1 | testu32a >> 31;
 	for (int i = -33; i <= 33; i++)
 	{

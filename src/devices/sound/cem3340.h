@@ -6,69 +6,62 @@
 
 #pragma once
 
+#include "sound/va_vco.h"
+
 DECLARE_DEVICE_TYPE(CEM3340, cem3340_device)
 
-// A CEM3340 voltage-controlled oscillator.
+// CEM3340 voltage-controlled oscillator.
+//
+// A triangle-core oscillator with triangle, ramp and variable width pulse outputs.
+//
+// The frequency is controlled by a control current (in Amperes) to pin 15.
+// The pulse width is controlled by a control voltage (in Volts) to pin 5.
+//
+// The CEM3340 supports multiple types of sync, some of which are unusual. At
+// the moment, only the "conventional hard sync" setup is emulated (figure 5 in
+// the datasheet), which is one that's commonly used. In this mode, a negative
+// pulse will unconditionally switch the direction of the triangle wave, from
+// which the other waveforms are derived from. However, we can't use the pulse
+// as an input here. Instead, the sync oscillator's frequency should be provided
+// as a stream input (see va_vco_device class documentation for details).
 //
 // TODO:
-// - Hard and soft sync inputs.
+// - Other types of sync.
 // - Linear FM input.
 // - High frequency tracking input.
-// - Hardcoded a lot of external components to the recommended values.
-class cem3340_device : public device_t, public device_sound_interface
+// - Configurable range of pulse waveform.
+class cem3340_device : public va_vco_device
 {
 public:
-	enum input
-	{
-		INPUT_FREQ = 0,
-		INPUT_PW
-	};
-
-	enum output
-	{
-		OUTPUT_TRIANGLE = 0,
-		OUTPUT_RAMP,
-		OUTPUT_PULSE
-	};
-
 	// cf - timing capacitor between pin 11 and GND.
 	// rr - reference current resistor between pin 13 and V+.
 	cem3340_device(const machine_config &mconfig, const char *tag, device_t *owner, float cf, float rr) ATTR_COLD;
 	cem3340_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) ATTR_COLD;
 
-	cem3340_device &set_freq_cc(float freq_cc);  // Frequency control current.
-	cem3340_device &set_pw_cv(float pw_cv);  // Pulse width control voltage.
+	// rz - total resistance between pin 1 and pin 3 (RZ in the datasheet).
+	// rt - total resistance between pin 2 and pin 3 (RT in the datasheet).
+	// By default, `rt` will be the recommended value in the datasheet, and `rz`
+	// will be perfectly trimmed as per instructions in the datasheet.
+	cem3340_device &set_tempco_gen_res(float rz, float rt);
 
-	float freq();  // in Hz
-	u32 sample_rate() const { return m_stream->sample_rate(); }
-
-	// Returns the time remaining for the ramp waveform to cross the specified
-	// voltage, in an upwards direction. Also works for 0V.
-	attotime ramp_time_to_thresh(float threshold);
+	// Returns the optimally trimmed RZ, given RT.
+	static float rz_optimal(float rt);
 
 protected:
 	void device_start() override ATTR_COLD;
-	void sound_stream_update(sound_stream &stream) override;
+
+	// Converts the control current at pin 15 to Hz.
+	float ctrl2freq(float freq_ctrl) const override;
+
+	// Converts the control voltage at pin 5 to a pulse width fraction (0-1).
+	float ctrl2pw(float pw_ctrl) const override;
 
 private:
-	void set_freq_cc_internal(float freq_cc);
-	void set_pw_cv_internal(float pw_cv);
+	const float m_cf;  // Timing capacitor between pin 11 and GND.
+	const float m_rr;  // Reference current resistor between pin 13 and V+.
 
-	float poly_blep(float phase) const;
-	float poly_blamp(float phase) const;
-
-	// configuration
-	const float m_cf;
-	const float m_rr;
-	sound_stream *m_stream;
-
-	// state
-	float m_freq_cc;
-	float m_freq;
-	float m_pw_cv;
-	float m_pw;
-	float m_step;
-	float m_phase;  // 0-1
+	float m_rz;  // Total resistance between pin 1 and pin 3.
+	float m_rt;  // Total resistance between pin 2 and pin 3.
 };
 
 #endif  // MAME_SOUND_CEM3340_H

@@ -171,7 +171,7 @@ INPUT_PORTS_END
 
 void geneve_memex_device::device_add_mconfig(machine_config &config)
 {
-	RAM(config, m_ram, 0);
+	RAM(config, m_ram);
 	m_ram->set_default_size("2M");
 	m_ram->set_default_value(0);
 }

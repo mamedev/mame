@@ -123,7 +123,9 @@ void pc6001_state::video_start()
 
 void pc6001mk2_state::video_start()
 {
-	// ...
+	save_item(NAME(m_exgfx_2bpp_mode));
+	save_item(NAME(m_exgfx_bitmap_mode));
+	save_item(NAME(m_exgfx_text_mode));
 }
 
 void pc6001mk2sr_state::video_start()
@@ -132,6 +134,14 @@ void pc6001mk2sr_state::video_start()
 	m_gvram = std::make_unique<uint8_t []>(320*256*8); // TODO: size
 	std::fill_n(m_gvram.get(), 320*256*8, 0);
 	save_pointer(NAME(m_gvram), 320*256*8);
+
+	// SR text mode CLUT colors
+	// [0f]-[0b]-[0e]-[0a] are modifiable thru respective $40~$43 ports,
+	// remaining entries are fixed.
+	for (int i = 0; i < 0x10; i++)
+		m_sr_clut[i] = i;
+
+	save_item(NAME(m_sr_clut));
 }
 
 void pc6001_state::draw_gfx_mode4(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr)
@@ -375,7 +385,8 @@ uint32_t pc6001_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 uint32_t pc6001mk2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	/* note: bitmap mode have priority over everything else, check American Truck */
+	// bitmap mode have priority over everything else, amtruck
+	// TODO: hudson3 contradicts with it, why?
 	if(m_exgfx_bitmap_mode)
 	{
 		int count = 0;
@@ -401,10 +412,10 @@ uint32_t pc6001mk2_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 					pen[1] = m_video_base[count+0x2000] >> (6-i*2) & 3;
 
 					int color = 0x10;
-					color |= ((pen[0] & 1) << 2);
-					color |= ((pen[0] & 2) >> 1);
-					color |= ((pen[1] & 1) << 1);
-					color |= ((pen[1] & 2) << 2);
+					color |= BIT(pen[0], 1) << 0;
+					color |= BIT(pen[1], 0) << 1;
+					color |= BIT(pen[0], 0) << 2;
+					color |= BIT(pen[1], 1) << 3;
 
 					if (cliprect.contains((x+i)*2+0, y))
 						bitmap.pix(y, (x+i)*2+0) = m_palette->pen(color);
@@ -441,16 +452,16 @@ uint32_t pc6001mk2_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 					if(m_bgcol_bank & 4) //PC-6001 emulation mode
 					{
 						color = 0x08;
-						color |= (pen[0]) | (pen[1]<<1);
+						color |= (pen[0]) | (pen[1] << 1);
 						color |= (m_bgcol_bank & 1) << 2;
 					}
 					else //Mk-2 mode
 					{
 						color = 0x10;
-						color |= ((pen[0] & 1) << 2);
-						color |= ((pen[1] & 1) >> 0);
-						color |= ((m_bgcol_bank & 1) << 1);
-						color |= ((m_bgcol_bank & 2) << 2);
+						color |= BIT(pen[1], 0) << 0;
+						color |= BIT(m_bgcol_bank, 0) << 1;
+						color |= BIT(pen[0], 0) << 2;
+						color |= BIT(m_bgcol_bank, 1) << 3;
 					}
 
 					if (cliprect.contains(x+i, y))
@@ -536,10 +547,8 @@ uint32_t pc6001mk2sr_state::screen_update(screen_device &screen, bitmap_ind16 &b
 
 						int pen = gfx_data[(tile * 0x10) + yi] >> (7 - xi) & 1;
 
-						int fgcol = (attr & 0x0f) + 0x10;
-						// TODO: definitely wants bright colors for N66SR BASIC, but quite won't work for "PC-6*01 World" screens
-						// (can't pinpoint banking on this HW, or maybe it's side effect of CLUT?)
-						int bgcol = ((attr & 0x70) >> 4) + 0x18; //+ m_bgcol_bank;
+						int fgcol = m_sr_clut[(attr & 0x0f)] + 0x10;
+						int bgcol = m_sr_clut[((attr & 0x70) >> 4) | 8] + 0x10; //+ m_bgcol_bank;
 
 						int color = pen ? fgcol : bgcol;
 
@@ -575,7 +584,7 @@ uint32_t pc6001mk2sr_state::screen_update(screen_device &screen, bitmap_ind16 &b
 				vram_addr = ((x + scroll_x) % x_pitch) + ((y + scroll_y) % y_pitch) * x_pitch;
 
 				// wants RGB -> BRG rotation
-				// (is it using a different palette bank?)
+				// (essentially the same bitswap as the planar modes above, applied to packed format)
 				u8 color = bitswap<4>(m_gvram[vram_addr] & 0x0f, 3, 0, 2, 1) + 0x10;
 				if (cliprect.contains(x, y))
 					bitmap.pix(y, x) = m_palette->pen(color);

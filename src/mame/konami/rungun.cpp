@@ -45,6 +45,8 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+#include "endianness.h"
+
 #include "rungun_dual.lh"
 
 
@@ -667,10 +669,10 @@ void rungun_state::rng(machine_config &config)
 	m_palette->enable_shadows();
 	m_palette->enable_highlights();
 
-	K053936(config, m_k053936, 0);
+	K053936(config, m_k053936);
 	m_k053936->set_offsets(34, 9);
 
-	K055673(config, m_k055673, 0);
+	K055673(config, m_k055673);
 	m_k055673->set_sprite_callback(FUNC(rungun_state::sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_RNG, -8, 15);
 	m_k055673->set_palette(m_palette);

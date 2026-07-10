@@ -642,7 +642,7 @@ void exorciser_state::exorciser(machine_config &config)
 	M6800(config, m_maincpu, 10000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &exorciser_state::dbg_map);
 
-	ADDRESS_MAP_BANK(config, m_bankdev, 0);
+	ADDRESS_MAP_BANK(config, m_bankdev);
 	m_bankdev->set_endianness(ENDIANNESS_BIG);
 	m_bankdev->set_data_width(8);
 	m_bankdev->set_addr_width(16);
@@ -659,7 +659,7 @@ void exorciser_state::exorciser(machine_config &config)
 	m_brg->out_f<9>().set(FUNC(exorciser_state::write_f9_clock));
 	m_brg->out_f<13>().set(FUNC(exorciser_state::write_f13_clock));
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
@@ -680,17 +680,17 @@ void exorciser_state::exorciser(machine_config &config)
 	m_pia_lpt->ca2_handler().set(FUNC(exorciser_state::pia_lpt_ca2_w));
 	m_pia_lpt->readpb_handler().set(FUNC(exorciser_state::pia_lpt_pb_r));
 
-	PRINTER(config, m_printer, 0);
+	PRINTER(config, m_printer);
 
 	// MEX6850? Serial printer port
-	ACIA6850(config, m_acia_prn, 0);
+	ACIA6850(config, m_acia_prn);
 	m_acia_prn->txd_handler().set("rs232_prn", FUNC(rs232_port_device::write_txd));
 
 	rs232_port_device &rs232_prn(RS232_PORT(config, "rs232_prn", default_rs232_devices, "printer"));
 	rs232_prn.rxd_handler().set(m_acia_prn, FUNC(acia6850_device::write_rxd));
 	rs232_prn.set_option_device_input_defaults("printer", DEVICE_INPUT_DEFAULTS_NAME(printer));
 
-	M68SFDC(config, m_fdc, 0);
+	M68SFDC(config, m_fdc);
 	m_fdc->irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
 	m_fdc->nmi_handler().set(m_mainnmi, FUNC(input_merger_device::in_w<3>));
 

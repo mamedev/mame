@@ -5,7 +5,7 @@ license:CC0-1.0
 -->
 <softwarelist name="c64_flop_orig" description="Commodore 64 original disks">
 
-	<!-- Games -->
+<!-- !Games -->
 
 	<software name="aztecchl">
 		<description>Aztec Challenge</description>
@@ -78,17 +78,18 @@ Fails loading
 		</part>
 	</software>
 
-	<software name="bbsb" supported="no">
+	<software name="bbsb" supported="yes">
 		<description>Bounty Bob Strikes Back! (v1.2)</description>
 		<year>1985</year>
 		<publisher>Big Five</publisher>
 		<notes><![CDATA[
-LOAD "BBSB",8,1
-Fails to LOAD "$",8 first time around, requires LOAD "*",8 first
-Eventually goes "CHECKSUM ERROR! LOAD ABORTED!" on bootstrap
+LOAD "*",8 then LOAD "BBSB",8,1
 ]]></notes>
+		<info name="usage" value="Needs a joystick in port 1 once it loads"/>
 		<info name="protection" value="halftrack" />
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		<!-- Goes "CHECKSUM ERROR! LOAD ABORTED!" on bootstrap otherwise -->
+		<sharedfeat name="write_protected" value="true" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<!-- will not load if disk is not write protected -->
@@ -120,7 +121,7 @@ LOAD "COMMANDO",8,1
 		<publisher>Cinemaware</publisher>
 		<notes><![CDATA[
 LOAD "*",8,1
-Gets stuck at a "V-MAX!" screen
+Shows "V-MAX!" screen then punts back to BASIC prompt
 ]]></notes>
 		<info name="protection" value="vmaxv2" />
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
@@ -160,9 +161,10 @@ Gets stuck at a "V-MAX!" screen
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
 LOAD "0:*",8,1
-Never leaves BASIC
+Black screen during loading
 ]]></notes>
 		<info name="video" value="PAL" />
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="green_beret[ocean_1986].g64" size="333744" crc="d5795cde" sha1="889393ba8d3238e8cb53640c85eb7153570a0be0"/>
@@ -188,10 +190,11 @@ Never leaves BASIC
 		<publisher>Gremlin Graphics</publisher>
 		<notes><![CDATA[
 LOAD "*",8,1
-Punts to BASIC
+Resets to BASIC, LOAD "$",8 non-functional
 ]]></notes>
 		<info name="video" value="PAL" />
 		<info name="protection" value="cyan" />
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="jack_the_nipper[gremlin_1986](cyan1)(pal).g64" size="333744" crc="14c6f53d" sha1="6427cc16ed360890034f84182a9db02b2e568f0a"/>
@@ -205,10 +208,11 @@ Punts to BASIC
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
 LOAD "*",8,1
-Punts to BASIC
+Punts to BASIC, or just fails loading
 ]]></notes>
 		<info name="video" value="PAL" />
 		<info name="protection" value="cyan" />
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="miami_vice[ocean_1986](cyan1)(pal).g64" size="333744" crc="b3556e0c" sha1="ed1d290baf83f0ad31424a4e11f4f2aef8515dbb"/>
@@ -238,6 +242,7 @@ Locks up during boot
 ]]></notes>
 		<info name="video" value="PAL" />
 		<info name="protection" value="xrom" />
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="rambo[ocean_1985](pal).g64" size="333744" crc="e9e186dd" sha1="ce2c06cf341c629e75ae6e47887f2aab635f9340"/>
@@ -255,6 +260,7 @@ Hangs on loading transition between trademarks and title
 ]]></notes>
 		<info name="video" value="NTSC" />
 		<info name="protection" value="signature" />
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="rambo_first_blood_part_ii[thunder_mtn_1985](ntsc).g64" size="333744" crc="f1e99142" sha1="8263d6eecd017468d505891b3546b80f7cc4989f"/>
@@ -272,6 +278,7 @@ Punts to BASIC
 ]]></notes>
 		<info name="video" value="PAL" />
 		<info name="protection" value="ocean" />
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="333744">
@@ -315,14 +322,16 @@ Part of player sprite draws transparent (collisions still works)
 		</part>
 	</software>
 
-	<software name="spoker" supported="no">
+	<software name="spoker" supported="yes">
 		<description>Strip Poker</description>
 		<year>1984</year>
 		<publisher>Artworx</publisher>
 		<notes><![CDATA[
-None of the files on disk leaves BASIC
+LOAD "STRIP POKER",8
 ]]></notes>
 		<info name="video" value="PAL" />
+		<sharedfeat name="write_protected" value="true" />
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="strip_poker[artworx_1984](pal).g64" size="333744" crc="4a66bc83" sha1="68d66ee9f357c3964303e94c625ff9587f5df7c2"/>
@@ -340,6 +349,7 @@ Crashes at the end of loading sequence
 ]]></notes>
 		<info name="video" value="PAL" />
 		<info name="protection" value="custom_dos" />
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="333744">
@@ -364,6 +374,7 @@ Punts to BASIC
 ]]></notes>
 		<info name="video" value="PAL" />
 		<info name="protection" value="sload" />
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="333744">
@@ -378,7 +389,7 @@ Punts to BASIC
 		</part>
 	</software>
 
-	<!-- Compilations -->
+<!-- !Compilations -->
 
 	<software name="gameset" supported="no">
 		<description>Game Set and Match</description>
@@ -386,9 +397,9 @@ Punts to BASIC
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
 LOAD "0:*",8,1
-Fails loading at least first two games
-Not extensively tested
+All games fails loading
 ]]></notes>
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 Side 1"/>
 			<dataarea name="flop" size="333744">
@@ -415,7 +426,7 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Applications -->
+<!-- !Applications -->
 
 	<software name="basickaa">
 		<description>BASIC-kääntäjä (Finland)</description>
@@ -453,7 +464,7 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- diskmags -->
+<!-- !diskmags -->
 
 	<software name="input64_22">
 		<description>INPUT 64 10/86</description>
@@ -789,7 +800,7 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Educational -->
+<!-- !Educational -->
 
 	<software name="koalapnt">
 		<!-- Flippy disk, a800 version on side B -->
@@ -805,9 +816,9 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Test/Demo disks -->
+<!-- !Test/Demo disks -->
 
-	<!-- MIDI -->
+<!-- !MIDI -->
 
 	<software name="midi8p">
 		<description>MIDI 8+</description>
@@ -858,6 +869,27 @@ Not extensively tested
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="sonusseq.g64" size="333744" crc="4b2d949a" sha1="824c0058c567e25fb4bc19b1f7a75352c4e19459"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1541algn">
+		<description>1541/1571 Drive Alignment</description>
+		<year>1987</year>
+		<publisher>Free Spirit Software</publisher>
+		<notes><![CDATA[
+LOAD "*",8
+]]></notes>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="1541_1571_drive_alignment_s0.g64" size="279582" crc="b6d3296b" sha1="2820b8c6a07461182eaa946ab65892310fb022b4"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="1541_1571_drive_alignment_s1.g64" size="279582" crc="dc31e1b2" sha1="be1043f10d4798472a28e86faaad230d43ca9059"/>
 			</dataarea>
 		</part>
 	</software>

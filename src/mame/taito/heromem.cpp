@@ -241,11 +241,11 @@ void heromem_state::heromem(machine_config &config)
 	rscreen.screen_vblank().set(FUNC(heromem_state::screen_vblank_r));
 	rscreen.set_palette("tc0091lvc_r:palette");
 
-	pc060ha_device &ciu_l(PC060HA(config, "ciu_l", 0));
+	pc060ha_device &ciu_l(PC060HA(config, "ciu_l"));
 	ciu_l.nmi_callback().set_inputline(m_tc0091lvc_l, INPUT_LINE_NMI);
 	ciu_l.reset_callback().set_inputline(m_tc0091lvc_l, INPUT_LINE_RESET);
 
-	pc060ha_device &ciu_r(PC060HA(config, "ciu_r", 0));
+	pc060ha_device &ciu_r(PC060HA(config, "ciu_r"));
 	ciu_r.nmi_callback().set_inputline(m_tc0091lvc_r, INPUT_LINE_NMI);
 	ciu_r.reset_callback().set_inputline(m_tc0091lvc_r, INPUT_LINE_RESET);
 
@@ -258,11 +258,11 @@ void heromem_state::heromem(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	tc0140syt_device &syt_l(TC0140SYT(config, "tc0140syt_l", 0));
+	tc0140syt_device &syt_l(TC0140SYT(config, "tc0140syt_l"));
 	syt_l.nmi_callback().set_inputline("audiocpu_l", INPUT_LINE_NMI);
 	syt_l.reset_callback().set_inputline("audiocpu_l", INPUT_LINE_RESET);
 
-	tc0140syt_device &syt_r(TC0140SYT(config, "tc0140syt_r", 0));
+	tc0140syt_device &syt_r(TC0140SYT(config, "tc0140syt_r"));
 	syt_r.nmi_callback().set_inputline("audiocpu_r", INPUT_LINE_NMI);
 	syt_r.reset_callback().set_inputline("audiocpu_r", INPUT_LINE_RESET);
 

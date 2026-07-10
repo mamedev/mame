@@ -227,6 +227,7 @@ Unoffical software releases for the Coleco Colecovision
 		</part>
 	</software>
 
+	<!-- TODO: standardize vs. other hash sets (blckonyx) -->
 	<software name="blackonx">
 		<description>The Black Onyx</description>
 		<year>2013</year>

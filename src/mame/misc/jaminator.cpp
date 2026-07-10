@@ -188,7 +188,6 @@ INPUT_PORTS_END
 
 void jaminator_state::machine_start()
 {
-	m_led_power.resolve();
 	m_input_sel = 0;
 	m_link_data = 0;
 

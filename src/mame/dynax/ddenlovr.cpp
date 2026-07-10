@@ -159,6 +159,7 @@ Notes:
 #include "sound/ymopl.h"
 
 #include "emupal.h"
+#include "input.h" // for video debug keys
 #include "screen.h"
 #include "speaker.h"
 
@@ -988,8 +989,6 @@ VIDEO_START_MEMBER(hanakanz_state,hanakanz)
 
 	m_ddenlovr_blit_rom_bits = 16;
 	m_ddenlovr_blit_commands = hanakanz_commands;
-
-	m_led.resolve();
 
 	save_item(NAME(m_romdata));
 	save_item(NAME(m_palette_index));
@@ -4832,7 +4831,7 @@ void htengoku_state::htengoku(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	RST_POS_BUFFER(config, "mainirq", 0).int_callback().set_inputline(m_maincpu, 0);
+	RST_POS_BUFFER(config, "mainirq").int_callback().set_inputline(m_maincpu, 0);
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(htengoku_state::flipscreen_w));
@@ -4855,7 +4854,7 @@ void htengoku_state::htengoku(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->screen_vblank().set(FUNC(htengoku_state::vblank_w));
 
-	DYNAX_BLITTER_REV2(config, m_blitter, 0);
+	DYNAX_BLITTER_REV2(config, m_blitter);
 	m_blitter->vram_out_cb().set(FUNC(htengoku_state::blit_pixel_w));
 	m_blitter->scrollx_cb().set(FUNC(htengoku_state::blit_scrollx_w));
 	m_blitter->scrolly_cb().set(FUNC(htengoku_state::blit_scrolly_w));
@@ -9576,8 +9575,6 @@ MACHINE_START_MEMBER(ddenlovr_state,rongrong)
 
 MACHINE_START_MEMBER(mmpanic_state,mmpanic)
 {
-	m_leds.resolve();
-
 	uint8_t *rom = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8, &rom[0x10000], 0x8000);
 
@@ -9588,8 +9585,6 @@ MACHINE_START_MEMBER(mmpanic_state,mmpanic)
 
 MACHINE_START_MEMBER(mmpanic_state,funkyfig)
 {
-	m_leds.resolve();
-
 	uint8_t *rom = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0x10, &rom[0x10000], 0x8000);
 	membank("bank2")->configure_entries(0, 8,    &rom[0x90000], 0x1000);

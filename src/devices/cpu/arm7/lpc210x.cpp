@@ -259,7 +259,7 @@ void lpc210x_device::write_timer(int timer, int offset, uint32_t data, uint32_t 
 
 void lpc210x_device::device_add_mconfig(machine_config &config)
 {
-	PL190_VIC(config, m_vic, 0);
+	PL190_VIC(config, m_vic);
 	m_vic->out_irq_cb().set_inputline(*this, ARM7_IRQ_LINE);
 	m_vic->out_fiq_cb().set_inputline(*this, ARM7_FIRQ_LINE);
 }

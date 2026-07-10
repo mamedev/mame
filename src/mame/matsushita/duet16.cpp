@@ -372,7 +372,7 @@ void duet16_state::duet16(machine_config &config)
 
 	I8741A(config, "i8741", 20_MHz_XTAL / 4);
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	AM9517A(config, m_dmac, 20_MHz_XTAL / 4);
@@ -383,7 +383,7 @@ void duet16_state::duet16(machine_config &config)
 	m_dmac->out_iow_callback<0>().set(m_fdc, FUNC(upd765a_device::dma_w));
 	m_dmac->out_eop_callback().set(m_fdc, FUNC(upd765a_device::tc_line_w));
 
-	pit8253_device &bgpit(PIT8253(config, "bgpit", 0));
+	pit8253_device &bgpit(PIT8253(config, "bgpit"));
 	bgpit.set_clk<0>(8_MHz_XTAL / 13);
 	bgpit.set_clk<1>(8_MHz_XTAL / 13);
 	bgpit.set_clk<2>(8_MHz_XTAL / 13);

@@ -69,7 +69,7 @@ static void pc_dd_floppies(device_slot_interface &device)
 
 void europc_fdc_device::device_add_mconfig(machine_config &config)
 {
-	WD37C65C(config, m_fdc, 16_MHz_XTAL);
+	WD37C65B(config, m_fdc, 16_MHz_XTAL); // WD37C65BJM
 	m_fdc->intrq_wr_callback().set(FUNC(europc_fdc_device::irq_w));
 	m_fdc->drq_wr_callback().set(FUNC(europc_fdc_device::drq_w));
 	// single built-in 3.5" 720K drive, connector for optional external 3.5" or 5.25" drive
@@ -86,8 +86,8 @@ void europc_fdc_device::device_start()
 
 void europc_fdc_device::map(address_map &map)
 {
-	map(2, 2).w(m_fdc, FUNC(wd37c65c_device::dor_w));
-	map(4, 5).m(m_fdc, FUNC(wd37c65c_device::map));
+	map(2, 2).w(m_fdc, FUNC(wd37c65b_device::dor_w));
+	map(4, 5).m(m_fdc, FUNC(wd37c65b_device::map));
 	// TODO: DCR also decoded by JIM/BIGJIM
 }
 
@@ -425,7 +425,7 @@ void europc_pc_state::europc(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &europc_pc_state::europc_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	PCNOPPI_MOTHERBOARD(config, m_mb, 0).set_cputag(m_maincpu);
+	PCNOPPI_MOTHERBOARD(config, m_mb).set_cputag(m_maincpu);
 	m_mb->int_callback().set_inputline(m_maincpu, 0);
 	m_mb->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_mb->kbddata_callback().set("kbd", FUNC(europc_keyboard_device::kbdata_w));

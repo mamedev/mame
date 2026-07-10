@@ -1024,8 +1024,6 @@ GFXDECODE_END
 
 void igrosoft_gamble_state::machine_start()
 {
-	m_lamps.resolve();
-
 	m_mainbank->configure_entries(0, 16, memregion("maincpu")->base(), 0x4000);
 
 	save_item(NAME(m_disp_enable));
@@ -1065,7 +1063,7 @@ void igrosoft_gamble_state::igrosoft_gamble(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, "aysnd", 6000000/4).add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	M48T35(config, m_m48t35, 0);
+	M48T35(config, m_m48t35);
 	HOPPER(config, m_hopper, attotime::from_msec(100));
 }
 

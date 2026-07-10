@@ -351,7 +351,7 @@ void hanadojo_state::hanadojo(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &hanadojo_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &hanadojo_state::io_map);
 
-	IOX_HLE(config, m_iox[0], 0);
+	IOX_HLE(config, m_iox[0]);
 	m_iox[0]->p1_key_input_cb<0>().set_ioport("P1_KEY0");
 	m_iox[0]->p1_key_input_cb<1>().set_ioport("P1_KEY1");
 	m_iox[0]->p1_key_input_cb<2>().set_ioport("P1_KEY2");
@@ -359,7 +359,7 @@ void hanadojo_state::hanadojo(machine_config &config)
 	m_iox[0]->p2_key_input_cb<1>().set_ioport("P2_KEY1");
 	m_iox[0]->p2_key_input_cb<2>().set_ioport("P2_KEY2");
 
-	IOX_HLE(config, m_iox[1], 0);
+	IOX_HLE(config, m_iox[1]);
 	m_iox[1]->p1_direct_input_cb().set_ioport("DSWD");
 	// TODO: looks latch inverted compared to the $a0-$a1 version
 	m_iox[1]->p2_direct_input_cb().set([this] () { return (m_dswb->read() & 0x3f) ^ 0x3f; });

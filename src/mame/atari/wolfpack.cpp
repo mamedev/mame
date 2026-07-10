@@ -411,7 +411,6 @@ TIMER_CALLBACK_MEMBER(wolfpack_state::periodic_callback)
 
 void wolfpack_state::machine_start()
 {
-	m_led.resolve();
 	m_periodic_timer = timer_alloc(FUNC(wolfpack_state::periodic_callback), this);
 }
 

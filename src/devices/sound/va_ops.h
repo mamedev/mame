@@ -14,6 +14,7 @@
 DECLARE_DEVICE_TYPE(VA_CONST, va_const_device)
 DECLARE_DEVICE_TYPE(VA_SCALE_OFFSET, va_scale_offset_device)
 DECLARE_DEVICE_TYPE(VA_COMPARATOR, va_comparator_device)
+DECLARE_DEVICE_TYPE(VA_LAMBDA, va_lambda_device)
 
 
 // Outputs a constant value to a stream. This is meant for things like
@@ -115,5 +116,23 @@ private:
 	bool m_state;
 };
 
+
+// Processes each sample in the input stream with an arbitrary function.
+class va_lambda_device : public device_t, public device_sound_interface
+{
+public:
+	using func_t = std::function<float (float)>;
+
+	va_lambda_device(const machine_config &mconfig, const char *tag, device_t *owner, func_t func) ATTR_COLD;
+	va_lambda_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0) ATTR_COLD;
+
+protected:
+	void device_start() override ATTR_COLD;
+	void sound_stream_update(sound_stream &stream) override;
+
+private:
+	sound_stream *m_stream;
+	func_t m_func;
+};
 
 #endif  // MAME_SOUND_VA_OPS_H

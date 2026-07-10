@@ -685,7 +685,7 @@ void djboy_state::djboy(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x200);
 	m_palette->set_endianness(ENDIANNESS_BIG);
 
-	KANEKO_PANDORA(config, m_pandora, 0, m_palette, gfx_djboy_spr);
+	KANEKO_PANDORA(config, m_pandora, m_palette, gfx_djboy_spr);
 
 	SPEAKER(config, "speaker", 2).front();
 

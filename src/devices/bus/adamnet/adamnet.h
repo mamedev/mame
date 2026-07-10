@@ -26,7 +26,7 @@ class adamnet_device : public device_t
 {
 public:
 	// construction/destruction
-	adamnet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adamnet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void add_device(device_t *target);
 
@@ -81,7 +81,7 @@ public:
 		set_bus(std::forward<T>(bus));
 		set_options(std::forward<U>(opts), dflt, false);
 	}
-	adamnet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adamnet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	// device_t implementation

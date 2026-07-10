@@ -118,6 +118,8 @@
 
         ATF22V10C   = QP24 QF5893 (Power Down Mode)
 
+        ATV750      = QP24 QF14394
+
         PLS173      = QP24
 
         GAL6001     = QP24
@@ -166,6 +168,8 @@
 #define OUTPUT_FEEDBACK_COMBINATORIAL 0x00000020 /* Feedback state independent of output enable */
 #define OUTPUT_FEEDBACK_REGISTERED    0x00000040 /* Feedback state independent of output enable */
 #define OUTPUT_FEEDBACK_NONE          0x00000080 /* Feedback not available */
+#define OUTPUT_BURIED                 0x00000100 /* Buried register which should not have terms printed */
+#define OUTPUT_COMBINED_TERMS         0x00000200 /* Combines multiple sets of terms */
 
 /*
     Output Feedback Output
@@ -327,6 +331,7 @@ static void print_gal20v8_product_terms(const pal_data* pal, const jed_data* jed
 static void print_palce22v10_pal22v10_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_gal22v10_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_atf22v10_power_down_mode_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_atv750_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_82s153_pls153_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_ck2605_product_terms(const pal_data* pal, const jed_data* jed);
 #if defined(ricoh_pals)
@@ -393,6 +398,7 @@ static void config_gal20v8_pins(const pal_data* pal, const jed_data* jed);
 static void config_palce22v10_pal22v10_pins(const pal_data* pal, const jed_data* jed);
 static void config_gal22v10_pins(const pal_data* pal, const jed_data* jed);
 static void config_atf22v10_power_down_mode_pins(const pal_data* pal, const jed_data* jed);
+static void config_atv750_pins(const pal_data* pal, const jed_data* jed);
 static void config_82s153_pls153_pins(const pal_data* pal, const jed_data* jed);
 static void config_ck2605_pins(const pal_data* pal, const jed_data* jed);
 #if defined(ricoh_pals)
@@ -448,10 +454,10 @@ static uint16_t get_peel18cv8_pin_fuse_state(const pal_data* pal, const jed_data
 static uint8_t *dstbuf;
 static size_t dstbuflen;
 
-static uint16_t inputpins[26];
+static uint16_t inputpins[42];
 static uint16_t inputpinscount;
 
-static pin_output_config outputpins[26];
+static pin_output_config outputpins[42];
 static uint16_t outputpinscount;
 
 static pin_fuse_rows pal10l8pinfuserows[] = {
@@ -741,6 +747,41 @@ static pin_fuse_rows atf22v10powerdownmodepinfuserows[] = {
 	{21, 924,  968,  1452},
 	{22, 440,  484,  880},
 	{23, 44,   88,   396}};
+
+static pin_fuse_rows atv750pinfuserows[] = {
+	/* Physical pins */
+	{14, 14196, 13188, 13776},
+	{15, 13104, 11928, 12684},
+	{16, 11844, 10500, 11424},
+	{17, 10416, 8904,  9996},
+	{18, 8820,  7140,  8400},
+	{19, 7056,  5376,  6636},
+	{20, 5292,  3780,  4872},
+	{21, 3696,  2352,  3276},
+	{22, 2268,  1092,  1848},
+	{23, 1008,  0,     588},
+	/* Q1 nodes */
+	{25, NO_OUTPUT_ENABLE_FUSE_ROW, 13524, 13776},
+	{26, NO_OUTPUT_ENABLE_FUSE_ROW, 12348, 12684},
+	{27, NO_OUTPUT_ENABLE_FUSE_ROW, 11004, 11424},
+	{28, NO_OUTPUT_ENABLE_FUSE_ROW, 9492,  9996},
+	{29, NO_OUTPUT_ENABLE_FUSE_ROW,  7812, 8400},
+	{30, NO_OUTPUT_ENABLE_FUSE_ROW,  6048, 6636},
+	{31, NO_OUTPUT_ENABLE_FUSE_ROW,  4368, 4872},
+	{32, NO_OUTPUT_ENABLE_FUSE_ROW,  2856, 3276},
+	{33, NO_OUTPUT_ENABLE_FUSE_ROW,  1512, 1848},
+	{34, NO_OUTPUT_ENABLE_FUSE_ROW,  336,  588},
+	/* Q0 nodes */
+	{35, NO_OUTPUT_ENABLE_FUSE_ROW, 13188, 13440},
+	{36, NO_OUTPUT_ENABLE_FUSE_ROW, 11928, 12264 },
+	{37, NO_OUTPUT_ENABLE_FUSE_ROW, 10500, 10920 },
+	{38, NO_OUTPUT_ENABLE_FUSE_ROW, 8904,  9408 },
+	{39, NO_OUTPUT_ENABLE_FUSE_ROW, 7140,  7728 },
+	{40, NO_OUTPUT_ENABLE_FUSE_ROW, 5376,  5964 },
+	{41, NO_OUTPUT_ENABLE_FUSE_ROW, 3780,  4284 },
+	{42, NO_OUTPUT_ENABLE_FUSE_ROW, 2352,  2772 },
+	{43, NO_OUTPUT_ENABLE_FUSE_ROW, 1092,  1428 },
+	{44, NO_OUTPUT_ENABLE_FUSE_ROW, 0,     252 }};
 
 static pin_fuse_rows _82s153_pls153pinfuserows[] = {
 	{9,  1472, 0, 0},
@@ -1609,6 +1650,50 @@ static pin_fuse_columns atf22v10powerdownmodepinfusecolumns[] = {
 	{22, 7,  6},
 	{23, 3,  2}};
 
+static pin_fuse_columns atv750pinfusecolumns[] = {
+	{13, 1, 0},
+	{11, 3, 2},
+	{10, 10, 11},
+	{9, 18, 19},
+	{8, 26, 27},
+	{7, 34, 35},
+	{6, 42, 43},
+	{5, 50, 51},
+	{4, 58, 59},
+	{3, 66, 67},
+	{2, 74, 75},
+	{1, 82, 83},
+	{14, 8, 9},
+	{15, 16, 17},
+	{16, 24, 25},
+	{17, 32, 33},
+	{18, 40, 41},
+	{19, 48, 49},
+	{20, 56, 57},
+	{21, 64, 65},
+	{22, 72, 73},
+	{23, 80, 81},
+	{25, 5, 4},
+	{26, 13, 12},
+	{27, 21, 20},
+	{28, 29, 28},
+	{29, 37, 36},
+	{30, 45, 44},
+	{31, 53, 52},
+	{32, 61, 60},
+	{33, 69, 68},
+	{34, 77, 76},
+	{35, 7, 6},
+	{36, 15, 14},
+	{37, 23, 22},
+	{38, 31, 30},
+	{39, 39, 38},
+	{40, 47, 46},
+	{41, 55, 54},
+	{42, 63, 62},
+	{43, 71, 70},
+	{44, 79, 78}};
+
 static pin_fuse_columns _82s153_pls153pinfusecolumns[] = {
 	{1,  1,  0},
 	{2,  3,  2},
@@ -2390,6 +2475,13 @@ static pal_data paldata[] = {
 		config_atf22v10_power_down_mode_pins,
 		nullptr,
 		nullptr},
+	{ "ATV750", 14394,
+		atv750pinfuserows, std::size(atv750pinfuserows),
+		atv750pinfusecolumns, std::size(atv750pinfusecolumns),
+		print_atv750_product_terms,
+		config_atv750_pins,
+		nullptr,
+		nullptr },
 	{"82S153", 1842,
 		_82s153_pls153pinfuserows, std::size(_82s153_pls153pinfuserows),
 		_82s153_pls153pinfusecolumns, std::size(_82s153_pls153pinfusecolumns),
@@ -3177,6 +3269,11 @@ static void print_output_pins()
 			fprintf(stderr, "Unknown output feedback type for pin %d!\n", outputpins[index].pin);
 		}
 
+		if (flags & OUTPUT_COMBINED_TERMS)
+		{
+			printf("Combined terms, ");
+		}
+
 		if (flags & OUTPUT_ACTIVELOW)
 		{
 			printf("Active low");
@@ -3222,6 +3319,11 @@ static void print_product_terms(const pal_data* pal, const jed_data* jed)
 		flags = outputpins[index].flags;
 
 		indent = 0;
+
+		if (flags & OUTPUT_BURIED)
+		{
+			continue;
+		}
 
 		if (flags & OUTPUT_ACTIVELOW)
 		{
@@ -3969,6 +4071,52 @@ static void print_atf22v10_power_down_mode_product_terms(const pal_data* pal, co
 }
 
 
+/*-------------------------------------------------
+	print_atv750_product_terms - prints the product
+	terms for an ATV750
+-------------------------------------------------*/
+
+static void print_atv750_product_terms(const pal_data* pal, const jed_data* jed)
+{
+	char buffer[200];
+	int ar0_rows[] = { 13860, 12768, 11508, 10080, 8484, 6720, 4956, 3360, 1932, 672 };
+	int ar1_rows[] = { 14112, 13020, 11760, 10332, 8736, 6972, 5208, 3612, 2184, 924 };
+	int clockq0_rows[] = { 13944, 12852, 11592, 10164, 8568, 6804, 5040, 3444, 2016, 756 };
+	int clockq1_rows[] = { 14028, 12936, 11676, 10248, 8652, 6888, 5124, 3528, 2100, 840 };
+	int oe_rows[] = { 14196, 13104, 11844, 10416, 8820, 7056, 5292, 3696, 2268, 1008 };
+
+	print_product_terms(pal, jed);
+
+	for (int i = 0; i < 10; i++)
+	{
+		generate_product_terms(pal, jed, clockq0_rows[i], buffer);
+		printf(OUTPUT_SYMBOL "%d.ck " COMBINATORIAL_ASSIGNMENT " %s\n", i + 14, buffer);
+	}
+
+	for (int i = 0; i < 10; i++)
+	{
+		generate_product_terms(pal, jed, clockq1_rows[i], buffer);
+		printf(OUTPUT_SYMBOL "%d.ck " COMBINATORIAL_ASSIGNMENT " %s\n", i + 25, buffer);
+	}
+
+	for (int i = 0; i < 10; i++)
+	{
+		generate_product_terms(pal, jed, oe_rows[i], buffer);
+		printf(OUTPUT_SYMBOL "%d.oe " COMBINATORIAL_ASSIGNMENT " %s\n", i + 14, buffer);
+	}
+
+	for (int i = 0; i < 10; i++)
+	{
+		generate_product_terms(pal, jed, ar0_rows[i], buffer);
+		printf(OUTPUT_SYMBOL "%d.ar " COMBINATORIAL_ASSIGNMENT " %s\n", i + 14, buffer);
+	}
+
+	for (int i = 0; i < 10; i++)
+	{
+		generate_product_terms(pal, jed, ar1_rows[i], buffer);
+		printf(OUTPUT_SYMBOL "%d.ar " COMBINATORIAL_ASSIGNMENT " %s\n", i + 25, buffer);
+	}
+}
 
 /*-------------------------------------------------
     print_82s153_pls153_product_terms - prints the product
@@ -6524,7 +6672,118 @@ static void config_atf22v10_power_down_mode_pins(const pal_data* pal, const jed_
 	set_output_pins(output_pins, output_pin_count);
 }
 
+/*-------------------------------------------------
+	config_atv750_pins - configures the pins for
+	an ATV750
+-------------------------------------------------*/
 
+static void config_atv750_pins(const pal_data* pal, const jed_data* jed)
+{
+	pin_fuse_rows* pinfuserows = (pin_fuse_rows*)pal->pinfuserows;
+
+	typedef struct _output_logic_macrocell output_logic_macrocell;
+	struct _output_logic_macrocell
+	{
+		uint16_t pin;
+		uint16_t s0_fuse; /* 0 - combinatorial, 1 - registered */
+		uint16_t s1_fuse; /* 0 - combined terms, 1 - separate terms */
+		uint16_t s2_fuse; /* 0 - active low, 1 - active high */
+	};
+
+	static output_logic_macrocell macrocells[] = {
+		{14, 14391, 14392, 14393},
+		{15, 14388, 14389, 14390},
+		{16, 14385, 14386, 14387},
+		{17, 14382, 14383, 14384},
+		{18, 14379, 14380, 14381},
+		{19, 14376, 14377, 14378},
+		{20, 14373, 14374, 14375},
+		{21, 14370, 14371, 14372},
+		{22, 14367, 14368, 14369},
+		{23, 14364, 14365, 14366}};
+	static uint16_t input_pins[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44 };
+	pin_output_config output_pins[std::size(macrocells) * 3];
+	uint16_t index, output_pin_count;
+
+	output_pin_count = 0;
+
+	for (index = 10; index < std::size(output_pins); ++index)
+	{
+		output_pins[index].pin = (25 - 10) + index;
+		output_pins[index].flags = OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED | OUTPUT_ACTIVEHIGH | OUTPUT_FEEDBACK_NONE;
+		++output_pin_count;
+	}
+
+	for (index = 0; index < std::size(macrocells); ++index)
+	{
+		if (jed_get_fuse(jed, macrocells[index].s0_fuse))
+		{
+			/* Combinatorial output or dedicated input */
+
+			if (does_output_enable_fuse_row_allow_output(pal, jed, pal->pinfuserows[index].fuserowoutputenable))
+			{
+				output_pins[index].pin = macrocells[index].pin;
+				output_pins[index].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT;
+
+				if (!jed_get_fuse(jed, macrocells[index].s2_fuse))
+				{
+					output_pins[index].flags |= OUTPUT_ACTIVELOW;
+				}
+				else
+				{
+					output_pins[index].flags |= OUTPUT_ACTIVEHIGH;
+				}
+
+				if (!jed_get_fuse(jed, macrocells[index].s1_fuse))
+				{
+					output_pins[index].flags |= OUTPUT_COMBINED_TERMS;
+					output_pins[index + 20].flags |= OUTPUT_BURIED; /* Q0 register. Don't resolve in combined terms mode. */
+					output_pins[index + 10].flags |= OUTPUT_BURIED; /* Q1 register. Don't resolve in combined terms mode. */
+				}
+				else
+				{
+					pinfuserows[index].fuserowtermend = pinfuserows[index + 20].fuserowtermend;
+					output_pins[index + 20].flags |= OUTPUT_BURIED; /* Q0 register. Don't resolve in combined terms mode. */
+				}
+
+				++output_pin_count;
+			}
+		}
+		else
+		{
+			/* Registered output */
+
+			output_pins[index].pin = macrocells[index].pin;
+			output_pins[index].flags = OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED;
+
+			if (!jed_get_fuse(jed, macrocells[index].s2_fuse))
+			{
+				output_pins[index].flags |= OUTPUT_ACTIVELOW;
+			}
+			else
+			{
+				output_pins[index].flags |= OUTPUT_ACTIVEHIGH;
+			}
+
+			if (!jed_get_fuse(jed, macrocells[index].s1_fuse))
+			{
+				output_pins[index].flags |= OUTPUT_COMBINED_TERMS;
+				output_pins[index + 20].flags |= OUTPUT_BURIED; /* Q0 register. Don't resolve in combined terms mode. */
+				output_pins[index + 10].flags |= OUTPUT_BURIED; /* Q1 register. Don't resolve in combined terms mode. */
+			}
+			else
+			{
+				pinfuserows[index].fuserowtermend = pinfuserows[index + 20].fuserowtermend;
+				output_pins[index + 20].flags |= OUTPUT_BURIED; /* Q0 register. Don't resolve in combined terms mode. */
+			}
+
+			++output_pin_count;
+		}
+	}
+
+	set_input_pins(input_pins, std::size(input_pins));
+	set_output_pins(output_pins, output_pin_count);
+}
 
 /*-------------------------------------------------
     config_82s153_pls153_pins - configures the pins for

@@ -153,12 +153,12 @@ protected:
 		}
 	}
 
-	virtual const tiny_rom_entry *device_rom_region() const override
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD
 	{
 		return ROM_NAME(a2000kbd);
 	}
 
-	virtual void device_add_mconfig(machine_config &config) override
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD
 	{
 		auto &mcu(I8039(config, "u1", 6_MHz_XTAL));
 		mcu.set_addrmap(AS_PROGRAM, &a2000_kbd_g80_device::program_map);
@@ -170,10 +170,8 @@ protected:
 		mcu.t1_in_cb().set([this] () { return m_mcu_kclk ? 1 : 0; });
 	}
 
-	virtual void device_start() override
+	virtual void device_start() override ATTR_COLD
 	{
-		m_led_kbd_caps.resolve();
-
 		save_item(NAME(m_row_drive));
 		save_item(NAME(m_host_kdat));
 		save_item(NAME(m_mcu_kdat));
@@ -185,13 +183,13 @@ protected:
 		m_mcu_kclk = true;
 	}
 
-	void program_map(address_map &map)
+	void program_map(address_map &map) ATTR_COLD
 	{
 		map.global_mask(0x07ff);
 		map(0x0000, 0x07ff).rom().region("mcu", 0);
 	}
 
-	void ext_map(address_map &map)
+	void ext_map(address_map &map) ATTR_COLD
 	{
 		map.global_mask(0x00ff);
 		map(0x0000, 0x00ff).r(FUNC(a2000_kbd_g80_device::mcu_bus_r));

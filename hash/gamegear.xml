@@ -10292,7 +10292,7 @@ a certain item) -->
 	</software>
 
 	<software name="wwfsteel">
-		<description>WWF Wrestlemania Steel Cage Challenge (Europe, SMS mode)</description>
+		<description>WWF WrestleMania: Steel Cage Challenge (Europe, SMS mode)</description>
 		<year>1993</year>
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="gamegear_cart">

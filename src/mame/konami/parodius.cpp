@@ -198,7 +198,7 @@ void parodius_state::_3fc0_w(uint8_t data)
 
 void parodius_state::sh_irqtrigger_w(uint8_t data)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 }
 
 void parodius_state::sound_arm_nmi_w(uint8_t data)
@@ -384,7 +384,7 @@ void parodius_state::parodius(machine_config &config)
 	m_k053245->set_palette("palette");
 	m_k053245->set_sprite_callback(FUNC(parodius_state::sprite_callback));
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();

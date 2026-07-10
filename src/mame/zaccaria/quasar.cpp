@@ -566,15 +566,15 @@ void quasar_state::quasar(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_quasar);
 	PALETTE(config, m_palette, FUNC(quasar_state::palette), (64 + 1) * 8 + (4 * 256), 0x500);
 
-	S2636(config, m_s2636[0], 0);
+	S2636(config, m_s2636[0]);
 	m_s2636[0]->set_offsets(-13, -26);
 	m_s2636[0]->add_route(ALL_OUTPUTS, "mono", 0.2);
 
-	S2636(config, m_s2636[1], 0);
+	S2636(config, m_s2636[1]);
 	m_s2636[1]->set_offsets(-13, -26);
 	m_s2636[1]->add_route(ALL_OUTPUTS, "mono", 0.2);
 
-	S2636(config, m_s2636[2], 0);
+	S2636(config, m_s2636[2]);
 	m_s2636[2]->set_offsets(-13, -26);
 	m_s2636[2]->add_route(ALL_OUTPUTS, "mono", 0.2);
 

@@ -116,6 +116,8 @@
 #include "i8085.h"
 #include "8085dasm.h"
 
+#include <bit>
+
 #define VERBOSE 0
 #include "logmacro.h"
 
@@ -272,7 +274,7 @@ void i8085a_cpu_device::device_clock_changed()
 
 void i8085a_cpu_device::init_tables()
 {
-	for (int i = 0; i < 256; i++)
+	for (unsigned i = 0; i < 256; i++)
 	{
 		// cycles
 		lut_cycles[i] = is_8085() ? lut_cycles_8085[i] : lut_cycles_8080[i];
@@ -282,7 +284,7 @@ void i8085a_cpu_device::init_tables()
 		if (i == 0) zs |= ZF;
 		if (i & 0x80) zs |= SF;
 
-		u8 p = (population_count_32(i) & 1) ? 0 : PF;
+		u8 p = (std::popcount(i) & 1) ? 0 : PF;
 
 		lut_zs[i] = zs;
 		lut_zsp[i] = zs | p;

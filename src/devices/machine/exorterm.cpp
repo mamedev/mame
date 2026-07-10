@@ -732,11 +732,6 @@ TIMER_CALLBACK_MEMBER(exorterm155_device::kbd_repeat)
 
 void exorterm155_device::device_start()
 {
-	m_online_led.resolve();
-	m_auto_lf_led.resolve();
-	m_page_mode_led.resolve();
-	m_insert_char_led.resolve();
-
 	// register for save states
 	save_item(NAME(m_term_data));
 	save_item(NAME(m_framecnt));
@@ -830,7 +825,7 @@ void exorterm155_device::device_add_mconfig(machine_config &config)
 
 	config.set_default_layout(layout_exorterm155);
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set(FUNC(exorterm155_device::acia_txd_w));
 	m_acia->rts_handler().set(FUNC(exorterm155_device::acia_rts_w));
 	m_acia->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));

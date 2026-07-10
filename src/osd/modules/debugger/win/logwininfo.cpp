@@ -39,8 +39,8 @@ logwin_info::logwin_info(debugger_windows_interface &debugger) :
 	RECT bounds;
 	bounds.top = bounds.left = 0;
 	bounds.right = m_views[0]->maxwidth() + (2 * EDGE_WIDTH);
-	bounds.bottom = 200;
-	AdjustWindowRectEx(&bounds, DEBUG_WINDOW_STYLE, FALSE, DEBUG_WINDOW_STYLE_EX);
+	bounds.bottom = (metrics().debug_font_ascent() * 16) + metrics().hscroll_height();
+	AdjustWindowRectExForDpi(&bounds, DEBUG_WINDOW_STYLE, FALSE, DEBUG_WINDOW_STYLE_EX, metrics().dpi());
 
 	// clamp the min/max size
 	set_maxwidth(bounds.right - bounds.left);

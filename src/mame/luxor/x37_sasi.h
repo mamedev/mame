@@ -27,7 +27,7 @@ class luxor_x37_sasi_device :  public device_t, public nscsi_device_interface
 {
 public:
 	// construction/destruction
-	luxor_x37_sasi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	luxor_x37_sasi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto int_callback() { return m_write_int.bind(); }
 	auto req0_callback() { return m_write_req0.bind(); }

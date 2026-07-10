@@ -447,8 +447,6 @@ void electronsp_state::io_w(offs_t offset, uint8_t data)
 
 void electron_state::machine_start()
 {
-	m_capslock_led.resolve();
-
 	/* set ULA RAM/ROM pointers */
 	m_ula->set_ram(m_ram->pointer());
 	m_ula->set_rom(m_region_mos->base());

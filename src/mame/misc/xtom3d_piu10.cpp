@@ -77,7 +77,7 @@ void isa16_piu10::device_add_mconfig(machine_config &config)
 {
 	MACRONIX_29F1610MC_16BIT(config, m_flash);
 
-	CAT702_PIU(config, m_cat702, 0);
+	CAT702_PIU(config, m_cat702);
 	m_cat702->dataout_handler().set([this] (u16 data) { m_cat702_data = data & 1; });
 
 	DAC3350A(config, m_dac3350a);

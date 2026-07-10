@@ -89,31 +89,31 @@ protected:
 class bt471_device : public bt47x_device_base
 {
 public:
-	bt471_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	bt471_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 };
 
 class bt473_device : public bt47x_device_base
 {
 public:
-	bt473_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	bt473_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 };
 
 class bt475_device : public bt475_device_base
 {
 public:
-	bt475_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	bt475_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 };
 
 class bt476_device : public bt47x_device_base
 {
 public:
-	bt476_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	bt476_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 };
 
 class bt477_device : public bt475_device_base
 {
 public:
-	bt477_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	bt477_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
 protected:
 	virtual unsigned color_bits() const override { return (m_command & D1) ? 8 : 6; }
@@ -122,13 +122,13 @@ protected:
 class bt478_device : public bt47x_device_base
 {
 public:
-	bt478_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	bt478_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 };
 
 class bt479_device : public bt47x_device_base
 {
 public:
-	bt479_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	bt479_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
 	virtual void map(address_map &map) override ATTR_COLD;
 	virtual u8 read(offs_t offset) override;

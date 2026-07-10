@@ -488,7 +488,7 @@ void alphatpc16_state::alphatpc16(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &alphatpc16_state::apc16_io);
 	m_maincpu->set_irq_acknowledge_callback(m_pic8259, FUNC(pic8259_device::inta_cb));
 
-	PIC8259(config, m_pic8259, 0);
+	PIC8259(config, m_pic8259);
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
 	z80dart_device &dart(Z80DART(config, "z80dart", 15_MHz_XTAL / 3)); // clock?
@@ -520,7 +520,7 @@ void alphatpc16_state::alphatpc16(machine_config &config)
 	screen.set_visarea(00, 492-1, 00, 270-1);
 	PALETTE(config, "palette").set_entries(8);
 
-	EF9345(config, m_ef9345, 0);
+	EF9345(config, m_ef9345);
 	m_ef9345->set_palette_tag("palette");
 
 	TIMER(config, "scanline").configure_scanline(NAME([this](timer_device &t, s32 p){m_ef9345->update_scanline((uint16_t)p);}), screen, 0, 10);

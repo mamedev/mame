@@ -109,7 +109,7 @@ void electron_mc68k_device::device_add_mconfig(machine_config &config)
 	via6522_device &via(MOS6522(config, "via", 10_MHz_XTAL / 10));
 	via.irq_handler().set("irq_ipl1", FUNC(input_merger_device::in_w<0>));
 
-	acia6850_device &acia(ACIA6850(config, "acia", 0));
+	acia6850_device &acia(ACIA6850(config, "acia"));
 	acia.irq_handler().set("irq_ipl1", FUNC(input_merger_device::in_w<1>));
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 3.6864_MHz_XTAL / 12));

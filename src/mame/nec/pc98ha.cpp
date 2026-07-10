@@ -502,7 +502,8 @@ void pc98lt_state::lt_config(machine_config &config)
 	m_maincpu->tout2_cb().set(m_sio_rs, FUNC(i8251_device::write_txc));
 	m_maincpu->tout2_cb().append(m_sio_rs, FUNC(i8251_device::write_rxc));
 //  m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-	m_maincpu->out_hreq_cb().set(m_maincpu, FUNC(v50_device::hack_w));
+	m_maincpu->out_hreq_cb().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_maincpu->out_hreq_cb().append(m_maincpu, FUNC(v50_device::hack_w));
 	m_maincpu->out_eop_cb().set(FUNC(pc98lt_state::tc_w));
 //  m_maincpu->in_ior_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_r));
 //  m_maincpu->out_iow_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_w));
@@ -517,7 +518,7 @@ void pc98lt_state::lt_config(machine_config &config)
 
 	pc9801_serial(config);
 
-	I8251(config, m_sio_kbd, 0);
+	I8251(config, m_sio_kbd);
 	m_sio_kbd->txd_handler().set("keyb", FUNC(pc98_kbd_device::input_txd));
 	m_sio_kbd->rxrdy_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 	m_sio_kbd->write_cts(0);
@@ -527,17 +528,17 @@ void pc98lt_state::lt_config(machine_config &config)
 	kbd_clock.signal_handler().set(m_sio_kbd, FUNC(i8251_device::write_rxc));
 	kbd_clock.signal_handler().append(m_sio_kbd, FUNC(i8251_device::write_txc));
 
-	PC98_KBD(config, m_keyb, 0);
+	PC98_KBD(config, m_keyb);
 	m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
 
-	I8255(config, m_ppi_sys, 0);
+	I8255(config, m_ppi_sys);
 	// PC98LT/HA has no dips, port A acts as a RAM storage
 	m_ppi_sys->in_pa_callback().set(m_ppi_sys, FUNC(i8255_device::pa_r));
 	m_ppi_sys->in_pb_callback().set_ioport("SYSB");
 //  m_ppi_sys->in_pc_callback().set_constant(0xa0); // 0x80 cpu triple fault reset flag?
 	m_ppi_sys->out_pc_callback().set(FUNC(pc98lt_state::ppi_sys_beep_portc_w));
 
-	I8255(config, m_ppi_prn, 0);
+	I8255(config, m_ppi_prn);
 	m_ppi_prn->in_pb_callback().set_ioport("PRNB");
 
 	UPD1990A(config, m_rtc);

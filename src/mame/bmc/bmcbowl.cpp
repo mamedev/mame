@@ -482,7 +482,7 @@ void bmcbowl_state::bmcbowl(machine_config &config)
 	screen.screen_vblank().append("via6522", FUNC(via6522_device::write_cb1));
 
 	PALETTE(config, m_palette).set_entries(256);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &bmcbowl_state::ramdac_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);

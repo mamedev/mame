@@ -396,7 +396,7 @@ void triplex_state::triplex(machine_config &config)
 	ptm.o3_callback().set([this](int state) { m_keyclk = state; if (state) m_mpu->clock_serial(); }); // KEYCLK
 	ptm.irq_callback().set("irqs", FUNC(input_merger_device::in_w<1>));
 
-	acia6850_device &acia(ACIA6850(config, "acia", 0));
+	acia6850_device &acia(ACIA6850(config, "acia"));
 	acia.txd_handler().set(m_serial_c, FUNC(rs232_port_device::write_txd));
 	acia.rts_handler().set(m_serial_c, FUNC(rs232_port_device::write_rts));
 	acia.irq_handler().set("irqs", FUNC(input_merger_device::in_w<2>));

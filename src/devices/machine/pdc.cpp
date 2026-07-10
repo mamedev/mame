@@ -279,7 +279,7 @@ void pdc_device::device_add_mconfig(machine_config &config)
 
 	/* Hard Disk Controller - HDC9224 */
 	// TODO: connect the HDC lines
-	HDC9224(config, HDC_TAG, 0);
+	HDC9224(config, HDC_TAG);
 	MFM_HD_CONNECTOR(config, "h1", pdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT);
 
 }

@@ -935,7 +935,6 @@ u16 gcm394_base_video_device::video_703a_palettebank_r()
 
 void gcm394_base_video_device::video_703a_palettebank_w(u16 data)
 {
-
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703a_palettebank_w %04x\n", machine().describe_context(), data);
 	m_703a_palettebank = data;
 }
@@ -1309,7 +1308,7 @@ void gcm394_base_video_device::device_add_mconfig(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 256*0x10);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx);
 
-	GPL_RENDERER(config, m_renderer, 0);
+	GPL_RENDERER(config, m_renderer);
 }
 
 

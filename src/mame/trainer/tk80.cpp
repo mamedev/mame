@@ -104,8 +104,6 @@ private:
 
 void tk80_state::machine_start()
 {
-	m_digit.resolve();
-
 	save_item(NAME(m_term_data));
 	save_item(NAME(m_keyb_press));
 	save_item(NAME(m_keyb_press_flag));

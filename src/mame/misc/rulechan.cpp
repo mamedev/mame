@@ -215,8 +215,8 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void rulechan(machine_config &config);
-	void rulechan_init();
+	void rulechan(machine_config &config) ATTR_COLD;
+	void rulechan_init() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -270,9 +270,6 @@ constexpr uint8_t rulechan_state::s_sndsrt[10];
 
 void rulechan_state::machine_start()
 {
-	m_lamps.resolve();
-	m_digits.resolve();
-
 	save_item(NAME(m_sline));
 	save_item(NAME(m_p30));
 	save_item(NAME(m_p31));

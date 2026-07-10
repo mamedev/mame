@@ -886,13 +886,6 @@ void cps2_state::cps2_render_sprites(screen_device &screen, bitmap_ind16 &bitmap
 	const int xoffs = 64 - m_output[CPS2_OBJ_XOFFS];
 	const int yoffs = 16 - m_output[CPS2_OBJ_YOFFS];
 
-#ifdef MAME_DEBUG
-	if (machine().input().code_pressed(KEYCODE_Z) && machine().input().code_pressed(KEYCODE_R))
-	{
-		return;
-	}
-#endif
-
 	for (int i = m_cps2_last_sprite_offset; i >= 0; i -= 4)
 	{
 		int x = base[i + 0];
@@ -1785,7 +1778,7 @@ void cps2_state::cps2comm(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps2_state::cps2_comm_map);
 
-	CAPCOM_CPS2_COMM(config, m_comm, 0U);
+	CAPCOM_CPS2_COMM(config, m_comm);
 }
 
 

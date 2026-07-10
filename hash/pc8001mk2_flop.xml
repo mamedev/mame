@@ -20,12 +20,67 @@ Bon Bon, Bon Bon, Compaq, Aug 83, Aug 83,
 
 -->
 
+<!-- !Operating Systems -->
 
-	<software name="cranstonmk2">
+	<software name="n80diskb" supported="partial">
+		<description>N80 Disk BASIC</description>
+		<year>1983</year>
+		<publisher>NEC / Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 18249 -->
+				<rom name="n-basic.d88" size="348848" crc="0ed0a4c8" sha1="2e80b0b4fc38eb1f81fd27f6828249c764091a55"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- vaguely different than the other sets -->
+	<!-- (has a "loadpi.c" program for the same picture files, no terminal stuff) -->
+	<software name="pc80sys" supported="partial">
+		<description>PC-8001mkII System Disk</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">    <!-- Data CRC16: 51389 -->
+				<rom name="pc-8001mkii system disk.d88" size="348832" crc="3fc9a80e" sha1="8e65e5b7376799553bbc3ae41223b36c7e807cee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TODO: alt of above? -->
+	<software name="n80mkii" supported="partial">
+		<description>N-80 BASIC system disk</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[os] n80 basic system disk (pc-8001mkii).d88" size="348848" crc="ff9416a4" sha1="3321c6a723545ef7f413a372683a1e40ef7ea4ef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="n80mkiia" cloneof="n80mkii" supported="partial">
+		<description>N-80 BASIC system disk (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[os] n80 basic system disk (pc-8001mkii) [alt 1].d88" size="348848" crc="452088aa" sha1="991dad9039b17ff3b1c5c234e47c96f1068cce53"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Games -->
+
+	<software name="cranstonmk2" supported="no">
 		<description>Cranston Manor</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<!-- TODO: "run MK2" ? -->
+		<notes><![CDATA[
+Randomly throws "Bad drive number in 2010" when booting
+Not extensively tested (katakana language barrier)
+]]></notes>
+		<info name="usage" value="Load a N-80 Disk BASIC then once in prompt swap with these two disks and run &quot;MK2&quot; (case sensitive)"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="344496">
 				<rom name="cranston manor (mkii) (disk 1) {run mk2}.d88" size="344496" crc="cae808d0" sha1="27a3f9d322217fb6f9c00c8056bc9a79419e484c"/>
@@ -38,10 +93,18 @@ Bon Bon, Bon Bon, Compaq, Aug 83, Aug 83,
 		</part>
 	</software>
 
-	<software name="ulyssesmk2">
+	<software name="ulyssesmk2" supported="no">
 		<description>Ulysses and the Golden Fleece</description>
 		<year>1983</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
+		<notes><![CDATA[
+Randomly throws "Bad drive number in 2010" when booting
+Not extensively tested (katakana language barrier)
+]]></notes>
+		<info name="release" value="198312xx"/>
+		<info name="alt_title" value="ユリシーズ"/>
+		<info name="usage" value="Load a N-80 Disk BASIC then once in prompt swap with these two disks and run &quot;MK2&quot; (case sensitive)"/>
+
 		<info name="alt_title" value="ユリシーズ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="344496">
@@ -55,12 +118,81 @@ Bon Bon, Bon Bon, Compaq, Aug 83, Aug 83,
 		</part>
 	</software>
 
-<!-- Collections -->
+	<software name="ulyssesa" cloneof="ulyssesmk2" supported="no">
+		<description>Ulysses and the Golden Fleece (alt)</description>
+		<year>1983</year>
+		<publisher>スタークラフト (Starcraft)</publisher>
+		<notes><![CDATA[
+(same as ulyssesmk2)
+]]></notes>
+		<info name="release" value="198312xx"/>
+		<info name="alt_title" value="ユリシーズ"/>
+		<info name="usage" value="Load a N-80 Disk BASIC then once in prompt swap with these two disks and run &quot;MK2&quot; (case sensitive)"/>
+		<!--combined image-->
+		<!--rom name="ulysses and the golden fleece(8001mkii).d88" size="693344" crc="c7888134" sha1="ea781898977ba7396cb91ba7a6ba1fec5db6184a"/-->
 
-	<software name="gamepc">
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="344496">
+				<rom name="ulysses and the golden fleece(8001mkii) (disk 1).d88" size="344496" crc="2333d50c" sha1="c1a940c985624a4c7794d880c5d28e79c7f6ebbd"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="348848">
+				<rom name="ulysses and the golden fleece(8001mkii) (disk 2).d88" size="348848" crc="4264b445" sha1="82594d02f0a135125d7e1423c57c72709718efa2"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+ExtractDisk  [01]"N80 BASIC    " -> "ulysses_v80_01.d88"
+ExtractDisk  [02]"Ulysses_Disk2   " -> "ulysses_v80_02.d88" (same as ulyssesa)
+ExtractDisk  [03]"Ulysses_Disk1   " -> "ulysses_v80_03.d88" (same as ulyssesa)
+-->
+	<software name="ulyssesb" cloneof="ulyssesmk2" supported="no">
+		<description>Ulysses and the Golden Fleece (alt 2)</description>
+		<year>1983</year>
+		<publisher>スタークラフト (Starcraft)</publisher>
+		<notes><![CDATA[
+(same as ulyssesmk2)
+]]></notes>
+		<info name="release" value="198312xx"/>
+		<info name="alt_title" value="ユリシーズ"/>
+		<info name="usage" value="Load a N-80 Disk BASIC then once in prompt swap with these two disks and run &quot;MK2&quot; (case sensitive)"/>
+		<!--combined image-->
+		<!--rom name="ulysses_v80.d88" size="1042192" crc="b4ee359c" sha1="4cb6a4a69b942184d43e639ec7ae9c20c1c5c20c"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="ulysses_v80_01.d88" size="348848" crc="6494d82f" sha1="7a409c2e68668e3443639e0f55e2e0c92efa2721"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="348848">
+				<rom name="ulysses and the golden fleece(8001mkii) (disk 2).d88" size="348848" crc="4264b445" sha1="82594d02f0a135125d7e1423c57c72709718efa2"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="344496">
+				<rom name="ulysses and the golden fleece(8001mkii) (disk 1).d88" size="344496" crc="2333d50c" sha1="c1a940c985624a4c7794d880c5d28e79c7f6ebbd"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- !Collections -->
+
+	<!-- TODO: what's the equivalent of FILES in this? Is it really a "game collection" or something else? -->
+	<software name="gamepc" supported="no">
 		<description>Game-PC (Collection)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1980</year>
+		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="31424">
 				<rom name="[os] game-pc (mkii).d88" size="31424" crc="a2f5c72e" sha1="702734c1f92f7a765db2b49a1a67215ff9ba662d"/>
@@ -68,59 +200,18 @@ Bon Bon, Bon Bon, Compaq, Aug 83, Aug 83,
 		</part>
 	</software>
 
-<!-- Operating Systems -->
 
-	<software name="n80diskb">
-		<description>N80 Disk BASIC</description>
-		<year>1983</year>
-		<publisher>NEC / Microsoft</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">    <!-- Data CRC16: 18249 -->
-				<rom name="n-basic.d88" size="348848" crc="0ed0a4c8" sha1="2e80b0b4fc38eb1f81fd27f6828249c764091a55"/>
-			</dataarea>
-		</part>
-	</software>
+<!-- !Utilities -->
 
-	<software name="pc80sys">
-		<description>PC-8001mkII System Disk</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348832">    <!-- Data CRC16: 51389 -->
-				<rom name="pc-8001mkii system disk.d88" size="348832" crc="3fc9a80e" sha1="8e65e5b7376799553bbc3ae41223b36c7e807cee"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- TODO: alt of above? -->
-	<software name="n80mkii">
-		<description>N80 BASIC system disk</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="[os] n80 basic system disk (pc-8001mkii).d88" size="348848" crc="ff9416a4" sha1="3321c6a723545ef7f413a372683a1e40ef7ea4ef"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="n80mkiia" cloneof="n80mkii">
-		<description>N80 BASIC system disk (alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="[os] n80 basic system disk (pc-8001mkii) [alt 1].d88" size="348848" crc="452088aa" sha1="991dad9039b17ff3b1c5c234e47c96f1068cce53"/>
-			</dataarea>
-		</part>
-	</software>
-
-<!-- Utilities -->
-
-	<software name="n80n88">
+	<!-- TODO: this set should be moved to pc8001_flop, it's a mix-in of N, N-80 and N-88 BASIC disks -->
+	<software name="n80n88" supported="no">
 		<description>N80 and N88 Disk BASIC Utility Collection</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+flop1: throws "Disk not mounted" with FILES issued
+flop5: "Incorrect layout on track 0 head 0, expected_size=50000, current_size=68144"
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348304">
 				<rom name="[utility] n80 and n88 disk basic utility collection (disk 1 - n mode).d88" size="348304" crc="ab1128ca" sha1="83bc1d6db510553be4aeec800209e3bb529a2fb0"/>

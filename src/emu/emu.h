@@ -54,7 +54,6 @@
 #include "save.h"
 
 // I/O
-#include "input.h"
 #include "ioport.h"
 #include "output.h"
 
@@ -99,6 +98,8 @@
 #include "video/generic.h"
 
 // member templates that don't like incomplete types
+#include "devdelegate.ipp"
 #include "device.ipp"
+#include "output.ipp"
 
 #endif // __EMU_H__

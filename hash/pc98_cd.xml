@@ -1261,6 +1261,9 @@ Media for undumped pc9821xa12
 	</software>
 
 	<!-- Requires disk 2 of the floppy version (included in the box) as copy protection -->
+	<!-- Allegedly should happen at Dela first encounter in area 4 -->
+	<!-- but doesn't seem to hit if floppy not assigned to drive B: (i.e. with lha201 extra partitions) -->
+	<!-- NOTE: game autosaves once you enter or exit an area (so backup BR1SDT*.K** files at start of said area) -->
 	<software name="brandnew">
 		<!--
 		Origin: redump.org

@@ -54,6 +54,8 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+#include <numbers>
+
 
 namespace {
 
@@ -374,10 +376,11 @@ uint32_t cntsteer_state::screen_update_zerotrgt(screen_device &screen, bitmap_in
 		     0
 		*/
 		/*65536*z*cos(a), 65536*z*sin(a), -65536*z*sin(a), 65536*z*cos(a)*/
-		p1 = -65536 * 1 * cos(2 * M_PI * (rot_val) / 1024);
-		p2 = -65536 * 1 * sin(2 * M_PI * (rot_val) / 1024);
-		p3 = 65536 * 1 * sin(2 * M_PI * (rot_val) / 1024);
-		p4 = -65536 * 1 * cos(2 * M_PI * (rot_val) / 1024);
+		constexpr double PI = std::numbers::pi;
+		p1 = -65536 * 1 * cos(2 * PI * (rot_val) / 1024);
+		p2 = -65536 * 1 * sin(2 * PI * (rot_val) / 1024);
+		p3 = 65536 * 1 * sin(2 * PI * (rot_val) / 1024);
+		p4 = -65536 * 1 * cos(2 * PI * (rot_val) / 1024);
 
 		x = -256 - (m_scrollx | m_scrollx_hi);
 		y = 256 + (m_scrolly | m_scrolly_hi);
@@ -421,10 +424,11 @@ uint32_t cntsteer_state::screen_update_cntsteer(screen_device &screen, bitmap_in
 		     0
 		*/
 		/*65536*z*cos(a), 65536*z*sin(a), -65536*z*sin(a), 65536*z*cos(a)*/
-		p1 = -65536 * 1 * cos(2 * M_PI * (rot_val) / 1024);
-		p2 = -65536 * 1 * sin(2 * M_PI * (rot_val) / 1024);
-		p3 = 65536 * 1 * sin(2 * M_PI * (rot_val) / 1024);
-		p4 = -65536 * 1 * cos(2 * M_PI * (rot_val) / 1024);
+		constexpr double PI = std::numbers::pi;
+		p1 = -65536 * 1 * cos(2 * PI * (rot_val) / 1024);
+		p2 = -65536 * 1 * sin(2 * PI * (rot_val) / 1024);
+		p3 = 65536 * 1 * sin(2 * PI * (rot_val) / 1024);
+		p4 = -65536 * 1 * cos(2 * PI * (rot_val) / 1024);
 
 		x = 256 + (m_scrollx | m_scrollx_hi);
 		y = 256 - (m_scrolly | m_scrolly_hi);

@@ -226,8 +226,13 @@ attotime nscsi_s1410_device::scsi_data_command_delay()
 	case SC_READ:
 	case SC_WRITE:
 	case SC_SEEK:
-		// average seek time of NEC D5126A hard disk
-		return attotime::from_msec(85);
+		// Legacy default (unchanged unless a driver calls set_seek_timing()): a
+		// flat average-seek delay charged on every command, matching the older
+		// NEC D5126A approximation the existing s1410 users rely on.  With a
+		// model configured, defer to the base's cylinder-aware timing.
+		if (!m_seek_model)
+			return attotime::from_msec(85);
+		return seek_time(get_u24be(&m_scsi_cmdbuf[1]) & 0x1fffff);
 
 	default:
 		return attotime::zero;

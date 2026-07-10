@@ -58,7 +58,7 @@ void newcanasta_state::newcanasta(machine_config &config)
 	PENTIUM4(config, m_maincpu, 100'000'000); // 775-pin LGA "Socket T" CPU, exact model unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &newcanasta_state::newcanasta_map);
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 
 	// I/O board

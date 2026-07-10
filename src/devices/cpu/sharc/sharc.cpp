@@ -565,7 +565,7 @@ void adsp21062_device::external_dma_write(uint32_t address, uint64_t data)
 void adsp21062_device::device_start()
 {
 	assert(m_blocks[0].length() == m_blocks[1].length());
-	assert(!(m_blocks[0].length() & (m_blocks[0].length() - 1)));
+	assert(std::has_single_bit(m_blocks[0].length()));
 
 	space(AS_PROGRAM).specific(m_program);
 	space(AS_DATA).specific(m_data);
@@ -586,7 +586,7 @@ void adsp21062_device::device_start()
 
 		// init UML generator
 		uint32_t umlflags = 0;
-		m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 1, 24, 0);
+		m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 1, 24, 0, COMPILE_FORWARDS_BYTES);
 
 		// add UML symbols
 		m_drcuml->symbol_add(&m_core->pc, sizeof(m_core->pc), "pc");

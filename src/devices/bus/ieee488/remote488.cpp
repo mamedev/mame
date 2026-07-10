@@ -360,7 +360,7 @@ remote488_device::remote488_device(const machine_config &mconfig, const char *ta
 
 void remote488_device::device_add_mconfig(machine_config &config)
 {
-	BITBANGER(config, m_stream, 0);
+	BITBANGER(config, m_stream);
 }
 
 void remote488_device::ieee488_eoi(int state)

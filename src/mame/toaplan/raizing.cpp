@@ -723,7 +723,7 @@ void sstriker_state::mahoudai(machine_config &config)
 	Z80(config, m_audiocpu, 32_MHz_XTAL/8);     // 4MHz, 32MHz Oscillator
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sstriker_state::raizing_sound_z80_mem);
 
-	TOAPLAN_COINCOUNTER(config, m_coincounter, 0);
+	TOAPLAN_COINCOUNTER(config, m_coincounter);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
@@ -770,7 +770,7 @@ void bgaregga_state::bgaregga(machine_config &config)
 	Z80(config, m_audiocpu, 32_MHz_XTAL/8);     // 4MHz, 32MHz Oscillator
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bgaregga_state::bgaregga_sound_z80_mem);
 
-	TOAPLAN_COINCOUNTER(config, m_coincounter, 0);
+	TOAPLAN_COINCOUNTER(config, m_coincounter);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 

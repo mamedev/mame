@@ -90,9 +90,6 @@ void rzone_state::machine_start()
 {
 	hh_sm510_state::machine_start();
 
-	// resolve outputs
-	m_led_out.resolve();
-
 	// register for savestates
 	save_item(NAME(m_led_pin));
 	save_item(NAME(m_sctrl));

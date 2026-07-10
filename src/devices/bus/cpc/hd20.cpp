@@ -17,7 +17,7 @@ DEFINE_DEVICE_TYPE(CPC_HD20, cpc_hd20_device, "cpc_hd20", "Dobbertin HD20")
 
 void cpc_hd20_device::device_add_mconfig(machine_config &config)
 {
-	ST11M_HDC(config, m_hdc,0);
+	ST11M_HDC(config, m_hdc);
 	m_hdc->irq_handler().set(FUNC(cpc_hd20_device::irq_w));
 	HARDDISK(config, "hdc:primary");
 	// no pass-through (?)

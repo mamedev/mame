@@ -130,23 +130,6 @@ int igs011_device::blitter_busy_r()
 
 u32 igs011_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-#ifdef MAME_DEBUG
-	int layer_enable = -1;
-	if (machine().input().code_pressed(KEYCODE_Z))
-	{
-		int mask = 0;
-		if (machine().input().code_pressed(KEYCODE_Q))  mask |= 0x01;
-		if (machine().input().code_pressed(KEYCODE_W))  mask |= 0x02;
-		if (machine().input().code_pressed(KEYCODE_E))  mask |= 0x04;
-		if (machine().input().code_pressed(KEYCODE_R))  mask |= 0x08;
-		if (machine().input().code_pressed(KEYCODE_A))  mask |= 0x10;
-		if (machine().input().code_pressed(KEYCODE_S))  mask |= 0x20;
-		if (machine().input().code_pressed(KEYCODE_D))  mask |= 0x40;
-		if (machine().input().code_pressed(KEYCODE_F))  mask |= 0x80;
-		if (mask)   layer_enable &= mask;
-	}
-#endif
-
 	u16 const *const pri_ram = &m_priority_ram[(m_priority & 7) * 512/2];
 	u32 const hibpp_layers = std::min<u32>(4 - (m_blitter.depth & 0x07), std::size(m_layer_ram));
 
@@ -172,10 +155,7 @@ u32 igs011_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 			{
 				layerpix[l] = m_layer_ram[i++][scr_addr];
 				if (layerpix[l] != 0xff)
-#ifdef MAME_DEBUG
-					if (BIT(layer_enable, l))
-#endif
-						pri_addr &= ~(1 << l);
+					pri_addr &= ~(1 << l);
 				++l;
 			}
 			while (std::size(m_layer_ram) > i)
@@ -183,31 +163,16 @@ u32 igs011_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 				u8 const pixdata = m_layer_ram[i++][scr_addr];
 				layerpix[l] = pixdata & 0x0f;
 				if (layerpix[l] != 0x0f)
-				{
-#ifdef MAME_DEBUG
-					if (BIT(layer_enable, l))
-#endif
-						pri_addr &= ~(1 << l);
-				}
+					pri_addr &= ~(1 << l);
 				++l;
 				layerpix[l] = (pixdata >> 4) & 0x0f;
 				if (layerpix[l] != 0x0f)
-				{
-#ifdef MAME_DEBUG
-					if (BIT(layer_enable, l))
-#endif
-						pri_addr &= ~(1 << l);
-				}
+					pri_addr &= ~(1 << l);
 				++l;
 			}
 
 			u16 const pri = pri_ram[pri_addr] & 7;
-#ifdef MAME_DEBUG
-			if ((layer_enable != -1) && (pri_addr == 0xff))
-				bitmap.pix(y, x) = palette().black_pen();
-			else
-#endif
-				bitmap.pix(y, x) = layerpix[pri] | (pri << 8);
+			bitmap.pix(y, x) = layerpix[pri] | (pri << 8);
 		}
 	}
 	return 0;

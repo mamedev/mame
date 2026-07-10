@@ -24,6 +24,8 @@
 #include "screen.h"
 #include "tilemap.h"
 
+#include "endianness.h"
+
 class namcos22_state;
 
 // higher precision for internal poly.h

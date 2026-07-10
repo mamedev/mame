@@ -278,7 +278,7 @@ void pcfx_state::pcfx(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcfx_state::pcfx_mem);
 	m_maincpu->set_addrmap(AS_IO, &pcfx_state::pcfx_io);
 
-	PCFX_INTC(config, m_intc, 0);
+	PCFX_INTC(config, m_intc);
 	m_intc->int_cb().set(FUNC(pcfx_state::int_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
