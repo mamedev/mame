@@ -1282,7 +1282,9 @@ void aristmk5_state::aristmk5_map(address_map &map)
 	map(0x03250058, 0x0325005b).r(FUNC(aristmk5_state::Ns5x58)); //IOEB interrupt Latch
 
 	map(0x03400000, 0x035fffff).w(m_vidc, FUNC(acorn_vidc10_device::write));
-	map(0x03600000, 0x037fffff).w(m_memc, FUNC(acorn_memc_device::registers_w));
+	// MEMC accessed by the actual offset, not data like other Archimedes targets
+	// (required for sound working in dimtouch and several others)
+	map(0x03600000, 0x037fffff).lw32(NAME([this] (offs_t offset, u32 data, u32 mem_mask) { m_memc->registers_w(0, 0x03600000 | (offset << 2), mem_mask); }));
 	map(0x03800000, 0x03ffffff).w(m_memc, FUNC(acorn_memc_device::page_w));
 
 	map(0x03400000, 0x037fffff).rom().region("game_prg", 0);
@@ -1536,7 +1538,7 @@ static INPUT_PORTS_START( aristmk5_usa )
 	PORT_BIT(0x00000002, IP_ACTIVE_LOW, IPT_OTHER)    // Battery
 
 	PORT_START("EXTRA")
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_OTHER)   PORT_TOGGLE PORT_CODE(KEYCODE_L)   PORT_NAME("Logic door")
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_OTHER)   PORT_TOGGLE PORT_CODE(KEYCODE_L)   PORT_NAME("Logic door / Security cage")
 	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_COIN1)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(aristmk5_state::coin_start), 0)
 INPUT_PORTS_END
 
@@ -1572,7 +1574,7 @@ static INPUT_PORTS_START( aristmk5 )
 	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_OTHER)   // Hopper empty
 	PORT_BIT(0x00000100, IP_ACTIVE_LOW,  IPT_DOOR)    PORT_CODE(KEYCODE_M) PORT_TOGGLE PORT_NAME("Main door optical sensor")
 	PORT_BIT(0x0000fe00, IP_ACTIVE_HIGH, IPT_UNUSED)  // Unused optical security sensors
-	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_DOOR)    PORT_CODE(KEYCODE_L) PORT_TOGGLE PORT_NAME("Logic door")
+	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_DOOR)    PORT_CODE(KEYCODE_L) PORT_TOGGLE PORT_NAME("Logic door / Security cage")
 	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_DOOR)    PORT_CODE(KEYCODE_Z) PORT_TOGGLE PORT_NAME("Topbox door")
 	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_DOOR)    PORT_CODE(KEYCODE_X) PORT_TOGGLE PORT_NAME("Meter cage")
 	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_DOOR)    PORT_CODE(KEYCODE_C) PORT_TOGGLE PORT_NAME("Cashbox door")
@@ -2515,6 +2517,7 @@ void aristmk5_state::aristmk5(machine_config &config)
 	m_vidc->set_screen("screen");
 	m_vidc->vblank().set(m_memc, FUNC(acorn_memc_device::vidrq_w));
 	m_vidc->sound_drq().set(m_memc, FUNC(acorn_memc_device::sndrq_w));
+	// TODO: sound mixing is very low (just one channel used?), expose from device
 
 	EEPROM_93C56_16BIT(config, m_eeprom[0]);
 	EEPROM_93C56_16BIT(config, m_eeprom[1]);
@@ -2534,18 +2537,22 @@ void aristmk5_state::aristmk5(machine_config &config)
 	uart1b.out_int_callback().set("uart_irq", FUNC(input_merger_device::in_w<3>));
 
 	// COMM port 4 - 5
-	NS16450(config, "uart_2a", MASTER_CLOCK / 9);
-//  uart2a.out_int_callback().set("uart_irq", FUNC(input_merger_device::in_w<4>));
-	NS16450(config, "uart_2b", MASTER_CLOCK / 9);
-//  uart2b.out_int_callback().set("uart_irq", FUNC(input_merger_device::in_w<5>));
+	ns16450_device &uart2a(NS16450(config, "uart_2a", MASTER_CLOCK / 9));
+	uart2a.out_int_callback().set("comm_irq", FUNC(input_merger_device::in_w<0>));
+	ns16450_device &uart2b(NS16450(config, "uart_2b", MASTER_CLOCK / 9));
+	uart2b.out_int_callback().set("comm_irq", FUNC(input_merger_device::in_w<1>));
 
 	// COMM port 6 - 7
-	NS16450(config, "uart_3a", MASTER_CLOCK / 9);
-//  uart3a.out_int_callback().set("uart_irq", FUNC(input_merger_device::in_w<6>));
-	NS16450(config, "uart_3b", MASTER_CLOCK / 9);
-//  uart3b.out_int_callback().set("uart_irq", FUNC(input_merger_device::in_w<7>));
+	ns16450_device &uart3a(NS16450(config, "uart_3a", MASTER_CLOCK / 9));
+	uart3a.out_int_callback().set("comm_irq", FUNC(input_merger_device::in_w<2>));
+	ns16450_device &uart3b(NS16450(config, "uart_3b", MASTER_CLOCK / 9));
+    uart3b.out_int_callback().set("comm_irq", FUNC(input_merger_device::in_w<3>));
 
 	INPUT_MERGER_ANY_HIGH(config, "uart_irq").output_handler().set(m_ioc, FUNC(acorn_ioc_device::il5_w));
+	// qnile (at least): will hang after 50 spins played/15 audit toggles without il0 connected.
+	// TODO: mk5 doc states this being really connected to interface board
+	// which implies driver should really use ARCHIMEDES_EXPANSION_BUS instead
+	INPUT_MERGER_ANY_HIGH(config, "comm_irq").output_handler().set(m_ioc, FUNC(acorn_ioc_device::il0_w));
 
 	DS1302(config, m_rtc, 32.768_kHz_XTAL);
 
