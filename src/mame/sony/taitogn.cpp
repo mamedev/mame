@@ -1353,7 +1353,7 @@ GAME( 1999, rcdego,    gobyrc,   coh3002t_t1, gobyrc,      taitogn_state,   empt
 GAME( 1999, flipmaze,  coh3002t, coh3002t_t1, taitogn,     taitogn_state,   empty_init,  ROT0,   "MOSS / Taito",        "Flip Maze (V2.04J 1999/09/02 20:00)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 2000, mawasunda, coh1002t, mawasunda,   mawasunda,   mawasunda_state, empty_init,  ROT0,   "Taito",               "Mawasunda!! (V2.08J 2000/02/01 11:02:54)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 2001, shikigam,  coh3002t, coh3002t_t1, taitogn,     taitogn_state,   empty_init,  ROT270, "Alfa System / Taito", "Shikigami no Shiro (V2.03J 2001/08/07 18:11)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 2001, shikigama, coh3002t, coh3002t_t1, taitogn,     taitogn_state,   empty_init,  ROT270, "Alfa System / Taito", "Shikigami no Shiro - internal build (V1.02J 2001/09/27 18:45)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, shikigama, shikigam, coh3002t_t1, taitogn,     taitogn_state,   empty_init,  ROT270, "Alfa System / Taito", "Shikigami no Shiro - internal build (V1.02J 2001/09/27 18:45)", MACHINE_SUPPORTS_SAVE )
 GAME( 2003, sianniv,   coh3002t, coh3002t_t1, taitogn,     ttgnirq_state,   init_nozoom, ROT270, "Taito",               "Space Invaders Anniversary (V2.02J 2003/09/12 20:00)",          MACHINE_SUPPORTS_SAVE )
 
 // CyberFront
