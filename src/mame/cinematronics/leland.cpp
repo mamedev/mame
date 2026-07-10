@@ -1564,51 +1564,59 @@ ROM_START( alleymas )
 ROM_END
 
 
+/*
+For Up Your Alley, the label format is:
+------------------------
+|(C)1987 Cinematronics | -> Copyright & Manufacturer
+|P/N 03-14168-01       | -> Part number with revision
+|UYA chk=EC46    U101  | -> Game name, checksum & ROM PCB location
+------------------------
+*/
 ROM_START( upyoural )
 	ROM_REGION( 0x28000, "master", 0 )
-	ROM_LOAD( "uya-u101.bin", 0x00000, 0x02000, CRC(82bf3b7a) SHA1(1a23da0535c736fa2f49a83fe5e33b8d60117bd1) )
-	ROM_LOAD( "uya-u102.bin", 0x10000, 0x02000, CRC(e1681268) SHA1(205519bf59e3be1ec485de7d81e3c4751e6630f6) )
-	ROM_CONTINUE(             0x1c000, 0x02000 )
-	ROM_LOAD( "uya-u103.bin", 0x12000, 0x02000, CRC(0d36aa78) SHA1(77241adf02e65e5ff85dcc4a2f70411a637eed54) )
-	ROM_CONTINUE(             0x1e000, 0x02000 )
-	ROM_LOAD( "uya-u104.bin", 0x14000, 0x02000, CRC(a4473886) SHA1(af63f8c0e96b3f9ce58469948a0ebdb6a853f5c4) )
-	ROM_CONTINUE(             0x20000, 0x02000 )
-	ROM_LOAD( "uya-u105.bin", 0x16000, 0x02000, CRC(4cad86a4) SHA1(f330800ca276aec7301a76c7c974736ee25290ce) )
-	ROM_CONTINUE(             0x22000, 0x02000 )
-	ROM_LOAD( "uya-u106.bin", 0x18000, 0x02000, CRC(26f4848e) SHA1(b76179b89483a19ca3ca16e0b56af3667c252d8b) )
-	ROM_CONTINUE(             0x24000, 0x02000 )
-	ROM_LOAD( "uya-u107.bin", 0x1a000, 0x02000, CRC(fd087cc7) SHA1(96b70e94d96baf4ea66d98b225cf67bf69cdd972) )
-	ROM_CONTINUE(             0x26000, 0x02000 )
+	ROM_LOAD( "03-14168-01_uya_chk-ec46.u101", 0x00000, 0x02000, CRC(82bf3b7a) SHA1(1a23da0535c736fa2f49a83fe5e33b8d60117bd1) )
+	ROM_LOAD( "03-14169-01_uya_chk-06e9.u102", 0x10000, 0x02000, CRC(e1681268) SHA1(205519bf59e3be1ec485de7d81e3c4751e6630f6) )
+	ROM_CONTINUE(                              0x1c000, 0x02000 )
+	ROM_LOAD( "03-14170-01_uya_chk-abf4.u103", 0x12000, 0x02000, CRC(0d36aa78) SHA1(77241adf02e65e5ff85dcc4a2f70411a637eed54) )
+	ROM_CONTINUE(                              0x1e000, 0x02000 )
+	ROM_LOAD( "03-14171-01_uya_chk-9e1d.u104", 0x14000, 0x02000, CRC(a4473886) SHA1(af63f8c0e96b3f9ce58469948a0ebdb6a853f5c4) )
+	ROM_CONTINUE(                              0x20000, 0x02000 )
+	ROM_LOAD( "03-14172-01_uya_chk-ec21.u105", 0x16000, 0x02000, CRC(4cad86a4) SHA1(f330800ca276aec7301a76c7c974736ee25290ce) )
+	ROM_CONTINUE(                              0x22000, 0x02000 )
+	ROM_LOAD( "03-14173-01_uya_chk-dc8a.u106", 0x18000, 0x02000, CRC(26f4848e) SHA1(b76179b89483a19ca3ca16e0b56af3667c252d8b) )
+	ROM_CONTINUE(                              0x24000, 0x02000 )
+	ROM_LOAD( "03-14174-01_uya_chk-96f3.u107", 0x1a000, 0x02000, CRC(fd087cc7) SHA1(96b70e94d96baf4ea66d98b225cf67bf69cdd972) )
+	ROM_CONTINUE(                              0x26000, 0x02000 )
 
 	ROM_REGION( 0x28000, "slave", 0 )
-	ROM_LOAD( "uya-u3.bin",  0x00000, 0x02000, CRC(3fee63ae) SHA1(519fe4981dc2c6d025fc2f27af6682103c99dd5e) )
-	ROM_LOAD( "uya-u4.bin",  0x10000, 0x02000, CRC(d302b5d1) SHA1(77263944d7b4e335fbc3b91d69def6cc85648ec6) )
-	ROM_CONTINUE(            0x1c000, 0x02000 )
-	ROM_LOAD( "uya-u5.bin",  0x12000, 0x02000, CRC(79bdb24d) SHA1(f64c3c5a715d5f4a27e01aeb31e1c43f1f3d5b17) )
-	ROM_CONTINUE(            0x1e000, 0x02000 )
-	ROM_LOAD( "uya-u6.bin",  0x14000, 0x02000, CRC(f0b15d68) SHA1(8017fce4b30e2f3bee74fba82d2a0154b3a1ab6d) )
-	ROM_CONTINUE(            0x20000, 0x02000 )
-	ROM_LOAD( "uya-u7.bin",  0x16000, 0x02000, CRC(6974036c) SHA1(222dd4d8c6d69f6b44b76681a508ff2cfafe1acc) )
-	ROM_CONTINUE(            0x22000, 0x02000 )
-	ROM_LOAD( "uya-u8.bin",  0x18000, 0x02000, CRC(a4357b5a) SHA1(c58505e1ef66641f4da5f29edbb197c5a09a367b) )
-	ROM_CONTINUE(            0x24000, 0x02000 )
-	ROM_LOAD( "uya-u9.bin",  0x1a000, 0x02000, CRC(6d74274e) SHA1(10bb04243eabeb8178884b4e0691c5e1765a1dc4) )
-	ROM_CONTINUE(            0x26000, 0x02000 )
+	ROM_LOAD( "03-14150-01_uya_chk-3c1d.u3",  0x00000, 0x02000, CRC(3fee63ae) SHA1(519fe4981dc2c6d025fc2f27af6682103c99dd5e) )
+	ROM_LOAD( "03-14151-01_uya_chk-05a7.u4",  0x10000, 0x02000, CRC(d302b5d1) SHA1(77263944d7b4e335fbc3b91d69def6cc85648ec6) )
+	ROM_CONTINUE(                             0x1c000, 0x02000 )
+	ROM_LOAD( "03-14152-01_uya_chk-c686.u5",  0x12000, 0x02000, CRC(79bdb24d) SHA1(f64c3c5a715d5f4a27e01aeb31e1c43f1f3d5b17) )
+	ROM_CONTINUE(                             0x1e000, 0x02000 )
+	ROM_LOAD( "03-14153-01_uya_chk-9254.u6",  0x14000, 0x02000, CRC(f0b15d68) SHA1(8017fce4b30e2f3bee74fba82d2a0154b3a1ab6d) )
+	ROM_CONTINUE(                             0x20000, 0x02000 )
+	ROM_LOAD( "03-14154-01_uya_chk-2d51.u7",  0x16000, 0x02000, CRC(6974036c) SHA1(222dd4d8c6d69f6b44b76681a508ff2cfafe1acc) )
+	ROM_CONTINUE(                             0x22000, 0x02000 )
+	ROM_LOAD( "03-14155-01_uya_chk-42b6.u8",  0x18000, 0x02000, CRC(a4357b5a) SHA1(c58505e1ef66641f4da5f29edbb197c5a09a367b) )
+	ROM_CONTINUE(                             0x24000, 0x02000 )
+	ROM_LOAD( "03-14156-01_uya_chk-43e3.u9",  0x1a000, 0x02000, CRC(6d74274e) SHA1(10bb04243eabeb8178884b4e0691c5e1765a1dc4) )
+	ROM_CONTINUE(                             0x26000, 0x02000 )
 
 	ROM_REGION( 0x0c000, "bg_gfx", 0 )
-	ROM_LOAD( "uya-u93.bin", 0x00000, 0x04000, CRC(e8addd70) SHA1(6fd6a09fbdbe866440c3205b103e4bede7e4b2d5) )
-	ROM_LOAD( "uya-u94.bin", 0x04000, 0x04000, CRC(3fd3be09) SHA1(abdafbf9472fe3320be1a3effd13407dadf66709) )
-	ROM_LOAD( "uya-u95.bin", 0x08000, 0x04000, CRC(37088dd1) SHA1(35e4a3b338baceae2e4b8ac6d95691af49ebc3c1) )
+	ROM_LOAD( "03-14165-01_uya_chk-72ca.u93", 0x00000, 0x04000, CRC(e8addd70) SHA1(6fd6a09fbdbe866440c3205b103e4bede7e4b2d5) )
+	ROM_LOAD( "03-14166-01_uya_chk-9f27.u94", 0x04000, 0x04000, CRC(3fd3be09) SHA1(abdafbf9472fe3320be1a3effd13407dadf66709) )
+	ROM_LOAD( "03-14167-01_uya_chk-0151.u95", 0x08000, 0x04000, CRC(37088dd1) SHA1(35e4a3b338baceae2e4b8ac6d95691af49ebc3c1) )
 
 	ROM_REGION( 0x20000, "bg_prom", 0 ) // Ordering: 70/92/69/91/68/90/67/89
 	// U70 = Empty
-	ROM_LOAD( "uya-u92.bin",  0x04000, 0x2000, CRC(a020eab5) SHA1(2f4f51f0eff8a042bf23d5f3ff42166db56e7822) )
-	ROM_LOAD( "uya-u69.bin",  0x08000, 0x2000, CRC(79abb979) SHA1(dfff8ea4d13dd0db2836e75b6b57f5f3ddac0201) )
+	ROM_LOAD( "03-14164-01_uya_chk-e1d0.u92",  0x04000, 0x2000, CRC(a020eab5) SHA1(2f4f51f0eff8a042bf23d5f3ff42166db56e7822) )
+	ROM_LOAD( "03-14159-01_uya_chk-ca48.u69",  0x08000, 0x2000, CRC(79abb979) SHA1(dfff8ea4d13dd0db2836e75b6b57f5f3ddac0201) )
 	// U91 = Empty
-	ROM_LOAD( "uya-u68.bin",  0x10000, 0x2000, CRC(0c583385) SHA1(4bf5648991441470c4427c88ce17265b447d30d0) )
-	ROM_LOAD( "uya-u90.bin",  0x14000, 0x2000, CRC(0e1769e3) SHA1(7ca5e3205e790d90e0a39dc88766c582f25147b7) )
-	ROM_LOAD( "uya-u67.bin",  0x18000, 0x4000, CRC(d30a385d) SHA1(a1e83d360acef6087c24235c5a56457d25ccd937) )
-	ROM_LOAD( "uya-u89.bin",  0x1c000, 0x4000, CRC(5c17401e) SHA1(2759b1d336ee43116cc4e34db36bd9c56762cca9) )
+	ROM_LOAD( "03-14158-01_uya_chk-18c8.u68",  0x10000, 0x2000, CRC(0c583385) SHA1(4bf5648991441470c4427c88ce17265b447d30d0) )
+	ROM_LOAD( "03-14162-01_uya_chk-10e0.u90",  0x14000, 0x2000, CRC(0e1769e3) SHA1(7ca5e3205e790d90e0a39dc88766c582f25147b7) )
+	ROM_LOAD( "03-14157-01_uya_chk-1727.u67",  0x18000, 0x4000, CRC(d30a385d) SHA1(a1e83d360acef6087c24235c5a56457d25ccd937) )
+	ROM_LOAD( "03-14161-01_uya_chk-010f.u89",  0x1c000, 0x4000, CRC(5c17401e) SHA1(2759b1d336ee43116cc4e34db36bd9c56762cca9) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "eeprom-upyoural.bin", 0x0000, 0x0080, CRC(8c622ba1) SHA1(68728af8a19a9716af9b89af3a558c62e50867f5) )
@@ -3602,8 +3610,8 @@ GAME( 1985, mayhem,     0,        leland,   mayhem,     leland_state,  init_mayh
 GAME( 1985, powrplay,   0,        leland,   mayhem,     leland_state,  init_powrplay, ROT0,   "Cinematronics", "Power Play", 0 )
 GAME( 1985, wseries,    0,        leland,   wseries,    leland_state,  init_wseries,  ROT0,   "Cinematronics", "World Series: The Season (rev 1)", 0 )
 GAME( 1985, wseries0,   wseries,  leland,   wseries,    leland_state,  init_wseries,  ROT0,   "Cinematronics", "World Series: The Season (rev 0)", 0 )
-GAME( 1986, alleymas,   0,        leland,   alleymas,   leland_state,  init_alleymas, ROT270, "Cinematronics", "Alley Master", 0 )
-GAME( 1986, upyoural,   alleymas, leland,   upyoural,   leland_state,  init_upyoural, ROT270, "Cinematronics", "Up Your Alley", 0 ) // prototype of Alley Master?
+GAME( 1987, upyoural,   0,        leland,   upyoural,   leland_state,  init_upyoural, ROT270, "Cinematronics", "Up Your Alley", 0 ) // copyright based on year printed on labels
+GAME( 1985, alleymas,   upyoural, leland,   alleymas,   leland_state,  init_alleymas, ROT270, "Cinematronics", "Alley Master", 0 ) // copyright based on year printed on labels
 
 /* odd master banks, small slave banks */
 GAME( 1986, dangerz,    0,        leland,   dangerz,    leland_state,  init_dangerz,  ROT0,   "Cinematronics", "Danger Zone (rev 2)", 0 )

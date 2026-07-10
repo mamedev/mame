@@ -12,15 +12,15 @@
 
 What's new :
  - added bootlegs - Bronx and Colt
- - Cycle Shooting added (bigger VRAM than nycpator, different (unknown yet) banking and
+ - Cycle Shooting added (bigger VRAM than nycaptor, different (unknown yet) banking and
    gfx control , ROMs probably are wrong mapped, gfx too)
- - Sub CPU halt (cpu #0 ,$d001)
- - Improved communication between main cpu and sound cpu ($d400 cpu#0 , $d000 sound cpu)
+ - Sub CPU halt (CPU #0 ,$d001)
+ - Improved communication between main CPU and sound CPU ($d400 CPU#0 , $d000 sound CPU)
 
 
 To do :
  - REAL bg/sprite priority system
- - cpu #0 , $d806 - only bits 0,1,2 used , something with sound control
+ - CPU #0 , $d806 - only bits 0,1,2 used , something with sound control
                     (code at $62x)
  - better sound emulation (mixing ?)
  - unknown R/W
@@ -92,17 +92,17 @@ Notes :
  $d804 - Input Port 2     -------x Button1
                           xxxxxxx- Unused
 
- $d805 - MCU Status read  ------x- MCU has sent data to the main cpu
+ $d805 - MCU Status read  ------x- MCU has sent data to the main CPU
 
  $d806 - Unknown
 
- $d807 - MCU Status read  -------x MCU is ready to receive data from main cpu
+ $d807 - MCU Status read  -------x MCU is ready to receive data from main CPU
 
 
 RAM :
 
  $e18e - sync between 1st and 2nd Z80
- $e18d - same as a bove
+ $e18d - same as above
 
  $e19d - coinage A (Word)
  $e19f - coinage B (Word)
@@ -191,18 +191,426 @@ Stephh's additional notes (based on the game Z80 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "nycaptor.h"
+
+#include "taito68705.h"
 #include "taitoipt.h"
 
 #include "cpu/m6805/m6805.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/input_merger.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "sound/msm5232.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
+namespace {
+
+class nycaptor_state : public driver_device
+{
+public:
+	nycaptor_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_subcpu(*this, "sub"),
+		m_bmcu(*this, "bmcu"),
+		m_msm(*this, "msm"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch%u", 1U),
+		m_soundnmi(*this, "soundnmi"),
+		m_videoram(*this, "videoram"),
+		m_scrlram(*this, "scrlram"),
+		m_sharedram(*this, "sharedram"),
+		m_spriteram(*this, "spriteram"),
+		m_paletteram(*this, "paletteram", 0x200, ENDIANNESS_LITTLE),
+		m_paletteram_ext(*this, "paletteram_ext", 0x200, ENDIANNESS_LITTLE),
+		m_mainbank(*this, "mainbank"),
+		m_lightx(*this, "LIGHTX"),
+		m_lighty(*this, "LIGHTY")
+	{ }
+
+	void nycaptor(machine_config &config) ATTR_COLD;
+
+	void init_nycaptor() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_subcpu;
+	optional_device<taito68705_mcu_device> m_bmcu;
+	required_device<msm5232_device> m_msm;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device_array<generic_latch_8_device, 2> m_soundlatch;
+	required_device<input_merger_device> m_soundnmi;
+
+	// memory pointers
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_scrlram;
+	required_shared_ptr<uint8_t> m_sharedram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	memory_share_creator<uint8_t> m_paletteram;
+	memory_share_creator<uint8_t> m_paletteram_ext;
+	required_memory_bank m_mainbank;
+
+	required_ioport m_lightx;
+	required_ioport m_lighty;
+
+	// video-related
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_gfxctrl = 0;
+	uint8_t m_char_bank = 0;
+	uint8_t m_palette_bank = 0;
+
+	// misc
+	uint8_t m_generic_control_reg = 0;
+	int m_gametype = 0;
+	int m_mask = 0; // for debug only
+
+	void sub_cpu_halt_w(uint8_t data);
+	uint8_t b_r();
+	uint8_t by_r();
+	uint8_t bx_r();
+	void sound_cpu_reset_w(uint8_t data);
+	uint8_t generic_control_r();
+
+	[[maybe_unused]] void setmask(); // for debug only
+
+	uint8_t sound_status_r();
+	void videoram_w(offs_t offset, uint8_t data);
+	void palette_w(offs_t offset, uint8_t data);
+	uint8_t palette_r(offs_t offset);
+	void gfxctrl_w(uint8_t data);
+	uint8_t gfxctrl_r();
+	void scrlram_w(offs_t offset, uint8_t data);
+	void unk_w(uint8_t data);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void sound_map(address_map &map) ATTR_COLD;
+
+private:
+	void nmi_disable_w(uint8_t data);
+	void nmi_enable_w(uint8_t data);
+	void generic_control_w(uint8_t data);
+	uint8_t mcu_status_r1();
+	uint8_t mcu_status_r2();
+
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	int spot();
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
+
+	void master_map(address_map &map) ATTR_COLD;
+	void slave_map(address_map &map) ATTR_COLD;
+};
+
+class cyclshtg_state : public nycaptor_state
+{
+public:
+	cyclshtg_state(const machine_config &mconfig, device_type type, const char *tag) :
+		nycaptor_state(mconfig, type, tag)
+	{ }
+
+
+	void cyclshtg(machine_config &config) ATTR_COLD;
+	void bronx(machine_config &config) ATTR_COLD;
+
+	void init_cyclshtg() ATTR_COLD;
+	void init_colt() ATTR_COLD;
+	void init_bronx() ATTR_COLD;
+
+private:
+	uint8_t mcu_status_r();
+	uint8_t mcu_r();
+	void mcu_w(uint8_t data);
+	uint8_t mcu_status_r1();
+	void generic_control_w(uint8_t data);
+
+	void bronx_master_map(address_map &map) ATTR_COLD;
+	void bronx_slave_io_map(address_map &map) ATTR_COLD;
+	void bronx_slave_map(address_map &map) ATTR_COLD;
+	void cyclshtg_master_map(address_map &map) ATTR_COLD;
+	void cyclshtg_slave_map(address_map &map) ATTR_COLD;
+};
+
+
+#define NYCAPTOR_DEBUG  0
 //#define USE_MCU
+
+
+/*
+ 298 (e298) - spot (0-3) , 299 (e299) - lives
+ spot number isn't set to 0 in main menu ; lives - yes
+ sprites in main menu req priority 'type' 0
+*/
+int nycaptor_state::spot()
+{
+	if (m_gametype == 0 || m_gametype == 2)
+		return m_sharedram[0x299] ? m_sharedram[0x298] : 0;
+	else
+		return 0;
+}
+
+TILE_GET_INFO_MEMBER(nycaptor_state::get_tile_info)
+{
+	int pal = m_videoram[tile_index * 2 + 1] & 0x0f;
+	tileinfo.category = (m_videoram[tile_index * 2 + 1] & 0x30) >> 4;
+
+	tileinfo.group = 0;
+
+	if ((!spot()) && (pal == 6))
+		tileinfo.group = 1;
+
+	if (((spot() == 3) && (pal == 8)) || ((spot() == 1) && (pal == 0xc)))
+		tileinfo.group = 2;
+
+	if ((spot() == 1) && (tileinfo.category == 2))
+		tileinfo.group = 3;
+
+#if NYCAPTOR_DEBUG
+	if (m_mask & (1 << tileinfo.category))
+	{
+		if (spot())
+			pal = 0xe;
+		else
+			pal = 4;
+	}
+#endif
+
+	tileinfo.set(0,
+			m_videoram[tile_index * 2] + ((m_videoram[tile_index * 2 + 1] & 0xc0) << 2) + 0x400 * m_char_bank,
+			pal, 0
+			);
+}
+
+
+void nycaptor_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nycaptor_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_bg_tilemap->set_transmask(0, 0xf800, 0x7ff); //split 0
+	m_bg_tilemap->set_transmask(1, 0xfe00, 0x01ff);//split 1
+	m_bg_tilemap->set_transmask(2, 0xfffc, 0x0003);//split 2
+	m_bg_tilemap->set_transmask(3, 0xfff0, 0x000f);//split 3
+	m_bg_tilemap->set_scroll_cols(32);
+
+	m_palette->basemem().set(&m_paletteram[0], m_paletteram.bytes(), 8, ENDIANNESS_LITTLE, 1);
+	m_palette->extmem().set(&m_paletteram_ext[0], m_paletteram_ext.bytes(), 8, ENDIANNESS_LITTLE, 1);
+}
+
+void nycaptor_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset >> 1);
+}
+
+void nycaptor_state::palette_w(offs_t offset, uint8_t data)
+{
+	if (offset & 0x100)
+		m_palette->write8_ext((offset & 0xff) + (m_palette_bank << 8), data);
+	else
+		m_palette->write8((offset & 0xff) + (m_palette_bank << 8), data);
+}
+
+uint8_t nycaptor_state::palette_r(offs_t offset)
+{
+	if (offset & 0x100)
+		return m_paletteram_ext[(offset & 0xff) + (m_palette_bank << 8)];
+	else
+		return m_paletteram[(offset & 0xff) + (m_palette_bank << 8)];
+}
+
+void nycaptor_state::gfxctrl_w(uint8_t data)
+{
+	m_gfxctrl = data;
+
+	if (m_char_bank != ((data & 0x18) >> 3))
+	{
+		m_char_bank = ((data & 0x18) >> 3);
+		m_bg_tilemap->mark_all_dirty();
+	}
+
+	m_palette_bank = BIT(data, 5);
+}
+
+uint8_t nycaptor_state::gfxctrl_r()
+{
+	return m_gfxctrl;
+}
+
+void nycaptor_state::scrlram_w(offs_t offset, uint8_t data)
+{
+	m_scrlram[offset] = data;
+	m_bg_tilemap->set_scrolly(offset, data);
+}
+
+void nycaptor_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
+{
+	for (int i = 0; i < 0x20; i++)
+	{
+		int const pr = m_spriteram[0x9f - i];
+		int const offs = (pr & 0x1f) * 4;
+
+		int const code = m_spriteram[offs + 2] + ((m_spriteram[offs + 1] & 0x10) << 4); // 1 bit wolny = 0x20
+		int pal = m_spriteram[offs + 1] & 0x0f;
+		int sx = m_spriteram[offs + 3];
+		int const sy = 240 - m_spriteram[offs + 0];
+		int const priori = (pr & 0xe0) >> 5;
+
+		if (priori == pri)
+		{
+#if NYCAPTOR_DEBUG
+			if (m_mask & (1 << (pri + 4))) pal = 0xd;
+#endif
+			int const flipx = BIT(m_spriteram[offs + 1], 6);
+			int const flipy = BIT(m_spriteram[offs + 1], 7);
+
+			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+					code,
+					pal,
+					flipx, flipy,
+					sx, sy, 15);
+
+			if (m_spriteram[offs + 3] > 240)
+			{
+				sx = (m_spriteram[offs + 3] - 256);
+				m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+					code,
+					pal,
+					flipx, flipy,
+					sx, sy, 15);
+			}
+		}
+	}
+}
+
+
+#if NYCAPTOR_DEBUG
+/*
+ Keys :
+   q/w/e/r - bg priority display select
+   a/s/d/f/g/h/j/k - sprite priority display select
+   z - clear
+   x - no bg/sprite pri.
+*/
+
+#define mKEY_MASK(x, y) if (machine().input().code_pressed_once(x)) { m_mask |= y; m_bg_tilemap->mark_all_dirty(); }
+
+void nycaptor_state::setmask()
+{
+	mKEY_MASK(KEYCODE_Q, 1); // bg
+	mKEY_MASK(KEYCODE_W, 2);
+	mKEY_MASK(KEYCODE_E, 4);
+	mKEY_MASK(KEYCODE_R, 8);
+
+	mKEY_MASK(KEYCODE_A, 0x10); // sprites
+	mKEY_MASK(KEYCODE_S, 0x20);
+	mKEY_MASK(KEYCODE_D, 0x40);
+	mKEY_MASK(KEYCODE_F, 0x80);
+	mKEY_MASK(KEYCODE_G, 0x100);
+	mKEY_MASK(KEYCODE_H, 0x200);
+	mKEY_MASK(KEYCODE_J, 0x400);
+	mKEY_MASK(KEYCODE_K, 0x800);
+
+	if (machine().input().code_pressed_once(KEYCODE_Z)) {m_mask = 0; m_bg_tilemap->mark_all_dirty();} // disable
+	if (machine().input().code_pressed_once(KEYCODE_X)) {m_mask |= 0x1000; m_bg_tilemap->mark_all_dirty();} // no layers
+}
+#endif
+
+uint32_t nycaptor_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+#if NYCAPTOR_DEBUG
+	setmask();
+	if (m_mask & 0x1000)
+	{
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 3, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 3, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 2, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 2, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 0);
+		draw_sprites(bitmap, cliprect, 0);
+		draw_sprites(bitmap, cliprect, 1);
+		draw_sprites(bitmap, cliprect, 2);
+		draw_sprites(bitmap, cliprect, 3);
+		draw_sprites(bitmap, cliprect, 4);
+		draw_sprites(bitmap, cliprect, 5);
+		draw_sprites(bitmap, cliprect, 6);
+		draw_sprites(bitmap, cliprect, 7);
+	}
+	else
+#endif
+	switch (spot() & 3)
+	{
+	case 0:
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 3, 0);
+		draw_sprites(bitmap, cliprect, 6);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 3, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 2, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 2, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 0);
+		draw_sprites(bitmap, cliprect, 3);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 0);
+		draw_sprites(bitmap, cliprect, 0);
+		draw_sprites(bitmap, cliprect, 2);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 0);
+		draw_sprites(bitmap, cliprect, 1);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 0);
+		break;
+
+	case 1:
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 3, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 3, 0);
+		draw_sprites(bitmap, cliprect, 3);
+		draw_sprites(bitmap, cliprect, 2);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 2, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 0);
+		draw_sprites(bitmap, cliprect, 1);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 2, 0);
+		draw_sprites(bitmap, cliprect, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 0);
+		break;
+
+	case 2:
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 3, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 3, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 0);
+		draw_sprites(bitmap, cliprect, 1);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 2, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 2, 0);
+		draw_sprites(bitmap, cliprect, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 0);
+		break;
+
+	case 3:
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 0);
+		draw_sprites(bitmap, cliprect, 1);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 0);
+		draw_sprites(bitmap, cliprect, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 0);
+		break;
+	}
+
+	return 0;
+}
 
 
 void nycaptor_state::sub_cpu_halt_w(uint8_t data)
@@ -210,14 +618,14 @@ void nycaptor_state::sub_cpu_halt_w(uint8_t data)
 	m_subcpu->set_input_line(INPUT_LINE_HALT, (data) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-uint8_t nycaptor_state::nycaptor_b_r()
+uint8_t nycaptor_state::b_r()
 {
 	return 1;
 }
 
-uint8_t nycaptor_state::nycaptor_by_r()
+uint8_t nycaptor_state::by_r()
 {
-	int port = ioport("LIGHTY")->read();
+	int port = m_lighty->read();
 
 	if (m_gametype == 1)
 		port = 255 - port;
@@ -225,35 +633,33 @@ uint8_t nycaptor_state::nycaptor_by_r()
 	return port - 8;
 }
 
-uint8_t nycaptor_state::nycaptor_bx_r()
+uint8_t nycaptor_state::bx_r()
 {
-	return (ioport("LIGHTX")->read() + 0x27) | 1;
+	return (m_lightx->read() + 0x27) | 1;
 }
 
 
 void nycaptor_state::sound_cpu_reset_w(uint8_t data)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data&1 )? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-uint8_t nycaptor_state::nycaptor_mcu_status_r1()
+uint8_t nycaptor_state::mcu_status_r1()
 {
-	/* bit 1 = when 1, mcu has sent data to the main cpu */
+	// bit 1 = when 1, MCU has sent data to the main CPU
 	return (CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 2 : 0;
 }
 
-uint8_t nycaptor_state::nycaptor_mcu_status_r2()
+uint8_t nycaptor_state::mcu_status_r2()
 {
-	/* bit 0 = when 1, mcu is ready to receive data from main cpu */
+	// bit 0 = when 1, MCU is ready to receive data from main CPU
 	return (CLEAR_LINE != m_bmcu->host_semaphore_r()) ? 0 : 1;
 }
 
 uint8_t nycaptor_state::sound_status_r()
 {
-	return (m_soundlatch->pending_r() ? 1 : 0) | (m_soundlatch2->pending_r() ? 2 : 0);
+	return (m_soundlatch[0]->pending_r() ? 1 : 0) | (m_soundlatch[1]->pending_r() ? 2 : 0);
 }
-
-
 
 void nycaptor_state::nmi_disable_w(uint8_t data)
 {
@@ -269,26 +675,26 @@ void nycaptor_state::unk_w(uint8_t data)
 {
 }
 
-uint8_t nycaptor_state::nycaptor_generic_control_r()
+uint8_t nycaptor_state::generic_control_r()
 {
 	return m_generic_control_reg;
 }
 
-void nycaptor_state::nycaptor_generic_control_w(uint8_t data)
+void nycaptor_state::generic_control_w(uint8_t data)
 {
 	m_generic_control_reg = data;
-	membank("bank1")->set_entry((data&0x08)>>3);
+	m_mainbank->set_entry(BIT(data, 3));
 }
 
-void nycaptor_state::nycaptor_master_map(address_map &map)
+void nycaptor_state::master_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xc7ff).ram().w(FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
+	map(0xc000, 0xc7ff).ram().w(FUNC(nycaptor_state::videoram_w)).share(m_videoram);
 	map(0xd000, 0xd000).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
 	map(0xd001, 0xd001).w(FUNC(nycaptor_state::sub_cpu_halt_w));
-	map(0xd002, 0xd002).rw(FUNC(nycaptor_state::nycaptor_generic_control_r), FUNC(nycaptor_state::nycaptor_generic_control_w));   /* bit 3 - memory bank at 0x8000-0xbfff */
-	map(0xd400, 0xd400).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xd002, 0xd002).rw(FUNC(nycaptor_state::generic_control_r), FUNC(nycaptor_state::generic_control_w));   // bit 3 - memory bank at 0x8000-0xbfff
+	map(0xd400, 0xd400).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 	map(0xd401, 0xd401).nopr();
 	map(0xd403, 0xd403).w(FUNC(nycaptor_state::sound_cpu_reset_w));
 	map(0xd800, 0xd800).portr("DSWA");
@@ -296,35 +702,35 @@ void nycaptor_state::nycaptor_master_map(address_map &map)
 	map(0xd802, 0xd802).portr("DSWC");
 	map(0xd803, 0xd803).portr("IN0");
 	map(0xd804, 0xd804).portr("IN1");
-	map(0xd805, 0xd805).r(FUNC(nycaptor_state::nycaptor_mcu_status_r1));
+	map(0xd805, 0xd805).r(FUNC(nycaptor_state::mcu_status_r1));
 	map(0xd806, 0xd806).r(FUNC(nycaptor_state::sound_status_r));
-	map(0xd807, 0xd807).r(FUNC(nycaptor_state::nycaptor_mcu_status_r2));
-	map(0xdc00, 0xdc9f).ram().share("spriteram");
-	map(0xdca0, 0xdcbf).ram().w(FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
+	map(0xd807, 0xd807).r(FUNC(nycaptor_state::mcu_status_r2));
+	map(0xdc00, 0xdc9f).ram().share(m_spriteram);
+	map(0xdca0, 0xdcbf).ram().w(FUNC(nycaptor_state::scrlram_w)).share(m_scrlram);
 	map(0xdce1, 0xdce1).nopw();
-	map(0xdd00, 0xdeff).rw(FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
-	map(0xdf03, 0xdf03).rw(FUNC(nycaptor_state::nycaptor_gfxctrl_r), FUNC(nycaptor_state::nycaptor_gfxctrl_w));
-	map(0xe000, 0xffff).ram().share("sharedram");
+	map(0xdd00, 0xdeff).rw(FUNC(nycaptor_state::palette_r), FUNC(nycaptor_state::palette_w));
+	map(0xdf03, 0xdf03).rw(FUNC(nycaptor_state::gfxctrl_r), FUNC(nycaptor_state::gfxctrl_w));
+	map(0xe000, 0xffff).ram().share(m_sharedram);
 }
 
-void nycaptor_state::nycaptor_slave_map(address_map &map)
+void nycaptor_state::slave_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xc000, 0xc7ff).ram().w(FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
+	map(0xc000, 0xc7ff).ram().w(FUNC(nycaptor_state::videoram_w)).share(m_videoram);
 	map(0xd800, 0xd800).portr("DSWA");
 	map(0xd801, 0xd801).portr("DSWB");
 	map(0xd802, 0xd802).portr("DSWC");
 	map(0xd803, 0xd803).portr("IN0");
 	map(0xd804, 0xd804).portr("IN1");
-	map(0xdc00, 0xdc9f).ram().share("spriteram");
-	map(0xdca0, 0xdcbf).w(FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
+	map(0xdc00, 0xdc9f).ram().share(m_spriteram);
+	map(0xdca0, 0xdcbf).w(FUNC(nycaptor_state::scrlram_w)).share(m_scrlram);
 
-	map(0xdd00, 0xdeff).rw(FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
-	map(0xdf00, 0xdf00).r(FUNC(nycaptor_state::nycaptor_bx_r));
-	map(0xdf01, 0xdf01).r(FUNC(nycaptor_state::nycaptor_by_r));
-	map(0xdf02, 0xdf02).r(FUNC(nycaptor_state::nycaptor_b_r));
-	map(0xdf03, 0xdf03).r(FUNC(nycaptor_state::nycaptor_gfxctrl_r)).nopw();/* ? gfx control ? */
-	map(0xe000, 0xffff).ram().share("sharedram");
+	map(0xdd00, 0xdeff).rw(FUNC(nycaptor_state::palette_r), FUNC(nycaptor_state::palette_w));
+	map(0xdf00, 0xdf00).r(FUNC(nycaptor_state::bx_r));
+	map(0xdf01, 0xdf01).r(FUNC(nycaptor_state::by_r));
+	map(0xdf02, 0xdf02).r(FUNC(nycaptor_state::b_r));
+	map(0xdf03, 0xdf03).r(FUNC(nycaptor_state::gfxctrl_r)).nopw(); // ? gfx control ?
+	map(0xe000, 0xffff).ram().share(m_sharedram);
 }
 
 void nycaptor_state::sound_map(address_map &map)
@@ -337,7 +743,7 @@ void nycaptor_state::sound_map(address_map &map)
 	map(0xca00, 0xca00).nopw();
 	map(0xcb00, 0xcb00).nopw();
 	map(0xcc00, 0xcc00).nopw();
-	map(0xd000, 0xd000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
+	map(0xd000, 0xd000).r(m_soundlatch[0], FUNC(generic_latch_8_device::read)).w(m_soundlatch[1], FUNC(generic_latch_8_device::write));
 	map(0xd200, 0xd200).nopr().w(FUNC(nycaptor_state::nmi_enable_w));
 	map(0xd400, 0xd400).w(FUNC(nycaptor_state::nmi_disable_w));
 	map(0xd600, 0xd600).w("dac", FUNC(dac_byte_interface::data_w)); //otherwise no girl's scream in cycle shooting, see MT03975
@@ -345,32 +751,32 @@ void nycaptor_state::sound_map(address_map &map)
 }
 
 
-/* Cycle Shooting */
+// Cycle Shooting
 
 
-uint8_t nycaptor_state::cyclshtg_mcu_status_r()
+uint8_t cyclshtg_state::mcu_status_r()
 {
 	return 0xff;
 }
 
-uint8_t nycaptor_state::cyclshtg_mcu_r()
+uint8_t cyclshtg_state::mcu_r()
 {
 	return 7;
 }
 
-void nycaptor_state::cyclshtg_mcu_w(uint8_t data)
+void cyclshtg_state::mcu_w(uint8_t data)
 {
 }
 
-uint8_t nycaptor_state::cyclshtg_mcu_status_r1()
+uint8_t cyclshtg_state::mcu_status_r1()
 {
 	return machine().rand();
 }
 
-void nycaptor_state::cyclshtg_generic_control_w(uint8_t data)
+void cyclshtg_state::generic_control_w(uint8_t data)
 {
 	m_generic_control_reg = data;
-	membank("bank1")->set_entry((data >> 2) & 3);
+	m_mainbank->set_entry((data >> 2) & 3);
 
 	// shared palette data gets overwritten in colt without this
 	if (m_gametype == 2)
@@ -378,111 +784,106 @@ void nycaptor_state::cyclshtg_generic_control_w(uint8_t data)
 }
 
 
-void nycaptor_state::cyclshtg_master_map(address_map &map)
+void cyclshtg_state::cyclshtg_master_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xcfff).ram().w(FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
-	map(0xd000, 0xd000).rw(FUNC(nycaptor_state::cyclshtg_mcu_r), FUNC(nycaptor_state::cyclshtg_mcu_w));
-	map(0xd001, 0xd001).w(FUNC(nycaptor_state::sub_cpu_halt_w));
-	map(0xd002, 0xd002).rw(FUNC(nycaptor_state::nycaptor_generic_control_r), FUNC(nycaptor_state::cyclshtg_generic_control_w));
-	map(0xd400, 0xd400).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xd403, 0xd403).w(FUNC(nycaptor_state::sound_cpu_reset_w));
+	map(0x8000, 0xbfff).bankr(m_mainbank);
+	map(0xc000, 0xcfff).ram().w(FUNC(cyclshtg_state::videoram_w)).share(m_videoram);
+	map(0xd000, 0xd000).rw(FUNC(cyclshtg_state::mcu_r), FUNC(cyclshtg_state::mcu_w));
+	map(0xd001, 0xd001).w(FUNC(cyclshtg_state::sub_cpu_halt_w));
+	map(0xd002, 0xd002).rw(FUNC(cyclshtg_state::generic_control_r), FUNC(cyclshtg_state::generic_control_w));
+	map(0xd400, 0xd400).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
+	map(0xd403, 0xd403).w(FUNC(cyclshtg_state::sound_cpu_reset_w));
 	map(0xd800, 0xd800).portr("DSWA");
 	map(0xd801, 0xd801).portr("DSWB");
 	map(0xd802, 0xd802).portr("DSWC");
 	map(0xd803, 0xd803).portr("IN0");
 	map(0xd804, 0xd804).portr("IN1");
-	map(0xd805, 0xd805).r(FUNC(nycaptor_state::cyclshtg_mcu_status_r));
-	map(0xd806, 0xd806).r(FUNC(nycaptor_state::sound_status_r));
-	map(0xd807, 0xd807).r(FUNC(nycaptor_state::cyclshtg_mcu_status_r));
-	map(0xdc00, 0xdc9f).ram().share("spriteram");
-	map(0xdca0, 0xdcbf).ram().w(FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
+	map(0xd805, 0xd805).r(FUNC(cyclshtg_state::mcu_status_r));
+	map(0xd806, 0xd806).r(FUNC(cyclshtg_state::sound_status_r));
+	map(0xd807, 0xd807).r(FUNC(cyclshtg_state::mcu_status_r));
+	map(0xdc00, 0xdc9f).ram().share(m_spriteram);
+	map(0xdca0, 0xdcbf).ram().w(FUNC(cyclshtg_state::scrlram_w)).share(m_scrlram);
 	map(0xdce1, 0xdce1).nopw();
-	map(0xdd00, 0xdeff).rw(FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
-	map(0xdf03, 0xdf03).rw(FUNC(nycaptor_state::nycaptor_gfxctrl_r), FUNC(nycaptor_state::nycaptor_gfxctrl_w));
-	map(0xe000, 0xffff).ram().share("sharedram");
+	map(0xdd00, 0xdeff).rw(FUNC(cyclshtg_state::palette_r), FUNC(cyclshtg_state::palette_w));
+	map(0xdf03, 0xdf03).rw(FUNC(cyclshtg_state::gfxctrl_r), FUNC(cyclshtg_state::gfxctrl_w));
+	map(0xe000, 0xffff).ram().share(m_sharedram);
 }
 
-void nycaptor_state::cyclshtg_slave_map(address_map &map)
+void cyclshtg_state::cyclshtg_slave_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xcfff).ram().w(FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
+	map(0xc000, 0xcfff).ram().w(FUNC(cyclshtg_state::videoram_w)).share(m_videoram);
 	map(0xd800, 0xd800).portr("DSWA");
 	map(0xd801, 0xd801).portr("DSWB");
 	map(0xd802, 0xd802).portr("DSWC");
 	map(0xd803, 0xd803).portr("IN0");
 	map(0xd804, 0xd804).portr("IN1");
-	map(0xdc00, 0xdc9f).ram().share("spriteram");
-	map(0xdca0, 0xdcbf).w(FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
-	map(0xdd00, 0xdeff).rw(FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
-	map(0xdf00, 0xdf00).r(FUNC(nycaptor_state::nycaptor_bx_r));
-	map(0xdf01, 0xdf01).r(FUNC(nycaptor_state::nycaptor_by_r));
-	map(0xdf02, 0xdf02).r(FUNC(nycaptor_state::nycaptor_b_r));
-	map(0xdf03, 0xdf03).r(FUNC(nycaptor_state::nycaptor_gfxctrl_r));
+	map(0xdc00, 0xdc9f).ram().share(m_spriteram);
+	map(0xdca0, 0xdcbf).w(FUNC(cyclshtg_state::scrlram_w)).share(m_scrlram);
+	map(0xdd00, 0xdeff).rw(FUNC(cyclshtg_state::palette_r), FUNC(cyclshtg_state::palette_w));
+	map(0xdf00, 0xdf00).r(FUNC(cyclshtg_state::bx_r));
+	map(0xdf01, 0xdf01).r(FUNC(cyclshtg_state::by_r));
+	map(0xdf02, 0xdf02).r(FUNC(cyclshtg_state::b_r));
+	map(0xdf03, 0xdf03).r(FUNC(cyclshtg_state::gfxctrl_r));
 	map(0xdf03, 0xdf03).nopw();
-	map(0xe000, 0xffff).ram().share("sharedram");
+	map(0xe000, 0xffff).ram().share(m_sharedram);
 }
 
-uint8_t nycaptor_state::unk_r()
-{
-	return machine().rand();
-}
-
-void nycaptor_state::bronx_master_map(address_map &map)
+void cyclshtg_state::bronx_master_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xcfff).ram().w(FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
-	map(0xd000, 0xd000).r(FUNC(nycaptor_state::cyclshtg_mcu_r)).nopw();
-	map(0xd001, 0xd001).w(FUNC(nycaptor_state::sub_cpu_halt_w));
-	map(0xd002, 0xd002).rw(FUNC(nycaptor_state::nycaptor_generic_control_r), FUNC(nycaptor_state::cyclshtg_generic_control_w));
-	map(0xd400, 0xd400).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xd401, 0xd401).r(FUNC(nycaptor_state::unk_r));
-	map(0xd403, 0xd403).w(FUNC(nycaptor_state::sound_cpu_reset_w));
+	map(0x8000, 0xbfff).bankr(m_mainbank);
+	map(0xc000, 0xcfff).ram().w(FUNC(cyclshtg_state::videoram_w)).share(m_videoram);
+	map(0xd000, 0xd000).r(FUNC(cyclshtg_state::mcu_r)).nopw();
+	map(0xd001, 0xd001).w(FUNC(cyclshtg_state::sub_cpu_halt_w));
+	map(0xd002, 0xd002).rw(FUNC(cyclshtg_state::generic_control_r), FUNC(cyclshtg_state::generic_control_w));
+	map(0xd400, 0xd400).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
+	map(0xd401, 0xd401).lr8(NAME([this] () -> uint8_t { return machine().rand(); })); // ??
+	map(0xd403, 0xd403).w(FUNC(cyclshtg_state::sound_cpu_reset_w));
 	map(0xd800, 0xd800).portr("DSWA");
 	map(0xd801, 0xd801).portr("DSWB");
 	map(0xd802, 0xd802).portr("DSWC");
 	map(0xd803, 0xd803).portr("IN0");
 	map(0xd804, 0xd804).portr("IN1");
-	map(0xd805, 0xd805).r(FUNC(nycaptor_state::cyclshtg_mcu_status_r));
-	map(0xd806, 0xd806).r(FUNC(nycaptor_state::sound_status_r));
-	map(0xd807, 0xd807).r(FUNC(nycaptor_state::cyclshtg_mcu_status_r));
-	map(0xdc00, 0xdc9f).ram().share("spriteram");
-	map(0xdca0, 0xdcbf).ram().w(FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
-	map(0xdd00, 0xdeff).rw(FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
-	map(0xdf03, 0xdf03).rw(FUNC(nycaptor_state::nycaptor_gfxctrl_r), FUNC(nycaptor_state::nycaptor_gfxctrl_w));
-	map(0xe000, 0xffff).ram().share("sharedram");
+	map(0xd805, 0xd805).r(FUNC(cyclshtg_state::mcu_status_r));
+	map(0xd806, 0xd806).r(FUNC(cyclshtg_state::sound_status_r));
+	map(0xd807, 0xd807).r(FUNC(cyclshtg_state::mcu_status_r));
+	map(0xdc00, 0xdc9f).ram().share(m_spriteram);
+	map(0xdca0, 0xdcbf).ram().w(FUNC(cyclshtg_state::scrlram_w)).share(m_scrlram);
+	map(0xdd00, 0xdeff).rw(FUNC(cyclshtg_state::palette_r), FUNC(cyclshtg_state::palette_w));
+	map(0xdf03, 0xdf03).rw(FUNC(cyclshtg_state::gfxctrl_r), FUNC(cyclshtg_state::gfxctrl_w));
+	map(0xe000, 0xffff).ram().share(m_sharedram);
 }
 
-void nycaptor_state::bronx_slave_map(address_map &map)
+void cyclshtg_state::bronx_slave_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xc000, 0xcfff).ram().w(FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
+	map(0xc000, 0xcfff).ram().w(FUNC(cyclshtg_state::videoram_w)).share(m_videoram);
 	map(0xd800, 0xd800).portr("DSWA");
 	map(0xd801, 0xd801).portr("DSWB");
 	map(0xd802, 0xd802).portr("DSWC");
 	map(0xd803, 0xd803).portr("IN0");
 	map(0xd804, 0xd804).portr("IN1");
-	map(0xd805, 0xd805).r(FUNC(nycaptor_state::cyclshtg_mcu_status_r1));
-	map(0xd807, 0xd807).r(FUNC(nycaptor_state::cyclshtg_mcu_status_r));
-	map(0xdc00, 0xdc9f).ram().share("spriteram");
-	map(0xdca0, 0xdcbf).w(FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
-	map(0xdd00, 0xdeff).rw(FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
-	map(0xdf00, 0xdf00).r(FUNC(nycaptor_state::nycaptor_bx_r));
-	map(0xdf01, 0xdf01).r(FUNC(nycaptor_state::nycaptor_by_r));
-	map(0xdf02, 0xdf02).r(FUNC(nycaptor_state::nycaptor_b_r));
-	map(0xdf03, 0xdf03).rw(FUNC(nycaptor_state::nycaptor_gfxctrl_r), FUNC(nycaptor_state::nycaptor_gfxctrl_w));
-	map(0xe000, 0xffff).ram().share("sharedram");
+	map(0xd805, 0xd805).r(FUNC(cyclshtg_state::mcu_status_r1));
+	map(0xd807, 0xd807).r(FUNC(cyclshtg_state::mcu_status_r));
+	map(0xdc00, 0xdc9f).ram().share(m_spriteram);
+	map(0xdca0, 0xdcbf).w(FUNC(cyclshtg_state::scrlram_w)).share(m_scrlram);
+	map(0xdd00, 0xdeff).rw(FUNC(cyclshtg_state::palette_r), FUNC(cyclshtg_state::palette_w));
+	map(0xdf00, 0xdf00).r(FUNC(cyclshtg_state::bx_r));
+	map(0xdf01, 0xdf01).r(FUNC(cyclshtg_state::by_r));
+	map(0xdf02, 0xdf02).r(FUNC(cyclshtg_state::b_r));
+	map(0xdf03, 0xdf03).rw(FUNC(cyclshtg_state::gfxctrl_r), FUNC(cyclshtg_state::gfxctrl_w));
+	map(0xe000, 0xffff).ram().share(m_sharedram);
 }
 
-void nycaptor_state::bronx_slave_io_map(address_map &map)
+void cyclshtg_state::bronx_slave_io_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("user1", 0);
 }
 
 
-/* verified from Z80 code */
+// verified from Z80 code
 static INPUT_PORTS_START( nycaptor )
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SWA:1,2")  // table at 0x00e5 in CPU1 - see notes for 'colt'
@@ -590,7 +991,7 @@ static INPUT_PORTS_START( nycaptor )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
 INPUT_PORTS_END
 
-/* verified from Z80 code */
+// verified from Z80 code
 static INPUT_PORTS_START( colt )
 	PORT_INCLUDE( nycaptor )
 
@@ -603,7 +1004,7 @@ static INPUT_PORTS_START( colt )
 INPUT_PORTS_END
 
 
-/* verified from Z80 code */
+// verified from Z80 code
 static INPUT_PORTS_START( cyclshtg )
 	PORT_START("DSWA")
 	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SWA:1")
@@ -661,7 +1062,7 @@ static INPUT_PORTS_START( cyclshtg )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
 INPUT_PORTS_END
 
-/* verified from Z80 code */
+// verified from Z80 code
 static INPUT_PORTS_START( bronx )
 	PORT_INCLUDE( cyclshtg )
 
@@ -699,8 +1100,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_nycaptor )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )//16 colors
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 256, 16 )//palette 2, 16 colors
+	GFXDECODE_ENTRY( "gfx", 0, charlayout,     0, 16 ) // 16 colors
+	GFXDECODE_ENTRY( "gfx", 0, spritelayout, 256, 16 ) // palette 2, 16 colors
 GFXDECODE_END
 
 
@@ -708,9 +1109,9 @@ GFXDECODE_END
 void nycaptor_state::machine_start()
 {
 	if (m_gametype == 0)
-		membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
+		m_mainbank->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
 	else
-		membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
+		m_mainbank->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	save_item(NAME(m_generic_control_reg));
 
@@ -730,58 +1131,58 @@ void nycaptor_state::machine_reset()
 
 void nycaptor_state::nycaptor(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 8000000/2); /* ??? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &nycaptor_state::nycaptor_master_map);
+	// basic machine hardware
+	Z80(config, m_maincpu, 8'000'000 / 2); // ???
+	m_maincpu->set_addrmap(AS_PROGRAM, &nycaptor_state::master_map);
 	m_maincpu->set_vblank_int("screen", FUNC(nycaptor_state::irq0_line_hold));
 
-	Z80(config, m_subcpu, 8000000/2);
-	m_subcpu->set_addrmap(AS_PROGRAM, &nycaptor_state::nycaptor_slave_map);
-	m_subcpu->set_vblank_int("screen", FUNC(nycaptor_state::irq0_line_hold)); /* IRQ generated by ??? */
+	Z80(config, m_subcpu, 8'000'000 / 2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &nycaptor_state::slave_map);
+	m_subcpu->set_vblank_int("screen", FUNC(nycaptor_state::irq0_line_hold)); // IRQ generated by ???
 
-	Z80(config, m_audiocpu, 8000000/2);
+	Z80(config, m_audiocpu, 8'000'000 / 2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nycaptor_state::sound_map);
 
-	const attotime audio_irq_period = attotime::from_ticks(0x10000, 8000000); // ~122Hz
+	const attotime audio_irq_period = attotime::from_ticks(0x10000, 8'000'000); // ~122Hz
 	m_audiocpu->set_periodic_int(FUNC(nycaptor_state::irq0_line_hold), audio_irq_period);
 
-	TAITO68705_MCU(config, m_bmcu, 2000000);
+	TAITO68705_MCU(config, m_bmcu, 2'000'000);
 
 	// 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(nycaptor_state::screen_update_nycaptor));
+	screen.set_screen_update(FUNC(nycaptor_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nycaptor);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 512);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<0>));
+	GENERIC_LATCH_8(config, m_soundlatch[0]).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<0>));
 
 	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	GENERIC_LATCH_8(config, m_soundlatch2);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	ay8910_device &ay1(AY8910(config, "ay1", 8000000/4));
+	ay8910_device &ay1(AY8910(config, "ay1", 8'000'000 / 4));
 	ay1.port_a_write_callback().set(FUNC(nycaptor_state::unk_w));
 	ay1.port_b_write_callback().set(FUNC(nycaptor_state::unk_w));
 	ay1.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	ay8910_device &ay2(AY8910(config, "ay2", 8000000/4));
+	ay8910_device &ay2(AY8910(config, "ay2", 8'000'000 / 4));
 	ay2.port_a_write_callback().set(FUNC(nycaptor_state::unk_w));
 	ay2.port_b_write_callback().set(FUNC(nycaptor_state::unk_w));
 	ay2.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	MSM5232(config, m_msm, 2000000);
+	MSM5232(config, m_msm, 2'000'000);
 	m_msm->set_capacitors(1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6); // 1 uF capacitors (match the sample, not verified, standard)
 	m_msm->add_route(0, "speaker", 1.0); // pin 28  2'-1
 	m_msm->add_route(1, "speaker", 1.0); // pin 29  4'-1
@@ -798,25 +1199,25 @@ void nycaptor_state::nycaptor(machine_config &config)
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 }
 
-void nycaptor_state::cyclshtg(machine_config &config)
+void cyclshtg_state::cyclshtg(machine_config &config)
 {
-	Z80(config, m_maincpu, 8000000/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &nycaptor_state::cyclshtg_master_map);
-	m_maincpu->set_vblank_int("screen", FUNC(nycaptor_state::irq0_line_hold));
+	Z80(config, m_maincpu, 8'000'000 / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cyclshtg_state::cyclshtg_master_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cyclshtg_state::irq0_line_hold));
 
-	Z80(config, m_subcpu, 8000000/2);
-	m_subcpu->set_addrmap(AS_PROGRAM, &nycaptor_state::cyclshtg_slave_map);
-	m_subcpu->set_addrmap(AS_IO, &nycaptor_state::bronx_slave_io_map);
-	m_subcpu->set_vblank_int("screen", FUNC(nycaptor_state::irq0_line_hold));
+	Z80(config, m_subcpu, 8'000'000 / 2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &cyclshtg_state::cyclshtg_slave_map);
+	m_subcpu->set_addrmap(AS_IO, &cyclshtg_state::bronx_slave_io_map);
+	m_subcpu->set_vblank_int("screen", FUNC(cyclshtg_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 8000000/2);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &nycaptor_state::sound_map);
+	Z80(config, m_audiocpu, 8'000'000 / 2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cyclshtg_state::sound_map);
 
-	const attotime audio_irq_period = attotime::from_ticks(0x10000, 8000000); // ~122Hz
-	m_audiocpu->set_periodic_int(FUNC(nycaptor_state::irq0_line_hold), audio_irq_period);
+	const attotime audio_irq_period = attotime::from_ticks(0x10000, 8'000'000); // ~122Hz
+	m_audiocpu->set_periodic_int(FUNC(cyclshtg_state::irq0_line_hold), audio_irq_period);
 
 #ifdef USE_MCU
-	TAITO68705_MCU(config, m_bmcu, 2000000);
+	TAITO68705_MCU(config, m_bmcu, 2'000'000);
 #endif
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
@@ -826,7 +1227,7 @@ void nycaptor_state::cyclshtg(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(nycaptor_state::screen_update_nycaptor));
+	screen.set_screen_update(FUNC(cyclshtg_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nycaptor);
@@ -834,20 +1235,20 @@ void nycaptor_state::cyclshtg(machine_config &config)
 
 	SPEAKER(config, "speaker").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<0>));
+	GENERIC_LATCH_8(config, m_soundlatch[0]).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<0>));
 
 	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	GENERIC_LATCH_8(config, m_soundlatch2);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	ay8910_device &ay1(AY8910(config, "ay1", 8000000/4));
-	ay1.port_a_write_callback().set(FUNC(nycaptor_state::unk_w));
-	ay1.port_b_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay8910_device &ay1(AY8910(config, "ay1", 8'000'000 / 4));
+	ay1.port_a_write_callback().set(FUNC(cyclshtg_state::unk_w));
+	ay1.port_b_write_callback().set(FUNC(cyclshtg_state::unk_w));
 	ay1.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	ay8910_device &ay2(AY8910(config, "ay2", 8000000/4));
-	ay2.port_a_write_callback().set(FUNC(nycaptor_state::unk_w));
-	ay2.port_b_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay8910_device &ay2(AY8910(config, "ay2", 8'000'000 / 4));
+	ay2.port_a_write_callback().set(FUNC(cyclshtg_state::unk_w));
+	ay2.port_b_write_callback().set(FUNC(cyclshtg_state::unk_w));
 	ay2.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
 	MSM5232(config, m_msm, 2000000);
@@ -868,22 +1269,22 @@ void nycaptor_state::cyclshtg(machine_config &config)
 }
 
 
-void nycaptor_state::bronx(machine_config &config)
+void cyclshtg_state::bronx(machine_config &config)
 {
-	Z80(config, m_maincpu, 8000000/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &nycaptor_state::bronx_master_map);
-	m_maincpu->set_vblank_int("screen", FUNC(nycaptor_state::irq0_line_hold));
+	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cyclshtg_state::bronx_master_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cyclshtg_state::irq0_line_hold));
 
-	Z80(config, m_subcpu, 8000000/2);
-	m_subcpu->set_addrmap(AS_PROGRAM, &nycaptor_state::bronx_slave_map);
-	m_subcpu->set_addrmap(AS_IO, &nycaptor_state::bronx_slave_io_map);
-	m_subcpu->set_vblank_int("screen", FUNC(nycaptor_state::irq0_line_hold));
+	Z80(config, m_subcpu, 8_MHz_XTAL / 2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &cyclshtg_state::bronx_slave_map);
+	m_subcpu->set_addrmap(AS_IO, &cyclshtg_state::bronx_slave_io_map);
+	m_subcpu->set_vblank_int("screen", FUNC(cyclshtg_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 8000000/2);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &nycaptor_state::sound_map);
+	Z80(config, m_audiocpu, 8_MHz_XTAL / 2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cyclshtg_state::sound_map);
 
-	const attotime audio_irq_period = attotime::from_ticks(0x10000, 8000000); // ~122Hz
-	m_audiocpu->set_periodic_int(FUNC(nycaptor_state::irq0_line_hold), audio_irq_period);
+	const attotime audio_irq_period = attotime::from_ticks(0x10000, 8_MHz_XTAL); // ~122Hz
+	m_audiocpu->set_periodic_int(FUNC(cyclshtg_state::irq0_line_hold), audio_irq_period);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
@@ -892,7 +1293,7 @@ void nycaptor_state::bronx(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(nycaptor_state::screen_update_nycaptor));
+	screen.set_screen_update(FUNC(cyclshtg_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nycaptor);
@@ -900,23 +1301,23 @@ void nycaptor_state::bronx(machine_config &config)
 
 	SPEAKER(config, "speaker").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<0>));
+	GENERIC_LATCH_8(config, m_soundlatch[0]).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<0>));
 
 	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	GENERIC_LATCH_8(config, m_soundlatch2);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	ay8910_device &ay1(AY8910(config, "ay1", 8000000/4));
-	ay1.port_a_write_callback().set(FUNC(nycaptor_state::unk_w));
-	ay1.port_b_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay8910_device &ay1(AY8910(config, "ay1", 8_MHz_XTAL / 4));
+	ay1.port_a_write_callback().set(FUNC(cyclshtg_state::unk_w));
+	ay1.port_b_write_callback().set(FUNC(cyclshtg_state::unk_w));
 	ay1.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	ay8910_device &ay2(AY8910(config, "ay2", 8000000/4));
-	ay2.port_a_write_callback().set(FUNC(nycaptor_state::unk_w));
-	ay2.port_b_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay8910_device &ay2(AY8910(config, "ay2", 8_MHz_XTAL / 4));
+	ay2.port_a_write_callback().set(FUNC(cyclshtg_state::unk_w));
+	ay2.port_b_write_callback().set(FUNC(cyclshtg_state::unk_w));
 	ay2.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	MSM5232(config, m_msm, 2000000);
+	MSM5232(config, m_msm, 8_MHz_XTAL / 4);
 	m_msm->set_capacitors(1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6); // 1 uF capacitors (match the sample, not verified, standard)
 	m_msm->add_route(0, "speaker", 1.0); // pin 28  2'-1
 	m_msm->add_route(1, "speaker", 1.0); // pin 29  4'-1
@@ -939,7 +1340,7 @@ void nycaptor_state::bronx(machine_config &config)
   Game driver(s)
 ***************************************************************************/
 
-ROM_START( nycaptor )
+ROM_START( nycaptor ) // J1100055A main PCB + J1100042A sound PCB
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "a50_04",   0x00000, 0x4000, CRC(33d971a3) SHA1(8bf6cb8d799739dc6f115d352453af278d58de9a) )
 	ROM_LOAD( "a50_03",   0x04000, 0x4000, CRC(8557fa44) SHA1(5639ec2ac21ae94c416c01bd7c0dae722cc14598) )
@@ -957,7 +1358,7 @@ ROM_START( nycaptor )
 	ROM_REGION( 0x0800, "bmcu:mcu", 0 )
 	ROM_LOAD( "a50_17",   0x0000, 0x0800, CRC(69fe08dc) SHA1(9bdac3e835f63bbb8806892169d89f43d447df21) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x20000, "gfx", ROMREGION_INVERT )
 	ROM_LOAD( "a50_07",   0x00000, 0x4000, CRC(b3b330cf) SHA1(8330e4831b8d0068c0367417db2e27fded7c56fe) )
 	ROM_LOAD( "a50_09",   0x04000, 0x4000, CRC(22e2232e) SHA1(3b43114a5511b00e45cd67073c3f833fcf098fb6) )
 	ROM_LOAD( "a50_11",   0x08000, 0x4000, CRC(2c04ad4f) SHA1(a6272f91f583d46dd4a3fe863482b39406c70e97) )
@@ -988,9 +1389,9 @@ ROM_START( cyclshtg )
 	ROM_LOAD( "a80_17.i25",   0x4000, 0x4000, CRC(a90b7bbc) SHA1(bd5c96861a59a1f84bb5032775b1c70efdb7066f) )
 
 	ROM_REGION( 0x0800, "bmcu:mcu", 0 )
-	ROM_LOAD( "a80_18",       0x0000, 0x0800, NO_DUMP ) /* Missing */
+	ROM_LOAD( "a80_18",       0x0000, 0x0800, NO_DUMP )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x20000, "gfx", ROMREGION_INVERT )
 	ROM_LOAD( "a80_11.u11",   0x00000, 0x4000, CRC(29e1293b) SHA1(106204ec46fae5d3b5e4a4d423bc0e886a637c61) )
 	ROM_LOAD( "a80_10.u10",   0x04000, 0x4000, CRC(345f576c) SHA1(fee5b2167bcd0fdc21c0a7b22ffdf7506a24baee) )
 	ROM_LOAD( "a80_09.u9",    0x08000, 0x4000, CRC(3ef06dff) SHA1(99bbd32ae89a6becac9e1bb8a34a834d81890444) )
@@ -1121,7 +1522,7 @@ ROM_START( bronx )
 	ROM_LOAD( "a80_16.i26",   0x0000, 0x4000, CRC(ce171a48) SHA1(e5ae9bb22f58c8857737bc6f5317866819a4e4d1) )
 	ROM_LOAD( "a80_17.i25",   0x4000, 0x4000, CRC(a90b7bbc) SHA1(bd5c96861a59a1f84bb5032775b1c70efdb7066f) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x20000, "gfx", ROMREGION_INVERT )
 	ROM_LOAD( "a80_11.u11",   0x00000, 0x4000, CRC(29e1293b) SHA1(106204ec46fae5d3b5e4a4d423bc0e886a637c61) )
 	ROM_LOAD( "a80_10.u10",   0x04000, 0x4000, CRC(345f576c) SHA1(fee5b2167bcd0fdc21c0a7b22ffdf7506a24baee) )
 	ROM_LOAD( "a80_09.u9",    0x08000, 0x4000, CRC(3ef06dff) SHA1(99bbd32ae89a6becac9e1bb8a34a834d81890444) )
@@ -1255,7 +1656,7 @@ ROM_START( colt )
 	ROM_LOAD( "a50_15",   0x0000, 0x4000, CRC(f8a604e5) SHA1(8fae920fd09584b5e5ccd0db8b8934b393a23d50) )
 	ROM_LOAD( "a50_16",   0x4000, 0x4000, CRC(fc24e11d) SHA1(ce1a1d7b809fa0f5f5e7a462047374b1b3f621c6) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x20000, "gfx", ROMREGION_INVERT )
 	ROM_LOAD( "a50_07",   0x00000, 0x4000, CRC(b3b330cf) SHA1(8330e4831b8d0068c0367417db2e27fded7c56fe) )
 	ROM_LOAD( "a50_09",   0x04000, 0x4000, CRC(22e2232e) SHA1(3b43114a5511b00e45cd67073c3f833fcf098fb6) )
 	ROM_LOAD( "a50_11",   0x08000, 0x4000, CRC(2c04ad4f) SHA1(a6272f91f583d46dd4a3fe863482b39406c70e97) )
@@ -1271,12 +1672,12 @@ void nycaptor_state::init_nycaptor()
 	m_gametype = 0;
 }
 
-void nycaptor_state::init_cyclshtg()
+void cyclshtg_state::init_cyclshtg()
 {
 	m_gametype = 1;
 }
 
-void nycaptor_state::init_bronx()
+void cyclshtg_state::init_bronx()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -1286,7 +1687,7 @@ void nycaptor_state::init_bronx()
 	m_gametype = 1;
 }
 
-void nycaptor_state::init_colt()
+void cyclshtg_state::init_colt()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -1296,8 +1697,11 @@ void nycaptor_state::init_colt()
 	m_gametype = 2;
 }
 
-GAME( 1985, nycaptor, 0,        nycaptor, nycaptor, nycaptor_state, init_nycaptor, ROT0,  "Taito",   "N.Y. Captor (rev 2)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, colt,     nycaptor, bronx,    colt,     nycaptor_state, init_colt,     ROT0,  "bootleg", "Colt (bootleg of N.Y. Captor)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+} // anonymous namespace
 
-GAME( 1986, cyclshtg, 0,        cyclshtg, cyclshtg, nycaptor_state, init_cyclshtg, ROT90, "Taito",   "Cycle Shooting",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, bronx,    cyclshtg, bronx,    bronx,    nycaptor_state, init_bronx,    ROT90, "bootleg", "Bronx (bootleg of Cycle Shooting)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+
+GAME( 1985, nycaptor, 0,        nycaptor, nycaptor, nycaptor_state, init_nycaptor, ROT0,  "Taito",   "N.Y. Captor (rev 2)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, colt,     nycaptor, bronx,    colt,     cyclshtg_state, init_colt,     ROT0,  "bootleg", "Colt (bootleg of N.Y. Captor)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+
+GAME( 1986, cyclshtg, 0,        cyclshtg, cyclshtg, cyclshtg_state, init_cyclshtg, ROT90, "Taito",   "Cycle Shooting",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bronx,    cyclshtg, bronx,    bronx,    cyclshtg_state, init_bronx,    ROT90, "bootleg", "Bronx (bootleg of Cycle Shooting)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
