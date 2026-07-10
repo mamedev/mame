@@ -681,6 +681,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1992, gunbustr,  0,        gunbustr,  gunbustr, gunbustr_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Gunbuster (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gunbustru, gunbustr, gunbustr,  gunbustr, gunbustr_state, empty_init, ORIENTATION_FLIP_X, "Taito America Corporation", "Gunbuster (US)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gunbustrj, gunbustr, gunbustrj, gunbustr, gunbustr_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation",         "Gunbuster (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gunbustr,  0,        gunbustr,  gunbustr, gunbustr_state, empty_init, ORIENTATION_FLIP_X, "Taito",         "Gunbuster (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gunbustru, gunbustr, gunbustr,  gunbustr, gunbustr_state, empty_init, ORIENTATION_FLIP_X, "Taito America", "Gunbuster (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gunbustrj, gunbustr, gunbustrj, gunbustr, gunbustr_state, empty_init, ORIENTATION_FLIP_X, "Taito",         "Gunbuster (Japan)", MACHINE_SUPPORTS_SAVE )

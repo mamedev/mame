@@ -199,4 +199,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1986?, pres2k, 0, pres2k, pres2k, pres2k_state, empty_init, ROT0, "Taito Corporation", "Presenter 2000", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // A70, fits between bigevglf (A67) and tokio (A71)
+GAME( 1986?, pres2k, 0, pres2k, pres2k, pres2k_state, empty_init, ROT0, "Taito", "Presenter 2000", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // A70, fits between bigevglf (A67) and tokio (A71)

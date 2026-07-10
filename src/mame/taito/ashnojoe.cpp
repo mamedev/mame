@@ -646,5 +646,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1990, scessjoe, 0,        ashnojoe, ashnojoe, ashnojoe_state, empty_init, ROT0, "Taito Corporation / Wave", "Success Joe (World)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ashnojoe, scessjoe, ashnojoe, ashnojoe, ashnojoe_state, empty_init, ROT0, "Taito Corporation / Wave", "Ashita no Joe (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, scessjoe, 0,        ashnojoe, ashnojoe, ashnojoe_state, empty_init, ROT0, "Taito / Wave", "Success Joe (World)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ashnojoe, scessjoe, ashnojoe, ashnojoe, ashnojoe_state, empty_init, ROT0, "Taito / Wave", "Ashita no Joe (Japan)", MACHINE_SUPPORTS_SAVE )

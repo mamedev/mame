@@ -1162,6 +1162,6 @@ void cyclemb_state::init_skydest()
 } // anonymous namespace
 
 
-//    year  name      parent  machine   input    class          init          rot   company              fullname                 flags
-GAME( 1984, cyclemb,  0,      cyclemb,  cyclemb, cyclemb_state, init_cyclemb, ROT0, "Taito Corporation", "Cycle Maabou (Japan)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1985, skydest,  0,      skydest,  skydest, cyclemb_state, init_skydest, ROT0, "Taito Corporation", "Sky Destroyer (Japan)", MACHINE_SUPPORTS_SAVE )
+//    Year  Name      Parent  Machine   Input    Class          Init          ROT   Company  Fullname                 Flags
+GAME( 1984, cyclemb,  0,      cyclemb,  cyclemb, cyclemb_state, init_cyclemb, ROT0, "Taito", "Cycle Maabou (Japan)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, skydest,  0,      skydest,  skydest, cyclemb_state, init_skydest, ROT0, "Taito", "Sky Destroyer (Japan)", MACHINE_SUPPORTS_SAVE )

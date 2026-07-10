@@ -1372,14 +1372,14 @@ ROM_END
     Game drivers
 *******************************************************************************/
 
-//    YEAR  NAME      PARENT MACHINE  INPUT    CLASS         INIT        SCREEN COMPANY              FULLNAME                              FLAGS
-GAME( 1984, lkage,    0,     lkage,   lkage,   lkage_state,  empty_init, ROT0,  "Taito Corporation", "The Legend of Kage (rev 2)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkagea,   lkage, lkage,   lkage,   lkage_state,  empty_init, ROT0,  "Taito Corporation", "The Legend of Kage (rev 1)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageb,   lkage, lkage,   lkage,   lkage_state,  empty_init, ROT0,  "Taito Corporation", "The Legend of Kage",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkagem,   lkage, lkagem,  lkage,   lkagem_state, empty_init, ROT0,  "Taito Corporation", "The Legend of Kage (rev 2, MSM5232 sound)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkagebl1, lkage, lkagebl, lkagebl, lkage_state,  empty_init, ROT0,  "bootleg",           "The Legend of Kage (bootleg set 1)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkagebl2, lkage, lkagebl, lkagebl, lkage_state,  empty_init, ROT0,  "bootleg",           "The Legend of Kage (bootleg set 2)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkagebl3, lkage, lkagebl, lkagebl, lkage_state,  empty_init, ROT0,  "bootleg",           "The Legend of Kage (bootleg set 3)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkagebl4, lkage, lkagebl, lkagebl, lkage_state,  empty_init, ROT0,  "bootleg",           "The Legend of Kage (bootleg set 4)",        MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT MACHINE  INPUT    CLASS         INIT        SCREEN COMPANY    FULLNAME                                     FLAGS
+GAME( 1984, lkage,    0,     lkage,   lkage,   lkage_state,  empty_init, ROT0,  "Taito",   "The Legend of Kage (rev 2)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkagea,   lkage, lkage,   lkage,   lkage_state,  empty_init, ROT0,  "Taito",   "The Legend of Kage (rev 1)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageb,   lkage, lkage,   lkage,   lkage_state,  empty_init, ROT0,  "Taito",   "The Legend of Kage",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkagem,   lkage, lkagem,  lkage,   lkagem_state, empty_init, ROT0,  "Taito",   "The Legend of Kage (rev 2, MSM5232 sound)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkagebl1, lkage, lkagebl, lkagebl, lkage_state,  empty_init, ROT0,  "bootleg", "The Legend of Kage (bootleg set 1)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkagebl2, lkage, lkagebl, lkagebl, lkage_state,  empty_init, ROT0,  "bootleg", "The Legend of Kage (bootleg set 2)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkagebl3, lkage, lkagebl, lkagebl, lkage_state,  empty_init, ROT0,  "bootleg", "The Legend of Kage (bootleg set 3)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkagebl4, lkage, lkagebl, lkagebl, lkage_state,  empty_init, ROT0,  "bootleg", "The Legend of Kage (bootleg set 4)",        MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, bygone,   0,     lkage,   bygone,  lkage_state,  empty_init, ROT0,  "Taito Corporation", "Bygone (prototype)",                        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, bygone,   0,     lkage,   bygone,  lkage_state,  empty_init, ROT0,  "Taito",   "Bygone (prototype)",                        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

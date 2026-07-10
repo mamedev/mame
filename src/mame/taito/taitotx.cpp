@@ -450,6 +450,6 @@ ROM_START( kofxii )
 ROM_END
 
 
-GAME( 2006, chasehq2, 0, taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Taito Corporation", "Chase H.Q. 2 (v2.0.6.JP)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2006, chasehq2, 0, taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Taito",             "Chase H.Q. 2 (v2.0.6.JP)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2008, samspsen, 0, taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "SNK Playmore",      "Samurai Spirits Sen (v1.00)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2009, kofxii,   0, taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "SNK Playmore",      "The King of Fighters XII (v1.00)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION )

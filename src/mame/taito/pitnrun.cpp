@@ -1021,7 +1021,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1984, pitnrun,  0,       pitnrun_mcu, pitnrun, pitnrun_mcu_state, empty_init, ROT90, "Taito Corporation", "Pit & Run - F-1 Race (rev 1)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, pitnruna, pitnrun, pitnrun_mcu, pitnrun, pitnrun_mcu_state, empty_init, ROT90, "Taito Corporation", "Pit & Run - F-1 Race",                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, pitnrunb, pitnrun, pitnrun_mcu, pitnrun, pitnrun_mcu_state, empty_init, ROT90, "Taito Corporation", "Pit & Run - F-1 Race (location test?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, jumpkun,  0,       pitnrun,     jumpkun, pitnrun_state,     empty_init, ROT90, "Kaneko",            "Jump Kun (prototype)",                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // no copyright message
+GAME( 1984, pitnrun,  0,       pitnrun_mcu, pitnrun, pitnrun_mcu_state, empty_init, ROT90, "Taito",  "Pit & Run - F-1 Race (rev 1)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pitnruna, pitnrun, pitnrun_mcu, pitnrun, pitnrun_mcu_state, empty_init, ROT90, "Taito",  "Pit & Run - F-1 Race",                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pitnrunb, pitnrun, pitnrun_mcu, pitnrun, pitnrun_mcu_state, empty_init, ROT90, "Taito",  "Pit & Run - F-1 Race (location test?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, jumpkun,  0,       pitnrun,     jumpkun, pitnrun_state,     empty_init, ROT90, "Kaneko", "Jump Kun (prototype)",                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // no copyright message

@@ -753,4 +753,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1980, scyclone, 0, scyclone, scyclone, scyclone_state, empty_init, ROT270, "Taito Corporation", "Space Cyclone (Japan)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, scyclone, 0, scyclone, scyclone, scyclone_state, empty_init, ROT270, "Taito", "Space Cyclone (Japan)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -1325,5 +1325,5 @@ ROM_END
     Game Driver
 *********************************/
 
-//     YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        SCREEN  COMPANY                      FULLNAME        FLAGS
-GAMEL( 1983, changela, 0,      changela, changela, changela_state, empty_init, ROT180, "Taito America Corporation", "Change Lanes", MACHINE_SUPPORTS_SAVE, layout_changela )
+//     YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        SCREEN  COMPANY          FULLNAME        FLAGS
+GAMEL( 1983, changela, 0,      changela, changela, changela_state, empty_init, ROT180, "Taito America", "Change Lanes", MACHINE_SUPPORTS_SAVE, layout_changela )

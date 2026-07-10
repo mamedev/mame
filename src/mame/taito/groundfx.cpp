@@ -668,4 +668,4 @@ void groundfx_state::init_groundfx()
 } // anonymous namespace
 
 
-GAME( 1992, groundfx, 0, groundfx, groundfx, groundfx_state, init_groundfx, ROT0, "Taito Corporation", "Ground Effects / Super Ground Effects (Japan)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, groundfx, 0, groundfx, groundfx, groundfx_state, init_groundfx, ROT0, "Taito", "Ground Effects / Super Ground Effects (Japan)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )

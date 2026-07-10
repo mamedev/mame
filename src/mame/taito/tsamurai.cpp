@@ -1355,22 +1355,23 @@ void m660_state::init_the26thz()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd803, 0xd803, read8smo_delegate(*this, FUNC(m660_state::tsamurai_unknown_d803_r)));
 }
 
-GAME( 1984, vsgongf,   0,        vsgongf,  vsgongf,   vsgongf_state,  empty_init,    ROT90, "Kaneko", "VS Gong Fight", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1984, vsgongf,   0,        vsgongf,  vsgongf,   vsgongf_state,  empty_init,    ROT90, "Kaneko",                 "VS Gong Fight",        MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1984, ringfgt,   vsgongf,  vsgongf,  vsgongf,   vsgongf_state,  empty_init,    ROT90, "Kaneko (Taito license)", "Ring Fighter (rev 1)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, ringfgta,  vsgongf,  vsgongf,  vsgongf,   vsgongf_state,  empty_init,    ROT90, "Kaneko (Taito license)", "Ring Fighter", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ringfgta,  vsgongf,  vsgongf,  vsgongf,   vsgongf_state,  empty_init,    ROT90, "Kaneko (Taito license)", "Ring Fighter",         MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, tsamurai,  0,        tsamurai, tsamurai,  tsamurai_state, empty_init,    ROT90, "Kaneko / Taito", "Samurai Nihon-Ichi (rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tsamuraia, tsamurai, tsamurai, tsamurai,  tsamurai_state, empty_init,    ROT90, "Kaneko / Taito", "Samurai Nihon-Ichi",  MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tsamuraih, tsamurai, tsamurai, tsamuraih, tsamurai_state, empty_init,    ROT90, "bootleg", "Samurai Nihon-Ichi (bootleg, harder)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tsamurai,  0,        tsamurai, tsamurai,  tsamurai_state, empty_init,    ROT90, "Kaneko / Taito", "Samurai Nihon-Ichi (rev 1)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tsamuraia, tsamurai, tsamurai, tsamurai,  tsamurai_state, empty_init,    ROT90, "Kaneko / Taito", "Samurai Nihon-Ichi",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tsamuraih, tsamurai, tsamurai, tsamuraih, tsamurai_state, empty_init,    ROT90, "bootleg",        "Samurai Nihon-Ichi (bootleg, harder)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, ladymstr,  0,        tsamurai, ladymstr,  tsamurai_state, empty_init,    ROT90, "Kaneko / Taito", "Lady Master of Kung Fu (rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ladymstra, ladymstr, tsamurai, ladymstr,  tsamurai_state, empty_init,    ROT90, "Kaneko / Taito", "Lady Master of Kung Fu", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, nunchaku,  ladymstr, tsamurai, nunchaku,  tsamurai_state, empty_init,    ROT90, "Kaneko / Taito", "Nunchackun", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ladymstra, ladymstr, tsamurai, ladymstr,  tsamurai_state, empty_init,    ROT90, "Kaneko / Taito", "Lady Master of Kung Fu",         MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nunchaku,  ladymstr, tsamurai, nunchaku,  tsamurai_state, empty_init,    ROT90, "Kaneko / Taito", "Nunchackun",                     MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, yamagchi,  0,        tsamurai, yamagchi,  tsamurai_state, empty_init,    ROT90, "Kaneko / Taito", "Go Go Mr. Yamaguchi / Yuke Yuke Yamaguchi-kun", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, m660,      0,        m660,     m660,      m660_state,     empty_init,    ROT90, "Wood Place Co. Ltd. (Taito America Corporation license)", "Mission 660 (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, m660j,     m660,     m660,     m660,      m660_state,     empty_init,    ROT90, "Wood Place Co. Ltd. (Taito Corporation license)", "Mission 660 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, m660b,     m660,     m660,     m660,      m660_state,     empty_init,    ROT90, "bootleg", "Mission 660 (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, alphaxz,   0,        m660,     m660,      m660_state,     empty_init,    ROT90, "Ed Co., Ltd. (Wood Place Co., Ltd. license)", "The Alphax Z (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, the26thz,  alphaxz,  m660,     m660,      m660_state,     init_the26thz, ROT90, "Ed Co., Ltd. (Taito license)", "The 26th Z (Japan, location test)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, m660,      0,        m660,     m660,      m660_state,     empty_init,    ROT90, "Wood Place (Taito America license)", "Mission 660 (US)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1986, m660j,     m660,     m660,     m660,      m660_state,     empty_init,    ROT90, "Wood Place (Taito license)",         "Mission 660 (Japan)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, m660b,     m660,     m660,     m660,      m660_state,     empty_init,    ROT90, "bootleg",                            "Mission 660 (bootleg)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1986, alphaxz,   0,        m660,     m660,      m660_state,     empty_init,    ROT90, "Ed Co. (Wood Place license)", "The Alphax Z (Japan)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1986, the26thz,  alphaxz,  m660,     m660,      m660_state,     init_the26thz, ROT90, "Ed Co. (Taito license)",      "The 26th Z (Japan, location test)", MACHINE_SUPPORTS_SAVE )

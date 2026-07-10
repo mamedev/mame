@@ -740,5 +740,5 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 1985, wyvernf0,  0,        wyvernf0, wyvernf0, wyvernf0_state, empty_init, ROT270, "Taito Corporation", "Wyvern F-0 (Rev 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND)
-GAME( 1985, wyvernf0a, wyvernf0, wyvernf0, wyvernf0, wyvernf0_state, empty_init, ROT270, "Taito Corporation", "Wyvern F-0",         MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND) // First version or earlier dev version?
+GAME( 1985, wyvernf0,  0,        wyvernf0, wyvernf0, wyvernf0_state, empty_init, ROT270, "Taito", "Wyvern F-0 (Rev 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND)
+GAME( 1985, wyvernf0a, wyvernf0, wyvernf0, wyvernf0, wyvernf0_state, empty_init, ROT270, "Taito", "Wyvern F-0",         MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND) // First version or earlier dev version?

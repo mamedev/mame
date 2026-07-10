@@ -733,8 +733,8 @@ void slapshot_state::driver_init()
 	m_gfxdecode->set_gfx(1, nullptr);
 }
 
-GAME( 1994, slapshot,  0,        slapshot, slapshot, slapshot_state, driver_init, ROT0, "Taito Corporation Japan",   "Slap Shot (Ver 3.0 O)",    MACHINE_SUPPORTS_SAVE ) // 7/1  12:00  Ver 3.0 O
-GAME( 1994, slapshotj, slapshot, slapshot, slapshot, slapshot_state, driver_init, ROT0, "Taito Corporation",         "Slap Shot (Ver 2.2 J)",    MACHINE_SUPPORTS_SAVE ) // 6/8  12:00  Ver 2.2 J
-GAME( 1994, opwolf3,   0,        opwolf3,  opwolf3,  slapshot_state, driver_init, ROT0, "Taito Corporation Japan",   "Operation Wolf 3 (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, opwolf3u,  opwolf3,  opwolf3,  opwolf3,  slapshot_state, driver_init, ROT0, "Taito America Corporation", "Operation Wolf 3 (US)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1994, opwolf3j,  opwolf3,  opwolf3,  opwolf3,  slapshot_state, driver_init, ROT0, "Taito Corporation",         "Operation Wolf 3 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, slapshot,  0,        slapshot, slapshot, slapshot_state, driver_init, ROT0, "Taito",         "Slap Shot (Ver 3.0 O)",    MACHINE_SUPPORTS_SAVE ) // 7/1  12:00  Ver 3.0 O
+GAME( 1994, slapshotj, slapshot, slapshot, slapshot, slapshot_state, driver_init, ROT0, "Taito",         "Slap Shot (Ver 2.2 J)",    MACHINE_SUPPORTS_SAVE ) // 6/8  12:00  Ver 2.2 J
+GAME( 1994, opwolf3,   0,        opwolf3,  opwolf3,  slapshot_state, driver_init, ROT0, "Taito",         "Operation Wolf 3 (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, opwolf3u,  opwolf3,  opwolf3,  opwolf3,  slapshot_state, driver_init, ROT0, "Taito America", "Operation Wolf 3 (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1994, opwolf3j,  opwolf3,  opwolf3,  opwolf3,  slapshot_state, driver_init, ROT0, "Taito",         "Operation Wolf 3 (Japan)", MACHINE_SUPPORTS_SAVE )

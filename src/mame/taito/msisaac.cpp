@@ -863,4 +863,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1985, msisaac, 0, msisaac, msisaac, msisaac_state, empty_init, ROT270, "Taito Corporation", "Metal Soldier Isaac II", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, msisaac, 0, msisaac, msisaac, msisaac_state, empty_init, ROT270, "Taito", "Metal Soldier Isaac II", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

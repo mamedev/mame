@@ -465,4 +465,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1982, sbowling, 0, sbowling, sbowling, sbowling_state, empty_init, ROT90, "Taito Corporation", "Strike Bowling", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, sbowling, 0, sbowling, sbowling, sbowling_state, empty_init, ROT90, "Taito", "Strike Bowling", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

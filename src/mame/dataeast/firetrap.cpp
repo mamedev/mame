@@ -1292,7 +1292,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1986, firetrap,   0,        firetrap,   firetrap,   original_state, empty_init, ROT90, "Woodplace Inc. (Data East USA license)", "Fire Trap (US, rev A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, firetrapa,  firetrap, firetrap,   firetrap,   original_state, empty_init, ROT90, "Woodplace Inc. (Data East USA license)", "Fire Trap (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, firetrapj,  firetrap, firetrap,   firetrapj,  original_state, empty_init, ROT90, "Woodplace Inc.",                         "Fire Trap (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, firetrapbl, firetrap, firetrapbl, firetrapbl, bootleg_state,  empty_init, ROT90, "bootleg",                                "Fire Trap (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, firetrap,   0,        firetrap,   firetrap,   original_state, empty_init, ROT90, "Wood Place (Data East USA license)", "Fire Trap (US, rev A)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, firetrapa,  firetrap, firetrap,   firetrap,   original_state, empty_init, ROT90, "Wood Place (Data East USA license)", "Fire Trap (US)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1986, firetrapj,  firetrap, firetrap,   firetrapj,  original_state, empty_init, ROT90, "Wood Place",                         "Fire Trap (Japan)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1986, firetrapbl, firetrap, firetrapbl, firetrapbl, bootleg_state,  empty_init, ROT90, "bootleg",                            "Fire Trap (Japan bootleg)", MACHINE_SUPPORTS_SAVE )

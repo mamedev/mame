@@ -530,6 +530,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1987, exzisus,  0,       exzisus, exzisus, exzisus_state, empty_init, ROT0, "Taito Corporation",               "Exzisus (Japan, dedicated)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, exzisusa, exzisus, exzisus, exzisus, exzisus_state, empty_init, ROT0, "Taito Corporation",               "Exzisus (Japan, conversion)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, exzisust, exzisus, exzisus, exzisus, exzisus_state, empty_init, ROT0, "Taito Corporation (TAD license)", "Exzisus (TAD license)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1987, exzisus,  0,       exzisus, exzisus, exzisus_state, empty_init, ROT0, "Taito",               "Exzisus (Japan, dedicated)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, exzisusa, exzisus, exzisus, exzisus, exzisus_state, empty_init, ROT0, "Taito",               "Exzisus (Japan, conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, exzisust, exzisus, exzisus, exzisus, exzisus_state, empty_init, ROT0, "Taito (TAD license)", "Exzisus (TAD license)",       MACHINE_SUPPORTS_SAVE )

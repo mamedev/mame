@@ -742,7 +742,7 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR  NAME      PARENT    MACHINE   INPUT    CLASS          INIT        SCREEN  COMPANY, FULLNAME, FLAGS
-GAME( 1983, fightrol, 0,        rollace,  rollace, rollrace_state, empty_init, ROT270, "Kaneko (Taito license)", "Fighting Roller", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT    MACHINE   INPUT    CLASS           INIT        SCREEN  COMPANY                      FULLNAME               FLAGS
+GAME( 1983, fightrol, 0,        rollace,  rollace, rollrace_state, empty_init, ROT270, "Kaneko (Taito license)",    "Fighting Roller",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, rollace,  fightrol, rollace,  rollace, rollrace_state, empty_init, ROT270, "Kaneko (Williams license)", "Roller Aces (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, rollace2, fightrol, rollace2, rollace, rollrace_state, empty_init, ROT90,  "Kaneko (Williams license)", "Roller Aces (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
