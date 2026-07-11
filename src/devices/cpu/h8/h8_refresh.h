@@ -57,23 +57,6 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	enum {
-		// RTMCSR bits (refresh timer control/status register, @0xee028 -- a
-		// SINGLE register, confirmed by disassembly of the vec21 ISR's
-		// compare-match-flag ack idiom: read @0xee028, AND #0x7f, write back,
-		// which only makes sense if CMF/CMIE/CKS all live in the same byte).
-		// Per the H8/3006/3007 hardware manual sec. 6.2.9: CMF=bit7, CMIE=bit6,
-		// CKS2-CKS0=bits5-3, bits2-0 reserved (always read as 1).
-		RTMCSR_CMF  = 0x80,  // compare-match flag (bit 7, hw-set/sw-clear-only)
-		RTMCSR_CMIE = 0x40,  // compare-match interrupt enable (bit 6)
-		RTMCSR_CKS  = 0x38,  // clock select (CKS2-CKS0, bits 5-3)
-	};
-
-	// prescaler shift per CKS2-CKS0 value, straight from the H8/3006/3007
-	// hardware manual's RTMCSR table (sec. 6.2.9): count-halted, /2, /8, /32,
-	// /128, /512, /2048, /4096. -1 marks "halted" (RTCNT does not advance).
-	static const int div_shift[8];
-
 	required_device<h8_device> m_cpu;
 	required_device<h8_intc_device> m_intc;
 	int m_irq;

@@ -17,13 +17,29 @@
 
 DEFINE_DEVICE_TYPE(H8_REFRESH, h8_refresh_device, "h8_refresh", "H8 refresh-timer")
 
+namespace {
+
+// RTMCSR bits (refresh timer control/status register, @0xee028 -- a SINGLE
+// register, confirmed by disassembly of the vec21 ISR's compare-match-flag
+// ack idiom: read @0xee028, AND #0x7f, write back, which only makes sense if
+// CMF/CMIE/CKS all live in the same byte). Per the H8/3006/3007 hardware
+// manual sec. 6.2.9: CMF=bit7, CMIE=bit6, CKS2-CKS0=bits5-3, bits2-0
+// reserved (always read as 1).
+enum {
+	RTMCSR_CMF  = 0x80,  // compare-match flag (bit 7, hw-set/sw-clear-only)
+	RTMCSR_CMIE = 0x40,  // compare-match interrupt enable (bit 6)
+	RTMCSR_CKS  = 0x38,  // clock select (CKS2-CKS0, bits 5-3)
+};
+
 // phi prescaler shift for each RTMCSR CKS2-CKS0 value, per the H8/3006/3007
 // hardware manual RTMCSR table (sec. 6.2.9): halted, /2, /8, /32, /128, /512,
 // /2048, /4096. Confirmed against the actual ROM: at PC 0x2c8 it writes
 // RTMCSR <- 0x2f (CKS=5, i.e. /512, shift 9) after priming RTCOR <- 0x7d at
 // PC 0x2ba, then later (PC 0x870) ORs in CMIE (0x40) without touching CKS.
 // -1 marks "halted" (RTCNT does not advance).
-const int h8_refresh_device::div_shift[8] = { -1, 1, 3, 5, 7, 9, 11, 12 };
+const int div_shift[8] = { -1, 1, 3, 5, 7, 9, 11, 12 };
+
+} // anonymous namespace
 
 h8_refresh_device::h8_refresh_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, H8_REFRESH, tag, owner, clock),
