@@ -29,6 +29,7 @@
 
 #include "emupal.h"
 #include "endianness.h"
+#include "machine/timer.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -257,6 +258,7 @@ private:
 	uint8_t spectrum_mux_r();
 	void spectrum_mux_w(uint8_t data);
 	void update_lanes();
+	TIMER_DEVICE_CALLBACK_MEMBER(lane_update_timer);
 	void te7752_port3_w(uint8_t data);
 	void te7752_port4_w(uint8_t data);
 	void te7752_port5_w(uint8_t data);
@@ -323,11 +325,19 @@ void flashbeats_state::update_lanes()
 	}
 }
 
+// Polls display RAM on a fixed-rate timer rather than from screen_update();
+// screen updates aren't a reliable game-state clock
+TIMER_DEVICE_CALLBACK_MEMBER(flashbeats_state::lane_update_timer)
+{
+	update_lanes();
+}
+
 // Flash Beats has no conventional raster screen; it has a 128x32 pinball-style
 // dot-matrix VFD and 5 RGB-LED "tube" lanes, both built by the H8 in work RAM.
 //
 // The MAME screen is the DMD itself (128x32). The 5 lanes are published as
-// artwork outputs by update_lanes() and drawn by the .lay.
+// artwork outputs by update_lanes(), polled on its own timer (see
+// lane_update_timer) rather than from here, and drawn by the .lay.
 //
 // The main-loop scene handlers compose source art into a staging canvas at
 // 0xa02800 via the sprite blitter at 0x749e, but that canvas only updates when
@@ -364,8 +374,6 @@ uint32_t flashbeats_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 			}
 		}
 	}
-
-	update_lanes();
 
 	return 0;
 }
@@ -504,13 +512,25 @@ void flashbeats_state::flashbeats(machine_config &config)
 	SEGA_315_5338A(config, m_315_5338a, 32_MHz_XTAL);
 
 	// The DMD itself is the MAME screen (128x32, built from H8 work RAM each
-	// frame). The 5 LED lanes are published as artwork outputs (update_lanes) and
-	// drawn by the .lay. Not a real raster device on the hardware.
+	// frame). The 5 LED lanes are published as artwork outputs (update_lanes),
+	// polled by their own timer below. Neither is a real raster device on the
+	// hardware.
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(DMD_W, DMD_H);
 	m_screen->set_visarea(0, DMD_W - 1, 0, DMD_H - 1);
 	m_screen->set_screen_update(FUNC(flashbeats_state::screen_update));
+
+	// LED lane state is plain artwork output, not screen-clocked; poll it on its
+	// own timer so frameskip/throttle can't affect its update rate. Rate chosen
+	// from live measurement (write-tap directly on 0xa0c000/0xa0c1e0, counting
+	// actual byte VALUE changes, not just writes -- the composer rewrites the
+	// whole buffer every cycle regardless of content change, ~595 writes/frame,
+	// so raw write count isn't useful): baseline content-change rate tracks the
+	// RTCOR system tick (~248Hz, matches h8_refresh.h's ~4.03ms tick almost
+	// exactly), with bursts up to ~433Hz measured during busier attract-mode
+	// animation. 480Hz stays above the observed burst ceiling with margin.
+	TIMER(config, "lane_timer").configure_periodic(FUNC(flashbeats_state::lane_update_timer), attotime::from_hz(480));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
