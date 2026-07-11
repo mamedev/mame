@@ -70,19 +70,25 @@ void h8gen_dma_device::set_input(int inputnum, int state)
 
 void h8gen_dma_device::start_stop_test()
 {
+	bool changed = false;
 	u8 chnmap = active_channels();
 	for(int i=0; i != 8; i++) {
 		if(BIT(chnmap, i)) {
-			if(!(m_dmach[i >> 1]->m_state[i & 1].m_flags & h8_dma_state::ACTIVE))
+			if(!(m_dmach[i >> 1]->m_state[i & 1].m_flags & h8_dma_state::ACTIVE)) {
 				m_dmach[i >> 1]->start(i & 1);
+				changed = true;
+			}
 
 		} else {
 			if(m_dmach[i >> 1] && (m_dmach[i >> 1]->m_state[i & 1].m_flags & h8_dma_state::ACTIVE)) {
 				logerror("forced abort %d\n", i);
 				m_dmach[i >> 1]->abort(i & 1);
+				changed = true;
 			}
 		}
 	}
+	if(changed)
+		m_cpu->update_active_dma_channel();
 }
 
 
@@ -549,7 +555,10 @@ void h8h_dma_channel_device::dtcrb_w(u8 data)
 
 void h8h_dma_channel_device::dma_done(int submodule)
 {
-	m_dtcr[submodule] &= ~0x80;
+	if(m_state[submodule].m_flags & h8_dma_state::FAE)
+		m_dtcr[0] &= ~0x80;
+	else
+		m_dtcr[submodule] &= ~0x80;
 	h8gen_dma_channel_device::dma_done(submodule);
 }
 

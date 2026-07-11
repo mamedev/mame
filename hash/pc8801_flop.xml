@@ -4500,16 +4500,15 @@ All weapons GFX displays are garbled in this version, is the dump right?
 		</part>
 	</software>
 
-	<software name="batlskin" supported="no">
+	<software name="batlskin" supported="yes">
 		<description>Battle Skin Panic - Zenra Senshi</description>
 		<year>1990</year>
 		<publisher>タケル (Takeru)</publisher>
-		<notes><![CDATA[
-Black screen, keeps spinning [FDC] motor in an awkward way
-]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19901215"/>
 		<info name="alt_title" value="バトルスキンパニック -全裸戦士-"/>
+		<!-- Really optional, but as first option given (1. mouse 2. joystick 3. keyboard) -->
+		<sharedfeat name="mouseport_default" value="mouse" />
 		<!--combined image-->
 		<!--rom name="battle skin panic.d88" size="1244928" crc="9269390a" sha1="3cdcf84e02d72e8862ec5ef8850dbdf1f99ab9fc"/-->
 
