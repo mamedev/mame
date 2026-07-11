@@ -84,6 +84,7 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/fsmgr.cpp",
 		MAME_DIR .. "src/lib/formats/fsblk.h",
 		MAME_DIR .. "src/lib/formats/fsblk.cpp",
+		MAME_DIR .. "src/lib/formats/fsblk_multi.h",
 		MAME_DIR .. "src/lib/formats/fsblk_vec.h",
 		MAME_DIR .. "src/lib/formats/fsblk_vec.cpp",
 		MAME_DIR .. "src/lib/formats/fs_unformatted.h",
@@ -2441,6 +2442,18 @@ if opt_tool(FORMATS, "FS_HP98X5") then
 	files {
 		MAME_DIR.. "src/lib/formats/fs_hp98x5.cpp",
 		MAME_DIR.. "src/lib/formats/fs_hp98x5.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/fs_adam_eos.h,FORMATS["FS_ADAM_EOS"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FS_ADAM_EOS") then
+	files {
+		MAME_DIR.. "src/lib/formats/fs_adam_eos.cpp",
+		MAME_DIR.. "src/lib/formats/fs_adam_eos.h",
 	}
 end
 
