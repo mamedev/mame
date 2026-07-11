@@ -114,7 +114,6 @@ protected:
 
 	void default_cartridge_reset();
 //	void default_cassette_hack_reset();
-	void default_keyboard_hle_reset();
 	void irq_reset(u8 timer_default_setting);
 
 	virtual void video_start() override ATTR_COLD;
@@ -160,11 +159,6 @@ protected:
 	void cart_map(address_map &map);
 
 private:
-	uint32_t m_old_key1 = 0;
-	uint32_t m_old_key2 = 0;
-	uint32_t m_old_key3 = 0;
-	u8 m_old_key_fn;
-
 	uint8_t m_joystick_out = 0xff;
 
 // IRQ model

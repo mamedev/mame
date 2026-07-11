@@ -9,8 +9,10 @@ On Mr. PC the keyboard is detached from the body, actually using an IR interface
 headset cable.
 
 TODO:
-- Mimicking some of the MCU actual internals here;
-- Double check keys marked in translate
+- Mimicking some of the MCU actual internals here, if/when MCU LLE is dumped properly
+  then this will just contain the input port def;
+- CTRL, GRAPH, KANA, CAPS (no scancode?), INS and ROT (two rotating arrows on vanilla PC-6001);
+- "<|--|> PAGE" (same as ROT?) and MODE on Mr. PC keyboards;
 
 **************************************************************************************************/
 
@@ -110,27 +112,25 @@ static INPUT_PORTS_START( pc6001_kbd )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("KEY8")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
-//	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("")
-//	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("")
-//	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("")
-//	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("")
-//	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(UCHAR_MAMEKEY(ENTER))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("STOP")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("UP") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("DOWN") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RIGHT") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LEFT") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("TAB") PORT_CODE(KEYCODE_TAB) PORT_CHAR(UCHAR_MAMEKEY(TAB))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
 
 	PORT_START("KEY9")
-//	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("")
+//	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("KANA")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("INS") PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("DEL") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE))
-//	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("")
-//	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("")
+//	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("ROT")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("HOME CLR") PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME))
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 //	PORT_START("KEY_MOD")
-//	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("KANA") PORT_CODE(KEYCODE_RCONTROL) PORT_TOGGLE
-//	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CAPS") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
-//	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("STOP") PORT_CODE(KEYCODE_ESC)
+//	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CAPS") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 INPUT_PORTS_END
 
 ioport_constructor pc6001_kbd_device::device_input_ports() const
@@ -160,49 +160,49 @@ uint8_t pc6001_kbd_device::translate(uint8_t row, uint8_t column)
 	const u8 keytable[2][10 * 8] = {
 		// normal
 		{
-	// [0]  ----   CTRL   SHIFT  GRAPH  ----   ----   ----   ----
+//     [0]  ----   CTRL   SHIFT  GRAPH  ----   ----   ----   ----
 			0x00,  0x00,  0x00,  0x00,  0x00,  0x00,  0x00,  0x00,
-	// [1]
+//     [1]  1      Q      A      Z      K      I      8      ,
 			0x31,  0x51,  0x41,  0x5a,  0x4b,  0x49,  0x38,  0x2c,
-	// [2]
+//     [2]  2      W      S      X      L      O      9      .
 			0x32,  0x57,  0x53,  0x58,  0x4c,  0x4f,  0x39,  0x2e,
-	// [3]
+//     [3]  3      E      D      C      ;      P      F1     /
 			0x33,  0x45,  0x44,  0x43,  0x3b,  0x50,  0xf0,  0x2f,
-	// [4]                                                   _?
+//     [4]  4      R      F      V      :      @      F2     _?
 			0x34,  0x52,  0x46,  0x56,  0x3a,  0x40,  0xf1,  0x5f,
-	// [5]
+//     [5]  5      T      G      B      ]      [      F3     SPACE
 			0x35,  0x54,  0x47,  0x42,  0x5d,  0x5b,  0xf2,  0x20,
-	// [6]
+//     [6]  6      Y      H      N      -      ^      F4     0
 			0x36,  0x59,  0x48,  0x4e,  0x2d,  0x5e,  0xf3,  0x30,
-	// [7]                              -----  YEN?   F5     -----
+//     [7]  7      U      J      M      -----  YEN?   F5     -----
 			0x37,  0x55,  0x4a,  0x4d,  0x00,  0x5c,  0xf4,  0x00,
-	// [8]
-			0x0d,  0x00,  0x00,  0x00,  0x00,  0x00,  0x09,  0x1b,
-	// [9]         INS?
-			0x00,  0x00,  0x08,  0x00,  0x00,  0x00,  0x00,  0x00
+//     [8]  RET    STOP   UP     DOWN   RIGHT  LEFT   TAB    ESC?
+			0x0d,  0xfa,  0x1e,  0x1f,  0x1c,  0x1d,  0x09,  0x1b,
+//     [9]  KANA   INS?   DEL    ROT?   HOME   -----  -----  -----
+			0x00,  0x00,  0x08,  0x00,  0x0b,  0x00,  0x00,  0x00
 		},
 		// shift
 		{
-	// [0]  ----   CTRL   SHIFT  GRAPH  ----   ----   ----   ----
+//     [0]  ----   CTRL   SHIFT  GRAPH  ----   ----   ----   ----
 			0x00,  0x00,  0x00,  0x00,  0x00,  0x00,  0x00,  0x00,
-	// [1]
+//     [1]  !      q      a      z      k      i      8      <
 			0x21,  0x71,  0x61,  0x7a,  0x6b,  0x69,  0x28,  0x3c,
-	// [2]
+//     [2]  "      w      s      x      l      o      )      >
 			0x22,  0x77,  0x73,  0x78,  0x6c,  0x6f,  0x29,  0x3e,
-	// [3]
+//     [3]  #      e      d      c      +      p      F6     ?
 			0x23,  0x65,  0x64,  0x63,  0x2b,  0x70,  0xf5,  0x3f,
-	// [4]                                                   _?
+//     [4]  $      r      f      v      *      @?     F7     _?
 			0x24,  0x72,  0x66,  0x76,  0x2a,  0x40,  0xf6,  0x5f,
-	// [5]
+//     [5]  %      t      g      b      }      {      F8     SPACE
 			0x25,  0x74,  0x67,  0x62,  0x7d,  0x7b,  0xf7,  0x20,
-	// [6]
+//     [6]  &      y      h      n      =      ~?     F9     0
 			0x26,  0x79,  0x68,  0x6e,  0x3d,  0x7e,  0xf8,  0x30,
-	// [7]                              -----  |?     F10    -----
+//     [7]  \      u      j      m      -----  |?     F10    -----
 			0x27,  0x75,  0x6a,  0x6d,  0x00,  0x7c,  0xf9,  0x00,
-	// [8]
-			0x0d,  0x00,  0x00,  0x00,  0x00,  0x00,  0x09,  0x1b,
-	// [9]  KANA   INS?
-			0x00,  0x00,  0x08,  0x00,  0x00,  0x00,  0x00,  0x00
+//     [8]  RET    STOP   UP     DOWN   RIGHT  LEFT   TAB    ESC?
+			0x0d,  0xfa,  0x1e,  0x1f,  0x1c,  0x1b,  0x09,  0x1b,
+//     [9]  KANA   INS?   DEL    ROT?   CLR    ----   ----   ----
+			0x00,  0x00,  0x08,  0x00,  0x0c,  0x00,  0x00,  0x00
 		}
 	};
 
@@ -215,6 +215,7 @@ uint8_t pc6001_kbd_device::translate(uint8_t row, uint8_t column)
 void pc6001_kbd_device::key_make(uint8_t row, uint8_t column)
 {
 	m_scan_code = translate(row, column);
+
 	if (m_scan_code != 0x00)
 	{
 		if ((m_scan_code & 0xf0) == 0xf0)
@@ -245,61 +246,25 @@ void pc6001_kbd_device::joy_cmd_w(int state)
 	{
 		// TODO: unknown timing, 0.1 msec is too short for pc6001:sharrier
 		m_joy_trigger_timer->reset();
-		m_joy_trigger_timer->adjust(attotime::from_usec(1600 * 2));
+		m_joy_trigger_timer->adjust(attotime::from_usec(1666 * 2));
 	}
 }
 
-// Rearrange keyboard key presses in a joystick like fashion
-// BIOS uses this to determine function key display at bottom
+// Rearrange keyboard key presses in a joystick like fashion (akin to Sharp X1)
+// BIOS uses shift from this to determine function key display at bottom
 uint8_t pc6001_kbd_device::convert_key_to_joy_map()
 {
 	const uint8_t space_key = BIT(m_key_rows[5]->read(), 7);
 	const uint8_t shift_key = BIT(m_key_rows[0]->read(), 2);
+	const uint8_t dir_keys = m_key_rows[8]->read() & 0x3c;
 	uint8_t joy_press = 0;
 
 	joy_press |= space_key << 7;
+	joy_press |= dir_keys;
 	joy_press |= shift_key;
 
 	return joy_press;
-
-	#if 0
-	uint8_t p1_key = m_joymux->output_r() ^ 0xff;
-	uint8_t shift_key = m_io_key_modifiers->read() & 0x02;
-	uint8_t space_key = m_io_keys[1]->read() & 0x01;
-	uint8_t joy_press;
-
-		/*
-		    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-		    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-		    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-		    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-		    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-		    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-		    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-		    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-		*/
-
-	joy_press = 0;
-
-	switch(p1_key & 0xf)
-	{
-		case 0x01: joy_press = 0x04; break; //up
-		case 0x02: joy_press = 0x08; break; //down
-		case 0x04: joy_press = 0x20; break;
-		case 0x05: joy_press = 0x24; break; //up-left
-		case 0x06: joy_press = 0x28; break; //down-left
-		case 0x08: joy_press = 0x10; break; //right
-		case 0x09: joy_press = 0x14; break; //up-right
-		case 0x0a: joy_press = 0x18; break; //down-right
-	}
-
-	if(p1_key & 0x10 || space_key) { joy_press |= 0x80; } //button 1 (space)
-	if(p1_key & 0x20 || shift_key) { joy_press |= 0x01; } //button 2 (shift)
-
-	return joy_press;
-	#endif
 }
-
 
 TIMER_CALLBACK_MEMBER(pc6001_kbd_device::joy_trigger_cb)
 {
@@ -307,4 +272,3 @@ TIMER_CALLBACK_MEMBER(pc6001_kbd_device::joy_trigger_cb)
 	m_joy_irq_cb(1);
 	m_joy_irq_cb(0);
 }
-

@@ -1127,89 +1127,6 @@ static INPUT_PORTS_START( pc6001 )
 	PORT_DIPSETTING(    0x03, "Pink/Green" )
 	PORT_DIPSETTING(    0x04, "Green/Pink" )
 	//5-6-7 is presumably invalid
-
-#if 0
-	PORT_START("key1") //0x00-0x1f
-	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_UNUSED) //0x00 null
-	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_UNUSED) //0x01 soh
-	PORT_BIT(0x00000004,IP_ACTIVE_HIGH,IPT_UNUSED) //0x02 stx
-	PORT_BIT(0x00000008,IP_ACTIVE_HIGH,IPT_UNUSED) //0x03 etx
-	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_UNUSED) //0x04 etx
-	PORT_BIT(0x00000020,IP_ACTIVE_HIGH,IPT_UNUSED) //0x05 eot
-	PORT_BIT(0x00000040,IP_ACTIVE_HIGH,IPT_UNUSED) //0x06 enq
-	PORT_BIT(0x00000080,IP_ACTIVE_HIGH,IPT_UNUSED) //0x07 ack
-	PORT_BIT(0x00000100,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
-	PORT_BIT(0x00000400,IP_ACTIVE_HIGH,IPT_UNUSED) //0x0a
-	PORT_BIT(0x00000800,IP_ACTIVE_HIGH,IPT_UNUSED) //0x0b lf
-	PORT_BIT(0x00001000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x0c vt
-
-	PORT_BIT(0x00004000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x0e cr
-	PORT_BIT(0x00008000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x0f so
-
-	PORT_BIT(0x00010000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x10 si
-	PORT_BIT(0x00020000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x11 dle
-	PORT_BIT(0x00040000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x12 dc1
-	PORT_BIT(0x00080000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x13 dc2
-	PORT_BIT(0x00100000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x14 dc3
-	PORT_BIT(0x00200000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x15 dc4
-	PORT_BIT(0x00400000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x16 nak
-	PORT_BIT(0x00800000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x17 syn
-	PORT_BIT(0x01000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x18 etb
-	PORT_BIT(0x02000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x19 cancel
-	PORT_BIT(0x04000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1a em
-	PORT_BIT(0x08000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1b sub
-	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("RIGHT") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("LEFT") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("UP") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("DOWN") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-
-	PORT_START("key2") //0x20-0x3f
-	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_UNUSED) //0x21 !
-	PORT_BIT(0x00000004,IP_ACTIVE_HIGH,IPT_UNUSED) //0x22 "
-	PORT_BIT(0x00000008,IP_ACTIVE_HIGH,IPT_UNUSED) //0x23 #
-	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_UNUSED) //0x24 $
-	PORT_BIT(0x00000020,IP_ACTIVE_HIGH,IPT_UNUSED) //0x25 %
-	PORT_BIT(0x00000040,IP_ACTIVE_HIGH,IPT_UNUSED) //0x26 &
-	PORT_BIT(0x00000080,IP_ACTIVE_HIGH,IPT_UNUSED) //0x27 '
-	PORT_BIT(0x00000100,IP_ACTIVE_HIGH,IPT_UNUSED) //0x28 (
-	PORT_BIT(0x00000200,IP_ACTIVE_HIGH,IPT_UNUSED) //0x29 )
-	PORT_BIT(0x00000400,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("*") PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR('*')
-	PORT_BIT(0x00000800,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("+") PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR('+')
-	PORT_BIT(0x00001000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') //0x2c
-	PORT_BIT(0x00004000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') //0x2e
-	PORT_BIT(0x00008000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') //0x2f
-
-	PORT_BIT(0x04000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x3a :
-	PORT_BIT(0x08000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x3b ;
-	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x3c <
-	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x3d =
-	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x3e >
-	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x3f ?
-
-	PORT_START("key3") //0x40-0x5f
-	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("@") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('@')
-
-	PORT_BIT(0x08000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("[") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('[')
-	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_UNUSED)
-	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("]") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(']')
-	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("^") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^')
-	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("_")
-
-	PORT_START("key_fn")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F1 / F6") PORT_CODE(KEYCODE_F1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F2 / F7") PORT_CODE(KEYCODE_F2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F3 / F8") PORT_CODE(KEYCODE_F3)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F4 / F9") PORT_CODE(KEYCODE_F4)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F5 / F10") PORT_CODE(KEYCODE_F5)
-
-	PORT_START("key_modifiers")
-	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL)
-	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT)
-	PORT_BIT(0x00000004,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("KANA") PORT_CODE(KEYCODE_RCONTROL) PORT_TOGGLE
-	PORT_BIT(0x00000008,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CAPS") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
-	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("GRPH") PORT_CODE(KEYCODE_LALT)
-	PORT_BIT(0x00000020,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("STOP") PORT_CODE(KEYCODE_ESC)
-#endif
 INPUT_PORTS_END
 
 TIMER_CALLBACK_MEMBER(pc6001_state::audio_callback)
@@ -1335,59 +1252,6 @@ uint8_t pc6001_state::ppi_portc_r()
 	return 0x88;
 }
 
-#if 0
-// TODO: move to own device, and add remapping tables depending on the mode used
-uint8_t pc6001_state::check_keyboard_press()
-{
-	int i, port_i, scancode;
-	u8 shift_pressed, caps_lock;
-	u8 io_fn = m_io_fn_keys->read();
-	scancode = 0;
-
-	shift_pressed = (m_io_key_modifiers->read() & 2)>>1;
-	caps_lock = (m_io_key_modifiers->read() & 8)>>3;
-
-	if (io_fn)
-	{
-		for(i = 0; i < 5; i++)
-			if (BIT(io_fn, i))
-				return (i + 0xf0) + shift_pressed * 5;
-	}
-
-	for(port_i = 0; port_i < 3; port_i++)
-	{
-		for(i=0;i<32;i++)
-		{
-			if((m_io_keys[port_i]->read()>>i) & 1)
-			{
-				if((shift_pressed != caps_lock) && scancode >= 0x41 && scancode <= 0x5f)
-					scancode+=0x20;
-
-				if(shift_pressed && scancode >= 0x31 && scancode <= 0x39)
-					scancode-=0x10;
-
-				if(shift_pressed && scancode == 0x30) // '0' / '='
-					scancode = 0x3d;
-
-				if(shift_pressed && scancode == 0x2c) // ',' / ';'
-					scancode = 0x3b;
-
-				if(shift_pressed && scancode == 0x2f) // '/' / '?'
-					scancode = 0x3f;
-
-				if(shift_pressed && scancode == 0x2e) // '.' / ':'
-					scancode = 0x3a;
-
-				return scancode;
-			}
-			scancode++;
-		}
-	}
-
-	return 0;
-}
-#endif
-
 TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::cassette_callback)
 {
 	if(m_cas_switch == 1)
@@ -1474,13 +1338,6 @@ SNAPSHOT_LOAD_MEMBER(pc6001_state::snapshot_cb)
 	return std::make_pair(std::error_condition(), std::string());
 }
 
-inline void pc6001_state::default_keyboard_hle_reset()
-{
-	m_port_c_8255 = 0;
-	m_old_key1 = m_old_key2 = m_old_key3 = 0;
-	m_old_key_fn = 0;
-}
-
 void pc6001_state::irq_reset(u8 timer_default_setting)
 {
 	m_timer_enable = false;
@@ -1500,7 +1357,7 @@ void pc6001_state::machine_reset()
 	//default_cassette_hack_reset();
 	m_cas_offset = 0;
 	irq_reset(3);
-	default_keyboard_hle_reset();
+	m_port_c_8255 = 0;
 }
 
 void pc6001mk2_state::machine_reset()
@@ -1516,7 +1373,7 @@ void pc6001mk2_state::machine_reset()
 	//default_cassette_hack_reset();
 	m_cas_offset = 0;
 	irq_reset(3);
-	default_keyboard_hle_reset();
+	m_port_c_8255 = 0;
 
 	/* set default bankswitch */
 	{
@@ -1565,7 +1422,7 @@ void pc6001mk2sr_state::machine_reset()
 //  m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	//default_cassette_hack_reset();
 	irq_reset(0x7f);
-	default_keyboard_hle_reset();
+	m_port_c_8255 = 0;
 	m_cas_offset = 0;
 
 	// default to text mode
@@ -1712,10 +1569,17 @@ void pc6001_state::pc6001(machine_config &config)
 		}
 	});
 	m_kbd->keyfn_irq_cb().set([this] (int state) {
-		if (state && !m_cas_switch)
+		if (state)
 		{
-			m_cur_keycode = m_kbd->read_key_press();
-			set_subcpu_irq_vector(0x14);
+			const u8 key_press = m_kbd->read_key_press();
+			// pc6001 specifically wants STOP at 0xfa
+			if (key_press == 0xfa || m_cas_switch == 0)
+			{
+				m_cur_keycode = key_press;
+				m_cas_switch = 0;
+				//m_cas_offset = 0;
+				set_subcpu_irq_vector(0x14);
+			}
 		}
 	});
 	m_kbd->joy_irq_cb().set([this] (int state) {
