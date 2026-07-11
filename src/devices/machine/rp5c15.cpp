@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder,tim lindner
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     Ricoh RP5C15 Real Time Clock emulation
@@ -10,6 +10,7 @@
 
     TODO:
 
+    - 12 hour clock
     - test register
     - timer reset
 
@@ -212,7 +213,6 @@ void rp5c15_device::device_start()
 	memset(m_reg, 0, sizeof(m_reg));
 	memset(m_ram, 0, sizeof(m_ram));
 	m_mode = 0;
-	m_mode = MODE_TIMER_EN; // start up with time running
 	m_reset = 0;
 	m_alarm = 0;
 	m_alarm_on = 0;
@@ -285,27 +285,8 @@ void rp5c15_device::rtc_clock_updated(int year, int month, int day, int day_of_w
 	write_counter(REGISTER_1_YEAR, year % 100);
 	write_counter(REGISTER_1_MONTH, month);
 	write_counter(REGISTER_1_DAY, day);
-	m_reg[MODE00][REGISTER_DAY_OF_THE_WEEK] = (day_of_week - 1) & 0x07;
-
-	// Handle 12/24 hour formatting for initial clock population
-	if ((m_reg[MODE01][REGISTER_12_24_SELECT] & 0x01) == 0) // 12-hour mode
-	{
-		int pm = 0;
-		if (hour >= 12)
-			pm = 1;
-
-		hour %= 12;
-		if (hour == 0)
-			hour = 12;
-
-		m_reg[MODE00][REGISTER_1_HOUR] = hour % 10;
-		m_reg[MODE00][REGISTER_10_HOUR] = (hour / 10) | (pm << 1);
-	}
-	else // 24-hour mode
-	{
-		write_counter(REGISTER_1_HOUR, hour);
-	}
-
+	m_reg[MODE00][REGISTER_DAY_OF_THE_WEEK] = day_of_week;
+	write_counter(REGISTER_1_HOUR, hour);
 	write_counter(REGISTER_1_MINUTE, minute);
 	write_counter(REGISTER_1_SECOND, second);
 
@@ -335,32 +316,7 @@ uint8_t rp5c15_device::read(offs_t offset)
 		break;
 
 	default:
-		if ((m_mode & MODE_MASK) == MODE00 && (offset == REGISTER_1_HOUR || offset == REGISTER_10_HOUR))
-		{
-			int hour = read_counter(REGISTER_1_HOUR);
-			int pm = 0;
-
-			// check for 12/24 hour mode (bit 0 of REGISTER_12_24_SELECT: 0 = 12h, 1 = 24h)
-			if ((m_reg[MODE01][REGISTER_12_24_SELECT] & 0x01) == 0)
-			{
-				if (hour >= 12)
-					pm = 1;
-
-				hour %= 12;
-
-				if (hour == 0)
-					hour = 12;
-			}
-
-			if (offset == REGISTER_1_HOUR)
-				data = hour % 10;
-			else
-				data = (hour / 10) | (pm << 2);
-		}
-		else
-		{
-			data = m_reg[m_mode & MODE_MASK][offset];
-		}
+		data = m_reg[m_mode & MODE_MASK][offset];
 		break;
 	}
 
@@ -417,21 +373,8 @@ void rp5c15_device::write(offs_t offset, uint8_t data)
 		case MODE00:
 			m_reg[MODE00][offset] = data & register_write_mask[MODE00][offset];
 
-			int hour;
-			if ((m_reg[MODE01][REGISTER_12_24_SELECT] & 0x01) == 0) // 12-hour mode
-			{
-				int pm = (m_reg[MODE00][REGISTER_10_HOUR] >> 1) & 1;
-				int h12 = (m_reg[MODE00][REGISTER_10_HOUR] & 0x01) * 10 + m_reg[MODE00][REGISTER_1_HOUR];
-				if (h12 == 12) h12 = 0;
-				hour = h12 + (pm ? 12 : 0);
-			}
-			else // 24-hour mode
-			{
-				hour = read_counter(REGISTER_1_HOUR);
-			}
-
 			set_time(false, read_counter(REGISTER_1_YEAR), read_counter(REGISTER_1_MONTH), read_counter(REGISTER_1_DAY), m_reg[MODE00][REGISTER_DAY_OF_THE_WEEK],
-				hour, read_counter(REGISTER_1_MINUTE), read_counter(REGISTER_1_SECOND));
+				read_counter(REGISTER_1_HOUR), read_counter(REGISTER_1_MINUTE), read_counter(REGISTER_1_SECOND));
 			break;
 
 		case MODE01:
