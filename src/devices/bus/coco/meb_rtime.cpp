@@ -46,9 +46,8 @@ namespace
 			void busy_w(int state);
 
 			required_device<msm58321_device> m_rtc;
-			u8 m_double_write;
 			required_device<centronics_device> m_centronics;
-			required_device<output_latch_device> m_latch;
+			required_device<output_latch_device> m_parallel_latch;
 			uint8_t m_rtc_data;
 			u8 m_centronics_busy;
 	};
@@ -66,9 +65,8 @@ namespace
 		: device_t(mconfig, DISTOMEB_RTIME, tag, owner, clock)
 		, device_distomeb_interface(mconfig, *this)
 		, m_rtc(*this, "rtc")
-		, m_double_write(0)
 		, m_centronics(*this, "centronics")
-		, m_latch(*this, "latch")
+		, m_parallel_latch(*this, "latch")
 		, m_rtc_data(0)
 		, m_centronics_busy(0)
 	{
@@ -82,7 +80,6 @@ namespace
 	{
 		// save state
 		save_item(NAME(m_rtc_data));
-		save_item(NAME(m_double_write));
 		save_item(NAME(m_centronics_busy));
 	}
 
@@ -103,8 +100,8 @@ namespace
 		CENTRONICS(config, m_centronics, centronics_devices, "printer");
 		m_centronics->busy_handler().set(FUNC(disto_rtime_device::busy_w));
 
-		OUTPUT_LATCH(config, m_latch);
-		m_centronics->set_output_latch(*m_latch);
+		OUTPUT_LATCH(config, m_parallel_latch);
+		m_centronics->set_output_latch(*m_parallel_latch);
 	}
 
 	//-------------------------------------------------
@@ -129,6 +126,7 @@ namespace
 
 			case 0x02:  /* FF52 */
 			case 0x03:  /* FF53 */
+				// busy is d7
 				result = m_centronics_busy << 7;
 				break;
 
@@ -177,23 +175,18 @@ namespace
 				m_rtc->address_write_w(0);
 				m_rtc->cs2_w(0);
 				m_rtc->cs1_w(0);
+
+				m_parallel_latch->write(data);
 				break;
 
 			case 0x03: /* FF53 */
-				if (!m_double_write)
-				{
-					m_double_write = 1;
-					m_latch->write(data);
-					m_centronics->write_strobe(1);
-					m_centronics->write_strobe(0);
-				}
+				m_centronics->write_strobe(1);
+				m_centronics->write_strobe(0);
 				break;
 
 			default:
 				break;
 		}
-
-		m_double_write = 0;
 	}
 
 
@@ -206,40 +199,40 @@ namespace
 		m_centronics_busy = state;
 	}
 
-void disto_rtime_device::rtc_d0_w(int state)
-{
-	if (state)
-		m_rtc_data |= 1;
-	else
-		m_rtc_data &= ~1;
+	void disto_rtime_device::rtc_d0_w(int state)
+	{
+		if (state)
+			m_rtc_data |= 1;
+		else
+			m_rtc_data &= ~1;
 
-}
+	}
 
-void disto_rtime_device::rtc_d1_w(int state)
-{
-	if (state)
-		m_rtc_data |= 2;
-	else
-		m_rtc_data &= ~2;
-}
+	void disto_rtime_device::rtc_d1_w(int state)
+	{
+		if (state)
+			m_rtc_data |= 2;
+		else
+			m_rtc_data &= ~2;
+	}
 
-void disto_rtime_device::rtc_d2_w(int state)
-{
-	if (state)
-		m_rtc_data |= 4;
-	else
-		m_rtc_data &= ~4;
+	void disto_rtime_device::rtc_d2_w(int state)
+	{
+		if (state)
+			m_rtc_data |= 4;
+		else
+			m_rtc_data &= ~4;
 
-}
+	}
 
-void disto_rtime_device::rtc_d3_w(int state)
-{
-	if (state)
-		m_rtc_data |= 8;
-	else
-		m_rtc_data &= ~8;
+	void disto_rtime_device::rtc_d3_w(int state)
+	{
+		if (state)
+			m_rtc_data |= 8;
+		else
+			m_rtc_data &= ~8;
 
-}
+	}
 
 } // Anonymous namespace
 
