@@ -101,7 +101,7 @@ cem3394_device::cem3394_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-cem3394_device::cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, const components &comps, const stream_inputs& inputs) :
+cem3394_device::cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, const components &comps, const stream_inputs &inputs) :
 	device_t(mconfig, CEM3394, tag, owner, 0),
 	device_sound_interface(mconfig, *this),
 	m_stream_inputs(inputs),

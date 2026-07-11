@@ -13,22 +13,26 @@ Cassette:
 * Kristall2: can load its own saves; can load radio86 tapes; can load radio99 tapes.
 
 
-ToDo:
+TODO:
 - Cassette - need schematic of CMT.
 
 *****************************************************************************************/
 
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
-#include "formats/rk_cas.h"
 #include "imagedev/cassette.h"
 #include "machine/i8255.h"
 #include "sound/dac.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
+#include "formats/rk_cas.h"
+
 
 namespace {
 
@@ -57,6 +61,10 @@ public:
 	void init_radio99() ATTR_COLD;
 	void init_mikro80() ATTR_COLD;
 
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+
 private:
 	u8 m_keyboard_mask = 0;
 	u8 m_key_mask = 0;
@@ -68,8 +76,6 @@ private:
 	void portc_w(u8 data);
 	void tape_w(u8 data);
 	u8 tape_r();
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void machine_start() override ATTR_COLD;
 	u32 screen_update_mikro80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void kristall_io(address_map &map) ATTR_COLD;

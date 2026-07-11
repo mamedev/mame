@@ -36,7 +36,7 @@ public:
 	};
 
 	cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0) ATTR_COLD;
-	cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, const components &comps, const stream_inputs& inputs) ATTR_COLD;
+	cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, const components &comps, const stream_inputs &inputs) ATTR_COLD;
 
 	// control voltage setters
 	// Cannot not be called when the corresponding CV is configured as a

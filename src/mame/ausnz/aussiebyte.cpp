@@ -18,7 +18,7 @@
 
     Developed in conjunction with members of the MSPP. Written in July, 2015.
 
-    ToDo:
+    TODO:
     - CRT8002 attributes controller
     - Graphics
     - Hard drive controllers and drives
@@ -41,24 +41,19 @@
 
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
-
 #include "cpu/z80/z80.h"
-#include "machine/z80daisy.h"
-
 #include "imagedev/floppy.h"
+#include "imagedev/snapquik.h"
 #include "machine/msm5832.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
-#include "machine/z80sio.h"
+#include "machine/z80daisy.h"
 #include "machine/z80dma.h"
 #include "machine/z80pio.h"
-
+#include "machine/z80sio.h"
 #include "sound/spkrdev.h"
 #include "sound/votrax.h"
-
 #include "video/mc6845.h"
-
-#include "imagedev/snapquik.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -103,7 +98,7 @@ public:
 		, m_rtc(*this, "rtc")
 	{ }
 
-	void aussiebyte(machine_config &config);
+	void aussiebyte(machine_config &config) ATTR_COLD;
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
@@ -270,8 +265,7 @@ void aussiebyte_state::port16_w(u8 data)
 	floppy_image_device *m_floppy = nullptr;
 	if ((data & 15) == 0)
 		m_floppy = m_floppy0->get_device();
-	else
-	if ((data & 15) == 1)
+	else if ((data & 15) == 1)
 		m_floppy = m_floppy1->get_device();
 
 	m_fdc->set_floppy(m_floppy);
@@ -466,8 +460,7 @@ void aussiebyte_state::register_w(u8 data)
 	// Get transparent address
 	if (m_video_index == 18)
 		m_alpha_address = (data << 8 ) | (temp & 0xff);
-	else
-	if (m_video_index == 19)
+	else if (m_video_index == 19)
 		m_alpha_address = data | (temp & 0xff00);
 }
 
@@ -585,26 +578,26 @@ void aussiebyte_state::rtc_w(offs_t offset, u8 data)
 ************************************************************/
 u8 aussiebyte_state::memory_read_byte(offs_t offset)
 {
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+	address_space &prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
 void aussiebyte_state::memory_write_byte(offs_t offset, u8 data)
 {
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+	address_space &prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
 }
 
 u8 aussiebyte_state::io_read_byte(offs_t offset)
 {
-	address_space& prog_space = m_maincpu->space(AS_IO);
-	return prog_space.read_byte(offset);
+	address_space &io_space = m_maincpu->space(AS_IO);
+	return io_space.read_byte(offset);
 }
 
 void aussiebyte_state::io_write_byte(offs_t offset, u8 data)
 {
-	address_space& prog_space = m_maincpu->space(AS_IO);
-	prog_space.write_byte(offset, data);
+	address_space &io_space = m_maincpu->space(AS_IO);
+	io_space.write_byte(offset, data);
 }
 
 /***********************************************************
@@ -730,7 +723,7 @@ QUICKLOAD_LOAD_MEMBER(aussiebyte_state::quickload_cb)
 	m_bankr0->set_entry(m_port1a); // enable correct program bank
 	m_bankw0->set_entry(m_port1a);
 
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+	address_space &prog_space = m_maincpu->space(AS_PROGRAM);
 
 	// Avoid loading a program if CP/M-80 is not in memory
 	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3))

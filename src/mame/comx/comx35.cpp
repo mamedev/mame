@@ -65,12 +65,16 @@ public:
 			m_modifiers(*this, "MODIFIERS")
 	{ }
 
-	void base(machine_config &config, const XTAL clock);
-	void pal(machine_config &config);
-	void ntsc(machine_config &config);
-	void comx35_pal_video(machine_config &config);
-	void comx35_ntsc_video(machine_config &config);
+	void pal(machine_config &config) ATTR_COLD;
+	void ntsc(machine_config &config) ATTR_COLD;
+	void comx35_pal_video(machine_config &config) ATTR_COLD;
+	void comx35_ntsc_video(machine_config &config) ATTR_COLD;
+
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cosmac_device> m_maincpu;
@@ -85,8 +89,7 @@ private:
 	required_ioport m_modifiers;
 	emu_timer *m_reset_done_timer = nullptr;
 
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
+	void base(machine_config &config, const XTAL clock) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(reset_done);
 
@@ -113,6 +116,7 @@ private:
 	void cdp1869_page_ram(address_map &map) ATTR_COLD;
 	void comx35_io(address_map &map) ATTR_COLD;
 	void comx35_mem(address_map &map) ATTR_COLD;
+
 	// processor state
 	int m_clear = 0;                // CPU mode
 	int m_q = 0;                    // Q flag
