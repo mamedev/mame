@@ -5,7 +5,7 @@
 #include "generalplus_gpl1625x_soc.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// GPAC800A register list
+// GPL16250 register list
 //
 // 7000 - Tx3_X_Position
 // 7001 - Tx3_Y_Position
@@ -222,21 +222,23 @@
 // 7854 - NF_Data
 // 7855 - NF_INT_Ctrl
 
+// 7856 - P_BCH_Control
 // 7857 - ECC_Ctrl
-// 7858 - ECC_LPRL_LB
-// 7859 - ECC_LPRH_LB
-// 785a - ECC_CPR_LB
-// 785b - ECC_LPR_CKL_LB
-// 785c - ECC_LPR_CKH_LB
-// 785d - ECC_CPCKR_LB
-// 785e - ECC_ERR0_LB
-// 785f - ECC_ERR1_LB
+
+// 7858 - ECC_LPRL_LB or BCH Error Flag Register
+// 7859 - ECC_LPRH_LB or BCH Parity Register 0
+// 785a - ECC_CPR_LB or BCH Parity Register 1
+// 785b - ECC_LPR_CKL_LB or BCH Parity Register 2
+// 785c - ECC_LPR_CKH_LB or BCH Parity Register 3
+// 785d - ECC_CPCKR_LB or BCH Parity Register 4
+// 785e - ECC_ERR0_LB or BCH Parity Register 5
+// 785f - ECC_ERR1_LB or BCH Parity Register 6
 
 // 7860 - IOA_Data
 // 7861 - IOA_Buffer
 // 7862 - IOA_Dir
 // 7863 - IOA_Attrib
-// 7854 - IOA_Drv
+// 7864 - IOA_Drv
 //
 // 7868 - IOB_Data
 // 7869 - IOB_Buffer
@@ -566,142 +568,41 @@
 // 7c00 - 7dff Sound Attribute
 // 7e00 - 7fff Sound Phase
 
-DEFINE_DEVICE_TYPE(GPAC800,   generalplus_gpac800_device,  "gpac800",    "GeneralPlus GPL1625x System-on-a-Chip (with NAND handling)")
-DEFINE_DEVICE_TYPE(GP_SPISPI, generalplus_gpspispi_device, "gpac800spi", "GeneralPlus GPL1625x System-on-a-Chip (with SPI handling)")
+DEFINE_DEVICE_TYPE(GPL16250,   generalplus_gpac800_device,  "gpl16250",    "GeneralPlus GPL1625x / GPAC800 System-on-a-Chip")
 
 generalplus_gpac800_device::generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	sunplus_gcm394_base_device(mconfig, GPAC800, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpac800_device::gpac800_internal_map), this))
+	sunplus_gcm394_base_device(mconfig, GPL16250, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpac800_device::gpac800_internal_map), this))
 {
 }
-
-generalplus_gpspispi_device::generalplus_gpspispi_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	sunplus_gcm394_base_device(mconfig, GP_SPISPI, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpspispi_device::gpspispi_internal_map), this))
-{
-}
-
 
 // GPR27P512A   = C2 76
 // HY27UF081G2A = AD F1 80 1D
 // H27U518S2C   = AD 76
 
-u16 generalplus_gpac800_device::nand_7854_r()
+u16 generalplus_gpac800_device::nand_data_r()
 {
-	// TODO: use actual NAND / Smart Media devices once this is better understood.
-	// The games have extensive checks on startup to determine the flash types, but then it appears that
-	// certain games (eg jak_tsm) will only function correctly with specific ones, even if the code
-	// continues regardless.  Others will bail early if they don't get what they want.
+	// straight trampoline for now, but this is talking to the NAND controller, which in turn talks to the NAND
+	return m_nand_data_in();
+}
 
-	// I think some unSP core maths bugs are causing severe issues after the initial load for jak_tsm
-	// at the moment, possibly the same ones that are causing rendering issues in the jak_gtg bitmap
-	// test and seemingly incorrect road data for jak_car2, either that or the hookup here is very
-	// non-standard outside of the ident codes
-
-	// real TSM code starts at 4c000
-
-
-	//logerror("%s:sunplus_gcm394_base_device::nand_7854_r\n", machine().describe_context());
-
-	if (m_nandcommand == 0x90) // read ident
-	{
-		logerror("%s:sunplus_gcm394_base_device::nand_7854_r   READ IDENT byte %d\n", machine().describe_context(), m_curblockaddr);
-
-		u8 data = 0x00;
-
-		if (m_romtype == 0)
-		{
-			if (m_curblockaddr == 0)
-				data = 0xc2;
-			else
-				data = 0x76;
-		}
-		else if (m_romtype == 1)
-		{
-			if (m_curblockaddr == 0)
-				data = 0xad;
-			else if (m_curblockaddr == 1)
-				data = 0x76;
-		}
-		else
-		{
-			if (m_curblockaddr == 0)
-				data = 0xad;
-			else if (m_curblockaddr == 1)
-				data = 0xf1;
-			else if (m_curblockaddr == 2)
-				data = 0x80;
-			else if (m_curblockaddr == 3)
-				data = 0x1d;
-		}
-
-		m_curblockaddr++;
-
-		return data;
-	}
-	else if (m_nandcommand == 0x00 || m_nandcommand == 0x01 || m_nandcommand  == 0x50)
-	{
-		//logerror("%s:sunplus_gcm394_base_device::nand_7854_r   READ DATA byte %d\n", machine().describe_context(), m_curblockaddr);
-
-		u8 data = m_nand_read_cb(m_effectiveaddress + m_curblockaddr);
-
-		m_curblockaddr++;
-
-		return data;
-	}
-	else if (m_nandcommand == 0x70) // read status
-	{
-		logerror("%s:sunplus_gcm394_base_device::nand_7854_r   READ STATUS byte %d\n", machine().describe_context(), m_curblockaddr);
-
-		return 0xffff;
-	}
-	else
-	{
-		logerror("%s:sunplus_gcm394_base_device::nand_7854_r   READ UNKNOWN byte %d\n", machine().describe_context(), m_curblockaddr);
-		return 0xffff;
-	}
-
-	return 0x0000;
+void generalplus_gpac800_device::nand_data_w(u16 data)
+{
+	m_nand_data_out(data & 0xff);
 }
 
 // 7998
 
 void generalplus_gpac800_device::nand_command_w(u16 data)
 {
+	// documentation indicate this is a 16-bit port, but NAND commands are 8-bit?
 	logerror("%s:sunplus_gcm394_base_device::nand_command_w %04x\n", machine().describe_context(), data);
-	m_nandcommand = data;
+	m_nand_command_out(data & 0xff);
 }
 
 void generalplus_gpac800_device::nand_addr_low_w(u16 data)
 {
 	logerror("%s:sunplus_gcm394_base_device::nand_addr_low_w %04x\n", machine().describe_context(), data);
 	m_nand_addr_low = data;
-	m_curblockaddr = 0;
-}
-
-void generalplus_gpac800_device::recalculate_calculate_effective_nand_address()
-{
-	u8 type = m_nand_7856 & 0xf;
-	u8 shift = 0;
-	u32 page_offset = 0;
-
-	if (type == 7)
-		shift = 4;
-	else if (type == 11)
-		shift = 5;
-
-	if (m_nandcommand == 0x01)
-		page_offset = 256;
-	else if (m_nandcommand == 0x50)
-		page_offset = 512;
-
-	u32 nandaddress = (m_nand_addr_high << 16) | m_nand_addr_low;
-
-	if (m_nand_7850 & 0x4000)
-		nandaddress *= 2;
-
-	u32 page = type ? nandaddress : /*(m_nand_7850 & 0x4000) ?*/ nandaddress >> 8 /*: nandaddress >> 9*/;
-	m_effectiveaddress = (page * 528 + page_offset) << shift;
-
-	logerror("%s: Requested address is %08x, translating to %08x\n", machine().describe_context(), nandaddress, m_effectiveaddress);
 }
 
 void generalplus_gpac800_device::nand_addr_high_w(u16 data)
@@ -709,10 +610,40 @@ void generalplus_gpac800_device::nand_addr_high_w(u16 data)
 	logerror("%s:sunplus_gcm394_base_device::nand_addr_high_w %04x\n", machine().describe_context(), data);
 	m_nand_addr_high = data;
 
-	recalculate_calculate_effective_nand_address();
+	// documentation indicates that the NAND Interface won't write the address to the NAND, even if only 2 bytes are needed
+	// unless this address is written, so presumably all 4 address bytes get sent after the write here
 
-	m_curblockaddr = 0;
+	// m_nand_dma_ctrl is 8600 when this is written, which would indicate the 4th byte isn't used
+	// but it's needed? (eg. jak_gtg going to title screen) so maybe doesn't realte to these bytes
+
+	// the timing of these writes on hardware is unclear
+	m_nand_address_out(m_nand_addr_low & 0xff);
+	m_nand_address_out(m_nand_addr_low >> 8);
+	m_nand_address_out(m_nand_addr_high & 0xff);
+	m_nand_address_out(m_nand_addr_high >> 8);
 }
+
+// 0x7855 - P_NF_INT_Ctrl ( DMA/INT Control Register )
+//
+// 15  REQF/C
+// 14  DMAEN
+// 13  INTEN
+// 12
+//
+// 11  ADR4EN  - enables 4th byte of address
+// 10  ADR3EN  - enables 3rd byte of address
+//  9  ADR2EN  - enables 2nd byte of address
+//  8
+//
+//  7
+//  6
+//  5
+//  4
+//
+//  3
+//  2
+//  1
+//  0
 
 void generalplus_gpac800_device::nand_dma_ctrl_w(u16 data)
 {
@@ -720,60 +651,102 @@ void generalplus_gpac800_device::nand_dma_ctrl_w(u16 data)
 	m_nand_dma_ctrl = data;
 }
 
+// 0x7850 - P_NF_Ctrl ( NAND Flash Control Register )
+//
+// 15  NFBF - Read Back Busy Status (1 = Ready) (RO)
+// 14
+// 13  OLDTYPE - Old-Type NAND Flash Read Support
+// 12
+//
+// 11
+// 10
+//  9
+//  8
+//
+//  7
+//  6  NFCTRL[6] - tREA[2]
+//  5  NFCTRL[5] - tREA[1]
+//  4  NFCTRL[4] - tREA[0]
+//
+//  3  NFCTRL[3] - tWH[1] / tREH[1]
+//  2  NFCTRL[2] - tWH[0] / tREH[0]
+//  1  NFCTRL[1] - tWP[1]
+//  0  NFCTRL[0] - tWP[0]
+
 u16 generalplus_gpac800_device::nand_7850_status_r()
 {
+	// TODO, talks to the NAND controller, which talks to the NAND
+	// so the status byte here should reflect that
 	// 0x8000 = ready
-	return m_nand_7850 | 0x8000;
+	return m_nand_ctrl | 0x8000;
 }
 
 void generalplus_gpac800_device::nand_7850_w(u16 data)
 {
 	logerror("%s:sunplus_gcm394_base_device::nand_7850_w %04x\n", machine().describe_context(), data);
-	m_nand_7850 = data;
+	m_nand_ctrl = data;
 }
 
-void generalplus_gpac800_device::nand_7856_type_w(u16 data)
+// 0x7856 - P_BCH_Control ( BCH Control Register )
+//
+// 15
+// 14
+// 13
+// 12
+//
+// 11
+// 10  PAGE_SEL [2] - Read parity page selection (R/W)
+//  9  PAGE_SEL [1]
+//  8  PAGE_SEL [0]
+//
+//  7
+//  6
+//  5  PARITY_CLR - Write pairy clear flag (WO)
+//  4  BCH_WR - Page read/write control (1 = write, 0 = read) (R/W)
+//
+//  3  PAGE_SIZE[1] - NAND flash page size selection. (0 = 528 bytes, 1 = 2112 bytes, 2 = 4224 bytes, 3 = reserved)
+//  2  PAGE_SIZE[0]
+//  1  BCH_8 - BCH 4/8-bit control register (0 = 4 bits, 1 = 8-bits)
+//  0  BCH_EN - BCH Controller enable register. (1 = enable)
+
+void generalplus_gpac800_device::nand_bch_ctrl_w(u16 data)
 {
-	logerror("%s:sunplus_gcm394_base_device::nand_7856_type_w %04x\n", machine().describe_context(), data);
-	m_nand_7856 = data;
-
-	recalculate_calculate_effective_nand_address();
-
-	m_curblockaddr = 0;
+	logerror("%s:sunplus_gcm394_base_device::nand_bch_ctrl_w %04x\n", machine().describe_context(), data);
+	m_nand_bch_ctrl = data;
 }
 
-void generalplus_gpac800_device::nand_7857_w(u16 data)
+void generalplus_gpac800_device::nand_ecc_ctrl_w(u16 data)
 {
-	logerror("%s:sunplus_gcm394_base_device::nand_7857_w %04x\n", machine().describe_context(), data);
-	m_nand_7857 = data;
+	logerror("%s:sunplus_gcm394_base_device::nand_ecc_ctrl_w %04x\n", machine().describe_context(), data);
+	m_nand_ecc_ctrl = data;
 }
 
-void generalplus_gpac800_device::nand_785b_w(u16 data)
+void generalplus_gpac800_device::nand_ecc_lpr_ckl_lb_w(u16 data)
 {
-	logerror("%s:sunplus_gcm394_base_device::nand_785b_w %04x\n", machine().describe_context(), data);
-	m_nand_785b = data;
+	logerror("%s:sunplus_gcm394_base_device::nand_ecc_lpr_ckl_lb_w %04x\n", machine().describe_context(), data);
+	m_nand_ecc_lpr_ckl_lb = data;
 }
 
-void generalplus_gpac800_device::nand_785c_w(u16 data)
+void generalplus_gpac800_device::nand_ecc_lpr_ckh_lb_w(u16 data)
 {
-	logerror("%s:sunplus_gcm394_base_device::nand_785c_w %04x\n", machine().describe_context(), data);
-	m_nand_785c = data;
+	logerror("%s:sunplus_gcm394_base_device::nand_ecc_lpr_ckh_lb_w %04x\n", machine().describe_context(), data);
+	m_nand_ecc_lpr_ckh_lb = data;
 }
 
-void generalplus_gpac800_device::nand_785d_w(u16 data)
+void generalplus_gpac800_device::nand_ecc_cpckr_lb_w(u16 data)
 {
-	logerror("%s:sunplus_gcm394_base_device::nand_785d_w %04x\n", machine().describe_context(), data);
-	m_nand_785d = data;
+	logerror("%s:sunplus_gcm394_base_device::nand_ecc_cpckr_lb_w %04x\n", machine().describe_context(), data);
+	m_nand_ecc_cpckr_lb = data;
 }
 
 // [:maincpu] ':maincpu' (00146D)  jak_tsm
-u16 generalplus_gpac800_device::nand_785e_r()
+u16 generalplus_gpac800_device::nand_ecc_err0_lb_r()
 {
 	return 0x0000;
 }
 
 //[:maincpu] ':maincpu' (001490)  jak_tsm
-u16 generalplus_gpac800_device::nand_ecc_low_byte_error_flag_1_r()
+u16 generalplus_gpac800_device::nand_ecc_err1_lb_r()
 {
 	return 0x0000;
 }
@@ -782,7 +755,7 @@ u16 generalplus_gpac800_device::nand_ecc_low_byte_error_flag_1_r()
 UNMAPPED reads  writes
 
 jak_tsm uses these (all iniitalized near start)
-unclear if these are specific to the GPAC800 type, or present in the older types
+unclear if these are specific to the GPL16250 type, or present in the older types
 
 [:maincpu] ':maincpu' (00043F):sunplus_gcm394_base_device::unk_w @ 0x780a (data 0x0000)
 [:maincpu] ':maincpu' (000442):sunplus_gcm394_base_device::unk_w @ 0x7808 (data 0x0000)
@@ -864,22 +837,32 @@ void generalplus_gpac800_device::gpac800_internal_map(address_map &map)
 	map(0x007851, 0x007851).w(FUNC(generalplus_gpac800_device::nand_command_w)); // NAND Command Reg
 	map(0x007852, 0x007852).w(FUNC(generalplus_gpac800_device::nand_addr_low_w)); // NAND Low Address Reg
 	map(0x007853, 0x007853).w(FUNC(generalplus_gpac800_device::nand_addr_high_w)); // NAND High Address Reg
-	map(0x007854, 0x007854).r(FUNC(generalplus_gpac800_device::nand_7854_r)); // NAND Data Reg
+	map(0x007854, 0x007854).rw(FUNC(generalplus_gpac800_device::nand_data_r), FUNC(generalplus_gpac800_device::nand_data_w)); // NAND Data Reg
 	map(0x007855, 0x007855).w(FUNC(generalplus_gpac800_device::nand_dma_ctrl_w)); // NAND DMA / INT Control
-	map(0x007856, 0x007856).w(FUNC(generalplus_gpac800_device::nand_7856_type_w)); // usually 0x0021?
-	map(0x007857, 0x007857).w(FUNC(generalplus_gpac800_device::nand_7857_w));
+	map(0x007856, 0x007856).w(FUNC(generalplus_gpac800_device::nand_bch_ctrl_w)); // usually 0x0021?
 
-	// most of these are likely ECC stuff for testing the ROM?
-	map(0x00785b, 0x00785b).w(FUNC(generalplus_gpac800_device::nand_785b_w));
-	map(0x00785c, 0x00785c).w(FUNC(generalplus_gpac800_device::nand_785c_w));
-	map(0x00785d, 0x00785d).w(FUNC(generalplus_gpac800_device::nand_785d_w));
-	map(0x00785e, 0x00785e).r(FUNC(generalplus_gpac800_device::nand_785e_r)); // also ECC status related?
-	map(0x00785f, 0x00785f).r(FUNC(generalplus_gpac800_device::nand_ecc_low_byte_error_flag_1_r)); // ECC Low Byte Error Flag 1 (maybe)
+	map(0x007857, 0x007857).w(FUNC(generalplus_gpac800_device::nand_ecc_ctrl_w));
+
+	// 7858 - 785f can have a different meaning if nand_bch_ctrl bit 0 is set!
+
+	// 7858 - ECC_LPRL_LB
+	// 7859 - ECC_LPRH_LB
+	// 785a - ECC_CPR_LB
+	map(0x00785b, 0x00785b).w(FUNC(generalplus_gpac800_device::nand_ecc_lpr_ckl_lb_w));
+	map(0x00785c, 0x00785c).w(FUNC(generalplus_gpac800_device::nand_ecc_lpr_ckh_lb_w));
+	map(0x00785d, 0x00785d).w(FUNC(generalplus_gpac800_device::nand_ecc_cpckr_lb_w));
+	map(0x00785e, 0x00785e).r(FUNC(generalplus_gpac800_device::nand_ecc_err0_lb_r)); // ECC Low Byte Error Flag 0
+	map(0x00785f, 0x00785f).r(FUNC(generalplus_gpac800_device::nand_ecc_err1_lb_r)); // ECC Low Byte Error Flag 1
+
+	map(0x007943, 0x007943).r(FUNC(generalplus_gpac800_device::spi_rxstatus_r));
+
+	map(0x007ae2, 0x007ae2).r(FUNC(generalplus_gpac800_device::efuse2_r)); // checked by the internal boot ROM
 
 	// 128kwords internal ROM
 	//map(0x08000, 0x0ffff).rom().region("internal", 0); // lower 32kwords of internal ROM is visible / shadowed depending on boot pins and register
 	map(0x08000, 0x0ffff).r(FUNC(generalplus_gpac800_device::internalrom_lower32_r)).nopw();
-	map(0x10000, 0x27fff).rom().region("internal", 0x10000); // upper 96kwords of internal ROM is always visible
+	map(0x10000, 0x17fff).rom().region("internal", 0x10000); // upper words of internal ROM is always visible
+	//map(0x18000, 0x27fff).rom().region("internal", 0x20000); // ? apparently more upper words, but nothing is here?
 	map(0x28000, 0x2ffff).noprw(); // reserved
 	// 0x30000+ is CS access
 
@@ -894,27 +877,41 @@ void generalplus_gpac800_device::device_reset()
 	m_nand_addr_low = 0x0000;
 	m_nand_addr_high = 0x0000;
 	m_nand_dma_ctrl = 0x0000;
-	m_nand_7850 = 0x0000;
-	m_nand_785d = 0x0000;
-	m_nand_785c = 0x0000;
-	m_nand_785b = 0x0000;
-	m_nand_7856 = 0x0000;
-	m_nand_7857 = 0x0000;
+	m_nand_ctrl = 0x0000;
+	m_nand_ecc_cpckr_lb = 0x0000;
+	m_nand_ecc_lpr_ckh_lb = 0x0000;
+	m_nand_ecc_lpr_ckl_lb = 0x0000;
+	m_nand_bch_ctrl = 0x0000;
+	m_nand_ecc_ctrl = 0x0000;
 }
 
-
-u16 generalplus_gpspispi_device::spi_unk_7943_r()
+u16 generalplus_gpac800_device::spi_rxstatus_r()
 {
 	return 0x0007;
 }
 
-void generalplus_gpspispi_device::gpspispi_internal_map(address_map &map)
+u16 generalplus_gpac800_device::efuse2_r()
 {
-	sunplus_gcm394_base_device::base_internal_map(map);
-
-	map(0x007943, 0x007943).r(FUNC(generalplus_gpspispi_device::spi_unk_7943_r));
-
-	map(0x008000, 0x00ffff).rom().region("internal", 0);
+	logerror("%s:generalplus_gpac800_device::efuse2_r\n", machine().describe_context());
+	return 0x0300;
 }
 
 
+// it is not clear if these are just different revisions of a standard internal boot ROM, assuming so for now
+// they appear to be for the 'A' models at least, because there are hardcoded addresses which would be above
+// the RAM area of the 'B' models
+//
+// not currently used by the emulation as we overwrite this with our own bootstrap logic
+ROM_START( gpl16250 )
+	ROM_REGION16_BE( 0x20000, "internal", 0 )
+	ROM_DEFAULT_BIOS("v7")
+	ROM_SYSTEM_BIOS( 0, "v7", "GPL16250 internal ROM (v7)" )
+	ROMX_LOAD("gpl16250v_bootrom_v7.bin",              0x00000, 0x20000, CRC(fc4d0e32) SHA1(4dad40aae258b54fd816590ee769a1c6059b1d4c), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(0) ) // from jewelpet music pod
+	ROM_SYSTEM_BIOS( 1, "unk", "GPL16250 internal ROM (unknown version)" )
+	ROMX_LOAD("gpl16250v_bootrom_unknown_version.bin", 0x00000, 0x20000, CRC(975ece00) SHA1(988e0befd33884b05aeccd6821e5cdd53f6a849f), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1) ) // from dragon quest adventure
+ROM_END
+
+const tiny_rom_entry *generalplus_gpac800_device::device_rom_region() const
+{
+	return ROM_NAME( gpl16250 );
+}

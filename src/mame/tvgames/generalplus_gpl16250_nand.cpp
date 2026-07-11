@@ -51,23 +51,6 @@ void generalplus_gpac800_game_state::cs1_w(offs_t offset, u16 data)
 	m_sdram[offset & (m_sdram_kwords-1)] = data;
 }
 
-u8 generalplus_gpac800_game_state::read_nand(offs_t offset)
-{
-	if (!m_nandregion)
-		return 0x0000;
-
-	if (offset < m_size)
-	{
-		return m_nandregion[offset];
-	}
-	else
-	{
-		popmessage("read outside of NAND ROM space (offset %08x) (size %08x)\n", offset, m_size);
-		return 0xff;
-	}
-
-	return 0x00;
-}
 void generalplus_gpac800_game_state::dma_complete_hacks(int state)
 {
 	// HACKS to get into service mode for debugging (needed for testing as many of these require input sequences on the not yet emulated custom controls)
@@ -103,7 +86,7 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 {
 	set_addrmap(0, &generalplus_gpac800_game_state::cs_map_base);
 
-	GPAC800(config, m_maincpu, 96000000/2, m_screen);
+	GPL16250(config, m_maincpu, 96000000/2, m_screen);
 	m_maincpu->porta_in().set(FUNC(generalplus_gpac800_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(generalplus_gpac800_game_state::portb_r));
 	m_maincpu->portc_in().set(FUNC(generalplus_gpac800_game_state::portc_r));
@@ -117,8 +100,10 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 	m_maincpu->set_cs_config_callback(FUNC(gcm394_game_state::cs_callback));
 	m_maincpu->set_cs_space(DEVICE_SELF, 0);
 	m_maincpu->dma_complete_callback().set(FUNC(generalplus_gpac800_game_state::dma_complete_hacks));
-
-	m_maincpu->nand_read_callback().set(FUNC(generalplus_gpac800_game_state::read_nand));
+	m_maincpu->nand_command_out().set(m_nand, FUNC(nand_device::command_w));
+	m_maincpu->nand_address_out().set(m_nand, FUNC(nand_device::address_w));
+	m_maincpu->nand_data_out().set(m_nand, FUNC(nand_device::data_w));
+	m_maincpu->nand_data_in().set(m_nand, FUNC(nand_device::data_r));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -128,6 +113,36 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 	m_screen->screen_vblank().set(m_maincpu, FUNC(sunplus_gcm394_device::vblank));
 
 	SPEAKER(config, "speaker", 2).front();
+}
+
+void generalplus_gpac800_game_state::generalplus_gpac800_nand64mbyte(machine_config &config)
+{
+	generalplus_gpac800(config);
+	GENERALPLUS_GPR27P512A(config, m_nand); // 64Mbyte part, with 0x200+0x10 sized pages (accepts many compatible devices)
+}
+
+void generalplus_gpac800_game_state::generalplus_gpac800_nand128mbyte(machine_config &config)
+{
+	generalplus_gpac800(config);
+	SANDISK_NAND_128MB_512_DEVICE(config, m_nand); // 128Mbyte part, with 0x200+0x10 sized pages (accepts many compatible devices)
+}
+
+void generalplus_gpac800_game_state::generalplus_gpac800_nand256mbyte(machine_config &config)
+{
+	generalplus_gpac800(config);
+	SANDISK_NAND_256MB_512_DEVICE(config, m_nand); // 256Mbyte part, with 0x200+0x10 sized pages (accepts many compatible devices)
+}
+
+void generalplus_gpac800_game_state::generalplus_gpac800_nand128mbyte_2048(machine_config &config)
+{
+	generalplus_gpac800(config);
+	SAMSUNG_K9F1G08U0M(config, m_nand); // 128Mbyte part, with 0x800+0x40 sized pages
+}
+
+void generalplus_gpac800_game_state::generalplus_gpac800_nand512mbyte_2048(machine_config &config)
+{
+	generalplus_gpac800(config);
+	HYNIX_HY27UF084G2M(config, m_nand); // 512Mbyte part, with 0x800+0x40 sized pages
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(generalplus_gpac800_vbaby_game_state::cart_load)
@@ -140,9 +155,9 @@ DEVICE_IMAGE_LOAD_MEMBER(generalplus_gpac800_vbaby_game_state::cart_load)
 	return std::make_pair(std::error_condition(), std::string());
 }
 
-void generalplus_gpac800_vbaby_game_state::generalplus_gpac800_vbaby(machine_config &config)
+void generalplus_gpac800_vbaby_game_state::generalplus_gpac800_nand128mbyte_2048_vbaby(machine_config &config)
 {
-	generalplus_gpac800_game_state::generalplus_gpac800(config);
+	generalplus_gpac800_game_state::generalplus_gpac800_nand128mbyte_2048(config);
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "vbaby_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
@@ -481,34 +496,22 @@ INPUT_PORTS_END
 
 
 ROM_START( wlsair60 )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
-
 	ROM_REGION( 0x8400000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "wlsair60.nand", 0x0000, 0x8400000, CRC(eec23b97) SHA1(1bb88290cf54579a5bb51c08a02d793cd4d79f7a) )
 ROM_END
 
 ROM_START( kiugames )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
-
 	ROM_REGION( 0x21000000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "hy27084g2m.u2", 0x0000, 0x21000000, CRC(65cc3864) SHA1(b759ec9816fe98a33ee7d5e12e5492f0160c5b31) )
 ROM_END
 
 
 ROM_START( jak_gtg )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
-
 	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "goldentee.bin", 0x0000, 0x4200000, CRC(87d5e815) SHA1(5dc46cd753b791449cc41d5eff4928c0dcaf35c0) )
 ROM_END
 
 ROM_START( jak_car2 )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
-
 	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "cars2.bin", 0x0000, 0x4200000, CRC(4d610e09) SHA1(bc59f5f7f676a8f2a78dfda7fb62c804bbf850b6) )
 ROM_END
@@ -543,9 +546,6 @@ One of the games has pin 2 grounded, and the other 2 have it N/C.  I'm not sure 
 */
 
 ROM_START( jak_sspop )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
-
 	/* TSOP32 NAND ROM
 
 	S976172-1
@@ -564,9 +564,6 @@ ROM_START( jak_sspop )
 ROM_END
 
 ROM_START( jak_hmhsm )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
-
 	/* TSOP32 NAND ROM
 
 	5769522.1
@@ -585,42 +582,27 @@ ROM_START( jak_hmhsm )
 ROM_END
 
 ROM_START( jak_camp )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
-
 	ROM_REGION( 0x10800000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "camprockguitar1_sandisk11352-256b_45da.bin", 0x0000, 0x10800000, CRC(f52a4289) SHA1(d027ae274cd4ac97924d2344df1a96456e8e7c55) )
 ROM_END
 
 ROM_START( jak_hmpt )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
-
 	ROM_REGION( 0x10800000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "hmsecretstar_sandisk11270_9876.bin", 0x0000, 0x10800000, CRC(fbe09633) SHA1(169a1546072f53c2da19ce97396cacd25412c5f2) )
 ROM_END
 
 ROM_START( jak_hsmg2 )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
-
 	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "hsm_as_hy27ys08121a_9876.bin", 0x0000, 0x4200000, CRC(4da61056) SHA1(d6c529a6df2703dd55b864e9d7c655203206f8b6) )
 ROM_END
 
 ROM_START( jak_hmg2 )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
-
 	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "hm_as_hy27us08121a_9876_fixed.bin", 0x0000, 0x4200000, BAD_DUMP CRC(ba97fcd6) SHA1(c02a6878910b1312009b21220d51d7c1c3adb767) ) // 4 blocks had to be fixed using data from jak_hmhsm
 ROM_END
 
 
 ROM_START( jak_umdf )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
-
 	/* TSOP32 NAND ROM
 
 	S744565-1
@@ -640,76 +622,49 @@ ROM_END
 
 
 ROM_START( jak_tsm )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
-
 	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "toystorymania.bin", 0x0000, 0x4200000, CRC(183b20a5) SHA1(eb4fa5ee9dfac58f5244d00d4e833b1e461cc52c) )
 ROM_END
 
 
 ROM_START( jak_duck )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
-
 	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "duckcommander_gpr27p512a_c276_as_hy27us08121a.bin", 0x0000, 0x4200000, CRC(d9356d5b) SHA1(aca05525b4a504f7ad264ae9bbc2f1f8f399c4ca) )
 ROM_END
 
 ROM_START( jak_swc )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
-
 	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "jakksstarwarspistol_gpr27p512a_c276_as_hy27us08121a.bin", 0x0000, 0x4200000, CRC(024d49b8) SHA1(9694f4c7cd083c976ffbbcfa6f626fc6b4bc8d91) )
 ROM_END
 
 ROM_START( jak_wdzh )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
-
 	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "walkingdeadrifle_gpr27p512a_c276_as_hy27us08121a.bin", 0x0000, 0x4200000, CRC(b2c762f0) SHA1(7e10df517cc24924e0ec55e2a263563023d945f8) )
 ROM_END
 
 ROM_START( jak_wdbg )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
-
 	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "amcwalkingdeadcrossbow_gpr27p512a_c276_as_hy27us08121a.bin", 0x0000, 0x4200000, CRC(66510fd4) SHA1(3ad6347c5a7758c035654cb3e96858320875b97a) )
 ROM_END
 
 
 ROM_START( vbaby )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
-
 	ROM_REGION( 0x8400000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "vbaby.bin", 0x0000, 0x8400000, CRC(d904441b) SHA1(3742bc4e1e403f061ce2813ecfafc6f30a44d287) )
 ROM_END
 
 ROM_START( tiviboo )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
-
 	ROM_REGION( 0x8400000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "hy27uf081g2a.u3", 0x0000, 0x8400000, CRC(69d08014) SHA1(d290c646c8223b3a47c0579e19d15a6717c7e4a8) )
 ROM_END
 
 
 ROM_START( mgtfit )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
-
 	ROM_REGION( 0x8400000, "nandrom", ROMREGION_ERASE00 ) // Samsung 937 K9F1G08U0D  Ident: 0xEC 0xF1 Full Ident: 0xECF1001540
 	ROM_LOAD( "k9f1g08u0d.bin", 0x0000, 0x8400000, CRC(1ca5ac09) SHA1(c2e123085d2198999c2c0edb1df4895361c00a99) )
 ROM_END
 
 ROM_START( beambox )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
-
 	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "beambox.bin", 0x0000, 0x4200000, CRC(a486f04e) SHA1(73c7d99d8922eba58d94e955e254b9c3baa4443e) )
 ROM_END
@@ -724,20 +679,19 @@ void generalplus_gpac800_game_state::machine_start()
 
 void generalplus_gpac800_game_state::nand_create_stripped_region()
 {
-	u8 *rom = m_nandregion;
-	int size = memregion("nandrom")->bytes();
-	m_size = size;
+	u8 *rom = m_nand->nand_data();
+	uint32_t size = m_nand->nand_size();
 
-	int numblocks = size / m_nandblocksize;
-	m_strippedsize = numblocks * m_nandblocksize_stripped;
-	m_strippedrom.resize(m_strippedsize);
+	int numblocks = size / m_nand->page_total_size();
+	uint32_t strippedsize = numblocks * m_nand->page_data_size();
+	m_strippedrom.resize(strippedsize);
 
 	for (int i = 0; i < numblocks; i++)
 	{
-		const int base = i * m_nandblocksize;
-		const int basestripped = i * m_nandblocksize_stripped;
+		const int base = i * m_nand->page_total_size();
+		const int basestripped = i * m_nand->page_data_size();
 
-		for (int j = 0; j < m_nandblocksize_stripped; j++)
+		for (int j = 0; j < m_nand->page_data_size(); j++)
 		{
 			m_strippedrom[basestripped + j] = rom[(base + j)];
 		}
@@ -750,7 +704,7 @@ void generalplus_gpac800_game_state::nand_create_stripped_region()
 		auto fp = fopen(filename.c_str(), "w+b");
 		if (fp)
 		{
-			fwrite(&m_strippedrom[0], m_nandblocksize_stripped * numblocks, 1, fp);
+			fwrite(&m_strippedrom[0], m_nand->page_data_size() * numblocks, 1, fp);
 			fclose(fp);
 		}
 	}
@@ -766,7 +720,7 @@ void generalplus_gpac800_game_state::machine_reset()
 	mem.write_word(0x007823, 0x0047);
 	mem.write_word(0x007824, 0x0047);
 
-	if (m_nandregion)
+	if (m_nand)
 	{
 		nand_create_stripped_region();
 
@@ -866,6 +820,7 @@ void generalplus_gpac800_game_state::machine_reset()
 		internal[0x7ffd] = 0xff10;
 		internal[0x7ffe] = 0xff12;
 		internal[0x7fff] = 0xff14;
+
 	}
 
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
@@ -874,52 +829,35 @@ void generalplus_gpac800_game_state::machine_reset()
 }
 
 
-void generalplus_gpac800_game_state::nand_init210()
+void generalplus_gpac800_game_state::nand_init()
 {
 	m_sdram.resize(m_sdram_kwords);
 	m_sdram2.resize(0x10000);
-
-	m_nandblocksize = 0x210;
-	m_nandblocksize_stripped = 0x200;
-
 	m_vectorbase = 0x6fe0;
 }
 
-void generalplus_gpac800_game_state::nand_init210_32mb()
+void generalplus_gpac800_game_state::nand_init_32mb()
 {
 	m_sdram_kwords = 0x400000 * 4;
-	nand_init210();
-}
-
-void generalplus_gpac800_game_state::nand_init840()
-{
-	m_sdram.resize(m_sdram_kwords);
-	m_sdram2.resize(0x10000);
-
-	m_nandblocksize = 0x840;
-	m_nandblocksize_stripped = 0x800;
-
-	m_vectorbase = 0x6fe0;
+	nand_init();
 }
 
 void generalplus_gpac800_game_state::nand_wlsair60()
 {
-	nand_init840();
+	nand_init();
 	m_initial_copy_words = 0x2800;
 }
 
 void generalplus_gpac800_game_state::nand_kiugames()
 {
-	nand_init840();
+	nand_init();
 	m_initial_copy_words = 0x10000;
 }
 
-
 void generalplus_gpac800_game_state::nand_vbaby()
 {
-	nand_init840();
+	nand_init();
 	m_initial_copy_words = 0x1000;
-	m_maincpu->set_romtype(2);
 }
 
 void generalplus_gpac800_game_state::nand_tsm()
@@ -932,43 +870,49 @@ void generalplus_gpac800_game_state::nand_tsm()
 
 	// the addresses written to the NAND device don't compensate for these data repeats, however dump seems ok as no other data is being repeated?
 	// reads after startup still need checking
-	nand_init210();
-	m_maincpu->set_romtype(1);
+	nand_init();
 }
 
 void generalplus_gpac800_game_state::nand_beambox()
 {
-	nand_init210();
+	nand_init();
 	m_vectorbase = 0x2fe0;
 }
 
 // NAND dumps w/ internal bootstrap (and u'nSP 2.0 extended opcodes)  (have gpnandnand strings)
 // the JAKKS ones seem to be known as 'Generalplus GPAC800' hardware
-CONS(2010, wlsair60,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60,      "Jungle Soft / Kids Station Toys Inc",      "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // some of the games seem to be based on ones found in the 'Millennium Arcade' multigames (WinFun related) so might have the same external timer check
-CONS(200?, beambox,    0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_beambox,       "Hasbro",                                   "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, mgtfit,     0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60,      "MGT",                                      "Fitness Konsole (NC1470)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // probably has other names in English too? menus don't appear to be in German
-CONS(200?, vbaby,      0, 0, generalplus_gpac800_vbaby, jak_car2, generalplus_gpac800_vbaby_game_state, nand_vbaby,         "VTech",                                    "V.Baby", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, tiviboo,    0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_vbaby,         "VTech",                                    "Tivi Boo (France)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, kiugames,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_kiugames,      "VideoJet",                                 "Kiu Games",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // probably has other names in English too? menus don't appear to be in German
-
-CONS(2011, jak_gtg,    0, 0, generalplus_gpac800,       jak_gtg,  generalplus_gpac800_game_state,       nand_init210,       "JAKKS Pacific Inc / HotGen Ltd",           "Golden Tee Golf (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, jak_car2,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210,       "JAKKS Pacific Inc / HotGen Ltd",           "Cars 2 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(2010, jak_tsm,    0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_tsm,           "JAKKS Pacific Inc / Schell Games",         "Toy Story Mania (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(2009, jak_sspop,  0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "Sing Scene Pop (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(2008, jak_hmg2,   0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "Hannah Montana G2 Deluxe - All in One (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // Jul 9 2008 11:50:08
-CONS(2008, jak_hsmg2,  0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "High School Musical G2 Deluxe - All in One (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // Jun 25 2008 14:53:14
-CONS(2008, jak_hmhsm,  0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "Hannah Montana G2 Deluxe / High School Musical G2 Deluxe - Two in One (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // Sep 12 2008 18:48:14 (Menu/HM) / Sep 12 2008 18:50:45 (HSM)
-CONS(2008, jak_umdf,   0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / Handheld Games",       "Ultimotion - Disney Fairies Sleeping Beauty & TinkerBell (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2011, jak_gtg,    0, 0, generalplus_gpac800_nand64mbyte,       jak_gtg,  generalplus_gpac800_game_state,       nand_init,       "JAKKS Pacific Inc / HotGen Ltd",           "Golden Tee Golf (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, jak_car2,   0, 0, generalplus_gpac800_nand64mbyte,       jak_car2, generalplus_gpac800_game_state,       nand_init,       "JAKKS Pacific Inc / HotGen Ltd",           "Cars 2 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2010, jak_tsm,    0, 0, generalplus_gpac800_nand64mbyte,       jak_car2, generalplus_gpac800_game_state,       nand_tsm,           "JAKKS Pacific Inc / Schell Games",         "Toy Story Mania (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2009, jak_sspop,  0, 0, generalplus_gpac800_nand128mbyte,      jak_hsm,  generalplus_gpac800_game_state,       nand_init_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "Sing Scene Pop (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2008, jak_hmg2,   0, 0, generalplus_gpac800_nand64mbyte,       jak_hsm,  generalplus_gpac800_game_state,       nand_init_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "Hannah Montana G2 Deluxe - All in One (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // Jul 9 2008 11:50:08
+CONS(2008, jak_hsmg2,  0, 0, generalplus_gpac800_nand64mbyte,       jak_hsm,  generalplus_gpac800_game_state,       nand_init_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "High School Musical G2 Deluxe - All in One (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // Jun 25 2008 14:53:14
+CONS(2008, jak_hmhsm,  0, 0, generalplus_gpac800_nand256mbyte,      jak_hsm,  generalplus_gpac800_game_state,       nand_init_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "Hannah Montana G2 Deluxe / High School Musical G2 Deluxe - Two in One (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // Sep 12 2008 18:48:14 (Menu/HM) / Sep 12 2008 18:50:45 (HSM)
+CONS(2008, jak_umdf,   0, 0, generalplus_gpac800_nand256mbyte,      jak_hsm,  generalplus_gpac800_game_state,       nand_init_32mb,  "JAKKS Pacific Inc / Handheld Games",       "Ultimotion - Disney Fairies Sleeping Beauty & TinkerBell (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // Ultimotion Swing Zone is SPG29xx instead
-CONS(2008, jak_camp,   0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "Camp Rock - Guitar Video Game (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2008, jak_camp,   0, 0, generalplus_gpac800_nand256mbyte,      jak_hsm,  generalplus_gpac800_game_state,       nand_init_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "Camp Rock - Guitar Video Game (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // 2 blocks fail the hidden ROM test in jak_hmpt set below, however this seems to be an error in the test mode, not the dump
 // a different set, https://www.youtube.com/watch?v=XiEMtLzcTFw showing a date of May 14 2008 10:05:22 shows exactly the same failures
-CONS(2008, jak_hmpt,   0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "Hannah Montana Pop Tour - Guitar Video Game (JAKKS Pacific TV Game) (May 16 2008)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // May 16 2008 10:36:59
+CONS(2008, jak_hmpt,   0, 0, generalplus_gpac800_nand256mbyte,      jak_hsm,  generalplus_gpac800_game_state,       nand_init_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "Hannah Montana Pop Tour - Guitar Video Game (JAKKS Pacific TV Game) (May 16 2008)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // May 16 2008 10:36:59
 
 // There were 1 player and 2 player versions for several of the JAKKS guns.  The 2nd gun appears to be simply a controller (no AV connectors) but as they were separate products with the 2 player versions being released up to a year after the original, the code could differ.
 // If they differ, it is currently uncertain which versions these ROMs are from
-CONS(2012, jak_wdzh,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210,       "JAKKS Pacific Inc / Merge Interactive",    "The Walking Dead: Zombie Hunter (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // gun games all had Atmel 16CM (24C16).
-CONS(2013, jak_duck,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / Merge Interactive",    "Duck Commander (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // no 2 Player version was released
-CONS(2013, jak_swc,    0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / Merge Interactive",    "Star Wars Clone Trooper (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(2014, jak_wdbg,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / Super Happy Fun Fun",  "The Walking Dead: Battleground (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2012, jak_wdzh,   0, 0, generalplus_gpac800_nand64mbyte,       jak_car2, generalplus_gpac800_game_state,       nand_init,       "JAKKS Pacific Inc / Merge Interactive",    "The Walking Dead: Zombie Hunter (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // gun games all had Atmel 16CM (24C16).
+CONS(2013, jak_duck,   0, 0, generalplus_gpac800_nand64mbyte,       jak_car2, generalplus_gpac800_game_state,       nand_init_32mb,  "JAKKS Pacific Inc / Merge Interactive",    "Duck Commander (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // no 2 Player version was released
+CONS(2013, jak_swc,    0, 0, generalplus_gpac800_nand64mbyte,       jak_car2, generalplus_gpac800_game_state,       nand_init_32mb,  "JAKKS Pacific Inc / Merge Interactive",    "Star Wars Clone Trooper (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2014, jak_wdbg,   0, 0, generalplus_gpac800_nand64mbyte,       jak_car2, generalplus_gpac800_game_state,       nand_init_32mb,  "JAKKS Pacific Inc / Super Happy Fun Fun",  "The Walking Dead: Battleground (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+
+// these are probably a GPL162xxB as they expect code to be copied to a lower address, and set the stack just below 0x3000
+// B models have only 12K words of RAM, but the GPL16250 boot ROMs we've seen are hardcoded to look for vectors above that
+CONS(200?, beambox,    0, 0, generalplus_gpac800_nand64mbyte,       jak_car2, generalplus_gpac800_game_state,       nand_beambox,       "Hasbro",                                   "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2010, wlsair60,   0, 0, generalplus_gpac800_nand128mbyte_2048, jak_car2, generalplus_gpac800_game_state,       nand_wlsair60,      "Jungle Soft / Kids Station Toys Inc",      "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // some of the games seem to be based on ones found in the 'Millennium Arcade' multigames (WinFun related) so might have the same external timer check
+
+// these might also be B models
+CONS(200?, mgtfit,     0, 0, generalplus_gpac800_nand128mbyte_2048,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60,      "MGT",                                      "Fitness Konsole (NC1470)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // probably has other names in English too? menus don't appear to be in German
+CONS(200?, vbaby,      0, 0, generalplus_gpac800_nand128mbyte_2048_vbaby, jak_car2, generalplus_gpac800_vbaby_game_state, nand_vbaby,         "VTech",                                    "V.Baby", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, tiviboo,    0, 0, generalplus_gpac800_nand128mbyte_2048,       jak_car2, generalplus_gpac800_game_state,       nand_vbaby,         "VTech",                                    "Tivi Boo (France)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// this one is strange, the area specified in the header to copy the code to is an unmapped area?
+CONS(200?, kiugames,   0, 0, generalplus_gpac800_nand512mbyte_2048,      jak_car2, generalplus_gpac800_game_state,       nand_kiugames,      "VideoJet",                                 "Kiu Games",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // probably has other names in English too? menus don't appear to be in German
