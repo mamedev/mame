@@ -2322,10 +2322,10 @@ void arkanoid_state::init_brixian()
 
 }
 
-/* Game Drivers */
+// Game Drivers
 
 // original sets of Arkanoid
-//    YEAR, NAME,         PARENT,   MACHINE,  INPUT,     STATE,          INIT,           MONITOR, COMPANY,                               FULLNAME,                                      FLAGS
+//    YEAR  NAME          PARENT    MACHINE   INPUT      STATE           INIT            MONITOR  COMPANY                                FULLNAME                                       FLAGS
 GAME( 1986, arkanoid,     0,        arkanoid, arkanoid,  arkanoid_state, empty_init,     ROT90,   "Taito",                               "Arkanoid (World, older)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1986, arkanoidu,    arkanoid, arkanoid, arkanoid,  arkanoid_state, empty_init,     ROT90,   "Taito America (Romstar license)",     "Arkanoid (US, newer)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1986, arkanoiduo,   arkanoid, arkanoid, arkanoid,  arkanoid_state, empty_init,     ROT90,   "Taito America (Romstar license)",     "Arkanoid (US, older)",                        MACHINE_SUPPORTS_SAVE )
