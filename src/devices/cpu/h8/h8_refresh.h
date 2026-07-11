@@ -82,6 +82,8 @@ private:
 	u64 m_cycle_base;
 
 	void rtcnt_update(u64 current_time = 0);
+	u8 rtcnt_peek() const;
+	bool cmf_peek() const;
 };
 
 DECLARE_DEVICE_TYPE(H8_REFRESH, h8_refresh_device)

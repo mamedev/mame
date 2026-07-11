@@ -88,10 +88,42 @@ void h8_refresh_device::rtcnt_update(u64 cur_time)
 	m_rtcnt = next;
 }
 
+// non-mutating equivalent of rtcnt_update(), for side-effects-disabled reads
+// (debugger memory views etc.) -- computes what RTCNT would read as right
+// now without touching m_cycle_base/m_rtcnt or raising the interrupt.
+u8 h8_refresh_device::rtcnt_peek() const
+{
+	int shift = div_shift[(m_rtmcsr & RTMCSR_CKS) >> 3];
+	if(shift < 0)
+		return m_rtcnt;
+
+	u64 spos = m_cycle_base >> shift;
+	u64 epos = m_cpu->total_cycles() >> shift;
+	u32 period = m_rtcor + 1;
+	u32 next = m_rtcnt + (epos - spos);
+	return next % period;
+}
+
+// non-mutating equivalent of the CMF-latch decision in rtcnt_update()
+bool h8_refresh_device::cmf_peek() const
+{
+	if(m_rtmcsr & RTMCSR_CMF)
+		return true;
+	int shift = div_shift[(m_rtmcsr & RTMCSR_CKS) >> 3];
+	if(shift < 0)
+		return false;
+
+	u64 spos = m_cycle_base >> shift;
+	u64 epos = m_cpu->total_cycles() >> shift;
+	u32 period = m_rtcor + 1;
+	return (m_rtcnt + (epos - spos)) >= period;
+}
+
 u8 h8_refresh_device::rtcnt_r()
 {
-	if(!machine().side_effects_disabled())
-		rtcnt_update();
+	if(machine().side_effects_disabled())
+		return rtcnt_peek();
+	rtcnt_update();
 	return m_rtcnt;
 }
 
@@ -116,9 +148,10 @@ void h8_refresh_device::rtcor_w(u8 data)
 
 u8 h8_refresh_device::rtmcsr_r()
 {
-	if(!machine().side_effects_disabled())
-		rtcnt_update();
 	// bits 2-0 are reserved and always read as 1
+	if(machine().side_effects_disabled())
+		return (m_rtmcsr | 0x07) | (cmf_peek() ? RTMCSR_CMF : 0);
+	rtcnt_update();
 	return m_rtmcsr | 0x07;
 }
 
