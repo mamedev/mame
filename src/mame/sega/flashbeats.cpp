@@ -661,7 +661,17 @@ static INPUT_PORTS_START( flashbeats )
 
 	// DIP SW2 on 315-5296 port H (read @boot, PC 0x650-0x69e, active-low). The
 	// H8 inverts, masks each field and adds 1 -> credit counts 1-4. Bit 7 is
-	// "ADVERTISE SOUND" (internal=OFF / external=ON).
+	// cabinet-documented "ADVERTISE SOUND" (Japanese label: 内部/外部, "internal/
+	// external"). This is a sound-source selector, not a demo-sounds mute -
+	// confirmed by a full 24-bit input sweep during attract mode that found no
+	// input bit (DIP or otherwise) silences advertise sound.
+	// Traced the boot read itself (PC 0x69C-0x6A8): bit 7 does gate a conditional
+	// write, but its target (0xfff438) sits above the H8/3007's on-chip RAM
+	// ceiling (0xfff1f per the Hitachi H8/300H family memory map) and below the
+	// internal I/O register block (0xfff20+) -- i.e. unmapped space in the
+	// current emulation, so the write is a no-op here and has no observable
+	// effect either way. Left as the literal cabinet-documented labels rather
+	// than DEF_STR( Demo_Sounds ) pending further hardware RE.
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, "Credits To Start (1P)" )  PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "1" )
