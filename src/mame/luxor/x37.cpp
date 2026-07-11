@@ -13,7 +13,7 @@
 
     TODO
 
-	- loadsys1 cannot find blocksize
+	- loadsys1 unable to mount sasi
     - tst.w 0xfffffc
 
 */
