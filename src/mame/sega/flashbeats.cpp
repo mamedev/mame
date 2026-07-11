@@ -28,6 +28,7 @@
 #include "dsb2.h"
 
 #include "emupal.h"
+#include "endianness.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -307,8 +308,7 @@ void flashbeats_state::machine_reset()
 void flashbeats_state::update_lanes()
 {
 	auto rd8 = [this](offs_t byteaddr) -> uint8_t {
-		const uint16_t word = m_dispram[(byteaddr & 0xffff) >> 1];
-		return (byteaddr & 1) ? (word & 0xff) : (word >> 8);
+		return util::big_endian_cast<uint8_t>(m_dispram.target())[byteaddr & 0xffff];
 	};
 
 	for (int lane = 0; lane < LANE_COUNT; lane++)
@@ -340,8 +340,7 @@ void flashbeats_state::update_lanes()
 uint32_t flashbeats_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	auto rd8 = [this](offs_t byteaddr) -> uint8_t {
-		const uint16_t word = m_dispram[(byteaddr & 0xffff) >> 1];
-		return (byteaddr & 1) ? (word & 0xff) : (word >> 8);
+		return util::big_endian_cast<uint8_t>(m_dispram.target())[byteaddr & 0xffff];
 	};
 
 	for (int ny = 0; ny < DMD_NATIVE_H; ny++)
