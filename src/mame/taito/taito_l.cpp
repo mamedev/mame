@@ -19,7 +19,7 @@
   - Evil Stone
 
   Triple processor games (1 main TC0090LVC (z80 core), 1 slave z80, 1 sound z80)
-  - Fighting hawk
+  - Fighting Hawk
   - Raimais
   - Champion Wrestler
 
