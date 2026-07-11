@@ -1,6 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+/*
+	Known Undumped:
+	MobiGo 2 (USA, English)
+	MobiGo 2 (UK and Australia, English)
+    MobiGo 2 (Canada, English)
+*/
+
 #include "emu.h"
 
 #include "generalplus_gpl16250_spi.h"

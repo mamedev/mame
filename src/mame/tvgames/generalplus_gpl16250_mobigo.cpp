@@ -12,17 +12,13 @@
 
     GPL16250 Mobigo support
     the original Mobigo is ROM+RAM config
-    the Mobigo 2 is NAND+RAM config
+    the Mobigo 2 is SPI+RAM+NAND config (see generalplus_gpl16250_mobigo2.cpp)
     cartridges are compatible
 
     Known Undumped:
-    MobiGo 2 (USA, English)
     MobiGo (UK and Australia, English)
-    MobiGo 2 (UK and Australia, English)
     MobiGo (Canada, English)
-    MobiGo 2 (Canada, English)
     MobiGo (Canada, French)
-
 */
 
 #include "emu.h"
@@ -108,7 +104,19 @@ ROM_START( mobigos )
 	ROM_LOAD16_WORD_SWAP("mobigospanish.bin", 0x0000, 0x200000, CRC(462b4f9d) SHA1(1541152f1a359bc18de4d4f3d5038a954c9a3ad4))
 ROM_END
 
+ROM_START( mobigof )
+	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("mobigo_fr.u5", 0x0000, 0x200000, CRC(61d739aa) SHA1(d23d4c806f1b60058c57ea9b339a7c5e3124bafa))
+
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASE00) // for built-in games and/or downloads? (not a boot ROM)
+	ROM_LOAD16_WORD_SWAP("mx25l1606e.u3", 0x0000, 0x200000, CRC(31110b90) SHA1(b6a3b707d9ff688635be8bc01221b4db503ce159))
+ROM_END
+
 } // anonymous namespace
 
 CONS( 2010, mobigo,  0,      0, mobigo,   mobigo, mobigo_state,  init_mobigo, "VTech", "MobiGo (USA)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2011, mobigos, mobigo, 0, mobigo,   mobigo, mobigo_state,  init_mobigo, "VTech", "MobiGo (Spain)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2011, mobigof, mobigo, 0, mobigo,   mobigo, mobigo_state,  init_mobigo, "VTech", "MobiGo (France)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
