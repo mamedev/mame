@@ -9,6 +9,9 @@
 
 #include "emu.h"
 #include "igs022.h"
+
+#include "multibyte.h"
+
 #include <sstream>
 
 #define LOG_DMA      (1U << 1)
@@ -21,6 +24,9 @@
 
 igs022_device::igs022_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, IGS022, tag, owner, clock)
+	, m_regs{0}
+	, m_stack{0}
+	, m_stack_ptr(0)
 	, m_sharedprotram(*this, "sharedprotram")
 	, m_rom(*this, DEVICE_SELF)
 {
@@ -51,14 +57,10 @@ void igs022_device::device_reset()
 		m_sharedprotram[i] = 0xa55a;
 
 	// the initial auto-DMA
-	const u16 * const PROTROM = (u16 *)m_rom->base();
-
-	u16 src        = PROTROM[0x100 / 2];
-	const u32 dst  = PROTROM[0x102 / 2];
-	const u16 size = PROTROM[0x104 / 2];
-	u16 mode       = PROTROM[0x106 / 2];
-
-	mode = swapendian_int16(mode);
+	u16 src        = get_u16le(&m_rom[0x100]);
+	const u32 dst  = get_u16le(&m_rom[0x102]);
+	const u16 size = get_u16le(&m_rom[0x104]);
+	u16 mode       = get_u16be(&m_rom[0x106]);
 
 	src >>= 1;
 
@@ -67,7 +69,7 @@ void igs022_device::device_reset()
 	// there is also a version ID? (or is it some kind of checksum) that is stored in the data rom, and gets copied..
 	// Dragon World 3 checks it
 	// Setting 0x3002a0 to #3 causes Dragon World 3 to skip this check
-	m_sharedprotram[0x2a2 / 2] = PROTROM[0x114 / 2];
+	m_sharedprotram[0x2a2 / 2] = get_u16le(&m_rom[0x114]);
 }
 
 // From IGS022 ROM to shared protection RAM
@@ -96,8 +98,6 @@ void igs022_device::do_dma(u16 src, u16 dst, u16 size, u16 mode)
 
 	mode &= 0x7; // what are the other bits?
 
-	const u16 * const PROTROM = (u16 *)m_rom->base();
-
 	switch (mode)
 	{
 	case 0: case 1: case 2: case 3: case 4:
@@ -110,13 +110,13 @@ void igs022_device::do_dma(u16 src, u16 dst, u16 size, u16 mode)
 		*/
 		for (int x = 0; x < size; x++)
 		{
-			u16 dat = PROTROM[src + x];
+			u16 dat = get_u16le(&m_rom[(src + x) << 1]);
 
 			const u8 extraoffset        =   param & 0xff;
-			const u8 * const dectable   =   (u8 *)m_rom->base(); // the basic decryption table is at the start of the mcu data rom!
 			const u8 taboff             =   ((x * 2) + extraoffset) & 0xff; // must allow for overflow in instances of odd offsets
 
-			u16 extraxor                =   ((dectable[taboff + 1]) << 8) | (dectable[taboff + 0] << 0);
+			// the basic decryption table is at the start of the mcu data rom!
+			u16 extraxor                =   get_u16le(&m_rom[taboff]);
 
 			switch (mode)
 			{
@@ -150,9 +150,7 @@ void igs022_device::do_dma(u16 src, u16 dst, u16 size, u16 mode)
 	case 5: // byteswapped copy
 		for (int x = 0; x < size; x++)
 		{
-			u16 dat = PROTROM[src + x];
-
-			dat = swapendian_int16(dat);
+			const u16 dat = get_u16be(&m_rom[(src + x) << 1]);
 
 			m_sharedprotram[dst + x] = dat;
 		}
@@ -161,7 +159,7 @@ void igs022_device::do_dma(u16 src, u16 dst, u16 size, u16 mode)
 	case 6: // nibble swapped copy
 		for (int x = 0; x < size; x++)
 		{
-			u16 dat = PROTROM[src + x];
+			u16 dat = get_u16le(&m_rom[(src + x) << 1]);
 
 			dat = ((dat & 0xf0f0) >> 4) | ((dat & 0x0f0f) << 4);
 

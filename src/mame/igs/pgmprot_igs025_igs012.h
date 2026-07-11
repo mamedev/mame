@@ -16,21 +16,24 @@ public:
 	{
 	}
 
-	void init_drgw2();
-	void init_dw2v100x();
-	void init_drgw2c();
-	void init_drgw2c101();
-	void init_drgw2j();
-	void init_drgw2hk();
+	void init_drgw2() ATTR_COLD;
+	void init_dw2v100x() ATTR_COLD;
+	void init_drgw2c() ATTR_COLD;
+	void init_drgw2c101() ATTR_COLD;
+	void init_drgw2j() ATTR_COLD;
+	void init_drgw2hk() ATTR_COLD;
 
-	void pgm_012_025_drgw2(machine_config &config);
+	void pgm_012_025_drgw2(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<igs025_device> m_igs025;
 
-	void drgw2_common_init();
+	u8 source_data_r(u32 region, u8 addr);
 
-	void pgm_drgw2_decrypt();
+	void drgw2_common_init() ATTR_COLD;
+
+	void pgm_drgw2_decrypt() ATTR_COLD;
+
 	void drgw2_mem(address_map &map) ATTR_COLD;
 };
 
