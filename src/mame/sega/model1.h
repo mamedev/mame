@@ -217,6 +217,7 @@ protected:
 	void irq_control_w(u8 data);
 	u8 irq_mask_r();
 	void irq_mask_w(u8 data);
+	void sound_ready_w(int state);
 
 	uint8_t m_irq_status = 0;
 	uint8_t m_irq_mask = 0xff;

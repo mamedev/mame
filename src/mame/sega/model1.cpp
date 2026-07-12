@@ -859,6 +859,13 @@ u8 model1_state::irq_mask_r()
 void model1_state::irq_mask_w(u8 data)
 {
 	m_irq_mask = data;
+	sound_ready_w(0);
+}
+
+void model1_state::sound_ready_w(int state)
+{
+	if ((m_m1uart->txrdy_r() || m_m1uart->rxrdy_r()) && !BIT(m_irq_mask, 3))
+		irq_raise(3);
 }
 
 // IRQ vectors in use:
@@ -900,12 +907,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
 	}
 	else if(scanline == 384/2)
 	{
-		// Periodic (timer?) source, wired to levels 0 and 3; each game
-		// unmasks at most one of them for its uart/sound queue pump.
+		// Kludge: IRQ0 is an unemulated programmable timer (registers 0xe00006-0xe0000f).
+		// We fire it mid-frame temporarily to keep the games running.
 		if (!BIT(m_irq_mask, 0))
 			irq_raise(0);
-		if (!BIT(m_irq_mask, 3))
-			irq_raise(3);
 	}
 }
 
@@ -1802,6 +1807,8 @@ void model1_state::model1(machine_config &config)
 
 	I8251(config, m_m1uart, 8000000); // uPD71051C, clock unknown
 	m_m1uart->txd_handler().set(m_m1audio, FUNC(segam1audio_device::write_txd));
+	m_m1uart->rxrdy_handler().set(FUNC(model1_state::sound_ready_w));
+	m_m1uart->txrdy_handler().set(FUNC(model1_state::sound_ready_w));
 
 	clock_device &m1uart_clock(CLOCK(config, "m1uart_clock", 16_MHz_XTAL / 2 / 16)); // 16 times 31.25kHz (standard Sega/MIDI sound data rate)
 	m1uart_clock.signal_handler().set(m_m1uart, FUNC(i8251_device::write_txc));
