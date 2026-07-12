@@ -32,7 +32,7 @@ protected:
 	virtual void key_make(uint8_t row, uint8_t column) override;
 	virtual void key_break(uint8_t row, uint8_t column) override;
 	virtual void key_repeat(uint8_t row, uint8_t column) override;
-	uint8_t translate(uint8_t row, uint8_t column);
+	std::tuple<uint8_t, bool> translate(uint8_t row, uint8_t column);
 
 private:
 	devcb_write_line m_key_irq_cb;
@@ -46,6 +46,7 @@ private:
 
 	u8 m_scan_code;
 	u8 m_joy_code;
+	bool m_fn_key;
 };
 
 DECLARE_DEVICE_TYPE(PC6001_KBD, pc6001_kbd_device)

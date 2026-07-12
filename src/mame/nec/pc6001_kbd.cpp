@@ -11,7 +11,9 @@ headset cable.
 TODO:
 - Mimicking some of the MCU actual internals here, if/when MCU LLE is dumped properly
   then this will just contain the input port def;
-- CTRL, GRAPH, KANA, CAPS (no scancode?), INS and ROT (two rotating arrows on vanilla PC-6001);
+- KANA keys needs double checking;
+- CTRL, GRAPH, INS and ROT (two rotating arrows on vanilla PC-6001);
+- CAPS (pc6001mk2 onward only);
 - "<|--|> PAGE" (same as ROT?) and MODE on Mr. PC keyboards;
 
 **************************************************************************************************/
@@ -122,7 +124,8 @@ static INPUT_PORTS_START( pc6001_kbd )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
 
 	PORT_START("KEY9")
-//	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("KANA")
+	// TODO: ALT CHAR on pc6001a
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("KANA") PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("INS") PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("DEL") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE))
 //	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("ROT")
@@ -144,6 +147,7 @@ void pc6001_kbd_device::device_start()
 
 	save_item(NAME(m_scan_code));
 	save_item(NAME(m_joy_code));
+	save_item(NAME(m_fn_key));
 }
 
 void pc6001_kbd_device::device_reset()
@@ -153,11 +157,12 @@ void pc6001_kbd_device::device_reset()
 	typematic_stop();
 
 	m_scan_code = 0x00;
+	m_fn_key = false;
 }
 
-uint8_t pc6001_kbd_device::translate(uint8_t row, uint8_t column)
+std::tuple<uint8_t, bool> pc6001_kbd_device::translate(uint8_t row, uint8_t column)
 {
-	const u8 keytable[2][10 * 8] = {
+	const u8 keytable[4][10 * 8] = {
 		// normal
 		{
 //     [0]  ----   CTRL   SHIFT  GRAPH  ----   ----   ----   ----
@@ -185,7 +190,7 @@ uint8_t pc6001_kbd_device::translate(uint8_t row, uint8_t column)
 		{
 //     [0]  ----   CTRL   SHIFT  GRAPH  ----   ----   ----   ----
 			0x00,  0x00,  0x00,  0x00,  0x00,  0x00,  0x00,  0x00,
-//     [1]  !      q      a      z      k      i      8      <
+//     [1]  !      q      a      z      k      i      (      <
 			0x21,  0x71,  0x61,  0x7a,  0x6b,  0x69,  0x28,  0x3c,
 //     [2]  "      w      s      x      l      o      )      >
 			0x22,  0x77,  0x73,  0x78,  0x6c,  0x6f,  0x29,  0x3e,
@@ -203,23 +208,81 @@ uint8_t pc6001_kbd_device::translate(uint8_t row, uint8_t column)
 			0x0d,  0xfa,  0x1e,  0x1f,  0x1c,  0x1b,  0x09,  0x1b,
 //     [9]  KANA   INS?   DEL    ROT?   CLR    ----   ----   ----
 			0x00,  0x00,  0x08,  0x00,  0x0c,  0x00,  0x00,  0x00
+		},
+		// kana normal
+		// NOTE: fn keys are bit 7 flipped so to not clash with the actual charset
+		// Assume these scancodes are identical on pc6001a (where it produces an extended GRAPH charset)
+		{
+//     [0]  ----   CTRL   SHIFT  GRAPH  ----   ----   ----   ----
+			0x00,  0x00,  0x00,  0x00,  0x00,  0x00,  0x00,  0x00,
+//     [1]  1      Q      A      Z      K      I      8      ,
+			0xe7,  0xe0,  0xe1,  0xe2,  0xe9,  0xe6,  0xf5,  0xe8,
+//     [2]  2      W      S      X      L      O      9      .
+			0xec,  0xe3,  0xe4,  0x9b,  0xf8,  0xf7,  0xf6,  0xf9,
+//     [3]  3      E      D      C      ;      P      F1     /
+			0x91,  0x92,  0x9c,  0x9f,  0xfa,  0x9e,  0x70,  0xf2,
+//     [4]  4      R      F      V      :      @      F2     _?
+			0x93,  0x9d,  0xea,  0xeb,  0x99,  0xde,  0x71,  0xfb,
+//     [5]  5      T      G?     B      ]      [?     F3     SPACE
+			0x94,  0x96,  0x97,  0x9a,  0xf1,  0xdf,  0x72,  0x20,
+//     [6]  6      Y      H      N      -      ^      F4     0
+			0x95,  0xfd,  0x98,  0xf0,  0xee,  0xed,  0x73,  0xfc,
+//     [7]  7      U      J      M      -----  YEN?   F5     -----
+			0xf4,  0xe5,  0xef,  0xf3,  0x00,  0xb0,  0x74,  0x00,
+//     [8]  RET    STOP   UP     DOWN   RIGHT  LEFT   TAB    ESC?
+			0x0d,  0x7a,  0x1e,  0x1f,  0x1c,  0x1d,  0x09,  0x1b,
+//     [9]  KANA   INS?   DEL    ROT?   HOME   -----  -----  -----
+			0x00,  0x00,  0x08,  0x00,  0x0b,  0x00,  0x00,  0x00
+		},
+		// kana shift
+		{
+//     [0]  ----   CTRL   SHIFT  GRAPH  ----   ----   ----   ----
+			0x00,  0x00,  0x00,  0x00,  0x00,  0x00,  0x00,  0x00,
+//     [1]  !      q      a      z      k      i      (      <
+			0xe7,  0xe0,  0xe1,  0x8f,  0xe9,  0xe6,  0x8d,  0xa4,
+//     [2]  "      w      s      x      l      o      )      >?
+			0xec,  0xe3,  0xe4,  0x9b,  0xf8,  0xf7,  0x8e,  0xa1,
+//     [3]  #      e      d      c      +      p      F6     ?
+			0x87,  0x88,  0x9c,  0x9f,  0xfa,  0x9e,  0x75,  0xa5,
+//     [4]  $      r      f      v      *      @      F7     _?
+			0x89,  0x9d,  0xea,  0xeb,  0x99,  0xde,  0x76,  0xfb,
+//     [5]  %      t      g      b      }      {      F8     SPACE
+			0x8a,  0x96,  0x97,  0x9a,  0xa3,  0xa2,  0x77,  0x20,
+//     [6]  &      y      h      n      =?     ~?     F9     0
+			0x95,  0xfd,  0x98,  0xf0,  0xee,  0xed,  0x78,  0x86,
+//     [7]  \      u      j      m      -----  |?     F10    -----
+			0x8c,  0xe5,  0xef,  0xf3,  0x00,  0xb0,  0x79,  0x00,
+//     [8]  RET    STOP   UP     DOWN   RIGHT  LEFT   TAB    ESC?
+			0x0d,  0x7a,  0x1e,  0x1f,  0x1c,  0x1b,  0x09,  0x1b,
+//     [9]  KANA   INS?   DEL    ROT?   CLR    ----   ----   ----
+			0x00,  0x00,  0x08,  0x00,  0x0c,  0x00,  0x00,  0x00
 		}
 	};
 
 	const u8 key_select = row * 8 + column;
 	const uint8_t shift_key = BIT(m_key_rows[0]->read(), 2);
+	const uint8_t kana_key = BIT(m_key_rows[9]->read(), 0);
+	const uint8_t mode = shift_key | (kana_key << 1);
 
-	return keytable[shift_key][key_select];
+	const uint8_t res = keytable[mode][key_select];
+	const uint8_t fn_mask = 0x70 | ((kana_key ^ 1) << 7);
+
+	return std::make_tuple(res, (res & 0xf0) == fn_mask);
 }
 
 void pc6001_kbd_device::key_make(uint8_t row, uint8_t column)
 {
-	m_scan_code = translate(row, column);
+	auto [scan_key, fn_key] = translate(row, column);
 
-	if (m_scan_code != 0x00)
+	if (scan_key != 0x00)
 	{
-		if ((m_scan_code & 0xf0) == 0xf0)
+		m_scan_code = scan_key;
+		m_fn_key = fn_key;
+		if (m_fn_key)
+		{
+			m_scan_code |= 0x80;
 			m_keyfn_irq_cb(1);
+		}
 		else
 			m_key_irq_cb(1);
 	}
@@ -227,12 +290,13 @@ void pc6001_kbd_device::key_make(uint8_t row, uint8_t column)
 
 void pc6001_kbd_device::key_break(uint8_t row, uint8_t column)
 {
-	if ((m_scan_code & 0xf0) == 0xf0)
+	if (m_fn_key)
 		m_keyfn_irq_cb(0);
 	else
 		m_key_irq_cb(0);
 
 	m_scan_code = 0x00;
+	m_fn_key = false;
 }
 
 void pc6001_kbd_device::key_repeat(uint8_t row, uint8_t column)
