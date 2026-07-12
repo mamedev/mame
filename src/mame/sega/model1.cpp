@@ -848,6 +848,9 @@ void model1_state::irq_control_w(u8 data)
 // - netmerc: writes 0xff at boot, then "and.b #0xfd" - unmasks level 1 only.
 //            All its other vectors point to a debug routine that cycles the
 //            backdrop colour, which must never run.
+//
+// Note: The games (e.g., netmerc) do perform read operations on this register,
+// likely for read-modify-write bit manipulations. It must remain readable.
 u8 model1_state::irq_mask_r()
 {
 	return m_irq_mask;
