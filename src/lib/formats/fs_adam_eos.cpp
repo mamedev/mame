@@ -732,12 +732,12 @@ bool fs::adam_eos_image::has_rsrc() const
 std::vector<fs::meta_description> fs::adam_eos_image::volume_meta_description() const
 {
 	std::vector<meta_description> results;
-	results.emplace_back(meta_description(meta_name::name, "", false, [](const meta_value &m) { return adam_eos_impl::validate_filename(m.as_string(), false); }, "Volume name, up to 12 characters"));
-	results.emplace_back(meta_description(meta_name::protect, false, false, nullptr, "Delete protection"));
-	results.emplace_back(meta_description(meta_name::size_in_blocks, 0, true, nullptr, "Total number of blocks"));
+	results.emplace_back(meta_name::name, "", false, [](const meta_value &m) { return adam_eos_impl::validate_filename(m.as_string(), false); }, "Volume name, up to 12 characters");
+	results.emplace_back(meta_name::protect, false, false, nullptr, "Delete protection");
+	results.emplace_back(meta_name::size_in_blocks, 0, true, nullptr, "Total number of blocks");
 
 	const auto now = util::arbitrary_datetime::now();
-	results.emplace_back(meta_description(meta_name::creation_date, now, false, nullptr, "Creation date"));
+	results.emplace_back(meta_name::creation_date, now, false, nullptr, "Creation date");
 
 	return results;
 }
@@ -745,17 +745,17 @@ std::vector<fs::meta_description> fs::adam_eos_image::volume_meta_description() 
 std::vector<fs::meta_description> fs::adam_eos_image::file_meta_description() const
 {
 	std::vector<meta_description> results;
-	results.emplace_back(meta_description(meta_name::name, "", false, [](const meta_value &m) { return adam_eos_impl::validate_filename(m.as_string(), true); }, "File name, up to 11 characters"));
-	results.emplace_back(meta_description(meta_name::file_type, "A", false, [](const meta_value &m) { return adam_eos_impl::validate_filetype(m.as_string()); }, "Type of the file"));
-	results.emplace_back(meta_description(meta_name::protect, false, false, nullptr, "Permanently protected against update"));
-	results.emplace_back(meta_description(meta_name::user, true, false, nullptr, "User file"));
-	results.emplace_back(meta_description(meta_name::system, false, false, nullptr, "System file"));
-	results.emplace_back(meta_description(meta_name::permissions, "rwx", false, [](const meta_value &m) { return adam_eos_impl::validate_permissions(m.as_string()); }, "Permitted modes (r/w/x)"));
-	results.emplace_back(meta_description(meta_name::max_blocks, 0, true, nullptr, "Maximum size of the file in blocks"));
-	results.emplace_back(meta_description(meta_name::length, 0, true, nullptr, "Size of the file in bytes"));
+	results.emplace_back(meta_name::name, "", false, [](const meta_value &m) { return adam_eos_impl::validate_filename(m.as_string(), true); }, "File name, up to 11 characters");
+	results.emplace_back(meta_name::file_type, "A", false, [](const meta_value &m) { return adam_eos_impl::validate_filetype(m.as_string()); }, "Type of the file");
+	results.emplace_back(meta_name::protect, false, false, nullptr, "Permanently protected against update");
+	results.emplace_back(meta_name::user, true, false, nullptr, "User file");
+	results.emplace_back(meta_name::system, false, false, nullptr, "System file");
+	results.emplace_back(meta_name::permissions, "rwx", false, [](const meta_value &m) { return adam_eos_impl::validate_permissions(m.as_string()); }, "Permitted modes (r/w/x)");
+	results.emplace_back(meta_name::max_blocks, 0, true, nullptr, "Maximum size of the file in blocks");
+	results.emplace_back(meta_name::length, 0, true, nullptr, "Size of the file in bytes");
 
 	const auto now = util::arbitrary_datetime::now();
-	results.emplace_back(meta_description(meta_name::creation_date, now, false, nullptr, "Creation date"));
+	results.emplace_back(meta_name::creation_date, now, false, nullptr, "Creation date");
 
 	return results;
 }
