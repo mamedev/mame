@@ -64,7 +64,6 @@ public:
 	void swa(machine_config &config);
 	void wingwar(machine_config &config);
 	void wingwar360(machine_config &config);
-	void netmerc(machine_config &config);
 
 	struct spoint_t
 	{
@@ -383,7 +382,6 @@ protected:
 	void swa_outputs_w(uint8_t data);
 	void wingwar_outputs_w(uint8_t data);
 	void wingwar360_outputs_w(uint8_t data);
-	void netmerc_outputs_w(uint8_t data);
 	void drive_board_w(uint8_t data);
 };
 
@@ -394,6 +392,10 @@ public:
 		: model1_state(mconfig, type, tag)
 	{
 	}
+
+	void netmerc(machine_config &config);
+
+	void netmerc_outputs_w(uint8_t data);
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;

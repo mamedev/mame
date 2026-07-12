@@ -694,7 +694,7 @@ void model1_state::wingwar360_outputs_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 }
 
-void model1_state::netmerc_outputs_w(uint8_t data)
+void netmerc_state::netmerc_outputs_w(uint8_t data)
 {
 	// 76------  unknown (not used?)
 	// --54----  mvd backlights
@@ -1970,11 +1970,11 @@ void model1_state::polhemus_map(address_map &map)
 	map(0xf8000, 0xfffff).rom().region("polhemus", 0);
 }
 
-void model1_state::netmerc(machine_config &config)
+void netmerc_state::netmerc(machine_config &config)
 {
 	model1(config);
 	i386sx_device &polhemus(I386SX(config, "polhemus", 16000000));
-	polhemus.set_addrmap(AS_PROGRAM, &model1_state::polhemus_map);
+	polhemus.set_addrmap(AS_PROGRAM, &netmerc_state::polhemus_map);
 
 	model1io2_device &ioboard(SEGA_MODEL1IO2(config.replace(), "ioboard", 0));
 	ioboard.set_default_bios_tag("epr18021");
@@ -1984,8 +1984,8 @@ void model1_state::netmerc(machine_config &config)
 	ioboard.in_callback<1>().set_ioport("IN.1");
 	ioboard.an_callback<0>().set_ioport("STICKX");
 	ioboard.an_callback<2>().set_ioport("STICKY");
-	ioboard.output_callback().set(FUNC(model1_state::netmerc_outputs_w));
-	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
+	ioboard.output_callback().set(FUNC(netmerc_state::netmerc_outputs_w));
+	ioboard.output_callback().append(FUNC(netmerc_state::gen_outputs_w));
 
 	config.set_default_layout(layout_model1io2);
 }
