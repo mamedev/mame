@@ -13,7 +13,6 @@
 
     TODO
 
-	- loadsys1 unable to mount sasi
     - tst.w 0xfffffc
 
 */
