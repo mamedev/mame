@@ -21013,6 +21013,9 @@ ultim809
 @source:homebrew/uzebox.cpp
 uzebox
 
+@source:homebrew/we816.cpp
+we816
+
 @source:homebrew/z80clock.cpp
 z80clock
 
