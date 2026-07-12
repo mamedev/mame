@@ -334,6 +334,118 @@ void pc6001_state::cart_map(address_map &map)
     ROM_LOAD( "kanjirom.62", 0x20000, 0x8000, CRC(20c8f3eb) SHA1(4c9f30f0a2ebbe70aa8e697f94eac74d8241cadd) )
 */
 
+template <unsigned N> u8 pc6001mk2_state::tv_kanji_r(offs_t offset)
+{
+	const u32 base_offset = N;
+	if (m_bank_opt == 0 || m_bank_opt == 2)
+		return m_tv_rom->base()[(offset | base_offset) & 0x3fff];
+	const u32 kanji_bank_base = (m_bank_opt & 1) * 0x4000;
+
+	return m_kanji_rom->base()[((offset | base_offset) & 0x3fff) | kanji_bank_base];
+}
+
+
+template <unsigned N> u8 pc6001mk2_state::voice_kanji_r(offs_t offset)
+{
+	const u32 base_offset = N;
+	if (m_bank_opt == 0 || m_bank_opt == 2)
+		return m_voice_rom->base()[(offset | base_offset) & 0x3fff];
+	const u32 kanji_bank_base = (m_bank_opt & 1) * 0x4000;
+
+	return m_kanji_rom->base()[((offset | base_offset) & 0x3fff) | kanji_bank_base];
+}
+
+
+// TODO: it was marking stuff with TVROM(2), which is outside the size of the actual ROM?
+void pc6001mk2_state::mk2_tv_map(address_map &map)
+{
+	map.unmap_value_high();
+	// 00: <invalid setting>
+	map(0x00000, 0x03fff).unmapr();
+	// 01: basic ROM
+	map(0x04000, 0x07fff).rom().region("basic_rom", 0);
+	// 02: TV or kanji ROM
+	map(0x08000, 0x0bfff).r(FUNC(pc6001mk2_state::tv_kanji_r<0>));
+	// 03: ex ROM 1
+//	map(0x0c000, 0x0dfff).mirror(0x2000) cart space 0x2000
+	// 04: ex ROM 0
+//	map(0x10000, 0x11fff).mirror(0x2000) cart space 0
+	// 05: TV ROM 0 & basic ROM 1
+	map(0x14000, 0x15fff).r(FUNC(pc6001mk2_state::tv_kanji_r<0>));
+	map(0x16000, 0x17fff).rom().region("basic_rom", 0x2000);
+	// 06: basic ROM 0 & TV ROM 2 (?)
+	map(0x18000, 0x19fff).rom().region("basic_rom", 0);
+//	map(0x1a000, 0x1bfff).r(FUNC(pc6001mk2_state::tv_kanji_r<0x2000>));
+	// 07: ex ROM 0 & 1
+//	map(0x1c000, 0x1ffff) cart space 0
+	// 08: ex ROM 1 & 0
+//	map(0x20000, 0x21fff) cart space 0x2000
+//	map(0x22000, 0x23fff) cart space 0
+	// 09: ex ROM 1 & basic ROM 1
+//	map(0x24000, 0x25fff) cart space 0x2000
+	map(0x26000, 0x27fff).rom().region("basic_rom", 0x2000);
+	// 0a: basic rom 0 & ex rom 1
+	map(0x28000, 0x29fff).rom().region("basic_rom", 0);
+//	map(0x2a000, 0x2bfff) cart space 0x2000
+	// 0b: ex ROM 0 & TV ROM 2 (?)
+//	map(0x2c000, 0x2dfff) cart space 0
+//	map(0x2e000, 0x2ffff).r(FUNC(pc6001mk2_state::tv_kanji_r<0x2000>));
+	// 0c: TV ROM 1 & ex ROM 0
+	map(0x30000, 0x31fff).r(FUNC(pc6001mk2_state::tv_kanji_r<0x2000>));
+//	map(0x32000, 0x33fff) cart space 0
+	// 0d: RAM 0 & 1
+	map(0x34000, 0x37fff).lr8(NAME([this] (offs_t offset) { return m_mk2_ram[offset]; }));
+	// 0e: EXRAM 0 & 1
+	map(0x38000, 0x3bfff).lr8(NAME([this] (offs_t offset) { return m_mk2_exram[offset]; }));
+	// 0f: <invalid setting>
+	map(0x3c000, 0x3ffff).unmapr();
+}
+
+template <unsigned BASIC_BASE, unsigned WORK_BASE> void pc6001mk2_state::mk2_voice_map(address_map &map)
+{
+	map.unmap_value_high();
+
+	// 00: <invalid setting>
+	map(0x00000, 0x03fff).unmapr();
+	// 01: basic ROM
+	map(0x04000, 0x07fff).rom().region("basic_rom", BASIC_BASE);
+	// 02: voice or kanji ROM
+	map(0x08000, 0x0bfff).r(FUNC(pc6001mk2_state::voice_kanji_r<0>));
+	// 03: ex ROM 1
+//	map(0x0c000, 0x0dfff).mirror(0x2000) cart space 0x2000
+	// 04: ex ROM 0
+//	map(0x10000, 0x11fff).mirror(0x2000) cart space 0
+	// 05: voice ROM 0 & basic ROM 3
+	map(0x14000, 0x15fff).r(FUNC(pc6001mk2_state::voice_kanji_r<0>));
+	map(0x16000, 0x17fff).rom().region("basic_rom", BASIC_BASE + 0x2000);
+	// 06: basic ROM 2 & voice ROM 1
+	map(0x18000, 0x19fff).rom().region("basic_rom", BASIC_BASE);
+	map(0x1a000, 0x1bfff).r(FUNC(pc6001mk2_state::voice_kanji_r<0x2000>));
+	// 07: ex ROM 0 & 1
+//	map(0x1c000, 0x1ffff) cart space 0
+	// 08: ex ROM 1 & 0
+//	map(0x20000, 0x21fff) cart space 0x2000
+//	map(0x22000, 0x23fff) cart space 0
+	// 09: ex ROM 1 & basic ROM 3
+//	map(0x24000, 0x25fff) cart space 0x2000
+	map(0x26000, 0x27fff).rom().region("basic_rom", BASIC_BASE + 0x2000);
+	// 0a: basic rom 2 & ex rom 1
+	map(0x28000, 0x29fff).rom().region("basic_rom", BASIC_BASE);
+//	map(0x2a000, 0x2bfff) cart space 0x2000
+	// 0b: ex ROM 0 & voice ROM 1
+//	map(0x2c000, 0x2dfff) cart space 0
+	map(0x2e000, 0x2ffff).r(FUNC(pc6001mk2_state::voice_kanji_r<0x2000>));
+	// 0c: voice ROM 0 & ex ROM 0
+	map(0x30000, 0x31fff).r(FUNC(pc6001mk2_state::voice_kanji_r<0>));
+//	map(0x32000, 0x33fff) cart space 0
+	// 0d: RAM 6 & 7
+	map(0x34000, 0x37fff).lr8(NAME([this] (offs_t offset) { return m_mk2_ram[offset | WORK_BASE]; }));
+	// 0e: EXRAM 6 & 7
+	map(0x38000, 0x3bfff).lr8(NAME([this] (offs_t offset) { return m_mk2_exram[offset | WORK_BASE]; }));
+	// 0f: <invalid setting>
+	map(0x3c000, 0x3ffff).unmapr();
+}
+
 #define BASICROM(_v_) \
 	0x10000+0x2000*_v_
 #define VOICEROM(_v_) \
@@ -496,38 +608,31 @@ static const uint32_t banksw_table_r1[0x10*4][4] = {
 
 void pc6001mk2_state::mk2_bank_r0_w(uint8_t data)
 {
-	uint8_t *ROM = m_region_maincpu->base();
-	uint8_t *gfx_data = m_region_gfx1->base();
 
 //  bankaddress = 0x10000 + (0x4000 * ((data & 0x40)>>6));
 //  membank(1)->set_base(&ROM[bankaddress]);
 
 	m_bank_r0 = data;
 
-//  printf("%02x BANK | %02x\n",data,m_bank_opt);
-	m_bank1->set_base(&ROM[banksw_table_r0[(data & 0xf)+(m_bank_opt*0x10)][0]]);
-	m_bank2->set_base(&ROM[banksw_table_r0[(data & 0xf)+(m_bank_opt*0x10)][1]]);
-	m_bank3->set_base(&ROM[banksw_table_r0[((data & 0xf0)>>4)+(m_bank_opt*0x10)][2]]);
-	if(!m_gfx_bank_on)
-		m_bank4->set_base(&ROM[banksw_table_r0[((m_bank_r0 & 0xf0)>>4)+(m_bank_opt*0x10)][3]]);
-	else
-		m_bank4->set_base(&gfx_data[m_cgrom_bank_addr]);
+	m_mk2_bank[0]->set_bank(m_bank_r0 & 0xf);
+	m_mk2_bank[1]->set_bank(m_bank_r0 >> 4);
+
+//	if(!m_gfx_bank_on)
+//		m_bank4->set_base(&ROM[banksw_table_r0[((m_bank_r0 & 0xf0)>>4)+(m_bank_opt*0x10)][3]]);
+//	else
+//		m_bank4->set_base(&gfx_data[m_cgrom_bank_addr]);
 }
 
 void pc6001mk2_state::mk2_bank_r1_w(uint8_t data)
 {
-	uint8_t *ROM = m_region_maincpu->base();
-
 //  bankaddress = 0x10000 + (0x4000 * ((data & 0x40)>>6));
 //  membank(1)->set_base(&ROM[bankaddress]);
 
 	m_bank_r1 = data;
 
 //  printf("%02x BANK\n",data);
-	m_bank5->set_base(&ROM[banksw_table_r1[(data & 0xf)+(m_bank_opt*0x10)][0]]);
-	m_bank6->set_base(&ROM[banksw_table_r1[(data & 0xf)+(m_bank_opt*0x10)][1]]);
-	m_bank7->set_base(&ROM[banksw_table_r1[((data & 0xf0)>>4)+(m_bank_opt*0x10)][2]]);
-	m_bank8->set_base(&ROM[banksw_table_r1[((data & 0xf0)>>4)+(m_bank_opt*0x10)][3]]);
+	m_mk2_bank[2]->set_bank(m_bank_r1 & 0xf);
+	m_mk2_bank[3]->set_bank(m_bank_r1 >> 4);
 }
 
 void pc6001mk2_state::mk2_bank_w0_w(uint8_t data)
@@ -537,9 +642,10 @@ void pc6001mk2_state::mk2_bank_w0_w(uint8_t data)
 
 void pc6001mk2_state::mk2_opt_bank_w(uint8_t data)
 {
-	uint8_t *ROM = m_region_maincpu->base();
-	uint8_t *gfx_data = m_region_gfx1->base();
+//	uint8_t *ROM = m_region_maincpu->base();
+//	uint8_t *gfx_data = m_region_gfx1->base();
 
+	// TODO: note doesn't seem right
 	/*
 	0 - TVROM / VOICE ROM
 	1 - KANJI ROM bank 0
@@ -548,67 +654,50 @@ void pc6001mk2_state::mk2_opt_bank_w(uint8_t data)
 	*/
 	m_bank_opt = data & 3;
 
-	m_bank1->set_base(&ROM[banksw_table_r0[(m_bank_r0 & 0xf)+(m_bank_opt*0x10)][0]]);
-	m_bank2->set_base(&ROM[banksw_table_r0[(m_bank_r0 & 0xf)+(m_bank_opt*0x10)][1]]);
-	m_bank3->set_base(&ROM[banksw_table_r0[((m_bank_r0 & 0xf0)>>4)+(m_bank_opt*0x10)][2]]);
-	if(!m_gfx_bank_on)
-		m_bank4->set_base(&ROM[banksw_table_r0[((m_bank_r0 & 0xf0)>>4)+(m_bank_opt*0x10)][3]]);
-	else
-		m_bank4->set_base(&gfx_data[m_cgrom_bank_addr]);
-	m_bank4->set_base(&ROM[banksw_table_r0[((m_bank_r0 & 0xf0)>>4)+(m_bank_opt*0x10)][3]]);
-	m_bank5->set_base(&ROM[banksw_table_r1[(m_bank_r1 & 0xf)+(m_bank_opt*0x10)][0]]);
-	m_bank6->set_base(&ROM[banksw_table_r1[(m_bank_r1 & 0xf)+(m_bank_opt*0x10)][1]]);
-	m_bank7->set_base(&ROM[banksw_table_r1[((m_bank_r1 & 0xf0)>>4)+(m_bank_opt*0x10)][2]]);
-	m_bank8->set_base(&ROM[banksw_table_r1[((m_bank_r1 & 0xf0)>>4)+(m_bank_opt*0x10)][3]]);
+//	m_bank1->set_base(&ROM[banksw_table_r0[(m_bank_r0 & 0xf)+(m_bank_opt*0x10)][0]]);
+//	m_bank2->set_base(&ROM[banksw_table_r0[(m_bank_r0 & 0xf)+(m_bank_opt*0x10)][1]]);
+//	m_bank3->set_base(&ROM[banksw_table_r0[((m_bank_r0 & 0xf0)>>4)+(m_bank_opt*0x10)][2]]);
+	// TODO: this can't possibly work out
+//	if(!m_gfx_bank_on)
+//		m_bank4->set_base(&ROM[banksw_table_r0[((m_bank_r0 & 0xf0)>>4)+(m_bank_opt*0x10)][3]]);
+//	else
+//		m_bank4->set_base(&gfx_data[m_cgrom_bank_addr]);
+//	m_bank4->set_base(&ROM[banksw_table_r0[((m_bank_r0 & 0xf0)>>4)+(m_bank_opt*0x10)][3]]);
+//	m_mk2_bank[2].set_bank(m_bank_r1 & 0xf);
+//	m_mk2_bank[3].set_bank(m_bank_r1 >> 4);
 
 }
 
 void pc6001mk2_state::mk2_work_ram0_w(offs_t offset, uint8_t data)
 {
-	uint8_t *ROM = m_region_maincpu->base();
-	ROM[offset+((m_bank_w & 0x01) ? WRAM(0) : EXWRAM(0))] = data;
+	if (BIT(m_bank_w, 0))
+		m_mk2_ram[offset] = data;
+	else
+		m_mk2_exram[offset] = data;
 }
 
 void pc6001mk2_state::mk2_work_ram1_w(offs_t offset, uint8_t data)
 {
-	uint8_t *ROM = m_region_maincpu->base();
-	ROM[offset+((m_bank_w & 0x01) ? WRAM(1) : EXWRAM(1))] = data;
+	if (BIT(m_bank_w, 2))
+		m_mk2_ram[offset | 0x4000] = data;
+	else
+		m_mk2_exram[offset | 0x4000] = data;
 }
 
 void pc6001mk2_state::mk2_work_ram2_w(offs_t offset, uint8_t data)
 {
-	uint8_t *ROM = m_region_maincpu->base();
-	ROM[offset+((m_bank_w & 0x04) ? WRAM(2) : EXWRAM(2))] = data;
+	if (BIT(m_bank_w, 4))
+		m_mk2_ram[offset | 0x8000] = data;
+	else
+		m_mk2_exram[offset | 0x8000] = data;
 }
 
 void pc6001mk2_state::mk2_work_ram3_w(offs_t offset, uint8_t data)
 {
-	uint8_t *ROM = m_region_maincpu->base();
-	ROM[offset+((m_bank_w & 0x04) ? WRAM(3) : EXWRAM(3))] = data;
-}
-
-void pc6001mk2_state::mk2_work_ram4_w(offs_t offset, uint8_t data)
-{
-	uint8_t *ROM = m_region_maincpu->base();
-	ROM[offset+((m_bank_w & 0x10) ? WRAM(4) : EXWRAM(4))] = data;
-}
-
-void pc6001mk2_state::mk2_work_ram5_w(offs_t offset, uint8_t data)
-{
-	uint8_t *ROM = m_region_maincpu->base();
-	ROM[offset+((m_bank_w & 0x10) ? WRAM(5) : EXWRAM(5))] = data;
-}
-
-void pc6001mk2_state::mk2_work_ram6_w(offs_t offset, uint8_t data)
-{
-	uint8_t *ROM = m_region_maincpu->base();
-	ROM[offset+((m_bank_w & 0x40) ? WRAM(6) : EXWRAM(6))] = data;
-}
-
-void pc6001mk2_state::mk2_work_ram7_w(offs_t offset, uint8_t data)
-{
-	uint8_t *ROM = m_region_maincpu->base();
-	ROM[offset+((m_bank_w & 0x40) ? WRAM(7) : EXWRAM(7))] = data;
+	if (BIT(m_bank_w, 6))
+		m_mk2_ram[offset | 0xc000] = data;
+	else
+		m_mk2_exram[offset | 0xc000] = data;
 }
 
 
@@ -618,21 +707,10 @@ void pc6001mk2_state::necmk2_ppi8255_w(offs_t offset, uint8_t data)
 	{
 		ppi_control_hack_w(data);
 
-		if((data & 0x0f) == 0x05)
-		{
-			uint8_t *ROM = m_region_maincpu->base();
-
-			m_gfx_bank_on = 0;
-			m_bank4->set_base(&ROM[banksw_table_r0[((m_bank_r0 & 0xf0)>>4)+(m_bank_opt*0x10)][3]]);
-		}
-
-		if((data & 0x0f) == 0x04)
-		{
-			uint8_t *gfx_data = m_region_gfx1->base();
-
-			m_gfx_bank_on = 1;
-			m_bank4->set_base(&gfx_data[m_cgrom_bank_addr]);
-		}
+		if ((data & 0x0f) == 0x05)
+			m_gfx_view.disable();
+		if ((data & 0x0f) == 0x04)
+			m_gfx_view.select(0);
 	}
 
 	m_ppi->write(offset,data);
@@ -645,7 +723,8 @@ void pc6001mk2_state::vram_bank_change(uint8_t vram_bank)
 //  uint8_t *work_ram = m_region_maincpu->base();
 
 //  bit 2 of vram_bank sets up 4 color mode
-	set_videoram_bank(0x28000 + bank_base_values[vram_bank_index]);
+//	set_videoram_bank(0x28000 + bank_base_values[vram_bank_index]);
+	m_video_base = &m_mk2_ram[bank_base_values[vram_bank_index]];
 
 //  popmessage("%02x",vram_bank);
 }
@@ -768,14 +847,14 @@ uint8_t pc6001mk2_state::mk2_bank_w0_r()
 void pc6001mk2_state::pc6001mk2_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x1fff).bankr("bank1").w(FUNC(pc6001mk2_state::mk2_work_ram0_w));
-	map(0x2000, 0x3fff).bankr("bank2").w(FUNC(pc6001mk2_state::mk2_work_ram1_w));
-	map(0x4000, 0x5fff).bankr("bank3").w(FUNC(pc6001mk2_state::mk2_work_ram2_w));
-	map(0x6000, 0x7fff).bankr("bank4").w(FUNC(pc6001mk2_state::mk2_work_ram3_w));
-	map(0x8000, 0x9fff).bankr("bank5").w(FUNC(pc6001mk2_state::mk2_work_ram4_w));
-	map(0xa000, 0xbfff).bankr("bank6").w(FUNC(pc6001mk2_state::mk2_work_ram5_w));
-	map(0xc000, 0xdfff).bankr("bank7").w(FUNC(pc6001mk2_state::mk2_work_ram6_w));
-	map(0xe000, 0xffff).bankr("bank8").w(FUNC(pc6001mk2_state::mk2_work_ram7_w));
+	map(0x0000, 0x3fff).r(m_mk2_bank[0], FUNC(address_map_bank_device::read8)).w(FUNC(pc6001mk2_state::mk2_work_ram0_w));
+	map(0x4000, 0x7fff).r(m_mk2_bank[1], FUNC(address_map_bank_device::read8)).w(FUNC(pc6001mk2_state::mk2_work_ram1_w));
+	map(0x6000, 0x7fff).view(m_gfx_view);
+	m_gfx_view[0](0x6000, 0x7fff).lr8(
+		NAME([this] (offs_t offset) { return m_tv_rom->base()[offset | m_cgrom_bank_addr]; })
+	);
+	map(0x8000, 0xbfff).r(m_mk2_bank[2], FUNC(address_map_bank_device::read8)).w(FUNC(pc6001mk2_state::mk2_work_ram2_w));
+	map(0xc000, 0xffff).r(m_mk2_bank[3], FUNC(address_map_bank_device::read8)).w(FUNC(pc6001mk2_state::mk2_work_ram3_w));
 }
 
 void pc6001mk2_state::pc6001mk2_io(address_map &map)
@@ -1360,10 +1439,18 @@ void pc6001_state::machine_reset()
 	m_port_c_8255 = 0;
 }
 
+void pc6001mk2_state::machine_start()
+{
+	pc6001_state::machine_start();
+	m_mk2_ram.resize(0x10000);
+	m_mk2_exram.resize(0x10000);
+}
+
 void pc6001mk2_state::machine_reset()
 {
 //  pc6001_state::machine_reset();
-	set_videoram_bank(0xc000 + 0x28000);
+//	set_videoram_bank(0xc000 + 0x28000);
+	m_video_base = &m_mk2_ram[0xc000];
 
 	default_cartridge_reset();
 	// TODO: hackish way to simplify bankswitch handling
@@ -1377,20 +1464,11 @@ void pc6001mk2_state::machine_reset()
 
 	/* set default bankswitch */
 	{
-		uint8_t *ROM = m_region_maincpu->base();
-		m_bank_r0 = 0x71;
-		m_bank1->set_base(&ROM[BASICROM(0)]);
-		m_bank2->set_base(&ROM[BASICROM(1)]);
-		m_bank3->set_base(&ROM[EXROM(0)]);
-		m_bank4->set_base(&ROM[EXROM(1)]);
-		m_bank_r1 = 0xdd;
-		m_bank5->set_base(&ROM[WRAM(4)]);
-		m_bank6->set_base(&ROM[WRAM(5)]);
-		m_bank7->set_base(&ROM[WRAM(6)]);
-		m_bank8->set_base(&ROM[WRAM(7)]);
+		mk2_bank_r0_w(0x71);
+		mk2_bank_r1_w(0xdd);
 		m_bank_opt = 0x02; //tv rom
 		m_bank_w = 0x50; //enable write to work ram 4,5,6,7
-		m_gfx_bank_on = 0;
+		m_gfx_view.disable();
 
 		m_bgcol_bank = 0;
 	}
@@ -1609,6 +1687,11 @@ void pc6001mk2_state::pc6001mk2(machine_config &config)
 
 	config.device_remove("cart_bank");
 
+	ADDRESS_MAP_BANK(config, m_mk2_bank[0]).set_map(&pc6001mk2_state::mk2_tv_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config, m_mk2_bank[1]).set_map(&pc6001mk2_state::mk2_voice_map<0x4000, 0x4000>).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config, m_mk2_bank[2]).set_map(&pc6001mk2_state::mk2_voice_map<0x0000, 0x8000>).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config, m_mk2_bank[3]).set_map(&pc6001mk2_state::mk2_voice_map<0x4000, 0xc000>).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+
 	m_screen->set_screen_update(FUNC(pc6001mk2_state::screen_update));
 
 	m_palette->set_entries(16+16);
@@ -1753,6 +1836,18 @@ ROM_START( pc6001mk2 )
 	// exrom                 0x48000, 0x4000
 	// <invalid>             0x4c000, 0x4000
 
+	ROM_REGION( 0x8000, "basic_rom", ROMREGION_ERASEFF )
+	ROM_COPY( "maincpu", 0x10000, 0, 0x8000 )
+
+	ROM_REGION( 0x4000, "tv_rom", ROMREGION_ERASEFF )
+	ROM_COPY( "maincpu", 0x1c000, 0, 0x4000 )
+
+	ROM_REGION( 0x4000, "voice_rom", ROMREGION_ERASEFF )
+	ROM_COPY( "maincpu", 0x18000, 0, 0x4000 )
+
+	ROM_REGION( 0x8000, "kanji_rom", ROMREGION_ERASEFF )
+	ROM_COPY( "maincpu", 0x20000, 0, 0x8000 )
+
 	ROM_REGION( 0x800, "mcu", ROMREGION_ERASEFF )
 	ROM_LOAD( "i8049", 0x000, 0x800, NO_DUMP )
 
@@ -1773,6 +1868,18 @@ ROM_START( pc6601 )
 	ROM_LOAD( "kanjirom.66", 0x20000, 0x8000, CRC(20c8f3eb) SHA1(4c9f30f0a2ebbe70aa8e697f94eac74d8241cadd) )
 	// exrom                 0x48000, 0x4000
 
+	ROM_REGION( 0x8000, "basic_rom", ROMREGION_ERASEFF )
+	ROM_COPY( "maincpu", 0x10000, 0, 0x8000 )
+
+	ROM_REGION( 0x4000, "tv_rom", ROMREGION_ERASEFF )
+	ROM_COPY( "maincpu", 0x1c000, 0, 0x4000 )
+
+	ROM_REGION( 0x4000, "voice_rom", ROMREGION_ERASEFF )
+	ROM_COPY( "maincpu", 0x18000, 0, 0x4000 )
+
+	ROM_REGION( 0x8000, "kanji_rom", ROMREGION_ERASEFF )
+	ROM_COPY( "maincpu", 0x20000, 0, 0x8000 )
+
 	ROM_REGION( 0x800, "mcu", ROMREGION_ERASEFF )
 	ROM_LOAD( "i8049", 0x000, 0x800, NO_DUMP )
 
@@ -1787,6 +1894,15 @@ ROM_START( pc6001mk2sr )
 	ROM_REGION( 0x20000, "sr_sysrom", ROMREGION_ERASEFF )
 	ROM_LOAD( "systemrom1.64", 0x10000, 0x10000, CRC(b6fc2db2) SHA1(dd48b1eee60aa34780f153359f5da7f590f8dff4) )
 	ROM_LOAD( "systemrom2.64", 0x00000, 0x10000, CRC(55a62a1d) SHA1(3a19855d290fd4ac04e6066fe4a80ecd81dc8dd7) )
+
+	// TODO: missing ROMs
+	ROM_REGION( 0x8000, "basic_rom", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x4000, "tv_rom", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x4000, "voice_rom", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x8000, "kanji_rom", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x800, "mcu", ROMREGION_ERASEFF )
 	ROM_LOAD( "i8049", 0x000, 0x800, NO_DUMP )
@@ -1814,6 +1930,18 @@ ROM_START( pc6601sr )
 	ROM_LOAD( "cgrom60.68",   0x0c000, 0x002000, CRC(331473a9) SHA1(361836f9758d6d9b5133c9dc7860a7c74f9cf596) )
 	ROM_LOAD( "cgrom66.68",   0x0e000, 0x002000, CRC(03ba2cf1) SHA1(6fb32a4332b26aba2f28c3d8872cac5606be3998) )
 	ROM_LOAD( "sysrom2.68",   0x10000, 0x002000, CRC(07318218) SHA1(061f3e7d6c85a560846856feb55fdc0a1f561548) )
+
+	ROM_REGION( 0x8000, "basic_rom", ROMREGION_ERASEFF )
+	ROM_COPY( "mk2", 0x00000, 0, 0x8000 )
+
+	ROM_REGION( 0x4000, "tv_rom", ROMREGION_ERASEFF )
+	ROM_COPY( "mk2", 0x0c000, 0, 0x4000 )
+
+	ROM_REGION( 0x4000, "voice_rom", ROMREGION_ERASEFF )
+	ROM_COPY( "mk2", 0x08000, 0, 0x4000 )
+
+	ROM_REGION( 0x8000, "kanji_rom", ROMREGION_ERASEFF )
+	ROM_COPY( "sr_sysrom", 0x18000, 0x00000, 0x8000 )
 
 	ROM_REGION( 0x800, "mcu", 0 )
 	ROM_LOAD( "d8049hc-016.bin", 0x000, 0x800, CRC(65394e8d) SHA1(761397cbd812623367ef1df5561c6dddb7ebdab7) )

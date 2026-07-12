@@ -196,14 +196,12 @@ class pc6001mk2_state : public pc6001_state
 public:
 	pc6001mk2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc6001_state(mconfig, type, tag)
-		, m_bank1(*this, "bank1")
-		, m_bank2(*this, "bank2")
-		, m_bank3(*this, "bank3")
-		, m_bank4(*this, "bank4")
-		, m_bank5(*this, "bank5")
-		, m_bank6(*this, "bank6")
-		, m_bank7(*this, "bank7")
-		, m_bank8(*this, "bank8")
+		, m_mk2_bank(*this, "mk2_bank_%u", 0U)
+		, m_gfx_view(*this, "gfx_view")
+		, m_basic_rom(*this, "basic_rom")
+		, m_tv_rom(*this, "tv_rom")
+		, m_voice_rom(*this, "voice_rom")
+		, m_kanji_rom(*this, "kanji_rom")
 	{ }
 
 	uint8_t mk2_bank_r0_r();
@@ -217,10 +215,6 @@ public:
 	void mk2_work_ram1_w(offs_t offset, uint8_t data);
 	void mk2_work_ram2_w(offs_t offset, uint8_t data);
 	void mk2_work_ram3_w(offs_t offset, uint8_t data);
-	void mk2_work_ram4_w(offs_t offset, uint8_t data);
-	void mk2_work_ram5_w(offs_t offset, uint8_t data);
-	void mk2_work_ram6_w(offs_t offset, uint8_t data);
-	void mk2_work_ram7_w(offs_t offset, uint8_t data);
 	void necmk2_ppi8255_w(offs_t offset, uint8_t data);
 	void mk2_system_latch_w(uint8_t data);
 	void mk2_vram_bank_w(uint8_t data);
@@ -239,21 +233,31 @@ protected:
 	void pc6001mk2_io(address_map &map) ATTR_COLD;
 
 	uint8_t m_bgcol_bank = 0;
-	uint8_t m_gfx_bank_on = 0;
-	optional_memory_bank m_bank1;
-	optional_memory_bank m_bank2;
-	optional_memory_bank m_bank3;
-	optional_memory_bank m_bank4;
-	optional_memory_bank m_bank5;
-	optional_memory_bank m_bank6;
-	optional_memory_bank m_bank7;
-	optional_memory_bank m_bank8;
+
+	optional_device_array<address_map_bank_device, 4> m_mk2_bank;
+	memory_view m_gfx_view;
+
+	required_memory_region m_basic_rom;
+	required_memory_region m_tv_rom;
+	required_memory_region m_voice_rom;
+	required_memory_region m_kanji_rom;
+
 	virtual void refresh_crtc_params();
 
-	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	virtual u8 vrtc_ack() override;
+
+	template <unsigned N> u8 tv_kanji_r(offs_t offset);
+	template <unsigned N> u8 voice_kanji_r(offs_t offset);
+
+	void mk2_tv_map(address_map &map);
+	template <unsigned BASIC_BASE, unsigned WORK_BASE> void mk2_voice_map(address_map &map);
+
+	std::vector<u8> m_mk2_ram;
+	std::vector<u8> m_mk2_exram;
 
 private:
 	uint8_t m_bank_r0 = 0;
