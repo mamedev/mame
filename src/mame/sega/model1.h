@@ -217,6 +217,14 @@ protected:
 	void irq_control_w(u8 data);
 	u8 irq_mask_r();
 	void irq_mask_w(u8 data);
+	u16 timer_r(offs_t offset, u16 mem_mask);
+	void timer_w(offs_t offset, u16 data, u16 mem_mask);
+	TIMER_CALLBACK_MEMBER(irq0_timer_tick);
+
+	emu_timer *m_irq0_timer[2] = { nullptr, nullptr };
+	uint16_t m_timer_period[2] = { 0, 0 };
+	uint16_t m_timer_val[2] = { 0, 0 };
+	uint16_t m_timer_mode[2] = { 0, 0 };
 	void sound_ready_w(int state);
 
 	uint8_t m_irq_status = 0;

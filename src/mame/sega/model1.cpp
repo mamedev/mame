@@ -868,6 +868,55 @@ void model1_state::sound_ready_w(int state)
 		irq_raise(3);
 }
 
+u16 model1_state::timer_r(offs_t offset, u16 mem_mask)
+{
+	if (offset == 3 || offset == 4)
+	{
+		int tnum = offset - 3;
+		if (m_irq0_timer[tnum]->enabled())
+		{
+			uint32_t ticks = m_irq0_timer[tnum]->remaining().as_ticks(m_maincpu->clock());
+			m_timer_val[tnum] = ticks / 0x800;
+		}
+		return m_timer_val[tnum];
+	}
+	return 0xffff;
+}
+
+void model1_state::timer_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	if (offset == 1 || offset == 2)
+	{
+		int tnum = offset - 1;
+		COMBINE_DATA(&m_timer_period[tnum]);
+		if (m_timer_period[tnum])
+		{
+			attotime period = attotime::from_ticks(0x800 * m_timer_period[tnum], m_maincpu->clock());
+			m_irq0_timer[tnum]->adjust(period, tnum);
+		}
+		else
+		{
+			m_irq0_timer[tnum]->adjust(attotime::never);
+		}
+	}
+	else if (offset == 0)
+	{
+		COMBINE_DATA(&m_timer_mode[0]);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(model1_state::irq0_timer_tick)
+{
+	if (!BIT(m_irq_mask, 0))
+		irq_raise(0);
+
+	if (m_timer_period[param])
+	{
+		attotime period = attotime::from_ticks(0x800 * m_timer_period[param], m_maincpu->clock());
+		m_irq0_timer[param]->adjust(period, param);
+	}
+}
+
 // IRQ vectors in use:
 // vf
 // 1 = fe3ed4 (vblank)
@@ -905,13 +954,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
 		if (!BIT(m_irq_mask, 1))
 			irq_raise(1);
 	}
-	else if(scanline == 384/2)
-	{
-		// Kludge: IRQ0 is an unemulated programmable timer (registers 0xe00006-0xe0000f).
-		// We fire it mid-frame temporarily to keep the games running.
-		if (!BIT(m_irq_mask, 0))
-			irq_raise(0);
-	}
+
 }
 
 void model1_state::machine_reset()
@@ -979,7 +1022,7 @@ void model1_state::model1_mem(address_map &map)
 	/* GLUE */ map(0xe00000, 0xe00000).w(FUNC(model1_state::irq_control_w));
 	/*      */ map(0xe00002, 0xe00002).rw(FUNC(model1_state::irq_mask_r), FUNC(model1_state::irq_mask_w));
 	/*      */ map(0xe00004, 0xe00005).w(FUNC(model1_state::bank_w));
-	/*      */ map(0xe00006, 0xe0000f).nopw(); // Unemulated timer? (E0000A: period, E0000C: free-running count, also read back; E0000E: unknown)
+	/*      */ map(0xe00006, 0xe0000f).rw(FUNC(model1_state::timer_r), FUNC(model1_state::timer_w)); // Unemulated timer? (E0000A: period, E0000C: count; E0000E: ?)
 
 	/* ROM0 */ map(0xf80000, 0xffffff).rom();
 }
