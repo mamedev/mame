@@ -129,7 +129,6 @@ cem3394_device::cem3394_device(const machine_config &mconfig, const char *tag, d
 	m_final_gain_cv(std::numeric_limits<double>::quiet_NaN()),
 	m_tri(false),
 	m_saw(false),
-	m_pulse(false),
 	m_vco_frequency(500.0),
 	m_pulse_width(0),
 	m_volume(0),
@@ -149,23 +148,23 @@ void cem3394_device::sound_stream_update(sound_stream &stream)
 void cem3394_device::device_add_mconfig(machine_config &config)
 {
 	// Set up the VCO.
-	// Route gains will be adjusted in update_mix().
+	// Route gains will be adjusted when relevant CVs are updated.
 	VA_VCO(config, m_vco)
 		.configure_pulse_from_tri(true)
 		.configure_pulse_dc_comp(true)
-		.add_route(va_vco_device::OUTPUT_RAMP, m_vcf, 1.0, va_lpf4_device::INPUT_AUDIO)
-		.add_route(va_vco_device::OUTPUT_PULSE, m_vcf, 1.0, va_lpf4_device::INPUT_AUDIO)
-		.add_route(va_vco_device::OUTPUT_TRIANGLE, m_vcf, 1.0, va_lpf4_device::INPUT_AUDIO)
-		.add_route(va_vco_device::OUTPUT_TRIANGLE, m_filt_fm, 1.0, va_vca_device::INPUT_AUDIO);
+		.add_route(va_vco_device::OUTPUT_RAMP, m_vcf, 0.0, va_lpf4_device::INPUT_AUDIO)
+		.add_route(va_vco_device::OUTPUT_PULSE, m_vcf, 0.0, va_lpf4_device::INPUT_AUDIO)
+		.add_route(va_vco_device::OUTPUT_TRIANGLE, m_vcf, 0.0, va_lpf4_device::INPUT_AUDIO)
+		.add_route(va_vco_device::OUTPUT_TRIANGLE, m_filt_fm, 0.0, va_vca_device::INPUT_AUDIO);
 
 	// Set up the external input.
 	if (m_stream_inputs.ext_input != nullptr)
 	{
-		// Route gain will be adjusted in update_mix().
-		m_stream_inputs.ext_input->add_route(0, m_vcf, 1.0, va_lpf4_device::INPUT_AUDIO);
+		// Route gain will be adjusted in set_mixer_balance_cv().
+		m_stream_inputs.ext_input->add_route(0, m_vcf, 0.0, va_lpf4_device::INPUT_AUDIO);
 	}
 
-	// Set up frequency control.
+	// Set up filter frequency control.
 	device_sound_interface *filt_freq = nullptr;
 	if (m_stream_inputs.filt_freq_cv != nullptr)
 	{
@@ -188,7 +187,8 @@ void cem3394_device::device_add_mconfig(machine_config &config)
 	// Second term, computed by the m_filt_fm VCA:
 	// - The triangle wave (range: [-1, 1]) is applied to m_filt_fm's INPUT_AUDIO
 	//   (see VCO configuration above).
-	// - The route gain of the above is set to filt_mod_amount * 0.5 (see update_mix()).
+	// - The route gain of the above is set to filt_mod_amount * 0.5
+	//   (see set_mod_amount_cv()).
 	// - filt_freq is applied to INPUT_GAIN (see right below).
 	// The above make m_filt_fm's output: filt_freq * filt_mod_amount * 0.5 * triangle
 	filt_freq->add_route(0, m_filt_fm, 1.0, va_vca_device::INPUT_GAIN);
@@ -235,7 +235,6 @@ void cem3394_device::device_start()
 
 	save_item(NAME(m_tri));
 	save_item(NAME(m_saw));
-	save_item(NAME(m_pulse));
 	save_item(NAME(m_vco_frequency));
 	save_item(NAME(m_pulse_width));
 	save_item(NAME(m_volume));
@@ -271,7 +270,6 @@ void cem3394_device::device_reset()
 		else
 			set_final_gain_cv(0.0);
 
-		update_mix();
 		m_initialized = true;
 	}
 }
@@ -282,7 +280,6 @@ void cem3394_device::set_vco_freq_cv(double cv)
 	if (cv == m_vco_freq_cv)
 		return;
 
-	m_stream->update();
 	m_vco_freq_cv = cv;
 
 	// frequency varies from -4.0 to +4.0, at 0.75V/octave
@@ -297,7 +294,6 @@ void cem3394_device::set_mod_amount_cv(double cv)
 	if (cv == m_mod_amount_cv)
 		return;
 
-	m_stream->update();
 	m_mod_amount_cv = cv;
 
 	// At max depth, the frequency is modulated from 0.01x to 2.0x. This
@@ -314,7 +310,9 @@ void cem3394_device::set_mod_amount_cv(double cv)
 		m_filter_modulation = 1.98 * (cv - 0.01) / (3.5 - 0.01);
 	LOGMASKED(LOG_CONTROL_CHANGES, "FLT_MODU=%6.3fV -> mod=%f\n", cv, m_filter_modulation);
 
-	update_mix();
+	// See m_filt_fm setup in device_add_mconfig().
+	const double mod_gain = 0.5 * m_filter_modulation;
+	m_vco->set_route_gain(va_vco_device::OUTPUT_TRIANGLE, m_filt_fm, va_vca_device::INPUT_AUDIO, mod_gain);
 }
 
 void cem3394_device::set_wave_select_cv(double cv)
@@ -322,7 +320,6 @@ void cem3394_device::set_wave_select_cv(double cv)
 	if (cv == m_wave_select_cv)
 		return;
 
-	m_stream->update();
 	m_wave_select_cv = cv;
 
 	// Wave select chooses between triangle, sawtooth, both, or neither.
@@ -338,7 +335,7 @@ void cem3394_device::set_wave_select_cv(double cv)
 	m_saw = (cv >= 0.35);
 	LOGMASKED(LOG_CONTROL_CHANGES, "WAVE_SEL=%6.3fV -> tri=%d saw=%d\n", cv, m_tri, m_saw);
 
-	update_mix();
+	update_osc_mix();
 }
 
 void cem3394_device::set_pulse_width_cv(double cv)
@@ -346,29 +343,15 @@ void cem3394_device::set_pulse_width_cv(double cv)
 	if (cv == m_pulse_width_cv)
 		return;
 
-	m_stream->update();
 	m_pulse_width_cv = cv;
 
 	// pulse width determines duty cycle; 0.0 means 0%, 2.0 means 100%
-	if (cv < 0.0)
-	{
-		m_pulse_width = 0.0;
-		m_pulse = false;
-	}
-	else if (cv > 2.0)
-	{
-		m_pulse_width = 1.0;
-		m_pulse = false;
-	}
-	else
-	{
-		m_pulse_width = cv * 0.5;
-		m_pulse = true;
-	}
-	LOGMASKED(LOG_CONTROL_CHANGES, "PULSE_WI=%6.3fV -> raw=%f adj=%f\n", cv, cv * 0.5, m_pulse_width);
+	// A pulse width of 0 or 1 will result in the waveform being 0 for its
+	// entire cycle, which means it is essentially disabled.
+	m_pulse_width = std::clamp(0.5 * cv, 0.0, 1.0);
+	LOGMASKED(LOG_CONTROL_CHANGES, "PULSE_WI=%6.3fV -> adj=%f\n", cv, m_pulse_width);
 
 	m_vco->set_pw_ctrl(m_pulse_width);
-	update_mix();
 }
 
 void cem3394_device::set_mixer_balance_cv(double cv)
@@ -376,7 +359,6 @@ void cem3394_device::set_mixer_balance_cv(double cv)
 	if (cv == m_mixer_balance_cv)
 		return;
 
-	m_stream->update();
 	m_mixer_balance_cv = cv;
 
 	// mixer balance is a pan between the external input and the internal input
@@ -393,7 +375,15 @@ void cem3394_device::set_mixer_balance_cv(double cv)
 	}
 	LOGMASKED(LOG_CONTROL_CHANGES, " BALANCE=%6.3fV -> int=%f ext=%f\n", cv, m_mixer_internal, m_mixer_external);
 
-	update_mix();
+	const double pulse_gain = PULSE_VOLUME * m_mixer_internal;
+	m_vco->set_route_gain(va_vco_device::OUTPUT_PULSE, m_vcf, va_lpf4_device::INPUT_AUDIO, pulse_gain);
+	update_osc_mix();
+
+	if (m_stream_inputs.ext_input != nullptr)
+	{
+		const double ext_gain = EXTERNAL_VOLUME * m_mixer_external;
+		m_stream_inputs.ext_input->set_route_gain(0, m_vcf, va_lpf4_device::INPUT_AUDIO, ext_gain);
+	}
 }
 
 void cem3394_device::set_filt_res_cv(double cv)
@@ -401,7 +391,6 @@ void cem3394_device::set_filt_res_cv(double cv)
 	if (cv == m_filt_res_cv)
 		return;
 
-	m_stream->update();
 	m_filt_res_cv = cv;
 
 	// According to the datasheet, the "no resonance" CV threshold is between
@@ -435,7 +424,6 @@ void cem3394_device::set_filt_freq_cv(double cv)
 	if (cv == m_filt_freq_cv)
 		return;
 
-	m_stream->update();
 	set_filt_freq_cv_internal(cv);
 	m_filt_freq->set_value(m_filter_frequency);
 }
@@ -459,7 +447,6 @@ void cem3394_device::set_final_gain_cv(double cv)
 	if (cv == m_final_gain_cv)
 		return;
 
-	m_stream->update();
 	set_final_gain_cv_internal(cv);
 	m_vca->set_fixed_gain_cv(m_volume);
 }
@@ -522,26 +509,13 @@ sound_stream::sample_t cem3394_device::compute_db_volume(double voltage)
 	return powf(0.891251f, compute_db(voltage));
 }
 
-void cem3394_device::update_mix()
+void cem3394_device::update_osc_mix()
 {
 	const double tri_gain = m_tri ? (TRIANGLE_VOLUME * m_mixer_internal) : 0;
 	m_vco->set_route_gain(va_vco_device::OUTPUT_TRIANGLE, m_vcf, va_lpf4_device::INPUT_AUDIO, tri_gain);
 
 	const double saw_gain = m_saw ? (SAWTOOTH_VOLUME * m_mixer_internal) : 0;
 	m_vco->set_route_gain(va_vco_device::OUTPUT_RAMP, m_vcf, va_lpf4_device::INPUT_AUDIO, saw_gain);
-
-	const double pulse_gain = m_pulse ? (PULSE_VOLUME * m_mixer_internal) : 0;
-	m_vco->set_route_gain(va_vco_device::OUTPUT_PULSE, m_vcf, va_lpf4_device::INPUT_AUDIO, pulse_gain);
-
-	// See m_filt_fm setup in device_add_mconfig().
-	const double mod_amount = 0.5 * m_filter_modulation;
-	m_vco->set_route_gain(va_vco_device::OUTPUT_TRIANGLE, m_filt_fm, va_vca_device::INPUT_AUDIO, mod_amount);
-
-	if (m_stream_inputs.ext_input != nullptr)
-	{
-		const double ext_gain = EXTERNAL_VOLUME * m_mixer_external;
-		m_stream_inputs.ext_input->set_route_gain(0, m_vcf, va_lpf4_device::INPUT_AUDIO, ext_gain);
-	}
 }
 
 float cem3394_device::stream_op_filter_freq(float voltage)
