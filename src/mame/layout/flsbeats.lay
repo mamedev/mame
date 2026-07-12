@@ -92,10 +92,24 @@ Whole view is ~16:9 and the content is grouped so MAME centers it vertically.
 	<!-- dark background -->
 	<element name="panel"><rect><color red="0.03" green="0.03" blue="0.05" /></rect></element>
 
+	<!-- Flash-lit background wash:
+	     unlit state matches the panel background; lit state is a lighter
+		 neutral tint of the background. -->
+	<element name="flash_glow" defstate="0">
+		<rect state="0"><color red="0.03" green="0.03" blue="0.05" /></rect>
+		<rect state="1"><color red="0.12" green="0.12" blue="0.16" /></rect>
+	</element>
+
 	<!-- 16:9 view; everything laid out within 0..320 x 0..180 -->
 	<view name="Cabinet">
 
 		<element ref="panel"><bounds x="0" y="0" width="320" height="180" /></element>
+
+		<!-- Flash-lit background wash: a simulation of the neon tubes
+			 lighting up most of the cabinet and surrounding area.
+			 Aids in gameplay so less focus is needed on the comparatively small 
+			 elements between the lanes -->
+		<element ref="flash_glow" name="lamp_flash"><bounds x="0" y="0" width="320" height="180" /></element>
 
 		<!-- DMD: top, centered -->
 		<screen index="0"><bounds x="96" y="8" width="128" height="32" /></screen>
