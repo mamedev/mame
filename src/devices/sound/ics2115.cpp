@@ -468,8 +468,8 @@ int ics2115_device::fill_output(ics2115_voice& voice, sound_stream &stream)
 		//15-bit volume + (5-bit worth of 32 channel sum) + 16-bit samples = 4-bit extra
 		if (voice.playing())
 		{
-			stream.add_int(0, i, (sample * vleft) >> (5 + 15), 32768);
-			stream.add_int(1, i, (sample * vright) >> (5 + 15), 32768);
+			stream.add_int(0, i, (sample * vleft) >> 15, 32768);
+			stream.add_int(1, i, (sample * vright) >> 15, 32768);
 		}
 
 		if (voice.playing())
