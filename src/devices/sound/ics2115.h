@@ -58,9 +58,9 @@ private:
 
 		struct {
 			s32 left;
-			u32 add;
-			u32 start, end;
-			u32 acc;
+			s32 add;
+			s32 start, end;
+			s32 acc;
 			u16 regacc;
 			u8 incr;
 			u8 pan, mode;
@@ -100,14 +100,12 @@ private:
 		// may lead to its elimination.
 		struct {
 			bool on;
-			int ramp;       // 100 0000 = 0x40 maximum
 		} state;
 
 		u16 regs[0x20]; // channel registers
 		bool playing();
 		int update_volume_envelope();
 		int update_oscillator();
-		void update_ramp();
 	};
 
 	struct ics2115_timer {
@@ -138,7 +136,7 @@ private:
 	s16 m_ulaw[256];
 	u16 m_volume[4096];
 	u16 m_panlaw[256];
-	static const int volume_bits = 15;
+	u32 m_volinc_frac[32];
 
 	ics2115_voice m_voice[32];
 	ics2115_timer m_timer[2];
@@ -150,12 +148,6 @@ private:
 	bool m_irq_on;
 
 	u16 m_regs[0x40]; // global registers
-
-	/*
-	    Unknown variable, seems to be effected by 0x12. Further investigation
-	    Required.
-	*/
-	u8 m_vmode;
 };
 
 

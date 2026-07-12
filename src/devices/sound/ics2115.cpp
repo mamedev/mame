@@ -54,7 +54,6 @@ ics2115_device::ics2115_device(const machine_config &mconfig, const char *tag, d
 	, m_irq_enabled(0)
 	, m_irq_pending(0)
 	, m_irq_on(false)
-	, m_vmode(0)
 {
 }
 
@@ -83,8 +82,25 @@ void ics2115_device::device_start()
 	//austere's table, derived from patent 5809466:
 	//See section V starting from page 195
 	//Subsection F (column 124, page 198) onwards
+	/*
 	for (int i = 0; i<4096; i++)
 		m_volume[i] = ((0x100 | (i & 0xff)) << (volume_bits-9)) >> (15 - (i>>8));
+	*/
+
+	// hardware measured formula
+	// exp = i[11:8]
+	// mant = i[7:0]
+	// exp == 0 : mant >> 7
+	// exp > 0 : ceil(((0x100 | mant) << exp) / 512)
+	for (int i = 0; i < 4096; i++)
+	{
+		const u8 exponent = (i >> 8);
+		const u8 mantissa = i & 0xff;
+		if (exponent == 0)
+			m_volume[i] = mantissa >> 7;
+		else
+			m_volume[i] = ((((0x100 | mantissa) << (exponent - 1)) + 0xff) >> 8);
+	}
 
 	//u-Law table as per MIL-STD-188-113
 	u16 lut[8];
@@ -106,6 +122,13 @@ void ics2115_device::device_start()
 	}
 	m_panlaw[0] = 0xfff; //all bits to one when no pan
 
+	// exponential volume increment fraction calculation
+	// round(1024*2^(frac/32))
+	for (u8 i = 0; i < 32; i++)
+	{
+		m_volinc_frac[i] = u16(std::round(1024.0 * std::pow(double(i / 32), 2.0)));
+	}
+
 	save_item(STRUCT_MEMBER(m_timer, period));
 	save_item(STRUCT_MEMBER(m_timer, scale));
 	save_item(STRUCT_MEMBER(m_timer, preset));
@@ -115,7 +138,6 @@ void ics2115_device::device_start()
 	save_item(NAME(m_irq_pending));
 	save_item(NAME(m_irq_on));
 	save_item(NAME(m_active_osc));
-	save_item(NAME(m_vmode));
 	save_item(NAME(m_regs));
 	save_item(STRUCT_MEMBER(m_voice, regs));
 
@@ -123,7 +145,6 @@ void ics2115_device::device_start()
 	{
 		save_item(NAME(m_voice[i].osc_conf.value), i);
 		save_item(NAME(m_voice[i].state.on), i);
-		save_item(NAME(m_voice[i].state.ramp), i);
 		save_item(NAME(m_voice[i].vol_ctrl.value), i);
 		save_item(NAME(m_voice[i].osc.left), i);
 		save_item(NAME(m_voice[i].osc.acc), i);
@@ -157,7 +178,6 @@ void ics2115_device::device_reset()
 	m_stream->set_sample_rate(clock() / ((m_active_osc + 1) * 32));
 	m_osc_select = 0;
 	m_reg_select = 0;
-	m_vmode = 0;
 	m_irq_on = false;
 	memset(m_voice, 0, sizeof(m_voice));
 	for (int i = 0; i < 2; i++)
@@ -185,7 +205,6 @@ void ics2115_device::device_reset()
 		elem.vol_ctrl.value = 1;
 		elem.vol.mode = 0;
 		elem.state.on = false;
-		elem.state.ramp = 0;
 	}
 }
 
@@ -374,7 +393,7 @@ s32 ics2115_device::get_sample(ics2115_voice& voice)
 	else
 		nextaddr = curaddr + 2;
 
-	s16 sample1, sample2;
+	s32 sample1, sample2;
 	if (voice.osc_conf.bitflags.ulaw)
 	{
 		sample1 = m_ulaw[read_sample(voice, curaddr)];
@@ -411,39 +430,33 @@ bool ics2115_device::ics2115_voice::playing()
 	return state.on && !(osc_conf.bitflags.stop);
 }
 
-void ics2115_device::ics2115_voice::update_ramp()
-{
-	//slow attack
-	if (state.on && !osc_conf.bitflags.stop)
-	{
-		if (state.ramp < 0x40)
-			state.ramp += 0x1;
-		else
-			state.ramp = 0x40;
-	}
-	//slow release
-	else
-	{
-		if (state.ramp)
-			state.ramp -= 0x1;
-	}
-}
-
 int ics2115_device::fill_output(ics2115_voice& voice, sound_stream &stream)
 {
 	bool irq_invalid = false;
-	const u16 fine = 1 << (3 * (voice.vol.incr >> 6));
-	voice.vol.add = (voice.vol.incr & 0x3f) << (10 - fine);
+	// measured from hardware
+	switch (voice.vol.mode & 0x3)
+	{
+		case 0x0:
+		case 0x1:
+		case 0x3: // Exponential
+		{
+			const u16 e = voice.vol.incr + (BIT(voice.vol.mode, 0) ? 256 : 0);
+			voice.vol.add = (m_volinc_frac[e & 0x1f] << (e >> 5)) >> 10;
+			break;
+		}
+		case 0x2: // Linear
+			voice.vol.add = voice.vol.incr << 10;
+			break;
+	}
 
 	for (int i = 0; i < stream.samples(); i++)
 	{
-		constexpr int RAMP_SHIFT = 6;
-		const u32 volacc = (voice.vol.acc >> 14) & 0xfff;
-		const s16 vlefti = volacc - m_panlaw[255 - voice.vol.pan]; // left index from acc - pan law
-		const s16 vrighti = volacc - m_panlaw[voice.vol.pan]; // right index from acc - pan law
+		const s32 volacc = (voice.vol.acc >> 14) & 0xfff;
+		const s32 vlefti = volacc - m_panlaw[255 - voice.vol.pan]; // left index from acc - pan law
+		const s32 vrighti = volacc - m_panlaw[voice.vol.pan]; // right index from acc - pan law
 		//check negative values so no cracks, is it a hardware feature ?
-		const u16 vleft = vlefti > 0 ? (m_volume[vlefti] * voice.state.ramp >> RAMP_SHIFT) : 0;
-		const u16 vright = vrighti > 0 ? (m_volume[vrighti] * voice.state.ramp >> RAMP_SHIFT) : 0;
+		const s32 vleft = vlefti > 0 ? m_volume[vlefti] : 0;
+		const s32 vright = vrighti > 0 ? m_volume[vrighti] : 0;
 
 		//From GUS doc:
 		//In general, it is necessary to remember that all voices are being summed in to the
@@ -453,14 +466,12 @@ int ics2115_device::fill_output(ics2115_voice& voice, sound_stream &stream)
 		const s32 sample = get_sample(voice);
 
 		//15-bit volume + (5-bit worth of 32 channel sum) + 16-bit samples = 4-bit extra
-		//if (voice.playing())
-		if (!m_vmode || voice.playing())
+		if (voice.playing())
 		{
-			stream.add_int(0, i, (sample * vleft) >> (5 + volume_bits), 32768);
-			stream.add_int(1, i, (sample * vright) >> (5 + volume_bits), 32768);
+			stream.add_int(0, i, (sample * vleft) >> (5 + 15), 32768);
+			stream.add_int(1, i, (sample * vright) >> (5 + 15), 32768);
 		}
 
-		voice.update_ramp();
 		if (voice.playing())
 		{
 			if (voice.update_oscillator())
@@ -609,10 +620,9 @@ u16 ics2115_device::reg_read()
 			// may expect |8 on voice irq with &40 == 0
 			// may expect |8 on reg 0 on voice irq with &80 == 0
 			// ret = 0xff;
-			if (!m_vmode)
-				ret = voice.vol_ctrl.bitflags.irq ? 0x81 : 0x01;
-			else
-				ret = 0x01;
+			ret |= 0x01;
+			if (voice.vol_ctrl.bitflags.irq)
+				ret |= 0x80;
 			//ret = voice.vol_ctrl.bitflags.value | 0x1;
 			ret <<= 8;
 			break;
@@ -854,12 +864,9 @@ void ics2115_device::reg_write(u16 data, u16 mem_mask)
 #endif
 					if (!voice.osc_conf.bitflags.stop || !voice.vol_ctrl.bitflags.stop)
 						LOGVOICE("%s: [%02d STOP]\n", machine().describe_context(), m_osc_select);
-					if (!m_vmode)
-					{
-						//try to key it off as well!
-						voice.osc_conf.bitflags.stop = true;
-						voice.vol_ctrl.bitflags.stop = true;
-					}
+					//try to key it off as well!
+					voice.osc_conf.bitflags.stop = true;
+					voice.vol_ctrl.bitflags.stop = true;
 				}
 				else
 					LOGUNK("%s: ICS2115: Unhandled* data write %d onto 0x10.\n", machine().describe_context(), data);
@@ -874,7 +881,7 @@ void ics2115_device::reg_write(u16 data, u16 mem_mask)
 		case 0x12:
 			//Could be per voice! -- investigate.
 			if (ACCESSING_BITS_8_15)
-				m_vmode = (data >> 8);
+				voice.vol.mode = (data >> 8);
 			break;
 		case 0x40: // Timer 1 Preset
 		case 0x41: // Timer 2 Preset
@@ -1045,9 +1052,6 @@ void ics2115_device::keyon()
 	if (m_osc_select != ICS2115_ISOLATE)
 		return;
 #endif
-	//set initial condition (may need to invert?) -- does NOT work since these are set to zero even
-	//no ramp up...
-	m_voice[m_osc_select].state.ramp = 0x40;
 
 	LOGVOICE("%s: [%02d vs:%04x ve:%04x va:%04x vi:%02x vc:%02x os:%06x oe:%06x oa:%06x of:%04x SA:%02x oc:%02x][%04x]\n", machine().describe_context(),
 			m_osc_select,
