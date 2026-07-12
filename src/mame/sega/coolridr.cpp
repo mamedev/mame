@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Angelo Salese, David Haywood
 // thanks-to: Guru
 /**************************************************************************************************
@@ -19,6 +19,16 @@ TODO:
    super loud / clear;
 - i8237 purpose is unknown (missing ROM for comms?);
 - verify zooming etc. our current algorithm is a bit ugly for text;
+- Requires SH7032 to be unstubbed, both games definitely access area $5xx'xxxx for stuff that
+  isn't on-chip I/O, huh?
+
+TODO (aquastge):
+- has two screens but only first one gets enabled;
+- service mode POST doesn't survive a memory test, gets stuck in IC21/IC22 RAM tests
+  (SH-2 reads from $eb00'dd50!?)
+- black screen with -nodrc;
+- Remaining inputs, where they are located?
+- Always enters test mode at startup (side effect of having several inputs high?);
 
 ===================================================================================================
 
@@ -2987,7 +2997,7 @@ void coolridr_state::aquastge_submap(address_map &map)
 	map(0x05200000, 0x0520ffff).ram();
 	map(0x05210000, 0x0521ffff).ram().share("share3"); /*Communication area RAM*/
 	map(0x05220000, 0x0537ffff).ram();
-	map(0x06000200, 0x06000207).nopw(); // program bug?
+	map(0x06000200, 0x06000207).nopw(); // program bug when writing to NVRAM? Happens cyclically
 }
 
 /* TODO: what is this for, volume mixing? MIDI? */
@@ -3340,6 +3350,14 @@ void coolridr_state::aquastge(machine_config &config)
 	sega_315_5649_device &io(SEGA_315_5649(config.replace(), "io", 0));
 	io.in_pc_callback().set_ioport("IN0");
 	io.in_pd_callback().set_ioport("IN1");
+	io.in_pe_callback().set_constant(0xff);
+	io.in_pf_callback().set_constant(0xff);
+	// flips 0x81 -> 0x80 from ch1, expects bit 0 of both channels to update
+	// pushing high avoids "CALL ATTENDANT" errors
+	io.serial_ch1_rd_callback().set([] () { return 0xff; });
+	//io.serial_ch1_wr_callback().set([this] (u8 data) {});
+	io.serial_ch2_rd_callback().set([] () { return 0xff; });
+	//io.serial_ch2_wr_callback().set([this] (u8 data) {});
 }
 
 ROM_START( coolridr )
