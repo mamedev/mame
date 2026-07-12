@@ -126,7 +126,7 @@ void ics2115_device::device_start()
 	// round(1024*2^(frac/32))
 	for (u8 i = 0; i < 32; i++)
 	{
-		m_volinc_frac[i] = u16(std::round(1024.0 * std::pow(double(i / 32), 2.0)));
+		m_volinc_frac[i] = u16(std::round(1024.0 * std::pow(double(i) / 32.0, 2.0)));
 	}
 
 	save_item(STRUCT_MEMBER(m_timer, period));
