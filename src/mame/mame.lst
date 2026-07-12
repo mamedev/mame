@@ -47508,6 +47508,15 @@ tvbg3c
 tvbg6a
 tvbg6b
 
+@source:tvgames/bk139in1.cpp
+bk139in1
+dgun3944
+lxcymls
+lxcympp
+lxcymsm
+lxcyrace
+starbuck
+
 @source:tvgames/elan_eu3a05.cpp
 airblsjs
 bratzra
@@ -47555,7 +47564,10 @@ tomyeggb
 
 @source:tvgames/generalplus_gpl16250_mobigo.cpp
 mobigo
+mobigof
 mobigos
+
+@source:tvgames/generalplus_gpl16250_mobigo2.cpp
 mobigo2
 
 @source:tvgames/generalplus_gpl16250_nand.cpp
@@ -47622,19 +47634,12 @@ wrlshunt
 anpanbd
 anpaneng
 anpanm15
-bk139in1
 bkrankp
-dgun3944
 jspodred
-lxcymls
-lxcympp
-lxcymsm
-lxcyrace
 pokegac2
 pokegac2y
 pokegach
 prailpls
-starbuck
 vmastspi
 wildking
 
