@@ -5,7 +5,7 @@
     Psion Workabout
 
     TODO:
-    - hookup the mx EEPROM (contains a unique Id).
+    - determine EEPROM factory settings.
 
 ******************************************************************************/
 
@@ -53,12 +53,13 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void palette_init(palette_device &palette) const ATTR_COLD;
 
 	uint16_t kbd_r();
+	uint16_t portab_r();
+	void portab_w(uint16_t data);
 
 	required_device<psion_asic9_device> m_asic9;
 	required_device<ram_device> m_ram;
@@ -80,10 +81,6 @@ void workabout_state::machine_start()
 	m_nvram->set_base(m_ram->pointer(), m_ram->size());
 
 	save_item(NAME(m_key_col));
-}
-
-void workabout_state::machine_reset()
-{
 }
 
 
@@ -163,7 +160,7 @@ static INPUT_PORTS_START( psionwa )
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(' ')
 	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)          PORT_CHAR('p')  PORT_CHAR('P')
 	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)          PORT_CHAR('l')  PORT_CHAR('L')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.')  PORT_CHAR(',')
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.')  PORT_CHAR(',')  PORT_CHAR('>')
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)          PORT_CHAR('5')  PORT_CHAR('%')  PORT_CHAR('{')
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))                  PORT_NAME(u8"\u2190") // U+2190 = ←
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                                                               PORT_NAME("Backlight")
@@ -197,6 +194,24 @@ uint16_t workabout_state::kbd_r()
 	}
 
 	return data;
+}
+
+
+uint16_t workabout_state::portab_r()
+{
+	uint16_t data = 0x00;
+
+	data |= kbd_r() & 0xff;
+	data |= m_eeprom->do_read() << 10;
+
+	return data;
+}
+
+void workabout_state::portab_w(uint16_t data)
+{
+	m_eeprom->cs_write(BIT(data, 11));
+	m_eeprom->di_write(BIT(data, 9));
+	m_eeprom->clk_write(BIT(data, 8));
 }
 
 
@@ -277,7 +292,8 @@ void workabout_state::psionwamx(machine_config &config)
 	PSION_ASIC9MX(config.replace(), m_asic9, 3.6864_MHz_XTAL * 15 / 2); // V30MX
 	m_asic9->set_screen("screen");
 	m_asic9->set_ram_rom("ram", "rom");
-	m_asic9->port_ab_r().set(FUNC(workabout_state::kbd_r));
+	m_asic9->port_ab_r().set(FUNC(workabout_state::portab_r));
+	m_asic9->port_ab_w().set(FUNC(workabout_state::portab_w));
 	m_asic9->buz_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 	m_asic9->col_cb().set([this](uint8_t data) { m_key_col = data; });
 	m_asic9->data_r<0>().set(m_ssd[0], FUNC(psion_ssd_device::data_r));      // SSD Pack 1
@@ -312,6 +328,8 @@ ROM_START(psionwamx)
 	ROM_REGION16_LE(0x200000, "rom", 0)
 	ROM_SYSTEM_BIOS(0, "720f", "V7.20F 230798")
 	ROMX_LOAD("w2mx_v7.20f.bin", 0x00000, 0x200000, CRC(63734683) SHA1(9d8aa1e45f52e7fcb52d6e81ac47f60d1104c35d), ROM_BIOS(0))
+
+	ROM_REGION16_LE(0x80, "eeprom", ROMREGION_ERASE00)
 ROM_END
 
 } // anonymous namespace
