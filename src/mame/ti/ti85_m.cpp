@@ -147,6 +147,11 @@ void ti85_state::update_ti83p_memory ()
 
 void ti85_state::update_ti83pse_memory ()
 {
+	if (m_model == TI84PCSE) {
+		update_ti84pcse_memory();
+		return;
+	}
+	
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	m_membank[0]->set_bank(m_booting ? (m_model==TI84P ? 0x3f : 0x7f) : 0);
@@ -168,6 +173,46 @@ void ti85_state::update_ti83pse_memory ()
 		m_membank[2]->set_bank(m_ti8x_memory_page_2);
 
 		m_membank[3]->set_bank(m_ti8x_memory_page_3 + 0x80);
+
+	}
+}
+
+void ti85_state::update_ti84pcse_memory ()
+{
+	//address_space &space = m_maincpu->space(AS_PROGRAM);
+
+	uint16_t memA = m_ti8x_memory_page_1 & 0x7F;
+	uint16_t memB = m_ti8x_memory_page_2 & 0x7F;
+
+	if (m_ti8x_memory_page_1 & 0x80) {
+		memA = (memA & 0x07) | 0x100;
+	} else if (m_ti84pcse_portE) {
+		memA |= (m_ti84pcse_portE & 0x1) << 7;
+	}
+
+	if (m_ti8x_memory_page_2 & 0x80) {
+		memB = (memB & 0x07) | 0x100;
+	} else if (m_ti84pcse_portF) {
+		memB |= (m_ti84pcse_portF & 0x1) << 7;
+	}
+
+	m_membank[0]->set_bank(m_booting ? 0xff : 0);
+
+	if (m_ti83p_port4 & 1)
+	{
+		m_membank[1]->set_bank(memA & 0x3fe);
+
+		m_membank[2]->set_bank(memA | 1);
+
+		m_membank[3]->set_bank(memB);
+	}
+	else
+	{
+		m_membank[1]->set_bank(memA);
+
+		m_membank[2]->set_bank(memB);
+
+		m_membank[3]->set_bank(m_ti8x_memory_page_3 | 0x100);
 
 	}
 }
@@ -384,6 +429,8 @@ void ti85_state::ti8xpse_init_common()
 	save_item(NAME(m_ti8x_memory_page_2));
 	save_item(NAME(m_ti8x_memory_page_3));
 	save_item(NAME(m_ti83p_port4));
+	save_item(NAME(m_ti84pcse_portE));
+	save_item(NAME(m_ti84pcse_portF));
 }
 
 
@@ -400,6 +447,15 @@ MACHINE_START_MEMBER(ti85_state,ti84pse)
 
 	ti8xpse_init_common();
 }
+
+
+MACHINE_START_MEMBER(ti85_state,ti84pcse)
+{
+	m_model = TI84PCSE;
+
+	ti8xpse_init_common();
+}
+
 
 MACHINE_START_MEMBER(ti85_state,ti84p)
 {
@@ -839,6 +895,29 @@ void ti85_state::ti83pse_port_0007_w(uint8_t data)
 	}
 	update_ti83pse_memory();
 }
+
+uint8_t ti85_state::ti84pcse_port_000E_r()
+{
+	return m_ti84pcse_portE;
+}
+
+uint8_t ti85_state::ti84pcse_port_000F_r()
+{
+	return m_ti84pcse_portF;
+}
+
+void ti85_state::ti84pcse_port_000E_w(uint8_t data)
+{
+	m_ti84pcse_portE = data & 0x3;
+	update_ti84pcse_memory();
+}
+
+void ti85_state::ti84pcse_port_000F_w(uint8_t data)
+{
+	m_ti84pcse_portF = data & 0x3;
+	update_ti84pcse_memory();
+}
+
 
 void ti85_state::ti83p_port_0014_w(uint8_t data)
 {

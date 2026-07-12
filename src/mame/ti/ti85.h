@@ -17,6 +17,7 @@
 #include "machine/intelfsh.h"
 #include "machine/nvram.h"
 #include "video/t6a04.h"
+#include "video/ili9335.h"
 #include "emupal.h"
 
 
@@ -31,7 +32,8 @@ enum ti85_model {
 	TI83P,
 	TI83PSE,
 	TI84P,
-	TI84PSE
+	TI84PSE,
+	TI84PCSE
 };
 
 struct ti83pse_timer
@@ -76,6 +78,7 @@ public:
 	void ti85d(machine_config &config);
 	void ti83pse(machine_config &config);
 	void ti84pse(machine_config &config);
+	void ti84pcse(machine_config &config);
 	void ti84pce(machine_config &config);
 	void ti86(machine_config &config);
 	void ti81(machine_config &config);
@@ -120,6 +123,8 @@ private:
 	uint8_t m_ti8x_port2 = 0;
 	uint8_t m_ti83p_port4 = 0;
 	uint8_t m_ti83pse_port21 = 0;
+	uint8_t m_ti84pcse_portE = 0;
+	uint8_t m_ti84pcse_portF = 0;
 	int m_ti_video_memory_size = 0;
 	int m_ti_screen_x_size = 0;
 	int m_ti_screen_y_size = 0;
@@ -165,6 +170,8 @@ private:
 	void ti83p_port_0014_w(uint8_t data);
 	void ti83pse_port_0020_w(uint8_t data);
 	void ti83pse_port_0021_w(uint8_t data);
+	void ti84pcse_port_000E_w(uint8_t data);
+	void ti84pcse_port_000F_w(uint8_t data);
 	uint8_t ti85_port_0002_r();
 	uint8_t ti85_port_0003_r();
 	uint8_t ti85_port_0004_r();
@@ -183,6 +190,8 @@ private:
 	uint8_t ti83pse_port_0021_r();
 	uint8_t ti84pse_port_0055_r();
 	uint8_t ti84pse_port_0056_r();
+	uint8_t ti84pcse_port_000E_r();
+	uint8_t ti84pcse_port_000F_r();
 	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 	void ti85_palette(palette_device &palette);
@@ -193,6 +202,7 @@ private:
 	DECLARE_MACHINE_START(ti83p);
 	DECLARE_MACHINE_START(ti83pse);
 	DECLARE_MACHINE_START(ti84pse);
+	DECLARE_MACHINE_START(ti84pcse);
 	DECLARE_MACHINE_START(ti84p);
 	void ti8xpse_init_common();
 
@@ -234,6 +244,7 @@ private:
 	void update_ti85_memory();
 	void update_ti83p_memory();
 	void update_ti83pse_memory();
+	void update_ti84pcse_memory();
 	void update_ti86_memory();
 	void ti8x_snapshot_setup_registers(uint8_t *data);
 	void ti85_setup_snapshot(uint8_t *data);
@@ -252,6 +263,8 @@ private:
 	void ti83p_io(address_map &map) ATTR_COLD;
 	void ti83pse_banked_mem(address_map &map) ATTR_COLD;
 	void ti83pse_io(address_map &map) ATTR_COLD;
+	void ti84pcse_banked_mem(address_map &map) ATTR_COLD;
+	void ti84pcse_io(address_map &map) ATTR_COLD;
 	void ti84p_banked_mem(address_map &map) ATTR_COLD;
 	void ti85_io(address_map &map) ATTR_COLD;
 	void ti86_io(address_map &map) ATTR_COLD;
