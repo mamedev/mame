@@ -216,7 +216,8 @@ public:
 	void main_scsp_map(address_map &map) ATTR_COLD;
 	void scsp_mem(address_map &map) ATTR_COLD;
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void palette_init(palette_device &palette) const;
 
 private:
 	virtual void machine_start() override ATTR_COLD;
@@ -347,7 +348,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(flashbeats_state::lane_update_timer)
 // scroll-position loop at 0x2cd8), producing genuine frame-by-frame animation.
 // Native resolution is 64x16 (half the physical panel in each dimension),
 // rendered pixel-doubled here to fill the 128x32 screen.
-uint32_t flashbeats_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t flashbeats_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	auto rd8 = [this](offs_t byteaddr) -> uint8_t {
 		return util::big_endian_cast<uint8_t>(m_dispram.target())[byteaddr & 0xffff];
@@ -357,9 +358,7 @@ uint32_t flashbeats_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 	{
 		for (int nx = 0; nx < DMD_NATIVE_W; nx++)
 		{
-			const uint8_t v = rd8(DMD_BASE + ny * DMD_PITCH + nx * 2) & 0x0f;
-			const rgb_t c = v ? rgb_t((v * 0xff) / 15, (v * 0x28) / 15, (v * 0x1e) / 15)
-			                   : rgb_t(0x10, 0x05, 0x05);
+			const uint16_t pen = rd8(DMD_BASE + ny * DMD_PITCH + nx * 2) & 0x0f;
 			const int x0 = nx * 2;
 			const int y0 = ny * 2;
 			for (int dy = 0; dy < 2; dy++)
@@ -369,13 +368,22 @@ uint32_t flashbeats_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 					const int x = x0 + dx;
 					const int y = y0 + dy;
 					if (cliprect.contains(x, y))
-						bitmap.pix(y, x) = c;
+						bitmap.pix(y, x) = pen;
 				}
 			}
 		}
 	}
 
 	return 0;
+}
+
+// 16-level amber/red VFD ramp: pen 0 is the unlit-segment glow, pens 1-15
+// scale up to full brightness.
+void flashbeats_state::palette_init(palette_device &palette) const
+{
+	palette.set_pen_color(0, 0x10, 0x05, 0x05);
+	for (int v = 1; v < 16; v++)
+		palette.set_pen_color(v, (v * 0xff) / 15, (v * 0x28) / 15, (v * 0x1e) / 15);
 }
 
 // TE7752 P3 lamp outputs
@@ -515,11 +523,12 @@ void flashbeats_state::flashbeats(machine_config &config)
 	// frame). The 5 LED lanes are published as artwork outputs (update_lanes),
 	// polled by their own timer below. Neither is a real raster device on the
 	// hardware.
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(DMD_W, DMD_H);
 	m_screen->set_visarea(0, DMD_W - 1, 0, DMD_H - 1);
 	m_screen->set_screen_update(FUNC(flashbeats_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	// LED lane state is plain artwork output, not screen-clocked; poll it on its
 	// own timer so frameskip/throttle can't affect its update rate. Rate chosen
@@ -532,7 +541,7 @@ void flashbeats_state::flashbeats(machine_config &config)
 	// animation. 480Hz stays above the observed burst ceiling with margin.
 	TIMER(config, "lane_timer").configure_periodic(FUNC(flashbeats_state::lane_update_timer), attotime::from_hz(480));
 
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	PALETTE(config, m_palette, FUNC(flashbeats_state::palette_init), 16);
 
 	config.set_default_layout(layout_flsbeats);
 
