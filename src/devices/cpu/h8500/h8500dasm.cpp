@@ -330,7 +330,7 @@ offs_t h8500_disassembler::dasm_general(std::ostream &stream, offs_t pc, u8 ea, 
 		}
 		else if ((op2 & 0xe8) == 0xa0 && (ea & 0xf8) == 0xa0)
 		{
-			util::stream_format(stream, "%-9s", "DADD.B");
+			util::stream_format(stream, "%-9s", BIT(op2, 4) ? "DSUB.B" : "DADD.B");
 			format_reg(stream, ea & 0x07, w);
 			stream << ", ";
 			format_reg(stream, op2 & 0x07, w);

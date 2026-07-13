@@ -809,6 +809,18 @@ if CPUS["H8500"] then
 		MAME_DIR .. "src/devices/cpu/h8500/h8532.h",
 		MAME_DIR .. "src/devices/cpu/h8500/h8534.cpp",
 		MAME_DIR .. "src/devices/cpu/h8500/h8534.h",
+		MAME_DIR .. "src/devices/cpu/h8500/h8500_frt.cpp",
+		MAME_DIR .. "src/devices/cpu/h8500/h8500_frt.h",
+		MAME_DIR .. "src/devices/cpu/h8500/h8500_intc.cpp",
+		MAME_DIR .. "src/devices/cpu/h8500/h8500_intc.h",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/cpu/h8500/h8500.cpp", GEN_DIR .. "emu/cpu/h8500/h8500.hxx" },
+	}
+
+	custombuildtask {
+		{ MAME_DIR .. "src/devices/cpu/h8500/h8500.lst", GEN_DIR .. "emu/cpu/h8500/h8500.hxx", { MAME_DIR .. "src/devices/cpu/h8500/h8500make.py" }, {"@echo Generating H8/500 source file...", PYTHON .. " $(1) $(<) s $(@)" }},
 	}
 end
 
