@@ -250,7 +250,8 @@ protected:
 	virtual u8 vrtc_ack() override;
 
 	template <unsigned TV_BASE> u8 tv_kanji_r(offs_t offset);
-	template <unsigned N> u8 voice_kanji_r(offs_t offset);
+	template <unsigned VOICE_BASE> u8 voice_kanji_r(offs_t offset);
+	template <unsigned CART_BASE> u8 cart_mk2_r(offs_t offset);
 
 	void mk2_tv_map(address_map &map);
 	template <unsigned BASIC_BASE, unsigned WORK_BASE> void mk2_voice_map(address_map &map);

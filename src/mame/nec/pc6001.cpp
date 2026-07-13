@@ -358,16 +358,20 @@ template <unsigned TV_BASE> u8 pc6001mk2_state::tv_kanji_r(offs_t offset)
 }
 
 // all other banks uses Voice and Kanji ROMs
-template <unsigned N> u8 pc6001mk2_state::voice_kanji_r(offs_t offset)
+template <unsigned VOICE_BASE> u8 pc6001mk2_state::voice_kanji_r(offs_t offset)
 {
-	const u32 base_offset = N;
 	if (m_bank_opt == 0 || m_bank_opt == 2)
-		return m_voice_rom->base()[(offset | base_offset) & 0x3fff];
+		return m_voice_rom->base()[(offset | VOICE_BASE) & 0x3fff];
 	const u32 kanji_bank_base = BIT(m_bank_opt, 1) * 0x4000;
 
-	return m_kanji_rom->base()[((offset | base_offset) & 0x3fff) | kanji_bank_base];
+	return m_kanji_rom->base()[((offset | VOICE_BASE) & 0x3fff) | kanji_bank_base];
 }
 
+// TODO: how writing works on mk2 mode?
+template <unsigned CART_BASE> u8 pc6001mk2_state::cart_mk2_r(offs_t offset)
+{
+	return m_cart->read_rom(offset + CART_BASE);
+}
 
 // TODO: it was marking stuff with TVROM(2), which is outside the size of the actual ROM?
 void pc6001mk2_state::mk2_tv_map(address_map &map)
@@ -380,9 +384,9 @@ void pc6001mk2_state::mk2_tv_map(address_map &map)
 	// 02: TV or kanji ROM
 	map(0x08000, 0x0bfff).r(FUNC(pc6001mk2_state::tv_kanji_r<0x0000>));
 	// 03: ex ROM 1
-//	map(0x0c000, 0x0dfff).mirror(0x2000) cart space 0x2000
+	map(0x0c000, 0x0dfff).mirror(0x2000).r(FUNC(pc6001mk2_state::cart_mk2_r<0x2000>));
 	// 04: ex ROM 0
-//	map(0x10000, 0x11fff).mirror(0x2000) cart space 0
+	map(0x10000, 0x11fff).mirror(0x2000).r(FUNC(pc6001mk2_state::cart_mk2_r<0x0000>));
 	// 05: TV ROM 1 & basic ROM 1
 	map(0x14000, 0x15fff).r(FUNC(pc6001mk2_state::tv_kanji_r<0x2000>));
 	map(0x16000, 0x17fff).rom().region("basic_rom", 0x2000);
@@ -390,22 +394,22 @@ void pc6001mk2_state::mk2_tv_map(address_map &map)
 	map(0x18000, 0x19fff).rom().region("basic_rom", 0);
 	map(0x1a000, 0x1bfff).r(FUNC(pc6001mk2_state::tv_kanji_r<0x4000>));
 	// 07: ex ROM 0 & 1
-//	map(0x1c000, 0x1ffff) cart space 0
+	map(0x1c000, 0x1ffff).r(FUNC(pc6001mk2_state::cart_mk2_r<0x0000>));
 	// 08: ex ROM 1 & 0
-//	map(0x20000, 0x21fff) cart space 0x2000
-//	map(0x22000, 0x23fff) cart space 0
+	map(0x20000, 0x21fff).r(FUNC(pc6001mk2_state::cart_mk2_r<0x2000>));
+	map(0x22000, 0x23fff).r(FUNC(pc6001mk2_state::cart_mk2_r<0x0000>));
 	// 09: ex ROM 1 & basic ROM 1
-//	map(0x24000, 0x25fff) cart space 0x2000
+	map(0x24000, 0x25fff).r(FUNC(pc6001mk2_state::cart_mk2_r<0x2000>));
 	map(0x26000, 0x27fff).rom().region("basic_rom", 0x2000);
 	// 0a: basic rom 0 & ex rom 1
 	map(0x28000, 0x29fff).rom().region("basic_rom", 0);
-//	map(0x2a000, 0x2bfff) cart space 0x2000
+	map(0x2a000, 0x2bfff).r(FUNC(pc6001mk2_state::cart_mk2_r<0x2000>));
 	// 0b: ex ROM 0 & TV ROM 2 (?)
-//	map(0x2c000, 0x2dfff) cart space 0
+	map(0x2c000, 0x2dfff).r(FUNC(pc6001mk2_state::cart_mk2_r<0x0000>));
 	map(0x2e000, 0x2ffff).r(FUNC(pc6001mk2_state::tv_kanji_r<0x4000>));
 	// 0c: TV ROM 1 & ex ROM 0
 	map(0x30000, 0x31fff).r(FUNC(pc6001mk2_state::tv_kanji_r<0x2000>));
-//	map(0x32000, 0x33fff) cart space 0
+	map(0x32000, 0x33fff).r(FUNC(pc6001mk2_state::cart_mk2_r<0x0000>));
 	// 0d: RAM 0 & 1
 	map(0x34000, 0x37fff).lr8(NAME([this] (offs_t offset) { return m_ram->pointer()[offset]; }));
 	// 0e: EXRAM 0 & 1
@@ -424,9 +428,9 @@ template <unsigned BASIC_BASE, unsigned WORK_BASE> void pc6001mk2_state::mk2_voi
 	// 02: voice or kanji ROM
 	map(0x08000, 0x0bfff).r(FUNC(pc6001mk2_state::voice_kanji_r<0>));
 	// 03: ex ROM 1
-//	map(0x0c000, 0x0dfff).mirror(0x2000) cart space 0x2000
+	map(0x0c000, 0x0dfff).mirror(0x2000).r(FUNC(pc6001mk2_state::cart_mk2_r<0x2000>));
 	// 04: ex ROM 0
-//	map(0x10000, 0x11fff).mirror(0x2000) cart space 0
+	map(0x10000, 0x11fff).mirror(0x2000).r(FUNC(pc6001mk2_state::cart_mk2_r<0x0000>));
 	// 05: voice ROM 0 & basic ROM 3
 	map(0x14000, 0x15fff).r(FUNC(pc6001mk2_state::voice_kanji_r<0>));
 	map(0x16000, 0x17fff).rom().region("basic_rom", BASIC_BASE + 0x2000);
@@ -434,22 +438,22 @@ template <unsigned BASIC_BASE, unsigned WORK_BASE> void pc6001mk2_state::mk2_voi
 	map(0x18000, 0x19fff).rom().region("basic_rom", BASIC_BASE);
 	map(0x1a000, 0x1bfff).r(FUNC(pc6001mk2_state::voice_kanji_r<0x2000>));
 	// 07: ex ROM 0 & 1
-//	map(0x1c000, 0x1ffff) cart space 0
+	map(0x1c000, 0x1ffff).r(FUNC(pc6001mk2_state::cart_mk2_r<0x0000>));
 	// 08: ex ROM 1 & 0
-//	map(0x20000, 0x21fff) cart space 0x2000
-//	map(0x22000, 0x23fff) cart space 0
+	map(0x20000, 0x21fff).r(FUNC(pc6001mk2_state::cart_mk2_r<0x2000>));
+	map(0x22000, 0x23fff).r(FUNC(pc6001mk2_state::cart_mk2_r<0x0000>));
 	// 09: ex ROM 1 & basic ROM 3
-//	map(0x24000, 0x25fff) cart space 0x2000
+	map(0x24000, 0x25fff).r(FUNC(pc6001mk2_state::cart_mk2_r<0x2000>));
 	map(0x26000, 0x27fff).rom().region("basic_rom", BASIC_BASE + 0x2000);
 	// 0a: basic rom 2 & ex rom 1
 	map(0x28000, 0x29fff).rom().region("basic_rom", BASIC_BASE);
-//	map(0x2a000, 0x2bfff) cart space 0x2000
+	map(0x2a000, 0x2bfff).r(FUNC(pc6001mk2_state::cart_mk2_r<0x2000>));
 	// 0b: ex ROM 0 & voice ROM 1
-//	map(0x2c000, 0x2dfff) cart space 0
+	map(0x2c000, 0x2dfff).r(FUNC(pc6001mk2_state::cart_mk2_r<0x0000>));
 	map(0x2e000, 0x2ffff).r(FUNC(pc6001mk2_state::voice_kanji_r<0x2000>));
 	// 0c: voice ROM 0 & ex ROM 0
 	map(0x30000, 0x31fff).r(FUNC(pc6001mk2_state::voice_kanji_r<0>));
-//	map(0x32000, 0x33fff) cart space 0
+	map(0x32000, 0x33fff).r(FUNC(pc6001mk2_state::cart_mk2_r<0x0000>));
 	// 0d: RAM 6 & 7
 	map(0x34000, 0x37fff).lr8(NAME([this] (offs_t offset) { return m_ram->pointer()[offset | WORK_BASE]; }));
 	// 0e: EXRAM 6 & 7
