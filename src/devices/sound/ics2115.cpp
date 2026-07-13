@@ -76,7 +76,7 @@ void ics2115_device::device_start()
 	//This seems to give the ok fit but it is not good enough.
 	/*double maxvol = ((1 << volume_bits) - 1) * pow(2., (double)1/0x100);
 	for (int i = 0; i < 0x1000; i++)
-	       m_volume[i] = floor(maxvol * pow(2.,(double)i/256 - 16) + 0.5);
+	    m_volume[i] = floor(maxvol * pow(2.,(double)i/256 - 16) + 0.5);
 	*/
 
 	//austere's table, derived from patent 5809466:
@@ -84,7 +84,7 @@ void ics2115_device::device_start()
 	//Subsection F (column 124, page 198) onwards
 	/*
 	for (int i = 0; i<4096; i++)
-		m_volume[i] = ((0x100 | (i & 0xff)) << (volume_bits-9)) >> (15 - (i>>8));
+	    m_volume[i] = ((0x100 | (i & 0xff)) << (volume_bits-9)) >> (15 - (i>>8));
 	*/
 
 	// hardware measured formula
@@ -94,12 +94,12 @@ void ics2115_device::device_start()
 	// exp > 0 : ceil(((0x100 | mant) << exp) / 512)
 	for (int i = 0; i < 4096; i++)
 	{
-		const u8 exponent = (i >> 8);
+		const u8 exponent = i >> 8;
 		const u8 mantissa = i & 0xff;
 		if (exponent == 0)
 			m_volume[i] = mantissa >> 7;
 		else
-			m_volume[i] = ((((0x100 | mantissa) << (exponent - 1)) + 0xff) >> 8);
+			m_volume[i] = (((0x100 | mantissa) << (exponent - 1)) + 0xff) >> 8;
 	}
 
 	//u-Law table as per MIL-STD-188-113
@@ -455,8 +455,8 @@ int ics2115_device::fill_output(ics2115_voice& voice, sound_stream &stream)
 		const s32 vlefti = volacc - m_panlaw[255 - voice.vol.pan]; // left index from acc - pan law
 		const s32 vrighti = volacc - m_panlaw[voice.vol.pan]; // right index from acc - pan law
 		//check negative values so no cracks, is it a hardware feature ?
-		const s32 vleft = vlefti > 0 ? m_volume[vlefti] : 0;
-		const s32 vright = vrighti > 0 ? m_volume[vrighti] : 0;
+		const s32 vleft = (vlefti > 0) ? m_volume[vlefti] : 0;
+		const s32 vright = (vrighti > 0) ? m_volume[vrighti] : 0;
 
 		//From GUS doc:
 		//In general, it is necessary to remember that all voices are being summed in to the
@@ -488,17 +488,17 @@ void ics2115_device::sound_stream_update(sound_stream &stream)
 	bool irq_invalid = false;
 	for (int osc = 0; osc <= m_active_osc; osc++)
 	{
-		ics2115_voice& voice = m_voice[osc];
+		ics2115_voice &voice = m_voice[osc];
 
 #ifdef ICS2115_ISOLATE
 		if (osc != ICS2115_ISOLATE)
 			continue;
 #endif
-/*
-        u32 curaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.acc >> 12);
-        s32 sample = get_sample(voice);
-        LOGVOICE("[%06x=%04x]", curaddr, (s16)sample);
-*/
+#if 0
+		u32 curaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.acc >> 12);
+		s32 sample = get_sample(voice);
+		LOGVOICE("[%06x=%04x]", curaddr, (s16)sample);
+#endif
 		if (fill_output(voice, stream))
 			irq_invalid = true;
 
@@ -511,17 +511,19 @@ void ics2115_device::sound_stream_update(sound_stream &stream)
 				LOGVOICE("*");
 			LOGVOICE(" ");
 
-			/*int min = 0x7fffffff, max = 0x80000000;
+#if 0
+			int min = 0x7fffffff, max = 0x80000000;
 			double average = 0;
 			for (int i = 0; i < samples; i++)
 			{
-			    if (outputs[0][i] > max) max = outputs[0][i];
-			    if (outputs[0][i] < min) min = outputs[0][i];
-			    average += fabs(outputs[0][i]);
+				if (outputs[0][i] > max) max = outputs[0][i];
+				if (outputs[0][i] < min) min = outputs[0][i];
+				average += fabs(outputs[0][i]);
 			}
 			average /= samples;
 			average /= 1 << 16;
-			LOGVOICE("<Mi:%d Mx:%d Av:%g>", min >> 16, max >> 16, average);*/
+			LOGVOICE("<Mi:%d Mx:%d Av:%g>", min >> 16, max >> 16, average);
+#endif
 		}
 	}
 
@@ -537,7 +539,7 @@ u16 ics2115_device::reg_read()
 	m_stream->update();
 
 	u16 ret = 0;
-	ics2115_voice& voice = m_voice[m_osc_select];
+	ics2115_voice &voice = m_voice[m_osc_select];
 
 	switch (m_reg_select)
 	{
@@ -636,7 +638,7 @@ u16 ics2115_device::reg_read()
 			ret = 0xff;
 			for (int i = 0; i <= m_active_osc; i++)
 			{
-				ics2115_voice& v = m_voice[i];
+				ics2115_voice &v = m_voice[i];
 				if (v.osc_conf.bitflags.irq_pending || v.vol_ctrl.bitflags.irq_pending)
 				{
 					ret = i | 0xe0;
@@ -723,7 +725,7 @@ void ics2115_device::reg_write(u16 data, u16 mem_mask)
 {
 	m_stream->update();
 
-	ics2115_voice& voice = m_voice[m_osc_select];
+	ics2115_voice &voice = m_voice[m_osc_select];
 	if (m_reg_select < 0x20)
 		COMBINE_DATA(&voice.regs[m_reg_select]);
 	else if (m_reg_select >= 0x40 && m_reg_select < 0x80)
@@ -875,13 +877,13 @@ void ics2115_device::reg_write(u16 data, u16 mem_mask)
 
 		case 0x11: // [osc] Wavesample static address 27-20
 			if (ACCESSING_BITS_8_15)
-				//v->Osc.SAddr = (data >> 8);
-				voice.osc.saddr = (data >> 8);
+				//v->Osc.SAddr = data >> 8;
+				voice.osc.saddr = data >> 8;
 			break;
 		case 0x12:
 			//Could be per voice! -- investigate.
 			if (ACCESSING_BITS_8_15)
-				voice.vol.mode = (data >> 8);
+				voice.vol.mode = data >> 8;
 			break;
 		case 0x40: // Timer 1 Preset
 		case 0x41: // Timer 2 Preset
@@ -1076,7 +1078,7 @@ void ics2115_device::recalc_irq()
 {
 	//Suspect
 	bool irq = (m_irq_pending & m_irq_enabled);
-	for (int i = 0; (!irq) && (i < 32); i++)
+	for (int i = 0; !irq && (i < 32); i++)
 	{
 		irq |= m_voice[i].osc_conf.bitflags.irq && m_voice[i].osc_conf.bitflags.irq_pending;
 		irq |= m_voice[i].vol_ctrl.bitflags.irq && m_voice[i].vol_ctrl.bitflags.irq_pending;
@@ -1098,7 +1100,7 @@ TIMER_CALLBACK_MEMBER(ics2115_device::timer_cb)
 void ics2115_device::recalc_timer(int timer)
 {
 	u64 period = ((m_timer[timer].scale & 0x1f) + 1) * (m_timer[timer].preset + 1);
-	period = period << (4 + (m_timer[timer].scale >> 5));
+	period <<= 4 + (m_timer[timer].scale >> 5);
 
 	if (m_timer[timer].period != period)
 	{
