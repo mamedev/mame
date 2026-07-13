@@ -123,8 +123,11 @@ private:
 	uint8_t m_ti8x_port2 = 0;
 	uint8_t m_ti83p_port4 = 0;
 	uint8_t m_ti83pse_port21 = 0;
+    uint8_t m_ti84p_port40 = 0;
 	uint8_t m_ti84pcse_portE = 0;
 	uint8_t m_ti84pcse_portF = 0;
+    uint32_t m_ti84p_rtc_currtime = 0;
+    uint32_t m_ti84p_rtc_basetime = 0;
 	int m_ti_video_memory_size = 0;
 	int m_ti_screen_x_size = 0;
 	int m_ti_screen_y_size = 0;
@@ -134,6 +137,7 @@ private:
 	emu_timer *m_ti85_timer = nullptr;
 	emu_timer *m_ti83_1st_timer = nullptr;
 	emu_timer *m_ti83_2nd_timer = nullptr;
+    emu_timer *m_ti84_rtc = nullptr;
 
 	uint8_t ti85_port_0000_r();
 	uint8_t ti8x_keypad_r();
@@ -170,6 +174,15 @@ private:
 	void ti83p_port_0014_w(uint8_t data);
 	void ti83pse_port_0020_w(uint8_t data);
 	void ti83pse_port_0021_w(uint8_t data);
+    void ti84p_port_0040_w(uint8_t data);
+	void ti84p_port_0041_w(uint8_t data);
+	void ti84p_port_0042_w(uint8_t data);
+	void ti84p_port_0043_w(uint8_t data);
+	void ti84p_port_0044_w(uint8_t data);
+	void ti84p_port_0045_w(uint8_t data);
+	void ti84p_port_0046_w(uint8_t data);
+	void ti84p_port_0047_w(uint8_t data);
+	void ti84p_port_0048_w(uint8_t data);
 	void ti84pcse_port_000E_w(uint8_t data);
 	void ti84pcse_port_000F_w(uint8_t data);
 	uint8_t ti85_port_0002_r();
@@ -188,6 +201,15 @@ private:
 	uint8_t ti83pse_port_0015_r();
 	uint8_t ti83pse_port_0020_r();
 	uint8_t ti83pse_port_0021_r();
+    uint8_t ti84p_port_0040_r();
+	uint8_t ti84p_port_0041_r();
+	uint8_t ti84p_port_0042_r();
+	uint8_t ti84p_port_0043_r();
+	uint8_t ti84p_port_0044_r();
+	uint8_t ti84p_port_0045_r();
+	uint8_t ti84p_port_0046_r();
+	uint8_t ti84p_port_0047_r();
+	uint8_t ti84p_port_0048_r();
 	uint8_t ti84pse_port_0055_r();
 	uint8_t ti84pse_port_0056_r();
 	uint8_t ti84pcse_port_000E_r();
@@ -212,6 +234,7 @@ private:
 	TIMER_CALLBACK_MEMBER(ti83_timer2_callback);
 
 	TIMER_CALLBACK_MEMBER(crystal_timer_tick);
+	TIMER_CALLBACK_MEMBER(rtc_tick);
 
 	//crystal timers
 	void ti83pse_count(uint8_t timer, uint8_t data);
@@ -237,6 +260,8 @@ private:
 	void ti83pse_ctimer3_loop_w(uint8_t data);
 	uint8_t ti83pse_ctimer3_count_r();
 	void ti83pse_ctimer3_count_w(uint8_t data);
+    inline uint8_t ti84p_rtc_r(uint32_t timer, uint8_t offset);
+    inline void ti84p_rtc_w(uint32_t &timer, uint8_t offset, uint8_t data);
 	uint8_t ti83p_membank2_r(offs_t offset);
 	uint8_t ti83p_membank3_r(offs_t offset);
 
@@ -263,9 +288,10 @@ private:
 	void ti83p_io(address_map &map) ATTR_COLD;
 	void ti83pse_banked_mem(address_map &map) ATTR_COLD;
 	void ti83pse_io(address_map &map) ATTR_COLD;
+	void ti84p_banked_mem(address_map &map) ATTR_COLD;
+    void ti84p_io(address_map &map) ATTR_COLD;
 	void ti84pcse_banked_mem(address_map &map) ATTR_COLD;
 	void ti84pcse_io(address_map &map) ATTR_COLD;
-	void ti84p_banked_mem(address_map &map) ATTR_COLD;
 	void ti85_io(address_map &map) ATTR_COLD;
 	void ti86_io(address_map &map) ATTR_COLD;
 	void ti86_mem(address_map &map) ATTR_COLD;

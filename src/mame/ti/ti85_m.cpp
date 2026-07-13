@@ -102,6 +102,11 @@ TIMER_CALLBACK_MEMBER(ti85_state::crystal_timer_tick)
 	}
 }
 
+TIMER_CALLBACK_MEMBER(ti85_state::rtc_tick)
+{
+    m_ti84p_rtc_currtime++;
+}
+
 void ti85_state::ti8x_update_bank(address_space &space, uint8_t bank, uint8_t *base, uint8_t page, bool is_ram)
 {
 	static const char *const tag[] = {"bank1", "bank2", "bank3", "bank4"};
@@ -421,6 +426,9 @@ void ti85_state::ti8xpse_init_common()
 	m_crystal_timer1 = timer_alloc(FUNC(ti85_state::crystal_timer_tick), this);
 	m_crystal_timer2 = timer_alloc(FUNC(ti85_state::crystal_timer_tick), this);
 	m_crystal_timer3 = timer_alloc(FUNC(ti85_state::crystal_timer_tick), this);
+
+    m_ti84_rtc = timer_alloc(FUNC(ti85_state::rtc_tick), this);
+    m_ti84_rtc->adjust(attotime(1, 0), 0, attotime(1, 0));
 
 		/* save states and debugging */
 	save_item(NAME(m_ctimer_interrupt_status));
@@ -951,6 +959,102 @@ void ti85_state::ti83pse_port_0021_w(uint8_t data)
 uint8_t ti85_state::ti83pse_port_0021_r()
 {
 	return m_ti83pse_port21;
+}
+
+inline uint8_t ti85_state::ti84p_rtc_r(uint32_t timer, uint8_t offset) {
+    return (uint8_t)(timer >> offset);
+}
+
+inline void ti85_state::ti84p_rtc_w(uint32_t &timer, uint8_t offset, uint8_t data) {
+    timer = (timer & ~(0xFF << offset)) | (data << offset);
+}
+
+uint8_t ti85_state::ti84p_port_0040_r() {
+    return m_ti84p_port40;
+}
+
+void ti85_state::ti84p_port_0040_w(uint8_t data) {
+    if ((data & 0b10) && !(m_ti84p_port40 & 0b10))
+        m_ti84p_rtc_currtime = m_ti84p_rtc_basetime;
+
+    m_ti84_rtc->enable((data & 0b01) == 0b01);
+    m_ti84p_port40 = data & 0b11;
+}
+
+uint8_t ti85_state::ti84p_port_0041_r() {
+    return ti84p_rtc_r(m_ti84p_rtc_basetime, 0);
+}
+
+void ti85_state::ti84p_port_0041_w(uint8_t data) {
+    ti84p_rtc_w(m_ti84p_rtc_basetime, 0, data);
+}
+
+uint8_t ti85_state::ti84p_port_0042_r() {
+    return ti84p_rtc_r(m_ti84p_rtc_basetime, 8);
+}
+
+void ti85_state::ti84p_port_0042_w(uint8_t data) {
+    ti84p_rtc_w(m_ti84p_rtc_basetime, 8, data);
+}
+
+uint8_t ti85_state::ti84p_port_0043_r() {
+    return ti84p_rtc_r(m_ti84p_rtc_basetime, 16);
+}
+
+void ti85_state::ti84p_port_0043_w(uint8_t data) {
+    ti84p_rtc_w(m_ti84p_rtc_basetime, 16, data);
+}
+
+uint8_t ti85_state::ti84p_port_0044_r() {
+    return ti84p_rtc_r(m_ti84p_rtc_basetime, 24);
+}
+
+void ti85_state::ti84p_port_0044_w(uint8_t data) {
+    ti84p_rtc_w(m_ti84p_rtc_basetime, 24, data);
+}
+
+uint8_t ti85_state::ti84p_port_0045_r() {
+    if (!(m_ti84p_port40 & 0b01))
+        return 0;
+
+    return ti84p_rtc_r(m_ti84p_rtc_currtime, 0);
+}
+
+void ti85_state::ti84p_port_0045_w(uint8_t data) {
+    ti84p_rtc_w(m_ti84p_rtc_currtime, 0, data);
+}
+
+uint8_t ti85_state::ti84p_port_0046_r() {
+    if (!(m_ti84p_port40 & 0b01))
+        return 0;
+
+    return ti84p_rtc_r(m_ti84p_rtc_currtime, 8);
+}
+
+void ti85_state::ti84p_port_0046_w(uint8_t data) {
+    ti84p_rtc_w(m_ti84p_rtc_currtime, 8, data);
+}
+
+uint8_t ti85_state::ti84p_port_0047_r() {
+    if (!(m_ti84p_port40 & 0b01))
+        return 0;
+
+    return ti84p_rtc_r(m_ti84p_rtc_currtime, 16);
+}
+
+void ti85_state::ti84p_port_0047_w(uint8_t data) {
+    ti84p_rtc_w(m_ti84p_rtc_currtime, 16, data);
+}
+
+uint8_t ti85_state::ti84p_port_0048_r() {
+    if (!(m_ti84p_port40 & 0b01))
+        return 0;
+
+    return ti84p_rtc_r(m_ti84p_rtc_currtime, 24);
+}
+
+void ti85_state::ti84p_port_0048_w(uint8_t data) {
+    ti84p_rtc_w(m_ti84p_rtc_currtime, 24, data);
 }
 
 uint8_t ti85_state::ti84pse_port_0055_r()
