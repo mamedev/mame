@@ -80,7 +80,7 @@ Doesn't draw any GFX just [VDG] if pressing any [keyboard] input, in turn receiv
 		<!-- "1987/4/12" according to LIST -->
 		<year>1987</year>
 		<publisher>MyCom BASIC</publisher>
-		<info name="usage" value="Mode 6"/>
+		<info name="usage" value="Mode 6. Hold space while pushing towards a block to use a bomb."/>
 		<info name="developer" value="Hiroshi Hashizume"/>
 		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="6258">

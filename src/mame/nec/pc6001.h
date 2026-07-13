@@ -18,6 +18,7 @@
 #include "machine/bankdev.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
+#include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/upd765.h"
 #include "sound/ay8910.h"
@@ -41,9 +42,9 @@ class pc6001_state : public driver_device
 public:
 	pc6001_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_ppi(*this, "ppi8255")
-		, m_ram(*this, "ram")
 		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, "ram")
+		, m_ppi(*this, "ppi8255")
 		, m_screen(*this, "screen")
 		, m_joy(*this, "joy%u", 1U)
 		, m_joymux(*this, "joymux")
@@ -64,7 +65,7 @@ public:
 	uint8_t nec_ppi8255_r(offs_t offset);
 	void nec_ppi8255_w(offs_t offset, uint8_t data);
 
-	void pc6001_palette(palette_device &palette) const;
+	void palette_init(palette_device &palette) const;
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -87,9 +88,9 @@ public:
 
 	void pc6001(machine_config &config);
 protected:
-	required_device<i8255_device> m_ppi;
-	optional_shared_ptr<uint8_t> m_ram;
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
+	required_device<i8255_device> m_ppi;
 	required_device<screen_device> m_screen;
 	required_device_array<msx_general_purpose_port_device, 2> m_joy;
 	required_device<ls157_x2_device> m_joymux;
@@ -223,7 +224,7 @@ public:
 	void mk2_timer_adj_w(uint8_t data);
 	void mk2_timer_irqv_w(uint8_t data);
 
-	void pc6001mk2_palette(palette_device &palette) const;
+	void mk2_palette_init(palette_device &palette) const;
 	void pc6001mk2(machine_config &config);
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
@@ -254,7 +255,6 @@ protected:
 	void mk2_tv_map(address_map &map);
 	template <unsigned BASIC_BASE, unsigned WORK_BASE> void mk2_voice_map(address_map &map);
 
-	std::vector<u8> m_mk2_ram;
 	std::vector<u8> m_mk2_exram;
 
 private:

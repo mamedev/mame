@@ -55,13 +55,13 @@ static constexpr rgb_t mk2_defcolors[] =
 	rgb_t(0xff, 0xff, 0xff)  // WHITE
 };
 
-void pc6001_state::pc6001_palette(palette_device &palette) const
+void pc6001_state::palette_init(palette_device &palette) const
 {
 	for(int i=0;i<8+4;i++)
 		palette.set_pen_color(i+8,defcolors[i]);
 }
 
-void pc6001mk2_state::pc6001mk2_palette(palette_device &palette) const
+void pc6001mk2_state::mk2_palette_init(palette_device &palette) const
 {
 	for(int i=0;i<8;i++)
 		palette.set_pen_color(i+8,defcolors[i]);

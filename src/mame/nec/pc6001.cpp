@@ -210,7 +210,7 @@ void pc6001_state::system_latch_w(uint8_t data)
 {
 	static const uint16_t startaddr[] = {0xC000, 0xE000, 0x8000, 0xA000 };
 
-	m_video_base = &m_ram[startaddr[(data >> 1) & 0x03] - 0x8000];
+	m_video_base = &m_ram->pointer()[startaddr[(data >> 1) & 0x03] - 0x8000];
 
 	cassette_latch_control((data & 8) == 8);
 	m_sys_latch = data;
@@ -307,7 +307,7 @@ void pc6001_state::pc6001_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom().nopw();
 	map(0x4000, 0x7fff).m(m_cart_bank, FUNC(address_map_bank_device::amap8));
-	map(0x8000, 0xffff).ram().share("ram");
+	map(0x8000, 0xffff).rw(m_ram, FUNC(ram_device::read), FUNC(ram_device::write));
 }
 
 void pc6001_state::pc6001_io(address_map &map)
@@ -407,7 +407,7 @@ void pc6001mk2_state::mk2_tv_map(address_map &map)
 	map(0x30000, 0x31fff).r(FUNC(pc6001mk2_state::tv_kanji_r<0x2000>));
 //	map(0x32000, 0x33fff) cart space 0
 	// 0d: RAM 0 & 1
-	map(0x34000, 0x37fff).lr8(NAME([this] (offs_t offset) { return m_mk2_ram[offset]; }));
+	map(0x34000, 0x37fff).lr8(NAME([this] (offs_t offset) { return m_ram->pointer()[offset]; }));
 	// 0e: EXRAM 0 & 1
 	map(0x38000, 0x3bfff).lr8(NAME([this] (offs_t offset) { return m_mk2_exram[offset]; }));
 	// 0f: <invalid setting>
@@ -451,7 +451,7 @@ template <unsigned BASIC_BASE, unsigned WORK_BASE> void pc6001mk2_state::mk2_voi
 	map(0x30000, 0x31fff).r(FUNC(pc6001mk2_state::voice_kanji_r<0>));
 //	map(0x32000, 0x33fff) cart space 0
 	// 0d: RAM 6 & 7
-	map(0x34000, 0x37fff).lr8(NAME([this] (offs_t offset) { return m_mk2_ram[offset | WORK_BASE]; }));
+	map(0x34000, 0x37fff).lr8(NAME([this] (offs_t offset) { return m_ram->pointer()[offset | WORK_BASE]; }));
 	// 0e: EXRAM 6 & 7
 	map(0x38000, 0x3bfff).lr8(NAME([this] (offs_t offset) { return m_mk2_exram[offset | WORK_BASE]; }));
 	// 0f: <invalid setting>
@@ -496,7 +496,7 @@ void pc6001mk2_state::mk2_opt_bank_w(uint8_t data)
 void pc6001mk2_state::mk2_work_ram0_w(offs_t offset, uint8_t data)
 {
 	if (BIT(m_bank_w, 0))
-		m_mk2_ram[offset] = data;
+		m_ram->pointer()[offset] = data;
 	else
 		m_mk2_exram[offset] = data;
 }
@@ -504,7 +504,7 @@ void pc6001mk2_state::mk2_work_ram0_w(offs_t offset, uint8_t data)
 void pc6001mk2_state::mk2_work_ram1_w(offs_t offset, uint8_t data)
 {
 	if (BIT(m_bank_w, 2))
-		m_mk2_ram[offset | 0x4000] = data;
+		m_ram->pointer()[offset | 0x4000] = data;
 	else
 		m_mk2_exram[offset | 0x4000] = data;
 }
@@ -512,7 +512,7 @@ void pc6001mk2_state::mk2_work_ram1_w(offs_t offset, uint8_t data)
 void pc6001mk2_state::mk2_work_ram2_w(offs_t offset, uint8_t data)
 {
 	if (BIT(m_bank_w, 4))
-		m_mk2_ram[offset | 0x8000] = data;
+		m_ram->pointer()[offset | 0x8000] = data;
 	else
 		m_mk2_exram[offset | 0x8000] = data;
 }
@@ -520,7 +520,7 @@ void pc6001mk2_state::mk2_work_ram2_w(offs_t offset, uint8_t data)
 void pc6001mk2_state::mk2_work_ram3_w(offs_t offset, uint8_t data)
 {
 	if (BIT(m_bank_w, 6))
-		m_mk2_ram[offset | 0xc000] = data;
+		m_ram->pointer()[offset | 0xc000] = data;
 	else
 		m_mk2_exram[offset | 0xc000] = data;
 }
@@ -549,7 +549,7 @@ void pc6001mk2_state::vram_bank_change(uint8_t vram_bank)
 
 //  bit 2 of vram_bank sets up 4 color mode
 //	set_videoram_bank(0x28000 + bank_base_values[vram_bank_index]);
-	m_video_base = &m_mk2_ram[bank_base_values[vram_bank_index]];
+	m_video_base = &m_ram->pointer()[bank_base_values[vram_bank_index]];
 
 //  popmessage("%02x",vram_bank);
 }
@@ -796,7 +796,7 @@ u8 pc6001mk2sr_state::work_ram_r(offs_t offset)
 	if (m_sr_text_mode == false && (offset & 0xe000) == 0)
 		return sr_gvram_r(offset);
 
-	return m_ram[offset];
+	return m_ram->pointer()[offset];
 }
 
 void pc6001mk2sr_state::work_ram_w(offs_t offset, u8 data)
@@ -808,7 +808,7 @@ void pc6001mk2sr_state::work_ram_w(offs_t offset, u8 data)
 		return;
 	}
 
-	m_ram[offset] = data;
+	m_ram->pointer()[offset] = data;
 }
 
 // TODO: does this maps to the work RAM in an alt fashion?
@@ -856,7 +856,7 @@ void pc6001mk2sr_state::sr_mode_w(u8 data)
 
 void pc6001mk2sr_state::sr_vram_bank_w(u8 data)
 {
-	m_video_base = &m_ram[(data & 0x0f) * 0x1000];
+	m_video_base = &m_ram->pointer()[(data & 0x0f) * 0x1000];
 
 //  set_videoram_bank(0x70000 + ((data & 0x0f)*0x1000));
 }
@@ -941,7 +941,7 @@ void pc6001mk2sr_state::sr_banked_map(address_map &map)
 //  map(0x00000, 0x0ffff).view(m_gvram_view);
 //  m_gvram_view[0](0x0000, 0xffff).ram();
 //  m_gvram_view[1](0x0000, 0x1fff).rw(FUNC(pc6001mk2sr_state::sr_gvram_r), FUNC(pc6001mk2sr_state::sr_gvram_w));
-	map(0x00000, 0x0ffff).rw(FUNC(pc6001mk2sr_state::work_ram_r), FUNC(pc6001mk2sr_state::work_ram_w)).share("ram");
+	map(0x00000, 0x0ffff).rw(FUNC(pc6001mk2sr_state::work_ram_r), FUNC(pc6001mk2sr_state::work_ram_w));
 
 	// exram0
 	map(0x20000, 0x2ffff).ram();
@@ -1256,7 +1256,6 @@ void pc6001_state::machine_reset()
 void pc6001mk2_state::machine_start()
 {
 	pc6001_state::machine_start();
-	m_mk2_ram.resize(0x10000);
 	m_mk2_exram.resize(0x10000);
 
 	save_item(NAME(m_bank_r0));
@@ -1271,7 +1270,7 @@ void pc6001mk2_state::machine_reset()
 {
 //  pc6001_state::machine_reset();
 //	set_videoram_bank(0xc000 + 0x28000);
-	m_video_base = &m_mk2_ram[0xc000];
+	m_video_base = &m_ram->pointer()[0xc000];
 
 	default_cartridge_reset();
 	// TODO: hackish way to simplify bankswitch handling
@@ -1311,7 +1310,7 @@ void pc6001mk2sr_state::machine_reset()
 //  pc6001_state::machine_reset();
 
 //  set_videoram_bank(0x70000);
-	m_video_base = &m_ram[0];
+	m_video_base = &m_ram->pointer()[0];
 
 	default_cartridge_reset();
 	// TODO: checkout where cart actually maps in SR model
@@ -1400,6 +1399,16 @@ void pc6001_state::pc6001(machine_config &config)
 
 //  I8049(config, "subcpu", 7987200);
 
+	RAM(config, m_ram).set_default_size("32K");
+
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(pc6001_state::ppi_porta_r));
+	m_ppi->out_pa_callback().set(FUNC(pc6001_state::ppi_porta_w));
+	m_ppi->in_pb_callback().set(FUNC(pc6001_state::ppi_portb_r));
+	m_ppi->out_pb_callback().set(FUNC(pc6001_state::ppi_portb_w));
+	m_ppi->in_pc_callback().set(FUNC(pc6001_state::ppi_portc_r));
+	m_ppi->out_pc_callback().set(FUNC(pc6001_state::ppi_portc_w));
+
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pc6001m2);
 
 	/* video hardware */
@@ -1412,15 +1421,7 @@ void pc6001_state::pc6001(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette, FUNC(pc6001_state::pc6001_palette), 16+4);
-
-	I8255(config, m_ppi);
-	m_ppi->in_pa_callback().set(FUNC(pc6001_state::ppi_porta_r));
-	m_ppi->out_pa_callback().set(FUNC(pc6001_state::ppi_porta_w));
-	m_ppi->in_pb_callback().set(FUNC(pc6001_state::ppi_portb_r));
-	m_ppi->out_pb_callback().set(FUNC(pc6001_state::ppi_portb_w));
-	m_ppi->in_pc_callback().set(FUNC(pc6001_state::ppi_portc_r));
-	m_ppi->out_pc_callback().set(FUNC(pc6001_state::ppi_portc_w));
+	PALETTE(config, m_palette, FUNC(pc6001_state::palette_init), 16 + 4);
 
 	ADDRESS_MAP_BANK(config, m_cart_bank).set_map(&pc6001_state::cart_map).set_options(ENDIANNESS_LITTLE, 8, 13 + 2, 0x4000);
 
@@ -1440,6 +1441,9 @@ void pc6001_state::pc6001(machine_config &config)
 //  m_cassette->set_formats(pc6001_cassette_formats);
 //  m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 //  m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	// TODO: move this as a dedicated device, get rid of timer_device
+	TIMER(config, "cassette_timer").configure_periodic(FUNC(pc6001_state::cassette_callback), attotime::from_hz(1200/12));
 
 	// cas and p6 are raw binary files with no tape markers
 	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "cas,p6"));
@@ -1489,9 +1493,6 @@ void pc6001_state::pc6001(machine_config &config)
 		}
 	});
 
-	// TODO: move this as a dedicated device, get rid of timer_device
-	TIMER(config, "cassette_timer").configure_periodic(FUNC(pc6001_state::cassette_callback), attotime::from_hz(1200/12));
-
 	SOFTWARE_LIST(config, "cart_list").set_original("pc6001_cart");
 	SOFTWARE_LIST(config, "cass_list").set_original("pc6001_cass");
 }
@@ -1503,6 +1504,8 @@ void pc6001mk2_state::pc6001mk2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc6001mk2_state::pc6001mk2_map);
 	m_maincpu->set_addrmap(AS_IO, &pc6001mk2_state::pc6001mk2_io);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(pc6001mk2_state::irq_callback));
+
+	RAM(config.replace(), m_ram).set_default_size("64K");
 
 //  MCFG_MACHINE_RESET_OVERRIDE(pc6001mk2_state,pc6001mk2)
 
@@ -1516,7 +1519,7 @@ void pc6001mk2_state::pc6001mk2(machine_config &config)
 	m_screen->set_screen_update(FUNC(pc6001mk2_state::screen_update));
 
 	m_palette->set_entries(16+16);
-	m_palette->set_init(FUNC(pc6001mk2_state::pc6001mk2_palette));
+	m_palette->set_init(FUNC(pc6001mk2_state::mk2_palette_init));
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_pc6001m2);
 
