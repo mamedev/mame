@@ -759,6 +759,23 @@ u16 h8500_device::do_subs16(u16 v1, u16 v2)
 	return res;
 }
 
+u8 h8500_device::do_dadd8(u8 v1, u8 v2)
+{
+	const u8 c = m_sr & SR_C ? 1 : 0;
+	u16 res = (v1 & 0x0f) + (v2 & 0x0f) + c;
+	if (res >= 0x0a)
+		res += 0x06;
+	res += (v1 & 0xf0) + (v2 & 0xf0);
+	if (res >= 0xa0)
+		res += 0x60;
+	m_sr &= ~(SR_Z | SR_C);
+	if (!u8(res))
+		m_sr |= SR_Z;
+	if (res & 0x100)
+		m_sr |= SR_C;
+	return res;
+}
+
 u8 h8500_device::do_rotxl8(u8 v)
 {
 	const u8 c = m_sr & SR_C ? 1 : 0;

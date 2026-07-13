@@ -303,6 +303,7 @@ protected:
 	O(cmp_ea_8);
 	O(cmp_ea_16);
 	O(cmp_ea_rd);
+	O(dadd);
 	O(divxu);
 	O(exts);
 	O(extu);
@@ -371,6 +372,7 @@ protected:
 	O(xor);
 	O(xorc);
 	// Multi-byte standalone dispatch transitions (byte 0 -> byte 1)
+	O(dispatch_00);
 	O(dispatch_01);
 	O(dispatch_06);
 	O(dispatch_07);
@@ -414,6 +416,7 @@ private:
 	u16 do_subx16(u16 a, u16 b);
 	u8 do_subs8(u8 a, u8 b);
 	u16 do_subs16(u16 a, u16 b);
+	u8 do_dadd8(u8 a, u8 b);
 	u8 do_rotxl8(u8 v);
 	u16 do_rotxl16(u16 v);
 	u8 do_rotxr8(u8 v);
