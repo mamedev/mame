@@ -44862,6 +44862,9 @@ t650c
 @source:sony/dfs500.cpp
 dfs500
 
+@source:sony/dpsd7.cpp
+dpsd7
+
 @source:sony/dpsv55.cpp
 dpsv55
 
