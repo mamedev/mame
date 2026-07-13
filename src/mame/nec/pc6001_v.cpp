@@ -117,8 +117,8 @@ void pc6001_state::video_start()
 	cfg.get_char_rom = pc6001_get_char_rom;
 	m6847_init(machine(), &cfg);
 	#endif
-	m_video_ram = make_unique_clear<uint8_t[]>(0x4000);
-	m_video_base = &m_video_ram[0];
+//	m_video_ram = make_unique_clear<uint8_t[]>(0x4000);
+//	m_video_base = &m_video_ram[0];
 }
 
 void pc6001mk2_state::video_start()
@@ -130,6 +130,7 @@ void pc6001mk2_state::video_start()
 
 void pc6001mk2sr_state::video_start()
 {
+	pc6001mk2_state::video_start();
 //  m_video_ram = std::make_unique<uint8_t[]>(0x4000);
 	m_gvram = std::make_unique<uint8_t []>(320*256*8); // TODO: size
 	std::fill_n(m_gvram.get(), 320*256*8, 0);
@@ -496,15 +497,20 @@ uint32_t pc6001mk2_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 				{
 					for(int xi = 0; xi < 8; xi++)
 					{
-						int pen = gfx_data[(tile * 0x10) + yi] >> (7 - xi) & 1;
+						int res_x = (x * 8) + xi;
+						int res_y = (y * 12) + yi;
+
+						// pc6001mk2sr in mk2 text mode uses this as 8x10
+						// (tv roms have junk afterwards)
+						int pen = yi >= 10 ? 0 : BIT(gfx_data[(tile * 0x10) + yi], 7 - xi);
 
 						int fgcol = (attr & 0x0f) + 0x10;
 						int bgcol = ((attr & 0x70) >> 4) + 0x10 + ((m_bgcol_bank & 2) << 2);
 
 						int color = pen ? fgcol : bgcol;
 
-						if (cliprect.contains(x*8+xi, y*12+yi))
-							bitmap.pix(((y*12+yi)), (x*8+xi)) = m_palette->pen(color);
+						if (cliprect.contains(res_x, res_y))
+							bitmap.pix(res_y, res_x) = m_palette->pen(color);
 					}
 				}
 			}

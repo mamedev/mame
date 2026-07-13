@@ -143,7 +143,7 @@ protected:
 
 	emu_timer *m_timer_irq_timer = nullptr;
 	uint8_t *m_video_base = nullptr;
-	std::unique_ptr<uint8_t[]> m_video_ram;
+//	std::unique_ptr<uint8_t[]> m_video_ram;
 	uint8_t m_cas_switch = 0;
 	uint8_t m_sys_latch = 0;
 	uint8_t m_bank_opt = 0;

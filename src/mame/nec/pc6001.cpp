@@ -908,6 +908,11 @@ void pc6001mk2sr_state::crt_mode_w(u8 data)
 
 inline void pc6001mk2sr_state::refresh_crtc_params()
 {
+	if (m_mk2_mode)
+	{
+		pc6001mk2_state::refresh_crtc_params();
+		return;
+	}
 	/* Apparently bitmap modes changes the screen res to 320 x 200 */
 	rectangle visarea = m_screen->visible_area();
 	const int y_height = (m_sr_text_mode) ? 240 : 200;

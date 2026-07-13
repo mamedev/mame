@@ -181,6 +181,9 @@ Requires user [tape] saving, prompts user after character creation
 		<year>198?</year>
 		<!-- Koei spinoff -->
 		<publisher>Comix</publisher>
+		<notes><![CDATA[
+pc6001mk2sr: crashes at title screen
+]]></notes>
 		<info name="usage" value="Mode 5, Page 3, BASIC" />
 		<info name="alt_title" value="クリス愛の旅立ち"/>
 		<part name="snap" interface="pc6001_snap">
