@@ -230,6 +230,7 @@ const double XTAL::known_xtals[] = {
 	 12'672'000, // 12.672_MHz_XTAL        TRS-80 Model 4 80*24 video
 	 12'800'000, // 12.8_MHz_XTAL          Cave CV1000
 	 12'854'400, // 12.8544_MHz_XTAL       Alphatronic P3
+	 12'875'000, // 12.875_MHz_XTAL        EACA Genie III video board
 	 12'936'000, // 12.936_MHz_XTAL        CDC 721
 	 12'979'200, // 12.9792_MHz_XTAL       Exidy 440
 	 13'000'000, // 13_MHz_XTAL            STM Pied Piper dot clock
