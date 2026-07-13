@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_TVGAMES_GENERALPLUS_gpl16250va_romram_H
-#define MAME_TVGAMES_GENERALPLUS_gpl16250va_romram_H
+#ifndef MAME_TVGAMES_GENERALPLUS_GPL16250_ROMRAM_H
+#define MAME_TVGAMES_GENERALPLUS_GPL16250_ROMRAM_H
 
 #pragma once
 
@@ -123,4 +123,4 @@ protected:
 };
 
 
-#endif // MAME_TVGAMES_GENERALPLUS_gpl16250va_romram_H
+#endif // MAME_TVGAMES_GENERALPLUS_GPL16250_ROMRAM_H
