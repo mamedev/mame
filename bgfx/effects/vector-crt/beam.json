@@ -1,0 +1,12 @@
+{
+	"blend": { "equation": "add", "srcColor": "1", "dstColor": "1", "srcAlpha": "1", "dstAlpha": "1" },
+	"depth": { "function": "always", "writeenable": false },
+	"cull": { "mode": "none" },
+	"write": { "rgb": true, "alpha": true },
+	"vertex": "chains/vector-crt/vs_beam",
+	"fragment": "chains/vector-crt/fs_beam",
+	"uniforms": [
+		{ "name": "u_vector_params", "type": "vec4", "values": [ 0.016667, 0.080, 1.25, 0.14 ] },
+		{ "name": "u_target_dims", "type": "vec4", "values": [ 640.0, 480.0, 0.0015625, 0.0020833 ] }
+	]
+}

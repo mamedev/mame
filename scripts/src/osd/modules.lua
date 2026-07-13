@@ -281,6 +281,8 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/render/bgfx/valueuniform.h",
 		MAME_DIR .. "src/osd/modules/render/bgfx/valueuniformreader.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/valueuniformreader.h",
+		MAME_DIR .. "src/osd/modules/render/bgfx/vectorrenderer.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/vectorrenderer.h",
 		MAME_DIR .. "src/osd/modules/render/bgfx/view.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/view.h",
 		MAME_DIR .. "src/osd/modules/render/bgfx/writereader.cpp",
