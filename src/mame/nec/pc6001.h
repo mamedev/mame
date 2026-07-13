@@ -106,15 +106,12 @@ protected:
 	optional_device<address_map_bank_device> m_cart_bank;
 	required_device<palette_device> m_palette;
 
-	memory_region *m_cart_rom = nullptr;
 	uint8_t m_timer_irq_vector = 0;
 	uint16_t m_timer_hz_div = 0;
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void default_cartridge_reset();
-//	void default_cassette_hack_reset();
 	void irq_reset(u8 timer_default_setting);
 
 	virtual void video_start() override ATTR_COLD;
@@ -128,7 +125,6 @@ protected:
 	inline void cassette_latch_control(bool new_state);
 	inline void ppi_control_hack_w(uint8_t data);
 	inline void set_timer_divider();
-	inline void set_videoram_bank(uint32_t offs);
 	void write_centronics_busy(int state);
 
 	// snapshot handling
@@ -311,6 +307,8 @@ public:
 		: pc6601_state(mconfig, type, tag)
 		, m_sr_bank(*this, "sr_bank_%u", 1U)
 		, m_sr_irq_vectors(*this, "irq_vectors")
+		, m_mk2_view(*this, "mk2_view")
+		, m_mk2_io_view(*this, "mk2_io_view")
 //      , m_gvram_view(*this, "gvram_view")
 		, m_sr_scrollx(*this, "sr_scrollx")
 		, m_sr_scrolly(*this, "sr_scrolly")
@@ -333,6 +331,8 @@ protected:
 private:
 	required_device_array<address_map_bank_device, 16> m_sr_bank;
 	required_shared_ptr<u8> m_sr_irq_vectors;
+	memory_view m_mk2_view;
+	memory_view m_mk2_io_view;
 	required_shared_ptr<u8> m_sr_scrollx;
 	required_shared_ptr<u8> m_sr_scrolly;
 	required_device<ym2203_device> m_ym;
@@ -344,6 +344,7 @@ private:
 	u8 m_bitmap_yoffs = 0, m_bitmap_xoffs = 0;
 	u8 m_width80 = 0;
 	u8 m_sr_clut[16];
+	bool m_mk2_mode;
 
 //  memory_view m_gvram_view;
 
@@ -354,7 +355,6 @@ private:
 	void sr_mode_w(u8 data);
 	void sr_vram_bank_w(u8 data);
 	void sr_system_latch_w(u8 data);
-	void necsr_ppi8255_w(offs_t offset, u8 data);
 
 	virtual void refresh_crtc_params() override;
 	void sr_bitmap_yoffs_w(u8 data);

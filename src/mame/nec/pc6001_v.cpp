@@ -161,7 +161,7 @@ void pc6001_state::draw_gfx_mode4(bitmap_ind16 &bitmap,const rectangle &cliprect
 	int col_setting = m_io_mode4_dsw->read() & 7;
 
 	if((attr & 0x0c) != 0x0c)
-		popmessage("Mode 4 vram attr != 0x0c, contact MESSdev");
+		popmessage("Mode 4 vram attr != 0x0c");
 
 	for(int y=0;y<192;y++)
 	{
@@ -477,9 +477,9 @@ uint32_t pc6001mk2_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 	{
 		uint8_t const *const gfx_data = m_region_gfx1->base();
 
-		for(int y=0;y<20;y++)
+		for(int y = 0; y < 20; y++)
 		{
-			for(int x=0;x<40;x++)
+			for(int x = 0; x < 40; x++)
 			{
 				/*
 				exgfx attr format:
@@ -492,11 +492,11 @@ uint32_t pc6001mk2_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 				int attr = m_video_base[(x+(y*40)) & 0x3ff];
 				tile += ((attr & 0x80) << 1);
 
-				for(int yi=0;yi<12;yi++)
+				for(int yi = 0; yi < 12; yi++)
 				{
-					for(int xi=0;xi<8;xi++)
+					for(int xi = 0; xi < 8; xi++)
 					{
-						int pen = gfx_data[(tile*0x10)+yi]>>(7-xi) & 1;
+						int pen = gfx_data[(tile * 0x10) + yi] >> (7 - xi) & 1;
 
 						int fgcol = (attr & 0x0f) + 0x10;
 						int bgcol = ((attr & 0x70) >> 4) + 0x10 + ((m_bgcol_bank & 2) << 2);
@@ -523,7 +523,13 @@ uint32_t pc6001mk2sr_state::screen_update(screen_device &screen, bitmap_ind16 &b
 {
 	uint8_t const *const gfx_data = m_region_gfx1->base();
 
-	bitmap.fill(0,cliprect);
+	bitmap.fill(0, cliprect);
+
+	if (m_mk2_mode)
+	{
+		pc6001mk2_state::screen_update(screen, bitmap, cliprect);
+		return 0;
+	}
 
 	if(m_sr_text_mode == true) // text mode
 	{

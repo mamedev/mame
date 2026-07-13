@@ -763,8 +763,8 @@ void pc6601_state::pc6601_io(address_map &map)
 
 inline u8 pc6001mk2sr_state::get_timer_base_divider()
 {
-//  if (sr_mode == false)
-//      return pc6001mk2_state::get_timer_base_divider();
+	if (m_mk2_mode)
+		return pc6001mk2_state::get_timer_base_divider();
 	return 0x80;
 }
 
@@ -854,8 +854,17 @@ void pc6001mk2sr_state::sr_mode_w(u8 data)
 //  if (data & 0x10)
 //      popmessage("VRAM bank select enabled");
 
-	if(data & 1)
-		throw emu_fatalerror("PC-6601SR in Mk-2 compatibility mode not yet supported!");
+	m_mk2_mode = BIT(data, 0);
+	if(m_mk2_mode)
+	{
+		m_mk2_view.select(0);
+		m_mk2_io_view.select(0);
+	}
+	else
+	{
+		m_mk2_view.disable();
+		m_mk2_io_view.disable();
+	}
 }
 
 void pc6001mk2sr_state::sr_vram_bank_w(u8 data)
@@ -872,30 +881,9 @@ void pc6001mk2sr_state::sr_system_latch_w(u8 data)
 
 	m_timer_enable = !(data & 1);
 	set_timer_divider();
-	//vram_bank_change((m_ex_vram_bank & 0x06) | ((m_sys_latch & 0x06) << 4));
+//	vram_bank_change((m_ex_vram_bank & 0x06) | ((m_sys_latch & 0x06) << 4));
 
 	//printf("%02x B0\n",data);
-}
-
-void pc6001mk2sr_state::necsr_ppi8255_w(offs_t offset, u8 data)
-{
-	if (offset==3)
-	{
-		ppi_control_hack_w(data);
-
-#if 0
-		{
-			//printf("%02x\n",data);
-
-			if ((data & 0x0f) == 0x05 && m_cart_rom)
-				m_bank1->set_base(m_cart_rom->base() + 0x2000);
-			if ((data & 0x0f) == 0x04)
-				m_bank1->set_base(m_region_gfx1->base());
-		}
-#endif
-	}
-
-	m_ppi->write(offset,data);
 }
 
 u8 pc6001mk2sr_state::hw_rev_r()
@@ -938,6 +926,8 @@ void pc6001mk2sr_state::pc6001mk2sr_map(address_map &map)
 		map(bank << 13, (bank << 13) | 0x1fff).r(m_sr_bank[bank], FUNC(address_map_bank_device::read8));
 		map(bank << 13, (bank << 13) | 0x1fff).w(m_sr_bank[bank+8], FUNC(address_map_bank_device::write8));
 	}
+	map(0x0000, 0xffff).view(m_mk2_view);
+	m_mk2_view[0](0x0000, 0xffff).m(*this, FUNC(pc6001mk2sr_state::pc6001mk2_map));
 }
 
 void pc6001mk2sr_state::sr_banked_map(address_map &map)
@@ -975,7 +965,7 @@ void pc6001mk2sr_state::pc6001mk2sr_io(address_map &map)
 
 	map(0x80, 0x81).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 
-	map(0x90, 0x93).mirror(0x0c).rw(FUNC(pc6001mk2sr_state::nec_ppi8255_r), FUNC(pc6001mk2sr_state::necsr_ppi8255_w));
+	map(0x90, 0x93).mirror(0x0c).rw(FUNC(pc6001mk2sr_state::nec_ppi8255_r), FUNC(pc6001mk2sr_state::necmk2_ppi8255_w));
 
 	map(0xa0, 0xa0).mirror(0x0c).w(m_ym, FUNC(ym2203_device::address_w));
 	map(0xa1, 0xa1).mirror(0x0c).w(m_ym, FUNC(ym2203_device::data_w));
@@ -989,9 +979,9 @@ void pc6001mk2sr_state::pc6001mk2sr_io(address_map &map)
 
 	map(0xb8, 0xbf).ram().share("irq_vectors");
 	map(0xc0, 0xc0).r(FUNC(pc6001_state::portc0_r));
-//  map(0xc0, 0xc0).w(FUNC(pc6001mk2sr_state::mk2_col_bank_w));
+	map(0xc0, 0xc0).w(FUNC(pc6001mk2sr_state::mk2_col_bank_w));
 	map(0xc1, 0xc1).w(FUNC(pc6001mk2sr_state::crt_mode_w));
-//  map(0xc2, 0xc2).w(FUNC(pc6001mk2sr_state::opt_bank_w));
+	map(0xc2, 0xc2).w(FUNC(pc6001mk2sr_state::mk2_opt_bank_w));
 
 	map(0xc8, 0xc8).w(FUNC(pc6001mk2sr_state::sr_mode_w));
 	map(0xc9, 0xc9).w(FUNC(pc6001mk2sr_state::sr_vram_bank_w));
@@ -1003,14 +993,19 @@ void pc6001mk2sr_state::pc6001mk2sr_io(address_map &map)
 
 	map(0xe0, 0xe3).mirror(0x0c).rw("upd7752", FUNC(upd7752_device::read), FUNC(upd7752_device::write));
 
-//  map(0xf0, 0xf0).rw(FUNC(pc6001mk2sr_state::mk2_bank_r0_r), FUNC(pc6001mk2sr_state::mk2_bank_r0_w));
-//  map(0xf1, 0xf1).rw(FUNC(pc6001mk2sr_state::mk2_bank_r1_r), FUNC(pc6001mk2sr_state::mk2_bank_r1_w));
-//  map(0xf2, 0xf2).rw(FUNC(pc6001mk2sr_state::mk2_bank_w0_r), FUNC(pc6001mk2sr_state::mk2_bank_w0_w));
+	map(0xf0, 0xf0).rw(FUNC(pc6001mk2sr_state::mk2_bank_r0_r), FUNC(pc6001mk2sr_state::mk2_bank_r0_w));
+	map(0xf1, 0xf1).rw(FUNC(pc6001mk2sr_state::mk2_bank_r1_r), FUNC(pc6001mk2sr_state::mk2_bank_r1_w));
+	map(0xf2, 0xf2).rw(FUNC(pc6001mk2sr_state::mk2_bank_w0_r), FUNC(pc6001mk2sr_state::mk2_bank_w0_w));
 	map(0xf3, 0xf3).w(FUNC(pc6001mk2sr_state::mk2_0xf3_w));
 //  map(0xf4
 //  map(0xf5
 	map(0xf6, 0xf6).w(FUNC(pc6001mk2sr_state::mk2_timer_adj_w));
 	map(0xf7, 0xf7).w(FUNC(pc6001mk2sr_state::mk2_timer_irqv_w));
+
+	// TODO: likely more registers are concealed in compatible modes
+	map(0x00, 0xff).view(m_mk2_io_view);
+	m_mk2_io_view[0](0xb0, 0xb0).w(FUNC(pc6001mk2sr_state::mk2_system_latch_w));
+	m_mk2_io_view[0](0xc1, 0xc1).w(FUNC(pc6001mk2sr_state::mk2_vram_bank_w));
 }
 
 /* Input ports */
@@ -1035,7 +1030,8 @@ TIMER_CALLBACK_MEMBER(pc6001_state::audio_callback)
 
 INTERRUPT_GEN_MEMBER(pc6001mk2sr_state::sr_vrtc_irq)
 {
-	set_irq_level(VRTC_IRQ);
+	if (!m_mk2_mode)
+		set_irq_level(VRTC_IRQ);
 }
 
 u8 pc6001_state::sub_ack()
@@ -1067,9 +1063,9 @@ u8 pc6001mk2_state::vrtc_ack()
 
 u8 pc6001mk2sr_state::vrtc_ack()
 {
-	// TODO: bit 0 of sr_mode_w
-//  if (sr_mode == false)
-//      return pc6001mk2_state::vrtc_ack();
+	// TODO: as above
+//	if (m_mk2_mode)
+//		return pc6001mk2_state::vrtc_ack();
 
 	return m_sr_irq_vectors[VRTC_IRQ];
 }
@@ -1197,20 +1193,9 @@ void pc6001_state::machine_start()
 	save_item(NAME(m_cas_maxsize));
 }
 
-inline void pc6001_state::set_videoram_bank(uint32_t offs)
-{
-	m_video_base = m_region_maincpu->base() + offs;
-}
-
 void pc6001_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
-}
-
-inline void pc6001_state::default_cartridge_reset()
-{
-	std::string region_tag;
-	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 }
 
 SNAPSHOT_LOAD_MEMBER(pc6001_state::snapshot_cb)
@@ -1248,10 +1233,8 @@ void pc6001_state::irq_reset(u8 timer_default_setting)
 
 void pc6001_state::machine_reset()
 {
-	set_videoram_bank(0xc000);
+	m_video_base = &m_ram->pointer()[0xc000 - 0x8000];
 
-	default_cartridge_reset();
-	//default_cassette_hack_reset();
 	m_cas_offset = 0;
 	irq_reset(3);
 	m_port_c_8255 = 0;
@@ -1276,12 +1259,6 @@ void pc6001mk2_state::machine_reset()
 //	set_videoram_bank(0xc000 + 0x28000);
 	m_video_base = &m_ram->pointer()[0xc000];
 
-	default_cartridge_reset();
-	// TODO: hackish way to simplify bankswitch handling
-	if (m_cart->exists())
-		memcpy(m_region_maincpu->base() + 0x48000, m_cart_rom->base(), 0x4000);
-
-	//default_cassette_hack_reset();
 	m_cas_offset = 0;
 	irq_reset(3);
 	m_port_c_8255 = 0;
@@ -1311,18 +1288,19 @@ void pc6601_state::machine_start()
 
 void pc6001mk2sr_state::machine_reset()
 {
-//  pc6001_state::machine_reset();
+	pc6001mk2_state::machine_reset();
 
 //  set_videoram_bank(0x70000);
 	m_video_base = &m_ram->pointer()[0];
 
-	default_cartridge_reset();
+	m_mk2_view.disable();
+	m_mk2_io_view.disable();
+	m_mk2_mode = false;
+
 	// TODO: checkout where cart actually maps in SR model
 	// should be mirrored into the EXROM regions?
 	// hard to tell without an actual SR cart dump
-//  std::string region_tag;
-//  m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-	//default_cassette_hack_reset();
+
 	irq_reset(0x7f);
 	m_port_c_8255 = 0;
 	m_cas_offset = 0;
@@ -1511,8 +1489,6 @@ void pc6001mk2_state::pc6001mk2(machine_config &config)
 
 	RAM(config.replace(), m_ram).set_default_size("64K");
 
-//  MCFG_MACHINE_RESET_OVERRIDE(pc6001mk2_state,pc6001mk2)
-
 	config.device_remove("cart_bank");
 
 	ADDRESS_MAP_BANK(config, m_mk2_bank[0]).set_map(&pc6001mk2_state::mk2_tv_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
@@ -1592,8 +1568,6 @@ void pc6001mk2sr_state::pc6001mk2sr(machine_config &config)
 	{
 		ADDRESS_MAP_BANK(config, bank).set_map(&pc6001mk2sr_state::sr_banked_map).set_options(ENDIANNESS_LITTLE, 8, 20, 0x2000);
 	}
-
-//  MCFG_MACHINE_RESET_OVERRIDE(pc6001mk2sr_state,pc6001mk2sr)
 
 	m_screen->set_screen_update(FUNC(pc6001mk2sr_state::screen_update));
 
