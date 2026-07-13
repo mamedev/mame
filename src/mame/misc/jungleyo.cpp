@@ -6,11 +6,12 @@
     Fruit Genie (c) 2003 Global
 
     TODO:
+    All games:
+    - they seem to use a ROM overlay for the SSP and reset vectors, as they don't
+      decrypt correctly otherwise. Likewise anything in the 0x100-0x1f7 range
+      doesn't seem valid at all;
+
     Jungle:
-    - with a clean NVRAM MAME needs to be soft reset after init or the game
-        will trip a '1111 exception' (caused by invalid opcode executed at
-        0x102, incomplete decryption most likely);
-    - Likewise anything in the 0x100-0x1f7 range doesn't seem valid at all;
     - game sometimes expects 1+ coins even if player has available points
       (and freezing with "COIN" text blinking), very unlikely to be intended
       behaviour?
@@ -29,15 +30,6 @@
     - outputs (lamps & ticket dispenser at very least);
 
     Fruit Genie:
-    - decryption seems good but gets stuck with 'data error' and 'illegal inst'
-        errors. Second one probably due to same problem as jungleyo. First one
-        possibly checksum failure due to patch in init_frtgenie()?
-        To bypass do:
-        frtgenie, frtgeniea: bp 5732,1,{curpc=0x5810;g}
-        frtgenieb: bp 581e,1,{curpc=0x58fe;g}
-        frtgeniec: bp 5812,1,{curpc=0x58f0;g}
-        frtgenied: bp 80de,1,{curpc=0x81bc;g}
-        kingfrt: bp 80d6,1,{curpc=0x81b4;g}
     - second half of frtgenie's main CPU ROM seems to contain an earlier version
       of the data 'GENIE FRUITS DATA: 2001/08/15 VERSION: VA1.00'. Can it be
       reached or just a leftover?
@@ -45,10 +37,6 @@
       various sets. Only the Oki ROM is always identical
     - it hits the layer_enable_w popmessage
     - title screen uses 4th 'reel'. Not implemented yet.
-
-   Magical Jack (Plus)
-    - with a clean NVRAM MAME needs to be soft reset after init or the game
-        will trip a '1111 exception';
 
 ===============================================================================
 
@@ -1368,8 +1356,8 @@ void jungleyo_state::init_jungleyo()
 
 	// TODO: Stack Pointer/Initial PC settings don't seem to decrypt correctly
 	// hack these until better understood (still wrong values)
-	src[0x000 / 2] = 0x0000;
-	src[0x002 / 2] = 0x0000;
+	src[0x000 / 2] = 0x00ff;
+	src[0x002 / 2] = 0x2000;
 	src[0x004 / 2] = 0x0000;
 	src[0x006 / 2] = 0x01f8; // reset opcode
 }
@@ -1392,8 +1380,8 @@ void jungleyo_state::init_jungleyoa()
 
 	// TODO: Stack Pointer/Initial PC settings don't seem to decrypt correctly
 	// hack these until better understood (still wrong values)
-	src[0x000 / 2] = 0x0000;
-	src[0x002 / 2] = 0x0000;
+	src[0x000 / 2] = 0x00ff;
+	src[0x002 / 2] = 0x2000;
 	src[0x004 / 2] = 0x0000;
 	src[0x006 / 2] = 0x01f8; // reset opcode
 }
@@ -1419,8 +1407,8 @@ void jungleyo_state::init_frtgenie()
 
 	// TODO: Stack Pointer/Initial PC settings don't seem to decrypt correctly
 	// hack these until better understood (still wrong values)
-	src[0x000 / 2] = 0x0000;
-	src[0x002 / 2] = 0x0000;
+	src[0x000 / 2] = 0x00ff;
+	src[0x002 / 2] = 0x2000;
 	src[0x004 / 2] = 0x0000;
 	src[0x006 / 2] = 0x01f8; // reset opcode
 }
@@ -1443,8 +1431,8 @@ void jungleyo_state::init_kingfrt()
 
 	// TODO: Stack Pointer/Initial PC settings don't seem to decrypt correctly
 	// hack these until better understood (still wrong values)
-	src[0x000 / 2] = 0x0000;
-	src[0x002 / 2] = 0x0000;
+	src[0x000 / 2] = 0x00ff;
+	src[0x002 / 2] = 0x2000;
 	src[0x004 / 2] = 0x0000;
 	src[0x006 / 2] = 0x01f8; // reset opcode
 }
@@ -1468,8 +1456,8 @@ void jungleyo_state::init_magjack()
 
 	// TODO: Stack Pointer/Initial PC settings don't seem to decrypt correctly
 	// hack these until better understood (still wrong values)
-	src[0x000 / 2] = 0x0000;
-	src[0x002 / 2] = 0x0000;
+	src[0x000 / 2] = 0x00ff;
+	src[0x002 / 2] = 0x2000;
 	src[0x004 / 2] = 0x0000;
 	src[0x006 / 2] = Reset_addr; // reset opcode
 }

@@ -104,8 +104,6 @@ private:
 
 	tilemap_t *m_bg_tilemap = nullptr;
 
-	uint8_t io_r(offs_t offset);
-
 	void init_gfx(const char *tag) ATTR_COLD;
 
 	void tileram_w(offs_t offset, uint8_t data);
@@ -163,7 +161,7 @@ void amstarz80_state::amstarz80_program_map(address_map &map)
 	map(0x4002, 0x4002).portr("IN0");
 	map(0x4003, 0x4003).portr("IN1");
 	map(0x4004, 0x4004).portr("IN2");
-//	map(0x4005, 0x4005).r();
+//  map(0x4005, 0x4005).r();
 	map(0x4006, 0x4006).portr("DSW1");
 	map(0x4007, 0x4007).portr("DSW2");
 	map(0x6000, 0x60ff).ram().share("nvram");
