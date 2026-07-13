@@ -112,14 +112,14 @@ ROM_START( mc6847_rom ) // extracted from decap imagery
 	ROM_LOAD( "mc6847_charset.bin", 0x0000, 0x0118, CRC(3b22d071) SHA1(5e9d68e55e73cae3d28adaff34fe115e00029009) )
 ROM_END
 
-ROM_START( mc6847t1_rom ) // reconstructed from video display
+ROM_START( mc6847t1_rom ) // reconstructed from video display, needs redump
 	ROM_REGION( 0x0480, "chargen", 0 )
-	ROM_LOAD( "mc6847t1_charset.bin", 0x0000, 0x0480, CRC(42e62f8d) SHA1(1f09a076732a1e4b132cf298f0d1747df817e1c6) )
+	ROM_LOAD( "mc6847t1_charset_needredump.bin", 0x0000, 0x0480, CRC(42e62f8d) SHA1(1f09a076732a1e4b132cf298f0d1747df817e1c6) )
 ROM_END
 
-ROM_START( s68047_rom ) // reconstructed from video display
+ROM_START( s68047_rom ) // reconstructed from video display, needs redump
 	ROM_REGION( 0x0118, "chargen", 0 )
-	ROM_LOAD( "s68047_charset.bin", 0x0000, 0x0118, CRC(b68adad6) SHA1(aaf3912b0928ecf3977ba8784cdc9baff7352a84) )
+	ROM_LOAD( "s68047_charset_needredump.bin", 0x0000, 0x0118, CRC(b68adad6) SHA1(aaf3912b0928ecf3977ba8784cdc9baff7352a84) )
 ROM_END
 
 
