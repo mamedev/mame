@@ -742,6 +742,7 @@ macro take_exception %vector
 	m_tmp1 = r8_r(m_ir[0] & 7);
 	fetch_reg_opbyte_8 m_tmp2
 	r8_w(op_byte(), do_dadd8(m_tmp2, m_tmp1));
+	cycles 4
 	prefetch
 
 # CMP.{B|W} EA, #imm8
