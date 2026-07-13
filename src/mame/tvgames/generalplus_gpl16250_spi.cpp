@@ -8,46 +8,8 @@
 */
 
 #include "emu.h"
-#include "generalplus_gpl16250.h"
+#include "generalplus_gpl16250_spi.h"
 #include "softlist_dev.h"
-
-
-namespace {
-
-class generalplus_gpspispi_game_state : public gcm394_game_state
-{
-public:
-	generalplus_gpspispi_game_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gcm394_game_state(mconfig, type, tag)
-	{
-	}
-
-	void generalplus_gpspispi(machine_config &config) ATTR_COLD;
-
-	void init_spi() ATTR_COLD;
-
-protected:
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-};
-
-
-class generalplus_gpspispi_bkrankp_game_state : public generalplus_gpspispi_game_state
-{
-public:
-	generalplus_gpspispi_bkrankp_game_state(const machine_config &mconfig, device_type type, const char *tag) :
-		generalplus_gpspispi_game_state(mconfig, type, tag),
-		m_cart(*this, "cartslot")
-	{
-	}
-
-	void generalplus_gpspispi_bkrankp(machine_config &config) ATTR_COLD;
-
-protected:
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-
-	required_device<generic_slot_device> m_cart;
-};
 
 
 void generalplus_gpspispi_game_state::machine_start()
@@ -186,41 +148,6 @@ ROM_START( pokegac2y )
 ROM_END
 
 
-ROM_START( bk139in1 )
-	ROM_REGION(0x4000000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD( "25q512.bin", 0x0000, 0x4000000, CRC(0cd111a4) SHA1(70553a44c3d946e5d23c09f04e0627a5dbaa3e4d) )
-ROM_END
-
-ROM_START( lxcyrace )
-	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD( "25q128.u2", 0x0000, 0x1000000, CRC(4489c99d) SHA1(792d6d224584fe1f3349c64a59aa79a587dd8c17) )
-ROM_END
-
-ROM_START( lxcymsm )
-	ROM_REGION(0x2000000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD( "25q256.bin", 0x0000, 0x2000000, CRC(96b3ee5c) SHA1(f1e6bf46a4503877074310506d1acc4607dac331) )
-ROM_END
-
-ROM_START( lxcympp )
-	ROM_REGION(0x2000000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD( "25q256.bin", 0x0000, 0x2000000, CRC(570b669c) SHA1(e7fcae662c8c8cae18cf1151d6caefacfe1e9fda) )
-ROM_END
-
-ROM_START( lxcymls )
-	ROM_REGION(0x2000000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD( "25q256.bin", 0x0000, 0x2000000, CRC(76c89fe5) SHA1(99668cbce2ace6ec972ee4e72fec8b93862a0ef4) )
-ROM_END
-
-ROM_START( dgun3944 )
-	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD( "by25q128as.bin", 0x0000, 0x1000000, CRC(cf2bfc98) SHA1(f8c984f0278506d74b0b6337d2e96bb9d3a58148) )
-ROM_END
-
-ROM_START( starbuck )
-	ROM_REGION(0x200000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD( "by25q16est.bin", 0x0000, 0x200000,  CRC(926c1499) SHA1(edd88b11f350e0016ee7dc76e872f9ae8c00aa6c) )
-ROM_END
-
 void generalplus_gpspispi_game_state::init_spi()
 {
 	int vectorbase = 0x2fe0;
@@ -267,7 +194,6 @@ void generalplus_gpspispi_game_state::init_spi()
 	internal[0x7fff] = vectorbase + 0x1e;
 }
 
-} // anonymous namespace
 
 // ぼくはプラレール運転士 新幹線で行こう！プラス  (I am a Plarail driver Let's go by Shinkansen! Plus)
 CONS(2015, prailpls, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Takara Tomy", "Boku wa Plarail Untenshi Shinkansen de Ikou! Plus (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // has built-in screen, but can be connected to a TV
@@ -298,23 +224,3 @@ CONS(2015, pokegach,  0,        0, generalplus_gpspispi_bkrankp, gcm394, general
 // the 2nd release comes in 2 colours and they can communicate?
 CONS(2015, pokegac2,  0,        0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Tomy", "Pokegacha V2 Red (20151230, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2015, pokegac2y, pokegach, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Tomy", "Pokegacha V2 Yellow (20151230, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-
-// This can be found listed as a ZHISHAN / Aojiao / Bornkid 32 Bit Preloaded 139-in-1 Handheld Game Console
-// but these just seem to be brands, manufacturer is unknown.
-// Various case styles are available, the unit here was styled after a Nintendo Switch
-//
-// Architecture is unknown, it contains many of the games in beijuehh / bornkidh (generalplus_gpl16250_rom.cpp)
-// but is running from SPI flash and has 'Loading' screens between menus and after selecting a game.
-//
-// While those are GeneralPlus based platforms, it's possible the games were ported to something else, the SPI
-// appears to contain a filesystem, but data looks to be compressed / encrypted with no obvious code.
-// There is no GPspi header in the SPI ROM.
-CONS(202?, bk139in1,  0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "<unknown>", "BornKid 32 Bit Preloaded 139-in-1 Handheld Game Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-// same unknown hardware as above, fewer games
-CONS(2021, lxcyrace,  0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "Lexibook", "Cyber Arcade Racing (JL3150)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2021, lxcymsm,   0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "Lexibook", "Cyber Arcade Motion - Superman (JL3180SU)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2021, lxcympp,   0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "Lexibook", "Cyber Arcade Motion - Paw Patrol (JL3180PA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2021, lxcymls,   0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "Lexibook", "Cyber Arcade Motion - Lilo & Stitch (JL3180D_01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2021, dgun3944,  0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "dreamGEAR", "My Arcade All Star Sports (Pixel Pocket, DGUNL3944)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-// sold by Starbucks China, contains a bunch of NES hacks (including a version of Super Mario Bros) probably running on an emulator
-CONS(2022, starbuck,  0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "Subor",     "Starbucks x Subor (OEM Q2, China)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

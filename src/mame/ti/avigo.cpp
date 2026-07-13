@@ -112,7 +112,7 @@ public:
 		, m_nvram(*this, "nvram")
 	{ }
 
-	void avigo(machine_config &config);
+	void avigo(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(pen_irq);
 	DECLARE_INPUT_CHANGED_MEMBER(pen_move_irq);
@@ -120,9 +120,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_down_irq);
 
 protected:
-	// defined in drivers/avigo.cpp
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
 	void refresh_ints();
 	void nvram_init(nvram_device &nvram, void *base, size_t size);
 
@@ -144,8 +145,6 @@ protected:
 	void speaker_w(uint8_t data);
 	uint8_t port_04_r();
 
-	// defined in video/avigo.cpp
-	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint8_t vid_memory_r(offs_t offset);
 	void vid_memory_w(offs_t offset, uint8_t data);

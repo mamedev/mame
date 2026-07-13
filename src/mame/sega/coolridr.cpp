@@ -1,25 +1,36 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Angelo Salese, David Haywood
-/******************************************************************************************************
+// thanks-to: Guru
+/**************************************************************************************************
 
-    System H1 (c) 1994 Sega
+System H1 (c) 1994 Sega
 
-    Driver by David Haywood, Angelo Salese and Tomasz Slanina
-    special thanks to Guru for references and HW advices
+Games on this system include Cool Riders and Aqua Stage.
 
-    Games on this system include Cool Riders and Aqua Stage.
+This system is interesting in that it makes use of an RLE compression scheme, which
+is not something common for Sega hardware, there is a patent for it ( 6,141,122 )
+http://www.google.com/patents/US6141122
 
-    This system is interesting in that it makes use of an RLE compression scheme, which
-    is not something common for Sega hardware, there is a patent for it ( 6,141,122 )
-    http://www.google.com/patents/US6141122
+TODO:
+- Understand what the 0x400000c reads on SH-2 really do.
+- improve sound emulation, sound comms are guessed and likely full of penalties
+\- Born to be Wild more like "Born to be Wuaass"
+\- Gameplay sound goes thru aggressive filter, except when you're in the tunnels where it goes
+   super loud / clear;
+- i8237 purpose is unknown (missing ROM for comms?);
+- verify zooming etc. our current algorithm is a bit ugly for text;
+- Requires SH7032 to be unstubbed, both games definitely access area $5xx'xxxx for stuff that
+  isn't on-chip I/O, huh?
 
-    TODO:
-    - Understand what the 0x400000c reads on SH-2 really do.
-    - improve sound emulation
-    - i8237 purpose is unknown (missing ROM for comms?).
-    - verify zooming etc. our current algorithm is a bit ugly for text
+TODO (aquastge):
+- has two screens but only first one gets enabled;
+- service mode POST doesn't survive a memory test, gets stuck in IC21/IC22 RAM tests
+  (SH-2 reads from $eb00'dd50!?)
+- black screen with -nodrc;
+- Remaining inputs, where they are located?
+- Always enters test mode at startup (side effect of having several inputs high?);
 
-=======================================================================================================
+===================================================================================================
 
 Cool Riders
 Sega 1994
@@ -215,7 +226,7 @@ Notes:
                     315-5697 (QFP208)
                     315-5698 (QFP144)
 
-*******************************************************************************************************
+***************************************************************************************************
 
 Note: This hardware appears to have been designed as a test-bed for a new RLE based compression system
       used by the zooming sprites.  It is possible that Sega planned on using this for ST-V, but
@@ -245,7 +256,7 @@ Note: This hardware appears to have been designed as a test-bed for a new RLE ba
    Sega Arcade History (published by Enterbrain) is '1995/4'.
 
 
-******************************************************************************************************/
+**************************************************************************************************/
 
 /*
 
@@ -295,6 +306,13 @@ to the same bank as defined through A20.
 #include "speaker.h"
 
 #include "aquastge.lh"
+
+#define LOG_VIDEO_DMA  (1U << 1)
+#define LOG_SOUND_DMA  (1U << 2)
+
+#define VERBOSE (LOG_GENERAL)
+
+#include "logmacro.h"
 
 
 namespace {
@@ -382,7 +400,18 @@ public:
 	uint32_t get_20bit_data(uint32_t romoffset, int _20bitwordnum);
 	uint16_t get_10bit_data(uint32_t romoffset, int _10bitwordnum);
 
-	uint32_t sound_dma_r(offs_t offset);
+	emu_timer *m_sound_dma_timer[2];
+	template <unsigned N> TIMER_CALLBACK_MEMBER(sound_dma_cb);
+
+	static constexpr int SOUND_DMA_TICKS = 2;
+	struct {
+		u32 src;
+		u32 dst;
+		s32 count;
+		bool status;
+	} m_sh1_sound_dma[2];
+
+	uint32_t sound_dma_r(offs_t offset, uint32_t mem_mask = ~0);
 	void sound_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t unk_blit_r(offs_t offset);
 	void unk_blit_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -519,9 +548,6 @@ public:
 	void system_h1_sound_map(address_map &map) ATTR_COLD;
 	template<int Chip> void scsp_map(address_map &map) ATTR_COLD;
 };
-
-#define PRINT_BLIT_STUFF \
-	printf("type blit %08x %08x(%d, %03x) %08x(%02x, %03x) %08x(%06x) %08x(%08x, %d, %d, %d) %08x(%d,%d) %04x %04x %04x %04x %08x %08x %d %d\n", blit0, blit1_unused,b1mode,b1colorNumber, blit2_unused,b2tpen,b2colorNumber, blit3_unused,b3romoffset, blit4_unused, blit4blendlevel, blit_flipy,blit_rotate, blit_flipx, blit5_unused, indirect_tile_enable, indirect_zoom_enable, vCellCount, hCellCount, vZoom, hZoom, blit10, textlookup, vPosition, hPosition);
 
 
 /* video */
@@ -1273,7 +1299,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 	uint32_t blit3_unused = object->spriteblit[3] & 0xffe00000;
 	uint32_t b3romoffset = (object->spriteblit[3] & 0x001fffff)*16;
 
-	if (blit3_unused) printf("unknown bits in blit word %d -  %08x\n", 3, blit3_unused);
+	if (blit3_unused) object->state.machine().logerror("unknown bits in blit word %d -  %08x\n", 3, blit3_unused);
 
 	/************* object->spriteblit[5] *************/
 
@@ -1283,7 +1309,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 	int indirect_zoom_enable = (object->spriteblit[5] & 0x00000001);
 
 
-	if (blit5_unused) printf("unknown bits in blit word %d -  %08x\n", 5, blit5_unused);
+	if (blit5_unused) object->state.machine().logerror("unknown bits in blit word %d -  %08x\n", 5, blit5_unused);
 	// 00010000 (text)
 	// 00000001 (other)
 
@@ -1306,7 +1332,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 	uint32_t b1mode = (object->spriteblit[1] & 0x00010000)>>16;
 	uint32_t b1colorNumber = (object->spriteblit[1] & 0x000007ff);    // Probably more bits
 
-	if (blit1_unused!=0) printf("blit1 unknown bits set %08x\n", object->spriteblit[1]);
+	if (blit1_unused!=0) object->state.machine().logerror("blit1 unknown bits set %08x\n", object->spriteblit[1]);
 
 
 	if (b1mode)
@@ -1330,10 +1356,10 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 //      printf("%08x %08x\n",b1colorNumber,b2colorNumber);
 
 
-	if (blit2_unused!=0) printf("blit1 unknown bits set %08x\n", object->spriteblit[2]);
+	if (blit2_unused!=0) object->state.machine().logerror("blit1 unknown bits set %08x\n", object->spriteblit[2]);
 	if (b1mode)
 	{
-		if (b2altpenmask != 0x7f) printf("b1mode 1, b2altpenmask!=0x7f\n");
+		if (b2altpenmask != 0x7f) object->state.machine().logerror("b1mode 1, b2altpenmask!=0x7f\n");
 	}
 	else
 	{
@@ -1360,7 +1386,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 	uint32_t blit_rotate = (object->spriteblit[4] & 0x00010000)>>16;
 	//uint32_t b4_unk = object->spriteblit[4] & 0x00000010;
 
-	if (blit4_unused) printf("unknown bits in blit word %d -  %08x\n", 4, blit4_unused);
+	if (blit4_unused) object->state.machine().logerror("unknown bits in blit word %d -  %08x\n", 4, blit4_unused);
 
 	// ---- -111 ---- ---r ---- ---y ---z ---x
 	// 1 = used bits? (unknown purpose.. might be object colour mode)
@@ -1400,7 +1426,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 	uint16_t hOrigin = (object->spriteblit[7] & 0x00000003);
 	uint16_t OriginUnused = (object->spriteblit[7] & 0xfffcfffc);
 
-	if (blit5_unused) printf("unknown bits in blit word %d -  %08x\n", 7, OriginUnused);
+	if (blit5_unused) object->state.machine().logerror("unknown bits in blit word %d -  %08x\n", 7, OriginUnused);
 
 	//printf("%04x %04x\n", vOrigin, hOrigin);
 
@@ -2185,7 +2211,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	}
 	else
 	{
-		printf("unknown blit0 value %08x\n", blit0);
+		LOG("unknown blit0 value %08x\n", blit0);
 		// abort early
 		return;
 	}
@@ -2348,7 +2374,7 @@ void coolridr_state::blit_mode_w(uint32_t data)
 
 		// not seen this triggered
 		if ((data & 0xff000000) != 0xac000000)
-			printf("blitter mode set without upper bits equal 0xac000000\n");
+			LOG("blitter mode set without upper bits equal 0xac000000\n");
 
 		// i've seen this triggered once or twice
 		// might be there are more z-bits, or it's just overflowing when there are too many sprites
@@ -2383,7 +2409,7 @@ void coolridr_state::blit_mode_w(uint32_t data)
 	}
 	else
 	{
-		printf("set unknown blit mode %02x\n", m_blitterMode);
+		LOG("set unknown blit mode %02x\n", m_blitterMode);
 	}
 }
 
@@ -2407,7 +2433,7 @@ void coolridr_state::blit_data_w(address_space &space, uint32_t data)
 		}
 		else
 		{
-			printf("more than 11 dwords (%d) in blit?\n", m_blitterSerialCount);
+			LOG("more than 11 dwords (%d) in blit?\n", m_blitterSerialCount);
 		}
 
 		// use the 11th blit write also as the trigger
@@ -2446,7 +2472,7 @@ void coolridr_state::blit_data_w(address_space &space, uint32_t data)
 	}
 	else
 	{
-		printf("unk blit mode %02x\n", m_blitterMode);
+		LOG("unk blit mode %02x\n", m_blitterMode);
 	}
 }
 
@@ -2487,12 +2513,12 @@ void coolridr_state::fb_data_w(offs_t offset, uint32_t data)
 	if(m_blitterClearCount == 0)
 	{
 		if(data != 1)
-			printf("Blitter Clear Count == 0 used with param %08x\n",data);
+			LOG("Blitter Clear Count == 0 used with param %08x\n",data);
 	}
 	else if(m_blitterClearCount == 1)
 	{
 		if(data != 0x17f)
-			printf("Blitter Clear Count == 1 used with param %08x\n",data);
+			LOG("Blitter Clear Count == 1 used with param %08x\n",data);
 	}
 	else if(m_blitterClearCount == 2)
 	{
@@ -2504,7 +2530,7 @@ void coolridr_state::fb_data_w(offs_t offset, uint32_t data)
 	else if(m_blitterClearCount == 3)
 	{
 		if(data != 0x00000007 && data != 0x00000207)
-			printf("Blitter Clear Count == 3 used with param %08x\n",data);
+			LOG("Blitter Clear Count == 3 used with param %08x\n",data);
 
 		{
 			const rectangle& visarea = m_screen->visible_area();
@@ -2610,7 +2636,7 @@ void coolridr_state::fb_data_w(offs_t offset, uint32_t data)
 	}
 	else
 	{
-		printf("Blitter Clear Count == %02x used with param %08x\n",m_blitterClearCount,m_txt_blit[offset]);
+		LOG("Blitter Clear Count == %02x used with param %08x\n",m_blitterClearCount,m_txt_blit[offset]);
 	}
 
 	m_blitterClearCount++;
@@ -2632,7 +2658,7 @@ void coolridr_state::unk_blit_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	{
 		default:
 		{
-			printf("sysh1_unk_blit_w unhandled offset %04x %08x %08x\n", offset, data, mem_mask);
+			LOG("sysh1_unk_blit_w unhandled offset %04x %08x %08x\n", offset, data, mem_mask);
 		}
 		break;
 
@@ -2679,10 +2705,10 @@ void coolridr_state::dma_transfer( address_space &space, uint16_t dma_index )
 				src = (m_framebuffer_vram[(0+dma_index)/4] & 0x03ffffff);
 				dst = (m_framebuffer_vram[(4+dma_index)/4]);
 				size = m_framebuffer_vram[(8+dma_index)/4];
-				printf("%08x %08x %04x\n",src,dst,size);
+				LOGMASKED(LOG_VIDEO_DMA, "%08x %08x %04x\n", src, dst, size);
 
 				if(dst & 0xfff00001)
-					printf("unk values to %02x dst %08x\n",cmd,dst);
+					LOG("unk values to %02x dst %08x\n",cmd,dst);
 				dst &= 0x000ffffe;
 				dst >>= 1;
 
@@ -2701,7 +2727,7 @@ void coolridr_state::dma_transfer( address_space &space, uint16_t dma_index )
 				dst = (m_framebuffer_vram[(4+dma_index)/4]);
 				size = m_framebuffer_vram[(8+dma_index)/4];
 				if(dst & 0xfff00000)
-					printf("unk values to %02x dst %08x\n",cmd,dst);
+					LOG("video DMA: unk values to %02x dst %08x\n", cmd, dst);
 				dst &= 0x000fffff;
 
 				for(int i=0;i<size;i++)
@@ -2721,7 +2747,7 @@ void coolridr_state::dma_transfer( address_space &space, uint16_t dma_index )
 				size = m_framebuffer_vram[(8+dma_index)/4];
 				/* Note: there are also some reads at 0x3e00000. This tells us that the DMA thing actually mirrors at 0x3c00000 too. */
 				if(dst & 0xfff00001)
-					printf("unk values to %02x dst %08x\n",cmd,dst);
+					LOG("video DMA: values to %02x dst %08x\n", cmd, dst);
 				dst &= 0x000ffffe;
 				dst >>= 1;
 
@@ -2760,7 +2786,7 @@ void coolridr_state::dma_transfer( address_space &space, uint16_t dma_index )
 				dma_index+=4;
 				break;
 			default:
-				printf("%02x %08x\n",cmd,m_framebuffer_vram[(0+dma_index)/4]);
+				LOG("video DMA: %02x %08x\n",cmd,m_framebuffer_vram[(0+dma_index)/4]);
 				dma_index+=4;
 				break;
 		}
@@ -2842,8 +2868,41 @@ void coolridr_state::lamps_w(uint8_t data)
 	*/
 }
 
+template <unsigned N> TIMER_CALLBACK_MEMBER(coolridr_state::sound_dma_cb)
+{
+	// TODO: actual bus penalty
+	// SH-1 passing along a SH-2 work RAM to 68k work RAM, it must bus request in some way.
+	address_space &main_space = m_maincpu->space(AS_PROGRAM);
+	address_space &sound_space = m_soundcpu->space(AS_PROGRAM);
 
-uint32_t coolridr_state::sound_dma_r(offs_t offset)
+	u32 src = m_sh1_sound_dma[N].src;
+	u32 dst = m_sh1_sound_dma[N].dst;
+
+	sound_space.write_word(dst,main_space.read_word(src));
+
+	s32 count = m_sh1_sound_dma[N].count;
+
+	count -= 2;
+
+	if (count <= 0)
+	{
+		LOGMASKED(LOG_SOUND_DMA, "sound DMA%d end: %08x %08x\n", N, m_sh1_sound_dma[N].src, m_sh1_sound_dma[N].dst);
+		m_sound_dma_timer[N]->adjust(attotime::never);
+		m_sh1_sound_dma[N].status &= ~1;
+	}
+	else
+	{
+		src += 2;
+		dst += 2;
+		m_sh1_sound_dma[N].src = src;
+		m_sh1_sound_dma[N].dst = dst;
+		m_sh1_sound_dma[N].count = count;
+		m_sound_dma_timer[N]->adjust(attotime::from_ticks(SOUND_DMA_TICKS, m_subcpu->clock()));
+	}
+}
+
+
+uint32_t coolridr_state::sound_dma_r(offs_t offset, uint32_t mem_mask)
 {
 	if(offset == 8)
 	{
@@ -2856,20 +2915,18 @@ uint32_t coolridr_state::sound_dma_r(offs_t offset)
 		return m_sound_data;
 	}
 
-	if(offset == 2 || offset == 6) // DMA status
-		return 0;
+//	printf("%08x & %08x\n", offset, mem_mask);
 
-	printf("%08x\n",offset);
+	if(offset == 2 || offset == 6) // DMA status
+		return m_sh1_sound_dma[BIT(offset, 2)].status << 16;
+
 
 	return m_sound_dma[offset];
 }
 
 void coolridr_state::sound_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	address_space &main_space = m_maincpu->space(AS_PROGRAM);
-	address_space &sound_space = m_soundcpu->space(AS_PROGRAM);
-
-	//printf("%08x %08x\n",offset*4,m_h1_unk[offset]);
+	// printf("%08x %08x & %08x\n",offset, data, mem_mask);
 
 	if(offset == 8)
 	{
@@ -2878,41 +2935,25 @@ void coolridr_state::sound_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask
 		return;
 	}
 
-	if(offset == 2)
+	if(offset == 2 || offset == 6)
 	{
-		if(data & 1 && (!(m_sound_dma[2] & 1))) // 0 -> 1 transition enables DMA
+		const u8 src_base = offset & 4;
+		const u8 dst_base = src_base >> 2;
+
+		// 0 -> 1 transition enables DMA
+		// bit 2 DMA enable, like Saturn SCU?
+		if(data & 1 && (!(m_sound_dma[src_base + 2] & 1)))
 		{
-			uint32_t src = m_sound_dma[0];
-			uint32_t dst = m_sound_dma[1];
-			uint32_t size = (m_sound_dma[2]>>16)*0x40;
+			m_sh1_sound_dma[dst_base].src = m_sound_dma[src_base];
+			m_sh1_sound_dma[dst_base].dst = m_sound_dma[src_base + 1];
+			m_sh1_sound_dma[dst_base].count = (m_sound_dma[src_base + 2]>>16)*0x40;
+			m_sh1_sound_dma[dst_base].status |= 1;
+			m_sound_dma_timer[dst_base]->adjust(attotime::from_ticks(SOUND_DMA_TICKS, m_subcpu->clock()));
 
-			//printf("%08x %08x %08x %02x\n",src,dst,size,m_sound_fifo);
-
-			for(int i = 0;i < size; i+=2)
-			{
-				sound_space.write_word(dst,main_space.read_word(src));
-				src+=2;
-				dst+=2;
-			}
-		}
-	}
-
-	if(offset == 6)
-	{
-		if(data & 1 && (!(m_sound_dma[6] & 1))) // 0 -> 1 transition enables DMA
-		{
-			uint32_t src = m_sound_dma[4];
-			uint32_t dst = m_sound_dma[5];
-			uint32_t size = (m_sound_dma[6]>>16)*0x40;
-
-			//printf("%08x %08x %08x %02x\n",src,dst,size,m_sound_fifo);
-
-			for(int i = 0;i < size; i+=2)
-			{
-				sound_space.write_word(dst,main_space.read_word(src));
-				src+=2;
-				dst+=2;
-			}
+			LOGMASKED(LOG_SOUND_DMA, "Sound DMA%d start: %08x %08x %08x %02x\n",
+				dst_base,
+				m_sh1_sound_dma[dst_base].src, m_sh1_sound_dma[dst_base].dst, m_sh1_sound_dma[dst_base].count,
+				m_sound_fifo);
 		}
 	}
 
@@ -2956,7 +2997,7 @@ void coolridr_state::aquastge_submap(address_map &map)
 	map(0x05200000, 0x0520ffff).ram();
 	map(0x05210000, 0x0521ffff).ram().share("share3"); /*Communication area RAM*/
 	map(0x05220000, 0x0537ffff).ram();
-	map(0x06000200, 0x06000207).nopw(); // program bug?
+	map(0x06000200, 0x06000207).nopw(); // program bug when writing to NVRAM? Happens cyclically
 }
 
 /* TODO: what is this for, volume mixing? MIDI? */
@@ -2965,12 +3006,13 @@ void coolridr_state::sound_to_sh1_w(uint8_t data)
 	m_sound_fifo = data;
 }
 
+// We assume using the same waitstate weights as Saturn, applied to SCSP area only
 void coolridr_state::system_h1_sound_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).ram().share("soundram1");
-	map(0x100000, 0x100fff).rw("scsp1", FUNC(scsp_device::read), FUNC(scsp_device::write));
-	map(0x200000, 0x27ffff).ram().share("soundram2");
-	map(0x300000, 0x300fff).rw("scsp2", FUNC(scsp_device::read), FUNC(scsp_device::write));
+	map(0x000000, 0x07ffff).before_delay(NAME([](offs_t) { return 1; })).ram().share("soundram1");
+	map(0x100000, 0x100fff).before_delay(NAME([](offs_t) { return 1; })).rw("scsp1", FUNC(scsp_device::read), FUNC(scsp_device::write));
+	map(0x200000, 0x27ffff).before_delay(NAME([](offs_t) { return 1; })).ram().share("soundram2");
+	map(0x300000, 0x300fff).before_delay(NAME([](offs_t) { return 1; })).rw("scsp2", FUNC(scsp_device::read), FUNC(scsp_device::write));
 	map(0x800000, 0x80ffff).mirror(0x200000).ram();
 	map(0x900001, 0x900001).w(FUNC(coolridr_state::sound_to_sh1_w));
 }
@@ -3188,13 +3230,22 @@ void coolridr_state::machine_start()
 
 	save_item(NAME(m_sound_data));
 	save_item(NAME(m_sound_fifo));
+
+	m_sound_dma_timer[0] = timer_alloc(FUNC(coolridr_state::sound_dma_cb<0>), this);
+	m_sound_dma_timer[1] = timer_alloc(FUNC(coolridr_state::sound_dma_cb<1>), this);
 }
 
 void coolridr_state::machine_reset()
 {
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-	m_usethreads = m_io_config->read()&1;
+	m_usethreads = m_io_config->read() & 1;
+
+	m_sound_data = 0;
+	m_sound_dma_timer[0]->adjust(attotime::never);
+	m_sound_dma_timer[1]->adjust(attotime::never);
+	m_sh1_sound_dma[0].status = 0;
+	m_sh1_sound_dma[1].status = 0;
 }
 
 void coolridr_state::scsp_irq(offs_t offset, uint8_t data)
@@ -3204,20 +3255,22 @@ void coolridr_state::scsp_irq(offs_t offset, uint8_t data)
 
 void coolridr_state::scsp1_to_sh1_irq(int state)
 {
-	m_subcpu->set_input_line(0xe, (state) ? ASSERT_LINE : CLEAR_LINE);
 	if(state)
 		m_sound_data |= 0x10;
 	else
 		m_sound_data &= ~0x10;
+
+	m_subcpu->set_input_line(0xe, (m_sound_data & 0x30) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void coolridr_state::scsp2_to_sh1_irq(int state)
 {
-	m_subcpu->set_input_line(0xe, (state) ? ASSERT_LINE : CLEAR_LINE);
 	if(state)
 		m_sound_data |= 0x20;
 	else
 		m_sound_data &= ~0x20;
+
+	m_subcpu->set_input_line(0xe, (m_sound_data & 0x30) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -3227,10 +3280,12 @@ void coolridr_state::coolridr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &coolridr_state::coolridr_h1_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(coolridr_state::interrupt_main), "screen", 0, 1);
 
-	M68000(config, m_soundcpu, XTAL(32'000'000)/2); // 16 MHz
+	M68000(config, m_soundcpu, XTAL(32'000'000) / 2); // 16 MHz
 	m_soundcpu->set_addrmap(AS_PROGRAM, &coolridr_state::system_h1_sound_map);
 
-	SH7032(config, m_subcpu, XTAL(32'000'000)/2); // SH7032 HD6417032F20!! 16 MHz
+	// HACK: after SCSP MSLC delayed updates SH-1 needs to be slowed down by half (8 MHz)
+	// This must come from not entirely understood sound DMA/comms behaviour.
+	SH7032(config, m_subcpu, XTAL(32'000'000) / 4); // SH7032 HD6417032F20!! 16 MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &coolridr_state::coolridr_submap);
 	TIMER(config, "scantimer2").configure_scanline(FUNC(coolridr_state::interrupt_sub), "screen", 0, 1);
 
@@ -3270,6 +3325,7 @@ void coolridr_state::coolridr(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
+	// TODO: initializes as 44'099 kHz in SCSP core
 	scsp_device &scsp1(SCSP(config, "scsp1", XTAL(22'579'000))); // 22.579 MHz
 	scsp1.set_addrmap(0, &coolridr_state::scsp_map<0>);
 	scsp1.irq_cb().set(FUNC(coolridr_state::scsp_irq));
@@ -3294,6 +3350,14 @@ void coolridr_state::aquastge(machine_config &config)
 	sega_315_5649_device &io(SEGA_315_5649(config.replace(), "io", 0));
 	io.in_pc_callback().set_ioport("IN0");
 	io.in_pd_callback().set_ioport("IN1");
+	io.in_pe_callback().set_constant(0xff);
+	io.in_pf_callback().set_constant(0xff);
+	// flips 0x81 -> 0x80 from ch1, expects bit 0 of both channels to update
+	// pushing high avoids "CALL ATTENDANT" errors
+	io.serial_ch1_rd_callback().set([] () { return 0xff; });
+	//io.serial_ch1_wr_callback().set([this] (u8 data) {});
+	io.serial_ch2_rd_callback().set([] () { return 0xff; });
+	//io.serial_ch2_wr_callback().set([this] (u8 data) {});
 }
 
 ROM_START( coolridr )
@@ -3393,4 +3457,4 @@ void coolridr_state::init_aquastge()
 
 
 GAME(  1995, coolridr, 0, coolridr, coolridr, coolridr_state, init_coolridr, ROT0, "Sega", "Cool Riders", MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN ) // region is set in test mode, this set is for Japan, USA and Export (all regions)
-GAMEL( 1995, aquastge, 0, aquastge, aquastge, coolridr_state, init_aquastge, ROT0, "Sega", "Aqua Stage",  MACHINE_NOT_WORKING, layout_aquastge)
+GAMEL( 1995, aquastge, 0, aquastge, aquastge, coolridr_state, init_aquastge, ROT0, "Sega", "Aqua Stage",  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING, layout_aquastge)

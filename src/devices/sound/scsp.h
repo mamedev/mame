@@ -127,6 +127,8 @@ private:
 	u32 m_IrqTimBC;
 	u32 m_IrqMidi;
 
+	u8 m_latched_MSLC;
+	u16 m_latched_MSLC_data;
 	u8 m_MidiOutStack[32];
 	u8 m_MidiOutW, m_MidiOutR;
 	u8 m_MidiStack[32];

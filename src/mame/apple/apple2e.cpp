@@ -1035,7 +1035,7 @@ void apple2e_state::machine_start()
 		// invert the fill pattern order on the ACE 500 and 2200, as it interacts with
 		// Franklin's monitor not returning the same values as Apple's plus some
 		// bugs in DOS 3.3.
-		if ((m_isace500) || (m_isace2200))
+		if (m_isace500 || m_isace2200)
 		{
 			m_ram_ptr[adr] = 0xff;
 			m_ram_ptr[adr+1] = 0;
@@ -1083,7 +1083,7 @@ void apple2e_state::machine_start()
 		}
 	}
 
-	if ((m_has_laser_mouse) || (m_isace500) || (m_isace2200))
+	if (m_has_laser_mouse || m_isace500 || m_isace2200)
 	{
 		m_strobe_timer = timer_alloc(FUNC(apple2e_state::update_laserprn_strobe), this);
 		m_next_strobe = 1U;
@@ -1273,7 +1273,7 @@ void apple2e_state::machine_reset()
 	m_35sel = false;
 
 	// IIe prefers INTCXROM default to off, IIc has it always on
-	if ((m_isiic) || (m_isace500))
+	if (m_isiic || m_isace500)
 	{
 		m_intcxrom = true;
 	}
@@ -1283,7 +1283,7 @@ void apple2e_state::machine_reset()
 	}
 
 	// Zip configuration
-	if ((m_isiicplus) || (m_sysconfig.read_safe(0) & 0x10))
+	if (m_isiicplus || (m_sysconfig.read_safe(0) & 0x10))
 	{
 		m_accel_present = true;
 		m_accel_speed = 4000000;    // Zip speed, set if present, even if not active initially
@@ -1351,7 +1351,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 	// timer fires at the end of active video; handle events for the next line
 	int scanline = param + 1;
 
-	if ((m_isiic) || (m_has_laser_mouse) || (m_isace500))
+	if (m_isiic || m_has_laser_mouse || m_isace500)
 	{
 		update_iic_mouse();
 	}
@@ -1379,7 +1379,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 			reset_w((m_kbspecial->read() & 0x88) != 0x88);
 
 		// check Franklin F-keys
-		if ((m_isace500) || (m_isace2200))
+		if (m_isace500 || m_isace2200)
 		{
 			const u32 uFkeys = m_franklin_fkeys->read();
 
@@ -1421,7 +1421,7 @@ void apple2e_state::reset_w(int state)
 			m_intc8rom = false;
 
 			// reset intcxrom to default
-			if ((m_isiic) || (m_isace500))
+			if (m_isiic || m_isace500)
 			{
 				m_intcxrom = true;
 			}
@@ -1502,7 +1502,7 @@ void apple2e_state::accel_reset()
 
 		// Zip Chip embedded firmware watches for Esc and space keys
 		// This is not emulated, config "Bootup speed" is an approximation
-		m_accel_fast = ((m_isiicplus) || (m_sysconfig.read_safe(0) & 0x20));
+		m_accel_fast = (m_isiicplus || (m_sysconfig.read_safe(0) & 0x20));
 		accel_update_speed();
 	}
 
@@ -1611,7 +1611,7 @@ void apple2e_state::update_slotrom_banks()
 
 		// IIc and IIc+ have working (readable) INTCXROM/SLOTC3ROM switches, but
 		// internal ROM is always present in the slots.
-		if ((m_intcxrom) || (m_isiic) || (m_isace500))
+		if (m_intcxrom || m_isiic || m_isace500)
 		{
 			if (m_romswitch)
 			{
@@ -1627,7 +1627,7 @@ void apple2e_state::update_slotrom_banks()
 		m_c400bank.select(cxswitch);
 
 		//printf("intcxrom %d intc8rom %d cnxx_slot %d isiic %d romswitch %d\n", m_intcxrom, m_intc8rom, m_cnxx_slot, m_isiic, m_romswitch);
-		if ((m_intcxrom) || (m_intc8rom) || (m_isiic))
+		if (m_intcxrom || m_intc8rom || m_isiic)
 		{
 			if (m_romswitch)
 			{
@@ -1643,7 +1643,7 @@ void apple2e_state::update_slotrom_banks()
 			m_c800bank.select(0);
 		}
 
-		if ((m_intcxrom) || (!m_slotc3rom) || (m_isiic))
+		if (m_intcxrom || !m_slotc3rom || m_isiic)
 		{
 			if (m_romswitch)
 			{
@@ -1698,14 +1698,14 @@ void apple2e_state::lc_update(int offset, bool writing)
 
 	//any write disables pre-write
 	//has no effect on write-enable if writing was enabled already
-	if (writing == true)
+	if (writing)
 	{
 		m_lcprewrite = false;
 	}
 	//first odd read enables pre-write, second one enables writing
 	else if ((offset & 1) == 1)
 	{
-		if (m_lcprewrite == false)
+		if (!m_lcprewrite)
 		{
 			m_lcprewrite = true;
 		}
@@ -1808,7 +1808,7 @@ void apple2e_state::do_io(int offset)
 	if ((offset & 0xf8) == 0x58)
 	{
 		// IIc-specific switches
-		if ((m_isiic || m_isace500) && (!m_ioudis))
+		if ((m_isiic || m_isace500) && !m_ioudis)
 		{
 			switch (offset)
 			{
@@ -1902,7 +1902,7 @@ void apple2e_state::do_io(int offset)
 			lcrom_update();
 
 			// MIG is reset when ROMSWITCH turns off
-			if ((m_isiicplus) && !(m_romswitch))
+			if (m_isiicplus && !m_romswitch)
 			{
 				m_migpage = 0;
 				m_intdrive = false;
@@ -2011,7 +2011,7 @@ void apple2e_state::do_io(int offset)
 			[[fallthrough]];
 		case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
-			if ((m_isiic) || (m_isace500))
+			if (m_isiic || m_isace500)
 			{
 				lower_irq(IRQ_VBL);
 			}
@@ -2510,7 +2510,7 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x5a:  // Zip accelerator unlock
-			if ((m_isiicplus) || (m_sysconfig.read_safe(0) & 0x10))
+			if (m_isiicplus || (m_sysconfig.read_safe(0) & 0x10))
 			{
 				if (data == 0x5a)
 				{
@@ -2618,7 +2618,7 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 				m_aux_bank_ptr = m_auxslotdevice->get_auxbank_ptr();
 			}
 
-			if ((m_isiic) || (m_isace500))  // CLRIOUDIS does not exist on IIe
+			if (m_isiic || m_isace500)  // CLRIOUDIS does not exist on IIe
 			{
 				switch (offset)
 				{
@@ -2847,7 +2847,7 @@ u8 apple2e_state::c080_r(offs_t offset)
 		{
 			accel_slot(slot);
 
-			if ((m_isiicplus) && (slot == 6))
+			if (m_isiicplus && (slot == 6))
 			{
 				return m_iwm->read(offset % 0x10);
 			}
@@ -2858,7 +2858,7 @@ u8 apple2e_state::c080_r(offs_t offset)
 			}
 			else
 			{
-				if ((m_iscec) && (slot == 3))
+				if (m_iscec && (slot == 3))
 				{
 					return m_cec_bank;
 				}
@@ -2884,7 +2884,7 @@ void apple2e_state::c080_w(offs_t offset, u8 data)
 	{
 		accel_slot(slot);
 
-		if ((m_isiicplus) && (slot == 6))
+		if (m_isiicplus && (slot == 6))
 		{
 			m_iwm->write(offset % 0x10, data);
 			return;
@@ -2896,7 +2896,7 @@ void apple2e_state::c080_w(offs_t offset, u8 data)
 		}
 		else
 		{
-			if ((m_iscec) && (!m_iscecm) && (slot == 3))
+			if (m_iscec && !m_iscecm && (slot == 3))
 			{
 				if (data != m_cec_bank)
 				{
@@ -2942,7 +2942,7 @@ void apple2e_state::write_slot_rom(int slotbias, int offset, u8 data)
 	const int slotnum = ((offset>>8) & 0xf) + slotbias;
 
 	// write addr C0B0 change to addr C600
-	if ((m_iscec) && (m_iscecm) && (slotnum == 6) && (!m_intcxrom))
+	if (m_iscec && m_iscecm && (slotnum == 6) && !m_intcxrom)
 	{
 		if (data != m_cec_bank)
 		{
@@ -2979,7 +2979,7 @@ u8 apple2e_state::read_int_rom(int slotbias, int offset)
 	const int slot = ((slotbias + offset) >> 8) & 0xf;
 
 	// slot 4 can't remap because the IRQ handler is there
-	if ((m_isace500) && (m_ace_cnxx_bank) && (slot != 4))
+	if (m_isace500 && m_ace_cnxx_bank && (slot != 4))
 	{
 		slotbias += 0x4000;
 		// even numbered slots come from $6x00 in this mode?
@@ -3066,7 +3066,7 @@ u8 apple2e_state::c400_int_bank_r(offs_t offset)
 void apple2e_state::c400_w(offs_t offset, u8 data)
 {
 	laser_slot(4 + ((offset >> 8) & 0x7));
-	if ((m_isiic) && (offset < 0x100))
+	if (m_isiic && (offset < 0x100))
 	{
 		m_mockingboard4c = true;
 	}
@@ -3079,7 +3079,7 @@ u8 apple2e_state::c400_cec_bank_r(offs_t offset)  { return m_rom_ptr[0x4400 + of
 
 void apple2e_state::c400_cec_w(offs_t offset, u8 data)
 {
-	if ((m_iscecm))
+	if (m_iscecm)
 	{
 		write_slot_rom(4, offset, data);
 	}
@@ -3197,7 +3197,7 @@ u8 apple2e_state::c800_int_r(offs_t offset)
 
 u8 apple2e_state::c800_b2_int_r(offs_t offset)
 {
-	if ((m_isiicplus) && (m_romswitch) && (((offset >= 0x400) && (offset < 0x500)) || ((offset >= 0x600) && (offset < 0x700))))
+	if (m_isiicplus && m_romswitch && (((offset >= 0x400) && (offset < 0x500)) || ((offset >= 0x600) && (offset < 0x700))))
 	{
 		return mig_r(offset-0x400);
 	}
@@ -3214,7 +3214,7 @@ u8 apple2e_state::c800_b2_int_r(offs_t offset)
 
 void apple2e_state::c800_w(offs_t offset, u8 data)
 {
-	if ((m_isace500) && (offset == 0x7ff))
+	if (m_isace500 && (offset == 0x7ff))
 	{
 		// TODO: use a version of our conventional CnXX handling for this
 		u8 page = (m_maincpu->pc() >> 8) & 0xf;
@@ -3235,7 +3235,7 @@ void apple2e_state::c800_w(offs_t offset, u8 data)
 		return;
 	}
 
-	if ((m_isiicplus) && (m_romswitch) && (((offset >= 0x400) && (offset < 0x500)) || ((offset >= 0x600) && (offset < 0x700))))
+	if (m_isiicplus && m_romswitch && (((offset >= 0x400) && (offset < 0x500)) || ((offset >= 0x600) && (offset < 0x700))))
 	{
 		mig_w(offset-0x400, data);
 		return;

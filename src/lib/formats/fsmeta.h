@@ -38,7 +38,12 @@ enum class meta_name {
 	attributes,
 	oem_name,
 	disk_id,
-	max = disk_id
+	protect,
+	user,
+	system,
+	permissions,
+	max_blocks,
+	max = max_blocks
 };
 
 enum class meta_type {

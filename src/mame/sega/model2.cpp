@@ -2470,10 +2470,11 @@ void model2_state::model2snd_ctrl(u16 data)
 	}
 }
 
+// We assume using the same waitstate weights as Saturn, applied to SCSP area only
 void model2_state::model2_snd(address_map &map)
 {
-	map(0x000000, 0x07ffff).ram().share("soundram");
-	map(0x100000, 0x100fff).rw(m_scsp, FUNC(scsp_device::read), FUNC(scsp_device::write));
+	map(0x000000, 0x07ffff).before_delay(NAME([](offs_t) { return 1; })).ram().share("soundram");
+	map(0x100000, 0x100fff).before_delay(NAME([](offs_t) { return 1; })).rw(m_scsp, FUNC(scsp_device::read), FUNC(scsp_device::write));
 	map(0x400000, 0x400001).w(FUNC(model2_state::model2snd_ctrl));
 	map(0x600000, 0x67ffff).rom().region("audiocpu", 0);
 	map(0x800000, 0x9fffff).rom().region("samples", 0);

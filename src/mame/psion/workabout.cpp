@@ -4,12 +4,16 @@
 
     Psion Workabout
 
+    TODO:
+    - determine EEPROM factory settings.
+
 ******************************************************************************/
 
 #include "emu.h"
 
 //#include "bus/psion/exp/slot.h"
 #include "bus/psion/sibo/slot.h"
+#include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "machine/psion_asic9.h"
 #include "machine/psion_ssd.h"
@@ -38,6 +42,7 @@ public:
 		, m_ssd(*this, "ssd%u", 1U)
 		, m_sibo(*this, "sibo")
 		//, m_exp(*this, "exp")
+		, m_eeprom(*this, "eeprom")
 	{ }
 
 	void workabout(machine_config &config);
@@ -48,9 +53,14 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 private:
+	void palette_init(palette_device &palette) const ATTR_COLD;
+
+	uint16_t kbd_r();
+	uint16_t portab_r();
+	void portab_w(uint16_t data);
+
 	required_device<psion_asic9_device> m_asic9;
 	required_device<ram_device> m_ram;
 	required_device<nvram_device> m_nvram;
@@ -60,10 +70,7 @@ private:
 	required_device_array<psion_ssd_device, 2> m_ssd;
 	required_device<psion_sibo_slot_device> m_sibo;
 	//required_device<psion_exp_slot_device> m_exp;
-
-	void palette_init(palette_device &palette);
-
-	uint16_t kbd_r();
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 
 	uint8_t m_key_col = 0;
 };
@@ -72,14 +79,12 @@ private:
 void workabout_state::machine_start()
 {
 	m_nvram->set_base(m_ram->pointer(), m_ram->size());
+
+	save_item(NAME(m_key_col));
 }
 
-void workabout_state::machine_reset()
-{
-}
 
-
-static INPUT_PORTS_START( workabout )
+static INPUT_PORTS_START( psionwa )
 	PORT_START("COL0")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)          PORT_CHAR('s')  PORT_CHAR('S')
 	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)          PORT_CHAR('u')  PORT_CHAR('U')
@@ -155,11 +160,20 @@ static INPUT_PORTS_START( workabout )
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(' ')
 	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)          PORT_CHAR('p')  PORT_CHAR('P')
 	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)          PORT_CHAR('l')  PORT_CHAR('L')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.')  PORT_CHAR(',')
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.')  PORT_CHAR(',')  PORT_CHAR('>')
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)          PORT_CHAR('5')  PORT_CHAR('%')  PORT_CHAR('{')
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))                  PORT_NAME(u8"\u2190") // U+2190 = ←
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                                                               PORT_NAME("Backlight")
 	PORT_BIT(0x180, IP_ACTIVE_HIGH, IPT_UNUSED)
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( psionwamx )
+	PORT_INCLUDE(psionwa)
+
+	PORT_MODIFY("COL0")
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC)        PORT_CHAR(UCHAR_MAMEKEY(ESC))                   PORT_NAME("On/Esc")          PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(workabout_state::wakeup), 0)
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 
@@ -183,7 +197,25 @@ uint16_t workabout_state::kbd_r()
 }
 
 
-void workabout_state::palette_init(palette_device &palette)
+uint16_t workabout_state::portab_r()
+{
+	uint16_t data = 0x00;
+
+	data |= kbd_r() & 0xff;
+	data |= m_eeprom->do_read() << 10;
+
+	return data;
+}
+
+void workabout_state::portab_w(uint16_t data)
+{
+	m_eeprom->cs_write(BIT(data, 11));
+	m_eeprom->di_write(BIT(data, 9));
+	m_eeprom->clk_write(BIT(data, 8));
+}
+
+
+void workabout_state::palette_init(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(190, 220, 190));
 
@@ -260,7 +292,8 @@ void workabout_state::psionwamx(machine_config &config)
 	PSION_ASIC9MX(config.replace(), m_asic9, 3.6864_MHz_XTAL * 15 / 2); // V30MX
 	m_asic9->set_screen("screen");
 	m_asic9->set_ram_rom("ram", "rom");
-	m_asic9->port_ab_r().set(FUNC(workabout_state::kbd_r));
+	m_asic9->port_ab_r().set(FUNC(workabout_state::portab_r));
+	m_asic9->port_ab_w().set(FUNC(workabout_state::portab_w));
 	m_asic9->buz_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 	m_asic9->col_cb().set([this](uint8_t data) { m_key_col = data; });
 	m_asic9->data_r<0>().set(m_ssd[0], FUNC(psion_ssd_device::data_r));      // SSD Pack 1
@@ -275,6 +308,8 @@ void workabout_state::psionwamx(machine_config &config)
 	m_asic9->data_w<4>().set(m_sibo, FUNC(psion_sibo_slot_device::data_w));
 
 	m_ram->set_default_size("2M");
+
+	EEPROM_93C46_16BIT(config, m_eeprom); // 93S46
 }
 
 
@@ -293,11 +328,13 @@ ROM_START(psionwamx)
 	ROM_REGION16_LE(0x200000, "rom", 0)
 	ROM_SYSTEM_BIOS(0, "720f", "V7.20F 230798")
 	ROMX_LOAD("w2mx_v7.20f.bin", 0x00000, 0x200000, CRC(63734683) SHA1(9d8aa1e45f52e7fcb52d6e81ac47f60d1104c35d), ROM_BIOS(0))
+
+	ROM_REGION16_LE(0x80, "eeprom", ROMREGION_ERASE00)
 ROM_END
 
 } // anonymous namespace
 
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY   FULLNAME        FLAGS
-COMP( 1995, psionwa,   0,      0,      psionwa,   workabout, workabout_state, empty_init, "Psion",  "Workabout",    MACHINE_SUPPORTS_SAVE )
-COMP( 1998, psionwamx, 0,      0,      psionwamx, workabout, workabout_state, empty_init, "Psion",  "Workabout mx", MACHINE_SUPPORTS_SAVE )
+COMP( 1995, psionwa,   0,      0,      psionwa,   psionwa,   workabout_state, empty_init, "Psion",  "Workabout",    MACHINE_SUPPORTS_SAVE )
+COMP( 1998, psionwamx, 0,      0,      psionwamx, psionwamx, workabout_state, empty_init, "Psion",  "Workabout mx", MACHINE_SUPPORTS_SAVE )

@@ -39,8 +39,6 @@ TODO:
 
 #include "cpu/i8085/i8085.h"
 
-#include "formats/vector06_dsk.h"
-
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
 
@@ -56,6 +54,9 @@ TODO:
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
+#include "formats/vector06_dsk.h"
+
 
 namespace {
 

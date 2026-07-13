@@ -1029,10 +1029,11 @@ void stv_state::stvcd_mem(address_map &map)
 	map(0x05800000, 0x0589ffff).m("saturn_cd_hle", FUNC(saturn_cd_hle_device::amap));
 }
 
+// same as base saturn
 void stv_state::sound_mem(address_map &map)
 {
-	map(0x000000, 0x0fffff).ram().share("sound_ram");
-	map(0x100000, 0x100fff).rw("scsp", FUNC(scsp_device::read), FUNC(scsp_device::write));
+	map(0x000000, 0x0fffff).before_delay(NAME([](offs_t) { return 1; })).ram().share("sound_ram");
+	map(0x100000, 0x100fff).before_delay(NAME([](offs_t) { return 1; })).rw("scsp", FUNC(scsp_device::read), FUNC(scsp_device::write));
 }
 
 void stv_state::scsp_mem(address_map &map)

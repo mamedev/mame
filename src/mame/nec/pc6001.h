@@ -6,6 +6,9 @@
 #pragma once
 
 #include "bus/centronics/ctronics.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+#include "bus/msx/ctrl/ctrl.h"
 #include "bus/nec_fdd/pc80s31k.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
@@ -22,9 +25,7 @@
 #include "sound/ymopn.h"
 #include "video/mc6847.h"
 
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
-#include "bus/msx/ctrl/ctrl.h"
+#include "pc6001_kbd.h"
 
 #include "emupal.h"
 #include "speaker.h"
@@ -47,7 +48,6 @@ public:
 		, m_joy(*this, "joy%u", 1U)
 		, m_joymux(*this, "joymux")
 		, m_cassette(*this, "cassette")
-		//, m_cas_hack(*this, "cas_hack")
 		, m_cart(*this, "cartslot")
 		, m_ay(*this, "aysnd")
 		, m_centronics(*this, "centronics")
@@ -55,9 +55,7 @@ public:
 		, m_region_maincpu(*this, "maincpu")
 		, m_region_gfx1(*this, "gfx1")
 		, m_io_mode4_dsw(*this, "MODE4_DSW")
-		, m_io_keys(*this, "key%u", 1U)
-		, m_io_fn_keys(*this, "key_fn")
-		, m_io_key_modifiers(*this, "key_modifiers")
+		, m_kbd(*this, "kbd")
 		, m_cart_bank(*this, "cart_bank")
 		, m_palette(*this, "palette")
 	{ }
@@ -72,9 +70,7 @@ public:
 
 //  INTERRUPT_GEN_MEMBER(vrtc_irq);
 	TIMER_CALLBACK_MEMBER(audio_callback);
-	TIMER_CALLBACK_MEMBER(sub_trig_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 
 	uint8_t ppi_porta_r();
 	void ppi_porta_w(uint8_t data);
@@ -98,7 +94,6 @@ protected:
 	required_device_array<msx_general_purpose_port_device, 2> m_joy;
 	required_device<ls157_x2_device> m_joymux;
 	optional_device<cassette_image_device> m_cassette;
-//	optional_device<generic_slot_device> m_cas_hack;
 	required_device<generic_slot_device> m_cart;
 	optional_device<ay8910_device> m_ay;
 	required_device<centronics_device> m_centronics;
@@ -106,9 +101,7 @@ protected:
 	optional_memory_region m_region_maincpu;
 	required_memory_region m_region_gfx1;
 	required_ioport m_io_mode4_dsw;
-	required_ioport_array<3> m_io_keys;
-	required_ioport m_io_fn_keys;
-	required_ioport m_io_key_modifiers;
+	required_device<pc6001_kbd_device> m_kbd;
 	optional_device<address_map_bank_device> m_cart_bank;
 	required_device<palette_device> m_palette;
 
@@ -121,7 +114,6 @@ protected:
 
 	void default_cartridge_reset();
 //	void default_cassette_hack_reset();
-	void default_keyboard_hle_reset();
 	void irq_reset(u8 timer_default_setting);
 
 	virtual void video_start() override ATTR_COLD;
@@ -167,14 +159,7 @@ protected:
 	void cart_map(address_map &map);
 
 private:
-	uint32_t m_old_key1 = 0;
-	uint32_t m_old_key2 = 0;
-	uint32_t m_old_key3 = 0;
-	u8 m_old_key_fn;
-
 	uint8_t m_joystick_out = 0xff;
-
-	emu_timer *m_sub_trig_timer = nullptr;
 
 // IRQ model
 protected:

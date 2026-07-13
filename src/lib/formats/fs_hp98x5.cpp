@@ -1450,10 +1450,10 @@ std::vector<meta_description> hp9825_image::file_meta_description() const
 {
 	std::vector<meta_description> res;
 
-	res.emplace_back(meta_description(meta_name::name, "Empty", false, [](const meta_value &m) { return m.as_string().size() <= 6; }, "File name, up to 6 characters"));
-	res.emplace_back(meta_description(meta_name::length, 0, true, nullptr, "File size"));
-	res.emplace_back(meta_description(meta_name::file_type, "", true, nullptr, "File type"));
-	res.emplace_back(meta_description(meta_name::attributes, "", true, nullptr, "File attributes"));
+	res.emplace_back(meta_name::name, "Empty", false, [](const meta_value &m) { return m.as_string().size() <= 6; }, "File name, up to 6 characters");
+	res.emplace_back(meta_name::length, 0, true, nullptr, "File size");
+	res.emplace_back(meta_name::file_type, "", true, nullptr, "File type");
+	res.emplace_back(meta_name::attributes, "", true, nullptr, "File attributes");
 
 	return res;
 }
@@ -1512,9 +1512,9 @@ std::vector<meta_description> hp9831_image::file_meta_description() const
 {
 	std::vector<meta_description> res;
 
-	res.emplace_back(meta_description(meta_name::name, "Empty", false, [](const meta_value &m) { return m.as_string().size() <= 6; }, "File name, up to 6 characters"));
-	res.emplace_back(meta_description(meta_name::length, 0, true, nullptr, "File size"));
-	res.emplace_back(meta_description(meta_name::file_type, "", true, nullptr, "File type"));
+	res.emplace_back(meta_name::name, "Empty", false, [](const meta_value &m) { return m.as_string().size() <= 6; }, "File name, up to 6 characters");
+	res.emplace_back(meta_name::length, 0, true, nullptr, "File size");
+	res.emplace_back(meta_name::file_type, "", true, nullptr, "File type");
 
 	return res;
 }
@@ -1574,10 +1574,10 @@ std::vector<meta_description> hp9845_image::file_meta_description() const
 {
 	std::vector<meta_description> res;
 
-	res.emplace_back(meta_description(meta_name::name, "Empty", false, [](const meta_value &m) { return m.as_string().size() <= 6; }, "File name, up to 6 characters"));
-	res.emplace_back(meta_description(meta_name::length, 0, true, nullptr, "File size"));
-	res.emplace_back(meta_description(meta_name::file_type, "", true, nullptr, "File type"));
-	res.emplace_back(meta_description(meta_name::attributes, "", true, nullptr, "File attributes"));
+	res.emplace_back(meta_name::name, "Empty", false, [](const meta_value &m) { return m.as_string().size() <= 6; }, "File name, up to 6 characters");
+	res.emplace_back(meta_name::length, 0, true, nullptr, "File size");
+	res.emplace_back(meta_name::file_type, "", true, nullptr, "File type");
+	res.emplace_back(meta_name::attributes, "", true, nullptr, "File attributes");
 
 	return res;
 }

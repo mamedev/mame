@@ -21013,6 +21013,9 @@ ultim809
 @source:homebrew/uzebox.cpp
 uzebox
 
+@source:homebrew/we816.cpp
+we816
+
 @source:homebrew/z80clock.cpp
 z80clock
 
@@ -39834,6 +39837,7 @@ psion3a2_it
 psion3a2_ru
 psion3a2_us
 psion3c
+psion3c_de
 psion3mx
 psion3mx_fr
 psion3mx_nl
@@ -39847,6 +39851,7 @@ psion5mx
 psion5mx_fr
 psion5mxp
 psion5mxp_de
+psion618c
 revo
 revo_de
 revo_fr
@@ -44857,6 +44862,9 @@ t650c
 @source:sony/dfs500.cpp
 dfs500
 
+@source:sony/dpsd7.cpp
+dpsd7
+
 @source:sony/dpsv55.cpp
 dpsv55
 
@@ -47508,6 +47516,15 @@ tvbg3c
 tvbg6a
 tvbg6b
 
+@source:tvgames/bk139in1.cpp
+bk139in1
+dgun3944
+lxcymls
+lxcympp
+lxcymsm
+lxcyrace
+starbuck
+
 @source:tvgames/elan_eu3a05.cpp
 airblsjs
 bratzra
@@ -47555,7 +47572,10 @@ tomyeggb
 
 @source:tvgames/generalplus_gpl16250_mobigo.cpp
 mobigo
+mobigof
 mobigos
+
+@source:tvgames/generalplus_gpl16250_mobigo2.cpp
 mobigo2
 
 @source:tvgames/generalplus_gpl16250_nand.cpp
@@ -47622,19 +47642,12 @@ wrlshunt
 anpanbd
 anpaneng
 anpanm15
-bk139in1
 bkrankp
-dgun3944
 jspodred
-lxcymls
-lxcympp
-lxcymsm
-lxcyrace
 pokegac2
 pokegac2y
 pokegach
 prailpls
-starbuck
 vmastspi
 wildking
 

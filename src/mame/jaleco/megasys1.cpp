@@ -2056,17 +2056,12 @@ void megasys1_state::system_B(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_sound_map);
 }
 
-void megasys1_bc_iosim_state::system_B_iosim(machine_config &config)
-{
-	system_B(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_bc_iosim_state::megasys1B_iosim_map);
-}
-
 void megasys1_bc_iomcu_state::system_B_iomcu(machine_config &config)
 {
 	system_B(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_bc_iomcu_state::megasys1B_iomcu_map);
+
 	m_scantimer->set_callback(FUNC(megasys1_bc_iomcu_state::megasys1BC_iomcu_scanline));
 
 	TMP91640(config, m_iomcu, SYS_B_CPU_CLOCK); // Toshiba TMP91640, with 16Kbyte internal ROM, 512bytes internal RAM
@@ -2081,9 +2076,9 @@ void megasys1_state::system_B_monkelf(machine_config &config)
 	system_base(config);
 
 	/* basic machine hardware */
-
 	m_maincpu->set_clock(SYS_B_CPU_CLOCK); /* 8MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_monkelf_map);
+
 	m_scantimer->set_callback(FUNC(megasys1_state::megasys1Bbl_scanline));
 
 	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_sound_map);
@@ -2094,6 +2089,7 @@ void megasys1_state::system_Bbl(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12_MHz_XTAL / 2); // edfbl has lower clock, verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_edfbl_map);
+
 	TIMER(config, m_scantimer).configure_scanline(FUNC(megasys1_state::megasys1Bbl_scanline), m_screen, 0, 1);
 
 	/* video hardware */
@@ -2128,9 +2124,10 @@ void megasys1_state::system_Bbl(machine_config &config)
 
 void megasys1_bc_iosim_state::system_B_hayaosi1(machine_config &config)
 {
-	system_B_iosim(config);
+	system_B(config);
 
 	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_bc_iosim_state::megasys1B_iosim_map);
 
 	OKIM6295(config.replace(), m_oki[0], 2000000, okim6295_device::PIN7_HIGH); /* correct speed, but unknown OSC + divider combo */
 	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 0.30, 0);

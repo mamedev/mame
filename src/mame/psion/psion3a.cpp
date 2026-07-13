@@ -377,12 +377,12 @@ static INPUT_PORTS_START( psion3c )
 INPUT_PORTS_END
 
 
-//static INPUT_PORTS_START( psion3c_de )
-//  PORT_INCLUDE(psion3a_de)
-//
-//  PORT_MODIFY("COL2")
-//  PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F9)         PORT_CHAR(UCHAR_MAMEKEY(F9))                    PORT_NAME("Notiz")           PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psion3a_state::wakeup), 0)
-//INPUT_PORTS_END
+static INPUT_PORTS_START( psion3c_de )
+	PORT_INCLUDE(psion3a_de)
+
+	PORT_MODIFY("COL2")
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F9)         PORT_CHAR(UCHAR_MAMEKEY(F9))                    PORT_NAME("Notiz")           PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psion3a_state::wakeup), 0)
+INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( psion3c_fr )
@@ -437,19 +437,13 @@ void psion3a_base_state::portcd_w(uint16_t data)
 {
 	// TODO: LCD backlight BIT(data, 0) (Series 3mx only)
 
-	// TODO: MSC1192 speaker amplifier, can be put into standby to mute audio (buzzer maybe Series 3mx only)
+	// TODO: MSC1192 speaker amplifier, can be put into standby to mute audio.
 	static const float codec_volume[4] = { 1.0f, 0.75f, 0.5f, 0.25f };
 
 	if (BIT(data, 3)) // AMPEN
-	{
-		//m_buzzer->set_output_gain(ALL_OUTPUTS, 1.0);
 		m_codec->set_output_gain(ALL_OUTPUTS, codec_volume[BIT(data, 6, 2)]); // VOL
-	}
 	else
-	{
-		//m_buzzer->set_output_gain(ALL_OUTPUTS, 0.0);
 		m_codec->set_output_gain(ALL_OUTPUTS, 0.0);
-	}
 
 	// TODO: LCD contrast BIT(data, 8, 4)
 
@@ -653,6 +647,12 @@ ROM_START(psion3c)
 	ROMX_LOAD("oak_v5.20f_eng.bin", 0x000000, 0x200000, CRC(d8e672ca) SHA1(23e7570ddbecbfd50953ce6a6b7ead7128814402), ROM_BIOS(0))
 ROM_END
 
+ROM_START(psion3c_de)
+	ROM_REGION16_LE(0x200000, "rom", 0)
+	ROM_SYSTEM_BIOS(0, "523f", "V5.23F/DEU")
+	ROMX_LOAD("oak_v5.23f_deu.bin", 0x000000, 0x200000, CRC(3b53f7e8) SHA1(0fb0a0a2c713d007b564b9ea9213cff95765495d), ROM_BIOS(0))
+ROM_END
+
 ROM_START(psion3mx)
 	// Known versions: English, Dutch, French, German, Italian
 	ROM_REGION16_LE(0x200000, "rom", 0)
@@ -690,6 +690,7 @@ COMP( 1995, psion3a2_it,  psion3a,  0,      psion3a2,  psion3a_it,  psion3a_stat
 COMP( 1995, psion3a2_de,  psion3a,  0,      psion3a2,  psion3a_de,  psion3a_state,  empty_init,  "Psion",            "Series 3a (2M) (German)",  MACHINE_SUPPORTS_SAVE )
 COMP( 1997, psion3a2_ru,  psion3a,  0,      psion3a2,  psion3a,     psion3a_state,  empty_init,  "Psion",            "Series 3a (2M) (Russian)", MACHINE_SUPPORTS_SAVE )
 COMP( 1996, psion3c,      0,        0,      psion3c,   psion3c,     psion3c_state,  empty_init,  "Psion",            "Series 3c",                MACHINE_SUPPORTS_SAVE )
+COMP( 1996, psion3c_de,   psion3c,  0,      psion3c,   psion3c_de,  psion3c_state,  empty_init,  "Psion",            "Series 3c (German)",       MACHINE_SUPPORTS_SAVE )
 COMP( 1998, psion3mx,     0,        0,      psion3mx,  psion3c,     psion3mx_state, empty_init,  "Psion",            "Series 3mx",               MACHINE_SUPPORTS_SAVE )
 COMP( 1998, psion3mx_nl,  psion3mx, 0,      psion3mx,  psion3c,     psion3mx_state, empty_init,  "Psion",            "Series 3mx (Dutch)",       MACHINE_SUPPORTS_SAVE )
 COMP( 1998, psion3mx_fr,  psion3mx, 0,      psion3mx,  psion3c_fr,  psion3mx_state, empty_init,  "Psion",            "Series 3mx (French)",      MACHINE_SUPPORTS_SAVE )
