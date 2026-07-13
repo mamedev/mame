@@ -193,9 +193,6 @@ protected:
 		float translation[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 		glm::vec3 light;
 		lightparam_t lightparams[256];
-		bool lightparam_set[256]{};
-		int light_bank = 0;
-		bool lightparams_hi_seen = false;
 	};
 
 	void model1_io(address_map &map) ATTR_COLD;
