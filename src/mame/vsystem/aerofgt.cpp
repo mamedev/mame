@@ -4,6 +4,10 @@
 
     Aero Fighters (newer hardware type)
 
+    TODO:
+    - Verify sprite delay from real hardware
+        - currently assumed to 1 frame, or DMA'd manually?
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -16,6 +20,7 @@
 #include "machine/gen_latch.h"
 #include "machine/mb3773.h"
 #include "sound/ymopn.h"
+#include "video/bufsprite.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -33,12 +38,12 @@ public:
 		, m_audiocpu(*this, "audiocpu")
 		, m_soundlatch(*this, "soundlatch")
 		, m_spr(*this, "vsystem_spr")
+		, m_spriteram(*this, "spriteram")
+		, m_sprlookupram(*this, "sprlookupram")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_vram(*this, "vram.%u", 0)
 		, m_rasterram(*this, "rasterram")
-		, m_sprlookupram(*this, "sprlookupram")
-		, m_spriteram(*this, "spriteram")
 		, m_soundbank(*this, "soundbank")
 	{ }
 
@@ -71,14 +76,14 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<vsystem_spr_device> m_spr;
+	required_device<buffered_spriteram16_device> m_spriteram;
+	required_device<buffered_spriteram16_device> m_sprlookupram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 	// memory pointers
 	required_shared_ptr_array<uint16_t, 2> m_vram;
 	required_shared_ptr<uint16_t> m_rasterram;
-	required_shared_ptr<uint16_t> m_sprlookupram;
-	required_shared_ptr<uint16_t> m_spriteram;
 
 	required_memory_bank m_soundbank;
 
@@ -130,7 +135,7 @@ void aerofgt_state::video_start()
 
 uint32_t aerofgt_state::tile_callback(uint32_t code)
 {
-	return m_sprlookupram[code & 0x7fff];
+	return m_sprlookupram->buffer()[code & 0x7fff];
 }
 
 uint32_t aerofgt_state::pri_callback(uint32_t color)
@@ -182,7 +187,7 @@ uint32_t aerofgt_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 1);
 	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 2);
 
-	m_spr->draw_sprites(m_spriteram, m_spriteram.bytes(), screen, bitmap, cliprect);
+	m_spr->draw_sprites(m_spriteram->buffer(), m_spriteram->bytes(), screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -227,10 +232,10 @@ void aerofgt_state::main_map(address_map &map)
 	map(0x1b0000, 0x1b07ff).ram().share(m_rasterram);   // used only for the scroll registers
 	map(0x1b0800, 0x1b0801).ram(); // tracks watchdog state
 	map(0x1b0ff0, 0x1b0fff).ram(); // stack area during boot
-	map(0x1b2000, 0x1b3fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
-	map(0x1b4000, 0x1b5fff).ram().w(FUNC(aerofgt_state::vram_w<1>)).share("vram.1");
-	map(0x1c0000, 0x1c7fff).ram().share(m_sprlookupram);
-	map(0x1d0000, 0x1d1fff).ram().share(m_spriteram);
+	map(0x1b2000, 0x1b3fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share(m_vram[0]);
+	map(0x1b4000, 0x1b5fff).ram().w(FUNC(aerofgt_state::vram_w<1>)).share(m_vram[1]);
+	map(0x1c0000, 0x1c7fff).ram().share("sprlookupram");
+	map(0x1d0000, 0x1d1fff).ram().share("spriteram");
 	map(0xfef000, 0xffefff).ram(); // work RAM
 	map(0xffff80, 0xffff87).w(FUNC(aerofgt_state::gfxbank_w));
 	map(0xffff88, 0xffff89).w(FUNC(aerofgt_state::scrolly_w<0>)); // + something else in the top byte
@@ -399,6 +404,8 @@ void aerofgt_state::aerofgt(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
 	screen.set_screen_update(FUNC(aerofgt_state::screen_update));
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	screen.screen_vblank().append(m_sprlookupram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aerofgt);
@@ -407,6 +414,9 @@ void aerofgt_state::aerofgt(machine_config &config)
 	VSYSTEM_SPR(config, m_spr, m_palette, gfx_aerofgt_spr);
 	m_spr->set_tile_indirect_cb(FUNC(aerofgt_state::tile_callback));
 	m_spr->set_pri_cb(FUNC(aerofgt_state::pri_callback));
+
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+	BUFFERED_SPRITERAM16(config, m_sprlookupram);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
