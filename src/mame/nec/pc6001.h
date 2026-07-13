@@ -232,8 +232,6 @@ protected:
 	void pc6001mk2_map(address_map &map) ATTR_COLD;
 	void pc6001mk2_io(address_map &map) ATTR_COLD;
 
-	uint8_t m_bgcol_bank = 0;
-
 	optional_device_array<address_map_bank_device, 4> m_mk2_bank;
 	memory_view m_gfx_view;
 
@@ -250,7 +248,7 @@ protected:
 
 	virtual u8 vrtc_ack() override;
 
-	template <unsigned N> u8 tv_kanji_r(offs_t offset);
+	template <unsigned TV_BASE> u8 tv_kanji_r(offs_t offset);
 	template <unsigned N> u8 voice_kanji_r(offs_t offset);
 
 	void mk2_tv_map(address_map &map);
@@ -268,6 +266,7 @@ private:
 	uint32_t m_cgrom_bank_addr = 0;
 	uint8_t m_exgfx_bitmap_mode = 0;
 	uint8_t m_exgfx_2bpp_mode = 0;
+	uint8_t m_bgcol_bank = 0;
 
 	void vram_bank_change(uint8_t vram_bank);
 };

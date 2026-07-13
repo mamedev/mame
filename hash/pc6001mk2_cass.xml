@@ -37,7 +37,7 @@ If usage specifies MONITOR:
 		<year>1984?</year>
 		<publisher>T&amp;E Soft</publisher>
 		<notes><![CDATA[
-Requires [keyboard] key repeat
+Requires [keyboard] key repeat (verify)
 ]]></notes>
 		<info name="usage" value="Mode 5, Page 3, BASIC"/>
 		<info name="alt_title" value="3Dゴルフシミュレーションスーパーバージョン"/>
@@ -114,7 +114,7 @@ Requires user [tape] saving, prompts user after character creation
 	<software name="cannonbl" supported="partial">
 		<description>Cannon Ball</description>
 		<year>1983</year>
-		<publisher>Hudson Soft</publisher>
+		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="usage" value="Mode 5, Page 4, MONITOR" />
 		<info name="alt_title" value="キャノンボール"/>
 		<part name="snap" interface="pc6001_snap">
@@ -160,10 +160,13 @@ Requires user [tape] saving, prompts user after character creation
 		</part>
 	</software>
 
-	<software name="chackpop" supported="partial">
+	<software name="chackpop" supported="no">
 		<description>Chack 'n Pop</description>
 		<year>1984</year>
 		<publisher>Nidecom Carry</publisher>
+		<notes><![CDATA[
+[timing] runs too fast
+]]></notes>
 		<info name="usage" value="Mode 5, Page 1, BASIC" />
 		<info name="alt_title" value="ちゃっくんぽっぷ"/>
 		<part name="snap" interface="pc6001_snap">
@@ -203,7 +206,7 @@ Requires user [tape] saving, prompts user after character creation
 	<software name="dezeni" supported="no">
 		<description>Dezeni Land</description>
 		<year>198?</year>
-		<publisher>Hudson Soft</publisher>
+		<publisher>ハドソン (Hudson Soft)</publisher>
 		<notes><![CDATA[
 Unsupported [tape] saving, other chapters requires an user tape
 Requires better [keyboard] handling
@@ -242,11 +245,15 @@ Requires better [keyboard] handling
 		</part>
 	</software>
 
-	<software name="digdug" supported="partial">
+	<software name="digdug" supported="no">
 		<description>Dig Dug</description>
-		<year>19??</year>
-		<publisher>Namco</publisher>
+		<year>198?</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<notes><![CDATA[
+[timing] Runs too fast
+]]></notes>
 		<info name="usage" value="Mode 5, Page 1, BASIC" />
+		<info name="developer" value="T. Matsushima"/>
 		<info name="alt_title" value="ディグダグ"/>
 		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="29546">
@@ -255,12 +262,15 @@ Requires better [keyboard] handling
 		</part>
 	</software>
 
-	<software name="doordoor" supported="partial">
+	<software name="doordoor" supported="no">
 		<description>Door Door Mk. II</description>
 		<year>1984</year>
 		<publisher>Enix</publisher>
+		<notes><![CDATA[
+[timing] Runs too fast
+]]></notes>
 		<info name="usage" value="Mode 5, Page 3, BASIC" />
-		<info name="alt_title" value="ドアドアmk2"/>
+		<info name="alt_title" value="ドアドアmkII"/>
 		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="71593">
 				<rom name="door door.p6" size="71593" crc="567f4190" sha1="4c82a9e4b939962a1fc703a5611f59b3f18118bb"/>
@@ -285,7 +295,7 @@ Requires better [keyboard] handling
 	<software name="flappy" supported="partial">
 		<description>Flappy</description>
 		<year>1984</year>
-		<publisher>dB-SOFT</publisher>
+		<publisher>デービーソフト (dB-Soft)</publisher>
 		<info name="usage" value="Mode 5, Page 2, BASIC" />
 		<info name="alt_title" value="フラッピー"/>
 		<part name="snap" interface="pc6001_snap">
@@ -298,7 +308,7 @@ Requires better [keyboard] handling
 	<software name="grobda" supported="partial">
 		<description>Grobda</description>
 		<year>198?</year>
-		<publisher>Dempa</publisher>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<notes><![CDATA[
 [timing] According to HW refs, when "get ready" speech plays, screen should be full white but instead it's black
 ]]></notes>
@@ -314,8 +324,11 @@ Requires better [keyboard] handling
 
 	<software name="hisya" supported="partial">
 		<description>Hisya</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>Carry Lab</publisher>
+		<notes><![CDATA[
+Optional [tape] saving and loading
+]]></notes>
 		<info name="usage" value="Mode 5, Page 1, BASIC" />
 		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="30124">
@@ -364,7 +377,6 @@ Prompts for a [tape] save at startup
 		<publisher>T&amp;E Soft</publisher>
 		<notes><![CDATA[
 Unsupported [tape] save
-[keyboard] arrow keys doesn't work
 ]]></notes>
 		<info name="usage" value="Mode 5, Page 2, BASIC. Use joystick in port 2."/>
 		<info name="alt_title" value="ハイドライド"/>
@@ -375,10 +387,14 @@ Unsupported [tape] save
 		</part>
 	</software>
 
-	<software name="iceblock" supported="partial">
+	<software name="iceblock" supported="no">
 		<description>Ice Block</description>
-		<year>19??</year>
-		<publisher>dB-SOFT</publisher>
+		<year>198?</year>
+		<publisher>デービーソフト (dB-Soft)</publisher>
+		<notes><![CDATA[
+Requires key pressed on [joystick] to make it advance frames, [keyboard]?
+[timing] Runs too fast
+]]></notes>
 		<info name="usage" value="Mode 5, Page 2, BASIC" />
 		<info name="alt_title" value="アイス・ブロック"/>
 		<part name="snap" interface="pc6001_snap">
@@ -394,7 +410,6 @@ Unsupported [tape] save
 		<year>1984</year>
 		<publisher>Enix</publisher>
 		<notes><![CDATA[
-[keyboard] arrow keys doesn't work
 [timing] may run too fast (verify)
 ]]></notes>
 		<info name="usage" value="Mode 5, Page 3, BASIC"/>
@@ -410,7 +425,7 @@ Unsupported [tape] save
 	<software name="nutsmilk" supported="partial">
 		<description>Nuts &amp; Milk</description>
 		<year>1984</year>
-		<publisher>Hudson Soft</publisher>
+		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="usage" value="Mode 5, Page 2, MONITOR" />
 		<info name="alt_title" value="ナッツ&amp;ミルク"/>
 		<part name="snap" interface="pc6001_snap">
@@ -423,7 +438,7 @@ Unsupported [tape] save
 	<software name="pacman" supported="no">
 		<description>Pac-Man</description>
 		<year>198?</year>
-		<publisher>Dempa</publisher>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<notes><![CDATA[
 [timing] Runs too fast
 ]]></notes>
@@ -437,10 +452,13 @@ Unsupported [tape] save
 		</part>
 	</software>
 
-	<software name="pascom" supported="partial">
+	<software name="pascom" supported="no">
 		<description>Pascom Tower</description>
 		<year>1984</year>
 		<publisher>MIA</publisher>
+		<notes><![CDATA[
+[timing] Runs too fast
+]]></notes>
 		<info name="usage" value="Mode 5, Page 4, BASIC" />
 		<info name="alt_title" value="パスコンタワー"/>
 		<part name="snap" interface="pc6001_snap">
@@ -450,10 +468,14 @@ Unsupported [tape] save
 		</part>
 	</software>
 
-	<software name="plazmaln" supported="partial">
+	<software name="plazmaln" supported="no">
 		<description>Plazma Line</description>
-		<year>19??</year>
-		<publisher>Techno Soft</publisher>
+		<year>198?</year>
+		<publisher>テクノソフト (Tecno Soft)</publisher>
+		<notes><![CDATA[
+Holding left+shift on [keyboard] pauses game (verify)
+[joystick] works only with directional keys, fire 1 and 2 doesn't accelerate or brake
+]]></notes>
 		<info name="usage" value="Mode 5, Page 3, BASIC" />
 		<info name="alt_title" value="プラズマライン"/>
 		<part name="snap" interface="pc6001_snap">
@@ -463,10 +485,14 @@ Unsupported [tape] save
 		</part>
 	</software>
 
-	<software name="punchbal" supported="partial">
+	<software name="punchbal" supported="no">
 		<description>Punch Ball Mario Bros.</description>
 		<year>1983</year>
-		<publisher>Nintendo / Hudson Soft</publisher>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<notes><![CDATA[
+Holding left+shift on [keyboard] pauses game (verify)
+[timing] Runs too fast
+]]></notes>
 		<info name="usage" value="Mode 5, Page 4, MONITOR" />
 		<info name="alt_title" value="パンチボールマリオブラザーズ"/>
 		<part name="snap" interface="pc6001_snap">
@@ -479,9 +505,9 @@ Unsupported [tape] save
 	<software name="tomathim" supported="no">
 		<description>Salad no Kuni no Tomato-hime</description>
 		<year>1984</year>
-		<publisher>Hudson Soft</publisher>
+		<publisher>ハドソン (Hudson Soft)</publisher>
 		<notes><![CDATA[
-May require [keyboard] kana lock to work properly
+Not extensively tested (language barrier)
 ]]></notes>
 		<info name="usage" value="Mode 5, Page 3, MONITOR"/>
 		<info name="alt_title" value="サラダの国のトマト姫"/>
@@ -495,7 +521,7 @@ May require [keyboard] kana lock to work properly
 	<software name="tforce" supported="partial">
 		<description>Thunder Force</description>
 		<year>1985</year>
-		<publisher>Techno Soft</publisher>
+		<publisher>テクノソフト (Tecno Soft)</publisher>
 		<info name="usage" value="Mode 5, Page 3, BASIC" />
 		<info name="alt_title" value="サンダーフォース"/>
 		<part name="snap" interface="pc6001_snap">
@@ -505,10 +531,13 @@ May require [keyboard] kana lock to work properly
 		</part>
 	</software>
 
-	<software name="vegcrash" supported="partial">
+	<software name="vegcrash" supported="no">
 		<description>Vegetable Crash</description>
-		<year>19??</year>
-		<publisher>Hudson Soft</publisher>
+		<year>198?</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<notes><![CDATA[
+[timing] Runs too fast
+]]></notes>
 		<info name="usage" value="Mode 5, Page 4, MONITOR" />
 		<info name="alt_title" value="ベジタブルクラッシュ"/>
 		<part name="snap" interface="pc6001_snap">
@@ -521,7 +550,7 @@ May require [keyboard] kana lock to work properly
 	<software name="volguard" supported="no">
 		<description>Volguard</description>
 		<year>1985</year>
-		<publisher>dB-Soft</publisher>
+		<publisher>デービーソフト (dB-Soft)</publisher>
 		<notes><![CDATA[
 [timing] runs too fast
 ]]></notes>
@@ -537,7 +566,7 @@ May require [keyboard] kana lock to work properly
 	<software name="yakyukyo" supported="partial">
 		<description>Yakyuu Kyou</description>
 		<year>1984</year>
-		<publisher>Hudson Soft</publisher>
+		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="usage" value="Mode 5, Page 4, MONITOR" />
 		<info name="alt_title" value="野球狂" />
 		<part name="snap" interface="pc6001_snap">

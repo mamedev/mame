@@ -455,7 +455,7 @@ uint32_t pc6001mk2_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 						color |= (pen[0]) | (pen[1] << 1);
 						color |= (m_bgcol_bank & 1) << 2;
 					}
-					else //Mk-2 mode
+					else // mkII mode
 					{
 						color = 0x10;
 						color |= BIT(pen[1], 0) << 0;
