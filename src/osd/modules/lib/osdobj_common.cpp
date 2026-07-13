@@ -157,6 +157,7 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_BGFX_PATH,                       "bgfx",            core_options::option_type::PATH,     "path to BGFX-related files" },
 	{ OSDOPTION_BGFX_BACKEND,                    "auto",            core_options::option_type::STRING,   "BGFX backend to use (d3d9, d3d11, d3d12, metal, opengl, gles, vulkan)" },
 	{ OSDOPTION_BGFX_DEBUG,                      "0",               core_options::option_type::BOOLEAN,  "enable BGFX debugging statistics" },
+	{ OSDOPTION_BGFX_VECTORCRT,                  "0",               core_options::option_type::BOOLEAN,  "enable BGFX vector CRT rendering" },
 	{ OSDOPTION_BGFX_SCREEN_CHAINS,              "",                core_options::option_type::STRING,   "comma-delimited list of screen chain JSON names, colon-delimited per-window" },
 	{ OSDOPTION_BGFX_SHADOW_MASK,                "slot-mask.png",   core_options::option_type::STRING,   "shadow mask texture name" },
 	{ OSDOPTION_BGFX_LUT,                        "lut-default.png", core_options::option_type::STRING,   "LUT texture name" },
