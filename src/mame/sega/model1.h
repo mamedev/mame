@@ -193,6 +193,7 @@ protected:
 		float translation[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 		glm::vec3 light;
 		lightparam_t lightparams[256];
+		bool spec_enable = false;
 	};
 
 	void model1_io(address_map &map) ATTR_COLD;
@@ -336,7 +337,7 @@ protected:
 
 	static float    min4f(float a, float b, float c, float d);
 	static float    max4f(float a, float b, float c, float d);
-	static float    compute_specular(glm::vec3& normal, glm::vec3& light, float diffuse,int lmode);
+	float   compute_specular(glm::vec3& normal, glm::vec3& light, float diffuse, int lmode);
 
 	int push_direct(int list_offset);
 	int draw_direct(bitmap_rgb32 &bitmap, const rectangle &cliprect, int list_offset);

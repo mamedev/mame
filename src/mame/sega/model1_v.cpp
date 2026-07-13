@@ -782,32 +782,26 @@ static const uint8_t num_of_times[]={1,1,1,1,2,2,2,3};
 #endif
 float model1_state::compute_specular(glm::vec3& normal, glm::vec3& light, float diffuse, int lmode)
 {
-#if 0
-	int p = m_view->lightparams[lmode].p & 7;
-	float sv = m_view->lightparams[lmode].s;
-
-	//This is how it should be according to model2 geo program, but doesn't work fine
-	float s = 2 * (diffuse * normal.z - light.z);
-	for (int i = 0; i < num_of_times[p]; i++)
-	{
-		s *= s;
-	}
-	s *= sv;
-	if (s < 0.0f)
-	{
+	if (!m_view->spec_enable)
 		return 0.0f;
-	}
-	if (s > 1.0f)
-	{
-		return 1.0f;
-	}
-	return s;
 
-	// ???
-	//return fabs(diffuse)*sv;
-#endif
+	const lightparam_t &lp = m_view->lightparams[lmode];
+	if (lp.p == 0 || lp.s <= 0.0f)
+		return 0.0f;
 
-	return 0;
+	// z component of the reflected light vector, as computed by the Model 2
+	// GEO program: R.z = 2*(N.L)*N.z - L.z, raised to a power of two selected
+	// by the power field and scaled by the specular scale.
+	float s = 2.0f * diffuse * normal.z - light.z;
+	if (s <= 0.0f)
+		return 0.0f;
+	if (lp.p >= 2)
+		s *= s;
+	if (lp.p >= 4)
+		s *= s;
+	if (lp.p >= 7)
+		s *= s;
+	return std::min(s * lp.s, 1.0f);
 }
 
 void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t size)
@@ -1505,7 +1499,12 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect, r
 				break;
 			}
 			case 7:
-				LOGMASKED(LOG_TGP, "VIDEO:   code 7 (%d)\n", readi(list_offset + 2));
+				// Mode word, as in the Model 2 GEO command 7: bit 0 enables the
+				// specular term (netmerc toggles it mid-list, on for the enemy
+				// mechs and off for terrain/cockpit); bit 1 tracks the display
+				// list double buffer parity.
+				LOGMASKED(LOG_TGP, "VIDEO:   mode word (%d)\n", readi(list_offset + 2));
+				m_view->spec_enable = BIT(readi(list_offset + 2), 0);
 				list_offset += 4;
 				break;
 			case 8:
