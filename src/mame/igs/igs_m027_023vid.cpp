@@ -412,7 +412,7 @@ void igs_m027_023vid_state::m027_023vid(machine_config &config)
 
 	ICS2115(config, m_ics, 33.8688_MHz_XTAL);
 	m_ics->irq().set(FUNC(igs_m027_023vid_state::irq_w<1>));
-	m_ics->add_route(ALL_OUTPUTS, "mono", 5.0);
+	m_ics->add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
