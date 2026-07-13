@@ -590,6 +590,11 @@ mpc2000xl
 @source:akai/mpc3000.cpp
 mpc3000
 
+@source:akai/s1000.cpp
+s1000
+s1000pb
+s1100
+
 @source:akai/s3000.cpp
 s2000
 s3000
