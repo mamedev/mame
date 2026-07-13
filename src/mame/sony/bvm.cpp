@@ -58,7 +58,6 @@ private:
 
 void bvm_state::mem_map(address_map &map)
 {
-	map(0x00000, 0x0f67f).rw("flash", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
 	map(0x10000, 0x17fff).ram().share("nvram");
 	map(0x18000, 0x18007).rw("cxdio0", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
 	map(0x18020, 0x18027).rw("cxdio1", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
@@ -97,7 +96,7 @@ ROM_END
 
 void bvm_state::init_bvm()
 {
-	// Generate a fake internal ROM that does nothing but handle exceptions
+	// Generate a fake internal ROM that does nothing but call exception handlers using PJSR
 	u8 *rom = memregion("maincpu")->base();
 	put_u32be(&rom[0], 0x00000200);
 	put_u24be(&rom[0x200], 0x04048d); // LDC.B #H'04, DP
