@@ -768,9 +768,9 @@ u8 h8500_device::do_dadd8(u8 v1, u8 v2)
 	res += (v1 & 0xf0) + (v2 & 0xf0);
 	if (res >= 0xa0)
 		res += 0x60;
-	m_sr &= ~(SR_Z | SR_C);
-	if (!u8(res))
-		m_sr |= SR_Z;
+	m_sr &= ~SR_C;
+	if (u8(res))
+		m_sr &= ~SR_Z;
 	if (res & 0x100)
 		m_sr |= SR_C;
 	return res;
