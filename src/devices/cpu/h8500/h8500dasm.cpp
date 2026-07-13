@@ -485,7 +485,7 @@ offs_t h8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const h8
 		if (m_expanded)
 		{
 			util::stream_format(stream, "%-9s@H'%02X%04X", BIT(op, 4) ? "PJMP" : "PJSR", opcodes.r8(pc + 1), opcodes.r16(pc + 2));
-			return 4 | (BIT(op, 4) ? STEP_OVER : 0) | SUPPORTED;
+			return 4 | (BIT(op, 4) ? 0 : STEP_OVER) | SUPPORTED;
 		}
 		else
 			return dasm_illegal(stream, op);
