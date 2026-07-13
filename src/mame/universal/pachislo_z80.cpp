@@ -100,6 +100,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1997, crankyc,  0, pachislo_z80, pachislo, pachislo_z80_state, empty_init, ROT0, "Universal", "Cranky Condor", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL ) // 1997.02.17
-GAME( 1997, thunderv, 0, pachislo_z80, pachislo, pachislo_z80_state, empty_init, ROT0, "Universal", "Thunder V",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL ) // 1997.09.08
-GAME( 1997, versus,   0, pachislo_z80, pachislo, pachislo_z80_state, empty_init, ROT0, "Universal", "Versus",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL ) // 1997.11.17
+GAME( 1997, crankyc,  0, pachislo_z80, pachislo, pachislo_z80_state, empty_init, ROT0, "Universal", "Cranky Contest", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL ) // 1997.02.17
+GAME( 1997, thunderv, 0, pachislo_z80, pachislo, pachislo_z80_state, empty_init, ROT0, "Universal", "Thunder V",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL ) // 1997.09.08
+GAME( 1997, versus,   0, pachislo_z80, pachislo, pachislo_z80_state, empty_init, ROT0, "Universal", "Versus",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL ) // 1997.11.17
