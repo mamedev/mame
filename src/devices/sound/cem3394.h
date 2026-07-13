@@ -74,7 +74,7 @@ private:
 
 	void set_filt_freq_cv_internal(double cv);
 	void set_final_gain_cv_internal(double cv);
-	void update_mix();
+	void update_osc_mix();
 
 	float stream_op_filter_freq(float voltage);
 	float stream_op_amp_gain(float voltage);
@@ -108,7 +108,6 @@ private:
 	// parameters derived from control voltages
 	bool m_tri;                       // triangle waveform enabled
 	bool m_saw;                       // sawtooth waveform enabled
-	bool m_pulse;                     // pulse waveform enabled
 	double m_vco_frequency;           // current VCO frequency
 	double m_pulse_width;             // fractional pulse width
 	double m_volume;                  // linear overall volume (0-1)
