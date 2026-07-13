@@ -23,14 +23,9 @@
 #include "screen.h"
 
 
-class sunplus_gcm394_base_device : public unsp_20_device, public device_mixer_interface
+class generalplus_gpl162xx_base_device : public unsp_20_device, public device_mixer_interface
 {
 public:
-	sunplus_gcm394_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
-		sunplus_gcm394_base_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(sunplus_gcm394_base_device::gcm394_internal_map), this))
-	{
-	}
-
 	auto porta_in() { return m_porta_in.bind(); }
 	auto portb_in() { return m_portb_in.bind(); }
 	auto portc_in() { return m_portc_in.bind(); }
@@ -45,7 +40,7 @@ public:
 	auto space_write_callback() { return m_space_write_cb.bind(); }
 	auto dma_complete_callback() { return m_dma_complete_cb.bind(); }
 
-	// currently used by GPL16250, but GPL16230 adds NAND support too
+	// currently used by GPL16250VA, but GPL16230 adds NAND support too
 	auto nand_command_out() { return m_nand_command_out.bind(); }
 	auto nand_address_out() { return m_nand_address_out.bind(); }
 	auto nand_data_out() { return m_nand_data_out.bind(); }
@@ -80,15 +75,17 @@ public:
 protected:
 	using cs_callback_delegate = device_delegate<void (u16, u16, u16, u16, u16)>;
 
-	sunplus_gcm394_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal);
+	generalplus_gpl162xx_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal);
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override ATTR_COLD;
 
-	void gcm394_internal_map(address_map &map) ATTR_COLD;
 	void base_internal_map(address_map &map) ATTR_COLD;
+	void internal_rom_64kword(address_map &map);
+	void internal_rom_4kword(address_map &map);
+	void cs_main_view_area(address_map &map);
 
 	required_device<screen_device> m_screen;
 	required_device<gcm394_video_device> m_spg_video;
@@ -170,9 +167,10 @@ protected:
 	u16 m_adc_setup;
 	u16 m_madc_ctrl;
 
-	u16 m_timera_ctrl;
-	u16 m_timerb_ctrl;
-
+	u16 m_timer_ctrl[6];
+	u16 m_timer_preload[6];
+	u16 m_timer_ccp_ctrl[3];
+	u16 m_timer_cc_reg[3];
 
 	u16 internalrom_lower32_r(offs_t offset);
 
@@ -299,14 +297,15 @@ protected:
 
 	virtual void update_interrupts(int state);
 
-	u16 timera_ctrl_r();
-	void timera_ctrl_w(u16 data);
-
-	u16 timerb_ctrl_r();
-	void timerb_ctrl_w(u16 data);
-
-	u16 timerc_ctrl_r();
-	u16 timerd_ctrl_r();
+	template<int Timer> u16 timer_ctrl_r();
+	template<int Timer> void timer_ctrl_w(u16 data);
+	template<int Timer> u16 timer_preload_r();
+	template<int Timer> void timer_preload_w(u16 data);
+	template<int Timer> u16 timer_ccp_ctrl_r();
+	template<int Timer> void timer_ccp_ctrl_w(u16 data);
+	template<int Timer> u16 timer_cc_reg_r();
+	template<int Timer> void timer_cc_reg_w(u16 data);
+	template<int Timer> u16 timer_upcount_r();
 
 	u16 cha_ctrl_r();
 	void cha_ctrl_w(u16 data);
@@ -362,32 +361,134 @@ protected:
 	// config/hacks
 	bool m_disable_timebase_interrupts;
 
+	void nand_peripheral_map(address_map &map) ATTR_COLD;
+	void spi_peripheral_map(address_map &map) ATTR_COLD;
+
 private:
 	void dma_complete(int state);
+
+	u16 nand_7850_status_r();
+	u16 nand_data_r();
+	void nand_data_w(u16 data);
+	void nand_dma_ctrl_w(u16 data);
+	void nand_7850_w(u16 data);
+	void nand_command_w(u16 data);
+	void nand_addr_low_w(u16 data);
+	void nand_addr_high_w(u16 data);
+	u16 nand_ecc_err1_lb_r();
+	void nand_bch_ctrl_w(u16 data);
+	void nand_ecc_ctrl_w(u16 data);
+	void nand_ecc_lpr_ckl_lb_w(u16 data);
+	void nand_ecc_lpr_ckh_lb_w(u16 data);
+	void nand_ecc_cpckr_lb_w(u16 data);
+	u16 nand_ecc_err0_lb_r();
+
+	u16 spi_rxstatus_r();
+
+	u16 efuse2_r();
+
+	u16 m_nand_addr_low;
+	u16 m_nand_addr_high;
+
+	u16 m_nand_dma_ctrl;
+	u16 m_nand_ctrl;
+	u16 m_nand_ecc_cpckr_lb;
+	u16 m_nand_ecc_lpr_ckh_lb;
+	u16 m_nand_ecc_lpr_ckl_lb;
+	u16 m_nand_bch_ctrl;
+	u16 m_nand_ecc_ctrl;
 
 };
 
 
-
-class sunplus_gcm394_device : public sunplus_gcm394_base_device
+class generalplus_gpl16220a_device : public generalplus_gpl162xx_base_device
 {
 public:
 	template <typename T>
-	sunplus_gcm394_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&screen_tag) :
-		sunplus_gcm394_device(mconfig, tag, owner, clock)
+	generalplus_gpl16220a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&screen_tag) :
+		generalplus_gpl16220a_device(mconfig, tag, owner, clock)
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));
 	}
 
-	sunplus_gcm394_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	generalplus_gpl16220a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	generalplus_gpl16220a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal);
+
+	void gpl16220a_map(address_map &map);
+};
+
+class generalplus_gpl16230a_device : public generalplus_gpl16220a_device
+{
+public:
+	template <typename T>
+	generalplus_gpl16230a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&screen_tag) :
+		generalplus_gpl16230a_device(mconfig, tag, owner, clock)
+	{
+		m_screen.set_tag(std::forward<T>(screen_tag));
+	}
+
+	generalplus_gpl16230a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	generalplus_gpl16230a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal);
+
+	void gpl16230a_map(address_map &map);
+};
+
+
+class generalplus_gpl16240va_device : public generalplus_gpl16230a_device
+{
+public:
+	template <typename T>
+	generalplus_gpl16240va_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&screen_tag) :
+		generalplus_gpl16240va_device(mconfig, tag, owner, clock)
+	{
+		m_screen.set_tag(std::forward<T>(screen_tag));
+	}
+
+	generalplus_gpl16240va_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	generalplus_gpl16240va_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal);
+
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	void gpl16240va_map(address_map &map);
 };
 
 
 
+class generalplus_gpl16250va_device : public generalplus_gpl16240va_device
+{
+public:
+	template <typename T>
+	generalplus_gpl16250va_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&screen_tag) :
+		generalplus_gpl16250va_device(mconfig, tag, owner, clock)
+	{
+		m_screen.set_tag(std::forward<T>(screen_tag));
+	}
 
+	generalplus_gpl16250va_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-DECLARE_DEVICE_TYPE(GCM394, sunplus_gcm394_device)
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
+	void gpl16250va_map(address_map &map);
+};
+
+DECLARE_DEVICE_TYPE(GPL16220A, generalplus_gpl16220a_device)
+DECLARE_DEVICE_TYPE(GPL16230A, generalplus_gpl16230a_device)
+DECLARE_DEVICE_TYPE(GPL16240VA, generalplus_gpl16240va_device)
+DECLARE_DEVICE_TYPE(GPL16250VA, generalplus_gpl16250va_device)
 
 #endif // MAME_MACHINE_GENERALPLUS_GPL162XX_SOC_H

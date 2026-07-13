@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_TVGAMES_GENERALPLUS_GPL16250_ROMRAM_H
-#define MAME_TVGAMES_GENERALPLUS_GPL16250_ROMRAM_H
+#ifndef MAME_TVGAMES_GENERALPLUS_gpl16250va_romram_H
+#define MAME_TVGAMES_GENERALPLUS_gpl16250va_romram_H
 
 #pragma once
 
@@ -23,8 +23,12 @@ public:
 	{
 	}
 
-	void gpl16250_romram(machine_config &config) ATTR_COLD;
+	void gpl16250va_romram(machine_config &config) ATTR_COLD;
+	void gpl16220a_romram(machine_config &config) ATTR_COLD;
+	void gpl16258vb_romram(machine_config &config) ATTR_COLD;
 
+	void common_config(machine_config &config) ATTR_COLD;
+	  
 	void init_wrlshunt() ATTR_COLD;
 	void init_ths() ATTR_COLD;
 
@@ -42,8 +46,6 @@ private:
 	virtual void cs0_w(offs_t offset, u16 data) override;
 	virtual u16 cs1_r(offs_t offset) override;
 	virtual void cs1_w(offs_t offset, u16 data) override;
-
-	//required_shared_ptr<u16> m_mainram;
 
 	int m_romwords_mask = 0;
 };
@@ -121,4 +123,4 @@ protected:
 };
 
 
-#endif // MAME_TVGAMES_GENERALPLUS_GPL16250_ROMRAM_H
+#endif // MAME_TVGAMES_GENERALPLUS_gpl16250va_romram_H

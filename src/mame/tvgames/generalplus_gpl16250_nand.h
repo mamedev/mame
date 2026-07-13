@@ -9,7 +9,7 @@
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
-#include "machine/generalplus_gpl1625x_soc.h"
+#include "machine/generalplus_gpl162xx_b_soc.h"
 #include "machine/nandflash.h"
 
 #include "screen.h"
@@ -32,8 +32,11 @@ public:
 	void generalplus_gpac800_nand128mbyte(machine_config &config) ATTR_COLD;
 	void generalplus_gpac800_nand256mbyte(machine_config &config) ATTR_COLD;
 
-	void generalplus_gpac800_nand128mbyte_2048(machine_config &config) ATTR_COLD;
-	void generalplus_gpac800_nand512mbyte_2048(machine_config &config) ATTR_COLD;
+	void generalplus_gpl16258vb_nand128mbyte_2048(machine_config &config) ATTR_COLD;
+	void generalplus_gpl16258vb_nand512mbyte_2048(machine_config &config) ATTR_COLD;
+
+	void generalplus_gpl16258vb(machine_config &config) ATTR_COLD;
+	void generalplus_gpl16258vb_nand64mbyte(machine_config &config) ATTR_COLD;
 
 	void nand_init() ATTR_COLD;
 	void nand_init_32mb() ATTR_COLD;
@@ -46,6 +49,8 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+	void common_config(machine_config &config);
 
 	virtual u16 cs0_r(offs_t offset) override;
 	virtual void cs0_w(offs_t offset, u16 data) override;
@@ -79,7 +84,7 @@ public:
 	{
 	}
 
-	void generalplus_gpac800_nand128mbyte_2048_vbaby(machine_config &config) ATTR_COLD;
+	void generalplus_gpl16258vb_nand128mbyte_2048_vbaby(machine_config &config) ATTR_COLD;
 
 protected:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
