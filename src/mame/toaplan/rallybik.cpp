@@ -428,5 +428,5 @@ ROM_END
 
 } // Anonymous namespace
 
-//    YEAR  NAME        PARENT    MACHINE   INPUT      CLASS           INIT        ROT     COMPANY                        FULLNAME                                        FLAGS
-GAME( 1988, rallybik,   0,        rallybik, rallybik,  rallybik_state, empty_init, ROT270, "Toaplan / Taito Corporation", "Rally Bike (Europe, US) / Dash Yarou (Japan)", 0 )
+//    YEAR  NAME        PARENT    MACHINE   INPUT      CLASS           INIT        ROT     COMPANY            FULLNAME                                        FLAGS
+GAME( 1988, rallybik,   0,        rallybik, rallybik,  rallybik_state, empty_init, ROT270, "Toaplan / Taito", "Rally Bike (Europe, US) / Dash Yarou (Japan)", 0 )

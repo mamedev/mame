@@ -1875,38 +1875,38 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1981, roundup,    0,        roundup,  roundup,  roundup_state, empty_init, ROT90, "Taito Corporation (Amenip/Centuri license)",  "Round-Up", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, fitter,     roundup,  roundup,  fitter,   roundup_state, empty_init, ROT90, "Taito Corporation",                           "Fitter", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, fitterbl,   roundup,  roundup,  fitter,   roundup_state, empty_init, ROT90, "bootleg",                                     "Fitter (bootleg of Round-Up)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ttfitter,   roundup,  roundup,  fitter,   roundup_state, empty_init, ROT90, "Taito Corporation",                           "T.T Fitter (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, roundup,    0,        roundup,  roundup,  roundup_state, empty_init, ROT90, "Taito (Amenip/Centuri license)",      "Round-Up",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fitter,     roundup,  roundup,  fitter,   roundup_state, empty_init, ROT90, "Taito",                               "Fitter",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fitterbl,   roundup,  roundup,  fitter,   roundup_state, empty_init, ROT90, "bootleg",                             "Fitter (bootleg of Round-Up)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ttfitter,   roundup,  roundup,  fitter,   roundup_state, empty_init, ROT90, "Taito",                               "T.T Fitter (Japan)",               MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, thepit,     0,        thepit,   thepit,   roundup_state, empty_init, ROT90, "Zilec Electronics",                           "The Pit", MACHINE_SUPPORTS_SAVE ) // AW == Andy Walker
-GAME( 1982, thepitu1,   thepit,   thepit,   thepit,   roundup_state, empty_init, ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, thepitu2,   thepit,   thepit,   thepit,   roundup_state, empty_init, ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 2)", MACHINE_SUPPORTS_SAVE ) // Bally PCB
-GAME( 1982, thepitu3,   thepit,   thepit,   thepit,   roundup_state, empty_init, ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, thepitj,    thepit,   thepit,   thepit,   roundup_state, empty_init, ROT90, "Zilec Electronics (Taito license)",           "The Pit (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, thehole,    thepit,   thepit,   thepit,   roundup_state, empty_init, ROT90, "bootleg",                                     "The Hole (bootleg of The Pit)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, thepit,     0,        thepit,   thepit,   roundup_state, empty_init, ROT90, "Zilec Electronics",                   "The Pit",                          MACHINE_SUPPORTS_SAVE ) // AW == Andy Walker
+GAME( 1982, thepitu1,   thepit,   thepit,   thepit,   roundup_state, empty_init, ROT90, "Zilec Electronics (Centuri license)", "The Pit (US set 1)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, thepitu2,   thepit,   thepit,   thepit,   roundup_state, empty_init, ROT90, "Zilec Electronics (Centuri license)", "The Pit (US set 2)",               MACHINE_SUPPORTS_SAVE ) // Bally PCB
+GAME( 1982, thepitu3,   thepit,   thepit,   thepit,   roundup_state, empty_init, ROT90, "Zilec Electronics (Centuri license)", "The Pit (US set 3)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, thepitj,    thepit,   thepit,   thepit,   roundup_state, empty_init, ROT90, "Zilec Electronics (Taito license)",   "The Pit (Japan)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, thehole,    thepit,   thepit,   thepit,   roundup_state, empty_init, ROT90, "bootleg",                             "The Hole (bootleg of The Pit)",    MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, dockman,    0,        intrepid, dockman,  roundup_state, empty_init, ROT90, "Taito Corporation",                           "Dock Man (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, dockmanb,   dockman,  dockmanb, dockman,  roundup_state, empty_init, ROT90, "Taito Corporation",                           "Dock Man (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, dockmanc,   dockman,  dockmanb, dockman,  roundup_state, empty_init, ROT90, "Taito Corporation",                           "Dock Man (set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // one GFX ROM is bad
-GAME( 1982, portman,    dockman,  intrepid, dockman,  roundup_state, empty_init, ROT90, "Taito Corporation (Nova Games Ltd. license)", "Port Man", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, portmanj,   dockman,  intrepid, dockman,  roundup_state, empty_init, ROT90, "Taito Corporation",                           "Port Man (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, theportr,   dockman,  theportr, dockman,  roundup_state, empty_init, ROT90, "bootleg",                                     "The Porter (bootleg of Port Man)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // PROM has been dumped, but colours seem wrong
+GAME( 1982, dockman,    0,        intrepid, dockman,  roundup_state, empty_init, ROT90, "Taito",                               "Dock Man (set 1)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dockmanb,   dockman,  dockmanb, dockman,  roundup_state, empty_init, ROT90, "Taito",                               "Dock Man (set 2)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dockmanc,   dockman,  dockmanb, dockman,  roundup_state, empty_init, ROT90, "Taito",                               "Dock Man (set 3)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // one GFX ROM is bad
+GAME( 1982, portman,    dockman,  intrepid, dockman,  roundup_state, empty_init, ROT90, "Taito (Nova Games license)",          "Port Man",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1982, portmanj,   dockman,  intrepid, dockman,  roundup_state, empty_init, ROT90, "Taito",                               "Port Man (Japan)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1982, theportr,   dockman,  theportr, dockman,  roundup_state, empty_init, ROT90, "bootleg",                             "The Porter (bootleg of Port Man)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // PROM has been dumped, but colours seem wrong
 
-GAME( 1982, suprmous,   0,        suprmous, suprmous, roundup_state, empty_init, ROT90, "Taito Corporation",                           "Super Mouse", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, funnymou,   suprmous, suprmous, suprmous, roundup_state, empty_init, ROT90, "Taito Corporation (Chuo Co. Ltd license)",    "Funny Mouse (Japan)", MACHINE_SUPPORTS_SAVE ) // Taito PCB
+GAME( 1982, suprmous,   0,        suprmous, suprmous, roundup_state, empty_init, ROT90, "Taito",                               "Super Mouse",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1982, funnymou,   suprmous, suprmous, suprmous, roundup_state, empty_init, ROT90, "Taito (Chuo license)",                "Funny Mouse (Japan)",              MACHINE_SUPPORTS_SAVE ) // Taito PCB
 
-GAME( 1982, machomou,   0,        suprmous, suprmous, roundup_state, empty_init, ROT90, "Techstar",                                    "Macho Mouse", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, machomou,   0,        suprmous, suprmous, roundup_state, empty_init, ROT90, "Techstar",                            "Macho Mouse",                      MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, desertdn,   0,        desertdn, desertdn, roundup_state, empty_init, ROT0,  "Kawakusu (Video Optics license)",             "Desert Dan", MACHINE_SUPPORTS_SAVE ) // export version of Gonta Road-Rush (gfx still contains part of "RUSH")
+GAME( 1982, desertdn,   0,        desertdn, desertdn, roundup_state, empty_init, ROT0,  "Kawakusu (Video Optics license)",     "Desert Dan",                       MACHINE_SUPPORTS_SAVE ) // export version of Gonta Road-Rush (gfx still contains part of "RUSH")
 
-GAME( 1983, intrepid,   0,        intrepid, intrepid, roundup_state, empty_init, ROT90, "Nova Games Ltd.",                             "Intrepid (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, intrepid2,  intrepid, intrepid, intrepid, roundup_state, empty_init, ROT90, "Nova Games Ltd.",                             "Intrepid (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, intrepidb,  intrepid, intrepid, intrepidb,roundup_state, empty_init, ROT90, "bootleg (Elsys)",                             "Intrepid (Elsys bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, intrepidb3, intrepid, intrepid, intrepidb,roundup_state, empty_init, ROT90, "bootleg (Elsys)",                             "Intrepid (Elsys bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, intrepidb2, intrepid, intrepid, intrepidb,roundup_state, empty_init, ROT90, "bootleg (Loris)",                             "Intrepid (Loris bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, intrepid,   0,        intrepid, intrepid, roundup_state, empty_init, ROT90, "Nova Games",                          "Intrepid (set 1)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1983, intrepid2,  intrepid, intrepid, intrepid, roundup_state, empty_init, ROT90, "Nova Games",                          "Intrepid (set 2)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1984, intrepidb,  intrepid, intrepid, intrepidb,roundup_state, empty_init, ROT90, "bootleg (Elsys)",                     "Intrepid (Elsys bootleg, set 1)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1984, intrepidb3, intrepid, intrepid, intrepidb,roundup_state, empty_init, ROT90, "bootleg (Elsys)",                     "Intrepid (Elsys bootleg, set 2)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1984, intrepidb2, intrepid, intrepid, intrepidb,roundup_state, empty_init, ROT90, "bootleg (Loris)",                     "Intrepid (Loris bootleg)",         MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, zaryavos,   0,        intrepid, intrepid, roundup_state, empty_init, ROT90, "Nova Games of Canada",                        "Zarya Vostoka", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, zaryavos,   0,        intrepid, intrepid, roundup_state, empty_init, ROT90, "Nova Games of Canada",                "Zarya Vostoka",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-GAME( 198?, rtriv,      0,        rtriv,    rtriv,    rtriv_state,   empty_init, ROT90, "Romar",                                       "Romar Triv", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, rtriv,      0,        rtriv,    rtriv,    rtriv_state,   empty_init, ROT90, "Romar",                               "Romar Triv",                        MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

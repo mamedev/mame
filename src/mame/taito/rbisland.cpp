@@ -1123,11 +1123,11 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1987, rbisland,  0,        rbisland, rbisland, rbisland_state, empty_init, ROT0, "Taito Corporation", "Rainbow Islands (rev 1)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rbislando, rbisland, rbisland, rbisland, rbisland_state, empty_init, ROT0, "Taito Corporation", "Rainbow Islands",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rbisland,  0,        rbisland, rbisland, rbisland_state, empty_init, ROT0, "Taito",             "Rainbow Islands (rev 1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rbislando, rbisland, rbisland, rbisland, rbisland_state, empty_init, ROT0, "Taito",             "Rainbow Islands",                 MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, jumping,   rbisland, jumping,  jumping,  jumping_state,  empty_init, ROT0, "bootleg",           "Jumping (set 1)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1988, jumpinga,  rbisland, jumping,  jumping,  jumping_state,  empty_init, ROT0, "bootleg (Seyutu)",  "Jumping (set 2)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1988, jumpingi,  rbisland, jumpingi, jumping,  jumping_state,  empty_init, ROT0, "bootleg (Seyutu)",  "Jumping (set 3, Imnoe PCB)",      MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, rbislande, 0,        rbisland, rbisland, rbisland_state, empty_init, ROT0, "Taito Corporation", "Rainbow Islands - Extra Version", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, rbislande, 0,        rbisland, rbisland, rbisland_state, empty_init, ROT0, "Taito",             "Rainbow Islands - Extra Version", MACHINE_SUPPORTS_SAVE )

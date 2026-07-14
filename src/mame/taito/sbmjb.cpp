@@ -539,11 +539,11 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 1997, honooinv,   0,        honooinv, honooinv, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Honoo no Invader (Japan, main ver. 1.35, video ver. 1.35)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, bubbroul,   0,        sbmjb,    bubbroul, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Bubblen Roulette (Japan, main ver. 1.8, video ver. 1.3)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, bubbroul17, bubbroul, sbmjb,    bubbroul, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Bubblen Roulette (Japan, main ver. 1.7, video ver. 1.3)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, packyts,    0,        sbmjb,    packyts,  sbmjb_state, empty_init, ROT0, "Taito Corporation", "Packy no Treasure Slot (Japan, main ver. 1.3, video ver. 1.1)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, harikiri,   0,        sbmjb,    harikiri, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Harikiri Junior Baseball (Japan, main ver. 1.0, video ver. 1.3)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sbmjb,      0,        sbmjb,    sbmjb,    sbmjb_state, empty_init, ROT0, "Taito Corporation", "Sonic Blast Man no Janken Battle (Japan, main ver. 1.1, video ver. 1.0)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, manpukuh,   0,        sbmjb,    rendfgtr, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Manpuku Hanten (Japan, main ver. 2.00, video ver. 2.00)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, rendfgtr,   0,        sbmjb,    rendfgtr, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Renda Fighter (Japan, main ver. 2.02, video ver. 2.03)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, honooinv,   0,        honooinv, honooinv, sbmjb_state, empty_init, ROT0, "Taito", "Honoo no Invader (Japan, main ver. 1.35, video ver. 1.35)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, bubbroul,   0,        sbmjb,    bubbroul, sbmjb_state, empty_init, ROT0, "Taito", "Bubblen Roulette (Japan, main ver. 1.8, video ver. 1.3)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, bubbroul17, bubbroul, sbmjb,    bubbroul, sbmjb_state, empty_init, ROT0, "Taito", "Bubblen Roulette (Japan, main ver. 1.7, video ver. 1.3)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, packyts,    0,        sbmjb,    packyts,  sbmjb_state, empty_init, ROT0, "Taito", "Packy no Treasure Slot (Japan, main ver. 1.3, video ver. 1.1)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, harikiri,   0,        sbmjb,    harikiri, sbmjb_state, empty_init, ROT0, "Taito", "Harikiri Junior Baseball (Japan, main ver. 1.0, video ver. 1.3)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbmjb,      0,        sbmjb,    sbmjb,    sbmjb_state, empty_init, ROT0, "Taito", "Sonic Blast Man no Janken Battle (Japan, main ver. 1.1, video ver. 1.0)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, manpukuh,   0,        sbmjb,    rendfgtr, sbmjb_state, empty_init, ROT0, "Taito", "Manpuku Hanten (Japan, main ver. 2.00, video ver. 2.00)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, rendfgtr,   0,        sbmjb,    rendfgtr, sbmjb_state, empty_init, ROT0, "Taito", "Renda Fighter (Japan, main ver. 2.02, video ver. 2.03)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

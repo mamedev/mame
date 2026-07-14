@@ -1130,6 +1130,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1982, bking,  0, bking,  bking,  bking_state,  empty_init, ROT270, "Taito Corporation", "Birdie King",   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, bking2, 0, bking,  bking2, bking_state,  empty_init, ROT90,  "Taito Corporation", "Birdie King 2", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bking3, 0, bking3, bking2, bking3_state, empty_init, ROT90,  "Taito Corporation", "Birdie King 3", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bking,  0, bking,  bking,  bking_state,  empty_init, ROT270, "Taito", "Birdie King",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bking2, 0, bking,  bking2, bking_state,  empty_init, ROT90,  "Taito", "Birdie King 2", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bking3, 0, bking3, bking2, bking3_state, empty_init, ROT90,  "Taito", "Birdie King 3", MACHINE_SUPPORTS_SAVE )

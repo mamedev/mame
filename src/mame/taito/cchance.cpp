@@ -329,4 +329,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1987, cchance, 0, cchance, cchance, cchance_state, empty_init, ROT0, "Taito Corporation", "Cherry Chance", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // year/manufacturer confirmed from Taito old "Arcade Game History" page
+GAME( 1987, cchance, 0, cchance, cchance, cchance_state, empty_init, ROT0, "Taito", "Cherry Chance", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // year/manufacturer confirmed from Taito old "Arcade Game History" page
