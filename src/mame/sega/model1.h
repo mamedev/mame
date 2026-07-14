@@ -394,10 +394,11 @@ public:
 
 	void netmerc(machine_config &config);
 
-	void netmerc_outputs_w(uint8_t data);
-
 protected:
 	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	void netmerc_outputs_w(uint8_t data);
 };
 
 #endif // MAME_SEGA_MODEL1_H
