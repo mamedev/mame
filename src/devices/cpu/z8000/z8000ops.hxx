@@ -108,7 +108,7 @@ void z8002_device::addr_to_reg(int regno, uint32_t addr)
 {
 	if (get_segmented_mode()) {
 		uint32_t segaddr = make_segmented_addr(addr);
-		RW(regno) = (RW(regno) & 0x80ff) | ((segaddr >> 16) & 0x7f00);
+		RW(regno) = (RW(regno) & 0x00ff) | ((segaddr >> 16) & 0xff00);
 		RW(regno | 1) = segaddr & 0xffff;
 	}
 	else
