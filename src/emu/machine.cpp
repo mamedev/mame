@@ -174,7 +174,67 @@ void running_machine::start()
 	// callbacks based on input port tags
 	time_t newbase = m_ioport.initialize();
 	if (newbase != 0)
+	{
 		m_base_time = newbase;
+
+		std::string rtc_str = options().rtc_time();
+		if (!rtc_str.empty() && rtc_str != "0")
+		{
+			osd_printf_warning("RTC: Input playback is active. Ignoring -rtc command line option.\n");
+		}
+	}
+	// if no playback file is active, look for the command-line override
+	else
+	{
+		std::string rtc_str = options().rtc_time();
+		if (!rtc_str.empty() && rtc_str != "0")
+		{
+			time_t old_base = m_base_time;
+			bool parsed_successfully = false;
+
+			// validate format: exactly 14 digits (YYYYMMDDhhmmss)
+			if (rtc_str.length() == 14 && rtc_str.find_first_not_of("0123456789") == std::string::npos)
+			{
+				int year = 0, month = 0, day = 0, hour = 0, min = 0, sec = 0;
+				if (sscanf(rtc_str.c_str(), "%4d%2d%2d%2d%2d%2d",
+					&year, &month, &day, &hour, &min, &sec) == 6)
+				{
+					struct tm t;
+					std::memset(&t, 0, sizeof(t));
+
+					t.tm_year = year - 1900;
+					t.tm_mon  = month - 1;
+					t.tm_mday = day;
+					t.tm_hour = hour;
+					t.tm_min  = min;
+					t.tm_sec  = sec;
+					t.tm_isdst = -1;
+
+					time_t parsed_time = mktime(&t);
+					if (parsed_time != (time_t)-1)
+					{
+						m_base_time = parsed_time;
+						osd_printf_verbose("RTC Override: Parsed '%s' successfully.\n", rtc_str.c_str());
+						parsed_successfully = true;
+					}
+				}
+			}
+
+			if (!parsed_successfully)
+			{
+				osd_printf_error("RTC Override Error: '%s' is not a valid YYYYMMDDhhmmss string.\n", rtc_str.c_str());
+			}
+
+			// print the final result to confirm it changed
+			if (m_base_time != old_base)
+			{
+				struct tm *final_tm = std::localtime(&m_base_time);
+				char time_buffer[64];
+				std::strftime(time_buffer, sizeof(time_buffer), "%Y-%m-%d %H:%M:%S", final_tm);
+				osd_printf_verbose("RTC Override Success: Base time set to %lld (%s)\n", (long long)m_base_time, time_buffer);
+			}
+		}
+	}
 
 	// initialize natural keyboard support after ports have been initialized
 	m_natkeyboard = std::make_unique<natural_keyboard>(*this);

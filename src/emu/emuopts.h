@@ -176,6 +176,7 @@
 #define OPTION_UI                   "ui"
 #define OPTION_RAMSIZE              "ramsize"
 #define OPTION_NVRAM_SAVE           "nvram_save"
+#define OPTION_RTC_TIME             "rtc"
 
 // core comm options
 #define OPTION_COMM_LOCAL_HOST      "comm_localhost"
@@ -459,6 +460,7 @@ public:
 	ui_option ui() const { return m_ui; }
 	const char *ram_size() const { return value(OPTION_RAMSIZE); }
 	bool nvram_save() const { return bool_value(OPTION_NVRAM_SAVE); }
+	const char *rtc_time() const { return value(OPTION_RTC_TIME); }
 
 	// core comm options
 	const char *comm_localhost() const { return value(OPTION_COMM_LOCAL_HOST); }
