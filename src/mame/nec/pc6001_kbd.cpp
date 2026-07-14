@@ -19,10 +19,10 @@ TODO:
 **************************************************************************************************/
 
 #include "emu.h"
-#include "machine/keyboard.ipp"
 #include "pc6001_kbd.h"
 
-#include "utf8.h"
+#include "machine/keyboard.ipp"
+
 
 DEFINE_DEVICE_TYPE(PC6001_KBD,   pc6001_kbd_device,   "pc6001_kbd",     "NEC PC-6001 Keyboard")
 
@@ -32,6 +32,7 @@ pc6001_kbd_device::pc6001_kbd_device(const machine_config &mconfig, const char *
 	, m_key_irq_cb(*this)
 	, m_keyfn_irq_cb(*this)
 	, m_joy_irq_cb(*this)
+	, m_joy_trigger_timer(nullptr)
 {
 }
 
@@ -109,7 +110,7 @@ static INPUT_PORTS_START( pc6001_kbd )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xEF\xBF\xA5") PORT_CHAR(165) PORT_CHAR('|')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(u8"¥") PORT_CHAR(U'¥') PORT_CHAR('|')
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F5 / F10") PORT_CODE(KEYCODE_F5)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -162,7 +163,7 @@ void pc6001_kbd_device::device_reset()
 
 std::tuple<uint8_t, bool> pc6001_kbd_device::translate(uint8_t row, uint8_t column)
 {
-	const u8 keytable[4][10 * 8] = {
+	static const u8 keytable[4][10 * 8] = {
 		// normal
 		{
 //     [0]  ----   CTRL   SHIFT  GRAPH  ----   ----   ----   ----

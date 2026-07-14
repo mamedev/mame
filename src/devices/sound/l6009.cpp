@@ -96,8 +96,8 @@ void l6009_device::sound_stream_update(sound_stream &stream)
 {
 	for (int s = 0; s < stream.samples(); s++)
 	{
-		s32 mono_out[8] = {0};
-		s32 stereo_out[2] = {0};
+		s32 mono_out[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+		s32 stereo_out[2] = {0, 0};
 		s32 effect_out = 0;
 
 		for (voice_t &v : m_voices)

@@ -82,7 +82,7 @@ public:
 		m_banks { { *this, "bank1" }, { *this, "bank2" }, { *this, "bank3" }, { *this, "bank4" } }
 	{ }
 
-	void genie3(machine_config &config);
+	void genie3(machine_config &config) ATTR_COLD;
 
 	void reset_w(int state);
 

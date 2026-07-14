@@ -62,7 +62,7 @@ public:
 	{
 	}
 
-	void pc8801(machine_config &config);
+	void pc8801(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -171,7 +171,8 @@ private:
 	void txdata_callback(int state);
 
 	// video section
-	void draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(u32 bitmap_offset, int y, int x, int xi)> dot_func);
+	template <typename T>
+	void draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, T &&dot_func);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void palette_reset();
@@ -188,8 +189,8 @@ public:
 		, m_alu_view(*this, "alu_view")
 	{ }
 
-	void pc8801mk2sr(machine_config &config);
-	void pc8801mk2mr(machine_config &config);
+	void pc8801mk2sr(machine_config &config) ATTR_COLD;
+	void pc8801mk2mr(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -226,7 +227,7 @@ public:
 		, m_setup_io_view(*this, "setup_io_view")
 	{ }
 
-	void pc8801fh(machine_config &config);
+	void pc8801fh(machine_config &config) ATTR_COLD;
 
 	template <bool IS_DUMPED> void init_setup_mode();
 
@@ -262,7 +263,7 @@ public:
 		, m_dictionary_rom(*this, "dictionary")
 	{ }
 
-	void pc8801ma(machine_config &config);
+	void pc8801ma(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -293,8 +294,8 @@ public:
 		, m_memsw_view(*this, "memsw_view")
 	{ }
 
-	void pc8801mc(machine_config &config);
-	void init_pc8801mc();
+	void pc8801mc(machine_config &config) ATTR_COLD;
+	void init_pc8801mc() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

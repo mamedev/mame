@@ -49,7 +49,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// device_memory_interface overrides
-	virtual space_config_vector memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override ATTR_COLD;
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream) override;
@@ -70,7 +70,7 @@ private:
 		u8 m_pitch_unk = 0;
 
 		u16 m_output_sel = 0;
-		u8 m_stereo[2] = {0};
+		u8 m_stereo[2] = {0, 0};
 
 		u16 m_volume_env = 0;
 		u32 m_volume_set = 0;
@@ -80,7 +80,7 @@ private:
 		u32 m_filter_set = 0;
 		u32 m_filter = 0;
 
-		s16 m_filter_out[3] = {0};
+		s16 m_filter_out[3] = {0, 0, 0};
 	};
 
 	void update_env(u32 &val, u32 dest, u16 rate);

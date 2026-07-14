@@ -150,9 +150,9 @@ void pc8801_state::palette_reset()
 	// bitmap init
 	for (i = 0; i < 8; i ++)
 	{
-		m_palram[i].b = i & 1 ? 7 : 0;
-		m_palram[i].r = i & 2 ? 7 : 0;
-		m_palram[i].g = i & 4 ? 7 : 0;
+		m_palram[i].b = (i & 1) ? 7 : 0;
+		m_palram[i].r = (i & 2) ? 7 : 0;
+		m_palram[i].g = (i & 4) ? 7 : 0;
 		m_palette->set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 	}
 	m_palette->set_pen_color(BGPAL_PEN, 0, 0, 0);
@@ -174,20 +174,21 @@ UPD3301_FETCH_ATTRIBUTE( pc8801_state::attr_fetch )
 	return attr_extend_info;
 }
 
-void pc8801_state::draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(u32 bitmap_offset, int y, int x, int xi)> dot_func)
+template <typename T>
+void pc8801_state::draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, T &&dot_func)
 {
 	uint16_t y_double = get_screen_frequency();
 	if ((m_gfx_ctrl & 0x11) == 0)
 		y_double = 0;
 	int32_t y_line_size = y_double + 1;
 
-	for(int y = cliprect.min_y; y <= cliprect.max_y; y += y_line_size)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y += y_line_size)
 	{
-		for(int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
 		{
 			u8 x_char = (x >> 3);
 			u32 bitmap_offset = (y >> y_double) * 80 + x_char;
-			for(int xi = 0; xi < 8; xi++)
+			for (int xi = 0; xi < 8; xi++)
 			{
 				u8 pen_dot = dot_func(bitmap_offset, y, x_char, 7 - xi);
 
@@ -212,7 +213,7 @@ void pc8801_state::draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, 
 
 uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if(m_gfx_ctrl & 8)
+	if (m_gfx_ctrl & 8)
 	{
 		// BG Pal applies to 1bpp mode only
 		// - sharrier draws blue backdrop with pen #0 during gameplay
@@ -220,37 +221,43 @@ uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 		const bool bitmap_color_mode = bool(m_gfx_ctrl & 0x10);
 		bitmap.fill(m_palette->pen(bitmap_color_mode ? 0 : BGPAL_PEN), cliprect);
 
-		if(bitmap_color_mode)
-			draw_bitmap(bitmap, cliprect, m_palette, [&](u32 bitmap_offset, int y, int x, int xi){
-				u8 res = 0;
+		if (bitmap_color_mode)
+		{
+			draw_bitmap(bitmap, cliprect, m_palette,
+					[this] (u32 bitmap_offset, int y, int x, int xi)
+					{
+						u8 res = 0;
 
-				// note: layer masking doesn't occur in 3bpp mode, bugattac relies on this
-				for (int plane = 0; plane < 3; plane ++)
-					res |= ((m_gvram[bitmap_offset + plane * 0x4000] >> xi) & 1) << plane;
+						// note: layer masking doesn't occur in 3bpp mode, bugattac relies on this
+						for (int plane = 0; plane < 3; plane ++)
+							res |= ((m_gvram[bitmap_offset + plane * 0x4000] >> xi) & 1) << plane;
 
-				return res;
-			});
+						return res;
+					});
+		}
 		else
 		{
 			if (m_gfx_ctrl & 1)
 			{
 				// b&w 640x200x3
-				draw_bitmap(bitmap, cliprect, m_palette, [&](u32 bitmap_offset, int y, int x, int xi){
-					u8 res = 0;
+				draw_bitmap(bitmap, cliprect, m_palette,
+						[this] (u32 bitmap_offset, int y, int x, int xi)
+						{
+							u8 res = 0;
 
-					// in this mode all three planes can potentially form the output
-					// it's the only place where I/O $53 bits 1-3 have an actual effect
-					for (int plane = 0; plane < 3; plane ++)
-					{
-						u8 mask = (m_bitmap_layer_mask >> plane) & 1;
-						res |= ((m_gvram[bitmap_offset + plane * 0x4000] >> xi) & mask);
-					}
+							// in this mode all three planes can potentially form the output
+							// it's the only place where I/O $53 bits 1-3 have an actual effect
+							for (int plane = 0; plane < 3; plane ++)
+							{
+								u8 mask = (m_bitmap_layer_mask >> plane) & 1;
+								res |= ((m_gvram[bitmap_offset + plane * 0x4000] >> xi) & mask);
+							}
 
-					if (!res)
-						return 0;
+							if (!res)
+								return 0;
 
-					return m_crtc->is_gfx_color_mode() ? (m_attr_info[y][x] >> 13) & 7 : 7;
-				});
+							return m_crtc->is_gfx_color_mode() ? (m_attr_info[y][x] >> 13) & 7 : 7;
+						});
 			}
 			else
 			{
@@ -260,31 +267,33 @@ uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 				//    that runs in 3bpp)
 				// - byoin set a transparent text layer (ASCII=0x20 / attribute = 0x80 0x00)
 				//   but it's in gfx_mode = 0 (b&w) so it just draw white from here.
-				draw_bitmap(bitmap, cliprect, m_crtc_palette, [&](u32 bitmap_offset, int y, int x, int xi){
-					u8 res = 0;
-					// HW pick ups just the first two planes (R and B), G is unused for drawing purposes.
-					// Plane switch happens at half screen, VRAM areas 0x3e80-0x3fff is unused again.
-					// TODO: confirm that a 15 kHz monitor cannot work with this
-					// - jettermi just uses the other b&w mode;
-					// - casablan/byoin doesn't bother in changing resolution so only the upper part is drawn.
-					// Update: real HW capture shows an ugly overlap with the two layers,
-					// implying that the second plane just latches on the same signals as the first,
-					// YAGNI unless found in concrete example.
-					int plane_offset = y >= 200 ? 384 : 0;
+				draw_bitmap(bitmap, cliprect, m_crtc_palette,
+						[this] (u32 bitmap_offset, int y, int x, int xi)
+						{
+							u8 res = 0;
+							// HW pick ups just the first two planes (R and B), G is unused for drawing purposes.
+							// Plane switch happens at half screen, VRAM areas 0x3e80-0x3fff is unused again.
+							// TODO: confirm that a 15 kHz monitor cannot work with this
+							// - jettermi just uses the other b&w mode;
+							// - casablan/byoin doesn't bother in changing resolution so only the upper part is drawn.
+							// Update: real HW capture shows an ugly overlap with the two layers,
+							// implying that the second plane just latches on the same signals as the first,
+							// YAGNI unless found in concrete example.
+							const int plane_offset = (y >= 200) ? 384 : 0;
 
-					res |= ((m_gvram[bitmap_offset + plane_offset] >> xi) & 1);
-					if (!res)
-						return 0;
+							res |= ((m_gvram[bitmap_offset + plane_offset] >> xi) & 1);
+							if (!res)
+								return 0;
 
-					return m_crtc->is_gfx_color_mode() ? (m_attr_info[y][x] >> 13) & 7 : 7;
-				});
+							return m_crtc->is_gfx_color_mode() ? (m_attr_info[y][x] >> 13) & 7 : 7;
+						});
 			}
 		}
 	}
 	else
 		bitmap.fill(0, cliprect);
 
-	if(!m_text_layer_mask)
+	if (!m_text_layer_mask)
 	{
 		m_text_bitmap.fill(0, cliprect);
 		m_crtc->screen_update(screen, m_text_bitmap, cliprect);
@@ -327,7 +336,7 @@ void pc8801_state::wram_w(offs_t offset, uint8_t data)
 
 uint8_t pc8801_state::ext_wram_r(offs_t offset)
 {
-	if(offset < m_extram_size)
+	if (offset < m_extram_size)
 		return m_ext_work_ram[offset];
 
 	return 0xff;
@@ -335,7 +344,7 @@ uint8_t pc8801_state::ext_wram_r(offs_t offset)
 
 void pc8801_state::ext_wram_w(offs_t offset, uint8_t data)
 {
-	if(offset < m_extram_size)
+	if (offset < m_extram_size)
 		m_ext_work_ram[offset] = data;
 }
 
@@ -390,25 +399,25 @@ void pc8801_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).lrw8(
 		NAME([this] (offs_t offset) {
-			if(m_extram_mode & 1)
+			if (m_extram_mode & 1)
 				return ext_wram_r(offset | (m_extram_bank * 0x8000));
 
-			if(m_gfx_ctrl & 2)
+			if (m_gfx_ctrl & 2)
 				return wram_r(offset);
 
-			if(cdbios_rom_enable())
+			if (cdbios_rom_enable())
 				return cdbios_rom_r(offset & 0x7fff);
 
-			if(m_gfx_ctrl & 4)
+			if (m_gfx_ctrl & 4)
 				return nbasic_rom_r(offset);
 
-			if(offset >= 0x6000 && offset <= 0x7fff && ((m_ext_rom_bank & 1) == 0))
+			if (offset >= 0x6000 && offset <= 0x7fff && ((m_ext_rom_bank & 1) == 0))
 				return n88basic_rom_r(0x8000 + (offset & 0x1fff) + (0x2000 * (m_misc_ctrl & 3)));
 
 			return n88basic_rom_r(offset);
 		}),
 		NAME([this] (offs_t offset, uint8_t data) {
-			if(m_extram_mode & 0x10)
+			if (m_extram_mode & 0x10)
 				ext_wram_w(offset | (m_extram_bank * 0x8000), data);
 			else
 				wram_w(offset, data);
@@ -429,7 +438,7 @@ void pc8801_state::main_map(address_map &map)
 			const uint16_t window_offset = (offset & 0x3ff) + (m_window_offset_bank << 8);
 
 			// castlex and imenes accesses this
-			if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
+			if (((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
 				return high_wram_r(window_offset & 0xfff);
 
 			return wram_r(window_offset);
@@ -438,7 +447,7 @@ void pc8801_state::main_map(address_map &map)
 			const uint16_t window_offset = (offset & 0x3ff) + (m_window_offset_bank << 8);
 
 			// castlex and imenes accesses this
-			if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
+			if (((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
 				high_wram_w(window_offset & 0xfff, data);
 			else
 				wram_w(window_offset, data);
@@ -449,7 +458,7 @@ void pc8801_state::main_map(address_map &map)
 
 uint8_t pc8801_state::wram_c000_r(offs_t offset)
 {
-	if((offset & 0x3000) == 0x3000 && (m_misc_ctrl & 0x10))
+	if ((offset & 0x3000) == 0x3000 && (m_misc_ctrl & 0x10))
 		return high_wram_r(offset & 0xfff);
 
 	return wram_r(offset + 0xc000);
@@ -457,7 +466,7 @@ uint8_t pc8801_state::wram_c000_r(offs_t offset)
 
 void pc8801_state::wram_c000_w(offs_t offset, uint8_t data)
 {
-	if((offset & 0x3000) == 0x3000 && (m_misc_ctrl & 0x10))
+	if ((offset & 0x3000) == 0x3000 && (m_misc_ctrl & 0x10))
 	{
 		high_wram_w(offset & 0xfff, data);
 		return;
@@ -575,16 +584,16 @@ void pc8801_state::port40_w(uint8_t data)
 	m_rtc->stb_w(BIT(data, 1));
 	m_rtc->clk_w(BIT(data, 2));
 
-	if(((m_device_ctrl_data & 0x20) == 0x00) && ((data & 0x20) == 0x20))
+	if (((m_device_ctrl_data & 0x20) == 0x00) && ((data & 0x20) == 0x20))
 		m_beeper->set_state(1);
 
-	if(((m_device_ctrl_data & 0x20) == 0x20) && ((data & 0x20) == 0x00))
+	if (((m_device_ctrl_data & 0x20) == 0x20) && ((data & 0x20) == 0x00))
 		m_beeper->set_state(0);
 
 	m_mouse_port->pin_8_w(BIT(data, 6));
 
 	// TODO: is SING a buzzer mask? bastard leaves beeper to ON state otherwise
-	if(m_device_ctrl_data & 0x80)
+	if (m_device_ctrl_data & 0x80)
 		m_beeper->set_state(0);
 
 	m_device_ctrl_data = data;
@@ -677,9 +686,9 @@ void pc8801_state::bgpal_w(uint8_t data)
 
 void pc8801_state::palram_w(offs_t offset, uint8_t data)
 {
-	if(m_misc_ctrl & 0x20) //analog palette
+	if (m_misc_ctrl & 0x20) //analog palette
 	{
-		if((data & 0x40) == 0)
+		if ((data & 0x40) == 0)
 		{
 			m_palram[offset].b = data & 0x7;
 			m_palram[offset].r = (data & 0x38) >> 3;
@@ -691,9 +700,9 @@ void pc8801_state::palram_w(offs_t offset, uint8_t data)
 	}
 	else //digital palette
 	{
-		m_palram[offset].b = data & 1 ? 7 : 0;
-		m_palram[offset].r = data & 2 ? 7 : 0;
-		m_palram[offset].g = data & 4 ? 7 : 0;
+		m_palram[offset].b = (data & 1) ? 7 : 0;
+		m_palram[offset].r = (data & 2) ? 7 : 0;
+		m_palram[offset].g = (data & 4) ? 7 : 0;
 	}
 
 	// TODO: What happens to the palette contents when the analog/digital palette mode changes?
@@ -752,7 +761,7 @@ void pc8801_state::extram_bank_w(uint8_t data)
  */
 template <unsigned kanji_level> uint8_t pc8801_state::kanji_r(offs_t offset)
 {
-	if((offset & 2) == 0)
+	if ((offset & 2) == 0)
 	{
 		const u8 *kanji_rom = kanji_level ? m_kanji_lv2_rom : m_kanji_rom;
 		const u32 kanji_address = (m_knj_addr[kanji_level] * 2) + ((offset & 1) ^ 1);
@@ -764,7 +773,7 @@ template <unsigned kanji_level> uint8_t pc8801_state::kanji_r(offs_t offset)
 
 template <unsigned kanji_level> void pc8801_state::kanji_w(offs_t offset, uint8_t data)
 {
-	if((offset & 2) == 0)
+	if ((offset & 2) == 0)
 	{
 		m_knj_addr[kanji_level] = (
 			((offset & 1) == 0) ?

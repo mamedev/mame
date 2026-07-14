@@ -8,6 +8,9 @@
 
 #include "machine/keyboard.h"
 
+#include <tuple>
+
+
 class pc6001_kbd_device : public device_t
 						, protected device_matrix_keyboard_interface<10>
 {
@@ -39,14 +42,15 @@ private:
 	devcb_write_line m_keyfn_irq_cb;
 	devcb_write_line m_joy_irq_cb;
 
-	TIMER_CALLBACK_MEMBER(joy_trigger_cb);
-	emu_timer *m_joy_trigger_timer = nullptr;
-
-	uint8_t convert_key_to_joy_map();
+	emu_timer *m_joy_trigger_timer;
 
 	u8 m_scan_code;
 	u8 m_joy_code;
 	bool m_fn_key;
+
+	TIMER_CALLBACK_MEMBER(joy_trigger_cb);
+
+	uint8_t convert_key_to_joy_map();
 };
 
 DECLARE_DEVICE_TYPE(PC6001_KBD, pc6001_kbd_device)
