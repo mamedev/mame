@@ -298,7 +298,7 @@
   [2018-11-10]
 
   Piccolo Poker 100 from Admiral/Novomatic.
-  - Protection understood, documented, and completelly simulated.
+  - Protection understood, documented, and completely simulated.
   - Removed the ugly patch/hack in the driver_init that formerly allows to boot.
   - Some clean-ups...
   - Added technical notes.
@@ -1272,6 +1272,21 @@ ROM_START( ampkr2b4 )
 	ROM_LOAD( "82s147an.u48", 0x0000, 0x0200, CRC(9bc8e543) SHA1(e4882868a43e21a509a180b9731600d1dd63b5cc) )
 ROM_END
 
+ROM_START( ampkr2b5 ) // PCB marked PJ-COM. There's a chance it may actually be an original.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pk.u4", 0x4000, 0x4000, CRC(f6da8719) SHA1(da7ba7c1b3f2685e6a60606fdebf61c2bd400dd4) )
+	ROM_CONTINUE(      0x0000, 0x4000 )
+	ROM_LOAD( "5.u5",  0x8000, 0x4000, CRC(6a670aa0) SHA1(2b6078708b02c5ad4897ae1d5f85aa9fdeb4a26c) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(                0x4000 )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "35.u35", 0x0000, 0x4000, CRC(a9992a51) SHA1(0c6b87a1bd8f7f9ce75a15ed4046ec1ddb08d196) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(                 0x4000 )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s147an.u56", 0x0000, 0x0200, CRC(9bc8e543) SHA1(e4882868a43e21a509a180b9731600d1dd63b5cc) )
+ROM_END
+
 ROM_START( ampkr95 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "amp95rus.u6", 0x0000, 0x10000, CRC(6ec74b2b) SHA1(2dca05bc111071f1407dd524b67b5a3dc5848c70) )
@@ -1579,6 +1594,7 @@ GAMEL( 1990, ampkr2b1,   ampoker2, ampoker2, ampoker2, ampoker2_state, empty_ini
 GAMEL( 1990, ampkr2b2,   ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg",           "American Poker II (bootleg, set 2)",           MACHINE_SUPPORTS_SAVE,                       layout_ampoker2 )
 GAMEL( 1994, ampkr2b3,   ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg",           "American Poker II (bootleg, set 3)",           MACHINE_SUPPORTS_SAVE,                       layout_ampoker2 )
 GAMEL( 1994, ampkr2b4,   ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg",           "American Poker II (bootleg, set 4)",           MACHINE_SUPPORTS_SAVE,                       layout_ampoker2 )
+GAMEL( 1994, ampkr2b5,   ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg",           "American Poker II (bootleg, set 5)",           MACHINE_SUPPORTS_SAVE,                       layout_ampoker2 )
 GAMEL( 1994, ampkr228,   ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg?",          "American Poker II (iamp2 v28)",                MACHINE_SUPPORTS_SAVE,                       layout_ampoker2 )
 GAMEL( 1994, ampkr2jsp,  ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg?",          "American Poker II - Jackpot (Spanish, set 1)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_ampoker2 )
 GAMEL( 1994, ampkr2jspa, ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg?",          "American Poker II - Jackpot (Spanish, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_ampoker2 )
