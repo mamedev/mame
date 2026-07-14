@@ -5164,6 +5164,7 @@ void z8002_device::Z8D_imm4_0011()
 void z8002_device::Z8D_imm4_0101()
 {
 	m_fcw ^= (m_op[0] & 0x00f0);
+	m_fcw ^= F_H;   /* opcode bit IR[2] is set, so hardware toggles H too */
 }
 
 /******************************************
