@@ -1833,7 +1833,7 @@ void z8002_device::Z15_ssN0_ddN0()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	RL(dst) = POPL(src);
+	WRIR_L(dst, POPL(src));
 }
 
 /******************************************
