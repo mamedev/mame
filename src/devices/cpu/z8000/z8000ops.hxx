@@ -684,7 +684,7 @@ uint32_t z8002_device::MULTW(uint16_t dest, uint16_t value)
 		/* multiplication with zero is faster */
 		m_icount += (70-18);
 	}
-	if((int32_t)result < -0x7fff || (int32_t)result >= 0x7fff) SET_C;
+	if((int32_t)result < -0x8000 || (int32_t)result >= 0x8000) SET_C;
 	return result;
 }
 
