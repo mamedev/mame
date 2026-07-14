@@ -813,11 +813,16 @@ uint64_t z8002_device::DIVL(uint64_t dest, uint32_t value)
 uint8_t z8002_device::RLB(uint8_t dest, uint8_t twice)
 {
 	uint8_t result = (dest << 1) | (dest >> 7);
+	uint8_t v = (result ^ dest) & S08;
 	CLR_CZSV;
-	if (twice) result = (result << 1) | (result >> 7);
+	if (twice) {
+		uint8_t prev = result;
+		result = (result << 1) | (result >> 7);
+		v |= (result ^ prev) & S08;
+	}
 	CHK_XXXB_ZS;    /* set Z and S flags for result byte       */
 	if (result & 0x01) SET_C;
-	if ((result ^ dest) & S08) SET_V;
+	if (v) SET_V;
 	return result;
 }
 
@@ -828,11 +833,16 @@ uint8_t z8002_device::RLB(uint8_t dest, uint8_t twice)
 uint16_t z8002_device::RLW(uint16_t dest, uint8_t twice)
 {
 	uint16_t result = (dest << 1) | (dest >> 15);
+	uint16_t v = (result ^ dest) & S16;
 	CLR_CZSV;
-	if (twice) result = (result << 1) | (result >> 15);
+	if (twice) {
+		uint16_t prev = result;
+		result = (result << 1) | (result >> 15);
+		v |= (result ^ prev) & S16;
+	}
 	CHK_XXXW_ZS;    /* set Z and S flags for result word       */
 	if (result & 0x0001) SET_C;
-	if ((result ^ dest) & S16) SET_V;
+	if (v) SET_V;
 	return result;
 }
 
@@ -844,15 +854,18 @@ uint8_t z8002_device::RLCB(uint8_t dest, uint8_t twice)
 {
 	uint8_t c = dest & S08;
 	uint8_t result = (dest << 1) | GET_C;
+	uint8_t v = (result ^ dest) & S08;
 	CLR_CZSV;
 	if (twice) {
 		uint8_t c1 = c >> 7;
+		uint8_t prev = result;
 		c = result & S08;
 		result = (result << 1) | c1;
+		v |= (result ^ prev) & S08;
 	}
 	CHK_XXXB_ZS;    /* set Z and S flags for result byte       */
 	if (c) SET_C;
-	if ((result ^ dest) & S08) SET_V;
+	if (v) SET_V;
 	return result;
 }
 
@@ -864,15 +877,18 @@ uint16_t z8002_device::RLCW(uint16_t dest, uint8_t twice)
 {
 	uint16_t c = dest & S16;
 	uint16_t result = (dest << 1) | GET_C;
+	uint16_t v = (result ^ dest) & S16;
 	CLR_CZSV;
 	if (twice) {
 		uint16_t c1 = c >> 15;
+		uint16_t prev = result;
 		c = result & S16;
 		result = (result << 1) | c1;
+		v |= (result ^ prev) & S16;
 	}
 	CHK_XXXW_ZS;    /* set Z and S flags for result word       */
 	if (c) SET_C;
-	if ((result ^ dest) & S16) SET_V;
+	if (v) SET_V;
 	return result;
 }
 
@@ -883,10 +899,15 @@ uint16_t z8002_device::RLCW(uint16_t dest, uint8_t twice)
 uint8_t z8002_device::RRB(uint8_t dest, uint8_t twice)
 {
 	uint8_t result = (dest >> 1) | (dest << 7);
+	uint8_t v = (result ^ dest) & S08;
 	CLR_CZSV;
-	if (twice) result = (result >> 1) | (result << 7);
+	if (twice) {
+		uint8_t prev = result;
+		result = (result >> 1) | (result << 7);
+		v |= (result ^ prev) & S08;
+	}
 	if (!result) SET_Z; else if (result & S08) SET_SC;
-	if ((result ^ dest) & S08) SET_V;
+	if (v) SET_V;
 	return result;
 }
 
@@ -897,10 +918,15 @@ uint8_t z8002_device::RRB(uint8_t dest, uint8_t twice)
 uint16_t z8002_device::RRW(uint16_t dest, uint8_t twice)
 {
 	uint16_t result = (dest >> 1) | (dest << 15);
+	uint16_t v = (result ^ dest) & S16;
 	CLR_CZSV;
-	if (twice) result = (result >> 1) | (result << 15);
+	if (twice) {
+		uint16_t prev = result;
+		result = (result >> 1) | (result << 15);
+		v |= (result ^ prev) & S16;
+	}
 	if (!result) SET_Z; else if (result & S16) SET_SC;
-	if ((result ^ dest) & S16) SET_V;
+	if (v) SET_V;
 	return result;
 }
 
@@ -912,15 +938,18 @@ uint8_t z8002_device::RRCB(uint8_t dest, uint8_t twice)
 {
 	uint8_t c = dest & 1;
 	uint8_t result = (dest >> 1) | (GET_C << 7);
+	uint8_t v = (result ^ dest) & S08;
 	CLR_CZSV;
 	if (twice) {
 		uint8_t c1 = c << 7;
+		uint8_t prev = result;
 		c = result & 1;
 		result = (result >> 1) | c1;
+		v |= (result ^ prev) & S08;
 	}
 	CHK_XXXB_ZS;    /* set Z and S flags for result byte       */
 	if (c) SET_C;
-	if ((result ^ dest) & S08) SET_V;
+	if (v) SET_V;
 	return result;
 }
 
@@ -932,15 +961,18 @@ uint16_t z8002_device::RRCW(uint16_t dest, uint8_t twice)
 {
 	uint16_t c = dest & 1;
 	uint16_t result = (dest >> 1) | (GET_C << 15);
+	uint16_t v = (result ^ dest) & S16;
 	CLR_CZSV;
 	if (twice) {
 		uint16_t c1 = c << 15;
+		uint16_t prev = result;
 		c = result & 1;
 		result = (result >> 1) | c1;
+		v |= (result ^ prev) & S16;
 	}
 	CHK_XXXW_ZS;    /* set Z and S flags for result word       */
 	if (c) SET_C;
-	if ((result ^ dest) & S16) SET_V;
+	if (v) SET_V;
 	return result;
 }
 
@@ -951,11 +983,13 @@ uint16_t z8002_device::RRCW(uint16_t dest, uint8_t twice)
 uint8_t z8002_device::SDAB(uint8_t dest, int8_t count)
 {
 	int8_t result = (int8_t) dest;
-	uint8_t c = 0;
+	uint8_t c = 0, v = 0;
 	CLR_CZSV;
 	while (count > 0) {
+		int8_t prev = result;
 		c = result & S08;
 		result <<= 1;
+		v |= (result ^ prev) & S08;
 		count--;
 	}
 	while (count < 0) {
@@ -965,7 +999,7 @@ uint8_t z8002_device::SDAB(uint8_t dest, int8_t count)
 	}
 	CHK_XXXB_ZS;    /* set Z and S flags for result byte       */
 	if (c) SET_C;
-	if ((result ^ dest) & S08) SET_V;
+	if (v) SET_V;
 	return (uint8_t)result;
 }
 
@@ -976,11 +1010,13 @@ uint8_t z8002_device::SDAB(uint8_t dest, int8_t count)
 uint16_t z8002_device::SDAW(uint16_t dest, int8_t count)
 {
 	int16_t result = (int16_t) dest;
-	uint16_t c = 0;
+	uint16_t c = 0, v = 0;
 	CLR_CZSV;
 	while (count > 0) {
+		int16_t prev = result;
 		c = result & S16;
 		result <<= 1;
+		v |= (result ^ prev) & S16;
 		count--;
 	}
 	while (count < 0) {
@@ -990,7 +1026,7 @@ uint16_t z8002_device::SDAW(uint16_t dest, int8_t count)
 	}
 	CHK_XXXW_ZS;    /* set Z and S flags for result word       */
 	if (c) SET_C;
-	if ((result ^ dest) & S16) SET_V;
+	if (v) SET_V;
 	return (uint16_t)result;
 }
 
@@ -1001,11 +1037,13 @@ uint16_t z8002_device::SDAW(uint16_t dest, int8_t count)
 uint32_t z8002_device::SDAL(uint32_t dest, int8_t count)
 {
 	int32_t result = (int32_t) dest;
-	uint32_t c = 0;
+	uint32_t c = 0, v = 0;
 	CLR_CZSV;
 	while (count > 0) {
+		int32_t prev = result;
 		c = result & S32;
 		result <<= 1;
+		v |= (result ^ prev) & S32;
 		count--;
 	}
 	while (count < 0) {
@@ -1015,7 +1053,7 @@ uint32_t z8002_device::SDAL(uint32_t dest, int8_t count)
 	}
 	CHK_XXXL_ZS;    /* set Z and S flags for result long       */
 	if (c) SET_C;
-	if ((result ^ dest) & S32) SET_V;
+	if (v) SET_V;
 	return (uint32_t) result;
 }
 
@@ -1026,21 +1064,25 @@ uint32_t z8002_device::SDAL(uint32_t dest, int8_t count)
 uint8_t z8002_device::SDLB(uint8_t dest, int8_t count)
 {
 	uint8_t result = dest;
-	uint8_t c = 0;
+	uint8_t c = 0, v = 0;
 	CLR_CZSV;
 	while (count > 0) {
+		uint8_t prev = result;
 		c = result & S08;
 		result <<= 1;
+		v |= (result ^ prev) & S08;
 		count--;
 	}
 	while (count < 0) {
+		uint8_t prev = result;
 		c = result & 0x01;
 		result >>= 1;
+		v |= (result ^ prev) & S08;
 		count++;
 	}
 	CHK_XXXB_ZS;    /* set Z and S flags for result byte       */
 	if (c) SET_C;
-	if ((result ^ dest) & S08) SET_V;
+	if (v) SET_V;
 	return result;
 }
 
@@ -1051,21 +1093,25 @@ uint8_t z8002_device::SDLB(uint8_t dest, int8_t count)
 uint16_t z8002_device::SDLW(uint16_t dest, int8_t count)
 {
 	uint16_t result = dest;
-	uint16_t c = 0;
+	uint16_t c = 0, v = 0;
 	CLR_CZSV;
 	while (count > 0) {
+		uint16_t prev = result;
 		c = result & S16;
 		result <<= 1;
+		v |= (result ^ prev) & S16;
 		count--;
 	}
 	while (count < 0) {
+		uint16_t prev = result;
 		c = result & 0x0001;
 		result >>= 1;
+		v |= (result ^ prev) & S16;
 		count++;
 	}
 	CHK_XXXW_ZS;    /* set Z and S flags for result word       */
 	if (c) SET_C;
-	if ((result ^ dest) & S16) SET_V;
+	if (v) SET_V;
 	return result;
 }
 
@@ -1076,21 +1122,25 @@ uint16_t z8002_device::SDLW(uint16_t dest, int8_t count)
 uint32_t z8002_device::SDLL(uint32_t dest, int8_t count)
 {
 	uint32_t result = dest;
-	uint32_t c = 0;
+	uint32_t c = 0, v = 0;
 	CLR_CZSV;
 	while (count > 0) {
+		uint32_t prev = result;
 		c = result & S32;
 		result <<= 1;
+		v |= (result ^ prev) & S32;
 		count--;
 	}
 	while (count < 0) {
+		uint32_t prev = result;
 		c = result & 0x00000001;
 		result >>= 1;
+		v |= (result ^ prev) & S32;
 		count++;
 	}
 	CHK_XXXL_ZS;    /* set Z and S flags for result long       */
 	if (c) SET_C;
-	if ((result ^ dest) & S32) SET_V;
+	if (v) SET_V;
 	return result;
 }
 
@@ -1100,13 +1150,20 @@ uint32_t z8002_device::SDLL(uint32_t dest, int8_t count)
  ******************************************/
 uint8_t z8002_device::SLAB(uint8_t dest, uint8_t count)
 {
-	uint8_t c = (count) ? (dest << (count - 1)) & S08 : 0;
-	uint8_t result = (uint8_t)((int8_t)dest << count);
+	int8_t result = (int8_t) dest;
+	uint8_t c = 0, v = 0;
 	CLR_CZSV;
+	while (count > 0) {
+		int8_t prev = result;
+		c = result & S08;
+		result <<= 1;
+		v |= (result ^ prev) & S08;
+		count--;
+	}
 	CHK_XXXB_ZS;    /* set Z and S flags for result byte       */
 	if (c) SET_C;
-	if ((result ^ dest) & S08) SET_V;
-	return result;
+	if (v) SET_V;
+	return (uint8_t)result;
 }
 
 /******************************************
@@ -1115,13 +1172,20 @@ uint8_t z8002_device::SLAB(uint8_t dest, uint8_t count)
  ******************************************/
 uint16_t z8002_device::SLAW(uint16_t dest, uint8_t count)
 {
-	uint16_t c = (count) ? (dest << (count - 1)) & S16 : 0;
-	uint16_t result = (uint16_t)((int16_t)dest << count);
+	int16_t result = (int16_t) dest;
+	uint16_t c = 0, v = 0;
 	CLR_CZSV;
+	while (count > 0) {
+		int16_t prev = result;
+		c = result & S16;
+		result <<= 1;
+		v |= (result ^ prev) & S16;
+		count--;
+	}
 	CHK_XXXW_ZS;    /* set Z and S flags for result word       */
 	if (c) SET_C;
-	if ((result ^ dest) & S16) SET_V;
-	return result;
+	if (v) SET_V;
+	return (uint16_t)result;
 }
 
 /******************************************
@@ -1130,13 +1194,20 @@ uint16_t z8002_device::SLAW(uint16_t dest, uint8_t count)
  ******************************************/
 uint32_t z8002_device::SLAL(uint32_t dest, uint8_t count)
 {
-	uint32_t c = (count) ? (dest << (count - 1)) & S32 : 0;
-	uint32_t result = (uint32_t)((int32_t)dest << count);
+	int32_t result = (int32_t) dest;
+	uint32_t c = 0, v = 0;
 	CLR_CZSV;
+	while (count > 0) {
+		int32_t prev = result;
+		c = result & S32;
+		result <<= 1;
+		v |= (result ^ prev) & S32;
+		count--;
+	}
 	CHK_XXXL_ZS;    /* set Z and S flags for result long       */
 	if (c) SET_C;
-	if ((result ^ dest) & S32) SET_V;
-	return result;
+	if (v) SET_V;
+	return (uint32_t)result;
 }
 
 /******************************************
@@ -1145,11 +1216,19 @@ uint32_t z8002_device::SLAL(uint32_t dest, uint8_t count)
  ******************************************/
 uint8_t z8002_device::SLLB(uint8_t dest, uint8_t count)
 {
-	uint8_t c = (count) ? (dest << (count - 1)) & S08 : 0;
-	uint8_t result = dest << count;
-	CLR_CZS;
+	uint8_t result = dest;
+	uint8_t c = 0, v = 0;
+	CLR_CZSV;
+	while (count > 0) {
+		uint8_t prev = result;
+		c = result & S08;
+		result <<= 1;
+		v |= (result ^ prev) & S08;
+		count--;
+	}
 	CHK_XXXB_ZS;    /* set Z and S flags for result byte       */
 	if (c) SET_C;
+	if (v) SET_V;
 	return result;
 }
 
@@ -1159,11 +1238,19 @@ uint8_t z8002_device::SLLB(uint8_t dest, uint8_t count)
  ******************************************/
 uint16_t z8002_device::SLLW(uint16_t dest, uint8_t count)
 {
-	uint16_t c = (count) ? (dest << (count - 1)) & S16 : 0;
-	uint16_t result = dest << count;
-	CLR_CZS;
+	uint16_t result = dest;
+	uint16_t c = 0, v = 0;
+	CLR_CZSV;
+	while (count > 0) {
+		uint16_t prev = result;
+		c = result & S16;
+		result <<= 1;
+		v |= (result ^ prev) & S16;
+		count--;
+	}
 	CHK_XXXW_ZS;    /* set Z and S flags for result word       */
 	if (c) SET_C;
+	if (v) SET_V;
 	return result;
 }
 
@@ -1173,11 +1260,19 @@ uint16_t z8002_device::SLLW(uint16_t dest, uint8_t count)
  ******************************************/
 uint32_t z8002_device::SLLL(uint32_t dest, uint8_t count)
 {
-	uint32_t c = (count) ? (dest << (count - 1)) & S32 : 0;
-	uint32_t result = dest << count;
-	CLR_CZS;
+	uint32_t result = dest;
+	uint32_t c = 0, v = 0;
+	CLR_CZSV;
+	while (count > 0) {
+		uint32_t prev = result;
+		c = result & S32;
+		result <<= 1;
+		v |= (result ^ prev) & S32;
+		count--;
+	}
 	CHK_XXXL_ZS;    /* set Z and S flags for result long       */
 	if (c) SET_C;
+	if (v) SET_V;
 	return result;
 }
 
@@ -1229,11 +1324,19 @@ uint32_t z8002_device::SRAL(uint32_t dest, uint8_t count)
  ******************************************/
 uint8_t z8002_device::SRLB(uint8_t dest, uint8_t count)
 {
-	uint8_t c = (count) ? (dest >> (count - 1)) & 1 : 0;
-	uint8_t result = dest >> count;
-	CLR_CZS;
+	uint8_t result = dest;
+	uint8_t c = 0, v = 0;
+	CLR_CZSV;
+	while (count > 0) {
+		uint8_t prev = result;
+		c = result & 0x01;
+		result >>= 1;
+		v |= (result ^ prev) & S08;
+		count--;
+	}
 	CHK_XXXB_ZS;    /* set Z and S flags for result byte       */
 	if (c) SET_C;
+	if (v) SET_V;
 	return result;
 }
 
@@ -1243,11 +1346,19 @@ uint8_t z8002_device::SRLB(uint8_t dest, uint8_t count)
  ******************************************/
 uint16_t z8002_device::SRLW(uint16_t dest, uint8_t count)
 {
-	uint8_t c = (count) ? (dest >> (count - 1)) & 1 : 0;
-	uint16_t result = dest >> count;
-	CLR_CZS;
+	uint16_t result = dest;
+	uint16_t c = 0, v = 0;
+	CLR_CZSV;
+	while (count > 0) {
+		uint16_t prev = result;
+		c = result & 0x0001;
+		result >>= 1;
+		v |= (result ^ prev) & S16;
+		count--;
+	}
 	CHK_XXXW_ZS;    /* set Z and S flags for result word       */
 	if (c) SET_C;
+	if (v) SET_V;
 	return result;
 }
 
@@ -1257,11 +1368,19 @@ uint16_t z8002_device::SRLW(uint16_t dest, uint8_t count)
  ******************************************/
 uint32_t z8002_device::SRLL(uint32_t dest, uint8_t count)
 {
-	uint8_t c = (count) ? (dest >> (count - 1)) & 1 : 0;
-	uint32_t result = dest >> count;
-	CLR_CZS;
+	uint32_t result = dest;
+	uint32_t c = 0, v = 0;
+	CLR_CZSV;
+	while (count > 0) {
+		uint32_t prev = result;
+		c = result & 0x00000001;
+		result >>= 1;
+		v |= (result ^ prev) & S32;
+		count--;
+	}
 	CHK_XXXL_ZS;    /* set Z and S flags for result long       */
 	if (c) SET_C;
+	if (v) SET_V;
 	return result;
 }
 
