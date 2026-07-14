@@ -66,15 +66,15 @@ public:
 	static char const *const WINDOW_PREFIX;
 
 private:
-		enum buffer_status
-		{
-			BUFFER_PRE_FLUSH,
-			BUFFER_FLUSH,
-			BUFFER_SCREEN,
-			BUFFER_EMPTY,
-			BUFFER_DONE_EMPTY,
-			BUFFER_DONE
-		};
+	enum buffer_status
+	{
+		BUFFER_PRE_FLUSH,
+		BUFFER_FLUSH,
+		BUFFER_SCREEN,
+		BUFFER_EMPTY,
+		BUFFER_DONE_EMPTY,
+		BUFFER_DONE
+	};
 
 	class parent_module_holder
 	{
