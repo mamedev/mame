@@ -18,6 +18,7 @@
 #include "machine/bankdev.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
+#include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/upd765.h"
 #include "sound/ay8910.h"
@@ -41,9 +42,9 @@ class pc6001_state : public driver_device
 public:
 	pc6001_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_ppi(*this, "ppi8255")
-		, m_ram(*this, "ram")
 		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, "ram")
+		, m_ppi(*this, "ppi8255")
 		, m_screen(*this, "screen")
 		, m_joy(*this, "joy%u", 1U)
 		, m_joymux(*this, "joymux")
@@ -64,7 +65,7 @@ public:
 	uint8_t nec_ppi8255_r(offs_t offset);
 	void nec_ppi8255_w(offs_t offset, uint8_t data);
 
-	void pc6001_palette(palette_device &palette) const;
+	void palette_init(palette_device &palette) const;
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -87,9 +88,9 @@ public:
 
 	void pc6001(machine_config &config);
 protected:
-	required_device<i8255_device> m_ppi;
-	optional_shared_ptr<uint8_t> m_ram;
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
+	required_device<i8255_device> m_ppi;
 	required_device<screen_device> m_screen;
 	required_device_array<msx_general_purpose_port_device, 2> m_joy;
 	required_device<ls157_x2_device> m_joymux;
@@ -105,15 +106,12 @@ protected:
 	optional_device<address_map_bank_device> m_cart_bank;
 	required_device<palette_device> m_palette;
 
-	memory_region *m_cart_rom = nullptr;
 	uint8_t m_timer_irq_vector = 0;
 	uint16_t m_timer_hz_div = 0;
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void default_cartridge_reset();
-//	void default_cassette_hack_reset();
 	void irq_reset(u8 timer_default_setting);
 
 	virtual void video_start() override ATTR_COLD;
@@ -127,7 +125,6 @@ protected:
 	inline void cassette_latch_control(bool new_state);
 	inline void ppi_control_hack_w(uint8_t data);
 	inline void set_timer_divider();
-	inline void set_videoram_bank(uint32_t offs);
 	void write_centronics_busy(int state);
 
 	// snapshot handling
@@ -146,7 +143,7 @@ protected:
 
 	emu_timer *m_timer_irq_timer = nullptr;
 	uint8_t *m_video_base = nullptr;
-	std::unique_ptr<uint8_t[]> m_video_ram;
+//	std::unique_ptr<uint8_t[]> m_video_ram;
 	uint8_t m_cas_switch = 0;
 	uint8_t m_sys_latch = 0;
 	uint8_t m_bank_opt = 0;
@@ -196,14 +193,12 @@ class pc6001mk2_state : public pc6001_state
 public:
 	pc6001mk2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc6001_state(mconfig, type, tag)
-		, m_bank1(*this, "bank1")
-		, m_bank2(*this, "bank2")
-		, m_bank3(*this, "bank3")
-		, m_bank4(*this, "bank4")
-		, m_bank5(*this, "bank5")
-		, m_bank6(*this, "bank6")
-		, m_bank7(*this, "bank7")
-		, m_bank8(*this, "bank8")
+		, m_mk2_bank(*this, "mk2_bank_%u", 0U)
+		, m_gfx_view(*this, "gfx_view")
+		, m_basic_rom(*this, "basic_rom")
+		, m_tv_rom(*this, "tv_rom")
+		, m_voice_rom(*this, "voice_rom")
+		, m_kanji_rom(*this, "kanji_rom")
 	{ }
 
 	uint8_t mk2_bank_r0_r();
@@ -217,10 +212,6 @@ public:
 	void mk2_work_ram1_w(offs_t offset, uint8_t data);
 	void mk2_work_ram2_w(offs_t offset, uint8_t data);
 	void mk2_work_ram3_w(offs_t offset, uint8_t data);
-	void mk2_work_ram4_w(offs_t offset, uint8_t data);
-	void mk2_work_ram5_w(offs_t offset, uint8_t data);
-	void mk2_work_ram6_w(offs_t offset, uint8_t data);
-	void mk2_work_ram7_w(offs_t offset, uint8_t data);
 	void necmk2_ppi8255_w(offs_t offset, uint8_t data);
 	void mk2_system_latch_w(uint8_t data);
 	void mk2_vram_bank_w(uint8_t data);
@@ -229,7 +220,7 @@ public:
 	void mk2_timer_adj_w(uint8_t data);
 	void mk2_timer_irqv_w(uint8_t data);
 
-	void pc6001mk2_palette(palette_device &palette) const;
+	void mk2_palette_init(palette_device &palette) const;
 	void pc6001mk2(machine_config &config);
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
@@ -238,22 +229,30 @@ protected:
 	void pc6001mk2_map(address_map &map) ATTR_COLD;
 	void pc6001mk2_io(address_map &map) ATTR_COLD;
 
-	uint8_t m_bgcol_bank = 0;
-	uint8_t m_gfx_bank_on = 0;
-	optional_memory_bank m_bank1;
-	optional_memory_bank m_bank2;
-	optional_memory_bank m_bank3;
-	optional_memory_bank m_bank4;
-	optional_memory_bank m_bank5;
-	optional_memory_bank m_bank6;
-	optional_memory_bank m_bank7;
-	optional_memory_bank m_bank8;
+	optional_device_array<address_map_bank_device, 4> m_mk2_bank;
+	memory_view m_gfx_view;
+
+	required_memory_region m_basic_rom;
+	required_memory_region m_tv_rom;
+	required_memory_region m_voice_rom;
+	required_memory_region m_kanji_rom;
+
 	virtual void refresh_crtc_params();
 
-	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	virtual u8 vrtc_ack() override;
+
+	template <unsigned TV_BASE> u8 tv_kanji_r(offs_t offset);
+	template <unsigned VOICE_BASE> u8 voice_kanji_r(offs_t offset);
+	template <unsigned CART_BASE> u8 cart_mk2_r(offs_t offset);
+
+	void mk2_tv_map(address_map &map);
+	template <unsigned BASIC_BASE, unsigned WORK_BASE> void mk2_voice_map(address_map &map);
+
+	std::vector<u8> m_mk2_exram;
 
 private:
 	uint8_t m_bank_r0 = 0;
@@ -264,6 +263,7 @@ private:
 	uint32_t m_cgrom_bank_addr = 0;
 	uint8_t m_exgfx_bitmap_mode = 0;
 	uint8_t m_exgfx_2bpp_mode = 0;
+	uint8_t m_bgcol_bank = 0;
 
 	void vram_bank_change(uint8_t vram_bank);
 };
@@ -307,6 +307,8 @@ public:
 		: pc6601_state(mconfig, type, tag)
 		, m_sr_bank(*this, "sr_bank_%u", 1U)
 		, m_sr_irq_vectors(*this, "irq_vectors")
+		, m_mk2_view(*this, "mk2_view")
+		, m_mk2_io_view(*this, "mk2_io_view")
 //      , m_gvram_view(*this, "gvram_view")
 		, m_sr_scrollx(*this, "sr_scrollx")
 		, m_sr_scrolly(*this, "sr_scrolly")
@@ -329,6 +331,8 @@ protected:
 private:
 	required_device_array<address_map_bank_device, 16> m_sr_bank;
 	required_shared_ptr<u8> m_sr_irq_vectors;
+	memory_view m_mk2_view;
+	memory_view m_mk2_io_view;
 	required_shared_ptr<u8> m_sr_scrollx;
 	required_shared_ptr<u8> m_sr_scrolly;
 	required_device<ym2203_device> m_ym;
@@ -340,6 +344,7 @@ private:
 	u8 m_bitmap_yoffs = 0, m_bitmap_xoffs = 0;
 	u8 m_width80 = 0;
 	u8 m_sr_clut[16];
+	bool m_mk2_mode;
 
 //  memory_view m_gvram_view;
 
@@ -350,7 +355,6 @@ private:
 	void sr_mode_w(u8 data);
 	void sr_vram_bank_w(u8 data);
 	void sr_system_latch_w(u8 data);
-	void necsr_ppi8255_w(offs_t offset, u8 data);
 
 	virtual void refresh_crtc_params() override;
 	void sr_bitmap_yoffs_w(u8 data);
