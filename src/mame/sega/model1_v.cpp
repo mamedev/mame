@@ -804,7 +804,13 @@ float model1_state::compute_specular(glm::vec3& normal, glm::vec3& light, float 
 	return std::min(s * lp.s, 1.0f);
 }
 
-void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t size)
+// old_z is the flat-z "reuse" register (poly zmode 0 = keep previous poly's
+// sort z). It persists ACROSS objects within a display-list walk: NetMerc's
+// garage door wings (all-zmode-0 dynamic objects) must inherit the ~325k z of
+// the preceding object so the z~40k wall occludes them (real-hardware
+// capture); resetting per object made them sort at z=0 (nearest) and paint
+// through the wall.
+void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t size, float &old_z)
 {
 	// Protect against bad data when attacking a super destroyer
 	if(tex_adr == 0xffffffff || size >= 0x1000000)
@@ -876,8 +882,6 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 	{
 		old_p1->s.x = old_p1->s.y = 0;
 	}
-
-	float old_z = m_dl_old_z; // persists across objects within a DL walk
 
 	poly_adr += 6;
 
@@ -994,7 +998,6 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 				cquad.z = 0.0;
 				break;
 		}
-		m_dl_old_z = old_z;
 
 		{
 #if 0
@@ -1404,7 +1407,7 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect, r
 		LOGMASKED(LOG_TGP, "VIDEO: render list %d\n", get_list_number());
 
 		m_view->init_translation_matrix();
-		m_dl_old_z = 0;
+		float old_z = 0;
 
 		int list_offset = 0;
 		for (;;) {
@@ -1418,13 +1421,13 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect, r
 			case 1:
 				// command 0x01 = object drawn below the cat1 HUD tilemaps
 				if (pass == RENDER_BELOW_HUD)
-					push_object(readi(list_offset + 2), readi(list_offset + 4), readi(list_offset + 6));
+					push_object(readi(list_offset + 2), readi(list_offset + 4), readi(list_offset + 6), old_z);
 				list_offset += 8;
 				break;
 			case 0x41:
 				// command 0x41 = object drawn above the HUD (e.g. SWA radar blips)
 				if (pass == RENDER_ABOVE_HUD)
-					push_object(readi(list_offset + 2), readi(list_offset + 4), readi(list_offset + 6));
+					push_object(readi(list_offset + 2), readi(list_offset + 4), readi(list_offset + 6), old_z);
 				list_offset += 8;
 				break;
 			case 2:

@@ -289,13 +289,6 @@ protected:
 	uint16_t  m_v60_copro_ram_latch[2]{};
 	std::unique_ptr<uint32_t[]> m_copro_ram_data;
 	uint16_t  m_listctl[2]{};
-	// Flat-z "reuse" register (poly zmode 0 = keep previous poly's sort z).
-	// Rasterizer state that persists ACROSS objects within a display-list
-	// walk: NetMerc's garage door wings (all-zmode-0 dynamic objects) must
-	// inherit the ~325k z of the preceding object so the z~40k wall occludes
-	// them (real-hardware capture); resetting per object made them sort at
-	// z=0 (nearest) and paint through the wall. Reset per walk in tgp_render.
-	float m_dl_old_z = 0;
 	uint16_t  *m_glist = nullptr;
 	bool    m_render_done = false;
 
@@ -343,7 +336,7 @@ protected:
 	int push_direct(int list_offset);
 	int draw_direct(bitmap_rgb32 &bitmap, const rectangle &cliprect, int list_offset);
 	int skip_direct(int list_offset) const;
-	void    push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t size);
+	void    push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t size, float &old_z);
 	void    draw_objects(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void set_current_render_list();
