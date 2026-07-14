@@ -868,40 +868,35 @@ void model1_state::sound_ready_w(int state)
 		irq_raise(3);
 }
 
-u16 model1_state::timer_r(offs_t offset, u16 mem_mask)
+u16 model1_state::timer_r(offs_t offset)
 {
-	if (offset == 3 || offset == 4)
+	u16 result = m_timer_val[offset];
+	if (m_irq0_timer[offset]->enabled())
 	{
-		int tnum = offset - 3;
-		if (m_irq0_timer[tnum]->enabled())
-		{
-			uint32_t ticks = m_irq0_timer[tnum]->remaining().as_ticks(m_maincpu->clock());
-			m_timer_val[tnum] = ticks / 0x800;
-		}
-		return m_timer_val[tnum];
+		uint32_t ticks = m_irq0_timer[offset]->remaining().as_ticks(m_maincpu->clock());
+		result = ticks / 0x800;
+		if (!machine().side_effects_disabled())
+			m_timer_val[offset] = result;
 	}
-	return 0xffff;
+	return result;
 }
 
-void model1_state::timer_w(offs_t offset, u16 data, u16 mem_mask)
+void model1_state::timer_mode_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	if (offset == 1 || offset == 2)
+	COMBINE_DATA(&m_timer_mode);
+}
+
+void model1_state::timer_period_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_timer_period[offset]);
+	if (m_timer_period[offset])
 	{
-		int tnum = offset - 1;
-		COMBINE_DATA(&m_timer_period[tnum]);
-		if (m_timer_period[tnum])
-		{
-			attotime period = attotime::from_ticks(0x800 * m_timer_period[tnum], m_maincpu->clock());
-			m_irq0_timer[tnum]->adjust(period, tnum);
-		}
-		else
-		{
-			m_irq0_timer[tnum]->adjust(attotime::never);
-		}
+		attotime period = attotime::from_ticks(0x800 * m_timer_period[offset], m_maincpu->clock());
+		m_irq0_timer[offset]->adjust(period, offset);
 	}
-	else if (offset == 0)
+	else
 	{
-		COMBINE_DATA(&m_timer_mode[0]);
+		m_irq0_timer[offset]->adjust(attotime::never);
 	}
 }
 
@@ -1022,7 +1017,9 @@ void model1_state::model1_mem(address_map &map)
 	/* GLUE */ map(0xe00000, 0xe00000).w(FUNC(model1_state::irq_control_w));
 	/*      */ map(0xe00002, 0xe00002).rw(FUNC(model1_state::irq_mask_r), FUNC(model1_state::irq_mask_w));
 	/*      */ map(0xe00004, 0xe00005).w(FUNC(model1_state::bank_w));
-	/*      */ map(0xe00006, 0xe0000f).rw(FUNC(model1_state::timer_r), FUNC(model1_state::timer_w)); // Unemulated timer? (E0000A: period, E0000C: count; E0000E: ?)
+	/*      */ map(0xe00006, 0xe00007).w(FUNC(model1_state::timer_mode_w));
+	/*      */ map(0xe00008, 0xe0000b).w(FUNC(model1_state::timer_period_w));
+	/*      */ map(0xe0000c, 0xe0000f).r(FUNC(model1_state::timer_r)).nopw(); // vf/swa write 0 to the count registers at init
 
 	/* ROM0 */ map(0xf80000, 0xffffff).rom();
 }
