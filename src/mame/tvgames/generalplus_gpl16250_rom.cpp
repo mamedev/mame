@@ -26,13 +26,12 @@ public:
 	{
 	}
 
-	void common_config(machine_config &config) ATTR_COLD;
 	void gpl16218b_rom(machine_config &config) ATTR_COLD;
 	void gpl16230a_rom(machine_config &config) ATTR_COLD;
 	void gpl16220a_rom(machine_config &config) ATTR_COLD;
 
-protected:
 private:
+	void common_config(machine_config &config) ATTR_COLD;
 };
 
 class tkmag220_game_state : public gpl162xx_rom_base_state

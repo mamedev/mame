@@ -28,10 +28,10 @@ DEFINE_DEVICE_TYPE(GCM394_VIDEO, gcm394_video_device, "gcm394_video", "GeneralPl
 gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
-	m_rowscroll(*this, "^rowscroll"), // FIXME: assumption about surrounding system
-	m_rowzoom(*this, "^rowzoom"), // FIXME: assumption about surrounding system
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_screen(*this, finder_base::DUMMY_TAG),
+	m_rowscroll(*this, "^rowscroll"), // FIXME: assumption about surrounding system
+	m_rowzoom(*this, "^rowzoom"), // FIXME: assumption about surrounding system
 	m_renderer(*this, "renderer"),
 	m_palette(*this, "palette"),
 	m_gfxdecode(*this, "gfxdecode"),

@@ -27,7 +27,6 @@ public:
 	{
 	}
 
-	void generalplus_gpac800(machine_config &config) ATTR_COLD;
 	void generalplus_gpac800_nand64mbyte(machine_config &config) ATTR_COLD;
 	void generalplus_gpac800_nand128mbyte(machine_config &config) ATTR_COLD;
 	void generalplus_gpac800_nand256mbyte(machine_config &config) ATTR_COLD;
@@ -35,7 +34,6 @@ public:
 	void generalplus_gpl16258vb_nand128mbyte_2048(machine_config &config) ATTR_COLD;
 	void generalplus_gpl16258vb_nand512mbyte_2048(machine_config &config) ATTR_COLD;
 
-	void generalplus_gpl16258vb(machine_config &config) ATTR_COLD;
 	void generalplus_gpl16258vb_nand64mbyte(machine_config &config) ATTR_COLD;
 
 	void nand_init() ATTR_COLD;
@@ -66,6 +64,9 @@ private:
 	void nand_create_stripped_region();
 
 	void dma_complete_hacks(int state);
+
+	void generalplus_gpac800(machine_config &config) ATTR_COLD;
+	void generalplus_gpl16258vb(machine_config &config) ATTR_COLD;
 
 	std::vector<u8> m_strippedrom;
 

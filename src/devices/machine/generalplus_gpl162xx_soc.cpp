@@ -56,23 +56,18 @@ generalplus_gpl162xx_base_device::generalplus_gpl162xx_base_device(const machine
 	m_nand_address_out(*this),
 	m_nand_data_out(*this),
 	m_nand_data_in(*this, 0),
-	m_cs_space(*this, finder_base::DUMMY_TAG, -1),
-	m_csbase(0x20000),
 	m_space_read_cb(*this, 0),
 	m_space_write_cb(*this),
 	m_dma_complete_cb(*this),
-	m_boot_mode(0),
+	m_cs_space(*this, finder_base::DUMMY_TAG, -1),
+	m_csbase(0x20000),
 	m_cs_callback(*this, DEVICE_SELF, FUNC(generalplus_gpl162xx_base_device::default_cs_callback)),
-	m_timer_a(*this, "timer_a"),
-	m_timer_b(*this, "timer_b"),
-	m_timer_c(*this, "timer_c"),
-	m_timer_d(*this, "timer_d"),
-	m_timer_e(*this, "timer_e"),
-	m_timer_f(*this, "timer_f"),
+	m_timer(*this, { "timer_a", "timer_b", "timer_c", "timer_d", "timer_e", "timer_f" }),
 	m_scheduler(*this, "scheduler"),
 	m_gpl_dma(*this, "gpl_dma"),
 	m_gpl_timebase(*this, "gpl_timebase"),
-	m_disable_timebase_interrupts(false)
+	m_disable_timebase_interrupts(false),
+	m_boot_mode(0)
 {
 }
 
@@ -745,27 +740,8 @@ void generalplus_gpl162xx_base_device::update_interrupts(int state)
 
 // programmable timers
 
-TIMER_DEVICE_CALLBACK_MEMBER(generalplus_gpl162xx_base_device::timer_a_cb)
-{
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(generalplus_gpl162xx_base_device::timer_b_cb)
-{
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(generalplus_gpl162xx_base_device::timer_c_cb)
-{
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(generalplus_gpl162xx_base_device::timer_d_cb)
-{
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(generalplus_gpl162xx_base_device::timer_e_cb)
-{
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(generalplus_gpl162xx_base_device::timer_f_cb)
+template<int Timer>
+TIMER_DEVICE_CALLBACK_MEMBER(generalplus_gpl162xx_base_device::timer_cb)
 {
 }
 
@@ -796,6 +772,7 @@ u16 generalplus_gpl162xx_base_device::timer_ctrl_r()
 {
 	LOGMASKED(LOG_GPL162XX, "%s:generalplus_gpl162xx_base_device::timer%c_ctrl_r\n", machine().describe_context(), 'a' + Timer);
 
+	// TODO: hack to maintain old behavior until timers are implemented
 	if (Timer > 1)
 		return machine().rand();
 
@@ -2418,6 +2395,12 @@ void generalplus_gpl162xx_base_device::internal_rom_64kword(address_map &map)
 //	map(0x18000, 0x1ffff).noprw(); // reserved
 }
 
+void generalplus_gpl162xx_base_device::no_internal_rom(address_map &map)
+{
+	map(0x08000, 0x0ffff).r(FUNC(generalplus_gpl16250va_device::cs_space_boot_mirror_r)); // lower 32kwords of internal ROM is visible / shadowed depending on boot pins and register
+//	map(0x10000, 0x1ffff).noprw(); // reserved
+}
+
 void generalplus_gpl162xx_base_device::internal_rom_4kword(address_map &map)
 {
 	map(0x08000, 0x0ffff).r(FUNC(generalplus_gpl162xx_base_device::internalrom_lower32_r)).nopw(); // f000-ffff can be internal ROM if present, otherwise ROM mirror
@@ -2457,7 +2440,7 @@ void generalplus_gpl162xx_base_device::nand_peripheral_map(address_map &map)
 	map(0x00785f, 0x00785f).r(FUNC(generalplus_gpl16250va_device::nand_ecc_err1_lb_r)); // ECC Low Byte Error Flag 1
 }
 
-void generalplus_gpl162xx_base_device::spi_peripheral_map(address_map& map)
+void generalplus_gpl162xx_base_device::spi_peripheral_map(address_map &map)
 {
 	map(0x007943, 0x007943).r(FUNC(generalplus_gpl16250va_device::spi_rxstatus_r));
 }
@@ -2468,8 +2451,8 @@ void generalplus_gpl16220a_device::gpl16220a_map(address_map &map)
 	map(0x000000, 0x003fff).ram().share("mainram"); // 16K * 16
 	base_internal_map(map);
 	//nand_peripheral_map(map); // no NAND support here
-	//spi_peripheral_map(map); // no SPI support?
-	internal_rom_64kword(map);
+	spi_peripheral_map(map); // but SPI is supported
+	no_internal_rom(map);
 	cs_main_view_area(map);
 }
 
@@ -2559,6 +2542,15 @@ u16 generalplus_gpl162xx_base_device::internalrom_lower32_r(offs_t offset)
 	}
 }
 
+u16 generalplus_gpl162xx_base_device::cs_space_boot_mirror_r(offs_t offset)
+{
+	if (!m_cs_space)
+		return 0x0000;
+
+	u16 val = m_cs_space->read_word(offset+0x8000);
+	return val;
+}
+
 
 void generalplus_gpl162xx_base_device::device_start()
 {
@@ -2582,7 +2574,6 @@ void generalplus_gpl162xx_base_device::device_start()
 	save_item(NAME(m_786b_portb_attribute));
 
 	save_item(NAME(m_ioc_data));
-	//save_item(NAME(m_7871));
 	save_item(NAME(m_7872_portc_direction));
 	save_item(NAME(m_7873_portc_attribute));
 	save_item(NAME(m_ioe_dir));
@@ -2637,8 +2628,6 @@ void generalplus_gpl162xx_base_device::device_reset()
 	m_786b_portb_attribute = 0x0000;
 
 	m_ioc_data = 0x0000;
-
-	//m_7871 = 0x0000;
 
 	m_7872_portc_direction = 0x0000;
 	m_7873_portc_attribute = 0x0000;
@@ -2794,23 +2783,23 @@ void generalplus_gpl162xx_base_device::device_add_mconfig(machine_config &config
 	m_spg_video->space_read_callback().set(FUNC(generalplus_gpl162xx_base_device::read_space));
 	m_spg_video->set_video_space(DEVICE_SELF, AS_PROGRAM);
 
-	TIMER(config, m_timer_a).configure_generic(FUNC(generalplus_gpl162xx_base_device::timer_a_cb));
-	TIMER(config, m_timer_b).configure_generic(FUNC(generalplus_gpl162xx_base_device::timer_b_cb));
-	TIMER(config, m_timer_c).configure_generic(FUNC(generalplus_gpl162xx_base_device::timer_c_cb));
-	TIMER(config, m_timer_d).configure_generic(FUNC(generalplus_gpl162xx_base_device::timer_d_cb));
-	TIMER(config, m_timer_e).configure_generic(FUNC(generalplus_gpl162xx_base_device::timer_e_cb));
-	TIMER(config, m_timer_f).configure_generic(FUNC(generalplus_gpl162xx_base_device::timer_f_cb));
+	TIMER(config, m_timer[0]).configure_generic(FUNC(generalplus_gpl162xx_base_device::timer_cb<0>));
+	TIMER(config, m_timer[1]).configure_generic(FUNC(generalplus_gpl162xx_base_device::timer_cb<1>));
+	TIMER(config, m_timer[2]).configure_generic(FUNC(generalplus_gpl162xx_base_device::timer_cb<2>));
+	TIMER(config, m_timer[3]).configure_generic(FUNC(generalplus_gpl162xx_base_device::timer_cb<3>));
+	TIMER(config, m_timer[4]).configure_generic(FUNC(generalplus_gpl162xx_base_device::timer_cb<4>));
+	TIMER(config, m_timer[5]).configure_generic(FUNC(generalplus_gpl162xx_base_device::timer_cb<5>));
 
 	TIMER(config, m_scheduler).configure_generic(FUNC(generalplus_gpl162xx_base_device::scheduler_cb));
 }
 
-void generalplus_gpl16240va_device::device_add_mconfig(machine_config & config)
+void generalplus_gpl16240va_device::device_add_mconfig(machine_config &config)
 {
 	generalplus_gpl16230a_device::device_add_mconfig(config);
 	m_spg_video->set_has_vga_modes();
 }
 
-void generalplus_gpl16250va_device::device_add_mconfig(machine_config & config)
+void generalplus_gpl16250va_device::device_add_mconfig(machine_config &config)
 {
 	generalplus_gpl16240va_device::device_add_mconfig(config);
 	m_spg_video->set_has_3d_sprite_modes();
@@ -3043,18 +3032,7 @@ const tiny_rom_entry *generalplus_gpl16230a_device::device_rom_region() const
 	return ROM_NAME( gpl1630a );
 }
 
-ROM_START( gpl1620a )
-	ROM_REGION16_BE( 0x20000, "internal", 0 )
-	ROM_LOAD16_WORD_SWAP("gpl16220a_bootrom.bin", 0x00000, 0x20000, NO_DUMP )
-ROM_END
-
-const tiny_rom_entry *generalplus_gpl16220a_device::device_rom_region() const
-{
-	return ROM_NAME( gpl1620a );
-}
-
-
 DEFINE_DEVICE_TYPE(GPL16220A,   generalplus_gpl16220a_device,    "gpl16220a",    "GeneralPlus GPL16220A System-on-a-Chip")  // aka GPAC500A (not used by JAKKS?)
 DEFINE_DEVICE_TYPE(GPL16230A,   generalplus_gpl16230a_device,    "gpl16230a",    "GeneralPlus GPL16230A System-on-a-Chip")
 DEFINE_DEVICE_TYPE(GPL16240VA,  generalplus_gpl16240va_device,   "gpl16240va",   "GeneralPlus GPL16240VA System-on-a-Chip")
-DEFINE_DEVICE_TYPE(GPL16250VA,  generalplus_gpl16250va_device,   "gpl16250va",   "GeneralPlus GPL16250VA System-on-a-Chip") // aka GPAC800A
+DEFINE_DEVICE_TYPE(GPL16250VA,  generalplus_gpl16250va_device,   "gpl16250va",   "GeneralPlus GPL16250VA / GPAC800A System-on-a-Chip")

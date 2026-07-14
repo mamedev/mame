@@ -83,15 +83,20 @@ protected:
 	virtual void device_post_load() override ATTR_COLD;
 
 	void base_internal_map(address_map &map) ATTR_COLD;
-	void internal_rom_64kword(address_map &map);
-	void internal_rom_4kword(address_map &map);
-	void cs_main_view_area(address_map &map);
+	void internal_rom_64kword(address_map &map) ATTR_COLD;
+	void internal_rom_4kword(address_map &map) ATTR_COLD;
+	void no_internal_rom(address_map &map) ATTR_COLD;
+	void cs_main_view_area(address_map &map) ATTR_COLD;
+	void nand_peripheral_map(address_map &map) ATTR_COLD;
+	void spi_peripheral_map(address_map &map) ATTR_COLD;
 
 	required_device<screen_device> m_screen;
 	required_device<gcm394_video_device> m_spg_video;
 	required_device<sunplus_gcm394_audio_device> m_spg_audio;
 	optional_memory_region m_internalrom;
 	required_shared_ptr<u16> m_mainram;
+
+private:
 
 	devcb_read16 m_porta_in;
 	devcb_read16 m_portb_in;
@@ -109,92 +114,25 @@ protected:
 
 	devcb_read8 m_nand_data_in;
 
+	devcb_read16 m_space_read_cb;
+	devcb_write16 m_space_write_cb;
+	devcb_write_line m_dma_complete_cb;
+
 	optional_address_space m_cs_space;
-	u32 m_csbase;
-
-	// unk 78xx
-	u16 m_sys_ctrl;
-
-	u16 m_clock_ctrl;
-
-	u16 m_membankswitch_7810;
-
-	u16 m_7816;
-	u16 m_pllchange;
-
-	u16 m_cache_ctrl;
-
-	u16 m_782x[5];
-
-	u16 m_782d;
-
-	u16 m_7835;
-
-	u16 m_7862_porta_direction;
-	u16 m_7863_porta_attribute;
-
-	u16 m_786a_portb_direction;
-	u16 m_786b_portb_attribute;
-
-	u16 m_7872_portc_direction;
-	u16 m_7873_portc_attribute;
-
-	u16 m_787a_portd_direction;
-	u16 m_787b_portd_attribute;
-
-	u16 m_ioc_data;
-
-	u16 m_ioe_dir;
-	u16 m_ioe_attrib;
-
-	u16 m_int_status1;
-
-	u16 m_int_priority_1;
-	u16 m_int_priority_2;
-	u16 m_int_priority_3;
-
-	u16 m_misc_int_ctrl;
-
-	u16 m_cha_ctrl;
-
-	u16 m_dac_pga;
-
-	// unk 79xx
-	u16 m_rtc_ctrl;
-	u16 m_rtc_int_status;
-	u16 m_rtc_int_ctrl;
-
-	u16 m_adc_setup;
-	u16 m_madc_ctrl;
-
-	u16 m_timer_ctrl[6];
-	u16 m_timer_preload[6];
-	u16 m_timer_ccp_ctrl[3];
-	u16 m_timer_cc_reg[3];
 
 	u16 internalrom_lower32_r(offs_t offset);
+	u16 cs_space_boot_mirror_r(offs_t offset);
 
 	u16 cs_space_r(offs_t offset);
 	void cs_space_w(offs_t offset, u16 data);
 	u16 cs_bank_space_r(offs_t offset);
 	void cs_bank_space_w(offs_t offset, u16 data);
 
-protected:
-	devcb_read16 m_space_read_cb;
-	devcb_write16 m_space_write_cb;
-	devcb_write_line m_dma_complete_cb;
-
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_a_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_b_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_c_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_e_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_f_cb);
+	template<int Timer>	TIMER_DEVICE_CALLBACK_MEMBER(timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(scheduler_cb);
 
 	u16 unk_r(offs_t offset);
 	void unk_w(offs_t offset, u16 data);
-
 
 	u16 power_state_r();
 	u16 dac_pga_r();
@@ -343,28 +281,6 @@ protected:
 	inline u16 read_space(offs_t offset);
 	inline void write_space(offs_t offset, u16 data);
 
-	// config registers (external pins)
-	int m_boot_mode; // 2 pins determine boot mode, likely only read at power-on
-	cs_callback_delegate m_cs_callback;
-
-	required_device<timer_device> m_timer_a;
-	required_device<timer_device> m_timer_b;
-	required_device<timer_device> m_timer_c;
-	required_device<timer_device> m_timer_d;
-	required_device<timer_device> m_timer_e;
-	required_device<timer_device> m_timer_f;
-	required_device<timer_device> m_scheduler;
-
-	required_device<gpl_dma_device> m_gpl_dma;
-	required_device<gpl_timebase_device> m_gpl_timebase;
-
-	// config/hacks
-	bool m_disable_timebase_interrupts;
-
-	void nand_peripheral_map(address_map &map) ATTR_COLD;
-	void spi_peripheral_map(address_map &map) ATTR_COLD;
-
-private:
 	void dma_complete(int state);
 
 	u16 nand_7850_status_r();
@@ -387,6 +303,55 @@ private:
 
 	u16 efuse2_r();
 
+	u32 m_csbase;
+	u16 m_sys_ctrl;
+	u16 m_clock_ctrl;
+	u16 m_membankswitch_7810;
+	u16 m_7816;
+	u16 m_pllchange;
+	u16 m_cache_ctrl;
+	u16 m_782x[5];
+	u16 m_782d;
+	u16 m_7835;
+
+	u16 m_7862_porta_direction;
+	u16 m_7863_porta_attribute;
+	u16 m_786a_portb_direction;
+	u16 m_786b_portb_attribute;
+	u16 m_7872_portc_direction;
+	u16 m_7873_portc_attribute;
+	u16 m_787a_portd_direction;
+	u16 m_787b_portd_attribute;
+
+	u16 m_ioc_data;
+
+	u16 m_ioe_dir;
+	u16 m_ioe_attrib;
+
+	u16 m_int_status1;
+
+	u16 m_int_priority_1;
+	u16 m_int_priority_2;
+	u16 m_int_priority_3;
+
+	u16 m_misc_int_ctrl;
+
+	u16 m_cha_ctrl;
+
+	u16 m_dac_pga;
+
+	u16 m_rtc_ctrl;
+	u16 m_rtc_int_status;
+	u16 m_rtc_int_ctrl;
+
+	u16 m_adc_setup;
+	u16 m_madc_ctrl;
+
+	u16 m_timer_ctrl[6];
+	u16 m_timer_preload[6];
+	u16 m_timer_ccp_ctrl[3];
+	u16 m_timer_cc_reg[3];
+
 	u16 m_nand_addr_low;
 	u16 m_nand_addr_high;
 
@@ -398,6 +363,18 @@ private:
 	u16 m_nand_bch_ctrl;
 	u16 m_nand_ecc_ctrl;
 
+	cs_callback_delegate m_cs_callback;
+
+	required_device_array<timer_device, 6> m_timer;
+	required_device<timer_device> m_scheduler;
+
+	required_device<gpl_dma_device> m_gpl_dma;
+	required_device<gpl_timebase_device> m_gpl_timebase;
+
+	// config/hacks
+	bool m_disable_timebase_interrupts;
+	// config registers (external pins)
+	int m_boot_mode; // 2 pins determine boot mode, likely only read at power-on
 };
 
 
@@ -414,10 +391,10 @@ public:
 	generalplus_gpl16220a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
-
+	// virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD; // no standard OTP?
 	generalplus_gpl16220a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal);
 
+private:
 	void gpl16220a_map(address_map &map);
 };
 
@@ -438,6 +415,7 @@ protected:
 
 	generalplus_gpl16230a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal);
 
+private:
 	void gpl16230a_map(address_map &map);
 };
 
@@ -461,6 +439,7 @@ protected:
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
+private:
 	void gpl16240va_map(address_map &map);
 };
 
@@ -483,6 +462,7 @@ protected:
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
+private:
 	void gpl16250va_map(address_map &map);
 };
 

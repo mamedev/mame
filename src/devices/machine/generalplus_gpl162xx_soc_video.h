@@ -46,7 +46,6 @@ public:
 
 	void write_tmap_regs(int tmap, u16 *regs, int offset, u16 data);
 
-	//void set_paldisplaybank_high(int pal_displaybank_high) { m_pal_displaybank_high = pal_displaybank_high; }
 	void set_legacy_video_mode() { m_use_legacy_mode = true; }
 	void set_disallow_resolution_control() { m_disallow_resolution_control = true; }
 
@@ -155,6 +154,10 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
+	required_device<unsp_device> m_cpu;
+	required_device<screen_device> m_screen;
+
+private:
 	TIMER_CALLBACK_MEMBER(screen_pos_reached);
 
 	inline void check_video_irq();
@@ -165,9 +168,6 @@ protected:
 
 	required_shared_ptr<u16> m_rowscroll;
 	required_shared_ptr<u16> m_rowzoom;
-
-	required_device<unsp_device> m_cpu;
-	required_device<screen_device> m_screen;
 
 	required_device<gpl_renderer_device> m_renderer;
 	required_device<palette_device> m_palette;
@@ -191,8 +191,6 @@ protected:
 	u16 m_videodma_dest;
 	u16 m_videodma_source;
 
-
-	// video 70xx
 	u16 m_tmap0_regs[0x4];
 	u16 m_tmap1_regs[0x4];
 
@@ -244,18 +242,18 @@ protected:
 
 	int m_maxgfxelement;
 
-	//int m_pal_displaybank_high;
-	//int m_pal_sprites;
-	//int m_pal_back;
+	// TODO: this is a hack, emulate relevant registers
 	bool m_use_legacy_mode; // could be related to the 'unused' bits in the palete bank select being set, but uncertain
+
+	// used for LCD games with fixed (croppted) resolution output, these might be enabling something else we can check
 	bool m_disallow_resolution_control;
 
 	// TODO: these could be handled by sub-classing the device, but until this gets refactored at least set these
 	//       to represent the differences
-	bool m_has_vga_modes;
-	bool m_has_3d_sprites;
+	bool m_has_vga_modes;  // 4x / 5x parts only (V in the part number)
+	bool m_has_3d_sprites; // 5x parts only
 	bool m_has_gpl162xx_b_features;
-	bool m_has_gpl162xx_b_extended_sprites;
+	bool m_has_gpl162xx_b_extended_sprites; // could probably just check if it's a B model and has VGA support
 };
 
 class gcm394_video_device : public gcm394_base_video_device
