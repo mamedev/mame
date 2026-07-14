@@ -305,7 +305,10 @@ void flashbeats_state::machine_reset()
 // (2-byte stride [value][pad]) => 47 LEDs per lane:
 //   * P0 (0xa0c000): the RED content
 //   * P1 (0xa0c1e0): the GREEN content
-// Output state per LED: 0 = off, 1 = green, 2 = red (red wins if both planes set).
+// The two planes are independent; the game routinely sets both for the same LED.
+// The real cabinet's bi-color LEDs drive both dies at once, and diffusion mixes
+// them to yellow. Output state per LED: 0 = off, 1 = green, 2 = red, 3 = yellow
+// (both).
 //
 // Big-endian H8: byte at even address = high byte of the 16-bit display word.
 void flashbeats_state::update_lanes()
@@ -321,7 +324,7 @@ void flashbeats_state::update_lanes()
 			const offs_t off = lane * 0x60 + i * 2;
 			const bool red   = rd8(0xa0c000 + off) != 0;   // P0
 			const bool green = rd8(0xa0c1e0 + off) != 0;   // P1
-			m_lane_led[lane][i] = red ? 2 : (green ? 1 : 0);
+			m_lane_led[lane][i] = (red && green) ? 3 : (red ? 2 : (green ? 1 : 0));
 		}
 	}
 }

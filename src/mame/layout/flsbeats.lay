@@ -23,12 +23,15 @@ Whole view is ~16:9 and the content is grouped so MAME centers it vertically.
 -->
 <mamelayout version="2">
 
-	<!-- bi-color lane LED: 0 = off, 1 = green (static logo plane), 2 = red
-	     (animated sweep plane, drawn on top). No blended state => no yellow. -->
+	<!-- Bi-color lane LED: 0 = off, 1 = green, 2 = red, 3 = yellow (BOTH plane
+	     bits set for this LED). The two planes are independent bitmaps in
+		 display RAM and the game routinely illuminates each plane for the same
+		 lane bits. -->
 	<element name="lane_led" defstate="0">
 		<rect state="0"><color red="0.0"  green="0.0"  blue="0.0" /></rect>
 		<rect state="1"><color red="0.05" green="1.0"  blue="0.12" /></rect>
 		<rect state="2"><color red="1.0"  green="0.06" blue="0.05" /></rect>
+		<rect state="3"><color red="1.0"  green="0.85" blue="0.06" /></rect>
 	</element>
 
 	<!-- round play button: lit (state 1) vs unlit (state 0) -->
