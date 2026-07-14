@@ -16,14 +16,15 @@ TODO:
   parameters, crtkill signal and bus request;
 - Merge PC-6001 video emulation with MC6847 (is it really one or rather a M5C6847P-1?);
 - Pinpoint what VDG supersets PC-6001mkII and SR models really uses;
-- upd7752 voice speech device needs to be properly emulated (device is currently a skeleton),
-  pc6001mk2_cass:chrith is a good test case, it's supposed to talk before title screen;
+- irq system needs improving, particularly for later machines (where it may really warrant exposing
+  as device);
 
 TODO (pc6001mk2):
-- refactor memory model to use address_map_bank_device;
 - confirm optional FDC used mapped at 0xd0-0xd3
 \- PC-6031? It looks like a 5'25 single drive with 8255 protocol, presumably earlier revision
    of PC-80S31 with no dump available;
+- upd7752 voice speech device needs to be properly emulated (device is currently a skeleton),
+  pc6001mk2_cass:chrith is a good test case, it's supposed to talk before title screen;
 
 TODO (pc6601):
 - current regression caused by an internal FDC sense interrupt status that expects a
@@ -32,11 +33,9 @@ TODO (pc6601):
   Update: tries to autoload cassette at startup for some reason.
 
 TODO (pc6601mk2sr):
-- Implement MK-2 compatibility mode via view handler(s)
-  (it changes the memory map to behave like the older versions);
+- check if there are more registers for mkII compatibility mode that are actually substituted
+  or unavailable (SR mode probably locked out for instance);
 - Video Telopper (superimposer) & TV tuner functions for later machines;
-- pc6001mk2sr/pc6601sr: currently doesn't work without -debug enabled (?), has serious keyboard
-  issues, BASIC based programs hangs at a $e6bb check (irq not fired regression? bp 102c,1,{pc+=2;g})
 
 ===================================================================================================
 
@@ -96,7 +95,7 @@ PC-6001 mkIISR (1984-12):
 PC-6001 irq table:
 irq vector 0x00: writes 0x00 to [$fa19]                                                     ;(unused)
 irq vector 0x02: (A = 0, B = 0) tests ppi port c, does something with ay ports (plus more?) ;keyboard data ready, no kanji lock, no caps lock
-irq vector 0x04:                                                                            ;uart irq
+irq vector 0x04:                                                                            ;RS-232C irq
 irq vector 0x06: operates with $fa28, $fa2e, $fd1b                                          ;timer irq
 irq vector 0x08: tests ppi port c, puts port A to $fa1d,puts 0x02 to [$fa19]                ;tape data ready
 irq vector 0x0a: writes 0x00 to [$fa19]                                                     ;(unused)
@@ -580,7 +579,12 @@ inline void pc6001mk2_state::refresh_crtc_params()
 
 	visarea.set(0, (320) - 1, 0, (y_height) - 1);
 
-	m_screen->configure(m_screen->width(), m_screen->height(), visarea, m_screen->frame_period().attoseconds());
+	const int htotal = 456;
+	const int vtotal = 262;
+	const XTAL pclock = XTAL(28'636'363) / 4;
+
+	m_screen->configure(htotal, vtotal, visarea, attotime::from_ticks(htotal * vtotal, pclock).as_attoseconds());
+
 }
 
 void pc6001mk2_state::mk2_vram_bank_w(uint8_t data)
@@ -608,19 +612,18 @@ void pc6001mk2_state::mk2_col_bank_w(uint8_t data)
 	m_bgcol_bank = data & 7;
 }
 
-
+/*
+ * x--- ---- M1 wait setting
+ * -x-- ---- ROM wait setting
+ * --x- ---- RAM wait setting
+ * ---x ---- joystick irq vector override (mkII mode only)
+ * ---- x--- sub CPU irq vector override (mkII mode only)
+ * ---- -x-- timer irq mask
+ * ---- --x- joystick irq mask
+ * ---- ---x sub CPU irq mask
+ */
 void pc6001mk2_state::mk2_0xf3_w(uint8_t data)
 {
-	/*
-	x--- ---- M1 wait setting
-	-x-- ---- ROM wait setting
-	--x- ---- RAM wait setting
-	---x ---- custom irq 2 address output
-	---- x--- custom irq 1 address output
-	---- -x-- timer irq mask 2 (mirror?)
-	---- --x- custom irq 2 mask
-	---- ---x custom irq 1 mask
-	*/
 	m_timer_irq_mask = BIT(data, 2);
 }
 
@@ -694,8 +697,8 @@ void pc6001mk2_state::pc6001mk2_io(address_map &map)
 	map(0xf1, 0xf1).rw(FUNC(pc6001mk2_state::mk2_bank_r1_r), FUNC(pc6001mk2_state::mk2_bank_r1_w));
 	map(0xf2, 0xf2).rw(FUNC(pc6001mk2_state::mk2_bank_w0_r), FUNC(pc6001mk2_state::mk2_bank_w0_w));
 	map(0xf3, 0xf3).w(FUNC(pc6001mk2_state::mk2_0xf3_w));
-//  map(0xf4
-//  map(0xf5
+//  map(0xf4, 0xf4) sub CPU irq vector override
+//  map(0xf5, 0xf5) joystick irq vector override
 	map(0xf6, 0xf6).w(FUNC(pc6001mk2_state::mk2_timer_adj_w));
 	map(0xf7, 0xf7).w(FUNC(pc6001mk2_state::mk2_timer_irqv_w));
 }
@@ -920,7 +923,12 @@ inline void pc6001mk2sr_state::refresh_crtc_params()
 
 	visarea.set(0, (x_width) - 1, 0, (y_height) - 1);
 
-	m_screen->configure(m_screen->width(), m_screen->height(), visarea, m_screen->frame_period().attoseconds());
+	// TODO: guessed
+	const int htotal = 456 * (m_width80 + 1);
+	const int vtotal = 262;
+	const XTAL pclock = XTAL(28'636'363) / (4 >> m_width80);
+
+	m_screen->configure(htotal, vtotal, visarea, attotime::from_ticks(htotal * vtotal, pclock).as_attoseconds());
 }
 
 void pc6001mk2sr_state::pc6001mk2sr_map(address_map &map)
@@ -1002,10 +1010,13 @@ void pc6001mk2sr_state::pc6001mk2sr_io(address_map &map)
 	map(0xf1, 0xf1).rw(FUNC(pc6001mk2sr_state::mk2_bank_r1_r), FUNC(pc6001mk2sr_state::mk2_bank_r1_w));
 	map(0xf2, 0xf2).rw(FUNC(pc6001mk2sr_state::mk2_bank_w0_r), FUNC(pc6001mk2sr_state::mk2_bank_w0_w));
 	map(0xf3, 0xf3).w(FUNC(pc6001mk2sr_state::mk2_0xf3_w));
-//  map(0xf4
-//  map(0xf5
+//  map(0xf4, 0xf4) sub CPU irq vector override
+//  map(0xf5, 0xf5) joystick irq vector override
 	map(0xf6, 0xf6).w(FUNC(pc6001mk2sr_state::mk2_timer_adj_w));
 	map(0xf7, 0xf7).w(FUNC(pc6001mk2sr_state::mk2_timer_irqv_w));
+
+//  map(0xfa, 0xfa) SR Mode irq mask
+//  map(0xfb, 0xfb) SR Mode irq vector override
 
 	// TODO: likely more registers are concealed in compatible modes
 	map(0x00, 0xff).view(m_mk2_io_view);
@@ -1189,15 +1200,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::cassette_callback)
 	}
 }
 
-void pc6001_state::machine_start()
-{
-	m_timer_irq_timer = timer_alloc(FUNC(pc6001_state::audio_callback), this);
-
-	save_item(NAME(m_cas_data));
-	save_item(NAME(m_cas_offset));
-	save_item(NAME(m_cas_maxsize));
-}
-
 void pc6001_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
@@ -1236,6 +1238,15 @@ void pc6001_state::irq_reset(u8 timer_default_setting)
 	set_timer_divider();
 }
 
+void pc6001_state::machine_start()
+{
+	m_timer_irq_timer = timer_alloc(FUNC(pc6001_state::audio_callback), this);
+
+	save_item(NAME(m_cas_data));
+	save_item(NAME(m_cas_offset));
+	save_item(NAME(m_cas_maxsize));
+}
+
 void pc6001_state::machine_reset()
 {
 	m_video_base = &m_ram->pointer()[0xc000 - 0x8000];
@@ -1260,13 +1271,9 @@ void pc6001mk2_state::machine_start()
 
 void pc6001mk2_state::machine_reset()
 {
-//  pc6001_state::machine_reset();
+	pc6001_state::machine_reset();
 //	set_videoram_bank(0xc000 + 0x28000);
 	m_video_base = &m_ram->pointer()[0xc000];
-
-	m_cas_offset = 0;
-	irq_reset(3);
-	m_port_c_8255 = 0;
 
 	/* set default bankswitch */
 	{
@@ -1372,7 +1379,9 @@ static GFXDECODE_START( gfx_pc6001m2 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, kanji_layout, 0x10, 1 )
 GFXDECODE_END
 
-// TODO: same as PC-88 / PC-98 31'948'800 ?
+// TODO: all clocks needs to be verified from HWs
+// same as PC-88 / PC-98 31'948'800 ?
+// different for mkIISR machines
 #define PC6001_MAIN_CLOCK 7987200
 
 void pc6001_state::pc6001(machine_config &config)
@@ -1400,12 +1409,8 @@ void pc6001_state::pc6001(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
 	m_screen->set_screen_update(FUNC(pc6001_state::screen_update));
-	// FIXME: actual parameters, particularly for later iterations
-	m_screen->set_size(320, 25+192+26);
-	m_screen->set_visarea(0, 319, 0, 239);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_raw(XTAL(28'636'363) / 4, 456, 0, 319, 262, 0, 239);
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(pc6001_state::palette_init), 16 + 4);
@@ -1553,8 +1558,9 @@ void pc6601_state::pc6601(machine_config &config)
 
 	pc6601_fdc_config(config);
 
-	// TODO: move this option to both regular mk2 and mk2sr
-	SOFTWARE_LIST(config, "flop_list_pc6001mk2").set_original("pc6001mk2_flop");
+	// TODO: move this option to regular mk2
+	// (needs mountable option from pc80s31 device)
+	SOFTWARE_LIST(config, "flop_list_mk2").set_original("pc6001mk2_flop");
 }
 
 void pc6001mk2sr_state::pc6001mk2sr(machine_config &config)
@@ -1589,6 +1595,7 @@ void pc6001mk2sr_state::pc6001mk2sr(machine_config &config)
 
 	SOFTWARE_LIST(config, "cass_list_mk2sr").set_original("pc6001mk2sr_cass");
 	SOFTWARE_LIST(config, "flop_list_mk2sr").set_original("pc6001mk2sr_flop");
+	SOFTWARE_LIST(config, "flop_list_mk2").set_original("pc6001mk2_flop");
 }
 
 void pc6601sr_state::pc6601sr(machine_config &config)
@@ -1781,11 +1788,11 @@ ROM_END
 COMP( 1981, pc6001,       0,           0,        pc6001,      pc6001, pc6001_state,       empty_init, "NEC",   "PC-6001 (Japan)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
 COMP( 1981, pc6001a,      pc6001,      0,        pc6001,      pc6001, pc6001_state,       empty_init, "NEC",   "PC-6001A \"NEC Trek\" (US)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
 
-COMP( 1983, pc6001mk2,    0,           0,        pc6001mk2,   pc6001, pc6001mk2_state,    empty_init, "NEC",   "PC-6001mkII (Japan)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
-COMP( 1983, pc6601,       pc6001mk2,   0,        pc6601,      pc6001, pc6601_state,       empty_init, "NEC",   "PC-6601 (Japan)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+COMP( 1983, pc6001mk2,    0,           0,        pc6001mk2,   pc6001, pc6001mk2_state,    empty_init, "NEC",   "PC-6001mkII (Japan)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND )
+COMP( 1983, pc6601,       pc6001mk2,   0,        pc6601,      pc6001, pc6601_state,       empty_init, "NEC",   "PC-6601 (Japan)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND )
 // al-Warka PC-6001, official Iraqi mkII equivalent with Arabic charset (allegedly without voice chip)
 // prototype English mkII
 
-COMP( 1984, pc6001mk2sr,  0,           0,        pc6001mk2sr, pc6001, pc6001mk2sr_state,  empty_init, "NEC",   "PC-6001mkIISR (Japan)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
-COMP( 1984, pc6601sr,     pc6001mk2sr, 0,        pc6601sr,    pc6001, pc6601sr_state,     empty_init, "NEC",   "PC-6601SR \"Mr. PC\" (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+COMP( 1984, pc6001mk2sr,  0,           0,        pc6001mk2sr, pc6001, pc6001mk2sr_state,  empty_init, "NEC",   "PC-6001mkIISR (Japan)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND )
+COMP( 1984, pc6601sr,     pc6001mk2sr, 0,        pc6601sr,    pc6001, pc6601sr_state,     empty_init, "NEC",   "PC-6601SR \"Mr. PC\" (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND )
 // al-Warka PC-6002, mkIISR equivalent (allegedly with *both* YM and PSG chips)

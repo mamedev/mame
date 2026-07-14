@@ -88,7 +88,7 @@ public:
 
 	void pc6001(machine_config &config);
 protected:
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<i8255_device> m_ppi;
 	required_device<screen_device> m_screen;
