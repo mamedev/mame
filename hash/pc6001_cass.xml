@@ -259,8 +259,7 @@ Olion: crashes MAME when pressing 'S' key in pc6001
 		<year>1982</year>
 		<publisher>ASCII</publisher>
 		<notes><![CDATA[
-Demo: [timing] should corrupt video when AY-based speech plays back (cfr. real HW refs)
-Space Enemy, Head-On: [timing] runs too fast
+Demo: [CRTKILL] should corrupt video when AY-based speech plays back (cfr. real HW refs)
 ]]></notes>
 		<info name="usage" value="Mode 1, Page 1 for all but for Powered Knight (Mode 2, Page 1)"/>
 
@@ -301,8 +300,6 @@ Space Enemy, Head-On: [timing] runs too fast
 		<year>1983</year>
 		<publisher>ASCII</publisher>
 		<notes><![CDATA[
-Demonstration: [timing] may be running too fast
-Police and Gang: [timing] runs too fast
 The Asterodian: [VDG] glitch for ASCII text in title (verify)
 ]]></notes>
 		<info name="usage" value="Mode 1, Page 1 for all programs. The Asterodian uses joystick in port 2"/>
@@ -339,13 +336,10 @@ The Asterodian: [VDG] glitch for ASCII text in title (verify)
 		</part>
 	</software>
 
-	<software name="ax8" supported="no">
+	<software name="ax8" supported="partial">
 		<description>AX-8</description>
 		<year>1984</year>
 		<publisher>ASCII</publisher>
-		<notes><![CDATA[
-Cannot start a game, requires [keyboard] stop key
-]]></notes>
 		<info name="usage" value="Mode 2, Page 1"/>
 		<info name="alt_title" value="ギャラクシーミッション"/>
 
@@ -369,7 +363,7 @@ Cannot start a game, requires [keyboard] stop key
 		<publisher>ASCII</publisher>
 		<notes><![CDATA[
 3D Flight Simulator: non-functional [keyboard] in gameplay
-Blue Sky: [VDG] ground cursor leaves trails when moved
+Blue Sky: [keyboard] doesn't allow hitting directions and space/shift key at same time (verify)
 ]]></notes>
 		<info name="usage" value="Mode 2, Page 1 for 3D Flight Simulator, Bounder Robo and Demonstration. Mode 2, Page 2 for Blue Sky"/>
 
@@ -403,9 +397,6 @@ Blue Sky: [VDG] ground cursor leaves trails when moved
 		<description>AX-10</description>
 		<year>1985</year>
 		<publisher>ASCII</publisher>
-		<notes><![CDATA[
-Outlaw: [timing] runs too fast
-]]></notes>
 		<info name="usage" value="Mode 2, Page 1 for Outlaw and The Seven Bibles, Mode 2, Page 2 for Pop Hand and Risuning"/>
 
 		<part name="snap1" interface="pc6001_snap">
@@ -558,7 +549,7 @@ Outlaw: [timing] runs too fast
 		<notes><![CDATA[
 Very sensitive with [sub] irq triggers
 [keyboard] joy triggers doesn't work properly (select F1 after loading), cannot move down
-[gfx] draws garbage on vanilla pc6001 and eventually crashes MAME
+[gfx] draws garbage on vanilla pc6001 and eventually crashes ([cart] RAM?)
 ]]></notes>
 		<info name="usage" value="Mode 2, Page 2"/>
 		<info name="developer" value="T. Matsushima"/>
@@ -617,9 +608,8 @@ Very sensitive with [sub] irq triggers
 		<year>1984</year>
 		<publisher>Dempa Micomsoft</publisher>
 		<notes><![CDATA[
-Currently crashes MAME with no expansion ROM attached
-pc6001: Heavy [VDG] issues (regression? works in pc6001mk2)
-Gameplay is too fast
+pc6001: Heavy [VDG] issues ([cart] RAM? works in pc6001mk2)
+[VDG] swaps gfx mode mid-scanline (text uses a different one)
 ]]></notes>
 		<info name="usage" value="Mode 2, Page 2, has optional support for Mode 4" />
 		<info name="alt_title" value="タイニーゼビウス2"/>

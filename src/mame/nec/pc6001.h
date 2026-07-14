@@ -141,9 +141,13 @@ protected:
 	void draw_border(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr,int has_mc6847);
 	void pc6001_screen_draw(bitmap_ind16 &bitmap,const rectangle &cliprect, int has_mc6847);
 
+	virtual bool screen_blanked();
+	TIMER_CALLBACK_MEMBER(video_sync_cb);
 	emu_timer *m_timer_irq_timer = nullptr;
+	emu_timer *m_video_sync_timer = nullptr;
 	uint8_t *m_video_base = nullptr;
 //	std::unique_ptr<uint8_t[]> m_video_ram;
+
 	uint8_t m_cas_switch = 0;
 	uint8_t m_sys_latch = 0;
 	uint8_t m_bank_opt = 0;
@@ -185,8 +189,8 @@ protected:
 private:
 	u8 m_irq_pending = 0;
 	u8 m_sub_vector = 0;
+	bool m_crtkill;
 };
-
 
 class pc6001mk2_state : public pc6001_state
 {
@@ -327,6 +331,7 @@ protected:
 
 	virtual u8 vrtc_ack() override;
 	virtual u8 get_timer_base_divider() override;
+	virtual bool screen_blanked() override;
 
 private:
 	required_device_array<address_map_bank_device, 16> m_sr_bank;

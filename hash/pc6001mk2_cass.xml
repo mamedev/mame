@@ -48,13 +48,10 @@ Requires [keyboard] key repeat (verify)
 		</part>
 	</software>
 
-	<software name="amtruck" supported="no">
+	<software name="amtruck" supported="partial">
 		<description>American Truck</description>
 		<year>1985?</year>
 		<publisher>Telenet Japan</publisher>
-		<notes><![CDATA[
-Runs too fast
-]]></notes>
 		<info name="usage" value="Mode 5, Page 4, MONITOR"/>
 		<info name="alt_title" value="アメリカントラック"/>
 		<part name="snap" interface="pc6001_snap">
@@ -124,13 +121,10 @@ Requires user [tape] saving, prompts user after character creation
 		</part>
 	</software>
 
-	<software name="castle" supported="no">
+	<software name="castle" supported="partial">
 		<description>The Castle</description>
 		<year>1986</year>
 		<publisher>ASCII</publisher>
-		<notes><![CDATA[
-[timing] runs too fast
-]]></notes>
 		<info name="usage" value="Mode 5, Page 2, BASIC"/>
 		<info name="alt_title" value="ザ・キャッスル"/>
 
@@ -147,8 +141,8 @@ Requires user [tape] saving, prompts user after character creation
 		<publisher>ASCII</publisher>
 		<notes><![CDATA[
 [gfx] wrong scan draw for title screen copyright text, bad dump?
-[timing] runs too fast
 [keyboard] has input problems, keeps going to the left
+No BGM sound
 ]]></notes>
 		<info name="usage" value="Mode 5, Page 2, BASIC" />
 		<info name="alt_title" value="キャッスルエクセレント"/>
@@ -160,13 +154,10 @@ Requires user [tape] saving, prompts user after character creation
 		</part>
 	</software>
 
-	<software name="chackpop" supported="no">
+	<software name="chackpop" supported="partial">
 		<description>Chack 'n Pop</description>
 		<year>1984</year>
 		<publisher>Nidecom Carry</publisher>
-		<notes><![CDATA[
-[timing] runs too fast
-]]></notes>
 		<info name="usage" value="Mode 5, Page 1, BASIC" />
 		<info name="alt_title" value="ちゃっくんぽっぷ"/>
 		<part name="snap" interface="pc6001_snap">
@@ -212,7 +203,6 @@ pc6001mk2sr: crashes at title screen
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<notes><![CDATA[
 Unsupported [tape] saving, other chapters requires an user tape
-Requires better [keyboard] handling
 ]]></notes>
 		<info name="usage" value="Mode 5, Page 4, MONITOR. Choose N at startup to start a new game"/>
 		<info name="alt_title" value="デゼニランド"/>
@@ -248,13 +238,10 @@ Requires better [keyboard] handling
 		</part>
 	</software>
 
-	<software name="digdug" supported="no">
+	<software name="digdug" supported="partial">
 		<description>Dig Dug</description>
 		<year>198?</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
-		<notes><![CDATA[
-[timing] Runs too fast
-]]></notes>
 		<info name="usage" value="Mode 5, Page 1, BASIC" />
 		<info name="developer" value="T. Matsushima"/>
 		<info name="alt_title" value="ディグダグ"/>
@@ -265,13 +252,10 @@ Requires better [keyboard] handling
 		</part>
 	</software>
 
-	<software name="doordoor" supported="no">
+	<software name="doordoor" supported="partial">
 		<description>Door Door Mk. II</description>
 		<year>1984</year>
 		<publisher>Enix</publisher>
-		<notes><![CDATA[
-[timing] Runs too fast
-]]></notes>
 		<info name="usage" value="Mode 5, Page 3, BASIC" />
 		<info name="alt_title" value="ドアドアmkII"/>
 		<part name="snap" interface="pc6001_snap">
@@ -313,7 +297,7 @@ Requires better [keyboard] handling
 		<year>198?</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<notes><![CDATA[
-[timing] According to HW refs, when "get ready" speech plays, screen should be full white but instead it's black
+[CRTKILL] According to HW refs, when "get ready" speech plays, screen should be full white but instead it's black
 ]]></notes>
 		<info name="usage" value="Mode 5, Page 3, BASIC"/>
 		<info name="developer" value="T. Matsushima"/>
@@ -390,14 +374,10 @@ Unsupported [tape] save
 		</part>
 	</software>
 
-	<software name="iceblock" supported="no">
+	<software name="iceblock" supported="partial">
 		<description>Ice Block</description>
 		<year>198?</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
-		<notes><![CDATA[
-Requires key pressed on [joystick] to make it advance frames, [keyboard]?
-[timing] Runs too fast
-]]></notes>
 		<info name="usage" value="Mode 5, Page 2, BASIC" />
 		<info name="alt_title" value="アイス・ブロック"/>
 		<part name="snap" interface="pc6001_snap">
@@ -408,12 +388,12 @@ Requires key pressed on [joystick] to make it advance frames, [keyboard]?
 	</software>
 
 	<!-- Original fanfun in pc8001_flop / pc8801_cass -->
-	<software name="nfanfun" supported="no">
+	<software name="nfanfun" supported="partial">
 		<description>New Fan Fun</description>
 		<year>1984</year>
 		<publisher>Enix</publisher>
 		<notes><![CDATA[
-[timing] may run too fast (verify)
+[psg] sounds very aliased
 ]]></notes>
 		<info name="usage" value="Mode 5, Page 3, BASIC"/>
 		<info name="developer" value="Miyata"/>
@@ -438,13 +418,10 @@ Requires key pressed on [joystick] to make it advance frames, [keyboard]?
 		</part>
 	</software>
 
-	<software name="pacman" supported="no">
+	<software name="pacman" supported="partial">
 		<description>Pac-Man</description>
 		<year>198?</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
-		<notes><![CDATA[
-[timing] Runs too fast
-]]></notes>
 		<info name="usage" value="Mode 5, Page 2, MONITOR R-0 then GDD74"/>
 		<info name="developer" value="H. Yomoda"/>
 		<info name="alt_title" value="パックマン"/>
@@ -455,13 +432,10 @@ Requires key pressed on [joystick] to make it advance frames, [keyboard]?
 		</part>
 	</software>
 
-	<software name="pascom" supported="no">
+	<software name="pascom" supported="partial">
 		<description>Pascom Tower</description>
 		<year>1984</year>
 		<publisher>MIA</publisher>
-		<notes><![CDATA[
-[timing] Runs too fast
-]]></notes>
 		<info name="usage" value="Mode 5, Page 4, BASIC" />
 		<info name="alt_title" value="パスコンタワー"/>
 		<part name="snap" interface="pc6001_snap">
@@ -494,7 +468,6 @@ Holding left+shift on [keyboard] pauses game (verify)
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<notes><![CDATA[
 Holding left+shift on [keyboard] pauses game (verify)
-[timing] Runs too fast
 ]]></notes>
 		<info name="usage" value="Mode 5, Page 4, MONITOR" />
 		<info name="alt_title" value="パンチボールマリオブラザーズ"/>
@@ -534,13 +507,10 @@ Not extensively tested (language barrier)
 		</part>
 	</software>
 
-	<software name="vegcrash" supported="no">
+	<software name="vegcrash" supported="partial">
 		<description>Vegetable Crash</description>
 		<year>198?</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<notes><![CDATA[
-[timing] Runs too fast
-]]></notes>
 		<info name="usage" value="Mode 5, Page 4, MONITOR" />
 		<info name="alt_title" value="ベジタブルクラッシュ"/>
 		<part name="snap" interface="pc6001_snap">
@@ -550,13 +520,10 @@ Not extensively tested (language barrier)
 		</part>
 	</software>
 
-	<software name="volguard" supported="no">
+	<software name="volguard" supported="partial">
 		<description>Volguard</description>
 		<year>1985</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
-		<notes><![CDATA[
-[timing] runs too fast
-]]></notes>
 		<info name="usage" value="Mode 5, Page 2, BASIC"/>
 		<info name="alt_title" value="ヴォルガード"/>
 		<part name="snap" interface="pc6001_snap">
@@ -596,14 +563,14 @@ Not extensively tested (language barrier)
 
 <!-- !Homebrew -->
 
-	<software name="mandelbr" supported="no">
+	<software name="mandelbr" supported="partial">
 		<description>Mandelbrot demo</description>
 		<!-- Source code timestamps: 05/10/2012 -->
 		<year>2012?</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<notes><![CDATA[
-Verify produced shape
-Takes 1h30m to complete (verify)
+Produces an image that isn't exactly a Mandelbrot (btanb, fixed version known to exist)
+Takes 1h30m to complete without busreq, approx 4h with it (verify)
 ]]></notes>
 		<info name="usage" value="Mode 5, Page 3"/>
 		<info name="developer" value="Bookworm"/>
