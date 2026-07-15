@@ -120,32 +120,16 @@ irq vector 0x26:                                                                
 
 #include "softlist_dev.h"
 
-#define LOG_IRQ    (1U << 1)
+#define LOG_IRQ     (1U << 1)
+#define LOG_SUB_CMD (1U << 2)
 
-#define VERBOSE (0)
+#define VERBOSE (LOG_GENERAL | LOG_SUB_CMD)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
-#define LOGIRQ(...)     LOGMASKED(LOG_IRQ, __VA_ARGS__)
-
-inline void pc6001_state::cassette_latch_control(bool new_state)
-{
-	// 0 -> 1 transition: send PLAY tape cmd to i8049
-	if((!(m_sys_latch & 8)) && new_state == true) //PLAY tape cmd
-	{
-		m_cas_switch = 1;
-		//m_cassette->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-		//m_cassette->change_state(CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
-	}
-	// 1 -> 0 transition: send STOP tape cmd to i8049
-	if((m_sys_latch & 8) && new_state == false) //STOP tape cmd
-	{
-		m_cas_switch = 0;
-		//m_cassette->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-		//m_cassette->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
-	}
-}
+#define LOGIRQ(...)      LOGMASKED(LOG_IRQ, __VA_ARGS__)
+#define LOGSUB_CMD(...)  LOGMASKED(LOG_SUB_CMD, __VA_ARGS__)
 
 // TODO: this is explicitly needed for making all machines to boot
 inline void pc6001_state::ppi_control_hack_w(uint8_t data)
@@ -210,7 +194,7 @@ void pc6001_state::system_latch_w(uint8_t data)
 
 	m_video_base = &m_ram->pointer()[startaddr[(data >> 1) & 0x03] - 0x8000];
 
-	cassette_latch_control((data & 8) == 8);
+	cassette_motor_control((data & 8) == 8);
 	m_sys_latch = data;
 
 	m_timer_enable = !(data & 1);
@@ -550,7 +534,7 @@ void pc6001mk2_state::vram_bank_change(uint8_t vram_bank)
 //  uint8_t *work_ram = m_region_maincpu->base();
 
 //  bit 2 of vram_bank sets up 4 color mode
-//	set_videoram_bank(0x28000 + bank_base_values[vram_bank_index]);
+//  set_videoram_bank(0x28000 + bank_base_values[vram_bank_index]);
 	m_video_base = &m_ram->pointer()[bank_base_values[vram_bank_index]];
 
 //  popmessage("%02x",vram_bank);
@@ -558,7 +542,7 @@ void pc6001mk2_state::vram_bank_change(uint8_t vram_bank)
 
 void pc6001mk2_state::mk2_system_latch_w(uint8_t data)
 {
-	cassette_latch_control((data & 8) == 8);
+	cassette_motor_control((data & 8) == 8);
 	m_sys_latch = data;
 
 	m_timer_enable = !(data & 1);
@@ -687,7 +671,7 @@ void pc6001mk2_state::pc6001mk2_io(address_map &map)
 	map(0xc2, 0xc2).w(FUNC(pc6001mk2_state::mk2_opt_bank_w));
 	map(0xc3, 0xc3).lw8(NAME([this] (u8 data) {
 		if (data != 0xff)
-			logerror("Port $c3: %02x\n", data);
+			LOG("Port $c3: %02x\n", data);
 	}));
 
 	map(0xe0, 0xe3).mirror(0x0c).rw("upd7752", FUNC(upd7752_device::read), FUNC(upd7752_device::write));
@@ -881,12 +865,12 @@ void pc6001mk2sr_state::sr_vram_bank_w(u8 data)
 
 void pc6001mk2sr_state::sr_system_latch_w(u8 data)
 {
-	cassette_latch_control((data & 8) == 8);
+	cassette_motor_control((data & 8) == 8);
 	m_sys_latch = data;
 
 	m_timer_enable = !(data & 1);
 	set_timer_divider();
-//	vram_bank_change((m_ex_vram_bank & 0x06) | ((m_sys_latch & 0x06) << 4));
+//  vram_bank_change((m_ex_vram_bank & 0x06) | ((m_sys_latch & 0x06) << 4));
 
 	//printf("%02x B0\n",data);
 }
@@ -1030,7 +1014,7 @@ void pc6001mk2sr_state::pc6001mk2sr_io(address_map &map)
 static INPUT_PORTS_START( pc6001 )
 	// TODO: is this really a DSW? bit arrangement is also unknown if so.
 	PORT_START("MODE4_DSW")
-	PORT_DIPNAME( 0x07, 0x00, "Mode 4 GFX colors" )
+	PORT_DIPNAME( 0x07, 0x00, "Screen 4 GFX colors" )
 	PORT_DIPSETTING(    0x00, "Monochrome" )
 	PORT_DIPSETTING(    0x01, "Red/Blue" )
 	PORT_DIPSETTING(    0x02, "Blue/Red" )
@@ -1039,7 +1023,7 @@ static INPUT_PORTS_START( pc6001 )
 	//5-6-7 is presumably invalid
 INPUT_PORTS_END
 
-TIMER_CALLBACK_MEMBER(pc6001_state::audio_callback)
+TIMER_CALLBACK_MEMBER(pc6001_state::timer_irq_cb)
 {
 	// TODO: shouldn't really need the cas switch check, different thread
 	if(m_cas_switch == 0 && m_timer_irq_mask == false)
@@ -1082,8 +1066,8 @@ u8 pc6001mk2_state::vrtc_ack()
 u8 pc6001mk2sr_state::vrtc_ack()
 {
 	// TODO: as above
-//	if (m_mk2_mode)
-//		return pc6001mk2_state::vrtc_ack();
+//  if (m_mk2_mode)
+//      return pc6001mk2_state::vrtc_ack();
 
 	return m_sr_irq_vectors[VRTC_IRQ];
 }
@@ -1126,20 +1110,53 @@ uint8_t pc6001_state::ppi_porta_r()
 	return 0;
 }
 
-void pc6001_state::ppi_porta_w(uint8_t data)
+void pc6001_state::sub_cmd_w(uint8_t data)
 {
-	// sub command
-	// [0x06]: trigger a 0x16 irq
-	// [0x19/0x39]: Cassette PLAY
-	// [0x1a]: Cassette STOP
-	// [0x1d/0x3d]: Cassette baud select 600
-	// [0x1e/0x3e]: Cassette baud select 1200
-	// [0x38]: Cassette RECord
-
-	if (data == 0x06)
+	switch(data)
 	{
-		m_kbd->joy_cmd_w(1);
+		// [0x06]: trigger a 0x16 irq
+		case 0x06:
+			m_kbd->joy_cmd_w(1);
+			break;
+		// [0x19/0x39]: Cassette PLAY
+		case 0x19:
+		case 0x39:
+			LOGSUB_CMD("sub_cmd_w: PLAY command (%02x) at %04x\n", data, m_cas_offset);
+			m_cas_switch = 1;
+			m_cassette_timer->adjust(attotime::from_hz(m_cas_baud_select / 16));
+			break;
+		// [0x1a]: Cassette STOP
+		// TODO: also 0x3a? (suprball)
+		case 0x1a:
+			LOGSUB_CMD("sub_cmd_w: STOP command (%02x) at %04x\n", data, m_cas_offset);
+			m_cas_switch = 0;
+			m_cassette_timer->adjust(attotime::never);
+			break;
+		// [0x1d/0x3d]: Cassette baud select 600
+		// [0x1e/0x3e]: Cassette baud select 1200
+		case 0x1d:
+		case 0x3d:
+		case 0x1e:
+		case 0x3e:
+			m_cas_baud_select = ((data & 0x1f) == 0x1e) ? 1200 : 600;
+			LOGSUB_CMD("sub_cmd_w: baud select command %d (%02x)\n", m_cas_baud_select, data);
+
+			if (m_cas_switch && m_cas_motor)
+			{
+				m_cassette_timer->reset();
+				m_cassette_timer->adjust(attotime::from_hz(m_cas_baud_select / 16));
+			}
+			break;
+
+		// [0x38]: Cassette RECord
+		case 0x38:
+			LOG("sub_cmd_w: Unhandled SUB REC command (%02x)\n", data);
+			break;
+		default:
+			LOG("sub_cmd_w: Unhandled SUB command %02x\n", data);
+			break;
 	}
+
 }
 
 uint8_t pc6001_state::ppi_portb_r()
@@ -1165,42 +1182,54 @@ uint8_t pc6001_state::ppi_portc_r()
 	return 0x88;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::cassette_callback)
+// this controls the motor relay for the tape deck (directly, not from sub CPU?)
+inline void pc6001_state::cassette_motor_control(bool new_state)
 {
-	if(m_cas_switch == 1)
+	// 0 -> 1 transition: send PLAY tape cmd to i8049
+	if((!(m_sys_latch & 8)) && new_state == true) //PLAY tape cmd
 	{
-		#if 0
-			static uint8_t cas_data_i = 0x80,cas_data_poll;
-			//m_cur_keycode = gfx_data[m_cas_offset++];
-			if(m_cassette->input() > 0.03)
-				cas_data_poll|= cas_data_i;
-			else
-				cas_data_poll&=~cas_data_i;
-			if(cas_data_i == 1)
-			{
-				m_cur_keycode = cas_data_poll;
-				cas_data_i = 0x80;
-				/* data ready, poll irq */
-				set_subcpu_irq_vector(0x08);
-			}
-			else
-				cas_data_i>>=1;
-		#else
-			m_cur_keycode = m_cas_data[m_cas_offset++];
-			popmessage("%04x %04x", m_cas_offset, m_cas_maxsize);
-			if(m_cas_offset > m_cas_maxsize)
-			{
-				m_cas_offset = 0;
-				m_cas_switch = 0;
-				// Tape-E
-				set_subcpu_irq_vector(0x12);
-			}
-			else
-			{
-				// Tape-D
-				set_subcpu_irq_vector(0x08);
-			}
-		#endif
+		m_cas_motor = true;
+		//m_cassette->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+	}
+	// 1 -> 0 transition: send STOP tape cmd to i8049
+	if((m_sys_latch & 8) && new_state == false) //STOP tape cmd
+	{
+		m_cas_motor = false;
+		//m_cassette->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+	}
+}
+
+// TODO: move this as a dedicated device
+// was 1200 / 12 pre-bus request
+// - check random failures in pc6001mk2 plazmaln, digdug, nfanfun loaders if modified
+// - pc6001mk2:zunou uses a STOP command when loading.
+// - pc6601 enables motor at startup, but doesn't want actually loading a tape.
+TIMER_CALLBACK_MEMBER(pc6001_state::cassette_data_cb)
+{
+	if (!m_cas_motor)
+	{
+		if (m_cas_switch)
+			m_cassette_timer->adjust(attotime::from_hz(m_cas_baud_select / 16));
+		return;
+	}
+
+	if (m_cas_switch == 1)
+	{
+		m_cur_keycode = m_cas_data[m_cas_offset++];
+		popmessage("%04x %04x", m_cas_offset, m_cas_maxsize);
+		if(m_cas_offset > m_cas_maxsize)
+		{
+			m_cas_offset = 0;
+			m_cas_switch = 0;
+			// Tape-E
+			set_subcpu_irq_vector(0x12);
+		}
+		else
+		{
+			// Tape-D
+			set_subcpu_irq_vector(0x08);
+			m_cassette_timer->adjust(attotime::from_hz(m_cas_baud_select / 16));
+		}
 	}
 }
 
@@ -1225,6 +1254,7 @@ SNAPSHOT_LOAD_MEMBER(pc6001_state::snapshot_cb)
 	memcpy(m_cas_data, &data[0], snapsize);
 
 	m_cas_switch = 0;
+	m_cas_motor = false;
 	m_cas_offset = 0;
 	m_cas_maxsize = snapsize;
 
@@ -1286,8 +1316,9 @@ TIMER_CALLBACK_MEMBER(pc6001_state::video_sync_cb)
 
 void pc6001_state::machine_start()
 {
-	m_timer_irq_timer = timer_alloc(FUNC(pc6001_state::audio_callback), this);
+	m_timer_irq_timer = timer_alloc(FUNC(pc6001_state::timer_irq_cb), this);
 	m_video_sync_timer = timer_alloc(FUNC(pc6001_state::video_sync_cb), this);
+	m_cassette_timer = timer_alloc(FUNC(pc6001_state::cassette_data_cb), this);
 
 	save_item(NAME(m_cas_data));
 	save_item(NAME(m_cas_offset));
@@ -1299,7 +1330,11 @@ void pc6001_state::machine_reset()
 {
 	m_video_base = &m_ram->pointer()[0xc000 - 0x8000];
 
+	m_cas_switch = 0;
+	m_cas_motor = false;
+	m_cas_baud_select = 1200;
 	m_cas_offset = 0;
+	m_cassette_timer->adjust(attotime::never);
 	irq_reset(3);
 	m_port_c_8255 = 0;
 
@@ -1324,7 +1359,7 @@ void pc6001mk2_state::machine_start()
 void pc6001mk2_state::machine_reset()
 {
 	pc6001_state::machine_reset();
-//	set_videoram_bank(0xc000 + 0x28000);
+//  set_videoram_bank(0xc000 + 0x28000);
 	m_video_base = &m_ram->pointer()[0xc000];
 
 	/* set default bankswitch */
@@ -1452,7 +1487,7 @@ void pc6001_state::pc6001(machine_config &config)
 
 	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(pc6001_state::ppi_porta_r));
-	m_ppi->out_pa_callback().set(FUNC(pc6001_state::ppi_porta_w));
+	m_ppi->out_pa_callback().set(FUNC(pc6001_state::sub_cmd_w));
 	m_ppi->in_pb_callback().set(FUNC(pc6001_state::ppi_portb_r));
 	m_ppi->out_pb_callback().set(FUNC(pc6001_state::ppi_portb_w));
 	m_ppi->in_pc_callback().set(FUNC(pc6001_state::ppi_portc_r));
@@ -1464,7 +1499,7 @@ void pc6001_state::pc6001(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_screen_update(FUNC(pc6001_state::screen_update));
 	// allegedly NTSC clock, PC8801FH_OSC1 equivalent
-	m_screen->set_raw(XTAL(28'636'363) / 4, 456, 0, 319, 262, 0, 239);
+	m_screen->set_raw(XTAL(28'636'363) / 4, 456, 0, 320, 262, 0, 240);
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(pc6001_state::palette_init), 16 + 4);
@@ -1487,11 +1522,6 @@ void pc6001_state::pc6001(machine_config &config)
 //  m_cassette->set_formats(pc6001_cassette_formats);
 //  m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 //  m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
-
-	// TODO: move this as a dedicated device, get rid of timer_device
-	// was 1200 / 12 pre-bus request
-	// - check random failures in pc6001mk2 plazmaln, digdug, nfanfun loaders if modified
-	TIMER(config, "cassette_timer").configure_periodic(FUNC(pc6001_state::cassette_callback), attotime::from_hz(1200/16));
 
 	// cas and p6 are raw binary files with no tape markers
 	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "cas,p6"));

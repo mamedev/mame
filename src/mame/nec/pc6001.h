@@ -70,11 +70,11 @@ public:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 //  INTERRUPT_GEN_MEMBER(vrtc_irq);
-	TIMER_CALLBACK_MEMBER(audio_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(cassette_callback);
+	TIMER_CALLBACK_MEMBER(timer_irq_cb);
+	TIMER_CALLBACK_MEMBER(cassette_data_cb);
 
 	uint8_t ppi_porta_r();
-	void ppi_porta_w(uint8_t data);
+	void sub_cmd_w(uint8_t data);
 	uint8_t ppi_portb_r();
 	void ppi_portb_w(uint8_t data);
 	void ppi_portc_w(uint8_t data);
@@ -122,15 +122,20 @@ protected:
 	// i/o functions
 	uint8_t check_joy_press();
 	uint8_t check_keyboard_press();
-	inline void cassette_latch_control(bool new_state);
+	inline void cassette_motor_control(bool new_state);
 	inline void ppi_control_hack_w(uint8_t data);
 	inline void set_timer_divider();
 	void write_centronics_busy(int state);
 
 	// snapshot handling
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
-	uint32_t m_cas_offset = 0;
-	uint32_t m_cas_maxsize = 0;
+	emu_timer *m_cassette_timer = nullptr;
+
+	uint8_t m_cas_switch;
+	bool m_cas_motor;
+	uint32_t m_cas_offset;
+	uint32_t m_cas_maxsize;
+	int m_cas_baud_select;
 	uint8_t m_cas_data[0x18000];
 
 	// video functions
@@ -148,7 +153,6 @@ protected:
 	uint8_t *m_video_base = nullptr;
 //	std::unique_ptr<uint8_t[]> m_video_ram;
 
-	uint8_t m_cas_switch = 0;
 	uint8_t m_sys_latch = 0;
 	uint8_t m_bank_opt = 0;
 	bool m_timer_enable = false;
