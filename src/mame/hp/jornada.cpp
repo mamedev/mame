@@ -648,4 +648,4 @@ ROM_END
 
 } // anonymous namespace
 
-COMP( 2000, jorn720, 0, 0, jornada720, jornada720, jornada_state, empty_init, "Hewlett Packard", "Jornada 720", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 2000, jorn720, 0, 0, jornada720, jornada720, jornada_state, empty_init, "Hewlett-Packard", "Jornada 720", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

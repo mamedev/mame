@@ -882,7 +882,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY             FULLNAME             FLAGS
-COMP( 1978, abc80,  0,      0,      abc80,   0,     abc80_state,  empty_init, "Luxor Datorer AB", "ABC 80",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1981, abc80l, abc80,  0,      abc80l,  0,     abc80l_state, empty_init, "Cat AB",           "ABC 80 with ABC80L", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 198?, tkn80,  abc80,  0,      tkn80,   tkn80, tkn80_state,  empty_init, "MYAB",             "ABC 80 with TKN80",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY   FULLNAME              FLAGS
+COMP( 1978, abc80,  0,      0,      abc80,   0,     abc80_state,  empty_init, "Luxor",  "ABC 80",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1981, abc80l, abc80,  0,      abc80l,  0,     abc80l_state, empty_init, "Cat AB", "ABC 80 with ABC80L", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 198?, tkn80,  abc80,  0,      tkn80,   tkn80, tkn80_state,  empty_init, "MYAB",   "ABC 80 with TKN80",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

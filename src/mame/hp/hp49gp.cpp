@@ -349,4 +349,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(2009, hp49gp, 0, 0, hp49gp, hp49gp, hp49gp_state, init_hp49gp, "Hewlett Packard", "HP49G+", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP(2009, hp49gp, 0, 0, hp49gp, hp49gp, hp49gp_state, init_hp49gp, "Hewlett-Packard", "HP49G+", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

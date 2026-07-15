@@ -1472,12 +1472,12 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS        INIT        COMPANY                 FULLNAME           FLAGS
-COMP( 1992, nc100,   0,      0,      nc100,   nc100,   nc100_state, empty_init, "Amstrad plc",          "NC100",           MACHINE_SUPPORTS_SAVE )
-COMP( 1992, nc100de, nc100,  0,      nc100,   nc100de, nc100_state, empty_init, "Amstrad plc",          "NC100 (Germany)", MACHINE_SUPPORTS_SAVE )
-COMP( 1992, nc100dk, nc100,  0,      nc100,   nc100dk, nc100_state, empty_init, "Amstrad plc",          "NC100 (Denmark)", MACHINE_SUPPORTS_SAVE )
-COMP( 1992, nc100sv, nc100,  0,      nc100,   nc100sv, nc100_state, empty_init, "Amstrad plc",          "NC100 (Sweden)",  MACHINE_SUPPORTS_SAVE )
-COMP( 1992, dw225,   nc100,  0,      nc100,   nc100,   nc100_state, empty_init, "NTS Computer Systems", "DreamWriter 225", MACHINE_SUPPORTS_SAVE )
-COMP( 1992, nc150fr, nc100,  0,      nc150,   nc150fr, nc100_state, empty_init, "Amstrad plc",          "NC150 (France)",  MACHINE_SUPPORTS_SAVE )
-COMP( 1992, nc150it, nc100,  0,      nc150,   nc150it, nc100_state, empty_init, "Amstrad plc",          "NC150 (Italy)",   MACHINE_SUPPORTS_SAVE )
-COMP( 1993, nc200,   0,      0,      nc200,   nc200,   nc200_state, empty_init, "Amstrad plc",          "NC200",           MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS        INIT        COMPANY        FULLNAME           FLAGS
+COMP( 1992, nc100,   0,      0,      nc100,   nc100,   nc100_state, empty_init, "Amstrad plc", "NC100",           MACHINE_SUPPORTS_SAVE )
+COMP( 1992, nc100de, nc100,  0,      nc100,   nc100de, nc100_state, empty_init, "Amstrad plc", "NC100 (Germany)", MACHINE_SUPPORTS_SAVE )
+COMP( 1992, nc100dk, nc100,  0,      nc100,   nc100dk, nc100_state, empty_init, "Amstrad plc", "NC100 (Denmark)", MACHINE_SUPPORTS_SAVE )
+COMP( 1992, nc100sv, nc100,  0,      nc100,   nc100sv, nc100_state, empty_init, "Amstrad plc", "NC100 (Sweden)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1992, dw225,   nc100,  0,      nc100,   nc100,   nc100_state, empty_init, "NTS",         "DreamWriter 225", MACHINE_SUPPORTS_SAVE )
+COMP( 1992, nc150fr, nc100,  0,      nc150,   nc150fr, nc100_state, empty_init, "Amstrad plc", "NC150 (France)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1992, nc150it, nc100,  0,      nc150,   nc150it, nc100_state, empty_init, "Amstrad plc", "NC150 (Italy)",   MACHINE_SUPPORTS_SAVE )
+COMP( 1993, nc200,   0,      0,      nc200,   nc200,   nc200_state, empty_init, "Amstrad plc", "NC200",           MACHINE_SUPPORTS_SAVE )

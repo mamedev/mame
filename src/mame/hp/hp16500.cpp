@@ -541,7 +541,7 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1989, hp1650b,  0, 0, hp1650,   hp16500, hp16500_state, empty_init, "Hewlett Packard", "HP 1650b",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-COMP( 1989, hp1651b,  0, 0, hp1651,   hp16500, hp16500_state, empty_init, "Hewlett Packard", "HP 1651b",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-COMP( 1991, hp165ka0, 0, 0, hp16500a, hp16500, hp16500_state, empty_init, "Hewlett Packard", "HP 16500a", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-COMP( 1991, hp16500b, 0, 0, hp16500b, hp16500, hp16500_state, empty_init, "Hewlett Packard", "HP 16500b", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP( 1989, hp1650b,  0, 0, hp1650,   hp16500, hp16500_state, empty_init, "Hewlett-Packard", "HP 1650b",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1989, hp1651b,  0, 0, hp1651,   hp16500, hp16500_state, empty_init, "Hewlett-Packard", "HP 1651b",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1991, hp165ka0, 0, 0, hp16500a, hp16500, hp16500_state, empty_init, "Hewlett-Packard", "HP 16500a", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1991, hp16500b, 0, 0, hp16500b, hp16500, hp16500_state, empty_init, "Hewlett-Packard", "HP 16500b", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
