@@ -302,6 +302,7 @@ void hanaawas_state::hanaawas_io_map(address_map &map)
 	base_io_map(map);
 	map(0x00, 0x00).rw(FUNC(hanaawas_state::input_port_0_r), FUNC(hanaawas_state::inputs_mux_w));
 	map(0x01, 0x01).nopr().w(FUNC(hanaawas_state::key_matrix_status_w)); // r bit 1: status ready, presumably of the input mux device / w = configure device?
+	// map(0x00, 0x01).rw("iomcu", FUNC(i8741a_device::upi41_master_r), FUNC(i8741a_device::upi41_master_w));
 }
 
 void hanaawas_state::hanaawasa_io_map(address_map &map)
@@ -451,7 +452,15 @@ void hanaawas_state::hanaawas(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &hanaawas_state::hanaawas_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(hanaawas_state::irq0_line_assert));
 
-	I8741A(config, "iomcu", 18.432_MHz_XTAL / 6).set_disable(); // type only faintly discerned on one PCB photo; divider not verified
+	i8741a_device &iomcu(I8741A(config, "iomcu", 18.432_MHz_XTAL / 6)); // type only faintly discerned on one PCB photo; divider not verified
+	iomcu.p1_in_cb().set([this] (uint8_t data) { logerror("%s IO MCU port 1 in\n", machine().describe_context()); return 0xff; });
+	iomcu.p2_in_cb().set([this] (uint8_t data) { logerror("%s IO MCU port 2 in\n", machine().describe_context()); return 0xff; });
+	iomcu.p1_out_cb().set([this] (uint8_t data) { logerror("%s IO MCU port 1 out: %02x\n", machine().describe_context(), data); });
+	iomcu.p2_out_cb().set([this] (uint8_t data) { logerror("%s IO MCU port 2 out: %02x\n", machine().describe_context(), data); });
+	iomcu.t0_in_cb().set([this] (uint8_t data) { logerror("%s IO MCU test 0 in\n", machine().describe_context()); return 0x00; });
+	iomcu.t1_in_cb().set([this] (uint8_t data) { logerror("%s IO MCU test 1 in\n", machine().describe_context()); return 0x00; });
+	iomcu.bus_in_cb().set([this] (uint8_t data) { logerror("%s IO MCU bus in\n", machine().describe_context()); return 0xff; });
+	iomcu.bus_out_cb().set([this] (uint8_t data) { logerror("%s IO MCU bus out: %02x\n", machine().describe_context(), data); });
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -512,7 +521,7 @@ ROM_START( hanaawas ) // PC0-017-11 PCB?
 	ROM_LOAD( "4.6e",       0x6000, 0x1000, CRC(24bee0dc) SHA1(a4237ad3611c923b563923462e79b0b3f66cc721) )
 
 	ROM_REGION( 0x0400, "iomcu", 0 )
-	ROM_LOAD( "az-001.3j",  0x0000, 0x0400, NO_DUMP )
+	ROM_LOAD( "az-001.3j",  0x0000, 0x0400, CRC(099d77e8) SHA1(7b9bceba6d701ac9ee9d89beaa8e256901d1fe4b) BAD_DUMP ) // not dumped for this set
 
 	ROM_REGION( 0x4000, "tiles", 0 )
 	ROM_LOAD( "5.9a",       0x0000, 0x1000, CRC(304ae219) SHA1(c1eac4973a6aec9fd8e848c206870667a8bb0922) )
@@ -556,7 +565,7 @@ ROM_START( hanaawmh )
 	ROM_CONTINUE(           0x3000, 0x1000 )
 
 	ROM_REGION( 0x0400, "iomcu", 0 )
-	ROM_LOAD( "d8741ad.3j",  0x0000, 0x0400, NO_DUMP )
+	ROM_LOAD( "d8741ad.3j",  0x0000, 0x0400, CRC(099d77e8) SHA1(7b9bceba6d701ac9ee9d89beaa8e256901d1fe4b) )
 
 	ROM_REGION( 0x8000, "tiles", 0 )
 	ROM_LOAD( "5.9a",       0x0000, 0x4000, CRC(c0cedc6e) SHA1(8c28e2a4a15a87ca19302d9592e363b561347695) )
