@@ -816,7 +816,7 @@ Optional [tape] load and save for construction mode
 		<publisher>Mycom BASIC</publisher>
 		<info name="usage" value="Mode 1, Page 2"/>
 		<info name="developer" value="Kunihisa Ogawa"/>
-ì		<part name="snap" interface="pc6001_snap">
+		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="2543">
 				<rom name="bound ball.cas" size="2543" crc="18385973" sha1="f2806d4e1e3adee3165d698a40d6c69e2dfe4cf1" offset="0" />
 			</dataarea>
@@ -1044,7 +1044,7 @@ Crashes on [tape] loading (regression)
         <year>2005</year>
 		<publisher>&lt;homebrew&gt;</publisher>
         <info name="usage" value="Mode 1, Page 2"/>
-		<!-- "the author and roadist" -->
+		<!-- "the author and roadist"? -->
         <info name="author" value="Sakai"/>
 		<info name="developer" value="Hashi"/>
 
