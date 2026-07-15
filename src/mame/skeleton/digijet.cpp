@@ -211,12 +211,12 @@ ROM_END
 
 ROM_START( digijet90 )
 	ROM_REGION( 0x2000, "maincpu", 0 ) // repeats itself 4 times
-	ROM_LOAD( "fabb05_03_03.bin", 0x0000, 0x2000, CRC(8c96bcdf) SHA1(73b26914cd15ca3a5e0d7427de9ce4b4e311fb00) ) // Volkswagen 1990, Germany
+	ROM_LOAD( "fabb05_03_03.bin", 0x0000, 0x2000, CRC(8c96bcdf) SHA1(73b26914cd15ca3a5e0d7427de9ce4b4e311fb00) ) // Volkswagen Polo, 1990, Germany
 ROM_END
 
 } // anonymous namespace
 
 
 //    YEAR  NAME       PARENT     COMPAT  MACHINE    INPUT    CLASS          INIT        COMPANY       FULLNAME          FLAGS
-CONS( 1985, digijet,   digijet90, 0,      digijet,   digijet, digijet_state, empty_init, "Volkswagen", "Digijet",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-CONS( 1990, digijet90, 0,         0,      digijet90, digijet, digijet_state, empty_init, "Volkswagen", "Digijet (1990)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+CONS( 1985, digijet,   0,         0,      digijet,   digijet, digijet_state, empty_init, "Volkswagen", "Digijet (Vanagon)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+CONS( 1990, digijet90, 0,         0,      digijet90, digijet, digijet_state, empty_init, "Volkswagen", "Digijet (Polo)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
