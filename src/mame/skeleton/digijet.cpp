@@ -77,6 +77,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_watchdog(*this, "watchdog")
 		, m_rpm_timer(*this, "rpm")
+		, m_led_fuel(*this, "led_fuel")
+		, m_led_inject(*this, "led_inject")
+		, m_led_check(*this, "led_check")
 	{
 	}
 
@@ -87,6 +90,9 @@ private:
 	required_device<mcs48_cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<timer_device> m_rpm_timer;
+	output_finder<> m_led_fuel;
+	output_finder<> m_led_inject;
+	output_finder<> m_led_check;
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override { }
@@ -133,9 +139,9 @@ void digijet_state::p1_w(uint8_t data)
 
 	m_interrupt_enable = blockint;
 
-	machine().output().set_value("led_fuel", !fuel);
-	machine().output().set_value("led_inject", !inject);
-	machine().output().set_value("led_check", !check);
+	m_led_fuel = !fuel;
+	m_led_inject = !inject;
+	m_led_check = !check;
 
 	if (watchdog)
 	{
