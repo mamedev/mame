@@ -136,14 +136,12 @@ inline void pc6001_state::cassette_latch_control(bool new_state)
 	{
 		m_cas_switch = 1;
 		//m_cassette->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-		//m_cassette->change_state(CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
 	}
 	// 1 -> 0 transition: send STOP tape cmd to i8049
 	if((m_sys_latch & 8) && new_state == false) //STOP tape cmd
 	{
 		m_cas_switch = 0;
 		//m_cassette->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-		//m_cassette->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
 	}
 }
 
@@ -550,7 +548,7 @@ void pc6001mk2_state::vram_bank_change(uint8_t vram_bank)
 //  uint8_t *work_ram = m_region_maincpu->base();
 
 //  bit 2 of vram_bank sets up 4 color mode
-//	set_videoram_bank(0x28000 + bank_base_values[vram_bank_index]);
+//  set_videoram_bank(0x28000 + bank_base_values[vram_bank_index]);
 	m_video_base = &m_ram->pointer()[bank_base_values[vram_bank_index]];
 
 //  popmessage("%02x",vram_bank);
@@ -886,7 +884,7 @@ void pc6001mk2sr_state::sr_system_latch_w(u8 data)
 
 	m_timer_enable = !(data & 1);
 	set_timer_divider();
-//	vram_bank_change((m_ex_vram_bank & 0x06) | ((m_sys_latch & 0x06) << 4));
+//  vram_bank_change((m_ex_vram_bank & 0x06) | ((m_sys_latch & 0x06) << 4));
 
 	//printf("%02x B0\n",data);
 }
@@ -1030,7 +1028,7 @@ void pc6001mk2sr_state::pc6001mk2sr_io(address_map &map)
 static INPUT_PORTS_START( pc6001 )
 	// TODO: is this really a DSW? bit arrangement is also unknown if so.
 	PORT_START("MODE4_DSW")
-	PORT_DIPNAME( 0x07, 0x00, "Mode 4 GFX colors" )
+	PORT_DIPNAME( 0x07, 0x00, "Screen 4 GFX colors" )
 	PORT_DIPSETTING(    0x00, "Monochrome" )
 	PORT_DIPSETTING(    0x01, "Red/Blue" )
 	PORT_DIPSETTING(    0x02, "Blue/Red" )
@@ -1082,8 +1080,8 @@ u8 pc6001mk2_state::vrtc_ack()
 u8 pc6001mk2sr_state::vrtc_ack()
 {
 	// TODO: as above
-//	if (m_mk2_mode)
-//		return pc6001mk2_state::vrtc_ack();
+//  if (m_mk2_mode)
+//      return pc6001mk2_state::vrtc_ack();
 
 	return m_sr_irq_vectors[VRTC_IRQ];
 }
@@ -1135,6 +1133,8 @@ void pc6001_state::ppi_porta_w(uint8_t data)
 	// [0x1d/0x3d]: Cassette baud select 600
 	// [0x1e/0x3e]: Cassette baud select 1200
 	// [0x38]: Cassette RECord
+
+	printf("%02x\n", data);
 
 	if (data == 0x06)
 	{
@@ -1324,7 +1324,7 @@ void pc6001mk2_state::machine_start()
 void pc6001mk2_state::machine_reset()
 {
 	pc6001_state::machine_reset();
-//	set_videoram_bank(0xc000 + 0x28000);
+//  set_videoram_bank(0xc000 + 0x28000);
 	m_video_base = &m_ram->pointer()[0xc000];
 
 	/* set default bankswitch */
@@ -1464,7 +1464,7 @@ void pc6001_state::pc6001(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_screen_update(FUNC(pc6001_state::screen_update));
 	// allegedly NTSC clock, PC8801FH_OSC1 equivalent
-	m_screen->set_raw(XTAL(28'636'363) / 4, 456, 0, 319, 262, 0, 239);
+	m_screen->set_raw(XTAL(28'636'363) / 4, 456, 0, 320, 262, 0, 240);
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(pc6001_state::palette_init), 16 + 4);
