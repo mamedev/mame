@@ -54,7 +54,6 @@ public:
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_coins(*this, "COINS"),
 		m_start(*this, "START"),
 		m_mux_inputs(*this, "IN%u", 0U)
 	{ }
@@ -65,7 +64,6 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -75,14 +73,12 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	optional_ioport m_coins, m_start;
+	required_ioport m_start;
 	optional_ioport_array<6> m_mux_inputs;
 
 	tilemap_t *m_bg_tilemap = nullptr;
 
 	uint8_t m_mux = 0;
-	uint8_t m_coin_settings = 0;
-	uint8_t m_coin_impulse = 0;
 
 	void inputs_mux_w(uint8_t data);
 	void iomcu_mux_w(uint8_t data);
@@ -403,14 +399,6 @@ GFXDECODE_END
 void hanaawas_state::machine_start()
 {
 	save_item(NAME(m_mux));
-	save_item(NAME(m_coin_settings));
-	save_item(NAME(m_coin_impulse));
-}
-
-void hanaawas_state::machine_reset()
-{
-	m_mux = 0;
-	m_coin_impulse = 0;
 }
 
 void hanaawas_state::hanaawas(machine_config &config)
