@@ -171,16 +171,16 @@ uint8_t hanaawas_state::hanaawasa_matrix_r()
 	uint8_t ret = 0xff;
 
 	if (!BIT(m_mux, 3))
-		ret &= (~m_player[0]->read() & 0x01f) << 3 | 0x07;
+		ret &= (~m_player[0]->read() & 0x01f) << 3 | 0x06 | (~m_player[0]->read() & 0x020) >> 5;
 
 	if (!BIT(m_mux, 2))
-		ret &= (~m_player[0]->read() & 0x3e0) >> 2 | 0x07;
+		ret &= (~m_player[0]->read() & 0x3c0) >> 3 | 0x87;
 
 	if (!BIT(m_mux, 0))
-		ret &= (~m_player[1]->read() & 0x01f) << 3 | 0x07;
+		ret &= (~m_player[1]->read() & 0x01f) << 3 | 0x06 | (~m_player[1]->read() & 0x020) >> 5;
 
 	if (!BIT(m_mux, 6))
-		ret &= (~m_player[1]->read() & 0x3e0) >> 2 | 0x07;
+		ret &= (~m_player[1]->read() & 0x3c0) >> 3 | 0x87;
 
 	return ret;
 }
