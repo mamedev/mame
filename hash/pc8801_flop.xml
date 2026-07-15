@@ -24469,12 +24469,12 @@ Should be supported by [PC8001mkIISR] too
 	</software>
 
 	<software name="nausicaa">
-		<description>Nausicaä Adventure Game</description>
+		<description>Kaze no Tani no Nausicaä</description>
 		<year>1984</year>
 		<publisher>徳間書店 (Tokuma Shoten Publishing)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198406xx"/>
-		<info name="alt_title" value="風の谷のナウシカ (Kaze no Tani no Naushika)"/>
+		<info name="alt_title" value="風の谷のナウシカ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348592">
 				<rom name="nausicaa.d88" size="348592" crc="fc9976be" sha1="24425dc8fa34e0636a7f7b246ceeef21dd459631"/>
@@ -32966,7 +32966,7 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 	</software>
 
 	<software name="mephius">
-		<description>Star Arthur Densetsu I - Wakusei Mephius</description>
+		<description>Star Arthur Densetsu I: Wakusei Mephius</description>
 		<year>1983</year>
 		<publisher>T&amp;E Soft</publisher>
 		<!-- PC8801 -->
@@ -32980,7 +32980,7 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 	</software>
 
 	<software name="mephiusa" cloneof="mephius">
-		<description>Star Arthur Densetsu I - Wakusei Mephius (alt)</description>
+		<description>Star Arthur Densetsu I: Wakusei Mephius (alt)</description>
 		<year>1983</year>
 		<publisher>T&amp;E Soft</publisher>
 		<!-- PC8801 -->
@@ -32994,7 +32994,7 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 	</software>
 
 	<software name="mephiush1" cloneof="mephius">
-		<description>Star Arthur Densetsu I - Wakusei Mephius (Fixed)</description>
+		<description>Star Arthur Densetsu I: Wakusei Mephius (fixed)</description>
 		<year>1983</year>
 		<publisher>T&amp;E Soft</publisher>
 		<!-- PC8801 -->
@@ -33008,7 +33008,8 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 	</software>
 
 	<software name="mephiush2" cloneof="mephius">
-		<description>Star Arthur Densetsu I - Wakusei Mephius (patched works through the end)</description>
+		<!-- TODO: understand what the note claims -->
+		<description>Star Arthur Densetsu I: Wakusei Mephius (patched works through the end)</description>
 		<year>1983</year>
 		<publisher>T&amp;E Soft</publisher>
 		<!-- PC8801 -->
@@ -33034,7 +33035,7 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 
 	<!-- Omake: run "SHUGYO" for a first person spaceship mini-game (eventually seen in the actual game too?) -->
 	<software name="ankosei" supported="yes">
-		<description>Star Arthur Densetsu II - Ankoku Seiun</description>
+		<description>Star Arthur Densetsu II: Ankoku Seiun</description>
 		<year>1984</year>
 		<publisher>T&amp;E Soft</publisher>
 		<!-- PC8801 -->
@@ -33051,7 +33052,7 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 
 	<!-- Omake: run "SHUGYO" for a first person spaceship mini-game (eventually seen in the actual game too?) -->
 	<software name="ankoseia" cloneof="ankosei" supported="yes">
-		<description>Star Arthur Densetsu II - Ankoku Seiun (alt)</description>
+		<description>Star Arthur Densetsu II: Ankoku Seiun (alt)</description>
 		<year>1984</year>
 		<publisher>T&amp;E Soft</publisher>
 		<!-- PC8801 -->

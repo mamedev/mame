@@ -25,6 +25,19 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 
 <!-- !Games -->
 
+	<software name="3dastfir" supported="partial">
+		<description>3D Asteroid Fire</description>
+		<year>1982</year>
+		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
+		<info name="usage" value="Mode 2, Page 4"/>
+		<info name="alt_title" value="３Ｄアステロイドファイヤー"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="6903">
+				<rom name="3d asteroid fire.cas" size="6903" crc="354b9fb6" sha1="0e535fcc35fa1c6d4f1b8c2154e1bad9920807d3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="amazon" supported="partial">
 		<description>The Amazon</description>
 		<year>19??</year>
@@ -33,18 +46,6 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="15260">
 				<rom name="amazon.cas" size="15260" crc="0b154850" sha1="a616b6d8852bea0fae27241ab7a0d5c81014e0e0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="amita" supported="partial">
-		<description>Amita</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Mode 1, Page 2" />
-		<part name="snap" interface="pc6001_snap">
-			<dataarea name="snap" size="2755">
-				<rom name="amita.cas" size="2755" crc="fbb5ec19" sha1="dc49c616fb7822f21ca895bbb5f3b16924d306d8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -64,7 +65,7 @@ Arabian Rhapsody: pc6001mk2 draws without border colors (verify)
 		<part name="snap1" interface="pc6001_snap">
 			<feature name="part_id" value="Demonstration"/>
 			<dataarea name="snap" size="13510">
-				<rom name="ax-1 (demo) {m1p1}.cas" size="13510" crc="5a7a7321" sha1="1086d76df3e03427b0181e704186f827828ab011" offset="0" />
+				<rom name="ax-1 (demo).cas" size="13510" crc="5a7a7321" sha1="1086d76df3e03427b0181e704186f827828ab011" offset="0" />
 			</dataarea>
 		</part>
 		<part name="snap2" interface="pc6001_snap">
@@ -427,8 +428,8 @@ Blue Sky: [keyboard] doesn't allow hitting directions and space/shift key at sam
 
 	<software name="brkthru" supported="partial">
 		<description>Break Through</description>
-		<year>19??</year>
-		<publisher>Compac</publisher>
+		<year>198?</year>
+		<publisher>コムパック (Compac)</publisher>
 		<info name="usage" value="Mode 2, Page 2" />
 		<info name="alt_title" value="ブレイク・スルー"/>
 		<part name="snap" interface="pc6001_snap">
@@ -441,7 +442,7 @@ Blue Sky: [keyboard] doesn't allow hitting directions and space/shift key at sam
 	<software name="doordoor" supported="partial">
 		<description>Door Door</description>
 		<year>1984</year>
-		<publisher>Enix</publisher>
+		<publisher>エニックス (Enix)</publisher>
 		<info name="usage" value="Mode 2, Page 2" />
 		<info name="alt_title" value="ドアドア"/>
 		<part name="snap" interface="pc6001_snap">
@@ -454,7 +455,7 @@ Blue Sky: [keyboard] doesn't allow hitting directions and space/shift key at sam
 	<software name="earthbnd" supported="partial">
 		<description>Earthbound</description>
 		<year>1984</year>
-		<publisher>Xtal Soft</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<info name="usage" value="Mode 2, Page 2" />
 		<info name="alt_title" value="アースバウンド"/>
 		<part name="snap" interface="pc6001_snap">
@@ -464,10 +465,33 @@ Blue Sky: [keyboard] doesn't allow hitting directions and space/shift key at sam
 		</part>
 	</software>
 
+	<software name="eformn" supported="no">
+		<description>Eformn</description>
+		<year>1984</year>
+		<publisher>システムソフト (SystemSoft)</publisher>
+		<notes><![CDATA[
+[VDG] swaps gfx mode mid-scanline (gameplay area uses SCREEN 4)
+]]></notes>
+		<info name="usage" value="Mode 2, Page 1"/>
+
+		<part name="snap1" interface="pc6001_snap">
+			<feature name="part_id" value="Easy"/>
+			<dataarea name="snap" size="25883">
+				<rom name="eformn (easy).cas" size="25883" crc="565ff19f" sha1="f4a0eb96defae89304a41bd78ea61489b320bc09" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap2" interface="pc6001_snap">
+			<feature name="part_id" value="Normal"/>
+			<dataarea name="snap" size="25884">
+				<rom name="eformn (normal).cas" size="25884" crc="f3709f1a" sha1="a08a1c3e2dc5e42b5661a97d3fc632632363334f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eggy" supported="partial">
 		<description>Eggy</description>
 		<year>1984</year>
-		<publisher>Bothtec</publisher>
+		<publisher>ボーステック (Bothtec)</publisher>
 		<info name="usage" value="Mode 2, Page 1" />
 		<info name="alt_title" value="エギー"/>
 		<part name="snap" interface="pc6001_snap">
@@ -477,15 +501,20 @@ Blue Sky: [keyboard] doesn't allow hitting directions and space/shift key at sam
 		</part>
 	</software>
 
-	<software name="headon" supported="partial">
-		<description>Head On</description>
-		<year>1982</year>
-		<publisher>ASCII</publisher>
-		<info name="usage" value="Mode 1, Page 1" />
-		<info name="alt_title" value="ヘッド・オン"/>
+	<software name="holyswrd" supported="no">
+		<description>Holy Sword</description>
+		<year>1983</year>
+		<!-- spelled as X'tal Soft on title -->
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
+		<notes><![CDATA[
+Not extensively tested (language barrier)
+]]></notes>
+		<info name="usage" value="Mode 2, Page 2"/>
+		<info name="author" value="K. Tomi"/>
+		<info name="alt_title" value="聖なる剣"/>
 		<part name="snap" interface="pc6001_snap">
-			<dataarea name="snap" size="5711">
-				<rom name="head on.cas" size="5711" crc="91f7d594" sha1="e64442f2c32f0a7b6c62e1adcc4555fcc8149b66"/>
+			<dataarea name="snap" size="18167">
+				<rom name="holy sword.cas" size="18167" crc="6a84aa38" sha1="df470de4f4df0f5b935877500f7b8d72c359a4c8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -493,7 +522,7 @@ Blue Sky: [keyboard] doesn't allow hitting directions and space/shift key at sam
 	<software name="jintori" supported="partial">
 		<description>Jintori Game</description>
 		<year>19??</year>
-		<publisher>Hudson Soft</publisher>
+		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="usage" value="Mode 1, Page 2" />
 		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="1766">
@@ -502,10 +531,87 @@ Blue Sky: [keyboard] doesn't allow hitting directions and space/shift key at sam
 		</part>
 	</software>
 
+	<software name="ledzone" supported="partial">
+		<description>Led Zone</description>
+		<year>1983?</year>
+		<publisher>T&amp;E Soft</publisher>
+		<info name="usage" value="Mode 2, Page 3"/>
+		<info name="developer" value="Keigo Kobayashi"/>
+		<info name="alt_title" value="レッドゾーン"/>
+		<part name="snap" interface="pc6001_snap">
+			<feature name="part_id" value="6001"/>
+			<dataarea name="snap" size="9727">
+				<rom name="led zone (6001).cas" size="9727" crc="450a4b45" sha1="93d75f164b4b5a0f93d491ac00ea7fa2893a431e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ldrun" supported="partial">
+		<description>Lode Runner</description>
+		<!-- MCMLXXXIV -->
+		<year>1984</year>
+		<publisher>システムソフト (SystemSoft)</publisher>
+		<notes><![CDATA[
+Has optional [tape] loading for extra stages
+]]></notes>
+		<info name="usage" value="Mode 2, Page 2"/>
+		<info name="alt_title" value="ロードランナー"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="72130">
+				<rom name="lode runner.p6" size="72130" crc="454d46a2" sha1="0d472ca72dc7d2d3dfb41b8d74ff790963d4317d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magfield" supported="partial">
+		<description>Magnetic Field</description>
+		<year>1983</year>
+		<publisher>エニックス (Enix)</publisher>
+		<info name="usage" value="Mode 2, Page 2"/>
+		<info name="alt_title" value="マグネチックフィールド"/>
+		<info name="developer" value="A. Hideyuki"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="15666">
+				<rom name="magnetic field.cas" size="15666" crc="55ad4690" sha1="d1d68f25a546963284c20d8f5850ba0564785fa5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="miyushou" supported="partial">
+		<!-- Capitalized as THE on title -->
+		<description>Miyuki the Shoubushi</description>
+		<year>1983</year>
+		<publisher>パックスソフトニカ (Pax Softonica)</publisher>
+		<info name="usage" value="Mode 2, Page 3"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="11845">
+				<rom name="miyuki the shoubushi.cas" size="11845" crc="27b5fc89" sha1="fe4334e48599497e5f008c678afca094895112fe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="portopia" supported="no">
+		<description>Portopia Renzoku Satsujin Jiken</description>
+		<year>1983</year>
+		<publisher>エニックス (Enix)</publisher>
+		<notes><![CDATA[
+[tape] throws an UL error at second loading (regression after bus request)
+Not extensively tested (language barrier)
+]]></notes>
+		<info name="usage" value="Mode 2, Page 1"/>
+		<info name="developer" value="Yuji Horii"/>
+		<info name="alt_title" value="ポートピア連続殺人事件"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="28596">
+				<rom name="portopia renzoku satsujin jiken.cas" size="28596" crc="5437dcc5" sha1="7536663a4463107d0841a83f8894012c6b7e35e1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="proracer" supported="partial">
 		<description>Pro Racer</description>
 		<year>19??</year>
-		<publisher>Hudson Soft</publisher>
+		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="usage" value="Mode 1, Page 2" />
 		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="8504">
@@ -523,6 +629,37 @@ Blue Sky: [keyboard] doesn't allow hitting directions and space/shift key at sam
 		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="15263">
 				<rom name="pyramid.cas" size="15263" crc="7d3b4628" sha1="e1be45b435d599d3f7444f159c538e093ba63f3f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pyramid2" supported="partial">
+		<description>Pyramid II</description>
+		<year>1983</year>
+		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
+		<notes><![CDATA[
+Optional [tape] user levels load and save
+]]></notes>
+		<info name="usage" value="Mode 4, Page 3. Select 3 to start game when prompted to"/>
+		<info name="alt_title" value="ピラミッドII"/>
+		<sharedfeat name="requirement" value="pc6001_cart:n60basic"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="18752">
+				<rom name="pyramid 2.cas" size="18752" crc="dcce31b0" sha1="2dff557da3e489e64a57d2205c5ea940e2062344" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="raigrwup" supported="partial">
+		<description>Raita no Growing Up</description>
+		<year>1983</year>
+		<publisher>エニックス (Enix)</publisher>
+		<info name="usage" value="Mode 2, Page 2"/>
+		<info name="developer" value="Hiroaki Shimada"/>
+		<info name="alt_title" value="雷太のグローイングアップ"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="12803">
+				<rom name="raita no growing up.cas" size="12803" crc="2819fc55" sha1="731fb27e5b0446599360bfd046f21f7b4dab957a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -545,7 +682,7 @@ Blue Sky: [keyboard] doesn't allow hitting directions and space/shift key at sam
 	<software name="sharrier" supported="no">
 		<description>Space Harrier</description>
 		<year>198?</year>
-		<publisher>Dempa</publisher>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<notes><![CDATA[
 Very sensitive with [sub] irq triggers
 [keyboard] joy triggers doesn't work properly (select F1 after loading), cannot move down
@@ -562,14 +699,15 @@ Very sensitive with [sub] irq triggers
 		</part>
 	</software>
 
-	<software name="suprball" supported="partial">
-		<description>Super Ball</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Mode 2, Page 2" />
+	<software name="stardest" supported="partial">
+		<description>Star Destroyer</description>
+		<year>1983</year>
+		<publisher>T&amp;E Soft</publisher>
+		<info name="usage" value="Mode 2, Page 3"/>
+		<info name="alt_title" value="スターデストロイヤー"/>
 		<part name="snap" interface="pc6001_snap">
-			<dataarea name="snap" size="18114">
-				<rom name="super ball.p6" size="18114" crc="a7923430" sha1="01cb476f5e127176290949ff273cac0c6ffe5c49"/>
+			<dataarea name="snap" size="10925">
+				<rom name="star destroyer.cas" size="10925" crc="5326525a" sha1="ce996a59bd6a29ff65435c38043f1ab06876b32a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -577,7 +715,7 @@ Very sensitive with [sub] irq triggers
 	<software name="trickboy" supported="partial">
 		<description>Trick Boy</description>
 		<year>1982</year>
-		<publisher>T&amp;E Soft</publisher>
+		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
 		<info name="usage" value="Mode 2, Page 2" />
 		<info name="alt_title" value="トリックボーイ"/>
 		<part name="snap" interface="pc6001_snap">
@@ -590,7 +728,7 @@ Very sensitive with [sub] irq triggers
 	<software name="txevious" supported="partial">
 		<description>Tiny Xevious</description>
 		<year>1984</year>
-		<publisher>Dempa Micomsoft</publisher>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="usage" value="Mode 4, Page 2 - PC-6001 requires N60 Extended BASIC cartridge" />
 		<info name="alt_title" value="タイニーゼビウス"/>
 		<info name="developer" value="T. Matsushima"/>
@@ -606,10 +744,11 @@ Very sensitive with [sub] irq triggers
 		<description>Tiny Xevious 2</description>
 		<!-- 1984 08. -->
 		<year>1984</year>
-		<publisher>Dempa Micomsoft</publisher>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<notes><![CDATA[
 pc6001: Heavy [VDG] issues ([cart] RAM? works in pc6001mk2)
 [VDG] swaps gfx mode mid-scanline (text uses a different one)
+Requires multiple space presses to actually start a game
 ]]></notes>
 		<info name="usage" value="Mode 2, Page 2, has optional support for Mode 4" />
 		<info name="alt_title" value="タイニーゼビウス2"/>
@@ -623,13 +762,106 @@ pc6001: Heavy [VDG] issues ([cart] RAM? works in pc6001mk2)
 		</part>
 	</software>
 
+	<software name="zunou" supported="partial">
+		<description>Zunou 4989</description>
+		<year>1984</year>
+		<publisher>エニックス (Enix)</publisher>
+		<notes><![CDATA[
+Optional [tape] load and save for construction mode
+]]></notes>
+		<info name="usage" value="Mode 2, Page 2"/>
+		<info name="developer" value="K. Ohashi"/>
+		<part name="snap" interface="pc6001_snap">
+			<feature name="part_id" value="6001"/>
+			<dataarea name="snap" size="11296">
+				<rom name="zunou 4989 (6001).cas" size="11296" crc="879ba9b4" sha1="e1d0e146322c1f0d10617c0929b8981a6c8f4e67" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- !Covermount -->
+
+	<software name="amidamu" supported="partial">
+		<description>Amida Mushi</description>
+		<!-- BasicMagazine 1988.4 -->
+		<year>1988</year>
+		<publisher>Mycom BASIC</publisher>
+		<info name="usage" value="Mode 1, Page 2"/>
+		<info name="developer" value="Kunihisa Ogawa"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="2755">
+				<rom name="amida mushi.cas" size="2755" crc="fbb5ec19" sha1="dc49c616fb7822f21ca895bbb5f3b16924d306d8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astesc" supported="partial">
+		<description>Asteroid Escape</description>
+		<!-- BasicMagazine 1987.4 -->
+		<year>1987</year>
+		<publisher>Mycom BASIC</publisher>
+		<info name="usage" value="Mode 1, Page 1"/>
+		<info name="developer" value="Kaw"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="3173">
+				<rom name="asteroid escape.cas" size="3173" crc="d4e4438d" sha1="a2f54cd9d777df7d3086b52287e9c6a2d0404614" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boundbal" supported="partial">
+		<description>Bound Ball</description>
+		<!-- BasicMagazine 1988.1 -->
+		<year>1988</year>
+		<publisher>Mycom BASIC</publisher>
+		<info name="usage" value="Mode 1, Page 2"/>
+		<info name="developer" value="Kunihisa Ogawa"/>
+ì		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="2543">
+				<rom name="bound ball.cas" size="2543" crc="18385973" sha1="f2806d4e1e3adee3165d698a40d6c69e2dfe4cf1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- v1.0 known to exist -->
+	<software name="fruitpan" supported="no">
+		<description>Fruit Panic (v1.1)</description>
+		<!-- PiO 1986/10 -->
+		<year>1986</year>
+		<publisher>PiO</publisher>
+		<notes><![CDATA[
+[VDG] Doesn't draw title screen semigfxs in pc6001
+Optional [tape] user level load and save
+]]></notes>
+		<!-- TODO: does it really require the extended BASIC? It seem to load fine without as well -->
+		<info name="usage" value="Mode 3, Page 1"/>
+		<info name="developer" value="Kaw"/>
+
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="8385">
+				<rom name="fruit panic (v1.1).p6" size="8385" crc="9a140a48" sha1="dd6c29495f97881efd953966bed2d4db84671f8d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fruitpap" supported="no">
+		<description>Fruit Panic Append</description>
+		<year>1986</year>
+		<publisher>PiO</publisher>
+		<info name="usage" value="Mode 3, Page 1. Fruit Panic data tape, load that first, press 3 on title, swap with this image and load."/>
+		<info name="developer" value="Kaw"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="3526">
+				<rom name="fruit panic append.p6" size="3526" crc="e2243bdc" sha1="21962c50d7934510b8cdf8812775301cdf93c76c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="takeoff" supported="no">
 		<description>Take Off 6000</description>
 		<!-- BasicMagazine 1989.10 -->
 		<year>1989</year>
-		<publisher>MyCom BASIC</publisher>
+		<publisher>Mycom BASIC</publisher>
 		<notes><![CDATA[
 [VDG] doesn't show avoidable objects in pc6001
 ]]></notes>
@@ -644,7 +876,136 @@ pc6001: Heavy [VDG] issues ([cart] RAM? works in pc6001mk2)
 
 <!-- !Homebrew -->
 
-	<!-- original as MyCom BASIC release -->
+	<software name="1scrprg" supported="no">
+		<description>1-Screen Programs</description>
+		<year>2009</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Miscellaneous BASIC programs, made between 2005 and 2009
+03 Tiny Typing: may warrant a CAPS from pc6001mk2 [keyboard]
+04 Puchi Deka: crashes in pc6001 (wants 16KB RAM?)
+05 Michinari: [VDG] doesn't draw text in pc6001
+06 Nuketashi: don't know what to do (draws a number sequence, verify thru readme/BASIC listing)
+07 Rendori: [VDG] doesn't draw semigraphics in pc6001
+08 P6 Navi: throws a SN error at 60
+09 At-tobi: not sure what to do (game reacts with [keyboard] space key)
+10 Atehate: may warrant a CAPS from pc6001mk2 [keyboard]
+12 Pirodori: [VDG] doesn't draw text in pc6001
+13 Mukudori: [VDG] doesn't draw text in pc6001
+15 Bunbetsu: not sure what to do (game reacts with [keyboard] space key)
+16 Ketsuraku: not sure what to do
+17 Tentori: not sure what to do
+]]></notes>
+		<info name="usage" value="Mode 1, Page 1"/>
+		<info name="developer" value="Kaw"/>
+		<!-- Tiny Typing Game -->
+		<info name="developer" value="Hashi"/>
+
+		<part name="snap1" interface="pc6001_snap">
+			<feature name="part_id" value="01 On-naji"/>
+			<dataarea name="snap" size="412">
+				<rom name="1-screen programs (01 on-naji).p6" size="412" crc="b4b8e8f7" sha1="6261e6a4621620f971ef94c5212648f773e78a17" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap2" interface="pc6001_snap">
+			<feature name="part_id" value="02 Iroai"/>
+			<dataarea name="snap" size="407">
+				<rom name="1-screen programs (02 iroai).p6" size="407" crc="a21cd88b" sha1="cb7cb7e869ba1d767bb6f4a2898292a5d91dd3a7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap3" interface="pc6001_snap">
+			<feature name="part_id" value="03 Tiny Typing Game"/>
+			<dataarea name="snap" size="290">
+				<rom name="1-screen programs (03 tiny typing game).p6" size="290" crc="5eb0d127" sha1="6b5360311a2b58ab4208b8eaf383b51b9ef2657f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap4" interface="pc6001_snap">
+			<feature name="part_id" value="04 Puchi Deka"/>
+			<dataarea name="snap" size="367">
+				<rom name="1-screen programs (04 puchi deka).p6" size="367" crc="fb0c21b0" sha1="2f61a629939410ffb6a6f2b97585408303d238d3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap5" interface="pc6001_snap">
+			<feature name="part_id" value="05 Michinari"/>
+			<dataarea name="snap" size="432">
+				<rom name="1-screen programs (05 michinari).p6" size="432" crc="91b34d05" sha1="bfca14da2ef6ffd76011cdc96a5133c4323220ed" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap6" interface="pc6001_snap">
+			<feature name="part_id" value="06 Nuketashi"/>
+			<dataarea name="snap" size="403">
+				<rom name="1-screen programs (06 nuketashi).p6" size="403" crc="d9fe924c" sha1="e480699b67885cdd86889a022d141b0d9d1f1483" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap7" interface="pc6001_snap">
+			<feature name="part_id" value="07 Rendori"/>
+			<dataarea name="snap" size="423">
+				<rom name="1-screen programs (07 rendori).p6" size="423" crc="5a95dda3" sha1="c2c8f854f363c01dd1d2a059fa990f876ce7f832" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap8" interface="pc6001_snap">
+			<feature name="part_id" value="08 P6 Navi"/>
+			<dataarea name="snap" size="565">
+				<rom name="1-screen programs (08 p6 navi) {m5p2}.p6" size="565" crc="4387a394" sha1="5a9a783b7969d1f48053471a30a26919a941829f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap9" interface="pc6001_snap">
+			<feature name="part_id" value="09 At-tobi"/>
+			<dataarea name="snap" size="419">
+				<rom name="1-screen programs (09 at-tobi).p6" size="419" crc="8e66d62c" sha1="2bc9a35abcab189b52bee923fc5c0e95201786d7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap10" interface="pc6001_snap">
+			<feature name="part_id" value="10 Atehate"/>
+			<dataarea name="snap" size="392">
+				<rom name="1-screen programs (10 atehate).p6" size="392" crc="5010282f" sha1="0a0454687f2ce3658d46d135fb51f59ed4cb58d2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap11" interface="pc6001_snap">
+			<feature name="part_id" value="11 Chika yori"/>
+			<dataarea name="snap" size="391">
+				<rom name="1-screen programs (11 chika yori).p6" size="391" crc="fa370664" sha1="d4ca344afae3943c880d4b3dda3b0af1384820ed" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap12" interface="pc6001_snap">
+			<feature name="part_id" value="12 Pirodori"/>
+			<dataarea name="snap" size="469">
+				<rom name="1-screen programs (12 pirodori).p6" size="469" crc="0e91912b" sha1="a0dd403f8f01b1f8b24f92fc3e69adfe9241179e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap13" interface="pc6001_snap">
+			<feature name="part_id" value="13 Mukudori"/>
+			<dataarea name="snap" size="393">
+				<rom name="1-screen programs (13 mukudori).p6" size="393" crc="14f3050d" sha1="9448e1dc7ec9230c5b67f296c3bb1a0870ac8c34" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap14" interface="pc6001_snap">
+			<feature name="part_id" value="14 Zendori"/>
+			<dataarea name="snap" size="399">
+				<rom name="1-screen programs (14 zendori).p6" size="399" crc="9038d123" sha1="698800c7e1a87937338f974c9e2839c8c01e238d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap15" interface="pc6001_snap">
+			<feature name="part_id" value="15 Bunbetsu"/>
+			<dataarea name="snap" size="441">
+				<rom name="1-screen programs (15 bunbetsu).p6" size="441" crc="67a0e7a0" sha1="bd3d607b869dd59e78a1bec440015109f5de52c4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap16" interface="pc6001_snap">
+			<feature name="part_id" value="16 Ketsuraku"/>
+			<dataarea name="snap" size="404">
+				<rom name="1-screen programs (16 ketsuraku).p6" size="404" crc="839c733b" sha1="c3ce74ba8d508f38793a8d7ec0ca7a6e9634194a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap17" interface="pc6001_snap">
+			<feature name="part_id" value="17 Tentori"/>
+			<dataarea name="snap" size="423">
+				<rom name="1-screen programs (17 tentori).p6" size="423" crc="6c0a3e36" sha1="502ddcb6bf43b03f9c6f016ab73cbb2ad1e13913" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- original as Mycom BASIC release -->
 	<!-- preview version known to exist -->
 	<software name="fdot2" supported="partial">
 		<description>F-Dot 2</description>
@@ -660,5 +1021,39 @@ pc6001: Heavy [VDG] issues ([cart] RAM? works in pc6001mk2)
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="suprball" supported="no">
+		<description>Super Ball</description>
+		<year>19??</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Crashes on [tape] loading (regression)
+]]></notes>
+		<info name="usage" value="Mode 2, Page 2" />
+		<info name="developer" value="Afoxai"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="18114">
+				<rom name="super ball.p6" size="18114" crc="a7923430" sha1="01cb476f5e127176290949ff273cac0c6ffe5c49"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- original game released by Technopolis? -->
+    <software name="tinygolf" supported="partial">
+        <description>Tiny Golf</description>
+        <year>2005</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+        <info name="usage" value="Mode 1, Page 2"/>
+		<!-- "the author and roadist" -->
+        <info name="author" value="Sakai"/>
+		<info name="developer" value="Hashi"/>
+
+        <part name="snap" interface="pc6001_snap">
+            <dataarea name="snap" size="443">
+                <rom name="tiny golf.cas" size="443" crc="4fa3c1e0" sha1="52090848c51c19fabb5f64c3d83df0319b61dcfa" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
 
 </softwarelist>

@@ -267,10 +267,13 @@ Old note: hangs at title screen due of a PIT bug (timer irq dies)
 		</part>
 	</software>
 
-	<software name="lizard">
+	<software name="lizard" supported="partial">
 		<description>Lizard</description>
 		<year>1985</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
+		<notes><![CDATA[
+Colors looks washed, perhaps wants upper bank only
+]]></notes>
 		<info name="alt_title" value="リザード"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -580,6 +583,7 @@ Cuts off top of player jumps with first capture (verify)
 		<description>Triton</description>
 		<year>198?</year>
 		<publisher>ザインソフト (Sein Soft)</publisher>
+		<info name="alt_title" value="トリトーン"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="545840">
