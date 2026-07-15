@@ -54,13 +54,11 @@
     24 Injector (P1.5)
     25 GND
 
-**************************************************************************/
-
-/*
     TODO:
 
     - Figure out how the ADC is accessed
-*/
+
+**************************************************************************/
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
@@ -79,7 +77,6 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_watchdog(*this, "watchdog")
 		, m_rpm_timer(*this, "rpm")
-		, m_io_adc(*this, "ADC%u", 0U)
 	{
 	}
 
@@ -90,7 +87,6 @@ private:
 	required_device<mcs48_cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<timer_device> m_rpm_timer;
-	required_ioport_array<4> m_io_adc;
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override { }
@@ -101,7 +97,6 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER( rpm_int );
 	uint8_t read_adc(offs_t offset);
-	void start_adc(uint8_t data);
 
 	bool m_rpm = false;
 	bool m_interrupt_enable = true;
@@ -116,7 +111,6 @@ void digijet_state::machine_start()
 void digijet_state::io_map(address_map &map)
 {
 	map(0x30, 0x3f).r(FUNC(digijet_state::read_adc));
-	map(0x30, 0x3f).w(FUNC(digijet_state::start_adc));
 };
 
 void digijet_state::prg_map(address_map &map)
@@ -126,13 +120,7 @@ void digijet_state::prg_map(address_map &map)
 
 uint8_t digijet_state::read_adc(offs_t offset)
 {
-	return m_io_adc[offset & 0x03]->read(); //FIXME this is a hack
-	// The address lines connected to the ADC are A8-A11 but those can't be accessed externally by this CPU
-};
-
-void digijet_state::start_adc(uint8_t data)
-{
-	;// Connected to the START pin is the CPUs WR and the CPUs RD to the ADC OE and ALE
+	return 0x00;
 };
 
 void digijet_state::p1_w(uint8_t data)
@@ -168,30 +156,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(digijet_state::rpm_int)
 }
 
 static INPUT_PORTS_START( digijet )
-	PORT_START("ADC0")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_NAME("Air amount")
-
-	PORT_START("ADC1")
-	PORT_BIT( 0xff, 0x80, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_NAME("Ignition")
-
-	PORT_START("ADC2")
-	PORT_BIT( 0xff, 0x80, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_NAME("Coolant temperature")
-
-	PORT_START("ADC3")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE_V ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_NAME("Air temperature")
-
 	PORT_START("LAMBDA")
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-
 	PORT_START("THROTTLE")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-
-	PORT_START("RPM")
-	PORT_BIT( 0xff, 0x80, IPT_PEDAL3 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_NAME("Engine RPM")
 INPUT_PORTS_END
 
 void digijet_state::digijet(machine_config &config)
