@@ -119,6 +119,7 @@ public:
 	void init_jungleyoa() ATTR_COLD;
 	void init_kingfrt() ATTR_COLD;
 	template <uint16_t Reset_addr> void init_magjack() ATTR_COLD;
+	void init_magjackd() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -969,6 +970,59 @@ static INPUT_PORTS_START( magjackc )
 	PORT_DIPSETTING(      0x8000, "50" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( magjackd )
+	PORT_INCLUDE( magjackc )
+
+	PORT_MODIFY("DSW12")
+	PORT_DIPNAME( 0x0078, 0x0078, "Max. Bet" ) PORT_DIPLOCATION("DSW1:4,5,6,7")
+	PORT_DIPSETTING(      0x0078, "5" )
+	PORT_DIPSETTING(      0x0038, "10" )
+	PORT_DIPSETTING(      0x0058, "15" )
+	PORT_DIPSETTING(      0x0018, "20" )
+	PORT_DIPSETTING(      0x0068, "30" )
+	PORT_DIPSETTING(      0x0028, "32" )
+	PORT_DIPSETTING(      0x0048, "40" )
+	PORT_DIPSETTING(      0x0008, "48" )
+	PORT_DIPSETTING(      0x0070, "50" )
+	PORT_DIPSETTING(      0x0030, "60" )
+	PORT_DIPSETTING(      0x0050, "64" )
+	PORT_DIPSETTING(      0x0010, "70" )
+	PORT_DIPSETTING(      0x0060, "80" )
+	PORT_DIPSETTING(      0x0020, "90" )
+	PORT_DIPSETTING(      0x0040, "96" )
+	PORT_DIPSETTING(      0x0000, "100" )
+
+	PORT_MODIFY("DSW34")
+	PORT_DIPNAME( 0x0001, 0x0001, "Skill Game Mode" ) PORT_DIPLOCATION("DSW3:1")
+	PORT_DIPSETTING(      0x0001, "One Ticket" )
+	PORT_DIPSETTING(      0x0000, "All Tickets" )
+	PORT_DIPNAME( 0x0002, 0x0002, "Player's Panel" ) PORT_DIPLOCATION("DSW3:2")
+	PORT_DIPSETTING(      0x0002, "Type A" )
+	PORT_DIPSETTING(      0x0000, "Type B" )
+	PORT_DIPNAME( 0x0004, 0x0004, "Double Up Rate" ) PORT_DIPLOCATION("DSW3:3")
+	PORT_DIPSETTING(      0x0000, "60%" )
+	PORT_DIPSETTING(      0x0004, "70%" )
+	PORT_DIPNAME( 0x0018, 0x0018, "Credit Limit" ) PORT_DIPLOCATION("DSW3:4,5")
+	PORT_DIPSETTING(      0x0018, "10000" )
+	PORT_DIPSETTING(      0x0008, "30000" )
+	PORT_DIPSETTING(      0x0010, "60000" )
+	PORT_DIPSETTING(      0x0000, "100000" )
+	PORT_DIPNAME( 0x0700, 0x0700, "Min. Bet" ) PORT_DIPLOCATION("DSW4:1,2,3")
+	PORT_DIPSETTING(      0x0700, "1" )
+	PORT_DIPSETTING(      0x0300, "2" )
+	PORT_DIPSETTING(      0x0500, "3" )
+	PORT_DIPSETTING(      0x0100, "5" )
+	PORT_DIPSETTING(      0x0600, "6" )
+	PORT_DIPSETTING(      0x0200, "8" )
+	PORT_DIPSETTING(      0x0400, "9" )
+	PORT_DIPSETTING(      0x0000, "10" )
+	PORT_DIPNAME( 0xc000, 0xc000, "Key Out" ) PORT_DIPLOCATION("DSW4:7,8")
+	PORT_DIPSETTING(      0x0000, "1" )
+	PORT_DIPSETTING(      0xc000, "10" )
+	PORT_DIPSETTING(      0x4000, "50" )
+	PORT_DIPSETTING(      0x8000, "100" )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( magjackp )
 	PORT_INCLUDE( magjack )
 
@@ -1295,6 +1349,27 @@ ROM_START( magjackc ) // MADE IN TAIWAN PCB NO-006A
 	ROM_LOAD( "atf20v8b.u37", 0x000, 0x157, NO_DUMP )
 ROM_END
 
+ROM_START( magjackd ) // MADE IN TAIWAN PCB NO-006A
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code, encrypted
+	ROM_LOAD16_BYTE( "3.u15", 0x00000, 0x20000, CRC(b592ffd5) SHA1(0bedbf9a42cf837f4a7aecf842c5c99756fc1d9b) ) // SLDH, 27C1001
+	ROM_LOAD16_BYTE( "2.u14", 0x00001, 0x20000, CRC(7a5cf959) SHA1(75a1fbf02b8113b436d9ee1ff7aacf9d1f0695c3) ) // SLDH, 27C1001
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "1.u99", 0x00000, 0x40000, CRC(bee977a7) SHA1(f924c53781e6a9b2796c23b5d9e63a62e0b75b9a) ) // same as magjackc, 27C020
+
+	ROM_REGION( 0x80000, "reelgfx", 0 )
+	ROM_LOAD( "4.u58", 0x00000, 0x80000, CRC(73e8fbda) SHA1(977b493d3b018b635a20d3a0c0d0132d77a0c6cc) ) // SLDH, 27C4001
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "5.u59", 0x00000, 0x80000, CRC(30a7a4dd) SHA1(27ab386af9af2939bbf342cbf72d2b68fcbabc30) ) // SLDH, 27C4001
+
+	ROM_REGION( 0x80000, "gfx3", 0 )
+	ROM_LOAD( "6.u60", 0x00000, 0x80000, CRC(f1ad1bbd) SHA1(94a39aedc3bd3d53a3e41fd7324cb465e02b2f14) ) // SLDH, 27C4001
+
+	ROM_REGION( 0x157, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "atf20v8b.u37", 0x000, 0x157, NO_DUMP )
+ROM_END
+
 ROM_START( magjackp )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code, encrypted
 	ROM_LOAD16_BYTE( "3.u15", 0x00000, 0x20000, CRC(c59d43c2) SHA1(a58f1a7b618956d93c27e321e64b86b12f15e3d8) ) // 27C010
@@ -1462,23 +1537,48 @@ void jungleyo_state::init_magjack()
 	src[0x006 / 2] = Reset_addr; // reset opcode
 }
 
+void jungleyo_state::init_magjackd()
+{
+	u16 *src = &memregion("maincpu")->as_u16();
+
+	for (int i = 0x00000; i < 0x10000 / 2; i++)
+		src[i] = bitswap<16>(src[i] ^ 0xffff, 8, 13, 11, 9, 15, 12, 10, 14, 1, 5, 3, 7, 0, 6, 4, 2);
+
+	for (int i = 0x10000 / 2; i < 0x20000 / 2; i++)
+		src[i] = bitswap<16>(src[i] ^ 0x00ff, 13, 10, 12, 8, 14, 9, 11, 15, 4, 3, 1, 5, 7, 2, 0, 6);
+
+	for (int i = 0x20000 / 2; i < 0x30000 / 2; i++)
+		src[i] = bitswap<16>(src[i] ^ 0xff00, 10, 14, 15, 11, 8, 13, 12, 9, 0, 7, 2, 6, 5, 1, 4, 3);
+
+	for (int i = 0x30000 / 2; i < 0x40000 / 2; i++)
+		src[i] = bitswap<16>(src[i] ^ 0x00ff, 11, 12, 10, 13, 9, 14, 15, 8, 2, 4, 7, 0, 6, 3, 5, 1);
+
+	// TODO: Stack Pointer/Initial PC settings don't seem to decrypt correctly
+	// hack these until better understood (still wrong values)
+	src[0x000 / 2] = 0x00ff;
+	src[0x002 / 2] = 0x2000;
+	src[0x004 / 2] = 0x0000;
+	src[0x006 / 2] = 0x0268;
+}
+
 } // anonymous namespace
 
 
-GAME( 2001, jungleyo,  0,        jungleyo, jungleyo,  jungleyo_state, init_jungleyo,       ROT0, "Yonshi",       "Jungle (Italy VI3.02)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2001/02/09
-GAME( 2001, jungleyoa, jungleyo, jungleyo, jungleyoa, jungleyo_state, init_jungleyoa,      ROT0, "Yonshi",       "Jungle (USA, VA 1.05)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2001/03/14
+GAME( 2001, jungleyo,  0,        jungleyo, jungleyo,  jungleyo_state, init_jungleyo,       ROT0, "Yonshi",                 "Jungle (Italy VI 3.02)",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2001/02/09
+GAME( 2001, jungleyoa, jungleyo, jungleyo, jungleyoa, jungleyo_state, init_jungleyoa,      ROT0, "Yonshi",                 "Jungle (USA, VA 1.05)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2001/03/14
 
-GAME( 2003, frtgenie,  0,        jungleyo, frtgenie,  jungleyo_state, init_frtgenie,       ROT0, "Global",       "Fruit Genie (Version 1-1-03, set 1)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2003, frtgeniea, frtgenie, jungleyo, frtgeniea, jungleyo_state, init_frtgenie,       ROT0, "Global",       "Fruit Genie (Version 1-1-03, set 2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2003, frtgenieb, frtgenie, jungleyo, frtgenieb, jungleyo_state, init_frtgenie,       ROT0, "Global",       "Fruit Genie (Version 1-1-03, set 3)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2003, frtgeniec, frtgenie, jungleyo, frtgeniec, jungleyo_state, init_frtgenie,       ROT0, "Global",       "Fruit Genie (Version 1-1-03, set 4)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, frtgenied, frtgenie, jungleyo, frtgenied, jungleyo_state, init_jungleyo,       ROT0, "Winnin World", "Fruit Genie (VT 2.11)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2004, kingfrt,   frtgenie, jungleyo, kingfrt,   jungleyo_state, init_kingfrt,        ROT0, "bootleg?",     "King Fruit (VZ 1.04)",                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, frtgenie,  0,        jungleyo, frtgenie,  jungleyo_state, init_frtgenie,       ROT0, "Global",                 "Fruit Genie (Version 1-1-03, set 1)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, frtgeniea, frtgenie, jungleyo, frtgeniea, jungleyo_state, init_frtgenie,       ROT0, "Global",                 "Fruit Genie (Version 1-1-03, set 2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, frtgenieb, frtgenie, jungleyo, frtgenieb, jungleyo_state, init_frtgenie,       ROT0, "Global",                 "Fruit Genie (Version 1-1-03, set 3)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, frtgeniec, frtgenie, jungleyo, frtgeniec, jungleyo_state, init_frtgenie,       ROT0, "Global",                 "Fruit Genie (Version 1-1-03, set 4)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, frtgenied, frtgenie, jungleyo, frtgenied, jungleyo_state, init_jungleyo,       ROT0, "Winnin World",           "Fruit Genie (VT 2.11)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2004, kingfrt,   frtgenie, jungleyo, kingfrt,   jungleyo_state, init_kingfrt,        ROT0, "bootleg?",               "King Fruit (VZ 1.04)",                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 2000, magjack,   0,        jungleyo, magjack,   jungleyo_state, init_magjack<0x260>, ROT0, "Global",       "Magical Jack (VA 4.00)",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2000/09/28
-GAME( 2000, magjacka,  magjack,  jungleyo, magjacka,  jungleyo_state, init_magjack<0x268>, ROT0, "Global",       "Magical Jack (VA 3.30)",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2000/08/04
-GAME( 2000, magjackb,  magjack,  jungleyo, magjackb,  jungleyo_state, init_magjack<0x268>, ROT0, "Global",       "Magical Jack (VA 3.11)",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2000/06/29
-GAME( 1999, magjackc,  magjack,  jungleyo, magjackc,  jungleyo_state, init_magjack<0x268>, ROT0, "Global",       "Magical Jack (VA 2.0)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 1999/10/28
+GAME( 2000, magjack,   0,        jungleyo, magjack,   jungleyo_state, init_magjack<0x260>, ROT0, "Global",                 "Magical Jack (VA 4.00)",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2000/09/28
+GAME( 2000, magjacka,  magjack,  jungleyo, magjacka,  jungleyo_state, init_magjack<0x268>, ROT0, "Global",                 "Magical Jack (VA 3.30)",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2000/08/04
+GAME( 2000, magjackb,  magjack,  jungleyo, magjackb,  jungleyo_state, init_magjack<0x268>, ROT0, "Global",                 "Magical Jack (VA 3.11)",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2000/06/29
+GAME( 1999, magjackc,  magjack,  jungleyo, magjackc,  jungleyo_state, init_magjack<0x268>, ROT0, "Global",                 "Magical Jack (VA 2.0)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 1999/10/28
+GAME( 1999, magjackd,  magjack,  jungleyo, magjackd,  jungleyo_state, init_magjackd,       ROT0, "Global (Gecas license)", "Magical Jack (VI 1.1C)",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 1999/08/08
 
-GAME( 2001, magjackp,  0,        jungleyo, magjackp,  jungleyo_state, init_magjack<0x1fe>, ROT0, "Global",       "Magical Jack Plus (VA 6.03)",         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2001/07/23
-GAME( 2000, magjackpa, magjackp, jungleyo, magjackp,  jungleyo_state, init_magjack<0x1fe>, ROT0, "Global",       "Magical Jack Plus (VA 6.01)",         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2001/02/14
+GAME( 2001, magjackp,  0,        jungleyo, magjackp,  jungleyo_state, init_magjack<0x1fe>, ROT0, "Global",                 "Magical Jack Plus (VA 6.03)",         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2001/07/23
+GAME( 2000, magjackpa, magjackp, jungleyo, magjackp,  jungleyo_state, init_magjack<0x1fe>, ROT0, "Global",                 "Magical Jack Plus (VA 6.01)",         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2001/02/14
