@@ -831,6 +831,35 @@ bool m68000_musashi_device::memory_translate(int spacenum, int intention, offs_t
 
 void m68000_musashi_device::execute_run()
 {
+	// Softfloat's rounding mode and precision are globals shared across all
+	// users in MAME, so save/restore them.  execute_run() has multiple return
+	// paths and can exit via throw, so we use an RAII helper.
+	struct fpu_rounding_saver
+	{
+		fpu_rounding_saver(m68000_musashi_device &cpu) : m_cpu(cpu)
+		{
+			if (m_cpu.m_has_fpu)
+			{
+				m_rounding = softfloat_roundingMode;
+				m_precision = extF80_roundingPrecision;
+				m_cpu.apply_fpcr_rounding();
+			}
+		}
+
+		~fpu_rounding_saver()
+		{
+			if (m_cpu.m_has_fpu)
+			{
+				softfloat_roundingMode = m_rounding;
+				extF80_roundingPrecision = m_precision;
+			}
+		}
+
+		m68000_musashi_device &m_cpu;
+		uint_fast8_t m_rounding = 0;
+		uint_fast8_t m_precision = 0;
+	} rounding_saver(*this);
+
 	m_initial_cycles = m_icount;
 
 	if (m_reset_cycles) {
@@ -1071,6 +1100,13 @@ void m68000_musashi_device::init_cpu_common(void)
 	save_item(NAME(m_can_instruction_restart));
 	save_item(NAME(m_restart_instruction));
 
+	save_item(STRUCT_MEMBER(m_fpr, signExp));
+	save_item(STRUCT_MEMBER(m_fpr, signif));
+	save_item(NAME(m_fpcr));
+	save_item(NAME(m_fpsr));
+	save_item(NAME(m_fpiar));
+	save_item(NAME(m_fpu_just_reset));
+
 	save_item(NAME(m_mmu_crp_aptr));
 	save_item(NAME(m_mmu_crp_limit));
 	save_item(NAME(m_mmu_srp_aptr));
@@ -1108,6 +1144,13 @@ void m68000_musashi_device::device_reset()
 	m_hmmu_enabled = 0;
 	m_emmu_enabled = false;
 	m_can_instruction_restart = false;
+
+	if (m_has_fpu)
+	{
+		// the FPU comes out of reset with NaNs in the data registers,
+		// zeroed control registers, and FSAVE producing a null frame
+		do_frestore_null();
+	}
 
 	m_mmu_tc = 0;
 	m_mmu_tt0 = 0;
@@ -1990,7 +2033,7 @@ void m68000_musashi_device::define_state(void)
 		state_add(M68K_CAAR,   "CAAR",      m_caar);
 	}
 
-	if (m_cpu_type & MASK_030_OR_LATER)
+	if (m_cpu_type & MASK_020_OR_LATER)
 	{
 		for (int regnum = 0; regnum < 8; regnum++) {
 			state_add(M68K_FP0 + regnum, string_format("FP%d", regnum).c_str(), m_iotemp).callimport().callexport().formatstr("%10s");

@@ -343,8 +343,6 @@ protected:
 	}
 
 	// defined in m68kfpu.cpp
-	static const u32 pkmask2[18];
-	static const u32 pkmask3[18];
 	inline extFloat80_t load_extended_float80(u32 ea);
 	inline void store_extended_float80(u32 ea, extFloat80_t fpr);
 	inline extFloat80_t load_pack_float80(u32 ea);
@@ -352,33 +350,34 @@ protected:
 	void set_condition_codes(extFloat80_t reg);
 	int test_condition(int condition);
 	void clear_exception_flags();
+	void update_accrued_exceptions();
 	void sync_exception_flags(extFloat80_t op1, extFloat80_t op2, u32 enables);
 	s32 convert_to_int(extFloat80_t source, s32 lowerLimit, s32 upperLimit);
 	u8 READ_EA_8(int ea);
 	u16 READ_EA_16(int ea);
 	u32 READ_EA_32(int ea);
 	u64 READ_EA_64(int ea);
-	extFloat80_t READ_EA_FPE(int mode, int reg, uint32_t offset);
-	extFloat80_t READ_EA_PACK(int ea);
+	u32 GET_EA_FPE(int mode, int reg);
+	extFloat80_t READ_EA_FPE(int mode, int reg, u32 address);
+	extFloat80_t READ_EA_PACK(int mode, int reg, u32 address);
 	void WRITE_EA_8(int ea, u8 data);
 	void WRITE_EA_16(int ea, u16 data);
 	void WRITE_EA_32(int ea, u32 data);
 	void WRITE_EA_64(int ea, u64 data);
-	void WRITE_EA_FPE(int mode, int reg, extFloat80_t fpr, uint32_t offset);
-	void WRITE_EA_PACK(int ea, int k, extFloat80_t fpr);
+	void WRITE_EA_FPE(int mode, int reg, extFloat80_t fpr, u32 address);
+	void WRITE_EA_PACK(int mode, int reg, int k, extFloat80_t fpr, u32 address);
 	void fpgen_rm_reg(u16 w2);
 	void fmove_reg_mem(u16 w2);
 	void fmove_fpcr(u16 w2);
+	void apply_fpcr_rounding();
 	void fmovem(u16 w2);
-	void fscc();
+	void fdbcc();
 	void fbcc16();
 	void fbcc32();
-	void m68040_fpu_op0();
 	int perform_fsave(u32 addr, int inc);
 	void do_frestore_null();
 	void m68040_do_fsave(u32 addr, int reg, int inc);
 	void m68040_do_frestore(u32 addr, int reg);
-	void m68040_fpu_op1();
 	void m68881_ftrap();
 	u32 m6888x_read_cir(offs_t offset);
 	void m6888x_write_cir(offs_t offset, u32 data);
