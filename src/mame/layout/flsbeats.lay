@@ -11,9 +11,11 @@ Mirrors the real cabinet (top-down):
 	pure white when lit (bound to lamp_flash; this is  the FLASH cue players
 	return on - gameplay-essential, not decorative).
   * 5 LED "tube" lanes stacked horizontally below the DMD (lane 0 top .. lane 4
-    bottom), each 47 LEDs long, spanning nearly the full view width. Driven by
-    outputs lane<r>_<c> from the driver: 0 = off, 1 = green, 2 = red. No
-    brightness levels - each LED is a simple 3-state on/off indicator.
+    bottom), each 47 LEDs long, spanning nearly the full view width. Each lane
+	position is driven by TWO independent on/off outputs from the driver - a red
+	die (lane<r>_<c>_r) and a green die (lane<r>_<c>_g) - drawn as two overlaid
+	emitters combined with blend="add", so both dies lit sums to yellow the way
+	the real diffused package does.
   * 5 round play buttons on each side (left/right), one per lane, at the lane ends.
     All buttons can light up (bound to btnlamp<n> outputs; default unlit).
   * On the LEFT cluster: UP and DOWN triangles above the 5 buttons, START
@@ -23,15 +25,31 @@ Whole view is ~16:9 and the content is grouped so MAME centers it vertically.
 -->
 <mamelayout version="2">
 
-	<!-- Bi-color lane LED: 0 = off, 1 = green, 2 = red, 3 = yellow (BOTH plane
-	     bits set for this LED). The two planes are independent bitmaps in
-		 display RAM and the game routinely illuminates each plane for the same
-		 lane bits. -->
-	<element name="lane_led" defstate="0">
-		<rect state="0"><color red="0.0"  green="0.0"  blue="0.0" /></rect>
-		<rect state="1"><color red="0.05" green="1.0"  blue="0.12" /></rect>
-		<rect state="2"><color red="1.0"  green="0.06" blue="0.05" /></rect>
-		<rect state="3"><color red="1.0"  green="0.85" blue="0.06" /></rect>
+	<!-- Bi-color lane LED. The unlit diffuser tube glows a fairly bright neutral
+	     white, provided by the always-on lane_led_base. A lit die must show its
+		 true saturated colour, not that colour added on top of the bright base, so
+		 each die is drawn in two passes: first a blend="multiply" mask that darkens
+		 the base to black wherever the die is lit (off = white = no change), then a
+		 blend="add" emitter that paints the saturated colour into that now-dark
+		 cell. Both dies lit -> red + green add to yellow. -->
+	<element name="lane_led_base">
+		<rect><color red="0.40" green="0.41" blue="0.47" /></rect>
+	</element>
+	<element name="lane_led_r_mask" defstate="0">
+		<rect state="0"><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><color red="0.35" green="0.35" blue="0.35" /></rect>
+	</element>
+	<element name="lane_led_g_mask" defstate="0">
+		<rect state="0"><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><color red="0.35" green="0.35" blue="0.35" /></rect>
+	</element>
+	<element name="lane_led_r" defstate="0">
+		<rect state="0"><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
+	</element>
+	<element name="lane_led_g" defstate="0">
+		<rect state="0"><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect state="1"><color red="0.0" green="1.0" blue="0.0" /></rect>
 	</element>
 
 	<!-- round play button: lit (state 1) vs unlit (state 0) -->
@@ -124,19 +142,34 @@ Whole view is ~16:9 and the content is grouped so MAME centers it vertically.
 		<element ref="flash_top" name="lamp_flash"><bounds x="116.25" y="69" width="87.5" height="7.4" /></element>
 		<element ref="flash_hbar" name="lamp_flash"><bounds x="80" y="89.2" width="160" height="8" /></element>
 		<element ref="flash_hbar" name="lamp_flash"><bounds x="80" y="111.8" width="160" height="8" /></element>
-		<element ref="flash_bottom" name="lamp_flash"><bounds x="116.25" y="132" width="87.5" height="7.4" /></element>
+		<element ref="flash_bottom" name="lamp_flash"><bounds x="116.25" y="132.5" width="87.5" height="7.4" /></element>
 
 		<!-- 5 lanes stacked horizontally below the DMD, stretched to nearly
-		     the full view width. 47 LEDs each, spanning x=26..294 (width 268),
+		     the full view width. 47 LEDs each, butted edge-to-edge (5.7 wide),
+		     spanning x=26..293.9 (width 267.9), centered in the 320 view,
 		     5 rows from y=56. -->
 		<repeat count="5">
 			<param name="lane" start="0" increment="1" />
 			<param name="ly"   start="56" increment="21" />
 			<repeat count="47">
 				<param name="col" start="0" increment="1" />
-				<param name="lx"  start="26" increment="5.702" />
-				<element ref="lane_led" name="lane~lane~_~col~">
-					<bounds x="~lx~" y="~ly~" width="4.9" height="13" />
+				<param name="lx"  start="26" increment="5.7" />
+				<!-- LEDs butt together (width == increment) so the lane reads as one
+				     continuous diffuser tube with no dark gaps between cells. -->
+				<element ref="lane_led_base">
+					<bounds x="~lx~" y="~ly~" width="5.7" height="13" />
+				</element>
+				<element ref="lane_led_r_mask" name="lane~lane~_~col~_r" blend="multiply">
+					<bounds x="~lx~" y="~ly~" width="5.7" height="13" />
+				</element>
+				<element ref="lane_led_g_mask" name="lane~lane~_~col~_g" blend="multiply">
+					<bounds x="~lx~" y="~ly~" width="5.7" height="13" />
+				</element>
+				<element ref="lane_led_r" name="lane~lane~_~col~_r" blend="add">
+					<bounds x="~lx~" y="~ly~" width="5.7" height="13" />
+				</element>
+				<element ref="lane_led_g" name="lane~lane~_~col~_g" blend="add">
+					<bounds x="~lx~" y="~ly~" width="5.7" height="13" />
 				</element>
 			</repeat>
 		</repeat>

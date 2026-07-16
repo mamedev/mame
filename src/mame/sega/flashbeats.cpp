@@ -202,7 +202,8 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_dispram(*this, "dispram"),
-		m_lane_led(*this, "lane%u_%u", 0U, 0U),
+		m_lane_red(*this, "lane%u_%u_r", 0U, 0U),
+		m_lane_green(*this, "lane%u_%u_g", 0U, 0U),
 		m_btn_lamp(*this, "btnlamp%u", 0U),
 		m_lamp_flash(*this, "lamp_flash"),
 		m_lamp_up(*this, "lamp_up"),
@@ -277,7 +278,8 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint16_t> m_dispram;   // 0xa00000 display work RAM (incl. lanes @0xa0c000)
-	output_finder<LANE_COUNT, LANE_LEN> m_lane_led;   // 5 lanes x 96 LEDs -> .lay artwork
+	output_finder<LANE_COUNT, LANE_LEN> m_lane_red;  // red plane -> .lay artwork
+	output_finder<LANE_COUNT, LANE_LEN> m_lane_green;  // green plane -> .lay artwork
 	output_finder<10> m_btn_lamp;   // btnlamp0-9 -> .lay (0-4 = P1 lanes 1-5, 5-9 = P2 lanes 1-5)
 	output_finder<> m_lamp_flash;   // lamp_flash -> .lay (gameplay cue: return on the FLASH)
 	output_finder<> m_lamp_up, m_lamp_dn, m_lamp_start;   // lamp_up/dn/start -> .lay
@@ -299,16 +301,17 @@ void flashbeats_state::machine_reset()
 	m_scspcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
-// Publish the 5 LED lanes as named artwork outputs lane<r>_<c>, consumed by the
-// .lay. The lanes are bi-color, built from TWO on/off planes in display RAM, both
-// 5 rows of 0x60 (96) bytes (one row per lane), cells at even byte offsets
-// (2-byte stride [value][pad]):
+// Publish the 5 LED lanes as named artwork outputs, consumed by the .lay. The
+// lanes are built from TWO on/off planes in display RAM, both 5 rows of 
+// 0x60 (96) bytes (one row per lane), cells at even byte offsets (2-byte stride
+// [value][pad]):
 //   * P0 (0xa0c000): the RED content
 //   * P1 (0xa0c1e0): the GREEN content
 // The two planes are independent; the game routinely sets both for the same LED.
-// The real cabinet's bi-color LEDs drive both dies at once, and diffusion mixes
-// them to yellow. Output state per LED: 0 = off, 1 = green, 2 = red, 3 = yellow
-// (both).
+// Each LED is published as TWO independent on/off outputs -- the red die
+// (lane<r>_<c>_r) and the green die (lane<r>_<c>_g) -- and the .lay overlays them
+// with blend="add", so an LED with both dies lit sums to yellow the same way the
+// real diffused bi-color package does.
 //
 // PLANE WIDTHS DIFFER -> 47 LEDs, adjacent-OR green:
 // Measured across all attract/meter frames, the RED plane lights cells 0..46 (47
@@ -331,7 +334,8 @@ void flashbeats_state::update_lanes()
 			const bool red   = rd8(0xa0c000 + off) != 0;   // P0: 47 cells, 1:1 per LED
 			// P1: 48 green cells OR'd down to 47 LEDs (this cell OR the next).
 			const bool green = rd8(0xa0c1e0 + off) != 0 || rd8(0xa0c1e0 + off + 2) != 0;
-			m_lane_led[lane][i] = (red && green) ? 3 : (red ? 2 : (green ? 1 : 0));
+			m_lane_red[lane][i]   = red   ? 1 : 0;
+			m_lane_green[lane][i] = green ? 1 : 0;
 		}
 	}
 }
