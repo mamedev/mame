@@ -216,11 +216,52 @@ void model1_state::fill_line(bitmap_rgb32 &bitmap, view_t *view, int color, int3
 
 // Draw a solid line between two screen points (integer Bresenham).  Wireframe
 // primitives reach the rasterizer as a degenerate quad with two coincident
-// vertex pairs (A,A,B,B); fill_quad only touches one pixel per scanline, so a
-// near-horizontal wire would collapse to a handful of dots.  Drawing the line
-// directly restores the full span (e.g. the Star Wars Arcade target box).
-static void draw_wireframe_line(bitmap_rgb32 &bitmap, int x1, int y1, int x2, int y2, uint32_t color, bool moire)
+// vertex pairs (A,A,B,B); the scanline filler only touches one pixel per row,
+// collapsing near-horizontal wires to dots (e.g. the Star Wars Arcade target
+// box).  The endpoints come from the unclipped projection and can be garbage
+// (a degenerate projection yields inf/NaN, which float->int conversion turns
+// into INT32_MIN on x86 hosts), so clip the segment to the viewport first,
+// like fill_slope() does for the filler - unclipped, wingwar hung during boot
+// walking a ~2^31-pixel line.
+static void draw_wireframe_line(bitmap_rgb32 &bitmap, const rectangle &clip, int x1, int y1, int x2, int y2, uint32_t color, bool moire)
 {
+	// Liang-Barsky clip against the viewport rectangle (doubles hold every
+	// int32 exactly, so in-range endpoints pass through unchanged)
+	const double lx1 = x1, ly1 = y1;
+	const double cdx = double(x2) - lx1, cdy = double(y2) - ly1;
+	const double p[4] = { -cdx, cdx, -cdy, cdy };
+	const double q[4] = { lx1 - clip.min_x, clip.max_x - lx1, ly1 - clip.min_y, clip.max_y - ly1 };
+	double t0 = 0.0, t1 = 1.0;
+	for (int i = 0; i < 4; i++)
+	{
+		if (p[i] == 0.0)
+		{
+			if (q[i] < 0.0)
+				return; // parallel to this edge and outside it
+		}
+		else
+		{
+			const double t = q[i] / p[i];
+			if (p[i] < 0.0)
+				t0 = std::max(t0, t);
+			else
+				t1 = std::min(t1, t);
+		}
+	}
+	if (t0 > t1)
+		return; // entirely outside the viewport
+
+	if (t1 < 1.0)
+	{
+		x2 = int(std::lround(lx1 + t1 * cdx));
+		y2 = int(std::lround(ly1 + t1 * cdy));
+	}
+	if (t0 > 0.0)
+	{
+		x1 = int(std::lround(lx1 + t0 * cdx));
+		y1 = int(std::lround(ly1 + t0 * cdy));
+	}
+
 	int dx = std::abs(x2 - x1), dy = std::abs(y2 - y1);
 	int sx = x1 < x2 ? 1 : -1, sy = y1 < y2 ? 1 : -1;
 	int err = dx - dy;
@@ -277,7 +318,8 @@ void model1_state::fill_quad(bitmap_rgb32 &bitmap, view_t *view, const quad_t& q
 		}
 		if (ndist == 2)
 		{
-			draw_wireframe_line(bitmap, ax, ay, bx, by, color & ~MOIRE, (color & MOIRE) != 0);
+			// clip to the viewport, exactly like the scanline filler below does
+			draw_wireframe_line(bitmap, rectangle(view->x1, view->x2, view->y1, view->y2), ax, ay, bx, by, color & ~MOIRE, (color & MOIRE) != 0);
 			return;
 		}
 	}
