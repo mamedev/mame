@@ -43,7 +43,7 @@ private:
 		IDLE,
 		WR1, WR2, WR3,
 		RD1, RD2, RD3, RD4,
-	}
+	};
 
 	void drq_w(int state);
 	void irq_w(int state);
