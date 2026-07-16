@@ -5,8 +5,9 @@ license:CC0-1.0
 Sega Flash Beats representative artwork layout.
 
 Mirrors the real cabinet (top-down):
-  * 128x32 dot-matrix VFD (the MAME "screen") at the top, centered, kept small
-    so the lanes below can stretch across the full 16:9 width. Neon 'Flash' 
+  * 64x16 dot-matrix display (an artwork dot grid of dmddot<n> outputs, NOT a MAME
+    screen) at the top, centered, kept small so the lanes below can stretch
+    across the full 16:9 width. Neon 'Flash'
 	tubes muted blue when unlit so it doesn't read as already lit, turning
 	pure white when lit (bound to lamp_flash; this is  the FLASH cue players
 	return on - gameplay-essential, not decorative).
@@ -110,6 +111,61 @@ Whole view is ~16:9 and the content is grouped so MAME centers it vertically.
 	<element name="lbl_lane4a"><text string="HIP HOP,"><color red="0.2" green="0.5" blue="1.0" /></text></element>
 	<element name="lbl_lane4b"><text string="RAP"><color red="0.2" green="0.5" blue="1.0" /></text></element>
 
+	<!-- DMD dot: the 64x16 amber/red dot-matrix display, one round emitter per dot.
+	     State 0..15 = dot brightness (driven by the dmddot outputs). All 16
+	     states are real: the panel is a genuine 16-level display, verified by
+	     tapping the live 0xa00000 dot values. The boot self-test writes a full
+	     0..15 gradient, and gameplay/attract scenes each pick their own subset
+	     (e.g. a 1/15 dim-glow-plus-bright logo, or an even 0/3/7/11/15 ramp). Any
+	     given scene only lights a few shades at once, so it reads as ~2-5 levels,
+	     but the value used spans the whole nibble across scenes, so we map all
+	     16. The colours reproduce the amber/red ramp: state 0 is the unlit-dot
+	     glow, states 1..15 scale up toward full brightness. A black backing rect
+	     (drawn slightly oversized) gives each dot its dark cell so the grid reads
+	     as a real DMD panel rather than a solid amber block. -->
+	<element name="dmddot" defstate="0">
+		<rect>
+			<color red="0" green="0" blue="0" />
+			<bounds left="-0.05" top="-0.05" right="1.05" bottom="1.05" />
+		</rect>
+		<disk state="0"><color red="0.0627" green="0.0196" blue="0.0196" /></disk>
+		<disk state="1"><color red="0.0667" green="0.0078" blue="0.0078" /></disk>
+		<disk state="2"><color red="0.1333" green="0.0196" blue="0.0157" /></disk>
+		<disk state="3"><color red="0.2000" green="0.0314" blue="0.0235" /></disk>
+		<disk state="4"><color red="0.2667" green="0.0392" blue="0.0314" /></disk>
+		<disk state="5"><color red="0.3333" green="0.0510" blue="0.0392" /></disk>
+		<disk state="6"><color red="0.4000" green="0.0627" blue="0.0471" /></disk>
+		<disk state="7"><color red="0.4667" green="0.0706" blue="0.0549" /></disk>
+		<disk state="8"><color red="0.5333" green="0.0824" blue="0.0627" /></disk>
+		<disk state="9"><color red="0.6000" green="0.0941" blue="0.0706" /></disk>
+		<disk state="10"><color red="0.6667" green="0.1020" blue="0.0784" /></disk>
+		<disk state="11"><color red="0.7333" green="0.1137" blue="0.0863" /></disk>
+		<disk state="12"><color red="0.8000" green="0.1255" blue="0.0941" /></disk>
+		<disk state="13"><color red="0.8667" green="0.1333" blue="0.1020" /></disk>
+		<disk state="14"><color red="0.9333" green="0.1451" blue="0.1098" /></disk>
+		<disk state="15"><color red="1.0000" green="0.1569" blue="0.1176" /></disk>
+	</element>
+
+	<!-- black backdrop the DMD sits on (extends a small margin past the dot grid) -->
+	<element name="dmd_bg"><rect><color red="0" green="0" blue="0" /></rect></element>
+
+	<!-- The 64x16 DMD dot grid, laid out in native dot coordinates (0..64 x
+	     0..16), one dmddot<n> per dot, row-major n = y*64 + x. Placed into the
+	     view as a single group so it can be positioned/scaled as a unit. -->
+	<group name="dmd">
+		<repeat count="16">
+			<param name="s" start="0" increment="64" />
+			<param name="y" start="0" increment="1" />
+			<repeat count="64">
+				<param name="n" start="~s~" increment="1" />
+				<param name="x" start="0" increment="1" />
+				<element name="dmddot~n~" ref="dmddot" state="0">
+					<bounds x="~x~" y="~y~" width="1" height="1" />
+				</element>
+			</repeat>
+		</repeat>
+	</group>
+
 	<!-- dark background -->
 	<element name="panel"><rect><color red="0.03" green="0.03" blue="0.05" /></rect></element>
 
@@ -132,8 +188,13 @@ Whole view is ~16:9 and the content is grouped so MAME centers it vertically.
 			 elements between the lanes -->
 		<element ref="flash_glow" name="lamp_flash"><bounds x="0" y="0" width="320" height="180" /></element>
 
-		<!-- DMD: top, centered -->
-		<screen index="0"><bounds x="96" y="8" width="128" height="32" /></screen>
+		<!-- DMD: top, centered. 64x16 dot-matrix display rendered as an artwork dot
+		     grid (no MAME screen). Kept the same footprint the old <screen>
+		     occupied (x=96 y=8, 128x32, a 4:1 box matching the 64:16 dots), with
+		     a black backdrop extending a ~3-unit margin around the dots so the
+		     panel reads as a framed DMD rather than floating amber dots. -->
+		<element ref="dmd_bg"><bounds x="93" y="5" width="134" height="38" /></element>
+		<group ref="dmd"><bounds x="96" y="8" width="128" height="32" /></group>
 
 		<!-- Lane-gap flash lighting: drawn BEFORE the lane <repeat> block below
 		     so the lane LEDs always render on top (lanes always take z-order

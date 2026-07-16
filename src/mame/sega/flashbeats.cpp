@@ -10,7 +10,7 @@
         - 68000 + SCSP for sound effects
         - DSB2 MPEG board with another 68000
         - Two Sega I/O chips: 315-5338A and 315-5296
-        - Pinball-style dot matrix VFD display
+        - Pinball-style 64x16 dot-matrix display
         - 5 display tubes containing an unknown number of RGB LEDs behind
           a diffuser
 
@@ -27,10 +27,8 @@
 #include "315_5338a.h"
 #include "dsb2.h"
 
-#include "emupal.h"
 #include "endianness.h"
 #include "machine/timer.h"
-#include "screen.h"
 #include "speaker.h"
 
 #include "flsbeats.lh"
@@ -168,9 +166,12 @@ flashbeats_spectrum_device::flashbeats_spectrum_device(const machine_config &mco
 
 class flashbeats_state : public driver_device
 {
-	// Flash Beats display geometry (recovered by RE; see notes at screen_update).
-	static constexpr int DMD_W = 128;
-	static constexpr int DMD_H = 32;
+	// Flash Beats display geometry (recovered by RE; see notes at update_dmd).
+	// The DMD is natively 64x16 -- exactly matching the display RAM -- NOT the
+	// 128x32 the physical panel's dot count might suggest. Each dot is one byte
+	// (low nibble = brightness 0..15) on a 2-byte stride ([value][pad]).
+	static constexpr int DMD_W = 64;
+	static constexpr int DMD_H = 16;
 	static constexpr int LANE_COUNT = 5;
 	static constexpr int LANE_LEN = 47;        // LEDs per lane (even bytes 0..92 of each 0x60 row at 0xa0c000)
 
@@ -178,14 +179,8 @@ class flashbeats_state : public driver_device
 	// canvas (itself filled by the sprite-blit at 0x749e) into 0xa00000, one row
 	// per DMD_PITCH bytes, dispatched by 0x7642(r5=0) from the scene handler's
 	// per-tick scroll loop.
-	// Native resolution is HALF the physical panel in both dimensions (64x16,
-	// exactly matching DMD_W/2 x DMD_H/2) -- rendered pixel-doubled to fill the
-	// 128x32 screen, one byte per dot (low-nibble brightness 0..15), horizontal
-	// stride 2 bytes ([value][pad]).
 	static constexpr offs_t DMD_BASE  = 0xa00000;
-	static constexpr offs_t DMD_PITCH = 0x80;    // bytes/row = (DMD_W/2) * 2
-	static constexpr int DMD_NATIVE_W = DMD_W / 2;
-	static constexpr int DMD_NATIVE_H = DMD_H / 2;
+	static constexpr offs_t DMD_PITCH = 0x80;    // bytes/row = DMD_W * 2
 
 public:
 	flashbeats_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -199,9 +194,8 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_315_5296(*this, "segaio1"),
 		m_315_5338a(*this, "segaio2"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
 		m_dispram(*this, "dispram"),
+		m_dmd(*this, "dmddot%u", 0U),
 		m_lane_red(*this, "lane%u_%u_r", 0U, 0U),
 		m_lane_green(*this, "lane%u_%u_g", 0U, 0U),
 		m_btn_lamp(*this, "btnlamp%u", 0U),
@@ -216,9 +210,6 @@ public:
 	void flashbeats_map(address_map &map) ATTR_COLD;
 	void main_scsp_map(address_map &map) ATTR_COLD;
 	void scsp_mem(address_map &map) ATTR_COLD;
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void palette_init(palette_device &palette) const;
 
 private:
 	virtual void machine_start() override ATTR_COLD;
@@ -260,6 +251,7 @@ private:
 	uint8_t spectrum_mux_r();
 	void spectrum_mux_w(uint8_t data);
 	void update_lanes();
+	void update_dmd();
 	TIMER_DEVICE_CALLBACK_MEMBER(lane_update_timer);
 	void te7752_port3_w(uint8_t data);
 	void te7752_port4_w(uint8_t data);
@@ -275,9 +267,8 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<sega_315_5296_device> m_315_5296;
 	required_device<sega_315_5338a_device> m_315_5338a;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 	required_shared_ptr<uint16_t> m_dispram;   // 0xa00000 display work RAM (incl. lanes @0xa0c000)
+	output_finder<DMD_W * DMD_H> m_dmd;   // 64x16 DMD dots (dmddot0..1023) -> .lay artwork
 	output_finder<LANE_COUNT, LANE_LEN> m_lane_red;  // red plane -> .lay artwork
 	output_finder<LANE_COUNT, LANE_LEN> m_lane_green;  // green plane -> .lay artwork
 	output_finder<10> m_btn_lamp;   // btnlamp0-9 -> .lay (0-4 = P1 lanes 1-5, 5-9 = P2 lanes 1-5)
@@ -340,19 +331,9 @@ void flashbeats_state::update_lanes()
 	}
 }
 
-// Polls display RAM on a fixed-rate timer rather than from screen_update();
-// screen updates aren't a reliable game-state clock
-TIMER_DEVICE_CALLBACK_MEMBER(flashbeats_state::lane_update_timer)
-{
-	update_lanes();
-}
-
-// Flash Beats has no conventional raster screen; it has a 128x32 pinball-style
-// dot-matrix VFD and 5 RGB-LED "tube" lanes, both built by the H8 in work RAM.
-//
-// The MAME screen is the DMD itself (128x32). The 5 lanes are published as
-// artwork outputs by update_lanes(), polled on its own timer (see
-// lane_update_timer) rather than from here, and drawn by the .lay.
+// Flash Beats has no conventional raster screen; it has a 64x16 pinball-style
+// dot-matrix display and 5 RGB-LED "tube" lanes, both built by the H8 in work
+// RAM and both published as named artwork outputs, drawn by the .lay.
 //
 // The main-loop scene handlers compose source art into a staging canvas at
 // 0xa02800 via the sprite blitter at 0x749e, but that canvas only updates when
@@ -360,44 +341,34 @@ TIMER_DEVICE_CALLBACK_MEMBER(flashbeats_state::lane_update_timer)
 // continuously-scanned panel is 0xa00000: sub 0x75ec copies shifting slices of
 // 0xa02800 into 0xa00000 every scene tick (dispatched by 0x7642(r5=0) from the
 // scroll-position loop at 0x2cd8), producing genuine frame-by-frame animation.
-// Native resolution is 64x16 (half the physical panel in each dimension),
-// rendered pixel-doubled here to fill the 128x32 screen.
-uint32_t flashbeats_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+//
+// The DMD is natively 64x16, one byte per dot (low nibble = brightness 0..15)
+// on a 2-byte stride ([value][pad]). It is a genuine 16-level display, not
+// on/off: verified by tapping the live dot values -- the boot self-test writes
+// a full 0..15 gradient, and gameplay/attract scenes each use their own subset
+// of shades (a 1/15 dim-glow-plus-bright logo, an even 0/3/7/11/15 ramp, etc.).
+// Only a few levels are lit in any one scene (so it reads as ~2-5), but the
+// value used spans the whole nibble across scenes. Each dot is published raw as
+// an output (dmddot<n>, row-major n = y*64 + x) carrying its 0..15 brightness;
+// the .lay maps that to a 16-state amber/red element.
+void flashbeats_state::update_dmd()
 {
 	auto rd8 = [this](offs_t byteaddr) -> uint8_t {
 		return util::big_endian_cast<uint8_t>(m_dispram.target())[byteaddr & 0xffff];
 	};
 
-	for (int ny = 0; ny < DMD_NATIVE_H; ny++)
-	{
-		for (int nx = 0; nx < DMD_NATIVE_W; nx++)
-		{
-			const uint16_t pen = rd8(DMD_BASE + ny * DMD_PITCH + nx * 2) & 0x0f;
-			const int x0 = nx * 2;
-			const int y0 = ny * 2;
-			for (int dy = 0; dy < 2; dy++)
-			{
-				for (int dx = 0; dx < 2; dx++)
-				{
-					const int x = x0 + dx;
-					const int y = y0 + dy;
-					if (cliprect.contains(x, y))
-						bitmap.pix(y, x) = pen;
-				}
-			}
-		}
-	}
-
-	return 0;
+	for (int y = 0; y < DMD_H; y++)
+		for (int x = 0; x < DMD_W; x++)
+			m_dmd[y * DMD_W + x] = rd8(DMD_BASE + y * DMD_PITCH + x * 2) & 0x0f;
 }
 
-// 16-level amber/red VFD ramp: pen 0 is the unlit-segment glow, pens 1-15
-// scale up to full brightness.
-void flashbeats_state::palette_init(palette_device &palette) const
+// Polls display RAM on a fixed-rate timer. Both the DMD and the lanes are pure
+// artwork outputs (no raster screen); screen updates aren't a reliable
+// game-state clock, so both are driven from this timer instead.
+TIMER_DEVICE_CALLBACK_MEMBER(flashbeats_state::lane_update_timer)
 {
-	palette.set_pen_color(0, 0x10, 0x05, 0x05);
-	for (int v = 1; v < 16; v++)
-		palette.set_pen_color(v, (v * 0xff) / 15, (v * 0x28) / 15, (v * 0x1e) / 15);
+	update_dmd();
+	update_lanes();
 }
 
 // TE7752 P3 lamp outputs
@@ -533,29 +504,21 @@ void flashbeats_state::flashbeats(machine_config &config)
 
 	SEGA_315_5338A(config, m_315_5338a, 32_MHz_XTAL);
 
-	// The DMD itself is the MAME screen (128x32, built from H8 work RAM each
-	// frame). The 5 LED lanes are published as artwork outputs (update_lanes),
-	// polled by their own timer below. Neither is a real raster device on the
-	// hardware.
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(DMD_W, DMD_H);
-	m_screen->set_visarea(0, DMD_W - 1, 0, DMD_H - 1);
-	m_screen->set_screen_update(FUNC(flashbeats_state::screen_update));
-	m_screen->set_palette(m_palette);
+	// Neither the DMD nor the LED lanes is a real raster device on the hardware:
+	// the 64x16 DMD and the 5 LED lanes are all built by the H8 in work RAM and
+	// published as named artwork outputs (update_dmd / update_lanes), drawn by
+	// the .lay. There is no MAME screen -- both are polled by the timer below.
 
-	// LED lane state is plain artwork output, not screen-clocked; poll it on its
-	// own timer so frameskip/throttle can't affect its update rate. Rate chosen
-	// from live measurement (write-tap directly on 0xa0c000/0xa0c1e0, counting
-	// actual byte VALUE changes, not just writes -- the composer rewrites the
-	// whole buffer every cycle regardless of content change, ~595 writes/frame,
-	// so raw write count isn't useful): baseline content-change rate tracks the
-	// RTCOR system tick (~248Hz, matches h8_refresh.h's ~4.03ms tick almost
-	// exactly), with bursts up to ~433Hz measured during busier attract-mode
-	// animation. 480Hz stays above the observed burst ceiling with margin.
+	// Artwork output state is not screen-clocked; poll it on its own timer so
+	// frameskip/throttle can't affect its update rate. Rate chosen from live
+	// measurement (write-tap directly on 0xa0c000/0xa0c1e0, counting actual byte
+	// VALUE changes, not just writes -- the composer rewrites the whole buffer
+	// every cycle regardless of content change, ~595 writes/frame, so raw write
+	// count isn't useful): baseline content-change rate tracks the RTCOR system
+	// tick (~248Hz, matches h8_refresh.h's ~4.03ms tick almost exactly), with
+	// bursts up to ~433Hz measured during busier attract-mode animation. 480Hz
+	// stays above the observed burst ceiling with margin.
 	TIMER(config, "lane_timer").configure_periodic(FUNC(flashbeats_state::lane_update_timer), attotime::from_hz(480));
-
-	PALETTE(config, m_palette, FUNC(flashbeats_state::palette_init), 16);
 
 	config.set_default_layout(layout_flsbeats);
 
