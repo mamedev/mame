@@ -313,18 +313,16 @@ void flashbeats_state::machine_reset()
 // Big-endian H8: byte at even address = high byte of the 16-bit display word.
 void flashbeats_state::update_lanes()
 {
-	auto rd8 = [this](offs_t byteaddr) -> uint8_t {
-		return util::big_endian_cast<uint8_t>(m_dispram.target())[byteaddr & 0xffff];
-	};
+	auto const disp8 = util::big_endian_cast<uint8_t const>(m_dispram.target());
 
 	for (int lane = 0; lane < LANE_COUNT; lane++)
 	{
 		for (int i = 0; i < LANE_LEN; i++)
 		{
 			const offs_t off = lane * 0x60 + i * 2;
-			const bool red   = rd8(0xa0c000 + off) != 0;   // P0: 47 cells, 1:1 per LED
+			const bool red   = disp8[(0xa0c000 + off) & 0xffff] != 0;   // P0: 47 cells, 1:1 per LED
 			// P1: 48 green cells OR'd down to 47 LEDs (this cell OR the next).
-			const bool green = rd8(0xa0c1e0 + off) != 0 || rd8(0xa0c1e0 + off + 2) != 0;
+			const bool green = disp8[(0xa0c1e0 + off) & 0xffff] != 0 || disp8[(0xa0c1e0 + off + 2) & 0xffff] != 0;
 			m_lane_red[lane][i]   = red   ? 1 : 0;
 			m_lane_green[lane][i] = green ? 1 : 0;
 		}
@@ -353,13 +351,11 @@ void flashbeats_state::update_lanes()
 // the .lay maps that to a 16-state amber/red element.
 void flashbeats_state::update_dmd()
 {
-	auto rd8 = [this](offs_t byteaddr) -> uint8_t {
-		return util::big_endian_cast<uint8_t>(m_dispram.target())[byteaddr & 0xffff];
-	};
+	auto const disp8 = util::big_endian_cast<uint8_t const>(m_dispram.target());
 
 	for (int y = 0; y < DMD_H; y++)
 		for (int x = 0; x < DMD_W; x++)
-			m_dmd[y * DMD_W + x] = rd8(DMD_BASE + y * DMD_PITCH + x * 2) & 0x0f;
+			m_dmd[y * DMD_W + x] = disp8[(DMD_BASE + y * DMD_PITCH + x * 2) & 0xffff] & 0x0f;
 }
 
 // Polls display RAM on a fixed-rate timer. Both the DMD and the lanes are pure
