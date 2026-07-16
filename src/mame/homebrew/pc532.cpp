@@ -33,6 +33,7 @@
 
 // busses and connectors
 #include "bus/rs232/rs232.h"
+#include "bus/nscsi/et532.h"
 #include "bus/nscsi/hd.h"
 #include "bus/nscsi/tape.h"
 
@@ -379,6 +380,7 @@ template <unsigned ST> void pc532_state::cpu_map(address_map &map)
 
 static void scsi_devices(device_slot_interface &device)
 {
+	device.option_add("et532", ET532_SCSI); // ET532 serial/ethernet coprocessor card (532SC)
 	device.option_add("harddisk", NSCSI_HARDDISK);
 	device.option_add("tape", NSCSI_TAPE);
 }
