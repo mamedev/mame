@@ -224,6 +224,29 @@ void pc9801_state::pc9801_common_io(address_map &map)
 	map(0x7fd8, 0x7fdf).rw(m_ppi_mouse, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
 }
 
+// Pack pc9801-03 mapping after fdc 2HD i/f (both should belong to C-Bus)
+// Not pretty, but it does the job for now.
+// Check with "pc9801m2 castle -cbus:5 pc9801_03" on mods.
+void pc9801_state::cbus_overlay_io(address_map &map)
+{
+	map(0x91, 0x91).lrw8(
+		NAME([this] (offs_t offset) { return m_cbus_root->io_r(0x90 >> 1, 0xff00); }),
+		NAME([this] (offs_t offset, u8 data) { m_cbus_root->io_w(0x90 >> 1, data << 8, 0xff00); })
+	);
+	map(0x93, 0x93).lrw8(
+		NAME([this] (offs_t offset) { return m_cbus_root->io_r(0x92 >> 1, 0xff00); }),
+		NAME([this] (offs_t offset, u8 data) { m_cbus_root->io_w(0x92 >> 1, data << 8, 0xff00); })
+	);
+	map(0x95, 0x95).lrw8(
+		NAME([this] (offs_t offset) { return m_cbus_root->io_r(0x94 >> 1, 0xff00); }),
+		NAME([this] (offs_t offset, u8 data) { m_cbus_root->io_w(0x94 >> 1, data << 8, 0xff00); })
+	);
+	map(0x97, 0x97).lrw8(
+		NAME([this] (offs_t offset) { return m_cbus_root->io_r(0x96 >> 1, 0xff00); }),
+		NAME([this] (offs_t offset, u8 data) { m_cbus_root->io_w(0x96 >> 1, data << 8, 0xff00); })
+	);
+}
+
 void pc9801_state::pc9801_io(address_map &map)
 {
 	map.unmap_value_high();
@@ -237,9 +260,12 @@ void pc9801_state::pc9801_io(address_map &map)
 	map(0x0090, 0x0090).r(m_fdc_2hd, FUNC(upd765a_device::msr_r));
 	map(0x0092, 0x0092).rw(m_fdc_2hd, FUNC(upd765a_device::fifo_r), FUNC(upd765a_device::fifo_w));
 	map(0x0094, 0x0094).rw(FUNC(pc9801_state::fdc_2hd_ctrl_r), FUNC(pc9801_state::fdc_2hd_ctrl_w));
+
 	map(0x00a0, 0x00af).rw(FUNC(pc9801_state::pc9801_a0_r), FUNC(pc9801_state::pc9801_a0_w)); //upd7220 bitmap ports / display registers
 //  map(0x00c8, 0x00cb).m(m_fdc_2dd, FUNC(upd765a_device::map)).umask16(0x00ff);
 //  map(0x00cc, 0x00cc).rw(FUNC(pc9801_state::fdc_2dd_ctrl_r), FUNC(pc9801_state::fdc_2dd_ctrl_w)); //upd765a 2dd / <undefined>
+
+	cbus_overlay_io(map);
 }
 
 /*************************************
