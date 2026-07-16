@@ -632,7 +632,6 @@ Not extensively tested (language barrier)
 		<year>198?</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<notes><![CDATA[
-[tape] fails loading after title
 Not extensively tested (language barrier)
 ]]></notes>
 		<info name="usage" value="Mode 2, Page 2"/>
@@ -709,7 +708,6 @@ Both games: wants [keyboard] shift+S to start a game (verify)
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
 		<notes><![CDATA[
-[tape] throws an UL error at second loading (regression after bus request)
 Not extensively tested (language barrier)
 ]]></notes>
 		<info name="usage" value="Mode 2, Page 1"/>
@@ -1291,13 +1289,10 @@ Miscellaneous BASIC programs, made between 2005 and 2009
 		</part>
 	</software>
 
-	<software name="suprball" supported="no">
+	<software name="suprball" supported="partial">
 		<description>Super Ball</description>
 		<year>19??</year>
 		<publisher>&lt;homebrew&gt;</publisher>
-		<notes><![CDATA[
-Crashes on [tape] loading (regression)
-]]></notes>
 		<info name="usage" value="Mode 2, Page 2" />
 		<info name="developer" value="Afoxai"/>
 		<part name="snap" interface="pc6001_snap">

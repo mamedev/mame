@@ -1289,28 +1289,59 @@ bool pc6001mk2sr_state::screen_blanked()
 	return true;
 }
 
-TIMER_CALLBACK_MEMBER(pc6001_state::video_sync_cb)
+rectangle pc6001_state::get_screen_display_area()
+{
+	// VDG regular display area is 256x192, on border bus request should be off
+	// A bunch of pc6001 will otherwise fail at startup:
+	// - mysterh2
+	// - portopia (on second load after explaination)
+	// - suprball
+	return rectangle { 32, 320 - 32, 24, 240 - 24 };
+}
+
+rectangle pc6001mk2_state::get_screen_display_area()
 {
 	// pc6001mk2:digdug intro clearly wants timing itself by 240 vertical
-	// assume mk2 bitmap mode cutoff is border overscan, not blanking
-	// TODO: mkIISR width80 needs to bump hsync by 640
-	int hsync = m_screen->hpos() >= 320;
-	int vsync = m_screen->vpos() >= 240;
+	// assume mk2 bitmap mode vertical cutoff is border overscan, not blanking
+	// TODO: cache mode
+	if (m_exgfx_text_mode || m_exgfx_2bpp_mode || m_exgfx_bitmap_mode)
+		return rectangle { 0, 320, 0, 240 };
+
+	return pc6001_state::get_screen_display_area();
+}
+
+rectangle pc6001mk2sr_state::get_screen_display_area()
+{
+	if (m_mk2_mode)
+		return pc6001mk2_state::get_screen_display_area();
+
+	const int scr_width = m_screen->visible_area().width();
+
+	return rectangle { 0, scr_width, 0, 240 };
+}
+
+TIMER_CALLBACK_MEMBER(pc6001_state::video_sync_cb)
+{
+	const rectangle visarea = get_screen_display_area();
+	int hpos = m_screen->hpos();
+	int vpos = m_screen->vpos();
+	int hsync = hpos < visarea.min_x || hpos >= visarea.max_x;
+	int vsync = vpos < visarea.min_y || vpos >= visarea.max_y;
+
+//	printf("%d %d %d %d (%d %d)\n", hsync, vsync, hpos, vpos, visarea.min_y, visarea.max_y);
 
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, hsync || vsync || screen_blanked() ? CLEAR_LINE : ASSERT_LINE);
 
 	if (vsync)
 	{
-		m_video_sync_timer->adjust(m_screen->time_until_pos(0, 0));
+		m_video_sync_timer->adjust(m_screen->time_until_pos(visarea.min_y, visarea.min_x));
 	}
 	else
 	{
-		int scanline = m_screen->vpos();
-
 		if (hsync)
-			m_video_sync_timer->adjust(m_screen->time_until_pos(scanline + 1, 0));
+			m_video_sync_timer->adjust(m_screen->time_until_pos(vpos + 1, visarea.min_x));
 		else
-			m_video_sync_timer->adjust(m_screen->time_until_pos(scanline, 320));
+			m_video_sync_timer->adjust(m_screen->time_until_pos(vpos, visarea.max_x));
 	}
 }
 

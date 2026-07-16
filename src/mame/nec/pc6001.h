@@ -146,6 +146,7 @@ protected:
 	void draw_border(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr,int has_mc6847);
 	void pc6001_screen_draw(bitmap_ind16 &bitmap,const rectangle &cliprect, int has_mc6847);
 
+	virtual rectangle get_screen_display_area();
 	virtual bool screen_blanked();
 	TIMER_CALLBACK_MEMBER(video_sync_cb);
 	emu_timer *m_timer_irq_timer = nullptr;
@@ -245,6 +246,7 @@ protected:
 	required_memory_region m_voice_rom;
 	required_memory_region m_kanji_rom;
 
+	virtual rectangle get_screen_display_area() override;
 	virtual void refresh_crtc_params();
 
 	virtual void machine_start() override ATTR_COLD;
@@ -335,6 +337,7 @@ protected:
 
 	virtual u8 vrtc_ack() override;
 	virtual u8 get_timer_base_divider() override;
+	virtual rectangle get_screen_display_area() override;
 	virtual bool screen_blanked() override;
 
 private:
