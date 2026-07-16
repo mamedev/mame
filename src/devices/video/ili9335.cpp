@@ -12,6 +12,77 @@
 #include "emu.h"
 #include "ili9335.h"
 
+namespace {
+    enum : uint8_t
+    {
+        REG_ID                 = 0x00,
+        REG_DRVOUTCTRL         = 0x01,
+        REG_LCDDRVCTRL         = 0x02,
+        REG_ENTRYMODE          = 0x03,
+        REG_DATAFORMAT         = 0x05,
+
+        REG_DISPCTRL1          = 0x07,
+        REG_DISPCTRL2          = 0x08,
+        REG_DISPCTRL3          = 0x09,
+        REG_DISPCTRL4          = 0x0A,
+
+        REG_RGBDISPIC1         = 0x0C,
+        REG_FRAMEMRK           = 0x0D,
+        REG_RGBDISPIC2         = 0x0F,
+
+        REG_PWRCTRL1           = 0x10,
+        REG_PWRCTRL2           = 0x11,
+        REG_PWRCTRL3           = 0x12,
+        REG_PWRCTRL4           = 0x13,
+        REG_PWRCTRL7           = 0x29,
+
+        REG_CSRCOL             = 0x20,
+        REG_CSRROW             = 0x21,
+        REG_GRAMPTR            = 0x22,
+
+        REG_FRCCTRL            = 0x2B,
+
+        REG_GMCTRL1            = 0x30,
+        REG_GMCTRL2            = 0x31,
+        REG_GMCTRL3            = 0x32,
+        REG_GMCTRL4            = 0x35,
+        REG_GMCTRL5            = 0x36,
+        REG_GMCTRL6            = 0x37,
+        REG_GMCTRL7            = 0x38,
+        REG_GMCTRL8            = 0x39,
+        REG_GMCTRL9            = 0x3C,
+        REG_GMCTRL10           = 0x3D,
+
+        REG_WINH_ADDR_STA      = 0x50,
+        REG_WINH_ADDR_END      = 0x51,
+        REG_WINV_ADDR_STA      = 0x52,
+        REG_WINV_ADDR_END      = 0x53,
+
+        REG_GATESCANCTRL       = 0x60,
+        REG_BIMGDISPCTRL       = 0x61,
+        REG_VSCRCTRL           = 0x6A,
+
+        REG_PARTIMG1DISPPOS    = 0x80,
+        REG_PARTIMG1STARTLN    = 0x81,
+        REG_PARTIMG1ENDLN      = 0x82,
+
+        REG_PARTIMG2DISPPOS    = 0x83,
+        REG_PARTIMG2STARTLN    = 0x84,
+        REG_PARTIMG2ENDLN      = 0x85,
+
+        REG_PANELINTCTRL1      = 0x90,
+        REG_PANELINTCTRL2      = 0x92,
+        REG_PANELINTCTRL4      = 0x95,
+        REG_PANELINTCTRL5      = 0x97,
+
+        REG_OTP_VCM_PC         = 0xA1,
+        REG_OTP_VCM_SE         = 0xA2,
+        REG_OTP_PID            = 0xA5,
+
+        REG_DEEPSBCTRL         = 0xE6
+    };
+}
+
 // devices
 DEFINE_DEVICE_TYPE(ILI9335, ili9335_device, "ili9335", "Ilitek ILI9335 LCD Controller")
 
@@ -43,7 +114,7 @@ void ili9335_device::device_reset()
     memset(m_lcdregs, 0x00, sizeof(m_lcdregs));
     memset(m_gram, 0x00, sizeof(m_gram));
 
-    m_lcdregs[0] = 0x9335;
+    m_lcdregs[REG_ID] = 0x9335;
 
     m_readlatch = 0;
     m_writelatch = 0;
@@ -92,7 +163,10 @@ uint8_t ili9335_device::data_read() {
     uint8_t data;
 
     if (m_currreg == REG_GRAMPTR) {
-        // read a pixel in rg
+        // read a pixel. If the BGR bit is set, then swap
+        // the red and blue channels regardless of whether 
+        // they were already swapped when written to GRAM.
+
         uint32_t pixelRaw = getPixel(m_lcdregs[REG_CSRCOL], m_lcdregs[REG_CSRROW]);
         if (m_lcdregs[REG_ENTRYMODE] & 0x1000)
             pixelRaw = rgb666_swapBGR(pixelRaw);
@@ -326,7 +400,6 @@ void ili9335_device::resetCursorRegs(uint16_t mode, bool resetX, bool resetY) {
 inline uint32_t ili9335_device::getGRAMData(uint32_t addr) {
     uint16_t hi = (m_gram[addr] << 8) | m_gram[addr + 1];
     uint16_t lo = (m_gram[addr + 2] << 8) | m_gram[addr + 3];
-
     return hi << 16 | lo;
 }
 
@@ -360,7 +433,6 @@ inline uint32_t ili9335_device::rgb666_swapBGR(uint32_t pixel) {
     uint8_t blue = (pixel & 0x3F);
     uint8_t green = (pixel & 0xFC0) >> 6;
     uint8_t red = (pixel & 0x3F000) >> 12;
-
     return red | (green << 6) | (blue << 12);
 }
 
@@ -369,12 +441,12 @@ void ili9335_device::writePixel_565(uint16_t pixel) {
     uint8_t green = (pixel >> 5) & 0x3F;
     uint8_t red = (pixel >> 10) & 0x3E;
 
+    // on the ILI9335, a rgb565 color is expanded to rgb666 by using the 
+    // high bits of the red and blue channels to set the extra lower bit
     red |= (pixel >> 15);
     blue |= ((pixel & 0x10) == 0x10);
 
-    uint32_t color18 = blue | (green << 6) | (red << 12);
-
-    writePixel_666(color18);
+    writePixel_666(blue | (green << 6) | (red << 12));
 }
 
 void ili9335_device::writePixel_666(uint32_t pixel) {
@@ -394,7 +466,7 @@ void ili9335_device::writePixel_666(uint32_t pixel) {
     for (int i = 0; i < 4; i++)
         m_gram[addr + (3 - i)] = (uint8_t)(newPixel >> 8*i);
 
-    // "auto-increment" for the cursor row really auto-decrements.
+    // "auto-increment" for the cursor row actually auto-decrements.
     if (m_lcdregs[REG_ENTRYMODE] & 0x08) {
         bool next = updateCursorReg(&m_lcdregs[REG_CSRROW], m_lcdregs[REG_WINV_ADDR_STA], m_lcdregs[REG_WINV_ADDR_END], 0x20);
 
@@ -412,17 +484,18 @@ void ili9335_device::writePixel_666_unpacked(uint32_t pixel) {
     uint8_t blue = (pixel >> 2) & 0x3F;
     uint8_t green = (pixel >> 10) & 0x3F;
     uint8_t red = (pixel >> 18) & 0x3F;
-    uint32_t color18 = blue | (green << 6) | (red << 12);
-    writePixel_666(color18);
+    writePixel_666(blue | (green << 6) | (red << 12));
 }
 
 uint32_t ili9335_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) {
     // clear screen
     rgb_t blank = m_lcdregs[REG_BIMGDISPCTRL] & 0x04 ? rgb_t::black() : rgb_t::white();
 
-    // if the LCD is disabled, always fill the bitmap with black pixels
-    if (!(m_lcdregs[REG_DISPCTRL1] & 0x0002))
-        blank = rgb_t::black();
+    // if the LCD is turned off, bail out after filling the bitmap with black pixels
+    if (!(m_lcdregs[REG_DISPCTRL1] & 0x0002)) {
+        bitmap.fill(rgb_t::black(), cliprect);
+        return 0;
+    }
 
     bitmap.fill(blank, cliprect);
 
@@ -465,7 +538,7 @@ void ili9335_device::drawInterlacedFrame(bitmap_rgb32 &bitmap) {
     if (m_lcdregs[REG_DISPCTRL1] & 0x1000) {
         for (int line = 0; line < m_height / 2; line++) {
             uint16_t y = start1 + line;
-            uint16_t dispY = ((line + disp1) * 2) % m_height;
+            uint16_t dispY = ((disp1 + line) * 2) % m_height;
 
             for (int x = 0; x < m_width; x++)
                 plotPixel(bitmap, getPixel(x, y), x, dispY);
@@ -475,7 +548,7 @@ void ili9335_device::drawInterlacedFrame(bitmap_rgb32 &bitmap) {
     if (m_lcdregs[REG_DISPCTRL1] & 0x2000) {
         for (int line = 0; line < m_height / 2; line++) {
             uint16_t y = start2 + line;
-            uint16_t dispY = ((line + disp2) * 2) % m_height;
+            uint16_t dispY = ((disp2 + line) * 2) % m_height;
 
             for (int x = 0; x < m_width; x++)
                 plotPixel(bitmap, getPixel(x, y), x, dispY + 1);
@@ -499,10 +572,10 @@ void ili9335_device::drawPartialImage(bitmap_rgb32 &bitmap, uint16_t disp_pos, u
 
 void ili9335_device::plotPixel(bitmap_rgb32 &bitmap, uint32_t pixel18, uint8_t x, uint16_t y) {
     // bail out if the coords are out of bounds or the LCD is off
-    if (y >= m_height || x >= m_width || !(m_lcdregs[REG_DISPCTRL1] & 0x0002))
+    if (y >= m_height || x >= m_width)
         return;
 
-    // flip Y if gate scan direction bit isn't set
+    // flip Y if the gate scan direction bit isn't set
     if (!(m_lcdregs[REG_GATESCANCTRL] & 0x8000))
         y = m_height - y - 1;
 

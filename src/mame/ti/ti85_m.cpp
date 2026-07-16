@@ -969,93 +969,37 @@ inline void ti85_state::ti84p_rtc_w(uint32_t &timer, uint8_t offset, uint8_t dat
     timer = (timer & ~(0xFF << offset)) | (data << offset);
 }
 
-uint8_t ti85_state::ti84p_port_0040_r() {
-    return m_ti84p_port40;
+uint8_t ti85_state::ti84p_rtc_control_r() {
+    return ti84p_rtc_control;
 }
 
-void ti85_state::ti84p_port_0040_w(uint8_t data) {
-    if ((data & 0b10) && !(m_ti84p_port40 & 0b10))
+void ti85_state::ti84p_rtc_control_w(uint8_t data) {
+    if ((data & 0b10) && !(ti84p_rtc_control & 0b10))
         m_ti84p_rtc_currtime = m_ti84p_rtc_basetime;
 
     m_ti84_rtc->enable((data & 0b01) == 0b01);
-    m_ti84p_port40 = data & 0b11;
+    ti84p_rtc_control = data & 0b11;
 }
 
-uint8_t ti85_state::ti84p_port_0041_r() {
-    return ti84p_rtc_r(m_ti84p_rtc_basetime, 0);
+uint8_t ti85_state::ti84p_rtc_basetime_r(offs_t offset) {
+    return ti84p_rtc_r(m_ti84p_rtc_basetime, offset * 8);
 }
 
-void ti85_state::ti84p_port_0041_w(uint8_t data) {
-    ti84p_rtc_w(m_ti84p_rtc_basetime, 0, data);
+void ti85_state::ti84p_rtc_basetime_w(offs_t offset, uint8_t data) {
+    ti84p_rtc_w(m_ti84p_rtc_basetime, offset * 8, data);
 }
 
-uint8_t ti85_state::ti84p_port_0042_r() {
-    return ti84p_rtc_r(m_ti84p_rtc_basetime, 8);
-}
-
-void ti85_state::ti84p_port_0042_w(uint8_t data) {
-    ti84p_rtc_w(m_ti84p_rtc_basetime, 8, data);
-}
-
-uint8_t ti85_state::ti84p_port_0043_r() {
-    return ti84p_rtc_r(m_ti84p_rtc_basetime, 16);
-}
-
-void ti85_state::ti84p_port_0043_w(uint8_t data) {
-    ti84p_rtc_w(m_ti84p_rtc_basetime, 16, data);
-}
-
-uint8_t ti85_state::ti84p_port_0044_r() {
-    return ti84p_rtc_r(m_ti84p_rtc_basetime, 24);
-}
-
-void ti85_state::ti84p_port_0044_w(uint8_t data) {
-    ti84p_rtc_w(m_ti84p_rtc_basetime, 24, data);
-}
-
-uint8_t ti85_state::ti84p_port_0045_r() {
-    if (!(m_ti84p_port40 & 0b01))
+uint8_t ti85_state::ti84p_rtc_currtime_r(offs_t offset) {
+    if (!(ti84p_rtc_control & 0b01))
         return 0;
 
-    return ti84p_rtc_r(m_ti84p_rtc_currtime, 0);
+    return ti84p_rtc_r(m_ti84p_rtc_currtime, offset * 8);
 }
 
-void ti85_state::ti84p_port_0045_w(uint8_t data) {
-    ti84p_rtc_w(m_ti84p_rtc_currtime, 0, data);
+void ti85_state::ti84p_rtc_currtime_w(offs_t offset, uint8_t data) {
+    ti84p_rtc_w(m_ti84p_rtc_currtime, offset * 8, data);
 }
 
-uint8_t ti85_state::ti84p_port_0046_r() {
-    if (!(m_ti84p_port40 & 0b01))
-        return 0;
-
-    return ti84p_rtc_r(m_ti84p_rtc_currtime, 8);
-}
-
-void ti85_state::ti84p_port_0046_w(uint8_t data) {
-    ti84p_rtc_w(m_ti84p_rtc_currtime, 8, data);
-}
-
-uint8_t ti85_state::ti84p_port_0047_r() {
-    if (!(m_ti84p_port40 & 0b01))
-        return 0;
-
-    return ti84p_rtc_r(m_ti84p_rtc_currtime, 16);
-}
-
-void ti85_state::ti84p_port_0047_w(uint8_t data) {
-    ti84p_rtc_w(m_ti84p_rtc_currtime, 16, data);
-}
-
-uint8_t ti85_state::ti84p_port_0048_r() {
-    if (!(m_ti84p_port40 & 0b01))
-        return 0;
-
-    return ti84p_rtc_r(m_ti84p_rtc_currtime, 24);
-}
-
-void ti85_state::ti84p_port_0048_w(uint8_t data) {
-    ti84p_rtc_w(m_ti84p_rtc_currtime, 24, data);
-}
 
 uint8_t ti85_state::ti84pse_port_0055_r()
 {

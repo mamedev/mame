@@ -319,8 +319,8 @@ void ti85_state::ti83pse_io(address_map &map)
 	map(0x0037, 0x0037).rw(FUNC(ti85_state::ti83pse_ctimer3_loop_r), FUNC(ti85_state::ti83pse_ctimer3_loop_w));
 	map(0x0038, 0x0038).rw(FUNC(ti85_state::ti83pse_ctimer3_count_r), FUNC(ti85_state::ti83pse_ctimer3_count_w));
 
-	map(0x0055, 0x0055).r(FUNC(ti85_state::ti84pse_port_0055_r));
-	map(0x0056, 0x0056).r(FUNC(ti85_state::ti84pse_port_0056_r));
+	map(0x0055, 0x0055).mirror(0x20).r(FUNC(ti85_state::ti84pse_port_0055_r));
+	map(0x0056, 0x0056).mirror(0x20).r(FUNC(ti85_state::ti84pse_port_0056_r));
 }
 
 void ti85_state::ti84p_io(address_map &map)
@@ -354,18 +354,12 @@ void ti85_state::ti84p_io(address_map &map)
 	map(0x0037, 0x0037).rw(FUNC(ti85_state::ti83pse_ctimer3_loop_r), FUNC(ti85_state::ti83pse_ctimer3_loop_w));
 	map(0x0038, 0x0038).rw(FUNC(ti85_state::ti83pse_ctimer3_count_r), FUNC(ti85_state::ti83pse_ctimer3_count_w));
 
-    map(0x0040, 0x0040).rw(FUNC(ti85_state::ti84p_port_0040_r), FUNC(ti85_state::ti84p_port_0040_w));
-    map(0x0041, 0x0041).rw(FUNC(ti85_state::ti84p_port_0041_r), FUNC(ti85_state::ti84p_port_0041_w));
-    map(0x0042, 0x0042).rw(FUNC(ti85_state::ti84p_port_0042_r), FUNC(ti85_state::ti84p_port_0042_w));
-    map(0x0043, 0x0043).rw(FUNC(ti85_state::ti84p_port_0043_r), FUNC(ti85_state::ti84p_port_0043_w));
-    map(0x0044, 0x0044).rw(FUNC(ti85_state::ti84p_port_0044_r), FUNC(ti85_state::ti84p_port_0044_w));
-    map(0x0045, 0x0045).rw(FUNC(ti85_state::ti84p_port_0045_r), FUNC(ti85_state::ti84p_port_0045_w));
-    map(0x0046, 0x0046).rw(FUNC(ti85_state::ti84p_port_0046_r), FUNC(ti85_state::ti84p_port_0046_w));
-    map(0x0047, 0x0047).rw(FUNC(ti85_state::ti84p_port_0047_r), FUNC(ti85_state::ti84p_port_0047_w));
-    map(0x0048, 0x0048).rw(FUNC(ti85_state::ti84p_port_0048_r), FUNC(ti85_state::ti84p_port_0048_w));
-
-	map(0x0055, 0x0055).r(FUNC(ti85_state::ti84pse_port_0055_r));
-	map(0x0056, 0x0056).r(FUNC(ti85_state::ti84pse_port_0056_r));
+    map(0x0040, 0x0040).mirror(0x20).rw(FUNC(ti85_state::ti84p_rtc_control_r), FUNC(ti85_state::ti84p_rtc_control_w));
+    map(0x0041, 0x0044).mirror(0x20).rw(FUNC(ti85_state::ti84p_rtc_basetime_r), FUNC(ti85_state::ti84p_rtc_basetime_w));
+    map(0x0045, 0x0048).mirror(0x20).rw(FUNC(ti85_state::ti84p_rtc_currtime_r), FUNC(ti85_state::ti84p_rtc_currtime_w));
+    
+	map(0x0055, 0x0055).mirror(0x20).r(FUNC(ti85_state::ti84pse_port_0055_r));
+	map(0x0056, 0x0056).mirror(0x20).r(FUNC(ti85_state::ti84pse_port_0056_r));
 }
 
 void ti85_state::ti84pcse_io(address_map &map)
@@ -401,18 +395,12 @@ void ti85_state::ti84pcse_io(address_map &map)
 	map(0x0037, 0x0037).rw(FUNC(ti85_state::ti83pse_ctimer3_loop_r), FUNC(ti85_state::ti83pse_ctimer3_loop_w));
 	map(0x0038, 0x0038).rw(FUNC(ti85_state::ti83pse_ctimer3_count_r), FUNC(ti85_state::ti83pse_ctimer3_count_w));
 
-    map(0x0040, 0x0040).rw(FUNC(ti85_state::ti84p_port_0040_r), FUNC(ti85_state::ti84p_port_0040_w));
-    map(0x0041, 0x0041).rw(FUNC(ti85_state::ti84p_port_0041_r), FUNC(ti85_state::ti84p_port_0041_w));
-    map(0x0042, 0x0042).rw(FUNC(ti85_state::ti84p_port_0042_r), FUNC(ti85_state::ti84p_port_0042_w));
-    map(0x0043, 0x0043).rw(FUNC(ti85_state::ti84p_port_0043_r), FUNC(ti85_state::ti84p_port_0043_w));
-    map(0x0044, 0x0044).rw(FUNC(ti85_state::ti84p_port_0044_r), FUNC(ti85_state::ti84p_port_0044_w));
-    map(0x0045, 0x0045).rw(FUNC(ti85_state::ti84p_port_0045_r), FUNC(ti85_state::ti84p_port_0045_w));
-    map(0x0046, 0x0046).rw(FUNC(ti85_state::ti84p_port_0046_r), FUNC(ti85_state::ti84p_port_0046_w));
-    map(0x0047, 0x0047).rw(FUNC(ti85_state::ti84p_port_0047_r), FUNC(ti85_state::ti84p_port_0047_w));
-    map(0x0048, 0x0048).rw(FUNC(ti85_state::ti84p_port_0048_r), FUNC(ti85_state::ti84p_port_0048_w));
+    map(0x0040, 0x0040).mirror(0x20).rw(FUNC(ti85_state::ti84p_rtc_control_r), FUNC(ti85_state::ti84p_rtc_control_w));
+    map(0x0041, 0x0044).mirror(0x20).rw(FUNC(ti85_state::ti84p_rtc_basetime_r), FUNC(ti85_state::ti84p_rtc_basetime_w));
+    map(0x0045, 0x0048).mirror(0x20).rw(FUNC(ti85_state::ti84p_rtc_currtime_r), FUNC(ti85_state::ti84p_rtc_currtime_w));
     
-	map(0x0055, 0x0055).r(FUNC(ti85_state::ti84pse_port_0055_r));
-	map(0x0056, 0x0056).r(FUNC(ti85_state::ti84pse_port_0056_r));
+	map(0x0055, 0x0055).mirror(0x20).r(FUNC(ti85_state::ti84pse_port_0055_r));
+	map(0x0056, 0x0056).mirror(0x20).r(FUNC(ti85_state::ti84pse_port_0056_r));
 }
 
 void ti85_state::ti86_io(address_map &map)
