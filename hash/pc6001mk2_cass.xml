@@ -658,7 +658,6 @@ Eventually requires [tape] user load and save
 		<year>198?</year>
 		<publisher>テクノソフト (Tecno Soft)</publisher>
 		<notes><![CDATA[
-Holding left+shift on [keyboard] pauses game (verify)
 [joystick] works only with directional keys, fire 1 and 2 doesn't accelerate or brake
 ]]></notes>
 		<info name="usage" value="Mode 5, Page 3, BASIC" />
@@ -683,13 +682,10 @@ Holding left+shift on [keyboard] pauses game (verify)
 		</part>
 	</software>
 
-	<software name="punchbal" supported="no">
+	<software name="punchbal" supported="partial">
 		<description>Punch Ball Mario Bros.</description>
 		<year>1983</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<notes><![CDATA[
-Holding left+shift on [keyboard] pauses game (verify)
-]]></notes>
 		<info name="usage" value="Mode 5, Page 4, MONITOR" />
 		<info name="alt_title" value="パンチボールマリオブラザーズ"/>
 		<part name="snap" interface="pc6001_snap">

@@ -100,10 +100,9 @@ Arabian Rhapsody: pc6001mk2 draws without border colors (verify)
 		<year>1982</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<notes><![CDATA[
-Nostromo, Dual Alien: MAME crash with pc6001
-Steal Alien: returns back to BASIC in pc6001
+Steal Alien: stuck [keyboard] arrows
 ]]></notes>
-		<info name="usage" value="Mode 1, Page 1 for Demonstration, Nostromo and Steal Alien. Mode 1, Page 2 for Dual Alien and In the Woods"/>
+		<info name="usage" value="Mode 1, Page 1 for Demonstration, Nostromo and Steal Alien. Mode 1, Page 2 for Dual Alien and In the Woods. Requires -ram 16K"/>
 
 		<part name="snap1" interface="pc6001_snap">
 			<feature name="part_id" value="Demonstration"/>
@@ -137,15 +136,11 @@ Steal Alien: returns back to BASIC in pc6001
 		</part>
 	</software>
 
-	<software name="ax3" supported="no">
+	<software name="ax3" supported="partial">
 		<description>AX-3</description>
 		<year>1982</year>
 		<publisher>アスキー (ASCII)</publisher>
-		<notes><![CDATA[
-All games but Demo: punts back to How Many Pages in pc6001 (and crashes MAME with ram 64K)
-Cosmic Revo: invisible charset in pc6001
-]]></notes>
-		<info name="usage" value="Mode 1, Page 1 for Demo, Cosmic Revo, Micro Othello and Slot Poker. Mode 1, Page 2 for Inter-Fight"/>
+		<info name="usage" value="Mode 1, Page 1 for Demo, Cosmic Revo, Micro Othello and Slot Poker. Mode 1, Page 2 for Inter-Fight. Requires -ram 16K"/>
 
 		<part name="snap1" interface="pc6001_snap">
 			<feature name="part_id" value="Demonstration"/>
@@ -184,7 +179,7 @@ Cosmic Revo: invisible charset in pc6001
 		<year>1982</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<notes><![CDATA[
-Black Hole: non-functional [keyboard] and [joystick] inputs in pc6001
+Black Hole: non-functional [joystick] inputs
 ]]></notes>
 		<info name="usage" value="Mode 1, Page 1 for Demo, American Football, Black Hole and Shut the Box. Mode 1, Page 2 for Car Race"/>
 
@@ -220,13 +215,10 @@ Black Hole: non-functional [keyboard] and [joystick] inputs in pc6001
 		</part>
 	</software>
 
-	<software name="ax5" supported="no">
+	<software name="ax5" supported="partial">
 		<description>AX-5</description>
 		<year>1982</year>
 		<publisher>アスキー (ASCII)</publisher>
-		<notes><![CDATA[
-Olion: crashes MAME when pressing 'S' key in pc6001
-]]></notes>
 		<info name="usage" value="Mode 2, Page 2 for Olion. Mode 2, Page 1 for Quest"/>
 
 		<!-- Mode refers to the *GFX* mode -->
@@ -365,7 +357,6 @@ The Asterodian: [VDG] glitch for ASCII text in title (verify)
 		<publisher>アスキー (ASCII)</publisher>
 		<notes><![CDATA[
 3D Flight Simulator: non-functional [keyboard] in gameplay
-Blue Sky: [keyboard] doesn't allow hitting directions and space/shift key at same time (verify)
 ]]></notes>
 		<info name="usage" value="Mode 2, Page 1 for 3D Flight Simulator, Bounder Robo and Demonstration. Mode 2, Page 2 for Blue Sky"/>
 
@@ -682,9 +673,6 @@ Not extensively tested (language barrier)
 		<description>PonyCa 2 Game Series: Galac Convoy &amp; Shooting Invaders</description>
 		<year>1982</year>
 		<publisher>ポニカ (PonyCa)</publisher>
-		<notes><![CDATA[
-Both games: wants [keyboard] shift+S to start a game (verify)
-]]></notes>
 		<info name="usage" value="Mode 1, Page 2 for both games"/>
 		<info name="developer" value="Rhodus"/>
 		<info name="alt_title" value="ポニカ 2 ゲームシリーズ：ギャラクコンボイ&amp;シューティングインベーダーズ"/>
@@ -980,11 +968,11 @@ Optional [tape] load and save for construction mode
 		<year>1986</year>
 		<publisher>PiO</publisher>
 		<notes><![CDATA[
-[VDG] Doesn't draw title screen semigfxs in pc6001
+[VDG] Doesn't draw title screen semigfxs in pc6001 (btanb, check usage)
 Optional [tape] user level load and save
 ]]></notes>
 		<!-- TODO: does it really require the extended BASIC? It seem to load fine without as well -->
-		<info name="usage" value="Mode 3, Page 1"/>
+		<info name="usage" value="Mode 3, Page 1. Needs -ram 16K to load title screen GFXs properly."/>
 		<info name="developer" value="Kaw"/>
 
 		<part name="snap" interface="pc6001_snap">
@@ -1124,15 +1112,15 @@ Released as covermount under GTX(II)-3 and Paperware PC-6001(1)
 		</part>
 	</software>
 
-	<software name="takeoff" supported="no">
+	<software name="takeoff" supported="partial">
 		<description>Take Off 6000</description>
 		<!-- BasicMagazine 1989.10 -->
 		<year>1989</year>
 		<publisher>Mycom BASIC</publisher>
 		<notes><![CDATA[
-[VDG] doesn't show avoidable objects in pc6001
+[VDG] doesn't show avoidable objects in pc6001 (btanb, check usage)
 ]]></notes>
-		<info name="usage" value="Mode 1, Page 1"/>
+		<info name="usage" value="Mode 1, Page 1. Needs -ram 16K to be playable on base PC-6001"/>
 		<info name="developer" value="Keisuke Ikeda"/>
 		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="996">
