@@ -301,14 +301,20 @@ void flashbeats_state::machine_reset()
 
 // Publish the 5 LED lanes as named artwork outputs lane<r>_<c>, consumed by the
 // .lay. The lanes are bi-color, built from TWO on/off planes in display RAM, both
-// 5 rows of 0x60 (96) bytes (one row per lane), LEDs at even byte offsets 0..92
-// (2-byte stride [value][pad]) => 47 LEDs per lane:
+// 5 rows of 0x60 (96) bytes (one row per lane), cells at even byte offsets
+// (2-byte stride [value][pad]):
 //   * P0 (0xa0c000): the RED content
 //   * P1 (0xa0c1e0): the GREEN content
 // The two planes are independent; the game routinely sets both for the same LED.
 // The real cabinet's bi-color LEDs drive both dies at once, and diffusion mixes
 // them to yellow. Output state per LED: 0 = off, 1 = green, 2 = red, 3 = yellow
 // (both).
+//
+// PLANE WIDTHS DIFFER -> 47 LEDs, adjacent-OR green:
+// Measured across all attract/meter frames, the RED plane lights cells 0..46 (47
+// cells, 1:1 with the 47 physical LEDs) but the GREEN plane lights cells 0..47
+// (48 cells). The 48-cell green source maps onto the 47 LEDs by OR-ing each cell
+// with its neighbour: LED_green[i] = green_cell[i] | green_cell[i+1].
 //
 // Big-endian H8: byte at even address = high byte of the 16-bit display word.
 void flashbeats_state::update_lanes()
@@ -322,8 +328,9 @@ void flashbeats_state::update_lanes()
 		for (int i = 0; i < LANE_LEN; i++)
 		{
 			const offs_t off = lane * 0x60 + i * 2;
-			const bool red   = rd8(0xa0c000 + off) != 0;   // P0
-			const bool green = rd8(0xa0c1e0 + off) != 0;   // P1
+			const bool red   = rd8(0xa0c000 + off) != 0;   // P0: 47 cells, 1:1 per LED
+			// P1: 48 green cells OR'd down to 47 LEDs (this cell OR the next).
+			const bool green = rd8(0xa0c1e0 + off) != 0 || rd8(0xa0c1e0 + off + 2) != 0;
 			m_lane_led[lane][i] = (red && green) ? 3 : (red ? 2 : (green ? 1 : 0));
 		}
 	}
