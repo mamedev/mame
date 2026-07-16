@@ -28,6 +28,9 @@ protected:
 	virtual u8 read_data(u16 offset);
 	virtual void write_data(u16 offset, u8 data);
 
+	// override this to return false when the device shouldn't respond
+	virtual bool is_present() const { return true; }
+
 	// override this to properly identify your device in logging
 	virtual const char *get_tag();
 
