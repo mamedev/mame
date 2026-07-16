@@ -118,7 +118,6 @@ private:
 
 	uint8_t m_audio_result = 0;
 	uint8_t m_bank_val = 0;
-	uint8_t m_vblank = 0;
 };
 
 
@@ -210,13 +209,12 @@ uint8_t neoprint_state::unk_r()
 	/* ---- xx-- one of these two must be high */
 	/* ---- --xx checked right before entering into attract mode, presumably printer/camera related */
 
-	if (!machine().side_effects_disabled())
-		m_vblank = (m_screen->frame_number() & 0x1) ? 0x10 : 0x00;
+	const uint8_t vblank = (m_screen->frame_number() & 0x1) ? 0x10 : 0x00;
 
 	//if (m_maincpu->pc() != 0x1504 && m_maincpu->pc() != 0x5f86 && m_maincpu->pc() != 0x5f90)
 	//  printf("%08x\n",m_maincpu->pc());
 
-	return m_vblank| 4 | 3;
+	return vblank | 4 | 3;
 }
 
 uint8_t neoprint_state::audio_result_r()
