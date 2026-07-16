@@ -167,13 +167,13 @@ Whole view is ~16:9 and the content is grouped so MAME centers it vertically.
 	</group>
 
 	<!-- dark background -->
-	<element name="panel"><rect><color red="0.03" green="0.03" blue="0.05" /></rect></element>
+	<element name="panel"><rect><color red="0.015" green="0.015" blue="0.025" /></rect></element>
 
 	<!-- Flash-lit background wash:
 	     unlit state matches the panel background; lit state is a lighter
 		 neutral tint of the background. -->
 	<element name="flash_glow" defstate="0">
-		<rect state="0"><color red="0.03" green="0.03" blue="0.05" /></rect>
+		<rect state="0"><color red="0.015" green="0.015" blue="0.025" /></rect>
 		<rect state="1"><color red="0.12" green="0.12" blue="0.16" /></rect>
 	</element>
 
