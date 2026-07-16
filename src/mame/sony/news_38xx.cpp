@@ -52,6 +52,7 @@
 #include "machine/upd765.h"
 #include "dmac_0266.h"
 #include "news_hid.h"
+#include "nwb_512.h"
 #include "machine/ncr5380.h"
 
 // video
@@ -74,6 +75,7 @@
 #define LOG_CPU (1U << 5)
 #define LOG_PARALLEL (1U << 6)
 
+#define VERBOSE 0
 #include "logmacro.h"
 
 
@@ -88,8 +90,6 @@ constexpr auto DISABLED = "disabled";
 class news_38xx_state : public driver_device
 {
 public:
-	static constexpr feature_type unemulated_features() { return feature::GRAPHICS; }
-
 	news_38xx_state(machine_config const &mconfig, device_type type, char const *tag) :
 		driver_device(mconfig, type, tag),
 		m_cpu(*this, "cpu"),
@@ -107,7 +107,8 @@ public:
 		m_parallel(*this, "parallel"),
 		m_parallel_data(*this, "parallel_data"),
 		m_eprom(*this, "eprom"),
-		m_led(*this, "led%u", 0U)
+		m_led(*this, "led%u", 0U),
+		m_fb(*this, "nwb_512")
 	{
 	}
 
@@ -116,7 +117,7 @@ public:
 	void init_common() ATTR_COLD;
 
 protected:
-	// Not all IRQs feed into the status register directly
+	// Not all IRQs feed into the status register directly.
 	// Because we have to handle IRQ data being stored everywhere and/or apply filtering to the status register,
 	// apply the same strategy used in news_68k_iop, which also had to deal with this problem.
 	enum class iop_irq : unsigned
@@ -145,6 +146,8 @@ protected:
 	};
 	static constexpr u32 IOP_NMI_MASK = 1 << u32(iop_irq::FDCDRQ) |
 										1 << u32(iop_irq::SCC) |
+										1 << u32(iop_irq::KEYBOARD) |
+										1 << u32(iop_irq::MOUSE) |
 										1 << u32(iop_irq::SCSI0) |
 										1 << u32(iop_irq::SCSI1) |
 										1 << u32(iop_irq::LANCE) |
@@ -259,6 +262,9 @@ protected:
 	required_region_ptr<u32> m_eprom;
 	output_finder<4> m_led;
 	std::unique_ptr<u16[]> m_net_ram;
+
+	// Framebuffer and CRT
+	required_device<nwb_512_device> m_fb;
 
 	// For RAM test-and-set implementation
 	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_memory_access;
@@ -422,7 +428,10 @@ void news_38xx_state::iop_map(address_map &map)
 	map(0x2c000000, 0x2c0000ff).rom().region("idrom", 0);
 	map(0x2c000100, 0x2c000103).portr("SW1");
 
-	map(0x2e000000, 0x2effffff).r(FUNC(news_38xx_state::iop_bus_error_r)).mirror(0x10000000); // Expansion I/O
+	map(0x2e000000, 0x2eefffff).r(FUNC(news_38xx_state::iop_bus_error_r)).mirror(0x10000000); // Expansion I/O
+
+	// NWB-512 Monochrome Framebuffer (816x1024)
+	map(0x2ef00000, 0x2effffff).m(m_fb, FUNC(nwb_512_device::map));
 }
 
 void news_38xx_state::iop_vector_map(address_map &map)
@@ -888,7 +897,7 @@ void news_38xx_state::common(machine_config &config)
 		});
 
 	// scc channel A
-	RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
+	RS232_PORT(config, m_serial[0], default_rs232_devices, nullptr);
 	m_serial[0]->cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
 	m_serial[0]->dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
 	m_serial[0]->rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
@@ -985,6 +994,9 @@ void news_38xx_state::common(machine_config &config)
 	m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(*this, FUNC(news_38xx_state::irq_w<iop_irq::KEYBOARD>));
 	m_hid->irq_out<news_hid_hle_device::MOUSE>().set(*this, FUNC(news_38xx_state::irq_w<iop_irq::MOUSE>));
 
+	// NWB-512 monochrome framebuffer + NWP-512D 15" Monochrome Display (816x1024)
+	NWB_512(config, m_fb);
+
 	SOFTWARE_LIST(config, "software_list").set_original("sony_news").set_filter("RISC,NWS3000");
 }
 
@@ -1006,8 +1018,8 @@ INPUT_PORTS_START(nws3860)
 	PORT_START("SW1")
 	PORT_DIPNAME(0x07000000, 0x07000000, "Display") PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(0x07000000, "Console")
-	PORT_DIPSETTING(0x06000000, "NWB-512")
-	PORT_DIPSETTING(0x03000000, "NWB-225A")
+	PORT_DIPSETTING(0x06000000, "NWB-225A")
+	PORT_DIPSETTING(0x03000000, "NWB-512")
 	PORT_DIPSETTING(0x00000000, "Autoselect")
 
 	PORT_DIPNAME(0x08000000, 0x08000000, "Boot Device") PORT_DIPLOCATION("SW1:4")
