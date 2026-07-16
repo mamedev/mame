@@ -10,9 +10,9 @@
       - SCN2661B EPCI -> host (SS97 = 38400 7O1 XON/XOFF)
       - detached keyboard (s97801_kbd LLE device) on the 8031 on-chip UART (TH1=0xD0
         -> f_cpu/18432 = 600.0 baud at 11.0592 MHz, matching the keyboard exactly)
-    The D26/D21/D23 EPROMs were imaged from Plamen Mihaylov's board (W26361-D253, the
-    second revision), whose clock modules are 22.1184 MHz (8031 = /2 = 11.0592 MHz, video
-    dot clock) + 4.9152 MHz (EPCI baud); his matched K111-V1 keyboard supplied the kbd dump.
+    The D26/D21/D23 EPROMs were imaged from a W26361-D253 (second revision) board, whose
+    clock modules are 22.1184 MHz (8031 = /2 = 11.0592 MHz, video dot clock) + 4.9152 MHz
+    (EPCI baud); the matched K111-V1 keyboard of the same unit supplied the kbd dump.
     (The earlier D311 revision carries 24.000 MHz instead: 12 MHz CPU, 651-baud kbd link,
     same 1.92 crystal pairing satisfied by a 6.25 MHz keyboard.)
     ROMs, board photos and the full RE notes are archived at
@@ -36,6 +36,7 @@ s97801_device::s97801_device(const machine_config &mconfig, const char *tag, dev
 	, m_avdc(*this, "avdc")
 	, m_epci(*this, "epci")
 	, m_kbd(*this, "kbd")
+	, m_screen(*this, "screen")
 	, m_chargen(*this, "chargen")
 	, m_txd_cb(*this)
 	, m_kbd_rxd(1)
@@ -154,16 +155,15 @@ void s97801_device::device_add_mconfig(machine_config &config)
 	m_cpu->port_in_cb<3>().set(FUNC(s97801_device::cpu_p3_r));  // P3.0 = keyboard RX
 	m_cpu->port_out_cb<3>().set(FUNC(s97801_device::cpu_p3_w)); // P3.1 = keyboard TX
 
-	SIEMENS_97801_KBD(config, m_kbd, 0);
+	SIEMENS_97801_KBD(config, m_kbd);
 	m_kbd->txd_handler().set(FUNC(s97801_device::kbd_txd_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_color(rgb_t::green());
-	screen.set_raw(22.1184_MHz_XTAL, 912, 0, 640, 423, 0, 400); // ~57.3 Hz on the D253 clocking
-	screen.set_screen_update(m_avdc, FUNC(scn2672_device::screen_update));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER); // white-phosphor tube
+	m_screen->set_raw(22.1184_MHz_XTAL, 912, 0, 640, 423, 0, 400); // ~57.3 Hz on the D253 clocking
+	m_screen->set_screen_update(m_avdc, FUNC(scn2672_device::screen_update));
 
 	SCN2672(config, m_avdc, 22.1184_MHz_XTAL / 8);
-	m_avdc->set_screen("screen");
+	m_avdc->set_screen(m_screen);
 	m_avdc->set_character_width(8);
 	m_avdc->set_addrmap(0, &s97801_device::char_map);
 	m_avdc->set_addrmap(1, &s97801_device::attr_map);

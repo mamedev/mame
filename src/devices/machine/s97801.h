@@ -10,6 +10,8 @@
 #include "machine/scn_pci.h"
 #include "video/scn2674.h"
 
+#include "screen.h"
+
 // Siemens 97801 terminal (LLE) -- core device.  The serial console for SINIX on the PC-MX2.
 // ROMs, board photos and the full RE notes are archived at
 // https://github.com/davidlrand/mame-system-media/tree/main/Siemens-PC-MX2.  Exposed as a serial peripheral: rxd_w() is the
@@ -49,6 +51,7 @@ private:
 	required_device<scn2672_device> m_avdc;
 	required_device<scn2661b_device> m_epci;
 	required_device<s97801_kbd_device> m_kbd;
+	required_device<screen_device> m_screen;
 	required_region_ptr<u8> m_chargen;
 	devcb_write_line m_txd_cb;
 

@@ -5,524 +5,423 @@
 	<element name="key_0" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="CAPS" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="CAPS" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="CAPS"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_1" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="F1" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="F1" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="F1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_2" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="F2" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="F2" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="F2"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_3" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="F3" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="F3" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="F3"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_4" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="F4" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="F4" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="F4"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_5" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="F5" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="F5" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="F5"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_6" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="F6" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="F6" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="F6"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_7" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="F7" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="F7" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="F7"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_8" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="F8" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="F8" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="F8"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_9" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="F9" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="F9" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="F9"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_10" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="F10" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="F10" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="F10"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_11" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="F11" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="F11" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="F11"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_12" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="F12" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="F12" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="F12"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_13" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="F13" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="F13" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="F13"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_14" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="F14" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="F14" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="F14"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_15" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="F15" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="F15" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="F15"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_16" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="F16" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="F16" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="F16"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_17" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="F17" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="F17" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="F17"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_18" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="F18" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="F18" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="F18"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_19" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="F19" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="F19" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="F19"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_20" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="F20" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="F20" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="F20"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_21" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="PRINT" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="PRINT" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="PRINT"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_22" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="ESC" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="ESC" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="ESC"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_23" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="1" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="1" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="!" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
-		<text string="!" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
+		<text string="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
+		<text string="!"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
 	</element>
 	<element name="key_24" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="2" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="2" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="&quot;" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
-		<text string="&quot;" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
+		<text string="2"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
+		<text string="&quot;"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
 	</element>
 	<element name="key_25" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="3" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="3" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="#" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
-		<text string="#" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
+		<text string="3"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
+		<text string="#"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
 	</element>
 	<element name="key_26" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="4" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="4" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="$" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
-		<text string="$" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
+		<text string="4"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
+		<text string="$"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
 	</element>
 	<element name="key_27" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="5" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="5" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="%" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
-		<text string="%" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
+		<text string="5"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
+		<text string="%"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
 	</element>
 	<element name="key_28" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="6" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="6" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="&amp;" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
-		<text string="&amp;" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
+		<text string="6"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
+		<text string="&amp;"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
 	</element>
 	<element name="key_29" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="7" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="7" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="'" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
-		<text string="'" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
+		<text string="7"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
+		<text string="'"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
 	</element>
 	<element name="key_30" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="8" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="8" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="(" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
-		<text string="(" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
+		<text string="8"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
+		<text string="("><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
 	</element>
 	<element name="key_31" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="9" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="9" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string=")" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
-		<text string=")" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
+		<text string="9"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
+		<text string=")"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
 	</element>
 	<element name="key_32" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="0" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="0" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="_" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
-		<text string="_" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
+		<text string="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
+		<text string="_"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
 	</element>
 	<element name="key_33" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="-" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="-" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="=" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
-		<text string="=" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
+		<text string="-"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
+		<text string="="><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
 	</element>
 	<element name="key_34" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="^" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="^" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="~" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
-		<text string="~" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
+		<text string="^"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
+		<text string="~"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
 	</element>
 	<element name="key_35" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="⌫" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="⌫" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="⌫"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_36" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="DEL" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="DEL" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="DEL"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_37" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="⇤" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="⇤" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="⇤"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_38" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="⇥" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="⇥" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="⇥"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_39" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="Q" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="Q" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="Q"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_40" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="W" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="W" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="W"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_41" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="E" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="E" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="E"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_42" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="R" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="R" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="R"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_43" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="T" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="T" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="T"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_44" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="Y" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="Y" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="Y"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_45" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="U" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="U" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="U"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_46" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="I" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="I" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="I"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_47" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="O" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="O" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="O"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_48" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="P" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="P" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="P"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_49" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="@" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="@" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="`" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
-		<text string="`" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
+		<text string="@"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
+		<text string="`"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
 	</element>
 	<element name="key_50" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="{" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="{" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="[" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
-		<text string="[" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
+		<text string="{"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
+		<text string="["><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
 	</element>
 	<element name="key_51" defstate="0">
-		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="20" height="20.6" /></rect>
-		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="20" height="20.6" /></rect>
-		<text string="↵" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="8.2" width="19" height="4.2" /></text>
-		<text string="↵" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="8.2" width="19" height="4.2" /></text>
+		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="15.6" height="20.6" /></rect>
+		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="15.6" height="20.6" /></rect>
+		<text string="↵"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="8.2" width="14.6" height="4.2" /></text>
 	</element>
 	<element name="key_52" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="CTRL" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="CTRL" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="CTRL"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_53" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="LOCK" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="LOCK" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="LOCK"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_54" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="A" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="A" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="A"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_55" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="S" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="S" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="S"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_56" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="D" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="D" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="D"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_57" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="F" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="F" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="F"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_58" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="G" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="G" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="G"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_59" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="H" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="H" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="H"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_60" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="J" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="J" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="J"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_61" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="K" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="K" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="K"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_62" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="L" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="L" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="L"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_63" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string=";" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string=";" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="+" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
-		<text string="+" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
+		<text string=";"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
+		<text string="+"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
 	</element>
 	<element name="key_64" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string=":" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string=":" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="*" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
-		<text string="*" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
+		<text string=":"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
+		<text string="*"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
 	</element>
 	<element name="key_65" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="}" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="}" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="]" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
-		<text string="]" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
+		<text string="}"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
+		<text string="]"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
 	</element>
 	<element name="key_66" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="15" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="15" height="10" /></rect>
-		<text string="SHIFT" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="14" height="4.2" /></text>
-		<text string="SHIFT" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="14" height="4.2" /></text>
+		<text string="SHIFT"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="14" height="4.2" /></text>
 	</element>
 	<element name="key_67" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="\" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="\" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="|" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
-		<text string="|" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
+		<text string="\"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
+		<text string="|"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
 	</element>
 	<element name="key_68" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="Z" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="Z" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="Z"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_69" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="X" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="X" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="X"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_70" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="C" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="C" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="C"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_71" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="V" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="V" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="V"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_72" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="B" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="B" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="B"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_73" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="N" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="N" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="N"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_74" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="M" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="M" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="M"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_75" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="," state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="," state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="&lt;" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
-		<text string="&lt;" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
+		<text string=","><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
+		<text string="&lt;"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
 	</element>
 	<element name="key_76" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="." state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="." state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="&gt;" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
-		<text string="&gt;" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
+		<text string="."><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
+		<text string="&gt;"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
 	</element>
 	<element name="key_77" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="/" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="/" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="?" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
-		<text string="?" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
+		<text string="/"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
+		<text string="?"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
 	</element>
 	<element name="key_78" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="15" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="15" height="10" /></rect>
-		<text string="SHIFT" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="14" height="4.2" /></text>
-		<text string="SHIFT" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="14" height="4.2" /></text>
+		<text string="SHIFT"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="14" height="4.2" /></text>
 	</element>
 	<element name="key_79" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.55" green="0.53" blue="0.50" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="MENU" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="MENU" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="MENU"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_80" defstate="0">
 		<rect state="0"><color red="0.76" green="0.74" blue="0.70" /><bounds x="0" y="0" width="94.8" height="10" /></rect>
@@ -543,112 +442,89 @@
 	<element name="key_84" defstate="0">
 		<rect state="0"><color red="0.82" green="0.52" blue="0.24" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.60" green="0.36" blue="0.14" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="HELP" state="0"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="HELP" state="1"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="HELP"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_85" defstate="0">
 		<rect state="0"><color red="0.82" green="0.52" blue="0.24" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.60" green="0.36" blue="0.14" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="START" state="0"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="START" state="1"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="START"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_86" defstate="0">
 		<rect state="0"><color red="0.82" green="0.52" blue="0.24" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.60" green="0.36" blue="0.14" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="END" state="0"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="END" state="1"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="END"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_87" defstate="0">
 		<rect state="0"><color red="0.82" green="0.52" blue="0.24" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.60" green="0.36" blue="0.14" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="DEL" state="0"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="0.833333" width="9" height="2.77778" /></text>
-		<text string="DEL" state="1"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="0.833333" width="9" height="2.77778" /></text>
-		<text string="CHAR" state="0"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="3.61111" width="9" height="2.77778" /></text>
-		<text string="CHAR" state="1"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="3.61111" width="9" height="2.77778" /></text>
-		<text string="INS" state="0"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="6.38889" width="9" height="2.77778" /></text>
-		<text string="INS" state="1"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="6.38889" width="9" height="2.77778" /></text>
+		<text string="DEL"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="0.833333" width="9" height="2.77778" /></text>
+		<text string="CHAR"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="3.61111" width="9" height="2.77778" /></text>
+		<text string="INS"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="6.38889" width="9" height="2.77778" /></text>
 	</element>
 	<element name="key_88" defstate="0">
 		<rect state="0"><color red="0.82" green="0.52" blue="0.24" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.60" green="0.36" blue="0.14" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="DEL" state="0"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="0.833333" width="9" height="2.77778" /></text>
-		<text string="DEL" state="1"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="0.833333" width="9" height="2.77778" /></text>
-		<text string="WORD" state="0"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="3.61111" width="9" height="2.77778" /></text>
-		<text string="WORD" state="1"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="3.61111" width="9" height="2.77778" /></text>
-		<text string="INS" state="0"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="6.38889" width="9" height="2.77778" /></text>
-		<text string="INS" state="1"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="6.38889" width="9" height="2.77778" /></text>
+		<text string="DEL"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="0.833333" width="9" height="2.77778" /></text>
+		<text string="WORD"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="3.61111" width="9" height="2.77778" /></text>
+		<text string="INS"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="6.38889" width="9" height="2.77778" /></text>
 	</element>
 	<element name="key_89" defstate="0">
 		<rect state="0"><color red="0.82" green="0.52" blue="0.24" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.60" green="0.36" blue="0.14" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="DEL" state="0"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="0.833333" width="9" height="2.77778" /></text>
-		<text string="DEL" state="1"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="0.833333" width="9" height="2.77778" /></text>
-		<text string="LINE" state="0"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="3.61111" width="9" height="2.77778" /></text>
-		<text string="LINE" state="1"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="3.61111" width="9" height="2.77778" /></text>
-		<text string="INS" state="0"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="6.38889" width="9" height="2.77778" /></text>
-		<text string="INS" state="1"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="6.38889" width="9" height="2.77778" /></text>
+		<text string="DEL"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="0.833333" width="9" height="2.77778" /></text>
+		<text string="LINE"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="3.61111" width="9" height="2.77778" /></text>
+		<text string="INS"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="6.38889" width="9" height="2.77778" /></text>
 	</element>
 	<element name="key_90" defstate="0">
 		<rect state="0"><color red="0.66" green="0.64" blue="0.35" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.48" green="0.46" blue="0.24" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="▲" state="0"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="▲" state="1"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="▲"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_91" defstate="0">
 		<rect state="0"><color red="0.66" green="0.64" blue="0.35" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.48" green="0.46" blue="0.24" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="↑" state="0"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="↑" state="1"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="↑"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_92" defstate="0">
 		<rect state="0"><color red="0.66" green="0.64" blue="0.35" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.48" green="0.46" blue="0.24" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="▼" state="0"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="▼" state="1"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="▼"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_93" defstate="0">
 		<rect state="0"><color red="0.66" green="0.64" blue="0.35" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.48" green="0.46" blue="0.24" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="←" state="0"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="←" state="1"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="←"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_94" defstate="0">
 		<rect state="0"><color red="0.66" green="0.64" blue="0.35" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.48" green="0.46" blue="0.24" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="↖" state="0"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="↖" state="1"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="↖"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_95" defstate="0">
 		<rect state="0"><color red="0.66" green="0.64" blue="0.35" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.48" green="0.46" blue="0.24" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="→" state="0"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="→" state="1"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="→"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_96" defstate="0">
 		<rect state="0"><color red="0.66" green="0.64" blue="0.35" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.48" green="0.46" blue="0.24" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="⇤~" state="0"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="⇤~" state="1"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="⇤~"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_97" defstate="0">
 		<rect state="0"><color red="0.66" green="0.64" blue="0.35" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.48" green="0.46" blue="0.24" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="↓" state="0"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="↓" state="1"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="↓"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_98" defstate="0">
 		<rect state="0"><color red="0.66" green="0.64" blue="0.35" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.48" green="0.46" blue="0.24" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="~⇥" state="0"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="~⇥" state="1"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="~⇥"><color red="0.10" green="0.10" blue="0.05" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_99" defstate="0">
 		<rect state="0"><color red="0.82" green="0.52" blue="0.24" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.60" green="0.36" blue="0.14" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="CH" state="0"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="CH" state="1"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
-		<text string="CODE" state="0"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
-		<text string="CODE" state="1"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
+		<text string="CH"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="1.15385" width="9" height="3.84615" /></text>
+		<text string="CODE"><color red="0.10" green="0.06" blue="0.03" /><bounds x="0.5" y="5" width="9" height="3.84615" /></text>
 	</element>
 	<element name="key_100" defstate="0">
 		<rect state="0"><color red="0.80" green="0.55" blue="0.30" /><bounds x="0" y="0" width="10" height="10" /></rect>
@@ -669,142 +545,118 @@
 	<element name="key_104" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="+" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="+" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="+"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_105" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="-" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="-" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="-"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_106" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="*" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="*" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="*"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_107" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="÷" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="÷" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="÷"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_108" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="=" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="=" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="="><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_109" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="CE" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="CE" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="CE"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_110" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="7" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="7" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="7"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_111" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="8" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="8" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="8"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_112" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="9" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="9" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="9"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_113" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="%" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="%" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="%"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_114" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="-" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="-" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="-"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_115" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="4" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="4" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="4"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_116" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="5" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="5" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="5"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_117" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="6" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="6" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="6"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_118" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="20.6" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="20.6" /></rect>
-		<text string="EN" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="6.1" width="9" height="4.2" /></text>
-		<text string="EN" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="6.1" width="9" height="4.2" /></text>
-		<text string="TER" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="10.3" width="9" height="4.2" /></text>
-		<text string="TER" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="10.3" width="9" height="4.2" /></text>
+		<text string="EN"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="6.1" width="9" height="4.2" /></text>
+		<text string="TER"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="10.3" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_119" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="0" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="0" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_120" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="1" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="1" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_121" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="2" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="2" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="2"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_122" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="3" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="3" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="3"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_123" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="00" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="00" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="00"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_124" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="000" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="000" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="000"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_125" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string=".," state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string=".," state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string=".,"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="key_126" defstate="0">
 		<rect state="0"><color red="0.86" green="0.85" blue="0.82" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="1"><color red="0.62" green="0.61" blue="0.58" /><bounds x="0" y="0" width="10" height="10" /></rect>
-		<text string="SP" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
-		<text string="SP" state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
+		<text string="SP"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0.5" y="2.9" width="9" height="4.2" /></text>
 	</element>
 	<element name="led" defstate="0">
 		<disk state="0"><color red="0.12" green="0.22" blue="0.12" /></disk>
@@ -879,7 +731,7 @@
 		<element ref="key_48" inputtag="term:kbd:COL9" inputmask="0x04"><bounds x="11.66" y="15.31" width="0.94" height="0.94" /></element>
 		<element ref="key_49" inputtag="term:kbd:COL10" inputmask="0x04"><bounds x="12.72" y="15.31" width="0.94" height="0.94" /></element>
 		<element ref="key_50" inputtag="term:kbd:COL15" inputmask="0x04"><bounds x="13.78" y="15.31" width="0.94" height="0.94" /></element>
-		<element ref="key_51" inputtag="term:kbd:COL14" inputmask="0x04"><bounds x="14.84" y="15.31" width="1.94" height="2" /></element>
+		<element ref="key_51" inputtag="term:kbd:COL14" inputmask="0x04"><bounds x="14.84" y="15.31" width="1.5" height="2" /></element>
 		<element ref="key_52" inputtag="term:kbd:MOD" inputmask="0x04"><bounds x="0" y="16.37" width="0.94" height="0.94" /></element>
 		<element ref="key_53" inputtag="term:kbd:MOD" inputmask="0x08"><bounds x="1.06" y="16.37" width="0.94" height="0.94" /></element>
 		<element ref="key_54" inputtag="term:kbd:COL0" inputmask="0x08"><bounds x="2.12" y="16.37" width="0.94" height="0.94" /></element>
