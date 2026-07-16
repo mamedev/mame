@@ -553,12 +553,8 @@ void pc6001mk2_state::mk2_system_latch_w(uint8_t data)
 
 inline void pc6001mk2_state::refresh_crtc_params()
 {
-	/* Apparently bitmap modes changes the screen res to 320 x 200 */
 	rectangle visarea = m_screen->visible_area();
-	int y_height;
-
-	// TODO: probably needs the *actual* mode used to fix hudson3 bottom part
-	y_height = (m_exgfx_bitmap_mode || m_exgfx_2bpp_mode) ? 200 : 240;
+	const int y_height = (m_exgfx_bitmap_mode || m_exgfx_2bpp_mode || m_exgfx_text_mode) ? 200 : 240;
 
 	visarea.set(0, (320) - 1, 0, (y_height) - 1);
 
@@ -904,7 +900,8 @@ inline void pc6001mk2sr_state::refresh_crtc_params()
 	}
 	/* Apparently bitmap modes changes the screen res to 320 x 200 */
 	rectangle visarea = m_screen->visible_area();
-	const int y_height = (m_sr_text_mode) ? 240 : 200;
+	//const int y_height = (m_sr_text_mode) ? 240 : 200;
+	const int y_height = 200;
 	const int x_width = (m_sr_text_mode) ? (m_width80 ? 640 : 320) : 320;
 
 	visarea.set(0, (x_width) - 1, 0, (y_height) - 1);

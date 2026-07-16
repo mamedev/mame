@@ -489,20 +489,20 @@ uint32_t pc6001mk2_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 				---- xxxx fg color
 				Note that the exgfx banks a different gfx ROM
 				*/
-				int tile = m_video_base[(x+(y*40))+0x400] + 0x200;
+				int tile = m_video_base[(x+(y*40)) + 0x400] + 0x200;
 				int attr = m_video_base[(x+(y*40)) & 0x3ff];
 				tile += ((attr & 0x80) << 1);
 
-				for(int yi = 0; yi < 12; yi++)
+				for(int yi = 0; yi < 10; yi++)
 				{
 					for(int xi = 0; xi < 8; xi++)
 					{
 						int res_x = (x * 8) + xi;
-						int res_y = (y * 12) + yi;
+						int res_y = (y * 10) + yi;
 
 						// pc6001mk2sr in mk2 text mode uses this as 8x10
 						// (tv roms have junk afterwards)
-						int pen = yi >= 10 ? 0 : BIT(gfx_data[(tile * 0x10) + yi], 7 - xi);
+						int pen = BIT(gfx_data[(tile * 0x10) + yi], 7 - xi);
 
 						int fgcol = (attr & 0x0f) + 0x10;
 						int bgcol = ((attr & 0x70) >> 4) + 0x10 + ((m_bgcol_bank & 2) << 2);
@@ -539,7 +539,10 @@ uint32_t pc6001mk2sr_state::screen_update(screen_device &screen, bitmap_ind16 &b
 
 	if(m_sr_text_mode == true) // text mode
 	{
-		const u8 text_cols = (m_width80 + 1) * 40;
+		const u8 text_cols = 40 << m_width80;
+		// WIDTH 40,25 or WIDTH 80,25 in 66SR BASIC
+		const u8 y_size = m_sr_text_rows == 25 ? 8 : 10;
+		const u16 char_bank = m_sr_text_rows == 25 ? 0x1000 : 0x2000;
 
 		for(int y = 0; y < m_sr_text_rows; y++)
 		{
@@ -549,15 +552,15 @@ uint32_t pc6001mk2sr_state::screen_update(screen_device &screen, bitmap_ind16 &b
 				int attr = m_video_base[(x + (y * text_cols)) * 2 + 1];
 				tile += ((attr & 0x80) << 1);
 
-				for(int yi = 0; yi < 12; yi++)
+				for(int yi = 0; yi < y_size; yi++)
 				{
-					int res_y = y * 12 + yi;
+					int res_y = y * y_size + yi;
 
 					for(int xi = 0; xi < 8; xi++)
 					{
 						int res_x = x * 8 + xi;
 
-						int pen = gfx_data[(tile * 0x10) + yi] >> (7 - xi) & 1;
+						int pen = BIT(gfx_data[((tile * 0x10) + yi) | char_bank], 7 - xi);
 
 						int fgcol = m_sr_clut[(attr & 0x0f)] + 0x10;
 						int bgcol = m_sr_clut[((attr & 0x70) >> 4) | 8] + 0x10; //+ m_bgcol_bank;
