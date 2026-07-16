@@ -307,6 +307,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/neo_zmc.h,MACHINES["NEO_ZMC"] = true
+---------------------------------------------------
+
+if MACHINES["NEO_ZMC"] then
+	files {
+		MAME_DIR .. "src/devices/machine/neo_zmc.cpp",
+		MAME_DIR .. "src/devices/machine/neo_zmc.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/53c810.h,MACHINES["LSI53C810"] = true
 ---------------------------------------------------
 
