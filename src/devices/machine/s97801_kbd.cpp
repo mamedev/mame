@@ -14,8 +14,8 @@
 
     A Philips MAB 8035HL (MCS-48, ROM-less) executes the K111 EPROM
     (P26361-K111, AM2732A/D2732A, 2 KB used) unmodified.  The firmware RE
-    (annotated disassembly archived with the ROMs at
-    https://github.com/davidlrand/mame-system-media/tree/main/Siemens-PC-MX2) established:
+    (key positions cross-checked against the SINIX /etc/termcap "standard" entry
+    documented in SINIX Schnittstellen Benutzerhandbuch U2300-J-Z95-1) established:
 
       BUS  in  key matrix row sense for the column selected on P1.0-3
                (16 columns x 8 rows, codes = rowbit*16+column -> the char/

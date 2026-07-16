@@ -15,8 +15,8 @@
     (EPCI baud); the matched K111-V1 keyboard of the same unit supplied the kbd dump.
     (The earlier D311 revision carries 24.000 MHz instead: 12 MHz CPU, 651-baud kbd link,
     same 1.92 crystal pairing satisfied by a 6.25 MHz keyboard.)
-    ROMs, board photos and the full RE notes are archived at
-    https://github.com/davidlrand/mame-system-media/tree/main/Siemens-PC-MX2.
+    References: Transdata 970/9780 Wartungshandbuch; SINIX Schnittstellen Benutzerhandbuch,
+    U2300-J-Z95-1 (12/1985) and its 1987 edition; terminal board W26361-D253.
 
     Packaged as a device so it can serve as a serial terminal for any host (its real use is the
     PC-MX2 SERAD port): rxd_w() = host->terminal, txd_handler() = terminal->host.

@@ -13,8 +13,7 @@
 #include "screen.h"
 
 // Siemens 97801 terminal (LLE) -- core device.  The serial console for SINIX on the PC-MX2.
-// ROMs, board photos and the full RE notes are archived at
-// https://github.com/davidlrand/mame-system-media/tree/main/Siemens-PC-MX2.  Exposed as a serial peripheral: rxd_w() is the
+// Exposed as a serial peripheral: rxd_w() is the
 // host->terminal line, txd_handler() the terminal->host line (the firmware runs the SCN2661 EPCI
 // at 38400 7O1 XON/XOFF).  The detached keyboard is the s97801_kbd LLE device on the 8031's
 // on-chip UART (600 baud both ways, firmware-timed).
