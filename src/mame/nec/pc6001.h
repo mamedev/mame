@@ -59,6 +59,7 @@ public:
 		, m_kbd(*this, "kbd")
 		, m_cart_bank(*this, "cart_bank")
 		, m_palette(*this, "palette")
+		, m_cas_maxsize(0)
 	{ }
 
 	void system_latch_w(uint8_t data);

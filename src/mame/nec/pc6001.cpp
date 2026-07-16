@@ -190,9 +190,14 @@ inline void pc6001_state::set_timer_divider()
 
 void pc6001_state::system_latch_w(uint8_t data)
 {
-	static const uint16_t startaddr[] = {0xC000, 0xE000, 0x8000, 0xA000 };
+	// NOTE: swapped in memory map
+	// static const uint16_t startaddr[] = { 0xC000, 0xE000, 0x8000, 0xA000 };
 
-	m_video_base = &m_ram->pointer()[startaddr[(data >> 1) & 0x03] - 0x8000];
+	// make sure anything doesn't try mapping out of bounds
+	// (that would either cause havoc in VDG or system just do this anyway)
+	const u32 ram_mask = ((m_ram->size() == 32 * 1024) << 1) | 0x01;
+
+	m_video_base = &m_ram->pointer()[((data >> 1) & ram_mask) << 13];
 
 	cassette_motor_control((data & 8) == 8);
 	m_sys_latch = data;
@@ -289,7 +294,18 @@ void pc6001_state::pc6001_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom().nopw();
 	map(0x4000, 0x7fff).m(m_cart_bank, FUNC(address_map_bank_device::amap8));
-	map(0x8000, 0xffff).rw(m_ram, FUNC(ram_device::read), FUNC(ram_device::write));
+	map(0x8000, 0xbfff).lrw8(
+		NAME([this] (offs_t offset) -> u8 {
+			if (m_ram->size() == 32 * 1024)
+				return m_ram->pointer()[offset | 0x4000];
+			return 0xff;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			if (m_ram->size() == 32 * 1024)
+				m_ram->pointer()[offset | 0x4000] = data;
+		})
+	);
+	map(0xc000, 0xffff).rw(m_ram, FUNC(ram_device::read), FUNC(ram_device::write));
 }
 
 void pc6001_state::pc6001_io(address_map &map)
@@ -1511,7 +1527,7 @@ void pc6001_state::pc6001(machine_config &config)
 
 //  I8049(config, "subcpu", 7987200);
 
-	RAM(config, m_ram).set_default_size("32K");
+	RAM(config, m_ram).set_default_size("32K").set_extra_options("16K");
 
 	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(pc6001_state::ppi_porta_r));
