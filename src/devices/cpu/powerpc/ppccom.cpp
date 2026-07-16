@@ -594,6 +594,7 @@ void ppc_device::device_start()
 	std::fill(std::begin(m_exception), std::end(m_exception), nullptr);
 	std::fill(std::begin(m_exception_norecover), std::end(m_exception_norecover), nullptr);
 	m_fpscr_finish = nullptr;
+	m_code_write_reset = nullptr;
 
 	/* initialize the implementation state tables */
 	memcpy(m_fpmode, fpmode_source, sizeof(fpmode_source));
