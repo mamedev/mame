@@ -38,6 +38,13 @@ protected:
 	template <unsigned ST> void cpu_map(address_map &map) ATTR_COLD;
 
 private:
+	enum dma_state : u8
+	{
+		IDLE,
+		WR1, WR2, WR3,
+		RD1, RD2, RD3, RD4,
+	}
+
 	void drq_w(int state);
 	void irq_w(int state);
 	u32 dma_r(offs_t offset, u32 mem_mask);
@@ -62,13 +69,7 @@ private:
 	bool m_drq;
 	bool m_irq;
 	u32 m_dma;
-	enum dma_state : unsigned
-	{
-		IDLE,
-		WR1, WR2, WR3,
-		RD1, RD2, RD3, RD4,
-	}
-	m_state;
+	dma_state m_state;
 };
 
 // ET532 as an intelligent SCSI slot card: drops into an NSCSI_CONNECTOR on a host

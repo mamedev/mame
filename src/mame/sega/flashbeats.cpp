@@ -17,25 +17,27 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/h8/h83006.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/eepromser.h"
-#include "machine/te7750.h"
-#include "sound/scsp.h"
 
 #include "315_5296.h"
 #include "315_5338a.h"
 #include "dsb2.h"
 
-#include "endianness.h"
+#include "cpu/h8/h83006.h"
+#include "cpu/m68000/m68000.h"
+#include "machine/eepromser.h"
+#include "machine/te7750.h"
 #include "machine/timer.h"
+#include "sound/scsp.h"
+
 #include "speaker.h"
 
-#include "flsbeats.lh"
+#include "endianness.h"
 
 #include <algorithm>
 #include <cmath>
 #include <numbers>
+
+#include "flsbeats.lh"
 
 
 namespace {
@@ -206,14 +208,16 @@ public:
 	{
 	}
 
-	void flashbeats(machine_config &config);
+	void flashbeats(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
 	void flashbeats_map(address_map &map) ATTR_COLD;
 	void main_scsp_map(address_map &map) ATTR_COLD;
 	void scsp_mem(address_map &map) ATTR_COLD;
-
-private:
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 	void scsp_irq(offs_t offset, uint8_t data);
 

@@ -162,11 +162,11 @@ u32 et532_board_device::dma_r(offs_t offset, u32 mem_mask)
 {
 	u32 data = 0;
 
-	if (!machine().side_effects_disabled())
+	switch (m_state)
 	{
-		switch (m_state)
+	case IDLE:
+		if (!machine().side_effects_disabled())
 		{
-		case IDLE:
 			if (m_drq && !m_irq)
 			{
 				m_dma = m_scsi->dma_r();
@@ -174,22 +174,24 @@ u32 et532_board_device::dma_r(offs_t offset, u32 mem_mask)
 
 				m_cpu->rdy_w(1);
 			}
-			break;
-
-		case RD1:
-		case RD2:
-		case RD3:
-			m_cpu->rdy_w(1);
-			break;
-
-		case RD4:
-			data = m_dma;
-			m_state = IDLE;
-			break;
-
-		default:
-			break;
 		}
+		break;
+
+	case RD1:
+	case RD2:
+	case RD3:
+		if (!machine().side_effects_disabled())
+			m_cpu->rdy_w(1);
+		break;
+
+	case RD4:
+		data = m_dma;
+		if (!machine().side_effects_disabled())
+			m_state = IDLE;
+		break;
+
+	default:
+		break;
 	}
 
 	return data;

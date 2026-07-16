@@ -128,22 +128,11 @@ Whole view is ~16:9 and the content is grouped so MAME centers it vertically.
 			<color red="0" green="0" blue="0" />
 			<bounds left="-0.05" top="-0.05" right="1.05" bottom="1.05" />
 		</rect>
-		<disk state="0"><color red="0.0627" green="0.0196" blue="0.0196" /></disk>
-		<disk state="1"><color red="0.0667" green="0.0078" blue="0.0078" /></disk>
-		<disk state="2"><color red="0.1333" green="0.0196" blue="0.0157" /></disk>
-		<disk state="3"><color red="0.2000" green="0.0314" blue="0.0235" /></disk>
-		<disk state="4"><color red="0.2667" green="0.0392" blue="0.0314" /></disk>
-		<disk state="5"><color red="0.3333" green="0.0510" blue="0.0392" /></disk>
-		<disk state="6"><color red="0.4000" green="0.0627" blue="0.0471" /></disk>
-		<disk state="7"><color red="0.4667" green="0.0706" blue="0.0549" /></disk>
-		<disk state="8"><color red="0.5333" green="0.0824" blue="0.0627" /></disk>
-		<disk state="9"><color red="0.6000" green="0.0941" blue="0.0706" /></disk>
-		<disk state="10"><color red="0.6667" green="0.1020" blue="0.0784" /></disk>
-		<disk state="11"><color red="0.7333" green="0.1137" blue="0.0863" /></disk>
-		<disk state="12"><color red="0.8000" green="0.1255" blue="0.0941" /></disk>
-		<disk state="13"><color red="0.8667" green="0.1333" blue="0.1020" /></disk>
-		<disk state="14"><color red="0.9333" green="0.1451" blue="0.1098" /></disk>
-		<disk state="15"><color red="1.0000" green="0.1569" blue="0.1176" /></disk>
+		<disk>
+			<color state="0" red="0.0627" green="0.0196" blue="0.0196" />
+			<color state="1" red="0.0667" green="0.0078" blue="0.0078" />
+			<color state="15" red="1.0000" green="0.1569" blue="0.1176" />
+		</disk>
 	</element>
 
 	<!-- black backdrop the DMD sits on (extends a small margin past the dot grid) -->

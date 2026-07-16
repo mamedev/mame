@@ -18,7 +18,7 @@
 
 #include "emu.h"
 
-// cpu cluster
+// CPU cluster
 #include "cpu/ns32000/ns32000.h"
 #include "machine/ns32081.h"
 #include "machine/ns32202.h"
@@ -62,7 +62,7 @@ public:
 	{
 	}
 
-	void pc532(machine_config &config);
+	void pc532(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

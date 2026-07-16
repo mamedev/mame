@@ -57,13 +57,13 @@ public:
 	{
 	}
 
-	void model1(machine_config &config);
-	void vf(machine_config &config);
-	void vr(machine_config &config);
-	void vformula(machine_config &config);
-	void swa(machine_config &config);
-	void wingwar(machine_config &config);
-	void wingwar360(machine_config &config);
+	void model1(machine_config &config) ATTR_COLD;
+	void vf(machine_config &config) ATTR_COLD;
+	void vr(machine_config &config) ATTR_COLD;
+	void vformula(machine_config &config) ATTR_COLD;
+	void swa(machine_config &config) ATTR_COLD;
+	void wingwar(machine_config &config) ATTR_COLD;
+	void wingwar360(machine_config &config) ATTR_COLD;
 
 	struct spoint_t
 	{
@@ -385,7 +385,7 @@ public:
 	{
 	}
 
-	void netmerc(machine_config &config);
+	void netmerc(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;

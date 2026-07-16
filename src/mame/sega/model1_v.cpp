@@ -58,9 +58,9 @@ void model1_state::view_t::transform_vector(glm::vec3& p) const
 
 void model1_state::cross_product(point_t* o, const point_t* p, const point_t* q) const
 {
-	o->x = p->y * q->z - q->y * p->z;
-	o->y = p->z * q->x - q->z * p->x;
-	o->z = p->x * q->y - q->x * p->y;
+	o->x = (p->y * q->z) - (q->y * p->z);
+	o->y = (p->z * q->x) - (q->z * p->x);
+	o->z = (p->x * q->y) - (q->x * p->y);
 }
 
 float model1_state::view_determinant(const point_t *p1, const point_t *p2, const point_t *p3) const
@@ -792,7 +792,7 @@ float model1_state::compute_specular(glm::vec3& normal, glm::vec3& light, float 
 	// z component of the reflected light vector, as computed by the Model 2
 	// GEO program: R.z = 2*(N.L)*N.z - L.z, raised to a power of two selected
 	// by the power field and scaled by the specular scale.
-	float s = 2.0f * diffuse * normal.z - light.z;
+	float s = (2.0f * diffuse * normal.z) - light.z;
 	if (s <= 0.0f)
 		return 0.0f;
 	if (lp.p >= 2)
