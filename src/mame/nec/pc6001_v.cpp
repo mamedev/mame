@@ -117,8 +117,8 @@ void pc6001_state::video_start()
 	cfg.get_char_rom = pc6001_get_char_rom;
 	m6847_init(machine(), &cfg);
 	#endif
-//	m_video_ram = make_unique_clear<uint8_t[]>(0x4000);
-//	m_video_base = &m_video_ram[0];
+//  m_video_ram = make_unique_clear<uint8_t[]>(0x4000);
+//  m_video_base = &m_video_ram[0];
 }
 
 void pc6001mk2_state::video_start()
@@ -317,32 +317,28 @@ void pc6001_state::draw_tile_text(bitmap_ind16 &bitmap,const rectangle &cliprect
 	}
 }
 
-void pc6001_state::draw_border(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr,int has_mc6847)
+int pc6001_state::get_border_pen(u8 attr,int has_mc6847)
 {
-	for(int y=0;y<240;y++)
-	{
-		for(int x=0;x<320;x++)
-		{
-			int color;
-			if(!has_mc6847) //mk2 border color is always black
-				color = 0;
-			else if((attr & 0x90) == 0x80) //2bpp
-				color = ((attr & 2)<<1) + 8;
-			else if((attr & 0x90) == 0x90) //1bpp
-				color = (attr & 2) ? 7 : 2;
-			else
-				color = 0; //FIXME: other modes not yet checked
+	// mk2 border color is always black
+	if (!has_mc6847)
+		return 0;
 
-			bitmap.pix(y, x) = m_palette->pen(color);
-		}
+	switch(attr & 0x90)
+	{
+		case 0x80: // 2 bpp
+			return ((attr & 2) << 1) + 8;
+		case 0x90: // 1 bpp
+			return (attr & 2) ? 7 : 2;
 	}
+	// FIXME: other modes not yet checked
+	return 0;
 }
 
 void pc6001_state::pc6001_screen_draw(bitmap_ind16 &bitmap,const rectangle &cliprect, int has_mc6847)
 {
 	int attr = m_video_base[0];
 
-	draw_border(bitmap,cliprect,attr,has_mc6847);
+	bitmap.fill(m_palette->pen(get_border_pen(attr, has_mc6847)), cliprect);
 
 	if(attr & 0x80) // gfx mode
 	{
@@ -498,10 +494,10 @@ uint32_t pc6001mk2_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 					for(int xi = 0; xi < 8; xi++)
 					{
 						int res_x = (x * 8) + xi;
+						// pc6001mk2sr has junk after 8x10, is it ever used for drawing
+						// or it's just readable from TV ROM banks?
 						int res_y = (y * 10) + yi;
 
-						// pc6001mk2sr in mk2 text mode uses this as 8x10
-						// (tv roms have junk afterwards)
 						int pen = BIT(gfx_data[(tile * 0x10) + yi], 7 - xi);
 
 						int fgcol = (attr & 0x0f) + 0x10;
