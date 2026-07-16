@@ -322,10 +322,7 @@ void pc6001_state::pc6001_io(address_map &map)
 	map(0xc0, 0xc0).mirror(0x0f).r(FUNC(pc6001_state::portc0_r));
 }
 
-// TODO: sharrier (at least) pretends to use this as writable work RAM
-// it also pretends to act as a mk2 machine, judging at $f0 writes.
-// Does it fail an identifier check?
-// There's really a work RAM when cart not inserted, or it actually wants a RAM cart?
+// TODO: use a memory_view like later iterations, eventually can mount a RAM cart.
 void pc6001_state::cart_map(address_map &map)
 {
 	map(0x2000, 0x3fff).rom().region("gfx1", 0);

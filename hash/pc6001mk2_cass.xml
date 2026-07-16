@@ -725,6 +725,27 @@ Not extensively tested (language barrier)
 		</part>
 	</software>
 
+	<!-- "for PC-6001mkII/SR" -->
+	<software name="sharrier" supported="no">
+		<description>Space Harrier</description>
+		<year>1986</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<notes><![CDATA[
+Sensitive with [sub] irq triggers
+[keyboard] joy triggers doesn't work properly (select F1 after loading), cannot move down
+Doesn't work on vanilla pc6001, btanb
+]]></notes>
+		<info name="usage" value="Mode 2, Page 2"/>
+		<info name="developer" value="T. Matsushima"/>
+		<info name="developer" value="Yet"/>
+		<info name="alt_title" value="スペースハリアー"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="43681">
+				<rom name="space harrier.cas" size="43681" crc="56319bd8" sha1="15e6ef72b233da81dbba4d096937fc18de6ffca3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mephius" supported="no">
 		<description>Star Arthur Densetsu I: Wakusei Mephius</description>
 		<year>1984?</year>
@@ -856,6 +877,29 @@ Eventually requires [tape] load and save
 		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="27110">
 				<rom name="suidou kozou.cas" size="27110" crc="edf9e6ba" sha1="a3226018595b6f3b3e1ad5a260673d91df0a343c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="txevious2" supported="no">
+		<!-- Alternatively known as Tiny Xevious mkII / タイニー ゼビウス マークII on cover art -->
+		<description>Tiny Xevious II</description>
+		<!-- 1984 08. -->
+		<year>1984</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<notes><![CDATA[
+[VDG] swaps gfx mode mid-scanline (text uses a different one)
+Requires multiple space presses to actually start a game
+Doesn't work on vanilla pc6001, btanb
+]]></notes>
+		<info name="usage" value="Mode 2, Page 2, has optional support for Mode 4" />
+		<info name="alt_title" value="タイニーゼビウスII"/>
+		<info name="developer" value="T. Matsushima"/>
+		<!-- <sharedfeat name="requirement" value="pc6001_cart:n60basic"/> -->
+
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="41774">
+				<rom name="tiny xevious 2.cas" size="41774" crc="966c3a54" sha1="b69d633c7fa4b81c6b3113c2118ce1ffc83f050c"/>
 			</dataarea>
 		</part>
 	</software>
