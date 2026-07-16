@@ -20933,6 +20933,9 @@ d6809
 @source:homebrew/dcebridge.cpp
 dcebridge
 
+@source:homebrew/et532.cpp
+et532
+
 @source:homebrew/gigatron.cpp
 gigatron
 
@@ -49483,6 +49486,7 @@ bigboard
 bigboard5
 mk82
 mk83
+mk84
 mojmikro
 x168
 x1685
