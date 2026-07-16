@@ -41,7 +41,7 @@ Autoboot program
 Autoboot program menu
 Japanese word processor example sentences
 
-Acts as a Disk BIOS for further loading
+Acts as a Disk BIOS for further loading. .dsk alt format known to exist
 -->
 	<software name="sruty" supported="no">
 		<description>PC-6601SR Utility Disk</description>

@@ -43176,6 +43176,7 @@ Cannot install, gets stuck at "please insert disk and press mouse" prompt, tests
 		<year>1986</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ザ・スクリーマー" />
+		<info name="developer" value="MagicalZoo" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="the screamer (1985)(magical zoo).fdi" size="1265664" crc="86f2163d" sha1="2d73222c8e7372f32b529798d0da60b36c875053" offset="0" />

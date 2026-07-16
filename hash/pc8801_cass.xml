@@ -1299,7 +1299,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 	<software name="ultraymj" supported="no">
 		<description>Ultra Yonin Mahjong</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>ツクモ (Tsukumo)</publisher>
 		<info name="alt_title" value="ウルトラ四人麻雀"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="25537">

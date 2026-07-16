@@ -125,7 +125,7 @@ Requires user [tape] saving, prompts user after character creation
 	<software name="bokosuka" supported="partial">
 		<description>Bokosuka Wars</description>
 		<year>1985</year>
-		<publisher>ASCII</publisher>
+		<publisher>アスキー (ASCII)</publisher>
 		<info name="usage" value="Mode 5, Page 3, BASIC" />
 		<info name="alt_title" value="ボコスカウォーズ"/>
 		<part name="snap" interface="pc6001_snap">
@@ -151,7 +151,7 @@ Requires user [tape] saving, prompts user after character creation
 	<software name="castle" supported="partial">
 		<description>The Castle</description>
 		<year>1986</year>
-		<publisher>ASCII</publisher>
+		<publisher>アスキー (ASCII)</publisher>
 		<info name="usage" value="Mode 5, Page 2, BASIC"/>
 		<info name="alt_title" value="ザ・キャッスル"/>
 
@@ -165,7 +165,7 @@ Requires user [tape] saving, prompts user after character creation
 	<software name="castleex" supported="no">
 		<description>Castle Excellent</description>
 		<year>1986?</year>
-		<publisher>ASCII</publisher>
+		<publisher>アスキー (ASCII)</publisher>
 		<notes><![CDATA[
 [gfx] wrong scan draw for title screen copyright text, bad dump?
 [keyboard] has input problems, keeps going to the left
@@ -561,6 +561,40 @@ Eventually requires [tape] user load and save
 		</part>
 	</software>
 
+	<software name="nanakin" supported="partial">
+		<description>Nana-chan no Kinjirareta Asobi (mkII)</description>
+		<year>198?</year>
+		<publisher>パックスソフトニカ (Pax Softonica)</publisher>
+		<notes><![CDATA[
+[tape] has extra audio track, not hooked up
+]]></notes>
+		<info name="usage" value="Mode 5, Page 3, BASIC"/>
+		<info name="developer" value="Yutaka"/>
+		<info name="alt_title" value="ナナちゃんの禁じられた遊び"/>
+		<part name="snap" interface="pc6001_snap">
+			<feature name="part_id" value="mkii"/>
+			<dataarea name="snap" size="23841">
+				<rom name="nana-chan no kinjirareta asobi (mkii).cas" size="23841" crc="e844d56e" sha1="7dc8ddba2b9cbedb3d6023ce6b2bf50b77103133" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nobunaga" supported="no">
+		<description>Nobunaga no Yabou</description>
+		<year>198?</year>
+		<publisher>光栄 (Koei)</publisher>
+		<notes><![CDATA[
+Eventually requires [tape] user load and save
+]]></notes>
+		<info name="usage" value="Mode 5, Page 2, BASIC"/>
+		<info name="alt_title" value="信長の野望"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="56435">
+				<rom name="nobunaga no yabou.cas" size="56435" crc="631ab2ab" sha1="c23176b401af93e4dae851a2cab52427c1cda325" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Original fanfun in pc8001_flop / pc8801_cass -->
 	<software name="nfanfun" supported="partial">
 		<description>New Fan Fun</description>
@@ -636,6 +670,19 @@ Holding left+shift on [keyboard] pauses game (verify)
 		</part>
 	</software>
 
+	<software name="profmj" supported="partial">
+		<description>Professional Mahjong (v2.1)</description>
+		<year>198?</year>
+		<publisher>シャノアール (Chat Noir)</publisher>
+		<info name="usage" value="Mode 5, Page 2, BASIC"/>
+		<info name="alt_title" value="プロフェッショナル麻雀"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="25940">
+				<rom name="professional mahjong.cas" size="25940" crc="425239ec" sha1="08029af982ddfce8701f50b8e7e1058164bd560d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="punchbal" supported="no">
 		<description>Punch Ball Mario Bros.</description>
 		<year>1983</year>
@@ -668,6 +715,19 @@ Not extensively tested (language barrier)
 		</part>
 	</software>
 
+	<software name="sorekuru" supported="partial">
+		<description>Soreyuke! Kurukuru</description>
+		<year>1984</year>
+		<publisher>パックスソフトニカ (Pax Softonica)</publisher>
+		<info name="usage" value="Mode 5, Page 3, MONITOR R-0 then G8800"/>
+		<info name="developer" value="T. Hotaka"/>
+		<info name="alt_title" value="それゆけ! くるくる"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="76076">
+				<rom name="soreyuke kurukuru.p6" size="76076" crc="4255facf" sha1="6d42c0c2406b4ee8a84f29044e98ca442c795d69" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="mephius" supported="no">
 		<description>Star Arthur Densetsu I: Wakusei Mephius</description>
@@ -790,6 +850,20 @@ Eventually requires [tape] load and save
 		</part>
 	</software>
 
+	<software name="suidokoz" supported="partial">
+		<description>Suidou Kozou</description>
+		<year>1983?</year>
+		<publisher>Hot-B</publisher>
+		<info name="usage" value="Mode 5, Page 3, BASIC"/>
+		<info name="developer" value="Gamu"/>
+		<info name="alt_title" value="水道小僧"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="27110">
+				<rom name="suidou kozou.cas" size="27110" crc="edf9e6ba" sha1="a3226018595b6f3b3e1ad5a260673d91df0a343c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tforce" supported="partial">
 		<description>Thunder Force</description>
 		<year>1985</year>
@@ -803,21 +877,21 @@ Eventually requires [tape] load and save
 		</part>
 	</software>
 
-    <software name="tritorn" supported="no">
-        <description>Tritorn</description>
-        <year>198?</year>
+	<software name="tritorn" supported="no">
+		<description>Tritorn</description>
+		<year>198?</year>
 		<publisher>ザインソフト (Sein Soft)</publisher>
 		<notes><![CDATA[
 Eventually requires [tape] load and save
 ]]></notes>
-        <info name="usage" value="Mode 5, Page 2, BASIC"/>
+		<info name="usage" value="Mode 5, Page 2, BASIC"/>
 		<info name="alt_title" value="トリトーン"/>
-        <part name="snap" interface="pc6001_snap">
-            <dataarea name="snap" size="45145">
-                <rom name="tritorn.cas" size="45145" crc="82ce5954" sha1="38564e29591c800d2dd92485250af204a4dafdbb" offset="0" />
-            </dataarea>
-        </part>
-    </software>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="45145">
+				<rom name="tritorn.cas" size="45145" crc="82ce5954" sha1="38564e29591c800d2dd92485250af204a4dafdbb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="vegcrash" supported="partial">
 		<description>Vegetable Crash</description>
