@@ -153,7 +153,7 @@ void pc6001mk2sr_state::video_start()
 	save_item(NAME(m_sr_clut));
 }
 
-void pc6001_state::draw_gfx_screen4(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr)
+void pc6001_state::draw_gfx_screen4(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, u8 tile, u8 attr, u8 col_setting)
 {
 	// TODO: this is a YUV conversion simplification
 	static const uint8_t pen_gattr[4][4] = {
@@ -168,104 +168,56 @@ void pc6001_state::draw_gfx_screen4(bitmap_ind16 &bitmap,const rectangle &clipre
 		{ 0, 5, 2, 7 }, //Pink / Green
 		{ 0, 2, 5, 7 }, //Green / Pink
 	};
-	int col_setting = m_io_mode4_dsw->read() & 7;
 
-	if((attr & 0x0c) != 0x0c)
-		popmessage("Mode 4 vram attr != 0x0c");
+	int res_y = y + VDG_BORDER_Y;
 
-	for(int y=0;y<192;y++)
+	if(col_setting == 0x00) //monochrome
 	{
-		for(int x=0;x<32;x++)
+		for(int xi = 0; xi < 8; xi++)
 		{
-			int tile = m_video_base[(x+(y*32))+0x200];
+			int fgcol = (attr & 2) ? 7 : 2;
+			int color = BIT(tile, 7 - xi) ? fgcol : 0;
+			int res_x = x * 8 + xi + VDG_BORDER_X;
 
-			if(col_setting == 0x00) //monochrome
-			{
-				for(int xi=0;xi<8;xi++)
-				{
-					int fgcol = (attr & 2) ? 7 : 2;
-					int color = BIT(tile, 7-xi) ? fgcol : 0;
-					int res_x = x * 8 + xi + VDG_BORDER_X;
-					int res_y = y + VDG_BORDER_Y;
+			bitmap.pix(res_y, res_x) = m_palette->pen(color);
+		}
+	}
+	else
+	{
+		for(int xi = 0; xi < 4; xi++)
+		{
+			int fgcol = (tile >> (6 - (xi * 2))) & 3;
 
-					bitmap.pix(res_y, res_x) = m_palette->pen(color);
-				}
-			}
-			else
-			{
-				for(int xi = 0; xi < 4; xi++)
-				{
-					int fgcol = (tile >> (6 - (xi * 2))) & 3;
+			int color = (attr & 2) ? (pen_wattr[col_setting-1][fgcol]) : (pen_gattr[col_setting-1][fgcol]);
 
-					int color = (attr & 2) ? (pen_wattr[col_setting-1][fgcol]) : (pen_gattr[col_setting-1][fgcol]);
+			int res_x = (x * 8 + xi * 2) + VDG_BORDER_X;
 
-					int res_y = y + VDG_BORDER_Y;
-					int res_x = (x * 8 + xi * 2) + VDG_BORDER_X;
-
-					bitmap.pix(res_y, res_x + 0) = m_palette->pen(color);
-					bitmap.pix(res_y, res_x + 1) = m_palette->pen(color);
-				}
-			}
+			bitmap.pix(res_y, res_x + 0) = m_palette->pen(color);
+			bitmap.pix(res_y, res_x + 1) = m_palette->pen(color);
 		}
 	}
 }
 
-void pc6001_state::draw_bitmap_2bpp(bitmap_ind16 &bitmap,const rectangle &cliprect, int attr)
+void pc6001_state::draw_gfx_2bpp(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, u8 tile, u8 attr)
 {
-	int shrink_x = 2*4;
-	int shrink_y = (attr & 8) ? 1 : 2;
-	int w = (shrink_x == 8) ? 32 : 16;
-	int col_bank = ((attr & 2)<<1);
+	int col_bank = ((attr & 2) << 1);
 
-	if(attr & 4)
+	int res_y = y + VDG_BORDER_Y;
+
+	for(int xi = 0; xi < 4; xi++)
 	{
-		for(int y=0;y<(192/shrink_y);y++)
-		{
-			for(int x=0;x<w;x++)
-			{
-				int tile = m_video_base[(x+(y*32))+0x200];
+		//int i = (shrink_x == 8) ? (xi & 0x06) : (xi & 0x0c)>>1;
+		int color = ((tile >> (6 - (xi * 2))) & 3) + 8;
+		color += col_bank;
 
-				for(int yi=0;yi<shrink_y;yi++)
-				{
-					for(int xi=0;xi<shrink_x;xi++)
-					{
-						int i = (shrink_x == 8) ? (xi & 0x06) : (xi & 0x0c)>>1;
-						int color = ((tile >> i) & 3)+8;
-						color+= col_bank;
+		int res_x = (x * 8 + xi * 2) + VDG_BORDER_X;
 
-						bitmap.pix(((y*shrink_y+yi) + VDG_BORDER_Y), (x*shrink_x+((shrink_x-1)-xi)) + VDG_BORDER_X) = m_palette->pen(color);
-					}
-				}
-			}
-		}
-	}
-	else /* TODO: clean this up */
-	{
-		for(int y=0;y<(192/shrink_y);y+=3)
-		{
-			for(int x=0;x<w;x++)
-			{
-				int tile = m_video_base[(x+((y/3)*32))+0x200];
-
-				for(int yi=0;yi<shrink_y;yi++)
-				{
-					for(int xi=0;xi<shrink_x;xi++)
-					{
-						int i = (shrink_x == 8) ? (xi & 0x06) : (xi & 0x0c)>>1;
-						int color = ((tile >> i) & 3)+8;
-						color+= col_bank;
-
-						bitmap.pix((((y+0)*shrink_y+yi) + VDG_BORDER_Y), (x*shrink_x+((shrink_x-1)-xi)) + VDG_BORDER_X) = m_palette->pen(color);
-						bitmap.pix((((y+1)*shrink_y+yi) + VDG_BORDER_Y), (x*shrink_x+((shrink_x-1)-xi)) + VDG_BORDER_X) = m_palette->pen(color);
-						bitmap.pix((((y+2)*shrink_y+yi) + VDG_BORDER_Y), (x*shrink_x+((shrink_x-1)-xi)) + VDG_BORDER_X) = m_palette->pen(color);
-					}
-				}
-			}
-		}
+		bitmap.pix(res_y, res_x + 0) = m_palette->pen(color);
+		bitmap.pix(res_y, res_x + 1) = m_palette->pen(color);
 	}
 }
 
-void pc6001_state::draw_tile_3bpp(bitmap_ind16 &bitmap,const rectangle &cliprect,int x,int y,int tile,int attr)
+void pc6001_state::draw_tile_semi(bitmap_ind16 &bitmap,const rectangle &cliprect, int x, int y, u8 tile, u8 attr)
 {
 	int pen;
 	if(attr & 0x10) //2x2 squares on a single cell
@@ -299,7 +251,7 @@ void pc6001_state::draw_tile_3bpp(bitmap_ind16 &bitmap,const rectangle &cliprect
 	}
 }
 
-void pc6001_state::draw_tile_text(bitmap_ind16 &bitmap,const rectangle &cliprect,int x,int y,int tile,int attr,int has_mc6847)
+void pc6001_state::draw_tile_text(bitmap_ind16 &bitmap,const rectangle &cliprect, int x, int y, u8 tile, u8 attr, int has_mc6847)
 {
 	uint8_t const *const gfx_data = m_region_gfx1->base();
 
@@ -357,39 +309,86 @@ int pc6001_state::get_border_pen(u8 attr,int has_mc6847)
 
 void pc6001_state::pc6001_screen_draw(bitmap_ind16 &bitmap,const rectangle &cliprect, int has_mc6847)
 {
-	int attr = m_video_base[0];
+	const u8 col_setting = m_io_mode4_dsw->read() & 7;
+	u8 attr = m_video_base[0];
 
 	bitmap.fill(m_palette->pen(get_border_pen(attr, has_mc6847)), cliprect);
 
-	// TODO: we need to fetch attribute one by one like in text modes below
-	if(attr & 0x80) // gfx mode
+	for(int y = 0; y < 16; y++)
 	{
-		if(attr & 0x10) // 256x192x1 mode (FIXME: might be a different trigger)
+		for(int x = 0; x < 32; x++)
 		{
-			draw_gfx_screen4(bitmap,cliprect,attr);
-		}
-		else // 128x192x2 mode
-		{
-			draw_bitmap_2bpp(bitmap,cliprect,attr);
-		}
-	}
-	else // text mode
-	{
-		for(int y = 0; y < 16; y++)
-		{
-			for(int x = 0; x < 32; x++)
-			{
-				const u32 attr_offset = x + y * 32;
-				int tile = m_video_base[attr_offset + 0x200];
-				attr = m_video_base[attr_offset & 0x1ff];
+			// TODO: why eformn expects attribute to be slow on changes with regular pc6001?
+			// pc6001mk2 gets a different linear setup ...
 
-				if(attr & 0x40)
+			const u32 attr_offset = x + y * 32;
+			attr = m_video_base[attr_offset & 0x1ff];
+
+			// AG
+			if (BIT(attr, 7))
+			{
+				// GM is swapped in this implementation
+				const u8 gm = bitswap<3>(attr >> 2, 0, 1, 2) & 7;
+
+				if (gm & 1)
 				{
-					draw_tile_3bpp(bitmap,cliprect,x,y,tile,attr);
+					// (luminance) graphic modes
+
+					// (1) 128x64, (3) 128x96, (5) 128x192, (7) 256x192
+					// TODO: find test cases for gm != 7
+					const u8 y_sizes[4] = { 3, 2, 1, 1 };
+					const int y_shrink = y_sizes[gm >> 1];
+					const int x_shrink = gm != 7;
+					const int pitch = 32 >> x_shrink;
+
+					for (int yi = 0; yi < 12; yi ++)
+					{
+						int dst_y = y * 12 + yi;
+						int src_y = dst_y / y_shrink;
+						int src_x = x >> x_shrink;
+
+						u8 tile = m_video_base[(src_x + src_y * pitch) + 0x200];
+
+						draw_gfx_screen4(bitmap, cliprect, x, dst_y, tile, attr, col_setting);
+					}
 				}
 				else
 				{
-					draw_tile_text(bitmap,cliprect,x,y,tile,attr,has_mc6847);
+					// color graphic modes
+
+					// (0) 64x64, (2) 128x64, (4) 128x96, (6) 128x192
+					// - often GM = 6
+					// - ax7:snap1 (demo) uses GM = 4
+					const u8 y_sizes[4] = { 3, 3, 2, 1 };
+					const int y_shrink = y_sizes[gm >> 1];
+					const int x_shrink = gm == 0;
+					const int pitch = 32 >> x_shrink;
+
+					for (int yi = 0; yi < 12; yi ++)
+					{
+						int dst_y = y * 12 + yi;
+						int src_y = dst_y / y_shrink;
+						int src_x = x >> x_shrink;
+
+						u8 tile = m_video_base[(src_x + src_y * pitch) + 0x200];
+
+						draw_gfx_2bpp(bitmap, cliprect, x, dst_y, tile, attr);
+					}
+				}
+			}
+			else
+			{
+				// text or semigraphics
+				u8 tile = m_video_base[attr_offset + 0x200];
+
+				// AS
+				if(attr & 0x40)
+				{
+					draw_tile_semi(bitmap, cliprect, x, y, tile, attr);
+				}
+				else
+				{
+					draw_tile_text(bitmap, cliprect, x, y, tile, attr, has_mc6847);
 				}
 			}
 		}
@@ -398,7 +397,7 @@ void pc6001_state::pc6001_screen_draw(bitmap_ind16 &bitmap,const rectangle &clip
 
 uint32_t pc6001_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pc6001_screen_draw(bitmap,cliprect,1);
+	pc6001_screen_draw(bitmap, cliprect, 1);
 
 	return 0;
 }
@@ -411,11 +410,11 @@ uint32_t pc6001mk2_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 	{
 		int count = 0;
 
-		for(int y=0;y<200;y++)
+		for(int y = 0; y < 200; y++)
 		{
-			for(int x=0;x<160;x+=4)
+			for(int x = 0; x < 160; x+=4)
 			{
-				for(int i=0;i<4;i++)
+				for(int i = 0; i < 4; i++)
 				{
 					int pen[2];
 #if 0
@@ -451,11 +450,11 @@ uint32_t pc6001mk2_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 	{
 		int count = 0;
 
-		for(int y=0;y<200;y++)
+		for(int y = 0; y < 200;y++)
 		{
-			for(int x=0;x<320;x+=8)
+			for(int x = 0; x < 320; x+=8)
 			{
-				for(int i=0;i<8;i++)
+				for(int i = 0; i < 8; i++)
 				{
 					int pen[2];
 #if 0
@@ -508,8 +507,8 @@ uint32_t pc6001mk2_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 				---- xxxx fg color
 				Note that the exgfx banks a different gfx ROM
 				*/
-				int tile = m_video_base[(x+(y*40)) + 0x400] + 0x200;
-				int attr = m_video_base[(x+(y*40)) & 0x3ff];
+				u16 tile = m_video_base[(x+(y*40)) + 0x400] + 0x200;
+				u8 attr = m_video_base[(x+(y*40)) & 0x3ff];
 				tile += ((attr & 0x80) << 1);
 
 				for(int yi = 0; yi < 10; yi++)
@@ -538,7 +537,7 @@ uint32_t pc6001mk2_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 	else
 	{
 		//attr = m_video_base[0];
-		pc6001_screen_draw(bitmap,cliprect,0);
+		pc6001_screen_draw(bitmap, cliprect, 0);
 	}
 
 	return 0;
@@ -567,8 +566,8 @@ uint32_t pc6001mk2sr_state::screen_update(screen_device &screen, bitmap_ind16 &b
 		{
 			for(int x = 0; x < text_cols; x++)
 			{
-				int tile = m_video_base[(x + (y * text_cols)) * 2 + 0];
-				int attr = m_video_base[(x + (y * text_cols)) * 2 + 1];
+				u16 tile = m_video_base[(x + (y * text_cols)) * 2 + 0];
+				u8 attr = m_video_base[(x + (y * text_cols)) * 2 + 1];
 				tile += ((attr & 0x80) << 1);
 
 				for(int yi = 0; yi < y_size; yi++)

@@ -140,10 +140,10 @@ protected:
 	uint8_t m_cas_data[0x18000];
 
 	// video functions
-	void draw_gfx_screen4(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr);
-	void draw_bitmap_2bpp(bitmap_ind16 &bitmap,const rectangle &cliprect, int attr);
-	void draw_tile_3bpp(bitmap_ind16 &bitmap,const rectangle &cliprect,int x,int y,int tile,int attr);
-	void draw_tile_text(bitmap_ind16 &bitmap,const rectangle &cliprect,int x,int y,int tile,int attr,int has_mc6847);
+	void draw_gfx_screen4(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, u8 tile, u8 attr, u8 col_setting);
+	void draw_gfx_2bpp(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, u8 tile, u8 attr);
+	void draw_tile_semi(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, u8 tile, u8 attr);
+	void draw_tile_text(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, u8 tile, u8 attr, int has_mc6847);
 	int get_border_pen(u8 attr, int has_mc6847);
 	void pc6001_screen_draw(bitmap_ind16 &bitmap,const rectangle &cliprect, int has_mc6847);
 

@@ -462,7 +462,7 @@ The Asterodian: [VDG] glitch for ASCII text in title (verify)
 		<year>1984</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<notes><![CDATA[
-[VDG] swaps gfx mode mid-scanline (gameplay area uses SCREEN 4)
+[VDG] swaps gfx mode mid-scanline, has issues on vanilla pc6001 (uses a different setup on mk2)
 ]]></notes>
 		<info name="usage" value="Mode 2, Page 1"/>
 
@@ -555,12 +555,13 @@ Not extensively tested (language barrier)
 		</part>
 	</software>
 
-	<software name="ldrun" supported="partial">
+	<software name="ldrun" supported="no">
 		<description>Lode Runner</description>
 		<!-- MCMLXXXIV -->
 		<year>1984</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<notes><![CDATA[
+Stuck [keyboard] arrows, no option for [joystick]?
 Has optional [tape] loading for extra stages
 ]]></notes>
 		<info name="usage" value="Mode 2, Page 2"/>
