@@ -200,6 +200,17 @@ winbingo: Win Win Bingo
 | 6          | 5693  | 7          | 2110  |            |       |
 +------------+-------+------------+-------+------------+-------+
 
+***List of some CGA missing games***
+HOT RUNNER      - Car racing game for single player
+JOKER FIRE      - 5 cards poker game with 2 Jokers
+MAGIC HAMMER    - 4 reels slot game
+ONE TOUCH       - 8in1 Multigame includes: Openseason, Sleepy Monk, Wrestling, Funny Hammer, Merry Christmas,go! Fishing, Air Heroes, Gogonight.
+POKER & LINER   - 2in1 combination with multi-liner Dino-Dino and poker game
+POKER 106       - 5 cards poker game
+POKER MATCH     - Lamp game with poker card GFX
+SMART HOLDER    - Poker game with fruits GFX
+TEXAS CHAMPION  - Texas Hold'em poker game
+UR DEALER       - Three traditional poker games. The player plays the role of Dealer
 *************************************************************************************************************/
 
 #include "emu.h"
