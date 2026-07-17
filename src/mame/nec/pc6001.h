@@ -140,7 +140,7 @@ protected:
 	uint8_t m_cas_data[0x18000];
 
 	// video functions
-	void draw_gfx_mode4(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr);
+	void draw_gfx_screen4(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr);
 	void draw_bitmap_2bpp(bitmap_ind16 &bitmap,const rectangle &cliprect, int attr);
 	void draw_tile_3bpp(bitmap_ind16 &bitmap,const rectangle &cliprect,int x,int y,int tile,int attr);
 	void draw_tile_text(bitmap_ind16 &bitmap,const rectangle &cliprect,int x,int y,int tile,int attr,int has_mc6847);
@@ -196,6 +196,9 @@ private:
 	u8 m_irq_pending = 0;
 	u8 m_sub_vector = 0;
 	bool m_crtkill;
+
+	static constexpr int VDG_BORDER_X  = 32;
+	static constexpr int VDG_BORDER_Y  = 24;
 };
 
 class pc6001mk2_state : public pc6001_state

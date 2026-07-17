@@ -1485,8 +1485,8 @@ static const gfx_layout char_layout =
 	RGN_FRAC(1,1),
 	1,
 	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ STEP8(0, 1) },
+	{ STEP16(0, 8) },
 	8*16
 };
 
@@ -1497,9 +1497,8 @@ static const gfx_layout kanji_layout =
 	RGN_FRAC(1,2),
 	1,
 	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-	0+RGN_FRAC(1,2), 1+RGN_FRAC(1,2), 2+RGN_FRAC(1,2), 3+RGN_FRAC(1,2), 4+RGN_FRAC(1,2), 5+RGN_FRAC(1,2), 6+RGN_FRAC(1,2), 7+RGN_FRAC(1,2)  },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ STEP8(0, 1), STEP8(RGN_FRAC(1, 2), 1) },
+	{ STEP16(0, 8) },
 	8*16
 };
 
@@ -1821,12 +1820,12 @@ ROM_START( pc6001mk2sr )
 	ROM_LOAD( "systemrom1.64", 0x10000, 0x10000, CRC(b6fc2db2) SHA1(dd48b1eee60aa34780f153359f5da7f590f8dff4) )
 	ROM_LOAD( "systemrom2.64", 0x00000, 0x10000, CRC(55a62a1d) SHA1(3a19855d290fd4ac04e6066fe4a80ecd81dc8dd7) )
 
-	// TODO: mk2sr in mk2 mode aren't dumped, using pc6601sr for now
+	// TODO: mk2sr in mk2 mode roms aren't dumped, using pc6601sr for now
 	ROM_REGION( 0x8000, "basic_rom", ROMREGION_ERASEFF )
 	ROM_LOAD( "basicrom.68",  0x0000, 0x8000, CRC(516b1be3) SHA1(e9977fc13f65f009f03d0340b1f1eb9a3e586739) )
 
 	ROM_REGION( 0x8000, "kanji_rom", ROMREGION_ERASEFF )
-	ROM_COPY( "sr_sysrom", 0x18000,  0x0000, 0x8000 )
+	ROM_COPY( "sr_sysrom", 0x08000,  0x0000, 0x8000 )
 
 	ROM_REGION( 0x8000, "tv_rom", ROMREGION_ERASEFF )
 	ROM_LOAD( "cgrom60.68",           0x0000, 0x2000, CRC(331473a9) SHA1(361836f9758d6d9b5133c9dc7860a7c74f9cf596) )
@@ -1846,7 +1845,7 @@ ROM_START( pc6001mk2sr )
 	ROM_COPY( "cgrom", 0, 0, 0x4000 )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_COPY( "sr_sysrom", 0x18000, 0x00000, 0x8000 )
+	ROM_COPY( "kanji_rom", 0x00000, 0x00000, 0x8000 )
 ROM_END
 
 ROM_START( pc6601sr )
@@ -1870,7 +1869,7 @@ ROM_START( pc6601sr )
 	ROM_COPY( "mk2", 0x08000, 0, 0x4000 )
 
 	ROM_REGION( 0x8000, "kanji_rom", ROMREGION_ERASEFF )
-	ROM_COPY( "sr_sysrom", 0x18000, 0x00000, 0x8000 )
+	ROM_COPY( "sr_sysrom", 0x08000, 0x00000, 0x8000 )
 
 	ROM_REGION( 0x8000, "tv_rom", ROMREGION_ERASEFF )
 	ROM_COPY( "mk2",       0x0c000, 0x0000, 0x4000 )
@@ -1892,7 +1891,7 @@ ROM_START( pc6601sr )
 	ROM_COPY( "cgrom", 0, 0, 0x4000 )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_COPY( "sr_sysrom", 0x18000, 0x00000, 0x8000 )
+	ROM_COPY( "kanji_rom", 0x00000, 0x00000, 0x8000 )
 ROM_END
 
 COMP( 1981, pc6001,       0,           0,        pc6001,      pc6001, pc6001_state,       empty_init, "NEC",   "PC-6001 (Japan)",              MACHINE_NOT_WORKING )

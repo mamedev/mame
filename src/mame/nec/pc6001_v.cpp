@@ -1,12 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/*******************************************************************
- *
- * PC-6xxx video related functions
- *
- *
- *
- ******************************************************************/
+/**************************************************************************************************
+
+PC-6xxx video related functions
+
+For mkII and beyond it is assumed that VDG is emulated thru an unknown part # address generator.
+Hooking up a VDG anyway vs. adapting the video part here is a TBD depending about how hairy the
+connection logic truly is.
+pc6001mk2/pc6601 has a semigraphics table at gfx1 tile = 0x100, including a line bug at 0x125
+(bad dump?).
+It is unknown at current time where said table is on SR machines.
+
+**************************************************************************************************/
 
 #include "emu.h"
 #include "pc6001.h"
@@ -57,17 +62,17 @@ static constexpr rgb_t mk2_defcolors[] =
 
 void pc6001_state::palette_init(palette_device &palette) const
 {
-	for(int i=0;i<8+4;i++)
-		palette.set_pen_color(i+8,defcolors[i]);
+	for(int i = 0; i < 8 + 4; i++)
+		palette.set_pen_color(i + 8, defcolors[i]);
 }
 
 void pc6001mk2_state::mk2_palette_init(palette_device &palette) const
 {
-	for(int i=0;i<8;i++)
-		palette.set_pen_color(i+8,defcolors[i]);
+	for(int i = 0; i < 8; i++)
+		palette.set_pen_color(i + 8, defcolors[i]);
 
-	for(int i=0x10;i<0x20;i++)
-		palette.set_pen_color(i,mk2_defcolors[i-0x10]);
+	for(int i = 0x10; i < 0x20; i++)
+		palette.set_pen_color(i, mk2_defcolors[i - 0x10]);
 }
 
 /*****************************************
@@ -132,9 +137,12 @@ void pc6001mk2sr_state::video_start()
 {
 	pc6001mk2_state::video_start();
 //  m_video_ram = std::make_unique<uint8_t[]>(0x4000);
-	m_gvram = std::make_unique<uint8_t []>(320*256*8); // TODO: size
-	std::fill_n(m_gvram.get(), 320*256*8, 0);
-	save_pointer(NAME(m_gvram), 320*256*8);
+	// TODO: unconfirmed size
+	const u32 gvram_size = 320 * 256 * 8;
+
+	m_gvram = std::make_unique<uint8_t []>(gvram_size);
+	std::fill_n(m_gvram.get(), gvram_size, 0);
+	save_pointer(NAME(m_gvram), gvram_size);
 
 	// SR text mode CLUT colors
 	// [0f]-[0b]-[0e]-[0a] are modifiable thru respective $40~$43 ports,
@@ -145,8 +153,9 @@ void pc6001mk2sr_state::video_start()
 	save_item(NAME(m_sr_clut));
 }
 
-void pc6001_state::draw_gfx_mode4(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr)
+void pc6001_state::draw_gfx_screen4(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr)
 {
+	// TODO: this is a YUV conversion simplification
 	static const uint8_t pen_gattr[4][4] = {
 		{ 0, 1, 6, 2 }, //Red / Blue
 		{ 0, 6, 1, 2 }, //Blue / Red
@@ -175,22 +184,26 @@ void pc6001_state::draw_gfx_mode4(bitmap_ind16 &bitmap,const rectangle &cliprect
 				for(int xi=0;xi<8;xi++)
 				{
 					int fgcol = (attr & 2) ? 7 : 2;
+					int color = BIT(tile, 7-xi) ? fgcol : 0;
+					int res_x = x * 8 + xi + VDG_BORDER_X;
+					int res_y = y + VDG_BORDER_Y;
 
-					int color = ((tile)>>(7-xi) & 1) ? fgcol : 0;
-
-					bitmap.pix((y+24), (x*8+xi)+32) = m_palette->pen(color);
+					bitmap.pix(res_y, res_x) = m_palette->pen(color);
 				}
 			}
 			else
 			{
-				for(int xi=0;xi<4;xi++)
+				for(int xi = 0; xi < 4; xi++)
 				{
-					int fgcol = ((tile)>>(6-(xi*2)) & 3);
+					int fgcol = (tile >> (6 - (xi * 2))) & 3;
 
 					int color = (attr & 2) ? (pen_wattr[col_setting-1][fgcol]) : (pen_gattr[col_setting-1][fgcol]);
 
-					bitmap.pix((y+24), ((x*8+xi*2)+0)+32) = m_palette->pen(color);
-					bitmap.pix((y+24), ((x*8+xi*2)+1)+32) = m_palette->pen(color);
+					int res_y = y + VDG_BORDER_Y;
+					int res_x = (x * 8 + xi * 2) + VDG_BORDER_X;
+
+					bitmap.pix(res_y, res_x + 0) = m_palette->pen(color);
+					bitmap.pix(res_y, res_x + 1) = m_palette->pen(color);
 				}
 			}
 		}
@@ -220,7 +233,7 @@ void pc6001_state::draw_bitmap_2bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 						int color = ((tile >> i) & 3)+8;
 						color+= col_bank;
 
-						bitmap.pix(((y*shrink_y+yi)+24), (x*shrink_x+((shrink_x-1)-xi))+32) = m_palette->pen(color);
+						bitmap.pix(((y*shrink_y+yi) + VDG_BORDER_Y), (x*shrink_x+((shrink_x-1)-xi)) + VDG_BORDER_X) = m_palette->pen(color);
 					}
 				}
 			}
@@ -242,9 +255,9 @@ void pc6001_state::draw_bitmap_2bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 						int color = ((tile >> i) & 3)+8;
 						color+= col_bank;
 
-						bitmap.pix((((y+0)*shrink_y+yi)+24), (x*shrink_x+((shrink_x-1)-xi))+32) = m_palette->pen(color);
-						bitmap.pix((((y+1)*shrink_y+yi)+24), (x*shrink_x+((shrink_x-1)-xi))+32) = m_palette->pen(color);
-						bitmap.pix((((y+2)*shrink_y+yi)+24), (x*shrink_x+((shrink_x-1)-xi))+32) = m_palette->pen(color);
+						bitmap.pix((((y+0)*shrink_y+yi) + VDG_BORDER_Y), (x*shrink_x+((shrink_x-1)-xi)) + VDG_BORDER_X) = m_palette->pen(color);
+						bitmap.pix((((y+1)*shrink_y+yi) + VDG_BORDER_Y), (x*shrink_x+((shrink_x-1)-xi)) + VDG_BORDER_X) = m_palette->pen(color);
+						bitmap.pix((((y+2)*shrink_y+yi) + VDG_BORDER_Y), (x*shrink_x+((shrink_x-1)-xi)) + VDG_BORDER_X) = m_palette->pen(color);
 					}
 				}
 			}
@@ -256,28 +269,32 @@ void pc6001_state::draw_tile_3bpp(bitmap_ind16 &bitmap,const rectangle &cliprect
 {
 	int pen;
 	if(attr & 0x10) //2x2 squares on a single cell
-		pen = (tile & 0x70)>>4;
+		pen = (tile & 0x70) >> 4;
 	else //2x3
-		pen = (tile & 0xc0) >> 6 | (attr & 2)<<1;
+		pen = (tile & 0xc0) >> 6 | (attr & 2) << 1;
 
-	for(int yi=0;yi<12;yi++)
+	for(int yi = 0; yi < 12; yi++)
 	{
-		for(int xi=0;xi<8;xi++)
+		for(int xi = 0; xi < 8; xi++)
 		{
-			int i = (xi & 4)>>2; //x-axis
+			// TODO: invert xi/yi logic
+			int res_x = (x * 8 + (7 - xi)) + VDG_BORDER_X;
+			int res_y = (y * 12 + (11 - yi)) + VDG_BORDER_Y;
+
+			int i = (xi & 4) >> 2; //x-axis
 			if(attr & 0x10) //2x2
 			{
 				i+= (yi >= 6) ? 2 : 0; //y-axis
 			}
 			else //2x3
 			{
-				i+= (yi & 4)>>1; //y-axis 1
-				i+= (yi & 8)>>1; //y-axis 2
+				i+= (yi & 4) >> 1; //y-axis 1
+				i+= (yi & 8) >> 1; //y-axis 2
 			}
 
-			int color = ((tile >> i) & 1) ? pen+8 : 0;
+			int color = ((tile >> i) & 1) ? pen + 8 : 0;
 
-			bitmap.pix(((y*12+(11-yi))+24), (x*8+(7-xi))+32) = m_palette->pen(color);
+			bitmap.pix(res_y, res_x) = m_palette->pen(color);
 		}
 	}
 }
@@ -286,24 +303,27 @@ void pc6001_state::draw_tile_text(bitmap_ind16 &bitmap,const rectangle &cliprect
 {
 	uint8_t const *const gfx_data = m_region_gfx1->base();
 
-	for(int yi=0;yi<12;yi++)
+	for(int yi = 0; yi < 12; yi++)
 	{
-		for(int xi=0;xi<8;xi++)
+		for(int xi = 0; xi < 8; xi++)
 		{
-			int pen = gfx_data[(tile*0x10)+yi]>>(7-xi) & 1;
+			int pen = BIT(gfx_data[(tile*0x10)+yi], 7 - xi);
+			int res_x = (x * 8 + xi) + VDG_BORDER_X;
+			int res_y = (y * 12 + yi) + VDG_BORDER_Y;
 
-			int fgcol,color;
+			int fgcol, color;
 			if(has_mc6847)
 			{
-				fgcol = (attr & 2) ? 0x12 : 0x10;
+				fgcol = 0x10 + (attr & 2);
 
 				if(attr & 1)
-					color = pen ? (fgcol+0) : (fgcol+1);
+					color = pen ? (fgcol + 0) : (fgcol + 1);
 				else
-					color = pen ? (fgcol+1) : (fgcol+0);
+					color = pen ? (fgcol + 1) : (fgcol + 0);
 			}
 			else
 			{
+				// TODO: using default MAME palette
 				fgcol = (attr & 2) ? 2 : 7;
 
 				if(attr & 1)
@@ -312,7 +332,7 @@ void pc6001_state::draw_tile_text(bitmap_ind16 &bitmap,const rectangle &cliprect
 					color = pen ? fgcol : 0;
 			}
 
-			bitmap.pix(((y*12+yi)+24), (x*8+xi)+32) = m_palette->pen(color);
+			bitmap.pix(res_y, res_x) = m_palette->pen(color);
 		}
 	}
 }
@@ -327,6 +347,7 @@ int pc6001_state::get_border_pen(u8 attr,int has_mc6847)
 	{
 		case 0x80: // 2 bpp
 			return ((attr & 2) << 1) + 8;
+		// TODO: this is touching something undefined by palette init, relying on MAME default
 		case 0x90: // 1 bpp
 			return (attr & 2) ? 7 : 2;
 	}
@@ -340,11 +361,12 @@ void pc6001_state::pc6001_screen_draw(bitmap_ind16 &bitmap,const rectangle &clip
 
 	bitmap.fill(m_palette->pen(get_border_pen(attr, has_mc6847)), cliprect);
 
+	// TODO: we need to fetch attribute one by one like in text modes below
 	if(attr & 0x80) // gfx mode
 	{
 		if(attr & 0x10) // 256x192x1 mode (FIXME: might be a different trigger)
 		{
-			draw_gfx_mode4(bitmap,cliprect,attr);
+			draw_gfx_screen4(bitmap,cliprect,attr);
 		}
 		else // 128x192x2 mode
 		{
@@ -353,12 +375,13 @@ void pc6001_state::pc6001_screen_draw(bitmap_ind16 &bitmap,const rectangle &clip
 	}
 	else // text mode
 	{
-		for(int y=0;y<16;y++)
+		for(int y = 0; y < 16; y++)
 		{
-			for(int x=0;x<32;x++)
+			for(int x = 0; x < 32; x++)
 			{
-				int tile = m_video_base[(x+(y*32))+0x200];
-				attr = m_video_base[(x+(y*32)) & 0x1ff];
+				const u32 attr_offset = x + y * 32;
+				int tile = m_video_base[attr_offset + 0x200];
+				attr = m_video_base[attr_offset & 0x1ff];
 
 				if(attr & 0x40)
 				{
