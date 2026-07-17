@@ -3,21 +3,13 @@
 /*****************************************************************************
 
     GPL16220A - 320x240 output, 16K words internal RAM
-    GPL16230A (GPAC500A) - expands RAM to 28K words, adds SDRAM support, adds NAND Flash/ROM/OTP support, USB support
+    GPL16230A - expands RAM to 28K words, adds SDRAM support, adds NAND Flash/ROM/OTP support, USB support
     GPL16240VA - adds 640x480 output (V = VGA support?)
-    GPL16250VAVA (GPAC800A) - adds '3D' sprite mode
+    GPL16250VA (GPAC800A) - adds '3D' sprite mode
 
-    there is also the 'B' series
-    these only have 12K words RAM? but have the extra maths unit at 0x79A0?
+    die is marked 'GCM394' on some chips (GPL16250VA at least)
 
-    GPL16218B
-    GPL16238B (this could be GPAC500B)
-    GPL16248VB
-    GPL16258VB (this could be GPAC800B)
-
-    die is marked 'GCM394' on some chips
-
-    The GPAC500 / GPAC800 might be slightly customized rather than direct rebadgings
+    GPAC800 is the version of the GPL16250VA produced for JAKKS Pacific
 
 **********************************************************************/
 

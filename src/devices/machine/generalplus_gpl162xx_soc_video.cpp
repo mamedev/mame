@@ -2,9 +2,9 @@
 // copyright-holders:Ryan Holtz, David Haywood
 /*****************************************************************************
 
-    SunPlus GCM394-series SoC peripheral emulation (Video)
+    SunPlus GPL162xx-series SoC peripheral emulation (Video)
 
-    This is very similar to spg2xx but with additional features, layers and modes
+    This is very similar to SPG2xx but with additional features, layers and modes
 
 **********************************************************************/
 

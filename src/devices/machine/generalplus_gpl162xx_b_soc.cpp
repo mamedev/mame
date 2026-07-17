@@ -2,10 +2,12 @@
 // copyright-holders:David Haywood
 /*****************************************************************************
 
-    GPL16218B
-    GPL16238B (this could be GPAC500B)
+    GPL16218B (not GPL16228B, even if that would make more sense)
+    GPL16238B
     GPL16248VB
-    GPL16258VB (this could be GPAC800B)
+    GPL16258VB
+
+	die is marked GCM420 on gormiti (assumed to be GPL16218B)
 
 	generalplus_gpl162xx_lcdtype.cpp appears to also use a GPL162xxB series
 	chip, just ignoring the video output, it does however use a custom OTP

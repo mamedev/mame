@@ -1,10 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/*****************************************************************************
-
-  SunPlus "GCM394" (based on die pictures)
-
-**********************************************************************/
 
 #ifndef MAME_MACHINE_GENERALPLUS_GPL162XX_SOC_H
 #define MAME_MACHINE_GENERALPLUS_GPL162XX_SOC_H

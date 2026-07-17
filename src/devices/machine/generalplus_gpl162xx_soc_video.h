@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz, David Haywood
 /*****************************************************************************
 
-    SunPlus GCM394-series SoC peripheral emulation (Video)
+    SunPlus GPL162xx-series SoC peripheral emulation (Video)
 
 **********************************************************************/
 
