@@ -1569,23 +1569,6 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	// AYp = (AZ * M12) + (AY * M11) + (AX * M10) + TY
 	// AXp = (AZ * M02) + (AY * M01) + (AX * M00) + TX
 
-	// Fast HSR Removal
-	if (1)
-	{
-		float PZr;
-
-		int8_t normal[3];
-		normal[0] = databuffer[0] >> 0;
-		normal[1] = databuffer[0] >> 8;
-		normal[2] = databuffer[0] >> 16;
-
-		PZr = normal[0] * m_state->zeus_matrix[2][0] + normal[1] * m_state->zeus_matrix[2][1] + normal[2] * m_state->zeus_matrix[2][2] + m_state->zeus_trans[3];
-
-		//m_state->logerror("norm: %i %i %i PZr: %f\n", normal[0], normal[1], normal[2], PZr);
-		if (PZr >= 0)
-			return;
-	}
-
 	/* extract raw x,y,z */
 	if (m_state->m_atlantis) {
 			// Atlantis quad 14
