@@ -25,13 +25,10 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD
 	{
-	}
-
-	virtual void device_reset() override ATTR_COLD
-	{
-		// idle the data line at MARK until the terminal's own UART drives it - otherwise the host
-		// sees a continuous BREAK during the terminal's boot (the SERAD firmware treats that as a
-		// line fault / flow stop on its XON/XOFF console link)
+		// idle the data line at MARK at start (not reset, to avoid glitching the host line on a
+		// soft reset) until the terminal's own UART drives it - otherwise the host sees a
+		// continuous BREAK during the terminal's boot (the SERAD firmware treats that as a line
+		// fault / flow stop on its XON/XOFF console link)
 		output_rxd(1);
 		// a powered 97801 holds its modem outputs asserted
 		output_dcd(0);

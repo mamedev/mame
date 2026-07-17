@@ -22,23 +22,27 @@ class s97801_device : public device_t
 public:
 	s97801_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
+	// configuration
 	auto txd_handler() { return m_txd_cb.bind(); } // terminal -> host
+
+	// live signals
 	void rxd_w(int state);                          // host -> terminal
 
 protected:
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
+	// configuration
 	void prg_map(address_map &map) ATTR_COLD;
 	void data_map(address_map &map) ATTR_COLD;
 	void char_map(address_map &map) ATTR_COLD;
 	void attr_map(address_map &map) ATTR_COLD;
-
 	SCN2672_DRAW_CHARACTER_MEMBER(draw_character);
 
+	// live signals
 	void epci_txd_w(int state) { m_txd_cb(state); }
 	void kbd_txd_w(int state) { m_kbd_rxd = state; }
 	u8 cpu_p3_r();
@@ -54,7 +58,7 @@ private:
 	required_region_ptr<u8> m_chargen;
 	devcb_write_line m_txd_cb;
 
-	int m_kbd_rxd; // keyboard -> terminal serial line, sampled by the 8031 UART on P3.0
+	u8 m_kbd_rxd; // keyboard -> terminal serial line, sampled by the 8031 UART on P3.0
 };
 
 DECLARE_DEVICE_TYPE(SIEMENS_97801, s97801_device)

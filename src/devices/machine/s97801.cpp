@@ -28,6 +28,8 @@
 
 #include "screen.h"
 
+#include "s97801.lh"
+
 DEFINE_DEVICE_TYPE(SIEMENS_97801, s97801_device, "s97801_device", "Siemens 97801 Terminal")
 
 s97801_device::s97801_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -43,15 +45,15 @@ s97801_device::s97801_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
+void s97801_device::device_resolve_objects()
+{
+	m_kbd_rxd = 1; // the keyboard drives this line; it will update us if it changes on reset
+}
+
 void s97801_device::device_start()
 {
 	save_item(NAME(m_kbd_rxd));
-}
-
-void s97801_device::device_reset()
-{
-	m_kbd_rxd = 1;
-	m_txd_cb(1); // mark idle
+	m_txd_cb(1); // mark the host line idle at power-up; the EPCI drives it thereafter
 }
 
 // host -> terminal serial line
@@ -173,6 +175,10 @@ void s97801_device::device_add_mconfig(machine_config &config)
 	SCN2661B(config, m_epci, 4.9152_MHz_XTAL);
 	m_epci->rxrdy_handler().set_inputline(m_cpu, MCS51_INT1_LINE);
 	m_epci->txd_handler().set(FUNC(s97801_device::epci_txd_w)); // terminal -> host
+
+	// clickable keyboard under the screen; attached to the device so it is available both
+	// standalone and when the terminal is used as an rs232 peripheral
+	config.set_default_layout(layout_s97801);
 }
 
 ROM_START(s97801)

@@ -17,8 +17,6 @@
 #include "machine/s97801.h"
 #include "bus/rs232/rs232.h"
 
-#include "s97801.lh"
-
 namespace {
 
 class s97801_state : public driver_device
@@ -55,8 +53,6 @@ void s97801_state::s97801(machine_config &config)
 	host.rxd_handler().set(m_term, FUNC(s97801_device::rxd_w));
 	host.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(ss97_defaults));
 	host.set_option_device_input_defaults("pty", DEVICE_INPUT_DEFAULTS_NAME(ss97_defaults));
-
-	config.set_default_layout(layout_s97801); // clickable keyboard under the screen
 }
 
 ROM_START(s97801)

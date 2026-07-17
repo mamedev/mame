@@ -17,7 +17,10 @@ class s97801_kbd_device : public device_t
 public:
 	s97801_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
+	// configuration
 	auto txd_handler() { return m_txd_cb.bind(); } // keyboard -> terminal
+
+	// live signals
 	void rxd_w(int state);                         // terminal -> keyboard
 
 protected:
@@ -29,6 +32,7 @@ protected:
 private:
 	void prg_map(address_map &map) ATTR_COLD;
 
+	// live signals
 	u8 bus_r();
 	void bus_w(u8 data);
 	void p1_w(u8 data);
@@ -49,7 +53,7 @@ private:
 	emu_timer *m_bell_timer;
 	u8 m_p1;
 	u8 m_p2;
-	int m_rxd;
+	u8 m_rxd;
 };
 
 DECLARE_DEVICE_TYPE(SIEMENS_97801_KBD, s97801_kbd_device)

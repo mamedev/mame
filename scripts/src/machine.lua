@@ -3415,18 +3415,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/sa1110.h,MACHINES["SA1110"] = true
----------------------------------------------------
-
-if MACHINES["SA1110"] then
-	files {
-		MAME_DIR .. "src/devices/machine/sa1110.cpp",
-		MAME_DIR .. "src/devices/machine/sa1110.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/s97801.h,MACHINES["S97801"] = true
 ---------------------------------------------------
 
@@ -3436,6 +3424,26 @@ if MACHINES["S97801"] then
 		MAME_DIR .. "src/devices/machine/s97801.h",
 		MAME_DIR .. "src/devices/machine/s97801_kbd.cpp",
 		MAME_DIR .. "src/devices/machine/s97801_kbd.h",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/machine/s97801.cpp", GEN_DIR .. "emu/layout/s97801.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "s97801"),
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/sa1110.h,MACHINES["SA1110"] = true
+---------------------------------------------------
+
+if MACHINES["SA1110"] then
+	files {
+		MAME_DIR .. "src/devices/machine/sa1110.cpp",
+		MAME_DIR .. "src/devices/machine/sa1110.h",
 	}
 end
 
