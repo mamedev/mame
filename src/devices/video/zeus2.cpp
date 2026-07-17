@@ -1677,6 +1677,7 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 		vert[i].p[2] += (texdata >> 16);
 		vert[i].p[1] *= 256.0f;
 		vert[i].p[2] *= 256.0f;
+		vert[i].p[3] = 0.0f;
 
 
 
@@ -1693,13 +1694,13 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 			unknownFloat[0], unknownFloat[1], unknownFloat[2], unknownFloat[3]);
 	}
 
-	// Z Clipping, done before clamp to 0
+	// Near-plane clip straddling quads instead of rejecting them (which dropped the nearest
+	// crusnexo road segment), matching the Zeus 1 renderer.
 	float clipVal = reinterpret_cast<float&>(m_state->m_zeusbase[0x78]);
-	for (int i = 0; i < 4; i++)
-	{
-		if (vert[i].p[0] < clipVal)
-			return;
-	}
+	z2_poly_vertex clipvert[8];
+	int numverts = zclip_if_less<4>(4, vert, clipvert, clipVal);
+	if (numverts < 3)
+		return;
 
 	float xOrigin = reinterpret_cast<float&>(m_state->m_zeusbase[0x6a]);
 	float yOrigin = reinterpret_cast<float&>(m_state->m_zeusbase[0x6b]);
@@ -1708,38 +1709,36 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	float zRound = (m_state->m_system == m_state->CRUSNEXO) ? 2.0f : 0.5f;
 
 	float oozBase = 1 << m_state->m_zeusbase[0x6c];
-	float ooz;
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < numverts; i++)
 	{
 		// Clamp to zero if negative
-		if (vert[i].p[0] < 0)
-			vert[i].p[0] = 0.0f;
+		if (clipvert[i].p[0] < 0)
+			clipvert[i].p[0] = 0.0f;
 
-		ooz = oozBase / (vert[i].p[0] + zRound);
+		float ooz = oozBase / (clipvert[i].p[0] + zRound);
 
-		if (1) {
-			//vert[i].p[0] += reinterpret_cast<float&>(m_state->m_zeusbase[0x63]);
-			vert[i].x *= ooz;
-			vert[i].y *= ooz;
-			//vert[i].p[0] = ooz;
-		}
+		clipvert[i].x *= ooz;
+		clipvert[i].y *= ooz;
+		// Perspective-correct texturing: carry u/z, v/z and 1/z for the per-pixel divide.
+		clipvert[i].p[1] *= ooz;
+		clipvert[i].p[2] *= ooz;
+		clipvert[i].p[3] = ooz;
 
-		vert[i].x += xOrigin;
-		vert[i].y += yOrigin;
+		clipvert[i].x += xOrigin;
+		clipvert[i].y += yOrigin;
 		// The Grid adds zoffset for objects with no light
 		if (m_state->m_useZOffset)
-			vert[i].p[0] += m_state->zeus_light[2];
+			clipvert[i].p[0] += m_state->zeus_light[2];
 
-		//clipvert[i].p[0] *= 65536.0f * 16.0f;
-		vert[i].p[0] *= 4096.0f * 1.0f;  // 12.12
+		clipvert[i].p[0] *= 4096.0f;  // 12.12
 
 		if (logextra & logit)
-			m_state->logerror("\t\t\tTranslated=(%f,%f, %f) scale = %f\n", (double)vert[i].x, (double)vert[i].y, (double)vert[i].p[0], ooz);
+			m_state->logerror("\t\t\tTranslated=(%f,%f, %f) scale = %f\n", (double)clipvert[i].x, (double)clipvert[i].y, (double)clipvert[i].p[0], ooz);
 	}
 	// Slow HSR
 	// ((AYs - BYs) * (BXs - CXs)) - ((AXs - BXs) * (BYs - CYs))
 	if (1) {
-		float slowHSR = ((vert[0].y - vert[1].y) * (vert[1].x - vert[2].x) - (vert[0].x - vert[1].x) * (vert[1].y - vert[2].y));
+		float slowHSR = ((clipvert[0].y - clipvert[1].y) * (clipvert[1].x - clipvert[2].x) - (clipvert[0].x - clipvert[1].x) * (clipvert[1].y - clipvert[2].y));
 		if (slowHSR >= 0)
 			return;
 	}
@@ -1793,9 +1792,7 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 		break;
 	}
 
-	//if (numverts == 3)
-	//  render_triangle<4>(m_state->zeus_cliprect, render_delegate(&zeus2_renderer::render_poly_8bit, this), vert[0], vert[1], vert[2]);
-	render_polygon<4, 4>(m_state->zeus_cliprect, render_delegate(&zeus2_renderer::render_poly_8bit, this), vert);
+	render_triangle_fan<4>(m_state->zeus_cliprect, render_delegate(&zeus2_renderer::render_poly_8bit, this), numverts, clipvert);
 }
 
 
@@ -1807,13 +1804,14 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 void zeus2_renderer::render_poly_8bit(int32_t scanline, const extent_t& extent, const zeus2_poly_extra_data& object, int threadid)
 {
 	int32_t curz = extent.param[0].start;
-	int32_t curu = extent.param[1].start;
-	int32_t curv = extent.param[2].start;
-	//  int32_t curi = extent.param[3].start;
+	// Perspective-correct texturing: params 1/2 hold u/z and v/z, param 3 holds 1/z.
+	float curupz = extent.param[1].start;
+	float curvpz = extent.param[2].start;
+	float curooz = extent.param[3].start;
 	int32_t dzdx = extent.param[0].dpdx;
-	int32_t dudx = extent.param[1].dpdx;
-	int32_t dvdx = extent.param[2].dpdx;
-	//  int32_t didx = extent.param[3].dpdx;
+	float dupzdx = extent.param[1].dpdx;
+	float dvpzdx = extent.param[2].dpdx;
+	float doozdx = extent.param[3].dpdx;
 	const void *texbase = object.texbase;
 	//const void *palbase = object.palbase;
 	uint16_t transcolor = object.transcolor;
@@ -1851,8 +1849,14 @@ void zeus2_renderer::render_poly_8bit(int32_t scanline, const extent_t& extent, 
 				depth_pass = false;
 		}
 		if (depth_pass) {
-			int u0 = (curu >> 8);// &(texwidth - 1);
-			int v0 = (curv >> 8);// &255;
+			// Perspective divide for texel coords; clamp guards the clipped near edge.
+			float oozInv = 1.0f / curooz;
+			int32_t curu = (int32_t)(curupz * oozInv);
+			int32_t curv = (int32_t)(curvpz * oozInv);
+			int u0 = (curu >> 8);
+			int v0 = (curv >> 8);
+			if (u0 < 0) u0 = 0;
+			if (v0 < 0) v0 = 0;
 			int u1 = (u0 + 1);
 			int v1 = (v0 + 1);
 			if (object.texture_rgb555) {
@@ -1968,9 +1972,9 @@ void zeus2_renderer::render_poly_8bit(int32_t scanline, const extent_t& extent, 
 			}
 		}
 		curz += dzdx;
-		curu += dudx;
-		curv += dvdx;
-		//      curi += didx;
+		curupz += dupzdx;
+		curvpz += dvpzdx;
+		curooz += doozdx;
 	}
 }
 
