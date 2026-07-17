@@ -1569,7 +1569,7 @@ Media for undumped pc9821xa12
 
 	<software name="crystadx" supported="yes">
 		<!--
-		http://redump.org/disc/92502/
+		https://redump.info/disc/92502/
 		Origin: redump.org
 		<rom name="Shin-ou Densetsu Crystania DX (Japan).bin" size="13660416" crc="26579922" sha1="6f29396429e3db3a9e1d0ec7414646981c2d5c0d"/>
 		<rom name="Shin-ou Densetsu Crystania DX (Japan).cue" size="103" crc="fff9e02c" sha1="5842591dceb26171658fc7b25640b7dca54ef9e7"/>

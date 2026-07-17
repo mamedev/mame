@@ -162,7 +162,7 @@ pc98: has color and graphic issues during gameplay
 		</part>
 	</software>
 
-	<!-- Source: http://redump.org/disc/92228/ -->
+	<!-- Source: https://redump.info/disc/92228/ -->
 	<!-- <rom name="Dig, The (Japan).cue" size="82" crc="7127b717" sha1="d0ffba436592b115b8ab5eb3b400210562d8031e"/> -->
 	<!-- <rom name="Dig, The (Japan).bin" size="778196832" crc="550c8138" sha1="3b3f8c72d86e380142299a91218139f32b34a682"/> -->
 	<!-- Pentium 133 MHz -->

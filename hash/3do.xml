@@ -19,7 +19,7 @@ NOTES:
 -->
 <softwarelist name="3do" description="3DO CD-ROMs">
 
-	<!-- http://redump.org/disc/13798/ -->
+	<!-- https://redump.info/disc/13798/ -->
 	<software name="cpquazar" supported="no">
 		<description>Captain Quazar (USA)</description>
 		<year>1996</year>
@@ -32,7 +32,7 @@ NOTES:
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/46905/ -->
+	<!-- https://redump.info/disc/46905/ -->
 	<software name="cowcasn" supported="no">
 		<description>Cowboy Casino (USA)</description>
 		<year>1994</year>
@@ -46,7 +46,7 @@ NOTES:
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/47940/ -->
+	<!-- https://redump.info/disc/47940/ -->
 	<software name="espnfit" supported="no">
 		<description>ESPN Fitness Pros: Step Aerobics (USA)</description>
 		<year>1994</year>
@@ -61,7 +61,7 @@ NOTES:
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/58378/ -->
+	<!-- https://redump.info/disc/58378/ -->
 	<software name="vpreika" supported="no">
 		<description>Virtual Puppet Reika (Japan)</description>
 		<year>1994</year>
@@ -78,7 +78,7 @@ NOTES:
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/89371/ -->
+	<!-- https://redump.info/disc/89371/ -->
 	<software name="virtuoso" supported="no">
 		<description>Virtuoso (USA)</description>
 		<year>1995</year>

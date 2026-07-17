@@ -7469,7 +7469,7 @@ https://mametesters.org/view.php?id=7972 (fixed)
 	</software>
 
 	<!--
-	Source: http://redump.org/disc/62014/
+	Source: https://redump.info/disc/62014/
 	<rom name="Implode (USA) (Unl).cue" size="1145" crc="7db10cbb" sha1="40cce6acd42b6df5670cc1b0f13fc67c1f1ecf1b"/>
 	<rom name="Implode (USA) (Unl) (Track 01).bin" size="2217936" crc="ca38443a" sha1="e6ac208247b025508ccce5d755ecab68c937ee49"/>
 	<rom name="Implode (USA) (Unl) (Track 02).bin" size="2751840" crc="d7ec6479" sha1="66aaafb28d277baab10330b01ae5977b6b73977f"/>
@@ -7889,7 +7889,7 @@ Offset [CRTC] screen
 	<!-- Unlicensed Discs -->
 
 	<!--
-	Source: http://redump.org/disc/62035/
+	Source: https://redump.info/disc/62035/
 	<rom name="Meteor Blaster DX (USA) (Unl) (Rerelease).cue" size="2861" crc="b85fc202" sha1="4de4ee2bd60b9f8de25dbe2108393ddb8b1a5cd7"/>
 	<rom name="Meteor Blaster DX (USA) (Unl) (Rerelease) (Track 01).bin" size="9800784" crc="efc2ee90" sha1="a1b09680b012a47996eada11fe85b7bfd3b1a437"/>
 	<rom name="Meteor Blaster DX (USA) (Unl) (Rerelease) (Track 02).bin" size="36105552" crc="c70deb95" sha1="6653419696ee19c61255c9116de51e891723ee0c"/>
@@ -7928,7 +7928,7 @@ Offset [CRTC] screen
 	</software>
 
 	<!--
-	Source: http://redump.org/disc/62015/
+	Source: https://redump.info/disc/62015/
 	<rom name="Meteor Blaster DX (USA) (Unl).cue" size="2609" crc="703dbcdc" sha1="5aaa4f2679d33b4639680f6cc2c2cb6eb1c8f3c8"/>
 	<rom name="Meteor Blaster DX (USA) (Unl) (Track 01).bin" size="5049744" crc="84c37434" sha1="b85752342c9f2f3df82c21806555e9dc0086c236"/>
 	<rom name="Meteor Blaster DX (USA) (Unl) (Track 02).bin" size="36105552" crc="aba046ac" sha1="078e2779cd32d397cab223ff411f1c56ffbfb91e"/>
@@ -8009,7 +8009,7 @@ Offset [CRTC] screen
 	</software>
 
 	<!--
-	Source: http://redump.org/disc/78660/
+	Source: https://redump.info/disc/78660/
 	<rom name="Hi-Leg Fantasy (Japan) (Unl).cue" size="1581" crc="e5857401" sha1="5326c8a4044caf0639f6c090ef48a5cc0ee0150f"/>
 	<rom name="Hi-Leg Fantasy (Japan) (Unl) (Track 01).bin" size="9678480" crc="f7bb332c" sha1="c9c862eab7fcb1e0edeaae566b3ec79f65897028"/>
 	<rom name="Hi-Leg Fantasy (Japan) (Unl) (Track 02).bin" size="20490624" crc="2f6aa10f" sha1="532a66c9d5bd053144b4e18b492e92f1fe7764ab"/>
@@ -8151,7 +8151,7 @@ Offset [CRTC] screen
 	</software>
 
 	<!--
-	Source: http://redump.org/disc/109174/
+	Source: https://redump.info/disc/109174/
 	<rom name="Jessie Jaeger in Cleopatra's Curse (World) (Unl).cue" size="1851" crc="17dfe61a" sha1="6367a535dd507cf7e2e408fdf0e68e5c26516b6a"/>
 	<rom name="Jessie Jaeger in Cleopatra's Curse (World) (Unl) (Track 01).bin" size="910224" crc="ecd234b8" sha1="80baf55be618f17a73fac830b64d3d2c23d631cd"/>
 	<rom name="Jessie Jaeger in Cleopatra's Curse (World) (Unl) (Track 02).bin" size="3370416" crc="f917f093" sha1="1d999569b014bc5d44bbc54937bf778e1bce66a6"/>
@@ -8206,7 +8206,7 @@ Offset [CRTC] screen
 	</software>
 
 	<!--
-	Source: http://redump.org/disc/69150/
+	Source: https://redump.info/disc/69150/
 	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease).cue" size="3147" crc="a24f8fec" sha1="21cc965155214be45f08bc62e8bae34b6e614922"/>
 	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease) (Track 01).bin" size="7117152" crc="5959676e" sha1="d14926b16640860c6e175da44e30903f48666b1a"/>
 	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease) (Track 02).bin" size="10118304" crc="a32370bd" sha1="763870e0c0d0a38d4271019770596c92f8838758"/>
@@ -8268,7 +8268,7 @@ Offset [CRTC] screen
 	</software>
 
 	<!--
-	Source: http://redump.org/disc/62036/
+	Source: https://redump.info/disc/62036/
 	<rom name="Hypernova Blast (USA) (Unl).cue" size="2933" crc="fb155243" sha1="8ca7766ae60c26dd5422c31b68d8b7c8ea800ecb"/>
 	<rom name="Hypernova Blast (USA) (Unl) (Track 01).bin" size="21518448" crc="ebcc7a88" sha1="b4ab4a9cd33c648c0cbc285c23e07bc9b63abb01"/>
 	<rom name="Hypernova Blast (USA) (Unl) (Track 02).bin" size="2347296" crc="c70d41ff" sha1="8ff57b3975bbed99ccf8c3467e59073c2520ab5a"/>
@@ -8309,7 +8309,7 @@ Offset [CRTC] screen
 	</software>
 
 	<!--
-	Source: http://redump.org/disc/70359/
+	Source: https://redump.info/disc/70359/
 	<rom name="Insanity (USA) (Unl).cue" size="1477" crc="ce8a2d65" sha1="bc833516704d72122d4c647d7e549e31c8072781"/>
 	<rom name="Insanity (USA) (Unl) (Track 01).bin" size="4120704" crc="e2992aca" sha1="c07eb25a6a181edc1313e508f11240d95e8be3db"/>
 	<rom name="Insanity (USA) (Unl) (Track 02).bin" size="2935296" crc="6859fb0d" sha1="80ef3d4572761d37429e6ca2c2364c51f29b2afa"/>
@@ -8339,7 +8339,7 @@ Offset [CRTC] screen
 	</software>
 
 	<!--
-	Source: http://redump.org/disc/60281/
+	Source: https://redump.info/disc/60281/
 	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease).cue" size="3589" crc="da073a3d" sha1="9936b139ed5a668b1c8d97a22e35e639712bf77b"/>
 	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 01).bin" size="13408752" crc="29c8be3f" sha1="16bab1d94660b6e8b7417dbdaeb3a42ebf9b7755"/>
 	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 02).bin" size="7954464" crc="bb5bfef1" sha1="73493cb719204c822e1d82aa17bb84c53db77f6b"/>
@@ -8388,7 +8388,7 @@ Offset [CRTC] screen
 	</software>
 
 	<!--
-	Source: http://redump.org/disc/49375/
+	Source: https://redump.info/disc/49375/
 	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl).cue" size="3241" crc="4052cbd1" sha1="d96a39018c95b3370d7b0c387bbc7950df1e9f66"/>
 	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 01).bin" size="13331136" crc="e9387df0" sha1="d433df05628ed3cb3273f74829a917175b174eee"/>
 	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 02).bin" size="8104992" crc="29cb97c5" sha1="1f10986f682bd1891d4252e4f747ef0bd3ac8204"/>
@@ -8437,7 +8437,7 @@ Offset [CRTC] screen
 	</software>
 
 	<!--
-	Source: http://redump.org/disc/49374/
+	Source: https://redump.info/disc/49374/
 	<rom name="Pyramid Plunder (USA) (Unl).cue" size="93" crc="c1241fca" sha1="d28ed142dbcb48e1cf1d0f6f4225049719d823c6"/>
 	<rom name="Pyramid Plunder (USA) (Unl).bin" size="2349648" crc="5d0a060d" sha1="bba6e8c5bdf41cbfb4bcf395a8900dc8153bbda4"/>
 	-->
@@ -8455,7 +8455,7 @@ Offset [CRTC] screen
 	</software>
 
 	<!--
-	Source: http://redump.org/disc/49376/
+	Source: https://redump.info/disc/49376/
 	<rom name="Revival Chase (USA) (En,Fr) (Unl).cue" size="1518" crc="3f6da1a3" sha1="f7481fb27806322080d2b57aa36c4604fa6262fd"/>
 	<rom name="Revival Chase (USA) (En,Fr) (Unl) (Track 01).bin" size="5115600" crc="6ffad6a2" sha1="405d4fad91304a0de94ef36bc10bec082bf3404d"/>
 	<rom name="Revival Chase (USA) (En,Fr) (Unl) (Track 02).bin" size="24733632" crc="efb59ee7" sha1="fbe108459e04b2744dc5d2e0cdcc796ff25bb62f"/>

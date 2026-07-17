@@ -149,7 +149,7 @@ license:CC0-1.0
 	Your Privacy Assured
 	-->
 
-	<!-- http://redump.org/disc/24202/ -->
+	<!-- https://redump.info/disc/24202/ -->
 	<software name="akira">
 		<description>Akira (Collector's Edition)</description>
 		<year>1994</year>
@@ -163,7 +163,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/3344/ -->
+	<!-- https://redump.info/disc/3344/ -->
 	<software name="alfred" supported="partial">
 		<description>Alfred Chicken</description>
 		<year>1993</year>
@@ -179,7 +179,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Freezes at main menu -->
-	<!-- http://redump.org/disc/3200/ -->
+	<!-- https://redump.info/disc/3200/ -->
 	<software name="abseqwak" supported="no">
 		<description>Alien Breed - Special Edition + Qwak</description>
 		<year>1994</year>
@@ -195,7 +195,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Crashes after menu -->
-	<!-- http://redump.org/disc/3093/ -->
+	<!-- https://redump.info/disc/3093/ -->
 	<software name="abreedta" supported="no">
 		<description>Alien Breed: Tower Assault</description>
 		<year>1994</year>
@@ -210,7 +210,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Freezes at into screen -->
-	<!-- http://redump.org/disc/3384/ -->
+	<!-- https://redump.info/disc/3384/ -->
 	<software name="abreed3d" supported="no">
 		<description>Alien Breed 3D</description>
 		<year>1995</year>
@@ -225,7 +225,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Bundled with Issue 1 (Mar 1994) of Amiga CD32 Magazine -->
-	<!-- http://redump.org/disc/5419/ -->
+	<!-- https://redump.info/disc/5419/ -->
 	<software name="cd32mag1" supported="partial">
 		<description>Amiga CD32 - Volume 1</description>
 		<year>1994</year>
@@ -240,7 +240,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Bundled with Issue 2 (Oct 1994) of Amiga CD32 Magazine -->
-	<!-- http://redump.org/disc/5420/ -->
+	<!-- https://redump.info/disc/5420/ -->
 	<software name="cd32mag2" supported="partial">
 		<description>Amiga CD32 - Volume 2</description>
 		<year>1994</year>
@@ -268,7 +268,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Bundled with Issue Two (Jun 1994) of Amiga CD32 Gamer Magazine -->
-	<!-- http://redump.org/disc/6791/ -->
+	<!-- https://redump.info/disc/6791/ -->
 	<software name="gamer2" supported="partial">
 		<description>Amiga CD32 Gamer - Volume 2</description>
 		<year>1994</year>
@@ -348,7 +348,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Bundled with Issue 8 (Jan 1995) of Amiga CD32 Gamer Magazine -->
-	<!-- http://redump.org/disc/39460/ -->
+	<!-- https://redump.info/disc/39460/ -->
 	<software name="gamer8" supported="no">
 		<description>Amiga CD32 Gamer - Volume 8</description>
 		<year>1995</year>
@@ -544,7 +544,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/3220/ -->
+	<!-- https://redump.info/disc/3220/ -->
 	<software name="arabian" supported="partial">
 		<description>Arabian Nights</description>
 		<year>1993</year>
@@ -558,7 +558,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/3435/ -->
+	<!-- https://redump.info/disc/3435/ -->
 	<software name="arcdpool">
 		<description>Arcade Pool (set 1)</description>
 		<year>1994</year>
@@ -573,7 +573,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Has an earlier build date, so might actually be an earlier version -->
-	<!-- http://redump.org/disc/3220/ -->
+	<!-- https://redump.info/disc/3220/ -->
 	<software name="arcdpool1" cloneof="arcdpool">
 		<description>Arcade Pool (set 2)</description>
 		<year>1994</year>
@@ -600,7 +600,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- No in-game HUD, scrolling problems-->
-	<!-- http://redump.org/disc/3293/ -->
+	<!-- https://redump.info/disc/3293/ -->
 	<software name="banshee" supported="partial">
 		<description>Banshee</description>
 		<year>1994</year>
@@ -614,7 +614,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/3872/ -->
+	<!-- https://redump.info/disc/3872/ -->
 	<software name="basejump" supported="partial">
 		<description>Base Jumpers</description>
 		<year>1995</year>
@@ -627,7 +627,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/18873/ -->
+	<!-- https://redump.info/disc/18873/ -->
 	<software name="btlchess">
 		<description>Battle Chess</description>
 		<year>1994</year>
@@ -642,7 +642,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Doesn't boot -->
-	<!-- http://redump.org/disc/3429/ -->
+	<!-- https://redump.info/disc/3429/ -->
 	<software name="btoads" supported="no">
 		<description>Battletoads</description>
 		<year>1994</year>
@@ -657,7 +657,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Works as far as tested -->
-	<!-- http://redump.org/disc/3053/ -->
+	<!-- https://redump.info/disc/3053/ -->
 	<software name="beavers" supported="partial">
 		<description>Beavers</description>
 		<year>1994</year>
@@ -671,7 +671,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/3184/ -->
+	<!-- https://redump.info/disc/3184/ -->
 	<software name="bass" supported="no">
 		<description>Beneath a Steel Sky</description>
 		<year>1994</year>
@@ -686,7 +686,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Doesn't boot -->
-	<!-- http://redump.org/disc/3400/ -->
+	<!-- https://redump.info/disc/3400/ -->
 	<software name="benefact" supported="no">
 		<description>Benefactor</description>
 		<year>1994</year>
@@ -713,7 +713,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Boot OK, has stripe glitch during FMV, road doesn't draw when player is on the left side of the road -->
-	<!-- http://redump.org/disc/3306/ -->
+	<!-- https://redump.info/disc/3306/ -->
 	<software name="blkviper" supported="no">
 		<description>Black Viper</description>
 		<year>1996</year>
@@ -726,7 +726,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/36197/ -->
+	<!-- https://redump.info/disc/36197/ -->
 	<software name="brutalf" supported="no">
 		<description>Brutal Sports Series: Football</description>
 		<year>1994</year>
@@ -742,7 +742,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Doesn't boot -->
-	<!-- http://redump.org/disc/16190/ -->
+	<!-- https://redump.info/disc/16190/ -->
 	<software name="bubba" supported="no">
 		<description>Bubba 'n' Stix</description>
 		<year>1994</year>
@@ -757,7 +757,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Doesn't boot -->
-	<!-- http://redump.org/disc/3371/ -->
+	<!-- https://redump.info/disc/3371/ -->
 	<software name="bubblesq" supported="no">
 		<description>Bubble and Squeak</description>
 		<year>1994</year>
@@ -771,7 +771,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Freezes on high score screen? -->
-	<!-- http://redump.org/disc/3326/ -->
+	<!-- https://redump.info/disc/3326/ -->
 	<software name="bumpburn" supported="partial">
 		<description>Bump 'n' Burn</description>
 		<year>1994</year>
@@ -785,7 +785,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/3427/ -->
+	<!-- https://redump.info/disc/3427/ -->
 	<software name="cannfodd" supported="no">
 		<description>Cannon Fodder</description>
 		<year>1994</year>
@@ -799,7 +799,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/16152/ -->
+	<!-- https://redump.info/disc/16152/ -->
 	<software name="castles2" supported="no">
 		<description>Castles II: Siege &amp; Conquest</description>
 		<year>1993</year>
@@ -814,7 +814,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Problems with graphics -->
-	<!-- http://redump.org/disc/3096/ -->
+	<!-- https://redump.info/disc/3096/ -->
 	<software name="shaolin" supported="partial">
 		<description>Chambers of Shaolin</description>
 		<year>1993</year>
@@ -829,7 +829,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Freezes after the intro, glitchy graphics-->
-	<!-- http://redump.org/disc/22005/ -->
+	<!-- https://redump.info/disc/22005/ -->
 	<software name="chaoseng" supported="no">
 		<description>The Chaos Engine</description>
 		<year>1994</year>
@@ -844,7 +844,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Doesn't boot -->
-	<!-- http://redump.org/disc/3219/ -->
+	<!-- https://redump.info/disc/3219/ -->
 	<software name="chuckrck" supported="no">
 		<description>Chuck Rock</description>
 		<year>1994</year>
@@ -859,7 +859,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Doesn't boot -->
-	<!-- http://redump.org/disc/16191/ -->
+	<!-- https://redump.info/disc/16191/ -->
 	<software name="chukrck2" supported="no">
 		<description>Chuck Rock II: Son of Chuck</description>
 		<year>1994</year>
@@ -874,7 +874,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Doesn't boot -->
-	<!-- http://redump.org/disc/36168/ -->
+	<!-- https://redump.info/disc/36168/ -->
 	<software name="lotus" supported="no">
 		<description>The Classic Lotus Trilogy</description>
 		<year>1994</year>
@@ -900,7 +900,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/3125/ -->
+	<!-- https://redump.info/disc/3125/ -->
 	<software name="dgen">
 		<description>D/Generation</description>
 		<year>1993</year>
@@ -916,7 +916,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- GFX color glitch with Flair mascot at boot -->
-	<!-- http://redump.org/disc/16189/ -->
+	<!-- https://redump.info/disc/16189/ -->
 	<software name="dstreets" supported="partial">
 		<description>Dangerous Streets</description>
 		<year>1994</year>
@@ -931,7 +931,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Doesn't boot -->
-	<!-- http://redump.org/disc/3094/ -->
+	<!-- https://redump.info/disc/3094/ -->
 	<software name="darkseed" supported="no">
 		<description>Dark Seed</description>
 		<year>1994</year>
@@ -945,7 +945,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/36258/ -->
+	<!-- https://redump.info/disc/36258/ -->
 	<software name="deepcore" supported="partial">
 		<description>Deep Core (Rev. 1)</description>
 		<year>1993</year>
@@ -972,7 +972,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Doesn't progress past loading screen-->
-	<!-- http://redump.org/disc/36226/ -->
+	<!-- https://redump.info/disc/36226/ -->
 	<software name="disphero" supported="no">
 		<description>Disposable Hero</description>
 		<year>1994</year>
@@ -986,7 +986,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Doesn't boot -->
-	<!-- http://redump.org/disc/4000/ -->
+	<!-- https://redump.info/disc/4000/ -->
 	<software name="donk" supported="no">
 		<description>Donk! The Samurai Duck!</description>
 		<year>1994</year>
@@ -1001,7 +1001,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Doesn't boot -->
-	<!-- http://redump.org/disc/22996/ -->
+	<!-- https://redump.info/disc/22996/ -->
 	<software name="dstone" supported="no">
 		<description>Dragonstone</description>
 		<year>1995</year>
@@ -1016,7 +1016,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Doesn't boot -->
-	<!-- http://redump.org/disc/22997/ -->
+	<!-- https://redump.info/disc/22997/ -->
 	<software name="emerald" supported="no">
 		<description>Emerald Mines</description>
 		<year>1994</year>
@@ -1031,7 +1031,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Glitchy graphics -->
-	<!-- http://redump.org/disc/16194/ -->
+	<!-- https://redump.info/disc/16194/ -->
 	<software name="fireice" supported="partial">
 		<description>Fire + Ice</description>
 		<year>1994</year>
@@ -1046,7 +1046,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/3051/ -->
+	<!-- https://redump.info/disc/3051/ -->
 	<software name="fireforc" supported="partial">
 		<description>Fireforce</description>
 		<year>1994</year>
@@ -1061,7 +1061,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Freezes at loading screen -->
-	<!-- http://redump.org/disc/28617/ -->
+	<!-- https://redump.info/disc/28617/ -->
 	<software name="flyhard" supported="no">
 		<description>Fly Harder</description>
 		<year>1994</year>
@@ -1087,7 +1087,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Doesn't boot -->
-	<!-- http://redump.org/disc/18926/ -->
+	<!-- https://redump.info/disc/18926/ -->
 	<software name="frontier" supported="no">
 		<description>Frontier: Elite II</description>
 		<year>1993</year>
@@ -1102,7 +1102,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Glitchy graphics, freezes after title screen? -->
-	<!-- http://redump.org/disc/36296/ -->
+	<!-- https://redump.info/disc/36296/ -->
 	<software name="global" supported="no">
 		<description>Global Effect</description>
 		<year>1994</year>
@@ -1117,7 +1117,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Glitchy graphics, freezes at title screen -->
-	<!-- http://redump.org/disc/3428/ -->
+	<!-- https://redump.info/disc/3428/ -->
 	<software name="gloom" supported="no">
 		<description>Gloom</description>
 		<year>1995</year>
@@ -1132,7 +1132,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Glitchy graphics, unplayable -->
-	<!-- http://redump.org/disc/23533/ -->
+	<!-- https://redump.info/disc/23533/ -->
 	<software name="guardian" supported="partial">
 		<description>Guardian</description>
 		<year>1994</year>
@@ -1146,7 +1146,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/3369/ -->
+	<!-- https://redump.info/disc/3369/ -->
 	<software name="gulp" supported="no">
 		<description>Gulp!</description>
 		<year>1994</year>
@@ -1174,7 +1174,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Doesn't boot -->
-	<!-- http://redump.org/disc/3201/ -->
+	<!-- https://redump.info/disc/3201/ -->
 	<software name="ikplus" supported="no">
 		<description>International Karate +</description>
 		<year>1994</year>
@@ -1202,7 +1202,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Glitchy graphics, hangs at boot while music plays -->
-	<!-- http://redump.org/disc/4026/ -->
+	<!-- https://redump.info/disc/4026/ -->
 	<software name="kidchaos" supported="no">
 		<description>Kid Chaos</description>
 		<year>1994</year>
@@ -1228,7 +1228,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Doesn't boot -->
-	<!-- http://redump.org/disc/16700/ -->
+	<!-- https://redump.info/disc/16700/ -->
 	<software name="marvin" supported="no">
 		<description>Marvin's Marvellous Adventure</description>
 		<year>1994</year>
@@ -1243,7 +1243,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Input is not working, graphics partially broken -->
-	<!-- http://redump.org/disc/3076/ -->
+	<!-- https://redump.info/disc/3076/ -->
 	<software name="mean" supported="no">
 		<description>Mean Arenas</description>
 		<year>1994</year>
@@ -1271,7 +1271,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Doesn't boot -->
-	<!-- http://redump.org/disc/20030/ -->
+	<!-- https://redump.info/disc/20030/ -->
 	<software name="flink" supported="no">
 		<description>The Misadventures of Flink</description>
 		<year>1994</year>
@@ -1297,7 +1297,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Doesn't boot -->
-	<!-- http://redump.org/disc/3368/ -->
+	<!-- https://redump.info/disc/3368/ -->
 	<software name="myth" supported="no">
 		<description>Myth: History in the Making</description>
 		<year>1993</year>
@@ -1312,7 +1312,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Glitchy graphics, seems to run otherwise -->
-	<!-- http://redump.org/disc/38004/ -->
+	<!-- https://redump.info/disc/38004/ -->
 	<software name="naughty" supported="partial">
 		<description>Naughty Ones</description>
 		<year>1994</year>
@@ -1327,7 +1327,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Doesn't boot -->
-	<!-- http://redump.org/disc/3097/ -->
+	<!-- https://redump.info/disc/3097/ -->
 	<software name="okillunc" supported="no">
 		<description>Overkill &amp; Lunar-C</description>
 		<year>1994</year>
@@ -1342,7 +1342,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/3287/ -->
+	<!-- https://redump.info/disc/3287/ -->
 	<software name="pgaeuro" supported="no">
 		<description>PGA European Tour</description>
 		<year>1995</year>
@@ -1355,7 +1355,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/3134/ -->
+	<!-- https://redump.info/disc/3134/ -->
 	<software name="pierre" supported="no">
 		<description>Pierre Le Chef is... Out to Lunch</description>
 		<year>1994</year>
@@ -1394,7 +1394,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/29269/ -->
+	<!-- https://redump.info/disc/29269/ -->
 	<software name="pwrdrive" supported="no">
 		<description>Power Drive</description>
 		<year>1994</year>
@@ -1408,7 +1408,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/29180/ -->
+	<!-- https://redump.info/disc/29180/ -->
 	<software name="pwrgames" supported="no">
 		<description>Power-Games</description>
 		<year>1994</year>
@@ -1421,7 +1421,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/3430/ -->
+	<!-- https://redump.info/disc/3430/ -->
 	<software name="prey" supported="no">
 		<description>Prey: An Alien Encounter</description>
 		<year>1994</year>
@@ -1449,7 +1449,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Doesn't boot? -->
-	<!-- http://redump.org/disc/36196/ -->
+	<!-- https://redump.info/disc/36196/ -->
 	<software name="projxubb" supported="no">
 		<description>Project-X + Ultimate Body Blows</description>
 		<year>1994</year>
@@ -1464,7 +1464,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Bundled with Issue 2 (Apr 1995) of Amiga CD32 Special Magazine -->
-	<!-- http://redump.org/disc/3129/ -->
+	<!-- https://redump.info/disc/3129/ -->
 	<software name="quik" supported="partial">
 		<description>Quik the Thunder Rabbit</description>
 		<year>1994</year>
@@ -1479,7 +1479,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Glitchy graphics, gameplay too fast? -->
-	<!-- http://redump.org/disc/3431/ -->
+	<!-- https://redump.info/disc/3431/ -->
 	<software name="riserobo" supported="partial">
 		<description>Rise of the Robots</description>
 		<year>1994</year>
@@ -1494,7 +1494,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Doesn't boot -->
-	<!-- http://redump.org/disc/3295/ -->
+	<!-- https://redump.info/disc/3295/ -->
 	<software name="roadkill" supported="no">
 		<description>Roadkill (set 1)</description>
 		<year>1995</year>
@@ -1508,7 +1508,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/3295/ -->
+	<!-- https://redump.info/disc/3295/ -->
 	<software name="roadkill1" supported="no" cloneof="roadkill">
 		<description>Roadkill (set 2)</description>
 		<year>1995</year>
@@ -1522,7 +1522,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Glitchy graphics, works okay otherwise -->
-	<!-- http://redump.org/disc/19202/ -->
+	<!-- https://redump.info/disc/19202/ -->
 	<software name="seekdest" supported="partial">
 		<description>Seek and Destroy</description>
 		<year>1994</year>
@@ -1537,7 +1537,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/3132/ -->
+	<!-- https://redump.info/disc/3132/ -->
 	<software name="jambala" supported="no">
 		<description>The Seven Gates of Jambala</description>
 		<year>1994</year>
@@ -1552,7 +1552,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Problems with graphics -->
-	<!-- http://redump.org/disc/3332/ -->
+	<!-- https://redump.info/disc/3332/ -->
 	<software name="shadfght" supported="partial">
 		<description>Shadow Fighter</description>
 		<year>1994</year>
@@ -1566,7 +1566,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/3215/ -->
+	<!-- https://redump.info/disc/3215/ -->
 	<software name="sheerdlt" supported="no">
 		<description>Sheer Delight</description>
 		<year>1994</year>
@@ -1579,7 +1579,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/3216/ -->
+	<!-- https://redump.info/disc/3216/ -->
 	<software name="simonsrc" supported="no">
 		<description>Simon the Sorcerer</description>
 		<year>1994</year>
@@ -1594,7 +1594,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Doesn't boot -->
-	<!-- http://redump.org/disc/22003/ -->
+	<!-- https://redump.info/disc/22003/ -->
 	<software name="skelkrew" supported="no">
 		<description>Skeleton Krew</description>
 		<year>1995</year>
@@ -1608,7 +1608,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/3432/ -->
+	<!-- https://redump.info/disc/3432/ -->
 	<software name="speris" supported="no">
 		<description>The Speris Legacy</description>
 		<year>1996</year>
@@ -1623,7 +1623,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- boot OK -->
-	<!-- http://redump.org/disc/3307/ -->
+	<!-- https://redump.info/disc/3307/ -->
 	<software name="strippot" supported="yes">
 		<description>Strip Pot</description>
 		<year>1994</year>
@@ -1636,7 +1636,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/3123/ -->
+	<!-- https://redump.info/disc/3123/ -->
 	<software name="sw2050" supported="no">
 		<description>Subwar 2050</description>
 		<year>1994</year>
@@ -1650,7 +1650,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- 2nd screen text has an overlayed glitchy black stripe in the swimming event -->
-	<!-- http://redump.org/disc/3230/ -->
+	<!-- https://redump.info/disc/3230/ -->
 	<software name="solympix" supported="partial">
 		<description>Summer Olympix</description>
 		<year>1994</year>
@@ -1664,7 +1664,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/16193/ -->
+	<!-- https://redump.info/disc/16193/ -->
 	<software name="methbros" supported="no">
 		<description>Super Methane Bros.</description>
 		<year>1994</year>
@@ -1679,7 +1679,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Doesn't work -->
-	<!-- http://redump.org/disc/3131/ -->
+	<!-- https://redump.info/disc/3131/ -->
 	<software name="suprputt" supported="no">
 		<description>Super Putty</description>
 		<year>1994</year>
@@ -1693,7 +1693,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/36295/ -->
+	<!-- https://redump.info/disc/36295/ -->
 	<software name="sskid" supported="no">
 		<description>Super Skidmarks (set 1)</description>
 		<year>1995</year>
@@ -1709,7 +1709,7 @@ license:CC0-1.0
 
 	<!-- bad screen mode -->
 	<!-- This is the same version as its parent, however the CD structure differs between the two. -->
-	<!-- http://redump.org/disc/25416/ -->
+	<!-- https://redump.info/disc/25416/ -->
 	<software name="sskid1" cloneof="sskid" supported="no">
 		<description>Super Skidmarks (set 2)</description>
 		<year>1995</year>
@@ -1724,7 +1724,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- runs and can be 'played', but gfx are badly scaled -->
-	<!-- http://redump.org/disc/7832/ -->
+	<!-- https://redump.info/disc/7832/ -->
 	<software name="sstardst" supported="no">
 		<description>Super Stardust</description>
 		<year>1995</year>
@@ -1738,7 +1738,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/3217/ -->
+	<!-- https://redump.info/disc/3217/ -->
 	<software name="suprfrog" supported="no">
 		<description>Superfrog</description>
 		<year>1994</year>
@@ -1752,7 +1752,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/3366/ -->
+	<!-- https://redump.info/disc/3366/ -->
 	<!-- Listed as possible bad dump on redump.org -->
 	<software name="suprfrog1" supported="no">
 		<description>Superfrog (rev 1)</description>
@@ -1767,7 +1767,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/3434/ -->
+	<!-- https://redump.info/disc/3434/ -->
 	<software name="surfninj" supported="no">
 		<description>Surf Ninjas</description>
 		<year>1994</year>
@@ -1782,7 +1782,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Some releases included a free copy of Alfred Chicken -->
-	<!-- http://redump.org/disc/3092/ -->
+	<!-- https://redump.info/disc/3092/ -->
 	<software name="syndicat" supported="no">
 		<description>Syndicate</description>
 		<year>1995</year>
@@ -1797,7 +1797,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/31362/ -->
+	<!-- https://redump.info/disc/31362/ -->
 	<software name="themeprk" supported="no">
 		<description>Theme Park</description>
 		<year>1995</year>
@@ -1812,7 +1812,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Crashes with "DSKDAT W 0000" -->
-	<!-- http://redump.org/disc/3049/ -->
+	<!-- https://redump.info/disc/3049/ -->
 	<software name="totcarn" supported="no">
 		<description>Total Carnage</description>
 		<year>1994</year>
@@ -1826,7 +1826,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/36281/ -->
+	<!-- https://redump.info/disc/36281/ -->
 	<software name="tp" supported="no">
 		<description>Trivial Pursuit</description>
 		<year>1994</year>
@@ -1841,7 +1841,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/25927/ -->
+	<!-- https://redump.info/disc/25927/ -->
 	<software name="trolls" supported="no">
 		<description>Trolls</description>
 		<year>1993</year>
@@ -1855,7 +1855,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/3124/ -->
+	<!-- https://redump.info/disc/3124/ -->
 	<software name="ufo" supported="no">
 		<description>UFO: Enemy Unknown</description>
 		<year>1994</year>
@@ -1868,7 +1868,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/22004/ -->
+	<!-- https://redump.info/disc/22004/ -->
 	<software name="ubb" supported="no">
 		<description>Ultimate Body Blows</description>
 		<year>1994</year>
@@ -1896,7 +1896,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Playable but missing some graphical effects -->
-	<!-- http://redump.org/disc/3126/ -->
+	<!-- https://redump.info/disc/3126/ -->
 	<software name="vital" supported="partial">
 		<description>Vital Light</description>
 		<year>1994</year>
@@ -1910,7 +1910,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Bundled with Issue 3 (Aug 1995) of Amiga CD32 Special Magazine -->
-	<!-- http://redump.org/disc/3127/ -->
+	<!-- https://redump.info/disc/3127/ -->
 	<software name="vital1" cloneof="vital" supported="partial">
 		<description>Vital Light (Amiga CD32 Special)</description>
 		<year>1995</year>
@@ -1924,7 +1924,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/3294/ -->
+	<!-- https://redump.info/disc/3294/ -->
 	<software name="wembley" supported="no">
 		<description>Wembley International Soccer</description>
 		<year>1994</year>
@@ -1938,7 +1938,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/18011/ -->
+	<!-- https://redump.info/disc/18011/ -->
 	<software name="whalevoy" supported="no">
 		<description>Whale's Voyage</description>
 		<year>1993</year>
@@ -1951,7 +1951,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/18710/ -->
+	<!-- https://redump.info/disc/18710/ -->
 	<software name="wildcup" supported="no">
 		<description>Wild Cup Soccer</description>
 		<year>1994</year>
@@ -1965,7 +1965,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Manual copy protection -->
-	<!-- http://redump.org/disc/16702/ -->
+	<!-- https://redump.info/disc/16702/ -->
 	<software name="worms" supported="no">
 		<description>Worms</description>
 		<year>1995</year>
@@ -1979,7 +1979,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/16327/ -->
+	<!-- https://redump.info/disc/16327/ -->
 	<software name="zool" supported="no">
 		<description>Zool: Ninja of the "Nth" Dimension</description>
 		<year>1993</year>
@@ -1993,7 +1993,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- http://redump.org/disc/29209/ -->
+	<!-- https://redump.info/disc/29209/ -->
 	<software name="zool2" supported="no">
 		<description>Zool 2</description>
 		<year>1994</year>

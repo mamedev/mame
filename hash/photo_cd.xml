@@ -3,12 +3,12 @@
 <!--
 license:CC0-1.0
 
-http://redump.org/discs/system/photo-cd/
+https://redump.info/discs/system/photo-cd/
 -->
 <softwarelist name="photo_cd" description="Kodak Photo CD images (Beige Book)">
 
 	<software name="toilhana" supported="no">
-		<!-- http://redump.org/disc/103991/ -->
+		<!-- https://redump.info/disc/103991/ -->
 		<description>Toilet no Hanako-san (Japan)</description>
 		<year>1995</year>
 		<publisher>Times In</publisher>
@@ -22,7 +22,7 @@ http://redump.org/discs/system/photo-cd/
 	</software>
 
 	<software name="winsenna" supported="no">
-		<!-- http://redump.org/disc/103998/ -->
+		<!-- https://redump.info/disc/103998/ -->
 		<description>Winning Run: Ayrton Senna: 20-nen no Kiseki (Japan)</description>
 		<year>1995</year>
 		<publisher>Kasakura Shuppan</publisher>
