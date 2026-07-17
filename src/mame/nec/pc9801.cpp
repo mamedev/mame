@@ -230,19 +230,19 @@ void pc9801_state::pc9801_common_io(address_map &map)
 void pc9801_state::cbus_overlay_io(address_map &map)
 {
 	map(0x91, 0x91).lrw8(
-		NAME([this] (offs_t offset) { return m_cbus_root->io_r(0x90 >> 1, 0xff00); }),
+		NAME([this] (offs_t offset) { return m_cbus_root->io_r(0x90 >> 1, 0xff00) >> 8; }),
 		NAME([this] (offs_t offset, u8 data) { m_cbus_root->io_w(0x90 >> 1, data << 8, 0xff00); })
 	);
 	map(0x93, 0x93).lrw8(
-		NAME([this] (offs_t offset) { return m_cbus_root->io_r(0x92 >> 1, 0xff00); }),
+		NAME([this] (offs_t offset) { return m_cbus_root->io_r(0x92 >> 1, 0xff00) >> 8; }),
 		NAME([this] (offs_t offset, u8 data) { m_cbus_root->io_w(0x92 >> 1, data << 8, 0xff00); })
 	);
 	map(0x95, 0x95).lrw8(
-		NAME([this] (offs_t offset) { return m_cbus_root->io_r(0x94 >> 1, 0xff00); }),
+		NAME([this] (offs_t offset) { return m_cbus_root->io_r(0x94 >> 1, 0xff00) >> 8; }),
 		NAME([this] (offs_t offset, u8 data) { m_cbus_root->io_w(0x94 >> 1, data << 8, 0xff00); })
 	);
 	map(0x97, 0x97).lrw8(
-		NAME([this] (offs_t offset) { return m_cbus_root->io_r(0x96 >> 1, 0xff00); }),
+		NAME([this] (offs_t offset) { return m_cbus_root->io_r(0x96 >> 1, 0xff00) >> 8; }),
 		NAME([this] (offs_t offset, u8 data) { m_cbus_root->io_w(0x96 >> 1, data << 8, 0xff00); })
 	);
 }
