@@ -410,7 +410,8 @@ uint8_t pc9801_state::pc9801_a0_r(offs_t offset)
 			}
 		}
 
-		logerror("Read to undefined port [%02x]\n",offset+0xa0);
+		if (!machine().side_effects_disabled())
+			logerror("Read to undefined port [%02x]\n",offset+0xa0);
 		return 0xff;
 	}
 }

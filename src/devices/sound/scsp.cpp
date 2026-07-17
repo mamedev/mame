@@ -1323,9 +1323,21 @@ void scsp_device::DoMasterSamples(sound_stream &stream)
 
 				s32 sample = UpdateSlot(slot);
 
-				Enc = ((TL(slot)) << 0x0) | ((IMXL(slot)) << 0xd);
+				// SDIR ("sound direct") sends the raw sample straight to the output,
+				// bypassing the envelope generator AND the TL attenuator (the EG/ALFO
+				// bypass is handled in UpdateSlot). BOTH downstream mixes -- the DSP
+				// input feed here and the direct-output mix below -- must therefore
+				// zero TL when SDIR is set, otherwise a slot programmed with SDIR=1 +
+				// a large TL is wrongly muted.
+				// (Flash Beats keys its SFX with SDIR=1, TL=0xff = -95 dB; in
+				// particular its in-game/"Voice" SFX route only through the DSP
+				// (DISDL=0, IMXL>0), so without this the effect path is starved to
+				// near-silence.)
+				u16 eff_tl = SDIR(slot) ? 0 : TL(slot);
+				Enc = ((eff_tl) << 0x0) | ((IMXL(slot)) << 0xd);
 				m_DSP.SetSample((sample*m_LPANTABLE[Enc]) >> (SHIFT-2), ISEL(slot), IMXL(slot));
-				Enc = ((TL(slot)) << 0x0) | ((DIPAN(slot)) << 0x8) | ((DISDL(slot)) << 0xd);
+				u16 dir_tl = SDIR(slot) ? 0 : TL(slot);
+				Enc = ((dir_tl) << 0x0) | ((DIPAN(slot)) << 0x8) | ((DISDL(slot)) << 0xd);
 				{
 					smpl += (sample * m_LPANTABLE[Enc]) >> SHIFT;
 					smpr += (sample * m_RPANTABLE[Enc]) >> SHIFT;

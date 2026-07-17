@@ -59,6 +59,7 @@ public:
 		, m_kbd(*this, "kbd")
 		, m_cart_bank(*this, "cart_bank")
 		, m_palette(*this, "palette")
+		, m_cas_maxsize(0)
 	{ }
 
 	void system_latch_w(uint8_t data);
@@ -143,15 +144,16 @@ protected:
 	void draw_bitmap_2bpp(bitmap_ind16 &bitmap,const rectangle &cliprect, int attr);
 	void draw_tile_3bpp(bitmap_ind16 &bitmap,const rectangle &cliprect,int x,int y,int tile,int attr);
 	void draw_tile_text(bitmap_ind16 &bitmap,const rectangle &cliprect,int x,int y,int tile,int attr,int has_mc6847);
-	void draw_border(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr,int has_mc6847);
+	int get_border_pen(u8 attr, int has_mc6847);
 	void pc6001_screen_draw(bitmap_ind16 &bitmap,const rectangle &cliprect, int has_mc6847);
 
+	virtual rectangle get_screen_display_area();
 	virtual bool screen_blanked();
 	TIMER_CALLBACK_MEMBER(video_sync_cb);
 	emu_timer *m_timer_irq_timer = nullptr;
 	emu_timer *m_video_sync_timer = nullptr;
 	uint8_t *m_video_base = nullptr;
-//	std::unique_ptr<uint8_t[]> m_video_ram;
+//  std::unique_ptr<uint8_t[]> m_video_ram;
 
 	uint8_t m_sys_latch = 0;
 	uint8_t m_bank_opt = 0;
@@ -245,6 +247,7 @@ protected:
 	required_memory_region m_voice_rom;
 	required_memory_region m_kanji_rom;
 
+	virtual rectangle get_screen_display_area() override;
 	virtual void refresh_crtc_params();
 
 	virtual void machine_start() override ATTR_COLD;
@@ -335,6 +338,7 @@ protected:
 
 	virtual u8 vrtc_ack() override;
 	virtual u8 get_timer_base_divider() override;
+	virtual rectangle get_screen_display_area() override;
 	virtual bool screen_blanked() override;
 
 private:

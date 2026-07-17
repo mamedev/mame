@@ -12,8 +12,9 @@
     If you want the mix-in's logging to show your device name, override
     get_tag() with something that just returns your tag().
 
-    This mix-in will auto-increment the address on repeated reads/writes,
-    it's up to your class that consumes this mix-in
+    This mix-in will auto-increment the address on repeated reads/writes.
+    It's up to your class that includes this mix-in to change that behavior
+	if necessary.
 */
 
 #include "emu.h"
@@ -136,7 +137,7 @@ void i2c_hle_interface::scl_write(int state)
 								// check if reading
 								if (m_latch & 1)
 								{
-									if ((m_latch >> 1) == m_address)
+									if (((m_latch >> 1) == m_address) && is_present())
 									{
 										LOG("%s: address matches, ACKing\n", get_tag());
 										write_sda(0);
@@ -154,7 +155,7 @@ void i2c_hle_interface::scl_write(int state)
 								}
 								else
 								{
-									if ((m_latch >> 1) == m_address)
+									if (((m_latch >> 1) == m_address) && is_present())
 									{
 										LOGMASKED(LOG_DATAOUT, "%s: write: getting subaddress\n", get_tag());
 										m_last_address = m_latch >> 1;

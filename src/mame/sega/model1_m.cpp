@@ -18,6 +18,11 @@ void model1_state::machine_start()
 	save_item(NAME(m_v60_copro_ram_adr));
 	save_item(NAME(m_v60_copro_ram_latch));
 
+	m_irq0_timer[0] = timer_alloc(FUNC(model1_state::irq0_timer_tick), this);
+	m_irq0_timer[1] = timer_alloc(FUNC(model1_state::irq0_timer_tick), this);
+	save_item(NAME(m_timer_period));
+	save_item(NAME(m_timer_mode));
+
 	m_copro_fifo_in->setup(16,
 						   [this]() { m_tgp_copro->stall(); },
 						   [this]() { m_tgp_copro->set_input_line(INPUT_LINE_HALT, ASSERT_LINE); },

@@ -401,19 +401,160 @@
 *********************************************************************************/
 
 #include "emu.h"
-#include "ampoker2.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+#include "video/resnet.h"
 
 #include "ampoker2.lh"
 #include "sigmapkr.lh"
 
 
-#define MASTER_CLOCK    XTAL(6'000'000)
+namespace {
+
+class ampoker2_state : public driver_device
+{
+public:
+	ampoker2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_videoram(*this, "videoram"),
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
+
+	void sigma2k(machine_config &config) ATTR_COLD;
+	void ampoker2(machine_config &config) ATTR_COLD;
+
+	void init_rabbitpk() ATTR_COLD;
+
+protected:
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_shared_ptr<uint8_t> m_videoram;
+	output_finder<10> m_lamps;
+	tilemap_t *m_bg_tilemap = nullptr;
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void port30_w(uint8_t data);
+	void port31_w(uint8_t data);
+	void port32_w(uint8_t data);
+	void port33_w(uint8_t data);
+	void port34_w(uint8_t data);
+	void port35_w(uint8_t data);
+	void port36_w(uint8_t data);
+	void watchdog_reset_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(s2k_get_bg_tile_info);
+	void palette_init(palette_device &palette) const ATTR_COLD;
+	DECLARE_VIDEO_START(sigma2k);
+
+	void io_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
+};
+
+
+void ampoker2_state::palette_init(palette_device &palette) const
+{
+	/*    - bits -
+	      76543210
+	      RRRGGGBB
+	*/
+	static constexpr int resistances_rg[3] = { 1000, 470, 220 };
+	static constexpr int resistances_b [2] = { 470, 220 };
+
+	double weights_r[3], weights_g[3], weights_b[2];
+	compute_resistor_weights(0, 255,    -1.0,
+			3,  resistances_rg, weights_r,  0,  0,
+			3,  resistances_rg, weights_g,  0,  0,
+			2,  resistances_b,  weights_b,  0,  0);
+
+
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		int bit0, bit1, bit2;
+
+		// blue component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		int const b = combine_weights(weights_b, bit0, bit1);
+
+		// green component
+		bit0 = BIT(color_prom[i], 2);
+		bit1 = BIT(color_prom[i], 3);
+		bit2 = BIT(color_prom[i], 4);
+		int const g = combine_weights(weights_g, bit0, bit1, bit2);
+
+		// red component
+		bit0 = BIT(color_prom[i], 5);
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int const r = combine_weights(weights_r, bit0, bit1, bit2);
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
+void ampoker2_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
+}
+
+TILE_GET_INFO_MEMBER(ampoker2_state::get_bg_tile_info)
+{
+	int const offs = tile_index * 2;
+	int const attr = m_videoram[offs + 1];
+	int code = m_videoram[offs];
+	int color = attr;
+	code = code + (256 * (color & 0x03));   // code = color.bit1 + color.bit0 + code
+	color = color >> 1;                     // color = color - bit0 (bit1..bit7)
+
+	tileinfo.set(0, code, color, 0);
+}
+
+TILE_GET_INFO_MEMBER(ampoker2_state::s2k_get_bg_tile_info)
+{
+	int const offs = tile_index * 2;
+	int const attr = m_videoram[offs + 1];
+	int code = m_videoram[offs];
+	int color = attr;
+	code = code + (256 * (color & 0x0f));   // the game uses 2 extra bits
+	color = color >> 1;
+
+	tileinfo.set(0, code, color, 0);
+}
+
+void ampoker2_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ampoker2_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+}
+
+VIDEO_START_MEMBER(ampoker2_state, sigma2k)
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ampoker2_state::s2k_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+}
+
+uint32_t ampoker2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
 
 
 /**********************
@@ -601,9 +742,9 @@ void ampoker2_state::watchdog_reset_w(uint8_t data)
     BIT 3 = W_DOG         ;WATCHDOG.
 --------------------------------------------------*/
 {
-	/* watchdog sometimes stop to work */
+	// watchdog sometimes stops to work
 
-	if (((data >> 3) & 0x01) == 0)      /* check for refresh value (0x08) */
+	if (((data >> 3) & 0x01) == 0)      // check for refresh value (0x08)
 	{
 		m_watchdog->watchdog_reset();
 //      popmessage("%02x", data);
@@ -629,7 +770,7 @@ void ampoker2_state::program_map(address_map &map)
 void ampoker2_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x08, 0x0f).nopw();                /* inexistent in the real hardware */
+	map(0x08, 0x0f).nopw();                // inexistent in the real hardware
 	map(0x10, 0x10).portr("IN0");
 	map(0x11, 0x11).portr("IN1");
 	map(0x12, 0x12).portr("IN2");
@@ -638,14 +779,14 @@ void ampoker2_state::io_map(address_map &map)
 	map(0x15, 0x15).portr("IN5");
 	map(0x16, 0x16).portr("IN6");
 	map(0x17, 0x17).portr("IN7");
-//  map(0x21, 0x21).nopw();                    /* undocumented, write 0x1a after each reset */
-	map(0x30, 0x30).w(FUNC(ampoker2_state::port30_w));    /* see write handlers */
-	map(0x31, 0x31).w(FUNC(ampoker2_state::port31_w));    /* see write handlers */
-	map(0x32, 0x32).w(FUNC(ampoker2_state::port32_w));    /* see write handlers */
-	map(0x33, 0x33).w(FUNC(ampoker2_state::port33_w));    /* see write handlers */
-	map(0x34, 0x34).w(FUNC(ampoker2_state::port34_w));    /* see write handlers */
-	map(0x35, 0x35).w(FUNC(ampoker2_state::port35_w));    /* see write handlers */
-	map(0x36, 0x36).w(FUNC(ampoker2_state::port36_w));    /* see write handlers */
+//  map(0x21, 0x21).nopw();                    // undocumented, write 0x1a after each reset
+	map(0x30, 0x30).w(FUNC(ampoker2_state::port30_w));    // see write handlers
+	map(0x31, 0x31).w(FUNC(ampoker2_state::port31_w));    // see write handlers
+	map(0x32, 0x32).w(FUNC(ampoker2_state::port32_w));    // see write handlers
+	map(0x33, 0x33).w(FUNC(ampoker2_state::port33_w));    // see write handlers
+	map(0x34, 0x34).w(FUNC(ampoker2_state::port34_w));    // see write handlers
+	map(0x35, 0x35).w(FUNC(ampoker2_state::port35_w));    // see write handlers
+	map(0x36, 0x36).w(FUNC(ampoker2_state::port36_w));    // see write handlers
 	map(0x37, 0x37).w(FUNC(ampoker2_state::watchdog_reset_w));
 	map(0x38, 0x39).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x3a, 0x3a).r("aysnd", FUNC(ay8910_device::data_r));
@@ -721,18 +862,18 @@ static INPUT_PORTS_START( ampoker2 )
 	PORT_START("IN3")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper Out") PORT_CODE(KEYCODE_G)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Supervisor Key") PORT_TOGGLE
-	PORT_DIPNAME( 0x08, 0x08, "Remote Credits" ) PORT_DIPLOCATION("SW1:1") /* DSW1 */
+	PORT_DIPNAME( 0x08, 0x08, "Remote Credits" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x08, "Cred x 100" ) PORT_CONDITION("IN1", 0x08, EQUALS,0x08)
 	PORT_DIPSETTING(    0x00, "Cred x  50" ) PORT_CONDITION("IN1", 0x08, EQUALS,0x08)
-	PORT_DIPSETTING(    0x08, "Cred x  20" ) PORT_CONDITION("IN1", 0x08, EQUALS,0x00) /* x100 in ampkr95 */
+	PORT_DIPSETTING(    0x08, "Cred x  20" ) PORT_CONDITION("IN1", 0x08, EQUALS,0x00) // x100 in ampkr95
 	PORT_DIPSETTING(    0x00, "Remote Off" ) PORT_CONDITION("IN1", 0x08, EQUALS,0x00)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Black Card")
 
 	PORT_START("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* not used */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // not used
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper Low") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
-	PORT_DIPNAME( 0x08, 0x08, "Auto Hold" )      PORT_DIPLOCATION("SW1:2") /* DSW2 */
+	PORT_DIPNAME( 0x08, 0x08, "Auto Hold" )      PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Take")
@@ -763,7 +904,7 @@ static INPUT_PORTS_START( ampoker2 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Remote Credit") PORT_IMPULSE(12) PORT_CODE(KEYCODE_3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2)
-	PORT_DIPNAME( 0x08, 0x08, "Jackpot" )        PORT_DIPLOCATION("SW1:8") /* DSW8 */
+	PORT_DIPNAME( 0x08, 0x08, "Jackpot" )        PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Clear Credits") PORT_CODE(KEYCODE_4)
@@ -806,18 +947,18 @@ static INPUT_PORTS_START( ampkr95 )
 	PORT_START("IN3")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper Out") PORT_CODE(KEYCODE_G)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Supervisor Key") PORT_TOGGLE
-	PORT_DIPNAME( 0x08, 0x08, "Remote Credits" ) PORT_DIPLOCATION("SW1:1") /* DSW1 */
+	PORT_DIPNAME( 0x08, 0x08, "Remote Credits" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x08, "Cred x 100" ) PORT_CONDITION("IN1",0x08,EQUALS,0x08)
 	PORT_DIPSETTING(    0x00, "Cred x  50" ) PORT_CONDITION("IN1",0x08,EQUALS,0x08)
-	PORT_DIPSETTING(    0x08, "Cred x 100" ) PORT_CONDITION("IN1",0x08,EQUALS,0x00) /* x100 in ampkr95 */
+	PORT_DIPSETTING(    0x08, "Cred x 100" ) PORT_CONDITION("IN1",0x08,EQUALS,0x00) // x100 in ampkr95
 	PORT_DIPSETTING(    0x00, "Remote Off" ) PORT_CONDITION("IN1",0x08,EQUALS,0x00)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Black Card")
 
 	PORT_START("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* not used */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // not used
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper Low") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
-	PORT_DIPNAME( 0x08, 0x08, "Auto Hold" )      PORT_DIPLOCATION("SW1:2") /* DSW2 */
+	PORT_DIPNAME( 0x08, 0x08, "Auto Hold" )      PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Take")
@@ -828,7 +969,7 @@ static INPUT_PORTS_START( ampkr95 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Return Line") PORT_CODE(KEYCODE_J)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT ) PORT_NAME("TILT")
-	PORT_DIPNAME( 0x08, 0x08, "Rate Table SW1" ) PORT_DIPLOCATION("SW1:3") /* DSW3 (should be arranged with DSW4) */
+	PORT_DIPNAME( 0x08, 0x08, "Rate Table SW1" ) PORT_DIPLOCATION("SW1:3") // should be arranged with DSW4
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
@@ -839,16 +980,16 @@ static INPUT_PORTS_START( ampkr95 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Bet / Red")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
-	PORT_DIPNAME( 0x08, 0x08, "Rate Table SW2" ) PORT_DIPLOCATION("SW1:4") /* DSW4 (should be arranged with DSW3) */
+	PORT_DIPNAME( 0x08, 0x08, "Rate Table SW2" ) PORT_DIPLOCATION("SW1:4") // should be arranged with DSW3
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 
 	PORT_START("IN7")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* not used */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // not used
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Remote Credit") PORT_IMPULSE(12) PORT_CODE(KEYCODE_3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2)
-	PORT_DIPNAME( 0x08, 0x08, "Jackpot" )        PORT_DIPLOCATION("SW1:8") /* DSW8 */
+	PORT_DIPNAME( 0x08, 0x08, "Jackpot" )        PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Clear Credits") PORT_CODE(KEYCODE_4)
@@ -894,15 +1035,15 @@ static INPUT_PORTS_START( sigmapkr )
 	PORT_DIPNAME( 0x08, 0x08, "Remote Credits" ) PORT_DIPLOCATION("SW1:1") /* DSW1 */
 	PORT_DIPSETTING(    0x08, "Cred x 100" ) PORT_CONDITION("IN1",0x08,EQUALS,0x08)
 	PORT_DIPSETTING(    0x00, "Cred x  50" ) PORT_CONDITION("IN1",0x08,EQUALS,0x08)
-	PORT_DIPSETTING(    0x08, "Cred x 100" ) PORT_CONDITION("IN1",0x08,EQUALS,0x00) /* x100 in ampkr95 */
+	PORT_DIPSETTING(    0x08, "Cred x 100" ) PORT_CONDITION("IN1",0x08,EQUALS,0x00) // x100 in ampkr95
 	PORT_DIPSETTING(    0x00, "Remote Off" ) PORT_CONDITION("IN1",0x08,EQUALS,0x00)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_NAME("Double")
 
 	PORT_START("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* not used */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // not used
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper Low") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
-	PORT_DIPNAME( 0x08, 0x08, "Auto Hold" )      PORT_DIPLOCATION("SW1:2") /* DSW2 */
+	PORT_DIPNAME( 0x08, 0x08, "Auto Hold" )      PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Take")
@@ -913,7 +1054,7 @@ static INPUT_PORTS_START( sigmapkr )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Return Line") PORT_CODE(KEYCODE_J)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT ) PORT_NAME("TILT")
-	PORT_DIPNAME( 0x08, 0x08, "Rate Table SW1" ) PORT_DIPLOCATION("SW1:3") /* DSW3 (should be arranged with DSW4) */
+	PORT_DIPNAME( 0x08, 0x08, "Rate Table SW1" ) PORT_DIPLOCATION("SW1:3") // should be arranged with DSW4
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
@@ -924,16 +1065,16 @@ static INPUT_PORTS_START( sigmapkr )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
-	PORT_DIPNAME( 0x08, 0x08, "Rate Table SW2" ) PORT_DIPLOCATION("SW1:4") /* DSW4 (should be arranged with DSW3) */
+	PORT_DIPNAME( 0x08, 0x08, "Rate Table SW2" ) PORT_DIPLOCATION("SW1:4") // should be arranged with DSW3
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 
 	PORT_START("IN7")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* not used */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // not used
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Remote Credit") PORT_IMPULSE(12) PORT_CODE(KEYCODE_3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2)
-	PORT_DIPNAME( 0x08, 0x08, "Jackpot" )        PORT_DIPLOCATION("SW1:8") /* DSW8 */
+	PORT_DIPNAME( 0x08, 0x08, "Jackpot" )        PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Clear Credits") PORT_CODE(KEYCODE_4)
@@ -1172,17 +1313,17 @@ GFXDECODE_END
 
 void ampoker2_state::ampoker2(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, MASTER_CLOCK/2);        /* 3 MHz */
+	// basic machine hardware
+	Z80(config, m_maincpu, 6_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ampoker2_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &ampoker2_state::io_map);
 	m_maincpu->set_periodic_int(FUNC(ampoker2_state::nmi_line_pulse), attotime::from_hz(1536));
 
-	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(200));   /* 200 ms, measured */
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(200));   // measured
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	/*  if VBLANK is used, the watchdog timer stop to work.
@@ -1194,18 +1335,18 @@ void ampoker2_state::ampoker2(machine_config &config)
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_ampoker2);
-	PALETTE(config, "palette", FUNC(ampoker2_state::ampoker2_palette), 512);
+	PALETTE(config, "palette", FUNC(ampoker2_state::palette_init), 512);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	AY8910(config, "aysnd", MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.30);  /* 1.5 MHz, measured */
+	AY8910(config, "aysnd", 6_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.30);  // measured
 }
 
 void ampoker2_state::sigma2k(machine_config &config)
 {
 	ampoker2(config);
 
-	/* video hardware */
+	// video hardware
 	m_gfxdecode->set_info(gfx_sigma2k);
 	MCFG_VIDEO_START_OVERRIDE(ampoker2_state, sigma2k)
 }
@@ -1217,9 +1358,9 @@ void ampoker2_state::sigma2k(machine_config &config)
 
 ROM_START( ampoker2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "poker9.003", 0x4000, 0x8000, CRC(a31221fc) SHA1(4a8bdd8ce8d5bff7e7cfc4ae91e27c1d366dc54d) )
-	ROM_COPY( "maincpu", 0x8000, 0x0000, 0x4000 ) /* poker9.003 contains the 16K halves swapped around */
-	ROM_LOAD( "poker9.002", 0x8000, 0x4000, CRC(bfde5bce) SHA1(c7c7ca2268694015e8ec673e8fa5c48043086d3f) )
+	ROM_LOAD( "poker9.003",      0x4000, 0x8000, CRC(a31221fc) SHA1(4a8bdd8ce8d5bff7e7cfc4ae91e27c1d366dc54d) )
+	ROM_COPY( "maincpu", 0x8000, 0x0000, 0x4000 ) // poker9.003 contains the 16K halves swapped around
+	ROM_LOAD( "poker9.002",      0x8000, 0x4000, CRC(bfde5bce) SHA1(c7c7ca2268694015e8ec673e8fa5c48043086d3f) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "poker9.028", 0x0000, 0x4000, CRC(65bccb40) SHA1(75f154a2aaf9f9be62e0e1dd8cbe630b9ea0145c) )
@@ -1369,9 +1510,9 @@ ROM_END
 
 ROM_START( pkrdewin )
 	ROM_REGION( 0x14000, "maincpu", 0 )
-	ROM_LOAD( "poker7.001", 0x4000, 0x10000, CRC(eca16b9e) SHA1(5063d733721457ab3b08caafbe8d33b2cbe4f88b) )
-	ROM_COPY( "maincpu",    0x8000, 0x0000, 0x4000 ) /* poker7.001 contains the 1st and 2nd 16K quarters swapped */
-	ROM_COPY( "maincpu", 0x10000, 0x8000, 0x4000 ) /* poker7.001 contains the 1st and 2nd 16K quarters swapped */
+	ROM_LOAD( "poker7.001",         0x04000, 0x10000, CRC(eca16b9e) SHA1(5063d733721457ab3b08caafbe8d33b2cbe4f88b) )
+	ROM_COPY( "maincpu",   0x08000, 0x00000, 0x04000 ) // poker7.001 contains the 1st and 2nd 16K quarters swapped
+	ROM_COPY( "maincpu",   0x10000, 0x08000, 0x04000 ) // poker7.001 contains the 1st and 2nd 16K quarters swapped
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "poker7.002", 0x0000, 0x4000, CRC(65bccb40) SHA1(75f154a2aaf9f9be62e0e1dd8cbe630b9ea0145c) )
@@ -1380,7 +1521,7 @@ ROM_START( pkrdewin )
 	ROM_LOAD( "82s147an.u48", 0x0000, 0x0200, CRC(9bc8e543) SHA1(e4882868a43e21a509a180b9731600d1dd63b5cc) )
 ROM_END
 
-ROM_START( videomat )   /* polish bootleg */
+ROM_START( videomat )   // Polish bootleg
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom.bin", 0x0000, 0x10000, CRC(910cd941) SHA1(350ca70370c5082901343d0c0c1424729d77b006) )
 
@@ -1448,7 +1589,7 @@ ROM_START( piccolop )
 	ROM_LOAD( "zei_8.11.bin", 0x4000, 0x4000, CRC(1b003672) SHA1(e58bd58023f332c30851204491b7e0bd7c5d9631) )
 	ROM_CONTINUE(             0x0000, 0x4000)
 
-	ROM_REGION( 0x200, "proms", 0 )  /* not dumped. using the ampoker2 one instead */
+	ROM_REGION( 0x200, "proms", 0 )  // not dumped. using the ampoker2 one instead
 	ROM_LOAD( "82s147an.u48", 0x0000, 0x0200, CRC(9bc8e543) SHA1(e4882868a43e21a509a180b9731600d1dd63b5cc) )
 ROM_END
 
@@ -1457,9 +1598,9 @@ ROM_END
   Rabbit Poker, or Arizona Poker 1.1 ??
 
   American Poker 2 board
-  program rom on small daughter board
+  program ROM on small daughter board
   with GAL22V10 and PIC16F84A
-  prom not dumped
+  PROM not dumped
 
 */
 
@@ -1474,7 +1615,7 @@ ROM_START( rabbitpk )
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "poldi_graf.u47", 0x0000, 0x4000, CRC(f1807f39) SHA1(631645272c7508104749e0ff1357bd74098851d5) )
 
-	ROM_REGION( 0x200, "proms", 0 )  /* not dumped. using the ampoker2 one instead */
+	ROM_REGION( 0x200, "proms", 0 )  // not dumped. using the ampoker2 one instead
 	ROM_LOAD( "82s147an.u48", 0x0000, 0x0200, CRC(9bc8e543) SHA1(e4882868a43e21a509a180b9731600d1dd63b5cc) )
 ROM_END
 
@@ -1566,22 +1707,24 @@ ROM_END
 
 void ampoker2_state::init_rabbitpk()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
 
 	for (int i = 0x0000; i < size; i++)
 	{
-		uint8_t x = ROM[i];
+		uint8_t x = rom[i];
 
-		if(i & 0x04) x ^= 0xc4;
-		if(i & 0x08) x ^= 0x45;
-		if(i & 0x10) x ^= 0xc6;
-		if(i & 0x20) x ^= 0x03;
-		if(i & 0x40) x ^= 0x83;
+		if (i & 0x04) x ^= 0xc4;
+		if (i & 0x08) x ^= 0x45;
+		if (i & 0x10) x ^= 0xc6;
+		if (i & 0x20) x ^= 0x03;
+		if (i & 0x40) x ^= 0x83;
 
-		ROM[i] = bitswap<8>(x, 1, 2, 5, 4, 3, 0, 7, 6);
+		rom[i] = bitswap<8>(x, 1, 2, 5, 4, 3, 0, 7, 6);
 	}
 }
+
+} // anonymous namespace
 
 
 /*************************

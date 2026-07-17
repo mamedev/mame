@@ -67,7 +67,7 @@
 
 /* Read/Write Handlers */
 
-uint8_t xerox820_state::fdc_r(offs_t offset)
+uint8_t xerox820_fdc_state::fdc_r(offs_t offset)
 {
 	// The first-gen 820's FD1771 data bus is inverted (m_fdc_xor = 0xff); the 820-II's
 	// FD1797 is not (m_fdc_xor = 0x00).  With the 0xff inversion the WD status bit 7
@@ -76,7 +76,7 @@ uint8_t xerox820_state::fdc_r(offs_t offset)
 	return m_fdc->read(offset) ^ m_fdc_xor;
 }
 
-void xerox820_state::fdc_w(offs_t offset, uint8_t data)
+void xerox820_fdc_state::fdc_w(offs_t offset, uint8_t data)
 {
 	m_fdc->write(offset, data ^ m_fdc_xor);
 }
@@ -208,15 +208,141 @@ void xerox820ii_state::xerox820ii_io(address_map &map)
 // xerox820_emii copro card (bus/xerox820/copro.cpp).  The earlier x1685/x1685s
 // reconstructions (rx024/sdvr port-ROMs) are superseded and have been removed.
 
-void xerox820_state::mk83_mem(address_map &map)
+// MK-83: 256K DRAM = fixed top 32K + a 0x0000-0x7FFF window holding one of
+// eight 32K pages, selected by the 3-bit bank code {PA7,PA6,P14.5} (see the
+// mk83_state comment in xerox820.h).  Bank code 6 overlays the 4K monitor
+// EPROM at 0x0000 and the video RAM at 0x7000 (the trampoline at 0xFB25
+// switches to code 6 around every call into the EPROM-resident routines);
+// bank code 7 decodes to the same DRAM half-row as the fixed top page.
+void mk83_state::mk83_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x2fff).view(m_view);
-	m_view[0](0x0000, 0x2fff).ram();
-	m_view[1](0x0000, 0x0fff).rom().region(Z80_TAG, 0);
-	map(0x3000, 0x6fff).ram();
-	map(0x7000, 0x7fff).ram().share("video_ram");
-	map(0x8000, 0xffff).ram();
+	map(0x0000, 0x7fff).view(m_view);
+	m_view[0](0x0000, 0x7fff).ram();
+	m_view[1](0x0000, 0x7fff).ram();
+	m_view[2](0x0000, 0x7fff).ram();
+	m_view[3](0x0000, 0x7fff).ram();
+	m_view[4](0x0000, 0x7fff).ram();
+	m_view[5](0x0000, 0x7fff).ram();
+	m_view[6](0x0000, 0x7fff).ram();
+	m_view[6](0x0000, 0x0fff).rom().region(Z80_TAG, 0);
+	m_view[6](0x7000, 0x7fff).ram().share("video_ram");
+	m_view[7](0x0000, 0x7fff).ram().share("mainram");
+	map(0x8000, 0xffff).ram().share("mainram");
+}
+
+// I/O decode per the U86 74LS138 (schematic sheet 2): 00 BAUDA, 04 SIO,
+// 08 GP PIO, 0C BAUDB (the SIO-B console baud), 10 FD1797, 14 SCROLL/bank
+// latch, 18 CTC, 1C KBD PIO.  Same layout as the Xerox 820 except that the
+// scroll latch takes the DATA byte (plus bank bit B2) rather than sampling
+// the address lines.
+void mk83_state::mk83_io(address_map &map)
+{
+	map(0x00, 0x00).mirror(0xff03).w(COM8116_TAG, FUNC(com8116_device::str_w));
+	map(0x04, 0x07).mirror(0xff00).rw(m_sio, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
+	map(0x08, 0x0b).mirror(0xff00).rw(Z80PIO_GP_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x0c, 0x0c).mirror(0xff03).w(COM8116_TAG, FUNC(com8116_device::stt_w));
+	map(0x10, 0x13).mirror(0xff00).rw(FUNC(mk83_state::fdc_r), FUNC(mk83_state::fdc_w));
+	map(0x14, 0x14).mirror(0xff03).w(FUNC(mk83_state::scroll_bank_w));
+	map(0x18, 0x1b).mirror(0xff00).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x1c, 0x1f).mirror(0xff00).rw(m_kbpio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+}
+
+void mk83_state::update_bank()
+{
+	m_view.select((m_bank_hi << 1) | m_bank_lo);
+}
+
+void mk83_state::scroll_bank_w(uint8_t data)
+{
+	// 0x14-0x17 write latch: bits 0-4 = CRT scroll row, bit 5 = bank bit B2.
+	// The monitor also mirrors the bank code into bits 6-7 here, but on the
+	// hardware those bank bits come from the PIO-A pins (bits 6-7 of this
+	// latch are unconnected), which is what makes the power-on state safe:
+	// the EPROM's first OUT (14h) is the video-clear's scroll value 0x17 with
+	// bank bits 0, and only the PA6/PA7 pull-ups keep the EPROM mapped.
+	m_scroll = data & 0x1f;
+	m_bank_lo = BIT(data, 5);
+	update_bank();
+}
+
+uint8_t mk83_state::mk83_kbpio_pa_r()
+{
+	/*
+
+	    bit     signal      description
+
+	    3       PBRDY       keyboard PIO-B ready
+	    6       B0          bank (pull-up; reads 1 while programmed as input)
+	    7       B1          bank (pull-up; reads 1 while programmed as input)
+
+	*/
+	return 0xc0 | (m_kbpio->rdy_b() << 3);
+}
+
+void mk83_state::mk83_kbpio_pa_w(uint8_t data)
+{
+	/*
+
+	    bit     signal      description
+
+	    0       DVSEL0      drive select unit # bit 0 (binary, decoded to DVSEL1-3 + J7)
+	    1       DVSEL1      drive select unit # bit 1
+	    2       MOTOR       1 = drive motor off (the 8 Hz tick ISR sets it after ~3 ticks)
+	    3       PBRDY       (input)
+	    4       SIZE        drive size per the FF6B geometry config (1 = 8")  [TODO: verify against media]
+	    5       DENS        density per the geometry config (1 = MFM)         [TODO: verify against media]
+	    6       B0          bank code bit 1
+	    7       B1          bank code bit 2
+
+	    MAME's z80pio passes mode-3 input bits to this callback as 1, which
+	    models the PA6/PA7 pull-ups: from power-on until the monitor's F7F7
+	    re-programs the I/O mask (CF 08), bits 6-7 are inputs and the bank
+	    code stays {1,1,B2} = EPROM mapped, regardless of the values the init
+	    code writes through here.
+
+	*/
+	floppy_image_device *floppy = nullptr;
+
+	switch (data & 0x03)
+	{
+	case 0: floppy = m_floppy0->get_device(); break;
+	case 1: floppy = m_floppy1->get_device(); break;
+	}
+
+	m_fdc->set_floppy(floppy);
+
+	if (floppy)
+		floppy->mon_w(BIT(data, 2));
+
+	// bits 4-5 feed the FDC9229BT data-separator config; model size as the
+	// FD1797 clock and density as DDEN until real media pins them down
+	m_fdc->set_unscaled_clock(BIT(data, 4) ? 16_MHz_XTAL / 8 : 16_MHz_XTAL / 16);
+	m_fdc->dden_w(!BIT(data, 5));
+
+	m_bank_hi = data >> 6;
+	update_bank();
+}
+
+void mk83_state::kb_put(u8 data)
+{
+	// latch the byte and pulse the PIO-B strobe: the falling edge samples
+	// pb_r, the rising edge raises the PIO interrupt (vector 0x1A -> the
+	// type-ahead FIFO at FF30)
+	m_kbdata = data;
+	m_kbpio->strobe_b(0);
+	m_kbpio->strobe_b(1);
+}
+
+// FD1797 DRQ drives /NMI directly (no /HALT gate on this board: the monitor
+// installs an EX AF/EXX/INI/EXX/EX AF/RETN handler at 0x0066 and polls the
+// busy bit while DRQ-NMIs move the bytes).  INTRQ is not wired to /NMI here:
+// the command end is detected by the busy poll, and an INTRQ-NMI would inject
+// a spurious INI after the last byte.
+void mk83_state::mk83_fdc_drq_w(int state)
+{
+	m_fdc_drq = bool(state);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -376,7 +502,7 @@ uint8_t xerox820_base_state::kbpio_pb_r()
 
 	*/
 
-	return m_kbd->read() ^ 0xff;
+	return read_keyboard() ^ 0xff;
 }
 
 /* Z80 CTC */
@@ -584,7 +710,7 @@ void xerox820_base_state::machine_start()
 
 void xerox820_state::machine_start()
 {
-	xerox820_base_state::machine_start();
+	xerox820_fdc_state::machine_start();
 
 	save_item(NAME(m_8n5));
 	save_item(NAME(m_400_460));
@@ -592,7 +718,7 @@ void xerox820_state::machine_start()
 
 void xerox820_state::machine_reset()
 {
-	xerox820_base_state::machine_reset();
+	xerox820_fdc_state::machine_reset();
 
 	m_view.select(1);
 
@@ -601,14 +727,10 @@ void xerox820_state::machine_reset()
 
 void bigboard_state::machine_reset()
 {
-	xerox820_base_state::machine_reset();
-
-	m_view.select(1);
+	xerox820_state::machine_reset();
 
 	/* bigboard has a one-pulse output to drive a user-supplied beeper */
 	m_beeper->set_state(0);
-
-	m_fdc->reset();
 
 	// The Big Board's monitor selects drives by a binary unit number in the low
 	// bits of the system PIO port (drive 0 = 0), not the Xerox 820's bit-per-drive.
@@ -618,11 +740,6 @@ void bigboard_state::machine_reset()
 	// motor on so the WD1771 sees READY for the boot ROM's RESTORE.
 	if (floppy_image_device *fd = m_floppy0->get_device()) fd->mon_w(0);
 	if (floppy_image_device *fd = m_floppy1->get_device()) fd->mon_w(0);
-}
-
-void xerox820ii_state::machine_start()
-{
-	xerox820_base_state::machine_start();
 }
 
 void xerox820ii_state::machine_reset()
@@ -797,8 +914,8 @@ void bigboard_state::bigboard5(machine_config &config)
 
 // Shared 820-II hardware plus the disk-controller daughterboard slot.  disk_card
 // selects the personality: the FD1797 floppy controller ("fdc"/"fdc5") or the
-// Shugart SASI host adapter ("sasi"), with the 16/8 expansion-box variant
-// ("fdcbox5").
+// Shugart SASI host adapter ("sasi"), with the 16/8 expansion-box variants
+// ("fdcbox5"/"sasirgd5").
 void xerox820ii_state::common(machine_config &config, const char *disk_card)
 {
 	/* basic machine hardware */
@@ -932,9 +1049,13 @@ void xerox820ii_state::add_8086(machine_config &config)
 }
 
 // the 16/8 machines: 820-II hardware + the 8086 coprocessor card + the LP keyboard
-void xerox820ii_state::xerox168(machine_config &config)  { common(config, "fdc");    add_8086(config); add_820ii_kbd(config); } // 16/8, 8" floppy (X928 ASCII keyboard)
-void xerox820ii_state::xerox1685(machine_config &config) { common(config, "fdc5");   add_8086(config); add_820ii_kbd(config); } // 16/8, 5.25" floppy (FD1797 daughterboard; mixed SD/DD; X928 ASCII keyboard)
-void xerox820ii_state::xerox168s(machine_config &config) { common(config, "sasi");   add_8086(config); add_820ii_kbd(config); } // 16/8, SASI (X928 ASCII keyboard)
+// The production 16/8 shipped the X928 ASCII keyboard, but the only dumped 16/8
+// u36 (the "RX" monitor, v404.u36 / rx024) decodes the position-encoded low-profile
+// (G25) keyboard *only* -- it ignores plain ASCII.  So the machines use the LPK here
+// to have working keyboard input; an X928-configured 16/8 u36 has not been dumped.
+void xerox820ii_state::xerox168(machine_config &config)  { common(config, "fdc");    add_8086(config); add_lpk(config); } // 16/8, 8" floppy
+void xerox820ii_state::xerox1685(machine_config &config) { common(config, "fdc5");   add_8086(config); add_lpk(config); } // 16/8, 5.25" floppy (FD1797 daughterboard; mixed SD/DD)
+void xerox820ii_state::xerox168s(machine_config &config) { common(config, "sasi");   add_8086(config); add_lpk(config); } // 16/8, SASI
 void xerox820ii_state::xerox168em(machine_config &config) // 16/8 + Expansion Module II (EM-II / WD1002-05)
 {
 	// The EM-II is a slot-connected expansion: the copro/8086-slot card owns
@@ -945,11 +1066,175 @@ void xerox820ii_state::xerox168em(machine_config &config) // 16/8 + Expansion Mo
 	add_lpk(config);
 }
 
-void xerox820_state::mk83(machine_config & config)
+void mk83_state::machine_start()
 {
-	xerox820(config);
+	xerox820_fdc_state::machine_start();
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &xerox820_state::mk83_mem);
+	save_item(NAME(m_kbdata));
+	save_item(NAME(m_bank_hi));
+	save_item(NAME(m_bank_lo));
+}
+
+void mk83_state::machine_reset()
+{
+	xerox820_fdc_state::machine_reset();
+
+	// power-on bank code = {1,1,0} = 6 (EPROM mapped): PA6/PA7 pull-ups with
+	// the PIO reset to inputs, port-0x14 latch bit 5 clear
+	m_bank_hi = 3;
+	m_bank_lo = 0;
+	update_bank();
+
+	m_fdc_xor = 0x00;   // the MK-83's FD1797 data bus is not inverted (unlike the Big Board FD1771)
+	m_fdc->reset();
+
+	// /SYNC idles inactive (RxD mark): the boot's console select polls RR0
+	// bit 4 for a serial start bit and would otherwise mis-detect one
+	m_sio->synca_w(1);
+	m_sio->syncb_w(1);
+}
+
+// Drives shipped with the MK3000: BASF 6106 5.25" 40-track SS/DD and Shugart
+// SA465 5.25" 80-track DS/DD; the board also carries a 50-pin 8" connector
+// (the monitor's default FF6B geometry is in fact 8" SSSD 77x26x128).
+static void mk83_floppies(device_slot_interface &device)
+{
+	device.option_add("basf6106", FLOPPY_525_SSDD);
+	device.option_add("sa465", FLOPPY_525_QD);
+	device.option_add("sa800", FLOPPY_8_SSDD);
+	device.option_add("sa850", FLOPPY_8_DSDD);
+}
+
+static void mk83_floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();    // includes IMD, the format the surviving Big Board family disks ship in
+}
+
+void mk83_state::mk83(machine_config &config)
+{
+	/* basic machine hardware: Z80A at 2.5 MHz (20 MHz crystal / 8, schematic sheet 2) */
+	Z80(config, m_maincpu, 20_MHz_XTAL / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mk83_state::mk83_mem);
+	m_maincpu->set_addrmap(AS_IO, &mk83_state::mk83_io);
+	m_maincpu->set_daisy_config(xerox820_daisy_chain);
+
+	/* video hardware: 14.318 MHz dot clock (sheet 3), 80x24, 7x10 cells, 5x7 glyphs */
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(mk83_state::screen_update));
+	screen.set_raw(14.318181_MHz_XTAL, 910, 0, 560, 262, 0, 240);
+
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_xerox820);
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
+
+	/* keyboard PIO (also drive select, motor, FDC9229 config and the bank bits) */
+	Z80PIO(config, m_kbpio, 20_MHz_XTAL / 8);
+	m_kbpio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_kbpio->in_pa_callback().set(FUNC(mk83_state::mk83_kbpio_pa_r));
+	m_kbpio->out_pa_callback().set(FUNC(mk83_state::mk83_kbpio_pa_w));
+	m_kbpio->in_pb_callback().set(FUNC(mk83_state::kbpio_pb_r));
+
+	/* general purpose (printer) PIO */
+	z80pio_device& pio_gp(Z80PIO(config, Z80PIO_GP_TAG, 20_MHz_XTAL / 8));
+	pio_gp.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
+	/* CTC: ch2 timer (/16, TC 210) cascades into ch3 counter (TC 93) for the
+	   8 Hz tick that runs the monitor's H/K clock and motor timeout; the disk
+	   code also reads the ch3 down-counter (port 0x1B) as its spin-up timer */
+	Z80CTC(config, m_ctc, 20_MHz_XTAL / 8);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
+
+	/* FD1797 + FDC9229BT; 16 MHz xtal on sheet 5 (1 MHz FDC clock for 5.25", 2 MHz for 8") */
+	FD1797(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->drq_wr_callback().set(FUNC(mk83_state::mk83_fdc_drq_w));
+	FLOPPY_CONNECTOR(config, FD1771_TAG":0", mk83_floppies, "sa465", mk83_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1771_TAG":1", mk83_floppies, "basf6106", mk83_floppy_formats);
+
+	/* SIO: channel B (data 0x05 / control 0x07) is the serial console option */
+	Z80SIO(config, m_sio, 20_MHz_XTAL / 8);
+	m_sio->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
+	m_sio->out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
+	m_sio->out_rtsa_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
+	m_sio->out_txdb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
+	m_sio->out_dtrb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_dtr));
+	m_sio->out_rtsb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
+	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
+	// the boot console select watches the /SYNC pin (RR0 bit 4) for a start
+	// bit to autobaud a serial console, so RxD also feeds /SYNC
+	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_sio, FUNC(z80sio_device::rxa_w));
+	rs232a.rxd_handler().append(m_sio, FUNC(z80sio_device::synca_w));
+	rs232a.cts_handler().set(m_sio, FUNC(z80sio_device::ctsa_w));
+	rs232a.dcd_handler().set(m_sio, FUNC(z80sio_device::dcda_w));
+
+	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_sio, FUNC(z80sio_device::rxb_w));
+	rs232b.rxd_handler().append(m_sio, FUNC(z80sio_device::syncb_w));
+	rs232b.cts_handler().set(m_sio, FUNC(z80sio_device::ctsb_w));
+	rs232b.dcd_handler().set(m_sio, FUNC(z80sio_device::dcdb_w));
+
+	com8116_device &dbrg(COM8116(config, COM8116_TAG, 5.0688_MHz_XTAL));
+	dbrg.fr_handler().set(m_sio, FUNC(z80sio_device::rxca_w));
+	dbrg.fr_handler().append(m_sio, FUNC(z80sio_device::txca_w));
+	dbrg.ft_handler().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
+
+	/* ASCII keyboard -> inverted data on PIO-B with a strobe per byte */
+	GENERIC_KEYBOARD(config, m_gkb, 0);
+	m_gkb->set_keyboard_callback(FUNC(mk83_state::kb_put));
+}
+
+// MK-84: the MK-83 platform at 5 MHz with the Xerox 820's HALT-gated
+// DRQ/INTRQ -> /NMI handshake (manual section 1.6) and the FDC9229
+// size/density configuration on PIO-A bits 5/4, active low
+void mk84_state::mk84_kbpio_pa_w(uint8_t data)
+{
+	/*
+
+	    bit     signal      description
+
+	    0       DVSEL0      drive select unit # bit 0
+	    1       DVSEL1      drive select unit # bit 1
+	    2       MOTOR       1 = drive motor off
+	    3       PBRDY       (input)
+	    4       DD          FDC9229 density: 0 = double (MFM)
+	    5       SIZE        FDC9229 format: 0 = 8", 1 = 5.25"
+	    6       B0          bank code bit 1
+	    7       B1          bank code bit 2
+
+	*/
+	floppy_image_device *floppy = nullptr;
+
+	switch (data & 0x03)
+	{
+	case 0: floppy = m_floppy0->get_device(); break;
+	case 1: floppy = m_floppy1->get_device(); break;
+	}
+
+	m_fdc->set_floppy(floppy);
+
+	if (floppy)
+		floppy->mon_w(BIT(data, 2));
+
+	m_fdc->set_unscaled_clock(BIT(data, 5) ? 16_MHz_XTAL / 16 : 16_MHz_XTAL / 8);
+	m_fdc->dden_w(BIT(data, 4));
+
+	m_bank_hi = data >> 6;
+	update_bank();
+}
+
+void mk84_state::mk84(machine_config &config)
+{
+	mk83(config);
+
+	/* Z80B at 5 MHz (20 MHz crystal / 4, manual section 1.1) */
+	m_maincpu->set_clock(20_MHz_XTAL / 4);
+	m_maincpu->halt_cb().set(FUNC(mk84_state::cpu_halt_w)); // FDC DRQ/INTRQ -> /NMI is /HALT-gated
+
+	m_kbpio->out_pa_callback().set(FUNC(mk84_state::mk84_kbpio_pa_w));
+
+	m_fdc->intrq_wr_callback().set(FUNC(mk84_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(mk84_state::fdc_drq_w));
 }
 
 /* ROMs */
@@ -988,91 +1273,79 @@ ROM_END
 // The base 820-II boot ROM set, shared by the FD1797 floppy (5.25"/8") and the SASI
 // disk-board variants (the ROM auto-detects the daughterboard via the PA bits).
 ROM_START( x820ii ) // 820-II, 8" floppy
-	ROM_DEFAULT_BIOS( "v50" ) // the X928 keyboard and the in-ROM SASI driver live in u33-u35; u36 carries the position-encoded low-profile (G25) keyboard decode table.
-	// v4.00/v4.01 u33-u35 and v4.04 u36 are not chip reads: they are ROM images recovered from Balcones/Xerox distribution master disks in the Don Maslin 820-II archive (bitsavers 820ii_images) and functionally validated by booting.  Images + recovered source: https://github.com/davidlrand/mame-system-media (Xerox-820-line-roms)
+	ROM_DEFAULT_BIOS( "v50" ) // the standard keyboard and the in-ROM SASI driver live in u33-u35; u36 carries the low-profile-keyboard (RX) position->char decode table.  The v5.0 source disk B23D13 carries a single u36 (cda7f598), so v50 and v50v018 share it -- the two entries are now effectively the same v5.0 build.
 	ROM_SYSTEM_BIOS( 0, "v400",    "Balcones Operating System v4.00" ) // u33-u35 split from ROM400.COM, master disk B16D35
 	ROM_SYSTEM_BIOS( 1, "v401",    "Balcones Operating System v4.01" ) // u33-u35 decoded from U3x.HEX, "820-II ROM IMAGES MASTER" disk B17D7
 	ROM_SYSTEM_BIOS( 2, "v402",    "Balcones Operating System v4.02" )
 	ROM_SYSTEM_BIOS( 3, "v403",    "Balcones Operating System v4.03" )
 	ROM_SYSTEM_BIOS( 4, "v404",    "Balcones Operating System v4.04" )
 	ROM_SYSTEM_BIOS( 5, "v50",     "Balcones Operating System v5.0" )
+	ROM_SYSTEM_BIOS( 6, "v50v018", "Balcones Operating System v5.0 v018" )
 
 	ROM_REGION( 0x2000, Z80_TAG, 0 )
-	ROMX_LOAD( "v400.u33",              0x0000, 0x0800, CRC(0d1bcaa8) SHA1(a6ac83f8584d19f7a08e666cb5d4b62620d7d3c0), ROM_BIOS(0) )
-	ROMX_LOAD( "v400.u34",              0x0800, 0x0800, CRC(f1df9e29) SHA1(79f38880c3aed9ddf2ccba4ddb11128586dc9c25), ROM_BIOS(0) )
-	ROMX_LOAD( "v400.u35",              0x1000, 0x0800, CRC(68357ed7) SHA1(78498542f4d8506edf5f2b3b9ed0fde3fd72f85b), ROM_BIOS(0) )
-	ROMX_LOAD( "v401.u33",              0x0000, 0x0800, CRC(fe9fa596) SHA1(194162b3d063b2d1bcad03d0bee51dabce2d1985), ROM_BIOS(1) )
-	ROMX_LOAD( "v401.u34",              0x0800, 0x0800, CRC(d3137de3) SHA1(d1de4e11f29799b2024af0412415a07984e58f3a), ROM_BIOS(1) )
-	ROMX_LOAD( "v401.u35",              0x1000, 0x0800, CRC(bf3096fb) SHA1(136f6b1cf2cd93f0b908688394675ef69883f47b), ROM_BIOS(1) )
-	ROMX_LOAD( "u33.4.02.rom",          0x0000, 0x0800, CRC(d9eb668e) SHA1(6acbef96e4e6526c58e068b7849fb9cce2ea2a10), ROM_BIOS(2) )
-	ROMX_LOAD( "u34.4.02.rom",          0x0800, 0x0800, CRC(62181209) SHA1(2238aec096d19af9307bb294532f66f53dd7dfc3), ROM_BIOS(2) )
-	ROMX_LOAD( "u35.4.02.rom",          0x1000, 0x0800, CRC(e22fbf6d) SHA1(6c162f79d42611176b0f1c0e8a4eeb07492beca1), ROM_BIOS(2) )
-	ROMX_LOAD( "u36.rx11.4.02.rom",     0x1800, 0x0800, CRC(b6a239ce) SHA1(330d28fa8ec006d48d948b1c5e714ffced88fe90), ROM_BIOS(2) )
-	ROMX_LOAD( "v403.u33",              0x0000, 0x0800, NO_DUMP,                                                      ROM_BIOS(3) )
-	ROMX_LOAD( "v403.u34",              0x0800, 0x0800, NO_DUMP,                                                      ROM_BIOS(3) )
-	ROMX_LOAD( "v403.u35",              0x1000, 0x0800, NO_DUMP,                                                      ROM_BIOS(3) )
-	ROMX_LOAD( "v403.u36",              0x1800, 0x0800, NO_DUMP,                                                      ROM_BIOS(3) )
-	ROMX_LOAD( "537p3652.u33",          0x0000, 0x0800, CRC(7807cfbb) SHA1(bd3cc5cc5c59c84a50747aae5c17eb4617b0dbc3), ROM_BIOS(4) )
-	ROMX_LOAD( "537p3653.u34",          0x0800, 0x0800, CRC(a9c6c0c3) SHA1(c2da9d1bf0da96e6b8bfa722783e411d2fe6deb9), ROM_BIOS(4) )
-	ROMX_LOAD( "537p3654.u35",          0x1000, 0x0800, CRC(a8a07223) SHA1(e8ae1ebf2d7caf76771205f577b88ae493836ac9), ROM_BIOS(4) )
-	ROMX_LOAD( "v404.u36",              0x1800, 0x0800, CRC(97047d38) SHA1(f36506635653736b8d754d2c04f608180602b5a2), ROM_BIOS(4) ) // RX ver 016 (27-Sep-83), best-available pair for v4.04, functionally validated; decoded from U36.ROM, master disk B17D7
+	// v4.00/v4.01 u33-u35 and v4.04 u36 are not chip reads: they are ROM images recovered from Balcones/Xerox distribution master disks in the Don Maslin 820-II archive (bitsavers 820ii_images) and functionally validated by booting.  Images + recovered source: https://github.com/davidlrand/mame-system-media (Xerox-820-line-roms)
+	ROMX_LOAD( "v400.u33", 0x0000, 0x0800, CRC(0d1bcaa8) SHA1(a6ac83f8584d19f7a08e666cb5d4b62620d7d3c0), ROM_BIOS(0) )
+	ROMX_LOAD( "v400.u34", 0x0800, 0x0800, CRC(f1df9e29) SHA1(79f38880c3aed9ddf2ccba4ddb11128586dc9c25), ROM_BIOS(0) )
+	ROMX_LOAD( "v400.u35", 0x1000, 0x0800, CRC(68357ed7) SHA1(78498542f4d8506edf5f2b3b9ed0fde3fd72f85b), ROM_BIOS(0) )
+	ROMX_LOAD( "v401.u33", 0x0000, 0x0800, CRC(fe9fa596) SHA1(194162b3d063b2d1bcad03d0bee51dabce2d1985), ROM_BIOS(1) )
+	ROMX_LOAD( "v401.u34", 0x0800, 0x0800, CRC(d3137de3) SHA1(d1de4e11f29799b2024af0412415a07984e58f3a), ROM_BIOS(1) )
+	ROMX_LOAD( "v401.u35", 0x1000, 0x0800, CRC(bf3096fb) SHA1(136f6b1cf2cd93f0b908688394675ef69883f47b), ROM_BIOS(1) )
+	ROMX_LOAD( "u33.4.02.rom",      0x0000, 0x0800, CRC(d9eb668e) SHA1(6acbef96e4e6526c58e068b7849fb9cce2ea2a10), ROM_BIOS(2) )
+	ROMX_LOAD( "u34.4.02.rom",      0x0800, 0x0800, CRC(62181209) SHA1(2238aec096d19af9307bb294532f66f53dd7dfc3), ROM_BIOS(2) )
+	ROMX_LOAD( "u35.4.02.rom",      0x1000, 0x0800, CRC(e22fbf6d) SHA1(6c162f79d42611176b0f1c0e8a4eeb07492beca1), ROM_BIOS(2) )
+	ROMX_LOAD( "u36.rx11.4.02.rom", 0x1800, 0x0800, CRC(b6a239ce) SHA1(330d28fa8ec006d48d948b1c5e714ffced88fe90), ROM_BIOS(2) )
+	ROMX_LOAD( "v403.u33", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(3) )
+	ROMX_LOAD( "v403.u34", 0x0800, 0x0800, NO_DUMP, ROM_BIOS(3) )
+	ROMX_LOAD( "v403.u35", 0x1000, 0x0800, NO_DUMP, ROM_BIOS(3) )
+	ROMX_LOAD( "v403.u36", 0x1800, 0x0800, NO_DUMP, ROM_BIOS(3) )
+	ROMX_LOAD( "537p3652.u33", 0x0000, 0x0800, CRC(7807cfbb) SHA1(bd3cc5cc5c59c84a50747aae5c17eb4617b0dbc3), ROM_BIOS(4) )
+	ROMX_LOAD( "537p3653.u34", 0x0800, 0x0800, CRC(a9c6c0c3) SHA1(c2da9d1bf0da96e6b8bfa722783e411d2fe6deb9), ROM_BIOS(4) )
+	ROMX_LOAD( "537p3654.u35", 0x1000, 0x0800, CRC(a8a07223) SHA1(e8ae1ebf2d7caf76771205f577b88ae493836ac9), ROM_BIOS(4) )
+	ROMX_LOAD( "v404.u36", 0x1800, 0x0800, CRC(97047d38) SHA1(f36506635653736b8d754d2c04f608180602b5a2), ROM_BIOS(4) ) // RX ver 016 (27-Sep-83), best-available pair for v4.04, functionally validated; decoded from U36.ROM, master disk B17D7
 	ROMX_LOAD( "u33.5.0_537p10828.bin", 0x0000, 0x0800, CRC(a17af0f1) SHA1(b1d9a151ed4558f49b3cdc1adbf348b54da48877), ROM_BIOS(5) )
 	ROMX_LOAD( "u34.5.0_537p10829.bin", 0x0800, 0x0800, CRC(c9f5182e) SHA1(ac830848614cea984c849a42687ea2944d6765d9), ROM_BIOS(5) )
-	ROMX_LOAD( "u35.5.0_537p10830.bin", 0x1000, 0x0800, CRC(278fa75f) SHA1(f47cf9eb30366211280f93a8460523fcc53eebe9), ROM_BIOS(5) ) // good dump from Balcones v5.0 source disk B23D13; was BAD_DUMP cc4e1c2b
-	ROMX_LOAD( "537p10831.u36.5.0.bin", 0x1800, 0x0800, CRC(cda7f598) SHA1(08ffd18959e1708136076c82486b8d121a04fa23), ROM_BIOS(5) ) // recovered from Balcones v5.0 source disk B23D13 (U36-V18.ROM); that disk carries u33-u35 matching this set and only this one u36
-
-	ROM_REGION( 0x1000, "chargen", 0 )
-	ROMX_LOAD( "x820ii.u57",       0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(0) )
-	ROMX_LOAD( "x820ii.u58",       0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(0) )
-	ROMX_LOAD( "x820ii.u57",       0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(1) )
-	ROMX_LOAD( "x820ii.u58",       0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(1) )
-	ROMX_LOAD( "u57.04.north.rom", 0x0000, 0x0800, CRC(eda727a2) SHA1(292cd8a0dc6699c3a2091b20c0fc63d97a266fbf), ROM_BIOS(2) )
-	ROMX_LOAD( "u58.03.north.rom", 0x0800, 0x0800, CRC(a2e514f3) SHA1(8ac22dd0cf0324a857718adf67b41912864893a3), ROM_BIOS(2) )
-	ROMX_LOAD( "x820ii.u57",       0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(3) )
-	ROMX_LOAD( "x820ii.u58",       0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(3) )
-	ROMX_LOAD( "x820ii.u57",       0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(4) )
-	ROMX_LOAD( "x820ii.u58",       0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(4) )
-	ROMX_LOAD( "x820ii.u57",       0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(5) )
-	ROMX_LOAD( "x820ii.u58",       0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(5) )
-ROM_END
-
-// the 5.25" floppy, SASI hard disk and low-profile-keyboard variants use the
-// identical 820-II ROM set; alias their rom_* symbols to x820ii's
-#define rom_x820ii5  rom_x820ii // 820-II, 5.25" floppy
-#define rom_x820iis  rom_x820ii // 820-II, SASI hard disk
-#define rom_x820iilp rom_x820ii // 820-II, low-profile keyboard
-
-ROM_START( x168 )
-	ROM_REGION( 0x2000, Z80_TAG, 0 )
-	ROM_DEFAULT_BIOS( "v50" ) // 16/8 ships with the Low Profile Keyboard, which only the v5.0 "RX" monitor decodes (v4.04 can't, and echoes "what?")
-	ROM_SYSTEM_BIOS( 0, "v404", "Balcones Operating System v4.04" ) // Changes sign-on message from Xerox 820-II to Xerox
-	ROMX_LOAD( "537p3652.u33", 0x0000, 0x0800, CRC(7807cfbb) SHA1(bd3cc5cc5c59c84a50747aae5c17eb4617b0dbc3), ROM_BIOS(0) )
-	ROMX_LOAD( "537p3653.u34", 0x0800, 0x0800, CRC(a9c6c0c3) SHA1(c2da9d1bf0da96e6b8bfa722783e411d2fe6deb9), ROM_BIOS(0) )
-	ROMX_LOAD( "537p3654.u35", 0x1000, 0x0800, CRC(a8a07223) SHA1(e8ae1ebf2d7caf76771205f577b88ae493836ac9), ROM_BIOS(0) )
-	ROMX_LOAD( "v404.u36", 0x1800, 0x0800, CRC(97047d38) SHA1(f36506635653736b8d754d2c04f608180602b5a2), ROM_BIOS(0) ) // fitted for low-profile keyboard only; RX ver 016, recovered from master disk B17D7 (see x820ii)
-
-	ROM_SYSTEM_BIOS( 1, "v50", "Balcones Operating System v5.0" ) // Operating system modifications for DEM and new 5.25" disk controller (4 new boot ROMs)
-	ROMX_LOAD( "l5.u33.rom", 0x0000, 0x0800, CRC(a17af0f1) SHA1(b1d9a151ed4558f49b3cdc1adbf348b54da48877), ROM_BIOS(1) )
-	ROMX_LOAD( "l5.u34.rom", 0x0800, 0x0800, CRC(c9f5182e) SHA1(ac830848614cea984c849a42687ea2944d6765d9), ROM_BIOS(1) )
-	ROMX_LOAD( "u35.5.0_537p10830.bin", 0x1000, 0x0800, CRC(278fa75f) SHA1(f47cf9eb30366211280f93a8460523fcc53eebe9), ROM_BIOS(1) ) // was BAD_DUMP l5.u35.rom (44c8dbf8): same ROM as 537p10830 but with data bit 7 stuck high
-	ROMX_LOAD( "u36.rx024.rom", 0x1800, 0x0800, CRC(a7f1d677) SHA1(8c2a442f3a691f2e181a640d65f767ce3b51d711), ROM_BIOS(1) ) // fitted for low-profile keyboard only
-
-	// the 8086 boot ROM lives on the 16/8 coprocessor card (bus/xerox820/copro.cpp)
+	ROMX_LOAD( "u35.5.0_537p10830.bin", 0x1000, 0x0800, CRC(278fa75f) SHA1(f47cf9eb30366211280f93a8460523fcc53eebe9), ROM_BIOS(5) )
+	ROMX_LOAD( "537p10831.u36.5.0.bin", 0x1800, 0x0800, CRC(cda7f598) SHA1(08ffd18959e1708136076c82486b8d121a04fa23), ROM_BIOS(5) ) // recovered from Balcones v5.0 source disk B23D13 (U36-V18.ROM); that disk carries u33-u35 matching this set and only this one u36, so v5.0 shares the v018 u36 -- the earlier "v500.u36" NO_DUMP was a phantom
+	ROMX_LOAD( "537p10828.u33.5.0.bin", 0x0000, 0x0800, CRC(a17af0f1) SHA1(b1d9a151ed4558f49b3cdc1adbf348b54da48877), ROM_BIOS(6) )
+	ROMX_LOAD( "537p10829.u34.5.0.bin", 0x0800, 0x0800, CRC(c9f5182e) SHA1(ac830848614cea984c849a42687ea2944d6765d9), ROM_BIOS(6) )
+	ROMX_LOAD( "u35.5.0_537p10830.bin", 0x1000, 0x0800, CRC(278fa75f) SHA1(f47cf9eb30366211280f93a8460523fcc53eebe9), ROM_BIOS(6) ) // good dump from Balcones v5.0 source disk B23D13; was BAD_DUMP cc4e1c2b
+	ROMX_LOAD( "537p10831.u36.5.0.bin", 0x1800, 0x0800, CRC(cda7f598) SHA1(08ffd18959e1708136076c82486b8d121a04fa23), ROM_BIOS(6) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROMX_LOAD( "x820ii.u57", 0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(0) )
 	ROMX_LOAD( "x820ii.u58", 0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(0) )
-
-	ROMX_LOAD( "u57.04.north.rom", 0x0000, 0x0800, CRC(eda727a2) SHA1(292cd8a0dc6699c3a2091b20c0fc63d97a266fbf), ROM_BIOS(1) )
-	ROMX_LOAD( "u58.03.north.rom", 0x0800, 0x0800, CRC(a2e514f3) SHA1(8ac22dd0cf0324a857718adf67b41912864893a3), ROM_BIOS(1)  )
+	ROMX_LOAD( "x820ii.u57", 0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(1) )
+	ROMX_LOAD( "x820ii.u58", 0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(1) )
+	ROMX_LOAD( "u57.04.north.rom", 0x0000, 0x0800, CRC(eda727a2) SHA1(292cd8a0dc6699c3a2091b20c0fc63d97a266fbf), ROM_BIOS(2) )
+	ROMX_LOAD( "u58.03.north.rom", 0x0800, 0x0800, CRC(a2e514f3) SHA1(8ac22dd0cf0324a857718adf67b41912864893a3), ROM_BIOS(2)  )
+	ROMX_LOAD( "x820ii.u57", 0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(3) )
+	ROMX_LOAD( "x820ii.u58", 0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(3) )
+	ROMX_LOAD( "x820ii.u57", 0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(4) )
+	ROMX_LOAD( "x820ii.u58", 0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(4) )
+	ROMX_LOAD( "x820ii.u57", 0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(5) )
+	ROMX_LOAD( "x820ii.u58", 0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(5) )
+	ROMX_LOAD( "x820ii.u57", 0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(6) )
+	ROMX_LOAD( "x820ii.u58", 0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(6) )
 ROM_END
+
+#define rom_x820ii5 rom_x820ii // 820-II, 5.25" floppy
+#define rom_x820iis rom_x820ii // 820-II, SASI hard disk
+#define rom_x820iilp rom_x820ii // 820-II, low-profile keyboard
 
 ROM_START( mk83 )
 	ROM_REGION( 0x1000, Z80_TAG, 0 )
-	ROM_LOAD( "2732mk83.bin", 0x0000, 0x1000, CRC(a845c7e1) SHA1(3ccf629c5cd384953794ac4a1d2b45678bd40e92) )
+	ROM_LOAD( "2732mk83.bin", 0x0000, 0x1000, CRC(a845c7e1) SHA1(3ccf629c5cd384953794ac4a1d2b45678bd40e92) ) // "SCOMAR MULTIPROG.   REL. 2.00" system monitor (U67; sockets U68-U70 for option ROMs are empty)
 
 	ROM_REGION( 0x800, "chargen", 0 )
-	ROM_LOAD( "2716mk83.bin", 0x0000, 0x0800, CRC(10bf0d81) SHA1(7ec73670a4d9d6421a5d6a4c4edc8b7c87923f6c) )
+	ROM_LOAD( "2716mk83.bin", 0x0000, 0x0800, CRC(10bf0d81) SHA1(7ec73670a4d9d6421a5d6a4c4edc8b7c87923f6c) ) // character generator (U73), same chip as the Big Board's
+ROM_END
+
+ROM_START( mk84 )
+	ROM_REGION( 0x1000, Z80_TAG, 0 )
+	ROM_LOAD( "mon84.bin", 0x0000, 0x1000, CRC(e49f3c1b) SHA1(0eb614c295a42f7c2191e5a5fafec5d9432e9ee2) ) // "MK-84 monitor 1.1 - ADE Elettronica" (U67; three independent dumps agree)
+
+	ROM_REGION( 0x800, "chargen", 0 )
+	ROM_LOAD( "2716mk83.bin", 0x0000, 0x0800, BAD_DUMP CRC(10bf0d81) SHA1(7ec73670a4d9d6421a5d6a4c4edc8b7c87923f6c) ) // not dumped from an MK-84 yet; the MK-83's character generator (the Big Board chip) is presumed identical
 ROM_END
 
 ROM_START( mojmikro )
@@ -1092,51 +1365,55 @@ ROM_END
 // outright dead, because EM-II/DEM support is monitor rev 500 ("Expansion Box II") which
 // v4.04 predates -- under v4.04 ddskld never runs and the WD1002-05 disk is invisible.
 // Always run the 16/8 on v5.0.
+ROM_START( x168 )
+	ROM_DEFAULT_BIOS( "v50" ) // 16/8 ships with the Low Profile Keyboard, which only the v5.0 "RX" monitor decodes (v4.04 can't, and echoes "what?")
+	ROM_SYSTEM_BIOS( 0, "v404", "Balcones Operating System v4.04" ) // Changes sign-on message from Xerox 820-II to Xerox
+	ROM_SYSTEM_BIOS( 1, "v50",  "Balcones Operating System v5.0" ) // Operating system modifications for DEM and new 5.25" disk controller (4 new boot ROMs)
+
+	ROM_REGION( 0x2000, Z80_TAG, 0 )
+	ROMX_LOAD( "537p3652.u33", 0x0000, 0x0800, CRC(7807cfbb) SHA1(bd3cc5cc5c59c84a50747aae5c17eb4617b0dbc3), ROM_BIOS(0) )
+	ROMX_LOAD( "537p3653.u34", 0x0800, 0x0800, CRC(a9c6c0c3) SHA1(c2da9d1bf0da96e6b8bfa722783e411d2fe6deb9), ROM_BIOS(0) )
+	ROMX_LOAD( "537p3654.u35", 0x1000, 0x0800, CRC(a8a07223) SHA1(e8ae1ebf2d7caf76771205f577b88ae493836ac9), ROM_BIOS(0) )
+	ROMX_LOAD( "v404.u36",     0x1800, 0x0800, CRC(97047d38) SHA1(f36506635653736b8d754d2c04f608180602b5a2), ROM_BIOS(0) ) // fitted for low-profile keyboard only; RX ver 016, recovered from master disk B17D7 (see x820ii)
+	ROMX_LOAD( "l5.u33.rom",            0x0000, 0x0800, CRC(a17af0f1) SHA1(b1d9a151ed4558f49b3cdc1adbf348b54da48877), ROM_BIOS(1) )
+	ROMX_LOAD( "l5.u34.rom",            0x0800, 0x0800, CRC(c9f5182e) SHA1(ac830848614cea984c849a42687ea2944d6765d9), ROM_BIOS(1) )
+	ROMX_LOAD( "u35.5.0_537p10830.bin", 0x1000, 0x0800, CRC(278fa75f) SHA1(f47cf9eb30366211280f93a8460523fcc53eebe9), ROM_BIOS(1) ) // was BAD_DUMP l5.u35.rom (44c8dbf8): same ROM as 537p10830 but with data bit 7 stuck high
+	ROMX_LOAD( "537p10831.u36.5.0.bin", 0x1800, 0x0800, CRC(cda7f598) SHA1(08ffd18959e1708136076c82486b8d121a04fa23), ROM_BIOS(1) ) // v5.0 u36 with the TYPEWRITER-paired G25 position->char table (matches the keycaps); shares u33-u35 with x820ii v50.  rx024 is a bit-paired variant ([->@, =->^) that does not match the G25
+
+	// the 8086 boot ROM lives on the 16/8 coprocessor card (bus/xerox820/copro.cpp)
+
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROMX_LOAD( "x820ii.u57", 0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(0) )
+	ROMX_LOAD( "x820ii.u58", 0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(0) )
+	ROMX_LOAD( "u57.04.north.rom", 0x0000, 0x0800, CRC(eda727a2) SHA1(292cd8a0dc6699c3a2091b20c0fc63d97a266fbf), ROM_BIOS(1) )
+	ROMX_LOAD( "u58.03.north.rom", 0x0800, 0x0800, CRC(a2e514f3) SHA1(8ac22dd0cf0324a857718adf67b41912864893a3), ROM_BIOS(1)  )
+ROM_END
 
 // 16/8, 5.25" floppy on the FD1797 daughterboard (the standard non-EM-II 5.25" path;
 // mixed SD/DD media).  The 8086 ROM comes from the 16/8 copro card.
-ROM_START( x1685 )
-	ROM_DEFAULT_BIOS( "v50" )
-	ROM_SYSTEM_BIOS( 0, "v404", "Balcones Operating System v4.04" )
-	ROM_SYSTEM_BIOS( 1, "v50",  "Balcones Operating System v5.0" )
-
-	ROM_REGION( 0x2000, Z80_TAG, 0 )
-	ROMX_LOAD( "537p3652.u33",          0x0000, 0x0800, CRC(7807cfbb) SHA1(bd3cc5cc5c59c84a50747aae5c17eb4617b0dbc3), ROM_BIOS(0) )
-	ROMX_LOAD( "537p3653.u34",          0x0800, 0x0800, CRC(a9c6c0c3) SHA1(c2da9d1bf0da96e6b8bfa722783e411d2fe6deb9), ROM_BIOS(0) )
-	ROMX_LOAD( "537p3654.u35",          0x1000, 0x0800, CRC(a8a07223) SHA1(e8ae1ebf2d7caf76771205f577b88ae493836ac9), ROM_BIOS(0) )
-	ROMX_LOAD( "v404.u36",              0x1800, 0x0800, CRC(97047d38) SHA1(f36506635653736b8d754d2c04f608180602b5a2), ROM_BIOS(0) ) // RX ver 016, recovered from master disk B17D7 (see x820ii)
-	ROMX_LOAD( "l5.u33.rom",            0x0000, 0x0800, CRC(a17af0f1) SHA1(b1d9a151ed4558f49b3cdc1adbf348b54da48877), ROM_BIOS(1) )
-	ROMX_LOAD( "l5.u34.rom",            0x0800, 0x0800, CRC(c9f5182e) SHA1(ac830848614cea984c849a42687ea2944d6765d9), ROM_BIOS(1) )
-	ROMX_LOAD( "u35.5.0_537p10830.bin", 0x1000, 0x0800, CRC(278fa75f) SHA1(f47cf9eb30366211280f93a8460523fcc53eebe9), ROM_BIOS(1) )
-	ROMX_LOAD( "u36.rx024.rom",         0x1800, 0x0800, CRC(a7f1d677) SHA1(8c2a442f3a691f2e181a640d65f767ce3b51d711), ROM_BIOS(1) )
-
-	ROM_REGION( 0x1000, "chargen", 0 )
-	ROMX_LOAD( "x820ii.u57",       0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(0) )
-	ROMX_LOAD( "x820ii.u58",       0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(0) )
-	ROMX_LOAD( "u57.04.north.rom", 0x0000, 0x0800, CRC(eda727a2) SHA1(292cd8a0dc6699c3a2091b20c0fc63d97a266fbf), ROM_BIOS(1) )
-	ROMX_LOAD( "u58.03.north.rom", 0x0800, 0x0800, CRC(a2e514f3) SHA1(8ac22dd0cf0324a857718adf67b41912864893a3), ROM_BIOS(1) )
-ROM_END
+#define rom_x1685 rom_x168
 
 // 16/8 + Expansion Module II (the slot-connected EM-II).  The genuine box ROM (537p3682)
 // and the 8086 ROM come from the EM-II copro card; the 5.25" disks are all-DD WD1002-05 media.
-#define rom_x168em rom_x1685
+#define rom_x168em rom_x168
 
-#define rom_x168s rom_x1685 // 16/8, SASI hard disk
+#define rom_x168s rom_x168 // 16/8, SASI hard disk
 
 /* System Drivers */
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE       INPUT     CLASS             INIT        COMPANY                       FULLNAME                          FLAGS
-COMP( 1980, bigboard, 0,        0,      bigboard,     xerox820, bigboard_state,   empty_init, "Digital Research Computers", "Big Board",                      0 )
-COMP( 1980, bigboard5,bigboard, 0,      bigboard5,    xerox820, bigboard_state,   empty_init, "Digital Research Computers", "Big Board (5.25\" drives)",      MACHINE_NOT_WORKING )
-COMP( 1981, x820,     bigboard, 0,      xerox820,     xerox820, xerox820_state,   empty_init, "Xerox",                      "Xerox 820",                      MACHINE_NO_SOUND_HW )
-COMP( 1982, mk82,     bigboard, 0,      bigboard,     xerox820, bigboard_state,   empty_init, "Scomar",                     "MK-82",                          0 )
-COMP( 1983, x820ii,   0,        0,      xerox820ii,   xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 820-II (8\" floppy)",      0 )
-COMP( 1983, x820iilp, x820ii,   0,      xerox820iilp, xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 820-II (low profile keyboard)", 0 )
-COMP( 1983, x820ii5,  x820ii,   0,      xerox820ii5,  xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 820-II (5.25\" floppy)",   0 )
-COMP( 1983, x820iis,  x820ii,   0,      xerox820iis,  xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 820-II (SASI hard disk)",  0 )
-COMP( 1983, x168,     x820ii,   0,      xerox168,     xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8 (8\" floppy)",        0 )
-COMP( 1983, x1685,    x820ii,   0,      xerox1685,    xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8 (5.25\" floppy)",     0 ) // FD1797 5.25" daughterboard (mixed SD/DD); the EM-II 5.25" box is x168em
-COMP( 1983, x168em,   x820ii,   0,      xerox168em,   xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8 (Expansion Module II)", 0 ) // EM-II (DEM): slot-connected WD1002-05 + the genuine 537p3682 box ROM, 5.25" ST-506 rigid + floppy
-COMP( 1983, x168s,    x820ii,   0,      xerox168s,    xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8 (SASI hard disk)",    0 )
-COMP( 1983, mk83,     bigboard, 0,      mk83,         xerox820, xerox820_state,   empty_init, "Scomar",                     "MK-83",                          MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1985, mojmikro, bigboard, 0,      bigboard,     xerox820, bigboard_state,   empty_init, "<unknown>",                  "Moj mikro Slovenija",            0 )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT     CLASS             INIT        COMPANY                       FULLNAME                          FLAGS
+COMP( 1980, bigboard, 0,        0,      bigboard,    xerox820, bigboard_state,   empty_init, "Digital Research Computers", "Big Board",                      0 )
+COMP( 1980, bigboard5,bigboard, 0,      bigboard5,   xerox820, bigboard_state,   empty_init, "Digital Research Computers", "Big Board (5.25\" drives)",      MACHINE_NOT_WORKING )
+COMP( 1981, x820,     bigboard, 0,      xerox820,    xerox820, xerox820_state,   empty_init, "Xerox",                      "Xerox 820",                      MACHINE_NO_SOUND_HW )
+COMP( 1982, mk82,     bigboard, 0,      bigboard,    xerox820, bigboard_state,   empty_init, "Scomar",                     "MK-82",                          0 )
+COMP( 1983, x820ii,   0,        0,      xerox820ii,  xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 820-II (8\" floppy)",      0 )
+COMP( 1983, x820iilp, x820ii,   0,      xerox820iilp, xerox820, xerox820ii_state, empty_init, "Xerox",                     "Xerox 820-II (low profile keyboard)", 0 )
+COMP( 1983, x820ii5,  x820ii,   0,      xerox820ii5, xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 820-II (5.25\" floppy)",   0 )
+COMP( 1983, x820iis,  x820ii,   0,      xerox820iis, xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 820-II (SASI hard disk)",  0 )
+COMP( 1983, x168,     x820ii,   0,      xerox168,    xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8 (8\" floppy)",        0 )
+COMP( 1983, x1685,    x820ii,   0,      xerox1685,   xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8 (5.25\" floppy)",     0 ) // FD1797 5.25" daughterboard (mixed SD/DD); the EM-II 5.25" box is x168em
+COMP( 1983, x168em,   x820ii,   0,      xerox168em,  xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8 (Expansion Module II)", 0 ) // EM-II (DEM): slot-connected WD1002-05 + the genuine 537p3682 box ROM, 5.25" ST-506 rigid + floppy
+COMP( 1983, x168s,    x820ii,   0,      xerox168s,   xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8 (SASI hard disk)",    0 )
+COMP( 1983, mk83,     0,        0,      mk83,        xerox820, mk83_state,       empty_init, "ADE Elettronica",            "MK-83",                          MACHINE_NO_SOUND_HW ) // fitted firmware is Scomar's MULTIPROG REL. 2.00; no original MK3000 media survives - boots a CP/M 2.2 disk reconstructed from the period format tables
+COMP( 1984, mk84,     0,        0,      mk84,        xerox820, mk84_state,       empty_init, "ADE Elettronica",            "MK-84",                          MACHINE_NO_SOUND_HW )
+COMP( 1985, mojmikro, bigboard, 0,      bigboard,    xerox820, bigboard_state,   empty_init, "<unknown>",                  "Moj mikro Slovenija",            0 )

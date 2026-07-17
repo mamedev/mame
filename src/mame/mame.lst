@@ -17966,6 +17966,7 @@ cookbib
 cookbiba
 dquizgo
 fncywld
+fncywlda
 funkyjetb
 magipur
 htchctch
@@ -20932,6 +20933,9 @@ d6809
 
 @source:homebrew/dcebridge.cpp
 dcebridge
+
+@source:homebrew/et532.cpp
+et532
 
 @source:homebrew/gigatron.cpp
 gigatron
@@ -32767,27 +32771,6 @@ ncarrera
 @source:misc/neomania.cpp
 neomania
 
-@source:misc/neoprint.cpp
-98best44
-neoprint
-npcartv1
-npcramen
-npeurver
-npeurver2
-npfpit
-npft
-npmillen
-npotogib
-nppopeye
-nprsp
-npspscv
-npscv1
-npskv
-npsprg98
-npsprgv4
-npssr2
-npusagif
-
 @source:misc/news.cpp
 news
 newsa
@@ -43895,6 +43878,9 @@ lilith
 @source:skeleton/lms46.cpp
 lms46
 
+@source:skeleton/luckyjkr.cpp
+luckyjkr
+
 @source:skeleton/madmoney2.cpp
 madmoney2
 
@@ -44744,6 +44730,27 @@ kf2k3pcb
 ms5pcb
 svcpcb
 svcpcba
+
+@source:snk/neoprint.cpp
+98best44
+neoprint
+npcartv1
+npcramen
+npeurver
+npeurver2
+npfpit
+npft
+npmillen
+npotogib
+nppopeye
+nprsp
+npspscv
+npscv1
+npskv
+npsprg98
+npsprgv4
+npssr2
+npusagif
 
 @source:snk/ngp.cpp
 ngp
@@ -49483,6 +49490,7 @@ bigboard
 bigboard5
 mk82
 mk83
+mk84
 mojmikro
 x168
 x1685

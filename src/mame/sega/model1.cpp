@@ -694,7 +694,7 @@ void model1_state::wingwar360_outputs_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 }
 
-void model1_state::netmerc_outputs_w(uint8_t data)
+void netmerc_state::netmerc_outputs_w(uint8_t data)
 {
 	// 76------  unknown (not used?)
 	// --54----  mvd backlights
@@ -833,19 +833,104 @@ void model1_state::irq_control_w(u8 data)
 	}
 }
 
+// E00002: per-level IRQ mask, active low (bit n set = IRQ level n masked).
+// Assumed to power up with all levels masked; every game programs it before
+// enabling interrupts in the PSW, so the reset value is not observable
+// (swa/wingwar write it in the instruction immediately preceding
+// updpsw #0x40000, the others earlier in their init).
+//
+// - vf/vr:   write 0xff then 0xfd at init - vblank only. vf additionally
+//            unmasks level 3 ("and.b #0xf7") while its sound queue is
+//            non-empty and masks it again ("or.b #8") once it drains - its
+//            level 3 handler pumps the queue to the uart.
+// - swa:     writes 0x3c - unmasks levels 0/1; level 0 is its uart pump.
+// - wingwar: writes 0x3d - unmasks level 1 only.
+// - netmerc: writes 0xff at boot, then "and.b #0xfd" - unmasks level 1 only.
+//            All its other vectors point to a debug routine that cycles the
+//            backdrop colour, which must never run.
+//
+// Note: The games (e.g., netmerc) do perform read operations on this register,
+// likely for read-modify-write bit manipulations. It must remain readable.
+u8 model1_state::irq_mask_r()
+{
+	return m_irq_mask;
+}
+
+void model1_state::irq_mask_w(u8 data)
+{
+	m_irq_mask = data;
+	sound_ready_w(0);
+}
+
+void model1_state::sound_ready_w(int state)
+{
+	if ((m_m1uart->txrdy_r() || m_m1uart->rxrdy_r()) && !BIT(m_irq_mask, 3))
+		irq_raise(3);
+}
+
+u16 model1_state::timer_r(offs_t offset)
+{
+	u16 result = m_timer_val[offset];
+	if (m_irq0_timer[offset]->enabled())
+	{
+		uint32_t ticks = m_irq0_timer[offset]->remaining().as_ticks(m_maincpu->clock());
+		result = ticks / 0x800;
+		if (!machine().side_effects_disabled())
+			m_timer_val[offset] = result;
+	}
+	return result;
+}
+
+void model1_state::timer_mode_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_timer_mode);
+}
+
+void model1_state::timer_period_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_timer_period[offset]);
+	if (m_timer_period[offset])
+	{
+		attotime period = attotime::from_ticks(0x800 * m_timer_period[offset], m_maincpu->clock());
+		m_irq0_timer[offset]->adjust(period, offset);
+	}
+	else
+	{
+		m_irq0_timer[offset]->adjust(attotime::never);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(model1_state::irq0_timer_tick)
+{
+	if (!BIT(m_irq_mask, 0))
+		irq_raise(0);
+
+	if (m_timer_period[param])
+	{
+		attotime period = attotime::from_ticks(0x800 * m_timer_period[param], m_maincpu->clock());
+		m_irq0_timer[param]->adjust(period, param);
+	}
+}
+
+// IRQ vectors in use:
 // vf
-// 1 = fe3ed4
-// 3 = fe3f5c
+// 1 = fe3ed4 (vblank)
+// 3 = fe3f5c (uart queue pump)
 // other = fe3ec8 / fe3ebc
 
 // vr
-// 1 = fe02bc
-// other = f302a4 / fe02b0
+// 1 = fe02bc (vblank)
+// other = fe02a4 / fe02b0
 
 // swa
-// 1 = ff504
+// 0 = ff558 (uart queue pump)
+// 1 = ff504 (vblank)
 // 3 = ff54c
 // other = ff568/ff574
+
+// netmerc
+// 1 = ffe000 (vblank)
+// other = ffe10c (debug backdrop cycler, always masked)
 
 void model1_state::irq_init()
 {
@@ -861,12 +946,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
 	{
 		if (m_m1comm != nullptr)
 			m_m1comm->check_vint_irq();
-		irq_raise(1);
+		if (!BIT(m_irq_mask, 1))
+			irq_raise(1);
 	}
-	else if(scanline == 384/2)
-	{
-		irq_raise(m_sound_irq);
-	}
+
 }
 
 void model1_state::machine_reset()
@@ -877,15 +960,20 @@ void model1_state::machine_reset()
 
 	m_irq_status = 0;
 	m_last_irq = 0;
+	m_irq_mask = 0xff;
+}
 
-	if (!strcmp(machine().system().name, "swa") ||
-		!strcmp(machine().system().name, "swaj"))
+void netmerc_state::machine_reset()
+{
+	model1_state::machine_reset();
+
+	// Initial HMD (VR glasses) pose: camera orientation vector
+	// 12868 ≈ 90°, 25736 ≈ 180° — points the camera forward
+	constexpr int16_t pose[6] = {0, 0, 0, 12868, 25736, 12868};
+	for (int i = 0; i < 6; i++)
 	{
-		m_sound_irq = 0;
-	}
-	else
-	{
-		m_sound_irq = 3;
+		m_dpram->left_w(0x80 + i * 2, pose[i] & 0xff);
+		m_dpram->left_w(0x81 + i * 2, (pose[i] >> 8) & 0xff);
 	}
 }
 
@@ -927,8 +1015,11 @@ void model1_state::model1_mem(address_map &map)
 	/*      */ map(0xdc0000, 0xdc0003).r(FUNC(model1_state::fifoin_status_r)).mirror(0x1fffc);
 
 	/* GLUE */ map(0xe00000, 0xe00000).w(FUNC(model1_state::irq_control_w));
+	/*      */ map(0xe00002, 0xe00002).rw(FUNC(model1_state::irq_mask_r), FUNC(model1_state::irq_mask_w));
 	/*      */ map(0xe00004, 0xe00005).w(FUNC(model1_state::bank_w));
-	/*      */ map(0xe0000c, 0xe0000f).nopw();
+	/*      */ map(0xe00006, 0xe00007).w(FUNC(model1_state::timer_mode_w));
+	/*      */ map(0xe00008, 0xe0000b).w(FUNC(model1_state::timer_period_w));
+	/*      */ map(0xe0000c, 0xe0000f).r(FUNC(model1_state::timer_r)).nopw(); // vf/swa write 0 to the count registers at init
 
 	/* ROM0 */ map(0xf80000, 0xffffff).rom();
 }
@@ -1156,7 +1247,7 @@ static INPUT_PORTS_START( netmerc )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("STICKX")
-	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 
 	PORT_START("STICKY")
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
@@ -1706,6 +1797,9 @@ ROM_START( netmerc )
 	ROM_REGION( 0x8000, "polhemus", 0 ) /* POLHEMUS board */
 	ROM_LOAD16_BYTE( "u1", 0x0000, 0x4000, CRC(7073a312) SHA1(d2582f9520b8c8c051708dd372633112af59206e) )
 	ROM_LOAD16_BYTE( "u2", 0x0001, 0x4000, CRC(c589f428) SHA1(98dc0114a5f89636b4e237ed954e19f1cfd186ab) )
+
+	ROM_REGION( 0x10000, "nvram", 0 ) /* default NVRAM */
+	ROM_LOAD( "netmerc_nvram.bin", 0, 0x10000, CRC(09866826) SHA1(411134c1e6307f2e32c3b4b372597b45b14a9834) )
 ROM_END
 
 void model1_state::model1(machine_config &config)
@@ -1753,6 +1847,8 @@ void model1_state::model1(machine_config &config)
 
 	I8251(config, m_m1uart, 8000000); // uPD71051C, clock unknown
 	m_m1uart->txd_handler().set(m_m1audio, FUNC(segam1audio_device::write_txd));
+	m_m1uart->rxrdy_handler().set(FUNC(model1_state::sound_ready_w));
+	m_m1uart->txrdy_handler().set(FUNC(model1_state::sound_ready_w));
 
 	clock_device &m1uart_clock(CLOCK(config, "m1uart_clock", 16_MHz_XTAL / 2 / 16)); // 16 times 31.25kHz (standard Sega/MIDI sound data rate)
 	m1uart_clock.signal_handler().set(m_m1uart, FUNC(i8251_device::write_txc));
@@ -1871,11 +1967,11 @@ void model1_state::polhemus_map(address_map &map)
 	map(0xf8000, 0xfffff).rom().region("polhemus", 0);
 }
 
-void model1_state::netmerc(machine_config &config)
+void netmerc_state::netmerc(machine_config &config)
 {
 	model1(config);
 	i386sx_device &polhemus(I386SX(config, "polhemus", 16000000));
-	polhemus.set_addrmap(AS_PROGRAM, &model1_state::polhemus_map);
+	polhemus.set_addrmap(AS_PROGRAM, &netmerc_state::polhemus_map);
 
 	model1io2_device &ioboard(SEGA_MODEL1IO2(config.replace(), "ioboard", 0));
 	ioboard.set_default_bios_tag("epr18021");
@@ -1885,8 +1981,8 @@ void model1_state::netmerc(machine_config &config)
 	ioboard.in_callback<1>().set_ioport("IN.1");
 	ioboard.an_callback<0>().set_ioport("STICKX");
 	ioboard.an_callback<2>().set_ioport("STICKY");
-	ioboard.output_callback().set(FUNC(model1_state::netmerc_outputs_w));
-	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
+	ioboard.output_callback().set(FUNC(netmerc_state::netmerc_outputs_w));
+	ioboard.output_callback().append(FUNC(netmerc_state::gen_outputs_w));
 
 	config.set_default_layout(layout_model1io2);
 }
@@ -1906,4 +2002,4 @@ GAME( 1994, wingwar,    0,       wingwar,    wingwar,    model1_state, empty_ini
 GAME( 1994, wingwaru,   wingwar, wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (US)",            0 )
 GAME( 1994, wingwarj,   wingwar, wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (Japan)",         0 )
 GAME( 1994, wingwar360, wingwar, wingwar360, wingwar360, model1_state, empty_init, ROT0,     "Sega",  "Wing War R360 (US)",       0 )
-GAME( 1993, netmerc,    0,       netmerc,    netmerc,    model1_state, empty_init, ROT0,     "Sega",  "Sega NetMerc",             MACHINE_NOT_WORKING )
+GAME( 1993, netmerc,    0,       netmerc,    netmerc,    netmerc_state, empty_init, ROT0,     "Sega",  "Sega NetMerc",             MACHINE_NOT_WORKING )

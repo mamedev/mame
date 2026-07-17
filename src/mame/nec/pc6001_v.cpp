@@ -117,8 +117,8 @@ void pc6001_state::video_start()
 	cfg.get_char_rom = pc6001_get_char_rom;
 	m6847_init(machine(), &cfg);
 	#endif
-//	m_video_ram = make_unique_clear<uint8_t[]>(0x4000);
-//	m_video_base = &m_video_ram[0];
+//  m_video_ram = make_unique_clear<uint8_t[]>(0x4000);
+//  m_video_base = &m_video_ram[0];
 }
 
 void pc6001mk2_state::video_start()
@@ -317,32 +317,28 @@ void pc6001_state::draw_tile_text(bitmap_ind16 &bitmap,const rectangle &cliprect
 	}
 }
 
-void pc6001_state::draw_border(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr,int has_mc6847)
+int pc6001_state::get_border_pen(u8 attr,int has_mc6847)
 {
-	for(int y=0;y<240;y++)
-	{
-		for(int x=0;x<320;x++)
-		{
-			int color;
-			if(!has_mc6847) //mk2 border color is always black
-				color = 0;
-			else if((attr & 0x90) == 0x80) //2bpp
-				color = ((attr & 2)<<1) + 8;
-			else if((attr & 0x90) == 0x90) //1bpp
-				color = (attr & 2) ? 7 : 2;
-			else
-				color = 0; //FIXME: other modes not yet checked
+	// mk2 border color is always black
+	if (!has_mc6847)
+		return 0;
 
-			bitmap.pix(y, x) = m_palette->pen(color);
-		}
+	switch(attr & 0x90)
+	{
+		case 0x80: // 2 bpp
+			return ((attr & 2) << 1) + 8;
+		case 0x90: // 1 bpp
+			return (attr & 2) ? 7 : 2;
 	}
+	// FIXME: other modes not yet checked
+	return 0;
 }
 
 void pc6001_state::pc6001_screen_draw(bitmap_ind16 &bitmap,const rectangle &cliprect, int has_mc6847)
 {
 	int attr = m_video_base[0];
 
-	draw_border(bitmap,cliprect,attr,has_mc6847);
+	bitmap.fill(m_palette->pen(get_border_pen(attr, has_mc6847)), cliprect);
 
 	if(attr & 0x80) // gfx mode
 	{
@@ -489,20 +485,20 @@ uint32_t pc6001mk2_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 				---- xxxx fg color
 				Note that the exgfx banks a different gfx ROM
 				*/
-				int tile = m_video_base[(x+(y*40))+0x400] + 0x200;
+				int tile = m_video_base[(x+(y*40)) + 0x400] + 0x200;
 				int attr = m_video_base[(x+(y*40)) & 0x3ff];
 				tile += ((attr & 0x80) << 1);
 
-				for(int yi = 0; yi < 12; yi++)
+				for(int yi = 0; yi < 10; yi++)
 				{
 					for(int xi = 0; xi < 8; xi++)
 					{
 						int res_x = (x * 8) + xi;
-						int res_y = (y * 12) + yi;
+						// pc6001mk2sr has junk after 8x10, is it ever used for drawing
+						// or it's just readable from TV ROM banks?
+						int res_y = (y * 10) + yi;
 
-						// pc6001mk2sr in mk2 text mode uses this as 8x10
-						// (tv roms have junk afterwards)
-						int pen = yi >= 10 ? 0 : BIT(gfx_data[(tile * 0x10) + yi], 7 - xi);
+						int pen = BIT(gfx_data[(tile * 0x10) + yi], 7 - xi);
 
 						int fgcol = (attr & 0x0f) + 0x10;
 						int bgcol = ((attr & 0x70) >> 4) + 0x10 + ((m_bgcol_bank & 2) << 2);
@@ -539,7 +535,10 @@ uint32_t pc6001mk2sr_state::screen_update(screen_device &screen, bitmap_ind16 &b
 
 	if(m_sr_text_mode == true) // text mode
 	{
-		const u8 text_cols = (m_width80 + 1) * 40;
+		const u8 text_cols = 40 << m_width80;
+		// WIDTH 40,25 or WIDTH 80,25 in 66SR BASIC
+		const u8 y_size = m_sr_text_rows == 25 ? 8 : 10;
+		const u16 char_bank = m_sr_text_rows == 25 ? 0x1000 : 0x2000;
 
 		for(int y = 0; y < m_sr_text_rows; y++)
 		{
@@ -549,15 +548,15 @@ uint32_t pc6001mk2sr_state::screen_update(screen_device &screen, bitmap_ind16 &b
 				int attr = m_video_base[(x + (y * text_cols)) * 2 + 1];
 				tile += ((attr & 0x80) << 1);
 
-				for(int yi = 0; yi < 12; yi++)
+				for(int yi = 0; yi < y_size; yi++)
 				{
-					int res_y = y * 12 + yi;
+					int res_y = y * y_size + yi;
 
 					for(int xi = 0; xi < 8; xi++)
 					{
 						int res_x = x * 8 + xi;
 
-						int pen = gfx_data[(tile * 0x10) + yi] >> (7 - xi) & 1;
+						int pen = BIT(gfx_data[((tile * 0x10) + yi) | char_bank], 7 - xi);
 
 						int fgcol = m_sr_clut[(attr & 0x0f)] + 0x10;
 						int bgcol = m_sr_clut[((attr & 0x70) >> 4) | 8] + 0x10; //+ m_bgcol_bank;

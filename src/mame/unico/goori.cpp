@@ -79,19 +79,19 @@ public:
 		m_bg_videoram(*this, "bg_videoram")
 	{ }
 
-	void goori(machine_config& config);
+	void goori(machine_config& config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	void goori_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
 
 	void bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	uint32_t screen_update(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -106,7 +106,7 @@ private:
 	required_shared_ptr<uint16_t> m_bg_videoram;
 
 	// video related
-	tilemap_t* m_bg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	bool m_display_enable = false;
 };
@@ -143,7 +143,7 @@ uint32_t goori_state::screen_update(screen_device& screen, bitmap_ind16& bitmap,
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	gfx_element &gfx = *m_gfxdecode->gfx(0);
-	// is this sprite format a clone of anything? (looks VERY similar to snowbros but this hardware also has a higer resolution, a tile layer and 8bpp)
+	// is this sprite format a clone of anything? (looks VERY similar to snowbros but this hardware also has a higher resolution, a tile layer and 8bpp)
 	for (int i = 0; i < 0x2000 / 2; i += 8)
 	{
 		// 0 unused
@@ -175,7 +175,7 @@ uint32_t goori_state::screen_update(screen_device& screen, bitmap_ind16& bitmap,
 	return 0;
 }
 
-void goori_state::goori_map(address_map &map)
+void goori_state::program_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x10ffff).ram(); // RAM main
@@ -212,7 +212,7 @@ static INPUT_PORTS_START( goori )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::di_write))
 	PORT_BIT( 0xfff8, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("DSW1")  /* 500001 */
+	PORT_START("DSW1")  // 500001
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED ) // no dips on this PCB
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -223,7 +223,7 @@ static INPUT_PORTS_START( goori )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("DSW2")  /* 500003 */
+	PORT_START("DSW2")  // 500003
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED ) // no dips on this PCB
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
@@ -234,7 +234,7 @@ static INPUT_PORTS_START( goori )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("SYSTEM")    /* 500005 */
+	PORT_START("SYSTEM")    // 500005
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -242,7 +242,7 @@ static INPUT_PORTS_START( goori )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1 ) // makes sound but doesn't add a coin
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // EEPROM
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 INPUT_PORTS_END
 
 static const gfx_layout layout_16x16x8 =
@@ -269,12 +269,12 @@ void goori_state::machine_start()
 
 void goori_state::goori(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 16_MHz_XTAL); /* 16MHz MC68HC000FN16 */
-	m_maincpu->set_addrmap(AS_PROGRAM, &goori_state::goori_map);
+	// basic machine hardware
+	M68000(config, m_maincpu, 16_MHz_XTAL); // 16MHz MC68HC000FN16
+	m_maincpu->set_addrmap(AS_PROGRAM, &goori_state::program_map);
 	m_maincpu->set_vblank_int("screen", FUNC(goori_state::irq4_line_hold));
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60); // not verified
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -289,7 +289,7 @@ void goori_state::goori(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x2000);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
 	OKIM6295(config, m_oki, 16_MHz_XTAL/16, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
@@ -319,5 +319,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1999, goori, 0, goori, goori, goori_state, empty_init, ROT0, "Unico", "Goori Goori", 0 )
+GAME( 1999, goori, 0, goori, goori, goori_state, empty_init, ROT0, "Unico", "Goori Goori", MACHINE_SUPPORTS_SAVE )
 
