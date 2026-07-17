@@ -3,7 +3,7 @@
 
 // Sony NWB-512 Monochrome Framebuffer and NWP-512D 15" Monochrome CRT Monitor
 // The NWB-512 is a NEWS expansion card (model DSC-001) that provides a single-plane monochrome output at 816x1024
-// resolution. It has hardware-accelerated graphics, provided by the Sony CXD1029 raster operation controller and pairs
+// resolution. It has hardware-accelerated graphics, provided by the Sony CXD1029 raster operation controller, and pairs
 // with the NWP-512D 15" monochrome CRT display.
 
 #include "emu.h"
