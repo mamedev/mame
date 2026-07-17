@@ -25,7 +25,7 @@ To Do:
 - steaser: sound uses an OkiM6295 (controlled by the sub MCU), check if it can be simulated;
 - deucesw2: colour cycling effect on attract mode is ugly (background should be blue, it's instead a MAME-esque
   palette), protection?
-- all Cadillac Jack sets but cbjb: they freeze on the double up side and when winning a bonus
+- all Cadillac Jack sets without MCU dump: they freeze on the double up side and when winning a bonus
 - cbjb: hangs at the Cadillac Jack screen
 - most if not all games: need emulation of the CDP68HC68T1E RTC
 - games with MCU dumped / sound: sometimes sound stops too early
@@ -37,6 +37,7 @@ To Do:
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6805/m68hc05.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
@@ -118,10 +119,10 @@ public:
 	void steaser(machine_config &config) ATTR_COLD;
 
 protected:
- 	required_device<cpu_device> m_maincpu;
- 	optional_device<mc6845_device> m_crtc;
- 
- 	void cj_nomcu_map(address_map &map) ATTR_COLD;
+	required_device<cpu_device> m_maincpu;
+	optional_device<mc6845_device> m_crtc;
+
+	void cj_nomcu_map(address_map &map) ATTR_COLD;
 
 private:
 	void blit_copy_w(uint16_t data);
@@ -259,12 +260,11 @@ public:
 		, m_mcu(*this, "mcu")
 		, m_dac(*this, "dac")
 		, m_samples(*this, "samples")
+		, m_to_mcu(*this, "to_mcu")
+		, m_from_mcu(*this, "from_mcu")
 	{ }
 
 	void cj_mcu(machine_config &config) ATTR_COLD;
-
-	ioport_value mcu_response_ready_r();
-	ioport_value mcu_busy_r();
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -273,22 +273,29 @@ protected:
 	required_device<ad7524_device> m_dac;
 	required_region_ptr<uint8_t> m_samples;
 
-	uint8_t m_mcu_porta_latch = 0xff;
-	uint8_t m_mcu_porta_out = 0xff;
-	uint8_t m_mcu_porta_input = 0xff;
+	// 68K<->MCU byte handshake modelled as two generic_latch_8_device instances:
+	//   m_to_mcu   - byte the 68K writes to $8e0000, read back by the MCU on PORTA.
+	//                Uses separate acknowledge: the MCU pulses PORTB.0 (not the PORTA
+	//                read itself) to signal it consumed the byte.  data_pending_cb is
+	//                wired to the MCU /IRQ line so a fresh byte automatically wakes
+	//                the MCU from its halt loop at $09E0.
+	//   m_from_mcu - byte the MCU strobes via PORTB.1, read back by the 68K at
+	//                $850000.  Acknowledge is implicit on the 68K read.
+	// pending_r() replaces the m_mcu_busy_for_68k / m_mcu_response_ready flags and
+	// the write() side gets a proper cross-scheduler-domain sync barrier for free.
+	required_device<generic_latch_8_device> m_to_mcu;
+	required_device<generic_latch_8_device> m_from_mcu;
+
+	uint8_t m_mcu_porta_out = 0xff;   // current value the MCU is driving on PORTA
 	uint8_t m_mcu_portb_prev = 0;
 	uint8_t m_mcu_portc_prev = 0;
-	bool m_mcu_response_ready = false;
-	bool m_mcu_busy_for_68k = false;
 
 	uint8_t m_smp_addr_lo = 0;
 	uint8_t m_smp_addr_mid = 0;
 	uint8_t m_smp_addr_hi = 0;
 	uint8_t m_smp_rom_data = 0;
 
-	uint16_t mcu_r();
-	void mcu_w(uint16_t data);
-	void mcu_irq_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void mcu_irq_w(uint8_t data);
 	uint8_t mcu_porta_r();
 	void mcu_porta_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 	uint8_t mcu_portb_r();
@@ -1081,22 +1088,30 @@ void blitz68k_state::cj_nomcu_map(address_map &map)
     Hardware notes (re-engineered from the dumped MCU firmware u30 and the M68K boot trace):
 
     - PORTA = bidirectional 8-bit data bus 68K <-> MCU.  When the MCU drives the bus
-      (DDRA = $FF) the byte on PORTA is latched into m_mcu_porta_latch which the 68K
-      reads at $850000.b (upper byte of the word).  When the MCU sets DDRA = 0 and reads
-      PORTA, it gets m_mcu_porta_input which the 68K previously wrote to $8e0000.b.
+      (DDRA = $FF) the byte on PORTA is latched into m_from_mcu which the 68K reads at
+      $850000.b (upper byte of the word).  When the MCU sets DDRA = 0 and reads PORTA,
+      it gets the byte in m_to_mcu which the 68K previously wrote to $8e0000.b.  Both
+      directions go through generic_latch_8_device instances, which take care of the
+      sync barrier across the two scheduler domains and expose a pending_r() flag used
+      as the MCU status bits on IN2 below.
     - PORTB.0 / PORTB.1 are handshake strobes pulsed by the MCU around each byte transfer
       ($024D-$025E for reads, $01D3-$01DE for writes).  Both lines idle HIGH because the
       first thing the MCU does at reset is STA #$0B,PORTB before turning DDRB to $EB.
       The rising edge of PORTB.1 (back to idle high after a low pulse) marks "byte
-      placed on PORTA is now valid for 68K" and asserts the "response ready" status flag.
-      The rising edge of PORTB.0 marks "MCU has finished reading the 68K byte off PORTA".
+      placed on PORTA is now valid for 68K" and pushes the current PORTA output into
+      m_from_mcu.  The rising edge of PORTB.0 marks "MCU has finished reading the 68K
+      byte off PORTA" and calls acknowledge_w() on m_to_mcu.
     - PORTD.7 input: handshake gate sampled by the MCU's send loop ($0221:
       BRCLR 7,$03,$022e).  It must be HIGH for the MCU to send the next byte and LOW
       while there is still an unread byte in the latch, so we tie its level to the
-      inverse of m_mcu_response_ready.
-    - 68K wakes the MCU from its halt loop at $09E0 by pulsing the /IRQ pin: it writes
-      1 then 0 to $8fe007.b.  We assert M68HC05_IRQ_LINE on the "1" write and clear it on
-      the "0" write; the HC05 core's edge-triggered IRQ latch picks it up.
+      inverse of m_from_mcu->pending_r().
+    - 68K wakes the MCU from its halt loop at $09E0 in two ways: (a) automatically -
+      m_to_mcu's data_pending callback is wired to the MCU /IRQ line, so any write to
+      $8e0000 asserts the /IRQ pin until the MCU consumes the byte; (b) explicitly - the
+      68K also pulses $8fe007.b (1 then 0) which drives the same /IRQ pin manually.  The
+      HC05 core's edge-triggered IRQ latch handles both.  $8fe007.b sits next to the
+      unrelated $8fe006.b light pen strobe, but the two bytes drive independent hardware
+      and are mapped as two separate byte handlers.
     - 68K reads the MCU status flags from IN2 at $874000 (16-bit port):
             bit 13 (0x2000) - "MCU response ready", ACTIVE LOW (bit = 0 when ready)
             bit 14 (0x4000) - "MCU busy",           ACTIVE LOW (bit = 0 when busy)
@@ -1111,26 +1126,19 @@ void blitz68k_mcu_state::machine_start()
 	blitz68k_state::machine_start();
 
 	// With the real MCU hooked up the ROM patches that bypassed the C8/checksum tests
-	// are no longer required.  Initialize and register the MCU<->68K handshake state.
-	m_mcu_porta_latch = 0xff;         // PORTA defaults to pulled-up high
+	// are no longer required.  Initialize and register the small amount of internal
+	// MCU state left after the two inter-CPU latches took over the handshake bytes.
 	m_mcu_porta_out = 0xff;
-	m_mcu_porta_input = 0xff;
-	m_mcu_portb_prev = 0x0b;          // mirror of the MCU's STA #$0B,PORTB at reset
-	m_mcu_portc_prev = 0x63;          // mirror of the MCU's STA #$63,PORTC at reset
-	m_mcu_response_ready = false;
-	m_mcu_busy_for_68k = false;
+	m_mcu_portb_prev = 0x0b;      // mirror of the MCU's STA #$0B,PORTB at reset
+	m_mcu_portc_prev = 0x63;      // mirror of the MCU's STA #$63,PORTC at reset
 	m_smp_addr_lo = 0;
 	m_smp_addr_mid = 0;
 	m_smp_addr_hi = 0;
 	m_smp_rom_data = 0;
 
-	save_item(NAME(m_mcu_porta_latch));
 	save_item(NAME(m_mcu_porta_out));
-	save_item(NAME(m_mcu_porta_input));
 	save_item(NAME(m_mcu_portb_prev));
 	save_item(NAME(m_mcu_portc_prev));
-	save_item(NAME(m_mcu_response_ready));
-	save_item(NAME(m_mcu_busy_for_68k));
 	save_item(NAME(m_smp_addr_lo));
 	save_item(NAME(m_smp_addr_mid));
 	save_item(NAME(m_smp_addr_hi));
@@ -1138,75 +1146,12 @@ void blitz68k_mcu_state::machine_start()
 }
 
 
-uint16_t blitz68k_mcu_state::mcu_r()
+void blitz68k_mcu_state::mcu_irq_w(uint8_t data)
 {
-	// 68K reads a byte from $850000.b: return the latch the MCU last placed on PORTA,
-	// and clear the "response ready" status so the next read waits for a fresh strobe.
-	uint8_t const ret = m_mcu_porta_latch;
-	if (!machine().side_effects_disabled())
-	{
-		m_mcu_response_ready = false;
-		LOGMCU("%s: 68K reads MCU latch = %02X (response_ready cleared)\n",
-				machine().describe_context(), ret);
-	}
-	return uint16_t(ret) << 8;
-}
-
-void blitz68k_mcu_state::mcu_w(uint16_t data)
-{
-	// 68K writes a byte to $8e0000.b.  On the PCB the write latches the byte for the MCU
-	// to read on PORTA and also pulses the MCU's /IRQ line, waking it from the halt loop
-	// at $09E0 so its main loop ($09B6) runs $02AA (which polls PORTB.2 = "byte ready"
-	// and reads PORTA) on the very next pass.  We:
-	//   - latch the byte into m_mcu_porta_input
-	//   - raise "MCU busy for 68K" (IN2 bit 14, ACTIVE LOW) so the 68K's $0286E0 burst
-	//     loop waits for the MCU to consume each byte instead of overwriting it
-	//   - pulse the external /IRQ so a halted MCU wakes up and actually performs the read
-	m_mcu_porta_input = data >> 8;
-	m_mcu_busy_for_68k = true;
-	LOGMCU("%s: 68K writes %02X for MCU (latched, busy raised, waking MCU)\n",
-			machine().describe_context(), m_mcu_porta_input);
-
-	m_mcu->pulse_input_line(M68HC05_IRQ_LINE, attotime::zero);
-}
-
-void blitz68k_mcu_state::mcu_irq_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	// Shared 8fe006/8fe007 word register: 8fe006 is the lpen latch (rising edge),
-	// 8fe007 is the MCU /IRQ pulse (1 then 0).
-	if (ACCESSING_BITS_8_15 && (data & 0x0100))
-		m_crtc->assert_light_pen_input();
-
-	if (ACCESSING_BITS_0_7)
-	{
-		if (data & 0x0001)
-		{
-			LOGMCU("%s: pulse MCU /IRQ (assert)\n", machine().describe_context());
-			m_mcu->set_input_line(M68HC05_IRQ_LINE, ASSERT_LINE);
-		}
-		else
-		{
-			m_mcu->set_input_line(M68HC05_IRQ_LINE, CLEAR_LINE);
-		}
-	}
-}
-
-ioport_value blitz68k_mcu_state::mcu_response_ready_r()
-{
-	// IN2 bit 13 (0x2000).  The 68K polls it at $0281CE and reads $850000 only when the
-	// bit is 0 ("response ready").  Declared IP_ACTIVE_HIGH so this returns the physical
-	// bit level directly: 0 while the MCU has a byte waiting for the 68K, else 1.
-	return m_mcu_response_ready ? 0 : 1;
-}
-
-ioport_value blitz68k_mcu_state::mcu_busy_r()
-{
-	// IN2 bit 14 (0x4000).  The 68K polls it at $0286E0 before each $8e0000 write and
-	// writes only when the bit is 1 ("not busy").  Declared IP_ACTIVE_HIGH so this
-	// returns the physical bit level directly: 0 while the 68K has written a byte the
-	// MCU has not yet consumed, else 1.  The MCU is woken by the /IRQ pulse in
-	// mcu_w, reads PORTA and pulses PORTB.0 to clear m_mcu_busy_for_68k.
-	return m_mcu_busy_for_68k ? 0 : 1;
+	// $8fe007.b: MCU /IRQ pulse (68K writes 1 then 0).  The MCU /IRQ is normally driven
+	// by the m_to_mcu latch's data_pending callback whenever the 68K writes a new byte
+	// to $8e0000; the explicit strobe here is used as an additional wake-up path.
+	m_mcu->set_input_line(M68HC05_IRQ_LINE, BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 uint8_t blitz68k_mcu_state::mcu_porta_r()
@@ -1214,26 +1159,27 @@ uint8_t blitz68k_mcu_state::mcu_porta_r()
 	// PORTA is a shared bus.  Which device drives it depends on the strobes:
 	//   - while PORTC.5 is held low (sample-ROM read enable, $0394 BCLR 5,$02 .. $0398
 	//     BSET 5,$02) the byte on PORTA comes from the sample ROM (m_smp_rom_data);
-	//   - otherwise it is the latch holding the last byte the 68K wrote to $8e0000.
+	//   - otherwise it is the 68K->MCU latch (m_to_mcu) holding the last byte the 68K
+	//     wrote to $8e0000.
 	// Keeping the two sources separate stops a 68K command write that lands in the
 	// middle of an audio interrupt from corrupting the sample byte (which made some
-	// reel spins play and others stay silent).
-	uint8_t const ret = BIT(m_mcu_portc_prev, 5) ? m_mcu_porta_input : m_smp_rom_data;
-	if (!machine().side_effects_disabled())
-		LOGMCU("MCU reads PORTA = %02X (%s)\n", ret,
-				BIT(m_mcu_portc_prev, 5) ? "68K latch" : "sample ROM");
-	return ret;
+	// reel spins play and others stay silent).  The latch has separate_acknowledge set,
+	// so this read leaves the pending flag alone - only the explicit PORTB.0 strobe
+	// clears it (see mcu_portb_w).
+	if (BIT(m_mcu_portc_prev, 5))
+		return m_to_mcu->read();
+	return m_smp_rom_data;
 }
 
 void blitz68k_mcu_state::mcu_porta_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	// MCU write to PORTA.  The MCU drives PORTA both to send a byte to the 68K (send
-	// routine $01D1) AND constantly during the audio ISR (sample bytes and ROM address
-	// bytes at $032E/$0384/$038C).  We must NOT treat every PORTA write as "a byte for
-	// the 68K", otherwise the audio stream corrupts the 68K-facing latch and the
-	// command protocol breaks intermittently.  So here we only track the current PORTA
-	// output value; the 68K-visible latch is captured separately when the MCU strobes
-	// PORTB.1 (see mcu_portb_w).
+	// MCU write to PORTA.  Just track the current PORTA output value; the actual
+	// MCU->68K transfer is triggered separately when the MCU strobes PORTB.1 (see
+	// mcu_portb_w), which is when we push the current PORTA value into the m_from_mcu
+	// latch.  During the audio ISR the MCU also drives PORTA with sample and ROM
+	// address bytes ($032E/$0384/$038C); those writes must not leak into the 68K
+	// latch, which is why the latch write is gated by the PORTB.1 strobe rather than
+	// happening here on every PORTA update.
 	if (mem_mask != 0)
 		m_mcu_porta_out = (m_mcu_porta_out & ~mem_mask) | (data & mem_mask);
 }
@@ -1245,7 +1191,7 @@ uint8_t blitz68k_mcu_state::mcu_portb_r()
 	// when PORTB.2 == 0, i.e. the line is ACTIVE LOW: 0 = a byte from the 68K is waiting,
 	// 1 = nothing pending.  PORTB.4 (the other input pin) is pulled high.
 	uint8_t ret = 0xff;
-	if (m_mcu_busy_for_68k)
+	if (m_to_mcu->pending_r())
 		ret &= ~0x04;     // bit 2 low: a byte from the 68K is pending
 	return ret;
 }
@@ -1254,30 +1200,25 @@ void blitz68k_mcu_state::mcu_portb_w(offs_t offset, uint8_t data, uint8_t mem_ma
 {
 	// The MCU's idle state for PORTB has b0=b1=1 (set by the very first STA at $097F).
 	// During a byte transfer the MCU pulses the line low (BCLR) then high (BSET).
-	// We detect the rising edge of b1 (end of MCU->68K transfer) to set "response ready"
-	// and the rising edge of b0 (end of MCU<-68K transfer) for logging only.
+	// We detect the rising edge of b1 (end of MCU->68K transfer) to push the byte the
+	// MCU is currently driving on PORTA into the 68K-facing latch, and the rising edge
+	// of b0 (end of MCU<-68K transfer) to acknowledge the 68K->MCU byte.
 	uint8_t const prev = m_mcu_portb_prev;
 	uint8_t const out = data & mem_mask;
 	uint8_t const rise = out & ~prev;
 
 	if (BIT(rise, 1))
 	{
-		// MCU has finished placing a byte for the 68K to pick up.  Capture the value the
-		// MCU is currently driving on PORTA as the 68K-visible latch HERE (and only
-		// here) - this is the one PORTA write that is actually meant for the 68K.  All
-		// the other PORTA writes (audio sample/address bytes) must not touch the latch.
-		m_mcu_porta_latch = m_mcu_porta_out;
-		m_mcu_response_ready = true;
-		LOGMCU("MCU strobe PORTB.1 rising: byte %02X is ready for 68K (response_ready)\n",
-				m_mcu_porta_latch);
+		// MCU has finished placing a byte for the 68K to pick up.  This is the ONE
+		// PORTA write actually meant for the 68K; all the other PORTA writes (audio
+		// sample/address bytes) must not touch the latch.
+		m_from_mcu->write(m_mcu_porta_out);
 	}
 	if (BIT(rise, 0))
 	{
-		// MCU has finished reading the byte 68K placed on PORTA; clear the "busy"
-		// status so the 68K's polling loop at $0286E0 can write the next byte.
-		m_mcu_busy_for_68k = false;
-		LOGMCU("MCU strobe PORTB.0 rising: MCU acked byte %02X from 68K (busy cleared)\n",
-				m_mcu_porta_input);
+		// MCU has finished reading the byte the 68K placed on PORTA; ack the latch so
+		// the 68K's polling loop at $0286E0 can write the next byte.
+		m_to_mcu->acknowledge_w();
 	}
 	m_mcu_portb_prev = out;
 }
@@ -1286,11 +1227,11 @@ uint8_t blitz68k_mcu_state::mcu_portd_r()
 {
 	// PORTD.7 is the "68K has consumed the previous byte" handshake gating the MCU's
 	// send loop ($0221: BRCLR 7,$03,$022e - it skips the send while PORTD.7 is low).
-	// We hold it low whenever there is an unread byte sitting in m_mcu_porta_latch
-	// (m_mcu_response_ready true) and release it high once the 68K reads $850000.
-	// Without this gate the MCU floods the latch with packet bytes faster than the
-	// 68K can drain them, and only the last one survives.
-	return m_mcu_response_ready ? 0x7f : 0xff;
+	// Hold it low whenever there is an unread byte sitting in the MCU->68K latch and
+	// release it high once the 68K reads $850000.  Without this gate the MCU floods
+	// the latch with packet bytes faster than the 68K can drain them, and only the
+	// last one survives.
+	return m_from_mcu->pending_r() ? 0x7f : 0xff;
 }
 
 void blitz68k_mcu_state::mcu_portc_w(offs_t offset, uint8_t data, uint8_t mem_mask)
@@ -1346,9 +1287,17 @@ void blitz68k_mcu_state::cj_map(address_map &map)
 {
 	cj_nomcu_map(map);
 
-	map(0x850000, 0x850001).r(FUNC(blitz68k_mcu_state::mcu_r));
-	map(0x8e0000, 0x8e0001).w(FUNC(blitz68k_mcu_state::mcu_w));
-	map(0x8fe006, 0x8fe007).nopr().w(FUNC(blitz68k_mcu_state::mcu_irq_w));
+	// $850000 / $8e0000 are the 68K-side ends of the two inter-CPU latches. The MCU byte lives on the upper byte of the word
+	// (even byte address, so bits 15-8 on a 68K big-endian bus).
+	map(0x850000, 0x850000).r(m_from_mcu, FUNC(generic_latch_8_device::read));
+	map(0x8e0000, 0x8e0000).w(m_to_mcu, FUNC(generic_latch_8_device::write));
+
+	// $8fe006 / $8fe007 are two independent single-byte registers that happen to share
+	// a word address:
+	//   $8fe006.b - CRTC light pen latch
+	//   $8fe007.b - MCU /IRQ pulse; the 68K writes 1 then 0 to wake the MCU.
+	map(0x8fe006, 0x8fe006).lw8(NAME([this] (uint8_t data) { if (BIT(data, 0)) m_crtc->assert_light_pen_input(); }));
+	map(0x8fe007, 0x8fe007).w(FUNC(blitz68k_mcu_state::mcu_irq_w));
 }
 
 /*************************************************************************************************************
@@ -1768,8 +1717,15 @@ static INPUT_PORTS_START( cj_mcu )
 	PORT_INCLUDE( cj_nomcu )
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(blitz68k_mcu_state::mcu_response_ready_r)) // 5] 0 = MCU response ready
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(blitz68k_mcu_state::mcu_busy_r))           // 6] 0 = MCU busy
+	// These two status bits are ACTIVE LOW: the physical bit is 0 while the latch has a
+	// byte pending, so pending_r() is wired straight through with IP_ACTIVE_LOW (which
+	// inverts it) instead of a trampoline that negates by hand.
+	//   bit 13 (0x2000) - "MCU response ready": 0 while m_from_mcu holds a byte for the
+	//                     68K (polled at $0281CE before the 68K reads $850000).
+	//   bit 14 (0x4000) - "MCU busy": 0 while m_to_mcu holds a byte the MCU has not yet
+	//                     consumed (polled at $0286E0 before the 68K writes $8e0000).
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("from_mcu", FUNC(generic_latch_8_device::pending_r))
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("to_mcu", FUNC(generic_latch_8_device::pending_r))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( surpr5 )
@@ -2229,6 +2185,18 @@ void blitz68k_mcu_state::cj_mcu(machine_config &config)
 	m_mcu->portb_w().set(FUNC(blitz68k_mcu_state::mcu_portb_w));
 	m_mcu->portc_w().set(FUNC(blitz68k_mcu_state::mcu_portc_w));
 	m_mcu->portd_r().set(FUNC(blitz68k_mcu_state::mcu_portd_r));
+
+	// Inter-CPU byte latches.  m_to_mcu (68K writes -> MCU reads) uses separate
+	// acknowledge because the MCU signals consumption via the PORTB.0 strobe rather
+	// than by the PORTA read itself, and its data-pending callback drives the MCU
+	// /IRQ line so a fresh byte automatically wakes the MCU from its halt loop.
+	// m_from_mcu (MCU writes -> 68K reads) uses the default implicit acknowledge on
+	// the 68K read.
+	GENERIC_LATCH_8(config, m_to_mcu);
+	m_to_mcu->set_separate_acknowledge(true);
+	m_to_mcu->data_pending_callback().set_inputline(m_mcu, M68HC05_IRQ_LINE);
+
+	GENERIC_LATCH_8(config, m_from_mcu);
 
 	// Audio: PCB has a single Analog Devices AD7524JN 8-bit multiplying DAC (U26)
 	// driven by PORTA (data) and PORTC.6 (/WR strobe).  Its current output is filtered
