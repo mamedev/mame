@@ -18,7 +18,7 @@ Known undumped list:
 		<year>1983</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
-Fails when mounted, requires mods in MSX .dsk identify
+[FDC] should autoboot from pc6601/pc6601sr
 Eventually uses [upd7752] voice
 ]]></notes>
 		<info name="alt_title" value="コロニーオデッセイ冒険篇"/>
@@ -65,8 +65,39 @@ pc6601: "d88: Floppy disk has excess of heads for this drive that will be discar
 		</part>
 	</software>
 
+<!-- !Utilities -->
 
-<!-- !homebrew -->
+	<software name="nihonwp" supported="no">
+		<description>PC-6601 Nihongo Word Processor</description>
+		<year>198?</year>
+		<publisher>NEC?</publisher>
+		<notes><![CDATA[
+[FDC] should autoboot from pc6601/pc6601sr
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="163840">
+				<rom name="nihongo word processor.dsk" size="163840" crc="0aaad58e" sha1="bd0f10239208f2c0373246a83ff20b2d49ac4fd6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mk2uty" supported="no">
+		<description>PC-6601 Utility Disk</description>
+		<year>198?</year>
+		<publisher>NEC</publisher>
+		<notes><![CDATA[
+[FDC] should autoboot from pc6601/pc6601sr
+]]></notes>
+		<info name="alt_title" value="PC-6601 ユーティリティディスク"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="163840">
+				<rom name="pc6601 utility disk.dsk" size="163840" crc="e3d7f35c" sha1="2453e9215e52425a0742d657dfe7e6d8f0e6ab28"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Homebrew -->
 
 	<!-- v1.0 known to exist (same with no sound) -->
 	<software name="asalt" supported="yes">
