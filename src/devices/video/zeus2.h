@@ -52,6 +52,7 @@ struct zeus2_poly_extra_data
 	uint32_t          tex_src;
 	bool            texture_alpha;
 	bool            texture_rgb555;
+	bool            solid_enable;
 	bool            blend_enable;
 	int32_t         zbuf_min;
 	bool            depth_min_enable;
