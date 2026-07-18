@@ -1763,8 +1763,9 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	extra.depth_clear_enable = (m_state->m_renderRegs[0x14] & 0x000c00);
 	// 021e0e = blend with texture alpha for type 2, 020202 blend src / dst alpha
 	extra.blend_enable = ((m_state->m_renderRegs[0x40] == 0x020202) || (m_state->m_renderRegs[0x40] == 0x021e0e && (texmode & 0x3) == 2));
-	extra.srcAlpha = m_state->m_renderRegs[0x0c];
-	extra.dstAlpha = m_state->m_renderRegs[0x0d];
+	// Clamp translucency (1.8 fixed, 0x100=1.0) to 0x100: scale8() takes a uint8_t, so >=0x100 would truncate to near-black.
+	extra.srcAlpha = std::min<uint32_t>(m_state->m_renderRegs[0x0c], 0x100);
+	extra.dstAlpha = std::min<uint32_t>(m_state->m_renderRegs[0x0d], 0x100);
 	extra.texture_alpha = false;
 	extra.texture_rgb555 = false;
 	switch (texmode & 0x3) {
