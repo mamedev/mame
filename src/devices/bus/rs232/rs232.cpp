@@ -166,6 +166,7 @@ device_rs232_port_interface::~device_rs232_port_interface()
 #include "printer.h"
 #include "pty.h"
 #include "rs232_sync_io.h"
+#include "s97801.h"
 #include "scorpion.h"
 #include "sun_kbd.h"
 #include "swtpc8212.h"
@@ -191,6 +192,7 @@ void default_rs232_devices(device_slot_interface &device)
 	device.option_add("pty",           PSEUDO_TERMINAL);
 	device.option_add("rs232_sync_io", RS232_SYNC_IO);
 	device.option_add("rs_printer",    RADIO_SHACK_SERIAL_PRINTER);
+	device.option_add("s97801",        SERIAL_TERMINAL_S97801);
 	device.option_add("scorpion",      SCORPION_IC);
 	device.option_add("sunkbd",        SUN_KBD_ADAPTOR);
 	device.option_add("swtpc8212",     SERIAL_TERMINAL_SWTPC8212);
