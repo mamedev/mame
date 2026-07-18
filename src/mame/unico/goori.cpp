@@ -67,7 +67,7 @@ namespace {
 class goori_state : public driver_device
 {
 public:
-	goori_state(const machine_config& mconfig, device_type type, const char* tag) :
+	goori_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
@@ -79,7 +79,7 @@ public:
 		m_bg_videoram(*this, "bg_videoram")
 	{ }
 
-	void goori(machine_config& config) ATTR_COLD;
+	void goori(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -133,7 +133,7 @@ void goori_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goori_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 }
 
-uint32_t goori_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
+uint32_t goori_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
