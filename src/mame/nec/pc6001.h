@@ -32,7 +32,7 @@
 #include "speaker.h"
 #include "screen.h"
 
-#include "formats/dsk_dsk.h"
+//#include "formats/dsk_dsk.h"
 #include "formats/msx_dsk.h"
 //#include "formats/p6001_cas.h"
 

@@ -28,9 +28,8 @@ TODO (pc6001mk2):
   pc6001mk2_cass:chrith is a good test case, it's supposed to talk before title screen;
 
 TODO (pc6601):
-- Internal FDC sense interrupt status expects a DIO high that never occurs;
-- Make FDC to actually load images, also fix .dsk identification
-\- or just convert them to .d88, not that many to bother maybe;
+- Make 3.5" FDC to actually load images;
+\- Internal FDC sense interrupt status expects a DIO high that never occurs;
 
 TODO (pc6601mk2sr):
 - check if there are more registers for mkII compatibility mode that are actually substituted
@@ -1622,22 +1621,22 @@ void pc6001mk2_state::pc6001mk2(machine_config &config)
 void pc6601_state::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
-	// TODO: cannot identify .dsk images anyway
-	// (HxC reports them to be MSX based images)
+	// uses MSX .dsk floppies
 	fr.add(FLOPPY_MSX_FORMAT);
 //	fr.add(FLOPPY_DSK_FORMAT);
 }
 
 static void pc6601_floppies(device_slot_interface &device)
 {
-	device.option_add("35dd", FLOPPY_35_DD);
+//	device.option_add("35dd", FLOPPY_35_DD);
 	device.option_add("35ssdd", FLOPPY_35_SSDD);
+	device.option_add("35sssd", FLOPPY_35_SSSD);
 }
 
 void pc6601_state::pc6601_fdc_config(machine_config &config)
 {
 	UPD765A(config, m_fdc, 8'000'000, true, true);
-	FLOPPY_CONNECTOR(config, m_floppy, pc6601_floppies, "35ssdd", pc6601_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy, pc6601_floppies, "35sssd", pc6601_state::floppy_formats).enable_sound(true);
 
 	// TODO: slotify external I/F
 	// PC-6031 mini disk unit (single 5'25 2D drive)
@@ -1703,7 +1702,7 @@ void pc6601sr_state::pc6601sr(machine_config &config)
 {
 	pc6001mk2sr(config);
 
-	FLOPPY_CONNECTOR(config.replace(), m_floppy, pc6601_floppies, "35dd", pc6601sr_state::floppy_formats);
+	FLOPPY_CONNECTOR(config.replace(), m_floppy, pc6601_floppies, "35ssdd", pc6601sr_state::floppy_formats);
 
 	// TODO: IR keyboard (does it have functional differences wrt normal PC-6001?)
 	// TODO: TV tuner
