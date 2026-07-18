@@ -674,11 +674,8 @@
 		<text string="-" state="0x20"><color red="0.90" green="0.89" blue="0.86" /><bounds x="2" y="1.5" width="6" height="7" /></text>
 		<text string="\" state="0x00"><color red="0.90" green="0.89" blue="0.86" /><bounds x="2" y="1.5" width="6" height="7" /></text>
 	</element>
-	<view name="Screen Only">
-		<screen index="0"><bounds x="0" y="0" width="4" height="3" /></screen>
-	</view>
 	<view name="Terminal and Keyboard">
-		<screen index="0"><bounds x="4.826" y="0" width="16" height="12" /></screen>
+		<screen tag="screen"><bounds x="4.826" y="0" width="16" height="12" /></screen>
 		<element ref="panel"><bounds x="-0.4" y="12.4" width="26.452" height="8.85" /></element>
 		<element ref="key_0" inputtag="kbd:MOD" inputmask="0x02"><bounds x="0" y="12.9" width="0.94" height="0.94" /></element>
 		<element ref="key_1" inputtag="kbd:COL1" inputmask="0x01"><bounds x="1.06" y="12.9" width="0.94" height="0.94" /></element>
