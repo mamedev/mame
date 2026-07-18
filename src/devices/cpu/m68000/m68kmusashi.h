@@ -184,6 +184,8 @@ protected:
 	u32 m_cyc_scc_r_true;
 	u32 m_cyc_movem_w;
 	u32 m_cyc_movem_l;
+	u32 m_cyc_movem_store_w;
+	u32 m_cyc_movem_store_l;
 	u32 m_cyc_shift;
 	u32 m_cyc_reset;
 
