@@ -871,7 +871,8 @@ void model1_state::sound_ready_w(int state)
 u16 model1_state::timer_r(offs_t offset)
 {
 	u16 result = m_timer_val[offset];
-	if (m_irq0_timer[offset]->enabled())
+
+	if (m_timer_period[offset])
 	{
 		uint32_t ticks = m_irq0_timer[offset]->remaining().as_ticks(m_maincpu->clock());
 		result = ticks / 0x800;
