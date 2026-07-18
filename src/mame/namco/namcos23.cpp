@@ -2179,6 +2179,8 @@ private:
 class namcoss23_gmen_state : public namcoss23_state
 {
 public:
+	static constexpr feature_type unemulated_features() { return feature::CAMERA; }
+
 	namcoss23_gmen_state(const machine_config &mconfig, device_type type, const char *tag) :
 		namcoss23_state(mconfig, type, tag),
 		m_sh2(*this, "sh2"),
