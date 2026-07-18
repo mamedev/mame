@@ -23,8 +23,10 @@ public:
 	{
 	}
 
-	void gpl16250_romram(machine_config &config) ATTR_COLD;
-
+	void gpl16250va_romram(machine_config &config) ATTR_COLD;
+	void gpl16220a_romram(machine_config &config) ATTR_COLD;
+	void gpl16258vb_romram(machine_config &config) ATTR_COLD;
+	  
 	void init_wrlshunt() ATTR_COLD;
 	void init_ths() ATTR_COLD;
 
@@ -43,7 +45,7 @@ private:
 	virtual u16 cs1_r(offs_t offset) override;
 	virtual void cs1_w(offs_t offset, u16 data) override;
 
-	//required_shared_ptr<u16> m_mainram;
+	void common_config(machine_config &config) ATTR_COLD;
 
 	int m_romwords_mask = 0;
 };

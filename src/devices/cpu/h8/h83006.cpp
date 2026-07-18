@@ -27,6 +27,7 @@ h83006_device::h83006_device(const machine_config &mconfig, device_type type, co
 	m_timer16_1(*this, "timer16:1"),
 	m_timer16_2(*this, "timer16:2"),
 	m_watchdog(*this, "watchdog"),
+	m_refresh(*this, "refresh"),
 	m_syscr(0),
 	m_ram_start(start)
 {
@@ -61,6 +62,20 @@ void h83006_device::map(address_map &map)
 	map(base | 0xee018, base | 0xee019).rw(m_intc, FUNC(h8h_intc_device::icr_r), FUNC(h8h_intc_device::icr_w));
 
 	map(base | 0xee03e, base | 0xee03e).rw(m_port4, FUNC(h8_port_device::pcr_r), FUNC(h8_port_device::pcr_w));
+
+	// refresh-controller compare-match timer (drives the periodic vector-21
+	// interrupt the game uses as its system tick). Real addresses per the
+	// H8/3006/3007 hardware manual sec 6.1.4/6.2.9: RTMCSR=0xee028 (a SINGLE
+	// register combining CMF/CMIE/CKS2-0, not split registers), RTCNT=0xee029,
+	// RTCOR=0xee02a. An earlier version of this map used 0xee010/12/14/28,
+	// which collided with the real SYSCR (0xee012) and ISCR (0xee014)
+	// registers and silently shadowed them -- confirmed by disassembly: the
+	// ROM's real RTMCSR/RTCOR setup is at PC 0x2b8-0x2c8 (RTCOR<-0x7d,
+	// RTMCSR<-0x2f i.e. CKS=5), and the vec21 ISR's CMF-ack idiom
+	// (@0xee028 & ~0x80) matches the real combined-register model exactly.
+	map(base | 0xee028, base | 0xee028).rw(m_refresh, FUNC(h8_refresh_device::rtmcsr_r), FUNC(h8_refresh_device::rtmcsr_w));
+	map(base | 0xee029, base | 0xee029).rw(m_refresh, FUNC(h8_refresh_device::rtcnt_r), FUNC(h8_refresh_device::rtcnt_w));
+	map(base | 0xee02a, base | 0xee02a).rw(m_refresh, FUNC(h8_refresh_device::rtcor_r), FUNC(h8_refresh_device::rtcor_w));
 
 	map(base | m_ram_start, base | 0xfff1f).ram();
 
@@ -158,6 +173,7 @@ void h83006_device::device_add_mconfig(machine_config &config)
 	H8_SCI(config, m_sci[1], 1, *this, m_intc, 56, 57, 58, 59);
 	H8_SCI(config, m_sci[2], 2, *this, m_intc, 60, 61, 62, 63);
 	H8_WATCHDOG(config, m_watchdog, *this, m_intc, 20, h8_watchdog_device::H);
+	H8_REFRESH(config, m_refresh, *this, m_intc, 21);
 }
 
 void h83006_device::execute_set_input(int inputnum, int state)
@@ -223,6 +239,7 @@ void h83006_device::internal_update(u64 current_time)
 	add_event(event_time, m_timer16_1->internal_update(current_time));
 	add_event(event_time, m_timer16_2->internal_update(current_time));
 	add_event(event_time, m_watchdog->internal_update(current_time));
+	add_event(event_time, m_refresh->internal_update(current_time));
 
 	recompute_bcount(event_time);
 }
@@ -241,6 +258,7 @@ void h83006_device::notify_standby(int state)
 	m_timer16_1->notify_standby(state);
 	m_timer16_2->notify_standby(state);
 	m_watchdog->notify_standby(state);
+	m_refresh->notify_standby(state);
 }
 
 void h83006_device::device_start()

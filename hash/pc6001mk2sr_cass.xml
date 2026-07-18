@@ -4,6 +4,10 @@
 license:CC0-1.0
 
 Mode 6 PC-6001mkIISR/PC-6601SR cassette snapshots. They specifically needs N66SR BASIC
+
+Known undumped list:
+- Plazma Line プラズマライン 66SR version (i.e. using cyan rather than purple for OSD)
+
 -->
 <softwarelist name="pc6001mk2sr_cass" description="NEC PC-6001mkIISR/PC-6601SR cassette snapshots">
 
@@ -13,7 +17,7 @@ Mode 6 PC-6001mkIISR/PC-6601SR cassette snapshots. They specifically needs N66SR
 		<description>9-gyou no Michi</description>
 		<!-- BasicMagazine 1992.2 -->
 		<year>1992</year>
-		<publisher>MyCom BASIC</publisher>
+		<publisher>Mycom BASIC</publisher>
 		<info name="usage" value="Mode 6"/>
 		<info name="developer" value="Hiroshi Hashizume"/>
 		<part name="snap" interface="pc6001_snap">
@@ -79,7 +83,7 @@ Doesn't draw any GFX just [VDG] if pressing any [keyboard] input, in turn receiv
 		<description>Jewels</description>
 		<!-- "1987/4/12" according to LIST -->
 		<year>1987</year>
-		<publisher>MyCom BASIC</publisher>
+		<publisher>Mycom BASIC</publisher>
 		<info name="usage" value="Mode 6. Hold space while pushing towards a block to use a bomb."/>
 		<info name="developer" value="Hiroshi Hashizume"/>
 		<part name="snap" interface="pc6001_snap">
@@ -93,7 +97,7 @@ Doesn't draw any GFX just [VDG] if pressing any [keyboard] input, in turn receiv
 		<description>Living Armor</description>
 		<!-- according to LIST -->
 		<year>1992</year>
-		<publisher>MyCom BASIC</publisher>
+		<publisher>Mycom BASIC</publisher>
 		<notes><![CDATA[
 Doesn't boot, throws a ?SN Error at 37376 when loading part 2 (should be at 10)
 ]]></notes>
@@ -118,7 +122,7 @@ Doesn't boot, throws a ?SN Error at 37376 when loading part 2 (should be at 10)
 		<description>Lizard Quest</description>
 		<!-- BasicMagazine 1987.4 -->
 		<year>1987</year>
-		<publisher>MyCom BASIC</publisher>
+		<publisher>Mycom BASIC</publisher>
 		<info name="usage" value="Mode 6"/>
 		<info name="developer" value="Taro Kondo"/>
 		<part name="snap" interface="pc6001_snap">
@@ -132,7 +136,7 @@ Doesn't boot, throws a ?SN Error at 37376 when loading part 2 (should be at 10)
 		<description>Lizard Quest II: Shitennou no Houfuku</description>
 		<!-- BasicMagazine 1987.10 -->
 		<year>1987</year>
-		<publisher>MyCom BASIC</publisher>
+		<publisher>Mycom BASIC</publisher>
 		<info name="usage" value="Mode 6"/>
 		<info name="developer" value="Taro Kondo"/>
 		<part name="snap" interface="pc6001_snap">
@@ -146,9 +150,7 @@ Doesn't boot, throws a ?SN Error at 37376 when loading part 2 (should be at 10)
 		<description>Lizard Quest III: Shi no Kami Gaabarian</description>
 		<!-- BasicMagazine 1988.4 -->
 		<year>1988</year>
-		<publisher>MyCom BASIC</publisher>
-		<notes><![CDATA[
-]]></notes>
+		<publisher>Mycom BASIC</publisher>
 		<info name="usage" value="Mode 6"/>
 		<info name="developer" value="Taro Kondo"/>
 
@@ -163,7 +165,7 @@ Doesn't boot, throws a ?SN Error at 37376 when loading part 2 (should be at 10)
 		<description>Lizard Quest IV: Gold Lizard</description>
 		<!-- BasicMagazine 1988.11 -->
 		<year>1988</year>
-		<publisher>MyCom BASIC</publisher>
+		<publisher>Mycom BASIC</publisher>
 		<info name="usage" value="Mode 6"/>
 		<info name="developer" value="Taro Kondo"/>
 		<part name="snap" interface="pc6001_snap">
@@ -177,7 +179,7 @@ Doesn't boot, throws a ?SN Error at 37376 when loading part 2 (should be at 10)
 		<description>The Order</description>
 		<!-- BasicMagazine 1991.1 -->
 		<year>1991</year>
-		<publisher>MyCom BASIC</publisher>
+		<publisher>Mycom BASIC</publisher>
 		<notes><![CDATA[
 Timer looks off (verify)
 Unclear about how to win at game.
@@ -195,7 +197,7 @@ Unclear about how to win at game.
 		<description>Pakuridius: '88 Dragon Breath</description>
 		<!-- According to LIST -->
 		<year>1988</year>
-		<publisher>MyCom BASIC</publisher>
+		<publisher>Mycom BASIC</publisher>
 		<notes><![CDATA[
 [VDG] title screen scrolling is weird (verify)
 ]]></notes>
@@ -212,7 +214,7 @@ Unclear about how to win at game.
 		<description>Satan</description>
 		<!-- BasicMagazine 1988.12 -->
 		<year>1988</year>
-		<publisher>MyCom BASIC</publisher>
+		<publisher>Mycom BASIC</publisher>
 		<notes><![CDATA[
 Oddly scrolls horizontally during fights (verify)
 ]]></notes>
@@ -229,7 +231,7 @@ Oddly scrolls horizontally during fights (verify)
 		<description>Wu-m Wakarannou</description>
 		<!-- BasicMagazine 1988.1 -->
 		<year>1988</year>
-		<publisher>MyCom BASIC</publisher>
+		<publisher>Mycom BASIC</publisher>
 		<notes><![CDATA[
 Unclear how to win, [keyboard] missing inputs?
 ]]></notes>

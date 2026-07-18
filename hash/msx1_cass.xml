@@ -7114,7 +7114,7 @@ license:CC0-1.0
 	<software name="gldngrv2">
 		<description>Golden Grave II (Japan)</description>
 		<year>1985</year>
-		<publisher>Magical Zoo</publisher>
+		<publisher>MagicalZoo</publisher>
 		<info name="alt_title" value="続・黄金の墓 スフィンクスの謎"/>
 		<info name="serial" value="MXMH21037"/>
 		<info name="usage" value="Load with CLOAD + RUN. Requires a Japanese system"/>
@@ -9896,7 +9896,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mephius">
-		<description>Legends of Star Arthur - Planet Mephius (Japan)</description>
+		<description>Star Arthur Densetsu I: Wakusei Mephius (Japan)</description>
 		<year>1985</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="TET-55"/>
@@ -12325,7 +12325,7 @@ license:CC0-1.0
 	<software name="ougon">
 		<description>Ougon no Haka (Japan)</description>
 		<year>1984</year>
-		<publisher>Magical Zoo</publisher>
+		<publisher>MagicalZoo</publisher>
 		<info name="serial" value="MXMH21002"/>
 		<info name="usage" value="Load with CLOAD + RUN. Requires a Japanese system."/>
 
@@ -12395,7 +12395,7 @@ license:CC0-1.0
 	<software name="outroyd">
 		<description>Outroyd (Japan)</description>
 		<year>1985</year>
-		<publisher>Magical Zoo</publisher>
+		<publisher>MagicalZoo</publisher>
 		<info name="serial" value="MXMH21047"/>
 		<info name="usage" value="Load with CLOAD + RUN"/>
 
@@ -12409,7 +12409,7 @@ license:CC0-1.0
 	<software name="outroyda" cloneof="outroyd">
 		<description>Outroyd (Japan, alt loader)</description>
 		<year>1985</year>
-		<publisher>Magical Zoo</publisher>
+		<publisher>MagicalZoo</publisher>
 		<info name="serial" value="MXMH21047"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 

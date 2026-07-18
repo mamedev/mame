@@ -19,9 +19,8 @@ void generalplus_gpspispi_game_state::machine_start()
 
 void generalplus_gpspispi_game_state::machine_reset()
 {
+	gcm394_game_state::machine_reset();
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
-
-	//m_maincpu->set_paldisplaybank_high_hack(0);
 }
 
 static INPUT_PORTS_START( gcm394 )
@@ -30,30 +29,53 @@ static INPUT_PORTS_START( gcm394 )
 	PORT_START("IN2")
 INPUT_PORTS_END
 
+// CS0 should be RAM on these? (will need to bootstrap the CS config too as it's done by the internal ROM)
+u16 generalplus_gpspispi_game_state::cs0_r(offs_t offset)
+{
+	logerror("%s: read from cs0 region %08x\n", machine().describe_context(), offset);
+	return 0x00;
+}
+
+void generalplus_gpspispi_game_state::cs0_w(offs_t offset, u16 data)
+{
+	logerror("%s: write to cs0 region %08x %04x\n", machine().describe_context(), offset, data);
+}
+
+u16 generalplus_gpspispi_game_state::cs1_r(offs_t offset)
+{
+	logerror("%s: read from cs1 region %08x\n", machine().describe_context(), offset);
+	return 0x00;
+}
+
+void generalplus_gpspispi_game_state::cs1_w(offs_t offset, u16 data)
+{
+	logerror("%s: write to cs1 region %08x %04x\n", machine().describe_context(), offset, data);
+}
 
 void generalplus_gpspispi_game_state::generalplus_gpspispi(machine_config &config)
 {
-	set_addrmap(0, &generalplus_gpspispi_game_state::cs_map_base);
+	set_addrmap(0, &gcm394_game_state::cs_map_base);
 
-	GPL16250(config, m_maincpu, 96000000/2, m_screen);
+	GPL16250VA(config, m_maincpu, 96000000, m_screen);
 	m_maincpu->porta_in().set(FUNC(generalplus_gpspispi_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(generalplus_gpspispi_game_state::portb_r));
 	m_maincpu->portc_in().set(FUNC(generalplus_gpspispi_game_state::portc_r));
 	m_maincpu->porta_out().set(FUNC(generalplus_gpspispi_game_state::porta_w));
 	m_maincpu->space_read_callback().set(FUNC(generalplus_gpspispi_game_state::read_external_space));
 	m_maincpu->space_write_callback().set(FUNC(generalplus_gpspispi_game_state::write_external_space));
-	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(sunplus_gcm394_base_device::irq_vector_cb));
+	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(generalplus_gpl162xx_base_device::irq_vector_cb));
 	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
 	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 	m_maincpu->set_bootmode(0); // boot from internal ROM (SPI bootstrap)
-	m_maincpu->set_cs_config_callback(FUNC(gcm394_game_state::cs_callback));
+	m_maincpu->set_cs_config_callback(FUNC(generalplus_gpspispi_game_state::cs_callback));
+	m_maincpu->set_cs_space(DEVICE_SELF, 0);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320*2, 262*2);
 	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);
-	m_screen->set_screen_update("maincpu", FUNC(sunplus_gcm394_device::screen_update));
-	m_screen->screen_vblank().set(m_maincpu, FUNC(sunplus_gcm394_device::vblank));
+	m_screen->set_screen_update("maincpu", FUNC(generalplus_gpl16250va_device::screen_update));
+	m_screen->screen_vblank().set(m_maincpu, FUNC(generalplus_gpl16250va_device::vblank));
 
 	SPEAKER(config, "speaker", 2).front();
 }
@@ -193,6 +215,13 @@ void generalplus_gpspispi_game_state::init_spi()
 	internal[0x7ffe] = vectorbase + 0x1c;
 	internal[0x7fff] = vectorbase + 0x1e;
 }
+
+
+// ----------------------------------------------------
+// these all use RAM up to 6fff
+//
+// high resolution mode is used, most likely GPL16250VA (but could be GPL16240VA if 3d mode isn't used)
+// ----------------------------------------------------
 
 
 // ぼくはプラレール運転士 新幹線で行こう！プラス  (I am a Plarail driver Let's go by Shinkansen! Plus)

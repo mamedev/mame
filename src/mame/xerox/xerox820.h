@@ -5,24 +5,26 @@
 
 #pragma once
 
+#include "x820kb.h"
+#include "xerox_lpk.h"
+
 #include "bus/rs232/rs232.h"
-#include "bus/xerox820/dbslot.h"
 #include "bus/xerox820/copro.h"
+#include "bus/xerox820/dbslot.h"
 #include "cpu/z80/z80.h"
-#include "machine/z80daisy.h"
+#include "imagedev/floppy.h"
+#include "imagedev/snapquik.h"
 #include "machine/com8116.h"
 #include "machine/keyboard.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
-#include "machine/z80pio.h"
 #include "machine/z80ctc.h"
+#include "machine/z80daisy.h"
+#include "machine/z80pio.h"
 #include "machine/z80sio.h"
-#include "x820kb.h"
-#include "xerox_lpk.h"
-#include "sound/spkrdev.h"
 #include "sound/beep.h"
-#include "imagedev/floppy.h"
-#include "imagedev/snapquik.h"
+#include "sound/spkrdev.h"
+
 #include "emupal.h"
 
 #define SCREEN_TAG      "screen"
@@ -55,6 +57,9 @@
 class xerox820_base_state : public driver_device
 {
 public:
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
+
+protected:
 	xerox820_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
@@ -68,9 +73,6 @@ public:
 		m_view(*this, "view")
 	{ }
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
-
-protected:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
@@ -130,7 +132,7 @@ protected:
 
 class xerox820_fdc_state : public xerox820_base_state
 {
-public:
+protected:
 	xerox820_fdc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		xerox820_base_state(mconfig, type, tag),
 		m_fdc(*this, FD1771_TAG),
@@ -138,7 +140,6 @@ public:
 		m_floppy1(*this, FD1771_TAG":1")
 	{ }
 
-protected:
 	uint8_t fdc_r(offs_t offset);
 	void fdc_w(offs_t offset, uint8_t data);
 
@@ -350,7 +351,6 @@ protected:
 	void xerox820ii_io(address_map &map) ATTR_COLD;
 	void xerox1685_io(address_map &map) ATTR_COLD;            // FDC map + reconstructed RX024 controller ROM
 
-	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<xerox820_dbslot_device> m_dbslot;

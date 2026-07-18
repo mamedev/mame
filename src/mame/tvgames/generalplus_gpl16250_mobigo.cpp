@@ -89,25 +89,16 @@ void mobigo_state::init_mobigo()
 }
 
 ROM_START( mobigo )
-	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
-
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("mobigo.bin", 0x0000, 0x800000, CRC(49479bad) SHA1(4ee82c7ba13072cf25a34893cf6272f2da5d8928) )
 ROM_END
 
 ROM_START( mobigos )
-	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
-
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("mobigospanish.bin", 0x0000, 0x200000, CRC(462b4f9d) SHA1(1541152f1a359bc18de4d4f3d5038a954c9a3ad4))
 ROM_END
 
 ROM_START( mobigof )
-	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
-
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("mobigo_fr.u5", 0x0000, 0x200000, CRC(61d739aa) SHA1(d23d4c806f1b60058c57ea9b339a7c5e3124bafa))
 
@@ -116,6 +107,12 @@ ROM_START( mobigof )
 ROM_END
 
 } // anonymous namespace
+
+// ----------------------------------------------------
+// these set SP to 6fff so must be 'GPL162xx A' type
+//
+// could be GPL16230A, GPL16240A or GPL16250A
+// ----------------------------------------------------
 
 CONS( 2010, mobigo,  0,      0, mobigo,   mobigo, mobigo_state,  init_mobigo, "VTech", "MobiGo (USA)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2011, mobigos, mobigo, 0, mobigo,   mobigo, mobigo_state,  init_mobigo, "VTech", "MobiGo (Spain)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

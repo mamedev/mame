@@ -190,9 +190,14 @@ inline void pc6001_state::set_timer_divider()
 
 void pc6001_state::system_latch_w(uint8_t data)
 {
-	static const uint16_t startaddr[] = {0xC000, 0xE000, 0x8000, 0xA000 };
+	// NOTE: swapped in memory map
+	// static const uint16_t startaddr[] = { 0xC000, 0xE000, 0x8000, 0xA000 };
 
-	m_video_base = &m_ram->pointer()[startaddr[(data >> 1) & 0x03] - 0x8000];
+	// make sure anything doesn't try mapping out of bounds
+	// (that would either cause havoc in VDG or system just do this anyway)
+	const u32 ram_mask = ((m_ram->size() == 32 * 1024) << 1) | 0x01;
+
+	m_video_base = &m_ram->pointer()[((data >> 1) & ram_mask) << 13];
 
 	cassette_motor_control((data & 8) == 8);
 	m_sys_latch = data;
@@ -289,7 +294,18 @@ void pc6001_state::pc6001_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom().nopw();
 	map(0x4000, 0x7fff).m(m_cart_bank, FUNC(address_map_bank_device::amap8));
-	map(0x8000, 0xffff).rw(m_ram, FUNC(ram_device::read), FUNC(ram_device::write));
+	map(0x8000, 0xbfff).lrw8(
+		NAME([this] (offs_t offset) -> u8 {
+			if (m_ram->size() == 32 * 1024)
+				return m_ram->pointer()[offset | 0x4000];
+			return 0xff;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			if (m_ram->size() == 32 * 1024)
+				m_ram->pointer()[offset | 0x4000] = data;
+		})
+	);
+	map(0xc000, 0xffff).rw(m_ram, FUNC(ram_device::read), FUNC(ram_device::write));
 }
 
 void pc6001_state::pc6001_io(address_map &map)
@@ -306,10 +322,7 @@ void pc6001_state::pc6001_io(address_map &map)
 	map(0xc0, 0xc0).mirror(0x0f).r(FUNC(pc6001_state::portc0_r));
 }
 
-// TODO: sharrier (at least) pretends to use this as writable work RAM
-// it also pretends to act as a mk2 machine, judging at $f0 writes.
-// Does it fail an identifier check?
-// There's really a work RAM when cart not inserted, or it actually wants a RAM cart?
+// TODO: use a memory_view like later iterations, eventually can mount a RAM cart.
 void pc6001_state::cart_map(address_map &map)
 {
 	map(0x2000, 0x3fff).rom().region("gfx1", 0);
@@ -553,12 +566,8 @@ void pc6001mk2_state::mk2_system_latch_w(uint8_t data)
 
 inline void pc6001mk2_state::refresh_crtc_params()
 {
-	/* Apparently bitmap modes changes the screen res to 320 x 200 */
 	rectangle visarea = m_screen->visible_area();
-	int y_height;
-
-	// TODO: probably needs the *actual* mode used to fix hudson3 bottom part
-	y_height = (m_exgfx_bitmap_mode || m_exgfx_2bpp_mode) ? 200 : 240;
+	const int y_height = (m_exgfx_bitmap_mode || m_exgfx_2bpp_mode || m_exgfx_text_mode) ? 200 : 240;
 
 	visarea.set(0, (320) - 1, 0, (y_height) - 1);
 
@@ -904,7 +913,8 @@ inline void pc6001mk2sr_state::refresh_crtc_params()
 	}
 	/* Apparently bitmap modes changes the screen res to 320 x 200 */
 	rectangle visarea = m_screen->visible_area();
-	const int y_height = (m_sr_text_mode) ? 240 : 200;
+	//const int y_height = (m_sr_text_mode) ? 240 : 200;
+	const int y_height = 200;
 	const int x_width = (m_sr_text_mode) ? (m_width80 ? 640 : 320) : 320;
 
 	visarea.set(0, (x_width) - 1, 0, (y_height) - 1);
@@ -1289,28 +1299,59 @@ bool pc6001mk2sr_state::screen_blanked()
 	return true;
 }
 
-TIMER_CALLBACK_MEMBER(pc6001_state::video_sync_cb)
+rectangle pc6001_state::get_screen_display_area()
+{
+	// VDG regular display area is 256x192, on border bus request should be off
+	// A bunch of pc6001 will otherwise fail at startup:
+	// - mysterh2
+	// - portopia (on second load after explaination)
+	// - suprball
+	return rectangle { 32, 320 - 32, 24, 240 - 24 };
+}
+
+rectangle pc6001mk2_state::get_screen_display_area()
 {
 	// pc6001mk2:digdug intro clearly wants timing itself by 240 vertical
-	// assume mk2 bitmap mode cutoff is border overscan, not blanking
-	// TODO: mkIISR width80 needs to bump hsync by 640
-	int hsync = m_screen->hpos() >= 320;
-	int vsync = m_screen->vpos() >= 240;
+	// assume mk2 bitmap mode vertical cutoff is border overscan, not blanking
+	// TODO: cache mode
+	if (m_exgfx_text_mode || m_exgfx_2bpp_mode || m_exgfx_bitmap_mode)
+		return rectangle { 0, 320, 0, 240 };
+
+	return pc6001_state::get_screen_display_area();
+}
+
+rectangle pc6001mk2sr_state::get_screen_display_area()
+{
+	if (m_mk2_mode)
+		return pc6001mk2_state::get_screen_display_area();
+
+	const int scr_width = m_screen->visible_area().width();
+
+	return rectangle { 0, scr_width, 0, 240 };
+}
+
+TIMER_CALLBACK_MEMBER(pc6001_state::video_sync_cb)
+{
+	const rectangle visarea = get_screen_display_area();
+	int hpos = m_screen->hpos();
+	int vpos = m_screen->vpos();
+	int hsync = hpos < visarea.min_x || hpos >= visarea.max_x;
+	int vsync = vpos < visarea.min_y || vpos >= visarea.max_y;
+
+//	printf("%d %d %d %d (%d %d)\n", hsync, vsync, hpos, vpos, visarea.min_y, visarea.max_y);
 
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, hsync || vsync || screen_blanked() ? CLEAR_LINE : ASSERT_LINE);
 
 	if (vsync)
 	{
-		m_video_sync_timer->adjust(m_screen->time_until_pos(0, 0));
+		m_video_sync_timer->adjust(m_screen->time_until_pos(visarea.min_y, visarea.min_x));
 	}
 	else
 	{
-		int scanline = m_screen->vpos();
-
 		if (hsync)
-			m_video_sync_timer->adjust(m_screen->time_until_pos(scanline + 1, 0));
+			m_video_sync_timer->adjust(m_screen->time_until_pos(vpos + 1, visarea.min_x));
 		else
-			m_video_sync_timer->adjust(m_screen->time_until_pos(scanline, 320));
+			m_video_sync_timer->adjust(m_screen->time_until_pos(vpos, visarea.max_x));
 	}
 }
 
@@ -1444,8 +1485,8 @@ static const gfx_layout char_layout =
 	RGN_FRAC(1,1),
 	1,
 	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ STEP8(0, 1) },
+	{ STEP16(0, 8) },
 	8*16
 };
 
@@ -1456,9 +1497,8 @@ static const gfx_layout kanji_layout =
 	RGN_FRAC(1,2),
 	1,
 	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-	0+RGN_FRAC(1,2), 1+RGN_FRAC(1,2), 2+RGN_FRAC(1,2), 3+RGN_FRAC(1,2), 4+RGN_FRAC(1,2), 5+RGN_FRAC(1,2), 6+RGN_FRAC(1,2), 7+RGN_FRAC(1,2)  },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ STEP8(0, 1), STEP8(RGN_FRAC(1, 2), 1) },
+	{ STEP16(0, 8) },
 	8*16
 };
 
@@ -1483,7 +1523,7 @@ void pc6001_state::pc6001(machine_config &config)
 
 //  I8049(config, "subcpu", 7987200);
 
-	RAM(config, m_ram).set_default_size("32K");
+	RAM(config, m_ram).set_default_size("32K").set_extra_options("16K");
 
 	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(pc6001_state::ppi_porta_r));
@@ -1780,12 +1820,12 @@ ROM_START( pc6001mk2sr )
 	ROM_LOAD( "systemrom1.64", 0x10000, 0x10000, CRC(b6fc2db2) SHA1(dd48b1eee60aa34780f153359f5da7f590f8dff4) )
 	ROM_LOAD( "systemrom2.64", 0x00000, 0x10000, CRC(55a62a1d) SHA1(3a19855d290fd4ac04e6066fe4a80ecd81dc8dd7) )
 
-	// TODO: mk2sr in mk2 mode aren't dumped, using pc6601sr for now
+	// TODO: mk2sr in mk2 mode roms aren't dumped, using pc6601sr for now
 	ROM_REGION( 0x8000, "basic_rom", ROMREGION_ERASEFF )
 	ROM_LOAD( "basicrom.68",  0x0000, 0x8000, CRC(516b1be3) SHA1(e9977fc13f65f009f03d0340b1f1eb9a3e586739) )
 
 	ROM_REGION( 0x8000, "kanji_rom", ROMREGION_ERASEFF )
-	ROM_COPY( "sr_sysrom", 0x18000,  0x0000, 0x8000 )
+	ROM_COPY( "sr_sysrom", 0x08000,  0x0000, 0x8000 )
 
 	ROM_REGION( 0x8000, "tv_rom", ROMREGION_ERASEFF )
 	ROM_LOAD( "cgrom60.68",           0x0000, 0x2000, CRC(331473a9) SHA1(361836f9758d6d9b5133c9dc7860a7c74f9cf596) )
@@ -1805,7 +1845,7 @@ ROM_START( pc6001mk2sr )
 	ROM_COPY( "cgrom", 0, 0, 0x4000 )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_COPY( "sr_sysrom", 0x18000, 0x00000, 0x8000 )
+	ROM_COPY( "kanji_rom", 0x00000, 0x00000, 0x8000 )
 ROM_END
 
 ROM_START( pc6601sr )
@@ -1829,7 +1869,7 @@ ROM_START( pc6601sr )
 	ROM_COPY( "mk2", 0x08000, 0, 0x4000 )
 
 	ROM_REGION( 0x8000, "kanji_rom", ROMREGION_ERASEFF )
-	ROM_COPY( "sr_sysrom", 0x18000, 0x00000, 0x8000 )
+	ROM_COPY( "sr_sysrom", 0x08000, 0x00000, 0x8000 )
 
 	ROM_REGION( 0x8000, "tv_rom", ROMREGION_ERASEFF )
 	ROM_COPY( "mk2",       0x0c000, 0x0000, 0x4000 )
@@ -1851,7 +1891,7 @@ ROM_START( pc6601sr )
 	ROM_COPY( "cgrom", 0, 0, 0x4000 )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_COPY( "sr_sysrom", 0x18000, 0x00000, 0x8000 )
+	ROM_COPY( "kanji_rom", 0x00000, 0x00000, 0x8000 )
 ROM_END
 
 COMP( 1981, pc6001,       0,           0,        pc6001,      pc6001, pc6001_state,       empty_init, "NEC",   "PC-6001 (Japan)",              MACHINE_NOT_WORKING )

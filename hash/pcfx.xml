@@ -190,7 +190,7 @@ Disc 2 requires a Win32 OS on PC-98 or DOS/V machines
 	</software>
 
 	<software name="samegame" supported="no">
-		<!-- http://redump.org/disc/46445/ -->
+		<!-- https://redump.info/disc/46445/ -->
 		<description>Same Game FX</description>
 		<year>1995</year>
 		<publisher>Hudson Soft</publisher>

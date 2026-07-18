@@ -330,10 +330,53 @@ void wrlshunt_game_state::init_ths()
 	m_sdram.resize(0x400000); // 0x400000 words, 0x800000 bytes (verify)
 }
 
-void wrlshunt_game_state::gpl16250_romram(machine_config &config)
+void wrlshunt_game_state::common_config(machine_config &config)
 {
-	gcm394_game_state::base(config);
+	set_addrmap(0, &gcm394_game_state::cs_map_base);
+
+	m_maincpu->porta_in().set(FUNC(wrlshunt_game_state::porta_r));
+	m_maincpu->portb_in().set(FUNC(wrlshunt_game_state::portb_r));
+	m_maincpu->portc_in().set(FUNC(wrlshunt_game_state::portc_r));
+	m_maincpu->porta_out().set(FUNC(wrlshunt_game_state::porta_w));
+	m_maincpu->space_read_callback().set(FUNC(wrlshunt_game_state::read_external_space));
+	m_maincpu->space_write_callback().set(FUNC(wrlshunt_game_state::write_external_space));
+	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(generalplus_gpl162xx_base_device::irq_vector_cb));
+	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
+	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
+	m_maincpu->set_bootmode(1); // boot from external ROM / CS mirror
+	m_maincpu->set_cs_config_callback(FUNC(wrlshunt_game_state::cs_callback));
+	m_maincpu->set_cs_space(DEVICE_SELF, 0);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(320*2, 262*2);
+	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);
+	m_screen->set_screen_update("maincpu", FUNC(generalplus_gpl16250va_device::screen_update));
+	m_screen->screen_vblank().set(m_maincpu, FUNC(generalplus_gpl16250va_device::vblank));
+
+	SPEAKER(config, "speaker", 2).front();
 }
+
+void wrlshunt_game_state::gpl16250va_romram(machine_config &config)
+{
+	GPL16250VA(config, m_maincpu, 96000000, m_screen);
+	common_config(config);
+}
+
+void wrlshunt_game_state::gpl16220a_romram(machine_config &config)
+{
+	GPL16220A(config, m_maincpu, 96000000, m_screen);
+	common_config(config);
+}
+
+void wrlshunt_game_state::gpl16258vb_romram(machine_config &config)
+{
+	GPL16258VB(config, m_maincpu, 96000000, m_screen);
+	common_config(config);
+}
+
+
+
 
 u16 wrlshunt_game_state::porta_r()
 {
@@ -395,22 +438,18 @@ void jak_s500_game_state::machine_reset()
 {
 	cs_callback(0x00, 0x00, 0x00, 0x00, 0x00);
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
-
-	//m_maincpu->set_paldisplaybank_high_hack(0);
 }
 
 
 void lazertag_game_state::machine_reset()
 {
 	jak_s500_game_state::machine_reset();
-	//m_maincpu->set_pal_sprites_hack(0x800);
 }
 
 void paccon_game_state::machine_reset()
 {
 	jak_s500_game_state::machine_reset();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6593, 0x6593, read16smo_delegate(*this, FUNC(paccon_game_state::paccon_speedup_hack_r)));
-//  install_speedup_hack(0x6593, 0x30033);
 }
 
 void jak_pf_game_state::machine_reset()
@@ -451,9 +490,6 @@ u16 jak_pf_game_state::jak_pf_speedup_hack2_r()
 }
 
 ROM_START( paccon )
-	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
-
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("pacmanconnect.bin", 0x000000, 0x400000, CRC(8567cdc7) SHA1(cef4e003142e479169e4438ab33558436ee9ee68) )
 ROM_END
@@ -461,95 +497,59 @@ ROM_END
 
 
 ROM_START(lazertag)
-	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
-
 	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("lazertag.bin", 0x000000, 0x1000000, CRC(8bf16a28) SHA1(90d05e1876332324b074e4845e28b90fcb007122) )
 ROM_END
 
 ROM_START(jak_sinv)
-	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
-
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("jakkspaceinvaders.u3", 0x000000, 0x800000, CRC(2ccb1fc9) SHA1(21d92829de4b03b92894d92853bb5ec360dfad3c) )
 ROM_END
 
 ROM_START(jak_s500)
-	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
-
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("spbwheel.bin", 0x000000, 0x800000, CRC(6ba1d335) SHA1(1bb3e4d02c7b35dd4d336971c6a9f82071cc6ce1) )
 ROM_END
 
 ROM_START(jak_swcl)
-	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
-
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("jakksclonewars.bin", 0x000000, 0x800000, CRC(549bb326) SHA1(992a60321580a4e014801d401b3a7ee000d2b465) )
 ROM_END
 
 ROM_START(jak_smwm)
-	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
-
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("spidersense.bin", 0x000000, 0x800000, CRC(e0676d0e) SHA1(01c01852fe4aea799c09ebbb6870b2f6e92085c4) )
 ROM_END
 
 
 ROM_START(jak_pf)
-	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
-
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("phineas.bin", 0x000000, 0x800000, CRC(bb18f70d) SHA1(4e3c204e44efe9186809404521ebeac348c45fac))
 ROM_END
 
 ROM_START(jak_prft)
-	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
-
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("powerrangerssword.bin", 0x000000, 0x800000, CRC(77bc8aea) SHA1(a2efaa718d8ecece46cebb9f0f13a8fa10fc2826) )
 ROM_END
 
 ROM_START(jak_tink)
-	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
-
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("disneyfairies.bin", 0x000000, 0x800000, CRC(566dae87) SHA1(3abe1b7d578ed9255101bfec0e4bb4d6dc0aa0b7) )
 ROM_END
 
 
-
-
-
 ROM_START(jak_totm)
-	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
-
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("toysonthemove.bin", 0x000000, 0x800000, CRC(d08fb72a) SHA1(1fea98542ef7c65eef31afb70fd50952b4cef1c1) )
 ROM_END
 
 ROM_START(jak_ths)
-	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
-
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("tripleheadersports.bin", 0x000000, 0x800000, CRC(2b5f8734) SHA1(57bccaa70f0efbf3da3259b74f3082d1a14c9908) )
 ROM_END
 
 
 ROM_START(wrlshunt)
-	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
-
 	ROM_REGION(0x8000000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("wireless.bin", 0x0000, 0x8000000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796))
 ROM_END
@@ -632,9 +632,6 @@ which is also found in the Wireless Air 60 ROM.
 
 // Bokudora Ver1.4 2014-09-20 on PCB
 ROM_START(tomycar)
-	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
-
 	ROM_REGION(0x2000000, "maincpu", ROMREGION_ERASE00)
 	// this loading gives correct sprites (must be swapped somewhere on PCB because this was otherwise a standard pinout?)
 	// but backgrounds are still broken (different issue maybe? there are writes to CS0 ROM area)
@@ -646,26 +643,46 @@ ROM_END
 
 
 
+// ----------------------------------------------------
+// these use RAM up to 6fff
+//
+// high resolution mode is used, the JAKKS games are known to be GPAC800, so GPL16250VA
+// ----------------------------------------------------
+
 // also sold as "Pac-Man Connect & Play 35th Anniversary" (same ROM?)
-CONS(2012, paccon,   0, 0, gpl16250_romram, paccon, paccon_game_state, init_wrlshunt, "Bandai", "Pac-Man Connect & Play (Feb 14 2012 10:46:23)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2012, paccon,   0, 0, gpl16250va_romram, paccon, paccon_game_state, init_wrlshunt, "Bandai", "Pac-Man Connect & Play (Feb 14 2012 10:46:23)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
-CONS(2008, lazertag, 0, 0, gpl16250_romram, jak_s500, lazertag_game_state, init_wrlshunt, "Tiger Electronics", "Lazer Tag Video Game Module", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
-CONS(2009, jak_swcl, 0, 0, gpl16250_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Star Wars: The Clone Wars - Republic Squadron (JAKKS Pacific TV Motion Game) (May 6 2009 12:53:31)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2009, jak_s500, 0, 0, gpl16250_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "SpongeBob SquarePants Bikini Bottom 500 (JAKKS Pacific TV Motion Game) (Apr 16 2009 15:11:17)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2009, jak_smwm, 0, 0, gpl16250_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Spider-Man Web Master (JAKKS Pacific TV Motion Game) (Apr 23 2009 17:10:04)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2010, jak_pf,   0, 0, gpl16250_romram, jak_s500, jak_pf_game_state,   init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Phineas and Ferb: Best Game Ever! (JAKKS Pacific TV Motion Game) (Sep 16 2009 17:36:00)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // build date is 2009, but onscreen display is 2010
-CONS(2009, jak_totm, 0, 0, gpl16250_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Toy Story - Toys on the Move (JAKKS Pacific TV Motion Game) (Dec 24 2009 17:34:29)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // Toys on the Move has ISSI 404A
+CONS(2009, jak_swcl, 0, 0, gpl16250va_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Star Wars: The Clone Wars - Republic Squadron (JAKKS Pacific TV Motion Game) (May 6 2009 12:53:31)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, jak_s500, 0, 0, gpl16250va_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "SpongeBob SquarePants Bikini Bottom 500 (JAKKS Pacific TV Motion Game) (Apr 16 2009 15:11:17)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, jak_smwm, 0, 0, gpl16250va_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Spider-Man Web Master (JAKKS Pacific TV Motion Game) (Apr 23 2009 17:10:04)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2010, jak_pf,   0, 0, gpl16250va_romram, jak_s500, jak_pf_game_state,   init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Phineas and Ferb: Best Game Ever! (JAKKS Pacific TV Motion Game) (Sep 16 2009 17:36:00)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // build date is 2009, but onscreen display is 2010
+CONS(2009, jak_totm, 0, 0, gpl16250va_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Toy Story - Toys on the Move (JAKKS Pacific TV Motion Game) (Dec 24 2009 17:34:29)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // Toys on the Move has ISSI 404A
 
-CONS(2009, jak_prft, 0, 0, gpl16250_romram, jak_s500, jak_prft_game_state, init_wrlshunt, "JAKKS Pacific Inc / Santa Cruz Games",    "Power Rangers Force In Time (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2009, jak_tink, 0, 0, gpl16250_romram, jak_s500, jak_prft_game_state, init_wrlshunt, "JAKKS Pacific Inc / Santa Cruz Games",    "Tinker Bell and the Lost Treasure (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, jak_prft, 0, 0, gpl16250va_romram, jak_s500, jak_prft_game_state, init_wrlshunt, "JAKKS Pacific Inc / Santa Cruz Games",    "Power Rangers Force In Time (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, jak_tink, 0, 0, gpl16250va_romram, jak_s500, jak_prft_game_state, init_wrlshunt, "JAKKS Pacific Inc / Santa Cruz Games",    "Tinker Bell and the Lost Treasure (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
-CONS(2009, jak_ths,  0, 0, gpl16250_romram, jak_ths,  jak_s500_game_state, init_ths,      "JAKKS Pacific Inc / Super Happy Fun Fun", "Triple Header Sports (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, jak_ths,  0, 0, gpl16250va_romram, jak_ths,  jak_s500_game_state, init_ths,      "JAKKS Pacific Inc / Super Happy Fun Fun", "Triple Header Sports (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
-CONS(2011, jak_sinv, 0, 0, gpl16250_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / Code Mystics",        "Retro Arcade featuring Space Invaders (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2011, jak_sinv, 0, 0, gpl16250va_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / Code Mystics",        "Retro Arcade featuring Space Invaders (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
-CONS(2011, wrlshunt, 0, 0, gpl16250_romram, wrlshunt, wrlshunt_game_state, init_wrlshunt, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2011, wrlshunt, 0, 0, gpl16250va_romram, wrlshunt, wrlshunt_game_state, init_wrlshunt, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// ----------------------------------------------------
+// these use RAM up to 2fff
+//
+// high resolution mode is used, NAND not used, SRAM is used, so probably GPL16248B or gpl16258vb
+// ----------------------------------------------------
 
 // ぼくはトミカドライバー はたらくのりもの大集合！
-CONS(2014, tomycar,  0, 0, gpl16250_romram, paccon, jak_prft_game_state, init_wrlshunt, "Takara Tomy", "Boku wa Tomica Driver - Hataraku Norimono Daishuugou! (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2014, tomycar,  0, 0, gpl16258vb_romram, paccon, jak_prft_game_state, init_wrlshunt, "Takara Tomy", "Boku wa Tomica Driver - Hataraku Norimono Daishuugou! (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+
+// ----------------------------------------------------
+// these use RAM up to 3fff
+//
+// high resolution modes not used, NAND not used, SRAM is used, so probably GPL16220A 
+// ----------------------------------------------------
+
+CONS(2008, lazertag, 0, 0, gpl16220a_romram, jak_s500, lazertag_game_state, init_wrlshunt, "Tiger Electronics", "Lazer Tag Video Game Module", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 

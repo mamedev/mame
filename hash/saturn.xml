@@ -23700,7 +23700,7 @@ Not extensively tested
 	</software>
 
 	<!-- Mini CD, [CD-Block] doesn't playback in driver, expected length of 13:54 matches -->
-	<!-- TODO: comes with T-16703G main disc, according to http://redump.org/disc/9318/ should be same as T-16705G-01 minus the changed serial -->
+	<!-- TODO: comes with T-16703G main disc, according to https://redump.info/disc/9318/ should be same as T-16705G-01 minus the changed serial -->
 	<software name="fromancra" cloneof="fromancr" supported="no">
 		<description>Idol Mahjong Final Romance R Mini Drama CD (Japan)</description>
 		<year>199?</year>

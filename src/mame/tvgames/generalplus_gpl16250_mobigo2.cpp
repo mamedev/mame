@@ -71,9 +71,6 @@ void generalplus_mobigo2_state::mobigo2(machine_config &config)
 
 
 ROM_START( mobigo2 )
-	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
-
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00)	// appears to be the boot ROM, has GPspispi header
 	ROM_LOAD16_WORD_SWAP( "n25s16.u3", 0x00000, 0x200000, CRC(dfbf5029) SHA1(2a079ddd8a13c5f3d8f40fa6d6c3de2dc1573449) )
 
@@ -82,5 +79,11 @@ ROM_START( mobigo2 )
 ROM_END
 
 } // anonymous namespace
+
+// ----------------------------------------------------
+// these set SP to 6fff so must be 'GPL162xx A' type
+//
+// could be GPL16230A, GPL16240A or GPL16250A
+// ----------------------------------------------------
 
 CONS( 2013, mobigo2, 0,      0, mobigo2,  mobigo2, generalplus_mobigo2_state, init_spi, "VTech", "MobiGo 2 (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

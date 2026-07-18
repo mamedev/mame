@@ -18,11 +18,27 @@
 
 namespace {
 
-class tkmag220_game_state : public gcm394_game_state
+class gpl162xx_rom_base_state : public gcm394_game_state
+{
+public:
+	gpl162xx_rom_base_state(const machine_config &mconfig, device_type type, const char *tag) :
+		gcm394_game_state(mconfig, type, tag)
+	{
+	}
+
+	void gpl16218b_rom(machine_config &config) ATTR_COLD;
+	void gpl16230a_rom(machine_config &config) ATTR_COLD;
+	void gpl16220a_rom(machine_config &config) ATTR_COLD;
+
+private:
+	void common_config(machine_config &config) ATTR_COLD;
+};
+
+class tkmag220_game_state : public gpl162xx_rom_base_state
 {
 public:
 	tkmag220_game_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gcm394_game_state(mconfig, type, tag)
+		gpl162xx_rom_base_state(mconfig, type, tag)
 	{
 	}
 
@@ -40,11 +56,11 @@ private:
 };
 
 
-class beijuehh_game_state : public gcm394_game_state
+class beijuehh_game_state : public gpl162xx_rom_base_state
 {
 public:
 	beijuehh_game_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gcm394_game_state(mconfig, type, tag)
+		gpl162xx_rom_base_state(mconfig, type, tag)
 	{
 	}
 
@@ -67,11 +83,11 @@ private:
 };
 
 
-class gameu_handheld_game_state : public gcm394_game_state
+class gameu_handheld_game_state : public gpl162xx_rom_base_state
 {
 public:
 	gameu_handheld_game_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gcm394_game_state(mconfig, type, tag)
+		gpl162xx_rom_base_state(mconfig, type, tag)
 	{
 	}
 
@@ -101,6 +117,50 @@ private:
 };
 
 
+void gpl162xx_rom_base_state::common_config(machine_config &config)
+{
+	set_addrmap(0, &gcm394_game_state::cs_map_base);
+
+	m_maincpu->porta_in().set(FUNC(gpl162xx_rom_base_state::porta_r));
+	m_maincpu->portb_in().set(FUNC(gpl162xx_rom_base_state::portb_r));
+	m_maincpu->portc_in().set(FUNC(gpl162xx_rom_base_state::portc_r));
+	m_maincpu->porta_out().set(FUNC(gpl162xx_rom_base_state::porta_w));
+	m_maincpu->space_read_callback().set(FUNC(gpl162xx_rom_base_state::read_external_space));
+	m_maincpu->space_write_callback().set(FUNC(gpl162xx_rom_base_state::write_external_space));
+	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(generalplus_gpl162xx_base_device::irq_vector_cb));
+	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
+	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
+	m_maincpu->set_bootmode(1); // boot from external ROM / CS mirror
+	m_maincpu->set_cs_config_callback(FUNC(gpl162xx_rom_base_state::cs_callback));
+	m_maincpu->set_cs_space(DEVICE_SELF, 0);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(320 * 2, 262 * 2);
+	m_screen->set_visarea(0, (320 * 2) - 1, 0, (240 * 2) - 1);
+	m_screen->set_screen_update("maincpu", FUNC(generalplus_gpl16218b_device::screen_update));
+	m_screen->screen_vblank().set(m_maincpu, FUNC(generalplus_gpl16218b_device::vblank));
+
+	SPEAKER(config, "speaker", 2).front();
+}
+
+void gpl162xx_rom_base_state::gpl16218b_rom(machine_config &config)
+{
+	GPL16218B(config, m_maincpu, 96000000, m_screen);
+	common_config(config);
+}
+
+void gpl162xx_rom_base_state::gpl16220a_rom(machine_config &config)
+{
+	GPL16220A(config, m_maincpu, 96000000, m_screen);
+	common_config(config);
+}
+
+void gpl162xx_rom_base_state::gpl16230a_rom(machine_config &config)
+{
+	GPL16230A(config, m_maincpu, 96000000, m_screen);
+	common_config(config);
+}
 
 static INPUT_PORTS_START( base )
 	PORT_START("IN0")
@@ -568,7 +628,7 @@ ROM_END
 
 void tkmag220_game_state::tkmag220(machine_config &config)
 {
-	gcm394_game_state::base(config);
+	gpl16218b_rom(config);
 
 	m_maincpu->porta_in().set_ioport("IN0");
 	m_maincpu->portb_in().set_ioport("IN1");
@@ -607,10 +667,6 @@ void tkmag220_game_state::machine_reset()
 	// each of those programs is 16MBytes, so is either going to have the upper half banked externally like the older hardware types, os possibly using the CS registers on this hardware type
 	m_upperbase = 0 * (0x1000000 / 2);
 	gcm394_game_state::machine_reset();
-
-	//m_maincpu->set_paldisplaybank_high_hack(0);
-	//m_maincpu->set_pal_sprites_hack(0x000);
-	//m_maincpu->set_pal_back_hack(0x000);
 }
 
 
@@ -618,7 +674,7 @@ void tkmag220_game_state::machine_reset()
 
 void beijuehh_game_state::beijuehh(machine_config &config)
 {
-	gcm394_game_state::base(config);
+	gpl16218b_rom(config);
 
 	m_maincpu->porta_in().set_ioport("IN0");
 	m_maincpu->portb_in().set_ioport("IN1");
@@ -704,9 +760,6 @@ void beijuehh_game_state::machine_reset()
 	m_upperbase = 0 * (0x400000);
 	gcm394_game_state::machine_reset();
 
-	//m_maincpu->set_paldisplaybank_high_hack(0);
-	//m_maincpu->set_pal_sprites_hack(0x000);
-	//m_maincpu->set_pal_back_hack(0x000);
 	m_maincpu->set_legacy_video_mode();
 }
 
@@ -714,7 +767,7 @@ void beijuehh_game_state::machine_reset()
 
 void gameu_handheld_game_state::gameu(machine_config &config)
 {
-	gcm394_game_state::base(config);
+	gpl16218b_rom(config);
 
 	m_maincpu->porta_out().set(FUNC(gameu_handheld_game_state::gameu_porta_w));
 	m_maincpu->portb_out().set(FUNC(gameu_handheld_game_state::gameu_portb_w));
@@ -839,21 +892,17 @@ void gameu_handheld_game_state::init_gameu108()
 
 } // anonymous namespace
 
+// ----------------------------------------------------
+// these set SP to 2fff / only use RAM below that, so are probably 'GPL162xx B' type
+//
+// none of them use NAND, or SDRAM, or high resolution modes, so could be GPL16218B
+// ----------------------------------------------------
+
 // the JAKKS ones of these seem to be known as 'Generalplus GPAC500' hardware?
-CONS(2008, jak_spmm,  0,       0, base, jak_spmm,  gcm394_game_state, empty_init, "JAKKS Pacific Inc / Santa Cruz Games", "The Amazing Spider-Man and The Masked Menace (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS(2008, jak_prr,   0,       0, base, jak_spmm,  gcm394_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Power Rangers to the Rescue (JAKKS Pacific TV Game) (Aug 8 2008 16:46:59)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS(2008, jak_bj,    0,       0, base, jak_bj,    gcm394_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Bejeweled Deluxe (JAKKS Pacific TV Game) (Feb 28 2008 22:54:43)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS(2009, jak_tpir,  0,       0, base, jak_spmm,  gcm394_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "The Price Is Right (JAKKS Pacific TV Game) (Mar 24 2009 17:34:55)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-
-CONS(2009, smartfp,   0,       0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2009, smartfps,  smartfp, 0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2009, smartfpf,  smartfp, 0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (France)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // boxart simply has 'Smart Fit'
-
-// skip the call at 6d47a to get it to show something
-CONS(2008, fpsport,   0,       0, base, base,     gcm394_game_state, empty_init, "Fisher-Price", "3-in-1 Smart Sports! (US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-
-// uses a barcode card scanner device with custom cards
-CONS(200?, dressmtv,  0,       0, base, dressmtv, gcm394_game_state, empty_init, "Takara Tomy", "Disney Princess Dress Mania TV (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(2008, jak_spmm,  0,       0, base, jak_spmm,  gpl162xx_rom_base_state, empty_init, "JAKKS Pacific Inc / Santa Cruz Games", "The Amazing Spider-Man and The Masked Menace (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(2008, jak_prr,   0,       0, base, jak_spmm,  gpl162xx_rom_base_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Power Rangers to the Rescue (JAKKS Pacific TV Game) (Aug 8 2008 16:46:59)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(2008, jak_bj,    0,       0, base, jak_bj,    gpl162xx_rom_base_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Bejeweled Deluxe (JAKKS Pacific TV Game) (Feb 28 2008 22:54:43)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(2009, jak_tpir,  0,       0, base, jak_spmm,  gpl162xx_rom_base_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "The Price Is Right (JAKKS Pacific TV Game) (Mar 24 2009 17:34:55)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // These are ports of the 'Family Sport' games to GPL16250 type hardware, but they don't seem to use many unSP 2.0 instructions.
 // The menu style is close to 'm505neo' but the game selection is closer to 'dnv200fs' (but without the Sports titles removed, and with a few other extras not found on that unit)
@@ -879,10 +928,33 @@ CONS(201?, bornk220,    beijuehh,0, beijuehh, beijuehh, beijuehh_game_state,  em
 CONS(201?, bornkidh,    0,       0, beijuehh, beijuehh, beijuehh_game_state,  empty_init,      "BornKid",     "BornKid 16 Bit Handheld Games 100-in-1 (model GB-10X)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // die on this one is 'GCM420'
-CONS(2013, gormiti,   0, 0, base, gormiti,  gcm394_game_state, empty_init, "Giochi Preziosi", "Gormiti Game Arena (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2013, gormiti,   0, 0, base, gormiti,  gpl162xx_rom_base_state, empty_init, "Giochi Preziosi", "Gormiti Game Arena (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // unit looks a bit like a knock-off Wii-U tablet, but much smaller
 // was also available under other names, with different designs (PSP style)
 CONS( 201?, gameu50,       0,              0,      gameu, gameu, gameu_handheld_game_state, init_gameu50,  "YSN", "Play Portable Color GameU+ (50-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 201?, gameu90,       0,              0,      gameu, gameu, gameu_handheld_game_state, init_gameu,    "YSN", "Play Portable Color GameU+ (90-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 201?, gameu108,      0,              0,      gameu, gameu, gameu_handheld_game_state, init_gameu108, "YSN", "Play Portable Color GameU+ (108-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// ----------------------------------------------------
+// these set SP to 3fff / only use RAM below that, so must be 'GPL162xx A' type
+//
+// high resolution modes not used, NAND not used, so probably GPL16220A
+// ----------------------------------------------------
+
+// uses a barcode card scanner device with custom cards
+CONS(200?, dressmtv,  0,       0, gpl16220a_rom, dressmtv, gpl162xx_rom_base_state, empty_init, "Takara Tomy", "Disney Princess Dress Mania TV (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// skip the call at 6d47a to get it to show something
+CONS(2008, fpsport,   0,       0, gpl16220a_rom, base,     gpl162xx_rom_base_state, empty_init, "Fisher-Price", "3-in-1 Smart Sports! (US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// ----------------------------------------------------
+// these set SP to 6fff so must be 'GPL162xx A' type
+
+// high resolution modes are not used, so probably GPL16230A
+// ----------------------------------------------------
+
+CONS(2009, smartfp,   0,       0, gpl16230a_rom, smartfp,  gpl162xx_rom_base_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, smartfps,  smartfp, 0, gpl16230a_rom, smartfp,  gpl162xx_rom_base_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, smartfpf,  smartfp, 0, gpl16230a_rom, smartfp,  gpl162xx_rom_base_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (France)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // boxart simply has 'Smart Fit'
+

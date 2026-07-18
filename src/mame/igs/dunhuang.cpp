@@ -52,16 +52,29 @@ Notes:
 *********************************************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
+#include "machine/ticket.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
 #include "video/ramdac.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+
+
+// configurable logging
+#define LOG_GFX     (1U << 1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_GFX)
+
+#include "logmacro.h"
+
+#define LOGGFX(...)     LOGMASKED(LOG_GFX,     __VA_ARGS__)
 
 
 namespace {
@@ -78,14 +91,63 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_hopper(*this, "hopper"),
+		m_videoram(*this, "videoram", 2* 0x40 * 0x20, ENDIANNESS_LITTLE),
+		m_videoram2(*this, "videoram2", 2* 0x40 * 0x08, ENDIANNESS_LITTLE),
+		m_colorram(*this, "colorram", 0x40 * 0x20, ENDIANNESS_LITTLE),
+		m_colorram2(*this, "colorram2", 0x40 * 0x08, ENDIANNESS_LITTLE),
 		m_mainbank(*this, "mainbank"),
-		m_inputs(*this, {"IN0", "IN1", "IN2", "IN3", "IN4"}),
-		m_dsw(*this, {"DSW1", "DSW2", "DSW3", "DSW4", "DSW5"}),
-		m_service(*this, "SERVICE") { }
+		m_gfx2(*this, "gfx2"),
+		m_inputs(*this, "IN%u", 0U),
+		m_dsw(*this, "DSW%u", 1U),
+		m_service(*this, "SERVICE")
+	{ }
 
-	void dunhuang(machine_config &config);
+
+	void dunhuang(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<hopper_device> m_hopper;
+
+	memory_share_creator<uint16_t> m_videoram;
+	memory_share_creator<uint16_t> m_videoram2;
+	memory_share_creator<uint8_t> m_colorram;
+	memory_share_creator<uint8_t> m_colorram2;
+	required_memory_bank m_mainbank;
+	required_region_ptr<uint8_t> m_gfx2;
+
+	required_ioport_array<5> m_inputs;
+	required_ioport_array<5> m_dsw;
+	required_ioport m_service;
+
+	// video-related
+	tilemap_t *m_tmap[2] {};
+	uint8_t m_written[2] {};
+	uint8_t m_pos_x = 0;
+	uint8_t m_pos_y = 0;
+	uint8_t m_clear_y = 0;
+	uint8_t m_block_x = 0;
+	uint8_t m_block_y = 0;
+	uint8_t m_block_w = 0;
+	uint8_t m_block_h = 0;
+	uint8_t m_block_addr_hi = 0;
+	uint8_t m_block_addr_lo = 0;
+	uint8_t m_block_dest = 0;
+	uint8_t m_block_c = 0;
+	uint8_t m_layers = 0;
+
+	// input-related
+	uint8_t m_input = 0;
+
 	void pos_x_w(uint8_t data);
 	void pos_y_w(uint8_t data);
 	void tile_w(offs_t offset, uint8_t data);
@@ -108,54 +170,12 @@ private:
 	void rombank_w(uint8_t data);
 	uint8_t dsw_r();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void dunhuang_io_map(address_map &map) ATTR_COLD;
-	void dunhuang_map(address_map &map) ATTR_COLD;
-	void ramdac_map(address_map &map) ATTR_COLD;
-
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
-
-	/* video-related */
-	tilemap_t         *m_tmap;
-	tilemap_t       *m_tmap2;
-	int             m_written;
-	int             m_written2;
-	uint8_t           m_pos_x;
-	uint8_t           m_pos_y;
-	uint8_t           m_clear_y;
-	uint8_t           m_block_x;
-	uint8_t           m_block_y;
-	uint8_t           m_block_w;
-	uint8_t           m_block_h;
-	uint8_t           m_block_addr_hi;
-	uint8_t           m_block_addr_lo;
-	uint8_t           m_block_dest;
-	uint8_t           m_block_c;
-	uint8_t           m_layers;
-
-	/* input-related */
-	uint8_t           m_input;
-	uint8_t           m_hopper;
-
-	/* memory */
-	uint16_t         m_videoram[0x40 * 0x20];
-	uint16_t         m_videoram2[0x40 * 0x8];
-	uint8_t          m_colorram[0x40 * 0x20];
-	uint8_t          m_colorram2[0x40 * 0x8];
-
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	required_memory_bank m_mainbank;
-	required_ioport_array<5> m_inputs;
-	required_ioport_array<5> m_dsw;
-	required_ioport m_service;
+	void io_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -166,29 +186,24 @@ private:
 
 TILE_GET_INFO_MEMBER(dunhuang_state::get_tile_info)
 {
-	uint16_t code = m_videoram[tile_index];
-	uint8_t color = m_colorram[tile_index] & 0x0f;
+	uint16_t const code = m_videoram[tile_index];
+	uint8_t const color = m_colorram[tile_index] & 0x0f;
 	tileinfo.set(0, code, color, 0);
 }
 TILE_GET_INFO_MEMBER(dunhuang_state::get_tile_info2)
 {
-	uint16_t code = m_videoram2[tile_index];
-	uint8_t color = m_colorram2[tile_index] & 0x0f;
+	uint16_t const code = m_videoram2[tile_index];
+	uint8_t const color = m_colorram2[tile_index] & 0x0f;
 	tileinfo.set(1, code, color, 0);
 }
 
 void dunhuang_state::video_start()
 {
-	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dunhuang_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20);
-	m_tmap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dunhuang_state::get_tile_info2)), TILEMAP_SCAN_ROWS, 8,32, 0x40,0x8);
+	m_tmap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dunhuang_state::get_tile_info)), TILEMAP_SCAN_ROWS, 0x08, 0x08, 0x40, 0x20);
+	m_tmap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dunhuang_state::get_tile_info2)), TILEMAP_SCAN_ROWS, 0x08, 0x20, 0x40, 0x08);
 
-	m_tmap->set_transparent_pen(0);
-	m_tmap2->set_transparent_pen(0);
-
-	save_item(NAME(m_videoram));
-	save_item(NAME(m_colorram));
-	save_item(NAME(m_videoram2));
-	save_item(NAME(m_colorram2));
+	m_tmap[0]->set_transparent_pen(0);
+	m_tmap[1]->set_transparent_pen(0);
 }
 
 uint32_t dunhuang_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -210,16 +225,16 @@ if (machine().input().code_pressed(KEYCODE_Z))
 	switch (m_layers)
 	{
 		case 0x04:  // girl select: bg over fg
-			if (layers_ctrl & 2)    m_tmap2->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-			if (layers_ctrl & 1)    m_tmap->draw(screen, bitmap, cliprect, 0, 0);
+			if (layers_ctrl & 2)    m_tmap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			if (layers_ctrl & 1)    m_tmap[0]->draw(screen, bitmap, cliprect, 0, 0);
 			break;
 		case 0x05:  // dips: must hide fg
-			if (layers_ctrl & 1)    m_tmap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			if (layers_ctrl & 1)    m_tmap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 			break;
 		case 0x07:  // game,demo: fg over bg
 		default:
-			if (layers_ctrl & 1)    m_tmap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-			if (layers_ctrl & 2)    m_tmap2->draw(screen, bitmap, cliprect, 0, 0);
+			if (layers_ctrl & 1)    m_tmap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			if (layers_ctrl & 2)    m_tmap[1]->draw(screen, bitmap, cliprect, 0, 0);
 			break;
 	}
 
@@ -231,24 +246,22 @@ if (machine().input().code_pressed(KEYCODE_Z))
 void dunhuang_state::pos_x_w(uint8_t data)
 {
 	m_pos_x = data & 0x3f;
-	m_written = 0;
-	m_written2 = 0;
+	m_written[0] = 0;
+	m_written[1] = 0;
 }
 
 void dunhuang_state::pos_y_w(uint8_t data)
 {
 	m_pos_y = data;
-	m_written = 0;
-	m_written2 = 0;
+	m_written[0] = 0;
+	m_written[1] = 0;
 }
 
 void dunhuang_state::tile_w(offs_t offset, uint8_t data)
 {
-	int addr;
-
-	if (m_written & (1 << offset))
+	if (m_written[0]  & (1 << offset))
 	{
-		m_written = 0;
+		m_written[0]  = 0;
 		m_pos_x++;
 		if (m_pos_x == 0x40)
 		{
@@ -256,25 +269,23 @@ void dunhuang_state::tile_w(offs_t offset, uint8_t data)
 			m_pos_y++;
 		}
 	}
-	m_written |= 1 << offset;
+	m_written[0]  |= 1 << offset;
 
-	addr = (m_pos_x & 0x3f) + (m_pos_y & 0x1f) * 0x40;
+	int const addr = (m_pos_x & 0x3f) + (m_pos_y & 0x1f) * 0x40;
 	switch (offset)
 	{
-		case 0: m_videoram[addr] = (m_videoram[addr] & 0xff00) | data;      break;
-		case 1: m_videoram[addr] = (m_videoram[addr] & 0x00ff) | (data<<8); break;
-		case 2: m_colorram[addr] = data;                                                break;
+		case 0: m_videoram[addr] = (m_videoram[addr] & 0xff00) | data; break;
+		case 1: m_videoram[addr] = (m_videoram[addr] & 0x00ff) | (data << 8); break;
+		case 2: m_colorram[addr] = data; break;
 	}
-	m_tmap->mark_tile_dirty(addr);
+	m_tmap[0]->mark_tile_dirty(addr);
 }
 
 void dunhuang_state::tile2_w(offs_t offset, uint8_t data)
 {
-	int addr;
-
-	if (m_written2 & (1 << offset))
+	if (m_written[1] & (1 << offset))
 	{
-		m_written2 = 0;
+		m_written[1] = 0;
 		m_pos_x++;
 		if (m_pos_x == 0x40)
 		{
@@ -282,16 +293,16 @@ void dunhuang_state::tile2_w(offs_t offset, uint8_t data)
 			m_pos_y++;
 		}
 	}
-	m_written2 |= 1 << offset;
+	m_written[1] |= 1 << offset;
 
-	addr = (m_pos_x & 0x3f) + (m_pos_y & 0x07) * 0x40;
+	int const addr = (m_pos_x & 0x3f) + (m_pos_y & 0x07) * 0x40;
 	switch (offset)
 	{
-		case 0: m_videoram2[addr] = (m_videoram2[addr] & 0xff00) | data;        break;
-		case 1: m_videoram2[addr] = (m_videoram2[addr] & 0x00ff) | (data<<8);   break;
-		case 2: m_colorram2[addr] = data;                                           break;
+		case 0: m_videoram2[addr] = (m_videoram2[addr] & 0xff00) | data; break;
+		case 1: m_videoram2[addr] = (m_videoram2[addr] & 0x00ff) | (data << 8); break;
+		case 2: m_colorram2[addr] = data; break;
 	}
-	m_tmap2->mark_tile_dirty(addr);
+	m_tmap[1]->mark_tile_dirty(addr);
 }
 
 // Clear a row of tiles (videoram)
@@ -302,15 +313,14 @@ void dunhuang_state::clear_y_w(uint8_t data)
 }
 void dunhuang_state::horiz_clear_w(uint8_t data)
 {
-	int i;
-//  logerror("%06x: horiz clear, y = %02x, data = %02d\n", m_maincpu->pc(), m_clear_y,data);
-	for (i = 0; i < 0x40; i++)
+	LOGGFX("%s: horiz clear, y = %02x, data = %02d\n", machine().describe_context(), m_clear_y, data);
+	for (int i = 0; i < 0x40; i++)
 	{
-		int addr = m_clear_y * 0x40 + i;
+		int const addr = m_clear_y * 0x40 + i;
 
 		m_videoram[addr] = 0;
 		m_colorram[addr] = 0;
-		m_tmap->mark_tile_dirty(addr);
+		m_tmap[0]->mark_tile_dirty(addr);
 	}
 }
 
@@ -318,22 +328,21 @@ void dunhuang_state::horiz_clear_w(uint8_t data)
 
 void dunhuang_state::vert_clear_w(uint8_t data)
 {
-	int i;
-//  logerror("%06x: vert clear, x = %02x, y = %02x, data = %02x\n", m_maincpu->pc(), m_pos_x,m_pos_y,data);
-	for (i = 0; i < 0x08; i++)
+	LOGGFX("%s: vert clear, x = %02x, y = %02x, data = %02x\n", machine().describe_context(), m_pos_x, m_pos_y, data);
+	for (int i = 0; i < 0x08; i++)
 	{
-		int addr = (m_pos_x & 0x3f) + (i & 0x07) * 0x40;
+		int const addr = (m_pos_x & 0x3f) + (i & 0x07) * 0x40;
 
 		m_videoram2[addr] = 1;
 		m_colorram2[addr] = 0;
-		m_tmap2->mark_tile_dirty(addr);
+		m_tmap[1]->mark_tile_dirty(addr);
 	}
 }
 
 
 // Draw a block of tiles.
 //
-// The tiles codes are read from the graphics roms too!
+// The tiles codes are read from the graphics ROMs too!
 //
 
 void dunhuang_state::block_dest_w(uint8_t data)
@@ -374,49 +383,47 @@ void dunhuang_state::block_addr_hi_w(uint8_t data)
 
 void dunhuang_state::block_h_w(uint8_t data)
 {
-	int i,j, addr;
-	uint8_t *tile_addr;
-
-//  logerror("%06x: block dst %x, src %x, xy %x %x, wh %x %x, clr %x\n", m_maincpu->pc(), m_block_dest, (m_block_addr_hi << 8) + m_block_addr_lo, m_block_x,m_block_y,m_block_w+1,m_block_h+1,m_block_c);
+	LOGGFX("%s: block dst %x, src %x, xy %x %x, wh %x %x, clr %x\n",
+			machine().describe_context(), m_block_dest, (m_block_addr_hi << 8) + m_block_addr_lo, m_block_x, m_block_y, m_block_w + 1, m_block_h + 1, m_block_c);
 
 	m_block_h = data;
 
-	tile_addr = memregion("gfx2")->base() + ((m_block_addr_hi << 8) + m_block_addr_lo) * 4;
+	uint8_t *tile_addr = &m_gfx2[((m_block_addr_hi << 8) + m_block_addr_lo) * 4];
 
 	switch (m_block_dest)
 	{
 		case 0x04:  // write to videoram
-			for (j = 0; j <= m_block_h; j++)
+			for (int j = 0; j <= m_block_h; j++)
 			{
-				for (i = 0; i <= m_block_w; i++)
+				for (int i = 0; i <= m_block_w; i++)
 				{
-					addr = ((m_block_x + i)& 0x3f) + ((m_block_y + j) & 0x1f) * 0x40;
+					int const addr = ((m_block_x + i)& 0x3f) + ((m_block_y + j) & 0x1f) * 0x40;
 
 					m_videoram[addr] = (tile_addr[1] << 8) | tile_addr[0];
 					m_colorram[addr] = m_block_c;
-					m_tmap->mark_tile_dirty(addr);
+					m_tmap[0]->mark_tile_dirty(addr);
 					tile_addr += 4;
 				}
 			}
 			break;
 
 		case 0x08:  // write to videoram2
-			for (j = 0; j <= m_block_h; j++)
+			for (int j = 0; j <= m_block_h; j++)
 			{
-				for (i = 0; i <= m_block_w; i++)
+				for (int i = 0; i <= m_block_w; i++)
 				{
-					addr = ((m_block_x + i)& 0x3f) + ((m_block_y + j) & 0x7) * 0x40;
+					int const addr = ((m_block_x + i)& 0x3f) + ((m_block_y + j) & 0x7) * 0x40;
 
 					m_videoram2[addr] = (tile_addr[1] << 8) | tile_addr[0];
 					m_colorram2[addr] = m_block_c;
-					m_tmap2->mark_tile_dirty(addr);
+					m_tmap[1]->mark_tile_dirty(addr);
 					tile_addr += 4;
 				}
 			}
 			break;
 
 		default:
-			popmessage("%06x: block dst=%x", m_maincpu->pc(), m_block_dest);
+			popmessage("%s: block dst=%x", machine().describe_context(), m_block_dest);
 	}
 }
 
@@ -424,7 +431,7 @@ void dunhuang_state::block_h_w(uint8_t data)
 
 void dunhuang_state::layers_w(uint8_t data)
 {
-//  popmessage("layers %02x",data);
+//  popmessage("layers %02x", data);
 	m_layers = data;
 }
 
@@ -432,11 +439,11 @@ void dunhuang_state::layers_w(uint8_t data)
                                 Memory Maps
 ***************************************************************************/
 
-void dunhuang_state::dunhuang_map(address_map &map)
+void dunhuang_state::program_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x7fff).ram();
-	map(0x8000, 0xffff).bankr("mainbank");
+	map(0x8000, 0xffff).bankr(m_mainbank);
 }
 
 // Inputs
@@ -448,47 +455,54 @@ void dunhuang_state::input_w(uint8_t data)
 
 uint8_t dunhuang_state::service_r()
 {
-	return m_service->read()
-		| ((m_hopper && !(m_screen->frame_number() % 10)) ? 0x00 : 0x08)    // bit 3: hopper sensor
-		| 0x80                                                              // bit 7 low -> tiles block transferrer busy
-	;
+	return m_service->read() | 0x80; // bit 7 low -> tiles block transferrer busy
 }
 
 uint8_t dunhuang_state::dsw_r()
 {
-	if (!(m_input & 0x01))  return m_dsw[0]->read();
-	if (!(m_input & 0x02))  return m_dsw[1]->read();
-	if (!(m_input & 0x04))  return m_dsw[2]->read();
-	if (!(m_input & 0x08))  return m_dsw[3]->read();
-	if (!(m_input & 0x10))  return m_dsw[4]->read();
-	logerror("%s: warning, unknown dsw bits read, input = %02x\n", machine().describe_context(), m_input);
-	return 0xff;
+	if ((m_input & 0xe0) != 0x00)
+		logerror("%s: warning, unknown dsw bits read, input = %02x\n", machine().describe_context(), m_input);
+
+	uint8_t res = 0xff;
+
+	for (int i = 0; i < 5; i++)
+	{
+		if (!BIT(m_input, i))
+			res &= m_dsw[i]->read();
+	}
+
+	return res;
 }
 uint8_t dunhuang_state::input_r()
 {
-	if (!(m_input & 0x01))  return m_inputs[0]->read();
-	if (!(m_input & 0x02))  return m_inputs[1]->read();
-	if (!(m_input & 0x04))  return m_inputs[2]->read();
-	if (!(m_input & 0x08))  return m_inputs[3]->read();
-	if (!(m_input & 0x10))  return m_inputs[4]->read();
-	logerror("%s: warning, unknown input bits read, input = %02x\n", machine().describe_context(), m_input);
-	return 0xff;
+	if ((m_input & 0xe0) != 0x00)
+		logerror("%s: warning, unknown input bits read, input = %02x\n", machine().describe_context(), m_input);
+
+	uint8_t res = 0xff;
+
+	for (int i = 0; i < 5; i++)
+	{
+		if (!BIT(m_input, i))
+			res &= m_inputs[i]->read();
+	}
+
+	return res;
 }
 
 void dunhuang_state::rombank_w(uint8_t data)
 {
-	// ?                data & 0x01
-	// ?                data & 0x02
+	// ?                BIT(data, 0)
+	// ?                BIT(data, 1)
 
-	m_mainbank->set_entry(((data >> 2) & 0x7));
+	m_mainbank->set_entry(((data >> 2) & 0x07));
 
-	// COIN OUT:        data & 0x20
-	machine().bookkeeping().coin_counter_w(0,    data & 0x40);
-	m_hopper = data & 0x80;
+	// COIN OUT:        BIT(data, 5)
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 6));
+	m_hopper->motor_w(BIT(data, 7));
 }
 
 
-void dunhuang_state::dunhuang_io_map(address_map &map)
+void dunhuang_state::io_map(address_map &map)
 {
 	map(0x0000, 0x0000).w(FUNC(dunhuang_state::pos_x_w));
 	map(0x0001, 0x0001).w(FUNC(dunhuang_state::pos_y_w));
@@ -543,7 +557,7 @@ void dunhuang_state::ramdac_map(address_map &map)
 ***************************************************************************/
 
 static INPUT_PORTS_START( dunhuang )
-	PORT_START("DSW1")      /* IN0 - DSW1 */
+	PORT_START("DSW1") // IN0 - DSW1
 	PORT_DIPNAME( 0x0f, 0x0f, "Main Game Chance (%)" )  PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x00, "78" )
 	PORT_DIPSETTING(    0x01, "80" )
@@ -573,7 +587,7 @@ static INPUT_PORTS_START( dunhuang )
 	PORT_DIPSETTING(    0x80, "Keys" )
 	PORT_DIPSETTING(    0x00, "Payout" )
 
-	PORT_START("DSW2")      /* IN1 - DSW2 */
+	PORT_START("DSW2") // IN1 - DSW2
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" )
 	PORT_DIPNAME( 0x06, 0x06, "Credits Per Coin" )      PORT_DIPLOCATION("SW2:2,3")
 	PORT_DIPSETTING(    0x06, "1" )
@@ -594,7 +608,7 @@ static INPUT_PORTS_START( dunhuang )
 	PORT_DIPSETTING(    0x80, "1000" )
 	PORT_DIPSETTING(    0xc0, "3000" )
 
-	PORT_START("DSW3")      /* IN2 - DSW3 */
+	PORT_START("DSW3") // IN2 - DSW3
 	PORT_DIPNAME( 0x03, 0x03, "Min Bet" )               PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -616,7 +630,7 @@ static INPUT_PORTS_START( dunhuang )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0xc0, "6" )
 
-	PORT_START("DSW4")      /* IN3 - DSW4 */
+	PORT_START("DSW4") // IN3 - DSW4
 	PORT_DIPNAME( 0x07, 0x07, "Credits Limit" )         PORT_DIPLOCATION("SW4:1,2,3")
 	PORT_DIPSETTING(    0x07, "2k" )
 	PORT_DIPSETTING(    0x06, "3k" )
@@ -642,7 +656,7 @@ static INPUT_PORTS_START( dunhuang )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
-	PORT_START("DSW5")      /* IN4 - DSW5 */
+	PORT_START("DSW5") // IN4 - DSW5
 	PORT_DIPNAME( 0x03, 0x03, "Douple Up Chance (%)" )  PORT_DIPLOCATION("SW5:1,2")
 	PORT_DIPSETTING(    0x00, "50" )
 	PORT_DIPSETTING(    0x01, "60" )
@@ -666,57 +680,57 @@ static INPUT_PORTS_START( dunhuang )
 	PORT_DIPSETTING(    0x80, "Strong" )
 	PORT_DIPSETTING(    0x00, "Weak" )
 
-	PORT_START("SERVICE")       /* IN5 - SERVICE */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SERVICE3 )      // clear (during boot)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE2 )      // book
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE  )      // test (in game: dips, during boot: service mode)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM  )      // hopper sensor
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE4 )      // payout
+	PORT_START("SERVICE") // IN5 - SERVICE
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_MEMORY_RESET ) // during boot
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE  ) // test (in game: dips, during boot: service mode)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_IMPULSE(2) // "coin jam" otherwise
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )       // 0 = tiles block transferrer busy
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) // 0 = tiles block transferrer busy
 
-	PORT_START("IN0")       /* IN6 - P1 */
+	PORT_START("IN0") // IN6 - P1
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )    // gun
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) // gun
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")       /* IN7 - P1 */
+	PORT_START("IN1") // IN7 - P1
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )  // tin
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) // tin
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")       /* IN8 - P1 */
+	PORT_START("IN2") // IN8 - P1
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )    // eat
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )    // hu
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) // eat
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) // hu
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN3")       /* IN9 - P1 */
+	PORT_START("IN3") // IN9 - P1
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )    // pon
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) // pon
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN4")       /* IN10 - P1 */
+	PORT_START("IN4") // IN10 - P1
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE  )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
@@ -769,7 +783,7 @@ void dunhuang_state::machine_start()
 	m_mainbank->configure_entries(0, 8, memregion("maincpu")->base(), 0x8000);
 
 	save_item(NAME(m_written));
-	save_item(NAME(m_written2));
+	save_item(NAME(m_written[1]));
 	save_item(NAME(m_pos_x));
 	save_item(NAME(m_pos_y));
 	save_item(NAME(m_clear_y));
@@ -783,13 +797,12 @@ void dunhuang_state::machine_start()
 	save_item(NAME(m_block_c));
 	save_item(NAME(m_layers));
 	save_item(NAME(m_input));
-	save_item(NAME(m_hopper));
 }
 
 void dunhuang_state::machine_reset()
 {
-	m_written = 0;
-	m_written2 = 0;
+	m_written[0] = 0;
+	m_written[1] = 0;
 	m_pos_x = 0;
 	m_pos_y = 0;
 	m_clear_y = 0;
@@ -803,21 +816,22 @@ void dunhuang_state::machine_reset()
 	m_block_c = 0;
 	m_layers = 0;
 	m_input = 0;
-	m_hopper = 0;
 }
 
 
 void dunhuang_state::dunhuang(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 12000000/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &dunhuang_state::dunhuang_map);
-	m_maincpu->set_addrmap(AS_IO, &dunhuang_state::dunhuang_io_map);
+	// basic machine hardware
+	Z80(config, m_maincpu, 12_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dunhuang_state::program_map);
+	m_maincpu->set_addrmap(AS_IO, &dunhuang_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(dunhuang_state::irq0_line_hold));
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(5));
 
-	/* video hardware */
+	HOPPER(config, m_hopper, attotime::from_msec(50)); // period not measured
+
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -832,17 +846,17 @@ void dunhuang_state::dunhuang(machine_config &config)
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
 	ramdac.set_addrmap(0, &dunhuang_state::ramdac_map);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	YM2413(config, "ymsnd", 3579545).add_route(ALL_OUTPUTS, "mono", 0.80);
+	YM2413(config, "ymsnd", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	ay8910_device &ay8910(AY8910(config, "ay8910", 12000000/8));
+	ay8910_device &ay8910(AY8910(config, "ay8910", 12_MHz_XTAL / 8));
 	ay8910.port_b_read_callback().set(FUNC(dunhuang_state::dsw_r));
 	ay8910.port_a_write_callback().set(FUNC(dunhuang_state::input_w));
 	ay8910.add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	OKIM6295(config, "oki", 12000000/8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.80);
+	OKIM6295(config, "oki", 12_MHz_XTAL / 8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
 

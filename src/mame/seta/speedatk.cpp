@@ -10,7 +10,7 @@ driver by Pierpaolo Prazzoli & Angelo Salese, based on early work by David Haywo
 
 TODO:
  - speedatk: Jack and King cards shouldn't have cyan border according to ref pics;
- - daifugo: Improve IOX device (many hardwired reads);
+ - daifugo: Improve non-MCU protection (many hardwired reads);
  - It's possible that there is only one coin chute and not two, needs a real board to know
    more about it.
  - harashi, hana6: Everything. They seem to run on similar hardware, similar
@@ -117,6 +117,7 @@ DIPSW       8 Elements Switch Array x1
 
 #include "emu.h"
 
+#include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/watchdog.h"
@@ -143,7 +144,7 @@ public:
 		m_colorram(*this, "colorram"),
 		m_coins(*this, "COINS"),
 		m_speedatk_input(*this, { "P1_ROW0", "P1_ROW1", "P2_ROW0", "P2_ROW1" }),
-		m_daifugo_input(*this, "PLAYER%u", 1U),
+		m_mux_input(*this, "IN%u", 0U),
 		m_hana6bl_input(*this, "KEY%u", 0U)
 	{ }
 
@@ -168,7 +169,7 @@ private:
 
 	optional_ioport m_coins;
 	optional_ioport_array<4> m_speedatk_input;
-	optional_ioport_array<2> m_daifugo_input;
+	optional_ioport_array<6> m_mux_input;
 	optional_ioport_array<6> m_hana6bl_input;
 
 	uint8_t m_crtc_vreg[0x100]{};
@@ -185,7 +186,8 @@ private:
 
 	uint8_t key_matrix_r();
 	void key_matrix_w(uint8_t data);
-	uint8_t daifugo_key_matrix_r();
+	uint8_t iomcu_inputs_r();
+	void iomcu_mux_w(uint8_t data);
 	uint8_t key_matrix_status_r();
 	void key_matrix_status_w(uint8_t data);
 	void m6845_w(offs_t offset, uint8_t data);
@@ -369,33 +371,23 @@ uint8_t speedatk_state::key_matrix_r()
 	return iox_key_matrix_calc((m_mux_data == 2) ? 0 : 2);
 }
 
-uint8_t speedatk_state::daifugo_key_matrix_r()
+uint8_t speedatk_state::iomcu_inputs_r()
 {
-	if (m_coin_impulse > 0)
-	{
-		m_coin_impulse--;
-		return 0x80;
-	}
+	uint8_t ret = 0xff;
 
-	if (m_coins->read() & 1)
-	{
-		m_coin_impulse = m_coin_settings;
-		m_coin_impulse--;
-		return 0x80;
-	}
+	for (int i = 0; i < 6; i++)
+		if (!BIT(m_mux_data, i) && m_mux_input[i].found())
+			ret &= m_mux_input[i]->read();
 
-	uint8_t const player_side = (m_mux_data >> 2) & 1;
+	return ret;
+}
 
-	// key matrix check and change binary digit to decimal number
-	for (int i = 0; i < 16; i++)
-	{
-		if (m_daifugo_input[player_side]->read() & (1 << i))
-		{
-			return (i + 1);
-		}
-	}
+void speedatk_state::iomcu_mux_w(uint8_t data)
+{
+	m_mux_data = data & 0x3f;
 
-	return 0;
+	machine().bookkeeping().coin_counter_w(0, !BIT(data, 6));
+	machine().bookkeeping().coin_counter_w(1, !BIT(data, 7));
 }
 
 void speedatk_state::key_matrix_w(uint8_t data)
@@ -467,11 +459,7 @@ void speedatk_state::speedatk_program_map(address_map &map)
 void speedatk_state::daifugo_program_map(address_map &map)
 {
 	speedatk_program_map(map);
-	map(0x8000, 0x8000).rw(FUNC(speedatk_state::daifugo_key_matrix_r), FUNC(speedatk_state::key_matrix_w));
-	map(0x8001, 0x8001).lr8(NAME([] (offs_t offset) {
-		// TODO: bit 1 seems to be a busy flag, will throw a "BAD CSTM 2" if that is high.
-		return 0x00;
-	}));
+	map(0x8000, 0x8001).rw("iomcu", FUNC(i8741a_device::upi41_master_r), FUNC(i8741a_device::upi41_master_w));
 	// Protection?
 	map(0x8464, 0x8464).lr8(NAME([] (offs_t offset) {
 		return 0x00;    // this value is never referenced in game
@@ -557,9 +545,9 @@ static INPUT_PORTS_START( daifugo )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -577,43 +565,49 @@ static INPUT_PORTS_START( daifugo )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START("PLAYER1")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_HANAFUDA_A )      PORT_PLAYER(1)  // 1
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_HANAFUDA_B )      PORT_PLAYER(1)  // 2
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_HANAFUDA_C )      PORT_PLAYER(1)  // 3
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_HANAFUDA_D )      PORT_PLAYER(1)  // 4
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(1)  // 5
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(1)  // 6
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_HANAFUDA_E )      PORT_PLAYER(1)  // 7
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_HANAFUDA_H )      PORT_PLAYER(1)  // 8
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_HANAFUDA_F )      PORT_PLAYER(1)  // 9
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_HANAFUDA_G )      PORT_PLAYER(1)  // 10
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(1)  // 11
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_START1 )          PORT_PLAYER(1)  // 12
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_START2 )          PORT_PLAYER(1)  // 13
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_HANAFUDA_YES )    PORT_PLAYER(1)  // 14
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_HANAFUDA_NO ) PORT_NAME("P1 Hanafuda No/Pass")    PORT_PLAYER(1)  // 15
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(1)  // 16
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A )      PORT_PLAYER(1)  // 1
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_B )      PORT_PLAYER(1)  // 2
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_C )      PORT_PLAYER(1)  // 3
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_D )      PORT_PLAYER(1)  // 4
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("PLAYER2")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_HANAFUDA_A )      PORT_PLAYER(2)  // 1
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_HANAFUDA_B )      PORT_PLAYER(2)  // 2
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_HANAFUDA_C )      PORT_PLAYER(2)  // 3
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_HANAFUDA_D )      PORT_PLAYER(2)  // 4
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(2)  // 5
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(2)  // 6
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_HANAFUDA_E )      PORT_PLAYER(2)  // 7
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_HANAFUDA_H )      PORT_PLAYER(2)  // 8
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_HANAFUDA_F )      PORT_PLAYER(2)  // 9
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_HANAFUDA_G )      PORT_PLAYER(2)  // 10
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(2)  // 11
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(2)  // 12
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(2)  // 13
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_HANAFUDA_YES )    PORT_PLAYER(2)  // 14
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_HANAFUDA_NO ) PORT_NAME("P2 Hanafuda No/Pass")    PORT_PLAYER(2)  // 15
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )          PORT_PLAYER(2)  // 16
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_E )      PORT_PLAYER(1)  // 7
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_H )      PORT_PLAYER(1)  // 8
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_F )      PORT_PLAYER(1)  // 9
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_G )      PORT_PLAYER(1)  // 10
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )          PORT_PLAYER(1)  // 12
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )          PORT_PLAYER(1)  // 13
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_YES )    PORT_PLAYER(1)  // 14
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_NAME("P1 Hanafuda No/Pass")    PORT_PLAYER(1)  // 15
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A )      PORT_PLAYER(2)  // 1
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_B )      PORT_PLAYER(2)  // 2
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_C )      PORT_PLAYER(2)  // 3
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_D )      PORT_PLAYER(2)  // 4
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_E )      PORT_PLAYER(2)  // 7
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_H )      PORT_PLAYER(2)  // 8
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_F )      PORT_PLAYER(2)  // 9
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_G )      PORT_PLAYER(2)  // 10
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN5")
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_YES )    PORT_PLAYER(2)  // 14
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_NAME("P2 Hanafuda No/Pass")    PORT_PLAYER(2)  // 15
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( speedatk )
@@ -839,6 +833,12 @@ void speedatk_state::daifugo(machine_config &config)
 {
 	speedatk(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &speedatk_state::daifugo_program_map);
+
+	i8741a_device &iomcu(I8741A(config, "iomcu", 12_MHz_XTAL / 2)); // divider unknown
+	iomcu.p1_in_cb().set(FUNC(speedatk_state::iomcu_inputs_r));
+	iomcu.p2_out_cb().set(FUNC(speedatk_state::iomcu_mux_w));
+	iomcu.t0_in_cb().set_ioport("COINS").bit(0);
+	iomcu.t1_in_cb().set_ioport("COINS").bit(1);
 }
 
 void speedatk_state::harashi(machine_config &config)
@@ -879,6 +879,10 @@ ROM_START( daifugo )
 	ROM_LOAD( "ca2_3.1e",      0x4000, 0x2000, CRC(570dc665) SHA1(f473aeeaa536ed476bd107fd6b594e3dfd5d9cf4) )
 	ROM_LOAD( "ca2_4.1h",      0x6000, 0x1000, CRC(85a1707c) SHA1(de95bb11918ed15f0061041f4a2ccbc38832280a) )
 
+	ROM_REGION( 0x0400, "iomcu", 0 )
+	// not dumped for this set; using a modified version of the hanaawmh MCU (incompatible but clearly similar) for now
+	ROM_LOAD( "iomcu.bin", 0x000, 0x400, CRC(5c9000d9) SHA1(9c92c913ff230dfd5cb4cd4123e6c5b456201ce9) BAD_DUMP )
+
 	ROM_REGION( 0x6000, "gfx1", ROMREGION_ERASE00 )
 	// unused in daifugo?
 
@@ -898,6 +902,9 @@ ROM_START( speedatk )
 	ROM_LOAD( "cb0-2",        0x2000, 0x2000, CRC(be949154) SHA1(8a594a7ebdc8456290919163f7ea4ccb0d1f4edb) )
 	ROM_LOAD( "cb1-3",        0x4000, 0x2000, CRC(741a5949) SHA1(7f7bebd4fb73fef9aa28549d100f632c442ac9b3) )
 	ROM_LOAD( "cb0-4",        0x6000, 0x2000, CRC(53a9c0c8) SHA1(cd0fd94411dabf09828c1f629891158c40794127) )
+
+	ROM_REGION( 0x0800, "iomcu", 0 )
+	ROM_LOAD( "iomcu.bin", 0x000, 0x800, NO_DUMP )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "cb0-7",        0x0000, 0x2000, CRC(a86007b5) SHA1(8e5cab76c37a8d53e1355000cd1a0a85ffae0e8c) )

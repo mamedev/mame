@@ -5,7 +5,7 @@ license:CC0-1.0
 
 TODO:
 - verify if all of these are really CDTV as minimum requirement;
-- Substitute low grade anon dumps with redump.org, for proper serial identification;
+- Substitute low grade anon dumps with redump.info, for proper serial identification;
 - Fill SKU for missing entries (CDT-*, from Commodore catalogues)
 - Discis disks all have Multi 5 help but book readings are English only.
   Is there any way to make them use other languages for audio reads?
@@ -139,7 +139,7 @@ cd32: black screen
 		<info name="disc_matrix2" value="SONOPRESS CD-ROM * H-1530 * B"/>
 		<part name="cdrom1" interface="cdrom">
 			<!-- <category>Applications</category> -->
-			<!-- http://redump.org/disc/20857/ -->
+			<!-- https://redump.info/disc/20857/ -->
 			<!-- <rom name="17 Bit - Collection for Amiga CDTV (Europe) (Disc A) (The Early Classics).cue" size="139" crc="7c63a156" md5="91d581fd2893068a621eb05c495f217f" sha1="651ee535011ddb36feb956334b4bcf8562b38719"/> -->
 			<!-- <rom name="17 Bit - Collection for Amiga CDTV (Europe) (Disc A) (The Early Classics).bin" size="526906800" crc="3b70fc1b" md5="b1c6f08b7f199283641e672cef13f89a" sha1="3d30e7117674698c5f6f401e59626c001ac14a98"/> -->
 			<diskarea name="cdrom">
@@ -148,7 +148,7 @@ cd32: black screen
 		</part>
 		<part name="cdrom2" interface="cdrom">
 			<!-- <category>Applications</category> -->
-			<!-- http://redump.org/disc/20858/ -->
+			<!-- https://redump.info/disc/20858/ -->
 			<!-- <rom name="17 Bit - Collection for Amiga CDTV (Europe) (Disc B) (The Latest Batch).cue" size="137" crc="0b75c7d0" md5="acbd34e3204d3e5b115218cbcbca8670" sha1="5b246cdc842396ca8e761262a48a72d65062abc8"/> -->
 			<!-- <rom name="17 Bit - Collection for Amiga CDTV (Europe) (Disc B) (The Latest Batch).bin" size="520027200" crc="d24d2746" md5="8d312fec9a3de6892c4ab44b8d0d267d" sha1="b3bafc74b2766c858599cc6e8f81deac9d0590e0"/> -->
 			<diskarea name="cdrom">
@@ -170,7 +170,7 @@ cd32: black screen
 		<info name="usage" value="Non-17 Bit entries are uncompressed Drawers" />
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Applications</category> -->
-			<!-- http://redump.org/disc/20859/ -->
+			<!-- https://redump.info/disc/20859/ -->
 			<!-- <rom name="17 Bit - Continuation Disc (Europe).cue" size="101" crc="d7d7dbbe" md5="a619ce89d1996ee4e0792616ed3f16a5" sha1="24908184c550ee4ee2363028bfa66ce8993688cb"/> -->
 			<!-- <rom name="17 Bit - Continuation Disc (Europe).bin" size="524512464" crc="64504039" md5="4cde0425b6dddb522e611b688744d81c" sha1="0c2ac57d774e4dc67f1e5580fa3840e7a1276fd9"/> -->
 			<diskarea name="cdrom">
@@ -191,7 +191,7 @@ cdtv/cd32: cursor is uncontrollable, [joytest] reset counter
 		<info name="disc_matrix" value="MADE BY DISCOVERY SYSTEMS - AN AMERICAN COMPANY U2RY010UB"/>
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Educational</category> -->
-			<!-- http://redump.org/disc/16704/ -->
+			<!-- https://redump.info/disc/16704/ -->
 			<!-- <rom name="Bun for Barney, A (USA).cue" size="193" crc="b188bdb7" md5="a0667c2ab8a02648bbf2cf3aa4297e00" sha1="3143e1211078a8e944db19eff45a953fe1a70e35"/> -->
 			<!-- <rom name="Bun for Barney, A (USA) (Track 1).bin" size="57769824" crc="fde78f74" md5="413076048144d9d6ebcad263ce1a27b9" sha1="dcc7099de1c33945e8ffd5eda10d3d70c3855dcd"/> -->
 			<!-- <rom name="Bun for Barney, A (USA) (Track 2).bin" size="376750416" crc="e5b93bdc" md5="b4b36d533cd6978e238649879a19f8e0" sha1="b08272eb3acf4bc8e41c04364dc838de5abb4076"/> -->
@@ -242,7 +242,7 @@ cdtv/cd32: cursor is uncontrollable, [joytest] reset counter
 		<info name="disc_matrix" value="MADE BY DISCOVERY SYSTEMS - AN AMERICAN COMPANY   U2RW010UB"/>
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Multimedia</category> -->
-			<!-- http://redump.org/disc/43650/ -->
+			<!-- https://redump.info/disc/43650/ -->
 			<!-- <rom name="Advanced Military Systems (Europe).cue" size="146" crc="e8538205" md5="2cc667843bbddbc8332fb73a8825cca1" sha1="1cb8c1ccf411c2c0533849130592884f2e54c65f"/> -->
 			<!-- <rom name="Advanced Military Systems (Europe).bin" size="551607504" crc="8c6fb38b" md5="753f2ca1e417ae15fa9180a85c0534fc" sha1="2e8942920ef41040198a8b59cd87061f51fd1b5f"/> -->
 			<diskarea name="cdrom">
@@ -276,7 +276,7 @@ Not extensively tested
 		<info name="sku" value="CDT-7501"/>
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Multimedia</category> -->
-			<!-- http://redump.org/disc/14908/ -->
+			<!-- https://redump.info/disc/14908/ -->
 			<!-- <rom name="American Heritage - Illustrated Encyclopedic Dictionary - 1991a Edition (USA).cue" size="143" crc="c99c7100" md5="05b2d66e845485d00355354be95f5046" sha1="701803fcd760361bda062daca0f9264b1b81e860"/> -->
 			<!-- <rom name="American Heritage - Illustrated Encyclopedic Dictionary - 1991a Edition (USA).bin" size="523242384" crc="7b780ae0" md5="880f7e4540e0a25d96a8ee3a1312284d" sha1="b5f8db73a1f59d5aac690a598d0b66cc5b35729f"/> -->
 			<diskarea name="cdrom">
@@ -354,7 +354,7 @@ cd32: hangs on title screen (verify)
 		<info name="disc_matrix" value="MADE BY DISCOVERY SYSTEMS - AN AMERICAN COMPANY U28Y050UA"/>
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Educational</category> -->
-			<!-- http://redump.org/disc/16699/ -->
+			<!-- https://redump.info/disc/16699/ -->
 			<!-- <rom name="Barney Bear Goes to School (USA).cue" size="10301" crc="ac37e95b" md5="37d1e3bf7439af1ac2d986150f525fc6" sha1="48d2d7269050249dc7a2e5881177778359a6345b"/> -->
 			<!-- <rom name="Barney Bear Goes to School (USA) (Track 01).bin" size="2391984" crc="c2b0380c" md5="d660d7258e04b3de83248f488c58e47c" sha1="552497c13fc47fa14a7b626bf6b01de6020e091a"/> -->
 			<!-- <rom name="Barney Bear Goes to School (USA) (Track 02).bin" size="712656" crc="c5a453dc" md5="ddcca5e6b1d05442505a935f1444c82d" sha1="d2bbb8e2d902bab9d2326c358da0f89076ba86ac"/> -->
@@ -620,7 +620,7 @@ Fills log with [DDFSTRT]=0xc underruns
 		<info name="disc_matrix" value="CDRM-735100"/>
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Educational</category> -->
-			<!-- http://redump.org/disc/16293/ -->
+			<!-- https://redump.info/disc/16293/ -->
 			<!-- <rom name="Cinderella - The Original Fairy Tale (USA) (En,Fr,De,Es,It).cue" size="125" crc="d02e7014" md5="6132a245d2e0c7b8ed7bfa7ceefd8589" sha1="f575fc5a5bcc4affa4668bae16ed071d216d0af8"/> -->
 			<!-- <rom name="Cinderella - The Original Fairy Tale (USA) (En,Fr,De,Es,It).bin" size="608222496" crc="9483d665" md5="9a6f8e3ab8560b1efa1b1e7ae6e6548f" sha1="6c848eb2c47a2076fd3e820fee1b72130fe051c3"/> -->
 			<diskarea name="cdrom">
@@ -637,7 +637,7 @@ Fills log with [DDFSTRT]=0xc underruns
 		<info name="sku" value="CDT-3506"/>
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Games</category> -->
-			<!-- http://redump.org/disc/18531/ -->
+			<!-- https://redump.info/disc/18531/ -->
 			<!-- <rom name="Classic Board Games (Europe) (En,Ja,Fr,De,Es,It).cue" size="114" crc="2a14355f" md5="cb64d8efa755b6dae5634b4a4fd71053" sha1="28d8e8e1ee93cff118663a3bfa00ebc331e70868"/> -->
 			<!-- <rom name="Classic Board Games (Europe) (En,Ja,Fr,De,Es,It).bin" size="113926176" crc="5540a1d9" md5="343851d323c2d708ceb39208f98d712d" sha1="3080a6870e2f574672d8349562df52b4014b8427"/> -->
 			<diskarea name="cdrom">
@@ -746,7 +746,7 @@ cd32: boot OK but random crashes (happened once while raiding a castle)
 		<info name="barcode" value="0 43467 53001 7"/>
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Games</category> -->
-			<!-- http://redump.org/disc/24518/ -->
+			<!-- https://redump.info/disc/24518/ -->
 			<!-- <rom name="Defender of the Crown (Europe).cue" size="230" crc="ee8b8985" md5="c10783a113cccba70286675709e39926" sha1="f41a5d3c09a51956901ed96ed0593cf2e882cd42"/> -->
 			<!-- <rom name="Defender of the Crown (Europe) (Track 1).bin" size="9878400" crc="104f29d5" md5="937a65f3cbecc340e006234e811f9386" sha1="b481c4a1645bd946c4e9643d55a105e6fa747526"/> -->
 			<!-- <rom name="Defender of the Crown (Europe) (Track 2).bin" size="260961456" crc="c387dbaf" md5="97272f12a36df7867ab5424b9dcff8e8" sha1="1f582a800fa371d0ac39f446e47f7c95776ec6b8"/> -->
@@ -784,7 +784,7 @@ cd32: boot OK
 		<info name="developer" value="CD-Soft"/>
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Multimedia</category> -->
-			<!-- http://redump.org/disc/3196/ -->
+			<!-- https://redump.info/disc/3196/ -->
 			<!-- <rom name="Deutschland Kompakt (Germany).cue" size="95" crc="b5141aa4" md5="82a1b76c21bb7ffbce31f8bb4d334fd9" sha1="14f3b61e99f96cd3a8458c29899c2353db2c28d2"/> -->
 			<!-- <rom name="Deutschland Kompakt (Germany).bin" size="435531600" crc="a68713ab" md5="1003357013af7251e5704f7cc15487da" sha1="922a86de11fd54fdf153e5f2cc808cb6198d1356"/> -->
 			<diskarea name="cdrom">
@@ -882,7 +882,7 @@ cd32: gameplay audio outputs SFX even if user selects BGM
 		<!-- baddump: MCN unverified -->
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Games</category> -->
-			<!-- http://redump.org/disc/3193/ -->
+			<!-- https://redump.info/disc/3193/ -->
 			<!-- <rom name="Fantastic Voyage (USA).cue" size="88" crc="f56848e3" md5="4966e2d46a73f488ea7f34a76f3800e0" sha1="c8a0929895e91b0f2830ec33c9e7aa6b7a0ec2ae"/> -->
 			<!-- <rom name="Fantastic Voyage (USA).bin" size="5244960" crc="019d4fcb" md5="eee20caf9b36a2f8830f7aeb9584d57c" sha1="e32aebdac017a3f19cdbaa746c829fc3c817dcfa"/> -->
 			<diskarea name="cdrom">
@@ -1012,7 +1012,7 @@ cd32: punts to cd32 player
 		<info name="barcode" value="0 43467 51002 6"/>
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Multimedia</category> -->
-			<!-- http://redump.org/disc/14997/ -->
+			<!-- https://redump.info/disc/14997/ -->
 			<!-- <rom name="Garden Fax - Garden Plants (USA).cue" size="98" crc="a85f1d8c" md5="6f10e3a9aecc49aaff4f89ceef454b79" sha1="66c8e715dae87fd72153f29e2dba94903de61105"/> -->
 			<!-- <rom name="Garden Fax - Garden Plants (USA).bin" size="57769824" crc="2b3cabdd" md5="561655a6444cc265217962822edbdabb" sha1="7dde3c9d4b9fb0057f9a118756021cc944a0ad79"/> -->
 			<diskarea name="cdrom">
@@ -1057,7 +1057,7 @@ May require CDTV input device
 		<info name="barcode" value="0 43467 51003 3"/>
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Games</category> -->
-			<!-- http://redump.org/disc/3231/ -->
+			<!-- https://redump.info/disc/3231/ -->
 			<!-- <rom name="Garden Fax - Trees, Shrubs, Roses &amp; Conifers (USA).cue" size="116" crc="f97173db" md5="776780af5559d263235ba29da9e7a4c8" sha1="08705572256b61bae0f6a89930c155a9349be46a"/> -->
 			<!-- <rom name="Garden Fax - Trees, Shrubs, Roses &amp; Conifers (USA).bin" size="115196256" crc="9004e8a6" md5="40b64c56656a3f634688368540a4c176" sha1="7abc58ae49c189f5b70f413d300052f9ece706d8"/> -->
 			<diskarea name="cdrom">
@@ -1220,7 +1220,7 @@ cd32: boot OK
 		<info name="disc_matrix" value="AREACEM DIGIPRESS JERIKO LTV ENGLISH 91364"/>
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Educational</category> -->
-			<!-- http://redump.org/disc/3222/ -->
+			<!-- https://redump.info/disc/3222/ -->
 			<!-- <rom name="Language TV - English (France).cue" size="96" crc="3c54b6e9" md5="c3e031a5de2069a839a5af3ba2303dcd" sha1="19390b51b2ae04383a5eb0d448667a7f6d1a5c24"/> -->
 			<!-- <rom name="Language TV - English (France).bin" size="399421344" crc="fd497b38" md5="f4cb8d1a72f86d5c7791be3c9069bea7" sha1="52d12aa51de2de874e30aa1889c14ba0c00802e7"/> -->
 			<diskarea name="cdrom">
@@ -1240,7 +1240,7 @@ lemmings boot OK, B button isn't recognized on Lemmings/Planetside demo initial 
 		<info name="barcode" value="0 53203 00438 2"/>
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Games</category> -->
-			<!-- http://redump.org/disc/36259/ -->
+			<!-- https://redump.info/disc/36259/ -->
 			<!-- <rom name="Lemmings (Europe).cue" size="83" crc="32fc8209" md5="1ce60d243301f7881ded33df38e1f7dc" sha1="b865b14cd6f5ae0a27a0b2599ccc7da45de61ef6"/> -->
 			<!-- <rom name="Lemmings (Europe).bin" size="69259344" crc="1659d12d" md5="1ee64a7b66aa58a94adefb98c412f622" sha1="ceaec027822c03a08e060b139908c0340c77bb20"/> -->
 			<!-- "Last sector is an empty audio track" -->
@@ -1262,7 +1262,7 @@ cd32: crashes after title screen (68k goes to lalaland) (verify)
 		<info name="barcode" value="4 005209 007641"/>
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Games</category> -->
-			<!-- http://redump.org/disc/3045/ -->
+			<!-- https://redump.info/disc/3045/ -->
 			<!-- <rom name="Log!cal (Europe).cue" size="82" crc="fad771da" md5="ffde14e09e6466114b3b0f15f9a2e145" sha1="f7ec454633127a2547f4fd9017cfc29cc6c0b08c"/> -->
 			<!-- <rom name="Log!cal (Europe).bin" size="20815200" crc="9005c890" md5="cbe25fd3c5bcf9e6edcff7c9e940b864" sha1="200f812cb38236840c3189c71108c63d8bc41d24"/> -->
 			<diskarea name="cdrom">
@@ -1313,7 +1313,7 @@ cd32: inputs doesn't work (verify)
 		<info name="barcode" value="730122974841"/>
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Educational</category> -->
-			<!-- http://redump.org/disc/16292/ -->
+			<!-- https://redump.info/disc/16292/ -->
 			<!-- <rom name="Mud Puddle (USA) (En,Fr,De,Es,It).cue" size="99" crc="ad417b13" md5="c409611544dc299cb7c7ae4da415d442" sha1="368dee815e460cf098558754f3630722a63fca07"/> -->
 			<!-- <rom name="Mud Puddle (USA) (En,Fr,De,Es,It).bin" size="322557984" crc="1485937a" md5="dafe4aac6fd8ac341c1bb357bc3392be" sha1="b5b7c32c7e588cf9c67d80a2d4192cdb21dd1696"/> -->
 			<diskarea name="cdrom">
@@ -1396,7 +1396,7 @@ cd32: outputs a very quiet [CDDA] redbook if you move on main menu with an analo
 		<info name="barcode" value="5 025465 130012"/>
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Multimedia</category> -->
-			<!-- http://redump.org/disc/17432/ -->
+			<!-- https://redump.info/disc/17432/ -->
 			<!-- <rom name="Pandora's CD (Europe).cue" size="87" crc="b6889cfa" md5="d600373013fadd5f93de3002bef267ce" sha1="1b71844069379cb009b60b522845987f2a706870"/> -->
 			<!-- <rom name="Pandora's CD (Europe).bin" size="444351600" crc="af034f7f" md5="1cc8ca2a08fff2a6fba41945e5bb690f" sha1="a68fac9b872e436a0ea970b0dbcf347bc0a4a684"/> -->
 			<diskarea name="cdrom">
@@ -1483,7 +1483,7 @@ cd32: hangs on acknowledge ending credits (i.e. when you die and have to start o
 		<info name="disc_matrix" value="MADE BY DISCOVERY SYSTEMS - AN AMERICAN COMPANY U2A2020UA"/>
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Games</category> -->
-			<!-- http://redump.org/disc/3443/ -->
+			<!-- https://redump.info/disc/3443/ -->
 			<!-- <rom name="Psycho Killer (Europe).cue" size="399" crc="0ac80308" md5="fc589e70df1d58cd85f5e9842a97c017" sha1="3f0ae24c2cf1082bb0f5f174f033003c843de460"/> -->
 			<!-- <rom name="Psycho Killer (Europe) (Track 1).bin" size="57769824" crc="f980487b" md5="4b19901c0a1d54a5b3072415d4c75269" sha1="b736e60d043783af98ff3ab4cd6857c8628c976e"/> -->
 			<!-- <rom name="Psycho Killer (Europe) (Track 2).bin" size="14648256" crc="c2901df2" md5="6e7593e6616a787d2b763794242d7eb0" sha1="156cb5dafc12c506cf8a55c00e1e30c2f66ed6ac"/> -->
@@ -1510,7 +1510,7 @@ cd32: disc 2 throws an AMOS software failure #8000000A at boot
 		<info name="disc_matrix2" value="SONOPRESS * G-4744 * CD-ROM A 2"/>
 		<part name="cdrom1" interface="cdrom">
 			<!-- <category>Multimedia</category> -->
-			<!-- http://redump.org/disc/4718/ -->
+			<!-- https://redump.info/disc/4718/ -->
 			<!-- <rom name="CDTV Demo Disc (Europe) (Disc 1) (Amiga CD Psygnosis Demo).cue" size="124" crc="d16bde19" md5="6031dd1d06497317ae04c16e83371ede" sha1="614dcdf2c32985d99c9b0b59ff81a63bf879be03"/> -->
 			<!-- <rom name="CDTV Demo Disc (Europe) (Disc 1) (Amiga CD Psygnosis Demo).bin" size="35632800" crc="3915bf02" md5="cc567b2f5973d34527abe5b16971d1e3" sha1="eccbbe05cb3cd3329950b873f4da4a7f74b659fe"/> -->
 			<diskarea name="cdrom">
@@ -1520,7 +1520,7 @@ cd32: disc 2 throws an AMOS software failure #8000000A at boot
 
 		<part name="cdrom2" interface="cdrom">
 			<!-- <category>Multimedia</category> -->
-			<!-- http://redump.org/disc/4719/ -->
+			<!-- https://redump.info/disc/4719/ -->
 			<!-- <rom name="CDTV Demo Disc (Europe) (Disc 2) (Amiga CDTV - Amiga 600 - Amiga 600 HD).cue" size="138" crc="444bae45" md5="54e0dbcf821780c8d5ce91646e5194f0" sha1="97e42a7e2bd4f621510cdb11d915051079834acf"/> -->
 			<!-- <rom name="CDTV Demo Disc (Europe) (Disc 2) (Amiga CDTV - Amiga 600 - Amiga 600 HD).bin" size="81144000" crc="d8a48e3c" md5="fce0a1df485e9e5ac538fdc06e29b68b" sha1="c6b52e93fb7cae4048cf5c47c0ed54f8d6ddff82"/> -->
 			<diskarea name="cdrom">
@@ -1538,7 +1538,7 @@ cd32: disc 2 throws an AMOS software failure #8000000A at boot
 		<!-- baddump: "MCN unverified" -->
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Games</category> -->
-			<!-- http://redump.org/disc/3047/ -->
+			<!-- https://redump.info/disc/3047/ -->
 			<!-- <rom name="Raffles (Sweden).cue" size="82" crc="8cad43b6" md5="8871b6a25d864903e7184f3a1fc7c7c6" sha1="c5929c303cd9977fa29554b57edaa4c0d7aa1495"/> -->
 			<!-- <rom name="Raffles (Sweden).bin" size="23320080" crc="563c7008" md5="7eb24c2032d3b083b59f987198415491" sha1="f35b8960889e34f9cd7cbb539336a33b48752aee"/> -->
 			<diskarea name="cdrom">
@@ -1690,7 +1690,7 @@ cd32: black screen
 		<!-- baddump: "MCN unverified" -->
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Games</category> -->
-			<!-- http://redump.org/disc/29268/ -->
+			<!-- https://redump.info/disc/29268/ -->
 			<!-- <rom name="Snoopy - The Case of the Missing Blanket (Sweden).cue" size="268" crc="8550a103" md5="d375ccf0ba9499d5d180a7d8a37d7854" sha1="02a233f19ead9ebe7b275db95cf059cfb38fb68e"/> -->
 			<!-- <rom name="Snoopy - The Case of the Missing Blanket (Sweden) (Track 1).bin" size="11830560" crc="b0c9e975" md5="d5b0ee51db3a90d3ed793938e8258c4e" sha1="7bcb83f33a11ee2dc01921ddfe9e78c9ead7d828"/> -->
 			<!-- <rom name="Snoopy - The Case of the Missing Blanket (Sweden) (Track 2).bin" size="52214400" crc="7d1afcb2" md5="b21ca4b2844a73320452eda42b4b2a1e" sha1="9b3f3971827658b07bba4988cabba71c2f546a15"/> -->
@@ -1755,7 +1755,7 @@ Deathbots: has slight player [sprite] corruption when moving left/right
 		<info name="disc_matrix" value="CDRM-729600 3"/>
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Games</category> -->
-			<!-- http://redump.org/disc/24030/ -->
+			<!-- https://redump.info/disc/24030/ -->
 			<!-- <rom name="Team Yankee (Europe).cue" size="86" crc="08deab09" md5="1f7f0657553fdb0697a6d54d35d66d20" sha1="284b5661257cd403430bca3a18240acc4ac86b14"/> -->
 			<!-- <rom name="Team Yankee (Europe).bin" size="6091680" crc="a500bad1" md5="807ed3b870edeae21752141dcabeeb58" sha1="845b51c3bf7ea9e0a3e94ac6af544dcab34b5f93"/> -->
 			<diskarea name="cdrom">
@@ -1890,7 +1890,7 @@ cd32: has serious sprite position issues (offset on demo, draws garbage from tim
 		<info name="barcode" value="4 005209 007634"/>
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Games</category> -->
-			<!-- http://redump.org/disc/3046/ -->
+			<!-- https://redump.info/disc/3046/ -->
 			<!-- <rom name="Curse of RA, The (Germany).cue" size="92" crc="968378d1" md5="aee161bbc24073b3336e77fc0539cde5" sha1="0892756ed637fa6a5f4f43fa31b21d5b88dc0075"/> -->
 			<!-- <rom name="Curse of RA, The (Germany).bin" size="20815200" crc="2ad9b4db" md5="cc713d8f30095f05172c5c4c19ac43fa" sha1="17cf59f01ee8a58a165498674b76dad13d6b265c"/> -->
 			<diskarea name="cdrom">
@@ -1911,7 +1911,7 @@ cd32: bottom GFX is corrupted on title screen
 		<info name="disc_matrix" value="SONOPRESS CD-ROM * H-2059 * A   4"/>
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Applications</category> -->
-			<!-- http://redump.org/disc/45850/ -->
+			<!-- https://redump.info/disc/45850/ -->
 			<!-- <rom name="Demo Collection for Amiga CDTV, The (Europe) (Black Disc).cue" size="123" crc="a1f8ffd8" md5="e52b38bcec067e85623fc8c7f9476906" sha1="499b9e7736e94f57042fa2943188b806c2bbc88a"/> -->
 			<!-- <rom name="Demo Collection for Amiga CDTV, The (Europe) (Black Disc).bin" size="712656000" crc="563ed322" md5="0e1a3760f4b3141c0462afe267f96903" sha1="796c40e4f404a75ff437ae554bf210b553d32721"/> -->
 			<diskarea name="cdrom">
@@ -1965,7 +1965,7 @@ cd32: boot OK, vertical scrolling glitches a bit in Pictures sub menu [Copper]
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Multimedia</category> -->
-			<!-- http://redump.org/disc/18532/ -->
+			<!-- https://redump.info/disc/18532/ -->
 			<!-- <rom name="Hutchinson Encyclopedia, The (Europe).cue" size="103" crc="b2dc3bc3" md5="1ae138576a59a0efa27fbe90aa52663c" sha1="3cf7a3e6774d46a78b17b5da897d527d4d903495"/> -->
 			<!-- <rom name="Hutchinson Encyclopedia, The (Europe).bin" size="767163600" crc="45a05376" md5="79ec5274dd664993cc988cf9ff278d9c" sha1="12b0b32c314d419a252723be7af8146372c7444a"/> -->
 			<diskarea name="cdrom">
@@ -2032,7 +2032,7 @@ cd32: GFX pitch corruption for intro screens, EA logo is offset to the left [ddf
 		<info name="sku" value="CDT-7507"/>
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Multimedia</category> -->
-			<!-- http://redump.org/disc/16957/ -->
+			<!-- https://redump.info/disc/16957/ -->
 			<!-- <rom name="New Basics Electronic Cookbook, The - 1991a Edition (USA).cue" size="123" crc="5daa7ae0" md5="4fccc521086a48b67db1f272bd93150d" sha1="19cf0718ff14676bc92ef7388df247506ad94acc"/> -->
 			<!-- <rom name="New Basics Electronic Cookbook, The - 1991a Edition (USA).bin" size="95317152" crc="c8d7ef3d" md5="59bf30dd84e33e6435de31c256749169" sha1="5e66985095280f9829bc8845955391a9e177c73e"/> -->
 			<diskarea name="cdrom">
@@ -2187,7 +2187,7 @@ cd32: black screen (verify)
 		<info name="barcode" value="7 28795 02112 2"/>
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Multimedia</category> -->
-			<!-- http://redump.org/disc/3078/ -->
+			<!-- https://redump.info/disc/3078/ -->
 			<!-- <rom name="Time Table of History - Business, Politics &amp; Media - 1991a Edition (USA).cue" size="138" crc="84beda6f" md5="2db68130f47e0ca7a5a6304d12d36b73" sha1="ddaa8fed119e0d63bd333234799905de2ebf3cbb"/> -->
 			<!-- <rom name="Time Table of History - Business, Politics &amp; Media - 1991a Edition (USA).bin" size="182642208" crc="e1c53227" md5="006f3f3288136cb0f1c7b3986388615d" sha1="97fccd3602f006cf4956209f2421afe004acc0cc"/> -->
 			<diskarea name="cdrom">
@@ -2222,7 +2222,7 @@ Optional save options, [FDC] format
 		<info name="barcode" value="5 022231 036189"/>
 		<part name="cdrom1" interface="cdrom">
 			<!-- <category>Games</category> -->
-			<!-- http://redump.org/disc/14963/ -->
+			<!-- https://redump.info/disc/14963/ -->
 			<!-- <rom name="Trivial Pursuit - The CDTV Edition (Europe) (Disc 1).cue" size="118" crc="7564a5ff" md5="ab9214b9ca49398815cd45521843e50c" sha1="62679bc5c37d8cbc4503eef3a7bfaef055aba8e5"/> -->
 			<!-- <rom name="Trivial Pursuit - The CDTV Edition (Europe) (Disc 1).bin" size="270562320" crc="48b01ac5" md5="5b43f79ea4f4419e77024bee6a95461a" sha1="ceda26140d4ae1f7cef6763f396d9863d0a421b9"/> -->
 			<diskarea name="cdrom">
@@ -2231,7 +2231,7 @@ Optional save options, [FDC] format
 		</part>
 		<part name="cdrom2" interface="cdrom">
 			<!-- <category>Games</category> -->
-			<!-- http://redump.org/disc/14962/ -->
+			<!-- https://redump.info/disc/14962/ -->
 			<!-- <rom name="Trivial Pursuit - The CDTV Edition (Europe) (Disc 2).cue" size="118" crc="7439832e" md5="9feb7538e24fd218af9fe3799db6775e" sha1="ea1004f64de951b7aeed370b9f95129b0df752c7"/> -->
 			<!-- <rom name="Trivial Pursuit - The CDTV Edition (Europe) (Disc 2).bin" size="269873184" crc="ee29ff98" md5="474bc93345bf2503ae2a11a1d0148966" sha1="d49eae1588d08a51cca075d8ab3ffe23fd5e8e21"/> -->
 			<diskarea name="cdrom">
@@ -2269,7 +2269,7 @@ cd32: black screen with unmapped accesses (verify)
 		<info name="barcode" value="4 005209 007689"/>
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Games</category> -->
-			<!-- http://redump.org/disc/3170/ -->
+			<!-- https://redump.info/disc/3170/ -->
 			<!-- <rom name="Turrican (Germany).cue" size="84" crc="1866b06a" md5="f0930bf7365a315fc031ac8c186e5627" sha1="fbccefef984ca61199f782838f54d5de145cb4b1"/> -->
 			<!-- <rom name="Turrican (Germany).bin" size="20815200" crc="d9d2a700" md5="2c5ac366851ae22038a876a0b1e8e579" sha1="ccfb408204450abe929b402bbd3c0b4367376f2f"/> -->
 			<diskarea name="cdrom">
@@ -2305,7 +2305,7 @@ cd32: black screen with unmapped accesses (verify)
 		<info name="barcode" value="4 005209 007696"/>
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Games</category> -->
-			<!-- http://redump.org/disc/3183/ -->
+			<!-- https://redump.info/disc/3183/ -->
 			<!-- <rom name="Turrican II - The Final Fight (Germany).cue" size="105" crc="0df13f9a" md5="98456a1b4b6861aeb0e3350dc60db3c1" sha1="107929d352a5a016faa3b80d7d297485a052d881"/> -->
 			<!-- <rom name="Turrican II - The Final Fight (Germany).bin" size="20815200" crc="7c2e3f0a" md5="87a97d7d2c7981b218e6ffa65f869e7b" sha1="715a958452c084db614447c7f3da73dadb0b46db"/> -->
 			<diskarea name="cdrom">
@@ -2339,7 +2339,7 @@ cd32: black screen with BGM playing (verify)
 		<info name="disc_matrix" value="CDRM-499000 1"/>
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Demos</category> -->
-			<!-- http://redump.org/disc/3098/ -->
+			<!-- https://redump.info/disc/3098/ -->
 			<!-- <rom name="Welcome to CDTV Multimedia (USA).cue" size="98" crc="4510c44d" md5="0146b734a6e7f578dc8445ee534b02cb" sha1="0b0d40551d3bf9197aa8684c22fcc279b689fc3b"/> -->
 			<!-- <rom name="Welcome to CDTV Multimedia (USA).bin" size="62069280" crc="d76ddb22" md5="068fe7f30136c68504fe124a2417e454" sha1="11284bb7da00456a538565484344c5a88bd82906"/> -->
 			<diskarea name="cdrom">
@@ -2511,7 +2511,7 @@ cd32: hangs at ReadySoft logo
 		<info name="barcode" value="0 92667 11000 0"/>
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Games</category> -->
-			<!-- http://redump.org/disc/37784/ -->
+			<!-- https://redump.info/disc/37784/ -->
 			<!-- <rom name="Wrath of the Demon (USA).cue" size="90" crc="0d833f61" md5="69a72804ea8794a89a1d30dad1a01648" sha1="1e7b9d5efb813a0bce13407eb1a7db57e51fd05a"/> -->
 			<!-- <rom name="Wrath of the Demon (USA).bin" size="7756896" crc="5397eb5c" md5="e92c37712b3bc5ab3d339a9e548e4710" sha1="5ad8d5b13cdd5bbbe5ea03c508804888f5fa344a"/> -->
 			<diskarea name="cdrom">
@@ -2540,7 +2540,7 @@ cd32: boot OK
 
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Games</category> -->
-			<!-- http://redump.org/disc/4012/ -->
+			<!-- https://redump.info/disc/4012/ -->
 			<!-- <rom name="Xenon 2 - Megablast (Europe) (En,Fr,De,It).cue" size="1763" crc="a51efa14" md5="bf30ad9d39af11048b52362dfc2adc73" sha1="ebce78861572a303853ad872fcc8ee41f8a40010"/> -->
 			<!-- <rom name="Xenon 2 - Megablast (Europe) (En,Fr,De,It) (Track 01).bin" size="14123760" crc="74f0388c" md5="c6d86451da6881150267b20a9ed625ec" sha1="a1cd9d031308295f76927c660aa37e4c7ff4e9ca"/> -->
 			<!-- <rom name="Xenon 2 - Megablast (Europe) (En,Fr,De,It) (Track 02).bin" size="48921600" crc="b4614563" md5="6b028111a6d69689c2d3270dacbad392" sha1="331fb27fe3b2b76c501a8e62c717b4c585b0f309"/> -->

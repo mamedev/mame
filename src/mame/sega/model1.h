@@ -16,6 +16,7 @@
 #include "machine/i8251.h"
 #include "machine/gen_fifo.h"
 #include "machine/mb8421.h"
+#include "machine/nvram.h"
 #include "machine/timer.h"
 
 #include "emupal.h"
@@ -47,6 +48,7 @@ public:
 		, m_display_list1(*this, "display_list1")
 		, m_color_xlat(*this, "color_xlat")
 		, m_paletteram16(*this, "palette")
+		, m_nvram(*this, "nvram")
 		, m_palette(*this, "palette")
 		, m_tiles(*this, "tile")
 		, m_digits(*this, "digit%u", 0U)
@@ -55,14 +57,13 @@ public:
 	{
 	}
 
-	void model1(machine_config &config);
-	void vf(machine_config &config);
-	void vr(machine_config &config);
-	void vformula(machine_config &config);
-	void swa(machine_config &config);
-	void wingwar(machine_config &config);
-	void wingwar360(machine_config &config);
-	void netmerc(machine_config &config);
+	void model1(machine_config &config) ATTR_COLD;
+	void vf(machine_config &config) ATTR_COLD;
+	void vr(machine_config &config) ATTR_COLD;
+	void vformula(machine_config &config) ATTR_COLD;
+	void swa(machine_config &config) ATTR_COLD;
+	void wingwar(machine_config &config) ATTR_COLD;
+	void wingwar360(machine_config &config) ATTR_COLD;
 
 	struct spoint_t
 	{
@@ -94,7 +95,7 @@ public:
 		int col = 0;
 	};
 
-private:
+protected:
 	// Machine
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -191,7 +192,8 @@ private:
 		float vxx = 0, vyy = 0, vzz = 0, ayy = 0, ayyc = 0, ayys = 0;
 		float translation[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 		glm::vec3 light;
-		lightparam_t lightparams[32];
+		lightparam_t lightparams[256];
+		bool spec_enable = false;
 	};
 
 	void model1_io(address_map &map) ATTR_COLD;
@@ -210,8 +212,21 @@ private:
 	void irq_raise(int level);
 	void irq_init();
 	void irq_control_w(u8 data);
+	u8 irq_mask_r();
+	void irq_mask_w(u8 data);
+	u16 timer_r(offs_t offset);
+	void timer_mode_w(offs_t offset, u16 data, u16 mem_mask);
+	void timer_period_w(offs_t offset, u16 data, u16 mem_mask);
+	TIMER_CALLBACK_MEMBER(irq0_timer_tick);
+
+	emu_timer *m_irq0_timer[2] = { nullptr, nullptr };
+	uint16_t m_timer_period[2] = { 0, 0 };
+	uint16_t m_timer_val[2] = { 0, 0 };
+	uint16_t m_timer_mode = 0;
+	void sound_ready_w(int state);
 
 	uint8_t m_irq_status = 0;
+	uint8_t m_irq_mask = 0xff;
 	int m_last_irq = 0;
 
 	// Devices
@@ -232,9 +247,6 @@ private:
 	required_shared_ptr<uint16_t> m_display_list0;
 	required_shared_ptr<uint16_t> m_display_list1;
 	required_shared_ptr<uint16_t> m_color_xlat;
-
-	// Sound
-	int m_sound_irq = 0;
 
 	// TGP FIFO
 	void    fifoout_push(uint32_t data);
@@ -319,12 +331,12 @@ private:
 
 	static float    min4f(float a, float b, float c, float d);
 	static float    max4f(float a, float b, float c, float d);
-	static float    compute_specular(glm::vec3& normal, glm::vec3& light, float diffuse,int lmode);
+	float   compute_specular(glm::vec3& normal, glm::vec3& light, float diffuse, int lmode);
 
 	int push_direct(int list_offset);
 	int draw_direct(bitmap_rgb32 &bitmap, const rectangle &cliprect, int list_offset);
 	int skip_direct(int list_offset) const;
-	void    push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t size);
+	void    push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t size, float &old_z);
 	void    draw_objects(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void set_current_render_list();
@@ -347,6 +359,7 @@ private:
 	void apply_overlay_stencil(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	optional_shared_ptr<uint16_t> m_paletteram16;
+	required_device<nvram_device> m_nvram;
 	required_device<palette_device> m_palette;
 	required_device<segas24_tile_device> m_tiles;
 
@@ -361,8 +374,24 @@ private:
 	void swa_outputs_w(uint8_t data);
 	void wingwar_outputs_w(uint8_t data);
 	void wingwar360_outputs_w(uint8_t data);
-	void netmerc_outputs_w(uint8_t data);
 	void drive_board_w(uint8_t data);
+};
+
+class netmerc_state : public model1_state
+{
+public:
+	netmerc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: model1_state(mconfig, type, tag)
+	{
+	}
+
+	void netmerc(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	void netmerc_outputs_w(uint8_t data);
 };
 
 #endif // MAME_SEGA_MODEL1_H
