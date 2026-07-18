@@ -368,6 +368,17 @@ void pc9801_state::txt_scrl_w(offs_t offset, uint8_t data)
  *
  ************************************************/
 
+uint8_t pc9801_state::kanji_r(offs_t offset)
+{
+	return m_kanji_rom[offset];
+}
+
+void pc9801_state::kanji_w(offs_t offset, uint8_t data)
+{
+	m_kanji_rom[offset] = data;
+	m_gfxdecode->gfx(2)->mark_dirty(offset >> 5);
+}
+
 uint8_t pc9801_state::pc9801_a0_r(offs_t offset)
 {
 	if((offset & 1) == 0)
@@ -406,7 +417,7 @@ uint8_t pc9801_state::pc9801_a0_r(offs_t offset)
 				pcg_offset |= m_font_lr;
 				pcg_offset |= (!m_video_ff[KAC_REG] << 12);
 
-				return m_kanji_rom[pcg_offset];
+				return kanji_r(pcg_offset);
 			}
 		}
 
@@ -483,8 +494,7 @@ void pc9801_state::pc9801_a0_w(offs_t offset, uint8_t data)
 				{
 					pcg_offset |= (!m_video_ff[KAC_REG] << 12);
 
-					m_kanji_rom[pcg_offset] = data;
-					m_gfxdecode->gfx(2)->mark_dirty(pcg_offset >> 5);
+					kanji_w(pcg_offset, data);
 				}
 				return;
 			}

@@ -859,12 +859,12 @@ u8 pc6001mk2sr_state::hw_rev_r()
 	// bit 1 is active for pc6601sr (and shows the "PC6601SR World" screen in place of the "PC6001mkIISR World"),
 	// causes a direct jump to "video telopper" for pc6001mk2sr
 	// bit 0 is related to FDC irq status
-	return 0 | 1;
+	return 0 | m_fdc->get_irq();
 }
 
 u8 pc6601sr_state::hw_rev_r()
 {
-	return 2 | 1;
+	return 2 | m_fdc->get_irq();
 }
 
 void pc6001mk2sr_state::crt_mode_w(u8 data)
