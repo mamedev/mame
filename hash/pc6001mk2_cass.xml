@@ -27,6 +27,9 @@ If usage specifies MONITOR:
 - Enter MON then press ENTER to enter the Monitor.
 - Type R-0 (- is entered automatically) then press ENTER.
 
+Known undumped list:
+- Golf Island ゴルフアイランド (original 2 tapes version)
+
 -->
 <softwarelist name="pc6001mk2_cass" description="NEC PC-6001mkII cassette snapshots">
 
@@ -35,7 +38,7 @@ If usage specifies MONITOR:
 	<software name="3dgolfsv" supported="no">
 		<description>3D Golf Simulation: Super Version</description>
 		<year>1984?</year>
-		<publisher>T&amp;E Soft</publisher>
+		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
 		<notes><![CDATA[
 Requires [keyboard] key repeat (verify)
 ]]></notes>
@@ -57,6 +60,30 @@ Requires [keyboard] key repeat (verify)
 		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="43303">
 				<rom name="american truck.cas" size="43303" crc="8b50ad46" sha1="aec8ba495b058f775b5f7bb418d430bd4ad7e0da" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aspic" supported="no">
+		<description>Aspic</description>
+		<year>198?</year>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
+		<notes><![CDATA[
+Requires [tape] scenario saving for a new game
+Side B use is unclear (required later?)
+]]></notes>
+		<info name="usage" value="Mode 5, Page 2, BASIC"/>
+		<info name="alt_title" value="アスピック"/>
+		<part name="snap1" interface="pc6001_snap">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="snap" size="47749">
+				<rom name="aspic (side a).cas" size="47749" crc="c89af7dd" sha1="d2af5424f477d63de8d5d1027f08610de4fe6f7e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap2" interface="pc6001_snap">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="snap" size="13107">
+				<rom name="aspic (side b).cas" size="13107" crc="b35eb02b" sha1="5ce96b9646f333e269a4378db90c9ca7ccccd5d2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -98,7 +125,7 @@ Requires user [tape] saving, prompts user after character creation
 	<software name="bokosuka" supported="partial">
 		<description>Bokosuka Wars</description>
 		<year>1985</year>
-		<publisher>ASCII</publisher>
+		<publisher>アスキー (ASCII)</publisher>
 		<info name="usage" value="Mode 5, Page 3, BASIC" />
 		<info name="alt_title" value="ボコスカウォーズ"/>
 		<part name="snap" interface="pc6001_snap">
@@ -124,7 +151,7 @@ Requires user [tape] saving, prompts user after character creation
 	<software name="castle" supported="partial">
 		<description>The Castle</description>
 		<year>1986</year>
-		<publisher>ASCII</publisher>
+		<publisher>アスキー (ASCII)</publisher>
 		<info name="usage" value="Mode 5, Page 2, BASIC"/>
 		<info name="alt_title" value="ザ・キャッスル"/>
 
@@ -138,7 +165,7 @@ Requires user [tape] saving, prompts user after character creation
 	<software name="castleex" supported="no">
 		<description>Castle Excellent</description>
 		<year>1986?</year>
-		<publisher>ASCII</publisher>
+		<publisher>アスキー (ASCII)</publisher>
 		<notes><![CDATA[
 [gfx] wrong scan draw for title screen copyright text, bad dump?
 [keyboard] has input problems, keeps going to the left
@@ -156,10 +183,12 @@ No BGM sound
 
 	<software name="chackpop" supported="partial">
 		<description>Chack 'n Pop</description>
+		<!-- '84 Oct on title screen -->
 		<year>1984</year>
-		<publisher>Nidecom Carry</publisher>
+		<publisher>ニデコム (Nidecom)</publisher>
 		<info name="usage" value="Mode 5, Page 1, BASIC" />
 		<info name="alt_title" value="ちゃっくんぽっぷ"/>
+		<info name="developer" value="Carry Lab" />
 		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="46630">
 				<rom name="chack 'n pop.cas" size="46630" crc="de769cca" sha1="3e35398d960442c98035db530c3226dda06ae12f"/>
@@ -174,6 +203,7 @@ No BGM sound
 		<publisher>Comix</publisher>
 		<notes><![CDATA[
 pc6001mk2sr: crashes at title screen
+Lack of [upd7752] voice during intro
 ]]></notes>
 		<info name="usage" value="Mode 5, Page 3, BASIC" />
 		<info name="alt_title" value="クリス愛の旅立ち"/>
@@ -187,7 +217,7 @@ pc6001mk2sr: crashes at title screen
 	<software name="daidasso" supported="partial">
 		<description>Dai Dassou</description>
 		<year>1985?</year>
-		<publisher>Carry Lab</publisher>
+		<publisher>キャリーラボ (Carry Lab)</publisher>
 		<info name="usage" value="Mode 5, Page 1, BASIC" />
 		<info name="alt_title" value="大脱走"/>
 		<part name="snap" interface="pc6001_snap">
@@ -255,7 +285,7 @@ Unsupported [tape] saving, other chapters requires an user tape
 	<software name="doordoor" supported="partial">
 		<description>Door Door Mk. II</description>
 		<year>1984</year>
-		<publisher>Enix</publisher>
+		<publisher>エニックス (Enix)</publisher>
 		<info name="usage" value="Mode 5, Page 3, BASIC" />
 		<info name="alt_title" value="ドアドアmkII"/>
 		<part name="snap" interface="pc6001_snap">
@@ -268,7 +298,7 @@ Unsupported [tape] saving, other chapters requires an user tape
 	<software name="dsbubble" supported="partial">
 		<description>Dr. Slump Bubble Daisakusen</description>
 		<year>1984</year>
-		<publisher>Enix</publisher>
+		<publisher>エニックス (Enix)</publisher>
 		<info name="usage" value="Mode 5, Page 3, MONITOR" />
 		<info name="developer" value="K. Okamoto" />
 		<info name="alt_title" value="スランプ バブル大作戦"/>
@@ -292,6 +322,32 @@ Unsupported [tape] saving, other chapters requires an user tape
 		</part>
 	</software>
 
+	<software name="frontlin" supported="partial">
+		<description>Front Line</description>
+		<year>198?</year>
+		<publisher>ニデコム (Nidecom)</publisher>
+		<info name="usage" value="Mode 5, Page 1, BASIC"/>
+		<info name="alt_title" value="フロントライン"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="28812">
+				<rom name="front line.cas" size="28812" crc="271f38c4" sha1="6ac866a27ea6ce46b3305016226933d974cf81b7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaxian" supported="partial">
+		<description>Galaxian</description>
+		<year>198?</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="usage" value="Mode 5, Page 2, MONITOR R-0 then G9000"/>
+		<info name="alt_title" value="ギャラクシアン"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="58391">
+				<rom name="galaxian.cas" size="58391" crc="fcc4fa9c" sha1="cef6d2fc21b3fa042950655fc133a34a50dc5fa8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="grobda" supported="partial">
 		<description>Grobda</description>
 		<year>198?</year>
@@ -309,17 +365,18 @@ Unsupported [tape] saving, other chapters requires an user tape
 		</part>
 	</software>
 
-	<software name="hisya" supported="partial">
-		<description>Hisya</description>
-		<year>198?</year>
-		<publisher>Carry Lab</publisher>
+	<software name="hisha" supported="partial">
+		<description>Hisha</description>
+		<year>1985?</year>
+		<publisher>キャリーラボ (Carry Lab)</publisher>
 		<notes><![CDATA[
 Optional [tape] saving and loading
 ]]></notes>
 		<info name="usage" value="Mode 5, Page 1, BASIC" />
+		<info name="alt_title" value="飛車"/>
 		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="30124">
-				<rom name="hisya.cas" size="30124" crc="c3d88ac6" sha1="c6a857cf88f1205b4dfff00e063739752992a7fc"/>
+				<rom name="hisha.cas" size="30124" crc="c3d88ac6" sha1="c6a857cf88f1205b4dfff00e063739752992a7fc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -361,7 +418,7 @@ Prompts for a [tape] save at startup
 	<software name="hydlide" supported="no">
 		<description>Hydlide</description>
 		<year>198?</year>
-		<publisher>T&amp;E Soft</publisher>
+		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
 		<notes><![CDATA[
 Unsupported [tape] save
 ]]></notes>
@@ -387,11 +444,162 @@ Unsupported [tape] save
 		</part>
 	</software>
 
+	<software name="jelda" supported="partial">
+		<description>Jelda</description>
+		<year>1984</year>
+		<publisher>キャリーラボ (Carry Lab)</publisher>
+		<info name="usage" value="Mode 5, Page 3, BASIC"/>
+		<info name="alt_title" value="ジェルダ"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="25238">
+				<rom name="jelda.cas" size="25238" crc="33be8325" sha1="b728124d4fe6bf6d821160b021b760777e7582c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="karuizaw" supported="no">
+		<description>Karuizawa Yuukai Annai</description>
+		<year>198?</year>
+		<publisher>エニックス (Enix)</publisher>
+		<notes><![CDATA[
+Eventually requires [tape] loading and saving
+Not extensively tested (language barrier)
+]]></notes>
+		<info name="usage" value="Mode 5, Page 2, BASIC"/>
+		<info name="alt_title" value="軽井沢誘拐案内"/>
+		<!-- TODO: are these two tapes? -->
+		<part name="snap1" interface="pc6001_snap">
+			<feature name="part_id" value="Side A - Ch. 1"/>
+			<dataarea name="snap" size="23080">
+				<rom name="karuizawa yuukai annai (side a - ch. 1).cas" size="23080" crc="09cdd251" sha1="1e861c60b41e337f59778fdf60f871b1c39413b4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap2" interface="pc6001_snap">
+			<feature name="part_id" value="Side B - Ch. 2+3"/>
+			<dataarea name="snap" size="44016">
+				<rom name="karuizawa yuukai annai (side b - ch. 2+3).cas" size="44016" crc="33c06466" sha1="9c291edeed04c538462331853ce6edf39f5b6575" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap3" interface="pc6001_snap">
+			<feature name="part_id" value="Side B2 - Ch. 3"/>
+			<dataarea name="snap" size="8580">
+				<rom name="karuizawa yuukai annai (side b2 - ch. 3).cas" size="8580" crc="2c765117" sha1="433237251bae874a874dd71a6a978c2025351c12" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap4" interface="pc6001_snap">
+			<feature name="part_id" value="Side C - Ch. 4"/>
+			<dataarea name="snap" size="34566">
+				<rom name="karuizawa yuukai annai (side c - ch. 4).cas" size="34566" crc="d66eadfd" sha1="cc72b3e268d2a205d28c8c05b5dc78448bbcb727" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap5" interface="pc6001_snap">
+			<feature name="part_id" value="Side D - Ch. 5+6"/>
+			<dataarea name="snap" size="77599">
+				<rom name="karuizawa yuukai annai (side d - ch. 5+6).cas" size="77599" crc="decd51bd" sha1="074ba981798ff351d3ea42d001a5737c1aaca09b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap6" interface="pc6001_snap">
+			<feature name="part_id" value="Side D2 - Ch. 6"/>
+			<dataarea name="snap" size="39497">
+				<rom name="karuizawa yuukai annai (side d2 - ch. 6).cas" size="39497" crc="9c1ccc52" sha1="18b2f474539bf270e257e54fcc5cb42110be3cd0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap7" interface="pc6001_snap">
+			<feature name="part_id" value="Side D3 - RPG"/>
+			<dataarea name="snap" size="2500">
+				<rom name="karuizawa yuukai annai (side d3 - rpg).cas" size="2500" crc="82917330" sha1="585b4806bdded5a637bc5727064843d8c2e9d7bd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nausicaa" supported="no">
+		<description>Kaze no Tani no Nausicaä</description>
+		<year>1984</year>
+		<publisher>テクノポリスソフト (Technopolis Soft)</publisher>
+		<notes><![CDATA[
+Loads a non-scene 1 after first playthrough ([tape]? bad dump?)
+]]></notes>
+		<info name="usage" value="Mode 5, Page 1 to load the demo. Mode 5, Page 3 CLOAD&quot;GAME to load the game."/>
+		<info name="developer" value="Me.Her.House"/>
+		<info name="alt_title" value="風の谷のナウシカ"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="57805">
+				<rom name="kaze no tani no nausicaa.p6" size="57805" crc="c3120c49" sha1="a030689b8027e43e189166213a11fd86f8368110" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ledzone" supported="partial">
+		<description>Led Zone (mkII)</description>
+		<year>198?</year>
+		<publisher>T&amp;E Soft</publisher>
+		<info name="usage" value="Mode 5, Page 3, BASIC"/>
+		<info name="developer" value="Keigo Kobayashi"/>
+		<info name="alt_title" value="レッドゾーン"/>
+		<part name="snap" interface="pc6001_snap">
+			<feature name="part_id" value="mkii"/>
+			<dataarea name="snap" size="16559">
+				<rom name="led zone (mkii).cas" size="16559" crc="14a58210" sha1="3a0ad9f38ec7277db534f790c3bc91c496c2b4e9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lizard" supported="no">
+		<description>Lizard</description>
+		<year>1984</year>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
+		<notes><![CDATA[
+Eventually requires [tape] user load and save
+]]></notes>
+		<info name="usage" value="Mode 5, Page 2, BASIC"/>
+		<info name="alt_title" value="リザード"/>
+		<info name="author" value="Chihiro.F"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="40671">
+				<rom name="lizard.cas" size="40671" crc="cb9d2f73" sha1="92bd14d1ced8cb6c20c30b148d80709e367768b0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nanakin" supported="partial">
+		<description>Nana-chan no Kinjirareta Asobi (mkII)</description>
+		<year>198?</year>
+		<publisher>パックスソフトニカ (Pax Softonica)</publisher>
+		<notes><![CDATA[
+[tape] has extra audio track, not hooked up
+]]></notes>
+		<info name="usage" value="Mode 5, Page 3, BASIC"/>
+		<info name="developer" value="Yutaka"/>
+		<info name="alt_title" value="ナナちゃんの禁じられた遊び"/>
+		<part name="snap" interface="pc6001_snap">
+			<feature name="part_id" value="mkii"/>
+			<dataarea name="snap" size="23841">
+				<rom name="nana-chan no kinjirareta asobi (mkii).cas" size="23841" crc="e844d56e" sha1="7dc8ddba2b9cbedb3d6023ce6b2bf50b77103133" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nobunaga" supported="no">
+		<description>Nobunaga no Yabou</description>
+		<year>198?</year>
+		<publisher>光栄 (Koei)</publisher>
+		<notes><![CDATA[
+Eventually requires [tape] user load and save
+]]></notes>
+		<info name="usage" value="Mode 5, Page 2, BASIC"/>
+		<info name="alt_title" value="信長の野望"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="56435">
+				<rom name="nobunaga no yabou.cas" size="56435" crc="631ab2ab" sha1="c23176b401af93e4dae851a2cab52427c1cda325" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Original fanfun in pc8001_flop / pc8801_cass -->
 	<software name="nfanfun" supported="partial">
 		<description>New Fan Fun</description>
 		<year>1984</year>
-		<publisher>Enix</publisher>
+		<publisher>エニックス (Enix)</publisher>
 		<notes><![CDATA[
 [psg] sounds very aliased
 ]]></notes>
@@ -450,7 +658,6 @@ Unsupported [tape] save
 		<year>198?</year>
 		<publisher>テクノソフト (Tecno Soft)</publisher>
 		<notes><![CDATA[
-Holding left+shift on [keyboard] pauses game (verify)
 [joystick] works only with directional keys, fire 1 and 2 doesn't accelerate or brake
 ]]></notes>
 		<info name="usage" value="Mode 5, Page 3, BASIC" />
@@ -462,13 +669,23 @@ Holding left+shift on [keyboard] pauses game (verify)
 		</part>
 	</software>
 
-	<software name="punchbal" supported="no">
+	<software name="profmj" supported="partial">
+		<description>Professional Mahjong (v2.1)</description>
+		<year>198?</year>
+		<publisher>シャノアール (Chat Noir)</publisher>
+		<info name="usage" value="Mode 5, Page 2, BASIC"/>
+		<info name="alt_title" value="プロフェッショナル麻雀"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="25940">
+				<rom name="professional mahjong.cas" size="25940" crc="425239ec" sha1="08029af982ddfce8701f50b8e7e1058164bd560d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="punchbal" supported="partial">
 		<description>Punch Ball Mario Bros.</description>
 		<year>1983</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<notes><![CDATA[
-Holding left+shift on [keyboard] pauses game (verify)
-]]></notes>
 		<info name="usage" value="Mode 5, Page 4, MONITOR" />
 		<info name="alt_title" value="パンチボールマリオブラザーズ"/>
 		<part name="snap" interface="pc6001_snap">
@@ -494,6 +711,199 @@ Not extensively tested (language barrier)
 		</part>
 	</software>
 
+	<software name="sorekuru" supported="partial">
+		<description>Soreyuke! Kurukuru</description>
+		<year>1984</year>
+		<publisher>パックスソフトニカ (Pax Softonica)</publisher>
+		<info name="usage" value="Mode 5, Page 3, MONITOR R-0 then G8800"/>
+		<info name="developer" value="T. Hotaka"/>
+		<info name="alt_title" value="それゆけ! くるくる"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="76076">
+				<rom name="soreyuke kurukuru.p6" size="76076" crc="4255facf" sha1="6d42c0c2406b4ee8a84f29044e98ca442c795d69" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- "for PC-6001mkII/SR" -->
+	<software name="sharrier" supported="no">
+		<description>Space Harrier</description>
+		<year>1986</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<notes><![CDATA[
+Sensitive with [sub] irq triggers
+[keyboard] joy triggers doesn't work properly (select F1 after loading), cannot move down
+Doesn't work on vanilla pc6001, btanb
+]]></notes>
+		<info name="usage" value="Mode 2, Page 2"/>
+		<info name="developer" value="T. Matsushima"/>
+		<info name="developer" value="Yet"/>
+		<info name="alt_title" value="スペースハリアー"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="43681">
+				<rom name="space harrier.cas" size="43681" crc="56319bd8" sha1="15e6ef72b233da81dbba4d096937fc18de6ffca3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mephius" supported="no">
+		<description>Star Arthur Densetsu I: Wakusei Mephius</description>
+		<year>1984?</year>
+		<publisher>T&amp;E Soft</publisher>
+		<notes><![CDATA[
+Not extensively tested (language barrier)
+Eventually requires [tape] load and save
+]]></notes>
+		<info name="usage" value="Mode 5, Page 3, BASIC"/>
+		<info name="alt_title" value="スターアーサー伝説 Ⅰ -惑星メフィウス-"/>
+
+		<part name="snap1" interface="pc6001_snap">
+			<feature name="part_id" value="Tape 1"/>
+			<dataarea name="snap" size="28362">
+				<rom name="legends of star arthur 1 - planet mephius (tape 1).cas" size="28362" crc="53589958" sha1="3df544bab8e2e4a31083161ddb2733be9bd3e8d7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap2" interface="pc6001_snap">
+			<feature name="part_id" value="Tape 2 Side A"/>
+			<dataarea name="snap" size="38417">
+				<rom name="legends of star arthur 1 - planet mephius (tape 2 side a) {m5p3}.cas" size="38417" crc="ba718296" sha1="d6f720295bab57afac5a5a1c0684c341f10be4a4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap3" interface="pc6001_snap">
+			<feature name="part_id" value="Tape 2 Side B"/>
+			<dataarea name="snap" size="8326">
+				<rom name="legends of star arthur 1 - planet mephius (tape 2 side b) {m5p3}.cas" size="8326" crc="4dd24f1c" sha1="654e09eac252f3ba5b5e48fe178ff6218ed66c5d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap4" interface="pc6001_snap">
+			<feature name="part_id" value="Tape 3 Side A"/>
+			<dataarea name="snap" size="34282">
+				<rom name="legends of star arthur 1 - planet mephius (tape 3 side a) {m5p3}.cas" size="34282" crc="c098c637" sha1="1f199c1adca26e309aceabd7b16942f1b1b0b72a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap5" interface="pc6001_snap">
+			<feature name="part_id" value="Tape 3 Side B"/>
+			<dataarea name="snap" size="7079">
+				<rom name="legends of star arthur 1 - planet mephius (tape 3 side b) {m5p3}.cas" size="7079" crc="07284e34" sha1="0436126aa742645dade3d71b5976325894575eaa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ankosei" supported="no">
+		<description>Star Arthur Densetsu II: Ankoku Seiun</description>
+		<year>1984</year>
+		<publisher>T&amp;E Soft</publisher>
+		<notes><![CDATA[
+Not extensively tested (language barrier)
+Eventually requires [tape] load and save
+]]></notes>
+		<info name="usage" value="Mode 5, Page 3, BASIC"/>
+		<info name="alt_title" value="スターアーサー伝説 Ⅱ -暗黒星雲-"/>
+		<part name="snap1" interface="pc6001_snap">
+			<feature name="part_id" value="tape 1"/>
+			<dataarea name="snap" size="83853">
+				<rom name="legends of star arthur 2 - dark nebula (tape 1).cas" size="83853" crc="825da3b3" sha1="17978c8acc7a9bf97097b62f37b2be89194e78cd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap2" interface="pc6001_snap">
+			<feature name="part_id" value="Tape 2 Side A"/>
+			<dataarea name="snap" size="77741">
+				<rom name="legends of star arthur 2 - dark nebula (tape 2 side a) {m5p3}.cas" size="77741" crc="4f084f5a" sha1="3055c272bbebb0da9dc7df447898fbd5b63267ac" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap3" interface="pc6001_snap">
+			<feature name="part_id" value="Tape 2 Side B"/>
+			<dataarea name="snap" size="52374">
+				<rom name="legends of star arthur 2 - dark nebula (tape 2 side b) {m5p3}.cas" size="52374" crc="f48a3fbd" sha1="157e3f6d872531082203b9da6b0e35791d16d96f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap4" interface="pc6001_snap">
+			<feature name="part_id" value="Tape 3 Side A"/>
+			<dataarea name="snap" size="81756">
+				<rom name="legends of star arthur 2 - dark nebula (tape 3 side a) {m5p3}.cas" size="81756" crc="112fda98" sha1="9571923af78f16f415052683caa6acc98832b696" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap5" interface="pc6001_snap">
+			<feature name="part_id" value="Tape 3 Side B"/>
+			<dataarea name="snap" size="54518">
+				<rom name="legends of star arthur 2 - dark nebula (tape 3 side b) {m5p3}.cas" size="54518" crc="2c3149cc" sha1="454b83547e368962017684d69b58c3a8a391b6f5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ter4001" supported="no">
+		<description>Star Arthur Densetsu III: Terra 4001</description>
+		<year>1984?</year>
+		<publisher>T&amp;E Soft</publisher>
+		<notes><![CDATA[
+Not extensively tested (language barrier)
+Eventually requires [tape] load and save
+]]></notes>
+		<info name="usage" value="Mode 5, Page 2, BASIC"/>
+		<info name="alt_title" value="スターアーサー伝説 III -テラ4001-"/>
+		<part name="snap1" interface="pc6001_snap">
+			<feature name="part_id" value="tape 1 side a"/>
+			<dataarea name="snap" size="63417">
+				<rom name="legends of star arthur 3 - terra 4001 (tape 1 side a).cas" size="63417" crc="4d6850ab" sha1="f3ada792697894cede22b6844e9d506edc982d87" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap2" interface="pc6001_snap">
+			<feature name="part_id" value="Tape 1 Side B"/>
+			<dataarea name="snap" size="3014">
+				<rom name="legends of star arthur 3 - terra 4001 (tape 1 side b) {m5p2}.cas" size="3014" crc="e1462597" sha1="1a9bd5027a415c8b155e2c8e7f20b48e8fdcca27" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap3" interface="pc6001_snap">
+			<feature name="part_id" value="Tape 2"/>
+			<dataarea name="snap" size="42400">
+				<rom name="legends of star arthur 3 - terra 4001 (tape 2) {m5p2}.cas" size="42400" crc="d95a2b6d" sha1="106d3bf5be1e90ebd0e0f003604d38e7394cf528" offset="0" />
+			</dataarea>
+		</part>
+		<part name="snap4" interface="pc6001_snap">
+			<feature name="part_id" value="Tape 3"/>
+			<dataarea name="snap" size="41736">
+				<rom name="legends of star arthur 3 - terra 4001 (tape 3) {m5p2}.cas" size="41736" crc="b1fe9d81" sha1="ac3c41246a2274ba64b8b78171c3f67f0dc2cde0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suidokoz" supported="partial">
+		<description>Suidou Kozou</description>
+		<year>1983?</year>
+		<publisher>Hot-B</publisher>
+		<info name="usage" value="Mode 5, Page 3, BASIC"/>
+		<info name="developer" value="Gamu"/>
+		<info name="alt_title" value="水道小僧"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="27110">
+				<rom name="suidou kozou.cas" size="27110" crc="edf9e6ba" sha1="a3226018595b6f3b3e1ad5a260673d91df0a343c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="txevious2" supported="no">
+		<!-- Alternatively known as Tiny Xevious mkII / タイニー ゼビウス マークII on cover art -->
+		<description>Tiny Xevious II</description>
+		<!-- 1984 08. -->
+		<year>1984</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<notes><![CDATA[
+[VDG] swaps gfx mode mid-scanline (text uses a different one)
+Requires multiple space presses to actually start a game
+Doesn't work on vanilla pc6001, btanb
+]]></notes>
+		<info name="usage" value="Mode 2, Page 2, has optional support for Mode 4" />
+		<info name="alt_title" value="タイニーゼビウスII"/>
+		<info name="developer" value="T. Matsushima"/>
+		<!-- <sharedfeat name="requirement" value="pc6001_cart:n60basic"/> -->
+
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="41774">
+				<rom name="tiny xevious 2.cas" size="41774" crc="966c3a54" sha1="b69d633c7fa4b81c6b3113c2118ce1ffc83f050c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tforce" supported="partial">
 		<description>Thunder Force</description>
 		<year>1985</year>
@@ -507,6 +917,22 @@ Not extensively tested (language barrier)
 		</part>
 	</software>
 
+	<software name="tritorn" supported="no">
+		<description>Tritorn</description>
+		<year>198?</year>
+		<publisher>ザインソフト (Sein Soft)</publisher>
+		<notes><![CDATA[
+Eventually requires [tape] load and save
+]]></notes>
+		<info name="usage" value="Mode 5, Page 2, BASIC"/>
+		<info name="alt_title" value="トリトーン"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="45145">
+				<rom name="tritorn.cas" size="45145" crc="82ce5954" sha1="38564e29591c800d2dd92485250af204a4dafdbb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="vegcrash" supported="partial">
 		<description>Vegetable Crash</description>
 		<year>198?</year>
@@ -516,6 +942,23 @@ Not extensively tested (language barrier)
 		<part name="snap" interface="pc6001_snap">
 			<dataarea name="snap" size="11027">
 				<rom name="vegetable crash.cas" size="11027" crc="7a0569d1" sha1="932d219a2eae516d57575511a0bdb2a96bd8fa6d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="victnine" supported="no">
+		<description>Victorious Nine</description>
+		<!-- 19850614 on title screen -->
+		<year>1985</year>
+		<publisher>ニデコム (Nidecom)</publisher>
+		<notes><![CDATA[
+Pitching doesn't trigger from neither [joystick] nor [keyboard]
+]]></notes>
+		<info name="usage" value="Mode 5, Page 1, BASIC"/>
+		<info name="alt_title" value="ビクトリアスナイン"/>
+		<part name="snap" interface="pc6001_snap">
+			<dataarea name="snap" size="53500">
+				<rom name="victorious nine.cas" size="53500" crc="efc7906d" sha1="a80974dd8e1f37d7333f4d0f254e84e5913f1bc3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -546,12 +989,30 @@ Not extensively tested (language barrier)
 		</part>
 	</software>
 
+	<software name="zunou" supported="partial">
+		<description>Zunou 4989 (mkII)</description>
+		<year>1984</year>
+		<publisher>エニックス (Enix)</publisher>
+		<notes><![CDATA[
+Loads twice after hooking up [cassette] deck (verify)
+Optional [tape] load and save for construction mode
+]]></notes>
+		<info name="usage" value="Mode 5, Page 3, MONITOR"/>
+		<info name="developer" value="K. Ohashi"/>
+		<part name="snap" interface="pc6001_snap">
+			<feature name="part_id" value="mkii"/>
+			<dataarea name="snap" size="11810">
+				<rom name="zunou 4989 (mkii).cas" size="11810" crc="e8db6d09" sha1="c53591627f28641333b8e58f7d9f064644658d0a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- !Covermount -->
 
 	<software name="vitalamp" supported="partial">
 		<description>Vital Lamp</description>
 		<year>198?</year>
-		<publisher>MyCom BASIC</publisher>
+		<publisher>Mycom BASIC</publisher>
 		<info name="usage" value="Mode 5, Page 2, BASIC"/>
 		<info name="developer" value="Kazuhisa Honda"/>
 		<part name="snap" interface="pc6001_snap">

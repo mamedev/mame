@@ -4,10 +4,47 @@
 license:CC0-1.0
 
 Mode 5 PC-6001mkII/PC-6601 floppy disks. They autoboot at startup.
+
+Known undumped list:
+- Colony Odyssey II Taiketsu-hen コロニーオデッセイ対決編 PS66-102F
+
 -->
 <softwarelist name="pc6001mk2_flop" description="NEC PC-6001mkII/PC-6601 disk images">
 
 <!-- !Games -->
+
+	<software name="colonody" supported="no">
+		<description>Colony Odyssey Bouken-hen</description>
+		<year>1983</year>
+		<publisher>NEC</publisher>
+		<notes><![CDATA[
+Fails when mounted, requires mods in MSX .dsk identify
+Eventually uses [upd7752] voice
+]]></notes>
+		<info name="alt_title" value="コロニーオデッセイ冒険篇"/>
+
+		<!-- No. 1~3 for this chapter, No. 4~6 for the sequel -->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="No. 1" />
+			<dataarea name="flop" size="163840">
+				<rom name="colony odyssey bouken-hen (6601) (disk 1).dsk" size="163840" crc="457bfc89" sha1="63078643aa88080b96ed6b26d6db705e918b0553"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="No. 2" />
+			<dataarea name="flop" size="163840">
+				<rom name="colony odyssey bouken-hen (6601) (disk 2).dsk" size="163840" crc="75eeb13e" sha1="5e99c5dd94da47864696edf3d29990dc304d89fd"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="No. 3" />
+			<dataarea name="flop" size="163840">
+				<rom name="colony odyssey bouken-hen (6601) (disk 3).dsk" size="163840" crc="f6c1f0b4" sha1="056def87674aee46fe8e41337907e5a4573f522c"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="hudson3" supported="no">
 		<description>Hudson Soft Best Hit Game Pack 3</description>
@@ -34,16 +71,52 @@ pc6601: "d88: Floppy disk has excess of heads for this drive that will be discar
 	<!-- v1.0 known to exist (same with no sound) -->
 	<software name="asalt" supported="yes">
 		<description>Asalt (v1.1, prototype)</description>
-		<year>19??</year>
+		<!-- 2009/06/07 -->
+		<year>2009</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<notes><![CDATA[
 Looks a tech demo (time doesn't run down, has no enemies, has 1 stage)
 ]]></notes>
+		<info name="developer" value="Kaw"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="153008">
 				<rom name="asalt (v1.1).d88" size="153008" crc="5649ace5" sha1="4e972be3d60979d1d6c27fb1dc83b623d8157c8b"/>
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="spcblufz" supported="no">
+		<description>Space Bluster FZ</description>
+		<!-- 2011/03/20 -->
+		<!-- In-game says 1986 (from the original MZ-700 version?) -->
+		<year>2011</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+pc6601: crashes after loading
+]]></notes>
+		<info name="developer" value="Kaw"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="153008">
+				<rom name="space bluster fz.d88" size="153008" crc="69f716e8" sha1="e78f3962cdce1774fb3ccad1092544df926db7a3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcblufzp" cloneof="spcblufz" supported="no">
+		<description>Space Bluster FZ (preview)</description>
+		<year>20??</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+pc6601: crashes after loading
+Crashes if pressing [keyboard] shift (verify, possibly part of the "preview version")
+]]></notes>
+		<info name="developer" value="Kaw"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="153008">
+				<rom name="space bluster fz (preview ver).d88" size="153008" crc="3b302903" sha1="f6f33ccfa292bcf1f4c8d1d83e657497fe6f232d"/>
+			</dataarea>
+		</part>
+	</software>
+
 
 </softwarelist>

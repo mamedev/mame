@@ -2,9 +2,9 @@
 // copyright-holders:Ryan Holtz, David Haywood
 /*****************************************************************************
 
-    SunPlus GCM394-series SoC peripheral emulation (Video)
+    SunPlus GPL162xx-series SoC peripheral emulation (Video)
 
-    This is very similar to spg2xx but with additional features, layers and modes
+    This is very similar to SPG2xx but with additional features, layers and modes
 
 **********************************************************************/
 
@@ -28,10 +28,10 @@ DEFINE_DEVICE_TYPE(GCM394_VIDEO, gcm394_video_device, "gcm394_video", "GeneralPl
 gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
-	m_rowscroll(*this, "^rowscroll"), // FIXME: assumption about surrounding system
-	m_rowzoom(*this, "^rowzoom"), // FIXME: assumption about surrounding system
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_screen(*this, finder_base::DUMMY_TAG),
+	m_rowscroll(*this, "^rowscroll"), // FIXME: assumption about surrounding system
+	m_rowzoom(*this, "^rowzoom"), // FIXME: assumption about surrounding system
 	m_renderer(*this, "renderer"),
 	m_palette(*this, "palette"),
 	m_gfxdecode(*this, "gfxdecode"),
@@ -40,7 +40,11 @@ gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig
 	m_cpuspace(*this, finder_base::DUMMY_TAG, -1),
 	m_cs_space(*this, finder_base::DUMMY_TAG, -1),
 	m_use_legacy_mode(false),
-	m_disallow_resolution_control(false)
+	m_disallow_resolution_control(false),
+	m_has_vga_modes(false),
+	m_has_3d_sprites(false),
+	m_has_gpl162xx_b_features(false),
+	m_has_gpl162xx_b_extended_sprites(false)
 {
 }
 
@@ -321,6 +325,10 @@ void gcm394_base_video_device::device_reset()
 	m_page2_addr_msb = 0;
 	m_page3_addr_lsb = 0;
 	m_page3_addr_msb = 0;
+
+	// start in 320x240 mode
+	if (!m_disallow_resolution_control)
+		m_screen->set_visible_area(0, 320 - 1, 0, 240 - 1);
 }
 
 u32 gcm394_base_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -373,7 +381,7 @@ u32 gcm394_base_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 	//const u16 bgcol = 0x7c1f; // magenta
 //  const u16 bgcol = 0x0000; // black
 	bool highres = false;
-	if (!m_disallow_resolution_control)
+	if ((!m_disallow_resolution_control) && m_has_vga_modes)
 	{
 		if (m_707f & 0x0010)
 		{

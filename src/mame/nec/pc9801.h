@@ -186,6 +186,7 @@ protected:
 	void pit_clock_config(machine_config &config, const XTAL clock);
 
 	void pc9801_common_io(address_map &map) ATTR_COLD;
+	void cbus_overlay_io(address_map &map) ATTR_COLD;
 	void ipl_bank(address_map &map) ATTR_COLD;
 
 	uint8_t pc9801_a0_r(offs_t offset);

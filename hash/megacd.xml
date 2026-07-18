@@ -122,7 +122,7 @@ Dumps that are known to exist, but are lost in the aether:
 | Batman Returns (Prototype)                                  |                                                                   |
 | Cobra Command (Prototype)                                   |                                                                   |
 | Final Fight (Prototype)                                     |                                                                   |
-| Hot Hits - Adventurous New Music Sampler                    | Redump.org dump. http://redump.org/disc/23530/                    |
+| Hot Hits - Adventurous New Music Sampler                    | Redump.org dump. https://redump.info/disc/23530/                    |
 | Hot Hits - Adventurous New Music Sampler                    | TruRip has two dumps. One is probably an alt to the redump dump.  |                                                                  |
 | INXS (Prototype)                                            |                                                                   |
 | Kris Kross (Prototype)                                      |                                                                   |
@@ -170,7 +170,7 @@ data, its properly documented dumps combined with the offset corrected
 nature of the dumps make them one of the best options available. At least
 until the CHD format has been upgraded with some way of appropriating the
 additional data found in other types of dumps.
-See: http://redump.org/
+See: https://redump.info/
 
 One step down the ladder we list the old TOSEC-ISO dumps. Note that this
 is not TruRip dumps, which are currently not handled well by the CHD
@@ -194,7 +194,7 @@ See: http://rawdump.net/
 
 	<!-- This game was only found bundled in a so called "Double Deal"-pack together with Hook. They did not share discs. -->
 	<software name="3ninja">
-		<!-- http://redump.org/disc/22251/
+		<!-- https://redump.info/disc/22251/
 		<rom name="3 Ninjas Kick Back (USA).cue" size="1433" crc="9d4d85ae" />
 		<rom name="3 Ninjas Kick Back (USA) (Track 01).bin" size="78657936" crc="4843082a" />
 		<rom name="3 Ninjas Kick Back (USA) (Track 02).bin" size="28172256" crc="7febf7d6" />
@@ -361,7 +361,7 @@ See: http://rawdump.net/
 	</software>
 
 	<software name="3x3eyes" supported="no">
-		<!-- http://redump.org/disc/10136/
+		<!-- https://redump.info/disc/10136/
 		<rom name="Seima Densetsu 3x3 Eyes (Japan).cue" size="5904" crc="caaaf2ac" />
 		<rom name="Seima Densetsu 3x3 Eyes (Japan) (Track 01).bin" size="310675680" crc="4811e91c" />
 		<rom name="Seima Densetsu 3x3 Eyes (Japan) (Track 02).bin" size="4388832" crc="ea403473" />
@@ -490,7 +490,7 @@ Hangs on BIOS logo
 	</software>
 
 	<software name="aburner3u" cloneof="aburner3">
-		<!-- http://redump.org/disc/21042/
+		<!-- https://redump.info/disc/21042/
 		<rom name="After Burner III (USA).cue" size="1386" crc="c5c57986" md5="a8a8015513c4fa64d7cdd0d9535926c5" sha1="e054d58ac8ecfc28eb66134d16b23ca53ff13542"/>
 		<rom name="After Burner III (USA) (Track 01).bin" size="5367264" crc="b2327ab5" md5="276a8b47a223ff7f118d22675e13686f" sha1="0a917485769f304599897a7e60ee50c5311765c2"/>
 		<rom name="After Burner III (USA) (Track 02).bin" size="12392688" crc="724a725e" md5="3096edf0b4667e385b2a7d0aefced9b8" sha1="58a12475c5f50486be8371b18fed342d5d279777"/>
@@ -543,7 +543,7 @@ Hangs on BIOS logo
 	</software>
 
 	<software name="advbatru" cloneof="advbatr">
-		<!-- http://redump.org/disc/16136/
+		<!-- https://redump.info/disc/16136/
 		<rom name="Adventures of Batman and Robin, The (USA).cue" size="927" crc="28438349" />
 		<rom name="Adventures of Batman and Robin, The (USA) (Track 1).bin" size="161845824" crc="0edec85f" />
 		<rom name="Adventures of Batman and Robin, The (USA) (Track 2).bin" size="30646560" crc="296867f7" />
@@ -624,7 +624,7 @@ Hangs on BIOS logo
 	</software>
 
 	<software name="ah3ts" cloneof="thawk" supported="no">
-		<!-- http://redump.org/disc/3280/
+		<!-- https://redump.info/disc/3280/
 		<rom name="AH3 - ThunderStrike (USA).cue" size="1422" crc="d83f8b35" />
 		<rom name="AH3 - ThunderStrike (USA) (Track 01).bin" size="147500976" crc="6ea8ee5b" />
 		<rom name="AH3 - ThunderStrike (USA) (Track 02).bin" size="38704512" crc="3574a538" />
@@ -1032,7 +1032,7 @@ Hangs on BIOS logo
 	</software>
 
 	<software name="ax101" supported="no">
-		<!-- http://redump.org/disc/22471/
+		<!-- https://redump.info/disc/22471/
 		<rom name="A-X-101 (USA) (RE).cue" size="229" crc="5dd5c2a1" md5="f63325683f0f7b7275c15ae5c1c243ee" sha1="7cb650ee451960270fcd5d975f05bf5f623fda5c"/>
 		<rom name="A-X-101 (USA) (RE) (Track 1).bin" size="623183568" crc="79b56a2b" md5="99ba20207299eef713900a60aea08243" sha1="6c354622c69d9494c216129e0a8fb12fbc24c165"/>
 		<rom name="A-X-101 (USA) (RE) (Track 2).bin" size="7596960" crc="188dd454" md5="81296eadbe6edc9e02530832be07db3f" sha1="69793487a0a9c6948385e55a7f1df95fbe5e0925"/>
@@ -1055,7 +1055,7 @@ Too slow during gameplay
 	</software>
 
 	<software name="ax101j" cloneof="ax101" supported="no">
-		<!-- http://redump.org/disc/1785/
+		<!-- https://redump.info/disc/1785/
 		<rom name="AX-101 (Japan).cue" size="198" crc="6c514d73" />
 		<rom name="AX-101 (Japan) (Track 1).bin" size="615817104" crc="03cbf674" />
 		<rom name="AX-101 (Japan) (Track 2).bin" size="2352000" crc="3fd8d737" />
@@ -1173,7 +1173,7 @@ Too slow during gameplay
 	</software>
 
 	<software name="bariarmj" cloneof="bariarm">
-		<!-- http://redump.org/disc/3118/
+		<!-- https://redump.info/disc/3118/
 		<rom name="Bari-Arm (Japan).cue" size="2091" crc="03cc6d8a" />
 		<rom name="Bari-Arm (Japan) (Track 01).bin" size="16849728" crc="af764474" />
 		<rom name="Bari-Arm (Japan) (Track 02).bin" size="22042944" crc="0b7d7a8e" />
@@ -1274,7 +1274,7 @@ Too slow during gameplay
 	</software>
 
 	<software name="batmanrn" supported="partial">
-		<!-- http://redump.org/disc/8168/
+		<!-- https://redump.info/disc/8168/
 		<rom name="Batman Returns (Europe).cue" size="2460" crc="422f5580" />
 		<rom name="Batman Returns (Europe) (Track 01).bin" size="20363616" crc="58e9e43b" />
 		<rom name="Batman Returns (Europe) (Track 02).bin" size="1176000" crc="b2b1400e" />
@@ -1315,7 +1315,7 @@ Batman driving the car is omitted in pre-Act 1 cutscene, following scene sports 
 	</software>
 
 	<software name="batmanrna" cloneof="batmanrn" supported="partial">
-		<!-- http://redump.org/disc/17556/
+		<!-- https://redump.info/disc/17556/
 		<rom name="Batman Returns (Europe) (Alt).cue" size="2586" crc="c6efd142" />
 		<rom name="Batman Returns (Europe) (Alt) (Track 01).bin" size="20363616" crc="58e9e43b" />
 		<rom name="Batman Returns (Europe) (Alt) (Track 02).bin" size="1176000" crc="b2b1400e" />
@@ -1356,7 +1356,7 @@ Same as parent
 	</software>
 
 	<software name="batmanrnu" cloneof="batmanrn" supported="partial">
-		<!-- http://redump.org/disc/21447/
+		<!-- https://redump.info/disc/21447/
 		<rom name="Batman Returns (USA).cue" size="2420" crc="5c5d239a" md5="c2acb5a8054c65a1874f0bb8d64b6627" sha1="03f590d80c03e79ce86a55b786855aebf14fe138"/>
 		<rom name="Batman Returns (USA) (Track 01).bin" size="20363616" crc="2130f186" md5="41717d4e849f86eced7eb79200468507" sha1="018ed3b942f09e813131ca6c755834e58696f0d3"/>
 		<rom name="Batman Returns (USA) (Track 02).bin" size="1164240" crc="c5a8bb58" md5="280456694d18b3272bf64175c579a035" sha1="106ed878bc7545aaa11d93da4f0c0e69556ca5db"/>
@@ -1398,7 +1398,7 @@ Same as parent
 	</software>
 
 	<software name="bcracers">
-		<!-- http://redump.org/disc/17594/
+		<!-- https://redump.info/disc/17594/
 		<rom name="BC Racers (Europe) (En,Fr,De).cue" size="1543" crc="14b3266f" />
 		<rom name="BC Racers (Europe) (En,Fr,De) (Track 01).bin" size="90215664" crc="7a4e52d3" />
 		<rom name="BC Racers (Europe) (En,Fr,De) (Track 02).bin" size="24009216" crc="bf82dd68" />
@@ -1485,7 +1485,7 @@ Same as parent
 	</software>
 
 	<software name="beast2" supported="partial">
-		<!-- http://redump.org/disc/3793/
+		<!-- https://redump.info/disc/3793/
 		<rom name="Shadow of the Beast II (Europe).cue" size="1872" crc="ae5d5ef4" />
 		<rom name="Shadow of the Beast II (Europe) (Track 01).bin" size="24051552" crc="7e722ab6" />
 		<rom name="Shadow of the Beast II (Europe) (Track 02).bin" size="164767008" crc="6fb389bc" />
@@ -1519,7 +1519,7 @@ Minor [VDP] backdrop and HP indicator flickering for split frames
 	</software>
 
 	<software name="beast2j" cloneof="beast2" supported="partial">
-		<!-- http://redump.org/disc/3117/
+		<!-- https://redump.info/disc/3117/
 		<rom name="Shadow of the Beast II - Juushin no Jubaku (Japan).cue" size="2012" crc="6b67e248" />
 		<rom name="Shadow of the Beast II - Juushin no Jubaku (Japan) (Track 01).bin" size="29976240" crc="0330e73d" />
 		<rom name="Shadow of the Beast II - Juushin no Jubaku (Japan) (Track 02).bin" size="230380752" crc="5b36b378" />
@@ -1608,7 +1608,7 @@ Minor [VDP] backdrop and HP indicator flickering for split frames
 	</software>
 
 	<software name="billwlshu" cloneof="billwlsh">
-		<!-- http://redump.org/disc/5974/
+		<!-- https://redump.info/disc/5974/
 		<rom name="Bill Walsh College Football (USA).cue" size="1708" crc="8999068f" />
 		<rom name="Bill Walsh College Football (USA) (Track 01).bin" size="103480944" crc="b976c0a1" />
 		<rom name="Bill Walsh College Football (USA) (Track 02).bin" size="21137424" crc="4e10e010" />
@@ -1641,7 +1641,7 @@ Minor [VDP] backdrop and HP indicator flickering for split frames
 	</software>
 
 	<software name="blackh">
-		<!-- http://redump.org/disc/17549/
+		<!-- https://redump.info/disc/17549/
 		<rom name="Blackhole Assault (Europe).cue" size="2765" crc="6921259f" />
 		<rom name="Blackhole Assault (Europe) (Track 01).bin" size="13855632" crc="9cdf503d" />
 		<rom name="Blackhole Assault (Europe) (Track 02).bin" size="15090432" crc="8bbabdb6" />
@@ -1681,7 +1681,7 @@ Minor [VDP] backdrop and HP indicator flickering for split frames
 	</software>
 
 	<software name="blackhu" cloneof="blackh">
-		<!-- http://redump.org/disc/21449/
+		<!-- https://redump.info/disc/21449/
 		<rom name="Blackhole Assault (USA).cue" size="2259" crc="c3d6a886" md5="e79d9728b736bbd2a0fc0614d1eb9e93" sha1="b5e11b0fddf9d6d98496cb3f0426a1ada72c4f69"/>
 		<rom name="Blackhole Assault (USA) (Track 01).bin" size="13857984" crc="e311d117" md5="2b3d92c12c7c4dee8155a4ee0c020fa4" sha1="6adad838067910c31d7f2b8a6bcc88285cbf194d"/>
 		<rom name="Blackhole Assault (USA) (Track 02).bin" size="15440880" crc="186016f0" md5="1dbca6d2a1781f09f28b12e7ad756f64" sha1="a136a50b25a41f7935bda491a7fd211bce522331"/>
@@ -1890,7 +1890,7 @@ Minor [VDP] backdrop and HP indicator flickering for split frames
 	</software>
 
 	<software name="bouncers" supported="no">
-		<!-- http://redump.org/disc/28028/
+		<!-- https://redump.info/disc/28028/
 		<rom name="Bouncers (USA).cue" size="954" crc="bca37abb" md5="1cb86ee3ddcc8999d32bb181d0981098" sha1="5292fcb4cfb13cca0111c7c6c95e2a2e5e8affce"/>
 		<rom name="Bouncers (USA) (Track 1).bin" size="238344624" crc="c89a9298" md5="c0ec4fd23f12188cafef26f6158d7937" sha1="f4bca7e9a8e3383f5e2cf69bfb379867a521750c"/>
 		<rom name="Bouncers (USA) (Track 2).bin" size="27113856" crc="c07e3bf5" md5="810349ffe4fd11d62f2f68de27e5303d" sha1="fdde5952c844dcd1b571912a9fc318baadb818ed"/>
@@ -1951,7 +1951,7 @@ Major [VDP] corruption during gameplay
 	</software>
 
 	<software name="brutalu" cloneof="brutal">
-		<!-- Source: redump.org - http://redump.org/disc/17252/
+		<!-- Source: redump.org - https://redump.info/disc/17252/
 		<rom name="Brutal - Paws of Fury (USA).cue" size="1812" crc="0af87d0c" />
 		<rom name="Brutal - Paws of Fury (USA) (Track 01).bin" size="91318752" crc="3861b809" />
 		<rom name="Brutal - Paws of Fury (USA) (Track 02).bin" size="24319680" crc="a6c937ca" />
@@ -1984,7 +1984,7 @@ Major [VDP] corruption during gameplay
 	</software>
 
 	<software name="btlcorps">
-		<!-- http://redump.org/disc/1628/
+		<!-- https://redump.info/disc/1628/
 		<rom name="Battlecorps (Europe) (En,Fr,De,Es).cue" size="5328" crc="7ab115a4" />
 		<rom name="Battlecorps (Europe) (En,Fr,De,Es) (Track 01).bin" size="85071840" crc="492d88ed" />
 		<rom name="Battlecorps (Europe) (En,Fr,De,Es) (Track 02).bin" size="2065056" crc="2bf15a13" />
@@ -2156,7 +2156,7 @@ Major [VDP] corruption during gameplay
 	</software>
 
 	<software name="btlcorpsu" cloneof="btlcorps">
-		<!-- Source: redump.org - http://redump.org/disc/5659/
+		<!-- Source: redump.org - https://redump.info/disc/5659/
 		<rom name="Battlecorps (USA).cue" size="5582" crc="cd568957" />
 		<rom name="Battlecorps (USA) (Track 01).bin" size="85114176" crc="2053ce31" />
 		<rom name="Battlecorps (USA) (Track 02).bin" size="1709904" crc="dd996179" />
@@ -2272,7 +2272,7 @@ Major [VDP] corruption during gameplay
 	</software>
 
 	<software name="burai">
-		<!-- http://redump.org/disc/1633/
+		<!-- https://redump.info/disc/1633/
 		<rom name="Burai - Hachigyoku no Yuushi Densetsu (Japan).cue" size="5862" crc="fe440e0c" />
 		<rom name="Burai - Hachigyoku no Yuushi Densetsu (Japan) (Track 01).bin" size="72425136" crc="ebe7837f" />
 		<rom name="Burai - Hachigyoku no Yuushi Densetsu (Japan) (Track 02).bin" size="6428016" crc="04532d6f" />
@@ -2368,7 +2368,7 @@ Major [VDP] corruption during gameplay
 	</software>
 
 	<software name="cfstory">
-		<!-- http://redump.org/disc/1991/
+		<!-- https://redump.info/disc/1991/
 		<rom name="Cosmic Fantasy Stories (Japan).cue" size="7232" crc="0b68973f" />
 		<rom name="Cosmic Fantasy Stories (Japan) (Track 01).bin" size="54244176" crc="eef94b45" />
 		<rom name="Cosmic Fantasy Stories (Japan) (Track 02).bin" size="1100736" crc="dde11567" />
@@ -2496,7 +2496,7 @@ Essentially requires [SRAM cart] for saving (124 blocks)
 	</software>
 
 	<software name="chuckrcku" cloneof="chuckrck">
-		<!-- http://redump.org/disc/35935/
+		<!-- https://redump.info/disc/35935/
 		<rom name="Chuck Rock (USA).cue" size="1226" crc="f11658ee" md5="6e52c090a24ab08cedb102e245a472e4" sha1="ad0ec7226674c3fd858bcf65565d94a5367faeff"/>
 		<rom name="Chuck Rock (USA) (Track 01).bin" size="12625536" crc="a2d666a8" md5="cd8aaeff0b7cb1de361c4c39d425763f" sha1="f0fc8bba5f404d0984f52a652dc9d541e0f20afa"/>
 		<rom name="Chuck Rock (USA) (Track 02).bin" size="42394800" crc="fd3e065d" md5="07cc7748add810f84e603345e8b1f56c" sha1="8390d77d5efe0f59f10fd7beabe32aa6b5c77326"/>
@@ -2554,7 +2554,7 @@ Essentially requires [SRAM cart] for saving (124 blocks)
 	</software>
 
 	<software name="chukrck2u" cloneof="chukrck2">
-		<!-- Source: redump.org - http://redump.org/disc/28625/
+		<!-- Source: redump.org - https://redump.info/disc/28625/
 		<rom name="Chuck Rock II - Son of Chuck (USA).cue" size="1682" crc="40f47b1f" md5="1da9d4b222d32a144928a735bb5c5a22" sha1="84bc3e091ea44a14d9cd4c07f3b9fbfed6f355f3"/>
 		<rom name="Chuck Rock II - Son of Chuck (USA) (Track 01).bin" size="75997824" crc="fad79bda" md5="f212456d0c005ebf9c590538102dc7cc" sha1="96ef30802fb3feafa9d03c5f7e513cbd7b98f639"/>
 		<rom name="Chuck Rock II - Son of Chuck (USA) (Track 02).bin" size="42091392" crc="e7760973" md5="f41c4128f9ca879d05d0bbe95e97f0c3" sha1="7fe9addcf000a3aaa238470c4df6f7f1ccda9f6d"/>
@@ -2608,7 +2608,7 @@ Stuck glitchy [VDP] tiles during FMVs in gameplay
 	</software>
 
 	<software name="cliffh">
-		<!-- http://redump.org/disc/543/
+		<!-- https://redump.info/disc/543/
 		<rom name="Cliffhanger (USA).cue" size="759" crc="9f971071" />
 		<rom name="Cliffhanger (USA) (Track 1).bin" size="187101600" crc="2926e7e8" />
 		<rom name="Cliffhanger (USA) (Track 2).bin" size="41329344" crc="d8e4d584" />
@@ -2633,7 +2633,7 @@ Stuck glitchy [VDP] tiles during FMVs in gameplay
 	</software>
 
 	<software name="cobra">
-		<!-- http://redump.org/disc/16094/
+		<!-- https://redump.info/disc/16094/
 		<rom name="Space Adventure, The - Cobra - The Legendary Bandit (Europe).cue" size="683" crc="8e777dbe" />
 		<rom name="Space Adventure, The - Cobra - The Legendary Bandit (Europe) (Track 1).bin" size="175946064" crc="eb23f34d" />
 		<rom name="Space Adventure, The - Cobra - The Legendary Bandit (Europe) (Track 2).bin" size="35987952" crc="3e1cef71" />
@@ -2674,7 +2674,7 @@ Stuck glitchy [VDP] tiles during FMVs in gameplay
 	</software>
 
 	<software name="cobracom" supported="no">
-		<!-- http://redump.org/disc/4099/
+		<!-- https://redump.info/disc/4099/
 		<rom name="Cobra Command (Europe).cue" size="214" crc="e9a17dc7" />
 		<rom name="Cobra Command (Europe) (Track 1).bin" size="256344480" crc="4b176df2" />
 		<rom name="Cobra Command (Europe) (Track 2).bin" size="1651104" crc="fd9c4ef7" />
@@ -2741,7 +2741,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 	</software>
 
 	<software name="cobracomu" cloneof="cobracom" supported="no">
-		<!-- http://redump.org/disc/3883/
+		<!-- https://redump.info/disc/3883/
 		<rom name="Cobra Command (USA).cue" size="208" crc="2ffd0c2c" />
 		<rom name="Cobra Command (USA) (Track 1).bin" size="256344480" crc="a2093c3c" />
 		<rom name="Cobra Command (USA) (Track 2).bin" size="2003904" crc="17d0d5ec" />
@@ -2858,7 +2858,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 	</software>
 
 	<software name="comptons201r" cloneof="comptons">
-		<!-- Source: redump.org - http://redump.org/disc/20214/
+		<!-- Source: redump.org - https://redump.info/disc/20214/
 		<rom name="Compton's Interactive Encyclopedia (USA) (2.01R).cue" size="289" crc="6fc690d9" md5="97a41ab3899c5911900d2bb6d1c95bf0" sha1="679e29f743ab4b02181f5adcfc5d9abf0b432e3d"/>
 		<rom name="Compton's Interactive Encyclopedia (USA) (2.01R) (Track 1).bin" size="380264304" crc="1d9b11c8" md5="1e181c4677a7dd9160f4559c5037a698" sha1="e7e839dbdaf68cf043dc322b4024dcd684218e85"/>
 		<rom name="Compton's Interactive Encyclopedia (USA) (2.01R) (Track 2).bin" size="2763600" crc="105280f9" md5="894dcb8c77145d9a8bf81c35bc87a35b" sha1="5276761377b221fa19aad1536dc26600649ab2db"/>
@@ -2896,7 +2896,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 	</software>
 
 	<software name="corpse" supported="no">
-		<!-- http://redump.org/disc/16156/
+		<!-- https://redump.info/disc/16156/
 		<rom name="Corpse Killer (Europe).cue" size="214" crc="a144d63b" />
 		<rom name="Corpse Killer (Europe) (Track 1).bin" size="626234112" crc="60cf5a65" />
 		<rom name="Corpse Killer (Europe) (Track 2).bin" size="1848672" crc="4b7fba78" />
@@ -2919,7 +2919,7 @@ Optional [Menacer] or [Justifier] support
 	</software>
 
 	<software name="corpse32" cloneof="corpse" supported="no">
-		<!-- http://redump.org/disc/2965/
+		<!-- https://redump.info/disc/2965/
 		<rom name="Corpse Killer (USA) (32X).cue" size="220" crc="5d439045" />
 		<rom name="Corpse Killer (USA) (32X) (Track 1).bin" size="624898176" crc="acd1f057" />
 		<rom name="Corpse Killer (USA) (32X) (Track 2).bin" size="1848672" crc="d6a1b2d3" />
@@ -3011,7 +3011,7 @@ Optional [Menacer] or [Justifier] support
 	</software>
 
 	<software name="cyborg9" supported="partial">
-		<!-- http://redump.org/disc/3143/
+		<!-- https://redump.info/disc/3143/
 		<rom name="Cyborg 009 (Japan).cue" size="3711" crc="35f389fe" />
 		<rom name="Cyborg 009 (Japan) (Track 01).bin" size="15694896" crc="4fc4da73" />
 		<rom name="Cyborg 009 (Japan) (Track 02).bin" size="16085328" crc="f6269638" />
@@ -3094,7 +3094,7 @@ Essentially requires [SRAM cart] for saving (120 blocks)
 	</software>
 
 	<software name="darkwiz">
-		<!-- http://redump.org/disc/6136/
+		<!-- https://redump.info/disc/6136/
 		<rom name="Dark Wizard (USA).cue" size="1326" crc="558ec74e" />
 		<rom name="Dark Wizard (USA) (Track 01).bin" size="415882992" crc="b0c3c6ba" />
 		<rom name="Dark Wizard (USA) (Track 02).bin" size="15443232" crc="0c8671c8" />
@@ -3191,7 +3191,7 @@ Essentially requires [SRAM cart] for saving (120 blocks)
 	</software>
 
 	<software name="dblswtchu" cloneof="dblswtch">
-		<!-- http://redump.org/disc/5571/
+		<!-- https://redump.info/disc/5571/
 		<rom name="Double Switch (USA).cue" size="208" crc="fcbaefb5" />
 		<rom name="Double Switch (USA) (Track 1).bin" size="632944368" crc="c9011b75" />
 		<rom name="Double Switch (USA) (Track 2).bin" size="1881600" crc="59e2ce56" />
@@ -3263,7 +3263,7 @@ Essentially requires [SRAM cart] for saving (125 blocks)
 	</software>
 
 	<software name="dennin" cloneof="roboales">
-		<!-- http://redump.org/disc/1634/
+		<!-- https://redump.info/disc/1634/
 		<rom name="Dennin Aleste - Nobunaga and His Ninja Force (Japan).cue" size="3657" crc="d1585b2f" />
 		<rom name="Dennin Aleste - Nobunaga and His Ninja Force (Japan) (Track 01).bin" size="15005760" crc="2bba56f5" />
 		<rom name="Dennin Aleste - Nobunaga and His Ninja Force (Japan) (Track 02).bin" size="1110144" crc="8fa35b51" />
@@ -3307,7 +3307,7 @@ Essentially requires [SRAM cart] for saving (125 blocks)
 	</software>
 
 	<software name="detonatr" supported="partial">
-		<!-- http://redump.org/disc/10137/
+		<!-- https://redump.info/disc/10137/
 		<rom name="Detonator Orgun (Japan).cue" size="1280" crc="80377bef" />
 		<rom name="Detonator Orgun (Japan) (Track 01).bin" size="48540576" crc="0856b08f" />
 		<rom name="Detonator Orgun (Japan) (Track 02).bin" size="1178352" crc="781663e0" />
@@ -3340,7 +3340,7 @@ Optional [SRAM cart] for saving, select 2 at startup.
 	</software>
 
 	<software name="devastat" supported="no">
-		<!-- http://redump.org/disc/3158/
+		<!-- https://redump.info/disc/3158/
 		<rom name="Devastator (Japan).cue" size="1225" crc="40c82789" />
 		<rom name="Devastator (Japan) (Track 01).bin" size="189074928" crc="55438f4a" />
 		<rom name="Devastator (Japan) (Track 02).bin" size="2272032" crc="1932fbab" />
@@ -3427,7 +3427,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 	</software>
 
 	<software name="dlairj" cloneof="dlair">
-		<!-- http://redump.org/disc/544/
+		<!-- https://redump.info/disc/544/
 		<rom name="Dragon's Lair (Japan) (En,Ja,Fr,De,It).cue" size="246" crc="1191378b" />
 		<rom name="Dragon's Lair (Japan) (En,Ja,Fr,De,It) (Track 1).bin" size="607935552" crc="280750dd" />
 		<rom name="Dragon's Lair (Japan) (En,Ja,Fr,De,It) (Track 2).bin" size="1521744" crc="60eade1a" />
@@ -3448,7 +3448,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 	</software>
 
 	<software name="dlairu" cloneof="dlair">
-		<!-- http://redump.org/disc/21036/
+		<!-- https://redump.info/disc/21036/
 		<rom name="Dragon's Lair (USA).cue" size="231" crc="345db17e" md5="fc6912bc8cf6467d73954340d0b6a637" sha1="213486ddcac93e45c1dbd8c38d28ffef980215c7"/>
 		<rom name="Dragon's Lair (USA) (Track 1).bin" size="210654528" crc="bf94a570" md5="fded2eb7509bd5e725fa49e71941ddef" sha1="acb107707824dbf4df93976bc3fb8fe915ec914b"/>
 		<rom name="Dragon's Lair (USA) (Track 2).bin" size="1524096" crc="d86d92d0" md5="ced8575ec23b7771e38b519dd87ea165" sha1="6088202d33d94614ca277bec0726a0a86d0ae030"/>
@@ -3567,7 +3567,7 @@ Black screen at startup if mouse connected to -ctrl2
 	</software>
 
 	<software name="dracula">
-		<!-- http://redump.org/disc/29309/
+		<!-- https://redump.info/disc/29309/
 		<rom name="Bram Stoker's Dracula (USA) (Rev A).cue" size="975" crc="219c0525" md5="3dae6cc30ccf1d728dba4d5f8bb8d34c" sha1="7d1e1e09394c01629a7f0a04da4cef735ed280ed"/>
 		<rom name="Bram Stoker's Dracula (USA) (Rev A) (Track 1).bin" size="275525040" crc="60ce4ef0" md5="9bf11502375d74e17f5b835278d99256" sha1="fed388b738f273b56b7f4f2569d5e951079be2bd"/>
 		<rom name="Bram Stoker's Dracula (USA) (Rev A) (Track 2).bin" size="42627648" crc="0c71c862" md5="a32bd9d6b087384ee90daf7b5ba599f2" sha1="cb718a048eec0d38e092a2b23c5327f7fb64c0bc"/>
@@ -3592,7 +3592,7 @@ Black screen at startup if mouse connected to -ctrl2
 	</software>
 
 	<software name="draculaa" cloneof="dracula">
-		<!-- http://redump.org/disc/3882/
+		<!-- https://redump.info/disc/3882/
 		<rom name="Bram Stoker's Dracula (USA).cue" size="829" crc="dc1f4075" />
 		<rom name="Bram Stoker's Dracula (USA) (Track 1).bin" size="275525040" crc="9fae63c4" />
 		<rom name="Bram Stoker's Dracula (USA) (Track 2).bin" size="41886768" crc="d1220cb9" />
@@ -3617,7 +3617,7 @@ Black screen at startup if mouse connected to -ctrl2
 	</software>
 
 	<software name="draculab" cloneof="dracula">
-		<!-- http://redump.org/disc/17156/
+		<!-- https://redump.info/disc/17156/
 		<rom name="Bram Stoker's Dracula (USA) (Alt).cue" size="871" crc="55aea57f" />
 		<rom name="Bram Stoker's Dracula (USA) (Alt) (Track 1).bin" size="275525040" crc="9fae63c4" />
 		<rom name="Bram Stoker's Dracula (USA) (Alt) (Track 2).bin" size="41884416" crc="fa4b8424" />
@@ -3642,8 +3642,8 @@ Black screen at startup if mouse connected to -ctrl2
 	</software>
 
 	<software name="dracunl" supported="no">
-		<!-- http://redump.org/disc/16084/
-		     http://redump.org/disc/16085/
+		<!-- https://redump.info/disc/16084/
+		     https://redump.info/disc/16085/
 		<rom name="Dracula Unleashed (Europe) (Disc 1).cue" size="240" crc="b99128f2" />
 		<rom name="Dracula Unleashed (Europe) (Disc 1) (Track 1).bin" size="544372752" crc="87dcea57" />
 		<rom name="Dracula Unleashed (Europe) (Disc 1) (Track 2).bin" size="12171600" crc="0d2a5673" />
@@ -3677,8 +3677,8 @@ Requires [disc swap]
 	</software>
 
 	<software name="dracunlu" cloneof="dracunl" supported="no">
-		<!-- http://redump.org/disc/21040/
-		     http://redump.org/disc/21041/
+		<!-- https://redump.info/disc/21040/
+		     https://redump.info/disc/21041/
 		<rom name="Dracula Unleashed (USA) (Disc 1).cue" size="257" crc="93ade26e" md5="fa725eb12ee7eb683144986261c33bf1" sha1="fdb6ad28c7fc21f99e35684502bcd32dfc1abb1b"/>
 		<rom name="Dracula Unleashed (USA) (Disc 1) (Track 1).bin" size="544372752" crc="0e728a6c" md5="282a9be8157a6167a389c7fff475ed3a" sha1="927b6d0525010265059ab1ee4d23c6a0598b7fb8"/>
 		<rom name="Dracula Unleashed (USA) (Disc 1) (Track 2).bin" size="10936800" crc="d786ed68" md5="67e2198ef6dc4c6c234ef791ee13bc8a" sha1="ea3b156235b3554b5d522054f83c811a3fc3188e"/>
@@ -3712,7 +3712,7 @@ Requires [disc swap]
 	</software>
 
 	<software name="dune">
-		<!-- http://redump.org/disc/15065/
+		<!-- https://redump.info/disc/15065/
 		<rom name="Dune (Europe) (En,Fr,De,Es,It,Ar).cue" size="236" crc="a71c7827" />
 		<rom name="Dune (Europe) (En,Fr,De,Es,It,Ar) (Track 1).bin" size="541369248" crc="3bff9924" />
 		<rom name="Dune (Europe) (En,Fr,De,Es,It,Ar) (Track 2).bin" size="1735776" crc="7e6caa2b" />
@@ -3779,7 +3779,7 @@ Requires [disc swap]
 	</software>
 
 	<software name="dungexplu" cloneof="dungexpl">
-		<!-- http://redump.org/disc/31817/
+		<!-- https://redump.info/disc/31817/
 		<rom name="Dungeon Explorer (USA).cue" size="1503" crc="7a681bba" md5="93b8fbc288447e4be4b93dcbb2ed1b4a" sha1="9cc6e6ee394496295eb111ca3118a5d24e18ba8a"/>
 		<rom name="Dungeon Explorer (USA) (Track 01).bin" size="5040336" crc="a6ad97e9" md5="340cb44b351a60f904d387c34af085cc" sha1="6254f8f20f82071c712d616d99bacdf9ccc8ff18"/>
 		<rom name="Dungeon Explorer (USA) (Track 02).bin" size="54020736" crc="a46c0f46" md5="028009274d66ba3b951c3c09504161af" sha1="df66426b63de46be9740e472610daf67e194d2eb"/>
@@ -3809,7 +3809,7 @@ Requires [disc swap]
 	</software>
 
 	<software name="dynamicc">
-		<!-- http://redump.org/disc/1956/
+		<!-- https://redump.info/disc/1956/
 		<rom name="Dynamic Country Club (Japan).cue" size="1581" crc="82b9b757" />
 		<rom name="Dynamic Country Club (Japan) (Track 01).bin" size="13556928" crc="aecc9427" />
 		<rom name="Dynamic Country Club (Japan) (Track 02).bin" size="29094240" crc="33ee0730" />
@@ -3841,7 +3841,7 @@ Requires [disc swap]
 	</software>
 
 	<software name="earnest" supported="no">
-		<!-- http://redump.org/disc/1737/
+		<!-- https://redump.info/disc/1737/
 		<rom name="Earnest Evans (Japan).cue" size="2882" crc="688b4a76" />
 		<rom name="Earnest Evans (Japan) (Track 01).bin" size="5207328" crc="8438f16a" />
 		<rom name="Earnest Evans (Japan) (Track 02).bin" size="1564080" crc="df681534" />
@@ -3888,7 +3888,7 @@ Hangs on BIOS logo
 	</software>
 
 	<software name="ecco">
-		<!-- http://redump.org/disc/2510/
+		<!-- https://redump.info/disc/2510/
 		<rom name="Ecco the Dolphin (Europe).cue" size="1580" crc="45008939" />
 		<rom name="Ecco the Dolphin (Europe) (Track 01).bin" size="59616144" crc="e6eaf047" />
 		<rom name="Ecco the Dolphin (Europe) (Track 02).bin" size="48773424" crc="2bfe906c" />
@@ -4050,7 +4050,7 @@ Hangs on BIOS logo
 	</software>
 
 	<software name="eccou" cloneof="ecco">
-		<!-- http://redump.org/disc/4104/
+		<!-- https://redump.info/disc/4104/
 		<rom name="Ecco the Dolphin (USA).cue" size="1854" crc="3a04c752" />
 		<rom name="Ecco the Dolphin (USA) (Track 01).bin" size="59616144" crc="4caaa8f5" />
 		<rom name="Ecco the Dolphin (USA) (Track 02).bin" size="48432384" crc="68097032" />
@@ -4083,7 +4083,7 @@ Hangs on BIOS logo
 	</software>
 
 	<software name="ecco2">
-		<!-- http://redump.org/disc/15332/
+		<!-- https://redump.info/disc/15332/
 		<rom name="Ecco - The Tides of Time (Europe) (En,Fr,De,Es).cue" size="2051" crc="6ea9acac" />
 		<rom name="Ecco - The Tides of Time (Europe) (En,Fr,De,Es) (Track 01).bin" size="150542112" crc="e22640de" />
 		<rom name="Ecco - The Tides of Time (Europe) (En,Fr,De,Es) (Track 02).bin" size="50711472" crc="be64d625" />
@@ -4117,7 +4117,7 @@ Hangs on BIOS logo
 	</software>
 
 	<software name="ecco2ua" cloneof="ecco2">
-		<!-- http://redump.org/disc/29311/
+		<!-- https://redump.info/disc/29311/
 		<rom name="Ecco - The Tides of Time (USA).cue" size="2130" crc="280bf750" md5="a988766b2d4d78e3ee8d80d3c0f9a7fe" sha1="d7448766bfe751aa52d39c03237ead1e72696e5d"/>
 		<rom name="Ecco - The Tides of Time (USA) (Track 01).bin" size="150640896" crc="eac03fe1" md5="7c43cb79f3c2553a198bec7fb2ee341a" sha1="bab86c4a7b3373b720d8e722b145b31622925f74"/>
 		<rom name="Ecco - The Tides of Time (USA) (Track 02).bin" size="49827120" crc="aa9241c6" md5="75c2134d58e15ab7677860f4fa4a9047" sha1="da3149f37a428475a43a5b5f581a5ad4f54720d9"/>
@@ -4151,7 +4151,7 @@ Hangs on BIOS logo
 	</software>
 
 	<software name="ecco2u" cloneof="ecco2">
-		<!-- http://redump.org/disc/11782/
+		<!-- https://redump.info/disc/11782/
 		<rom name="Ecco - The Tides of Time (USA).cue" size="2107" crc="e0ba4c3d" />
 		<rom name="Ecco - The Tides of Time (USA) (Track 01).bin" size="150469200" crc="4720cff7" />
 		<rom name="Ecco - The Tides of Time (USA) (Track 02).bin" size="50005872" crc="67abb8de" />
@@ -4185,7 +4185,7 @@ Hangs on BIOS logo
 	</software>
 
 	<software name="ejimse">
-		<!-- http://redump.org/disc/545/
+		<!-- https://redump.info/disc/545/
 		<rom name="Earthworm Jim - Special Edition (Europe).cue" size="3164" crc="78f01d05" />
 		<rom name="Earthworm Jim - Special Edition (Europe) (Track 01).bin" size="16087680" crc="e13e222b" />
 		<rom name="Earthworm Jim - Special Edition (Europe) (Track 02).bin" size="1582896" crc="94c1c145" />
@@ -4247,7 +4247,7 @@ Hangs on BIOS logo
 	</software>
 
 	<software name="espnbb">
-		<!-- http://redump.org/disc/17155/
+		<!-- https://redump.info/disc/17155/
 		<rom name="ESPN Baseball Tonight (Europe).cue" size="230" crc="cb0a080b" />
 		<rom name="ESPN Baseball Tonight (Europe) (Track 1).bin" size="205571856" crc="41289a30" />
 		<rom name="ESPN Baseball Tonight (Europe) (Track 2).bin" size="11952864" crc="9b867a9f" />
@@ -4266,7 +4266,7 @@ Hangs on BIOS logo
 	</software>
 
 	<software name="espnbbu" cloneof="espnbb">
-		<!-- http://redump.org/disc/5973/
+		<!-- https://redump.info/disc/5973/
 		<rom name="ESPN Baseball Tonight (USA).cue" size="224" crc="7897b2c8" />
 		<rom name="ESPN Baseball Tonight (USA) (Track 1).bin" size="205571856" crc="fdaf514a" />
 		<rom name="ESPN Baseball Tonight (USA) (Track 2).bin" size="11952864" crc="61b42231" />
@@ -4326,7 +4326,7 @@ Hangs on BIOS logo
 	</software>
 
 	<software name="espnnfl">
-		<!-- http://redump.org/disc/20253/
+		<!-- https://redump.info/disc/20253/
 		<rom name="ESPN Sunday Night NFL (USA).cue" size="224" crc="d1fe54ab" md5="6115bf958437e3a1e9828878b6532308" sha1="4fe91657c85b8104f430a1469a54bc69280b0949"/>
 		<rom name="ESPN Sunday Night NFL (USA) (Track 1).bin" size="286939296" crc="f24d3a1a" md5="04522508b694182c8e69e936656f02c0" sha1="8c672457556f2fdb2b0fead23b2f703f136f0d18"/>
 		<rom name="ESPN Sunday Night NFL (USA) (Track 2).bin" size="15974784" crc="e0cd3cf6" md5="38b53420387a24e9ba00f2a9373fc0fa" sha1="11ba1f36e1a961471bd841b4099a6274ff1928c6"/>
@@ -4381,7 +4381,7 @@ Hangs on BIOS logo
 	</software>
 
 	<software name="eternalcu" cloneof="eternalc">
-		<!-- http://redump.org/disc/2263/
+		<!-- https://redump.info/disc/2263/
 		<rom name="Eternal Champions - Challenge from the Dark Side (USA).cue" size="2813" crc="c12d13d7" />
 		<rom name="Eternal Champions - Challenge from the Dark Side (USA) (Track 01).bin" size="155641248" crc="5fd53235" />
 		<rom name="Eternal Champions - Challenge from the Dark Side (USA) (Track 02).bin" size="19796784" crc="ecf0da0d" />
@@ -4417,7 +4417,7 @@ Hangs on BIOS logo
 	</software>
 
 	<software name="eternalcua" cloneof="eternalc">
-		<!-- http://redump.org/disc/19031/
+		<!-- https://redump.info/disc/19031/
 		<rom name="Eternal Champions - Challenge from the Dark Side (USA) (RE).cue" size="2931" crc="c9279545" md5="bad0ff27158810a9b22d5ddeef28b172" sha1="58140771e4544b19bd29e8c979640272593df22f"/>
 		<rom name="Eternal Champions - Challenge from the Dark Side (USA) (RE) (Track 01).bin" size="155641248" crc="4a5ecc21" md5="44a65c6270861647d8711a8006209c02" sha1="06ccf19a9d84ed0efc4e8a0a40c22252411f6fe6"/>
 		<rom name="Eternal Champions - Challenge from the Dark Side (USA) (RE) (Track 02).bin" size="19796784" crc="246148ed" md5="4efee02c0cdf002682b32258218f5860" sha1="e1222a065bc0fd2db2c6cd1ad789b1f1d9b9f264"/>
@@ -4608,7 +4608,7 @@ Essentially requires [SRAM cart] for saving (125 blocks)
 	</software>
 
 	<software name="eyebeholu" cloneof="eyebehol" supported="partial">
-		<!-- http://redump.org/disc/22369/
+		<!-- https://redump.info/disc/22369/
 		<rom name="Eye of the Beholder (USA).cue" size="6702" crc="4c545624" md5="f5d15d77b39cdef246063c21eaf9a23f" sha1="ed3ae15a3ca73bf4ff996414c92e8e201cb1ba85"/>
 		<rom name="Eye of the Beholder (USA) (Track 01).bin" size="26594064" crc="8d298aab" md5="8a2b792d3d8793b736983cdaf8c44b2c" sha1="41dc4540f4337119e74c205940f56cf796e77946"/>
 		<rom name="Eye of the Beholder (USA) (Track 02).bin" size="52494288" crc="2a05a26c" md5="4e96727df08f8e4d40c97795a825fe4b" sha1="eb8876a0cbdb51fc3a91856b74ca403babd1f886"/>
@@ -4739,7 +4739,7 @@ Essentially requires [SRAM cart] for saving (125 blocks)
 	</software>
 
 	<software name="f1btlu" cloneof="f1btl">
-		<!-- http://redump.org/disc/28602/
+		<!-- https://redump.info/disc/28602/
 		<rom name="Formula One World Championship - Beyond the Limit (USA).cue" size="5532" crc="6d432c22" md5="b2d646317424a3565d0c4885e537bbef" sha1="f95e57462255586077cac8af8a2a5b5002f9542c"/>
 		<rom name="Formula One World Championship - Beyond the Limit (USA) (Track 01).bin" size="202721232" crc="78015fa5" md5="a4b377d4057b97b568c67d7f84b0218c" sha1="2b994690658927b962bcafba9732abc246175a93"/>
 		<rom name="Formula One World Championship - Beyond the Limit (USA) (Track 02).bin" size="16155888" crc="01285dec" md5="4d16f2bdd793144d9d2284b46c2449f1" sha1="3fe9df75adb55092ef111e1404085ae8ce27cf54"/>
@@ -4793,7 +4793,7 @@ Essentially requires [SRAM cart] for saving (125 blocks)
 	</software>
 
 	<software name="f1circus">
-		<!-- http://redump.org/disc/1739/
+		<!-- https://redump.info/disc/1739/
 		<rom name="F1 Circus CD (Japan).cue" size="3317" crc="dc3116ca" />
 		<rom name="F1 Circus CD (Japan) (Track 01).bin" size="16995552" crc="4100652e" />
 		<rom name="F1 Circus CD (Japan) (Track 02).bin" size="8892912" crc="3998b296" />
@@ -4841,7 +4841,7 @@ Essentially requires [SRAM cart] for saving (125 blocks)
 	</software>
 
 	<software name="fahrenhe">
-		<!-- http://redump.org/disc/559/
+		<!-- https://redump.info/disc/559/
 		<rom name="Fahrenheit (Europe).cue" size="208" crc="35111e19" />
 		<rom name="Fahrenheit (Europe) (Track 1).bin" size="593710656" crc="ff7637da" />
 		<rom name="Fahrenheit (Europe) (Track 2).bin" size="2932944" crc="832e3da4" />
@@ -4899,8 +4899,8 @@ Essentially requires [SRAM cart] for saving (125 blocks)
 	<!-- This game came in a bundle with both a Sega CD compatible disc and one which takes advantage of the 32X expansion. -->
 	<!-- TODO: where to load disc 2? Does it detects 32x automatically and just then prompt user? -->
 	<software name="fahrenheu" cloneof="fahrenhe" supported="partial">
-		<!-- http://redump.org/disc/29440/
-		     http://redump.org/disc/29441/
+		<!-- https://redump.info/disc/29440/
+		     https://redump.info/disc/29441/
 		<rom name="Fahrenheit (USA) (Disc 1) (Key Disc) (Sega CD).cue" size="262" crc="8982108b" md5="0b0a464fd029c7df830ad19ed1bfe099" sha1="825a83edb4966e0d9beaafc2d94233a2a0bc30f0"/>
 		<rom name="Fahrenheit (USA) (Disc 1) (Key Disc) (Sega CD) (Track 1).bin" size="593710656" crc="e22ff784" md5="f96fdb4fc2f8a6308c46d8af793d5c21" sha1="436141455a4726ce065d37db8e39f540c303de0a"/>
 		<rom name="Fahrenheit (USA) (Disc 1) (Key Disc) (Sega CD) (Track 2).bin" size="2227344" crc="2e31f14c" md5="a49444c570f9695bea3164d9c1005298" sha1="edfec8a88ae4dee5dc160cd6dfa3a00918f6800a"/>
@@ -5044,7 +5044,7 @@ Has optional unemulated [32X] mode, which in turn needs [disc swap]
 	</software>
 
 	<software name="ffightcd">
-		<!-- http://redump.org/disc/3752/
+		<!-- https://redump.info/disc/3752/
 		<rom name="Final Fight CD (Europe).cue" size="3050" crc="771d2e80" />
 		<rom name="Final Fight CD (Europe) (Track 01).bin" size="28209888" crc="e068334d" />
 		<rom name="Final Fight CD (Europe) (Track 02).bin" size="22936704" crc="0a05e927" />
@@ -5087,7 +5087,7 @@ Has optional unemulated [32X] mode, which in turn needs [disc swap]
 	</software>
 
 	<software name="ffightcdj" cloneof="ffightcd">
-		<!-- http://redump.org/disc/3115/
+		<!-- https://redump.info/disc/3115/
 		<rom name="Final Fight CD (Japan).cue" size="3375" crc="68256ab8" />
 		<rom name="Final Fight CD (Japan) (Track 01).bin" size="28209888" crc="0539a47e" />
 		<rom name="Final Fight CD (Japan) (Track 02).bin" size="22936704" crc="0a05e927" />
@@ -5135,7 +5135,7 @@ Has optional unemulated [32X] mode, which in turn needs [disc swap]
 	</software>
 
 	<software name="ffightcdu" cloneof="ffightcd">
-		<!-- http://redump.org/disc/1939/
+		<!-- https://redump.info/disc/1939/
 		<rom name="Final Fight CD (USA).cue" size="2972" crc="733dfce2" />
 		<rom name="Final Fight CD (USA) (Track 01).bin" size="28209888" crc="9c4fda3e" />
 		<rom name="Final Fight CD (USA) (Track 02).bin" size="22913184" crc="20952172" />
@@ -5179,7 +5179,7 @@ Has optional unemulated [32X] mode, which in turn needs [disc swap]
 	</software>
 
 	<software name="fheyarea">
-		<!-- http://redump.org/disc/10138/
+		<!-- https://redump.info/disc/10138/
 		<rom name="Seirei Shinseiki - Fhey Area (Japan).cue" size="11117" crc="48ab62ca" />
 		<rom name="Seirei Shinseiki - Fhey Area (Japan) (Track 01).bin" size="16285248" crc="da4a8e92" />
 		<rom name="Seirei Shinseiki - Fhey Area (Japan) (Track 02).bin" size="1121904" crc="fb93618b" />
@@ -5612,7 +5612,7 @@ Has optional unemulated [32X] mode, which in turn needs [disc swap]
 	</software>
 
 	<software name="fifau" cloneof="fifa">
-		<!-- http://redump.org/disc/19818/
+		<!-- https://redump.info/disc/19818/
 		<rom name="FIFA International Soccer (USA).cue" size="5755" crc="bf8a281e" md5="7859520ce8ae3116c0826f644dd39ea8" sha1="d31d832f1c8aaa65701688384409d7d0616eece6"/>
 		<rom name="FIFA International Soccer (USA) (Track 01).bin" size="262838352" crc="15819d3d" md5="b05d1c1160fa46f305f2b07959c631c8" sha1="6da4751d5370494a6e4574e6978c7c438fc2aa97"/>
 		<rom name="FIFA International Soccer (USA) (Track 02).bin" size="23804592" crc="e16818d1" md5="2c7339ed3923b023610fc5e4382b0032" sha1="430b188029f5f57300ff8d9c44c60ded9178005d"/>
@@ -5777,7 +5777,7 @@ Glitchy FMV after game start
 
 	<!-- This game was only found bundled in a so called "Double Deal"-pack together with Bram Stoker's Dracula. They did not share discs. -->
 	<software name="franken" supported="no">
-		<!-- http://redump.org/disc/29310/
+		<!-- https://redump.info/disc/29310/
 		<rom name="Mary Shelly's Frankenstein (USA).cue" size="864" crc="2ae072d4" md5="6216258ed40c3e715a0c527917ca11fd" sha1="36056af8bde3373be357af806235d75b4212b696"/>
 		<rom name="Mary Shelly's Frankenstein (USA) (Track 1).bin" size="107023056" crc="9b13990d" md5="4efa6263bd572ac2ac709d0dc74f5692" sha1="aebc3b15f006341969e4bc0170368bb4a57a5896"/>
 		<rom name="Mary Shelly's Frankenstein (USA) (Track 2).bin" size="30620688" crc="4346b17d" md5="209f82c59e4f5c51dd15a60365d23c20" sha1="d3f379e75a05d58dd2b0dce9dc87c2eb16f94f09"/>
@@ -5872,7 +5872,7 @@ All FMVs are severely glitched
 	</software>
 
 	<software name="funkband">
-		<!-- http://redump.org/disc/1664/
+		<!-- https://redump.info/disc/1664/
 		<rom name="Wakusei Woodstock - Funky Horror Band (Japan).cue" size="677" crc="d30c2458" />
 		<rom name="Wakusei Woodstock - Funky Horror Band (Japan) (Track 1).bin" size="58030896" crc="15c08675" />
 		<rom name="Wakusei Woodstock - Funky Horror Band (Japan) (Track 2).bin" size="30528960" crc="195f442b" />
@@ -5896,7 +5896,7 @@ All FMVs are severely glitched
 	</software>
 
 	<software name="gambler2">
-		<!-- http://redump.org/disc/1631/
+		<!-- https://redump.info/disc/1631/
 		<rom name="Gambler Jiko Chuushinha 2 - Gekitou! Tokyo Mahjongland Hen (Japan).cue" size="8032" crc="4dcef857" />
 		<rom name="Gambler Jiko Chuushinha 2 - Gekitou! Tokyo Mahjongland Hen (Japan) (Track 01).bin" size="33762960" crc="502bf08e" />
 		<rom name="Gambler Jiko Chuushinha 2 - Gekitou! Tokyo Mahjongland Hen (Japan) (Track 02).bin" size="1088976" crc="a9e9f99c" />
@@ -5965,7 +5965,7 @@ All FMVs are severely glitched
 	</software>
 
 	<software name="gamenk1">
-		<!-- http://redump.org/disc/1661/
+		<!-- https://redump.info/disc/1661/
 		<rom name="Game no Kandume Vol.1 (Japan).cue" size="3826" crc="0bc97ffc" />
 		<rom name="Game no Kandume Vol.1 (Japan) (Track 01).bin" size="11416608" crc="1babe750" />
 		<rom name="Game no Kandume Vol.1 (Japan) (Track 02).bin" size="17461248" crc="fd703147" />
@@ -6015,7 +6015,7 @@ All FMVs are severely glitched
 	</software>
 
 	<software name="gamenk2">
-		<!-- http://redump.org/disc/10139/
+		<!-- https://redump.info/disc/10139/
 		<rom name="Game no Kandume Vol.2 (Japan).cue" size="2958" crc="1d3c864c" />
 		<rom name="Game no Kandume Vol.2 (Japan) (Track 01).bin" size="9041088" crc="b02c2f00" />
 		<rom name="Game no Kandume Vol.2 (Japan) (Track 02).bin" size="16654512" crc="a7378315" />
@@ -6058,7 +6058,7 @@ All FMVs are severely glitched
 	</software>
 
 	<software name="garousp" cloneof="fatfursp">
-		<!-- http://redump.org/disc/3156/
+		<!-- https://redump.info/disc/3156/
 		<rom name="Garou Densetsu Special (Japan).cue" size="4732" crc="a1d75963" />
 		<rom name="Garou Densetsu Special (Japan) (Track 01).bin" size="15826608" crc="9cab4019" />
 		<rom name="Garou Densetsu Special (Japan) (Track 02).bin" size="2904720" crc="ba444a89" />
@@ -6247,8 +6247,8 @@ Essentially requires [SRAM cart] for saving (118 blocks)
 	</software>
 
 	<software name="gztexas" supported="no">
-		<!-- http://redump.org/disc/17595/
-		     http://redump.org/disc/17596/
+		<!-- https://redump.info/disc/17595/
+		     https://redump.info/disc/17596/
 		<rom name="Ground Zero Texas (Europe) (Disc 1).cue" size="240" crc="2743534d" />
 		<rom name="Ground Zero Texas (Europe) (Disc 1) (Track 1).bin" size="630267792" crc="c87d6af5" />
 		<rom name="Ground Zero Texas (Europe) (Disc 1) (Track 2).bin" size="2587200" crc="45deffb8" />
@@ -6282,8 +6282,8 @@ Requires [disc swap]
 	</software>
 
 	<software name="gztexasu" cloneof="gztexas" supported="no">
-		<!-- http://redump.org/disc/19472/
-		     http://redump.org/disc/19473/
+		<!-- https://redump.info/disc/19472/
+		     https://redump.info/disc/19473/
 		<rom name="Ground Zero Texas (USA) (Disc 1).cue" size="257" crc="d0c584c7" md5="113dd7490af1f86d08f70448d443ed93" sha1="2041c4c954bb0b19ede6dbef1190836c9f2c72b7"/>
 		<rom name="Ground Zero Texas (USA) (Disc 1) (Track 1).bin" size="629355216" crc="20b937a8" md5="27eac38ea6f5deee11367f0062f55608" sha1="d151430da0d6e25af45ecd0a9133dea9a1d1d285"/>
 		<rom name="Ground Zero Texas (USA) (Disc 1) (Track 2).bin" size="2940000" crc="75562ed6" md5="06c826b8fd0391297b5e73f40d22bd8f" sha1="32007bb0f5eec3dfcd9d56f70f3e0dc78570f5e3"/>
@@ -6351,7 +6351,7 @@ Requires [disc swap]
 	</software>
 
 	<software name="heavenly" cloneof="f1btl">
-		<!-- http://redump.org/disc/1738/
+		<!-- https://redump.info/disc/1738/
 		<rom name="Heavenly Symphony (Japan).cue" size="4422" crc="c406b0cd" />
 		<rom name="Heavenly Symphony (Japan) (Track 01).bin" size="202761216" crc="41aafac7" />
 		<rom name="Heavenly Symphony (Japan) (Track 02).bin" size="16014768" crc="129ed3da" />
@@ -6407,7 +6407,7 @@ Requires [disc swap]
 	</software>
 
 	<software name="heavenlydemo">
-		<!-- http://redump.org/disc/70721/
+		<!-- https://redump.info/disc/70721/
 		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo).cue" size="6110" crc="7096405f" />
 		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 01).bin" size="202408416" crc="9b3fb252" />
 		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 02).bin" size="16014768" crc="129ed3da" />
@@ -6462,7 +6462,7 @@ Requires [disc swap]
 	</software>
 
 	<software name="heavynov">
-		<!-- http://redump.org/disc/1741/
+		<!-- https://redump.info/disc/1741/
 		<rom name="Heavy Nova (Japan).cue" size="1790" crc="3c2ab392" />
 		<rom name="Heavy Nova (Japan) (Track 01).bin" size="2791824" crc="a282781b" />
 		<rom name="Heavy Nova (Japan) (Track 02).bin" size="28054656" crc="7f76c7b2" />
@@ -6497,7 +6497,7 @@ Requires [disc swap]
 	</software>
 
 	<software name="heavynovp" cloneof="heavynov" supported="no">
-		<!-- http://redump.org/disc/126503/
+		<!-- https://redump.info/disc/126503/
 		<rom name="Heavy Nova (Japan) (Beta) (1991-11-02).cue" size="2110" crc="3642313d" md5="192cb352974f5e3e1ae5e423c8bc72e9" sha1="5563dcbf81a8bf533503cb9679979f40d57680fb"/>
 		<rom name="Heavy Nova (Japan) (Beta) (1991-11-02) (Track 01).bin" size="2429616" crc="7a28795c" md5="e3b3d16b33165d46e118b6bba014cec1" sha1="197a7ad9a7cf7c10c28cdf07472ee17a1771e121"/>
 		<rom name="Heavy Nova (Japan) (Beta) (1991-11-02) (Track 02).bin" size="27847680" crc="e188eff3" md5="1956e8ff353e248e612f7f87a5d9f1e5" sha1="b5b7f2627ac3205a7a9528ef37a519387ce5ee03"/>
@@ -6534,7 +6534,7 @@ Disc does not boot, uses development security boot code.
 	</software>
 
 	<software name="heimdall">
-		<!-- http://redump.org/disc/21039/
+		<!-- https://redump.info/disc/21039/
 		<rom name="Heimdall (USA).cue" size="2294" crc="d9024819" md5="efe0f4d6da5b56c260bf6af3b1ccf174" sha1="66e858090085673dbfdea26d06dd354504b2296d"/>
 		<rom name="Heimdall (USA) (Track 01).bin" size="25888464" crc="38d5dd04" md5="9c9d9dae336002fc2f74c8424c7f3ee6" sha1="2f858db859baf28d8b38db72bcc0b84b04ab8fe3"/>
 		<rom name="Heimdall (USA) (Track 02).bin" size="15520848" crc="a3a15a84" md5="7c54669ba048df09a6e1b824e400a74d" sha1="856869cb3d8f0744a8d4971b6452407cfef4ca42"/>
@@ -6573,7 +6573,7 @@ Disc does not boot, uses development security boot code.
 	</software>
 
 	<software name="heimdallj" cloneof="heimdall">
-		<!-- http://redump.org/disc/3155/
+		<!-- https://redump.info/disc/3155/
 		<rom name="Heimdall (Japan).cue" size="2646" crc="d5465570" />
 		<rom name="Heimdall (Japan) (Track 01).bin" size="25881408" crc="b07c3ddd" />
 		<rom name="Heimdall (Japan) (Track 02).bin" size="15523200" crc="9eef3fc6" />
@@ -6616,7 +6616,7 @@ Disc does not boot, uses development security boot code.
 	</software>
 
 	<software name="holmes">
-		<!-- http://redump.org/disc/17153/
+		<!-- https://redump.info/disc/17153/
 		<rom name="Sherlock Holmes - Consulting Detective Vol. I (Europe).cue" size="120" crc="0e54ae48" />
 		<rom name="Sherlock Holmes - Consulting Detective Vol. I (Europe).bin" size="752581200" crc="49805f7a" />
 		-->
@@ -6635,7 +6635,7 @@ Disc does not boot, uses development security boot code.
 
 	<!-- This game was only ever bundled together with a Sega-CD device and Sega Classics Arcade Collection. -->
 	<software name="holmesu" cloneof="holmes">
-		<!-- http://redump.org/disc/24517/
+		<!-- https://redump.info/disc/24517/
 		<rom name="Sherlock Holmes - Consulting Detective (USA).cue" size="281" crc="5c2bcbff" md5="9504970bad61ba73e2b27b99a2965cff" sha1="34ceaafb35b61e4b1b7ca7db60fec5ccaf76569e"/>
 		<rom name="Sherlock Holmes - Consulting Detective (USA) (Track 1).bin" size="750673728" crc="1fbc2139" md5="989bba8d4f51d2d311686582a387d4f0" sha1="1930786b3936bcd6f8063897683ac30499477c38"/>
 		<rom name="Sherlock Holmes - Consulting Detective (USA) (Track 2).bin" size="11094384" crc="e23049e3" md5="99111d538eb50cfff63ce5c0eb73f9e6" sha1="6ae64a75a067f1a0929466b49db6549c45150303"/>
@@ -6685,8 +6685,8 @@ Requires [disc swap]
 	</software>
 
 	<software name="holmes2u" cloneof="holmes2" supported="no">
-		<!-- http://redump.org/disc/17162/
-		     http://redump.org/disc/17163/
+		<!-- https://redump.info/disc/17162/
+		     https://redump.info/disc/17163/
 		<rom name="Sherlock Holmes - Consulting Detective Vol. II (USA) (Disc 1).cue" size="292" crc="a33aa103" />
 		<rom name="Sherlock Holmes - Consulting Detective Vol. II (USA) (Disc 1) (Track 1).bin" size="529374048" crc="94a913b7" />
 		<rom name="Sherlock Holmes - Consulting Detective Vol. II (USA) (Disc 1) (Track 2).bin" size="10936800" crc="cd4a8412" />
@@ -6759,7 +6759,7 @@ Requires [disc swap]
 	</software>
 
 	<software name="hooku" cloneof="hook">
-		<!-- http://redump.org/disc/28626/
+		<!-- https://redump.info/disc/28626/
 		<rom name="Hook (USA).cue" size="2315" crc="ba07f18d" md5="04df168eace6dcf1753b049f6e0d2a47" sha1="a56f37f5255523b507f4b183bdb5371cbd194cd8"/>
 		<rom name="Hook (USA) (Track 01).bin" size="19930848" crc="f1dfc54a" md5="ed61d203f81e53229e03d50378c5923f" sha1="a30dfcfc405b536061a11f2b9f34c379bdac846b"/>
 		<rom name="Hook (USA) (Track 02).bin" size="10318224" crc="31a8c955" md5="c4049e4e9ad4c0ec8b76f368ba0bcc08" sha1="5308cf33ba20fcf2403c83398a364a2ea4840660"/>
@@ -6837,7 +6837,7 @@ Requires [disc swap]
 	</software>
 
 	<software name="hota">
-		<!-- http://redump.org/disc/17253/
+		<!-- https://redump.info/disc/17253/
 		<rom name="Heart of the Alien - Out of this World Parts I and II (USA) (RE).cue" size="6660" crc="66491c3a" />
 		<rom name="Heart of the Alien - Out of this World Parts I and II (USA) (RE) (Track 01).bin" size="12070464" crc="c524515e" />
 		<rom name="Heart of the Alien - Out of this World Parts I and II (USA) (RE) (Track 02).bin" size="2817696" crc="6dd9c780" />
@@ -6962,7 +6962,7 @@ Requires [disc swap]
 	</software>
 
 	<software name="ironhlx">
-		<!-- http://redump.org/disc/16922/
+		<!-- https://redump.info/disc/16922/
 		<rom name="Iron Helix (USA).cue" size="202" crc="92afb016" />
 		<rom name="Iron Helix (USA) (Track 1).bin" size="454556928" crc="4be42079" />
 		<rom name="Iron Helix (USA) (Track 2).bin" size="20949264" crc="fbaac5fe" />
@@ -7001,7 +7001,7 @@ Requires [disc swap]
 	</software>
 
 	<software name="jagxj220" supported="no">
-		<!-- http://redump.org/disc/4297/
+		<!-- https://redump.info/disc/4297/
 		<rom name="Jaguar XJ220 (Europe) (En,Ja).cue" size="1594" crc="606ee5ca" />
 		<rom name="Jaguar XJ220 (Europe) (En,Ja) (Track 01).bin" size="12042240" crc="1b5e8d8e" />
 		<rom name="Jaguar XJ220 (Europe) (En,Ja) (Track 02).bin" size="63976752" crc="facc3c84" />
@@ -7034,7 +7034,7 @@ Side objects all draws in a stretched form
 	</software>
 
 	<software name="jagxj220j" cloneof="jagxj220" supported="no">
-		<!-- http://redump.org/disc/10140/
+		<!-- https://redump.info/disc/10140/
 		<rom name="Jaguar XJ220 (Japan) (En,Ja).cue" size="1581" crc="b84b6a6a" />
 		<rom name="Jaguar XJ220 (Japan) (En,Ja) (Track 01).bin" size="12042240" crc="3ebc3c2e" />
 		<rom name="Jaguar XJ220 (Japan) (En,Ja) (Track 02).bin" size="63976752" crc="facc3c84" />
@@ -7102,7 +7102,7 @@ Side objects all draws in a stretched form
 	</software>
 
 	<software name="jangouwc">
-		<!-- http://redump.org/disc/1990/
+		<!-- https://redump.info/disc/1990/
 		<rom name="Jangou World Cup (Japan).cue" size="2005" crc="b53cdd58" />
 		<rom name="Jangou World Cup (Japan) (Track 01).bin" size="33146736" crc="ee6b68a0" />
 		<rom name="Jangou World Cup (Japan) (Track 02).bin" size="17364816" crc="74c7ade0" />
@@ -7138,7 +7138,7 @@ Side objects all draws in a stretched form
 	</software>
 
 	<software name="jeopardy" supported="no">
-		<!-- http://redump.org/disc/28627/
+		<!-- https://redump.info/disc/28627/
 		<rom name="Jeopardy! (USA).cue" size="309" crc="6c28da39" md5="43ccd1f797fb9d76824fcec13693f90d" sha1="d6cac996cac2f558349818e901dfbd38731d6156"/>
 		<rom name="Jeopardy! (USA) (Track 1).bin" size="95540592" crc="ea4c7949" md5="679d176e4f96fd7413beb7fc8986a0e7" sha1="e2efaf03f631e5e623db94ff66a44c33642fcd0f"/>
 		<rom name="Jeopardy! (USA) (Track 2).bin" size="11910528" crc="ea25a559" md5="73fbac09804bfa718a1aa6a5b897fbfa" sha1="89262e648df632ef11ee7e56c2db3ed63cf870d7"/>
@@ -7162,7 +7162,7 @@ Hangs at start of a game, after entering name
 	</software>
 
 	<software name="joemont">
-		<!-- http://redump.org/disc/20227/
+		<!-- https://redump.info/disc/20227/
 		<rom name="Joe Montana's NFL Football (USA).cue" size="761" crc="981e4777" md5="2bc3110fe8d93c90d4b1d4b9e40e222e" sha1="d9d0a8b6315ffc543cf59b0449010f66d19b6be0"/>
 		<rom name="Joe Montana's NFL Football (USA) (Track 1).bin" size="181819008" crc="989d8600" md5="e363615aa4a7c10c8fae378f15563ee3" sha1="24ecd405cd234a1ded9f9a39230d63fbfb566132"/>
 		<rom name="Joe Montana's NFL Football (USA) (Track 2).bin" size="33849984" crc="289c546d" md5="8f8fec8b075fb20f67ade2d498857eb5" sha1="94fbc04542b6973d12617d338e7cb6d6b8e49dd9"/>
@@ -7211,7 +7211,7 @@ Severe GFX glitches
 	</software>
 
 	<software name="jpark">
-		<!-- http://redump.org/disc/8318/
+		<!-- https://redump.info/disc/8318/
 		<rom name="Jurassic Park (Europe).cue" size="3726" crc="a5fdb459" />
 		<rom name="Jurassic Park (Europe) (Track 01).bin" size="190462608" crc="f4fe953d" />
 		<rom name="Jurassic Park (Europe) (Track 02).bin" size="11378976" crc="81d0fb97" />
@@ -7358,7 +7358,7 @@ Severe GFX glitches
 	</software>
 
 	<software name="jparku" cloneof="jpark">
-		<!-- http://redump.org/disc/3884/
+		<!-- https://redump.info/disc/3884/
 		<rom name="Jurassic Park (USA).cue" size="3630" crc="3b5e205a" />
 		<rom name="Jurassic Park (USA) (Track 01).bin" size="190462608" crc="2094023a" />
 		<rom name="Jurassic Park (USA) (Track 02).bin" size="11378976" crc="b8bf14e9" />
@@ -7445,7 +7445,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 	</software>
 
 	<software name="kamenrzoj" cloneof="kamenrzo" supported="no">
-		<!-- http://redump.org/disc/1996/
+		<!-- https://redump.info/disc/1996/
 		<rom name="Kamen Rider ZO (Japan).cue" size="562" crc="664ab999" />
 		<rom name="Kamen Rider ZO (Japan) (Track 1).bin" size="449996400" crc="a21571de" />
 		<rom name="Kamen Rider ZO (Japan) (Track 2).bin" size="2907072" crc="a1d33bde" />
@@ -7555,7 +7555,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 	</software>
 
 	<software name="keioj" cloneof="keio">
-		<!-- http://redump.org/disc/3136/
+		<!-- https://redump.info/disc/3136/
 		<rom name="Keiou Yuugekitai (Japan).cue" size="2957" crc="e1a6760b" />
 		<rom name="Keiou Yuugekitai (Japan) (Track 01).bin" size="77853552" crc="8586c1e7" />
 		<rom name="Keiou Yuugekitai (Japan) (Track 02).bin" size="1117200" crc="6cdfd209" />
@@ -7602,7 +7602,7 @@ Offset [redbook] playback during cutscenes, with lip sync drift
 	</software>
 
 	<software name="keiojdemo" cloneof="keio">
-		<!-- http://redump.org/disc/41968/
+		<!-- https://redump.info/disc/41968/
 		<rom name="Keiou Yuugekitai (Japan) (Demo).cue" size="1895" crc="6a5d99f2" />
 		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 01).bin" size="75790848" crc="04c07f7e" />
 		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 02).bin" size="1117200" crc="6cdfd209" />
@@ -7672,7 +7672,7 @@ Offset [redbook] playback during cutscenes, with lip sync drift
 	</software>
 
 	<software name="kidssiteu" cloneof="kidssite">
-		<!-- http://redump.org/disc/28029/
+		<!-- https://redump.info/disc/28029/
 		<rom name="Kids on Site (USA).cue" size="229" crc="9d823eca" md5="724647094a1d79ed14e3a74585194169" sha1="07902cd2dc2b021484d69e3c8235825818bfeaef"/>
 		<rom name="Kids on Site (USA) (Track 1).bin" size="516012336" crc="ef445a91" md5="6593d5f992966425166702ddd0db9bb7" sha1="aa3ad66dbf085c7c5d9d11454877f07e287e37df"/>
 		<rom name="Kids on Site (USA) (Track 2).bin" size="2469600" crc="3a48744a" md5="b37ce726f331e9aedf9529db5262af46" sha1="2a9eb0c64bd21a81cc8e692eb6e5b41ba228876c"/>
@@ -7768,7 +7768,7 @@ Jump music video start stuttering at 1:30
 	</software>
 
 	<software name="le2">
-		<!-- http://redump.org/disc/17154/
+		<!-- https://redump.info/disc/17154/
 		<rom name="Lethal Enforcers II - Gun Fighters (Europe).cue" size="3156" crc="7d74c5ce" />
 		<rom name="Lethal Enforcers II - Gun Fighters (Europe) (Track 01).bin" size="14845824" crc="3d5df472" />
 		<rom name="Lethal Enforcers II - Gun Fighters (Europe) (Track 02).bin" size="43697808" crc="b93c5d38" />
@@ -7891,7 +7891,7 @@ Optionally uses [Justifier] gun
 	</software>
 
 	<software name="le2u" cloneof="le2" supported="no">
-		<!-- http://redump.org/disc/21451/
+		<!-- https://redump.info/disc/21451/
 		<rom name="Lethal Enforcers II - Gun Fighters (USA).cue" size="3087" crc="9b8fce6d" md5="d89875f4fc90228b467b5dda0fbf8418" sha1="e3905d6ff2c3e14bf565f79b76b5d08aa1278dfb"/>
 		<rom name="Lethal Enforcers II - Gun Fighters (USA) (Track 01).bin" size="14845824" crc="a84c7a5d" md5="a0a816b6efccb7a04d413230429272ca" sha1="06b1f47f29b9c441c9a046b728f7f1b6b809c6fe"/>
 		<rom name="Lethal Enforcers II - Gun Fighters (USA) (Track 02).bin" size="43697808" crc="b93c5d38" md5="c4e1e9ec5b903e0e78de978d35996a20" sha1="bbb852eb4d7438367dda8d94dcfc7ae1262448ed"/>
@@ -8022,7 +8022,7 @@ Optionally uses [Justifier] gun
 	</software>
 
 	<software name="lethalenu" cloneof="lethalen" supported="partial">
-		<!-- http://redump.org/disc/21495/
+		<!-- https://redump.info/disc/21495/
 		<rom name="Lethal Enforcers (USA).cue" size="2673" crc="944dadcd" />
 		<rom name="Lethal Enforcers (USA) (Track 01).bin" size="10097136" crc="964be602" />
 		<rom name="Lethal Enforcers (USA) (Track 02).bin" size="2116800" crc="95ebb62d" />
@@ -8067,7 +8067,7 @@ Optionally uses [Justifier] gun
 
 	<!-- This version was bundled with the Justifier light-gun. -->
 	<software name="lethalenua" cloneof="lethalen" supported="partial">
-		<!-- http://redump.org/disc/24562/
+		<!-- https://redump.info/disc/24562/
 		<rom name="Lethal Enforcers (USA) (U12).cue" size="2811" crc="dcc52475" md5="c492454ec35d0cbf0fa50f84e25aad8e" sha1="f87d1195088fd80df3058e6300a1f0ca57b14f88"/>
 		<rom name="Lethal Enforcers (USA) (U12) (Track 01).bin" size="10097136" crc="964be602" md5="f247062b06390e39d0a7e01998bc5d22" sha1="91c34f86a1607ddd4088f7b1e36dbd383ef3e0cf"/>
 		<rom name="Lethal Enforcers (USA) (U12) (Track 02).bin" size="2116800" crc="85ee15d4" md5="ec549e0b92e878b542542d57b5f99472" sha1="54993d91b0f150155a3071f35346937a3ef77ec6"/>
@@ -8151,7 +8151,7 @@ Optionally uses [Justifier] gun
 	</software>
 
 	<software name="loadstar">
-		<!-- http://redump.org/disc/20226/
+		<!-- https://redump.info/disc/20226/
 		<rom name="Loadstar - The Legend of Tully Bodine (USA).cue" size="279" crc="0799fdc0" md5="85efd60a9defe291a6d0546e6a76b772" sha1="16527805b0a853f542765632d5a387c20dd8e894"/>
 		<rom name="Loadstar - The Legend of Tully Bodine (USA) (Track 1).bin" size="656419680" crc="96b5157a" md5="f6666523c7cd0f455cf5fc8467fc1fb3" sha1="3e4a0e916f54b2b4e836ed0cafba09f4460d4812"/>
 		<rom name="Loadstar - The Legend of Tully Bodine (USA) (Track 2).bin" size="1258320" crc="9a35811b" md5="b69bfc0275fe00cd55ec8aaa1575f70c" sha1="247a1429c4c51aa8069d1662df70136652f1519d"/>
@@ -8170,7 +8170,7 @@ Optionally uses [Justifier] gun
 	</software>
 
 	<software name="loadstarp" cloneof="loadstar">
-		<!-- http://redump.org/disc/125403/
+		<!-- https://redump.info/disc/125403/
 		<rom name="Loadstar - The Legend of Tully Bodine (USA) (Beta).cue" size="308" crc="ecd1539d" md5="9884739faae9fde68908f95d7a626f51" sha1="0d2a2091bc42e314bacbb76346a523810ded6d37"/>
 		<rom name="Loadstar - The Legend of Tully Bodine (USA) (Beta) (Track 1).bin" size="656137440" crc="764e8c85" md5="1118d66eb68efc0ca9f3e5c373cbcadb" sha1="c57082ef7344c44acb2463bc4cf3de88f0ffe8d3"/>
 		<rom name="Loadstar - The Legend of Tully Bodine (USA) (Beta) (Track 2).bin" size="1258320" crc="a32f8a84" md5="1eb2e5bc68c67c4429f642fc34c31e6a" sha1="2855d99357b775a54b8bbce17d1b000e6c2d2023"/>
@@ -8188,7 +8188,7 @@ Optionally uses [Justifier] gun
 	</software>
 
 	<software name="lodoss">
-		<!-- http://redump.org/disc/1635/
+		<!-- https://redump.info/disc/1635/
 		<rom name="Lodoss Tou Senki - Eiyuu Sensou (Japan).cue" size="1858" crc="98bfd15e" />
 		<rom name="Lodoss Tou Senki - Eiyuu Sensou (Japan) (Track 01).bin" size="190392048" crc="1112c998" />
 		<rom name="Lodoss Tou Senki - Eiyuu Sensou (Japan) (Track 02).bin" size="26215392" crc="f630543f" />
@@ -8287,7 +8287,7 @@ Optionally uses [Justifier] gun
 	</software>
 
 	<software name="lordthunu" cloneof="lordthun">
-		<!-- http://redump.org/disc/31683/
+		<!-- https://redump.info/disc/31683/
 		<rom name="Lords of Thunder (USA).cue" size="2462" crc="fa2e14b7" md5="b671665459694ea092d0300f27060952" sha1="e5dc85ec465196a5c430fd764366781c2b27c9a6"/>
 		<rom name="Lords of Thunder (USA) (Track 01).bin" size="8311968" crc="3eb3c77c" md5="315ee58885b83a9a3d4d0969f048a609" sha1="be3933bb3b4522223c9662909aa77e98095dcd04"/>
 		<rom name="Lords of Thunder (USA) (Track 02).bin" size="5814144" crc="5c1c92e0" md5="36814fdec67cb1a7f66527f793d6b22f" sha1="aa7cc21097cab6c8f1601174772a2177b5317016"/>
@@ -8325,7 +8325,7 @@ Optionally uses [Justifier] gun
 	</software>
 
 	<software name="lunar" supported="no">
-		<!-- http://redump.org/disc/29312/
+		<!-- https://redump.info/disc/29312/
 		<rom name="Lunar - The Silver Star (USA).cue" size="6430" crc="b8f7f6cb" />
 		<rom name="Lunar - The Silver Star (USA) (Track 01).bin" size="12752544" crc="079e5831" />
 		<rom name="Lunar - The Silver Star (USA) (Track 02).bin" size="2486064" crc="8a960eec" />
@@ -8398,7 +8398,7 @@ First gameplay screen is severely glitched (side effect of above?)
 	</software>
 
 	<software name="lunarj" cloneof="lunar" supported="no">
-		<!-- http://redump.org/disc/1636/
+		<!-- https://redump.info/disc/1636/
 		<rom name="Lunar - The Silver Star (Japan).cue" size="6534" crc="36b473ba" />
 		<rom name="Lunar - The Silver Star (Japan) (Track 01).bin" size="32989152" crc="90aa9eef" />
 		<rom name="Lunar - The Silver Star (Japan) (Track 02).bin" size="2401392" crc="d150053b" />
@@ -8621,7 +8621,7 @@ First gameplay screen is severely glitched (side effect of above?)
 	</software>
 
 	<software name="lunar2">
-		<!-- http://redump.org/disc/21035/
+		<!-- https://redump.info/disc/21035/
 		<rom name="Lunar - Eternal Blue (USA).cue" size="365" crc="bea3dfdd" md5="b55c0aeb6952b9895b5da8c3c31cb8c0" sha1="85c8e51c788d0c4686ab36248c928c7cf1091277"/>
 		<rom name="Lunar - Eternal Blue (USA) (Track 1).bin" size="469555632" crc="430af523" md5="951e0f07f310276a5151eba189ad53e8" sha1="5db76e9307269827ed64ec06838800a241cd7c79"/>
 		<rom name="Lunar - Eternal Blue (USA) (Track 2).bin" size="51120720" crc="b8825042" md5="62b9fce031f086a610836853ce89b6aa" sha1="3e3f7090254d7645e577e009fda460cb17110c9f"/>
@@ -8641,7 +8641,7 @@ First gameplay screen is severely glitched (side effect of above?)
 	</software>
 
 	<software name="lunar2j" cloneof="lunar2">
-		<!-- http://redump.org/disc/10141/
+		<!-- https://redump.info/disc/10141/
 		<rom name="Lunar - Eternal Blue (Japan).cue" size="470" crc="cf310d01" />
 		<rom name="Lunar - Eternal Blue (Japan) (Track 1).bin" size="458849328" crc="c445ce6d" />
 		<rom name="Lunar - Eternal Blue (Japan) (Track 2).bin" size="50930208" crc="c7e46925" />
@@ -8733,7 +8733,7 @@ First gameplay screen is severely glitched (side effect of above?)
 	</software>
 
 	<software name="lunar2jdemo" cloneof="lunar2">
-		<!-- http://redump.org/disc/54196/
+		<!-- https://redump.info/disc/54196/
 		<rom name="Lunar - Eternal Blue (Japan) (Demo).cue" size="240" crc="e130f104" />
 		<rom name="Lunar - Eternal Blue (Japan) (Demo) (Track 1).bin" size="38706864" crc="66c67434" />
 		<rom name="Lunar - Eternal Blue (Japan) (Demo) (Track 2).bin" size="1611120" crc="18661dfb" />
@@ -8753,7 +8753,7 @@ First gameplay screen is severely glitched (side effect of above?)
 	</software>
 
 	<software name="maddog" supported="partial">
-		<!-- http://redump.org/disc/28030/
+		<!-- https://redump.info/disc/28030/
 		<rom name="Mad Dog McCree (USA).cue" size="803" crc="4251b074" md5="e51a141b968be4d4cd6e7a4f19142826" sha1="c7c3b770b43b05c28758165a47514bef1daf0da0"/>
 		<rom name="Mad Dog McCree (USA) (Track 1).bin" size="242677008" crc="662784f2" md5="5cd92d667e9d71251441950f505c1414" sha1="add89b1c071c9ba60d75f1a864e54b7da542fb81"/>
 		<rom name="Mad Dog McCree (USA) (Track 2).bin" size="2227344" crc="2e31f14c" md5="a49444c570f9695bea3164d9c1005298" sha1="edfec8a88ae4dee5dc160cd6dfa3a00918f6800a"/>
@@ -8803,7 +8803,7 @@ Optional [Menacer] or [Justifier] support
 	</software>
 
 	<software name="mansion" cloneof="mystmans">
-		<!-- http://redump.org/disc/17254/
+		<!-- https://redump.info/disc/17254/
 		<rom name="Mansion of Hidden Souls (USA).cue" size="228" crc="0811c359" />
 		<rom name="Mansion of Hidden Souls (USA) (Track 1).bin" size="605141376" crc="6576ae2c" />
 		<rom name="Mansion of Hidden Souls (USA) (Track 2).bin" size="7192416" crc="aaded020" />
@@ -9033,7 +9033,7 @@ Occasional minor GFX garbage strips on opponent sprites (verify)
 	</software>
 
 	<software name="microcosj" cloneof="microcos">
-		<!-- http://redump.org/disc/3122/
+		<!-- https://redump.info/disc/3122/
 		<rom name="Microcosm (Japan).cue" size="981" crc="9d8c52cf" />
 		<rom name="Microcosm (Japan) (Track 1).bin" size="274203216" crc="440ce76f" />
 		<rom name="Microcosm (Japan) (Track 2).bin" size="20993952" crc="5a892270" />
@@ -9061,7 +9061,7 @@ Occasional minor GFX garbage strips on opponent sprites (verify)
 	</software>
 
 	<software name="microcosjdemo" cloneof="microcos">
-		<!-- http://redump.org/disc/54197/
+		<!-- https://redump.info/disc/54197/
 		<rom name="Microcosm (Japan) (Demo).cue" size="1067" crc="512f02d3" />
 		<rom name="Microcosm (Japan) (Demo) (Track 1).bin" size="274203216" crc="5c4ae0c1" />
 		<rom name="Microcosm (Japan) (Demo) (Track 2).bin" size="20993952" crc="5a892270" />
@@ -9088,7 +9088,7 @@ Occasional minor GFX garbage strips on opponent sprites (verify)
 	</software>
 
 	<software name="microcosu" cloneof="microcos">
-		<!-- http://redump.org/disc/19452/
+		<!-- https://redump.info/disc/19452/
 		<rom name="Microcosm (USA).cue" size="963" crc="c644650c" md5="2764d48ed61ff4eee8b53c5447ce8625" sha1="5f0e537a31d7dc8aa67eaba0c72bb81ecf24e5d8"/>
 		<rom name="Microcosm (USA) (Track 1).bin" size="274203216" crc="9146e163" md5="ae633a666129abbf275009a220c2dec7" sha1="6a6c320138f0ec73a7d73d2ba1e4315b37c1932e"/>
 		<rom name="Microcosm (USA) (Track 2).bin" size="20991600" crc="587a2bea" md5="55ce538fe0217954e7d4505d5e4f3f85" sha1="de0f9a464d1269bb96e5fa0004c359c67357e5ef"/>
@@ -9132,7 +9132,7 @@ Occasional minor GFX garbage strips on opponent sprites (verify)
 	</software>
 
 	<software name="midnightu" cloneof="midnight">
-		<!-- http://redump.org/disc/19474/
+		<!-- https://redump.info/disc/19474/
 		<rom name="Midnight Raiders (USA).cue" size="237" crc="3f58e4bc" md5="d58b5a21c07b8d50e901a2ea110fa922" sha1="d54075fbee45dcf9f6330eecee99d766b5a0177f"/>
 		<rom name="Midnight Raiders (USA) (Track 1).bin" size="499454256" crc="7cf624a3" md5="28492819efa402b0906e09933861a0e5" sha1="1b81e261f674b56b5154941208a9e245f16e7694"/>
 		<rom name="Midnight Raiders (USA) (Track 2).bin" size="37074576" crc="a594b44f" md5="8ffbe10a3ad8b7120d229023f3b1c226" sha1="2fbb983b390f44697841415054a2da53f7942722"/>
@@ -9221,7 +9221,7 @@ Optional [mouse] is too slow
 	</software>
 
 	<software name="mk" supported="no">
-		<!-- http://redump.org/disc/7847/
+		<!-- https://redump.info/disc/7847/
 		<rom name="Mortal Kombat (Europe).cue" size="2002" crc="c1c7dd5f" />
 		<rom name="Mortal Kombat (Europe) (Track 01).bin" size="37516752" crc="509c1303" />
 		<rom name="Mortal Kombat (Europe) (Track 02).bin" size="7561680" crc="d8aaadbc" />
@@ -9306,7 +9306,7 @@ Either crashes or have more or less severe GFX glitches during gameplay
 	</software>
 
 	<software name="mku" cloneof="mk" supported="no">
-		<!-- http://redump.org/disc/2173/
+		<!-- https://redump.info/disc/2173/
 		<rom name="Mortal Kombat (USA).cue" size="2376" crc="4e47aa2c" />
 		<rom name="Mortal Kombat (USA) (Track 01).bin" size="37516752" crc="a14a402f" />
 		<rom name="Mortal Kombat (USA) (Track 02).bin" size="7208880" crc="9e0eb9cb" />
@@ -9350,7 +9350,7 @@ https://mametesters.org/view.php?id=7509
 	</software>
 
 	<software name="mmania">
-		<!-- http://redump.org/disc/7689/
+		<!-- https://redump.info/disc/7689/
 		<rom name="Mickey Mania (Europe).cue" size="3230" crc="27e28c06" />
 		<rom name="Mickey Mania (Europe) (Track 01).bin" size="15676080" crc="024d38a9" />
 		<rom name="Mickey Mania (Europe) (Track 02).bin" size="22595664" crc="551213d7" />
@@ -9481,7 +9481,7 @@ https://mametesters.org/view.php?id=7509
 	</software>
 
 	<software name="mmaniau" cloneof="mmania">
-		<!-- http://redump.org/disc/20251/
+		<!-- https://redump.info/disc/20251/
 		<rom name="Mickey Mania: The Timeless Adventures of Mickey Mouse (USA).cue" size="4183" crc="8b274085" sha1="baf7851017e64fc1a1f43ab29e3f06dc51ebfa8e" />
 		<rom name="Mickey Mania: The Timeless Adventures of Mickey Mouse (USA) (Track 01).bin" size="15676080" crc="811dbd43" sha1="2291effccf920f99da97992add55db860b4d460c" />
 		<rom name="Mickey Mania: The Timeless Adventures of Mickey Mouse (USA) (Track 02).bin" size="22595664" crc="ab25259a" sha1="07e992f40923b51a9a62f300c0c908de80d1e8a2" />
@@ -9580,7 +9580,7 @@ Glitchy tile in border area (verify)
 	</software>
 
 	<software name="mmpru" cloneof="mmpr" supported="partial">
-		<!-- http://redump.org/disc/19474/
+		<!-- https://redump.info/disc/19474/
 		<rom name="Mighty Morphin Power Rangers (USA).cue" size="261" crc="bd9ee789" md5="99b64ed4df709f6c01076333c506bc6b" sha1="87262cbc791ef6018748ac2b654c5f56b50f59e6"/>
 		<rom name="Mighty Morphin Power Rangers (USA) (Track 1).bin" size="465155040" crc="a7cf6c1b" md5="8ce1c15622e66652b85efdd7732f16bc" sha1="a93a3d0e8d065909dbe5b657796642b88dfc0d3b"/>
 		<rom name="Mighty Morphin Power Rangers (USA) (Track 2).bin" size="7596960" crc="da3cf811" md5="712144d1835d67abe6ae3b23d16514f3" sha1="d94341b152360c43ec8660a5cfbd4251ec3f4c62"/>
@@ -9603,7 +9603,7 @@ Glitchy tile in border area (verify)
 	</software>
 
 	<software name="monkey">
-		<!-- http://redump.org/disc/36040/
+		<!-- https://redump.info/disc/36040/
 		<rom name="Secret of Monkey Island, The (USA).cue" size="3488" crc="04a1e02f" md5="027ccf6397d96b6d9a5b7b33adcaa9fc" sha1="2c14e74a3fca8214008621434a530d861268307c"/>
 		<rom name="Secret of Monkey Island, The (USA) (Track 01).bin" size="13063008" crc="8a9c032d" md5="9efbaf7fa3ebe088db4deb78f93f05e4" sha1="a63fc8aad1001064f16fda2f57c4c59eb7994908"/>
 		<rom name="Secret of Monkey Island, The (USA) (Track 02).bin" size="21525504" crc="2482c4ef" md5="c1d50fb26e4b5cf8d2c05a7082f3ba9a" sha1="65546e87bc9af111574aaf822a57e41771871fcc"/>
@@ -9649,7 +9649,7 @@ Glitchy tile in border area (verify)
 	</software>
 
 	<software name="monkeya" cloneof="monkey">
-		<!-- http://redump.org/disc/89210/
+		<!-- https://redump.info/disc/89210/
 		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games).cue" size="4603" crc="f701139e" md5="4ac8b47fa064192030580511ab61249c" sha1="fc0c5dd77aa0320d22a0189c05988495c60b5b87"/>
 		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 01).bin" size="13063008" crc="8a9c032d" md5="9efbaf7fa3ebe088db4deb78f93f05e4" sha1="a63fc8aad1001064f16fda2f57c4c59eb7994908"/>
 		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 02).bin" size="21525504" crc="b770d568" md5="d09ee2c920c89d7c8f6e273af9ed2325" sha1="14c8aeff008231a792b8d6afb9a4ed3290f63c23"/>
@@ -9781,7 +9781,7 @@ Black screen at startup if mouse connected to -ctrl2
 	</software>
 
 	<software name="yumemi" cloneof="mystmans">
-		<!-- http://redump.org/disc/1838/
+		<!-- https://redump.info/disc/1838/
 		<rom name="Yumemi Yakata no Monogatari (Japan).cue" size="240" crc="e9b007a4" />
 		<rom name="Yumemi Yakata no Monogatari (Japan) (Track 1).bin" size="625389744" crc="e491e189" />
 		<rom name="Yumemi Yakata no Monogatari (Japan) (Track 2).bin" size="7190064" crc="1d6aa9a6" />
@@ -9803,7 +9803,7 @@ Black screen at startup if mouse connected to -ctrl2
 	</software>
 
 	<software name="yumemidemo" cloneof="mystmans">
-		<!-- http://redump.org/disc/54198/
+		<!-- https://redump.info/disc/54198/
 		<rom name="Yumemi Yakata no Monogatari (Japan) (Demo).cue" size="277" crc="bf0d9c31" />
 		<rom name="Yumemi Yakata no Monogatari (Japan) (Demo) (Track 1).bin" size="625389744" crc="7ed0b9bc" />
 		<rom name="Yumemi Yakata no Monogatari (Japan) (Demo) (Track 2).bin" size="7190064" crc="1d6aa9a6" />
@@ -9823,7 +9823,7 @@ Black screen at startup if mouse connected to -ctrl2
 	</software>
 
 	<software name="nbajam">
-		<!-- http://redump.org/disc/15426/
+		<!-- https://redump.info/disc/15426/
 		<rom name="NBA Jam (Europe).cue" size="972" crc="15ddb4c3" />
 		<rom name="NBA Jam (Europe) (Track 1).bin" size="51240672" crc="8478b943" />
 		<rom name="NBA Jam (Europe) (Track 2).bin" size="52350816" crc="cef08a42" />
@@ -9876,7 +9876,7 @@ Black screen at startup if mouse connected to -ctrl2
 	</software>
 
 	<software name="nbajamu" cloneof="nbajam">
-		<!-- http://redump.org/disc/28628/
+		<!-- https://redump.info/disc/28628/
 		<rom name="NBA Jam (USA).cue" size="945" crc="cdf4a699" md5="1fa5a7e3006f864b36486c1d07b6f1bf" sha1="fbfd6e5bf180965155e37a85d099378210a6a4a4"/>
 		<rom name="NBA Jam (USA) (Track 1).bin" size="51240672" crc="55fe001d" md5="3017c771d419f2d1ba798214c9c25401" sha1="1d214e0cd0c137d1aa67aeaff6f5a6452429a102"/>
 		<rom name="NBA Jam (USA) (Track 2).bin" size="52350816" crc="9184b102" md5="60c02b62e5447636fcdfc0572b7ac5b4" sha1="5fd5a1aad42b6894dcf5316575388a461433cef0"/>
@@ -9903,7 +9903,7 @@ Black screen at startup if mouse connected to -ctrl2
 	</software>
 
 	<software name="nflgreat">
-		<!-- http://redump.org/disc/24558/
+		<!-- https://redump.info/disc/24558/
 		<rom name="NFL's Greatest - San Francisco vs. Dallas 1978-1993 (USA).cue" size="284" crc="82157b37" md5="4c28fa7316b818fbd24364ad31fec18e" sha1="754f14d3c7261f7f09f0bdf0f91ba4ca1bf70004"/>
 		<rom name="NFL's Greatest - San Francisco vs. Dallas 1978-1993 (USA) (Track 1).bin" size="627755856" crc="7bdc5233" md5="9743d7b9585de738475615bcd34b90fc" sha1="f41908f1a2db5979e8c74d428718a7d4e580b2f0"/>
 		<rom name="NFL's Greatest - San Francisco vs. Dallas 1978-1993 (USA) (Track 2).bin" size="4821600" crc="82671365" md5="7dcc79e89a3afced38831ba69c2f2107" sha1="89a4ead11574121d5d21cda0ddbf39915488da12"/>
@@ -10036,7 +10036,7 @@ Black screen at startup if mouse connected to -ctrl2
 	</software>
 
 	<software name="nhl94u" cloneof="nhl94">
-		<!-- http://redump.org/disc/17157/
+		<!-- https://redump.info/disc/17157/
 		<rom name="NHL '94 (USA).cue" size="8514" crc="0bce920a" />
 		<rom name="NHL '94 (USA) (Track 01).bin" size="209363280" crc="bb13c98d" />
 		<rom name="NHL '94 (USA) (Track 02).bin" size="18084528" crc="f5a1d100" />
@@ -10208,7 +10208,7 @@ Refuses to run without a [SRAM cart] (471 blocks!)
 	</software>
 
 	<software name="nost1907">
-		<!-- http://redump.org/disc/1786/
+		<!-- https://redump.info/disc/1786/
 		<rom name="Nostalgia 1907 (Japan).cue" size="214" crc="fae49f9e" />
 		<rom name="Nostalgia 1907 (Japan) (Track 1).bin" size="192649968" crc="b1478a7e" />
 		<rom name="Nostalgia 1907 (Japan) (Track 2).bin" size="24710112" crc="747ca04b" />
@@ -10307,7 +10307,7 @@ Refuses to run without a [SRAM cart] (471 blocks!)
 	</software>
 
 	<software name="nstriker" supported="partial">
-		<!-- http://redump.org/disc/17390/
+		<!-- https://redump.info/disc/17390/
 		<rom name="Night Striker (Japan, Korea).cue" size="4779" crc="9fef22f7" />
 		<rom name="Night Striker (Japan, Korea) (Track 01).bin" size="15605520" crc="184fb14e" />
 		<rom name="Night Striker (Japan, Korea) (Track 02).bin" size="6383328" crc="7d83c902" />
@@ -10436,8 +10436,8 @@ Requires [disc swap]
 	</software>
 
 	<software name="ntrap32u" cloneof="ntrap" supported="no">
-		<!-- http://redump.org/disc/17550/
-		     http://redump.org/disc/17551/
+		<!-- https://redump.info/disc/17550/
+		     https://redump.info/disc/17551/
 		<rom name="Night Trap (USA) (Disc 1) (32X).cue" size="232" crc="40b701ce" />
 		<rom name="Night Trap (USA) (Disc 1) (32X) (Track 1).bin" size="617061312" crc="fc9d7f2e" />
 		<rom name="Night Trap (USA) (Disc 1) (32X) (Track 2).bin" size="2551920" crc="43a2e918" />
@@ -10505,8 +10505,8 @@ Requires [disc swap]
 	</software>
 
 	<software name="ntrapj" cloneof="ntrap" supported="no">
-		<!-- http://redump.org/disc/1959/
-		     http://redump.org/disc/1960/
+		<!-- https://redump.info/disc/1959/
+		     https://redump.info/disc/1960/
 		<rom name="Night Trap (Japan) (Disc 1).cue" size="224" crc="f3527896" />
 		<rom name="Night Trap (Japan) (Disc 1) (Track 1).bin" size="615875904" crc="17744c64" />
 		<rom name="Night Trap (Japan) (Disc 1) (Track 2).bin" size="2587200" crc="ff1b77f6" />
@@ -10542,7 +10542,7 @@ Requires [disc swap]
 	</software>
 
 	<software name="ntrapjdemo" cloneof="ntrap">
-		<!-- http://redump.org/disc/39382/
+		<!-- https://redump.info/disc/39382/
 		<rom name="Night Trap (Japan) (Demo).cue" size="243" crc="9dce8d3d" />
 		<rom name="Night Trap (Japan) (Demo) (Track 1).bin" size="615875904" crc="03e24407" />
 		<rom name="Night Trap (Japan) (Demo) (Track 2).bin" size="2587200" crc="1cc25944" />
@@ -10595,8 +10595,8 @@ Requires [disc swap]
 
 	<!-- This is a dump from the original edition. Investigate if the re-release is different. -->
 	<software name="ntrapua" cloneof="ntrap" supported="no">
-		<!-- http://redump.org/disc/17158/
-		     http://redump.org/disc/17159/
+		<!-- https://redump.info/disc/17158/
+		     https://redump.info/disc/17159/
 		<rom name="Night Trap (USA) (Disc 1).cue" size="91" crc="b5fae72b" />
 		<rom name="Night Trap (USA) (Disc 1).bin" size="616997808" crc="900cf0aa" />
 
@@ -10631,8 +10631,8 @@ Required [disc swap]
 
 	<!-- Only the first disk is different from the parent. -->
 	<software name="ntrapub" cloneof="ntrap" supported="no">
-		<!-- http://redump.org/disc/20867/
-		     http://redump.org/disc/17159/
+		<!-- https://redump.info/disc/20867/
+		     https://redump.info/disc/17159/
 		<rom name="Night Trap (USA) (Disc 1) (Alt).cue" size="97" crc="f2950016" md5="c9261a74b06972b2e1fbf7addc5fb5a0" sha1="2456d059254e74ebaf8b8f17fc665222fa47c323"/>
 		<rom name="Night Trap (USA) (Disc 1) (Alt).bin" size="616645008" crc="133b76ce" md5="6bfe493a225713115096d730edf77afe" sha1="9cd08d3718e17134a013cae92a52a2ac0b226b77"/>
 
@@ -10776,7 +10776,7 @@ Requires [disc swap]
 	</software>
 
 	<software name="pitfallu" cloneof="pitfall">
-		<!-- http://redump.org/disc/11781/
+		<!-- https://redump.info/disc/11781/
 		<rom name="Pitfall - The Mayan Adventure (USA).cue" size="2949" crc="fc3ad28a" />
 		<rom name="Pitfall - The Mayan Adventure (USA) (Track 01).bin" size="26104848" crc="85a8926a" />
 		<rom name="Pitfall - The Mayan Adventure (USA) (Track 02).bin" size="4798080" crc="79ae94fa" />
@@ -10869,7 +10869,7 @@ Requires [disc swap]
 	</software>
 
 	<software name="popmail">
-		<!-- http://redump.org/disc/20699/
+		<!-- https://redump.info/disc/20699/
 		<rom name="Popful Mail (USA).cue" size="449" crc="2414276b" md5="f324f3bf93e3ff4b0dba22d22ec262ab" sha1="26a42b82895a203bbb79dff6567492e05e0d18a7"/>
 		<rom name="Popful Mail (USA) (Track 1).bin" size="421130304" crc="f17b5750" md5="1d583f4bbcdfc73f5686a6824c782494" sha1="00c67d62649bdc936da87e3218f7fd7c081df549"/>
 		<rom name="Popful Mail (USA) (Track 2).bin" size="25119360" crc="6329c847" md5="51b6f6ad0f9437345dca11bbaec9dd47" sha1="ca3c7af222e657016963d1e66a8136cae9c20f56"/>
@@ -10891,7 +10891,7 @@ Requires [disc swap]
 	</software>
 
 	<software name="popmailj" cloneof="popmail">
-		<!-- http://redump.org/disc/3116/
+		<!-- https://redump.info/disc/3116/
 		<rom name="Popful Mail (Japan).cue" size="321" crc="76e15750" />
 		<rom name="Popful Mail (Japan) (Track 1).bin" size="349281408" crc="da0db5b4" />
 		<rom name="Popful Mail (Japan) (Track 2).bin" size="25133472" crc="d044aac3" />
@@ -10913,7 +10913,7 @@ Requires [disc swap]
 	</software>
 
 	<software name="popmailjdemo" cloneof="popmail">
-		<!-- http://redump.org/disc/39375/
+		<!-- https://redump.info/disc/39375/
 		<rom name="PopfulMail (Japan) (Demo).cue" size="362" crc="9a2711d1" />
 		<rom name="PopfulMail (Japan) (Demo) (Track 1).bin" size="353736096" crc="6ec9ff55" />
 		<rom name="PopfulMail (Japan) (Demo) (Track 2).bin" size="25133472" crc="4afcdca3" />
@@ -10934,7 +10934,7 @@ Requires [disc swap]
 	</software>
 
 	<software name="ppersia">
-		<!-- http://redump.org/disc/4101/
+		<!-- https://redump.info/disc/4101/
 		<rom name="Prince of Persia (Europe).cue" size="2982" crc="973d4c21" />
 		<rom name="Prince of Persia (Europe) (Track 01).bin" size="2641296" crc="ad500b93" />
 		<rom name="Prince of Persia (Europe) (Track 02).bin" size="33708864" crc="49811689" />
@@ -10976,7 +10976,7 @@ Requires [disc swap]
 	</software>
 
 	<software name="ppersiaj" cloneof="ppersia">
-		<!-- http://redump.org/disc/1655/
+		<!-- https://redump.info/disc/1655/
 		<rom name="Prince of Persia (Japan).cue" size="2957" crc="742ea509" />
 		<rom name="Prince of Persia (Japan) (Track 01).bin" size="7933296" crc="a7ef5614" />
 		<rom name="Prince of Persia (Japan) (Track 02).bin" size="33708864" crc="49811689" />
@@ -11020,7 +11020,7 @@ Requires [disc swap]
 	</software>
 
 	<software name="ppersiau" cloneof="ppersia">
-		<!-- http://redump.org/disc/4105/
+		<!-- https://redump.info/disc/4105/
 		<rom name="Prince of Persia (USA).cue" size="2907" crc="8ee6022d" />
 		<rom name="Prince of Persia (USA) (Track 01).bin" size="2641296" crc="e085f060" />
 		<rom name="Prince of Persia (USA) (Track 02).bin" size="33706512" crc="d90aea57" />
@@ -11167,7 +11167,7 @@ Glitchy tiles spawning on all FMVs and main menu
 
 	<!-- Only the first disc is dumped to redump.org standard. The second disc is a TOSEC-ISO dump. -->
 	<software name="prizefigu" cloneof="prizefig" supported="no">
-		<!-- Source: TOSEC-ISO & redump.org - http://redump.org/disc/28629/
+		<!-- Source: TOSEC-ISO & redump.org - https://redump.info/disc/28629/
 		<rom name="Prize Fighter (USA) (Disc 1).cue" size="226" crc="008693c6" md5="5d9afab480f10aff98863b7bb6e35eb2" sha1="88788d86717177eca87075169ee40d0fdc683286"/>
 		<rom name="Prize Fighter (USA) (Disc 1) (Track 1).bin" size="410527488" crc="7d3f2a3c" md5="f8c2e9f9adc690908bd753c5c5ad1511" sha1="a310fc47ee68ba2f6c860b24b11be76ac4f08d86"/>
 		<rom name="Prize Fighter (USA) (Disc 1) (Track 2).bin" size="1881600" crc="59e2ce56" md5="3e98c47c9f75e731393a6516568a00bf" sha1="590fe2a3cefdf1dcfe77a911c972775b26059ee1"/>
@@ -11202,7 +11202,7 @@ Glitchy tiles spawning on all FMVs and main menu
 	</software>
 
 	<software name="proyakcd">
-		<!-- http://redump.org/disc/1958/
+		<!-- https://redump.info/disc/1958/
 		<rom name="Pro Yakyuu Super League CD (Japan).cue" size="2949" crc="b74953c9" />
 		<rom name="Pro Yakyuu Super League CD (Japan) (Track 01).bin" size="51685200" crc="069a0e83" />
 		<rom name="Pro Yakyuu Super League CD (Japan) (Track 02).bin" size="11825856" crc="97c32cc2" />
@@ -11250,7 +11250,7 @@ Glitchy tiles spawning on all FMVs and main menu
 	be improved. As such, this disc is not really a game in it's own right.
 	-->
 	<software name="psgaesd" supported="no">
-		<!-- http://redump.org/disc/19787/
+		<!-- https://redump.info/disc/19787/
 		<rom name="Pier Solar and the Great Architects Enhanced Soundtrack Disc (USA).cue" size="622" crc="6d317fa8" md5="f0e03431664704058746f511e21c0958" sha1="ef30161fe9b6737346530bd74644996b3dc58041"/>
 		<rom name="Pier Solar and the Great Architects Enhanced Soundtrack Disc (USA) (Track 1).bin" size="511769328" crc="59200094" md5="5861f8067b1a3b8f1f6567e844a58dd3" sha1="649ca22c941afb50613167a942fd82b0c0b93384"/>
 		<rom name="Pier Solar and the Great Architects Enhanced Soundtrack Disc (USA) (Track 2).bin" size="14533008" crc="f4efb8ba" md5="504e6fec737c03b6a79192a742ee128b" sha1="33d55d40a6572b03189bc0b3a739ccdfc20db7e5"/>
@@ -11434,7 +11434,7 @@ Glitchy odd lines on FMVs
 	</software>
 
 	<software name="puggsyu" cloneof="puggsy" supported="partial">
-		<!-- http://redump.org/disc/4106/
+		<!-- https://redump.info/disc/4106/
 		<rom name="Puggsy (USA).cue" size="2336" crc="890dbfbb" />
 		<rom name="Puggsy (USA) (Track 01).bin" size="104388816" crc="88336725" />
 		<rom name="Puggsy (USA) (Track 02).bin" size="33539520" crc="763a36ef" />
@@ -11477,7 +11477,7 @@ Glitchy odd lines on FMVs
 	</software>
 
 	<software name="quizss" supported="partial">
-		<!-- http://redump.org/disc/1657/
+		<!-- https://redump.info/disc/1657/
 		<rom name="Quiz Scramble Special (Japan) (Rev B).cue" size="5394" crc="32fb3613" />
 		<rom name="Quiz Scramble Special (Japan) (Rev B) (Track 01).bin" size="28261632" crc="24f14a3d" />
 		<rom name="Quiz Scramble Special (Japan) (Rev B) (Track 02).bin" size="12352704" crc="ec5d2bdd" />
@@ -11667,7 +11667,7 @@ Offset [redbook] playback during cutscenes, with lip sync drift
 	</software>
 
 	<software name="quiztono">
-		<!-- http://redump.org/disc/1993/
+		<!-- https://redump.info/disc/1993/
 		<rom name="Capcom no Quiz - Tonosama no Yabou (Japan).cue" size="254" crc="dcb26809" />
 		<rom name="Capcom no Quiz - Tonosama no Yabou (Japan) (Track 1).bin" size="498555792" crc="ac72da73" />
 		<rom name="Capcom no Quiz - Tonosama no Yabou (Japan) (Track 2).bin" size="2050944" crc="07287a36" />
@@ -11688,7 +11688,7 @@ Offset [redbook] playback during cutscenes, with lip sync drift
 	</software>
 
 	<software name="racinace">
-		<!-- http://redump.org/disc/24556/
+		<!-- https://redump.info/disc/24556/
 		<rom name="Racing Aces (USA).cue" size="1214" crc="84e9bb9b" md5="293ece452f4a2585f5dd28ece1607d37" sha1="cbdc9e1e27d8965b905e1de79b0f14790fba9b99"/>
 		<rom name="Racing Aces (USA) (Track 01).bin" size="14939904" crc="d33ff98a" md5="3796ee3952260af8fe9c0e278a588f73" sha1="9dad2c6fa3538e5fe4cd224c5bcc98f936ab2b73"/>
 		<rom name="Racing Aces (USA) (Track 02).bin" size="39513600" crc="222d5d07" md5="edcb22a6cec19af1c053fd996d6c891f" sha1="f9298af478aa3e0d30305c2e4913e16b63c91814"/>
@@ -11764,7 +11764,7 @@ Black screen with continous track 1 access
 	</software>
 
 	<software name="ragecageu" cloneof="ragecage">
-		<!-- http://redump.org/disc/24400/
+		<!-- https://redump.info/disc/24400/
 		<rom name="WWF - Rage in the Cage (USA).cue" size="249" crc="441f81ae" md5="ac6e90c5f1a67e8979469a12fc920205" sha1="884fc60aa3c55b030436fa8708fe84873a455a8b"/>
 		<rom name="WWF - Rage in the Cage (USA) (Track 1).bin" size="244071744" crc="d8108020" md5="0b343e4747c88cd1a5a53c4a0a3ff231" sha1="bd00621b669deae9cd88f2d773bd9bbe65f14146"/>
 		<rom name="WWF - Rage in the Cage (USA) (Track 2).bin" size="3885504" crc="375c89e2" md5="47a21e6123c5224f676090e6e17e60c0" sha1="95d76698d0196deef72e0ffff8540a9f9303a113"/>
@@ -11784,7 +11784,7 @@ Black screen with continous track 1 access
 	</software>
 
 	<software name="ranma" supported="partial">
-		<!-- http://redump.org/disc/1660/
+		<!-- https://redump.info/disc/1660/
 		<rom name="Ranma 1-2 - Byakuranaika (Japan).cue" size="3157" crc="3a971b70" />
 		<rom name="Ranma 1-2 - Byakuranaika (Japan) (Track 01).bin" size="49519008" crc="a92a2dc5" />
 		<rom name="Ranma 1-2 - Byakuranaika (Japan) (Track 02).bin" size="10334688" crc="f8086912" />
@@ -11856,7 +11856,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 	</software>
 
 	<software name="rdf" supported="partial">
-		<!-- http://redump.org/disc/21450/
+		<!-- https://redump.info/disc/21450/
 		<rom name="RDF - Global Conflict (USA).cue" size="852" crc="29c93c89" md5="66072c384f42e3a2d08458dfa51d0f13" sha1="0ff3b55ddaf143adf19b72e007481bec8b555dd8"/>
 		<rom name="RDF - Global Conflict (USA) (Track 1).bin" size="256711392" crc="dcfb7926" md5="e7081e9e9d13cd14103ece2c6e665b08" sha1="f262c98ffa79ebb3e7e9155de467c87d45e55f81"/>
 		<rom name="RDF - Global Conflict (USA) (Track 2).bin" size="21607824" crc="7161c764" md5="c33f5809ca9b0c78c5f352500c7d586d" sha1="ac5f4fbde44e6c49c4875c5303ec66159eb9edcb"/>
@@ -11883,7 +11883,7 @@ Plays back bogus [redbook] with hiccups during briefing FMVs
 	</software>
 
 	<software name="revninja" supported="no">
-		<!-- http://redump.org/disc/17202/
+		<!-- https://redump.info/disc/17202/
 		<rom name="Revenge of the Ninja (USA).cue" size="582" crc="fd8526de" />
 		<rom name="Revenge of the Ninja (USA) (Track 1).bin" size="325801392" crc="33c4b555" />
 		<rom name="Revenge of the Ninja (USA) (Track 2).bin" size="3544464" crc="59fa6f1b" />
@@ -11926,7 +11926,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 	</software>
 
 	<software name="risedrg">
-		<!-- http://redump.org/disc/11784/
+		<!-- https://redump.info/disc/11784/
 		<rom name="Rise of the Dragon (USA).cue" size="572" crc="0c8cddf9" />
 		<rom name="Rise of the Dragon (USA) (Track 1).bin" size="129028368" crc="e2d7b047" />
 		<rom name="Rise of the Dragon (USA) (Track 2).bin" size="15864240" crc="3115d3ca" />
@@ -11948,7 +11948,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 	</software>
 
 	<software name="risedrga" cloneof="risedrg">
-		<!-- http://redump.org/disc/17160/
+		<!-- https://redump.info/disc/17160/
 		<rom name="Rise of the Dragon (USA) (Alt).cue" size="602" crc="99d5038d" />
 		<rom name="Rise of the Dragon (USA) (Alt) (Track 1).bin" size="128993088" crc="4d6ba481" />
 		<rom name="Rise of the Dragon (USA) (Alt) (Track 2).bin" size="15866592" crc="e01f55ca" />
@@ -11971,7 +11971,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 	</software>
 
 	<software name="risedrgj" cloneof="risedrg">
-		<!-- http://redump.org/disc/1658/
+		<!-- https://redump.info/disc/1658/
 		<rom name="Rise of the Dragon - A Blade Hunter Mystery (Japan).cue" size="707" crc="59bdb6fd" />
 		<rom name="Rise of the Dragon - A Blade Hunter Mystery (Japan) (Track 1).bin" size="178145184" crc="e9c09483" />
 		<rom name="Rise of the Dragon - A Blade Hunter Mystery (Japan) (Track 2).bin" size="15866592" crc="272c6e01" />
@@ -11995,7 +11995,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 	</software>
 
 	<software name="roadaven" supported="no">
-		<!-- http://redump.org/disc/7216/
+		<!-- https://redump.info/disc/7216/
 		<rom name="Road Avenger (Europe).cue" size="442" crc="c852ae6d" />
 		<rom name="Road Avenger (Europe) (Track 1).bin" size="317816352" crc="c15fde6f" />
 		<rom name="Road Avenger (Europe) (Track 2).bin" size="2667168" crc="f523ac94" />
@@ -12019,7 +12019,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 	</software>
 
 	<software name="roadavenu" cloneof="roadaven" supported="no">
-		<!-- http://redump.org/disc/29313/
+		<!-- https://redump.info/disc/29313/
 		<rom name="Road Avenger (USA).cue" size="453" crc="9e7d5e08" md5="840ebb398cce8d27cf3a5d253d8b575d" sha1="cd2b55540b911786886f43aae99e228d9f85efc5"/>
 		<rom name="Road Avenger (USA) (Track 1).bin" size="317816352" crc="cf3bd177" md5="71e1578e091e0d5df4b07f4f26e4d2c9" sha1="9cf7095ab8f7a5aa5df046d0b665263f4f506f19"/>
 		<rom name="Road Avenger (USA) (Track 2).bin" size="2664816" crc="5ef6a4c1" md5="3c3aab85aca0bf19bf2dd24d98f4e0e2" sha1="13ff4a9ceaf86c8eaa2e9545debf93795f83178e"/>
@@ -12297,7 +12297,7 @@ Misbehaves during opening, runs too fast, ROZ stretches past the intended place
 	</software>
 
 	<software name="sangoku3" supported="partial">
-		<!-- http://redump.org/disc/1630/
+		<!-- https://redump.info/disc/1630/
 		<rom name="Sangokushi III (Japan).cue" size="5832" crc="1748f5b9" />
 		<rom name="Sangokushi III (Japan) (Track 01).bin" size="11160240" crc="5e0d844c" />
 		<rom name="Sangokushi III (Japan) (Track 02).bin" size="1427664" crc="dc5eda0e" />
@@ -12369,7 +12369,7 @@ Cannot save without a [SRAM cart] (631 blocks!)
 	</software>
 
 	<software name="segaac">
-		<!-- http://redump.org/disc/8167/
+		<!-- https://redump.info/disc/8167/
 		<rom name="Sega Classics Arcade Collection (Europe).cue" size="1602" crc="00f4c433" />
 		<rom name="Sega Classics Arcade Collection (Europe) (Track 01).bin" size="25893168" crc="7d8ab493" />
 		<rom name="Sega Classics Arcade Collection (Europe) (Track 02).bin" size="16315824" crc="824dfd97" />
@@ -12427,7 +12427,7 @@ Cannot save without a [SRAM cart] (631 blocks!)
 	</software>
 
 	<software name="segaacj" cloneof="segaac">
-		<!-- http://redump.org/disc/1735/
+		<!-- https://redump.info/disc/1735/
 		<rom name="Sega Classic Arcade Collection (Japan).cue" size="1578" crc="1426a3b5" />
 		<rom name="Sega Classic Arcade Collection (Japan) (Track 01).bin" size="25149936" crc="a65db4ba" />
 		<rom name="Sega Classic Arcade Collection (Japan) (Track 02).bin" size="16315824" crc="824dfd97" />
@@ -12552,7 +12552,7 @@ Cannot save without a [SRAM cart] (631 blocks!)
 
 	<!-- This was bundled together with a Sega-CD device, along with Sherlock Holmes: Consulting Detective Vol. I. -->
 	<software name="segaac4a" cloneof="segaac4">
-		<!-- http://redump.org/disc/24519/
+		<!-- https://redump.info/disc/24519/
 		<rom name="Sega Classics Arcade Collection (USA) (RE) (4-in-1).cue" size="1757" crc="e8f8a601" md5="ad2f339bd1053b415d2aa77977523926" sha1="f2df03f67c2a6af397ca1856f2f472509a2ac5d8"/>
 		<rom name="Sega Classics Arcade Collection (USA) (RE) (4-in-1) (Track 01).bin" size="25149936" crc="54797302" md5="c263f1dbad75b50acbf0a8a92bb9a8bb" sha1="49edf796c8a5bf5da1aae61b78b548a622a3f9c1"/>
 		<rom name="Sega Classics Arcade Collection (USA) (RE) (4-in-1) (Track 02).bin" size="16313472" crc="71366051" md5="7690c1abaafd229284a54411c75501cd" sha1="d8323c5e37fb4fc90a8963d48a6beeba4be46dba"/>
@@ -12582,7 +12582,7 @@ Cannot save without a [SRAM cart] (631 blocks!)
 
 	<!-- This was bundled together with a Sega-CD device, along with Ecco the Dolphin. -->
 	<software name="segaac5">
-		<!-- http://redump.org/disc/21496/
+		<!-- https://redump.info/disc/21496/
 		<rom name="Sega Classics Arcade Collection (USA) (5-in-1).cue" size="1674" crc="cddb46f5" md5="354f5361fd5125cc2a194698d66e1aad" sha1="16e4b4129038ae845da9c10a98edbe0668cd5266"/>
 		<rom name="Sega Classics Arcade Collection (USA) (5-in-1) (Track 01).bin" size="25893168" crc="641e1b23" md5="03d1d2c51d6c1df30a94c7367118318a" sha1="370dec46d11410f98037232c37908d5c9e9637b1"/>
 		<rom name="Sega Classics Arcade Collection (USA) (5-in-1) (Track 02).bin" size="16313472" crc="71366051" md5="7690c1abaafd229284a54411c75501cd" sha1="d8323c5e37fb4fc90a8963d48a6beeba4be46dba"/>
@@ -12964,7 +12964,7 @@ Requires [SRAM cart] for playing final scenario
 	</software>
 
 	<software name="shinfrcej" cloneof="shinfrce" supported="partial">
-		<!-- http://redump.org/disc/1938/
+		<!-- https://redump.info/disc/1938/
 		<rom name="Shining Force CD (Japan).cue" size="4147" crc="51bef593" />
 		<rom name="Shining Force CD (Japan) (Track 01).bin" size="68664288" crc="4dd14b8b" />
 		<rom name="Shining Force CD (Japan) (Track 02).bin" size="1768704" crc="75589f1a" />
@@ -13021,7 +13021,7 @@ Requires [SRAM cart] for playing final scenario
 	</software>
 
 	<software name="shinfrceu" cloneof="shinfrce" supported="partial">
-		<!-- http://redump.org/disc/2702/
+		<!-- https://redump.info/disc/2702/
 		<rom name="Shining Force CD (USA).cue" size="4054" crc="ede67263" />
 		<rom name="Shining Force CD (USA) (Track 01).bin" size="68666640" crc="a85fa1a0" />
 		<rom name="Shining Force CD (USA) (Track 02).bin" size="1764000" crc="cf2919d5" />
@@ -13075,7 +13075,7 @@ Requires [SRAM cart] for playing final scenario
 	</software>
 
 	<software name="shinfrceua" cloneof="shinfrce" supported="partial">
-		<!-- http://redump.org/disc/3875/
+		<!-- https://redump.info/disc/3875/
 		<rom name="Shining Force CD (USA) (Alt).cue" size="4264" crc="d7af633d" />
 		<rom name="Shining Force CD (USA) (Alt) (Track 01).bin" size="68666640" crc="a85fa1a0" />
 		<rom name="Shining Force CD (USA) (Alt) (Track 02).bin" size="1764000" crc="3ba2537d" />
@@ -13144,7 +13144,7 @@ Requires [SRAM cart] for playing final scenario
 	</software>
 
 	<software name="shinmt" supported="partial">
-		<!-- http://redump.org/disc/10143/
+		<!-- https://redump.info/disc/10143/
 		<rom name="Shin Megami Tensei (Japan).cue" size="3491" crc="8b795266" />
 		<rom name="Shin Megami Tensei (Japan) (Track 01).bin" size="68633712" crc="4fbbcf95" />
 		<rom name="Shin Megami Tensei (Japan) (Track 02).bin" size="3499776" crc="d6b82430" />
@@ -13305,7 +13305,7 @@ Essentially requires [SRAM cart] for saving (100 blocks)
 	</software>
 
 	<software name="silpheed">
-		<!-- http://redump.org/disc/8166/
+		<!-- https://redump.info/disc/8166/
 		<rom name="Silpheed (Europe).cue" size="870" crc="e8000097" />
 		<rom name="Silpheed (Europe) (Track 1).bin" size="362417328" crc="96866125" />
 		<rom name="Silpheed (Europe) (Track 2).bin" size="16097088" crc="71ebc6c3" />
@@ -13330,7 +13330,7 @@ Essentially requires [SRAM cart] for saving (100 blocks)
 	</software>
 
 	<software name="silpheedj" cloneof="silpheed">
-		<!-- http://redump.org/disc/1740/
+		<!-- https://redump.info/disc/1740/
 		<rom name="Silpheed (Japan).cue" size="862" crc="b6759734" />
 		<rom name="Silpheed (Japan) (Track 1).bin" size="369174624" crc="4d419bdf" />
 		<rom name="Silpheed (Japan) (Track 2).bin" size="16099440" crc="9d8797f4" />
@@ -13357,7 +13357,7 @@ Essentially requires [SRAM cart] for saving (100 blocks)
 	</software>
 
 	<software name="silpheedjdemo" supported="no">
-		<!-- http://redump.org/disc/39378/
+		<!-- https://redump.info/disc/39378/
 		<rom name="Silpheed (Japan) (Demo).cue" size="216" crc="84cd95f7" />
 		<rom name="Silpheed (Japan) (Demo) (Track 1).bin" size="369174624" crc="70ab8271" />
 		<rom name="Silpheed (Japan) (Demo) (Track 2).bin" size="1058400" crc="b22e5a2a" />
@@ -13380,7 +13380,7 @@ Disc does not boot due to improper mastering. More info can be found at the Redu
 	</software>
 
 	<software name="silpheedjdemof" cloneof="silpheedjdemo" supported="no">
-		<!-- http://redump.org/disc/39383/
+		<!-- https://redump.info/disc/39383/
 		<rom name="Silpheed (Japan) (Demo) (Fixed Dump).cue" size="242" crc="87d9d2bb" />
 		<rom name="Silpheed (Japan) (Demo) (Fixed Dump) (Track 1).bin" size="369174624" crc="6b59f551" />
 		<rom name="Silpheed (Japan) (Demo) (Fixed Dump) (Track 2).bin" size="1058400" crc="648c227c" />
@@ -13404,7 +13404,7 @@ Non-playable stages desyncs with CPU controlled inputs (verify)
 	</software>
 
 	<software name="silpheedu" cloneof="silpheed">
-		<!-- http://redump.org/disc/17203/
+		<!-- https://redump.info/disc/17203/
 		<rom name="Silpheed (USA).cue" size="846" crc="ec090dec" />
 		<rom name="Silpheed (USA) (Track 1).bin" size="369233424" crc="bddb8612" />
 		<rom name="Silpheed (USA) (Track 2).bin" size="16097088" crc="3f9c5a60" />
@@ -13697,10 +13697,10 @@ Requires [disc swap]
 	</software>
 
 	<software name="slamcityu" cloneof="slamcity" supported="no">
-		<!-- http://redump.org/disc/28031/
-		     http://redump.org/disc/28032/
-		     http://redump.org/disc/28033/
-		     http://redump.org/disc/28034/
+		<!-- https://redump.info/disc/28031/
+		     https://redump.info/disc/28032/
+		     https://redump.info/disc/28033/
+		     https://redump.info/disc/28034/
 		<rom name="Slam City with Scottie Pippen (USA) (Disc 1) (Fingers).cue" size="301" crc="3f50c8bc" md5="35ca36913af0a3df72cf8c3492eceec1" sha1="e3511c717bb78966f75e0dd4a2190b5d390faefe"/>
 		<rom name="Slam City with Scottie Pippen (USA) (Disc 1) (Fingers) (Track 1).bin" size="587070960" crc="becd1484" md5="99a012c46ec31fec5f9538eaa510bd5a" sha1="f32cf26f6fa4acf12807e7f1064e9e202d11cff3"/>
 		<rom name="Slam City with Scottie Pippen (USA) (Disc 1) (Fingers) (Track 2).bin" size="17122560" crc="e5008538" md5="6591a3d2fc756fb0f9f128d21af5e182" sha1="ba88dd54677ea1f1618761a50e4ab88da8c0e264"/>
@@ -13814,7 +13814,7 @@ Requires [disc swap]
 	</software>
 
 	<software name="smurfs">
-		<!-- http://redump.org/disc/16096/
+		<!-- https://redump.info/disc/16096/
 		<rom name="Smurfs, The (Europe) (En,Fr,De,Es,It).cue" size="2754" crc="feff73f0" />
 		<rom name="Smurfs, The (Europe) (En,Fr,De,Es,It) (Track 01).bin" size="16398144" crc="7d49548a" />
 		<rom name="Smurfs, The (Europe) (En,Fr,De,Es,It) (Track 02).bin" size="13502832" crc="d6110ae3" />
@@ -13893,7 +13893,7 @@ Optional [Justifier] support
 	</software>
 
 	<software name="snatcherp" cloneof="snatcher" supported="partial">
-		<!-- http://redump.org/disc/62657/
+		<!-- https://redump.info/disc/62657/
 		<rom name="Snatcher (USA) (Beta) (1994-10-07).cue" size="2754" crc="a285b223" md5="e020d9136d1b7d69d8a2e71b64a3613c" sha1="2e3b0743e1ab99f62413a1a2889c37b87f9999df"/>
 		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 01).bin" size="131744928" crc="b6f1932e" md5="44b57d67b3e216e77d6357abb3e4627f" sha1="606dc65dba04fd95097d0cfc8fed22de7122d786"/>
 		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 02).bin" size="1164240" crc="d00f54c4" md5="cc325c2484ff41e7d4b0e9060894146b" sha1="ac73d5629875586db0a5d776a13beef377d9a854"/>
@@ -13932,7 +13932,7 @@ Optional [Justifier] support
 	</software>
 
 	<software name="snatcheru" cloneof="snatcher" supported="partial">
-		<!-- http://redump.org/disc/20559/
+		<!-- https://redump.info/disc/20559/
 		<rom name="Snatcher (USA).cue" size="2271" crc="13845fdf" md5="fe305d5467811e10fee501bc9135efb5" sha1="c6bdafb2bdb8b2558c8104549cbfdd9ef9a1817f"/>
 		<rom name="Snatcher (USA) (Track 01).bin" size="131744928" crc="13ad0387" md5="8a4f5185fa0754e073e331bebd91bbb4" sha1="1f4164205ed736a0d9a03eb7972868e9aa737d35"/>
 		<rom name="Snatcher (USA) (Track 02).bin" size="1164240" crc="d00f54c4" md5="cc325c2484ff41e7d4b0e9060894146b" sha1="ac73d5629875586db0a5d776a13beef377d9a854"/>
@@ -13974,7 +13974,7 @@ Optional [Justifier] support
 	</software>
 
 	<software name="solfeace" supported="no">
-		<!-- http://redump.org/disc/4100/
+		<!-- https://redump.info/disc/4100/
 		<rom name="Sol-Feace (Europe).cue" size="2016" crc="cfc94dfb" />
 		<rom name="Sol-Feace (Europe) (Track 01).bin" size="6319824" crc="46429d5f" />
 		<rom name="Sol-Feace (Europe) (Track 02).bin" size="2006256" crc="97380316" />
@@ -14091,7 +14091,7 @@ Will black screen on FMV anyway
 	</software>
 
 	<software name="solfeacej" cloneof="solfeace" supported="no">
-		<!-- http://redump.org/disc/3113/
+		<!-- https://redump.info/disc/3113/
 		<rom name="Sol-Feace (Japan).cue" size="2446" crc="e3bf68e3" />
 		<rom name="Sol-Feace (Japan) (Track 01).bin" size="4097184" crc="03c0bd53" />
 		<rom name="Sol-Feace (Japan) (Track 02).bin" size="2053296" crc="36364065" />
@@ -14136,7 +14136,7 @@ Hangs on BIOS logo
 
 	<!-- This game was only ever bundled together with a Sega-CD device. -->
 	<software name="solfeaceu" cloneof="solfeace" supported="no">
-		<!-- http://redump.org/disc/24480/
+		<!-- https://redump.info/disc/24480/
 		<rom name="Sol-Feace (USA) (RE2).cue" size="2093" crc="c5a409c6" md5="ffdcd949f1487eab3d8f4c8ce67da61e" sha1="db492dbb3499a4d617cc1c706d6c9c4400d51565"/>
 		<rom name="Sol-Feace (USA) (RE2) (Track 01).bin" size="6326880" crc="12d07dc0" md5="81b8e0b7d4ae4bf1c89c1c8afdef9a90" sha1="76425f2e2f8812da76beba73837a8f5f7a9b759e"/>
 		<rom name="Sol-Feace (USA) (RE2) (Track 02).bin" size="1996848" crc="9103f7fc" md5="6b0f10b1c55dd007917e00df10149ded" sha1="719ca5a54c8b92bd9f451ffa5381356c5e06f83c"/>
@@ -14175,7 +14175,7 @@ Will black screen on FMV anyway
 	</software>
 
 	<software name="soniccd">
-		<!-- http://redump.org/disc/8302/
+		<!-- https://redump.info/disc/8302/
 		<rom name="Sonic CD (Europe).cue" size="3902" crc="e19b0360" />
 		<rom name="Sonic CD (Europe) (Track 01).bin" size="129590496" crc="0060ac74" />
 		<rom name="Sonic CD (Europe) (Track 02).bin" size="1091328" crc="f6f21067" />
@@ -14227,7 +14227,7 @@ Will black screen on FMV anyway
 	</software>
 
 	<software name="soniccdj" cloneof="soniccd">
-		<!-- http://redump.org/disc/1632/
+		<!-- https://redump.info/disc/1632/
 		<rom name="Sonic the Hedgehog CD (Japan).cue" size="4322" crc="6a065b3b" />
 		<rom name="Sonic the Hedgehog CD (Japan) (Track 01).bin" size="129592848" crc="4c9fb365" />
 		<rom name="Sonic the Hedgehog CD (Japan) (Track 02).bin" size="1093680" crc="b5575d36" />
@@ -14281,7 +14281,7 @@ Will black screen on FMV anyway
 	</software>
 
 	<software name="soniccdjdemo" cloneof="soniccd">
-		<!-- http://redump.org/disc/54195/
+		<!-- https://redump.info/disc/54195/
 		<rom name="Sonic the Hedgehog CD (Japan) (Demo).cue" size="4590" crc="c5f52249" />
 		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 01).bin" size="129592848" crc="128ac97f" />
 		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 02).bin" size="1093680" crc="b5575d36" />
@@ -14335,7 +14335,7 @@ Will black screen on FMV anyway
 	</software>
 
 	<software name="soniccdu" cloneof="soniccd">
-		<!-- http://redump.org/disc/29188/
+		<!-- https://redump.info/disc/29188/
 		<rom name="Sonic CD (USA).cue" size="3797" crc="086e1953" />
 		<rom name="Sonic CD (USA) (Track 01).bin" size="139381872" crc="a6184e05" />
 		<rom name="Sonic CD (USA) (Track 02).bin" size="1086624" crc="15012c2f" />
@@ -14445,7 +14445,7 @@ Will black screen on FMV anyway
 	</software>
 
 	<software name="soniccdua" cloneof="soniccd">
-		<!-- http://redump.org/disc/24557/
+		<!-- https://redump.info/disc/24557/
 		<rom name="Sonic CD (USA) (RE125).cue" size="4100" crc="e8a15187" md5="92d0c52b29c25b21e8d0bef3e3086115" sha1="ff275b2a8bf5c301fed311addca55aee8a1a13ab"/>
 		<rom name="Sonic CD (USA) (RE125) (Track 01).bin" size="139381872" crc="a6184e05" md5="ed96420538f989e94480f810d5f90685" sha1="3c316af52cc9ee8c30976a1cdb66339545dda3bd"/>
 		<rom name="Sonic CD (USA) (RE125) (Track 02).bin" size="1086624" crc="15012c2f" md5="db67c23a4edadb89bf1c527c230f1fb9" sha1="4aa8d5356ca9208d12a1e52a1b161a5d9a5ba354"/>
@@ -14500,7 +14500,7 @@ Will black screen on FMV anyway
 
 	<!-- This disc was bundled together with a Sega-CD device. -->
 	<software name="soniccdub" cloneof="soniccd">
-		<!-- http://redump.org/disc/29653/
+		<!-- https://redump.info/disc/29653/
 		<rom name="Sonic CD (USA) (RE125) (Alt).cue" size="4310" crc="53948c76" md5="ac75d9b8331ba59da608c49e5cc03cb7" sha1="4d190b6a7cc7e2284f7c16f6afaf94ff625dfb8c"/>
 		<rom name="Sonic CD (USA) (RE125) (Alt) (Track 01).bin" size="139381872" crc="a6184e05" md5="ed96420538f989e94480f810d5f90685" sha1="3c316af52cc9ee8c30976a1cdb66339545dda3bd"/>
 		<rom name="Sonic CD (USA) (RE125) (Alt) (Track 02).bin" size="1086624" crc="15012c2f" md5="db67c23a4edadb89bf1c527c230f1fb9" sha1="4aa8d5356ca9208d12a1e52a1b161a5d9a5ba354"/>
@@ -14553,7 +14553,7 @@ Will black screen on FMV anyway
 	</software>
 
 	<software name="soniccduc" cloneof="soniccd">
-		<!-- http://redump.org/disc/119465/
+		<!-- https://redump.info/disc/119465/
 		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 01).bin" size="139381872" crc="a6184e05" md5="ed96420538f989e94480f810d5f90685" sha1="3c316af52cc9ee8c30976a1cdb66339545dda3bd" />
 		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 02).bin" size="1086624" crc="15012c2f" md5="db67c23a4edadb89bf1c527c230f1fb9" sha1="4aa8d5356ca9208d12a1e52a1b161a5d9a5ba354" />
 		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 03).bin" size="19618032" crc="38ca5b03" md5="9c4f328f0ea9ade89b463a6c4e521bd7" sha1="e3e6fddaa2e6bd83b425fc26c6c71742b5fb8e9f" />
@@ -14606,7 +14606,7 @@ Will black screen on FMV anyway
 	</software>
 
 	<software name="soulstar">
-		<!-- http://redump.org/disc/16095/
+		<!-- https://redump.info/disc/16095/
 		<rom name="SoulStar (Europe) (En,Fr,De).cue" size="1728" crc="f61747a2" />
 		<rom name="SoulStar (Europe) (En,Fr,De) (Track 01).bin" size="145885152" crc="9d516485" />
 		<rom name="SoulStar (Europe) (En,Fr,De) (Track 02).bin" size="17226048" crc="4025cb08" />
@@ -14694,7 +14694,7 @@ Will black screen on FMV anyway
 	</software>
 
 	<software name="soulstaru" cloneof="soulstar">
-		<!-- http://redump.org/disc/29655/
+		<!-- https://redump.info/disc/29655/
 		<rom name="SoulStar (USA).cue" size="1858" crc="abd6f11a" md5="60a9cd1064fe684a48237b0e7d82db33" sha1="7a48145bf6bb4196decb79afaef4898e4d730397"/>
 		<rom name="SoulStar (USA) (Track 01).bin" size="145885152" crc="d647bf71" md5="5fe5f9a7f0d958fe586beca9d6caede6" sha1="48e11204d1119cc064ba0706710323e763bfefd5"/>
 		<rom name="SoulStar (USA) (Track 02).bin" size="16873248" crc="30d5ad9a" md5="00df4182fe88ad02c08b824661010eab" sha1="7fb61ca54d8d01345cb99324fd68025c0a9abbea"/>
@@ -14729,7 +14729,7 @@ Will black screen on FMV anyway
 	</software>
 
 	<software name="spaceace">
-		<!-- http://redump.org/disc/21037/
+		<!-- https://redump.info/disc/21037/
 		<rom name="Space Ace (USA).cue" size="200" crc="2d1fa0f5" md5="ae880100bad12052e2f241802e522a11" sha1="675ef3486253a90e1c61f593c212f61947b05774"/>
 		<rom name="Space Ace (USA) (Track 1).bin" size="306263328" crc="7a029b47" md5="e272da5ae4526d9e88ac08f78109d483" sha1="d5c1dacbeba1f4e28d23690ae889a9540a27df94"/>
 		<rom name="Space Ace (USA) (Track 2).bin" size="1521744" crc="60eade1a" md5="219338306d836e503200995f9b6cdfbf" sha1="3e7034584cf93dbb4fe059d08f3c909cca4891aa"/>
@@ -14764,7 +14764,7 @@ Will black screen on FMV anyway
 	</software>
 
 	<software name="spidking">
-		<!-- http://redump.org/disc/17593/
+		<!-- https://redump.info/disc/17593/
 		<rom name="Amazing Spider-Man Vs. The Kingpin, The (Europe).cue" size="1841" crc="bb8deaa5" />
 		<rom name="Amazing Spider-Man Vs. The Kingpin, The (Europe) (Track 01).bin" size="155330784" crc="61d60f64" />
 		<rom name="Amazing Spider-Man Vs. The Kingpin, The (Europe) (Track 02).bin" size="44462208" crc="3e9fb470" />
@@ -14794,7 +14794,7 @@ Will black screen on FMV anyway
 	</software>
 
 	<software name="spidkingu" cloneof="spidking">
-		<!-- http://redump.org/disc/21446/
+		<!-- https://redump.info/disc/21446/
 		<rom name="Amazing Spider-Man vs. The Kingpin, The (USA).cue" size="1825" crc="e9bdce95" md5="cda12eceedc7c6acbcf1499ead3eeeb5" sha1="646a13adf0ece1416399e2809d6442fac23b25cd"/>
 		<rom name="Amazing Spider-Man vs. The Kingpin, The (USA) (Track 01).bin" size="155330784" crc="781b2d3f" md5="3b7b7435b70d24aabcf97fa82b4e74cc" sha1="15b4fe55e5cdd45b16c9f4c6fa2c145d4f919a87"/>
 		<rom name="Amazing Spider-Man vs. The Kingpin, The (USA) (Track 02).bin" size="44125872" crc="a6e4359b" md5="bacf87188b2528d179fe0362431d8978" sha1="1ddafdb182ddacd1cb2466d8a5ac81392c8d5451"/>
@@ -14825,7 +14825,7 @@ Will black screen on FMV anyway
 	</software>
 
 	<software name="sshark">
-		<!-- http://redump.org/disc/7851/
+		<!-- https://redump.info/disc/7851/
 		<rom name="Sewer Shark (Europe).cue" size="210" crc="c41da738" />
 		<rom name="Sewer Shark (Europe) (Track 1).bin" size="487536672" crc="e995691c" />
 		<rom name="Sewer Shark (Europe) (Track 2).bin" size="2410800" crc="933d470a" />
@@ -14845,7 +14845,7 @@ Will black screen on FMV anyway
 
 	<!-- This disc was bundled together with a Sega-CD device. -->
 	<software name="ssharku" cloneof="sshark">
-		<!-- http://redump.org/disc/17161/
+		<!-- https://redump.info/disc/17161/
 		<rom name="Sewer Shark (USA) (Bundle) (Alt).cue" size="234" crc="ff1908ab" />
 		<rom name="Sewer Shark (USA) (Bundle) (Alt) (Track 1).bin" size="487360272" crc="57b21ebe" />
 		<rom name="Sewer Shark (USA) (Bundle) (Alt) (Track 2).bin" size="2234400" crc="9705cbfe" />
@@ -14865,7 +14865,7 @@ Will black screen on FMV anyway
 	</software>
 
 	<software name="ssharkua" cloneof="sshark">
-		<!-- http://redump.org/disc/20215/
+		<!-- https://redump.info/disc/20215/
 		<rom name="Sewer Shark (USA).cue" size="83" crc="1db0c2a0" md5="d952dfe13456fd6800109e173b4b8657" sha1="e306c648550a6903078abb9a8da66cc8764cde60"/>
 		<rom name="Sewer Shark (USA).bin" size="488418672" crc="9868681b" md5="02f292b31c5cd336b4e18c861518bee2" sha1="94ca329bbe4eb70cf820fe502c37091787f5a551"/>
 		-->
@@ -14884,7 +14884,7 @@ Will black screen on FMV anyway
 	</software>
 
 	<software name="ssharkub" cloneof="sshark">
-		<!-- http://redump.org/disc/6135/
+		<!-- https://redump.info/disc/6135/
 		<rom name="Sewer Shark (USA).cue" size="83" crc="1db0c2a0" />
 		<rom name="Sewer Shark (USA).bin" size="488418672" crc="19f2fe42" />
 		-->
@@ -14904,7 +14904,7 @@ Will black screen on FMV anyway
 
 	<!-- This disc was bundled together with a Sega-CD device. -->
 	<software name="ssharkuc" cloneof="sshark">
-		<!-- http://redump.org/disc/24552/
+		<!-- https://redump.info/disc/24552/
 		<rom name="Sewer Shark (USA) (Rev B) (Alt 1).cue" size="259" crc="2e7eb382" md5="b48b4d62a9654af9f2a7881147cc0c68" sha1="e4f116197617758c52d8cb74deae1d82c9ba13c0"/>
 		<rom name="Sewer Shark (USA) (Rev B) (Alt 1) (Track 1).bin" size="487360272" crc="57b21ebe" md5="b05ca93f4b221bee8b206b6e368bc699" sha1="a14d881c0956434ccd04b0b86f8afe6b214f1f8a"/>
 		<rom name="Sewer Shark (USA) (Rev B) (Alt 1) (Track 2).bin" size="2234400" crc="ff2f7adc" md5="af34f10417653d93e6ed0ad3cda9f9a8" sha1="d8ee48d98af0fc667ed5d999b1a32365d7ea892b"/>
@@ -14924,7 +14924,7 @@ Will black screen on FMV anyway
 
 	<!-- This disc was bundled together with a Sega-CD device. -->
 	<software name="ssharkud" cloneof="sshark">
-		<!-- http://redump.org/disc/29654/
+		<!-- https://redump.info/disc/29654/
 		<rom name="Sewer Shark (USA) (Bundle).cue" size="222" crc="bef879f8" />
 		<rom name="Sewer Shark (USA) (Bundle) (Track 1).bin" size="487360272" crc="57b21ebe" />
 		<rom name="Sewer Shark (USA) (Bundle) (Track 2).bin" size="2234400" crc="75573804" />
@@ -14961,7 +14961,7 @@ Will black screen on FMV anyway
 	</software>
 
 	<software name="starbladj" cloneof="starblad">
-		<!-- http://redump.org/disc/10145/
+		<!-- https://redump.info/disc/10145/
 		<rom name="Starblade (Japan).cue" size="204" crc="04ca242d" />
 		<rom name="Starblade (Japan) (Track 1).bin" size="466669728" crc="239f44d6" />
 		<rom name="Starblade (Japan) (Track 2).bin" size="1528800" crc="9265e140" />
@@ -14982,7 +14982,7 @@ Will black screen on FMV anyway
 	</software>
 
 	<software name="starbladu" cloneof="starblad">
-		<!-- http://redump.org/disc/21038/
+		<!-- https://redump.info/disc/21038/
 		<rom name="Starblade (USA).cue" size="200" crc="ae85834b" md5="6e22cb519a92dc0289585f54232eac12" sha1="0c9d7e4f642284204db77a345f928e41b0531065"/>
 		<rom name="Starblade (USA) (Track 1).bin" size="466669728" crc="1bc4b93f" md5="243ca56356fa83632a80b9e5d9f5ad74" sha1="3ea7411b78dce9c03beff78a450480d53b7127e3"/>
 		<rom name="Starblade (USA) (Track 2).bin" size="1528800" crc="9265e140" md5="745b11da19fa5137a007a990eec3515e" sha1="e6251cae47325e237b59a849b3513516a5b1f4ea"/>
@@ -15024,7 +15024,7 @@ Will black screen on FMV anyway
 	</software>
 
 	<software name="stellarf" supported="no">
-		<!-- http://redump.org/disc/3903/
+		<!-- https://redump.info/disc/3903/
 		<rom name="Stellar-Fire (USA).cue" size="2355" crc="a95a065f" />
 		<rom name="Stellar-Fire (USA) (Track 01).bin" size="99252048" crc="2e3ef2e4" />
 		<rom name="Stellar-Fire (USA) (Track 02).bin" size="10040688" crc="4f169953" />
@@ -15066,7 +15066,7 @@ Heavy graphic trails during gameplay
 	</software>
 
 	<software name="supleag">
-		<!-- http://redump.org/disc/1662/
+		<!-- https://redump.info/disc/1662/
 		<rom name="Egawa Suguru no Super League CD (Japan).cue" size="4672" crc="46a0371c" />
 		<rom name="Egawa Suguru no Super League CD (Japan) (Track 01).bin" size="41446944" crc="ef4adeb8" />
 		<rom name="Egawa Suguru no Super League CD (Japan) (Track 02).bin" size="1397088" crc="b4a16139" />
@@ -15275,7 +15275,7 @@ Changes language from English to Cantonese after losing a life
 	</software>
 
 	<software name="surgical32u" cloneof="surgical" supported="no">
-		<!-- http://redump.org/disc/46308/
+		<!-- https://redump.info/disc/46308/
 		<rom name="Surgical Strike (Brazil) (Sega CD 32X).cue" size="378" crc="5046e80c" />
 		<rom name="Surgical Strike (Brazil) (Sega CD 32X) (Track 1).bin" size="438499824" crc="2356dcc6" />
 		<rom name="Surgical Strike (Brazil) (Sega CD 32X) (Track 2).bin" size="43210944" crc="87b19436" />
@@ -15298,7 +15298,7 @@ Requires [32X] add-on, game asks you to plug it in if not present
 	</software>
 
 	<software name="surgicalu" cloneof="surgical">
-		<!-- http://redump.org/disc/20252/
+		<!-- https://redump.info/disc/20252/
 		<rom name="Surgical Strike (USA).cue" size="327" crc="5e7052c3" md5="63920b1c6a7b3917286e7a241312aa8e" sha1="015f1b4b5ae51d66fc1560d9dfd20000af2f2215"/>
 		<rom name="Surgical Strike (USA) (Track 1).bin" size="445005456" crc="eb94db26" md5="7624e55d7c85825036a21a9e13e7dd52" sha1="d4204796ac98245a7ad9ed9ff5792c5a58d0d7cd"/>
 		<rom name="Surgical Strike (USA) (Track 2).bin" size="43210944" crc="87b19436" md5="743818576ccae4b33af1a9b313edf9a7" sha1="fd9cbc2109cbffadd752e6b3d74ae8eef22ef8b3"/>
@@ -15340,7 +15340,7 @@ Can crash after battle animation
 	</software>
 
 	<software name="swchessu" cloneof="swchess" supported="no">
-		<!-- http://redump.org/disc/21448/
+		<!-- https://redump.info/disc/21448/
 		<rom name="Software Toolworks' Star Wars Chess, The (USA).cue" size="262" crc="eddd396f" md5="2c12f949441867e21c6dccb35b89358b" sha1="035cdc6ea08fa0a16cb356faea54951c8bcc6131"/>
 		<rom name="Software Toolworks' Star Wars Chess, The (USA) (Track 1).bin" size="261163728" crc="bea83946" md5="0f93cd21e33e1cd30a98bd6d7d080639" sha1="d8f5c2f22cb27b00efd5679a1a1c8cad799dc97d"/>
 		<rom name="Software Toolworks' Star Wars Chess, The (USA) (Track 2).bin" size="1521744" crc="a408bb52" md5="04a26d0c4b82d757ceb424e2d827adf7" sha1="f14b874390ba045c0a1368bfae5753089415b188"/>
@@ -15362,7 +15362,7 @@ Can crash after battle animation
 	</software>
 
 	<software name="switch" cloneof="panic" supported="partial">
-		<!-- http://redump.org/disc/2628/
+		<!-- https://redump.info/disc/2628/
 		<rom name="Switch (Japan).cue" size="4996" crc="78993adf" />
 		<rom name="Switch (Japan) (Track 01).bin" size="253884288" crc="09aceef5" />
 		<rom name="Switch (Japan) (Track 02).bin" size="16732128" crc="8414ba7d" />
@@ -15431,7 +15431,7 @@ offset [redbook] in intro
 	</software>
 
 	<software name="swra">
-		<!-- http://redump.org/disc/16097/
+		<!-- https://redump.info/disc/16097/
 		<rom name="Star Wars - Rebel Assault (Europe).cue" size="238" crc="6f455677" />
 		<rom name="Star Wars - Rebel Assault (Europe) (Track 1).bin" size="395255952" crc="2c8b3ea0" />
 		<rom name="Star Wars - Rebel Assault (Europe) (Track 2).bin" size="58148496" crc="51a31463" />
@@ -15484,7 +15484,7 @@ offset [redbook] in intro
 	</software>
 
 	<software name="swraj" cloneof="swra">
-		<!-- http://redump.org/disc/10144/
+		<!-- https://redump.info/disc/10144/
 		<rom name="Star Wars - Rebel Assault (Japan).cue" size="236" crc="593af0ea" />
 		<rom name="Star Wars - Rebel Assault (Japan) (Track 1).bin" size="395248896" crc="e49d72d3" />
 		<rom name="Star Wars - Rebel Assault (Japan) (Track 2).bin" size="57795696" crc="ea28d67f" />
@@ -15505,7 +15505,7 @@ offset [redbook] in intro
 	</software>
 
 	<software name="swrau" cloneof="swra">
-		<!-- http://redump.org/disc/16896/
+		<!-- https://redump.info/disc/16896/
 		<rom name="Star Wars - Rebel Assault (USA).cue" size="232" crc="6eafe8d6" />
 		<rom name="Star Wars - Rebel Assault (USA) (Track 1).bin" size="395255952" crc="310bc2e8" />
 		<rom name="Star Wars - Rebel Assault (USA) (Track 2).bin" size="57798048" crc="4af56d2c" />
@@ -15525,7 +15525,7 @@ offset [redbook] in intro
 	</software>
 
 	<software name="swraua" cloneof="swra">
-		<!-- http://redump.org/disc/75925/
+		<!-- https://redump.info/disc/75925/
 		<rom name="Star Wars - Rebel Assault (USA) (Limited Run Games).cue" size="295" crc="39203248" md5="56d27694df8a14b67bc5a16bc5135c28" sha1="238d2a5f29102e42407d739de0c83716cc4e6fff"/>
 		<rom name="Star Wars - Rebel Assault (USA) (Limited Run Games) (Track 1).bin" size="395255952" crc="310bc2e8" md5="d6a6e3dd209869bad97c1908fcf8b59c" sha1="786bb1709349ef83da583009b088ea711f598daf"/>
 		<rom name="Star Wars - Rebel Assault (USA) (Limited Run Games) (Track 2).bin" size="57798048" crc="23e0f645" md5="962b35c4019b1dbc99e9bec1186c0272" sha1="9e53fa60d97acb77ef7ab43729f4a6ce0d36d502"/>
@@ -15581,7 +15581,7 @@ offset [redbook] in intro
 	</software>
 
 	<software name="tcataly">
-		<!-- http://redump.org/disc/7883/
+		<!-- https://redump.info/disc/7883/
 		<rom name="Tomcat Alley (Europe).cue" size="212" crc="ba3e5b0f" />
 		<rom name="Tomcat Alley (Europe) (Track 1).bin" size="567756336" crc="5e41b3ba" />
 		<rom name="Tomcat Alley (Europe) (Track 2).bin" size="2669520" crc="ac3d778c" />
@@ -15618,7 +15618,7 @@ offset [redbook] in intro
 	</software>
 
 	<software name="tcatalyg" cloneof="tcataly">
-		<!-- http://redump.org/disc/16093/
+		<!-- https://redump.info/disc/16093/
 		<rom name="Tomcat Alley (Germany).cue" size="214" crc="2bde10ab" />
 		<rom name="Tomcat Alley (Germany) (Track 1).bin" size="532775040" crc="64f930f1" />
 		<rom name="Tomcat Alley (Germany) (Track 2).bin" size="2690688" crc="c01db8b1" />
@@ -15675,7 +15675,7 @@ offset [redbook] in intro
 	</software>
 
 	<software name="tcatalyu" cloneof="tcataly">
-		<!-- http://redump.org/disc/3485/
+		<!-- https://redump.info/disc/3485/
 		<rom name="Tomcat Alley (USA).cue" size="206" crc="3106e238" />
 		<rom name="Tomcat Alley (USA) (Track 1).bin" size="567408240" crc="8110d2ef" />
 		<rom name="Tomcat Alley (USA) (Track 2).bin" size="2335536" crc="77561509" />
@@ -15695,7 +15695,7 @@ offset [redbook] in intro
 	</software>
 
 	<software name="tcatalyua" cloneof="tcataly">
-		<!-- http://redump.org/disc/24405/
+		<!-- https://redump.info/disc/24405/
 		<rom name="Tomcat Alley (USA).cue" size="229" crc="472a189e" md5="779b6e95b27983fce151ddbc350d1651" sha1="84aca06cfb9bfb2cb881eddfe2251a4aabc4891c"/>
 		<rom name="Tomcat Alley (USA) (Track 1).bin" size="567756336" crc="e064fd12" md5="147bfb944524cbcdd78671348205853c" sha1="49b8fdc6d399bc2bf4c1c5c48922abf1ef5accc8"/>
 		<rom name="Tomcat Alley (USA) (Track 2).bin" size="2337888" crc="aa74f12a" md5="157a4fb5cc0fddde1a5d7ec4b2bd848d" sha1="cbb5362ca92cc0d8ff050c92af3ed5ecf934b045"/>
@@ -15714,7 +15714,7 @@ offset [redbook] in intro
 	</software>
 
 	<software name="tenbu" supported="no">
-		<!-- http://redump.org/disc/1994/
+		<!-- https://redump.info/disc/1994/
 		<rom name="Tenbu Mega CD Special (Japan).cue" size="1089" crc="79c8ab53" />
 		<rom name="Tenbu Mega CD Special (Japan) (Track 1).bin" size="216478080" crc="c4127fc0" />
 		<rom name="Tenbu Mega CD Special (Japan) (Track 2).bin" size="43580208" crc="84945981" />
@@ -15759,7 +15759,7 @@ Hangs after title
 	</software>
 
 	<software name="tenkafub" supported="partial">
-		<!-- http://redump.org/disc/1620/
+		<!-- https://redump.info/disc/1620/
 		<rom name="Tenkafubu - Eiyuutachi no Houkou (Japan).cue" size="2547" crc="0d10e057" />
 		<rom name="Tenkafubu - Eiyuutachi no Houkou (Japan) (Track 01).bin" size="120457680" crc="487c1c68" />
 		<rom name="Tenkafubu - Eiyuutachi no Houkou (Japan) (Track 02).bin" size="1613472" crc="42d8c275" />
@@ -15826,7 +15826,7 @@ Cuts off Game Arts sample at intro FMV [redbook]
 	</software>
 
 	<software name="termintru" cloneof="termintr">
-		<!-- http://redump.org/disc/21510/
+		<!-- https://redump.info/disc/21510/
 		<rom name="Terminator, The (USA).cue" size="1165" crc="5f9f4e4b" md5="68a66526821f2ca794cc1f8a4e489dcc" sha1="0523868e28061d3d02ec488ed1b37b8bc0c4ff92"/>
 		<rom name="Terminator, The (USA) (Track 01).bin" size="123449424" crc="ae8dbaab" md5="6b52ac74ebbe7593901caf2d5bfae219" sha1="049a79e3ba42aaa4f42747442272ab269ae91b40"/>
 		<rom name="Terminator, The (USA) (Track 02).bin" size="27779472" crc="23bef086" md5="480d91726c3b9537c8000a9017f8d359" sha1="a08e7f7e247900ff6644ee5ca33d2d06afbfe3fc"/>
@@ -15854,7 +15854,7 @@ Cuts off Game Arts sample at intro FMV [redbook]
 	</software>
 
 	<software name="thawk" supported="no">
-		<!-- http://redump.org/disc/7218/
+		<!-- https://redump.info/disc/7218/
 		<rom name="Thunderhawk (Europe) (En,Fr,De,Es).cue" size="1530" crc="03b7f9a4" />
 		<rom name="Thunderhawk (Europe) (En,Fr,De,Es) (Track 01).bin" size="147500976" crc="1894660a" />
 		<rom name="Thunderhawk (Europe) (En,Fr,De,Es) (Track 02).bin" size="38704512" crc="3574a538" />
@@ -15995,7 +15995,7 @@ Buggy ROZ drawing in minimap (raster effect?)
 	</software>
 
 	<software name="thawkj" cloneof="thawk" supported="no">
-		<!-- http://redump.org/disc/15427/
+		<!-- https://redump.info/disc/15427/
 		<rom name="Thunderhawk (Japan).cue" size="1236" crc="f4ae0600" />
 		<rom name="Thunderhawk (Japan) (Track 01).bin" size="104504064" crc="590bda55" />
 		<rom name="Thunderhawk (Japan) (Track 02).bin" size="38704512" crc="6d7bdc00" />
@@ -16028,7 +16028,7 @@ Buggy ROZ drawing in minimap (raster effect?)
 	</software>
 
 	<software name="thawkjdemo" cloneof="thawk" supported="no">
-		<!-- http://redump.org/disc/42759/
+		<!-- https://redump.info/disc/42759/
 		<rom name="Thunderhawk (Japan) (Demo).cue" size="365" crc="9a4d410f" />
 		<rom name="Thunderhawk (Japan) (Demo) (Track 1).bin" size="23204832" crc="be4dae9e" />
 		<rom name="Thunderhawk (Japan) (Demo) (Track 2).bin" size="38539872" crc="89ddd6fb" />
@@ -16176,7 +16176,7 @@ Buggy ROZ drawing in minimap (raster effect?)
 	</software>
 
 	<software name="timegal" supported="no">
-		<!-- http://redump.org/disc/7848/
+		<!-- https://redump.info/disc/7848/
 		<rom name="Time Gal (Europe).cue" size="204" crc="70dba7fd" />
 		<rom name="Time Gal (Europe) (Track 1).bin" size="298936848" crc="d59965e8" />
 		<rom name="Time Gal (Europe) (Track 2).bin" size="1651104" crc="297595a7" />
@@ -16198,7 +16198,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 	</software>
 
 	<software name="timegalj" cloneof="timegal" supported="no">
-		<!-- http://redump.org/disc/4103/
+		<!-- https://redump.info/disc/4103/
 		<rom name="Time Gal (Japan).cue" size="202" crc="a50da29e" />
 		<rom name="Time Gal (Japan) (Track 1).bin" size="304652208" crc="1a756c12" />
 		<rom name="Time Gal (Japan) (Track 2).bin" size="1651104" crc="fd9c4ef7" />
@@ -16222,7 +16222,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 	</software>
 
 	<software name="timegalu" cloneof="timegal" supported="no">
-		<!-- http://redump.org/disc/625/
+		<!-- https://redump.info/disc/625/
 		<rom name="Time Gal (USA).cue" size="198" crc="27b9ee28" />
 		<rom name="Time Gal (USA) (Track 1).bin" size="298936848" crc="2941c00f" />
 		<rom name="Time Gal (USA) (Track 2).bin" size="1653456" crc="bf577267" />
@@ -16264,7 +16264,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 	</software>
 
 	<software name="tstormfx" cloneof="cobracom" supported="no">
-		<!-- http://redump.org/disc/1995/
+		<!-- https://redump.info/disc/1995/
 		<rom name="Thunder Storm FX (Japan).cue" size="218" crc="aa9ff0ed" />
 		<rom name="Thunder Storm FX (Japan) (Track 1).bin" size="259446768" crc="5512fd9c" />
 		<rom name="Thunder Storm FX (Japan) (Track 2).bin" size="1653456" crc="bf577267" />
@@ -16340,7 +16340,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x (likely)
 	</software>
 
 	<software name="uruseiya" supported="partial">
-		<!-- http://redump.org/disc/3157/
+		<!-- https://redump.info/disc/3157/
 		<rom name="Urusei Yatsura - Dear My Friends (Japan).cue" size="384" crc="6947c2fa" />
 		<rom name="Urusei Yatsura - Dear My Friends (Japan) (Track 1).bin" size="383653536" crc="187ce23e" />
 		<rom name="Urusei Yatsura - Dear My Friends (Japan) (Track 2).bin" size="21083328" crc="ef56f804" />
@@ -16365,7 +16365,7 @@ Hangs at Game Arts copyright screen if optional [mouse] is connected
 	</software>
 
 	<software name="uruseiyademo" cloneof="uruseiya">
-		<!-- http://redump.org/disc/42758/
+		<!-- https://redump.info/disc/42758/
 		<rom name="Urusei Yatsura - Dear My Friends (Japan) (Demo).cue" size="474" crc="d3d46675" />
 		<rom name="Urusei Yatsura - Dear My Friends (Japan) (Demo) (Track 1).bin" size="6077568" />
 		<rom name="Urusei Yatsura - Dear My Friends (Japan) (Demo) (Track 2).bin" size="21080976" />
@@ -16386,7 +16386,7 @@ Hangs at Game Arts copyright screen if optional [mouse] is connected
 	</software>
 
 	<software name="vay">
-		<!-- http://redump.org/disc/21511/
+		<!-- https://redump.info/disc/21511/
 		<rom name="Vay (USA).cue" size="2293" crc="47a228e8" md5="b3a9694fcfa531bbcabeb4a5c2d372d2" sha1="0ac359d68e4f54a8279ef9a1a2209744dcaab364"/>
 		<rom name="Vay (USA) (Track 01).bin" size="137883648" crc="1d9be2b9" md5="71ffefc6efc3760ab205bab471462f00" sha1="e2c9d8438cef364d31d7ffee2df5894e09168572"/>
 		<rom name="Vay (USA) (Track 02).bin" size="1368864" crc="a3b616c3" md5="072263a2a1e2eab5d65086c46de4e13e" sha1="74d152c0d431266320728b166bbf03b06204f472"/>
@@ -16425,7 +16425,7 @@ Hangs at Game Arts copyright screen if optional [mouse] is connected
 	</software>
 
 	<software name="vayj" cloneof="vay">
-		<!-- http://redump.org/disc/1937/
+		<!-- https://redump.info/disc/1937/
 		<rom name="Vay - Ryuusei no Yoroi (Japan).cue" size="2107" crc="b0351491" />
 		<rom name="Vay - Ryuusei no Yoroi (Japan) (Track 01).bin" size="122294592" crc="e080738e" />
 		<rom name="Vay - Ryuusei no Yoroi (Japan) (Track 02).bin" size="1368864" crc="e0613845" />
@@ -16513,7 +16513,7 @@ Hangs at Game Arts copyright screen if optional [mouse] is connected
 	</software>
 
 	<software name="wcup94u" cloneof="wcup94">
-		<!-- http://redump.org/disc/24402/
+		<!-- https://redump.info/disc/24402/
 		<rom name="World Cup USA '94 (USA).cue" size="2129" crc="4de8096f" md5="d4ad9c5d6d551ef8036f57bd40c95e09" sha1="d0e67e85e3778a2cc408af14a2b6db475e0bda54"/>
 		<rom name="World Cup USA '94 (USA) (Track 01).bin" size="129268272" crc="364850ab" md5="657d57f82b9d85006a22513fa2846d2d" sha1="ccde562c9396af4761c17f72cfa19b65b1762a58"/>
 		<rom name="World Cup USA '94 (USA) (Track 02).bin" size="24192672" crc="5a991853" md5="4db26fab6659f7da3260d46bbd58a440" sha1="ab3af947968a3b4edec2598024bb5552343e7657"/>
@@ -16548,7 +16548,7 @@ Hangs at Game Arts copyright screen if optional [mouse] is connected
 	</software>
 
 	<software name="wheelfor">
-		<!-- http://redump.org/disc/8273/
+		<!-- https://redump.info/disc/8273/
 		<rom name="Wheel of Fortune (USA).cue" size="910" crc="a383dffe" />
 		<rom name="Wheel of Fortune (USA) (Track 1).bin" size="58670640" crc="54163db9" />
 		<rom name="Wheel of Fortune (USA) (Track 2).bin" size="19086480" crc="0ce7b26d" />
@@ -16573,7 +16573,7 @@ Hangs at Game Arts copyright screen if optional [mouse] is connected
 	</software>
 
 	<software name="whoshot" supported="partial">
-		<!-- http://redump.org/disc/3303/
+		<!-- https://redump.info/disc/3303/
 		<rom name="Who Shot Johnny Rock (USA).cue" size="222" crc="b288f6df" />
 		<rom name="Who Shot Johnny Rock (USA) (Track 1).bin" size="248963904" crc="704bb4ba" />
 		<rom name="Who Shot Johnny Rock (USA) (Track 2).bin" size="1874544" crc="f65cb7d6" />
@@ -16631,7 +16631,7 @@ Optional [Menacer] or [Justifier] support
 	</software>
 
 	<software name="wilybeam">
-		<!-- http://redump.org/disc/20250/
+		<!-- https://redump.info/disc/20250/
 		<rom name="Adventures of Willy Beamish, The (USA).cue" size="2000" crc="7e070f1f" md5="1c01a036318fae087eaca07502699c3e" sha1="ad68b3e076259b7f34ae99622472c5dd115857fd"/>
 		<rom name="Adventures of Willy Beamish, The (USA) (Track 01).bin" size="233269008" crc="abe534e3" md5="c5caa37328f05e17d9401c48cf08de99" sha1="14639e1596ac00f4b3d9aa141e2f4ea78ebb2575"/>
 		<rom name="Adventures of Willy Beamish, The (USA) (Track 02).bin" size="1764000" crc="e7887563" md5="3078714f29b09408fbf800f7a2ce03d0" sha1="923937048d6b3fe908cbe4115a099a3b7a195d0b"/>
@@ -16663,7 +16663,7 @@ Optional [Menacer] or [Justifier] support
 	</software>
 
 	<software name="wingcomm">
-		<!-- http://redump.org/disc/19466/
+		<!-- https://redump.info/disc/19466/
 		<rom name="Wing Commander (USA).cue" size="804" crc="47b303b2" md5="e284ba5630e5fe637c75a23dcae937ef" sha1="0384cbd28a94e93e4a26561329e7c86e61f45721"/>
 		<rom name="Wing Commander (USA) (Track 1).bin" size="385394016" crc="df21b6e3" md5="1677878b98ccd075792c6b2906879010" sha1="89863d46871fd6a0f46c98b2bd5a9a8a8ff041f2"/>
 		<rom name="Wing Commander (USA) (Track 2).bin" size="20761104" crc="cd279afb" md5="2b1ff3dafaf1184a6d90ac15e70398a8" sha1="24525be27a75677c20689a35df916a065049e672"/>
@@ -16687,7 +16687,7 @@ Optional [Menacer] or [Justifier] support
 	</software>
 
 	<software name="wingcommj" cloneof="wingcomm">
-		<!-- http://redump.org/disc/10146/
+		<!-- https://redump.info/disc/10146/
 		<rom name="Wing Commander (Japan).cue" size="678" crc="6367c9d3" />
 		<rom name="Wing Commander (Japan) (Track 1).bin" size="425876640" crc="bd623044" />
 		<rom name="Wing Commander (Japan) (Track 2).bin" size="20765808" crc="8031b38b" />
@@ -16712,7 +16712,7 @@ Optional [Menacer] or [Justifier] support
 	</software>
 
 	<software name="winpost" supported="partial">
-		<!-- http://redump.org/disc/1637/
+		<!-- https://redump.info/disc/1637/
 		<rom name="Winning Post (Japan).cue" size="2167" crc="0a09b085" />
 		<rom name="Winning Post (Japan) (Track 01).bin" size="10252368" crc="db23bafd" />
 		<rom name="Winning Post (Japan) (Track 02).bin" size="7989744" crc="c41baa20" />
@@ -16753,7 +16753,7 @@ Cannot save without a [SRAM cart] (621 blocks!)
 	</software>
 
 	<software name="wirehead">
-		<!-- http://redump.org/disc/28035/
+		<!-- https://redump.info/disc/28035/
 		<rom name="WireHead (USA).cue" size="221" crc="2ec162e1" md5="cdc78b8d197a76ace26295a2ef1179ec" sha1="323d827469093030548ed52722ab37312f9ce71b"/>
 		<rom name="WireHead (USA) (Track 1).bin" size="626641008" crc="e896b306" md5="f8fd756c5692f74e5a2ea97c8a302bcc" sha1="c0812455aa6b81aea5f0a20e15901bfba3e01d47"/>
 		<rom name="WireHead (USA) (Track 2).bin" size="1982736" crc="d5a007ad" md5="2e00d8aa85fe90f039e7c0156b3e63b1" sha1="1b2ecedb429924e3f009ce355649d2ec9781aa3e"/>
@@ -16772,7 +16772,7 @@ Cannot save without a [SRAM cart] (621 blocks!)
 	</software>
 
 	<software name="wireheadp" cloneof="wirehead">
-		<!-- http://redump.org/disc/103543/
+		<!-- https://redump.info/disc/103543/
 		<rom name="WireHead (Europe) (Beta) (1995-09-12).cue" size="244" crc="08904ecc" md5="071260eb65874a23ffd185d6241f6aed" sha1="d0e0794a21dfca0b91aa85fd05edb05b0b17d1f7"/>
 		<rom name="WireHead (Europe) (Beta) (1995-09-12) (Track 1).bin" size="626991456" crc="08895d06" md5="9927fe4108cc562541c52bb27dfdc63a" sha1="46d2cc707718e1e8a9e25910cd3dc2645b733857"/>
 		<rom name="WireHead (Europe) (Beta) (1995-09-12) (Track 2).bin" size="1632288" crc="fb30352a" md5="9479493accbdc93735bf3de02e65fb06" sha1="0e03384f2742eaf5591ac7e8de8540822295df03"/>
@@ -16790,7 +16790,7 @@ Cannot save without a [SRAM cart] (621 blocks!)
 
 	<!-- This disc was bundled with the JVC X'Eye system in the USA. -->
 	<software name="wixeye">
-		<!-- http://redump.org/disc/70286/
+		<!-- https://redump.info/disc/70286/
 		<rom name="What is X'Eye Multi Entertainment System (USA).cue" size="1125" crc="ad4993c3" />
 		<rom name="What is X'Eye Multi Entertainment System (USA) (Track 1).bin" size="49316736" crc="7def0d97" />
 		<rom name="What is X'Eye Multi Entertainment System (USA) (Track 2).bin" size="6738480" crc="4865c4cf" />
@@ -16827,7 +16827,7 @@ Cannot save without a [SRAM cart] (621 blocks!)
 	</software>
 
 	<software name="wmcolb" cloneof="wmcol">
-		<!-- http://redump.org/disc/31953/
+		<!-- https://redump.info/disc/31953/
 		<rom name="WonderMega Collection (Japan) (Rev 2).cue" size="4625" crc="cce652f6" />
 		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 01).bin" size="67032000" crc="45fdc758" />
 		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 02).bin" size="41103552" crc="4dfccbd1" />
@@ -16880,7 +16880,7 @@ Cannot save without a [SRAM cart] (621 blocks!)
 	</software>
 
 	<software name="wolfchld">
-		<!-- http://redump.org/disc/4102/
+		<!-- https://redump.info/disc/4102/
 		<rom name="Wolfchild (Europe).cue" size="1225" crc="c9122a4f" />
 		<rom name="Wolfchild (Europe) (Track 01).bin" size="11343696" crc="e3a77cfa" />
 		<rom name="Wolfchild (Europe) (Track 02).bin" size="34477968" crc="b41b20c1" />
@@ -16908,7 +16908,7 @@ Cannot save without a [SRAM cart] (621 blocks!)
 	</software>
 
 	<software name="wolfchldj" cloneof="wolfchld">
-		<!-- http://redump.org/disc/1736/
+		<!-- https://redump.info/disc/1736/
 		<rom name="Wolfchild (Japan).cue" size="1214" crc="d3f5888a" />
 		<rom name="Wolfchild (Japan) (Track 01).bin" size="11343696" crc="e2e83143" />
 		<rom name="Wolfchild (Japan) (Track 02).bin" size="34477968" crc="b41b20c1" />
@@ -16994,7 +16994,7 @@ Cannot save without a [SRAM cart] (621 blocks!)
 	</software>
 
 	<software name="wonderdgj" cloneof="wonderdg">
-		<!-- http://redump.org/disc/3114/
+		<!-- https://redump.info/disc/3114/
 		<rom name="Wonder Dog (Japan).cue" size="2355" crc="e62fe1de" />
 		<rom name="Wonder Dog (Japan) (Track 01).bin" size="32746896" crc="0cbf80c2" />
 		<rom name="Wonder Dog (Japan) (Track 02).bin" size="42961632" crc="4c909867" />
@@ -17072,7 +17072,7 @@ Cannot save without a [SRAM cart] (621 blocks!)
 	</software>
 
 	<software name="yumimimx">
-		<!-- http://redump.org/disc/1992/
+		<!-- https://redump.info/disc/1992/
 		<rom name="Yumimi Mix (Japan).cue" size="430" crc="70013638" />
 		<rom name="Yumimi Mix (Japan) (Track 1).bin" size="197299872" crc="e93a646f" />
 		<rom name="Yumimi Mix (Japan) (Track 2).bin" size="21676032" crc="c535ba1f" />

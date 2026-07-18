@@ -12292,7 +12292,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 	<software name="skygaldo">
 		<description>Skygaldo (Japan)</description>
 		<year>1986</year>
-		<publisher>Magical Zoo</publisher>
+		<publisher>MagicalZoo</publisher>
 		<info name="serial" value="MXMH21052" />
 		<info name="alt_title" value="スカイギャルド" />
 		<info name="gtin" value="04988614000011"/>

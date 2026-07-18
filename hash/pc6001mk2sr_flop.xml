@@ -7,6 +7,26 @@ Mode 6 PC-6001mkIISR/PC-6601SR floppy disks. They autoboot at startup.
 -->
 <softwarelist name="pc6001mk2sr_flop" description="NEC PC-6001mkIISR/PC-6601SR disk images">
 
+<!-- !Games -->
+
+	<software name="golfisl" supported="no">
+		<!-- TODO: pinpoint if this is normal or "Special" version -->
+		<!-- All covers seems to have the suffix -->
+		<description>Golf Island (66SR)</description>
+		<year>1985?</year>
+		<publisher>テクノソフト (Tecno Soft)</publisher>
+		<notes><![CDATA[
+[FDC] should autoboot from pc6601sr
+]]></notes>
+		<info name="alt_title" value="ゴルフアイランド"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="golf island (66sr).d88" size="305328" crc="d4573555" sha1="52953b7c9831726919eae91082b25c21e0bd1d58"/>
+			</dataarea>
+		</part>
+	</software>
+
+
 <!-- !Utilities -->
 
 <!--
@@ -21,7 +41,7 @@ Autoboot program
 Autoboot program menu
 Japanese word processor example sentences
 
-Acts as a Disk BIOS for further loading
+Acts as a Disk BIOS for further loading. .dsk alt format known to exist
 -->
 	<software name="sruty" supported="no">
 		<description>PC-6601SR Utility Disk</description>

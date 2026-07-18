@@ -27,10 +27,9 @@
 #include "emu.h"
 
 #include "bus/nscsi/et532.h"
-
-#include "machine/nscsi_bus.h"
 #include "bus/nscsi/hd.h"
 #include "bus/nscsi/tape.h"
+#include "machine/nscsi_bus.h"
 
 namespace {
 
@@ -44,7 +43,7 @@ public:
 	{
 	}
 
-	void et532(machine_config &config);
+	void et532(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<et532_board_device> m_board;

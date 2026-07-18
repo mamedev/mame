@@ -496,6 +496,28 @@ ROM_START( charles )
 	ROM_LOAD( "pat_063_tibpal16l8-25cn.u6", 0x000, 0x104, NO_DUMP ) // "PAT 063/1", protected
 ROM_END
 
+/* '61509960606-5 PCB (exactly the same as '960606-5', but with better quality connectors).
+   CPLD labeled as 'PD18'. There's a sticker on the PCB with the date '17/07/2010'.
+   Manuals with schematics:  https://www.recreativas.org/cirsa-euro-bingo-7-7172-unidesa-cirsa  */
+ROM_START( eurbingo7 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "cirsa_euro_bingo_b-00-2193-a_v8.0_caa_02e02c5f_checksum_cl-000929_unidesa.u2", 0x000000, 0x100000, CRC(79c1bbcb) SHA1(2b3b8eacec5233c5ba71a7894710936653a5addd) )
+	// U3 not used
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "s-576_otp.u14", 0x000000, 0x100000, CRC(56198e16) SHA1(27835ee69cd57c125bf27fa45009f28b0416f2fd) )
+	// U15 not used
+
+	ROM_REGION( 0x800, "eeprom", 0 )
+	ROM_LOAD( "24lc16.u10", 0x000, 0x800, CRC(9ebb9996) SHA1(d025b59261181ec0a64570915b62fa9a4bb7bb87) )
+
+	ROM_REGION( 0x800, "counters", 0 )
+	ROM_LOAD( "cirsa_cs-4.bin", 0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "pat.u6", 0x000, 0x104, NO_DUMP )
+ROM_END
+
 /* '960606-5 PCB and 'CB1 (CS4)' security counters module. CPLD labeled as 'PD18'. This is mechanical.
    A complete manual with schematics can be downloaded from https://www.recreativas.org/manuales
    There's a newer model running on CPU PCB 2060608-3 (different ROMs, undumped). */
@@ -715,6 +737,7 @@ GAME( 2008,  perlacrb,   0,         video,    neptunp2, neptunp2_video_state, em
 GAME( 1999,  ccorsario,  0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa",         "Corsarios (Cirsa slot machine, V6.0D)",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from sticker on PCB
 GAME( 1999,  ccorsarioa, ccorsario, no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa",         "Corsarios (Cirsa slot machine, V5.10D, Catalonia)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from sticker on PCB
 GAME( 2002?, charles,    0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa/Europea", "Charleston (V2.1, Catalonia)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from sticker on PCB
+GAME( 2010,  eurbingo7,  0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa",         "Euro Bingo 7 (V8.0, CAA)",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from parts' manual and sticker on PCB
 GAME( 2008,  gladiador,  0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa",         "Gladiadores (V1.0, CAA)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from manual
 GAME( 2006,  mltpoints,  0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa",         "Multi Points (V1.0, CAA)",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from manual
 GAME( 1999,  rockroll,   0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa",         "Rock 'n' Roll",                                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from parts' manual and sticker on PCB

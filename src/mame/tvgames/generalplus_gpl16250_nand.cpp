@@ -82,18 +82,17 @@ void generalplus_gpac800_game_state::dma_complete_hacks(int state)
 	//  mem.write_word(0x37244, 0x4840);    // hannah montana guitar force service mode
 }
 
-void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
+void generalplus_gpac800_game_state::common_config(machine_config &config)
 {
 	set_addrmap(0, &generalplus_gpac800_game_state::cs_map_base);
 
-	GPL16250(config, m_maincpu, 96000000/2, m_screen);
 	m_maincpu->porta_in().set(FUNC(generalplus_gpac800_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(generalplus_gpac800_game_state::portb_r));
 	m_maincpu->portc_in().set(FUNC(generalplus_gpac800_game_state::portc_r));
 	m_maincpu->porta_out().set(FUNC(generalplus_gpac800_game_state::porta_w));
 	m_maincpu->space_read_callback().set(FUNC(generalplus_gpac800_game_state::read_external_space));
 	m_maincpu->space_write_callback().set(FUNC(generalplus_gpac800_game_state::write_external_space));
-	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(sunplus_gcm394_base_device::irq_vector_cb));
+	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(generalplus_gpl162xx_base_device::irq_vector_cb));
 	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
 	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 	m_maincpu->set_bootmode(0); // boot from internal ROM (NAND bootstrap)
@@ -109,16 +108,35 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320*2, 262*2);
 	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);
-	m_screen->set_screen_update("maincpu", FUNC(sunplus_gcm394_device::screen_update));
-	m_screen->screen_vblank().set(m_maincpu, FUNC(sunplus_gcm394_device::vblank));
+	m_screen->set_screen_update("maincpu", FUNC(generalplus_gpl16218b_device::screen_update));
+	m_screen->screen_vblank().set(m_maincpu, FUNC(generalplus_gpl16218b_device::vblank));
 
 	SPEAKER(config, "speaker", 2).front();
 }
+
+void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
+{
+	GPL16250VA(config, m_maincpu, 96000000/2, m_screen);
+	common_config(config);
+}
+
+void generalplus_gpac800_game_state::generalplus_gpl16258vb(machine_config &config)
+{
+	GPL16258VB(config, m_maincpu, 96000000/2, m_screen);
+	common_config(config);
+}
+
 
 void generalplus_gpac800_game_state::generalplus_gpac800_nand64mbyte(machine_config &config)
 {
 	generalplus_gpac800(config);
 	GENERALPLUS_GPR27P512A(config, m_nand); // 64Mbyte part, with 0x200+0x10 sized pages (accepts many compatible devices)
+}
+
+void generalplus_gpac800_game_state::generalplus_gpl16258vb_nand64mbyte(machine_config &config)
+{
+	generalplus_gpl16258vb(config);
+	GENERALPLUS_GPR27P512A(config, m_nand);
 }
 
 void generalplus_gpac800_game_state::generalplus_gpac800_nand128mbyte(machine_config &config)
@@ -133,15 +151,15 @@ void generalplus_gpac800_game_state::generalplus_gpac800_nand256mbyte(machine_co
 	SANDISK_NAND_256MB_512_DEVICE(config, m_nand); // 256Mbyte part, with 0x200+0x10 sized pages (accepts many compatible devices)
 }
 
-void generalplus_gpac800_game_state::generalplus_gpac800_nand128mbyte_2048(machine_config &config)
+void generalplus_gpac800_game_state::generalplus_gpl16258vb_nand128mbyte_2048(machine_config &config)
 {
-	generalplus_gpac800(config);
+	generalplus_gpl16258vb(config);
 	SAMSUNG_K9F1G08U0M(config, m_nand); // 128Mbyte part, with 0x800+0x40 sized pages
 }
 
-void generalplus_gpac800_game_state::generalplus_gpac800_nand512mbyte_2048(machine_config &config)
+void generalplus_gpac800_game_state::generalplus_gpl16258vb_nand512mbyte_2048(machine_config &config)
 {
-	generalplus_gpac800(config);
+	generalplus_gpl16258vb(config);
 	HYNIX_HY27UF084G2M(config, m_nand); // 512Mbyte part, with 0x800+0x40 sized pages
 }
 
@@ -155,9 +173,9 @@ DEVICE_IMAGE_LOAD_MEMBER(generalplus_gpac800_vbaby_game_state::cart_load)
 	return std::make_pair(std::error_condition(), std::string());
 }
 
-void generalplus_gpac800_vbaby_game_state::generalplus_gpac800_nand128mbyte_2048_vbaby(machine_config &config)
+void generalplus_gpac800_vbaby_game_state::generalplus_gpl16258vb_nand128mbyte_2048_vbaby(machine_config &config)
 {
-	generalplus_gpac800_game_state::generalplus_gpac800_nand128mbyte_2048(config);
+	generalplus_gpac800_game_state::generalplus_gpl16258vb_nand128mbyte_2048(config);
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "vbaby_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
@@ -771,7 +789,7 @@ void generalplus_gpac800_game_state::machine_reset()
 		internal[0x7f02] = 0xfe80 | (addr >> 16);
 		internal[0x7f03] = (addr & 0xffff);
 
-		addr = (dest + 0x20) & 0x000fffff; // point boot vector at code in RAM (probably in reality points to internal code that copies the first block)
+		addr = (dest + 0x20) & 0x001fffff; // point boot vector at code in RAM (probably in reality points to internal code that copies the first block)
 		internal[0x7f04] = 0xfe80 | (addr >> 16);
 		internal[0x7f05] = (addr & 0xffff);
 
@@ -879,11 +897,17 @@ void generalplus_gpac800_game_state::nand_beambox()
 	m_vectorbase = 0x2fe0;
 }
 
+// ----------------------------------------------------
+// these all use RAM up to 6fff
+//
+// JAKKS games are known to be GPAC800, so GPL16240VA
+// ----------------------------------------------------
+
 // NAND dumps w/ internal bootstrap (and u'nSP 2.0 extended opcodes)  (have gpnandnand strings)
 // the JAKKS ones seem to be known as 'Generalplus GPAC800' hardware
 CONS(2011, jak_gtg,    0, 0, generalplus_gpac800_nand64mbyte,       jak_gtg,  generalplus_gpac800_game_state,       nand_init,       "JAKKS Pacific Inc / HotGen Ltd",           "Golden Tee Golf (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, jak_car2,   0, 0, generalplus_gpac800_nand64mbyte,       jak_car2, generalplus_gpac800_game_state,       nand_init,       "JAKKS Pacific Inc / HotGen Ltd",           "Cars 2 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(2010, jak_tsm,    0, 0, generalplus_gpac800_nand64mbyte,       jak_car2, generalplus_gpac800_game_state,       nand_tsm,           "JAKKS Pacific Inc / Schell Games",         "Toy Story Mania (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2010, jak_tsm,    0, 0, generalplus_gpac800_nand64mbyte,       jak_car2, generalplus_gpac800_game_state,       nand_tsm,        "JAKKS Pacific Inc / Schell Games",         "Toy Story Mania (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(2009, jak_sspop,  0, 0, generalplus_gpac800_nand128mbyte,      jak_hsm,  generalplus_gpac800_game_state,       nand_init_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "Sing Scene Pop (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(2008, jak_hmg2,   0, 0, generalplus_gpac800_nand64mbyte,       jak_hsm,  generalplus_gpac800_game_state,       nand_init_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "Hannah Montana G2 Deluxe - All in One (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // Jul 9 2008 11:50:08
 CONS(2008, jak_hsmg2,  0, 0, generalplus_gpac800_nand64mbyte,       jak_hsm,  generalplus_gpac800_game_state,       nand_init_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "High School Musical G2 Deluxe - All in One (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // Jun 25 2008 14:53:14
@@ -904,15 +928,18 @@ CONS(2013, jak_swc,    0, 0, generalplus_gpac800_nand64mbyte,       jak_car2, ge
 CONS(2014, jak_wdbg,   0, 0, generalplus_gpac800_nand64mbyte,       jak_car2, generalplus_gpac800_game_state,       nand_init_32mb,  "JAKKS Pacific Inc / Super Happy Fun Fun",  "The Walking Dead: Battleground (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 
-// these are probably a GPL162xxB as they expect code to be copied to a lower address, and set the stack just below 0x3000
-// B models have only 12K words of RAM, but the GPL16250 boot ROMs we've seen are hardcoded to look for vectors above that
-CONS(200?, beambox,    0, 0, generalplus_gpac800_nand64mbyte,       jak_car2, generalplus_gpac800_game_state,       nand_beambox,       "Hasbro",                                   "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(2010, wlsair60,   0, 0, generalplus_gpac800_nand128mbyte_2048, jak_car2, generalplus_gpac800_game_state,       nand_wlsair60,      "Jungle Soft / Kids Station Toys Inc",      "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // some of the games seem to be based on ones found in the 'Millennium Arcade' multigames (WinFun related) so might have the same external timer check
+// ----------------------------------------------------
+// these all use RAM up to 2fff
+//
+// NAND is used, so GPL16238B (or higher B series if high res modes / 3d sprites are used, assume 58VB for now)
+// ----------------------------------------------------
+
+CONS(200?, beambox,    0, 0, generalplus_gpl16258vb_nand64mbyte,       jak_car2, generalplus_gpac800_game_state,       nand_beambox,       "Hasbro",                                   "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2010, wlsair60,   0, 0, generalplus_gpl16258vb_nand128mbyte_2048, jak_car2, generalplus_gpac800_game_state,       nand_wlsair60,      "Jungle Soft / Kids Station Toys Inc",      "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // some of the games seem to be based on ones found in the 'Millennium Arcade' multigames (WinFun related) so might have the same external timer check
 
 // these might also be B models
-CONS(200?, mgtfit,     0, 0, generalplus_gpac800_nand128mbyte_2048,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60,      "MGT",                                      "Fitness Konsole (NC1470)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // probably has other names in English too? menus don't appear to be in German
-CONS(200?, vbaby,      0, 0, generalplus_gpac800_nand128mbyte_2048_vbaby, jak_car2, generalplus_gpac800_vbaby_game_state, nand_vbaby,         "VTech",                                    "V.Baby", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, tiviboo,    0, 0, generalplus_gpac800_nand128mbyte_2048,       jak_car2, generalplus_gpac800_game_state,       nand_vbaby,         "VTech",                                    "Tivi Boo (France)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, mgtfit,     0, 0, generalplus_gpl16258vb_nand128mbyte_2048,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60,      "MGT",                                      "Fitness Konsole (NC1470)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // probably has other names in English too? menus don't appear to be in German
+CONS(200?, vbaby,      0, 0, generalplus_gpl16258vb_nand128mbyte_2048_vbaby, jak_car2, generalplus_gpac800_vbaby_game_state, nand_vbaby,         "VTech",                                    "V.Baby", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, tiviboo,    0, 0, generalplus_gpl16258vb_nand128mbyte_2048,       jak_car2, generalplus_gpac800_game_state,       nand_vbaby,         "VTech",                                    "Tivi Boo (France)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
-// this one is strange, the area specified in the header to copy the code to is an unmapped area?
-CONS(200?, kiugames,   0, 0, generalplus_gpac800_nand512mbyte_2048,      jak_car2, generalplus_gpac800_game_state,       nand_kiugames,      "VideoJet",                                 "Kiu Games",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // probably has other names in English too? menus don't appear to be in German
+CONS(200?, kiugames,   0, 0, generalplus_gpl16258vb_nand512mbyte_2048,      jak_car2, generalplus_gpac800_game_state,       nand_kiugames,      "VideoJet",                                 "Kiu Games",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // probably has other names in English too? menus don't appear to be in German

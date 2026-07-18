@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+All of the available disk images seem to be modified, no pristine dumps
+
+-->
+
+<softwarelist name="genie3_flop" description="EACA Genie III floppy disks">
+
+	<software name="cpm22x_g3">
+		<description>Genie III CP/M 2.2XV3, 1.31</description>
+		<year>2021</year>
+		<publisher>Klaus Kämpf</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1024016">
+				<rom name="cpm22x-g3.dmk" size="1024016" crc="d78dd5b5" sha1="94f95437e4609a37e16e1504fd4d415a4fccca92" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gdos21">
+		<description>G-DOS 2.1</description>
+		<year>198?</year>
+		<publisher>JHL Köln</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="720631">
+				<rom name="g3gd21-1.imd" size="720631" crc="e2fbe23d" sha1="455986ff99718c883ab205c1e3d7a4546f086cf7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gdos24">
+		<description>G-DOS 2.4</description>
+		<year>1984</year>
+		<publisher>TCS/MVC</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="731848">
+				<rom name="g3gd24-1.imd" size="731848" crc="a7ed6a35" sha1="e08a05cbbe8a7f1a8049cf0e3854c5ce6e9fe706" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm22low">
+		<description>CP/M 2.2a</description>
+		<year>198?</year>
+		<publisher>Lowe Electronics</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="109825">
+				<rom name="g3lowe01.imd" size="109825" crc="20d389b4" sha1="54b567e31fae773059045516f2c97672739e5a4a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- The following three disks are not specifically for Genie III but compatible -->
+
+	<software name="g3nd_g01">
+		<description>NEWDOS/80 Games Disk 1</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="733887">
+				<rom name="g3nd-g01.imd" size="733887" crc="23f8fc4c" sha1="6d2c01773560a26fc271844b61af64cc405d1e7a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="g3nd_g02">
+		<description>NEWDOS/80 Games Disk 2</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="701768">
+				<rom name="g3nd-g02.imd" size="701768" crc="55d0f23d" sha1="90b0fef68730faea090e0b3fd3db4f8962e078a9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="g3nd_g03">
+		<description>NEWDOS/80 Games Disk 3</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="713254">
+				<rom name="g3nd-g03.imd" size="713254" crc="31fcb379" sha1="64edbe4554831977ec9bfefe993e8151f8f41bfb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nd80_1">
+		<description>NEWDOS/80 2.0A (with AGCAP)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="731135">
+				<rom name="g3nd2a-1.imd" size="731135" crc="8f7d24fd" sha1="e64a71c3ed3374a7a3601643191a2a81f246a110" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nd80_2">
+		<description>NEWDOS/80 2.0A</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="728851">
+				<rom name="g3nd2a-2.imd" size="728851" crc="74e794c3" sha1="9677be0f318ceb1fbd5e475d58da4127b2bb0f33" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nd80_3">
+		<description>NEWDOS/80 2.0A (with PELOT)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="428033">
+				<rom name="g3nd2a-3.imd" size="428033" crc="e27fe751" sha1="56e748ba075d3bb43fcde47db649e85f8fb0bfd3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scripsit">
+		<description>SCRIPSIT Word Processing (NEWDOS/80 2.0A)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="366367">
+				<rom name="g3nd2a-4.imd" size="366367" crc="7dce1d01" sha1="5fe0b3aa13da2eed032dfc43d9ae3282274958e3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="newbasic">
+		<description>NEWBASIC 2.1 and other BASIC software (NEWDOS/80 2.0A)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="728634">
+				<rom name="g3ndbas1.imd" size="728634" crc="3c392549" sha1="d30c9714e5baced13d97fe84558c490f72a15d37" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
