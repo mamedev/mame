@@ -1330,6 +1330,7 @@ ROM_END
 
 #define rom_x820ii5 rom_x820ii // 820-II, 5.25" floppy
 #define rom_x820iis rom_x820ii // 820-II, SASI hard disk
+
 ROM_START( x820iilp ) // 820-II, low-profile keyboard
 	ROM_DEFAULT_BIOS( "v50" ) // the low-profile keyboard sends position codes that only the v5.0 "RX" monitor decodes (via the u36 table)
 	ROM_SYSTEM_BIOS( 0, "v400",    "Balcones Operating System v4.00" ) // u33-u35 split from ROM400.COM, master disk B16D35

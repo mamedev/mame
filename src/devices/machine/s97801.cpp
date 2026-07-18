@@ -24,11 +24,12 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/s97801.h"
+#include "s97801.h"
 
 #include "screen.h"
 
 #include "s97801.lh"
+
 
 DEFINE_DEVICE_TYPE(SIEMENS_97801, s97801_device, "s97801_device", "Siemens 97801 Terminal")
 

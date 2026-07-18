@@ -1173,13 +1173,14 @@ uint8_t pc6001_state::ppi_portc_r()
 inline void pc6001_state::cassette_motor_control(bool new_state)
 {
 	// 0 -> 1 transition: send PLAY tape cmd to i8049
-	if((!(m_sys_latch & 8)) && new_state == true) //PLAY tape cmd
+	if (!(m_sys_latch & 8) && new_state) //PLAY tape cmd
 	{
 		m_cas_motor = true;
 		//m_cassette->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 	}
+
 	// 1 -> 0 transition: send STOP tape cmd to i8049
-	if((m_sys_latch & 8) && new_state == false) //STOP tape cmd
+	if ((m_sys_latch & 8) && !new_state) //STOP tape cmd
 	{
 		m_cas_motor = false;
 		//m_cassette->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);

@@ -14,8 +14,8 @@
 
 #include "emu.h"
 
-#include "machine/s97801.h"
 #include "bus/rs232/rs232.h"
+#include "machine/s97801.h"
 
 namespace {
 

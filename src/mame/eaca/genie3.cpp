@@ -39,19 +39,22 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "formats/dmk_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/clock.h"
 #include "machine/ins8250.h"
 #include "machine/msm5832.h"
 #include "machine/wd_fdc.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
+
+#include "formats/dmk_dsk.h"
 
 
 namespace {

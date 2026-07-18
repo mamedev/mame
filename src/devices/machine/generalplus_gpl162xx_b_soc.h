@@ -11,10 +11,9 @@
 
 class generalplus_gpl162xx_b_base : public generalplus_gpl162xx_base_device
 {
-public:
+protected:
 	generalplus_gpl162xx_b_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal);
 
-protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -36,7 +35,7 @@ class generalplus_gpl16218b_device : public generalplus_gpl162xx_b_base
 {
 public:
 	template <typename T> generalplus_gpl16218b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&screen_tag) :
-	generalplus_gpl16218b_device(mconfig, tag, owner, clock)
+		generalplus_gpl16218b_device(mconfig, tag, owner, clock)
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));
 	}
@@ -46,10 +45,10 @@ public:
 protected:
 	generalplus_gpl16218b_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal);
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	// virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD; // uncertain
+	//virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD; // uncertain
 
 private:
-	void gpl16218b_map(address_map &map);
+	void gpl16218b_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -70,7 +69,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
-	void gpl16238b_map(address_map &map);
+	void gpl16238b_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -91,7 +90,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
-	void gpl16248vb_map(address_map &map);
+	void gpl16248vb_map(address_map &map) ATTR_COLD;
 };
 
 class generalplus_gpl16258vb_device : public generalplus_gpl16248vb_device
@@ -110,7 +109,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
-	void gpl16258vb_map(address_map &map);
+	void gpl16258vb_map(address_map &map) ATTR_COLD;
 };
 
 
