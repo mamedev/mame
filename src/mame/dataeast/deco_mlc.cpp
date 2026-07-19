@@ -110,7 +110,7 @@
 #include "emu.h"
 #include "deco_mlc.h"
 
-#include "deco156_m.h"
+#include "deco156.h"
 #include "machine/eepromser.h"
 #include "cpu/arm/arm.h"
 #include "cpu/sh/sh7604.h"

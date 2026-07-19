@@ -13,7 +13,7 @@
 */
 
 #include "emu.h"
-#include "deco156_m.h"
+#include "deco156.h"
 #include "deco16ic.h"
 #include "decocrpt.h"
 #include "decospr.h"
@@ -105,7 +105,7 @@ uint32_t backfire_state::screen_update_left(screen_device &screen, bitmap_ind16 
 	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
 	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2], m_pf_rowscroll[3]);
 
-	screen.priority().fill(0);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(0x100, cliprect);
 
 	if (m_left_priority[0] == 0)
@@ -136,7 +136,7 @@ uint32_t backfire_state::screen_update_right(screen_device &screen, bitmap_ind16
 	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
 	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2], m_pf_rowscroll[3]);
 
-	screen.priority().fill(0);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(0x500, cliprect);
 
 	if (m_right_priority[0] == 0)
@@ -574,7 +574,6 @@ void backfire_state::descramble_sound()
 
 uint32_t backfire_state::backfire_speedup_r()
 {
-
 	if (!machine().side_effects_disabled())
 	{
 		//logerror( "%08x\n",m_maincpu->pc());

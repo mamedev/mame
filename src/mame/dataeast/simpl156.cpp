@@ -17,6 +17,7 @@
   Data East:
     Joe & Mac Returns (Japanese version called Caveman Ninja 2 might exist)
     Chain Reaction / Magical Drop / Magical Drop Plus 1
+	- Reset with Player 1 & 2 start button held to display version info
 
   Mitchell games:
     Charlie Ninja
@@ -94,7 +95,7 @@ even be configurable.
 
 #include "emu.h"
 
-#include "deco156_m.h"
+#include "deco156.h"
 #include "deco16ic.h"
 #include "decocrpt.h"
 #include "decospr.h"
@@ -165,6 +166,7 @@ private:
 	void vblank_interrupt(int state);
 
 	void base_map(address_map &map) ATTR_COLD;
+	void common_map(address_map &map) ATTR_COLD;
 	void chainrec_map(address_map &map) ATTR_COLD;
 	void joemacr_map(address_map &map) ATTR_COLD;
 	void magdrop_map(address_map &map) ATTR_COLD;
@@ -294,21 +296,25 @@ void simpl156_state::base_map(address_map &map)
 	map(0x201000, 0x201fff).ram().share(m_systemram).mirror(0x002000); // work ram (32-bit)
 }
 
+void simpl156_state::common_map(address_map &map)
+{
+	map(0x00000, 0x07fff).rw(FUNC(simpl156_state::mainram_r), FUNC(simpl156_state::mainram_w)); // main ram
+	map(0x10000, 0x11fff).rw(FUNC(simpl156_state::spriteram_r), FUNC(simpl156_state::spriteram_w));
+	map(0x20000, 0x20fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
+	map(0x30000, 0x30003).portr("IN1").w(FUNC(simpl156_state::eeprom_w));
+	map(0x40000, 0x4001f).rw(m_deco_tilegen, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x50000, 0x51fff).mirror(0x2000).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x54000, 0x55fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x60000, 0x61fff).rw(FUNC(simpl156_state::rowscroll_r<0>), FUNC(simpl156_state::rowscroll_w<0>));
+	map(0x64000, 0x65fff).rw(FUNC(simpl156_state::rowscroll_r<1>), FUNC(simpl156_state::rowscroll_w<1>));
+	map(0x70000, 0x70003).readonly().nopw(); // ?
+}
+
 /* Joe and Mac Returns */
 void simpl156_state::joemacr_map(address_map &map)
 {
 	base_map(map);
-	map(0x100000, 0x107fff).rw(FUNC(simpl156_state::mainram_r), FUNC(simpl156_state::mainram_w)); // main ram
-	map(0x110000, 0x111fff).rw(FUNC(simpl156_state::spriteram_r), FUNC(simpl156_state::spriteram_w));
-	map(0x120000, 0x120fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
-	map(0x130000, 0x130003).portr("IN1").w(FUNC(simpl156_state::eeprom_w));
-	map(0x140000, 0x14001f).rw(m_deco_tilegen, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
-	map(0x150000, 0x151fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x152000, 0x153fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x154000, 0x155fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
-	map(0x160000, 0x161fff).rw(FUNC(simpl156_state::rowscroll_r<0>), FUNC(simpl156_state::rowscroll_w<0>));
-	map(0x164000, 0x165fff).rw(FUNC(simpl156_state::rowscroll_r<1>), FUNC(simpl156_state::rowscroll_w<1>));
-	map(0x170000, 0x170003).readonly().nopw(); // ?
+	map(0x100000, 0x17ffff).m(*this, FUNC(simpl156_state::common_map));
 	map(0x180000, 0x180000).rw("okisfx", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x1c0000, 0x1c0000).rw(m_okimusic, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
@@ -319,17 +325,7 @@ void simpl156_state::chainrec_map(address_map &map)
 {
 	base_map(map);
 	map(0x3c0000, 0x3c0000).rw(m_okimusic, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x400000, 0x407fff).rw(FUNC(simpl156_state::mainram_r), FUNC(simpl156_state::mainram_w)); // main ram?
-	map(0x410000, 0x411fff).rw(FUNC(simpl156_state::spriteram_r), FUNC(simpl156_state::spriteram_w));
-	map(0x420000, 0x420fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
-	map(0x430000, 0x430003).portr("IN1").w(FUNC(simpl156_state::eeprom_w));
-	map(0x440000, 0x44001f).rw(m_deco_tilegen, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
-	map(0x450000, 0x451fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x452000, 0x453fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x454000, 0x455fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
-	map(0x460000, 0x461fff).rw(FUNC(simpl156_state::rowscroll_r<0>), FUNC(simpl156_state::rowscroll_w<0>));
-	map(0x464000, 0x465fff).rw(FUNC(simpl156_state::rowscroll_r<1>), FUNC(simpl156_state::rowscroll_w<1>));
-	map(0x470000, 0x470003).readonly().nopw(); // ??
+	map(0x400000, 0x47ffff).m(*this, FUNC(simpl156_state::common_map));
 	map(0x480000, 0x480000).rw("okisfx", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
@@ -339,17 +335,7 @@ void simpl156_state::magdrop_map(address_map &map)
 {
 	base_map(map);
 	map(0x340000, 0x340000).rw(m_okimusic, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x380000, 0x387fff).rw(FUNC(simpl156_state::mainram_r), FUNC(simpl156_state::mainram_w)); // main ram?
-	map(0x390000, 0x391fff).rw(FUNC(simpl156_state::spriteram_r), FUNC(simpl156_state::spriteram_w));
-	map(0x3a0000, 0x3a0fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
-	map(0x3b0000, 0x3b0003).portr("IN1").w(FUNC(simpl156_state::eeprom_w));
-	map(0x3c0000, 0x3c001f).rw(m_deco_tilegen, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
-	map(0x3d0000, 0x3d1fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x3d2000, 0x3d3fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x3d4000, 0x3d5fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
-	map(0x3e0000, 0x3e1fff).rw(FUNC(simpl156_state::rowscroll_r<0>), FUNC(simpl156_state::rowscroll_w<0>));
-	map(0x3e4000, 0x3e5fff).rw(FUNC(simpl156_state::rowscroll_r<1>), FUNC(simpl156_state::rowscroll_w<1>));
-	map(0x3f0000, 0x3f0003).readonly().nopw(); //?
+	map(0x380000, 0x3fffff).m(*this, FUNC(simpl156_state::common_map));
 	map(0x400000, 0x400000).rw("okisfx", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
@@ -359,17 +345,7 @@ void simpl156_state::magdropp_map(address_map &map)
 {
 	base_map(map);
 	map(0x4c0000, 0x4c0000).rw(m_okimusic, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x680000, 0x687fff).rw(FUNC(simpl156_state::mainram_r), FUNC(simpl156_state::mainram_w)); // main ram?
-	map(0x690000, 0x691fff).rw(FUNC(simpl156_state::spriteram_r), FUNC(simpl156_state::spriteram_w));
-	map(0x6a0000, 0x6a0fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
-	map(0x6b0000, 0x6b0003).portr("IN1").w(FUNC(simpl156_state::eeprom_w));
-	map(0x6c0000, 0x6c001f).rw(m_deco_tilegen, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
-	map(0x6d0000, 0x6d1fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x6d2000, 0x6d3fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x6d4000, 0x6d5fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
-	map(0x6e0000, 0x6e1fff).rw(FUNC(simpl156_state::rowscroll_r<0>), FUNC(simpl156_state::rowscroll_w<0>));
-	map(0x6e4000, 0x6e5fff).rw(FUNC(simpl156_state::rowscroll_r<1>), FUNC(simpl156_state::rowscroll_w<1>));
-	map(0x6f0000, 0x6f0003).readonly().nopw(); // ?
+	map(0x680000, 0x6fffff).m(*this, FUNC(simpl156_state::common_map));
 	map(0x780000, 0x780000).rw("okisfx", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
@@ -380,17 +356,7 @@ void simpl156_state::mitchell156_map(address_map &map)
 	base_map(map);
 	map(0x100000, 0x100000).rw("okisfx", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140000).rw(m_okimusic, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x180000, 0x187fff).rw(FUNC(simpl156_state::mainram_r), FUNC(simpl156_state::mainram_w)); // main ram
-	map(0x190000, 0x191fff).rw(FUNC(simpl156_state::spriteram_r), FUNC(simpl156_state::spriteram_w));
-	map(0x1a0000, 0x1a0fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
-	map(0x1b0000, 0x1b0003).portr("IN1").w(FUNC(simpl156_state::eeprom_w));
-	map(0x1c0000, 0x1c001f).rw(m_deco_tilegen, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
-	map(0x1d0000, 0x1d1fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x1d2000, 0x1d3fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x1d4000, 0x1d5fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
-	map(0x1e0000, 0x1e1fff).rw(FUNC(simpl156_state::rowscroll_r<0>), FUNC(simpl156_state::rowscroll_w<0>));
-	map(0x1e4000, 0x1e5fff).rw(FUNC(simpl156_state::rowscroll_r<1>), FUNC(simpl156_state::rowscroll_w<1>));
-	map(0x1f0000, 0x1f0003).readonly().nopw(); // ?
+	map(0x180000, 0x1fffff).m(*this, FUNC(simpl156_state::common_map));
 }
 
 
@@ -457,7 +423,7 @@ void simpl156_state::video_start()
 
 u32 simpl156_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	screen.priority().fill(0);
+	screen.priority().fill(0, cliprect);
 
 	m_deco_tilegen->pf_update(m_rowscroll[0], m_rowscroll[1]);
 
@@ -605,7 +571,7 @@ ROM_START( joemacr )
 	ROM_REGION( 0x40000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "mbn04",    0x00000, 0x40000,  CRC(dcbd4771) SHA1(2a1ab6b0fc372333c7eb17aab077fe1ca5ba1dea) ) /* 07.u46 */
 
-	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
+	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples (banked) */
 	ROM_LOAD( "mbn03",    0x00000, 0x200000, CRC(70b71a2a) SHA1(45851b0692de73016fc9b913316001af4690534c) ) /* 06.u45 */
 ROM_END
 
@@ -641,7 +607,7 @@ ROM_START( joemacra )
 	ROM_REGION( 0x40000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "mbn04",    0x00000, 0x40000,  CRC(dcbd4771) SHA1(2a1ab6b0fc372333c7eb17aab077fe1ca5ba1dea) )
 
-	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
+	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples (banked) */
 	ROM_LOAD( "mbn03",    0x00000, 0x200000, CRC(70b71a2a) SHA1(45851b0692de73016fc9b913316001af4690534c) )
 ROM_END
 
@@ -659,7 +625,7 @@ ROM_START( joemacrj )
 	ROM_REGION( 0x40000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "mbn04",    0x00000, 0x40000,  CRC(dcbd4771) SHA1(2a1ab6b0fc372333c7eb17aab077fe1ca5ba1dea) )
 
-	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
+	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples (banked) */
 	ROM_LOAD( "mbn03",    0x00000, 0x200000, CRC(70b71a2a) SHA1(45851b0692de73016fc9b913316001af4690534c) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* eeprom */
@@ -708,7 +674,7 @@ ROM_START( chainrec )
 	ROM_REGION( 0x40000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "mcc-04",    0x00000, 0x40000,  CRC(86ee6ade) SHA1(56ad3f432c7f430f19fcba7c89940c63da165906) )
 
-	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
+	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples (banked) */
 	ROM_LOAD( "mcc-03",    0x00000, 0x100000, CRC(da2ebba0) SHA1(96d31dea4c7226ee1d386b286919fa334388c7a1) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* eeprom */
@@ -753,7 +719,7 @@ ROM_START( magdrop )
 	ROM_REGION( 0x40000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "mcc-04",    0x00000, 0x40000,  CRC(86ee6ade) SHA1(56ad3f432c7f430f19fcba7c89940c63da165906) )
 
-	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
+	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples (banked) */
 	ROM_LOAD( "mcc-03",    0x00000, 0x100000, CRC(da2ebba0) SHA1(96d31dea4c7226ee1d386b286919fa334388c7a1) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* eeprom */
@@ -774,7 +740,7 @@ ROM_START( magdropp )
 	ROM_REGION( 0x40000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "mcc-04",    0x00000, 0x40000,  CRC(86ee6ade) SHA1(56ad3f432c7f430f19fcba7c89940c63da165906) )
 
-	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
+	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples (banked) */
 	ROM_LOAD( "mcc-03",    0x00000, 0x100000, CRC(da2ebba0) SHA1(96d31dea4c7226ee1d386b286919fa334388c7a1) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* eeprom */
@@ -840,7 +806,7 @@ ROM_START( charlien )
 	ROM_REGION( 0x40000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "nd01-0.13h",    0x00000, 0x40000,  CRC(635a100a) SHA1(f6ec70890892e7557097ccd519de37247bb8c98d) )
 
-	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
+	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples (banked) */
 	ROM_LOAD( "mbr-02.12f",    0x00000, 0x100000, CRC(4f67d333) SHA1(608f921bfa6b7020c0ce72e5229b3f1489208b23) ) // 00, 01, 04, 05
 ROM_END
 
@@ -923,7 +889,7 @@ ROM_START( prtytime )
 	ROM_REGION( 0x40000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "pz_01-0.13h",    0x00000, 0x40000,  CRC(8925bce2) SHA1(0ff2d5db7a24a2af30bd753eba274572c32cc2e7) )
 
-	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
+	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples (banked) */
 	ROM_LOAD( "mcb-04.12f",    0x00000, 0x200000, CRC(e23d3590) SHA1(dc8418edc525f56e84f26e9334d5576000b14e5f) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* eeprom */
@@ -949,7 +915,7 @@ ROM_START( gangonta )
 	ROM_REGION( 0x40000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "rd_01-0.13h",    0x00000, 0x40000,  CRC(70fd18c6) SHA1(368cd8e10c5f5a13eb3813974a7e6b46a4fa6b6c) )
 
-	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
+	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples (banked) */
 	ROM_LOAD( "mcb-04.12f",    0x00000, 0x200000, CRC(e23d3590) SHA1(dc8418edc525f56e84f26e9334d5576000b14e5f) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* eeprom */
@@ -1014,7 +980,7 @@ ROM_START( osman )
 	ROM_REGION( 0x40000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "sa01-0.13h",    0x00000, 0x40000,  CRC(cea8368e) SHA1(1fcc641381fdc29bd50d3a4b23e67647f79e505a))
 
-	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
+	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples (banked) */
 	ROM_LOAD( "mcf-05.12f",    0x00000, 0x200000, CRC(f007d376) SHA1(4ba20e5dabeacc3278b7f30c4462864cbe8f6984) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* eeprom */
@@ -1042,7 +1008,7 @@ ROM_START( candance )
 	ROM_REGION( 0x40000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "sa01-0.13h",    0x00000, 0x40000,  CRC(cea8368e) SHA1(1fcc641381fdc29bd50d3a4b23e67647f79e505a))
 
-	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
+	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples (banked) */
 	ROM_LOAD( "mcf-05.12f",    0x00000, 0x200000, CRC(f007d376) SHA1(4ba20e5dabeacc3278b7f30c4462864cbe8f6984) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* eeprom */
@@ -1221,12 +1187,12 @@ void simpl156_state::init_osman()
 } // anonymous namespace
 
 /* Data East games running on the DE-0409-1 or DE-0491-1 PCB */
-GAME( 1994, joemacr,  0,        joemacr,     simpl156, simpl156_state, init_joemacr,  ROT0,  "Data East Corporation", "Joe & Mac Returns (World, Version 1.1, 1994.05.27)", MACHINE_SUPPORTS_SAVE ) /* bootleg board with genuine DECO parts */
-GAME( 1994, joemacra, joemacr,  joemacr,     simpl156, simpl156_state, init_joemacr,  ROT0,  "Data East Corporation", "Joe & Mac Returns (World, Version 1.0, 1994.05.19)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, joemacrj, joemacr,  joemacr,     simpl156, simpl156_state, init_joemacr,  ROT0,  "Data East Corporation", "Joe & Mac Returns (Japan, Version 1.2, 1994.06.06)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, chainrec, 0,        chainrec,    magdrop,  simpl156_state, init_chainrec, ROT0,  "Data East Corporation", "Chain Reaction (World, Version 2.2, 1995.09.25)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, magdrop,  chainrec, magdrop,     magdrop,  simpl156_state, init_chainrec, ROT0,  "Data East Corporation", "Magical Drop (Japan, Version 1.1, 1995.06.21)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, magdropp, chainrec, magdropp,    magdrop,  simpl156_state, init_chainrec, ROT0,  "Data East Corporation", "Magical Drop Plus 1 (Japan, Version 2.1, 1995.09.12)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, joemacr,  0,        joemacr,     simpl156, simpl156_state, init_joemacr,  ROT0,  "Data East Corporation", "Joe & Mac Returns (World, Master Version 1.1, 1994.05.27)", MACHINE_SUPPORTS_SAVE ) /* bootleg board with genuine DECO parts */
+GAME( 1994, joemacra, joemacr,  joemacr,     simpl156, simpl156_state, init_joemacr,  ROT0,  "Data East Corporation", "Joe & Mac Returns (World, Master Version 1.0, 1994.05.19)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, joemacrj, joemacr,  joemacr,     simpl156, simpl156_state, init_joemacr,  ROT0,  "Data East Corporation", "Joe & Mac Returns (Japan, Master Version 1.2, 1994.06.06)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, chainrec, 0,        chainrec,    magdrop,  simpl156_state, init_chainrec, ROT0,  "Data East Corporation", "Chain Reaction (World, Master Version 2.2, 1995.09.25)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, magdrop,  chainrec, magdrop,     magdrop,  simpl156_state, init_chainrec, ROT0,  "Data East Corporation", "Magical Drop (Japan, Master Version 1.5, 1995.06.21)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, magdropp, chainrec, magdropp,    magdrop,  simpl156_state, init_chainrec, ROT0,  "Data East Corporation", "Magical Drop Plus 1 (Japan, Master Version 2.1, 1995.09.12)", MACHINE_SUPPORTS_SAVE )
 
 /* Mitchell games running on the DEC-22VO / MT5601-0 PCB */
 GAME( 1995, charlien, 0,        mitchell156, simpl156, simpl156_state, init_charlien, ROT0,  "Mitchell", "Charlie Ninja" , MACHINE_SUPPORTS_SAVE ) /* language in service mode */
