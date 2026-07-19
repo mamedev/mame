@@ -30,8 +30,6 @@ class render_target;
 
 typedef uintptr_t HashT;
 
-#define OSDWORK_CALLBACK(name)  void *name(void *param, int threadid)
-
 class mac_window_info : public osd_window_t<void *>
 {
 public:
@@ -56,6 +54,7 @@ public:
 	void notify_changed();
 
 	osd_dim get_size() override;
+	osd_dim get_size_pixels() override;
 
 	int xy_to_render_target(int x, int y, int *xt, int *yt);
 
@@ -66,6 +65,10 @@ private:
 	// dimensions
 	osd_dim             m_minimum_dim;
 	osd_dim             m_windowed_dim;
+
+	// last aspect-constraint state pushed to the window
+	bool                m_last_keepaspect;
+	int                 m_last_scale_mode;
 
 	// rendering info
 	osd_event           m_rendered_event;
@@ -78,6 +81,7 @@ private:
 private:
 	int wnd_extra_width();
 	int wnd_extra_height();
+	void update_aspect_ratio();
 	osd_rect constrain_to_aspect_ratio(const osd_rect &rect, int adjustment);
 	osd_dim get_min_bounds(int constrain);
 	osd_dim get_max_bounds(int constrain);

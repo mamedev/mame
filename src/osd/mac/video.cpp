@@ -63,7 +63,9 @@ bool mac_osd_interface::video_init()
 
 	// initialize the window system so we can make windows
 	if (!window_init())
+	{
 		return false;
+	}
 
 	// create the windows
 	for (index = 0; index < video_config.numscreens; index++)
@@ -76,7 +78,9 @@ bool mac_osd_interface::video_init()
 		auto win = std::make_unique<mac_window_info>(machine(), *m_render, index, m_monitor_module->pick_monitor(reinterpret_cast<osd_options &>(options()), index), &conf);
 
 		if (win->window_init())
+		{
 			return false;
+		}
 
 		s_window_list.emplace_back(std::move(win));
 	}
@@ -105,14 +109,18 @@ void mac_osd_interface::update(bool skip_redraw)
 	if (!skip_redraw)
 	{
 //      profiler_mark(PROFILER_BLIT);
-		for (auto const &window : osd_common_t::window_list())
+		for (const auto &window : osd_common_t::window_list())
+		{
 			window->update();
+		}
 //      profiler_mark(PROFILER_END);
 	}
 
 	// if we're running, disable some parts of the debugger
 	if ((machine().debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
+	{
 		debugger_update();
+	}
 }
 
 //============================================================
@@ -140,12 +148,16 @@ void mac_osd_interface::check_osd_inputs()
 	{
 		// destroy the renderers first so that the render module can bounce if it depends on having a window handle
 		for (auto it = window_list().rbegin(); window_list().rend() != it; ++it)
+		{
 			(*it)->renderer_reset();
-		for (auto const &curwin : window_list())
+		}
+		for (const auto &curwin : window_list())
+		{
 			dynamic_cast<mac_window_info &>(*curwin).toggle_full_screen();
+		}
 	}
 
-	auto const &window = window_list().front();
+	const auto &window = window_list().front();
 
 	//FIXME: on a per window basis
 	if (inp.pressed(IPT_OSD_5))
@@ -155,13 +167,19 @@ void mac_osd_interface::check_osd_inputs()
 	}
 
 	if (inp.pressed(IPT_OSD_6))
+	{
 		dynamic_cast<mac_window_info &>(*window).modify_prescale(-1);
+	}
 
 	if (inp.pressed(IPT_OSD_7))
+	{
 		dynamic_cast<mac_window_info &>(*window).modify_prescale(1);
+	}
 
 	if (inp.pressed(IPT_OSD_8))
+	{
 		window->renderer().record();
+	}
 }
 
 //============================================================
@@ -178,7 +196,9 @@ void mac_osd_interface::extract_video_config()
 
 	// if we are in debug mode, never go full screen
 	if (machine().debug_flags & DEBUG_FLAG_OSD_ENABLED)
+	{
 		video_config.windowed = true;
+	}
 
 	video_config.switchres     = options().switch_res();
 	video_config.waitvsync     = options().wait_vsync();
@@ -216,15 +236,23 @@ static void get_resolution(const char *defdata, const char *data, osd_window_con
 	if (strcmp(data, OSDOPTVAL_AUTO) == 0)
 	{
 		if (strcmp(defdata, OSDOPTVAL_AUTO) == 0)
+		{
 			return;
+		}
 		data = defdata;
 	}
 
 	if (sscanf(data, "%dx%dx%d", &config->width, &config->height, &config->depth) < 2 && report_error)
+	{
 		osd_printf_error("Illegal resolution value = %s\n", data);
+	}
 
 	const char * at_pos = strchr(data, '@');
 	if (at_pos)
+	{
 		if (sscanf(at_pos + 1, "%d", &config->refresh) < 1 && report_error)
+		{
 			osd_printf_error("Illegal refresh rate in resolution value = %s\n", data);
+		}
+	}
 }

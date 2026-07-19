@@ -9,8 +9,9 @@
 //============================================================
 
 #import <Cocoa/Cocoa.h>
-#import "oglview.h"
 
 @interface MAMEWindowController : NSWindowController
+
+- (NSWindow *) getStandardWindow;
 
 @end

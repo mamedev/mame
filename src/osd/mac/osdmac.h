@@ -13,12 +13,6 @@
 
 #define MACOPTION_INIPATH               "inipath"
 
-#define MACOPTVAL_OPENGL                "opengl"
-#define MACOPTVAL_BGFX                  "bgfx"
-#define MACOPTVAL_METAL                 "metal"
-
-#define MACOPTVAL_GLLIB                 "/System/Library/Frameworks/OpenGL.framework/Libraries/libGL.dylib"
-
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
@@ -49,8 +43,6 @@ public:
 
 	// input overridables
 	virtual void customize_input_type_list(std::vector<input_type_entry> &typelist) override;
-
-	virtual void video_register();
 
 	virtual bool video_init() override;
 	virtual bool window_init() override;
