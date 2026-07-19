@@ -35,13 +35,12 @@ Svenska i datasalen
 		</part>
 	</software>
 
-	<!-- requires a hardware key, which isn't dumped -->
 	<software name="action1" supported="no">
 		<description>Action1 Glosprogram (nät/skollicens)</description>
 		<year>1987</year>
 		<publisher>Almqvist &amp; Wiksell Läromedel AB</publisher>
 		<notes><![CDATA[
-key is missing
+requires a hardware key, which isn't dumped
 ]]></notes>
 		<info name="serial" value="24-33584" />
 		<info name="release" value="19870114" />
@@ -77,14 +76,13 @@ key is missing
 		</part>
 	</software>
 
-	<!-- From non-original media -->
-	<!-- Requires hardware key 15, which isn't dumped -->
 	<software name="compiskom" supported="no">
 		<description>Compis Kommunikation 1.2</description>
 		<year>19??</year>
 		<publisher>Esselte Studium</publisher>
 		<notes><![CDATA[
-key is missing
+Dumped from non-original media
+Requires hardware key 15, which isn't dumped
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="5761878">
@@ -93,11 +91,13 @@ key is missing
 		</part>
 	</software>
 
-	<!-- From non-original media -->
 	<software name="pascal">
 		<description>Compis Pascal 3.12</description>
 		<year>19??</year>
 		<publisher>Telenova</publisher>
+		<notes><![CDATA[
+Dumped from non-original media
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="5227808">
 				<rom name="compis pascal v3.12 (19xx)(telenova).mfi" size="5227808" crc="f79acca3" sha1="401109b45a9ad1082aa18096c05ba8ae0d3ee5f6" status="baddump"/>
@@ -105,11 +105,13 @@ key is missing
 		</part>
 	</software>
 
-	<!-- From non-original media -->
 	<software name="pasboot" cloneof="compisnetib">
 		<description>CompisNet I PASBOOT med nyteknik</description>
 		<year>19??</year>
 		<publisher>Telenova</publisher>
+		<notes><![CDATA[
+Dumped from non-original media
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="5892310">
 				<rom name="pasboot net i skiva 1 med nyteknik (19xx)(telenova)(se).mfi" size="5892310" crc="ae328508" sha1="0892e44421eb9103a17523065d983c5664900645" status="baddump"/>
@@ -248,13 +250,12 @@ disk 1, 2, 3, and 5 are missing
 		</part>
 	</software>
 
-	<!-- Requires hardware key 22, which isn't dumped -->
 	<software name="databorjan" supported="no">
 		<description>Datorn i början (enanvändare)</description>
 		<year>1987</year>
 		<publisher>Esselte Studium</publisher>
 		<notes><![CDATA[
-key is missing
+Requires hardware key 22, which isn't dumped
 ]]></notes>
 		<info name="serial" value="24-34810" />
 		<info name="release" value="19870806" />
@@ -265,13 +266,12 @@ key is missing
 		</part>
 	</software>
 
-	<!-- Requires hardware key 50, which isn't dumped -->
 	<software name="datakom" supported="no">
 		<description>Datorn i kommunikation (enanvändare)</description>
 		<year>1986</year>
 		<publisher>Esselte Studium</publisher>
 		<notes><![CDATA[
-key is missing
+Requires hardware key 50, which isn't dumped
 ]]></notes>
 		<info name="serial" value="24-33828" />
 		<info name="release" value="19861006" />
@@ -306,13 +306,12 @@ key is missing
 		</part>
 	</software>
 
-	<!-- Requires a hardware key, which isn't dumped -->
 	<software name="distrib" supported="no">
 		<description>Distributionskunskap (version 8014)</description>
 		<year>19??</year>
 		<publisher>Telenova</publisher>
 		<notes><![CDATA[
-key is missing
+Requires a hardware key, which isn't dumped
 ]]></notes>
 		<info name="serial" value="24-33362/33813-3" />
 		<part name="flop1" interface="floppy_5_25">
@@ -336,13 +335,12 @@ key is missing
 		</part>
 	</software>
 
-	<!-- Requires hardware key 19, which isn't dumped -->
 	<software name="skvallra" supported="no">
 		<description>Får dataregister skvallra? (enanvändare)</description>
 		<year>1985</year>
 		<publisher>Esselte Studium</publisher>
 		<notes><![CDATA[
-key is missing
+Requires hardware key 19, which isn't dumped
 ]]></notes>
 		<info name="serial" value="24-34112" />
 		<info name="release" value="19851029" />
@@ -366,13 +364,12 @@ key is missing
 		</part>
 	</software>
 
-	<!-- Requires a hardware key, which isn't dumped -->
 	<software name="graphmaster2" supported="no">
 		<description>GraphMaster 2.0 (nät/skollicens)</description>
 		<year>1987</year>
 		<publisher>Esselte Studium</publisher>
 		<notes><![CDATA[
-key is missing
+Requires a hardware key, which isn't dumped
 ]]></notes>
 		<info name="serial" value="24-33589" />
 		<info name="release" value="19870728" />
@@ -383,11 +380,13 @@ key is missing
 		</part>
 	</software>
 
-	<!-- From non-original media -->
 	<software name="harmoni1">
 		<description>HarmoniEtt 2.0 (gamma)</description>
 		<year>19??</year>
 		<publisher>Esselte Studium</publisher>
+		<notes><![CDATA[
+Dumped from non-original media
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="5501142">
 				<rom name="harmoniett v2.0 (19xx)(esselte studium)(se) ].mfi" size="5501142" crc="c559283c" sha1="827071fa3ea726e6dcde8a6f5bef172d2235e9c1" status="baddump"/>
@@ -395,11 +394,13 @@ key is missing
 		</part>
 	</software>
 
-	<!-- From non-original media -->
 	<software name="harmoni2">
 		<description>HarmoniTvå 2.0 (alfa)</description>
 		<year>19??</year>
 		<publisher>Esselte Studium</publisher>
+		<notes><![CDATA[
+Dumped from non-original media
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="5823106">
 				<rom name="harmonitv v2.0 (19xx)(esselte studium)(se).mfi" size="5823106" crc="d6809ad4" sha1="01599899cf7444962b23b96c3d9e4adc21b23bc8" status="baddump"/>
@@ -407,12 +408,12 @@ key is missing
 		</part>
 	</software>
 
-	<!-- From non-original media -->
 	<software name="ibmdos" supported="no">
 		<description>IBM DOS 3.00</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
+Dumped from non-original media
 disk not identified, not for Compis?
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
@@ -448,13 +449,12 @@ disk not identified, not for Compis?
 		</part>
 	</software>
 
-	<!-- Requires hardware key 10, which isn't dumped -->
 	<software name="ify" supported="no">
 		<description>Intresse-fallenhet-yrkesval (enanvändare)</description>
 		<year>1985</year>
 		<publisher>Esselte Studium</publisher>
 		<notes><![CDATA[
-key is missing
+Requires hardware key 10, which isn't dumped
 ]]></notes>
 		<info name="serial" value="24-34266" />
 		<info name="release" value="19851129" />
@@ -478,13 +478,12 @@ key is missing
 		</part>
 	</software>
 
-	<!-- requires a hardware key, which isn't dumped -->
 	<software name="kemi1">
 		<description>Kemi 1 (nät/skollicens)</description>
 		<year>1986</year>
 		<publisher>Telenova</publisher>
 		<notes><![CDATA[
-key is missing
+Requires a hardware key, which isn't dumped
 ]]></notes>
 		<info name="serial" value="24-34208" />
 		<info name="release" value="19860313" />
@@ -559,11 +558,13 @@ key is missing
 		</part>
 	</software>
 
-	<!-- Requires hardware key 27, which isn't dumped -->
 	<software name="millikan">
 		<description>Millikans försök (enanvändare)</description>
 		<year>1987</year>
 		<publisher>Esselte Studium</publisher>
+		<notes><![CDATA[
+Requires hardware key 27, which isn't dumped
+]]></notes>
 		<info name="serial" value="24-33764" />
 		<info name="release" value="19870729" />
 		<part name="flop1" interface="floppy_5_25">
@@ -675,13 +676,12 @@ Doesn't load
 		</part>
 	</software>
 
-	<!-- Requires a hardware key, which isn't dumped -->
 	<software name="matvarde" supported="no">
 		<description>Mätvärdesinsamling 1.0 (alfa, enanvändare)</description>
 		<year>19??</year>
 		<publisher>Esselte Studium</publisher>
 		<notes><![CDATA[
-key is missing
+Requires a hardware key, which isn't dumped
 ]]></notes>
 		<info name="serial" value="24-35090" />
 		<info name="release" value="19870820" />
@@ -717,12 +717,12 @@ key is missing
 		</part>
 	</software>
 
-	<!-- From non-original media -->
 	<software name="profirange" supported="no">
 		<description>ProfiRange (version 6181)</description>
 		<year>198?</year>
 		<publisher>Telenova</publisher>
 		<notes><![CDATA[
+Dumped from non-original media
 Doesn't start
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
@@ -739,12 +739,12 @@ Doesn't start
 		</part>
 	</software>
 
-	<!-- From non-original media -->
 	<software name="profitext">
 		<description>ProfiText: Textbehandling med Compis (version 6181)</description>
 		<year>1986</year>
 		<publisher>TeleNova</publisher>
 		<notes><![CDATA[
+Dumped from non-original media
 Doesn't start
 ]]></notes>
 		<info name="release" value="19860816" />
@@ -756,11 +756,13 @@ Doesn't start
 		</part>
 	</software>
 
-	<!-- Requires hardware key 7, which isn't dumped -->
 	<software name="ritett">
 		<description>RitEtt (enanvändare)</description>
 		<year>1986</year>
 		<publisher>Esselte Studium</publisher>
+		<notes><![CDATA[
+Requires hardware key 7, which isn't dumped
+]]></notes>
 		<info name="serial" value="24-34250" />
 		<info name="release" value="19860404" />
 		<part name="flop1" interface="floppy_5_25">
@@ -770,11 +772,13 @@ Doesn't start
 		</part>
 	</software>
 
-	<!-- Requires hardware key 34, which isn't dumped -->
 	<software name="raknrattd" cloneof="raknratt">
 		<description>Räkna lätt, räkna rätt (demo, ekonomiredaktionen, version 6175)</description>
 		<year>19??</year>
 		<publisher>Esselte Studium</publisher>
+		<notes><![CDATA[
+Requires hardware key 34, which isn't dumped
+]]></notes>
 		<info name="serial" value="24-4408-7" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="2209405">
@@ -795,13 +799,13 @@ Doesn't start
 		</part>
 	</software>
 
-	<!-- From non-original source -->
 	<software name="skatteprog" supported="no">
 		<description>Skatteprogram S91</description>
 		<year>1992?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
-disk is damaged
+Dumped from non-original media
+Disk is damaged
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="3525632">
@@ -810,11 +814,13 @@ disk is damaged
 		</part>
 	</software>
 
-	<!-- From non-original media -->
 	<software name="skriv6401" cloneof="skriv">
 		<description>Skriv lätt, skriv rätt (version 6401)</description>
 		<year>19??</year>
 		<publisher>Esselte Studium</publisher>
+		<notes><![CDATA[
+Dumped from non-original media
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="5250800">
 				<rom name="skriv latt skriv ratt (disk copy).mfi" size="5250800" crc="592334a6" sha1="a24d0353f74e08aa39b6e13ff47361cdc9f45e02" status="baddump"/>
@@ -834,13 +840,12 @@ disk is damaged
 		</part>
 	</software>
 
-	<!-- requires a hardware key, which isn't dumped -->
 	<software name="skriv" supported="no">
 		<description>Skriv lätt, skriv rätt (version 8101, ekonomiredaktionen)</description>
 		<year>19??</year>
 		<publisher>Esselte Studium</publisher>
 		<notes><![CDATA[
-key is missing
+requires a hardware key, which isn't dumped
 ]]></notes>
 		<info name="serial" value="24-33825-7" />
 		<part name="flop1" interface="floppy_5_25">
@@ -877,12 +882,12 @@ key is missing
 		</part>
 	</software>
 
-	<!-- From non-original media -->
 	<software name="statettb" cloneof="statett" supported="no">
 		<description>StatEtt (beta, nät/skollicens)</description>
 		<year>1987</year>
 		<publisher>Esselte Studium</publisher>
 		<notes><![CDATA[
+Dumped from non-original media
 "Kan inte ladda"
 ]]></notes>
 		<info name="release" value="19871019" />
@@ -893,11 +898,13 @@ key is missing
 		</part>
 	</software>
 
-	<!-- Requires hardware key 29, which isn't dumped -->
 	<software name="stvaratt">
 		<description>Stava rätt på nytt sätt (version 8481)</description>
 		<year>19??</year>
 		<publisher>Esselte Studium</publisher>
+		<notes><![CDATA[
+Requires hardware key 29, which isn't dumped
+]]></notes>
 		<info name="serial" value="24-34298-X" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="2178838">
@@ -990,11 +997,13 @@ EXECUTION ERROR
 		</part>
 	</software>
 
-	<!-- From non-original media -->
 	<software name="turbopascal">
 		<description>Turbo Pascal 3.01</description>
 		<year>1986</year>
 		<publisher>Borland</publisher>
+		<notes><![CDATA[
+Dumped from non-original media
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Turbo Pascal" />
 			<dataarea name="flop" size="5211972">
