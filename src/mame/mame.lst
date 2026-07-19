@@ -17811,6 +17811,9 @@ sotsugyok
 hvysmsh
 hvysmsha
 hvysmshj
+wcvol95
+wcvol95j
+wcvol95x
 
 @source:dataeast/karnov.cpp
 chelnov
@@ -17990,11 +17993,6 @@ kuhga
 vaportra
 vaportra3
 vaportrau
-
-@source:dataeast/wcvol95.cpp
-wcvol95
-wcvol95j
-wcvol95x
 
 @source:ddr/ac1.cpp
 ac1
