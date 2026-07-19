@@ -1895,16 +1895,19 @@ bool mips3_device::generate_opcode(drcuml_block &block, compiler_state &compiler
 			return true;
 
 		case 0x3c:  /* SCD - MIPS III */
-			UML_DMOV(block, I1, R64(RTREG));                                    // dmov    i1,<rtreg>
-			UML_DMOV(block, R64(RTREG), 0);                                     // dmov   <rtreg>,0
-			UML_CMP(block, mem(&m_core->llbit), 0);                             // cmp     [llbit],0
-			UML_JMPc(block, COND_E, skip = compiler.labelnum++);                // je      skip
-			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                            // add     i0,<rsreg>,SIMMVAL
-			UML_CMP(block, mem(&m_core->cpr[0][COP0_LLAddr]), I0);              // cmp [LLADDR], RSREG + SIMMVAL
-			UML_JMPc(block, COND_NE, skip);                                     // jne      skip
-			UML_CALLH(block, *m_write64[m_core->mode >> 1]);                    // callh   write64
-			UML_DMOV(block, R64(RTREG), 1);                                     // dmov   <rtreg>,1
-			UML_LABEL(block, skip);                                             // skip:
+			UML_DMOV(block, I1, R64(RTREG));                                // dmov    i1,<rtreg>
+			UML_DMOV(block, R64(RTREG), 0);                                 // dmov    <rtreg>,0
+			UML_CMP(block, mem(&m_core->llbit), 0);                         // cmp     [llbit],0
+			UML_JMPc(block, COND_E, skip = compiler.labelnum++);            // je      skip
+			if (RTREG == RSREG)
+				UML_ADD(block, I0, I1, SIMMVAL);                            // add     i0,i,SIMMVAL
+			else
+				UML_ADD(block, I0, R32(RSREG), SIMMVAL);                    // add     i0,<rsreg>,SIMMVAL
+			UML_CMP(block, mem(&m_core->cpr[0][COP0_LLAddr]), I0);          // cmp     [LLADDR],RSREG + SIMMVAL
+			UML_JMPc(block, COND_NE, skip);                                 // jne     skip
+			UML_CALLH(block, *m_write64[m_core->mode >> 1]);                // callh   write64
+			UML_DMOV(block, R64(RTREG), 1);                                 // dmov    <rtreg>,1
+			UML_LABEL(block, skip);                                         // skip:
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, true);
 			return true;
