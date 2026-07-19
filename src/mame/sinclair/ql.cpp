@@ -10,7 +10,6 @@
 
     TODO:
 
-    - microdrive
     - ZX8301 memory access slowdown
     - use resnet.h to create palette
     - Tyche bios is broken
@@ -107,7 +106,6 @@ namespace {
 
 #define X1 XTAL(15'000'000)
 #define X2 XTAL(32'768)
-#define X3 XTAL_4_436MHz
 #define X4 XTAL(11'000'000)
 
 class ql_state : public driver_device
@@ -120,8 +118,8 @@ public:
 		m_zx8301(*this, ZX8301_TAG),
 		m_zx8302(*this, ZX8302_TAG),
 		m_speaker(*this, "speaker"),
-		m_mdv1(*this, MDV_1),
-		m_mdv2(*this, MDV_2),
+		m_mdv1(*this, "mdv1"),
+		m_mdv2(*this, "mdv2"),
 		m_ser1(*this, RS232_A_TAG),
 		m_ser2(*this, RS232_B_TAG),
 		m_ram(*this, RAM_TAG),
@@ -181,10 +179,6 @@ private:
 	void zx8302_mdselck_w(int state);
 	void zx8302_mdrdw_w(int state);
 	void zx8302_erase_w(int state);
-	void zx8302_raw1_w(int state);
-	int zx8302_raw1_r();
-	void zx8302_raw2_w(int state);
-	int zx8302_raw2_r();
 	void exp_extintl_w(int state);
 	void qimi_extintl_w(int state);
 
@@ -232,19 +226,20 @@ uint8_t ql_state::read(offs_t offset)
 	}
 	if (offset >= 0x18000 && offset <= 0x18003)
 	{
-		data = m_zx8302->rtc_r(offset & 0x03);
+		data = m_zx8302->rtc_r(offset & 0x03); // pc_clock
 	}
 	if (offset == 0x18020)
 	{
-		data = m_zx8302->status_r();
+		data = m_zx8302->status_r(); // pc_ipcrd
 	}
 	if (offset == 0x18021)
 	{
-		data = m_zx8302->irq_status_r();
+		data = m_zx8302->irq_status_r(); // pc_intr
 	}
 	if (offset >= 0x18022 && offset <= 0x18023)
 	{
-		data = m_zx8302->mdv_track_r();
+		// pc_trak1 (0x18022) and pc_trak2 (0x18023)
+		data = m_zx8302->mdv_track_r(offset & 1);
 	}
 	if (offset >= 0x20000 && offset < 0x40000)
 	{
@@ -279,27 +274,29 @@ void ql_state::write(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x18000 && offset <= 0x18001)
 	{
+		// pc_clc0 (not implemented -> resets the clock)
+		// pc_clc1
 		m_zx8302->rtc_w(data);
 	}
 	if (offset == 0x18002)
 	{
-		m_zx8302->control_w(data);
+		m_zx8302->control_w(data); // pc_tctrl
 	}
 	if (offset == 0x18003)
 	{
-		m_zx8302->ipc_command_w(data);
+		m_zx8302->ipc_command_w(data); // pc_ipcwr
 	}
 	if (offset == 0x18020)
 	{
-		m_zx8302->mdv_control_w(data);
+		m_zx8302->mdv_control_w(data); // pc_mctrl
 	}
 	if (offset == 0x18021)
 	{
-		m_zx8302->irq_acknowledge_w(data);
+		m_zx8302->irq_acknowledge_w(data); // pc_intr
 	}
 	if (offset == 0x18022)
 	{
-		m_zx8302->data_w(data);
+		m_zx8302->data_w(data); // pc_tdata
 	}
 	if (offset == 0x18063)
 	{
@@ -827,28 +824,6 @@ void ql_state::zx8302_erase_w(int state)
 	m_mdv2->erase_w(state);
 }
 
-void ql_state::zx8302_raw1_w(int state)
-{
-	m_mdv1->data1_w(state);
-	m_mdv2->data1_w(state);
-}
-
-int ql_state::zx8302_raw1_r()
-{
-	return m_mdv1->data1_r() | m_mdv2->data1_r();
-}
-
-void ql_state::zx8302_raw2_w(int state)
-{
-	m_mdv1->data2_w(state);
-	m_mdv2->data2_w(state);
-}
-
-int ql_state::zx8302_raw2_r()
-{
-	return m_mdv1->data2_r() | m_mdv2->data2_r();
-}
-
 void ql_state::update_interrupt()
 {
 	m_zx8302->extint_w(m_extintl || m_qimi_extint);
@@ -943,14 +918,18 @@ void ql_state::ql(machine_config &config)
 	m_zx8302->out_mdseld_callback().set(m_mdv1, FUNC(microdrive_image_device::comms_in_w));
 	m_zx8302->out_mdrdw_callback().set(FUNC(ql_state::zx8302_mdrdw_w));
 	m_zx8302->out_erase_callback().set(FUNC(ql_state::zx8302_erase_w));
-	m_zx8302->out_raw1_callback().set(FUNC(ql_state::zx8302_raw1_w));
-	m_zx8302->in_raw1_callback().set(FUNC(ql_state::zx8302_raw1_r));
-	m_zx8302->out_raw2_callback().set(FUNC(ql_state::zx8302_raw2_w));
-	m_zx8302->in_raw2_callback().set(FUNC(ql_state::zx8302_raw2_r));
 
 	MICRODRIVE(config, m_mdv1);
-	m_mdv1->comms_out_wr_callback().set(m_mdv2, FUNC(microdrive_image_device::comms_in_w));
+	m_mdv1->comms_out_wr_callback().set(m_mdv2, FUNC(microdrive_image_device::comms_in_w)); // Select daisy chain mdv1 -> mdv2
+	m_mdv1->data1_out_wr_callback().set(m_zx8302, FUNC(zx8302_device::raw1_w));
+	m_mdv1->data2_out_wr_callback().set(m_zx8302, FUNC(zx8302_device::raw2_w));
+	m_mdv1->gap_out_wr_callback().set(m_zx8302, FUNC(zx8302_device::gap_w));
+	m_mdv1->tx_pair_rd_callback().set(m_zx8302, FUNC(zx8302_device::mdv_tx_pop));
 	MICRODRIVE(config, m_mdv2);
+	m_mdv2->data1_out_wr_callback().set(m_zx8302, FUNC(zx8302_device::raw1_w));
+	m_mdv2->data2_out_wr_callback().set(m_zx8302, FUNC(zx8302_device::raw2_w));
+	m_mdv2->gap_out_wr_callback().set(m_zx8302, FUNC(zx8302_device::gap_w));
+	m_mdv2->tx_pair_rd_callback().set(m_zx8302, FUNC(zx8302_device::mdv_tx_pop));
 
 	RS232_PORT(config, m_ser1, default_rs232_devices, nullptr); // wired as DCE
 	RS232_PORT(config, m_ser2, default_rs232_devices, nullptr); // wired as DTE

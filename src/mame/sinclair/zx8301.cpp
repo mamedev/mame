@@ -26,7 +26,10 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 0
+#define LOG_RAM   (1U << 1)   // every RAM read/write access
+
+// #define VERBOSE (LOG_GENERAL)
+#include "logmacro.h"
 
 
 // low resolution palette
@@ -188,7 +191,7 @@ void zx8301_device::control_w(uint8_t data)
 
 	*/
 
-	if (LOG) logerror("ZX8301 Control: %02x\n", data);
+	LOG("Control: %02x\n", data);
 
 	// display off
 	m_dispoff = BIT(data, 1);
@@ -207,7 +210,7 @@ void zx8301_device::control_w(uint8_t data)
 
 uint8_t zx8301_device::data_r(offs_t offset)
 {
-	if (LOG) logerror("ZX8301 RAM Read: %06x\n", offset);
+	LOGMASKED(LOG_RAM, "RAM Read: %06x\n", offset);
 
 	if (m_vda)
 	{
@@ -224,7 +227,7 @@ uint8_t zx8301_device::data_r(offs_t offset)
 
 void zx8301_device::data_w(offs_t offset, uint8_t data)
 {
-	if (LOG) logerror("ZX8301 RAM Write: %06x = %02x\n", offset, data);
+	LOGMASKED(LOG_RAM, "RAM Write: %06x = %02x\n", offset, data);
 
 	if (m_vda)
 	{
