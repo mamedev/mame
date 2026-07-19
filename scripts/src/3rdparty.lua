@@ -94,6 +94,11 @@ if _OPTIONS["gcc"]~=nil then
 		}
 	end
 end
+if _OPTIONS["targetos"]=="asmjs" then
+		buildoptions_c {
+			"-Wno-error=format", -- expat ptrdiff_t format mismatch
+		}
+end
 if _OPTIONS["targetos"]=="windows" then
 		buildoptions_c {
 			"-Wno-error=format", -- GCC with UCRT produces warnings for the non-standard I64 size modifier
@@ -1845,6 +1850,13 @@ project "wdlfft"
 project "ymfm"
 	uuid "2403a536-cb0a-4b50-b41f-10c17917689b"
 	kind "StaticLib"
+
+	configuration { "gmake or ninja" }
+		if _OPTIONS["targetos"]=="asmjs" then
+			buildoptions_cpp {
+				"-Wno-array-bounds", -- ymfm_fm.ipp accesses operator array index past 12 in template code clang can't fully analyse
+			}
+		end
 
 	configuration { }
 		defines {

@@ -5,21 +5,20 @@ license:CC0-1.0
 
 Undumped:
 Användbara procedurer i Pascal (enanvändare) [24-33398-0]
-Användbara procedurer i Pascal (nät/skollicens) [24-2433601-7]
-CompisNet 1B v2.01 (1986)
-Compis Pascal (enanvändare) [24-33286-0]
-Datorn i början (enanvändare) [24-34810-4]
 Datorn i början (nät/skollicens) [24-34690-X]
 Ekologi-akvariet (nät/skollicens) [24-34203, 1987-07-27]
-Enter-Program v1.3 (nätverk) [20-20841-9]
 HarmoniEtt (delta) (nät/skollicens) [24-33667, 1987-10-21]
-HarmoniTvå
 GraphMaster - Verktyg för funktionsgrafer (enanvändare) [24-33148-1]
-GraphMaster - Verktyg för funktionsgrafer (nät/skollicens) [24-33589-4]
 Gör en enkät (nät/skollicens) [24-33680, 1985-09-25]
+ProfiText [24-33939-3]
+ProfiCalc [24-34029-4]
+ProfiPost [24-34028-6]
+ProfiFiler [24-34027-8]
+ProfiReport [24-34122-3]
+ProfiOn [24-34026-X]
+StatEtt (enanvändare) [24-34792-2]
+StatEtt (nät/skollicens) [24-34791-4]
 Svenska i datasalen
-Systemskiva för hårdskiveenhet [version 6335]
-Systemskiva för hårdskiveenhet [version 7242]
 -->
 <softwarelist name="compis" description="Telenova Compis disk images">
 
@@ -36,84 +35,18 @@ Systemskiva för hårdskiveenhet [version 7242]
 		</part>
 	</software>
 
-	<software name="demospel">
-		<description>Demospel</description>
-		<year>19??</year>
-		<publisher>DataNova</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="331170">
-				<rom name="demospel.td0" size="331170" crc="974cd06e" sha1="656baa0c46ad443e8d2507d783a2a1371cdd2d1e" status="baddump"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="harmonie">
-		<description>PI HarmoniEtt (Delta, enanvändare)</description>
+	<software name="action1" supported="no">
+		<description>Action1 Glosprogram (nät/skollicens)</description>
 		<year>1987</year>
-		<publisher>Telenova</publisher>
-		<info name="serial" value="24-33664" />
-		<info name="release" value="19871021" />
+		<publisher>Almqvist &amp; Wiksell Läromedel AB</publisher>
+		<notes><![CDATA[
+requires a hardware key, which isn't dumped
+]]></notes>
+		<info name="serial" value="24-33584" />
+		<info name="release" value="19870114" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="246025">
-				<rom name="harmoniett.td0" size="246025" crc="85334c70" sha1="d8d49ee3c246a44bb0c714f465af2853534c92ee" status="baddump"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ma2">
-		<description>MA2 info (skollicens)</description>
-		<year>19??</year>
-		<publisher>Hjärsta Mediakonsult Handelsbolag</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="113003">
-				<rom name="ma2.td0" size="113003" crc="5bede5b3" sha1="b6753ede4cc24ef8c0d4ba503302aebc27cc1e10" status="baddump"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="skriv">
-		<description>Skriv lätt, skriv rätt (version 7532)</description>
-		<year>19??</year>
-		<publisher>Telenova</publisher>
-		<info name="serial" value="24-33825-7" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="140545">
-				<rom name="skriv1.td0" size="140545" crc="69c68426" sha1="5bc886ec8cae72a70e1d31a8fca3ebe963117be2" status="baddump"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="msdos32">
-		<description>MS-DOS v3.2 (version 7331)</description>
-		<year>1987</year>
-		<publisher>Telenova</publisher>
-		<info name="release" value="19870609" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="compismsdos.img" size="737280" crc="4abfe76c" sha1="ecac054d4044675d53454a7878f9b9438d29d818"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="system2">
-		<description>Systemskiva II (Svensk, version 6385)</description>
-		<year>1986</year>
-		<publisher>Telenova</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="compissys2.img" size="737280" crc="2eb61d13" sha1="d96a3aeb2dde991e840b3f4938b904feca72abef"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="distrib">
-		<description>Distributionskunskap (version 8014)</description>
-		<year>19??</year>
-		<publisher>Telenova</publisher>
-		<info name="serial" value="24-33362" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="2209534">
-				<rom name="distributionskunskap.mfm" size="2209534" crc="145c545d" sha1="8bfdd67985af6b4626b9ec56c36e4ef5aea17909"/>
+			<dataarea name="flop" size="2209365">
+				<rom name="Action1 Glosprogram.mfm" size="2209365" crc="1e2a96a1" sha1="098842f0571c0b9beb64295bef5ded29e5ce6add"/>
 			</dataarea>
 		</part>
 	</software>
@@ -130,136 +63,176 @@ Systemskiva för hårdskiveenhet [version 7242]
 		</part>
 	</software>
 
-	<software name="lkmdlrkn">
-		<description>Läkemedelsräkning (version 7234)</description>
-		<year>19??</year>
-		<publisher>Telenova</publisher>
-		<info name="serial" value="24-34327-7" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="2209417">
-				<rom name="lakemedelsrakning.mfm" size="2209417" crc="39df5967" sha1="190713daa7dc50ec428ea5259972f2865de91ec9"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="procent">
-		<description>Procenträkning (version 7334)</description>
-		<year>19??</year>
-		<publisher>Telenova</publisher>
-		<info name="serial" value="24-34736-1" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="2209414">
-				<rom name="procentrakning.mfm" size="2209414" crc="888188a0" sha1="88f45b4fd560ff847b27eb4f754d4a1a7c9bd5a4"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="raknratt">
-		<description>Räkna lätt, räkna rätt (version 6175)</description>
-		<year>19??</year>
-		<publisher>Telenova</publisher>
-		<info name="serial" value="24-34408-7" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="2209544">
-				<rom name="rakna latt, rakna ratt.mfm" size="2209544" crc="1268cd5d" sha1="56c31ccadf4515e5926eadd2e3cd7639611e8cb4"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Requires a hardware key which isn't dumped -->
-	<software name="stvaratt">
-		<description>Stava rätt på nytt sätt (version 8481)</description>
-		<year>19??</year>
-		<publisher>Esselte Studium</publisher>
-		<info name="serial" value="24-34298-X" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="2178838">
-				<rom name="Stava ratt pa nytt satt.mfm" size="2178838" crc="9777a5bb" sha1="1ac2be0062fe800deed3cbccddb95710ae116d92"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mattev1">
-		<description>Matematikverkstad I (beta, nät/skollicens)</description>
+	<software name="procpascal">
+		<description>Användbara procedurer i Pascal 1.5 (nät/skollicens)</description>
 		<year>1987</year>
-		<publisher>Esselte Studium</publisher>
-		<info name="serial" value="24-33777" />
-		<info name="release" value="19870806" />
+		<publisher>Telenova</publisher>
+		<info name="serial" value="24-33601" />
+		<info name="release" value="19870402" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="2217678">
-				<rom name="Matematikverkstad I.mfm" size="2217678" crc="a5956a47" sha1="3e8e1af3c54b26775ab127f499f7260cca0f9389"/>
+			<dataarea name="flop" size="5076965">
+				<rom name="anvandbara procedurer i pascal.mfi" size="5076965" crc="bf08aa1f" sha1="9e666372d89649943406d645819eedda00ef9de2"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="video">
-		<description>Video-butiken (enanvändare)</description>
-		<year>1986</year>
+	<software name="compiskom" supported="no">
+		<description>Compis Kommunikation 1.2</description>
+		<year>19??</year>
 		<publisher>Esselte Studium</publisher>
-		<info name="serial" value="24-33070" />
-		<info name="release" value="19860916" />
+		<notes><![CDATA[
+Dumped from non-original media
+Requires hardware key 15, which isn't dumped
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Video-butiken Drive A" />
-			<dataarea name="flop" size="2209512">
-				<rom name="Video-butiken Drive A.mfm" size="2209512" crc="5d4a1c41" sha1="315befb495c46360e9665e4525623543e2160cd1"/>
+			<dataarea name="flop" size="5761878">
+				<rom name="compis kommunikation (19xx)(esselte studium)(se).mfi" size="5761878" crc="12bff80c" sha1="f85130e49e16eaa9780e251c1cb002d73b5c06b7" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pascal">
+		<description>Compis Pascal 3.12</description>
+		<year>19??</year>
+		<publisher>Telenova</publisher>
+		<notes><![CDATA[
+Dumped from non-original media
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="5227808">
+				<rom name="compis pascal v3.12 (19xx)(telenova).mfi" size="5227808" crc="f79acca3" sha1="401109b45a9ad1082aa18096c05ba8ae0d3ee5f6" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pasboot" cloneof="compisnetib">
+		<description>CompisNet I PASBOOT med nyteknik</description>
+		<year>19??</year>
+		<publisher>Telenova</publisher>
+		<notes><![CDATA[
+Dumped from non-original media
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="5892310">
+				<rom name="pasboot net i skiva 1 med nyteknik (19xx)(telenova)(se).mfi" size="5892310" crc="ae328508" sha1="0892e44421eb9103a17523065d983c5664900645" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="compisnetib" supported="no">
+		<description>CompisNet IB 2.01 (version 6191)</description>
+		<year>1986</year>
+		<publisher>Telenova</publisher>
+		<notes><![CDATA[
+disk 4 is damaged
+disk 1, 2, 3, and 5 are missing
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="1(8)" />
+			<dataarea name="flop" size="2000000">
+				<rom name="compisnet 1b (disk 1 of 8).hfe" size="2000000" status="nodump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Video-butiken Drive B" />
-			<dataarea name="flop" size="2209459">
-				<rom name="Video-butiken Drive B.mfm" size="2209459" crc="bf491515" sha1="b7ed4b1796f9f6056f7394381a0ea26cffdbef6a"/>
+			<feature name="part_id" value="2(8)" />
+			<dataarea name="flop" size="2000000">
+				<rom name="compisnet 1b (disk 2 of 8).hfe" size="2000000" status="nodump"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="3(8)" />
+			<dataarea name="flop" size="2000000">
+				<rom name="compisnet 1b (disk 3 of 8).hfe" size="2000000" status="nodump"/>
+			</dataarea>
+		</part>
+		<!-- Damaged disk -->
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="DATABAS CP/M 4(8)" />
+			<dataarea name="flop" size="2034688">
+				<rom name="compisnet 1b (disk 4 of 8).hfe" size="2034688" crc="d34eba6d" sha1="6fdf6145203656b70b009303f84391ff1ad03b5e" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="5(8)" />
+			<dataarea name="flop" size="2000000">
+				<rom name="compisnet 1b (disk 5 of 8).hfe" size="2000000" status="nodump"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="PASBOOT 6(8)" />
+			<dataarea name="flop" size="5315085">
+				<rom name="compisnet 1b (disk 6 of 8).mfi" size="5315085" crc="58f686bb" sha1="b935579618147caeded3f5f1bba0fa33e497dcc3"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="CPMBOOT 7(8)" />
+			<dataarea name="flop" size="5620256">
+				<rom name="compisnet 1b (disk 7 of 8).mfi" size="5620256" crc="5f686645" sha1="dc89f76923abf8f281398a1444906a5988af4f48"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="DIAGNOS 8(8)" />
+			<dataarea name="flop" size="5365595">
+				<rom name="compisnet 1b (disk 8 of 8).mfi" size="5365595" crc="ffea94d3" sha1="95065827d04f45be0feb0c0330fd9441d43709de"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="statett">
-		<description>StatEtt - Analys</description>
-		<year>1990</year>
-		<publisher>Esselte Studium</publisher>
-		<info name="serial" value="24-35831" />
-		<info name="release" value="19900101" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="2217707">
-				<rom name="StatEtt Analys.mfm" size="2217707" crc="017ae3c4" sha1="6ff89815eb79ca9cd6369defaca59948035275e0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Requires a hardware key which isn't dumped -->
-	<software name="raknrattd" cloneof="raknratt">
-		<description>Räkna lätt, räkna rätt (demo, version 6175)</description>
+	<software name="compisnet20">
+		<description>CompisNet 2.0 (version 5314)</description>
 		<year>19??</year>
-		<publisher>Esselte Studium</publisher>
-		<info name="serial" value="24-4408-7" />
+		<publisher>Telenova</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="2209405">
-				<rom name="Rakna latt, rakna ratt demo.mfm" size="2209405" crc="acc2bf39" sha1="f08288227e1ea1586976163ba42499aa13244c95"/>
+			<feature name="part_id" value="START" />
+			<dataarea name="flop" size="5293288">
+				<rom name="compisnet 2.0 (disk 1 of 7).mfi" size="5293288" crc="4f894634" sha1="b44ae1e2a7c44234c104dc36b8ecf223dd17b6bc"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="CPMBOOT" />
+			<dataarea name="flop" size="5760382">
+				<rom name="compisnet 2.0 (disk 2 of 7).mfi" size="5760382" crc="350938e6" sha1="66f3604bec78abf09ac6d4bab39690eebc2d75e3"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="CENTRAL CP/M" />
+			<dataarea name="flop" size="5209020">
+				<rom name="compisnet 2.0 (disk 3 of 7).mfi" size="5209020" crc="b9a7d24f" sha1="96e2a0066568953c0ed0aaea5438d18ddc131044"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="CENTRAL CP/M och p-Sys" />
+			<dataarea name="flop" size="5420307">
+				<rom name="compisnet 2.0 (disk 4 of 7).mfi" size="5420307" crc="acadef51" sha1="3e5d9543d826618cd3e62392e11d524f87d966d5"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="DATABAS CP/M" />
+			<dataarea name="flop" size="5391101">
+				<rom name="compisnet 2.0 (disk 5 of 7).mfi" size="5391101" crc="0b3f7f04" sha1="fc8d1082410ea2cc0a467ac05e29ce6a3979d8d2"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="DATABAS CP/M och p-Sys" />
+			<dataarea name="flop" size="5214042">
+				<rom name="compisnet 2.0 (disk 6 of 7).mfi" size="5214042" crc="151217b8" sha1="b6fadd39d16dc4c93fed3ec2f378f59a9ae37b7e"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="PASBOOT" />
+			<dataarea name="flop" size="5296480">
+				<rom name="compisnet 2.0 (disk 7 of 7).mfi" size="5296480" crc="e7376cf0" sha1="2fe17153452de3dbe3875d07996af9bac77fc371"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="stilplus">
-		<description>Stil-Plus (alfa 1.0, nät/skollicens)</description>
-		<year>1989</year>
-		<publisher>Esselte Studium</publisher>
-		<info name="serial" value="24-35456" />
-		<info name="release" value="19890530" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="2217678">
-				<rom name="StilPlus.mfm" size="2217678" crc="b16bb821" sha1="d965a865e3f97d7d256c89176948ef371d65254b"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="action1">
-		<description>Action1 Glosprogram (nät/skollicens)</description>
+	<software name="compisnetiiplus">
+		<description>CompisNet II Plus (CPMBOOT, version 7244)</description>
 		<year>1987</year>
-		<publisher>Almqvist &amp; Wiksell Läromedel AB</publisher>
-		<info name="serial" value="24-33584" />
-		<info name="release" value="19870114" />
+		<publisher>Telenova</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="2209365">
-				<rom name="Action1 Glosprogram.mfm" size="2209365" crc="1e2a96a1" sha1="098842f0571c0b9beb64295bef5ded29e5ce6add"/>
+			<dataarea name="flop" size="5417343">
+				<rom name="compisnet ii plus (1987)(telenova)(se)(cpmboot).mfi" size="5417343" crc="b520a43f" sha1="879df96bbd92cb04822e63f83888e1268a746140"/>
 			</dataarea>
 		</part>
 	</software>
@@ -277,37 +250,98 @@ Systemskiva för hårdskiveenhet [version 7242]
 		</part>
 	</software>
 
-	<software name="kinetik">
-		<description>Kinetik (nät/skollicens)</description>
+	<software name="databorjan" supported="no">
+		<description>Datorn i början (enanvändare)</description>
 		<year>1987</year>
 		<publisher>Esselte Studium</publisher>
-		<info name="serial" value="24-34652" />
-		<info name="release" value="19870823" />
+		<notes><![CDATA[
+Requires hardware key 22, which isn't dumped
+]]></notes>
+		<info name="serial" value="24-34810" />
+		<info name="release" value="19870806" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="2209459">
-				<rom name="Kinetik.mfm" size="2209459" crc="c906fa1d" sha1="a6e9411dcc1935cb17a65c7eb162fc127eb1f9a1"/>
+			<dataarea name="flop" size="5941627">
+				<rom name="datorn i brjan (1987-08-06)(esselte studium)(se)(pd)[24-34810][enanvndare].mfi" size="5941627" crc="e63aa59b" sha1="2478840d26abb43f3bea01413938c94641d0d3d9"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="jordskift">
-		<description>Jorden skiftas, folket skingras (nät/skollicens)</description>
-		<year>1987</year>
+	<software name="datakom" supported="no">
+		<description>Datorn i kommunikation (enanvändare)</description>
+		<year>1986</year>
 		<publisher>Esselte Studium</publisher>
-		<info name="serial" value="24-33799" />
-		<info name="release" value="19871105" />
+		<notes><![CDATA[
+Requires hardware key 50, which isn't dumped
+]]></notes>
+		<info name="serial" value="24-33828" />
+		<info name="release" value="19861006" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="2209529">
-				<rom name="Jorden skiftas, folket skingras.mfm" size="2209529" crc="b1df76ea" sha1="6d6e2fd20ccc4cec2999932168f8a82221f16c47"/>
+			<dataarea name="flop" size="2209396">
+				<rom name="Datorn i kommunikation.mfm" size="2209396" crc="780900ce" sha1="923cbefe3ac449d64f1a5ef50f69f59f3a33e438"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Requires a hardware key which isn't dumped -->
-	<software name="skvallra">
+	<software name="datmatte">
+		<description>Datorn i matematik (nät/skollicens)</description>
+		<year>1986</year>
+		<publisher>Esselte Studium</publisher>
+		<info name="serial" value="24-34175" />
+		<info name="release" value="19861003" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2217631">
+				<rom name="Datorn i matematik.mfm" size="2217631" crc="0a19fc5b" sha1="5d764656e8428c3767bf3cc1a2e3ce6c0451df88"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demospel">
+		<description>Demospel</description>
+		<year>19??</year>
+		<publisher>DataNova</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="331170">
+				<rom name="demospel.td0" size="331170" crc="974cd06e" sha1="656baa0c46ad443e8d2507d783a2a1371cdd2d1e" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="distrib" supported="no">
+		<description>Distributionskunskap (version 8014)</description>
+		<year>19??</year>
+		<publisher>Telenova</publisher>
+		<notes><![CDATA[
+Requires a hardware key, which isn't dumped
+]]></notes>
+		<info name="serial" value="24-33362/33813-3" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209534">
+				<rom name="distributionskunskap.mfm" size="2209534" crc="145c545d" sha1="8bfdd67985af6b4626b9ec56c36e4ef5aea17909"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="enter">
+		<description>Enter 1.3 (demo, nät/skollicens)</description>
+		<year>19??</year>
+		<publisher>Liber</publisher>
+		<info name="serial" value="40-20841-9" />
+		<info name="release" value="19840108" />
+		<info name="isbn" value="40-20841-9" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="4922817">
+				<rom name="enter v1.3 (demo) (19xx)(liber)(se)[40-20841-9][nt-skollicens].mfi" size="4922817" crc="7afe4e2d" sha1="9f343e1c13c23a02003e65080a8f890b5bf48027"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skvallra" supported="no">
 		<description>Får dataregister skvallra? (enanvändare)</description>
 		<year>1985</year>
 		<publisher>Esselte Studium</publisher>
+		<notes><![CDATA[
+Requires hardware key 19, which isn't dumped
+]]></notes>
 		<info name="serial" value="24-34112" />
 		<info name="release" value="19851029" />
 		<part name="flop1" interface="floppy_5_25">
@@ -330,82 +364,74 @@ Systemskiva för hårdskiveenhet [version 7242]
 		</part>
 	</software>
 
-	<!-- Requires a hardware key which isn't dumped -->
-	<software name="kommunik">
-		<description>Datorn i kommunikation (enanvändare)</description>
-		<year>1986</year>
-		<publisher>Esselte Studium</publisher>
-		<info name="serial" value="24-33828" />
-		<info name="release" value="19861006" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="2209396">
-				<rom name="Datorn i kommunikation.mfm" size="2209396" crc="780900ce" sha1="923cbefe3ac449d64f1a5ef50f69f59f3a33e438"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="matett">
-		<description>MätEtt (enanvändare)</description>
+	<software name="graphmaster2" supported="no">
+		<description>GraphMaster 2.0 (nät/skollicens)</description>
 		<year>1987</year>
 		<publisher>Esselte Studium</publisher>
-		<info name="serial" value="24-33748" />
-		<info name="release" value="19870831" />
+		<notes><![CDATA[
+Requires a hardware key, which isn't dumped
+]]></notes>
+		<info name="serial" value="24-33589" />
+		<info name="release" value="19870728" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="2209452">
-				<rom name="matett.mfm" size="2209452" crc="f3c96357" sha1="4f8ca5fef4f22ad73a1101ab971118730fff102f"/>
+			<dataarea name="flop" size="5238938">
+				<rom name="graphmaster v2.0 (1987-07-28)(esselte studium)(se)(pd)[24-33589][nt-skollicens].mfi" size="5238938" crc="4fe171b4" sha1="06fc2854cd8b176d94bb1e9b0073325e02897a03"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Requires a hardware key which isn't dumped -->
-	<software name="millikan">
-		<description>Millikans försök (enanvändare)</description>
-		<year>1987</year>
+	<software name="harmoni1">
+		<description>HarmoniEtt 2.0 (gamma)</description>
+		<year>19??</year>
 		<publisher>Esselte Studium</publisher>
-		<info name="serial" value="24-33764" />
-		<info name="release" value="19870729" />
+		<notes><![CDATA[
+Dumped from non-original media
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="2209538">
-				<rom name="Millikans forsok.mfm" size="2209538" crc="40e161ad" sha1="704f1c23f02206c5e28166cf149bb39f7c24bb45"/>
+			<dataarea name="flop" size="5501142">
+				<rom name="harmoniett v2.0 (19xx)(esselte studium)(se) ].mfi" size="5501142" crc="c559283c" sha1="827071fa3ea726e6dcde8a6f5bef172d2235e9c1" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ritett">
-		<description>RitEtt (enanvändare)</description>
-		<year>1986</year>
+	<software name="harmoni2">
+		<description>HarmoniTvå 2.0 (alfa)</description>
+		<year>19??</year>
 		<publisher>Esselte Studium</publisher>
-		<info name="serial" value="24-34250" />
-		<info name="release" value="19860404" />
+		<notes><![CDATA[
+Dumped from non-original media
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="2217597">
-				<rom name="RitEtt.mfm" size="2217597" crc="e7cf88d0" sha1="225396bc29cb2ba158949a9286fcee9201617265"/>
+			<dataarea name="flop" size="5823106">
+				<rom name="harmonitv v2.0 (19xx)(esselte studium)(se).mfi" size="5823106" crc="d6809ad4" sha1="01599899cf7444962b23b96c3d9e4adc21b23bc8" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="datmatte">
-		<description>Datorn i matematik (nät/skollicens)</description>
-		<year>1986</year>
-		<publisher>Esselte Studium</publisher>
-		<info name="serial" value="24-34175" />
-		<info name="release" value="19861003" />
+	<software name="ibmdos" supported="no">
+		<description>IBM DOS 3.00</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Dumped from non-original media
+disk not identified, not for Compis?
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="2217631">
-				<rom name="Datorn i matematik.mfm" size="2217631" crc="0a19fc5b" sha1="5d764656e8428c3767bf3cc1a2e3ce6c0451df88"/>
+			<dataarea name="flop" size="3141051">
+				<rom name="ibm dos v3.00.mfi" size="3141051" crc="e77475b9" sha1="c9cfd8c001e0c01a3eef917d603a482de6139dbb" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="matenergi">
-		<description>Mät energi (enanvändare)</description>
-		<year>1986</year>
-		<publisher>Esselte Studium</publisher>
-		<info name="serial" value="24-34051" />
-		<info name="release" value="19860701" />
+	<software name="grekiskan">
+		<description>Internationella ord från grekiskan (nät/skollicens)</description>
+		<year>1988</year>
+		<publisher>Almqvist &amp; Wiksell</publisher>
+		<info name="serial" value="21-98006" />
+		<info name="release" value="19880101" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="2209441">
-				<rom name="Mat energi.mfm" size="2209441" crc="5e6b2fcb" sha1="91d79cc4f190a7069a54abd818922540e915837c"/>
+			<dataarea name="flop" size="2217724">
+				<rom name="Internationella ord fran grekiskan.mfm" size="2217724" crc="bb4e2e86" sha1="be6651cc0728b07d636b069324dd1d77ed10f470"/>
 			</dataarea>
 		</part>
 	</software>
@@ -423,15 +449,609 @@ Systemskiva för hårdskiveenhet [version 7242]
 		</part>
 	</software>
 
-	<software name="grekiskan">
-		<description>Internationella ord från grekiskan (nät/skollicens)</description>
-		<year>1988</year>
-		<publisher>Almqvist &amp; Wiksell</publisher>
-		<info name="serial" value="21-98006" />
-		<info name="release" value="19880101" />
+	<software name="ify" supported="no">
+		<description>Intresse-fallenhet-yrkesval (enanvändare)</description>
+		<year>1985</year>
+		<publisher>Esselte Studium</publisher>
+		<notes><![CDATA[
+Requires hardware key 10, which isn't dumped
+]]></notes>
+		<info name="serial" value="24-34266" />
+		<info name="release" value="19851129" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="2217724">
-				<rom name="Internationella ord fran grekiskan.mfm" size="2217724" crc="bb4e2e86" sha1="be6651cc0728b07d636b069324dd1d77ed10f470"/>
+			<dataarea name="flop" size="4956329">
+				<rom name="intresse-fallenhet-yrkesval (1985-11-29)(esselte studium)(se)[24-34266][enanvndare][req dongle].mfi" size="4956329" crc="783b0a19" sha1="d38d53b169e31e72041a50f3ff011c38c9440842"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jordskift">
+		<description>Jorden skiftas, folket skingras (nät/skollicens)</description>
+		<year>1987</year>
+		<publisher>Esselte Studium</publisher>
+		<info name="serial" value="24-33799" />
+		<info name="release" value="19871105" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209529">
+				<rom name="Jorden skiftas, folket skingras.mfm" size="2209529" crc="b1df76ea" sha1="6d6e2fd20ccc4cec2999932168f8a82221f16c47"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kemi1">
+		<description>Kemi 1 (nät/skollicens)</description>
+		<year>1986</year>
+		<publisher>Telenova</publisher>
+		<notes><![CDATA[
+Requires a hardware key, which isn't dumped
+]]></notes>
+		<info name="serial" value="24-34208" />
+		<info name="release" value="19860313" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="5333265">
+				<rom name="kemi1.mfi" size="5333265" crc="d9f04d2c" sha1="79d768e0049d2807cbab929c53059cad3e89981c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kinetik">
+		<description>Kinetik (nät/skollicens)</description>
+		<year>1987</year>
+		<publisher>Esselte Studium</publisher>
+		<info name="serial" value="24-34652" />
+		<info name="release" value="19870823" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209459">
+				<rom name="Kinetik.mfm" size="2209459" crc="c906fa1d" sha1="a6e9411dcc1935cb17a65c7eb162fc127eb1f9a1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lkmdlrkn">
+		<description>Läkemedelsräkning (version 7234)</description>
+		<year>19??</year>
+		<publisher>Telenova</publisher>
+		<info name="serial" value="24-34327-7" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209417">
+				<rom name="lakemedelsrakning.mfm" size="2209417" crc="39df5967" sha1="190713daa7dc50ec428ea5259972f2865de91ec9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ma2">
+		<description>MA2 info (skollicens)</description>
+		<year>19??</year>
+		<publisher>Hjärsta Mediakonsult Handelsbolag</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="113003">
+				<rom name="ma2.td0" size="113003" crc="5bede5b3" sha1="b6753ede4cc24ef8c0d4ba503302aebc27cc1e10" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mattev1">
+		<description>Matematikverkstad I (beta 19870806, nät/skollicens)</description>
+		<year>1987</year>
+		<publisher>Esselte Studium</publisher>
+		<info name="serial" value="24-33777" />
+		<info name="release" value="19870806" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2217678">
+				<rom name="Matematikverkstad I.mfm" size="2217678" crc="a5956a47" sha1="3e8e1af3c54b26775ab127f499f7260cca0f9389"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mattev1a" cloneof="mattev1" supported="no">
+		<description>Matematikverkstad I (beta 19860606)</description>
+		<year>19??</year>
+		<publisher>Esselte Studium</publisher>
+		<notes><![CDATA[
+"kan inte ladda"
+]]></notes>
+		<info name="release" value="19860606" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="5424277">
+				<rom name="matematikverkstad i ver. beta (1986-06-06)(esselte studium)(se) ].mfi" size="5424277" crc="01b59feb" sha1="4efec40b96c9ee518f1e1c16d4ef745096f971eb" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="millikan">
+		<description>Millikans försök (enanvändare)</description>
+		<year>1987</year>
+		<publisher>Esselte Studium</publisher>
+		<notes><![CDATA[
+Requires hardware key 27, which isn't dumped
+]]></notes>
+		<info name="serial" value="24-33764" />
+		<info name="release" value="19870729" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209538">
+				<rom name="Millikans forsok.mfm" size="2209538" crc="40e161ad" sha1="704f1c23f02206c5e28166cf149bb39f7c24bb45"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos32">
+		<description>MS-DOS v3.2 (version 7331)</description>
+		<year>1987</year>
+		<publisher>Telenova</publisher>
+		<info name="release" value="19870609" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="5935836">
+				<rom name="ms-dos v3.2 (1987)(telenova).mfi" size="5935836" crc="9d597bf7" sha1="0418afa8703cfe49e3edb3e70a7e2644a1dfb83f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="absorption" supported="no">
+		<description>Mät absorption (nät/skollicens)</description>
+		<year>1985</year>
+		<publisher>Esselte Studium</publisher>
+		<notes><![CDATA[
+Cannot load filesystem
+]]></notes>
+		<info name="serial" value="24-33763" />
+		<info name="release" value="19850916" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="5181149">
+				<rom name="mt absorption (1985-09-16)(esselte studium)(se)[24-33763][nt-skollicens].mfi" size="5181149" crc="e677b1d7" sha1="0569f7ac3dd78dddbe2b1798842233a25512c4c6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matenergi">
+		<description>Mät energi (enanvändare)</description>
+		<year>1986</year>
+		<publisher>Esselte Studium</publisher>
+		<info name="serial" value="24-34051" />
+		<info name="release" value="19860701" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209441">
+				<rom name="Mat energi.mfm" size="2209441" crc="5e6b2fcb" sha1="91d79cc4f190a7069a54abd818922540e915837c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="halveringstid" supported="no">
+		<description>Mät halveringstid (nät/skollicens)</description>
+		<year>1986</year>
+		<publisher>Esselte Studium</publisher>
+		<notes><![CDATA[
+Loads but quits to system
+]]></notes>
+		<info name="serial" value="24-34259" />
+		<info name="release" value="19860701" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="5102952">
+				<rom name="mt halveringstid (1986-07-01)(esselte studium)(se)[24-34259][nt-skollicens].mfi" size="5102952" crc="3a70747f" sha1="e6cd197d1785b6cf9995daa5178c07dcbbd71edd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fotoceller" supported="no">
+		<description>Mät med fotoceller 1.0 (enanvändare)</description>
+		<year>19??</year>
+		<publisher>Esselte Studium</publisher>
+		<notes><![CDATA[
+Loads but quits to system
+]]></notes>
+		<info name="serial" value="24-34868" />
+		<info name="release" value="19870108" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="5068278">
+				<rom name="mt med fotoceller v1.0 (1987-01-08)(esselte studium)(se)[24-34868][enanvndare].mfi" size="5068278" crc="ec86bc07" sha1="7936a2e1639eb0f6085acff52df05ef80fb835c4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matettenanv" cloneof="matett">
+		<description>MätEtt (enanvändare)</description>
+		<year>1987</year>
+		<publisher>Esselte Studium</publisher>
+		<info name="serial" value="24-33748" />
+		<info name="release" value="19870831" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209452">
+				<rom name="matett.mfm" size="2209452" crc="f3c96357" sha1="4f8ca5fef4f22ad73a1101ab971118730fff102f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matett" supported="no">
+		<description>MätEtt (nät-skollicens)</description>
+		<year>1987</year>
+		<publisher>Esselte Studium</publisher>
+		<notes><![CDATA[
+Doesn't load
+]]></notes>
+		<info name="serial" value="24-33751" />
+		<info name="release" value="19870831" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="5732216">
+				<rom name="mtett (1987-08-31)(esselte studium)(se)(pd)[24-33751][nt-skollicens].mfi" size="5732216" crc="ef3f073e" sha1="934634b398b6cc36d81e5330aa8be575c0585111"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matvarde" supported="no">
+		<description>Mätvärdesinsamling 1.0 (alfa, enanvändare)</description>
+		<year>19??</year>
+		<publisher>Esselte Studium</publisher>
+		<notes><![CDATA[
+Requires a hardware key, which isn't dumped
+]]></notes>
+		<info name="serial" value="24-35090" />
+		<info name="release" value="19870820" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="5267209">
+				<rom name="mtvrdesinsamling v1.0 (1987-08-20)(esselte studium)(se)(pd)(alfa)[24-35090][enanvndare].mfi" size="5267209" crc="5b08b5ce" sha1="37dd358f84bf5f6064343fcc7208edbcee88fb5d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="harmoni1d" cloneof="harmoni1">
+		<description>PI HarmoniEtt (delta, enanvändare)</description>
+		<year>1987</year>
+		<publisher>Telenova</publisher>
+		<info name="serial" value="24-33664" />
+		<info name="release" value="19871021" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="246025">
+				<rom name="harmoniett.td0" size="246025" crc="85334c70" sha1="d8d49ee3c246a44bb0c714f465af2853534c92ee" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="procent">
+		<description>Procenträkning (version 7334)</description>
+		<year>19??</year>
+		<publisher>Telenova</publisher>
+		<info name="serial" value="24-34736-1" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209414">
+				<rom name="procentrakning.mfm" size="2209414" crc="888188a0" sha1="88f45b4fd560ff847b27eb4f754d4a1a7c9bd5a4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="profirange" supported="no">
+		<description>ProfiRange (version 6181)</description>
+		<year>198?</year>
+		<publisher>Telenova</publisher>
+		<notes><![CDATA[
+Dumped from non-original media
+Doesn't start
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Programskiva" />
+			<dataarea name="flop" size="5781353">
+				<rom name="profi-range (disk 1 of 2).mfi" size="5781353" crc="ef3ac53d" sha1="89d05a5be45619916922b921d075477e21b23840" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Underhållsskiva" />
+			<dataarea name="flop" size="5619039">
+				<rom name="profi-range (disk 2 of 2).mfi" size="5619039" crc="704c09a0" sha1="2df2bca4d974645df233dabee22aa84e893a3c72" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="profitext">
+		<description>ProfiText: Textbehandling med Compis (version 6181)</description>
+		<year>1986</year>
+		<publisher>TeleNova</publisher>
+		<notes><![CDATA[
+Dumped from non-original media
+Doesn't start
+]]></notes>
+		<info name="release" value="19860816" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Programskiva" />
+			<dataarea name="flop" size="5733418">
+				<rom name="profitext (1986-08-16)(telenova)(se).mfi" size="5733418" crc="9541e126" sha1="79cc2e5a034d66db6f048d272b7d0e047d4c72c9" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ritett">
+		<description>RitEtt (enanvändare)</description>
+		<year>1986</year>
+		<publisher>Esselte Studium</publisher>
+		<notes><![CDATA[
+Requires hardware key 7, which isn't dumped
+]]></notes>
+		<info name="serial" value="24-34250" />
+		<info name="release" value="19860404" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2217597">
+				<rom name="RitEtt.mfm" size="2217597" crc="e7cf88d0" sha1="225396bc29cb2ba158949a9286fcee9201617265"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="raknrattd" cloneof="raknratt">
+		<description>Räkna lätt, räkna rätt (demo, ekonomiredaktionen, version 6175)</description>
+		<year>19??</year>
+		<publisher>Esselte Studium</publisher>
+		<notes><![CDATA[
+Requires hardware key 34, which isn't dumped
+]]></notes>
+		<info name="serial" value="24-4408-7" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209405">
+				<rom name="Rakna latt, rakna ratt demo.mfm" size="2209405" crc="acc2bf39" sha1="f08288227e1ea1586976163ba42499aa13244c95"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="raknratt">
+		<description>Räkna lätt, räkna rätt (version 6175)</description>
+		<year>19??</year>
+		<publisher>Telenova</publisher>
+		<info name="serial" value="24-34408-7" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209544">
+				<rom name="rakna latt, rakna ratt.mfm" size="2209544" crc="1268cd5d" sha1="56c31ccadf4515e5926eadd2e3cd7639611e8cb4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skatteprog" supported="no">
+		<description>Skatteprogram S91</description>
+		<year>1992?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Dumped from non-original media
+Disk is damaged
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="3525632">
+				<rom name="skatteprogram s91.hfe" size="3525632" crc="490b1719" sha1="280706ddea6c87fca223da288be25e96c94e3e9f" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skriv6401" cloneof="skriv">
+		<description>Skriv lätt, skriv rätt (version 6401)</description>
+		<year>19??</year>
+		<publisher>Esselte Studium</publisher>
+		<notes><![CDATA[
+Dumped from non-original media
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="5250800">
+				<rom name="skriv latt skriv ratt (disk copy).mfi" size="5250800" crc="592334a6" sha1="a24d0353f74e08aa39b6e13ff47361cdc9f45e02" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skriv7532" cloneof="skriv">
+		<description>Skriv lätt, skriv rätt (version 7532)</description>
+		<year>19??</year>
+		<publisher>Telenova</publisher>
+		<info name="serial" value="24-33825-7" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="5558252">
+				<rom name="skriv latt skriv ratt.mfi" size="5558252" crc="5e2fec35" sha1="283bce8c225d80108945c71824ecd5499b2f866e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skriv" supported="no">
+		<description>Skriv lätt, skriv rätt (version 8101, ekonomiredaktionen)</description>
+		<year>19??</year>
+		<publisher>Esselte Studium</publisher>
+		<notes><![CDATA[
+requires a hardware key, which isn't dumped
+]]></notes>
+		<info name="serial" value="24-33825-7" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="5632695">
+				<rom name="skriv ltt, skriv rtt v8101 (19xx)(esselte studium)(se)[24-33825-7].mfi" size="5632695" crc="f34f2e33" sha1="c033e7fdfac86d6f4c0959ae05a92413bc356efd"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="slv">
+		<description>Spara-låna-vinna (enanvändare)</description>
+		<year>1987</year>
+		<publisher>Esselte Studium</publisher>
+		<info name="serial" value="24-34698" />
+		<info name="release" value="19870220" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="5112204">
+				<rom name="spara-lna-vinna (1987-02-20)(esselte studium)(se)[24-34698][enanvndare].mfi" size="5112204" crc="ccc400bc" sha1="acc02214d45b2bbab7bdd8678811737ea1cab723"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="statett">
+		<description>StatEtt - Analys</description>
+		<year>1990</year>
+		<publisher>Esselte Studium</publisher>
+		<info name="serial" value="24-35831" />
+		<info name="release" value="19900101" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2217707">
+				<rom name="StatEtt Analys.mfm" size="2217707" crc="017ae3c4" sha1="6ff89815eb79ca9cd6369defaca59948035275e0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="statettb" cloneof="statett" supported="no">
+		<description>StatEtt (beta, nät/skollicens)</description>
+		<year>1987</year>
+		<publisher>Esselte Studium</publisher>
+		<notes><![CDATA[
+Dumped from non-original media
+"Kan inte ladda"
+]]></notes>
+		<info name="release" value="19871019" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="5215315">
+				<rom name="statett ver. beta (1987-10-19)(esselte studium)(se).mfi" size="5215315" crc="417c265d" sha1="d4c6c4bd4d6f0be720e485e27b39a2013ec17393" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stvaratt">
+		<description>Stava rätt på nytt sätt (version 8481)</description>
+		<year>19??</year>
+		<publisher>Esselte Studium</publisher>
+		<notes><![CDATA[
+Requires hardware key 29, which isn't dumped
+]]></notes>
+		<info name="serial" value="24-34298-X" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2178838">
+				<rom name="Stava ratt pa nytt satt.mfm" size="2178838" crc="9777a5bb" sha1="1ac2be0062fe800deed3cbccddb95710ae116d92"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stilplus">
+		<description>Stil-Plus (alfa 1.0, nät/skollicens)</description>
+		<year>1989</year>
+		<publisher>Esselte Studium</publisher>
+		<info name="serial" value="24-35456" />
+		<info name="release" value="19890530" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2217678">
+				<rom name="StilPlus.mfm" size="2217678" crc="b16bb821" sha1="d965a865e3f97d7d256c89176948ef371d65254b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="system1">
+		<description>Systemskiva I (version 6245)</description>
+		<year>1986</year>
+		<publisher>Telenova</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="5848723">
+				<rom name="systemskiva i (1986)(telenova)(se)[a3].mfi" size="5848723" crc="0636a26b" sha1="71b09503f0644bf52b6804b4f261fe267ff295ae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="system2">
+		<description>Systemskiva II (Svensk, version 6385)</description>
+		<year>1986</year>
+		<publisher>Telenova</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="6194133">
+				<rom name="systemskiva ii (1986)(telenova)(se).mfi" size="6194133" crc="f2b1fd00" sha1="afd7b87d3698d8eb600f2a863461647f08105196"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="system20">
+		<description>Systemskiva 2.0</description>
+		<year>19??</year>
+		<publisher>Telenova</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="5636330">
+				<rom name="systemskiva v2.0 (19xx)(telenova)(se).mfi" size="5636330" crc="5e3cf7ae" sha1="62e75064a9c74dffcdde8cf65a8b8b4e266d3c7f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="systemhdd">
+		<description>Systemskiva för hårdskiveenhet 2.01 (version 6335)</description>
+		<year>1986</year>
+		<publisher>Telenova</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="5441351">
+				<rom name="systemskiva fr hrdskiveenhet v2.01 (1986)(telenova)(se).mfi" size="5441351" crc="11e6ba5b" sha1="9f3f12069115b96e0f7c106573ef90d0569fe359" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="systemhdda" cloneof="systemhdd">
+		<description>Systemskiva för hårdskiveenhet 1.00 (version 7242)</description>
+		<year>1987</year>
+		<publisher>Telenova</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="5246786">
+				<rom name="systemskiva fr hrdskiveenhet.mfi" size="5246786" crc="8755e070" sha1="64c8d20382f7b30e6fd9ff552cada90bb47a8deb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tabba" supported="no">
+		<description>Tabba lätt, tabba rätt (version 7235)</description>
+		<year>1987</year>
+		<publisher>Esselte Studium</publisher>
+		<notes><![CDATA[
+EXECUTION ERROR
+]]></notes>
+		<info name="serial" value="24-34825-2" />
+		<info name="programmer" value="Karin Kimby Victor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="3997995">
+				<rom name="tabba ltt v7235 (19xx)(esselte studium)(se)[24-34825-2].mfi" size="3997995" crc="aa096671" sha1="04bfd3ae4a10bcd0e75b9b0f6aa78727828c38ca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turbopascal">
+		<description>Turbo Pascal 3.01</description>
+		<year>1986</year>
+		<publisher>Borland</publisher>
+		<notes><![CDATA[
+Dumped from non-original media
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Turbo Pascal" />
+			<dataarea name="flop" size="5211972">
+				<rom name="turbo pascal (1986).mfi" size="5211972" crc="ab312c2b" sha1="e62dd1b03c313657438704c11b591eb8b7546df5" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Turbo Pascal BCD" />
+			<dataarea name="flop" size="4802476">
+				<rom name="turbo pascal bcd (1986).mfi" size="4802476" crc="6ec3b8d5" sha1="f4aefce602144bbd94a43e61f8ad324447444c89" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uppgradpkt1">
+		<description>Uppgraderingspaket 1 för Compis I (version 6262)</description>
+		<year>1986</year>
+		<publisher>Telenova</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="p-System, CENTRAL, BACKUP" />
+			<dataarea name="flop" size="5274685">
+				<rom name="uppgrad.pkt1 fr compis i (disk 1 of 2).mfi" size="5274685" crc="d555784f" sha1="07f5b17969b8110702b3f484ca335fb8b78dfbcb"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="CP/M-86 2.2, COMAL 2.1, BOXEN, START" />
+			<dataarea name="flop" size="5327184">
+				<rom name="uppgrad.pkt1 fr compis i (disk 2 of 2).mfi" size="5327184" crc="17145259" sha1="d21d415115a3c7367acf0442a9f125488be2a881"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="video">
+		<description>Video-butiken (enanvändare)</description>
+		<year>1986</year>
+		<publisher>Esselte Studium</publisher>
+		<info name="serial" value="24-33070" />
+		<info name="release" value="19860916" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Video-butiken Drive A" />
+			<dataarea name="flop" size="2209512">
+				<rom name="Video-butiken Drive A.mfm" size="2209512" crc="5d4a1c41" sha1="315befb495c46360e9665e4525623543e2160cd1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Video-butiken Drive B" />
+			<dataarea name="flop" size="2209459">
+				<rom name="Video-butiken Drive B.mfm" size="2209459" crc="bf491515" sha1="b7ed4b1796f9f6056f7394381a0ea26cffdbef6a"/>
 			</dataarea>
 		</part>
 	</software>

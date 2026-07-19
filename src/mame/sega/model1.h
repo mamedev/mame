@@ -47,7 +47,7 @@ public:
 		, m_display_list0(*this, "display_list0")
 		, m_display_list1(*this, "display_list1")
 		, m_color_xlat(*this, "color_xlat")
-		, m_paletteram16(*this, "palette")
+		, m_paletteram16(*this, "paletteram")
 		, m_nvram(*this, "nvram")
 		, m_palette(*this, "palette")
 		, m_tiles(*this, "tile")
@@ -358,7 +358,7 @@ protected:
 	void build_overlay_mask(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void apply_overlay_stencil(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	optional_shared_ptr<uint16_t> m_paletteram16;
+	required_shared_ptr<uint16_t> m_paletteram16;
 	required_device<nvram_device> m_nvram;
 	required_device<palette_device> m_palette;
 	required_device<segas24_tile_device> m_tiles;

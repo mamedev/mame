@@ -1022,7 +1022,9 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_DIPUNKNOWN_DIPLOC( 0x200, 0x200, "SW1:10" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "System Specification" ) PORT_DIPLOCATION("SW2:1") //jumps to daa00 if off, presumably some card booting
+	// jumps to daa00 if off, presumably some card booting
+	// Update: bit 0 of SDIP suggests "N-Basic boot", pinpoint if ever released in (86) version.
+	PORT_DIPNAME( 0x01, 0x01, "System Specification" ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "Terminal Mode" ) PORT_DIPLOCATION("SW2:2")
@@ -1035,8 +1037,8 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_DIPSETTING(    0x08, "20 lines/screen" )
 	PORT_DIPSETTING(    0x00, "25 lines/screen" )
 	PORT_DIPNAME( 0x10, 0x00, "Memory Switch Init" ) PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) ) //Fix memory switch condition
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) ) //Initialize Memory Switch with the system default
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) ) // Hold MEMSW contents
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) ) // Initialize MEMSW with the system default
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )

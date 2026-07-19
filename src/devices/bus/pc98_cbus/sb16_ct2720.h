@@ -8,7 +8,7 @@
 
 #include "slot.h"
 //#include "bus/midi/midi.h"
-//#include "bus/pc_joy/pc_joy.h"
+#include "bus/pc_joy/pc_joy.h"
 #include "sound/ct1745.h"
 #include "sound/dac.h"
 #include "sound/ymopl.h"
@@ -44,6 +44,7 @@ private:
 	required_device<ct1745_mixer_device> m_mixer;
 	required_device<dac_16bit_r2r_device> m_ldac;
 	required_device<dac_16bit_r2r_device> m_rdac;
+	required_device<pc_joy_device> m_joy;
 };
 
 
