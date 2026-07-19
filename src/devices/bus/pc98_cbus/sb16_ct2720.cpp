@@ -10,13 +10,19 @@ References:
 
 TODO:
 - Optional YM2203 (+ ROM socket), PC-9801-26K equivalent fallback;
-- Game port;
 - MIDI;
 - CT1741 (DSP);
 - CT1745 (Mixer);
 - CD-Rom interface/CD-In;
 - Mic-In/Line-In;
 - Configuration dips;
+- wolf3d: fails identification purely from OPL3
+\- Writes 0x60 -> 0x80 to reg $04 (mask timer A and B, send a reset to FM)
+\- loads OPL3 timer A with a 0xff in reg $02 (max time?)
+\- sets OPL3 timer reg $04 -> 0x21 (enable timer A, mask timer B)
+\- bp 13e51b pretends to read it back as res & 0xe0 == 0xc0
+   (irq and timer A statuses high, timer B low)
+\- does plenty of non-SB16 accesses at $28d1, for delay?
 
 **************************************************************************************************/
 
@@ -35,6 +41,7 @@ sb16_ct2720_device::sb16_ct2720_device(const machine_config &mconfig, const char
 	, m_mixer(*this, "mixer")
 	, m_ldac(*this, "ldac")
 	, m_rdac(*this, "rdac")
+	, m_joy(*this, "pc_joy")
 {
 }
 
@@ -54,7 +61,7 @@ void sb16_ct2720_device::device_add_mconfig(machine_config &config)
 		//return (m_irq8 << 0) | (m_irq16 << 1) | (m_irq_midi << 2) | (0x8 << 4);
 	});
 
-//  PC_JOY(config, m_joy);
+	PC_JOY(config, m_joy);
 
 //  MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(FUNC(sb_device::midi_rx_w));
 //  MIDI_PORT(config, "mdout", midiout_slot, "midiout");
@@ -90,7 +97,8 @@ void sb16_ct2720_device::remap(int space_id, offs_t start, offs_t end)
 void sb16_ct2720_device::io_map(address_map &map)
 {
 	const u16 base = 0xd2;
-//  map(0x0400 | base, 0x0400 | base).select(0x300) PC Gameport
+	// ($200-$207 on AT)
+	map(0x0400 | base, 0x0400 | base).select(0x300).rw(m_joy, FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
 	map(0x2000 | base, 0x2000 | base).select(0x300).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_opl3->read(offset >> 8);

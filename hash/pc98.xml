@@ -52208,6 +52208,38 @@ doesn't boot when converted to d88 (2DD)
 		</part>
 	</software>
 
+	<software name="wolf3d" supported="partial">
+		<description>Wolfenstein 3D</description>
+		<year>1994</year>
+		<publisher>イマジニア (Imagineer)</publisher>
+		<notes><![CDATA[
+[SB16] detection doesn't work due of [OPL3]
+Has no BGM on main menu (verify)
+]]></notes>
+		<info name="alt_title" value="ウルフェンシュタイン3D" />
+		<info name="usage" value="Requires HDD install thru DOS, optionally wants a MS-DOS format disk (safe to skip when prompted to)" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<!-- TODO: Check media labels, is "kidou" actually written with kanji? -->
+			<feature name="part_id" value="Startup disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="wolfenstein 3d (kidou disk).hdm" size="1261568" crc="472f5a26" sha1="50b45b06fa005fede60510cb68bebe932bdc080b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="wolfenstein 3d (disk 1).hdm" size="1261568" crc="995ac998" sha1="45e0a692cbc553d4cf4a8fd55399d8c3a2993072" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="wolfenstein 3d (disk 2).hdm" size="1261568" crc="bf79a9dd" sha1="29e4b8c2ef802566b0dcfce56bd7a0ec2fc2a6b2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wolfishg">
 		<description>Wolfish Gallop - Legacy of the Solomon</description>
 		<year>1994</year>
