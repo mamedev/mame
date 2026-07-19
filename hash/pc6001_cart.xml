@@ -19,14 +19,12 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="crowman" supported="partial">
+	<software name="crowman" supported="yes">
 		<description>The Curse of Crowley Manor</description>
 		<year>1981</year>
 		<!-- "FOR NEC HOME ELECTRONICS" -->
 		<publisher>Adventure International</publisher>
-		<notes><![CDATA[
-Doesn't boot on regular pc6001 (does on pc6001mk2)
-]]></notes>
+		<info name="usage" value="Requires ram -16K for regular pc6001" />
 		<part name="cart" interface="pc6001_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="the curse of crowley manor.bin" size="16384" crc="592c54af" sha1="c0e2155181a20d3c963ee9151a3eabab4765ffd9"/>
@@ -62,13 +60,10 @@ Doesn't boot on regular pc6001 (does on pc6001mk2)
 		</part>
 	</software>
 
-	<software name="tutankhm" supported="partial">
+	<software name="tutankhm" supported="yes">
 		<description>Tutankham</description>
 		<year>1982</year>
 		<publisher>Konami</publisher>
-		<notes><![CDATA[
-Has missing text (uses raster effect)
-]]></notes>
 		<info name="alt_title" value="ツタンカーム"/>
 
 		<part name="cart" interface="pc6001_cart">
@@ -116,7 +111,7 @@ Has missing text (uses raster effect)
 		<!-- Developed by fuzzballj -->
 		<publisher>&lt;homebrew&gt;</publisher>
 		<notes><![CDATA[
-Too slow during gameplay
+Too slow during gameplay (verify)
 ]]></notes>
 		<part name="cart" interface="pc6001_cart">
 			<dataarea name="rom" size="11829">
@@ -171,7 +166,7 @@ Not extensively tested
 	</software>
 
 	<!-- TODO: not sure what this is supposed to do -->
-	<software name="electpen">
+	<software name="electpen" supported="partial">
 		<description>The Electric Pencil (v2.0R)</description>
 		<year>1982</year>
 		<publisher>Racet Computes</publisher>

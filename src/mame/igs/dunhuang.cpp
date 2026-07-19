@@ -53,6 +53,8 @@ Notes:
 
 #include "emu.h"
 
+#include "mahjong.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/ticket.h"
 #include "machine/watchdog.h"
@@ -85,8 +87,8 @@ namespace {
 class dunhuang_state : public driver_device
 {
 public:
-	dunhuang_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dunhuang_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
@@ -98,11 +100,10 @@ public:
 		m_colorram2(*this, "colorram2", 0x40 * 0x08, ENDIANNESS_LITTLE),
 		m_mainbank(*this, "mainbank"),
 		m_gfx2(*this, "gfx2"),
-		m_inputs(*this, "IN%u", 0U),
+		m_inputs(*this, "KEY%u", 0U),
 		m_dsw(*this, "DSW%u", 1U),
 		m_service(*this, "SERVICE")
 	{ }
-
 
 	void dunhuang(machine_config &config) ATTR_COLD;
 
@@ -211,13 +212,13 @@ uint32_t dunhuang_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	int layers_ctrl = -1;
 
 #if DUNHUANG_DEBUG
-if (machine().input().code_pressed(KEYCODE_Z))
-{
-	int msk = 0;
-	if (machine().input().code_pressed(KEYCODE_Q))  msk |= 1;
-	if (machine().input().code_pressed(KEYCODE_W))  msk |= 2;
-	if (msk != 0) layers_ctrl &= msk;
-}
+	if (machine().input().code_pressed(KEYCODE_Z))
+	{
+		int msk = 0;
+		if (machine().input().code_pressed(KEYCODE_Q))  msk |= 1;
+		if (machine().input().code_pressed(KEYCODE_W))  msk |= 2;
+		if (msk != 0) layers_ctrl &= msk;
+	}
 #endif
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
@@ -228,7 +229,7 @@ if (machine().input().code_pressed(KEYCODE_Z))
 			if (layers_ctrl & 2)    m_tmap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 			if (layers_ctrl & 1)    m_tmap[0]->draw(screen, bitmap, cliprect, 0, 0);
 			break;
-		case 0x05:  // dips: must hide fg
+		case 0x05:  // DIP switches: must hide fg
 			if (layers_ctrl & 1)    m_tmap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 			break;
 		case 0x07:  // game,demo: fg over bg
@@ -283,7 +284,7 @@ void dunhuang_state::tile_w(offs_t offset, uint8_t data)
 
 void dunhuang_state::tile2_w(offs_t offset, uint8_t data)
 {
-	if (m_written[1] & (1 << offset))
+	if (BIT(m_written[1], offset))
 	{
 		m_written[1] = 0;
 		m_pos_x++;
@@ -431,7 +432,7 @@ void dunhuang_state::block_h_w(uint8_t data)
 
 void dunhuang_state::layers_w(uint8_t data)
 {
-//  popmessage("layers %02x", data);
+	//popmessage("layers %02x", data);
 	m_layers = data;
 }
 
@@ -473,12 +474,13 @@ uint8_t dunhuang_state::dsw_r()
 
 	return res;
 }
+
 uint8_t dunhuang_state::input_r()
 {
 	if ((m_input & 0xe0) != 0x00)
 		logerror("%s: warning, unknown input bits read, input = %02x\n", machine().describe_context(), m_input);
 
-	uint8_t res = 0xff;
+	uint8_t res = 0x3f;
 
 	for (int i = 0; i < 5; i++)
 	{
@@ -486,7 +488,7 @@ uint8_t dunhuang_state::input_r()
 			res &= m_inputs[i]->read();
 	}
 
-	return res;
+	return 0xc0 | res;
 }
 
 void dunhuang_state::rombank_w(uint8_t data)
@@ -558,80 +560,80 @@ void dunhuang_state::ramdac_map(address_map &map)
 
 static INPUT_PORTS_START( dunhuang )
 	PORT_START("DSW1") // IN0 - DSW1
-	PORT_DIPNAME( 0x0f, 0x0f, "Main Game Chance (%)" )  PORT_DIPLOCATION("SW1:1,2,3,4")
-	PORT_DIPSETTING(    0x00, "78" )
-	PORT_DIPSETTING(    0x01, "80" )
-	PORT_DIPSETTING(    0x02, "81" )
-	PORT_DIPSETTING(    0x03, "83" )
-	PORT_DIPSETTING(    0x04, "84" )
-	PORT_DIPSETTING(    0x05, "86" )
-	PORT_DIPSETTING(    0x06, "87" )
-	PORT_DIPSETTING(    0x07, "89" )
-	PORT_DIPSETTING(    0x08, "90" )
-	PORT_DIPSETTING(    0x09, "92" )
-	PORT_DIPSETTING(    0x0a, "93" )
-	PORT_DIPSETTING(    0x0b, "94" )
-	PORT_DIPSETTING(    0x0c, "95" )
-	PORT_DIPSETTING(    0x0d, "96" )
-	PORT_DIPSETTING(    0x0e, "97" )
-	PORT_DIPSETTING(    0x0f, "98" )
-	PORT_DIPNAME( 0x30, 0x30, "Main Game Rate" )        PORT_DIPLOCATION("SW1:5,6")
-	PORT_DIPSETTING(    0x30, "A" )
-	PORT_DIPSETTING(    0x20, "B" )
-	PORT_DIPSETTING(    0x10, "C" )
-	PORT_DIPSETTING(    0x00, "D" )
-	PORT_DIPNAME( 0x40, 0x40, "Input Tokens" )          PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(    0x40, "Keys" )
-	PORT_DIPSETTING(    0x00, "Coins" )
-	PORT_DIPNAME( 0x80, 0x80, "Output Tokens" )         PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x80, "Keys" )
-	PORT_DIPSETTING(    0x00, "Payout" )
+	PORT_DIPNAME( 0x0f, 0x0f, "Main Game Payout Rate" )       PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPSETTING(    0x00, "78%" )
+	PORT_DIPSETTING(    0x01, "80%" )
+	PORT_DIPSETTING(    0x02, "81%" )
+	PORT_DIPSETTING(    0x03, "83%" )
+	PORT_DIPSETTING(    0x04, "84%" )
+	PORT_DIPSETTING(    0x05, "86%" )
+	PORT_DIPSETTING(    0x06, "87%" )
+	PORT_DIPSETTING(    0x07, "89%" )
+	PORT_DIPSETTING(    0x08, "90%" )
+	PORT_DIPSETTING(    0x09, "92%" )
+	PORT_DIPSETTING(    0x0a, "93%" )
+	PORT_DIPSETTING(    0x0b, "94%" )
+	PORT_DIPSETTING(    0x0c, "95%" )
+	PORT_DIPSETTING(    0x0d, "96%" )
+	PORT_DIPSETTING(    0x0e, "97%" )
+	PORT_DIPSETTING(    0x0f, "98%" )
+	PORT_DIPNAME( 0x30, 0x30, "Odds Rate" )                   PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x30, "1 2 4 8 12 16 24 32" )         // A
+	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )          // D
+	PORT_DIPSETTING(    0x20, "2 3 6 8 12 15 30 50" )         // B
+	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )        // C
+	PORT_DIPNAME( 0x40, 0x40, "Credit Mode" )                 PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, "Key-In" )
+	PORT_DIPSETTING(    0x00, "Coin Acceptor" )
+	PORT_DIPNAME( 0x80, 0x80, "Payout Mode" )                 PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, "Key-Out" )
+	PORT_DIPSETTING(    0x00, "Return Coins" )
 
 	PORT_START("DSW2") // IN1 - DSW2
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" )
-	PORT_DIPNAME( 0x06, 0x06, "Credits Per Coin" )      PORT_DIPLOCATION("SW2:2,3")
-	PORT_DIPSETTING(    0x06, "1" )
-	PORT_DIPSETTING(    0x04, "2" )
-	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x00, "20" )
-	PORT_DIPNAME( 0x18, 0x18, "Credits Per Key-In" )    PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR(Coinage) )              PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(    0x06, DEF_STR(1C_1C) )
+	PORT_DIPSETTING(    0x04, DEF_STR(1C_2C) )
+	PORT_DIPSETTING(    0x02, DEF_STR(1C_5C) )
+	PORT_DIPSETTING(    0x00, DEF_STR(1C_20C) )
+	PORT_DIPNAME( 0x18, 0x18, "Key-In Rate" )                 PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "1" )
 	PORT_DIPSETTING(    0x10, "10" )
 	PORT_DIPSETTING(    0x08, "50" )
 	PORT_DIPSETTING(    0x00, "100" )
-	PORT_DIPNAME( 0x20, 0x20, "Credits Per Key-Out" )   PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x20, 0x20, "Key-Out Rate" )                PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, "1" )
 	PORT_DIPSETTING(    0x00, "100" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Max Credits" )           PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, "Max Credits" )                 PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0x00, "300" )
 	PORT_DIPSETTING(    0x40, "500" )
 	PORT_DIPSETTING(    0x80, "1000" )
 	PORT_DIPSETTING(    0xc0, "3000" )
 
 	PORT_START("DSW3") // IN2 - DSW3
-	PORT_DIPNAME( 0x03, 0x03, "Min Bet" )               PORT_DIPLOCATION("SW3:1,2")
+	PORT_DIPNAME( 0x03, 0x03, "Minimum Bet" )                 PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Max Bet" )               PORT_DIPLOCATION("SW3:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Maximum Bet" )                 PORT_DIPLOCATION("SW3:3,4")
 	PORT_DIPSETTING(    0x0c, "1" )
 	PORT_DIPSETTING(    0x08, "5" )
 	PORT_DIPSETTING(    0x04, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
-	PORT_DIPNAME( 0x30, 0x30, "Renso Bonus Time" )      PORT_DIPLOCATION("SW3:5,6")
+	PORT_DIPNAME( 0x30, 0x30, "Renso Bonus Time" )            PORT_DIPLOCATION("SW3:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPSETTING(    0x30, "6" )
-	PORT_DIPNAME( 0xc0, 0xc0, "DonDen Times" )          PORT_DIPLOCATION("SW3:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, "DonDen Times" )                PORT_DIPLOCATION("SW3:7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x40, "3" )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0xc0, "6" )
 
 	PORT_START("DSW4") // IN3 - DSW4
-	PORT_DIPNAME( 0x07, 0x07, "Credits Limit" )         PORT_DIPLOCATION("SW4:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, "Credits Limit" )               PORT_DIPLOCATION("SW4:1,2,3")
 	PORT_DIPSETTING(    0x07, "2k" )
 	PORT_DIPSETTING(    0x06, "3k" )
 	PORT_DIPSETTING(    0x05, "5k" )
@@ -640,7 +642,7 @@ static INPUT_PORTS_START( dunhuang )
 	PORT_DIPSETTING(    0x02, "30k" )
 	PORT_DIPSETTING(    0x01, "50k" )
 	PORT_DIPSETTING(    0x00, "100k" )
-	PORT_DIPNAME( 0x38, 0x38, "Service-In Limit" )      PORT_DIPLOCATION("SW4:4,5,6")
+	PORT_DIPNAME( 0x38, 0x38, "Service-In Limit" )            PORT_DIPLOCATION("SW4:4,5,6")
 	PORT_DIPSETTING(    0x00, "20k" )
 	PORT_DIPSETTING(    0x08, "30k" )
 	PORT_DIPSETTING(    0x10, "40k" )
@@ -649,34 +651,34 @@ static INPUT_PORTS_START( dunhuang )
 	PORT_DIPSETTING(    0x28, "100k" )
 	PORT_DIPSETTING(    0x30, "200k" )
 	PORT_DIPSETTING(    0x38, "990k" )
-	PORT_DIPNAME( 0x40, 0x40, "Hu Type" )               PORT_DIPLOCATION("SW4:7")
+	PORT_DIPNAME( 0x40, 0x40, "Hu Type" )                     PORT_DIPLOCATION("SW4:7")
 	PORT_DIPSETTING(    0x40, "Topple" )
 	PORT_DIPSETTING(    0x00, "Non-Topple" )
-	PORT_DIPNAME( 0x80, 0x80, "Double Up" )             PORT_DIPLOCATION("SW4:8")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, "Double Up Game" )              PORT_DIPLOCATION("SW4:8")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x80, DEF_STR(On) )
 
 	PORT_START("DSW5") // IN4 - DSW5
-	PORT_DIPNAME( 0x03, 0x03, "Douple Up Chance (%)" )  PORT_DIPLOCATION("SW5:1,2")
-	PORT_DIPSETTING(    0x00, "50" )
-	PORT_DIPSETTING(    0x01, "60" )
-	PORT_DIPSETTING(    0x02, "70" )
-	PORT_DIPSETTING(    0x03, "80" )
-	PORT_DIPNAME( 0x04, 0x04, "Chinese Word" )          PORT_DIPLOCATION("SW5:3")
+	PORT_DIPNAME( 0x03, 0x03, "Double Up Game Payout Rate" )  PORT_DIPLOCATION("SW5:1,2")
+	PORT_DIPSETTING(    0x00, "50%" )
+	PORT_DIPSETTING(    0x01, "60%" )
+	PORT_DIPSETTING(    0x02, "70%" )
+	PORT_DIPSETTING(    0x03, "80%" )
+	PORT_DIPNAME( 0x04, 0x04, "Chinese Word" )                PORT_DIPLOCATION("SW5:3")
 	PORT_DIPSETTING(    0x04, "3..6" )
 	PORT_DIPSETTING(    0x00, "5..10" )
-	PORT_DIPNAME( 0x08, 0x08, "Big Odds Times" )        PORT_DIPLOCATION("SW5:4")
+	PORT_DIPNAME( 0x08, 0x08, "Big Odds Times" )              PORT_DIPLOCATION("SW5:4")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x08, "5" )
-	PORT_DIPNAME( 0x30, 0x30, "Hu Test Times" )         PORT_DIPLOCATION("SW5:5,6")
+	PORT_DIPNAME( 0x30, 0x30, "Hu Test Times" )               PORT_DIPLOCATION("SW5:5,6")
 	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x10, "6" )
 	PORT_DIPSETTING(    0x20, "8" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW5:7")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Computer Strength" )     PORT_DIPLOCATION("SW5:8")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR(Demo_Sounds) )          PORT_DIPLOCATION("SW5:7")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x40, DEF_STR(On) )
+	PORT_DIPNAME( 0x80, 0x80, "Computer Strength" )           PORT_DIPLOCATION("SW5:8")
 	PORT_DIPSETTING(    0x80, "Strong" )
 	PORT_DIPSETTING(    0x00, "Weak" )
 
@@ -685,60 +687,14 @@ static INPUT_PORTS_START( dunhuang )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE  ) // test (in game: dips, during boot: service mode)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_IMPULSE(2) // "coin jam" otherwise
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYOUT )                PORT_CONDITION("DSW1", 0x80, EQUALS, 0x80)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )                PORT_CONDITION("DSW1", 0x80, EQUALS, 0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN )                 PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN1 )        PORT_IMPULSE(2) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00) // "coin jam" otherwise
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) // 0 = tiles block transferrer busy
 
-	PORT_START("IN0") // IN6 - P1
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) // gun
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN1") // IN7 - P1
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) // tin
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN2") // IN8 - P1
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) // eat
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) // hu
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN3") // IN9 - P1
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) // pon
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN4") // IN10 - P1
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE  )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_INCLUDE(mahjong_matrix_1p_bet_wup)
 INPUT_PORTS_END
 
 

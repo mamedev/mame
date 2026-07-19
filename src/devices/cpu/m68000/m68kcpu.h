@@ -234,6 +234,36 @@ inline u32 CPU_TYPE_IS_000() const         { return ((m_cpu_type) == CPU_TYPE_00
 
 inline u32 CPU_TYPE_IS_070() const         { return ((m_cpu_type) == CPU_TYPE_SCC070); }
 
+inline u32 m68ki_shift_cycles(u32 shift) const
+{
+	// this calculation is only for '030+
+	if (!CPU_TYPE_IS_030_PLUS())
+		return 0;
+
+	if (m_cpu_type & (CPU_TYPE_EC030 | CPU_TYPE_030))
+	{
+		if (!BIT_5(m_ir))
+			return 0;
+
+		const u32 operand_bits = 8U << ((m_ir >> 6) & 3);
+		if (shift > operand_bits)
+		{
+			switch ((m_ir >> 3) & 3)
+			{
+			case 0: // ASx
+				return BIT_8(m_ir) ? 0 : 4;
+
+			case 1: // LSx
+				return 2;
+			}
+		}
+
+		return 0;
+	}
+
+	return shift * m_cyc_shift;
+}
+
 
 /* Initiates trace checking before each instruction (t1) */
 inline void m68ki_trace_t1() { m_tracing = m_t1_flag; }

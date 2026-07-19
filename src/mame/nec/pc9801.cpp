@@ -296,11 +296,11 @@ uint8_t pc9801vm_state::pc9801rs_knjram_r(offs_t offset)
 	if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
 	{
 		pcg_offset |= (!m_video_ff[KAC_REG] << 12);
-		return m_kanji_rom[pcg_offset | m_font_lr];
+		return kanji_r(pcg_offset | m_font_lr);
 	}
 
 	// ... but mezaset2 don't, implying it just read this linearly
-	return m_kanji_rom[pcg_offset | (offset & 1)];
+	return kanji_r(pcg_offset | (offset & 1));
 }
 
 void pc9801vm_state::pc9801rs_knjram_w(offs_t offset, uint8_t data)
@@ -320,8 +320,7 @@ void pc9801vm_state::pc9801rs_knjram_w(offs_t offset, uint8_t data)
 		// This traces back by POST routines setting that location with 0x80, then it successively
 		// wipes out a good chunk of the area with KAC mode enabled ...
 		pcg_offset |= (!m_video_ff[KAC_REG] << 12);
-		m_kanji_rom[pcg_offset] = data;
-		m_gfxdecode->gfx(2)->mark_dirty(pcg_offset >> 5);
+		kanji_w(pcg_offset, data);
 	}
 }
 

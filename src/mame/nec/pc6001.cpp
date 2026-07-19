@@ -6,9 +6,8 @@ PC-6001 series (c) 1981 NEC
 
 TODO:
 - Move MCU HLE simulation in a device;
+\- Proper support for .wav/.p6t file formats used by the cassette interface;
 - Remove the 8255 hacks;
-- Proper support for .wav/.p6t file formats used by the cassette interface;
-- Make FDC to actually load images, also fix .dsk identification;
 - Confirm irq model daisy chain behaviour, and add missing irqs and features
   (namely the irq dispatch for SR mode should really honor I/O $fb and fallback to legacy
    behaviour if masked);
@@ -17,6 +16,9 @@ TODO:
 - Pinpoint what VDG supersets PC-6001mkII and SR models really use;
 - irq system needs improving, particularly for later machines (where it may really warrant exposing
   as device);
+- hookup waitstates
+\- 1 wait for r/w for lower $0000-$7fff and I/O $a0-$af on vanilla pc6001, supersets TBD
+- measure exact bus request kick-ins/-outs;
 
 TODO (pc6001mk2):
 - confirm optional FDC use mapped at 0xd0-0xd3
@@ -26,10 +28,8 @@ TODO (pc6001mk2):
   pc6001mk2_cass:chrith is a good test case, it's supposed to talk before title screen;
 
 TODO (pc6601):
-- current regression caused by an internal FDC sense interrupt status that expects a
-  DIO high that never occurs;
-- mon r-0 type games doesn't seem to work at all on this system?
-  Update: tries to autoload cassette at startup for some reason.
+- Make 3.5" FDC to actually load images;
+\- Internal FDC sense interrupt status expects a DIO high that never occurs;
 
 TODO (pc6601mk2sr):
 - check if there are more registers for mkII compatibility mode that are actually substituted
@@ -226,15 +226,6 @@ void pc6001_state::nec_ppi8255_w(offs_t offset, uint8_t data)
 	if (offset==3)
 	{
 		ppi_control_hack_w(data);
-		//printf("%02x\n",data);
-
-		if ((data & 0x0e) == 0x04)
-			m_cart_bank->set_bank(data & 1);
-
-//      if ((data & 0x0f) == 0x05 && m_cart_rom)
-//          m_bank1->set_base(m_cart_rom->base() + 0x2000);
-//      if ((data & 0x0f) == 0x04)
-//          m_bank1->set_base(m_region_gfx1->base());
 	}
 
 	m_ppi->write(offset,data);
@@ -293,7 +284,9 @@ void pc6001_state::pc6001_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom().nopw();
-	map(0x4000, 0x7fff).m(m_cart_bank, FUNC(address_map_bank_device::amap8));
+	map(0x4000, 0x7fff).r(m_cart, FUNC(generic_slot_device::read_rom));
+	map(0x6000, 0x7fff).view(m_gfx_view);
+	m_gfx_view[0](0x6000, 0x7fff).rom().region("gfx1", 0);
 	map(0x8000, 0xbfff).lrw8(
 		NAME([this] (offs_t offset) -> u8 {
 			if (m_ram->size() == 32 * 1024)
@@ -320,13 +313,6 @@ void pc6001_state::pc6001_io(address_map &map)
 	map(0xa3, 0xa3).mirror(0x0c).nopw();
 	map(0xb0, 0xb0).mirror(0x0f).w(FUNC(pc6001_state::system_latch_w));
 	map(0xc0, 0xc0).mirror(0x0f).r(FUNC(pc6001_state::portc0_r));
-}
-
-// TODO: use a memory_view like later iterations, eventually can mount a RAM cart.
-void pc6001_state::cart_map(address_map &map)
-{
-	map(0x2000, 0x3fff).rom().region("gfx1", 0);
-	map(0x4000, 0x7fff).r(m_cart, FUNC(generic_slot_device::read_rom));
 }
 
 /*****************************************
@@ -524,22 +510,6 @@ void pc6001mk2_state::mk2_work_ram3_w(offs_t offset, uint8_t data)
 		m_mk2_exram[offset | 0xc000] = data;
 }
 
-
-void pc6001mk2_state::necmk2_ppi8255_w(offs_t offset, uint8_t data)
-{
-	if (offset==3)
-	{
-		ppi_control_hack_w(data);
-
-		if ((data & 0x0f) == 0x05)
-			m_gfx_view.disable();
-		if ((data & 0x0f) == 0x04)
-			m_gfx_view.select(0);
-	}
-
-	m_ppi->write(offset,data);
-}
-
 void pc6001mk2_state::vram_bank_change(uint8_t vram_bank)
 {
 	uint32_t bank_base_values[8] = { 0x8000, 0xc000, 0xc000, 0xe000, 0x0000, 0x8000, 0x4000, 0xa000 };
@@ -664,7 +634,7 @@ void pc6001mk2_state::pc6001mk2_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x80, 0x81).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 
-	map(0x90, 0x93).mirror(0x0c).rw(FUNC(pc6001mk2_state::nec_ppi8255_r), FUNC(pc6001mk2_state::necmk2_ppi8255_w));
+	map(0x90, 0x93).mirror(0x0c).rw(FUNC(pc6001mk2_state::nec_ppi8255_r), FUNC(pc6001mk2_state::nec_ppi8255_w));
 
 	map(0xa0, 0xa0).mirror(0x0c).w(m_ay, FUNC(ay8910_device::address_w));
 	map(0xa1, 0xa1).mirror(0x0c).w(m_ay, FUNC(ay8910_device::data_w));
@@ -889,12 +859,12 @@ u8 pc6001mk2sr_state::hw_rev_r()
 	// bit 1 is active for pc6601sr (and shows the "PC6601SR World" screen in place of the "PC6001mkIISR World"),
 	// causes a direct jump to "video telopper" for pc6001mk2sr
 	// bit 0 is related to FDC irq status
-	return 0 | 1;
+	return 0 | m_fdc->get_irq();
 }
 
 u8 pc6601sr_state::hw_rev_r()
 {
-	return 2 | 1;
+	return 2 | m_fdc->get_irq();
 }
 
 void pc6001mk2sr_state::crt_mode_w(u8 data)
@@ -935,6 +905,7 @@ void pc6001mk2sr_state::pc6001mk2sr_map(address_map &map)
 		map(bank << 13, (bank << 13) | 0x1fff).r(m_sr_bank[bank], FUNC(address_map_bank_device::read8));
 		map(bank << 13, (bank << 13) | 0x1fff).w(m_sr_bank[bank+8], FUNC(address_map_bank_device::write8));
 	}
+	// TODO: does enabling m_gfx_view actually overlay on SR mode?
 	map(0x0000, 0xffff).view(m_mk2_view);
 	m_mk2_view[0](0x0000, 0xffff).m(*this, FUNC(pc6001mk2sr_state::pc6001mk2_map));
 }
@@ -974,7 +945,7 @@ void pc6001mk2sr_state::pc6001mk2sr_io(address_map &map)
 
 	map(0x80, 0x81).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 
-	map(0x90, 0x93).mirror(0x0c).rw(FUNC(pc6001mk2sr_state::nec_ppi8255_r), FUNC(pc6001mk2sr_state::necmk2_ppi8255_w));
+	map(0x90, 0x93).mirror(0x0c).rw(FUNC(pc6001mk2sr_state::nec_ppi8255_r), FUNC(pc6001mk2sr_state::nec_ppi8255_w));
 
 	map(0xa0, 0xa0).mirror(0x0c).w(m_ym, FUNC(ym2203_device::address_w));
 	map(0xa1, 0xa1).mirror(0x0c).w(m_ym, FUNC(ym2203_device::data_w));
@@ -1185,6 +1156,12 @@ void pc6001_state::ppi_portc_w(uint8_t data)
 	m_crtkill = BIT(~data, 1);
 	if (m_crtkill)
 		m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, CLEAR_LINE);
+	// CGSW select
+	// tutankhm and turpin carts are sensible to bank in gfx1 area properly
+	if (BIT(data, 2))
+		m_gfx_view.disable();
+	else
+		m_gfx_view.select(0);
 }
 
 uint8_t pc6001_state::ppi_portc_r()
@@ -1196,13 +1173,14 @@ uint8_t pc6001_state::ppi_portc_r()
 inline void pc6001_state::cassette_motor_control(bool new_state)
 {
 	// 0 -> 1 transition: send PLAY tape cmd to i8049
-	if((!(m_sys_latch & 8)) && new_state == true) //PLAY tape cmd
+	if (!(m_sys_latch & 8) && new_state) //PLAY tape cmd
 	{
 		m_cas_motor = true;
 		//m_cassette->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 	}
+
 	// 1 -> 0 transition: send STOP tape cmd to i8049
-	if((m_sys_latch & 8) && new_state == false) //STOP tape cmd
+	if ((m_sys_latch & 8) && !new_state) //STOP tape cmd
 	{
 		m_cas_motor = false;
 		//m_cassette->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
@@ -1302,7 +1280,7 @@ bool pc6001mk2sr_state::screen_blanked()
 rectangle pc6001_state::get_screen_display_area()
 {
 	// VDG regular display area is 256x192, on border bus request should be off
-	// A bunch of pc6001 will otherwise fail at startup:
+	// A bunch of pc6001_cass are very sensible at load:
 	// - mysterh2
 	// - portopia (on second load after explaination)
 	// - suprball
@@ -1380,6 +1358,8 @@ void pc6001_state::machine_reset()
 	m_port_c_8255 = 0;
 
 	m_crtkill = false;
+	m_gfx_view.disable();
+
 	m_video_sync_timer->adjust(m_screen->time_until_pos(0, 0));
 }
 
@@ -1409,7 +1389,6 @@ void pc6001mk2_state::machine_reset()
 		mk2_bank_r1_w(0xdd);
 		m_bank_opt = 0x02; //tv rom
 		m_bank_w = 0x50; //enable write to work ram 4,5,6,7
-		m_gfx_view.disable();
 
 		m_bgcol_bank = 0;
 	}
@@ -1544,8 +1523,6 @@ void pc6001_state::pc6001(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(pc6001_state::palette_init), 16 + 4);
 
-	ADDRESS_MAP_BANK(config, m_cart_bank).set_map(&pc6001_state::cart_map).set_options(ENDIANNESS_LITTLE, 8, 13 + 2, 0x4000);
-
 	/* uart */
 	I8251(config, "uart");
 
@@ -1625,8 +1602,6 @@ void pc6001mk2_state::pc6001mk2(machine_config &config)
 
 	RAM(config.replace(), m_ram).set_default_size("64K");
 
-	config.device_remove("cart_bank");
-
 	ADDRESS_MAP_BANK(config, m_mk2_bank[0]).set_map(&pc6001mk2_state::mk2_tv_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 	ADDRESS_MAP_BANK(config, m_mk2_bank[1]).set_map(&pc6001mk2_state::mk2_voice_map<0x4000, 0x4000>).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 	ADDRESS_MAP_BANK(config, m_mk2_bank[2]).set_map(&pc6001mk2_state::mk2_voice_map<0x0000, 0x8000>).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
@@ -1647,22 +1622,22 @@ void pc6001mk2_state::pc6001mk2(machine_config &config)
 void pc6601_state::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
-	// TODO: cannot identify .dsk images anyway
-	// (HxC reports them to be MSX based images)
+	// uses MSX .dsk floppies
 	fr.add(FLOPPY_MSX_FORMAT);
-	fr.add(FLOPPY_DSK_FORMAT);
+//	fr.add(FLOPPY_DSK_FORMAT);
 }
 
 static void pc6601_floppies(device_slot_interface &device)
 {
-	device.option_add("35dd", FLOPPY_35_DD);
+//	device.option_add("35dd", FLOPPY_35_DD);
 	device.option_add("35ssdd", FLOPPY_35_SSDD);
+	device.option_add("35sssd", FLOPPY_35_SSSD);
 }
 
 void pc6601_state::pc6601_fdc_config(machine_config &config)
 {
 	UPD765A(config, m_fdc, 8'000'000, true, true);
-	FLOPPY_CONNECTOR(config, m_floppy, pc6601_floppies, "35ssdd", pc6601_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy, pc6601_floppies, "35sssd", pc6601_state::floppy_formats).enable_sound(true);
 
 	// TODO: slotify external I/F
 	// PC-6031 mini disk unit (single 5'25 2D drive)
@@ -1728,7 +1703,7 @@ void pc6601sr_state::pc6601sr(machine_config &config)
 {
 	pc6001mk2sr(config);
 
-	FLOPPY_CONNECTOR(config.replace(), m_floppy, pc6601_floppies, "35dd", pc6601sr_state::floppy_formats);
+	FLOPPY_CONNECTOR(config.replace(), m_floppy, pc6601_floppies, "35ssdd", pc6601sr_state::floppy_formats);
 
 	// TODO: IR keyboard (does it have functional differences wrt normal PC-6001?)
 	// TODO: TV tuner

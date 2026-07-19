@@ -14,14 +14,15 @@ References:
 
 TODO (pc9821):
 - non-fatal "cache error" at POST for all machines listed here;
-- undumped IDE ROM, kludged to work;
+- partial dump, has undumped IDE ROM and no setup bank, kludged to work;
 - further state machine breakdowns;
 
 TODO (pc9821ap2):
-- To enter SETUP mode, unmap F3 or move MAME soft reset out of F3 then hold HELP key.
+- To enter setup mode, unmap F3 or move MAME soft reset out of F3 then hold HELP key.
 \- alternative: bp 0xf8a32,1,{esi|=40;g} to simulate holding HELP key at power-on/reset;
 - Unimplemented 15MB memory hole mark for Windows NT
 \- cfr. io_wab.txt, interfaces with VGA core thru local bus via address-data ports at $fa2-3
+- several .hdi games squashes text GDC to 15 kHz, check SDIP DSW1.
 
 TODO (pc9821as):
 - unimplemented SDIP specific access;
@@ -838,6 +839,28 @@ void pc9821_mate_a_state::cbus_43f_bank_w(offs_t offset, uint8_t data)
 	pc9801vm_state::cbus_43f_bank_w(offset, data);
 }
 
+// pc9821ap2 (at very least) plonks in some sort of SRAM in the unused gaiji area
+uint8_t pc9821_mate_a_state::kanji_r(offs_t offset)
+{
+	if (offset >= 0xad000 && offset <= 0xadfff)
+		return m_nvram_ptr[offset - 0xad000];
+
+	if (offset >= 0xaf000 && offset <= 0xaffff)
+		return m_nvram_ptr[offset - 0xae000];
+
+	return pc9821_state::kanji_r(offset);
+}
+
+void pc9821_mate_a_state::kanji_w(offs_t offset, uint8_t data)
+{
+	if (offset >= 0xad000 && offset <= 0xadfff)
+		m_nvram_ptr[offset - 0xad000] = data;
+	else if (offset >= 0xaf000 && offset <= 0xaffff)
+		m_nvram_ptr[offset - 0xae000] = data;
+
+	pc9821_state::kanji_w(offset, data);
+}
+
 void pc9821_mate_a_state::pc9821as_map(address_map &map)
 {
 	pc9821_map(map);
@@ -1040,6 +1063,16 @@ static INPUT_PORTS_START( pc9821 )
 	PORT_CONFSETTING(    0x04, DEF_STR( No ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( pc9821ap2 )
+	PORT_INCLUDE( pc9821 )
+
+	PORT_MODIFY("DSW2")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("sdip", FUNC(pc98_sdip_device::dsw2_r))
+
+//	PORT_MODIFY("DSW3")
+//	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("sdip", FUNC(pc98_sdip_device::dsw3_r))
+INPUT_PORTS_END
+
 // works better without the SDIP hack
 static INPUT_PORTS_START( pc9821ce )
 	PORT_INCLUDE( pc9821 )
@@ -1076,10 +1109,19 @@ MACHINE_START_MEMBER(pc9821_state,pc9821)
 	// ...
 }
 
+void pc9821_mate_a_state::sram_init()
+{
+	const u32 nvram_size = 0x2000;
+
+	m_nvram_ptr = std::make_unique<uint8_t[]>(nvram_size);
+	m_nvram->set_base(m_nvram_ptr.get(), nvram_size);
+}
+
 MACHINE_START_MEMBER(pc9821_mate_a_state,pc9821ap2)
 {
 	MACHINE_START_CALL_MEMBER(pc9821);
 
+	sram_init();
 	// ...
 }
 
@@ -1131,7 +1173,7 @@ void pc9821_state::pc9821(machine_config &config)
 	m_pit->set_clk<1>(MAIN_CLOCK_X2);
 	m_pit->set_clk<2>(MAIN_CLOCK_X2);
 
-	// FIXME: set clock to SCKL1 clock frequency
+	// FIXME: set clock to SCLK1 clock frequency
 	PC98_CBUS_SLOT(config.replace(), "cbus:0", 0, "cbus", pc98_cbus_devices, "pc9801_86");
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_state, pc9821)
@@ -1176,6 +1218,8 @@ void pc9821_mate_a_state::pc9821as(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(pc9821_mate_a_state, pc9821ap2)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9821_mate_a_state, pc9821ap2)
 
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
+
 	// RAM 3.6 MB ~ 14.6 MB
 	PC9801_61_SIMM(config.replace(), "simm", pc9821_simm_options, "4mb");
 //  m_ram->set_default_size("4M");
@@ -1204,6 +1248,8 @@ void pc9821_mate_a_state::pc9821ap2(machine_config &config)
 //  m_ram->set_default_size("4M");
 //  m_ram->set_extra_options("8M,14M,32M,64M,72M,74M");
 
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
+
 	// 340MB HD
 	// Expansion slot C-BUS4 (4)
 	// Graphics controller S3 86C928
@@ -1225,7 +1271,7 @@ void pc9821_canbe_state::pc9821ce(machine_config &config)
 //  m_ram->set_extra_options("6M,8M,14M,15M");
 
 	// pc9801-86 (built-in)
-	// FIXME: set clock to SCKL1 clock frequency
+	// FIXME: set clock to SCLK1 clock frequency
 	PC98_CBUS_SLOT(config.replace(), "cbus:0", 0, "cbus", pc98_cbus_devices, nullptr);
 	PC98_CBUS_SLOT(config, "cbus:mb1", 0, "cbus", pc98_cbus_devices, "sound_pc9821ce", true);
 
@@ -1254,7 +1300,7 @@ void pc9821_canbe_state::pc9821cx3(machine_config &config)
 	//pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
 
 //  m_cbus[0]->set_default_option(nullptr);
-	// FIXME: set clock to SCKL1 clock frequency
+	// FIXME: set clock to SCLK1 clock frequency
 	PC98_CBUS_SLOT(config.replace(), "cbus:0", 0, "cbus", pc98_cbus_devices, nullptr);
 	PC98_CBUS_SLOT(config, "cbus:mb1", 0, "cbus", pc98_cbus_devices, "sound_pc9821cx3", true);
 
@@ -1992,7 +2038,7 @@ COMP( 1992, pc9821,      0,          0, pc9821,        pc9821,    pc9821_state, 
 
 // 98MATE [A] (i486, desktop, has 98 MATE local bus "ML", with optional RL-like high-reso)
 COMP( 1993, pc9821as,    0,          0, pc9821as,      pc9821,    pc9821_mate_a_state, init_pc9801_kanji,   "NEC",   "PC-9821As (98MATE A)",          MACHINE_NOT_WORKING )
-COMP( 1993, pc9821ap2,   pc9821as,   0, pc9821ap2,     pc9821,    pc9821_mate_a_state, init_pc9801_kanji,   "NEC",   "PC-9821Ap2/U8W (98MATE A)",     0 )
+COMP( 1993, pc9821ap2,   pc9821as,   0, pc9821ap2,     pc9821ap2, pc9821_mate_a_state, init_pc9801_kanji,   "NEC",   "PC-9821Ap2/U8W (98MATE A)",     0 )
 
 // SC-9821A (rebranded MATE A machines with minor differences such as SW power control)
 // ...

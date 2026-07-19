@@ -152,6 +152,23 @@ static void reduce_trig_argument(extFloat80_t &a)
 	}
 }
 
+// Force the result rounding for the 68040 FSxxx/FDxxx instructions
+struct forced_precision
+{
+	forced_precision(int opmode)
+	{
+		m_saved = extF80_roundingPrecision;
+		extF80_roundingPrecision = (opmode & 0x04) ? 64 : 32;
+	}
+
+	~forced_precision()
+	{
+		extF80_roundingPrecision = m_saved;
+	}
+
+	uint_fast8_t m_saved;
+};
+
 // directed rounding follows the value's sign, but the packed conversions
 // work on the magnitude, so the directed modes swap for negative values
 static uint_fast8_t rounding_mode_for_sign(uint_fast8_t mode, bool sign)
@@ -1477,7 +1494,31 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 	int opmode = w2 & 0x7f;
 	extFloat80_t source;
 
-	// fmovecr #$f, fp0 f200 5c0f
+	// Verify the opmode before any operand fetch so that undefined
+	// encodings and (on 68881/68882) the 68040-only rounding forms
+	// take an F-line exception before we do any EA shenanigans.
+	if (!(rm && src == 7))
+	{
+		bool valid;
+		if (opmode & 0x40)
+		{
+			// mask of valid 68040 opmodes
+			static constexpr u64 VALID_040 = 0x000011dd55000033U;
+			valid = (m_cpu_type & CPU_TYPE_040) && BIT(VALID_040, opmode & 0x3f);
+		}
+		else
+		{
+			// mask of valid 6888x opmodes
+			static constexpr u64 VALID_6888X = 0xfffffffff777f75fU;
+			valid = BIT(VALID_6888X, opmode);
+		}
+
+		if (!valid)
+		{
+			m68ki_exception_1111();
+			return;
+		}
+	}
 
 	if (rm)
 	{
@@ -1837,38 +1878,6 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 			m_icount -= 54;
 			break;
 		}
-		case 0x60:      // FSDIVS
-		{
-			float32_t sngSrc, sngDst;
-			sngSrc = extF80_to_f32(source);
-			sngDst = extF80_to_f32(m_fpr[dst]);
-			if (f32_eq(sngSrc, i32_to_f32(0)))
-			{
-				m_fpsr |= FPES_DIVZERO | FPAE_DIVZERO;
-			}
-			sngDst = f32_div(sngDst, sngSrc);
-			m_fpr[dst] = f32_to_extF80(sngDst);
-			set_condition_codes(m_fpr[dst]);
-			sync_exception_flags(source, dstCopy, EXC_ENB_INEXACT | EXC_ENB_OVRFLOW | EXC_ENB_UNDFLOW);
-			m_icount -= 124;
-			break;
-		}
-		case 0x64:      // FDDIV
-		{
-			float64_t sngSrc, sngDst;
-			sngSrc = extF80_to_f64(source);
-			sngDst = extF80_to_f64(m_fpr[dst]);
-			if (f64_eq(sngSrc, i32_to_f64(0)))
-			{
-				m_fpsr |= FPES_DIVZERO | FPAE_DIVZERO;
-			}
-			sngDst = f64_div(sngDst, sngSrc);
-			m_fpr[dst] = f64_to_extF80(sngDst);
-			set_condition_codes(m_fpr[dst]);
-			sync_exception_flags(source, dstCopy, EXC_ENB_INEXACT | EXC_ENB_OVRFLOW | EXC_ENB_UNDFLOW);
-			m_icount -= 130;
-			break;
-		}
 		case 0x20:      // FDIV
 		{
 			if (extF80_eq(source, i32_to_extF80(0)))
@@ -1908,7 +1917,6 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 			m_icount -= 76;
 			break;
 		}
-		case 0x63:      // FSMULS (JFF)
 		case 0x23:      // FMUL
 		{
 			m_fpr[dst] = extF80_mul(m_fpr[dst], source);
@@ -2066,6 +2074,196 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 			sync_exception_flags(source, dstCopy, EXC_ENB_UNDFLOW);
 			LOGMASKED(LOG_INSTRUCTIONS_VERBOSE, "FTENTOX: 10 ** %f = %f\n", fx80_to_double(source), fx80_to_double(m_fpr[dst]));
 			m_icount -= 590;
+			break;
+		}
+
+		case 0x02:      // FSINH = (e^x - e^-x) / 2
+		{
+			if (((source.signExp & 0x7fff) == 0) && (source.signif == 0))
+			{
+				m_fpr[dst] = source;    // +/-0 passes through
+			}
+			else
+			{
+				extFloat80_t mx = source;
+				mx.signExp ^= 0x8000;
+				const extFloat80_t num = extF80_sub(extFloat80_etox(source), extFloat80_etox(mx));
+				m_fpr[dst] = extF80_div(num, i32_to_extF80(2));
+			}
+			set_condition_codes(m_fpr[dst]);
+			sync_exception_flags(source, source, EXC_ENB_INEXACT | EXC_ENB_OVRFLOW | EXC_ENB_UNDFLOW);
+			m_icount -= 687;
+			break;
+		}
+		case 0x19:      // FCOSH = (e^x + e^-x) / 2
+		{
+			extFloat80_t mx = source;
+			mx.signExp ^= 0x8000;
+			const extFloat80_t num = extF80_add(extFloat80_etox(source), extFloat80_etox(mx));
+			m_fpr[dst] = extF80_div(num, i32_to_extF80(2));
+			set_condition_codes(m_fpr[dst]);
+			sync_exception_flags(source, source, EXC_ENB_INEXACT | EXC_ENB_OVRFLOW);
+			m_icount -= 607;
+			break;
+		}
+		case 0x09:      // FTANH = (e^2x - 1) / (e^2x + 1)
+		{
+			const extFloat80_t one = i32_to_extF80(1);
+			const extFloat80_t e2x = extFloat80_etox(extF80_add(source, source));
+			if (((source.signExp & 0x7fff) == 0) && (source.signif == 0))
+			{
+				m_fpr[dst] = source;    // +/-0 passes through
+			}
+			else if (((e2x.signExp & 0x7fff) == 0x7fff) && ((e2x.signif << 1) == 0))
+			{
+				// e^2x overflowed to infinity: tanh saturates at +/-1
+				m_fpr[dst] = one;
+				m_fpr[dst].signExp |= source.signExp & 0x8000;
+			}
+			else
+			{
+				m_fpr[dst] = extF80_div(extF80_sub(e2x, one), extF80_add(e2x, one));
+			}
+			set_condition_codes(m_fpr[dst]);
+			sync_exception_flags(source, source, EXC_ENB_INEXACT | EXC_ENB_UNDFLOW);
+			m_icount -= 661;
+			break;
+		}
+		case 0x0c:      // FASIN = atan(x / sqrt(1 - x^2))
+		{
+			const extFloat80_t one = i32_to_extF80(1);
+			const extFloat80_t root = extF80_sqrt(extF80_sub(one, extF80_mul(source, source)));
+			m_fpr[dst] = extFloat80_68katan(extF80_div(source, root));
+			set_condition_codes(m_fpr[dst]);
+			sync_exception_flags(source, source, EXC_ENB_INEXACT | EXC_ENB_UNDFLOW);
+			m_icount -= 581;
+			break;
+		}
+		case 0x1c:      // FACOS = 2 * atan(sqrt((1 - x) / (1 + x)))
+		{
+			const extFloat80_t one = i32_to_extF80(1);
+			const extFloat80_t ratio = extF80_div(extF80_sub(one, source), extF80_add(one, source));
+			const extFloat80_t half = extFloat80_68katan(extF80_sqrt(ratio));
+			m_fpr[dst] = extF80_add(half, half);
+			set_condition_codes(m_fpr[dst]);
+			sync_exception_flags(source, source, EXC_ENB_INEXACT);
+			m_icount -= 604;
+			break;
+		}
+		case 0x0d:      // FATANH = ln(1 + (2x / (1 - x))) / 2
+		{
+			const extFloat80_t one = i32_to_extF80(1);
+			const extFloat80_t ratio = extF80_div(extF80_add(source, source), extF80_sub(one, source));
+			m_fpr[dst] = extF80_div(extFloat80_lognp1(ratio), i32_to_extF80(2));
+			set_condition_codes(m_fpr[dst]);
+			sync_exception_flags(source, source, EXC_ENB_INEXACT | EXC_ENB_UNDFLOW);
+			m_icount -= 693;
+			break;
+		}
+
+		// 68040-specific forced-precision forms
+		case 0x40:      // FSMOVE
+		case 0x44:      // FDMOVE
+		{
+			{
+				const forced_precision fp(opmode);
+				m_fpr[dst] = extF80_mul(source, i32_to_extF80(1));
+			}
+			set_condition_codes(m_fpr[dst]);
+			sync_exception_flags(source, source, EXC_ENB_INEXACT | EXC_ENB_OVRFLOW | EXC_ENB_UNDFLOW);
+			m_icount -= 58;
+			break;
+		}
+		case 0x41:      // FSSQRT
+		case 0x45:      // FDSQRT
+		{
+			{
+				const forced_precision fp(opmode);
+				m_fpr[dst] = extF80_sqrt(source);
+			}
+			set_condition_codes(m_fpr[dst]);
+			sync_exception_flags(source, source, EXC_ENB_INEXACT);
+			m_icount -= 109;
+			break;
+		}
+		case 0x58:      // FSABS
+		case 0x5c:      // FDABS
+		{
+			extFloat80_t temp = source;
+			temp.signExp &= 0x7fff;
+			{
+				const forced_precision fp(opmode);
+				m_fpr[dst] = extF80_mul(temp, i32_to_extF80(1));
+			}
+			set_condition_codes(m_fpr[dst]);
+			sync_exception_flags(source, source, EXC_ENB_INEXACT | EXC_ENB_OVRFLOW | EXC_ENB_UNDFLOW);
+			m_icount -= 58;
+			break;
+		}
+		case 0x5a:      // FSNEG
+		case 0x5e:      // FDNEG
+		{
+			extFloat80_t temp = source;
+			temp.signExp ^= 0x8000;
+			{
+				const forced_precision fp(opmode);
+				m_fpr[dst] = extF80_mul(temp, i32_to_extF80(1));
+			}
+			set_condition_codes(m_fpr[dst]);
+			sync_exception_flags(source, source, EXC_ENB_INEXACT | EXC_ENB_OVRFLOW | EXC_ENB_UNDFLOW);
+			m_icount -= 58;
+			break;
+		}
+		case 0x60:      // FSDIV
+		case 0x64:      // FDDIV
+		{
+			if (extF80_eq(source, i32_to_extF80(0)))
+			{
+				m_fpsr |= FPES_DIVZERO | FPAE_DIVZERO;
+			}
+			{
+				const forced_precision fp(opmode);
+				m_fpr[dst] = extF80_div(m_fpr[dst], source);
+			}
+			set_condition_codes(m_fpr[dst]);
+			sync_exception_flags(source, dstCopy, EXC_ENB_INEXACT | EXC_ENB_OVRFLOW | EXC_ENB_UNDFLOW);
+			m_icount -= 124;
+			break;
+		}
+		case 0x62:      // FSADD
+		case 0x66:      // FDADD
+		{
+			{
+				const forced_precision fp(opmode);
+				m_fpr[dst] = extF80_add(m_fpr[dst], source);
+			}
+			set_condition_codes(m_fpr[dst]);
+			sync_exception_flags(source, dstCopy, EXC_ENB_INEXACT | EXC_ENB_OVRFLOW | EXC_ENB_UNDFLOW);
+			m_icount -= 76;
+			break;
+		}
+		case 0x63:      // FSMUL
+		case 0x67:      // FDMUL
+		{
+			{
+				const forced_precision fp(opmode);
+				m_fpr[dst] = extF80_mul(m_fpr[dst], source);
+			}
+			set_condition_codes(m_fpr[dst]);
+			sync_exception_flags(source, dstCopy, EXC_ENB_INEXACT | EXC_ENB_OVRFLOW | EXC_ENB_UNDFLOW);
+			m_icount -= 96;
+			break;
+		}
+		case 0x68:      // FSSUB
+		case 0x6c:      // FDSUB
+		{
+			{
+				const forced_precision fp(opmode);
+				m_fpr[dst] = extF80_sub(m_fpr[dst], source);
+			}
+			set_condition_codes(m_fpr[dst]);
+			sync_exception_flags(source, dstCopy, EXC_ENB_INEXACT | EXC_ENB_OVRFLOW | EXC_ENB_UNDFLOW);
+			m_icount -= 76;
 			break;
 		}
 

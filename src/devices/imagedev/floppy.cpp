@@ -60,6 +60,7 @@ DEFINE_DEVICE_TYPE(FLOPPY_3_DSDD, floppy_3_dsdd, "floppy_3_dsdd", "3\" double-si
 DEFINE_DEVICE_TYPE(FLOPPY_3_DSQD, floppy_3_dsqd, "floppy_3_dsqd", "3\" double-sided quad density floppy drive")
 
 // generic 3.5" drives
+DEFINE_DEVICE_TYPE(FLOPPY_35_SSSD, floppy_35_sssd, "floppy_35_sssd", "3.5\" single-sided single density floppy drive")
 DEFINE_DEVICE_TYPE(FLOPPY_35_SSDD, floppy_35_ssdd, "floppy_35_ssdd", "3.5\" single-sided double density floppy drive")
 DEFINE_DEVICE_TYPE(FLOPPY_35_DD,   floppy_35_dd,   "floppy_35_dd",   "3.5\" double density floppy drive")
 DEFINE_DEVICE_TYPE(FLOPPY_35_HD,   floppy_35_hd,   "floppy_35_hd",   "3.5\" high density floppy drive")
@@ -987,7 +988,7 @@ void floppy_image_device::stp_w(int state)
 			}
 			LOGMASKED(LOG_STEP, "track %d [%f]\n", m_cyl, machine().time().as_double());
 			if (m_make_sound) m_sound_out->step(m_cyl);
-				
+
 			// Correct the possibly invalid track number
 			if (m_cyl < 0) m_cyl = 0;
 			else if (m_cyl > m_tracks-1) m_cyl = m_tracks-1;
@@ -2208,6 +2209,30 @@ void floppy_3_dsqd::setup_characteristics()
 	add_variant(floppy_image::DSDD);
 	add_variant(floppy_image::DSQD);
 }
+
+//-------------------------------------------------
+//  3.5" single-sided single density
+//-------------------------------------------------
+
+floppy_35_sssd::floppy_35_sssd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_35_SSSD, tag, owner, clock)
+{
+}
+
+floppy_35_sssd::~floppy_35_sssd()
+{
+}
+
+void floppy_35_sssd::setup_characteristics()
+{
+	m_form_factor = floppy_image::FF_35;
+	m_tracks = 42;
+	m_sides = 1;
+	set_rpm(300);
+
+	add_variant(floppy_image::SSSD);
+}
+
 
 //-------------------------------------------------
 //  3.5" single-sided double density

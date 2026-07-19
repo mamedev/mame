@@ -1008,14 +1008,14 @@ c180 f1c0 and      l A+-DXWL    01:12 7:15 234fc:4
 	}
 
 
-e000 f1f8 asr      b .          01234fc:6 7:13
+e000 f1f8 asr      b .          0124fc:6 3:4 7:13
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 src = MASK_OUT_ABOVE_8(*r_dst);
 	u32 res = src >> shift;
 
 	if(shift != 0)
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 	if(GET_MSB_8(src))
 		res |= m68ki_shift_8_table[shift];
@@ -1028,14 +1028,14 @@ e000 f1f8 asr      b .          01234fc:6 7:13
 	m_x_flag = m_c_flag = src << (9-shift);
 
 
-e040 f1f8 asr      w .          01234fc:6 7:13
+e040 f1f8 asr      w .          0124fc:6 3:4 7:13
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 src = MASK_OUT_ABOVE_16(*r_dst);
 	u32 res = src >> shift;
 
 	if(shift != 0)
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 	if(GET_MSB_16(src))
 		res |= m68ki_shift_16_table[shift];
@@ -1048,14 +1048,14 @@ e040 f1f8 asr      w .          01234fc:6 7:13
 	m_x_flag = m_c_flag = src << (9-shift);
 
 
-e080 f1f8 asr      l .          01:8 7:13 234fc:6
+e080 f1f8 asr      l .          01:8 7:13 24fc:6 3:4
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 src = *r_dst;
 	u32 res = src >> shift;
 
 	if(shift != 0)
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 	if(GET_MSB_32(src))
 		res |= m68ki_shift_32_table[shift];
@@ -1075,7 +1075,7 @@ e020 f1f8 asr      b .          01234fc:6 7:13
 	u32 res = src >> shift;
 
 	if(shift != 0) {
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 		if(shift < 8) {
 			if(GET_MSB_8(src))
@@ -1119,7 +1119,7 @@ e060 f1f8 asr      w .          01234fc:6 7:13
 	u32 res = src >> shift;
 
 	if(shift != 0) {
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 		if(shift < 16) {
 			if(GET_MSB_16(src))
@@ -1163,7 +1163,7 @@ e0a0 f1f8 asr      l .          01:8 7:13 234fc:6
 	u32 res = src >> shift;
 
 	if(shift != 0) {
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 		if(shift < 32) {
 			if(GET_MSB_32(src))
@@ -1200,7 +1200,7 @@ e0a0 f1f8 asr      l .          01:8 7:13 234fc:6
 	}
 
 
-e0c0 ffc0 asr      w A+-DXWL    01:8 7:14 234fc:5
+e0c0 ffc0 asr      w A+-DXWL    01:8 7:14 24fc:5 3:4
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 src = m68ki_read_16(ea);
 	u32 res = src >> 1;
@@ -1216,14 +1216,14 @@ e0c0 ffc0 asr      w A+-DXWL    01:8 7:14 234fc:5
 	m_c_flag = m_x_flag = src << 8;
 
 
-e100 f1f8 asl      b .          01:6 7:13 234fc:8
+e100 f1f8 asl      b .          01:6 7:13 24fc:8 3:6
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 src = MASK_OUT_ABOVE_8(*r_dst);
 	u32 res = MASK_OUT_ABOVE_8(src << shift);
 
 	if(shift != 0)
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
 
@@ -1234,14 +1234,14 @@ e100 f1f8 asl      b .          01:6 7:13 234fc:8
 	m_v_flag = (!(src == 0 || (src == m68ki_shift_8_table[shift + 1] && shift < 8)))<<7;
 
 
-e140 f1f8 asl      w .          01:6 7:13 234fc:8
+e140 f1f8 asl      w .          01:6 7:13 24fc:8 3:6
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 src = MASK_OUT_ABOVE_16(*r_dst);
 	u32 res = MASK_OUT_ABOVE_16(src << shift);
 
 	if(shift != 0)
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
 
@@ -1252,14 +1252,14 @@ e140 f1f8 asl      w .          01:6 7:13 234fc:8
 	m_v_flag = (!(src == 0 || src == m68ki_shift_16_table[shift + 1]))<<7;
 
 
-e180 f1f8 asl      l .          01234fc:8 7:13
+e180 f1f8 asl      l .          0124fc:8 3:6 7:13
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 src = *r_dst;
 	u32 res = MASK_OUT_ABOVE_32(src << shift);
 
 	if(shift != 0)
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 	*r_dst = res;
 
@@ -1277,7 +1277,7 @@ e120 f1f8 asl      b .          01:6 7:13 234fc:8
 	u32 res = MASK_OUT_ABOVE_8(src << shift);
 
 	if(shift != 0) {
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 		if(shift < 8) {
 			*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
@@ -1309,7 +1309,7 @@ e160 f1f8 asl      w .          01:6 7:13 234fc:8
 	u32 res = MASK_OUT_ABOVE_16(src << shift);
 
 	if(shift != 0) {
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 		if(shift < 16) {
 			*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
@@ -1340,7 +1340,7 @@ e1a0 f1f8 asl      l .          01234fc:8 7:13
 	u32 res = MASK_OUT_ABOVE_32(src << shift);
 
 	if(shift != 0) {
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 		if(shift < 32) {
 			*r_dst = res;
@@ -3565,7 +3565,7 @@ e008 f1f8 lsr      b .          01:6 7:13 234fc:4
 	u32 res = src >> shift;
 
 	if(shift != 0)
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
 
@@ -3582,7 +3582,7 @@ e048 f1f8 lsr      w .          01:6 7:13 234fc:4
 	u32 res = src >> shift;
 
 	if(shift != 0)
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
 
@@ -3599,7 +3599,7 @@ e088 f1f8 lsr      l .          01:8 7:13 234fc:4
 	u32 res = src >> shift;
 
 	if(shift != 0)
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 	*r_dst = res;
 
@@ -3616,7 +3616,7 @@ e028 f1f8 lsr      b .          01234fc:6 7:13
 	u32 res = src >> shift;
 
 	if(shift != 0) {
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 		if(shift <= 8) {
 			*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
@@ -3648,7 +3648,7 @@ e068 f1f8 lsr      w .          01234fc:6 7:13
 	u32 res = src >> shift;
 
 	if(shift != 0) {
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 		if(shift <= 16) {
 			*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
@@ -3678,7 +3678,7 @@ e0a8 f1f8 lsr      l .          01:8 7:13 234fc:6
 	u32 res = src >> shift;
 
 	if(shift != 0) {
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 		if(shift < 32) {
 			*r_dst = res;
@@ -3701,7 +3701,7 @@ e0a8 f1f8 lsr      l .          01:8 7:13 234fc:6
 	}
 
 
-e2c0 ffc0 lsr      w A+-DXWL    01:8 7:14 234fc:5
+e2c0 ffc0 lsr      w A+-DXWL    01:8 7:14 24fc:5 3:4
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 src = m68ki_read_16(ea);
 	u32 res = src >> 1;
@@ -3721,7 +3721,7 @@ e108 f1f8 lsl      b .          01:6 7:13 234fc:4
 	u32 res = MASK_OUT_ABOVE_8(src << shift);
 
 	if(shift != 0)
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
 
@@ -3738,7 +3738,7 @@ e148 f1f8 lsl      w .          01:6 7:13 234fc:4
 	u32 res = MASK_OUT_ABOVE_16(src << shift);
 
 	if(shift != 0)
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
 
@@ -3755,7 +3755,7 @@ e188 f1f8 lsl      l .          01:8 7:13 234fc:4
 	u32 res = MASK_OUT_ABOVE_32(src << shift);
 
 	if(shift != 0)
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 	*r_dst = res;
 
@@ -3772,7 +3772,7 @@ e128 f1f8 lsl      b .          01234fc:6 7:13
 	u32 res = MASK_OUT_ABOVE_8(src << shift);
 
 	if(shift != 0) {
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 		if(shift <= 8) {
 			*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
@@ -3803,7 +3803,7 @@ e168 f1f8 lsl      w .          01234fc:6 7:13
 	u32 res = MASK_OUT_ABOVE_16(src << shift);
 
 	if(shift != 0) {
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 		if(shift <= 16) {
 			*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
@@ -3834,7 +3834,7 @@ e1a8 f1f8 lsl      l .          01:8 7:13 234fc:6
 	u32 res = MASK_OUT_ABOVE_32(src << shift);
 
 	if(shift != 0) {
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 		if(shift < 32) {
 			*r_dst = res;
@@ -3857,7 +3857,7 @@ e1a8 f1f8 lsl      l .          01:8 7:13 234fc:6
 	}
 
 
-e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 234fc:5
+e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 24fc:5 3:4
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 src = m68ki_read_16(ea);
 	u32 res = MASK_OUT_ABOVE_16(src << 1);
@@ -5518,7 +5518,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 234fc:5
 		}
 	AY() = ea;
 
-	m_icount -= count * m_cyc_movem_w;
+	m_icount -= count * (m_cyc_movem_store_w ? m_cyc_movem_store_w : m_cyc_movem_w);
 
 
 4880 ffc0 movem    w ADXWL      01:8 7:23 234fc:4
@@ -5534,7 +5534,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 234fc:5
 			count++;
 		}
 
-	m_icount -= count * m_cyc_movem_w;
+	m_icount -= count * (m_cyc_movem_store_w ? m_cyc_movem_store_w : m_cyc_movem_w);
 
 
 48e0 fff8 movem    l .          01:8 7:23 234fc:4
@@ -5552,7 +5552,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 234fc:5
 		}
 	AY() = ea;
 
-	m_icount -= count * m_cyc_movem_l;
+	m_icount -= count * (m_cyc_movem_store_l ? m_cyc_movem_store_l : m_cyc_movem_l);
 
 
 48c0 ffc0 movem    l ADXWL      01:8 7:23 234fc:4
@@ -5568,7 +5568,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 234fc:5
 			count++;
 		}
 
-	m_icount -= count * m_cyc_movem_l;
+	m_icount -= count * (m_cyc_movem_store_l ? m_cyc_movem_store_l : m_cyc_movem_l);
 
 
 4c98 fff8 movem    w .          01:12 7:26 234fc:8
@@ -6517,9 +6517,38 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 7:76 1:30 234fc:27
 	m68ki_push_32(ea);
 
 
+f500 fff8 pflushn  l .          4fc:4p
+	// no per-entry ATC is modeled for the 68040, so all four PFLUSH variants flush everything
+	if(m_has_pmmu) {
+		if(m_s_flag) {
+			pmmu_atc_flush();
+		} else {
+			m68ki_exception_privilege_violation();
+		}
+	} else {
+		m68ki_exception_1111();
+	}
+
+
+f508 fff8 pflush   l .          4fc:4p
+	if(m_has_pmmu) {
+		if(m_s_flag) {
+			pmmu_atc_flush();
+		} else {
+			m68ki_exception_privilege_violation();
+		}
+	} else {
+		m68ki_exception_1111();
+	}
+
+
 f518 fff8 pflusha  l .          4fc:4p
 	if(m_has_pmmu) {
-		logerror("68040: unhandled PFLUSHA (ir=%04x)\n", m_ir);
+		if(m_s_flag) {
+			pmmu_atc_flush();
+		} else {
+			m68ki_exception_privilege_violation();
+		}
 	} else {
 		m68ki_exception_1111();
 	}
@@ -6527,13 +6556,18 @@ f518 fff8 pflusha  l .          4fc:4p
 
 f510 fff8 pflushan l .          4fc:4p
 	if(m_has_pmmu) {
-		logerror("68040: unhandled PFLUSHAN (ir=%04x)\n", m_ir);
+		if(m_s_flag) {
+			pmmu_atc_flush();
+		} else {
+			m68ki_exception_privilege_violation();
+		}
 	} else {
 		m68ki_exception_1111();
 	}
 
 
-f000 fe00 pmmu     l .          234fc:8p
+f000 fe00 pmmu     l .          23fc:8p
+	// 68851/68030 MMU instructions; all of these are F-line exceptions on the 68040
 	if (m_has_pmmu)
 	{
 		m68851_mmu_ops();
@@ -6547,7 +6581,14 @@ f000 fe00 pmmu     l .          234fc:8p
 f548 ffd8 ptest    l .          4:8p
 	if(m_has_pmmu)
 	{
-		//logerror("68040: unhandled PTEST\n");
+		if(m_s_flag)
+		{
+			m68040_ptest();
+		}
+		else
+		{
+			m68ki_exception_privilege_violation();
+		}
 	}
 	else
 	{
@@ -6564,7 +6605,7 @@ f548 ffd8 ptest    l .          4:8p
 		m68ki_exception_privilege_violation();
 	}
 
-e018 f1f8 ror      b .          01:6 7:13 234fc:8
+e018 f1f8 ror      b .          01:6 7:13 24fc:8 3:6
 	u32* r_dst = &DY();
 	u32 orig_shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 shift = orig_shift & 7;
@@ -6572,7 +6613,7 @@ e018 f1f8 ror      b .          01:6 7:13 234fc:8
 	u32 res = ROR_8(src, shift);
 
 	if(orig_shift != 0)
-		m_icount -= orig_shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(orig_shift);
 
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
 
@@ -6582,14 +6623,14 @@ e018 f1f8 ror      b .          01:6 7:13 234fc:8
 	m_v_flag = VFLAG_CLEAR;
 
 
-e058 f1f8 ror      w .          01:6 7:13 234fc:8
+e058 f1f8 ror      w .          01:6 7:13 24fc:8 3:6
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 src = MASK_OUT_ABOVE_16(*r_dst);
 	u32 res = ROR_16(src, shift);
 
 	if(shift != 0)
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
 
@@ -6599,14 +6640,14 @@ e058 f1f8 ror      w .          01:6 7:13 234fc:8
 	m_v_flag = VFLAG_CLEAR;
 
 
-e098 f1f8 ror      l .          01234fc:8 7:13
+e098 f1f8 ror      l .          0124fc:8 3:6 7:13
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u64 src = *r_dst;
 	u32 res = ROR_32(src, shift);
 
 	if(shift != 0)
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 	*r_dst = res;
 
@@ -6624,7 +6665,7 @@ e038 f1f8 ror      b .          01:6 7:13 234fc:8
 	u32 res = ROR_8(src, shift);
 
 	if(orig_shift != 0) {
-		m_icount -= orig_shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(orig_shift);
 
 		*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
 		m_c_flag = src << (8-((shift-1)&7));
@@ -6647,7 +6688,7 @@ e078 f1f8 ror      w .          01:6 7:13 234fc:8
 	u32 res = ROR_16(src, shift);
 
 	if(orig_shift != 0) {
-		m_icount -= orig_shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(orig_shift);
 
 		*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
 		m_c_flag = (src >> ((shift - 1) & 15)) << 8;
@@ -6670,7 +6711,7 @@ e0b8 f1f8 ror      l .          01234fc:8 7:13
 	u32 res = ROR_32(src, shift);
 
 	if(orig_shift != 0) {
-		m_icount -= orig_shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(orig_shift);
 
 		*r_dst = res;
 		m_c_flag = (src >> ((shift - 1) & 31)) << 8;
@@ -6685,7 +6726,7 @@ e0b8 f1f8 ror      l .          01234fc:8 7:13
 	}
 
 
-e6c0 ffc0 ror      w A+-DXWL    01:8 7:14 234fc:7
+e6c0 ffc0 ror      w A+-DXWL    01:8 7:14 24fc:7 3:6
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 src = m68ki_read_16(ea);
 	u32 res = ROR_16(src, 1);
@@ -6698,7 +6739,7 @@ e6c0 ffc0 ror      w A+-DXWL    01:8 7:14 234fc:7
 	m_v_flag = VFLAG_CLEAR;
 
 
-e118 f1f8 rol      b .          01:6 7:13 234fc:8
+e118 f1f8 rol      b .          01:6 7:13 24fc:8 3:6
 	u32* r_dst = &DY();
 	u32 orig_shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 shift = orig_shift & 7;
@@ -6706,7 +6747,7 @@ e118 f1f8 rol      b .          01:6 7:13 234fc:8
 	u32 res = ROL_8(src, shift);
 
 	if(orig_shift != 0)
-		m_icount -= orig_shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(orig_shift);
 
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
 
@@ -6716,14 +6757,14 @@ e118 f1f8 rol      b .          01:6 7:13 234fc:8
 	m_v_flag = VFLAG_CLEAR;
 
 
-e158 f1f8 rol      w .          01:6 7:13 234fc:8
+e158 f1f8 rol      w .          01:6 7:13 24fc:8 3:6
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 src = MASK_OUT_ABOVE_16(*r_dst);
 	u32 res = ROL_16(src, shift);
 
 	if(shift != 0)
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
 
@@ -6733,14 +6774,14 @@ e158 f1f8 rol      w .          01:6 7:13 234fc:8
 	m_v_flag = VFLAG_CLEAR;
 
 
-e198 f1f8 rol      l .          01234fc:8 7:13
+e198 f1f8 rol      l .          0124fc:8 3:6 7:13
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u64 src = *r_dst;
 	u32 res = ROL_32(src, shift);
 
 	if(shift != 0)
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 	*r_dst = res;
 
@@ -6758,7 +6799,7 @@ e138 f1f8 rol      b .          01:6 7:13 234fc:8
 	u32 res = ROL_8(src, shift);
 
 	if(orig_shift != 0) {
-		m_icount -= orig_shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(orig_shift);
 
 		if(shift != 0) {
 			*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
@@ -6788,7 +6829,7 @@ e178 f1f8 rol      w .          01:6 7:13 234fc:8
 	u32 res = MASK_OUT_ABOVE_16(ROL_16(src, shift));
 
 	if(orig_shift != 0) {
-		m_icount -= orig_shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(orig_shift);
 
 		if(shift != 0) {
 			*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
@@ -6818,7 +6859,7 @@ e1b8 f1f8 rol      l .          01234fc:8 7:13
 	u32 res = ROL_32(src, shift);
 
 	if(orig_shift != 0) {
-		m_icount -= orig_shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(orig_shift);
 
 		*r_dst = res;
 
@@ -6834,7 +6875,7 @@ e1b8 f1f8 rol      l .          01234fc:8 7:13
 	}
 
 
-e7c0 ffc0 rol      w A+-DXWL    01:8 7:14 234fc:7
+e7c0 ffc0 rol      w A+-DXWL    01:8 7:14 24fc:7 3:6
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 src = m68ki_read_16(ea);
 	u32 res = MASK_OUT_ABOVE_16(ROL_16(src, 1));
@@ -6854,7 +6895,7 @@ e010 f1f8 roxr     b .          01:6 7:13 234fc:12
 	u32 res = ROR_9(src | (XFLAG_1() << 8), shift);
 
 	if(shift != 0)
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 	m_c_flag = m_x_flag = res;
 	res = MASK_OUT_ABOVE_8(res);
@@ -6873,7 +6914,7 @@ e050 f1f8 roxr     w .          01:6 7:13 234fc:12
 	u32 res = ROR_17(src | (XFLAG_1() << 16), shift);
 
 	if(shift != 0)
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 	m_c_flag = m_x_flag = res >> 8;
 	res = MASK_OUT_ABOVE_16(res);
@@ -6892,7 +6933,7 @@ e090 f1f8 roxr     l .          01:8 7:13 234fc:12
 	u64 res   = src | (((u64)XFLAG_1()) << 32);
 
 	if(shift != 0)
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 	res = ROR_33_64(res, shift);
 
@@ -6915,7 +6956,7 @@ e030 f1f8 roxr     b .          01:6 7:13 234fc:12
 		u32 src   = MASK_OUT_ABOVE_8(*r_dst);
 		u32 res   = ROR_9(src | (XFLAG_1() << 8), shift);
 
-		m_icount -= orig_shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(orig_shift);
 
 		m_c_flag = m_x_flag = res;
 		res = MASK_OUT_ABOVE_8(res);
@@ -6942,7 +6983,7 @@ e070 f1f8 roxr     w .          01:6 7:13 234fc:12
 		u32 src   = MASK_OUT_ABOVE_16(*r_dst);
 		u32 res   = ROR_17(src | (XFLAG_1() << 16), shift);
 
-		m_icount -= orig_shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(orig_shift);
 
 		m_c_flag = m_x_flag = res >> 8;
 		res = MASK_OUT_ABOVE_16(res);
@@ -6970,7 +7011,7 @@ e0b0 f1f8 roxr     l .          01:8 7:13 234fc:12
 
 		res = ROR_33_64(res, shift);
 
-		m_icount -= orig_shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(orig_shift);
 
 		m_c_flag = m_x_flag = res >> 24;
 		res = MASK_OUT_ABOVE_32(res);
@@ -6987,7 +7028,7 @@ e0b0 f1f8 roxr     l .          01:8 7:13 234fc:12
 	}
 
 
-e4c0 ffc0 roxr     w A+-DXWL    01:8 7:14 234fc:5
+e4c0 ffc0 roxr     w A+-DXWL    01:8 7:14 24fc:5 3:4
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 src = m68ki_read_16(ea);
 	u32 res = ROR_17(src | (XFLAG_1() << 16), 1);
@@ -7009,7 +7050,7 @@ e110 f1f8 roxl     b .          01:6 7:13 234fc:12
 	u32 res = ROL_9(src | (XFLAG_1() << 8), shift);
 
 	if(shift != 0)
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 	m_c_flag = m_x_flag = res;
 	res = MASK_OUT_ABOVE_8(res);
@@ -7028,7 +7069,7 @@ e150 f1f8 roxl     w .          01:6 7:13 234fc:12
 	u32 res = ROL_17(src | (XFLAG_1() << 16), shift);
 
 	if(shift != 0)
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 	m_c_flag = m_x_flag = res >> 8;
 	res = MASK_OUT_ABOVE_16(res);
@@ -7047,7 +7088,7 @@ e190 f1f8 roxl     l .          01:8 7:13 234fc:12
 	u64 res   = src | (((u64)XFLAG_1()) << 32);
 
 	if(shift != 0)
-		m_icount -= shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(shift);
 
 	res = ROL_33_64(res, shift);
 
@@ -7071,7 +7112,7 @@ e130 f1f8 roxl     b .          01:6 7:13 234fc:12
 		u32 src   = MASK_OUT_ABOVE_8(*r_dst);
 		u32 res   = ROL_9(src | (XFLAG_1() << 8), shift);
 
-		m_icount -= orig_shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(orig_shift);
 
 		m_c_flag = m_x_flag = res;
 		res = MASK_OUT_ABOVE_8(res);
@@ -7097,7 +7138,7 @@ e170 f1f8 roxl     w .          01:6 7:13 234fc:12
 		u32 src   = MASK_OUT_ABOVE_16(*r_dst);
 		u32 res   = ROL_17(src | (XFLAG_1() << 16), shift);
 
-		m_icount -= orig_shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(orig_shift);
 
 		m_c_flag = m_x_flag = res >> 8;
 		res = MASK_OUT_ABOVE_16(res);
@@ -7125,7 +7166,7 @@ e1b0 f1f8 roxl     l .          01:8 7:13 234fc:12
 
 		res = ROL_33_64(res, shift);
 
-		m_icount -= orig_shift * m_cyc_shift;
+		m_icount -= m68ki_shift_cycles(orig_shift);
 
 		m_c_flag = m_x_flag = res >> 24;
 		res = MASK_OUT_ABOVE_32(res);
@@ -7142,7 +7183,7 @@ e1b0 f1f8 roxl     l .          01:8 7:13 234fc:12
 	}
 
 
-e5c0 ffc0 roxl     w A+-DXWL    01:8 7:14 234fc:5
+e5c0 ffc0 roxl     w A+-DXWL    01:8 7:14 24fc:5 3:4
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 src = m68ki_read_16(ea);
 	u32 res = ROL_17(src | (XFLAG_1() << 16), 1);
@@ -8417,5 +8458,4 @@ f400 ff20 cinv     l .          4:16
 
 f420 ff20 cpush    l .          4:16
 	//logerror("%s at %08x: called unimplemented instruction %04x (cpush)\n", tag(), m_ppc, m_ir);
-
 

@@ -32,7 +32,7 @@
 #include "speaker.h"
 #include "screen.h"
 
-#include "formats/dsk_dsk.h"
+//#include "formats/dsk_dsk.h"
 #include "formats/msx_dsk.h"
 //#include "formats/p6001_cas.h"
 
@@ -45,6 +45,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_ram(*this, "ram")
 		, m_ppi(*this, "ppi8255")
+		, m_gfx_view(*this, "gfx_view")
 		, m_screen(*this, "screen")
 		, m_joy(*this, "joy%u", 1U)
 		, m_joymux(*this, "joymux")
@@ -57,7 +58,6 @@ public:
 		, m_region_gfx1(*this, "gfx1")
 		, m_io_mode4_dsw(*this, "MODE4_DSW")
 		, m_kbd(*this, "kbd")
-		, m_cart_bank(*this, "cart_bank")
 		, m_palette(*this, "palette")
 		, m_cas_maxsize(0)
 	{ }
@@ -92,6 +92,7 @@ protected:
 	required_device<z80_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<i8255_device> m_ppi;
+	memory_view m_gfx_view;
 	required_device<screen_device> m_screen;
 	required_device_array<msx_general_purpose_port_device, 2> m_joy;
 	required_device<ls157_x2_device> m_joymux;
@@ -104,7 +105,6 @@ protected:
 	required_memory_region m_region_gfx1;
 	required_ioport m_io_mode4_dsw;
 	required_device<pc6001_kbd_device> m_kbd;
-	optional_device<address_map_bank_device> m_cart_bank;
 	required_device<palette_device> m_palette;
 
 	uint8_t m_timer_irq_vector = 0;
@@ -163,8 +163,6 @@ protected:
 	uint8_t m_cur_keycode = 0;
 	uint8_t m_centronics_busy = 0;
 
-	void cart_map(address_map &map);
-
 private:
 	uint8_t m_joystick_out = 0xff;
 
@@ -207,7 +205,6 @@ public:
 	pc6001mk2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc6001_state(mconfig, type, tag)
 		, m_mk2_bank(*this, "mk2_bank_%u", 0U)
-		, m_gfx_view(*this, "gfx_view")
 		, m_basic_rom(*this, "basic_rom")
 		, m_tv_rom(*this, "tv_rom")
 		, m_voice_rom(*this, "voice_rom")
@@ -225,7 +222,6 @@ public:
 	void mk2_work_ram1_w(offs_t offset, uint8_t data);
 	void mk2_work_ram2_w(offs_t offset, uint8_t data);
 	void mk2_work_ram3_w(offs_t offset, uint8_t data);
-	void necmk2_ppi8255_w(offs_t offset, uint8_t data);
 	void mk2_system_latch_w(uint8_t data);
 	void mk2_vram_bank_w(uint8_t data);
 	void mk2_col_bank_w(uint8_t data);
@@ -243,7 +239,6 @@ protected:
 	void pc6001mk2_io(address_map &map) ATTR_COLD;
 
 	optional_device_array<address_map_bank_device, 4> m_mk2_bank;
-	memory_view m_gfx_view;
 
 	required_memory_region m_basic_rom;
 	required_memory_region m_tv_rom;

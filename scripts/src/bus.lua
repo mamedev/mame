@@ -4935,6 +4935,8 @@ if BUSES["RS232"] then
 		MAME_DIR .. "src/devices/bus/rs232/rs232.h",
 		MAME_DIR .. "src/devices/bus/rs232/rs232_sync_io.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/rs232_sync_io.h",
+		MAME_DIR .. "src/devices/bus/rs232/s97801.cpp",
+		MAME_DIR .. "src/devices/bus/rs232/s97801.h",
 		MAME_DIR .. "src/devices/bus/rs232/scorpion.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/scorpion.h",
 		MAME_DIR .. "src/devices/bus/rs232/sun_kbd.cpp",
