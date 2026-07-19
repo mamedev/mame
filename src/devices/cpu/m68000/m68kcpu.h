@@ -1628,6 +1628,24 @@ inline void m68ki_exception_1111()
 	m_icount -= m_cyc_exception[EXCEPTION_1111] - m_cyc_instruction[m_ir];
 }
 
+// Helper for unimplemented coprocessor instructions
+inline void m68ki_cp_unimplemented(const char *name)
+{
+	const int cpid = (m_ir >> 9) & 7;
+
+	if ((cpid == 0 && m_has_pmmu) || (cpid == 1 && m_has_fpu))
+	{
+		logerror("%s at %08x: called unimplemented instruction %04x (%s)\n",
+				tag(), m_ppc, m_ir, name);
+	}
+	else
+	{
+		logerror("%s at %08x: coprocessor %d not present (%s %04x)\n",
+				tag(), m_ppc, cpid, name, m_ir);
+		m68ki_exception_1111();
+	}
+}
+
 /* Exception for illegal instructions */
 inline void m68ki_exception_illegal()
 {

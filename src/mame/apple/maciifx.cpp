@@ -139,6 +139,8 @@ void maciifx_state::machine_start()
 	save_item(NAME(m_last_taken_interrupt));
 	save_item(NAME(m_adb_in));
 
+	m_scsidma->set_ram_base(m_ram->pointer());
+
 	m_6015_timer = timer_alloc(FUNC(maciifx_state::oss_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
 

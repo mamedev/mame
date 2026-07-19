@@ -5866,13 +5866,20 @@ void m68000_musashi_device::xecd0_bfclr_l_ai_234fc()
 	mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
 	mask_long = mask_base >> offset;
 
-	data_long = m68ki_read_32(ea);
+	data_long = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	m_n_flag = NFLAG_32(data_long << offset);
 	m_not_z_flag = data_long & mask_long;
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	m68ki_write_32(ea, data_long & ~mask_long);
+	if((width + offset) <= 8) {
+		m68ki_write_8(ea, (data_long & ~mask_long) >> 24);
+	} else if((width + offset) <= 16) {
+		m68ki_write_16(ea, (data_long & ~mask_long) >> 16);
+	} else {
+		m68ki_write_32(ea, data_long & ~mask_long);
+	}
 
 	if((width + offset) > 32) {
 		mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
@@ -5912,13 +5919,20 @@ void m68000_musashi_device::xece8_bfclr_l_di_234fc()
 	mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
 	mask_long = mask_base >> offset;
 
-	data_long = m68ki_read_32(ea);
+	data_long = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	m_n_flag = NFLAG_32(data_long << offset);
 	m_not_z_flag = data_long & mask_long;
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	m68ki_write_32(ea, data_long & ~mask_long);
+	if((width + offset) <= 8) {
+		m68ki_write_8(ea, (data_long & ~mask_long) >> 24);
+	} else if((width + offset) <= 16) {
+		m68ki_write_16(ea, (data_long & ~mask_long) >> 16);
+	} else {
+		m68ki_write_32(ea, data_long & ~mask_long);
+	}
 
 	if((width + offset) > 32) {
 		mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
@@ -5958,13 +5972,20 @@ void m68000_musashi_device::xecf0_bfclr_l_ix_234fc()
 	mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
 	mask_long = mask_base >> offset;
 
-	data_long = m68ki_read_32(ea);
+	data_long = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	m_n_flag = NFLAG_32(data_long << offset);
 	m_not_z_flag = data_long & mask_long;
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	m68ki_write_32(ea, data_long & ~mask_long);
+	if((width + offset) <= 8) {
+		m68ki_write_8(ea, (data_long & ~mask_long) >> 24);
+	} else if((width + offset) <= 16) {
+		m68ki_write_16(ea, (data_long & ~mask_long) >> 16);
+	} else {
+		m68ki_write_32(ea, data_long & ~mask_long);
+	}
 
 	if((width + offset) > 32) {
 		mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
@@ -6004,13 +6025,20 @@ void m68000_musashi_device::xecf8_bfclr_l_aw_234fc()
 	mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
 	mask_long = mask_base >> offset;
 
-	data_long = m68ki_read_32(ea);
+	data_long = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	m_n_flag = NFLAG_32(data_long << offset);
 	m_not_z_flag = data_long & mask_long;
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	m68ki_write_32(ea, data_long & ~mask_long);
+	if((width + offset) <= 8) {
+		m68ki_write_8(ea, (data_long & ~mask_long) >> 24);
+	} else if((width + offset) <= 16) {
+		m68ki_write_16(ea, (data_long & ~mask_long) >> 16);
+	} else {
+		m68ki_write_32(ea, data_long & ~mask_long);
+	}
 
 	if((width + offset) > 32) {
 		mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
@@ -6050,13 +6078,20 @@ void m68000_musashi_device::xecf9_bfclr_l_al_234fc()
 	mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
 	mask_long = mask_base >> offset;
 
-	data_long = m68ki_read_32(ea);
+	data_long = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	m_n_flag = NFLAG_32(data_long << offset);
 	m_not_z_flag = data_long & mask_long;
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	m68ki_write_32(ea, data_long & ~mask_long);
+	if((width + offset) <= 8) {
+		m68ki_write_8(ea, (data_long & ~mask_long) >> 24);
+	} else if((width + offset) <= 16) {
+		m68ki_write_16(ea, (data_long & ~mask_long) >> 16);
+	} else {
+		m68ki_write_32(ea, data_long & ~mask_long);
+	}
 
 	if((width + offset) > 32) {
 		mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
@@ -6118,8 +6153,8 @@ void m68000_musashi_device::xebd0_bfexts_l_ai_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) < 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 
 	data = MASK_OUT_ABOVE_32(data<<offset);
 
@@ -6161,8 +6196,8 @@ void m68000_musashi_device::xebe8_bfexts_l_di_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) < 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 
 	data = MASK_OUT_ABOVE_32(data<<offset);
 
@@ -6204,8 +6239,8 @@ void m68000_musashi_device::xebf0_bfexts_l_ix_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) < 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 
 	data = MASK_OUT_ABOVE_32(data<<offset);
 
@@ -6247,8 +6282,8 @@ void m68000_musashi_device::xebf8_bfexts_l_aw_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) < 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 
 	data = MASK_OUT_ABOVE_32(data<<offset);
 
@@ -6290,8 +6325,8 @@ void m68000_musashi_device::xebf9_bfexts_l_al_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) < 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 
 	data = MASK_OUT_ABOVE_32(data<<offset);
 
@@ -6333,8 +6368,8 @@ void m68000_musashi_device::xebfa_bfexts_l_pcdi_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) < 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 
 	data = MASK_OUT_ABOVE_32(data<<offset);
 
@@ -6376,8 +6411,8 @@ void m68000_musashi_device::xebfb_bfexts_l_pcix_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) < 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 
 	data = MASK_OUT_ABOVE_32(data<<offset);
 
@@ -6446,8 +6481,8 @@ void m68000_musashi_device::xe9d0_bfextu_l_ai_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) < 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<offset);
 
 	if((offset+width) > 32)
@@ -6488,8 +6523,8 @@ void m68000_musashi_device::xe9e8_bfextu_l_di_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) < 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<offset);
 
 	if((offset+width) > 32)
@@ -6530,8 +6565,8 @@ void m68000_musashi_device::xe9f0_bfextu_l_ix_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) < 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<offset);
 
 	if((offset+width) > 32)
@@ -6572,8 +6607,8 @@ void m68000_musashi_device::xe9f8_bfextu_l_aw_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) < 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<offset);
 
 	if((offset+width) > 32)
@@ -6614,8 +6649,8 @@ void m68000_musashi_device::xe9f9_bfextu_l_al_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) < 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<offset);
 
 	if((offset+width) > 32)
@@ -6656,8 +6691,8 @@ void m68000_musashi_device::xe9fa_bfextu_l_pcdi_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) < 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<offset);
 
 	if((offset+width) > 32)
@@ -6698,8 +6733,8 @@ void m68000_musashi_device::xe9fb_bfextu_l_pcix_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) < 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<offset);
 
 	if((offset+width) > 32)
@@ -6771,7 +6806,8 @@ void m68000_musashi_device::xedd0_bfffo_l_ai_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 	if((local_offset+width) > 32)
@@ -6815,7 +6851,8 @@ void m68000_musashi_device::xede8_bfffo_l_di_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 	if((local_offset+width) > 32)
@@ -6859,7 +6896,8 @@ void m68000_musashi_device::xedf0_bfffo_l_ix_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 	if((local_offset+width) > 32)
@@ -6903,7 +6941,8 @@ void m68000_musashi_device::xedf8_bfffo_l_aw_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 	if((local_offset+width) > 32)
@@ -6947,7 +6986,8 @@ void m68000_musashi_device::xedf9_bfffo_l_al_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 	if((local_offset+width) > 32)
@@ -6991,7 +7031,8 @@ void m68000_musashi_device::xedfa_bfffo_l_pcdi_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 	if((local_offset+width) > 32)
@@ -7035,7 +7076,8 @@ void m68000_musashi_device::xedfb_bfffo_l_pcix_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 	if((local_offset+width) > 32)
@@ -7127,14 +7169,14 @@ void m68000_musashi_device::xefd0_bfins_l_ai_234fc()
 	m_not_z_flag = insert_base;
 	insert_long = insert_base >> offset;
 
-	data_long = (offset+width) < 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data_long = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	if((width + offset) < 8) {
+	if((width + offset) <= 8) {
 		m68ki_write_8(ea, ((data_long & ~mask_long) | insert_long) >> 24);
-	} else if((width + offset) < 16) {
+	} else if((width + offset) <= 16) {
 		m68ki_write_16(ea, ((data_long & ~mask_long) | insert_long) >> 16);
 	} else {
 		m68ki_write_32(ea, (data_long & ~mask_long) | insert_long);
@@ -7189,14 +7231,14 @@ void m68000_musashi_device::xefe8_bfins_l_di_234fc()
 	m_not_z_flag = insert_base;
 	insert_long = insert_base >> offset;
 
-	data_long = (offset+width) < 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data_long = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	if((width + offset) < 8) {
+	if((width + offset) <= 8) {
 		m68ki_write_8(ea, ((data_long & ~mask_long) | insert_long) >> 24);
-	} else if((width + offset) < 16) {
+	} else if((width + offset) <= 16) {
 		m68ki_write_16(ea, ((data_long & ~mask_long) | insert_long) >> 16);
 	} else {
 		m68ki_write_32(ea, (data_long & ~mask_long) | insert_long);
@@ -7251,14 +7293,14 @@ void m68000_musashi_device::xeff0_bfins_l_ix_234fc()
 	m_not_z_flag = insert_base;
 	insert_long = insert_base >> offset;
 
-	data_long = (offset+width) < 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data_long = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	if((width + offset) < 8) {
+	if((width + offset) <= 8) {
 		m68ki_write_8(ea, ((data_long & ~mask_long) | insert_long) >> 24);
-	} else if((width + offset) < 16) {
+	} else if((width + offset) <= 16) {
 		m68ki_write_16(ea, ((data_long & ~mask_long) | insert_long) >> 16);
 	} else {
 		m68ki_write_32(ea, (data_long & ~mask_long) | insert_long);
@@ -7313,14 +7355,14 @@ void m68000_musashi_device::xeff8_bfins_l_aw_234fc()
 	m_not_z_flag = insert_base;
 	insert_long = insert_base >> offset;
 
-	data_long = (offset+width) < 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data_long = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	if((width + offset) < 8) {
+	if((width + offset) <= 8) {
 		m68ki_write_8(ea, ((data_long & ~mask_long) | insert_long) >> 24);
-	} else if((width + offset) < 16) {
+	} else if((width + offset) <= 16) {
 		m68ki_write_16(ea, ((data_long & ~mask_long) | insert_long) >> 16);
 	} else {
 		m68ki_write_32(ea, (data_long & ~mask_long) | insert_long);
@@ -7375,14 +7417,14 @@ void m68000_musashi_device::xeff9_bfins_l_al_234fc()
 	m_not_z_flag = insert_base;
 	insert_long = insert_base >> offset;
 
-	data_long = (offset+width) < 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data_long = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	if((width + offset) < 8) {
+	if((width + offset) <= 8) {
 		m68ki_write_8(ea, ((data_long & ~mask_long) | insert_long) >> 24);
-	} else if((width + offset) < 16) {
+	} else if((width + offset) <= 16) {
 		m68ki_write_16(ea, ((data_long & ~mask_long) | insert_long) >> 16);
 	} else {
 		m68ki_write_32(ea, (data_long & ~mask_long) | insert_long);
@@ -7455,13 +7497,20 @@ void m68000_musashi_device::xeed0_bfset_l_ai_234fc()
 	mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
 	mask_long = mask_base >> offset;
 
-	data_long = m68ki_read_32(ea);
+	data_long = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	m_n_flag = NFLAG_32(data_long << offset);
 	m_not_z_flag = data_long & mask_long;
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	m68ki_write_32(ea, data_long | mask_long);
+	if((width + offset) <= 8) {
+		m68ki_write_8(ea, (data_long | mask_long) >> 24);
+	} else if((width + offset) <= 16) {
+		m68ki_write_16(ea, (data_long | mask_long) >> 16);
+	} else {
+		m68ki_write_32(ea, data_long | mask_long);
+	}
 
 	if((width + offset) > 32) {
 		mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
@@ -7501,13 +7550,20 @@ void m68000_musashi_device::xeee8_bfset_l_di_234fc()
 	mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
 	mask_long = mask_base >> offset;
 
-	data_long = m68ki_read_32(ea);
+	data_long = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	m_n_flag = NFLAG_32(data_long << offset);
 	m_not_z_flag = data_long & mask_long;
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	m68ki_write_32(ea, data_long | mask_long);
+	if((width + offset) <= 8) {
+		m68ki_write_8(ea, (data_long | mask_long) >> 24);
+	} else if((width + offset) <= 16) {
+		m68ki_write_16(ea, (data_long | mask_long) >> 16);
+	} else {
+		m68ki_write_32(ea, data_long | mask_long);
+	}
 
 	if((width + offset) > 32) {
 		mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
@@ -7547,13 +7603,20 @@ void m68000_musashi_device::xeef0_bfset_l_ix_234fc()
 	mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
 	mask_long = mask_base >> offset;
 
-	data_long = m68ki_read_32(ea);
+	data_long = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	m_n_flag = NFLAG_32(data_long << offset);
 	m_not_z_flag = data_long & mask_long;
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	m68ki_write_32(ea, data_long | mask_long);
+	if((width + offset) <= 8) {
+		m68ki_write_8(ea, (data_long | mask_long) >> 24);
+	} else if((width + offset) <= 16) {
+		m68ki_write_16(ea, (data_long | mask_long) >> 16);
+	} else {
+		m68ki_write_32(ea, data_long | mask_long);
+	}
 
 	if((width + offset) > 32) {
 		mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
@@ -7593,13 +7656,20 @@ void m68000_musashi_device::xeef8_bfset_l_aw_234fc()
 	mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
 	mask_long = mask_base >> offset;
 
-	data_long = m68ki_read_32(ea);
+	data_long = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	m_n_flag = NFLAG_32(data_long << offset);
 	m_not_z_flag = data_long & mask_long;
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	m68ki_write_32(ea, data_long | mask_long);
+	if((width + offset) <= 8) {
+		m68ki_write_8(ea, (data_long | mask_long) >> 24);
+	} else if((width + offset) <= 16) {
+		m68ki_write_16(ea, (data_long | mask_long) >> 16);
+	} else {
+		m68ki_write_32(ea, data_long | mask_long);
+	}
 
 	if((width + offset) > 32) {
 		mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
@@ -7639,13 +7709,20 @@ void m68000_musashi_device::xeef9_bfset_l_al_234fc()
 	mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
 	mask_long = mask_base >> offset;
 
-	data_long = m68ki_read_32(ea);
+	data_long = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	m_n_flag = NFLAG_32(data_long << offset);
 	m_not_z_flag = data_long & mask_long;
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	m68ki_write_32(ea, data_long | mask_long);
+	if((width + offset) <= 8) {
+		m68ki_write_8(ea, (data_long | mask_long) >> 24);
+	} else if((width + offset) <= 16) {
+		m68ki_write_16(ea, (data_long | mask_long) >> 16);
+	} else {
+		m68ki_write_32(ea, data_long | mask_long);
+	}
 
 	if((width + offset) > 32) {
 		mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
@@ -12007,41 +12084,31 @@ void m68000_musashi_device::xb188_cmpm_l_071234fc()
 }
 void m68000_musashi_device::xf080_cpbcc_l_23()
 {
-	logerror("%s at %08x: called unimplemented instruction %04x (cpbcc)\n",
-					tag(), m_ppc, m_ir);
+	m68ki_cp_unimplemented("cpbcc");
 
 
 }
 void m68000_musashi_device::xf048_cpdbcc_l_23()
 {
-	logerror("%s at %08x: called unimplemented instruction %04x (cpdbcc)\n",
-					tag(), m_ppc, m_ir);
+	m68ki_cp_unimplemented("cpdbcc");
 
 
 }
 void m68000_musashi_device::xf000_cpgen_l_23()
 {
-	if(m_has_fpu || m_has_pmmu)
-	{
-		logerror("%s at %08x: called unimplemented instruction %04x (cpgen)\n",
-						tag(), m_ppc, m_ir);
-	} else {
-		m68ki_exception_1111();
-	}
+	m68ki_cp_unimplemented("cpgen");
 
 
 }
 void m68000_musashi_device::xf040_cpscc_l_23()
 {
-	logerror("%s at %08x: called unimplemented instruction %04x (cpscc)\n",
-					tag(), m_ppc, m_ir);
+	m68ki_cp_unimplemented("cpscc");
 
 
 }
 void m68000_musashi_device::xf078_cptrapcc_l_23()
 {
-	logerror("%s at %08x: called unimplemented instruction %04x (cptrapcc)\n",
-					tag(), m_ppc, m_ir);
+	m68ki_cp_unimplemented("cptrapcc");
 
 
 }

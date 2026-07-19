@@ -1613,13 +1613,20 @@ ecc0 ffc0 bfclr    l ADXWL      234fc:20
 	mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
 	mask_long = mask_base >> offset;
 
-	data_long = m68ki_read_32(ea);
+	data_long = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	m_n_flag = NFLAG_32(data_long << offset);
 	m_not_z_flag = data_long & mask_long;
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	m68ki_write_32(ea, data_long & ~mask_long);
+	if((width + offset) <= 8) {
+		m68ki_write_8(ea, (data_long & ~mask_long) >> 24);
+	} else if((width + offset) <= 16) {
+		m68ki_write_16(ea, (data_long & ~mask_long) >> 16);
+	} else {
+		m68ki_write_32(ea, data_long & ~mask_long);
+	}
 
 	if((width + offset) > 32) {
 		mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
@@ -1677,8 +1684,8 @@ ebc0 ffc0 bfexts   l ADXWLdx    234fc:15
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) < 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 
 	data = MASK_OUT_ABOVE_32(data<<offset);
 
@@ -1743,8 +1750,8 @@ e9c0 ffc0 bfextu   l ADXWLdx    234fc:15
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) < 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<offset);
 
 	if((offset+width) > 32)
@@ -1812,7 +1819,8 @@ edc0 ffc0 bfffo    l ADXWLdx    234fc:28
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 	if((local_offset+width) > 32)
@@ -1900,14 +1908,14 @@ efc0 ffc0 bfins    l ADXWL      234fc:17
 	m_not_z_flag = insert_base;
 	insert_long = insert_base >> offset;
 
-	data_long = (offset+width) < 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data_long = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	if((width + offset) < 8) {
+	if((width + offset) <= 8) {
 		m68ki_write_8(ea, ((data_long & ~mask_long) | insert_long) >> 24);
-	} else if((width + offset) < 16) {
+	} else if((width + offset) <= 16) {
 		m68ki_write_16(ea, ((data_long & ~mask_long) | insert_long) >> 16);
 	} else {
 		m68ki_write_32(ea, (data_long & ~mask_long) | insert_long);
@@ -1976,13 +1984,20 @@ eec0 ffc0 bfset    l ADXWL      234fc:20
 	mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
 	mask_long = mask_base >> offset;
 
-	data_long = m68ki_read_32(ea);
+	data_long = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	m_n_flag = NFLAG_32(data_long << offset);
 	m_not_z_flag = data_long & mask_long;
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	m68ki_write_32(ea, data_long | mask_long);
+	if((width + offset) <= 8) {
+		m68ki_write_8(ea, (data_long | mask_long) >> 24);
+	} else if((width + offset) <= 16) {
+		m68ki_write_16(ea, (data_long | mask_long) >> 16);
+	} else {
+		m68ki_write_32(ea, data_long | mask_long);
+	}
 
 	if((width + offset) > 32) {
 		mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
@@ -3035,33 +3050,23 @@ b188 f1f8 cmpm     l .          01:20 7:26 234fc:9
 
 
 f080 f180 cpbcc    l .          23:4
-	logerror("%s at %08x: called unimplemented instruction %04x (cpbcc)\n",
-					tag(), m_ppc, m_ir);
+	m68ki_cp_unimplemented("cpbcc");
 
 
 f048 f1f8 cpdbcc   l .          23:4
-	logerror("%s at %08x: called unimplemented instruction %04x (cpdbcc)\n",
-					tag(), m_ppc, m_ir);
+	m68ki_cp_unimplemented("cpdbcc");
 
 
 f000 f1c0 cpgen    l .          23:4
-	if(m_has_fpu || m_has_pmmu)
-	{
-		logerror("%s at %08x: called unimplemented instruction %04x (cpgen)\n",
-						tag(), m_ppc, m_ir);
-	} else {
-		m68ki_exception_1111();
-	}
+	m68ki_cp_unimplemented("cpgen");
 
 
 f040 f1c0 cpscc    l .          23:4
-	logerror("%s at %08x: called unimplemented instruction %04x (cpscc)\n",
-					tag(), m_ppc, m_ir);
+	m68ki_cp_unimplemented("cpscc");
 
 
 f078 f1f8 cptrapcc l .          23:4
-	logerror("%s at %08x: called unimplemented instruction %04x (cptrapcc)\n",
-					tag(), m_ppc, m_ir);
+	m68ki_cp_unimplemented("cptrapcc");
 
 
 50c8 fff8 dbt      w .          01:12 7:14 234fc:6
