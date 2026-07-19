@@ -28,9 +28,6 @@
  dataeast/hvysmsh.cpp
 
  Heavy Smash (hvysmsh*)
-
- dataeast/wcvol95.cpp
-
  World Cup Volley '95 (wcvol95*)
 
  dataeast/backfire.cpp
