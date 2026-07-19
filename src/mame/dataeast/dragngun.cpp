@@ -184,7 +184,6 @@ protected:
 	void volume_w(u8 data);
 	void lc7535_volume_w(u8 data);
 	void speaker_switch_w(u32 data);
-	void vblank_ack_w(u32 data);
 	u32 lightgun_r();
 	void lightgun_w(offs_t offset, u32 data = 0);
 	void sprite_control_w(u32 data);
@@ -409,11 +408,6 @@ void dragngun_state::spriteram_dma_w(u32 data)
 	/* DMA spriteram to private sprite chip area, and clear cpu ram */
 	m_spriteram->copy();
 	memset(m_spriteram->live(), 0, 0x2000);
-}
-
-void dragngun_state::vblank_ack_w(u32 data)
-{
-	m_maincpu->set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
 }
 
 // tattass tests these as 32-bit ram, even if only 16-bits are hooked up to the tilemap chip - does it mirror parts of the dword?
