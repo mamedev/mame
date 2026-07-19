@@ -1,13 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 
-#include <glm/geometric.hpp>
-
 #include "emu.h"
-#include "cpu/mb86233/mb86233.h"
 #include "model1.h"
 
+#include "cpu/mb86233/mb86233.h"
+
 #include "corefloat.h"
+
+#include <glm/geometric.hpp>
 
 #define LOG_TGP (1U << 1)
 

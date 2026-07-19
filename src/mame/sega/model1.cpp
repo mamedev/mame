@@ -595,14 +595,17 @@ Notes:
 #include "emu.h"
 #include "model1.h"
 
-#include "cpu/i386/i386.h"
-#include "machine/clock.h"
 #include "model1io.h"
 #include "model1io2.h"
+
+#include "cpu/i386/i386.h"
+#include "machine/clock.h"
 #include "machine/nvram.h"
+
 #include "speaker.h"
 
 #include "model1io2.lh"
+
 
 // On the real system, another 315-5338A is acting as slave
 // and writes the data to the dual port RAM. This isn't
@@ -988,8 +991,8 @@ void model1_state::model1_mem(address_map &map)
 	/* RAMA */ map(0x400000, 0x40ffff).ram().share("nvram");
 	/* RAMB */ map(0x500000, 0x53ffff).ram();
 
-	/* TGP  */ map(0x600000, 0x60ffff).ram().share("display_list0");
-	/*      */ map(0x610000, 0x61ffff).ram().share("display_list1");
+	/* TGP  */ map(0x600000, 0x60ffff).ram().share(m_display_list0);
+	/*      */ map(0x610000, 0x61ffff).ram().share(m_display_list1);
 	/*      */ map(0x680000, 0x680003).rw(FUNC(model1_state::model1_listctl_r), FUNC(model1_state::model1_listctl_w));
 
 	/* SCR  */ map(0x700000, 0x70ffff).rw(m_tiles, FUNC(segas24_tile_device::tile_r), FUNC(segas24_tile_device::tile_w));
@@ -1001,8 +1004,8 @@ void model1_state::model1_mem(address_map &map)
 
 	/* OBJ  */
 
-	/* COL  */ map(0x900000, 0x903fff).ram().w(FUNC(model1_state::model1_paletteram_w)).share("palette");
-	/*      */ map(0x910000, 0x91bfff).ram().share("color_xlat");
+	/* COL  */ map(0x900000, 0x903fff).ram().w(FUNC(model1_state::model1_paletteram_w)).share(m_paletteram16);
+	/*      */ map(0x910000, 0x91bfff).ram().share(m_color_xlat);
 
 	/* EX0  */
 	/* EX1  */
@@ -1832,7 +1835,7 @@ void model1_state::model1(machine_config &config)
 	m_screen->set_screen_update(FUNC(model1_state::screen_update_model1));
 	m_screen->screen_vblank().set(FUNC(model1_state::screen_vblank_model1));
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 8192);
+	PALETTE(config, m_palette).set_entries(8192);
 
 	// create SEGA_MODEL1IO device *after* SCREEN device
 	model1io_device &ioboard(SEGA_MODEL1IO(config, "ioboard"));
@@ -1993,14 +1996,14 @@ void netmerc_state::netmerc(machine_config &config)
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT   MACHINE     INPUT       CLASS         INIT        ROTATION  COMPANY  FULLNAME                    FLAGS
-GAME( 1993, vf,         0,       vf,         vf,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Fighter",           MACHINE_NOT_WORKING )
-GAMEL(1992, vr,         0,       vr,         vr,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Racing",            0, layout_vr )
-GAME( 1993, vformula,   vr,      vformula,   vr,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Formula",           MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, swa,        0,       swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars (Sega, US)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
-GAME( 1994, swaj,       swa,     swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars (Sega, Japan)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
-GAME( 1994, wingwar,    0,       wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (World)",         0 )
-GAME( 1994, wingwaru,   wingwar, wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (US)",            0 )
-GAME( 1994, wingwarj,   wingwar, wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (Japan)",         0 )
-GAME( 1994, wingwar360, wingwar, wingwar360, wingwar360, model1_state, empty_init, ROT0,     "Sega",  "Wing War R360 (US)",       0 )
+//    YEAR  NAME        PARENT   MACHINE     INPUT       CLASS          INIT        ROTATION  COMPANY  FULLNAME                    FLAGS
+GAME( 1993, vf,         0,       vf,         vf,         model1_state,  empty_init, ROT0,     "Sega",  "Virtua Fighter",           MACHINE_NOT_WORKING )
+GAMEL(1992, vr,         0,       vr,         vr,         model1_state,  empty_init, ROT0,     "Sega",  "Virtua Racing",            0, layout_vr )
+GAME( 1993, vformula,   vr,      vformula,   vr,         model1_state,  empty_init, ROT0,     "Sega",  "Virtua Formula",           MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, swa,        0,       swa,        swa,        model1_state,  empty_init, ROT0,     "Sega",  "Star Wars (Sega, US)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1994, swaj,       swa,     swa,        swa,        model1_state,  empty_init, ROT0,     "Sega",  "Star Wars (Sega, Japan)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1994, wingwar,    0,       wingwar,    wingwar,    model1_state,  empty_init, ROT0,     "Sega",  "Wing War (World)",         0 )
+GAME( 1994, wingwaru,   wingwar, wingwar,    wingwar,    model1_state,  empty_init, ROT0,     "Sega",  "Wing War (US)",            0 )
+GAME( 1994, wingwarj,   wingwar, wingwar,    wingwar,    model1_state,  empty_init, ROT0,     "Sega",  "Wing War (Japan)",         0 )
+GAME( 1994, wingwar360, wingwar, wingwar360, wingwar360, model1_state,  empty_init, ROT0,     "Sega",  "Wing War R360 (US)",       0 )
 GAME( 1993, netmerc,    0,       netmerc,    netmerc,    netmerc_state, empty_init, ROT0,     "Sega",  "Sega NetMerc",             MACHINE_NOT_WORKING )

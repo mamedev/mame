@@ -5,10 +5,13 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
+#include "model1.h"
+
 #include "cpu/mb86233/mb86233.h"
 #include "cpu/v60/v60.h"
-#include "model1.h"
+
+#include "debugger.h"
+
 
 void model1_state::machine_start()
 {
