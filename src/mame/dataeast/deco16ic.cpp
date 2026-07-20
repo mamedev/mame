@@ -283,13 +283,12 @@ TILE_GET_INFO_MEMBER(deco16ic_device::get_tile_info)
 
 	if (BIT(tile, 15))
 	{
-		const u8 shift = Which << 3;
-		if (BIT(m_control[6], shift + 0))
+		if (BIT(m_tmap[Which].m_control1, 0))
 		{
 			flags |= TILE_FLIPX;
 			colour &= 0x7;
 		}
-		if (BIT(m_control[6], shift + 1))
+		if (BIT(m_tmap[Which].m_control1, 1))
 		{
 			flags |= TILE_FLIPY;
 			colour &= 0x7;
@@ -442,8 +441,7 @@ void deco16ic_device::set_transmask(int tmap, int group, u32 fgmask, u32 bgmask)
 void deco16ic_device::set_tilemap_colour_mask(int tmap, int mask)
 {
 	m_tmap[tmap].m_colour_mask = mask;
-	m_tmap[tmap].m_tilemap_16x16->mark_all_dirty();
-	m_tmap[tmap].m_tilemap_8x8->mark_all_dirty();
+	m_tmap[tmap].mark_both_all_dirty();
 }
 
 void deco16ic_device::set_tilemap_colour_bank(int tmap, int bank)
@@ -451,10 +449,7 @@ void deco16ic_device::set_tilemap_colour_bank(int tmap, int bank)
 	if (m_tmap[tmap].m_colour_bank != bank)
 	{
 		m_tmap[tmap].m_colour_bank = bank;
-		if (m_tmap[tmap].m_tilemap_16x16)
-			m_tmap[tmap].m_tilemap_16x16->mark_all_dirty();
-		if (m_tmap[tmap].m_tilemap_8x8)
-			m_tmap[tmap].m_tilemap_8x8->mark_all_dirty();
+		m_tmap[tmap].mark_both_all_dirty();
 	}
 }
 
@@ -495,9 +490,8 @@ void deco16ic_device::set_scrolldx(int tmap, int size, int dx, int dx_if_flipped
 /* cninjabl does not enable background layers */
 void deco16ic_device::set_enable(int tmap, int enable)
 {
-	int shift = (tmap & 1) ? 15 : 7;
-	m_control[5] &= ~(1 << shift);
-	m_control[5] |= (enable & 1) << shift;
+	m_tmap[tmap].m_control0 &= ~(1 << 7);
+	m_tmap[tmap].m_control0 |= (enable & 1) << 7;
 }
 
 
@@ -545,11 +539,28 @@ void deco16ic_device::control_w(offs_t offset, u16 data, u16 mem_mask)
 				m_tmap[1].m_control0 = (data >> 8) & 0xff;
 			break;
 		case 6:
+		{
+			u8 old_control1;
 			if (ACCESSING_BITS_0_7)
+			{
+				old_control1 = m_tmap[0].m_control1;
 				m_tmap[0].m_control1 = data & 0xff;
+				if ((old_control1 ^ m_tmap[0].m_control1) & 0x3)
+				{
+					m_tmap[0].mark_both_all_dirty();
+				}
+			}
 			if (ACCESSING_BITS_8_15)
+			{
+				old_control1 = m_tmap[1].m_control1;
 				m_tmap[1].m_control1 = (data >> 8) & 0xff;
+				if ((old_control1 ^ m_tmap[1].m_control1) & 0x3)
+				{
+					m_tmap[1].mark_both_all_dirty();
+				}
+			}
 			break;
+		}
 		case 7:
 			if (ACCESSING_BITS_0_7)
 				m_tmap[0].m_bankval = data & 0xff;
@@ -725,10 +736,7 @@ void deco16ic_device::deco16_tmap::update()
 
 		if (bank != m_bank)
 		{
-			if (m_tilemap_8x8)
-				m_tilemap_8x8->mark_all_dirty();
-			if (m_tilemap_16x16)
-				m_tilemap_16x16->mark_all_dirty();
+			mark_both_all_dirty();
 
 			m_bank = bank;
 		}
@@ -759,8 +767,8 @@ void deco16ic_device::print_debug_info(bitmap_ind16 &bitmap)
 
     if (m_control)
     {
-        sprintf(buf,"%04X %04X %04X %04X\n", m_control[0], m_control[1], m_control[2], m_control[3]);
-        sprintf(&buf[strlen(buf)],"%04X %04X %04X %04X\n", m_control[4], m_control[5], m_control[6], m_control[7]);
+        sprintf(buf,"%04X %04X %04X %04X\n", m_control[0], m_tmap[0].m_scrollx, m_tmap[0].m_scrolly, m_tmap[1].m_scrollx);
+        sprintf(&buf[strlen(buf)],"%04X %04X %04X %04X\n", m_tmap[1].m_scrolly, m_control[5], m_control[6], m_control[7]);
     }
     else
         sprintf(buf, "\n\n");
@@ -775,7 +783,14 @@ void deco16ic_device::tilemap_1_draw_common(screen_device &screen, BitmapClass &
 {
 	if (m_tmap[0].m_use_custom_pf)
 	{
-		custom_tilemap_draw(screen, bitmap, cliprect, m_tmap[0].m_tilemap_8x8, m_tmap[0].m_tilemap_16x16, nullptr, nullptr, m_tmap[0].m_rowscroll_ptr, m_control[1], m_control[2], m_control[5] & 0xff, m_control[6] & 0xff, 0, 0, flags, priority, pmask);
+		custom_tilemap_draw(screen, bitmap, cliprect,
+				m_tmap[0].m_tilemap_8x8, m_tmap[0].m_tilemap_16x16,
+				nullptr, nullptr,
+				m_tmap[0].m_rowscroll_ptr,
+				m_tmap[0].m_scrollx, m_tmap[0].m_scrolly,
+				m_tmap[0].m_control0, m_tmap[0].m_control1,
+				0, 0,
+				flags, priority, pmask);
 	}
 	else
 	{
@@ -798,7 +813,14 @@ void deco16ic_device::tilemap_2_draw_common(screen_device &screen, BitmapClass &
 {
 	if (m_tmap[1].m_use_custom_pf)
 	{
-		custom_tilemap_draw(screen, bitmap, cliprect, m_tmap[1].m_tilemap_8x8, m_tmap[1].m_tilemap_16x16, nullptr, nullptr, m_tmap[1].m_rowscroll_ptr, m_control[3], m_control[4], m_control[5] >> 8, m_control[6] >> 8, 0, 0, flags, priority, pmask);
+		custom_tilemap_draw(screen, bitmap, cliprect,
+				m_tmap[1].m_tilemap_8x8, m_tmap[1].m_tilemap_16x16,
+				nullptr, nullptr,
+				m_tmap[1].m_rowscroll_ptr,
+				m_tmap[1].m_scrollx, m_tmap[1].m_scrolly,
+				m_tmap[1].m_control0, m_tmap[1].m_control1,
+				0, 0,
+				flags, priority, pmask);
 	}
 	else
 	{
@@ -821,10 +843,24 @@ void deco16ic_device::tilemap_2_draw(screen_device &screen, bitmap_rgb32 &bitmap
 // Combines the output of two 4BPP tilemaps into an 8BPP tilemap
 void deco16ic_device::tilemap_12_combine_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask)
 {
-	custom_tilemap_draw(screen, bitmap, cliprect, nullptr, m_tmap[0].m_tilemap_16x16, nullptr, m_tmap[1].m_tilemap_16x16, m_tmap[0].m_rowscroll_ptr, m_control[1], m_control[2], m_control[5] & 0xff, m_control[6] & 0xff, 0xf, 4, flags, priority, pmask);
+	custom_tilemap_draw(screen, bitmap, cliprect,
+			nullptr, m_tmap[0].m_tilemap_16x16,
+			nullptr, m_tmap[1].m_tilemap_16x16,
+			m_tmap[0].m_rowscroll_ptr,
+			m_tmap[0].m_scrollx, m_tmap[0].m_scrolly,
+			m_tmap[0].m_control0, m_tmap[0].m_control1,
+			0xf, 4,
+			flags, priority, pmask);
 }
 
 void deco16ic_device::tilemap_12_combine_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask)
 {
-	custom_tilemap_draw(screen, bitmap, cliprect, nullptr, m_tmap[0].m_tilemap_16x16, nullptr, m_tmap[1].m_tilemap_16x16, m_tmap[0].m_rowscroll_ptr, m_control[1], m_control[2], m_control[5] & 0xff, m_control[6] & 0xff, 0xf, 4, flags, priority, pmask);
+	custom_tilemap_draw(screen, bitmap, cliprect,
+			nullptr, m_tmap[0].m_tilemap_16x16,
+			nullptr, m_tmap[1].m_tilemap_16x16,
+			m_tmap[0].m_rowscroll_ptr,
+			m_tmap[0].m_scrollx, m_tmap[0].m_scrolly,
+			m_tmap[0].m_control0, m_tmap[0].m_control1,
+			0xf, 4,
+			flags, priority, pmask);
 }

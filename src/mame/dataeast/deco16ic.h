@@ -185,6 +185,12 @@ private:
 		u8 m_bankval;
 
 		void update();
+
+		void mark_both_all_dirty()
+		{
+			m_tilemap_16x16->mark_all_dirty();
+			m_tilemap_8x8->mark_all_dirty();
+		}
 	};
 
 	deco16_tmap m_tmap[2];
