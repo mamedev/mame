@@ -412,19 +412,19 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 	// We had a dirty writeback eviction, total up the background cost penalty we'll pay on subsequent cycles
 	if (m_wb_address != 0)
 	{
-		if (is_sdram_region(address))
+		if (is_sdram_region(m_wb_address))
 		{
 			uint32_t bank_write = sdram_bank(m_wb_address);
 			// Bank collision in auto precharge mode, we have to wait for precharge to finish before starting
 			if (bank_read == bank_write)
 				m_wb_active_cycles += mcr_tpc() * 2;
-			m_wb_active_cycles += (BUS_ACCESS_PENALTY + get_wcr1_timing(address) + BURST_WRITE_WORD_PENALTY + mcr_rcd() + mcr_trwl()) * 2;
+			m_wb_active_cycles += (BUS_ACCESS_PENALTY + get_wcr1_timing(m_wb_address) + BURST_WRITE_WORD_PENALTY + mcr_rcd() + mcr_trwl()) * 2;
 			m_last_sdram_bank = bank_write;
 		}
 		else
 		{
-			m_wb_active_cycles += get_wcr1_timing(address) * 2;
-			m_wb_active_cycles += ((BUS_ACCESS_PENALTY + get_wcr2_timing(address)) * cache_line_fetch_count(address)) * 2;
+			m_wb_active_cycles += get_wcr1_timing(m_wb_address) * 2;
+			m_wb_active_cycles += ((BUS_ACCESS_PENALTY + get_wcr2_timing(m_wb_address)) * cache_line_fetch_count(m_wb_address)) * 2;
 		}
 
 		m_wb_address = 0;
