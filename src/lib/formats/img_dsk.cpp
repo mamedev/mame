@@ -22,6 +22,8 @@
 
 #include "osdcore.h" // osd_printf_*
 
+#include <cstring>
+
 
 // Debugging
 #define VERBOSE 0

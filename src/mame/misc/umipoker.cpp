@@ -56,7 +56,7 @@ public:
 	{
 	}
 
-	void umipoker(machine_config &config);
+	void umipoker(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -98,10 +98,7 @@ public:
 	{
 	}
 
-	void saiyukip(machine_config &config);
-
-protected:
-	virtual void machine_start() override ATTR_COLD;
+	void saiyukip(machine_config &config) ATTR_COLD;
 
 private:
 	void lamps_w(uint16_t data);
@@ -586,7 +583,7 @@ static INPUT_PORTS_START( saiyukip )
 	PORT_DIPSETTING(    0x0030, "30000" )
 	PORT_DIPSETTING(    0x0038, "50000" )
 	PORT_DIPSETTING(    0x0000, "Limit Over & Coin In Max OFF" )
-	PORT_DIPNAME( 0x0040, 0x0040, "Demo Sound" )        PORT_DIPLOCATION("DSW3:!7")
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Demo_Sounds ) )        PORT_DIPLOCATION("DSW3:!7")  // "Demo Sound"
 	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0040, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080, 0x0080, "BGM" )               PORT_DIPLOCATION("DSW3:!8")
@@ -877,13 +874,6 @@ INPUT_PORTS_END
 static GFXDECODE_START( gfx_umipoker )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_planar, 0, 0x40)
 GFXDECODE_END
-
-void saiyukip_state::machine_start()
-{
-	umipoker_state::machine_start();
-
-	m_lamps.resolve();
-}
 
 // TODO: Verify clocks (XTALs are 14.3181 and 2.000MHz)
 void umipoker_state::umipoker(machine_config &config)

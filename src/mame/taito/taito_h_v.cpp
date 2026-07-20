@@ -50,6 +50,8 @@ sprite RAM
 #include "emu.h"
 #include "taito_h.h"
 
+#include "input.h" // for video debug keys
+
 
 /***************************************************************************
   Screen refresh

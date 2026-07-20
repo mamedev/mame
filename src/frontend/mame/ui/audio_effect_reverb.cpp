@@ -15,11 +15,13 @@
 
 #include "audio_effects/aeffect.h"
 #include "audio_effects/reverb.h"
+#include "input.h"
+
 
 namespace ui {
 
-menu_audio_effect_reverb::menu_audio_effect_reverb(mame_ui_manager &mui, render_container &container, u16 chain, u16 entry, audio_effect *effect)
-	: menu(mui, container)
+menu_audio_effect_reverb::menu_audio_effect_reverb(mame_ui_manager &mui, render_target &target, u16 chain, u16 entry, audio_effect *effect)
+	: menu(mui, target)
 {
 	m_chain = chain;
 	m_entry = entry;

@@ -13,6 +13,7 @@
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NSCSI_CDROM, nscsi_cdrom_device, "scsi_cdrom", "SCSI CD-ROM")
+DEFINE_DEVICE_TYPE(NSCSI_CDROM_2X, nscsi_cdrom_2x_device, "scsi_cdrom2x", "SCSI CD-ROM (2X speed)")
 DEFINE_DEVICE_TYPE(NSCSI_CDROM_SGI, nscsi_cdrom_sgi_device, "scsi_cdrom_sgi", "SCSI CD-ROM SGI")
 DEFINE_DEVICE_TYPE(NSCSI_CDROM_NEWS, nscsi_cdrom_news_device, "scsi_cdrom_news", "SCSI CD-ROM NEWS")
 DEFINE_DEVICE_TYPE(NSCSI_RRD45, nscsi_dec_rrd45_device, "nrrd45", "RRD45 CD-ROM (New)")
@@ -45,13 +46,18 @@ nscsi_cdrom_device::nscsi_cdrom_device(const machine_config &mconfig, const char
 {
 }
 
+nscsi_cdrom_2x_device::nscsi_cdrom_2x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	nscsi_cdrom_device(mconfig, NSCSI_CDROM_2X, tag, owner, "Sony", "CDU-76S", "1.0", 0x00, 0x05)
+{
+}
+
 nscsi_cdrom_sgi_device::nscsi_cdrom_sgi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	nscsi_cdrom_device(mconfig, NSCSI_CDROM_SGI, tag, owner, "Sony", "CDU-76S", "1.0", 0x00, 0x05)
 {
 }
 
 nscsi_cdrom_news_device::nscsi_cdrom_news_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	nscsi_cdrom_device(mconfig, NSCSI_CDROM_NEWS, tag, owner, "Sony", "CD-ROM CDU-541", "1.0A", 0x00, 0x05)
+	nscsi_cdrom_device(mconfig, NSCSI_CDROM_NEWS, tag, owner, "SONY", "CD-ROM CDU-541", "1.0A", 0x00, 0x05)
 {
 }
 
@@ -1104,6 +1110,27 @@ void nscsi_cdrom_device::scsi_command()
 	}
 }
 
+attotime nscsi_cdrom_2x_device::scsi_data_byte_period()
+{
+	// 150 sectors/second * 2048 bytes/sector = 307,200 bytes/second
+	return attotime::from_ticks(1, 307'200);
+}
+
+attotime nscsi_cdrom_2x_device::scsi_data_command_delay()
+{
+	switch (m_scsi_cmdbuf[0])
+	{
+	case SC_READ_6:
+	case SC_READ_10:
+	case SC_READ_12:
+	case SC_READ_TOC_PMA_ATIP:
+		return attotime::from_usec(100);
+
+	default:
+		return attotime::zero;
+	}
+}
+
 enum sgi_scsi_command_e : uint8_t {
 	/*
 	 * The SGI supplied CD-ROM drives (and possibly those from some other vendors)
@@ -1581,8 +1608,20 @@ void nscsi_cdrom_apple_device::scsi_command()
 			// 1 = address is the stop address, start address was set by a TRACK SEARCH command
 			if (m_scsi_cmdbuf[1] & 0x10)
 			{
-				const auto start = cdda->get_audio_lba();
-				cdda->start_audio(start, address - start);
+				// several games' audio playback track searches the same track and assume it means "just play this track"
+				if (m_stop_position == address)
+				{
+					if (start_track >= image->get_last_track())
+					{
+						m_stop_position = image->get_track_start(0xaa);
+					}
+					else
+					{
+						m_stop_position = image->get_track_start(start_track + 1);
+					}
+				}
+
+				cdda->start_audio(address, m_stop_position - address);
 			}
 			else
 			{

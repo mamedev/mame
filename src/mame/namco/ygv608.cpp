@@ -138,7 +138,7 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(YGV608, ygv608_device, "ygv608", "YGV608 VDP")
+DEFINE_DEVICE_TYPE(YGV608, ygv608_device, "ygv608", "Yamaha YGV608 PVDC2")
 
 /* text-layer characters */
 

@@ -91,15 +91,14 @@ class dblewing_state : public driver_device
 public:
 	dblewing_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_pf_rowscroll(*this, "pf%u_rowscroll", 1U),
+		m_rowscroll(*this, "rowscroll_%u", 1U),
 		m_spriteram(*this, "spriteram"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_deco_tilegen(*this, "tilegen"),
+		m_tilegen(*this, "tilegen"),
 		m_deco104(*this, "ioprot"),
-		m_sprgen(*this, "spritegen"),
-		m_soundlatch_pending(false)
+		m_sprgen(*this, "spritegen")
 	{ }
 
 	void dblewing(machine_config &config);
@@ -108,22 +107,21 @@ public:
 
 private:
 	/* memory pointers */
-	required_shared_ptr_array<uint16_t, 2> m_pf_rowscroll;
+	required_shared_ptr_array<uint16_t, 2> m_rowscroll;
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_decrypted_opcodes;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<deco16ic_device> m_deco_tilegen;
+	required_device<deco16ic_device> m_tilegen;
 	required_device<deco104_device> m_deco104;
 	required_device<decospr_device> m_sprgen;
 
 	uint8_t irq_latch_r();
-	void soundlatch_irq_w(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	int bank_callback(int bank);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 
 	uint16_t ioprot_r(offs_t offset);
@@ -133,23 +131,22 @@ private:
 	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 	void sound_io(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
-	bool m_soundlatch_pending;
 };
 
 
 uint32_t dblewing_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t const flip = m_deco_tilegen->pf_control_r(0);
+	uint16_t const flip = m_tilegen->control_r(0);
 
 	flip_screen_set(BIT(flip, 7));
 	m_sprgen->set_flip_screen(BIT(flip, 7));
-	m_deco_tilegen->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
+	m_tilegen->update(m_rowscroll[0], m_rowscroll[1]);
 
 	bitmap.fill(0, cliprect); /* not Confirmed */
 	screen.priority().fill(0);
 
-	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
-	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
+	m_tilegen->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
+	m_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 	return 0;
 }
@@ -171,26 +168,21 @@ void dblewing_state::ioprot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_deco104->write_data( deco146_addr, data, mem_mask, cs );
 }
 
-void dblewing_state::soundlatch_irq_w(int state)
-{
-	m_soundlatch_pending = bool(state);
-}
-
 void dblewing_state::dblewing_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 
-	map(0x100000, 0x100fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x102000, 0x102fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x104000, 0x104fff).ram().share(m_pf_rowscroll[0]);
-	map(0x106000, 0x106fff).ram().share(m_pf_rowscroll[1]);
+	map(0x100000, 0x100fff).rw(m_tilegen, FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x102000, 0x102fff).rw(m_tilegen, FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x104000, 0x104fff).ram().share(m_rowscroll[0]);
+	map(0x106000, 0x106fff).ram().share(m_rowscroll[1]);
 
 //  map(0x280000, 0x2807ff).rw("ioprot104", FUNC(deco104_device::dblewing_prot_r), FUNC(deco104_device::dblewing_prot_w)).share("prot16ram");
-	map(0x280000, 0x283fff).rw(FUNC(dblewing_state::ioprot_r), FUNC(dblewing_state::ioprot_w)).share("prot16ram"); /* Protection device */
+	map(0x280000, 0x283fff).rw(FUNC(dblewing_state::ioprot_r), FUNC(dblewing_state::ioprot_w)); /* Protection device */
 
 	map(0x284000, 0x284001).ram();
 	map(0x288000, 0x288001).ram();
-	map(0x28c000, 0x28c00f).ram().w(m_deco_tilegen, FUNC(deco16ic_device::pf_control_w));
+	map(0x28c000, 0x28c00f).ram().w(m_tilegen, FUNC(deco16ic_device::control_w));
 	map(0x300000, 0x3007ff).ram().share("spriteram");
 	map(0x320000, 0x3207ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0xff0000, 0xff3fff).mirror(0xc000).ram();
@@ -204,7 +196,7 @@ void dblewing_state::decrypted_opcodes_map(address_map &map)
 uint8_t dblewing_state::irq_latch_r()
 {
 	// bit 0: irq type (0 = latch, 1 = ym)
-	return m_soundlatch_pending ? 0 : 1;
+	return m_deco104->soundlatch_pending_r() ? 0 : 1;
 }
 
 void dblewing_state::sound_map(address_map &map)
@@ -331,9 +323,9 @@ static INPUT_PORTS_START( dblewing )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-DECO16IC_BANK_CB_MEMBER(dblewing_state::bank_callback)
+int dblewing_state::bank_callback(int bank)
 {
-	return ((bank >> 4) & 0x7) * 0x1000;
+	return (bank & 0x70) << 8;
 }
 
 DECOSPR_PRIORITY_CB_MEMBER(dblewing_state::pri_callback)
@@ -369,30 +361,29 @@ void dblewing_state::dblewing(machine_config &config)
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 2048/2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_dblewing);
 
-	DECO16IC(config, m_deco_tilegen, 0);
-	m_deco_tilegen->set_pf1_size(DECO_64x32);
-	m_deco_tilegen->set_pf2_size(DECO_64x32);
-	m_deco_tilegen->set_pf1_col_bank(0x00);
-	m_deco_tilegen->set_pf2_col_bank(0x10);
-	m_deco_tilegen->set_pf1_col_mask(0x0f);
-	m_deco_tilegen->set_pf2_col_mask(0x0f);
-	m_deco_tilegen->set_bank1_callback(FUNC(dblewing_state::bank_callback));
-	m_deco_tilegen->set_bank2_callback(FUNC(dblewing_state::bank_callback));
-	m_deco_tilegen->set_pf12_8x8_bank(0);
-	m_deco_tilegen->set_pf12_16x16_bank(1);
-	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
+	DECO16IC(config, m_tilegen);
+	m_tilegen->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen->set_col_bank<0>(0x00);
+	m_tilegen->set_col_bank<1>(0x10);
+	m_tilegen->set_col_mask<0>(0x0f);
+	m_tilegen->set_col_mask<1>(0x0f);
+	m_tilegen->set_bank_callback<0>(FUNC(dblewing_state::bank_callback));
+	m_tilegen->set_bank_callback<1>(FUNC(dblewing_state::bank_callback));
+	m_tilegen->set_8x8_bank(0);
+	m_tilegen->set_16x16_bank(1);
+	m_tilegen->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen, 0, "palette", gfx_dblewing_spr);
+	DECO_SPRITE(config, m_sprgen, "palette", gfx_dblewing_spr);
 	m_sprgen->set_pri_callback(FUNC(dblewing_state::pri_callback));
 
-	DECO104PROT(config, m_deco104, 0);
+	DECO104PROT(config, m_deco104);
 	m_deco104->port_a_cb().set_ioport("INPUTS");
 	m_deco104->port_b_cb().set_ioport("SYSTEM");
 	m_deco104->port_c_cb().set_ioport("DSW");
 	m_deco104->set_interface_scramble_interleave();
 	m_deco104->set_use_magic_read_address_xor(true);
-	m_deco104->soundlatch_irq_cb().set(FUNC(dblewing_state::soundlatch_irq_w));
-	m_deco104->soundlatch_irq_cb().append("soundirq", FUNC(input_merger_device::in_w<0>));
+	m_deco104->soundlatch_irq_cb().set("soundirq", FUNC(input_merger_device::in_w<0>));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -488,8 +479,6 @@ void dblewing_state::init_dblewing()
 {
 	deco56_decrypt_gfx(machine(), "tiles");
 	deco102_decrypt_cpu((uint16_t *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x80000, 0x399d, 0x25, 0x3d);
-
-	save_item(NAME(m_soundlatch_pending));
 }
 
 } // anonymous namespace

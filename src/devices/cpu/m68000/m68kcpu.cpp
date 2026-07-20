@@ -810,15 +810,18 @@ bool m68000_musashi_device::memory_translate(int spacenum, int intention, offs_t
 			if (CPU_TYPE_IS_040_PLUS())
 			{
 				address = pmmu_translate_addr_with_fc_040(address, mode, 1);
+				if (!(m_mmu_tmp_sr & M68K_MMU_SR_040_R)) {
+					address = 0;
+				}
 			}
 			else
 			{
 				address = pmmu_translate_addr_with_fc<false, false>(address, mode, 1);
-			}
 
-			if ((m_mmu_tmp_sr & M68K_MMU_SR_INVALID) != 0) {
-//              logerror("cpu_translate_m68k failed with mmu_sr=%04x va=%08x pa=%08x\n",m_mmu_tmp_sr,va ,address);
-				address = 0;
+				if ((m_mmu_tmp_sr & M68K_MMU_SR_INVALID) != 0) {
+//                  logerror("cpu_translate_m68k failed with mmu_sr=%04x va=%08x pa=%08x\n",m_mmu_tmp_sr,va ,address);
+					address = 0;
+				}
 			}
 
 			m_mmu_tmp_sr = temp_mmu_tmp_sr;
@@ -831,6 +834,35 @@ bool m68000_musashi_device::memory_translate(int spacenum, int intention, offs_t
 
 void m68000_musashi_device::execute_run()
 {
+	// Softfloat's rounding mode and precision are globals shared across all
+	// users in MAME, so save/restore them.  execute_run() has multiple return
+	// paths and can exit via throw, so we use an RAII helper.
+	struct fpu_rounding_saver
+	{
+		fpu_rounding_saver(m68000_musashi_device &cpu) : m_cpu(cpu)
+		{
+			if (m_cpu.m_has_fpu)
+			{
+				m_rounding = softfloat_roundingMode;
+				m_precision = extF80_roundingPrecision;
+				m_cpu.apply_fpcr_rounding();
+			}
+		}
+
+		~fpu_rounding_saver()
+		{
+			if (m_cpu.m_has_fpu)
+			{
+				softfloat_roundingMode = m_rounding;
+				extF80_roundingPrecision = m_precision;
+			}
+		}
+
+		m68000_musashi_device &m_cpu;
+		uint_fast8_t m_rounding = 0;
+		uint_fast8_t m_precision = 0;
+	} rounding_saver(*this);
+
 	m_initial_cycles = m_icount;
 
 	if (m_reset_cycles) {
@@ -1071,6 +1103,13 @@ void m68000_musashi_device::init_cpu_common(void)
 	save_item(NAME(m_can_instruction_restart));
 	save_item(NAME(m_restart_instruction));
 
+	save_item(STRUCT_MEMBER(m_fpr, signExp));
+	save_item(STRUCT_MEMBER(m_fpr, signif));
+	save_item(NAME(m_fpcr));
+	save_item(NAME(m_fpsr));
+	save_item(NAME(m_fpiar));
+	save_item(NAME(m_fpu_just_reset));
+
 	save_item(NAME(m_mmu_crp_aptr));
 	save_item(NAME(m_mmu_crp_limit));
 	save_item(NAME(m_mmu_srp_aptr));
@@ -1109,9 +1148,20 @@ void m68000_musashi_device::device_reset()
 	m_emmu_enabled = false;
 	m_can_instruction_restart = false;
 
+	if (m_has_fpu)
+	{
+		// the FPU comes out of reset with NaNs in the data registers,
+		// zeroed control registers, and FSAVE producing a null frame
+		do_frestore_null();
+	}
+
 	m_mmu_tc = 0;
 	m_mmu_tt0 = 0;
 	m_mmu_tt1 = 0;
+	m_mmu_itt0 = 0;
+	m_mmu_itt1 = 0;
+	m_mmu_dtt0 = 0;
+	m_mmu_dtt1 = 0;
 
 	/* Clear all stop levels and eat up all remaining cycles */
 	m_stopped = 0;
@@ -1990,7 +2040,7 @@ void m68000_musashi_device::define_state(void)
 		state_add(M68K_CAAR,   "CAAR",      m_caar);
 	}
 
-	if (m_cpu_type & MASK_030_OR_LATER)
+	if (m_cpu_type & MASK_020_OR_LATER)
 	{
 		for (int regnum = 0; regnum < 8; regnum++) {
 			state_add(M68K_FP0 + regnum, string_format("FP%d", regnum).c_str(), m_iotemp).callimport().callexport().formatstr("%10s");
@@ -2030,6 +2080,7 @@ void m68000_musashi_device::define_state(void)
 			state_add(M68K_DTT1, "DTT1", m_mmu_dtt1);
 			state_add(M68K_URP_APTR, "URP", m_mmu_urp_aptr);
 			state_add(M68K_SRP_APTR, "SRP", m_mmu_srp_aptr);
+			state_add(M68K_MMU_SR_040, "MMUSR", m_mmu_sr_040);
 		}
 	}
 
@@ -2153,7 +2204,9 @@ void m68000_musashi_device::init_cpu_m68020(void)
 	m_cyc_scc_r_true   = 0;
 	m_cyc_movem_w      = 4;
 	m_cyc_movem_l      = 4;
-	m_cyc_shift        = 1;
+	m_cyc_movem_store_w = 3;
+	m_cyc_movem_store_l = 3;
+	m_cyc_shift        = 0;
 	m_cyc_reset        = 518;
 
 	define_state();
@@ -2209,7 +2262,9 @@ void m68000_musashi_device::init_cpu_m68ec020(void)
 	m_cyc_scc_r_true   = 0;
 	m_cyc_movem_w      = 4;
 	m_cyc_movem_l      = 4;
-	m_cyc_shift        = 1;
+	m_cyc_movem_store_w = 3;
+	m_cyc_movem_store_l = 3;
+	m_cyc_shift        = 0;
 	m_cyc_reset        = 518;
 	m_has_pmmu         = 0;
 	m_has_fpu          = 0;
@@ -2237,6 +2292,8 @@ void m68000_musashi_device::init_cpu_m68030(void)
 	m_cyc_scc_r_true   = 0;
 	m_cyc_movem_w      = 4;
 	m_cyc_movem_l      = 4;
+	m_cyc_movem_store_w = 2;
+	m_cyc_movem_store_l = 2;
 	m_cyc_shift        = 1;
 	m_cyc_reset        = 518;
 	m_has_pmmu         = 1;
@@ -2265,6 +2322,8 @@ void m68000_musashi_device::init_cpu_m68ec030(void)
 	m_cyc_scc_r_true   = 0;
 	m_cyc_movem_w      = 4;
 	m_cyc_movem_l      = 4;
+	m_cyc_movem_store_w = 2;
+	m_cyc_movem_store_l = 2;
 	m_cyc_shift        = 1;
 	m_cyc_reset        = 518;
 	m_has_pmmu         = 0;     /* EC030 lacks the PMMU and is effectively a die-shrink 68020 */
@@ -2294,7 +2353,7 @@ void m68000_musashi_device::init_cpu_m68040(void)
 	m_cyc_scc_r_true   = 0;
 	m_cyc_movem_w      = 4;
 	m_cyc_movem_l      = 4;
-	m_cyc_shift        = 1;
+	m_cyc_shift        = 0;
 	m_cyc_reset        = 518;
 	m_has_pmmu         = 1;
 
@@ -2321,7 +2380,7 @@ void m68000_musashi_device::init_cpu_m68ec040(void)
 	m_cyc_scc_r_true   = 0;
 	m_cyc_movem_w      = 4;
 	m_cyc_movem_l      = 4;
-	m_cyc_shift        = 1;
+	m_cyc_shift        = 0;
 	m_cyc_reset        = 518;
 	m_has_pmmu         = 0;
 	m_has_fpu          = 0;
@@ -2349,7 +2408,7 @@ void m68000_musashi_device::init_cpu_m68lc040(void)
 	m_cyc_scc_r_true   = 0;
 	m_cyc_movem_w      = 4;
 	m_cyc_movem_l      = 4;
-	m_cyc_shift        = 1;
+	m_cyc_shift        = 0;
 	m_cyc_reset        = 518;
 	m_has_pmmu         = 1;
 	m_has_fpu          = 0;
@@ -2589,6 +2648,8 @@ void m68000_musashi_device::clear_all()
 	m_cyc_scc_r_true = 0;
 	m_cyc_movem_w = 1;
 	m_cyc_movem_l = 1;
+	m_cyc_movem_store_w = 0;
+	m_cyc_movem_store_l = 0;
 	m_cyc_shift = 1;
 	m_cyc_reset = 0;
 
@@ -2763,4 +2824,3 @@ bool m68000_musashi_device::supervisor_mode() const noexcept
 {
 	return m_s_flag;
 }
-

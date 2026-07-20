@@ -18,11 +18,24 @@
   this still needs significant cleanups before work is started on individual
   systems
 
+
+  Bugs that exist on real hardware
+  --------------------------------
+
+  Some of the VT3xx versions of Move Fun (and reskins of it) have broken 'Lives' counter
+  VT3xx versions of Mr Onion can show incorrect tiles behind keys that were picked up
+
+  Bugs that need to be verified
+  -----------------------------
+  lxcmcypp (game 05, Turbo Hovercraft) has a broken raster split
+
+
   ***************************************************************************/
 
 #include "emu.h"
 
 #include "nes_vt369_vtunknown_soc.h"
+#include "nes_vt4ffx_soc.h"
 #include "vt_menu_protection.h"
 #include "vt_menu_protection_lxcap.h"
 
@@ -41,7 +54,6 @@ public:
 		driver_device(mconfig, type, tag),
 		m_io0(*this, "IO0"),
 		m_io1(*this, "IO1"),
-		m_cartsel(*this, "CARTSEL"),
 		m_exin(*this, "EXTRAIN%u", 0U),
 		m_prgrom(*this, "mainrom")
 	{ }
@@ -63,24 +75,18 @@ protected:
 	u8 m_latch1;
 	u8 m_previous_port0;
 
-	optional_ioport m_cartsel;
 	optional_ioport_array<4> m_exin;
 
 	/* Misc */
 	u32 m_ahigh; // external banking bits
-	u8 m_4242;
-	u8 m_411c;
-	u8 m_411d;
 
 	required_region_ptr<u8> m_prgrom;
-
-	void configure_soc(vt3xx_soc_base_device *soc);
 
 	void extbank_w(u8 data);
 	void extbank_red5mam_w(u8 data);
 	void extbank_h12p1000_w(u8 data);
 
-private:
+protected:
 	/* Extra IO */
 	template <u8 NUM> u8 extrain_r();
 	u8 default_4139_r();
@@ -91,8 +97,7 @@ class vt369_state : public vt369_base_state
 {
 public:
 	vt369_state(const machine_config &mconfig, device_type type, const char *tag) :
-		vt369_base_state(mconfig, type, tag),
-		m_soc(*this, "soc")
+		vt369_base_state(mconfig, type, tag)
 	{ }
 
 	void vt_external_space_map_32mbyte(address_map &map) ATTR_COLD;
@@ -113,8 +118,6 @@ public:
 
 protected:
 	u8 vt_rom_banked_r(offs_t offset);
-
-	required_device<vt3xx_soc_base_device> m_soc;
 };
 
 
@@ -122,7 +125,8 @@ class vt36x_state : public vt369_state
 {
 public:
 	vt36x_state(const machine_config &mconfig, device_type type, const char *tag) :
-		vt369_state(mconfig, type, tag)
+		vt369_state(mconfig, type, tag),
+		m_soc(*this, "soc")
 	{ }
 
 	void vt36x(machine_config &config) ATTR_COLD;
@@ -134,13 +138,11 @@ public:
 	void vt36x_32mb(machine_config &config) ATTR_COLD;
 	void vt36x_32mb_2banks_lexi(machine_config &config) ATTR_COLD;
 	void vt36x_32mb_2banks_lexi300(machine_config &config) ATTR_COLD;
-	void vt36x_h12p1000(machine_config &config) ATTR_COLD;
 
 	void vt36x_swap(machine_config &config) ATTR_COLD;
 	void vt36x_swap_2mb(machine_config &config) ATTR_COLD;
 	void vt36x_swap_4mb(machine_config &config) ATTR_COLD;
 	void vt36x_swap_8mb(machine_config &config) ATTR_COLD;
-	void vt36x_swap_16mb(machine_config &config) ATTR_COLD;
 	void vt36x_swap_512kb(machine_config &config) ATTR_COLD;
 
 	void vt36x_altswap(machine_config &config) ATTR_COLD;
@@ -149,15 +151,39 @@ public:
 	void vt36x_altswap_16mb(machine_config &config) ATTR_COLD;
 	void vt36x_altswap_32mb_4banks_red5mam(machine_config &config) ATTR_COLD;
 
-	void vt36x_vibesswap_8mb(machine_config &config) ATTR_COLD;
-	void vt36x_vibesswap_16mb(machine_config &config) ATTR_COLD;
-	void vt36x_gbox2020_8mb(machine_config &config) ATTR_COLD;
-	void vt36x_gbox2020_16mb(machine_config &config) ATTR_COLD;
-	void vt36x_s10swap_8mb(machine_config &config) ATTR_COLD;
-	void vt36x_rsps300swap_16mb(machine_config &config) ATTR_COLD;
-
 	void vt369_unk(machine_config &config) ATTR_COLD;
 	void vt369_unk_16mb(machine_config &config) ATTR_COLD;
+
+protected:
+	void configure_soc(vt3xx_soc_base_device *soc);
+
+	required_device<vt3xx_soc_base_device> m_soc;
+};
+
+class vt4ffx_state : public vt369_state
+{
+public:
+	vt4ffx_state(const machine_config &mconfig, device_type type, const char *tag) :
+		vt369_state(mconfig, type, tag),
+		m_soc(*this, "soc")
+	{ }
+
+	void vt4ffx(machine_config &config) ATTR_COLD;
+	void vt4ffx_16mb(machine_config &config) ATTR_COLD;
+	void vt4ffx_32mb(machine_config &config) ATTR_COLD;
+	void vt4ffx_h12p1000(machine_config &config) ATTR_COLD;
+
+	void vt4ffx_vibesswap_8mb(machine_config &config) ATTR_COLD;
+	void vt4ffx_vibesswap_16mb(machine_config &config) ATTR_COLD;
+	void vt4ffx_gbox2020_8mb(machine_config &config) ATTR_COLD;
+	void vt4ffx_gbox2020_16mb(machine_config &config) ATTR_COLD;
+	void vt4ffx_s10swap_8mb(machine_config &config) ATTR_COLD;
+	void vt4ffx_rsps300swap_16mb(machine_config &config) ATTR_COLD;
+
+protected:
+	void configure_soc(vt4ffx_soc_base_device *soc);
+
+	required_device<vt4ffx_soc_base_device> m_soc;
 };
 
 class vt36x_gtct885_state : public vt36x_state
@@ -178,16 +204,16 @@ private:
 	required_device<vt_menu_protection_device> m_protection;
 };
 
-class vt36x_goretrop_state : public vt36x_state
+class vt4ffx_goretrop_state : public vt4ffx_state
 {
 public:
-	vt36x_goretrop_state(const machine_config &mconfig, device_type type, const char *tag) :
-		vt36x_state(mconfig, type, tag),
+	vt4ffx_goretrop_state(const machine_config &mconfig, device_type type, const char *tag) :
+		vt4ffx_state(mconfig, type, tag),
 		m_protection(*this, "protection")
 	{ }
 
-	void vt36x_32mb_goretrop(machine_config &config) ATTR_COLD;
-	void vt36x_1mb_rbbrite(machine_config &config) ATTR_COLD;
+	void vt4ffx_32mb_goretrop(machine_config &config) ATTR_COLD;
+	void vt4ffx_1mb_rbbrite(machine_config &config) ATTR_COLD;
 
 private:
 	u8 goretrop_prot_r();
@@ -358,18 +384,11 @@ void vt369_base_state::machine_start()
 	m_latch1 = 0;
 	m_previous_port0 = 0;
 
-	m_4242 = 0;
-	m_411c = 0;
-	m_411d = 0;
-
 	save_item(NAME(m_latch0));
 	save_item(NAME(m_latch1));
 	save_item(NAME(m_previous_port0));
 
 	save_item(NAME(m_ahigh));
-	save_item(NAME(m_4242));
-	save_item(NAME(m_411c));
-	save_item(NAME(m_411d));
 }
 
 void vt369_base_state::machine_reset()
@@ -377,20 +396,34 @@ void vt369_base_state::machine_reset()
 	m_ahigh = 0;
 }
 
-void vt369_base_state::configure_soc(vt3xx_soc_base_device *soc)
+void vt36x_state::configure_soc(vt3xx_soc_base_device *soc)
 {
-	soc->set_addrmap(AS_PROGRAM, &vt369_state::vt_external_space_map_32mbyte);
-	soc->read_0_callback().set(FUNC(vt369_base_state::in0_r));
-	soc->read_1_callback().set(FUNC(vt369_base_state::in1_r));
-	soc->write_0_callback().set(FUNC(vt369_base_state::in0_w));
+	soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_32mbyte);
+	soc->read_0_callback().set(FUNC(vt36x_state::in0_r));
+	soc->read_1_callback().set(FUNC(vt36x_state::in1_r));
+	soc->write_0_callback().set(FUNC(vt36x_state::in0_w));
 
-	soc->extra_read_0_callback().set(FUNC(vt369_base_state::extrain_r<0>));
-	soc->extra_read_1_callback().set(FUNC(vt369_base_state::extrain_r<1>));
-	soc->extra_read_2_callback().set(FUNC(vt369_base_state::extrain_r<2>));
-	soc->extra_read_3_callback().set(FUNC(vt369_base_state::extrain_r<3>));
+	soc->extra_read_0_callback().set(FUNC(vt36x_state::extrain_r<0>));
+	soc->extra_read_1_callback().set(FUNC(vt36x_state::extrain_r<1>));
+	soc->extra_read_2_callback().set(FUNC(vt36x_state::extrain_r<2>));
+	soc->extra_read_3_callback().set(FUNC(vt36x_state::extrain_r<3>));
 
-	soc->io_4139_read_callback().set(FUNC(vt369_base_state::default_4139_r));
-	soc->io_414b_read_callback().set(FUNC(vt369_base_state::default_414b_r));
+	soc->io_414b_read_callback().set(FUNC(vt36x_state::default_414b_r));
+}
+
+void vt4ffx_state::configure_soc(vt4ffx_soc_base_device *soc)
+{
+	soc->set_addrmap(AS_PROGRAM, &vt4ffx_state::vt_external_space_map_32mbyte);
+	soc->read_0_callback().set(FUNC(vt4ffx_state::in0_r));
+	soc->read_1_callback().set(FUNC(vt4ffx_state::in1_r));
+	soc->write_0_callback().set(FUNC(vt4ffx_state::in0_w));
+
+	soc->extra_read_0_callback().set(FUNC(vt4ffx_state::extrain_r<0>));
+	soc->extra_read_1_callback().set(FUNC(vt4ffx_state::extrain_r<1>));
+	soc->extra_read_2_callback().set(FUNC(vt4ffx_state::extrain_r<2>));
+	soc->extra_read_3_callback().set(FUNC(vt4ffx_state::extrain_r<3>));
+
+	soc->io_4139_read_callback().set(FUNC(vt4ffx_state::default_4139_r));
 }
 
 
@@ -413,6 +446,15 @@ void vt36x_state::vt369_unk_16mb(machine_config &config)
 void vt36x_state::vt36x(machine_config &config)
 {
 	VT369_SOC_INTROM_NOSWAP(config, m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
+
+	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
+	m_soc->force_bad_dma();
+}
+
+void vt4ffx_state::vt4ffx(machine_config &config)
+{
+	VT4FFX_SOC_NOSWAP(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 
 	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
@@ -449,12 +491,6 @@ void vt36x_state::vt36x_swap_8mb(machine_config &config)
 {
 	vt36x_swap(config);
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_8mbyte);
-}
-
-void vt36x_state::vt36x_swap_16mb(machine_config &config)
-{
-	vt36x_swap(config);
-	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte);
 }
 
 void vt36x_state::vt36x_altswap(machine_config &config)
@@ -509,9 +545,9 @@ void vt36x_gtct885_state::gtct885_prot_w(u8 data)
 	// so 0x20, 0x10, and 0x08 are outputs
 	// some kind of serial device
 
-	m_protection->write_data((data & 0x20) ? true : false);
-	m_protection->write_enable((data & 0x10) ? true : false);
-	m_protection->write_clock((data & 0x08) ? true : false);
+	m_protection->write_data(BIT(data, 5));
+	m_protection->write_enable(BIT(data, 4));
+	m_protection->write_clock(BIT(data, 3));
 }
 
 u8 vt36x_gtct885_state::gtct885_prot_r()
@@ -521,15 +557,15 @@ u8 vt36x_gtct885_state::gtct885_prot_r()
 	return m_protection->read() ? 0x20 : 0x00;
 }
 
-void vt36x_goretrop_state::goretrop_prot_w(u8 data)
+void vt4ffx_goretrop_state::goretrop_prot_w(u8 data)
 {
 	// direction is set to 0x0e before writing here
-	m_protection->write_data((data & 0x08) ? true : false);
-	m_protection->write_enable((data & 0x04) ? true : false);
-	m_protection->write_clock((data & 0x02) ? false : true);
+	m_protection->write_data(BIT(data, 3));
+	m_protection->write_enable(BIT(data, 2));
+	m_protection->write_clock(BIT(~data, 1));
 }
 
-u8 vt36x_goretrop_state::goretrop_prot_r()
+u8 vt4ffx_goretrop_state::goretrop_prot_r()
 {
 	// direction set to 0x06 before reading
 	return (m_protection->read() ? 0x08 : 0x00);
@@ -552,8 +588,8 @@ void vt36x_tetrtin_state::lxcap_prot_w(u8 data)
 
 	*/
 
-	m_protection->write_data((data & 0x02) ? true : false);
-	m_protection->write_clock((data & 0x01) ? true : false);
+	m_protection->write_data(BIT(data, 1));
+	m_protection->write_clock(BIT(data, 0));
 }
 
 u8 vt36x_tetrtin_state::lxcap_prot_r()
@@ -566,8 +602,8 @@ u8 vt36x_tetrtin_state::lxcap_prot_r()
 
 void vt36x_tetrtin_state::pixel_prot_w(u8 data)
 {
-	m_protection->write_data((data & 0x10) ? true : false);
-	m_protection->write_clock((data & 0x20) ? true : false);
+	m_protection->write_data(BIT(data, 4));
+	m_protection->write_clock(BIT(data, 5));
 }
 
 u8 vt36x_tetrtin_state::pixel_prot_r()
@@ -588,14 +624,14 @@ void vt36x_tetrtin_state::nesvt270_prot_w(u8 data)
 
 void vt36x_otrail_state::otrail_seeprom_w(u8 data)
 {
-	m_i2cmem->write_scl((data & 0x04) ? true : false);
-	m_i2cmem->write_sda((data & 0x08) ? true : false);
+	m_i2cmem->write_scl(BIT(data, 2));
+	m_i2cmem->write_sda(BIT(data, 3));
 }
 
 void vt36x_otrail_state::otrail_sound_w(u8 data)
 {
 	// is this really a DAC?
-	// 
+	//
 	// it might be an another chip playing samples from an internal ROM
 	// as there are longer sound clips and only short bursts of writes that
 	// look more like commands
@@ -616,60 +652,52 @@ void vt36x_state::vt36x_altswap_32mb_4banks_red5mam(machine_config &config)
 	m_soc->set_41e6_write_cb().set(FUNC(vt36x_state::extbank_red5mam_w));
 }
 
-void vt36x_state::vt36x_vibesswap_16mb(machine_config &config)
+void vt4ffx_state::vt4ffx_vibesswap_16mb(machine_config &config)
 {
-	vt36x_swap_16mb(config);
-
-	VT369_SOC_INTROM_VIBESSWAP(config.replace(), m_soc, NTSC_APU_CLOCK);
+	VT4FFX_SOC_VIBESSWAP(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	//m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
 	m_soc->force_bad_dma();
-	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt4ffx_state::vt_external_space_map_16mbyte);
 }
 
-void vt36x_state::vt36x_vibesswap_8mb(machine_config &config)
+void vt4ffx_state::vt4ffx_vibesswap_8mb(machine_config &config)
 {
-	vt36x_vibesswap_16mb(config);
-	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_8mbyte);
+	vt4ffx_vibesswap_16mb(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt4ffx_state::vt_external_space_map_8mbyte);
 }
 
-void vt36x_state::vt36x_gbox2020_8mb(machine_config &config)
+void vt4ffx_state::vt4ffx_gbox2020_8mb(machine_config &config)
 {
-	vt36x_swap_16mb(config);
-
-	VT369_SOC_INTROM_GBOX2020(config.replace(), m_soc, NTSC_APU_CLOCK);
+	VT4FFX_SOC_GBOX2020(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	//m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
 	m_soc->force_bad_dma();
-	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_8mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt4ffx_state::vt_external_space_map_8mbyte);
 }
 
-void vt36x_state::vt36x_gbox2020_16mb(machine_config &config)
+void vt4ffx_state::vt4ffx_gbox2020_16mb(machine_config &config)
 {
-	vt36x_gbox2020_8mb(config);
-	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte);
+	vt4ffx_gbox2020_8mb(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt4ffx_state::vt_external_space_map_16mbyte);
 }
 
-void vt36x_state::vt36x_s10swap_8mb(machine_config &config)
+void vt4ffx_state::vt4ffx_s10swap_8mb(machine_config &config)
 {
-	vt36x_swap_8mb(config);
-
-	VT369_SOC_INTROM_S10SWAP(config.replace(), m_soc, NTSC_APU_CLOCK);
+	VT4FFX_SOC_S10SWAP(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
 	m_soc->force_bad_dma();
-	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_8mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt4ffx_state::vt_external_space_map_8mbyte);
 }
 
-void vt36x_state::vt36x_rsps300swap_16mb(machine_config &config)
+void vt4ffx_state::vt4ffx_rsps300swap_16mb(machine_config &config)
 {
-	vt36x_swap_16mb(config);
-
-	VT369_SOC_INTROM_RSPS300SWAP(config.replace(), m_soc, NTSC_APU_CLOCK);
+	VT4FFX_SOC_RSPS300SWAP(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	//m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
 	m_soc->force_bad_dma();
-	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt4ffx_state::vt_external_space_map_16mbyte);
 }
 
 
@@ -698,6 +726,12 @@ void vt36x_state::vt36x_16mb(machine_config &config)
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte);
 }
 
+void vt4ffx_state::vt4ffx_16mb(machine_config &config)
+{
+	vt4ffx(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt4ffx_state::vt_external_space_map_16mbyte);
+}
+
 void vt36x_state::vt36x_16mb_sdcard(machine_config &config)
 {
 	vt36x(config);
@@ -708,6 +742,12 @@ void vt36x_state::vt36x_32mb(machine_config &config)
 {
 	vt36x(config);
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_32mbyte);
+}
+
+void vt4ffx_state::vt4ffx_32mb(machine_config &config)
+{
+	vt4ffx(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt4ffx_state::vt_external_space_map_32mbyte);
 }
 
 void vt36x_state::vt36x_32mb_2banks_lexi(machine_config &config)
@@ -730,7 +770,7 @@ void vt36x_gtct885_state::vt36x_8mb_gtct885(machine_config &config)
 	m_soc->io_4153_read_callback().set(FUNC(vt36x_gtct885_state::gtct885_prot_r));
 	m_soc->io_4152_write_callback().set(FUNC(vt36x_gtct885_state::gtct885_prot_w));
 
-	VT_MENU_PROTECTION(config, m_protection, 0);
+	VT_MENU_PROTECTION(config, m_protection);
 }
 
 void vt36x_gtct885_state::vt36x_altswap_2mb_36pcase(machine_config &config)
@@ -740,36 +780,39 @@ void vt36x_gtct885_state::vt36x_altswap_2mb_36pcase(machine_config &config)
 	m_soc->io_4153_read_callback().set(FUNC(vt36x_gtct885_state::gtct885_prot_r));
 	m_soc->io_4152_write_callback().set(FUNC(vt36x_gtct885_state::gtct885_prot_w));
 
-	VT_MENU_PROTECTION(config, m_protection, 0);
+	m_soc->enable_36pcase_gpio();
+	VT_MENU_PROTECTION(config, m_protection);
+	m_protection->set_read_start_byte(1);
+	m_protection->enable_36pcase_late_protocol();
 }
 
-void vt36x_goretrop_state::vt36x_32mb_goretrop(machine_config &config)
+void vt4ffx_goretrop_state::vt4ffx_32mb_goretrop(machine_config &config)
 {
-	vt36x_32mb(config);
-	m_soc->io_4139_read_callback().set(FUNC(vt36x_goretrop_state::goretrop_prot_r));
-	m_soc->io_4139_write_callback().set(FUNC(vt36x_goretrop_state::goretrop_prot_w));
+	vt4ffx_32mb(config);
+	m_soc->io_4139_read_callback().set(FUNC(vt4ffx_goretrop_state::goretrop_prot_r));
+	m_soc->io_4139_write_callback().set(FUNC(vt4ffx_goretrop_state::goretrop_prot_w));
 
-	VT_MENU_PROTECTION(config, m_protection, 0);
+	VT_MENU_PROTECTION(config, m_protection);
 }
 
-void vt36x_goretrop_state::vt36x_1mb_rbbrite(machine_config &config)
+void vt4ffx_goretrop_state::vt4ffx_1mb_rbbrite(machine_config &config)
 {
-	vt36x_32mb_goretrop(config);
-	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_1mbyte);
+	vt4ffx_32mb_goretrop(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt4ffx_goretrop_state::vt_external_space_map_1mbyte);
 }
 
-void vt36x_state::vt36x_h12p1000(machine_config &config)
+void vt4ffx_state::vt4ffx_h12p1000(machine_config &config)
 {
-	vt36x_16mb(config);
-	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte_bank);
-	m_soc->io_4139_write_callback().set(FUNC(vt36x_state::extbank_h12p1000_w));
+	vt4ffx_16mb(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt4ffx_state::vt_external_space_map_16mbyte_bank);
+	m_soc->io_4139_write_callback().set(FUNC(vt4ffx_state::extbank_h12p1000_w));
 }
 
 // there are also accesses to 4158 and 4151 which may be related to the I/O ports
 void vt36x_tetrtin_state::vt36x_1mb_tetrtin(machine_config &config)
 {
 	vt36x_1mb(config);
-	VT_MENU_PROTECTION_LXCAP(config, m_protection, 0);
+	VT_MENU_PROTECTION_LXCAP(config, m_protection);
 
 	m_soc->io_4153_read_callback().set(FUNC(vt36x_tetrtin_state::lxcap_prot_r));
 	m_soc->io_4152_write_callback().set(FUNC(vt36x_tetrtin_state::lxcap_prot_w));
@@ -778,7 +821,7 @@ void vt36x_tetrtin_state::vt36x_1mb_tetrtin(machine_config &config)
 void vt36x_tetrtin_state::vt36x_8mb_lxcap(machine_config &config)
 {
 	vt36x_8mb(config);
-	VT_MENU_PROTECTION_LXCAP(config, m_protection, 0);
+	VT_MENU_PROTECTION_LXCAP(config, m_protection);
 
 	m_soc->io_4153_read_callback().set(FUNC(vt36x_tetrtin_state::lxcap_prot_r));
 	m_soc->io_4152_write_callback().set(FUNC(vt36x_tetrtin_state::lxcap_prot_w));
@@ -787,7 +830,7 @@ void vt36x_tetrtin_state::vt36x_8mb_lxcap(machine_config &config)
 void vt36x_tetrtin_state::vt36x_8mb_pixel(machine_config &config)
 {
 	vt36x_8mb(config);
-	VT_MENU_PROTECTION_LXCAP(config, m_protection, 0);
+	VT_MENU_PROTECTION_LXCAP(config, m_protection);
 
 	m_soc->io_414b_read_callback().set(FUNC(vt36x_tetrtin_state::pixel_prot_r));
 	m_soc->io_414a_write_callback().set(FUNC(vt36x_tetrtin_state::pixel_prot_w));
@@ -796,7 +839,7 @@ void vt36x_tetrtin_state::vt36x_8mb_pixel(machine_config &config)
 void vt36x_tetrtin_state::vt36x_16mb_nesvt270(machine_config &config)
 {
 	vt36x_16mb(config);
-	VT_MENU_PROTECTION_LXCAP(config, m_protection, 0); // might not be this device
+	VT_MENU_PROTECTION_LXCAP(config, m_protection); // might not be this device
 
 	m_soc->io_414b_read_callback().set(FUNC(vt36x_tetrtin_state::nesvt270_prot_r));
 	m_soc->io_414b_write_callback().set(FUNC(vt36x_tetrtin_state::nesvt270_prot_w));
@@ -806,9 +849,9 @@ void vt36x_tetrtin_state::vt36x_16mb_nesvt270(machine_config &config)
 void vt36x_otrail_state::vt36x_1mb_otrail(machine_config &config)
 {
 	vt36x_1mb(config);
-	VT_MENU_PROTECTION_LXCAP(config, m_protection, 0);
+	VT_MENU_PROTECTION_LXCAP(config, m_protection);
 
-	I2C_24C04(config, "i2cmem", 0);
+	I2C_24C04(config, "i2cmem");
 
 	SPEAKER(config, "internal").front_center();
 
@@ -895,6 +938,10 @@ ROM_START( 240in1ar )
 	ROM_LOAD( "mw-106-2g.u3", 0x00000, 0x8000000, CRC(c46d2ca9) SHA1(0fff7d3461ff620c5b5e43f54f9e7badd089b951) )
 ROM_END
 
+ROM_START( urban240 )
+	ROM_REGION( 0x8000000, "mainrom", 0 )
+	ROM_LOAD( "urban240.u3", 0x00000, 0x8000000, CRC(73d03f0d) SHA1(a1615dba39e9114ace7a8ad68f46195da655bf35) )
+ROM_END
 
 ROM_START( rtvgc300 )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
@@ -1082,6 +1129,13 @@ ROM_START( lxcmcyppa ) // all games selectable
 	VT3XX_INTERNAL_NO_SWAP
 ROM_END
 
+ROM_START( lxcmcypp75 ) // all games selectable
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "jl2365pa-a.u1", 0x00000, 0x2000000, CRC(c6f17abd) SHA1(336ea385dec851a648d50b6f854920f95f86b21f) )
+
+	VT3XX_INTERNAL_NO_SWAP
+ROM_END
+
 ROM_START( lxcypkdp ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "ddp.u2", 0x00000, 0x4000000, CRC(ac5ce022) SHA1(450d11886385aeadc81e62090acd1d8ef8fedcd8) )
@@ -1151,8 +1205,10 @@ ROM_START( 36pcase )
 	ROM_REGION( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "25q16.ic3", 0x00000, 0x200000, CRC(a8edb73e) SHA1(1028656530e411607ffa3b63788b42e41bf971d7) )
 
+	VT3XX_INTERNAL_NO_SWAP // verified for this set
+
 	ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection (put at 0xe01 in RAM) (checks for something before this)
-	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
+	ROM_LOAD( "serial-rom.bin", 0x00000, 0x100, CRC(877fb90b) SHA1(f8aa2512460244b03fb2f3c013f063c836adf1bd) )
 ROM_END
 
 
@@ -1282,7 +1338,7 @@ ROM_START( lxcap )
 
 	//ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection
 	// This table is just (0x100 - offset) & 0xff with a nibble swap applied at the end
-	// 
+	//
 	// The chip here (which is accessed in a different way to gtct885 etc.) might not
 	// be fetching data from a table, but doing a calculation
 	//
@@ -1416,8 +1472,6 @@ ROM_START( rbbrite )
 	// jumps to 0743
 	// jumps to 07d9
 	// (same addresses as goretrop, maybe same data is expected)
-
-	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
 /*
@@ -1476,11 +1530,11 @@ ROM_START( goretrop )
 	ROM_LOAD( "goretroportable.bin", 0x00000, 0x2000000, CRC(e7279dd3) SHA1(5f096ce22e46f112c2cc6588cb1c527f4f0430b5) )
 
 	ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection (copied to 0x701 - 0x7ff)
-	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
-	ROM_FILL( 0x000, 0x100, 0x60) // wants actual code here, just RTS opcodes don't work
-	// jumps to 072b
-	// jumps to 072f after putting a value in a
-	// jumps to 0743 after putting a value in x
+	// This is a hacked version of the data from gtct885, as the 'jump from ROM' offsets seem to match, but the
+	// code needs to be at a different address, and some of the ports read/written by the code are different too
+	//
+	// This is functional enough to get the menu running, but the real data still needs extracting.
+	ROM_LOAD( "protection.bin", 0x00000, 0x100, BAD_DUMP CRC(3cd42234) SHA1(3a4afc890d894b4256960150b2729fd5f93555a0) )
 ROM_END
 
 ROM_START( goretropa )
@@ -1488,7 +1542,8 @@ ROM_START( goretropa )
 	ROM_LOAD( "goretro.bin", 0x00000, 0x2000000, CRC(e2c579cc) SHA1(b5cb8883d1f0b238fc9966ac635583dd5c66bcfe) )
 
 	ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection (copied to 0x701 - 0x7ff)
-	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
+	// see note in goretrop set
+	ROM_LOAD( "protection.bin", 0x00000, 0x100, BAD_DUMP CRC(3cd42234) SHA1(3a4afc890d894b4256960150b2729fd5f93555a0) )
 ROM_END
 
 ROM_START( goretropu13 )
@@ -1496,7 +1551,8 @@ ROM_START( goretropu13 )
 	ROM_LOAD( "goretroportable250p_v13.bin", 0x00000, 0x2000000, CRC(b2a94173) SHA1(e64989f4b0a29820b0dce5e0ca91abb8f247c269) )
 
 	ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection (copied to 0x701 - 0x7ff)
-	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
+	// see note in goretrop set
+	ROM_LOAD( "protection.bin", 0x00000, 0x100, BAD_DUMP CRC(3cd42234) SHA1(3a4afc890d894b4256960150b2729fd5f93555a0) )
 ROM_END
 
 ROM_START( goretropu12 )
@@ -1504,7 +1560,8 @@ ROM_START( goretropu12 )
 	ROM_LOAD( "goretroportable250p_v12.bin", 0x00000, 0x2000000, CRC(fda93863) SHA1(75e48ac27e5520953676894747d6d06307cdc1af) )
 
 	ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection (copied to 0x701 - 0x7ff)
-	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
+	// see note in goretrop set
+	ROM_LOAD( "protection.bin", 0x00000, 0x100, BAD_DUMP CRC(3cd42234) SHA1(3a4afc890d894b4256960150b2729fd5f93555a0) )
 ROM_END
 
 ROM_START( s10fake )
@@ -1704,35 +1761,39 @@ CONS( 201?, dvnimbus,   0,        0,  vt369_unk_16mb, vt369, vt36x_state, empty_
 
 ****************************************************************************************************************/
 
-CONS( 2012, lexi30,    0,  0,  vt36x_8mb,  vt369_rot, vt36x_state, empty_init, "Lexibook", "Arcade Center - 30-in-1 (JL1800_01)", MACHINE_NOT_WORKING | ROT270 )
+CONS( 2012, lexi30,    0,  0,  vt36x_8mb,  vt369_rot, vt36x_state, empty_init, "Lexibook", "Arcade Center - 30-in-1 (JL1800_01)", MACHINE_IMPERFECT_GRAPHICS | ROT270 )
 
 // Q2 1.8 VER1.2 2012.03.18 on PCB
-CONS( 2012, jl1810gr,  0,  0,  vt36x_16mb, vt369_rot, vt36x_state, empty_init, "Lexibook", "Arcade Center - 60-in-1 (JL1810GR)", MACHINE_NOT_WORKING | ROT270 )
+CONS( 2012, jl1810gr,  0,  0,  vt36x_16mb, vt369_rot, vt36x_state, empty_init, "Lexibook", "Arcade Center - 60-in-1 (JL1810GR)", MACHINE_IMPERFECT_GRAPHICS | ROT270 )
 
-CONS( 2012, lxccatv,   0,  0,  vt36x_32mb, vt369,     vt36x_state, empty_init, "Lexibook", "Compact Cyber Arcade TV - 120 in 1 (JL2370)", MACHINE_NOT_WORKING ) // 32MByte ROM, 2011 on case, 2012 on PCB
+CONS( 2012, lxccatv,   0,  0,  vt36x_32mb, vt369,     vt36x_state, empty_init, "Lexibook", "Compact Cyber Arcade TV - 120 in 1 (JL2370)", MACHINE_IMPERFECT_GRAPHICS ) // 32MByte ROM, 2011 on case, 2012 on PCB
 
 // All Lexibook units below have 64Mbyte ROMs, must be externally banked, or different addressing scheme
+
+// these sets which render as 'vertical' still have a number of games (mostly hacks) not working properly
 CONS( 2012, lxcmcysp,  0,         0,  vt36x_32mb_2banks_lexi, vt369_rot, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Spider-Man (120-in-1)", MACHINE_NOT_WORKING | ROT270) // renders vertically, but screen stretches it to horizontal
 CONS( 2012, lxcmcyspa, lxcmcysp,  0,  vt36x_32mb_2banks_lexi, vt369_rot, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Spider-Man (JL2350SP, 120-in-1)", MACHINE_NOT_WORKING | ROT270)
-CONS( 2012, lxcmcydp,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Disney Princess (120-in-1)", MACHINE_NOT_WORKING )
-CONS( 2014, lxcmcyco,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars (JL2360DC-1, 120-in-1)", MACHINE_NOT_WORKING )
+
+CONS( 2012, lxcmcydp,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Disney Princess (120-in-1)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2014, lxcmcyco,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars (JL2360DC-1, 120-in-1)", MACHINE_IMPERFECT_GRAPHICS )
 // JL2365 models (150-in-1 versions)
-CONS( 200?, lxcmcysw,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Star Wars Rebels (JL2365SW)", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcyfz,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Frozen (JL2365FZ)", MACHINE_NOT_WORKING )
-CONS( 2018, lxcmcypj,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - PJ Masks (JL2365PJM)", MACHINE_NOT_WORKING )
-CONS( 2014, lxcmcyba,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Barbie (JL2365BB)", MACHINE_NOT_WORKING )
-CONS( 2014, lxcmcycr,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars (JL2365DC)", MACHINE_NOT_WORKING )
-CONS( 2014, lxcmcyfd,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Finding Dory", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcysw,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Star Wars Rebels (JL2365SW)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, lxcmcyfz,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Frozen (JL2365FZ)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2018, lxcmcypj,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - PJ Masks (JL2365PJM)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2014, lxcmcyba,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Barbie (JL2365BB)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2014, lxcmcycr,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars (JL2365DC)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2014, lxcmcyfd,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Finding Dory", MACHINE_IMPERFECT_GRAPHICS )
 // later JL2365 models (with added bitswap)
-CONS( 200?, lxcmcyfza, lxcmcyfz,  0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Frozen (JL2365FZ-6)", MACHINE_NOT_WORKING )
-CONS( 2018, lxcmcyppa, lxcmcypp,  0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol (JL2365PA-5)", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcyfza, lxcmcyfz,  0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Frozen (JL2365FZ-6)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2018, lxcmcyppa, lxcmcypp,  0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol (JL2365PA-5)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2018, lxcmcypp75,lxcmcypp,  0,  vt36x_32mb,             vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol (JL2365PA-A, 75-in-1)", MACHINE_IMPERFECT_GRAPHICS )
 // JL2367 models (150-in-1 versions, newer case style)
-CONS( 2018, lxcmcypp,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol (JL2367PA)", MACHINE_NOT_WORKING )
-CONS( 2020, lxcmcybt,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Batman (JL2367BAT)", MACHINE_NOT_WORKING )
-CONS( 2021, lxcmcyls,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Lilo & Stitch (JL2367D)", MACHINE_NOT_WORKING )
-CONS( 2014, lxcmcydpn, 0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Disney Princess (JL2367DP, 150-in-1)", MACHINE_NOT_WORKING )
-CONS( 2014, lxcmcyspn, 0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Spider-Man (JL2367SP, 150-in-1)", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcyfzb, lxcmcyfz,  0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Frozen (JL2367FZ)", MACHINE_NOT_WORKING )
+CONS( 2018, lxcmcypp,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol (JL2367PA)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2020, lxcmcybt,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Batman (JL2367BAT)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2021, lxcmcyls,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Lilo & Stitch (JL2367D)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2014, lxcmcydpn, 0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Disney Princess (JL2367DP, 150-in-1)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2014, lxcmcyspn, 0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Spider-Man (JL2367SP, 150-in-1)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, lxcmcyfzb, lxcmcyfz,  0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Frozen (JL2367FZ)", MACHINE_IMPERFECT_GRAPHICS )
 
 // JL1895 models, Cyber Arcade Pocket.  This make strange use of the LCDC, the menus are vertical (so must be copied to the LCD rotated) but the games are horizontal as usual
 CONS( 201?, lxcypkdp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Cyber Arcade Pocket - Disney Princess (JL1895DP)", MACHINE_NOT_WORKING )
@@ -1740,71 +1801,57 @@ CONS( 201?, lxcypksp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty
 CONS( 201?, lxcypkpp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Cyber Arcade Pocket - Paw Patrol (JL1895PA)", MACHINE_NOT_WORKING )
 CONS( 201?, lxcypkfz,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Cyber Arcade Pocket - Frozen (JL1895FZ)", MACHINE_NOT_WORKING )
 
-CONS( 200?, lxccminn,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Console Colour - Minnie Mouse (JL2800MN)", MACHINE_NOT_WORKING )
-CONS( 200?, lxccplan,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Console Colour - Disney's Planes (JL2800PL)", MACHINE_NOT_WORKING )
+CONS( 200?, lxccminn,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Console Colour - Minnie Mouse (JL2800MN)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, lxccplan,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Console Colour - Disney's Planes (JL2800PL)", MACHINE_IMPERFECT_GRAPHICS )
 // similar menus to the lxccminn/lxccplan sets
-CONS( 2013, lxcmcy,    0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 200 in 1 (JL2355)", MACHINE_NOT_WORKING )
-CONS( 2012, dgun2561,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System with 140 Games (DGUN-2561)", MACHINE_NOT_WORKING )
+CONS( 2013, lxcmcy,    0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 200 in 1 (JL2355)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2012, dgun2561,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System with 140 Games (DGUN-2561)", MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 200?, lxcmc250,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmc250,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_IMPERFECT_GRAPHICS )
 
 // JL2367-V1.03 20200228 on PCB, JL2377 on case
-CONS( 2020, jl2377,    0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - 250 in 1 (JL2377)", MACHINE_NOT_WORKING )
+CONS( 2020, jl2377,    0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - 250 in 1 (JL2377)", MACHINE_IMPERFECT_GRAPHICS )
 
-// GB-NO13-Main-VT389-2 on PCBs - uses higher resolution mode (twice usual h-res?)
-CONS( 2016, rtvgc300,  0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )
-CONS( 2017, rtvgc300fz,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )
-CONS( 2017, rtvgc300cr,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - Disney Cars - 300 Games (JG7800DC-1)", MACHINE_NOT_WORKING )
-CONS( 2018, rtvgc300pj,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - PJ Masks - 300 Games (JG7800PJM-1)", MACHINE_NOT_WORKING )
+// GB-NO13-Main-VT389-2 on PCBs - uses higher resolution mode for the menus (twice hres and interlaced)
+// currently renders without high-res/interlace support
+CONS( 2016, rtvgc300,  0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - 300 Games", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2017, rtvgc300fz,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - Frozen - 300 Games", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2017, rtvgc300cr,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - Disney Cars - 300 Games (JG7800DC-1)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2018, rtvgc300pj,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - PJ Masks - 300 Games (JG7800PJM-1)", MACHINE_IMPERFECT_GRAPHICS )
 
 
 /* The following are also confirmed to be NES/VT derived units, most having a standard set of games with a handful of lazy graphic mods thrown in to fit the unit theme
 
-    (handheld units, use standard AAA batteries)
-    Lexibook Compact Cyber Arcade - Finding Dory
-
-    (handheld units, use standard AAA batteries, smaller display)
-    Lexibook Compact Cyber Arcade Pocket - Paw Patrol
-    Lexibook Compact Cyber Arcade Pocket - Frozen
-
     (Handheld units, but different form factor to Compact Cyber Arcade, charged via USB, different menus)
     Lexibook Console Colour - Barbie
 
-    (more?)
-
-    There are also updated 'Compact Cyber Arcade' branded units with a large + D-pad and internal battery / USB charger for
-    Spiderman
-    Frozen
-    (generic)
-    it isn't verified if these use the same ROMs as the original Compact Cyber Arcade releases, or if the software has been updated
-
+	further case variations of supported units may exist with different product numbers and slightly different ROM data 
 */
 
 // uncertain, NOT SPI ROM
-CONS( 200?, zonefusn,  0,         0,  vt36x_16mb,     vt369, vt36x_state, empty_init, "Ultimate Products / Jungle's Soft", "Zone Fusion",  MACHINE_NOT_WORKING )
+CONS( 200?, zonefusn,  0,         0,  vt36x_16mb,     vt369, vt36x_state, empty_init, "Ultimate Products / Jungle's Soft", "Zone Fusion",  MACHINE_IMPERFECT_GRAPHICS )
 // same as above but without Jungle's Soft boot logo? model number taken from cover of manual
-CONS( 200?, sealvt,    zonefusn,  0,  vt36x_16mb,     vt369, vt36x_state, empty_init, "Lexibook / Sit Up Limited / Jungle's Soft", "Seal 30-in-1 (VT based, Model FN098134)",  MACHINE_NOT_WORKING )
+CONS( 200?, sealvt,    zonefusn,  0,  vt36x_16mb,     vt369, vt36x_state, empty_init, "Lexibook / Sit Up Limited / Jungle's Soft", "Seal 30-in-1 (VT based, Model FN098134)",  MACHINE_IMPERFECT_GRAPHICS )
 
-// possibly VT269; contains high-resolution versions of classic NES games
-// sub-CPU hangs on unemulated $2117 register and later uses vtsetdbk to switch opcode encryption
-CONS( 201?, dgun2572, 0,  0,  vt36x_32mb, vt369, vt36x_state, init_dgun2572, "dreamGEAR", "My Arcade Wireless Video Game Station 200-in-1 (DGUN-2572)", MACHINE_NOT_WORKING )
+// many games lack sound, not a bug
+CONS( 200?, gcs2mgp,   0,  0,  vt36x_altswap_16mb, vt369_rot, vt36x_state, empty_init, "Jungle's Soft", "Mini Game Player 48-in-1",  MACHINE_IMPERFECT_GRAPHICS | ROT270 )
 
 // NOT SPI roms, altswap sets code starts with '6a'
 
-CONS( 201?, red5mam,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "Red5", "Mini Arcade Machine (Red5, 'Xtra Game')", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+CONS( 201?, red5mam,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "Red5", "Mini Arcade Machine (Red5, 'Xtra Game')", MACHINE_NOT_WORKING )
 
-CONS( 2016, dgun2593,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+CONS( 2016, dgun2593,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING )
 
-CONS( 200?, gcs2mgp,   0,  0,  vt36x_altswap_16mb, vt369_rot, vt36x_state, empty_init, "Jungle's Soft", "Mini Game Player 48-in-1",  MACHINE_NOT_WORKING | ROT270 )
+CONS( 201?, urban240,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "Urban Outfitters", "Mini Arcade Machine 240-in-1 (translucent case)", MACHINE_NOT_WORKING )
 
 // Not the same as the other 240-in-1 machine from Thumbs Up below (tup240) This one makes greater use of newer VT features with most games having sampled music, not APU sound.
 // Several of the games contained in here are buggy / broken on real hardware (see https://www.youtube.com/watch?v=-mgGNaDQ1HE )
-CONS( 201?, 240in1ar,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "Thumbs Up", "Mini Arcade Machine (Thumbs Up, 240IN1ARC)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
-// portable fan + famiclone combo handheld, very similar to 240in1ar
+CONS( 201?, 240in1ar,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "Thumbs Up", "Mini Arcade Machine (Thumbs Up, 240IN1ARC)", MACHINE_NOT_WORKING )
+// portable fan + famiclone combo handheld, very similar to 240in1ar, pacman doesn't work (check why)
 CONS( 2020, nubsupmf,   0,      0,  vt36x_altswap_4mb, vt369, vt36x_state, empty_init, "<unknown>", "NubSup Mini Game Fan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // protected both with accesses involving 41e7 / 41eb / 414f (probably more IO ports, to get 2 bytes in RAM) and the serial devices to get ~0x100 bytes of code
-CONS( 202?, 36pcase,    0,      0,  vt36x_altswap_2mb_36pcase, vt369, vt36x_gtct885_state, empty_init, "<unknown>", "36-in-1 Classic Games phone case", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 202?, 36pcase,    0,      0,  vt36x_altswap_2mb_36pcase, vt369, vt36x_gtct885_state, empty_init, "<unknown>", "36-in-1 Classic Games phone case", MACHINE_IMPERFECT_GRAPHICS )
 
 
 /*****************************************************************************
@@ -1815,42 +1862,42 @@ CONS( 202?, 36pcase,    0,      0,  vt36x_altswap_2mb_36pcase, vt369, vt36x_gtct
 *****************************************************************************/
 
 // different SoC (and language select music) from 2019 version, opcodes are scrambled
-CONS( 2020, gbox2020, gbox2019, 0, vt36x_gbox2020_16mb, vt369, vt36x_state, empty_init, "Sup", "Game Box 400 in 1 (2020 PCB)", MACHINE_NOT_WORKING )
+CONS( 2020, gbox2020, gbox2019, 0, vt4ffx_gbox2020_16mb, vt369, vt4ffx_state, empty_init, "Sup", "Game Box 400 in 1 (2020 PCB)", MACHINE_NOT_WORKING )
 
 // GB-40-36V1.2 and 20180825 on PCB, assuming to be from Sup although unit wasn't branded
-CONS( 2018, rsps300,  0,        0,  vt36x_rsps300swap_16mb, vt369, vt36x_state, empty_init,   "Sup", "Retro Station Pocket System GB-40 300 in 1",  MACHINE_NOT_WORKING )
+CONS( 2018, rsps300,  0,        0,  vt4ffx_rsps300swap_16mb, vt369, vt4ffx_state, empty_init,   "Sup", "Retro Station Pocket System GB-40 300 in 1",  MACHINE_NOT_WORKING )
 
 // unknown tech, probably from 2021, probably VT369, ROM wouldn't read consistently
 // several games don't work (eg. Curly Monkey 2, maybe due to bad dump?)
-CONS( 202?, vibes240, 0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1 (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 202?, vibes240, 0,        0,  vt4ffx_vibesswap_16mb, vt369, vt4ffx_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1 (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 // also a bad dump, different encryption, but Curly Monkey 2 works here, only first 2 opcodes are encrypted
-CONS( 202?, vibes240a,vibes240, 0,  vt36x_gbox2020_16mb,  vt369, vt36x_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1 (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 202?, vibes240a,vibes240, 0,  vt4ffx_gbox2020_16mb,  vt369, vt4ffx_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1 (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // has TUI (holiday company) logo on packaging, no other manufacturer details
-CONS( 201?, tui240,     0,        0,  vt36x_gbox2020_8mb,    vt369, vt36x_state, init_tui240, "<unknown>",  "TUI 240-in-1", MACHINE_NOT_WORKING )
+CONS( 201?, tui240,   0,        0,  vt4ffx_gbox2020_8mb,   vt369, vt4ffx_state, init_tui240, "<unknown>",  "TUI 240-in-1", MACHINE_NOT_WORKING )
 
 // boots and runs, but not all games have been tested
-CONS( 202?, t3_630,   0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, empty_init, "<unknown>", "630 Games in 1 Handheld (T3)", MACHINE_NOT_WORKING )
+CONS( 202?, t3_630,   0,        0,  vt4ffx_vibesswap_16mb, vt369, vt4ffx_state, empty_init, "<unknown>", "630 Games in 1 Handheld (T3)", MACHINE_NOT_WORKING )
 
-CONS( 202?, zl383,    0,        0,  vt36x_vibesswap_8mb,  vt369, vt36x_state, empty_init, "<unknown>", "ZL-383 400-in-1 Handheld Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 202?, zl383,    0,        0,  vt4ffx_vibesswap_8mb,  vt369, vt4ffx_state, empty_init, "<unknown>", "ZL-383 400-in-1 Handheld Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 202?, retro620, 0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, empty_init, "<unknown>", "Retro FC 620-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 202?, retro620, 0,        0,  vt4ffx_vibesswap_16mb, vt369, vt4ffx_state, empty_init, "<unknown>", "Retro FC 620-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // all games after the first 180 listed on the menu are duplicates. BTANB: games 501-520 are mislabeled duplicates: e.g., "511. Exerion" actually loads Pac-Man.
 // unused routines suggest this was originally developed for nes_vt42xx.cpp hardware (cf. g9_666, g5_500 with the same bitswap)
 // there are other S10 units available
-CONS( 202?, s10fake,   0,  0,  vt36x_s10swap_8mb, vt369, vt36x_state, init_s10fake, "<unknown>", "S10 Handheld Game Console (520-in-1, fake entries)", MACHINE_NOT_WORKING )
+CONS( 202?, s10fake,   0,  0,  vt4ffx_s10swap_8mb, vt369, vt4ffx_state, init_s10fake, "<unknown>", "S10 Handheld Game Console (520-in-1, fake entries)", MACHINE_NOT_WORKING )
 // different version, same packaging.  Larger ROM, fewer duplicates etc.
-CONS( 202?, s10_520,   0,  0,  vt36x_gbox2020_16mb, vt369, vt36x_state, empty_init, "<unknown>", "S10 Handheld Game Console (520-in-1)",  MACHINE_NOT_WORKING )
+CONS( 202?, s10_520,   0,  0,  vt4ffx_gbox2020_16mb, vt369, vt4ffx_state, empty_init, "<unknown>", "S10 Handheld Game Console (520-in-1)",  MACHINE_NOT_WORKING )
 // similar to above, but no scramble?
-CONS( 202?, s5_520,    0,  0,  vt36x_16mb,          vt369, vt36x_state, empty_init, "<unknown>", "S5 Game Box (520-in-1)",  MACHINE_NOT_WORKING )
+CONS( 202?, s5_520,    0,  0,  vt4ffx_16mb,          vt369, vt4ffx_state, empty_init, "<unknown>", "S5 Game Box (520-in-1)",  MACHINE_NOT_WORKING )
 // fewer games, but does have the scramble
-CONS( 202?, 500in1hh,  0,  0,  vt36x_gbox2020_16mb, vt369, vt36x_state, empty_init, "<unknown>", "500-in-1 Handheld Game",  MACHINE_NOT_WORKING )
+CONS( 202?, 500in1hh,  0,  0,  vt4ffx_gbox2020_16mb, vt369, vt4ffx_state, empty_init, "<unknown>", "500-in-1 Handheld Game",  MACHINE_NOT_WORKING )
 
 // there were also 'F1' units, shaped like a car, ROM may or may not be the same
-CONS( 202?, f5_620,    0,  0,  vt36x_16mb,        vt369, vt36x_state, init_f5_620,   "<unknown>", "F5 Handheld Game Console (620-in-1)",  MACHINE_NOT_WORKING )
+CONS( 202?, f5_620,    0,  0,  vt4ffx_16mb,        vt369, vt4ffx_state, init_f5_620,   "<unknown>", "F5 Handheld Game Console (620-in-1)",  MACHINE_NOT_WORKING )
 
-CONS( 202?, h12p1000,  0,        0,  vt36x_h12p1000,     vt369, vt36x_state, empty_init, "<unknown>", "H12 Pro 1000 in 1 Handheld Game Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 202?, h12p1000,  0,        0,  vt4ffx_h12p1000,     vt369, vt4ffx_state, empty_init, "<unknown>", "H12 Pro 1000 in 1 Handheld Game Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 /*****************************************************************************
 * below are VT369 games that use SQI / SPI ROM
@@ -1895,11 +1942,10 @@ CONS( 202?, 168pcase, 0,      0,  vt36x_4mb, vt369, vt36x_state, empty_init, "<u
 // game 13 (Powerpul Girl) has entirely broken graphics even on the real device
 CONS( 201?, lxcap,    0,      0,  vt36x_8mb_lxcap, vt369, vt36x_tetrtin_state, empty_init, "Lexibook", "Cyber Arcade Pocket (JL1895)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-// seems to be running the NES version of Pac-Man with some extra splash screens, has extra protection
-// (protection is the same as lxcap)
+// seems to be running the NES version of Pac-Man with some extra splash screens, has extra protection (the same as lxcap)
+// pactin has broken gfx in cutscenes
 CONS( 2021, pactin,     0,        0,  vt36x_1mb_tetrtin, vt369, vt36x_tetrtin_state, empty_init, "Fizz Creations", "Pac-Man Arcade in a Tin", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-// (protection is the same as lxcap)
-CONS( 2021, tetrtin,    0,        0,  vt36x_1mb_tetrtin, vt369, vt36x_tetrtin_state, empty_init, "Fizz Creations", "Tetris Arcade in a Tin", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2021, tetrtin,    0,        0,  vt36x_1mb_tetrtin, vt369, vt36x_tetrtin_state, empty_init, "Fizz Creations", "Tetris Arcade in a Tin", MACHINE_IMPERFECT_GRAPHICS )
 
 // 2022 date on 'BL-867 PCB03' PCB, has extra protection?
 CONS( 2022, nesvt270,    0,  0,  vt36x_16mb_nesvt270, vt369, vt36x_tetrtin_state, empty_init, "<unknown>", "unknown VT3xx based 270-in-1 (BL-867 PCB03)", MACHINE_NOT_WORKING )
@@ -1930,9 +1976,9 @@ CONS( 200?, jl2050,    0,        0,  vt36x_16mb, vt369, vt36x_state, empty_init,
 // the menus are very different to the plug-in TV version found in ppgc200g
 CONS( 201?, supr200,    0,        0,  vt36x_swap_8mb, vt369, vt36x_state, empty_init, "Fizz Creations",  "Supreme 200 (handheld)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 201?, tiger108,  0,        0,  vt36x_4mb, vt369, vt36x_state, empty_init, "Zebra AS / Tiger Retail", "Spillekonsol Game console - 108-in-1", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, tiger108,  0,        0,  vt36x_swap_4mb, vt369, vt36x_state, empty_init, "Zebra AS / Tiger Retail", "Spillekonsol Game console - 108-in-1", MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 201?, gon100,    0,        0,  vt36x_4mb, vt369, vt36x_state, empty_init, "<unknown>", "Game On 100-in-1", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, gon100,    0,        0,  vt36x_swap_4mb, vt369, vt36x_state, empty_init, "<unknown>", "Game On 100-in-1", MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 201?, d12power,  0,        0,  vt36x_16mb, vt369, vt36x_state, empty_init, "SZDiiER", "Power - Charging and playing games (D12) (416-in-1)", MACHINE_IMPERFECT_GRAPHICS )
 
@@ -1952,11 +1998,15 @@ CONS( 202?, a6plus,    0,        0,  vt36x_8mb, vt369, vt36x_state, empty_init, 
 CONS( 202?, unk198vt, 0,        0,  vt36x_8mb,  vt369, vt36x_state, empty_init, "<unknown>", "198-in-1 Handheld Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // has extra protection (using ports at 4138 / 4139, copied to 0x701)
-CONS( 2018, rbbrite,    0,        0,  vt36x_1mb_rbbrite, vt369, vt36x_goretrop_state, empty_init, "Coleco", "Rainbow Brite (mini-arcade)", MACHINE_NOT_WORKING )
+CONS( 2018, rbbrite,    0,        0,  vt4ffx_1mb_rbbrite, vt369, vt4ffx_goretrop_state, empty_init, "Coleco", "Rainbow Brite (mini-arcade)", MACHINE_NOT_WORKING )
 
 // has extra protection (using ports at 4138 / 4139, copied to 0x701)
-CONS( 2018, goretrop,  0,         0,  vt36x_32mb_goretrop, vt369, vt36x_goretrop_state, empty_init,    "Retro-Bit", "Go Retro Portable 260+ Games", MACHINE_NOT_WORKING )
-CONS( 2018, goretropa, goretrop,  0,  vt36x_32mb_goretrop, vt369, vt36x_goretrop_state, empty_init,    "Retro-Bit", "Go Retro Portable 260+ Games (older)", MACHINE_NOT_WORKING ) // doesn't have commando or higemaru
+CONS( 2018, goretrop,  0,         0,  vt4ffx_32mb_goretrop, vt369, vt4ffx_goretrop_state, empty_init,    "Retro-Bit", "Go Retro Portable 260+ Games", MACHINE_NOT_WORKING )
+CONS( 2018, goretropa, goretrop,  0,  vt4ffx_32mb_goretrop, vt369, vt4ffx_goretrop_state, empty_init,    "Retro-Bit", "Go Retro Portable 260+ Games (older)", MACHINE_NOT_WORKING ) // doesn't have commando or higemaru
 // these US versions have 1.2 and 1.3 printed on the packaging
-CONS( 2018, goretropu13,goretrop, 0,  vt36x_32mb_goretrop, vt369, vt36x_goretrop_state, empty_init,    "Retro-Bit", "Go Retro Portable 250+ Games (US, V1.3)", MACHINE_NOT_WORKING )
-CONS( 2018, goretropu12,goretrop, 0,  vt36x_32mb_goretrop, vt369, vt36x_goretrop_state, empty_init,    "Retro-Bit", "Go Retro Portable 250+ Games (US, V1.2)", MACHINE_NOT_WORKING )
+CONS( 2018, goretropu13,goretrop, 0,  vt4ffx_32mb_goretrop, vt369, vt4ffx_goretrop_state, empty_init,    "Retro-Bit", "Go Retro Portable 250+ Games (US, V1.3)", MACHINE_NOT_WORKING )
+CONS( 2018, goretropu12,goretrop, 0,  vt4ffx_32mb_goretrop, vt369, vt4ffx_goretrop_state, empty_init,    "Retro-Bit", "Go Retro Portable 250+ Games (US, V1.2)", MACHINE_NOT_WORKING )
+
+// possibly VT269; contains high-resolution versions of classic NES games
+// sub-CPU hangs on unemulated $2117 register and later uses vtsetdbk to switch opcode encryption
+CONS( 201?, dgun2572, 0,  0,  vt36x_32mb, vt369, vt36x_state, init_dgun2572, "dreamGEAR", "My Arcade Wireless Video Game Station 200-in-1 (DGUN-2572)", MACHINE_NOT_WORKING )

@@ -33,12 +33,358 @@ TODO:
 ****************************************************************************/
 
 #include "emu.h"
-#include "vector06.h"
 
-#include "formats/vector06_dsk.h"
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+
+#include "cpu/i8085/i8085.h"
+
+#include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
+
+#include "machine/i8255.h"
+#include "machine/pit8253.h"
+#include "machine/ram.h"
+#include "machine/wd_fdc.h"
+
+#include "sound/ay8910.h"
+#include "sound/spkrdev.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
+#include "formats/vector06_dsk.h"
+
+
+namespace {
+
+class vector06_state : public driver_device
+{
+public:
+	vector06_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "maincpu")
+		, m_speaker(*this, "speaker")
+		, m_cassette(*this, "cassette")
+		, m_cart(*this, "cartslot")
+		, m_fdc(*this, "fdc")
+		, m_floppy0(*this, "fdc:0")
+		, m_floppy1(*this, "fdc:1")
+		, m_ay(*this, "aysnd")
+		, m_ram(*this, RAM_TAG)
+		, m_palette(*this, "palette")
+		, m_screen(*this, "screen")
+		, m_ppi1(*this, "ppi1")
+		, m_ppi2(*this, "ppi2")
+		, m_pit(*this, "pit")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_bank3(*this, "bank3")
+		, m_io_keyboard(*this, "LINE.%u", 0U)
+		, m_io_reset(*this, "RESET")
+	{ }
+
+	void vector06(machine_config &config) ATTR_COLD;
+	DECLARE_INPUT_CHANGED_MEMBER(f11_button);
+	DECLARE_INPUT_CHANGED_MEMBER(f12_button);
+
+private:
+	static void floppy_formats(format_registration &fr);
+
+	uint8_t ppi1_portb_r();
+	uint8_t ppi1_portc_r();
+	void ppi1_porta_w(uint8_t data);
+	void ppi1_portb_w(uint8_t data);
+	void color_set(uint8_t data);
+	uint8_t ppi2_portb_r();
+	void ppi2_portb_w(uint8_t data);
+	void ppi2_porta_w(uint8_t data);
+	void ppi2_portc_w(uint8_t data);
+	void disc_w(uint8_t data);
+	void status_callback(uint8_t data);
+	void ramdisk_w(uint8_t data);
+	void speaker_w(int state);
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	IRQ_CALLBACK_MEMBER(irq_callback);
+	void update_mem();
+
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+
+	required_device<i8080_cpu_device> m_maincpu;
+	required_region_ptr<u8> m_rom;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<cassette_image_device> m_cassette;
+	required_device<generic_slot_device> m_cart;
+	required_device<kr1818vg93_device> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<ay8910_device> m_ay;
+	required_device<ram_device> m_ram;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+	required_device<i8255_device> m_ppi1, m_ppi2;
+	required_device<pit8253_device> m_pit;
+	required_memory_bank m_bank1;
+	required_memory_bank m_bank2;
+	required_memory_bank m_bank3;
+	required_ioport_array<9> m_io_keyboard;
+	required_ioport m_io_reset;
+
+	uint8_t m_keyboard_mask = 0;
+	uint8_t m_color_index = 0;
+	uint8_t m_romdisk_msb = 0;
+	uint8_t m_romdisk_lsb = 0;
+	uint8_t m_vblank_state = 0;
+	uint8_t m_rambank = 0;
+	uint8_t m_aylatch = 0;
+	bool m_video_mode = false;
+	bool m_stack_state = false;
+	bool m_romen = false;
+};
+
+
+uint8_t vector06_state::ppi1_portb_r()
+{
+	uint8_t key = 0xff;
+	for (u8 i = 0; i < 8; i++)
+		if (BIT(m_keyboard_mask, i))
+			key &= m_io_keyboard[i]->read();
+
+	return key;
+}
+
+uint8_t vector06_state::ppi1_portc_r()
+{
+	uint8_t ret = m_io_keyboard[8]->read();
+
+	if (m_cassette->input() > 0)
+		ret |= 0x10;
+
+	return ret;
+}
+
+void vector06_state::ppi1_porta_w(uint8_t data)
+{
+	m_keyboard_mask = data ^ 0xff;
+}
+
+void vector06_state::ppi1_portb_w(uint8_t data)
+{
+	m_color_index = data & 0x0f;
+	if (BIT(data, 4) != m_video_mode)
+	{
+		m_video_mode = BIT(data, 4);
+		u16 width = m_video_mode ? 512 : 256;
+		rectangle visarea(0, width+64-1, 0, 256+64-1);
+		m_screen->configure(width+64, 256+64, visarea, m_screen->frame_period().attoseconds());
+	}
+}
+
+void vector06_state::color_set(uint8_t data)
+{
+	uint8_t r = (data & 7) << 5;
+	uint8_t g = ((data >> 3) & 7) << 5;
+	uint8_t b = ((data >>6) & 3) << 6;
+	m_palette->set_pen_color( m_color_index, rgb_t(r,g,b) );
+}
+
+
+uint8_t vector06_state::ppi2_portb_r()
+{
+	uint16_t addr = ((m_romdisk_msb & 0x7f) << 8) | m_romdisk_lsb;
+	if ((m_romdisk_msb & 0x80) && m_cart->exists() && addr < m_cart->get_rom_size())
+		return m_cart->read_rom(addr);
+	else
+		return m_ay->data_r();
+}
+
+void vector06_state::ppi2_portb_w(uint8_t data)
+{
+	m_aylatch = data;
+}
+
+void vector06_state::ppi2_porta_w(uint8_t data)
+{
+	m_romdisk_lsb = data;
+}
+
+void vector06_state::ppi2_portc_w (uint8_t data)
+{
+	if (data & 4)
+		m_ay->address_data_w((data >> 1) & 1, m_aylatch);
+	m_romdisk_msb = data;
+}
+
+IRQ_CALLBACK_MEMBER(vector06_state::irq_callback)
+{
+	// Interrupt is RST 7
+	return 0xff;
+}
+
+INPUT_CHANGED_MEMBER(vector06_state::f11_button)
+{
+	if (newval)
+	{
+		m_romen = true;
+		update_mem();
+		m_maincpu->reset();
+	}
+}
+
+INPUT_CHANGED_MEMBER(vector06_state::f12_button)
+{
+	if (newval)
+	{
+		m_romen = false;
+		update_mem();
+		m_maincpu->reset();
+	}
+}
+
+void vector06_state::disc_w(uint8_t data)
+{
+	floppy_image_device *floppy = nullptr;
+
+	switch (data & 0x01)
+	{
+	case 0: floppy = m_floppy0->get_device(); break;
+	case 1: floppy = m_floppy1->get_device(); break;
+	}
+
+	m_fdc->set_floppy(floppy);
+
+	if (floppy)
+	{
+		// something here needs to turn the motor on
+		floppy->mon_w(0);
+		floppy->ss_w(!BIT(data, 2));
+	}
+}
+
+void vector06_state::update_mem()
+{
+	if (BIT(m_rambank, 4) && m_stack_state)
+	{
+		u8 sentry = ((m_rambank >> 2) & 3) + 1;
+		m_bank1->set_entry(sentry);
+		m_bank3->set_entry(sentry);
+		m_bank2->set_entry(sentry + 1u);
+	}
+	else
+	{
+		m_bank1->set_entry(0);
+		u8 ventry = 0;
+		if (BIT(m_rambank, 5))
+			ventry = (m_rambank & 3) + 1;
+		m_bank3->set_entry(ventry);
+		if (m_romen)
+			m_bank2->set_entry(0);
+		else
+			m_bank2->set_entry(1);
+	}
+}
+
+void vector06_state::ramdisk_w(uint8_t data)
+{
+	const uint8_t oldbank = m_rambank;
+	m_rambank = data;
+	if (oldbank != m_rambank)
+		update_mem();
+}
+
+void vector06_state::status_callback(uint8_t data)
+{
+	const bool oldstate = m_stack_state;
+	m_stack_state = bool(data & i8080_cpu_device::STATUS_STACK);
+	if ((oldstate != m_stack_state) && BIT(m_rambank, 4))
+		update_mem();
+}
+
+void vector06_state::speaker_w(int state)
+{
+	m_speaker->level_w(state);
+}
+
+void vector06_state::machine_start()
+{
+	u8 *r = m_ram->pointer();
+
+	m_bank1->configure_entries(0, 5, r, 0x10000);
+	m_bank2->configure_entry(0, m_rom);
+	m_bank2->configure_entries(1, 5, r, 0x10000);
+	m_bank3->configure_entries(0, 5, r + 0xa000, 0x10000);
+
+	save_item(NAME(m_keyboard_mask));
+	save_item(NAME(m_color_index));
+	save_item(NAME(m_romdisk_msb));
+	save_item(NAME(m_romdisk_lsb));
+	save_item(NAME(m_vblank_state));
+	save_item(NAME(m_rambank));
+	save_item(NAME(m_aylatch));
+	save_item(NAME(m_video_mode));
+	save_item(NAME(m_stack_state));
+	save_item(NAME(m_romen));
+}
+
+void vector06_state::machine_reset()
+{
+	m_stack_state = false;
+	m_rambank = 0;
+	m_romen = true;
+
+	update_mem();
+
+	m_keyboard_mask = 0;
+	m_color_index = 0;
+	m_video_mode = 0;
+	m_bank1->set_entry(0);
+	m_bank2->set_entry(0);
+	m_bank3->set_entry(0);
+}
+
+
+uint32_t vector06_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	uint8_t const *const ram = m_ram->pointer();
+
+	u16 const width = (m_video_mode) ? 512 : 256;
+	rectangle screen_area(0,width+64-1,0,256+64-1);
+	// fill border color
+	bitmap.fill(m_color_index, screen_area);
+
+	// draw image
+	for (int x = 0; x < 32; x++)
+	{
+		for (int y = 0; y < 256; y++)
+		{
+			// port A of 8255 also used as scroll
+			int const draw_y = ((255-y-m_keyboard_mask) & 0xff) +32;
+			uint8_t const code1 = ram[0x8000 + x*256 + y];
+			uint8_t const code2 = ram[0xa000 + x*256 + y];
+			uint8_t const code3 = ram[0xc000 + x*256 + y];
+			uint8_t const code4 = ram[0xe000 + x*256 + y];
+			for (int b = 0; b < 8; b++)
+			{
+				uint8_t const col = BIT(code1, b) * 8 + BIT(code2, b) * 4 + BIT(code3, b)* 2+ BIT(code4, b);
+				if (!m_video_mode)
+					bitmap.pix(draw_y, x*8+(7-b)+32) = col;
+				else
+				{
+					bitmap.pix(draw_y, x*16+(7-b)*2+1+32) = BIT(code2, b) * 2;
+					bitmap.pix(draw_y, x*16+(7-b)*2+32)   = BIT(code3, b) * 2;
+				}
+			}
+		}
+	}
+	return 0;
+}
+
 
 /* Address maps */
 void vector06_state::mem_map(address_map &map)
@@ -224,7 +570,7 @@ void vector06_state::vector06(machine_config &config)
 
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(1500000);
 	m_pit->set_clk<1>(1500000);
 	m_pit->set_clk<2>(1500000);
@@ -275,6 +621,9 @@ ROM_START( krista2 ) // appears it wants to load a tape at boot
 	ROM_REGION( 0x0200, "palette", 0 )
 	ROM_LOAD( "krista2.pal", 0x0000, 0x0200, CRC(b243da33) SHA1(9af7873e6f8bf452c8d831833ffb02dce833c095))
 ROM_END
+
+} // anonymous namespace
+
 /* Driver */
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME       FLAGS */

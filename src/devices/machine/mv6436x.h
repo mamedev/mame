@@ -38,8 +38,16 @@ public:
 		set_pcihost_tag(0, std::forward<U>(pcihost0_tag));
 		set_pcihost_tag(1, std::forward<V>(pcihost1_tag));
 	}
+	template <typename T, typename U, typename V>
+	mv64361_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&pcihost0_tag, V &&pcihost1_tag):
+		mv64361_device(mconfig, tag, owner)
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+		set_pcihost_tag(0, std::forward<U>(pcihost0_tag));
+		set_pcihost_tag(1, std::forward<V>(pcihost1_tag));
+	}
 
-	mv64361_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mv64361_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_pcihost_tag(int idx, T &&tag) { m_pcihost[idx].set_tag(std::forward<T>(tag)); }
@@ -242,9 +250,9 @@ class mv64361_pci_host_device : public pci_host_device
 {
 public:
 	// construction/destruction
-	mv64361_pci_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mv64361_pci_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	uint32_t config_address_r(offs_t offset, uint32_t mem_mask = ~0);
+	virtual uint32_t config_address_r(offs_t offset, uint32_t mem_mask = ~0) override;
 	virtual void config_address_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) override;
 	uint32_t config_data_r(offs_t offset, uint32_t mem_mask = ~0);
 	void config_data_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

@@ -8813,7 +8813,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="inindo">
-		<description>Inindou - Datou Nobunaga (Japan)</description>
+		<description>Inindou: Datou Nobunaga (Japan)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="伊忍道打倒信長"/>
@@ -8841,7 +8841,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="inindoa" cloneof="inindo">
-		<description>Inindou - Datou Nobunaga (Japan, alt)</description>
+		<description>Inindou: Datou Nobunaga (Japan, alt)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="伊忍道打倒信長"/>

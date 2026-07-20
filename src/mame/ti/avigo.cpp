@@ -66,16 +66,211 @@
 
 
 #include "emu.h"
-#include "avigo.h"
 
+#include "bus/rs232/rs232.h"
+#include "cpu/z80/z80.h"
+#include "imagedev/snapquik.h"
+#include "machine/bankdev.h"
+#include "machine/ins8250.h"
+#include "machine/intelfsh.h"
+#include "machine/nvram.h"
+#include "machine/ram.h"
+#include "machine/rp5c01.h"
+#include "machine/timer.h"
+#include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 #include "avigo.lh"
 
+#define AVIGO_SCREEN_WIDTH        160
+#define AVIGO_SCREEN_HEIGHT       240
+#define AVIGO_PANEL_HEIGHT        26
+
 
 #define AVIGO_LOG 0
 #define LOG(x) do { if (AVIGO_LOG) logerror x; } while (0)
+
+
+namespace {
+
+class avigo_state : public driver_device
+{
+public:
+	avigo_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
+		, m_speaker(*this, "speaker")
+		, m_uart(*this, "ns16550")
+		, m_serport(*this, "serport")
+		, m_palette(*this, "palette")
+		, m_bankdev1(*this, "bank0")
+		, m_bankdev2(*this, "bank1")
+		, m_flash1(*this, "flash1")
+		, m_nvram(*this, "nvram")
+	{ }
+
+	void avigo(machine_config &config) ATTR_COLD;
+
+	DECLARE_INPUT_CHANGED_MEMBER(pen_irq);
+	DECLARE_INPUT_CHANGED_MEMBER(pen_move_irq);
+	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
+	DECLARE_INPUT_CHANGED_MEMBER(power_down_irq);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+	void refresh_ints();
+	void nvram_init(nvram_device &nvram, void *base, size_t size);
+
+	void tc8521_alarm_int(int state);
+	void com_interrupt(int state);
+
+	uint8_t key_data_read_r();
+	void set_key_line_w(uint8_t data);
+	void port2_w(uint8_t data);
+	uint8_t irq_r();
+	void irq_w(uint8_t data);
+	uint8_t bank1_r(offs_t offset);
+	uint8_t bank2_r(offs_t offset);
+	void bank1_w(offs_t offset, uint8_t data);
+	void bank2_w(offs_t offset, uint8_t data);
+	uint8_t ad_control_status_r();
+	void ad_control_status_w(uint8_t data);
+	uint8_t ad_data_r();
+	void speaker_w(uint8_t data);
+	uint8_t port_04_r();
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint8_t vid_memory_r(offs_t offset);
+	void vid_memory_w(offs_t offset, uint8_t data);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(avigo_scan_timer);
+	TIMER_DEVICE_CALLBACK_MEMBER(avigo_1hz_timer);
+
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
+	void avigo_banked_map(address_map &map) ATTR_COLD;
+	void avigo_io(address_map &map) ATTR_COLD;
+	void avigo_mem(address_map &map) ATTR_COLD;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<ns16550_device> m_uart;
+	required_device<rs232_port_device> m_serport;
+	required_device<palette_device> m_palette;
+	required_device<address_map_bank_device> m_bankdev1;
+	required_device<address_map_bank_device> m_bankdev2;
+	required_device<intelfsh8_device> m_flash1;
+	required_shared_ptr<uint8_t> m_nvram;
+
+	// driver state
+	uint8_t               m_key_line = 0U;
+	uint8_t               m_irq = 0U;
+	uint8_t               m_port2 = 0U;
+	uint8_t               m_bank2_l = 0U;
+	uint8_t               m_bank2_h = 0U;
+	uint8_t               m_bank1_l = 0U;
+	uint8_t               m_bank1_h = 0U;
+	uint8_t               m_ad_control_status = 0U;
+	uint16_t              m_ad_value = 0U;
+	std::unique_ptr<uint8_t[]> m_video_memory;
+	uint8_t               m_screen_column = 0U;
+	uint8_t               m_warm_start = 0U;
+};
+
+
+/***************************************************************************
+  Start the video hardware emulation.
+***************************************************************************/
+
+/* mem size = 0x017c0 */
+
+
+/* current column to read/write */
+
+uint8_t avigo_state::vid_memory_r(offs_t offset)
+{
+	if (!offset)
+		return m_screen_column;
+
+	if ((offset<0x0100) || (offset>=0x01f0) || (m_screen_column >= (AVIGO_SCREEN_WIDTH>>3)))
+	{
+		LOG(("vid mem read: %04x\n", offset));
+		return 0;
+	}
+
+	/* 0x0100-0x01f0 contains data for selected column */
+	return m_video_memory[m_screen_column + ((offset&0xff)*(AVIGO_SCREEN_WIDTH>>3))];
+}
+
+void avigo_state::vid_memory_w(offs_t offset, uint8_t data)
+{
+	if (!offset)
+	{
+		/* select column to read/write */
+		m_screen_column = data;
+
+		LOG(("vid mem column write: %02x\n",data));
+
+		if (data>=(AVIGO_SCREEN_WIDTH>>3))
+		{
+			LOG(("error: vid mem column write: %02x\n",data));
+		}
+		return;
+	}
+
+	if ((offset<0x0100) || (offset>=0x01f0) || (m_screen_column >= (AVIGO_SCREEN_WIDTH>>3)))
+	{
+		LOG(("vid mem write: %04x %02x\n", offset, data));
+		return;
+	}
+
+	/* 0x0100-0x01f0 contains data for selected column */
+	m_video_memory[m_screen_column + ((offset&0xff)*(AVIGO_SCREEN_WIDTH>>3))] = data;
+}
+
+void avigo_state::video_start()
+{
+	/* current selected column to read/write */
+	m_screen_column = 0;
+
+	/* allocate video memory */
+	m_video_memory = make_unique_clear<uint8_t[]>((AVIGO_SCREEN_WIDTH>>3) * AVIGO_SCREEN_HEIGHT + 1);
+
+	save_pointer(NAME(m_video_memory), (AVIGO_SCREEN_WIDTH>>3) * AVIGO_SCREEN_HEIGHT + 1);
+}
+
+uint32_t avigo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	/* draw avigo display */
+	for (int y=0; y<AVIGO_SCREEN_HEIGHT; y++)
+	{
+		uint8_t *line_ptr = &m_video_memory[y*(AVIGO_SCREEN_WIDTH>>3)];
+
+		int x = 0;
+		for (int by=((AVIGO_SCREEN_WIDTH>>3)-1); by>=0; by--)
+		{
+			uint8_t byte = line_ptr[0];
+
+			int px = x;
+			for (int b=7; b>=0; b--)
+			{
+				bitmap.pix(y, px) = ((byte>>7) & 0x01);
+				px++;
+				byte <<= 1;
+			}
+
+			x = px;
+			line_ptr++;
+		}
+	}
+	return 0;
+}
 
 
 /*
@@ -895,6 +1090,8 @@ ROM_START(avigo_it)
 	ROMX_LOAD("italian_1002.rom", 0x000000, 0x050000, CRC(093bc032) SHA1(2c75d950d356a7fd1d058808e5f0be8e15b8ea2a), ROM_BIOS(1))
 	ROMX_LOAD("italian_100.rom",  0x000000, 0x050000, CRC(de359218) SHA1(6185727aba8ffc98723f2df74dda388fd0d70cc9), ROM_BIOS(2))
 ROM_END
+
+} // anonymous namespace
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY              FULLNAME                     FLAGS
 COMP( 1997, avigo,    0,      0,      avigo,   avigo, avigo_state, empty_init, "Texas Instruments", "TI Avigo 10 PDA",           MACHINE_SUPPORTS_SAVE)

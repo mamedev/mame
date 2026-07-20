@@ -17,6 +17,7 @@
 #include "strformat.h"
 
 #include <array>
+#include <cstring>
 #include <numeric>
 #include <optional>
 #include <set>

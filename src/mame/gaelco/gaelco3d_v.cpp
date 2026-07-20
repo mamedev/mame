@@ -182,6 +182,17 @@ void gaelco3d_state::gaelco3d_renderer::render_poly(screen_device &screen, uint3
 	/* if we have a valid number of verts, render them */
 	if (vertnum >= 3)
 	{
+		/* Prevent poly.h down-rounding from discarding the outermost vert coord */
+		float const maxx = float(screen.width());
+		float const maxy = float(screen.height());
+		for (int i = 0; i < vertnum; i++)
+		{
+			if (vert[i].x > maxx - 1.0f && vert[i].x < maxx)
+				vert[i].x = maxx;
+			if (vert[i].y > maxy - 1.0f && vert[i].y < maxy)
+				vert[i].y = maxy;
+		}
+
 		const rectangle &visarea = screen.visible_area();
 
 		/* special case: no Z buffering and no perspective correction */
@@ -204,7 +215,7 @@ void gaelco3d_state::gaelco3d_renderer::render_poly(screen_device &screen, uint3
 
 void gaelco3d_state::gaelco3d_renderer::render_noz_noperspective(int32_t scanline, const extent_t &extent, const gaelco3d_object_data &object, int threadid)
 {
-	float const zbase = recip_approx(object.ooz_base);
+	float const zbase = 1.0f / object.ooz_base;
 	float const uoz_step = object.uoz_dx * zbase;
 	float const voz_step = object.voz_dx * zbase;
 	int const zbufval = (int)(-object.z0 * zbase);
@@ -261,7 +272,7 @@ void gaelco3d_state::gaelco3d_renderer::render_normal(int32_t scanline, const ex
 		if (ooz > 0)
 		{
 			/* compute Z and check the Z buffer value first */
-			float const z = recip_approx(ooz);
+			float const z = 1.0f / ooz;
 			int zbufval = (int)(z0 * z);
 			if (zbufval < zbuf[x])
 			{
@@ -310,7 +321,7 @@ void gaelco3d_state::gaelco3d_renderer::render_alphablend(int32_t scanline, cons
 		if (ooz > 0)
 		{
 			/* compute Z and check the Z buffer value first */
-			float const z = recip_approx(ooz);
+			float const z = 1.0f / ooz;
 			int const zbufval = (int)(z0 * z);
 			if (zbufval < zbuf[x])
 			{

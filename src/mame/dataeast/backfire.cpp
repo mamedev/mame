@@ -13,7 +13,7 @@
 */
 
 #include "emu.h"
-#include "deco156_m.h"
+#include "deco156.h"
 #include "deco16ic.h"
 #include "decocrpt.h"
 #include "decospr.h"
@@ -38,26 +38,26 @@ public:
 	backfire_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram%u", 1U, 0x1000U, ENDIANNESS_LITTLE),
-		m_pf_rowscroll(*this, "pf%u_rowscroll", 1U, 0x800U, ENDIANNESS_LITTLE),
+		m_rowscroll(*this, "rowscroll_%u", 1U, 0x800U, ENDIANNESS_LITTLE),
 		m_mainram(*this, "mainram"),
 		m_left_priority(*this, "left_priority"),
 		m_right_priority(*this, "right_priority"),
 		m_maincpu(*this, "maincpu"),
 		m_sprgen(*this, "spritegen%u", 1U),
-		m_deco_tilegen(*this, "tilegen%u", 1U),
+		m_tilegen(*this, "tilegen%u", 1U),
 		m_eeprom(*this, "eeprom"),
 		m_adc(*this, "adc"),
 		m_palette(*this, "palette"),
 		m_lscreen(*this, "lscreen")
 	{ }
 
-	void backfire(machine_config &config);
-	void init_backfire();
+	void backfire(machine_config &config) ATTR_COLD;
+	void init_backfire() ATTR_COLD;
 
 private:
 	uint32_t control2_r();
-	template<int Layer> uint32_t pf_rowscroll_r(offs_t offset);
-	template<int Layer> void pf_rowscroll_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template<int Layer> uint32_t rowscroll_r(offs_t offset);
+	template<int Layer> void rowscroll_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	template<int Chip> uint32_t spriteram_r(offs_t offset);
 	template<int Chip> void spriteram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t backfire_speedup_r();
@@ -67,15 +67,15 @@ private:
 	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vbl_interrupt(int state);
 	void irq_ack_w(uint32_t data);
-	void descramble_sound();
-	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	void descramble_sound() ATTR_COLD;
+	int bank_callback(int bank);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 
 	void backfire_map(address_map &map) ATTR_COLD;
 
 	/* memory pointers */
 	memory_share_array_creator<uint16_t, 2> m_spriteram;
-	memory_share_array_creator<uint16_t, 4> m_pf_rowscroll;
+	memory_share_array_creator<uint16_t, 4> m_rowscroll;
 	required_shared_ptr<uint32_t> m_mainram;
 	required_shared_ptr<uint32_t> m_left_priority;
 	required_shared_ptr<uint32_t> m_right_priority;
@@ -83,7 +83,7 @@ private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device_array<decospr_device, 2> m_sprgen;
-	required_device_array<deco16ic_device, 2> m_deco_tilegen;
+	required_device_array<deco16ic_device, 2> m_tilegen;
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<adc0808_device> m_adc;
@@ -102,22 +102,22 @@ uint32_t backfire_state::screen_update_left(screen_device &screen, bitmap_ind16 
 
 	/* screen 1 uses pf1 as the foreground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */
-	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
-	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2], m_pf_rowscroll[3]);
+	m_tilegen[0]->update(m_rowscroll[0], m_rowscroll[1]);
+	m_tilegen[1]->update(m_rowscroll[2], m_rowscroll[3]);
 
-	screen.priority().fill(0);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(0x100, cliprect);
 
 	if (m_left_priority[0] == 0)
 	{
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 1);
-		m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
+		m_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 1);
+		m_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
 		m_sprgen[0]->draw_sprites(bitmap, cliprect, m_spriteram[0], 0x2000/4);
 	}
 	else if (m_left_priority[0] == 2)
 	{
-		m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
+		m_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
+		m_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
 		m_sprgen[0]->draw_sprites(bitmap, cliprect, m_spriteram[0], 0x2000/4);
 	}
 	else
@@ -133,22 +133,22 @@ uint32_t backfire_state::screen_update_right(screen_device &screen, bitmap_ind16
 
 	/* screen 1 uses pf1 as the foreground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */
-	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
-	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2], m_pf_rowscroll[3]);
+	m_tilegen[0]->update(m_rowscroll[0], m_rowscroll[1]);
+	m_tilegen[1]->update(m_rowscroll[2], m_rowscroll[3]);
 
-	screen.priority().fill(0);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(0x500, cliprect);
 
 	if (m_right_priority[0] == 0)
 	{
-		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 1);
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
+		m_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 1);
+		m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
 		m_sprgen[1]->draw_sprites(bitmap, cliprect, m_spriteram[1], 0x2000/4);
 	}
 	else if (m_right_priority[0] == 2)
 	{
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
-		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
+		m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
+		m_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
 		m_sprgen[1]->draw_sprites(bitmap, cliprect, m_spriteram[1], 0x2000/4);
 	}
 	else
@@ -169,8 +169,8 @@ void backfire_state::eeprom_w(uint8_t data)
 
 /* map 32-bit writes to 16-bit */
 
-template<int Layer> uint32_t backfire_state::pf_rowscroll_r(offs_t offset){ return m_pf_rowscroll[Layer][offset] ^ 0xffff0000; }
-template<int Layer> void backfire_state::pf_rowscroll_w(offs_t offset, uint32_t data, uint32_t mem_mask){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf_rowscroll[Layer][offset]); }
+template<int Layer> uint32_t backfire_state::rowscroll_r(offs_t offset){ return m_rowscroll[Layer][offset] ^ 0xffff0000; }
+template<int Layer> void backfire_state::rowscroll_w(offs_t offset, uint32_t data, uint32_t mem_mask){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_rowscroll[Layer][offset]); }
 
 
 uint32_t backfire_state::pot_select_r(offs_t offset)
@@ -199,16 +199,16 @@ void backfire_state::spriteram_w(offs_t offset, uint32_t data, uint32_t mem_mask
 void backfire_state::backfire_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x100000, 0x10001f).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
-	map(0x110000, 0x111fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x114000, 0x115fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
-	map(0x120000, 0x120fff).rw(FUNC(backfire_state::pf_rowscroll_r<0>), FUNC(backfire_state::pf_rowscroll_w<0>));
-	map(0x124000, 0x124fff).rw(FUNC(backfire_state::pf_rowscroll_r<1>), FUNC(backfire_state::pf_rowscroll_w<1>));
-	map(0x130000, 0x13001f).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
-	map(0x140000, 0x141fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x144000, 0x145fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
-	map(0x150000, 0x150fff).rw(FUNC(backfire_state::pf_rowscroll_r<2>), FUNC(backfire_state::pf_rowscroll_w<2>));
-	map(0x154000, 0x154fff).rw(FUNC(backfire_state::pf_rowscroll_r<3>), FUNC(backfire_state::pf_rowscroll_w<3>));
+	map(0x100000, 0x10001f).rw(m_tilegen[0], FUNC(deco16ic_device::control32_r), FUNC(deco16ic_device::control32_w));
+	map(0x110000, 0x111fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram32_r<0>), FUNC(deco16ic_device::vram32_w<0>));
+	map(0x114000, 0x115fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram32_r<1>), FUNC(deco16ic_device::vram32_w<1>));
+	map(0x120000, 0x120fff).rw(FUNC(backfire_state::rowscroll_r<0>), FUNC(backfire_state::rowscroll_w<0>));
+	map(0x124000, 0x124fff).rw(FUNC(backfire_state::rowscroll_r<1>), FUNC(backfire_state::rowscroll_w<1>));
+	map(0x130000, 0x13001f).rw(m_tilegen[1], FUNC(deco16ic_device::control32_r), FUNC(deco16ic_device::control32_w));
+	map(0x140000, 0x141fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram32_r<0>), FUNC(deco16ic_device::vram32_w<0>));
+	map(0x144000, 0x145fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram32_r<1>), FUNC(deco16ic_device::vram32_w<1>));
+	map(0x150000, 0x150fff).rw(FUNC(backfire_state::rowscroll_r<2>), FUNC(backfire_state::rowscroll_w<2>));
+	map(0x154000, 0x154fff).rw(FUNC(backfire_state::rowscroll_r<3>), FUNC(backfire_state::rowscroll_w<3>));
 	map(0x160000, 0x161fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
 	map(0x170000, 0x177fff).ram().share(m_mainram);// main ram
 	map(0x180010, 0x180013).nopw(); // always 180010 ?
@@ -325,13 +325,10 @@ void backfire_state::irq_ack_w(uint32_t data)
 }
 
 
-DECO16IC_BANK_CB_MEMBER(backfire_state::bank_callback)
+int backfire_state::bank_callback(int bank)
 {
 	//  logerror("bank callback %04x\n",bank); // bit 1 gets set too?
-	bank = bank >> 4;
-	bank = (bank & 1) | ((bank & 4) >> 1) | ((bank & 2) << 1);
-
-	return bank * 0x1000;
+	return bitswap<3>(bank, 5, 6, 4) << 12;
 }
 
 DECOSPR_PRIORITY_CB_MEMBER(backfire_state::pri_callback)
@@ -381,48 +378,50 @@ void backfire_state::backfire(machine_config &config)
 	rscreen.set_screen_update(FUNC(backfire_state::screen_update_right));
 	rscreen.set_palette(m_palette);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
-	m_deco_tilegen[0]->set_screen(m_lscreen);
-	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
-	m_deco_tilegen[0]->set_pf2_col_bank(0x40);
-	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(backfire_state::bank_callback));
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(backfire_state::bank_callback));
-	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
-	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
+	DECO16IC(config, m_tilegen[0]);
+	m_tilegen[0]->set_screen(m_lscreen);
+	m_tilegen[0]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_col_bank<0>(0x00);
+	m_tilegen[0]->set_col_bank<1>(0x40);
+	m_tilegen[0]->set_col_mask<0>(0x0f);
+	m_tilegen[0]->set_col_mask<1>(0x0f);
+	m_tilegen[0]->set_bank_callback<0>(FUNC(backfire_state::bank_callback));
+	m_tilegen[0]->set_bank_callback<1>(FUNC(backfire_state::bank_callback));
+	m_tilegen[0]->set_8x8_bank(0);
+	m_tilegen[0]->set_16x16_bank(1);
+	m_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	DECO16IC(config, m_deco_tilegen[1], 0);
-	m_deco_tilegen[1]->set_screen(m_lscreen);
-	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_col_bank(0x10);
-	m_deco_tilegen[1]->set_pf2_col_bank(0x50);
-	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(backfire_state::bank_callback));
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(backfire_state::bank_callback));
-	m_deco_tilegen[1]->set_pf12_8x8_bank(2);
-	m_deco_tilegen[1]->set_pf12_16x16_bank(3);
-	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
+	DECO16IC(config, m_tilegen[1]);
+	m_tilegen[1]->set_screen(m_lscreen);
+	m_tilegen[1]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_col_bank<0>(0x10);
+	m_tilegen[1]->set_col_bank<1>(0x50);
+	m_tilegen[1]->set_col_mask<0>(0x0f);
+	m_tilegen[1]->set_col_mask<1>(0x0f);
+	m_tilegen[1]->set_bank_callback<0>(FUNC(backfire_state::bank_callback));
+	m_tilegen[1]->set_bank_callback<1>(FUNC(backfire_state::bank_callback));
+	m_tilegen[1]->set_8x8_bank(2);
+	m_tilegen[1]->set_16x16_bank(3);
+	m_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen[0], 0, m_palette, gfx_backfire_spr1);
+	DECO_SPRITE(config, m_sprgen[0], m_palette, gfx_backfire_spr1);
 	m_sprgen[0]->set_screen(m_lscreen);
 	m_sprgen[0]->set_pri_callback(FUNC(backfire_state::pri_callback));
 
-	DECO_SPRITE(config, m_sprgen[1], 0, m_palette, gfx_backfire_spr2);
+	DECO_SPRITE(config, m_sprgen[1], m_palette, gfx_backfire_spr2);
 	m_sprgen[1]->set_screen("rscreen");
 	m_sprgen[1]->set_pri_callback(FUNC(backfire_state::pri_callback));
 
 	/* sound hardware */
-	SPEAKER(config, "speaker", 2).front();
+	// each screen paired with mono speakers
+	SPEAKER(config, "lspeaker").front_center();
+	SPEAKER(config, "rspeaker").front_center();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", 28000000 / 2));
-	ymz.add_route(0, "speaker", 1.0, 0);
-	ymz.add_route(1, "speaker", 1.0, 1);
+	ymz.add_route(0, "lspeaker", 1.0, 0);
+	ymz.add_route(1, "rspeaker", 1.0, 1);
 }
 
 
@@ -574,7 +573,6 @@ void backfire_state::descramble_sound()
 
 uint32_t backfire_state::backfire_speedup_r()
 {
-
 	if (!machine().side_effects_disabled())
 	{
 		//logerror( "%08x\n",m_maincpu->pc());

@@ -148,6 +148,8 @@
 #include "jaguar.h"
 #include "jagblit.h"
 
+#include "endianness.h"
+
 #define LOG_BLITS           (1U << 1)
 #define LOG_BLITTER_STATS   (1U << 2)
 #define LOG_BLITTER_WRITE   (1U << 3)

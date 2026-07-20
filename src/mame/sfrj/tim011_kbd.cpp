@@ -94,11 +94,6 @@ tim011_keyboard_device::tim011_keyboard_device(const machine_config &mconfig, co
 {
 }
 
-void tim011_keyboard_device::device_resolve_objects()
-{
-	m_leds.resolve();
-}
-
 void tim011_keyboard_device::device_start()
 {
 	save_item(NAME(m_shifter));

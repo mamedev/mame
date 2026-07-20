@@ -83,6 +83,8 @@ which hardware it runs on, see diamond.cpp for Diamond II.
 #include "screen.h"
 #include "speaker.h"
 
+#include <bit>
+
 // internal artwork
 #include "novag_chesstea.lh"
 #include "novag_sapphire.lh"
@@ -108,11 +110,11 @@ public:
 		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
-	void init_chesstea();
+	void init_chesstea() ATTR_COLD;
 
-	void sapphire(machine_config &config);
-	void sapphire2(machine_config &config);
-	void chesstea(machine_config &config);
+	void sapphire(machine_config &config) ATTR_COLD;
+	void sapphire2(machine_config &config) ATTR_COLD;
+	void chesstea(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_switch);
 
@@ -162,8 +164,6 @@ private:
 
 void sapphire_state::machine_start()
 {
-	m_out_lcd.resolve();
-
 	if (m_rombank)
 		m_rombank->configure_entries(0, 4, memregion("eprom")->base(), 0x8000);
 
@@ -183,7 +183,7 @@ void sapphire_state::machine_start()
 
 void sapphire_state::init_chesstea()
 {
-	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
+	u16 *rom = (u16*)memregion("maincpu")->base();
 
 	// There's a bug in the serial routine, where it clears SSR TDRE, and then
 	// writes to TDR. The H8 documentation warns not to do this, since the next
@@ -252,7 +252,7 @@ void sapphire_state::update_lcd()
 		const u8 shift = m_lcd_pwm->width() & 0x18;
 
 		// LCD common is analog (voltage level)
-		const u8 com = population_count_32(m_lcd_data >> (shift + (i * 2)) & 3);
+		const u8 com = std::popcount(m_lcd_data >> (shift + (i * 2)) & 3U);
 		u16 segs = m_lcd_data & ((1 << shift) - 1);
 		segs |= m_lcd_segs2 << shift; // sapphire
 

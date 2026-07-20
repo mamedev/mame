@@ -282,6 +282,7 @@ private:
 	void unk_snd_dffx_w(offs_t offset, u8 data);
 	void soundlatch_w(u8 data);
 
+	IRQ_CALLBACK_MEMBER( vector_r );
 	void vblank_irq(int state);
 
 	void descramble_16x16tiles(uint8_t* src, int len);
@@ -642,24 +643,31 @@ static GFXDECODE_START( gfx_raiden_ms )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8x4_layout, 0x000, 16 )
 GFXDECODE_END
 
+IRQ_CALLBACK_MEMBER(raiden_ms_state::vector_r)
+{
+	// both CPUs points at the same vector
+	return 0xc8 / 4;
+}
+
 void raiden_ms_state::vblank_irq(int state)
 {
 	if (state)
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); // V30
-		m_subcpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); // V30
+		m_maincpu->set_input_line(0, HOLD_LINE);
+		m_subcpu->set_input_line(0, HOLD_LINE);
 	}
 }
-
 
 void raiden_ms_state::raidenm(machine_config &config)
 {
 	// Basic machine hardware
 	V30(config, m_maincpu, 20_MHz_XTAL / 2); // divisor unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &raiden_ms_state::raidenm_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(raiden_ms_state::vector_r));
 
 	V30(config, m_subcpu, 20_MHz_XTAL / 2); // divisor unknown
 	m_subcpu->set_addrmap(AS_PROGRAM, &raiden_ms_state::raidenm_sub_map);
+	m_subcpu->set_irq_acknowledge_callback(FUNC(raiden_ms_state::vector_r));
 
 	Z80(config, m_audiocpu, XTAL(4'000'000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &raiden_ms_state::audio_map);

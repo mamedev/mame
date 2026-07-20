@@ -284,7 +284,7 @@ void acvirus_state::virus_common(machine_config &config)
 	midiout_slot(mdout);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &acvirus_state::prog_map);
-	m_maincpu->set_addrmap(AS_DATA,    &acvirus_state::data_map);
+	m_maincpu->set_addrmap(AS_DATA, &acvirus_state::data_map);
 	m_maincpu->port_in_cb<1>().set(FUNC(acvirus_state::p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(acvirus_state::p1_w));
 	m_maincpu->port_in_cb<3>().set(FUNC(acvirus_state::p3_r));

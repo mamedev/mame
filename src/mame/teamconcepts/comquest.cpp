@@ -91,14 +91,12 @@ void comquest_state::comquest_write(offs_t offset, uint8_t data)
 
 uint32_t comquest_state::screen_update_comquest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int y = 0; y < 128; y++) {
-		for (int x = 0, j = 0; j < 8; j++, x += 8 * 4) {
 #if 0
-			m_gfxdecode->gfx(0)->opaque(bitmap,0, state->m_data[y][j],0,
-					0,0,x,y);
+	for (int y = 0; y < 128; y++)
+		for (int x = 0, j = 0; j < 8; j++, x += 8 * 4)
+			m_gfxdecode->gfx(0)->opaque(bitmap, 0, m_data[y][j], 0, 0, 0, x, y);
 #endif
-		}
-	}
+
 	return 0;
 }
 
@@ -207,7 +205,6 @@ static INPUT_PORTS_START( comquest )
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("") PORT_CODE(KEYCODE_6)
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("") PORT_CODE(KEYCODE_7)
 #endif
-
 INPUT_PORTS_END
 
 static const gfx_layout comquest_charlayout =

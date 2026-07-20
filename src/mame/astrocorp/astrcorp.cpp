@@ -235,7 +235,7 @@ winbingo: Win Win Bingo
 class astro_cpucode_device : public device_t
 {
 public:
-	astro_cpucode_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	astro_cpucode_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// read handlers
 	int do_read();              // DO
@@ -1681,7 +1681,6 @@ GFXDECODE_END
 
 void astrocorp_state::machine_start()
 {
-	m_lamps.resolve();
 	m_screen_enable = 0;
 }
 
@@ -1832,7 +1831,7 @@ void zoo_state::zoo(machine_config &config)
 
 	m_screen->set_raw(26.824_MHz_XTAL / 4, 437, 0, 320, 261, 0, 240); // ??? ~15.345kHz Hsync, ??? ~58.795Hz Vsync
 
-	ASTRO_CPUCODE(config, m_cpucode, 0);
+	ASTRO_CPUCODE(config, m_cpucode);
 }
 
 void zoo_state::zulu(machine_config &config)
@@ -1996,7 +1995,7 @@ void astoneag_state::astoneag(machine_config &config)
 
 	// Adds RAMDAC
 	PALETTE(config.replace(), m_palette).set_entries(256);
-	RAMDAC(config, m_ramdac, 0, m_palette);
+	RAMDAC(config, m_ramdac, m_palette);
 	m_ramdac->set_addrmap(0, &astoneag_state::ramdac_map);
 
 	// Tiles are double size vertically
@@ -3950,6 +3949,7 @@ ROM_START( wwitch )
 	ROM_REGION( 0x1800000, "sprites", ROMREGION_ERASE00 )
 	ROM_LOAD( "mx29f1610mc.u51", 0x0000000, 0x200000, CRC(05bc898d) SHA1(c88c14e4858943b2ea719abe0cc9ac0738d682dd) ) // silkscreened 'ROM # 3' on PCB under the chip
 	ROM_LOAD( "mx29f1610mc.u30", 0x0800000, 0x200000, CRC(d4e7b00d) SHA1(2689d19fcdd828d0d47265362f6625377a90c1e4) ) // silkscreened 'ROM # 4' on PCB under the chip
+	ROM_RELOAD(                  0x0200000, 0x200000 ) // expects to read a part of the pumpkin reel sprites from here
 	ROM_LOAD( "mx29f1610mc.bin", 0x1000000, 0x200000, CRC(8dad2fc0) SHA1(88c4bda8e247839029a8c9a84d3bd598892b1775) ) // no U location on the PCB, silkscreened 'ROM # 7' on PCB under the chip
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -3972,6 +3972,7 @@ ROM_START( lwitch )
 	ROM_REGION( 0x18000000, "sprites", ROMREGION_ERASE00 )
 	ROM_LOAD( "mx29f1610mc.rom3.u51", 0x0000000, 0x200000, CRC(05bc898d) SHA1(c88c14e4858943b2ea719abe0cc9ac0738d682dd) ) // same as wwitch
 	ROM_LOAD( "mx29f1610mc.rom4.u30", 0x0800000, 0x200000, CRC(cdedc2fc) SHA1(fb4f36a923db3b49e96aa8dde28c862c2ac063e3) )
+	ROM_RELOAD(                       0x0200000, 0x200000 ) // expects to read a part of the pumpkin reel sprites from here
 	ROM_LOAD( "mx29f1610mc.rom7",     0x1000000, 0x200000, CRC(5ac66b7d) SHA1(c5acba5a600e3f6b3b592451fd3897c275bb1851) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -4103,6 +4104,7 @@ ROM_START( foxyruby )
 	ROM_REGION( 0x1000000, "sprites", ROMREGION_ERASE00 )
 	ROM_LOAD( "mx29f1610mc.u51", 0x0000000, 0x200000, CRC(f116c767) SHA1(a05abd89d0015831a2953bbf0a7b95178f9ca6e4) ) // silkscreened 'ROM # 3' on PCB under the chip
 	ROM_LOAD( "mx29f1610mc.u30", 0x0800000, 0x200000, CRC(820fa9f6) SHA1(ae7fb4f9f4b6321f5c67f3bb563c8622446ef732) ) // silkscreened 'ROM # 4' on PCB under the chip
+	ROM_RELOAD(                  0x0200000, 0x200000 ) // odds table screen expects to read some data from here, too
 	// rom 7 not populated
 
 	ROM_REGION( 0x80000, "oki", 0 )

@@ -9,9 +9,16 @@
     Boots up from floppy.
     Output to serial terminal and to 6545 are working. Serial keyboard works.
 
+    Video
+    Graphics not working properly.
+    Mode 0 - lores (wide, chunky)
+    Mode 1 - external, *should* be ok
+    Mode 2 - thin graphics, not explained well enough to code
+    Mode 3 - alphanumeric, works
+
     Developed in conjunction with members of the MSPP. Written in July, 2015.
 
-    ToDo:
+    TODO:
     - CRT8002 attributes controller
     - Graphics
     - Hard drive controllers and drives
@@ -31,11 +38,148 @@
 
 ************************************************************/
 #include "emu.h"
-#include "aussiebyte.h"
 
+#include "bus/centronics/ctronics.h"
+#include "bus/rs232/rs232.h"
+#include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
+#include "imagedev/snapquik.h"
+#include "machine/msm5832.h"
+#include "machine/wd_fdc.h"
+#include "machine/z80ctc.h"
+#include "machine/z80daisy.h"
+#include "machine/z80dma.h"
+#include "machine/z80pio.h"
+#include "machine/z80sio.h"
+#include "sound/spkrdev.h"
+#include "sound/votrax.h"
+#include "video/mc6845.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
+
+/***********************************************************
+
+    Class
+
+************************************************************/
+namespace {
+
+class aussiebyte_state : public driver_device
+{
+public:
+	aussiebyte_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_palette(*this, "palette")
+		, m_maincpu(*this, "maincpu")
+		, m_bankr0(*this, "bankr0")
+		, m_bankw0(*this, "bankw0")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_p_chargen(*this, "chargen")
+		, m_p_mram(*this, "mram", 0x40000, ENDIANNESS_LITTLE)
+		, m_p_videoram(*this, "vram", 0x10000, ENDIANNESS_LITTLE)
+		, m_p_attribram(*this, "aram", 0x800, ENDIANNESS_LITTLE)
+		, m_ctc(*this, "ctc")
+		, m_dma(*this, "dma")
+		, m_pio1(*this, "pio1")
+		, m_pio2(*this, "pio2")
+		, m_centronics(*this, "centronics")
+		, m_rs232(*this, "rs232")
+		, m_fdc(*this, "fdc")
+		, m_floppy0(*this, "fdc:0")
+		, m_floppy1(*this, "fdc:1")
+		, m_crtc(*this, "crtc")
+		, m_speaker(*this, "speaker")
+		, m_votrax(*this, "votrax")
+		, m_rtc(*this, "rtc")
+	{ }
+
+	void aussiebyte(machine_config &config) ATTR_COLD;
+
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	u8 memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, u8 data);
+	u8 io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, u8 data);
+	void port15_w(u8 data);
+	void port16_w(u8 data);
+	void port17_w(u8 data);
+	void port18_w(u8 data);
+	u8 port19_r();
+	void port1a_w(u8 data);
+	void port1b_w(u8 data);
+	void port1c_w(u8 data);
+	void port20_w(u8 data);
+	u8 port28_r();
+	u8 port33_r();
+	void port34_w(u8 data);
+	void port35_w(u8 data);
+	u8 port36_r();
+	u8 port37_r();
+	u8 rtc_r(offs_t offset);
+	void rtc_w(offs_t offset, u8 data);
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
+	void sio1_rdya_w(int state);
+	void sio1_rdyb_w(int state);
+	void sio2_rdya_w(int state);
+	void sio2_rdyb_w(int state);
+	void address_w(u8 data);
+	void register_w(u8 data);
+	MC6845_UPDATE_ROW(crtc_update_row);
+	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
+
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+
+	u8 crt8002(u8 ac_ra, u8 ac_chr, u8 ac_attr, u16 ac_cnt, bool ac_curs);
+	bool m_port15 = false; // rom switched in (0), out (1)
+	u8 m_port17 = 0U;
+	u8 m_port17_rdy = 0U;
+	u8 m_port19 = 0U;
+	u8 m_port1a = 0U; // bank to switch to when write to port 15 happens
+	u8 m_port28 = 0U;
+	u8 m_port34 = 0U;
+	u8 m_port35 = 0U; // byte to be written to vram or aram
+	u8 m_video_index = 0U;
+	u16 m_cnt = 0U;
+	u16 m_alpha_address = 0U;
+	u16 m_graph_address = 0U;
+	bool m_centronics_busy = false;
+	std::unique_ptr<u8[]> m_vram; // video ram, 64k dynamic
+	std::unique_ptr<u8[]> m_aram; // attribute ram, 2k static
+	std::unique_ptr<u8[]> m_ram;  // main ram, 256k dynamic
+	required_device<palette_device> m_palette;
+	required_device<z80_device> m_maincpu;
+	required_memory_bank m_bankr0, m_bankw0, m_bank1, m_bank2;
+	required_region_ptr<u8> m_p_chargen;
+	memory_share_creator<u8> m_p_mram;
+	memory_share_creator<u8> m_p_videoram;
+	memory_share_creator<u8> m_p_attribram;
+	required_device<z80ctc_device> m_ctc;
+	required_device<z80dma_device> m_dma;
+	required_device<z80pio_device> m_pio1;
+	required_device<z80pio_device> m_pio2;
+	required_device<centronics_device> m_centronics;
+	required_device<rs232_port_device> m_rs232;
+	required_device<wd2797_device> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	optional_device<floppy_connector> m_floppy1;
+	required_device<mc6845_device> m_crtc;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<votrax_sc01_device> m_votrax;
+	required_device<msm5832_device> m_rtc;
+};
 
 
 /***********************************************************
@@ -121,8 +265,7 @@ void aussiebyte_state::port16_w(u8 data)
 	floppy_image_device *m_floppy = nullptr;
 	if ((data & 15) == 0)
 		m_floppy = m_floppy0->get_device();
-	else
-	if ((data & 15) == 1)
+	else if ((data & 15) == 1)
 		m_floppy = m_floppy1->get_device();
 
 	m_fdc->set_floppy(m_floppy);
@@ -230,6 +373,182 @@ u8 aussiebyte_state::port28_r()
 	return m_port28;
 }
 
+
+// dummy read port, forces requested action to happen
+u8 aussiebyte_state::port33_r()
+{
+	return 0xff;
+}
+
+/*
+Video control - needs to be fully understood
+d0, d1, d2, d3 - can replace RA0-3 in graphics mode
+d4 - GS - unknown
+d5 - /SRRD - controls write of data to either vram or aram (1=vram, 0=aram)
+d6 - /VWR - 0 = enable write vdata to vram, read from aram to vdata ; 1 = enable write to aram from vdata
+d7 - OE on port 35
+*/
+void aussiebyte_state::port34_w(u8 data)
+{
+	m_port34 = data;
+}
+
+void aussiebyte_state::port35_w(u8 data)
+{
+	m_port35 = data;
+}
+
+u8 aussiebyte_state::port36_r()
+{
+	if (BIT(m_port34, 5))
+	{
+		if (BIT(m_aram[m_alpha_address & 0x7ff], 7))
+			return m_vram[m_alpha_address];
+		else
+			return m_vram[m_graph_address];
+	}
+	else
+		return m_aram[m_alpha_address & 0x7ff];
+}
+
+u8 aussiebyte_state::port37_r()
+{
+	return m_crtc->de_r() ? 0xff : 0xfe;
+}
+
+
+/***********************************************************
+
+    Video
+
+************************************************************/
+MC6845_ON_UPDATE_ADDR_CHANGED( aussiebyte_state::crtc_update_addr )
+{
+/* not sure what goes in here - parameters passed are device, address, strobe */
+//  m_video_address = address;// & 0x7ff;
+}
+
+void aussiebyte_state::address_w(u8 data)
+{
+	m_crtc->address_w(data);
+
+	m_video_index = data & 0x1f;
+
+	if (m_video_index == 31)
+	{
+		m_alpha_address++;
+		m_alpha_address &= 0x3fff;
+		m_graph_address = (m_alpha_address << 4) | (m_port34 & 15);
+
+		if (BIT(m_port34, 5))
+		{
+			if (BIT(m_aram[m_alpha_address & 0x7ff], 7))
+				m_vram[m_alpha_address] = m_port35;
+			else
+				m_vram[m_graph_address] = m_port35;
+		}
+		else
+			m_aram[m_alpha_address & 0x7ff] = m_port35;
+	}
+}
+
+void aussiebyte_state::register_w(u8 data)
+{
+	m_crtc->register_w(data);
+	u16 temp = m_alpha_address;
+
+	// Get transparent address
+	if (m_video_index == 18)
+		m_alpha_address = (data << 8 ) | (temp & 0xff);
+	else if (m_video_index == 19)
+		m_alpha_address = data | (temp & 0xff00);
+}
+
+u8 aussiebyte_state::crt8002(u8 ac_ra, u8 ac_chr, u8 ac_attr, u16 ac_cnt, bool ac_curs)
+{
+	u8 gfx = 0;
+	switch (ac_attr & 3)
+	{
+		case 0: // lores gfx
+			switch (ac_ra)
+			{
+				case 0:
+				case 1:
+				case 2:
+					gfx = (BIT(ac_chr, 7) ? 0xf8 : 0) | (BIT(ac_chr, 3) ? 7 : 0);
+					break;
+				case 3:
+				case 4:
+				case 5:
+					gfx = (BIT(ac_chr, 6) ? 0xf8 : 0) | (BIT(ac_chr, 2) ? 7 : 0);
+					break;
+				case 6:
+				case 7:
+				case 8:
+					gfx = (BIT(ac_chr, 5) ? 0xf8 : 0) | (BIT(ac_chr, 1) ? 7 : 0);
+					break;
+				default:
+					gfx = (BIT(ac_chr, 4) ? 0xf8 : 0) | (BIT(ac_chr, 0) ? 7 : 0);
+					break;
+			}
+			break;
+		case 1: // external mode
+			gfx = bitswap<8>(ac_chr, 0,1,2,3,4,5,6,7);
+			break;
+		case 2: // thin gfx
+			break;
+		case 3: // alpha
+			gfx = m_p_chargen[((ac_chr & 0x7f)<<4) | ac_ra];
+			break;
+	}
+
+	if (BIT(ac_attr, 3) & (ac_ra == 11)) // underline
+		gfx = 0xff;
+	if (BIT(ac_attr, 2) & ((ac_ra == 5) | (ac_ra == 6))) // strike-through
+		gfx = 0xff;
+	if (BIT(ac_attr, 6) & BIT(ac_cnt, 13)) // flash
+		gfx = 0;
+	if (BIT(ac_attr, 5)) // blank
+		gfx = 0;
+	if (ac_curs && BIT(ac_cnt, 14)) // cursor
+		gfx ^= 0xff;
+	if (BIT(ac_attr, 4)) // reverse video
+		gfx ^= 0xff;
+	return gfx;
+}
+
+MC6845_UPDATE_ROW( aussiebyte_state::crtc_update_row )
+{
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	u32 *p = &bitmap.pix(y);
+	ra &= 15;
+	m_cnt++;
+
+	for (u16 x = 0; x < x_count; x++)
+	{
+		u16 mem = ma + x;
+		u8 attr = m_aram[mem & 0x7ff];
+		u8 chr;
+		if (BIT(attr, 7))
+			chr = m_vram[mem & 0x3fff]; // alpha
+		else
+			chr = m_vram[(mem << 4) | ra]; // gfx
+
+		u8 gfx = crt8002(ra, chr, attr, m_cnt, (x==cursor_x));
+
+		/* Display a scanline of a character (8 pixels) */
+		*p++ = palette[BIT(gfx, 7)];
+		*p++ = palette[BIT(gfx, 6)];
+		*p++ = palette[BIT(gfx, 5)];
+		*p++ = palette[BIT(gfx, 4)];
+		*p++ = palette[BIT(gfx, 3)];
+		*p++ = palette[BIT(gfx, 2)];
+		*p++ = palette[BIT(gfx, 1)];
+		*p++ = palette[BIT(gfx, 0)];
+	}
+}
+
+
 /***********************************************************
 
     RTC
@@ -259,26 +578,26 @@ void aussiebyte_state::rtc_w(offs_t offset, u8 data)
 ************************************************************/
 u8 aussiebyte_state::memory_read_byte(offs_t offset)
 {
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+	address_space &prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
 void aussiebyte_state::memory_write_byte(offs_t offset, u8 data)
 {
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+	address_space &prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
 }
 
 u8 aussiebyte_state::io_read_byte(offs_t offset)
 {
-	address_space& prog_space = m_maincpu->space(AS_IO);
-	return prog_space.read_byte(offset);
+	address_space &io_space = m_maincpu->space(AS_IO);
+	return io_space.read_byte(offset);
 }
 
 void aussiebyte_state::io_write_byte(offs_t offset, u8 data)
 {
-	address_space& prog_space = m_maincpu->space(AS_IO);
-	prog_space.write_byte(offset, data);
+	address_space &io_space = m_maincpu->space(AS_IO);
+	io_space.write_byte(offset, data);
 }
 
 /***********************************************************
@@ -404,7 +723,7 @@ QUICKLOAD_LOAD_MEMBER(aussiebyte_state::quickload_cb)
 	m_bankr0->set_entry(m_port1a); // enable correct program bank
 	m_bankw0->set_entry(m_port1a);
 
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+	address_space &prog_space = m_maincpu->space(AS_PROGRAM);
 
 	// Avoid loading a program if CP/M-80 is not in memory
 	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3))
@@ -610,6 +929,8 @@ ROM_START(aussieby)
 	ROM_REGION(0x800, "chargen", 0)
 	ROM_LOAD( "8002.bin", 0x0000, 0x0800, CRC(fdd6eb13) SHA1(a094d416e66bdab916e72238112a6265a75ca690) )
 ROM_END
+
+} // anonymous namespace
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY        FULLNAME          FLAGS
 COMP( 1984, aussieby, 0,      0,      aussiebyte, aussiebyte, aussiebyte_state, empty_init, "SME Systems", "Aussie Byte II", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

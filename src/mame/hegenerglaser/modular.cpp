@@ -86,8 +86,8 @@ Reminder: unsupported on Almeria and Portorose 1.01, this is not a bug.
 
 #include "emu.h"
 
-#include "mmboard.h"
-#include "mmdisplay2.h"
+#include "mboard.h"
+#include "mdisplay2.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/m68000/m68020.h"

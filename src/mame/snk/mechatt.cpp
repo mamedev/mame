@@ -169,7 +169,6 @@ public:
 	void mechatt(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -213,11 +212,6 @@ private:
 };
 
 /******************************************************************************/
-
-void mechatt_state::machine_start()
-{
-	m_gun_recoil.resolve();
-}
 
 void mechatt_state::sound_cpu_w(uint8_t data)
 {
@@ -510,7 +504,7 @@ void mechatt_state::mechatt(machine_config &config)
 
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	SNK_BBUSTERS_SPR(config, m_sprites, 0);
+	SNK_BBUSTERS_SPR(config, m_sprites);
 	m_sprites->set_scaletable_tag("sprites:scale_table");
 	m_sprites->set_palette("palette");
 	m_sprites->set_spriteram_tag("spriteram");

@@ -71,7 +71,7 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void videosaa(machine_config &config);
+	void videosaa(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -379,8 +379,6 @@ void videosaa_state::machine_start()
 	m_vram1 = make_unique_clear<uint8_t[]>(0x800);
 
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(videosaa_state::tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-
-	m_lamps.resolve();
 
 	// register for savestates
 	save_pointer(NAME(m_vram0), 0x800);

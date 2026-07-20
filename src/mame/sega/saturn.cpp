@@ -574,10 +574,11 @@ void sat_console_state::saturn_mem(address_map &map)
 	map(0xc0000000, 0xc0000fff).ram(); // cache data array, Dragon Ball Z sprites relies on this
 }
 
+// NOTE: waitstate weights should be +2/+1, going +2 for both r/w kills BIOS startup sound already.
 void sat_console_state::sound_mem(address_map &map)
 {
-	map(0x000000, 0x0fffff).ram().share("sound_ram");
-	map(0x100000, 0x100fff).rw(m_scsp, FUNC(scsp_device::read), FUNC(scsp_device::write));
+	map(0x000000, 0x0fffff).before_delay(NAME([](offs_t) { return 1; })).ram().share("sound_ram");
+	map(0x100000, 0x100fff).before_delay(NAME([](offs_t) { return 1; })).rw(m_scsp, FUNC(scsp_device::read), FUNC(scsp_device::write));
 }
 
 void sat_console_state::scsp_mem(address_map &map)
@@ -872,7 +873,7 @@ void sat_console_state::saturn(machine_config &config)
 	m_scsp->add_route(0, "speaker", 1.0, 0);
 	m_scsp->add_route(1, "speaker", 1.0, 1);
 
-	SATURN_CD_HLE(config, m_saturn_cd_hle, 0);
+	SATURN_CD_HLE(config, m_saturn_cd_hle);
 	m_saturn_cd_hle->add_route(0, "scsp", 1.0, 0);
 	m_saturn_cd_hle->add_route(1, "scsp", 1.0, 1);
 

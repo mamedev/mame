@@ -479,7 +479,7 @@ void wicat_state::wicat(machine_config &config)
 	m_via->writepb_handler().set(FUNC(wicat_state::via_b_w));
 	m_via->irq_handler().set_inputline(m_maincpu, M68K_IRQ_1);
 
-	MM58174(config, m_rtc, 0);
+	MM58174(config, m_rtc);
 
 	// internal terminal
 	SCN2661C(config, m_uart[0], 5.0688_MHz_XTAL);  // connected to terminal board

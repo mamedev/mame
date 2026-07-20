@@ -1,11 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 
-#include <glm/geometric.hpp>
-
 #include "emu.h"
-#include "cpu/mb86233/mb86233.h"
 #include "model1.h"
+
+#include "cpu/mb86233/mb86233.h"
+
+#include "corefloat.h"
+
+#include <glm/geometric.hpp>
 
 #define LOG_TGP (1U << 1)
 
@@ -56,9 +59,9 @@ void model1_state::view_t::transform_vector(glm::vec3& p) const
 
 void model1_state::cross_product(point_t* o, const point_t* p, const point_t* q) const
 {
-	o->x = p->y * q->z - q->y * p->z;
-	o->y = p->z * q->x - q->z * p->x;
-	o->z = p->x * q->y - q->x * p->y;
+	o->x = (p->y * q->z) - (q->y * p->z);
+	o->y = (p->z * q->x) - (q->z * p->x);
+	o->z = (p->x * q->y) - (q->x * p->y);
 }
 
 float model1_state::view_determinant(const point_t *p1, const point_t *p2, const point_t *p3) const
@@ -104,7 +107,7 @@ void model1_state::draw_hline_moired(bitmap_rgb32 &bitmap, int x1, int x2, int y
 	uint32_t *const base = &bitmap.pix(y);
 	while(x1 <= x2)
 	{
-		if((x1^y) & 1)
+		if(!((x1^y) & 1))
 		{
 			base[x1] = color;
 		}
@@ -212,6 +215,70 @@ void model1_state::fill_line(bitmap_rgb32 &bitmap, view_t *view, int color, int3
 	}
 }
 
+// Draw a solid line between two screen points (integer Bresenham).  Wireframe
+// primitives reach the rasterizer as a degenerate quad with two coincident
+// vertex pairs (A,A,B,B); the scanline filler only touches one pixel per row,
+// collapsing near-horizontal wires to dots (e.g. the Star Wars Arcade target
+// box).  The endpoints come from the unclipped projection and can be garbage
+// (a degenerate projection yields inf/NaN, which float->int conversion turns
+// into INT32_MIN on x86 hosts), so clip the segment to the viewport first,
+// like fill_slope() does for the filler - unclipped, wingwar hung during boot
+// walking a ~2^31-pixel line.
+static void draw_wireframe_line(bitmap_rgb32 &bitmap, const rectangle &clip, int x1, int y1, int x2, int y2, uint32_t color, bool moire)
+{
+	// Liang-Barsky clip against the viewport rectangle (doubles hold every
+	// int32 exactly, so in-range endpoints pass through unchanged)
+	const double lx1 = x1, ly1 = y1;
+	const double cdx = double(x2) - lx1, cdy = double(y2) - ly1;
+	const double p[4] = { -cdx, cdx, -cdy, cdy };
+	const double q[4] = { lx1 - clip.min_x, clip.max_x - lx1, ly1 - clip.min_y, clip.max_y - ly1 };
+	double t0 = 0.0, t1 = 1.0;
+	for (int i = 0; i < 4; i++)
+	{
+		if (p[i] == 0.0)
+		{
+			if (q[i] < 0.0)
+				return; // parallel to this edge and outside it
+		}
+		else
+		{
+			const double t = q[i] / p[i];
+			if (p[i] < 0.0)
+				t0 = std::max(t0, t);
+			else
+				t1 = std::min(t1, t);
+		}
+	}
+	if (t0 > t1)
+		return; // entirely outside the viewport
+
+	if (t1 < 1.0)
+	{
+		x2 = int(std::lround(lx1 + t1 * cdx));
+		y2 = int(std::lround(ly1 + t1 * cdy));
+	}
+	if (t0 > 0.0)
+	{
+		x1 = int(std::lround(lx1 + t0 * cdx));
+		y1 = int(std::lround(ly1 + t0 * cdy));
+	}
+
+	int dx = std::abs(x2 - x1), dy = std::abs(y2 - y1);
+	int sx = x1 < x2 ? 1 : -1, sy = y1 < y2 ? 1 : -1;
+	int err = dx - dy;
+	for (;;)
+	{
+		if (x1 >= 0 && x1 < bitmap.width() && y1 >= 0 && y1 < bitmap.height())
+			if (!moire || !((x1 ^ y1) & 1))
+				bitmap.pix(y1, x1) = color;
+		if (x1 == x2 && y1 == y2)
+			break;
+		int e2 = 2 * err;
+		if (e2 > -dy) { err -= dy; x1 += sx; }
+		if (e2 < dx)  { err += dx; y1 += sy; }
+	}
+}
+
 void model1_state::fill_quad(bitmap_rgb32 &bitmap, view_t *view, const quad_t& q) const
 {
 	spoint_t p[8];
@@ -225,6 +292,37 @@ void model1_state::fill_quad(bitmap_rgb32 &bitmap, view_t *view, const quad_t& q
 					q.p[1]->s.x, q.p[1]->s.y,
 					q.p[2]->s.x, q.p[2]->s.y,
 					q.p[3]->s.x, q.p[3]->s.y);
+	}
+
+	// A wireframe primitive arrives as a degenerate quad with only two distinct
+	// screen vertices (A,A,B,B); rasterize it as a line so near-horizontal wires
+	// keep their full span instead of collapsing to one pixel per row.
+	{
+		int ax = q.p[0]->s.x, ay = q.p[0]->s.y;
+		int bx = ax, by = ay, ndist = 1;
+		for (int i = 1; i < 4; i++)
+		{
+			int vx = q.p[i]->s.x, vy = q.p[i]->s.y;
+			if (vx == ax && vy == ay)
+				continue;
+			if (ndist == 1)
+			{
+				bx = vx;
+				by = vy;
+				ndist = 2;
+			}
+			else if (vx != bx || vy != by)
+			{
+				ndist = 3;
+				break;
+			}
+		}
+		if (ndist == 2)
+		{
+			// clip to the viewport, exactly like the scanline filler below does
+			draw_wireframe_line(bitmap, rectangle(view->x1, view->x2, view->y1, view->y2), ax, ay, bx, by, color & ~MOIRE, (color & MOIRE) != 0);
+			return;
+		}
 	}
 
 	for (int i = 0; i < 4; i++)
@@ -727,35 +825,35 @@ static const uint8_t num_of_times[]={1,1,1,1,2,2,2,3};
 #endif
 float model1_state::compute_specular(glm::vec3& normal, glm::vec3& light, float diffuse, int lmode)
 {
-#if 0
-	int p = m_view->lightparams[lmode].p & 7;
-	float sv = m_view->lightparams[lmode].s;
-
-	//This is how it should be according to model2 geo program, but doesn't work fine
-	float s = 2 * (diffuse * normal.z - light.z);
-	for (int i = 0; i < num_of_times[p]; i++)
-	{
-		s *= s;
-	}
-	s *= sv;
-	if (s < 0.0f)
-	{
+	if (!m_view->spec_enable)
 		return 0.0f;
-	}
-	if (s > 1.0f)
-	{
-		return 1.0f;
-	}
-	return s;
 
-	// ???
-	//return fabs(diffuse)*sv;
-#endif
+	const lightparam_t &lp = m_view->lightparams[lmode];
+	if (lp.p == 0 || lp.s <= 0.0f)
+		return 0.0f;
 
-	return 0;
+	// z component of the reflected light vector, as computed by the Model 2
+	// GEO program: R.z = 2*(N.L)*N.z - L.z, raised to a power of two selected
+	// by the power field and scaled by the specular scale.
+	float s = (2.0f * diffuse * normal.z) - light.z;
+	if (s <= 0.0f)
+		return 0.0f;
+	if (lp.p >= 2)
+		s *= s;
+	if (lp.p >= 4)
+		s *= s;
+	if (lp.p >= 7)
+		s *= s;
+	return std::min(s * lp.s, 1.0f);
 }
 
-void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t size)
+// old_z is the flat-z "reuse" register (poly zmode 0 = keep previous poly's
+// sort z). It persists ACROSS objects within a display-list walk: NetMerc's
+// garage door wings (all-zmode-0 dynamic objects) must inherit the ~325k z of
+// the preceding object so the z~40k wall occludes them (real-hardware
+// capture); resetting per object made them sort at z=0 (nearest) and paint
+// through the wall.
+void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t size, float &old_z)
 {
 	// Protect against bad data when attacking a super destroyer
 	if(tex_adr == 0xffffffff || size >= 0x1000000)
@@ -828,8 +926,6 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 		old_p1->s.x = old_p1->s.y = 0;
 	}
 
-	float old_z = 0;
-
 	poly_adr += 6;
 
 	for (int i = 0; i < size; i++)
@@ -849,7 +945,12 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 
 		if (flags & 0x00001000)
 			tex_adr++;
-		int lightmode = (flags >> 17) & 15;
+		// Flags bit 22 selects the second light parameter bank. netmerc uploads
+		// two banks (0x00-0x0c organic/terrain, 0x80-0x9e metal) and mixes
+		// polygons from both within a single display list; the other games
+		// never set the bit. In the Model 2 GEO attribute word this same bit
+		// is the top bit of the texture parameter index.
+		int lightmode = ((flags >> 17) & 15) | ((flags & 0x00400000) ? 0x80 : 0);
 
 		point_t *p0 = m_pointpt++;
 		point_t *p1 = m_pointpt++;
@@ -861,6 +962,13 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 		p1->x = poly_data[poly_adr + 7];
 		p1->y = poly_data[poly_adr + 8];
 		p1->z = poly_data[poly_adr + 9];
+
+		if (type == 2)
+		{
+			p1->x = p0->x;
+			p1->y = p0->y;
+			p1->z = p0->z;
+		}
 
 		int link = (flags >> 8) & 3;
 
@@ -946,16 +1054,32 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 			float spec = compute_specular(vn, m_view->light, dif, lightmode);
 			float ln = m_view->lightparams[lightmode].a + m_view->lightparams[lightmode].d * std::max(0.0f, dif) + spec;
 			int lumval = 255.0f * std::min(1.0f, ln);
-			int color = m_paletteram16[0x1000 | (m_tgp_ram[tex_adr - 0x40000] & 0x3ff)];
+			// bits [11:10] of the tile word select a colour mode: bit 10 marks a
+			// flat UI element (radar blips, HUD text) drawn unlit, and mode 01
+			// additionally blinks by rotating the BGR channels on alternate frames.
+			uint16_t tex_data = m_tgp_ram[tex_adr - 0x40000];
+			int color = m_paletteram16[0x1000 | (tex_data & 0x3ff)];
 			int r = (color >> 0x0) & 0x1f;
 			int g = (color >> 0x5) & 0x1f;
 			int b = (color >> 0xA) & 0x1f;
+			if (((tex_data >> 10) & 3) == 1 && (m_screen->frame_number() & 1))
+			{
+				// rotate b -> g -> r -> b
+				int tmp = b;
+				b = r;
+				r = g;
+				g = tmp;
+			}
 
 			lumval >>= 2; //there must be a luma translation table somewhere
 			if (lumval > 0x3f)
 				lumval = 0x3f;
 			else if (lumval < 0)
 				lumval = 0;
+
+			// flat UI element: draw unlit at full intensity instead of shading it
+			if (tex_data & 0x400)
+				lumval = 0x3f;
 
 			r = (m_color_xlat[(r << 8) | lumval | 0x0] >> 3) & 0x1f;
 			g = (m_color_xlat[(g << 8) | lumval | 0x2000] >> 3) & 0x1f;
@@ -1007,25 +1131,13 @@ int model1_state::push_direct(int list_offset) {
 		old_p0->x, old_p0->y, old_p0->z,
 		old_p1->x, old_p1->y, old_p1->z);
 
-	//m_view-transform_point(old_p0);
-	//m_view->transform_point(old_p1);
-	if (old_p0->z > 0)
-	{
-		m_view->project_point_direct(old_p0);
-	}
-	else
-	{
-		old_p0->s.x = old_p0->s.y = 0;
-	}
-
-	if (old_p1->z > 0)
-	{
-		m_view->project_point_direct(old_p1);
-	}
-	else
-	{
-		old_p1->s.x = old_p1->s.y = 0;
-	}
+	// Direct (2D-projected) polys are screen-space: project_point_direct only
+	// offsets x/y by the viewport centre and ignores z, so project every vertex
+	// unconditionally.  Guarding on z > 0 and snapping behind-"camera" vertices
+	// to (0,0) spawns huge spurious triangles radiating from the screen origin
+	// (the bogus red cross over the SWA cockpit once direct polys draw on top).
+	m_view->project_point_direct(old_p0);
+	m_view->project_point_direct(old_p1);
 
 	list_offset += 18;
 
@@ -1082,14 +1194,8 @@ int model1_state::push_direct(int list_offset) {
 
 		//m_view->transform_point(p0);
 		//m_view->transform_point(p1);
-		if (p0->z > 0)
-		{
-			m_view->project_point_direct(p0);
-		}
-		if (p1->z > 0)
-		{
-			m_view->project_point_direct(p1);
-		}
+		m_view->project_point_direct(p0);
+		m_view->project_point_direct(p1);
 
 		if (old_p0 && old_p1)
 			LOGMASKED(LOG_TGP, "VIDEOD:     %08x (%d, %d) (%d, %d) (%d, %d) (%d, %d)\n",
@@ -1129,9 +1235,34 @@ int model1_state::push_direct(int list_offset) {
 		}
 		//cquad.col  = scale_color(machine().pens[0x1000|(m_tgp_ram[tex_adr-0x40000] & 0x3ff)],((float) (lum>>24)) / 128.0);
 		if (flags & 0x00002000)
+		{
 			cquad.col |= MOIRE;
+			// A moiré (stipple-translucent) direct poly whose flat colour resolves
+			// to the transparent texture pen (index 0x1000 -> black) is a "fade
+			// toward backdrop" overlay, not a black fill.  Painting the pen
+			// literally gives a black/scene checkerboard (the Star Wars Arcade
+			// gunner 2nd-viewport overlay); the arcade alternates backdrop/scene.
+			// Paint the backdrop pen (palette[0]) so the stipple reads
+			// backdrop/scene.
+			if ((m_tgp_ram[tex_adr - 0x40000] & 0x3ff) == 0)
+				cquad.col = MOIRE | (m_palette->pen(0) & 0xffffff);
 
-		fclip_push_quad(0, cquad);
+			// wingwar's display list carries a constant degenerate moiré record
+			// (all four vertices on one point) that the flat-quad filler would
+			// paint as a stray dot at the viewport centre; not seen on hardware.
+			if (cquad.p[0]->s.x == cquad.p[1]->s.x && cquad.p[1]->s.x == cquad.p[2]->s.x && cquad.p[2]->s.x == cquad.p[3]->s.x &&
+				cquad.p[0]->s.y == cquad.p[1]->s.y && cquad.p[1]->s.y == cquad.p[2]->s.y && cquad.p[2]->s.y == cquad.p[3]->s.y)
+				goto next;
+		}
+
+		// Direct polys are screen-space - project_point_direct only offsets x/y by
+		// the viewport centre and ignores z.  fclip_push_quad's frustum clip tests
+		// vertices against z-scaled planes (y > z*a_bottom, ...), which for a direct
+		// poly with small/zero z collapses every plane onto the origin and culls the
+		// whole poly (e.g. the SWA FIGHTER CONTROL console moiré rect, all z = 0).
+		// Skip the frustum clip and queue the quad directly; fill_quad still scissors
+		// it to the viewport rectangle.
+		*m_quadpt++ = cquad;
 
 	next:
 		switch (link) {
@@ -1238,6 +1369,26 @@ void model1_state::model1_listctl_w(offs_t offset, u16 data, u16 mem_mask)
 	LOGMASKED(LOG_TGP, "VIDEO: control=%08x\n", (m_listctl[1] << 16) | m_listctl[0]);
 }
 
+void model1_state::model1_paletteram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_paletteram16[offset]);
+	u16 const v = m_paletteram16[offset];
+	int r = pal5bit((v >> 0) & 0x1f);
+	int g = pal5bit((v >> 5) & 0x1f);
+	int b = pal5bit((v >> 10) & 0x1f);
+	// Bit 15 is an intensity/shade bit, not unused as the plain xBGR_555 decode
+	// assumes.  Almost every entry has it set (full brightness); a handful clear
+	// it to render dimmed (e.g. Star Wars Arcade's grey menu backdrop pen 0x7777).
+	// Halve the channels when it is clear so those pens stop reading too bright.
+	if (!BIT(v, 15))
+	{
+		r >>= 1;
+		g >>= 1;
+		b >>= 1;
+	}
+	m_palette->set_pen_color(offset, r, g, b);
+}
+
 void model1_state::view_t::init_translation_matrix()
 {
 	memset(translation, 0, sizeof(translation));
@@ -1297,16 +1448,16 @@ void model1_state::view_t::set_view_translation(float x, float y)
 
 
 
-void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect, render_pass pass)
 {
 	m_render_done = 1;
 	if ((m_listctl[1] & 0x1f) == 0x1f)
 	{
 		set_current_render_list();
-		int zz = 0;
 		LOGMASKED(LOG_TGP, "VIDEO: render list %d\n", get_list_number());
 
 		m_view->init_translation_matrix();
+		float old_z = 0;
 
 		int list_offset = 0;
 		for (;;) {
@@ -1318,21 +1469,25 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				list_offset += 2;
 				break;
 			case 1:
+				// command 0x01 = object drawn below the cat1 HUD tilemaps
+				if (pass == RENDER_BELOW_HUD)
+					push_object(readi(list_offset + 2), readi(list_offset + 4), readi(list_offset + 6), old_z);
+				list_offset += 8;
+				break;
 			case 0x41:
-				// 1 = plane 1
-				// 2 = ??  draw object (413d3, 17c4c, e)
-				// 3 = plane 2
-				// 4 = ??  draw object (408a8, a479, 9)
-				// 5 = decor
-				// 6 = ??  draw object (57bd4, 387460, 2ad)
-
-				if (true || zz >= 666)
-					push_object(readi(list_offset + 2), readi(list_offset + 4), readi(list_offset + 6));
+				// command 0x41 = object drawn above the HUD (e.g. SWA radar blips)
+				if (pass == RENDER_ABOVE_HUD)
+					push_object(readi(list_offset + 2), readi(list_offset + 4), readi(list_offset + 6), old_z);
 				list_offset += 8;
 				break;
 			case 2:
 			{
-				list_offset = draw_direct(bitmap, cliprect, list_offset);
+				// direct (2D-projected) polys; push them in the below-HUD pass so
+				// they share the per-viewport z-sort with the 0x01 objects
+				if (pass == RENDER_BELOW_HUD)
+					list_offset = push_direct(list_offset);
+				else
+					list_offset = skip_direct(list_offset);
 				break;
 			}
 			case 3:
@@ -1397,8 +1552,12 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				break;
 			}
 			case 7:
-				LOGMASKED(LOG_TGP, "VIDEO:   code 7 (%d)\n", readi(list_offset + 2));
-				zz++;
+				// Mode word, as in the Model 2 GEO command 7: bit 0 enables the
+				// specular term (netmerc toggles it mid-list, on for the enemy
+				// mechs and off for terrain/cockpit); bit 1 tracks the display
+				// list double buffer parity.
+				LOGMASKED(LOG_TGP, "VIDEO:   mode word (%d)\n", readi(list_offset + 2));
+				m_view->spec_enable = BIT(readi(list_offset + 2), 0);
 				list_offset += 4;
 				break;
 			case 8:
@@ -1569,6 +1728,10 @@ void model1_state::video_start()
 	m_pointdb = std::make_unique<point_t[]>(1000000*2);
 	m_quaddb  = std::make_unique<quad_t[]>(1000000);
 	m_quadind = make_unique_clear<quad_t *[]>(1000000);
+	m_overlay_stride = m_screen->width();
+	int overlay_pixels = m_overlay_stride * m_screen->height();
+	m_overlay_block = std::make_unique<uint8_t[]>(overlay_pixels);
+	m_overlay_hud_snapshot = std::make_unique<uint32_t[]>(overlay_pixels);
 
 	m_pointpt = &m_pointdb[0];
 	m_quadpt = &m_quaddb[0];
@@ -1586,6 +1749,42 @@ void model1_state::video_start()
 	save_pointer(NAME(m_tgp_ram), 0x100000-0x40000);
 	save_pointer(NAME(m_poly_ram), 0x40000);
 	save_item(NAME(m_listctl));
+}
+
+// Snapshot the HUD after the cat1 tilemaps are composited: a pixel is a bright
+// "feature" (grid lines, struts) when any channel rises above near-black,
+// otherwise it is transparent/screen background where the above-HUD blips show.
+void model1_state::build_overlay_mask(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	constexpr int feature_level = 8; // anything darker counts as HUD background
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		uint32_t const *const src = &bitmap.pix(y);
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			uint32_t argb = src[x];
+			int r = (argb >> 16) & 0xff, g = (argb >> 8) & 0xff, b = argb & 0xff;
+			int i = y * m_overlay_stride + x;
+			m_overlay_block[i] = (r > feature_level || g > feature_level || b > feature_level);
+			m_overlay_hud_snapshot[i] = argb;
+		}
+	}
+}
+
+// Restore the bright HUD features over the above-HUD blip pass, so blips only
+// remain where the HUD pixel was transparent / near-black.
+void model1_state::apply_overlay_stencil(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		uint32_t *const dst = &bitmap.pix(y);
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			int i = y * m_overlay_stride + x;
+			if (m_overlay_block[i])
+				dst[x] = m_overlay_hud_snapshot[i];
+		}
+	}
 }
 
 uint32_t model1_state::screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1647,7 +1846,7 @@ uint32_t model1_state::screen_update_model1(screen_device &screen, bitmap_rgb32 
 	view->ayys = sin(view->ayy);
 
 	screen.priority().fill(0);
-	bitmap.fill(m_palette->pen(0x400), cliprect);
+	bitmap.fill(m_palette->pen(0), cliprect);
 
 	// draw tilemap B as opaque
 	m_tiles->draw(screen, bitmap, cliprect, 6, 0, TILEMAP_DRAW_OPAQUE);
@@ -1655,12 +1854,22 @@ uint32_t model1_state::screen_update_model1(screen_device &screen, bitmap_rgb32 
 	m_tiles->draw(screen, bitmap, cliprect, 2, 0, 0);
 	m_tiles->draw(screen, bitmap, cliprect, 0, 0, 0);
 
-	tgp_render(bitmap, cliprect);
+	// 3D objects (0x01) and direct polys (0x02) render below the HUD tilemaps,
+	// sharing the per-viewport z-sort.
+	tgp_render(bitmap, cliprect, RENDER_BELOW_HUD);
 
+	// HUD tilemaps (cat1): cockpit struts, grid lines, radar screen background.
 	m_tiles->draw(screen, bitmap, cliprect, 7, 0, 0);
 	m_tiles->draw(screen, bitmap, cliprect, 5, 0, 0);
 	m_tiles->draw(screen, bitmap, cliprect, 3, 0, 0);
 	m_tiles->draw(screen, bitmap, cliprect, 1, 0, 0);
+
+	// 0x41 objects (e.g. radar blips) draw on top of the HUD, but the hardware
+	// only lets them through "background" HUD pixels. Snapshot the HUD, draw the
+	// above-HUD pass, then restore the bright HUD features over it.
+	build_overlay_mask(bitmap, cliprect);
+	tgp_render(bitmap, cliprect, RENDER_ABOVE_HUD);
+	apply_overlay_stencil(bitmap, cliprect);
 
 	return 0;
 }

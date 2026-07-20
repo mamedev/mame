@@ -1560,8 +1560,7 @@ INTERRUPT_GEN_MEMBER(mz2500_state::vblank_cb)
 
 IRQ_CALLBACK_MEMBER(mz2500_state::irq_ack_cb)
 {
-	int i;
-	for(i=0;i<4;i++)
+	for(int i = 0; i < 4; i++)
 	{
 		if(m_irq_mask[i] && m_irq_pending[i])
 		{
@@ -1745,7 +1744,11 @@ void mz2500_state::rtc_alarm_irq(int state)
 {
 	// TODO: doesn't work yet
 //  if(m_irq_mask[3] && state & 1)
-//      m_maincpu->set_input_line_and_vector(0, HOLD_LINE,drvm_irq_vector[3]); // Z80
+//  {
+//      m_irq_pending[3] = 1;
+//      m_maincpu->set_input_line(0, ASSERT_LINE);
+//  }
+
 }
 
 

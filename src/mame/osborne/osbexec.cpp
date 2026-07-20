@@ -578,7 +578,7 @@ void osbexec_state::osbexec(machine_config &config)
 	m_sio->out_rtsb_callback().set(PRINTER_PORT_TAG, FUNC(rs232_port_device::write_rts));
 	m_sio->out_int_callback().set("mainirq", FUNC(input_merger_device::in_w<4>));
 
-	pit8253_device &ctc(PIT8253(config, "ctc", 0));
+	pit8253_device &ctc(PIT8253(config, "ctc"));
 	ctc.set_clk<0>(MAIN_CLOCK / 13); // divided by 74S161 @ UC25
 	ctc.set_clk<1>(MAIN_CLOCK / 13); // divided by 74S161 @ UC25
 	ctc.set_clk<2>(MAIN_CLOCK / 12);

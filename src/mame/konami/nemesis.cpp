@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
 /***************************************************************************
+
 This entire hardware series is generally called 'GX400'
 
     Bubble System           (various games) GX400 PWB(B) 200207F
@@ -30,15 +31,15 @@ driver by Bryan McPhail
 
 Boards, from earliest to latest:
 * GX400 PWB(B) 200207F - The Bubble System top board: (DATA VERIFIED THRU TRACING)
-    Uses an 0x800 long block of shared SRAM at 0x000-0x7ff with the bubble MCU used for block transfers and boot
+    Uses an 0x800 long block of shared SRAM at 0x000-0x7ff with the 005297 used for block transfers and boot
     Uses Program RAM (0x10000-0x1ffff), data uploaded from bubble cart
     Uses 8-bit RAM at (0x20000-0x27fff) on the lower half of the bus (upper half is ???)
     Uses Graphics RAM (0x30000-0x3ffff) data uploaded from bubble cart
     Uses Work RAM at 0x70000-0x73fff
-    Uses an unknown SDIP64 'Bubble MCU' to handle all bubble access and refresh and system init; the bubble MCU
+    Uses an unknown SDIP64 '005297' to handle all bubble access and refresh and system init; the 005297
       uploads a 0x1e0 long BIOS/Bootloader to the shared ram at 0x000-0x800 and controls the 68k /RESET and /BR lines
       and only releases these lines after the bubble memory has warmed up and is ready.
-    Has 4 Interrupts: ODD/EVEN frame, VBLANK, MCU done, and 220hz timer, through a priority encoder
+    Has 4 Interrupts: ODD/EVEN frame, VBLANK, 005297 done, and 220hz timer, through a priority encoder
     Has VLM5030
     VLM5030 voice data is at ram at Sound CPU 0x8000
     Sound CPU clocked at 1.789772MHz
@@ -76,9 +77,9 @@ TODO: others.
 TODO:
 - exact cycles/scanlines for VBLANK and 256V int assert/clear need to be figured out and implemented.
 - bubble system needs a delay (and auto-sound-nmi hookup) so the 'getting ready... 49...' countdown actually
-  plays before the simulated MCU releases the 68k and the load (and morning music) begins.
+  plays before the simulated 005297 releases the 68k and the load (and morning music) begins.
 - hcrash: Konami GT-type inputs doesn't work properly.
-- gradiusb: still needs proper MCU emulation;
+- bs_gradius: still needs proper 005297 emulation;
 
 modified by Hau
 03/27/2009
@@ -124,6 +125,11 @@ initials
 
 #include "konamigt.lh"
 
+#define LOG_BUBBLE (1 << 1)
+
+#define VERBOSE (0)
+
+#include "logmacro.h"
 
 void gx400_base_state::vblank_irq1(int state)
 {
@@ -229,14 +235,10 @@ void gx400_base_state::irq4_enable_w(int state)
 		m_maincpu->set_input_line(4, CLEAR_LINE);
 }
 
-void gx400_base_state::coin1_lockout_w(int state)
+template <unsigned Which>
+void gx400_base_state::coin_lockout_w(int state)
 {
-	machine().bookkeeping().coin_lockout_w(0, state);
-}
-
-void gx400_base_state::coin2_lockout_w(int state)
-{
-	machine().bookkeeping().coin_lockout_w(1, state);
+	machine().bookkeeping().coin_lockout_w(Which, state);
 }
 
 void gx400_base_state::sound_irq_w(int state)
@@ -256,7 +258,7 @@ void gx400_base_state::sound_nmi_w(int state)
 	// Effectively, if the bit is 1, NMI is asserted, otherwise it is cleared. This is also cleared on reset.
 	// The ??? input is likely either tied to VBLANK or 256V, or tied to one of those two through a 74ls74 enable latch, controlled
 	// by something else (probably either the one of the two output/int enable latches of the 68k, or by exx0/exx7 address-latched
-	// accesses from the sound z80, though technically it could be anything, even the /BS signal from the mcu to the 68k)
+	// accesses from the sound z80, though technically it could be anything, even the /BS signal from the 005297 to the 68k)
 	// TODO: trace implement the other NMI source; without this, the 'getting ready' pre-bubble-ready countdown in bubble system cannot work,
 	// since it requires a sequence of NMIs in order to function.
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
@@ -280,8 +282,8 @@ void salamand_state::blkpnthr_intlatch_w(uint8_t data)
 void salamand_state::outlatch_w(uint8_t data)
 {
 	// direct latch instead of 74259
-	coin1_lockout_w(BIT(data, 1));
-	coin2_lockout_w(BIT(data, 2));
+	coin_lockout_w<0>(BIT(data, 1));
+	coin_lockout_w<1>(BIT(data, 2));
 	sound_irq_w(BIT(data, 3));
 }
 
@@ -291,10 +293,10 @@ void hcrash_state::citybomb_outlatch_w(uint8_t data)
 	m_selected_ip = BIT(~data, 4); // citybomb steering & accel
 }
 
-void bubsys_state::bubsys_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void bubsys_state::bubsys_005297_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bubsys_control_ram[offset]);
-	//logerror("bubsys_mcu_w (%08x) %d (%02x %02x %02x %02x)\n", m_maincpu->pc(), state, m_bubsys_control_ram[0], m_bubsys_control_ram[1], m_bubsys_control_ram[2], m_bubsys_control_ram[3]);
+	//LOGMASKED(LOG_BUBBLE, "%s: bubsys_005297_w %d (%02x %02x %02x %02x)\n", machine().describe_context(), state, m_bubsys_control_ram[0], m_bubsys_control_ram[1], m_bubsys_control_ram[2], m_bubsys_control_ram[3]);
 
 	if (offset == 1)
 	{
@@ -305,29 +307,29 @@ void bubsys_state::bubsys_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		// Read
 		else if (m_bubsys_control_ram[1] == 1)
 		{
-			// The MCU copies the requested page of bubble memory to 0xf00 of shared RAM
-			int page = m_bubsys_control_ram[0] & 0x7ff;
+			// The 005297 copies the requested page of bubble memory to 0xf00 of shared RAM
+			int const page = m_bubsys_control_ram[0] & 0x7ff;
 			//int unknownBit = m_bubsys_control_ram[0] & 0x800;
 
-			logerror("\tCopy page %02x to shared ram\n", page);
+			LOGMASKED(LOG_BUBBLE, "%s: \tCopy page %02x to shared ram\n", machine().describe_context(), page);
 
 			const uint8_t *src = m_bubblememory_region->base();
 			memcpy(&m_bubsys_shared_ram[0xf00/2], src + page * 0x90, 0x80);
 
 			// The last 2 bytes of the block are loaded into the control register
-			m_bubsys_control_ram[0] = src[page * 0x90 + 0x80] | (src[page * 0x90 + 0x81]<<8);
-			m_maincpu->set_input_line(5, HOLD_LINE); // This presumably gets asserted (under mcu control) whenever the MCU has completed a command
+			m_bubsys_control_ram[0] = src[page * 0x90 + 0x80] | (src[page * 0x90 + 0x81] << 8);
+			m_maincpu->set_input_line(5, HOLD_LINE); // This presumably gets asserted (under 005297 control) whenever the 005297 has completed a command
 		}
 		// Write?
 		else if (m_bubsys_control_ram[1] == 2)
 		{
-			logerror("Request to write to bubble memory?  %04x\n", m_bubsys_control_ram[0]);
+			LOGMASKED(LOG_BUBBLE, "%s: Request to write to bubble memory?  %04x\n", machine().describe_context(), m_bubsys_control_ram[0]);
 		}
 	}
 	else
 	{
-		//logerror("bubsys_mcu_trigger_w (%08x) %d (%02x %02x %02x %02x)\n", m_maincpu->pc(), state, m_bubsys_control_ram[0], m_bubsys_control_ram[1], m_bubsys_control_ram[2], m_bubsys_control_ram[3]);
-		// Not confirmed the clear happens here; clear is done by the MCU code itself, presumably some number of cycles after the assert.
+		//LOGMASKED(LOG_BUBBLE, "%s: bubsys_005297_trigger_w %d (%02x %02x %02x %02x)\n", machine().describe_context(), state, m_bubsys_control_ram[0], m_bubsys_control_ram[1], m_bubsys_control_ram[2], m_bubsys_control_ram[3]);
+		// Not confirmed the clear happens here; clear is done by the 005297 itself, presumably some number of cycles after the assert.
 		m_maincpu->set_input_line(5, CLEAR_LINE);
 	}
 }
@@ -469,22 +471,59 @@ void gx400_base_state::colorram_w(offs_t offset, uint16_t data, uint16_t mem_mas
 	m_tilemap[Which]->mark_tile_dirty(offset);
 }
 
+void gx400_state::gx400_video_map(address_map &map)
+{
+	map(0x050000, 0x0503ff).ram().share(m_xscroll[0]);
+	map(0x050400, 0x0507ff).ram().share(m_xscroll[1]);
+	map(0x050800, 0x050eff).ram();
+	map(0x050f00, 0x050f7f).ram().share(m_yscroll[1]);
+	map(0x050f80, 0x050fff).ram().share(m_yscroll[0]);
+	map(0x051000, 0x051fff).ram();
+	map(0x052000, 0x052fff).ram().w(FUNC(gx400_state::videoram_w<0>)).share(m_videoram[0]);       /* VRAM */
+	map(0x053000, 0x053fff).ram().w(FUNC(gx400_state::videoram_w<1>)).share(m_videoram[1]);
+	map(0x054000, 0x054fff).ram().w(FUNC(gx400_state::colorram_w<0>)).share(m_colorram[0]);
+	map(0x055000, 0x055fff).ram().w(FUNC(gx400_state::colorram_w<1>)).share(m_colorram[1]);
+	map(0x056000, 0x056fff).ram().share(m_spriteram);
+	map(0x057000, 0x057fff).ram(); // needed for twinbee
+	map(0x05a000, 0x05afff).ram().w(FUNC(gx400_state::palette_w)).share(m_paletteram);
+}
+
+void gx400_state::gx400_base_map(address_map &map)
+{
+	map(0x010000, 0x01ffff).ram(); // PROGRAM RAM
+	map(0x020000, 0x027fff).rw(FUNC(gx400_state::sound_sharedram_word_r), FUNC(gx400_state::sound_sharedram_word_w));
+	map(0x030000, 0x03ffff).ram().w(FUNC(gx400_state::charram_w)).share(m_charram);
+	// unknown write at 0x040000 thorugh 0x04ffff
+	gx400_video_map(map);
+	map(0x05c001, 0x05c001).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x05c402, 0x05c403).portr("DSW0");
+	map(0x05c404, 0x05c405).portr("DSW1");
+	map(0x05c406, 0x05c407).portr("TEST");
+	map(0x05c800, 0x05c801).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* probably */
+	map(0x05cc00, 0x05cc01).portr("IN0");
+	map(0x05cc02, 0x05cc03).portr("IN1");
+	map(0x05cc04, 0x05cc05).portr("IN2");
+	// Unknown read at 0x05d000 through 0x05ffff
+	map(0x05e000, 0x05e00f).w("outlatch", FUNC(ls259_device::write_d0)).umask16(0xff00);
+	map(0x05e000, 0x05e00f).w("intlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff);
+}
+
+// 2 Addon board variants: RAM addon (GX456, gradius) and Additional IO (GX561, rf2)
+void gx400_state::addon_gx456_map(address_map &map)
+{
+	map(0x070000, 0x073fff).ram();         /* WORK RAM */
+}
+
+void gx400_state::addon_gx561_map(address_map &map)
+{
+	map(0x070000, 0x070001).r(FUNC(gx400_state::konamigt_input_word_r));
+}
+
 void gx400_state::nemesis_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x04ffff).ram().w(FUNC(gx400_state::charram_w)).share(m_charram);
-	map(0x050000, 0x0503ff).ram().share(m_xscroll[0]);
-	map(0x050400, 0x0507ff).ram().share(m_xscroll[1]);
-	map(0x050800, 0x050eff).ram();
-	map(0x050f00, 0x050f7f).ram().share(m_yscroll[1]);
-	map(0x050f80, 0x050fff).ram().share(m_yscroll[0]);
-	map(0x051000, 0x051fff).ram();
-	map(0x052000, 0x052fff).ram().w(FUNC(gx400_state::videoram_w<0>)).share(m_videoram[0]);       /* VRAM */
-	map(0x053000, 0x053fff).ram().w(FUNC(gx400_state::videoram_w<1>)).share(m_videoram[1]);
-	map(0x054000, 0x054fff).ram().w(FUNC(gx400_state::colorram_w<0>)).share(m_colorram[0]);
-	map(0x055000, 0x055fff).ram().w(FUNC(gx400_state::colorram_w<1>)).share(m_colorram[1]);
-	map(0x056000, 0x056fff).ram().share(m_spriteram);
-	map(0x05a000, 0x05afff).ram().w(FUNC(gx400_state::palette_w)).share(m_paletteram);
+	gx400_video_map(map);
 	map(0x05c001, 0x05c001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x05c400, 0x05c401).portr("DSW0");
 	map(0x05c402, 0x05c403).portr("DSW1");
@@ -496,136 +535,51 @@ void gx400_state::nemesis_map(address_map &map)
 	map(0x05e000, 0x05e00f).w("outlatch", FUNC(ls259_device::write_d0)).umask16(0xff00);
 	map(0x05e000, 0x05e00f).w("intlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff);
 	map(0x060000, 0x067fff).ram();         /* WORK RAM */
-}
-
-void gx400_state::gx400_map(address_map &map)
-{
-	map(0x000000, 0x00ffff).rom();     /* ROM BIOS */
-	map(0x010000, 0x01ffff).ram();
-	map(0x020000, 0x027fff).rw(FUNC(gx400_state::sound_sharedram_word_r), FUNC(gx400_state::sound_sharedram_word_w));
-	map(0x030000, 0x03ffff).ram().w(FUNC(gx400_state::charram_w)).share(m_charram);
-	map(0x050000, 0x0503ff).ram().share(m_xscroll[0]);
-	map(0x050400, 0x0507ff).ram().share(m_xscroll[1]);
-	map(0x050800, 0x050eff).ram();
-	map(0x050f00, 0x050f7f).ram().share(m_yscroll[1]);
-	map(0x050f80, 0x050fff).ram().share(m_yscroll[0]);
-	map(0x051000, 0x051fff).ram();
-	map(0x052000, 0x052fff).ram().w(FUNC(gx400_state::videoram_w<0>)).share(m_videoram[0]);       /* VRAM */
-	map(0x053000, 0x053fff).ram().w(FUNC(gx400_state::videoram_w<1>)).share(m_videoram[1]);
-	map(0x054000, 0x054fff).ram().w(FUNC(gx400_state::colorram_w<0>)).share(m_colorram[0]);
-	map(0x055000, 0x055fff).ram().w(FUNC(gx400_state::colorram_w<1>)).share(m_colorram[1]);
-	map(0x056000, 0x056fff).ram().share(m_spriteram);
-	map(0x057000, 0x057fff).ram();             /* needed for twinbee */
-	map(0x05a000, 0x05afff).ram().w(FUNC(gx400_state::palette_w)).share(m_paletteram);
-	map(0x05c001, 0x05c001).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x05c402, 0x05c403).portr("DSW0");
-	map(0x05c404, 0x05c405).portr("DSW1");
-	map(0x05c406, 0x05c407).portr("TEST");
-	map(0x05c800, 0x05c801).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* probably */
-	map(0x05cc00, 0x05cc01).portr("IN0");
-	map(0x05cc02, 0x05cc03).portr("IN1");
-	map(0x05cc04, 0x05cc05).portr("IN2");
-	map(0x05e000, 0x05e00f).w("outlatch", FUNC(ls259_device::write_d0)).umask16(0xff00);
-	map(0x05e000, 0x05e00f).w("intlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff);
-	map(0x060000, 0x07ffff).ram();         /* WORK RAM */
-	map(0x080000, 0x0bffff).rom();
-}
-
-void bubsys_state::main_map(address_map &map)
-{
-	map(0x000000, 0x000fff).ram().share(m_bubsys_shared_ram); /* Shared with MCU */
-	map(0x010000, 0x01ffff).ram(); /* PROGRAM RAM */
-	map(0x020000, 0x027fff).rw(FUNC(bubsys_state::sound_sharedram_word_r), FUNC(bubsys_state::sound_sharedram_word_w));
-	map(0x030000, 0x03ffff).ram().w(FUNC(bubsys_state::charram_w)).share(m_charram);
-	map(0x040000, 0x040007).ram().w(FUNC(bubsys_state::bubsys_mcu_w)).share(m_bubsys_control_ram); // Shared with MCU
-	map(0x050000, 0x0503ff).ram().share(m_xscroll[0]);
-	map(0x050400, 0x0507ff).ram().share(m_xscroll[1]);
-	map(0x050800, 0x050eff).ram();
-	map(0x050f00, 0x050f7f).ram().share(m_yscroll[1]);
-	map(0x050f80, 0x050fff).ram().share(m_yscroll[0]);
-	map(0x051000, 0x051fff).ram();
-	map(0x052000, 0x052fff).ram().w(FUNC(bubsys_state::videoram_w<0>)).share(m_videoram[0]);       /* VRAM */
-	map(0x053000, 0x053fff).ram().w(FUNC(bubsys_state::videoram_w<1>)).share(m_videoram[1]);
-	map(0x054000, 0x054fff).ram().w(FUNC(bubsys_state::colorram_w<0>)).share(m_colorram[0]);
-	map(0x055000, 0x055fff).ram().w(FUNC(bubsys_state::colorram_w<1>)).share(m_colorram[1]);
-	map(0x056000, 0x056fff).ram().share(m_spriteram);
-	map(0x057000, 0x057fff).ram();
-	map(0x05a000, 0x05afff).ram().w(FUNC(bubsys_state::palette_w)).share(m_paletteram);
-	map(0x05c001, 0x05c001).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x05c402, 0x05c403).portr("DSW0");
-	map(0x05c404, 0x05c405).portr("DSW1");
-	map(0x05c406, 0x05c407).portr("TEST");
-	map(0x05c800, 0x05c801).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* probably */
-	map(0x05cc00, 0x05cc01).portr("IN0");
-	map(0x05cc02, 0x05cc03).portr("IN1");
-	map(0x05cc04, 0x05cc05).portr("IN2");
-	map(0x05e000, 0x05e00f).w("outlatch", FUNC(ls259_device::write_d0)).umask16(0xff00);
-	map(0x05e000, 0x05e00f).w("intlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff);
-	map(0x070000, 0x073fff).ram();  /* WORK RAM */
-	map(0x078000, 0x07ffff).rom();  /* Empty diagnostic ROM slot */
 }
 
 void gx400_state::konamigt_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();
-	map(0x040000, 0x04ffff).ram().w(FUNC(gx400_state::charram_w)).share(m_charram);
-	map(0x050000, 0x0503ff).ram().share(m_xscroll[0]);
-	map(0x050400, 0x0507ff).ram().share(m_xscroll[1]);
-	map(0x050800, 0x050eff).ram();
-	map(0x050f00, 0x050f7f).ram().share(m_yscroll[1]);
-	map(0x050f80, 0x050fff).ram().share(m_yscroll[0]);
-	map(0x051000, 0x051fff).ram();
-	map(0x052000, 0x052fff).ram().w(FUNC(gx400_state::videoram_w<0>)).share(m_videoram[0]);       /* VRAM */
-	map(0x053000, 0x053fff).ram().w(FUNC(gx400_state::videoram_w<1>)).share(m_videoram[1]);
-	map(0x054000, 0x054fff).ram().w(FUNC(gx400_state::colorram_w<0>)).share(m_colorram[0]);
-	map(0x055000, 0x055fff).ram().w(FUNC(gx400_state::colorram_w<1>)).share(m_colorram[1]);
-	map(0x056000, 0x056fff).ram().share(m_spriteram);
-	map(0x05a000, 0x05afff).ram().w(FUNC(gx400_state::palette_w)).share(m_paletteram);
-	map(0x05c001, 0x05c001).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x05c400, 0x05c401).portr("DSW0");
-	map(0x05c402, 0x05c403).portr("DSW1");
-	map(0x05c800, 0x05c801).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* probably */
-	map(0x05cc00, 0x05cc01).portr("IN0");
-	map(0x05cc02, 0x05cc03).portr("IN1");
-	map(0x05cc04, 0x05cc05).portr("IN2");
-	map(0x05cc06, 0x05cc07).portr("TEST");
-	map(0x05e000, 0x05e00f).w("outlatch", FUNC(ls259_device::write_d0)).umask16(0xff00);
-	map(0x05e000, 0x05e00f).w("intlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff);
-	map(0x060000, 0x067fff).ram();         /* WORK RAM */
-	map(0x070000, 0x070001).r(FUNC(gx400_state::konamigt_input_word_r));
+	nemesis_map(map);
+	addon_gx561_map(map);
+}
+
+void gx400_state::gx400_map(address_map &map)
+{
+	gx400_base_map(map);
+	map(0x000000, 0x00ffff).rom();     /* ROM BIOS */
+	map(0x080000, 0x0bffff).rom().region("maindata", 0);
+}
+
+void gx400_state::gradius_map(address_map &map)
+{
+	gx400_map(map);
+	addon_gx456_map(map);
 }
 
 void gx400_state::rf2_gx400_map(address_map &map)
 {
-	map(0x000000, 0x00ffff).rom();     /* ROM BIOS */
-	map(0x010000, 0x01ffff).ram();
-	map(0x020000, 0x027fff).rw(FUNC(gx400_state::sound_sharedram_word_r), FUNC(gx400_state::sound_sharedram_word_w));
-	map(0x030000, 0x03ffff).ram().w(FUNC(gx400_state::charram_w)).share(m_charram);
-	map(0x050000, 0x0503ff).ram().share(m_xscroll[0]);
-	map(0x050400, 0x0507ff).ram().share(m_xscroll[1]);
-	map(0x050800, 0x050eff).ram();
-	map(0x050f00, 0x050f7f).ram().share(m_yscroll[1]);
-	map(0x050f80, 0x050fff).ram().share(m_yscroll[0]);
-	map(0x051000, 0x051fff).ram();
-	map(0x052000, 0x052fff).ram().w(FUNC(gx400_state::videoram_w<0>)).share(m_videoram[0]);       /* VRAM */
-	map(0x053000, 0x053fff).ram().w(FUNC(gx400_state::videoram_w<1>)).share(m_videoram[1]);
-	map(0x054000, 0x054fff).ram().w(FUNC(gx400_state::colorram_w<0>)).share(m_colorram[0]);
-	map(0x055000, 0x055fff).ram().w(FUNC(gx400_state::colorram_w<1>)).share(m_colorram[1]);
-	map(0x056000, 0x056fff).ram().share(m_spriteram);
-	map(0x05a000, 0x05afff).ram().w(FUNC(gx400_state::palette_w)).share(m_paletteram);
-	map(0x05c001, 0x05c001).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x05c402, 0x05c403).portr("DSW0");
-	map(0x05c404, 0x05c405).portr("DSW1");
-	map(0x05c406, 0x05c407).portr("TEST");
-	map(0x05c800, 0x05c801).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* probably */
-	map(0x05cc00, 0x05cc01).portr("IN0");
-	map(0x05cc02, 0x05cc03).portr("IN1");
-	map(0x05cc04, 0x05cc05).portr("IN2");
-	map(0x05e000, 0x05e00f).w("outlatch", FUNC(ls259_device::write_d0)).umask16(0xff00);
-	map(0x05e000, 0x05e00f).w("intlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff);
-	map(0x060000, 0x067fff).ram();         /* WORK RAM */
-	map(0x070000, 0x070001).r(FUNC(gx400_state::konamigt_input_word_r));
-	map(0x080000, 0x0bffff).rom();
+	gx400_map(map);
+	addon_gx561_map(map);
+}
+
+void bubsys_state::main_map(address_map &map)
+{
+	gx400_base_map(map);
+	map(0x000000, 0x000fff).ram().share(m_bubsys_shared_ram); /* Shared with 005297 */
+	map(0x040000, 0x040007).ram().w(FUNC(bubsys_state::bubsys_005297_w)).share(m_bubsys_control_ram); // Shared with 005297
+	map(0x078000, 0x07ffff).rom().region("diagnostic", 0);  /* Empty diagnostic ROM slot */
+}
+
+void bubsys_state::bs_gradius_map(address_map &map)
+{
+	main_map(map);
+	addon_gx456_map(map);
+}
+
+void bubsys_state::bs_rf2_map(address_map &map)
+{
+	main_map(map);
+	addon_gx561_map(map);
 }
 
 
@@ -747,7 +701,7 @@ void hcrash_state::citybomb_map(address_map &map)
 	map(0x0f0021, 0x0f0021).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write));
 	map(0x0f8000, 0x0f8000).w(FUNC(hcrash_state::citybomb_outlatch_w));
 	map(0x0f8001, 0x0f8001).w(FUNC(hcrash_state::salamand_intlatch_w));
-	map(0x100000, 0x1bffff).rom();
+	map(0x100000, 0x1bffff).rom().region("maindata", 0);
 	map(0x200000, 0x20ffff).ram().w(FUNC(hcrash_state::charram_w)).share(m_charram);
 	map(0x210000, 0x210fff).ram().w(FUNC(hcrash_state::videoram_w<0>)).share(m_videoram[0]);       /* VRAM */
 	map(0x211000, 0x211fff).ram().w(FUNC(hcrash_state::videoram_w<1>)).share(m_videoram[1]);
@@ -776,7 +730,7 @@ void salamand_state::nyanpani_map(address_map &map)
 	map(0x070018, 0x070019).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* probably */
 	map(0x078000, 0x078000).w(FUNC(salamand_state::outlatch_w));
 	map(0x078001, 0x078001).w(FUNC(salamand_state::salamand_intlatch_w));
-	map(0x100000, 0x13ffff).rom();
+	map(0x100000, 0x13ffff).rom().region("maindata", 0);
 	map(0x200000, 0x200fff).ram().w(FUNC(salamand_state::videoram_w<0>)).share(m_videoram[0]);       /* VRAM */
 	map(0x201000, 0x201fff).ram().w(FUNC(salamand_state::videoram_w<1>)).share(m_videoram[1]);
 	map(0x202000, 0x202fff).ram().w(FUNC(salamand_state::colorram_w<0>)).share(m_colorram[0]);
@@ -830,7 +784,7 @@ void salamand_state::city_sound_map(address_map &map)
 void hcrash_state::hcrash_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
-	map(0x040000, 0x05ffff).rom();
+	map(0x040000, 0x05ffff).rom().region("maindata", 0);
 	map(0x080000, 0x083fff).ram();
 	map(0x090000, 0x091fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
 	map(0x0a0000, 0x0a0000).w(FUNC(hcrash_state::outlatch_w));
@@ -1013,7 +967,7 @@ static INPUT_PORTS_START( rf2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_BUTTON3 ) /* gear (0-7) */
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_BUTTON3 ) /* gear (0-7) - actually analog? */
 	PORT_BIT( 0x8f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
@@ -1627,7 +1581,7 @@ static INPUT_PORTS_START( bubsys )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( gradiusb )
+static INPUT_PORTS_START( bs_gradius )
 	PORT_INCLUDE( bubsys )
 
 	PORT_MODIFY("DSW1")
@@ -1651,7 +1605,7 @@ static INPUT_PORTS_START( gradiusb )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( twinbeeb )
+static INPUT_PORTS_START( bs_twinbee )
 	PORT_INCLUDE( bubsys )
 
 	PORT_MODIFY("DSW1")
@@ -1844,6 +1798,50 @@ void gx400_base_state::set_screen_raw_params(machine_config &config)
 	m_screen->set_raw(XTAL(18'432'000.0)/3,384,0,256,264,2*8,30*8);
 }
 
+void gx400_state::nemesis_common_sound(machine_config &config)
+{
+	Z80(config, m_audiocpu, 14'318'180/8); /* 1.7897725MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gx400_state::sound_map); /* fixed */
+
+	SPEAKER(config, "mono").front_center();
+
+	GENERIC_LATCH_8(config, "soundlatch");
+
+	ay8910_device &ay1(AY8910(config, "ay1", 14'318'180/8));
+	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
+	ay1.port_a_read_callback().set(FUNC(gx400_state::nemesis_portA_r));
+	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
+
+	ay8910_device &ay2(AY8910(config, "ay2", 14'318'180/8));
+	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::control_A_w));
+	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::control_B_w));
+	ay2.add_route(0, "filter2", 1.00);
+	ay2.add_route(1, "filter3", 1.00);
+	ay2.add_route(2, "filter4", 1.00);
+
+	FILTER_RC(config, m_filter[0]);
+	m_filter[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter[1]);
+	m_filter[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter[2]);
+	m_filter[2]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter[3]);
+	m_filter[3]->add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	K005289(config, m_k005289, 3'579'545);
+	m_k005289->add_route(ALL_OUTPUTS, "mono", 0.35);
+}
+
+void gx400_state::gx400_common_sound(machine_config &config)
+{
+	nemesis_common_sound(config);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gx400_state::gx400_sound_map);
+
+	VLM5030(config, m_vlm, 3'579'545);
+	m_vlm->set_addrmap(0, &gx400_state::gx400_vlm_map);
+	m_vlm->add_route(ALL_OUTPUTS, "mono", 0.70);
+}
+
 void gx400_state::nemesis(machine_config &config)
 {
 	/* basic machine hardware */
@@ -1851,12 +1849,9 @@ void gx400_state::nemesis(machine_config &config)
 //  14318180/2, /* From schematics, should be accurate */
 	m_maincpu->set_addrmap(AS_PROGRAM, &gx400_state::nemesis_map);
 
-	Z80(config, m_audiocpu, 14'318'180/8); /* 1.7897725MHz */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &gx400_state::sound_map); /* fixed */
-
 	ls259_device &outlatch(LS259(config, "outlatch")); // 13J
-	outlatch.q_out_cb<0>().set(FUNC(gx400_state::coin1_lockout_w));
-	outlatch.q_out_cb<0>().append(FUNC(gx400_state::coin2_lockout_w));
+	outlatch.q_out_cb<0>().set(FUNC(gx400_state::coin_lockout_w<0>));
+	outlatch.q_out_cb<0>().append(FUNC(gx400_state::coin_lockout_w<1>));
 	outlatch.q_out_cb<2>().set(FUNC(gx400_state::sound_irq_w));
 
 	ls259_device &intlatch(LS259(config, "intlatch")); // 11K
@@ -1864,7 +1859,7 @@ void gx400_state::nemesis(machine_config &config)
 	intlatch.q_out_cb<2>().set(FUNC(gx400_state::gfx_flipx_w));
 	intlatch.q_out_cb<3>().set(FUNC(gx400_state::gfx_flipy_w));
 
-	WATCHDOG_TIMER(config, "watchdog", 0);
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1877,101 +1872,7 @@ void gx400_state::nemesis(machine_config &config)
 	PALETTE(config, m_palette).set_entries(2048);
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	GENERIC_LATCH_8(config, "soundlatch");
-
-	ay8910_device &ay1(AY8910(config, "ay1", 14'318'180/8));
-	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
-	ay1.port_a_read_callback().set(FUNC(gx400_state::nemesis_portA_r));
-	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
-
-	ay8910_device &ay2(AY8910(config, "ay2", 14'318'180/8));
-	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::control_A_w));
-	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::control_B_w));
-	ay2.add_route(0, "filter2", 1.00);
-	ay2.add_route(1, "filter3", 1.00);
-	ay2.add_route(2, "filter4", 1.00);
-
-	FILTER_RC(config, m_filter[0]);
-	m_filter[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
-	FILTER_RC(config, m_filter[1]);
-	m_filter[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
-	FILTER_RC(config, m_filter[2]);
-	m_filter[2]->add_route(ALL_OUTPUTS, "mono", 1.0);
-	FILTER_RC(config, m_filter[3]);
-	m_filter[3]->add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	K005289(config, m_k005289, 3'579'545);
-	m_k005289->add_route(ALL_OUTPUTS, "mono", 0.35);
-}
-
-void gx400_state::gx400(machine_config &config)
-{
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 18'432'000/2); /* 9.216MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &gx400_state::gx400_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(gx400_state::gx400_interrupt), "screen", 0, 1);
-
-	Z80(config, m_audiocpu, 14'318'180/8);        /* 1.7897725MHz */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &gx400_state::gx400_sound_map);
-
-	ls259_device &outlatch(LS259(config, "outlatch"));
-	outlatch.q_out_cb<0>().set(FUNC(gx400_state::coin1_lockout_w));
-	outlatch.q_out_cb<1>().set(FUNC(gx400_state::coin2_lockout_w));
-	outlatch.q_out_cb<2>().set(FUNC(gx400_state::sound_irq_w));
-	outlatch.q_out_cb<7>().set(FUNC(gx400_state::irq4_enable_w)); // ??
-
-	ls259_device &intlatch(LS259(config, "intlatch"));
-	intlatch.q_out_cb<0>().set(FUNC(gx400_state::irq2_enable_w));
-	intlatch.q_out_cb<1>().set(FUNC(gx400_state::irq1_enable_w));
-	intlatch.q_out_cb<2>().set(FUNC(gx400_state::gfx_flipx_w));
-	intlatch.q_out_cb<3>().set(FUNC(gx400_state::gfx_flipy_w));
-
-	WATCHDOG_TIMER(config, "watchdog");
-
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	set_screen_raw_params(config);
-	m_screen->set_screen_update(FUNC(gx400_state::screen_update));
-	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI);
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
-	PALETTE(config, m_palette).set_entries(2048);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	GENERIC_LATCH_8(config, "soundlatch");
-
-	ay8910_device &ay1(AY8910(config, "ay1", 14'318'180/8));
-	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
-	ay1.port_a_read_callback().set(FUNC(gx400_state::nemesis_portA_r));
-	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
-
-	ay8910_device &ay2(AY8910(config, "ay2", 14'318'180/8));
-	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::control_A_w));
-	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::control_B_w));
-	ay2.add_route(0, "filter2", 1.00);
-	ay2.add_route(1, "filter3", 1.00);
-	ay2.add_route(2, "filter4", 1.00);
-
-	FILTER_RC(config, m_filter[0]);
-	m_filter[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
-	FILTER_RC(config, m_filter[1]);
-	m_filter[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
-	FILTER_RC(config, m_filter[2]);
-	m_filter[2]->add_route(ALL_OUTPUTS, "mono", 1.0);
-	FILTER_RC(config, m_filter[3]);
-	m_filter[3]->add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	K005289(config, m_k005289, 3'579'545);
-	m_k005289->add_route(ALL_OUTPUTS, "mono", 0.35);
-
-	VLM5030(config, m_vlm, 3'579'545);
-	m_vlm->set_addrmap(0, &gx400_state::gx400_vlm_map);
-	m_vlm->add_route(ALL_OUTPUTS, "mono", 0.70);
+	nemesis_common_sound(config);
 }
 
 void gx400_state::konamigt(machine_config &config)
@@ -1981,12 +1882,9 @@ void gx400_state::konamigt(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gx400_state::konamigt_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(gx400_state::konamigt_interrupt), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, 14'318'180/8);        /* 1.7897725MHz */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &gx400_state::sound_map);
-
 	ls259_device &outlatch(LS259(config, "outlatch"));
-	outlatch.q_out_cb<0>().set(FUNC(gx400_state::coin2_lockout_w));
-	outlatch.q_out_cb<1>().set(FUNC(gx400_state::coin1_lockout_w));
+	outlatch.q_out_cb<0>().set(FUNC(gx400_state::coin_lockout_w<1>));
+	outlatch.q_out_cb<1>().set(FUNC(gx400_state::coin_lockout_w<0>));
 	outlatch.q_out_cb<2>().set(FUNC(gx400_state::sound_irq_w));
 
 	ls259_device &intlatch(LS259(config, "intlatch"));
@@ -2007,48 +1905,22 @@ void gx400_state::konamigt(machine_config &config)
 	PALETTE(config, m_palette).set_entries(2048);
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
+	nemesis_common_sound(config);
 
-	GENERIC_LATCH_8(config, "soundlatch");
-
-	ay8910_device &ay1(AY8910(config, "ay1", 14'318'180/8));
-	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
-	ay1.port_a_read_callback().set(FUNC(gx400_state::nemesis_portA_r));
-	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
-
-	ay8910_device &ay2(AY8910(config, "ay2", 14'318'180/8));
-	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::control_A_w));
-	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::control_B_w));
-	ay2.add_route(0, "filter2", 1.00);
-	ay2.add_route(1, "filter3", 1.00);
-	ay2.add_route(2, "filter4", 1.00);
-
-	FILTER_RC(config, m_filter[0]);
-	m_filter[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
-	FILTER_RC(config, m_filter[1]);
-	m_filter[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
-	FILTER_RC(config, m_filter[2]);
-	m_filter[2]->add_route(ALL_OUTPUTS, "mono", 1.0);
-	FILTER_RC(config, m_filter[3]);
-	m_filter[3]->add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	K005289(config, m_k005289, 3'579'545);
+	m_k005289->reset_routes();
 	m_k005289->add_route(ALL_OUTPUTS, "mono", 0.60);
 }
 
-void gx400_state::rf2_gx400(machine_config &config)
+void gx400_state::gx400(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 18'432'000/2); /* 9.216MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &gx400_state::rf2_gx400_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gx400_state::gx400_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(gx400_state::gx400_interrupt), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, 14'318'180/8); /* 1.7897725MHz */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &gx400_state::gx400_sound_map);
-
 	ls259_device &outlatch(LS259(config, "outlatch"));
-	outlatch.q_out_cb<0>().set(FUNC(gx400_state::coin1_lockout_w));
-	outlatch.q_out_cb<1>().set(FUNC(gx400_state::coin2_lockout_w));
+	outlatch.q_out_cb<0>().set(FUNC(gx400_state::coin_lockout_w<0>));
+	outlatch.q_out_cb<1>().set(FUNC(gx400_state::coin_lockout_w<1>));
 	outlatch.q_out_cb<2>().set(FUNC(gx400_state::sound_irq_w));
 	outlatch.q_out_cb<7>().set(FUNC(gx400_state::irq4_enable_w)); // ??
 
@@ -2071,37 +1943,22 @@ void gx400_state::rf2_gx400(machine_config &config)
 	PALETTE(config, m_palette).set_entries(2048);
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
+	gx400_common_sound(config);
+}
 
-	GENERIC_LATCH_8(config, "soundlatch");
+void gx400_state::gradius(machine_config &config)
+{
+	gx400(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gx400_state::gradius_map);
+}
 
-	ay8910_device &ay1(AY8910(config, "ay1", 14'318'180/8));
-	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
-	ay1.port_a_read_callback().set(FUNC(gx400_state::nemesis_portA_r));
-	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
+void gx400_state::rf2_gx400(machine_config &config)
+{
+	gx400(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gx400_state::rf2_gx400_map);
 
-	ay8910_device &ay2(AY8910(config, "ay2", 14'318'180/8));
-	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::control_A_w));
-	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::control_B_w));
-	ay2.add_route(0, "filter2", 1.00);
-	ay2.add_route(1, "filter3", 1.00);
-	ay2.add_route(2, "filter4", 1.00);
-
-	FILTER_RC(config, m_filter[0]);
-	m_filter[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
-	FILTER_RC(config, m_filter[1]);
-	m_filter[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
-	FILTER_RC(config, m_filter[2]);
-	m_filter[2]->add_route(ALL_OUTPUTS, "mono", 1.0);
-	FILTER_RC(config, m_filter[3]);
-	m_filter[3]->add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	K005289(config, m_k005289, 3'579'545);
+	m_k005289->reset_routes();
 	m_k005289->add_route(ALL_OUTPUTS, "mono", 0.60);
-
-	VLM5030(config, m_vlm, 3'579'545);
-	m_vlm->set_addrmap(0, &gx400_state::gx400_vlm_map);
-	m_vlm->add_route(ALL_OUTPUTS, "mono", 0.70);
 }
 
 void salamand_state::salamand(machine_config &config)
@@ -2317,6 +2174,61 @@ void hcrash_state::hcrash(machine_config &config)
 	ymsnd.add_route(1, "speaker", 0.50, 1);
 }
 
+void bubsys_state::bubsys(machine_config &config)
+{
+	/* basic machine hardware */
+	M68000(config, m_maincpu, 18'432'000/2); /* 9.216MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &bubsys_state::main_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(bubsys_state::bubsys_interrupt), "screen", 0, 1);
+
+	ls259_device &outlatch(LS259(config, "outlatch"));
+	outlatch.q_out_cb<0>().set(FUNC(bubsys_state::coin_lockout_w<0>));
+	outlatch.q_out_cb<1>().set(FUNC(bubsys_state::coin_lockout_w<1>));
+	outlatch.q_out_cb<2>().set(FUNC(bubsys_state::sound_irq_w));
+	outlatch.q_out_cb<4>().set(FUNC(bubsys_state::sound_nmi_w));
+	outlatch.q_out_cb<7>().set(FUNC(bubsys_state::irq4_enable_w));
+
+	ls259_device &intlatch(LS259(config, "intlatch"));
+	intlatch.q_out_cb<0>().set(FUNC(bubsys_state::irq2_enable_w));
+	intlatch.q_out_cb<1>().set(FUNC(bubsys_state::irq1_enable_w));
+	intlatch.q_out_cb<2>().set(FUNC(bubsys_state::gfx_flipx_w));
+	intlatch.q_out_cb<3>().set(FUNC(bubsys_state::gfx_flipy_w));
+
+	WATCHDOG_TIMER(config, "watchdog");
+
+	/* video hardware */
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	set_screen_raw_params(config);
+	m_screen->set_screen_update(FUNC(bubsys_state::screen_update));
+	m_screen->set_palette(m_palette);
+	// TODO: This is supposed to be gated by something on bubble system, unclear what.
+	// it should only be active while the bubble memory is warming up, and disabled after
+	// the bubble 005297 'releases' the 68k from reset.
+	//m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
+	PALETTE(config, m_palette).set_entries(2048);
+
+	/* sound hardware */
+	gx400_common_sound(config);
+}
+
+void bubsys_state::bs_gradius(machine_config &config)
+{
+	bubsys(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bubsys_state::bs_gradius_map);
+}
+
+void bubsys_state::bs_rf2(machine_config &config)
+{
+	bubsys(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bubsys_state::bs_rf2_map);
+
+	m_k005289->reset_routes();
+	m_k005289->add_route(ALL_OUTPUTS, "mono", 0.60);
+}
+
+
 /***************************************************************************
 
   Game driver(s)
@@ -2334,7 +2246,7 @@ ROM_START( nemesis )
 	ROM_LOAD16_BYTE( "456-d04.15a",   0x30000, 0x8000, CRC(9ca75592) SHA1(04388f2874faa54dd2cabfec4d6ce3e8d164cbcc) )
 	ROM_LOAD16_BYTE( "456-d08.15c",   0x30001, 0x8000, CRC(03c0b7f5) SHA1(4eb31bcbd2ee66afe4158308351a57589c5a1e4e) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_REGION( 0x4000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "456-d09.9c",   0x00000, 0x4000, CRC(26bf9636) SHA1(009dcbf18ea6230fc75a72232bd4fc29ad28dbf0) )
 
 	ROM_REGION( 0x0200,  "k005289", 0 )      /* 2x 256 byte for 0005289 wavetable data */
@@ -2353,7 +2265,7 @@ ROM_START( nemesisuk )
 	ROM_LOAD16_BYTE( "456-e04.15a",   0x30000, 0x8000, CRC(322423d0) SHA1(6106b607132a09193353f339d06032a13b1e3de8) )
 	ROM_LOAD16_BYTE( "456-e08.15c",   0x30001, 0x8000, CRC(eb656266) SHA1(2f4abea282d30775f7a25747eb41bfd8d5299967) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_REGION( 0x4000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "456-b09.9c",   0x00000, 0x4000, CRC(26bf9636) SHA1(009dcbf18ea6230fc75a72232bd4fc29ad28dbf0) ) /* Labeled "B09" but same as above set */
 
 	ROM_REGION( 0x0200,  "k005289", 0 )      /* 2x 256 byte for 0005289 wavetable data */
@@ -2372,7 +2284,7 @@ ROM_START( konamigt )
 	ROM_LOAD16_BYTE( "561-b04.15a",   0x30000, 0x8000, CRC(94bd4bd7) SHA1(314b537ba97dec1a91dcfc5deeb1dd9f7bb4a930) )
 	ROM_LOAD16_BYTE( "561-b08.15c",   0x30001, 0x8000, CRC(b7236567) SHA1(7626d70262a0acff36357877a5e7c9ed3f45415e) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_REGION( 0x4000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(       "561-b09.9c",  0x00000, 0x4000, CRC(539d0c49) SHA1(4c16b07fbd876b6445fc0ec49c3ad5ab1a92cbf6) )
 
 	ROM_REGION( 0x0200,  "k005289", 0 )      /* 2x 256 byte for 0005289 wavetable data */
@@ -2381,13 +2293,15 @@ ROM_START( konamigt )
 ROM_END
 
 ROM_START( rf2 )
-	ROM_REGION( 0xc0000, "maincpu", 0 )    /* 5 * 64k for code and rom */
+	ROM_REGION( 0x10000, "maincpu", 0 )    /* 2 * 32k for code */
 	ROM_LOAD16_BYTE( "400-a06.15l",  0x00000, 0x08000, CRC(b99d8cff) SHA1(18e277827a534bab2b3b8b81e51d886b8382d435) )
 	ROM_LOAD16_BYTE( "400-a04.10l",  0x00001, 0x08000, CRC(d02c9552) SHA1(ec0aaa093541dab98412c11f666161cd558c383a) )
-	ROM_LOAD16_BYTE( "561-a07.17l",  0x80000, 0x20000, CRC(ed6e7098) SHA1(a28f2846b091b5bc333088054451d7b6d7f6458e) )
-	ROM_LOAD16_BYTE( "561-a05.12l",  0x80001, 0x20000, CRC(dfe04425) SHA1(0817992aeeba140feba1417c265b794f096936d9) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_REGION16_BE( 0x40000, "maindata", 0 )    /* 2 * 128k for data */
+	ROM_LOAD16_BYTE( "561-a07.17l",  0x00000, 0x20000, CRC(ed6e7098) SHA1(a28f2846b091b5bc333088054451d7b6d7f6458e) )
+	ROM_LOAD16_BYTE( "561-a05.12l",  0x00001, 0x20000, CRC(dfe04425) SHA1(0817992aeeba140feba1417c265b794f096936d9) )
+
+	ROM_REGION( 0x2000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "400-e03.5l",   0x00000, 0x02000, CRC(a5a8e57d) SHA1(f4236770093392dec3f76835a5766e9b3ed64e2e) )
 
 	ROM_REGION( 0x0200,  "k005289", 0 )      /* 2x 256 byte for 0005289 wavetable data */
@@ -2396,13 +2310,15 @@ ROM_START( rf2 )
 ROM_END
 
 ROM_START( twinbee )
-	ROM_REGION( 0xc0000, "maincpu", 0 )    /* 5 * 64k for code and rom */
+	ROM_REGION( 0x10000, "maincpu", 0 )    /* 2 * 32k for code */
 	ROM_LOAD16_BYTE( "400-a06.15l",  0x00000, 0x08000, CRC(b99d8cff) SHA1(18e277827a534bab2b3b8b81e51d886b8382d435) )
 	ROM_LOAD16_BYTE( "400-a04.10l",  0x00001, 0x08000, CRC(d02c9552) SHA1(ec0aaa093541dab98412c11f666161cd558c383a) )
-	ROM_LOAD16_BYTE( "412-a07.17l",  0x80000, 0x20000, CRC(d93c5499) SHA1(4555b9232ce86192360ea5b5092643ff51446aa0) )
-	ROM_LOAD16_BYTE( "412-a05.12l",  0x80001, 0x20000, CRC(2b357069) SHA1(409cf3aa174f5d7dc5efc8b8b1c925fcb677fc98) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_REGION16_BE( 0x40000, "maindata", 0 )    /* 2 * 128k for data */
+	ROM_LOAD16_BYTE( "412-a07.17l",  0x00000, 0x20000, CRC(d93c5499) SHA1(4555b9232ce86192360ea5b5092643ff51446aa0) )
+	ROM_LOAD16_BYTE( "412-a05.12l",  0x00001, 0x20000, CRC(2b357069) SHA1(409cf3aa174f5d7dc5efc8b8b1c925fcb677fc98) )
+
+	ROM_REGION( 0x2000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "400-e03.5l",   0x00000, 0x02000, CRC(a5a8e57d) SHA1(f4236770093392dec3f76835a5766e9b3ed64e2e) )
 
 	ROM_REGION( 0x0200,  "k005289", 0 )      /* 2x 256 byte for 0005289 wavetable data */
@@ -2411,13 +2327,15 @@ ROM_START( twinbee )
 ROM_END
 
 ROM_START( gradius )
-	ROM_REGION( 0xc0000, "maincpu", 0 )    /* 5 * 64k for code and rom */
+	ROM_REGION( 0x10000, "maincpu", 0 )    /* 2 * 32k for code */
 	ROM_LOAD16_BYTE( "400-a06.15l",  0x00000, 0x08000, CRC(b99d8cff) SHA1(18e277827a534bab2b3b8b81e51d886b8382d435) )
 	ROM_LOAD16_BYTE( "400-a04.10l",  0x00001, 0x08000, CRC(d02c9552) SHA1(ec0aaa093541dab98412c11f666161cd558c383a) )
-	ROM_LOAD16_BYTE( "456-a07.17l",  0x80000, 0x20000, CRC(92df792c) SHA1(aec916f70af92a2d6476d7a36ba9be265890f9aa) )
-	ROM_LOAD16_BYTE( "456-a05.12l",  0x80001, 0x20000, CRC(5cafb263) SHA1(7cd12c695ec6ef4d5785ce218911961fc3528e95) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_REGION16_BE( 0x40000, "maindata", 0 )    /* 2 * 128k for data */
+	ROM_LOAD16_BYTE( "456-a07.17l",  0x00000, 0x20000, CRC(92df792c) SHA1(aec916f70af92a2d6476d7a36ba9be265890f9aa) )
+	ROM_LOAD16_BYTE( "456-a05.12l",  0x00001, 0x20000, CRC(5cafb263) SHA1(7cd12c695ec6ef4d5785ce218911961fc3528e95) )
+
+	ROM_REGION( 0x2000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "400-e03.5l",   0x00000, 0x2000, CRC(a5a8e57d) SHA1(f4236770093392dec3f76835a5766e9b3ed64e2e) )
 
 	ROM_REGION( 0x0200,  "k005289", 0 )      /* 2x 256 byte for 0005289 wavetable data */
@@ -2426,13 +2344,15 @@ ROM_START( gradius )
 ROM_END
 
 ROM_START( gwarrior )
-	ROM_REGION( 0xc0000, "maincpu", 0 )    /* 5 * 64k for code and rom */
+	ROM_REGION( 0x10000, "maincpu", 0 )    /* 2 * 32k for code */
 	ROM_LOAD16_BYTE( "400-a06.15l",  0x00000, 0x08000, CRC(b99d8cff) SHA1(18e277827a534bab2b3b8b81e51d886b8382d435) )
 	ROM_LOAD16_BYTE( "400-a04.10l",  0x00001, 0x08000, CRC(d02c9552) SHA1(ec0aaa093541dab98412c11f666161cd558c383a) )
-	ROM_LOAD16_BYTE( "578-a07.17l",  0x80000, 0x20000, CRC(0aedacb5) SHA1(bf8e4b443df37e021a86e1fe76683113977a1a76) )
-	ROM_LOAD16_BYTE( "578-a05.12l",  0x80001, 0x20000, CRC(76240e2e) SHA1(3f4086972fa655704ec6480fa3012c3e8999d8ab) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_REGION16_BE( 0x40000, "maindata", 0 )    /* 2 * 128k for data */
+	ROM_LOAD16_BYTE( "578-a07.17l",  0x00000, 0x20000, CRC(0aedacb5) SHA1(bf8e4b443df37e021a86e1fe76683113977a1a76) )
+	ROM_LOAD16_BYTE( "578-a05.12l",  0x00001, 0x20000, CRC(76240e2e) SHA1(3f4086972fa655704ec6480fa3012c3e8999d8ab) )
+
+	ROM_REGION( 0x2000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "400-e03.5l",   0x00000, 0x02000, CRC(a5a8e57d) SHA1(f4236770093392dec3f76835a5766e9b3ed64e2e) )
 
 	ROM_REGION( 0x0200,  "k005289", 0 )      /* 2x 256 byte for 0005289 wavetable data */
@@ -2447,7 +2367,7 @@ ROM_START( salamand )
 	ROM_LOAD16_BYTE( "587-c03.17b",  0x40000, 0x20000, CRC(e5caf6e6) SHA1(f5df4fbc43cfa6e2866558c99dd95ba8dc89dc7a) ) /* Mask rom */
 	ROM_LOAD16_BYTE( "587-c06.17c",  0x40001, 0x20000, CRC(c2f567ea) SHA1(0c38fea53f3d4a9ae0deada5669deca4be8c9fd3) ) /* Mask rom */
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_REGION( 0x8000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "587-d09.11j",      0x00000, 0x08000, CRC(5020972c) SHA1(04c752c3b7fd850a8a51ecd230b39e6edde9dd7e) )
 
 	ROM_REGION( 0x04000, "vlm", 0 )    /* VLM5030 data */
@@ -2464,7 +2384,7 @@ ROM_START( salamandj )
 	ROM_LOAD16_BYTE( "587-c03.17b",  0x40000, 0x20000, CRC(e5caf6e6) SHA1(f5df4fbc43cfa6e2866558c99dd95ba8dc89dc7a) ) /* Mask rom */
 	ROM_LOAD16_BYTE( "587-c06.17c",  0x40001, 0x20000, CRC(c2f567ea) SHA1(0c38fea53f3d4a9ae0deada5669deca4be8c9fd3) ) /* Mask rom */
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_REGION( 0x8000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "587-d09.11j",      0x00000, 0x08000, CRC(5020972c) SHA1(04c752c3b7fd850a8a51ecd230b39e6edde9dd7e) )
 
 	ROM_REGION( 0x04000, "vlm", 0 )    /* VLM5030 data */
@@ -2484,7 +2404,7 @@ ROM_START( salamandt )
 	ROM_LOAD16_BYTE( "9_27512.17b",  0x60000, 0x10000, CRC(b4d2fec9) SHA1(b095e003d86f6d5f486a1d9a4cf02572ff20edeb) )
 	ROM_LOAD16_BYTE( "3_27512.17c",  0x60001, 0x10000, CRC(6ea59643) SHA1(cb2ba819a601eb417eb67d50568126269fa613a4) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) // 64k for sound
+	ROM_REGION( 0x8000, "audiocpu", 0 ) // 64k for sound
 	ROM_LOAD( "2_tmm24256ap.11j",    0x00000, 0x08000, CRC(7eb8bb88) SHA1(8eb3063b0f4b0775b80f25cc6588661c0e61227d) ) // Unique for this set
 
 	ROM_REGION( 0x04000, "vlm", 0 )      // VLM5030 data
@@ -2505,7 +2425,7 @@ ROM_START( lifefrce )
 	ROM_LOAD16_BYTE( "6107.17b",     0x40000, 0x20000, CRC(e5caf6e6) SHA1(f5df4fbc43cfa6e2866558c99dd95ba8dc89dc7a) ) /* Mask rom */
 	ROM_LOAD16_BYTE( "6108.17c",     0x40001, 0x20000, CRC(c2f567ea) SHA1(0c38fea53f3d4a9ae0deada5669deca4be8c9fd3) ) /* Mask rom */
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_REGION( 0x8000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "587-k09.11j",    0x00000, 0x08000, CRC(2255fe8c) SHA1(6ee35575a15f593642b29020857ec466094ef495) )
 
 	ROM_REGION( 0x04000, "vlm", 0 )    /* VLM5030 data */
@@ -2522,7 +2442,7 @@ ROM_START( lifefrcej )
 	ROM_LOAD16_BYTE( "587-n03.17b",  0x40000, 0x20000, CRC(9041f850) SHA1(d62b8c3132916a4053cb282448b2404ac0143e01) )
 	ROM_LOAD16_BYTE( "587-n06.17c",  0x40001, 0x20000, CRC(fba8b6aa) SHA1(5ef861b89b7a89c9d70355e09621b106baa5c1e7) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_REGION( 0x8000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "587-n09.11j",  0x00000, 0x08000, CRC(e8496150) SHA1(c7d40b6dc56849dfd8d080f1aaebad36c88d93df) )
 
 	ROM_REGION( 0x04000, "vlm", 0 )    /* VLM5030 data */
@@ -2539,7 +2459,7 @@ ROM_START( blkpnthr )
 	ROM_LOAD16_BYTE( "604-c03.17b",  0x40000, 0x20000, CRC(815bc3b0) SHA1(ee643b9af5906d12b1d621996503c2e28d93a207) )
 	ROM_LOAD16_BYTE( "604-c06.17c",  0x40001, 0x20000, CRC(4af6bf7f) SHA1(bf6d128670dda1f30cbf72cb82b61bf6ddfcde60) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_REGION( 0x8000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "604-a08.11j",  0x00000, 0x08000, CRC(aff88a2b) SHA1(7080add63deab5755606759a218dea9105df4819) )
 
 	ROM_REGION( 0x20000, "k007232", 0 )    /* 007232 data */
@@ -2547,17 +2467,19 @@ ROM_START( blkpnthr )
 ROM_END
 
 ROM_START( citybomb )
-	ROM_REGION( 0x1c0000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "787-g10.15k",  0x000000, 0x10000, CRC(26207530) SHA1(ccb5e4ca472aad11cf308973d6a020d3af22a134) )
 	ROM_LOAD16_BYTE( "787-g09.15h",  0x000001, 0x10000, CRC(ce7de262) SHA1(73ab58c057113ffffb633c314fa383e65236d423) )
-	ROM_LOAD16_BYTE( "787-g08.15f",  0x100000, 0x20000, CRC(6242ef35) SHA1(16fd4478d54117bbf09792e22c786622ca5049bb) )
-	ROM_LOAD16_BYTE( "787-g07.15d",  0x100001, 0x20000, CRC(21be5e9e) SHA1(37fdf6d6fe3e84e897f2d908afdfc47e8d4a9265) )
-	ROM_LOAD16_BYTE( "787-e06.14f",  0x140000, 0x20000, CRC(c251154a) SHA1(7c6a1f862ddf64a604164b85e4a04bb01e2966a7) )
-	ROM_LOAD16_BYTE( "787-e05.14d",  0x140001, 0x20000, CRC(0781e22d) SHA1(03a998ee47194960af4dde2bf553359fe8a3aee7) )
-	ROM_LOAD16_BYTE( "787-g04.13f",  0x180000, 0x20000, CRC(137cf39f) SHA1(39cfd25c45d824cabc3641fd39eb77c98d32ec9b) )
-	ROM_LOAD16_BYTE( "787-g03.13d",  0x180001, 0x20000, CRC(0cc704dc) SHA1(b0c3991393cdb6a75461597d51452bfa08955081) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_REGION16_BE( 0xc0000, "maindata", 0 )
+	ROM_LOAD16_BYTE( "787-g08.15f",  0x000000, 0x20000, CRC(6242ef35) SHA1(16fd4478d54117bbf09792e22c786622ca5049bb) )
+	ROM_LOAD16_BYTE( "787-g07.15d",  0x000001, 0x20000, CRC(21be5e9e) SHA1(37fdf6d6fe3e84e897f2d908afdfc47e8d4a9265) )
+	ROM_LOAD16_BYTE( "787-e06.14f",  0x040000, 0x20000, CRC(c251154a) SHA1(7c6a1f862ddf64a604164b85e4a04bb01e2966a7) )
+	ROM_LOAD16_BYTE( "787-e05.14d",  0x040001, 0x20000, CRC(0781e22d) SHA1(03a998ee47194960af4dde2bf553359fe8a3aee7) )
+	ROM_LOAD16_BYTE( "787-g04.13f",  0x080000, 0x20000, CRC(137cf39f) SHA1(39cfd25c45d824cabc3641fd39eb77c98d32ec9b) )
+	ROM_LOAD16_BYTE( "787-g03.13d",  0x080001, 0x20000, CRC(0cc704dc) SHA1(b0c3991393cdb6a75461597d51452bfa08955081) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "787-e02.4h",  0x00000, 0x08000, CRC(f4591e46) SHA1(c17c1a24bf1866fbba388521a4b7ea0975bda587) )
 
 	ROM_REGION( 0x80000, "k007232", 0 )    /* 007232 data */
@@ -2565,17 +2487,19 @@ ROM_START( citybomb )
 ROM_END
 
 ROM_START( citybombj )
-	ROM_REGION( 0x1c0000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "787-h10.15k",  0x000000, 0x10000, CRC(66fecf69) SHA1(5881ec019ef6228a693af5c9f6c26e05bdee3846) )
 	ROM_LOAD16_BYTE( "787-h09.15h",  0x000001, 0x10000, CRC(a0e29468) SHA1(78971da14a748ade6ea94770080a393c7617b97d) )
-	ROM_LOAD16_BYTE( "787-g08.15f",  0x100000, 0x20000, CRC(6242ef35) SHA1(16fd4478d54117bbf09792e22c786622ca5049bb) )
-	ROM_LOAD16_BYTE( "787-g07.15d",  0x100001, 0x20000, CRC(21be5e9e) SHA1(37fdf6d6fe3e84e897f2d908afdfc47e8d4a9265) )
-	ROM_LOAD16_BYTE( "787-e06.14f",  0x140000, 0x20000, CRC(c251154a) SHA1(7c6a1f862ddf64a604164b85e4a04bb01e2966a7) )
-	ROM_LOAD16_BYTE( "787-e05.14d",  0x140001, 0x20000, CRC(0781e22d) SHA1(03a998ee47194960af4dde2bf553359fe8a3aee7) )
-	ROM_LOAD16_BYTE( "787-g04.13f",  0x180000, 0x20000, CRC(137cf39f) SHA1(39cfd25c45d824cabc3641fd39eb77c98d32ec9b) )
-	ROM_LOAD16_BYTE( "787-g03.13d",  0x180001, 0x20000, CRC(0cc704dc) SHA1(b0c3991393cdb6a75461597d51452bfa08955081) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_REGION16_BE( 0xc0000, "maindata", 0 )
+	ROM_LOAD16_BYTE( "787-g08.15f",  0x000000, 0x20000, CRC(6242ef35) SHA1(16fd4478d54117bbf09792e22c786622ca5049bb) )
+	ROM_LOAD16_BYTE( "787-g07.15d",  0x000001, 0x20000, CRC(21be5e9e) SHA1(37fdf6d6fe3e84e897f2d908afdfc47e8d4a9265) )
+	ROM_LOAD16_BYTE( "787-e06.14f",  0x040000, 0x20000, CRC(c251154a) SHA1(7c6a1f862ddf64a604164b85e4a04bb01e2966a7) )
+	ROM_LOAD16_BYTE( "787-e05.14d",  0x040001, 0x20000, CRC(0781e22d) SHA1(03a998ee47194960af4dde2bf553359fe8a3aee7) )
+	ROM_LOAD16_BYTE( "787-g04.13f",  0x080000, 0x20000, CRC(137cf39f) SHA1(39cfd25c45d824cabc3641fd39eb77c98d32ec9b) )
+	ROM_LOAD16_BYTE( "787-g03.13d",  0x080001, 0x20000, CRC(0cc704dc) SHA1(b0c3991393cdb6a75461597d51452bfa08955081) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "787-e02.4h",  0x00000, 0x08000, CRC(f4591e46) SHA1(c17c1a24bf1866fbba388521a4b7ea0975bda587) )
 
 	ROM_REGION( 0x80000, "k007232", 0 )    /* 007232 data */
@@ -2583,13 +2507,15 @@ ROM_START( citybombj )
 ROM_END
 
 ROM_START( kittenk )
-	ROM_REGION( 0x140000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "712-b10.15k",  0x000000, 0x10000, CRC(8267cb2b) SHA1(63c4ebef834850eff379141b8eb0fafbdcf26d0e) )
 	ROM_LOAD16_BYTE( "712-b09.15h",  0x000001, 0x10000, CRC(eb41cfa5) SHA1(d481e63faea098625a42613c13f82fec310a7c62) )
-	ROM_LOAD16_BYTE( "712-b08.15f",  0x100000, 0x20000, CRC(e6d71611) SHA1(89fced4074c491c211fea908f08be94595c57f31) )
-	ROM_LOAD16_BYTE( "712-b07.15d",  0x100001, 0x20000, CRC(30f75c9f) SHA1(0cbc247ff37800dd3275d2ff23a63ed19ec4cef2) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_REGION16_BE( 0x40000, "maindata", 0 )
+	ROM_LOAD16_BYTE( "712-b08.15f",  0x000000, 0x20000, CRC(e6d71611) SHA1(89fced4074c491c211fea908f08be94595c57f31) )
+	ROM_LOAD16_BYTE( "712-b07.15d",  0x000001, 0x20000, CRC(30f75c9f) SHA1(0cbc247ff37800dd3275d2ff23a63ed19ec4cef2) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "712-e02.4h",  0x00000, 0x08000, CRC(ba76f310) SHA1(cc2164a9617493d1b3b8ac67430f9eb26fd987d2) )
 
 	ROM_REGION( 0x80000, "k007232", 0 )    /* 007232 data */
@@ -2597,13 +2523,15 @@ ROM_START( kittenk )
 ROM_END
 
 ROM_START( nyanpani )
-	ROM_REGION( 0x140000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "712-j10.15k",  0x000000, 0x10000, CRC(924b27ec) SHA1(019279349b1be45ba46e57ef8f21d79a1b115d7b) )
 	ROM_LOAD16_BYTE( "712-j09.15h",  0x000001, 0x10000, CRC(a9862ea1) SHA1(84e481eb6159889d54d0dfe4c31399ab06e13bb7) )
-	ROM_LOAD16_BYTE( "712-b08.15f",  0x100000, 0x20000, CRC(e6d71611) SHA1(89fced4074c491c211fea908f08be94595c57f31) )
-	ROM_LOAD16_BYTE( "712-b07.15d",  0x100001, 0x20000, CRC(30f75c9f) SHA1(0cbc247ff37800dd3275d2ff23a63ed19ec4cef2) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_REGION16_BE( 0x40000, "maindata", 0 )
+	ROM_LOAD16_BYTE( "712-b08.15f",  0x000000, 0x20000, CRC(e6d71611) SHA1(89fced4074c491c211fea908f08be94595c57f31) )
+	ROM_LOAD16_BYTE( "712-b07.15d",  0x000001, 0x20000, CRC(30f75c9f) SHA1(0cbc247ff37800dd3275d2ff23a63ed19ec4cef2) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "712-e02.4h",  0x00000, 0x08000, CRC(ba76f310) SHA1(cc2164a9617493d1b3b8ac67430f9eb26fd987d2) )
 
 	ROM_REGION( 0x80000, "k007232", 0 )    /* 007232 data */
@@ -2717,13 +2645,15 @@ Notes:
 */
 
 ROM_START( hcrash )
-	ROM_REGION( 0x140000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "790-d03.t9",   0x00000, 0x08000, CRC(10177dce) SHA1(e46f75e3206eff5299e08e5258e67b68efc4c20c) )
 	ROM_LOAD16_BYTE( "790-d06.t7",   0x00001, 0x08000, CRC(fca5ab3e) SHA1(2ad335cf25a86fe38c190e2e0fe101ea161eb81d) )
-	ROM_LOAD16_BYTE( "790-c02.s9",   0x40000, 0x10000, CRC(8ae6318f) SHA1(b3205df1103a69eef34c5207e567a27a5fee5660) )
-	ROM_LOAD16_BYTE( "790-c05.s7",   0x40001, 0x10000, CRC(c214f77b) SHA1(c5754c3da2a3820d8d06f8ff171be6c2aea92ecc) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_REGION16_BE( 0x20000, "maindata", 0)
+	ROM_LOAD16_BYTE( "790-c02.s9",   0x00000, 0x10000, CRC(8ae6318f) SHA1(b3205df1103a69eef34c5207e567a27a5fee5660) )
+	ROM_LOAD16_BYTE( "790-c05.s7",   0x00001, 0x10000, CRC(c214f77b) SHA1(c5754c3da2a3820d8d06f8ff171be6c2aea92ecc) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD( "790-c09.n2",   0x00000, 0x8000, CRC(a68a8cce) SHA1(a54966b9cbbe37b2be6a2276ee09c81452d9c0ca) )
 
 	ROM_REGION( 0x08000, "vlm", 0 )  /* VLM5030 data */
@@ -2735,13 +2665,15 @@ ROM_START( hcrash )
 ROM_END
 
 ROM_START( hcrashc )
-	ROM_REGION( 0x140000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "790-c03.t9",   0x00000, 0x08000, CRC(d98ec625) SHA1(ddec88b0babd1c538fe5055adec73b537d637d3e) )
 	ROM_LOAD16_BYTE( "790-c06.t7",   0x00001, 0x08000, CRC(1d641a86) SHA1(d20ae01565d04db62d5687546c19d87c8e26248c) )
-	ROM_LOAD16_BYTE( "790-c02.s9",   0x40000, 0x10000, CRC(8ae6318f) SHA1(b3205df1103a69eef34c5207e567a27a5fee5660) )
-	ROM_LOAD16_BYTE( "790-c05.s7",   0x40001, 0x10000, CRC(c214f77b) SHA1(c5754c3da2a3820d8d06f8ff171be6c2aea92ecc) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_REGION16_BE( 0x20000, "maindata", 0)
+	ROM_LOAD16_BYTE( "790-c02.s9",   0x00000, 0x10000, CRC(8ae6318f) SHA1(b3205df1103a69eef34c5207e567a27a5fee5660) )
+	ROM_LOAD16_BYTE( "790-c05.s7",   0x00001, 0x10000, CRC(c214f77b) SHA1(c5754c3da2a3820d8d06f8ff171be6c2aea92ecc) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD( "790-c09.n2",   0x00000, 0x8000, CRC(a68a8cce) SHA1(a54966b9cbbe37b2be6a2276ee09c81452d9c0ca) )
 
 	ROM_REGION( 0x08000, "vlm", 0 )  /* VLM5030 data */
@@ -2752,27 +2684,6 @@ ROM_START( hcrashc )
 	ROM_LOAD( "790-c01.m10",  0x00000, 0x20000, CRC(07976bc3) SHA1(9341ac6084fbbe17c4e7bbefade9a3f1dec3f132) )
 ROM_END
 
-
-
-GAME(  1985, nemesis,   0,        nemesis,   nemesis,  gx400_state,    empty_init, ROT0,   "Konami",                  "Nemesis (ROM version)",         MACHINE_SUPPORTS_SAVE )
-GAME(  1985, nemesisuk, nemesis,  nemesis,   nemesuk,  gx400_state,    empty_init, ROT0,   "Konami",                  "Nemesis (World?, ROM version)", MACHINE_SUPPORTS_SAVE )
-GAMEL( 1985, konamigt,  0,        konamigt,  konamigt, gx400_state,    empty_init, ROT0,   "Konami",                  "Konami GT",                     MACHINE_SUPPORTS_SAVE, layout_konamigt )
-GAME(  1985, rf2,       konamigt, rf2_gx400, rf2,      gx400_state,    empty_init, ROT0,   "Konami",                  "Konami RF2 - Red Fighter",      MACHINE_SUPPORTS_SAVE )
-GAME(  1985, twinbee,   0,        gx400,     twinbee,  gx400_state,    empty_init, ROT90,  "Konami",                  "TwinBee (ROM version)",         MACHINE_SUPPORTS_SAVE )
-GAME(  1985, gradius,   nemesis,  gx400,     gradius,  gx400_state,    empty_init, ROT0,   "Konami",                  "Gradius (Japan, ROM version)",  MACHINE_SUPPORTS_SAVE )
-GAME(  1985, gwarrior,  0,        gx400,     gwarrior, gx400_state,    empty_init, ROT0,   "Konami",                  "Galactic Warriors",             MACHINE_SUPPORTS_SAVE )
-GAME(  1986, salamand,  0,        salamand,  salamand, salamand_state, empty_init, ROT0,   "Konami",                  "Salamander (version D)",        MACHINE_SUPPORTS_SAVE )
-GAME(  1986, salamandj, salamand, salamand,  salamand, salamand_state, empty_init, ROT0,   "Konami",                  "Salamander (version J)",        MACHINE_SUPPORTS_SAVE )
-GAME(  1986, salamandt, salamand, salamand,  salamand, salamand_state, empty_init, ROT0,   "Konami (Tecfri license)", "Salamander (Tecfri license)",   MACHINE_SUPPORTS_SAVE )
-GAME(  1986, lifefrce,  salamand, salamand,  salamand, salamand_state, empty_init, ROT0,   "Konami",                  "Lifeforce (US)",                MACHINE_SUPPORTS_SAVE )
-GAME(  1987, lifefrcej, salamand, salamand,  lifefrcj, salamand_state, empty_init, ROT0,   "Konami",                  "Lifeforce (Japan)",             MACHINE_SUPPORTS_SAVE )
-GAME(  1987, blkpnthr,  0,        blkpnthr,  blkpnthr, salamand_state, empty_init, ROT0,   "Konami",                  "Black Panther",                 MACHINE_SUPPORTS_SAVE )
-GAME(  1987, citybomb,  0,        citybomb,  citybomb, hcrash_state,   empty_init, ROT270, "Konami",                  "City Bomber (World)",           MACHINE_SUPPORTS_SAVE )
-GAME(  1987, citybombj, citybomb, citybomb,  citybomb, hcrash_state,   empty_init, ROT270, "Konami",                  "City Bomber (Japan)",           MACHINE_SUPPORTS_SAVE )
-GAME(  1987, hcrash,    0,        hcrash,    hcrash,   hcrash_state,   empty_init, ROT0,   "Konami",                  "Hyper Crash (version D)",       MACHINE_SUPPORTS_SAVE )
-GAME(  1987, hcrashc,   hcrash,   hcrash,    hcrash,   hcrash_state,   empty_init, ROT0,   "Konami",                  "Hyper Crash (version C)",       MACHINE_SUPPORTS_SAVE )
-GAME(  1988, kittenk,   0,        nyanpani,  nyanpani, salamand_state, empty_init, ROT0,   "Konami",                  "Kitten Kaboodle",               MACHINE_SUPPORTS_SAVE )
-GAME(  1988, nyanpani,  kittenk,  nyanpani,  nyanpani, salamand_state, empty_init, ROT0,   "Konami",                  "Nyan Nyan Panic (Japan)",       MACHINE_SUPPORTS_SAVE )
 
 /*
 
@@ -3029,7 +2940,7 @@ Manual says SW4, 5, 6, 7 & 8 not used, leave off
 Interrupt source info from ArcadeHacker:
 74LS147 @ 17E
 PIN1 INPUT 4 -> 14H 74LS74 PIN 5
-PIN2 INPUT 5 -> MCU PIN  31
+PIN2 INPUT 5 -> 005297 PIN  31
 PIN3 INPUT 6 -> VCC
 PIN4 INPUT 7 -> VCC
 PIN5 INPUT 8 -> VCC
@@ -3047,90 +2958,15 @@ PIN16 VCC
 
 */
 
-void bubsys_state::bubsys(machine_config &config)
-{
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 18'432'000/2); /* 9.216MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &bubsys_state::main_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(bubsys_state::bubsys_interrupt), "screen", 0, 1);
-
-	Z80(config, m_audiocpu, 14'318'180/8); /* 1.7897725MHz */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &bubsys_state::gx400_sound_map);
-
-	ls259_device &outlatch(LS259(config, "outlatch"));
-	outlatch.q_out_cb<0>().set(FUNC(bubsys_state::coin1_lockout_w));
-	outlatch.q_out_cb<1>().set(FUNC(bubsys_state::coin2_lockout_w));
-	outlatch.q_out_cb<2>().set(FUNC(bubsys_state::sound_irq_w));
-	outlatch.q_out_cb<4>().set(FUNC(bubsys_state::sound_nmi_w));
-	outlatch.q_out_cb<7>().set(FUNC(bubsys_state::irq4_enable_w));
-
-	ls259_device &intlatch(LS259(config, "intlatch"));
-	intlatch.q_out_cb<0>().set(FUNC(bubsys_state::irq2_enable_w));
-	intlatch.q_out_cb<1>().set(FUNC(bubsys_state::irq1_enable_w));
-	intlatch.q_out_cb<2>().set(FUNC(bubsys_state::gfx_flipx_w));
-	intlatch.q_out_cb<3>().set(FUNC(bubsys_state::gfx_flipy_w));
-
-	WATCHDOG_TIMER(config, "watchdog");
-
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	set_screen_raw_params(config);
-	m_screen->set_screen_update(FUNC(bubsys_state::screen_update));
-	m_screen->set_palette(m_palette);
-	// TODO: This is supposed to be gated by something on bubble system, unclear what.
-	// it should only be active while the bubble memory is warming up, and disabled after
-	// the bubble mcu 'releases' the 68k from reset.
-	//m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI);
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
-	PALETTE(config, m_palette).set_entries(2048);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	GENERIC_LATCH_8(config, "soundlatch");
-
-	ay8910_device &ay1(AY8910(config, "ay1", 14'318'180/8));
-	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
-	ay1.port_a_read_callback().set(FUNC(bubsys_state::nemesis_portA_r));
-	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
-
-	ay8910_device &ay2(AY8910(config, "ay2", 14'318'180/8));
-	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::control_A_w));
-	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::control_B_w));
-	ay2.add_route(0, "filter2", 1.00);
-	ay2.add_route(1, "filter3", 1.00);
-	ay2.add_route(2, "filter4", 1.00);
-
-	FILTER_RC(config, m_filter[0]);
-	m_filter[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
-	FILTER_RC(config, m_filter[1]);
-	m_filter[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
-	FILTER_RC(config, m_filter[2]);
-	m_filter[2]->add_route(ALL_OUTPUTS, "mono", 1.0);
-	FILTER_RC(config, m_filter[3]);
-	m_filter[3]->add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	K005289(config, m_k005289, 3'579'545);
-	m_k005289->add_route(ALL_OUTPUTS, "mono", 0.35);
-
-	VLM5030(config, m_vlm, 3'579'545);
-	m_vlm->set_addrmap(0, &bubsys_state::gx400_vlm_map);
-	m_vlm->add_route(ALL_OUTPUTS, "mono", 0.70);
-}
-
-
-
 ROM_START( bubsys )
-	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD( "boot.bin", 0x0000, 0x1e0, CRC(f0774fc2) SHA1(84fade54e025f170d983200a86c1ed96ef1a9ed3) )
+
+	ROM_REGION16_BE( 0x8000, "diagnostic", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x49000, "bubblememory", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASE00 ) /* Fujitsu MCU, unknown type */
-	ROM_LOAD( "mcu", 0x0000, 0x1000, NO_DUMP )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_REGION( 0x2000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD( "400b03.8g",   0x00000, 0x2000, CRC(85c2afc5) SHA1(387842d02d50d0d78a27270e7267af19555b9e63) )
 
 	ROM_REGION( 0x0200,  "k005289", 0 )      /* 2x 256 byte for 0005289 wavetable data */
@@ -3138,18 +2974,17 @@ ROM_START( bubsys )
 	ROM_LOAD( "400a2.1b", 0x100, 0x100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
 ROM_END
 
-ROM_START( gradiusb )
-	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
+ROM_START( bs_gradius )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD( "boot.bin", 0x0000, 0x1e0, CRC(f0774fc2) SHA1(84fade54e025f170d983200a86c1ed96ef1a9ed3) )
 
+	ROM_REGION16_BE( 0x8000, "diagnostic", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x48360, "bubblememory", 0 )
-	/* The Gradius cartridge contains 0x807 pages of 130 bytes each */
+	/* The cartridge contains 0x807 pages of 130 bytes each */
 	ROM_LOAD16_WORD_SWAP( "gradius.bin", 0x000, 0x48360, CRC(f83b9607) SHA1(53493c2d5b0e66dd6b75865abf0982ee50c01a6f) )
 
-	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASE00 ) /* Fujitsu MCU, unknown type */
-	ROM_LOAD( "mcu", 0x0000, 0x1000, NO_DUMP )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_REGION( 0x2000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD( "400b03.8g",   0x00000, 0x2000, CRC(85c2afc5) SHA1(387842d02d50d0d78a27270e7267af19555b9e63) )
 
 	ROM_REGION( 0x0200,  "k005289", 0 )      /* 2x 256 byte for 0005289 wavetable data */
@@ -3157,20 +2992,55 @@ ROM_START( gradiusb )
 	ROM_LOAD( "400a2.1b", 0x100, 0x100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
 ROM_END
 
-ROM_START( twinbeeb )
-	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
+ROM_START( bs_gwarrior )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD( "boot.bin", 0x000, 0x1e0, CRC(728263bd) SHA1(70dde04b9e3d55e3ac809be52cdc2d616eaa114a) )
+
+	ROM_REGION16_BE( 0x8000, "diagnostic", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x48360, "bubblememory", 0 )
+	/* The cartridge contains 0x807 pages of 130 bytes each */
+	ROM_LOAD16_WORD_SWAP( "gwarriorb.bin", 0x00000, 0x48360, CRC(a10e1b62) SHA1(a801ad8d318644495fbe2c971395d271d12508f1)    )
+
+	ROM_REGION( 0x2000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_LOAD( "400b03.8g", 0x0000, 0x2000, CRC(85c2afc5) SHA1(387842d02d50d0d78a27270e7267af19555b9e63) )
+
+	ROM_REGION( 0x0200,  "k005289", 0 )      /* 2x 256 byte for 0005289 wavetable data */
+	ROM_LOAD( "400a1.2b", 0x000, 0x100, CRC(5827b1e8) SHA1(fa8cf5f868cfb08bce203baaebb6c4055ee2a000) )
+	ROM_LOAD( "400a2.1b", 0x100, 0x100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
+ROM_END
+
+ROM_START( bs_rf2 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD( "boot.bin", 0x000, 0x1e0, CRC(ee6e93d7) SHA1(7302c08a726a760f59d6837be8fd10bbd1f79da0) )
 
-	ROM_REGION( 0x806*0x90, "bubblememory", ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x8000, "diagnostic", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x48360, "bubblememory", 0 )
+	/* The cartridge contains 0x807 pages of 130 bytes each */
+	ROM_LOAD16_WORD_SWAP( "rf2b.bin", 0x00000, 0x48360, CRC(7ee7acc5) SHA1(ab95a75b259327a7f88c7ec56dbca74496c91688)     )
+
+	ROM_REGION( 0x2000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_LOAD( "400b03.8g", 0x0000, 0x2000, CRC(85c2afc5) SHA1(387842d02d50d0d78a27270e7267af19555b9e63) )
+
+	ROM_REGION( 0x0200,  "k005289", 0 )      /* 2x 256 byte for 0005289 wavetable data */
+	ROM_LOAD( "400a1.2b", 0x000, 0x100, CRC(5827b1e8) SHA1(fa8cf5f868cfb08bce203baaebb6c4055ee2a000) )
+	ROM_LOAD( "400a2.1b", 0x100, 0x100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
+ROM_END
+
+ROM_START( bs_twinbee )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD( "boot.bin", 0x000, 0x1e0, CRC(ee6e93d7) SHA1(7302c08a726a760f59d6837be8fd10bbd1f79da0) )
+
+	ROM_REGION16_BE( 0x8000, "diagnostic", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x48360, "bubblememory", ROMREGION_ERASE00 )
 //  ROM_LOAD16_WORD_SWAP( "bubble_twinbeeb", 0x000, 0x48360, CRC(21599cf5) SHA1(7eb068e10134d5c66f7f90f6d6b265353b7bd8be) ) // re-encoded data
 
-	ROM_REGION( 0x806*0x80, "bubblememory_temp", 0 )
+	ROM_REGION( 0x40300, "bubblememory_temp", 0 )
 	ROM_LOAD( "twinbee.bin", 0x00000, 0x40300, CRC(4d396a0a) SHA1(ee922a1bd7062c0fcf358f5079cca6424aadc975) )
 
-	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASE00 ) // Fujitsu MCU
-	ROM_LOAD( "mcu", 0x0000, 0x1000, NO_DUMP )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "400-e03.5l",   0x00000, 0x02000, CRC(a5a8e57d) SHA1(f4236770093392dec3f76835a5766e9b3ed64e2e) )
 
 	ROM_REGION( 0x0200,  "k005289", 0 )
@@ -3178,16 +3048,17 @@ ROM_START( twinbeeb )
 	ROM_LOAD( "400-a02.fse",  0x00100, 0x0100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
 ROM_END
 
+
 void bubsys_state::bubsys_init()
 {
 	/*
-	    The MCU is the master of the system and controls the /RESET and /BS lines of the 68000.
-	    At boot the MCU asserts /RESET and /BS of the 68000 and waits for the bubble memory to warm up.
+	    The 005297 is the master of the system and controls the /RESET and /BS lines of the 68000.
+	    At boot the 005297 asserts /RESET and /BS of the 68000 and waits for the bubble memory to warm up.
 	    During this period, the Audio CPU is running and speaking the "Getting ready... Fifty..."
-	    countdown via the vlm5030. Once the bubble memory is ready, the MCU copies the 68000 boot program
+	    countdown via the vlm5030. Once the bubble memory is ready, the 005297 copies the 68000 boot program
 	    to shared RAM which takes 30.65 milliseconds then releases /RESET and /BS so the 68000 starts execution.
 
-	    As the MCU is not dumped we effectively start the simulation at the point the 68000
+	    As the 005297 is not emulated we effectively start the simulation at the point the 68000
 	    is released, and manually copy the boot program to 68000 address space.
 
 	    TODO: add a 'delay' (configurable) to simulate the bubble memory 'warming up' and only release the 68k after this is done.
@@ -3197,28 +3068,28 @@ void bubsys_state::bubsys_init()
 	memcpy(m_bubsys_shared_ram, src, 0x1e0);
 
 	/*
-	    The MCU sets this flag once the boot program is copied.  The 68000 will reset
+	    The 005297 sets this flag once the boot program is copied.  The 68000 will reset
 	    if the value is not correct. Presumably this was done for safety in case somehow the
-	    68000 was released from reset when the MCU wasn't yet ready.
+	    68000 was released from reset when the 005297 wasn't yet ready.
 	*/
 	m_bubsys_control_ram[3] = 0x240;
 }
 
 
-void bubsys_state::bubsys_twinbeeb_init()
+void bubsys_state::bs_twinbee_init()
 {
 	// the twinbee bubble data is in a stripped down, predecoded state already, why?
 	// this reencodes it to something the loading code can actually use
 
-	uint8_t *src = memregion("bubblememory_temp")->base();
-	uint8_t *dst = m_bubblememory_region->base();
+	const uint8_t *const src = memregion("bubblememory_temp")->base();
+	uint8_t *const dst = m_bubblememory_region->base();
 
 	for (int i = 0; i < 0x806; i++)
 	{
 		[[maybe_unused]] uint16_t crc = 0;
 
-		int sourcebase = i * 0x80;
-		int destbase = i * 0x90;
+		const int sourcebase = i * 0x80;
+		const int destbase = i * 0x90;
 
 		for (int j = 0; j < 0x80; j++)
 		{
@@ -3236,16 +3107,41 @@ void bubsys_state::bubsys_twinbeeb_init()
 			dst[destbase + j + 1] = temp1;
 		}
 
-		dst[destbase+0x83] = i >> 8;
-		dst[destbase+0x82] = i & 0xff;
+		dst[destbase + 0x83] = i >> 8;
+		dst[destbase + 0x82] = i & 0xff;
 	}
 
 	bubsys_init();
 }
 
-GAME( 1985, bubsys,   0,         bubsys,    bubsys,   bubsys_state, bubsys_init, ROT0,   "Konami", "Bubble System BIOS", MACHINE_IS_BIOS_ROOT )
-GAME( 1985, gradiusb, bubsys,    bubsys,    gradiusb, bubsys_state, bubsys_init, ROT0,   "Konami", "Gradius (Bubble System)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1985, twinbeeb, bubsys,    bubsys,    twinbeeb, bubsys_state, bubsys_twinbeeb_init, ROT90,   "Konami", "TwinBee (Bubble System)", MACHINE_UNEMULATED_PROTECTION )
-// Bubble System RF2
-// Bubble System Galactic Warriors
-// Bubble System Attack Rush
+
+// Dedicated
+GAME( 1985, nemesis,     0,        nemesis,    nemesis,    gx400_state,    empty_init,      ROT0,   "Konami", "Nemesis (ROM version)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nemesisuk,   nemesis,  nemesis,    nemesuk,    gx400_state,    empty_init,      ROT0,   "Konami", "Nemesis (World?, ROM version)",           MACHINE_SUPPORTS_SAVE )
+GAMEL(1985, konamigt,    0,        konamigt,   konamigt,   gx400_state,    empty_init,      ROT0,   "Konami", "Konami GT",                               MACHINE_SUPPORTS_SAVE, layout_konamigt )
+GAME( 1985, rf2,         konamigt, rf2_gx400,  rf2,        gx400_state,    empty_init,      ROT0,   "Konami", "Konami RF2: Red Fighter",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1985, twinbee,     0,        gx400,      twinbee,    gx400_state,    empty_init,      ROT90,  "Konami", "TwinBee (ROM version)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gradius,     nemesis,  gradius,    gradius,    gx400_state,    empty_init,      ROT0,   "Konami", "Gradius (Japan, ROM version)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gwarrior,    0,        gx400,      gwarrior,   gx400_state,    empty_init,      ROT0,   "Konami", "Galactic Warriors",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, salamand,    0,        salamand,   salamand,   salamand_state, empty_init,      ROT0,   "Konami", "Salamander (version D)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, salamandj,   salamand, salamand,   salamand,   salamand_state, empty_init,      ROT0,   "Konami", "Salamander (version J)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, salamandt,   salamand, salamand,   salamand,   salamand_state, empty_init,      ROT0,   "Konami (Tecfri license)", "Salamander (Tecfri license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lifefrce,    salamand, salamand,   salamand,   salamand_state, empty_init,      ROT0,   "Konami", "Lifeforce (US)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1987, lifefrcej,   salamand, salamand,   lifefrcj,   salamand_state, empty_init,      ROT0,   "Konami", "Lifeforce (Japan)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blkpnthr,    0,        blkpnthr,   blkpnthr,   salamand_state, empty_init,      ROT0,   "Konami", "Black Panther",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1987, citybomb,    0,        citybomb,   citybomb,   hcrash_state,   empty_init,      ROT270, "Konami", "City Bomber (World)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1987, citybombj,   citybomb, citybomb,   citybomb,   hcrash_state,   empty_init,      ROT270, "Konami", "City Bomber (Japan)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hcrash,      0,        hcrash,     hcrash,     hcrash_state,   empty_init,      ROT0,   "Konami", "Hyper Crash (version D)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hcrashc,     hcrash,   hcrash,     hcrash,     hcrash_state,   empty_init,      ROT0,   "Konami", "Hyper Crash (version C)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kittenk,     0,        nyanpani,   nyanpani,   salamand_state, empty_init,      ROT0,   "Konami", "Kitten Kaboodle",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1988, nyanpani,    kittenk,  nyanpani,   nyanpani,   salamand_state, empty_init,      ROT0,   "Konami", "Nyan Nyan Panic (Japan)",                 MACHINE_SUPPORTS_SAVE )
+
+// Bubble System
+GAME( 1985, bubsys,      0,        bubsys,     bubsys,     bubsys_state,   bubsys_init,     ROT0,   "Konami", "Bubble System BIOS",                      MACHINE_IS_BIOS_ROOT )
+
+GAME( 1985, bs_gradius,  bubsys,   bs_gradius, bs_gradius, bubsys_state,   bubsys_init,     ROT0,   "Konami", "Gradius (Bubble System)",                 MACHINE_UNEMULATED_PROTECTION )
+GAME( 1985, bs_gwarrior, bubsys,   bubsys,     gwarrior,   bubsys_state,   bubsys_init,     ROT0,   "Konami", "Galactic Warriors (Bubble System)",       MACHINE_UNEMULATED_PROTECTION )
+GAME( 1985, bs_rf2,      bubsys,   bs_rf2,     rf2,        bubsys_state,   bubsys_init,     ROT0,   "Konami", "Konami RF2: Red Fighter (Bubble System)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1985, bs_twinbee,  bubsys,   bubsys,     bs_twinbee, bubsys_state,   bs_twinbee_init, ROT90,  "Konami", "TwinBee (Bubble System)",                 MACHINE_UNEMULATED_PROTECTION )
+
+// Bubble System Attack Rush was announced, but never released

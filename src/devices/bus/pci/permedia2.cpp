@@ -72,7 +72,7 @@ void permedia2_device::device_add_mconfig(machine_config &config)
 	screen.set_screen_update(m_vga, FUNC(vga_device::screen_update));
 
 	// TODO: bump to TVP4020 core
-	VGA(config, m_vga, 0);
+	VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	// either 4 or 8MB
 	m_vga->set_vram_size(8*1024*1024);

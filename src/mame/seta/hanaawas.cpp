@@ -27,7 +27,7 @@
 
 
 TODO:
-- hanaawasa reads inputs differently. Not implemented yet.
+- hanaawmh probably works, but needs verifying
 ***************************************************************************/
 
 #include "emu.h"
@@ -54,17 +54,16 @@ public:
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_coins(*this, "COINS"),
 		m_start(*this, "START"),
-		m_player(*this, "P%u", 1U)
+		m_mux_inputs(*this, "IN%u", 0U)
 	{ }
 
 	void hanaawas(machine_config &config) ATTR_COLD;
 	void hanaawasa(machine_config &config) ATTR_COLD;
+	void hanaawmh(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -74,21 +73,19 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	optional_ioport m_coins, m_start;
-	required_ioport_array<2> m_player;
+	required_ioport m_start;
+	optional_ioport_array<6> m_mux_inputs;
 
 	tilemap_t *m_bg_tilemap = nullptr;
 
 	uint8_t m_mux = 0;
-	uint8_t m_coin_settings = 0;
-	uint8_t m_coin_impulse = 0;
 
-	uint8_t input_port_0_r();
 	void inputs_mux_w(uint8_t data);
+	void iomcu_mux_w(uint8_t data);
+	uint8_t iomcu_inputs_r();
 	uint8_t hanaawasa_matrix_r();
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
-	void key_matrix_status_w(uint8_t data);
 	void irq_ack_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void palette(palette_device &palette) const ATTR_COLD;
@@ -100,68 +97,28 @@ private:
 	void hanaawasa_io_map(address_map &map) ATTR_COLD;
 };
 
-uint8_t hanaawas_state::input_port_0_r()
-{
-	// TODO: key matrix seems identical to speedatk.cpp, needs merging
-	if (m_coin_impulse > 0)
-	{
-		m_coin_impulse--;
-		return 0x80;
-	}
-
-	if ((m_coins->read() & 1) || (m_coins->read() & 2))
-	{
-		m_coin_impulse = m_coin_settings * 2;
-		m_coin_impulse--;
-		return 0x80;
-	}
-
-	uint16_t buttons = 0;
-
-	switch (m_mux)
-	{
-		case 1: // start buttons
-			buttons = m_start->read();
-			break;
-		case 2: // player 1 buttons
-			buttons = m_player[0]->read();
-			break;
-		case 4: // player 2 buttons
-			buttons = m_player[1]->read();
-			break;
-	}
-
-
-	// map button pressed into 1-10 range
-
-	int ordinal = 0;
-
-	for (int i = 0; i < 10; i++)
-	{
-		if (buttons & (1 << i))
-		{
-			ordinal = (i + 1);
-			break;
-		}
-	}
-
-	return ordinal;
-}
-
 void hanaawas_state::inputs_mux_w(uint8_t data)
 {
 	m_mux = data;
 }
 
-void hanaawas_state::irq_ack_w(uint8_t data)
+void hanaawas_state::iomcu_mux_w(uint8_t data)
 {
-	m_maincpu->set_input_line(0, CLEAR_LINE);
+	m_mux = data & 0x3f;
+
+	machine().bookkeeping().coin_counter_w(0, !BIT(data, 6));
+	machine().bookkeeping().coin_counter_w(1, !BIT(data, 7));
 }
 
-void hanaawas_state::key_matrix_status_w(uint8_t data)
+uint8_t hanaawas_state::iomcu_inputs_r()
 {
-	if ((data & 0xf0) == 0x40) //coinage setting command
-		m_coin_settings = data & 0xf;
+	uint8_t ret = m_start->read();
+
+	for (int i = 0; i < 6; i++)
+		if (!BIT(m_mux, i) && m_mux_inputs[i].found())
+			ret &= m_mux_inputs[i]->read();
+
+	return ret;
 }
 
 uint8_t hanaawas_state::hanaawasa_matrix_r()
@@ -169,18 +126,23 @@ uint8_t hanaawas_state::hanaawasa_matrix_r()
 	uint8_t ret = 0xff;
 
 	if (!BIT(m_mux, 3))
-		ret &= (~m_player[0]->read() & 0x01f) << 3 | 0x07;
+		ret &= m_mux_inputs[0]->read();
 
 	if (!BIT(m_mux, 2))
-		ret &= (~m_player[0]->read() & 0x3e0) >> 2 | 0x07;
+		ret &= m_mux_inputs[1]->read();
 
 	if (!BIT(m_mux, 0))
-		ret &= (~m_player[1]->read() & 0x01f) << 3 | 0x07;
+		ret &= m_mux_inputs[3]->read();
 
 	if (!BIT(m_mux, 6))
-		ret &= (~m_player[1]->read() & 0x3e0) >> 2 | 0x07;
+		ret &= m_mux_inputs[4]->read();
 
-	return ret;
+	return (ret << 3) | (ret >> 5);
+}
+
+void hanaawas_state::irq_ack_w(uint8_t data)
+{
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 /***************************************************************************
@@ -260,7 +222,7 @@ TILE_GET_INFO_MEMBER(hanaawas_state::get_bg_tile_info)
 	int offset = (tile_index + (flip_screen() ? 1 : -1)) & 0x3ff;
 	int attr = m_colorram[offset];
 	int gfxbank = (attr & 0x40) >> 6;
-	int code = m_videoram[tile_index] + ((attr & 0x20) << 3);
+	int code = m_videoram[tile_index] + ((attr & 0x20) << 3) + ((attr & 0x80) << 2); // bit 7 is used by the Dyna subboard, via flying wire, for the girls' GFX
 	int color = m_colorram[tile_index] & 0x1f;
 
 	tileinfo.set(gfxbank, code, color, 0);
@@ -279,9 +241,7 @@ uint32_t hanaawas_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void hanaawas_state::prg_map(address_map &map)
 {
-	map(0x0000, 0x2fff).rom();
-	map(0x4000, 0x4fff).rom();
-	map(0x6000, 0x6fff).rom();
+	map(0x0000, 0x6fff).rom();
 	map(0x8000, 0x83ff).ram().w(FUNC(hanaawas_state::videoram_w)).share(m_videoram);
 	map(0x8400, 0x87ff).ram().w(FUNC(hanaawas_state::colorram_w)).share(m_colorram);
 	map(0x8800, 0x8bff).ram();
@@ -300,8 +260,7 @@ void hanaawas_state::base_io_map(address_map &map)
 void hanaawas_state::hanaawas_io_map(address_map &map)
 {
 	base_io_map(map);
-	map(0x00, 0x00).rw(FUNC(hanaawas_state::input_port_0_r), FUNC(hanaawas_state::inputs_mux_w));
-	map(0x01, 0x01).nopr().w(FUNC(hanaawas_state::key_matrix_status_w)); // r bit 1: status ready, presumably of the input mux device / w = configure device?
+	map(0x00, 0x01).rw("iomcu", FUNC(i8741a_device::upi41_master_r), FUNC(i8741a_device::upi41_master_w));
 }
 
 void hanaawas_state::hanaawasa_io_map(address_map &map)
@@ -335,43 +294,50 @@ static INPUT_PORTS_START( common )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 
-	// fake port.  The button depressed gets converted to an integer in the 1-10 range
-	PORT_START("P1")
-	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_HANAFUDA_A )
-	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_HANAFUDA_B )
-	PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_HANAFUDA_C )
-	PORT_BIT( 0x008, IP_ACTIVE_HIGH, IPT_HANAFUDA_D )
-	PORT_BIT( 0x010, IP_ACTIVE_HIGH, IPT_HANAFUDA_E )
-	PORT_BIT( 0x020, IP_ACTIVE_HIGH, IPT_HANAFUDA_F )
-	PORT_BIT( 0x040, IP_ACTIVE_HIGH, IPT_HANAFUDA_G )
-	PORT_BIT( 0x080, IP_ACTIVE_HIGH, IPT_HANAFUDA_H )
-	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_HANAFUDA_YES )
-	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_HANAFUDA_NO )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_PLAYER(1)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	// fake port.  The button depressed gets converted to an integer in the 1-10 range
-	PORT_START("P2")
-	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_HANAFUDA_A ) PORT_PLAYER(2)
-	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_HANAFUDA_B ) PORT_PLAYER(2)
-	PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_HANAFUDA_C ) PORT_PLAYER(2)
-	PORT_BIT( 0x008, IP_ACTIVE_HIGH, IPT_HANAFUDA_D ) PORT_PLAYER(2)
-	PORT_BIT( 0x010, IP_ACTIVE_HIGH, IPT_HANAFUDA_E ) PORT_PLAYER(2)
-	PORT_BIT( 0x020, IP_ACTIVE_HIGH, IPT_HANAFUDA_F ) PORT_PLAYER(2)
-	PORT_BIT( 0x040, IP_ACTIVE_HIGH, IPT_HANAFUDA_G ) PORT_PLAYER(2)
-	PORT_BIT( 0x080, IP_ACTIVE_HIGH, IPT_HANAFUDA_H ) PORT_PLAYER(2)
-	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_HANAFUDA_YES ) PORT_PLAYER(2)
-	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_HANAFUDA_NO ) PORT_PLAYER(2)
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_G ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_H ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_YES ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_PLAYER(1)
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_PLAYER(2)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_G ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_H ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_YES ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_PLAYER(2)
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hanaawas )
 	PORT_INCLUDE( common )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_START("START")
-	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hanaawasa )
@@ -409,17 +375,30 @@ static GFXDECODE_START( gfx_hanaawas )
 GFXDECODE_END
 
 
+#define MH_GFX(name, offs1, offs2, offs3)              \
+static const gfx_layout name =                      \
+{                                                   \
+	8,8,    /* 8*8 chars */                         \
+	1024,    /* 1024 characters */                    \
+	3,      /* 3 bits per pixel */                  \
+	{ offs1, offs2, offs3 },  /* bitplanes */       \
+	{ 8*8+0, 8*8+1, 8*8+2, 8*8+3, 0, 1, 2, 3 },     \
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },     \
+	8*16     /* every char takes 16 consecutive bytes */    \
+};
+
+MH_GFX( mh_charlayout_1bpp, 0x4000*8+4, 0x4000*8+4, 0x4000*8+4 )
+MH_GFX( mh_charlayout_3bpp, 0x4000*8,   0,          4          )
+
+static GFXDECODE_START( gfx_hanaawmh )
+	GFXDECODE_ENTRY( "tiles", 0, mh_charlayout_1bpp, 0, 32 )
+	GFXDECODE_ENTRY( "tiles", 0, mh_charlayout_3bpp, 0, 32 )
+GFXDECODE_END
+
+
 void hanaawas_state::machine_start()
 {
 	save_item(NAME(m_mux));
-	save_item(NAME(m_coin_settings));
-	save_item(NAME(m_coin_impulse));
-}
-
-void hanaawas_state::machine_reset()
-{
-	m_mux = 0;
-	m_coin_impulse = 0;
 }
 
 void hanaawas_state::hanaawas(machine_config &config)
@@ -430,7 +409,11 @@ void hanaawas_state::hanaawas(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &hanaawas_state::hanaawas_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(hanaawas_state::irq0_line_assert));
 
-	I8741A(config, "iomcu", 18.432_MHz_XTAL / 6).set_disable(); // type only faintly discerned on one PCB photo; divider not verified
+	i8741a_device &iomcu(I8741A(config, "iomcu", 18.432_MHz_XTAL / 6)); // type only faintly discerned on one PCB photo; divider not verified
+	iomcu.p1_in_cb().set(FUNC(hanaawas_state::iomcu_inputs_r));
+	iomcu.p2_out_cb().set(FUNC(hanaawas_state::iomcu_mux_w));
+	iomcu.t0_in_cb().set_ioport("COINS").bit(0);
+	iomcu.t1_in_cb().set_ioport("COINS").bit(1);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -467,6 +450,12 @@ void hanaawas_state::hanaawasa(machine_config &config)
 	ppi.out_pc_callback().set(FUNC(hanaawas_state::inputs_mux_w));
 }
 
+void hanaawas_state::hanaawmh(machine_config &config)
+{
+	hanaawas(config);
+
+	m_gfxdecode->set_info(gfx_hanaawmh);
+}
 
 /***************************************************************************
 
@@ -485,7 +474,8 @@ ROM_START( hanaawas ) // PC0-017-11 PCB?
 	ROM_LOAD( "4.6e",       0x6000, 0x1000, CRC(24bee0dc) SHA1(a4237ad3611c923b563923462e79b0b3f66cc721) )
 
 	ROM_REGION( 0x0400, "iomcu", 0 )
-	ROM_LOAD( "az-001.3j",  0x0000, 0x0400, NO_DUMP )
+	ROM_LOAD( "az-001.3j",  0x0000, 0x0400, CRC(099d77e8) SHA1(7b9bceba6d701ac9ee9d89beaa8e256901d1fe4b) BAD_DUMP ) // not dumped for this set
+	ROM_FILL( 0x264, 1, 0x07 ) // FIXME: why is this patch necessary?
 
 	ROM_REGION( 0x4000, "tiles", 0 )
 	ROM_LOAD( "5.9a",       0x0000, 0x1000, CRC(304ae219) SHA1(c1eac4973a6aec9fd8e848c206870667a8bb0922) )
@@ -518,9 +508,35 @@ ROM_START( hanaawasa ) // PC0-017-41 PCB
 	ROM_LOAD( "6g.bpr", 0x0120, 0x0100, BAD_DUMP CRC(4d94fed5) SHA1(3ea8e6fb95d5677991dc90fe7435f91e5320bb16) )  // not dumped for this set
 ROM_END
 
+// HF-1108 PCB + DYNA riser PCB with Visco sticker + flying wires
+// PCB is mostly similar to the hanaawas' one
+ROM_START( hanaawmh )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "1.1e",       0x0000, 0x2000, CRC(218c8d28) SHA1(784a34ec560d99ca54b96e2466e4a162e93441b7) )
+	ROM_LOAD( "2.3e",       0x2000, 0x1000, CRC(cedadc9c) SHA1(3d7041ec8f862d901cd9929f6ba3fb0352122bdf) )
+	ROM_LOAD( "3.4e",       0x4000, 0x1000, CRC(03c0cdb7) SHA1(ba01ad34f340836101123c37d0e3fe9914350ce8) )
+	ROM_LOAD( "4.sub",      0x5000, 0x1000, CRC(c2840865) SHA1(3c4b52e53d8f87ae4afd4c7c1a2cd4a4388a9ee4) )
+	ROM_CONTINUE(           0x3000, 0x1000 )
+
+	ROM_REGION( 0x0400, "iomcu", 0 )
+	ROM_LOAD( "d8741ad.3j",  0x0000, 0x0400, CRC(099d77e8) SHA1(7b9bceba6d701ac9ee9d89beaa8e256901d1fe4b) )
+	ROM_FILL( 0x264, 1, 0x07 ) // FIXME: why is this patch necessary?
+
+	ROM_REGION( 0x8000, "tiles", 0 )
+	ROM_LOAD( "5.9a",       0x0000, 0x4000, CRC(c0cedc6e) SHA1(8c28e2a4a15a87ca19302d9592e363b561347695) )
+	// socket at 10a empty
+	ROM_LOAD( "7.12a",      0x4000, 0x4000, CRC(ec7a7fd0) SHA1(ce582b38133a65e706dd172f0120c1c50b6e1353) )
+	// socket at 13a empty
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "13j.bpr",    0x0000, 0x0020, CRC(99300d85) SHA1(dd383db1f3c8c6d784121d32f20ffed3d83e2278) ) // colors
+	ROM_LOAD( "2a.bpr",     0x0020, 0x0100, CRC(e26f21a2) SHA1(d0df06f833e0f97872d9d2ffeb7feef94aaaa02a) ) // lookup table
+ROM_END
+
 } // anonymous namespace
 
 
 GAME( 1982, hanaawas,  0,        hanaawas,  hanaawas,  hanaawas_state, empty_init, ROT0, "Seta Kikaku", "Hana Awase (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, hanaawasa, hanaawas, hanaawasa, hanaawasa, hanaawas_state, empty_init, ROT0, "Seta Kikaku", "Hana Awase (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hanaawmh,  0,        hanaawmh,  hanaawas,  hanaawas_state, empty_init, ROT0, "Dyna",        "Hana Awase Maihime", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 

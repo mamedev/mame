@@ -127,7 +127,7 @@ TODO:
 - daichukaa: setting of time to next inspection doesn't stick, even without resetting, so the game is always
   stuck with the 'inspection needed' message
 
-- rselect: needs correct inputs and DIP definitions
+- rselect: seems to sometimes get stuck in a state where the roulette won't stop, needs control panel lamps and proper hopper
 
 Notes:
 
@@ -159,6 +159,7 @@ Notes:
 #include "sound/ymopl.h"
 
 #include "emupal.h"
+#include "input.h" // for video debug keys
 #include "screen.h"
 #include "speaker.h"
 
@@ -174,6 +175,7 @@ Notes:
 
 
 DECLARE_DEVICE_TYPE(HGOKOU_JOYSTICK, device_mahjong_panel_interface)
+DECLARE_DEVICE_TYPE(RSELECT_PANEL,   device_mahjong_panel_interface)
 
 namespace {
 
@@ -184,6 +186,47 @@ INPUT_PORTS_START(hgokou_joystick)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)       PORT_PLAYER(1)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)              PORT_PLAYER(1)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START)                PORT_PLAYER(1)
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START(rselect_panel)
+	PORT_START("KEY0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A)           PORT_PLAYER(1)  PORT_NAME("%p Seven")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E)           PORT_PLAYER(1)  PORT_NAME("%p Apple")
+	PORT_BIT(0x0c, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP)    PORT_PLAYER(1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B)           PORT_PLAYER(1)  PORT_NAME("%p Bell")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F)           PORT_PLAYER(1)  PORT_NAME("%p Plum")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_START)                PORT_PLAYER(1)
+	PORT_BIT(0x38, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C)           PORT_PLAYER(1)  PORT_NAME("%p Watermelon")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_G)           PORT_PLAYER(1)  PORT_NAME("%p Orange")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL)        PORT_PLAYER(1)
+	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D)           PORT_PLAYER(1)  PORT_NAME("%p Pineapple")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_H)           PORT_PLAYER(1)  PORT_NAME("%p Cherry")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_BIG)          PORT_PLAYER(1)
+	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY4")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE)        PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1)              PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON2)              PORT_PLAYER(1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP)    PORT_PLAYER(1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON3)              PORT_PLAYER(1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON4)              PORT_PLAYER(1)
+
+	PORT_START("KEY5")
+	PORT_BIT(0x3f, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 
@@ -213,6 +256,26 @@ protected:
 
 private:
 	required_ioport m_in;
+};
+
+
+class rselect_panel_device : public mahjong_panel_device_base
+{
+public:
+	rselect_panel_device(
+			machine_config const &mconfig,
+			char const *tag,
+			device_t *owner,
+			u32 clock) :
+		mahjong_panel_device_base(mconfig, RSELECT_PANEL, tag, owner, clock)
+	{
+	}
+
+protected:
+	ioport_constructor device_input_ports() const override ATTR_COLD
+	{
+		return INPUT_PORTS_NAME(rselect_panel);
+	}
 };
 
 
@@ -268,6 +331,12 @@ void hgokou_panels(device_slot_interface &device)
 	mahjong_panel_connector_device::standard_panels(device);
 	device.option_add("hr",   HANAROKU_PANEL);
 	device.option_add("joy",  HGOKOU_JOYSTICK);
+}
+
+void rselect_panels(device_slot_interface &device)
+{
+	device.option_add("mj",   MAHJONG_MEDAL_PANEL);
+	device.option_add("rs",   RSELECT_PANEL);
 }
 
 
@@ -920,8 +989,6 @@ VIDEO_START_MEMBER(hanakanz_state,hanakanz)
 
 	m_ddenlovr_blit_rom_bits = 16;
 	m_ddenlovr_blit_commands = hanakanz_commands;
-
-	m_led.resolve();
 
 	save_item(NAME(m_romdata));
 	save_item(NAME(m_palette_index));
@@ -4764,7 +4831,7 @@ void htengoku_state::htengoku(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	RST_POS_BUFFER(config, "mainirq", 0).int_callback().set_inputline(m_maincpu, 0);
+	RST_POS_BUFFER(config, "mainirq").int_callback().set_inputline(m_maincpu, 0);
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(htengoku_state::flipscreen_w));
@@ -4787,7 +4854,7 @@ void htengoku_state::htengoku(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->screen_vblank().set(FUNC(htengoku_state::vblank_w));
 
-	DYNAX_BLITTER_REV2(config, m_blitter, 0);
+	DYNAX_BLITTER_REV2(config, m_blitter);
 	m_blitter->vram_out_cb().set(FUNC(htengoku_state::blit_pixel_w));
 	m_blitter->scrollx_cb().set(FUNC(htengoku_state::blit_scrollx_w));
 	m_blitter->scrolly_cb().set(FUNC(htengoku_state::blit_scrolly_w));
@@ -7254,12 +7321,18 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( mjmyster )
-	// The manual provides three sets of standard settings:
+	// The Mahjong the Mysterious World manual provides three sets of standard settings:
 	//       標準設定　シングル向け                        標準設定　メダルコーナー向け                 標準設定　アミューズコーナー向け
 	// SW 1  Off Off Off  On  On  On Off  On  On Off       Off Off Off  On  On  On Off  On  On Off        On Off Off  On Off Off  On Off  On Off
 	// SW 2  Off Off Off Off  On  On Off  On  On Off       Off Off Off Off Off Off  On  On  On Off       Off Off Off Off Off Off Off Off Off Off
 	// SW 3  Off Off Off  On  On  On  On  On  On  On       Off Off Off  On  On  On  On  On  On Off       Off  On Off  On  On  On  On  On  On Off
 	// SW 4  Off  On  On  On  On Off Off Off Off Off        On  On  On  On  On Off Off Off Off Off        On  On  On  On  On Off Off Off Off Off
+
+	// The Mahjong the Mysterious Universe manual provides two sets of standard settings, but unfortunately the Chinese text in the scans is illegible:
+	// SW 1  Off Off Off  On  On  On Off  On  On Off        On Off Off  On Off Off  On Off  On Off
+	// SW 2  Off Off Off Off  On  On Off  On  On Off       Off Off Off Off Off Off Off Off Off Off
+	// SW 3  Off Off Off  On  On  On  On  On  On Off       Off  On Off  On  On  On  On  On  On Off
+	// SW 4  Off  On  On  On  On Off Off   On On Off        On  On  On  On  On Off Off  On  On Off
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CONDITION("DSW3", 0x03, EQUALS, 0x02) // pay
@@ -7605,7 +7678,7 @@ static INPUT_PORTS_START( hgokou )
 	PORT_DIPSETTING(    0x04, "4" )                                                                 // 　　　4
 	PORT_DIPSETTING(    0x05, "3" )                                                                 // 　　　3
 	PORT_DIPSETTING(    0x06, "2" )                                                                 // 　　　2
-	PORT_DIPSETTING(    0x07, "1 (high)" )                                                          // 低い　1
+	PORT_DIPSETTING(    0x07, "1 (high)" )                                                          // 高い　1
 	PORT_DIPNAME( 0x08, 0x00, "Payout Variation" )                   PORT_DIPLOCATION("SW1:4")      // 配当の波
 	PORT_DIPSETTING(    0x00, "Small" )                                                             // 小さい
 	PORT_DIPSETTING(    0x08, "Large" )                                                             // 大きい
@@ -8195,6 +8268,145 @@ static INPUT_PORTS_START( hparadis )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DIP-SW2:9" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DIP-SW2:10" )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( rselect )
+	// The manual provides two sets of standard settings:
+	//       標準設定コインプールタイプ                    標準設定メダルタイプ
+	// SW 1  OFF  ON OFF OFF  ON  ON OFF  ON OFF OFF       OFF OFF OFF OFF  ON OFF OFF OFF OFF OFF
+	// SW 2   ON  ON  ON  ON  ON  ON  ON  ON OFF OFF        ON  ON  ON  ON  ON  ON  ON  ON OFF OFF
+	// SW 3  OFF OFF OFF OFF OFF OFF OFF OFF OFF OFF       OFF OFF OFF OFF OFF OFF OFF OFF OFF OFF
+	// SW 4  OFF  ON  ON  ON OFF OFF OFF OFF OFF OFF        ON  ON  ON  ON OFF OFF OFF OFF OFF OFF
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR(Test))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )   // analyzer
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // data clear
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x07, 0x05, "Payout Rate" )                        PORT_DIPLOCATION("DIP-SW1:1,2,3")  // PAY OUT RATE 配当率
+	PORT_DIPSETTING(    0x00, "8 (low)" )                                                               // 低　(8)
+	PORT_DIPSETTING(    0x01, "7" )                                                                     // 　　(7)
+	PORT_DIPSETTING(    0x02, "6" )                                                                     // 　　(6)
+	PORT_DIPSETTING(    0x03, "5" )                                                                     // 　　(5)
+	PORT_DIPSETTING(    0x04, "4" )                                                                     // 　　(4)
+	PORT_DIPSETTING(    0x05, "3" )                                                                     // 　　(3)
+	PORT_DIPSETTING(    0x06, "2" )                                                                     // 　　(2)
+	PORT_DIPSETTING(    0x07, "1 (high)" )                                                              // 高　(1)
+	PORT_DIPNAME( 0x18, 0x08, "Maximum Bet (per symbol)" )           PORT_DIPLOCATION("DIP-SW1:4,5")    // BET MAX (各アイテムに毎に)
+	PORT_DIPSETTING(    0x18, "1" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPSETTING(    0x08, "10" )
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPNAME( 0xe0, 0x40, DEF_STR(Coinage) )                     PORT_DIPLOCATION("DIP-SW1:6,7,8")  // COIN RATE
+	PORT_DIPSETTING(    0xe0, DEF_STR(1C_1C) )                                                          // １コイン 1クレジット
+	PORT_DIPSETTING(    0xc0, DEF_STR(1C_2C) )                                                          // １コイン 2クレジット
+	PORT_DIPSETTING(    0xa0, DEF_STR(1C_4C) )                                                          // １コイン 4クレジット
+	PORT_DIPSETTING(    0x80, DEF_STR(1C_5C) )                                                          // １コイン 5クレジット
+	PORT_DIPSETTING(    0x60, DEF_STR(1C_8C) )                                                          // １コイン 8クレジット
+	PORT_DIPSETTING(    0x40, DEF_STR(1C_10C) )                                                         // １コイン10クレジット
+	PORT_DIPSETTING(    0x20, DEF_STR(1C_20C) )                                                         // １コイン20クレジット
+	PORT_DIPSETTING(    0x00, DEF_STR(1C_50C) )                                                         // １コイン50クレジット
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x07, 0x00, "Coin Limit" )                         PORT_DIPLOCATION("DIP-SW2:1,2,3")  // COIN LIMIT
+	PORT_DIPSETTING(    0x07, "150" )                                                                   //  150
+	PORT_DIPSETTING(    0x06, "300" )                                                                   //  300
+	PORT_DIPSETTING(    0x05, "500" )                                                                   //  500
+	PORT_DIPSETTING(    0x04, "1,000" )                                                                 // 1000
+	PORT_DIPSETTING(    0x03, "1,500" )                                                                 // 1500
+	PORT_DIPSETTING(    0x02, "2,000" )                                                                 // 2000
+	PORT_DIPSETTING(    0x01, "5,000" )                                                                 // 5000
+	PORT_DIPSETTING(    0x00, "Unlimited" )                                                             // FREE
+	PORT_DIPNAME( 0x18, 0x00, "Note Limit" )                         PORT_DIPLOCATION("DIP-SW2:4,5")    // NOTE LIMIT
+	PORT_DIPSETTING(    0x18, "300" )                                                                   //  300
+	PORT_DIPSETTING(    0x10, "1,000" )                                                                 // 1000
+	PORT_DIPSETTING(    0x08, "3,000" )                                                                 // 3000
+	PORT_DIPSETTING(    0x00, "Unlimited" )                                                             // FREE
+	PORT_DIPNAME( 0xe0, 0x00, "Credit Limit" )                       PORT_DIPLOCATION("DIP-SW2:6,7,8")  // CREDIT LIMIT
+	PORT_DIPSETTING(    0xe0, "500" )                                                                   //   500
+	PORT_DIPSETTING(    0xc0, "1,000" )                                                                 //  1000
+	PORT_DIPSETTING(    0xa0, "2,000" )                                                                 //  2000
+	PORT_DIPSETTING(    0x80, "3,000" )                                                                 //  3000
+	PORT_DIPSETTING(    0x60, "5,000" )                                                                 //  5000
+	PORT_DIPSETTING(    0x40, "10,000" )                                                                // 10000
+	PORT_DIPSETTING(    0x20, "20,000" )                                                                // 20000
+	PORT_DIPSETTING(    0x00, "Unlimited" )                                                             // FREE
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, "Game Type" )                          PORT_DIPLOCATION("DIP-SW3:1")      // ゲーム・タイプ
+	PORT_DIPSETTING(    0x01, "Credit Type" )                                                           // クレジット式
+	PORT_DIPSETTING(    0x00, "Hopper Type" )                                                           // ホッパー式
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DIP-SW3:2" )                                                   // OFF固定
+	PORT_DIPNAME( 0x04, 0x04, "Hopper Polarity" )                    PORT_DIPLOCATION("DIP-SW3:3")      // ホッパーアクティブ
+	PORT_DIPSETTING(    0x04, DEF_STR(Normal) )                                                         // 通常
+	PORT_DIPSETTING(    0x00, "Inverted" )                                                              // 反転
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DIP-SW3:4" )                                                   // OFF固定
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DIP-SW3:5" )                                                   // OFF固定
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIP-SW3:6" )                                                   // OFF固定
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DIP-SW3:7" )                                                   // OFF固定
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DIP-SW3:8" )                                                   // OFF固定
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR(Demo_Sounds) )                 PORT_DIPLOCATION("DIP-SW4:1")      // デモサ・ウンド
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )                                                            // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                             // 有
+	PORT_DIPNAME( 0x02, 0x00, "In-Game Music" )                      PORT_DIPLOCATION("DIP-SW4:2")      // ゲーム・サウンド
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )                                                            // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                             // 有
+	PORT_DIPNAME( 0x04, 0x00, "Double Up Game" )                     PORT_DIPLOCATION("DIP-SW4:3")      // W-UP
+	PORT_DIPSETTING(    0x04, DEF_STR(Off) )                                                            // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                             // 有
+	PORT_DIPNAME( 0x08, 0x00, "Quiz/Coin Toss" )                     PORT_DIPLOCATION("DIP-SW4:4")      // クイズとコイントス
+	PORT_DIPSETTING(    0x08, "Quiz" )                                                                  // クイズ
+	PORT_DIPSETTING(    0x00, "Coin Toss" )                                                             // コイントス
+	PORT_DIPNAME( 0x10, 0x00, "Panel Lamps" )                        PORT_DIPLOCATION("DIP-SW4:5")      // パネルランプ
+	PORT_DIPSETTING(    0x10, DEF_STR(Off) )                                                            // 不使用
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                             // 使用
+	PORT_DIPNAME( 0x20, 0x20, "Clock Set" )                          PORT_DIPLOCATION("DIP-SW4:6")      // 時計セット
+	PORT_DIPSETTING(    0x20, DEF_STR(Off) )                                                            // 通常
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                             // セット
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR(Service_Mode) )                PORT_DIPLOCATION("DIP-SW4:7")      // ハードテスト
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )                                                            // 通常
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                             // ハードテスト
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DIP-SW4:8" )                                                   // OFF固定
+
+	PORT_START("DSW5")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DIP-SW4:9" )                                                   // OFF固定
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DIP-SW4:10" )                                                  // OFF固定
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DIP-SW3:9" )                                                   // OFF固定
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DIP-SW3:10" )                                                  // OFF固定
+	PORT_DIPNAME( 0x10, 0x10, "Bonus Game Difficulty" )              PORT_DIPLOCATION("DIP-SW2:9")      // ボーナスゲームの難易度
+	PORT_DIPSETTING(    0x00, DEF_STR(Easy) )                                                           // やや易しい
+	PORT_DIPSETTING(    0x10, DEF_STR(Normal) )                                                         // 普通
+	PORT_DIPNAME( 0x20, 0x20, "Fever Odds" )                         PORT_DIPLOCATION("DIP-SW2:10")     // フィーバーに当たる率
+	PORT_DIPSETTING(    0x00, DEF_STR(Low) )                                                            // やや低しい
+	PORT_DIPSETTING(    0x20, DEF_STR(Normal) )                                                         // 普通
+	PORT_DIPNAME( 0x40, 0x40, "Credits Per Note" )                   PORT_DIPLOCATION("DIP-SW1:9")      // NOTE RATE、COIN RATE
+	PORT_DIPSETTING(    0x00, "5" )       PORT_CONDITION("DSW1", 0xe0, EQUALS, 0xe0)                    //  5倍
+	PORT_DIPSETTING(    0x00, "10" )      PORT_CONDITION("DSW1", 0xe0, EQUALS, 0xc0)
+	PORT_DIPSETTING(    0x00, "20" )      PORT_CONDITION("DSW1", 0xe0, EQUALS, 0xa0)
+	PORT_DIPSETTING(    0x00, "25" )      PORT_CONDITION("DSW1", 0xe0, EQUALS, 0x80)
+	PORT_DIPSETTING(    0x00, "40" )      PORT_CONDITION("DSW1", 0xe0, EQUALS, 0x60)
+	PORT_DIPSETTING(    0x00, "50" )      PORT_CONDITION("DSW1", 0xe0, EQUALS, 0x40)
+	PORT_DIPSETTING(    0x00, "100" )     PORT_CONDITION("DSW1", 0xe0, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, "250" )     PORT_CONDITION("DSW1", 0xe0, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x40, "10" )      PORT_CONDITION("DSW1", 0xe0, EQUALS, 0xe0)                    // 10倍
+	PORT_DIPSETTING(    0x40, "20" )      PORT_CONDITION("DSW1", 0xe0, EQUALS, 0xc0)
+	PORT_DIPSETTING(    0x40, "40" )      PORT_CONDITION("DSW1", 0xe0, EQUALS, 0xa0)
+	PORT_DIPSETTING(    0x40, "50" )      PORT_CONDITION("DSW1", 0xe0, EQUALS, 0x80)
+	PORT_DIPSETTING(    0x40, "80" )      PORT_CONDITION("DSW1", 0xe0, EQUALS, 0x60)
+	PORT_DIPSETTING(    0x40, "100" )     PORT_CONDITION("DSW1", 0xe0, EQUALS, 0x40)
+	PORT_DIPSETTING(    0x40, "200" )     PORT_CONDITION("DSW1", 0xe0, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x40, "500" )     PORT_CONDITION("DSW1", 0xe0, EQUALS, 0x00)
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Flip_Screen) )                 PORT_DIPLOCATION("DIP-SW1:10")     // モニター画面反転
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                                            // 通常
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                             // 反転
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sryudens )
@@ -9363,8 +9575,6 @@ MACHINE_START_MEMBER(ddenlovr_state,rongrong)
 
 MACHINE_START_MEMBER(mmpanic_state,mmpanic)
 {
-	m_leds.resolve();
-
 	uint8_t *rom = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8, &rom[0x10000], 0x8000);
 
@@ -9375,8 +9585,6 @@ MACHINE_START_MEMBER(mmpanic_state,mmpanic)
 
 MACHINE_START_MEMBER(mmpanic_state,funkyfig)
 {
-	m_leds.resolve();
-
 	uint8_t *rom = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0x10, &rom[0x10000], 0x8000);
 	membank("bank2")->configure_entries(0, 8,    &rom[0x90000], 0x1000);
@@ -10110,6 +10318,9 @@ void ddenlovr_state::rselect(machine_config &config)
 	// basic machine hardware
 	subdevice<tmpz84c015_device>("maincpu")->set_addrmap(AS_PROGRAM, &ddenlovr_state::rselect_map);
 	subdevice<tmpz84c015_device>("maincpu")->out_pb_callback().set(FUNC(ddenlovr_state::hginga_rombank_w<0x0f>));
+
+	m_key_matrix[0]->set_options(rselect_panels, "rs", false);
+	m_key_matrix[1]->set_options(rselect_panels, "rs", false);
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjflove)
 }
@@ -13378,6 +13589,7 @@ ROM_END
 } // anonymous namespace
 
 DEFINE_DEVICE_TYPE_PRIVATE(HGOKOU_JOYSTICK, device_mahjong_panel_interface, hgokou_joystick_device, "hgokou_joystick", "Hanafuda Hana Gokou joystick")
+DEFINE_DEVICE_TYPE_PRIVATE(RSELECT_PANEL,   device_mahjong_panel_interface, rselect_panel_device,   "rselect_panel",   "Royal Selection panel")
 
 
 GAME( 1992, htengoku,    0,        htengoku,  htengoku,   htengoku_state, empty_init,    ROT180, "Dynax",                                     "Hanafuda Hana Tengoku (Japan)",                                  0 )
@@ -13418,7 +13630,7 @@ GAME( 1994, rongrongg,   rongrong, rongrong,  rongrong,   ddenlovr_state, init_r
 
 GAME( 1994, hparadis,    0,        hparadis,  hparadis,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Super Hana Paradise (Japan)",                                    MACHINE_NO_COCKTAIL  )
 
-GAME( 1994, rselect,     0,        rselect,   hgokou,     ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Royal Selection (Japan, ver. 1.01)",                             MACHINE_NO_COCKTAIL  | MACHINE_NOT_WORKING ) // needs correct inputs and DIP definitions
+GAME( 1994, rselect,     0,        rselect,   rselect,    ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Royal Selection (Japan, ver. 1.01)",                             MACHINE_NO_COCKTAIL  | MACHINE_NOT_WORKING )
 
 GAME( 1995, hgokou,      0,        hgokou,    hgokou,     ddenlovr_state, empty_init,    ROT0, "Dynax (Alba license)",                        "Hanafuda Hana Gokou (Japan, ver. B)",                            MACHINE_NO_COCKTAIL  | MACHINE_NOT_WORKING )
 GAME( 1995, hgokoua,     hgokou,   hgokbang,  hgokou,     ddenlovr_state, empty_init,    ROT0, "Dynax (Alba license)",                        "Hanafuda Hana Gokou (Japan, ver. A)",                            MACHINE_NO_COCKTAIL  | MACHINE_NOT_WORKING )

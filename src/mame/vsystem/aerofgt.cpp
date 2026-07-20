@@ -4,6 +4,10 @@
 
     Aero Fighters (newer hardware type)
 
+    TODO:
+    - Verify sprite delay from real hardware
+        - currently assumed to 1 frame, or DMA'd manually?
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -16,6 +20,7 @@
 #include "machine/gen_latch.h"
 #include "machine/mb3773.h"
 #include "sound/ymopn.h"
+#include "video/bufsprite.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -33,12 +38,12 @@ public:
 		, m_audiocpu(*this, "audiocpu")
 		, m_soundlatch(*this, "soundlatch")
 		, m_spr(*this, "vsystem_spr")
+		, m_spriteram(*this, "spriteram")
+		, m_sprlookupram(*this, "sprlookupram")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_vram(*this, "vram.%u", 0)
 		, m_rasterram(*this, "rasterram")
-		, m_sprlookupram(*this, "sprlookupram")
-		, m_spriteram(*this, "spriteram")
 		, m_soundbank(*this, "soundbank")
 	{ }
 
@@ -59,7 +64,7 @@ private:
 	void gfxbank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint32_t tile_callback(uint32_t code);
 	uint32_t pri_callback(uint32_t color);
-	void soundlatch_pending_w(int state);
+	uint8_t soundlatch_pending_r();
 	void sh_bankswitch_w(uint8_t data);
 
 	void main_map(address_map &map) ATTR_COLD;
@@ -71,22 +76,23 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<vsystem_spr_device> m_spr;
+	required_device<buffered_spriteram16_device> m_spriteram;
+	required_device<buffered_spriteram16_device> m_sprlookupram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 	// memory pointers
 	required_shared_ptr_array<uint16_t, 2> m_vram;
 	required_shared_ptr<uint16_t> m_rasterram;
-	required_shared_ptr<uint16_t> m_sprlookupram;
-	required_shared_ptr<uint16_t> m_spriteram;
 
 	required_memory_bank m_soundbank;
 
-	// video-related
-	tilemap_t   *m_tilemap[2]{};
-	uint8_t     m_gfxbank[8]{};
-	uint16_t    m_bank[4]{};
-	uint16_t    m_scrolly[2]{};
+	// variables
+	tilemap_t *m_tilemap[2]{};
+	uint8_t m_gfxbank[8]{};
+	uint16_t m_bank[4]{};
+	uint16_t m_scrolly[2]{};
+	bool m_z80_sync = false;
 };
 
 
@@ -129,7 +135,7 @@ void aerofgt_state::video_start()
 
 uint32_t aerofgt_state::tile_callback(uint32_t code)
 {
-	return m_sprlookupram[code & 0x7fff];
+	return m_sprlookupram->buffer()[code & 0x7fff];
 }
 
 uint32_t aerofgt_state::pri_callback(uint32_t color)
@@ -181,19 +187,24 @@ uint32_t aerofgt_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 1);
 	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 2);
 
-	m_spr->draw_sprites(m_spriteram, m_spriteram.bytes(), screen, bitmap, cliprect);
+	m_spr->draw_sprites(m_spriteram->buffer(), m_spriteram->bytes(), screen, bitmap, cliprect);
 
 	return 0;
 }
 
 
-void aerofgt_state::soundlatch_pending_w(int state)
+uint8_t aerofgt_state::soundlatch_pending_r()
 {
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+	{
+		// retry_access() forces the z80 to catch up before maincpu does the read
+		if (!m_z80_sync)
+			m_maincpu->retry_access();
 
-	// NMI routine is very short, so briefly set perfect_quantum to make sure that the timing is right
-	if (state)
-		machine().scheduler().perfect_quantum(attotime::from_usec(100));
+		m_z80_sync = !m_z80_sync;
+	}
+
+	return m_soundlatch->pending_r();
 }
 
 void aerofgt_state::sh_bankswitch_w(uint8_t data)
@@ -221,10 +232,10 @@ void aerofgt_state::main_map(address_map &map)
 	map(0x1b0000, 0x1b07ff).ram().share(m_rasterram);   // used only for the scroll registers
 	map(0x1b0800, 0x1b0801).ram(); // tracks watchdog state
 	map(0x1b0ff0, 0x1b0fff).ram(); // stack area during boot
-	map(0x1b2000, 0x1b3fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
-	map(0x1b4000, 0x1b5fff).ram().w(FUNC(aerofgt_state::vram_w<1>)).share("vram.1");
-	map(0x1c0000, 0x1c7fff).ram().share(m_sprlookupram);
-	map(0x1d0000, 0x1d1fff).ram().share(m_spriteram);
+	map(0x1b2000, 0x1b3fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share(m_vram[0]);
+	map(0x1b4000, 0x1b5fff).ram().w(FUNC(aerofgt_state::vram_w<1>)).share(m_vram[1]);
+	map(0x1c0000, 0x1c7fff).ram().share("sprlookupram");
+	map(0x1d0000, 0x1d1fff).ram().share("spriteram");
 	map(0xfef000, 0xffefff).ram(); // work RAM
 	map(0xffff80, 0xffff87).w(FUNC(aerofgt_state::gfxbank_w));
 	map(0xffff88, 0xffff89).w(FUNC(aerofgt_state::scrolly_w<0>)); // + something else in the top byte
@@ -353,11 +364,14 @@ GFXDECODE_END
 void aerofgt_state::machine_start()
 {
 	m_soundbank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
+
+	save_item(NAME(m_z80_sync));
 }
 
 void aerofgt_state::machine_reset()
 {
 	m_soundbank->set_entry(0);
+	m_z80_sync = false;
 }
 
 void aerofgt_state::aerofgt(machine_config &config)
@@ -371,17 +385,17 @@ void aerofgt_state::aerofgt(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &aerofgt_state::sound_portmap); // IRQs are triggered by the YM2610
 
-	vs9209_device &io(VS9209(config, "io", 0));
+	vs9209_device &io(VS9209(config, "io"));
 	io.porta_input_cb().set_ioport("P1");
 	io.portb_input_cb().set_ioport("P2");
 	io.portc_input_cb().set_ioport("SYSTEM");
 	io.portd_input_cb().set_ioport("DSW1");
 	io.porte_input_cb().set_ioport("DSW2");
-	io.portg_input_cb().set(m_soundlatch, FUNC(generic_latch_8_device::pending_r)).lshift(0);
+	io.portg_input_cb().set(FUNC(aerofgt_state::soundlatch_pending_r));
 	io.portg_output_cb().set("watchdog", FUNC(mb3773_device::write_line_ck)).bit(7);
 	io.porth_input_cb().set_ioport("JP1");
 
-	MB3773(config, "watchdog", 0);
+	MB3773(config, "watchdog");
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -390,23 +404,28 @@ void aerofgt_state::aerofgt(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
 	screen.set_screen_update(FUNC(aerofgt_state::screen_update));
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	screen.screen_vblank().append(m_sprlookupram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aerofgt);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
-	VSYSTEM_SPR(config, m_spr, 0, m_palette, gfx_aerofgt_spr);
+	VSYSTEM_SPR(config, m_spr, m_palette, gfx_aerofgt_spr);
 	m_spr->set_tile_indirect_cb(FUNC(aerofgt_state::tile_callback));
 	m_spr->set_pri_cb(FUNC(aerofgt_state::pri_callback));
+
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+	BUFFERED_SPRITERAM16(config, m_sprlookupram);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set(FUNC(aerofgt_state::soundlatch_pending_w));
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(8'000'000)));  // verified on pcb
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(8'000'000))); // verified on pcb
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "speaker", 0.75, 0);
 	ymsnd.add_route(0, "speaker", 0.75, 1);

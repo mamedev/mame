@@ -161,11 +161,11 @@ void tatsumi_state::tatsumi_v30_68000_w(offs_t offset, uint16_t data, uint16_t m
 
 /******************************************************************************/
 
-INTERRUPT_GEN_MEMBER(tatsumi_state::v30_interrupt)
+// apache3 & roundup5 vblank irq vector
+IRQ_CALLBACK_MEMBER(tatsumi_state::v30_vector_r)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);   /* V30 - VBL */
+	return 0xc8 / 4;
 }
-
 
 
 /***************************************************************************/

@@ -26,6 +26,7 @@ public:
 	microterm_f8_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_smi(*this, "smi")
 		, m_uart(*this, "uart")
 		, m_io(*this, "io")
 		, m_screen(*this, "screen")
@@ -66,7 +67,8 @@ private:
 	void f8_mem(address_map &map) ATTR_COLD;
 	void f8_io(address_map &map) ATTR_COLD;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<f8_cpu_device> m_maincpu;
+	required_device<f3853_device> m_smi;
 	required_device<ay51013_device> m_uart;
 	required_device<rs232_port_device> m_io;
 	//required_device<rs232_port_device> m_aux;
@@ -332,7 +334,7 @@ void microterm_f8_state::f8_io(address_map &map)
 	map.unmap_value_high();
 	map(0x00, 0x00).rw(FUNC(microterm_f8_state::port00_r), FUNC(microterm_f8_state::port00_w));
 	map(0x01, 0x01).r(FUNC(microterm_f8_state::port01_r)).nopw();
-	map(0x0c, 0x0f).rw("smi", FUNC(f3853_device::read), FUNC(f3853_device::write));
+	map(0x0c, 0x0f).rw(m_smi, FUNC(f3853_device::read), FUNC(f3853_device::write));
 }
 
 static INPUT_PORTS_START(act5a)
@@ -527,13 +529,13 @@ INPUT_PORTS_END
 
 void microterm_f8_state::act5a(machine_config &config)
 {
-	cpu_device &maincpu(F8(config, "maincpu", 2_MHz_XTAL));
-	maincpu.set_addrmap(AS_PROGRAM, &microterm_f8_state::f8_mem);
-	maincpu.set_addrmap(AS_IO, &microterm_f8_state::f8_io);
-	maincpu.set_irq_acknowledge_callback("smi", FUNC(f3853_device::int_acknowledge));
+	F8(config, m_maincpu, 2_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &microterm_f8_state::f8_mem);
+	m_maincpu->set_addrmap(AS_IO, &microterm_f8_state::f8_io);
+	m_maincpu->int_cycle_callback().set(m_smi, FUNC(f3853_device::int_acknowledge));
 
-	f3853_device &smi(F3853(config, "smi", 2_MHz_XTAL));
-	smi.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
+	F3853(config, m_smi, 2_MHz_XTAL);
+	m_smi->int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
 	AY51013(config, m_uart);
 	m_uart->read_si_callback().set(m_io, FUNC(rs232_port_device::rxd_r));

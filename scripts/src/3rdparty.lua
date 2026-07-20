@@ -94,6 +94,11 @@ if _OPTIONS["gcc"]~=nil then
 		}
 	end
 end
+if _OPTIONS["targetos"]=="asmjs" then
+		buildoptions_c {
+			"-Wno-error=format", -- expat ptrdiff_t format mismatch
+		}
+end
 if _OPTIONS["targetos"]=="windows" then
 		buildoptions_c {
 			"-Wno-error=format", -- GCC with UCRT produces warnings for the non-standard I64 size modifier
@@ -1146,40 +1151,31 @@ end
 	configuration { }
 
 	files {
-		MAME_DIR .. "3rdparty/portmidi/pm_common/portmidi.c",
 		MAME_DIR .. "3rdparty/portmidi/pm_common/pmutil.c",
+		MAME_DIR .. "3rdparty/portmidi/pm_common/portmidi.c",
 	}
 
 	if _OPTIONS["targetos"]=="windows" then
 		files {
-			MAME_DIR .. "3rdparty/portmidi/porttime/ptwinmm.c",
 			MAME_DIR .. "3rdparty/portmidi/pm_win/pmwin.c",
 			MAME_DIR .. "3rdparty/portmidi/pm_win/pmwinmm.c",
 			MAME_DIR .. "3rdparty/portmidi/porttime/ptwinmm.c",
 		}
-	end
-
-	if _OPTIONS["targetos"]=="linux" then
+	elseif _OPTIONS["targetos"]=="linux" then
 		files {
 			MAME_DIR .. "3rdparty/portmidi/pm_linux/pmlinux.c",
 			MAME_DIR .. "3rdparty/portmidi/pm_linux/pmlinuxalsa.c",
-			MAME_DIR .. "3rdparty/portmidi/pm_linux/finddefault.c",
 			MAME_DIR .. "3rdparty/portmidi/porttime/ptlinux.c",
 		}
-	end
-	if _OPTIONS["targetos"]=="netbsd" then
+	elseif _OPTIONS["targetos"]=="netbsd" then
 		files {
 			MAME_DIR .. "3rdparty/portmidi/pm_linux/pmlinux.c",
-			MAME_DIR .. "3rdparty/portmidi/pm_linux/finddefault.c",
 			MAME_DIR .. "3rdparty/portmidi/porttime/ptlinux.c",
 		}
-	end
-	if _OPTIONS["targetos"]=="macosx" then
+	elseif _OPTIONS["targetos"]=="macosx" then
 		files {
 			MAME_DIR .. "3rdparty/portmidi/pm_mac/pmmac.c",
 			MAME_DIR .. "3rdparty/portmidi/pm_mac/pmmacosxcm.c",
-			MAME_DIR .. "3rdparty/portmidi/pm_mac/finddefault.c",
-			MAME_DIR .. "3rdparty/portmidi/pm_mac/readbinaryplist.c",
 			MAME_DIR .. "3rdparty/portmidi/porttime/ptmacosx_mach.c",
 		}
 	end
@@ -1854,6 +1850,13 @@ project "wdlfft"
 project "ymfm"
 	uuid "2403a536-cb0a-4b50-b41f-10c17917689b"
 	kind "StaticLib"
+
+	configuration { "gmake or ninja" }
+		if _OPTIONS["targetos"]=="asmjs" then
+			buildoptions_cpp {
+				"-Wno-array-bounds", -- ymfm_fm.ipp accesses operator array index past 12 in template code clang can't fully analyse
+			}
+		end
 
 	configuration { }
 		defines {

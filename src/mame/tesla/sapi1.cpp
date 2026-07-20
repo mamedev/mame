@@ -823,7 +823,7 @@ void sapi_state::sapi2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sapi_state::sapi2_mem);
 	m_maincpu->set_addrmap(AS_IO, &sapi_state::sapi2_io);
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(sapi_state::kbd_put));
 }
 

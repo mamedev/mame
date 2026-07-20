@@ -62,7 +62,7 @@ class t4dwave_pcm_device : public device_t
 						 , public device_sound_interface
 {
 public:
-	t4dwave_pcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	t4dwave_pcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto datain_cb() { return m_datain_cb.bind(); }
 	auto irq_cb()    { return m_irq_cb.bind(); }
@@ -104,7 +104,7 @@ public:
 	void gvsel_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 protected:
-	t4dwave_pcm_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	t4dwave_pcm_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;

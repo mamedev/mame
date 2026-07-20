@@ -6490,7 +6490,7 @@ Black screen, fnum reject in [CD-Block]
 	<software name="noon" supported="no">
 		<description>Noon (Japan, rev. A)</description>
 		<year>1998</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="T-5206G"/>
 		<info name="release" value="19980129"/>
 		<info name="alt_title" value="ヌーン"/>
@@ -8767,7 +8767,7 @@ TODO: test Sonic 2, 3 and Knuckles
 	<software name="swordsor" supported="no">
 		<description>Sword &amp; Sorcery (Japan, 2M)</description>
 		<year>1996</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<notes><![CDATA[
 Crashes after now loading screen, [CD-Block]
 ]]></notes>
@@ -16238,6 +16238,7 @@ Opening FMV has visible screen tearing [CD-Block] (verify)
 		<info name="serial" value="T-7657G"/>
 		<info name="release" value="19980129"/>
 		<info name="alt_title" value="大航海時代外伝"/>
+		<info name="usage" value="Requires 349 free blocks, using a backup RAM cart is advised"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -17013,7 +17014,7 @@ TODO: how to reload with [mouse]?
 	<software name="gahero" supported="no">
 		<description>Eiyuu Shigan - Gal Act Heroism (Japan)</description>
 		<year>1998</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="T-5204G"/>
 		<info name="release" value="19980416"/>
 		<info name="alt_title" value="英雄志願 ～Gal Act Heroism～"/>
@@ -20165,7 +20166,7 @@ Glitchy Tecnosoft logo, [SCUDSP]
 	<software name="savaki" supported="no">
 		<description>Savaki (Japan)</description>
 		<year>1998</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="T-5208G"/>
 		<info name="release" value="19980416"/>
 		<info name="alt_title" value="サバキ"/>
@@ -23699,7 +23700,7 @@ Not extensively tested
 	</software>
 
 	<!-- Mini CD, [CD-Block] doesn't playback in driver, expected length of 13:54 matches -->
-	<!-- TODO: comes with T-16703G main disc, according to http://redump.org/disc/9318/ should be same as T-16705G-01 minus the changed serial -->
+	<!-- TODO: comes with T-16703G main disc, according to https://redump.info/disc/9318/ should be same as T-16705G-01 minus the changed serial -->
 	<software name="fromancra" cloneof="fromancr" supported="no">
 		<description>Idol Mahjong Final Romance R Mini Drama CD (Japan)</description>
 		<year>199?</year>
@@ -25282,7 +25283,7 @@ Glitchy [VDP1] sprites during gameplay
 	<software name="prinmak2" supported="no">
 		<description>Princess Maker 2 (Japan)</description>
 		<year>1995</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="T-5201G"/>
 		<info name="release" value="19951027"/>
 		<info name="alt_title" value="プリンセスメーカー2"/>
@@ -25298,7 +25299,7 @@ Glitchy [VDP1] sprites during gameplay
 	<software name="prinmak2sa" cloneof="prinmak2" supported="no">
 		<description>Princess Maker 2 (Japan, Satakore)</description>
 		<year>1997</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="T-5203G"/>
 		<info name="release" value="19970620"/>
 		<info name="alt_title" value="プリンセスメーカー2 (サタコレ)"/>
@@ -26374,7 +26375,7 @@ Not extensively tested
 	<software name="swordsora" cloneof="swordsor" supported="no">
 		<description>Sword &amp; Sorcery (Japan)</description>
 		<year>1996</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="T-5202G"/>
 		<info name="release" value="19960531"/>
 		<info name="alt_title" value="ソード&amp;ソーサリー"/>
@@ -26390,7 +26391,7 @@ Not extensively tested
 	<software name="swordsorsa" cloneof="swordsor" supported="no">
 		<description>Sword &amp; Sorcery (Japan, Satakore)</description>
 		<year>1997</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="T-5207G"/>
 		<info name="release" value="19971211"/>
 		<info name="alt_title" value="ソード&amp;ソーサリー (サタコレ)"/>
@@ -28838,7 +28839,7 @@ Not extensively tested
 	<software name="gaheroa" cloneof="gahero" supported="no">
 		<description>Eiyuu Shigan - Gal Act Heroism (Japan, alt)</description>
 		<year>1998</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="T-5204G"/>
 		<info name="release" value="19980416"/>
 		<info name="alt_title" value="英雄志願 ～Gal Act Heroism～"/>
@@ -39340,5 +39341,93 @@ Game will freeze if you let the intro video play and press start. You can skip i
 		</part>
 	</software>
 
+	<!-- !Homebrew -->
+
+	<software name="deza2sgm1" supported="partial">
+		<description>Dezaemon 2 Save Game Manager</description>
+		<year>2007</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+https://wiki.mamedev.org/index.php?title=Game:deza2sgm
+Data disk for dezaemn2 games, requires a Backup RAM [cart]
+]]></notes>
+		<info name="developer" value="Madroms" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dezaemon 2 save game manager" sha1="60e5242641d869c3eaba4ff21c8e57acd5dfb062" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="deza2sgm2" supported="partial">
+		<description>Dezaemon 2 Save Game Manager Vol. 2</description>
+		<year>2008</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+https://wiki.mamedev.org/index.php?title=Game:deza2sgm
+Data disk for dezaemn2 games, requires a Backup RAM [cart] or a [FDD]
+]]></notes>
+		<info name="developer" value="Madroms" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dezaemon 2 save game manager vol 2" sha1="341dd03af9789604e8a17456921da651dcc005ae" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pssati" supported="no">
+		<!-- from v0.832 FINAL -->
+		<description>Pseudo Saturn Installer (v1.2)</description>
+		<year>2015</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+https://github.com/cyberwarriorx/pseudosaturn
+Action Replay to Pseudo Saturn Installer
+Optional [ComLink] support
+]]></notes>
+		<info name="developer" value="Pseudo Saturn Team" />
+		<info name="developer" value="CyberWarriorX" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="installer" sha1="33b4fdcaabc13e9f59eff4aa75942695a3237171" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="psatkaif" supported="no">
+		<description>Pseudo Saturn Kai Flasher (v6.545)</description>
+		<year>2024</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Action Replay to Pseudo Saturn Kai Installer, requires 1024KB of cart memory
+]]></notes>
+		<info name="developer" value="cafe-alpha" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="pskai_flasher_full" sha1="b22ef701bb8c9480319cbed62e45872b89b5a638" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="usbcartf" supported="no">
+		<description>USB Cart Flasher (Revision 11)</description>
+		<year>2013</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+https://github.com/andersm/usbcart/tree/master
+Requires a working Action Replay flash [cart]
+]]></notes>
+		<info name="developer" value="andersm"/>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="usb_cart_flasher" sha1="94e0f0663858f4ab932e9376cce4bfbaca86d1cd" />
+			</diskarea>
+		</part>
+	</software>
 
 </softwarelist>

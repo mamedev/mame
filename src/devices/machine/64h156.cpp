@@ -176,7 +176,7 @@ void c64h156_device::start_writing(const attotime &tm)
 
 void c64h156_device::stop_writing(const attotime &tm)
 {
-	commit(tm);
+	commit(tm, true);
 	cur_live.write_start_time = attotime::never;
 }
 
@@ -199,9 +199,12 @@ bool c64h156_device::write_next_bit(bool bit, const attotime &limit)
 	return false;
 }
 
-void c64h156_device::commit(const attotime &tm)
+void c64h156_device::commit(const attotime &tm, bool force)
 {
 	if(cur_live.write_start_time.is_never() || tm == cur_live.write_start_time || !cur_live.write_position)
+		return;
+
+	if(!force && cur_live.write_position < std::size(cur_live.write_buffer))
 		return;
 
 	LOG("%s committing %u transitions since %s\n", tm.as_string(), cur_live.write_position, cur_live.write_start_time.as_string());

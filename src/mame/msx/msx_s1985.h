@@ -16,7 +16,7 @@ class msx_s1985_device : public device_t,
 	public device_nvram_interface
 {
 public:
-	msx_s1985_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msx_s1985_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// msx_switched_interface overrides
 	virtual u8 switched_read(offs_t offset) override;

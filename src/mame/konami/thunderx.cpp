@@ -515,7 +515,7 @@ void scontra_state::gbusters_videobank_w(uint8_t data)
 
 void thunderx_state_base::sh_irqtrigger_w(uint8_t data)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 }
 
 void scontra_state::k007232_bankswitch_w(uint8_t data)

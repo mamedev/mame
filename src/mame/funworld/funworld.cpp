@@ -3427,7 +3427,7 @@ void funworld_state::saloon(machine_config &config)
 	config.device_remove("pia1");
 
 	// Serial Memory
-	I2C_24C02(config, "i2cmem", 0).set_e0(1); // ? or maybe 2nd half of 24C04?
+	I2C_24C02(config, "i2cmem").set_e0(1); // ? or maybe 2nd half of 24C04?
 }
 
 
@@ -3557,12 +3557,12 @@ uint8_t royalcrdf_state::royalcrdf_opcode_r(offs_t offset)
 		0x02, 0x02, 0xa6, 0x82, 0x02, 0x02, 0x06, 0x82, 0x02, 0x02, 0xa6, 0x00, 0x02, 0x02, 0x06, 0x00
 	};
 
-	uint8_t data {m_maincpu->space(AS_PROGRAM).read_byte(offset)};
+	uint8_t data = m_maincpu->space(AS_PROGRAM).read_byte(offset);
 
 	if(offset < 0x800)
 		data = bitswap<8>(data ^ 0x22, 2, 6, 7, 4, 3, 1, 5, 0);
 
-	u64 idx = bitswap<4>(offset, 8, 5, 2, 1);
+	auto const idx = bitswap<4>(unsigned(offset), 8, 5, 2, 1);
 
 	return bitswap<8>(data, bs[idx][3], 6, bs[idx][2], 4, 3, bs[idx][1], bs[idx][0], 0) ^ xm[idx];
 }
@@ -3622,8 +3622,8 @@ uint8_t multiwin_state::multiwin_opcode_r(offs_t offset)
 		0x00, 0x00, 0x10, 0x00, 0x20, 0x00, 0x30, 0x00, 0x00, 0xb5, 0x10, 0xb5, 0x20, 0xb5, 0x30, 0xb5
 	};
 
-	uint8_t data {m_maincpu->space(AS_PROGRAM).read_byte(offset)};
-	u64 idx = bitswap<4>(offset, 6,9,5,3);
+	uint8_t const data = m_maincpu->space(AS_PROGRAM).read_byte(offset);
+	auto const idx = bitswap<4>(unsigned(offset), 6,9,5,3);
 
 	return bitswap<8>(data, bs[idx&7][4],6,bs[idx&7][3],bs[idx&7][2],3,bs[idx&7][1],1,bs[idx&7][0]) ^ xm[idx];
 }

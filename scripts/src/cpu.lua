@@ -688,6 +688,7 @@ if CPUS["H8"] then
 		MAME_DIR .. "src/devices/cpu/h8/c77.h",
 		MAME_DIR .. "src/devices/cpu/h8/h8.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/h8.h",
+		MAME_DIR .. "src/devices/cpu/h8/h8_cpu_base.h",
 		MAME_DIR .. "src/devices/cpu/h8/h8h.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/h8h.h",
 		MAME_DIR .. "src/devices/cpu/h8/h8s2000.cpp",
@@ -732,14 +733,17 @@ if CPUS["H8"] then
 		MAME_DIR .. "src/devices/cpu/h8/h8_dtc.h",
 		MAME_DIR .. "src/devices/cpu/h8/h8_intc.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/h8_intc.h",
+		MAME_DIR .. "src/devices/cpu/h8/h8_intc_base.h",
 		MAME_DIR .. "src/devices/cpu/h8/h8_port.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/h8_port.h",
+		MAME_DIR .. "src/devices/cpu/h8/h8_refresh.cpp",
+		MAME_DIR .. "src/devices/cpu/h8/h8_refresh.h",
+		MAME_DIR .. "src/devices/cpu/h8/h8_sci.cpp",
+		MAME_DIR .. "src/devices/cpu/h8/h8_sci.h",
 		MAME_DIR .. "src/devices/cpu/h8/h8_timer8.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/h8_timer8.h",
 		MAME_DIR .. "src/devices/cpu/h8/h8_timer16.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/h8_timer16.h",
-		MAME_DIR .. "src/devices/cpu/h8/h8_sci.cpp",
-		MAME_DIR .. "src/devices/cpu/h8/h8_sci.h",
 		MAME_DIR .. "src/devices/cpu/h8/h8_watchdog.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/h8_watchdog.h",
 		MAME_DIR .. "src/devices/cpu/h8/gt913.cpp",
@@ -807,6 +811,18 @@ if CPUS["H8500"] then
 		MAME_DIR .. "src/devices/cpu/h8500/h8532.h",
 		MAME_DIR .. "src/devices/cpu/h8500/h8534.cpp",
 		MAME_DIR .. "src/devices/cpu/h8500/h8534.h",
+		MAME_DIR .. "src/devices/cpu/h8500/h8500_frt.cpp",
+		MAME_DIR .. "src/devices/cpu/h8500/h8500_frt.h",
+		MAME_DIR .. "src/devices/cpu/h8500/h8500_intc.cpp",
+		MAME_DIR .. "src/devices/cpu/h8500/h8500_intc.h",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/cpu/h8500/h8500.cpp", GEN_DIR .. "emu/cpu/h8500/h8500.hxx" },
+	}
+
+	custombuildtask {
+		{ MAME_DIR .. "src/devices/cpu/h8500/h8500.lst", GEN_DIR .. "emu/cpu/h8500/h8500.hxx", { MAME_DIR .. "src/devices/cpu/h8500/h8500make.py" }, {"@echo Generating H8/500 source file...", PYTHON .. " $(1) $(<) s $(@)" }},
 	}
 end
 
@@ -4246,6 +4262,10 @@ if CPUS["C33"] then
 		MAME_DIR .. "src/devices/cpu/c33/c33helpers.ipp",
 		MAME_DIR .. "src/devices/cpu/c33/c33std.cpp",
 		MAME_DIR .. "src/devices/cpu/c33/c33std.h",
+		MAME_DIR .. "src/devices/cpu/c33/s1c33l17.cpp",
+		MAME_DIR .. "src/devices/cpu/c33/s1c33l17.h",
+		MAME_DIR .. "src/devices/cpu/c33/s1c33l27.cpp",
+		MAME_DIR .. "src/devices/cpu/c33/s1c33l27.h",
 		MAME_DIR .. "src/devices/cpu/c33/s1c33209.cpp",
 		MAME_DIR .. "src/devices/cpu/c33/s1c33209.h",
 	}
@@ -4330,4 +4350,21 @@ if opt_tool(CPUS, "DSP563XX") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp563xx/dsp563xxd-tables.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp563xx/dsp563xxd.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp563xx/dsp563xxd.h")
+end
+
+--------------------------------------------------
+-- Elan eDSP
+--@src/devices/cpu/edsp/edsp.h,CPUS["EDSP"] = true
+--------------------------------------------------
+
+if CPUS["EDSP"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/edsp/edsp.cpp",
+		MAME_DIR .. "src/devices/cpu/edsp/edsp.h",
+	}
+end
+
+if opt_tool(CPUS, "EDSP") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/edsp/edspdasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/edsp/edspdasm.h")
 end

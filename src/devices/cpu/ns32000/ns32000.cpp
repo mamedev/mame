@@ -17,6 +17,7 @@ DEFINE_DEVICE_TYPE(NS32016, ns32016_device, "ns32016", "National Semiconductor N
 DEFINE_DEVICE_TYPE(NS32032, ns32032_device, "ns32032", "National Semiconductor NS32032")
 DEFINE_DEVICE_TYPE(NS32332, ns32332_device, "ns32332", "National Semiconductor NS32332")
 DEFINE_DEVICE_TYPE(NS32532, ns32532_device, "ns32532", "National Semiconductor NS32532")
+DEFINE_DEVICE_TYPE(NS32CG16, ns32cg16_device, "ns32cg16", "National Semiconductor NS32CG16")
 
 /*
  * TODO:
@@ -93,8 +94,9 @@ class ns32000_delay : public std::exception { };
 
 static const u32 size_mask[] = { 0x0000'00ffU, 0x0000'ffffU, 0x0000'0000U, 0xffff'ffffU };
 
-template <int HighBits, int Width>ns32000_device<HighBits, Width>::ns32000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+template <int HighBits, int Width>ns32000_device<HighBits, Width>::ns32000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool cg16)
 	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_mmu_uses_cfg_m(true)
 	, m_address_mask(util::make_bitmask<u32>(HighBits))
 	, m_program_config("program", ENDIANNESS_LITTLE, 8 << Width, HighBits, 0)
 	, m_iam_config("iam", ENDIANNESS_LITTLE, 8 << Width, HighBits, 0)
@@ -122,6 +124,7 @@ template <int HighBits, int Width>ns32000_device<HighBits, Width>::ns32000_devic
 	, m_int_line(false)
 	, m_wait(false)
 	, m_sequential(false)
+	, m_cg16(cg16)
 {
 }
 
@@ -132,6 +135,12 @@ ns32008_device::ns32008_device(const machine_config &mconfig, const char *tag, d
 
 ns32016_device::ns32016_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: ns32000_device(mconfig, NS32016, tag, owner, clock)
+{
+}
+
+ns32cg16_device::ns32cg16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: ns32000_device(mconfig, NS32CG16, tag, owner, clock, true)
+	, m_out_bpu(*this)
 {
 }
 
@@ -151,6 +160,8 @@ ns32532_device::ns32532_device(const machine_config &mconfig, const char *tag, d
 	, m_pt1_config("pt1", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_pt2_config("pt2", ENDIANNESS_LITTLE, 32, 32, 0)
 {
+	// the on-chip MMU gates translation via MSR/MCR, not the CFG M bit
+	m_mmu_uses_cfg_m = false;
 }
 
 template <int HighBits, int Width> void ns32000_device<HighBits, Width>::device_start()
@@ -266,7 +277,13 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::state_s
 template <int HighBits, int Width> template<typename T> T ns32000_device<HighBits, Width>::mem_read(unsigned st, offs_t address, bool user, bool pfs)
 {
 	offs_t physical = address;
-	ns32000_mmu_interface::translate_result tr = m_mmu ?
+	// the CPU routes accesses through the external MMU only once SETCFG has
+	// enabled it (CFG M).  When the MMU is idle/just-reset the page tables are
+	// ignored and every address is physical, regardless of a stale MSR
+	// translation-enable.  (The 32532's on-chip MMU gates internally, so it
+	// clears m_mmu_uses_cfg_m and always consults translate().)
+	bool const xlat = m_mmu && (!m_mmu_uses_cfg_m || (m_cfg & CFG_M));
+	ns32000_mmu_interface::translate_result tr = xlat ?
 		m_mmu->translate(m_bus[st].space(), st, physical, (m_psr & PSR_U) || user, false, pfs) : ns32000_mmu_interface::COMPLETE;
 
 	if (tr == ns32000_mmu_interface::COMPLETE)
@@ -281,7 +298,7 @@ template <int HighBits, int Width> template<typename T> T ns32000_device<HighBit
 		{
 			u32 const pagemask = ((m_cfg & CFG_P) ? 0xfffU : 0x1ffU) & ~unitmask;
 
-			if (!m_mmu || (~address & pagemask))
+			if (!xlat || (~address & pagemask))
 			{
 				// unaligned access, one page (or no mmu)
 				switch (sizeof(T))
@@ -351,7 +368,9 @@ template <int HighBits, int Width> template<typename T> T ns32000_device<HighBit
 template <int HighBits, int Width> template<typename T> void ns32000_device<HighBits, Width>::mem_write(unsigned st, offs_t address, u64 data, bool user)
 {
 	offs_t physical = address;
-	ns32000_mmu_interface::translate_result tr = m_mmu ?
+	// see mem_read: the external MMU is consulted only when SETCFG has enabled it
+	bool const xlat = m_mmu && (!m_mmu_uses_cfg_m || (m_cfg & CFG_M));
+	ns32000_mmu_interface::translate_result tr = xlat ?
 		m_mmu->translate(m_bus[st].space(), st, physical, (m_psr & PSR_U) || user, true) : ns32000_mmu_interface::COMPLETE;
 
 	if (tr == ns32000_mmu_interface::COMPLETE)
@@ -365,7 +384,7 @@ template <int HighBits, int Width> template<typename T> void ns32000_device<High
 		{
 			u32 const pagemask = ((m_cfg & CFG_P) ? 0xfffU : 0x1ffU) & ~unitmask;
 
-			if (!m_mmu || (~address & pagemask))
+			if (!xlat || (~address & pagemask))
 			{
 				// unaligned access, one page (or no mmu)
 				switch (sizeof(T))
@@ -2105,7 +2124,363 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::execute
 						}
 						break;
 					default:
-						interrupt(UND);
+						// NS32CG16 graphics instructions occupy Format-5 opcodes
+						// 4-14 (encoding: nat/DOCS/APPS/INSREVB); on a non-CG16
+						// part these are undefined.
+						if (m_cg16)
+						{
+							switch (BIT(opword, 2, 4))
+							{
+							case 0x7:
+								// MOVMPi - move multiple pattern
+								//   R0 destination, R1 signed pointer increment (bytes),
+								//   R2 unsigned count, R3 source pattern (size i).
+								// Writes the pattern R2 times, advancing the destination
+								// by R1 after each write; R2 is left zero.
+								// timing (Version B, no wait states): 16 + 7*R2 for
+								// byte/word, 16 + 8*R2 for doubleword
+								tex = 16 + (size == SIZE_D ? 8 : 7) * m_r[2];
+								while (m_r[2])
+								{
+									if (size == SIZE_D)
+										mem_write<u32>(ns32000::ST_ODT, m_r[0], m_r[3]);
+									else if (size == SIZE_W)
+										mem_write<u16>(ns32000::ST_ODT, m_r[0], m_r[3]);
+									else
+										mem_write<u8>(ns32000::ST_ODT, m_r[0], m_r[3]);
+
+									m_r[0] += m_r[1];
+									m_r[2]--;
+								}
+								break;
+							case 0x8:
+								// BITWT - bit-aligned word transfer
+								//   R0 source, R1 destination, R2 shift (0-15).
+								// Reads the source word, zero-extends and shifts it left
+								// by R2, ORs it into the destination and writes back, then
+								// advances both pointers by two.  The mandatory preceding
+								// CMPB R2,0 leaves PSR L clear for a zero shift, which
+								// selects a word- rather than doubleword-sized destination
+								// read-modify-write (avoiding a touch of the next word).
+								{
+									unsigned const shift = u8(m_r[2]);
+									u32 const src = mem_read<u16>(ns32000::ST_ODT, m_r[0]);
+
+									if (m_psr & PSR_L)
+									{
+										u32 const dst = mem_read<u32>(ns32000::ST_ODT, m_r[1]);
+										mem_write<u32>(ns32000::ST_ODT, m_r[1], dst | (src << shift));
+
+										// timing (Version B): 28 for shift 1-8, +1 per
+										// bit beyond 8
+										tex = (shift <= 8) ? 28 : 28 + (shift - 8);
+									}
+									else
+									{
+										u32 const dst = mem_read<u16>(ns32000::ST_ODT, m_r[1]);
+										mem_write<u16>(ns32000::ST_ODT, m_r[1], u16(dst | src));
+
+										// timing (Version B): 16 for a zero shift
+										tex = 16;
+									}
+
+									m_r[0] += 2;
+									m_r[1] += 2;
+								}
+								break;
+							case 0x9:
+								// TBITS - test bit string
+								//   R0 base, R1 signed bit offset, R2 run length,
+								//   R3 maximum run length, R4 maximum bit offset.
+								// Counts a run of bits equal to the option S starting at
+								// bit R1; terminates on the first opposite bit, on R2
+								// reaching R3, or on R1 reaching R4.  L distinguishes a
+								// run-length stop (1) from a max-offset stop (0); F holds
+								// the value of the last bit tested.
+								{
+									bool const s = BIT(opword, 7);
+									// timing (Version B, no wait states): 27 per bit tested
+									tex = 7;
+
+									if (s32(m_r[1]) >= s32(m_r[4]))
+									{
+										// max offset reached on entry: F = option, L clear
+										m_psr &= ~PSR_L;
+										if (s)
+											m_psr |= PSR_F;
+										else
+											m_psr &= ~PSR_F;
+									}
+									else for (;;)
+									{
+										u32 const byte = mem_read<u8>(ns32000::ST_ODT, m_r[0] + (s32(m_r[1]) >> 3));
+										bool const bit = BIT(byte, m_r[1] & 7);
+										tex += 27;
+
+										if (bit != s)
+										{
+											// opposite bit found; R1 left pointing at it
+											m_psr |= PSR_L;
+											if (bit)
+												m_psr |= PSR_F;
+											else
+												m_psr &= ~PSR_F;
+											break;
+										}
+
+										m_r[1]++;
+										m_r[2]++;
+
+										if (m_r[2] >= m_r[3])
+										{
+											// maximum run length reached
+											m_psr |= PSR_L;
+											if (bit)
+												m_psr |= PSR_F;
+											else
+												m_psr &= ~PSR_F;
+											break;
+										}
+										if (s32(m_r[1]) >= s32(m_r[4]))
+										{
+											// maximum bit offset reached
+											m_psr &= ~PSR_L;
+											if (bit)
+												m_psr |= PSR_F;
+											else
+												m_psr &= ~PSR_F;
+											break;
+										}
+									}
+								}
+								break;
+							case 0xb:
+								// SBITPS - set bit perpendicular string
+								//   R0 base, R1 signed bit offset, R2 run length,
+								//   R3 signed destination warp.
+								// Sets R2 bits, stepping the bit offset by the warp after
+								// each so that horizontal, vertical and 45-degree lines can
+								// be drawn.
+								// timing (Version B, no wait states): 8 + 34*R2
+								tex = 8 + 34 * m_r[2];
+								while (m_r[2])
+								{
+									u32 const addr = m_r[0] + (s32(m_r[1]) >> 3);
+									u8 const byte = mem_read<u8>(ns32000::ST_ODT, addr);
+									mem_write<u8>(ns32000::ST_ODT, addr, byte | (1U << (m_r[1] & 7)));
+
+									m_r[1] += m_r[3];
+									m_r[2]--;
+								}
+								break;
+							case 0xd:
+								// SBITS - set bit string
+								//   R0 base, R1 signed bit offset, R2 run length,
+								//   R3 address of the mask look-up table (Figure 1: eight
+								//   bit-offset groups of 32 doublewords, entry =
+								//   ((2^runlen - 1) << bitoffset)).
+								// Sets R2 contiguous bits.  A run longer than 25 bits is
+								// not set in hardware: the destination doubleword is read,
+								// PSR F is set, and software is expected to take over.
+								{
+									u32 const addr = m_r[0] + (s32(m_r[1]) >> 3);
+									unsigned const bitoff = m_r[1] & 7;
+
+									if (m_r[2] > 25)
+									{
+										(void)mem_read<u32>(ns32000::ST_ODT, addr);
+										m_psr |= PSR_F;
+
+										// timing (Version B, no wait states): 42 when R2 > 25
+										tex = 42;
+									}
+									else
+									{
+										u32 const mask = mem_read<u32>(ns32000::ST_ODT, m_r[3] + (bitoff * 32 + m_r[2]) * 4);
+										u32 const dst = mem_read<u32>(ns32000::ST_ODT, addr);
+										mem_write<u32>(ns32000::ST_ODT, addr, dst | mask);
+										m_psr &= ~PSR_F;
+
+										// timing (Version B, no wait states): 39 when R2 <= 25
+										tex = 39;
+									}
+								}
+								break;
+							case 0x4: // BBSTOD - bit-block source -> destination
+							case 0x6: // BBOR   - bit-block OR
+							case 0xa: // BBAND  - bit-block AND
+							case 0xc: // BBFOR  - bit-block fast OR
+							case 0xe: // BBXOR  - bit-block XOR
+								// BITBLT series - bit-aligned block transfer.  Operands:
+								//   R0 source base, R1 destination base, R2 shift (0-15),
+								//   R3 height in lines, R4 first mask, R5 second mask,
+								//   R6 adjusted source warp, R7 adjusted destination warp,
+								//   0(sp) width in words.
+								// Each line transfers `width` words: the first word uses
+								// the first mask, the last word the second mask, the inner
+								// words an all-ones (OR-style) or all-zeros (AND-style)
+								// default.  For OR/XOR/FOR the masked source is shifted and
+								// OR/XOR-combined into the destination doubleword; for AND
+								// the source is combined with a high-order word of ones, the
+								// mask is ORed in, the result rotated and ANDed into the
+								// destination; for STOD the destination is cleared under the
+								// rotated mask before the shifted source is stored.  The -S
+								// option complements the source, DA reverses direction; BBFOR
+								// has neither.  (The shift-of-zero word-vs-doubleword
+								// optimisation gated by the L bit of the mandatory preceding
+								// CMPB R2,0 is result-identical here and not modelled.)
+								{
+									unsigned const op = BIT(opword, 2, 4);
+									bool const fast = (op == 0xc);
+									bool const invert = !fast && BIT(opword, 7);
+									bool const decr = !fast && BIT(opword, 9);
+									unsigned const shift = u8(m_r[2]) & 31;
+									s32 const step = decr ? -2 : 2;
+									u16 const inner = (op == 0xa) ? 0x0000 : 0xffff;
+									u32 const width0 = mem_read<u16>(ns32000::ST_ODT, SP());
+
+									// timing (Version B, no wait states): per-op base +
+									// (per + inc*(width-2))*height, plus (shift-8)*width*height
+									// for shifts greater than eight
+									unsigned bbbase, bbper, bbinc;
+									switch (op)
+									{
+									case 0x6: bbbase = 42; bbper = 107; bbinc = 44; break; // BBOR
+									case 0xe: bbbase = 44; bbper = 107; bbinc = 44; break; // BBXOR
+									case 0xa: bbbase = 45; bbper = 111; bbinc = 44; break; // BBAND
+									case 0x4: bbbase = 66; bbper = 170; bbinc = 60; break; // BBSTOD
+									default:  // BBFOR
+										bbbase = 48;
+										if (shift) { bbper = 74; bbinc = 32; } else { bbper = 61; bbinc = 25; }
+										break;
+									}
+									tex = bbbase + u32(s32(bbper) + s32(bbinc) * (s32(width0) - 2)) * m_r[3];
+									if (shift > 8)
+										tex += (shift - 8) * width0 * m_r[3];
+									while (m_r[3])
+									{
+										u32 width = width0;
+										u16 mask = u16(m_r[4]);
+
+										while (width)
+										{
+											u16 src = mem_read<u16>(ns32000::ST_ODT, m_r[0]);
+											if (invert)
+												src = u16(~src);
+											u32 const dst = mem_read<u32>(ns32000::ST_ODT, m_r[1]);
+
+											u32 result;
+											if (op == 0xa)
+											{
+												// BBAND
+												u32 const t = (0xffff'0000U | src) | mask;
+												u32 const ss = shift ? ((t << shift) | (t >> (32 - shift))) : t;
+												result = dst & ss;
+											}
+											else
+											{
+												u32 const ss = (u32(src) & mask) << shift;
+												if (op == 0x4)
+												{
+													// BBSTOD
+													u32 const m = mask;
+													u32 const rot = shift ? ((m << shift) | (m >> (32 - shift))) : m;
+													result = (dst & ~rot) | ss;
+												}
+												else if (op == 0xe)
+													result = dst ^ ss; // BBXOR
+												else
+													result = dst | ss; // BBOR / BBFOR
+											}
+											mem_write<u32>(ns32000::ST_ODT, m_r[1], result);
+
+											// every word but the last of the line advances the
+											// pointers by two (the warp is applied afterwards)
+											if (--width)
+											{
+												m_r[0] += step;
+												m_r[1] += step;
+												mask = (width == 1) ? u16(m_r[5]) : inner;
+											}
+										}
+
+										m_r[0] += m_r[6];
+										m_r[1] += m_r[7];
+										m_r[3]--;
+									}
+								}
+								break;
+							case 0x5:
+								// EXTBLT - external bit-aligned block transfer.  Operands:
+								//   R0 source base, R1 destination base, R2 width in bytes,
+								//   R3 height in lines, R4 horizontal increment in bytes,
+								//   R5 current width (working), R6 source warp, R7 dest warp.
+								// The shift/mask/logic combine is performed by an external
+								// DP8510/DP8511 BITBLT processing unit (BPU).  The instruction
+								// itself only runs the bus cycles - read source, read
+								// destination, write - and asserts out_bpu() for the duration;
+								// a BPU wired up in the driver snoops those cycles via memory
+								// taps, latching the source/destination words and substituting
+								// its processed output on the write.  With no BPU connected the
+								// cycles run as a plain source-to-destination copy.  A cleared
+								// PSR L (from a preceding CMPQB 1,2) requests preloading, which
+								// primes the BPU pipeline with an extra source word per line.
+								// (On the real part that copy only latched with more than one
+								// wait state - the bus-cycle timing took priority over the
+								// late-arriving data; the supported >1-wait-state case is
+								// modelled here.)
+								{
+									bool const preload = !(m_psr & PSR_L);
+									s32 const incr = s32(m_r[4]);
+
+									// timing (Version B, no wait states): 35 + (k + 13*width)*
+									// height, k = 17 pre-read (cleared L) else 11; width in
+									// words = R2 / horizontal increment
+									u32 const ewidth = incr ? u32(s32(m_r[2]) / incr) : 0;
+									tex = 35 + ((preload ? 17 : 11) + 13 * ewidth) * m_r[3];
+
+									bpu_window(true);
+									while (m_r[3])
+									{
+										m_r[5] = m_r[2];
+
+										if (preload)
+										{
+											// preload source word (latched by the BPU tap)
+											mem_read<u16>(ns32000::ST_ODT, m_r[0]);
+											m_r[0] += incr;
+										}
+
+										while (m_r[5])
+										{
+											u16 const src = mem_read<u16>(ns32000::ST_ODT, m_r[0]);
+											// destination read - value discarded here, but the
+											// bus cycle is what the BPU's tap latches
+											mem_read<u16>(ns32000::ST_ODT, m_r[1]);
+
+											// default behaviour is a plain copy; a BPU tap
+											// replaces the written value with output_r()
+											mem_write<u16>(ns32000::ST_ODT, m_r[1], src);
+
+											m_r[0] += incr;
+											m_r[1] += incr;
+											m_r[5] -= incr;
+										}
+
+										m_r[0] += m_r[6];
+										m_r[1] += m_r[7];
+										m_r[3]--;
+									}
+									bpu_window(false);
+								}
+								break;
+							default: // 0xf reserved
+								interrupt(UND);
+								break;
+							}
+						}
+						else
+							interrupt(UND);
 						break;
 					}
 				}
@@ -3671,12 +4046,17 @@ template <int HighBits, int Width> device_memory_interface::space_config_vector 
 template <int HighBits, int Width> bool ns32000_device<HighBits, Width>::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
 	target_space = &space(spacenum);
-	return !m_mmu || m_mmu->translate(space(spacenum), spacenum, address, m_psr & PSR_U, intention == TR_WRITE, false, true) == ns32000_mmu_interface::COMPLETE;
+	return !(m_mmu && (!m_mmu_uses_cfg_m || (m_cfg & CFG_M))) || m_mmu->translate(space(spacenum), spacenum, address, m_psr & PSR_U, intention == TR_WRITE, false, true) == ns32000_mmu_interface::COMPLETE;
 }
 
 template <int HighBits, int Width> std::unique_ptr<util::disasm_interface> ns32000_device<HighBits, Width>::create_disassembler()
 {
-	return std::make_unique<ns32000_disassembler>();
+	return std::make_unique<ns32000_disassembler>(ns32000_disassembler::model::ns32032);
+}
+
+std::unique_ptr<util::disasm_interface> ns32532_device::create_disassembler()
+{
+	return std::make_unique<ns32000_disassembler>(ns32000_disassembler::model::ns32532);
 }
 
 template <int HighBits, int Width> u16 ns32000_device<HighBits, Width>::slave(u8 opbyte, u16 opword, addr_mode op1, addr_mode op2)
@@ -3898,6 +4278,28 @@ void ns32532_device::device_reset()
 	m_mcr = 0;
 	m_msr = 0;
 	m_dcr = 0;
+
+	tlb_flush();
+}
+
+void ns32532_device::tlb_flush()
+{
+	for (tlb_entry &e : m_tlb)
+		e.valid = false;
+}
+
+void ns32532_device::tlb_flush_as(bool as)
+{
+	for (tlb_entry &e : m_tlb)
+		if (e.as == as)
+			e.valid = false;
+}
+
+void ns32532_device::tlb_invalidate(u32 va, bool as)
+{
+	tlb_entry &e = m_tlb[(va >> 12) & (TLB_ENTRIES - 1)];
+	if (e.valid && e.tag == (va >> 12) && e.as == as)
+		e.valid = false;
 }
 
 device_memory_interface::space_config_vector ns32532_device::memory_space_config() const
@@ -3986,12 +4388,38 @@ ns32000_mmu_interface::translate_result ns32532_device::translate(address_space 
 	if ((!user && !(m_mcr & MCR_TS)) || (user && !(m_mcr & MCR_TU)))
 		return COMPLETE;
 
-	// TODO: translation look-aside buffer
-
 	bool const address_space = (m_mcr & MCR_DS) && user;
 	unsigned const access_level = (user && !(m_mcr & MCR_AO))
 		? ((write || st == ns32000::ST_RMW) ? PL_URW : PL_URO)
 		: ((write || st == ns32000::ST_RMW) ? PL_SRW : PL_SRO);
+
+	// translation look-aside buffer: a hit avoids the two page-table reads
+	bool const rmw = write || (st == ns32000::ST_RMW);
+	u32 const tlb_vpn = address >> 12;
+	tlb_entry &tlb = m_tlb[tlb_vpn & (TLB_ENTRIES - 1)];
+	if (tlb.valid && tlb.tag == tlb_vpn && tlb.as == address_space)
+	{
+		if (unsigned(tlb.pl) < access_level)
+		{
+			if (!suppress)
+			{
+				m_msr = MSR(st, user, write, TEX_PROT);
+				m_tear = address;
+				return ABORT;
+			}
+			else
+				return CANCEL;
+		}
+
+		// a write to a page whose modified bit is not yet recorded must fall
+		// through to the walk so that PTE.M gets set in the page table
+		if (!(rmw && !tlb.m))
+		{
+			address = tlb.pfn | BIT(address, 0, 12);
+
+			return COMPLETE;
+		}
+	}
 
 	LOGMASKED(LOG_TRANSLATE, "translate address_space %d access_level %d page table 0x%08x address 0x%08x\n",
 		address_space, access_level, m_ptb[address_space], address);
@@ -4071,6 +4499,21 @@ ns32000_mmu_interface::translate_result ns32532_device::translate(address_space 
 	// set modified and referenced
 	if ((!(pte2 & PTE_R) || ((write || st == ns32000::ST_RMW) && !(pte2 & PTE_M))) && !suppress)
 		m_bus[ns32000::ST_PT2].write_dword(pte2_address, pte2 | ((write || st == ns32000::ST_RMW) ? PTE_M : 0) | PTE_R);
+
+	// update the translation look-aside buffer (not on suppressed probes, which
+	// do not set the PTE R/M bits).  The effective protection level is the more
+	// restrictive of the two levels; the recorded M bit reflects the page table
+	// after the (possible) write above.
+	if (!suppress)
+	{
+		tlb.valid = true;
+		tlb.tag = tlb_vpn;
+		tlb.as = address_space;
+		tlb.pfn = pte2 & PTE_PFN;
+		tlb.pl = u8(std::min<u32>(pte1 & PTE_PL, pte2 & PTE_PL));
+		tlb.ci = bool(pte2 & PTE_CI);
+		tlb.m = bool(pte2 & PTE_M) || rmw;
+	}
 
 	address = (pte2 & PTE_PFN) | BIT(address, 0, 12);
 	LOGMASKED(LOG_TRANSLATE, "translate complete 0x%08x\n", address);
@@ -4209,13 +4652,13 @@ u16 ns32532_device::slave(u8 opbyte, u16 opword, addr_mode op1, addr_mode op2)
 			switch (BIT(opword, 7, 4))
 			{
 			case 0x8: break;
-			case 0x9: m_mcr = gen_read(op1); break;
+			case 0x9: m_mcr = gen_read(op1); tlb_flush(); break;
 			case 0xa: m_msr = gen_read(op1); break;
 			case 0xb: m_tear = gen_read(op1); break;
-			case 0xc: m_ptb[0] = gen_read(op1) & ~0xfffU; break; // TODO: invalidate TLB
-			case 0xd: m_ptb[1] = gen_read(op1) & ~0xfffU; break; // TODO: invalidate TLB
-			case 0xe: gen_read(op1); break; // ivar0
-			case 0xf: gen_read(op1); break; // ivar1
+			case 0xc: m_ptb[0] = gen_read(op1) & ~0xfffU; tlb_flush_as(0); break; // loading PTBn invalidates its address space
+			case 0xd: m_ptb[1] = gen_read(op1) & ~0xfffU; tlb_flush_as(1); break;
+			case 0xe: tlb_invalidate(gen_read(op1), 0); break; // ivar0: purge one page in AS0
+			case 0xf: tlb_invalidate(gen_read(op1), 1); break; // ivar1: purge one page in AS1
 			default:
 				interrupt(UND);
 				break;

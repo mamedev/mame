@@ -51,7 +51,7 @@ static const floppy_interface nes_floppy_interface =
 
 void nes_disksys_device::device_add_mconfig(machine_config &config)
 {
-	LEGACY_FLOPPY(config, m_disk, 0, &nes_floppy_interface);
+	LEGACY_FLOPPY(config, m_disk, &nes_floppy_interface);
 
 	SPEAKER(config, "addon").front_center(); // connected to motherboard
 

@@ -642,7 +642,7 @@ void gstriker_state::base(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gstriker_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &gstriker_state::sound_io_map);
 
-	vs9209_device &io(VS9209(config, "io", 0));
+	vs9209_device &io(VS9209(config, "io"));
 	io.porta_input_cb().set_ioport("P1");
 	io.portb_input_cb().set_ioport("P2");
 	io.portc_input_cb().set_ioport("SYSTEM");
@@ -651,7 +651,7 @@ void gstriker_state::base(machine_config &config)
 	io.porth_input_cb().set("soundlatch", FUNC(generic_latch_8_device::pending_r)).lshift(0);
 	io.porth_output_cb().set("watchdog", FUNC(mb3773_device::write_line_ck)).bit(3);
 
-	MB3773(config, m_watchdog, 0);
+	MB3773(config, m_watchdog);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
@@ -666,15 +666,15 @@ void gstriker_state::base(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gstriker);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x800);
 
-	MB60553(config, m_bg, 0);
+	MB60553(config, m_bg);
 	m_bg->set_gfxdecode_tag(m_gfxdecode);
 	m_bg->set_gfx_region(1);
 
-	VS920A(config, m_tx, 0);
+	VS920A(config, m_tx);
 	m_tx->set_gfxdecode_tag(m_gfxdecode);
 	m_tx->set_gfx_region(0);
 
-	VSYSTEM_SPR(config, m_spr, 0, m_palette, gfx_gstriker_spr);
+	VSYSTEM_SPR(config, m_spr, m_palette, gfx_gstriker_spr);
 	m_spr->set_pri_cb(FUNC(gstriker_state::pri_callback));
 	m_spr->set_pal_mask(0x1f);
 	m_spr->set_transpen(0);
@@ -701,7 +701,7 @@ void gstriker_state::gstriker(machine_config &config)
 
 	base(config);
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->irq_handler().set_inputline(m_maincpu, M68K_IRQ_2);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 
@@ -1292,9 +1292,10 @@ void gstriker_state::init_vgoalsoc()
 
 /*** GAME DRIVERS ************************************************************/
 
-GAME( 1993, gstriker,  0,        gstriker, gstriker, gstriker_state, empty_init, ROT0, "Human", "Grand Striker (Europe, Oceania)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, gstrikera, gstriker, gstriker, gstriker, gstriker_state, empty_init, ROT0, "Human", "Grand Striker (Americas)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, gstrikerj, gstriker, gstriker, gstriker, gstriker_state, empty_init, ROT0, "Human", "Grand Striker (Japan)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+// on flyer, company name is "Human Entertainment" and subtitle is "Human Cup '93"
+GAME( 1993, gstriker,  0,        gstriker, gstriker, gstriker_state, empty_init, ROT0, "Human Amusement", "Grand Striker - Human Cup (Europe, Oceania)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gstrikera, gstriker, gstriker, gstriker, gstriker_state, empty_init, ROT0, "Human Amusement", "Grand Striker - Human Cup (Americas)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gstrikerj, gstriker, gstriker, gstriker, gstriker_state, empty_init, ROT0, "Human Amusement", "Grand Striker - Human Cup (Japan)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Similar, but not identical hardware, appear to be protected by an MCU
 GAME( 1994, vgoalsoc,  0,        vgoal, vgoalsoc, gstriker_state, init_vgoalsoc, ROT0, "Tecmo", "V Goal Soccer (Europe)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/eng/spa/fra

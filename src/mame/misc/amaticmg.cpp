@@ -1053,8 +1053,6 @@ void amaticmg_state::machine_start()
 
 	m_rombank->configure_entries(0, 0x10, &rombank[0x8000], 0x4000);
 
-	m_lamps.resolve();
-
 	save_item(NAME(m_nmi_mask));
 }
 

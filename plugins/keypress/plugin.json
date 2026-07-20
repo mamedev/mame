@@ -1,0 +1,10 @@
+{
+	"plugin": {
+		"name": "keypress",
+		"description": "Display currently pressed keys on screen",
+		"version": "0.0.1",
+		"author": "Andrei I. Holub",
+		"type": "plugin",
+		"start": "false"
+	}
+}

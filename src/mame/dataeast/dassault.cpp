@@ -239,14 +239,14 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_subcpu(*this, "sub")
-		, m_deco_tilegen(*this, "tilegen%u", 1U)
+		, m_tilegen(*this, "tilegen%u", 1U)
 		, m_oki2(*this, "oki2")
 		, m_spriteram(*this, "spriteram%u", 1U)
 		, m_sprgen(*this, "spritegen%u", 1U)
 		, m_palette(*this, "palette")
 		, m_soundlatch(*this, "soundlatch")
-		, m_pf2_rowscroll(*this, "pf2_rowscroll")
-		, m_pf4_rowscroll(*this, "pf4_rowscroll")
+		, m_rowscroll_2(*this, "rowscroll_2")
+		, m_rowscroll_4(*this, "rowscroll_4")
 		, m_input(*this, { "P1_P2", "P3_P4", "DSW1", "DSW2", "SYSTEM" })
 	{ }
 
@@ -263,7 +263,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<h6280_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
-	required_device_array<deco16ic_device, 2> m_deco_tilegen;
+	required_device_array<deco16ic_device, 2> m_tilegen;
 	required_device<okim6295_device> m_oki2;
 	required_device_array<buffered_spriteram16_device, 2> m_spriteram;
 	required_device_array<decospr_device, 2> m_sprgen;
@@ -271,8 +271,8 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	// memory pointers
-	required_shared_ptr<uint16_t> m_pf2_rowscroll;
-	required_shared_ptr<uint16_t> m_pf4_rowscroll;
+	required_shared_ptr<uint16_t> m_rowscroll_2;
+	required_shared_ptr<uint16_t> m_rowscroll_4;
 
 	required_ioport_array<5> m_input;
 
@@ -286,7 +286,7 @@ private:
 	void sound_bankswitch_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void mix_layer(bitmap_rgb32 &bitmap, bitmap_ind16 *sprite_bitmap, const rectangle &cliprect, uint16_t pri, uint16_t primask, uint16_t penbase, uint8_t alpha);
-	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	int bank_callback(int bank);
 	void main_map(address_map &map) ATTR_COLD;
 	void sub_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
@@ -366,7 +366,7 @@ void dassault_state::mix_layer(bitmap_rgb32 &bitmap, bitmap_ind16 *sprite_bitmap
 // but if (for example) you walk to the side of the crates in the first part of the game you appear over them...
 uint32_t dassault_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint16_t const flip = m_deco_tilegen[0]->pf_control_r(0);
+	uint16_t const flip = m_tilegen[0]->control_r(0);
 
 	flip_screen_set(BIT(flip, 7));
 	m_sprgen[0]->set_flip_screen(BIT(flip, 7));
@@ -378,21 +378,21 @@ uint32_t dassault_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	bitmap_ind16 *sprite_bitmap2 = &m_sprgen[1]->get_sprite_temp_bitmap();
 
 	// Update tilemaps
-	m_deco_tilegen[0]->pf_update(nullptr, m_pf2_rowscroll);
-	m_deco_tilegen[1]->pf_update(nullptr, m_pf4_rowscroll);
+	m_tilegen[0]->update(nullptr, m_rowscroll_2);
+	m_tilegen[1]->update(nullptr, m_rowscroll_4);
 
 	// Draw playfields/update priority bitmap
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->pen(3072), cliprect);
-	m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	// The middle playfields can be swapped priority-wise
 	if ((m_priority & 3) == 0)
 	{
 		mix_layer(bitmap, sprite_bitmap1, cliprect, 0x0600, 0x0600, 0x400, 0xff); // 1
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2); // 2
+		m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2); // 2
 		mix_layer(bitmap, sprite_bitmap1, cliprect, 0x0400, 0x0600, 0x400, 0xff); // 8
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 16); // 16
+		m_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 16); // 16
 		mix_layer(bitmap, sprite_bitmap1, cliprect, 0x0200, 0x0600, 0x400, 0xff); // 32
 		mix_layer(bitmap, sprite_bitmap2, cliprect, 0x0000, 0x0000, 0x800, 0x80); // 64?
 		mix_layer(bitmap, sprite_bitmap1, cliprect, 0x0000, 0x0600, 0x400, 0xff); // 128
@@ -401,19 +401,19 @@ uint32_t dassault_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	else if ((m_priority & 3) == 1)
 	{
 		mix_layer(bitmap, sprite_bitmap1, cliprect, 0x0600, 0x0600, 0x400, 0xff); // 1
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2); // 2
+		m_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2); // 2
 		mix_layer(bitmap, sprite_bitmap1, cliprect, 0x0400, 0x0600, 0x400, 0xff); // 8
 		mix_layer(bitmap, sprite_bitmap2, cliprect, 0x0000, 0x0000, 0x800, 0x80); // 16?
 		mix_layer(bitmap, sprite_bitmap1, cliprect, 0x0200, 0x0600, 0x400, 0xff); // 32
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 64); // 64
+		m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 64); // 64
 		mix_layer(bitmap, sprite_bitmap1, cliprect, 0x0000, 0x0600, 0x400, 0xff); // 128
 	}
 	else if ((m_priority & 3) == 3)
 	{
 		mix_layer(bitmap, sprite_bitmap1, cliprect, 0x0600, 0x0600, 0x400, 0xff); // 1
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2); // 2
+		m_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2); // 2
 		mix_layer(bitmap, sprite_bitmap1, cliprect, 0x0400, 0x0600, 0x400, 0xff); // 8
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 16); // 16
+		m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 16); // 16
 		mix_layer(bitmap, sprite_bitmap1, cliprect, 0x0200, 0x0600, 0x400, 0xff); // 32
 		mix_layer(bitmap, sprite_bitmap2, cliprect, 0x0000, 0x0000, 0x800, 0x80); // 64?
 		mix_layer(bitmap, sprite_bitmap1, cliprect, 0x0000, 0x0600, 0x400, 0xff); // 128
@@ -423,7 +423,7 @@ uint32_t dassault_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 		// Unused
 	}
 
-	m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -493,15 +493,15 @@ void dassault_state::main_map(address_map &map)
 	map(0x1c000c, 0x1c000d).w(m_spriteram[1], FUNC(buffered_spriteram16_device::write));
 	map(0x1c000e, 0x1c000f).w(FUNC(dassault_state::control_w));
 
-	map(0x200000, 0x201fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x202000, 0x203fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x212000, 0x212fff).writeonly().share(m_pf2_rowscroll);
-	map(0x220000, 0x22000f).w(m_deco_tilegen[0], FUNC(deco16ic_device::pf_control_w));
+	map(0x200000, 0x201fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x202000, 0x203fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x212000, 0x212fff).writeonly().share(m_rowscroll_2);
+	map(0x220000, 0x22000f).w(m_tilegen[0], FUNC(deco16ic_device::control_w));
 
-	map(0x240000, 0x240fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x242000, 0x242fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x252000, 0x252fff).writeonly().share(m_pf4_rowscroll);
-	map(0x260000, 0x26000f).w(m_deco_tilegen[1], FUNC(deco16ic_device::pf_control_w));
+	map(0x240000, 0x240fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x242000, 0x242fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x252000, 0x252fff).writeonly().share(m_rowscroll_4);
+	map(0x260000, 0x26000f).w(m_tilegen[1], FUNC(deco16ic_device::control_w));
 
 	map(0x3f8000, 0x3fbfff).ram(); // Main RAM
 	map(0x3fc000, 0x3fcfff).ram().share("spriteram2");
@@ -719,9 +719,9 @@ void dassault_state::sound_bankswitch_w(uint8_t data)
 	m_oki2->set_rom_bank(data & 1);
 }
 
-DECO16IC_BANK_CB_MEMBER(dassault_state::bank_callback)
+int dassault_state::bank_callback(int bank)
 {
-	return ((bank >> 4) & 0xf) << 12;
+	return (bank & 0xf0) << 8;
 }
 
 void dassault_state::machine_reset()
@@ -762,34 +762,34 @@ void dassault_state::dassault(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 	BUFFERED_SPRITERAM16(config, m_spriteram[1]);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
-	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_col_bank(0);
-	m_deco_tilegen[0]->set_pf2_col_bank(16);
-	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(dassault_state::bank_callback));
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(dassault_state::bank_callback));
-	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
-	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
+	DECO16IC(config, m_tilegen[0]);
+	m_tilegen[0]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_col_bank<0>(0);
+	m_tilegen[0]->set_col_bank<1>(16);
+	m_tilegen[0]->set_col_mask<0>(0x0f);
+	m_tilegen[0]->set_col_mask<1>(0x0f);
+	m_tilegen[0]->set_bank_callback<0>(FUNC(dassault_state::bank_callback));
+	m_tilegen[0]->set_bank_callback<1>(FUNC(dassault_state::bank_callback));
+	m_tilegen[0]->set_8x8_bank(0);
+	m_tilegen[0]->set_16x16_bank(1);
+	m_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	DECO16IC(config, m_deco_tilegen[1], 0);
-	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_col_bank(0);
-	m_deco_tilegen[1]->set_pf2_col_bank(16);
-	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(dassault_state::bank_callback));
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(dassault_state::bank_callback));
-	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
-	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
+	DECO16IC(config, m_tilegen[1]);
+	m_tilegen[1]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_col_bank<0>(0);
+	m_tilegen[1]->set_col_bank<1>(16);
+	m_tilegen[1]->set_col_mask<0>(0x0f);
+	m_tilegen[1]->set_col_mask<1>(0x0f);
+	m_tilegen[1]->set_bank_callback<0>(FUNC(dassault_state::bank_callback));
+	m_tilegen[1]->set_bank_callback<1>(FUNC(dassault_state::bank_callback));
+	m_tilegen[1]->set_8x8_bank(0);
+	m_tilegen[1]->set_16x16_bank(2);
+	m_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen[0], 0, m_palette, gfx_dassault_spr1);
-	DECO_SPRITE(config, m_sprgen[1], 0, m_palette, gfx_dassault_spr2);
+	DECO_SPRITE(config, m_sprgen[0], m_palette, gfx_dassault_spr1);
+	DECO_SPRITE(config, m_sprgen[1], m_palette, gfx_dassault_spr2);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();

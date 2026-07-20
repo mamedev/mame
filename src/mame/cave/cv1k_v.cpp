@@ -8,6 +8,8 @@
 
 #include "screen.h"
 
+#include "endianness.h"
+
 #define LOG_DEBUG     (1U << 1)
 #define LOG_GFX       (1U << 2)
 #define LOG_FIRMWARE  (1U << 3)

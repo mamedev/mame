@@ -84,6 +84,7 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/fsmgr.cpp",
 		MAME_DIR .. "src/lib/formats/fsblk.h",
 		MAME_DIR .. "src/lib/formats/fsblk.cpp",
+		MAME_DIR .. "src/lib/formats/fsblk_multi.h",
 		MAME_DIR .. "src/lib/formats/fsblk_vec.h",
 		MAME_DIR .. "src/lib/formats/fsblk_vec.cpp",
 		MAME_DIR .. "src/lib/formats/fs_unformatted.h",
@@ -1616,19 +1617,6 @@ if opt_tool(FORMATS, "P2000T_CAS") then
 	}
 end
 
-
---------------------------------------------------
---
---@src/lib/formats/p6001_cas.h,FORMATS["P6001_CAS"] = true
---------------------------------------------------
-
-if opt_tool(FORMATS, "P6001_CAS") then
-	files {
-		MAME_DIR.. "src/lib/formats/p6001_cas.cpp",
-		MAME_DIR.. "src/lib/formats/p6001_cas.h",
-	}
-end
-
 --------------------------------------------------
 --
 --@src/lib/formats/pasti_dsk.h,FORMATS["PASTI_DSK"] = true
@@ -1823,6 +1811,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/s900_dsk.h,FORMATS["S900_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "S900_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/s900_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/s900_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/sap_dsk.h,FORMATS["SAP_DSK"] = true
 --------------------------------------------------
 
@@ -1842,6 +1842,18 @@ if opt_tool(FORMATS, "SC3000_BIT") then
 	files {
 		MAME_DIR.. "src/lib/formats/sc3000_bit.cpp",
 		MAME_DIR.. "src/lib/formats/sc3000_bit.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/scl_dsk.h,FORMATS["SCL_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "SCL_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/scl_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/scl_dsk.h",
 	}
 end
 
@@ -2430,6 +2442,18 @@ if opt_tool(FORMATS, "FS_HP98X5") then
 	files {
 		MAME_DIR.. "src/lib/formats/fs_hp98x5.cpp",
 		MAME_DIR.. "src/lib/formats/fs_hp98x5.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/fs_adam_eos.h,FORMATS["FS_ADAM_EOS"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FS_ADAM_EOS") then
+	files {
+		MAME_DIR.. "src/lib/formats/fs_adam_eos.cpp",
+		MAME_DIR.. "src/lib/formats/fs_adam_eos.h",
 	}
 end
 

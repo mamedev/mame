@@ -13,7 +13,7 @@ class sega_315_6154_device : public pci_host_device
 {
 public:
 	// construction/destruction
-	sega_315_6154_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_315_6154_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto irq1_callback() { return irq1_cb.bind(); }
 

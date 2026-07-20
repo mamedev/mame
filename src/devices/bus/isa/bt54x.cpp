@@ -69,7 +69,7 @@ void bt54x_device::local_map(address_map &map)
 
 void bt54x_device::fsc_base(machine_config &config)
 {
-	//ncr86c05_device &busintf(NCR86C05(config, "busintf", 0));
+	//ncr86c05_device &busintf(NCR86C05(config, "busintf"));
 	//busintf.mint_callback().set(m_mpu, FUNC(i80188_cpu_device::int1_w));
 	//busintf.dma_ack_callback().set("scsic", FUNC(ncr53cf94_device::dma_w));
 
@@ -92,7 +92,7 @@ void bt542b_device::device_add_mconfig(machine_config &config)
 	I80188(config, m_mpu, 16_MHz_XTAL);
 	m_mpu->set_addrmap(AS_PROGRAM, &bt542b_device::local_map);
 
-	//ncr86c05_device &busintf(NCR86C05(config, "busintf", 0));
+	//ncr86c05_device &busintf(NCR86C05(config, "busintf"));
 	//busintf.mint_callback().set(m_mpu, FUNC(i80188_cpu_device::int1_w));
 	//busintf.dma_ack_callback().set("scsic", FUNC(ncr53c94_device::dma_w));
 

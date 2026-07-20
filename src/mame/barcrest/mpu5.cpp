@@ -422,7 +422,6 @@ INPUT_PORTS_END
 
 void mpu5_state::machine_start()
 {
-	m_statuslamp.resolve();
 	m_cpuregion = &memregion("maincpu")->as_u16();
 	m_mainram = make_unique_clear<uint16_t []>(0x20000);
 	m_pic_output_bit = 0;

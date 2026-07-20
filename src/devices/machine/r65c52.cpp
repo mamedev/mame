@@ -77,8 +77,8 @@ const int r65c52_device::internal_divider[16] =
 
 void r65c52_device::device_add_mconfig(machine_config &config)
 {
-	CLOCK(config, m_internal_clock1, 0);
-	CLOCK(config, m_internal_clock2, 0);
+	CLOCK(config, m_internal_clock1);
+	CLOCK(config, m_internal_clock2);
 	m_internal_clock1->signal_handler().set(FUNC(r65c52_device::internal_clock1));
 	m_internal_clock2->signal_handler().set(FUNC(r65c52_device::internal_clock2));
 }

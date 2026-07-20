@@ -490,7 +490,7 @@ void b16_state::b16(machine_config &config)
 	m_intm->in_sp_callback().set_constant(1);
 	m_intm->read_slave_ack_callback().set(m_ints, FUNC(pic8259_device::acknowledge));
 
-	PIC8259(config, m_ints, 0);
+	PIC8259(config, m_ints);
 	m_ints->out_int_callback().set(m_intm, FUNC(pic8259_device::ir6_w));
 	m_ints->in_sp_callback().set_constant(0);
 

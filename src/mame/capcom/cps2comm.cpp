@@ -92,6 +92,7 @@
 #include <locale>
 #include <optional>
 #include <sstream>
+#include <system_error>
 #include <thread>
 #include <utility>
 
@@ -142,6 +143,8 @@ public:
 		if (m_remote)
 		{
 			m_in_sock.open(m_remote->protocol(), err);
+			if (!err)
+				m_in_sock.set_option(asio::ip::tcp::no_delay(true), err);
 			if (err)
 				return err;
 		}
@@ -346,8 +349,10 @@ private:
 	{
 		LOG("Accepting OUT port connection on %s\n", *m_local);
 		m_acceptor.async_accept(
-				[this] (std::error_code const &err, asio::ip::tcp::socket sock)
+				[this] (std::error_code err, asio::ip::tcp::socket sock)
 				{
+					if (!err)
+						sock.set_option(asio::ip::tcp::no_delay(true), err);
 					if (err)
 					{
 						LOG("Error accepting OUT port connection: %s\n", err.message());
@@ -411,6 +416,8 @@ private:
 					{
 						std::error_code e;
 						m_in_sock.open(m_remote->protocol(), e);
+						if (!e)
+							m_in_sock.set_option(asio::ip::tcp::no_delay(true), e);
 						if (e)
 						{
 							LOG("Error opening IN port socket: %s\n", e.message());
@@ -563,6 +570,11 @@ DEFINE_DEVICE_TYPE(CAPCOM_CPS2_COMM, cps2_comm_device, "cps2comm", "Capcom CPS-2
 cps2_comm_device::cps2_comm_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, CAPCOM_CPS2_COMM, tag, owner, clock),
 	m_config(*this, "CFG")
+{
+}
+
+
+cps2_comm_device::~cps2_comm_device()
 {
 }
 

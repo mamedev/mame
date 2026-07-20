@@ -417,31 +417,12 @@ uint32_t pitnrun_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	int dx = 0, dy = 0;
 	rectangle myclip = cliprect;
 
-#ifdef MAME_DEBUG
-	if (machine().input().code_pressed_once(KEYCODE_Q))
-	{
-		uint8_t *ROM = memregion("maincpu")->base();
-		ROM[0x84f6] = 0; // lap 0 - normal
-	}
-
-	if (machine().input().code_pressed_once(KEYCODE_W))
-	{
-		uint8_t *ROM = memregion("maincpu")->base();
-		ROM[0x84f6] = 6; // lap 6 = spotlight
-	}
-
-	if (machine().input().code_pressed_once(KEYCODE_E))
-	{
-		uint8_t *ROM = memregion("maincpu")->base();
-		ROM[0x84f6] = 2; // lap 3 (trial 2)= lightnings
-		ROM[0x8102] = 1;
-	}
-#endif
-
 	bitmap.fill(0, cliprect);
 
 	if (!(m_ha & 4))
+	{
 		m_bg->draw(screen, bitmap, cliprect, 0, 0);
+	}
 	else
 	{
 		dx = 128 - m_h_heed + ((m_ha & 8) << 5) + 3;
@@ -1040,7 +1021,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1984, pitnrun,  0,       pitnrun_mcu, pitnrun, pitnrun_mcu_state, empty_init, ROT90, "Taito Corporation", "Pit & Run - F-1 Race (rev 1)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, pitnruna, pitnrun, pitnrun_mcu, pitnrun, pitnrun_mcu_state, empty_init, ROT90, "Taito Corporation", "Pit & Run - F-1 Race",                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, pitnrunb, pitnrun, pitnrun_mcu, pitnrun, pitnrun_mcu_state, empty_init, ROT90, "Taito Corporation", "Pit & Run - F-1 Race (location test?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, jumpkun,  0,       pitnrun,     jumpkun, pitnrun_state,     empty_init, ROT90, "Kaneko",            "Jump Kun (prototype)",                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // no copyright message
+GAME( 1984, pitnrun,  0,       pitnrun_mcu, pitnrun, pitnrun_mcu_state, empty_init, ROT90, "Taito",  "Pit & Run - F-1 Race (rev 1)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pitnruna, pitnrun, pitnrun_mcu, pitnrun, pitnrun_mcu_state, empty_init, ROT90, "Taito",  "Pit & Run - F-1 Race",                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pitnrunb, pitnrun, pitnrun_mcu, pitnrun, pitnrun_mcu_state, empty_init, ROT90, "Taito",  "Pit & Run - F-1 Race (location test?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, jumpkun,  0,       pitnrun,     jumpkun, pitnrun_state,     empty_init, ROT90, "Kaneko", "Jump Kun (prototype)",                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // no copyright message

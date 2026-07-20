@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "awpvid.h" // Fruit Machines Only
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/mcs51/i80c51.h"
@@ -41,7 +40,7 @@ public:
 		m_sw2_port(*this, "SW2"),
 		m_kbd_ports(*this, { "SW1", "SW2", "STROBE2", "STROBE3", "STROBE4", "STROBE5", "STROBE6", "STROBE7", }),
 		m_bank1(*this, "bank1"),
-		m_reels(*this, "reel%u", 0U),
+		m_reels(*this, "reel%u", 1U),
 		m_meters(*this, "meters"),
 		m_oki_region(*this, "msm6376"),
 		m_lamps(*this, "lamp%u", 0U),
@@ -49,14 +48,14 @@ public:
 	{
 	}
 
-	void maygay_m1_no_oki(machine_config &config);
-	void maygay_m1(machine_config &config);
-	void maygay_m1_nec(machine_config &config);
-	void maygay_m1_empire(machine_config &config);
+	void maygay_m1_no_oki(machine_config &config) ATTR_COLD;
+	void maygay_m1(machine_config &config) ATTR_COLD;
+	void maygay_m1_nec(machine_config &config) ATTR_COLD;
+	void maygay_m1_empire(machine_config &config) ATTR_COLD;
 
-	void init_m1();
-	void init_m1common();
-	void init_m1nec();
+	void init_m1() ATTR_COLD;
+	void init_m1common() ATTR_COLD;
+	void init_m1nec() ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;

@@ -14,6 +14,8 @@
 
 #include "screen.h"
 
+#include "corefloat.h"
+
 /* constant definitions */
 #define VISIBLE_SCREEN_WIDTH         (32*8) /* Visible screen width */
 
@@ -175,7 +177,7 @@ void ppu_vt03_device::init_vt03_palette_tables(int palmode)
 
 			float fLuma = (nLuma - 4) / 9.625;     // Value determined from matching saturation =0 phases 1-12
 			float fChroma = nChroma / 18.975;      // Value determined from matching phases 0 and 13 across all luminance and saturation levels
-			const float fPhase = ((nPhase - 2) * 30.0 + phaseOffset) * M_PI / 180.0;
+			const float fPhase = DEGREE_TO_RADIAN((nPhase - 2) * 30.0 + phaseOffset);
 
 			if (palmode == 1)
 			{
@@ -247,6 +249,7 @@ void ppu_vt03_device::device_start()
 	save_item(NAME(m_newvid_1d));
 	save_item(NAME(m_newvid_1e));
 	save_item(NAME(m_tilebases_2x));
+	save_item(NAME(m_vt369_dma_vram_target));
 }
 
 void ppu_vt03_device::device_reset()
@@ -279,7 +282,10 @@ void ppu_vt03_device::device_reset()
 
 	for (int i = 0; i < 4; i++)
 		m_tilebases_2x[i] = 0x00;
+
+	m_vt369_dma_vram_target = 0;
 }
+
 
 u8 ppu_vt03_device::get_m_read_bg4_bg3()
 {
@@ -683,6 +689,9 @@ void ppu_vt3xx_device::device_start()
 
 	save_item(NAME(m_204x_screenregs));
 	save_item(NAME(m_2008_spritehigh));
+	save_item(NAME(m_201f_ext));
+	save_item(NAME(m_2024_lightgun1_y));
+	save_item(NAME(m_2050_lcdc));
 }
 
 void ppu_vt3xx_device::device_reset()
@@ -693,11 +702,15 @@ void ppu_vt3xx_device::device_reset()
 		m_204x_screenregs[i] = 0x00;
 
 	m_2008_spritehigh = 0;
+	m_201f_ext = 0;
+	m_2024_lightgun1_y = 0;
+	m_2050_lcdc = 0;
 }
 
 u8 ppu_vt3xx_device::extvidreg_201c_r(offs_t offset) { return m_newvid_1c; }
 u8 ppu_vt3xx_device::extvidreg_201d_r(offs_t offset) { return m_newvid_1d; }
 u8 ppu_vt3xx_device::extvidreg_201e_r(offs_t offset) { return m_newvid_1e; }
+u8 ppu_vt3xx_device::lightgun1_y_2024_r() { return m_2024_lightgun1_y; }
 u8 ppu_vt3xx_device::tilebases_202x_r(offs_t offset) { return m_tilebases_2x[offset]; }
 
 void ppu_vt3xx_device::extvidreg_201c_w(offs_t offset, u8 data) { m_newvid_1c = data; logerror("%s: extvidreg_201c_w %02x\n", machine().describe_context(), data); }
@@ -712,6 +725,16 @@ void ppu_vt3xx_device::extvidreg_201e_w(offs_t offset, u8 data)
 	*/
 	m_newvid_1e = data;
 	logerror("%s: extvidreg_201e_w %02x\n", machine().describe_context(), data);
+}
+
+void ppu_vt3xx_device::extvidreg_201f_w(u8 data)
+{
+	m_201f_ext = data;
+}
+
+void ppu_vt3xx_device::lightgun1_y_2024_w(u8 data)
+{
+	m_2024_lightgun1_y = data;
 }
 
 void ppu_vt3xx_device::tilebases_202x_w(offs_t offset, u8 data)
@@ -755,6 +778,8 @@ void ppu_vt3xx_device::lcdc_regs_w(offs_t offset, u8 data)
 
 		// lxcypkdp uses this on the menus, they must rotate the rendering somehow as this is vertical and the games are horizontal!
 		{ 0, 127, 0, 159, { 0x80, 0xfe, 0x00, 0x50, 0xff, 0x04, 0x00, 0xa8, 0x04, 0x00 }, },
+
+		{ 0, 255, 0, 239, { 0x40, 0xa1, 0x00, 0x78, 0xff, 0x04, 0x0a, 0xd8, 0x0a, 0x00 }, }, // 36pcase language selector
 
 		// configurations used for 'regular' output
 		{ 0, 255, 0, 239, { 0xa0, 0x57, 0x09, 0x40, 0x93, 0x04, 0x00, 0x83, 0x08, 0x00 }, }, // full mode for the 0, 159, 0, 127 config
@@ -806,6 +831,33 @@ void ppu_vt3xx_device::lcdc_regs_w(offs_t offset, u8 data)
 	}
 }
 
+void ppu_vt3xx_device::lcdc_2050_w(u8 data)
+{
+	m_2050_lcdc = data;
+}
+
+void ppu_vt3xx_device::write(offs_t offset, u8 data)
+{
+	if (((offset & 7) == PPU_ADDRESS) && (m_newvid_1c == 0x12) && (m_newvid_1d == 0x09) && (m_newvid_1e == 0x0f))
+	{
+		if (m_toggle)
+			m_vt369_dma_vram_target = (m_vt369_dma_vram_target & 0xff00) | data;
+		else
+			m_vt369_dma_vram_target = (m_vt369_dma_vram_target & 0x00ff) | ((data & (m_videoram_addr_mask >> 8)) << 8);
+	}
+
+	const bool was_rendering = (m_regs[PPU_CONTROL1] & (PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES)) != 0;
+
+	ppu_vt03_device::write(offset, data);
+
+	if (((offset & 7) == PPU_CONTROL1) && (m_newvid_1c == 0x12) && (m_newvid_1d == 0x09) && (m_newvid_1e == 0x0f))
+	{
+		const bool is_rendering = (m_regs[PPU_CONTROL1] & (PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES)) != 0;
+		if (!was_rendering && is_rendering)
+			reload_refresh_data();
+	}
+}
+
 // vt3xx tile modes are no longer planar, but the tile code provides ROM offsets that
 // would be, this converts them to offsets that give us the data we want.
 offs_t ppu_vt3xx_device::recalculate_offsets_8x8x4packed_tile(int address, int va34)
@@ -826,7 +878,7 @@ offs_t ppu_vt3xx_device::recalculate_offsets_8x8x8packed_tile(int address, int v
 	int colorbits = get_m_read_bg4_bg3();
 	int tileline = address & 0x0007;
 	int tileplane = address & 0x0008;
-	int tilenum = address & 0x0ff0;
+	int tilenum = address & (((m_newvid_1c == 0x12) && (m_newvid_1d == 0x09) && (m_newvid_1e == 0x0f)) ? 0xfff0 : 0x0ff0);
 	int finaloffset = (tilenum << 2) | (tileline << 3) | (tileplane >> 1) | va34;
 	finaloffset += colorbits * 0x4000;
 	return finaladdr + finaloffset;
@@ -882,14 +934,18 @@ void ppu_vt3xx_device::read_tile_plane_data(int address, int color)
 		{
 			if ((m_newvid_1c & 0x03) == 0x02)
 			{
-				m_planebuf[0] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 0));
-				m_planebuf[1] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 0));
-				m_planebuf[2] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 1));
-				m_planebuf[3] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 1));
-				m_planebuf[4] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 2));
-				m_planebuf[5] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 2));
-				m_planebuf[6] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 3));
-				m_planebuf[7] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 3));
+				const bool is_vt369_8bpp_wide_tile = (m_newvid_1c == 0x12) && (m_newvid_1d == 0x09) && (m_newvid_1e == 0x0f);
+				const int address0 = is_vt369_8bpp_wide_tile ? (address + 0) : ((address + 0) & 0x1fff);
+				const int address8 = is_vt369_8bpp_wide_tile ? (address + 8) : ((address + 8) & 0x1fff);
+
+				m_planebuf[0] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile(address0, 0));
+				m_planebuf[1] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile(address8, 0));
+				m_planebuf[2] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile(address0, 1));
+				m_planebuf[3] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile(address8, 1));
+				m_planebuf[4] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile(address0, 2));
+				m_planebuf[5] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile(address8, 2));
+				m_planebuf[6] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile(address0, 3));
+				m_planebuf[7] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile(address8, 3));
 			}
 			else
 			{
@@ -930,6 +986,86 @@ void ppu_vt3xx_device::shift_tile_plane_data(u8 &pix)
 			}
 		}
 		m_whichpixel++;
+	}
+}
+
+void ppu_vt3xx_device::draw_background(u8 *line_priority)
+{
+	const bool is_vt369_64_byte_names = (m_newvid_1c == 0x12) && (m_newvid_1d == 0x09) && (m_newvid_1e == 0x0f)
+			&& BIT(m_tilebases_2x[0], 4) && (m_tilebases_2x[2] == 0x08);
+
+	if (!is_vt369_64_byte_names)
+	{
+		ppu_vt03_device::draw_background(line_priority);
+		return;
+	}
+
+	const u8 scroll_x_coarse = m_refresh_data & 0x001f;
+	const u8 scroll_y_coarse = (m_refresh_data & 0x03e0) >> 5;
+	const u16 nametable = m_refresh_data & 0x0c00;
+	const u8 scroll_y_fine = (m_refresh_data & 0x7000) >> 12;
+
+	int x = scroll_x_coarse;
+	const u8 source_y_coarse = (scroll_y_coarse + (BIT(nametable, 11) ? 30 : 0)) & 0x1f;
+	const u8 source_y_fine = scroll_y_fine;
+
+	int tile_index = 0x2000 + source_y_coarse * 64;
+
+	int start_x = (m_x_fine ^ 0x07) - 7;
+	u32 *dest = &m_bitmap.pix(m_scanline, start_x);
+
+	m_tilecount = 0;
+
+	while (m_tilecount < 34)
+	{
+		const int index1 = tile_index + x * 2;
+		const int page2 = readbyte(index1) | (readbyte(index1 + 1) << 8);
+		const int color = 0;
+
+		if (!m_latch.isnull())
+			m_latch((m_tile_page << 10) | (page2 << 4));
+
+		if (start_x < VISIBLE_SCREEN_WIDTH)
+		{
+			const int address = (m_tile_page ? 0x1000 : 0) + (page2 * 16) + source_y_fine;
+			read_tile_plane_data(address, color);
+
+			for (int i = 0; i < 8; i++)
+			{
+				u8 pix;
+				shift_tile_plane_data(pix);
+
+				if ((start_x + i) >= 0 && (start_x + i) < VISIBLE_SCREEN_WIDTH)
+				{
+					draw_tile_pixel(pix, color, m_back_color, dest);
+
+					if (pix)
+						line_priority[start_x + i] |= 0x02;
+				}
+				dest++;
+			}
+
+			start_x += 8;
+
+			x++;
+			if (x > 31)
+			{
+				x = 0;
+			}
+		}
+		m_tilecount++;
+	}
+
+	if (!(m_regs[PPU_CONTROL1] & PPU_CONTROL1_BACKGROUND_L8))
+	{
+		dest = &m_bitmap.pix(m_scanline);
+		for (int i = 0; i < 8; i++)
+		{
+			draw_back_pen(dest, m_back_color);
+			dest++;
+
+			line_priority[i] ^= 0x02;
+		}
 	}
 }
 
@@ -1264,7 +1400,6 @@ void ppu_vt3xx_device::draw_sprites_standard_res(u8 *line_priority)
 				if (xpos + pixel >= 0)
 					draw_extended_sprite_pixel_high(m_bitmap, pixel_data, pixel, xpos, pal, bpp, line_priority);
 			}
-
 		}
 	}
 }

@@ -48,13 +48,13 @@ public:
 
 	// configuration helpers
 	template <typename T, typename U, typename Ret, typename... Params>
-	std::enable_if_t<is_related_device<T, U>::value> set_addrmap(int spacenum, T &obj, Ret (U::*func)(Params...)) { set_addrmap(spacenum, address_map_constructor(func, obj.tag(), &downcast<U &>(obj))); }
+	void set_addrmap(int spacenum, T &obj, Ret (U::*func)(Params...)) requires is_related_device<T, U>::value { set_addrmap(spacenum, address_map_constructor(func, obj.tag(), &downcast<U &>(obj))); }
 	template <typename T, typename U, typename Ret, typename... Params>
-	std::enable_if_t<is_related_interface<T, U>::value> set_addrmap(int spacenum, T &obj, Ret (U::*func)(Params...)) { set_addrmap(spacenum, address_map_constructor(func, obj.device().tag(), &downcast<U &>(obj))); }
+	void set_addrmap(int spacenum, T &obj, Ret (U::*func)(Params...)) requires is_related_interface<T, U>::value { set_addrmap(spacenum, address_map_constructor(func, obj.device().tag(), &downcast<U &>(obj))); }
 	template <typename T, typename U, typename Ret, typename... Params>
-	std::enable_if_t<is_unrelated_device<T, U>::value> set_addrmap(int spacenum, T &obj, Ret (U::*func)(Params...)) { set_addrmap(spacenum, address_map_constructor(func, obj.tag(), &dynamic_cast<U &>(obj))); }
+	void set_addrmap(int spacenum, T &obj, Ret (U::*func)(Params...)) requires is_unrelated_device<T, U>::value { set_addrmap(spacenum, address_map_constructor(func, obj.tag(), &dynamic_cast<U &>(obj))); }
 	template <typename T, typename U, typename Ret, typename... Params>
-	std::enable_if_t<is_unrelated_interface<T, U>::value> set_addrmap(int spacenum, T &obj, Ret (U::*func)(Params...)) { set_addrmap(spacenum, address_map_constructor(func, obj.device().tag(), &dynamic_cast<U &>(obj))); }
+	void set_addrmap(int spacenum, T &obj, Ret (U::*func)(Params...)) requires is_unrelated_interface<T, U>::value { set_addrmap(spacenum, address_map_constructor(func, obj.device().tag(), &dynamic_cast<U &>(obj))); }
 	template <typename T, typename Ret, typename... Params>
 	void set_addrmap(int spacenum, Ret (T::*func)(Params...));
 	void set_addrmap(int spacenum, address_map_constructor map);

@@ -75,7 +75,6 @@
 #include "pmutil.h"
 #include "pminternal.h"
 #include "porttime.h"
-#include "pmmac.h"
 #include "pmmacosxcm.h"
 
 #include <stdio.h>
@@ -182,8 +181,9 @@
 #define MIDI_CLOCK       0xf8
 #define MIDI_STATUS_MASK 0x80
 
-// "Ref"s are pointers on 32-bit machines and ints on 64 bit machines
-// NULL_REF is our representation of either 0 or NULL
+/* "Ref"s are pointers on 32-bit machines and ints on 64 bit machines
+   NULL_REF is our representation of either 0 or NULL
+*/
 #ifdef __LP64__
 #define NULL_REF 0
 #else
@@ -212,8 +212,6 @@ typedef struct coremidi_info_struct {
     Byte sysex_buffer[SYSEX_BUFFER_SIZE]; /* temp storage for sysex data */
     MIDITimeStamp sysex_timestamp; /* host timestamp to use with sysex data */
     /* allow for running status (is running status possible here? -rbd): -cpr */
-    unsigned char last_command; 
-    int32_t last_msg_length;
     UInt64 min_next_time; /* when can the next send take place? (host time) */
     int isIACdevice;
     Float64 us_per_host_tick; /* host clock frequency, units of min_next_time */
@@ -221,15 +219,15 @@ typedef struct coremidi_info_struct {
 } coremidi_info_node, *coremidi_info_type;
 
 /* private function declarations */
-MIDITimeStamp timestamp_pm_to_cm(PmTimestamp timestamp);  // returns host time
-PmTimestamp timestamp_cm_to_pm(MIDITimeStamp timestamp);  // returns ms
+MIDITimeStamp timestamp_pm_to_cm(PmTimestamp timestamp); /* returns host time */
+PmTimestamp timestamp_cm_to_pm(MIDITimeStamp timestamp); /* returns ms */
 
-char* cm_get_full_endpoint_name(MIDIEndpointRef endpoint, int *isIAC);
+char* cm_get_full_endpoint_name(MIDIEndpointRef endpoint, int *iac_flag);
 
 static PmError check_hosterror(OSStatus err, const char *msg)
 {
     if (err != noErr) {
-        sprintf(pm_hosterror_text, "Host error %ld: %s", (long) err, msg);
+        snprintf(pm_hosterror_text, PM_HOST_ERROR_MSG_LEN, "Host error %ld: %s", (long) err, msg);
         pm_hosterror = TRUE;
         return pmHostError;
     }
@@ -237,32 +235,13 @@ static PmError check_hosterror(OSStatus err, const char *msg)
 }
 
 
-static int midi_length(int32_t msg)
-{
-    int status, high, low;
-    static int high_lengths[] = {
-        1, 1, 1, 1, 1, 1, 1, 1,         /* 0x00 through 0x70 */
-        3, 3, 3, 3, 2, 2, 3, 1          /* 0x80 through 0xf0 */
-    };
-    static int low_lengths[] = {
-        1, 2, 3, 2, 1, 1, 1, 1,         /* 0xf0 through 0xf8 */
-        1, 1, 1, 1, 1, 1, 1, 1          /* 0xf9 through 0xff */
-    };
-
-    status = msg & 0xFF;
-    high = status >> 4;
-    low = status & 15;
-
-    return (high != 0xF) ? high_lengths[high] : low_lengths[low];
-}
-
 static PmTimestamp midi_synchronize(PmInternal *midi)
 {
     coremidi_info_type info = (coremidi_info_type) midi->api_info;
-    UInt64 pm_stream_time_2 = // current time in ns
+    UInt64 pm_stream_time_2 = /* current time in ns */
             AudioConvertHostTimeToNanos(AudioGetCurrentHostTime());
-    PmTimestamp real_time;  // in ms
-    UInt64 pm_stream_time;  // in ns
+    PmTimestamp real_time;  /* in ms */
+    UInt64 pm_stream_time;  /* in ns */
     /* if latency is zero and this is an output, there is no 
        time reference and midi_synchronize should never be called */
     assert(midi->time_proc);
@@ -281,110 +260,13 @@ static PmTimestamp midi_synchronize(PmInternal *midi)
 }
 
 
-static void process_packet(MIDIPacket *packet, PmEvent *event, 
-                           PmInternal *midi, coremidi_info_type info)
-{
-    /* handle a packet of MIDI messages from CoreMIDI */
-    /* there may be multiple short messages in one packet (!) */
-    unsigned int remaining_length = packet->length;
-    unsigned char *cur_packet_data = packet->data;
-    while (remaining_length > 0) {
-        if (cur_packet_data[0] == MIDI_SYSEX ||
-            /* are we in the middle of a sysex message? */
-            (info->last_command == 0 &&
-             !(cur_packet_data[0] & MIDI_STATUS_MASK))) {
-            info->last_command = 0; /* no running status */
-            unsigned int amt = pm_read_bytes(midi, cur_packet_data, 
-                                             remaining_length, 
-                                             event->timestamp);
-            remaining_length -= amt;
-            cur_packet_data += amt;
-        } else if (cur_packet_data[0] == MIDI_EOX) {
-            /* this should never happen, because pm_read_bytes should
-             * get and read all EOX bytes*/
-            midi->sysex_in_progress = FALSE;
-            info->last_command = 0;
-        } else if (cur_packet_data[0] & MIDI_STATUS_MASK) {
-            /* compute the length of the next (short) msg in packet */
-	    unsigned int cur_message_length = midi_length(cur_packet_data[0]);
-            if (cur_message_length > remaining_length) {
-#ifdef DEBUG
-                printf("PortMidi debug msg: not enough data");
-#endif
-		/* since there's no more data, we're done */
-		return;
-	    }
-            if (cur_packet_data[0] < MIDI_SYSEX) {
-                /* channel messages set running status */
-                info->last_command = cur_packet_data[0];
-                info->last_msg_length = cur_message_length;
-            } else if (cur_packet_data[0] < MIDI_CLOCK) {
-                /* system messages clear running status */
-                info->last_command = 0;
-                info->last_msg_length = 0;
-            }
-	    switch (cur_message_length) {
-	    case 1:
-	        event->message = Pm_Message(cur_packet_data[0], 0, 0);
-		break; 
-	    case 2:
-	        event->message = Pm_Message(cur_packet_data[0], 
-					    cur_packet_data[1], 0);
-		break;
-	    case 3:
-	        event->message = Pm_Message(cur_packet_data[0],
-					    cur_packet_data[1], 
-					    cur_packet_data[2]);
-		break;
-	    default:
-                /* PortMIDI internal error; should never happen */
-                assert(cur_message_length == 1);
-	        return; /* give up on packet if continued after assert */
-	    }
-	    pm_read_short(midi, event);
-	    remaining_length -= cur_message_length;
-	    cur_packet_data += cur_message_length;
-	} else if (info->last_msg_length > remaining_length + 1) {
-	    /* we have running status, but not enough data */
-#ifdef DEBUG
-	    printf("PortMidi debug msg: not enough data in CoreMIDI packet");
-#endif
-	    /* since there's no more data, we're done */
-	    return;
-	} else { /* output message using running status */
-	    switch (info->last_msg_length) {
-	    case 1:
-	        event->message = Pm_Message(info->last_command, 0, 0);
-		break;
-	    case 2:
-	        event->message = Pm_Message(info->last_command,
-					    cur_packet_data[0], 0);
-		break;
-	    case 3:
-	        event->message = Pm_Message(info->last_command,
-					    cur_packet_data[0], 
-					    cur_packet_data[1]);
-		break;
-	    default:
-	        /* last_msg_length is invalid -- internal PortMIDI error */
-	        assert(info->last_msg_length == 1);
-	    }
-	    pm_read_short(midi, event);
-	    remaining_length -= (info->last_msg_length - 1);
-	    cur_packet_data += (info->last_msg_length - 1);
-	}
-    }
-}
-
-
 /* called when MIDI packets are received */
 static void read_callback(const MIDIPacketList *newPackets, PmInternal *midi)
 {
-    PmEvent event;
+    PmTimestamp timestamp;
     MIDIPacket *packet;
     unsigned int packetIndex;
     uint32_t now;
-    unsigned int status;
     /* Retrieve the context for this connection */
     coremidi_info_type info = (coremidi_info_type) midi->api_info;
     assert(info);
@@ -425,29 +307,13 @@ static void read_callback(const MIDIPacketList *newPackets, PmInternal *midi)
                         packet->timeStamp,
                         AudioConvertHostTimeToNanos(packet->timeStamp));
         if (packet->timeStamp == 0) {
-            event.timestamp = now;
+            timestamp = now;
         } else {
-            event.timestamp = (PmTimestamp) /* explicit conversion */ (
+            timestamp = (PmTimestamp) /* explicit conversion */ (
                 (AudioConvertHostTimeToNanos(packet->timeStamp) - info->delta) /
                 (UInt64) 1000000);
         }
-        status = packet->data[0];
-        /* process packet as sysex data if it begins with MIDI_SYSEX, or
-           MIDI_EOX or non-status byte with no running status */
-        CM_DEBUG printf("        len %d stat %x\n", packet->length, status);
-        if (status == MIDI_SYSEX || status == MIDI_EOX || 
-            ((!(status & MIDI_STATUS_MASK)) && !info->last_command)) {
-            /* previously was: !(status & MIDI_STATUS_MASK)) {
-             * but this could mistake running status for sysex data
-             */
-            /* reset running status data -cpr */
-            info->last_command = 0;
-            info->last_msg_length = 0;
-            /* printf("sysex packet length: %d\n", packet->length); */
-            pm_read_bytes(midi, packet->data, packet->length, event.timestamp);
-        } else {
-            process_packet(packet, &event, midi, info);
-	}
+        pm_read_bytes(midi, packet->data, packet->length, timestamp);
         packet = MIDIPacketNext(packet);
     }
 }
@@ -502,8 +368,6 @@ static coremidi_info_type create_macosxcm_info(int is_virtual, int is_input)
     info->sysex_word = 0;
     info->sysex_byte_count = 0;
     info->packet = NULL;
-    info->last_command = 0;
-    info->last_msg_length = 0;
     info->min_next_time = 0;
     info->isIACdevice = FALSE;
     info->us_per_host_tick = 1000000.0 / AudioGetHostClockFrequency();
@@ -679,11 +543,10 @@ static PmError midi_create_virtual(int is_input, const char *name,
         return id;
     }
 
-    nameRef = CFStringCreateWithCString(NULL, name, kCFStringEncodingASCII);
+    nameRef = CFStringCreateWithCString(NULL, name, kCFStringEncodingUTF8);
     if (is_input) {
         macHostError = MIDIDestinationCreate(client, nameRef, 
-                               virtual_read_callback, (void *) (intptr_t) id,
-                               &endpoint);
+                virtual_read_callback, (void *) (intptr_t) id, &endpoint);
     } else {
         macHostError = MIDISourceCreate(client, nameRef, &endpoint);
     }
@@ -693,9 +556,27 @@ static PmError midi_create_virtual(int is_input, const char *name,
         /* undo the device we just allocated */
         pm_undo_add_device(id);
         return check_hosterror(macHostError, (is_input ?
-                       "MIDIDestinationCreate() in midi_create_virtual()" :
-                       "MIDISourceCreate() in midi_create_virtual()"));
+                "MIDIDestinationCreateWithProtocol() in midi_create_virtual()" :
+                "MIDISourceCreateWithProtocol() in midi_create_virtual()"));
     }
+
+    /* Do we have a manufacturer name? If not, set to "PortMidi" */
+    const char *mfr_name = "PortMidi";
+    PmSysDepInfo *info = (PmSysDepInfo *) device_info;
+    /* the version where pmKeyCoreMidiManufacturer was introduced is 210 */
+    if (info && info->structVersion >= 210) {
+        int i;
+        for (i = 0; i < info->length; i++) {  /* search for key */
+            if (info->properties[i].key == pmKeyCoreMidiManufacturer) {
+                mfr_name = info->properties[i].value;
+                break;
+            }  /* no other keys are recognized; they are ignored */
+        }
+    }
+    nameRef = CFStringCreateWithCString(NULL, mfr_name, kCFStringEncodingUTF8);
+    MIDIObjectSetStringProperty(endpoint, kMIDIPropertyManufacturer, nameRef);
+    CFRelease(nameRef);
+
     pm_descriptors[id].descriptor = (void *) (intptr_t) endpoint;
     return id;
 }
@@ -705,7 +586,6 @@ static PmError midi_delete_virtual(PmDeviceID id)
 {
     MIDIEndpointRef endpoint;
     OSStatus macHostError;
-    PmError err = pmNoError;
     
     endpoint = (MIDIEndpointRef) (long) pm_descriptors[id].descriptor;
     if (endpoint == NULL_REF) {
@@ -719,7 +599,6 @@ static PmError midi_delete_virtual(PmDeviceID id)
 
 static PmError midi_abort(PmInternal *midi)
 {
-    PmError err = pmNoError;
     OSStatus macHostError;
     MIDIEndpointRef endpoint = (MIDIEndpointRef) (intptr_t)
                                pm_descriptors[midi->device_id].descriptor;
@@ -771,9 +650,6 @@ static PmError send_packet(PmInternal *midi, Byte *message,
     info->packet = MIDIPacketListAdd(info->packetList,
                                      sizeof(info->packetBuffer), info->packet,
                                      timestamp, messageLength, message);
-#if defined(LIMIT_SEND_RATE) && (LIMIT_SEND_RATE != 0)
-    info->byte_count += messageLength;
-#endif
     if (info->packet == NULL) {
         /* out of space, send the buffer and start refilling it */
         /* make midi->packet non-null to fool midi_write_flush into sending */
@@ -838,7 +714,7 @@ static PmError midi_write_short(PmInternal *midi, PmEvent *event)
     message[0] = Pm_MessageStatus(what);
     message[1] = Pm_MessageData1(what);
     message[2] = Pm_MessageData2(what);
-    messageLength = midi_length(what);
+    messageLength = pm_midi_length((int32_t) what);
 
 #ifdef LIMIT_RATE
     /* Make sure we go forward in time. */
@@ -970,18 +846,19 @@ PmTimestamp timestamp_cm_to_pm(MIDITimeStamp timestamp)
 }
 
 
-//
-// Code taken from http://developer.apple.com/qa/qa2004/qa1374.html
-//////////////////////////////////////
-// Obtain the name of an endpoint without regard for whether it has connections.
-// The result should be released by the caller.
-CFStringRef EndpointName(MIDIEndpointRef endpoint, bool isExternal, int *isIAC)
+/* Code taken from http://developer.apple.com/qa/qa2004/qa1374.html
+ *
+ * Obtain the name of an endpoint without regard for whether it has connections.
+ * The result should be released by the caller.
+ */
+CFStringRef EndpointName(MIDIEndpointRef endpoint, bool isExternal,
+                         int *iac_flag)
 {
     CFMutableStringRef result = CFStringCreateMutable(NULL, 0);
     CFStringRef str;
-    *isIAC = FALSE;
+    *iac_flag = FALSE;
   
-    // begin with the endpoint's name
+    /* begin with the endpoint's name */
     str = NULL;
     MIDIObjectGetStringProperty(endpoint, kMIDIPropertyName, &str);
     if (str != NULL) {
@@ -991,23 +868,23 @@ CFStringRef EndpointName(MIDIEndpointRef endpoint, bool isExternal, int *isIAC)
     MIDIEntityRef entity = NULL_REF;
     MIDIEndpointGetEntity(endpoint, &entity);
     if (entity == NULL_REF) {
-        // probably virtual
+        /* probably virtual */
         return result;
     }
     if (!isExternal) { /* detect IAC devices */
-        //extern const CFStringRef kMIDIPropertyDriverOwner;
+        /* extern const CFStringRef kMIDIPropertyDriverOwner; */
         MIDIObjectGetStringProperty(entity, kMIDIPropertyDriverOwner, &str);
         if (str != NULL) {
             char s[32]; /* driver name may truncate, but that's OK */
             CFStringGetCString(str, s, 31, kCFStringEncodingUTF8);
             s[31] = 0;  /* make sure it is terminated just to be safe */
             CM_DEBUG printf("driver %s\n", s);
-            *isIAC = (strcmp(s, "com.apple.AppleMIDIIACDriver") == 0);
+            *iac_flag = (strcmp(s, "com.apple.AppleMIDIIACDriver") == 0);
         }
     }
 
     if (CFStringGetLength(result) == 0) {
-        // endpoint name has zero length -- try the entity
+        /* endpoint name has zero length -- try the entity */
         str = NULL;
         MIDIObjectGetStringProperty(entity, kMIDIPropertyName, &str);
         if (str != NULL) {
@@ -1015,7 +892,7 @@ CFStringRef EndpointName(MIDIEndpointRef endpoint, bool isExternal, int *isIAC)
             CFRelease(str);
         }
     }
-    // now consider the device's name
+    /* now consider the device's name */
     MIDIDeviceRef device = NULL_REF;
     MIDIEntityGetDevice(entity, &device);
     if (device == NULL_REF)
@@ -1028,8 +905,9 @@ CFStringRef EndpointName(MIDIEndpointRef endpoint, bool isExternal, int *isIAC)
         return str;
     }
     if (str != NULL) {
-        // if an external device has only one entity, throw away
-        // the endpoint name and just use the device name
+        /* if an external device has only one entity, throw away
+           the endpoint name and just use the device name
+        */
         if (isExternal && MIDIDeviceGetNumberOfEntities(device) < 2) {
             CFRelease(result);
             return str;
@@ -1038,14 +916,15 @@ CFStringRef EndpointName(MIDIEndpointRef endpoint, bool isExternal, int *isIAC)
                 CFRelease(str);
                 return result;
             }
-            // does the entity name already start with the device name?
-            // (some drivers do this though they shouldn't)
-            // if so, do not prepend
+            /* does the entity name already start with the device name?
+               (some drivers do this though they shouldn't)
+               if so, do not prepend
+            */
             if (CFStringCompareWithOptions(result, /* endpoint name */
                         str, /* device name */
                         CFRangeMake(0, CFStringGetLength(str)), 0) != 
                 kCFCompareEqualTo) {
-                // prepend the device name to the entity name
+                /* prepend the device name to the entity name */
                 if (CFStringGetLength(result) > 0)
                     CFStringInsert(result, 0, CFSTR(" "));
                 CFStringInsert(result, 0, str);
@@ -1057,24 +936,27 @@ CFStringRef EndpointName(MIDIEndpointRef endpoint, bool isExternal, int *isIAC)
 }
 
 
-// Obtain the name of an endpoint, following connections.
-// The result should be released by the caller.
-static CFStringRef ConnectedEndpointName(MIDIEndpointRef endpoint, int *isIAC)
+/* Obtain the name of an endpoint, following connections.
+   The result should be released by the caller.
+*/
+static CFStringRef ConnectedEndpointName(MIDIEndpointRef endpoint,
+                                         int *iac_flag)
 {
     CFMutableStringRef result = CFStringCreateMutable(NULL, 0);
     CFStringRef str;
     OSStatus err;
     long i;
   
-    // Does the endpoint have connections?
+    /* Does the endpoint have connections? */
     CFDataRef connections = NULL;
     long nConnected = 0;
     bool anyStrings = false;
     err = MIDIObjectGetDataProperty(endpoint, kMIDIPropertyConnectionUniqueID,
                                     &connections);
     if (connections != NULL) {
-        // It has connections, follow them
-        // Concatenate the names of all connected devices
+        /* It has connections, follow them
+           Concatenate the names of all connected devices
+        */
         nConnected = CFDataGetLength(connections) / 
                      (int32_t) sizeof(MIDIUniqueID);
         if (nConnected) {
@@ -1088,12 +970,13 @@ static CFStringRef ConnectedEndpointName(MIDIEndpointRef endpoint, int *isIAC)
                 if (err == noErr) {
                     if (connObjectType == kMIDIObjectType_ExternalSource  ||
                         connObjectType == kMIDIObjectType_ExternalDestination) {
-                        // Connected to an external device's endpoint (>=10.3)
+                        /* Connected to an external device's endpoint (>=10.3) */
                         str = EndpointName((MIDIEndpointRef)(connObject), true,
-                                           isIAC);
+                                           iac_flag);
                     } else {
-                        // Connected to an external device (10.2) 
-                        // (or something else, catch-all)
+                        /* Connected to an external device (10.2) 
+                           (or something else, catch-all)
+                        */
                         str = NULL;
                         MIDIObjectGetStringProperty(connObject, 
                                                     kMIDIPropertyName, &str);
@@ -1111,24 +994,33 @@ static CFStringRef ConnectedEndpointName(MIDIEndpointRef endpoint, int *isIAC)
         CFRelease(connections);
     }
     if (anyStrings)
-        return result; // caller should release result
+        return result; /* caller should release result */
 
     CFRelease(result);
 
-    // Here, either the endpoint had no connections, or we failed to
-    // obtain names for any of them.
-    return EndpointName(endpoint, false, isIAC);
+    /* Here, either the endpoint had no connections, or we failed to
+       obtain names for any of them.
+    */
+    return EndpointName(endpoint, false, iac_flag);
 }
 
 
-char *cm_get_full_endpoint_name(MIDIEndpointRef endpoint, int *isIAC)
+/* cm_get_full_endpoint_name -- returns UTF-8 namem for endpoint.
+ *     caller is owner and responsible for pm_free'ing the string
+ */
+char *cm_get_full_endpoint_name(MIDIEndpointRef endpoint, int *iac_flag)
 {
-    /* Thanks to Dan Wilcox for fixes for Unicode handling */
-    CFStringRef fullName = ConnectedEndpointName(endpoint, isIAC);
-    CFIndex utf16_len = CFStringGetLength(fullName) + 1;
+    /* Thanks to Dan Wilcox for fixes for Unicode handling
+     * and kichikuou at github for fixing buffer size calculation.
+     */
+    CFStringRef fullName = ConnectedEndpointName(endpoint, iac_flag);
+    CFIndex len = CFStringGetLength(fullName) + 1;
+    /* (len seems to be length in Unicode characters, although docs add
+     *  the confusing explanation "in terms of UTF-16 code pairs")
+     */
     CFIndex max_byte_len = CFStringGetMaximumSizeForEncoding(
-                                   utf16_len, kCFStringEncodingUTF8) + 1;
-    char* pmname = (char *) pm_alloc(CFStringGetLength(fullName) + 1);
+                                   len, kCFStringEncodingUTF8) + 1;
+    char* pmname = (char *) pm_alloc(max_byte_len);
 
     /* copy the string into our buffer; note that there may be some wasted
        space, but the total waste is not large */
@@ -1199,7 +1091,6 @@ PmError pm_macosxcm_init(void)
 {
     ItemCount numInputs, numOutputs, numDevices;
     MIDIEndpointRef endpoint;
-    int i;
     OSStatus macHostError = noErr;
     const char *error_text;
 
@@ -1227,7 +1118,7 @@ PmError pm_macosxcm_init(void)
                                         &client);
     } else {  /* see notes above on device scanning */
         for (int i = 0; i < 100; i++) {
-            // look for any changes before scanning for devices
+            /* look for any changes before scanning for devices: */
             CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, true);
             if (i % 5 == 0) Pt_Sleep(1);  /* insert 20 delays */
         }
@@ -1255,40 +1146,37 @@ PmError pm_macosxcm_init(void)
     }
 
     /* Iterate over the MIDI input devices */
-    for (i = 0; i < numInputs; i++) {
-        int isIACflag;
+    for (int i = 0; i < numInputs; i++) {
+        int iac_flag;
         endpoint = MIDIGetSource(i);
         if (endpoint == NULL_REF) {
             continue;
         }
-        /* set the first input we see to the default */
-        if (pm_default_input_device_id == -1)
-            pm_default_input_device_id = pm_descriptor_len;
-        
         /* Register this device with PortMidi */
-        pm_add_device("CoreMIDI", 
-                cm_get_full_endpoint_name(endpoint, &isIACflag), TRUE, FALSE,
-                (void *) (intptr_t) endpoint, &pm_macosx_in_dictionary);
+        char *name = cm_get_full_endpoint_name(endpoint, &iac_flag);
+        pm_add_device("CoreMIDI", name, TRUE, FALSE,
+                      (void *) (intptr_t) endpoint, &pm_macosx_in_dictionary);
+        /* pm_add_device copies name, so it is no longer needed */
+        pm_free(name);
     }
 
     /* Iterate over the MIDI output devices */
-    for (i = 0; i < numOutputs; i++) {
-        int isIACflag;
+    for (int i = 0; i < numOutputs; i++) {
+        int iac_flag;
         PmDeviceID id;
         endpoint = MIDIGetDestination(i);
         if (endpoint == NULL_REF) {
             continue;
         }
-        /* set the first output we see to the default */
-        if (pm_default_output_device_id == -1)
-            pm_default_output_device_id = pm_descriptor_len;
-
         /* Register this device with PortMidi */
-        id = pm_add_device("CoreMIDI", 
-                cm_get_full_endpoint_name(endpoint, &isIACflag), FALSE, FALSE,
+        char *name = cm_get_full_endpoint_name(endpoint, &iac_flag);
+        id = pm_add_device("CoreMIDI", name, FALSE, FALSE,
                 (void *) (intptr_t) endpoint, &pm_macosx_out_dictionary);
+        /* pm_add_device copies name, so it is no longer needed */
+        pm_free(name);
+
         /* if this is an IAC device, tuck that info away for write functions */
-        if (isIACflag && id <= MAX_IAC_NUM) {
+        if (iac_flag && id <= MAX_IAC_NUM) {
             isIAC[id] = TRUE;
         }
     }

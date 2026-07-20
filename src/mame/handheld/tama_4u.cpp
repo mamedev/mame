@@ -3,7 +3,7 @@
 
 #include "emu.h"
 
-#include "cpu/c33/s1c33209.h"
+#include "cpu/c33/s1c33l17.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -47,7 +47,7 @@ void tama_4u_state::machine_start()
 
 void tama_4u_state::mem_map(address_map &map)
 {
-	map(0x0800000, 0x0ffffff).rom().region("maincpu", 0);
+	map(0x0c00000, 0x0ffffff).rom().region("maincpu", 0x400000);
 	map(0x2000000, 0x27fffff).rom().region("maincpu", 0);
 }
 
@@ -58,7 +58,7 @@ INPUT_PORTS_END
 
 void tama_4u_state::tama4u(machine_config &config)
 {
-	S1C33209(config, m_maincpu, 10'000'000); // unknown model and clock
+	S1C33E07(config, m_maincpu, 10'000'000); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &tama_4u_state::mem_map);
 
 	// wrong, just so it's clear this has a screen

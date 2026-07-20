@@ -483,13 +483,11 @@ void ltcasin2_state::init_mv4in1()
 void ltcasino_state::machine_start()
 {
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ltcasino_state::tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_lamps.resolve();
 }
 
 void ltcasin2_state::machine_start()
 {
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ltcasin2_state::tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_lamps.resolve();
 }
 
 uint8_t ltcasino_state::input_s_r()

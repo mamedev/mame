@@ -15,6 +15,8 @@
 
 #include "audio_effects/aeffect.h"
 #include "audio_effects/eq.h"
+#include "input.h"
+
 
 namespace ui {
 
@@ -30,8 +32,8 @@ constexpr u32 FREQ_LIMITS[5][2] = {
 
 } // anonymous namespace
 
-menu_audio_effect_eq::menu_audio_effect_eq(mame_ui_manager &mui, render_container &container, u16 chain, u16 entry, audio_effect *effect)
-	: menu(mui, container)
+menu_audio_effect_eq::menu_audio_effect_eq(mame_ui_manager &mui, render_target &target, u16 chain, u16 entry, audio_effect *effect)
+	: menu(mui, target)
 {
 	m_chain = chain;
 	m_entry = entry;

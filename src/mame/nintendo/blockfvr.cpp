@@ -109,11 +109,6 @@ public:
 	}
 
 protected:
-	virtual void device_resolve_objects() override ATTR_COLD
-	{
-		m_start.resolve();
-	}
-
 	virtual void driver_start() override ATTR_COLD
 	{
 		save_item(NAME(m_ball_x));

@@ -636,7 +636,7 @@ void xmen_state::base(machine_config &config)
 	m_k053246->set_config(NORMAL_PLANE_ORDER, -43, -2);
 	m_k053246->set_palette("palette");
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 }
 
 void xmen_state::xmen(machine_config &config)

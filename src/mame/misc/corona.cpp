@@ -350,14 +350,13 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void winner81(machine_config &config);
-	void winner82(machine_config &config);
-	void rcirulet(machine_config &config);
-	void luckyrlt(machine_config &config);
-	void re800(machine_config &config);
+	void winner81(machine_config &config) ATTR_COLD;
+	void winner82(machine_config &config) ATTR_COLD;
+	void rcirulet(machine_config &config) ATTR_COLD;
+	void luckyrlt(machine_config &config) ATTR_COLD;
+	void re800(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -1660,6 +1659,37 @@ ROM_START(legrandc)
 	ROM_LOAD( "legrandc_prom.bin",  0x0000, 0x0020, CRC(388e9052) SHA1(0472fb7ba8f24d98afa5d2a14c2304c501f0eef6) )
 ROM_END
 
+ROM_START(winner81c)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("0.24",   0x0000, 0x0800, CRC(d42493bb) SHA1(c10b00d175a3bca585008437f8a7bb7f1e787df8) )
+	ROM_LOAD("1.25",   0x0800, 0x0800, CRC(99a8876b) SHA1(eaea6a6daf97f7baa021f6f4f8df4b9c220410b0) )
+	ROM_LOAD("2.26",   0x1000, 0x0800, CRC(aafb4b3c) SHA1(1758fc84641c88363e1cc0b940ef425bddff4829) )
+	ROM_LOAD("3.28",   0x1800, 0x0800, CRC(098161f5) SHA1(995721fc149a3b5cc25ee0ab2405ce1af55803a4) )
+	ROM_LOAD("4.27",   0x2000, 0x0800, CRC(8a558bef) SHA1(9f8560864a60fa4c34ffb4c4b16f05bb4170cb42) )
+	ROM_LOAD("5.23",   0x2800, 0x0800, CRC(f4ce47ba) SHA1(fba06e63f84bae41653c9158173bed67e41c6e34) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )  // IM1 instead of NMI. Identical halves
+	ROM_LOAD("7.bin",   0x0000, 0x0800, CRC(aaaaa37a) SHA1(60daf9bf8f1e25da0e55e2d652a3a232f0717e9b) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "legrandc_prom.bin",  0x0000, 0x0020, CRC(388e9052) SHA1(0472fb7ba8f24d98afa5d2a14c2304c501f0eef6) BAD_DUMP ) // not dumped for this set
+ROM_END
+
+ROM_START(winner81d)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("1.24",   0x0000, 0x0800, CRC(5e58269c) SHA1(dff488253886f49422349a4beb6a8bf1ff6a9d14) )
+	ROM_LOAD("2.25",   0x0800, 0x0800, CRC(872cdc69) SHA1(3e6789181a45375a051191efe13d4688cc753793) )
+	ROM_LOAD("3.26",   0x1000, 0x0800, CRC(3d9e4978) SHA1(28b24f50bc530469eba571e17ddc1827414cca4a) )
+	ROM_LOAD("4.28",   0x1800, 0x0800, CRC(48226c06) SHA1(6e8e3d90e9d76ec40bbe4ad5bc42e17eb6bdb4bd) )
+	ROM_LOAD("5.27",   0x2000, 0x0800, CRC(8e8648e0) SHA1(2e1a67b227a51a5ce16bb764ee95c58b7c77b0cb) )
+	ROM_LOAD("6.23",   0x2800, 0x0800, CRC(90dd9f81) SHA1(c2ebee0b48b0d5b08da47406d97f55d797a09c90) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )  // IM1 instead of NMI. Identical halves
+	ROM_LOAD("7.29",   0x0000, 0x0800, CRC(aaaaa37a) SHA1(60daf9bf8f1e25da0e55e2d652a3a232f0717e9b) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "legrandc_prom.bin",  0x0000, 0x0020, CRC(388e9052) SHA1(0472fb7ba8f24d98afa5d2a14c2304c501f0eef6) BAD_DUMP ) // not dumped for this set
+ROM_END
 
 /***************************************************
 
@@ -1780,7 +1810,7 @@ ROM_START(luckyrlt)
 	ROM_LOAD( "promrulxx.123",  0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 /******************************************
@@ -1791,6 +1821,8 @@ ROM_END
 GAME(  1982, winner82,  0,        winner82, winner82, corona_state, empty_init, ROT0,   "Corona Co, LTD.",          "Winners Circle (82)",                      0 )
 GAME(  1981, winner81,  winner82, winner81, winner81, corona_state, empty_init, ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 28*28 PCB)",           MACHINE_IMPERFECT_SOUND )
 GAME(  1981, winner81b, winner82, winner82, winner82, corona_state, empty_init, ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 18*22 PCB)",           0 )
+GAME(  1981, winner81c, winner82, winner82, winner82, corona_state, empty_init, ROT0,   "Corona Co, LTD.",          "Winners Circle (81, set 3)",               0 )
+GAME(  1981, winner81d, winner82, winner82, winner82, corona_state, empty_init, ROT0,   "Corona Co, LTD.",          "Winners Circle (81, set 4)",               0 )
 GAME(  198?, legrandc,  0,        winner82, winner82, corona_state, empty_init, ROT0,   "Isermatic France S.A.",    "Le Grandchamps",                           0 )
 GAMEL( 1991, re800ea,   re800v1,  re800,    re800,    corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)",      0,                        layout_re800 )
 GAMEL( 1991, re800v1,   0,        re800,    re800,    corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0, set 1)",              0,                        layout_re800 )

@@ -72,7 +72,7 @@ void bbc_speech_device::device_add_mconfig(machine_config &config)
 	TMS5220(config, m_vsp, 640000);
 	m_vsp->add_route(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.5);
 
-	TMS6100(config, "vsm", 0);
+	TMS6100(config, "vsm");
 	m_vsp->m0_cb().set("vsm", FUNC(tms6100_device::m0_w));
 	m_vsp->m1_cb().set("vsm", FUNC(tms6100_device::m1_w));
 	m_vsp->addr_cb().set("vsm", FUNC(tms6100_device::add_w));
@@ -106,7 +106,7 @@ DEVICE_IMAGE_LOAD_MEMBER(bbc_speech_device::load_phrom)
 	else
 		size = image.get_software_region_length("rom");
 
-	if (size < 0x1000 || size > 0x4000 || (size & (size - 1)) != 0)
+	if (size < 0x1000 || size > 0x4000 || !std::has_single_bit(size))
 		return std::make_pair(image_error::INVALIDLENGTH, "Invalid PHROM size");
 
 	uint8_t *vsm = memregion("vsm")->base();

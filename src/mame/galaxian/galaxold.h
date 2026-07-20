@@ -313,9 +313,6 @@ public:
 	void junglekv_map(address_map &map) ATTR_COLD;
 	void tazzmang_map(address_map &map) ATTR_COLD;
 
-protected:
-	virtual void machine_start() override { m_leds.resolve(); }
-
 private:
 	uint8_t m_superbikg_latch = 0;
 };

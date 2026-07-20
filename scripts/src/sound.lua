@@ -258,6 +258,18 @@ end
 
 
 ---------------------------------------------------
+-- Creative Labs CT1741 SB16 DSP
+--@src/devices/sound/ct1741.h,SOUNDS["CT1741"] = true
+---------------------------------------------------
+
+if SOUNDS["CT1741"] then
+	files {
+		MAME_DIR .. "src/devices/sound/ct1741.cpp",
+		MAME_DIR .. "src/devices/sound/ct1741.h",
+	}
+end
+
+---------------------------------------------------
 -- Creative Labs CT1745 SB16 Mixer
 --@src/devices/sound/ct1745.h,SOUNDS["CT1745"] = true
 ---------------------------------------------------
@@ -1308,6 +1320,18 @@ if SOUNDS["VA_VCA"] then
 end
 
 --------------------------------------------------
+-- Virtual analog voltage-controlled oscillator (VCO)
+--@src/devices/sound/va_vco.h,SOUNDS["VA_VCO"] = true
+--------------------------------------------------
+
+if SOUNDS["VA_VCO"] then
+	files {
+		MAME_DIR .. "src/devices/sound/va_vco.cpp",
+		MAME_DIR .. "src/devices/sound/va_vco.h",
+	}
+end
+
+--------------------------------------------------
 -- Virtual analog voltage-controlled filters (VCFs)
 --@src/devices/sound/va_vcf.h,SOUNDS["VA_VCF"] = true
 --------------------------------------------------
@@ -1948,5 +1972,17 @@ if SOUNDS["FZ_PCM"] then
 	files {
 		MAME_DIR .. "src/devices/sound/fz_pcm.cpp",
 		MAME_DIR .. "src/devices/sound/fz_pcm.h",
+	}
+end
+
+---------------------------------------------------
+-- Akai L6009
+--@src/devices/sound/l6009.h,SOUNDS["L6009"] = true
+---------------------------------------------------
+
+if SOUNDS["L6009"] then
+	files {
+		MAME_DIR .. "src/devices/sound/l6009.cpp",
+		MAME_DIR .. "src/devices/sound/l6009.h",
 	}
 end

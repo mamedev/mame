@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0-1.0
+
 As with other Sharp MZ series machines, there is no built in BASIC so this needs to be loaded from cassette before any
 BASIC programs can be run.
 

@@ -101,7 +101,7 @@ void trackfld_audio_device::sh_irqtrigger_w(int state)
 {
 	// setting bit 0 low then high triggers IRQ on the sound CPU
 	if (!m_last_irq && state)
-		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+		m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 
 	m_last_irq = state;
 }

@@ -36,7 +36,7 @@ class exidy_sound_device : public device_t, public device_sound_interface
 	};
 
 public:
-	exidy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	exidy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	~exidy_sound_device();
 
 	uint8_t sh6840_r(offs_t offset);
@@ -44,7 +44,7 @@ public:
 	void sfxctrl_w(offs_t offset, uint8_t data);
 
 protected:
-	exidy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	exidy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -84,7 +84,7 @@ DECLARE_DEVICE_TYPE(EXIDY, exidy_sound_device)
 class exidy_sh8253_sound_device : public exidy_sound_device
 {
 protected:
-	exidy_sh8253_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	exidy_sh8253_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -108,7 +108,7 @@ private:
 class venture_sound_device : public exidy_sh8253_sound_device
 {
 public:
-	venture_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	venture_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration access
 	auto pa_callback() { return m_pa_callback.bind(); }
@@ -123,7 +123,7 @@ public:
 	void cb_w(int state) { m_pia->cb1_w(state); }
 
 protected:
-	venture_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	venture_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -152,7 +152,7 @@ DECLARE_DEVICE_TYPE(EXIDY_VENTURE, venture_sound_device)
 class mtrap_sound_device : public venture_sound_device
 {
 public:
-	mtrap_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mtrap_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	// device_t implementation
@@ -184,7 +184,7 @@ DECLARE_DEVICE_TYPE(EXIDY_MTRAP, mtrap_sound_device)
 class victory_sound_device : public exidy_sh8253_sound_device
 {
 public:
-	victory_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	victory_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// external access
 	uint8_t response_r();

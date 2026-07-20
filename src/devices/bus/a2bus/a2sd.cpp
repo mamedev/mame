@@ -109,7 +109,7 @@ void a2bus_a2sd_device::device_add_mconfig(machine_config &config)
 {
 	AT28C64B_NVRAM(config, m_flash, 0);
 
-	SPI_SDCARD(config, m_sdcard, 0);
+	SPI_SDCARD(config, m_sdcard);
 	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set(FUNC(a2bus_a2sd_device::spi_miso_w));
 }

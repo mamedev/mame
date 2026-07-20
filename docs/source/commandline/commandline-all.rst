@@ -1125,18 +1125,16 @@ Configuration Options
 
       - ``mame.ini``
       - ``debug.ini``                       (if the debugger is enabled)
-      - ``source/``\ *<driver>*\ ``.ini``   (based on the source filename of the driver)
       - ``vertical.ini``                    (for systems with vertical monitor orientation)
       - ``horizont.ini``                    (for systems with horizontal monitor orientation)
-      - ``arcade.ini``                      (for systems in source added with ``GAME()`` macro)
-      - ``console.ini``                     (for systems in source added with ``CONS()`` macro)
-      - ``computer.ini``                    (for systems in source added with ``COMP()`` macro)
-      - ``othersys.ini``                    (for systems in source added with ``SYST()`` macro)
-      - ``vector.ini``                      (for vector systems only)
+      - ``raster.ini``                      (for raster display systems only)
+      - ``vector.ini``                      (for vector display systems only)
+      - ``lcd.ini``                         (for matrix display systems only)
+      - ``source/``\ *<driver>*\ ``.ini``   (based on the source filename of the driver)
       - *<parent>*\ ``.ini``                (for clones only, may be called recursively)
       - *<systemname>*\ ``.ini``
 
-      (See :ref:`advanced-multi-CFG` for further details)
+      (See :ref:`advanced-multicfg-order` for further details)
 
     The settings in the later INIs override those in the earlier INIs.  So, for
     example, if you wanted to disable overlay effects in the vector systems, you
@@ -3312,7 +3310,7 @@ Core Input Options
     Generally you will want to set up the **-joystick_map** setting in the
     per-system ``<system>.ini`` file as opposed to the main ``MAME.INI``
     file so that the mapping only affects the systems you want it to.  See
-    :ref:`Multiple Configuration Files <advanced-multi-CFG>` for further
+    :ref:`Multiple Configuration Files <advanced-multicfg-order>` for further
     details on per-system configuration.
 
     Maps are defined as a string of numbers and characters. Since the grid is
@@ -4118,6 +4116,22 @@ Core Misc Options
 
             mame galaga88 -nonvram_save
 
+.. _mame-commandline-rtc:
+
+**-rtc <value>**
+
+    Specifies a fixed baseline time to initialize the real-time clock (RTC) chips
+    emulated by MAME. By default, MAME initializes RTC chips using your host
+    computer's current system time.
+
+    The option accepts a 14-digit formatted date and time string for `<value>`
+    in the format **YYYYMMDDhhmmss** (e.g., ``20260709070000`` for July 9, 2026,
+    at 07:00:00).
+
+.. Tip:: If an input macro playback file (such as with **-playback**) is active,
+         it takes absolute precedence to prevent input desynchronization. The
+         **-rtc** command-line option will be ignored, and a warning will be
+         displayed in the console.
 
 .. _mame-commandline-scripting:
 

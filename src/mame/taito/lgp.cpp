@@ -415,7 +415,7 @@ void lgp_state::lgp(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &lgp_state::sound_program_map);
 	audiocpu.set_addrmap(AS_IO, &lgp_state::sound_io_map);
 
-	PIONEER_LDV1000(config, m_laserdisc, 0);
+	PIONEER_LDV1000(config, m_laserdisc);
 	m_laserdisc->command_strobe_callback().set(FUNC(lgp_state::ld_command_strobe_cb));
 	m_laserdisc->set_overlay(256, 256, FUNC(lgp_state::screen_update_lgp));
 	m_laserdisc->add_route(0, "speaker", 1.0, 0);
@@ -613,6 +613,6 @@ void lgp_state::init_lgp()
 } // anonymous namespace
 
 
-/*    YEAR  NAME PARENT   MACHINE INPUT STATE      INIT      MONITOR  COMPANY   FULLNAME                         FLAGS) */
-GAME( 1983, lgp, 0,       lgp,    lgp,  lgp_state, init_lgp, ROT0,    "Taito",  "Laser Grand Prix",              MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME( 1983, lgpalt, lgp,  lgp,    lgp,  lgp_state, init_lgp, ROT0,    "Taito",  "Laser Grand Prix (alternate)",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+//    YEAR  NAME PARENT   MACHINE INPUT STATE      INIT      MONITOR  COMPANY   FULLNAME                         FLAGS
+GAME( 1983, lgp, 0,       lgp,    lgp,  lgp_state, init_lgp, ROT0,    "Taito",  "Laser Grand Prix",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1983, lgpalt, lgp,  lgp,    lgp,  lgp_state, init_lgp, ROT0,    "Taito",  "Laser Grand Prix (alternate)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

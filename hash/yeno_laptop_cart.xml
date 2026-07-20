@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="yeno_laptop_cart" description="Yeno educational laptop cartridges">
+
+	<software name="wissenst" supported="no">
+		<description>Wissens Tester (Germany)</description>
+		<year>199?</year>
+		<publisher>Yeno</publisher>
+		<part name="cart" interface="yeno_laptop_cart">
+			<dataarea name="rom" size="0x40000">
+				<rom name="27c020.ic1" size="0x40000" crc="20c43741" sha1="cc1dfa301180f89755672d2b74b6013627b85928"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swissen" supported="no">
+		<description>Super Wissen (Germany)</description>
+		<year>199?</year>
+		<publisher>Yeno</publisher>
+		<part name="cart" interface="yeno_laptop_cart">
+			<dataarea name="rom" size="0x40000">
+				<rom name="Superwissen.ic1" size="0x40000" crc="714b4cbe" sha1="d1f5ce30bb8be73ed4edd9ce613c96a9cf7c39ab"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="decouv1" supported="no">
+		<description>Decouvertes 1 (France)</description>
+		<year>199?</year>
+		<publisher>Yeno</publisher>
+		<part name="cart" interface="yeno_laptop_cart">
+			<dataarea name="rom" size="0x40000">
+				<rom name="decouvertes1.bin" size="0x40000" crc="f629f929" sha1="e6fd8f67fba5bea0e3888a51462e1b3a77ff2c4f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="decouv2" supported="no">
+		<description>Decouvertes 2 (France)</description>
+		<year>199?</year>
+		<publisher>Yeno</publisher>
+		<part name="cart" interface="yeno_laptop_cart">
+			<dataarea name="rom" size="0x40000">
+				<rom name="decouvertes2.bin" size="0x40000" crc="e6909500" sha1="b742b83ec3285b26ac99768916ba6522a5cd4453"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

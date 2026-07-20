@@ -380,7 +380,7 @@ Bottom board: JCG DAUGHTERL PCB-C K9100633A J9100434A (Sticker K91J0633A)
 Notes:
       All 3k files are PALs type PALCE 16V8 and saved in Jedec format.
       6264: 8k x8 SRAM
-      SMC_COM20020I: Network communmication IC
+      SMC_COM20020I: Network communication IC
       ROMs .36-.39 are 27C4001, main program.
       ROMs .5-.12, .18-.25 are 16M MASK, graphics.
       ROMs .32-.35 are 16M MASK, sound data.
@@ -1090,9 +1090,6 @@ void taitojc_state::machine_reset()
 
 void taitojc_state::machine_start()
 {
-	m_lamps.resolve();
-	m_wheel_motor.resolve();
-
 	// register for savestates
 	save_item(NAME(m_dsp_rom_pos));
 	save_item(NAME(m_first_dsp_reset));
@@ -1104,13 +1101,6 @@ void taitojc_state::machine_start()
 	save_item(NAME(m_mcu_comm_hc11));
 	save_item(NAME(m_mcu_data_main));
 	save_item(NAME(m_mcu_data_hc11));
-}
-
-void dendego_state::machine_start()
-{
-	taitojc_state::machine_start();
-
-	m_counters.resolve();
 }
 
 
@@ -1147,7 +1137,7 @@ void taitojc_state::taitojc(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	TC0640FIO(config, m_tc0640fio, 0);
+	TC0640FIO(config, m_tc0640fio);
 	m_tc0640fio->read_0_callback().set_ioport("SERVICE");
 	m_tc0640fio->read_1_callback().set_ioport("COINS");
 	m_tc0640fio->read_2_callback().set_ioport("START");
@@ -1165,12 +1155,12 @@ void taitojc_state::taitojc(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_888, 32768);
 
-	TC0780FPA(config, m_tc0780fpa, 0);
+	TC0780FPA(config, m_tc0780fpa);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
+	taito_en_device &taito_en(TAITO_EN(config, "taito_en"));
 	taito_en.add_route(0, "speaker", 1.0, 0);
 	taito_en.add_route(1, "speaker", 1.0, 1);
 }

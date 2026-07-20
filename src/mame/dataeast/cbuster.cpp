@@ -56,6 +56,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 
 // configurable logging
 #define LOG_PROT (1U << 1)
@@ -76,12 +78,12 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
-		, m_deco_tilegen(*this, "tilegen%u", 1U)
+		, m_tilegen(*this, "tilegen%u", 1U)
 		, m_palette(*this, "palette")
 		, m_spriteram(*this, "spriteram")
 		, m_soundlatch(*this, "soundlatch")
 		, m_sprgen(*this, "spritegen")
-		, m_pf_rowscroll(*this, "pf%u_rowscroll", 1U)
+		, m_rowscroll(*this, "rowscroll_%u", 1U)
 	{ }
 
 	void init_twocrude();
@@ -97,14 +99,14 @@ private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<h6280_device> m_audiocpu;
-	required_device_array<deco16ic_device, 2> m_deco_tilegen;
+	required_device_array<deco16ic_device, 2> m_tilegen;
 	required_device<palette_device> m_palette;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<decospr_device> m_sprgen;
 
 	// memory pointers
-	required_shared_ptr_array<u16, 4> m_pf_rowscroll;
+	required_shared_ptr_array<u16, 4> m_rowscroll;
 
 	// misc
 	u16 m_prot = 0U;
@@ -113,7 +115,7 @@ private:
 	void prot_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 prot_r();
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	int bank_callback(int bank);
 	static rgb_t xbgr_888(u32 raw);
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
@@ -157,35 +159,35 @@ rgb_t cbuster_state::xbgr_888(u32 raw)
 
 u32 cbuster_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const u16 flip = m_deco_tilegen[0]->pf_control_r(0);
+	const u16 flip = m_tilegen[0]->control_r(0);
 
 	flip_screen_set(!BIT(flip, 7));
 	m_sprgen->set_flip_screen(!BIT(flip, 7));
 
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
 
-	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
-	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2], m_pf_rowscroll[3]);
+	m_tilegen[0]->update(m_rowscroll[0], m_rowscroll[1]);
+	m_tilegen[1]->update(m_rowscroll[2], m_rowscroll[3]);
 
 	// Draw playfields & sprites
-	m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	m_sprgen->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0900, 0x100, 0x0ff);
 	m_sprgen->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0900, 0x0900, 0x500, 0x0ff);
 
 	if (m_pri)
 	{
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+		m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
+		m_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
 	{
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
+		m_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+		m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
 	}
 
 	m_sprgen->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0900, 0x100, 0x0ff);
 	m_sprgen->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0100, 0x0900, 0x500, 0x0ff);
-	m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -227,7 +229,8 @@ void cbuster_state::prot_w(offs_t offset, u16 data, u16 mem_mask)
 
 u16 cbuster_state::prot_r()
 {
-	LOGPROT("%04x : protection control read at 0bc004\n", m_maincpu->pc());
+	if (!machine().side_effects_disabled())
+		LOGPROT("%s : protection control read at 0bc004\n", machine().describe_context());
 	return m_prot;
 }
 
@@ -238,20 +241,20 @@ void cbuster_state::main_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x083fff).ram();
 
-	map(0x0a0000, 0x0a1fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x0a2000, 0x0a2fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x0a4000, 0x0a47ff).ram().share(m_pf_rowscroll[0]);
-	map(0x0a6000, 0x0a67ff).ram().share(m_pf_rowscroll[1]);
+	map(0x0a0000, 0x0a1fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x0a2000, 0x0a2fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x0a4000, 0x0a47ff).ram().share(m_rowscroll[0]);
+	map(0x0a6000, 0x0a67ff).ram().share(m_rowscroll[1]);
 
-	map(0x0a8000, 0x0a8fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x0aa000, 0x0aafff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x0ac000, 0x0ac7ff).ram().share(m_pf_rowscroll[2]);
-	map(0x0ae000, 0x0ae7ff).ram().share(m_pf_rowscroll[3]);
+	map(0x0a8000, 0x0a8fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x0aa000, 0x0aafff).rw(m_tilegen[1], FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x0ac000, 0x0ac7ff).ram().share(m_rowscroll[2]);
+	map(0x0ae000, 0x0ae7ff).ram().share(m_rowscroll[3]);
 
 	map(0x0b0000, 0x0b07ff).ram().share("spriteram");
 	map(0x0b4000, 0x0b4001).nopw();
-	map(0x0b5000, 0x0b500f).w(m_deco_tilegen[0], FUNC(deco16ic_device::pf_control_w));
-	map(0x0b6000, 0x0b600f).w(m_deco_tilegen[1], FUNC(deco16ic_device::pf_control_w));
+	map(0x0b5000, 0x0b500f).w(m_tilegen[0], FUNC(deco16ic_device::control_w));
+	map(0x0b6000, 0x0b600f).w(m_tilegen[1], FUNC(deco16ic_device::control_w));
 	map(0x0b8000, 0x0b8fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x0b9000, 0x0b9fff).ram().w(m_palette, FUNC(palette_device::write16_ext)).share("palette_ext");
 	map(0x0bc000, 0x0bc001).portr("P1_P2").w(m_spriteram, FUNC(buffered_spriteram16_device::write));
@@ -386,7 +389,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-DECO16IC_BANK_CB_MEMBER(cbuster_state::bank_callback)
+int cbuster_state::bank_callback(int bank)
 {
 	return (bank & 0x70) << 8;
 }
@@ -427,33 +430,33 @@ void cbuster_state::twocrude(machine_config &config)
 
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
-	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
-	m_deco_tilegen[0]->set_pf2_col_bank(0x20);
-	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(cbuster_state::bank_callback));
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(cbuster_state::bank_callback));
-	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
-	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
+	DECO16IC(config, m_tilegen[0]);
+	m_tilegen[0]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_col_bank<0>(0x00);
+	m_tilegen[0]->set_col_bank<1>(0x20);
+	m_tilegen[0]->set_col_mask<0>(0x0f);
+	m_tilegen[0]->set_col_mask<1>(0x0f);
+	m_tilegen[0]->set_bank_callback<0>(FUNC(cbuster_state::bank_callback));
+	m_tilegen[0]->set_bank_callback<1>(FUNC(cbuster_state::bank_callback));
+	m_tilegen[0]->set_8x8_bank(0);
+	m_tilegen[0]->set_16x16_bank(1);
+	m_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	DECO16IC(config, m_deco_tilegen[1], 0);
-	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_col_bank(0x30);
-	m_deco_tilegen[1]->set_pf2_col_bank(0x40);
-	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(cbuster_state::bank_callback));
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(cbuster_state::bank_callback));
-	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
-	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
+	DECO16IC(config, m_tilegen[1]);
+	m_tilegen[1]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_col_bank<0>(0x30);
+	m_tilegen[1]->set_col_bank<1>(0x40);
+	m_tilegen[1]->set_col_mask<0>(0x0f);
+	m_tilegen[1]->set_col_mask<1>(0x0f);
+	m_tilegen[1]->set_bank_callback<0>(FUNC(cbuster_state::bank_callback));
+	m_tilegen[1]->set_bank_callback<1>(FUNC(cbuster_state::bank_callback));
+	m_tilegen[1]->set_8x8_bank(0);
+	m_tilegen[1]->set_16x16_bank(2);
+	m_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen, 0, m_palette, gfx_cbuster_spr);
+	DECO_SPRITE(config, m_sprgen, m_palette, gfx_cbuster_spr);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

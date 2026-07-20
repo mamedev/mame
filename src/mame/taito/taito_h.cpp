@@ -602,7 +602,7 @@ void taitoh_state::taitoh_base(machine_config &config)
 	// video hardware
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 33*16);
 
-	TC0080VCO(config, m_tc0080vco, 0);
+	TC0080VCO(config, m_tc0080vco);
 	m_tc0080vco->set_offsets(1, 1);
 	m_tc0080vco->set_bgflip_yoffs(-2);
 	m_tc0080vco->set_palette(m_palette);
@@ -616,7 +616,7 @@ void taitoh_state::taitoh_base(machine_config &config)
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	tc0140syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -629,7 +629,7 @@ void syvalion_state::syvalion(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &syvalion_state::syvalion_map);
 	m_maincpu->set_vblank_int("screen", FUNC(taitoh_state::irq2_line_hold));
 
-	TC0040IOC(config, m_tc0040ioc, 0);
+	TC0040IOC(config, m_tc0040ioc);
 	m_tc0040ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0040ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0040ioc->read_2_callback().set_ioport("IN0");
@@ -655,7 +655,7 @@ void taitoh_state::recordbr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitoh_state::recordbr_map);
 	m_maincpu->set_vblank_int("screen", FUNC(taitoh_state::irq2_line_hold));
 
-	TC0040IOC(config, m_tc0040ioc, 0);
+	TC0040IOC(config, m_tc0040ioc);
 	m_tc0040ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0040ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0040ioc->read_2_callback().set_ioport("IN0");
@@ -693,7 +693,7 @@ void taitoh_state::dleague(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitoh_state::dleague_map);
 	m_maincpu->set_vblank_int("screen", FUNC(taitoh_state::irq1_line_hold));
 
-	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc", 0));
+	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc"));
 	tc0220ioc.read_0_callback().set_ioport("DSWA");
 	tc0220ioc.read_1_callback().set_ioport("DSWB");
 	tc0220ioc.read_2_callback().set_ioport("IN0");
@@ -1031,13 +1031,13 @@ ROM_START( dleaguej )
 ROM_END
 
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT        MONITOR  COMPANY                      FULLNAME                                 FLAGS
-GAME( 1988, syvalion,  0,        syvalion, syvalion,  syvalion_state, empty_init, ROT0,    "Taito Corporation",         "Syvalion (Japan)",                      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1988, syvalionp, syvalion, syvalion, syvalionp, syvalion_state, empty_init, ROT0,    "Taito Corporation",         "Syvalion (World, prototype)",           MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1988, syvalionu, syvalion, syvalion, syvalion,  syvalion_state, empty_init, ROT0,    "Taito America Corporation", "Syvalion (US, PS2 Taito Legends 2)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1988, syvalionw, syvalion, syvalion, syvalion,  syvalion_state, empty_init, ROT0,    "Taito Corporation Japan",   "Syvalion (World, PS2 Taito Legends 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1988, recordbr,  0,        recordbr, recordbr,  taitoh_state,   empty_init, ROT0,    "Taito Corporation Japan",   "Recordbreaker (World)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gogold,    recordbr, recordbr, gogold,    taitoh_state,   empty_init, ROT0,    "Taito Corporation",         "Go For The Gold (Japan)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tetristh,  tetris,   tetristh, tetristh,  taitoh_state,   empty_init, ROT0,    "Sega",                      "Tetris (Japan, rev 1, Taito H-System)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, dleague,   0,        dleague,  dleague,   taitoh_state,   empty_init, ROT0,    "Taito America Corporation", "Dynamite League (US)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1990, dleaguej,  dleague,  dleague,  dleaguej,  taitoh_state,   empty_init, ROT0,    "Taito Corporation",         "Dynamite League (Japan)",               MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT        MONITOR  COMPANY          FULLNAME                                 FLAGS
+GAME( 1988, syvalion,  0,        syvalion, syvalion,  syvalion_state, empty_init, ROT0,    "Taito",         "Syvalion (Japan)",                      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1988, syvalionp, syvalion, syvalion, syvalionp, syvalion_state, empty_init, ROT0,    "Taito",         "Syvalion (World, prototype)",           MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1988, syvalionu, syvalion, syvalion, syvalion,  syvalion_state, empty_init, ROT0,    "Taito America", "Syvalion (US, PS2 Taito Legends 2)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1988, syvalionw, syvalion, syvalion, syvalion,  syvalion_state, empty_init, ROT0,    "Taito",         "Syvalion (World, PS2 Taito Legends 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1988, recordbr,  0,        recordbr, recordbr,  taitoh_state,   empty_init, ROT0,    "Taito",         "Recordbreaker (World)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gogold,    recordbr, recordbr, gogold,    taitoh_state,   empty_init, ROT0,    "Taito",         "Go For The Gold (Japan)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tetristh,  tetris,   tetristh, tetristh,  taitoh_state,   empty_init, ROT0,    "Sega",          "Tetris (Japan, rev 1, Taito H-System)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, dleague,   0,        dleague,  dleague,   taitoh_state,   empty_init, ROT0,    "Taito America", "Dynamite League (US)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1990, dleaguej,  dleague,  dleague,  dleaguej,  taitoh_state,   empty_init, ROT0,    "Taito",         "Dynamite League (Japan)",               MACHINE_SUPPORTS_SAVE )

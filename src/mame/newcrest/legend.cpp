@@ -166,8 +166,6 @@ private:
 
 void legend_state::machine_start()
 {
-	m_out_lcd.resolve();
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_inp_mux2));

@@ -748,7 +748,7 @@ void sbrain_state::sbrain(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:2", sbrain_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:3", sbrain_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
-	TIMER(config, "timer_a", 0).configure_periodic(FUNC(sbrain_state::kbd_scan), attotime::from_hz(15));
+	TIMER(config, "timer_a").configure_periodic(FUNC(sbrain_state::kbd_scan), attotime::from_hz(15));
 
 	SOFTWARE_LIST(config, "flop_list").set_original("sbrain");
 }

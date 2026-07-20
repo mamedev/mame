@@ -49,8 +49,6 @@ Notes:
 
 void suna8_state::machine_start()
 {
-	m_leds.resolve();
-
 	m_rombank = 0;
 
 	save_item(NAME(m_rombank));

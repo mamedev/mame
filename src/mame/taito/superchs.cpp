@@ -221,7 +221,7 @@ void superchs_state::superchs(machine_config &config)
 	adc.in_callback<1>().set_ioport("ACCEL");
 	adc.in_callback<2>().set(FUNC(superchs_state::volume_r));
 
-	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio"));
 	tc0510nio.read_1_callback().set_ioport("COINS");
 	tc0510nio.read_2_callback().set_ioport("SWITCHES");
 	tc0510nio.read_3_callback().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::do_read)).lshift(7);
@@ -243,7 +243,7 @@ void superchs_state::superchs(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_superchs);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 8192);
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x20, 0x08);
 	m_tc0480scp->set_offsets_tx(-1, 0);
@@ -251,7 +251,7 @@ void superchs_state::superchs(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
 
-	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
+	taito_en_device &taito_en(TAITO_EN(config, "taito_en"));
 	taito_en.add_route(0, "speaker", 1.0, 0);
 	taito_en.add_route(1, "speaker", 1.0, 1);
 }
@@ -560,8 +560,8 @@ void superchs_state::init_superchs()
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0x80000a, 0x80000b, read16smo_delegate(*this, FUNC(superchs_state::sub_cycle_r)));
 }
 
-GAMEL( 1992, superchs,   0,        superchs, superchs, superchs_state, init_superchs, ROT0,               "Taito Corporation Japan",   "Super Chase - Criminal Termination (World)", 0, layout_superchs ) // 1993/02/16 11:39:36 SUPER CHASE VER 1.2O
-GAMEL( 1992, superchsu,  superchs, superchs, superchs, superchs_state, init_superchs, ROT0,               "Taito America Corporation", "Super Chase - Criminal Termination (US)",    0, layout_superchs ) // 1993/02/16 11:39:36 SUPER CHASE VER 1.2A
-GAMEL( 1992, superchsj,  superchs, superchs, superchs, superchs_state, init_superchs, ROT0,               "Taito Corporation",         "Super Chase - Criminal Termination (Japan)", 0, layout_superchs ) // 1993/02/16 11:29:18 SUPER CHASE VER 1.2J
-GAMEL( 1992, superchsp,  superchs, chase3,   superchs, superchs_state, empty_init,    ORIENTATION_FLIP_X, "Taito Corporation",         "Super Chase - Criminal Termination (1992/10/26 20:24:29 CHASE 3 VER 1.1, prototype)", 0, layout_superchs ) // has CHASE 3 as the internal description
-GAMEL( 1992, superchsp2, superchs, chase3,   superchs, superchs_state, empty_init,    ORIENTATION_FLIP_X, "Taito Corporation",         "Super Chase - Criminal Termination (1992/01/18 18:29:18 CHASE 3 VER 1.3O, prototype)", 0, layout_superchs )
+GAMEL( 1992, superchs,   0,        superchs, superchs, superchs_state, init_superchs, ROT0,               "Taito",         "Super Chase - Criminal Termination (World)", 0, layout_superchs ) // 1993/02/16 11:39:36 SUPER CHASE VER 1.2O
+GAMEL( 1992, superchsu,  superchs, superchs, superchs, superchs_state, init_superchs, ROT0,               "Taito America", "Super Chase - Criminal Termination (US)",    0, layout_superchs ) // 1993/02/16 11:39:36 SUPER CHASE VER 1.2A
+GAMEL( 1992, superchsj,  superchs, superchs, superchs, superchs_state, init_superchs, ROT0,               "Taito",         "Super Chase - Criminal Termination (Japan)", 0, layout_superchs ) // 1993/02/16 11:29:18 SUPER CHASE VER 1.2J
+GAMEL( 1992, superchsp,  superchs, chase3,   superchs, superchs_state, empty_init,    ORIENTATION_FLIP_X, "Taito",         "Super Chase - Criminal Termination (1992/10/26 20:24:29 CHASE 3 VER 1.1, prototype)", 0, layout_superchs ) // has CHASE 3 as the internal description
+GAMEL( 1992, superchsp2, superchs, chase3,   superchs, superchs_state, empty_init,    ORIENTATION_FLIP_X, "Taito",         "Super Chase - Criminal Termination (1992/01/18 18:29:18 CHASE 3 VER 1.3O, prototype)", 0, layout_superchs )

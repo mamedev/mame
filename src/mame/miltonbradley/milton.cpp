@@ -60,7 +60,6 @@ milton_filter_device::milton_filter_device(const machine_config &mconfig, const 
 void milton_filter_device::device_start()
 {
 	m_stream = stream_alloc(1, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
-	m_led_out.resolve();
 }
 
 void milton_filter_device::sound_stream_update(sound_stream &stream)
@@ -75,7 +74,7 @@ void milton_filter_device::sound_stream_update(sound_stream &stream)
 	if (stream.samples() > 0)
 		level /= stream.samples();
 
-	// 2 leds connected to the audio circuit
+	// 2 LEDs connected to the audio circuit
 	const sound_stream::sample_t threshold = 1500.0 / 32768.0;
 	m_led_out = (level > threshold) ? 1 : 0;
 }

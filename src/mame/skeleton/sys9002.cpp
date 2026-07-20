@@ -148,7 +148,7 @@ void sys9002_state::sys9002(machine_config &config)
 	uart_clock.signal_handler().append("uart2", FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append("uart2", FUNC(i8251_device::write_rxc));
 
-	i8251_device &uart1(I8251(config, "uart1", 0)); // sync
+	i8251_device &uart1(I8251(config, "uart1")); // sync
 	uart1.txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
 	uart1.dtr_handler().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	uart1.rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));
@@ -158,7 +158,7 @@ void sys9002_state::sys9002(machine_config &config)
 	rs232a.dsr_handler().set("uart1", FUNC(i8251_device::write_dsr));
 	rs232a.cts_handler().set("uart1", FUNC(i8251_device::write_cts));
 
-	i8251_device &uart2(I8251(config, "uart2", 0)); // sync
+	i8251_device &uart2(I8251(config, "uart2")); // sync
 	uart2.txd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
 	uart2.dtr_handler().set("rs232b", FUNC(rs232_port_device::write_dtr));
 	uart2.rts_handler().set("rs232b", FUNC(rs232_port_device::write_rts));

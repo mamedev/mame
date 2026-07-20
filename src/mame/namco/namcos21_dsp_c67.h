@@ -23,7 +23,7 @@ public:
 		NAMCOS21_SOLVALOU,
 	};
 
-	namcos21_dsp_c67_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	namcos21_dsp_c67_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// config
 	template <typename T> void set_renderer_tag(T &&tag) { m_renderer.set_tag(std::forward<T>(tag)); }
@@ -58,7 +58,7 @@ private:
 			std::fill(std::begin(master_port_data), std::end(master_port_data), 0);
 			std::fill(std::begin(master_ddraw_buffer), std::end(master_ddraw_buffer), 0);
 			std::fill(std::begin(slave_input_buffer), std::end(slave_input_buffer), 0);
-			std::fill(std::begin(slave_output_buffer), std::end(slave_output_buffer), 0);
+			std::fill(std::begin(slave_output_buffer), std::end(slave_output_buffer), 0xffff);
 		}
 
 		u16 master_port_data[0x10];
@@ -131,7 +131,7 @@ private:
 	u16 slave_port2_r();
 	u16 slave_port3_r();
 	void slave_port3_w(u16 data);
-	void slave_XF_output_w(u16 data);
+	void slave_xf_output_w(u16 data);
 	u16 slave_portf_r();
 
 	void master_dsp_data(address_map &map) ATTR_COLD;

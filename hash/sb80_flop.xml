@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+Colonial Data Services SB-80 (colonial/sb80.cpp) 8" floppies.
+
+The bootable system disks here carry Dave Rand's v1.22 CBIOS
+("SB 80 CP/M 2.2 61K Version 1.22  Dave Rand  04/15/84").  The Maslin
+dumps are Teledisk (.td0); the curated/recovery images are ImageDisk
+(.imd).  The driver registers both readers.
+
+Provenance and third-party terms for the underlying disks are documented
+in the preservation repository (github: davidlrand/mame-system-media,
+colonial-sb80/README.md and LICENSE).
+-->
+<softwarelist name="sb80_flop" description="Colonial Data Services SB-80 floppies">
+
+	<software name="cpm">
+		<description>CP/M 2.2 (CBIOS v1.22)</description>
+		<year>1984</year>
+		<publisher>Dave Rand</publisher>
+		<info name="usage" value="Dave Rand's v1.22 CBIOS system disk; Don Maslin archive dump 1993-02-09"/>
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="230958">
+				<rom name="sb80-dr.td0" size="230958" crc="f9bfd6dc" sha1="7c2813b54959f79a2f44e62d4518ee2379ec7c7f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmutils">
+		<description>CP/M 2.2 with utilities</description>
+		<year>1984</year>
+		<publisher>Dave Rand</publisher>
+		<info name="usage" value="Curated bootable disk, v1.22 CBIOS plus the standard CP/M utility set"/>
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="821059">
+				<rom name="sb80-boot.imd" size="821059" crc="6abd4a88" sha1="9d3e149c9e2a5f89226099d8cd8a5b1c02d588b1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmrec">
+		<description>CP/M 2.2 (8-inch recovery image)</description>
+		<year>1984</year>
+		<publisher>Dave Rand</publisher>
+		<info name="usage" value="2022 recovery of an original 8-inch system disk; source of the extracted v1.22 BIOS"/>
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="1245621">
+				<rom name="sb80-004.imd" size="1245621" crc="2182d95c" sha1="2ec8381df3c7384ea3f4930f34bec5b4d87c177a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Colonial Data's own OEM CP/M 2.2 (02.15) build: all-MFM 8x1024 with no
+	     IBM-3740 cold-boot track, so it does not cold-boot the stock sb80
+	     driver as-is (needs Colonial Data's own loader).  Preserved here. -->
+	<software name="cpmcds" supported="no">
+		<description>CP/M 2.2 (02.15) (Colonial Data OEM)</description>
+		<year>1984</year>
+		<publisher>Colonial Data Services Corp.</publisher>
+		<info name="usage" value="OEM customer build; will not cold-boot the stock driver (no IBM-3740 boot track)"/>
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="64898">
+				<rom name="sb80-1k.td0" size="64898" crc="740d2b93" sha1="e2636d6105f24e1e38ed4434d7207c79d70e2f2f"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

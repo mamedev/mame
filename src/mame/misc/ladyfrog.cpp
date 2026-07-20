@@ -52,13 +52,242 @@ Notes:
 */
 
 #include "emu.h"
-#include "ladyfrog.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "sound/msm5232.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+
+namespace {
+
+
+class ladyfrog_state : public driver_device
+{
+public:
+	ladyfrog_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_videoram(*this, "videoram"),
+		m_scrlram(*this, "scrlram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_msm(*this, "msm"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch")
+	{ }
+
+	void toucheme(machine_config &config);
+	void ladyfrog(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	/* memory pointers */
+	required_shared_ptr<uint8_t> m_videoram;
+	std::unique_ptr<uint8_t[]>    m_spriteram;
+	required_shared_ptr<uint8_t> m_scrlram;
+	std::vector<uint8_t> m_paletteram;
+	std::vector<uint8_t> m_paletteram_ext;
+
+	/* video-related */
+	tilemap_t    *m_bg_tilemap = nullptr;
+	int        m_tilebank = 0;
+	int        m_palette_bank = 0;
+	int        m_spritetilebase = 0;
+
+	/* misc */
+	int        m_sound_nmi_enable = 0;
+	int        m_pending_nmi = 0;
+	int        m_snd_flag = 0;
+	uint8_t      m_snd_data = 0U;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<msm5232_device> m_msm;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	uint8_t from_snd_r();
+	void to_main_w(uint8_t data);
+	void sound_cpu_reset_w(uint8_t data);
+	void sound_command_w(uint8_t data);
+	void nmi_disable_w(uint8_t data);
+	void nmi_enable_w(uint8_t data);
+	uint8_t snd_flag_r();
+	void ladyfrog_spriteram_w(offs_t offset, uint8_t data);
+	uint8_t ladyfrog_spriteram_r(offs_t offset);
+	void ladyfrog_videoram_w(offs_t offset, uint8_t data);
+	uint8_t ladyfrog_videoram_r(offs_t offset);
+	void ladyfrog_palette_w(offs_t offset, uint8_t data);
+	uint8_t ladyfrog_palette_r(offs_t offset);
+	void ladyfrog_gfxctrl_w(uint8_t data);
+	void ladyfrog_gfxctrl2_w(uint8_t data);
+	uint8_t ladyfrog_scrlram_r(offs_t offset);
+	void ladyfrog_scrlram_w(offs_t offset, uint8_t data);
+	void unk_w(uint8_t data);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	DECLARE_VIDEO_START(toucheme);
+	DECLARE_VIDEO_START(ladyfrog_common);
+	uint32_t screen_update_ladyfrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(nmi_callback);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void ladyfrog_map(address_map &map) ATTR_COLD;
+	void ladyfrog_sound_map(address_map &map) ATTR_COLD;
+};
+
+
+void ladyfrog_state::ladyfrog_spriteram_w(offs_t offset, uint8_t data)
+{
+	m_spriteram[offset] = data;
+}
+
+uint8_t ladyfrog_state::ladyfrog_spriteram_r(offs_t offset)
+{
+	return m_spriteram[offset];
+}
+
+TILE_GET_INFO_MEMBER(ladyfrog_state::get_tile_info)
+{
+	int pal = m_videoram[tile_index * 2 + 1] & 0x0f;
+	int tile = m_videoram[tile_index * 2] + ((m_videoram[tile_index * 2 + 1] & 0xc0) << 2)+ ((m_videoram[tile_index * 2 + 1] & 0x30) << 6);
+	tileinfo.set(0,
+			tile + 0x1000 * m_tilebank,
+			pal,TILE_FLIPY
+			);
+}
+
+void ladyfrog_state::ladyfrog_videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset >> 1);
+}
+
+uint8_t ladyfrog_state::ladyfrog_videoram_r(offs_t offset)
+{
+	return m_videoram[offset];
+}
+
+void ladyfrog_state::ladyfrog_palette_w(offs_t offset, uint8_t data)
+{
+	if (offset & 0x100)
+		m_palette->write8_ext((offset & 0xff) + (m_palette_bank << 8), data);
+	else
+		m_palette->write8((offset & 0xff) + (m_palette_bank << 8), data);
+}
+
+uint8_t ladyfrog_state::ladyfrog_palette_r(offs_t offset)
+{
+	if (offset & 0x100)
+		return m_paletteram_ext[(offset & 0xff) + (m_palette_bank << 8)];
+	else
+		return m_paletteram[(offset & 0xff) + (m_palette_bank << 8)];
+}
+
+void ladyfrog_state::ladyfrog_gfxctrl_w(uint8_t data)
+{
+	m_palette_bank = (data & 0x20) >> 5;
+}
+
+void ladyfrog_state::ladyfrog_gfxctrl2_w(uint8_t data)
+{
+	m_tilebank = ((data & 0x18) >> 3) ^ 3;
+	m_bg_tilemap->mark_all_dirty();
+}
+
+uint8_t ladyfrog_state::ladyfrog_scrlram_r(offs_t offset)
+{
+	return m_scrlram[offset];
+}
+
+void ladyfrog_state::ladyfrog_scrlram_w(offs_t offset, uint8_t data)
+{
+	m_scrlram[offset] = data;
+	m_bg_tilemap->set_scrolly(offset, data);
+}
+
+void ladyfrog_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+{
+	int i;
+	for (i = 0; i < 0x20; i++)
+	{
+		int pr = m_spriteram[0x9f - i];
+		int offs = (pr & 0x1f) * 4;
+		{
+			int code, sx, sy, flipx, flipy, pal;
+			code = m_spriteram[offs + 2] + ((m_spriteram[offs + 1] & 0x10) << 4) + m_spritetilebase;
+			pal = m_spriteram[offs + 1] & 0x0f;
+			sx = m_spriteram[offs + 3];
+			sy = 238 - m_spriteram[offs + 0];
+			flipx = ((m_spriteram[offs + 1] & 0x40)>>6);
+			flipy = ((m_spriteram[offs + 1] & 0x80)>>7);
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+					code,
+					pal,
+					flipx,flipy,
+					sx,sy,15);
+
+			if (m_spriteram[offs + 3] > 240)
+			{
+				sx = (m_spriteram[offs + 3] - 256);
+				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+						code,
+						pal,
+						flipx,flipy,
+							sx,sy,15);
+			}
+		}
+	}
+}
+
+VIDEO_START_MEMBER(ladyfrog_state,ladyfrog_common)
+{
+	m_spriteram = std::make_unique<uint8_t[]>(160);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ladyfrog_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_paletteram.resize(0x200);
+	m_paletteram_ext.resize(0x200);
+	m_palette->basemem().set(m_paletteram, ENDIANNESS_LITTLE, 1);
+	m_palette->extmem().set(m_paletteram_ext, ENDIANNESS_LITTLE, 1);
+
+	m_bg_tilemap->set_scroll_cols(32);
+	m_bg_tilemap->set_scrolldy(15, 15);
+
+	save_pointer(NAME(m_spriteram), 160);
+	save_item(NAME(m_paletteram));
+	save_item(NAME(m_paletteram_ext));
+}
+
+void ladyfrog_state::video_start()
+{
+	// weird, there are sprite tiles at 0x000 and 0x400, but they don't contain all the sprites!
+	m_spritetilebase = 0x800;
+	VIDEO_START_CALL_MEMBER(ladyfrog_common);
+}
+
+VIDEO_START_MEMBER(ladyfrog_state,toucheme)
+{
+	m_spritetilebase = 0x000;
+	VIDEO_START_CALL_MEMBER(ladyfrog_common);
+}
+
+
+uint32_t ladyfrog_state::screen_update_ladyfrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect);
+	return 0;
+}
 
 
 uint8_t ladyfrog_state::from_snd_r()
@@ -394,6 +623,8 @@ ROM_START( touchemea )
 	ROM_LOAD( "7.ic9",    0x10000, 0x10000, CRC(feb1b974) SHA1(ffd4527472cdf655fbebebf4d3abb61962e54457) )
 	ROM_LOAD( "8.ic10",   0x20000, 0x10000, CRC(fc6808bf) SHA1(f1f1b75a79dfdb500012f9b52c6364f0a13dce2d) )
 ROM_END
+
+} // anonymous namespace
 
 GAME( 1990, ladyfrog,  0,        ladyfrog, ladyfrog, ladyfrog_state, empty_init, ORIENTATION_SWAP_XY, "Mondial Games", "Lady Frog", MACHINE_SUPPORTS_SAVE )
 

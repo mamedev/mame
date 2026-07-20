@@ -18,11 +18,27 @@
 
 namespace {
 
-class tkmag220_game_state : public gcm394_game_state
+class gpl162xx_rom_base_state : public gcm394_game_state
 {
 public:
-	tkmag220_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+	gpl162xx_rom_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		gcm394_game_state(mconfig, type, tag)
+	{
+	}
+
+	void gpl16218b_rom(machine_config &config) ATTR_COLD;
+	void gpl16230a_rom(machine_config &config) ATTR_COLD;
+	void gpl16220a_rom(machine_config &config) ATTR_COLD;
+
+private:
+	void common_config(machine_config &config) ATTR_COLD;
+};
+
+class tkmag220_game_state : public gpl162xx_rom_base_state
+{
+public:
+	tkmag220_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+		gpl162xx_rom_base_state(mconfig, type, tag)
 	{
 	}
 
@@ -32,19 +48,19 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	virtual uint16_t cs0_r(offs_t offset) override;
+	virtual u16 cs0_r(offs_t offset) override;
 
-	void tkmag220_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void tkmag220_portd_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	int m_upperbase = 0;
 };
 
 
-class beijuehh_game_state : public gcm394_game_state
+class beijuehh_game_state : public gpl162xx_rom_base_state
 {
 public:
-	beijuehh_game_state(const machine_config& mconfig, device_type type, const char* tag) :
-		gcm394_game_state(mconfig, type, tag)
+	beijuehh_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+		gpl162xx_rom_base_state(mconfig, type, tag)
 	{
 	}
 
@@ -54,28 +70,28 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	virtual uint16_t cs0_r(offs_t offset) override;
+	virtual u16 cs0_r(offs_t offset) override;
 
-	void beijuehh_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void beijuehh_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void beijuehh_portb_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void beijuehh_portd_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	int m_upperbase = 0;
 
-	uint16_t m_portb_data = 0U;
-	uint16_t m_portd_data = 0U;
-	uint8_t m_bank = 0U;
+	u16 m_portb_data = 0U;
+	u16 m_portd_data = 0U;
+	u8 m_bank = 0U;
 };
 
 
-class gameu_handheld_game_state : public gcm394_game_state
+class gameu_handheld_game_state : public gpl162xx_rom_base_state
 {
 public:
-	gameu_handheld_game_state(const machine_config& mconfig, device_type type, const char* tag) :
-		gcm394_game_state(mconfig, type, tag)
+	gameu_handheld_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+		gpl162xx_rom_base_state(mconfig, type, tag)
 	{
 	}
 
-	virtual uint16_t cs0_r(offs_t offset) override;
+	virtual u16 cs0_r(offs_t offset) override;
 
 	void gameu(machine_config &config) ATTR_COLD;
 
@@ -88,19 +104,63 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void gameu_porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void gameu_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void gameu_portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void gameu_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gameu_porta_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void gameu_portb_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void gameu_portc_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void gameu_portd_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	uint32_t m_upperbase;
-	uint16_t m_porta_data;
-	uint16_t m_portb_data;
-	uint16_t m_portc_data;
-	uint16_t m_portd_data;
+	u32 m_upperbase;
+	u16 m_porta_data;
+	u16 m_portb_data;
+	u16 m_portc_data;
+	u16 m_portd_data;
 };
 
 
+void gpl162xx_rom_base_state::common_config(machine_config &config)
+{
+	set_addrmap(0, &gcm394_game_state::cs_map_base);
+
+	m_maincpu->porta_in().set(FUNC(gpl162xx_rom_base_state::porta_r));
+	m_maincpu->portb_in().set(FUNC(gpl162xx_rom_base_state::portb_r));
+	m_maincpu->portc_in().set(FUNC(gpl162xx_rom_base_state::portc_r));
+	m_maincpu->porta_out().set(FUNC(gpl162xx_rom_base_state::porta_w));
+	m_maincpu->space_read_callback().set(FUNC(gpl162xx_rom_base_state::read_external_space));
+	m_maincpu->space_write_callback().set(FUNC(gpl162xx_rom_base_state::write_external_space));
+	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(generalplus_gpl162xx_base_device::irq_vector_cb));
+	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
+	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
+	m_maincpu->set_bootmode(1); // boot from external ROM / CS mirror
+	m_maincpu->set_cs_config_callback(FUNC(gpl162xx_rom_base_state::cs_callback));
+	m_maincpu->set_cs_space(DEVICE_SELF, 0);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(320 * 2, 262 * 2);
+	m_screen->set_visarea(0, (320 * 2) - 1, 0, (240 * 2) - 1);
+	m_screen->set_screen_update("maincpu", FUNC(generalplus_gpl16218b_device::screen_update));
+	m_screen->screen_vblank().set(m_maincpu, FUNC(generalplus_gpl16218b_device::vblank));
+
+	SPEAKER(config, "speaker", 2).front();
+}
+
+void gpl162xx_rom_base_state::gpl16218b_rom(machine_config &config)
+{
+	GPL16218B(config, m_maincpu, 96000000, m_screen);
+	common_config(config);
+}
+
+void gpl162xx_rom_base_state::gpl16220a_rom(machine_config &config)
+{
+	GPL16220A(config, m_maincpu, 96000000, m_screen);
+	common_config(config);
+}
+
+void gpl162xx_rom_base_state::gpl16230a_rom(machine_config &config)
+{
+	GPL16230A(config, m_maincpu, 96000000, m_screen);
+	common_config(config);
+}
 
 static INPUT_PORTS_START( base )
 	PORT_START("IN0")
@@ -406,7 +466,9 @@ static INPUT_PORTS_START( beijuehh )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x0e00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // this one must be kept in this state or the machine will freeze after a few seconds?
 	PORT_BIT( 0xe000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -489,15 +551,43 @@ ROM_START( myac220 )
 	ROM_LOAD16_WORD_SWAP( "myarcadegogamerportable.bin", 0x0000000, 0x8000000, BAD_DUMP CRC(c929a2fa) SHA1(e99007ccc45a268267b4ea0efaf22e3117f5a6bd) ) // several sections seemed to be erased, was repaired with data from tkmag220, likely good but should be verified
 ROM_END
 
+ROM_START( typo176 )
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "gl01gp.u2", 0x0000000, 0x8000000, CRC(44b04142) SHA1(f04a6275e4f3010c660699ab83bd78ca73cb3c7b) )
+ROM_END
+
 ROM_START( gp230 )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "s29gl01gp12tfi01.u2", 0x0000000, 0x8000000, CRC(9deb638e) SHA1(d5815135f48178460eee4a3abd45d79fabe1bcfa) )
 ROM_END
 
+// upper address line ordering is likely wrong on either beijuehh or bornk220
+// currently swapped when loading bornk220 so they match what the beijuehh banking code expects
 ROM_START( beijuehh )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "beijeu.bin", 0x0000000, 0x8000000, CRC(e7b968af) SHA1(a39a3a70e6e0827e4395e09e55983eb9e9348e4a) ) // some address lines might be swapped
+	ROM_LOAD16_WORD_SWAP( "beijeu.bin", 0x0000000, 0x8000000, CRC(e7b968af) SHA1(a39a3a70e6e0827e4395e09e55983eb9e9348e4a) )
 ROM_END
+
+ROM_START( bornk220 )
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "bornkid220.bin", 0x0000000, 0x0800000, CRC(1cd39ea1) SHA1(5a748f2a654ac51014d727a4a0e661e81151a249) )
+	ROM_CONTINUE(0x1000000, 0x0800000)
+	ROM_CONTINUE(0x0800000, 0x0800000)
+	ROM_CONTINUE(0x1800000, 0x0800000)
+	ROM_CONTINUE(0x2000000, 0x0800000)
+	ROM_CONTINUE(0x3000000, 0x0800000)
+	ROM_CONTINUE(0x2800000, 0x0800000)
+	ROM_CONTINUE(0x3800000, 0x0800000)
+	ROM_CONTINUE(0x4000000, 0x0800000)
+	ROM_CONTINUE(0x5000000, 0x0800000)
+	ROM_CONTINUE(0x4800000, 0x0800000)
+	ROM_CONTINUE(0x5800000, 0x0800000)
+	ROM_CONTINUE(0x6000000, 0x0800000)
+	ROM_CONTINUE(0x7000000, 0x0800000)
+	ROM_CONTINUE(0x6800000, 0x0800000)
+	ROM_CONTINUE(0x7800000, 0x0800000)
+ROM_END
+
 
 ROM_START( bornkidh )
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
@@ -538,7 +628,7 @@ ROM_END
 
 void tkmag220_game_state::tkmag220(machine_config &config)
 {
-	gcm394_game_state::base(config);
+	gpl16218b_rom(config);
 
 	m_maincpu->porta_in().set_ioport("IN0");
 	m_maincpu->portb_in().set_ioport("IN1");
@@ -547,7 +637,7 @@ void tkmag220_game_state::tkmag220(machine_config &config)
 	m_maincpu->portd_out().set(FUNC(tkmag220_game_state::tkmag220_portd_w));
 }
 
-void tkmag220_game_state::tkmag220_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void tkmag220_game_state::tkmag220_portd_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (m_maincpu->pc() < 0x10000)
 	{
@@ -565,7 +655,7 @@ void tkmag220_game_state::tkmag220_portd_w(offs_t offset, uint16_t data, uint16_
 }
 
 
-uint16_t tkmag220_game_state::cs0_r(offs_t offset)
+u16 tkmag220_game_state::cs0_r(offs_t offset)
 {
 	// [:] installing cs0 handler start_address 00000000 end_address 007fffff
 	return m_romregion[(offset & 0x07fffff) + m_upperbase];
@@ -577,10 +667,6 @@ void tkmag220_game_state::machine_reset()
 	// each of those programs is 16MBytes, so is either going to have the upper half banked externally like the older hardware types, os possibly using the CS registers on this hardware type
 	m_upperbase = 0 * (0x1000000 / 2);
 	gcm394_game_state::machine_reset();
-
-	//m_maincpu->set_paldisplaybank_high_hack(0);
-	//m_maincpu->set_pal_sprites_hack(0x000);
-	//m_maincpu->set_pal_back_hack(0x000);
 }
 
 
@@ -588,7 +674,7 @@ void tkmag220_game_state::machine_reset()
 
 void beijuehh_game_state::beijuehh(machine_config &config)
 {
-	gcm394_game_state::base(config);
+	gpl16218b_rom(config);
 
 	m_maincpu->porta_in().set_ioport("IN0");
 	m_maincpu->portb_in().set_ioport("IN1");
@@ -597,10 +683,15 @@ void beijuehh_game_state::beijuehh(machine_config &config)
 
 	m_maincpu->portb_out().set(FUNC(beijuehh_game_state::beijuehh_portb_w));
 	m_maincpu->portd_out().set(FUNC(beijuehh_game_state::beijuehh_portd_w));
+
+	// beijuehh and bornkidh have a protection function that runs in the timebase interrupt
+	// for beijuehh it causes freezes in xracer3, in bornkidh it runs at all times and even
+	// freezes the menus.  disable the timebase interrupts in the core until this is understood.
+	m_maincpu->disable_timebase_interrupts();
 }
 
 
-void beijuehh_game_state::beijuehh_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void beijuehh_game_state::beijuehh_portb_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (m_maincpu->pc() < 0xf000)
 	{
@@ -623,7 +714,7 @@ void beijuehh_game_state::beijuehh_portb_w(offs_t offset, uint16_t data, uint16_
 }
 
 
-void beijuehh_game_state::beijuehh_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void beijuehh_game_state::beijuehh_portd_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (m_maincpu->pc() < 0xf000)
 	{
@@ -646,7 +737,7 @@ void beijuehh_game_state::beijuehh_portd_w(offs_t offset, uint16_t data, uint16_
 }
 
 
-uint16_t beijuehh_game_state::cs0_r(offs_t offset)
+u16 beijuehh_game_state::cs0_r(offs_t offset)
 {
 	// [:] installing cs0 handler start_address 00000000 end_address 003fffff
 	return m_romregion[(offset & 0x03fffff) + m_upperbase];
@@ -669,9 +760,6 @@ void beijuehh_game_state::machine_reset()
 	m_upperbase = 0 * (0x400000);
 	gcm394_game_state::machine_reset();
 
-	//m_maincpu->set_paldisplaybank_high_hack(0);
-	//m_maincpu->set_pal_sprites_hack(0x000);
-	//m_maincpu->set_pal_back_hack(0x000);
 	m_maincpu->set_legacy_video_mode();
 }
 
@@ -679,7 +767,7 @@ void beijuehh_game_state::machine_reset()
 
 void gameu_handheld_game_state::gameu(machine_config &config)
 {
-	gcm394_game_state::base(config);
+	gpl16218b_rom(config);
 
 	m_maincpu->porta_out().set(FUNC(gameu_handheld_game_state::gameu_porta_w));
 	m_maincpu->portb_out().set(FUNC(gameu_handheld_game_state::gameu_portb_w));
@@ -690,30 +778,30 @@ void gameu_handheld_game_state::gameu(machine_config &config)
 	m_screen->set_visarea(0, (160)-1, 0, (128)-1); // appears to be the correct resolution for the LCD panel
 }
 
-uint16_t gameu_handheld_game_state::cs0_r(offs_t offset)
+u16 gameu_handheld_game_state::cs0_r(offs_t offset)
 {
 	return m_romregion[(offset & 0x00fffff) + m_upperbase];
 }
 
-void gameu_handheld_game_state::gameu_porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void gameu_handheld_game_state::gameu_porta_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	logerror("%s: porta write %04x\n", machine().describe_context(), data);
 	m_porta_data = data;
 }
 
-void gameu_handheld_game_state::gameu_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void gameu_handheld_game_state::gameu_portb_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	logerror("%s: portb write %04x\n", machine().describe_context(), data);
 	m_portb_data = data;
 }
 
-void gameu_handheld_game_state::gameu_portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void gameu_handheld_game_state::gameu_portc_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	logerror("%s: portc write %04x\n", machine().describe_context(), data);
 	m_portc_data = data;
 }
 
-void gameu_handheld_game_state::gameu_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void gameu_handheld_game_state::gameu_portd_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// hacky, maybe we need better direction/attribute handling on the ports in the core?
 	m_portd_data = data;
@@ -722,7 +810,7 @@ void gameu_handheld_game_state::gameu_portd_w(offs_t offset, uint16_t data, uint
 	{
 		logerror("%s: portd write %04x %04x\n", machine().describe_context(), data, mem_mask);
 
-		uint8_t bank = (data & 0xfc00) >> 10;
+		u8 bank = (data & 0xfc00) >> 10;
 		m_upperbase = bank * 0x40000;
 	}
 
@@ -752,7 +840,7 @@ void gameu_handheld_game_state::machine_reset()
 
 void gameu_handheld_game_state::init_gameu()
 {
-	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
+	u16 *ROM = (u16*)memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
 
 	for (int i = 0; i < size/2; i++)
@@ -771,7 +859,7 @@ void gameu_handheld_game_state::init_gameu50()
 	init_gameu();
 
 	// why do we need these? it will jump to 0 after the menu selection (prior to fadeout and bank select) otherwise, which can't be correct
-	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
+	u16 *ROM = (u16*)memregion("maincpu")->base();
 	int base = 0x19c9a;
 	ROM[(base + 0x00) / 2] = 0xf165;
 	ROM[(base + 0x02) / 2] = 0xf165;
@@ -790,7 +878,7 @@ void gameu_handheld_game_state::init_gameu108()
 {
 	init_gameu();
 
-	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
+	u16 *ROM = (u16*)memregion("maincpu")->base();
 
 	// why do we need these? it will jump to 0 after the menu selection (prior to fadeout and bank select) otherwise, which can't be correct
 	ROM[(0x1aa48) / 2] = 0xf165;
@@ -804,27 +892,24 @@ void gameu_handheld_game_state::init_gameu108()
 
 } // anonymous namespace
 
+// ----------------------------------------------------
+// these set SP to 2fff / only use RAM below that, so are probably 'GPL162xx B' type
+//
+// none of them use NAND, or SDRAM, or high resolution modes, so could be GPL16218B
+// ----------------------------------------------------
+
 // the JAKKS ones of these seem to be known as 'Generalplus GPAC500' hardware?
-CONS(2008, jak_spmm,  0,       0, base, jak_spmm,  gcm394_game_state, empty_init, "JAKKS Pacific Inc / Santa Cruz Games", "The Amazing Spider-Man and The Masked Menace (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS(2008, jak_prr,   0,       0, base, jak_spmm,  gcm394_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Power Rangers to the Rescue (JAKKS Pacific TV Game) (Aug 8 2008 16:46:59)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS(2008, jak_bj,    0,       0, base, jak_bj,    gcm394_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Bejeweled Deluxe (JAKKS Pacific TV Game) (Feb 28 2008 22:54:43)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS(2009, jak_tpir,  0,       0, base, jak_spmm,  gcm394_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "The Price Is Right (JAKKS Pacific TV Game) (Mar 24 2009 17:34:55)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-
-CONS(2009, smartfp,   0,       0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2009, smartfps,  smartfp, 0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2009, smartfpf,  smartfp, 0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (France)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // boxart simply has 'Smart Fit'
-
-// skip the call at 6d47a to get it to show something
-CONS(2008, fpsport,   0,       0, base, base,     gcm394_game_state, empty_init, "Fisher-Price", "3-in-1 Smart Sports! (US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-
-// uses a barcode card scanner device with custom cards
-CONS(200?, dressmtv,  0,       0, base_alt_irq, dressmtv, gcm394_game_state, empty_init, "Takara Tomy", "Disney Princess Dress Mania TV (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(2008, jak_spmm,  0,       0, base, jak_spmm,  gpl162xx_rom_base_state, empty_init, "JAKKS Pacific Inc / Santa Cruz Games", "The Amazing Spider-Man and The Masked Menace (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(2008, jak_prr,   0,       0, base, jak_spmm,  gpl162xx_rom_base_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Power Rangers to the Rescue (JAKKS Pacific TV Game) (Aug 8 2008 16:46:59)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(2008, jak_bj,    0,       0, base, jak_bj,    gpl162xx_rom_base_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Bejeweled Deluxe (JAKKS Pacific TV Game) (Feb 28 2008 22:54:43)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(2009, jak_tpir,  0,       0, base, jak_spmm,  gpl162xx_rom_base_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "The Price Is Right (JAKKS Pacific TV Game) (Mar 24 2009 17:34:55)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // These are ports of the 'Family Sport' games to GPL16250 type hardware, but they don't seem to use many unSP 2.0 instructions.
 // The menu style is close to 'm505neo' but the game selection is closer to 'dnv200fs' (but without the Sports titles removed, and with a few other extras not found on that unit)
 CONS(201?, tkmag220,  0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "TaiKee / Senca",         "Mini Arcade Games Console (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // DGUN-2891 or DGUN-2864 ? both look the same, no indication on unboxed unit?
 CONS(201?, myac220,   0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "dreamGEAR / Senca",      "My Arcade Go Gamer Portable (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS(201?, typo176,   0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "Typo / Senca",           "Arcade Game 2.0 (model 8052C, Family Sport 176-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // has 227 selectable games, and 3 single game cartridges
 // cartridges have no ROM but launch a single game after the boot screen (Fighter, Baseball or Golf)
@@ -835,17 +920,41 @@ CONS(201?, gp230,  0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_i
 CONS(2012, imgame,    0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "I'm Game / Senca",      "I'm Game! GP120 (Family Sport 120-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // a 180 game Family Sport I'm Game! also exists (and some Famiclones)
 
-// Also sold as 'BornKid 220 in 1' There are lower capacity versions too, was sold with note that 'X-Racer III crashes in-game'
-// Does the 'Helicopter' game work properly on real hardware? The function at 0x0D2BE7 uses RAM address 0x2372 for the upper bits of the tile base offset calculation
-// but that RAM address doesn't appear to be written anywhere in the code, resulting in scrolling being entirely broken.
+// beijuehh was sold with a note that 'X-Racer III crashes in-game' (might only not crash in MAME as we're not executing the protection running in the timers)
+// The 'Helicopter' game has severly broken scrolling even on the real devices, not an emulation bug.
 CONS(201?, beijuehh,    0,       0, beijuehh, beijuehh, beijuehh_game_state,  empty_init,      "Beijue",      "Beijue 16 Bit Handheld Games 220-in-1 (Game Boy style case)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS(201?, bornk220,    beijuehh,0, beijuehh, beijuehh, beijuehh_game_state,  empty_init,      "BornKid",     "BornKid 16 Bit Handheld Games 220-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
 CONS(201?, bornkidh,    0,       0, beijuehh, beijuehh, beijuehh_game_state,  empty_init,      "BornKid",     "BornKid 16 Bit Handheld Games 100-in-1 (model GB-10X)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // die on this one is 'GCM420'
-CONS(2013, gormiti,   0, 0, base, gormiti,  gcm394_game_state, empty_init, "Giochi Preziosi", "Gormiti Game Arena (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2013, gormiti,   0, 0, base, gormiti,  gpl162xx_rom_base_state, empty_init, "Giochi Preziosi", "Gormiti Game Arena (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // unit looks a bit like a knock-off Wii-U tablet, but much smaller
 // was also available under other names, with different designs (PSP style)
 CONS( 201?, gameu50,       0,              0,      gameu, gameu, gameu_handheld_game_state, init_gameu50,  "YSN", "Play Portable Color GameU+ (50-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 201?, gameu90,       0,              0,      gameu, gameu, gameu_handheld_game_state, init_gameu,    "YSN", "Play Portable Color GameU+ (90-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 201?, gameu108,      0,              0,      gameu, gameu, gameu_handheld_game_state, init_gameu108, "YSN", "Play Portable Color GameU+ (108-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// ----------------------------------------------------
+// these set SP to 3fff / only use RAM below that, so must be 'GPL162xx A' type
+//
+// high resolution modes not used, NAND not used, so probably GPL16220A
+// ----------------------------------------------------
+
+// uses a barcode card scanner device with custom cards
+CONS(200?, dressmtv,  0,       0, gpl16220a_rom, dressmtv, gpl162xx_rom_base_state, empty_init, "Takara Tomy", "Disney Princess Dress Mania TV (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// skip the call at 6d47a to get it to show something
+CONS(2008, fpsport,   0,       0, gpl16220a_rom, base,     gpl162xx_rom_base_state, empty_init, "Fisher-Price", "3-in-1 Smart Sports! (US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// ----------------------------------------------------
+// these set SP to 6fff so must be 'GPL162xx A' type
+
+// high resolution modes are not used, so probably GPL16230A
+// ----------------------------------------------------
+
+CONS(2009, smartfp,   0,       0, gpl16230a_rom, smartfp,  gpl162xx_rom_base_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, smartfps,  smartfp, 0, gpl16230a_rom, smartfp,  gpl162xx_rom_base_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, smartfpf,  smartfp, 0, gpl16230a_rom, smartfp,  gpl162xx_rom_base_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (France)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // boxart simply has 'Smart Fit'
+

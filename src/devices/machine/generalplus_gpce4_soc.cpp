@@ -74,6 +74,7 @@ void generalplus_gpce4_soc_device::device_start()
 	save_item(NAME(m_pwm3_ctrl));
 
 	set_vectorbase(0x4010);
+	set_bootvectorbase(0x4010);
 
 	m_spiregion = 0;
 	m_spisize = 0;
@@ -1019,7 +1020,7 @@ void generalplus_gpce4_soc_device::fiq2_sel_w(u16 data)
 // 15  SPIEN
 // 14  ---
 // 13  LBM
-// 12  SPICS_IO
+// 12  SPICS_IO (0 = SPI_CS controlled by I/O, 1 = SPI_CS auto controlled)
 //
 // 11  SPIRST
 // 10  ---
@@ -1061,8 +1062,8 @@ void generalplus_gpce4_soc_device::spi2_rxstatus_w(u16 data)
 
 // SPI2_TXSTATUS
 //
-// 15  SPITXIF
-// 14  SPITXIEN
+// 15  SPITXIF     (SPI Transmit Interrupt Flag, Read 0 = Not Occured, Read 1 = Occured, Write 0 = No Effect, Write 1 = Clear flag)
+// 14  SPITXIEN    (SPI Transmit Interrupt Enable)
 // 13  --
 // 12  --
 //
@@ -1071,12 +1072,12 @@ void generalplus_gpce4_soc_device::spi2_rxstatus_w(u16 data)
 //  9  --
 //  8  --
 //
-//  7  TXFLEV[3]
+//  7  TXFLEV[3] - Transmit FIFO interrupt level register (how many empty slots when issuing an IRQ)
 //  6  TXFLEV[2]
 //  5  TXFLEV[1]
 //  4  TXFLEX[0]
 //
-//  3  TXFFLAG[3]
+//  3  TXFFLAG[3] - Transmit FIFO Data Level - how much data is in FIFO
 //  2  TXFFLAG[2]
 //  1  TXFFLAG[1]
 //  0  TXFFLAG[0]
@@ -1115,7 +1116,7 @@ u16 generalplus_gpce4_soc_device::spi2_rxdata_r()
 // 11  ---
 // 10  ---
 //  9  OVER
-//  8  SMART
+//  8  SMART   (0 = Normal Interrupt Clear, 1 = Smart Interrupt Clear)
 //
 //  7  ---
 //  6  ---

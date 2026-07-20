@@ -59,7 +59,7 @@ public:
 	void ms1600(machine_config &config);
 
 protected:
-	virtual void device_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	void configure_sam();
 
 	// PIA1
@@ -100,7 +100,7 @@ public:
 	void ff30_write(offs_t offset, uint8_t data);
 
 protected:
-	virtual void device_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	void configure_sam();
 	void deluxecoco_rom2(address_map &map) ATTR_COLD;
 	void deluxecoco_io1(address_map &map) ATTR_COLD;

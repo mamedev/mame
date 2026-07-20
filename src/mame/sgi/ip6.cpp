@@ -456,7 +456,7 @@ void ip6_state::common(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, "cdrom", false);
 	NSCSI_CONNECTOR(config, "scsi:7", scsi_devices, nullptr, false);
 
-	AM7990(config, m_enet);
+	AM7990(config, m_enet, 10'000'000); // clock is a guess
 	m_enet->intr_out().set(FUNC(ip6_state::lio_interrupt<LIO_ENET>));
 	m_enet->dma_in().set(
 		[this](offs_t offset)
@@ -555,8 +555,6 @@ void ip6_state::machine_start()
 	m_lio_int = false;
 
 	m_dmahi = make_unique_clear<u16 []>(2048);
-
-	m_leds.resolve();
 }
 
 void ip6_state::lio_interrupt(unsigned number, int state)

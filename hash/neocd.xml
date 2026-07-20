@@ -329,7 +329,7 @@ license:CC0-1.0
 	</software>
 
 	<!--
-	source: redump.org/disc/80699/
+	https://redump.info/disc/80699/
 	<rom name="Bang^2 Busters (France) (En,Ja) (Unl).cue" size="339" crc="6e420f96" sha1="5e26f9c70009278f74bbd9f5db9cb5cdc4f2ef77"/>
 	<rom name="Bang^2 Busters (France) (En,Ja) (Unl) (Track 1).bin" size="7883904" crc="f555da2f" sha1="d9e54974652b9fbbe6c3ac82a70e9c06cc16700f"/>
 	<rom name="Bang^2 Busters (France) (En,Ja) (Unl) (Track 2).bin" size="9988944" crc="77311095" sha1="9b77e1ec7e308a567828b5bf8c1e57147781b9ab"/>
@@ -1554,7 +1554,7 @@ license:CC0-1.0
 	</software>
 
 	<!--
-	source: redump.org/disc/96924/
+	https://redump.info/disc/96924/
 	<rom name="Xeno Crisis (World) (Unl).cue" size="5289" crc="0eb03610" sha1="932c61415755579288e8a881e2957c12faa8e5d4"/>
 	<rom name="Xeno Crisis (World) (Unl) (Track 01).bin" size="8069712" crc="97db440b" sha1="11c58e0271e88e92c100211b512bd03c88a0818c"/>
 	<rom name="Xeno Crisis (World) (Unl) (Track 02).bin" size="3083472" crc="1694009d" sha1="570914f1f9aa2b7c58ef9e988b3c619cc428336d"/>

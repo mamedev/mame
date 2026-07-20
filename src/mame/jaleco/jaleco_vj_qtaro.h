@@ -12,7 +12,7 @@
 class jaleco_vj_qtaro_device : public device_t
 {
 public:
-	jaleco_vj_qtaro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	jaleco_vj_qtaro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	static constexpr feature_type imperfect_features() {
 		return feature::TIMING; // DMA timings aren't perfectly synced between all displays so one video stream may end up out of sync
@@ -45,7 +45,7 @@ private:
 class jaleco_vj_king_qtaro_device : public pci_device
 {
 public:
-	jaleco_vj_king_qtaro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	jaleco_vj_king_qtaro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <int DeviceId> void video_mix_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_qtaro[DeviceId]->video_mix_w(offset, data, mem_mask); }
 

@@ -6034,7 +6034,7 @@ Loading cassette software on TO7 and TO7/70 also requires a cartridge, usually B
 
 <!--
     <software name="panique">
-        <description>Panique Atomique Chez NovaSprites (Cracked by Snark Software, Bad)</description>
+        <description>Panique Atomique Chez NovaSprites (cracked by Snark Software, Bad)</description>
         <year>1985</year>
         <publisher>Novasoft</publisher>
 
@@ -8289,7 +8289,7 @@ Loading cassette software on TO7 and TO7/70 also requires a cartridge, usually B
 	</software>
 
 	<software name="yiear2">
-		<description>Yie Ar Kung Fu II</description>
+		<description>Yie Ar Kung-Fu II</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 		<info name="serial" value="KF 1101"/>
@@ -8302,7 +8302,7 @@ Loading cassette software on TO7 and TO7/70 also requires a cartridge, usually B
 	</software>
 
 	<software name="yiear2a" cloneof="yiear2">
-		<description>Yie Ar Kung Fu II (alt)</description>
+		<description>Yie Ar Kung-Fu II (alt)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 		<info name="serial" value="KF 1101"/>

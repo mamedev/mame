@@ -17034,6 +17034,18 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
+	<software name="tarzan">
+		<description>Tarzan (prototype)</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f0" />
+			<dataarea name="rom" size="16384">
+				<rom name="atari_tarzan_42a3.bin" size="16384" crc="15e22f06" sha1="a6d9a3375f9ca62123353760d0c78d05717de7d2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="taskfrce">
 		<description>Task Force</description>
 		<year>1987</year>

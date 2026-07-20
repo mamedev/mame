@@ -27,7 +27,13 @@ public:
 	{
 		set_hostcpu(std::forward<T>(hostcpu), is_master);
 	}
-	namco_c148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T, std::enable_if_t<!std::is_integral_v<std::remove_reference_t<T>>, int> = 0>
+	namco_c148_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&hostcpu, bool is_master) :
+		namco_c148_device(mconfig, tag, owner, 0)
+	{
+		set_hostcpu(std::forward<T>(hostcpu), is_master);
+	}
+	namco_c148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void map(address_map &map) ATTR_COLD;
 
@@ -39,6 +45,7 @@ public:
 
 	template <typename T> void link_c148_device(T &&tag) { m_linked_c148.set_tag(std::forward<T>(tag)); }
 
+	auto in_ext_callback() { return m_in_ext_cb.bind(); }
 	auto out_ext1_callback() { return m_out_ext1_cb.bind(); }
 	auto out_ext2_callback() { return m_out_ext2_cb.bind(); }
 
@@ -55,6 +62,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
+	devcb_read8 m_in_ext_cb;
 	devcb_write8 m_out_ext1_cb;
 	devcb_write8 m_out_ext2_cb;
 

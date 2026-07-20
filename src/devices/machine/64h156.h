@@ -168,7 +168,7 @@ private:
 	void rollback();
 	bool write_next_bit(bool bit, const attotime &limit);
 	void start_writing(const attotime &tm);
-	void commit(const attotime &tm);
+	void commit(const attotime &tm, bool force = false);
 	void stop_writing(const attotime &tm);
 	void live_delay(int state);
 	void live_sync();

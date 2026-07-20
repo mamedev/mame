@@ -50,7 +50,7 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void cardline(machine_config &config);
+	void cardline(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -92,7 +92,6 @@ private:
 
 void cardline_state::machine_start()
 {
-	m_lamps.resolve();
 	m_video = 0;
 	m_hsync_q = 1;
 

@@ -513,8 +513,6 @@ void dblcrown_state::machine_start()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("rom_bank")->configure_entries(0, 0x20, &ROM[0], 0x2000);
-
-	m_lamps.resolve();
 }
 
 void dblcrown_state::machine_reset()
@@ -586,7 +584,7 @@ void dblcrown_state::dblcrown(machine_config &config)
 	ppi.out_pb_callback().set(FUNC(dblcrown_state::bank_w));
 	ppi.out_pc_callback().set(FUNC(dblcrown_state::key_select_w));
 
-	for (auto bank : m_vram_bank)
+	for (auto &bank : m_vram_bank)
 		ADDRESS_MAP_BANK(config, bank).set_map(&dblcrown_state::vram_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x1000);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

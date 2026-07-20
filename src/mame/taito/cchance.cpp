@@ -284,7 +284,7 @@ void cchance_state::cchance(machine_config &config)
 	//m_maincpu->set_vblank_int("screen", FUNC(cchance_state::irq0_line_hold));
 	TIMER(config, "scantimer").configure_scanline(FUNC(cchance_state::scanline_cb), "screen", 0, 1);
 
-	TAITOIO_OPTO(config, "opto", 0);
+	TAITOIO_OPTO(config, "opto");
 	HOPPER(config, m_hopper, attotime::from_msec(100));
 
 	X1_001(config, m_spritegen, 12_MHz_XTAL, m_palette, gfx_cchance);
@@ -329,4 +329,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1987, cchance, 0, cchance, cchance, cchance_state, empty_init, ROT0, "Taito Corporation", "Cherry Chance", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // year/manufacturer confirmed from Taito old "Arcade Game History" page
+GAME( 1987, cchance, 0, cchance, cchance, cchance_state, empty_init, ROT0, "Taito", "Cherry Chance", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // year/manufacturer confirmed from Taito old "Arcade Game History" page

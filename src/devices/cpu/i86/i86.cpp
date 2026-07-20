@@ -9,6 +9,19 @@
     on the i286 emulator by Fabrice Frances which had initial work based on
     David Hedley's pcemu(!).
 
+    DIV/IDIV note: it's been observed on real 8086/8088 that DIV and IDIV
+    set the zero flag in the expected manner according to the quotient.  The
+    firmware for the Akai MPC60 expicitly relies on this behavior.  One
+    example from the routine that calculates how many timer ticks a sample
+    should play for:
+
+    5659 sub dx,dx      ; sets ZF=1
+    565b mov cx,0x000a  ; flags unchanged
+    565e div cx         ; firmware expects this to affect ZF
+    5660 jne 0x5665
+    5662 mov ax,1       ; if ZF=1 the quotient was zero, round up to 1 tick
+    5665 ...
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -497,6 +510,7 @@ void i8086_common_cpu_device::device_start()
 	save_item(NAME(m_sregs));
 	save_item(NAME(m_ip));
 	save_item(NAME(m_prev_ip));
+	save_item(NAME(m_io_stall));
 	save_item(NAME(m_TF));
 	save_item(NAME(m_IF));
 	save_item(NAME(m_DF));
@@ -2044,23 +2058,47 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 			break;
 
 		case 0xe4: // i_inal
-			if (m_lock) m_lock_handler(1);
-			m_regs.b[AL] = read_port_byte( fetch() );
-			if (m_lock) { m_lock_handler(0); m_lock = false; }
-			CLK(IN_IMM8);
+			{
+				if (m_lock) m_lock_handler(1);
+				uint8_t const v = read_port_byte( fetch() );
+				if (m_lock) { m_lock_handler(0); m_lock = false; }
+				if (access_to_be_redone())
+				{
+					// the device wait-stated the cycle; restart
+					m_ip = m_prev_ip;
+					m_icount -= 4;
+					break;
+				}
+				m_regs.b[AL] = v;
+				CLK(IN_IMM8);
+			}
 			break;
 
 		case 0xe5: // i_inax
 			{
 				uint8_t port = fetch();
 
-				m_regs.w[AX] = read_port_word(port);
+				uint16_t const v = read_port_word(port);
+				if (access_to_be_redone())
+				{
+					m_ip = m_prev_ip;
+					m_icount -= 4;
+					break;
+				}
+				m_regs.w[AX] = v;
 				CLK(IN_IMM16);
 			}
 			break;
 
 		case 0xe6: // i_outal
 			write_port_byte_al(fetch());
+			if (access_to_be_redone())
+			{
+				// the device wait-stated the cycle; restart
+				m_ip = m_prev_ip;
+				m_icount -= 4;
+				break;
+			}
 			CLK(OUT_IMM8);
 			break;
 
@@ -2069,6 +2107,13 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 				uint8_t port = fetch();
 
 				write_port_word(port, m_regs.w[AX]);
+				if (access_to_be_redone())
+				{
+					// the device wait-stated the cycle; restart
+					m_ip = m_prev_ip;
+					m_icount -= 4;
+					break;
+				}
 				CLK(OUT_IMM16);
 			}
 			break;
@@ -2117,21 +2162,44 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 			break;
 
 		case 0xec: // i_inaldx
-			m_regs.b[AL] = read_port_byte(m_regs.w[DX]);
-			CLK(IN_DX8);
+			{
+				uint8_t const v = read_port_byte(m_regs.w[DX]);
+				if (access_to_be_redone())
+				{
+					m_ip = m_prev_ip;
+					m_icount -= 4;
+					break;
+				}
+				m_regs.b[AL] = v;
+				CLK(IN_DX8);
+			}
 			break;
 
 		case 0xed: // i_inaxdx
 			{
 				uint32_t port = m_regs.w[DX];
 
-				m_regs.w[AX] = read_port_word(port);
+				uint16_t const v = read_port_word(port);
+				if (access_to_be_redone())
+				{
+					m_ip = m_prev_ip;
+					m_icount -= 4;
+					break;
+				}
+				m_regs.w[AX] = v;
 				CLK(IN_DX16);
 			}
 			break;
 
 		case 0xee: // i_outdxal
 			write_port_byte_al(m_regs.w[DX]);
+			if (access_to_be_redone())
+			{
+				// the device wait-stated the cycle; restart
+				m_ip = m_prev_ip;
+				m_icount -= 4;
+				break;
+			}
 			CLK(OUT_DX8);
 			break;
 
@@ -2140,6 +2208,13 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 				uint32_t port = m_regs.w[DX];
 
 				write_port_word(port, m_regs.w[AX]);
+				if (access_to_be_redone())
+				{
+					// the device wait-stated the cycle; restart
+					m_ip = m_prev_ip;
+					m_icount -= 4;
+					break;
+				}
 				CLK(OUT_DX16);
 			}
 			break;
@@ -2286,6 +2361,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 						{
 							m_regs.b[AL] = uresult;
 							m_regs.b[AH] = uresult2;
+							set_ZF(m_regs.b[AL]);
 						}
 					}
 					else
@@ -2309,6 +2385,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 						{
 							m_regs.b[AL] = result;
 							m_regs.b[AH] = result2;
+							set_ZF(m_regs.b[AL]);
 						}
 					}
 					else
@@ -2381,6 +2458,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 						{
 							m_regs.w[AX] = uresult;
 							m_regs.w[DX] = uresult2;
+							set_ZF(m_regs.w[AX]);
 						}
 					}
 					else
@@ -2404,6 +2482,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 						{
 							m_regs.w[AX] = result;
 							m_regs.w[DX] = result2;
+							set_ZF(m_regs.w[AX]);
 						}
 					}
 					else

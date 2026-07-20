@@ -151,8 +151,8 @@ generic_terminal_device::generic_terminal_device(const machine_config &mconfig, 
 	, m_height(h)
 	, m_buffer()
 	, m_x_pos(0)
-	, m_framecnt(0)
 	, m_y_pos(0)
+	, m_framecnt(0)
 	, m_bell_timer(nullptr)
 	, m_beeper(*this, "beeper")
 	, m_keyboard_cb(*this)
@@ -336,7 +336,7 @@ void generic_terminal_device::device_add_mconfig(machine_config &config)
 	screen.set_visarea(0, generic_terminal_device::TERMINAL_WIDTH*8-1, 0, generic_terminal_device::TERMINAL_HEIGHT*10-1);
 	screen.set_screen_update(FUNC(generic_terminal_device::update));
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG, 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG));
 	keyboard.set_keyboard_callback(FUNC(generic_terminal_device::kbd_put));
 
 	SPEAKER(config, "bell").front_center();

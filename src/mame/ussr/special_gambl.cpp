@@ -57,7 +57,7 @@ public:
 		, m_cold_boot(0)
 	{ }
 
-	void dice(machine_config &config);
+	void dice(machine_config &config) ATTR_COLD;
 
 	ioport_value boot_r() { return m_cold_boot; }
 	DECLARE_INPUT_CHANGED_MEMBER(ram_test) { m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE); }
@@ -128,8 +128,6 @@ TIMER_CALLBACK_MEMBER(dinaris_state::update_boot_flag)
 
 void dinaris_state::machine_start()
 {
-	m_lamps.resolve();
-
 	constexpr int size = 0x800; // actually used only 256 bytes
 	m_sram = std::make_unique<u8[]>(size);
 	m_nvram->set_base(&m_sram[0], size);
@@ -253,9 +251,9 @@ void dinaris_state::dice(machine_config &config)
 
 	// Sound
 	SPEAKER(config, "speaker").front_center();
-	SPECIMX_SND(config, "custom", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	SPECIMX_SND(config, "custom").add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(XTAL(8'000'000) / 4);
 	m_pit->out_handler<0>().set("custom", FUNC(specimx_sound_device::set_input_ch0));
 	m_pit->set_clk<1>(XTAL(8'000'000) / 4);

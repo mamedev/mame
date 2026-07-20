@@ -29,6 +29,8 @@ public:
 
 	template <u8 mask> void slot_irq_w(int state);
 	void asc_irq_w(int state);
+	void scsi_irq_w(int state) { m_pseudovia->scsi_irq_w(state); }
+	void scsi_drq_w(int state) { m_pseudovia->scsi_drq_w(state); }
 
 protected:
 	// device_t implementation

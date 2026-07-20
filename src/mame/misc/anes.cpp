@@ -110,7 +110,7 @@ private:
 
 	void rombank_w(uint8_t data);
 	void matrix_w(uint8_t data);
-	uint8_t key_r(offs_t offset);
+	uint8_t key_r();
 	uint8_t m1_rom_r(offs_t offset);
 
 	void palette_enable_w(uint8_t data);
@@ -278,7 +278,7 @@ void anes_state::matrix_w(uint8_t data)
 		logerror("%s: Unknown mux bit written %02X\n", machine().describe_context(), data);
 }
 
-uint8_t anes_state::key_r(offs_t offset)
+uint8_t anes_state::key_r()
 {
 	uint8_t data = 0xff;
 
@@ -821,7 +821,7 @@ ROM_START( chardash )
 
 	ROM_REGION(0x200000, "blitter", 0)
 	ROM_LOAD( "anes_e21.u16", 0x000000, 0x100000, CRC(2db77530) SHA1(a1e7f1b4c34999342a75b459f63f790526da9ca0) )
-	ROM_LOAD( "anes_e22.u17", 0x000000, 0x100000, CRC(ba10631e) SHA1(5f1e69171b9d1ddf6a12d549d5a402acd09fa3bf) )
+	ROM_LOAD( "anes_e22.u17", 0x100000, 0x100000, CRC(ba10631e) SHA1(5f1e69171b9d1ddf6a12d549d5a402acd09fa3bf) )
 
 	ROM_REGION(0x100000, "oki", 0)
 	ROM_LOAD( "anes_m11.u29", 0x000000, 0x100000, CRC(66316c40) SHA1(d253299dd4da3c680b41fef709377e974dc7a969) )

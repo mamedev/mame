@@ -587,6 +587,8 @@ void maciici_state::maciixi_base(machine_config &config)
 	NCR53C80(config, m_ncr5380);
 	m_scsibus1->set_external_device(7, m_ncr5380);
 	m_ncr5380->drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
+	m_ncr5380->drq_handler().append(m_rbv, FUNC(rbv_device::scsi_drq_w));
+	m_ncr5380->irq_handler().set(m_rbv, FUNC(rbv_device::scsi_irq_w)).invert();
 
 	MAC_SCSI_HELPER(config, m_scsihelp);
 	m_scsihelp->scsi_read_callback().set(m_ncr5380, FUNC(ncr53c80_device::read));
@@ -615,7 +617,7 @@ void maciici_state::maciixi_base(machine_config &config)
 	m_ram->set_default_size("2M");
 	m_ram->set_extra_options("4M,8M,16M,32M,48M,64M,128M");
 
-	nubus_device &nubus(NUBUS(config, "nubus", 0));
+	nubus_device &nubus(NUBUS(config, "nubus"));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.out_irq9_callback().set(m_rbv, FUNC(rbv_device::slot_irq_w<0x01>));
 	nubus.out_irqa_callback().set(m_rbv, FUNC(rbv_device::slot_irq_w<0x02>));
@@ -675,7 +677,7 @@ void maciici_state::maciisi(machine_config &config)
 	config.device_remove("nubus");
 
 	// TODO: IIsi takes an adapter card that can accept either one SE/30 PDS card or one NuBus card
-	nubus_device &nubus(NUBUS(config, "pds", 0));
+	nubus_device &nubus(NUBUS(config, "pds"));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.out_irq9_callback().set(m_rbv, FUNC(rbv_device::slot_irq_w<0x01>));
 	nubus.out_irqa_callback().set(m_rbv, FUNC(rbv_device::slot_irq_w<0x02>));

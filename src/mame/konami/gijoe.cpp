@@ -534,7 +534,7 @@ void gijoe_state::gijoe(machine_config &config)
 	m_k053246->set_config(NORMAL_PLANE_ORDER, -37, 20);
 	m_k053246->set_palette(m_palette);
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();

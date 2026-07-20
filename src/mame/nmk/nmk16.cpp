@@ -214,9 +214,11 @@ Reference of music tempo:
 #include "sound/ymopn.h"
 #include "sound/ymopl.h"
 
-#include "multibyte.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "endianness.h"
+#include "multibyte.h"
 
 #define VERBOSE     0
 #include "logmacro.h"
@@ -4435,7 +4437,7 @@ void nmk16_state::sprite_dma_cb(int state)
 
 void nmk16_state::set_interrupt_timing(machine_config &config)
 {
-	NMK_IRQ(config, m_nmk_irq, 0);
+	NMK_IRQ(config, m_nmk_irq);
 	m_nmk_irq->set_screen(m_screen);
 	m_nmk_irq->irq_callback().set(FUNC(nmk16_state::main_irq_cb));
 	m_nmk_irq->sprite_dma_callback().set(FUNC(nmk16_state::sprite_dma_cb));
@@ -4661,7 +4663,7 @@ void nmk16_state::mustangb(machine_config &config)
 
 	OKIM6295(config, "oki", 1320000, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound"));
 	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
 	seibu_sound.coin_io_callback().set_constant(0xff); // unused
 	seibu_sound.set_rom_tag("audiocpu");
@@ -4881,7 +4883,7 @@ void nmk16_state::acrobatmbl(machine_config &config)
 
 	OKIM6295(config, "oki", 8_MHz_XTAL / 8, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40); // divider not verified
 
-	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound"));
 	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
 	seibu_sound.coin_io_callback().set_constant(0xff); // unused
 	seibu_sound.set_rom_tag("audiocpu");
@@ -4937,7 +4939,7 @@ void nmk16_state::tdragonb(machine_config &config)    // bootleg using Raiden so
 
 	OKIM6295(config, "oki", 1320000, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound"));
 	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
 	seibu_sound.coin_io_callback().set_constant(0xff); // unused
 	seibu_sound.set_rom_tag("audiocpu");
@@ -5214,7 +5216,7 @@ void nmk16_state::strahljbl(machine_config &config)
 
 	OKIM6295(config, "oki", 12_MHz_XTAL / 12, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40); // XTAL confirmed, divisor not
 
-	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound"));
 	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
 	seibu_sound.coin_io_callback().set_constant(0xff); // unused
 	seibu_sound.set_rom_tag("audiocpu");
@@ -5472,7 +5474,7 @@ void nmk16_state::macross2(machine_config &config)
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 
@@ -5518,7 +5520,7 @@ void nmk16_state::tdragon2(machine_config &config)
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 
@@ -5581,7 +5583,7 @@ void nmk16_state::raphero(machine_config &config)
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 
@@ -5613,7 +5615,7 @@ void nmk16_state::bjtwin(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 
@@ -5693,11 +5695,11 @@ void macross_prot_state::base_nmk214_215(machine_config &config)
 	m_protcpu->port_write<3>().set(FUNC(macross_prot_state::mcu_port3_to_214_w));
 	m_protcpu->port_write<7>().set(FUNC(macross_prot_state::mcu_port7_to_214_w));
 
-	NMK214(config, m_nmk214[0], 0); // Descrambling device for sprite GFX data
+	NMK214(config, m_nmk214[0]); // Descrambling device for sprite GFX data
 	m_nmk214[0]->set_mode(0);
 	m_nmk214[0]->set_input_address_bitswap(nmk214_sprites_address_bitswap);
 
-	NMK214(config, m_nmk214[1], 0); // Descrambling device for BG GFX data
+	NMK214(config, m_nmk214[1]); // Descrambling device for BG GFX data
 	m_nmk214[1]->set_mode(1);
 	m_nmk214[1]->set_input_address_bitswap(nmk214_bg_address_bitswap);
 }
@@ -5757,7 +5759,7 @@ void nmk16_state::powerins(machine_config &config)
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 2.0);
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 
@@ -5840,7 +5842,7 @@ void nmk16_state::powerinsb(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 
@@ -9762,7 +9764,7 @@ ROM_START( redhawkc ) // China & Hong Kong
 	// Unused
 
 	ROM_REGION( 0x40000, "oki1", 0 ) // Samples
-	ROM_LOAD( "afega_5", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) ) // same as all Red Hawk sets
+	ROM_LOAD( "afega_5.bin", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) ) // same as all Red Hawk sets
 ROM_END
 
 
@@ -10417,6 +10419,32 @@ ROM_START( dolmenk )
 	ROM_LOAD( "afega_3.su13", 0x040000, 0x40000, CRC(d3531018) SHA1(940067a8634339258666c89319cb0e1b43f2af56) )
 ROM_END
 
+ROM_START( puzlwrld )
+	ROM_REGION( 0x40000, "maincpu", 0 )     // 68000 code
+	ROM_LOAD16_BYTE( "afega8.uj3", 0x00000, 0x20000, CRC(be64d452) SHA1(a85df15738a03138c47c5ffca6a8255c428ee339) )
+	ROM_LOAD16_BYTE( "afega7.uj2", 0x00001, 0x20000, CRC(d812eca4) SHA1(d1b6802cf2c09f57c55464d2c41e49021f97c8fa) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )     // Z80 code
+	ROM_LOAD( "afega1.su6", 0x00000, 0x08000, CRC(17e11c06) SHA1(29d7b8b39b3a21de4740249ac45eb9832ca0475c) )
+
+	ROM_REGION( 0x80000, "sprites", 0 )   // Sprites, 16x16x4
+	ROM_LOAD16_BYTE( "afega4.ub11", 0x00000, 0x40000, CRC(ba1d2fde) SHA1(6f62b2f0956da50dabdceeceb01c29a0ce0ea874) )
+	ROM_LOAD16_BYTE( "afega5.ub13", 0x00001, 0x40000, CRC(223da2b4) SHA1(b86afb063d8461f49cb8da632570ea832919eb51) )
+
+	ROM_REGION( 0x40000, "bgtile", 0 )    // Layer 0, 16x16x8
+	ROM_LOAD( "afega9.ui20", 0x00000, 0x40000, CRC(7edd3c4e) SHA1(1321c86396c892a3a405f2f4ab7b9488f0f24188) )
+	// second empty socket
+
+	ROM_REGION( 0x20000, "fgtile", 0 )    // Layer 1, 8x8x4
+	ROM_LOAD( "afega6.uj11", 0x00000, 0x20000, CRC(8db1a7c1) SHA1(60b29e30faa7c4df07cf2d07158543b6eae42571) )
+
+	ROM_REGION( 0x80000, "oki1", 0 )   // Samples
+	ROM_LOAD( "afega2.su12", 0x000000, 0x20000, CRC(667c208a) SHA1(cc37bdbdb5fd6d09eaa517d01806775f59384758) )
+	ROM_RELOAD(              0x020000, 0x20000 )
+	ROM_LOAD( "afega3.su13", 0x040000, 0x40000, CRC(1f042b9c) SHA1(9eb5cccf072d9fa89184cbd1403f502da3eb54ae) )
+ROM_END
+
+
 /***************************************************************************
 
 Fire Hawk (ESD, 2001)
@@ -10780,6 +10808,9 @@ GAME( 1995, twinactn,   0,        twinactn,     twinactn,     nmk16_state, init_
 
 GAME( 1995, dolmen,     0,        twinactn,     dolmen,       nmk16_state, init_twinactn,        ROT0,               "Afega",                             "Dolmen", 0 )
 GAME( 1995, dolmenk,    dolmen,   twinactn,     dolmenk,      nmk16_state, init_twinactn,        ROT0,               "Afega",                             "Goindol (Afega)", 0 )
+
+// a Korean release of Puzzle World also exists, with different title screen
+GAME( 1996, puzlwrld,   0,        twinactn,     dolmen,       nmk16_state, init_twinactn,        ROT0,               "Afega",                             "Puzzle World", 0 )
 
 GAME( 1998, stagger1,   0,        stagger1,     stagger1,     afega_state, empty_init,           ROT270,             "Afega",                             "Stagger I (Japan)", 0 ) // flip-screen doesn't work on sprites for all sets
 GAME( 1997, redhawk,    stagger1, stagger1,     stagger1,     afega_state, init_redhawk,         ROT270,             "Afega (New Vision Ent. license)",   "Red Hawk (USA, Canada & South America)", 0 )

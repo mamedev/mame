@@ -2,13 +2,14 @@
 // copyright-holders:Olivier Galibert
 
 #include "emu.h"
+
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i186.h"
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/floppy.h"
+#include "machine/ins8250.h"
 #include "machine/upd765.h"
 #include "sound/dac.h"
-#include "machine/ins8250.h"
-#include "bus/rs232/rs232.h"
 
 #include "screen.h"
 #include "softlist_dev.h"
@@ -114,7 +115,6 @@ public:
 		set_options(std::forward<T>(opts), dflt, fixed);
 	}
 	mindset_module(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-	virtual ~mindset_module() = default;
 
 	void map(address_space &space, offs_t base, bool id);
 
@@ -153,7 +153,6 @@ void mindset_module::map(address_space &space, offs_t base, bool id)
 class mindset_sound_module: public mindset_module_interface {
 public:
 	mindset_sound_module(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-	virtual ~mindset_sound_module() = default;
 
 	virtual void map(address_map &map) override ATTR_COLD;
 	virtual void idmap(address_map &map) override ATTR_COLD;
@@ -249,7 +248,6 @@ void mindset_sound_module::device_add_mconfig(machine_config &config)
 class mindset_rs232_module: public mindset_module_interface {
 public:
 	mindset_rs232_module(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-	virtual ~mindset_rs232_module() = default;
 
 	virtual void map(address_map &map) override ATTR_COLD;
 	virtual void idmap(address_map &map) override ATTR_COLD;
@@ -298,9 +296,8 @@ class mindset_state: public driver_device
 {
 public:
 	mindset_state(const machine_config &mconfig, device_type type, const char *tag);
-	virtual ~mindset_state() = default;
 
-	void mindset(machine_config &config);
+	void mindset(machine_config &config) ATTR_COLD;
 
 protected:
 	required_device<i80186_cpu_device> m_maincpu;
@@ -429,11 +426,6 @@ template<int floppy> void mindset_state::floppy_led_cb(floppy_image_device *, in
 
 void mindset_state::machine_start()
 {
-	m_floppy_leds.resolve();
-	m_red_led.resolve();
-	m_yellow_led.resolve();
-	m_green_led.resolve();
-
 	m_maincpu->space(AS_PROGRAM).cache(m_gcps);
 	for(int i=0; i<2; i++)
 		m_floppy[i] = m_fdco[i]->get_device();

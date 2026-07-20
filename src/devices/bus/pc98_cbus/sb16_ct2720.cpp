@@ -10,13 +10,27 @@ References:
 
 TODO:
 - Optional YM2203 (+ ROM socket), PC-9801-26K equivalent fallback;
-- Game port;
 - MIDI;
-- CT1741 (DSP);
 - CT1745 (Mixer);
 - CD-Rom interface/CD-In;
 - Mic-In/Line-In;
 - Configuration dips;
+- Doesn't play well with hardcoded FDC DRQ3 in base driver (use DRQ0 for now);
+- wolf3d: fails identification purely from OPL3
+\- Writes 0x60 -> 0x80 to reg $04 (mask timer A and B, send a reset to FM)
+\- loads OPL3 timer A with a 0xff in reg $02 (max time?)
+\- sets OPL3 timer reg $04 -> 0x21 (enable timer A, mask timer B)
+\- bp 13e51b pretends to read it back as res & 0xe0 == 0xc0
+   (irq and timer A statuses high, timer B low)
+\- does plenty of non-SB16 accesses at $28d1, for delay?
+- doom: fails identification from DSP
+\- sets a speaker on command 0xd1, which throws DSP out of service host PC=131dde MCU PC=11f6
+
+Notes:
+- For debugging DSP from debugger (and convert to AT style):
+wpiset 0x2c00,0x400,w,(wpaddr & 0xff) == 0xd2,{printf "%04x %02x",((wpaddr >> 8) & 0x0f )+ 0x220, wpdata;g}
+wpiset 0x2c00,0x400,r,(wpaddr & 0xff) == 0xd2,{printf "%04x R",((wpaddr >> 8) & 0x0f )+ 0x220;g}
+
 
 **************************************************************************************************/
 
@@ -32,9 +46,12 @@ sb16_ct2720_device::sb16_ct2720_device(const machine_config &mconfig, const char
 	: device_t(mconfig, SB16_CT2720, tag, owner, clock)
 	, device_pc98_cbus_slot_interface(mconfig, *this)
 	, m_opl3(*this, "opl3")
+	, m_dsp(*this, "dsp")
 	, m_mixer(*this, "mixer")
 	, m_ldac(*this, "ldac")
 	, m_rdac(*this, "rdac")
+	, m_irqs(*this, "irqs")
+	, m_joy(*this, "pc_joy")
 {
 }
 
@@ -49,12 +66,37 @@ void sb16_ct2720_device::device_add_mconfig(machine_config &config)
 	m_mixer->add_route(0, "speaker", 1.0, 0);
 	m_mixer->add_route(1, "speaker", 1.0, 1);
 	m_mixer->irq_status_cb().set([this] () {
-		(void)this;
-		return 0;
 		//return (m_irq8 << 0) | (m_irq16 << 1) | (m_irq_midi << 2) | (0x8 << 4);
+		return (m_irq8 << 0) | (m_irq16 << 1) | (0x8 << 4);
 	});
 
-//  PC_JOY(config, m_joy);
+	CT1741(config, m_dsp, XTAL(24'000'000));
+	m_dsp->ldac_write_cb().set(m_ldac, FUNC(dac_16bit_r2r_device::write));
+	m_dsp->rdac_write_cb().set(m_rdac, FUNC(dac_16bit_r2r_device::write));
+	m_dsp->irq8_cb().set([this] (int state) {
+		m_irq8 = state;
+		m_irqs->in_w<0>(state);
+	});
+	m_dsp->irq16_cb().set([this] (int state) {
+		m_irq16 = state;
+		m_irqs->in_w<1>(state);
+	});
+	m_dsp->drq8_cb().set([this] (int state) {
+		m_bus->drq_w(0, state);
+	});
+	m_dsp->drq16_cb().set([this] (int state) {
+		if (state)
+			popmessage("sb16_ct2720.cpp: DMA16 high on C-Bus?\n");
+	});
+	m_dsp->speaker_off_cb().set(m_mixer, FUNC(ct1745_mixer_device::dac_speaker_off_cb));
+
+	// TODO: PnP line
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set([this](int state) { m_bus->int_w(1, state); });
+
+
+	PC_JOY(config, m_joy);
+	// doom can set this up, but generally for PC-98 we want it opt-in really
+	m_joy->set_default_option(nullptr);
 
 //  MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(FUNC(sb_device::midi_rx_w));
 //  MIDI_PORT(config, "mdout", midiout_slot, "midiout");
@@ -71,6 +113,10 @@ void sb16_ct2720_device::device_add_mconfig(machine_config &config)
 
 void sb16_ct2720_device::device_start()
 {
+	m_bus->set_dma_channel(0, this, false);
+
+	save_item(NAME(m_irq8));
+	save_item(NAME(m_irq16));
 }
 
 void sb16_ct2720_device::device_reset()
@@ -90,7 +136,8 @@ void sb16_ct2720_device::remap(int space_id, offs_t start, offs_t end)
 void sb16_ct2720_device::io_map(address_map &map)
 {
 	const u16 base = 0xd2;
-//  map(0x0400 | base, 0x0400 | base).select(0x300) PC Gameport
+	// ($200-$207 on AT)
+	map(0x0400 | base, 0x0400 | base).select(0x300).rw(m_joy, FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
 	map(0x2000 | base, 0x2000 | base).select(0x300).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_opl3->read(offset >> 8);
@@ -108,7 +155,7 @@ void sb16_ct2720_device::io_map(address_map &map)
 			m_mixer->write(offset >> 8, data);
 		})
 	);
-//  map(0x2600 | base, 0x2600 | base) CT1741 DSP reset
+	map(0x2600 | base, 0x2600 | base).w(m_dsp, FUNC(ct1741_dsp_device::dsp_reset_w));
 	map(0x2800 | base, 0x2800 | base).select(0x100).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_opl3->read(offset >> 8);
@@ -117,8 +164,11 @@ void sb16_ct2720_device::io_map(address_map &map)
 			m_opl3->write(offset >> 8, data);
 		})
 	);
-//  map(0x2a00 | base, 0x2a00 | base) CT1741 DSP read data port
-//  map(0x2c00 | base, 0x2c00 | base).select(0x300) CT1741 DSP ($22c-$22f on AT)
+	map(0x2a00 | base, 0x2a00 | base).r(m_dsp, FUNC(ct1741_dsp_device::host_data_r));
+	// $22c-$22f on AT
+	map(0x2c00 | base, 0x2c00 | base).select(0x100).rw(m_dsp, FUNC(ct1741_dsp_device::dsp_wbuf_status_r), FUNC(ct1741_dsp_device::host_cmd_w));
+	map(0x2e00 | base, 0x2e00 | base).select(0x100).r(m_dsp, FUNC(ct1741_dsp_device::dsp_rbuf_status_r));
+
 //  map(0x8000 | base, 0x8000 | base).select(0x100) MIDI port/Wave Blaster
 	map(0xc800 | base, 0xc800 | base).select(0x300).lrw8(
 		NAME([this] (offs_t offset) {
@@ -128,4 +178,14 @@ void sb16_ct2720_device::io_map(address_map &map)
 			m_opl3->write(offset >> 8, data);
 		})
 	);
+}
+
+u8 sb16_ct2720_device::dack_r(int line)
+{
+	return m_dsp->dack_r();
+}
+
+void sb16_ct2720_device::dack_w(int line, u8 data)
+{
+	m_dsp->dack_w(data);
 }

@@ -133,7 +133,7 @@ void vt82c586b_isa_device::device_add_mconfig(machine_config &config)
 	m_aux_con->out_clock_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::aux_clk_w));
 	m_aux_con->out_data_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::aux_data_w));
 
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->irq3_callback().set(FUNC(vt82c586b_isa_device::pc_irq3_w));
 	m_isabus->irq4_callback().set(FUNC(vt82c586b_isa_device::pc_irq4_w));
 	m_isabus->irq5_callback().set(FUNC(vt82c586b_isa_device::pc_irq5_w));
@@ -286,9 +286,9 @@ void vt82c586b_isa_device::config_map(address_map &map)
 			LOG("46h: Miscellaneous Control 1 %02x\n", data);
 		})
 	);
-	// bit 5 EISA $4d0/$4d1 enable
-	// bit 3 <reserved> but can be written to
-	// bit 0 PCI reset
+	// --x- ---- EISA $4d0/$4d1 enable
+	// ---- x--- <reserved> but can be written to
+	// ---- ---x PCI reset
 	map(0x47, 0x47).lrw8(
 		NAME([this] () { return m_misc_control[1]; }),
 		NAME([this] (offs_t offset, u8 data) {

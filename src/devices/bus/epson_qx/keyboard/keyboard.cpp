@@ -126,8 +126,6 @@ void keyboard_device::device_add_mconfig(machine_config &config)
 
 void keyboard_device::device_start()
 {
-	m_leds.resolve();
-
 	m_clk_state = 0;
 
 	save_item(NAME(m_rxd));

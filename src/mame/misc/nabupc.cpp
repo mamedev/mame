@@ -350,8 +350,6 @@ void nabupc_state::nabupc(machine_config &config)
 // Machine Start
 void nabupc_state::machine_start()
 {
-	m_leds.resolve();
-
 	m_hccauart->write_np(1);
 	m_hccauart->write_nb2(1);
 	m_hccauart->write_nb1(1);

@@ -386,9 +386,9 @@ void generalplus_gpce4_state::generalplus_gpce4(machine_config &config)
 	// this triggers the SPI2 interrupt, causing pixels to be pushed to the display
 	TIMER(config, "timer").configure_periodic(FUNC(generalplus_gpce4_state::timer), attotime::from_hz(300000));
 
-	GENERIC_SPI_FLASH(config, m_genspi, 0);
+	GENERIC_SPI_FLASH(config, m_genspi);
 
-	ST7735(config, m_lcdc, 0);
+	ST7735(config, m_lcdc);
 }
 
 void generalplus_gpce4_digicolr_state::digicolr(machine_config &config)
@@ -495,4 +495,3 @@ CONS( 2022, digicolr,   0,         0,      digicolr,            digicolr,       
 
 // Probably not identical hardware, but still not direct mapped SPI.  External ROM after 0x3000 is encrypted (maybe decrypted in software) seems to have jumps to internal ROM
 CONS( 2021, siddr,         0,       0,      generalplus_gpce4,   generalplus_gpce4, generalplus_gpce4_mapacman_state, init_siddr, "Super Impulse", "Dance Dance Revolution - Broadwalk Arcade", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-

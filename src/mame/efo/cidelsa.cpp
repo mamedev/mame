@@ -364,8 +364,6 @@ TIMER_CALLBACK_MEMBER(cidelsa_state::reset_done)
 
 void cidelsa_state::machine_start()
 {
-	m_leds.resolve();
-
 	// register for state saving
 	save_item(NAME(m_reset));
 

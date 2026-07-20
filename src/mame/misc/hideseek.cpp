@@ -1,14 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:Guru
+// copyright-holders:
+
 /* Hide & Seek
 
-the AG-2 AX51201 should be the follow-up to the AG-1 AX51101 in gunpey.cpp
+"Augus Gaming System" (AGS series, Augus being the devs?)
 
-AS:
-Current ROM code barely contains some valid SH-2 opcodes but not enough for a HD64F7045F28. i.e. It doesn't contain VBR set-up, valid irq routines,
-a valid irq table and no internal SH-2 i/o set-up. sub-routine at 0xe0 also points to 0x4b0, which is full of illegal opcodes with current ROM.
-The HD64F7045F28 manual says that there's an on-chip ROM at 0-0x3ffff (page 168), meaning that this one definitely needs a trojan/decap (and also an SH-2 core
-that supports the very different i/o map ;-)
+the AG-2 AX51201 should be the follow-up to the AG-1 AX51101 in gunpey.cpp
 
 Guru:
 It's called Hide and Seek. I don't know the manufacturer.
@@ -27,7 +24,12 @@ Other stuff: NEC D4992 (RTC?) and xtal possibly 32.768kHz, 3V coin battery, 93L4
 
 
 #include "emu.h"
-#include "cpu/sh/sh7604.h"
+
+#include "cpu/sh/sh7042.h"
+#include "machine/eepromser.h"
+#include "machine/upd4992.h"
+#include "sound/okim9810.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -41,32 +43,39 @@ public:
 	hideseek_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_in(*this, "IN%u", 0U)
+		, m_system(*this, "SYSTEM%u", 0U)
 	{
 	}
 
-	void hideseek(machine_config &config);
-
-	void init_hideseek();
+	void hideseek(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	void hideseek_palette(palette_device &palette) const;
-	uint32_t screen_update_hideseek(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
+	required_ioport_array<3> m_in;
+	required_ioport_array<2> m_system;
+
+	void palette_init(palette_device &palette) const ATTR_COLD;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void mem_map(address_map &map) ATTR_COLD;
-
-	required_device<cpu_device> m_maincpu;
 };
 
+void hideseek_state::palette_init(palette_device &palette) const
+{
+	for (int i = 0; i < 0x8000; i++)
+		palette.set_pen_color(i, rgb_t(pal5bit((i >> 10)&0x1f), pal5bit((i >> 5)&0x1f), pal5bit((i >> 0)&0x1f)));
+}
 
 void hideseek_state::video_start()
 {
 }
 
 
-uint32_t hideseek_state::screen_update_hideseek(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hideseek_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -77,15 +86,41 @@ void hideseek_state::mem_map(address_map &map)
 	map(0x00200000, 0x0023ffff).ram(); // CS0
 	map(0x00400000, 0x005fffff).rom().region("prg", 0); // CS1
 	// CS2 - CS3
+	map(0x00800000, 0x00800002).lr8(NAME([this] (offs_t offset) { return m_in[offset]->read(); }));
+	map(0x00800100, 0x00800101).lr8(NAME([this] (offs_t offset) { return m_system[offset]->read(); }));
+
+	map(0x00880000, 0x00880000).w("oki", FUNC(okim9810_device::write_tmp_register));
+	map(0x00880001, 0x00880001).rw("oki", FUNC(okim9810_device::read_status), FUNC(okim9810_device::write_command));
+	// Axell area
+	map(0x00c10000, 0x00c17fff).ram(); // or pattern RAM
+//  map(0x00c1fc00, 0x00c1fcff) vregs
+//      map(0x0c, 0x0c) bit 2 0->1 trigger
+//      map(0x34, 0x3f) X/Y/width/height (word units)
+//      map(0x40, 0x40) flags?
+//      map(0x54, 0x5f) CRTC or global flags (vdisplay/hdisplay at $54)
+	map(0x00c1fc9c, 0x00c1fc9f).lr8(NAME([] (offs_t offset) { return 0xff; })); // likely busy status
+
 	map(0x01000000, 0x01ffffff).ram(); // DRAM
-	map(0xffff8000, 0xffff87ff).ram(); // HD64F7045F28 i/os
-	map(0xfffff000, 0xffffffff).ram(); // on-chip RAM
 //  map(0x06000000, 0x07ffffff).rom().region("blit_data", 0);
 }
 
 
 
 static INPUT_PORTS_START( hideseek )
+	PORT_START("IN0")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SYSTEM0")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SYSTEM1")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -97,73 +132,64 @@ static GFXDECODE_START( gfx_hideseek )
 GFXDECODE_END
 
 
-void hideseek_state::hideseek_palette(palette_device &palette) const
-{
-	for (int i = 0; i < 0x8000; i++)
-		palette.set_pen_color(i, rgb_t(pal5bit((i >> 10)&0x1f), pal5bit((i >> 5)&0x1f), pal5bit((i >> 0)&0x1f)));
-}
-
-
 
 void hideseek_state::hideseek(machine_config &config)
 {
-	/* basic machine hardware */
-	SH7604(config, m_maincpu, 7372800 * 4);
+	// basic machine hardware
+	SH7043A(config, m_maincpu, 7.3728_MHz_XTAL * 4); // actually SH7045
 	m_maincpu->set_addrmap(AS_PROGRAM, &hideseek_state::mem_map);
-//  TIMER(config, "scantimer").configure_scanline(FUNC(hideseek_state::hideseek_scanline), "screen", 0, 1);
+	// populated vectors:
+	// 0x100 ~ 0x10c
+	// 0x160
+	// 0x210 ~ 0x21c
+	// 0x108 allows surpassing PC=0x73AC tight loop checks
+	m_maincpu->set_vblank_int("screen", FUNC(hideseek_state::irq2_line_hold));
 
-	/* video hardware */
+	EEPROM_93C46_16BIT(config, "eeprom");
+
+	UPD4992(config, "rtc", 32.768_kHz_XTAL);
+
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
-	screen.set_screen_update(FUNC(hideseek_state::screen_update_hideseek));
+	screen.set_size(128*8, 64*8);
+	screen.set_visarea(0*8, 640-1, 0*8, 400-1);
+	screen.set_screen_update(FUNC(hideseek_state::screen_update));
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(hideseek_state::hideseek_palette), 0x10000);
+	PALETTE(config, "palette", FUNC(hideseek_state::palette_init), 0x10000);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_hideseek);
+
+	// AG-2 AX51201
 
 	SPEAKER(config, "speaker", 2).front();
 
-	/* sound : M9810 */
+	okim9810_device &oki(OKIM9810(config, "oki", 4.096_MHz_XTAL));
+	oki.add_route(0, "speaker", 1.00, 0);
+	oki.add_route(1, "speaker", 1.00, 1);
 }
 
 
 ROM_START( hideseek )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD( "hd64f7045f28_internal_rom.bin",  0x000000, 0x040000, NO_DUMP ) // on chip ROM
-	ROM_FILL(         0, 1, 0x00 )
-	ROM_FILL(         1, 1, 0x40 )
-	ROM_FILL(         2, 1, 0x00 )
-	ROM_FILL(         3, 1, 0x00 )
-	ROM_FILL(         4, 1, 0x01 )
-	ROM_FILL(         5, 1, 0xff )
-	ROM_FILL(         6, 1, 0xff )
-	ROM_FILL(         7, 1, 0xfc )
+	ROM_REGION( 0x40000, "maincpu", 0)
+	ROM_LOAD( "hideseek_sh2_hd64f7045f28-vga.u6", 0x00000, 0x40000, CRC(a6d11053) SHA1(90b7a4238f398f4831355aa2d31bc17595fab56d) ) // on chip ROM
 
-	ROM_REGION32_BE( 0x400000, "prg", 0 ) /* SH2 code */
-	ROM_LOAD16_WORD_SWAP( "29f160te.u10",  0x000000, 0x200000, CRC(44539f9b) SHA1(2e531455e5445e09e99494e47d96866e8ee07135) )
-	ROM_LOAD16_WORD_SWAP( "29f160te.u11",  0x200000, 0x200000, CRC(9a4109e5) SHA1(ba59caac5f5a80fc52c507d8a47f322a380aa9a1) ) /* empty! */
+	ROM_REGION32_BE( 0x400000, "prg", 0 ) // SH2 code
+	ROM_LOAD16_WORD_SWAP( "29f160te.u10", 0x000000, 0x200000, CRC(44539f9b) SHA1(2e531455e5445e09e99494e47d96866e8ee07135) )
+	ROM_LOAD16_WORD_SWAP( "29f160te.u11", 0x200000, 0x200000, CRC(9a4109e5) SHA1(ba59caac5f5a80fc52c507d8a47f322a380aa9a1) ) // empty!
 
 	ROM_REGION( 0x4000000, "blit_data", 0 )
-	ROM_LOAD16_WORD_SWAP( "s29gl128n.u6",  0x0000000, 0x1000000,  CRC(2d6632f3) SHA1(e8d91bcc6975f5c07b438d29e8a23d403c7e52aa) )
-	ROM_LOAD16_WORD_SWAP( "s29gl128n.u7",  0x1000000, 0x1000000,  CRC(9af057bf) SHA1(e905d0dfa5b866d7317adafe03fcdfadd1e44d78) )
-	ROM_LOAD16_WORD_SWAP( "s29gl128n.u8",  0x2000000, 0x1000000,  CRC(a47ca14a) SHA1(3b4417fc421cee30a9ad0fd9319220a8dae32da2) ) /* empty! */
-	ROM_LOAD16_WORD_SWAP( "s29gl128n.u9",  0x3000000, 0x1000000,  CRC(a47ca14a) SHA1(3b4417fc421cee30a9ad0fd9319220a8dae32da2) ) /* empty! */
+	ROM_LOAD16_WORD_SWAP( "s29gl128n.u6", 0x0000000, 0x1000000,  CRC(2d6632f3) SHA1(e8d91bcc6975f5c07b438d29e8a23d403c7e52aa) )
+	ROM_LOAD16_WORD_SWAP( "s29gl128n.u7", 0x1000000, 0x1000000,  CRC(9af057bf) SHA1(e905d0dfa5b866d7317adafe03fcdfadd1e44d78) )
+	ROM_LOAD16_WORD_SWAP( "s29gl128n.u8", 0x2000000, 0x1000000,  CRC(a47ca14a) SHA1(3b4417fc421cee30a9ad0fd9319220a8dae32da2) ) // empty!
+	ROM_LOAD16_WORD_SWAP( "s29gl128n.u9", 0x3000000, 0x1000000,  CRC(a47ca14a) SHA1(3b4417fc421cee30a9ad0fd9319220a8dae32da2) ) // empty!
 
-
-	ROM_REGION( 0x1000000, "ymz", 0 )
-	ROM_LOAD( "s29gl128n.u4",  0x000000, 0x1000000, CRC(b8eb7cdb) SHA1(a90c70058e50f3369a6e517e0a534b9ef1e0087c) )
+	ROM_REGION( 0x1000000, "oki", 0 )
+	ROM_LOAD( "s29gl128n.u4", 0x000000, 0x1000000, CRC(b8eb7cdb) SHA1(a90c70058e50f3369a6e517e0a534b9ef1e0087c) )
 ROM_END
-
-
-
-void hideseek_state::init_hideseek()
-{
-}
 
 } // anonymous namespace
 
 
-GAME( 200?, hideseek, 0, hideseek, hideseek, hideseek_state, init_hideseek, ROT0, "<unknown>", "Hide & Seek", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, hideseek, 0, hideseek, hideseek, hideseek_state, empty_init, ROT0, "Appli", "Hide & Seek", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

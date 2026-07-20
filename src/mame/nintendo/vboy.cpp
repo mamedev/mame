@@ -29,9 +29,10 @@ TODO:
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include <iostream>
+
 #include "vboy.lh"
 
-#include <iostream>
 
 namespace {
 

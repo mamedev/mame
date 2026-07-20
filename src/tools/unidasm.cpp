@@ -52,6 +52,7 @@ using util::BIT;
 #include "cpu/dspp/dsppdasm.h"
 #include "cpu/e0c6200/e0c6200d.h"
 #include "cpu/e132xs/e1dasm.h"
+#include "cpu/edsp/edspdasm.h"
 #include "cpu/es5510/es5510d.h"
 #include "cpu/esrip/esripdsm.h"
 #include "cpu/f2mc16/f2mc16d.h"
@@ -227,13 +228,13 @@ using util::BIT;
 #include "cpu/z8000/8000dasm.h"
 
 #include "corestr.h"
-#include "eminline.h"
-#include "endianness.h"
 #include "ioprocs.h"
+#include "multibyte.h"
 #include "osdfile.h"
 #include "strformat.h"
 
 #include <algorithm>
+#include <bit>
 #include <cctype>
 #include <cstdio>
 #include <cstdlib>
@@ -303,6 +304,7 @@ struct m7700_unidasm_t : m7700_disassembler::config
 	virtual bool get_x_flag() const override { return x_flag; }
 } m7700_unidasm;
 
+
 // Configuration missing
 struct s2650_unidasm_t : s2650_disassembler::config
 {
@@ -357,16 +359,18 @@ struct nec_unidasm_t : nec_disassembler::config
 	virtual int get_mode() const override { return mode; }
 } nec_unidasm;
 
-static constexpr auto le = util::endianness::little;
-static constexpr auto be = util::endianness::big;
+
+static constexpr auto le = std::endian::little;
+static constexpr auto be = std::endian::big;
 
 struct dasm_table_entry
 {
 	const char *            name;
-	util::endianness        endian;
+	std::endian             endian;
 	int8_t                  pcshift;
 	std::function<util::disasm_interface *()> alloc;
 };
+
 
 struct options
 {
@@ -447,6 +451,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "dsp563xx",        le, -2, []() -> util::disasm_interface * { return new dsp563xx_disassembler; } },
 	{ "dspp",            be, -1, []() -> util::disasm_interface * { return new dspp_disassembler; } },
 	{ "e0c6200",         be, -1, []() -> util::disasm_interface * { return new e0c6200_disassembler; } },
+	{ "edsp",            le, -1, []() -> util::disasm_interface * { return new edsp_disassembler; } },
 	{ "epg3231",         le, -1, []() -> util::disasm_interface * { return new epg3231_disassembler; } },
 //  { "es5510",          be,  0, []() -> util::disasm_interface * { return new es5510_disassembler; } }, // Currently does nothing
 	{ "esrip",           be,  0, []() -> util::disasm_interface * { return new esrip_disassembler; } },
@@ -567,6 +572,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "nios2",           le,  0, []() -> util::disasm_interface * { return new nios2_disassembler; } },
 	{ "nova",            be, -1, []() -> util::disasm_interface * { return new nova_disassembler; } },
 	{ "ns32000",         le,  0, []() -> util::disasm_interface * { return new ns32000_disassembler; } },
+	{ "ns32532",         le,  0, []() -> util::disasm_interface * { return new ns32000_disassembler(ns32000_disassembler::model::ns32532); } },
 	{ "nuon",            be,  0, []() -> util::disasm_interface * { return new nuon_disassembler; } },
 	{ "nsc8105",         be,  0, []() -> util::disasm_interface * { return new m680x_disassembler(8105); } },
 	{ "nx8_500s",        le,  0, []() -> util::disasm_interface * { return new nx8_500s_disassembler; } },
@@ -631,6 +637,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "sparcv9vis3",     be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, sparc_disassembler::v9, sparc_disassembler::vis_3); } },
 	{ "sparcv9vis3b",    be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, sparc_disassembler::v9, sparc_disassembler::vis_3b); } },
 	{ "spc700",          le,  0, []() -> util::disasm_interface * { return new spc700_disassembler; } },
+	//{ "specnextcopper",  be,  0, []() -> util::disasm_interface * { return new specnext_copper_disassembler; } },
 	{ "ssem",            le,  0, []() -> util::disasm_interface * { return new ssem_disassembler; } },
 	{ "ssp1601",         be, -1, []() -> util::disasm_interface * { return new ssp1601_disassembler; } },
 	{ "st62xx",          le,  0, []() -> util::disasm_interface * { return new st62xx_disassembler; } },
@@ -931,31 +938,29 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 			case le:
 				lr16 = [this](offs_t pc) -> u16 {
 					const u8 *p = get_ptr<u8>(pc);
-					return p ? p[0] | (p[1] << 8) : 0x0000;
+					return p ? get_u16le(p) : 0x0000;
 				};
 				lr32 = [this](offs_t pc) -> u32 {
 					const u8 *p = get_ptr<u8>(pc);
-					return p ? p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24) : 0x00000000;
+					return p ? get_u32le(p) : 0x00000000;
 				};
 				lr64 = [this](offs_t pc) -> u64 {
 					const u8 *p = get_ptr<u8>(pc);
-					return p ? p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24) |
-						   (u64(p[4]) << 32) | (u64(p[5]) << 40) | (u64(p[6]) << 48) | (u64(p[7]) << 56) : 0x0000000000000000;
+					return p ? get_u64le(p) : 0x0000000000000000;
 				};
 				break;
 			case be:
 				lr16 = [this](offs_t pc) -> u16 {
 					const u8 *p = get_ptr<u8>(pc);
-					return p ? (p[0] << 8) | p[1] : 0x0000;
+					return p ? get_u16be(p) : 0x0000;
 				};
 				lr32 = [this](offs_t pc) -> u32 {
 					const u8 *p = get_ptr<u8>(pc);
-					return p ? (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3] : 0x00000000;
+					return p ? get_u32be(p) : 0x00000000;
 				};
 				lr64 = [this](offs_t pc) -> u64 {
 					const u8 *p = get_ptr<u8>(pc);
-					return p ? (u64(p[0]) << 56) | (u64(p[1]) << 48) | (u64(p[2]) << 40) | (u64(p[3]) << 32) |
-						   (p[4] << 24) | (p[5] << 16) | (p[6] << 8) | p[7] : 0x0000000000000000;
+					return p ? get_u64be(p) : 0x0000000000000000;
 				};
 				break;
 			}
@@ -1174,7 +1179,10 @@ static int parse_options(int argc, char *argv[], options *opts)
 			pending_base = false;
 		} else if (pending_arch) {
 			// architecture
-			auto const arch = std::find_if( std::begin(dasm_table), std::end(dasm_table), [&curarg] (dasm_table_entry const &e) { return !core_stricmp(curarg, e.name); });
+			auto const arch = std::find_if(
+					std::begin(dasm_table),
+					std::end(dasm_table),
+					[&curarg] (dasm_table_entry const &e) { return !core_stricmp(curarg, e.name); });
 			if (std::end(dasm_table) == arch)
 				goto usage;
 			opts->dasm = &*arch;
@@ -1275,7 +1283,7 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 	// Compute the pc wraparound
 	offs_t pclength = opts.dasm->pcshift < 0 ? rounded_size >> -opts.dasm->pcshift : rounded_size << opts.dasm->pcshift;
 	offs_t limit = opts.basepc + pclength;
-	offs_t pc_mask = limit ? util::make_bitmask<offs_t>(32 - count_leading_zeros_32(limit - 1)) : 0xffffffff;
+	offs_t pc_mask = limit ? util::make_bitmask<offs_t>(std::bit_width(limit - 1)) : 0xffffffff;
 
 	// Compute the page wraparound
 	offs_t page_mask = flags & util::disasm_interface::PAGED ? (1 << disasm->page_address_bits()) - 1 : 0;
@@ -1322,17 +1330,17 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 	}
 
 	// Compute the shift amount from pc delta to granularity-sized elements
-	u32 granularity_shift = 31 - count_leading_zeros_32(disasm->opcode_alignment());
+	u32 granularity_shift = std::bit_width(disasm->opcode_alignment()) - 1;
 
 	// Number of pc steps to disassemble
 	u32 count = pclength;
 
-	if (count > opts.count && opts.count != 0)
+	if ((count > opts.count) && (opts.count != 0))
 		count = opts.count;
 
 	// pc to string conversion
 	std::function<std::string (offs_t pc)> pc_to_string;
-	int aw = 32 - count_leading_zeros_32(pc_mask);
+	int aw = std::bit_width(pc_mask);
 	bool is_octal = opts.octal; // Parameter?  Per-cpu config?
 	if ((flags & util::disasm_interface::PAGED2LEVEL) == util::disasm_interface::PAGED2LEVEL) {
 		int bits1 = disasm->page_address_bits();
@@ -1348,14 +1356,20 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 			int nc2 = (bits2 + 2) / 3;
 			int nc3 = (bits3 + 2) / 3;
 			pc_to_string = [nc1, nc2, nc3, sm1, sm2, sh2, sh3](offs_t pc) -> std::string {
-				return util::string_format("%0*o:%0*o:%0*o", nc3, pc >> sh3, nc2, (pc >> sh2) & sm2, nc1, pc & sm1);
+				return util::string_format("%0*o:%0*o:%0*o",
+						nc3, pc >> sh3,
+						nc2, (pc >> sh2) & sm2,
+						nc1, pc & sm1);
 			};
 		} else {
 			int nc1 = (bits1 + 3) / 4;
 			int nc2 = (bits2 + 3) / 4;
 			int nc3 = (bits3 + 3) / 4;
 			pc_to_string = [nc1, nc2, nc3, sm1, sm2, sh2, sh3](offs_t pc) -> std::string {
-				return util::string_format("%0*x:%0*x:%0*x", nc3, pc >> sh3, nc2, (pc >> sh2) & sm2, nc1, pc & sm1);
+				return util::string_format("%0*x:%0*x:%0*x",
+						nc3, pc >> sh3,
+						nc2, (pc >> sh2) & sm2,
+						nc1, pc & sm1);
 			};
 		}
 
@@ -1369,13 +1383,17 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 			int nc1 = (bits1 + 2) / 3;
 			int nc2 = (bits2 + 2) / 3;
 			pc_to_string = [nc1, nc2, sm1, sh2](offs_t pc) -> std::string {
-				return util::string_format("%0*o:%0*o", nc2, pc >> sh2, nc1, pc & sm1);
+				return util::string_format("%0*o:%0*o",
+						nc2, pc >> sh2,
+						nc1, pc & sm1);
 			};
 		} else {
 			int nc1 = (bits1 + 3) / 4;
 			int nc2 = (bits2 + 3) / 4;
 			pc_to_string = [nc1, nc2, sm1, sh2](offs_t pc) -> std::string {
-				return util::string_format("%0*x:%0*x", nc2, pc >> sh2, nc1, pc & sm1);
+				return util::string_format("%0*x:%0*x",
+						nc2, pc >> sh2,
+						nc1, pc & sm1);
 			};
 		}
 

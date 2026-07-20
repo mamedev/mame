@@ -50,7 +50,7 @@ void sralslot_state::sralslot(machine_config &config)
 
 void sralslot_state::init_sral1990()
 {
-	uint16_t *src = &memregion("maincpu")->as_u16(); 
+	uint16_t *src = &memregion("maincpu")->as_u16();
 	int srcsize = memregion("maincpu")->bytes();
 	// same basic scramble as pluto5.cpp, astrafr.cpp (also Heber platforms)
 	std::vector<uint16_t> dst(srcsize / 2);
@@ -95,7 +95,7 @@ ROM_END
 
    Either this is misidentified (another 'Super Rally' game?) or this is a rebuild on different hardware
    as if we assume this is running on a Heber Pluto platform (Pluto 1?) it can't have been earlier than 94
-   
+
    1345    3AB-1986    SUPER RALLY    01.01.1990    1EC-00000016    COVIELSA, S.A
 */
 

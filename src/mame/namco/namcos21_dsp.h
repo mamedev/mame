@@ -13,7 +13,7 @@
 class namcos21_dsp_device : public device_t
 {
 public:
-	namcos21_dsp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	namcos21_dsp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// config
 	template <typename T> void set_renderer_tag(T &&tag) { m_renderer.set_tag(std::forward<T>(tag)); }
@@ -41,35 +41,36 @@ protected:
 
 private:
 	static constexpr unsigned PTRAM_SIZE = 0x20000;
-	static constexpr unsigned MAX_POLY_PARAM = 1+256*3;
+	static constexpr unsigned MAX_POLY_PARAM = 256 * 3 + 1;
 
-	required_device<cpu_device> m_dsp;
+	required_device<tms320c25_device> m_dsp;
 	required_shared_ptr<u16> m_dspbios;
 	required_shared_ptr<u16> m_polydata;
 	required_region_ptr<u16> m_ptrom16;
 
 	required_device<namcos21_3d_device> m_renderer;
 	std::unique_ptr<u8[]> m_pointram;
-	int m_pointram_idx;
+	u32 m_pointram_idx;
 	u16 m_pointram_control;
 
 	u16 m_dspcomram_control[8];
 	std::unique_ptr<u16[]> m_dspcomram;
-	u16 m_poly_buf[MAX_POLY_PARAM]{};
-	int m_poly_index;
+	u16 m_poly_buf[MAX_POLY_PARAM];
+	u32 m_poly_index;
+	u32 m_poly_size;
 	u32 m_pointrom_addr;
+	u32 m_pointrom_mask;
+	u16 m_dsp_busy;
 	u16 m_dsp_complete;
-
-	void flush_poly();
 
 	u16 cuskey_r();
 	void cuskey_w(u16 data);
 	u16 dspcomram_r(offs_t offset);
 	void dspcomram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 table_r(offs_t offset);
+	void dsp_busy_w(u16 data);
 	void dsp_complete_w(u16 data);
 	void dsp_render_w(u16 data);
-	u16 poly_reset_r();
 	void dsp_pointrom_addr_w(offs_t offset, u16 data);
 	u16 dsp_pointrom_data_r();
 

@@ -2110,13 +2110,13 @@ void cmi_state::cmi2x(machine_config &config)
 	PTM6840(config, m_cmi07_ptm, 2000000); // ptm_cmi07_config
 	m_cmi07_ptm->irq_callback().set(FUNC(cmi_state::cmi07_irq));
 
-	PTM6840(config, m_midi_ptm[0], 0);
+	PTM6840(config, m_midi_ptm[0]);
 	m_midi_ptm[0]->set_external_clocks(0, 384000, 0); // C1 is 0, C2 is 384kHz per schematic block diagram, C3 is CLICK SYNC IN
 	//m_midi_ptm[0]->o1_callback().set(FUNC(cmi_state::midi_ptm0_c1_w)); // TIMER 1A O/P per schematic
 	//m_midi_ptm[0]->o2_callback().set(FUNC(cmi_state::midi_ptm0_c2_w)); // CLK 2 per schematic
 	m_midi_ptm[0]->o3_callback().set(FUNC(cmi_state::midi_ptm0_c3_w));
 
-	PTM6840(config, m_midi_ptm[1], 0); // entirely clocked by PTM 0
+	PTM6840(config, m_midi_ptm[1]); // entirely clocked by PTM 0
 	//m_midi_ptm[1]->o1_callback().set(FUNC(cmi_state::midi_sync_out_1_w)); // SYNC OUT 1 per schematic
 	//m_midi_ptm[1]->o2_callback().set(FUNC(cmi_state::midi_sync_out_2_w)); // SYNC OUT 2 per schematic
 	//m_midi_ptm[1]->o3_callback().set(FUNC(cmi_state::midi_sync_out_3_w)); // SYNC OUT 3 per schematic

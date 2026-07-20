@@ -517,7 +517,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::scanline_tick)
 
 void ironhors_base_state::sh_irqtrigger_w(uint8_t data)
 {
-	m_soundcpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_soundcpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 }
 
 void ironhors_base_state::filter_w(uint8_t data)

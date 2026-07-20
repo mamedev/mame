@@ -132,6 +132,8 @@
 #include "machine/eeprompar.h"
 #include "speaker.h"
 
+#include "corefloat.h"
+
 
 static constexpr XTAL MASTER_CLOCK = XTAL(20'000'000);
 
@@ -213,8 +215,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarisy2_state::scanline_update)
 
 void atarisy2_state::machine_start()
 {
-	m_leds.resolve();
-
 	m_scanline_int_state = false;
 	m_video_int_state = false;
 	m_p2portwr_state = false;
@@ -362,7 +362,7 @@ uint8_t atarisy2_state::leta_r(offs_t offset)
 				/* if the joystick is centered, leave the rest of this alone */
 				double angle = m_joy_last_angle;
 				if (analogx < -32 || analogx > 32 || analogy < -32 || analogy > 32)
-					angle = atan2((double)analogx, (double)analogy) * 360 / (2 * M_PI);
+					angle = RADIAN_TO_DEGREE(atan2((double)analogx, (double)analogy));
 
 				/* detect when we pass the 0 point in either direction */
 				if (m_joy_last_angle < -90 && angle > 90)
@@ -824,7 +824,7 @@ static INPUT_PORTS_START( paperboy )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("tms", FUNC(tms5220_device::readyq_r))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CONDITION("IN0", 0x8000, EQUALS, 0x8000) // self-test
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
@@ -1072,9 +1072,6 @@ static INPUT_PORTS_START( apb )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED )
 
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-
 	PORT_MODIFY("ADC0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1213,7 +1210,7 @@ void atarisy2_state::atarisy2(machine_config &config)
 	TILEMAP(config, m_playfield_tilemap, "gfxdecode", 2, 8,8, TILEMAP_SCAN_ROWS, 128,64).set_info_callback(FUNC(atarisy2_state::get_playfield_tile_info));
 	TILEMAP(config, m_alpha_tilemap, "gfxdecode", 2, 8,8, TILEMAP_SCAN_ROWS, 64,48, 0).set_info_callback(FUNC(atarisy2_state::get_alpha_tile_info));
 
-	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, atarisy2_state::s_mob_config);
+	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, atarisy2_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1590,7 +1587,7 @@ ROM_START( 720 )
 	ROM_LOAD( "136047-1125.4t",  0x000000, 0x004000, CRC(6b7e2328) SHA1(cc9a315ccafe7228951b7c32cf3b31caa89ae7d3) )
 
 	ROM_REGION( 0x200, "eeprom", 0 )
-	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(cfe1c24e) SHA1(5f7623b0a2ff0d99ffa8e6420a5bc03e0c55250d) )
+	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(5d2acf11) SHA1(824864032b947ffcf606b2363a48e1a181c6c3d2) )
 ROM_END
 
 
@@ -1658,7 +1655,7 @@ ROM_START( 720r3 )
 	ROM_LOAD( "136047-1125.4t",  0x000000, 0x004000, CRC(6b7e2328) SHA1(cc9a315ccafe7228951b7c32cf3b31caa89ae7d3) )
 
 	ROM_REGION( 0x200, "eeprom", 0 )
-	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(cfe1c24e) SHA1(5f7623b0a2ff0d99ffa8e6420a5bc03e0c55250d) )
+	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(5d2acf11) SHA1(824864032b947ffcf606b2363a48e1a181c6c3d2) )
 ROM_END
 
 
@@ -1726,7 +1723,7 @@ ROM_START( 720r2 )
 	ROM_LOAD( "136047-1125.4t",  0x000000, 0x004000, CRC(6b7e2328) SHA1(cc9a315ccafe7228951b7c32cf3b31caa89ae7d3) )
 
 	ROM_REGION( 0x200, "eeprom", 0 )
-	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(cfe1c24e) SHA1(5f7623b0a2ff0d99ffa8e6420a5bc03e0c55250d) )
+	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(5d2acf11) SHA1(824864032b947ffcf606b2363a48e1a181c6c3d2) )
 ROM_END
 
 
@@ -1794,7 +1791,7 @@ ROM_START( 720r1 )
 	ROM_LOAD( "136047-1125.4t",  0x000000, 0x004000, CRC(6b7e2328) SHA1(cc9a315ccafe7228951b7c32cf3b31caa89ae7d3) )
 
 	ROM_REGION( 0x200, "eeprom", 0 )
-	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(cfe1c24e) SHA1(5f7623b0a2ff0d99ffa8e6420a5bc03e0c55250d) )
+	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(5d2acf11) SHA1(824864032b947ffcf606b2363a48e1a181c6c3d2) )
 ROM_END
 
 
@@ -1862,7 +1859,7 @@ ROM_START( 720g )
 	ROM_LOAD( "136047-1225.4t",  0x000000, 0x004000, CRC(264eda88) SHA1(f0f5fe87741e0e17117085cf45f700090a02cb94) )
 
 	ROM_REGION( 0x200, "eeprom", 0 )
-	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(cfe1c24e) SHA1(5f7623b0a2ff0d99ffa8e6420a5bc03e0c55250d) )
+	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(5d2acf11) SHA1(824864032b947ffcf606b2363a48e1a181c6c3d2) )
 ROM_END
 
 
@@ -1930,7 +1927,7 @@ ROM_START( 720gr1 )
 	ROM_LOAD( "136047-1225.4t",  0x000000, 0x004000, CRC(264eda88) SHA1(f0f5fe87741e0e17117085cf45f700090a02cb94) )
 
 	ROM_REGION( 0x200, "eeprom", 0 )
-	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(cfe1c24e) SHA1(5f7623b0a2ff0d99ffa8e6420a5bc03e0c55250d) )
+	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(5d2acf11) SHA1(824864032b947ffcf606b2363a48e1a181c6c3d2) )
 ROM_END
 
 

@@ -1082,9 +1082,6 @@ MACHINE_START_MEMBER(meritm_state, common)
 
 void meritm_state::machine_start()
 {
-	m_p1_disc_lamp.resolve();
-	m_p1_play_lamp.resolve();
-	m_p1_cancel_lamp.resolve();
 	m_banks[0]->configure_entries(0, 8, m_region_maincpu->base(), 0x10000);
 	m_bank = 0xff;
 	crt250_switch_banks();
@@ -1174,8 +1171,8 @@ void meritm_state::crt250(machine_config &config)
 	m_v9938[1]->set_vram_size(0x20000);
 	//m_v9938[1]->int_cb().set(FUNC(meritm_state::vdp1_interrupt));
 
-	TIMER(config, "vblank_start", 0).configure_scanline(FUNC(meritm_state::vblank_start_tick), "screen", 259, 262);
-	TIMER(config, "vblank_end", 0).configure_scanline(FUNC(meritm_state::vblank_end_tick), "screen", 262, 262);
+	TIMER(config, "vblank_start").configure_scanline(FUNC(meritm_state::vblank_start_tick), "screen", 259, 262);
+	TIMER(config, "vblank_end").configure_scanline(FUNC(meritm_state::vblank_end_tick), "screen", 262, 262);
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER).set_screen_update(FUNC(meritm_state::screen_update));
 

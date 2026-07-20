@@ -50,12 +50,12 @@ class dietgo_state : public driver_device
 public:
 	dietgo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_pf_rowscroll(*this, "pf%u_rowscroll", 1)
+		, m_rowscroll(*this, "rowscroll_%u", 1)
 		, m_spriteram(*this, "spriteram")
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
-		, m_deco_tilegen(*this, "tilegen")
+		, m_tilegen(*this, "tilegen")
 		, m_deco104(*this, "ioprot104")
 		, m_sprgen(*this, "spritegen")
 	{ }
@@ -66,19 +66,19 @@ public:
 
 private:
 	// memory pointers
-	required_shared_ptr_array<uint16_t, 2> m_pf_rowscroll;
+	required_shared_ptr_array<uint16_t, 2> m_rowscroll;
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_decrypted_opcodes;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<h6280_device> m_audiocpu;
-	required_device<deco16ic_device> m_deco_tilegen;
+	required_device<deco16ic_device> m_tilegen;
 	required_device<deco104_device> m_deco104;
 	required_device<decospr_device> m_sprgen;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	int bank_callback(int bank);
 
 	uint16_t ioprot_r(offs_t offset);
 	void ioprot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -90,16 +90,16 @@ private:
 
 uint32_t dietgo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t const flip = m_deco_tilegen->pf_control_r(0);
+	uint16_t const flip = m_tilegen->control_r(0);
 
 	flip_screen_set(BIT(flip, 7));
 	m_sprgen->set_flip_screen(BIT(flip, 7));
-	m_deco_tilegen->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
+	m_tilegen->update(m_rowscroll[0], m_rowscroll[1]);
 
 	bitmap.fill(256, cliprect); // not verified
 
-	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 	return 0;
@@ -126,11 +126,11 @@ void dietgo_state::ioprot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 void dietgo_state::main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x200000, 0x20000f).w(m_deco_tilegen, FUNC(deco16ic_device::pf_control_w));
-	map(0x210000, 0x211fff).w(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_w));
-	map(0x212000, 0x213fff).w(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_w));
-	map(0x220000, 0x2207ff).writeonly().share(m_pf_rowscroll[0]);
-	map(0x222000, 0x2227ff).writeonly().share(m_pf_rowscroll[1]);
+	map(0x200000, 0x20000f).w(m_tilegen, FUNC(deco16ic_device::control_w));
+	map(0x210000, 0x211fff).w(m_tilegen, FUNC(deco16ic_device::vram_w<0>));
+	map(0x212000, 0x213fff).w(m_tilegen, FUNC(deco16ic_device::vram_w<1>));
+	map(0x220000, 0x2207ff).writeonly().share(m_rowscroll[0]);
+	map(0x222000, 0x2227ff).writeonly().share(m_rowscroll[1]);
 	map(0x280000, 0x2807ff).ram().share(m_spriteram);
 	map(0x300000, 0x300bff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x340000, 0x343fff).rw(FUNC(dietgo_state::ioprot_r), FUNC(dietgo_state::ioprot_w)).share("prot16ram"); // Protection device
@@ -272,7 +272,7 @@ static GFXDECODE_START( gfx_dietgo_spr )
 	GFXDECODE_ENTRY( "sprites", 0, tile_16x16_layout, 512, 16 )    // Sprites (16x16)
 GFXDECODE_END
 
-DECO16IC_BANK_CB_MEMBER(dietgo_state::bank_callback)
+int dietgo_state::bank_callback(int bank)
 {
 	return (bank & 0x70) << 8;
 }
@@ -302,22 +302,22 @@ void dietgo_state::dietgo(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_dietgo);
 
-	DECO16IC(config, m_deco_tilegen, 0);
-	m_deco_tilegen->set_pf1_size(DECO_64x32);
-	m_deco_tilegen->set_pf2_size(DECO_64x32);
-	m_deco_tilegen->set_pf1_col_bank(0x00);
-	m_deco_tilegen->set_pf2_col_bank(0x10);
-	m_deco_tilegen->set_pf1_col_mask(0x0f);
-	m_deco_tilegen->set_pf2_col_mask(0x0f);
-	m_deco_tilegen->set_bank1_callback(FUNC(dietgo_state::bank_callback));
-	m_deco_tilegen->set_bank2_callback(FUNC(dietgo_state::bank_callback));
-	m_deco_tilegen->set_pf12_8x8_bank(0);
-	m_deco_tilegen->set_pf12_16x16_bank(1);
-	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
+	DECO16IC(config, m_tilegen);
+	m_tilegen->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen->set_col_bank<0>(0x00);
+	m_tilegen->set_col_bank<1>(0x10);
+	m_tilegen->set_col_mask<0>(0x0f);
+	m_tilegen->set_col_mask<1>(0x0f);
+	m_tilegen->set_bank_callback<0>(FUNC(dietgo_state::bank_callback));
+	m_tilegen->set_bank_callback<1>(FUNC(dietgo_state::bank_callback));
+	m_tilegen->set_8x8_bank(0);
+	m_tilegen->set_16x16_bank(1);
+	m_tilegen->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen, 0, "palette", gfx_dietgo_spr);
+	DECO_SPRITE(config, m_sprgen, "palette", gfx_dietgo_spr);
 
-	DECO104PROT(config, m_deco104, 0);
+	DECO104PROT(config, m_deco104);
 	m_deco104->port_a_cb().set_ioport("INPUTS");
 	m_deco104->port_b_cb().set_ioport("SYSTEM");
 	m_deco104->port_c_cb().set_ioport("DSW");

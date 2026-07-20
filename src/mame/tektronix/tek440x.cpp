@@ -16,6 +16,7 @@
         * MC68681 DUART / timer (3.6864 MHz clock) (serial channel A = keyboard, channel B = RS-232 port)
         * AM9513 timer (source of timer IRQ)
         * NCR5385 SCSI controller
+		* X2210 NVRAM
 
         Video is a 640x480 1bpp window on a 1024x1024 VRAM area; smooth panning around that area
         is possible as is flat-out changing the scanout address.
@@ -58,6 +59,7 @@
 #include "machine/ncr5385.h"
 #include "machine/ns32081.h"
 #include "machine/nscsi_bus.h"
+#include "machine/x2212.h"
 #include "sound/sn76496.h"
 
 #include "emupal.h"
@@ -80,8 +82,9 @@ public:
 		m_snsnd(*this, "snsnd"),
 		m_rtc(*this, "rtc"),
 		m_scsi(*this, "ncr5385"),
+		m_novram(*this, "novram"),
 		m_vint(*this, "vint"),
-		m_prom(*this, "maincpu"),
+		m_prom(*this, "bootrom"),
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram"),
 		m_map(*this, "map", 0x1000, ENDIANNESS_BIG),
@@ -94,11 +97,13 @@ public:
 		m_kb_loop(false)
 	{ }
 
-	void tek4404(machine_config &config);
+	void tek4404(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	u16 memory_r(offs_t offset, u16 mem_mask);
@@ -109,6 +114,13 @@ private:
 	void mapcntl_w(u8 data);
 	void sound_w(u8 data);
 	void diag_w(u8 data);
+
+	u8 nvram_r(address_space &space, offs_t offset);
+	void nvram_w(offs_t offset, u8 data);
+	u8 recall_r();
+	void recall_w(u8 data);
+	u8 store_r();
+	void store_w(u8 data);
 
 	void kb_rdata_w(int state);
 	void kb_tdata_w(int state);
@@ -124,6 +136,7 @@ private:
 	required_device<sn76496_device> m_snsnd;
 	required_device<mc146818_device> m_rtc;
 	required_device<ncr5385_device> m_scsi;
+	required_device<x2210_device> m_novram;
 	required_device<input_merger_all_high_device> m_vint;
 
 	required_region_ptr<u16> m_prom;
@@ -139,6 +152,8 @@ private:
 	bool m_kb_rclamp;
 	bool m_kb_loop;
 };
+
+
 
 /*************************************
  *
@@ -171,6 +186,9 @@ void tek440x_state::machine_reset()
 	m_keyboard->kdo_w(1);
 	mapcntl_w(0);
 	m_vint->in_w<1>(0);
+	
+	m_novram->recall(ASSERT_LINE);
+	m_novram->recall(CLEAR_LINE);
 }
 
 
@@ -312,6 +330,62 @@ void tek440x_state::kb_tdata_w(int state)
 	}
 }
 
+u8 tek440x_state::nvram_r(address_space &space, offs_t offset)
+{
+	u8 data = m_novram->read(space, offset);
+
+	LOG("%s: nvram_r(0x%x) => 0x%02x\n", machine().describe_context(), offset, data);
+
+	// kick it up to top 4 bits
+	return data << 4;
+}
+
+void tek440x_state::nvram_w(offs_t offset, u8 data)
+{
+	LOG("%s: nvram_w(0x%x) <= %02x\n", machine().describe_context(), offset, data);
+
+	m_novram->write(offset, data >> 4);
+}
+	
+u8 tek440x_state::recall_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		LOG("%s: recall_r\n", machine().describe_context());
+		m_novram->recall(1);
+		m_novram->recall(0);
+	}
+
+	return 0xff;
+}
+
+void tek440x_state::recall_w(u8 data)
+{
+	LOG("%s: recall_w\n", machine().describe_context());
+	m_novram->recall(1);
+	m_novram->recall(0);
+}
+
+u8 tek440x_state::store_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		LOG("%s: store_r\n", machine().describe_context());
+		m_novram->store(1);
+		m_novram->store(0);
+	}
+
+	return 0xff;
+}
+
+void tek440x_state::store_w(u8 data)
+{
+	LOG("%s: store_w\n", machine().describe_context());
+	m_novram->store(1);
+	m_novram->store(0);
+}
+
+
 void tek440x_state::logical_map(address_map &map)
 {
 	map(0x000000, 0x7fffff).rw(FUNC(tek440x_state::memory_r), FUNC(tek440x_state::memory_w));
@@ -326,7 +400,16 @@ void tek440x_state::physical_map(address_map &map)
 
 	// 700000-71ffff spare 0
 	// 720000-73ffff spare 1
-	map(0x740000, 0x747fff).rom().mirror(0x8000).region("maincpu", 0);
+
+	// maps 128 address range to nvram (see p2.8-3)
+	// 721000-72107f net ram (A0 ignored, uses A1-A6)
+	map(0x721000, 0x72107f).umask16(0xff00).cswidth(16).rw(FUNC(tek440x_state::nvram_r), FUNC(tek440x_state::nvram_w));
+	// 722000-722fff nvram nybbles
+	map(0x722000, 0x722fff).rw(FUNC(tek440x_state::recall_r), FUNC(tek440x_state::recall_w));
+	map(0x723000, 0x723fff).rw(FUNC(tek440x_state::store_r), FUNC(tek440x_state::store_w));
+
+	map(0x740000, 0x747fff).rom().mirror(0x8000).region("bootrom", 0);
+
 	map(0x760000, 0x760fff).ram().mirror(0xf000); // debug RAM
 
 	// 780000-79ffff processor board I/O
@@ -415,7 +498,7 @@ void tek440x_state::tek4404(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	screen.set_raw(25.2_MHz_XTAL, 800, 0, 640, 525, 0, 480); // 31.5 kHz horizontal (guessed), 60 Hz vertical
+	screen.set_raw(25.2_MHz_XTAL, 800, 0, 640, 525, 0, 480); // 31.5 kHz horizontal, 60 Hz vertical
 	screen.set_screen_update(FUNC(tek440x_state::screen_update));
 	screen.set_palette("palette");
 	screen.screen_vblank().set(m_vint, FUNC(input_merger_all_high_device::in_w<1>));
@@ -425,6 +508,8 @@ void tek440x_state::tek4404(machine_config &config)
 	aica.set_xtal(1.8432_MHz_XTAL);
 	aica.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	aica.irq_handler().set_inputline(m_maincpu, M68K_IRQ_7);
+
+	X2210(config, m_novram);
 
 	MC68681(config, m_duart, 14.7456_MHz_XTAL / 4);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_5); // auto-vectored
@@ -475,7 +560,7 @@ void tek440x_state::tek4404(machine_config &config)
  *************************************/
 
 ROM_START( tek4404 )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x8000, "bootrom", 0 )
 	ROM_LOAD16_BYTE( "tek_u158.bin", 0x000000, 0x004000, CRC(9939e660) SHA1(66b4309e93e4ff20c1295dc2ec2a8d6389b2578c) )
 	ROM_LOAD16_BYTE( "tek_u163.bin", 0x000001, 0x004000, CRC(a82dcbb1) SHA1(a7e4545e9ea57619faacc1556fa346b18f870084) )
 

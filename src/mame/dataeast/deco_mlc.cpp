@@ -110,7 +110,7 @@
 #include "emu.h"
 #include "deco_mlc.h"
 
-#include "deco156_m.h"
+#include "deco156.h"
 #include "machine/eepromser.h"
 #include "cpu/arm/arm.h"
 #include "cpu/sh/sh7604.h"
@@ -622,7 +622,7 @@ void deco_mlc_state::stadhr96(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &deco_mlc_state::decomlc_146_map);
 
-	DECO146PROT(config, m_deco146, 0);
+	DECO146PROT(config, m_deco146);
 	m_deco146->set_use_magic_read_address_xor(true);
 }
 

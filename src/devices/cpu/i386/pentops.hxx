@@ -2837,7 +2837,7 @@ void i386_device::sse_group_0fae()  // Opcode 0f ae
 				for(int i = 0; i < 8; i++)
 				{
 					WRITE64(ea + i*16 + 32, m_x87_reg[i].signif);
-					WRITE64(ea + i*16 + 40, m_x87_reg[i].signExp);
+					WRITE16(ea + i*16 + 40, m_x87_reg[i].signExp);
 				}
 				for(int i = 0; i < 8; i++)
 				{

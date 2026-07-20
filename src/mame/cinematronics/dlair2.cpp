@@ -59,7 +59,8 @@ private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(dlair2_timer_irq);
+	IRQ_CALLBACK_MEMBER(vector_r);
+	INTERRUPT_GEN_MEMBER(timer_irq);
 	void dlair2_palette(palette_device &palette) const;
 
 	void dlair2_io(address_map &map) ATTR_COLD;
@@ -181,9 +182,16 @@ void dlair2_state::dlair2_palette(palette_device &palette) const
 {
 }
 
-INTERRUPT_GEN_MEMBER(dlair2_state::dlair2_timer_irq)
+IRQ_CALLBACK_MEMBER(dlair2_state::vector_r)
 {
-	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x20/4);
+	// 0x20: vblank
+	// 0x2c: serial (TBD)
+	return 0x20 / 4;
+}
+
+INTERRUPT_GEN_MEMBER(dlair2_state::timer_irq)
+{
+	device.execute().set_input_line(0, HOLD_LINE);
 }
 
 void dlair2_state::dlair2(machine_config &config)
@@ -192,7 +200,8 @@ void dlair2_state::dlair2(machine_config &config)
 	I8088(config, m_maincpu, MAIN_CLOCK/3);   /* Schematics show I8088 "max" CPU */
 	m_maincpu->set_addrmap(AS_PROGRAM, &dlair2_state::dlair2_map);
 	m_maincpu->set_addrmap(AS_IO, &dlair2_state::dlair2_io);
-	m_maincpu->set_periodic_int(FUNC(dlair2_state::dlair2_timer_irq), attotime::from_hz(60)); // timer irq, TODO: timing
+	m_maincpu->set_irq_acknowledge_callback(FUNC(dlair2_state::vector_r));
+	m_maincpu->set_periodic_int(FUNC(dlair2_state::timer_irq), attotime::from_hz(60)); // timer irq, TODO: from vblank signal really?
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

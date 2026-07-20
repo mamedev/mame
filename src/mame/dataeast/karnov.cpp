@@ -79,6 +79,9 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 #include "emu.h"
 
+#include "deckarn.h"
+#include "decrmc3.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/mcs51/i8051.h"
@@ -88,8 +91,6 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "sound/ymopl.h"
 #include "video/bufsprite.h"
 
-#include "deckarn.h"
-#include "decrmc3.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
@@ -117,9 +118,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_ram(*this, "ram"),
-		m_videoram(*this, "videoram"),
-		m_pf_data(*this, "pf_data"),
+		m_mainram(*this, "mainram"),
+		m_tx_vram(*this, "tx_vram"),
+		m_bg_vram(*this, "bg_vram"),
 		m_scroll(*this, "scroll") { }
 
 	void chelnovjbl(machine_config &config);
@@ -142,17 +143,17 @@ private:
 	required_device<deco_rmc3_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<uint16_t> m_ram;
-	required_shared_ptr<uint16_t> m_videoram;
-	required_shared_ptr<uint16_t> m_pf_data;
+	required_shared_ptr<uint16_t> m_mainram;
+	required_shared_ptr<uint16_t> m_tx_vram;
+	required_shared_ptr<uint16_t> m_bg_vram;
 	required_shared_ptr<uint16_t> m_scroll;
 
 	// video
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_fix_tilemap = nullptr;
 
-	void videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void playfield_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void tx_vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void bg_vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void vintctl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fix_tile_info);
@@ -248,7 +249,7 @@ void karnov_state::mcu_p2_w(uint8_t data)
 		m_maincpu->set_input_line(6, ASSERT_LINE);
 
 	if (BIT(fall, 4))
-		m_mcu_p0 = m_maincpu_to_mcu >> 0;
+		m_mcu_p0 = m_maincpu_to_mcu & 0xff;
 
 	if (BIT(fall, 5))
 		m_mcu_p1 = m_maincpu_to_mcu >> 8;
@@ -276,7 +277,7 @@ void karnov_state::chelnovjbl_mcu_data_map(address_map &map)
 
 uint8_t karnov_state::mcu_data_l_r()
 {
-	return m_maincpu_to_mcu >> 0;
+	return m_maincpu_to_mcu & 0xff;
 }
 
 void karnov_state::mcu_data_l_w(uint8_t data)
@@ -318,19 +319,19 @@ void karnov_state::mcubl_p1_w(uint8_t data)
 void karnov_state::karnov_map(address_map &map)
 {
 	map(0x000000, 0x05ffff).rom();
-	map(0x060000, 0x063fff).ram().share("ram");
+	map(0x060000, 0x063fff).ram().share(m_mainram);
 	map(0x080000, 0x080fff).ram().share("spriteram");
-	map(0x0a0000, 0x0a07ff).ram().w(FUNC(karnov_state::videoram_w)).share("videoram");
-	map(0x0a0800, 0x0a0fff).w(FUNC(karnov_state::videoram_w)); /* Wndrplnt Mirror */
-	map(0x0a1000, 0x0a17ff).w(FUNC(karnov_state::playfield_w)).share("pf_data");
+	map(0x0a0000, 0x0a07ff).ram().w(FUNC(karnov_state::tx_vram_w)).share(m_tx_vram);
+	map(0x0a0800, 0x0a0fff).w(FUNC(karnov_state::tx_vram_w)); /* Wndrplnt Mirror */
+	map(0x0a1000, 0x0a17ff).w(FUNC(karnov_state::bg_vram_w)).share(m_bg_vram);
 	map(0x0a1800, 0x0a1fff).lw16([this](offs_t offset, u16 data, u16 mem_mask)
-							{ playfield_w(((offset & 0x1f) << 5) | ((offset & 0x3e0) >> 5), data, mem_mask); }, "pf_col_w");
+							{ bg_vram_w(((offset & 0x1f) << 5) | ((offset & 0x3e0) >> 5), data, mem_mask); }, "bg_col_w");
 	map(0x0c0000, 0x0c0001).portr("P1_P2").w(FUNC(karnov_state::mcu_ack_w));
 	map(0x0c0002, 0x0c0003).portr("SYSTEM");
 	map(0x0c0003, 0x0c0003).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x0c0004, 0x0c0005).portr("DSW").w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 	map(0x0c0006, 0x0c0007).rw(FUNC(karnov_state::mcu_r), FUNC(karnov_state::mcu_w));
-	map(0x0c0008, 0x0c000b).writeonly().share("scroll");
+	map(0x0c0008, 0x0c000b).writeonly().share(m_scroll);
 	map(0x0c000c, 0x0c000f).nopr().w(FUNC(karnov_state::vintctl_w));
 }
 
@@ -602,7 +603,7 @@ INPUT_PORTS_END
 
 uint32_t karnov_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int const flip = BIT(m_scroll[0], 15);
+	bool const flip = BIT(m_scroll[0], 15);
 
 	m_bg_tilemap->set_flip(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	m_fix_tilemap->set_flip(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
@@ -619,31 +620,31 @@ uint32_t karnov_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 TILE_GET_INFO_MEMBER(karnov_state::get_fix_tile_info)
 {
-	int tile = m_videoram[tile_index];
+	int const tile = m_tx_vram[tile_index];
 	tileinfo.set(0, tile & 0xfff, tile >> 14, 0);
 }
 
 TILE_GET_INFO_MEMBER(karnov_state::get_bg_tile_info)
 {
-	int tile = m_pf_data[tile_index];
+	int const tile = m_bg_vram[tile_index];
 	tileinfo.set(1, tile & 0x7ff, tile >> 12, 0);
 }
 
-void karnov_state::videoram_w(offs_t offset, u16 data, u16 mem_mask)
+void karnov_state::tx_vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_videoram[offset]);
+	COMBINE_DATA(&m_tx_vram[offset]);
 	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
-void karnov_state::playfield_w(offs_t offset, u16 data, u16 mem_mask)
+void karnov_state::bg_vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_pf_data[offset]);
+	COMBINE_DATA(&m_bg_vram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 void karnov_state::vintctl_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	m_vint_en = bool(offset & 1);
+	m_vint_en = bool(BIT(offset, 0));
 	// writing to any position in the range will clear the line
 	m_maincpu->set_input_line(7, CLEAR_LINE);
 }
@@ -733,7 +734,7 @@ void karnov_state::machine_start()
 
 void karnov_state::machine_reset()
 {
-	memset(m_ram, 0, 0x4000 / 2); /* Chelnov likes ram clear on reset.. */
+	memset(m_mainram, 0, 0x4000 / 2); /* Chelnov likes ram clear on reset.. */
 
 	m_scroll[0] = 0;
 	m_scroll[1] = 0;
@@ -779,7 +780,7 @@ void karnov_state::karnov(machine_config &config)
 	m_palette->set_prom_region("proms");
 	m_palette->set_init("palette", FUNC(deco_rmc3_device::palette_init_proms));
 
-	DECO_KARNOVSPRITES(config, m_spritegen, 0, m_palette, gfx_karnov_spr);
+	DECO_KARNOVSPRITES(config, m_spritegen, m_palette, gfx_karnov_spr);
 
 	MCFG_VIDEO_START_OVERRIDE(karnov_state,karnov)
 

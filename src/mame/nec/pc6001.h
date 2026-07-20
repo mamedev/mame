@@ -6,14 +6,19 @@
 #pragma once
 
 #include "bus/centronics/ctronics.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+#include "bus/msx/ctrl/ctrl.h"
 #include "bus/nec_fdd/pc80s31k.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "imagedev/floppy.h"
 #include "machine/74157.h"
 #include "machine/bankdev.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
+#include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/upd765.h"
 #include "sound/ay8910.h"
@@ -21,17 +26,15 @@
 #include "sound/ymopn.h"
 #include "video/mc6847.h"
 
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
-#include "bus/msx/ctrl/ctrl.h"
+#include "pc6001_kbd.h"
 
 #include "emupal.h"
 #include "speaker.h"
 #include "screen.h"
 
-#include "formats/dsk_dsk.h"
+//#include "formats/dsk_dsk.h"
 #include "formats/msx_dsk.h"
-#include "formats/p6001_cas.h"
+//#include "formats/p6001_cas.h"
 
 
 class pc6001_state : public driver_device
@@ -39,14 +42,14 @@ class pc6001_state : public driver_device
 public:
 	pc6001_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_ppi(*this, "ppi8255")
-		, m_ram(*this, "ram")
 		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, "ram")
+		, m_ppi(*this, "ppi8255")
+		, m_gfx_view(*this, "gfx_view")
 		, m_screen(*this, "screen")
 		, m_joy(*this, "joy%u", 1U)
 		, m_joymux(*this, "joymux")
 		, m_cassette(*this, "cassette")
-		, m_cas_hack(*this, "cas_hack")
 		, m_cart(*this, "cartslot")
 		, m_ay(*this, "aysnd")
 		, m_centronics(*this, "centronics")
@@ -54,29 +57,25 @@ public:
 		, m_region_maincpu(*this, "maincpu")
 		, m_region_gfx1(*this, "gfx1")
 		, m_io_mode4_dsw(*this, "MODE4_DSW")
-		, m_io_keys(*this, "key%u", 1U)
-		, m_io_fn_keys(*this, "key_fn")
-		, m_io_key_modifiers(*this, "key_modifiers")
-		, m_bank1(*this, "bank1")
+		, m_kbd(*this, "kbd")
 		, m_palette(*this, "palette")
+		, m_cas_maxsize(0)
 	{ }
 
 	void system_latch_w(uint8_t data);
 	uint8_t nec_ppi8255_r(offs_t offset);
 	void nec_ppi8255_w(offs_t offset, uint8_t data);
 
-	void pc6001_palette(palette_device &palette) const;
+	void palette_init(palette_device &palette) const;
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 //  INTERRUPT_GEN_MEMBER(vrtc_irq);
-	TIMER_CALLBACK_MEMBER(audio_callback);
-	TIMER_CALLBACK_MEMBER(sub_trig_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(cassette_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
+	TIMER_CALLBACK_MEMBER(timer_irq_cb);
+	TIMER_CALLBACK_MEMBER(cassette_data_cb);
 
 	uint8_t ppi_porta_r();
-	void ppi_porta_w(uint8_t data);
+	void sub_cmd_w(uint8_t data);
 	uint8_t ppi_portb_r();
 	void ppi_portb_w(uint8_t data);
 	void ppi_portc_w(uint8_t data);
@@ -90,14 +89,14 @@ public:
 
 	void pc6001(machine_config &config);
 protected:
+	required_device<z80_device> m_maincpu;
+	required_device<ram_device> m_ram;
 	required_device<i8255_device> m_ppi;
-	optional_shared_ptr<uint8_t> m_ram;
-	required_device<cpu_device> m_maincpu;
+	memory_view m_gfx_view;
 	required_device<screen_device> m_screen;
 	required_device_array<msx_general_purpose_port_device, 2> m_joy;
 	required_device<ls157_x2_device> m_joymux;
 	optional_device<cassette_image_device> m_cassette;
-	optional_device<generic_slot_device> m_cas_hack;
 	required_device<generic_slot_device> m_cart;
 	optional_device<ay8910_device> m_ay;
 	required_device<centronics_device> m_centronics;
@@ -105,22 +104,15 @@ protected:
 	optional_memory_region m_region_maincpu;
 	required_memory_region m_region_gfx1;
 	required_ioport m_io_mode4_dsw;
-	required_ioport_array<3> m_io_keys;
-	required_ioport m_io_fn_keys;
-	required_ioport m_io_key_modifiers;
-	optional_memory_bank m_bank1;
+	required_device<pc6001_kbd_device> m_kbd;
 	required_device<palette_device> m_palette;
 
-	memory_region *m_cart_rom = nullptr;
 	uint8_t m_timer_irq_vector = 0;
 	uint16_t m_timer_hz_div = 0;
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void default_cartridge_reset();
-	void default_cassette_hack_reset();
-	void default_keyboard_hle_reset();
 	void irq_reset(u8 timer_default_setting);
 
 	virtual void video_start() override ATTR_COLD;
@@ -131,27 +123,39 @@ protected:
 	// i/o functions
 	uint8_t check_joy_press();
 	uint8_t check_keyboard_press();
-	inline void cassette_latch_control(bool new_state);
+	inline void cassette_motor_control(bool new_state);
 	inline void ppi_control_hack_w(uint8_t data);
 	inline void set_timer_divider();
-	inline void set_videoram_bank(uint32_t offs);
 	void write_centronics_busy(int state);
 
+	// snapshot handling
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
+	emu_timer *m_cassette_timer = nullptr;
+
+	uint8_t m_cas_switch;
+	bool m_cas_motor;
+	uint32_t m_cas_offset;
+	uint32_t m_cas_maxsize;
+	int m_cas_baud_select;
+	uint8_t m_cas_data[0x18000];
+
 	// video functions
-	void draw_gfx_mode4(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr);
-	void draw_bitmap_2bpp(bitmap_ind16 &bitmap,const rectangle &cliprect, int attr);
-	void draw_tile_3bpp(bitmap_ind16 &bitmap,const rectangle &cliprect,int x,int y,int tile,int attr);
-	void draw_tile_text(bitmap_ind16 &bitmap,const rectangle &cliprect,int x,int y,int tile,int attr,int has_mc6847);
-	void draw_border(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr,int has_mc6847);
+	void draw_gfx_screen4(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, u8 tile, u8 attr, u8 col_setting);
+	void draw_gfx_2bpp(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, u8 tile, u8 attr);
+	void draw_tile_semi(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, u8 tile, u8 attr);
+	void draw_tile_text(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, u8 tile, u8 attr, int has_mc6847);
+	int get_border_pen(u8 attr, int has_mc6847);
 	void pc6001_screen_draw(bitmap_ind16 &bitmap,const rectangle &cliprect, int has_mc6847);
 
+	virtual rectangle get_screen_display_area();
+	virtual bool screen_blanked();
+	TIMER_CALLBACK_MEMBER(video_sync_cb);
 	emu_timer *m_timer_irq_timer = nullptr;
+	emu_timer *m_video_sync_timer = nullptr;
 	uint8_t *m_video_base = nullptr;
-	std::unique_ptr<uint8_t[]> m_video_ram;
-	uint8_t m_cas_switch = 0;
+//  std::unique_ptr<uint8_t[]> m_video_ram;
+
 	uint8_t m_sys_latch = 0;
-	uint32_t m_cas_offset = 0;
-	uint32_t m_cas_maxsize = 0;
 	uint8_t m_bank_opt = 0;
 	bool m_timer_enable = false;
 	bool m_timer_irq_mask = false;
@@ -160,14 +164,7 @@ protected:
 	uint8_t m_centronics_busy = 0;
 
 private:
-	uint32_t m_old_key1 = 0;
-	uint32_t m_old_key2 = 0;
-	uint32_t m_old_key3 = 0;
-	u8 m_old_key_fn;
-
 	uint8_t m_joystick_out = 0xff;
-
-	emu_timer *m_sub_trig_timer = nullptr;
 
 // IRQ model
 protected:
@@ -196,21 +193,22 @@ protected:
 private:
 	u8 m_irq_pending = 0;
 	u8 m_sub_vector = 0;
-};
+	bool m_crtkill;
 
+	static constexpr int VDG_BORDER_X  = 32;
+	static constexpr int VDG_BORDER_Y  = 24;
+};
 
 class pc6001mk2_state : public pc6001_state
 {
 public:
 	pc6001mk2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc6001_state(mconfig, type, tag)
-		, m_bank2(*this, "bank2")
-		, m_bank3(*this, "bank3")
-		, m_bank4(*this, "bank4")
-		, m_bank5(*this, "bank5")
-		, m_bank6(*this, "bank6")
-		, m_bank7(*this, "bank7")
-		, m_bank8(*this, "bank8")
+		, m_mk2_bank(*this, "mk2_bank_%u", 0U)
+		, m_basic_rom(*this, "basic_rom")
+		, m_tv_rom(*this, "tv_rom")
+		, m_voice_rom(*this, "voice_rom")
+		, m_kanji_rom(*this, "kanji_rom")
 	{ }
 
 	uint8_t mk2_bank_r0_r();
@@ -224,11 +222,6 @@ public:
 	void mk2_work_ram1_w(offs_t offset, uint8_t data);
 	void mk2_work_ram2_w(offs_t offset, uint8_t data);
 	void mk2_work_ram3_w(offs_t offset, uint8_t data);
-	void mk2_work_ram4_w(offs_t offset, uint8_t data);
-	void mk2_work_ram5_w(offs_t offset, uint8_t data);
-	void mk2_work_ram6_w(offs_t offset, uint8_t data);
-	void mk2_work_ram7_w(offs_t offset, uint8_t data);
-	void necmk2_ppi8255_w(offs_t offset, uint8_t data);
 	void mk2_system_latch_w(uint8_t data);
 	void mk2_vram_bank_w(uint8_t data);
 	void mk2_col_bank_w(uint8_t data);
@@ -236,7 +229,7 @@ public:
 	void mk2_timer_adj_w(uint8_t data);
 	void mk2_timer_irqv_w(uint8_t data);
 
-	void pc6001mk2_palette(palette_device &palette) const;
+	void mk2_palette_init(palette_device &palette) const;
 	void pc6001mk2(machine_config &config);
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
@@ -245,21 +238,30 @@ protected:
 	void pc6001mk2_map(address_map &map) ATTR_COLD;
 	void pc6001mk2_io(address_map &map) ATTR_COLD;
 
-	uint8_t m_bgcol_bank = 0;
-	uint8_t m_gfx_bank_on = 0;
-	optional_memory_bank m_bank2;
-	optional_memory_bank m_bank3;
-	optional_memory_bank m_bank4;
-	optional_memory_bank m_bank5;
-	optional_memory_bank m_bank6;
-	optional_memory_bank m_bank7;
-	optional_memory_bank m_bank8;
+	optional_device_array<address_map_bank_device, 4> m_mk2_bank;
+
+	required_memory_region m_basic_rom;
+	required_memory_region m_tv_rom;
+	required_memory_region m_voice_rom;
+	required_memory_region m_kanji_rom;
+
+	virtual rectangle get_screen_display_area() override;
 	virtual void refresh_crtc_params();
 
-	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	virtual u8 vrtc_ack() override;
+
+	template <unsigned TV_BASE> u8 tv_kanji_r(offs_t offset);
+	template <unsigned VOICE_BASE> u8 voice_kanji_r(offs_t offset);
+	template <unsigned CART_BASE> u8 cart_mk2_r(offs_t offset);
+
+	void mk2_tv_map(address_map &map);
+	template <unsigned BASIC_BASE, unsigned WORK_BASE> void mk2_voice_map(address_map &map);
+
+	std::vector<u8> m_mk2_exram;
 
 private:
 	uint8_t m_bank_r0 = 0;
@@ -270,6 +272,7 @@ private:
 	uint32_t m_cgrom_bank_addr = 0;
 	uint8_t m_exgfx_bitmap_mode = 0;
 	uint8_t m_exgfx_2bpp_mode = 0;
+	uint8_t m_bgcol_bank = 0;
 
 	void vram_bank_change(uint8_t vram_bank);
 };
@@ -313,6 +316,8 @@ public:
 		: pc6601_state(mconfig, type, tag)
 		, m_sr_bank(*this, "sr_bank_%u", 1U)
 		, m_sr_irq_vectors(*this, "irq_vectors")
+		, m_mk2_view(*this, "mk2_view")
+		, m_mk2_io_view(*this, "mk2_io_view")
 //      , m_gvram_view(*this, "gvram_view")
 		, m_sr_scrollx(*this, "sr_scrollx")
 		, m_sr_scrolly(*this, "sr_scrolly")
@@ -331,10 +336,14 @@ protected:
 
 	virtual u8 vrtc_ack() override;
 	virtual u8 get_timer_base_divider() override;
+	virtual rectangle get_screen_display_area() override;
+	virtual bool screen_blanked() override;
 
 private:
 	required_device_array<address_map_bank_device, 16> m_sr_bank;
 	required_shared_ptr<u8> m_sr_irq_vectors;
+	memory_view m_mk2_view;
+	memory_view m_mk2_io_view;
 	required_shared_ptr<u8> m_sr_scrollx;
 	required_shared_ptr<u8> m_sr_scrolly;
 	required_device<ym2203_device> m_ym;
@@ -345,6 +354,8 @@ private:
 	std::unique_ptr<u8 []> m_gvram;
 	u8 m_bitmap_yoffs = 0, m_bitmap_xoffs = 0;
 	u8 m_width80 = 0;
+	u8 m_sr_clut[16];
+	bool m_mk2_mode;
 
 //  memory_view m_gvram_view;
 
@@ -355,7 +366,6 @@ private:
 	void sr_mode_w(u8 data);
 	void sr_vram_bank_w(u8 data);
 	void sr_system_latch_w(u8 data);
-	void necsr_ppi8255_w(offs_t offset, u8 data);
 
 	virtual void refresh_crtc_params() override;
 	void sr_bitmap_yoffs_w(u8 data);

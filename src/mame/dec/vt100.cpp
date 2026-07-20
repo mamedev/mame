@@ -377,13 +377,13 @@ void vt100_state::vt100(machine_config &config)
 
 	ER1400(config, m_nvr);
 
-	VT100_KEYBOARD(config, m_keyboard, 0).signal_out_callback().set(m_kbduart, FUNC(ay31015_device::write_si));
+	VT100_KEYBOARD(config, m_keyboard).signal_out_callback().set(m_kbduart, FUNC(ay31015_device::write_si));
 
-	AY31015(config, m_kbduart, 0);
+	AY31015(config, m_kbduart);
 	m_kbduart->write_dav_callback().set(m_rstbuf, FUNC(rst_pos_buffer_device::rst1_w));
 	m_kbduart->set_auto_rdav(true);
 
-	RST_POS_BUFFER(config, m_rstbuf, 0).int_callback().set_inputline(m_maincpu, 0);
+	RST_POS_BUFFER(config, m_rstbuf).int_callback().set_inputline(m_maincpu, 0);
 }
 
 void vt100_state::stp_mem(address_map &map)

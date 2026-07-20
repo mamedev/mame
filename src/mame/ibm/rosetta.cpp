@@ -203,8 +203,6 @@ void rosetta_device::device_validity_check(validity_checker &valid) const
 
 void rosetta_device::device_start()
 {
-	m_leds.resolve();
-
 	save_item(NAME(m_segment));
 	save_item(NAME(m_control));
 	save_item(NAME(m_mear_lock));

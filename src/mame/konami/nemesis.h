@@ -77,8 +77,7 @@ protected:
 	void irq4_enable_w(int state);
 	void gfx_flipx_w(int state);
 	void gfx_flipy_w(int state);
-	void coin1_lockout_w(int state);
-	void coin2_lockout_w(int state);
+	template <unsigned Which> void coin_lockout_w(int state);
 	void sound_irq_w(int state);
 	void sound_nmi_w(int state);
 
@@ -176,10 +175,11 @@ public:
 		m_sound_shared_ram(*this, "sound_shared")
 	{ }
 
-	void konamigt(machine_config &config) ATTR_COLD;
-	void rf2_gx400(machine_config &config) ATTR_COLD;
+	void gradius(machine_config &config) ATTR_COLD;
 	void gx400(machine_config &config) ATTR_COLD;
+	void konamigt(machine_config &config) ATTR_COLD;
 	void nemesis(machine_config &config) ATTR_COLD;
+	void rf2_gx400(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -211,9 +211,20 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(gx400_interrupt);
 	void create_palette_lookups() ATTR_COLD;
 
+	void gx400_common_sound(machine_config &config) ATTR_COLD;
+	void nemesis_common_sound(machine_config &config) ATTR_COLD;
+
+	void addon_gx456_map(address_map &map) ATTR_COLD;
+	void addon_gx561_map(address_map &map) ATTR_COLD;
+
+	void gx400_base_map(address_map &map) ATTR_COLD;
+	void gx400_video_map(address_map &map) ATTR_COLD;
+
 	void gx400_map(address_map &map) ATTR_COLD;
 	void gx400_sound_map(address_map &map) ATTR_COLD;
 	void gx400_vlm_map(address_map &map) ATTR_COLD;
+
+	void gradius_map(address_map &map) ATTR_COLD;
 	void konamigt_map(address_map &map) ATTR_COLD;
 	void nemesis_map(address_map &map) ATTR_COLD;
 	void rf2_gx400_map(address_map &map) ATTR_COLD;
@@ -232,9 +243,11 @@ public:
 	{ }
 
 	void bubsys(machine_config &config) ATTR_COLD;
+	void bs_gradius(machine_config &config) ATTR_COLD;
+	void bs_rf2(machine_config &config) ATTR_COLD;
 
 	void bubsys_init() ATTR_COLD;
-	void bubsys_twinbeeb_init() ATTR_COLD;
+	void bs_twinbee_init() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -248,11 +261,14 @@ private:
 
 	uint16_t  m_scanline_counter = 0;
 
-	void bubsys_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bubsys_005297_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(bubsys_interrupt);
 
 	void main_map(address_map &map) ATTR_COLD;
+
+	void bs_gradius_map(address_map &map) ATTR_COLD;
+	void bs_rf2_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_KONAMI_NEMESIS_H

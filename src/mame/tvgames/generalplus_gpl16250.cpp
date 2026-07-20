@@ -3,12 +3,12 @@
 /*
     (unSP 2.0 based System on a Chip)
 
-    JAKKS call this GPAC800, other sources (including Pac-Man Connect and Play test mode) call it GPL16250
+    JAKKS call this GPAC800, other sources (including Pac-Man Connect and Play test mode) call it GPL16250VA
 
     die markings GCM394
      - Smart Fit Park
      - Spongebob Bikini Bottom 500
-     - Mobigo2 (sunplus_unsp20soc_mobigo.cpp)
+     - Mobigo2 (generalplus_gpl16250_mobigo2.cpp)
 
     some of the systems here might use newer dies but the video etc. appears the same.
 
@@ -30,9 +30,9 @@
         V.Baby
         Playskool Heroes Transformers Rescue Bots Beam Box
 
-    GPAC500 (based on test modes, unknown hardware, might be GPAC800 but without the higher resolution support?)
+    GPAC500 (based on test modes)
         The Price is Right
-        Bejeweled? (might be GPAC800)
+        Bejeweled
 
     Notes
         smartfp: hold button Circle, Star and Home on startup for Test Menu
@@ -71,51 +71,51 @@
 #include "generalplus_gpl16250.h"
 
 
-uint16_t gcm394_game_state::cs0_r(offs_t offset)
+u16 gcm394_game_state::cs0_r(offs_t offset)
 {
 	return m_romregion[offset & 0x3fffff];
 }
 
-void gcm394_game_state::cs0_w(offs_t offset, uint16_t data)
+void gcm394_game_state::cs0_w(offs_t offset, u16 data)
 {
 	logerror("cs0_w %04x %04x (to ROM!)\n", offset, data);
 }
 
-uint16_t gcm394_game_state::cs1_r(offs_t offset) { logerror("cs1_r %06n", offset); return 0x0000; }
-void gcm394_game_state::cs1_w(offs_t offset, uint16_t data) { logerror("cs1_w %06x %04x\n", offset, data); }
-uint16_t gcm394_game_state::cs2_r(offs_t offset) { logerror("cs2_r %06n", offset); return 0x0000; }
-void gcm394_game_state::cs2_w(offs_t offset, uint16_t data) { logerror("cs2_w %06x %04x\n", offset, data); }
-uint16_t gcm394_game_state::cs3_r(offs_t offset) { logerror("cs3_r %06n", offset); return 0x0000; }
-void gcm394_game_state::cs3_w(offs_t offset, uint16_t data) { logerror("cs3_w %06x %04x\n", offset, data); }
-uint16_t gcm394_game_state::cs4_r(offs_t offset) { logerror("cs4_r %06n", offset); return 0x0000; }
-void gcm394_game_state::cs4_w(offs_t offset, uint16_t data) { logerror("cs4_w %06x %04x\n", offset, data); }
+u16 gcm394_game_state::cs1_r(offs_t offset) { logerror("cs1_r %06n", offset); return 0x0000; }
+void gcm394_game_state::cs1_w(offs_t offset, u16 data) { logerror("cs1_w %06x %04x\n", offset, data); }
+u16 gcm394_game_state::cs2_r(offs_t offset) { logerror("cs2_r %06n", offset); return 0x0000; }
+void gcm394_game_state::cs2_w(offs_t offset, u16 data) { logerror("cs2_w %06x %04x\n", offset, data); }
+u16 gcm394_game_state::cs3_r(offs_t offset) { logerror("cs3_r %06n", offset); return 0x0000; }
+void gcm394_game_state::cs3_w(offs_t offset, u16 data) { logerror("cs3_w %06x %04x\n", offset, data); }
+u16 gcm394_game_state::cs4_r(offs_t offset) { logerror("cs4_r %06n", offset); return 0x0000; }
+void gcm394_game_state::cs4_w(offs_t offset, u16 data) { logerror("cs4_w %06x %04x\n", offset, data); }
 
-void gcm394_game_state::cs_map_base(address_map& map)
+void gcm394_game_state::cs_map_base(address_map &map)
 {
 }
 
-uint16_t gcm394_game_state::porta_r()
+u16 gcm394_game_state::porta_r()
 {
-	uint16_t data = m_io[0]->read();
+	u16 data = m_io[0]->read();
 	logerror("Port A Read: %04x\n", data);
 	return data;
 }
 
-uint16_t gcm394_game_state::portb_r()
+u16 gcm394_game_state::portb_r()
 {
-	uint16_t data = m_io[1]->read();
+	u16 data = m_io[1]->read();
 	logerror("Port B Read: %04x\n", data);
 	return data;
 }
 
-uint16_t gcm394_game_state::portc_r()
+u16 gcm394_game_state::portc_r()
 {
-	uint16_t data = m_io[2]->read();
+	u16 data = m_io[2]->read();
 	logerror("Port C Read: %04x\n", data);
 	return data;
 }
 
-void gcm394_game_state::porta_w(uint16_t data)
+void gcm394_game_state::porta_w(u16 data)
 {
 	logerror("%s: Port A:WRITE %04x\n", machine().describe_context(), data);
 }
@@ -128,14 +128,14 @@ void gcm394_game_state::base(machine_config &config)
 {
 	set_addrmap(0, &gcm394_game_state::cs_map_base);
 
-	GCM394(config, m_maincpu, 96000000, m_screen);
+	GPL16218B(config, m_maincpu, 96000000, m_screen);
 	m_maincpu->porta_in().set(FUNC(gcm394_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(gcm394_game_state::portb_r));
 	m_maincpu->portc_in().set(FUNC(gcm394_game_state::portc_r));
 	m_maincpu->porta_out().set(FUNC(gcm394_game_state::porta_w));
 	m_maincpu->space_read_callback().set(FUNC(gcm394_game_state::read_external_space));
 	m_maincpu->space_write_callback().set(FUNC(gcm394_game_state::write_external_space));
-	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(sunplus_gcm394_base_device::irq_vector_cb));
+	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(generalplus_gpl162xx_base_device::irq_vector_cb));
 	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
 	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 	m_maincpu->set_bootmode(1); // boot from external ROM / CS mirror
@@ -146,16 +146,10 @@ void gcm394_game_state::base(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320*2, 262*2);
 	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);
-	m_screen->set_screen_update("maincpu", FUNC(sunplus_gcm394_device::screen_update));
-	m_screen->screen_vblank().set(m_maincpu, FUNC(sunplus_gcm394_device::vblank));
+	m_screen->set_screen_update("maincpu", FUNC(generalplus_gpl16218b_device::screen_update));
+	m_screen->screen_vblank().set(m_maincpu, FUNC(generalplus_gpl16218b_device::vblank));
 
 	SPEAKER(config, "speaker", 2).front();
-}
-
-void gcm394_game_state::base_alt_irq(machine_config &config)
-{
-	gcm394_game_state::base(config);
-	m_maincpu->set_alt_periodic_irq(true);
 }
 
 void gcm394_game_state::machine_start()
@@ -177,7 +171,7 @@ device_memory_interface::space_config_vector gcm394_game_state::memory_space_con
 	return space_config_vector{ std::make_pair(0, &m_full_mem_config) };
 }
 
-void gcm394_game_state::cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4)
+void gcm394_game_state::cs_callback(u16 cs0, u16 cs1, u16 cs2, u16 cs3, u16 cs4)
 {
 	address_space &external = space(0);
 

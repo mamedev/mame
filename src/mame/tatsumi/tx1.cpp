@@ -171,6 +171,7 @@ void tx1_state::tx1(machine_config &config)
 {
 	I8086(config, m_maincpu, CPU_MASTER_CLOCK / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tx1_state::tx1_main);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(tx1_state::vector_callback));
 
 	WATCHDOG_TIMER(config, "watchdog");//.set_time(5);
 
@@ -215,6 +216,7 @@ void tx1_state::buggyboy(machine_config &config)
 {
 	I8086(config, m_maincpu, CPU_MASTER_CLOCK / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tx1_state::buggyboy_main);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(tx1_state::vector_callback));
 
 	WATCHDOG_TIMER(config, "watchdog");//.set_time(5);
 

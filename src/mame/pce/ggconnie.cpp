@@ -26,8 +26,6 @@
 #include "machine/msm6242.h"
 #include "sound/okim6295.h"
 #include "video/huc6202.h"
-#include "video/huc6260.h"
-#include "video/huc6270.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -71,7 +69,6 @@ private:
 void ggconnie_state::machine_start()
 {
 	pce_common_state::machine_start();
-	m_lamp.resolve();
 
 	for (auto &okibank : m_okibank)
 		okibank->configure_entries(0, 8, memregion("oki")->base(), 0x10000);
@@ -197,7 +194,7 @@ static INPUT_PORTS_START(ggconnie)
 	PORT_DIPSETTING(0xc0, DEF_STR(Normal))
 
 	PORT_START("SWC")
-	PORT_DIPNAME(0x03, 0x03, "Demo Sound" )  PORT_DIPLOCATION("SWC:1,2")
+	PORT_DIPNAME(0x03, 0x03, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SWC:1,2")  // "Demo Sound"
 	PORT_DIPSETTING(0x00, DEF_STR(Off) )
 	PORT_DIPSETTING(0x01, "3/1" )
 	PORT_DIPSETTING(0x02, "2/1" )
@@ -282,7 +279,7 @@ static INPUT_PORTS_START(smf)
 	PORT_DIPSETTING(0xc0, DEF_STR(Normal))
 
 	PORT_START("SWC")
-	PORT_DIPNAME(0x03, 0x03, "Demo Sound" )  PORT_DIPLOCATION("SWC:1,2")
+	PORT_DIPNAME(0x03, 0x03, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SWC:1,2")
 	PORT_DIPSETTING(0x00, DEF_STR(Off) )
 	PORT_DIPSETTING(0x01, "1/3" )
 	PORT_DIPSETTING(0x02, "1/2" )

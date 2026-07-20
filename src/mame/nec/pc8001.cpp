@@ -22,8 +22,10 @@ References:
     - PC-8011 (expansion unit)
     - PC-8021;
     - PC-8031 (mini disk unit, in progress)
+	- pc8001mk2: implement 1 layer GVRAM;
     - pc8001mk2sr: verify how much needs to be ported from pc8801.cpp code
-      (Has 3 bitplane GVRAM like PC-8801 V1 mode);
+      (Has 3 bitplane GVRAM like PC-8801 V1 mode + ALU + few unique modes eventually ditched,
+	  mapped at $8000 rather than $c000);
     - waitstates & DMA penalty (some games are suspciously fast);
     - buzzer has pretty ugly aliasing in places;
 
@@ -40,7 +42,9 @@ References:
 */
 
 #include "emu.h"
+#include "pc88_kbd.h"
 #include "pc8001.h"
+
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -192,7 +196,7 @@ UPD3301_DRAW_CHARACTER_MEMBER( pc8001_base_state::draw_text )
 	}
 }
 
-uint32_t pc8001_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t pc8001_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	// TODO: superimposing
@@ -200,6 +204,295 @@ uint32_t pc8001_state::screen_update( screen_device &screen, bitmap_rgb32 &bitma
 	m_crtc->screen_update(screen, bitmap, cliprect);
 	return 0;
 }
+
+/*
+ * MkII video
+ */
+
+void pc8001mk2_state::video_start()
+{
+	m_screen->register_screen_bitmap(m_text_bitmap);
+
+	save_item(NAME(m_text_layer_mask));
+	save_item(NAME(m_bitmap_layer_mask));
+}
+
+void pc8001mk2_state::video_reset()
+{
+	m_text_layer_mask = true;
+	m_bitmap_layer_mask = 0x7;
+}
+
+void pc8001mk2_state::draw_bitmap_2bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(u32 bitmap_offset, int y, int x, int xi)> dot_func)
+{
+	const uint16_t y_double = 0;
+	int32_t y_line_size = y_double + 1;
+
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y += y_line_size)
+	{
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
+		{
+			u8 x_char = (x >> 3);
+			u32 bitmap_offset = (y >> y_double) * 80 + x_char;
+			for(int xi = 0; xi < 4; xi ++)
+			{
+				u8 pen_dot = dot_func(bitmap_offset, y, x_char, 6 - (xi * 2));
+
+				if (pen_dot == 0)
+					continue;
+
+				for (int yi = 0; yi < y_line_size; yi ++)
+				{
+					int res_x = x + xi * 2;
+					int res_y = y + yi;
+					if (cliprect.contains(res_x, res_y))
+						bitmap.pix(res_y, res_x) = palette->pen(pen_dot);
+					if (cliprect.contains(res_x + 1, res_y))
+						bitmap.pix(res_y, res_x + 1) = palette->pen(pen_dot);
+				}
+			}
+		}
+	}
+}
+
+
+uint32_t pc8001mk2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	if (BIT(m_port31, 3))
+	{
+		// mkII has no settable palette, use the CRTC one for convenience.
+		bitmap.fill(m_crtc_palette->pen(0), cliprect);
+
+		// TODO: backported from mk2sr, see below
+		draw_bitmap_2bpp(bitmap, cliprect, m_crtc_palette, [&](u32 bitmap_offset, int y, int x, int xi){
+			const u8 color_table[8] = { 0x00, 0x02, 0x04, 0x03, 0x00, 0x02, 0x04, 0x07 };
+
+			u8 res = 0;
+
+			// we have one filled plane only in this implementation
+			//for (int plane = 0; plane < 3; plane ++)
+			{
+				const u8 plane = 0;
+				u8 mask = BIT(m_bitmap_layer_mask, plane) * 3;
+				res |= (m_gvram[bitmap_offset + plane * 0x4000] >> xi) & mask;
+			}
+
+			if (!res)
+				return (u8)0;
+
+			return color_table[res | BIT(m_port31, 2) << 2];
+			//return m_crtc->is_gfx_color_mode() ? (m_attr_info[y][x] >> 13) & 7 : 7;
+		});
+
+	}
+	else
+		bitmap.fill(0, cliprect);
+
+	if(m_text_layer_mask)
+	{
+		m_text_bitmap.fill(0, cliprect);
+		m_crtc->screen_update(screen, m_text_bitmap, cliprect);
+		copybitmap_trans(bitmap, m_text_bitmap, 0, 0, 0, 0, cliprect, 0);
+	}
+
+	return 0;
+}
+
+/*
+ * mkIISR video
+ */
+
+void pc8001mk2sr_state::video_start()
+{
+	pc8001mk2_state::video_start();
+	m_screen->register_screen_bitmap(m_graph_bitmap);
+
+	save_item(STRUCT_MEMBER(m_palram, r));
+	save_item(STRUCT_MEMBER(m_palram, g));
+	save_item(STRUCT_MEMBER(m_palram, b));
+}
+
+void pc8001mk2sr_state::video_reset()
+{
+	pc8001mk2_state::video_reset();
+	for (int i = 0; i < 8; i ++)
+	{
+		m_palram[i].b = i & 1 ? 7 : 0;
+		m_palram[i].r = i & 2 ? 7 : 0;
+		m_palram[i].g = i & 4 ? 7 : 0;
+		m_palette->set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+	}
+}
+
+void pc8001mk2sr_state::draw_bitmap_w80(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(u32 bitmap_offset, int y, int x, int xi)> dot_func)
+{
+	const uint16_t y_double = 0;
+	int32_t y_line_size = y_double + 1;
+
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y += y_line_size)
+	{
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
+		{
+			u8 x_char = (x >> 3);
+			u32 bitmap_offset = (y >> y_double) * 80 + x_char;
+			for(int xi = 0; xi < 8; xi++)
+			{
+				u8 pen_dot = dot_func(bitmap_offset, y, x_char, 7 - xi);
+
+				if (pen_dot == 0)
+					continue;
+
+				for (int yi = 0; yi < y_line_size; yi ++)
+				{
+					int res_x = x + xi;
+					int res_y = y + yi;
+					if (cliprect.contains(res_x, res_y))
+						bitmap.pix(res_y, res_x) = palette->pen(pen_dot);
+				}
+			}
+		}
+	}
+}
+
+void pc8001mk2sr_state::draw_bitmap_w40(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(int layer_n, u32 bitmap_offset, int y, int x, int xi)> dot_func)
+{
+	const uint16_t y_double = 0;
+	int32_t y_line_size = y_double + 1;
+	// n80srbas "demo2/3/4.nsr"
+	// normally priority is 0 > 1, bit enabled makes it 0 < 1
+	const u8 pr1 = BIT(m_port33, 2);
+	const u8 pri0 = 0 ^ pr1;
+	const u8 pri1 = 1 ^ pr1;
+
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y += y_line_size)
+	{
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x += 16)
+		{
+			u8 x_char = (x >> 4);
+			u32 bitmap_offset = (y >> y_double) * 40 + x_char;
+			for(int xi = 0; xi < 16; xi++)
+			{
+				u8 pen_dot[2];
+				pen_dot[0] = dot_func(0, bitmap_offset + 0x0000, y, x_char, 7 - (xi >> 1));
+				pen_dot[1] = dot_func(1, bitmap_offset + 0x2000, y, x_char, 7 - (xi >> 1));
+
+				for (int yi = 0; yi < y_line_size; yi ++)
+				{
+					int res_x = x + xi;
+					int res_y = y + yi;
+					if (cliprect.contains(res_x, res_y))
+					{
+						if (pen_dot[pri1])
+							bitmap.pix(res_y, res_x) = palette->pen(pen_dot[pri1]);
+						if (pen_dot[pri0])
+							bitmap.pix(res_y, res_x) = palette->pen(pen_dot[pri0]);
+					}
+				}
+			}
+		}
+	}
+}
+
+
+uint32_t pc8001mk2sr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	m_graph_bitmap.fill(0, cliprect);
+
+	if (BIT(m_port31, 3))
+	{
+		// pack2:"Dragon Slayer"
+		bitmap.fill(m_palette->pen(0), cliprect);
+
+		// TODO: mkII compatible mono mode
+		// 640x200x1bpp, SR GVRAM banks actually OR-ed like pc8801 -> mirror on write access.
+		// Also Spectrum-like colors from text attribute (verify if regular mk2 can do it as well).
+
+		if (BIT(m_port31, 5))
+		{
+			// 2bpp color
+			// The goofy one out, OR-es in planar like other 1bpp modes but also draws in packed
+			// - pack1 game list
+			// - pack1:"Nuts & Milk"
+			// - any mk2 SW
+			// TODO: enable guessed
+			// m_port31 & 0xe0 may be border color really?
+			// m_port31 & 0x30 == 0x20 should give mono mode instead
+			// n80diskb "mark2" demo plays with this a ton, presumably wants mono color in places
+
+			draw_bitmap_2bpp(m_graph_bitmap, cliprect, m_palette, [&](u32 bitmap_offset, int y, int x, int xi){
+				const u8 color_table[8] = { 0x00, 0x02, 0x04, 0x03, 0x00, 0x02, 0x04, 0x07 };
+
+				u8 res = 0;
+
+				for (int plane = 0; plane < 3; plane ++)
+				{
+					u8 mask = BIT(m_bitmap_layer_mask, plane) * 3;
+					res |= (m_gvram[bitmap_offset + plane * 0x4000] >> xi) & mask;
+				}
+
+				if (!res)
+					return (u8)0;
+
+				return color_table[res | BIT(m_port31, 2) << 2];
+				//return m_crtc->is_gfx_color_mode() ? (m_attr_info[y][x] >> 13) & 7 : 7;
+			});
+		}
+		else if (BIT(m_port31, 2))
+		{
+			// 2 planes width 40
+
+			draw_bitmap_w40(m_graph_bitmap, cliprect, m_palette, [&](int layer_n, u32 bitmap_offset, int y, int x, int xi){
+				u8 res = 0;
+				if (!BIT(m_bitmap_layer_mask, layer_n))
+					return res;
+
+				for (int plane = 0; plane < 3; plane ++)
+					res |= ((m_gvram[bitmap_offset + plane * 0x4000] >> xi) & 1) << plane;
+
+				return res;
+			});
+		}
+		else
+		{
+			// 1 plane width 80
+
+			// NOTE: unlike pc8801 port $53 actually allows disabling the single plane
+			if (BIT(m_bitmap_layer_mask, 0))
+			{
+				draw_bitmap_w80(m_graph_bitmap, cliprect, m_palette, [&](u32 bitmap_offset, int y, int x, int xi){
+					u8 res = 0;
+
+					for (int plane = 0; plane < 3; plane ++)
+						res |= ((m_gvram[bitmap_offset + plane * 0x4000] >> xi) & 1) << plane;
+
+					return res;
+				});
+			}
+		}
+	}
+	else
+		bitmap.fill(0, cliprect);
+
+	m_text_bitmap.fill(0, cliprect);
+	if(m_text_layer_mask)
+		m_crtc->screen_update(screen, m_text_bitmap, cliprect);
+
+	// PR2 makes graph to be higher priority than text layer
+	// - pack2:"Burger Time" depends on this
+	if (BIT(m_port33, 3))
+	{
+		copybitmap_trans(bitmap, m_text_bitmap, 0, 0, 0, 0, cliprect, 0);
+		copybitmap_trans(bitmap, m_graph_bitmap, 0, 0, 0, 0, cliprect, 0);
+	}
+	else
+	{
+		copybitmap_trans(bitmap, m_graph_bitmap, 0, 0, 0, 0, cliprect, 0);
+		copybitmap_trans(bitmap, m_text_bitmap, 0, 0, 0, 0, cliprect, 0);
+	}
+
+	return 0;
+}
+
 
 /* Read/Write Handlers */
 
@@ -246,23 +539,27 @@ void pc8001_base_state::port30_w(uint8_t data)
 	m_cassette->change_state(BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
+/*
+ * xxx- ---- background color
+ * ---x ---- resolution (0=640x200, 1=320x200)
+ * ---- x--- graphics enable
+ * ---- -x-- color mode (0=attribute, 1=B&W)
+ * ---- --x- memory mode (0=ROM, 1=RAM)
+ * ---- ---x expansion ROM (0=expansion, 1=N80)
+ */
 void pc8001mk2_state::port31_w(uint8_t data)
 {
-	/*
+	m_port31 = data;
+	flush_low_bank();
+}
 
-	    bit     description
-
-	    0       expansion ROM (0=expansion, 1=N80)
-	    1       memory mode (0=ROM, 1=RAM)
-	    2       color mode (0=attribute, 1=B&W)
-	    3       graphics enable
-	    4       resolution (0=640x200, 1=320x200)
-	    5       background color
-	    6       background color
-	    7       background color
-
-	*/
-	membank("bank2")->set_entry(data & 1);
+void pc8001mk2_state::flush_low_bank()
+{
+	// enable 64K work RAM
+	if (BIT(m_port31, 1))
+		m_exp_view.disable();
+	else
+		m_exp_view.select(m_port31 & 1);
 }
 
 void pc8001_base_state::write_centronics_busy(int state)
@@ -320,29 +617,136 @@ void pc8001_state::port40_w(uint8_t data)
 	m_beep->set_state(BIT(data, 5));
 }
 
+/* i8214 PICU section */
+
+void pc8001_base_state::irq_level_w(uint8_t data)
+{
+	m_picu->b_sgs_w(~data);
+}
+
+/*
+ * ---- -x-- /RXMF RXRDY irq mask
+ * ---- --x- /VRMF VRTC irq mask
+ * ---- ---x /RTMF Real-time clock irq mask
+ *
+ */
+void pc8001_base_state::irq_mask_w(uint8_t data)
+{
+	m_irq_state.enable &= ~7;
+	// mapping reversed to the correlated irq levels
+	m_irq_state.enable |= bitswap<3>(data & 7, 0, 1, 2);
+
+	check_irq(RXRDY_IRQ_LEVEL);
+	check_irq(VRTC_IRQ_LEVEL);
+	check_irq(CLOCK_IRQ_LEVEL);
+}
+
+void pc8001_base_state::rxrdy_irq_w(int state)
+{
+	if (state)
+		assert_irq(RXRDY_IRQ_LEVEL);
+}
+
+/*
+ * 0 RXRDY
+ * 1 VRTC
+ * 2 CLOCK
+ * 3 INT3 (GSX-8800)
+ * 4 INT4 (any OPN, external boards included with different irq mask at $aa)
+ * 5 INT5
+ * 6 FDCINT1
+ * 7 FDCINT2
+ *
+ */
+IRQ_CALLBACK_MEMBER(pc8001_base_state::int_ack_cb)
+{
+	// TODO: schematics sports a μPB8212 too, with DI2-DI4 connected to 8214 A0-A2
+	// Seems just an intermediate bridge for translating raw levels to vectors
+	// with no access from outside world?
+	u8 level = m_picu->a_r();
+	m_picu->r_w(level, 1);
+
+	return (7 - level) * 2;
+}
+
+void pc8001_base_state::int4_irq_w(int state)
+{
+	bool irq_state = m_sound_irq_enable & state;
+
+	// remember current setting so that an enable reg variation will pick up
+	// particularly needed by PC-88 Telenet games (xzr2, valis2)
+	// TODO: understand how exactly the external irq source works out (Sound Board II)
+	// has a separate irq mask for secondary OPNA but still sends INT4s,
+	// we separate the logic from the others since this exact function needs templatized array for enable and pending anyway
+	// (and won't otherwise work for xzr2 anyway).
+	m_picu->r_w(7 ^ INT4_IRQ_LEVEL, !irq_state);
+	m_sound_irq_pending = state;
+}
+
+// FIXME: convert to pure write-line-style member
+// Works with 0 -> 1 F/F transitions
+TIMER_DEVICE_CALLBACK_MEMBER(pc8001_base_state::clock_irq_w)
+{
+	// NOTE: pc8801:castlex uses this rather than dedicated OPN INT4 for BGM tempo
+	assert_irq(CLOCK_IRQ_LEVEL);
+}
+
+void pc8001_base_state::check_irq(u8 level)
+{
+	u8 mask = 1 << level;
+
+	// pc8801:megamit and pc8801:babylon are particularly fussy if the VRTC irq isn't disabled when requested
+	// - megamit jumps to PC=0
+	// - babylon has just a ret coded in the VRTC irq, so accepting that will wreck the program flow and hang at title screen with no sound (because it expects INT4s)
+	if (!(m_irq_state.enable & mask))
+		m_picu->r_w(7 ^ level, 1);
+	else if (m_irq_state.enable & m_irq_state.pending & mask)
+		assert_irq(level);
+}
+
+void pc8001_base_state::assert_irq(u8 level)
+{
+	u8 mask = 1 << level;
+
+	if (mask & m_irq_state.enable)
+	{
+		m_irq_state.pending &= ~mask;
+		m_picu->r_w(7 ^ level, 0);
+	}
+	else
+		m_irq_state.pending |= mask;
+}
+
+void pc8001_base_state::vrtc_irq_w(int state)
+{
+//  bool irq_state = m_vrtc_irq_enable & state;
+	if (state)
+	{
+		assert_irq(VRTC_IRQ_LEVEL);
+	}
+}
+
+
 /* Memory Maps */
 
 void pc8001_state::pc8001_map(address_map &map)
 {
-	map(0x0000, 0x5fff).bankrw("bank1");
-	map(0x6000, 0x7fff).bankrw("bank2");
-	map(0x8000, 0xffff).bankrw("bank3");
+	map(0x0000, 0x7fff).rw(FUNC(pc8001_state::ram_r<0x8000>), FUNC(pc8001_state::ram_w<0x8000>));
+	map(0x0000, 0x7fff).view(m_exp_view);
+	m_exp_view[0](0x0000, 0x5fff).rom().region("maincpu", 0x0000);
+	// TODO: hookup expansion ROM
+	m_exp_view[0](0x6000, 0x7fff).lr8(NAME([] (offs_t offset) { return 0xff; }));
+	m_exp_view[1](0x0000, 0x5fff).rom().region("maincpu", 0x0000);
+	m_exp_view[1](0x6000, 0x7fff).rom().region("maincpu", 0x6000);
+	map(0x8000, 0xbfff).rw(FUNC(pc8001_state::ram_r<0x4000>), FUNC(pc8001_state::ram_w<0x4000>));
+	map(0xc000, 0xffff).rw(FUNC(pc8001_state::ram_r<0x0000>), FUNC(pc8001_state::ram_w<0x0000>));
 }
 
 void pc8001_state::pc8001_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x00, 0x00).portr("Y0");
-	map(0x01, 0x01).portr("Y1");
-	map(0x02, 0x02).portr("Y2");
-	map(0x03, 0x03).portr("Y3");
-	map(0x04, 0x04).portr("Y4");
-	map(0x05, 0x05).portr("Y5");
-	map(0x06, 0x06).portr("Y6");
-	map(0x07, 0x07).portr("Y7");
-	map(0x08, 0x08).portr("Y8");
-	map(0x09, 0x09).portr("Y9");
+	map(0x00, 0x0f).r("kbd", FUNC(pc8001_kbd_device::read_direct));
 	map(0x10, 0x10).mirror(0x0f).w(FUNC(pc8001_state::port10_w));
 	map(0x20, 0x21).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x30, 0x30).mirror(0x0f).w(FUNC(pc8001_state::port30_w));
@@ -369,19 +773,44 @@ void pc8001_state::pc8001_io(address_map &map)
 //  map(0xdc, 0xdc).w(FUNC(pc8001_state::pc8011_ieee488_nrfd_w));
 //  map(0xde, 0xde).w(FUNC(pc8001_state::pc8011_ieee488_bus_mode_control_w));
 //  map(0xe0, 0xe3).w(FUNC(pc8001_state::expansion_storage_mode_w));
-//  map(0xe4, 0xe4).mirror(0x01).w(FUNC(pc8001_state::irq_level_w));
-//  map(0xe6, 0xe6).w(FUNC(pc8001_state::irq_mask_w));
+	map(0xe4, 0xe4).w(FUNC(pc8001_state::irq_level_w));
+	map(0xe6, 0xe6).w(FUNC(pc8001_state::irq_mask_w));
 //  map(0xe7, 0xe7).w(FUNC(pc8001_state::pc8012_memory_mode_w));
 //  map(0xe8, 0xfb) unused
 	map(0xfc, 0xff).m(m_pc80s31, FUNC(pc80s31_device::host_map));
 }
 
+/*
+ *
+ * mkII (GVRAM)
+ *
+ */
+
+void pc8001mk2_state::flush_gvram_access()
+{
+	m_gvram_bank->set_bank(m_vram_sel);
+}
+
+uint8_t pc8001mk2_state::gvram_r(offs_t offset)
+{
+	return m_gvram[offset];
+}
+
+void pc8001mk2_state::gvram_w(offs_t offset, uint8_t data)
+{
+	m_gvram[offset] = data;
+}
+
+void pc8001mk2_state::gvram_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rw(FUNC(pc8001mk2_state::gvram_r), FUNC(pc8001mk2_state::gvram_w));
+	map(0xc000, 0xffff).rw(FUNC(pc8001mk2_state::ram_r<0x4000>), FUNC(pc8001mk2_state::ram_w<0x4000>));
+}
+
 void pc8001mk2_state::pc8001mk2_map(address_map &map)
 {
-	map(0x0000, 0x5fff).bankrw("bank1");
-	map(0x6000, 0x7fff).bankrw("bank2");
-	map(0x8000, 0xbfff).bankrw("bank3");
-	map(0xc000, 0xffff).bankrw("bank4");
+	pc8001_map(map);
+	map(0x8000, 0xbfff).m(m_gvram_bank, FUNC(address_map_bank_device::amap8));
 }
 
 void pc8001mk2_state::pc8001mk2_io(address_map &map)
@@ -389,8 +818,17 @@ void pc8001mk2_state::pc8001mk2_io(address_map &map)
 	pc8001_io(map);
 	map(0x30, 0x30).portr("DSW1").w(FUNC(pc8001mk2_state::port30_w));
 	map(0x31, 0x31).portr("DSW2").w(FUNC(pc8001mk2_state::port31_w));
-//  map(0x5c, 0x5c).w(FUNC(pc8001mk2_state::gram_on_w));
-//  map(0x5f, 0x5f).w(FUNC(pc8001mk2_state::gram_off_w));
+	map(0x53, 0x53).lw8(
+		NAME([this] (u8 data) {
+			m_text_layer_mask = !!(BIT(~data, 0));
+			// NOTE: more bits vs. pc8801
+			m_bitmap_layer_mask = ((data & 0x7e) >> 1) ^ 0x3f;
+		})
+	);
+//  map(0x5c, 0x5c).w(FUNC(pc8001mk2_state::gvram_on_w));
+//  map(0x5f, 0x5f).w(FUNC(pc8001mk2_state::gvram_off_w));
+	map(0x5c, 0x5c).lw8(NAME([this] (offs_t offset, u8 data) { (void)data; m_vram_sel = 0; flush_gvram_access(); }));
+	map(0x5f, 0x5f).lw8(NAME([this] (offs_t offset, u8 data) { (void)data; m_vram_sel = 3; flush_gvram_access(); }));
 //  map(0xe8, 0xe8) kanji_address_lo_w, kanji_data_lo_r
 //  map(0xe9, 0xe9) kanji_address_hi_w, kanji_data_hi_r
 //  map(0xea, 0xea) kanji_readout_start_w
@@ -406,21 +844,104 @@ void pc8001mk2_state::pc8001mk2_io(address_map &map)
 //  map(0xfb, 0xfb) DMA type 5 inch FDC data register
 }
 
-void pc8001mk2sr_state::port33_w(u8 data)
+/*
+ *
+ * PC-8001mkIISR (ALU, bumped GVRAM)
+ *
+ */
+
+void pc8001mk2sr_state::gvram_map(address_map &map)
 {
-	// TODO: needs progressive flush
-#ifdef UNUSED_FUNCTION
-	if (data & 0x80)
+	map(0x0000, 0xbfff).rw(FUNC(pc8001mk2sr_state::gvram_r), FUNC(pc8001mk2sr_state::gvram_w));
+	map(0xc000, 0xffff).rw(FUNC(pc8001mk2sr_state::ram_r<0x4000>), FUNC(pc8001mk2sr_state::ram_w<0x4000>));
+}
+
+void pc8001mk2sr_state::flush_low_bank()
+{
+	// work RAM enable has priority over any BIOS
+	if (BIT(m_port31, 1))
 	{
-		membank("bank1")->set_entry(2);
-		membank("bank2")->set_entry(2 | (m_n80sr_bank & 1));
+		m_exp_view.disable();
+		return;
+	}
+
+	// $e2 individual work RAM select works similarly to PC-8801,
+	// except it has just one register and can only bank to 64K
+	if (m_extram_mode & 0x11)
+	{
+		m_extram_view.select(m_extram_mode);
+	}
+	else
+		m_extram_view.disable();
+
+	if (BIT(m_port33, 7))
+	{
+		m_exp_view.select(2 | (m_n80sr_bank & 1));
 	}
 	else
 	{
-		membank("bank1")->set_entry(0);
-		membank("bank2")->set_entry(0);
+		m_exp_view.select(0 | (m_port31 & 1));
 	}
-#endif
+}
+
+void pc8001mk2sr_state::flush_gvram_access()
+{
+	// NOTE: different than the equivalent pc88 access ($32 vs. $33)
+	//if (BIT(m_misc_ctrl, 6))
+	if (BIT(m_port33, 6))
+	{
+		if (m_alu_gam)
+		{
+			m_alu_view.select(0);
+		}
+		else
+		{
+			m_alu_view.disable();
+		}
+
+		// NOTE: ALU enabled wins over GVRAM, to the point of disabling its latch when setting changes
+		m_vram_sel = 3;
+	}
+	else
+		m_alu_view.disable();
+
+	pc8001mk2_state::flush_gvram_access();
+}
+
+u8 pc8001mk2sr_state::port33_r()
+{
+	return m_port33;
+}
+
+/*
+ * x--- ---- N80SR enable SR specific BIOS
+ * -x-- ---- GVAM ALU enable
+ * ---x ---- HIRA hiragana enable
+ * ---- x--- PR2 graphic priority over text
+ * ---- -x-- PR1 swap bank 0 and bank 1 in 320x200 graphic mode
+ * ---- --x- SINTM sound irq mask
+ */
+void pc8001mk2sr_state::port33_w(u8 data)
+{
+	m_port33 = data;
+
+	if (data & 0x10)
+		popmessage("pc8001.cpp: port33_w HIRA %02x", data);
+	flush_low_bank();
+	flush_gvram_access();
+
+	m_sound_irq_enable = !!BIT(~data, 1);
+
+	if (m_sound_irq_enable)
+		int4_irq_w(m_sound_irq_pending);
+
+}
+
+void pc8001mk2sr_state::alu_ctrl2_w(u8 data)
+{
+	m_alu->ctrl2_w(data);
+	m_alu_gam = BIT(data, 7);
+	flush_gvram_access();
 }
 
 u8 pc8001mk2sr_state::port71_r()
@@ -431,118 +952,70 @@ u8 pc8001mk2sr_state::port71_r()
 void pc8001mk2sr_state::port71_w(u8 data)
 {
 	m_n80sr_bank = data;
+	flush_low_bank();
+}
+
+void pc8001mk2sr_state::pc8001mk2sr_map(address_map &map)
+{
+	pc8001mk2_map(map);
+	m_exp_view[2](0x0000, 0x5fff).rom().region(N80SR_ROM_TAG, 0x0000);
+	m_exp_view[2](0x6000, 0x7fff).rom().region(N80SR_ROM_TAG, 0x8000);
+	m_exp_view[3](0x0000, 0x5fff).rom().region(N80SR_ROM_TAG, 0x0000);
+	m_exp_view[3](0x6000, 0x7fff).rom().region(N80SR_ROM_TAG, 0x6000);
+	map(0x0000, 0x7fff).view(m_extram_view);
+	m_extram_view[0x01](0x0000, 0x7fff).r(FUNC(pc8001mk2sr_state::ram_r<0x8000>));
+	m_extram_view[0x10](0x0000, 0x7fff).w(FUNC(pc8001mk2sr_state::ram_w<0x8000>));
+	m_extram_view[0x11](0x0000, 0x7fff).rw(FUNC(pc8001mk2sr_state::ram_r<0x8000>), FUNC(pc8001mk2sr_state::ram_w<0x8000>));
+
+	map(0x8000, 0xbfff).view(m_alu_view);
+	m_alu_view[0](0x8000, 0xbfff).rw(m_alu, FUNC(pc88_alu_device::alu_r), FUNC(pc88_alu_device::alu_w));
 }
 
 void pc8001mk2sr_state::pc8001mk2sr_io(address_map &map)
 {
 	pc8001mk2_io(map);
-	map(0x33, 0x33).w(FUNC(pc8001mk2sr_state::port33_w));
+	// latch for mkIISR (pack2:"Burger Time" cares)
+	map(0x32, 0x32).lrw8(
+		NAME([this] () { return m_port32; }),
+		NAME([this] (u8 data) { m_port32 = data; })
+	);
+	map(0x33, 0x33).rw(FUNC(pc8001mk2sr_state::port33_r), FUNC(pc8001mk2sr_state::port33_w));
+	map(0x34, 0x34).w(m_alu, FUNC(pc88_alu_device::ctrl1_w));
+	map(0x35, 0x35).w(FUNC(pc8001mk2sr_state::alu_ctrl2_w));
+	map(0x41, 0x4f).unmaprw();
+	map(0x44, 0x45).rw(m_opn, FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	// 0x53 in pc8001mk2 (layer disable)
+	map(0x54, 0x5b).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			m_palram[offset].b = data & 1 ? 7 : 0;
+			m_palram[offset].r = data & 2 ? 7 : 0;
+			m_palram[offset].g = data & 4 ? 7 : 0;
+
+			m_palette->set_pen_color(offset, pal3bit(m_palram[offset].r), pal3bit(m_palram[offset].g), pal3bit(m_palram[offset].b));
+		})
+	);
+	map(0x5c, 0x5c).lr8(NAME([this] () {
+		return 0xf8 | ((m_vram_sel == 3) ? 0 : (1 << m_vram_sel));
+	}));
+	map(0x5c, 0x5f).lw8(NAME([this] (offs_t offset, u8 data) { (void)data; m_vram_sel = offset & 3; flush_gvram_access(); }));
+
+	map(0x70, 0x70).ram(); // latch for mkIISR detection
 	map(0x71, 0x71).rw(FUNC(pc8001mk2sr_state::port71_r), FUNC(pc8001mk2sr_state::port71_w));
+
+	map(0xe2, 0xe2).lrw8(
+		NAME([this] () {
+			return (m_extram_mode ^ 0x11) | 0xee;
+		}),
+		NAME([this] (u8 data) {
+			m_extram_mode = data & 0x11;
+			flush_low_bank();
+		})
+	);
 }
 
 /* Input Ports */
 
 static INPUT_PORTS_START( pc8001 )
-	PORT_START("Y0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0_PAD)      PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1_PAD)      PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2_PAD)      PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3_PAD)      PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4_PAD)      PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5_PAD)      PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6_PAD)      PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7_PAD)      PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
-
-	PORT_START("Y1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8_PAD)      PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9_PAD)      PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK)   PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PLUS_PAD)   PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP)       PORT_CHAR(UCHAR_MAMEKEY(EQUALS_PAD))
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN)       PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL_PAD)    PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(13)
-
-	PORT_START("Y2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('@')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B)          PORT_CHAR('b') PORT_CHAR('B')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C)          PORT_CHAR('c') PORT_CHAR('C')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D)          PORT_CHAR('d') PORT_CHAR('D')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E)          PORT_CHAR('e') PORT_CHAR('E')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F)          PORT_CHAR('f') PORT_CHAR('F')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G)          PORT_CHAR('g') PORT_CHAR('G')
-
-	PORT_START("Y3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H)          PORT_CHAR('h') PORT_CHAR('H')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I)          PORT_CHAR('i') PORT_CHAR('I')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J)          PORT_CHAR('j') PORT_CHAR('J')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)          PORT_CHAR('k') PORT_CHAR('K')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)          PORT_CHAR('l') PORT_CHAR('L')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M)          PORT_CHAR('m') PORT_CHAR('M')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N)          PORT_CHAR('n') PORT_CHAR('N')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O)          PORT_CHAR('o') PORT_CHAR('O')
-
-	PORT_START("Y4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P)          PORT_CHAR('p') PORT_CHAR('P')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q)          PORT_CHAR('q') PORT_CHAR('Q')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R)          PORT_CHAR('r') PORT_CHAR('R')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S)          PORT_CHAR('s') PORT_CHAR('S')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T)          PORT_CHAR('t') PORT_CHAR('T')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U)          PORT_CHAR('u') PORT_CHAR('U')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V)          PORT_CHAR('v') PORT_CHAR('V')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W)          PORT_CHAR('w') PORT_CHAR('W')
-
-	PORT_START("Y5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X)          PORT_CHAR('x') PORT_CHAR('X')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y)          PORT_CHAR('y') PORT_CHAR('Y')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('[')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR(0xA5)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR(']')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('^')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-') PORT_CHAR('=')
-
-	PORT_START("Y6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0)          PORT_CHAR('0')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1)          PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2)          PORT_CHAR('2') PORT_CHAR('"')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3)          PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4)          PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5)          PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6)          PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7)          PORT_CHAR('7') PORT_CHAR('\'')
-
-	PORT_START("Y7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8)          PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(':') PORT_CHAR('*')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR('+')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("  _") PORT_CODE(KEYCODE_DEL)           PORT_CHAR(0xff) PORT_CHAR('_')
-
-	PORT_START("Y8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Clr Home") PORT_CODE(KEYCODE_HOME)     PORT_CHAR(UCHAR_MAMEKEY(HOME))
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP)  PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT)    PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Del Ins") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(UCHAR_MAMEKEY(DEL)) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Grph") PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Kana") PORT_CODE(KEYCODE_LCONTROL) PORT_TOGGLE
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RCONTROL)                       PORT_CHAR(UCHAR_SHIFT_2)
-
-	PORT_START("Y9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Stop") PORT_CODE(KEYCODE_TILDE)        PORT_CHAR(3)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1)                             PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHAR(UCHAR_MAMEKEY(F6))
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2)                             PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_CHAR(UCHAR_MAMEKEY(F7))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F3)                             PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CHAR(UCHAR_MAMEKEY(F8))
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F4)                             PORT_CHAR(UCHAR_MAMEKEY(F4)) PORT_CHAR(UCHAR_MAMEKEY(F9))
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F5)                             PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHAR(UCHAR_MAMEKEY(F10))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE)                          PORT_CHAR(' ')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ESC)                            PORT_CHAR(27)
-
 //  PORT_START("DSW1")
 INPUT_PORTS_END
 
@@ -550,7 +1023,7 @@ static INPUT_PORTS_START( pc8001mk2 )
 	PORT_INCLUDE( pc8001 )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "Boot Mode" )
+	PORT_DIPNAME( 0x01, 0x01, "Boot Mode" )
 	PORT_DIPSETTING(    0x00, "N-BASIC" )
 	PORT_DIPSETTING(    0x01, "N80-BASIC" )
 	PORT_DIPNAME( 0x02, 0x02, "DSW1" )
@@ -608,7 +1081,7 @@ static INPUT_PORTS_START( pc8001mk2sr )
 	PORT_MODIFY("DSW1")
 	// This is really a tri-state dip on front panel
 	// BIOS just expects bit 1 to be off for SR mode
-	PORT_DIPNAME( 0x03, 0x02, "Boot Mode" )
+	PORT_DIPNAME( 0x03, 0x01, "Boot Mode" )
 	PORT_DIPSETTING(    0x00, "N80SR-BASIC (duplicate)")
 	PORT_DIPSETTING(    0x01, "N80SR-BASIC" )
 	PORT_DIPSETTING(    0x02, "N-BASIC" )
@@ -650,78 +1123,87 @@ void pc8001_base_state::machine_start()
 	save_item(NAME(m_color));
 	save_item(NAME(m_screen_reverse));
 	save_item(NAME(m_screen_is_24KHz));
+
+	// PICU init
+	save_item(STRUCT_MEMBER(m_irq_state, enable));
+	save_item(STRUCT_MEMBER(m_irq_state, pending));
+	save_item(NAME(m_sound_irq_enable));
+	save_item(NAME(m_sound_irq_pending));
 }
 
 void pc8001_state::machine_start()
 {
 	pc8001_base_state::machine_start();
 
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
 	/* initialize DMA */
 	m_dma->ready_w(1);
-
-	/* setup memory banking */
-	uint8_t *ram = m_ram->pointer();
-
-	membank("bank1")->configure_entry(1, m_rom->base());
-	program.install_read_bank(0x0000, 0x5fff, membank("bank1"));
-	program.unmap_write(0x0000, 0x5fff);
-	membank("bank2")->configure_entry(1, m_rom->base() + 0x6000);
-
-	switch (m_ram->size())
-	{
-	case 16*1024:
-		membank("bank3")->configure_entry(0, ram);
-		program.unmap_readwrite(0x8000, 0xbfff);
-		program.install_readwrite_bank(0xc000, 0xffff, membank("bank3"));
-		break;
-
-	case 32*1024:
-		membank("bank3")->configure_entry(0, ram);
-		program.unmap_readwrite(0x8000, 0xbfff);
-		program.install_readwrite_bank(0x8000, 0xffff, membank("bank3"));
-		break;
-
-	case 64*1024:
-		membank("bank1")->configure_entry(0, ram);
-		membank("bank2")->configure_entry(0, ram + 0x6000);
-		membank("bank3")->configure_entry(0, ram + 0x8000);
-		program.install_readwrite_bank(0x0000, 0x5fff, membank("bank1"));
-		program.install_readwrite_bank(0x6000, 0xbfff, membank("bank2"));
-		program.install_readwrite_bank(0x8000, 0xffff, membank("bank3"));
-//      membank("bank2")->set_entry(0);
-		break;
-	}
 
 	// PC8001 is 15KHz only
 	set_screen_frequency(false);
 }
 
-void pc8001_state::machine_reset()
+void pc8001_base_state::picu_reset()
 {
-	membank("bank1")->set_entry(1);
-	membank("bank2")->set_entry(1);
-	membank("bank3")->set_entry(0);
+	m_picu->etlg_w(1);
+	m_picu->inte_w(1);
+	m_irq_state.pending = 0;
+	m_irq_state.enable = 0;
+	m_sound_irq_enable = false;
+	m_sound_irq_pending = false;
 }
 
-void pc8001mk2sr_state::machine_start()
+void pc8001_state::machine_reset()
+{
+	m_exp_view.select(1);
+	picu_reset();
+}
+
+void pc8001mk2_state::machine_start()
 {
 	pc8001_state::machine_start();
 
-	membank("bank1")->configure_entry(2, m_n80sr_rom->base());
-	membank("bank2")->configure_entry(2, m_n80sr_rom->base() + 0x6000);
-	membank("bank2")->configure_entry(3, m_n80sr_rom->base() + 0x8000);
+	// NOTE: regular mk2 has 0x4000 only of GVRAM
+	m_gvram = make_unique_clear<uint8_t[]>(0xc000);
+
+	save_pointer(NAME(m_gvram), 0xc000);
+	save_item(NAME(m_vram_sel));
+}
+
+void pc8001mk2_state::machine_reset()
+{
+	pc8001_state::machine_reset();
+
+	m_vram_sel = 3;
+	flush_gvram_access();
+}
+
+
+void pc8001mk2sr_state::machine_start()
+{
+	pc8001mk2_state::machine_start();
 
 	save_item(NAME(m_n80sr_bank));
+	save_item(NAME(m_port31));
+	save_item(NAME(m_port32));
+	save_item(NAME(m_port33));
+	save_item(NAME(m_alu_gam));
+	save_item(NAME(m_extram_mode));
 }
 
 void pc8001mk2sr_state::machine_reset()
 {
-	pc8001_state::machine_reset();
+	pc8001mk2_state::machine_reset();
 
-	//membank("bank1")->set_entry(2);
-	//membank("bank2")->set_entry(2);
+	m_port31 = 0;
+	m_port32 = 0x98;
+	// SR BIOS doesn't check DSW1 for non-SR modes
+	m_port33 = BIT(m_dsw[0]->read(), 1) ? 0 : 0x80;
+	m_n80sr_bank = 1;
+	m_extram_mode = 0;
+	flush_low_bank();
+
+	m_alu_gam = 0;
+	flush_gvram_access();
 }
 
 /* Snapquik */
@@ -731,7 +1213,7 @@ SNAPSHOT_LOAD_MEMBER(pc8001_state::snapshot_cb)
 	if (m_ram->size() < 0x10000)
 		return std::make_pair(image_error::UNSUPPORTED, std::string("Configured RAM size must be 64K"));
 
-	if (image.length() > 0x8000)
+	if (image.length() < 0x7f40 || image.length() > 0x8000)
 		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 
 	uint8_t *ram = m_ram->pointer();
@@ -739,8 +1221,14 @@ SNAPSHOT_LOAD_MEMBER(pc8001_state::snapshot_cb)
 	std::vector<u8> snapshot(image.length());
 	image.fread(&snapshot[0], image.length());
 
-	std::copy(std::begin(snapshot), std::end(snapshot), &ram[0x8000]);
-	m_maincpu->set_state_int(Z80_SP, ram[0xff3e] | (ram[0xff3f] << 8));
+	std::copy_n(&snapshot[0x0000], 0x4000, &ram[0x4000]);
+	const s32 load_size = image.length() - 0x4000;
+	if (load_size > 0)
+	{
+		std::copy_n(&snapshot[0x4000], load_size, &ram[0x0000]);
+	}
+
+	m_maincpu->set_state_int(Z80_SP, snapshot[0x7f3e] | (snapshot[0x7f3f] << 8));
 	m_maincpu->set_pc(0xff3d);
 
 	//m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
@@ -760,9 +1248,14 @@ void pc8001_state::pc8001(machine_config &config)
 	Z80(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc8001_state::pc8001_map);
 	m_maincpu->set_addrmap(AS_IO, &pc8001_state::pc8001_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(pc8001_state::int_ack_cb));
+
+	I8214(config, m_picu, MASTER_CLOCK);
+	m_picu->int_wr_callback().set_inputline(m_maincpu, 0);
+	m_picu->set_int_dis_hack(true);
 
 	PC80S31(config, m_pc80s31, MASTER_CLOCK);
-	config.set_perfect_quantum(m_maincpu);
+	// TODO: get rid of this
 	config.set_perfect_quantum("pc80s31:fdc_cpu");
 
 	/* video hardware */
@@ -779,6 +1272,7 @@ void pc8001_state::pc8001(machine_config &config)
 	m_crtc->set_attribute_fetch_callback(FUNC(pc8001_state::attr_fetch));
 	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 	m_crtc->rvv_wr_callback().set(FUNC(pc8001_state::crtc_reverse_w));
+	m_crtc->vrtc_wr_callback().set(FUNC(pc8001_state::vrtc_irq_w));
 	m_crtc->set_screen(m_screen);
 
 	I8257(config, m_dma, MASTER_CLOCK);
@@ -787,7 +1281,9 @@ void pc8001_state::pc8001(machine_config &config)
 	m_dma->out_iow_cb<2>().set(m_crtc, FUNC(upd3301_device::dack_w));
 
 	/* devices */
-	I8251(config, I8251_TAG, 0);
+	TIMER(config, "rtc_timer").configure_periodic(FUNC(pc8001_state::clock_irq_w), attotime::from_hz(600));
+
+	I8251(config, I8251_TAG);
 
 	UPD1990A(config, m_rtc);
 
@@ -800,19 +1296,30 @@ void pc8001_state::pc8001(machine_config &config)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.025, 0);
+	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.025, 1);
 
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K,64K");
+
+	PC8001_KBD(config, "kbd");
+
+	PC8801_EXP_SLOT(config, m_exp, pc8801_exp_devices, nullptr);
+	m_exp->set_iospace(m_maincpu, AS_IO);
+	m_exp->int3_callback().set([this] (bool state) { m_picu->r_w(7 ^ INT3_IRQ_LEVEL, !state); });
+	m_exp->int4_callback().set([this] (bool state) { m_picu->r_w(7 ^ INT4_IRQ_LEVEL, !state); });
+	m_exp->int5_callback().set([this] (bool state) { m_picu->r_w(7 ^ INT5_IRQ_LEVEL, !state); });
+
+	/* sound hardware */
+	SPEAKER(config, "speaker", 2).front();
+	// TODO: unknown clock, is it really a beeper?
+	BEEP(config, m_beep, 2400);
+	m_beep->add_route(ALL_OUTPUTS, "speaker", 0.10, 0);
+	m_beep->add_route(ALL_OUTPUTS, "speaker", 0.10, 1);
 
 	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "bin,n80", attotime::from_seconds(1)));
 	snapshot.set_load_callback(FUNC(pc8001_state::snapshot_cb));
 
 	SOFTWARE_LIST(config, "disk_n_list").set_original("pc8001_flop");
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	// TODO: unknown clock, is it really a beeper?
-	BEEP(config, m_beep, 2400).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 void pc8001mk2_state::pc8001mk2(machine_config &config)
@@ -821,7 +1328,7 @@ void pc8001mk2_state::pc8001mk2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc8001mk2_state::pc8001mk2_map);
 	m_maincpu->set_addrmap(AS_IO, &pc8001mk2_state::pc8001mk2_io);
 
-	// TODO: video HW has extra GVRAM setup
+	ADDRESS_MAP_BANK(config, m_gvram_bank).set_map(&pc8001mk2_state::gvram_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x4000);
 
 	RAM(config.replace(), RAM_TAG).set_default_size("64K");
 
@@ -831,9 +1338,27 @@ void pc8001mk2_state::pc8001mk2(machine_config &config)
 void pc8001mk2sr_state::pc8001mk2sr(machine_config &config)
 {
 	pc8001mk2(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc8001mk2sr_state::pc8001mk2sr_map);
 	m_maincpu->set_addrmap(AS_IO, &pc8001mk2sr_state::pc8001mk2sr_io);
 
-	// TODO: mods for SR mode support
+	PC8801_KBD(config.replace(), "kbd");
+
+//	m_gvram_bank->set_map(&pc8001mk2sr_state::gvram_map);
+	PALETTE(config, m_palette, palette_device::BLACK, 0x8);
+
+	PC88_ALU(config, m_alu, 0);
+	m_alu->gvram_read_cb().set(FUNC(pc8001mk2sr_state::gvram_r));
+	m_alu->gvram_write_cb().set(FUNC(pc8001mk2sr_state::gvram_w));
+
+	YM2203(config, m_opn, XTAL(4'000'000));
+	m_opn->irq_handler().set(FUNC(pc8001mk2sr_state::int4_irq_w));
+	// TODO: pull high for now (pack2:"Dig Dug")
+	// OPN/OPNA needs to be moved in a common internal expansion slot
+	m_opn->port_a_read_callback().set([] () { return 0xff; });
+	m_opn->port_b_read_callback().set([] () { return 0xff; });
+//	m_opn->port_b_write_callback().set(FUNC(pc8801mk2sr_state::opn_portb_w));
+	m_opn->add_route(ALL_OUTPUTS, "speaker", 0.25, 0);
+	m_opn->add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
 
 	SOFTWARE_LIST(config, "disk_n80sr_list").set_original("pc8001mk2sr_flop");
 }

@@ -11,12 +11,18 @@ class smc777_kbd_device : public device_t
 						, protected device_matrix_keyboard_interface<10>
 {
 public:
-	smc777_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	smc777_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	u8 data_r(offs_t offset);
 	void data_w(offs_t offset, u8 data);
 	u8 status_r(offs_t offset);
 	void control_w(offs_t offset, u8 data);
+
+	auto caplock_callback() { return m_caplock_cb.bind(); }
+	auto kanalock_callback() { return m_kanalock_cb.bind(); }
+
+	DECLARE_INPUT_CHANGED_MEMBER(cap_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(kana_changed);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -31,6 +37,8 @@ protected:
 
 private:
 	required_ioport m_key_mod;
+	devcb_write_line m_caplock_cb;
+	devcb_write_line m_kanalock_cb;
 
 	void scan_mode(u8 data);
 	u8 m_command;

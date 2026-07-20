@@ -5,7 +5,7 @@
 Driver's Eyes
     not yet working
 
-see http://www.tvspels-nostalgi.com/driverseye.htm for details about setup
+see http://www.tvspels-nostalgi.com/driverseye.htm for details about setup (go to archive.org)
 
 2008/06/11, by Naibo(translated to English by Mameplus team):
 
@@ -19,8 +19,7 @@ NOTES:
 
 TODO:
 - add communications for Left and Right screen (linked C139 or something else?)
-- same flickering polygon glitches as namcos21.cpp
-- are the left and right PCB sound outputs N/C?
+- verify video timing, it's assumed to be the same as namcos21 with a different XTAL
 
 */
 
@@ -40,7 +39,6 @@ TODO:
 #include "cpu/m6809/m6809.h"
 #include "cpu/tms320c2x/tms320c2x.h"
 #include "machine/nvram.h"
-#include "machine/timer.h"
 #include "sound/c140.h"
 #include "sound/mb87077.h"
 #include "sound/mixer.h"
@@ -58,7 +56,7 @@ class namco_de_pcbstack_device : public device_t
 {
 public:
 	// construction/destruction
-	namco_de_pcbstack_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	namco_de_pcbstack_device(const machine_config &mconfig, const char *tag, device_t *owner, u8 pcb, u32 clock = 0);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -66,8 +64,6 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	INTERRUPT_GEN_MEMBER(irq0_line_hold) { device.execute().set_input_line(0, HOLD_LINE); }
-
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_slave;
@@ -79,7 +75,7 @@ private:
 	required_device<c140_device> m_c140;
 	required_device<ym2151_device> m_ym2151;
 	required_device_array<mb87077_device, 2> m_mb87077;
-	required_device_array<mixer_device, 2> m_mixer;
+	optional_device_array<mixer_device, 2> m_mixer;
 	required_device<namco_c355spr_device> m_c355spr;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
@@ -89,6 +85,7 @@ private:
 	required_device<namcos21_3d_device> m_namcos21_3d;
 	required_device<namcos21_dsp_device> m_namcos21_dsp;
 
+	u8 m_pcb = 0;
 	u16 m_video_enable = 0;
 
 	u16 video_enable_r();
@@ -108,8 +105,7 @@ private:
 	void sound_reset_w(u8 data);
 	void system_reset_w(u8 data);
 	void reset_all_subcpus(int state);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
+	void vblank_irq(int state);
 
 	bool sprite_mix_callback(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -126,7 +122,7 @@ private:
 DEFINE_DEVICE_TYPE(NAMCO_DE_PCB, namco_de_pcbstack_device, "namco_de_pcb", "Namco Driver's Eyes PCB stack")
 
 
-namco_de_pcbstack_device::namco_de_pcbstack_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+namco_de_pcbstack_device::namco_de_pcbstack_device(const machine_config &mconfig, const char *tag, device_t *owner, u8 pcb, u32 clock) :
 	device_t(mconfig, NAMCO_DE_PCB, tag, owner, clock),
 	m_maincpu(*this, "maincpu"),
 	m_audiocpu(*this, "audiocpu"),
@@ -147,7 +143,8 @@ namco_de_pcbstack_device::namco_de_pcbstack_device(const machine_config &mconfig
 	m_c140_region(*this, "c140"),
 	m_dpram(*this, "dpram"),
 	m_namcos21_3d(*this, "namcos21_3d"),
-	m_namcos21_dsp(*this, "namcos21dsp")
+	m_namcos21_dsp(*this, "namcos21dsp"),
+	m_pcb(pcb)
 {
 }
 
@@ -156,15 +153,14 @@ void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, 49.152_MHz_XTAL / 4); // Master
 	m_maincpu->set_addrmap(AS_PROGRAM, &namco_de_pcbstack_device::driveyes_master_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(namco_de_pcbstack_device::screen_scanline), "screen", 0, 1);
 
 	M68000(config, m_slave, 49.152_MHz_XTAL / 4); // Slave
 	m_slave->set_addrmap(AS_PROGRAM, &namco_de_pcbstack_device::driveyes_slave_map);
 
-	MC6809E(config, m_audiocpu, 3072000); // Sound
+	MC6809E(config, m_audiocpu, 49.152_MHz_XTAL / 24); // Sound
 	m_audiocpu->set_addrmap(AS_PROGRAM, &namco_de_pcbstack_device::sound_map);
 
-	NAMCOC68(config, m_c68, 8000000);
+	NAMCOC68(config, m_c68, 49.152_MHz_XTAL / 6);
 	m_c68->in_pb_callback().set_ioport("MCUB");
 	m_c68->in_pc_callback().set_ioport("MCUC");
 	m_c68->in_ph_callback().set_ioport("MCUH");
@@ -184,38 +180,38 @@ void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 	m_c68->dp_in_callback().set(FUNC(namco_de_pcbstack_device::dpram_byte_r));
 	m_c68->dp_out_callback().set(FUNC(namco_de_pcbstack_device::dpram_byte_w));
 
-	NAMCOS21_DSP(config, m_namcos21_dsp, 0);
+	NAMCOS21_DSP(config, m_namcos21_dsp);
 	m_namcos21_dsp->set_renderer_tag("namcos21_3d");
 
-	config.set_maximum_quantum(attotime::from_hz(6000)); // 100 CPU slices per frame
+	config.set_maximum_quantum(attotime::from_hz(60000));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	NAMCO_C148(config, m_master_intc, 0, m_maincpu, true);
+	NAMCO_C148(config, m_master_intc, m_maincpu, true);
 	m_master_intc->link_c148_device(m_slave_intc);
 	m_master_intc->out_ext1_callback().set(FUNC(namco_de_pcbstack_device::sound_reset_w));
 	m_master_intc->out_ext2_callback().set(FUNC(namco_de_pcbstack_device::system_reset_w));
 
-	NAMCO_C148(config, m_slave_intc, 0, m_slave, false);
+	NAMCO_C148(config, m_slave_intc, m_slave, false);
 	m_slave_intc->link_c148_device(m_master_intc);
 
-	NAMCO_C139(config, m_sci, 0);
+	NAMCO_C139(config, m_sci);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	// TODO: basic parameters to get 60.606060 Hz, x2 is for interlace
-	m_screen->set_raw(49.152_MHz_XTAL / 4 * 2, 768, 0, 496, 264*2, 0, 480);
+	m_screen->set_raw(38.76922_MHz_XTAL / 4 * 2, 616, 0, 496, 262 + 263, 0, 480); // x2 is for interlace
 	m_screen->set_screen_update(FUNC(namco_de_pcbstack_device::screen_update));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(namco_de_pcbstack_device::vblank_irq));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_888, 0x10000/2);
 
-	NAMCOS21_3D(config, m_namcos21_3d, 0);
+	NAMCOS21_3D(config, m_namcos21_3d);
 	m_namcos21_3d->set_framebuffer_size(496, 480);
 	m_namcos21_3d->set_num_palettes(0x20);
 	m_namcos21_3d->set_depth_reverse(false);
 
-	NAMCO_C355SPR(config, m_c355spr, 0);
+	NAMCO_C355SPR(config, m_c355spr);
 	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_palette(m_palette);
 	m_c355spr->set_scroll_offsets(0, 0x20);
@@ -224,10 +220,8 @@ void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 	m_c355spr->set_external_prifill(true);
 
 	// sound hardware
-	SPEAKER(config, "speaker", 4).corners();
-
-	MB87077(config, m_mb87077[0]).gain_changed().set(FUNC(namco_de_pcbstack_device::mb87077_gain_changed<0>));
-	MB87077(config, m_mb87077[1]).gain_changed().set(FUNC(namco_de_pcbstack_device::mb87077_gain_changed<1>));
+	MB87077(config, m_mb87077[0]);
+	MB87077(config, m_mb87077[1]);
 
 	C140(config, m_c140, 49.152_MHz_XTAL / 384 / 6);
 	m_c140->set_addrmap(0, &namco_de_pcbstack_device::c140_map);
@@ -235,17 +229,26 @@ void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 
 	YM2151(config, m_ym2151, 3.579545_MHz_XTAL);
 
-	for (int i = 0; i < 4; i++)
+	// left and right PCBs don't output sound
+	if (m_pcb == 1)
 	{
-		m_c140->add_route(i & 1, m_mixer[0], 0.50, i);
-		m_ym2151->add_route(i & 1, m_mixer[1], 0.30, i);
+		SPEAKER(config, "speaker", 4).corners();
+
+		m_mb87077[0]->gain_changed().set(FUNC(namco_de_pcbstack_device::mb87077_gain_changed<0>));
+		m_mb87077[1]->gain_changed().set(FUNC(namco_de_pcbstack_device::mb87077_gain_changed<1>));
+
+		for (int i = 0; i < 4; i++)
+		{
+			m_c140->add_route(i & 1, m_mixer[0], 0.50, i);
+			m_ym2151->add_route(i & 1, m_mixer[1], 0.30, i);
+		}
+
+		MIXER(config, m_mixer[0]);
+		MIXER(config, m_mixer[1]);
+
+		for (int i = 0; i < 8; i++)
+			m_mixer[i / 4]->add_route(i & 3, "speaker", 0.50, i & 3);
 	}
-
-	MIXER(config, m_mixer[0]);
-	MIXER(config, m_mixer[1]);
-
-	for (int i = 0; i < 8; i++)
-		m_mixer[i / 4]->add_route(i & 3, "speaker", 0.50, i & 3);
 }
 
 
@@ -403,7 +406,7 @@ void namco_de_pcbstack_device::driveyes_master_map(address_map &map)
 	map(0x250000, 0x25ffff).ram().share("namcos21dsp:polydata");
 	map(0x280000, 0x281fff).w(m_namcos21_dsp, FUNC(namcos21_dsp_device::dspbios_w));
 	map(0x380000, 0x38000f).rw(m_namcos21_dsp, FUNC(namcos21_dsp_device::dspcomram_control_r), FUNC(namcos21_dsp_device::dspcomram_control_w));
-	map(0x3c0000, 0x3c1fff).rw(m_namcos21_dsp, FUNC(namcos21_dsp_device::m68k_dspcomram_r), FUNC(namcos21_dsp_device::m68k_dspcomram_w));
+	map(0x3c0000, 0x3c0fff).rw(m_namcos21_dsp, FUNC(namcos21_dsp_device::m68k_dspcomram_r), FUNC(namcos21_dsp_device::m68k_dspcomram_w));
 	map(0x400000, 0x400001).w(m_namcos21_dsp, FUNC(namcos21_dsp_device::pointram_control_w));
 	map(0x440000, 0x440001).rw(m_namcos21_dsp, FUNC(namcos21_dsp_device::pointram_data_r), FUNC(namcos21_dsp_device::pointram_data_w));
 }
@@ -430,21 +433,12 @@ void namco_de_pcbstack_device::mb87077_gain_changed(offs_t offset, u8 data)
 
 void namco_de_pcbstack_device::sound_reset_w(u8 data)
 {
-	if (data & 0x01)
-	{
-		// Resume execution
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-	}
-	else
-	{
-		// Suspend execution
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	}
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void namco_de_pcbstack_device::system_reset_w(u8 data)
 {
-	reset_all_subcpus(data & 1 ? CLEAR_LINE : ASSERT_LINE);
+	reset_all_subcpus(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void namco_de_pcbstack_device::reset_all_subcpus(int state)
@@ -456,12 +450,9 @@ void namco_de_pcbstack_device::reset_all_subcpus(int state)
 		m_slave_intc->reset();
 }
 
-
-TIMER_DEVICE_CALLBACK_MEMBER(namco_de_pcbstack_device::screen_scanline)
+void namco_de_pcbstack_device::vblank_irq(int state)
 {
-	int scanline = param;
-
-	if (scanline == 240 * 2)
+	if (state)
 	{
 		m_master_intc->vblank_irq_trigger();
 		m_slave_intc->vblank_irq_trigger();
@@ -510,10 +501,10 @@ private:
 void namcos21_de_state::driveyes(machine_config &config)
 {
 	NAMCO_DE_PCB(config, m_pcb[0], 0);
-	NAMCO_DE_PCB(config, m_pcb[1], 0);
-	NAMCO_DE_PCB(config, m_pcb[2], 0);
+	NAMCO_DE_PCB(config, m_pcb[1], 1);
+	NAMCO_DE_PCB(config, m_pcb[2], 2);
 
-	NAMCOIO_GEARBOX(config, m_io_gearbox, 0);
+	NAMCOIO_GEARBOX(config, m_io_gearbox);
 }
 
 // stacks with the DSWs set to left or right screen will show 'receive error' because they want comms from the main screen
@@ -567,11 +558,11 @@ static INPUT_PORTS_START( driveyes )
 	PORT_START("pcb_1:AN0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("pcb_1:AN1")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x3f) PORT_SENSITIVITY(15) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x40) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
 	PORT_START("pcb_1:AN2")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
 	PORT_START("pcb_1:AN3")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0x3f) PORT_SENSITIVITY(15) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0x40) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
 	PORT_START("pcb_1:AN4")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("pcb_1:AN5")
@@ -744,7 +735,7 @@ ROM_START( driveyes )
 	ROM_LOAD16_BYTE( "de1-data-u.3a",  0x00000, 0x80000, CRC(fe65d2ab) SHA1(dbe962dda7efa60357fa3a684a265aaad49df5b5) )
 	ROM_LOAD16_BYTE( "de1-data-l.1a",  0x00001, 0x80000, CRC(9bb37aca) SHA1(7f5dffc95cadcf12f53ff7944920afc25ed3cf68) )
 
-	ROM_REGION16_BE( 0xc0000, "pcb_1:namcos21dsp:point16", 0 ) /* 3d objects */
+	ROM_REGION16_BE( 0x100000, "pcb_1:namcos21dsp:point16", ROMREGION_ERASE00 ) /* 3d objects */
 	ROM_LOAD16_BYTE( "de1-pt0-ub.8j", 0x00000, 0x20000, CRC(3b6b746d) SHA1(40c992ef4cf5187b30aba42c5fe7ce0f8f02bee0) )
 	ROM_LOAD16_BYTE( "de1-pt0-lb.8d", 0x00001, 0x20000, CRC(9c5c477e) SHA1(c8ae8a663227d636d35bd5f432d23f05d6695942) )
 	ROM_LOAD16_BYTE( "de1-pt1-u.8l",  0x40000, 0x20000, CRC(23bc72a1) SHA1(083e2955ae2f88d1ad461517b47054d64375b46e) )
@@ -787,7 +778,7 @@ ROM_START( driveyes )
 	ROM_LOAD16_BYTE( "de1-data-u.3a",  0x00000, 0x80000, CRC(fe65d2ab) SHA1(dbe962dda7efa60357fa3a684a265aaad49df5b5) )
 	ROM_LOAD16_BYTE( "de1-data-l.1a",  0x00001, 0x80000, CRC(9bb37aca) SHA1(7f5dffc95cadcf12f53ff7944920afc25ed3cf68) )
 
-	ROM_REGION16_BE( 0xc0000, "pcb_0:namcos21dsp:point16", 0 ) /* 3d objects */
+	ROM_REGION16_BE( 0x100000, "pcb_0:namcos21dsp:point16", ROMREGION_ERASE00 ) /* 3d objects */
 	ROM_LOAD16_BYTE( "de1-pt0-ub.8j", 0x00000, 0x20000, CRC(3b6b746d) SHA1(40c992ef4cf5187b30aba42c5fe7ce0f8f02bee0) )
 	ROM_LOAD16_BYTE( "de1-pt0-lb.8d", 0x00001, 0x20000, CRC(9c5c477e) SHA1(c8ae8a663227d636d35bd5f432d23f05d6695942) )
 	ROM_LOAD16_BYTE( "de1-pt1-u.8l",  0x40000, 0x20000, CRC(23bc72a1) SHA1(083e2955ae2f88d1ad461517b47054d64375b46e) )
@@ -830,7 +821,7 @@ ROM_START( driveyes )
 	ROM_LOAD16_BYTE( "de1-data-u.3a",  0x00000, 0x80000, CRC(fe65d2ab) SHA1(dbe962dda7efa60357fa3a684a265aaad49df5b5) )
 	ROM_LOAD16_BYTE( "de1-data-l.1a",  0x00001, 0x80000, CRC(9bb37aca) SHA1(7f5dffc95cadcf12f53ff7944920afc25ed3cf68) )
 
-	ROM_REGION16_BE( 0xc0000, "pcb_2:namcos21dsp:point16", 0 ) /* 3d objects */
+	ROM_REGION16_BE( 0x100000, "pcb_2:namcos21dsp:point16", ROMREGION_ERASE00 ) /* 3d objects */
 	ROM_LOAD16_BYTE( "de1-pt0-ub.8j", 0x00000, 0x20000, CRC(3b6b746d) SHA1(40c992ef4cf5187b30aba42c5fe7ce0f8f02bee0) )
 	ROM_LOAD16_BYTE( "de1-pt0-lb.8d", 0x00001, 0x20000, CRC(9c5c477e) SHA1(c8ae8a663227d636d35bd5f432d23f05d6695942) )
 	ROM_LOAD16_BYTE( "de1-pt1-u.8l",  0x40000, 0x20000, CRC(23bc72a1) SHA1(083e2955ae2f88d1ad461517b47054d64375b46e) )

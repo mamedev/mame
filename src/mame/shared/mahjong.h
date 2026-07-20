@@ -52,6 +52,21 @@ private:
 };
 
 
+class mahjong_panel_device_base : public device_t, public device_mahjong_panel_interface
+{
+public:
+	virtual u8 read(u8 select) override;
+
+protected:
+	mahjong_panel_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+
+	virtual void device_start() override ATTR_COLD;
+
+private:
+	required_ioport_array<6> m_keys;
+};
+
+
 DECLARE_DEVICE_TYPE(MAHJONG_PANEL_CONNECTOR, mahjong_panel_connector_device)
 
 DECLARE_DEVICE_TYPE(MAHJONG_PANEL,        device_mahjong_panel_interface)

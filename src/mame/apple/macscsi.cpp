@@ -98,6 +98,8 @@ void mac_scsi_helper_device::device_start()
 void mac_scsi_helper_device::device_reset()
 {
 	dma_stop();
+	m_read_fifo_bytes = 0;
+	m_write_fifo_bytes = 0;
 
 	m_cpu_halt_callback(CLEAR_LINE);
 	m_pseudo_dma_timer->enable(false);
@@ -163,16 +165,29 @@ TIMER_CALLBACK_MEMBER(mac_scsi_helper_device::timer_callback)
 
 void mac_scsi_helper_device::dma_stop()
 {
+	// Unread bytes are kept in the FIFO: they were already ACKed on the SCSI
+	// bus by the prefetch, but the CPU has not consumed them yet. A/UX's
+	// standalone shell and kernel read a single data-in phase using several
+	// short pseudo-DMA sessions, ending DMA mode in between; on real hardware
+	// the unconsumed bytes simply remain in the target until the next session.
 	if (m_read_fifo_bytes != 0)
-		logerror("%s: %d unread byte(s) lost (%08X)\n", machine().describe_context(), m_read_fifo_bytes, m_read_fifo_data);
+		LOG("%s: %d unread byte(s) held in FIFO (%08X)\n", machine().describe_context(), m_read_fifo_bytes, m_read_fifo_data);
 	if (m_write_fifo_bytes != 0)
-		logerror("%s: %d unwritten byte(s) lost (%08X)\n", machine().describe_context(), m_write_fifo_bytes, m_write_fifo_data);
+		LOG("%s: %d unwritten byte(s) lost (%08X)\n", machine().describe_context(), m_write_fifo_bytes, m_write_fifo_data);
 
 	m_mode = mode::NON_DMA;
-	m_read_fifo_bytes = 0;
 	m_write_fifo_bytes = 0;
-	m_read_fifo_data = 0;
 	m_write_fifo_data = 0;
+}
+
+void mac_scsi_helper_device::read_fifo_flush()
+{
+	if (m_read_fifo_bytes != 0)
+	{
+		logerror("%s: %d stale unread byte(s) discarded (%08X)\n", machine().describe_context(), m_read_fifo_bytes, m_read_fifo_data);
+		m_read_fifo_bytes = 0;
+		m_read_fifo_data = 0;
+	}
 }
 
 u8 mac_scsi_helper_device::read_wrapper(bool pseudo_dma, offs_t offset)
@@ -186,23 +201,50 @@ u8 mac_scsi_helper_device::read_wrapper(bool pseudo_dma, offs_t offset)
 			dma_stop();
 		break;
 
+	case 4:
+		data = m_scsi_read_callback(4);
+		if (!machine().side_effects_disabled() && !BIT(m_scsi_read_callback(2), 1))
+			dma_stop();
+		// Bytes preserved across a pseudo-DMA stop are still logically inside
+		// the target: until a new session drains them, the bus must keep
+		// looking like DATA IN with REQ asserted, as it would on hardware.
+		if (m_read_fifo_bytes != 0 && (m_mode == mode::NON_DMA || m_mode == mode::READ_WAIT_DRQ))
+			data = (data & 0x83) | 0x64; // keep RST/SEL/DBP; force BSY|REQ|I/O, clear MSG|C/D
+		break;
+
 	case 5:
 		data = m_scsi_read_callback(5);
 		if (!machine().side_effects_disabled())
 		{
 			if (!BIT(m_scsi_read_callback(2), 1))
 				dma_stop();
-			if (m_mode == mode::READ_WAIT_DRQ && BIT(data, 6))
+			if (m_mode == mode::READ_WAIT_DRQ && (BIT(data, 6) || m_read_fifo_bytes != 0))
 			{
 				m_mode = mode::READ_DMA;
-				m_read_fifo_data = u32(m_scsi_dma_read_callback(6)) << 24;
-				LOG("%s: Pseudo-DMA read started: first byte = %02X\n", machine().describe_context(), m_read_fifo_data >> 24);
-				m_read_fifo_bytes = 1;
-				m_pseudo_dma_timer->adjust(m_timeout);
-				m_cpu_halt_callback(ASSERT_LINE);
+				if (m_read_fifo_bytes == 0)
+				{
+					m_read_fifo_data = u32(m_scsi_dma_read_callback(6)) << 24;
+					LOG("%s: Pseudo-DMA read started: first byte = %02X\n", machine().describe_context(), m_read_fifo_data >> 24);
+					m_read_fifo_bytes = 1;
+					m_pseudo_dma_timer->adjust(m_timeout);
+					m_cpu_halt_callback(ASSERT_LINE);
+
+				}
+				else
+					LOG("%s: Pseudo-DMA read resumed: %d byte(s) buffered\n", machine().describe_context(), m_read_fifo_bytes);
 			}
 		}
-		if ((m_mode == mode::READ_DMA && m_read_fifo_bytes != 0) || (m_mode == mode::WRITE_DMA && m_write_fifo_bytes < 4))
+		if (m_mode == mode::READ_DMA && m_read_fifo_bytes != 0)
+			data |= 0x48; // DRQ, and phase match while the FIFO still holds data
+		else if (m_read_fifo_bytes != 0 && (m_mode == mode::NON_DMA || m_mode == mode::READ_WAIT_DRQ))
+		{
+			// preserved bytes waiting for the next session: fake DRQ and phase
+			// match, and hide the (premature) phase-mismatch interrupt that
+			// the over-eager prefetch provoked
+			data |= 0x48;
+			data &= ~0x10;
+		}
+		else if (m_mode == mode::WRITE_DMA && m_write_fifo_bytes < 4)
 			data |= 0x40;
 		break;
 
@@ -278,30 +320,43 @@ void mac_scsi_helper_device::write_wrapper(bool pseudo_dma, offs_t offset, u8 da
 			}
 		}
 		else if (pseudo_dma)
+		{
 			m_scsi_dma_write_callback(0, data);
+		}
 		else
+		{
+			// data going out for arbitration/selection begins a new bus
+			// transaction; anything still unread from the last one is gone
+			read_fifo_flush();
 			m_scsi_write_callback(0, data);
+		}
 		break;
 
-	case 2:
-		if (!BIT(data, 1))
-			dma_stop();
-		m_scsi_write_callback(2, data);
-		break;
+			case 2:
+				if (!BIT(data, 1))
+					dma_stop();
+				m_scsi_write_callback(2, data);
+				break;
 
-	case 5:
-		if (m_mode == mode::NON_DMA && BIT(m_scsi_read_callback(2), 1))
-			m_mode = mode::WRITE_DMA;
-		m_scsi_write_callback(5, data);
-		break;
+			case 5:
+				if (m_mode == mode::NON_DMA && BIT(m_scsi_read_callback(2), 1))
+				{
+					m_mode = mode::WRITE_DMA;
+				}
+				m_scsi_write_callback(5, data);
+				break;
 
-	case 6: case 7:
+			case 6: case 7:
 		if (m_mode == mode::NON_DMA && BIT(m_scsi_read_callback(2), 1))
 			m_mode = mode::READ_WAIT_DRQ;
 		m_scsi_write_callback(offset & 7, data);
 		break;
 
 	default:
+		if ((offset & 7) == 1 && BIT(data, 7)) // RST
+		{
+			read_fifo_flush();
+		}
 		m_scsi_write_callback(offset & 7, data);
 		break;
 	}

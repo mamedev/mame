@@ -233,7 +233,7 @@ protected:
 
 	u32 rdft_speedup_r();
 
-	void ymf_irqhandler(int state);
+	IRQ_CALLBACK_MEMBER( audio_vector_r );
 
 	void init_spi_common() ATTR_COLD;
 

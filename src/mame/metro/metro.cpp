@@ -3256,7 +3256,7 @@ void metro_upd7810_state::poitto(machine_config &config)
 void metro_upd7810_state::pururun(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 24_MHz_XTAL/2); // Not confirmed
+	M68000(config, m_maincpu, 24_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &metro_upd7810_state::pururun_map);
 	m_maincpu->set_periodic_int(FUNC(metro_upd7810_state::periodic_interrupt), attotime::from_hz(8*60)); // ?
 
@@ -3275,7 +3275,7 @@ void metro_upd7810_state::pururun(machine_config &config)
 	ymsnd.irq_handler().set_inputline(m_audiocpu, UPD7810_INTF2);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	OKIM6295(config, m_oki, 3.579545_MHz_XTAL/3, okim6295_device::PIN7_HIGH); // sample rate =  M6295 clock / 132
+	OKIM6295(config, m_oki, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH); // sample rate =  M6295 clock / 132
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.40);
 }
 
@@ -3384,7 +3384,7 @@ void vmetal_state::vmetal(machine_config &config)
 
 	OKIM6295(config, m_oki, 1_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	ES8712(config, m_essnd, 0);
+	ES8712(config, m_essnd);
 	m_essnd->reset_handler().set(FUNC(vmetal_state::es8712_irq));
 	m_essnd->msm_write_handler().set("msm", FUNC(msm6585_device::data_w));
 	m_essnd->set_msm_tag("msm");
@@ -3426,7 +3426,7 @@ void blzntrnd_state::blzntrnd(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, "vdp2:palette", gfx_blzntrnd);
 
-	K053936(config, m_k053936, 0);
+	K053936(config, m_k053936);
 	m_k053936->set_offsets(-77, -21);
 
 	// sound hardware
@@ -4060,9 +4060,9 @@ Notes:
       68000 clock     - 12.000MHz [24/2]
       D78C10 clock    - 12.000MHz [24/2]
       YM2151 clock    - 3.579545MHz
-      Oki M6295 clock - 1.200MHz [24/20], sample rate = 1200000 / 132
-      VSync - 60Hz
-      HSync - 15.55kHz
+      Oki M6295 clock - 1.200MHz [24/20] (from the MACH110 CPLD), sample rate = 1200000 / 132 (pin 7 high)
+      VSync - 59.3517Hz
+      HSync - 15.4235kHz
 
 RAM - CY7C199 (x2), 6164 (x2), LH5168 (x2), 6116 (x1)
 ROMs 5+6 = Main Prg

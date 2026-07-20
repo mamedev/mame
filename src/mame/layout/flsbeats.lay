@@ -1,0 +1,316 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+
+Sega Flash Beats representative artwork layout.
+
+Mirrors the real cabinet (top-down):
+  * 64x16 dot-matrix display (an artwork dot grid of dmddot<n> outputs, NOT a MAME
+    screen) at the top, centered, kept small so the lanes below can stretch
+    across the full 16:9 width. Neon 'Flash'
+	tubes muted blue when unlit so it doesn't read as already lit, turning
+	pure white when lit (bound to lamp_flash; this is  the FLASH cue players
+	return on - gameplay-essential, not decorative).
+  * 5 LED "tube" lanes stacked horizontally below the DMD (lane 0 top .. lane 4
+    bottom), each 47 LEDs long, spanning nearly the full view width. Each lane
+	position is driven by TWO independent on/off outputs from the driver - a red
+	die (lane<r>_<c>_r) and a green die (lane<r>_<c>_g) - drawn as two overlaid
+	emitters combined with blend="add", so both dies lit sums to yellow the way
+	the real diffused package does.
+  * 5 round play buttons on each side (left/right), one per lane, at the lane ends.
+    All buttons can light up (bound to btnlamp<n> outputs; default unlit).
+  * On the LEFT cluster: UP and DOWN triangles above the 5 buttons, START
+    below the 5 buttons, and genre labels for P1's buttons.
+
+Whole view is ~16:9 and the content is grouped so MAME centers it vertically.
+-->
+<mamelayout version="2">
+
+	<!-- Bi-color lane LED. The unlit diffuser tube glows a fairly bright neutral
+	     white, provided by the always-on lane_led_base. A lit die must show its
+		 true saturated colour, not that colour added on top of the bright base, so
+		 each die is drawn in two passes: first a blend="multiply" mask that darkens
+		 the base to black wherever the die is lit (off = white = no change), then a
+		 blend="add" emitter that paints the saturated colour into that now-dark
+		 cell. Both dies lit -> red + green add to yellow. -->
+	<element name="lane_led_base">
+		<rect><color red="0.40" green="0.41" blue="0.47" /></rect>
+	</element>
+	<element name="lane_led_r_mask" defstate="0">
+		<rect state="0"><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><color red="0.35" green="0.35" blue="0.35" /></rect>
+	</element>
+	<element name="lane_led_g_mask" defstate="0">
+		<rect state="0"><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><color red="0.35" green="0.35" blue="0.35" /></rect>
+	</element>
+	<element name="lane_led_r" defstate="0">
+		<rect state="0"><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
+	</element>
+	<element name="lane_led_g" defstate="0">
+		<rect state="0"><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect state="1"><color red="0.0" green="1.0" blue="0.0" /></rect>
+	</element>
+
+	<!-- round play button: lit (state 1) vs unlit (state 0) -->
+	<element name="btn" defstate="0">
+		<disk state="0"><color red="0.42" green="0.28" blue="0.04" /></disk>
+		<disk state="1"><color red="1.0"  green="0.88" blue="0.20" /></disk>
+	</element>
+
+	<!-- Select1 (UP) arrow: HORIZONTAL, tip points RIGHT, toward the DMD (right element).
+	     Filled right-pointing triangle drawn as inline SVG so it FILLS the bounds
+	     (text glyphs only occupy a fraction of their box). Lights white at state 1. -->
+	<element name="tri_up" defstate="0">
+		<image state="0"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="15,10 90,50 15,90" fill="#73737a"/></svg>]]></data></image>
+		<image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="15,10 90,50 15,90" fill="#ffffff"/></svg>]]></data></image>
+	</element>
+	<!-- Select2 (DOWN) arrow: HORIZONTAL, tip points LEFT, away from the DMD (left element).
+	     Filled left-pointing triangle (inline SVG). Lights white at state 1. -->
+	<element name="tri_dn" defstate="0">
+		<image state="0"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="85,10 10,50 85,90" fill="#73737a"/></svg>]]></data></image>
+		<image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="85,10 10,50 85,90" fill="#ffffff"/></svg>]]></data></image>
+	</element>
+
+	<!-- START: small round white button, lit-capable -->
+	<element name="btn_white" defstate="0">
+		<disk state="0"><color red="0.45" green="0.45" blue="0.48" /></disk>
+		<disk state="1"><color red="1.0"  green="1.0"  blue="1.0" /></disk>
+	</element>
+
+	<!-- Lane-gap flash lighting: Drawn BEFORE the lane <repeat> block in the view so the
+	     lane LEDs always render on top (lanes always take z-order priority), matching
+		 the real cabinet where the neon tubes are physically below the lane LED strips. -->
+	<element name="flash_top" defstate="0">
+		<image state="0"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 268 8"><path d="M10,1 L111.67,7 L156.33,7 L258,1" fill="none" stroke="#384761" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>]]></data></image>
+		<image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 268 8"><path d="M10,1 L111.67,7 L156.33,7 L258,1" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>]]></data></image>
+	</element>
+	<element name="flash_hbar" defstate="0">
+		<image state="0"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 268 8"><path d="M10,4 L258,4" fill="none" stroke="#384761" stroke-width="2.4" stroke-linecap="round"/></svg>]]></data></image>
+		<image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 268 8"><path d="M10,4 L258,4" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round"/></svg>]]></data></image>
+	</element>
+	<element name="flash_bottom" defstate="0">
+		<image state="0"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 268 8"><path d="M10,7 L111.67,1 L156.33,1 L258,7" fill="none" stroke="#384761" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>]]></data></image>
+		<image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 268 8"><path d="M10,7 L111.67,1 L156.33,1 L258,7" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>]]></data></image>
+	</element>
+
+	<element name="lbl_start"><text string="START"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="lbl_select"><text string="SELECT"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+	<!-- Genre labels, one per lane, sitting left of the P1 buttons (rotated 90
+	     like START/SELECT so they read sideways from the cabinet's front, but
+	     end up centered under/along their button when viewed from P1's side). -->
+	<element name="lbl_lane0a"><text string="HOUSE"><color red="0.2" green="0.5" blue="1.0" /></text></element>
+	<element name="lbl_lane1a"><text string="DRUM"><color red="0.2" green="0.5" blue="1.0" /></text></element>
+	<element name="lbl_lane1b"><text string="&amp; BASS"><color red="0.2" green="0.5" blue="1.0" /></text></element>
+	<element name="lbl_lane2a"><text string="TECHNO,"><color red="0.2" green="0.5" blue="1.0" /></text></element>
+	<element name="lbl_lane2b"><text string="TRANCE"><color red="0.2" green="0.5" blue="1.0" /></text></element>
+	<element name="lbl_lane3a"><text string="DIGITAL"><color red="0.2" green="0.5" blue="1.0" /></text></element>
+	<element name="lbl_lane3b"><text string="ROCK"><color red="0.2" green="0.5" blue="1.0" /></text></element>
+	<element name="lbl_lane4a"><text string="HIP HOP,"><color red="0.2" green="0.5" blue="1.0" /></text></element>
+	<element name="lbl_lane4b"><text string="RAP"><color red="0.2" green="0.5" blue="1.0" /></text></element>
+
+	<!-- DMD dot: the 64x16 amber/red dot-matrix display, one round emitter per dot.
+	     State 0..15 = dot brightness (driven by the dmddot outputs). All 16
+	     states are real: the panel is a genuine 16-level display, verified by
+	     tapping the live 0xa00000 dot values. The boot self-test writes a full
+	     0..15 gradient, and gameplay/attract scenes each pick their own subset
+	     (e.g. a 1/15 dim-glow-plus-bright logo, or an even 0/3/7/11/15 ramp). Any
+	     given scene only lights a few shades at once, so it reads as ~2-5 levels,
+	     but the value used spans the whole nibble across scenes, so we map all
+	     16. The colours reproduce the amber/red ramp: state 0 is the unlit-dot
+	     glow, states 1..15 scale up toward full brightness. A black backing rect
+	     (drawn slightly oversized) gives each dot its dark cell so the grid reads
+	     as a real DMD panel rather than a solid amber block. -->
+	<element name="dmddot" defstate="0">
+		<rect>
+			<color red="0" green="0" blue="0" />
+			<bounds left="-0.05" top="-0.05" right="1.05" bottom="1.05" />
+		</rect>
+		<disk>
+			<color state="0" red="0.0627" green="0.0196" blue="0.0196" />
+			<color state="1" red="0.0667" green="0.0078" blue="0.0078" />
+			<color state="15" red="1.0000" green="0.1569" blue="0.1176" />
+		</disk>
+	</element>
+
+	<!-- black backdrop the DMD sits on (extends a small margin past the dot grid) -->
+	<element name="dmd_bg"><rect><color red="0" green="0" blue="0" /></rect></element>
+
+	<!-- The 64x16 DMD dot grid, laid out in native dot coordinates (0..64 x
+	     0..16), one dmddot<n> per dot, row-major n = y*64 + x. Placed into the
+	     view as a single group so it can be positioned/scaled as a unit. -->
+	<group name="dmd">
+		<repeat count="16">
+			<param name="s" start="0" increment="64" />
+			<param name="y" start="0" increment="1" />
+			<repeat count="64">
+				<param name="n" start="~s~" increment="1" />
+				<param name="x" start="0" increment="1" />
+				<element name="dmddot~n~" ref="dmddot" state="0">
+					<bounds x="~x~" y="~y~" width="1" height="1" />
+				</element>
+			</repeat>
+		</repeat>
+	</group>
+
+	<!-- dark background -->
+	<element name="panel"><rect><color red="0.015" green="0.015" blue="0.025" /></rect></element>
+
+	<!-- Flash-lit background wash:
+	     unlit state matches the panel background; lit state is a lighter
+		 neutral tint of the background. -->
+	<element name="flash_glow" defstate="0">
+		<rect state="0"><color red="0.015" green="0.015" blue="0.025" /></rect>
+		<rect state="1"><color red="0.12" green="0.12" blue="0.16" /></rect>
+	</element>
+
+	<!-- 16:9 view; everything laid out within 0..320 x 0..180 -->
+	<view name="Cabinet">
+
+		<element ref="panel"><bounds x="0" y="0" width="320" height="180" /></element>
+
+		<!-- Flash-lit background wash: a simulation of the neon tubes
+			 lighting up most of the cabinet and surrounding area.
+			 Aids in gameplay so less focus is needed on the comparatively small 
+			 elements between the lanes -->
+		<element ref="flash_glow" name="lamp_flash"><bounds x="0" y="0" width="320" height="180" /></element>
+
+		<!-- DMD: top, centered. 64x16 dot-matrix display rendered as an artwork dot
+		     grid (no MAME screen). Kept the same footprint the old <screen>
+		     occupied (x=96 y=8, 128x32, a 4:1 box matching the 64:16 dots), with
+		     a black backdrop extending a ~3-unit margin around the dots so the
+		     panel reads as a framed DMD rather than floating amber dots. -->
+		<element ref="dmd_bg"><bounds x="93" y="5" width="134" height="38" /></element>
+		<group ref="dmd"><bounds x="96" y="8" width="128" height="32" /></group>
+
+		<!-- Lane-gap flash lighting: drawn BEFORE the lane <repeat> block below
+		     so the lane LEDs always render on top (lanes always take z-order
+		     priority), matching the cabinet where the neon tubes are physically
+			 below the lane LED strips. One light per gap between the 5 lane rows. -->
+		<element ref="flash_top" name="lamp_flash"><bounds x="116.25" y="69" width="87.5" height="7.4" /></element>
+		<element ref="flash_hbar" name="lamp_flash"><bounds x="80" y="89.2" width="160" height="8" /></element>
+		<element ref="flash_hbar" name="lamp_flash"><bounds x="80" y="111.8" width="160" height="8" /></element>
+		<element ref="flash_bottom" name="lamp_flash"><bounds x="116.25" y="132.5" width="87.5" height="7.4" /></element>
+
+		<!-- 5 lanes stacked horizontally below the DMD, stretched to nearly
+		     the full view width. 47 LEDs each, butted edge-to-edge (5.7 wide),
+		     spanning x=26..293.9 (width 267.9), centered in the 320 view,
+		     5 rows from y=56. -->
+		<repeat count="5">
+			<param name="lane" start="0" increment="1" />
+			<param name="ly"   start="56" increment="21" />
+			<repeat count="47">
+				<param name="col" start="0" increment="1" />
+				<param name="lx"  start="26" increment="5.7" />
+				<!-- LEDs butt together (width == increment) so the lane reads as one
+				     continuous diffuser tube with no dark gaps between cells. -->
+				<element ref="lane_led_base">
+					<bounds x="~lx~" y="~ly~" width="5.7" height="13" />
+				</element>
+				<element ref="lane_led_r_mask" name="lane~lane~_~col~_r" blend="multiply">
+					<bounds x="~lx~" y="~ly~" width="5.7" height="13" />
+				</element>
+				<element ref="lane_led_g_mask" name="lane~lane~_~col~_g" blend="multiply">
+					<bounds x="~lx~" y="~ly~" width="5.7" height="13" />
+				</element>
+				<element ref="lane_led_r" name="lane~lane~_~col~_r" blend="add">
+					<bounds x="~lx~" y="~ly~" width="5.7" height="13" />
+				</element>
+				<element ref="lane_led_g" name="lane~lane~_~col~_g" blend="add">
+					<bounds x="~lx~" y="~ly~" width="5.7" height="13" />
+				</element>
+			</repeat>
+		</repeat>
+
+		<!-- LEFT side: 5 round play buttons, one per lane, at the lane ends.
+		     Lit-capable via output btnlamp<n>; default unlit (inputs not yet
+		     wired in the driver). -->
+		<repeat count="5">
+			<param name="n"  start="0" increment="1" />
+			<param name="by" start="56" increment="21" />
+			<element ref="btn" name="btnlamp~n~">
+				<bounds x="8" y="~by~" width="13" height="13" />
+			</element>
+		</repeat>
+
+		<!-- Genre labels, left of the P1 button column (x=8), one per lane,
+		     rotated 90 like SELECT/START. Two-line lanes use a near column
+			 (x=4.7, closer to the button) for the FIRST line and a far column
+			 (x=2.4) for the SECOND line; rotate=90 renders the near column on
+			 top, so this ordering is required to read correctly top-to-bottom.
+		     x=4.7 also opens up breathing room from the button edge (x=8). -->
+		<element ref="lbl_lane0a">
+			<bounds x="4.7" y="59.75" width="2" height="6" />
+			<orientation rotate="90" />
+		</element>
+
+		<element ref="lbl_lane1a">
+			<bounds x="4.7" y="81" width="2" height="6" />
+			<orientation rotate="90" />
+		</element>
+		<element ref="lbl_lane1b">
+			<bounds x="2.4" y="81" width="2" height="6" />
+			<orientation rotate="90" />
+		</element>
+
+		<element ref="lbl_lane2a">
+			<bounds x="4.7" y="102" width="2" height="6" />
+			<orientation rotate="90" />
+		</element>
+		<element ref="lbl_lane2b">
+			<bounds x="2.4" y="102" width="2" height="6" />
+			<orientation rotate="90" />
+		</element>
+
+		<element ref="lbl_lane3a">
+			<bounds x="4.7" y="123" width="2" height="6" />
+			<orientation rotate="90" />
+		</element>
+		<element ref="lbl_lane3b">
+			<bounds x="2.4" y="123" width="2" height="6" />
+			<orientation rotate="90" />
+		</element>
+
+		<element ref="lbl_lane4a">
+			<bounds x="4.7" y="144" width="2" height="6" />
+			<orientation rotate="90" />
+		</element>
+		<element ref="lbl_lane4b">
+			<bounds x="2.4" y="144" width="2" height="6" />
+			<orientation rotate="90" />
+		</element>
+
+		<!-- RIGHT side: 5 round play buttons, one per lane, at the lane ends -->
+		<repeat count="5">
+			<param name="n"  start="5" increment="1" />
+			<param name="by" start="56" increment="21" />
+			<element ref="btn" name="btnlamp~n~">
+				<bounds x="299" y="~by~" width="13" height="13" />
+			</element>
+		</repeat>
+
+		<!-- LEFT cluster extras, aligned to the left button column (x ~8..21):
+		     DOWN (left, points away from DMD) + UP (right, points at DMD) above
+		     the buttons. -->
+		<element ref="tri_dn" name="lamp_dn"><bounds x="7.5" y="46" width="7" height="7" /></element>
+		<element ref="tri_up" name="lamp_up"><bounds x="17.5" y="46" width="7" height="7" /></element>
+
+		<element ref="lbl_select">
+			<bounds x="9" y="33.5" width="4" height="12" />
+			<orientation rotate="90" />
+		</element>
+		<element ref="lbl_select">
+			<bounds x="19" y="33.5" width="4" height="12" />
+			<orientation rotate="90" />
+		</element>
+
+		<element ref="btn_white" name="lamp_start"><bounds x="15" y="158" width="6" height="6" /></element>
+		<element ref="lbl_start">
+			<bounds x="16" y="166" width="4" height="9" />
+			<orientation rotate="90" />
+		</element>
+
+	</view>
+</mamelayout>

@@ -263,7 +263,7 @@ void hp98x6_base_state::hp98x6_base(machine_config &config, unsigned dot_clock, 
 
 	SOFTWARE_LIST(config, "optrom_list").set_original("hp98x6_rom");
 
-	DIO16(config, m_dio_bus, 0);
+	DIO16(config, m_dio_bus);
 	m_dio_bus->set_program_space(m_cpu, AS_PROGRAM);
 	m_cpu->reset_cb().append(m_dio_bus, FUNC(bus::hp_dio::dio16_device::reset_in));
 	// IRQ mergers
@@ -285,8 +285,8 @@ void hp98x6_base_state::hp98x6_base(machine_config &config, unsigned dot_clock, 
 
 	m_upi->irq1_write_cb().set(m_irq1_merger, FUNC(input_merger_any_high_device::in_w<1>));
 
-	DIO16_SLOT(config, "slot0", 0, "diobus", dio16_hp98x6_cards, nullptr, false);
-	DIO16_SLOT(config, "slot1", 0, "diobus", dio16_hp98x6_cards, nullptr, false);
+	DIO16_SLOT(config, "slot0", "diobus", dio16_hp98x6_cards, nullptr, false);
+	DIO16_SLOT(config, "slot1", "diobus", dio16_hp98x6_cards, nullptr, false);
 }
 
 void hp98x6_base_state::cpu_mem_map(address_map &map)
@@ -972,6 +972,7 @@ void hp9826_36_state::machine_start()
 void hp9826_36_state::machine_reset()
 {
 	hp98x6_base_state::machine_reset();
+	m_fdc->dden_w(0);
 	m_curr_floppy = nullptr;
 	floppy_reset();
 }
@@ -996,7 +997,6 @@ void hp9826_36_state::hp9826_36(machine_config &mconfig, unsigned dot_clock, int
 
 	FD1793(mconfig, m_fdc, HPIB_CLOCK / 5);
 	m_fdc->set_force_ready(true);
-	m_fdc->dden_w(0);
 	m_fdc->intrq_wr_callback().set(FUNC(hp9826_36_state::fdc_irq_w));
 	m_fdc->drq_wr_callback().set(FUNC(hp9826_36_state::fdc_drq_w));
 	m_fdc->hld_wr_callback().set(FUNC(hp9826_36_state::fdc_hld_w));

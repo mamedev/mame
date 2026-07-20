@@ -49,6 +49,8 @@
 #include "emu.h"
 #include "scn_pci.h"
 
+#include <bit>
+
 #define LOG_INIT    (1U << 1)
 #define LOG_COMMAND (1U << 2)
 #define LOG_RCVR    (1U << 3)
@@ -1156,7 +1158,7 @@ void scn_pci_device::write_syn(u8 data)
 	else
 		LOGMASKED(LOG_INIT, "SYN%d character = %02X\n", m_syn_pointer + 1, data);
 	if (m_syn_pointer == 0)
-		m_syn1_parity = BIT(population_count_32(data), 0);
+		m_syn1_parity = BIT(std::popcount(data), 0);
 
 	// Write SYN1/SYN2/DLE in sequence
 	if (m_syn_pointer++ == 2)

@@ -48,6 +48,8 @@ BTANB:
 #include "screen.h"
 #include "speaker.h"
 
+#include <bit>
+
 // internal artwork
 #include "novag_diamond.lh"
 #include "novag_diamond2.lh"
@@ -132,8 +134,6 @@ private:
 
 void diamond_state::machine_start()
 {
-	m_out_lcd.resolve();
-
 	if (m_rombank)
 		m_rombank->configure_entries(0, 4, memregion("eprom")->base(), 0x8000);
 
@@ -201,7 +201,7 @@ void diamond_state::update_lcd()
 		const u8 shift = m_lcd_pwm->width() & 0x18;
 
 		// LCD common is analog (voltage level)
-		const u8 com = population_count_32(m_lcd_data >> (shift + (i * 2)) & 3);
+		const u8 com = std::popcount(m_lcd_data >> (shift + (i * 2)) & 3U);
 		u16 segs = m_lcd_data & ((1 << shift) - 1);
 		segs |= m_lcd_segs2 << shift; // diamond
 
@@ -256,7 +256,7 @@ u8 diamond_state::read_board()
 	// priority encoded (either a 74148 on d1, or 2*7421 on d2)
 	for (int i = 0; i < 8; i++)
 		if (BIT(m_inp_mux, i))
-			data |= (count_leading_zeros_32(m_board->read_rank(i)) - 24) ^ 8;
+			data |= std::countl_zero(u8(m_board->read_rank(i))) ^ 8;
 
 	return ~data;
 }

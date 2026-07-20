@@ -27,11 +27,6 @@ mu5lcd_device::mu5lcd_device(const machine_config &mconfig, const char *tag, dev
 
 void mu5lcd_device::device_start()
 {
-	m_outputs.resolve();
-}
-
-void mu5lcd_device::device_reset()
-{
 }
 
 u32 mu5lcd_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

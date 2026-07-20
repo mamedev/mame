@@ -77,6 +77,7 @@ Notes:
       SKNSA1 is BIOS (Asia)
       HM514260, W24257, LH5168, M62X42 all smt SRAM
       LH540202 is DIP SRAM
+      SH2 is HD6417604F28 (SH7604)
 
 
 Cart Layout
@@ -169,7 +170,7 @@ NEP-16
 
 #include "logmacro.h"
 
-#define LOGHIT(...)   LOGMASKED(LOG_HIT, __VA_ARGS__) 
+#define LOGHIT(...)   LOGMASKED(LOG_HIT, __VA_ARGS__)
 
 static void hit_calc_orig(u16 p, u16 s, u16 org, u16 &l, u16 &r)
 {
@@ -621,8 +622,8 @@ static INPUT_PORTS_START( cyvern )      /* 2 buttons, 2 players */
 	PORT_INCLUDE( skns )
 
 	PORT_MODIFY("400000")
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )   /* No Button 3 */
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* No Button 3 */
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("%p Button 3 (undocumented)")  /* Undocumented and not shown in test mode, but has unique effect in game */
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("%p Button 3 (undocumented)")  /* Undocumented and not shown in test mode, but has unique effect in game */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( galpanis )    /* 1 button, 2 players */
@@ -668,10 +669,10 @@ void skns_state::io_w(offs_t offset, u32 data, u32 mem_mask)
 		case 2:
 			if (ACCESSING_BITS_24_31)
 			{ /* Coin Lock/Count */
-	//          machine().bookkeeping().coin_counter_w(0, BIT(data, 24));
-	//          machine().bookkeeping().coin_counter_w(1, BIT(data, 25));
-	//          machine().bookkeeping().coin_lockout_w(0, BIT(~data, 26));
-	//          machine().bookkeeping().coin_lockout_w(1, BIT(~data, 27)); // Works in puzzloop, others behave strange.
+				//machine().bookkeeping().coin_counter_w(0, BIT(data, 24));
+				//machine().bookkeeping().coin_counter_w(1, BIT(data, 25));
+				//machine().bookkeeping().coin_lockout_w(0, BIT(~data, 26));
+				//machine().bookkeeping().coin_lockout_w(1, BIT(~data, 27)); // Works in puzzloop, others behave strange.
 			}
 			if (ACCESSING_BITS_16_23)
 			{ /* Analogue Input Select */
@@ -686,7 +687,8 @@ void skns_state::io_w(offs_t offset, u32 data, u32 mem_mask)
 		case 3:
 			if (ACCESSING_BITS_8_15)
 			{ /* Interrupt Clear, do we need these? */
-	/*          if (BIT(data, 0))
+#if 0
+				if (BIT(data, 0))
 					m_maincpu->set_input_line(1, CLEAR_LINE);
 				if (BIT(data, 1))
 					m_maincpu->set_input_line(3, CLEAR_LINE);
@@ -701,9 +703,10 @@ void skns_state::io_w(offs_t offset, u32 data, u32 mem_mask)
 				if (BIT(data, 6))
 					m_maincpu->set_input_line(13, CLEAR_LINE);
 				if (BIT(data, 7))
-					m_maincpu->set_input_line(15, CLEAR_LINE);*/
+					m_maincpu->set_input_line(15, CLEAR_LINE);
+#endif
 
-				/* idle skip for vblokbrk/sarukani, i can't find a better place to put it :-( but i think it works ok unless its making the game too fast */
+				/* idle skip for vblokbrk/sarukani, I can't find a better place to put it :-( but I think it works OK unless it's making the game too fast */
 				if (m_maincpu->pc() == 0x04013b42)
 				{
 					if (!strcmp(machine().system().name,"vblokbrk") ||
@@ -754,6 +757,7 @@ void skns_state::skns_map(address_map &map)
 	map(0x00400000, 0x00400003).portr("400000");
 	map(0x00400004, 0x00400007).portr("400004");
 	/* In between is write only */
+//	map(0x00400008, 0x0040000b) read by vblokbrk/sarukani, propagated to $06000110 buffer (never read to?)
 	map(0x0040000c, 0x0040000f).portr("40000c");
 	map(0x00800000, 0x00801fff).ram().share("nvram"); /* 'backup' RAM */
 	map(0x00c00000, 0x00c00001).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)); /* ymz280_w (sound) */
@@ -821,7 +825,7 @@ void skns_state::skns(machine_config &config)
 	PALETTE(config, m_palette).set_entries(32768);
 	GFXDECODE(config, m_gfxdecode, m_palette, skns_bg);
 
-	KANEKO_RLE_SPRITES(config, m_spritegen, 0);
+	KANEKO_RLE_SPRITES(config, m_spritegen);
 	m_spritegen->set_screen(m_screen);
 
 	/* sound hardware */

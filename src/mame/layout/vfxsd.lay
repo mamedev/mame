@@ -287,7 +287,7 @@
 				<param name="n" start="~s~" increment="1" />
 				<param name="x" start="0" increment="342" />
 
-				<param name="input" value="vfd~n~" />
+				<param name="input" value="panel:vfd:vfd~n~" />
 				<group ref="vfd_cell">
 					<bounds x="~x~" y="~y~" width="342" height="572" />
 				</group>
@@ -556,83 +556,53 @@
 	</element>
 	<!-- Button shapes -->
 	<element name="button_15_8x5_dark">
-		<image state="0">
-			<color red="0.06667" green="0.06667" blue="0.06667" />
+		<image>
 			<data>
 				<![CDATA[
 					<svg width="15.8" height="5" viewBox="0 0 15.8 5"><rect x="0.25" y="0.25" width="15.3" height="4.5" rx="1.25" fill="white" stroke="none" /></svg>
 				]]></data>
-		</image>
-		<image state="1">
-			<color red="1" green="1" blue="1" />
-			<data>
-				<![CDATA[
-					<svg width="15.8" height="5" viewBox="0 0 15.8 5"><rect x="0.25" y="0.25" width="15.3" height="4.5" rx="1.25" fill="white" stroke="none" /></svg>
-				]]></data>
+			<color state="0" red="0.06667" green="0.06667" blue="0.06667" />
+			<color state="1" red="1" green="1" blue="1" />
 		</image>
 	</element>
 	<element name="button_15_8x5_screen">
-		<image state="0">
-			<color red="0.16471" green="0.16471" blue="0.16471" />
+		<image>
 			<data>
 				<![CDATA[
 					<svg width="15.8" height="5" viewBox="0 0 15.8 5"><rect x="0.25" y="0.25" width="15.3" height="4.5" rx="1.25" fill="white" stroke="none" /></svg>
 				]]></data>
-		</image>
-		<image state="1">
-			<color red="1" green="1" blue="1" />
-			<data>
-				<![CDATA[
-					<svg width="15.8" height="5" viewBox="0 0 15.8 5"><rect x="0.25" y="0.25" width="15.3" height="4.5" rx="1.25" fill="white" stroke="none" /></svg>
-				]]></data>
+			<color state="0" red="0.16471" green="0.16471" blue="0.16471" />
+			<color state="1" red="1" green="1" blue="1" />
 		</image>
 	</element>
 	<element name="button_15_8x10_light">
-		<image state="0">
-			<color red="0.73333" green="0.73333" blue="0.73333" />
+		<image>
 			<data>
 				<![CDATA[
 					<svg width="15.8" height="10" viewBox="0 0 15.8 10"><rect x="0.25" y="0.25" width="15.3" height="9.5" rx="1.25" fill="white" stroke="none" /></svg>
 				]]></data>
-		</image>
-		<image state="1">
-			<color red="1" green="1" blue="1" />
-			<data>
-				<![CDATA[
-					<svg width="15.8" height="10" viewBox="0 0 15.8 10"><rect x="0.25" y="0.25" width="15.3" height="9.5" rx="1.25" fill="white" stroke="none" /></svg>
-				]]></data>
+			<color state="0" red="0.73333" green="0.73333" blue="0.73333" />
+			<color state="1" red="1" green="1" blue="1" />
 		</image>
 	</element>
 	<element name="button_15_8x10_medium">
-		<image state="0">
-			<color red="0.46667" green="0.46667" blue="0.46667" />
+		<image>
 			<data>
 				<![CDATA[
 					<svg width="15.8" height="10" viewBox="0 0 15.8 10"><rect x="0.25" y="0.25" width="15.3" height="9.5" rx="1.25" fill="white" stroke="none" /></svg>
 				]]></data>
-		</image>
-		<image state="1">
-			<color red="1" green="1" blue="1" />
-			<data>
-				<![CDATA[
-					<svg width="15.8" height="10" viewBox="0 0 15.8 10"><rect x="0.25" y="0.25" width="15.3" height="9.5" rx="1.25" fill="white" stroke="none" /></svg>
-				]]></data>
+			<color state="0" red="0.46667" green="0.46667" blue="0.46667" />
+			<color state="1" red="1" green="1" blue="1" />
 		</image>
 	</element>
 	<element name="button_15_8x5_light">
-		<image state="0">
-			<color red="0.73333" green="0.73333" blue="0.73333" />
+		<image>
 			<data>
 				<![CDATA[
 					<svg width="15.8" height="5" viewBox="0 0 15.8 5"><rect x="0.25" y="0.25" width="15.3" height="4.5" rx="1.25" fill="white" stroke="none" /></svg>
 				]]></data>
-		</image>
-		<image state="1">
-			<color red="1" green="1" blue="1" />
-			<data>
-				<![CDATA[
-					<svg width="15.8" height="5" viewBox="0 0 15.8 5"><rect x="0.25" y="0.25" width="15.3" height="4.5" rx="1.25" fill="white" stroke="none" /></svg>
-				]]></data>
+			<color state="0" red="0.73333" green="0.73333" blue="0.73333" />
+			<color state="1" red="1" green="1" blue="1" />
 		</image>
 	</element>
 	<element name="psel_9x12">
@@ -649,6 +619,32 @@
 				<![CDATA[
 					<svg width="9" height="12" viewBox="0 0 9 12"><rect x="0" y="0" width="9" height="12" rx="0" fill="white" stroke="none" /></svg>
 				]]></data>
+		</image>
+	</element>
+	<element name="fs_right">
+		<image>
+			<data>
+				<![CDATA[
+					<svg width="45" height="100" viewBox="0 0 45 100"><svg x="0" y="0" width="45" height="100" viewBox="0 0 45 100">
+						<path d="M0,0V70C0,90 15,100 25,100 36,100 45,92 45,82 45,63 25,50 25,20V0Z" fill="#878787" stroke="none" />
+						<path d="M3.5,0V70C3.5,88.25 17.33333,96.5 25,96.5 34.30303,96.5 41.5,89.9 41.5,82 41.5,73.72807 36.97898,66.27187 31.91211,56.77148 26.84524,47.2711 21.5,35.77778 21.5,20V0Z" fill="#bbbbbb" stroke="none" />
+					</svg></svg>
+				]]></data>
+			<color state="0" red="1" green="1" blue="1" />
+			<color state="1" red="0.78431" green="0.78431" blue="0.78431" />
+		</image>
+	</element>
+	<element name="fs_left">
+		<image>
+			<data>
+				<![CDATA[
+					<svg width="45" height="100" viewBox="0 0 45 100"><svg x="0" y="0" width="45" height="100" viewBox="0 0 45 100">
+						<path d="M45,0V70C45,90 30,100 20,100 9,100 0,92 0,82 0,63 20,50 20,20V0Z" fill="#878787" stroke="none" />
+						<path d="M41.5,0V70C41.5,88.25 27.66667,96.5 20,96.5 10.69697,96.5 3.5,89.9 3.5,82 3.5,73.72807 8.02102,66.27187 13.08789,56.77148 18.15476,47.2711 23.5,35.77778 23.5,20V0Z" fill="#bbbbbb" stroke="none" />
+					</svg></svg>
+				]]></data>
+			<color state="0" red="1" green="1" blue="1" />
+			<color state="1" red="0.78431" green="0.78431" blue="0.78431" />
 		</image>
 	</element>
 
@@ -1012,19 +1008,19 @@
 		<element ref="text_L_data_entry">
 			<bounds x="47.5" y="96.87737" width="35" height="4.44107" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_63__decrement" inputtag="buttons_32" inputmask="0x80000000">
+		<element ref="button_15_8x5_dark" id="button_63__decrement" inputtag="panel:buttons_32" inputmask="0x80000000">
 			<bounds x="47.5" y="60" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_62__increment" inputtag="buttons_32" inputmask="0x40000000">
+		<element ref="button_15_8x5_dark" id="button_62__increment" inputtag="panel:buttons_32" inputmask="0x40000000">
 			<bounds x="47.5" y="35" width="15.8" height="5" />
 		</element>
 		<param name="slider_id" value="volume" />
-		<param name="port_name" value="analog_volume" />
+		<param name="port_name" value="panel:analog_volume" />
 		<group ref="slider">
 			<bounds x="0" y="15" width="20" height="60" />
 		</group>
 		<param name="slider_id" value="data_entry" />
-		<param name="port_name" value="analog_data_entry" />
+		<param name="port_name" value="panel:analog_data_entry" />
 		<group ref="slider">
 			<bounds x="70" y="15" width="20" height="60" />
 		</group>
@@ -1082,64 +1078,64 @@
 		<group ref="vfd">
 			<bounds x="12" y="32.50936" width="221" height="18.48129" />
 		</group>
-		<element ref="button_15_8x5_screen" id="button_50__display_below_left" inputtag="buttons_32" inputmask="0x00040000">
+		<element ref="button_15_8x5_screen" id="button_50__display_below_left" inputtag="panel:buttons_32" inputmask="0x00040000">
 			<bounds x="60" y="65.5" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_screen" id="button_44__display_below_middle" inputtag="buttons_32" inputmask="0x00001000">
+		<element ref="button_15_8x5_screen" id="button_44__display_below_middle" inputtag="panel:buttons_32" inputmask="0x00001000">
 			<bounds x="126" y="65.5" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_screen" id="button_45__display_below_right" inputtag="buttons_32" inputmask="0x00002000">
+		<element ref="button_15_8x5_screen" id="button_45__display_below_right" inputtag="panel:buttons_32" inputmask="0x00002000">
 			<bounds x="192" y="65.5" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_screen" id="button_58__display_above_left" inputtag="buttons_32" inputmask="0x04000000">
+		<element ref="button_15_8x5_screen" id="button_58__display_above_left" inputtag="panel:buttons_32" inputmask="0x04000000">
 			<bounds x="60" y="13" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_screen" id="button_42__diplay_above_center" inputtag="buttons_32" inputmask="0x00000400">
+		<element ref="button_15_8x5_screen" id="button_42__diplay_above_center" inputtag="panel:buttons_32" inputmask="0x00000400">
 			<bounds x="126" y="13" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_screen" id="button_43__display_above_right" inputtag="buttons_32" inputmask="0x00000800">
+		<element ref="button_15_8x5_screen" id="button_43__display_above_right" inputtag="panel:buttons_32" inputmask="0x00000800">
 			<bounds x="193" y="13" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x10_light" id="button_52__cartbankset" inputtag="buttons_32" inputmask="0x00100000">
+		<element ref="button_15_8x10_light" id="button_52__cartbankset" inputtag="panel:buttons_32" inputmask="0x00100000">
 			<bounds x="0" y="82" width="15.8" height="10" />
 		</element>
-		<element ref="button_15_8x10_light" id="button_53__sounds" inputtag="buttons_32" inputmask="0x00200000">
+		<element ref="button_15_8x10_light" id="button_53__sounds" inputtag="panel:buttons_32" inputmask="0x00200000">
 			<bounds x="15.8" y="82" width="15.8" height="10" />
 		</element>
-		<element ref="button_15_8x10_light" id="button_54__presets" inputtag="buttons_32" inputmask="0x00400000">
+		<element ref="button_15_8x10_light" id="button_54__presets" inputtag="panel:buttons_32" inputmask="0x00400000">
 			<bounds x="31.6" y="82" width="15.8" height="10" />
 		</element>
-		<element ref="button_15_8x10_light" id="button_51__seq" inputtag="buttons_32" inputmask="0x00080000">
+		<element ref="button_15_8x10_light" id="button_51__seq" inputtag="panel:buttons_32" inputmask="0x00080000">
 			<bounds x="47.4" y="82" width="15.8" height="10" />
 		</element>
-		<element ref="button_15_8x10_medium" id="button_55__0" inputtag="buttons_32" inputmask="0x00800000">
+		<element ref="button_15_8x10_medium" id="button_55__0" inputtag="panel:buttons_32" inputmask="0x00800000">
 			<bounds x="87" y="82" width="15.8" height="10" />
 		</element>
-		<element ref="button_15_8x10_medium" id="button_56__1" inputtag="buttons_32" inputmask="0x01000000">
+		<element ref="button_15_8x10_medium" id="button_56__1" inputtag="panel:buttons_32" inputmask="0x01000000">
 			<bounds x="102.8" y="82" width="15.8" height="10" />
 		</element>
-		<element ref="button_15_8x10_medium" id="button_57__2" inputtag="buttons_32" inputmask="0x02000000">
+		<element ref="button_15_8x10_medium" id="button_57__2" inputtag="panel:buttons_32" inputmask="0x02000000">
 			<bounds x="118.6" y="82" width="15.8" height="10" />
 		</element>
-		<element ref="button_15_8x10_medium" id="button_46__3" inputtag="buttons_32" inputmask="0x00004000">
+		<element ref="button_15_8x10_medium" id="button_46__3" inputtag="panel:buttons_32" inputmask="0x00004000">
 			<bounds x="134.4" y="82" width="15.8" height="10" />
 		</element>
-		<element ref="button_15_8x10_medium" id="button_47__4" inputtag="buttons_32" inputmask="0x00008000">
+		<element ref="button_15_8x10_medium" id="button_47__4" inputtag="panel:buttons_32" inputmask="0x00008000">
 			<bounds x="150.2" y="82" width="15.8" height="10" />
 		</element>
-		<element ref="button_15_8x10_medium" id="button_48__5" inputtag="buttons_32" inputmask="0x00010000">
+		<element ref="button_15_8x10_medium" id="button_48__5" inputtag="panel:buttons_32" inputmask="0x00010000">
 			<bounds x="166" y="82" width="15.8" height="10" />
 		</element>
-		<element ref="button_15_8x10_medium" id="button_49__6" inputtag="buttons_32" inputmask="0x00020000">
+		<element ref="button_15_8x10_medium" id="button_49__6" inputtag="panel:buttons_32" inputmask="0x00020000">
 			<bounds x="181.8" y="82" width="15.8" height="10" />
 		</element>
-		<element ref="button_15_8x10_medium" id="button_35__7" inputtag="buttons_32" inputmask="0x00000008">
+		<element ref="button_15_8x10_medium" id="button_35__7" inputtag="panel:buttons_32" inputmask="0x00000008">
 			<bounds x="197.6" y="82" width="15.8" height="10" />
 		</element>
-		<element ref="button_15_8x10_medium" id="button_34__8" inputtag="buttons_32" inputmask="0x00000004">
+		<element ref="button_15_8x10_medium" id="button_34__8" inputtag="panel:buttons_32" inputmask="0x00000004">
 			<bounds x="213.4" y="82" width="15.8" height="10" />
 		</element>
-		<element ref="button_15_8x10_medium" id="button_25__9" inputtag="buttons_0" inputmask="0x02000000">
+		<element ref="button_15_8x10_medium" id="button_25__9" inputtag="panel:buttons_0" inputmask="0x02000000">
 			<bounds x="229.2" y="82" width="15.8" height="10" />
 		</element>
 		<element name="lights" ref="light_15">
@@ -1421,124 +1417,124 @@
 		<element ref="text_L_programming">
 			<bounds x="120" y="96.87737" width="35" height="4.44107" />
 		</element>
-		<element ref="button_15_8x10_medium" id="button_29_replace_program" inputtag="buttons_0" inputmask="0x20000000">
+		<element ref="button_15_8x10_medium" id="button_29_replace_program" inputtag="panel:buttons_0" inputmask="0x20000000">
 			<bounds x="0" y="82" width="15.8" height="10" />
 		</element>
-		<element ref="button_15_8x10_medium" id="button_5_select_voice" inputtag="buttons_0" inputmask="0x00000020">
+		<element ref="button_15_8x10_medium" id="button_5_select_voice" inputtag="panel:buttons_0" inputmask="0x00000020">
 			<bounds x="120" y="82" width="15.8" height="10" />
 		</element>
-		<element ref="button_15_8x10_medium" id="button_9_copy" inputtag="buttons_0" inputmask="0x00000200">
+		<element ref="button_15_8x10_medium" id="button_9_copy" inputtag="panel:buttons_0" inputmask="0x00000200">
 			<bounds x="135.8" y="82" width="15.8" height="10" />
 		</element>
-		<element ref="button_15_8x10_medium" id="button_3_write" inputtag="buttons_0" inputmask="0x00000008">
+		<element ref="button_15_8x10_medium" id="button_3_write" inputtag="panel:buttons_0" inputmask="0x00000008">
 			<bounds x="151.6" y="82" width="15.8" height="10" />
 		</element>
-		<element ref="button_15_8x10_medium" id="button_8_compare" inputtag="buttons_0" inputmask="0x00000100">
+		<element ref="button_15_8x10_medium" id="button_8_compare" inputtag="panel:buttons_0" inputmask="0x00000100">
 			<bounds x="167.4" y="82" width="15.8" height="10" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_26_patch_select" inputtag="buttons_0" inputmask="0x04000000">
+		<element ref="button_15_8x5_dark" id="button_26_patch_select" inputtag="panel:buttons_0" inputmask="0x04000000">
 			<bounds x="0" y="62" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_27_midi" inputtag="buttons_0" inputmask="0x08000000">
+		<element ref="button_15_8x5_dark" id="button_27_midi" inputtag="panel:buttons_0" inputmask="0x08000000">
 			<bounds x="15.8" y="62" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_28_effects" inputtag="buttons_0" inputmask="0x10000000">
+		<element ref="button_15_8x5_dark" id="button_28_effects" inputtag="panel:buttons_0" inputmask="0x10000000">
 			<bounds x="31.6" y="62" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_39_key_zone" inputtag="buttons_32" inputmask="0x00000080">
+		<element ref="button_15_8x5_dark" id="button_39_key_zone" inputtag="panel:buttons_32" inputmask="0x00000080">
 			<bounds x="0" y="42" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_40_transpose" inputtag="buttons_32" inputmask="0x00000100">
+		<element ref="button_15_8x5_dark" id="button_40_transpose" inputtag="panel:buttons_32" inputmask="0x00000100">
 			<bounds x="15.8" y="42" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_41_release" inputtag="buttons_32" inputmask="0x00000200">
+		<element ref="button_15_8x5_dark" id="button_41_release" inputtag="panel:buttons_32" inputmask="0x00000200">
 			<bounds x="31.6" y="42" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_36_volume" inputtag="buttons_32" inputmask="0x00000010">
+		<element ref="button_15_8x5_dark" id="button_36_volume" inputtag="panel:buttons_32" inputmask="0x00000010">
 			<bounds x="0" y="22" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_37_pan" inputtag="buttons_32" inputmask="0x00000020">
+		<element ref="button_15_8x5_dark" id="button_37_pan" inputtag="panel:buttons_32" inputmask="0x00000020">
 			<bounds x="15.8" y="22" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_38_timbre" inputtag="buttons_32" inputmask="0x00000040">
+		<element ref="button_15_8x5_dark" id="button_38_timbre" inputtag="panel:buttons_32" inputmask="0x00000040">
 			<bounds x="31.6" y="22" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_4_wave" inputtag="buttons_0" inputmask="0x00000010">
+		<element ref="button_15_8x5_dark" id="button_4_wave" inputtag="panel:buttons_0" inputmask="0x00000010">
 			<bounds x="120" y="62" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_6_mod_mixer" inputtag="buttons_0" inputmask="0x00000040">
+		<element ref="button_15_8x5_dark" id="button_6_mod_mixer" inputtag="panel:buttons_0" inputmask="0x00000040">
 			<bounds x="135.8" y="62" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_2_program_control" inputtag="buttons_0" inputmask="0x00000004">
+		<element ref="button_15_8x5_dark" id="button_2_program_control" inputtag="panel:buttons_0" inputmask="0x00000004">
 			<bounds x="151.6" y="62" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_7_effects" inputtag="buttons_0" inputmask="0x00000080">
+		<element ref="button_15_8x5_dark" id="button_7_effects" inputtag="panel:buttons_0" inputmask="0x00000080">
 			<bounds x="167.4" y="62" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_11_pitch" inputtag="buttons_0" inputmask="0x00000800">
+		<element ref="button_15_8x5_dark" id="button_11_pitch" inputtag="panel:buttons_0" inputmask="0x00000800">
 			<bounds x="120" y="42" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_13_pitch_mod" inputtag="buttons_0" inputmask="0x00002000">
+		<element ref="button_15_8x5_dark" id="button_13_pitch_mod" inputtag="panel:buttons_0" inputmask="0x00002000">
 			<bounds x="135.8" y="42" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_15_filters" inputtag="buttons_0" inputmask="0x00008000">
+		<element ref="button_15_8x5_dark" id="button_15_filters" inputtag="panel:buttons_0" inputmask="0x00008000">
 			<bounds x="151.6" y="42" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_17_output" inputtag="buttons_0" inputmask="0x00020000">
+		<element ref="button_15_8x5_dark" id="button_17_output" inputtag="panel:buttons_0" inputmask="0x00020000">
 			<bounds x="167.4" y="42" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_10_lfo" inputtag="buttons_0" inputmask="0x00000400">
+		<element ref="button_15_8x5_dark" id="button_10_lfo" inputtag="panel:buttons_0" inputmask="0x00000400">
 			<bounds x="120" y="22" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_12_env1" inputtag="buttons_0" inputmask="0x00001000">
+		<element ref="button_15_8x5_dark" id="button_12_env1" inputtag="panel:buttons_0" inputmask="0x00001000">
 			<bounds x="135.8" y="22" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_14_env2" inputtag="buttons_0" inputmask="0x00004000">
+		<element ref="button_15_8x5_dark" id="button_14_env2" inputtag="panel:buttons_0" inputmask="0x00004000">
 			<bounds x="151.6" y="22" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_16_env3" inputtag="buttons_0" inputmask="0x00010000">
+		<element ref="button_15_8x5_dark" id="button_16_env3" inputtag="panel:buttons_0" inputmask="0x00010000">
 			<bounds x="167.4" y="22" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x10_medium" id="button_30_1_6" inputtag="buttons_0" inputmask="0x40000000">
+		<element ref="button_15_8x10_medium" id="button_30_1_6" inputtag="panel:buttons_0" inputmask="0x40000000">
 			<bounds x="15.8" y="82" width="15.8" height="10" />
 		</element>
-		<element ref="button_15_8x10_medium" id="button_31_7_12" inputtag="buttons_0" inputmask="0x80000000">
+		<element ref="button_15_8x10_medium" id="button_31_7_12" inputtag="panel:buttons_0" inputmask="0x80000000">
 			<bounds x="31.6" y="82" width="15.8" height="10" />
 		</element>
-		<element ref="button_15_8x10_medium" id="button_19_rec" inputtag="buttons_0" inputmask="0x00080000">
+		<element ref="button_15_8x10_medium" id="button_19_rec" inputtag="panel:buttons_0" inputmask="0x00080000">
 			<bounds x="60" y="82" width="15.8" height="10" />
 		</element>
-		<element ref="button_15_8x10_medium" id="button_22_stop_cont" inputtag="buttons_0" inputmask="0x00400000">
+		<element ref="button_15_8x10_medium" id="button_22_stop_cont" inputtag="panel:buttons_0" inputmask="0x00400000">
 			<bounds x="75.8" y="82" width="15.8" height="10" />
 		</element>
-		<element ref="button_15_8x10_medium" id="button_23_play" inputtag="buttons_0" inputmask="0x00800000">
+		<element ref="button_15_8x10_medium" id="button_23_play" inputtag="panel:buttons_0" inputmask="0x00800000">
 			<bounds x="91.6" y="82" width="15.8" height="10" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_32_click" inputtag="buttons_32" inputmask="0x00000001">
+		<element ref="button_15_8x5_dark" id="button_32_click" inputtag="panel:buttons_32" inputmask="0x00000001">
 			<bounds x="60" y="62" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_18_seq_control" inputtag="buttons_0" inputmask="0x00040000">
+		<element ref="button_15_8x5_dark" id="button_18_seq_control" inputtag="panel:buttons_0" inputmask="0x00040000">
 			<bounds x="75.8" y="62" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_33_locate" inputtag="buttons_32" inputmask="0x00000002">
+		<element ref="button_15_8x5_dark" id="button_33_locate" inputtag="panel:buttons_32" inputmask="0x00000002">
 			<bounds x="91.6" y="62" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_60_song" inputtag="buttons_32" inputmask="0x10000000">
+		<element ref="button_15_8x5_dark" id="button_60_song" inputtag="panel:buttons_32" inputmask="0x10000000">
 			<bounds x="60" y="42" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_59_seq" inputtag="buttons_32" inputmask="0x08000000">
+		<element ref="button_15_8x5_dark" id="button_59_seq" inputtag="panel:buttons_32" inputmask="0x08000000">
 			<bounds x="75.8" y="42" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_61_track" inputtag="buttons_32" inputmask="0x20000000">
+		<element ref="button_15_8x5_dark" id="button_61_track" inputtag="panel:buttons_32" inputmask="0x20000000">
 			<bounds x="91.6" y="42" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_light" id="button_20_master" inputtag="buttons_0" inputmask="0x00100000">
+		<element ref="button_15_8x5_light" id="button_20_master" inputtag="panel:buttons_0" inputmask="0x00100000">
 			<bounds x="60" y="22" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_light" id="button_21_storage" inputtag="buttons_0" inputmask="0x00200000">
+		<element ref="button_15_8x5_light" id="button_21_storage" inputtag="panel:buttons_0" inputmask="0x00200000">
 			<bounds x="75.8" y="22" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_light" id="button_24_midi_control" inputtag="buttons_0" inputmask="0x01000000">
+		<element ref="button_15_8x5_light" id="button_24_midi_control" inputtag="panel:buttons_0" inputmask="0x01000000">
 			<bounds x="91.69" y="22" width="15.8" height="5" />
 		</element>
 		<element name="lights" ref="light_5">
@@ -1658,19 +1654,19 @@
 		<element ref="text_L_mod">
 			<bounds x="66.5" y="93.87737" width="15" height="4.44107" />
 		</element>
-		<element ref="psel_9x12" id="patch_select_1" inputtag="patch_select" inputmask="0x2">
+		<element ref="psel_9x12" id="patch_select_1" inputtag="panel:patch_select" inputmask="0x2">
 			<bounds x="6" y="2" width="9" height="12" />
 		</element>
-		<element ref="psel_9x12" id="patch_select_0" inputtag="patch_select" inputmask="0x1">
+		<element ref="psel_9x12" id="patch_select_0" inputtag="panel:patch_select" inputmask="0x1">
 			<bounds x="21" y="2" width="9" height="12" />
 		</element>
 		<param name="wheel_id" value="pitch_bend" />
-		<param name="port_name" value="analog_pitch_bend" />
+		<param name="port_name" value="panel:analog_pitch_bend" />
 		<group ref="wheel">
 			<bounds x="29.5" y="26" width="13" height="66" />
 		</group>
 		<param name="wheel_id" value="mod_wheel" />
-		<param name="port_name" value="analog_mod_wheel" />
+		<param name="port_name" value="panel:analog_mod_wheel" />
 		<group ref="wheel">
 			<bounds x="66.5" y="26" width="13" height="66" />
 		</group>
@@ -2202,19 +2198,19 @@
 		<element ref="text_L_mod">
 			<bounds x="53" y="93.87737" width="15" height="4.44107" />
 		</element>
-		<element ref="psel_9x12" id="patch_select_1" inputtag="patch_select" inputmask="0x2">
+		<element ref="psel_9x12" id="patch_select_1" inputtag="panel:patch_select" inputmask="0x2">
 			<bounds x="6" y="2" width="9" height="12" />
 		</element>
-		<element ref="psel_9x12" id="patch_select_0" inputtag="patch_select" inputmask="0x1">
+		<element ref="psel_9x12" id="patch_select_0" inputtag="panel:patch_select" inputmask="0x1">
 			<bounds x="21" y="2" width="9" height="12" />
 		</element>
 		<param name="wheel_id" value="pitch_bend" />
-		<param name="port_name" value="analog_pitch_bend" />
+		<param name="port_name" value="panel:analog_pitch_bend" />
 		<group ref="wheel">
 			<bounds x="20" y="26" width="13" height="66" />
 		</group>
 		<param name="wheel_id" value="mod_wheel" />
-		<param name="port_name" value="analog_mod_wheel" />
+		<param name="port_name" value="panel:analog_mod_wheel" />
 		<group ref="wheel">
 			<bounds x="53" y="26" width="13" height="66" />
 		</group>
@@ -2531,7 +2527,7 @@
 			<bounds x="0" y="96.87737" width="35" height="4.44107" />
 		</element>
 		<param name="slider_id" value="volume" />
-		<param name="port_name" value="analog_volume" />
+		<param name="port_name" value="panel:analog_volume" />
 		<group ref="slider">
 			<bounds x="0" y="15" width="20" height="60" />
 		</group>
@@ -2544,10 +2540,10 @@
 		<element ref="text_L_patch_select">
 			<bounds x="0" y="96.87737" width="35" height="4.44107" />
 		</element>
-		<element ref="psel_9x12" id="patch_select_1" inputtag="patch_select" inputmask="0x2">
+		<element ref="psel_9x12" id="patch_select_1" inputtag="panel:patch_select" inputmask="0x2">
 			<bounds x="0" y="55" width="9" height="12" />
 		</element>
-		<element ref="psel_9x12" id="patch_select_0" inputtag="patch_select" inputmask="0x1">
+		<element ref="psel_9x12" id="patch_select_0" inputtag="panel:patch_select" inputmask="0x1">
 			<bounds x="15" y="55" width="9" height="12" />
 		</element>
 	</group>
@@ -2565,20 +2561,40 @@
 		<element ref="text_L_data_entry">
 			<bounds x="0" y="96.87737" width="35" height="4.44107" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_63__decrement" inputtag="buttons_32" inputmask="0x80000000">
+		<element ref="button_15_8x5_dark" id="button_63__decrement" inputtag="panel:buttons_32" inputmask="0x80000000">
 			<bounds x="0" y="60" width="15.8" height="5" />
 		</element>
-		<element ref="button_15_8x5_dark" id="button_62__increment" inputtag="buttons_32" inputmask="0x40000000">
+		<element ref="button_15_8x5_dark" id="button_62__increment" inputtag="panel:buttons_32" inputmask="0x40000000">
 			<bounds x="0" y="35" width="15.8" height="5" />
 		</element>
 		<param name="slider_id" value="data_entry" />
-		<param name="port_name" value="analog_data_entry" />
+		<param name="port_name" value="panel:analog_data_entry" />
 		<group ref="slider">
 			<bounds x="20" y="15" width="20" height="60" />
 		</group>
 	</group>
+	<group name="DisplayOnly">
+		<bounds x="11" y="30.75936" width="223" height="20.48129" />
+		<element ref="rect_glass">
+			<bounds x="11" y="30.75936" width="223" height="20.48129" />
+		</element>
+		<group ref="vfd">
+			<bounds x="12" y="32.50936" width="221" height="18.48129" />
+		</group>
+	</group>
 
 	<view name="Full">
+		<collection name="Pedals" visible="no">
+			<element ref="rect_black">
+				<bounds x="-156" y="302.5" width="1023" height="100" />
+			</element>
+			<element ref="fs_right" inputtag="panel:buttons_0" inputmask="0x00000001">
+				<bounds x="379" y="302.5" width="45" height="100" />
+			</element>
+			<element ref="fs_left" inputtag="panel:buttons_0" inputmask="0x00000002">
+				<bounds x="287" y="302.5" width="45" height="100" />
+			</element>
+		</collection>
 		<element ref="rect_black">
 			<bounds x="-156" y="-32" width="1023" height="334.5" />
 		</element>
@@ -2665,6 +2681,20 @@
 		</element>
 	</view>
 	<view name="Compact">
+		<collection name="Pedals" visible="no">
+			<element ref="rect_black">
+				<bounds x="-95" y="254.2" width="578.2" height="60" />
+			</element>
+			<element ref="fs_right" inputtag="panel:buttons_0" inputmask="0x00000001">
+				<bounds x="217.6" y="214.2" width="45" height="100" />
+			</element>
+			<element ref="fs_left" inputtag="panel:buttons_0" inputmask="0x00000002">
+				<bounds x="125.6" y="214.2" width="45" height="100" />
+			</element>
+			<element ref="rect_black" clickthrough="no">
+				<bounds x="125.6" y="214.2" width="137" height="40" />
+			</element>
+		</collection>
 		<element ref="rect_panel">
 			<bounds x="-95" y="-11.94107" width="578.2" height="107.14107" />
 		</element>
@@ -2739,6 +2769,11 @@
 			<bounds x="42.5" y="86.36667" width="190" height="12.66667" />
 		</element>
 	</view>
+	<view name="Display">
+		<group ref="DisplayOnly">
+			<bounds x="11" y="30.75936" width="223" height="20.48129" />
+		</group>
+	</view>
 	<script>
 		<![CDATA[
 			-- Keep track of the pointer managers
@@ -2749,38 +2784,57 @@
 			file:set_resolve_tags_callback(
 				function ()
 					for view_name, view in pairs(file.views) do
-						-- Hide the warning about requiring the Layout plugin.
-						view.items["plugin_warning"]:set_state(0)
-
-						local manager = PointerManager:create(view)
-						pointer_managers[view_name] = manager
 
 						if view.unqualified_name == "Full" then
-							manager:addHandler(SliderHandler:create(view, "slider_volume", "slider_knob_volume", "analog_volume"))
-							manager:addHandler(SliderHandler:create(view, "slider_data_entry", "slider_knob_data_entry", "analog_data_entry"))
+							-- Hide the warning about requiring the Layout plugin.
+							view.items["plugin_warning"]:set_state(0)
+
+							local manager = PointerManager:create(view)
+							pointer_managers[view_name] = manager
+
+							manager:addHandler(SliderHandler:create(view, "slider_volume", "slider_knob_volume", "panel:analog_volume"))
+							manager:addHandler(SliderHandler:create(view, "slider_data_entry", "slider_knob_data_entry", "panel:analog_data_entry"))
 							media_change_notifiers[":cart"] = add_media_change_notifier(view, "media_cartridge", ":cart")
 							media_change_notifiers[":wd1772:0:35dd"] = add_media_change_notifier(view, "media_floppy", ":wd1772:0:35dd")
-							manager:addHandler(SliderHandler:create(view, "wheel_pitch_bend", "wheel_knob_pitch_bend", "analog_pitch_bend", true, true))
-							manager:addHandler(SliderHandler:create(view, "wheel_mod_wheel", "wheel_knob_mod_wheel", "analog_mod_wheel", true, false))
-							manager:addHandler(KeyboardHandler:create(view, "full_keyboard_background", "full_keyboard_key_", "key_", 3, 5))
+							manager:addHandler(SliderHandler:create(view, "wheel_pitch_bend", "wheel_knob_pitch_bend", "panel:analog_pitch_bend", true, true))
+							manager:addHandler(SliderHandler:create(view, "wheel_mod_wheel", "wheel_knob_mod_wheel", "panel:analog_mod_wheel", true, false))
+							manager:addHandler(KeyboardHandler:create(view, "full_keyboard_background", "full_keyboard_key_", "panel:key_", 3, 5))
 						end
 
 						if view.unqualified_name == "Compact" then
-							manager:addHandler(SliderHandler:create(view, "slider_volume", "slider_knob_volume", "analog_volume"))
-							manager:addHandler(SliderHandler:create(view, "slider_data_entry", "slider_knob_data_entry", "analog_data_entry"))
-							manager:addHandler(SliderHandler:create(view, "wheel_pitch_bend", "wheel_knob_pitch_bend", "analog_pitch_bend", true, true))
-							manager:addHandler(SliderHandler:create(view, "wheel_mod_wheel", "wheel_knob_mod_wheel", "analog_mod_wheel", true, false))
-							manager:addHandler(KeyboardHandler:create(view, "compact_keyboard_background", "compact_keyboard_key_", "key_", 4, 3))
+							-- Hide the warning about requiring the Layout plugin.
+							view.items["plugin_warning"]:set_state(0)
+
+							local manager = PointerManager:create(view)
+							pointer_managers[view_name] = manager
+
+							manager:addHandler(SliderHandler:create(view, "slider_volume", "slider_knob_volume", "panel:analog_volume"))
+							manager:addHandler(SliderHandler:create(view, "slider_data_entry", "slider_knob_data_entry", "panel:analog_data_entry"))
+							manager:addHandler(SliderHandler:create(view, "wheel_pitch_bend", "wheel_knob_pitch_bend", "panel:analog_pitch_bend", true, true))
+							manager:addHandler(SliderHandler:create(view, "wheel_mod_wheel", "wheel_knob_mod_wheel", "panel:analog_mod_wheel", true, false))
+							manager:addHandler(KeyboardHandler:create(view, "compact_keyboard_background", "compact_keyboard_key_", "panel:key_", 4, 3))
 						end
 
 						if view.unqualified_name == "Panel" then
-							manager:addHandler(SliderHandler:create(view, "slider_volume", "slider_knob_volume", "analog_volume"))
-							manager:addHandler(SliderHandler:create(view, "slider_data_entry", "slider_knob_data_entry", "analog_data_entry"))
+							-- Hide the warning about requiring the Layout plugin.
+							view.items["plugin_warning"]:set_state(0)
+
+							local manager = PointerManager:create(view)
+							pointer_managers[view_name] = manager
+
+							manager:addHandler(SliderHandler:create(view, "slider_volume", "slider_knob_volume", "panel:analog_volume"))
+							manager:addHandler(SliderHandler:create(view, "slider_data_entry", "slider_knob_data_entry", "panel:analog_data_entry"))
 						end
 
 						if view.unqualified_name == "Tablet" then
-							manager:addHandler(SliderHandler:create(view, "slider_volume", "slider_knob_volume", "analog_volume"))
-							manager:addHandler(SliderHandler:create(view, "slider_data_entry", "slider_knob_data_entry", "analog_data_entry"))
+							-- Hide the warning about requiring the Layout plugin.
+							view.items["plugin_warning"]:set_state(0)
+
+							local manager = PointerManager:create(view)
+							pointer_managers[view_name] = manager
+
+							manager:addHandler(SliderHandler:create(view, "slider_volume", "slider_knob_volume", "panel:analog_volume"))
+							manager:addHandler(SliderHandler:create(view, "slider_data_entry", "slider_knob_data_entry", "panel:analog_data_entry"))
 						end
 					end
 				end
@@ -3108,12 +3162,17 @@
 				local full_width = octaves_width + w_white
 
 				local function find_12_key(x, y, w, h)
-					if x > octaves_width then
+					if x < 0 or full_width < x then
+						return nil
+					end
+
+					if octaves_width <= x then
 						return 12 * n_octaves
 					end
 
 					local octave, kx = math.modf((x / w) * (full_width / octave_shift))
 					if octave == n_octaves then
+						-- this should already have been taken care of by the above
 						return 12 * octave
 					end
 
@@ -3167,6 +3226,9 @@
 			KeyboardHandler = {}
 
 			function KeyboardHandler:create(view, clickarea_id, key_id_prefix, port_prefix, from_octave, n_octaves)
+				local from_key = 12 * from_octave
+				local n_keys = 12 * n_octaves + 1
+
 				local instance = {
 					view = view,
 					clickarea = view.items[clickarea_id],
@@ -3190,10 +3252,7 @@
 					return nil
 				end
 
-				local from_key = 12 * from_octave
-				local n_keys = 12 * n_octaves + 1
-
-				for i = 0, n_keys -1 do
+				for i = 0, n_keys - 1 do
 					local key_info = k12[(i % 12) + 1]
 					local key = {
 						id = key_id_prefix .. i,
@@ -3217,7 +3276,7 @@
 
 					function key:updateViewItemState()
 						if self.pressure > 0 then
-							self.item:set_state(127 + key.pressure)
+							self.item:set_state(127 + self.pressure)
 						elseif self.velocity > 0 then
 							self.item:set_state(self.velocity)
 						else

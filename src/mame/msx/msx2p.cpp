@@ -256,7 +256,7 @@ void msx2p_state::fsa1fx(machine_config &config)
 	add_internal_disk_mirrored(config, MSX_SLOT_DISK3_TC8566, "disk", 3, 2, 1, 2, "maincpu", 0x3c000);
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 3, 3, 1, 2, "maincpu", 0x20000);
 
-	msx_matsushita_device &matsushita(MSX_MATSUSHITA(config, "matsushita", 0));
+	msx_matsushita_device &matsushita(MSX_MATSUSHITA(config, "matsushita"));
 	matsushita.turbo_callback().set([this] (int state) {
 		// 0 - 5.369317 MHz
 		// 1 - 3.579545 MHz
@@ -316,7 +316,7 @@ void msx2p_state::fsa1wsx(machine_config &config)
 	add_internal_disk_mirrored(config, MSX_SLOT_DISK3_TC8566, "disk", 3, 2, 1, 2, "diskrom");
 	add_internal_slot(config, MSX_SLOT_PANASONIC08, "firmware", 3, 3, 0, 4, "firmware");
 
-	msx_matsushita_device &matsushita(MSX_MATSUSHITA(config, "matsushita", 0));
+	msx_matsushita_device &matsushita(MSX_MATSUSHITA(config, "matsushita"));
 	matsushita.turbo_callback().set([this] (int state) {
 		// 0 - 5.369317 MHz
 		// 1 - 3.579545 MHz
@@ -377,7 +377,7 @@ void msx2p_state::fsa1wx(machine_config &config)
 	add_internal_disk_mirrored(config, MSX_SLOT_DISK3_TC8566, "disk", 3, 2, 1, 2, "diskrom");
 	add_internal_slot(config, MSX_SLOT_PANASONIC08, "firmware", 3, 3, 0, 4, "firmware");
 
-	msx_matsushita_device &matsushita(MSX_MATSUSHITA(config, "matsushita", 0));
+	msx_matsushita_device &matsushita(MSX_MATSUSHITA(config, "matsushita"));
 	matsushita.turbo_callback().set([this] (int state) {
 		// 0 - 5.369317 MHz
 		// 1 - 3.579545 MHz
@@ -585,7 +585,7 @@ void msx2p_state::hbf1xdj(machine_config &config)
 
 	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0x00);
 
-	MSX_S1985(config, "s1985", 0);
+	MSX_S1985(config, "s1985");
 
 	msx_ym2413(config);
 
@@ -628,7 +628,7 @@ void msx2p_state::hbf1xv(machine_config &config)
 
 	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0x00);
 
-	MSX_S1985(config, "s1985", 0);
+	MSX_S1985(config, "s1985");
 
 	msx_ym2413(config);
 

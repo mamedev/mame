@@ -7,7 +7,11 @@
  */
 #include "emu.h"
 #include "pci.h"
+
 #include "bus/pci/pci_slot.h"
+
+#include <bit>
+
 
 DEFINE_DEVICE_TYPE(PCI_ROOT,   pci_root_device,   "pci_root",   "PCI virtual root")
 DEFINE_DEVICE_TYPE(PCI_BRIDGE, pci_bridge_device, "pci_bridge", "PCI-PCI Bridge")
@@ -964,7 +968,7 @@ void pci_host_device::regenerate_mapping()
 				io_window_start, io_window_end, io_offset, io_space);
 }
 
-uint32_t pci_host_device::config_address_r()
+uint32_t pci_host_device::config_address_r(offs_t offset, uint32_t mem_mask)
 {
 	return config_address;
 }
@@ -990,7 +994,7 @@ uint32_t pci_host_device::config_data_ex_r(offs_t offset, uint32_t mem_mask)
 	// is this a Type 0 or Type 1 configuration address? (page 31, PCI 2.2 Specification)
 	if ((config_address & 3) == 0)
 	{
-		const int devnum = 31 - count_leading_zeros_32(config_address & 0xfffff800);
+		const int devnum = std::bit_width(config_address & 0xfffff800) - 1;
 		return root_config_read(0, devnum << 3, config_address & 0xfc, mem_mask);
 	}
 	else if ((config_address & 3) == 1)
@@ -1005,7 +1009,7 @@ void pci_host_device::config_data_ex_w(offs_t offset, uint32_t data, uint32_t me
 	// is this a Type 0 or Type 1 configuration address? (page 31, PCI 2.2 Specification)
 	if ((config_address & 3) == 0)
 	{
-		const int devnum = 31 - count_leading_zeros_32(config_address & 0xfffff800);
+		const int devnum = std::bit_width(config_address & 0xfffff800) - 1;
 		root_config_write(0, devnum << 3, config_address & 0xfc, data, mem_mask);
 	}
 	else if ((config_address & 3) == 1)

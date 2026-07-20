@@ -37,7 +37,7 @@ void vp595_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-	CDP1863(config, m_pfg, 0);
+	CDP1863(config, m_pfg);
 	m_pfg->set_clock2(CDP1863_XTAL);
 	m_pfg->add_route(ALL_OUTPUTS, "mono", 0.25);
 }

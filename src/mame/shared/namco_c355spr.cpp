@@ -23,7 +23,8 @@ TODO:
 - dragngun does a masking trick on the dragon during the attract intro, it should not be visible but rather
   cause the fire to be invisible in the shape of the dragon
 - dragngun 'waterfall' prior to one of the bosses also needs correct priority
-- aircomb ranking screen during attract also seems masking related
+- aircomb ranking screen during attract also seems masking related, or something else? it appears that the
+  sprites aren't processed (if they even are in the spritelist)
 
 relative to the start of the sprite area these offets are typically used
 it is not clear if this is implemented in a single RAM chip, or multiple on some boards

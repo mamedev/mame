@@ -12,6 +12,8 @@
 #include "debugger.h"
 #include "screen.h"
 
+#include <cstdio>
+
 
 //**************************************************************************
 //  DEBUGGING

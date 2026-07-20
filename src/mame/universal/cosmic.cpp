@@ -1046,6 +1046,29 @@ ROM_START( panicger )
 	ROM_LOAD( "spcpanic.8",   0x0000, 0x0800, CRC(7da0b321) SHA1(b450cc02de9cc27e3f336c626221c90c6961b51e) )
 ROM_END
 
+ROM_START( panicbl ) // bootleg, 2 board stack
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.2d", 0x0000, 0x0800, CRC(e1efa292) SHA1(de2f8523cfb22c9c4e84974e7c403cecd2fcb0a6) )
+	ROM_LOAD( "2.3d", 0x0800, 0x0800, CRC(a5885fb1) SHA1(9f0e3e87baec0dc5821910e6dc46fb246ddb4022) )
+	ROM_LOAD( "3.4d", 0x1000, 0x0800, CRC(ab402d38) SHA1(c5fae961e5e2aab0c6a97be04e248176a6c5281a) )
+	ROM_LOAD( "4.5d", 0x1800, 0x0800, CRC(27c69de1) SHA1(83bb8ea31ffe58deeb4a1588c0c577a9d646e184) )
+	ROM_LOAD( "5.5d", 0x2000, 0x0800, CRC(9b409a21) SHA1(ebb5783264ad60f845f1f2ce8042d8571f94fd6e) )
+	ROM_LOAD( "6.6d", 0x2800, 0x0800, CRC(add15e92) SHA1(56fcfc89b750d5797ca05d1389c30035f6f883ea) )
+	ROM_LOAD( "7.7d", 0x3000, 0x0800, CRC(786c8d41) SHA1(f2313156d680f46342e77bdfcb12869a95799f98) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 ) // identical to the original
+	ROM_LOAD( "11.7m",  0x0000, 0x0800, CRC(acea9df4) SHA1(7de2a82da8160ad1a01c32a516d10c19dc306051) )
+	ROM_LOAD( "12.5m",  0x0800, 0x0800, CRC(e83423d0) SHA1(eba1129537869f1ecb5afeeae19db19b134865f6) )
+	ROM_LOAD( "10.8m",  0x1000, 0x0800, CRC(c9631c2d) SHA1(e5ab95e19c1b22a798a70a1a6599bc1f5e853c60) )
+	ROM_LOAD( "9.9m",   0x1800, 0x0800, CRC(eec78b4c) SHA1(efd21d0a26b988a490c45315a7a121607f74d147) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mmi6330.5l",    0x0000, 0x0020, CRC(35d43d2f) SHA1(2ce164c92ed7ba3ee26a907f0c5969ec3decca01) BAD_DUMP ) // not dumped for this set
+
+	ROM_REGION( 0x0800, "user1", 0 ) // color map, identical to the original
+	ROM_LOAD( "8.2l",   0x0000, 0x0800, CRC(7da0b321) SHA1(b450cc02de9cc27e3f336c626221c90c6961b51e) )
+ROM_END
+
 ROM_START( cosmica ) // Later revision 7910-AII PCB; some ROMs are marked II-x; note that this set does NOT have the 1979 copyright date on the titlescreen!
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ii-1.e3",     0x0000, 0x0800, CRC(535ee0c5) SHA1(3ec3056b7fabe07ef49a9179114aa74be44a943e) ) // TMS2516
@@ -1361,5 +1384,6 @@ GAME( 1980, panic3,    panic,   panic,   panic,    cosmic_state, init_panic,   R
 GAME( 1980, panic4,    panic,   panic,   panic,    cosmic_state, init_panic,   ROT270, "Universal",                         "Space Panic (set 4)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, panich,    panic,   panic,   panic,    cosmic_state, init_panic,   ROT270, "Universal",                         "Space Panic (harder)",             MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, panicger,  panic,   panic,   panic,    cosmic_state, init_panic,   ROT270, "Universal (ADP Automaten license)", "Space Panic (German)",             MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, panicbl,   panic,   panic,   panic,    cosmic_state, init_panic,   ROT270, "bootleg",                           "Space Panic (bootleg)",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, devzone,   0,       devzone, devzone,  cosmic_state, init_devzone, ROT270, "Universal",                         "Devil Zone",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, devzone2,  devzone, devzone, devzone2, cosmic_state, init_devzone, ROT270, "Universal",                         "Devil Zone (easier)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

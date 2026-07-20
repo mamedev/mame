@@ -85,11 +85,9 @@ public:
 
 	{ }
 
-	void taitoo(machine_config &config);
-	DECLARE_INPUT_CHANGED_MEMBER(all_clear_cb);
+	void taitoo(machine_config &config) ATTR_COLD;
 
-protected:
-	virtual void machine_start() override { m_lamps.resolve(); };
+	DECLARE_INPUT_CHANGED_MEMBER(all_clear_cb);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -438,7 +436,7 @@ void taitoo_state::taitoo(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	for (auto &opto : m_opto)
-		TAITOIO_OPTO(config, opto, 0);
+		TAITOIO_OPTO(config, opto);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -450,7 +448,7 @@ void taitoo_state::taitoo(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 33*16);
 
-	TC0080VCO(config, m_tc0080vco, 0);
+	TC0080VCO(config, m_tc0080vco);
 	m_tc0080vco->set_offsets(1, 1);
 	m_tc0080vco->set_bgflip_yoffs(-2);
 	m_tc0080vco->set_palette(m_palette);
@@ -511,6 +509,6 @@ ROM_END
 
 } // anonymous namespace
 
-//     YEAR  NAME      PARENT   MACHINE   INPUT     CLASS         INIT        ROT    COMPANY  FULLNAME              FLAGS                                               LAYOUT
+//     YEAR  NAME      PARENT   MACHINE   INPUT     CLASS         INIT        ROT   COMPANY  FULLNAME               FLAGS                                               LAYOUT
 GAMEL( 1989, parentj,  0,       taitoo,   parentj,  taitoo_state, empty_init, ROT0, "Taito", "Parent Jack (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_parentj )
 GAMEL( 1990, eibise,   0,       taitoo,   eibise,   taitoo_state, empty_init, ROT0, "Taito", "Eibise (Japan)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_eibise )

@@ -342,11 +342,10 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 		}
 	}
 
+	const int color = node->data.quad.color;
 	const int cz_value = node->data.quad.cz_value;
 	const int cz_type = node->data.quad.cz_type;
 	const int cz_adjust = node->data.quad.cz_adjust;
-	const int color2 = cz_adjust >> 16 & 0xff;
-	const int color = node->data.quad.color | color2;
 	const int objectflags = node->data.quad.objectflags;
 
 	namcos22_object_data &extra = object_data().next();
@@ -438,7 +437,17 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 			extra.shade_enabled = false;
 		}
 		else
-			extra.pens += color2;
+		{
+			// unknown masking? timecris sets pen to 0x3a at the helicopter when it definitely wants 0x1a
+			extra.pens += (cz_adjust >> 16 & 0x7f) & (color | 0x1f);
+		}
+	}
+
+	// disable poly fog
+	if (BIT(cz_adjust, 23))
+	{
+		extra.zfog_enabled = false;
+		extra.fogfactor = 0;
 	}
 
 	if (m_state.m_is_ss22)
@@ -1402,15 +1411,16 @@ void namcos22_state::slavesim_handle_233002(const s32 *src)
 	    00000000: common
 	    00800000: alpinr2b cancel fogging on selection screen
 	    00800000: raverace cancel fogging on sky in attract mode
-		--xx----: pen when textures are disabled with objectflags 003fffff
-		----xxxx: pen when textures are disabled with objectflags 005fffff / 009fffff
+	    --xx----: pen when textures are disabled with objectflags 003fffff
+	    ----xxxx: pen when textures are disabled with objectflags 005fffff / 009fffff
 
 	    objectshift:
-        00800000: set at same time as objectflags 009fffff
-		--xxxxxx: low 22 bits: object z bias adjust (see blit_single_quad)
+	    00800000: set at same time as objectflags 009fffff
+	    --xxxxxx: low 22 bits: object z bias adjust (see blit_single_quad)
 
 	    objectflags:
 	    001fffff: common
+	    003fffff: alpinerd distant scenery ground level when reaching finish (white)
 	    003fffff: adillor arrows on level select screen (no effect?)
 	    003fffff: propcycl attract mode particles when Solitar rises (unknown effect)
 	    003fffff: timecris shoot helicopter (white, but shading enabled)
@@ -2605,8 +2615,7 @@ void namcos22_state::init_tables()
 	save_pointer(NAME(m_pointram), 0x20000);
 
 	// force all texture tiles to be decoded now
-	for (int i = 0; i < m_gfxdecode->gfx(1)->elements(); i++)
-		m_gfxdecode->gfx(1)->get_data(i);
+	m_gfxdecode->gfx(1)->decode_all();
 
 	m_texture_tilemap = (u16 *)memregion("textilemap")->base();
 	m_texture_tiledata = (u8 *)m_gfxdecode->gfx(1)->get_data(0);

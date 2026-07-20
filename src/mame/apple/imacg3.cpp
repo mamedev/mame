@@ -97,21 +97,18 @@ void imac_state::machine_start()
 	m_dimm0->set_dimm_size(dimm_spd_device::SIZE_SLOT_EMPTY);
 	m_dimm1->set_dimm_size(dimm_spd_device::SIZE_SLOT_EMPTY);
 
-// TODO: iMac queries DIMM0 twice, so we have to
-// halve the DIMM size here to get the requested amount.
-// Cuda 3.0 may fix this, since that's what it's expecting to talk to
 	switch (m_ram->size())
 	{
 		case 32 * 1024 * 1024:
-			m_dimm0->set_dimm_size(dimm_spd_device::SIZE_16_MIB);
-			break;
-
-		case 64 * 1024 * 1024:
 			m_dimm0->set_dimm_size(dimm_spd_device::SIZE_32_MIB);
 			break;
 
-		case 128 * 1024 * 1024:
+		case 64 * 1024 * 1024:
 			m_dimm0->set_dimm_size(dimm_spd_device::SIZE_64_MIB);
+			break;
+
+		case 128 * 1024 * 1024:
+			m_dimm0->set_dimm_size(dimm_spd_device::SIZE_128_MIB);
 			break;
 	}
 
@@ -150,14 +147,14 @@ void imac_state::write_sense(u16 data)
 
 void imac_state::imac(machine_config &config)
 {
-	PPC750(config, m_maincpu, 66000000);    // actually 233 MHz
+	PPC750(config, m_maincpu, 233'000'000);
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 	m_maincpu->set_addrmap(AS_PROGRAM, &imac_state::imac_map);
 
-	PCI_ROOT(config, "pci", 0);
-	MPC106(config, m_mpc106, 0, mpc106_host_device::MAP_TYPE_B, "maincpu", "bootrom");
+	PCI_ROOT(config, "pci");
+	MPC106(config, m_mpc106, mpc106_host_device::MAP_TYPE_B, "maincpu", "bootrom");
 
-	paddington_device &paddington(PADDINGTON(config, "pci:10.0", 0));
+	paddington_device &paddington(PADDINGTON(config, "pci:10.0"));
 	paddington.set_maincpu_tag("maincpu");
 	paddington.irq_callback().set(FUNC(imac_state::irq_w));
 

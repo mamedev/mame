@@ -11,7 +11,7 @@
 class kaneko_rle_sprites_device : public device_t, public device_video_interface, public device_rom_interface<27>
 {
 public:
-	kaneko_rle_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	kaneko_rle_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// configurations
 	void set_sprite_kludge(int x, int y);

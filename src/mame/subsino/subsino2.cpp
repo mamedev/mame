@@ -81,6 +81,7 @@ by the otherwise seemingly unnecessary internal ROMs.
 #include "video/ramdac.h"
 
 #include "emupal.h"
+#include "input.h" // for video debug keys
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
@@ -95,26 +96,7 @@ enum tilesize_t : uint8_t
 
 ALLOW_SAVE_TYPE(tilesize_t);
 
-enum vram_t
-{
-	VRAM_LO,
-	VRAM_HI
-};
-
-
-// Layers
-struct layer_t
-{
-	std::unique_ptr<uint16_t[]> videoram;
-
-	std::unique_ptr<uint16_t[]> scrollram;
-	int scroll_x;
-	int scroll_y;
-
-	tilemap_t *tmap;
-	tilesize_t tilesize;
-
-};
+namespace {
 
 class subsino2_state : public driver_device
 {
@@ -154,24 +136,38 @@ public:
 	void init_tbonusal() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD { m_leds.resolve(); }
 	virtual void video_start() override ATTR_COLD;
 
 private:
+	enum vram_t
+	{
+		VRAM_LO,
+		VRAM_HI
+	};
+
+	// Layers
+	struct layer_t
+	{
+		void ss9601_videoram_w(vram_t vram, offs_t offset, uint8_t data);
+
+		std::unique_ptr<uint16_t[]> videoram;
+
+		std::unique_ptr<uint16_t[]> scrollram;
+		int scroll_x;
+		int scroll_y;
+
+		tilemap_t *tmap;
+		tilesize_t tilesize;
+	};
+
 	void ss9601_byte_lo_w(uint8_t data);
 	void ss9601_byte_lo2_w(uint8_t data);
-	void ss9601_videoram_0_hi_w(offs_t offset, uint8_t data);
-	void ss9601_videoram_0_lo_w(offs_t offset, uint8_t data);
-	void ss9601_videoram_0_hi_lo_w(offs_t offset, uint8_t data);
-	void ss9601_videoram_0_hi_lo2_w(offs_t offset, uint8_t data);
-	uint8_t ss9601_videoram_0_hi_r(offs_t offset);
-	uint8_t ss9601_videoram_0_lo_r(offs_t offset);
-	void ss9601_videoram_1_hi_w(offs_t offset, uint8_t data);
-	void ss9601_videoram_1_lo_w(offs_t offset, uint8_t data);
-	void ss9601_videoram_1_hi_lo_w(offs_t offset, uint8_t data);
-	void ss9601_videoram_1_hi_lo2_w(offs_t offset, uint8_t data);
-	uint8_t ss9601_videoram_1_hi_r(offs_t offset);
-	uint8_t ss9601_videoram_1_lo_r(offs_t offset);
+	template <unsigned N> void ss9601_videoram_hi_w(offs_t offset, uint8_t data);
+	template <unsigned N> void ss9601_videoram_lo_w(offs_t offset, uint8_t data);
+	template <unsigned N> void ss9601_videoram_hi_lo_w(offs_t offset, uint8_t data);
+	template <unsigned N> void ss9601_videoram_hi_lo2_w(offs_t offset, uint8_t data);
+	template <unsigned N> uint8_t ss9601_videoram_hi_r(offs_t offset);
+	template <unsigned N> uint8_t ss9601_videoram_lo_r(offs_t offset);
 	void ss9601_reelram_hi_lo_w(offs_t offset, uint8_t data);
 	uint8_t ss9601_reelram_hi_r(offs_t offset);
 	uint8_t ss9601_reelram_lo_r(offs_t offset);
@@ -316,105 +312,77 @@ void subsino2_state::ss9601_byte_lo2_w(uint8_t data)
 }
 
 
-static inline void ss9601_videoram_w(layer_t *l, vram_t vram, offs_t offset, uint8_t data)
+inline void subsino2_state::layer_t::ss9601_videoram_w(vram_t vram, offs_t offset, uint8_t data)
 {
 	switch (vram)
 	{
 	case VRAM_HI:
-		l->videoram[offset] = uint8_t(data) << 8 | (l->videoram[offset] & 0xff);
+		videoram[offset] = uint8_t(data) << 8 | (videoram[offset] & 0xff);
 		break;
 
 	case VRAM_LO:
-		l->videoram[offset] = data | (l->videoram[offset] & 0xff00);
+		videoram[offset] = data | (videoram[offset] & 0xff00);
 		break;
 	}
 
-	switch (l->tilesize)
+	switch (tilesize)
 	{
 	default:
 	case TILE_8x8:
-		l->tmap->mark_tile_dirty(offset);
+		tmap->mark_tile_dirty(offset);
 		break;
 
 	case TILE_8x32:
 		offset &= ~0x180;
 		for (int y = 0; y < 0x80*4; y += 0x80)
-			l->tmap->mark_tile_dirty(offset + y);
+			tmap->mark_tile_dirty(offset + y);
 		break;
 
 	case TILE_64x32:
 		offset &= ~0x187;
 		for (int x = 0; x < 8; x++)
 			for (int y = 0; y < 0x80*4; y += 0x80)
-				l->tmap->mark_tile_dirty(offset + y + x);
+				tmap->mark_tile_dirty(offset + y + x);
 		break;
 	}
 }
 
-// Layer 0
-void subsino2_state::ss9601_videoram_0_hi_w(offs_t offset, uint8_t data)
+template <unsigned N>
+void subsino2_state::ss9601_videoram_hi_w(offs_t offset, uint8_t data)
 {
-	ss9601_videoram_w(&m_layers[0], VRAM_HI, offset, data);
+	m_layers[N].ss9601_videoram_w(VRAM_HI, offset, data);
 }
 
-void subsino2_state::ss9601_videoram_0_lo_w(offs_t offset, uint8_t data)
+template <unsigned N>
+void subsino2_state::ss9601_videoram_lo_w(offs_t offset, uint8_t data)
 {
-	ss9601_videoram_w(&m_layers[0], VRAM_LO, offset, data);
+	m_layers[N].ss9601_videoram_w(VRAM_LO, offset, data);
 }
 
-void subsino2_state::ss9601_videoram_0_hi_lo_w(offs_t offset, uint8_t data)
+template <unsigned N>
+void subsino2_state::ss9601_videoram_hi_lo_w(offs_t offset, uint8_t data)
 {
-	ss9601_videoram_w(&m_layers[0], VRAM_HI, offset, data);
-	ss9601_videoram_w(&m_layers[0], VRAM_LO, offset, m_ss9601_byte_lo);
+	m_layers[N].ss9601_videoram_w(VRAM_HI, offset, data);
+	m_layers[N].ss9601_videoram_w(VRAM_LO, offset, m_ss9601_byte_lo);
 }
 
-void subsino2_state::ss9601_videoram_0_hi_lo2_w(offs_t offset, uint8_t data)
+template <unsigned N>
+void subsino2_state::ss9601_videoram_hi_lo2_w(offs_t offset, uint8_t data)
 {
-	ss9601_videoram_w(&m_layers[0], VRAM_HI, offset, data);
-	ss9601_videoram_w(&m_layers[0], VRAM_LO, offset, m_ss9601_byte_lo2);
+	m_layers[N].ss9601_videoram_w(VRAM_HI, offset, data);
+	m_layers[N].ss9601_videoram_w(VRAM_LO, offset, m_ss9601_byte_lo2);
 }
 
-uint8_t subsino2_state::ss9601_videoram_0_hi_r(offs_t offset)
+template <unsigned N>
+uint8_t subsino2_state::ss9601_videoram_hi_r(offs_t offset)
 {
-	return m_layers[0].videoram[offset] >> 8;
+	return m_layers[N].videoram[offset] >> 8;
 }
 
-uint8_t subsino2_state::ss9601_videoram_0_lo_r(offs_t offset)
+template <unsigned N>
+uint8_t subsino2_state::ss9601_videoram_lo_r(offs_t offset)
 {
-	return m_layers[0].videoram[offset] & 0xff;
-}
-
-// Layer 1
-void subsino2_state::ss9601_videoram_1_hi_w(offs_t offset, uint8_t data)
-{
-	ss9601_videoram_w(&m_layers[1], VRAM_HI, offset, data);
-}
-
-void subsino2_state::ss9601_videoram_1_lo_w(offs_t offset, uint8_t data)
-{
-	ss9601_videoram_w(&m_layers[1], VRAM_LO, offset, data);
-}
-
-void subsino2_state::ss9601_videoram_1_hi_lo_w(offs_t offset, uint8_t data)
-{
-	ss9601_videoram_w(&m_layers[1], VRAM_HI, offset, data);
-	ss9601_videoram_w(&m_layers[1], VRAM_LO, offset, m_ss9601_byte_lo);
-}
-
-void subsino2_state::ss9601_videoram_1_hi_lo2_w(offs_t offset, uint8_t data)
-{
-	ss9601_videoram_w(&m_layers[1], VRAM_HI, offset, data);
-	ss9601_videoram_w(&m_layers[1], VRAM_LO, offset, m_ss9601_byte_lo2);
-}
-
-uint8_t subsino2_state::ss9601_videoram_1_hi_r(offs_t offset)
-{
-	return m_layers[1].videoram[offset] >> 8;
-}
-
-uint8_t subsino2_state::ss9601_videoram_1_lo_r(offs_t offset)
-{
-	return m_layers[1].videoram[offset] & 0xff;
+	return m_layers[N].videoram[offset] & 0xff;
 }
 
 // Layer 0 Reels
@@ -1010,25 +978,25 @@ void subsino2_state::bishjan_map(address_map &map)
 	map(0x200000, 0x207fff).ram().share("nvram"); // battery
 
 	// read lo (L1)   (only half tilemap?)
-	map(0x412000, 0x412fff).r(FUNC(subsino2_state::ss9601_videoram_1_lo_r));
+	map(0x412000, 0x412fff).r(FUNC(subsino2_state::ss9601_videoram_lo_r<1>));
 	map(0x413000, 0x4131ff).rw(FUNC(subsino2_state::ss9601_scrollram_1_lo_r), FUNC(subsino2_state::ss9601_scrollram_1_lo_w));
 	// read lo (REEL)
 	map(0x416000, 0x416fff).r(FUNC(subsino2_state::ss9601_reelram_lo_r));
 	map(0x417000, 0x4171ff).rw(FUNC(subsino2_state::ss9601_scrollram_0_lo_r), FUNC(subsino2_state::ss9601_scrollram_0_lo_w));
 
 	// read hi (L1)
-	map(0x422000, 0x422fff).r(FUNC(subsino2_state::ss9601_videoram_1_hi_r));
+	map(0x422000, 0x422fff).r(FUNC(subsino2_state::ss9601_videoram_hi_r<1>));
 	map(0x423000, 0x4231ff).rw(FUNC(subsino2_state::ss9601_scrollram_1_hi_r), FUNC(subsino2_state::ss9601_scrollram_1_hi_w));
 	// read hi (REEL)
 	map(0x426000, 0x426fff).r(FUNC(subsino2_state::ss9601_reelram_hi_r));
 	map(0x427000, 0x4271ff).rw(FUNC(subsino2_state::ss9601_scrollram_0_hi_r), FUNC(subsino2_state::ss9601_scrollram_0_hi_w));
 
 	// write both (L1)
-	map(0x430000, 0x431fff).w(FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
-	map(0x432000, 0x432fff).w(FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
+	map(0x430000, 0x431fff).w(FUNC(subsino2_state::ss9601_videoram_hi_lo_w<1>));
+	map(0x432000, 0x432fff).w(FUNC(subsino2_state::ss9601_videoram_hi_lo_w<1>));
 	map(0x433000, 0x4331ff).w(FUNC(subsino2_state::ss9601_scrollram_1_hi_lo_w));
 	// write both (L0 & REEL)
-	map(0x434000, 0x435fff).w(FUNC(subsino2_state::ss9601_videoram_0_hi_lo_w));
+	map(0x434000, 0x435fff).w(FUNC(subsino2_state::ss9601_videoram_hi_lo_w<0>));
 	map(0x436000, 0x436fff).w(FUNC(subsino2_state::ss9601_reelram_hi_lo_w));
 	map(0x437000, 0x4371ff).w(FUNC(subsino2_state::ss9601_scrollram_0_hi_lo_w));
 
@@ -1085,9 +1053,9 @@ void subsino2_state::new2001_map(address_map &map)
 	bishjan_map(map);
 
 	// write both (L1, byte_lo2)
-	map(0x410000, 0x411fff).w(FUNC(subsino2_state::ss9601_videoram_1_hi_lo2_w));
+	map(0x410000, 0x411fff).w(FUNC(subsino2_state::ss9601_videoram_hi_lo2_w<1>));
 	// write both (L0 & REEL, byte_lo2)
-	map(0x414000, 0x415fff).w(FUNC(subsino2_state::ss9601_videoram_0_hi_lo2_w));
+	map(0x414000, 0x415fff).w(FUNC(subsino2_state::ss9601_videoram_hi_lo2_w<0>));
 
 	map(0x600020, 0x600020).w(FUNC(subsino2_state::ss9601_byte_lo2_w));
 }
@@ -1181,13 +1149,13 @@ void subsino2_state::mtrain_videoram_w(offs_t offset, uint8_t data)
 	switch (m_ss9601_byte_lo & (~0x08))
 	{
 	case 0x00:
-		ss9601_videoram_w(&m_layers[1], vram, offset,        data);
-		ss9601_videoram_w(&m_layers[1], vram, offset+0x1000, data);
+		m_layers[1].ss9601_videoram_w(vram, offset,        data);
+		m_layers[1].ss9601_videoram_w(vram, offset+0x1000, data);
 		break;
 
 	case 0x04:
-		ss9601_videoram_w(&m_layers[0], vram, offset,        data);
-		ss9601_videoram_w(&m_layers[0], vram, offset+0x1000, data);
+		m_layers[0].ss9601_videoram_w(vram, offset,        data);
+		m_layers[0].ss9601_videoram_w(vram, offset+0x1000, data);
 		break;
 
 	case 0x06:
@@ -1306,23 +1274,23 @@ void subsino2_state::saklove_map(address_map &map)
 	map(0x00000, 0x07fff).ram().share("nvram"); // battery
 
 	// read lo (L1)   (only half tilemap?)
-	map(0x12000, 0x12fff).rw(FUNC(subsino2_state::ss9601_videoram_1_lo_r), FUNC(subsino2_state::ss9601_videoram_1_lo_w));
+	map(0x12000, 0x12fff).rw(FUNC(subsino2_state::ss9601_videoram_lo_r<1>), FUNC(subsino2_state::ss9601_videoram_lo_w<1>));
 	map(0x13000, 0x131ff).rw(FUNC(subsino2_state::ss9601_scrollram_1_lo_r), FUNC(subsino2_state::ss9601_scrollram_1_lo_w));
 	// read lo (L0)
-	map(0x16000, 0x16fff).rw(FUNC(subsino2_state::ss9601_videoram_0_lo_r), FUNC(subsino2_state::ss9601_videoram_0_lo_w));
+	map(0x16000, 0x16fff).rw(FUNC(subsino2_state::ss9601_videoram_lo_r<0>), FUNC(subsino2_state::ss9601_videoram_lo_w<0>));
 	map(0x17000, 0x171ff).rw(FUNC(subsino2_state::ss9601_scrollram_0_lo_r), FUNC(subsino2_state::ss9601_scrollram_0_lo_w));
 
 	// read hi (L1)
-	map(0x22000, 0x22fff).rw(FUNC(subsino2_state::ss9601_videoram_1_hi_r), FUNC(subsino2_state::ss9601_videoram_1_hi_w));
+	map(0x22000, 0x22fff).rw(FUNC(subsino2_state::ss9601_videoram_hi_r<1>), FUNC(subsino2_state::ss9601_videoram_hi_w<1>));
 	map(0x23000, 0x231ff).rw(FUNC(subsino2_state::ss9601_scrollram_1_hi_r), FUNC(subsino2_state::ss9601_scrollram_1_hi_w));
 	// read hi (L0)
-	map(0x26000, 0x26fff).rw(FUNC(subsino2_state::ss9601_videoram_0_hi_r), FUNC(subsino2_state::ss9601_videoram_0_hi_w));
+	map(0x26000, 0x26fff).rw(FUNC(subsino2_state::ss9601_videoram_hi_r<0>), FUNC(subsino2_state::ss9601_videoram_hi_w<0>));
 	map(0x27000, 0x271ff).rw(FUNC(subsino2_state::ss9601_scrollram_0_hi_r), FUNC(subsino2_state::ss9601_scrollram_0_hi_w));
 
 	// write both (L1)
-	map(0x30000, 0x31fff).rw(FUNC(subsino2_state::ss9601_videoram_1_hi_r), FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
+	map(0x30000, 0x31fff).rw(FUNC(subsino2_state::ss9601_videoram_hi_r<1>), FUNC(subsino2_state::ss9601_videoram_hi_lo_w<1>));
 	// write both (L0)
-	map(0x34000, 0x35fff).rw(FUNC(subsino2_state::ss9601_videoram_0_hi_r), FUNC(subsino2_state::ss9601_videoram_0_hi_lo_w));
+	map(0x34000, 0x35fff).rw(FUNC(subsino2_state::ss9601_videoram_hi_r<0>), FUNC(subsino2_state::ss9601_videoram_hi_lo_w<0>));
 
 	map(0xe0000, 0xfffff).rom().region("maincpu", 0);
 }
@@ -1382,30 +1350,30 @@ void subsino2_state::xplan_map(address_map &map)
 	map(0x00000, 0x07fff).ram().share("nvram"); // battery
 
 	// write both (L1, byte_lo2)
-	map(0x10000, 0x11fff).w(FUNC(subsino2_state::ss9601_videoram_1_hi_lo2_w));
+	map(0x10000, 0x11fff).w(FUNC(subsino2_state::ss9601_videoram_hi_lo2_w<1>));
 	// read lo (L1)   (only half tilemap?)
-	map(0x12000, 0x12fff).r(FUNC(subsino2_state::ss9601_videoram_1_lo_r));
+	map(0x12000, 0x12fff).r(FUNC(subsino2_state::ss9601_videoram_lo_r<1>));
 	map(0x13000, 0x131ff).rw(FUNC(subsino2_state::ss9601_scrollram_1_lo_r), FUNC(subsino2_state::ss9601_scrollram_1_lo_w));
 
 	// write both (L0, byte_lo2)
-	map(0x14000, 0x15fff).w(FUNC(subsino2_state::ss9601_videoram_0_hi_lo2_w));
+	map(0x14000, 0x15fff).w(FUNC(subsino2_state::ss9601_videoram_hi_lo2_w<0>));
 	// read lo (REEL)
 	map(0x16000, 0x16fff).r(FUNC(subsino2_state::ss9601_reelram_lo_r));
 	map(0x17000, 0x171ff).rw(FUNC(subsino2_state::ss9601_scrollram_0_lo_r), FUNC(subsino2_state::ss9601_scrollram_0_lo_w));
 
 	// read hi (L1)
-	map(0x22000, 0x22fff).r(FUNC(subsino2_state::ss9601_videoram_1_hi_r));
+	map(0x22000, 0x22fff).r(FUNC(subsino2_state::ss9601_videoram_hi_r<1>));
 	map(0x23000, 0x231ff).rw(FUNC(subsino2_state::ss9601_scrollram_1_hi_r), FUNC(subsino2_state::ss9601_scrollram_1_hi_w));
 	// read hi (REEL)
 	map(0x26000, 0x26fff).r(FUNC(subsino2_state::ss9601_reelram_hi_r));
 	map(0x27000, 0x271ff).rw(FUNC(subsino2_state::ss9601_scrollram_0_hi_r), FUNC(subsino2_state::ss9601_scrollram_0_hi_w));
 
 	// write both (L1, byte_lo)
-	map(0x30000, 0x31fff).w(FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
-	map(0x32000, 0x32fff).w(FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
+	map(0x30000, 0x31fff).w(FUNC(subsino2_state::ss9601_videoram_hi_lo_w<1>));
+	map(0x32000, 0x32fff).w(FUNC(subsino2_state::ss9601_videoram_hi_lo_w<1>));
 	map(0x33000, 0x331ff).w(FUNC(subsino2_state::ss9601_scrollram_1_hi_lo_w));
 	// write both (L0 & REEL, byte_lo)
-	map(0x34000, 0x35fff).w(FUNC(subsino2_state::ss9601_videoram_0_hi_lo_w));
+	map(0x34000, 0x35fff).w(FUNC(subsino2_state::ss9601_videoram_hi_lo_w<0>));
 	map(0x36000, 0x36fff).w(FUNC(subsino2_state::ss9601_reelram_hi_lo_w));
 	map(0x37000, 0x371ff).w(FUNC(subsino2_state::ss9601_scrollram_0_hi_lo_w));
 
@@ -2906,7 +2874,7 @@ void subsino2_state::bishjan(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ss9601);
 	PALETTE(config, m_palette).set_entries(256);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
 	ramdac.set_addrmap(0, &subsino2_state::ramdac_map);
 
 	// sound hardware
@@ -3016,7 +2984,7 @@ void subsino2_state::mtrain(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ss9601);
 	PALETTE(config, m_palette).set_entries(256);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
 	ramdac.set_addrmap(0, &subsino2_state::ramdac_map);
 
 	// sound hardware
@@ -3076,7 +3044,7 @@ void subsino2_state::saklove(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ss9601);
 	PALETTE(config, m_palette).set_entries(256);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
 	ramdac.set_addrmap(0, &subsino2_state::ramdac_map);
 
 	// sound hardware
@@ -3128,7 +3096,7 @@ void subsino2_state::xplan(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ss9601);
 	PALETTE(config, m_palette).set_entries(256);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
 	ramdac.set_addrmap(0, &subsino2_state::ramdac_map);
 
 	// sound hardware
@@ -4309,6 +4277,8 @@ ROM_START( dongshiz ) // default password is all bet
 	ROM_FILL(              0x20, 0x01, 0x14 ) // return correct device ID for now
 	ROM_FILL(              0x27, 0x01, 0x1d ) // return expected checksum for now
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1997, mtrain,      0,        mtrain,   mtrain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                          "Magic Train (Ver. 1.4)",                0 )  // inside the program ROM says 1997, but on screen shows 1996

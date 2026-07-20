@@ -111,10 +111,201 @@ Notes:
 */
 
 #include "emu.h"
-#include "tmc600.h"
 
-#include "utf8.h"
+#include "cpu/cosmac/cosmac.h"
+#include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/tmc600/euro.h"
+#include "machine/cdp1852.h"
+#include "machine/ram.h"
+#include "machine/timer.h"
+#include "sound/cdp1869.h"
+#include "softlist_dev.h"
+#include "speaker.h"
 
+#define SCREEN_TAG          "screen"
+#define CDP1802_TAG         "cdp1802"
+#define CDP1869_TAG         "cdp1869"
+#define CDP1852_KB_TAG      "cdp1852_kb"
+#define CDP1852_BUS_TAG     "cdp1852_bus"
+#define CDP1852_TMC700_TAG  "cdp1852_printer"
+#define CENTRONICS_TAG      "centronics"
+
+#define TMC600_PAGE_RAM_SIZE    0x400
+#define TMC600_PAGE_RAM_MASK    0x3ff
+
+namespace {
+
+class tmc600_state : public driver_device
+{
+public:
+	tmc600_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, CDP1802_TAG),
+		m_vis(*this, CDP1869_TAG),
+		m_bwio(*this, CDP1852_KB_TAG),
+		m_cassette(*this, "cassette"),
+		m_centronics(*this, "centronics"),
+		m_bus(*this, "bus"),
+		m_ram(*this, RAM_TAG),
+		m_char_rom(*this, "chargen"),
+		m_page_ram(*this, "page_ram"),
+		m_color_ram(*this, "color_ram", TMC600_PAGE_RAM_SIZE, ENDIANNESS_LITTLE),
+		m_run(*this, "RUN"),
+		m_key_row(*this, "Y%u", 0)
+	{ }
+
+	void tmc600(machine_config &config) ATTR_COLD;
+
+private:
+	required_device<cosmac_device> m_maincpu;
+	required_device<cdp1869_device> m_vis;
+	required_device<cdp1852_device> m_bwio;
+	required_device<cassette_image_device> m_cassette;
+	required_device<centronics_device> m_centronics;
+	required_device<tmc600_eurobus_slot_device> m_bus;
+	required_device<ram_device> m_ram;
+	required_region_ptr<uint8_t> m_char_rom;
+	required_shared_ptr<uint8_t> m_page_ram;
+	memory_share_creator<uint8_t> m_color_ram;
+	required_ioport m_run;
+	required_ioport_array<8> m_key_row;
+
+	virtual void video_start() override ATTR_COLD;
+
+	uint8_t  rtc_r();
+	void printer_w(uint8_t data);
+	void vismac_register_w(uint8_t data);
+	void vismac_data_w(uint8_t data);
+	void page_ram_w(offs_t offset, uint8_t data);
+	int clear_r();
+	int ef2_r();
+	int ef3_r();
+	void q_w(int state);
+	void sc_w(uint8_t data);
+	void out3_w(uint8_t data);
+	void prd_w(int state);
+
+	uint8_t get_color(uint16_t pma);
+
+	// video state
+	int m_vismac_reg_latch = 0;     // video register latch
+	int m_vismac_color_latch = 0;   // color latch
+	bool m_blink = false;                // cursor blink
+	int m_frame = 0;
+	bool m_rtc_int = false;
+	u8 m_out3 = 0;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(blink_tick);
+	CDP1869_CHAR_RAM_READ_MEMBER(tmc600_char_ram_r);
+	CDP1869_PCB_READ_MEMBER(tmc600_pcb_r);
+
+	void cdp1869_page_ram(address_map &map) ATTR_COLD;
+	void tmc600_io_map(address_map &map) ATTR_COLD;
+	void tmc600_map(address_map &map) ATTR_COLD;
+
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
+};
+
+
+//**************************************************************************
+//  Video interface
+//**************************************************************************
+
+void tmc600_state::vismac_register_w(uint8_t data)
+{
+	m_vismac_reg_latch = data >> 4;
+}
+
+void tmc600_state::vismac_data_w(uint8_t data)
+{
+	uint16_t ma = m_maincpu->get_memory_address();
+
+	switch (m_vismac_reg_latch & 0x07)
+	{
+	case 2: m_vismac_color_latch = data & 0x0f; break;
+	case 3: m_vis->out3_w(data); break;
+	case 4: m_vis->out4_w(ma); break;
+	case 5: m_vis->out5_w(ma); break;
+	case 6: m_vis->out6_w(ma); break;
+	case 7: m_vis->out7_w(ma); break;
+	}
+}
+
+uint8_t tmc600_state::get_color(uint16_t pma)
+{
+	uint16_t pageaddr = pma & TMC600_PAGE_RAM_MASK;
+	uint8_t color = m_color_ram[pageaddr];
+
+	if (BIT(color, 3) && m_blink)
+	{
+		color = 0;
+	}
+
+	return color;
+}
+
+void tmc600_state::page_ram_w(offs_t offset, uint8_t data)
+{
+	m_page_ram[offset] = data;
+	m_color_ram[offset] = m_vismac_color_latch;
+}
+
+void tmc600_state::cdp1869_page_ram(address_map &map)
+{
+	map(0x000, 0x3ff).mirror(0x400).ram().share("page_ram").w(FUNC(tmc600_state::page_ram_w));
+}
+
+CDP1869_CHAR_RAM_READ_MEMBER( tmc600_state::tmc600_char_ram_r )
+{
+	uint16_t pageaddr = pma & TMC600_PAGE_RAM_MASK;
+	uint8_t color = get_color(pageaddr);
+	uint16_t charaddr = ((cma & 0x08) << 8) | (pmd << 3) | (cma & 0x07);
+	uint8_t cdb = m_char_rom[charaddr] & 0x3f;
+
+	int ccb0 = BIT(color, 2);
+	int ccb1 = BIT(color, 1);
+
+	return (ccb1 << 7) | (ccb0 << 6) | cdb;
+}
+
+CDP1869_PCB_READ_MEMBER( tmc600_state::tmc600_pcb_r )
+{
+	uint16_t pageaddr = pma & TMC600_PAGE_RAM_MASK;
+	uint8_t color = get_color(pageaddr);
+
+	return BIT(color, 0);
+}
+
+void tmc600_state::prd_w(int state)
+{
+	if (!state) {
+		m_frame++;
+
+		switch (m_frame) {
+		case 8:
+			m_maincpu->int_w(CLEAR_LINE);
+			break;
+
+		case 16:
+			m_maincpu->int_w(m_rtc_int);
+			m_blink = !m_blink;
+			m_frame = 0;
+			break;
+		}
+	}
+}
+
+void tmc600_state::video_start()
+{
+	// state saving
+	save_item(NAME(m_vismac_reg_latch));
+	save_item(NAME(m_vismac_color_latch));
+	save_item(NAME(m_frame));
+	save_item(NAME(m_blink));
+	save_item(NAME(m_out3));
+}
 
 //**************************************************************************
 //  I/O
@@ -311,6 +502,23 @@ INPUT_PORTS_END
 //  MACHINE DRIVERS
 //**************************************************************************
 
+static const gfx_layout tmc600_charlayout =
+{
+	6, 9,                   // 6 x 9 characters
+	256,                    // 256 characters
+	1,                      // 1 bits per pixel
+	{ 0 },                  // no bitplanes
+	// x offsets
+	{ 2, 3, 4, 5, 6, 7 },
+	// y offsets
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 2048*8 },
+	8*8                     // every char takes 8 x 8 bytes
+};
+
+static GFXDECODE_START( gfx_tmc600 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, tmc600_charlayout, 0, 36 )
+GFXDECODE_END
+
 void tmc600_state::tmc600(machine_config &config)
 {
 	// CPU
@@ -325,8 +533,20 @@ void tmc600_state::tmc600(machine_config &config)
 	cpu.tpb_cb().set(CDP1852_KB_TAG, FUNC(cdp1852_device::clock_w));
 	cpu.tpb_cb().append(CDP1852_TMC700_TAG, FUNC(cdp1852_device::clock_w));
 
-	// sound and video hardware
-	tmc600_video(config);
+	// video hardware
+	GFXDECODE(config, "gfxdecode", CDP1869_TAG":palette", gfx_tmc600);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	CDP1869(config, m_vis, 3.57_MHz_XTAL, &tmc600_state::cdp1869_page_ram);
+	m_vis->add_pal_screen(config, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL);
+	m_vis->set_color_clock(cdp1869_device::COLOR_CLK_PAL);
+	m_vis->set_pcb_read_callback(FUNC(tmc600_state::tmc600_pcb_r));
+	m_vis->set_char_ram_read_callback(FUNC(tmc600_state::tmc600_char_ram_r));
+	m_vis->pal_ntsc_callback().set_constant(1);
+	m_vis->prd_callback().set(FUNC(tmc600_state::prd_w));
+	m_vis->set_screen(SCREEN_TAG);
+	m_vis->add_route(ALL_OUTPUTS, "mono", 0.1);
 
 	// keyboard output latch
 	CDP1852(config, m_bwio); // clock is CDP1802 TPB
@@ -404,6 +624,7 @@ ROM_START( tmc600s2 )
 	ROM_LOAD( "chargen",    0x0000, 0x1000, CRC(93f92cbf) SHA1(371156fb38fa5319c6fde537ccf14eed94e7adfb) )
 ROM_END
 
+} // anonymous namespace
 
 //**************************************************************************
 //  SYSTEM DRIVERS

@@ -274,26 +274,26 @@ DEFINE_DEVICE_TYPE(MK68564,         mk68564_device,     "mk68564",         "Most
 //-------------------------------------------------
 void z80sio_device::device_add_mconfig(machine_config &config)
 {
-	Z80SIO_CHANNEL(config, CHANA_TAG, 0);
-	Z80SIO_CHANNEL(config, CHANB_TAG, 0);
+	Z80SIO_CHANNEL(config, CHANA_TAG);
+	Z80SIO_CHANNEL(config, CHANB_TAG);
 }
 
 void z80dart_device::device_add_mconfig(machine_config &config)
 {
-	Z80DART_CHANNEL(config, CHANA_TAG, 0);
-	Z80DART_CHANNEL(config, CHANB_TAG, 0);
+	Z80DART_CHANNEL(config, CHANA_TAG);
+	Z80DART_CHANNEL(config, CHANB_TAG);
 }
 
 void i8274_device::device_add_mconfig(machine_config &config)
 {
-	I8274_CHANNEL(config, CHANA_TAG, 0);
-	I8274_CHANNEL(config, CHANB_TAG, 0);
+	I8274_CHANNEL(config, CHANA_TAG);
+	I8274_CHANNEL(config, CHANB_TAG);
 }
 
 void mk68564_device::device_add_mconfig(machine_config &config)
 {
-	MK68564_CHANNEL(config, CHANA_TAG, 0);
-	MK68564_CHANNEL(config, CHANB_TAG, 0);
+	MK68564_CHANNEL(config, CHANA_TAG);
+	MK68564_CHANNEL(config, CHANB_TAG);
 }
 
 
@@ -1908,7 +1908,7 @@ void z80sio_channel::advance_rx_fifo()
 			m_rx_error_fifo >>= 8;
 
 			// load error status from the FIFO
-			m_rr1 = (m_rr1 & ~m_rr1_auto_reset) | uint8_t(m_rx_error_fifo & 0x000000ffU & ~RR1_HIDDEN_1ST_MARKER);
+			update_rr1();
 		}
 		else
 		{
@@ -1918,6 +1918,11 @@ void z80sio_channel::advance_rx_fifo()
 		}
 	}
 	update_rx_int();
+}
+
+void z80sio_channel::update_rr1()
+{
+	m_rr1 = (m_rr1 & ~m_rr1_auto_reset) | uint8_t(m_rx_error_fifo & 0xffU & ~RR1_HIDDEN_1ST_MARKER);
 }
 
 uint8_t z80sio_channel::get_special_rx_mask() const
@@ -1944,16 +1949,12 @@ void z80sio_channel::update_rx_int()
 	auto rx_int_mode = m_wr1 & WR1_RX_INT_MODE_MASK;
 	if (rx_int_mode != WR1_RX_INT_DISABLE)
 	{
-		if (m_rr1 & get_special_rx_mask())
+		if (m_rr1 & RR1_END_OF_FRAME ||
+			(m_rx_fifo_depth != 0 &&
+			 ((m_rr1 & get_special_rx_mask()) != 0 ||
+			  rx_int_mode != WR1_RX_INT_FIRST ||
+			  (m_rx_error_fifo & RR1_HIDDEN_1ST_MARKER) != 0)))
 			state = true;
-		else if (m_rx_fifo_depth)
-		{
-			// FIFO not empty
-			if (rx_int_mode != WR1_RX_INT_FIRST)
-				state = true;
-			else if (m_rx_error_fifo & RR1_HIDDEN_1ST_MARKER)
-				state = true;
-		}
 	}
 	LOGINT("rx %d wr1 %02x rr1 %02x fd %u ref %06x\n", state, m_wr1, m_rr1, m_rx_fifo_depth, m_rx_error_fifo);
 	if (state)
@@ -2309,7 +2310,7 @@ void z80sio_channel::queue_received(uint16_t data, uint32_t error)
 		m_rx_data_fifo |= uint32_t(data & 0x00ffU) << (8 * m_rx_fifo_depth);
 		m_rx_error_fifo |= error << (8 * m_rx_fifo_depth);
 		if (!m_rx_fifo_depth)
-			m_rr1 = (m_rr1 & ~m_rr1_auto_reset) | uint8_t(error & ~RR1_HIDDEN_1ST_MARKER);
+			update_rr1();
 		++m_rx_fifo_depth;
 	}
 

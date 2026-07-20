@@ -39,14 +39,14 @@
 #include "emu.h"
 #include "render.h"
 
-#include "corestr.h"
+#include "config.h"
+#include "drivenum.h"
 #include "emuopts.h"
 #include "fileio.h"
 #include "rendfont.h"
 #include "rendlay.h"
 #include "rendutil.h"
-#include "config.h"
-#include "drivenum.h"
+#include "uiinput.h"
 #include "layout/generic.h"
 
 #include "ui/uimain.h"
@@ -55,6 +55,8 @@
 #include "util/language.h"
 #include "util/path.h"
 #include "util/xmlfile.h"
+
+#include "corestr.h"
 
 #include <algorithm>
 #include <limits>
@@ -933,6 +935,7 @@ template <typename T>
 render_target::render_target(render_manager &manager, render_container *ui, T &&layout, u32 flags, constructor_impl_t)
 	: m_next(nullptr)
 	, m_manager(manager)
+	, m_event_sink(manager.m_event_sink)
 	, m_ui_container(ui)
 	, m_curview(0U)
 	, m_flags(flags)
@@ -1055,7 +1058,7 @@ void render_target::set_bounds(s32 width, s32 height, float pixel_aspect)
 	m_bounds.x0 = m_bounds.y0 = 0;
 	m_bounds.x1 = float(width);
 	m_bounds.y1 = float(height);
-	m_pixel_aspect = pixel_aspect != 0.0F ? pixel_aspect : 1.0F;
+	m_pixel_aspect = (pixel_aspect != 0.0F) ? pixel_aspect : 1.0F;
 }
 
 
@@ -1832,6 +1835,46 @@ void render_target::resolve_tags()
 
 	update_layer_config();
 	current_view().preload();
+}
+
+
+//-------------------------------------------------
+//  osd::ui_event_handler implementation
+//-------------------------------------------------
+
+void render_target::push_window_focus_event()
+{
+	m_event_sink.push_window_focus_event(*this);
+}
+
+void render_target::push_window_defocus_event()
+{
+	m_event_sink.push_window_defocus_event(*this);
+}
+
+void render_target::push_mouse_wheel_event(s32 x, s32 y, short delta, int lines)
+{
+	m_event_sink.push_mouse_wheel_event(*this, x, y, delta, lines);
+}
+
+void render_target::push_pointer_update(pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 buttons, u32 pressed, u32 released, s16 clicks)
+{
+	m_event_sink.push_pointer_update(*this, type, ptrid, device, x, y, buttons, pressed, released, clicks);
+}
+
+void render_target::push_pointer_leave(pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 released, s16 clicks)
+{
+	m_event_sink.push_pointer_leave(*this, type, ptrid, device, x, y, released, clicks);
+}
+
+void render_target::push_pointer_abort(pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 released, s16 clicks)
+{
+	m_event_sink.push_pointer_abort(*this, type, ptrid, device, x, y, released, clicks);
+}
+
+void render_target::push_char_event(char32_t ch)
+{
+	m_event_sink.push_char_event(*this, ch);
 }
 
 
@@ -3320,8 +3363,9 @@ done:
 //  render_manager - constructor
 //-------------------------------------------------
 
-render_manager::render_manager(running_machine &machine)
+render_manager::render_manager(running_machine &machine, ui_event_sink &event_sink)
 	: m_machine(machine)
+	, m_event_sink(event_sink)
 	, m_ui_target(nullptr)
 	, m_live_textures(0)
 	, m_texture_id(0)
@@ -3443,66 +3487,51 @@ render_target *render_manager::target_by_index(int index) const
 //  fonts
 //-------------------------------------------------
 
-float render_manager::ui_aspect(render_container *rc)
+float render_manager::ui_aspect(render_target &target)
 {
-	// work out if this is a UI container
-	render_target *target = nullptr;
-	if (!rc)
-	{
-		target = &ui_target();
-		rc = target->ui_container();
-		assert(rc);
-	}
-	else
-	{
-		for (render_target &t : m_targetlist)
-		{
-			if (t.ui_container() == rc)
-			{
-				target = &t;
-				break;
-			}
-		}
-	}
+	assert(target.ui_container());
 
+	// based on the orientation of the target, compute height/width or width/height
+	int const orient = orientation_add(target.orientation(), target.ui_container()->orientation());
 	float aspect;
-
-	if (target)
-	{
-		// UI container, aggregated multi-screen target
-
-		// based on the orientation of the target, compute height/width or width/height
-		int const orient = orientation_add(target->orientation(), rc->orientation());
-		if (!(orient & ORIENTATION_SWAP_XY))
-			aspect = float(target->height()) / float(target->width());
-		else
-			aspect = float(target->width()) / float(target->height());
-
-		// if we have a valid pixel aspect, apply that and return
-		if (target->pixel_aspect() != 0.0f)
-		{
-			float pixel_aspect = target->pixel_aspect();
-
-			if (orient & ORIENTATION_SWAP_XY)
-				pixel_aspect = 1.0f / pixel_aspect;
-
-			return aspect /= pixel_aspect;
-		}
-	}
+	if (!(orient & ORIENTATION_SWAP_XY))
+		aspect = float(target.height()) / float(target.width());
 	else
-	{
-		// single screen container
+		aspect = float(target.width()) / float(target.height());
 
-		// based on the orientation of the target, compute height/width or width/height
-		int const orient = rc->orientation();
-		if (!(orient & ORIENTATION_SWAP_XY))
-			aspect = (float)rc->screen()->visible_area().height() / (float)rc->screen()->visible_area().width();
-		else
-			aspect = (float)rc->screen()->visible_area().width() / (float)rc->screen()->visible_area().height();
+	// if we have a valid pixel aspect, apply that and return
+	if (target.pixel_aspect() != 0.0F)
+	{
+		float pixel_aspect = target.pixel_aspect();
+
+		if (orient & ORIENTATION_SWAP_XY)
+			pixel_aspect = 1.0F / pixel_aspect;
+
+		return aspect / pixel_aspect;
 	}
 
 	// clamp for extreme proportions
-	return std::clamp(aspect, 0.66f, 1.5f);
+	return std::clamp(aspect, 0.66F, 1.5F);
+}
+
+float render_manager::ui_aspect(render_container &rc)
+{
+	// deal with UI containers
+	for (render_target &target : m_targetlist)
+	{
+		if (target.ui_container() == &rc)
+			return ui_aspect(target);
+	}
+
+	// based on the orientation of the target, compute height/width or width/height
+	assert(rc.screen());
+	int const orient = rc.orientation();
+	float const viswidth = rc.screen()->visible_area().width();
+	float const visheight = rc.screen()->visible_area().height();
+	float const aspect = !(orient & ORIENTATION_SWAP_XY) ? (visheight / viswidth) : (viswidth / visheight);
+
+	// clamp for extreme proportions
+	return std::clamp(aspect, 0.66F, 1.5F);
 }
 
 

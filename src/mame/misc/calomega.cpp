@@ -728,7 +728,23 @@
 ***********************************************************************************/
 
 #include "emu.h"
-#include "calomega.h"
+
+#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/r65c02.h"
+#include "cpu/mcs48/mcs48.h"
+#include "machine/6821pia.h"
+#include "machine/6850acia.h"
+#include "machine/clock.h"
+#include "machine/i8251.h"
+#include "machine/nvram.h"
+#include "machine/ticket.h"
+#include "machine/timer.h"
+#include "sound/ay8910.h"
+#include "video/mc6845.h"
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
 
 #include "kenokb.lh"
 
@@ -736,6 +752,231 @@
 #define CPU_CLOCK           (MASTER_CLOCK/16)
 #define UART_CLOCK          (MASTER_CLOCK/16)
 #define SND_CLOCK           (MASTER_CLOCK/8)
+
+namespace {
+
+class calomega_state : public driver_device
+{
+public:
+	calomega_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_pia(*this, "pia%u", 0U),
+		m_maincpu(*this, "maincpu"),
+		m_kstec(*this, "kstec"),
+		m_uart(*this, "uart"),
+		m_key_row(*this, "KB_%u", 0),
+		m_acia6850(*this, "acia6850_%u", 0U),
+		m_aciabaud(*this, "aciabaud"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_hopper(*this, "hopper"),
+		m_in0(*this, "IN0"),
+		m_in0_0(*this, "IN0-0"),
+		m_in0_1(*this, "IN0-1"),
+		m_in0_2(*this, "IN0-2"),
+		m_in0_3(*this, "IN0-3"),
+		m_frq(*this, "FRQ"),
+		m_sw2(*this, "SW2"),
+		m_lamps(*this, "lamp%u", 1U),
+		m_red(*this, "POT1_RED"),
+		m_grn(*this, "POT2_GREEN"),
+		m_blu(*this, "POT3_BLUE")
+	{
+	}
+
+	void init_comg079() ATTR_COLD;
+	void init_comg080() ATTR_COLD;
+	void init_comg145() ATTR_COLD;
+	void init_comg176() ATTR_COLD;
+	[[maybe_unused]] void init_any() ATTR_COLD;
+
+	void sys903(machine_config &config) ATTR_COLD;
+	void s903mod(machine_config &config) ATTR_COLD;
+	void sys903kb(machine_config &config) ATTR_COLD;
+	void sys905(machine_config &config) ATTR_COLD;
+	void sys906(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	void calomega_videoram_w(offs_t offset, uint8_t data);
+	void calomega_colorram_w(offs_t offset, uint8_t data);
+	uint8_t s903_mux_port_r();
+	void s903_mux_w(uint8_t data);
+	uint8_t s905_mux_port_r();
+	void s905_mux_w(uint8_t data);
+	[[maybe_unused]] uint8_t pia0_bin_r();
+	void pia0_aout_w(uint8_t data);
+	void pia0_bout_w(uint8_t data);
+	uint8_t pia1_ain_r();
+	uint8_t pia1_bin_r();
+	uint8_t dummy_pia_r();
+	void pia1_aout_w(uint8_t data);
+	void pia1_bout_w(uint8_t data);
+	void lamps_903a_w(uint8_t data);
+	void lamps_903b_w(uint8_t data);
+	void lamps_905_w(uint8_t data);
+	void dummy_pia_w(uint8_t data);
+	uint8_t keyb_903_r();
+
+	void pia1_cb2_w(int state);
+	void vblank0_w(int state);
+	void vblank1_w(int state);
+	void vblank2_w(int state);
+	void dummy_pia_line_w(int state);
+	void write_acia_clock(int state);
+	void w_903kb_acia_clock(int state);
+	void update_aciabaud_scale(int state);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_0);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_1);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_2);
+
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
+	uint32_t screen_update_calomega(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void calomega_palette(palette_device &palette) const;
+
+	void sys903_map(address_map &map) ATTR_COLD;
+	void s903mod_map(address_map &map) ATTR_COLD;
+	void sys905_map(address_map &map) ATTR_COLD;
+	void sys906_map(address_map &map) ATTR_COLD;
+	void kstec_mem_map(address_map &map) ATTR_COLD;
+	void kstec_io_map(address_map &map) ATTR_COLD;
+
+	optional_device_array<pia6821_device, 2> m_pia;
+	required_device<m6502_device> m_maincpu;
+	optional_device<i8035_device> m_kstec;
+	optional_device<i8251_device> m_uart;
+	optional_ioport_array<16> m_key_row;
+	optional_device_array<acia6850_device, 1> m_acia6850;  // keep array mode for future implementations
+	optional_device<clock_device> m_aciabaud;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+
+	required_device<ticket_dispenser_device> m_hopper;
+
+	optional_ioport m_in0;
+	optional_ioport m_in0_0;
+	optional_ioport m_in0_1;
+	optional_ioport m_in0_2;
+	optional_ioport m_in0_3;
+
+	optional_ioport m_frq;
+	optional_ioport m_sw2;
+
+	output_finder<9> m_lamps;
+	required_ioport m_red;
+	required_ioport m_grn;
+	required_ioport m_blu;
+
+	uint8_t m_timer = 0U;
+	int m_s903_mux_data = 0;
+	int m_s905_mux_data = 0;
+	int m_pia_data = 0;
+	bool m_lockout = false;
+	bool m_diverter = false;
+	int m_kbscan = 0;
+	int m_rxrdy = 0;
+	int r_pot = 0;
+	int g_pot = 0;
+	int b_pot = 0;
+
+	tilemap_t *m_bg_tilemap = nullptr;
+};
+
+
+/**************************************************
+*                Video Hardware                   *
+**************************************************/
+
+void calomega_state::calomega_videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void calomega_state::calomega_colorram_w(offs_t offset, uint8_t data)
+{
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+TILE_GET_INFO_MEMBER(calomega_state::get_bg_tile_info)
+{
+/*  - bits -
+    7654 3210
+    --xx xx--   tiles color.
+    ---- --x-   tiles bank.
+    x--- ---x   extended tiles addressing.
+    -x-- ----   seems unused.
+*/
+	int attr = m_colorram[tile_index];
+	int code = ((attr & 1) << 8) | m_videoram[tile_index];  // bit 0 extends the the tiles addressing.
+	int bank = (attr & 0x02) >> 1;                          // bit 1 switch the gfx banks.
+	int color = (attr & 0x3c) >> 2;                         // bits 2-3-4-5 for color.
+
+	tileinfo.set(bank, code, color, 0);
+}
+
+void calomega_state::video_start()
+{
+	m_gfxdecode->gfx(0)->set_granularity(8);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(calomega_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 31);
+}
+
+uint32_t calomega_state::screen_update_calomega(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	if(r_pot != m_red->read()) { r_pot = m_red->read() * 2.55; calomega_palette(*m_palette);}
+	if(g_pot != m_grn->read()) { g_pot = m_grn->read() * 2.55; calomega_palette(*m_palette);}
+	if(b_pot != m_blu->read()) { b_pot = m_blu->read() * 2.55; calomega_palette(*m_palette);}
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
+
+void calomega_state::calomega_palette(palette_device &palette) const
+{
+/*  The proms are 256 x 4 bits, but the games only seem to need the first 128 entries,
+    and the rest of the PROM data looks like junk rather than valid colors
+
+    prom bits
+    3210
+    ---x   red component
+    --x-   green component
+    -x--   blue component
+    x---   foreground (colors with this bit set are full brightness,
+           colors with it clear are attenuated by the analogic color pots)
+*/
+
+	uint8_t const *const color_prom = memregion("proms")->base();
+	if (!color_prom)
+		return;
+
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		int const nibble = color_prom[i];
+
+		int const fg = BIT(nibble, 3);
+
+		// red component
+		int const r = BIT(nibble, 0) * (fg ? 0xff : r_pot);
+
+		// green component
+		int const g = BIT(nibble, 1) * (fg ? 0xff : g_pot);
+
+		// blue component
+		int const b = BIT(nibble, 2) * (fg ? 0xff : b_pot);
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
 
 
 /**************************************************
@@ -4640,7 +4881,7 @@ void calomega_state::sys903(machine_config &config)
 	ay8912.add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	// acia 0
-	ACIA6850(config, m_acia6850[0], 0);
+	ACIA6850(config, m_acia6850[0]);
 	m_acia6850[0]->irq_handler().set_inputline("maincpu", M6502_IRQ_LINE);
 
 	clock_device &aciabaud(CLOCK(config, "aciabaud", UART_CLOCK));
@@ -4713,7 +4954,7 @@ void calomega_state::sys903kb(machine_config &config)
 	ay8912.add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	// acia 0
-	ACIA6850(config, m_acia6850[0], 0);
+	ACIA6850(config, m_acia6850[0]);
 	m_acia6850[0]->txd_handler().set("uart", FUNC(i8251_device::write_rxd));
 	m_acia6850[0]->irq_handler().set_inputline("maincpu", M6502_IRQ_LINE);
 
@@ -5919,27 +6160,57 @@ ROM_START( jjpokerb )  // pokr_j
 	ROM_LOAD( "tunipoker.u28",  0x0000, 0x0100, CRC(5101a33b) SHA1(a36bc421064d0ed96beb27b549f69adce0a553c2) )
 ROM_END
 
-ROM_START( ssipkr24 )  // pokr02_4 (gfx and prom from jjpoker)
+/*
+
+  SSI Poker 4.0
+
+  PCB is marked: "K4449" on component side.
+  PCB is marked: "II QUALITY 94V-O" and "92-16" on solder side.
+
+  1x R6502P  (u1)       8-bit Microprocessor.
+  1x MC6845P (u24)      CRT Controller (CRTC).
+  2x EF6821P (u39, u54) Peripheral Interface Adapter.
+  1x EF6850P (u81)      Asincronous Communications Interface Adapter (ACIA).
+  1x AY-3-8912 (u77)    Programmable Sound Generator.
+  1x NE4558    (u73)    Dual general-purpouse Operational Amplifier.
+  1x LM380N    (u79)    Audio Amplifier.
+
+  ROMs
+  9x TMS2716  (u5-u9, u67-u70) dumped.
+  1x N82S129N (u28)            dumped.
+
+  RAMs
+  2x LH5101S (u10, u11)
+  4x 2114L-3 (u15-u18)
+
+  1x oscillator 10.000 MHz (y1).
+  2x 28x2 edge connector.
+  5x trimmer (r3, r4, r5, r33, r118).
+  1x 8 DIP switches bank (SW2, SW1 is unpopulated).
+  1x battery 3.6V.
+
+*/
+ROM_START( ssipkr40 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pokr02_4.01.u5", 0x1800, 0x0800, CRC(8adf1d6d) SHA1(d83677eed9426841767d947919f6da671b5fbed4) )
-	ROM_LOAD( "pokr02_4.02.u6", 0x2000, 0x0800, CRC(5298a01c) SHA1(a0085498699bc15cc6ada9e4e9541bd84b97eeae) )
-	ROM_LOAD( "pokr02_4.03.u7", 0x2800, 0x0800, CRC(30b5ead6) SHA1(7650ebb5f17eae17f3a0ddee67432a7f9dbf1c13) )
-	ROM_LOAD( "pokr02_4.04.u8", 0x3000, 0x0800, CRC(ade57860) SHA1(ee80e97302a4d6371fde5bacb58747075976f617) )
-	ROM_LOAD( "pokr02_4.05.u9", 0x3800, 0x0800, CRC(ad15250b) SHA1(d006657df1d2e01e33a3efb906e4532a2cd5b85d) )
+	ROM_LOAD( "4.01.1800.u5",    0x1800, 0x0800, CRC(461eb68c) SHA1(54781670930c723c993ca9ad80e06e38ddd2f035) )
+	ROM_LOAD( "4.02.2000.u6",    0x2000, 0x0800, CRC(099094a9) SHA1(c5a6ccb5ec0bebc79ef0b9c98595ef87c65ce361) )
+	ROM_LOAD( "4.03.2800.u7",    0x2800, 0x0800, CRC(1c923554) SHA1(d0050a8833f9a1a5fa0598b06a7bb265f0e814e4) )
+	ROM_LOAD( "4.04.3000.u8",    0x3000, 0x0800, CRC(552bf73d) SHA1(bf9197aab029c8dfaac88abcbda57547845323da) )
+	ROM_LOAD( "4.05.3800.u9",    0x3800, 0x0800, CRC(4d388d13) SHA1(8d46d6c227fe22f0433f02909b172f60cada1dd4) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_LOAD( "tuni-83.u67",    0x0000, 0x0800, BAD_DUMP CRC(a8ac979d) SHA1(f7299d3f7c4aded028a65ae4365c174f0e953824) )
+	ROM_LOAD( "et_67.cg0.u67",    0x0000, 0x0800, CRC(a8ac979d) SHA1(f7299d3f7c4aded028a65ae4365c174f0e953824) )
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_LOAD( "tuni-83.u70",    0x0000, 0x0800, BAD_DUMP CRC(c131bf96) SHA1(3fb6717955a7312061395e5770c0f1ca9716d77c) )
-	ROM_LOAD( "tuni-83.u69",    0x0800, 0x0800, BAD_DUMP CRC(3483b4fb) SHA1(ac04b68c5fb8f8f142582181ad13bee87636cead) )
-	ROM_LOAD( "tuni-83.u68",    0x1000, 0x0800, BAD_DUMP CRC(e055a148) SHA1(d80e4330dce96b98df5bec731876f185476d6058) )
+	ROM_LOAD( "et_70.cg2c.u70", 0x0000, 0x0800, CRC(c131bf96) SHA1(3fb6717955a7312061395e5770c0f1ca9716d77c) )
+	ROM_LOAD( "et_69.cg2b.u69", 0x0800, 0x0800, CRC(3483b4fb) SHA1(ac04b68c5fb8f8f142582181ad13bee87636cead) )
+	ROM_LOAD( "et_68.cg2a.u68", 0x1000, 0x0800, CRC(e055a148) SHA1(d80e4330dce96b98df5bec731876f185476d6058) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "tunipoker.u28",  0x0000, 0x0100, BAD_DUMP CRC(5101a33b) SHA1(a36bc421064d0ed96beb27b549f69adce0a553c2) )
+	ROM_LOAD( "n82s129n.u28",  0x0000, 0x0100, CRC(a26a8fae) SHA1(d570fe9443a0912bd34b81ac4c3e4c5f8901f523) )
 ROM_END
 
-ROM_START( ssipkr30 )  // pokr03_0 (gfx and prom from jjpoker)
+ROM_START( ssipkr30 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pokr03_0.01.u5", 0x1800, 0x0800, CRC(db9581fe) SHA1(605b254e0ebb96423eb522ce75242083d70f01ca) )
 	ROM_LOAD( "pokr03_0.02.u6", 0x2000, 0x0800, CRC(861243ad) SHA1(290eba5c820177669e5adeac1e2f172b73789542) )
@@ -5948,35 +6219,35 @@ ROM_START( ssipkr30 )  // pokr03_0 (gfx and prom from jjpoker)
 	ROM_LOAD( "pokr03_0.05.u9", 0x3800, 0x0800, CRC(bd2ffd49) SHA1(b60c3866b11acd5053ec6dc5c37c0e322cb29478) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_LOAD( "tuni-83.u67",    0x0000, 0x0800, BAD_DUMP CRC(a8ac979d) SHA1(f7299d3f7c4aded028a65ae4365c174f0e953824) )
+	ROM_LOAD( "et_67.cg0.u67",    0x0000, 0x0800, CRC(a8ac979d) SHA1(f7299d3f7c4aded028a65ae4365c174f0e953824) )
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_LOAD( "tuni-83.u70",    0x0000, 0x0800, BAD_DUMP CRC(c131bf96) SHA1(3fb6717955a7312061395e5770c0f1ca9716d77c) )
-	ROM_LOAD( "tuni-83.u69",    0x0800, 0x0800, BAD_DUMP CRC(3483b4fb) SHA1(ac04b68c5fb8f8f142582181ad13bee87636cead) )
-	ROM_LOAD( "tuni-83.u68",    0x1000, 0x0800, BAD_DUMP CRC(e055a148) SHA1(d80e4330dce96b98df5bec731876f185476d6058) )
+	ROM_LOAD( "et_70.cg2c.u70", 0x0000, 0x0800, CRC(c131bf96) SHA1(3fb6717955a7312061395e5770c0f1ca9716d77c) )
+	ROM_LOAD( "et_69.cg2b.u69", 0x0800, 0x0800, CRC(3483b4fb) SHA1(ac04b68c5fb8f8f142582181ad13bee87636cead) )
+	ROM_LOAD( "et_68.cg2a.u68", 0x1000, 0x0800, CRC(e055a148) SHA1(d80e4330dce96b98df5bec731876f185476d6058) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "tunipoker.u28",  0x0000, 0x0100, BAD_DUMP CRC(5101a33b) SHA1(a36bc421064d0ed96beb27b549f69adce0a553c2) )
+	ROM_LOAD( "n82s129n.u28",  0x0000, 0x0100, CRC(a26a8fae) SHA1(d570fe9443a0912bd34b81ac4c3e4c5f8901f523) )
 ROM_END
 
-ROM_START( ssipkr40 )  // (gfx and prom from jjpoker)
+ROM_START( ssipkr24 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "40-1.903.u5",    0x1800, 0x0800, CRC(461eb68c) SHA1(54781670930c723c993ca9ad80e06e38ddd2f035) )
-	ROM_LOAD( "40-2.903.u6",    0x2000, 0x0800, CRC(099094a9) SHA1(c5a6ccb5ec0bebc79ef0b9c98595ef87c65ce361) )
-	ROM_LOAD( "40-3.903.u7",    0x2800, 0x0800, CRC(1c923554) SHA1(d0050a8833f9a1a5fa0598b06a7bb265f0e814e4) )
-	ROM_LOAD( "40-4.903.u8",    0x3000, 0x0800, CRC(552bf73d) SHA1(bf9197aab029c8dfaac88abcbda57547845323da) )
-	ROM_LOAD( "40-5.903.u9",    0x3800, 0x0800, CRC(4d388d13) SHA1(8d46d6c227fe22f0433f02909b172f60cada1dd4) )
+	ROM_LOAD( "pokr02_4.01.u5", 0x1800, 0x0800, CRC(8adf1d6d) SHA1(d83677eed9426841767d947919f6da671b5fbed4) )
+	ROM_LOAD( "pokr02_4.02.u6", 0x2000, 0x0800, CRC(5298a01c) SHA1(a0085498699bc15cc6ada9e4e9541bd84b97eeae) )
+	ROM_LOAD( "pokr02_4.03.u7", 0x2800, 0x0800, CRC(30b5ead6) SHA1(7650ebb5f17eae17f3a0ddee67432a7f9dbf1c13) )
+	ROM_LOAD( "pokr02_4.04.u8", 0x3000, 0x0800, CRC(ade57860) SHA1(ee80e97302a4d6371fde5bacb58747075976f617) )
+	ROM_LOAD( "pokr02_4.05.u9", 0x3800, 0x0800, CRC(ad15250b) SHA1(d006657df1d2e01e33a3efb906e4532a2cd5b85d) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_LOAD( "tuni-83.u67",    0x0000, 0x0800, BAD_DUMP CRC(a8ac979d) SHA1(f7299d3f7c4aded028a65ae4365c174f0e953824) )
+	ROM_LOAD( "et_67.cg0.u67",    0x0000, 0x0800, CRC(a8ac979d) SHA1(f7299d3f7c4aded028a65ae4365c174f0e953824) )
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_LOAD( "tuni-83.u70",    0x0000, 0x0800, BAD_DUMP CRC(c131bf96) SHA1(3fb6717955a7312061395e5770c0f1ca9716d77c) )
-	ROM_LOAD( "tuni-83.u69",    0x0800, 0x0800, BAD_DUMP CRC(3483b4fb) SHA1(ac04b68c5fb8f8f142582181ad13bee87636cead) )
-	ROM_LOAD( "tuni-83.u68",    0x1000, 0x0800, BAD_DUMP CRC(e055a148) SHA1(d80e4330dce96b98df5bec731876f185476d6058) )
+	ROM_LOAD( "et_70.cg2c.u70", 0x0000, 0x0800, CRC(c131bf96) SHA1(3fb6717955a7312061395e5770c0f1ca9716d77c) )
+	ROM_LOAD( "et_69.cg2b.u69", 0x0800, 0x0800, CRC(3483b4fb) SHA1(ac04b68c5fb8f8f142582181ad13bee87636cead) )
+	ROM_LOAD( "et_68.cg2a.u68", 0x1000, 0x0800, CRC(e055a148) SHA1(d80e4330dce96b98df5bec731876f185476d6058) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "tunipoker.u28",  0x0000, 0x0100, BAD_DUMP CRC(5101a33b) SHA1(a36bc421064d0ed96beb27b549f69adce0a553c2) )
+	ROM_LOAD( "n82s129n.u28",  0x0000, 0x0100, CRC(a26a8fae) SHA1(d570fe9443a0912bd34b81ac4c3e4c5f8901f523) )
 ROM_END
 
 /*
@@ -6229,6 +6500,8 @@ void calomega_state::init_any()
 
 }
 
+} // anonymous namespace
+
 /*************************************************
 *                  Game Drivers                  *
 *************************************************/
@@ -6288,9 +6561,9 @@ GAME( 1989, comg6004,  0,        sys906,   stand906, calomega_state, empty_init,
 GAME( 1982, elgrande,  0,        s903mod,  elgrande, calomega_state, empty_init,   ROT0, "Tuni Electro Service",                  "El Grande - 5 Card Draw (New)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1983, jjpoker,   0,        s903mod,  jjpoker,  calomega_state, empty_init,   ROT0, "Enter-Tech, Ltd.",                      "Jackpot Joker Poker (set 1)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1983, jjpokerb,  jjpoker,  s903mod,  jjpoker,  calomega_state, empty_init,   ROT0, "Enter-Tech, Ltd.",                      "Jackpot Joker Poker (set 2)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ssipkr24,  0,        s903mod,  ssipkr,   calomega_state, empty_init,   ROT0, "SSI",                                   "SSI Poker (v2.4)",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ssipkr30,  ssipkr24, s903mod,  ssipkr,   calomega_state, empty_init,   ROT0, "SSI",                                   "SSI Poker (v3.0)",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ssipkr40,  ssipkr24, s903mod,  ssipkr,   calomega_state, empty_init,   ROT0, "SSI",                                   "SSI Poker (v4.0)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ssipkr40,  0,        s903mod,  ssipkr,   calomega_state, empty_init,   ROT0, "SSI",                                   "SSI Poker (v4.0)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ssipkr30,  ssipkr40, s903mod,  ssipkr,   calomega_state, empty_init,   ROT0, "SSI",                                   "SSI Poker (v3.0)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ssipkr24,  ssipkr40, s903mod,  ssipkr,   calomega_state, empty_init,   ROT0, "SSI",                                   "SSI Poker (v2.4)",                                 MACHINE_SUPPORTS_SAVE )
 
 //****** Unofficial 906-III family 3rd party games *******
 GAME( 1990, cas21iwc,  0,        sys906,   cas21iwc, calomega_state, empty_init,   ROT0, "UCMC/IWC",                              "Casino 21 UCMC/IWC (ver 30.08)",                   MACHINE_SUPPORTS_SAVE )

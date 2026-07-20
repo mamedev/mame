@@ -1047,7 +1047,7 @@ void m10_state::m10(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m10);
 	PALETTE(config, m_palette, FUNC(m10_state::palette), 2 * 8);
 
-	TTL74123(config, m_ic8j1, 0); // completely illegible
+	TTL74123(config, m_ic8j1); // completely illegible
 	m_ic8j1->set_connection_type(TTL74123_NOT_GROUNDED_DIODE);  // the hook up type
 	m_ic8j1->set_resistor_value(RES_K(1));                      // resistor connected to RCext
 	m_ic8j1->set_capacitor_value(CAP_U(1));                     // capacitor connected to Cext and RCext
@@ -1056,7 +1056,7 @@ void m10_state::m10(machine_config &config)
 	m_ic8j1->set_clear_pin_value(1);                            // Clear pin - pulled high
 	m_ic8j1->out_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	TTL74123(config, m_ic8j2, 0);
+	TTL74123(config, m_ic8j2);
 	m_ic8j2->set_connection_type(TTL74123_NOT_GROUNDED_DIODE);  // the hook up type
 	// 10k + 20k variable resistor
 	m_ic8j2->set_resistor_value(RES_K(10 + 6));                 // resistor connected to RCext

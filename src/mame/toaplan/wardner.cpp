@@ -476,7 +476,7 @@ void wardner_state::wardner(machine_config &config)
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(2);
 
-	TOAPLAN_SCU(config, m_spritegen, 0);
+	TOAPLAN_SCU(config, m_spritegen);
 	m_spritegen->set_screen(m_screen);
 	m_spritegen->set_palette(m_palette);
 	m_spritegen->set_xoffsets(32, 14);
@@ -753,8 +753,8 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1987, wardner,   0,       wardner, wardner,   wardner_state, empty_init, ROT0, "Toaplan / Taito Corporation Japan",   "Wardner (World)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wardnerb,  wardner, wardner, wardner,   wardner_state, empty_init, ROT0, "bootleg",                             "Wardner (World, bootleg)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, pyros,     wardner, wardner, pyros,     wardner_state, empty_init, ROT0, "Toaplan / Taito America Corporation", "Pyros (US)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wardnerj,  wardner, wardner, wardnerj,  wardner_state, empty_init, ROT0, "Toaplan / Taito Corporation",         "Wardner no Mori (Japan)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wardnerjb, wardner, wardner, wardnerjb, wardner_state, empty_init, ROT0, "bootleg",                             "Wardner no Mori (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wardner,   0,       wardner, wardner,   wardner_state, empty_init, ROT0, "Toaplan / Taito",         "Wardner (World)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wardnerb,  wardner, wardner, wardner,   wardner_state, empty_init, ROT0, "bootleg",                 "Wardner (World, bootleg)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, pyros,     wardner, wardner, pyros,     wardner_state, empty_init, ROT0, "Toaplan / Taito America", "Pyros (US)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wardnerj,  wardner, wardner, wardnerj,  wardner_state, empty_init, ROT0, "Toaplan / Taito",         "Wardner no Mori (Japan)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wardnerjb, wardner, wardner, wardnerjb, wardner_state, empty_init, ROT0, "bootleg",                 "Wardner no Mori (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )

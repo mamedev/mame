@@ -15,7 +15,8 @@
     - SCN68681C1N40
     - MC68B50P
     - 16.667 MHz XTAL, 100 MHz XTAL
-    - XTAL X1 3.6864 MHz (assumed, unreadable), XTAL X2 (unreadable)
+    - XTAL X1 3.6864 MHz (assumed, unreadable), XTAL X2 20 MHz
+      (assumed, unreadable, next to AM7992BDC)
     - 4 position DIP switch
     - Buzzer
 
@@ -295,7 +296,7 @@ void xds_state::xds19p(machine_config &config)
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(64);
 
-	AM7990(config, m_lance, 0);
+	AM7990(config, m_lance, 20_MHz_XTAL / 2);
 	m_lance->intr_out().set_inputline(m_maincpu, 5).invert();
 	m_lance->dma_in().set(FUNC(xds_state::lance_dma_r));
 	m_lance->dma_out().set(FUNC(xds_state::lance_dma_w));
@@ -317,7 +318,7 @@ void xds_state::xds19p(machine_config &config)
 	m_serialport->dcd_handler().set(m_duart, FUNC(mc68681_device::ip2_w));
 	m_serialport->si_handler().set(m_duart, FUNC(mc68681_device::ip5_w));
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->irq_handler().set_inputline(m_maincpu, 3);
 	m_acia->txd_handler().set("kbd", FUNC(xds_kbd_hle_device::rx_w));
 

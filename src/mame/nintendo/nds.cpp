@@ -17,17 +17,15 @@
 #include "emu.h"
 #include "nds.h"
 
-#include <cstdarg>
+#define LOG_UNK_RD      (1U << 1)
+#define LOG_UNK_WR      (1U << 2)
+#define LOG_TIMER       (1U << 3)
+#define LOG_TIMER_EXTRA (1U << 4)
+#define LOG_SPI         (1U << 5)
+#define LOG_GAMECARD    (1U << 6)
+#define LOG_INTERRUPT   (1U << 7)
 
-#define LOG_UNK_RD		(1U << 1)
-#define LOG_UNK_WR		(1U << 2)
-#define LOG_TIMER		(1U << 3)
-#define LOG_TIMER_EXTRA	(1U << 4)
-#define LOG_SPI			(1U << 5)
-#define LOG_GAMECARD	(1U << 6)
-#define LOG_INTERRUPT	(1U << 7)
-
-#define VERBOSE			(0)
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 // Measured value from GBATEK.  Actual crystal unknown.
@@ -443,7 +441,6 @@ void nds_state::arm9_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 					double hz = clocksel / rate;
 
 					m_timer_hz[timer] = hz;
-
 					m_timer_recalc[timer] = 0;
 
 					LOGMASKED(LOG_TIMER_EXTRA, "Enabling timer %d @ %f Hz\n", timer, hz);

@@ -1959,7 +1959,7 @@
 		</element>
 		<element ref="reel0">
 			<bounds x="169" y="617" width="80" height="140"/>
-			<yscroll name="sreel1" size="0.1875" wrap="yes" min="128342" max="62807"/>
+			<yscroll name="reel1:scroll" size="0.1875" wrap="yes" min="128342" max="62807"/>
 		</element>
 		<element ref="reel_background">
 			<bounds x="251" y="617" width="80" height="140"/>
@@ -1975,7 +1975,7 @@
 		</element>
 		<element ref="reel1">
 			<bounds x="251" y="617" width="80" height="140"/>
-			<yscroll name="sreel2" size="0.1875" wrap="yes" min="128342" max="62807"/>
+			<yscroll name="reel2:scroll" size="0.1875" wrap="yes" min="128342" max="62807"/>
 		</element>
 		<element ref="reel_background">
 			<bounds x="333" y="617" width="80" height="140"/>
@@ -1991,7 +1991,7 @@
 		</element>
 		<element ref="reel2">
 			<bounds x="333" y="617" width="80" height="140"/>
-			<yscroll name="sreel3" size="0.1875" wrap="yes" min="128342" max="62807"/>
+			<yscroll name="reel3:scroll" size="0.1875" wrap="yes" min="128342" max="62807"/>
 		</element>
 		<element ref="reel_background">
 			<bounds x="459" y="356" width="80" height="80"/>
@@ -2001,7 +2001,7 @@
 		</element>
 		<element ref="reel3">
 			<bounds x="459" y="356" width="80" height="80"/>
-			<yscroll name="sreel4" size="0.0833333" wrap="yes" min="66901" max="1366"/>
+			<yscroll name="reel4:scroll" size="0.0833333" wrap="yes" min="66901" max="1366"/>
 		</element>
 		<element ref="reel_background">
 			<bounds x="974" y="99" width="80" height="140"/>
@@ -2017,7 +2017,7 @@
 		</element>
 		<element ref="reel4">
 			<bounds x="974" y="99" width="80" height="140"/>
-			<yscroll name="sreel5" size="0.1875" wrap="yes" min="128342" max="62807"/>
+			<yscroll name="reel5:scroll" size="0.1875" wrap="yes" min="128342" max="62807"/>
 		</element>
 		<element ref="reel_background">
 			<bounds x="1010" y="174" width="80" height="140"/>
@@ -2033,7 +2033,7 @@
 		</element>
 		<element ref="reel5">
 			<bounds x="1010" y="174" width="80" height="140"/>
-			<yscroll name="sreel6" size="0.1875" wrap="yes" min="128342" max="62807"/>
+			<yscroll name="reel6:scroll" size="0.1875" wrap="yes" min="128342" max="62807"/>
 		</element>
 		<element name="lamp162" ref="lamp_162_1_border" state="0">
 			<bounds x="540" y="387" width="36" height="26"/>
@@ -3575,7 +3575,7 @@
 		</element>
 		<element ref="reel0">
 			<bounds x="1100" y="32" width="120" height="240"/>
-			<yscroll name="sreel1" size="0.1875" wrap="yes" min="128342" max="62807"/>
+			<yscroll name="reel1:scroll" size="0.1875" wrap="yes" min="128342" max="62807"/>
 		</element>
 		<element ref="reel_background">
 			<bounds x="1240" y="32" width="120" height="240"/>
@@ -3591,7 +3591,7 @@
 		</element>
 		<element ref="reel1">
 			<bounds x="1240" y="32" width="120" height="240"/>
-			<yscroll name="sreel2" size="0.1875" wrap="yes" min="128342" max="62807"/>
+			<yscroll name="reel2:scroll" size="0.1875" wrap="yes" min="128342" max="62807"/>
 		</element>
 		<element ref="reel_background">
 			<bounds x="1380" y="32" width="120" height="240"/>
@@ -3607,7 +3607,7 @@
 		</element>
 		<element ref="reel2">
 			<bounds x="1380" y="32" width="120" height="240"/>
-			<yscroll name="sreel3" size="0.1875" wrap="yes" min="128342" max="62807"/>
+			<yscroll name="reel3:scroll" size="0.1875" wrap="yes" min="128342" max="62807"/>
 		</element>
 		<element ref="reel_background">
 			<bounds x="1520" y="32" width="120" height="240"/>
@@ -3617,7 +3617,7 @@
 		</element>
 		<element ref="reel3">
 			<bounds x="1520" y="32" width="120" height="240"/>
-			<yscroll name="sreel4" size="0.0833333" wrap="yes" min="66901" max="1366"/>
+			<yscroll name="reel4:scroll" size="0.0833333" wrap="yes" min="66901" max="1366"/>
 		</element>
 		<element ref="reel_background">
 			<bounds x="1660" y="32" width="120" height="240"/>
@@ -3633,7 +3633,7 @@
 		</element>
 		<element ref="reel4">
 			<bounds x="1660" y="32" width="120" height="240"/>
-			<yscroll name="sreel5" size="0.1875" wrap="yes" min="128342" max="62807"/>
+			<yscroll name="reel5:scroll" size="0.1875" wrap="yes" min="128342" max="62807"/>
 		</element>
 		<element ref="reel_background">
 			<bounds x="1100" y="312" width="120" height="240"/>
@@ -3649,24 +3649,24 @@
 		</element>
 		<element ref="reel5">
 			<bounds x="1100" y="312" width="120" height="240"/>
-			<yscroll name="sreel6" size="0.1875" wrap="yes" min="128342" max="62807"/>
+			<yscroll name="reel6:scroll" size="0.1875" wrap="yes" min="128342" max="62807"/>
 		</element>
-		<element name="reel1" ref="debug_stepper_value">
+		<element name="reel1:pos" ref="debug_stepper_value">
 			<bounds x="1100" y="272" width="50" height="30"/>
 		</element>
-		<element name="reel2" ref="debug_stepper_value">
+		<element name="reel2:pos" ref="debug_stepper_value">
 			<bounds x="1240" y="272" width="50" height="30"/>
 		</element>
-		<element name="reel3" ref="debug_stepper_value">
+		<element name="reel3:pos" ref="debug_stepper_value">
 			<bounds x="1380" y="272" width="50" height="30"/>
 		</element>
-		<element name="reel4" ref="debug_stepper_value">
+		<element name="reel4:pos" ref="debug_stepper_value">
 			<bounds x="1520" y="272" width="50" height="30"/>
 		</element>
-		<element name="reel5" ref="debug_stepper_value">
+		<element name="reel5:pos" ref="debug_stepper_value">
 			<bounds x="1660" y="272" width="50" height="30"/>
 		</element>
-		<element name="reel6" ref="debug_stepper_value">
+		<element name="reel6:pos" ref="debug_stepper_value">
 			<bounds x="1100" y="552" width="50" height="30"/>
 		</element>
 		<element name="debug_reel_symbol_count" ref="debug_reel_symbol_count_0">

@@ -17,6 +17,8 @@
 
 #include "emuopts.h"
 
+#include <bit>
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -210,7 +212,7 @@ void dspp_device::device_start()
 		m_core = m_cache.alloc_near<dspp_internal_state>();
 
 		uint32_t flags = 0;
-		m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 1, 16, 0);
+		m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 1, 16, 0, COMPILE_FORWARDS_BYTES);
 
 		m_drcfe = std::make_unique<frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 	}
@@ -1615,7 +1617,7 @@ void dspp_device::update_fifo_dma()
 
 	while (mask != 0)
 	{
-		uint32_t channel = 31 - count_leading_zeros_32(mask);
+		uint32_t channel = std::bit_width(mask) - 1;
 
 		const fifo_dma & dma = m_fifo_dma[channel];
 

@@ -13,20 +13,178 @@ Cassette:
 * Kristall2: can load its own saves; can load radio86 tapes; can load radio99 tapes.
 
 
-ToDo:
+TODO:
 - Cassette - need schematic of CMT.
 
 *****************************************************************************************/
 
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
-#include "formats/rk_cas.h"
-#include "mikro80.h"
+#include "imagedev/cassette.h"
+#include "machine/i8255.h"
+#include "sound/dac.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
+#include "formats/rk_cas.h"
+
+
+namespace {
+
+
+class mikro80_state : public driver_device
+{
+public:
+	mikro80_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_aram(*this, "attrram")
+		, m_vram(*this, "videoram")
+		, m_ppi(*this, "ppi8255")
+		, m_cassette(*this, "cassette")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
+		, m_p_chargen(*this, "chargen")
+		, m_io_keyboard(*this, "LINE%u", 0U)
+		, m_dac(*this, "dac")
+		, m_maincpu(*this, "maincpu")
+	{ }
+
+	void kristall(machine_config &config) ATTR_COLD;
+	void radio99(machine_config &config) ATTR_COLD;
+	void mikro80(machine_config &config) ATTR_COLD;
+
+	void init_radio99() ATTR_COLD;
+	void init_mikro80() ATTR_COLD;
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	u8 m_keyboard_mask = 0;
+	u8 m_key_mask = 0;
+	void sound_w(u8 data);
+	u8 portb_r();
+	u8 portc_r();
+	u8 kristall2_portc_r();
+	void porta_w(u8 data);
+	void portc_w(u8 data);
+	void tape_w(u8 data);
+	u8 tape_r();
+	u32 screen_update_mikro80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void kristall_io(address_map &map) ATTR_COLD;
+	void mikro80_io(address_map &map) ATTR_COLD;
+	void mikro80_mem(address_map &map) ATTR_COLD;
+	void radio99_io(address_map &map) ATTR_COLD;
+
+	memory_passthrough_handler m_rom_shadow_tap;
+	required_shared_ptr<uint8_t> m_aram;
+	required_shared_ptr<uint8_t> m_vram;
+	required_device<i8255_device> m_ppi;
+	required_device<cassette_image_device> m_cassette;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
+	required_region_ptr<u8> m_p_chargen;
+	required_ioport_array<9> m_io_keyboard;
+	optional_device<dac_bit_interface> m_dac;
+	required_device<cpu_device> m_maincpu;
+};
+
+
+/* Driver initialization */
+void mikro80_state::init_mikro80()
+{
+	m_key_mask = 0x7f;
+}
+
+void mikro80_state::init_radio99()
+{
+	m_key_mask = 0xff;
+}
+
+u8 mikro80_state::portb_r()
+{
+	u8 key = 0xff;
+	for (u8 i = 0; i < 8; i++)
+		if (BIT(m_keyboard_mask, i))
+			key &= m_io_keyboard[i]->read();
+
+	return key & m_key_mask;
+}
+
+u8 mikro80_state::portc_r()
+{
+	return m_io_keyboard[8]->read();
+}
+
+u8 mikro80_state::kristall2_portc_r()
+{
+	return (m_io_keyboard[8]->read() & 0xfe) | ((m_cassette->input() < 0.04) ? 1 : 0);
+}
+
+void mikro80_state::porta_w(u8 data)
+{
+	m_keyboard_mask = data ^ 0xff;
+}
+
+void mikro80_state::portc_w(u8 data)
+{
+	m_cassette->output(BIT(data, 7) ? 1.0 : -1.0);   // for Kristall2 only
+}
+
+void mikro80_state::machine_start()
+{
+	save_item(NAME(m_keyboard_mask));
+	save_item(NAME(m_key_mask));
+}
+
+void mikro80_state::machine_reset()
+{
+	m_keyboard_mask = 0;
+
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0xf800, 0xffff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
+
+					// reinstall RAM over the ROM shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+				}
+			},
+			&m_rom_shadow_tap);
+}
+
+void mikro80_state::tape_w(u8 data)
+{
+	// TODO: this is incorrect, to be fixed when the CMT schematic can be found
+	m_cassette->output(BIT(data, 0) ? 1.0 : -1.0);
+}
+
+
+u8 mikro80_state::tape_r()
+{
+	return (m_cassette->input() < 0.04) ? 0xff : 0;
+}
+
+void mikro80_state::sound_w(u8 data)
+{
+	m_dac->write(BIT(data, 1));
+}
+
 
 /* Address maps */
 void mikro80_state::mikro80_mem(address_map &map)
@@ -288,6 +446,7 @@ ROM_START( kristall2 )
 	ROM_LOAD( "kristall-2.fnt", 0x0000, 0x0800, CRC(9661c9f5) SHA1(830c38735dcb1c8a271fa0027f94b4e034848fc8))
 ROM_END
 
+} // anonymous namespace
 
 /* Driver */
 /*    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT    CLASS          INIT          COMPANY      FULLNAME       FLAGS */

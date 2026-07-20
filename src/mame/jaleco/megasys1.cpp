@@ -1950,7 +1950,7 @@ void megasys1_typea_state::system_A(machine_config &config)
 void megasys1_typea_state::system_A_d65006(machine_config &config)
 {
 	system_A(config);
-	MEGASYS1_GATEARRAY_D65006(config, m_gatearray, 0);
+	MEGASYS1_GATEARRAY_D65006(config, m_gatearray);
 	m_gatearray->set_cpuspace_tag(m_maincpu, AS_PROGRAM);
 	m_gatearray->set_cpuregion_tag("maincpu");
 }
@@ -1958,7 +1958,7 @@ void megasys1_typea_state::system_A_d65006(machine_config &config)
 void megasys1_typea_state::system_A_gs88000(machine_config &config)
 {
 	system_A(config);
-	MEGASYS1_GATEARRAY_GS88000(config, m_gatearray, 0);
+	MEGASYS1_GATEARRAY_GS88000(config, m_gatearray);
 	m_gatearray->set_cpuspace_tag(m_maincpu, AS_PROGRAM);
 	m_gatearray->set_cpuregion_tag("maincpu");
 }
@@ -1966,7 +1966,7 @@ void megasys1_typea_state::system_A_gs88000(machine_config &config)
 void megasys1_typea_state::system_A_unkarray(machine_config &config)
 {
 	system_A(config);
-	MEGASYS1_GATEARRAY_UNKARRAY(config, m_gatearray, 0);
+	MEGASYS1_GATEARRAY_UNKARRAY(config, m_gatearray);
 	m_gatearray->set_cpuspace_tag(m_maincpu, AS_PROGRAM);
 	m_gatearray->set_cpuregion_tag("maincpu");
 }
@@ -2056,17 +2056,12 @@ void megasys1_state::system_B(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_sound_map);
 }
 
-void megasys1_bc_iosim_state::system_B_iosim(machine_config &config)
-{
-	system_B(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_bc_iosim_state::megasys1B_iosim_map);
-}
-
 void megasys1_bc_iomcu_state::system_B_iomcu(machine_config &config)
 {
 	system_B(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_bc_iomcu_state::megasys1B_iomcu_map);
+
 	m_scantimer->set_callback(FUNC(megasys1_bc_iomcu_state::megasys1BC_iomcu_scanline));
 
 	TMP91640(config, m_iomcu, SYS_B_CPU_CLOCK); // Toshiba TMP91640, with 16Kbyte internal ROM, 512bytes internal RAM
@@ -2081,9 +2076,9 @@ void megasys1_state::system_B_monkelf(machine_config &config)
 	system_base(config);
 
 	/* basic machine hardware */
-
 	m_maincpu->set_clock(SYS_B_CPU_CLOCK); /* 8MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_monkelf_map);
+
 	m_scantimer->set_callback(FUNC(megasys1_state::megasys1Bbl_scanline));
 
 	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_sound_map);
@@ -2094,6 +2089,7 @@ void megasys1_state::system_Bbl(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12_MHz_XTAL / 2); // edfbl has lower clock, verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_edfbl_map);
+
 	TIMER(config, m_scantimer).configure_scanline(FUNC(megasys1_state::megasys1Bbl_scanline), m_screen, 0, 1);
 
 	/* video hardware */
@@ -2128,9 +2124,10 @@ void megasys1_state::system_Bbl(machine_config &config)
 
 void megasys1_bc_iosim_state::system_B_hayaosi1(machine_config &config)
 {
-	system_B_iosim(config);
+	system_B(config);
 
 	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_bc_iosim_state::megasys1B_iosim_map);
 
 	OKIM6295(config.replace(), m_oki[0], 2000000, okim6295_device::PIN7_HIGH); /* correct speed, but unknown OSC + divider combo */
 	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 0.30, 0);
@@ -2731,7 +2728,7 @@ ROM_START( avspirit )
 	ROM_LOAD16_BYTE( "spirit02.rom",  0x000001, 0x020000, CRC(30213390) SHA1(9334978d3568b36215ed29789501f7cbaf6651ea) )
 
 	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code */
-	ROM_LOAD( "avspirit.mcu", 0x00000, 0x04000, NO_DUMP )
+	ROM_LOAD( "avspirit.mcu", 0x00000, 0x04000, CRC(d9b2eb1a) SHA1(6e0ec065a46b5c5352a3228e6de46b7d60bc393a) )
 
 	ROM_REGION( 0x80000, "scroll1", 0 ) /* Scroll 0 */
 	ROM_LOAD( "spirit12.rom",  0x000000, 0x080000, CRC(728335d4) SHA1(bbf13378ac0bff5e732eb30081b421ed89d12fa2) )
@@ -5260,12 +5257,6 @@ void megasys1_typea_state::init_lordofkbp()
 	}
 }
 
-
-void megasys1_bc_iosim_state::init_avspirit() // Type B
-{
-	m_ip_select_values = avspirit_seq;
-}
-
 void megasys1_bc_iosim_state::init_hayaosi1() // Type B
 {
 	m_ip_select_values = hayaosi1_seq;
@@ -5339,8 +5330,8 @@ GAME( 1989, hachooa,    hachoo,   system_A_gs88000,         hachoo,   megasys1_t
 GAME( 1989, hachooj,    hachoo,   system_A_gs88000,         hachoo,   megasys1_typea_hachoo_state, empty_init,        ROT0,   "Jaleco", "Hachoo! (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, jitsupro,   0,        system_A_gs88000,         jitsupro, megasys1_typea_state,        init_jitsupro_gfx, ROT0,   "Jaleco", "Jitsuryoku!! Pro Yakyuu (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, plusalph,   0,        system_A_gs88000,         plusalph, megasys1_typea_state,        empty_init,        ROT270, "Jaleco", "Plus Alpha", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, stdragon,   0,        system_A_d65006,          stdragon, megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "Saint Dragon (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, stdragona,  stdragon, system_A_d65006,          stdragon, megasys1_typea_state,        init_stdragon_gfx, ROT0,   "Jaleco", "Saint Dragon (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, stdragon,   0,        system_A_d65006,          stdragon, megasys1_typea_state,        empty_init,        ROT0,   "Jaleco / NMK", "Saint Dragon (set 1)", MACHINE_SUPPORTS_SAVE ) // "produced by NMK" in ending screen
+GAME( 1989, stdragona,  stdragon, system_A_d65006,          stdragon, megasys1_typea_state,        init_stdragon_gfx, ROT0,   "Jaleco / NMK", "Saint Dragon (set 2)", MACHINE_SUPPORTS_SAVE ) // ^
 GAME( 1989, stdragonb,  stdragon, system_A,                 stdragon, megasys1_typea_state,        init_stdragon_gfx, ROT0,   "bootleg","Saint Dragon (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, rodland,    0,        system_A_unkarray,        rodland,  megasys1_typea_state,        init_rodland_gfx,  ROT0,   "Jaleco", "Rod-Land (World, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, rodlanda,   rodland,  system_A_gs88000,         rodland,  megasys1_typea_state,        init_rodland_gfx,  ROT0,   "Jaleco", "Rod-Land (World, set 2)", MACHINE_SUPPORTS_SAVE )
@@ -5355,7 +5346,7 @@ GAME( 1992, soldam,     0,        system_A_d65006_soldam,   soldam,   megasys1_t
 GAME( 1992, soldamj,    soldam,   system_A_gs88000_soldam,  soldam,   megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "Soldam (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Type B
-GAME( 1991, avspirit,   0,        system_B_iosim,           avspirit, megasys1_bc_iosim_state,     init_avspirit,     ROT0,   "Jaleco", "Avenging Spirit", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, avspirit,   0,        system_B_iomcu,           avspirit, megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "Avenging Spirit", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, monkelf,    avspirit, system_B_monkelf,         avspirit, megasys1_state,              init_monkelf,      ROT0,   "bootleg","Monky Elf (Korean bootleg of Avenging Spirit)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, edf,        0,        system_B_iomcu,           edf,      megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "E.D.F.: Earth Defense Force (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, edfa,       edf,      system_B_iomcu,           edf,      megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "E.D.F.: Earth Defense Force (set 2)", MACHINE_SUPPORTS_SAVE )

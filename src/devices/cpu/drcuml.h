@@ -152,6 +152,7 @@ public:
 	virtual int execute(uml::code_handle &entry) = 0;
 	virtual void generate(drcuml_block &block, uml::instruction const *instlist, u32 numinst) = 0;
 	virtual bool hash_exists(u32 mode, u32 pc) const noexcept = 0;
+	virtual void hash_invalidate_range(u32 pcstart, u32 pcend) noexcept = 0;
 	virtual void get_info(drcbe_info &info) const noexcept = 0;
 	virtual bool logging() const noexcept { return false; }
 
@@ -173,12 +174,13 @@ class drcuml_state
 {
 public:
 	// construction/destruction
-	drcuml_state(device_t &device, drc_cache &cache, u32 flags, int modes, int addrbits, int ignorebits);
+	drcuml_state(device_t &device, drc_cache &cache, u32 flags, int modes, int addrbits, int ignorebits, u32 max_sequence_length);
 	~drcuml_state();
 
 	// getters
 	device_t &device() const { return m_device; }
 	drc_cache &cache() const { return m_cache; }
+	u32 max_sequence_length() const { return m_max_sequence_length; }
 
 	// reset the state
 	void reset();
@@ -191,6 +193,7 @@ public:
 	// back-end interface
 	void get_backend_info(drcbe_info &info) const { m_beintf->get_info(info); }
 	bool hash_exists(u32 mode, u32 pc) const { return m_beintf->hash_exists(mode, pc); }
+	void hash_invalidate_range(u32 pcstart, u32 pcend) { m_beintf->hash_invalidate_range(pcstart, pcend); }
 	void generate(drcuml_block &block, uml::instruction *instructions, u32 count) { m_beintf->generate(block, instructions, count); }
 
 	// handle management
@@ -249,6 +252,7 @@ private:
 	// internal state
 	device_t &                              m_device;           // CPU device we are associated with
 	drc_cache &                             m_cache;            // pointer to the codegen cache
+	u32 const                               m_max_sequence_length; // maximum length in bytes of a generated sequence
 	std::unique_ptr<drcbe_interface> const  m_beintf;           // backend interface pointer
 	std::unique_ptr<std::ostream> const     m_umllog;           // handle to the UML logfile
 	std::list<block_impl>                   m_blocklist;        // list of active blocks

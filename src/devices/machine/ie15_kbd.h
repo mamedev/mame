@@ -31,7 +31,7 @@ public:
 		IE_KB_NR_BIT    = 7,
 	};
 
-	ie15_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ie15_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto keyboard_cb() { return m_keyboard_cb.bind(); }
 	auto sdv_cb() { return m_sdv_cb.bind(); }

@@ -72,7 +72,7 @@ void toccata_device::mmio_map(address_map &map)
 
 void toccata_device::device_add_mconfig(machine_config &config)
 {
-	AD1848(config, m_ad1848, 0);
+	AD1848(config, m_ad1848);
 	m_ad1848->drq().set(FUNC(toccata_device::drq_w));
 
 	IDT7202(config, m_fifo[0]);

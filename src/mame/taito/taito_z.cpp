@@ -3111,7 +3111,6 @@ void taitoz_state::device_post_load()
 void taitoz_state::machine_start()
 {
 	save_item(NAME(m_cpua_ctrl));
-	m_cpua_out.resolve();
 }
 
 void taitoz_z80_sound_state::machine_start()
@@ -3125,8 +3124,6 @@ void taitoz_z80_sound_state::machine_start()
 void contcirc_state::machine_start()
 {
 	taitoz_z80_sound_state::machine_start();
-
-	m_shutter_out.resolve();
 
 	m_shutter_toggle = 0;
 	m_shutter_control = 0;
@@ -3142,23 +3139,6 @@ void sci_state::machine_start()
 	save_item(NAME(m_sci_int6));
 
 	m_int6_timer = timer_alloc(FUNC(sci_state::trigger_int6), this);
-}
-
-void nightstr_state::machine_start()
-{
-	taitoz_z80_sound_state::machine_start();
-
-	m_motor_dir.resolve();
-	m_motor_speed.resolve();
-	m_motor_debug.resolve();
-	m_lamps.resolve();
-}
-
-void spacegun_state::machine_start()
-{
-	taitoz_state::machine_start();
-
-	m_recoil.resolve();
 }
 
 void taitoz_state::machine_reset()
@@ -3196,7 +3176,7 @@ void contcirc_state::contcirc(machine_config &config) //OSC: 26.686, 24.000, 16.
 	m_subcpu->set_addrmap(AS_PROGRAM, &contcirc_state::contcirc_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(contcirc_state::irq6_line_hold));
 
-	TC0040IOC(config, m_tc0040ioc, 0);
+	TC0040IOC(config, m_tc0040ioc);
 	m_tc0040ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0040ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0040ioc->read_2_callback().set_ioport("IN0");
@@ -3211,12 +3191,12 @@ void contcirc_state::contcirc(machine_config &config) //OSC: 26.686, 24.000, 16.
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
-	TC0150ROD(config, m_tc0150rod, 0);
+	TC0150ROD(config, m_tc0150rod);
 
-	TC0110PCR(config, m_tc0110pcr, 0);
+	TC0110PCR(config, m_tc0110pcr);
 	m_tc0110pcr->set_shift(0);
 	m_tc0110pcr->set_color_callback(FUNC(contcirc_state::color_xrgb555));
 
@@ -3238,7 +3218,7 @@ void contcirc_state::contcirc(machine_config &config) //OSC: 26.686, 24.000, 16.
 	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rear", 1.0);
 	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "front", 1.0);
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_tc0140syt->reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -3257,7 +3237,7 @@ void chasehq_state::chasehq(machine_config &config) //OSC: 26.686, 24.000, 16.00
 	m_subcpu->set_addrmap(AS_PROGRAM, &chasehq_state::chasehq_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(chasehq_state::irq4_line_hold));
 
-	TC0040IOC(config, m_tc0040ioc, 0);
+	TC0040IOC(config, m_tc0040ioc);
 	m_tc0040ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0040ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0040ioc->read_2_callback().set_ioport("IN0");
@@ -3272,12 +3252,12 @@ void chasehq_state::chasehq(machine_config &config) //OSC: 26.686, 24.000, 16.00
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_chasehq);
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
-	TC0150ROD(config, m_tc0150rod, 0);
+	TC0150ROD(config, m_tc0150rod);
 
-	TC0110PCR(config, m_tc0110pcr, 0);
+	TC0110PCR(config, m_tc0110pcr);
 	m_tc0110pcr->set_shift(0);
 	m_tc0110pcr->set_color_callback(FUNC(chasehq_state::color_xbgr555));
 
@@ -3299,7 +3279,7 @@ void chasehq_state::chasehq(machine_config &config) //OSC: 26.686, 24.000, 16.00
 	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rear", 1.0);
 	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "front", 1.0);
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_tc0140syt->reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -3320,7 +3300,7 @@ void contcirc_state::enforce(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	TC0040IOC(config, m_tc0040ioc, 0);
+	TC0040IOC(config, m_tc0040ioc);
 	m_tc0040ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0040ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0040ioc->read_2_callback().set_ioport("IN0");
@@ -3336,12 +3316,12 @@ void contcirc_state::enforce(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
-	TC0150ROD(config, m_tc0150rod, 0);
+	TC0150ROD(config, m_tc0150rod);
 
-	TC0110PCR(config, m_tc0110pcr, 0);
+	TC0110PCR(config, m_tc0110pcr);
 	m_tc0110pcr->set_shift(0);
 	m_tc0110pcr->set_color_callback(FUNC(contcirc_state::color_xrgb555));
 
@@ -3362,7 +3342,7 @@ void contcirc_state::enforce(machine_config &config)
 	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_tc0140syt->reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -3380,7 +3360,7 @@ void taitoz_state::bshark_base(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	TC0220IOC(config, m_tc0220ioc, 0);
+	TC0220IOC(config, m_tc0220ioc);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
@@ -3395,10 +3375,10 @@ void taitoz_state::bshark_base(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_palette("palette");
 
-	TC0150ROD(config, m_tc0150rod, 0);
+	TC0150ROD(config, m_tc0150rod);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
@@ -3453,7 +3433,7 @@ void sci_state::sci(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(3000));
 
-	TC0220IOC(config, m_tc0220ioc, 0);
+	TC0220IOC(config, m_tc0220ioc);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
@@ -3469,10 +3449,10 @@ void sci_state::sci(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_palette("palette");
 
-	TC0150ROD(config, m_tc0150rod, 0);
+	TC0150ROD(config, m_tc0150rod);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
@@ -3491,7 +3471,7 @@ void sci_state::sci(machine_config &config)
 	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_tc0140syt->reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -3519,7 +3499,7 @@ void nightstr_state::nightstr(machine_config &config) //OSC: 26.686, 24.000, 16.
 	adc.in_callback<2>().set_ioport("X_ADJUST");
 	adc.in_callback<3>().set_ioport("Y_ADJUST");
 
-	TC0220IOC(config, m_tc0220ioc, 0);
+	TC0220IOC(config, m_tc0220ioc);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
@@ -3535,12 +3515,12 @@ void nightstr_state::nightstr(machine_config &config) //OSC: 26.686, 24.000, 16.
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_chasehq);
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
-	TC0150ROD(config, m_tc0150rod, 0);
+	TC0150ROD(config, m_tc0150rod);
 
-	TC0110PCR(config, m_tc0110pcr, 0);
+	TC0110PCR(config, m_tc0110pcr);
 	m_tc0110pcr->set_shift(0);
 	m_tc0110pcr->set_color_callback(FUNC(nightstr_state::color_xbgr555));
 
@@ -3562,7 +3542,7 @@ void nightstr_state::nightstr(machine_config &config) //OSC: 26.686, 24.000, 16.
 	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rear", 1.0);
 	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "front", 1.0);
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_tc0140syt->reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -3583,7 +3563,7 @@ void taitoz_z80_sound_state::aquajack(machine_config &config) //OSC: 26.686, 24.
 
 	config.set_maximum_quantum(attotime::from_hz(30000));
 
-	TC0220IOC(config, m_tc0220ioc, 0);
+	TC0220IOC(config, m_tc0220ioc);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
@@ -3598,12 +3578,12 @@ void taitoz_z80_sound_state::aquajack(machine_config &config) //OSC: 26.686, 24.
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
-	TC0150ROD(config, m_tc0150rod, 0);
+	TC0150ROD(config, m_tc0150rod);
 
-	TC0110PCR(config, m_tc0110pcr, 0);
+	TC0110PCR(config, m_tc0110pcr);
 	m_tc0110pcr->set_shift(0);
 	m_tc0110pcr->set_color_callback(FUNC(taitoz_z80_sound_state::color_xbgr555));
 
@@ -3624,7 +3604,7 @@ void taitoz_z80_sound_state::aquajack(machine_config &config) //OSC: 26.686, 24.
 	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_tc0140syt->reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -3651,7 +3631,7 @@ void spacegun_state::spacegun(machine_config &config) //OSC: 26.686, 24.000, 16.
 	adc.in_callback<2>().set_ioport("STICKX2");
 	adc.in_callback<3>().set_ioport("STICKY2");
 
-	TC0510NIO(config, m_tc0510nio, 0);
+	TC0510NIO(config, m_tc0510nio);
 	m_tc0510nio->read_0_callback().set_ioport("DSWA");
 	m_tc0510nio->read_1_callback().set_ioport("DSWB");
 	m_tc0510nio->read_2_callback().set_ioport("IN0");
@@ -3667,11 +3647,11 @@ void spacegun_state::spacegun(machine_config &config) //OSC: 26.686, 24.000, 16.
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_offsets(4, 0);
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
-	TC0110PCR(config, m_tc0110pcr, 0);
+	TC0110PCR(config, m_tc0110pcr);
 	m_tc0110pcr->set_shift(0);
 	m_tc0110pcr->set_color_callback(FUNC(spacegun_state::color_xrgb555));
 
@@ -3710,7 +3690,7 @@ void taitoz_z80_sound_state::dblaxle(machine_config &config)
 	// make quantum time to be a multiple of the xtal (fixes road layer stuck on continue)
 	config.set_maximum_quantum(attotime::from_hz(XTAL(32'000'000)/1024));
 
-	TC0510NIO(config, m_tc0510nio, 0);
+	TC0510NIO(config, m_tc0510nio);
 	m_tc0510nio->read_0_callback().set_ioport("DSWA");
 	m_tc0510nio->read_1_callback().set_ioport("DSWB");
 	m_tc0510nio->read_2_callback().set_ioport("IN0");
@@ -3726,11 +3706,11 @@ void taitoz_z80_sound_state::dblaxle(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette("palette");
 	m_tc0480scp->set_offsets(0x1f, 0x08);
 
-	TC0150ROD(config, m_tc0150rod, 0);
+	TC0150ROD(config, m_tc0150rod);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
@@ -3749,7 +3729,7 @@ void taitoz_z80_sound_state::dblaxle(machine_config &config)
 	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_tc0140syt->reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -3770,7 +3750,7 @@ void sci_state::racingb(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	TC0510NIO(config, m_tc0510nio, 0);
+	TC0510NIO(config, m_tc0510nio);
 	m_tc0510nio->read_0_callback().set_ioport("DSWA");
 	m_tc0510nio->read_1_callback().set_ioport("DSWB");
 	m_tc0510nio->read_2_callback().set_ioport("IN0");
@@ -3786,11 +3766,11 @@ void sci_state::racingb(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette("palette");
 	m_tc0480scp->set_offsets(0x1f, 0x08);
 
-	TC0150ROD(config, m_tc0150rod, 0);
+	TC0150ROD(config, m_tc0150rod);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
@@ -3809,7 +3789,7 @@ void sci_state::racingb(machine_config &config)
 	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_tc0140syt->reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -5673,49 +5653,49 @@ ROM_START( racingbj )
 ROM_END
 
 
-GAMEL(1987, contcirc,   0,        contcirc,  contcirc,  contcirc_state,         empty_init,  ROT0,               "Taito Corporation Japan",   "Continental Circus (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1987, contcircu,  contcirc, contcirc,  contcrcu,  contcirc_state,         empty_init,  ROT0,               "Taito America Corporation", "Continental Circus (US set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1987, contcircua, contcirc, contcirc,  contcrcj,  contcirc_state,         empty_init,  ROT0,               "Taito America Corporation", "Continental Circus (US set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1987, contcircj,  contcirc, contcirc,  contcrcj,  contcirc_state,         empty_init,  ROT0,               "Taito Corporation",         "Continental Circus (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1987, contcirc,   0,        contcirc,  contcirc,  contcirc_state,         empty_init,  ROT0,               "Taito",         "Continental Circus (World)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1987, contcircu,  contcirc, contcirc,  contcrcu,  contcirc_state,         empty_init,  ROT0,               "Taito America", "Continental Circus (US set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1987, contcircua, contcirc, contcirc,  contcrcj,  contcirc_state,         empty_init,  ROT0,               "Taito America", "Continental Circus (US set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1987, contcircj,  contcirc, contcirc,  contcrcj,  contcirc_state,         empty_init,  ROT0,               "Taito",         "Continental Circus (Japan)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
 
-GAMEL(1988, chasehq,    0,        chasehq,   chasehq,   chasehq_state,          empty_init,  ROT0,               "Taito Corporation Japan",   "Chase H.Q. (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq )
-GAMEL(1988, chasehqj,   chasehq,  chasehq,   chasehqj,  chasehq_state,          empty_init,  ROT0,               "Taito Corporation",         "Chase H.Q. (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq )
-GAMEL(1988, chasehqju,  chasehq,  chasehq,   chasehq,   chasehq_state,          empty_init,  ROT0,               "Taito Corporation",         "Chase H.Q. (Japan, upright?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq ) // same code rev as Chase H.Q. (World)
-GAMEL(1988, chasehqu,   chasehq,  chasehq,   chasehq,   chasehq_state,          empty_init,  ROT0,               "Taito America Corporation", "Chase H.Q. (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq )
+GAMEL(1988, chasehq,    0,        chasehq,   chasehq,   chasehq_state,          empty_init,  ROT0,               "Taito",         "Chase H.Q. (World)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq )
+GAMEL(1988, chasehqj,   chasehq,  chasehq,   chasehqj,  chasehq_state,          empty_init,  ROT0,               "Taito",         "Chase H.Q. (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq )
+GAMEL(1988, chasehqju,  chasehq,  chasehq,   chasehq,   chasehq_state,          empty_init,  ROT0,               "Taito",         "Chase H.Q. (Japan, upright?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq ) // same code rev as Chase H.Q. (World)
+GAMEL(1988, chasehqu,   chasehq,  chasehq,   chasehq,   chasehq_state,          empty_init,  ROT0,               "Taito America", "Chase H.Q. (US)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq )
 
-GAME( 1988, enforce,    0,        enforce,   enforce,   contcirc_state,         empty_init,  ROT0,               "Taito Corporation Japan",   "Enforce (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, enforcej,   enforce,  enforce,   enforcej,  contcirc_state,         empty_init,  ROT0,               "Taito Corporation",         "Enforce (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAMEL(1988, enforceja,  enforce,  enforce,   enforceja, contcirc_state,         empty_init,  ROT0,               "Taito Corporation",         "Enforce (Japan, Analog Controls)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_enforceja )
+GAME( 1988, enforce,    0,        enforce,   enforce,   contcirc_state,         empty_init,  ROT0,               "Taito", "Enforce (World)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, enforcej,   enforce,  enforce,   enforcej,  contcirc_state,         empty_init,  ROT0,               "Taito", "Enforce (Japan)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAMEL(1988, enforceja,  enforce,  enforce,   enforceja, contcirc_state,         empty_init,  ROT0,               "Taito", "Enforce (Japan, Analog Controls)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_enforceja )
 
-GAME( 1989, bshark,     0,        bshark,    bshark,    taitoz_state,           empty_init,  ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Battle Shark (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bsharku,    bshark,   bshark,    bsharku,   taitoz_state,           empty_init,  ORIENTATION_FLIP_X, "Taito America Corporation", "Battle Shark (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bsharkuo,   bshark,   bshark,    bsharku,   taitoz_state,           empty_init,  ORIENTATION_FLIP_X, "Taito America Corporation", "Battle Shark (US, older)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bsharkj,    bshark,   bshark,    bsharkj,   taitoz_state,           empty_init,  ORIENTATION_FLIP_X, "Taito Corporation",         "Battle Shark (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bsharkjjs,  bshark,   bsharkjjs, bsharkjjs, taitoz_state,           empty_init,  ORIENTATION_FLIP_X, "Taito Corporation",         "Battle Shark (Japan, Joystick)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bshark,     0,        bshark,    bshark,    taitoz_state,           empty_init,  ORIENTATION_FLIP_X, "Taito",         "Battle Shark (World)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bsharku,    bshark,   bshark,    bsharku,   taitoz_state,           empty_init,  ORIENTATION_FLIP_X, "Taito America", "Battle Shark (US)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bsharkuo,   bshark,   bshark,    bsharku,   taitoz_state,           empty_init,  ORIENTATION_FLIP_X, "Taito America", "Battle Shark (US, older)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bsharkj,    bshark,   bshark,    bsharkj,   taitoz_state,           empty_init,  ORIENTATION_FLIP_X, "Taito",         "Battle Shark (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bsharkjjs,  bshark,   bsharkjjs, bsharkjjs, taitoz_state,           empty_init,  ORIENTATION_FLIP_X, "Taito",         "Battle Shark (Japan, Joystick)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAMEL(1989, sci,        0,        sci,       sci,       sci_state,              empty_init,  ROT0,               "Taito Corporation Japan",   "Special Criminal Investigation (World set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq )
-GAMEL(1989, scia,       sci,      sci,       sci,       sci_state,              empty_init,  ROT0,               "Taito Corporation Japan",   "Special Criminal Investigation (World set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq )
-GAMEL(1989, scij,       sci,      sci,       scij,      sci_state,              empty_init,  ROT0,               "Taito Corporation",         "Special Criminal Investigation (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq )
-GAMEL(1989, sciu,       sci,      sci,       sciu,      sci_state,              empty_init,  ROT0,               "Taito America Corporation", "Special Criminal Investigation (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq )
-GAMEL(1991, scin,       sci,      sci,       sci,       sci_state,              empty_init,  ROT0,               "hack (Negro Torino)",       "Super Special Criminal Investigation (Negro Torino hack)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq )
+GAMEL(1989, sci,        0,        sci,       sci,       sci_state,              empty_init,  ROT0,               "Taito",               "Special Criminal Investigation (World set 1)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq )
+GAMEL(1989, scia,       sci,      sci,       sci,       sci_state,              empty_init,  ROT0,               "Taito",               "Special Criminal Investigation (World set 2)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq )
+GAMEL(1989, scij,       sci,      sci,       scij,      sci_state,              empty_init,  ROT0,               "Taito",               "Special Criminal Investigation (Japan)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq )
+GAMEL(1989, sciu,       sci,      sci,       sciu,      sci_state,              empty_init,  ROT0,               "Taito America",       "Special Criminal Investigation (US)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq )
+GAMEL(1991, scin,       sci,      sci,       sci,       sci_state,              empty_init,  ROT0,               "hack (Negro Torino)", "Super Special Criminal Investigation (Negro Torino hack)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq )
 
-GAME( 1989, nightstr,   0,        nightstr,  nightstr,  nightstr_state,         empty_init,  ROT0,               "Taito Corporation Japan",   "Night Striker (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, nightstrj,  nightstr, nightstr,  nghtstrj,  nightstr_state,         empty_init,  ROT0,               "Taito Corporation",         "Night Striker (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, nightstru,  nightstr, nightstr,  nghtstru,  nightstr_state,         empty_init,  ROT0,               "Taito America Corporation", "Night Striker (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, nightstr,   0,        nightstr,  nightstr,  nightstr_state,         empty_init,  ROT0,               "Taito",         "Night Striker (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, nightstrj,  nightstr, nightstr,  nghtstrj,  nightstr_state,         empty_init,  ROT0,               "Taito",         "Night Striker (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, nightstru,  nightstr, nightstr,  nghtstru,  nightstr_state,         empty_init,  ROT0,               "Taito America", "Night Striker (US)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, aquajack,   0,        aquajack,  aquajack,  taitoz_z80_sound_state, empty_init,  ROT0,               "Taito Corporation Japan",   "Aqua Jack (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aquajacku,  aquajack, aquajack,  aquajack,  taitoz_z80_sound_state, empty_init,  ROT0,               "Taito America Corporation", "Aqua Jack (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aquajackj,  aquajack, aquajack,  aquajckj,  taitoz_z80_sound_state, empty_init,  ROT0,               "Taito Corporation",         "Aqua Jack (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aquajack,   0,        aquajack,  aquajack,  taitoz_z80_sound_state, empty_init,  ROT0,               "Taito",         "Aqua Jack (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aquajacku,  aquajack, aquajack,  aquajack,  taitoz_z80_sound_state, empty_init,  ROT0,               "Taito America", "Aqua Jack (US)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aquajackj,  aquajack, aquajack,  aquajckj,  taitoz_z80_sound_state, empty_init,  ROT0,               "Taito",         "Aqua Jack (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, spacegun,   0,        spacegun,  spacegun,  spacegun_state,         empty_init,  ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Space Gun (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, spacegunj,  spacegun, spacegun,  spacegnj,  spacegun_state,         empty_init,  ORIENTATION_FLIP_X, "Taito Corporation",         "Space Gun (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, spacegunu,  spacegun, spacegun,  spacegnu,  spacegun_state,         empty_init,  ORIENTATION_FLIP_X, "Taito America Corporation", "Space Gun (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, spacegun,   0,        spacegun,  spacegun,  spacegun_state,         empty_init,  ORIENTATION_FLIP_X, "Taito",         "Space Gun (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, spacegunj,  spacegun, spacegun,  spacegnj,  spacegun_state,         empty_init,  ORIENTATION_FLIP_X, "Taito",         "Space Gun (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, spacegunu,  spacegun, spacegun,  spacegnu,  spacegun_state,         empty_init,  ORIENTATION_FLIP_X, "Taito America", "Space Gun (US)",    MACHINE_SUPPORTS_SAVE )
 
-GAMEL(1991, dblaxle,    0,        dblaxle,   dblaxles,  taitoz_z80_sound_state, empty_init,  ROT0,               "Taito America Corporation", "Double Axle (US, Rev 1, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
-GAMEL(1991, dblaxleua,  dblaxle,  dblaxle,   dblaxles,  taitoz_z80_sound_state, empty_init,  ROT0,               "Taito America Corporation", "Double Axle (US, Rev 1, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
-GAMEL(1991, dblaxleu,   dblaxle,  dblaxle,   dblaxles,  taitoz_z80_sound_state, empty_init,  ROT0,               "Taito America Corporation", "Double Axle (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
-GAMEL(1991, dblaxleul,  dblaxle,  dblaxle,   dblaxle,   taitoz_z80_sound_state, empty_init,  ROT0,               "Taito America Corporation", "Double Axle (US, Rev 1, Linkable)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_dblaxle )
-GAMEL(1991, pwheelsj,   dblaxle,  dblaxle,   pwheelsj,  taitoz_z80_sound_state, empty_init,  ROT0,               "Taito Corporation",         "Power Wheels (Japan, Rev 2, Linkable)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_dblaxle )
+GAMEL(1991, dblaxle,    0,        dblaxle,   dblaxles,  taitoz_z80_sound_state, empty_init,  ROT0,               "Taito America", "Double Axle (US, Rev 1, set 1)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
+GAMEL(1991, dblaxleua,  dblaxle,  dblaxle,   dblaxles,  taitoz_z80_sound_state, empty_init,  ROT0,               "Taito America", "Double Axle (US, Rev 1, set 2)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
+GAMEL(1991, dblaxleu,   dblaxle,  dblaxle,   dblaxles,  taitoz_z80_sound_state, empty_init,  ROT0,               "Taito America", "Double Axle (US)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
+GAMEL(1991, dblaxleul,  dblaxle,  dblaxle,   dblaxle,   taitoz_z80_sound_state, empty_init,  ROT0,               "Taito America", "Double Axle (US, Rev 1, Linkable)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_dblaxle )
+GAMEL(1991, pwheelsj,   dblaxle,  dblaxle,   pwheelsj,  taitoz_z80_sound_state, empty_init,  ROT0,               "Taito",         "Power Wheels (Japan, Rev 2, Linkable)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_dblaxle )
 
-GAMEL(1991, racingb,    0,        racingb,   racingb,   sci_state,              empty_init,  ROT0,               "Taito Corporation Japan",   "Racing Beat (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_dblaxle )
-GAMEL(1991, racingbj,   racingb,  racingb,   racingb,   sci_state,              empty_init,  ROT0,               "Taito Corporation",         "Racing Beat (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_dblaxle )
+GAMEL(1991, racingb,    0,        racingb,   racingb,   sci_state,              empty_init,  ROT0,               "Taito", "Racing Beat (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_dblaxle )
+GAMEL(1991, racingbj,   racingb,  racingb,   racingb,   sci_state,              empty_init,  ROT0,               "Taito", "Racing Beat (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_dblaxle )

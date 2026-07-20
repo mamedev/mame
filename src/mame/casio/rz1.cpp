@@ -382,12 +382,6 @@ void rz1_state::port_c_w(uint8_t data)
 
 void rz1_state::machine_start()
 {
-	// resolve output finders
-	m_led_sampling.resolve();
-	m_led_song.resolve();
-	m_led_pattern.resolve();
-	m_led_startstop.resolve();
-
 	// register for save states
 	save_item(NAME(m_port_a));
 	save_item(NAME(m_port_b));

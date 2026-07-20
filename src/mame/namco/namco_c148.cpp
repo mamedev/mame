@@ -70,6 +70,7 @@ DEFINE_DEVICE_TYPE(NAMCO_C148, namco_c148_device, "namco_c148", "Namco C148 Inte
 
 namco_c148_device::namco_c148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NAMCO_C148, tag, owner, clock),
+	m_in_ext_cb(*this, 0x07),
 	m_out_ext1_cb(*this),
 	m_out_ext2_cb(*this),
 	m_hostcpu(*this, finder_base::DUMMY_TAG),
@@ -185,7 +186,7 @@ void namco_c148_device::sci_irq_trigger()    { m_hostcpu->set_input_line(m_irqle
 
 uint8_t namco_c148_device::ext_r()
 {
-	return 0xff; // TODO: bit 0 EEPROM bit ready
+	return m_in_ext_cb() & 7;
 }
 
 void namco_c148_device::ext1_w(uint8_t data)
@@ -196,7 +197,6 @@ void namco_c148_device::ext1_w(uint8_t data)
 void namco_c148_device::ext2_w(uint8_t data)
 {
 	m_out_ext2_cb(data & 7);
-	// TODO: bit 1/2 in Winning Run GPU might be irq enable?
 }
 
 uint8_t namco_c148_device::bus_ctrl_r()

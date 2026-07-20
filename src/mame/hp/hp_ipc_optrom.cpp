@@ -61,8 +61,8 @@ std::pair<std::error_condition, std::string> hp_ipc_optrom_device::call_load()
 		return std::make_pair(image_error::BADSOFTWARE, "Software item is missing 'base' feature");
 	}
 
-	u32 base;
-	if (base_feature[ 0 ] != '0' || base_feature[ 1 ] != 'x' || sscanf(&base_feature[ 2 ] , "%x" , &base) != 1) {
+	unsigned long base;
+	if (base_feature[0] != '0' || base_feature[1] != 'x' || sscanf(&base_feature[2] , "%lx" , &base) != 1) {
 		return std::make_pair(image_error::BADSOFTWARE, "Can't parse software item 'base' feature");
 	}
 

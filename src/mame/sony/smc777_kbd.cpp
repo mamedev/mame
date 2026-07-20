@@ -29,6 +29,8 @@ smc777_kbd_device::smc777_kbd_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, SMC777_KBD, tag, owner, clock)
 	, device_matrix_keyboard_interface(mconfig, *this, "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8", "KEY9")
 	, m_key_mod(*this, "KEY_MOD")
+	, m_caplock_cb(*this)
+	, m_kanalock_cb(*this)
 {
 }
 
@@ -89,6 +91,16 @@ void smc777_kbd_device::device_reset()
 	for (int j = 0; j < 3; j++)
 		for (int i = 0; i < 6; i++)
 			m_fkey_table[j][i] = fkey_default_table[j][i];
+}
+
+INPUT_CHANGED_MEMBER(smc777_kbd_device::cap_changed)
+{
+	m_caplock_cb(newval);
+}
+
+INPUT_CHANGED_MEMBER(smc777_kbd_device::kana_changed)
+{
+	m_kanalock_cb(newval);
 }
 
 static INPUT_PORTS_START( smc777_kbd )
@@ -197,8 +209,8 @@ static INPUT_PORTS_START( smc777_kbd )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	// printed without the 'S'
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CAP LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KANA LOCK") PORT_CODE(KEYCODE_LALT) PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CAP LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(smc777_kbd_device::cap_changed), 0)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KANA LOCK") PORT_CODE(KEYCODE_LALT) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(smc777_kbd_device::kana_changed), 0)
 INPUT_PORTS_END
 
 ioport_constructor smc777_kbd_device::device_input_ports() const

@@ -71,7 +71,6 @@ void i82425ex_psc_device::device_start()
 	save_item(NAME(m_smireq));
 	save_item(NAME(m_ctltmrl));
 	save_item(NAME(m_ctltmrh));
-
 }
 
 void i82425ex_psc_device::device_reset()
@@ -389,7 +388,6 @@ void i82425ex_psc_device::map_extra(
 	uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space
 ) {
-	// TODO: $cf9 for TRC register
 	io_space->install_device(0, 0xffff,  *static_cast<pci_host_device *>(this), &pci_host_device::io_configuration_access_map);
 
 	regenerate_config_mapping();

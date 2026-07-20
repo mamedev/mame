@@ -116,13 +116,13 @@ public:
 	funkyjet_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_spriteram(*this, "spriteram")
-		, m_pf_rowscroll(*this, "pf%u_rowscroll", 1)
+		, m_rowscroll(*this, "rowscroll_%u", 1)
 		, m_screen(*this, "screen")
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_deco146(*this, "ioprot")
 		, m_sprgen(*this, "spritegen")
-		, m_deco_tilegen(*this, "tilegen")
+		, m_tilegen(*this, "tilegen")
 	{ }
 
 	void funkyjet(machine_config &config);
@@ -132,7 +132,7 @@ public:
 private:
 	// memory pointers
 	required_shared_ptr<uint16_t> m_spriteram;
-	required_shared_ptr_array<uint16_t, 2> m_pf_rowscroll;
+	required_shared_ptr_array<uint16_t, 2> m_rowscroll;
 
 	// devices
 	required_device<screen_device> m_screen;
@@ -140,7 +140,7 @@ private:
 	required_device<h6280_device> m_audiocpu;
 	required_device<deco146_device> m_deco146;
 	required_device<decospr_device> m_sprgen;
-	required_device<deco16ic_device> m_deco_tilegen;
+	required_device<deco16ic_device> m_tilegen;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -165,20 +165,20 @@ uint32_t funkyjet_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	//
 	// it is unclear where this offset comes from, but real hardware videos confirm it is needed
 
-	m_deco_tilegen->set_scrolldx(0, 0, 1, 1);
-	m_deco_tilegen->set_scrolldx(0, 1, 1, 1);
-	m_deco_tilegen->set_scrolldx(1, 0, 1, 1);
-	m_deco_tilegen->set_scrolldx(1, 1, 1, 1);
+	m_tilegen->set_scrolldx(0, 0, 1, 1);
+	m_tilegen->set_scrolldx(0, 1, 1, 1);
+	m_tilegen->set_scrolldx(1, 0, 1, 1);
+	m_tilegen->set_scrolldx(1, 1, 1, 1);
 
-	uint16_t const flip = m_deco_tilegen->pf_control_r(0);
+	uint16_t const flip = m_tilegen->control_r(0);
 
 	flip_screen_set(BIT(flip, 7));
 	m_sprgen->set_flip_screen(BIT(flip, 7));
-	m_deco_tilegen->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
+	m_tilegen->update(m_rowscroll[0], m_rowscroll[1]);
 
 	bitmap.fill(768, cliprect);
-	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 	return 0;
 }
@@ -215,14 +215,14 @@ void funkyjet_state::maincpu_map(address_map &map)
 	map(0x120000, 0x1207ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x140000, 0x143fff).ram();
 	map(0x160000, 0x1607ff).ram().share(m_spriteram);
-	map(0x180000, 0x183fff).rw(FUNC(funkyjet_state::ioprot_r), FUNC(funkyjet_state::ioprot_w)).share("prot16ram"); // Protection device, unlikely to be cs0 region
+	map(0x180000, 0x183fff).rw(FUNC(funkyjet_state::ioprot_r), FUNC(funkyjet_state::ioprot_w)); // Protection device, unlikely to be cs0 region
 	map(0x184000, 0x184001).nopw();
 	map(0x188000, 0x188001).nopw();
-	map(0x300000, 0x30000f).w(m_deco_tilegen, FUNC(deco16ic_device::pf_control_w));
-	map(0x320000, 0x321fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x322000, 0x323fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x340000, 0x340bff).ram().share(m_pf_rowscroll[0]);
-	map(0x342000, 0x342bff).ram().share(m_pf_rowscroll[1]);
+	map(0x300000, 0x30000f).w(m_tilegen, FUNC(deco16ic_device::control_w));
+	map(0x320000, 0x321fff).rw(m_tilegen, FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x322000, 0x323fff).rw(m_tilegen, FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x340000, 0x340bff).ram().share(m_rowscroll[0]);
+	map(0x342000, 0x342bff).ram().share(m_rowscroll[1]);
 }
 
 /******************************************************************************/
@@ -386,8 +386,8 @@ static const gfx_layout tile_layout =
 };
 
 static GFXDECODE_START( gfx_funkyjet )
-	GFXDECODE_ENTRY( "chars", 0, charlayout,  256, 32 )  // Characters 8x8
-	GFXDECODE_ENTRY( "chars", 0, tile_layout, 256, 32 )  // Tiles 16x16
+	GFXDECODE_ENTRY( "tiles", 0, charlayout,  256, 32 )  // Characters 8x8
+	GFXDECODE_ENTRY( "tiles", 0, tile_layout, 256, 32 )  // Tiles 16x16
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_funkyjet_spr )
@@ -417,7 +417,7 @@ void funkyjet_state::funkyjet(machine_config &config)
 	m_screen->set_screen_update(FUNC(funkyjet_state::screen_update));
 	m_screen->set_palette("palette");
 
-	DECO146PROT(config, m_deco146, 0);
+	DECO146PROT(config, m_deco146);
 	m_deco146->port_a_cb().set_ioport("INPUTS");
 	m_deco146->port_b_cb().set_ioport("SYSTEM");
 	m_deco146->port_c_cb().set_ioport("DSW");
@@ -427,18 +427,18 @@ void funkyjet_state::funkyjet(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_funkyjet);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 1024);
 
-	DECO16IC(config, m_deco_tilegen, 0);
-	m_deco_tilegen->set_pf1_size(DECO_64x32);
-	m_deco_tilegen->set_pf2_size(DECO_64x32);
-	m_deco_tilegen->set_pf1_col_bank(0x00);
-	m_deco_tilegen->set_pf2_col_bank(0x10);
-	m_deco_tilegen->set_pf1_col_mask(0x0f);
-	m_deco_tilegen->set_pf2_col_mask(0x0f);
-	m_deco_tilegen->set_pf12_8x8_bank(0);
-	m_deco_tilegen->set_pf12_16x16_bank(1);
-	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
+	DECO16IC(config, m_tilegen);
+	m_tilegen->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen->set_col_bank<0>(0x00);
+	m_tilegen->set_col_bank<1>(0x10);
+	m_tilegen->set_col_mask<0>(0x0f);
+	m_tilegen->set_col_mask<1>(0x0f);
+	m_tilegen->set_8x8_bank(0);
+	m_tilegen->set_16x16_bank(1);
+	m_tilegen->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen, 0, "palette", gfx_funkyjet_spr);
+	DECO_SPRITE(config, m_sprgen, "palette", gfx_funkyjet_spr);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
@@ -463,7 +463,7 @@ ROM_START( funkyjet )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "jk02.16f",    0x00000, 0x10000, CRC(748c0bd8) SHA1(35910e6a4c4f198fb76bde0f5b053e2c66cfa0ff) )
 
-	ROM_REGION( 0x080000, "chars", 0 )
+	ROM_REGION( 0x080000, "tiles", 0 )
 	ROM_LOAD( "mat02", 0x000000, 0x80000, CRC(e4b94c7e) SHA1(7b6ddd0bd388c8d32277fce4b3abb102724bc7d1) ) // encrypted
 
 	ROM_REGION( 0x100000, "sprites", 0 )
@@ -484,7 +484,7 @@ ROM_START( funkyjeta )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "jk02.16f",    0x00000, 0x10000, CRC(748c0bd8) SHA1(35910e6a4c4f198fb76bde0f5b053e2c66cfa0ff) )
 
-	ROM_REGION( 0x080000, "chars", 0 )
+	ROM_REGION( 0x080000, "tiles", 0 )
 	ROM_LOAD( "mat02", 0x000000, 0x80000, CRC(e4b94c7e) SHA1(7b6ddd0bd388c8d32277fce4b3abb102724bc7d1) ) // encrypted
 
 	ROM_REGION( 0x100000, "sprites", 0 )
@@ -504,7 +504,7 @@ ROM_START( funkyjeta2 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "16f",    0x00000, 0x10000, CRC(748c0bd8) SHA1(35910e6a4c4f198fb76bde0f5b053e2c66cfa0ff) )
 
-	ROM_REGION( 0x080000, "chars", 0 )
+	ROM_REGION( 0x080000, "tiles", 0 )
 	ROM_LOAD( "mat02", 0x000000, 0x80000, CRC(e4b94c7e) SHA1(7b6ddd0bd388c8d32277fce4b3abb102724bc7d1) ) // encrypted
 
 	ROM_REGION( 0x100000, "sprites", 0 )
@@ -523,7 +523,7 @@ ROM_START( funkyjetj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "jh02.16f",    0x00000, 0x10000, CRC(748c0bd8) SHA1(35910e6a4c4f198fb76bde0f5b053e2c66cfa0ff) ) // same as jk02.16f from world set
 
-	ROM_REGION( 0x080000, "chars", 0 )
+	ROM_REGION( 0x080000, "tiles", 0 )
 	ROM_LOAD( "mat02", 0x000000, 0x80000, CRC(e4b94c7e) SHA1(7b6ddd0bd388c8d32277fce4b3abb102724bc7d1) ) // encrypted
 
 	ROM_REGION( 0x100000, "sprites", 0 )
@@ -543,7 +543,7 @@ ROM_START( sotsugyo )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sb020.16f",    0x00000, 0x10000, CRC(baf5ec93) SHA1(82b22a0b565e51cd40733f21fa876dd7064eb604) )
 
-	ROM_REGION( 0x080000, "chars", 0 )
+	ROM_REGION( 0x080000, "tiles", 0 )
 	ROM_LOAD( "02.2f", 0x000000, 0x80000, CRC(337b1451) SHA1(ab3a4526e683c23b7634ac3304fb073f6ce98e82) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )
@@ -562,7 +562,7 @@ ROM_START( sotsugyok ) // only ROMs that match the parent are the audio CPU and 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "27c512.16f",    0x00000, 0x10000, CRC(baf5ec93) SHA1(82b22a0b565e51cd40733f21fa876dd7064eb604) )
 
-	ROM_REGION( 0x080000, "chars", 0 )
+	ROM_REGION( 0x080000, "tiles", 0 )
 	ROM_LOAD( "27c4000.2f", 0x000000, 0x80000, CRC(8a76a083) SHA1(f5cccb3a7834225af0c6118af33362efeff66999) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )
@@ -575,7 +575,7 @@ ROM_END
 
 void funkyjet_state::init_funkyjet()
 {
-	deco74_decrypt_gfx(machine(), "chars");
+	deco74_decrypt_gfx(machine(), "tiles");
 }
 
 } // Anonymous namespace

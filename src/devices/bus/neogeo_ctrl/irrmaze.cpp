@@ -75,8 +75,6 @@ ioport_constructor neogeo_irrmaze_device::device_input_ports() const
 
 void neogeo_irrmaze_device::device_start()
 {
-	m_spi_outputs.resolve();
-
 	save_item(NAME(m_spi_sr));
 	save_item(NAME(m_ctrl_sel));
 }

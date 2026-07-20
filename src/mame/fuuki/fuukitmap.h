@@ -14,9 +14,15 @@ class fuukitmap_device : public device_t, public device_gfx_interface, public de
 public:
 	typedef device_delegate<void (u8 layer, u32 &colour)> colour_cb_delegate;
 
-	fuukitmap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	fuukitmap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 	template <typename T> fuukitmap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)
 		: fuukitmap_device(mconfig, tag, owner, clock)
+	{
+		set_info(gfxinfo);
+		set_palette(std::forward<T>(palette_tag));
+	}
+	template <typename T> fuukitmap_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag, const gfx_decode_entry *gfxinfo)
+		: fuukitmap_device(mconfig, tag, owner, 0, std::forward<T>(palette_tag), gfxinfo)
 	{
 		set_info(gfxinfo);
 		set_palette(std::forward<T>(palette_tag));

@@ -253,25 +253,25 @@ void jpmsys5_state::reel_0123_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	if (m_reel[0])
 	{
 		m_reel[0]->update(reel_interface_table[(data >> 0) & 0x03]);
-		awp_draw_reel(machine(), "reel1", *m_reel[0]);
+		m_reel[0]->draw();
 	}
 
 	if (m_reel[1])
 	{
 		m_reel[1]->update(reel_interface_table[(data >> 4) & 0x03]);
-		awp_draw_reel(machine(), "reel2", *m_reel[1]);
+		m_reel[1]->draw();
 	}
 
 	if (m_reel[2])
 	{
 		m_reel[2]->update(reel_interface_table[(data >> 8) & 0x03]);
-		awp_draw_reel(machine(), "reel3", *m_reel[2]);
+		m_reel[2]->draw();
 	}
 
 	if (m_reel[3])
 	{
 		m_reel[3]->update(reel_interface_table[(data >> 12) & 0x03]);
-		awp_draw_reel(machine(), "reel4", *m_reel[3]);
+		m_reel[3]->draw();
 	}
 }
 
@@ -285,23 +285,23 @@ void jpmsys5_state::reel_4567_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	if (m_reel[4])
 	{
 		m_reel[4]->update(reel_interface_table[(data >> 0) & 0x03]);
-		awp_draw_reel(machine(), "reel5", *m_reel[4]);
+		m_reel[4]->draw();
 	}
 	if (m_reel[5])
 	{
 		m_reel[5]->update(reel_interface_table[(data >> 4) & 0x03]);
-		awp_draw_reel(machine(), "reel6", *m_reel[5]);
+		m_reel[5]->draw();
 	}
 #if 0
 	if (m_reel[6])
 	{
 		m_reel[6]->update(reel_interface_table[(data >> 8) & 0x03]);
-		awp_draw_reel(machine(), "reel6", *m_reel[6]);
+		m_reel[6]->draw();
 	}
 	if (m_reel[7])
 	{
 		m_reel[7]->update(reel_interface_table[(data >> 12) & 0x03]);
-		awp_draw_reel(machine(), "reel7", *m_reel[7]);
+		m_reel[7]->draw();
 	}
 #endif
 }
@@ -758,19 +758,19 @@ void jpmsys5_state::jpmsys5_common(machine_config& config)
 	M68000(config, m_maincpu, 8_MHz_XTAL);
 
 	INPUT_MERGER_ANY_HIGH(config, "acia_irq").output_handler().set_inputline(m_maincpu, INT_6850ACIA);
-	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta", 0));
+	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta"));
 
-	ACIA6850(config, m_acia6850[0], 0);
+	ACIA6850(config, m_acia6850[0]);
 	m_acia6850[0]->txd_handler().set("bacta", FUNC(bacta_datalogger_device::write_txd));
 	m_acia6850[0]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<0>));
 
 	bacta.rxd_handler().set(m_acia6850[0], FUNC(acia6850_device::write_rxd));
 
-	ACIA6850(config, m_acia6850[1], 0);
+	ACIA6850(config, m_acia6850[1]);
 	m_acia6850[1]->txd_handler().set(FUNC(jpmsys5_state::a1_tx_w));
 	m_acia6850[1]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<1>));
 
-	ACIA6850(config, m_acia6850[2], 0);
+	ACIA6850(config, m_acia6850[2]);
 	m_acia6850[2]->txd_handler().set(FUNC(jpmsys5_state::a2_tx_w));
 	m_acia6850[2]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<2>));
 
@@ -830,7 +830,7 @@ void jpmsys5v_state::tmsvideo(machine_config &config)
 	screen.set_raw(XTAL(40'000'000) / 4, 676, 20*4, 147*4, 256, 0, 254);
 	screen.set_screen_update(FUNC(jpmsys5v_state::screen_update_jpmsys5v));
 
-	TMS34061(config, m_tms34061, 0);
+	TMS34061(config, m_tms34061);
 	m_tms34061->set_rowshift(8);  /* VRAM address is (row << rowshift) | col */
 	m_tms34061->set_vram_size(0x40000);
 	m_tms34061->int_callback().set(FUNC(jpmsys5v_state::generate_tms34061_interrupt));
@@ -872,7 +872,7 @@ void jpmsys5_state::jpmsys5_ym(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsys5_state::m68000_awp_map);
 
-	METERS(config, m_meters, 0).set_number(8);
+	METERS(config, m_meters).set_number(8);
 
 	ymsound(config);
 
@@ -886,7 +886,7 @@ void jpmsys5_state::jpmsys5(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsys5_state::m68000_awp_map_saa);
 
-	METERS(config, m_meters, 0).set_number(8);
+	METERS(config, m_meters).set_number(8);
 
 	saasound(config);
 
@@ -1094,10 +1094,6 @@ INPUT_PORTS_END
 
 void jpmsys5_state::machine_start()
 {
-	m_lamps.resolve();
-	m_sys5leds.resolve();
-	m_reellamp_out.resolve();
-
 	m_lamp_strobe = 0;
 }
 

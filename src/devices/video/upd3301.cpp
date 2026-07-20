@@ -72,6 +72,7 @@
 #define COMMAND_RESET_COUNTERS          0xc0    // not supported
 
 
+//#define STATUS_?                      0x80    // undocumented, low on underrun condition
 #define STATUS_VE                       0x10
 #define STATUS_U                        0x08    // not supported
 #define STATUS_N                        0x04    // not supported
@@ -306,7 +307,7 @@ uint8_t upd3301_device::read(offs_t offset)
 		case 1: // status
 			data = m_status;
 			if (!machine().side_effects_disabled())
-				m_status &= ~(STATUS_LP | STATUS_E |STATUS_N | STATUS_U);
+				m_status &= ~(STATUS_LP | STATUS_E | STATUS_N | STATUS_U);
 			break;
 	}
 
@@ -449,6 +450,7 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 				// re-enabling display.
 				set_display(0);
 				set_interrupt(0);
+				m_status |= 0x80;
 				break;
 
 			case COMMAND_START_DISPLAY:
@@ -467,6 +469,8 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 				}
 				set_display(1);
 				reset_counters();
+				m_status |= 0x80;
+				m_status &= ~STATUS_U;
 				break;
 			}
 
@@ -476,7 +480,10 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 				m_me = BIT(data, 0);
 				// special control character irq mask
 				m_mn = BIT(data, 1);
-				// TODO: Apparently unmasking ME should be reflected in undocumented status bit 7
+				// Unmasking ME has the side effect of clearing all status bits except bit 7
+				// pc8801:laptick implictly expect text layer to be concealed by running this command alone
+				if (!m_me)
+					m_status = 0x80;
 				LOGCMD("ME: %u (vblank irq mask)\n", m_me);
 				LOGCMD("MN: %u (special control char irq mask)\n", m_mn);
 				break;
@@ -486,6 +493,7 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 				// TODO: similar to cursor parameters except on read
 				// (plus an HR to bit 7 param [0])
 				m_mode = MODE_READ_LIGHT_PEN;
+				m_status &= ~STATUS_LP;
 				break;
 
 			case COMMAND_LOAD_CURSOR_POSITION:
@@ -521,6 +529,7 @@ void upd3301_device::dack_w(uint8_t data)
 	// TODO: underrun condition
 	if (m_y >= (m_l * m_r))
 	{
+		// m_status &= ~0x80;
 		return;
 	}
 

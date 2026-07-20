@@ -32,6 +32,8 @@
 #include "sound/ymopn.h"
 #include "sound/ymz280b.h"
 
+#include "endianness.h"
+
 #define LOG_BANK        (1U << 1)
 #define LOG_DMA         (1U << 2)
 #define LOG_MCU         (1U << 3)
@@ -110,10 +112,10 @@ void zn_state::zn_base(machine_config &config)
 
 	SPEAKER(config, m_speaker, 2).front();
 
-	AT28C16(config, m_at28c16, 0);
+	AT28C16(config, m_at28c16);
 
 	auto &sio0(*m_maincpu->subdevice<psxsio0_device>("sio0"));
-	ZNMCU(config, m_znmcu, 0);
+	ZNMCU(config, m_znmcu);
 	sio0.sck_handler().append(m_znmcu, FUNC(znmcu_device::sck));
 	m_znmcu->dsr().set(sio0, FUNC(psxsio0_device::write_dsr));
 	m_znmcu->txd().set(FUNC(zn_state::znmcu_dataout));
@@ -127,7 +129,7 @@ void zn_state::zn_base(machine_config &config)
 template<unsigned N>
 void zn_state::cat702(machine_config &config)
 {
-	CAT702(config, m_cat702[N], 0);
+	CAT702(config, m_cat702[N]);
 	m_cat702[N]->dataout_handler().set(FUNC(zn_state::cat702_dataout<N>));
 	auto &sio0(*m_maincpu->subdevice<psxsio0_device>("sio0"));
 	sio0.sck_handler().append(m_cat702[N], FUNC(cat702_device::write_clock));
@@ -921,7 +923,7 @@ public:
 
 		MB3773(config, m_mb3773);
 
-		TC0140SYT(config, m_tc0140syt, 0);
+		TC0140SYT(config, m_tc0140syt);
 		m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 		m_tc0140syt->reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 	}
@@ -2181,7 +2183,7 @@ public:
 
 		ADDRESS_MAP_BANK(config, m_bankmap).set_map(&nbajamex_state::bank_map).set_options(ENDIANNESS_LITTLE, 32, 24, 0x800000);
 
-		ACCLAIM_RAX(config, m_rax, 0);
+		ACCLAIM_RAX(config, m_rax);
 		m_rax->add_route(0, m_speaker, 1.0, 0);
 		m_rax->add_route(1, m_speaker, 1.0, 1);
 	}
@@ -5987,7 +5989,7 @@ GAME( 1997, sfexpj1,   sfexp,    coh1002c,  capcom6b, capcom_zn_state,  empty_in
 GAME( 1995, coh1000t,  0,        coh1000ta, znt2p,    taito_fx1s_state, empty_init, ROT0, "Taito",                   "Taito FX-1",                        MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, sfchamp,   coh1000t, coh1000ta, znt2p,    taito_fx1s_state, empty_init, ROT0, "Taito",                   "Super Football Champ (Ver 2.5O)",                          MACHINE_SUPPORTS_SAVE )
 GAME( 1995, sfchampo,  sfchamp,  coh1000ta, znt2p,    taito_fx1s_state, empty_init, ROT0, "Taito",                   "Super Football Champ (Ver 2.4O)",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sfchampu,  sfchamp,  coh1000ta, znt2p,    taito_fx1s_state, empty_init, ROT0, "Taito",                   "Super Football Champ (Ver 2.4A)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sfchampu,  sfchamp,  coh1000ta, znt2p,    taito_fx1s_state, empty_init, ROT0, "Taito America",           "Super Football Champ (Ver 2.4A)",                          MACHINE_SUPPORTS_SAVE )
 GAME( 1995, sfchampj,  sfchamp,  coh1000ta, znt2p,    taito_fx1s_state, empty_init, ROT0, "Taito",                   "Super Football Champ (Ver 2.4J)",                          MACHINE_SUPPORTS_SAVE )
 GAME( 1995, psyforce,  coh1000t, coh1000ta, znt2p,    taito_fx1s_state, empty_init, ROT0, "Taito",                   "Psychic Force (Ver 2.4O)",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1995, psyforcej, psyforce, coh1000ta, znt2p,    taito_fx1s_state, empty_init, ROT0, "Taito",                   "Psychic Force (Ver 2.4J)",                                 MACHINE_SUPPORTS_SAVE )
@@ -5996,10 +5998,10 @@ GAME( 1996, mgcldate,  mgcldtex, coh1000ta, znt2p,    taito_fx1s_state, empty_in
 GAME( 1997, mgcldtex,  coh1000t, coh1000ta, znt2p,    taito_fx1s_state, empty_init, ROT0, "Taito",                   "Magical Date EX / Magical Date - Sotsugyou Kokuhaku Daisakusen (Ver 2.01J)", MACHINE_SUPPORTS_SAVE )
 
 // Taito FX-1 (ZROM PCB)
-GAME( 1996, raystorm,  coh1000t, coh1000tb, raystorm, taito_fx1z_state, empty_init, ROT0, "Taito",                   "Ray Storm (Ver 2.06A)",                                    MACHINE_SUPPORTS_SAVE )
-GAME( 1996, raystormo, raystorm, coh1000tb, raystorm, taito_fx1z_state, empty_init, ROT0, "Taito",                   "Ray Storm (Ver 2.05O)",                                    MACHINE_SUPPORTS_SAVE )
-GAME( 1996, raystormu, raystorm, coh1000tb, raystorm, taito_fx1z_state, empty_init, ROT0, "Taito",                   "Ray Storm (Ver 2.05A)",                                    MACHINE_SUPPORTS_SAVE )
-GAME( 1996, raystormj, raystorm, coh1000tb, raystorm, taito_fx1z_state, empty_init, ROT0, "Taito",                   "Ray Storm (Ver 2.05J)",                                    MACHINE_SUPPORTS_SAVE )
+GAME( 1996, raystorm,  coh1000t, coh1000tb, raystorm, taito_fx1z_state, empty_init, ROT0, "Taito",                   "RayStorm (Ver 2.06A)",                                     MACHINE_SUPPORTS_SAVE )
+GAME( 1996, raystormo, raystorm, coh1000tb, raystorm, taito_fx1z_state, empty_init, ROT0, "Taito",                   "RayStorm (Ver 2.05O)",                                     MACHINE_SUPPORTS_SAVE )
+GAME( 1996, raystormu, raystorm, coh1000tb, raystorm, taito_fx1z_state, empty_init, ROT0, "Taito",                   "RayStorm (Ver 2.05A)",                                     MACHINE_SUPPORTS_SAVE )
+GAME( 1996, raystormj, raystorm, coh1000tb, raystorm, taito_fx1z_state, empty_init, ROT0, "Taito",                   "RayStorm (Ver 2.05J)",                                     MACHINE_SUPPORTS_SAVE )
 GAME( 1996, ftimpact,  ftimpcta, coh1000tb, znt2p,    taito_fx1z_state, empty_init, ROT0, "Taito",                   "Fighters' Impact (Ver 2.02O)",                             MACHINE_SUPPORTS_SAVE )
 GAME( 1996, ftimpactu, ftimpcta, coh1000tb, znt2p,    taito_fx1z_state, empty_init, ROT0, "Taito",                   "Fighters' Impact (Ver 2.02A)",                             MACHINE_SUPPORTS_SAVE )
 GAME( 1996, ftimpactj, ftimpcta, coh1000tb, znt2p,    taito_fx1z_state, empty_init, ROT0, "Taito",                   "Fighters' Impact (Ver 2.02J)",                             MACHINE_SUPPORTS_SAVE )

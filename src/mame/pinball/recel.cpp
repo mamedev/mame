@@ -63,7 +63,11 @@ public:
 		, m_digit(*this, "digit%d", 0U)
 	{ }
 
-	void recel(machine_config &config);
+	void recel(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 solenoids_r(offs_t offset);
@@ -75,11 +79,8 @@ private:
 	void lamps_w(offs_t offset, u8 data);
 	u8 nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, u8 data);
-	[[maybe_unused]]u8 bic_r(offs_t offset);
-	[[maybe_unused]]void bic_w(offs_t offset, u8 data);
-
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
+	[[maybe_unused]] u8 bic_r(offs_t offset);
+	[[maybe_unused]] void bic_w(offs_t offset, u8 data);
 
 	void recel_map(address_map &map) ATTR_COLD;
 	void recel_data(address_map &map) ATTR_COLD;
@@ -180,8 +181,6 @@ INPUT_PORTS_END
 void recel_state::machine_start()
 {
 	genpin_class::machine_start();
-
-	m_digit.resolve();
 
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_nvram_addr));
@@ -359,17 +358,17 @@ void recel_state::recel(machine_config & config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	ra17xx_device &u5(RA17XX(config, "b2", 0));
+	ra17xx_device &u5(RA17XX(config, "b2"));
 	u5.iord_cb().set(FUNC(recel_state::nvram_r));
 	u5.iowr_cb().set(FUNC(recel_state::nvram_w));     // control NVRAM, printer
 	u5.set_cpu_tag(m_maincpu);
 
-	ra17xx_device &u4(RA17XX(config, "b1", 0));
+	ra17xx_device &u4(RA17XX(config, "b1"));
 	u4.iord_cb().set(FUNC(recel_state::lamps_r));
 	u4.iowr_cb().set(FUNC(recel_state::lamps_w));    // control lamps
 	u4.set_cpu_tag(m_maincpu);
 
-	r10696_device &u3(R10696(config, "b3", 0));
+	r10696_device &u3(R10696(config, "b3"));
 	u3.iord_cb().set(FUNC(recel_state::solenoids_r));
 	u3.iowr_cb().set(FUNC(recel_state::solenoids_w));   // to sound, solenoids, lamps
 

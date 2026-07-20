@@ -144,8 +144,6 @@ const char *const amiga_state::s_custom_reg_names[0x100] =
 
 void amiga_state::machine_start()
 {
-	m_power_led.resolve();
-
 	// set up chip RAM access
 	memory_share *share = memshare("chip_ram");
 	if (share == nullptr)

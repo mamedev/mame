@@ -1836,64 +1836,83 @@ ROM_START( vigilantbl )
 	ROM_LOAD( "v10_129c.bin", 0x0300, 0x0100, CRC(3f186bc8) SHA1(e5270fbc16c5844294cf20b42e57f4edaabbe629) )
 ROM_END
 
+/*
+Meikyu Jima / Kickle Cubele (c) 1988 IREM
 
+IREM M77-A-A PCB
+
+   CPU: NEC D780C-1 Z80 x2
+ Sound: Yamaha YM2151, Y3014B DAC
+   OSC: 3579.545KHz, 24000.00KHz (3.579545MHz & 24MHz)
+Custom: NANAO KNA70H016
+        NANAO KNA6074601
+        NANAO KNA91H014
+        NANAO KNA6021902 x 2
+  MISC: 8 Switch DIP switches
+        Volume pot
+*/
 ROM_START( kikcubic )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "mqj-p0",       0x00000, 0x08000, CRC(9cef394a) SHA1(be9cc78420b4c35f8f9523b529bd56315749762c) )
-	ROM_LOAD( "mqj-b0",       0x10000, 0x10000, CRC(d9bcf4cd) SHA1(f1f1cb8609343dae8637f115e5c96fd88a00f5eb) )
-	ROM_LOAD( "mqj-b1",       0x20000, 0x10000, CRC(54a0abe1) SHA1(0fb1d050c1e299394609214c903bcf4cf11329ff) )
+	ROM_LOAD( "mqj_a-p0-.ic4",  0x00000, 0x08000, CRC(9cef394a) SHA1(be9cc78420b4c35f8f9523b529bd56315749762c) )
+	ROM_LOAD( "mqj_a-b0-.ic37", 0x10000, 0x10000, CRC(d9bcf4cd) SHA1(f1f1cb8609343dae8637f115e5c96fd88a00f5eb) )
+	ROM_LOAD( "mqj_a-b1-.ic38", 0x20000, 0x10000, CRC(54a0abe1) SHA1(0fb1d050c1e299394609214c903bcf4cf11329ff) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "mqj-sp",       0x00000, 0x10000, CRC(bbcf3582) SHA1(4a5b9d4161b26e3ca400573fa78268893e42d5db) )
+	ROM_LOAD( "mqj_a-sp-.ic34", 0x00000, 0x10000, CRC(bbcf3582) SHA1(4a5b9d4161b26e3ca400573fa78268893e42d5db) )
 
 	ROM_REGION( 0x20000, "chars", 0 )
-	ROM_LOAD( "mqj-c0",       0x00000, 0x10000, CRC(975585c5) SHA1(eb8245e458a5d4880add5b4a305a4468fa8f6491) )
-	ROM_LOAD( "mqj-c1",       0x10000, 0x10000, CRC(49d9936d) SHA1(c4169ddd481c19e8e24457e2fe011db1b34db6d3) )
+	ROM_LOAD( "mqj_a-c0-.ic71", 0x00000, 0x10000, CRC(975585c5) SHA1(eb8245e458a5d4880add5b4a305a4468fa8f6491) ) // also known to be nondescript soldered in place mask ROMs
+	ROM_LOAD( "mqj_a-c1-.ic72", 0x10000, 0x10000, CRC(49d9936d) SHA1(c4169ddd481c19e8e24457e2fe011db1b34db6d3) ) // also known to be nondescript soldered in place mask ROMs
 
 	ROM_REGION( 0x80000, "sprites", 0 )
-	ROM_LOAD( "mqj-00",       0x00000, 0x40000, CRC(7fb0c58f) SHA1(f70ff39e2d648606686c87cf1a7a3ffb46c2656a) )
-	ROM_LOAD( "mqj-10",       0x40000, 0x40000, CRC(3a189205) SHA1(063d664d4cf709931b5e3a5b6eb7c75bcd57b518) )
+	ROM_LOAD( "mqj_a-00-.ic97", 0x00000, 0x40000, CRC(7fb0c58f) SHA1(f70ff39e2d648606686c87cf1a7a3ffb46c2656a) ) // also known to be nondescript soldered in place mask ROMs
+	ROM_LOAD( "mqj_a-10-.ic95", 0x40000, 0x40000, CRC(3a189205) SHA1(063d664d4cf709931b5e3a5b6eb7c75bcd57b518) ) // also known to be nondescript soldered in place mask ROMs
+	// 01 at IC96 & 11 at IC94 unpopulated
 
 	ROM_REGION( 0x10000, "m72", 0 ) // samples
-	ROM_LOAD( "mqj-v0",       0x00000, 0x10000, CRC(54762956) SHA1(f08e983af28b16d27505d465ca64e7c7a93373a4) )
+	ROM_LOAD( "mqj_a-v0-.ic31", 0x00000, 0x10000, CRC(54762956) SHA1(f08e983af28b16d27505d465ca64e7c7a93373a4) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "8d",           0x0000, 0x0100, CRC(7379bb12) SHA1(cf0c4e27911505f937004ea5eac1154956ec5d3b) )    // unknown (timing?)
-	ROM_LOAD( "6h",           0x0100, 0x0020, CRC(face0cbb) SHA1(c56aea3b7aaabbd4ff1b4546fcad94f51b473cde) )    // unknown (bad read?)
-	ROM_LOAD( "7s",           0x0120, 0x0020, CRC(face0cbb) SHA1(c56aea3b7aaabbd4ff1b4546fcad94f51b473cde) )    // unknown (bad read?)
+	ROM_LOAD( "m77_a-8d-.ic80",  0x0000, 0x0100, CRC(7379bb12) SHA1(cf0c4e27911505f937004ea5eac1154956ec5d3b) ) // unknown (timing?)
+	ROM_LOAD( "m77_a-030-.ic59", 0x0100, 0x0020, CRC(face0cbb) SHA1(c56aea3b7aaabbd4ff1b4546fcad94f51b473cde) ) // unknown
+	ROM_LOAD( "m77_a-030-.ic75", 0x0120, 0x0020, CRC(face0cbb) SHA1(c56aea3b7aaabbd4ff1b4546fcad94f51b473cde) ) // unknown
+
+	ROM_REGION( 0x0400, "plds", 0 )
+	ROM_LOAD( "m77_a_2h-.ic8",  0x0000, 0x0104, NO_DUMP ) // unknown PAL type
+	ROM_LOAD( "m77_a_3p-.ic25", 0x0200, 0x0104, NO_DUMP ) // unknown PAL type
 ROM_END
 
 ROM_START( kikcubicb )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "1.bin",        0x00000, 0x08000, CRC(d3a589ba) SHA1(be2fa4515ed3510fec2b182a3ffcf5ddb9d7256d) )
-	ROM_LOAD( "4.bin",        0x10000, 0x10000, CRC(9ae1e1a6) SHA1(7f3099206300eaa275b003e829dff0b7b91d8cc8) )
-	ROM_LOAD( "5.bin",        0x20000, 0x08000, CRC(a5a6bffd) SHA1(372452c8c9b2c65307434af19eddcb60e7cd0fa3) )
-	ROM_RELOAD(               0x28000, 0x08000 )
+	ROM_LOAD( "1.bin", 0x00000, 0x08000, CRC(d3a589ba) SHA1(be2fa4515ed3510fec2b182a3ffcf5ddb9d7256d) )
+	ROM_LOAD( "4.bin", 0x10000, 0x10000, CRC(9ae1e1a6) SHA1(7f3099206300eaa275b003e829dff0b7b91d8cc8) )
+	ROM_LOAD( "5.bin", 0x20000, 0x08000, CRC(a5a6bffd) SHA1(372452c8c9b2c65307434af19eddcb60e7cd0fa3) )
+	ROM_RELOAD(        0x28000, 0x08000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "mqj-sp",       0x00000, 0x10000, CRC(bbcf3582) SHA1(4a5b9d4161b26e3ca400573fa78268893e42d5db) ) // 2.bin
+	ROM_LOAD( "2.bin", 0x00000, 0x10000, CRC(bbcf3582) SHA1(4a5b9d4161b26e3ca400573fa78268893e42d5db) ) // == mqj_a-sp-.ic34
 
 	ROM_REGION( 0x20000, "chars", 0 )
-	ROM_LOAD( "7.bin",        0x00000, 0x10000, CRC(1788d51a) SHA1(bf7182379a34c366f192cb7d2494b26f6e27d97f) )
-	ROM_LOAD( "mqj-c1",       0x10000, 0x10000, CRC(49d9936d) SHA1(c4169ddd481c19e8e24457e2fe011db1b34db6d3) ) // 6.bin
+	ROM_LOAD( "7.bin", 0x00000, 0x10000, CRC(1788d51a) SHA1(bf7182379a34c366f192cb7d2494b26f6e27d97f) )
+	ROM_LOAD( "6.bin", 0x10000, 0x10000, CRC(49d9936d) SHA1(c4169ddd481c19e8e24457e2fe011db1b34db6d3) ) // == mqj-c1.ic72
 
 	ROM_REGION( 0x80000, "sprites", 0 )
-	ROM_LOAD( "11.bin",       0x00000, 0x10000, CRC(0f0cac92) SHA1(32cf4b274b61d69a6d9f0ad39aa903c7a99b981d) )
-	ROM_RELOAD(               0x20000, 0x10000 )
-	ROM_LOAD( "10.bin",       0x10000, 0x10000, CRC(7d3822a8) SHA1(20e07a6edd46abf46b0d101a0ccee72f087f63b2) )
-	ROM_RELOAD(               0x30000, 0x10000 )
-	ROM_LOAD( "9.bin",        0x40000, 0x10000, CRC(56fb4fa3) SHA1(ed82602bfe98e60208d50f29f064c11cec01b3a7) )
-	ROM_RELOAD(               0x60000, 0x10000 )
-	ROM_LOAD( "8.bin",        0x50000, 0x10000, CRC(947dbd4e) SHA1(278ad7126bacb752886800cf48c6fe704427149d) )
-	ROM_RELOAD(               0x70000, 0x10000 )
+	ROM_LOAD( "11.bin", 0x00000, 0x10000, CRC(0f0cac92) SHA1(32cf4b274b61d69a6d9f0ad39aa903c7a99b981d) )
+	ROM_RELOAD(         0x20000, 0x10000 )
+	ROM_LOAD( "10.bin", 0x10000, 0x10000, CRC(7d3822a8) SHA1(20e07a6edd46abf46b0d101a0ccee72f087f63b2) )
+	ROM_RELOAD(         0x30000, 0x10000 )
+	ROM_LOAD( "9.bin",  0x40000, 0x10000, CRC(56fb4fa3) SHA1(ed82602bfe98e60208d50f29f064c11cec01b3a7) )
+	ROM_RELOAD(         0x60000, 0x10000 )
+	ROM_LOAD( "8.bin",  0x50000, 0x10000, CRC(947dbd4e) SHA1(278ad7126bacb752886800cf48c6fe704427149d) )
+	ROM_RELOAD(         0x70000, 0x10000 )
 
 	ROM_REGION( 0x10000, "m72", 0 ) // samples
-	ROM_LOAD( "mqj-v0",       0x00000, 0x10000, CRC(54762956) SHA1(f08e983af28b16d27505d465ca64e7c7a93373a4) )
+	ROM_LOAD( "3.bin", 0x00000, 0x10000, CRC(54762956) SHA1(f08e983af28b16d27505d465ca64e7c7a93373a4) ) // == mqj_a-v0-.ic31
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "8d",           0x0000, 0x0100, CRC(7379bb12) SHA1(cf0c4e27911505f937004ea5eac1154956ec5d3b) )    // unknown (timing?)
-	ROM_LOAD( "6h",           0x0100, 0x0020, CRC(face0cbb) SHA1(c56aea3b7aaabbd4ff1b4546fcad94f51b473cde) )    // unknown (bad read?)
-	ROM_LOAD( "7s",           0x0120, 0x0020, CRC(face0cbb) SHA1(c56aea3b7aaabbd4ff1b4546fcad94f51b473cde) )    // unknown (bad read?)
+	ROM_LOAD( "8d", 0x0000, 0x0100, CRC(7379bb12) SHA1(cf0c4e27911505f937004ea5eac1154956ec5d3b) ) // unknown (timing?)
+	ROM_LOAD( "6h", 0x0100, 0x0020, CRC(face0cbb) SHA1(c56aea3b7aaabbd4ff1b4546fcad94f51b473cde) ) // unknown
+	ROM_LOAD( "7s", 0x0120, 0x0020, CRC(face0cbb) SHA1(c56aea3b7aaabbd4ff1b4546fcad94f51b473cde) ) // unknown
 ROM_END
 
 

@@ -383,7 +383,6 @@ void vpoker_state::machine_start()
 	m_nvram_data = make_unique_clear<u8[]>(0x200);
 	subdevice<nvram_device>("nvram")->set_base(&m_nvram_data[0], 0x200);
 	save_pointer(NAME(m_nvram_data), 0x200);
-	m_lamps.resolve();
 }
 
 

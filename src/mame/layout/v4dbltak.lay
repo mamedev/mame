@@ -195,6 +195,7 @@ license:CC0-1.0
 			{ 80, 81, 82, 83, 84, 85, 86, 87 },
 			{ 72, 73, 74, 75, 76, 77, 78     },
 			{ 64, 65, 66, 67, 68, 69, 70     } }
+		local outputs
 
 		local function configure_view(view)
 			local led_items = {
@@ -204,10 +205,10 @@ license:CC0-1.0
 					view.items["compoundled3"] }
 			view:set_prepare_items_callback(
 					function ()
-						for ledno, lamps in pairs(ledlamps) do
+						for ledno, lamps in pairs(outputs) do
 							local ledstate = 0
-							for bit, lampno in pairs(lamps) do
-								if machine.output:get_indexed_value("lamp", lampno) > 0 then
+							for bit, output in pairs(lamps) do
+								if output:get() > 0 then
 									ledstate = ledstate | (1 << (bit - 1))
 								end
 							end
@@ -220,6 +221,13 @@ license:CC0-1.0
 
 		file:set_resolve_tags_callback(
 				function ()
+					outputs = { }
+					for ledno, lamps in pairs(ledlamps) do
+						table.insert(outputs, { })
+						for bit, lampno in pairs(lamps) do
+							table.insert(outputs[ledno], file.device:output(string.format("lamp%u", lampno)))
+						end
+					end
 					for k, view in pairs(file.views) do
 						configure_view(view)
 					end

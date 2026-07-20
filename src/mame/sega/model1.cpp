@@ -595,14 +595,17 @@ Notes:
 #include "emu.h"
 #include "model1.h"
 
-#include "cpu/i386/i386.h"
-#include "machine/clock.h"
 #include "model1io.h"
 #include "model1io2.h"
+
+#include "cpu/i386/i386.h"
+#include "machine/clock.h"
 #include "machine/nvram.h"
+
 #include "speaker.h"
 
 #include "model1io2.lh"
+
 
 // On the real system, another 315-5338A is acting as slave
 // and writes the data to the dual port RAM. This isn't
@@ -694,7 +697,7 @@ void model1_state::wingwar360_outputs_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 }
 
-void model1_state::netmerc_outputs_w(uint8_t data)
+void netmerc_state::netmerc_outputs_w(uint8_t data)
 {
 	// 76------  unknown (not used?)
 	// --54----  mvd backlights
@@ -804,7 +807,7 @@ void model1_state::irq_raise(int level)
 	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-IRQ_CALLBACK_MEMBER(model1_state::irq_callback)
+u8 model1_state::irq_callback()
 {
 	for (int i = 0; i < 8; i++)
 		if (BIT(m_irq_status, i))
@@ -833,19 +836,105 @@ void model1_state::irq_control_w(u8 data)
 	}
 }
 
+// E00002: per-level IRQ mask, active low (bit n set = IRQ level n masked).
+// Assumed to power up with all levels masked; every game programs it before
+// enabling interrupts in the PSW, so the reset value is not observable
+// (swa/wingwar write it in the instruction immediately preceding
+// updpsw #0x40000, the others earlier in their init).
+//
+// - vf/vr:   write 0xff then 0xfd at init - vblank only. vf additionally
+//            unmasks level 3 ("and.b #0xf7") while its sound queue is
+//            non-empty and masks it again ("or.b #8") once it drains - its
+//            level 3 handler pumps the queue to the uart.
+// - swa:     writes 0x3c - unmasks levels 0/1; level 0 is its uart pump.
+// - wingwar: writes 0x3d - unmasks level 1 only.
+// - netmerc: writes 0xff at boot, then "and.b #0xfd" - unmasks level 1 only.
+//            All its other vectors point to a debug routine that cycles the
+//            backdrop colour, which must never run.
+//
+// Note: The games (e.g., netmerc) do perform read operations on this register,
+// likely for read-modify-write bit manipulations. It must remain readable.
+u8 model1_state::irq_mask_r()
+{
+	return m_irq_mask;
+}
+
+void model1_state::irq_mask_w(u8 data)
+{
+	m_irq_mask = data;
+	sound_ready_w(0);
+}
+
+void model1_state::sound_ready_w(int state)
+{
+	if ((m_m1uart->txrdy_r() || m_m1uart->rxrdy_r()) && !BIT(m_irq_mask, 3))
+		irq_raise(3);
+}
+
+u16 model1_state::timer_r(offs_t offset)
+{
+	u16 result = m_timer_val[offset];
+
+	if (m_timer_period[offset])
+	{
+		uint32_t ticks = m_irq0_timer[offset]->remaining().as_ticks(m_maincpu->clock());
+		result = ticks / 0x800;
+		if (!machine().side_effects_disabled())
+			m_timer_val[offset] = result;
+	}
+	return result;
+}
+
+void model1_state::timer_mode_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_timer_mode);
+}
+
+void model1_state::timer_period_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_timer_period[offset]);
+	if (m_timer_period[offset])
+	{
+		attotime period = attotime::from_ticks(0x800 * m_timer_period[offset], m_maincpu->clock());
+		m_irq0_timer[offset]->adjust(period, offset);
+	}
+	else
+	{
+		m_irq0_timer[offset]->adjust(attotime::never);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(model1_state::irq0_timer_tick)
+{
+	if (!BIT(m_irq_mask, 0))
+		irq_raise(0);
+
+	if (m_timer_period[param])
+	{
+		attotime period = attotime::from_ticks(0x800 * m_timer_period[param], m_maincpu->clock());
+		m_irq0_timer[param]->adjust(period, param);
+	}
+}
+
+// IRQ vectors in use:
 // vf
-// 1 = fe3ed4
-// 3 = fe3f5c
+// 1 = fe3ed4 (vblank)
+// 3 = fe3f5c (uart queue pump)
 // other = fe3ec8 / fe3ebc
 
 // vr
-// 1 = fe02bc
-// other = f302a4 / fe02b0
+// 1 = fe02bc (vblank)
+// other = fe02a4 / fe02b0
 
 // swa
-// 1 = ff504
+// 0 = ff558 (uart queue pump)
+// 1 = ff504 (vblank)
 // 3 = ff54c
 // other = ff568/ff574
+
+// netmerc
+// 1 = ffe000 (vblank)
+// other = ffe10c (debug backdrop cycler, always masked)
 
 void model1_state::irq_init()
 {
@@ -861,12 +950,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
 	{
 		if (m_m1comm != nullptr)
 			m_m1comm->check_vint_irq();
-		irq_raise(1);
+		if (!BIT(m_irq_mask, 1))
+			irq_raise(1);
 	}
-	else if(scanline == 384/2)
-	{
-		irq_raise(m_sound_irq);
-	}
+
 }
 
 void model1_state::machine_reset()
@@ -877,15 +964,20 @@ void model1_state::machine_reset()
 
 	m_irq_status = 0;
 	m_last_irq = 0;
+	m_irq_mask = 0xff;
+}
 
-	if (!strcmp(machine().system().name, "swa") ||
-		!strcmp(machine().system().name, "swaj"))
+void netmerc_state::machine_reset()
+{
+	model1_state::machine_reset();
+
+	// Initial HMD (VR glasses) pose: camera orientation vector
+	// 12868 ≈ 90°, 25736 ≈ 180° — points the camera forward
+	constexpr int16_t pose[6] = {0, 0, 0, 12868, 25736, 12868};
+	for (int i = 0; i < 6; i++)
 	{
-		m_sound_irq = 0;
-	}
-	else
-	{
-		m_sound_irq = 3;
+		m_dpram->left_w(0x80 + i * 2, pose[i] & 0xff);
+		m_dpram->left_w(0x81 + i * 2, (pose[i] >> 8) & 0xff);
 	}
 }
 
@@ -899,8 +991,8 @@ void model1_state::model1_mem(address_map &map)
 	/* RAMA */ map(0x400000, 0x40ffff).ram().share("nvram");
 	/* RAMB */ map(0x500000, 0x53ffff).ram();
 
-	/* TGP  */ map(0x600000, 0x60ffff).ram().share("display_list0");
-	/*      */ map(0x610000, 0x61ffff).ram().share("display_list1");
+	/* TGP  */ map(0x600000, 0x60ffff).ram().share(m_display_list0);
+	/*      */ map(0x610000, 0x61ffff).ram().share(m_display_list1);
 	/*      */ map(0x680000, 0x680003).rw(FUNC(model1_state::model1_listctl_r), FUNC(model1_state::model1_listctl_w));
 
 	/* SCR  */ map(0x700000, 0x70ffff).rw(m_tiles, FUNC(segas24_tile_device::tile_r), FUNC(segas24_tile_device::tile_w));
@@ -912,8 +1004,8 @@ void model1_state::model1_mem(address_map &map)
 
 	/* OBJ  */
 
-	/* COL  */ map(0x900000, 0x903fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	/*      */ map(0x910000, 0x91bfff).ram().share("color_xlat");
+	/* COL  */ map(0x900000, 0x903fff).ram().w(FUNC(model1_state::model1_paletteram_w)).share(m_paletteram16);
+	/*      */ map(0x910000, 0x91bfff).ram().share(m_color_xlat);
 
 	/* EX0  */
 	/* EX1  */
@@ -927,8 +1019,11 @@ void model1_state::model1_mem(address_map &map)
 	/*      */ map(0xdc0000, 0xdc0003).r(FUNC(model1_state::fifoin_status_r)).mirror(0x1fffc);
 
 	/* GLUE */ map(0xe00000, 0xe00000).w(FUNC(model1_state::irq_control_w));
+	/*      */ map(0xe00002, 0xe00002).rw(FUNC(model1_state::irq_mask_r), FUNC(model1_state::irq_mask_w));
 	/*      */ map(0xe00004, 0xe00005).w(FUNC(model1_state::bank_w));
-	/*      */ map(0xe0000c, 0xe0000f).nopw();
+	/*      */ map(0xe00006, 0xe00007).w(FUNC(model1_state::timer_mode_w));
+	/*      */ map(0xe00008, 0xe0000b).w(FUNC(model1_state::timer_period_w));
+	/*      */ map(0xe0000c, 0xe0000f).r(FUNC(model1_state::timer_r)).nopw(); // vf/swa write 0 to the count registers at init
 
 	/* ROM0 */ map(0xf80000, 0xffffff).rom();
 }
@@ -1156,7 +1251,7 @@ static INPUT_PORTS_START( netmerc )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("STICKX")
-	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 
 	PORT_START("STICKY")
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
@@ -1356,7 +1451,7 @@ ROM_START( swa )
 	ROM_RELOAD(              0x080000, 0x80000 )
 
 	ROM_REGION32_LE( 0x2000, "tgp_copro", 0)
-	ROM_LOAD( "315-5711.bin", 0, 0x2000, CRC(c5ddb8fc) SHA1(9e21d3a07ffa315e0139483b664e3fa283ef4e06) BAD_DUMP)
+	ROM_LOAD( "315-5711.bin", 0, 0x2000, CRC(6a21f304) SHA1(d5c61ea6e4744f10170ea556068c248bd43bb111) BAD_DUMP)
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP( "epr-16470.7", 0x000000, 0x020000, CRC(7da18cf7) SHA1(bd432d882d217277faee120e2577357a32eb4a6e) )
@@ -1404,7 +1499,7 @@ ROM_START( swaj )
 	ROM_RELOAD(              0x080000, 0x80000 )
 
 	ROM_REGION32_LE( 0x2000, "tgp_copro", 0)
-	ROM_LOAD( "315-5711.bin", 0, 0x2000, CRC(c5ddb8fc) SHA1(9e21d3a07ffa315e0139483b664e3fa283ef4e06) BAD_DUMP )
+	ROM_LOAD( "315-5711.bin", 0, 0x2000, CRC(6a21f304) SHA1(d5c61ea6e4744f10170ea556068c248bd43bb111) BAD_DUMP)
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP( "epr-16470.7", 0x000000, 0x020000, CRC(7da18cf7) SHA1(bd432d882d217277faee120e2577357a32eb4a6e) )
@@ -1461,7 +1556,7 @@ ROM_START( wingwar )
 	ROM_LOAD16_BYTE( "mpr-16733.11", 0x1200001, 0x80000, CRC(e105847b) SHA1(8489a6c91fd6d1e9ba81e8eaf36c514da30dccbe) )
 
 	ROM_REGION32_LE( 0x2000, "tgp_copro", 0)
-	ROM_LOAD( "315-5711.bin", 0, 0x2000, CRC(c5ddb8fc) SHA1(9e21d3a07ffa315e0139483b664e3fa283ef4e06) BAD_DUMP )
+	ROM_LOAD( "315-5711.bin", 0, 0x2000, CRC(6a21f304) SHA1(d5c61ea6e4744f10170ea556068c248bd43bb111) BAD_DUMP)
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP( "epr-17126.7", 0x000000, 0x20000, CRC(50178e40) SHA1(fb01aecfbe4e90adc997de0d45a63c16ef353b37) )
@@ -1522,7 +1617,7 @@ ROM_START( wingwaru )
 	ROM_LOAD16_BYTE( "mpr-16733.11", 0x1200001, 0x80000, CRC(e105847b) SHA1(8489a6c91fd6d1e9ba81e8eaf36c514da30dccbe) )
 
 	ROM_REGION32_LE( 0x2000, "tgp_copro", 0)
-	ROM_LOAD( "315-5711.bin", 0, 0x2000, CRC(c5ddb8fc) SHA1(9e21d3a07ffa315e0139483b664e3fa283ef4e06) BAD_DUMP )
+	ROM_LOAD( "315-5711.bin", 0, 0x2000, CRC(6a21f304) SHA1(d5c61ea6e4744f10170ea556068c248bd43bb111) BAD_DUMP)
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP( "epr-16751.7", 0x000000, 0x20000, CRC(23ba5ebc) SHA1(b98aab546c5e980baeedbada4e7472eb4c588260) )
@@ -1574,7 +1669,7 @@ ROM_START( wingwarj )
 	ROM_LOAD16_BYTE( "mpr-16733.11", 0x1200001, 0x80000, CRC(e105847b) SHA1(8489a6c91fd6d1e9ba81e8eaf36c514da30dccbe) )
 
 	ROM_REGION32_LE( 0x2000, "tgp_copro", 0)
-	ROM_LOAD( "315-5711.bin", 0, 0x2000, CRC(c5ddb8fc) SHA1(9e21d3a07ffa315e0139483b664e3fa283ef4e06) BAD_DUMP )
+	ROM_LOAD( "315-5711.bin", 0, 0x2000, CRC(6a21f304) SHA1(d5c61ea6e4744f10170ea556068c248bd43bb111) BAD_DUMP)
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP( "epr-16751.7", 0x000000, 0x20000, CRC(23ba5ebc) SHA1(b98aab546c5e980baeedbada4e7472eb4c588260) )
@@ -1628,7 +1723,7 @@ ROM_START( wingwar360 )
 	ROM_LOAD16_BYTE( "mpr-16733.11", 0x1200001, 0x80000, CRC(e105847b) SHA1(8489a6c91fd6d1e9ba81e8eaf36c514da30dccbe) )
 
 	ROM_REGION32_LE( 0x2000, "tgp_copro", 0)
-	ROM_LOAD( "315-5711.bin", 0, 0x2000, CRC(c5ddb8fc) SHA1(9e21d3a07ffa315e0139483b664e3fa283ef4e06) BAD_DUMP )
+	ROM_LOAD( "315-5711.bin", 0, 0x2000, CRC(6a21f304) SHA1(d5c61ea6e4744f10170ea556068c248bd43bb111) BAD_DUMP)
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP( "epr-17126.7", 0x000000, 0x20000, CRC(50178e40) SHA1(fb01aecfbe4e90adc997de0d45a63c16ef353b37) )
@@ -1680,7 +1775,7 @@ ROM_START( netmerc )
 	ROM_LOAD16_BYTE( "epr-18127.ic11", 0x1200001, 0x80000, CRC(d307a4ca) SHA1(5555235f740c1b09f6e1587d0fceb35b23d4a8a8) )
 
 	ROM_REGION32_LE( 0x2000, "tgp_copro", 0)
-	ROM_LOAD( "315-5711.bin", 0, 0x2000, CRC(c5ddb8fc) SHA1(9e21d3a07ffa315e0139483b664e3fa283ef4e06) BAD_DUMP )
+	ROM_LOAD( "315-5711.bin", 0, 0x2000, CRC(6a21f304) SHA1(d5c61ea6e4744f10170ea556068c248bd43bb111) BAD_DUMP)
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP( "epr-18121.ic7", 0x00000, 0x80000, CRC(113285b5) SHA1(5d060cee41e8d6a4a918f890c2d169d87dbcad79) )
@@ -1706,6 +1801,9 @@ ROM_START( netmerc )
 	ROM_REGION( 0x8000, "polhemus", 0 ) /* POLHEMUS board */
 	ROM_LOAD16_BYTE( "u1", 0x0000, 0x4000, CRC(7073a312) SHA1(d2582f9520b8c8c051708dd372633112af59206e) )
 	ROM_LOAD16_BYTE( "u2", 0x0001, 0x4000, CRC(c589f428) SHA1(98dc0114a5f89636b4e237ed954e19f1cfd186ab) )
+
+	ROM_REGION( 0x10000, "nvram", 0 ) /* default NVRAM */
+	ROM_LOAD( "netmerc_nvram.bin", 0, 0x10000, CRC(09866826) SHA1(411134c1e6307f2e32c3b4b372597b45b14a9834) )
 ROM_END
 
 void model1_state::model1(machine_config &config)
@@ -1713,13 +1811,13 @@ void model1_state::model1(machine_config &config)
 	V60(config, m_maincpu, 32_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model1_state::model1_mem);
 	m_maincpu->set_addrmap(AS_IO, &model1_state::model1_io);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(model1_state::irq_callback));
+	m_maincpu->irq_cycle_callback().set(FUNC(model1_state::irq_callback));
 
 	// vf (at least) depends on default being 1-filled for ranking to initialize properly
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // 2x MB84256A-70LL + battery
 
-	GENERIC_FIFO_U32(config, "copro_fifo_in", 0);
-	GENERIC_FIFO_U32(config, "copro_fifo_out", 0);
+	GENERIC_FIFO_U32(config, "copro_fifo_in");
+	GENERIC_FIFO_U32(config, "copro_fifo_out");
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(model1_state::model1_interrupt), "screen", 0, 1);
 
@@ -1737,22 +1835,24 @@ void model1_state::model1(machine_config &config)
 	m_screen->set_screen_update(FUNC(model1_state::screen_update_model1));
 	m_screen->screen_vblank().set(FUNC(model1_state::screen_vblank_model1));
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 8192);
+	PALETTE(config, m_palette).set_entries(8192);
 
 	// create SEGA_MODEL1IO device *after* SCREEN device
-	model1io_device &ioboard(SEGA_MODEL1IO(config, "ioboard", 0));
+	model1io_device &ioboard(SEGA_MODEL1IO(config, "ioboard"));
 	ioboard.read_callback().set(m_dpram, FUNC(mb8421_device::left_r));
 	ioboard.write_callback().set(m_dpram, FUNC(mb8421_device::left_w));
 	ioboard.in_callback<0>().set_ioport("IN.0");
 	ioboard.in_callback<1>().set_ioport("IN.1");
 
-	MB8421(config, m_dpram, 0);
+	MB8421(config, m_dpram);
 
-	SEGAM1AUDIO(config, m_m1audio, 0);
+	SEGAM1AUDIO(config, m_m1audio);
 	m_m1audio->rxd_handler().set(m_m1uart, FUNC(i8251_device::write_rxd));
 
 	I8251(config, m_m1uart, 8000000); // uPD71051C, clock unknown
 	m_m1uart->txd_handler().set(m_m1audio, FUNC(segam1audio_device::write_txd));
+	m_m1uart->rxrdy_handler().set(FUNC(model1_state::sound_ready_w));
+	m_m1uart->txrdy_handler().set(FUNC(model1_state::sound_ready_w));
 
 	clock_device &m1uart_clock(CLOCK(config, "m1uart_clock", 16_MHz_XTAL / 2 / 16)); // 16 times 31.25kHz (standard Sega/MIDI sound data rate)
 	m1uart_clock.signal_handler().set(m_m1uart, FUNC(i8251_device::write_txc));
@@ -1784,7 +1884,7 @@ void model1_state::vr(machine_config &config)
 	ioboard.output_callback().set(FUNC(model1_state::vr_outputs_w));
 	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
-	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15112");
+	M1COMM(config, "m1comm").set_default_bios_tag("epr15112");
 }
 
 void model1_state::vformula(machine_config &config)
@@ -1801,7 +1901,7 @@ void model1_state::vformula(machine_config &config)
 	ioboard.output_callback().set(FUNC(model1_state::vr_outputs_w));
 	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
-	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15624");
+	M1COMM(config, "m1comm").set_default_bios_tag("epr15624");
 }
 
 void model1_state::swa(machine_config &config)
@@ -1819,7 +1919,7 @@ void model1_state::swa(machine_config &config)
 	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
 	SPEAKER(config, "mpeg", 2).front();
-	DSBZ80(config, m_dsbz80, 0);
+	DSBZ80(config, m_dsbz80);
 	m_dsbz80->add_route(0, "mpeg", 1.0, 0);
 	m_dsbz80->add_route(1, "mpeg", 1.0, 1);
 
@@ -1847,7 +1947,7 @@ void model1_state::wingwar(machine_config &config)
 
 	config.set_default_layout(layout_model1io2);
 
-	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15112");
+	M1COMM(config, "m1comm").set_default_bios_tag("epr15112");
 }
 
 void model1_state::wingwar360(machine_config &config)
@@ -1871,11 +1971,11 @@ void model1_state::polhemus_map(address_map &map)
 	map(0xf8000, 0xfffff).rom().region("polhemus", 0);
 }
 
-void model1_state::netmerc(machine_config &config)
+void netmerc_state::netmerc(machine_config &config)
 {
 	model1(config);
 	i386sx_device &polhemus(I386SX(config, "polhemus", 16000000));
-	polhemus.set_addrmap(AS_PROGRAM, &model1_state::polhemus_map);
+	polhemus.set_addrmap(AS_PROGRAM, &netmerc_state::polhemus_map);
 
 	model1io2_device &ioboard(SEGA_MODEL1IO2(config.replace(), "ioboard", 0));
 	ioboard.set_default_bios_tag("epr18021");
@@ -1885,8 +1985,8 @@ void model1_state::netmerc(machine_config &config)
 	ioboard.in_callback<1>().set_ioport("IN.1");
 	ioboard.an_callback<0>().set_ioport("STICKX");
 	ioboard.an_callback<2>().set_ioport("STICKY");
-	ioboard.output_callback().set(FUNC(model1_state::netmerc_outputs_w));
-	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
+	ioboard.output_callback().set(FUNC(netmerc_state::netmerc_outputs_w));
+	ioboard.output_callback().append(FUNC(netmerc_state::gen_outputs_w));
 
 	config.set_default_layout(layout_model1io2);
 }
@@ -1896,14 +1996,14 @@ void model1_state::netmerc(machine_config &config)
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT   MACHINE     INPUT       CLASS         INIT        ROTATION  COMPANY  FULLNAME              FLAGS
-GAME( 1993, vf,         0,       vf,         vf,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Fighter",           MACHINE_NOT_WORKING )
-GAMEL(1992, vr,         0,       vr,         vr,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Racing",            0, layout_vr )
-GAME( 1993, vformula,   vr,      vformula,   vr,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Formula",           MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, swa,        0,       swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars Arcade (US)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
-GAME( 1993, swaj,       swa,     swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars Arcade (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
-GAME( 1994, wingwar,    0,       wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (World)",         0 )
-GAME( 1994, wingwaru,   wingwar, wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (US)",            0 )
-GAME( 1994, wingwarj,   wingwar, wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (Japan)",         0 )
-GAME( 1994, wingwar360, wingwar, wingwar360, wingwar360, model1_state, empty_init, ROT0,     "Sega",  "Wing War R360 (US)",       0 )
-GAME( 1993, netmerc,    0,       netmerc,    netmerc,    model1_state, empty_init, ROT0,     "Sega",  "Sega NetMerc",             MACHINE_NOT_WORKING )
+//    YEAR  NAME        PARENT   MACHINE     INPUT       CLASS          INIT        ROTATION  COMPANY  FULLNAME                    FLAGS
+GAME( 1993, vf,         0,       vf,         vf,         model1_state,  empty_init, ROT0,     "Sega",  "Virtua Fighter",           MACHINE_NOT_WORKING )
+GAMEL(1992, vr,         0,       vr,         vr,         model1_state,  empty_init, ROT0,     "Sega",  "Virtua Racing",            0, layout_vr )
+GAME( 1993, vformula,   vr,      vformula,   vr,         model1_state,  empty_init, ROT0,     "Sega",  "Virtua Formula",           MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, swa,        0,       swa,        swa,        model1_state,  empty_init, ROT0,     "Sega",  "Star Wars (Sega, US)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1994, swaj,       swa,     swa,        swa,        model1_state,  empty_init, ROT0,     "Sega",  "Star Wars (Sega, Japan)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1994, wingwar,    0,       wingwar,    wingwar,    model1_state,  empty_init, ROT0,     "Sega",  "Wing War (World)",         0 )
+GAME( 1994, wingwaru,   wingwar, wingwar,    wingwar,    model1_state,  empty_init, ROT0,     "Sega",  "Wing War (US)",            0 )
+GAME( 1994, wingwarj,   wingwar, wingwar,    wingwar,    model1_state,  empty_init, ROT0,     "Sega",  "Wing War (Japan)",         0 )
+GAME( 1994, wingwar360, wingwar, wingwar360, wingwar360, model1_state,  empty_init, ROT0,     "Sega",  "Wing War R360 (US)",       0 )
+GAME( 1993, netmerc,    0,       netmerc,    netmerc,    netmerc_state, empty_init, ROT0,     "Sega",  "Sega NetMerc",             MACHINE_NOT_WORKING )

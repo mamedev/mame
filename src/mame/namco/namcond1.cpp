@@ -11,8 +11,11 @@
             Walter Fath
 
     abcheck TODOs:
-    - Ending has a rowscroll GFX bug;
+    - Ending has a rowscroll GFX bug, scroll X the wrong GFX part
+	  (expect to bounce upper kanji strip and regular scroll the two "abnormal check" strings,
+	   goes in the middle of playfield instead);
     - Where is the extra data ROM mapped?
+	  Ending reads $68'xxxx-$6f'xxxx areas for bitbanging serial device at $70'0000
 
     gynotai TODOs:
     - printer (disable it in service mode to suppress POST error);
@@ -506,7 +509,7 @@ void namcond1_state::namcond1(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	YGV608(config, m_ygv608, 0);
+	YGV608(config, m_ygv608);
 	m_ygv608->vblank_callback().set_inputline(m_maincpu, 1);
 	m_ygv608->raster_callback().set_inputline(m_maincpu, 2);
 	m_ygv608->set_screen("screen");
@@ -530,7 +533,7 @@ void namcond1_state::namcond1(machine_config &config)
 	//c352.add_route(2, "speaker", 1.00); // Second DAC not present.
 	//c352.add_route(3, "speaker", 1.00);
 
-	AT28C16(config, "at28c16", 0);
+	AT28C16(config, "at28c16");
 }
 
 void namcond1_state::abcheck(machine_config &config)

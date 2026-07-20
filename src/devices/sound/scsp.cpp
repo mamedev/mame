@@ -146,8 +146,10 @@ scsp_device::scsp_device(const machine_config &mconfig, const char *tag, device_
 	: device_t(mconfig, SCSP, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		device_rom_interface(mconfig, *this),
+		device_serial_interface(mconfig, *this),
 		m_irq_cb(*this),
 		m_main_irq_cb(*this),
+		m_midi_out_cb(*this),
 		m_BUFPTR(0),
 		m_stream(nullptr),
 		m_IrqTimA(0),
@@ -240,6 +242,9 @@ void scsp_device::device_start()
 	save_item(NAME(m_DELAYPTR));
 #endif
 
+	save_item(NAME(m_latched_MSLC));
+	save_item(NAME(m_latched_MSLC_data));
+
 	save_item(NAME(m_IrqTimA));
 	save_item(NAME(m_IrqTimBC));
 	save_item(NAME(m_IrqMidi));
@@ -279,6 +284,16 @@ void scsp_device::device_start()
 }
 
 //-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void scsp_device::device_reset()
+{
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+	set_rate(31250);
+}
+
+//-------------------------------------------------
 //  device_post_load - called after loading a saved state
 //-------------------------------------------------
 
@@ -313,6 +328,22 @@ void scsp_device::rom_bank_pre_change()
 void scsp_device::sound_stream_update(sound_stream &stream)
 {
 	DoMasterSamples(stream);
+
+	// MSLC     |  CA   |SGC|EG
+	// f e d c b a 9 8 7 6 5 4 3 2 1 0
+
+	// latch the new MSLC, updates every 44.1 kHz
+	// cfr. vstriker (GK reflecting ball with heavy shots) and srallyc (PowerGames BGM bleeps at end)
+	u8 MSLC = m_latched_MSLC;
+	SCSP_SLOT *slot = m_Slots + MSLC;
+	u32 SGC = (slot->EG.state) & 3;
+	u32 CA = (slot->cur_addr >> (SHIFT + 12)) & 0xf;
+	u32 EG = (0x1f - (slot->EG.volume >> (EG_SHIFT + 5))) & 0x1f;
+	// NOTE: according to the manual MSLC is write only, CA, SGC and EG read only.
+	// saturn:toughtrk will hang on Human logo otherwise
+	m_latched_MSLC_data =  /*(MSLC << 11) |*/ (CA << 7) | (SGC << 5) | EG;
+
+	// TODO: 1 sample (1Fs) 44.1 kHz irq here.
 }
 
 u8 scsp_device::DecodeSCI(u8 irq)
@@ -734,13 +765,23 @@ void scsp_device::UpdateReg(int reg)
 			break;
 		case 0x6:
 		case 0x7:
-			midi_out_w(m_udata.data[0x6/2] & 0xff);
+			{
+				u8 data = m_udata.data[0x6 / 2] & 0xff;
+				if (m_MidiOutR == m_MidiOutW)
+				{
+					// not busy, so start transmission
+					transmit_register_setup(data);
+				}
+				m_MidiOutStack[m_MidiOutW++] = data;
+				m_MidiOutW &= 31;
+			}
 			break;
 		case 8:
 		case 9:
 			/* Only MSLC could be written.  */
-			// NOTE: docs claims MSLC to be 0x7800, but Jikkyou Parodius doesn't agree, why?
-			m_udata.data[0x8/2] &= 0xf800;
+			// docs claims MSLC to be 0x7800 but saturn:jikkparo doesn't agree,
+			// assume doc mistake out of being 0~31 slots
+			m_latched_MSLC = (m_udata.data[0x8/2] & 0xf800) >> 11;
 			break;
 		case 0x12:
 		case 0x13:
@@ -836,7 +877,7 @@ void scsp_device::UpdateReg(int reg)
 				ResetInterrupts();
 
 				// behavior from real hardware: if you SCIRE a timer that's expired,
-				// it'll immediately pop up again in SCIPD.  ask Sakura Taisen on the Saturn...
+				// it'll immediately pop up again in SCIPD.  cfr. saturn:sakurat
 				if (m_TimCnt[0] == 0xffff)
 				{
 					m_udata.data[0x20/2] |= 0x40;
@@ -917,15 +958,7 @@ void scsp_device::UpdateRegR(int reg)
 		case 8:
 		case 9:
 			{
-				// MSLC     |  CA   |SGC|EG
-				// f e d c b a 9 8 7 6 5 4 3 2 1 0
-				u8 MSLC = (m_udata.data[0x8/2] >> 11) & 0x1f;
-				SCSP_SLOT *slot = m_Slots + MSLC;
-				u32 SGC = (slot->EG.state) & 3;
-				u32 CA = (slot->cur_addr >> (SHIFT + 12)) & 0xf;
-				u32 EG = (0x1f - (slot->EG.volume >> (EG_SHIFT + 5))) & 0x1f;
-				/* note: according to the manual MSLC is write only, CA, SGC and EG read only.  */
-				m_udata.data[0x8/2] =  /*(MSLC << 11) |*/ (CA << 7) | (SGC << 5) | EG;
+				m_udata.data[0x8/2] = m_latched_MSLC_data;
 			}
 			break;
 
@@ -1290,9 +1323,21 @@ void scsp_device::DoMasterSamples(sound_stream &stream)
 
 				s32 sample = UpdateSlot(slot);
 
-				Enc = ((TL(slot)) << 0x0) | ((IMXL(slot)) << 0xd);
+				// SDIR ("sound direct") sends the raw sample straight to the output,
+				// bypassing the envelope generator AND the TL attenuator (the EG/ALFO
+				// bypass is handled in UpdateSlot). BOTH downstream mixes -- the DSP
+				// input feed here and the direct-output mix below -- must therefore
+				// zero TL when SDIR is set, otherwise a slot programmed with SDIR=1 +
+				// a large TL is wrongly muted.
+				// (Flash Beats keys its SFX with SDIR=1, TL=0xff = -95 dB; in
+				// particular its in-game/"Voice" SFX route only through the DSP
+				// (DISDL=0, IMXL>0), so without this the effect path is starved to
+				// near-silence.)
+				u16 eff_tl = SDIR(slot) ? 0 : TL(slot);
+				Enc = ((eff_tl) << 0x0) | ((IMXL(slot)) << 0xd);
 				m_DSP.SetSample((sample*m_LPANTABLE[Enc]) >> (SHIFT-2), ISEL(slot), IMXL(slot));
-				Enc = ((TL(slot)) << 0x0) | ((DIPAN(slot)) << 0x8) | ((DISDL(slot)) << 0xd);
+				u16 dir_tl = SDIR(slot) ? 0 : TL(slot);
+				Enc = ((dir_tl) << 0x0) | ((DIPAN(slot)) << 0x8) | ((DISDL(slot)) << 0xd);
 				{
 					smpl += (sample * m_LPANTABLE[Enc]) >> SHIFT;
 					smpr += (sample * m_RPANTABLE[Enc]) >> SHIFT;
@@ -1447,29 +1492,30 @@ void scsp_device::write(offs_t offset, u16 data, u16 mem_mask)
 	w16(offset * 2, tmp);
 }
 
-void scsp_device::midi_in(u8 data)
+void scsp_device::tra_callback()
 {
-	//    printf("scsp_midi_in: %02x\n", data);
+	m_midi_out_cb(transmit_register_get_data_bit());
+}
 
-	m_MidiStack[m_MidiW++] = data;
+void scsp_device::tra_complete()
+{
+	m_MidiOutR++;
+	m_MidiOutR &= 31;
+
+	// if buffer not empty, transmit next byte
+	if (m_MidiOutR != m_MidiOutW)
+	{
+		transmit_register_setup(m_MidiOutStack[m_MidiOutR]);
+	}
+}
+
+void scsp_device::rcv_complete()
+{
+	receive_register_extract();
+	m_MidiStack[m_MidiW++] = get_received_char();
 	m_MidiW &= 31;
 
 	CheckPendingIRQ();
-}
-
-u16 scsp_device::midi_out_r()
-{
-	u8 val = m_MidiOutStack[m_MidiOutR++];
-	m_MidiOutR &= 31;
-	return val;
-}
-
-void scsp_device::midi_out_w(u8 data)
-{
-	m_MidiOutStack[m_MidiOutW++] = data;
-	m_MidiOutW &= 31;
-
-	//CheckPendingIRQ();
 }
 
 //LFO handling

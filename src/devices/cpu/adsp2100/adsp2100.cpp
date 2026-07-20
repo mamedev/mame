@@ -109,6 +109,8 @@
 #include "adsp2100.h"
 #include "2100dasm.h"
 
+#include <bit>
+
 
 // device type definitions
 DEFINE_DEVICE_TYPE(ADSP2100, adsp2100_device, "adsp2100", "Analog Devices ADSP-2100")

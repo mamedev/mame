@@ -10,7 +10,6 @@ References:
 
 TODO:
 - convert video to a proper mc6845, consider this as a good base for new device rewrite;
-- cursor stuck in Bird Crash;
 - interlace (cfr. cpm22 in setup mode);
 - ROM/RAM bankswitch, it apparently happens after one instruction prefetching.
   Hacked around for now;
@@ -20,6 +19,7 @@ TODO:
 - Superimposing features (if/when SW dumps arises, cfr. SMC-70G promotional video)
 - Find better reference materials, available one lacks several pages;
 - Hookup expansion bus (needs pinout/specifications)
+- Currently emulating SMC-777C, base SMC-777 doesn't have the remappable color bank by default.
 
 **************************************************************************************************/
 
@@ -44,6 +44,7 @@ TODO:
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include "smc777.lh"
 
 namespace {
 
@@ -82,6 +83,8 @@ public:
 		// "JOY STICK#" dual DE-9 ports, on the right side of body chassis (near the volume knob)
 		, m_joystick_port(*this, "joystick%u", 1U)
 		, m_kanji_rom(*this, "kanji")
+		, m_caplock_led(*this, "caplock_led")
+		, m_kanalock_led(*this, "kanalock_led")
 	{ }
 
 	void smc777(machine_config &config);
@@ -155,6 +158,8 @@ private:
 	required_device<smc777_kbd_device> m_kbd;
 	required_device_array<msx_general_purpose_port_device, 2> m_joystick_port;
 	required_region_ptr<u8> m_kanji_rom;
+	output_finder<> m_caplock_led;
+	output_finder<> m_kanalock_led;
 
 	u8 *m_ipl_rom = nullptr;
 	std::unique_ptr<u8[]> m_work_ram;
@@ -1044,7 +1049,11 @@ void smc777_state::smc777(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_original("smc777");
 	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(smc777_state::quickload_cb));
 
-	SMC777_KBD(config, m_kbd, 0);
+	config.set_default_layout(layout_smc777);
+
+	SMC777_KBD(config, m_kbd);
+	m_kbd->caplock_callback().set([this] (int state) { m_caplock_led = state; });
+	m_kbd->kanalock_callback().set([this] (int state) { m_kanalock_led = state; });
 
 	// No clue about bundled defaults but:
 	// - dragon expects joystick in port 1

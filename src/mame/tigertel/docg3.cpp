@@ -11,18 +11,16 @@
 #include "emu.h"
 #include "docg3.h"
 
-#include <cstdarg>
+#define LOG_SEC1_RD     (1U << 1)
+#define LOG_SEC1_WR     (1U << 2)
+#define LOG_SEC2_RD     (1U << 3)
+#define LOG_SEC2_WR     (1U << 4)
+#define LOG_SEC2_UNK    (1U << 5)
+#define LOG_SEC3_RD     (1U << 6)
+#define LOG_SEC3_WR     (1U << 7)
+#define LOG_ERASE       (1U << 8)
 
-#define LOG_SEC1_RD		(1U << 1)
-#define LOG_SEC1_WR		(1U << 2)
-#define LOG_SEC2_RD		(1U << 3)
-#define LOG_SEC2_WR		(1U << 4)
-#define LOG_SEC2_UNK	(1U << 5)
-#define LOG_SEC3_RD		(1U << 6)
-#define LOG_SEC3_WR		(1U << 7)
-#define LOG_ERASE		(1U << 8)
-
-#define VERBOSE			( 0 )
+#define VERBOSE         ( 0 )
 #include "logmacro.h"
 
 

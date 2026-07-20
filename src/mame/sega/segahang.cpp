@@ -560,8 +560,6 @@ void segahang_state::i8751_p1_w(uint8_t data)
 
 void segahang_state::machine_start()
 {
-	m_lamps.resolve();
-
 	m_i8751_sync_timer = timer_alloc(FUNC(segahang_state::i8751_sync), this);
 }
 
@@ -680,7 +678,7 @@ void segahang_state::sound_map_2203(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xc7ff).mirror(0x0800).ram();
 	map(0xd000, 0xd001).mirror(0x0ffe).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0xe000, 0xe0ff).mirror(0x0f00).rw("pcm", FUNC(segapcm_device::read), FUNC(segapcm_device::write));
+	map(0xe000, 0xe0ff).mirror(0x0f00).m("pcm", FUNC(segapcm_discrete_device::map));
 }
 
 void segahang_state::sound_portmap_2203(address_map &map)
@@ -694,7 +692,7 @@ void segahang_state::sound_map_2151(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
-	map(0xf000, 0xf0ff).mirror(0x700).rw("pcm", FUNC(segapcm_device::read), FUNC(segapcm_device::write));
+	map(0xf000, 0xf0ff).mirror(0x700).m("pcm", FUNC(sega_315_5218_device::map));
 	map(0xf800, 0xffff).ram();
 }
 
@@ -1014,8 +1012,8 @@ void segahang_state::shared_base(machine_config &config)
 	ADC0804(config, m_adc, 25.1748_MHz_XTAL / 4 / 6);
 	m_adc->vin_callback().set(FUNC(segahang_state::analog_r));
 
-	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
-	SEGAIC16_ROAD(config, m_segaic16road, 0);
+	SEGAIC16VID(config, m_segaic16vid, "gfxdecode");
+	SEGAIC16_ROAD(config, m_segaic16road);
 
 	// video hardware
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_segahang);
@@ -1033,7 +1031,7 @@ void segahang_state::hangon_base(machine_config &config)
 {
 	shared_base(config);
 	// video hardware
-	SEGA_HANGON_SPRITES(config, m_sprites, 0);
+	SEGA_HANGON_SPRITES(config, m_sprites);
 }
 
 void segahang_state::sharrier_base(machine_config &config)
@@ -1047,7 +1045,7 @@ void segahang_state::sharrier_base(machine_config &config)
 	m_subcpu->set_clock(10_MHz_XTAL);
 
 	// video hardware
-	SEGA_SHARRIER_SPRITES(config, m_sprites, 0);
+	SEGA_SHARRIER_SPRITES(config, m_sprites);
 	m_palette->set_entries(2048*2);
 }
 
@@ -1092,8 +1090,7 @@ void segahang_state::sound_board_2203(machine_config &config)
 	ymsnd.add_route(3, "speaker", 0.15, 0);
 	ymsnd.add_route(3, "speaker", 0.15, 1);
 
-	segapcm_device &pcm(SEGAPCM(config, "pcm", 8_MHz_XTAL));
-	pcm.set_bank(segapcm_device::BANK_512);
+	segapcm_discrete_device &pcm(SEGAPCM_DISCRETE(config, "pcm", 8_MHz_XTAL / 2));
 	pcm.add_route(0, "speaker", 0.40, 0);
 	pcm.add_route(1, "speaker", 0.40, 1);
 }
@@ -1129,8 +1126,8 @@ void segahang_state::sound_board_2203x2(machine_config &config)
 	ym2.add_route(3, "speaker", 0.15, 0);
 	ym2.add_route(3, "speaker", 0.15, 1);
 
-	segapcm_device &pcm(SEGAPCM(config, "pcm", 8_MHz_XTAL / 2));
-	pcm.set_bank(segapcm_device::BANK_512);
+	sega_315_5218_device &pcm(SEGA_315_5218(config, "pcm", 8_MHz_XTAL / 2));
+	pcm.set_bank(sega_315_5218_device::BANK_512);
 	pcm.add_route(0, "speaker", 0.40, 0);
 	pcm.add_route(1, "speaker", 0.40, 1);
 }
@@ -1150,8 +1147,8 @@ void segahang_state::sound_board_2151(machine_config &config)
 	ymsnd.add_route(0, "speaker", 0.30, 0);
 	ymsnd.add_route(1, "speaker", 0.30, 1);
 
-	segapcm_device &pcm(SEGAPCM(config, "pcm", 8_MHz_XTAL / 2));
-	pcm.set_bank(segapcm_device::BANK_512);
+	sega_315_5218_device &pcm(SEGA_315_5218(config, "pcm", 8_MHz_XTAL / 2));
+	pcm.set_bank(sega_315_5218_device::BANK_512);
 	pcm.add_route(0, "speaker", 0.70, 0);
 	pcm.add_route(1, "speaker", 0.70, 1);
 }

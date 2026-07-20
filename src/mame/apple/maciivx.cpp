@@ -377,7 +377,7 @@ void maciivx_state::maciiv_base(machine_config &config)
 
 	MACADB(config, m_macadb, C15M);
 
-	nubus_device &nubus(NUBUS(config, "nubus", 0));
+	nubus_device &nubus(NUBUS(config, "nubus"));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.out_irqc_callback().set(m_vasp, FUNC(vasp_device::slot0_irq_w));
 	nubus.out_irqd_callback().set(m_vasp, FUNC(vasp_device::slot1_irq_w));

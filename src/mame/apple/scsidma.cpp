@@ -9,16 +9,18 @@
     style transfers.  True DMA to the full 32-bit address space is also
     available, along with automated SCSI bus arbitration.
 
-    However, no shipped version of MacOS supports the full DMA mode.  When
-    A/UX is supported we will check out if that uses it.
+    No shipped version of MacOS supports the full DMA mode.  But A/UX does.
 */
 
 #include "emu.h"
+
 #include "scsidma.h"
 
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
 #include "machine/nscsi_bus.h"
+
+#include "endianness.h"
 
 #define LOG_IRQ         (1U << 1)
 #define LOG_DRQ         (1U << 2)
@@ -42,15 +44,15 @@ DEFINE_DEVICE_TYPE(SCSIDMA, scsidma_device, "scsidma", "Apple SCSIDMA ASIC")
 void scsidma_device::map(address_map &map)
 {
 	map(0x0000, 0x007f).rw(FUNC(scsidma_device::scsi_r), FUNC(scsidma_device::scsi_w));
-	map(0x0000, 0x0003).w(FUNC(scsidma_device::handshake_w));
+	map(0x0000, 0x0003).rw(FUNC(scsidma_device::handshake_data_r), FUNC(scsidma_device::handshake_w));
 	map(0x0060, 0x0063).r(FUNC(scsidma_device::handshake_r));
-	map(0x0080, 0x0083).rw(FUNC(scsidma_device::control_r), FUNC(scsidma_device::control_w));
+	map(0x0080, 0x01ff).rw(FUNC(scsidma_device::control_r), FUNC(scsidma_device::control_w));
 }
 
 void scsidma_device::device_add_mconfig(machine_config &config)
 {
 	NSCSI_BUS(config, m_scsibus);
-	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config([](device_t *device)
@@ -60,7 +62,7 @@ void scsidma_device::device_add_mconfig(machine_config &config)
 	});
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, nullptr);
 
 	NCR53C80(config, m_ncr);
 	m_scsibus->set_external_device(7, m_ncr);
@@ -77,9 +79,12 @@ scsidma_device::scsidma_device(const machine_config &mconfig, const char *tag, d
 	m_scsi_irq(0),
 	m_control(0),
 	m_holding(0),
+	m_dma_address(0),
+	m_dma_count(0),
 	m_holding_remaining(0),
 	m_is_write(false),
-	m_drq_completed(false)
+	m_drq_completed(false),
+	m_dma_direction(false)
 {
 }
 
@@ -92,6 +97,9 @@ void scsidma_device::device_start()
 	save_item(NAME(m_holding_remaining));
 	save_item(NAME(m_is_write));
 	save_item(NAME(m_drq_completed));
+	save_item(NAME(m_dma_address));
+	save_item(NAME(m_dma_count));
+	save_item(NAME(m_dma_direction));
 }
 
 void scsidma_device::device_reset()
@@ -100,29 +108,55 @@ void scsidma_device::device_reset()
 	m_holding = 0;
 	m_holding_remaining = 0;
 	m_drq_completed = false;
+	m_dma_address = 0;
+	m_dma_count = 0;
+	m_dma_direction = false;
 }
 
-u32 scsidma_device::control_r()
+u32 scsidma_device::control_r(offs_t offset)
 {
-	return m_control;
+	switch (offset)
+	{
+		case (0x80 - 0x80) >> 2:
+			return m_control;
+
+		case (0xc0 - 0x80) >> 2:
+			return m_dma_count;
+
+		case (0x100 - 0x80) >> 2:
+			return m_dma_address;
+	}
+
+	return 0;
 }
 
-void scsidma_device::control_w(u32 data)
+void scsidma_device::control_w(offs_t offset, u32 data)
 {
-	LOGMASKED(LOG_GENERAL, "%s: control_w %08x (PC=%08x)\n", tag(), data, m_maincpu->pc());
+	LOGMASKED(LOG_GENERAL, "%s: control_w %08x @ %x (PC=%08x)\n", tag(), data, (offset << 2) + 0x80, m_maincpu->pc());
 
-	// check for unemulated features
-	if (data & CTRL_DMAEN)
+	switch (offset)
 	{
-		fatalerror("%s: DMA mode enabled, but not supported!\n", tag());
-	}
-	if (data & CTRL_ARBEN)
-	{
-		fatalerror("%s: Auto-arbitration enabled, but not supported!\n", tag());
-	}
+		case (0x80 - 0x80) >> 2:
+			// check for unemulated features
+			if (data & CTRL_ARBEN)
+			{
+				fatalerror("%s: Auto-arbitration enabled, but not supported!\n", tag());
+			}
 
-	m_control &= CTRL_SCIRQEN | CTRL_WDIRQ | CTRL_DMABERR | CTRL_WONARB;
-	m_control |= data & ~(CTRL_SCIRQEN | CTRL_WDIRQ | CTRL_DMABERR | CTRL_WONARB);
+			m_control &= CTRL_SCIRQEN | CTRL_WDIRQ | CTRL_DMABERR | CTRL_WONARB;
+			m_control |= data & ~(CTRL_SCIRQEN | CTRL_WDIRQ | CTRL_DMABERR | CTRL_WONARB);
+			break;
+
+		case (0xc0 - 0x80) >> 2:
+			m_dma_count = data;
+			LOGMASKED(LOG_GENERAL, "%s: DMA count set to %08x\n", tag(), m_dma_count);
+			break;
+
+		case (0x100 - 0x80) >> 2:
+			m_dma_address = data;
+			LOGMASKED(LOG_GENERAL, "%s: DMA address set to %08x\n", tag(), m_dma_address);
+			break;
+	}
 }
 
 u8 scsidma_device::scsi_r(offs_t offset)
@@ -132,7 +166,18 @@ u8 scsidma_device::scsi_r(offs_t offset)
 
 void scsidma_device::scsi_w(offs_t offset, u8 data)
 {
-	m_ncr->write(offset>>4, data);
+	const auto ncr_reg = offset >> 4;
+
+	if (ncr_reg == 5)
+	{
+		m_dma_direction = false;
+	}
+	else if (ncr_reg == 7)
+	{
+		m_dma_direction = true;
+	}
+
+	m_ncr->write(ncr_reg, data);
 }
 
 u32 scsidma_device::handshake_r(offs_t offset, u32 mem_mask)
@@ -212,6 +257,16 @@ u32 scsidma_device::handshake_r(offs_t offset, u32 mem_mask)
 	}
 	fatalerror("%s: Unhandled handshake read mask %08x\n", tag(), mem_mask);
 	return 0xffffffff;
+}
+
+u32 scsidma_device::handshake_data_r(offs_t offset, u32 mem_mask)
+{
+	if (!m_drq_completed && (mem_mask == 0xff000000) && !(m_control & CTRL_HNDSHK) && !m_drq)
+	{
+		return u32(m_ncr->read(0)) << 24;
+	}
+
+	return handshake_r(offset, mem_mask);
 }
 
 void scsidma_device::handshake_w(offs_t offset, u32 data, u32 mem_mask)
@@ -310,7 +365,39 @@ void scsidma_device::scsi_irq_w(int state)
 void scsidma_device::scsi_drq_w(int state)
 {
 	LOGMASKED(LOG_DRQ, "%s: 53C80 DRQ %d (was %d) (remain %d write %d)\n", tag(), state, m_drq, m_holding_remaining, m_is_write);
-	if ((state) && (m_holding_remaining > 0))
+
+	if ((state) && (m_control & CTRL_DMAEN) && m_dma_count)
+	{
+		if (m_dma_direction)
+		{
+			const u8 data = m_ncr->dma_r();
+			m_ram_base[BYTE4_XOR_BE(m_dma_address)] = data;
+			LOGMASKED(LOG_DRQ, "%s: DMA read byte %02x to address %08x\n", tag(), data, m_dma_address);
+			m_dma_address++;
+			m_dma_count--;
+		}
+		else
+		{
+			const u8 data = m_ram_base[BYTE4_XOR_BE(m_dma_address)];
+			LOGMASKED(LOG_DRQ, "%s: DMA write byte %02x from address %08x\n", tag(), data, m_dma_address);
+			m_ncr->dma_w(data);
+			m_dma_address++;
+			m_dma_count--;
+		}
+
+		if (m_dma_count == 0)
+		{
+			LOGMASKED(LOG_DRQ, "DMA completed\n");
+
+			// we're done, now tell the 53C80 that.
+			m_ncr->eop_w(1);
+			m_ncr->eop_w(0);
+		}
+
+		return;
+	}
+
+	if ((state) && (m_holding_remaining > 0) && (m_control & CTRL_HNDSHK))
 	{
 		if (m_is_write)
 		{

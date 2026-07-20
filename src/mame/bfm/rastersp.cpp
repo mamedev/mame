@@ -35,6 +35,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 
 namespace {
 
@@ -1502,7 +1504,7 @@ void fbcrazy_state::fbcrazy(machine_config &config)
 	auto &cdrom(NSCSI_CDROM(config, "cdrom"));
 	m_scsibus->set_external_device(3, cdrom);
 
-	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta", 0));
+	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta"));
 
 	m_duart->out_txda_callback().set("bacta", FUNC(bacta_datalogger_device::write_txd));
 	bacta.rxd_handler().set(m_duart, FUNC(z80scc_device::rxa_w));

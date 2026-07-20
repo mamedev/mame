@@ -110,7 +110,7 @@ INPUT_PORTS_START(hanafuda_matrix_bet)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E)           PORT_PLAYER(1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES)         PORT_PLAYER(1)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START)                PORT_PLAYER(1)
 
 	PORT_START("KEY1")
@@ -195,40 +195,6 @@ INPUT_PORTS_START(hanaroku_panel)
 	PORT_BIT(0x38, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-
-
-class mahjong_panel_device_base : public device_t, public device_mahjong_panel_interface
-{
-public:
-	virtual u8 read(u8 select) override
-	{
-		u8 result = 0x3f;
-		for (unsigned i = 0; m_keys.size() > i; ++i)
-		{
-			if (!BIT(select, i))
-				result &= m_keys[i]->read();
-		}
-		return result;
-	}
-
-protected:
-	mahjong_panel_device_base(
-			machine_config const &mconfig,
-			device_type type,
-			char const *tag,
-			device_t *owner,
-			u32 clock) :
-		device_t(mconfig, type, tag, owner, clock),
-		device_mahjong_panel_interface(mconfig, *this),
-		m_keys(*this, "KEY%u", 0U)
-	{
-	}
-
-	virtual void device_start() override ATTR_COLD { }
-
-private:
-	required_ioport_array<6> m_keys;
-};
 
 
 class mahjong_panel_device : public mahjong_panel_device_base
@@ -405,6 +371,34 @@ void mahjong_panel_connector_device::amusement_panels(device_slot_interface &dev
 {
 	device.option_add("mjam", MAHJONG_PANEL);
 	device.option_add("hfam", HANAFUDA_PANEL);
+}
+
+
+mahjong_panel_device_base::mahjong_panel_device_base(
+		machine_config const &mconfig,
+		device_type type,
+		char const *tag,
+		device_t *owner,
+		u32 clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_mahjong_panel_interface(mconfig, *this),
+	m_keys(*this, "KEY%u", 0U)
+{
+}
+
+u8 mahjong_panel_device_base::read(u8 select)
+{
+	u8 result = 0x3f;
+	for (unsigned i = 0; m_keys.size() > i; ++i)
+	{
+		if (!BIT(select, i))
+			result &= m_keys[i]->read();
+	}
+	return result;
+}
+
+void mahjong_panel_device_base::device_start()
+{
 }
 
 
