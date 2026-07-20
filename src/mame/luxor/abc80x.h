@@ -81,7 +81,7 @@
 class abc800_state : public driver_device
 {
 public:
-	abc800_state(const machine_config &mconfig, device_type type, const char *tag, size_t char_ram_size) :
+	abc800_state(const machine_config &mconfig, device_type type, const char *tag, size_t char_ram_size, size_t video_ram_size = 0x4000) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
 		m_ctc(*this, Z80CTC_TAG),
@@ -92,7 +92,7 @@ public:
 		m_quickload(*this, "quickload"),
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, Z80_TAG),
-		m_video_ram(*this, "video_ram", 0x4000, ENDIANNESS_LITTLE),
+		m_video_ram(*this, "video_ram", video_ram_size, ENDIANNESS_LITTLE),
 		m_char_ram(*this, "char_ram", 0x800, ENDIANNESS_LITTLE),
 		m_io_sb(*this, "SB"),
 		m_ctc_z0(0),
@@ -276,15 +276,16 @@ class abc806_state : public abc800_state
 {
 public:
 	abc806_state(const machine_config &mconfig, device_type type, const char *tag) :
-		abc800_state(mconfig, type, tag, ABC806_CHAR_RAM_SIZE),
+		abc800_state(mconfig, type, tag, ABC806_CHAR_RAM_SIZE, ABC806_VIDEO_RAM_SIZE),
 		m_crtc(*this, MC6845_TAG),
 		m_palette(*this, "palette"),
 		m_rtc(*this, E0516_TAG),
 		m_sto(*this, "sto"),
 		m_rad_prom(*this, "rad"),
-		m_hru2_prom(*this, "hru"),
+		m_hru2_prom(*this, "hru2"),
 		m_char_rom(*this, MC6845_TAG),
-		m_attr_ram(*this, "attr_ram", 0x800, ENDIANNESS_LITTLE)
+		m_attr_ram(*this, "attr_ram", 0x800, ENDIANNESS_LITTLE),
+		m_hr_config(*this, "HR")
 	{ }
 
 	required_device<mc6845_device> m_crtc;
@@ -292,9 +293,10 @@ public:
 	required_device<e0516_device> m_rtc;
 	required_device<addressable_latch_device> m_sto;
 	required_memory_region m_rad_prom;
-	required_memory_region m_hru2_prom;
+	required_memory_region m_hru2_prom; // HRU II 512×4 (App. D); not HRU I ("hru")
 	required_memory_region m_char_rom;
 	memory_share_creator<uint8_t> m_attr_ram;
+	required_ioport m_hr_config;
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;

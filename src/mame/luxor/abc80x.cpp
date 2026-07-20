@@ -141,7 +141,10 @@ Notes:
 
     TODO:
 
-    - abc806 30K banking
+    - abc806 PAL P4-11 memory mapper (read_pal_p4): emulate the real PAL
+      decode for 0x0000-0x77ff (m_map pages, EME, HRS F15-F18). §10 already
+      covers 7800-7FFF: M1 fetch → Options PROM (vr forced off); data R/W →
+      character/attribute RAM. Do not redirect operand fetches to ROM.
     - cassette
     - abc800 video card bus
 
@@ -1037,31 +1040,116 @@ void abc806_state::vs_w(int state)
 
 void abc806_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	constexpr int HORIZONTAL_PORCH_HACK   = 109;
-	constexpr int VERTICAL_PORCH_HACK     = 27;
+	/*
+	    Native ABC 806 HR scanout (service manual §17 / App. A):
+
+	    - 128 bytes/line × 240 lines from the HRS-selected visible bank
+	      (VM14–VM17 in bits 0–3; §17.3). CPU bank is bits 4–7 (F14–F18).
+	    - Each byte holds two 4-bit färgnr values indexing the 16 HRC regs.
+	    - Each HRC byte is DOT1|DOT2 as P|… nibble pairs (App. A). Hardware
+	      clocks DOT1 then DOT2; unequal pairs are perceived as blandfärg.
+	    - §17.5: all-zero HRC → no HR image. P selects overwrite of text.
+
+	    Pen index uses bits 2–0 of each DOT nibble (bit0=R, matching §17.5
+	    example 0001B = red and abc806_palette). P is bit 3.
+	*/
+	constexpr int HORIZONTAL_PORCH_HACK = 109;
+	constexpr int VERTICAL_PORCH_HACK   = 27;
+	constexpr uint32_t ROW_STRIDE       = 128;
 
 	const pen_t *pen = m_palette->pens();
+	const uint32_t videoram_mask = ABC806_VIDEO_RAM_SIZE - 1;
+	const uint32_t base = ((m_hrs & 0x0f) << 15) & videoram_mask;
 
-	uint32_t addr = (m_hrs & 0x0f) << 15;
+	const int y0 = m_sync + VERTICAL_PORCH_HACK;
+	const int y1 = std::min(cliprect.max_y + 1, y0 + 240);
+	const int x0 = HORIZONTAL_PORCH_HACK + (ABC800_CHAR_WIDTH * 4) - 16;
 
-	for (int y = m_sync + VERTICAL_PORCH_HACK; y < std::min(cliprect.max_y + 1, m_sync + VERTICAL_PORCH_HACK + 240); y++)
+	bool any_hrc = false;
+	for (uint8_t reg : m_hrc)
 	{
-		for (int sx = 0; sx < 128; sx++)
+		if (reg != 0)
 		{
-			uint8_t data = m_video_ram[addr++];
-			uint16_t dot = (m_hrc[data >> 4] << 8) | m_hrc[data & 0x0f];
+			any_hrc = true;
+			break;
+		}
+	}
+	if (!any_hrc)
+		return;
 
-			for (int pixel = 0; pixel < 4; pixel++)
+	// 0 = separate DOT pixels; 1 = ½+½; 2 = ⅓ DOT1 + ⅔ DOT2; 3 = ⅔ DOT1 + ⅓ DOT2
+	const unsigned mix_mode = m_hr_config->read() & 0x03;
+
+	auto mix_dots = [](rgb_t c1, rgb_t c2, unsigned mode) -> rgb_t
+	{
+		unsigned w1 = 1, w2 = 1;
+		switch (mode)
+		{
+		default:
+		case 1: w1 = 1; w2 = 1; break;
+		case 2: w1 = 1; w2 = 2; break;
+		case 3: w1 = 2; w2 = 1; break;
+		}
+		const unsigned sum = w1 + w2;
+		return rgb_t(
+			uint8_t((c1.r() * w1 + c2.r() * w2) / sum),
+			uint8_t((c1.g() * w1 + c2.g() * w2) / sum),
+			uint8_t((c1.b() * w1 + c2.b() * w2) / sum));
+	};
+
+	auto plot_dot = [&](int y, int x, uint8_t nib)
+	{
+		const bool opaque = BIT(nib, 3);
+		const uint8_t color = nib & 0x07;
+		if (color == 0 && !opaque)
+			return;
+		if (x < 0 || x >= bitmap.width() || y < 0 || y >= bitmap.height())
+			return;
+		if (opaque || bitmap.pix(y, x) == rgb_t::black())
+			bitmap.pix(y, x) = pen[color];
+	};
+
+	auto plot_hrc = [&](int y, int &x, uint8_t hrc)
+	{
+		const uint8_t nib1 = hrc >> 4;
+		const uint8_t nib2 = hrc & 0x0f;
+
+		if (mix_mode == 0)
+		{
+			plot_dot(y, x++, nib1);
+			plot_dot(y, x++, nib2);
+			return;
+		}
+
+		// Blandfärg: one grafikpunkt colour across both DOT positions (App. A).
+		const uint8_t c1 = nib1 & 0x07;
+		const uint8_t c2 = nib2 & 0x07;
+		const bool lit = (c1 | c2) != 0;
+		const bool opaque =
+			(BIT(nib1, 3) && c1) ||
+			(BIT(nib2, 3) && c2);
+		const rgb_t color = (c1 == c2) ? pen[c1] : mix_dots(pen[c1], pen[c2], mix_mode);
+
+		for (int d = 0; d < 2; d++)
+		{
+			if (lit && x >= 0 && x < bitmap.width() && y >= 0 && y < bitmap.height())
 			{
-				int x = HORIZONTAL_PORCH_HACK + (ABC800_CHAR_WIDTH * 4) - 16 + (sx * 4) + pixel;
-
-				if (BIT(dot, 15) || (bitmap.pix(y, x) == rgb_t::black()))
-				{
-					bitmap.pix(y, x) = pen[(dot >> 12) & 0x07];
-				}
-
-				dot <<= 4;
+				if (opaque || bitmap.pix(y, x) == rgb_t::black())
+					bitmap.pix(y, x) = color;
 			}
+			x++;
+		}
+	};
+
+	uint32_t addr = base;
+	for (int y = y0; y < y1; y++)
+	{
+		int x = x0;
+		for (int sx = 0; sx < ROW_STRIDE; sx++)
+		{
+			const uint8_t data = m_video_ram[addr++ & videoram_mask];
+			plot_hrc(y, x, m_hrc[data >> 4]);
+			plot_hrc(y, x, m_hrc[data & 0x0f]);
 		}
 	}
 }
@@ -1334,12 +1422,15 @@ void abc806_state::read_pal_p4(offs_t offset, bool m1l, bool xml, offs_t &m, boo
 
 	if (!m1l)
 	{
+		// §10: M1 (opcode fetch) at 7800-7FFF selects Options PROM, not videominne.
 		vr = 1;
 	}
 /*
     if (!m1l && (offset < 0x7800)
     {
-        TODO 0..30k read from videoram if fetch opcode from 7800-7fff
+        // PAL P4-11: when an opcode was fetched from 7800-7fff, the 0..30k
+        // graphics window may read from banked videoram (HRS F15-F18). Not yet
+        // implemented — see TODO at top of file.
         romd = 1;
         hre = 1;
         mux = 0;
@@ -1611,7 +1702,9 @@ void abc806_state::abc806_io(address_map &map)
 	abc800m_io(map);
 
 	map(0x06, 0x06).mirror(0xff18).w(FUNC(abc806_state::hrs_w));
-	map(0x07, 0x07).mirror(0xff18).w(FUNC(abc806_state::hrc_w));
+	// Replace abc800 FGCTL-style port-07 write; HRC regs use A8–A11 (§17.5 / App. A).
+	map(0x07, 0x07).mirror(0xff18).unmapw();
+	map(0x07, 0x07).select(0xff00).w(FUNC(abc806_state::hrc_w));
 	map(0x34, 0x34).select(0xff00).rw(FUNC(abc806_state::mai_r), FUNC(abc806_state::mao_w));
 	map(0x35, 0x35).mirror(0xff00).rw(FUNC(abc806_state::ami_r), FUNC(abc806_state::amo_w));
 	map(0x36, 0x36).mirror(0xff00).rw(FUNC(abc806_state::sti_r), FUNC(abc806_state::sto_w));
@@ -1667,6 +1760,13 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( abc806 )
 	PORT_INCLUDE(abc800)
+
+	PORT_START("HR")
+	PORT_CONFNAME(0x03, 0x01, "HR DOT1/DOT2 mix")
+	PORT_CONFSETTING(0x00, "Separate pixels")
+	PORT_CONFSETTING(0x01, "Blandfärg average (1/2+1/2)")
+	PORT_CONFSETTING(0x02, "Blandfärg 1/3 DOT1 + 2/3 DOT2")
+	PORT_CONFSETTING(0x03, "Blandfärg 2/3 DOT1 + 1/3 DOT2")
 INPUT_PORTS_END
 
 
