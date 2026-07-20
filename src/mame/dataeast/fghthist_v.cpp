@@ -43,8 +43,8 @@ void fghthist_state::palette_dma_w(u32 data)
 // sprite and BG2/3 color banks are changeable at run time
 void nslasher_state::tilemap_color_bank_w(u8 data)
 {
-	m_deco_tilegen[1]->set_tilemap_colour_bank(0, ((data >> 0) & 7) << 4);
-	m_deco_tilegen[1]->set_tilemap_colour_bank(1, ((data >> 3) & 7) << 4);
+	m_tilegen[1]->set_tilemap_colour_bank(0, ((data >> 0) & 7) << 4);
+	m_tilegen[1]->set_tilemap_colour_bank(1, ((data >> 3) & 7) << 4);
 }
 
 void nslasher_state::sprite1_color_bank_w(u8 data)
@@ -63,11 +63,11 @@ void fghthist_common_state::video_start()
 {
 	for (int i = 0; i < 4; i++)
 	{
-		const u32 size = m_pf_rowscroll32[i].length();
+		const u32 size = m_rowscroll32[i].length();
 
-		m_pf_rowscroll[i] = make_unique_clear<u16[]>(size);
+		m_rowscroll[i] = make_unique_clear<u16[]>(size);
 
-		save_pointer(NAME(m_pf_rowscroll[i]), size, i);
+		save_pointer(NAME(m_rowscroll[i]), size, i);
 	}
 	save_item(NAME(m_pri));
 }
@@ -112,24 +112,24 @@ u32 fghthist_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->pen(0x300), cliprect); // Palette index not confirmed
 
-	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0].get(), m_pf_rowscroll[1].get());
-	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2].get(), m_pf_rowscroll[3].get());
+	m_tilegen[0]->update(m_rowscroll[0].get(), m_rowscroll[1].get());
+	m_tilegen[1]->update(m_rowscroll[2].get(), m_rowscroll[3].get());
 
 	/* Draw screen */
-	m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 1);
+	m_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 1);
 
 	if (m_pri & 1)
 	{
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
+		m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
+		m_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
 	}
 	else
 	{
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
+		m_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
+		m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
 	}
 
-	m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 8);
+	m_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 8);
 
 	// sprites are flipped relative to tilemaps
 	m_sprgen[0]->set_flip_screen(true);
@@ -293,8 +293,8 @@ void nslasher_state::mix_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, c
 u32 nslasher_state::screen_update_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bool alphaTilemap = false;
-	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0].get(), m_pf_rowscroll[1].get());
-	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2].get(), m_pf_rowscroll[3].get());
+	m_tilegen[0]->update(m_rowscroll[0].get(), m_rowscroll[1].get());
+	m_tilegen[1]->update(m_rowscroll[2].get(), m_rowscroll[3].get());
 
 	/* This is not a conclusive test for deciding if tilemap needs alpha blending */
 	if (m_deco_ace->get_aceram(0x17) != 0x0 && (m_pri & 3))
@@ -320,33 +320,33 @@ u32 nslasher_state::screen_update_nslasher(screen_device &screen, bitmap_rgb32 &
 	/* Draw playfields & sprites */
 	if (m_pri & 2)
 	{
-		m_deco_tilegen[1]->tilemap_12_combine_draw(screen, bitmap, cliprect, 0, 1);
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
+		m_tilegen[1]->tilemap_12_combine_draw(screen, bitmap, cliprect, 0, 1);
+		m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
 	}
 	else
 	{
-		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 1);
+		m_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 1);
 		if (m_pri & 1)
 		{
-			m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
+			m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
 			if (alphaTilemap)
-				m_deco_tilegen[1]->tilemap_1_draw(screen, m_tilemap_alpha_bitmap, cliprect, 0, 4);
+				m_tilegen[1]->tilemap_1_draw(screen, m_tilemap_alpha_bitmap, cliprect, 0, 4);
 			else
-				m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
+				m_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
 		}
 		else
 		{
-			m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
+			m_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
 			if (alphaTilemap)
-				m_deco_tilegen[0]->tilemap_2_draw(screen, m_tilemap_alpha_bitmap, cliprect, 0, 4);
+				m_tilegen[0]->tilemap_2_draw(screen, m_tilemap_alpha_bitmap, cliprect, 0, 4);
 			else
-				m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
+				m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
 		}
 	}
 
 	mix_nslasher(screen, bitmap, cliprect, m_sprgen[0]->gfx(0), m_sprgen[1]->gfx(0), alphaTilemap);
 
-	m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -495,8 +495,8 @@ void tattass_state::mix_tattass(screen_device &screen, bitmap_rgb32 &bitmap, con
 u32 tattass_state::screen_update_tattass(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bool alphaTilemap = false;
-	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0].get(), m_pf_rowscroll[1].get());
-	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2].get(), m_pf_rowscroll[3].get());
+	m_tilegen[0]->update(m_rowscroll[0].get(), m_rowscroll[1].get());
+	m_tilegen[1]->update(m_rowscroll[2].get(), m_rowscroll[3].get());
 
 	/* This is not a conclusive test for deciding if tilemap needs alpha blending */
 	if (m_deco_ace->get_aceram(0x17) != 0x0 && (m_pri & 3))
@@ -522,32 +522,32 @@ u32 tattass_state::screen_update_tattass(screen_device &screen, bitmap_rgb32 &bi
 	/* Draw playfields & sprites */
 	if (m_pri & 2)
 	{
-		m_deco_tilegen[1]->tilemap_12_combine_draw(screen, bitmap, cliprect, 0, 1);
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
+		m_tilegen[1]->tilemap_12_combine_draw(screen, bitmap, cliprect, 0, 1);
+		m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
 	}
 	else
 	{
-		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 1);
+		m_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 1);
 		if (m_pri & 1)
 		{
-			m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
+			m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
 			if (alphaTilemap)
-				m_deco_tilegen[1]->tilemap_1_draw(screen, m_tilemap_alpha_bitmap, cliprect, 0, 4);
+				m_tilegen[1]->tilemap_1_draw(screen, m_tilemap_alpha_bitmap, cliprect, 0, 4);
 			else
-				m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
+				m_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
 		}
 		else
 		{
-			m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
+			m_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
 			if (alphaTilemap)
-				m_deco_tilegen[0]->tilemap_2_draw(screen, m_tilemap_alpha_bitmap, cliprect, 0, 4);
+				m_tilegen[0]->tilemap_2_draw(screen, m_tilemap_alpha_bitmap, cliprect, 0, 4);
 			else
-				m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
+				m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
 		}
 	}
 
 	mix_tattass(screen, bitmap, cliprect, m_sprgen[0]->gfx(0), m_sprgen[1]->gfx(0), alphaTilemap);
 
-	m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

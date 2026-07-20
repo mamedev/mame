@@ -24,7 +24,7 @@ license:CC0-1.0
 		<year>1981</year>
 		<!-- "FOR NEC HOME ELECTRONICS" -->
 		<publisher>Adventure International</publisher>
-		<info name="usage" value="Requires ram -16K for regular pc6001" />
+		<info name="usage" value="Requires -ram 16K for regular pc6001" />
 		<part name="cart" interface="pc6001_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="the curse of crowley manor.bin" size="16384" crc="592c54af" sha1="c0e2155181a20d3c963ee9151a3eabab4765ffd9"/>

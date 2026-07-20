@@ -17,6 +17,12 @@ copyright-holders:m1macrophage
 		</text>
 	</element>
 
+	<element name="nvram_warning" defstate="0">
+		<text state="1" string="!!! Outdated NVRAM. Either delete the NVRAM files (recommended), or run the 'manual tune' and 'center pitch wheel' procedures and restart. !!!">
+			<color red="0.84" green="0.84" blue="0.84"/>
+		</text>
+	</element>
+
 	<!-- multi-track section elements -->
 
 	<element name="multitrack_label">
@@ -901,8 +907,9 @@ copyright-holders:m1macrophage
 
 		<!-- case -->
 
-		<collection name="script warning">
-			<element ref="script_warning" id="warning"><bounds x="360" y="0" width="800" height="18"/></element>
+		<collection name="warnings">
+			<element ref="script_warning" id="script_warning"><bounds x="460" y="0" width="600" height="18"/></element>
+			<element ref="nvram_warning" id="nvram_warning"><bounds x="210" y="0" width="1100" height="18"/></element>
 		</collection>
 
 		<element ref="panel"><bounds x="30" y="20" width="1465" height="320"/></element>
@@ -1065,6 +1072,16 @@ copyright-holders:m1macrophage
 	</view>
 
 	<script><![CDATA[
+		local script_hooks = {}
+		function script_hooks.reset()
+			-- 0x4afd stores a value relating to pitch wheel centering. Warn if
+			-- the value does not match that of the latest NVRAM, since tuning
+			-- could be way off in this case.
+			local pitch_center = file.device:subdevice("maincpu").spaces["program"]:read_u8(0x4afd)
+			local show_warning = (pitch_center == 120) and 0 or 1
+			file.views["Default Layout"].items["nvram_warning"]:set_state(show_warning)
+		end
+
 		file:set_resolve_tags_callback(
 			function()
 				local view = file.views["Default Layout"]
@@ -1079,7 +1096,7 @@ copyright-holders:m1macrophage
 				add_slider(view, "pitch_wheel", "pitch_wheel_dent", "wheel_0")
 				add_slider(view, "mod_wheel", "mod_wheel_dent", "wheel_1")
 
-				view.items["warning"]:set_state(0)
+				view.items["script_warning"]:set_state(0)
 			end)
 
 		function add_sixtrak_knob(view, knob_id, scale)
@@ -1347,5 +1364,7 @@ copyright-holders:m1macrophage
 		-----------------------------------------------------------------------
 		-- Slider and knob library ends.
 		-----------------------------------------------------------------------
+
+		return script_hooks
 	]]></script>
 </mamelayout>

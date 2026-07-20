@@ -103,12 +103,12 @@ class pktgaldx_state : public base_state
 public:
 	pktgaldx_state(const machine_config &mconfig, device_type type, const char *tag) :
 		base_state(mconfig, type, tag),
-		m_pf_rowscroll(*this, "pf%u_rowscroll", 1U),
+		m_rowscroll(*this, "rowscroll_%u", 1U),
 		m_spriteram(*this, "spriteram"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_deco104(*this, "ioprot104"),
 		m_sprgen(*this, "spritegen"),
-		m_deco_tilegen(*this, "tilegen")
+		m_tilegen(*this, "tilegen")
 	{ }
 
 	void pktgaldx(machine_config &config);
@@ -117,17 +117,17 @@ public:
 
 private:
 	// memory pointers
-	required_shared_ptr_array<uint16_t, 2> m_pf_rowscroll;
+	required_shared_ptr_array<uint16_t, 2> m_rowscroll;
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_decrypted_opcodes;
 
 	// devices
 	required_device<deco104_device> m_deco104;
 	required_device<decospr_device> m_sprgen;
-	required_device<deco16ic_device> m_deco_tilegen;
+	required_device<deco16ic_device> m_tilegen;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	int bank_callback(int bank);
 
 	uint16_t ioprot_r(offs_t offset);
 	void ioprot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -163,19 +163,19 @@ private:
 
 uint32_t pktgaldx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t const flip = m_deco_tilegen->pf_control_r(0);
+	uint16_t const flip = m_tilegen->control_r(0);
 
 	// sprites are flipped relative to tilemaps
 	flip_screen_set(BIT(flip, 7));
 	m_sprgen->set_flip_screen(!BIT(flip, 7));
-	m_deco_tilegen->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
+	m_tilegen->update(m_rowscroll[0], m_rowscroll[1]);
 
 	bitmap.fill(0, cliprect); // not confirmed
 	screen.priority().fill(0);
 
-	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
-	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -269,10 +269,10 @@ void pktgaldx_state::prg_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 
-	map(0x100000, 0x100fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x102000, 0x102fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x110000, 0x1107ff).ram().share(m_pf_rowscroll[0]);
-	map(0x112000, 0x1127ff).ram().share(m_pf_rowscroll[1]);
+	map(0x100000, 0x100fff).rw(m_tilegen, FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x102000, 0x102fff).rw(m_tilegen, FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x110000, 0x1107ff).ram().share(m_rowscroll[0]);
+	map(0x112000, 0x1127ff).ram().share(m_rowscroll[1]);
 
 	map(0x120000, 0x1207ff).ram().share(m_spriteram);
 	map(0x130000, 0x130fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -282,10 +282,10 @@ void pktgaldx_state::prg_map(address_map &map)
 	map(0x150000, 0x15000f).w(m_oki2, FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x150007, 0x150007).r(m_oki2, FUNC(okim6295_device::read));
 
-	map(0x161800, 0x16180f).w(m_deco_tilegen, FUNC(deco16ic_device::pf_control_w));
+	map(0x161800, 0x16180f).w(m_tilegen, FUNC(deco16ic_device::control_w));
 	map(0x164800, 0x164801).w(FUNC(pktgaldx_state::oki_bank_w));
 	map(0x166800, 0x166801).w(FUNC(pktgaldx_state::vblank_ack_w));
-	map(0x167800, 0x167fff).rw(FUNC(pktgaldx_state::ioprot_r), FUNC(pktgaldx_state::ioprot_w)).share("prot16ram");
+	map(0x167800, 0x167fff).rw(FUNC(pktgaldx_state::ioprot_r), FUNC(pktgaldx_state::ioprot_w));
 
 	map(0x170000, 0x17ffff).ram();
 }
@@ -479,13 +479,13 @@ static const gfx_layout bootleg_spritelayout =
 };
 
 static GFXDECODE_START( gfx_bootleg )
-	GFXDECODE_ENTRY( "tiles", 0, bootleg_spritelayout,     0, 64 )
+	GFXDECODE_ENTRY( "tiles", 0, bootleg_spritelayout, 0, 64 )
 GFXDECODE_END
 
 
-DECO16IC_BANK_CB_MEMBER(pktgaldx_state::bank_callback)
+int pktgaldx_state::bank_callback(int bank)
 {
-	return ((bank >> 4) & 0x7) * 0x1000;
+	return (bank & 0x70) << 8;
 }
 
 
@@ -510,18 +510,18 @@ void pktgaldx_state::pktgaldx(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pktgaldx);
 
-	DECO16IC(config, m_deco_tilegen);
-	m_deco_tilegen->set_pf1_size(DECO_64x32);
-	m_deco_tilegen->set_pf2_size(DECO_64x32);
-	m_deco_tilegen->set_pf1_col_bank(0x00);
-	m_deco_tilegen->set_pf2_col_bank(0x10);
-	m_deco_tilegen->set_pf1_col_mask(0x0f);
-	m_deco_tilegen->set_pf2_col_mask(0x0f);
-	m_deco_tilegen->set_bank1_callback(FUNC(pktgaldx_state::bank_callback));
-	m_deco_tilegen->set_bank2_callback(FUNC(pktgaldx_state::bank_callback));
-	m_deco_tilegen->set_pf12_8x8_bank(0);
-	m_deco_tilegen->set_pf12_16x16_bank(1);
-	m_deco_tilegen->set_gfxdecode_tag(m_gfxdecode);
+	DECO16IC(config, m_tilegen);
+	m_tilegen->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen->set_col_bank<0>(0x00);
+	m_tilegen->set_col_bank<1>(0x10);
+	m_tilegen->set_col_mask<0>(0x0f);
+	m_tilegen->set_col_mask<1>(0x0f);
+	m_tilegen->set_bank_callback<0>(FUNC(pktgaldx_state::bank_callback));
+	m_tilegen->set_bank_callback<1>(FUNC(pktgaldx_state::bank_callback));
+	m_tilegen->set_8x8_bank(0);
+	m_tilegen->set_16x16_bank(1);
+	m_tilegen->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_SPRITE(config, m_sprgen, m_palette, gfx_pktgaldx_spr);
 

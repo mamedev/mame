@@ -258,6 +258,18 @@ end
 
 
 ---------------------------------------------------
+-- Creative Labs CT1741 SB16 DSP
+--@src/devices/sound/ct1741.h,SOUNDS["CT1741"] = true
+---------------------------------------------------
+
+if SOUNDS["CT1741"] then
+	files {
+		MAME_DIR .. "src/devices/sound/ct1741.cpp",
+		MAME_DIR .. "src/devices/sound/ct1741.h",
+	}
+end
+
+---------------------------------------------------
 -- Creative Labs CT1745 SB16 Mixer
 --@src/devices/sound/ct1745.h,SOUNDS["CT1745"] = true
 ---------------------------------------------------

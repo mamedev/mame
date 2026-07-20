@@ -117,11 +117,11 @@ public:
 		, m_deco104(*this, "ioprot")
 		, m_deco_ace(*this, "deco_ace")
 		, m_screen(*this, "screen")
-		, m_deco_tilegen(*this, "tilegen%u", 1)
+		, m_tilegen(*this, "tilegen%u", 1)
 		, m_oki(*this, "oki%u", 1)
 		, m_sprgen(*this, "spritegen%u", 1)
 		, m_spriteram(*this, "spriteram%u", 1)
-		, m_pf_rowscroll(*this, "pf%u_rowscroll", 1)
+		, m_rowscroll(*this, "rowscroll_%u", 1)
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
@@ -139,12 +139,12 @@ private:
 	required_device<deco104_device> m_deco104;
 	required_device<deco_ace_device> m_deco_ace;
 	required_device<screen_device> m_screen;
-	required_device_array<deco16ic_device, 2> m_deco_tilegen;
+	required_device_array<deco16ic_device, 2> m_tilegen;
 	required_device_array<okim6295_device, 2> m_oki;
 	required_device_array<decospr_device, 2> m_sprgen;
 	required_device_array<buffered_spriteram16_device, 2> m_spriteram;
 
-	required_shared_ptr_array<u16, 4> m_pf_rowscroll;
+	required_shared_ptr_array<u16, 4> m_rowscroll;
 	required_shared_ptr<u16> m_decrypted_opcodes;
 
 	u16 m_priority = 0U;
@@ -158,8 +158,8 @@ private:
 	u16 ioprot_r(offs_t offset);
 	void ioprot_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	DECO16IC_BANK_CB_MEMBER(bank_callback);
-	DECO16IC_BANK_CB_MEMBER(bank_callback2);
+	int bank_callback(int bank);
+	int bank_callback2(int bank);
 
 	void audio_map(address_map &map) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
@@ -416,7 +416,7 @@ void boogwing_state::mix(screen_device &screen, bitmap_rgb32 &bitmap, const rect
 
 u32 boogwing_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	u16 const flip = m_deco_tilegen[0]->pf_control_r(0);
+	u16 const flip = m_tilegen[0]->control_r(0);
 	u16 const priority = m_priority;
 
 	// sprites are flipped relative to tilemaps
@@ -428,8 +428,8 @@ u32 boogwing_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	m_sprgen[1]->draw_sprites(bitmap, cliprect, m_spriteram[1]->buffer(), 0x400);
 	m_sprgen[0]->draw_sprites(bitmap, cliprect, m_spriteram[0]->buffer(), 0x400);
 
-	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
-	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2], m_pf_rowscroll[3]);
+	m_tilegen[0]->update(m_rowscroll[0], m_rowscroll[1]);
+	m_tilegen[1]->update(m_rowscroll[2], m_rowscroll[3]);
 
 	// Draw playfields
 	bitmap.fill(m_deco_ace->pen(0x400), cliprect); // pen not confirmed
@@ -440,40 +440,40 @@ u32 boogwing_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	// bit&0x4 combines playfields
 	if ((priority & 0x7) == 0x5)
 	{
-		m_deco_tilegen[0]->tilemap_2_draw(screen, m_temp_bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_deco_tilegen[1]->tilemap_12_combine_draw(screen, m_temp_bitmap, cliprect, 0, 32);
+		m_tilegen[0]->tilemap_2_draw(screen, m_temp_bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_tilegen[1]->tilemap_12_combine_draw(screen, m_temp_bitmap, cliprect, 0, 32);
 	}
 	else if ((priority & 0x7) == 0x4)
 	{
-		m_deco_tilegen[1]->tilemap_12_combine_draw(screen, m_temp_bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_deco_tilegen[0]->tilemap_2_draw(screen, m_temp_bitmap, cliprect, 0, 32);
+		m_tilegen[1]->tilemap_12_combine_draw(screen, m_temp_bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_tilegen[0]->tilemap_2_draw(screen, m_temp_bitmap, cliprect, 0, 32);
 	}
 	else if ((priority & 0x7) == 0x1 || (priority & 0x7) == 0x2)
 	{
-		m_deco_tilegen[1]->tilemap_2_draw(screen, m_temp_bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_deco_tilegen[0]->tilemap_2_draw(screen, m_temp_bitmap, cliprect, 0, 8);
-		m_deco_tilegen[1]->tilemap_1_draw(screen, m_temp_bitmap, cliprect, 0, 32);
+		m_tilegen[1]->tilemap_2_draw(screen, m_temp_bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_tilegen[0]->tilemap_2_draw(screen, m_temp_bitmap, cliprect, 0, 8);
+		m_tilegen[1]->tilemap_1_draw(screen, m_temp_bitmap, cliprect, 0, 32);
 	}
 	else if ((priority & 0x7) == 0x3)
 	{
-		m_deco_tilegen[1]->tilemap_2_draw(screen, m_temp_bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_deco_tilegen[0]->tilemap_2_draw(screen, m_temp_bitmap, cliprect, 0, 8);
+		m_tilegen[1]->tilemap_2_draw(screen, m_temp_bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_tilegen[0]->tilemap_2_draw(screen, m_temp_bitmap, cliprect, 0, 8);
 
 		// This mode uses playfield 3 to shadow sprites & playfield 2 (instead of
 		// regular alpha-blending, the destination is inverted).  Not yet implemented.
 		m_alpha_tmap_bitmap.fill(0, cliprect);
-		m_deco_tilegen[1]->tilemap_1_draw(screen, m_alpha_tmap_bitmap, cliprect, 0, 0); // 32
+		m_tilegen[1]->tilemap_1_draw(screen, m_alpha_tmap_bitmap, cliprect, 0, 0); // 32
 	}
 	else
 	{
-		m_deco_tilegen[1]->tilemap_2_draw(screen, m_temp_bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_deco_tilegen[1]->tilemap_1_draw(screen, m_temp_bitmap, cliprect, 0, 8);
-		m_deco_tilegen[0]->tilemap_2_draw(screen, m_temp_bitmap, cliprect, 0, 32);
+		m_tilegen[1]->tilemap_2_draw(screen, m_temp_bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_tilegen[1]->tilemap_1_draw(screen, m_temp_bitmap, cliprect, 0, 8);
+		m_tilegen[0]->tilemap_2_draw(screen, m_temp_bitmap, cliprect, 0, 32);
 	}
 
 	mix(screen,bitmap,cliprect);
 
-	m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -517,19 +517,19 @@ void boogwing_state::main_map(address_map &map)
 //  map(0x24e6c0, 0x24e6c1).portr("DSW");
 //  map(0x24e138, 0x24e139).portr("SYSTEM");
 //  map(0x24e344, 0x24e345).portr("INPUTS");
-	map(0x24e000, 0x24efff).rw(FUNC(boogwing_state::ioprot_r), FUNC(boogwing_state::ioprot_w)).share("prot16ram"); // Protection device
+	map(0x24e000, 0x24efff).rw(FUNC(boogwing_state::ioprot_r), FUNC(boogwing_state::ioprot_w)); // Protection device
 
-	map(0x260000, 0x26000f).w(m_deco_tilegen[0], FUNC(deco16ic_device::pf_control_w));
-	map(0x264000, 0x265fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x266000, 0x267fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x268000, 0x268fff).ram().share(m_pf_rowscroll[0]);
-	map(0x26a000, 0x26afff).ram().share(m_pf_rowscroll[1]);
+	map(0x260000, 0x26000f).w(m_tilegen[0], FUNC(deco16ic_device::control_w));
+	map(0x264000, 0x265fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x266000, 0x267fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x268000, 0x268fff).ram().share(m_rowscroll[0]);
+	map(0x26a000, 0x26afff).ram().share(m_rowscroll[1]);
 
-	map(0x270000, 0x27000f).w(m_deco_tilegen[1], FUNC(deco16ic_device::pf_control_w));
-	map(0x274000, 0x275fff).ram().w(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_w));
-	map(0x276000, 0x277fff).ram().w(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_w));
-	map(0x278000, 0x278fff).ram().share(m_pf_rowscroll[2]);
-	map(0x27a000, 0x27afff).ram().share(m_pf_rowscroll[3]);
+	map(0x270000, 0x27000f).w(m_tilegen[1], FUNC(deco16ic_device::control_w));
+	map(0x274000, 0x275fff).ram().w(m_tilegen[1], FUNC(deco16ic_device::vram_w<0>));
+	map(0x276000, 0x277fff).ram().w(m_tilegen[1], FUNC(deco16ic_device::vram_w<1>));
+	map(0x278000, 0x278fff).ram().share(m_rowscroll[2]);
+	map(0x27a000, 0x27afff).ram().share(m_rowscroll[3]);
 
 	map(0x280000, 0x28000f).noprw(); // ?
 	map(0x282000, 0x282001).noprw(); // Palette setup?
@@ -696,14 +696,14 @@ void boogwing_state::sound_bankswitch_w(u8 data)
 }
 
 
-DECO16IC_BANK_CB_MEMBER(boogwing_state::bank_callback)
+int boogwing_state::bank_callback(int bank)
 {
-	return ((bank >> 4) & 0x7) * 0x1000;
+	return (bank & 0x70) << 8;
 }
 
-DECO16IC_BANK_CB_MEMBER(boogwing_state::bank_callback2)
+int boogwing_state::bank_callback2(int bank)
 {
-	int offset = ((bank >> 4) & 0x7) * 0x1000;
+	int offset = (bank & 0x70) << 8;
 	if ((bank & 0xf) == 0xa)
 		offset += 0x800; // strange - transporter level
 
@@ -738,31 +738,31 @@ void boogwing_state::boogwing(machine_config &config)
 
 	DECO_ACE(config, m_deco_ace);
 
-	DECO16IC(config, m_deco_tilegen[0]);
-	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_col_bank(0);
-	m_deco_tilegen[0]->set_pf2_col_bank(0);   // pf2 is non default
-	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
+	DECO16IC(config, m_tilegen[0]);
+	m_tilegen[0]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_col_bank<0>(0);
+	m_tilegen[0]->set_col_bank<1>(0);   // pf2 is non default
+	m_tilegen[0]->set_col_mask<0>(0x0f);
+	m_tilegen[0]->set_col_mask<1>(0x0f);
 	// no bank1 callback
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(boogwing_state::bank_callback));
-	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
-	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
+	m_tilegen[0]->set_bank_callback<1>(FUNC(boogwing_state::bank_callback));
+	m_tilegen[0]->set_8x8_bank(0);
+	m_tilegen[0]->set_16x16_bank(1);
+	m_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	DECO16IC(config, m_deco_tilegen[1]);
-	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_col_bank(0);
-	m_deco_tilegen[1]->set_pf2_col_bank(16);
-	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(boogwing_state::bank_callback2));
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(boogwing_state::bank_callback2));
-	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
-	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
+	DECO16IC(config, m_tilegen[1]);
+	m_tilegen[1]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_col_bank<0>(0);
+	m_tilegen[1]->set_col_bank<1>(16);
+	m_tilegen[1]->set_col_mask<0>(0x0f);
+	m_tilegen[1]->set_col_mask<1>(0x0f);
+	m_tilegen[1]->set_bank_callback<0>(FUNC(boogwing_state::bank_callback2));
+	m_tilegen[1]->set_bank_callback<1>(FUNC(boogwing_state::bank_callback2));
+	m_tilegen[1]->set_8x8_bank(0);
+	m_tilegen[1]->set_16x16_bank(2);
+	m_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 
 	DECO_SPRITE(config, m_sprgen[0], m_deco_ace, gfx_boogwing_spr1);
 	DECO_SPRITE(config, m_sprgen[1], m_deco_ace, gfx_boogwing_spr2);
