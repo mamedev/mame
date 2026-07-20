@@ -756,18 +756,26 @@ Doesn't start
 		</part>
 	</software>
 
-	<software name="ritett">
+	<software name="ritett" supported="no">
 		<description>RitEtt (enanvändare)</description>
 		<year>1986</year>
 		<publisher>Esselte Studium</publisher>
 		<notes><![CDATA[
-Requires hardware key 7, which isn't dumped
+Throws "Kan inte ladda"
+hardware key isn't hooked up yet
 ]]></notes>
 		<info name="serial" value="24-34250" />
 		<info name="release" value="19860404" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="2217597">
-				<rom name="RitEtt.mfm" size="2217597" crc="e7cf88d0" sha1="225396bc29cb2ba158949a9286fcee9201617265"/>
+			<dataarea name="flop" size="5108622">
+				<rom name="ritett.mfi" size="5108622" crc="20c3dc41" sha1="e2b0586d5b472959f65f0d07ad747bbcf481a497"/>
+			</dataarea>
+		</part>
+		<!-- Programvarunyckel 7 -->
+		<part name="key" interface="compis_key">
+			<dataarea name="rom" size="2">
+				<rom value="0xe3" offset="0" size="1" loadflag="fill" />
+				<rom value="0x0f" offset="1" size="1" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
