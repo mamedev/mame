@@ -51,8 +51,8 @@ public:
 		m_lscreen(*this, "lscreen")
 	{ }
 
-	void backfire(machine_config &config);
-	void init_backfire();
+	void backfire(machine_config &config) ATTR_COLD;
+	void init_backfire() ATTR_COLD;
 
 private:
 	uint32_t control2_r();
@@ -67,7 +67,7 @@ private:
 	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vbl_interrupt(int state);
 	void irq_ack_w(uint32_t data);
-	void descramble_sound();
+	void descramble_sound() ATTR_COLD;
 	int bank_callback(int bank);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 
@@ -328,9 +328,7 @@ void backfire_state::irq_ack_w(uint32_t data)
 int backfire_state::bank_callback(int bank)
 {
 	//  logerror("bank callback %04x\n",bank); // bit 1 gets set too?
-	bank = (bank & 0x10) | ((bank & 0x40) >> 1) | ((bank & 0x20) << 1);
-
-	return bank << 8;
+	return bitswap<3>(bank, 5, 6, 4) << 12;
 }
 
 DECOSPR_PRIORITY_CB_MEMBER(backfire_state::pri_callback)
