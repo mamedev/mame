@@ -143,7 +143,7 @@ u8 captaven_state::captaven_soundcpu_status_r()
 	// 7-------  sound cpu status (0 = busy)
 	// -6543210  unknown
 
-	return 0xff;
+	return 0x7f | (m_ioprot->soundlatch_pending_r() ? 0 : 0x80);
 }
 
 void captaven_state::sound_bankswitch_w(u8 data)

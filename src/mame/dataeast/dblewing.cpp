@@ -98,8 +98,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_tilegen(*this, "tilegen"),
 		m_deco104(*this, "ioprot"),
-		m_sprgen(*this, "spritegen"),
-		m_soundlatch_pending(false)
+		m_sprgen(*this, "spritegen")
 	{ }
 
 	void dblewing(machine_config &config);
@@ -120,7 +119,6 @@ private:
 	required_device<decospr_device> m_sprgen;
 
 	uint8_t irq_latch_r();
-	void soundlatch_irq_w(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	int bank_callback(int bank);
@@ -133,7 +131,6 @@ private:
 	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 	void sound_io(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
-	bool m_soundlatch_pending;
 };
 
 
@@ -171,11 +168,6 @@ void dblewing_state::ioprot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_deco104->write_data( deco146_addr, data, mem_mask, cs );
 }
 
-void dblewing_state::soundlatch_irq_w(int state)
-{
-	m_soundlatch_pending = bool(state);
-}
-
 void dblewing_state::dblewing_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
@@ -204,7 +196,7 @@ void dblewing_state::decrypted_opcodes_map(address_map &map)
 uint8_t dblewing_state::irq_latch_r()
 {
 	// bit 0: irq type (0 = latch, 1 = ym)
-	return m_soundlatch_pending ? 0 : 1;
+	return m_deco104->soundlatch_pending_r() ? 0 : 1;
 }
 
 void dblewing_state::sound_map(address_map &map)
@@ -391,8 +383,7 @@ void dblewing_state::dblewing(machine_config &config)
 	m_deco104->port_c_cb().set_ioport("DSW");
 	m_deco104->set_interface_scramble_interleave();
 	m_deco104->set_use_magic_read_address_xor(true);
-	m_deco104->soundlatch_irq_cb().set(FUNC(dblewing_state::soundlatch_irq_w));
-	m_deco104->soundlatch_irq_cb().append("soundirq", FUNC(input_merger_device::in_w<0>));
+	m_deco104->soundlatch_irq_cb().set("soundirq", FUNC(input_merger_device::in_w<0>));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -488,8 +479,6 @@ void dblewing_state::init_dblewing()
 {
 	deco56_decrypt_gfx(machine(), "tiles");
 	deco102_decrypt_cpu((uint16_t *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x80000, 0x399d, 0x25, 0x3d);
-
-	save_item(NAME(m_soundlatch_pending));
 }
 
 } // anonymous namespace
