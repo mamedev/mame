@@ -1,25 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
 #include "emu.h"
-#include "deco32.h"
+#include "fghthist.h"
 
 /******************************************************************************/
 
-void deco32_state::pri_w(u32 data)
+void fghthist_common_state::pri_w(u32 data)
 {
 	m_pri = data;
-}
-
-void dragngun_state::sprite_control_w(u32 data)
-{
-	m_sprite_ctrl = data;
-}
-
-void dragngun_state::spriteram_dma_w(u32 data)
-{
-	/* DMA spriteram to private sprite chip area, and clear cpu ram */
-	m_spriteram->copy();
-	memset(m_spriteram->live(),0,0x2000);
 }
 
 /******************************************************************************/
@@ -27,13 +15,13 @@ void dragngun_state::spriteram_dma_w(u32 data)
 /* Later games have double buffered paletteram - the real palette ram is
 only updated on a DMA call */
 
-void deco32_state::buffered_palette_w(offs_t offset, u32 data, u32 mem_mask)
+void fghthist_state::buffered_palette_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_paletteram[offset]);
 	m_dirty_palette[offset] = 1;
 }
 
-void deco32_state::palette_dma_w(u32 data)
+void fghthist_state::palette_dma_w(u32 data)
 {
 	for (int i = 0; i < m_palette->entries(); i++)
 	{
@@ -71,12 +59,20 @@ void nslasher_state::sprite2_color_bank_w(u8 data)
 
 /******************************************************************************/
 
-void deco32_state::video_start()
+void fghthist_common_state::video_start()
 {
+	for (int i = 0; i < 4; i++)
+	{
+		const u32 size = m_pf_rowscroll32[i].length();
+
+		m_pf_rowscroll[i] = make_unique_clear<u16[]>(size);
+
+		save_pointer(NAME(m_pf_rowscroll[i]), size, i);
+	}
 	save_item(NAME(m_pri));
 }
 
-void deco32_state::allocate_spriteram(int chip)
+void fghthist_common_state::allocate_spriteram(int chip)
 {
 	m_spriteram16[chip] = std::make_unique<u16[]>(0x2000/4);
 	m_spriteram16_buffered[chip] = std::make_unique<u16[]>(0x2000/4);
@@ -84,37 +80,13 @@ void deco32_state::allocate_spriteram(int chip)
 	save_pointer(NAME(m_spriteram16_buffered[chip]), 0x2000/4, chip);
 }
 
-void deco32_state::allocate_buffered_palette()
-{
-	m_dirty_palette = make_unique_clear<u8[]>(2048);
-	save_pointer(NAME(m_dirty_palette), 2048);
-}
-
-void deco32_state::allocate_rowscroll(int size1, int size2, int size3, int size4)
-{
-	m_pf_rowscroll[0] = make_unique_clear<u16[]>(size1);
-	m_pf_rowscroll[1] = make_unique_clear<u16[]>(size2);
-	m_pf_rowscroll[2] = make_unique_clear<u16[]>(size3);
-	m_pf_rowscroll[3] = make_unique_clear<u16[]>(size4);
-	save_pointer(NAME(m_pf_rowscroll[0]), size1);
-	save_pointer(NAME(m_pf_rowscroll[1]), size2);
-	save_pointer(NAME(m_pf_rowscroll[2]), size3);
-	save_pointer(NAME(m_pf_rowscroll[3]), size4);
-}
-
-void captaven_state::video_start()
-{
-	deco32_state::allocate_spriteram(0);
-	deco32_state::allocate_rowscroll(0x4000/4, 0x2000/4, 0x4000/4, 0x2000/4);
-	deco32_state::video_start();
-}
-
 void fghthist_state::video_start()
 {
-	deco32_state::allocate_spriteram(0);
-	deco32_state::allocate_rowscroll(0x2000/4, 0x2000/4, 0x2000/4, 0x2000/4);
-	deco32_state::allocate_buffered_palette();
-	deco32_state::video_start();
+	fghthist_common_state::allocate_spriteram(0);
+	fghthist_common_state::video_start();
+
+	m_dirty_palette = make_unique_clear<u8[]>(2048);
+	save_pointer(NAME(m_dirty_palette), 2048);
 }
 
 void nslasher_state::video_start()
@@ -125,158 +97,15 @@ void nslasher_state::video_start()
 	for (int chip = 0; chip < 2; chip++)
 	{
 		m_sprgen[chip]->alloc_sprite_bitmap();
-		deco32_state::allocate_spriteram(chip);
+		fghthist_common_state::allocate_spriteram(chip);
 	}
-	deco32_state::allocate_rowscroll(0x2000/4, 0x2000/4, 0x2000/4, 0x2000/4);
-	deco32_state::video_start();
+	fghthist_common_state::video_start();
 }
 
-void dragngun_state::video_start()
-{
-	deco32_state::allocate_rowscroll(0x4000/4, 0x2000/4, 0x4000/4, 0x2000/4);
-	deco32_state::allocate_buffered_palette();
-	save_item(NAME(m_sprite_ctrl));
-}
 /******************************************************************************/
 
 
 /******************************************************************************/
-
-u32 captaven_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	const u16 flip = m_deco_tilegen[0]->pf_control_r(0);
-	flip_screen_set(BIT(flip, 7));
-	m_sprgen[0]->set_flip_screen(BIT(flip, 7));
-
-	screen.priority().fill(0, cliprect);
-	bitmap.fill(m_palette->pen(0x000), cliprect); // Palette index not confirmed
-
-	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0].get(), m_pf_rowscroll[1].get());
-	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2].get(), m_pf_rowscroll[3].get());
-
-	// pf4 not used (because pf3 is in 8bpp mode)
-
-	if ((m_pri & 1) == 0)
-	{
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 1);
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
-	}
-	else
-	{
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 1);
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
-	}
-
-	m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
-
-	m_sprgen[0]->draw_sprites(bitmap, cliprect, m_spriteram16_buffered[0].get(), 0x400); // only low half of sprite ram is used?
-
-	return 0;
-}
-
-u16 dragngun_state::read_spritetile(int lookupram_offset)
-{
-	if (lookupram_offset & 0x2000)
-		return m_sprite_spritetile[1][lookupram_offset&0x1fff];
-	else
-		return m_sprite_spritetile[0][lookupram_offset&0x1fff];
-}
-
-u16 dragngun_state::read_spriteformat(int spriteformatram_offset, u8 attr)
-{
-	if (spriteformatram_offset & 0x400)
-		return m_sprite_spriteformat[1][((spriteformatram_offset & 0x1ff)<<2) + attr];
-	else
-		return m_sprite_spriteformat[0][((spriteformatram_offset & 0x1ff)<<2) + attr];
-}
-
-u16 dragngun_state::read_spritetable(int offs, u8 attr)
-{
-	return m_spriteram->buffer()[(offs << 3) + attr];
-}
-
-u16 dragngun_state::read_spritelist(int offs)
-{
-	return m_sprite_indextable[offs];
-}
-
-u16 dragngun_state::read_cliptable(int offs, u8 attr)
-{
-	return m_sprite_cliptable[(offs << 2) + attr];
-}
-
-int dragngun_state::sprite_priority_callback(int priority)
-{
-	/* For some reason, this bit when used in Dragon Gun causes the sprites
-	   to flicker every other frame (fake transparency)
-
-	   This would usually be a priority bit, but the flicker can't be a
-	   post-process mixing effect filtering out those priorities, because then
-	   it would still cut holes in sprites where it was drawn, and it doesn't.
-
-	   Instead sprites with this priority must simple be disabled every other
-	   frame.  maybe there's a register in the sprite chip to control this on
-	   a per-priority level?
-	*/
-
-	if ((priority & 0x80) && (m_screen->frame_number() & 1)) // flicker
-		return -1;
-
-	priority = (priority & 0x60) >> 5;
-	if (priority == 0) priority = 7;
-	else if (priority == 1) priority = 7; // set to 1 to have the 'masking effect' with the dragon on the dragngun attract mode, but that breaks the player select where it needs to be 3, probably missing some bits..
-	else if (priority == 2) priority = 7;
-	else if (priority == 3) priority = 7;
-	return priority;
-}
-
-bool dragngun_state::sprite_mix_callback(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri)
-{
-	// TODO: proper priority handling
-	if (srcpri >= destpri)
-	{
-		if ((src & 0xf) != 0xf)
-		{
-			dest = colbase + src;
-			destpri = srcpri;
-			return true;
-		}
-	}
-	return false;
-}
-
-
-u32 dragngun_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	screen.priority().fill(0, cliprect);
-	bitmap.fill(m_palette->pen(0x400), cliprect); // Palette index not confirmed
-
-	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0].get(), m_pf_rowscroll[1].get());
-	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2].get(), m_pf_rowscroll[3].get());
-
-	m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 1); // it uses pf3 in 8bpp mode instead, like captaven
-	m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
-	m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
-	m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 8);
-
-	// zooming sprite draw is very slow, and sprites are buffered.. however, one of the levels attempts to use
-	// partial updates for every line, which causes things to be very slow... the sprites appear to support
-	// multiple layers of alpha, so rendering to a buffer for layer isn't easy (maybe there are multiple sprite
-	// chips at work?)
-	//
-	// really, it needs optimizing ..
-	// so for now we only draw these 2 layers on the last update call
-	if (cliprect.bottom() == 247)
-	{
-		rectangle clip(cliprect.left(), cliprect.right(), 8, 247);
-		m_sprgenzoom->clear_screen_bitmap(clip);
-		m_sprgenzoom->build_sprite_list_and_render_sprites(clip);
-		m_sprgenzoom->draw(screen, bitmap, clip);
-	}
-
-	return 0;
-}
-
 
 u32 fghthist_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {

@@ -17500,6 +17500,15 @@ bwingso
 zaviga
 zavigaj
 
+@source:dataeast/captaven.cpp
+captaven
+captavena
+captavene
+captavenj
+captavenu
+captavenua
+captavenuu
+
 @source:dataeast/cbuster.cpp
 cbuster
 cbusterj
@@ -17638,45 +17647,6 @@ srdarwin
 srdarwinj
 srdarwinb
 
-@source:dataeast/deco156.cpp
-hvysmsh
-hvysmsha
-hvysmshj
-wcvol95
-wcvol95j
-wcvol95x
-
-@source:dataeast/deco32.cpp
-captaven
-captavena
-captavene
-captavenj
-captavenu
-captavenua
-captavenuu
-dragngun
-dragngunj
-fghthist
-fghthista
-fghthistb
-fghthistj
-fghthistja
-fghthistjb
-fghthistu
-fghthistua
-fghthistub
-fghthistuc
-gunhard
-lockload
-lockloadu
-nslasher
-nslasherj
-nslashers
-nslasheru
-tattass
-tattassa
-tattasso
-
 @source:dataeast/deco_ld.cpp
 begas
 begas1
@@ -17778,6 +17748,13 @@ dietgoeb
 dietgoj
 dietgou
 
+@source:dataeast/dragngun.cpp
+dragngun
+dragngunj
+gunhard
+lockload
+lockloadu
+
 @source:dataeast/dreambal.cpp
 dreambal
 
@@ -17797,6 +17774,25 @@ drgninjam
 ffantasym
 secretagm
 
+@source:dataeast/fghthist.cpp
+fghthist
+fghthista
+fghthistb
+fghthistj
+fghthistja
+fghthistjb
+fghthistu
+fghthistua
+fghthistub
+fghthistuc
+nslasher
+nslasherj
+nslashers
+nslasheru
+tattass
+tattassa
+tattasso
+
 @source:dataeast/firetrap.cpp
 firetrap
 firetrapa
@@ -17810,6 +17806,14 @@ funkyjeta2
 funkyjetj
 sotsugyo
 sotsugyok
+
+@source:dataeast/hvysmsh.cpp
+hvysmsh
+hvysmsha
+hvysmshj
+wcvol95
+wcvol95j
+wcvol95x
 
 @source:dataeast/karnov.cpp
 chelnov
