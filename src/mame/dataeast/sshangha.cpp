@@ -121,8 +121,7 @@ public:
 		m_deco146(*this, "ioprot"),
 		m_spriteram(*this, "spriteram%u", 1U),
 		m_sound_shared_ram(*this, "sound_shared"),
-		m_pf_rowscroll(*this, "pf%u_rowscroll", 1U),
-		m_prot_data(*this, "prot_data"),
+		m_rowscroll(*this, "rowscroll_%u", 1U),
 		m_inputs(*this, "INPUTS"),
 		m_system(*this, "SYSTEM"),
 		m_dsw(*this, "DSW")
@@ -146,8 +145,7 @@ private:
 
 	required_shared_ptr_array<uint16_t, 2> m_spriteram;
 	required_shared_ptr<uint16_t> m_sound_shared_ram;
-	required_shared_ptr_array<uint16_t, 2> m_pf_rowscroll;
-	optional_shared_ptr<uint16_t> m_prot_data;
+	required_shared_ptr_array<uint16_t, 2> m_rowscroll;
 
 	required_ioport m_inputs;
 	required_ioport m_system;
@@ -155,13 +153,11 @@ private:
 
 	uint16_t m_video_control = 0;
 
-	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	int bank_callback(int bank);
 	uint16_t mix_callback(uint16_t p, uint16_t p2);
 
-	uint16_t sshangha_protection_region_8_146_r(offs_t offset);
-	void sshangha_protection_region_8_146_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t sshangha_protection_region_d_146_r(offs_t offset);
-	void sshangha_protection_region_d_146_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template <offs_t Base> uint16_t ioprot_r(offs_t offset);
+	template <offs_t Base> void ioprot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t deco_71_r();
 	uint16_t sshanghab_protection16_r(offs_t offset);
 
@@ -172,8 +168,8 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void sshangha_main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
+	void sshangha_main_map(address_map &map) ATTR_COLD;
 	void sshanghab_main_map(address_map &map) ATTR_COLD;
 };
 
@@ -191,7 +187,7 @@ void sshangha_state::video_w(uint16_t data)
 {
 	// 0x4: Special video mode, other bits unknown
 	m_video_control = data;
-	LOGVIDEOREGS("video_w: %04x", data);
+	LOGVIDEOREGS("%s: video_w: %04x", machine().describe_context(), data);
 }
 
 /******************************************************************************/
@@ -211,7 +207,7 @@ uint32_t sshangha_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	const bool combine_tilemaps = (m_video_control & 4) ? false : true;
 
 	// sprites are flipped relative to tilemaps
-	uint16_t flip = m_tilegen->pf_control_r(0);
+	uint16_t flip = m_tilegen->control_r(0);
 	flip_screen_set(BIT(flip, 7));
 	m_sprgen[0]->set_flip_screen(!BIT(flip, 7));
 	m_sprgen[1]->set_flip_screen(!BIT(flip, 7));
@@ -223,7 +219,7 @@ uint32_t sshangha_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	// draw / mix
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	m_tilegen->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
+	m_tilegen->update(m_rowscroll[0], m_rowscroll[1]);
 
 	// TODO: fully verify draw order / priorities
 
@@ -249,9 +245,6 @@ uint32_t sshangha_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 /******************************************************************************/
 
-
-
-
 uint16_t sshangha_state::sshanghab_protection16_r(offs_t offset) // bootleg inputs
 {
 	switch (offset)
@@ -264,7 +257,7 @@ uint16_t sshangha_state::sshanghab_protection16_r(offs_t offset) // bootleg inpu
 			return m_dsw->read();
 	}
 
-	return m_prot_data[offset]; // TODO: m_prot_data share isn't mapped in the bootleg, so this is useless?
+	return 0; // TODO: this is useless?
 }
 
 // Probably returns 0xffff when sprite DMA is complete, the game waits on it
@@ -276,35 +269,20 @@ uint16_t sshangha_state::deco_71_r()
 
 /******************************************************************************/
 
-uint16_t sshangha_state::sshangha_protection_region_d_146_r(offs_t offset)
+template <offs_t Base>
+uint16_t sshangha_state::ioprot_r(offs_t offset)
 {
-	int const real_address = 0x3f4000 + (offset * 2);
+	int const real_address = Base + (offset * 2);
 	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	uint16_t const data = m_deco146->read_data(deco146_addr, cs);
 	return data;
 }
 
-void sshangha_state::sshangha_protection_region_d_146_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+template <offs_t Base>
+void sshangha_state::ioprot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int const real_address = 0x3f4000 + (offset * 2);
-	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	uint8_t cs = 0;
-	m_deco146->write_data(deco146_addr, data, mem_mask, cs);
-}
-
-uint16_t sshangha_state::sshangha_protection_region_8_146_r(offs_t offset)
-{
-	int const real_address = 0x3e0000 + (offset * 2);
-	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	uint8_t cs = 0;
-	uint16_t const data = m_deco146->read_data(deco146_addr, cs);
-	return data;
-}
-
-void sshangha_state::sshangha_protection_region_8_146_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	int const real_address = 0x3e0000 + (offset *2);
+	int const real_address = Base + (offset * 2);
 	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	m_deco146->write_data(deco146_addr, data, mem_mask, cs);
@@ -316,12 +294,12 @@ void sshangha_state::sshangha_main_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x10000f).ram().share(m_sound_shared_ram);
 
-	map(0x200000, 0x201fff).rw(m_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x202000, 0x203fff).rw(m_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x204000, 0x2047ff).ram().share(m_pf_rowscroll[0]);
-	map(0x206000, 0x2067ff).ram().share(m_pf_rowscroll[1]);
+	map(0x200000, 0x201fff).rw(m_tilegen, FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x202000, 0x203fff).rw(m_tilegen, FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x204000, 0x2047ff).ram().share(m_rowscroll[0]);
+	map(0x206000, 0x2067ff).ram().share(m_rowscroll[1]);
 	map(0x206800, 0x207fff).ram();
-	map(0x300000, 0x30000f).w(m_tilegen, FUNC(deco16ic_device::pf_control_w));
+	map(0x300000, 0x30000f).w(m_tilegen, FUNC(deco16ic_device::control_w));
 	map(0x320000, 0x320001).w(FUNC(sshangha_state::video_w));
 	map(0x320002, 0x320005).nopw();
 	map(0x320006, 0x320007).nopr(); //irq ack
@@ -335,9 +313,9 @@ void sshangha_state::sshangha_main_map(address_map &map)
 
 	map(0x380000, 0x380fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x381000, 0x383fff).ram(); // unused palette area
-	map(0x3e0000, 0x3e3fff).rw(FUNC(sshangha_state::sshangha_protection_region_8_146_r), FUNC(sshangha_state::sshangha_protection_region_8_146_w));
+	map(0x3e0000, 0x3e3fff).rw(FUNC(sshangha_state::ioprot_r<0x3e0000>), FUNC(sshangha_state::ioprot_w<0x3e0000>));
 	map(0x3ec000, 0x3f3fff).ram();
-	map(0x3f4000, 0x3f7fff).rw(FUNC(sshangha_state::sshangha_protection_region_d_146_r), FUNC(sshangha_state::sshangha_protection_region_d_146_w)).share(m_prot_data);
+	map(0x3f4000, 0x3f7fff).rw(FUNC(sshangha_state::ioprot_r<0x3f4000>), FUNC(sshangha_state::ioprot_w<0x3f4000>));
 }
 
 void sshangha_state::sshanghab_main_map(address_map &map)
@@ -346,12 +324,12 @@ void sshangha_state::sshanghab_main_map(address_map &map)
 	map(0x084000, 0x0847ff).r(FUNC(sshangha_state::sshanghab_protection16_r));
 	map(0x101000, 0x10100f).ram().share(m_sound_shared_ram); // the bootleg writes here
 
-	map(0x200000, 0x201fff).rw(m_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x202000, 0x203fff).rw(m_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x204000, 0x2047ff).ram().share(m_pf_rowscroll[0]);
-	map(0x206000, 0x2067ff).ram().share(m_pf_rowscroll[1]);
+	map(0x200000, 0x201fff).rw(m_tilegen, FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x202000, 0x203fff).rw(m_tilegen, FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x204000, 0x2047ff).ram().share(m_rowscroll[0]);
+	map(0x206000, 0x2067ff).ram().share(m_rowscroll[1]);
 	map(0x206800, 0x207fff).ram();
-	map(0x300000, 0x30000f).w(m_tilegen, FUNC(deco16ic_device::pf_control_w));
+	map(0x300000, 0x30000f).w(m_tilegen, FUNC(deco16ic_device::control_w));
 	map(0x320000, 0x320001).w(FUNC(sshangha_state::video_w));
 	map(0x320002, 0x320005).nopw();
 	map(0x320006, 0x320007).nopr(); //irq ack
@@ -519,9 +497,9 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-DECO16IC_BANK_CB_MEMBER(sshangha_state::bank_callback)
+int sshangha_state::bank_callback(int bank)
 {
-	return (bank >> 4) * 0x1000;
+	return (bank & ~0xf) << 8;
 }
 
 // similar as tattass (dataeast/deco32.cpp) but base color is pf2 color bank
@@ -556,17 +534,17 @@ void sshangha_state::sshangha(machine_config &config)
 	DECO16IC(config, m_tilegen);
 	// requires pf1 to be 64x64 for the ending screen to be displayed properly
 	// TODO: confirm arrangement, game barely uses scrolling otherwise
-	m_tilegen->set_pf1_size(DECO_64x64);
-	m_tilegen->set_pf2_size(DECO_64x32);
-	m_tilegen->set_pf1_col_bank(0x10);
-	m_tilegen->set_pf2_col_bank(0x30);
-	m_tilegen->set_pf1_col_mask(0x0f);
-	m_tilegen->set_pf2_col_mask(0x0f);
-	m_tilegen->set_bank1_callback(FUNC(sshangha_state::bank_callback));
-	m_tilegen->set_bank2_callback(FUNC(sshangha_state::bank_callback));
+	m_tilegen->set_size<0>(deco16ic_device::DECO_64x64);
+	m_tilegen->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen->set_col_bank<0>(0x10);
+	m_tilegen->set_col_bank<1>(0x30);
+	m_tilegen->set_col_mask<0>(0x0f);
+	m_tilegen->set_col_mask<1>(0x0f);
+	m_tilegen->set_bank_callback<0>(FUNC(sshangha_state::bank_callback));
+	m_tilegen->set_bank_callback<1>(FUNC(sshangha_state::bank_callback));
 	m_tilegen->set_mix_callback(FUNC(sshangha_state::mix_callback));
-	m_tilegen->set_pf12_8x8_bank(0);
-	m_tilegen->set_pf12_16x16_bank(1);
+	m_tilegen->set_8x8_bank(0);
+	m_tilegen->set_16x16_bank(1);
 	m_tilegen->set_gfxdecode_tag("gfxdecode");
 
 	DECO_SPRITE(config, m_sprgen[0], m_palette, gfx_sshangha_spr1);

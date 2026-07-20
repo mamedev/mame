@@ -31,14 +31,14 @@ protected:
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_sprgen(*this, "spritegen%u", 1)
-		, m_deco_tilegen(*this, "tilegen%u", 1)
+		, m_tilegen(*this, "tilegen%u", 1)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_eeprom(*this, "eeprom")
 		, m_ioprot(*this, "ioprot")
 		, m_ym2151(*this, "ymsnd")
 		, m_oki(*this, "oki%u", 1)
-		, m_pf_rowscroll32(*this, "pf%u_rowscroll32", 1)
+		, m_rowscroll32(*this, "rowscroll32_%u", 1)
 	{ }
 
 	virtual void video_start() override ATTR_COLD;
@@ -51,7 +51,7 @@ protected:
 	void volume_w(u8 data);
 	void vblank_ack_w(u32 data);
 
-	template<int Chip> void pf_rowscroll_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	template<int Chip> void rowscroll_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	template<int Chip> u32 spriteram_r(offs_t offset);
 	template<int Chip> void spriteram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -68,7 +68,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device_array<decospr_device, 2> m_sprgen;
-	required_device_array<deco16ic_device, 2> m_deco_tilegen;
+	required_device_array<deco16ic_device, 2> m_tilegen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -77,12 +77,12 @@ protected:
 	optional_device_array<okim6295_device, 2> m_oki;
 
 	// we use the pointers below to store a 32-bit copy..
-	required_shared_ptr_array<u32, 4> m_pf_rowscroll32;
+	required_shared_ptr_array<u32, 4> m_rowscroll32;
 
 	u32 m_pri = 0;
 	std::unique_ptr<u16[]> m_spriteram16[2]{};
 	std::unique_ptr<u16[]> m_spriteram16_buffered[2]{};
-	std::unique_ptr<u16[]> m_pf_rowscroll[4]{};
+	std::unique_ptr<u16[]> m_rowscroll[4]{};
 };
 
 class fghthist_state : public fghthist_common_state
@@ -125,7 +125,7 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	int bank_callback(int bank);
 	DECOSPR_PRIORITY_CB_MEMBER(fghthist_pri_callback);
 
 	void fghthist_common_map(address_map &map) ATTR_COLD;
@@ -164,7 +164,7 @@ protected:
 	void mix_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
 	u32 screen_update_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	int bank_callback(int bank);
 	u16 mix_callback(u16 p, u16 p2);
 
 	void nslasher_common_map(address_map &map) ATTR_COLD;

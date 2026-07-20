@@ -137,7 +137,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_sprgen(*this, "c355spr")
-		, m_deco_tilegen(*this, "tilegen%u", 1)
+		, m_tilegen(*this, "tilegen%u", 1)
 		, m_spriteram(*this, "spriteram")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
@@ -153,7 +153,7 @@ public:
 		, m_sprite_spritetile(*this, "look%u", 0)
 		, m_sprite_cliptable(*this, "spclip")
 		, m_sprite_indextable(*this, "spindex")
-		, m_pf_rowscroll32(*this, "pf%u_rowscroll32", 1)
+		, m_rowscroll32(*this, "rowscroll32_%u", 1)
 		, m_paletteram(*this, "paletteram")
 		, m_io_inputs(*this, "INPUTS")
 		, m_io_light_x(*this, "LIGHT%u_X", 0U)
@@ -192,7 +192,7 @@ protected:
 	u32 unk_video_r();
 	u32 lockload_gun_mirror_r(offs_t offset);
 
-	template<int Chip> void pf_rowscroll_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	template<int Chip> void rowscroll_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	void buffered_palette_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void palette_dma_w(u32 data);
@@ -208,8 +208,8 @@ protected:
 	bool sprite_mix_callback(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECO16IC_BANK_CB_MEMBER(bank_1_callback);
-	DECO16IC_BANK_CB_MEMBER(bank_2_callback);
+	int bank_1_callback(int bank);
+	int bank_2_callback(int bank);
 
 	void expand_sprite_data() ATTR_COLD;
 	void dragngun_init_common() ATTR_COLD;
@@ -228,7 +228,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	required_device<namco_c355spr_device> m_sprgen;
-	required_device_array<deco16ic_device, 2> m_deco_tilegen;
+	required_device_array<deco16ic_device, 2> m_tilegen;
 	required_device<buffered_spriteram32_device> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -247,7 +247,7 @@ protected:
 	required_shared_ptr<u32> m_sprite_indextable;
 
 	// we use the pointers below to store a 32-bit copy..
-	required_shared_ptr_array<u32, 4> m_pf_rowscroll32;
+	required_shared_ptr_array<u32, 4> m_rowscroll32;
 	optional_shared_ptr<u32> m_paletteram;
 
 	optional_ioport m_io_inputs;
@@ -255,7 +255,7 @@ protected:
 	optional_ioport_array<2> m_io_light_y;
 
 	std::unique_ptr<u8[]> m_dirty_palette{};
-	std::unique_ptr<u16[]> m_pf_rowscroll[4]{};
+	std::unique_ptr<u16[]> m_rowscroll[4]{};
 
 	u32 m_sprite_ctrl = 0U;
 	u32 m_lightgun_port = 0;
@@ -363,11 +363,11 @@ void dragngun_state::video_start()
 {
 	for (int i = 0; i < 4; i++)
 	{
-		const u32 size = m_pf_rowscroll32[i].length();
+		const u32 size = m_rowscroll32[i].length();
 
-		m_pf_rowscroll[i] = make_unique_clear<u16[]>(size);
+		m_rowscroll[i] = make_unique_clear<u16[]>(size);
 
-		save_pointer(NAME(m_pf_rowscroll[i]), size, i);
+		save_pointer(NAME(m_rowscroll[i]), size, i);
 	}
 	m_dirty_palette = make_unique_clear<u8[]>(2048);
 
@@ -411,19 +411,19 @@ void dragngun_state::spriteram_dma_w(u32 data)
 }
 
 // tattass tests these as 32-bit ram, even if only 16-bits are hooked up to the tilemap chip - does it mirror parts of the dword?
-template <int TileMap> void dragngun_state::pf_rowscroll_w(offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_pf_rowscroll32[TileMap][offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf_rowscroll[TileMap][offset]); }
+template <int TileMap> void dragngun_state::rowscroll_w(offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_rowscroll32[TileMap][offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_rowscroll[TileMap][offset]); }
 
 u32 dragngun_state::unk_video_r()
 {
 	return machine().rand();
 }
 
-DECO16IC_BANK_CB_MEMBER(dragngun_state::bank_1_callback)
+int dragngun_state::bank_1_callback(int bank)
 {
 	return (bank & ~0xf) << 8;
 }
 
-DECO16IC_BANK_CB_MEMBER(dragngun_state::bank_2_callback)
+int dragngun_state::bank_2_callback(int bank)
 {
 	return (bank & ~0x1f) << 7;
 }
@@ -535,13 +535,13 @@ u32 dragngun_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->pen(0x400), cliprect); // Palette index not confirmed
 
-	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0].get(), m_pf_rowscroll[1].get());
-	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2].get(), m_pf_rowscroll[3].get());
+	m_tilegen[0]->update(m_rowscroll[0].get(), m_rowscroll[1].get());
+	m_tilegen[1]->update(m_rowscroll[2].get(), m_rowscroll[3].get());
 
-	m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 1); // it uses pf3 in 8bpp mode instead, like captaven
-	m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
-	m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
-	m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 8);
+	m_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 1); // it uses pf3 in 8bpp mode instead, like captaven
+	m_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
+	m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
+	m_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 8);
 
 	// zooming sprite draw is very slow, and sprites are buffered.. however, one of the levels attempts to use
 	// partial updates for every line, which causes things to be very slow... the sprites appear to support
@@ -666,16 +666,16 @@ void dragngun_state::common_map(address_map &map)
 	map(0x228000, 0x2283ff).ram().share(m_sprite_indextable); // sprite index (just a table 0x00-0xff here)
 	map(0x230000, 0x230003).w(FUNC(dragngun_state::spriteram_dma_w));
 
-	map(0x180000, 0x18001f).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
-	map(0x190000, 0x191fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x194000, 0x195fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
-	map(0x1a0000, 0x1a3fff).ram().w(FUNC(dragngun_state::pf_rowscroll_w<0>)).share(m_pf_rowscroll32[0]);
-	map(0x1a4000, 0x1a5fff).ram().w(FUNC(dragngun_state::pf_rowscroll_w<1>)).share(m_pf_rowscroll32[1]);
-	map(0x1c0000, 0x1c001f).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
-	map(0x1d0000, 0x1d1fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x1d4000, 0x1d5fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w)); // unused
-	map(0x1e0000, 0x1e3fff).ram().w(FUNC(dragngun_state::pf_rowscroll_w<2>)).share(m_pf_rowscroll32[2]);
-	map(0x1e4000, 0x1e5fff).ram().w(FUNC(dragngun_state::pf_rowscroll_w<3>)).share(m_pf_rowscroll32[3]); // unused
+	map(0x180000, 0x18001f).rw(m_tilegen[0], FUNC(deco16ic_device::control32_r), FUNC(deco16ic_device::control32_w));
+	map(0x190000, 0x191fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram32_r<0>), FUNC(deco16ic_device::vram32_w<0>));
+	map(0x194000, 0x195fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram32_r<1>), FUNC(deco16ic_device::vram32_w<1>));
+	map(0x1a0000, 0x1a3fff).ram().w(FUNC(dragngun_state::rowscroll_w<0>)).share(m_rowscroll32[0]);
+	map(0x1a4000, 0x1a5fff).ram().w(FUNC(dragngun_state::rowscroll_w<1>)).share(m_rowscroll32[1]);
+	map(0x1c0000, 0x1c001f).rw(m_tilegen[1], FUNC(deco16ic_device::control32_r), FUNC(deco16ic_device::control32_w));
+	map(0x1d0000, 0x1d1fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram32_r<0>), FUNC(deco16ic_device::vram32_w<0>));
+	map(0x1d4000, 0x1d5fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram32_r<1>), FUNC(deco16ic_device::vram32_w<1>)); // unused
+	map(0x1e0000, 0x1e3fff).ram().w(FUNC(dragngun_state::rowscroll_w<2>)).share(m_rowscroll32[2]);
+	map(0x1e4000, 0x1e5fff).ram().w(FUNC(dragngun_state::rowscroll_w<3>)).share(m_rowscroll32[3]); // unused
 
 	map(0x300000, 0x3fffff).rom().region("maincpu", 0x100000);
 	map(0x420000, 0x420000).rw(FUNC(dragngun_state::eeprom_r), FUNC(dragngun_state::eeprom_w));
@@ -1020,31 +1020,31 @@ void dragngun_state::dragngun(machine_config &config)
 
 	BUFFERED_SPRITERAM32(config, m_spriteram);
 
-	DECO16IC(config, m_deco_tilegen[0]);
-	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_col_bank(0x20);
-	m_deco_tilegen[0]->set_pf2_col_bank(0x30);
-	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(dragngun_state::bank_1_callback));
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(dragngun_state::bank_1_callback));
-	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
-	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
+	DECO16IC(config, m_tilegen[0]);
+	m_tilegen[0]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_col_bank<0>(0x20);
+	m_tilegen[0]->set_col_bank<1>(0x30);
+	m_tilegen[0]->set_col_mask<0>(0x0f);
+	m_tilegen[0]->set_col_mask<1>(0x0f);
+	m_tilegen[0]->set_bank_callback<0>(FUNC(dragngun_state::bank_1_callback));
+	m_tilegen[0]->set_bank_callback<1>(FUNC(dragngun_state::bank_1_callback));
+	m_tilegen[0]->set_8x8_bank(0);
+	m_tilegen[0]->set_16x16_bank(1);
+	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1]);
-	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_col_bank(0x04);
-	m_deco_tilegen[1]->set_pf2_col_bank(0x04);
-	m_deco_tilegen[1]->set_pf1_col_mask(0x03);
-	m_deco_tilegen[1]->set_pf2_col_mask(0x03);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(dragngun_state::bank_2_callback));
+	DECO16IC(config, m_tilegen[1]);
+	m_tilegen[1]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_col_bank<0>(0x04);
+	m_tilegen[1]->set_col_bank<1>(0x04);
+	m_tilegen[1]->set_col_mask<0>(0x03);
+	m_tilegen[1]->set_col_mask<1>(0x03);
+	m_tilegen[1]->set_bank_callback<0>(FUNC(dragngun_state::bank_2_callback));
 	// no bank2 callback
-	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
-	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
+	m_tilegen[1]->set_8x8_bank(0);
+	m_tilegen[1]->set_16x16_bank(2);
+	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	namco_sprites(config);
 
@@ -1104,8 +1104,8 @@ void dragngun_state::lockloadu(machine_config &config)
 
 	m_deco_irq->lightgun_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<2>));
 
-	m_deco_tilegen[1]->set_pf1_size(DECO_32x32);
-	m_deco_tilegen[1]->set_pf2_size(DECO_32x32);    // lockload definitely wants pf34 half width..
+	m_tilegen[1]->set_size<0>(deco16ic_device::DECO_32x32);
+	m_tilegen[1]->set_size<1>(deco16ic_device::DECO_32x32);    // lockload definitely wants pf34 half width..
 
 	m_ym2151->port_write_handler().set(FUNC(dragngun_state::lockload_okibank_lo_w));
 }
@@ -1147,31 +1147,31 @@ void dragngun_state::lockload(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dragngun);
 	PALETTE(config, m_palette).set_entries(2048);
 
-	DECO16IC(config, m_deco_tilegen[0]);
-	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_col_bank(0x20);
-	m_deco_tilegen[0]->set_pf2_col_bank(0x30);
-	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(dragngun_state::bank_1_callback));
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(dragngun_state::bank_1_callback));
-	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
-	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
+	DECO16IC(config, m_tilegen[0]);
+	m_tilegen[0]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_col_bank<0>(0x20);
+	m_tilegen[0]->set_col_bank<1>(0x30);
+	m_tilegen[0]->set_col_mask<0>(0x0f);
+	m_tilegen[0]->set_col_mask<1>(0x0f);
+	m_tilegen[0]->set_bank_callback<0>(FUNC(dragngun_state::bank_1_callback));
+	m_tilegen[0]->set_bank_callback<1>(FUNC(dragngun_state::bank_1_callback));
+	m_tilegen[0]->set_8x8_bank(0);
+	m_tilegen[0]->set_16x16_bank(1);
+	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1]);
-	m_deco_tilegen[1]->set_pf1_size(DECO_32x32);
-	m_deco_tilegen[1]->set_pf2_size(DECO_32x32);    // lockload definitely wants pf34 half width..
-	m_deco_tilegen[1]->set_pf1_col_bank(0x04);
-	m_deco_tilegen[1]->set_pf2_col_bank(0x04);
-	m_deco_tilegen[1]->set_pf1_col_mask(0x03);
-	m_deco_tilegen[1]->set_pf2_col_mask(0x03);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(dragngun_state::bank_2_callback));
+	DECO16IC(config, m_tilegen[1]);
+	m_tilegen[1]->set_size<0>(deco16ic_device::DECO_32x32);
+	m_tilegen[1]->set_size<1>(deco16ic_device::DECO_32x32);    // lockload definitely wants pf34 half width..
+	m_tilegen[1]->set_col_bank<0>(0x04);
+	m_tilegen[1]->set_col_bank<1>(0x04);
+	m_tilegen[1]->set_col_mask<0>(0x03);
+	m_tilegen[1]->set_col_mask<1>(0x03);
+	m_tilegen[1]->set_bank_callback<0>(FUNC(dragngun_state::bank_2_callback));
 	// no bank2 callback
-	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
-	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
+	m_tilegen[1]->set_8x8_bank(0);
+	m_tilegen[1]->set_16x16_bank(2);
+	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	namco_sprites(config);
 

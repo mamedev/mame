@@ -181,30 +181,16 @@ DEFINE_DEVICE_TYPE(DECO16IC, deco16ic_device, "deco16ic", "DECO 55 / 56 / 74 / 1
 deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DECO16IC, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
-	, m_pf1_data(nullptr)
-	, m_pf2_data(nullptr)
-	, m_pf12_control(nullptr)
-	, m_pf1_rowscroll_ptr(nullptr)
-	, m_pf2_rowscroll_ptr(nullptr)
-	, m_tile_cb(*this)
-	, m_bank1_cb(*this)
-	, m_bank2_cb(*this)
-	, m_mix_cb(*this)
-	, m_use_custom_pf1(0)
-	, m_use_custom_pf2(0)
-	, m_pf1_bank(0)
-	, m_pf2_bank(0)
-	, m_pf12_last_small(0)
-	, m_pf12_last_big(0)
-	, m_pf1_size(0)
-	, m_pf2_size(0)
-	, m_pf1_colour_bank(0)
-	, m_pf2_colour_bank(0)
-	, m_pf1_colourmask(0xf)
-	, m_pf2_colourmask(0xf)
-	, m_pf12_8x8_gfx_bank(0)
-	, m_pf12_16x16_gfx_bank(0)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
+	, m_vram(*this, "vram_%u", 1U, 0x2000U, ENDIANNESS_BIG)
+	, m_control(*this, "control", 0x10U, ENDIANNESS_BIG)
+	, m_tmap{(*this), (*this)}
+	, m_tile_cb(*this)
+	, m_mix_cb(*this)
+	, m_last_small(0)
+	, m_last_big(0)
+	, m_8x8_gfx_bank(0)
+	, m_16x16_gfx_bank(0)
 {
 }
 
@@ -214,60 +200,57 @@ deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag,
 
 void deco16ic_device::device_start()
 {
-	if(!m_gfxdecode->started())
+	if (!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
 	m_tile_cb.resolve();
-	m_bank1_cb.resolve();
-	m_bank2_cb.resolve();
+	m_tmap[0].m_bank_cb.resolve();
+	m_tmap[1].m_bank_cb.resolve();
 	m_mix_cb.resolve();
 
-	int fullheight1 = 0;
-	int fullwidth1 = 0;
+	int fullheight1 = 32;
+	int fullwidth1 = 32;
 
-	int fullheight2 = 0;
-	int fullwidth2 = 0;
+	int fullheight2 = 32;
+	int fullwidth2 = 32;
 
-	if (m_pf1_size&DECO_32x64)
-		fullheight1 = 1;
+	if (m_tmap[0].m_size & DECO_32x64)
+		fullheight1 = 64;
 
-	if (m_pf1_size&DECO_64x32)
-		fullwidth1 = 1;
+	if (m_tmap[0].m_size & DECO_64x32)
+		fullwidth1 = 64;
 
-	if (m_pf2_size&DECO_32x64)
-		fullheight2 = 1;
+	if (m_tmap[1].m_size & DECO_32x64)
+		fullheight2 = 64;
 
-	if (m_pf2_size&DECO_64x32)
-		fullwidth2 = 1;
+	if (m_tmap[1].m_size & DECO_64x32)
+		fullwidth2 = 64;
 
-	m_pf1_tilemap_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(deco16ic_device::get_pf1_tile_info)), tilemap_mapper_delegate(*this, FUNC(deco16ic_device::deco16_scan_rows)), 16, 16, fullwidth1 ? 64 : 32, fullheight1 ? 64 : 32);
-//  m_pf1_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(deco16ic_device::get_pf1_tile_info_b)), TILEMAP_SCAN_ROWS, 8, 8, fullwidth1 ? 64 : 32, fullheight1 ? 64 : 32);
-	m_pf1_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(deco16ic_device::get_pf1_tile_info_b)), TILEMAP_SCAN_ROWS, 8, 8, fullwidth1 ? 64 : 32, fullheight1 ? 64 : 32);
+	m_tmap[0].m_tilemap_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&deco16ic_device::get_tile_info<0, false>))), tilemap_mapper_delegate(*this, FUNC(deco16ic_device::scan_rows)), 16, 16, fullwidth1, fullheight1);
+	m_tmap[0].m_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&deco16ic_device::get_tile_info<0, true>))), TILEMAP_SCAN_ROWS, 8, 8, fullwidth1, fullheight1);
 
-	m_pf2_tilemap_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(deco16ic_device::get_pf2_tile_info)), tilemap_mapper_delegate(*this, FUNC(deco16ic_device::deco16_scan_rows)), 16, 16, fullwidth2 ? 64 : 32, fullheight2 ? 64 : 32);
-	m_pf2_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(deco16ic_device::get_pf2_tile_info_b)), TILEMAP_SCAN_ROWS, 8, 8, fullwidth2 ? 64 : 32, fullheight2 ? 64 : 32);
+	m_tmap[1].m_tilemap_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&deco16ic_device::get_tile_info<1, false>))), tilemap_mapper_delegate(*this, FUNC(deco16ic_device::scan_rows)), 16, 16, fullwidth2, fullheight2);
+	m_tmap[1].m_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&deco16ic_device::get_tile_info<1, true>))), TILEMAP_SCAN_ROWS, 8, 8, fullwidth2, fullheight2);
 
-	m_pf1_tilemap_8x8->set_transparent_pen(0);
-	m_pf2_tilemap_8x8->set_transparent_pen(0);
-	m_pf1_tilemap_16x16->set_transparent_pen(0);
-	m_pf2_tilemap_16x16->set_transparent_pen(0);
+	m_tmap[0].m_tilemap_8x8->set_transparent_pen(0);
+	m_tmap[1].m_tilemap_8x8->set_transparent_pen(0);
+	m_tmap[0].m_tilemap_16x16->set_transparent_pen(0);
+	m_tmap[1].m_tilemap_16x16->set_transparent_pen(0);
 
-	m_pf1_data = make_unique_clear<u16[]>(0x2000 / 2);
-	m_pf2_data = make_unique_clear<u16[]>(0x2000 / 2);
-	m_pf12_control = make_unique_clear<u16[]>(0x10 / 2);
+	save_item(STRUCT_MEMBER(m_tmap, m_use_custom_pf));
+	save_item(STRUCT_MEMBER(m_tmap, m_bank));
+	save_item(STRUCT_MEMBER(m_tmap, m_colour_bank));
+	save_item(STRUCT_MEMBER(m_tmap, m_colour_mask));
+	save_item(STRUCT_MEMBER(m_tmap, m_scrollx));
+	save_item(STRUCT_MEMBER(m_tmap, m_scrolly));
+	save_item(STRUCT_MEMBER(m_tmap, m_control0));
+	save_item(STRUCT_MEMBER(m_tmap, m_control1));
+	save_item(STRUCT_MEMBER(m_tmap, m_bankval));
 
-	save_item(NAME(m_use_custom_pf1));
-	save_item(NAME(m_use_custom_pf2));
-	save_item(NAME(m_pf1_bank));
-	save_item(NAME(m_pf2_bank));
-	save_item(NAME(m_pf12_8x8_gfx_bank));
-	save_item(NAME(m_pf12_16x16_gfx_bank));
-	save_item(NAME(m_pf12_last_small));
-	save_item(NAME(m_pf12_last_big));
-
-	save_pointer(NAME(m_pf1_data), 0x2000 / 2);
-	save_pointer(NAME(m_pf2_data), 0x2000 / 2);
-	save_pointer(NAME(m_pf12_control), 0x10 / 2);
+	save_item(NAME(m_8x8_gfx_bank));
+	save_item(NAME(m_16x16_gfx_bank));
+	save_item(NAME(m_last_small));
+	save_item(NAME(m_last_big));
 }
 
 //-------------------------------------------------
@@ -276,35 +259,37 @@ void deco16ic_device::device_start()
 
 void deco16ic_device::device_reset()
 {
-	m_pf1_bank = m_pf2_bank = 0;
-	m_pf12_last_small = m_pf12_last_big = -1;
-	m_use_custom_pf1 = m_use_custom_pf2 = 0;
-	m_pf1_rowscroll_ptr = nullptr;
-	m_pf2_rowscroll_ptr = nullptr;
+	m_tmap[0].m_bank = m_tmap[1].m_bank = 0;
+	m_last_small = m_last_big = -1;
+	m_tmap[0].m_use_custom_pf = m_tmap[1].m_use_custom_pf = false;
+	m_tmap[0].m_rowscroll_ptr = nullptr;
+	m_tmap[1].m_rowscroll_ptr = nullptr;
 }
 
 /*****************************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(deco16ic_device::deco16_scan_rows)
+TILEMAP_MAPPER_MEMBER(deco16ic_device::scan_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5) + ((row & 0x20) << 6);
 }
 
-TILE_GET_INFO_MEMBER(deco16ic_device::get_pf2_tile_info)
+template <unsigned Which, bool is8x8>
+TILE_GET_INFO_MEMBER(deco16ic_device::get_tile_info)
 {
-	u32 tile = m_pf2_data[tile_index];
+	u32 tile = m_vram[Which][tile_index];
 	u32 colour = (tile >> 12) & 0xf;
 	u8 flags = 0;
 
-	if (tile & 0x8000)
+	if (BIT(tile, 15))
 	{
-		if ((m_pf12_control[6] >> 8) & 0x01)
+		const u8 shift = Which << 3;
+		if (BIT(m_control[6], shift + 0))
 		{
 			flags |= TILE_FLIPX;
 			colour &= 0x7;
 		}
-		if ((m_pf12_control[6] >> 8) & 0x02)
+		if (BIT(m_control[6], shift + 1))
 		{
 			flags |= TILE_FLIPY;
 			colour &= 0x7;
@@ -313,101 +298,11 @@ TILE_GET_INFO_MEMBER(deco16ic_device::get_pf2_tile_info)
 
 	tile &= 0xfff;
 	if (!m_tile_cb.isnull())
-		m_tile_cb(tile, colour, 1, false);
+		m_tile_cb(tile, colour, Which, is8x8);
 
-	tileinfo.set(m_pf12_16x16_gfx_bank,
-			tile + m_pf2_bank,
-			(colour & m_pf2_colourmask) + m_pf2_colour_bank,
-			flags);
-}
-
-TILE_GET_INFO_MEMBER(deco16ic_device::get_pf1_tile_info)
-{
-	u32 tile = m_pf1_data[tile_index];
-	u32 colour = (tile >> 12) & 0xf;
-	u8 flags = 0;
-
-	if (tile & 0x8000)
-	{
-		if ((m_pf12_control[6] >> 0) & 0x01)
-		{
-			flags |= TILE_FLIPX;
-			colour &= 0x7;
-		}
-		if ((m_pf12_control[6] >> 0) & 0x02)
-		{
-			flags |= TILE_FLIPY;
-			colour &= 0x7;
-		}
-	}
-
-	tile &= 0xfff;
-	if (!m_tile_cb.isnull())
-		m_tile_cb(tile, colour, 0, false);
-
-	tileinfo.set(m_pf12_16x16_gfx_bank,
-			tile + m_pf1_bank,
-			(colour & m_pf1_colourmask) + m_pf1_colour_bank,
-			flags);
-}
-
-TILE_GET_INFO_MEMBER(deco16ic_device::get_pf2_tile_info_b)
-{
-	u32 tile = m_pf2_data[tile_index];
-	u32 colour = (tile >> 12) & 0xf;
-	u8 flags = 0;
-
-	if (tile & 0x8000)
-	{
-		if ((m_pf12_control[6] >> 8) & 0x01)
-		{
-			flags |= TILE_FLIPX;
-			colour &= 0x7;
-		}
-		if ((m_pf12_control[6] >> 8) & 0x02)
-		{
-			flags |= TILE_FLIPY;
-			colour &= 0x7;
-		}
-	}
-
-	tile &= 0xfff;
-	if (!m_tile_cb.isnull())
-		m_tile_cb(tile, colour, 1, true);
-
-	tileinfo.set(m_pf12_8x8_gfx_bank,
-			tile + m_pf2_bank,
-			(colour & m_pf2_colourmask) + m_pf2_colour_bank,
-			flags);
-}
-
-TILE_GET_INFO_MEMBER(deco16ic_device::get_pf1_tile_info_b)
-{
-	u32 tile = m_pf1_data[tile_index];
-	u32 colour = (tile >> 12) & 0xf;
-	u8 flags = 0;
-
-	if (tile & 0x8000)
-	{
-		if ((m_pf12_control[6] >> 0) & 0x01)
-		{
-			flags |= TILE_FLIPX;
-			colour &= 0x7;
-		}
-		if ((m_pf12_control[6] >> 0) & 0x02)
-		{
-			flags |= TILE_FLIPY;
-			colour &= 0x7;
-		}
-	}
-
-	tile &= 0xfff;
-	if (!m_tile_cb.isnull())
-		m_tile_cb(tile, colour, 0, true);
-
-	tileinfo.set(m_pf12_8x8_gfx_bank,
-			tile + m_pf1_bank,
-			(colour & m_pf1_colourmask) + m_pf1_colour_bank,
+	tileinfo.set(is8x8 ? m_8x8_gfx_bank : m_16x16_gfx_bank,
+			tile + m_tmap[Which].m_bank,
+			(colour & m_tmap[Which].m_colour_mask) + m_tmap[Which].m_colour_bank,
 			flags);
 }
 
@@ -539,226 +434,167 @@ void deco16ic_device::custom_tilemap_draw(
 
 void deco16ic_device::set_transmask(int tmap, int group, u32 fgmask, u32 bgmask)
 {
-	switch (tmap)
-	{
-	case 0:
-		m_pf1_tilemap_16x16->set_transmask(group, fgmask, bgmask);
-		m_pf1_tilemap_8x8->set_transmask(group, fgmask, bgmask);
-		break;
-	case 1:
-		m_pf2_tilemap_16x16->set_transmask(group, fgmask, bgmask);
-		m_pf2_tilemap_8x8->set_transmask(group, fgmask, bgmask);
-		break;
-	}
+	m_tmap[tmap].m_tilemap_16x16->set_transmask(group, fgmask, bgmask);
+	m_tmap[tmap].m_tilemap_8x8->set_transmask(group, fgmask, bgmask);
 }
 
 /* robocop 2 can switch between 2 tilemaps at 4bpp, or 1 at 8bpp */
 void deco16ic_device::set_tilemap_colour_mask(int tmap, int mask)
 {
-	switch (tmap)
-	{
-	case 0: m_pf1_colourmask = mask; m_pf1_tilemap_16x16->mark_all_dirty(); m_pf1_tilemap_8x8->mark_all_dirty(); break;
-	case 1: m_pf2_colourmask = mask; m_pf2_tilemap_16x16->mark_all_dirty(); m_pf2_tilemap_8x8->mark_all_dirty(); break;
-	}
+	m_tmap[tmap].m_colour_mask = mask;
+	m_tmap[tmap].m_tilemap_16x16->mark_all_dirty();
+	m_tmap[tmap].m_tilemap_8x8->mark_all_dirty();
 }
 
 void deco16ic_device::set_tilemap_colour_bank(int tmap, int bank)
 {
-	switch (tmap)
+	if (m_tmap[tmap].m_colour_bank != bank)
 	{
-	case 0:
-		if (m_pf1_colour_bank != bank)
-		{
-			m_pf1_colour_bank = bank;
-			if (m_pf1_tilemap_16x16)
-				m_pf1_tilemap_16x16->mark_all_dirty();
-			if (m_pf1_tilemap_8x8)
-				m_pf1_tilemap_8x8->mark_all_dirty();
-		}
-		break;
-	case 1:
-		if (m_pf2_colour_bank != bank)
-		{
-			m_pf2_colour_bank = bank;
-			if (m_pf2_tilemap_16x16)
-				m_pf2_tilemap_16x16->mark_all_dirty();
-			if (m_pf2_tilemap_8x8)
-				m_pf2_tilemap_8x8->mark_all_dirty();
-		}
-		break;
+		m_tmap[tmap].m_colour_bank = bank;
+		if (m_tmap[tmap].m_tilemap_16x16)
+			m_tmap[tmap].m_tilemap_16x16->mark_all_dirty();
+		if (m_tmap[tmap].m_tilemap_8x8)
+			m_tmap[tmap].m_tilemap_8x8->mark_all_dirty();
 	}
 }
 
-void deco16ic_device::pf12_set_gfxbank(int small, int big)
+void deco16ic_device::set_gfxbank(int small, int big)
 {
-	if (m_pf12_last_big != big)
+	if (m_last_big != big)
 	{
-		if (m_pf1_tilemap_16x16)
-			m_pf1_tilemap_16x16->mark_all_dirty();
-		if (m_pf2_tilemap_16x16)
-			m_pf2_tilemap_16x16->mark_all_dirty();
+		if (m_tmap[0].m_tilemap_16x16)
+			m_tmap[0].m_tilemap_16x16->mark_all_dirty();
+		if (m_tmap[1].m_tilemap_16x16)
+			m_tmap[1].m_tilemap_16x16->mark_all_dirty();
 
-		m_pf12_last_big = big;
+		m_last_big = big;
 	}
-	m_pf12_16x16_gfx_bank = big;
+	m_16x16_gfx_bank = big;
 
-	if (m_pf12_last_small != small)
+	if (m_last_small != small)
 	{
-		if (m_pf1_tilemap_8x8)
-			m_pf1_tilemap_8x8->mark_all_dirty();
-		if (m_pf2_tilemap_8x8)
-			m_pf2_tilemap_8x8->mark_all_dirty();
+		if (m_tmap[0].m_tilemap_8x8)
+			m_tmap[0].m_tilemap_8x8->mark_all_dirty();
+		if (m_tmap[1].m_tilemap_8x8)
+			m_tmap[1].m_tilemap_8x8->mark_all_dirty();
 
-		m_pf12_last_small = small;
+		m_last_small = small;
 	}
-	m_pf12_8x8_gfx_bank = small;
+	m_8x8_gfx_bank = small;
 }
 
 /* stoneage has broken scroll registers, original tumble pop expects a 1 pixel offset */
 void deco16ic_device::set_scrolldx(int tmap, int size, int dx, int dx_if_flipped)
 {
-	switch (tmap)
-	{
-	case 0:
-		if (!size)
-			m_pf1_tilemap_16x16->set_scrolldx(dx, dx_if_flipped);
-		else
-			m_pf1_tilemap_8x8->set_scrolldx(dx, dx_if_flipped);
-		break;
-	case 1:
-		if (!size)
-			m_pf2_tilemap_16x16->set_scrolldx(dx, dx_if_flipped);
-		else
-			m_pf2_tilemap_8x8->set_scrolldx(dx, dx_if_flipped);
-		break;
-	}
+	if (!size)
+		m_tmap[tmap].m_tilemap_16x16->set_scrolldx(dx, dx_if_flipped);
+	else
+		m_tmap[tmap].m_tilemap_8x8->set_scrolldx(dx, dx_if_flipped);
 }
 
 /* cninjabl does not enable background layers */
 void deco16ic_device::set_enable(int tmap, int enable)
 {
 	int shift = (tmap & 1) ? 15 : 7;
-	m_pf12_control[5] &= ~(1 << shift);
-	m_pf12_control[5] |= (enable & 1) << shift;
+	m_control[5] &= ~(1 << shift);
+	m_control[5] |= (enable & 1) << shift;
 }
 
 
 /******************************************************************************/
 
-void deco16ic_device::pf1_data_w(offs_t offset, u16 data, u16 mem_mask)
+void deco16ic_device::vram_common_w(u8 index, offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_pf1_data[offset]);
+	COMBINE_DATA(&m_vram[index][offset]);
 
-	m_pf1_tilemap_8x8->mark_tile_dirty(offset);
-//  if (offset < 0x800)
-		m_pf1_tilemap_16x16->mark_tile_dirty(offset);
+	m_tmap[index].m_tilemap_8x8->mark_tile_dirty(offset);
+	m_tmap[index].m_tilemap_16x16->mark_tile_dirty(offset);
 }
 
-void deco16ic_device::pf2_data_w(offs_t offset, u16 data, u16 mem_mask)
+u16 deco16ic_device::vram_common_r(u8 index, offs_t offset)
 {
-	COMBINE_DATA(&m_pf2_data[offset]);
-
-	m_pf2_tilemap_8x8->mark_tile_dirty(offset);
-//  if (offset < 0x800)
-		m_pf2_tilemap_16x16->mark_tile_dirty(offset);
+	return m_vram[index][offset];
 }
 
-u16 deco16ic_device::pf1_data_r(offs_t offset)
-{
-	return m_pf1_data[offset];
-}
-
-u16 deco16ic_device::pf2_data_r(offs_t offset)
-{
-	return m_pf2_data[offset];
-}
-
-void deco16ic_device::pf_control_w(offs_t offset, u16 data, u16 mem_mask)
+void deco16ic_device::control_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// update until current scanline (inclusive if we're in hblank)
-	int ydelta = (screen().hpos() > screen().visible_area().right()) ? 0 : 1;
+	const int ydelta = (screen().hpos() > screen().visible_area().right()) ? 0 : 1;
 	screen().update_partial(screen().vpos() - ydelta);
 
-	COMBINE_DATA(&m_pf12_control[offset]);
+	data = COMBINE_DATA(&m_control[offset]);
+
+	switch (offset)
+	{
+		case 1:
+			m_tmap[0].m_scrollx = data;
+			break;
+		case 2:
+			m_tmap[0].m_scrolly = data;
+			break;
+		case 3:
+			m_tmap[1].m_scrollx = data;
+			break;
+		case 4:
+			m_tmap[1].m_scrolly = data;
+			break;
+		case 5:
+			if (ACCESSING_BITS_0_7)
+				m_tmap[0].m_control0 = data & 0xff;
+			if (ACCESSING_BITS_8_15)
+				m_tmap[1].m_control0 = (data >> 8) & 0xff;
+			break;
+		case 6:
+			if (ACCESSING_BITS_0_7)
+				m_tmap[0].m_control1 = data & 0xff;
+			if (ACCESSING_BITS_8_15)
+				m_tmap[1].m_control1 = (data >> 8) & 0xff;
+			break;
+		case 7:
+			if (ACCESSING_BITS_0_7)
+				m_tmap[0].m_bankval = data & 0xff;
+			if (ACCESSING_BITS_8_15)
+				m_tmap[1].m_bankval = (data >> 8) & 0xff;
+			break;
+	}
 }
 
-u16 deco16ic_device::pf_control_r(offs_t offset)
+u16 deco16ic_device::control_r(offs_t offset)
 {
-	return m_pf12_control[offset];
+	return m_control[offset];
 }
-
-
-u32 deco16ic_device::pf_control_dword_r(offs_t offset)
-{
-	return pf_control_r(offset) ^ 0xffff0000;
-}
-
-void deco16ic_device::pf_control_dword_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	pf_control_w(offset, data & 0xffff, mem_mask & 0xffff);
-}
-
-u32 deco16ic_device::pf1_data_dword_r(offs_t offset)
-{
-	return pf1_data_r(offset) ^ 0xffff0000;
-}
-
-void deco16ic_device::pf1_data_dword_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	pf1_data_w(offset, data & 0xffff, mem_mask & 0xffff);
-}
-
-u32 deco16ic_device::pf2_data_dword_r(offs_t offset)
-{
-	return pf2_data_r(offset) ^ 0xffff0000;
-}
-
-void deco16ic_device::pf2_data_dword_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	pf2_data_w(offset, data & 0xffff, mem_mask & 0xffff);
-}
-
 
 
 /*****************************************************************************************/
 
-static int deco16_pf_update(
-	tilemap_t *tilemap_8x8,
-	tilemap_t *tilemap_16x16,
-	const u16 *rowscroll_ptr,
-	const u16 scrollx,
-	const u16 scrolly,
-	const u16 control0,
-	const u16 control1,
-	const int tilemapsizes
-	)
+void deco16ic_device::deco16_tmap::update()
 {
-	int rows, cols, offs, use_custom = 0;
+	m_use_custom_pf = false;
 
 	/* Toggle between 8x8 and 16x16 modes (and master enable bit) */
-	if (BIT(control1, 7))
+	if (BIT(m_control1, 7))
 	{
-		if (tilemap_8x8)
-			tilemap_8x8->enable(BIT(control0, 7));
+		if (m_tilemap_8x8)
+			m_tilemap_8x8->enable(BIT(m_control0, 7));
 
-		if (tilemap_16x16)
-			tilemap_16x16->enable(0);
-
+		if (m_tilemap_16x16)
+			m_tilemap_16x16->enable(false);
 	}
 	else
 	{
-		if (tilemap_8x8)
-			tilemap_8x8->enable(0);
+		if (m_tilemap_8x8)
+			m_tilemap_8x8->enable(false);
 
-		if (tilemap_16x16)
-			tilemap_16x16->enable(BIT(control0, 7));
+		if (m_tilemap_16x16)
+			m_tilemap_16x16->enable(BIT(m_control0, 7));
 	}
 
 	/* Rowscroll enable */
-	if (rowscroll_ptr && (control1 & 0x60) == 0x40)
+	if (m_rowscroll_ptr && (m_control1 & 0x60) == 0x40)
 	{
+		int rows;
 		/* Several different rowscroll styles */
-		switch ((control0 >> 3) & 0xf)
+		switch ((m_control0 >> 3) & 0xf)
 		{
 			case 0:     rows = 512;     break;/* Every line of 512 height bitmap */
 			case 1:     rows = 256;     break;
@@ -772,162 +608,143 @@ static int deco16_pf_update(
 			default:    rows = 1;       break;
 		}
 
-		if (tilemap_16x16)
+		if (m_tilemap_16x16)
 		{
 			int numrows = rows;
 
 			// cap at tilemap size
-			if (numrows > tilemap_16x16->height())
-				numrows = tilemap_16x16->height();
+			if (numrows > m_tilemap_16x16->height())
+				numrows = m_tilemap_16x16->height();
 
-			tilemap_16x16->set_scroll_cols(1);
-			tilemap_16x16->set_scroll_rows(numrows);
-			tilemap_16x16->set_scrolly(0, scrolly);
+			m_tilemap_16x16->set_scroll_cols(1);
+			m_tilemap_16x16->set_scroll_rows(numrows);
+			m_tilemap_16x16->set_scrolly(0, m_scrolly);
 
-
-			for (offs = 0; offs < numrows; offs++)
-				tilemap_16x16->set_scrollx(offs, scrollx + rowscroll_ptr[offs]);
+			for (int offs = 0; offs < numrows; offs++)
+				m_tilemap_16x16->set_scrollx(offs, m_scrollx + m_rowscroll_ptr[offs]);
 		}
 
-		if (tilemap_8x8)
+		if (m_tilemap_8x8)
 		{
 			int numrows = rows;
 
 			// wolffang uses a larger 8x8 tilemap for the Japanese intro text, everything else seems to need this logic tho?
-			if (!(tilemapsizes & DECO_32x64))
+			if (!(m_size & deco16ic_device::DECO_32x64))
 				numrows = rows >> 1;
 
 			// cap at tilemap size
-			if (numrows > tilemap_8x8->height())
-				numrows = tilemap_8x8->height();
+			if (numrows > m_tilemap_8x8->height())
+				numrows = m_tilemap_8x8->height();
 
-			tilemap_8x8->set_scroll_cols(1);
-			tilemap_8x8->set_scroll_rows(numrows);
-			tilemap_8x8->set_scrolly(0, scrolly);
+			m_tilemap_8x8->set_scroll_cols(1);
+			m_tilemap_8x8->set_scroll_rows(numrows);
+			m_tilemap_8x8->set_scrolly(0, m_scrolly);
 
-			for (offs = 0; offs < numrows; offs++)
-				tilemap_8x8->set_scrollx(offs, scrollx + rowscroll_ptr[offs]);
+			for (int offs = 0; offs < numrows; offs++)
+				m_tilemap_8x8->set_scrollx(offs, m_scrollx + m_rowscroll_ptr[offs]);
 		}
 	}
-	else if (rowscroll_ptr && (control1 & 0x60) == 0x20)  /* Column scroll */
+	else if (m_rowscroll_ptr && (m_control1 & 0x60) == 0x20)  /* Column scroll */
 	{
 		/* Column scroll ranges from 8 pixel columns to 512 pixel columns */
-		int mask = (0x40 >> (control0 & 7)) - 1;
+		int mask = (0x40 >> (m_control0 & 7)) - 1;
 		if (mask == -1)
 			mask = 0;
 
-		cols = (8 << (control0 & 7)) & 0x3ff;
+		int cols = (8 << (m_control0 & 7)) & 0x3ff;
 		if (!cols)
 			cols = 1024;
 
 		cols = 1024 / cols;
 
-		if (tilemap_16x16)
+		if (m_tilemap_16x16)
 		{
-			tilemap_16x16->set_scroll_cols(cols);
-			tilemap_16x16->set_scroll_rows(1);
-			tilemap_16x16->set_scrollx(0, scrollx);
+			m_tilemap_16x16->set_scroll_cols(cols);
+			m_tilemap_16x16->set_scroll_rows(1);
+			m_tilemap_16x16->set_scrollx(0, m_scrollx);
 
-			for (offs = 0; offs < cols; offs++)
-				tilemap_16x16->set_scrolly(offs, scrolly + rowscroll_ptr[(offs & mask) + 0x200]);
+			for (int offs = 0; offs < cols; offs++)
+				m_tilemap_16x16->set_scrolly(offs, m_scrolly + m_rowscroll_ptr[(offs & mask) + 0x200]);
 		}
 
-		if (tilemap_8x8)
+		if (m_tilemap_8x8)
 		{
 			cols = cols / 2; /* Adjust because 8x8 tilemap is half the width of 16x16 */
 
-			tilemap_8x8->set_scroll_cols(cols);
-			tilemap_8x8->set_scroll_rows(1);
-			tilemap_8x8->set_scrollx(0, scrollx);
+			m_tilemap_8x8->set_scroll_cols(cols);
+			m_tilemap_8x8->set_scroll_rows(1);
+			m_tilemap_8x8->set_scrollx(0, m_scrollx);
 
-			for (offs = 0; offs < cols; offs++)
-				tilemap_8x8->set_scrolly(offs, scrolly + rowscroll_ptr[(offs & mask) + 0x200]);
+			for (int offs = 0; offs < cols; offs++)
+				m_tilemap_8x8->set_scrolly(offs, m_scrolly + m_rowscroll_ptr[(offs & mask) + 0x200]);
 		}
 	}
-	else if (control1 & 0x60)
+	else if (m_control1 & 0x60)
 	{
 		/* Simultaneous row & column scroll requested - use custom renderer */
-		use_custom = 1;
+		m_use_custom_pf = true;
 
-		if (tilemap_16x16)
+		if (m_tilemap_16x16)
 		{
-			tilemap_16x16->set_scroll_rows(1);
-			tilemap_16x16->set_scroll_cols(1);
-			tilemap_16x16->set_scrollx(0, scrollx);
-			tilemap_16x16->set_scrolly(0, scrolly);
+			m_tilemap_16x16->set_scroll_rows(1);
+			m_tilemap_16x16->set_scroll_cols(1);
+			m_tilemap_16x16->set_scrollx(0, m_scrollx);
+			m_tilemap_16x16->set_scrolly(0, m_scrolly);
 		}
 
-		if (tilemap_8x8)
+		if (m_tilemap_8x8)
 		{
-			tilemap_8x8->set_scroll_rows(1);
-			tilemap_8x8->set_scroll_cols(1);
-			tilemap_8x8->set_scrollx(0, scrollx);
-			tilemap_8x8->set_scrolly(0, scrolly);
-
+			m_tilemap_8x8->set_scroll_rows(1);
+			m_tilemap_8x8->set_scroll_cols(1);
+			m_tilemap_8x8->set_scrollx(0, m_scrollx);
+			m_tilemap_8x8->set_scrolly(0, m_scrolly);
 		}
-
 	}
 	else
 	{
-		if (tilemap_16x16)
+		if (m_tilemap_16x16)
 		{
-			tilemap_16x16->set_scroll_rows(1);
-			tilemap_16x16->set_scroll_cols(1);
-			tilemap_16x16->set_scrollx(0, scrollx);
-			tilemap_16x16->set_scrolly(0, scrolly);
+			m_tilemap_16x16->set_scroll_rows(1);
+			m_tilemap_16x16->set_scroll_cols(1);
+			m_tilemap_16x16->set_scrollx(0, m_scrollx);
+			m_tilemap_16x16->set_scrolly(0, m_scrolly);
 		}
 
-		if (tilemap_8x8)
+		if (m_tilemap_8x8)
 		{
-			tilemap_8x8->set_scroll_rows(1);
-			tilemap_8x8->set_scroll_cols(1);
-			tilemap_8x8->set_scrollx(0, scrollx);
-			tilemap_8x8->set_scrolly(0, scrolly);
+			m_tilemap_8x8->set_scroll_rows(1);
+			m_tilemap_8x8->set_scroll_cols(1);
+			m_tilemap_8x8->set_scrollx(0, m_scrollx);
+			m_tilemap_8x8->set_scrolly(0, m_scrolly);
 		}
 	}
 
-	return use_custom;
+	if (!m_bank_cb.isnull())
+	{
+		const int bank = m_bank_cb(m_bankval);
+
+		if (bank != m_bank)
+		{
+			if (m_tilemap_8x8)
+				m_tilemap_8x8->mark_all_dirty();
+			if (m_tilemap_16x16)
+				m_tilemap_16x16->mark_all_dirty();
+
+			m_bank = bank;
+		}
+	}
 }
 
-void deco16ic_device::pf_update(const u16 *rowscroll_1_ptr, const u16 *rowscroll_2_ptr)
+void deco16ic_device::update(const u16 *rowscroll_1_ptr, const u16 *rowscroll_2_ptr)
 {
-	int bank1, bank2;
-
 	/* Update scrolling and tilemap enable */
-	m_pf1_rowscroll_ptr = rowscroll_1_ptr;
-	m_pf2_rowscroll_ptr = rowscroll_2_ptr;
-	m_use_custom_pf2 = deco16_pf_update(m_pf2_tilemap_8x8, m_pf2_tilemap_16x16, rowscroll_2_ptr, m_pf12_control[3], m_pf12_control[4], m_pf12_control[5] >> 8, m_pf12_control[6] >> 8, m_pf2_size);
-	m_use_custom_pf1 = deco16_pf_update(m_pf1_tilemap_8x8, m_pf1_tilemap_16x16, rowscroll_1_ptr, m_pf12_control[1], m_pf12_control[2], m_pf12_control[5] & 0xff, m_pf12_control[6] & 0xff, m_pf1_size);
+	m_tmap[0].m_rowscroll_ptr = rowscroll_1_ptr;
+	m_tmap[1].m_rowscroll_ptr = rowscroll_2_ptr;
 
-	/* Update banking and global flip state */
-	if (!m_bank1_cb.isnull())
+	/* Update banking */
+	for (int i = 0; i < 2; i++)
 	{
-		bank1 = m_bank1_cb(m_pf12_control[7] & 0xff);
-
-		if (bank1 != m_pf1_bank)
-		{
-			if (m_pf1_tilemap_8x8)
-				m_pf1_tilemap_8x8->mark_all_dirty();
-			if (m_pf1_tilemap_16x16)
-				m_pf1_tilemap_16x16->mark_all_dirty();
-
-			m_pf1_bank = bank1;
-		}
-	}
-
-	if (!m_bank2_cb.isnull())
-	{
-		bank2 = m_bank2_cb(m_pf12_control[7] >> 8);
-
-		if (bank2 != m_pf2_bank)
-		{
-			if (m_pf2_tilemap_8x8)
-				m_pf2_tilemap_8x8->mark_all_dirty();
-			if (m_pf2_tilemap_16x16)
-				m_pf2_tilemap_16x16->mark_all_dirty();
-
-			m_pf2_bank = bank2;
-		}
+		m_tmap[i].update();
 	}
 }
 
@@ -940,10 +757,10 @@ void deco16ic_device::print_debug_info(bitmap_ind16 &bitmap)
     if (machine().input().code_pressed(KEYCODE_O))
         return;
 
-    if (m_pf12_control)
+    if (m_control)
     {
-        sprintf(buf,"%04X %04X %04X %04X\n", m_pf12_control[0], m_pf12_control[1], m_pf12_control[2], m_pf12_control[3]);
-        sprintf(&buf[strlen(buf)],"%04X %04X %04X %04X\n", m_pf12_control[4], m_pf12_control[5], m_pf12_control[6], m_pf12_control[7]);
+        sprintf(buf,"%04X %04X %04X %04X\n", m_control[0], m_control[1], m_control[2], m_control[3]);
+        sprintf(&buf[strlen(buf)],"%04X %04X %04X %04X\n", m_control[4], m_control[5], m_control[6], m_control[7]);
     }
     else
         sprintf(buf, "\n\n");
@@ -956,16 +773,16 @@ void deco16ic_device::print_debug_info(bitmap_ind16 &bitmap)
 template<class BitmapClass>
 void deco16ic_device::tilemap_1_draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask)
 {
-	if (m_use_custom_pf1)
+	if (m_tmap[0].m_use_custom_pf)
 	{
-		custom_tilemap_draw(screen, bitmap, cliprect, m_pf1_tilemap_8x8, m_pf1_tilemap_16x16, nullptr, nullptr, m_pf1_rowscroll_ptr, m_pf12_control[1], m_pf12_control[2], m_pf12_control[5] & 0xff, m_pf12_control[6] & 0xff, 0, 0, flags, priority, pmask);
+		custom_tilemap_draw(screen, bitmap, cliprect, m_tmap[0].m_tilemap_8x8, m_tmap[0].m_tilemap_16x16, nullptr, nullptr, m_tmap[0].m_rowscroll_ptr, m_control[1], m_control[2], m_control[5] & 0xff, m_control[6] & 0xff, 0, 0, flags, priority, pmask);
 	}
 	else
 	{
-		if (m_pf1_tilemap_8x8)
-			m_pf1_tilemap_8x8->draw(screen, bitmap, cliprect, flags, priority, pmask);
-		if (m_pf1_tilemap_16x16)
-			m_pf1_tilemap_16x16->draw(screen, bitmap, cliprect, flags, priority, pmask);
+		if (m_tmap[0].m_tilemap_8x8)
+			m_tmap[0].m_tilemap_8x8->draw(screen, bitmap, cliprect, flags, priority, pmask);
+		if (m_tmap[0].m_tilemap_16x16)
+			m_tmap[0].m_tilemap_16x16->draw(screen, bitmap, cliprect, flags, priority, pmask);
 	}
 }
 
@@ -979,16 +796,16 @@ void deco16ic_device::tilemap_1_draw(screen_device &screen, bitmap_rgb32 &bitmap
 template<class BitmapClass>
 void deco16ic_device::tilemap_2_draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask)
 {
-	if (m_use_custom_pf2)
+	if (m_tmap[1].m_use_custom_pf)
 	{
-		custom_tilemap_draw(screen, bitmap, cliprect, m_pf2_tilemap_8x8, m_pf2_tilemap_16x16, nullptr, nullptr, m_pf2_rowscroll_ptr, m_pf12_control[3], m_pf12_control[4], m_pf12_control[5] >> 8, m_pf12_control[6] >> 8, 0, 0, flags, priority, pmask);
+		custom_tilemap_draw(screen, bitmap, cliprect, m_tmap[1].m_tilemap_8x8, m_tmap[1].m_tilemap_16x16, nullptr, nullptr, m_tmap[1].m_rowscroll_ptr, m_control[3], m_control[4], m_control[5] >> 8, m_control[6] >> 8, 0, 0, flags, priority, pmask);
 	}
 	else
 	{
-		if (m_pf2_tilemap_8x8)
-			m_pf2_tilemap_8x8->draw(screen, bitmap, cliprect, flags, priority, pmask);
-		if (m_pf2_tilemap_16x16)
-			m_pf2_tilemap_16x16->draw(screen, bitmap, cliprect, flags, priority, pmask);
+		if (m_tmap[1].m_tilemap_8x8)
+			m_tmap[1].m_tilemap_8x8->draw(screen, bitmap, cliprect, flags, priority, pmask);
+		if (m_tmap[1].m_tilemap_16x16)
+			m_tmap[1].m_tilemap_16x16->draw(screen, bitmap, cliprect, flags, priority, pmask);
 	}
 }
 
@@ -1004,10 +821,10 @@ void deco16ic_device::tilemap_2_draw(screen_device &screen, bitmap_rgb32 &bitmap
 // Combines the output of two 4BPP tilemaps into an 8BPP tilemap
 void deco16ic_device::tilemap_12_combine_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask)
 {
-	custom_tilemap_draw(screen, bitmap, cliprect, nullptr, m_pf1_tilemap_16x16, nullptr, m_pf2_tilemap_16x16, m_pf1_rowscroll_ptr, m_pf12_control[1], m_pf12_control[2], m_pf12_control[5] & 0xff, m_pf12_control[6] & 0xff, 0xf, 4, flags, priority, pmask);
+	custom_tilemap_draw(screen, bitmap, cliprect, nullptr, m_tmap[0].m_tilemap_16x16, nullptr, m_tmap[1].m_tilemap_16x16, m_tmap[0].m_rowscroll_ptr, m_control[1], m_control[2], m_control[5] & 0xff, m_control[6] & 0xff, 0xf, 4, flags, priority, pmask);
 }
 
 void deco16ic_device::tilemap_12_combine_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask)
 {
-	custom_tilemap_draw(screen, bitmap, cliprect, nullptr, m_pf1_tilemap_16x16, nullptr, m_pf2_tilemap_16x16, m_pf1_rowscroll_ptr, m_pf12_control[1], m_pf12_control[2], m_pf12_control[5] & 0xff, m_pf12_control[6] & 0xff, 0xf, 4, flags, priority, pmask);
+	custom_tilemap_draw(screen, bitmap, cliprect, nullptr, m_tmap[0].m_tilemap_16x16, nullptr, m_tmap[1].m_tilemap_16x16, m_tmap[0].m_rowscroll_ptr, m_control[1], m_control[2], m_control[5] & 0xff, m_control[6] & 0xff, 0xf, 4, flags, priority, pmask);
 }

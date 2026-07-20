@@ -60,30 +60,32 @@ template<int Chip>
 void cninja_state::cninja_pf_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos());
-	m_deco_tilegen[Chip]->pf_control_w(offset, data, mem_mask);
+	m_tilegen[Chip]->control_w(offset, data, mem_mask);
 }
 
-
-uint16_t cninja_state::cninja_protection_region_0_104_r(offs_t offset)
+template <offs_t Base>
+uint16_t cninja_state::ioprot_r(offs_t offset)
 {
-	int const real_address = 0 + (offset * 2);
+	int const real_address = Base + (offset * 2);
 	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	uint16_t const data = m_ioprot->read_data( deco146_addr, cs );
+	uint16_t const data = m_ioprot->read_data(deco146_addr, cs);
 	return data;
 }
 
-void cninja_state::cninja_protection_region_0_104_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+template <offs_t Base>
+void cninja_state::ioprot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int const real_address = 0 + (offset * 2);
+	int const real_address = Base + (offset * 2);
 	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	m_ioprot->write_data( deco146_addr, data, mem_mask, cs );
+	m_ioprot->write_data(deco146_addr, data, mem_mask, cs);
 }
 
 uint16_t cninja_state::cninjabl2_sprite_dma_r()
 {
-	m_spriteram[0]->copy();
+	if (!machine().side_effects_disabled())
+		m_spriteram[0]->copy();
 	return 0;
 }
 
@@ -93,16 +95,16 @@ void cninja_state::cninja_map(address_map &map)
 	map(0x000000, 0x0bffff).rom();
 
 	map(0x140000, 0x14000f).w(FUNC(cninja_state::cninja_pf_control_w<0>));
-	map(0x144000, 0x144fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x146000, 0x146fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x14c000, 0x14c7ff).writeonly().share(m_pf_rowscroll[0]);
-	map(0x14e000, 0x14e7ff).ram().share(m_pf_rowscroll[1]);
+	map(0x144000, 0x144fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x146000, 0x146fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x14c000, 0x14c7ff).writeonly().share(m_rowscroll[0]);
+	map(0x14e000, 0x14e7ff).ram().share(m_rowscroll[1]);
 
 	map(0x150000, 0x15000f).w(FUNC(cninja_state::cninja_pf_control_w<1>));
-	map(0x154000, 0x154fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x156000, 0x156fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x15c000, 0x15c7ff).ram().share(m_pf_rowscroll[2]);
-	map(0x15e000, 0x15e7ff).ram().share(m_pf_rowscroll[3]);
+	map(0x154000, 0x154fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x156000, 0x156fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x15c000, 0x15c7ff).ram().share(m_rowscroll[2]);
+	map(0x15e000, 0x15e7ff).ram().share(m_rowscroll[3]);
 
 	map(0x184000, 0x187fff).ram();
 	map(0x190000, 0x190007).m("irq", FUNC(deco_irq_device::map)).umask16(0x00ff);
@@ -110,7 +112,7 @@ void cninja_state::cninja_map(address_map &map)
 
 	map(0x1a4000, 0x1a47ff).ram().share("spriteram1");           /* Sprites */
 	map(0x1b4000, 0x1b4001).w(m_spriteram[0], FUNC(buffered_spriteram16_device::write)); /* DMA flag */
-	map(0x1bc000, 0x1bffff).rw(FUNC(cninja_state::cninja_protection_region_0_104_r), FUNC(cninja_state::cninja_protection_region_0_104_w)).share("prot16ram"); /* Protection device */
+	map(0x1bc000, 0x1bffff).rw(FUNC(cninja_state::ioprot_r<0>), FUNC(cninja_state::ioprot_w<0>)); /* Protection device */
 
 	map(0x308000, 0x308fff).nopw(); /* Bootleg only */
 }
@@ -122,16 +124,16 @@ void cninja_state::cninjabl_map(address_map &map)
 	map(0x138000, 0x1387ff).ram().share("spriteram1"); /* bootleg sprite-ram (sprites rewritten here in new format) */
 
 	map(0x140000, 0x14000f).w(FUNC(cninja_state::cninja_pf_control_w<0>));
-	map(0x144000, 0x144fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x146000, 0x146fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x14c000, 0x14c7ff).writeonly().share(m_pf_rowscroll[0]);
-	map(0x14e000, 0x14e7ff).ram().share(m_pf_rowscroll[1]);
+	map(0x144000, 0x144fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x146000, 0x146fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x14c000, 0x14c7ff).writeonly().share(m_rowscroll[0]);
+	map(0x14e000, 0x14e7ff).ram().share(m_rowscroll[1]);
 
 	map(0x150000, 0x15000f).w(FUNC(cninja_state::cninja_pf_control_w<1>));    // not used / incorrect on this
-	map(0x154000, 0x154fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x156000, 0x156fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x15c000, 0x15c7ff).ram().share(m_pf_rowscroll[2]);
-	map(0x15e000, 0x15e7ff).ram().share(m_pf_rowscroll[3]);
+	map(0x154000, 0x154fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x156000, 0x156fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x15c000, 0x15c7ff).ram().share(m_rowscroll[2]);
+	map(0x15e000, 0x15e7ff).ram().share(m_rowscroll[3]);
 
 	map(0x17ff22, 0x17ff23).portr("DSW");
 	map(0x17ff28, 0x17ff29).portr("SYSTEM");
@@ -154,70 +156,28 @@ void cninja_state::cninjabl2_map(address_map &map)
 	map(0x1b4000, 0x1b4001).r(FUNC(cninja_state::cninjabl2_sprite_dma_r));
 }
 
-uint16_t cninja_state::edrandy_protection_region_8_146_r(offs_t offset)
-{
-	int const real_address = 0x1a0000 + (offset * 2);
-	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	uint8_t cs = 0;
-	uint16_t const data = m_ioprot->read_data( deco146_addr, cs );
-	return data;
-}
-
-void cninja_state::edrandy_protection_region_8_146_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	int const real_address = 0x1a0000 + (offset * 2);
-	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	uint8_t cs = 0;
-	m_ioprot->write_data( deco146_addr, data, mem_mask, cs );
-}
-
-uint16_t cninja_state::edrandy_protection_region_6_146_r(offs_t offset)
-{
-//  uint16_t realdat = deco16_60_prot_r(space,offset&0x3ff,mem_mask);
-
-	int const real_address = 0x198000 + (offset * 2);
-	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	uint8_t cs = 0;
-	uint16_t const data = m_ioprot->read_data( deco146_addr, cs );
-
-//  if ((realdat & mem_mask) != (data & mem_mask))
-//      printf("returned %04x instead of %04x (real address %08x)\n", data, realdat, real_address);
-
-	return data;
-}
-
-void cninja_state::edrandy_protection_region_6_146_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-//  deco16_60_prot_w(space,offset&0x3ff,data,mem_mask);
-
-	int const real_address = 0x198000 + (offset * 2);
-	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	uint8_t cs = 0;
-	m_ioprot->write_data( deco146_addr, data, mem_mask, cs );
-}
-
 void cninja_state::edrandy_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 
 	map(0x140000, 0x14000f).w(FUNC(cninja_state::cninja_pf_control_w<0>));
-	map(0x144000, 0x144fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x146000, 0x146fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x14c000, 0x14c7ff).ram().share(m_pf_rowscroll[0]);
-	map(0x14e000, 0x14e7ff).ram().share(m_pf_rowscroll[1]);
+	map(0x144000, 0x144fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x146000, 0x146fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x14c000, 0x14c7ff).ram().share(m_rowscroll[0]);
+	map(0x14e000, 0x14e7ff).ram().share(m_rowscroll[1]);
 
 	map(0x150000, 0x15000f).w(FUNC(cninja_state::cninja_pf_control_w<1>));
-	map(0x154000, 0x154fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x156000, 0x156fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x15c000, 0x15c7ff).ram().share(m_pf_rowscroll[2]);
-	map(0x15e000, 0x15e7ff).ram().share(m_pf_rowscroll[3]);
+	map(0x154000, 0x154fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x156000, 0x156fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x15c000, 0x15c7ff).ram().share(m_rowscroll[2]);
+	map(0x15e000, 0x15e7ff).ram().share(m_rowscroll[3]);
 
 	map(0x188000, 0x189fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x194000, 0x197fff).ram(); /* Main ram */
-	map(0x198000, 0x19bfff).rw(FUNC(cninja_state::edrandy_protection_region_6_146_r), FUNC(cninja_state::edrandy_protection_region_6_146_w)).share("prot16ram"); /* Protection device */
-//  map(0x198000, 0x1987ff).rw(FUNC(cninja_state::edrandy_protection_region_6_146_r), FUNC(cninja_state::edrandy_protection_region_6_146_w)).share("prot16ram"); /* Protection device */
+	map(0x198000, 0x19bfff).rw(FUNC(cninja_state::ioprot_r<0x198000>), FUNC(cninja_state::ioprot_w<0x198000>)); /* Protection device */
+//  map(0x198000, 0x1987ff).rw(FUNC(cninja_state::ioprot_r<0x198000>), FUNC(cninja_state::ioprot_w<0x198000>)); /* Protection device */
 
-	map(0x1a0000, 0x1a3fff).rw(FUNC(cninja_state::edrandy_protection_region_8_146_r), FUNC(cninja_state::edrandy_protection_region_8_146_w));
+	map(0x1a0000, 0x1a3fff).rw(FUNC(cninja_state::ioprot_r<0x1a0000>), FUNC(cninja_state::ioprot_w<0x1a0000>));
 
 	map(0x1a4000, 0x1a4007).m("irq", FUNC(deco_irq_device::map)).umask16(0x00ff);
 	map(0x1ac000, 0x1ac001).w(m_spriteram[0], FUNC(buffered_spriteram16_device::write)); /* DMA flag */
@@ -235,22 +195,22 @@ void cninja_state::robocop2_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 
 	map(0x140000, 0x14000f).w(FUNC(cninja_state::cninja_pf_control_w<0>));
-	map(0x144000, 0x144fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x146000, 0x146fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x14c000, 0x14c7ff).ram().share(m_pf_rowscroll[0]);
-	map(0x14e000, 0x14e7ff).ram().share(m_pf_rowscroll[1]);
+	map(0x144000, 0x144fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x146000, 0x146fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x14c000, 0x14c7ff).ram().share(m_rowscroll[0]);
+	map(0x14e000, 0x14e7ff).ram().share(m_rowscroll[1]);
 
 	map(0x150000, 0x15000f).w(FUNC(cninja_state::cninja_pf_control_w<1>));
-	map(0x154000, 0x154fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x156000, 0x156fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x15c000, 0x15c7ff).ram().share(m_pf_rowscroll[2]);
-	map(0x15e000, 0x15e7ff).ram().share(m_pf_rowscroll[3]);
+	map(0x154000, 0x154fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x156000, 0x156fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x15c000, 0x15c7ff).ram().share(m_rowscroll[2]);
+	map(0x15e000, 0x15e7ff).ram().share(m_rowscroll[3]);
 
 	map(0x180000, 0x1807ff).ram().share("spriteram1");
 //  map(0x18c000, 0x18c0ff).w(FUNC(cninja_state::cninja_loopback_w)) /* Protection writes */
 //  map(0x18c000, 0x18c7ff).r(m_ioprot, FUNC(deco146_device,robocop2_prot_r)) /* Protection device */
 //  map(0x18c064, 0x18c065).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x18c000, 0x18ffff).rw(FUNC(cninja_state::mutantf_protection_region_0_146_r), FUNC(cninja_state::mutantf_protection_region_0_146_w)).share("prot16ram"); /* Protection device */
+	map(0x18c000, 0x18ffff).rw(FUNC(cninja_state::ioprot_r<0>), FUNC(cninja_state::ioprot_w<0>)); /* Protection device */
 
 	map(0x198000, 0x198001).w(m_spriteram[0], FUNC(buffered_spriteram16_device::write)); /* DMA flag */
 	map(0x1a8000, 0x1a9fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -260,23 +220,6 @@ void cninja_state::robocop2_map(address_map &map)
 	map(0x1f8000, 0x1f8001).portr("DSW3"); /* Dipswitch #3 */
 }
 
-
-uint16_t cninja_state::mutantf_protection_region_0_146_r(offs_t offset)
-{
-	int const real_address = 0 + (offset * 2);
-	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	uint8_t cs = 0;
-	uint16_t const data = m_ioprot->read_data( deco146_addr, cs );
-	return data;
-}
-
-void cninja_state::mutantf_protection_region_0_146_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	int const real_address = 0 + (offset * 2);
-	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	uint8_t cs = 0;
-	m_ioprot->write_data( deco146_addr, data, mem_mask, cs );
-}
 
 uint16_t cninja_state::mutantf_71_r()
 {
@@ -292,21 +235,21 @@ void cninja_state::mutantf_map(address_map &map)
 	map(0x160000, 0x161fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x180000, 0x180001).w(FUNC(cninja_state::robocop2_priority_w));
 	map(0x180002, 0x180003).nopw(); /* VBL irq ack */
-	map(0x1a0000, 0x1a3fff).rw(FUNC(cninja_state::mutantf_protection_region_0_146_r), FUNC(cninja_state::mutantf_protection_region_0_146_w)).share("prot16ram"); /* Protection device */
+	map(0x1a0000, 0x1a3fff).rw(FUNC(cninja_state::ioprot_r<0>), FUNC(cninja_state::ioprot_w<0>)); /* Protection device */
 	map(0x1c0000, 0x1c0001).w(m_spriteram[0], FUNC(buffered_spriteram16_device::write)).r(FUNC(cninja_state::mutantf_71_r));
 	map(0x1e0000, 0x1e0001).w(m_spriteram[1], FUNC(buffered_spriteram16_device::write));
 
 	map(0x300000, 0x30000f).w(FUNC(cninja_state::cninja_pf_control_w<0>));
-	map(0x304000, 0x305fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x306000, 0x307fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x308000, 0x3087ff).ram().share(m_pf_rowscroll[0]);
-	map(0x30a000, 0x30a7ff).ram().share(m_pf_rowscroll[1]);
+	map(0x304000, 0x305fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x306000, 0x307fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x308000, 0x3087ff).ram().share(m_rowscroll[0]);
+	map(0x30a000, 0x30a7ff).ram().share(m_rowscroll[1]);
 
 	map(0x310000, 0x31000f).w(FUNC(cninja_state::cninja_pf_control_w<1>));
-	map(0x314000, 0x315fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x316000, 0x317fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x318000, 0x3187ff).ram().share(m_pf_rowscroll[2]);
-	map(0x31a000, 0x31a7ff).ram().share(m_pf_rowscroll[3]);
+	map(0x314000, 0x315fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x316000, 0x317fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x318000, 0x3187ff).ram().share(m_rowscroll[2]);
+	map(0x31a000, 0x31a7ff).ram().share(m_rowscroll[3]);
 
 	map(0xad00ac, 0xad00ff).nopr(); /* Reads from here seem to be a game code bug */
 }
@@ -413,7 +356,6 @@ void cninja_state::cninjabl2_oki_map(address_map &map)
 /**********************************************************************************/
 
 static INPUT_PORTS_START( edrandy )
-
 	PORT_START("INPUTS")
 	DATAEAST_2BUTTON
 
@@ -467,7 +409,6 @@ static INPUT_PORTS_START( edrandc )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cninja )
-
 	PORT_START("INPUTS")
 	DATAEAST_2BUTTON
 
@@ -478,7 +419,6 @@ static INPUT_PORTS_START( cninja )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("DSW")   /* Dip switch bank 1 */
-
 	DATAEAST_COINAGE
 
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:7")
@@ -547,7 +487,6 @@ static INPUT_PORTS_START( robocop2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("DSW")   /* Dip switch bank 1 */
-
 	DATAEAST_COINAGE
 
 	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:7")
@@ -604,7 +543,6 @@ static INPUT_PORTS_START( robocop2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mutantf )
-
 	PORT_START("INPUTS")
 	DATAEAST_2BUTTON
 
@@ -615,7 +553,6 @@ static INPUT_PORTS_START( mutantf )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("DSW")   /* Dip switch bank 1 */
-
 	DATAEAST_COINAGE
 
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:7")
@@ -718,26 +655,21 @@ void cninja_state::cninjabl2_oki_bank_w(uint8_t data)
 
 /**********************************************************************************/
 
-DECO16IC_BANK_CB_MEMBER(cninja_state::cninja_bank_callback)
+int cninja_state::cninja_bank_callback(int bank)
 {
-	if ((bank >> 4) & 0xf)
+	if (bank & 0xf0)
 		return 0x0000; /* Only 2 banks */
 	return 0x1000;
 }
 
-DECO16IC_BANK_CB_MEMBER(cninja_state::robocop2_bank_callback)
+int cninja_state::robocop2_bank_callback(int bank)
 {
 	return (bank & 0x30) << 8;
 }
 
-DECO16IC_BANK_CB_MEMBER(cninja_state::mutantf_1_bank_callback)
+int cninja_state::mutantf_2_bank_callback(int bank)
 {
-	return ((bank >> 4) & 0x3) << 12;
-}
-
-DECO16IC_BANK_CB_MEMBER(cninja_state::mutantf_2_bank_callback)
-{
-	return ((bank >> 5) & 0x1) << 14;
+	return (bank & 0x20) << 9;
 }
 
 // palette bits are not effected
@@ -799,29 +731,29 @@ void cninja_state::cninja(machine_config &config)
 
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 
-	DECO16IC(config, m_deco_tilegen[0]);
-	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
-	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
-	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
-	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
+	DECO16IC(config, m_tilegen[0]);
+	m_tilegen[0]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_col_bank<0>(0x00);
+	m_tilegen[0]->set_col_bank<1>(0x10);
+	m_tilegen[0]->set_col_mask<0>(0x0f);
+	m_tilegen[0]->set_col_mask<1>(0x0f);
+	m_tilegen[0]->set_8x8_bank(0);
+	m_tilegen[0]->set_16x16_bank(1);
+	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1]);
-	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
-	m_deco_tilegen[1]->set_pf2_col_bank(0x30);
-	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::cninja_bank_callback));
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::cninja_bank_callback));
-	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
-	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
+	DECO16IC(config, m_tilegen[1]);
+	m_tilegen[1]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_col_bank<0>(0x00);
+	m_tilegen[1]->set_col_bank<1>(0x30);
+	m_tilegen[1]->set_col_mask<0>(0x0f);
+	m_tilegen[1]->set_col_mask<1>(0x0f);
+	m_tilegen[1]->set_bank_callback<0>(FUNC(cninja_state::cninja_bank_callback));
+	m_tilegen[1]->set_bank_callback<1>(FUNC(cninja_state::cninja_bank_callback));
+	m_tilegen[1]->set_8x8_bank(0);
+	m_tilegen[1]->set_16x16_bank(2);
+	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_SPRITE(config, m_sprgen[0], m_palette, gfx_cninja_spr);
 	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback));
@@ -880,29 +812,29 @@ void cninja_state::stoneage(machine_config &config)
 
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 
-	DECO16IC(config, m_deco_tilegen[0]);
-	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
-	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
-	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
-	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
+	DECO16IC(config, m_tilegen[0]);
+	m_tilegen[0]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_col_bank<0>(0x00);
+	m_tilegen[0]->set_col_bank<1>(0x10);
+	m_tilegen[0]->set_col_mask<0>(0x0f);
+	m_tilegen[0]->set_col_mask<1>(0x0f);
+	m_tilegen[0]->set_8x8_bank(0);
+	m_tilegen[0]->set_16x16_bank(1);
+	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1]);
-	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
-	m_deco_tilegen[1]->set_pf2_col_bank(0x30);
-	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::cninja_bank_callback));
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::cninja_bank_callback));
-	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
-	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
+	DECO16IC(config, m_tilegen[1]);
+	m_tilegen[1]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_col_bank<0>(0x00);
+	m_tilegen[1]->set_col_bank<1>(0x30);
+	m_tilegen[1]->set_col_mask<0>(0x0f);
+	m_tilegen[1]->set_col_mask<1>(0x0f);
+	m_tilegen[1]->set_bank_callback<0>(FUNC(cninja_state::cninja_bank_callback));
+	m_tilegen[1]->set_bank_callback<1>(FUNC(cninja_state::cninja_bank_callback));
+	m_tilegen[1]->set_8x8_bank(0);
+	m_tilegen[1]->set_16x16_bank(2);
+	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_SPRITE(config, m_sprgen[0], m_palette, gfx_cninja_spr);
 	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback));
@@ -970,29 +902,29 @@ void cninja_state::cninjabl(machine_config &config)
 
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 
-	DECO16IC(config, m_deco_tilegen[0]);
-	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
-	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
-	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
-	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
+	DECO16IC(config, m_tilegen[0]);
+	m_tilegen[0]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_col_bank<0>(0x00);
+	m_tilegen[0]->set_col_bank<1>(0x10);
+	m_tilegen[0]->set_col_mask<0>(0x0f);
+	m_tilegen[0]->set_col_mask<1>(0x0f);
+	m_tilegen[0]->set_8x8_bank(0);
+	m_tilegen[0]->set_16x16_bank(1);
+	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1]);
-	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
-	m_deco_tilegen[1]->set_pf2_col_bank(0x30);
-	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::cninja_bank_callback));
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::cninja_bank_callback));
-	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
-	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
+	DECO16IC(config, m_tilegen[1]);
+	m_tilegen[1]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_col_bank<0>(0x00);
+	m_tilegen[1]->set_col_bank<1>(0x30);
+	m_tilegen[1]->set_col_mask<0>(0x0f);
+	m_tilegen[1]->set_col_mask<1>(0x0f);
+	m_tilegen[1]->set_bank_callback<0>(FUNC(cninja_state::cninja_bank_callback));
+	m_tilegen[1]->set_bank_callback<1>(FUNC(cninja_state::cninja_bank_callback));
+	m_tilegen[1]->set_8x8_bank(0);
+	m_tilegen[1]->set_16x16_bank(2);
+	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1036,29 +968,29 @@ void cninja_state::edrandy(machine_config &config)
 
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 
-	DECO16IC(config, m_deco_tilegen[0]);
-	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
-	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
-	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
-	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
+	DECO16IC(config, m_tilegen[0]);
+	m_tilegen[0]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_col_bank<0>(0x00);
+	m_tilegen[0]->set_col_bank<1>(0x10);
+	m_tilegen[0]->set_col_mask<0>(0x0f);
+	m_tilegen[0]->set_col_mask<1>(0x0f);
+	m_tilegen[0]->set_8x8_bank(0);
+	m_tilegen[0]->set_16x16_bank(1);
+	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1]);
-	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
-	m_deco_tilegen[1]->set_pf2_col_bank(0x30);
-	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::cninja_bank_callback));
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::cninja_bank_callback));
-	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
-	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
+	DECO16IC(config, m_tilegen[1]);
+	m_tilegen[1]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_col_bank<0>(0x00);
+	m_tilegen[1]->set_col_bank<1>(0x30);
+	m_tilegen[1]->set_col_mask<0>(0x0f);
+	m_tilegen[1]->set_col_mask<1>(0x0f);
+	m_tilegen[1]->set_bank_callback<0>(FUNC(cninja_state::cninja_bank_callback));
+	m_tilegen[1]->set_bank_callback<1>(FUNC(cninja_state::cninja_bank_callback));
+	m_tilegen[1]->set_8x8_bank(0);
+	m_tilegen[1]->set_16x16_bank(2);
+	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_SPRITE(config, m_sprgen[0], m_palette, gfx_cninja_spr);
 	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback));
@@ -1116,31 +1048,31 @@ void cninja_state::robocop2(machine_config &config)
 
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 
-	DECO16IC(config, m_deco_tilegen[0]);
-	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
-	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
-	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(cninja_state::robocop2_bank_callback));
-	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
-	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
+	DECO16IC(config, m_tilegen[0]);
+	m_tilegen[0]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_col_bank<0>(0x00);
+	m_tilegen[0]->set_col_bank<1>(0x10);
+	m_tilegen[0]->set_col_mask<0>(0x0f);
+	m_tilegen[0]->set_col_mask<1>(0x0f);
+	m_tilegen[0]->set_bank_callback<1>(FUNC(cninja_state::robocop2_bank_callback));
+	m_tilegen[0]->set_8x8_bank(0);
+	m_tilegen[0]->set_16x16_bank(1);
+	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1]);
-	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
-	m_deco_tilegen[1]->set_pf2_col_bank(0x30);
-	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::robocop2_bank_callback));
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::robocop2_bank_callback));
-	m_deco_tilegen[1]->set_mix_callback(FUNC(cninja_state::robocop2_mix_callback));
-	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
-	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
+	DECO16IC(config, m_tilegen[1]);
+	m_tilegen[1]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_col_bank<0>(0x00);
+	m_tilegen[1]->set_col_bank<1>(0x30);
+	m_tilegen[1]->set_col_mask<0>(0x0f);
+	m_tilegen[1]->set_col_mask<1>(0x0f);
+	m_tilegen[1]->set_bank_callback<0>(FUNC(cninja_state::robocop2_bank_callback));
+	m_tilegen[1]->set_bank_callback<1>(FUNC(cninja_state::robocop2_bank_callback));
+	m_tilegen[1]->set_mix_callback(FUNC(cninja_state::robocop2_mix_callback));
+	m_tilegen[1]->set_8x8_bank(0);
+	m_tilegen[1]->set_16x16_bank(2);
+	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_SPRITE(config, m_sprgen[0], m_palette, gfx_cninja_spr);
 	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback));
@@ -1195,31 +1127,31 @@ void cninja_state::mutantf(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 	BUFFERED_SPRITERAM16(config, m_spriteram[1]);
 
-	DECO16IC(config, m_deco_tilegen[0]);
-	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
-	m_deco_tilegen[0]->set_pf2_col_bank(0x30);
-	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(cninja_state::mutantf_1_bank_callback));
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(cninja_state::mutantf_2_bank_callback));
-	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
-	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
+	DECO16IC(config, m_tilegen[0]);
+	m_tilegen[0]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_col_bank<0>(0x00);
+	m_tilegen[0]->set_col_bank<1>(0x30);
+	m_tilegen[0]->set_col_mask<0>(0x0f);
+	m_tilegen[0]->set_col_mask<1>(0x0f);
+	m_tilegen[0]->set_bank_callback<0>(FUNC(cninja_state::robocop2_bank_callback));
+	m_tilegen[0]->set_bank_callback<1>(FUNC(cninja_state::mutantf_2_bank_callback));
+	m_tilegen[0]->set_8x8_bank(0);
+	m_tilegen[0]->set_16x16_bank(1);
+	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1]);
-	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_col_bank(0x20);
-	m_deco_tilegen[1]->set_pf2_col_bank(0x40);
-	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::mutantf_1_bank_callback));
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::mutantf_1_bank_callback));
-	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
-	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
+	DECO16IC(config, m_tilegen[1]);
+	m_tilegen[1]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_col_bank<0>(0x20);
+	m_tilegen[1]->set_col_bank<1>(0x40);
+	m_tilegen[1]->set_col_mask<0>(0x0f);
+	m_tilegen[1]->set_col_mask<1>(0x0f);
+	m_tilegen[1]->set_bank_callback<0>(FUNC(cninja_state::robocop2_bank_callback));
+	m_tilegen[1]->set_bank_callback<1>(FUNC(cninja_state::robocop2_bank_callback));
+	m_tilegen[1]->set_8x8_bank(0);
+	m_tilegen[1]->set_16x16_bank(2);
+	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_SPRITE(config, m_sprgen[0], m_palette, gfx_mutantf_spr1);
 	m_sprgen[0]->set_alt_format(true);
