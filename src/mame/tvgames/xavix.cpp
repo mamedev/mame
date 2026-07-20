@@ -1490,11 +1490,25 @@ static INPUT_PORTS_START( pl1000 )
 	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+
+	PORT_START("GUN1_0")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+	PORT_START("GUN1_1")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+	PORT_START("GUN2_0")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(2)
+
+	PORT_START("GUN2_1")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(2)
 
 INPUT_PORTS_END
-
 
 static INPUT_PORTS_START( tcarnavi )
 	PORT_INCLUDE(xavix)
@@ -1620,8 +1634,6 @@ void xavix_state::xavix(machine_config &config)
 	/* basic machine hardware */
 	XAVIX(config, m_maincpu, MAIN_CLOCK);
 	set_xavix_cpumaps(config);
-
-	TIMER(config, "scantimer").configure_scanline(FUNC(xavix_state::scanline_cb), "screen", 0, 1);
 
 	XAVIX_ADC(config, m_adc);
 	m_adc->read_0_callback().set_ioport("AN0");
@@ -2097,7 +2109,68 @@ void xavix_cart_state::xavix_cart_ddrfammt(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("ekara_cart").set_filter("FAMMAT");
 }
 
+void xavix_pl1000_state::xavix_pl1000(machine_config &config)
+{
+	xavix_2mb_nv(config);
+	TIMER(config, "scantimer").configure_scanline(FUNC(xavix_pl1000_state::scanline_cb), "screen", 0, 1);
+}
 
+u8 xavix_pl1000_state::lightgun_r(offs_t offset)
+{
+	u16 gunx = 0, guny = 0;
+
+	if (m_which_lightgun < 8)
+	{
+		gunx = m_lightgun[0]->read();
+		guny = m_lightgun[1]->read();
+	}
+
+	gunx += 0x20;
+	guny = guny * (224.0f / 256.0f);
+	guny += 0x20;
+
+	switch (offset)
+	{
+	case 0x00:
+		return gunx;
+	case 0x01:
+		return gunx >> 8;
+	case 0x02:
+		return guny;
+
+	}
+	return 0x00;
+}
+
+void xavix_pl1000_state::machine_start()
+{
+	xavix_state::machine_start();
+	save_item(NAME(m_which_lightgun));
+}
+
+void xavix_pl1000_state::machine_reset()
+{
+	xavix_state::machine_reset();
+	m_which_lightgun = 0xff;
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(xavix_pl1000_state::scanline_cb)
+{
+	// this needs 8 ioevent_trg08 triggers per frame to read the guns
+	// where are these coming from?
+
+	if (param == 0)
+		m_which_lightgun = 0xff;
+
+	if ((param >= 40) && (param <= 110))
+	{
+		if ((param % 10) == 0)
+		{
+			ioevent_trg08(1);
+			m_which_lightgun++;
+		}
+	}
+}
 
 void xavix_state::init_xavix()
 {
@@ -2111,7 +2184,7 @@ void xavix_state::init_xavix_slowenv()
 	m_default_audio_tempo_override = 0x40;
 }
 
-void xavix_state::init_pl1000()
+void xavix_pl1000_state::init_pl1000()
 {
 	init_xavix();
 
@@ -2732,7 +2805,7 @@ ROM_END
 
 */
 
-CONS( 1999, pl1000, 0,         0,  xavix_2mb, pl1000,xavix_state,      init_pl1000,    "Pelican Accessories / Mani Industries / Gameone Systems",             "Video Challenger (PL-1000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 1999, pl1000, 0,         0,  xavix_pl1000, pl1000,xavix_pl1000_state,      init_pl1000,    "Pelican Accessories / Mani Industries / Gameone Systems",             "Video Challenger (PL-1000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // product code 80-32705.
 // Some sites say 1997, but 1999 is what SSD had listed, and seems more fitting.

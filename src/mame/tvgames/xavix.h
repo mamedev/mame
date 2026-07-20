@@ -100,7 +100,6 @@ public:
 
 	void init_xavix();
 	void init_xavix_slowenv();
-	void init_pl1000();
 
 	uint8_t sound_current_page() const;
 
@@ -206,8 +205,6 @@ protected:
 	void xavix_lowbus_map(address_map &map) ATTR_COLD;
 
 	INTERRUPT_GEN_MEMBER(interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
-
 
 	virtual void video_start() override ATTR_COLD;
 
@@ -1219,5 +1216,27 @@ protected:
 
 };
 
+
+class xavix_pl1000_state : public xavix_state
+{
+public:
+	xavix_pl1000_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag)
+		, m_lightgun2(*this, "GUN2_%u", 0U)
+	{ }
+
+	void init_pl1000();
+	void xavix_pl1000(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	virtual uint8_t lightgun_r(offs_t offset) override;
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
+	u8 m_which_lightgun;
+	required_ioport_array<2> m_lightgun2;
+};
 
 #endif // MAME_TVGAMES_XAVIX_H

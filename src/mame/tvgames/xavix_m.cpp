@@ -259,12 +259,6 @@ void xavix_state::slotreg_7810_w(uint8_t data)
 	LOG("%s: slotreg_7810_w %02x\n", machine().describe_context(), data);
 }
 
-
-TIMER_DEVICE_CALLBACK_MEMBER(xavix_state::scanline_cb)
-{
-
-}
-
 INTERRUPT_GEN_MEMBER(xavix_state::interrupt)
 {
 	if (m_video_ctrl & 0x20)
