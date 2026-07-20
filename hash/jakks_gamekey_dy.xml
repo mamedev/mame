@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="jakks_gamekey_dy" description="JAKKS Pacific 'DY' Game Keys (Featuring Disney)">
+<softwarelist name="jakks_gamekey_dy" description="Jakks Pacific 'DY' Game Keys (Featuring Disney)">
 
 	<!-- This list is for the 'DY' coded Game Keys, for Disney base systems (not Disney Princess) -->
 
@@ -13,7 +13,8 @@ license:CC0-1.0
 	<software name="sbwlgoof" supported="no"> <!-- AT24C04 SEEPROM -->
 		<description>Sports Bowling &amp; Goofy's Underwater Adventure (V1.31 - JUN 15 2005)</description>
 		<year>2005</year>
-		<publisher>JAKKS Pacific / HotGen Ltd</publisher>
+		<publisher>Jakks Pacific</publisher>
+		<info name="developer" value="HotGen"/>
 		<part name="cart" interface="jakks_gamekey">
 			<feature name="slot" value="rom_24lc04"/>
 			<dataarea name="rom" size="0x800000">
@@ -28,7 +29,8 @@ license:CC0-1.0
 	<software name="stenfchs" supported="no"> <!-- AT24C04 SEEPROM -->
 		<description>Sports Tennis &amp; Face Chase (15 JUN 2005 C)</description>
 		<year>2005</year>
-		<publisher>JAKKS Pacific / HotGen Ltd</publisher>
+		<publisher>Jakks Pacific</publisher>
+		<info name="developer" value="HotGen"/>
 		<part name="cart" interface="jakks_gamekey">
 			<feature name="slot" value="rom_24lc04"/>
 			<dataarea name="rom" size="0x800000">
@@ -43,7 +45,8 @@ license:CC0-1.0
 	<software name="stenfcha" supported="no"> <!-- AT24C04 SEEPROM -->
 		<description>Sports Tennis &amp; Face Chase &amp; Riches of Agrabah (15 JUN 2005 A)</description>
 		<year>2005</year>
-		<publisher>JAKKS Pacific / HotGen Ltd</publisher>
+		<publisher>Jakks Pacific</publisher>
+		<info name="developer" value="HotGen"/>
 		<part name="cart" interface="jakks_gamekey">
 			<feature name="slot" value="rom_24lc04"/>
 			<dataarea name="rom" size="0x800000">

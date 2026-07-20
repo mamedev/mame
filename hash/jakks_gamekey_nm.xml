@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="jakks_gamekey_nm" description="JAKKS Pacific 'NM' Game Keys (Namco)">
+<softwarelist name="jakks_gamekey_nm" description="Jakks Pacific 'NM' Game Keys (Namco)">
 
 	<!-- This list is for the 'NM' coded Game Keys, for Namco base systems (MS Pacman) -->
 	<!-- for test mode, hold UP, press A, press DOWN -->
@@ -13,7 +13,8 @@ license:CC0-1.0
 	<software name="pacbos"> <!-- has SEEPROM -->
 		<description>Pac-Man &amp; Bosconian (01 APR 2005 A SKU G)</description>
 		<year>2005</year>
-		<publisher>JAKKS Pacific Inc / Namco / HotGen Ltd</publisher>
+		<publisher>Jakks Pacific / Namco</publisher>
+		<info name="developer" value="HotGen"/>
 		<part name="cart" interface="jakks_gamekey">
 			<feature name="slot" value="rom_24lc04"/>
 			<dataarea name="rom" size="0x800000">
@@ -27,7 +28,8 @@ license:CC0-1.0
 	<software name="nrxdig"> <!-- has SEEPROM -->
 		<description>New Rally-X &amp; Dig Dug (01 APR 2005 A SKU E)</description>
 		<year>2005</year>
-		<publisher>JAKKS Pacific Inc / Namco / HotGen Ltd</publisher>
+		<publisher>Jakks Pacific / Namco</publisher>
+		<info name="developer" value="HotGen"/>
 		<part name="cart" interface="jakks_gamekey">
 			<feature name="slot" value="rom_24lc04"/>
 			<dataarea name="rom" size="0x800000">
@@ -39,7 +41,8 @@ license:CC0-1.0
 	<software name="pacbosrx"> <!-- has SEEPROM -->
 		<description>Pac-Man &amp; Bosconian &amp; Rally-X (11 JUL 2005 A SKU I)</description>
 		<year>2005</year>
-		<publisher>JAKKS Pacific Inc / Namco / HotGen Ltd</publisher>
+		<publisher>Jakks Pacific / Namco</publisher>
+		<info name="developer" value="HotGen"/>
 		<part name="cart" interface="jakks_gamekey">
 			<feature name="slot" value="rom_24lc04"/>
 			<dataarea name="rom" size="0x800000">
