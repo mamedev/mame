@@ -274,7 +274,7 @@ TILEMAP_MAPPER_MEMBER(deco16ic_device::scan_rows)
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5) + ((row & 0x20) << 6);
 }
 
-template <unsigned Which, bool is8x8>
+template <unsigned Which, bool Is8x8>
 TILE_GET_INFO_MEMBER(deco16ic_device::get_tile_info)
 {
 	u32 tile = m_vram[Which][tile_index];
@@ -297,9 +297,9 @@ TILE_GET_INFO_MEMBER(deco16ic_device::get_tile_info)
 
 	tile &= 0xfff;
 	if (!m_tile_cb.isnull())
-		m_tile_cb(tile, colour, Which, is8x8);
+		m_tile_cb(tile, colour, Which, Is8x8);
 
-	tileinfo.set(is8x8 ? m_8x8_gfx_bank : m_16x16_gfx_bank,
+	tileinfo.set(Is8x8 ? m_8x8_gfx_bank : m_16x16_gfx_bank,
 			tile + m_tmap[Which].m_bank,
 			(colour & m_tmap[Which].m_colour_mask) + m_tmap[Which].m_colour_bank,
 			flags);
@@ -490,7 +490,7 @@ void deco16ic_device::set_scrolldx(int tmap, int size, int dx, int dx_if_flipped
 /* cninjabl does not enable background layers */
 void deco16ic_device::set_enable(int tmap, int enable)
 {
-	m_tmap[tmap].m_control0 &= ~(1 << 7);
+	m_tmap[tmap].m_control0 &= ~(uint16_t(1) << 7);
 	m_tmap[tmap].m_control0 |= (enable & 1) << 7;
 }
 
