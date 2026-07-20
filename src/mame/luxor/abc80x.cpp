@@ -1077,36 +1077,34 @@ void abc806_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	if (!any_hrc)
 		return;
 
-	// 0 = separate DOT pixels; 1 = ½+½; 2 = ⅓ DOT1 + ⅔ DOT2; 3 = ⅔ DOT1 + ⅓ DOT2
+	// 0 = separate DOT pixels; 1 = average both positions; 2 = soft blend
+	// (DOT1 pos (2·D1+D2)/3, DOT2 pos (D1+2·D2)/3) — merges colour, keeps some resolution.
 	const unsigned mix_mode = m_hr_config->read() & 0x03;
 
-	auto mix_dots = [](rgb_t c1, rgb_t c2, unsigned mode) -> rgb_t
+	auto mix_rgb = [](rgb_t a, rgb_t b, unsigned wa, unsigned wb) -> rgb_t
 	{
-		unsigned w1 = 1, w2 = 1;
-		switch (mode)
-		{
-		default:
-		case 1: w1 = 1; w2 = 1; break;
-		case 2: w1 = 1; w2 = 2; break;
-		case 3: w1 = 2; w2 = 1; break;
-		}
-		const unsigned sum = w1 + w2;
+		const unsigned sum = wa + wb;
 		return rgb_t(
-			uint8_t((c1.r() * w1 + c2.r() * w2) / sum),
-			uint8_t((c1.g() * w1 + c2.g() * w2) / sum),
-			uint8_t((c1.b() * w1 + c2.b() * w2) / sum));
+			uint8_t((a.r() * wa + b.r() * wb) / sum),
+			uint8_t((a.g() * wa + b.g() * wb) / sum),
+			uint8_t((a.b() * wa + b.b() * wb) / sum));
+	};
+
+	auto plot_rgb = [&](int y, int x, rgb_t color, bool opaque, bool lit)
+	{
+		if (!lit)
+			return;
+		if (x < 0 || x >= bitmap.width() || y < 0 || y >= bitmap.height())
+			return;
+		if (opaque || bitmap.pix(y, x) == rgb_t::black())
+			bitmap.pix(y, x) = color;
 	};
 
 	auto plot_dot = [&](int y, int x, uint8_t nib)
 	{
 		const bool opaque = BIT(nib, 3);
 		const uint8_t color = nib & 0x07;
-		if (color == 0 && !opaque)
-			return;
-		if (x < 0 || x >= bitmap.width() || y < 0 || y >= bitmap.height())
-			return;
-		if (opaque || bitmap.pix(y, x) == rgb_t::black())
-			bitmap.pix(y, x) = pen[color];
+		plot_rgb(y, x, rgb_t(pen[color]), opaque, color != 0 || opaque);
 	};
 
 	auto plot_hrc = [&](int y, int &x, uint8_t hrc)
@@ -1121,24 +1119,27 @@ void abc806_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			return;
 		}
 
-		// Blandfärg: one grafikpunkt colour across both DOT positions (App. A).
 		const uint8_t c1 = nib1 & 0x07;
 		const uint8_t c2 = nib2 & 0x07;
 		const bool lit = (c1 | c2) != 0;
 		const bool opaque =
 			(BIT(nib1, 3) && c1) ||
 			(BIT(nib2, 3) && c2);
-		const rgb_t color = (c1 == c2) ? rgb_t(pen[c1]) : mix_dots(rgb_t(pen[c1]), rgb_t(pen[c2]), mix_mode);
+		const rgb_t rgb1 = rgb_t(pen[c1]);
+		const rgb_t rgb2 = rgb_t(pen[c2]);
 
-		for (int d = 0; d < 2; d++)
+		if (mix_mode == 1 || c1 == c2)
 		{
-			if (lit && x >= 0 && x < bitmap.width() && y >= 0 && y < bitmap.height())
-			{
-				if (opaque || bitmap.pix(y, x) == rgb_t::black())
-					bitmap.pix(y, x) = color;
-			}
-			x++;
+			// Average blandfärg: same mixed colour on both DOT positions.
+			const rgb_t color = (c1 == c2) ? rgb1 : mix_rgb(rgb1, rgb2, 1, 1);
+			plot_rgb(y, x++, color, opaque, lit);
+			plot_rgb(y, x++, color, opaque, lit);
+			return;
 		}
+
+		// Soft blandfärg: bias each position toward its own DOT.
+		plot_rgb(y, x++, mix_rgb(rgb1, rgb2, 2, 1), opaque, lit);
+		plot_rgb(y, x++, mix_rgb(rgb1, rgb2, 1, 2), opaque, lit);
 	};
 
 	uint32_t addr = base;
@@ -1762,11 +1763,10 @@ static INPUT_PORTS_START( abc806 )
 	PORT_INCLUDE(abc800)
 
 	PORT_START("HR")
-	PORT_CONFNAME(0x03, 0x01, "HR DOT1/DOT2 mix")
+	PORT_CONFNAME(0x03, 0x02, "HR DOT1/DOT2 mix")
 	PORT_CONFSETTING(0x00, "Separate pixels")
-	PORT_CONFSETTING(0x01, "Blandfärg average (1/2+1/2)")
-	PORT_CONFSETTING(0x02, "Blandfärg 1/3 DOT1 + 2/3 DOT2")
-	PORT_CONFSETTING(0x03, "Blandfärg 2/3 DOT1 + 1/3 DOT2")
+	PORT_CONFSETTING(0x01, "Blandfärg average (same on both)")
+	PORT_CONFSETTING(0x02, "Blandfärg soft ((2·D1+D2)/3, (D1+2·D2)/3)")
 INPUT_PORTS_END
 
 
