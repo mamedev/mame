@@ -618,7 +618,7 @@ static INPUT_PORTS_START( konmedal )
 	PORT_DIPNAME( 0x40, 0x40, "Backup Memory" )      PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, "Clear" )
 	PORT_DIPSETTING(    0x40, "Keep" )
-	PORT_DIPNAME( 0x80, 0x00, "Demo Sound" )         PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )         PORT_DIPLOCATION("SW2:8")  // "Demo Sound"
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
