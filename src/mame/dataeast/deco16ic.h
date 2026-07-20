@@ -28,13 +28,13 @@ public:
 	static constexpr unsigned DECO_32x64 = 2;
 	static constexpr unsigned DECO_64x64 = 3;
 
+	using deco16_tile_cb_delegate = device_delegate<void (u32 &tile, u32 &colour, int layer, bool is_8x8)>;
+	using deco16_bank_cb_delegate = device_delegate<int (int bank)>;
+	using deco16_mix_cb_delegate = device_delegate<u16 (u16 p, u16 p2)>;
+
 	deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
-	typedef device_delegate<void (u32 &tile, u32 &colour, int layer, bool is_8x8)> deco16_tile_cb_delegate;
-	typedef device_delegate<int (int bank)> deco16_bank_cb_delegate;
-	typedef device_delegate<u16 (u16 p, u16 p2)> deco16_mix_cb_delegate;
-
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 //  void set_palette_tag(const char *tag);
 	template <typename... T> void set_tile_callback(T &&... args) { m_tile_cb.set(std::forward<T>(args)...); }
@@ -85,9 +85,9 @@ public:
 
 	void update(const u16 *rowscroll_1_ptr, const u16 *rowscroll_2_ptr);
 
-	template<class BitmapClass>
+	template <class BitmapClass>
 	void tilemap_1_draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask = 0xff);
-	template<class BitmapClass>
+	template <class BitmapClass>
 	void tilemap_2_draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask = 0xff);
 	void tilemap_1_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask = 0xff);
 	void tilemap_1_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask = 0xff);
@@ -114,7 +114,7 @@ public:
 	/* used by nslasher */
 	void set_tilemap_colour_bank(int tmap, int bank);
 
-	template<class BitmapClass>
+	template <class BitmapClass>
 	void custom_tilemap_draw(
 			screen_device &screen,
 			BitmapClass &bitmap,
@@ -135,7 +135,7 @@ public:
 			u8 pmask = 0xff);
 
 protected:
-	// device-level overrides
+	// device_t implementation overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -207,7 +207,7 @@ private:
 	void vram_common_w(u8 index, offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	TILEMAP_MAPPER_MEMBER(scan_rows);
-	template <unsigned Which, bool is8x8> TILE_GET_INFO_MEMBER(get_tile_info);
+	template <unsigned Which, bool Is8x8> TILE_GET_INFO_MEMBER(get_tile_info);
 	template <unsigned Which> TILE_GET_INFO_MEMBER(get_tile_info_8x8);
 };
 
