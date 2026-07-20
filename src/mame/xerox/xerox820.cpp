@@ -1458,7 +1458,7 @@ ROM_END
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT     CLASS             INIT        COMPANY                       FULLNAME                          FLAGS
 COMP( 1980, bigboard, 0,        0,      bigboard,    xerox820, bigboard_state,   empty_init, "Digital Research Computers", "Big Board",                      0 )
-COMP( 1980, bigboard5,bigboard, 0,      bigboard5,   xerox820, bigboard_state,   empty_init, "Digital Research Computers", "Big Board (5.25\" drives)",      MACHINE_NOT_WORKING )
+COMP( 1980, bigboard5,bigboard, 0,      bigboard5,   xerox820, bigboard_state,   empty_init, "Digital Research Computers", "Big Board (5.25\" drives)",      0 )
 COMP( 1981, x820,     bigboard, 0,      xerox820,    xerox820, xerox820_state,   empty_init, "Xerox",                      "Xerox 820",                      MACHINE_NO_SOUND_HW )
 COMP( 1982, mk82,     bigboard, 0,      bigboard,    xerox820, bigboard_state,   empty_init, "Scomar",                     "MK-82",                          0 )
 COMP( 1983, x820ii,   0,        0,      xerox820ii,  xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 820-II (8\" floppy)",      0 )
