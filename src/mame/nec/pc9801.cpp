@@ -1004,26 +1004,38 @@ ioport_value pc98_base_state::system_type_r()
 	return m_sys_type;
 }
 
+// pc9801/e/f*/m*
 static INPUT_PORTS_START( pc9801 )
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0001, 0x0001, "Display Type" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0000, "Normal Display (15KHz)" )
 	PORT_DIPSETTING(      0x0001, "Hi-Res Display (24KHz)" )
-	// TODO: "GFX" screen selections (routing?) for vanilla class
-	PORT_DIPUNKNOWN_DIPLOC( 0x002, 0x002, "SW1:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x004, 0x004, "SW1:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x008, 0x008, "SW1:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x010, 0x010, "SW1:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x020, 0x000, "SW1:6" )
-	// TODO: built-in RXC / TXC clocks for RS-232C (routing?) for vanilla class
-	PORT_DIPUNKNOWN_DIPLOC( 0x040, 0x000, "SW1:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x080, 0x080, "SW1:8" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x100, 0x000, "SW1:9" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x200, 0x200, "SW1:10" )
+	// TODO: Check what this really does (and if the mapping is correct)
+	// 1 dip only must be active, no idea about dupes
+	PORT_DIPNAME( 0x003e, 0x001e, "Display selection") PORT_DIPLOCATION("SW1:2,3,4,5,6")
+	PORT_DIPSETTING(      0x003c, "Graphic Screen 1 only" )
+	PORT_DIPSETTING(      0x003a, "Graphic Screen 2 only" )
+	PORT_DIPSETTING(      0x0036, "Graphic Screen 3 only" )
+	PORT_DIPSETTING(      0x002e, "Text Screen only" )
+	PORT_DIPSETTING(      0x001e, "Show All" )
+	// TODO: built-in RXC / TXC clocks for RS-232C (routing?) for vanilla class?
+	PORT_DIPNAME( 0x0040, 0x0000, "Built-in Timer Enable" ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "Modem receive timer Enable" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0000, "Main unit timer enable" ) PORT_DIPLOCATION("SW1:9")
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, "Modem timer 2 select" ) PORT_DIPLOCATION("SW1:10")
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("DSW2")
 	// jumps to daa00 if off, presumably some card booting
 	// Update: bit 0 of SDIP suggests "N-Basic boot", pinpoint if ever released in (86) version.
+	// 98JUNK.DOC reports this as "always OFF"
 	PORT_DIPNAME( 0x01, 0x01, "System Specification" ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1057,20 +1069,39 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Left Button")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( pc9801rs )
+// TODO: make it derive from pc9801u once we have a dump of that
+// pc9801uv2/21/11/cv21
+static INPUT_PORTS_START( pc9801uv )
 	PORT_INCLUDE( pc9801 )
 
 	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x02, 0x02, "Superimpose board" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	// LCD display, 98DO Demo explicitly wants it to be non-Plasma
 	PORT_DIPNAME( 0x04, 0x04, "Monitor Type" ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, "RGB" )
 	PORT_DIPSETTING(    0x00, "Plasma" )
+	PORT_DIPNAME( 0x08, 0x08, "FDD selection" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, "Internal" )
+	PORT_DIPSETTING(    0x00, "External" )
+	// TODO: understand what's this for
+	PORT_DIPNAME( 0x30, 0x30, "Serial mode" ) PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x30, "Timing Sync" )
+	PORT_DIPSETTING(    0x20, "RS-232C ST2 Sync" )
+	PORT_DIPSETTING(    0x10, "Sync Time Standby" )
+	PORT_DIPSETTING(    0x00, "RS-232C BCI sync")
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:7" )
 	PORT_DIPNAME( 0x80, 0x00, "Graphic Function" ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, "Basic (8 Colors)" )
 	PORT_DIPSETTING(    0x00, "Expanded (16/4096 Colors)" )
 	PORT_BIT(0x300, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("DSW2")
+	// pc9801uv11 only, others "always off"
+	PORT_DIPNAME( 0x40, 0x40, "FDD motor control") PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "GDC clock" ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, "2.5 MHz" )
 	PORT_DIPSETTING(    0x00, "5 MHz" )
@@ -1085,14 +1116,44 @@ static INPUT_PORTS_START( pc9801rs )
 	PORT_DIPSETTING(    0x02, "2HD" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW3:3" )
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW3:4" )
-	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW3:5" )
+	// pc9801uv11 and PC-98DO, others "always off"
+	PORT_DIPNAME( 0x10, 0x10, "CPU weight" ) PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, "0" )
+	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPNAME( 0x20, 0x20, "Conventional RAM size" ) PORT_DIPLOCATION("SW3:6")
 	PORT_DIPSETTING(    0x20, "640 KB" )
 	PORT_DIPSETTING(    0x00, "512 KB" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW3:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW3:8" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( pc9801vm )
+	PORT_INCLUDE( pc9801uv )
+
+	PORT_MODIFY("DSW2")
+	// "HDD select" for vm4 only
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )
+
+	PORT_MODIFY("DSW3")
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW3:5" )
+	// i8086 mode select, if board available
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
+INPUT_PORTS_END
+
+// pc9801vm01/21/41/vx0/2/4/01/21/41 (and essentially everything else with physical dips)
+static INPUT_PORTS_START( pc9801vx )
+	PORT_INCLUDE( pc9801vm )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x20, 0x20, "HDD select" ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, "Internal" )
+	PORT_DIPSETTING(    0x00, "External" )
+
+	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x80, 0x00, "CPU Type" ) PORT_DIPLOCATION("SW3:8")
 	PORT_DIPSETTING(    0x80, "V30" )
-	PORT_DIPSETTING(    0x00, "I386" )
+	PORT_DIPSETTING(    0x00, "I286" )
 
 	PORT_START("BIOS_LOAD")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1100,17 +1161,6 @@ static INPUT_PORTS_START( pc9801rs )
 	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_CONFSETTING(    0x04, DEF_STR( No ) )
 INPUT_PORTS_END
-
-//static INPUT_PORTS_START( pc9801vm11 )
-//  PORT_INCLUDE( pc9801rs )
-//
-//  PORT_MODIFY("DSW3")
-//  // TODO: "CPU Add Waitstate Penalty"?
-//  // specific for PC-98DO, CV21, UV11 and VM11
-//  PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:!5")
-//  PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-//  PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-//INPUT_PORTS_END
 
 
 static const gfx_layout charset_8x8 =
@@ -2464,8 +2514,6 @@ ROM_END
 
 /*
 VM - V30 8/10
-
-missing itf roms, if they exist
 */
 
 ROM_START( pc9801vm )
@@ -2908,32 +2956,32 @@ COMP( 1984, pc9801m2,   pc9801,   0, pc9801m,   pc9801,   pc9801_state, empty_in
 // VM class (V30)
 //COMP(1985, pc9801u2
 //COMP(1985, pc9801vf2
-COMP( 1985, pc9801vm,   0,        0, pc9801vm,  pc9801rs, pc9801vm_state, init_pc9801vm_kanji, "NEC",   "PC-9801VM",                     MACHINE_NOT_WORKING ) // genuine dump
-COMP( 1986, pc9801uv2,  pc9801vm, 0, pc9801uv,  pc9801rs, pc9801vm_state, init_pc9801vm_kanji, "NEC",   "PC-9801UV2",                     MACHINE_NOT_WORKING ) // genuine dump
+COMP( 1985, pc9801vm,   0,        0, pc9801vm,  pc9801vm, pc9801vm_state, init_pc9801vm_kanji, "NEC",   "PC-9801VM",                     MACHINE_NOT_WORKING ) // genuine dump
+COMP( 1986, pc9801uv2,  pc9801vm, 0, pc9801uv,  pc9801uv, pc9801vm_state, init_pc9801vm_kanji, "NEC",   "PC-9801UV2",                     MACHINE_NOT_WORKING ) // genuine dump
 
 // VX class (i286 + V30, first model using an EGC)
 // original VX0/VX2/VX4 released in Nov 1986, minor updates with OS pre-installed etc. in 1987
 // (PC-9801VX4/WN PC-9801VX41/WN)
-COMP( 1986, pc9801vx,   0,        0, pc9801vx,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801VX",                     MACHINE_NOT_WORKING )
+COMP( 1986, pc9801vx,   0,        0, pc9801vx,  pc9801vx, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801VX",                     MACHINE_NOT_WORKING )
 
 // CV class (V30, compact version with monitor built-in like a Macintosh)
 //COMP(1988, pc9801cv
 
 // RX class (i286 + V30)
-COMP( 1987, pc9801ux,   0,        0, pc9801ux,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801UX",                     MACHINE_NOT_WORKING )
-COMP( 1988, pc9801rx,   0,        0, pc9801rs,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801RX",                     MACHINE_NOT_WORKING )
+COMP( 1987, pc9801ux,   0,        0, pc9801ux,  pc9801vx, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801UX",                     MACHINE_NOT_WORKING )
+COMP( 1988, pc9801rx,   0,        0, pc9801rs,  pc9801vx, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801RX",                     MACHINE_NOT_WORKING )
 
 // RA class (i386dx + V30)
 //COMP(1988, pc9801ra
 
 // RS class (i386sx)
-COMP( 1989, pc9801rs,   0,        0, pc9801rs,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801RS",                     0 )
+COMP( 1989, pc9801rs,   0,        0, pc9801rs,  pc9801vx, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801RS",                     0 )
 //COMP( 1991, pc9801ds
 //COMP( 1991, pc9801cs
 //COMP( 1992, pc9801fx
 
 // DX class (i286)
-COMP( 1990, pc9801dx,   0,        0, pc9801dx,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801DX",                     MACHINE_NOT_WORKING )
+COMP( 1990, pc9801dx,   0,        0, pc9801dx,  pc9801vx, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801DX",                     MACHINE_NOT_WORKING )
 
 // DA class (i386DX + SDIP and EMS)
 //COMP( 1991, pc9801da
@@ -2944,17 +2992,17 @@ COMP( 1990, pc9801dx,   0,        0, pc9801dx,  pc9801rs, pc9801vm_state, init_p
 //COMP( 1991, pc9801ur
 
 // FS class (i386SX + ?)
-COMP( 1992, pc9801fs,   0,        0, pc9801fs,  pc9801rs, pc9801us_state, init_pc9801_kanji,   "NEC",   "PC-9801FS",                     MACHINE_NOT_WORKING )
+COMP( 1992, pc9801fs,   0,        0, pc9801fs,  pc9801vx, pc9801us_state, init_pc9801_kanji,   "NEC",   "PC-9801FS",                     MACHINE_NOT_WORKING )
 
 // US class (i386SX + SDIP, optional high-reso according to BIOS? Derivatives of UX)
-COMP( 1992, pc9801us,   0,        0, pc9801us,  pc9801rs, pc9801us_state, init_pc9801_kanji,   "NEC",   "PC-9801US",                     MACHINE_NOT_WORKING )
+COMP( 1992, pc9801us,   0,        0, pc9801us,  pc9801vx, pc9801us_state, init_pc9801_kanji,   "NEC",   "PC-9801US",                     MACHINE_NOT_WORKING )
 
 // FA class (i486sx)
 //COMP( 1992, pc9801fa
 
 // BX class (i486sx2, official nickname "98 FELLOW", the lower end of PC-9821 line at this point)
 //COMP( 1993, pc9801bx
-COMP( 1993, pc9801bx2,  0,        0, pc9801bx2, pc9801rs, pc9801bx_state, init_pc9801_kanji,   "NEC",   "PC-9801BX2/U2 (98 FELLOW)",                 MACHINE_NOT_WORKING )
+COMP( 1993, pc9801bx2,  0,        0, pc9801bx2, pc9801vx, pc9801bx_state, init_pc9801_kanji,   "NEC",   "PC-9801BX2/U2 (98 FELLOW)",                 MACHINE_NOT_WORKING )
 //COMP( 1993, pc9801bx3
 //COMP( 1995, pc9801bx4
 

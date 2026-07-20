@@ -26,8 +26,10 @@ TODO (pc9821ap2):
 
 TODO (pc9821as):
 - unimplemented SDIP specific access;
-- "SYSTEM SHUTDOWN" while accessing above;
-- Update: it never goes into above after default of m_dma_access_ctrl changed to 0xfe?
+- "SYSTEM SHUTDOWN" while accessing above (does a 0xaa55 check at PC=f834f, akin
+  to ap2 stealth SRAM);
+\- Update: it never goes into above after default of m_dma_access_ctrl changed to 0xfe?
+- Eventually needs pc9821ce style sound PnP access.
 
 TODO (pc9821ce):
 - Throws random TIMER errors at POST (soft reset to bypass);
