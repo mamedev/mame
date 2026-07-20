@@ -107,7 +107,7 @@ private:
 uint32_t actfancr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// Draw playfield
-	bool flip = m_tilegen[1]->get_flip_state();
+	const bool flip = m_tilegen[1]->get_flip_state();
 	m_tilegen[0]->set_flip_screen(flip);
 	m_tilegen[1]->set_flip_screen(flip);
 	m_spritegen->set_flip_screen(flip);
