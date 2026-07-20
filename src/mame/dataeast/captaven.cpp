@@ -44,7 +44,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_sprgen(*this, "spritegen")
-		, m_deco_tilegen(*this, "tilegen%u", 1)
+		, m_tilegen(*this, "tilegen%u", 1)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
@@ -52,7 +52,7 @@ public:
 		, m_ioprot(*this, "ioprot")
 		, m_ym2151(*this, "ymsnd")
 		, m_oki(*this, "oki%u", 1)
-		, m_pf_rowscroll32(*this, "pf%u_rowscroll32", 1)
+		, m_rowscroll32(*this, "rowscroll32_%u", 1)
 		, m_io_dsw(*this, "DSW%u", 1U)
 	{ }
 
@@ -71,7 +71,7 @@ private:
 	u32 _71_r();
 	u8 captaven_soundcpu_status_r();
 
-	template<int Chip> void pf_rowscroll_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	template<int Chip> void rowscroll_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	u32 spriteram_r(offs_t offset);
 	void spriteram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -79,8 +79,8 @@ private:
 	void pri_w(u32 data);
 
 	void tile_callback(u32 &tile, u32 &colour, int layer, bool is_8x8);
-	DECO16IC_BANK_CB_MEMBER(bank_callback);
-	DECOSPR_PRIORITY_CB_MEMBER(captaven_pri_callback);
+	int bank_callback(int bank);
+	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -90,7 +90,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<decospr_device> m_sprgen;
-	required_device_array<deco16ic_device, 2> m_deco_tilegen;
+	required_device_array<deco16ic_device, 2> m_tilegen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -100,14 +100,14 @@ private:
 	required_device_array<okim6295_device, 2> m_oki;
 
 	// we use the pointers below to store a 32-bit copy..
-	required_shared_ptr_array<u32, 4> m_pf_rowscroll32;
+	required_shared_ptr_array<u32, 4> m_rowscroll32;
 
 	required_ioport_array<3> m_io_dsw;
 
 	u32 m_pri = 0;
 	std::unique_ptr<u16[]> m_spriteram16;
 	std::unique_ptr<u16[]> m_spriteram16_buffered;
-	std::unique_ptr<u16[]> m_pf_rowscroll[4]{};
+	std::unique_ptr<u16[]> m_rowscroll[4]{};
 };
 
 
@@ -164,11 +164,11 @@ void captaven_state::video_start()
 
 	for (int i = 0; i < 4; i++)
 	{
-		const u32 size = m_pf_rowscroll32[i].length();
+		const u32 size = m_rowscroll32[i].length();
 
-		m_pf_rowscroll[i] = make_unique_clear<u16[]>(size);
+		m_rowscroll[i] = make_unique_clear<u16[]>(size);
 
-		save_pointer(NAME(m_pf_rowscroll[i]), size, i);
+		save_pointer(NAME(m_rowscroll[i]), size, i);
 	}
 	save_pointer(NAME(m_spriteram16), 0x2000/4);
 	save_pointer(NAME(m_spriteram16_buffered), 0x2000/4);
@@ -205,9 +205,9 @@ void captaven_state::buffer_spriteram_w(u32 data)
 }
 
 // tattass tests these as 32-bit ram, even if only 16-bits are hooked up to the tilemap chip - does it mirror parts of the dword?
-template <int TileMap> void captaven_state::pf_rowscroll_w(offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_pf_rowscroll32[TileMap][offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf_rowscroll[TileMap][offset]); }
+template <int TileMap> void captaven_state::rowscroll_w(offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_rowscroll32[TileMap][offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_rowscroll[TileMap][offset]); }
 
-DECOSPR_PRIORITY_CB_MEMBER(captaven_state::captaven_pri_callback)
+DECOSPR_PRIORITY_CB_MEMBER(captaven_state::pri_callback)
 {
 	if ((pri & 0x60) == 0x00)
 	{
@@ -239,37 +239,37 @@ void captaven_state::tile_callback(u32 &tile, u32 &colour, int layer, bool is_8x
 	}
 }
 
-DECO16IC_BANK_CB_MEMBER(captaven_state::bank_callback)
+int captaven_state::bank_callback(int bank)
 {
 	return (bank & 0x20) << 9;
 }
 
 u32 captaven_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const u16 flip = m_deco_tilegen[0]->pf_control_r(0);
+	const u16 flip = m_tilegen[0]->control_r(0);
 	flip_screen_set(BIT(flip, 7));
 	m_sprgen->set_flip_screen(BIT(flip, 7));
 
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->pen(0x000), cliprect); // Palette index not confirmed
 
-	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0].get(), m_pf_rowscroll[1].get());
-	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2].get(), m_pf_rowscroll[3].get());
+	m_tilegen[0]->update(m_rowscroll[0].get(), m_rowscroll[1].get());
+	m_tilegen[1]->update(m_rowscroll[2].get(), m_rowscroll[3].get());
 
 	// pf4 not used (because pf3 is in 8bpp mode)
 
 	if ((m_pri & 1) == 0)
 	{
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 1);
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
+		m_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 1);
+		m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
 	}
 	else
 	{
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 1);
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
+		m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 1);
+		m_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
 	}
 
-	m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
+	m_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
 
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram16_buffered.get(), 0x400); // only low half of sprite ram is used?
 
@@ -298,17 +298,17 @@ void captaven_state::main_map(address_map &map)
 	map(0x168002, 0x168002).lr8(NAME([this] () { return m_io_dsw[2]->read(); }));
 	map(0x168003, 0x168003).r(FUNC(captaven_state::captaven_soundcpu_status_r));
 	map(0x178000, 0x178003).w(FUNC(captaven_state::pri_w));
-	map(0x180000, 0x18001f).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x180000, 0x18001f).rw(m_tilegen[0], FUNC(deco16ic_device::control32_r), FUNC(deco16ic_device::control32_w));
 	// Mirror address - bug in program code
-	map(0x190000, 0x191fff).mirror(0x2000).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x194000, 0x195fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
-	map(0x1a0000, 0x1a3fff).ram().w(FUNC(captaven_state::pf_rowscroll_w<0>)).share(m_pf_rowscroll32[0]);
-	map(0x1a4000, 0x1a5fff).ram().w(FUNC(captaven_state::pf_rowscroll_w<1>)).share(m_pf_rowscroll32[1]);
-	map(0x1c0000, 0x1c001f).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
-	map(0x1d0000, 0x1d1fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x1d4000, 0x1d5fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w)); // unused
-	map(0x1e0000, 0x1e3fff).ram().w(FUNC(captaven_state::pf_rowscroll_w<2>)).share(m_pf_rowscroll32[2]);
-	map(0x1e4000, 0x1e5fff).ram().w(FUNC(captaven_state::pf_rowscroll_w<3>)).share(m_pf_rowscroll32[3]); // unused
+	map(0x190000, 0x191fff).mirror(0x2000).rw(m_tilegen[0], FUNC(deco16ic_device::vram32_r<0>), FUNC(deco16ic_device::vram32_w<0>));
+	map(0x194000, 0x195fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram32_r<1>), FUNC(deco16ic_device::vram32_w<1>));
+	map(0x1a0000, 0x1a3fff).ram().w(FUNC(captaven_state::rowscroll_w<0>)).share(m_rowscroll32[0]);
+	map(0x1a4000, 0x1a5fff).ram().w(FUNC(captaven_state::rowscroll_w<1>)).share(m_rowscroll32[1]);
+	map(0x1c0000, 0x1c001f).rw(m_tilegen[1], FUNC(deco16ic_device::control32_r), FUNC(deco16ic_device::control32_w));
+	map(0x1d0000, 0x1d1fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram32_r<0>), FUNC(deco16ic_device::vram32_w<0>));
+	map(0x1d4000, 0x1d5fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram32_r<1>), FUNC(deco16ic_device::vram32_w<1>)); // unused
+	map(0x1e0000, 0x1e3fff).ram().w(FUNC(captaven_state::rowscroll_w<2>)).share(m_rowscroll32[2]);
+	map(0x1e4000, 0x1e5fff).ram().w(FUNC(captaven_state::rowscroll_w<3>)).share(m_rowscroll32[3]); // unused
 }
 
 void captaven_state::sound_map(address_map &map)
@@ -563,33 +563,33 @@ void captaven_state::captaven(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_captaven);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
-	DECO16IC(config, m_deco_tilegen[0]);
-	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_col_bank(0x20);
-	m_deco_tilegen[0]->set_pf2_col_bank(0x30);
-	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
-	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
+	DECO16IC(config, m_tilegen[0]);
+	m_tilegen[0]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_col_bank<0>(0x20);
+	m_tilegen[0]->set_col_bank<1>(0x30);
+	m_tilegen[0]->set_col_mask<0>(0x0f);
+	m_tilegen[0]->set_col_mask<1>(0x0f);
+	m_tilegen[0]->set_8x8_bank(0);
+	m_tilegen[0]->set_16x16_bank(1);
+	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1]);    // pf3 is in 8bpp mode, pf4 is not used
-	m_deco_tilegen[1]->set_pf1_size(DECO_32x32);
-	m_deco_tilegen[1]->set_pf2_size(DECO_32x32);
-	m_deco_tilegen[1]->set_pf1_col_bank(0x04);
-	m_deco_tilegen[1]->set_pf2_col_bank(0x00);
-	m_deco_tilegen[1]->set_pf1_col_mask(0x03);
-	m_deco_tilegen[1]->set_pf2_col_mask(0x00);
-	m_deco_tilegen[1]->set_tile_callback(FUNC(captaven_state::tile_callback));
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(captaven_state::bank_callback));
+	DECO16IC(config, m_tilegen[1]);    // pf3 is in 8bpp mode, pf4 is not used
+	m_tilegen[1]->set_size<0>(deco16ic_device::DECO_32x32);
+	m_tilegen[1]->set_size<1>(deco16ic_device::DECO_32x32);
+	m_tilegen[1]->set_col_bank<0>(0x04);
+	m_tilegen[1]->set_col_bank<1>(0x00);
+	m_tilegen[1]->set_col_mask<0>(0x03);
+	m_tilegen[1]->set_col_mask<1>(0x00);
+	m_tilegen[1]->set_tile_callback(FUNC(captaven_state::tile_callback));
+	m_tilegen[1]->set_bank_callback<0>(FUNC(captaven_state::bank_callback));
 	// no bank2 callback
-	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
-	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
+	m_tilegen[1]->set_8x8_bank(0);
+	m_tilegen[1]->set_16x16_bank(2);
+	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_SPRITE(config, m_sprgen, m_palette, gfx_captaven_spr);
-	m_sprgen->set_pri_callback(FUNC(captaven_state::captaven_pri_callback));
+	m_sprgen->set_pri_callback(FUNC(captaven_state::pri_callback));
 	m_sprgen->set_alt_format(true);
 
 	DECO146PROT(config, m_ioprot);

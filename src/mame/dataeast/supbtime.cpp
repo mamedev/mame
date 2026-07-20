@@ -87,10 +87,10 @@ public:
 	supbtime_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_spriteram(*this, "spriteram")
-		, m_pf_rowscroll(*this, "pf%u_rowscroll", 1U)
+		, m_rowscroll(*this, "rowscroll_%u", 1U)
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
-		, m_deco_tilegen(*this, "tilegen")
+		, m_tilegen(*this, "tilegen")
 		, m_sprgen(*this, "spritegen")
 	{ }
 
@@ -102,10 +102,10 @@ public:
 
 private:
 	required_shared_ptr<uint16_t> m_spriteram;
-	required_shared_ptr_array<uint16_t, 2> m_pf_rowscroll;
+	required_shared_ptr_array<uint16_t, 2> m_rowscroll;
 	required_device<cpu_device> m_maincpu;
 	required_device<h6280_device> m_audiocpu;
-	required_device<deco16ic_device> m_deco_tilegen;
+	required_device<deco16ic_device> m_tilegen;
 	required_device<decospr_device> m_sprgen;
 
 	void vblank_w(int state);
@@ -135,21 +135,21 @@ private:
 
 uint32_t supbtime_state::screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool use_offsets)
 {
-	uint16_t const flip = m_deco_tilegen->pf_control_r(0);
+	uint16_t const flip = m_tilegen->control_r(0);
 
 	flip_screen_set(BIT(flip, 7));
 	m_sprgen->set_flip_screen(BIT(flip, 7));
-	m_deco_tilegen->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
+	m_tilegen->update(m_rowscroll[0], m_rowscroll[1]);
 
 	bitmap.fill(768, cliprect);
 
 	if (use_offsets)
 	{
 		// chinatwn and tumblep are verified as needing a 1 pixel offset on the tilemaps to match original hardware (supbtime appears to not want them)
-		m_deco_tilegen->set_scrolldx(0, 0, 1, -1);
-		m_deco_tilegen->set_scrolldx(0, 1, 1, -1);
-		m_deco_tilegen->set_scrolldx(1, 0, 1, -1);
-		m_deco_tilegen->set_scrolldx(1, 1, 1, -1);
+		m_tilegen->set_scrolldx(0, 0, 1, -1);
+		m_tilegen->set_scrolldx(0, 1, 1, -1);
+		m_tilegen->set_scrolldx(1, 0, 1, -1);
+		m_tilegen->set_scrolldx(1, 1, 1, -1);
 	}
 
 	return 0;
@@ -160,9 +160,9 @@ uint32_t supbtime_state::screen_update_supbtime(screen_device &screen, bitmap_in
 {
 	screen_update_common(screen, bitmap, cliprect, false);
 
-	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
-	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -171,9 +171,9 @@ uint32_t supbtime_state::screen_update_chinatwn(screen_device &screen, bitmap_in
 {
 	screen_update_common(screen, bitmap, cliprect, true);
 
-	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
-	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -182,8 +182,8 @@ uint32_t supbtime_state::screen_update_tumblep(screen_device &screen, bitmap_ind
 {
 	screen_update_common(screen, bitmap, cliprect, true);
 
-	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 
 	return 0;
@@ -208,11 +208,11 @@ void supbtime_state::supbtime_map(address_map &map)
 	map(0x18000a, 0x18000b).r(FUNC(supbtime_state::vblank_ack_r));
 	map(0x18000a, 0x18000d).nopw(); // ?
 	map(0x1a0001, 0x1a0001).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x300000, 0x30000f).rw(m_deco_tilegen, FUNC(deco16ic_device::pf_control_r), FUNC(deco16ic_device::pf_control_w));
-	map(0x320000, 0x321fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x322000, 0x323fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x340000, 0x3407ff).ram().share(m_pf_rowscroll[0]);
-	map(0x342000, 0x3427ff).ram().share(m_pf_rowscroll[1]);
+	map(0x300000, 0x30000f).rw(m_tilegen, FUNC(deco16ic_device::control_r), FUNC(deco16ic_device::control_w));
+	map(0x320000, 0x321fff).rw(m_tilegen, FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x322000, 0x323fff).rw(m_tilegen, FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x340000, 0x3407ff).ram().share(m_rowscroll[0]);
+	map(0x342000, 0x3427ff).ram().share(m_rowscroll[1]);
 }
 
 void supbtime_state::chinatwn_map(address_map &map)
@@ -227,11 +227,11 @@ void supbtime_state::chinatwn_map(address_map &map)
 	map(0x18000a, 0x18000b).r(FUNC(supbtime_state::vblank_ack_r));
 	map(0x18000a, 0x18000d).nopw(); // ?
 	map(0x1a0000, 0x1a3fff).ram();
-	map(0x300000, 0x30000f).rw(m_deco_tilegen, FUNC(deco16ic_device::pf_control_r), FUNC(deco16ic_device::pf_control_w));
-	map(0x320000, 0x321fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x322000, 0x323fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x340000, 0x3407ff).ram().share(m_pf_rowscroll[0]); // unused
-	map(0x342000, 0x3427ff).ram().share(m_pf_rowscroll[1]); // unused
+	map(0x300000, 0x30000f).rw(m_tilegen, FUNC(deco16ic_device::control_r), FUNC(deco16ic_device::control_w));
+	map(0x320000, 0x321fff).rw(m_tilegen, FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x322000, 0x323fff).rw(m_tilegen, FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x340000, 0x3407ff).ram().share(m_rowscroll[0]); // unused
+	map(0x342000, 0x3427ff).ram().share(m_rowscroll[1]); // unused
 }
 
 void supbtime_state::tumblep_map(address_map &map)
@@ -249,11 +249,11 @@ void supbtime_state::tumblep_map(address_map &map)
 	map(0x18000a, 0x18000b).r(FUNC(supbtime_state::vblank_ack_r));
 	map(0x18000a, 0x18000d).nopw(); // ?
 	map(0x1a0000, 0x1a07ff).ram().share(m_spriteram);
-	map(0x300000, 0x30000f).w(m_deco_tilegen, FUNC(deco16ic_device::pf_control_w));
-	map(0x320000, 0x320fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x322000, 0x322fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x340000, 0x3407ff).writeonly().share(m_pf_rowscroll[0]); // unused
-	map(0x342000, 0x3427ff).writeonly().share(m_pf_rowscroll[1]); // unused
+	map(0x300000, 0x30000f).w(m_tilegen, FUNC(deco16ic_device::control_w));
+	map(0x320000, 0x320fff).rw(m_tilegen, FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x322000, 0x322fff).rw(m_tilegen, FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x340000, 0x3407ff).writeonly().share(m_rowscroll[0]); // unused
+	map(0x342000, 0x3427ff).writeonly().share(m_rowscroll[1]); // unused
 }
 
 // Physical memory map (21 bits)
@@ -473,16 +473,16 @@ void supbtime_state::supbtime(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_supbtime);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 1024);
 
-	DECO16IC(config, m_deco_tilegen);
-	m_deco_tilegen->set_pf1_size(DECO_64x32);
-	m_deco_tilegen->set_pf2_size(DECO_64x32);
-	m_deco_tilegen->set_pf1_col_bank(0x00);
-	m_deco_tilegen->set_pf2_col_bank(0x10);
-	m_deco_tilegen->set_pf1_col_mask(0x0f);
-	m_deco_tilegen->set_pf2_col_mask(0x0f);
-	m_deco_tilegen->set_pf12_8x8_bank(0);
-	m_deco_tilegen->set_pf12_16x16_bank(1);
-	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
+	DECO16IC(config, m_tilegen);
+	m_tilegen->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen->set_col_bank<0>(0x00);
+	m_tilegen->set_col_bank<1>(0x10);
+	m_tilegen->set_col_mask<0>(0x0f);
+	m_tilegen->set_col_mask<1>(0x0f);
+	m_tilegen->set_8x8_bank(0);
+	m_tilegen->set_16x16_bank(1);
+	m_tilegen->set_gfxdecode_tag("gfxdecode");
 
 	DECO_SPRITE(config, m_sprgen, "palette", gfx_supbtime_spr);
 

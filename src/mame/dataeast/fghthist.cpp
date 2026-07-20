@@ -389,9 +389,9 @@ void fghthist_common_state::buffer_spriteram_w(u32 data)
 }
 
 // tattass tests these as 32-bit ram, even if only 16-bits are hooked up to the tilemap chip - does it mirror parts of the dword?
-template <int TileMap> void fghthist_common_state::pf_rowscroll_w(offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_pf_rowscroll32[TileMap][offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf_rowscroll[TileMap][offset]); }
+template <int TileMap> void fghthist_common_state::rowscroll_w(offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_rowscroll32[TileMap][offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_rowscroll[TileMap][offset]); }
 
-DECOSPR_PRIORITY_CB_MEMBER( fghthist_state::fghthist_pri_callback )
+DECOSPR_PRIORITY_CB_MEMBER(fghthist_state::fghthist_pri_callback)
 {
 	u32 mask = GFX_PMASK_8; // under the text layer
 	if (extpri)
@@ -400,14 +400,14 @@ DECOSPR_PRIORITY_CB_MEMBER( fghthist_state::fghthist_pri_callback )
 	return mask;
 }
 
-DECO16IC_BANK_CB_MEMBER( fghthist_state::bank_callback )
+int fghthist_state::bank_callback(int bank)
 {
 	bank = (bank & 0x10) | ((bank & 0x40) >> 1) | ((bank & 0x20) << 1);
 
 	return bank << 8;
 }
 
-DECO16IC_BANK_CB_MEMBER( nslasher_state::bank_callback )
+int nslasher_state::bank_callback(int bank)
 {
 	return (bank & ~0xf) << 8;
 }
@@ -615,16 +615,16 @@ void fghthist_common_state::common_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x11ffff).ram();
 	map(0x140000, 0x140003).w(FUNC(fghthist_state::vblank_ack_w));
-	map(0x182000, 0x183fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x184000, 0x185fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
-	map(0x192000, 0x193fff).ram().w(FUNC(fghthist_state::pf_rowscroll_w<0>)).share(m_pf_rowscroll32[0]);
-	map(0x194000, 0x195fff).ram().w(FUNC(fghthist_state::pf_rowscroll_w<1>)).share(m_pf_rowscroll32[1]);
-	map(0x1a0000, 0x1a001f).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
-	map(0x1c2000, 0x1c3fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x1c4000, 0x1c5fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
-	map(0x1d2000, 0x1d3fff).ram().w(FUNC(fghthist_state::pf_rowscroll_w<2>)).share(m_pf_rowscroll32[2]);
-	map(0x1d4000, 0x1d5fff).ram().w(FUNC(fghthist_state::pf_rowscroll_w<3>)).share(m_pf_rowscroll32[3]);
-	map(0x1e0000, 0x1e001f).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x182000, 0x183fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram32_r<0>), FUNC(deco16ic_device::vram32_w<0>));
+	map(0x184000, 0x185fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram32_r<1>), FUNC(deco16ic_device::vram32_w<1>));
+	map(0x192000, 0x193fff).ram().w(FUNC(fghthist_state::rowscroll_w<0>)).share(m_rowscroll32[0]);
+	map(0x194000, 0x195fff).ram().w(FUNC(fghthist_state::rowscroll_w<1>)).share(m_rowscroll32[1]);
+	map(0x1a0000, 0x1a001f).rw(m_tilegen[0], FUNC(deco16ic_device::control32_r), FUNC(deco16ic_device::control32_w));
+	map(0x1c2000, 0x1c3fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram32_r<0>), FUNC(deco16ic_device::vram32_w<0>));
+	map(0x1c4000, 0x1c5fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram32_r<1>), FUNC(deco16ic_device::vram32_w<1>));
+	map(0x1d2000, 0x1d3fff).ram().w(FUNC(fghthist_state::rowscroll_w<2>)).share(m_rowscroll32[2]);
+	map(0x1d4000, 0x1d5fff).ram().w(FUNC(fghthist_state::rowscroll_w<3>)).share(m_rowscroll32[3]);
+	map(0x1e0000, 0x1e001f).rw(m_tilegen[1], FUNC(deco16ic_device::control32_r), FUNC(deco16ic_device::control32_w));
 	map(0x200000, 0x207fff).rw(FUNC(fghthist_state::ioprot_r), FUNC(fghthist_state::ioprot_w)).umask32(0xffff0000).share("prot32ram"); // only maps on 16-bits
 }
 
@@ -643,7 +643,7 @@ void fghthist_state::fghthisto_map(address_map &map)
 {
 	map.unmap_value_high();
 	fghthist_common_map(map);
-//  map(0x000000, 0x001fff).rom().w(FUNC(fghthist_state::pf1_data_w)); // wtf??
+//  map(0x000000, 0x001fff).rom().w(FUNC(fghthist_state::vram_w<0>)); // wtf??
 	map(0x120020, 0x120021).lr16(NAME([this] () { return m_io_in[0]->read(); }));
 	map(0x120024, 0x120025).lr16(NAME([this] () { return m_io_in[1]->read(); }));
 	map(0x120028, 0x120028).r(FUNC(fghthist_state::eeprom_r));
@@ -953,31 +953,31 @@ void fghthist_state::fghthisto(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fghthist);
 	PALETTE(config, m_palette).set_entries(2048);
 
-	DECO16IC(config, m_deco_tilegen[0]);
-	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
-	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
-	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(fghthist_state::bank_callback));
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(fghthist_state::bank_callback));
-	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
-	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
+	DECO16IC(config, m_tilegen[0]);
+	m_tilegen[0]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_col_bank<0>(0x00);
+	m_tilegen[0]->set_col_bank<1>(0x10);
+	m_tilegen[0]->set_col_mask<0>(0x0f);
+	m_tilegen[0]->set_col_mask<1>(0x0f);
+	m_tilegen[0]->set_bank_callback<0>(FUNC(fghthist_state::bank_callback));
+	m_tilegen[0]->set_bank_callback<1>(FUNC(fghthist_state::bank_callback));
+	m_tilegen[0]->set_8x8_bank(0);
+	m_tilegen[0]->set_16x16_bank(1);
+	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1]);
-	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_col_bank(0x20);
-	m_deco_tilegen[1]->set_pf2_col_bank(0x30);
-	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(fghthist_state::bank_callback));
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(fghthist_state::bank_callback));
-	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
-	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
+	DECO16IC(config, m_tilegen[1]);
+	m_tilegen[1]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_col_bank<0>(0x20);
+	m_tilegen[1]->set_col_bank<1>(0x30);
+	m_tilegen[1]->set_col_mask<0>(0x0f);
+	m_tilegen[1]->set_col_mask<1>(0x0f);
+	m_tilegen[1]->set_bank_callback<0>(FUNC(fghthist_state::bank_callback));
+	m_tilegen[1]->set_bank_callback<1>(FUNC(fghthist_state::bank_callback));
+	m_tilegen[1]->set_8x8_bank(0);
+	m_tilegen[1]->set_16x16_bank(2);
+	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_SPRITE(config, m_sprgen[0], m_palette, gfx_fghthist_spr);
 	m_sprgen[0]->set_pri_callback(FUNC(fghthist_state::fghthist_pri_callback));
@@ -1064,32 +1064,32 @@ void nslasher_state::nslasher(machine_config &config)
 
 	DECO_ACE(config, m_deco_ace);
 
-	DECO16IC(config, m_deco_tilegen[0]);
-	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
-	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
-	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(nslasher_state::bank_callback));
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(nslasher_state::bank_callback));
-	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
-	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
+	DECO16IC(config, m_tilegen[0]);
+	m_tilegen[0]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_col_bank<0>(0x00);
+	m_tilegen[0]->set_col_bank<1>(0x10);
+	m_tilegen[0]->set_col_mask<0>(0x0f);
+	m_tilegen[0]->set_col_mask<1>(0x0f);
+	m_tilegen[0]->set_bank_callback<0>(FUNC(nslasher_state::bank_callback));
+	m_tilegen[0]->set_bank_callback<1>(FUNC(nslasher_state::bank_callback));
+	m_tilegen[0]->set_8x8_bank(0);
+	m_tilegen[0]->set_16x16_bank(1);
+	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1]);
-	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_col_bank(0x20);
-	m_deco_tilegen[1]->set_pf2_col_bank(0x30);
-	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(nslasher_state::bank_callback));
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(nslasher_state::bank_callback));
-	m_deco_tilegen[1]->set_mix_callback(FUNC(nslasher_state::mix_callback));
-	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
-	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
+	DECO16IC(config, m_tilegen[1]);
+	m_tilegen[1]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_col_bank<0>(0x20);
+	m_tilegen[1]->set_col_bank<1>(0x30);
+	m_tilegen[1]->set_col_mask<0>(0x0f);
+	m_tilegen[1]->set_col_mask<1>(0x0f);
+	m_tilegen[1]->set_bank_callback<0>(FUNC(nslasher_state::bank_callback));
+	m_tilegen[1]->set_bank_callback<1>(FUNC(nslasher_state::bank_callback));
+	m_tilegen[1]->set_mix_callback(FUNC(nslasher_state::mix_callback));
+	m_tilegen[1]->set_8x8_bank(0);
+	m_tilegen[1]->set_16x16_bank(2);
+	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_SPRITE(config, m_sprgen[0], m_deco_ace, gfx_nslasher_spr1);
 	DECO_SPRITE(config, m_sprgen[1], m_deco_ace, gfx_nslasher_spr2);
@@ -1156,32 +1156,32 @@ void tattass_state::tattass(machine_config &config)
 
 	DECO_ACE(config, m_deco_ace);
 
-	DECO16IC(config, m_deco_tilegen[0]);
-	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
-	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
-	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(tattass_state::bank_callback));
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(tattass_state::bank_callback));
-	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
-	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
+	DECO16IC(config, m_tilegen[0]);
+	m_tilegen[0]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_col_bank<0>(0x00);
+	m_tilegen[0]->set_col_bank<1>(0x10);
+	m_tilegen[0]->set_col_mask<0>(0x0f);
+	m_tilegen[0]->set_col_mask<1>(0x0f);
+	m_tilegen[0]->set_bank_callback<0>(FUNC(tattass_state::bank_callback));
+	m_tilegen[0]->set_bank_callback<1>(FUNC(tattass_state::bank_callback));
+	m_tilegen[0]->set_8x8_bank(0);
+	m_tilegen[0]->set_16x16_bank(1);
+	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1]);
-	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_col_bank(0x20);
-	m_deco_tilegen[1]->set_pf2_col_bank(0x30);
-	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(tattass_state::bank_callback));
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(tattass_state::bank_callback));
-	m_deco_tilegen[1]->set_mix_callback(FUNC(tattass_state::mix_callback));
-	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
-	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
+	DECO16IC(config, m_tilegen[1]);
+	m_tilegen[1]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_col_bank<0>(0x20);
+	m_tilegen[1]->set_col_bank<1>(0x30);
+	m_tilegen[1]->set_col_mask<0>(0x0f);
+	m_tilegen[1]->set_col_mask<1>(0x0f);
+	m_tilegen[1]->set_bank_callback<0>(FUNC(tattass_state::bank_callback));
+	m_tilegen[1]->set_bank_callback<1>(FUNC(tattass_state::bank_callback));
+	m_tilegen[1]->set_mix_callback(FUNC(tattass_state::mix_callback));
+	m_tilegen[1]->set_8x8_bank(0);
+	m_tilegen[1]->set_16x16_bank(2);
+	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_SPRITE(config, m_sprgen[0], m_deco_ace, gfx_nslasher_spr1);
 	DECO_SPRITE(config, m_sprgen[1], m_deco_ace, gfx_nslasher_spr2);
