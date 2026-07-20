@@ -74,20 +74,20 @@ private:
 void madmotor_state::main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x180000, 0x180007).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control_0_w));                          // text layer
-	map(0x180010, 0x180017).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control_1_w));
-	map(0x184000, 0x18407f).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
+	map(0x180000, 0x180007).w(m_tilegen[0], FUNC(deco_bac06_device::ctrlreg_w));                          // text layer
+	map(0x180010, 0x180017).w(m_tilegen[0], FUNC(deco_bac06_device::scrollreg_w));
+	map(0x184000, 0x18407f).rw(m_tilegen[0], FUNC(deco_bac06_device::colscroll_r), FUNC(deco_bac06_device::colscroll_w));
 	map(0x184080, 0x1843ff).ram();
-	map(0x184400, 0x1847ff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
-	map(0x188000, 0x189fff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x184400, 0x1847ff).rw(m_tilegen[0], FUNC(deco_bac06_device::rowscroll_r), FUNC(deco_bac06_device::rowscroll_w));
+	map(0x188000, 0x189fff).rw(m_tilegen[0], FUNC(deco_bac06_device::vram_r), FUNC(deco_bac06_device::vram_w));
 	map(0x18c000, 0x18c001).noprw();
-	map(0x190000, 0x190007).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control_0_w));                          // text layer
-	map(0x190010, 0x190017).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control_1_w));
-	map(0x198000, 0x1987ff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x190000, 0x190007).w(m_tilegen[1], FUNC(deco_bac06_device::ctrlreg_w));                          // text layer
+	map(0x190010, 0x190017).w(m_tilegen[1], FUNC(deco_bac06_device::scrollreg_w));
+	map(0x198000, 0x1987ff).rw(m_tilegen[1], FUNC(deco_bac06_device::vram_r), FUNC(deco_bac06_device::vram_w));
 	map(0x19c000, 0x19c001).nopr();
-	map(0x1a0000, 0x1a0007).w(m_tilegen[2], FUNC(deco_bac06_device::pf_control_0_w));                          // text layer
-	map(0x1a0010, 0x1a0017).w(m_tilegen[2], FUNC(deco_bac06_device::pf_control_1_w));
-	map(0x1a4000, 0x1a4fff).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x1a0000, 0x1a0007).w(m_tilegen[2], FUNC(deco_bac06_device::ctrlreg_w));                          // text layer
+	map(0x1a0010, 0x1a0017).w(m_tilegen[2], FUNC(deco_bac06_device::scrollreg_w));
+	map(0x1a4000, 0x1a4fff).rw(m_tilegen[2], FUNC(deco_bac06_device::vram_r), FUNC(deco_bac06_device::vram_w));
 	map(0x3e0000, 0x3e3fff).ram();
 	map(0x3e8000, 0x3e87ff).ram().share(m_spriteram);
 	map(0x3f0000, 0x3f07ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
@@ -235,10 +235,10 @@ uint32_t madmotor_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_tilegen[2]->set_flip_screen(flip);
 	m_spritegen->set_flip_screen(flip);
 
-	m_tilegen[2]->deco_bac06_pf_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_tilegen[1]->deco_bac06_pf_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen[2]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_tilegen[1]->draw(screen, bitmap, cliprect, 0, 0);
 	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_spriteram, 0x800 / 2);
-	m_tilegen[0]->deco_bac06_pf_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen[0]->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

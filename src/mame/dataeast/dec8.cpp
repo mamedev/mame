@@ -70,7 +70,6 @@ TODO:
 #include "cpu/m6502/r65c02.h"
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/msm5205.h"
 #include "sound/ymopn.h"
 #include "sound/ymopl.h"
 
@@ -249,7 +248,8 @@ void csilver_state::adpcm_int(int state)
 
 u8 csilver_state::adpcm_reset_r()
 {
-	m_msm->reset_w(0);
+	if (!machine().side_effects_disabled())
+		m_msm->reset_w(0);
 	return 0;
 }
 
@@ -367,7 +367,7 @@ void lastmisn_state::shackled_map(address_map &map)
 	map(0x2000, 0x27ff).ram().w(FUNC(lastmisn_state::videoram_w));
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x37ff).ram().share("share2");
-	map(0x3800, 0x3fff).rw(FUNC(lastmisn_state::bg_ram_r), FUNC(lastmisn_state::bg_ram_w)).share("bg_ram");
+	map(0x3800, 0x3fff).rw(FUNC(lastmisn_state::bg_ram_r), FUNC(lastmisn_state::bg_ram_w)).share(m_bg_ram);
 	map(0x4000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0xffff).rom();
 }
@@ -403,9 +403,9 @@ void ghostb_state::ghostb_map(address_map &map)
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x17ff).ram();
 	map(0x1800, 0x1fff).ram().w(FUNC(ghostb_state::videoram_w)).share(m_videoram);
-	map(0x2000, 0x27ff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_data_8bit_r), FUNC(deco_bac06_device::pf_data_8bit_w));
+	map(0x2000, 0x27ff).rw(m_tilegen[0], FUNC(deco_bac06_device::vram8_r<false>), FUNC(deco_bac06_device::vram8_w<false>));
 	map(0x2800, 0x2bff).ram(); // colscroll? mirror?
-	map(0x2c00, 0x2fff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_rowscroll_8bit_r), FUNC(deco_bac06_device::pf_rowscroll_8bit_w));
+	map(0x2c00, 0x2fff).rw(m_tilegen[0], FUNC(deco_bac06_device::rowscroll8_r<false>), FUNC(deco_bac06_device::rowscroll8_w<false>));
 	map(0x3000, 0x37ff).ram().share("spriteram");
 	map(0x3800, 0x3800).portr("IN0");
 	map(0x3800, 0x3800).w(FUNC(ghostb_state::sound_w));
@@ -413,8 +413,8 @@ void ghostb_state::ghostb_map(address_map &map)
 	map(0x3802, 0x3802).portr("IN2");
 	map(0x3803, 0x3803).portr("DSW0");
 	map(0x3820, 0x3820).portr("DSW1");
-	map(0x3820, 0x3827).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control0_8bit_w));
-	map(0x3830, 0x383f).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_control1_8bit_r), FUNC(deco_bac06_device::pf_control1_8bit_w));
+	map(0x3820, 0x3827).w(m_tilegen[0], FUNC(deco_bac06_device::ctrlreg8_w));
+	map(0x3830, 0x383f).rw(m_tilegen[0], FUNC(deco_bac06_device::scrollreg8_r<false>), FUNC(deco_bac06_device::scrollreg8_w<false>));
 	map(0x3840, 0x3840).r(FUNC(ghostb_state::i8751_hi_r));
 	map(0x3840, 0x3840).w(FUNC(ghostb_state::ghostb_bank_w));
 	map(0x3860, 0x3860).r(FUNC(ghostb_state::i8751_lo_r));
@@ -428,7 +428,7 @@ void gondo_state::gondo_map(address_map &map)
 {
 	map(0x0000, 0x17ff).ram();
 	map(0x1800, 0x1fff).ram().w(FUNC(gondo_state::videoram_w)).share(m_videoram);
-	map(0x2000, 0x27ff).rw(FUNC(gondo_state::bg_ram_r), FUNC(gondo_state::bg_ram_w)).share("bg_ram");
+	map(0x2000, 0x27ff).rw(FUNC(gondo_state::bg_ram_r), FUNC(gondo_state::bg_ram_w)).share(m_bg_ram);
 	map(0x2800, 0x2bff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x2c00, 0x2fff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
 	map(0x3000, 0x37ff).ram().share("spriteram");
@@ -453,7 +453,7 @@ void ghostb_state::garyoret_map(address_map &map)
 {
 	map(0x0000, 0x17ff).ram();
 	map(0x1800, 0x1fff).ram().w(FUNC(ghostb_state::videoram_w)).share(m_videoram);
-	map(0x2000, 0x27ff).rw(FUNC(ghostb_state::bg_ram_r), FUNC(ghostb_state::bg_ram_w)).share("bg_ram");
+	map(0x2000, 0x27ff).rw(FUNC(ghostb_state::bg_ram_r), FUNC(ghostb_state::bg_ram_w)).share(m_bg_ram);
 	map(0x2800, 0x2bff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x2c00, 0x2fff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
 	map(0x3000, 0x37ff).ram().share("spriteram");
@@ -495,7 +495,7 @@ void csilver_state::main_map(address_map &map)
 	map(0x2000, 0x27ff).ram().w(FUNC(csilver_state::videoram_w));
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x37ff).ram().share("share2");
-	map(0x3800, 0x3fff).rw(FUNC(csilver_state::bg_ram_r), FUNC(csilver_state::bg_ram_w)).share("bg_ram");
+	map(0x3800, 0x3fff).rw(FUNC(csilver_state::bg_ram_r), FUNC(csilver_state::bg_ram_w)).share(m_bg_ram);
 	map(0x4000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0xffff).rom();
 }
@@ -525,7 +525,7 @@ void oscar_state::oscar_map(address_map &map)
 	map(0x0f00, 0x0fff).ram();
 	map(0x1000, 0x1fff).ram().share("share2");
 	map(0x2000, 0x27ff).ram().w(FUNC(oscar_state::videoram_w)).share(m_videoram);
-	map(0x2800, 0x2fff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_data_8bit_r), FUNC(deco_bac06_device::pf_data_8bit_w));
+	map(0x2800, 0x2fff).rw(m_tilegen[0], FUNC(deco_bac06_device::vram8_r<false>), FUNC(deco_bac06_device::vram8_w<false>));
 	map(0x3000, 0x37ff).ram().share("spriteram");
 	map(0x3800, 0x3bff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x3c00, 0x3c00).portr("IN0");
@@ -533,8 +533,8 @@ void oscar_state::oscar_map(address_map &map)
 	map(0x3c02, 0x3c02).portr("IN2");
 	map(0x3c03, 0x3c03).portr("DSW0");
 	map(0x3c04, 0x3c04).portr("DSW1");
-	map(0x3c00, 0x3c07).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control0_8bit_w));
-	map(0x3c10, 0x3c1f).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control1_8bit_w));
+	map(0x3c00, 0x3c07).w(m_tilegen[0], FUNC(deco_bac06_device::ctrlreg8_w));
+	map(0x3c10, 0x3c1f).w(m_tilegen[0], FUNC(deco_bac06_device::scrollreg8_w<false>));
 	map(0x3c80, 0x3c80).w(FUNC(oscar_state::buffer_spriteram16_w)); // DMA
 	map(0x3d00, 0x3d00).w(FUNC(oscar_state::bank_w)); // BNKS
 	map(0x3d80, 0x3d80).w(m_soundlatch, FUNC(generic_latch_8_device::write)); // SOUN
@@ -565,7 +565,7 @@ void srdarwin_state::main_map(address_map &map)
 	map(0x0600, 0x07ff).ram().share("spriteram");
 	map(0x0800, 0x0fff).ram().w(FUNC(srdarwin_state::srdarwin_videoram_w)).share(m_videoram);
 	map(0x1000, 0x13ff).ram();
-	map(0x1400, 0x17ff).rw(FUNC(srdarwin_state::bg_ram_r), FUNC(srdarwin_state::bg_ram_w)).share("bg_ram");
+	map(0x1400, 0x17ff).rw(FUNC(srdarwin_state::bg_ram_r), FUNC(srdarwin_state::bg_ram_w)).share(m_bg_ram);
 	map(0x1800, 0x1800).w(FUNC(srdarwin_state::i8751_hi_w));
 	map(0x1801, 0x1801).w(FUNC(srdarwin_state::i8751_lo_w));
 	map(0x1803, 0x1803).nopw();
@@ -595,8 +595,8 @@ void srdarwin_state::srdarwinb_map(address_map &map)
 void oscar_state::cobra_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x0800, 0x0fff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_data_8bit_r), FUNC(deco_bac06_device::pf_data_8bit_w));
-	map(0x1000, 0x17ff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_data_8bit_r), FUNC(deco_bac06_device::pf_data_8bit_w));
+	map(0x0800, 0x0fff).rw(m_tilegen[0], FUNC(deco_bac06_device::vram8_r<false>), FUNC(deco_bac06_device::vram8_w<false>));
+	map(0x1000, 0x17ff).rw(m_tilegen[1], FUNC(deco_bac06_device::vram8_r<false>), FUNC(deco_bac06_device::vram8_w<false>));
 	map(0x1800, 0x1fff).ram();
 	map(0x2000, 0x27ff).ram().w(FUNC(oscar_state::videoram_w)).share(m_videoram);
 	map(0x2800, 0x2fff).ram().share("spriteram");
@@ -606,11 +606,11 @@ void oscar_state::cobra_map(address_map &map)
 	map(0x3801, 0x3801).portr("IN1");
 	map(0x3802, 0x3802).portr("DSW0");
 	map(0x3803, 0x3803).portr("DSW1");
-	map(0x3800, 0x3807).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control0_8bit_w));
-	map(0x3810, 0x381f).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control1_8bit_w));
+	map(0x3800, 0x3807).w(m_tilegen[0], FUNC(deco_bac06_device::ctrlreg8_w));
+	map(0x3810, 0x381f).w(m_tilegen[0], FUNC(deco_bac06_device::scrollreg8_w<false>));
 	map(0x3a00, 0x3a00).portr("IN2");
-	map(0x3a00, 0x3a07).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control0_8bit_w));
-	map(0x3a10, 0x3a1f).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control1_8bit_w));
+	map(0x3a00, 0x3a07).w(m_tilegen[1], FUNC(deco_bac06_device::ctrlreg8_w));
+	map(0x3a10, 0x3a1f).w(m_tilegen[1], FUNC(deco_bac06_device::scrollreg8_w<false>));
 	map(0x3c00, 0x3c00).w(FUNC(oscar_state::bank_w));
 	map(0x3c02, 0x3c02).w(FUNC(oscar_state::buffer_spriteram16_w));
 	map(0x3e00, 0x3e00).w(m_soundlatch, FUNC(generic_latch_8_device::write));

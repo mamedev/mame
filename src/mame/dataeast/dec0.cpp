@@ -474,24 +474,24 @@ void automat_state::automat_control_w(offs_t offset, u16 data, u16 mem_mask)
 void dec0_state::dec0_map(address_map &map)
 {
 	map(0x000000, 0x05ffff).rom();
-	map(0x240000, 0x240007).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control_0_w));                          /* text layer */
-	map(0x240010, 0x240017).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control_1_w));
-	map(0x242000, 0x24207f).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
-	map(0x242400, 0x2427ff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
+	map(0x240000, 0x240007).w(m_tilegen[0], FUNC(deco_bac06_device::ctrlreg_w));                          /* text layer */
+	map(0x240010, 0x240017).w(m_tilegen[0], FUNC(deco_bac06_device::scrollreg_w));
+	map(0x242000, 0x24207f).rw(m_tilegen[0], FUNC(deco_bac06_device::colscroll_r), FUNC(deco_bac06_device::colscroll_w));
+	map(0x242400, 0x2427ff).rw(m_tilegen[0], FUNC(deco_bac06_device::rowscroll_r), FUNC(deco_bac06_device::rowscroll_w));
 	map(0x242800, 0x243fff).ram();                                                     /* Robocop only */
-	map(0x244000, 0x245fff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x244000, 0x245fff).rw(m_tilegen[0], FUNC(deco_bac06_device::vram_r), FUNC(deco_bac06_device::vram_w));
 
-	map(0x246000, 0x246007).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control_0_w));                                  /* first tile layer */
-	map(0x246010, 0x246017).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control_1_w));
-	map(0x248000, 0x24807f).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
-	map(0x248400, 0x2487ff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
-	map(0x24a000, 0x24a7ff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x246000, 0x246007).w(m_tilegen[1], FUNC(deco_bac06_device::ctrlreg_w));                                  /* first tile layer */
+	map(0x246010, 0x246017).w(m_tilegen[1], FUNC(deco_bac06_device::scrollreg_w));
+	map(0x248000, 0x24807f).rw(m_tilegen[1], FUNC(deco_bac06_device::colscroll_r), FUNC(deco_bac06_device::colscroll_w));
+	map(0x248400, 0x2487ff).rw(m_tilegen[1], FUNC(deco_bac06_device::rowscroll_r), FUNC(deco_bac06_device::rowscroll_w));
+	map(0x24a000, 0x24a7ff).rw(m_tilegen[1], FUNC(deco_bac06_device::vram_r), FUNC(deco_bac06_device::vram_w));
 
-	map(0x24c000, 0x24c007).w(m_tilegen[2], FUNC(deco_bac06_device::pf_control_0_w));                              /* second tile layer */
-	map(0x24c010, 0x24c017).w(m_tilegen[2], FUNC(deco_bac06_device::pf_control_1_w));
-	map(0x24c800, 0x24c87f).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
-	map(0x24cc00, 0x24cfff).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
-	map(0x24d000, 0x24d7ff).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x24c000, 0x24c007).w(m_tilegen[2], FUNC(deco_bac06_device::ctrlreg_w));                              /* second tile layer */
+	map(0x24c010, 0x24c017).w(m_tilegen[2], FUNC(deco_bac06_device::scrollreg_w));
+	map(0x24c800, 0x24c87f).rw(m_tilegen[2], FUNC(deco_bac06_device::colscroll_r), FUNC(deco_bac06_device::colscroll_w));
+	map(0x24cc00, 0x24cfff).rw(m_tilegen[2], FUNC(deco_bac06_device::rowscroll_r), FUNC(deco_bac06_device::rowscroll_w));
+	map(0x24d000, 0x24d7ff).rw(m_tilegen[2], FUNC(deco_bac06_device::vram_r), FUNC(deco_bac06_device::vram_w));
 
 	map(0x300000, 0x300001).portr("AN0");
 	map(0x300008, 0x300009).portr("AN1");
@@ -553,9 +553,9 @@ void hippodrm_state::sub_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
 	map(0x180000, 0x18001f).ram().share(m_sharedram);
-	map(0x1a0000, 0x1a0007).w(m_tilegen[2], FUNC(deco_bac06_device::pf_control0_8bit_packed_w));
-	map(0x1a0010, 0x1a001f).w(m_tilegen[2], FUNC(deco_bac06_device::pf_control1_8bit_swap_w));
-	map(0x1a1000, 0x1a17ff).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));
+	map(0x1a0000, 0x1a0007).w(m_tilegen[2], FUNC(deco_bac06_device::ctrlreg8_packed_w<true>));
+	map(0x1a0010, 0x1a001f).w(m_tilegen[2], FUNC(deco_bac06_device::scrollreg8_w<true>));
+	map(0x1a1000, 0x1a17ff).rw(m_tilegen[2], FUNC(deco_bac06_device::vram8_r<true>), FUNC(deco_bac06_device::vram8_w<true>));
 	map(0x1d0000, 0x1d00ff).rw(FUNC(hippodrm_state::prot_r), FUNC(hippodrm_state::prot_w));
 	map(0x1f0000, 0x1f1fff).ram(); /* Local RAM */
 }
@@ -663,33 +663,33 @@ void slyspy_state::main_map(address_map &map)
 	map(0x24a000, 0x24a001).w(FUNC(slyspy_state::prot_state_w));
 	map(0x240000, 0x24ffff).view(m_pfview);
 	// Default state (called by Traps 1, 3, 4, 7, C)
-	m_pfview[0](0x240000, 0x240007).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control_0_w));
-	m_pfview[0](0x240010, 0x240017).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control_1_w));
-	m_pfview[0](0x242000, 0x24207f).w(m_tilegen[1], FUNC(deco_bac06_device::pf_colscroll_w));
-	m_pfview[0](0x242400, 0x2427ff).w(m_tilegen[1], FUNC(deco_bac06_device::pf_rowscroll_w));
-	m_pfview[0](0x246000, 0x247fff).w(m_tilegen[1], FUNC(deco_bac06_device::pf_data_w));
-	m_pfview[0](0x248000, 0x248007).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control_0_w));
-	m_pfview[0](0x248010, 0x248017).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control_1_w));
-	m_pfview[0](0x24c000, 0x24c07f).w(m_tilegen[0], FUNC(deco_bac06_device::pf_colscroll_w));
-	m_pfview[0](0x24c400, 0x24c7ff).w(m_tilegen[0], FUNC(deco_bac06_device::pf_rowscroll_w));
-	m_pfview[0](0x24e000, 0x24ffff).w(m_tilegen[0], FUNC(deco_bac06_device::pf_data_w));
+	m_pfview[0](0x240000, 0x240007).w(m_tilegen[1], FUNC(deco_bac06_device::ctrlreg_w));
+	m_pfview[0](0x240010, 0x240017).w(m_tilegen[1], FUNC(deco_bac06_device::scrollreg_w));
+	m_pfview[0](0x242000, 0x24207f).w(m_tilegen[1], FUNC(deco_bac06_device::colscroll_w));
+	m_pfview[0](0x242400, 0x2427ff).w(m_tilegen[1], FUNC(deco_bac06_device::rowscroll_w));
+	m_pfview[0](0x246000, 0x247fff).w(m_tilegen[1], FUNC(deco_bac06_device::vram_w));
+	m_pfview[0](0x248000, 0x248007).w(m_tilegen[0], FUNC(deco_bac06_device::ctrlreg_w));
+	m_pfview[0](0x248010, 0x248017).w(m_tilegen[0], FUNC(deco_bac06_device::scrollreg_w));
+	m_pfview[0](0x24c000, 0x24c07f).w(m_tilegen[0], FUNC(deco_bac06_device::colscroll_w));
+	m_pfview[0](0x24c400, 0x24c7ff).w(m_tilegen[0], FUNC(deco_bac06_device::rowscroll_w));
+	m_pfview[0](0x24e000, 0x24ffff).w(m_tilegen[0], FUNC(deco_bac06_device::vram_w));
 	// State 1 (Called by Trap 9)
-	m_pfview[1](0x248000, 0x249fff).w(m_tilegen[0], FUNC(deco_bac06_device::pf_data_w));
-	m_pfview[1](0x24c000, 0x24dfff).w(m_tilegen[1], FUNC(deco_bac06_device::pf_data_w));
+	m_pfview[1](0x248000, 0x249fff).w(m_tilegen[0], FUNC(deco_bac06_device::vram_w));
+	m_pfview[1](0x24c000, 0x24dfff).w(m_tilegen[1], FUNC(deco_bac06_device::vram_w));
 	// State 2 (Called by Trap A)
-	m_pfview[2](0x240000, 0x241fff).w(m_tilegen[1], FUNC(deco_bac06_device::pf_data_w));
-	m_pfview[2](0x242000, 0x243fff).w(m_tilegen[0], FUNC(deco_bac06_device::pf_data_w));
-	m_pfview[2](0x24e000, 0x24ffff).w(m_tilegen[0], FUNC(deco_bac06_device::pf_data_w));
+	m_pfview[2](0x240000, 0x241fff).w(m_tilegen[1], FUNC(deco_bac06_device::vram_w));
+	m_pfview[2](0x242000, 0x243fff).w(m_tilegen[0], FUNC(deco_bac06_device::vram_w));
+	m_pfview[2](0x24e000, 0x24ffff).w(m_tilegen[0], FUNC(deco_bac06_device::vram_w));
 	// State 3 (Called by Trap B)
-	m_pfview[3](0x240000, 0x241fff).w(m_tilegen[0], FUNC(deco_bac06_device::pf_data_w));
-	m_pfview[3](0x248000, 0x249fff).w(m_tilegen[1], FUNC(deco_bac06_device::pf_data_w));
+	m_pfview[3](0x240000, 0x241fff).w(m_tilegen[0], FUNC(deco_bac06_device::vram_w));
+	m_pfview[3](0x248000, 0x249fff).w(m_tilegen[1], FUNC(deco_bac06_device::vram_w));
 
 	/* Pf3 is unaffected by protection */
-	map(0x300000, 0x300007).w(m_tilegen[2], FUNC(deco_bac06_device::pf_control_0_w));
-	map(0x300010, 0x300017).w(m_tilegen[2], FUNC(deco_bac06_device::pf_control_1_w));
-	map(0x300800, 0x30087f).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
-	map(0x300c00, 0x300fff).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
-	map(0x301000, 0x3017ff).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x300000, 0x300007).w(m_tilegen[2], FUNC(deco_bac06_device::ctrlreg_w));
+	map(0x300010, 0x300017).w(m_tilegen[2], FUNC(deco_bac06_device::scrollreg_w));
+	map(0x300800, 0x30087f).rw(m_tilegen[2], FUNC(deco_bac06_device::colscroll_r), FUNC(deco_bac06_device::colscroll_w));
+	map(0x300c00, 0x300fff).rw(m_tilegen[2], FUNC(deco_bac06_device::rowscroll_r), FUNC(deco_bac06_device::rowscroll_w));
+	map(0x301000, 0x3017ff).rw(m_tilegen[2], FUNC(deco_bac06_device::vram_r), FUNC(deco_bac06_device::vram_w));
 
 	map(0x304000, 0x307fff).ram().share(m_ram); /* Sly Spy main ram */
 	map(0x308000, 0x3087ff).ram().share("spriteram");   /* Sprites */
@@ -712,24 +712,24 @@ void dec0_state::midres_map(address_map &map)
 	map(0x180008, 0x18000f).nopw(); /* ?? watchdog ?? */
 	map(0x1a0001, 0x1a0001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
-	map(0x200000, 0x200007).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control_0_w));
-	map(0x200010, 0x200017).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control_1_w));
-	map(0x220000, 0x2207ff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
-	map(0x220800, 0x220fff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w)); /* mirror address used in end sequence */
-	map(0x240000, 0x24007f).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
-	map(0x240400, 0x2407ff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
+	map(0x200000, 0x200007).w(m_tilegen[1], FUNC(deco_bac06_device::ctrlreg_w));
+	map(0x200010, 0x200017).w(m_tilegen[1], FUNC(deco_bac06_device::scrollreg_w));
+	map(0x220000, 0x2207ff).rw(m_tilegen[1], FUNC(deco_bac06_device::vram_r), FUNC(deco_bac06_device::vram_w));
+	map(0x220800, 0x220fff).rw(m_tilegen[1], FUNC(deco_bac06_device::vram_r), FUNC(deco_bac06_device::vram_w)); /* mirror address used in end sequence */
+	map(0x240000, 0x24007f).rw(m_tilegen[1], FUNC(deco_bac06_device::colscroll_r), FUNC(deco_bac06_device::colscroll_w));
+	map(0x240400, 0x2407ff).rw(m_tilegen[1], FUNC(deco_bac06_device::rowscroll_r), FUNC(deco_bac06_device::rowscroll_w));
 
-	map(0x280000, 0x280007).w(m_tilegen[2], FUNC(deco_bac06_device::pf_control_0_w));
-	map(0x280010, 0x280017).w(m_tilegen[2], FUNC(deco_bac06_device::pf_control_1_w));
-	map(0x2a0000, 0x2a07ff).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
-	map(0x2c0000, 0x2c007f).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
-	map(0x2c0400, 0x2c07ff).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
+	map(0x280000, 0x280007).w(m_tilegen[2], FUNC(deco_bac06_device::ctrlreg_w));
+	map(0x280010, 0x280017).w(m_tilegen[2], FUNC(deco_bac06_device::scrollreg_w));
+	map(0x2a0000, 0x2a07ff).rw(m_tilegen[2], FUNC(deco_bac06_device::vram_r), FUNC(deco_bac06_device::vram_w));
+	map(0x2c0000, 0x2c007f).rw(m_tilegen[2], FUNC(deco_bac06_device::colscroll_r), FUNC(deco_bac06_device::colscroll_w));
+	map(0x2c0400, 0x2c07ff).rw(m_tilegen[2], FUNC(deco_bac06_device::rowscroll_r), FUNC(deco_bac06_device::rowscroll_w));
 
-	map(0x300000, 0x300007).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control_0_w));
-	map(0x300010, 0x300017).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control_1_w));
-	map(0x320000, 0x321fff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
-	map(0x340000, 0x34007f).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
-	map(0x340400, 0x3407ff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
+	map(0x300000, 0x300007).w(m_tilegen[0], FUNC(deco_bac06_device::ctrlreg_w));
+	map(0x300010, 0x300017).w(m_tilegen[0], FUNC(deco_bac06_device::scrollreg_w));
+	map(0x320000, 0x321fff).rw(m_tilegen[0], FUNC(deco_bac06_device::vram_r), FUNC(deco_bac06_device::vram_w));
+	map(0x340000, 0x34007f).rw(m_tilegen[0], FUNC(deco_bac06_device::colscroll_r), FUNC(deco_bac06_device::colscroll_w));
+	map(0x340400, 0x3407ff).rw(m_tilegen[0], FUNC(deco_bac06_device::rowscroll_r), FUNC(deco_bac06_device::rowscroll_w));
 }
 
 void dec0_state::midresb_map(address_map &map)
@@ -862,19 +862,19 @@ void automat_state::automat_map(address_map &map)
 	map(0x242000, 0x24207f).ram();
 	map(0x242400, 0x2427ff).ram();
 	map(0x242800, 0x243fff).ram();
-	map(0x244000, 0x245fff).ram().rw(m_tilegen[0], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x244000, 0x245fff).ram().rw(m_tilegen[0], FUNC(deco_bac06_device::vram_r), FUNC(deco_bac06_device::vram_w));
 
 	map(0x246000, 0x246007).ram();         /* first tile layer */
 	map(0x246010, 0x246017).ram();
 	map(0x248000, 0x24807f).ram();
 	map(0x248400, 0x2487ff).ram();
-	map(0x24a000, 0x24a7ff).ram().rw(m_tilegen[1], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x24a000, 0x24a7ff).ram().rw(m_tilegen[1], FUNC(deco_bac06_device::vram_r), FUNC(deco_bac06_device::vram_w));
 
 	map(0x24c000, 0x24c007).ram();         /* second tile layer */
 	map(0x24c010, 0x24c017).ram();
 	map(0x24c800, 0x24c87f).ram();
 	map(0x24cc00, 0x24cfff).ram();
-	map(0x24d000, 0x24d7ff).ram().rw(m_tilegen[2], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x24d000, 0x24d7ff).ram().rw(m_tilegen[2], FUNC(deco_bac06_device::vram_r), FUNC(deco_bac06_device::vram_w));
 
 	map(0x300000, 0x300001).portr("AN0");
 	map(0x300008, 0x300009).portr("AN1");
@@ -896,17 +896,17 @@ void automat_state::automat_map(address_map &map)
 void automat_state::secretab_map(address_map &map)
 {
 	map(0x000000, 0x05ffff).rom();
-//  map(0x240000, 0x240007).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control_0_w));
-//  map(0x240010, 0x240017).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control_1_w));
-	map(0x246000, 0x247fff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
-//  map(0x240000, 0x24007f).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
-//  map(0x240400, 0x2407ff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
+//  map(0x240000, 0x240007).w(m_tilegen[1], FUNC(deco_bac06_device::ctrlreg_w));
+//  map(0x240010, 0x240017).w(m_tilegen[1], FUNC(deco_bac06_device::scrollreg_w));
+	map(0x246000, 0x247fff).rw(m_tilegen[1], FUNC(deco_bac06_device::vram_r), FUNC(deco_bac06_device::vram_w));
+//  map(0x240000, 0x24007f).rw(m_tilegen[1], FUNC(deco_bac06_device::colscroll_r), FUNC(deco_bac06_device::colscroll_w));
+//  map(0x240400, 0x2407ff).rw(m_tilegen[1], FUNC(deco_bac06_device::rowscroll_r), FUNC(deco_bac06_device::rowscroll_w));
 
-//  map(0x200000, 0x300007).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control_0_w));
-//  map(0x300010, 0x300017).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control_1_w));
-	map(0x24e000, 0x24ffff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
-//  map(0x340000, 0x34007f).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
-//  map(0x340400, 0x3407ff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
+//  map(0x200000, 0x300007).w(m_tilegen[0], FUNC(deco_bac06_device::ctrlreg_w));
+//  map(0x300010, 0x300017).w(m_tilegen[0], FUNC(deco_bac06_device::scrollreg_w));
+	map(0x24e000, 0x24ffff).rw(m_tilegen[0], FUNC(deco_bac06_device::vram_r), FUNC(deco_bac06_device::vram_w));
+//  map(0x340000, 0x34007f).rw(m_tilegen[0], FUNC(deco_bac06_device::colscroll_r), FUNC(deco_bac06_device::colscroll_w));
+//  map(0x340400, 0x3407ff).rw(m_tilegen[0], FUNC(deco_bac06_device::rowscroll_r), FUNC(deco_bac06_device::rowscroll_w));
 
 	map(0x314008, 0x31400f).r(FUNC(automat_state::slyspy_controls_r));
 	map(0x314001, 0x314001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
@@ -915,7 +915,7 @@ void automat_state::secretab_map(address_map &map)
 	map(0x300010, 0x300017).ram();
 	map(0x300800, 0x30087f).ram();
 	map(0x300c00, 0x300fff).ram();
-	map(0x301000, 0x3017ff).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x301000, 0x3017ff).rw(m_tilegen[2], FUNC(deco_bac06_device::vram_r), FUNC(deco_bac06_device::vram_w));
 	map(0x301800, 0x307fff).ram().share(m_ram); /* Sly Spy main ram */
 	map(0x310000, 0x3107ff).rw(FUNC(automat_state::automat_palette_r), FUNC(automat_state::automat_palette_w)).share("palette");
 	map(0xb08000, 0xb08fff).ram().share("spriteram"); /* Sprites */
