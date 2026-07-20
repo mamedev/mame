@@ -7,10 +7,11 @@
 /*
  * TODO:
  * - UART is connected to MIDI port, mixer, adc
- * - jagdead: Gus utterances randomly drifts (enables both DMA controls)
+ * - jagdead: Gus Tarballs utterances randomly drifts (enables both DMA controls)
  * - tentacle: misses voice playback quite often (voice mixing?)
  * - guimo: acts weird with sound detail and frequency (really a PIT bug?)
  * - Move DSP code out, for bus/pc98_cbus/sb16_ct2720
+ * - Check dack DMAs to be against the intended line;
  *
  */
 
