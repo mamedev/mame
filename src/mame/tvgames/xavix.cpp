@@ -1486,6 +1486,14 @@ static INPUT_PORTS_START( multiplt )
 	PORT_DIPSETTING(    0x02, "TV Output")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( pl1000 )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+
+INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( tcarnavi )
@@ -2103,6 +2111,24 @@ void xavix_state::init_xavix_slowenv()
 	m_default_audio_tempo_override = 0x40;
 }
 
+void xavix_state::init_pl1000()
+{
+	init_xavix();
+
+	// this could be the earliest XaviX SoC as it doesn't seem to have an A15 line, meaning we need
+	// to mirror the ROM data so that everything appears in the correct place
+	u8 *plainrom = memregion("plainrom")->base();
+	for (int i = 0; i < m_rgnlen; i++)
+	{
+		u32 addr = bitswap<20>(i, 20, 19, 18, 17, 16, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+		m_rgn[i] = plainrom[addr]; 
+	}
+
+	// TODO: understand this better as this isn't perfect here either
+	m_sprite_xhigh_ignore_hack = 2;
+}
+
+
 /***************************************************************************
 
   Game driver(s)
@@ -2686,6 +2712,14 @@ ROM_START( multiplt )
 	ROM_LOAD( "2en1multipilotefr.u2", 0x000000, 0x200000, CRC(77f2ebf6) SHA1(0181bc7d3b6ea5a4a247ffe02fee2cb4942c1623) )
 ROM_END
 
+ROM_START( pl1000 )
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
+	// code is expanded from 'plainrom' region below
+
+	ROM_REGION( 0x100000, "plainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "video_challenger_pl-1000.u2", 0x000000, 0x100000, CRC(039e6f07) SHA1(d554976913beaa03828bd920d24ede6e433a8b4d) )
+ROM_END
+
 /* XaviX hardware titles (1st Generation)
 
     These use
@@ -2697,6 +2731,8 @@ ROM_END
     only new opcodes are callf and retf?
 
 */
+
+CONS( 1999, pl1000, 0,         0,  xavix_2mb, pl1000,xavix_state,      init_pl1000,    "Pelican Accessories / Mani Industries / Gameone Systems",             "Video Challenger (PL-1000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // product code 80-32705.
 // Some sites say 1997, but 1999 is what SSD had listed, and seems more fitting.

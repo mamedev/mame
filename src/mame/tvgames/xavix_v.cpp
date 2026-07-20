@@ -142,7 +142,9 @@ void xavix_state::spriteram_w(offs_t offset, uint8_t data)
 	{
 		m_fragment_sprite[offset] = data & 1;
 		m_fragment_sprite[offset - 0x400] = (m_fragment_sprite[offset - 0x400] & 0xfe) | (data & 0x01);
-		m_sprite_xhigh_ignore_hack = false; // still doesn't help monster truck test mode case, which writes here, but still expects values to be ignored
+
+		if (m_sprite_xhigh_ignore_hack != 2)
+			m_sprite_xhigh_ignore_hack = 0; // still doesn't help monster truck test mode case, which writes here, but still expects values to be ignored
 	}
 	else
 	{
