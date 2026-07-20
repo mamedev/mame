@@ -1128,7 +1128,7 @@ void abc806_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		const bool opaque =
 			(BIT(nib1, 3) && c1) ||
 			(BIT(nib2, 3) && c2);
-		const rgb_t color = (c1 == c2) ? pen[c1] : mix_dots(pen[c1], pen[c2], mix_mode);
+		const rgb_t color = (c1 == c2) ? rgb_t(pen[c1]) : mix_dots(rgb_t(pen[c1]), rgb_t(pen[c2]), mix_mode);
 
 		for (int d = 0; d < 2; d++)
 		{
