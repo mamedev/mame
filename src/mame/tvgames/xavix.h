@@ -1233,8 +1233,16 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
+
+	virtual void write_io1(uint8_t data, uint8_t direction) override
+	{
+		m_io1_out = data;
+	}
+
+
 	virtual uint8_t lightgun_r(offs_t offset) override;
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
+	u8 m_io1_out;
 	u8 m_which_lightgun;
 	required_ioport_array<2> m_lightgun2;
 };

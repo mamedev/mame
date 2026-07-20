@@ -2119,10 +2119,15 @@ u8 xavix_pl1000_state::lightgun_r(offs_t offset)
 {
 	u16 gunx = 0, guny = 0;
 
-	if (m_which_lightgun < 8)
+	if ((m_io1_out & 0x80) == 0)
 	{
 		gunx = m_lightgun[0]->read();
 		guny = m_lightgun[1]->read();
+	}
+	else
+	{
+		gunx = m_lightgun2[0]->read();
+		guny = m_lightgun2[1]->read();
 	}
 
 	gunx += 0x20;
@@ -2145,29 +2150,28 @@ u8 xavix_pl1000_state::lightgun_r(offs_t offset)
 void xavix_pl1000_state::machine_start()
 {
 	xavix_state::machine_start();
-	save_item(NAME(m_which_lightgun));
+	save_item(NAME(m_io1_out));
 }
 
 void xavix_pl1000_state::machine_reset()
 {
 	xavix_state::machine_reset();
-	m_which_lightgun = 0xff;
+	m_io1_out = 0x00;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(xavix_pl1000_state::scanline_cb)
 {
 	// this needs 8 ioevent_trg08 triggers per frame to read the guns
 	// where are these coming from?
-
-	if (param == 0)
-		m_which_lightgun = 0xff;
+	//
+	// guns are read on alternate frames?
+	// set by bit 0x80 of io1
 
 	if ((param >= 40) && (param <= 110))
 	{
 		if ((param % 10) == 0)
 		{
 			ioevent_trg08(1);
-			m_which_lightgun++;
 		}
 	}
 }
