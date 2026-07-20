@@ -141,10 +141,9 @@ Notes:
 
     TODO:
 
-    - abc806 PAL P4-11 memory mapper (read_pal_p4): emulate the real PAL
-      decode for 0x0000-0x77ff (m_map pages, EME, HRS F15-F18). §10 already
-      covers 7800-7FFF: M1 fetch → Options PROM (vr forced off); data R/W →
-      character/attribute RAM. Do not redirect operand fetches to ROM.
+    - abc806 PAL P4-11 mapper: m_fetch_charram still required for BASIC FG*
+      (opcode from 7800-7FFF → operand/ROM + low 30K videoram). §10 Options PROM
+      path alone is not sufficient for FGCTL/FGPOINT.
     - cassette
     - abc800 video card bus
 
@@ -1423,20 +1422,33 @@ void abc806_state::read_pal_p4(offs_t offset, bool m1l, bool xml, offs_t &m, boo
 
 	if (!m1l)
 	{
-		// §10: M1 (opcode fetch) at 7800-7FFF selects Options PROM, not videominne.
 		vr = 1;
 	}
-/*
-    if (!m1l && (offset < 0x7800)
-    {
-        // PAL P4-11: when an opcode was fetched from 7800-7fff, the 0..30k
-        // graphics window may read from banked videoram (HRS F15-F18). Not yet
-        // implemented — see TODO at top of file.
-        romd = 1;
-        hre = 1;
-        mux = 0;
-    }
-*/
+
+	// ABC 806: while executing an instruction fetched from the character RAM
+	// window (0x7800-0x7fff), the following operand and data reads must see the
+	// underlying memory instead of the text RAM.  The 0x7800-0x7fff window then
+	// reads the ROM image and the lower 30 KiB is redirected to video RAM.
+	if (m_fetch_charram && m1l && offset < 0x8000)
+	{
+		if (offset >= 0x7800)
+		{
+			romd = 0;
+			ramd = 1;
+			hre = 0;
+			vr = 1;
+			mux = 0;
+		}
+		else
+		{
+			romd = 1;
+			ramd = 1;
+			hre = 1;
+			vr = 1;
+			mux = 0;
+		}
+	}
+
 	size_t videoram_mask = m_ram->size() - 0x8001;
 
 	m = (mux ? ((map & 0x7f) << 12 | (offset & 0xfff)) : ((m_hrs & 0xf0) << 11 | (offset & 0x7fff))) & videoram_mask;
@@ -1476,6 +1488,8 @@ uint8_t abc806_state::read(offs_t offset)
 uint8_t abc806_state::m1_r(offs_t offset)
 {
 	uint8_t data = 0xff;
+
+	m_fetch_charram = offset >= 0x7800 && offset < 0x8000;
 
 	offs_t m = 0;
 	bool m1l = 0, xml = 1, romd = 0, ramd = 0, hre = 0, vr = 1;
@@ -1703,8 +1717,7 @@ void abc806_state::abc806_io(address_map &map)
 	abc800m_io(map);
 
 	map(0x06, 0x06).mirror(0xff18).w(FUNC(abc806_state::hrs_w));
-	// Replace abc800 FGCTL-style port-07 write; HRC regs use A8–A11 (§17.5 / App. A).
-	map(0x07, 0x07).mirror(0xff18).unmapw();
+	// HR palette registers 0-15: OUT (C),A with C=07 and the register in the high byte (e.g. 0x0107)
 	map(0x07, 0x07).select(0xff00).w(FUNC(abc806_state::hrc_w));
 	map(0x34, 0x34).select(0xff00).rw(FUNC(abc806_state::mai_r), FUNC(abc806_state::mao_w));
 	map(0x35, 0x35).mirror(0xff00).rw(FUNC(abc806_state::ami_r), FUNC(abc806_state::amo_w));

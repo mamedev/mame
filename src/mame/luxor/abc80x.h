@@ -282,7 +282,7 @@ public:
 		m_rtc(*this, E0516_TAG),
 		m_sto(*this, "sto"),
 		m_rad_prom(*this, "rad"),
-		m_hru2_prom(*this, "hru2"),
+		m_hru2_prom(*this, "hru"),
 		m_char_rom(*this, MC6845_TAG),
 		m_attr_ram(*this, "attr_ram", 0x800, ENDIANNESS_LITTLE),
 		m_hr_config(*this, "HR")
@@ -293,7 +293,7 @@ public:
 	required_device<e0516_device> m_rtc;
 	required_device<addressable_latch_device> m_sto;
 	required_memory_region m_rad_prom;
-	required_memory_region m_hru2_prom; // HRU II 512×4 (App. D); not HRU I ("hru")
+	required_memory_region m_hru2_prom;
 	required_memory_region m_char_rom;
 	memory_share_creator<uint8_t> m_attr_ram;
 	required_ioport m_hr_config;
