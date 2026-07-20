@@ -23,13 +23,12 @@ TODO:
 \- bp 13e51b pretends to read it back as res & 0xe0 == 0xc0
    (irq and timer A statuses high, timer B low)
 \- does plenty of non-SB16 accesses at $28d1, for delay?
-- doom: fails identification from DSP
-\- sets a speaker on command 0xd1, which throws DSP out of service host PC=131dde MCU PC=11f6
 
 Notes:
 - For debugging DSP from debugger (and convert to AT style):
-wpiset 0x2c00,0x400,w,(wpaddr & 0xff) == 0xd2,{printf "%04x %02x",((wpaddr >> 8) & 0x0f )+ 0x220, wpdata;g}
-wpiset 0x2c00,0x400,r,(wpaddr & 0xff) == 0xd2,{printf "%04x R",((wpaddr >> 8) & 0x0f )+ 0x220;g}
+wpiset 0x2c00,0x400,w,(wpaddr & 0xff) == 0xd2,{printf "%04x %02x",((wpaddr >> 8) & 0xf) + 0x220,wpdata;g}
+
+wpiset 0x2c00,0x400,r,(wpaddr & 0xff) == 0xd2,{printf "%04x R",((wpaddr >> 8) & 0x0f) + 0x220;g}
 
 
 **************************************************************************************************/
