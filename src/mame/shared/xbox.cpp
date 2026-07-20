@@ -310,15 +310,15 @@ void xbox_base_state::threadlist_command(const std::vector<std::string_view> &pa
 	con.printf("-------------------------------\n");
 	for (int pri = 0; pri < 16; pri++)
 	{
-		uint32_t curr = debugc_bios->parameter[1 - 1] + pri * 8;
-		uint32_t addr = curr;
+		offs_t curr = debugc_bios->parameter[1 - 1] + pri * 8;
+		offs_t addr = curr;
 		if (!m_maincpu->translate(AS_PROGRAM, device_memory_interface::TR_READ, addr, tspace))
 			continue;
-		uint32_t next = tspace->read_dword_unaligned(addr);
+		offs_t next = tspace->read_dword_unaligned(addr);
 
 		while ((next != curr) && (next != 0))
 		{
-			uint32_t kthrd = next - debugc_bios->parameter[2 - 1];
+			offs_t kthrd = next - debugc_bios->parameter[2 - 1];
 			if (!m_maincpu->translate(AS_PROGRAM, device_memory_interface::TR_READ, kthrd, tspace))
 				break;
 			uint32_t topstack = tspace->read_dword_unaligned(kthrd + debugc_bios->parameter[3 - 1]);

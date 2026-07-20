@@ -197,6 +197,8 @@ public:
 		m_cent_data_out(*this, "cent_data_out"),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
+		m_io_line(*this, "LINE%u", 0U),
+		m_io_line_alt(*this, "LINE%u_alt", 4U),
 		m_bank1_switching(0)
 	{
 	}
@@ -216,6 +218,8 @@ private:
 	optional_device<output_latch_device> m_cent_data_out;
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
+	optional_ioport_array<8> m_io_line;
+	optional_ioport_array<2> m_io_line_alt;
 	memory_region *m_cart_rom;
 
 	int m_tape_interrupt_enable;
@@ -301,17 +305,12 @@ void tutor_state::machine_reset()
 
 uint8_t tutor_state::key_r(offs_t offset)
 {
-	char port[12];
-	uint8_t value;
-
-	snprintf(port, std::size(port), "LINE%d", (offset & 0x007e) >> 3);
-	value = ioport(port)->read();
+	uint8_t value = m_io_line[(offset & 0x0078) >> 3]->read();
 
 	/* hack for ports overlapping with joystick */
 	if (offset >= 32 && offset < 48)
 	{
-		snprintf(port, std::size(port), "LINE%d_alt", (offset & 0x007e) >> 3);
-		value |= ioport(port)->read();
+		value |= m_io_line_alt[(offset & 0x0078) >> 3]->read();
 	}
 
 	return BIT(value, offset & 7);

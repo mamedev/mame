@@ -17,9 +17,16 @@
 #include "emu.h"
 #include "nds.h"
 
-#include <cstdarg>
+#define LOG_UNK_RD      (1U << 1)
+#define LOG_UNK_WR      (1U << 2)
+#define LOG_TIMER       (1U << 3)
+#define LOG_TIMER_EXTRA (1U << 4)
+#define LOG_SPI         (1U << 5)
+#define LOG_GAMECARD    (1U << 6)
+#define LOG_INTERRUPT   (1U << 7)
 
-#define VERBOSE_LEVEL   (0)
+#define VERBOSE         (0)
+#include "logmacro.h"
 
 // Measured value from GBATEK.  Actual crystal unknown.
 #define MASTER_CLOCK (33513982)
@@ -59,19 +66,6 @@
 
 static const uint32_t timer_clks[4] = { MASTER_CLOCK, MASTER_CLOCK / 64, MASTER_CLOCK / 256, MASTER_CLOCK / 1024 };
 
-static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, const char *s_fmt, ...)
-{
-	if( VERBOSE_LEVEL >= n_level )
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		device.logerror( "%08x: %s", device.machine().describe_context(), buf );
-	}
-}
-
 uint32_t nds_state::arm7_io_r(offs_t offset, uint32_t mem_mask)
 {
 	uint8_t temp1, temp2;
@@ -82,13 +76,11 @@ uint32_t nds_state::arm7_io_r(offs_t offset, uint32_t mem_mask)
 		case TIMER_OFFSET+2:
 		case TIMER_OFFSET+3:
 			{
-				uint32_t elapsed;
-				double time, ticks;
 				int timer = (offset - TIMER_OFFSET) + 4;
 
-				printf("Read timer reg %x (PC=%x)\n", timer, m_arm7->pc());
+				LOGMASKED(LOG_TIMER, "Read timer reg %x (PC=%x)\n", timer, m_arm7->pc());
 
-				// update times for
+				uint32_t elapsed;
 				if (m_timer_regs[timer] & 0x800000)
 				{
 					if (m_timer_regs[timer] & 0x00040000)
@@ -97,11 +89,11 @@ uint32_t nds_state::arm7_io_r(offs_t offset, uint32_t mem_mask)
 					}
 					else
 					{
-						time = 0.1; //m_tmr_timer[timer]->elapsed().as_double();
+						double time = 0.1; //m_tmr_timer[timer]->elapsed().as_double();
 
-						ticks = (double)(0x10000 - (m_timer_regs[timer] & 0xffff));
+						double ticks = (double)(0x10000 - (m_timer_regs[timer] & 0xffff));
 
-	//                  printf("time %f ticks %f 1/hz %f\n", time, ticks, 1.0 / m_timer_hz[timer]);
+						LOGMASKED(LOG_TIMER_EXTRA, "time %f ticks %f 1/hz %f\n", time, ticks, 1.0 / m_timer_hz[timer]);
 
 						time *= ticks;
 						time /= (1.0 / m_timer_hz[timer]);
@@ -109,11 +101,11 @@ uint32_t nds_state::arm7_io_r(offs_t offset, uint32_t mem_mask)
 						elapsed = (uint32_t)time;
 					}
 
-//                  printf("elapsed = %x\n", elapsed);
+					LOGMASKED(LOG_TIMER_EXTRA, "elapsed = %x\n", elapsed);
 				}
 				else
 				{
-//                  printf("Reading inactive timer!\n");
+					LOGMASKED(LOG_TIMER_EXTRA, "Reading inactive timer!\n");
 					elapsed = 0;
 				}
 
@@ -134,27 +126,23 @@ uint32_t nds_state::arm7_io_r(offs_t offset, uint32_t mem_mask)
 			return m_arm7_ipcsync;
 
 		case AUX_SPI_CNT_OFFSET:
-			printf("arm7: read AUX_SPI_CNT mask %08x\n", mem_mask);
+			LOGMASKED(LOG_SPI, "arm7: read AUX_SPI_CNT mask %08x\n", mem_mask);
 			return 0;
-			break;
 
 		case GAMECARD_BUS_CTRL_OFFSET:
-			//printf("arm7: read GAMECARD_BUS_CTRL (%08x) mask %08x\n", m_gamecard_ctrl, mem_mask);
+			LOGMASKED(LOG_GAMECARD, "arm7: read GAMECARD_BUS_CTRL (%08x) mask %08x\n", m_gamecard_ctrl, mem_mask);
 			return m_gamecard_ctrl;
-			break;
 
 		case GAMECARD_DATA_OFFSET:
-			printf("arm7: read to GAMECARD_DATA mask %08x\n", mem_mask);
+			LOGMASKED(LOG_GAMECARD, "arm7: read to GAMECARD_DATA mask %08x\n", mem_mask);
 			return 0xffffffff;
-			break;
 
 		case GAMECARD_DATA_2_OFFSET:
-			printf("arm7: read to GAMECARD_DATA2 mask %08x\n", mem_mask);
+			LOGMASKED(LOG_GAMECARD, "arm7: read to GAMECARD_DATA2 mask %08x\n", mem_mask);
 			return 0xffffffff;
-			break;
 
 		case GAMECARD_DATA_IN_OFFSET:
-			//printf("arm7: read to GAMECARD_DATA_IN mask %08x (len = %x)\n", mem_mask, m_cartdata_len);
+			LOGMASKED(LOG_GAMECARD, "arm7: read to GAMECARD_DATA_IN mask %08x (len = %x)\n", mem_mask, m_cartdata_len);
 			if (m_cartdata_len >= 4)
 			{
 				m_cartdata_len -= 4;
@@ -166,17 +154,15 @@ uint32_t nds_state::arm7_io_r(offs_t offset, uint32_t mem_mask)
 
 			if (m_cartdata_len == 0)
 			{
-				printf("NDS: xfer over\n");
+				LOGMASKED(LOG_GAMECARD, "NDS: xfer over\n");
 				m_gamecard_ctrl &= ~GAMECARD_DATA_READY;
 				m_gamecard_ctrl &= ~GAMECARD_BLOCK_BUSY;
 			}
 			return 0xffffffff;
-			break;
 
 		case SPI_CTRL_OFFSET:
-			//printf("arm7: read SPI_CTRL mask %08x\n", mem_mask);
+			LOGMASKED(LOG_SPI, "arm7: read SPI_CTRL mask %08x\n", mem_mask);
 			return 0;
-			break;
 
 		case POSTFLG_OFFSET:
 			/* Bit   Use
@@ -190,7 +176,7 @@ uint32_t nds_state::arm7_io_r(offs_t offset, uint32_t mem_mask)
 			return (m_wramcnt << 8) | temp1 | temp2;
 
 		default:
-			verboselog(*this, 0, "[ARM7] [IO] Unknown read: %08x (%08x)\n", offset*4, mem_mask);
+			LOGMASKED(LOG_UNK_RD, "[ARM7] [IO] Unknown read: %08x (%08x)\n", offset*4, mem_mask);
 			break;
 	}
 
@@ -206,16 +192,11 @@ void nds_state::arm7_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		case TIMER_OFFSET+2:
 		case TIMER_OFFSET+3:
 			{
-				double rate, clocksel;
-				uint32_t old_timer_regs;
-
 				int timer = (offset - TIMER_OFFSET)+4;
-
-				old_timer_regs = m_timer_regs[timer];
-
+				uint32_t old_timer_regs = m_timer_regs[timer];
 				m_timer_regs[timer] = (m_timer_regs[timer] & ~(mem_mask & 0xFFFF0000)) | (data & (mem_mask & 0xFFFF0000));
 
-				printf("%08x to timer %d (mask %08x PC %x)\n", data, timer, ~mem_mask, m_arm7->pc());
+				LOGMASKED(LOG_TIMER, "%08x to timer %d (mask %08x PC %x)\n", data, timer, ~mem_mask, m_arm7->pc());
 
 				if (ACCESSING_BITS_0_15)
 				{
@@ -226,29 +207,24 @@ void nds_state::arm7_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 				// enabling this timer?
 				if ((ACCESSING_BITS_16_31) && (data & 0x800000))
 				{
-					double final;
-
 					if ((old_timer_regs & 0x00800000) == 0) // start bit 0 -> 1
 					{
 						m_timer_regs[timer] = (m_timer_regs[timer] & 0xFFFF0000) | (m_timer_reload[timer] & 0x0000FFFF);
 					}
 
-					rate = 0x10000 - (m_timer_regs[timer] & 0xffff);
+					double rate = 0x10000 - (m_timer_regs[timer] & 0xffff);
+					double clocksel = timer_clks[(m_timer_regs[timer] >> 16) & 3];
+					double hz = clocksel / rate;
 
-					clocksel = timer_clks[(m_timer_regs[timer] >> 16) & 3];
-
-					final = clocksel / rate;
-
-					m_timer_hz[timer] = final;
-
+					m_timer_hz[timer] = hz;
 					m_timer_recalc[timer] = 0;
 
-					printf("Enabling timer %d @ %f Hz regs %08x\n", timer, final, m_timer_regs[timer]);
+					LOGMASKED(LOG_TIMER_EXTRA, "Enabling timer %d @ %f Hz regs %08x\n", timer, hz, m_timer_regs[timer]);
 
 					// enable the timer
 					if( !(data & 0x40000) ) // if we're not in Count-Up mode
 					{
-						attotime time = attotime::from_hz(final);
+						attotime time = attotime::from_hz(hz);
 						m_tmr_timer[timer]->adjust(time, timer, time);
 					}
 				}
@@ -256,12 +232,12 @@ void nds_state::arm7_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			break;
 
 		case IME_OFFSET:
-			printf("ARM7: %08x to IME\n", data);
+			LOGMASKED(LOG_INTERRUPT, "ARM7: %08x to IME\n", data);
 			COMBINE_DATA(&m_ime[1]);
 			break;
 
 		case IE_OFFSET:
-			printf("ARM7: %08x to IE\n", data);
+			LOGMASKED(LOG_INTERRUPT, "ARM7: %08x to IE\n", data);
 			COMBINE_DATA(&m_ie[1]);
 			break;
 
@@ -270,7 +246,7 @@ void nds_state::arm7_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			break;
 
 		case IPCSYNC_OFFSET:
-			//printf("ARM7: %x to IPCSYNC\n", data);
+			LOGMASKED(LOG_INTERRUPT, "ARM7: %x to IPCSYNC\n", data);
 			m_arm9_ipcsync &= ~0xf;
 			m_arm9_ipcsync |= ((data >> 8) & 0xf);
 			m_arm7_ipcsync &= 0xf;
@@ -278,18 +254,17 @@ void nds_state::arm7_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			break;
 
 		case AUX_SPI_CNT_OFFSET:
-			//printf("arm7: %08x to AUX_SPI_CNT mask %08x\n", data, mem_mask);
+			LOGMASKED(LOG_SPI, "arm7: %08x to AUX_SPI_CNT mask %08x\n", data, mem_mask);
 			m_spicnt &= 0x0080;
 			m_spicnt |= (data & 0xe043);
-
 			break;
 
 		case GAMECARD_BUS_CTRL_OFFSET:
-			//printf("arm7: %08x to GAMECARD_BUS_CTRL mask %08x\n", data, mem_mask);
+			LOGMASKED(LOG_GAMECARD, "arm7: %08x to GAMECARD_BUS_CTRL mask %08x\n", data, mem_mask);
 			m_gamecard_ctrl &= GAMECARD_DATA_READY;
 			m_gamecard_ctrl |= (data & ~GAMECARD_DATA_READY);
 
-			if (!(m_spicnt & (1<<15)))
+			if (!BIT(m_spicnt, 15))
 			{
 				return;
 			}
@@ -308,7 +283,7 @@ void nds_state::arm7_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			{
 				m_cartdata_len = 256 << m_cartdata_len;
 			}
-			printf("nds: cartdata for transfer = %x\n", m_cartdata_len);
+			LOGMASKED(LOG_GAMECARD, "nds: cartdata for transfer = %x\n", m_cartdata_len);
 
 			if (m_cartdata_len > 0)
 			{
@@ -316,22 +291,22 @@ void nds_state::arm7_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			else
 			{
-				printf("NDS: xfer over\n");
+				LOGMASKED(LOG_GAMECARD, "NDS: xfer over\n");
 				m_gamecard_ctrl &= ~GAMECARD_DATA_READY;
 				m_gamecard_ctrl &= ~GAMECARD_BLOCK_BUSY;
 			}
 			break;
 
 		case GAMECARD_DATA_OFFSET:
-			//printf("arm7: %08x to GAMECARD_DATA mask %08x\n", data, mem_mask);
+			LOGMASKED(LOG_GAMECARD, "arm7: %08x to GAMECARD_DATA mask %08x\n", data, mem_mask);
 			break;
 
 		case GAMECARD_DATA_2_OFFSET:
-			//printf("arm7: %08x to GAMECARD_DATA2 mask %08x\n", data, mem_mask);
+			LOGMASKED(LOG_GAMECARD, "arm7: %08x to GAMECARD_DATA2 mask %08x\n", data, mem_mask);
 			break;
 
 		case SPI_CTRL_OFFSET:
-			//printf("arm7: %08x to SPI_CTRL mask %08x\n", data, mem_mask);
+			LOGMASKED(LOG_SPI, "arm7: %08x to SPI_CTRL mask %08x\n", data, mem_mask);
 			break;
 
 		case POSTFLG_OFFSET:
@@ -348,14 +323,14 @@ void nds_state::arm7_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			{
 				if ((data>>8) & 0x80)
 				{
-					printf("arm7: HALT\n"); // halts the arm7 until an interrupt occurs
+					LOGMASKED(LOG_INTERRUPT, "arm7: HALT\n"); // halts the arm7 until an interrupt occurs
 					m_arm7->suspend(SUSPEND_REASON_HALT, 1);
 					m_arm7halted = true;
 				}
 			}
 			break;
 		default:
-			verboselog(*this, 0, "[ARM7] [IO] Unknown write: %08x = %08x (%08x)\n", offset*4, data, mem_mask);
+			LOGMASKED(LOG_UNK_WR, "[ARM7] [IO] Unknown write: %08x = %08x (%08x)\n", offset*4, data, mem_mask);
 			break;
 	}
 }
@@ -369,13 +344,11 @@ uint32_t nds_state::arm9_io_r(offs_t offset, uint32_t mem_mask)
 		case TIMER_OFFSET+2:
 		case TIMER_OFFSET+3:
 			{
-				uint32_t elapsed;
-				double time, ticks;
 				int timer = (offset - TIMER_OFFSET);
 
-				//printf("Read timer reg %x (PC=%x)\n", timer, m_arm9->pc());
+				LOGMASKED(LOG_TIMER, "Read timer reg %x (PC=%x)\n", timer, m_arm9->pc());
 
-				// update times for
+				uint32_t elapsed;
 				if (m_timer_regs[timer] & 0x800000)
 				{
 					if (m_timer_regs[timer] & 0x00040000)
@@ -384,11 +357,11 @@ uint32_t nds_state::arm9_io_r(offs_t offset, uint32_t mem_mask)
 					}
 					else
 					{
-						time = 0.1; //m_tmr_timer[timer]->elapsed().as_double();
+						double time = 0.1; //m_tmr_timer[timer]->elapsed().as_double();
 
-						ticks = (double)(0x10000 - (m_timer_regs[timer] & 0xffff));
+						double ticks = (double)(0x10000 - (m_timer_regs[timer] & 0xffff));
 
-	//                  printf("time %f ticks %f 1/hz %f\n", time, ticks, 1.0 / m_timer_hz[timer]);
+						LOGMASKED(LOG_TIMER_EXTRA, "time %f ticks %f 1/hz %f\n", time, ticks, 1.0 / m_timer_hz[timer]);
 
 						time *= ticks;
 						time /= (1.0 / m_timer_hz[timer]);
@@ -396,11 +369,11 @@ uint32_t nds_state::arm9_io_r(offs_t offset, uint32_t mem_mask)
 						elapsed = (uint32_t)time;
 					}
 
-//                  printf("elapsed = %x\n", elapsed);
+					LOGMASKED(LOG_TIMER_EXTRA, "elapsed = %x\n", elapsed);
 				}
 				else
 				{
-//                  printf("Reading inactive timer!\n");
+					LOGMASKED(LOG_TIMER_EXTRA, "Reading inactive timer!\n");
 					elapsed = 0;
 				}
 
@@ -427,7 +400,7 @@ uint32_t nds_state::arm9_io_r(offs_t offset, uint32_t mem_mask)
 			*/
 			return m_arm9_postflg;
 		default:
-			verboselog(*this, 0, "[ARM9] [IO] Unknown read: %08x (%08x)\n", offset*4, mem_mask);
+			LOGMASKED(LOG_UNK_RD, "[ARM9] [IO] Unknown read: %08x (%08x)\n", offset*4, mem_mask);
 			break;
 	}
 
@@ -443,16 +416,11 @@ void nds_state::arm9_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		case TIMER_OFFSET+2:
 		case TIMER_OFFSET+3:
 			{
-				double rate, clocksel;
-				uint32_t old_timer_regs;
-
 				int timer = (offset - TIMER_OFFSET)+4;
-
-				old_timer_regs = m_timer_regs[timer];
-
+				uint32_t old_timer_regs = m_timer_regs[timer];
 				m_timer_regs[timer] = (m_timer_regs[timer] & ~(mem_mask & 0xFFFF0000)) | (data & (mem_mask & 0xFFFF0000));
 
-				printf("%x to timer %d (mask %x PC %x)\n", data, timer, ~mem_mask, m_arm9->pc());
+				LOGMASKED(LOG_TIMER, "%x to timer %d (mask %x PC %x)\n", data, timer, ~mem_mask, m_arm9->pc());
 
 				if (ACCESSING_BITS_0_15)
 				{
@@ -463,29 +431,24 @@ void nds_state::arm9_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 				// enabling this timer?
 				if ((ACCESSING_BITS_16_31) && (data & 0x800000))
 				{
-					double final;
-
 					if ((old_timer_regs & 0x00800000) == 0) // start bit 0 -> 1
 					{
 						m_timer_regs[timer] = (m_timer_regs[timer] & 0xFFFF0000) | (m_timer_reload[timer] & 0x0000FFFF);
 					}
 
-					rate = 0x10000 - (m_timer_regs[timer] & 0xffff);
+					double rate = 0x10000 - (m_timer_regs[timer] & 0xffff);
+					double clocksel = timer_clks[(m_timer_regs[timer] >> 16) & 3];
+					double hz = clocksel / rate;
 
-					clocksel = timer_clks[(m_timer_regs[timer] >> 16) & 3];
-
-					final = clocksel / rate;
-
-					m_timer_hz[timer] = final;
-
+					m_timer_hz[timer] = hz;
 					m_timer_recalc[timer] = 0;
 
-					printf("Enabling timer %d @ %f Hz\n", timer, final);
+					LOGMASKED(LOG_TIMER_EXTRA, "Enabling timer %d @ %f Hz\n", timer, hz);
 
 					// enable the timer
-					if( !(data & 0x40000) ) // if we're not in Count-Up mode
+					if (!BIT(data, 18)) // if we're not in Count-Up mode
 					{
-						attotime time = attotime::from_hz(final);
+						attotime time = attotime::from_hz(hz);
 						m_tmr_timer[timer]->adjust(time, timer, time);
 					}
 				}
@@ -493,12 +456,12 @@ void nds_state::arm9_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			break;
 
 		case IME_OFFSET:
-			printf("ARM9: %08x to IME\n", data);
+			LOGMASKED(LOG_INTERRUPT, "ARM9: %08x to IME\n", data);
 			COMBINE_DATA(&m_ime[0]);
 			break;
 
 		case IE_OFFSET:
-			printf("ARM9: %08x to IE\n", data);
+			LOGMASKED(LOG_INTERRUPT, "ARM9: %08x to IE\n", data);
 			COMBINE_DATA(&m_ie[0]);
 			break;
 
@@ -507,7 +470,7 @@ void nds_state::arm9_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			break;
 
 		case IPCSYNC_OFFSET:
-			printf("ARM9: %x to IPCSYNC\n", data);
+			LOGMASKED(LOG_INTERRUPT, "ARM9: %x to IPCSYNC\n", data);
 			m_arm7_ipcsync &= ~0xf;
 			m_arm7_ipcsync |= ((data >> 8) & 0xf);
 			m_arm9_ipcsync &= 0xf;
@@ -579,7 +542,7 @@ void nds_state::arm9_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			m_arm9_postflg |= data & POSTFLG_RAM_MASK;
 			break;
 		default:
-			verboselog(*this, 0, "[ARM7] [IO] Unknown write: %08x = %08x (%08x)\n", offset*4, data, mem_mask);
+			LOGMASKED(LOG_UNK_WR, "[ARM7] [IO] Unknown write: %08x = %08x (%08x)\n", offset*4, data, mem_mask);
 			break;
 	}
 }
@@ -864,7 +827,7 @@ TIMER_CALLBACK_MEMBER(nds_state::timer_expire)
 	uintptr_t tmr = (uintptr_t) param;
 	int cpu = (tmr > 4) ? 1 : 0;
 
-	verboselog(*this, 1, "Timer %d expired\n", (int)tmr);
+	LOGMASKED(LOG_TIMER_EXTRA, "Timer %d expired\n", (int)tmr);
 
 	// "The reload value is copied into the counter only upon following two situations: Automatically upon timer overflows,"
 	// "or when the timer start bit becomes changed from 0 to 1."

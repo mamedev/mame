@@ -481,7 +481,7 @@ void adsp21062_device::build_opcode_table()
 
 /*****************************************************************************/
 
-void adsp21062_device::external_iop_write(uint32_t address, uint32_t data)
+void adsp21062_device::external_iop_write(offs_t address, uint32_t data)
 {
 	// host packing mode used to determine width of external host bus width (16/32)
 	// if writing to external port DMA buffer, just write the data directly;
@@ -514,7 +514,7 @@ void adsp21062_device::external_iop_write(uint32_t address, uint32_t data)
 	}
 }
 
-void adsp21062_device::external_dma_write(uint32_t address, uint64_t data)
+void adsp21062_device::external_dma_write(offs_t address, uint64_t data)
 {
 	/*
 	All addresses in the 17-bit index registers are offset by 0x0002 0000, the
