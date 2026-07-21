@@ -223,7 +223,7 @@ u8 bigbord2_sasi_host_device::status_r()
 	if (ctrl & S_MSG) d |= 0x08;   // MSG
 	if (ctrl & S_CTL) d |= 0x20;   // C/D
 	if (ctrl & S_REQ) d |= 0x80;   // REQ -- the DMA-variant ST412 BIOS polls D9 bit7
-	                               // (REQBIT); the INIR cbios masks it off (0x2b/0x21)
+								   // (REQBIT); the INIR cbios masks it off (0x2b/0x21)
 	return d;
 }
 

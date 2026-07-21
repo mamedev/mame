@@ -134,7 +134,7 @@ void cpzodiac_state::main_map(address_map &map)
 	map(0xa000, 0xbfff).ram();
 	map(0xc000, 0xdfff).ram().share("vram"); // video?
 	map(0xe000, 0xe00f).rw("io", FUNC(te7750_device::read), FUNC(te7750_device::write));
-//	map(0xe016, 0xe017).ram(); SED1351F data/address lines, r/w?
+//  map(0xe016, 0xe017).ram(); SED1351F data/address lines, r/w?
 	map(0xe020, 0xe020).w("syt", FUNC(tc0140syt_device::master_port_w));
 	map(0xe021, 0xe021).rw("syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 }

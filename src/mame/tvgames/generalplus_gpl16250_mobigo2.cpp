@@ -2,9 +2,9 @@
 // copyright-holders:David Haywood
 
 /*
-	Known Undumped:
-	MobiGo 2 (USA, English)
-	MobiGo 2 (UK and Australia, English)
+    Known Undumped:
+    MobiGo 2 (USA, English)
+    MobiGo 2 (UK and Australia, English)
     MobiGo 2 (Canada, English)
 */
 
@@ -71,7 +71,7 @@ void generalplus_mobigo2_state::mobigo2(machine_config &config)
 
 
 ROM_START( mobigo2 )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00)	// appears to be the boot ROM, has GPspispi header
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00) // appears to be the boot ROM, has GPspispi header
 	ROM_LOAD16_WORD_SWAP( "n25s16.u3", 0x00000, 0x200000, CRC(dfbf5029) SHA1(2a079ddd8a13c5f3d8f40fa6d6c3de2dc1573449) )
 
 	ROM_REGION( 0x8400000, "nandrom", ROMREGION_ERASE00 ) // no GPnandnand header so not a boot device

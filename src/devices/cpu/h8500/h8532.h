@@ -32,7 +32,7 @@ public:
 	auto write_port6() { return m_write_port[PORT_6].bind(); }
 	auto read_port7() { return m_read_port[PORT_7].bind(); }
 	auto write_port7() { return m_write_port[PORT_7].bind(); }
-	auto read_port8() { return m_read_port[PORT_8].bind(); }	// port 8 is read-only on the H8/532
+	auto read_port8() { return m_read_port[PORT_8].bind(); }    // port 8 is read-only on the H8/532
 	auto read_port9() { return m_read_port[PORT_9].bind(); }
 	auto write_port9() { return m_write_port[PORT_9].bind(); }
 

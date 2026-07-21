@@ -297,7 +297,7 @@ void flashbeats_state::machine_reset()
 }
 
 // Publish the 5 LED lanes as named artwork outputs, consumed by the .lay. The
-// lanes are built from TWO on/off planes in display RAM, both 5 rows of 
+// lanes are built from TWO on/off planes in display RAM, both 5 rows of
 // 0x60 (96) bytes (one row per lane), cells at even byte offsets (2-byte stride
 // [value][pad]):
 //   * P0 (0xa0c000): the RED content
@@ -579,7 +579,7 @@ void flashbeats_state::scsp_irq(offs_t offset, uint8_t data)
 // Input mappings
 // 3 bits seem genuinely dead (scanner never reads them) and left PORT_BIT(..., IPT_UNUSED).
 static INPUT_PORTS_START( flashbeats )
-	// 315-5296 port A -- @0x400000.		
+	// 315-5296 port A -- @0x400000.
 	PORT_START("IN_A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P2 Attack 1") PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P2 Attack 2") PORT_PLAYER(2)
@@ -601,7 +601,7 @@ static INPUT_PORTS_START( flashbeats )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW ) PORT_NAME("Test")  // TEST button (menu open/select)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service")  // SERVICE button (credit + menu advance)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Select 1 (Up)") PORT_PLAYER(1) 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Select 1 (Up)") PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Select 2 (Down)") PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unconfirmed, not a dead line

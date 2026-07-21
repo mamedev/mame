@@ -123,7 +123,7 @@ private:
 	u16 cs_bank_space_r(offs_t offset);
 	void cs_bank_space_w(offs_t offset, u16 data);
 
-	template<int Timer>	TIMER_DEVICE_CALLBACK_MEMBER(timer_cb);
+	template<int Timer> TIMER_DEVICE_CALLBACK_MEMBER(timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(scheduler_cb);
 
 	u16 unk_r(offs_t offset);

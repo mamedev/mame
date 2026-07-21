@@ -17,7 +17,7 @@
   Data East:
     Joe & Mac Returns (Japanese version called Caveman Ninja 2 might exist)
     Chain Reaction / Magical Drop / Magical Drop Plus 1
-	- Reset with Player 1 & 2 start button held to display version info
+    - Reset with Player 1 & 2 start button held to display version info
 
   Mitchell games:
     Charlie Ninja

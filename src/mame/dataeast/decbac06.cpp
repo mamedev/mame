@@ -79,7 +79,7 @@ deco_bac06_device::deco_bac06_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, DECO_BAC06, tag, owner, clock)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 	// 0x2000 is the maximum needed, some games / chip setups map less and mirror - stadium hero banks this to 0x4000?!
-	, m_vram(*this, "vram", 0x4000U, ENDIANNESS_BIG) 
+	, m_vram(*this, "vram", 0x4000U, ENDIANNESS_BIG)
 	, m_rowscroll(*this, "rowscroll", 0x2000U, ENDIANNESS_BIG)
 	, m_colscroll(*this, "colscroll", 0x2000U, ENDIANNESS_BIG)
 	, m_tile_cb(*this)

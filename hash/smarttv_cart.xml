@@ -148,7 +148,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="cars2it" supported="no"> <!-- checksum matches header -->
 		<description>Disney/Pixar Cars 2 (Italy)</description>
 		<year>200?</year>

@@ -2,27 +2,27 @@
 // copyright-holders:Devin Acker
 
 /***************************************************************************
-	Akai S612, S700, X7000 samplers
+    Akai S612, S700, X7000 samplers
 
-	These early Akai samplers share a 6-voice sound hardware design based around
-	two 8253 (or 8254) timers each clocking an 8237 DMA controller into a 12-bit DAC.
-	Two more 8253s also clock a total of six MF6CN-50 lowpass filter ICs (one per voice).
-	The S700 and X7000 expand the sampling capacity via bank switching.
+    These early Akai samplers share a 6-voice sound hardware design based around
+    two 8253 (or 8254) timers each clocking an 8237 DMA controller into a 12-bit DAC.
+    Two more 8253s also clock a total of six MF6CN-50 lowpass filter ICs (one per voice).
+    The S700 and X7000 expand the sampling capacity via bank switching.
 
-	All three models support Quick Disk loading and saving.
-	The S612 uses a separate disk drive unit based around a Z80 SIO and discrete logic.
-	The S700 and X7000 instead have a built-in drive controlled by a 8251 and MB87013.
+    All three models support Quick Disk loading and saving.
+    The S612 uses a separate disk drive unit based around a Z80 SIO and discrete logic.
+    The S700 and X7000 instead have a built-in drive controlled by a 8251 and MB87013.
 
-	The S612 also supports Commodore Datasette tape units, but the physical connector was
-	removed early in production. The Aug. 1985 service bulletin cites "the unfavorable
-	popularity of Commodore type cassette data recorder" [sic].	Both firmware versions
-	support it if present, though.
+    The S612 also supports Commodore Datasette tape units, but the physical connector was
+    removed early in production. The Aug. 1985 service bulletin cites "the unfavorable
+    popularity of Commodore type cassette data recorder" [sic]. Both firmware versions
+    support it if present, though.
 
-	TODO:
-	- output & input filters
-	- layouts
-	- S612 analog dials/sliders
-	- disk support
+    TODO:
+    - output & input filters
+    - layouts
+    - S612 analog dials/sliders
+    - disk support
 
 ***************************************************************************/
 #include "emu.h"
@@ -58,7 +58,7 @@
 #include <algorithm>
 
 namespace {
-	
+
 class s612_state : public driver_device
 {
 public:
@@ -1025,7 +1025,7 @@ static INPUT_PORTS_START( x7000 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("B6")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("C7")
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
-		
+
 	PORT_START("PITCH")
 	PORT_BIT( 0x1ff, 0x100, IPT_PADDLE ) PORT_NAME("Pitch Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CODE_DEC(JOYCODE_Y_DOWN_SWITCH) PORT_CODE_INC(JOYCODE_Y_UP_SWITCH)
 

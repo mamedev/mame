@@ -2546,7 +2546,7 @@ void aristmk5_state::aristmk5(machine_config &config)
 	ns16450_device &uart3a(NS16450(config, "uart_3a", MASTER_CLOCK / 9));
 	uart3a.out_int_callback().set("comm_irq", FUNC(input_merger_device::in_w<2>));
 	ns16450_device &uart3b(NS16450(config, "uart_3b", MASTER_CLOCK / 9));
-    uart3b.out_int_callback().set("comm_irq", FUNC(input_merger_device::in_w<3>));
+	uart3b.out_int_callback().set("comm_irq", FUNC(input_merger_device::in_w<3>));
 
 	INPUT_MERGER_ANY_HIGH(config, "uart_irq").output_handler().set(m_ioc, FUNC(acorn_ioc_device::il5_w));
 	// qnile (at least): will hang after 50 spins played/15 audit toggles without il0 connected.

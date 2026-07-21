@@ -27,7 +27,7 @@
     lockload, gunhard is a slightly different hardware
     revision: board # DE-0420-1 where the US set is DE-0359-2.
     The sound is _not_ hooked up correctly for this set.
-	Music tempo is unverified (it has external timer / IRQ controller?).
+    Music tempo is unverified (it has external timer / IRQ controller?).
 
     dragngun*: Sprite flickers during attract demo
 

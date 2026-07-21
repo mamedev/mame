@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont, AJR
 /***************************************************************************
 
-	Hitachi H8/534 & H8/536
+    Hitachi H8/534 & H8/536
 
 ***************************************************************************/
 
@@ -175,7 +175,7 @@ void h8534_device::register_field_map(address_map &map)
 	map(0xfe8b, 0xfe8b).rw(m_port6, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(0xfe8c, 0xfe8c).rw(m_port7, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
 	map(0xfe8e, 0xfe8e).rw(m_port7, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
-	map(0xfe8f, 0xfe8f).r(m_port8, FUNC(h8_port_device::port_r));	// port 8 is read-only
+	map(0xfe8f, 0xfe8f).r(m_port8, FUNC(h8_port_device::port_r));   // port 8 is read-only
 
 	// 16-bit free-running timers (8-bit bus, byte accessors with TEMP)
 	map(0xfe90, 0xfe90).rw(m_frt1, FUNC(h8500_frt_device::tcr_r), FUNC(h8500_frt_device::tcr_w));

@@ -26,7 +26,7 @@ public:
 	void gpl16250va_romram(machine_config &config) ATTR_COLD;
 	void gpl16220a_romram(machine_config &config) ATTR_COLD;
 	void gpl16258vb_romram(machine_config &config) ATTR_COLD;
-	  
+
 	void init_wrlshunt() ATTR_COLD;
 	void init_ths() ATTR_COLD;
 

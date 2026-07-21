@@ -245,33 +245,33 @@ void i7000_state::i7000_mem(address_map &map)
 }
 
 /*
-	Notes:
-	The boot ROM programs the MC6845 CRTC for 40x25
-	and Redator reprograms it for 80x25;
+    Notes:
+    The boot ROM programs the MC6845 CRTC for 40x25
+    and Redator reprograms it for 80x25;
 
-	The AGENCIA overlay also drives a register file at 0x28+
-	(written via a self-modifying OUT stub, read in its serial IRQ handler).
+    The AGENCIA overlay also drives a register file at 0x28+
+    (written via a self-modifying OUT stub, read in its serial IRQ handler).
 */
 
 void i7000_state::i7000_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-//	map(0x06, 0x06).w(FUNC(i7000_state::i7000_io_?_w));
+//  map(0x06, 0x06).w(FUNC(i7000_state::i7000_io_?_w));
 	map(0x08, 0x08).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x09, 0x09).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-//	map(0x0c, 0x0c).w(FUNC(i7000_state::i7000_io_?_w));  // 0x0C and 0x10 may be related to mem page swapping. (self-test "4. PAG")
-//	map(0x14, 0x14).w(FUNC(i7000_state::i7000_io_?_w));  // The AGENCIA banking overlay's serial interrupt handlers write here
+//  map(0x0c, 0x0c).w(FUNC(i7000_state::i7000_io_?_w));  // 0x0C and 0x10 may be related to mem page swapping. (self-test "4. PAG")
+//  map(0x14, 0x14).w(FUNC(i7000_state::i7000_io_?_w));  // The AGENCIA banking overlay's serial interrupt handlers write here
 	map(0x18, 0x1b).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-//	map(0x1c, 0x1c).w(FUNC(i7000_state::i7000_io_printer_data_w));  // ASCII data
+//  map(0x1c, 0x1c).w(FUNC(i7000_state::i7000_io_printer_data_w));  // ASCII data
 	map(0x1d, 0x1d).portr("DSW");
-//	map(0x1e, 0x1e).rw(FUNC(i7000_state::i7000_io_printer_status_r), FUNC(i7000_state::i7000_io_?_w));
-//	map(0x1f, 0x1f).w(FUNC(i7000_state::i7000_io_printer_strobe_w));  // self-test routine writes 0x08 and 0x09 (it seems that bit 0 is the strobe and bit 3 is an enable signal)
+//  map(0x1e, 0x1e).rw(FUNC(i7000_state::i7000_io_printer_status_r), FUNC(i7000_state::i7000_io_?_w));
+//  map(0x1f, 0x1f).w(FUNC(i7000_state::i7000_io_printer_strobe_w));  // self-test routine writes 0x08 and 0x09 (it seems that bit 0 is the strobe and bit 3 is an enable signal)
 	map(0x20, 0x21).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
-//	map(0x28, 0x2d).rw(FUNC(i7000_state::i7000_io_joystick_r), FUNC(i7000_state::i7000_io_joystick_w));
-//	map(0x3b, 0x3b).w(FUNC(i7000_state::i7000_io_?_w));
-//	map(0x66, 0x67).w(FUNC(i7000_state::i7000_io_?_w));
-//	map(0xbb, 0xbb).w(FUNC(i7000_state::i7000_io_?_w));  // May be related to page-swapping; the AGENCIA overlay writes 0x0F here with interrupts masked
+//  map(0x28, 0x2d).rw(FUNC(i7000_state::i7000_io_joystick_r), FUNC(i7000_state::i7000_io_joystick_w));
+//  map(0x3b, 0x3b).w(FUNC(i7000_state::i7000_io_?_w));
+//  map(0x66, 0x67).w(FUNC(i7000_state::i7000_io_?_w));
+//  map(0xbb, 0xbb).w(FUNC(i7000_state::i7000_io_?_w));  // May be related to page-swapping; the AGENCIA overlay writes 0x0F here with interrupts masked
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(i7000_state::card_load)

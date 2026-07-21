@@ -669,18 +669,18 @@ bool imd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	uint32_t img_variant;
 	if (img_form == floppy_image::FF_8) {
 		img_variant = any_mfm ? (ds ? floppy_image::DSDD : floppy_image::SSDD)
-		                      : (ds ? floppy_image::DSSD : floppy_image::SSSD);
+							  : (ds ? floppy_image::DSSD : floppy_image::SSSD);
 	} else if (img_form == floppy_image::FF_525 || img_form == floppy_image::FF_35) {
 		if (any_500kbps && any_mfm)
 			img_variant = floppy_image::DSHD;
 		else if (any_mfm)
 			img_variant = ds ? (maxtrack > 42 ? floppy_image::DSQD : floppy_image::DSDD)
-			                 : floppy_image::SSDD;
+							 : floppy_image::SSDD;
 		else
 			img_variant = ds ? floppy_image::DSSD : floppy_image::SSSD;
 	} else {
 		img_variant = any_mfm ? (ds ? floppy_image::DSDD : floppy_image::SSDD)
-		                      : (ds ? floppy_image::DSSD : floppy_image::SSSD);
+							  : (ds ? floppy_image::DSSD : floppy_image::SSSD);
 	}
 	image.set_form_variant(img_form, img_variant);
 

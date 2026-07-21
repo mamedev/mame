@@ -201,7 +201,7 @@ void subsino_kr_h8_state::program_map(address_map &map)
 	map(0x000000, 0x007fff).rom();
 	map(0x080000, 0x0bffff).rom();
 	map(0x200000, 0x207fff).ram();
-//	map(0x400000, 0x40007f).ram(); // SG001 commands?
+//  map(0x400000, 0x40007f).ram(); // SG001 commands?
 	map(0x400094, 0x400094).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x400095, 0x400095).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x400096, 0x400096).w("ramdac", FUNC(ramdac_device::mask_w));
@@ -211,7 +211,7 @@ void subsino_kr_h8_state::program_map(address_map &map)
 	map(0x600000, 0x60001f).rw("io", FUNC(ss9802_device::read), FUNC(ss9802_device::write));
 	// map(0x600060, 0x600061);
 	// map(0x800000, 0x800001);
-//	map(0xa00000, 0xa000ff).ram(); // second SG001 commands?
+//  map(0xa00000, 0xa000ff).ram(); // second SG001 commands?
 	map(0xa000c0, 0xa000df).rw(m_sg001[1], FUNC(subsino_sg001_device::read), FUNC(subsino_sg001_device::write));
 }
 

@@ -16,7 +16,7 @@
         * MC68681 DUART / timer (3.6864 MHz clock) (serial channel A = keyboard, channel B = RS-232 port)
         * AM9513 timer (source of timer IRQ)
         * NCR5385 SCSI controller
-		* X2210 NVRAM
+        * X2210 NVRAM
 
         Video is a 640x480 1bpp window on a 1024x1024 VRAM area; smooth panning around that area
         is possible as is flat-out changing the scanout address.
@@ -186,7 +186,7 @@ void tek440x_state::machine_reset()
 	m_keyboard->kdo_w(1);
 	mapcntl_w(0);
 	m_vint->in_w<1>(0);
-	
+
 	m_novram->recall(ASSERT_LINE);
 	m_novram->recall(CLEAR_LINE);
 }
@@ -346,7 +346,7 @@ void tek440x_state::nvram_w(offs_t offset, u8 data)
 
 	m_novram->write(offset, data >> 4);
 }
-	
+
 u8 tek440x_state::recall_r()
 {
 	if (!machine().side_effects_disabled())

@@ -1316,7 +1316,7 @@ TIMER_CALLBACK_MEMBER(pc6001_state::video_sync_cb)
 	int hsync = hpos < visarea.min_x || hpos >= visarea.max_x;
 	int vsync = vpos < visarea.min_y || vpos >= visarea.max_y;
 
-//	printf("%d %d %d %d (%d %d)\n", hsync, vsync, hpos, vpos, visarea.min_y, visarea.max_y);
+//  printf("%d %d %d %d (%d %d)\n", hsync, vsync, hpos, vpos, visarea.min_y, visarea.max_y);
 
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, hsync || vsync || screen_blanked() ? CLEAR_LINE : ASSERT_LINE);
 
@@ -1624,12 +1624,12 @@ void pc6601_state::floppy_formats(format_registration &fr)
 	fr.add_mfm_containers();
 	// uses MSX .dsk floppies
 	fr.add(FLOPPY_MSX_FORMAT);
-//	fr.add(FLOPPY_DSK_FORMAT);
+//  fr.add(FLOPPY_DSK_FORMAT);
 }
 
 static void pc6601_floppies(device_slot_interface &device)
 {
-//	device.option_add("35dd", FLOPPY_35_DD);
+//  device.option_add("35dd", FLOPPY_35_DD);
 	device.option_add("35ssdd", FLOPPY_35_SSDD);
 	device.option_add("35sssd", FLOPPY_35_SSSD);
 }

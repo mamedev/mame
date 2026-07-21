@@ -479,7 +479,7 @@ INPUT_PORTS_END
 
 //static void mouse_devices(device_slot_interface &device)
 //{
-//	device.option_add("alps_mouse", ALPS_HLE_SERIAL_MOUSE);
+//  device.option_add("alps_mouse", ALPS_HLE_SERIAL_MOUSE);
 //}
 
 

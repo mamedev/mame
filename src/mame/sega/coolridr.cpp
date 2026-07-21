@@ -2915,7 +2915,7 @@ uint32_t coolridr_state::sound_dma_r(offs_t offset, uint32_t mem_mask)
 		return m_sound_data;
 	}
 
-//	printf("%08x & %08x\n", offset, mem_mask);
+//  printf("%08x & %08x\n", offset, mem_mask);
 
 	if(offset == 2 || offset == 6) // DMA status
 		return m_sh1_sound_dma[BIT(offset, 2)].status << 16;
