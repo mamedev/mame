@@ -1096,9 +1096,16 @@ OSD Output Options
     to connect external outputs such as the LED lights for the Player 1/2 start
     buttons on certain arcade machines.
 
-    You can choose from: ``auto``, ``none``, ``console`` or ``network``
+    You can choose from: ``auto``, ``none``, ``console``, ``network``,
+    or ``serial``.
 
     Note that network port is fixed at 8000.
+
+    The ``serial`` provider writes output notifications as ``name = value``
+    lines (newline-terminated) to a configured serial port - useful for
+    driving external arcade I/O hardware such as ticket dispensers, coin
+    hoppers, and lamp boards.  Configure the port and baud rate with the
+    options below.
 
     Example:
         .. code-block:: bash
@@ -1109,6 +1116,39 @@ OSD Output Options
             ...
             led0 = 1
             led0 = 0
+
+
+.. _mame-commandline-output-serial-port:
+
+**-output_serial_port** *<port>*
+
+    Selects the serial port the ``serial`` output provider writes to.
+    Accepts platform-native port names, for example ``COM4`` on Windows
+    or ``/dev/ttyUSB0`` on Linux.
+
+    The default is empty; if no port is set when ``-output serial`` is
+    selected, the provider fails to initialise and MAME falls back to
+    ``-output none``.
+
+    Example:
+        .. code-block:: bash
+
+            mame ddboy -output serial -output_serial_port COM4
+
+.. _mame-commandline-output-serial-baud:
+
+**-output_serial_baud** *<rate>*
+
+    Sets the baud rate for the ``serial`` output provider.
+
+    The default is ``9600``.  Heavier games with frequent output
+    activity (e.g. many lamps blinking) may benefit from a higher rate
+    such as ``115200``.
+
+    Example:
+        .. code-block:: bash
+
+            mame ddboy -output serial -output_serial_port COM4 -output_serial_baud 115200
 
 
 .. _mame-commandline-configoptions:

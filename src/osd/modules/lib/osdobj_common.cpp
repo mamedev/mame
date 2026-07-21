@@ -46,6 +46,8 @@ const options_entry osd_options::s_option_entries[] =
 
 	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD OUTPUT OPTIONS" },
 	{ OSD_OUTPUT_PROVIDER,                       OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "provider for output notifications: " },
+	{ OSDOPTION_OUTPUT_SERIAL_PORT,              "",               core_options::option_type::STRING,    "serial port for 'serial' output provider (e.g. COM4, /dev/ttyUSB0)" },
+	{ OSDOPTION_OUTPUT_SERIAL_BAUD,              "9600",           core_options::option_type::INTEGER,   "serial port baud rate for 'serial' output provider" },
 
 	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD INPUT OPTIONS" },
 	{ OSD_KEYBOARDINPUT_PROVIDER,                OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "provider for keyboard input: " },
@@ -334,6 +336,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, OUTPUT_NONE);
 	REGISTER_MODULE(m_mod_man, OUTPUT_CONSOLE);
 	REGISTER_MODULE(m_mod_man, OUTPUT_NETWORK);
+	REGISTER_MODULE(m_mod_man, OUTPUT_SERIAL);
 	REGISTER_MODULE(m_mod_man, OUTPUT_WIN32);
 
 
