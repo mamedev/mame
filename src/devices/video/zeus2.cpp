@@ -29,6 +29,8 @@ zeus2_renderer::zeus2_renderer(zeus2_device *state)
 
 DEFINE_DEVICE_TYPE(ZEUS2, zeus2_device, "zeus2", "Midway Zeus2")
 
+uint8_t *zeus2_device::s_waveram_base = nullptr;
+
 zeus2_device::zeus2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ZEUS2, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
@@ -75,6 +77,7 @@ void zeus2_device::device_start()
 {
 	/* allocate memory for "wave" RAM */
 	m_waveram = std::make_unique<uint32_t[]>(WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8/4);
+	s_waveram_base = reinterpret_cast<uint8_t *>(m_waveram.get());
 	m_frameColor = std::make_unique<uint32_t[]>(WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
 	m_frameDepth = std::make_unique<int32_t[]>(WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
 
