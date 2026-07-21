@@ -2197,6 +2197,20 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/epson_qx/video/video.h,BUSES["EPSON_QX_VIDEO"] = true
+---------------------------------------------------
+
+if BUSES["EPSON_QX_VIDEO"] then
+	files {
+		MAME_DIR .. "src/devices/bus/epson_qx/video/qx_gdc_cards.cpp",
+		MAME_DIR .. "src/devices/bus/epson_qx/video/qx_gdc_cards.h",
+		MAME_DIR .. "src/devices/bus/epson_qx/video/video.cpp",
+		MAME_DIR .. "src/devices/bus/epson_qx/video/video.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/epson_sio/epson_sio.h,BUSES["EPSON_SIO"] = true
 ---------------------------------------------------
 if BUSES["EPSON_SIO"] then
