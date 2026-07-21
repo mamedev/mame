@@ -304,7 +304,8 @@ INPUT_PORTS_START( kr03 )
 	PORT_BIT(0x00, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( ms7007 )
+// keyboard module is MS7007, originally designed for UKNC
+INPUT_PORTS_START( rk7007 )
 	PORT_START("LINE0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR(' ') PORT_CHAR('0')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR(')') PORT_CHAR('9')
@@ -697,7 +698,7 @@ COMP( 1986, radio4k,  radio86, 0,      radio86,  radio86, radio86_state, init_ra
 COMP( 1986, radiorom, radio86, 0,      radiorom, radio86, radio86_state, init_radio86,  "<unknown>",   "Radio-86RK (ROM-Disk)",       MACHINE_SUPPORTS_SAVE )
 COMP( 1986, radioram, radio86, 0,      radioram, radio86, radio86_state, init_radioram, "<unknown>",   "Radio-86RK (ROM/RAM Disk)",   MACHINE_SUPPORTS_SAVE )
 COMP( 1986, spektr01, radio86, 0,      radio86,  radio86, radio86_state, init_radio86,  "<unknown>",   "Spektr-001",                  MACHINE_SUPPORTS_SAVE )
-COMP( 1986, rk7007,   radio86, 0,      rk7007,   ms7007,  radio86_state, init_radio86,  "<unknown>",   "Radio-86RK (MS7007)",         MACHINE_SUPPORTS_SAVE )
-COMP( 1986, rk700716, radio86, 0,      rk700716, ms7007,  radio86_state, init_radio86,  "<unknown>",   "Radio-86RK (MS7007 16K RAM)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, rk7007,   radio86, 0,      rk7007,   rk7007,  radio86_state, init_radio86,  "<unknown>",   "Radio-86RK (MS7007)",         MACHINE_SUPPORTS_SAVE )
+COMP( 1986, rk700716, radio86, 0,      rk700716, rk7007,  radio86_state, init_radio86,  "<unknown>",   "Radio-86RK (MS7007 16K RAM)", MACHINE_SUPPORTS_SAVE )
 COMP( 1986, mikron2,  radio86, 0,      mikron2,  radio86, radio86_state, init_radio86,  "<unknown>",   "Mikron-2",                    MACHINE_SUPPORTS_SAVE )
 COMP( 1986, impuls03, radio86, 0,      impuls03, radio86, radio86_state, init_radio86,  "<unknown>",   "Impuls-03",                   MACHINE_SUPPORTS_SAVE )
