@@ -956,7 +956,7 @@ void elan_eu3a05_pvwwcas_state::init_pvwwcas()
 
 CONS( 2004, rad_sinv, 0, 0, elan_rad_sinv, rad_sinv, elan_eu3a05_rad_sinv_state, empty_init, "Radica (licensed from Taito)", "Space Invaders [Lunar Rescue, Colony 7, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
 
-CONS( 2004, rad_tetr, 0, 0, elan_eu3a05_1mb, rad_tetr, elan_eu3a05_state, empty_init, "Radica (licensed from Elorg / The Tetris Company)", "Tetris (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING ) // "5 Tetris games in 1"
+CONS( 2004, rad_tetr, 0, 0, elan_eu3a05_1mb, rad_tetr, elan_eu3a05_state, empty_init, "Radica / Medialink (licensed from Elorg / The Tetris Company)", "Tetris (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING ) // "5 Tetris games in 1"
 
 // it isn't clear if the ELAN is generating the music on this, or if one of the other globs is an audio MCU
 // VJ Starz Dance Mat on box, VJ Starz Dancing Mat on screen

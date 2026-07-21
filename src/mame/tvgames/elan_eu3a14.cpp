@@ -833,8 +833,8 @@ CONS( 2006, rad_foot, 0, 0, radica_eu3a14p, radica_foot, elan_eu3a14_state, empt
 CONS( 2005, rad_bb3,  0,       0, radica_eu3a14_altrambase_bb3,  radica_bb3, elan_eu3a14_state, empty_init, "Radica / FarSight Studios", "Play TV Baseball 3",  MACHINE_NOT_WORKING )
 CONS( 2005, rad_bb3p, rad_bb3, 0, radica_eu3a14p_altrambase_bb3, radica_bb3, elan_eu3a14_state, empty_init, "Radica / FarSight Studios", "Connectv Baseball 3", MACHINE_NOT_WORKING )
 
-CONS( 2005, rad_hnt3,  0,        0, radica_eu3a14,  radica_hnt3, elan_eu3a14_state, empty_init, "Radica / V-Tac Technology Co Ltd.", "Play TV Huntin' 3",  MACHINE_NOT_WORKING )
-CONS( 2005, rad_hnt3p, rad_hnt3, 0, radica_eu3a14p, radica_hnt3, elan_eu3a14_state, empty_init, "Radica / V-Tac Technology Co Ltd.", "Connectv Huntin' 3", MACHINE_NOT_WORKING )
+CONS( 2005, rad_hnt3,  0,        0, radica_eu3a14,  radica_hnt3, elan_eu3a14_state, empty_init, "Radica / V-Tac Technology", "Play TV Huntin' 3",  MACHINE_NOT_WORKING )
+CONS( 2005, rad_hnt3p, rad_hnt3, 0, radica_eu3a14p, radica_hnt3, elan_eu3a14_state, empty_init, "Radica / V-Tac Technology", "Connectv Huntin' 3", MACHINE_NOT_WORKING )
 
 CONS( 2005, rad_bask,  0,        0, radica_eu3a14_altrambase,  radica_bask, elan_eu3a14_state, empty_init, "Radica / FarSight Studios", "Play TV Basketball",  MACHINE_NOT_WORKING )
 CONS( 2005, rad_baskp, rad_bask, 0, radica_eu3a14p_altrambase, radica_bask, elan_eu3a14_state, empty_init, "Radica / FarSight Studios", "Connectv Basketball", MACHINE_NOT_WORKING )
