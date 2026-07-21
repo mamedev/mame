@@ -824,20 +824,20 @@ ROM_END
 CONS( 2006, rad_gtg, 0, 0, radica_eu3a14_altrambase_adc, rad_gtg, elan_eu3a14_state, empty_init, "Radica / FarSight Studios (licensed from Incredible Technologies)", "Golden Tee Golf: Home Edition", MACHINE_NOT_WORKING )
 
 CONS( 2005, rad_rsg,   0,       0, radica_eu3a14_altrambase,  rad_rsg, elan_eu3a14_state, empty_init, "Radica / FarSight Studios", "Play TV Real Swing Golf", MACHINE_NOT_WORKING )
-CONS( 2005, rad_rsgp,  rad_rsg, 0, radica_eu3a14p_altrambase, rad_rsg, elan_eu3a14_state, empty_init, "Radica / FarSight Studios", "Connectv Real Swing Golf (set 1)", MACHINE_NOT_WORKING ) // English only
-CONS( 2005, rad_rsgpa, rad_rsg, 0, radica_eu3a14p_altrambase, rad_rsg, elan_eu3a14_state, empty_init, "Radica / FarSight Studios", "Connectv Real Swing Golf (set 2)", MACHINE_NOT_WORKING ) // English, German, French, Spanish, Italian
+CONS( 2005, rad_rsgp,  rad_rsg, 0, radica_eu3a14p_altrambase, rad_rsg, elan_eu3a14_state, empty_init, "Radica / FarSight Studios", "ConnecTV Real Swing Golf (set 1)", MACHINE_NOT_WORKING ) // English only
+CONS( 2005, rad_rsgpa, rad_rsg, 0, radica_eu3a14p_altrambase, rad_rsg, elan_eu3a14_state, empty_init, "Radica / FarSight Studios", "ConnecTV Real Swing Golf (set 2)", MACHINE_NOT_WORKING ) // English, German, French, Spanish, Italian
 
 // also has a Connectv Real Soccer logo in the roms, apparently unused, maybe that was to be the US title (without the logo being changed to Play TV) but Play TV Soccer ended up being a different game licensed from Epoch instead.
-CONS( 2006, rad_foot, 0, 0, radica_eu3a14p, radica_foot, elan_eu3a14_state, empty_init, "Radica / Medialink", "Connectv Football", MACHINE_NOT_WORKING )
+CONS( 2006, rad_foot, 0, 0, radica_eu3a14p, radica_foot, elan_eu3a14_state, empty_init, "Radica / Medialink", "ConnecTV Football", MACHINE_NOT_WORKING )
 
 CONS( 2005, rad_bb3,  0,       0, radica_eu3a14_altrambase_bb3,  radica_bb3, elan_eu3a14_state, empty_init, "Radica / FarSight Studios", "Play TV Baseball 3",  MACHINE_NOT_WORKING )
-CONS( 2005, rad_bb3p, rad_bb3, 0, radica_eu3a14p_altrambase_bb3, radica_bb3, elan_eu3a14_state, empty_init, "Radica / FarSight Studios", "Connectv Baseball 3", MACHINE_NOT_WORKING )
+CONS( 2005, rad_bb3p, rad_bb3, 0, radica_eu3a14p_altrambase_bb3, radica_bb3, elan_eu3a14_state, empty_init, "Radica / FarSight Studios", "ConnecTV Baseball 3", MACHINE_NOT_WORKING )
 
 CONS( 2005, rad_hnt3,  0,        0, radica_eu3a14,  radica_hnt3, elan_eu3a14_state, empty_init, "Radica / V-Tac Technology", "Play TV Huntin' 3",  MACHINE_NOT_WORKING )
-CONS( 2005, rad_hnt3p, rad_hnt3, 0, radica_eu3a14p, radica_hnt3, elan_eu3a14_state, empty_init, "Radica / V-Tac Technology", "Connectv Huntin' 3", MACHINE_NOT_WORKING )
+CONS( 2005, rad_hnt3p, rad_hnt3, 0, radica_eu3a14p, radica_hnt3, elan_eu3a14_state, empty_init, "Radica / V-Tac Technology", "ConnecTV Huntin' 3", MACHINE_NOT_WORKING )
 
 CONS( 2005, rad_bask,  0,        0, radica_eu3a14_altrambase,  radica_bask, elan_eu3a14_state, empty_init, "Radica / FarSight Studios", "Play TV Basketball",  MACHINE_NOT_WORKING )
-CONS( 2005, rad_baskp, rad_bask, 0, radica_eu3a14p_altrambase, radica_bask, elan_eu3a14_state, empty_init, "Radica / FarSight Studios", "Connectv Basketball", MACHINE_NOT_WORKING )
+CONS( 2005, rad_baskp, rad_bask, 0, radica_eu3a14p_altrambase, radica_bask, elan_eu3a14_state, empty_init, "Radica / FarSight Studios", "ConnecTV Basketball", MACHINE_NOT_WORKING )
 
 CONS( 200?, tsbuzz,  0, 0, radica_eu3a14_altspritebase,     tsbuzz, elan_eu3a14_state, empty_init, "Thinkway Toys", "Interactive M.A.G. Motion Activated Gear: Toy Story and Beyond! Buzz Lightyear Galactic Adventure", MACHINE_NOT_WORKING )
 CONS( 200?, batvgc,  0, 0, radica_eu3a14_altspritebase_bat, tsbuzz, elan_eu3a14_state, empty_init, "Thinkway Toys", "Interactive M.A.G. Motion Activated Gear: The Batman - Villains of Gotham City", MACHINE_NOT_WORKING )

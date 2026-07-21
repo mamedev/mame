@@ -3213,9 +3213,9 @@ void spg2xx_game_state::init_itvphone()
 
 // Radica TV games
 CONS( 2006, rad_skat,  0,         0, rad_skat,   rad_skat,   spg2xx_game_state,               init_crc,      "Radica", "Play TV Skateboarder (NTSC)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2006, rad_skatp, rad_skat,  0, rad_skatp,  rad_skatp,  spg2xx_game_state,               init_crc,      "Radica", "Connectv Skateboarder (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, rad_skatp, rad_skat,  0, rad_skatp,  rad_skatp,  spg2xx_game_state,               init_crc,      "Radica", "ConnecTV Skateboarder (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2006, rad_crik,  0,         0, rad_crik,   rad_crik,   spg2xx_game_state,               init_crc,      "Radica", "Connectv Cricket (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Version 3.00 20/03/06 is listed in INTERNAL TEST
+CONS( 2006, rad_crik,  0,         0, rad_crik,   rad_crik,   spg2xx_game_state,               init_crc,      "Radica", "ConnecTV Cricket (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Version 3.00 20/03/06 is listed in INTERNAL TEST
 
 CONS( 2007, rad_fb2,   0,         0, rad_skat,   rad_fb2,    spg2xx_game_state,               init_crc,      "Radica", "Play TV Football 2", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // offers a 2 player option in menus, but seems to have only been programmed for, and released as, a single player unit, P2 controls appear unfinished.
 
