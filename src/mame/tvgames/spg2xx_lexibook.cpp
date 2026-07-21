@@ -529,26 +529,26 @@ ROM_END
 
 // these all have the same ROM scrambling
 
-CONS( 200?, lexizeus, 0, 0, lexizeus, lexizeus, spg2xx_lexizeus_game_state, init_zeus,     "Lexibook / JungleTac", "Zeus IG900 20-in-1 (US?)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad sound and some corrupt bg tilemap entries in Tiger Rescue, verify ROM data (same game runs in Zone 60 without issue)
+CONS( 200?, lexizeus,    0,     0,        lexizeus,     lexizeus, spg2xx_lexizeus_game_state, init_zeus, "Lexibook / JungleTac", "Zeus IG900 20-in-1 (US?)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad sound and some corrupt bg tilemap entries in Tiger Rescue, verify ROM data (same game runs in Zone 60 without issue)
 
-CONS( 200?, arcade3d, 0, 0, lexizeus, lexiseal, spg2xx_lexizeus_game_state, init_zeus,     "Millennium 2000 GmbH / JungleTac", "Millennium Arcade 3D 15-in-1", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, arcade3d,    0,     0,        lexizeus,     lexiseal, spg2xx_lexizeus_game_state, init_zeus, "Millennium 2000 GmbH / JungleTac", "Millennium Arcade 3D 15-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // 2007.08.02 Rev 05 on PCB
-CONS( 2007, pokermor, 0, 0, lexizeus, pokermor, spg2xx_lexizeus_game_state, init_zeus,     "SA.BI.NE trend", "Poker & More 18-in-1 (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) 
+CONS( 2007, pokermor,    0,     0,        lexizeus,     pokermor, spg2xx_lexizeus_game_state, init_zeus, "SA.BI.NE trend", "Poker & More 18-in-1 (Germany)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) 
 
-CONS( 200?, vsplus,   0, 0, vsplus,   vsplus,   spg2xx_vsplus_game_state,   init_vsplus,   "<unknown> / JungleTac", "Vs Power Plus 30-in-1", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, vsplus,      0,     0,        vsplus,     vsplus, spg2xx_vsplus_game_state, init_vsplus, "<unknown> / JungleTac", "Vs Power Plus 30-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // marked as SPG260
-CONS( 2010, cybrtvfe, 0, 0, lexiseal, lexiseal, spg2xx_cybrtvfe_game_state, init_cybrtvfe, "Lexibook", "Cyber Arcade TV - Ferrari 105-in-1 (JL2500FE)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2010, cybrtvfe,    0,     0,        lexiseal,     lexiseal, spg2xx_cybrtvfe_game_state, init_cybrtvfe, "Lexibook", "Cyber Arcade TV - Ferrari 105-in-1 (JL2500FE)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // need to hook up seeprom
-CONS( 2010, cybrtvbb, 0, 0, cybrtvbb, cybrtvbb, spg2xx_cybrtvbb_game_state, init_cybrtvfe, "Lexibook", "Cyber Arcade TV - Barbie 75-in-1 (JL2500BB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2010, cybrtvbb,    0,     0,        cybrtvbb,     cybrtvbb, spg2xx_cybrtvbb_game_state, init_cybrtvfe, "Lexibook", "Cyber Arcade TV - Barbie 75-in-1 (JL2500BB)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 200?, lexiseal, 0, 0, lexiseal, lexiseal, spg2xx_lexiseal_game_state, init_zeus,     "Lexibook / Sit Up Limited / JungleTac", "Seal 50-in-1", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // also has bad sound in Tiger Rescue, but no corrupt tilemap
+CONS( 200?, lexiseal,    0,     0,        lexiseal,     lexiseal, spg2xx_lexiseal_game_state, init_zeus, "Lexibook / Sit Up Limited / JungleTac", "Seal 50-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // also has bad sound in Tiger Rescue, but no corrupt tilemap
 // There are versions of the Seal 50-in-1 that actually show Lexibook on the boot screen rather than it just being on the unit.  The Seal name was also used for some VT systems
 
-CONS( 2006, discpal,  0, 0, lexizeus, lexiseal, spg2xx_lexizeus_game_state, init_zeus,     "Performance Designed Products / Disney / Jungle Soft", "Disney Game It! Classic Pals", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2006, disppal,  0, 0, lexizeus, lexiseal, spg2xx_lexizeus_game_state, init_zeus,     "Performance Designed Products / Disney / Jungle Soft", "Disney Game It! Princess Pals", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, discpal,     0,     0,        lexizeus,     lexiseal, spg2xx_lexizeus_game_state, init_zeus, "Performance Designed Products / Disney / Jungle Soft", "Disney Game It! Classic Pals",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, disppal,     0,     0,        lexizeus,     lexiseal, spg2xx_lexizeus_game_state, init_zeus, "Performance Designed Products / Disney / Jungle Soft", "Disney Game It! Princess Pals",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2006, vgcaplet, 0, 0, lexiseal, lexiseal, spg2xx_lexiseal_game_state, init_zeus,     "Performance Designed Products / JungleTac (licensed by Taito / Data East)", "VG Pocket Caplet Fast Acting 50-in-1", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, vgcaplet,    0,     0,        lexiseal,     lexiseal, spg2xx_lexiseal_game_state, init_zeus, "Performance Designed Products (licensed by Taito / Data East) / JungleTac", "VG Pocket Caplet Fast Acting 50-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2006, vgcap35,  0, 0, lexiseal, lexiseal, spg2xx_lexiseal_game_state, init_zeus,     "Performance Designed Products / JungleTac (licensed by Taito / Data East)", "VG Pocket Caplet Fast Acting 35-in-1", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, vgcap35,     0,     0,        lexiseal,     lexiseal, spg2xx_lexiseal_game_state, init_zeus, "Performance Designed Products (licensed by Taito / Data East) / JungleTac", "VG Pocket Caplet Fast Acting 35-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
