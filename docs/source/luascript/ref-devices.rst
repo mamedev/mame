@@ -198,6 +198,15 @@ device.spaces[] (read-only)
     indexed by name.  Only valid for devices that implement the memory
     interface.  Note that the names are specific to the device type and have no
     special significance.
+device.outputs[] (read-only)
+    A table of the outputs the device has created, ordered by name.  Each
+    element is a table with a ``name`` field holding the output’s name relative
+    to the device, and a ``qualified_name`` field holding the name qualified by
+    the device’s tag (the form used by the ``-output`` host output modules).  An
+    :ref:`output proxy <luascript-ref-outputproxy>` may be obtained by passing
+    the ``name`` field to the device’s ``output`` method.  Note that outputs are
+    created while devices are being started, so the set of outputs is only
+    complete once the machine has finished starting.
 
 
 .. _luascript-ref-dipalette:

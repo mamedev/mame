@@ -1639,6 +1639,32 @@ void lua_engine::initialize()
 						table[rom.name()] = rom;
 				return table;
 			});
+	device_type["outputs"] = sol::property(
+			[this] (device_t &dev)
+			{
+				// outputs are created while devices are starting, the set is fixed after that
+				std::vector<osd::output_item const *> items;
+				dev.machine().output().notify_all(
+						[&dev, &items] (osd::output_item const &item)
+						{
+							if (item.device_tag() == dev.tag())
+								items.emplace_back(&item);
+						});
+				std::sort(
+						items.begin(),
+						items.end(),
+						[] (osd::output_item const *l, osd::output_item const *r) { return l->name() < r->name(); });
+				sol::table table = sol().create_table();
+				int index = 0;
+				for (osd::output_item const *item : items)
+				{
+					sol::table entry = sol().create_table();
+					entry["name"] = std::string(item->name());
+					entry["qualified_name"] = item->qualified_name();
+					table[++index] = entry;
+				}
+				return table;
+			});
 
 	auto dipalette_type = sol().registry().new_usertype<device_palette_interface>("dipalette", sol::no_constructor);
 	dipalette_type.set_function("pen", &device_palette_interface::pen);
