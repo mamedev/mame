@@ -83,13 +83,13 @@ void deco_buffered_palette_device::dma_w(u8 data)
 void deco_buffered_palette_device::write8(offs_t offset, u8 data)
 {
 	m_paletteram.write8(offset, data);
-	set_dirty_area(offset >> 2);
+	set_dirty_area(offset >> ((m_paletteram_ext.base() != nullptr) ? 1 : 2));
 }
 
 void deco_buffered_palette_device::write16(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_paletteram.write16(offset, data, mem_mask);
-	set_dirty_area(offset >> 1);
+	set_dirty_area(offset >> ((m_paletteram_ext.base() != nullptr) ? 0 : 1));
 }
 
 void deco_buffered_palette_device::write32(offs_t offset, u32 data, u32 mem_mask)
@@ -122,14 +122,14 @@ u32 deco_buffered_palette_device::read32(offs_t offset)
 void deco_buffered_palette_device::write8_ext(offs_t offset, u8 data)
 {
 	m_paletteram_ext.write8(offset, data);
-	set_dirty_area(offset >> 2);
+	set_dirty_area(offset >> 1);
 }
 
 
 void deco_buffered_palette_device::write16_ext(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_paletteram_ext.write16(offset, data, mem_mask);
-	set_dirty_area(offset >> 1);
+	set_dirty_area(offset);
 }
 
 
