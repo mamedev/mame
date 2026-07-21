@@ -1486,6 +1486,7 @@ static INPUT_PORTS_START( multiplt )
 	PORT_DIPSETTING(    0x02, "TV Output")
 INPUT_PORTS_END
 
+// for test mode hold P1 Button 1, P1 Button 2, P2 Button 2 on startup (currently fails the hardware tests)
 static INPUT_PORTS_START( pl1000 )
 	PORT_INCLUDE(xavix)
 
