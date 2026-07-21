@@ -1243,7 +1243,6 @@ private:
 	virtual uint8_t lightgun_r(offs_t offset) override;
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 	u8 m_io1_out;
-	u8 m_which_lightgun;
 	required_ioport_array<2> m_lightgun2;
 };
 
