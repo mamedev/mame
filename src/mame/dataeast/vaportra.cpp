@@ -49,8 +49,8 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_soundlatch(*this, "soundlatch")
-		, m_paletteram(*this, "palette")
-		, m_paletteram_ext(*this, "palette_ext")
+		, m_paletteram(*this, "paletteram")
+		, m_paletteram_ext(*this, "paletteram_ext")
 	{ }
 
 	void vaportra(machine_config &config);
@@ -193,9 +193,10 @@ uint32_t vaportra_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 uint8_t vaportra_state::irq6_ack_r()
 {
-	m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 
-	return (0);
+	return 0;
 }
 
 void vaportra_state::irq6_ack_w(uint8_t data)
