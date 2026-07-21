@@ -469,7 +469,7 @@ u32 popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	// vreg[0x01] is always
 	// 0xfefb
-	
+
 	// regs
 	// 0  see above
 	// 1
@@ -487,7 +487,7 @@ u32 popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	// d  enable 2/3
 	// e
 	// f
-	
+
 	// pixram
 	if (!get_tilemap_enable(0) && !get_tilemap_enable(1) && !get_tilemap_enable(2) && !get_tilemap_enable(3) && BIT(m_vregs[0x0e], 5))
 	{

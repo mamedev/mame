@@ -9,7 +9,7 @@
     History protection and tracking down Tattoo Assassins!
 
     reset with both start buttons held down for test mode with
-	version info.
+    version info.
 
 ***************************************************************************/
 

@@ -65,22 +65,22 @@ public:
 	/* CPU status codes */
 	enum
 	{
-		ST_INTERNAL = 0,	/* internal operation */
-		ST_MEM_REFRESH,		/* memory refresh */
-		ST_REF_IO,			/* I/O reference */
-		ST_REF_SIO,			/* special I/O reference */
-		ST_SEGT_ACK,		/* segment trap acknowledge */
-		ST_NMI_ACK,			/* nonmaskable interrupt acknowledge */
-		ST_NVI_ACK,			/* nonvectored interrupt acknowledge */
-		ST_VI_ACK,			/* vectored interrupt acknowledge */
-		ST_REQ_DATA,		/* data memory request */
-		ST_REQ_STACK,		/* stack memory request */
-		ST_EREQ_DATA,		/* data memory request (EPU) */
-		ST_EREQ_STACK,		/* stack memory request (EPU) */
-		ST_IFETCH_N,		/* instruction fetch, nth word */
-		ST_IFETCH_1,		/* instruction fetch, first word */
-		ST_EPU_TRF,			/* extension processor transfer */
-		ST_BUS_LOCK			/* bus lock, data memory request (not used) */
+		ST_INTERNAL = 0,    /* internal operation */
+		ST_MEM_REFRESH,     /* memory refresh */
+		ST_REF_IO,          /* I/O reference */
+		ST_REF_SIO,         /* special I/O reference */
+		ST_SEGT_ACK,        /* segment trap acknowledge */
+		ST_NMI_ACK,         /* nonmaskable interrupt acknowledge */
+		ST_NVI_ACK,         /* nonvectored interrupt acknowledge */
+		ST_VI_ACK,          /* vectored interrupt acknowledge */
+		ST_REQ_DATA,        /* data memory request */
+		ST_REQ_STACK,       /* stack memory request */
+		ST_EREQ_DATA,       /* data memory request (EPU) */
+		ST_EREQ_STACK,      /* stack memory request (EPU) */
+		ST_IFETCH_N,        /* instruction fetch, nth word */
+		ST_IFETCH_1,        /* instruction fetch, first word */
+		ST_EPU_TRF,         /* extension processor transfer */
+		ST_BUS_LOCK         /* bus lock, data memory request (not used) */
 	};
 
 	enum

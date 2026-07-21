@@ -22,10 +22,10 @@ References:
     - PC-8011 (expansion unit)
     - PC-8021;
     - PC-8031 (mini disk unit, in progress)
-	- pc8001mk2: implement 1 layer GVRAM;
+    - pc8001mk2: implement 1 layer GVRAM;
     - pc8001mk2sr: verify how much needs to be ported from pc8801.cpp code
       (Has 3 bitplane GVRAM like PC-8801 V1 mode + ALU + few unique modes eventually ditched,
-	  mapped at $8000 rather than $c000);
+      mapped at $8000 rather than $c000);
     - waitstates & DMA penalty (some games are suspciously fast);
     - buzzer has pretty ugly aliasing in places;
 
@@ -1343,7 +1343,7 @@ void pc8001mk2sr_state::pc8001mk2sr(machine_config &config)
 
 	PC8801_KBD(config.replace(), "kbd");
 
-//	m_gvram_bank->set_map(&pc8001mk2sr_state::gvram_map);
+//  m_gvram_bank->set_map(&pc8001mk2sr_state::gvram_map);
 	PALETTE(config, m_palette, palette_device::BLACK, 0x8);
 
 	PC88_ALU(config, m_alu, 0);
@@ -1356,7 +1356,7 @@ void pc8001mk2sr_state::pc8001mk2sr(machine_config &config)
 	// OPN/OPNA needs to be moved in a common internal expansion slot
 	m_opn->port_a_read_callback().set([] () { return 0xff; });
 	m_opn->port_b_read_callback().set([] () { return 0xff; });
-//	m_opn->port_b_write_callback().set(FUNC(pc8801mk2sr_state::opn_portb_w));
+//  m_opn->port_b_write_callback().set(FUNC(pc8801mk2sr_state::opn_portb_w));
 	m_opn->add_route(ALL_OUTPUTS, "speaker", 0.25, 0);
 	m_opn->add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
 

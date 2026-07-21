@@ -139,7 +139,7 @@ void roland_jv80_state::jv880_mem_map(address_map &map)
 void roland_jv80_state::jv_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(88, 247, 0)); // bright green
-	palette.set_pen_color(1, rgb_t(3, 3, 60));	 // dark blue
+	palette.set_pen_color(1, rgb_t(3, 3, 60));   // dark blue
 }
 
 HD44780_PIXEL_UPDATE(roland_jv80_state::lcd_pixel_update)

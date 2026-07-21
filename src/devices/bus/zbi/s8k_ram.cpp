@@ -137,9 +137,9 @@ bool zbi_s8k_parity_ram_card_device::check_parity(offs_t offset, uint8_t data, b
 	uint8_t x = data;
 	bool parity;
 
-    x ^= x >> 4;
-    x ^= x >> 2;
-    x ^= x >> 1;
+	x ^= x >> 4;
+	x ^= x >> 2;
+	x ^= x >> 1;
 	parity = (x & 1);
 
 	if (write)

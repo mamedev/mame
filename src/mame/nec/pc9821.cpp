@@ -1071,8 +1071,8 @@ static INPUT_PORTS_START( pc9821ap2 )
 	PORT_MODIFY("DSW2")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("sdip", FUNC(pc98_sdip_device::dsw2_r))
 
-//	PORT_MODIFY("DSW3")
-//	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("sdip", FUNC(pc98_sdip_device::dsw3_r))
+//  PORT_MODIFY("DSW3")
+//  PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("sdip", FUNC(pc98_sdip_device::dsw3_r))
 INPUT_PORTS_END
 
 // works better without the SDIP hack

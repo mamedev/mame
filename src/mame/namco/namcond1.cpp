@@ -12,10 +12,10 @@
 
     abcheck TODOs:
     - Ending has a rowscroll GFX bug, scroll X the wrong GFX part
-	  (expect to bounce upper kanji strip and regular scroll the two "abnormal check" strings,
-	   goes in the middle of playfield instead);
+      (expect to bounce upper kanji strip and regular scroll the two "abnormal check" strings,
+       goes in the middle of playfield instead);
     - Where is the extra data ROM mapped?
-	  Ending reads $68'xxxx-$6f'xxxx areas for bitbanging serial device at $70'0000
+      Ending reads $68'xxxx-$6f'xxxx areas for bitbanging serial device at $70'0000
 
     gynotai TODOs:
     - printer (disable it in service mode to suppress POST error);

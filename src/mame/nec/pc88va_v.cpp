@@ -905,7 +905,7 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 	// use the border color entry as a marker for not drawing
 	m_graphic_bitmap[which].fill(0x20, cliprect);
 
-//	const int layer_inc = (!is_5bpp) + 1;
+//  const int layer_inc = (!is_5bpp) + 1;
 	const int layer_fixed = is_5bpp + 1;
 
 	// layer 2 is implicitly skipped in animefrm

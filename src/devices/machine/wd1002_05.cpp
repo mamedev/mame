@@ -150,7 +150,7 @@ uint8_t wd1002_05_device::read(offs_t offset)
 		return m_f_err; // floppy error register (WD1015 front-end, not the WD1010's)
 	if ((offset & 7) == 6 && floppy)
 		return m_sdh; // present the shadowed SDH: the WD1010 base masks the drive-select bits,
-		              // but INIT reads the SDH back to add side/size before issuing FORMAT
+					  // but INIT reads the SDH back to add side/size before issuing FORMAT
 	return wd1002_hd0_device::read(offset); // buffer (0) + rigid task file / status
 }
 
@@ -199,8 +199,8 @@ void wd1002_05_device::write(offs_t offset, uint8_t data)
 			m_f_sec   = m_secno;
 			m_ptr     = 0;
 			m_f_err   = 0; // a fresh command clears the prior error -- the WD1015 status is per-command
-			                // (the EM ROM's SEEK-then-READ probe reads the error via a shared WAIT/RSTAT,
-			                //  so a stale RNF from a failed probe must not carry into the next command)
+							// (the EM ROM's SEEK-then-READ probe reads the error via a shared WAIT/RSTAT,
+							//  so a stale RNF from a failed probe must not carry into the next command)
 			if (cmd == HOST_READ)            // READ: start the WD2797 now; host polls then reads buf
 				f_start(false, false);
 			else if (cmd == HOST_WRITE)      // WRITE: buffer the host data first, then start the FDC

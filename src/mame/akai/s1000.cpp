@@ -2,19 +2,19 @@
 // copyright-holders:Devin Acker
 
 /***************************************************************************
-	Akai S1000, S1100 samplers
+    Akai S1000, S1100 samplers
 
-	These are the 16-bit successors to the 12-bit S900/S950 family, and are the first S-series
-	samplers to use dedicated sound hardware instead of off-the-shelf DMA controllers.
+    These are the 16-bit successors to the 12-bit S900/S950 family, and are the first S-series
+    samplers to use dedicated sound hardware instead of off-the-shelf DMA controllers.
 
-	TODO:
-	- layouts
-	- some sound hardware details (see devices/sound/l6009.cpp)
-	- software list for floppies
-	- make sure SCSI hard disks work (currently only tested with CDs)
-	- S1000KB support (same ROMs as S1000 plus extra key scan MCU, probably uPD7811 like X7000)
-	- S1100EX support? (expander version of S1100, connects over both MIDI and SCSI)
-	- DSP56001 emulation is needed for S1100 onboard effects
+    TODO:
+    - layouts
+    - some sound hardware details (see devices/sound/l6009.cpp)
+    - software list for floppies
+    - make sure SCSI hard disks work (currently only tested with CDs)
+    - S1000KB support (same ROMs as S1000 plus extra key scan MCU, probably uPD7811 like X7000)
+    - S1100EX support? (expander version of S1100, connects over both MIDI and SCSI)
+    - DSP56001 emulation is needed for S1100 onboard effects
 ***************************************************************************/
 
 #include "emu.h"
@@ -45,7 +45,7 @@
 #include "formats/hxchfe_dsk.h"
 
 namespace {
-	
+
 class s1000_state : public driver_device
 {
 public:
@@ -592,7 +592,7 @@ INPUT_PORTS_START( s1000 )
 	PORT_MODIFY("PA")
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(s1000_state::dial_r<0>));
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(s1000_state::dial_r<1>));
-	
+
 	PORT_MODIFY("P3000")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER  ) PORT_NAME("Foot Switch")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_OTHER  ) // high when foot switch plugged in

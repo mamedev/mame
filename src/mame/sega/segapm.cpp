@@ -111,8 +111,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(segapm_state::scanline_timer_cb)
 	bool int6_vbl = scanline == 224;
 
 	// only 68k irq valid, pushes stuff to a non-existant VDP, left-over?
-//	if (int6_vbl)
-//		m_maincpu->set_input_line(6, HOLD_LINE);
+//  if (int6_vbl)
+//      m_maincpu->set_input_line(6, HOLD_LINE);
 
 	m_32x->interrupt_cb(scanline, int6_vbl);
 

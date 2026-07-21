@@ -111,8 +111,8 @@ March 2013 NPW:
     Darren Atkinson for the discovery of these bugs.
 
 260629 TJL:
-	Fix cycle count and condition code flags for DIVD and DIVQ based on Xroar
-	(with permission), hoglet67 and personal fuzzing.
+    Fix cycle count and condition code flags for DIVD and DIVQ based on Xroar
+    (with permission), hoglet67 and personal fuzzing.
 
 *****************************************************************************/
 

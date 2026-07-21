@@ -14,8 +14,8 @@
     History protection and tracking down Tattoo Assassins!
 
     Fighter's History - reset with both start buttons held down for
-	test mode.  Reset with player 1 start held in Fighter's History
-	for 'Pattern Editor'.
+    test mode.  Reset with player 1 start held in Fighter's History
+    for 'Pattern Editor'.
 
     For version information:
      Fighter's History - Reset with Player 1 button 1 & 2 held
@@ -34,7 +34,7 @@
     special blending effects.  It's exact effect is unclear.
 
     Z80 Sound cpu version games:
-	Music tempo is unverified (it has external timer / IRQ controller?).
+    Music tempo is unverified (it has external timer / IRQ controller?).
 
 
 Night Slashers

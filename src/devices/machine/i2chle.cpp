@@ -14,7 +14,7 @@
 
     This mix-in will auto-increment the address on repeated reads/writes.
     It's up to your class that includes this mix-in to change that behavior
-	if necessary.
+    if necessary.
 */
 
 #include "emu.h"

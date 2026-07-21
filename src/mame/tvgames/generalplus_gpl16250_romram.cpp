@@ -681,7 +681,7 @@ CONS( 2014, tomycar, 0, 0, gpl16258vb_romram, paccon, jak_prft_game_state, init_
 // ----------------------------------------------------
 // these use RAM up to 3fff
 //
-// high resolution modes not used, NAND not used, SRAM is used, so probably GPL16220A 
+// high resolution modes not used, NAND not used, SRAM is used, so probably GPL16220A
 // ----------------------------------------------------
 
 CONS( 2008, lazertag, 0, 0, gpl16220a_romram, jak_s500, lazertag_game_state, init_wrlshunt, "Hasbro / Tiger Electronics", "Lazer Tag Video Game Module", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

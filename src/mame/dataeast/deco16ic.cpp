@@ -183,7 +183,6 @@ deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag,
 	, device_video_interface(mconfig, *this)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 	, m_vram(*this, "vram_%u", 1U, 0x2000U, ENDIANNESS_BIG)
-	, m_control(*this, "control", 0x10U, ENDIANNESS_BIG)
 	, m_tmap{(*this), (*this)}
 	, m_tile_cb(*this)
 	, m_mix_cb(*this)
@@ -191,6 +190,7 @@ deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag,
 	, m_last_big(0)
 	, m_8x8_gfx_bank(0)
 	, m_16x16_gfx_bank(0)
+	, m_control{0}
 {
 }
 
@@ -251,6 +251,8 @@ void deco16ic_device::device_start()
 	save_item(NAME(m_16x16_gfx_bank));
 	save_item(NAME(m_last_small));
 	save_item(NAME(m_last_big));
+
+	save_item(NAME(m_control));
 }
 
 //-------------------------------------------------

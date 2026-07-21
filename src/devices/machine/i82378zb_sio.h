@@ -35,7 +35,7 @@ public:
 	auto boot_state_hook() { return m_boot_state_hook.bind(); }
 	auto a20m() { return m_write_a20m.bind(); }
 	auto cpureset() { return m_write_cpureset.bind(); }
-//	auto pcirst() { return m_write_pcirst.bind(); }
+//  auto pcirst() { return m_write_pcirst.bind(); }
 
 	// X-Bus integrations
 	void pc_irq1_w(int state);
@@ -183,13 +183,13 @@ private:
 	void pc_irq11_w(int state);
 	void pc_irq12m_w(int state);
 
-//	void pc_pirqa_w(int state);
-//	void pc_pirqb_w(int state);
-//	void pc_pirqc_w(int state);
-//	void pc_pirqd_w(int state);
-//	void pc_mirq0_w(int state);
-//	void pc_mirq1_w(int state);
-//	void pc_mirq2_w(int state);
+//  void pc_pirqa_w(int state);
+//  void pc_pirqb_w(int state);
+//  void pc_pirqc_w(int state);
+//  void pc_pirqd_w(int state);
+//  void pc_mirq0_w(int state);
+//  void pc_mirq1_w(int state);
+//  void pc_mirq2_w(int state);
 
 	void iochck_w(int state);
 	void pc_select_dma_channel(int channel, bool state);

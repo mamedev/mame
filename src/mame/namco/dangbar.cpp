@@ -106,7 +106,7 @@ void sspanic_state::audio_map(address_map &map) // TODO: audio section seems sim
 void dangbar_state::main_map(address_map &map)
 {
 	sspanic_state::main_map(map);
-//	map(0x4000, 0x4000) comms with LED CPU?
+//  map(0x4000, 0x4000) comms with LED CPU?
 }
 
 void dangbar_state::ledcpu_map(address_map &map)

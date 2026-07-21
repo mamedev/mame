@@ -112,9 +112,9 @@ void zbi_bus_device::busack_w(int state)
 		if (entry.busdaisy_req_state() == ASSERT_LINE)
 		{
 			if (state)
-				entry.busdaisy_req_ack();	// Acknowledge request
+				entry.busdaisy_req_ack();   // Acknowledge request
 			else
-				busreq_w(ASSERT_LINE);		// Trigger bus request on behalf of waiting device
+				busreq_w(ASSERT_LINE);      // Trigger bus request on behalf of waiting device
 
 			break;
 		}

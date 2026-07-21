@@ -316,10 +316,10 @@ u16 nes_vt02_vt03_soc_device::decode_nt_addr(u16 addr, bool handle_single_page)
 	   bit 1 = 0 (HV Mode)
 
 	   or
-	 
+
 	   bit 0 = Page (0 = Page 0, 1 = Page 1)
-	   bit 1 = 1 (One Page mode) 
-	
+	   bit 1 = 1 (One Page mode)
+
 	   does single page mode only affect rendering, not PPU accesses?
 	   several games require single page mode when rendering, but have
 	   incorrect rendering if it's applied to PPU reads/writes outside

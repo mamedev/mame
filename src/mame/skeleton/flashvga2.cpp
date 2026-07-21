@@ -295,11 +295,11 @@ ROM_START( ruletamag )
 	ROM_FILL( 0x0060 >> 1, 1, 0x0b )
 
 	// does further checks if this skipped (going back to "error en reloj")
-//	ROM_FILL( 0x00b0 >> 1, 1, 0x55 )
-//	ROM_FILL( 0x00b2 >> 1, 1, 0xaa )
+//  ROM_FILL( 0x00b0 >> 1, 1, 0x55 )
+//  ROM_FILL( 0x00b2 >> 1, 1, 0xaa )
 
-//	ROM_FILL( 0x0008 >> 1, 1, 0x71 )
-//	ROM_FILL( 0x000a >> 1, 1, 0xac )
+//  ROM_FILL( 0x0008 >> 1, 1, 0x71 )
+//  ROM_FILL( 0x000a >> 1, 1, 0xac )
 ROM_END
 
 

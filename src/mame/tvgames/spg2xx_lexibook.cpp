@@ -534,7 +534,7 @@ CONS( 200?, lexizeus,    0,     0,        lexizeus,     lexizeus, spg2xx_lexizeu
 CONS( 200?, arcade3d,    0,     0,        lexizeus,     lexiseal, spg2xx_lexizeus_game_state, init_zeus, "Millennium 2000 GmbH / JungleTac", "Millennium Arcade 3D 15-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // 2007.08.02 Rev 05 on PCB
-CONS( 2007, pokermor,    0,     0,        lexizeus,     pokermor, spg2xx_lexizeus_game_state, init_zeus, "SA.BI.NE trend", "Poker & More 18-in-1 (Germany)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) 
+CONS( 2007, pokermor,    0,     0,        lexizeus,     pokermor, spg2xx_lexizeus_game_state, init_zeus, "SA.BI.NE trend", "Poker & More 18-in-1 (Germany)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 200?, vsplus,      0,     0,        vsplus,     vsplus, spg2xx_vsplus_game_state, init_vsplus, "<unknown> / JungleTac", "Vs Power Plus 30-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 

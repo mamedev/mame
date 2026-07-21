@@ -802,7 +802,7 @@ ROM_END
 
 /* Original Zaccaria PCBs, ASSA (Automave) stickers on ROMs.
    Only one byte on CPU ROM 1A differs from "monymony2" (at 0x14e5, from 0xbe to 0x96, same value here as "monymony"). */
-ROM_START( monymony3	 )
+ROM_START( monymony3     )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cpu1.1a",            0x0000, 0x1000, CRC(932006cd) SHA1(93cac6ad55af9f051f82abd18b5ff6ac2161b27f) ) // Original Zaccaria sticker on the only different ROM
 	ROM_CONTINUE(                   0x8000, 0x1000 )
@@ -843,7 +843,7 @@ ROM_START( monymony3	 )
 	ROM_REGION( 0x0117, "plds", 0 )
 	ROM_LOAD( "01_pal16v8.ic6j",            0x0000, 0x0117, BAD_DUMP CRC(38097d9b) SHA1(ce739600ed749466cab47ce73d93d22df1b5e199) ) // Bruteforced and untested
 	ROM_LOAD( "01_pal16v8.ic6k",            0x0000, 0x0117, BAD_DUMP CRC(b8f87879) SHA1(3098814e14fb69368553da67582f734eb15ce133) ) // Bruteforced and untested
-    ROM_LOAD( "a-00281_assa_m5_pal16l8.1a", 0x0000, 0x0104, NO_DUMP ) // On the ROMs PCB 1B11147
+	ROM_LOAD( "a-00281_assa_m5_pal16l8.1a", 0x0000, 0x0104, NO_DUMP ) // On the ROMs PCB 1B11147
 ROM_END
 
 ROM_START( jackrabt )
@@ -943,7 +943,7 @@ ROM_START( jackrabt2 )
 	ROM_REGION( 0x0104, "plds", 0 )
 	ROM_LOAD( "pal16l8.6j",   0x0000, 0x0104, CRC(a88e52d6) SHA1(32efecb91843d5d1bdace86cbcc94ebacf1b9389) )
 	ROM_LOAD( "pal16l8.6k",   0x0000, 0x0104, NO_DUMP )
-    ROM_LOAD( "pal.1a",       0x0000, 0x0104, NO_DUMP ) // On the ROMs PCB
+	ROM_LOAD( "pal.1a",       0x0000, 0x0104, NO_DUMP ) // On the ROMs PCB
 ROM_END
 
 ROM_START( jackrabts )

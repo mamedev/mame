@@ -2,9 +2,9 @@
 // copyright-holders:R. Belmont, AJR, Olivier Galibert
 /***************************************************************************
 
-	h8500.h
+    h8500.h
 
-	Hitachi H8/500 family base CPU device.
+    Hitachi H8/500 family base CPU device.
 
 ***************************************************************************/
 
@@ -208,14 +208,14 @@ protected:
 	};
 
 	static const char port_names[];
-	u16 m_pc;		// Current program counter - may not be the start of the executing instruction due to prefetch
-	u16 m_ppc;		// Previous program counter, the start of the currently executing instruction
-	u16 m_sr;		// Status register (low 8 bits are CCR)
-	u8 m_cp;		// Code page, the top 8 bits of the 24-bit program counter in maximum modes
-	u8 m_dp;		// Data page, the top 8 bits of the address for accesses relative to R0-R3 in maximum modes
-	u8 m_ep;		// Extra page, like DP but for accesses relative to R4-R5
-	u8 m_tp;		// sTack page, the top 8 bits of the address for accesses relative to R6 (FP) and R7 (SP)
-	u8 m_br;		// Base register, used as bits 15-8 of the address for "zero page" like instructions
+	u16 m_pc;       // Current program counter - may not be the start of the executing instruction due to prefetch
+	u16 m_ppc;      // Previous program counter, the start of the currently executing instruction
+	u16 m_sr;       // Status register (low 8 bits are CCR)
+	u8 m_cp;        // Code page, the top 8 bits of the 24-bit program counter in maximum modes
+	u8 m_dp;        // Data page, the top 8 bits of the address for accesses relative to R0-R3 in maximum modes
+	u8 m_ep;        // Extra page, like DP but for accesses relative to R4-R5
+	u8 m_tp;        // sTack page, the top 8 bits of the address for accesses relative to R6 (FP) and R7 (SP)
+	u8 m_br;        // Base register, used as bits 15-8 of the address for "zero page" like instructions
 	u16 m_r[8];
 
 	// ---- Dispatch / prefetch working state ----

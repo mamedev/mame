@@ -8,8 +8,8 @@ license:CC0-1.0
 
     NO ROM:
     Revista - SEEPROM only (was blank)
-	
-	the ROM cartridges appear to be data only
+
+    the ROM cartridges appear to be data only
 -->
 
 <!--
@@ -85,7 +85,7 @@ CEi = CE Internal ROM! (set to VCC in Cartridge-PCB)
 			-->
 		</part>
 	</software>
-	
+
 	<software name="cdisco" supported="no">
 		<description>Club Disco (Italy)</description>
 		<year>200?</year>
@@ -102,7 +102,7 @@ CEi = CE Internal ROM! (set to VCC in Cartridge-PCB)
 			-->
 		</part>
 	</software>
-	
+
 	<software name="cdiscos" cloneof="cdisco" supported="no">
 		<description>Club Disco (Spain)</description>
 		<year>200?</year>
@@ -112,6 +112,6 @@ CEi = CE Internal ROM! (set to VCC in Cartridge-PCB)
 				<rom name="clubdisco_spain.bin" size="0x800000" crc="8f200051" sha1="253a7bf48908eee8084c01fcc22b07db729d4714"/>
 			</dataarea>
 		</part>
-	</software>		
+	</software>
 
 </softwarelist>

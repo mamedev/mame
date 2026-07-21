@@ -4072,8 +4072,8 @@ static void print_atf22v10_power_down_mode_product_terms(const pal_data* pal, co
 
 
 /*-------------------------------------------------
-	print_atv750_product_terms - prints the product
-	terms for an ATV750
+    print_atv750_product_terms - prints the product
+    terms for an ATV750
 -------------------------------------------------*/
 
 static void print_atv750_product_terms(const pal_data* pal, const jed_data* jed)
@@ -6673,8 +6673,8 @@ static void config_atf22v10_power_down_mode_pins(const pal_data* pal, const jed_
 }
 
 /*-------------------------------------------------
-	config_atv750_pins - configures the pins for
-	an ATV750
+    config_atv750_pins - configures the pins for
+    an ATV750
 -------------------------------------------------*/
 
 static void config_atv750_pins(const pal_data* pal, const jed_data* jed)

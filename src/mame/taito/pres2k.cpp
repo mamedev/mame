@@ -46,7 +46,7 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-//	virtual void machine_reset() override ATTR_COLD;
+	//virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
