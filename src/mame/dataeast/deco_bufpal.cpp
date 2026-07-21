@@ -24,14 +24,15 @@
 DEFINE_DEVICE_TYPE(DECO_BUFFERED_PALETTE, deco_buffered_palette_device, "deco_bufpal", "DECO Buffered Palette Hardware")
 
 deco_buffered_palette_device::deco_buffered_palette_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: deco_buffered_palette_device(mconfig, tag, owner, clock, 0)
+	: deco_buffered_palette_device(mconfig, tag, owner, clock, 0, ENDIANNESS_LITTLE)
 {
 }
 
-deco_buffered_palette_device::deco_buffered_palette_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, u32 entries)
+deco_buffered_palette_device::deco_buffered_palette_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, u32 entries, endianness_t endianness)
 	: device_t(mconfig, DECO_BUFFERED_PALETTE, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
 	, m_entries(entries)
+	, m_paletteram(*this, "paletteram", entries << 2, endianness)
 	, m_dirty_start(entries)
 	, m_dirty_end(-1)
 {
@@ -68,7 +69,7 @@ void deco_buffered_palette_device::dma_w(u8 data)
 	{
 		if (m_dirty[i])
 		{
-			set_pen_color(i, xbgr_888_decoder(read_entry(i)));
+			set_pen_color(i, xbgr_888_decoder(m_paletteram[i]));
 			m_dirty[i] = false;
 		}
 	}
@@ -77,59 +78,18 @@ void deco_buffered_palette_device::dma_w(u8 data)
 }
 
 //-------------------------------------------------
-//  write* - write a byte to the base paletteram
+//  write* - write a word to the base paletteram
 //-------------------------------------------------
-
-void deco_buffered_palette_device::write8(offs_t offset, u8 data)
-{
-	m_paletteram.write8(offset, data);
-	set_dirty_area(offset >> ((m_paletteram_ext.base() != nullptr) ? 1 : 2));
-}
-
-void deco_buffered_palette_device::write16(offs_t offset, u16 data, u16 mem_mask)
-{
-	m_paletteram.write16(offset, data, mem_mask);
-	set_dirty_area(offset >> ((m_paletteram_ext.base() != nullptr) ? 0 : 1));
-}
 
 void deco_buffered_palette_device::write32(offs_t offset, u32 data, u32 mem_mask)
 {
-	m_paletteram.write32(offset, data, mem_mask);
+	COMBINE_DATA(&m_paletteram[offset]);
 	set_dirty_area(offset);
-}
-
-u8 deco_buffered_palette_device::read8(offs_t offset)
-{
-	return m_paletteram.read8(offset);
-}
-
-u16 deco_buffered_palette_device::read16(offs_t offset)
-{
-	return m_paletteram.read16(offset);
 }
 
 u32 deco_buffered_palette_device::read32(offs_t offset)
 {
-	return m_paletteram.read32(offset);
-}
-
-
-//-------------------------------------------------
-//  write*_ext - write a byte to the extended
-//  paletteram
-//-------------------------------------------------
-
-void deco_buffered_palette_device::write8_ext(offs_t offset, u8 data)
-{
-	m_paletteram_ext.write8(offset, data);
-	set_dirty_area(offset >> 1);
-}
-
-
-void deco_buffered_palette_device::write16_ext(offs_t offset, u16 data, u16 mem_mask)
-{
-	m_paletteram_ext.write16(offset, data, mem_mask);
-	set_dirty_area(offset);
+	return m_paletteram[offset];
 }
 
 
@@ -145,24 +105,6 @@ void deco_buffered_palette_device::device_start()
 {
 	assert(m_entries > 0);
 
-	// find the memory, if present
-	const memory_share *share = memshare(tag());
-	if (share != nullptr)
-	{
-		// find the extended (split) memory, if present
-		std::string tag_ext = std::string(tag()).append("_ext");
-		const memory_share *share_ext = memshare(tag_ext.c_str());
-
-		// determine bytes per entry and configure
-		const int bytes_per_entry = 4;
-		if (share_ext == nullptr)
-			m_paletteram.set(*share, bytes_per_entry);
-		else
-		{
-			m_paletteram.set(*share, bytes_per_entry / 2);
-			m_paletteram_ext.set(*share_ext, bytes_per_entry / 2);
-		}
-	}
 	const u32 entries = m_entries;
 	m_dirty = make_unique_clear<bool[]>(entries);
 

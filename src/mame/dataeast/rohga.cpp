@@ -638,7 +638,7 @@ void rohga_state::rohga_map(address_map &map)
 	map(0x3ce000, 0x3cefff).mirror(0x1000).ram().share(m_rowscroll[3]);
 
 	map(0x3d0000, 0x3d07ff).ram().share("spriteram1");
-	map(0x3e0000, 0x3e1fff).ram().w(m_palette, FUNC(deco_buffered_palette_device::write16)).share("palette");
+	map(0x3e0000, 0x3e1fff).rw(m_palette, FUNC(deco_buffered_palette_device::read16<false>), FUNC(deco_buffered_palette_device::write16<false>));
 	map(0x3f0000, 0x3f3fff).ram(); // Main RAM
 }
 
@@ -668,7 +668,7 @@ void rohga_state::wizdfire_map(address_map &map)
 	map(0x360000, 0x3607ff).ram().share("spriteram2");
 	map(0x370000, 0x370001).w(m_spriteram[1], FUNC(buffered_spriteram16_device::write)); // Triggers DMA for spriteram
 
-	map(0x380000, 0x381fff).ram().w(m_palette, FUNC(deco_buffered_palette_device::write16)).share("palette");
+	map(0x380000, 0x381fff).rw(m_palette, FUNC(deco_buffered_palette_device::read16<false>), FUNC(deco_buffered_palette_device::write16<false>));
 	map(0x390008, 0x390009).w(m_palette, FUNC(deco_buffered_palette_device::dma_w));
 
 	map(0xfdc000, 0xfe3fff).ram();
@@ -703,7 +703,7 @@ void rohga_state::nitrobal_map(address_map &map)
 	map(0x360000, 0x3607ff).ram().share("spriteram2");
 	map(0x370000, 0x370001).w(m_spriteram[1], FUNC(buffered_spriteram16_device::write)); // Triggers DMA for spriteram
 
-	map(0x380000, 0x381fff).ram().w(m_palette, FUNC(deco_buffered_palette_device::write16)).share("palette");
+	map(0x380000, 0x381fff).rw(m_palette, FUNC(deco_buffered_palette_device::read16<false>), FUNC(deco_buffered_palette_device::write16<false>));
 	map(0x390008, 0x390009).w(m_palette, FUNC(deco_buffered_palette_device::dma_w));
 
 	map(0xfec000, 0xff3fff).ram();
@@ -739,7 +739,7 @@ void rohga_state::hotb_base_map(address_map &map)
 	map(0x3ce000, 0x3cefff).mirror(0x1000).ram().share(m_rowscroll[3]);
 
 	map(0x3d0000, 0x3d07ff).ram().share("spriteram1");
-	map(0x3e0000, 0x3e1fff).mirror(0x2000).ram().w(m_palette, FUNC(deco_buffered_palette_device::write16)).share("palette");
+	map(0x3e0000, 0x3e1fff).mirror(0x2000).rw(m_palette, FUNC(deco_buffered_palette_device::read16<false>), FUNC(deco_buffered_palette_device::write16<false>));
 }
 
 void rohga_state::schmeisr_map(address_map &map)
@@ -1331,7 +1331,7 @@ void rohga_state::rohga_base(machine_config &config)
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
 
-	DECO_BUFFERED_PALETTE(config, m_palette, 0, 2048);
+	DECO_BUFFERED_PALETTE(config, m_palette, 0, 2048, ENDIANNESS_BIG);
 
 	DECO16IC(config, m_tilegen[0]);
 	m_tilegen[0]->set_size<0>(deco16ic_device::DECO_64x64);

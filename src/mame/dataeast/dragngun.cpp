@@ -622,7 +622,7 @@ void dragngun_state::common_map(address_map &map)
 	map(0x100000, 0x11ffff).ram();
 	map(0x120000, 0x127fff).rw(FUNC(dragngun_state::ioprot_r), FUNC(dragngun_state::ioprot_w)).umask32(0x0000ffff);
 	map(0x128000, 0x12800f).m(m_deco_irq, FUNC(deco_irq_device::map)).umask32(0x000000ff);
-	map(0x130000, 0x131fff).ram().w(m_palette, FUNC(deco_buffered_palette_device::write32)).share("palette");
+	map(0x130000, 0x131fff).rw(m_palette, FUNC(deco_buffered_palette_device::read32), FUNC(deco_buffered_palette_device::write32));
 	map(0x138008, 0x13800b).w(m_palette, FUNC(deco_buffered_palette_device::dma_w));
 
 	//  0x2xxxxx Namco Zooming Sprites
@@ -1022,7 +1022,7 @@ void dragngun_state::dragngun(machine_config &config)
 	//I82750DB(config, m_i82750db, XTAL(25'000'000));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dragngun);
-	DECO_BUFFERED_PALETTE(config, m_palette, 0, 2048);
+	DECO_BUFFERED_PALETTE(config, m_palette, 0, 2048, ENDIANNESS_LITTLE);
 
 	DECO146PROT(config, m_ioprot);
 	m_ioprot->port_a_cb().set_ioport("INPUTS");
@@ -1114,7 +1114,7 @@ void dragngun_state::lockload(machine_config &config)
 	BUFFERED_SPRITERAM32(config, m_spriteram);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dragngun);
-	DECO_BUFFERED_PALETTE(config, m_palette, 0, 2048);
+	DECO_BUFFERED_PALETTE(config, m_palette, 0, 2048, ENDIANNESS_LITTLE);
 
 	DECO16IC(config, m_tilegen[0]);
 	m_tilegen[0]->set_size<0>(deco16ic_device::DECO_64x32);

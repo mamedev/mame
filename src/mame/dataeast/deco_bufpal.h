@@ -13,8 +13,6 @@
 
 #pragma once
 
-#include "memarray.h"
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -27,36 +25,37 @@ class deco_buffered_palette_device : public device_t, public device_palette_inte
 {
 public:
 	// construction/destruction
-	deco_buffered_palette_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, u32 entries);
+	deco_buffered_palette_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, u32 entries, endianness_t endianness);
 	deco_buffered_palette_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration
-//  void set_membits(int membits);
-//  void set_endianness(endianness_t endianness);
 	void set_entries(u32 entries) { m_entries = entries; }
 
-	// palette RAM accessors
-	memory_array &basemem() { return m_paletteram; }
-	memory_array &extmem() { return m_paletteram_ext; }
-
-	// raw entry reading
-	u32 read_entry(pen_t pen) const
-	{
-		u32 data = m_paletteram.read(pen);
-		if (m_paletteram_ext.base() != nullptr)
-			data |= m_paletteram_ext.read(pen) << (8 * m_paletteram.bytes_per_entry());
-		return data;
-	}
-
 	// generic read/write handlers
-	u8 read8(offs_t offset);
-	void write8(offs_t offset, u8 data);
-	void write8_ext(offs_t offset, u8 data);
-	u16 read16(offs_t offset);
-	void write16(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void write16_ext(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u32 read32(offs_t offset);
 	void write32(offs_t offset, u32 data, u32 mem_mask = ~0);
+
+	template <bool IsLittleEndian> u16 read16(offs_t offset)
+	{
+		const u8 shift = BIT(IsLittleEndian ? offset : ~offset, 0) << 4;
+		return (read32(offset >> 1) >> shift) & 0xffff;
+	}
+	template <bool IsLittleEndian> void write16(offs_t offset, u16 data, u16 mem_mask = ~0)
+	{
+		const u8 shift = BIT(IsLittleEndian ? offset : ~offset, 0) << 4;
+		write32(offset >> 1, u32(data) << shift, u32(mem_mask) << shift);
+	}
+
+	template <bool IsLittleEndian> u8 read8(offs_t offset)
+	{
+		const u8 shift = BIT(IsLittleEndian ? offset : ~offset, 0, 2) << 3;
+		return (read32(offset >> 2) >> shift) & 0xff;
+	}
+	template <bool IsLittleEndian> void write8(offs_t offset, u8 data)
+	{
+		const u8 shift = BIT(IsLittleEndian ? offset : ~offset, 0, 2) << 3;
+		write32(offset >> 2, u32(data) << shift, u32(0xff) << shift);
+	}
 
 	void dma_w(u8 data);
 
@@ -72,23 +71,15 @@ private:
 	rgb_t xbgr_888_decoder(u32 raw);
 
 	// configuration state
-	u32                     m_entries;              // number of entries in the palette
-//  u32                     m_indirect_entries;     // number of indirect colors in the palette
-//  bool                    m_enable_shadows;       // are shadows enabled?
-//  bool                    m_enable_highlights;    // are highlights enabled?
-//  int                     m_membits;              // width of palette RAM, if different from native
-//  bool                    m_membits_supplied;     // true if membits forced in static config
-//  endianness_t            m_endianness;           // endianness of palette RAM, if different from native
-//  bool                    m_endianness_supplied;  // true if endianness forced in static config
+	u32                       m_entries;              // number of entries in the palette
 
 	// palette RAM
-	memory_array            m_paletteram;           // base memory
-	memory_array            m_paletteram_ext;       // extended memory
+	memory_share_creator<u32> m_paletteram;
 
 	// dirty flag
-	std::unique_ptr<bool[]> m_dirty;
-	s32                     m_dirty_start;
-	s32                     m_dirty_end;
+	std::unique_ptr<bool[]>   m_dirty;
+	s32                       m_dirty_start;
+	s32                       m_dirty_end;
 };
 
 #endif  // MAME_DATAEAST_DECO_BUFPAL_H

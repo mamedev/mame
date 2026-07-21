@@ -631,7 +631,7 @@ void fghthist_common_state::common_map(address_map &map)
 void fghthist_state::fghthist_common_map(address_map &map)
 {
 	common_map(map);
-	map(0x168000, 0x169fff).ram().w(m_palette, FUNC(deco_buffered_palette_device::write32)).share("palette");
+	map(0x168000, 0x169fff).rw(m_palette, FUNC(deco_buffered_palette_device::read32), FUNC(deco_buffered_palette_device::write32));
 	map(0x16c008, 0x16c00b).w(m_palette, FUNC(deco_buffered_palette_device::dma_w));
 	map(0x16c010, 0x16c013).r(FUNC(fghthist_state::unk_status_r));
 	map(0x178000, 0x179fff).rw(FUNC(fghthist_state::spriteram_r<0>), FUNC(fghthist_state::spriteram_w<0>));
@@ -951,7 +951,7 @@ void fghthist_state::fghthisto(machine_config &config)
 	m_screen->set_screen_update(FUNC(fghthist_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fghthist);
-	DECO_BUFFERED_PALETTE(config, m_palette, 0, 2048);
+	DECO_BUFFERED_PALETTE(config, m_palette, 0, 2048, ENDIANNESS_LITTLE);
 
 	DECO16IC(config, m_tilegen[0]);
 	m_tilegen[0]->set_size<0>(deco16ic_device::DECO_64x32);
