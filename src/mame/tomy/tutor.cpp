@@ -188,8 +188,8 @@ namespace {
 class tutor_state : public driver_device
 {
 public:
-	tutor_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tutor_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cart(*this, "cartslot"),
 		m_cass(*this, "cassette"),
@@ -305,12 +305,12 @@ void tutor_state::machine_reset()
 
 uint8_t tutor_state::key_r(offs_t offset)
 {
-	uint8_t value = m_io_line[(offset & 0x0078) >> 3]->read();
+	uint8_t value = m_io_line[(offset & 0x0038) >> 3]->read();
 
 	/* hack for ports overlapping with joystick */
 	if (offset >= 32 && offset < 48)
 	{
-		value |= m_io_line_alt[(offset & 0x0078) >> 3]->read();
+		value |= m_io_line_alt[(offset & 0x0008) >> 3]->read();
 	}
 
 	return BIT(value, offset & 7);
@@ -376,7 +376,7 @@ void tutor_state::tutor_mapper_w(offs_t offset, uint8_t data)
 		break;
 
 	default:
-		if (!(offset & 1))
+		if (~offset & 1)
 			logerror("unknown port in %s %d\n", __FILE__, __LINE__);
 		break;
 	}
@@ -484,7 +484,7 @@ uint8_t tutor_state::tutor_printer_r(offs_t offset)
 		break;
 
 	default:
-		if (! (offset & 1))
+		if (~offset & 1)
 			logerror("unknown port in %s %d\n", __FILE__, __LINE__);
 		reply = 0;
 		break;
@@ -508,7 +508,7 @@ void tutor_state::tutor_printer_w(offs_t offset, uint8_t data)
 		break;
 
 	default:
-		if (! (offset & 1))
+		if (~offset & 1)
 			logerror("unknown port in %s %d\n", __FILE__, __LINE__);
 		break;
 	}
@@ -781,7 +781,6 @@ void tutor_state::tutor(machine_config &config)
 
 	// software lists
 	SOFTWARE_LIST(config, "cart_list").set_original("tutor");
-
 }
 
 void tutor_state::pyuutajr(machine_config &config)
