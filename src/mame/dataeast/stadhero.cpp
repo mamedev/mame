@@ -169,7 +169,7 @@ uint32_t stadhero_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_spritegen->set_flip_screen(flip);
 	m_pf1_tilemap->set_flip(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	m_tilegen->deco_bac06_pf_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_tilegen->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_spriteram, 0x800 / 2);
 	m_pf1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -227,9 +227,9 @@ void stadhero_state::main_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x200000, 0x2007ff).ram().w(FUNC(stadhero_state::pf1_data_w)).share(m_pf1_data);
-	map(0x240000, 0x240007).w(m_tilegen, FUNC(deco_bac06_device::pf_control_0_w)); // text layer
-	map(0x240010, 0x240017).w(m_tilegen, FUNC(deco_bac06_device::pf_control_1_w));
-	map(0x260000, 0x261fff).rw(m_tilegen, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x240000, 0x240007).w(m_tilegen, FUNC(deco_bac06_device::ctrlreg_w)); // text layer
+	map(0x240010, 0x240017).w(m_tilegen, FUNC(deco_bac06_device::scrollreg_w));
+	map(0x260000, 0x261fff).rw(m_tilegen, FUNC(deco_bac06_device::vram_r), FUNC(deco_bac06_device::vram_w));
 	map(0x30c000, 0x30c001).portr("INPUTS");
 	map(0x30c002, 0x30c002).lr8(NAME([this] () { return uint8_t(m_coin->read()); }));
 	map(0x30c003, 0x30c003).r(FUNC(stadhero_state::mystery_r));
@@ -389,6 +389,7 @@ void stadhero_state::stadhero(machine_config &config)
 	DECO_BAC06(config, m_tilegen);
 	m_tilegen->set_gfx_region_wide(1, 1, 2);
 	m_tilegen->set_gfxdecode_tag(m_gfxdecode);
+	m_tilegen->set_has_bank(true);
 
 	DECO_MXC06(config, m_spritegen, "palette", gfx_stadhero_spr);
 

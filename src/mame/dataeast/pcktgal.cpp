@@ -151,7 +151,7 @@ uint32_t pcktgal_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 {
 	bool flip = m_tilegen->get_flip_state();
 	m_tilegen->set_flip_screen(flip);
-	m_tilegen->deco_bac06_pf_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_tilegen->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	draw_sprites(bitmap, cliprect, flip);
 	return 0;
 }
@@ -161,7 +161,7 @@ uint32_t pcktgal_state::screen_update_bootleg(screen_device &screen, bitmap_ind1
 	bool flip = m_tilegen->get_flip_state();
 	m_tilegen->set_flip_screen(flip);
 	// the bootleg doesn't properly set the tilemap registers, because it's on non-original hardware, which probably doesn't have the flexible tilemaps.
-	m_tilegen->deco_bac06_pf_draw_bootleg(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0, 2, 0);
+	m_tilegen->draw_bootleg(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0, 2, 0);
 	draw_sprites(bitmap, cliprect, flip);
 	return 0;
 }
@@ -216,11 +216,11 @@ uint8_t pcktgal_state::sound_unk_r()
 void pcktgal_state::main_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x0800, 0x0fff).rw(m_tilegen, FUNC(deco_bac06_device::pf_data_8bit_r), FUNC(deco_bac06_device::pf_data_8bit_w));
+	map(0x0800, 0x0fff).rw(m_tilegen, FUNC(deco_bac06_device::vram8_r<false>), FUNC(deco_bac06_device::vram8_w<false>));
 	map(0x1000, 0x11ff).ram().share(m_spriteram);
 	map(0x1800, 0x1800).portr("P1");
-	map(0x1800, 0x1807).w(m_tilegen, FUNC(deco_bac06_device::pf_control0_8bit_w));
-	map(0x1810, 0x181f).rw(m_tilegen, FUNC(deco_bac06_device::pf_control1_8bit_r), FUNC(deco_bac06_device::pf_control1_8bit_w));
+	map(0x1800, 0x1807).w(m_tilegen, FUNC(deco_bac06_device::ctrlreg8_w));
+	map(0x1810, 0x181f).rw(m_tilegen, FUNC(deco_bac06_device::scrollreg8_r<false>), FUNC(deco_bac06_device::scrollreg8_w<false>));
 	map(0x1a00, 0x1a00).portr("P2").w(FUNC(pcktgal_state::sound_w));
 	map(0x1c00, 0x1c00).portr("DSW").w(FUNC(pcktgal_state::bank_w));
 	map(0x4000, 0x5fff).bankr(m_mainbank[0]);

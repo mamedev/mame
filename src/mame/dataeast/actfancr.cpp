@@ -107,14 +107,14 @@ private:
 uint32_t actfancr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// Draw playfield
-	bool flip = m_tilegen[1]->get_flip_state();
+	const bool flip = m_tilegen[1]->get_flip_state();
 	m_tilegen[0]->set_flip_screen(flip);
 	m_tilegen[1]->set_flip_screen(flip);
 	m_spritegen->set_flip_screen(flip);
 
-	m_tilegen[0]->deco_bac06_pf_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_tilegen[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_spriteram16.target(), 0x800/2);
-	m_tilegen[1]->deco_bac06_pf_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen[1]->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -154,12 +154,12 @@ void actfancr_state::buffer_spriteram_w(uint8_t data)
 void actfancr_state::prg_map(address_map &map)
 {
 	map(0x000000, 0x02ffff).rom();
-	map(0x060000, 0x060007).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control0_8bit_w));
-	map(0x060010, 0x06001f).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control1_8bit_swap_w));
-	map(0x062000, 0x063fff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));
-	map(0x070000, 0x070007).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control0_8bit_w));
-	map(0x070010, 0x07001f).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control1_8bit_swap_w));
-	map(0x072000, 0x0727ff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));
+	map(0x060000, 0x060007).w(m_tilegen[0], FUNC(deco_bac06_device::ctrlreg8_w));
+	map(0x060010, 0x06001f).w(m_tilegen[0], FUNC(deco_bac06_device::scrollreg8_w<true>));
+	map(0x062000, 0x063fff).rw(m_tilegen[0], FUNC(deco_bac06_device::vram8_r<true>), FUNC(deco_bac06_device::vram8_w<true>));
+	map(0x070000, 0x070007).w(m_tilegen[1], FUNC(deco_bac06_device::ctrlreg8_w));
+	map(0x070010, 0x07001f).w(m_tilegen[1], FUNC(deco_bac06_device::scrollreg8_w<true>));
+	map(0x072000, 0x0727ff).rw(m_tilegen[1], FUNC(deco_bac06_device::vram8_r<true>), FUNC(deco_bac06_device::vram8_w<true>));
 	map(0x100000, 0x1007ff).ram().share(m_spriteram);
 	map(0x110000, 0x110001).w(FUNC(actfancr_state::buffer_spriteram_w));
 	map(0x120000, 0x1205ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
@@ -175,14 +175,14 @@ void actfancr_state::prg_map(address_map &map)
 void triothep_state::prg_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x040000, 0x040007).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control0_8bit_w));
-	map(0x040010, 0x04001f).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control1_8bit_swap_w));
-	map(0x044000, 0x045fff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));
-	map(0x046400, 0x0467ff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_rowscroll_8bit_swap_r), FUNC(deco_bac06_device::pf_rowscroll_8bit_swap_w));
-	map(0x060000, 0x060007).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control0_8bit_w));
-	map(0x060010, 0x06001f).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control1_8bit_swap_w));
-	map(0x064000, 0x0647ff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));
-	map(0x066400, 0x0667ff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_rowscroll_8bit_swap_r), FUNC(deco_bac06_device::pf_rowscroll_8bit_swap_w));
+	map(0x040000, 0x040007).w(m_tilegen[1], FUNC(deco_bac06_device::ctrlreg8_w));
+	map(0x040010, 0x04001f).w(m_tilegen[1], FUNC(deco_bac06_device::scrollreg8_w<true>));
+	map(0x044000, 0x045fff).rw(m_tilegen[1], FUNC(deco_bac06_device::vram8_r<true>), FUNC(deco_bac06_device::vram8_w<true>));
+	map(0x046400, 0x0467ff).rw(m_tilegen[1], FUNC(deco_bac06_device::rowscroll8_r<true>), FUNC(deco_bac06_device::rowscroll8_w<true>));
+	map(0x060000, 0x060007).w(m_tilegen[0], FUNC(deco_bac06_device::ctrlreg8_w));
+	map(0x060010, 0x06001f).w(m_tilegen[0], FUNC(deco_bac06_device::scrollreg8_w<true>));
+	map(0x064000, 0x0647ff).rw(m_tilegen[0], FUNC(deco_bac06_device::vram8_r<true>), FUNC(deco_bac06_device::vram8_w<true>));
+	map(0x066400, 0x0667ff).rw(m_tilegen[0], FUNC(deco_bac06_device::rowscroll8_r<true>), FUNC(deco_bac06_device::rowscroll8_w<true>));
 	map(0x100000, 0x100000).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x110000, 0x110001).w(FUNC(triothep_state::buffer_spriteram_w));
 	map(0x120000, 0x1207ff).ram().share("spriteram");

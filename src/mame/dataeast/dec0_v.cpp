@@ -31,9 +31,9 @@ u32 dec0_8751_state::screen_update_hbarrel(screen_device &screen, bitmap_ind16 &
 	m_tilegen[2]->set_flip_screen(flip);
 	m_spritegen->set_flip_screen(flip);
 
-	m_tilegen[2]->deco_bac06_pf_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
-	m_tilegen[1]->deco_bac06_pf_draw(screen, bitmap, cliprect, 0, 2);
-	m_tilegen[0]->deco_bac06_pf_draw(screen, bitmap, cliprect, 0, 4);
+	m_tilegen[2]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
+	m_tilegen[1]->draw(screen, bitmap, cliprect, 0, 2);
+	m_tilegen[0]->draw(screen, bitmap, cliprect, 0, 4);
 	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_buffered_spriteram, 0x800/2);
 	return 0;
 }
@@ -65,15 +65,15 @@ u32 dec0_8751_state::screen_update_bandit(screen_device &screen, bitmap_ind16 &b
 
 	if (m_pri == 7)
 	{
-		m_tilegen[1]->deco_bac06_pf_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
-		m_tilegen[2]->deco_bac06_pf_draw(screen, bitmap, cliprect, 0, 2);
-		m_tilegen[0]->deco_bac06_pf_draw(screen, bitmap, cliprect, 0, 4);
+		m_tilegen[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
+		m_tilegen[2]->draw(screen, bitmap, cliprect, 0, 2);
+		m_tilegen[0]->draw(screen, bitmap, cliprect, 0, 4);
 	}
 	else
 	{
-		m_tilegen[2]->deco_bac06_pf_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
-		m_tilegen[1]->deco_bac06_pf_draw(screen, bitmap, cliprect, 0, 2);
-		m_tilegen[0]->deco_bac06_pf_draw(screen, bitmap, cliprect, 0, 4);
+		m_tilegen[2]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
+		m_tilegen[1]->draw(screen, bitmap, cliprect, 0, 2);
+		m_tilegen[0]->draw(screen, bitmap, cliprect, 0, 4);
 	}
 
 	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_buffered_spriteram, 0x800/2);
@@ -98,18 +98,18 @@ u32 drgninjab_state::screen_update_baddudes(screen_device &screen, bitmap_ind16 
 	/* WARNING: inverted wrt Midnight Resistance */
 	const u8 fg = BIT(m_pri, 0) ? 1 : 2;
 	const u8 bg = BIT(m_pri, 0) ? 2 : 1;
-	m_tilegen[bg]->deco_bac06_pf_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_tilegen[fg]->deco_bac06_pf_draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | TILEMAP_DRAW_LAYER1, 0);
+	m_tilegen[bg]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_tilegen[fg]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | TILEMAP_DRAW_LAYER1, 0);
 
 	if (BIT(m_pri, 1))
-		m_tilegen[bg]->deco_bac06_pf_draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0); // upper 8 pens of upper 8 priority marked tiles /* Foreground pens only */
+		m_tilegen[bg]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0); // upper 8 pens of upper 8 priority marked tiles /* Foreground pens only */
 
 	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_buffered_spriteram, 0x800/2);
 
 	if (BIT(m_pri, 2))
-		m_tilegen[fg]->deco_bac06_pf_draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0); // upper 8 pens of upper 8 priority marked tiles /* Foreground pens only */
+		m_tilegen[fg]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0); // upper 8 pens of upper 8 priority marked tiles /* Foreground pens only */
 
-	m_tilegen[0]->deco_bac06_pf_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen[0]->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -154,10 +154,10 @@ u32 dec0_state::screen_update_robocop(screen_device &screen, bitmap_ind16 &bitma
 
 	const u8 fg = BIT(m_pri, 0) ? 2 : 1;
 	const u8 bg = BIT(m_pri, 0) ? 1 : 2;
-	m_tilegen[bg]->deco_bac06_pf_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
-	m_tilegen[fg]->deco_bac06_pf_draw(screen, bitmap, cliprect, 0, 2);
+	m_tilegen[bg]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
+	m_tilegen[fg]->draw(screen, bitmap, cliprect, 0, 2);
 	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_buffered_spriteram, 0x800/2);
-	m_tilegen[0]->deco_bac06_pf_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen[0]->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -168,30 +168,30 @@ u32 automat_state::screen_update_automat(screen_device &screen, bitmap_ind16 &bi
 	// layer enables seem different... where are they?
 
 	// the bootleg doesn't write these registers, I think they're hardcoded?, so fake them for compatibility with our implementation..
-	m_tilegen[0]->pf_control_0_w(0,0x0003, 0x00ff); // 8x8
-	m_tilegen[0]->pf_control_0_w(1,0x0003, 0x00ff);
-	m_tilegen[0]->pf_control_0_w(2,0x0000, 0x00ff);
-	m_tilegen[0]->pf_control_0_w(3,0x0001, 0x00ff); // dimensions
+	m_tilegen[0]->ctrlreg_w(0,0x0003, 0x00ff); // 8x8
+	m_tilegen[0]->ctrlreg_w(1,0x0003, 0x00ff);
+	m_tilegen[0]->ctrlreg_w(2,0x0000, 0x00ff);
+	m_tilegen[0]->ctrlreg_w(3,0x0001, 0x00ff); // dimensions
 
-	m_tilegen[1]->pf_control_0_w(0,0x0082, 0x00ff); // 16x16
-	m_tilegen[1]->pf_control_0_w(1,0x0000, 0x00ff);
-	m_tilegen[1]->pf_control_0_w(2,0x0000, 0x00ff);
-	m_tilegen[1]->pf_control_0_w(3,0x0001, 0x00ff); // dimensions
+	m_tilegen[1]->ctrlreg_w(0,0x0082, 0x00ff); // 16x16
+	m_tilegen[1]->ctrlreg_w(1,0x0000, 0x00ff);
+	m_tilegen[1]->ctrlreg_w(2,0x0000, 0x00ff);
+	m_tilegen[1]->ctrlreg_w(3,0x0001, 0x00ff); // dimensions
 
-	m_tilegen[2]->pf_control_0_w(0,0x0082, 0x00ff); // 16x16
-	m_tilegen[2]->pf_control_0_w(1,0x0003, 0x00ff);
-	m_tilegen[2]->pf_control_0_w(2,0x0000, 0x00ff);
-	m_tilegen[2]->pf_control_0_w(3,0x0001, 0x00ff); // dimensions
+	m_tilegen[2]->ctrlreg_w(0,0x0082, 0x00ff); // 16x16
+	m_tilegen[2]->ctrlreg_w(1,0x0003, 0x00ff);
+	m_tilegen[2]->ctrlreg_w(2,0x0000, 0x00ff);
+	m_tilegen[2]->ctrlreg_w(3,0x0001, 0x00ff); // dimensions
 
 	// scroll registers got written elsewhere, copy them across
-	m_tilegen[0]->pf_control_1_w(0,0x0000, 0xffff); // no scroll?
-	m_tilegen[0]->pf_control_1_w(1,0x0000, 0xffff); // no scroll?
+	m_tilegen[0]->scrollreg_w(0,0x0000, 0xffff); // no scroll?
+	m_tilegen[0]->scrollreg_w(1,0x0000, 0xffff); // no scroll?
 
-	m_tilegen[1]->pf_control_1_w(0,m_automat_scroll_regs[3] - 0x010a, 0xffff);
-	m_tilegen[1]->pf_control_1_w(1,m_automat_scroll_regs[2], 0xffff);
+	m_tilegen[1]->scrollreg_w(0,m_automat_scroll_regs[3] - 0x010a, 0xffff);
+	m_tilegen[1]->scrollreg_w(1,m_automat_scroll_regs[2], 0xffff);
 
-	m_tilegen[2]->pf_control_1_w(0,m_automat_scroll_regs[1] - 0x0108, 0xffff);
-	m_tilegen[2]->pf_control_1_w(1,m_automat_scroll_regs[0], 0xffff);
+	m_tilegen[2]->scrollreg_w(0,m_automat_scroll_regs[1] - 0x0108, 0xffff);
+	m_tilegen[2]->scrollreg_w(1,m_automat_scroll_regs[0], 0xffff);
 
 
 	const bool flip = m_tilegen[0]->get_flip_state();
@@ -202,10 +202,10 @@ u32 automat_state::screen_update_automat(screen_device &screen, bitmap_ind16 &bi
 
 	const u8 fg = BIT(m_pri, 0) ? 2 : 1;
 	const u8 bg = BIT(m_pri, 0) ? 1 : 2;
-	m_tilegen[bg]->deco_bac06_pf_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
-	m_tilegen[fg]->deco_bac06_pf_draw(screen, bitmap, cliprect, 0, 2);
+	m_tilegen[bg]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
+	m_tilegen[fg]->draw(screen, bitmap, cliprect, 0, 2);
 	m_spritegen->draw_sprites_bootleg(screen, bitmap, cliprect, m_buffered_spriteram, 0x800/2); // TODO : RAM size
-	m_tilegen[0]->deco_bac06_pf_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen[0]->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -222,9 +222,9 @@ u32 dec0_8751_state::screen_update_birdtry(screen_device &screen, bitmap_ind16 &
 	/* This game doesn't have the extra playfield chip on the game board, but
 	the palette does show through. */
 	bitmap.fill(m_palette->pen(768), cliprect);
-	m_tilegen[1]->deco_bac06_pf_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen[1]->draw(screen, bitmap, cliprect, 0, 0);
 	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_buffered_spriteram, 0x800/2);
-	m_tilegen[0]->deco_bac06_pf_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen[0]->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -239,16 +239,16 @@ u32 slyspy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	m_tilegen[2]->set_flip_screen(flip);
 	m_spritegen->set_flip_screen(flip);
 
-	m_tilegen[2]->deco_bac06_pf_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_tilegen[1]->deco_bac06_pf_draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | TILEMAP_DRAW_LAYER1, 0);
+	m_tilegen[2]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_tilegen[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | TILEMAP_DRAW_LAYER1, 0);
 
 	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_buffered_spriteram, 0x800/2);
 
 	/* Redraw top 8 pens of top 8 palettes over sprites */
 	if (BIT(m_pri, 7))
-		m_tilegen[1]->deco_bac06_pf_draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0); // upper 8 pens of upper 8 priority marked tiles
+		m_tilegen[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0); // upper 8 pens of upper 8 priority marked tiles
 
-	m_tilegen[0]->deco_bac06_pf_draw(screen, bitmap, cliprect, 0,0);
+	m_tilegen[0]->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -257,30 +257,30 @@ u32 automat_state::screen_update_secretab(screen_device &screen, bitmap_ind16 &b
 	// layer enables seem different... where are they?
 
 	// the bootleg doesn't write these registers, I think they're hardcoded?, so fake them for compatibility with our implementation..
-	m_tilegen[0]->pf_control_0_w(0,0x0003, 0x00ff); // 8x8
-	m_tilegen[0]->pf_control_0_w(1,0x0003, 0x00ff);
-	m_tilegen[0]->pf_control_0_w(2,0x0000, 0x00ff);
-	m_tilegen[0]->pf_control_0_w(3,0x0001, 0x00ff); // dimensions
+	m_tilegen[0]->ctrlreg_w(0,0x0003, 0x00ff); // 8x8
+	m_tilegen[0]->ctrlreg_w(1,0x0003, 0x00ff);
+	m_tilegen[0]->ctrlreg_w(2,0x0000, 0x00ff);
+	m_tilegen[0]->ctrlreg_w(3,0x0001, 0x00ff); // dimensions
 
-	m_tilegen[1]->pf_control_0_w(0,0x0082, 0x00ff); // 16x16
-	m_tilegen[1]->pf_control_0_w(1,0x0000, 0x00ff);
-	m_tilegen[1]->pf_control_0_w(2,0x0000, 0x00ff);
-	m_tilegen[1]->pf_control_0_w(3,0x0001, 0x00ff); // dimensions
+	m_tilegen[1]->ctrlreg_w(0,0x0082, 0x00ff); // 16x16
+	m_tilegen[1]->ctrlreg_w(1,0x0000, 0x00ff);
+	m_tilegen[1]->ctrlreg_w(2,0x0000, 0x00ff);
+	m_tilegen[1]->ctrlreg_w(3,0x0001, 0x00ff); // dimensions
 
-	m_tilegen[2]->pf_control_0_w(0,0x0082, 0x00ff); // 16x16
-	m_tilegen[2]->pf_control_0_w(1,0x0003, 0x00ff);
-	m_tilegen[2]->pf_control_0_w(2,0x0000, 0x00ff);
-	m_tilegen[2]->pf_control_0_w(3,0x0001, 0x00ff); // dimensions
+	m_tilegen[2]->ctrlreg_w(0,0x0082, 0x00ff); // 16x16
+	m_tilegen[2]->ctrlreg_w(1,0x0003, 0x00ff);
+	m_tilegen[2]->ctrlreg_w(2,0x0000, 0x00ff);
+	m_tilegen[2]->ctrlreg_w(3,0x0001, 0x00ff); // dimensions
 
 	// scroll registers got written elsewhere, copy them across
-	m_tilegen[0]->pf_control_1_w(0,0x0000, 0xffff); // no scroll?
-	m_tilegen[0]->pf_control_1_w(1,0x0000, 0xffff); // no scroll?
+	m_tilegen[0]->scrollreg_w(0,0x0000, 0xffff); // no scroll?
+	m_tilegen[0]->scrollreg_w(1,0x0000, 0xffff); // no scroll?
 
-	m_tilegen[1]->pf_control_1_w(0,m_automat_scroll_regs[3] - 0x010a, 0xffff);
-	m_tilegen[1]->pf_control_1_w(1,m_automat_scroll_regs[2], 0xffff);
+	m_tilegen[1]->scrollreg_w(0,m_automat_scroll_regs[3] - 0x010a, 0xffff);
+	m_tilegen[1]->scrollreg_w(1,m_automat_scroll_regs[2], 0xffff);
 
-	m_tilegen[2]->pf_control_1_w(0,m_automat_scroll_regs[1] - 0x0108, 0xffff);
-	m_tilegen[2]->pf_control_1_w(1,m_automat_scroll_regs[0], 0xffff);
+	m_tilegen[2]->scrollreg_w(0,m_automat_scroll_regs[1] - 0x0108, 0xffff);
+	m_tilegen[2]->scrollreg_w(1,m_automat_scroll_regs[0], 0xffff);
 
 	const bool flip = m_tilegen[0]->get_flip_state();
 	m_tilegen[0]->set_flip_screen(flip);
@@ -288,16 +288,16 @@ u32 automat_state::screen_update_secretab(screen_device &screen, bitmap_ind16 &b
 	m_tilegen[2]->set_flip_screen(flip);
 	m_spritegen->set_flip_screen(flip);
 
-	m_tilegen[2]->deco_bac06_pf_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_tilegen[1]->deco_bac06_pf_draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | TILEMAP_DRAW_LAYER1, 0);
+	m_tilegen[2]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_tilegen[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | TILEMAP_DRAW_LAYER1, 0);
 
 	m_spritegen->draw_sprites_bootleg(screen, bitmap, cliprect, m_buffered_spriteram, 0x800/2); // TODO : RAM size
 
 	/* Redraw top 8 pens of top 8 palettes over sprites */
 	if (BIT(m_pri, 7))
-		m_tilegen[1]->deco_bac06_pf_draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0); // upper 8 pens of upper 8 priority marked tiles
+		m_tilegen[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0); // upper 8 pens of upper 8 priority marked tiles
 
-	m_tilegen[0]->deco_bac06_pf_draw(screen, bitmap, cliprect, 0,0);
+	m_tilegen[0]->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 

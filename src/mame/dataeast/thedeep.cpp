@@ -207,7 +207,7 @@ uint32_t thedeep_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	m_tilegen->deco_bac06_pf_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_tilegen->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	m_spritegen->draw_sprites(screen, bitmap, cliprect, reinterpret_cast<uint16_t *>(m_spriteram.target()), 0x400 / 2);
 	m_text_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -283,12 +283,12 @@ void thedeep_state::main_map(address_map &map)
 	map(0xe00b, 0xe00b).portr("e00b");           // DSW2
 	map(0xe00c, 0xe00c).w("soundlatch", FUNC(generic_latch_8_device::write));  // To sound CPU
 	map(0xe100, 0xe100).w(FUNC(thedeep_state::e100_w));   // ?
-	map(0xe200, 0xe207).w(m_tilegen, FUNC(deco_bac06_device::pf_control0_8bit_w));
-	map(0xe210, 0xe217).w(m_tilegen, FUNC(deco_bac06_device::pf_control1_8bit_swap_w));
+	map(0xe200, 0xe207).w(m_tilegen, FUNC(deco_bac06_device::ctrlreg8_w));
+	map(0xe210, 0xe217).w(m_tilegen, FUNC(deco_bac06_device::scrollreg8_w<true>));
 	map(0xe400, 0xe7ff).ram().share(m_spriteram);   // Sprites
 	map(0xe800, 0xefff).ram().w(FUNC(thedeep_state::textram_w)).share(m_textram);  // Text layer
-	map(0xf000, 0xf7ff).rw(m_tilegen, FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));  // Background layer
-	map(0xf800, 0xf83f).rw(m_tilegen, FUNC(deco_bac06_device::pf_colscroll_8bit_swap_r), FUNC(deco_bac06_device::pf_colscroll_8bit_swap_w));
+	map(0xf000, 0xf7ff).rw(m_tilegen, FUNC(deco_bac06_device::vram8_r<true>), FUNC(deco_bac06_device::vram8_w<true>));  // Background layer
+	map(0xf800, 0xf83f).rw(m_tilegen, FUNC(deco_bac06_device::colscroll8_r<true>), FUNC(deco_bac06_device::colscroll8_w<true>));
 	map(0xf840, 0xffff).ram();
 }
 
