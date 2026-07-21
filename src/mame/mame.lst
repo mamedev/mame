@@ -36179,6 +36179,7 @@ pldoraemon
 pllovegene
 plpittashi
 sluster2
+srspirit
 sweethrt
 trocana
 
@@ -42051,8 +42052,8 @@ nclubv4
 othellos
 patocar
 pblbeach
-pclb2elk
 pckobe99
+pclb2elk
 pclove
 pclove2
 pclub2
@@ -42068,10 +42069,11 @@ pclub2wb
 pclubol
 pclubor
 pclubpok
-pcpooh2
-pcpooh3
+pclubsc5
 pclubyo
 pclubyo2
+pcpooh2
+pcpooh3
 prc28su
 prc29au
 prc297wi
@@ -45594,6 +45596,9 @@ csesame2
 
 @source:taito/caprcyc.cpp
 caprcyc
+
+@source:taito/caprstar.cpp
+caprstrs
 
 @source:taito/cchance.cpp
 cchance

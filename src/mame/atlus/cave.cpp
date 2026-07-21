@@ -4367,10 +4367,10 @@ ROM_START( paccarn )
 	ROM_REGION( 0x40000, "oki2", ROMREGION_ERASE00 )
 	// empty ROM socket
 
-	ROM_REGION( 0x117 * 3, "plds", 0 ) // all protected
-	ROM_LOAD( "n44u1b.u1",   0x117*0, 0x117, NO_DUMP )
-	ROM_LOAD( "n44u3b.u3",   0x117*1, 0x117, NO_DUMP )
-	ROM_LOAD( "n44u51a.u51", 0x117*2, 0x117, NO_DUMP )
+	ROM_REGION( 0x117 * 3, "plds", 0 )
+	ROM_LOAD( "n44u1b.u1",   0x117*0, 0x117, CRC(5ceb0101) SHA1(ad5d221eb87c52ee558d60e5e44a9933c669dcf2) )
+	ROM_LOAD( "n44u3b.u3",   0x117*1, 0x117, CRC(4cd79750) SHA1(cfb3331cd8bb2eaaf5d2a80ae76a5a15ae92d379) )
+	ROM_LOAD( "n44u51a.u51", 0x117*2, 0x117, CRC(3c5e9bc5) SHA1(b4e04c4fa91ff33542b73971f67e71d13e24c5ec) )
 ROM_END
 
 /***************************************************************************
