@@ -49,8 +49,8 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_soundlatch(*this, "soundlatch")
-		, m_paletteram(*this, "palette")
-		, m_paletteram_ext(*this, "palette_ext")
+		, m_paletteram(*this, "paletteram")
+		, m_paletteram_ext(*this, "paletteram_ext")
 	{ }
 
 	void vaportra(machine_config &config);

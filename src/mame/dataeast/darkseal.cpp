@@ -51,8 +51,8 @@ public:
 		, m_soundlatch(*this, "soundlatch")
 		, m_rowscroll_1(*this, "rowscroll_1")
 		, m_rowscroll_3(*this, "rowscroll_3")
-		, m_paletteram(*this, "palette")
-		, m_paletteram_ext(*this, "palette_ext")
+		, m_paletteram(*this, "paletteram")
+		, m_paletteram_ext(*this, "paletteram_ext")
 	{ }
 
 	void darkseal(machine_config &config);
