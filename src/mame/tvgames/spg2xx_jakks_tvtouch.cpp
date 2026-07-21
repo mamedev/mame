@@ -290,8 +290,8 @@ ROM_END
 } // anonymous namespace
 
 
-// TV Touch Games (these are re-release versions of classic JAKKS games but using a touchpad controller)
-CONS( 2012, tvtchsw,  0, 0, tvtouch, tvtouch, jakks_tvtouch_state, empty_init, "JAKKS Pacific Inc / Code Mystics", "TV Touch Games: Star Wars Original Trilogy", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // Touch games have 24C04
-CONS( 2012, tvtchspd, 0, 0, tvtouch, tvtouch, jakks_tvtouch_state, empty_init, "JAKKS Pacific Inc / Code Mystics", "TV Touch Games: Spider-Man in Villain Round-Up", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2012, tvtchsb,  0, 0, tvtouch, tvtouch, jakks_tvtouch_state, empty_init, "JAKKS Pacific Inc / Code Mystics", "TV Touch Games: SpongeBob SquarePants Jellyfish Dodge", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// TV Touch Games (these are re-release versions of classic Jakks games but using a touchpad controller)
+CONS( 2012, tvtchsw,  0, 0, tvtouch, tvtouch, jakks_tvtouch_state, empty_init, "Jakks Pacific / Code Mystics", "TV Touch Games: Star Wars Original Trilogy",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // Touch games have 24C04
+CONS( 2012, tvtchspd, 0, 0, tvtouch, tvtouch, jakks_tvtouch_state, empty_init, "Jakks Pacific / Code Mystics", "TV Touch Games: Spider-Man in Villain Round-Up",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2012, tvtchsb,  0, 0, tvtouch, tvtouch, jakks_tvtouch_state, empty_init, "Jakks Pacific / Code Mystics", "TV Touch Games: SpongeBob SquarePants Jellyfish Dodge", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // Cut the Rope was planned but never released

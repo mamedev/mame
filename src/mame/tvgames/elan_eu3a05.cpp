@@ -954,7 +954,7 @@ void elan_eu3a05_pvwwcas_state::init_pvwwcas()
 } // anonymous namespace
 
 
-CONS( 2004, rad_sinv, 0, 0, elan_rad_sinv, rad_sinv, elan_eu3a05_rad_sinv_state, empty_init, "Radica (licensed from Taito)",                      "Space Invaders [Lunar Rescue, Colony 7, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
+CONS( 2004, rad_sinv, 0, 0, elan_rad_sinv, rad_sinv, elan_eu3a05_rad_sinv_state, empty_init, "Radica (licensed from Taito)", "Space Invaders [Lunar Rescue, Colony 7, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
 
 CONS( 2004, rad_tetr, 0, 0, elan_eu3a05_1mb, rad_tetr, elan_eu3a05_state, empty_init, "Radica (licensed from Elorg / The Tetris Company)", "Tetris (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING ) // "5 Tetris games in 1"
 
@@ -967,29 +967,29 @@ CONS( 2005, airblsjs, 0, 0, elan_eu3a05_pal_4mb, airblsjs, elan_eu3a05_state, em
 
 CONS( 2004, buzztime, 0, 0, elan_buzztime, sudoku, elan_eu3a05_buzztime_state, empty_init, "Cadaco", "Buzztime Home Trivia System", MACHINE_NOT_WORKING )
 
-CONS( 2005, pvwwcas,  0,        0, pvwwcas,    sudoku,   elan_eu3a05_pvwwcas_state, init_pvwwcas, "Play Vision / Taikee / V-Tac", "Worldwide Casino Tour 12-in-1", MACHINE_NOT_WORKING )
+CONS( 2005, pvwwcas, 0, 0, pvwwcas, sudoku, elan_eu3a05_pvwwcas_state, init_pvwwcas, "Play Vision / Taikee / V-Tac", "Worldwide Casino Tour 12-in-1", MACHINE_NOT_WORKING )
 
 // unknown, might be EU3A05, but bad dump
 // CE and OE are on the other side of the CPU die compared to EU3A05, ROM seems half sized, or maybe internal area missing?
-CONS( 200?, bratzra,  0,        0, elan_eu3a05_1mb,    rad_sinv,   elan_eu3a05_state, empty_init, "MGA", "Bratz Rock Angelz", MACHINE_NOT_WORKING )
+CONS( 200?, bratzra, 0, 0, elan_eu3a05_1mb, rad_sinv, elan_eu3a05_state, empty_init, "MGA", "Bratz Rock Angelz", MACHINE_NOT_WORKING )
 
 
 // Below seem to be EU3A13, as that was confirmed for the Family Tetris die.  They're like EU3A05, but with a different memory map
 
-CONS( 2006, sudelan3, 0,        0, elan_eu3a13_1mb,      sudoku,   elan_eu3a13_state, init_sudelan3,  "All in 1 Products Ltd / Senario",  "Ultimate Sudoku TV Edition 3-in-1 (All in 1 / Senario)", MACHINE_NOT_WORKING )
+CONS( 2006, sudelan3, 0, 0, elan_eu3a13_1mb,     sudoku, elan_eu3a13_state, init_sudelan3, "All in 1 Products Ltd / Senario",      "Ultimate Sudoku TV Edition 3-in-1 (All in 1 / Senario)", MACHINE_NOT_WORKING )
 // Senario also distributed this version in the US without the '3 in 1' text on the box, ROM has not been verified to match
-CONS( 2005, sudelan, 0,         0, elan_eu3a13_pal_1mb,  sudoku,   elan_eu3a13_state, init_sudelan,  "All in 1 Products Ltd / Play Vision",  "Carol Vorderman's Sudoku Plug & Play TV Game (All in 1 / Play Vision)", MACHINE_NOT_WORKING )
+CONS( 2005, sudelan,  0, 0, elan_eu3a13_pal_1mb, sudoku, elan_eu3a13_state, init_sudelan,  "All in 1 Products Ltd / Play Vision",  "Carol Vorderman's Sudoku Plug & Play TV Game (All in 1 / Play Vision)", MACHINE_NOT_WORKING )
 
-CONS( 2005, sudoku2p, 0,        0, elan_eu3a13_pal_1mb,  sudoku2p, elan_eu3a13_state, empty_init,  "<unknown>",  "Sudoku TV Game (PAL, 2 players)", MACHINE_NOT_WORKING ) // a pair of yellow controllers with 'TV Sudoku Awesome Puzzles' on their label
+CONS( 2005, sudoku2p, 0, 0, elan_eu3a13_pal_1mb, sudoku2p, elan_eu3a13_state, empty_init, "<unknown>", "Sudoku TV Game (PAL, 2 players)", MACHINE_NOT_WORKING ) // a pair of yellow controllers with 'TV Sudoku Awesome Puzzles' on their label
 
-CONS( 2006, rad_ftet,  0,        0, elan_eu3a13_1mb,      rad_ftet, elan_eu3a13_state, empty_init,  "Radica",  "Family Tetris (NTSC)", MACHINE_NOT_WORKING )
-CONS( 2006, rad_ftetp, rad_ftet, 0, elan_eu3a13_pal_1mb,  rad_ftet, elan_eu3a13_state, empty_init,  "Radica",  "Family Tetris (PAL)", MACHINE_NOT_WORKING )
+CONS( 2006, rad_ftet,  0,        0, elan_eu3a13_1mb,     rad_ftet, elan_eu3a13_state, empty_init, "Radica", "Family Tetris (NTSC)", MACHINE_NOT_WORKING )
+CONS( 2006, rad_ftetp, rad_ftet, 0, elan_eu3a13_pal_1mb, rad_ftet, elan_eu3a13_state, empty_init, "Radica", "Family Tetris (PAL)",  MACHINE_NOT_WORKING )
 
-CONS( 200?, carlecfg, 0,        0, elan_eu3a13_1mb,      carlecfg, elan_eu3a13_state, empty_init,  "Excalibur Electronics",  "Carl Edwards' Chase For Glory", MACHINE_NOT_WORKING )
+CONS( 200?, carlecfg, 0, 0, elan_eu3a13_1mb, carlecfg, elan_eu3a13_state, empty_init, "Excalibur Electronics", "Carl Edwards' Chase For Glory", MACHINE_NOT_WORKING )
 
 // this is in very similar packaging to the 'pvmil' game in tvgames/spg2xx_playvision.cpp, and the casing is identical
 // however this is from a year earlier, and there is a subtle difference in the otherwise identical text on the back of the box, mentioning that it uses an 8-bit processor, where the other box states 16-bit
-CONS( 2005, pvmil8,   0,        0, elan_eu3a13_pal_2mb,  sudoku,   elan_eu3a13_state, empty_init,  "Play Vision", "Who Wants to Be a Millionaire? (Play Vision, Plug and Play, UK, 8-bit version)", MACHINE_NOT_WORKING )
+CONS( 2005, pvmil8,   0,      0, elan_eu3a13_pal_2mb, sudoku, elan_eu3a13_state, empty_init, "Play Vision", "Who Wants to Be a Millionaire? (Play Vision, Plug and Play, UK, 8-bit version)", MACHINE_NOT_WORKING )
 // see https://millionaire.fandom.com/wiki/Haluatko_miljon%C3%A4%C3%A4riksi%3F_(Play_Vision_game)
-CONS( 2005, pvmilfin, pvmil8,   0, elan_eu3a13_pal_2mb,  sudoku,   elan_eu3a13_state, empty_init,  "Play Vision", u8"Haluatko miljonääriksi? (Finland)", MACHINE_NOT_WORKING )
+CONS( 2005, pvmilfin, pvmil8, 0, elan_eu3a13_pal_2mb, sudoku, elan_eu3a13_state, empty_init, "Play Vision", u8"Haluatko miljonääriksi? (Finland)", MACHINE_NOT_WORKING )
 

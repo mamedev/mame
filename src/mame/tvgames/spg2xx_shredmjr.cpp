@@ -234,18 +234,18 @@ ROM_END
 // and sometimes even slightly different hardware, so aren't set as clones of each other
 
 // box title not confirmed, Guitar Rock on title screen, has Bon Jovi etc.
-CONS( 2007, taikeegr,    0,        0,        taikeegrp,    taikeegr, shredmjr_game_state, init_taikeegr, "TaiKee", "Guitar Rock (PAL)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // timing not quite correct yet
+CONS( 2007, taikeegr,  0, 0, taikeegrp, taikeegr,  shredmjr_game_state, init_taikeegr, "TaiKee", "Guitar Rock (PAL)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // timing not quite correct yet
 
 // Plug 'N' Play Rockstar Guitar on box, Guitar Rock on title screen, has Manic Street Preachers etc.
-CONS( 2007, rockstar,    0,        0,        taikeegrp,    taikeegr, shredmjr_game_state, init_taikeegr, "Ultimate Products / TaiKee", "Plug 'N' Play Rockstar Guitar / Guitar Rock (PAL)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // timing not quite correct yet
+CONS( 2007, rockstar,  0, 0, taikeegrp, taikeegr,  shredmjr_game_state, init_taikeegr, "Ultimate Products / TaiKee", "Plug 'N' Play Rockstar Guitar / Guitar Rock (PAL)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // timing not quite correct yet
 
 // dreamGEAR branded presentation, modified hardware (buttons read in a different way) same song seletion as taikeegr
-CONS( 2007, shredmjr,    0,        0,        shredmjr,     taikeegr, shredmjr_game_state, init_taikeegr, "dreamGEAR", "Shredmaster Jr (NTSC)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^
+CONS( 2007, shredmjr,  0, 0, shredmjr,  taikeegr,  shredmjr_game_state, init_taikeegr, "dreamGEAR", "Shredmaster Jr (NTSC)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^
 
 // doesn't have a Senario logo ingame, but does on box.  unique song selection
-CONS( 200?, guitarst,    0,        0,        taikeegr,     taikeegr, shredmjr_game_state, init_taikeegr, "Senario", "Guitar Star (US, Senario, NTSC)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^
+CONS( 200?, guitarst,  0, 0, taikeegr,  taikeegr,  shredmjr_game_state, init_taikeegr, "Senario", "Guitar Star (US, Senario, NTSC)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^
 
 // This one has the same songs as 'rockstar' but different game style / presentation.
 // Unit found in Ireland "imported by Cathay Product Sourcing Ltd." on the box, with address in Ireland
 // ITEM #01109 on instruction sheet, no manufacturer named on either box or instructions
-CONS( 200?, guitarstp,   0,        0,        taikeegrp,    guitarstp,shredmjr_game_state, init_taikeegr, "<unknown>", "Guitar Star (Europe, PAL)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^
+CONS( 200?, guitarstp, 0, 0, taikeegrp, guitarstp, shredmjr_game_state, init_taikeegr, "<unknown>", "Guitar Star (Europe, PAL)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^

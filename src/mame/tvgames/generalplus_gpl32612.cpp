@@ -564,82 +564,82 @@ void generalplus_gpl32612_game_state::nand_init880()
 } // anonymous namespace
 
 
-//    year, name,         parent,  compat, machine,      input,        class,              init,       company,  fullname,                             flags
-CONS( 200?, jak_swbstrik,    0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Star Wars Blaster Strike", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 200?, jak_tmnthp,      0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Teenage Mutant Ninja Turtles Hero Portal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 200?, jak_ddhp,        0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "DreamWorks Dragons Hero Portal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 200?, jak_prhp,        0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Power Rangers Super Megaforce Hero Portal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // from a PAL unit (probably not region specific)
-CONS( 200?, jak_dchp,        0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "DC Super Heroes The Watchtower Hero Portal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    Year  Name          Parent  Compat  Machine   Input     Class                            Init          Company                   Fullname                    Flags
+CONS( 2015, jak_swbstrik, 0,      0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "Jakks Pacific / HotGen", "Star Wars: Blaster Strike", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2014, jak_tmnthp,   0,      0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "Jakks Pacific / HotGen", "Hero Portal: Teenage Mutant Ninja Turtles - Heroes in a Half Shell", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2014, jak_ddhp,     0,      0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "Jakks Pacific / HotGen", "Hero Portal: DreamWorks Dragons", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2014, jak_prhp,     0,      0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "Jakks Pacific / HotGen", "Hero Portal: Power Rangers Super Megaforce - Legendary Power", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // from a PAL unit (probably not region specific)
+CONS( 2014, jak_dchp,     0,      0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "Jakks Pacific / HotGen", "Hero Portal: DC Comics Super Heroes = The Watchtower", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // Might not belong here, SoC is marked GPL32300A instead, but is still ARM based, and has GPNAND strings
-CONS( 201?, zippity,         0,       0,      zippity, gpl32612, generalplus_zippity_game_state, empty_init,  "LeapFrog",         "Zippity (US)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, zippity,   0,       0, zippity, gpl32612, generalplus_zippity_game_state, empty_init, "LeapFrog", "Zippity (US)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // TODO, check if code differs, or just unused areas of the NAND
-CONS( 201?, zippityuk,       zippity, 0,      zippity, gpl32612, generalplus_zippity_game_state, empty_init,  "LeapFrog",         "Zippity (UK)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, zippityuk, zippity, 0, zippity, gpl32612, generalplus_zippity_game_state, empty_init, "LeapFrog", "Zippity (UK)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // GP32C01 (maybe, picture is unclear) - Camera for kids
-CONS( 2013, kidizmp,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "VTech",         "Kidizoom Connect (Germany, pink camera)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2013, kidizmp, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "VTech", "Kidizoom Connect (Germany, pink camera)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // seems to be older tech, just glob + ROM, assuming it's a GP32 series based on above and due to having ARM code
-CONS( 201?, kidizmb,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "VTech",         "Kidizoom (Germany, blue camera)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, kidizmb, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "VTech", "Kidizoom (Germany, blue camera)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // uses GPL32610
-CONS( 2019, pocketmp,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",        "Pocket Monsters PC",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2019, pocketmp, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880, "Takara Tomy", "Pocket Monsters PC", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // ポケモン図鑑 スマホロトム
 // uses a glob
-CONS( 2019, pocketmr,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",        "Pokemon Zukan - Sumaho Rotom (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2019, pocketmr, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880, "Takara Tomy", u8"Pokémon Zukan: Sumaho Rotom (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // uses GPL32610 - 「それいけ！アンパンマン」スポーツ育脳マット
-CONS( 2019, anpanm19,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "JoyPalette",        "Anpanman: Sports Ikunou Mat (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2019, anpanm19, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "JoyPalette", "Anpanman: Sports Ikunou Mat (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // unknown (uses a glob) has GPspispi header, ARM based, SPI ROM
-CONS( 201?, smatomo,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Smatomo (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, smatomo, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Bandai", "Smatomo (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // unknown (uses a glob) has GPspispi header, ARM based, SPI ROM
-CONS( 2020, froz2dct,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Takara Tomy",        "Frozen 2 Dream Camera Tablet (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2020, froz2dct, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Takara Tomy", "Frozen II Dream Camera Tablet (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // (these all use the same PCB) - unknown SoC (uses a glob) has GPspispi header, ARM based, SPI ROM
 // ディズニー&ディズニー／ピクサーキャラクターズ ワンダフルスイートパソコン
-CONS( 2014, bandplap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Disney & Disney/Pixar Characters Wonderful Sweet PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2014, bandplap, 0,         0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Bandai", "Disney & Disney/Pixar Characters Wonderful Sweet PC (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // ディズニー&ディズニー／ピクサーキャラクターズ ワンダフルドリームパソコン
-CONS( 2014, bandslap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Disney & Disney/Pixar Characters Wonderful Dream PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2014, bandslap, 0,         0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Bandai", "Disney & Disney/Pixar Characters Wonderful Dream PC (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // あそんでまなべる！マウスでクリック！アンパンマンパソコン
-CONS( 2014, bananlap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Asonde Manaberu! Mouse de Click! Anpanman PC (Japan, orange/white case)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // white lid, orange base
+CONS( 2014, bananlap, 0,         0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Bandai", "Asonde Manaberu! Mouse de Click! Anpanman PC (Japan, orange/white case)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // white lid, orange base
 // アンパンマンカラーパソコンスマート
-CONS( 2014, bananlapa,       bananlap, 0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Anpanman Color PC Smart (Japan, yellow/white case)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // white lid, yellow base
+CONS( 2014, bananlapa, bananlap, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Bandai", "Anpanman Color PC Smart (Japan, yellow/white case)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // white lid, yellow base
 // ドラえもんステップアップパソコン
-CONS( 2014, bandolap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Doraemon Step Up PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2014, bandolap,  0,        0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Bandai", "Doraemon Step Up PC (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-CONS( 2018, disbestf,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Disney & Disney/Pixar Characters Best Friends PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2018, disbestf, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Bandai", "Disney & Disney/Pixar Characters Best Friends PC (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // uses GPL32630A
-CONS( 2020, anp2020t,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Anpanman Chiiku Pad (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2020, anp2020t, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Bandai", "Anpanman Chiiku Pad (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // uses GPL32630A has GPspispi header  マーメイドアクアポット
-CONS( 2021, banaquap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Tropical Rouge! PreCure: Mermaid Aqua Pot (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2021, banaquap, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Bandai", "Tropical Rouge! PreCure: Mermaid Aqua Pot (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // uses GPL32630A has GPspispi header
 // アンパンマンすくすく知育パッド
-CONS( 2018, anpntb18,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Anpanman Sukusuku Chiiku Pad (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2018, anpntb18, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Bandai", "Anpanman Sukusuku Chiiku Pad (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // uses GPL32630A has GPspispi header
 // アンパンマンカラーパッドプラス ピンクカラーVer.
-CONS( 2017, anpncp17,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Anpanman Color Pad Plus (Pink Color Version) (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2017, anpncp17, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Bandai", "Anpanman Color Pad Plus (Pink Color Version) (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // uses GPL32630A has GPspispi header
 // ドラえもんひらめきパッド
-CONS( 2017, doraet17,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Doraemon Hirameki Pad (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2017, doraet17, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Bandai", "Doraemon Hirameki Pad (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // uses a glob, has GPspispi header, "Pear 265077A. 2022 11 22" on PCB
 // めざせ！あこがれのわたし♡プリキュアミラーパッド！オールスター
-CONS( 2022, banpear,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "PreCure Mirror Pad! All Star (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2022, banpear, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Bandai", "PreCure Mirror Pad! All Star (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // unknown (uses a glob) but it's GeneralPlus and ARM based, so put in here for now
 // ROM has 'GPNandTag2' header rather than the usual
 // 鬼滅の刃 全集中パッド（グリーン)
-CONS( 2021, dmnslayg,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Bandai",        "Demon Slayer: Kimetsu no Yaiba Zenshuuchuu Pad (green ver.) (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2021, dmnslayg, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880, "Bandai", "Demon Slayer: Kimetsu no Yaiba Zenshuuchuu Pad (green ver.) (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // unknown (uses a glob) GPNandTag2 header
-CONS( 201?, pokepeac,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",        "Pokemon Peaceful Place My Pad (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, pokepeac, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880, "Takara Tomy", u8"Pokémon Peaceful Place My Pad (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 
 
@@ -657,67 +657,67 @@ GPY0201A "Power management ASIC"
 
 */
 
-CONS( 2009, pdcm2,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "VideoJet / Conny",        "PDC M2",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2009, pdcm2, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "VideoJet / Conny", "PDC M2", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // uses a GPL32600A-003A-QL141
-CONS( 200?, arcadege,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840,  "Millennium 2000 GmbH",        "Millennium Arcade Genius SE",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 200?, arcadege, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "Millennium 2000 GmbH", "Millennium Arcade Genius SE", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // uses a GP326813
 // 学習おうえんAI★ミラクルロボ
-CONS( 2020, airobo,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840,  "Benesse Corporation",        "Gakushuu Ouen AI Miracle Robo",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2020, airobo, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "Benesse Corporation", "Gakushuu Ouen AI Miracle Robo", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // uses a glob CPU
 // ちいかわラーニングパソコン
-CONS( 2021, chiikpc,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Chiikawa Learning PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2021, chiikpc, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Bandai", "Chiikawa Learning PC (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // uses a glob CPU
 // 学びの最強王になれ! 最強王図鑑パソコン
-CONS( 2020, saikyopc,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Manabi no Sai-Kyo-Oh ni Nare! Sai-Kyo-Oh Zukan PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2020, saikyopc, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Bandai", "Manabi no Sai-Kyo-Oh ni Nare! Sai-Kyo-Oh Zukan PC (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // uses a glob CPU
-CONS( 2022, doralpc,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Doraemon Learning Personal Computer (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2022, doralpc, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Bandai", "Doraemon Learning Personal Computer (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // uses a glob CPU
-CONS( 2020, displpc,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Disney Princess Learning Personal Computer (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2020, displpc, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Bandai", "Disney Princess Learning Personal Computer (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // uses GPL32600A
 // マウスできせかえ! すみっコぐらしパソコンプラス
-CONS( 2019, sumikpcp,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Mouse de Kisekae! Sumikko Gurashi PC Plus (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // from a unit with purple top, white base
+CONS( 2019, sumikpcp, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Sega Toys", "Mouse de Kisekae! Sumikko Gurashi PC Plus (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // from a unit with purple top, white base
 // there are code changes between these 2 sets, but there also look to be some bits that might be incorrectly flipped on one or both of them
-CONS( 2019, sumikpc,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Mouse de Kisekae! Sumikko Gurashi PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // from a unit with blue top, white base
+CONS( 2019, sumikpc,  0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Sega Toys", "Mouse de Kisekae! Sumikko Gurashi PC (Japan)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // from a unit with blue top, white base
 
 // uses a glob
-CONS( 2021, sumipc21,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Mouse de Kisekae! Sumikko Gurashi Premium Plus (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // white top, blue base
+CONS( 2021, sumipc21, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Sega Toys", "Mouse de Kisekae! Sumikko Gurashi Premium Plus (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // white top, blue base
 
 // uses GPL32611
 // ディズニーキャラクターズ マジカルパッド ～ガールズレッスン～
-CONS( 2016, segdis16,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Disney Characters Magical Pad -Girls Lesson- (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2016, segdis16, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Sega Toys", "Disney Characters Magical Pad -Girls Lesson- (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // uses GPL32611
-CONS( 201?, segcarsh,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Disney Cars Shake It! (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, segcarsh, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Sega Toys", "Disney Cars Shake It! (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // uses glob, has GPSPI header
-CONS( 201?, jpaddp,              0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Jewel Pad Diamond Premium (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, jpaddp, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Sega Toys", "Jewel Pad Diamond Premium (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-CONS( 201?, jpad,                0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Jewel Pad (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, jpad, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Sega Toys", "Jewel Pad (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // uses GPL32600A
 // マウスでバトル!! 恐竜図鑑パソコン
-CONS( 2020, dinopc,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Mouse de Battle!! Kyouryuu Zukan PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2020, dinopc, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Sega Toys", "Mouse de Battle!! Kyouryuu Zukan PC (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 
 // ディズニー&ディズニー／ピクサーキャラクターズ できた!がいっぱい ドリームトイパッド
-CONS( 2020, tmydistb,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Tomy",          "Disney & Disney/Pixar Characters Dekita! ga Ippai Dream Toy Pad (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2020, tmydistb, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "Takara Tomy", "Disney & Disney/Pixar Characters Dekita! ga Ippai Dream Toy Pad (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // uses GPL32610
 // カメラでリンク! ポケモン図鑑 スマホロトム
-CONS( 201?, rotom2,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",          "Camera de Link! Pokemon Zukan - SmaFo Rotom (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, rotom2, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880, "Takara Tomy", u8"Camera de Link! Pokémon Zukan: SmaFo Rotom (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // uses GPL32611
 // 小学館の図鑑 NEO Pad - 生きもの編 (this is the standard green version)
-CONS( 201?, neopad,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",          "Shogakukan no Zukan NEO Pad - Ikimono-hen (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, neopad, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880, "Takara Tomy", "Shogakukan no Zukan NEO Pad: Ikimono-hen (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // a blue version exists with the subtitle Norimono + Kuraberu-hen (乗りもの＋くらべる編).
 // another green version with 'DX' on the end of the title also exists
 
 // uses GPL32611
-CONS( 201?, spicanot,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840,  "Takara Tomy",          "Spica Note (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, spicanot, 0, 0, gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "Takara Tomy", "Spica Note (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

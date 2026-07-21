@@ -5,7 +5,7 @@
     GPL16250 / GPAC800 / GMC384 / GCM420 related support
 
     GPL16250 is the GeneralPlus / SunPlus part number
-    GPAC800 is the JAKKS Pacific codename
+    GPAC800 is the Jakks Pacific codename
     GMC384 / GCM420 is what is printed on the die
 
     ----
@@ -114,6 +114,6 @@ ROM_END
 // could be GPL16230A, GPL16240A or GPL16250A
 // ----------------------------------------------------
 
-CONS( 2010, mobigo,  0,      0, mobigo,   mobigo, mobigo_state,  init_mobigo, "VTech", "MobiGo (USA)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2011, mobigos, mobigo, 0, mobigo,   mobigo, mobigo_state,  init_mobigo, "VTech", "MobiGo (Spain)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2011, mobigof, mobigo, 0, mobigo,   mobigo, mobigo_state,  init_mobigo, "VTech", "MobiGo (France)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2010, mobigo,  0,      0, mobigo, mobigo, mobigo_state, init_mobigo, "VTech", "MobiGo (USA)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2011, mobigos, mobigo, 0, mobigo, mobigo, mobigo_state, init_mobigo, "VTech", "MobiGo (Spain)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2011, mobigof, mobigo, 0, mobigo, mobigo, mobigo_state, init_mobigo, "VTech", "MobiGo (France)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
