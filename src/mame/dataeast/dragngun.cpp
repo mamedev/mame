@@ -103,6 +103,7 @@ from Dragon Gun.
 
 #include "emu.h"
 
+#include "deco_bufpal.h"
 #include "deco_irq.h"
 #include "deco16ic.h"
 #include "deco146.h"
@@ -119,7 +120,6 @@ from Dragon Gun.
 #include "sound/ymopm.h"
 #include "video/bufsprite.h"
 
-#include "emupal.h"
 #include "screen.h"
 
 #include "speaker.h"
@@ -154,7 +154,6 @@ public:
 		, m_sprite_cliptable(*this, "spclip")
 		, m_sprite_indextable(*this, "spindex")
 		, m_rowscroll32(*this, "rowscroll32_%u", 1)
-		, m_paletteram(*this, "paletteram")
 		, m_io_inputs(*this, "INPUTS")
 		, m_io_light_x(*this, "LIGHT%u_X", 0U)
 		, m_io_light_y(*this, "LIGHT%u_Y", 0U)
@@ -194,9 +193,6 @@ protected:
 
 	template<int Chip> void rowscroll_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	void buffered_palette_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	void palette_dma_w(u32 data);
-
 	int sprite_bank_callback(int sprite);
 	u16 read_spritetile(int lookupram_offset);
 	u16 read_spriteformat(int spriteformatram_offset, u8 attr);
@@ -232,7 +228,7 @@ protected:
 	required_device<buffered_spriteram32_device> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	optional_device<palette_device> m_palette;
+	optional_device<deco_buffered_palette_device> m_palette;
 	optional_device<deco_irq_device> m_deco_irq;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<deco146_device> m_ioprot;
@@ -248,13 +244,11 @@ protected:
 
 	// we use the pointers below to store a 32-bit copy..
 	required_shared_ptr_array<u32, 4> m_rowscroll32;
-	optional_shared_ptr<u32> m_paletteram;
 
 	optional_ioport m_io_inputs;
 	optional_ioport_array<2> m_io_light_x;
 	optional_ioport_array<2> m_io_light_y;
 
-	std::unique_ptr<u8[]> m_dirty_palette{};
 	std::unique_ptr<u16[]> m_rowscroll[4]{};
 
 	u32 m_sprite_ctrl = 0U;
@@ -369,33 +363,8 @@ void dragngun_state::video_start()
 
 		save_pointer(NAME(m_rowscroll[i]), size, i);
 	}
-	m_dirty_palette = make_unique_clear<u8[]>(2048);
 
 	save_item(NAME(m_sprite_ctrl));
-	save_pointer(NAME(m_dirty_palette), 2048);
-}
-
-void dragngun_state::buffered_palette_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	COMBINE_DATA(&m_paletteram[offset]);
-	m_dirty_palette[offset] = 1;
-}
-
-void dragngun_state::palette_dma_w(u32 data)
-{
-	for (int i = 0; i < m_palette->entries(); i++)
-	{
-		if (m_dirty_palette[i])
-		{
-			m_dirty_palette[i] = 0;
-
-			const u8 b = (m_paletteram[i] >> 16) & 0xff;
-			const u8 g = (m_paletteram[i] >>  8) & 0xff;
-			const u8 r = (m_paletteram[i] >>  0) & 0xff;
-
-			m_palette->set_pen_color(i, rgb_t(r, g, b));
-		}
-	}
 }
 
 void dragngun_state::sprite_control_w(u32 data)
@@ -653,8 +622,8 @@ void dragngun_state::common_map(address_map &map)
 	map(0x100000, 0x11ffff).ram();
 	map(0x120000, 0x127fff).rw(FUNC(dragngun_state::ioprot_r), FUNC(dragngun_state::ioprot_w)).umask32(0x0000ffff);
 	map(0x128000, 0x12800f).m(m_deco_irq, FUNC(deco_irq_device::map)).umask32(0x000000ff);
-	map(0x130000, 0x131fff).ram().w(FUNC(dragngun_state::buffered_palette_w)).share(m_paletteram);
-	map(0x138008, 0x13800b).w(FUNC(dragngun_state::palette_dma_w));
+	map(0x130000, 0x131fff).ram().w(m_palette, FUNC(deco_buffered_palette_device::write32)).share("palette");
+	map(0x138008, 0x13800b).w(m_palette, FUNC(deco_buffered_palette_device::dma_w));
 
 	//  0x2xxxxx Namco Zooming Sprites
 	map(0x204800, 0x204fff).ram().share(m_sprite_cliptable);// (all entries set to 320x256 here)
@@ -1053,7 +1022,7 @@ void dragngun_state::dragngun(machine_config &config)
 	//I82750DB(config, m_i82750db, XTAL(25'000'000));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dragngun);
-	PALETTE(config, m_palette).set_entries(2048);
+	DECO_BUFFERED_PALETTE(config, m_palette, 0, 2048);
 
 	DECO146PROT(config, m_ioprot);
 	m_ioprot->port_a_cb().set_ioport("INPUTS");
@@ -1145,7 +1114,7 @@ void dragngun_state::lockload(machine_config &config)
 	BUFFERED_SPRITERAM32(config, m_spriteram);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dragngun);
-	PALETTE(config, m_palette).set_entries(2048);
+	DECO_BUFFERED_PALETTE(config, m_palette, 0, 2048);
 
 	DECO16IC(config, m_tilegen[0]);
 	m_tilegen[0]->set_size<0>(deco16ic_device::DECO_64x32);
