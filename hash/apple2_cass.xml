@@ -3346,4 +3346,42 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="forbgame">
+		<description>Forbidden Games (Micom BASIC Magazine 1984-10)</description>
+		<year>1984</year>
+		<publisher>Micom BASIC Magazine</publisher>
+		<info name="alt_title" value="禁じられた遊び" />
+		<info name="programmer" value="Ringo" />
+		<info name="usage" value="Requires a 48K Apple ][ or later with 10K Applesoft BASIC." />
+		<info name="version" value="1984-10" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl0_default" value="romcardfp" />
+		<!-- Dump released: 2024-02-06 -->
+		<!-- action game -->
+		<part name="cass" interface="apple2_cass">
+			<feature name="part_id" value="Forbidden Games" />
+			<dataarea name="cass" size="4049894">
+				<rom name="kinaso_og.wav" size="4049894" crc="a162f56a" sha1="0172bebdc58c42d260b09080bd718bf96178246d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loresrun">
+		<description>LORES Runner (Micom BASIC Magazine 1984-09)</description>
+		<year>1984</year>
+		<publisher>Micom BASIC Magazine</publisher>
+		<info name="programmer" value="Mitsuo Takahashi" />
+		<info name="usage" value="Requires an Apple ][ or later with 10K Applesoft BASIC. Apple II J-Plus.  POKE 103,1. Poke104,96. Poke 24576.0. NEW. LOAD. Run." />
+		<info name="version" value="1984-09" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl0_default" value="romcardfp" />
+		<!-- Dump released: 2024-02-06 -->
+		<!-- action game -->
+		<part name="cass" interface="apple2_cass">
+			<feature name="part_id" value="LORES Runner" />
+			<dataarea name="cass" size="6075554">
+				<rom name="lores.wav" size="6075554" crc="0da9ad3a" sha1="bfbe16a239ac5a0fe946c6f0130ed8dad3d9d3fc" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
