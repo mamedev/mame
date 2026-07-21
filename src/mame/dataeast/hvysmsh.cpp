@@ -38,7 +38,7 @@ public:
 		, m_tilegen(*this, "tilegen")
 		, m_sprgen(*this, "spritegen")
 		, m_palette(*this, "palette")
-		, m_rowscroll(*this, "pf%u_rowscroll", 1U, 0x800U, ENDIANNESS_LITTLE)
+		, m_rowscroll(*this, "rowscroll_%u", 1U, 0x800U, ENDIANNESS_LITTLE)
 		, m_spriteram(*this, "spriteram", 0x1000U, ENDIANNESS_LITTLE)
 		, m_io_eepromout(*this, "EEPROMOUT")
 	{ }
@@ -55,7 +55,7 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank_interrupt(int state);
 
-	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	int bank_callback(int bank);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 
 	void descramble_sound(const char *tag) ATTR_COLD;
@@ -109,7 +109,7 @@ uint32_t wcvol95_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	screen.priority().fill(0);
 	bitmap.fill(0);
 
-	m_tilegen->pf_update(m_rowscroll[0], m_rowscroll[1]);
+	m_tilegen->update(m_rowscroll[0], m_rowscroll[1]);
 
 	m_tilegen->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x800);
@@ -154,9 +154,9 @@ void wcvol95_state::spriteram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 void wcvol95_state::tilegen_map(address_map &map)
 {
-	map(0x00000, 0x0001f).rw(m_tilegen, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
-	map(0x10000, 0x11fff).rw(m_tilegen, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x14000, 0x15fff).rw(m_tilegen, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x00000, 0x0001f).rw(m_tilegen, FUNC(deco16ic_device::control32_r), FUNC(deco16ic_device::control32_w));
+	map(0x10000, 0x11fff).rw(m_tilegen, FUNC(deco16ic_device::vram32_r<0>), FUNC(deco16ic_device::vram32_w<0>));
+	map(0x14000, 0x15fff).rw(m_tilegen, FUNC(deco16ic_device::vram32_r<1>), FUNC(deco16ic_device::vram32_w<1>));
 	map(0x20000, 0x20fff).rw(FUNC(hvysmsh_state::rowscroll_r<0>), FUNC(hvysmsh_state::rowscroll_w<0>));
 	map(0x24000, 0x24fff).rw(FUNC(hvysmsh_state::rowscroll_r<1>), FUNC(hvysmsh_state::rowscroll_w<1>));
 }
@@ -320,9 +320,9 @@ void wcvol95_state::vblank_interrupt(int state)
 	m_maincpu->set_input_line(ARM_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-DECO16IC_BANK_CB_MEMBER(wcvol95_state::bank_callback)
+int wcvol95_state::bank_callback(int bank)
 {
-	return ((bank >> 4) & 0x7) * 0x1000;
+	return (bank & 0x70) << 8;
 }
 
 DECOSPR_PRIORITY_CB_MEMBER(wcvol95_state::pri_callback)
@@ -358,16 +358,16 @@ void hvysmsh_state::hvysmsh(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 1024);
 
 	DECO16IC(config, m_tilegen);
-	m_tilegen->set_pf1_size(DECO_64x32);
-	m_tilegen->set_pf2_size(DECO_64x32);
-	m_tilegen->set_pf1_col_bank(0x00);
-	m_tilegen->set_pf2_col_bank(0x10);
-	m_tilegen->set_pf1_col_mask(0x0f);
-	m_tilegen->set_pf2_col_mask(0x0f);
-	m_tilegen->set_bank1_callback(FUNC(hvysmsh_state::bank_callback));
-	m_tilegen->set_bank2_callback(FUNC(hvysmsh_state::bank_callback));
-	m_tilegen->set_pf12_8x8_bank(0);
-	m_tilegen->set_pf12_16x16_bank(1);
+	m_tilegen->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen->set_col_bank<0>(0x00);
+	m_tilegen->set_col_bank<1>(0x10);
+	m_tilegen->set_col_mask<0>(0x0f);
+	m_tilegen->set_col_mask<1>(0x0f);
+	m_tilegen->set_bank_callback<0>(FUNC(hvysmsh_state::bank_callback));
+	m_tilegen->set_bank_callback<1>(FUNC(hvysmsh_state::bank_callback));
+	m_tilegen->set_8x8_bank(0);
+	m_tilegen->set_16x16_bank(1);
 	m_tilegen->set_gfxdecode_tag("gfxdecode");
 
 	DECO_SPRITE(config, m_sprgen, m_palette, gfx_hvysmsh_spr);
@@ -403,16 +403,16 @@ void wcvol95_state::wcvol95(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
 	DECO16IC(config, m_tilegen);
-	m_tilegen->set_pf1_size(DECO_64x32);
-	m_tilegen->set_pf2_size(DECO_64x32);
-	m_tilegen->set_pf1_col_bank(0x00);
-	m_tilegen->set_pf2_col_bank(0x10);
-	m_tilegen->set_pf1_col_mask(0x0f);
-	m_tilegen->set_pf2_col_mask(0x0f);
-	m_tilegen->set_bank1_callback(FUNC(wcvol95_state::bank_callback));
-	m_tilegen->set_bank2_callback(FUNC(wcvol95_state::bank_callback));
-	m_tilegen->set_pf12_8x8_bank(0);
-	m_tilegen->set_pf12_16x16_bank(1);
+	m_tilegen->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen->set_col_bank<0>(0x00);
+	m_tilegen->set_col_bank<1>(0x10);
+	m_tilegen->set_col_mask<0>(0x0f);
+	m_tilegen->set_col_mask<1>(0x0f);
+	m_tilegen->set_bank_callback<0>(FUNC(wcvol95_state::bank_callback));
+	m_tilegen->set_bank_callback<1>(FUNC(wcvol95_state::bank_callback));
+	m_tilegen->set_8x8_bank(0);
+	m_tilegen->set_16x16_bank(1);
 	m_tilegen->set_gfxdecode_tag("gfxdecode");
 
 	DECO_SPRITE(config, m_sprgen, m_palette, gfx_hvysmsh_spr);

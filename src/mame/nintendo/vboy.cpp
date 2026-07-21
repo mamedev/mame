@@ -29,6 +29,8 @@ TODO:
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include <iostream>
+
 #include "vboy.lh"
 
 
@@ -811,7 +813,7 @@ uint16_t vboy_state::vip_io_r(offs_t offset)
 		case 0x42:  //XPCTRL
 					return m_vip_io.XPCTRL;
 		case 0x44:  //VER
-					printf("%08x read VER\n",m_maincpu->pc());
+					util::stream_format(std::cout, "%08x read VER\n",m_maincpu->pc());
 					return m_vip_io.VER;
 		case 0x48:  //SPT0
 					return m_vip_io.SPT[0];

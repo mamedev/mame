@@ -1246,6 +1246,13 @@ int model1_state::push_direct(int list_offset) {
 			// backdrop/scene.
 			if ((m_tgp_ram[tex_adr - 0x40000] & 0x3ff) == 0)
 				cquad.col = MOIRE | (m_palette->pen(0) & 0xffffff);
+
+			// wingwar's display list carries a constant degenerate moiré record
+			// (all four vertices on one point) that the flat-quad filler would
+			// paint as a stray dot at the viewport centre; not seen on hardware.
+			if (cquad.p[0]->s.x == cquad.p[1]->s.x && cquad.p[1]->s.x == cquad.p[2]->s.x && cquad.p[2]->s.x == cquad.p[3]->s.x &&
+				cquad.p[0]->s.y == cquad.p[1]->s.y && cquad.p[1]->s.y == cquad.p[2]->s.y && cquad.p[2]->s.y == cquad.p[3]->s.y)
+				goto next;
 		}
 
 		// Direct polys are screen-space - project_point_direct only offsets x/y by

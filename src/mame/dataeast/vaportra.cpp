@@ -43,14 +43,14 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
-		, m_deco_tilegen(*this, "tilegen%u", 1U)
+		, m_tilegen(*this, "tilegen%u", 1U)
 		, m_spritegen(*this, "spritegen")
 		, m_spriteram(*this, "spriteram")
 		, m_gfxdecode(*this, "gfxdecode")
-		, m_palette(*this, "colors")
+		, m_palette(*this, "palette")
 		, m_soundlatch(*this, "soundlatch")
-		, m_paletteram(*this, "palette")
-		, m_paletteram_ext(*this, "palette_ext")
+		, m_paletteram(*this, "paletteram")
+		, m_paletteram_ext(*this, "paletteram_ext")
 	{ }
 
 	void vaportra(machine_config &config);
@@ -65,7 +65,7 @@ private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<h6280_device> m_audiocpu;
-	required_device_array<deco16ic_device, 2> m_deco_tilegen;
+	required_device_array<deco16ic_device, 2> m_tilegen;
 	required_device<deco_mxc06_device> m_spritegen;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -88,7 +88,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_palette( int offset );
 
-	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	int bank_callback(int bank);
 
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
@@ -111,15 +111,13 @@ void vaportra_state::priority_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 /******************************************************************************/
 
-void vaportra_state::update_palette( int offset )
+void vaportra_state::update_palette(int offset)
 {
-	uint8_t r, g, b;
-
 	// TODO : Values aren't written in game when higher than 0xf0,
 	// It's related to hardware colour resistors?
-	r = (m_paletteram[offset] >> 0) & 0xff;
-	g = (m_paletteram[offset] >> 8) & 0xff;
-	b = (m_paletteram_ext[offset] >> 0) & 0xff;
+	uint8_t const r = (m_paletteram[offset] >> 0) & 0xff;
+	uint8_t const g = (m_paletteram[offset] >> 8) & 0xff;
+	uint8_t const b = (m_paletteram_ext[offset] >> 0) & 0xff;
 
 	m_palette->set_pen_color(offset, rgb_t(r,g,b));
 }
@@ -149,44 +147,44 @@ void vaportra_state::colpri_cb(u32 &colour, u32 &pri_mask)
 
 uint32_t vaportra_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t const flip = m_deco_tilegen[0]->pf_control_r(0);
+	uint16_t const flip = m_tilegen[0]->control_r(0);
 	int const pri = m_priority[0] & 0x03;
 
 	screen.priority().fill(0, cliprect);
 	flip_screen_set(!BIT(flip, 7));
-	m_deco_tilegen[0]->pf_update(nullptr, nullptr);
-	m_deco_tilegen[1]->pf_update(nullptr, nullptr);
+	m_tilegen[0]->update(nullptr, nullptr);
+	m_tilegen[1]->update(nullptr, nullptr);
 
 	m_spritegen->set_flip_screen(!BIT(flip, 7));
 
 	// Draw playfields
 	if (pri == 0)
 	{
-		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
+		m_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
+		m_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
+		m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
 	}
 	else if (pri == 1)
 	{
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
-		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
+		m_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
+		m_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
+		m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
 	}
 	else if (pri == 2)
 	{
-		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
+		m_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
+		m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
+		m_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
 	}
 	else
 	{
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
-		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
+		m_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
+		m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
+		m_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
 	}
 
 	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_spriteram->buffer(), 0x800 / 2);
-	m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -195,9 +193,10 @@ uint32_t vaportra_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 uint8_t vaportra_state::irq6_ack_r()
 {
-	m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 
-	return (0);
+	return 0;
 }
 
 void vaportra_state::irq6_ack_w(uint8_t data)
@@ -215,12 +214,12 @@ void vaportra_state::main_map(address_map &map)
 	map(0x100004, 0x100005).portr("DSW");
 	map(0x100000, 0x100003).w(FUNC(vaportra_state::priority_w));
 	map(0x100007, 0x100007).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x200000, 0x201fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x202000, 0x203fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x240000, 0x24000f).w(m_deco_tilegen[1], FUNC(deco16ic_device::pf_control_w));
-	map(0x280000, 0x281fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x282000, 0x283fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x2c0000, 0x2c000f).w(m_deco_tilegen[0], FUNC(deco16ic_device::pf_control_w));
+	map(0x200000, 0x201fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x202000, 0x203fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x240000, 0x24000f).w(m_tilegen[1], FUNC(deco16ic_device::control_w));
+	map(0x280000, 0x281fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x282000, 0x283fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x2c0000, 0x2c000f).w(m_tilegen[0], FUNC(deco16ic_device::control_w));
 	map(0x300000, 0x3009ff).ram().w(FUNC(vaportra_state::palette_w)).share(m_paletteram);
 	map(0x304000, 0x3049ff).ram().w(FUNC(vaportra_state::palette_ext_w)).share(m_paletteram_ext);
 	map(0x308001, 0x308001).rw(FUNC(vaportra_state::irq6_ack_r), FUNC(vaportra_state::irq6_ack_w));
@@ -358,9 +357,9 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-DECO16IC_BANK_CB_MEMBER(vaportra_state::bank_callback)
+int vaportra_state::bank_callback(int bank)
 {
-	return ((bank >> 4) & 0x7) * 0x1000;
+	return (bank & 0x70) << 8;
 }
 
 void vaportra_state::machine_start()
@@ -400,31 +399,31 @@ void vaportra_state::vaportra(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vaportra);
 	PALETTE(config, m_palette).set_entries(1280);
 
-	DECO16IC(config, m_deco_tilegen[0]);
-	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
-	m_deco_tilegen[0]->set_pf2_col_bank(0x20);
-	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(vaportra_state::bank_callback));
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(vaportra_state::bank_callback));
-	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
-	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
+	DECO16IC(config, m_tilegen[0]);
+	m_tilegen[0]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_col_bank<0>(0x00);
+	m_tilegen[0]->set_col_bank<1>(0x20);
+	m_tilegen[0]->set_col_mask<0>(0x0f);
+	m_tilegen[0]->set_col_mask<1>(0x0f);
+	m_tilegen[0]->set_bank_callback<0>(FUNC(vaportra_state::bank_callback));
+	m_tilegen[0]->set_bank_callback<1>(FUNC(vaportra_state::bank_callback));
+	m_tilegen[0]->set_8x8_bank(0);
+	m_tilegen[0]->set_16x16_bank(1);
+	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1]);
-	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_col_bank(0x30);
-	m_deco_tilegen[1]->set_pf2_col_bank(0x40);
-	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(vaportra_state::bank_callback));
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(vaportra_state::bank_callback));
-	m_deco_tilegen[1]->set_pf12_8x8_bank(2);
-	m_deco_tilegen[1]->set_pf12_16x16_bank(3);
-	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
+	DECO16IC(config, m_tilegen[1]);
+	m_tilegen[1]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_col_bank<0>(0x30);
+	m_tilegen[1]->set_col_bank<1>(0x40);
+	m_tilegen[1]->set_col_mask<0>(0x0f);
+	m_tilegen[1]->set_col_mask<1>(0x0f);
+	m_tilegen[1]->set_bank_callback<0>(FUNC(vaportra_state::bank_callback));
+	m_tilegen[1]->set_bank_callback<1>(FUNC(vaportra_state::bank_callback));
+	m_tilegen[1]->set_8x8_bank(2);
+	m_tilegen[1]->set_16x16_bank(3);
+	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_MXC06(config, m_spritegen, m_palette, gfx_vaportra_spr);
 	m_spritegen->set_colpri_callback(FUNC(vaportra_state::colpri_cb));

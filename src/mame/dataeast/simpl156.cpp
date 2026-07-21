@@ -118,7 +118,7 @@ public:
 	simpl156_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_deco_tilegen(*this, "tilegen"),
+		m_tilegen(*this, "tilegen"),
 		m_eeprom(*this, "eeprom"),
 		m_okimusic(*this, "okimusic"),
 		m_sprgen(*this, "spritegen"),
@@ -146,7 +146,7 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	int bank_callback(int bank);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 
 	void eeprom_w(u32 data);
@@ -175,7 +175,7 @@ private:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<deco16ic_device> m_deco_tilegen;
+	required_device<deco16ic_device> m_tilegen;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<okim6295_device> m_okimusic;
 	required_device<decospr_device> m_sprgen;
@@ -302,9 +302,9 @@ void simpl156_state::common_map(address_map &map)
 	map(0x10000, 0x11fff).rw(FUNC(simpl156_state::spriteram_r), FUNC(simpl156_state::spriteram_w));
 	map(0x20000, 0x20fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
 	map(0x30000, 0x30003).portr("IN1").w(FUNC(simpl156_state::eeprom_w));
-	map(0x40000, 0x4001f).rw(m_deco_tilegen, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
-	map(0x50000, 0x51fff).mirror(0x2000).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x54000, 0x55fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x40000, 0x4001f).rw(m_tilegen, FUNC(deco16ic_device::control32_r), FUNC(deco16ic_device::control32_w));
+	map(0x50000, 0x51fff).mirror(0x2000).rw(m_tilegen, FUNC(deco16ic_device::vram32_r<0>), FUNC(deco16ic_device::vram32_w<0>));
+	map(0x54000, 0x55fff).rw(m_tilegen, FUNC(deco16ic_device::vram32_r<1>), FUNC(deco16ic_device::vram32_w<1>));
 	map(0x60000, 0x61fff).rw(FUNC(simpl156_state::rowscroll_r<0>), FUNC(simpl156_state::rowscroll_w<0>));
 	map(0x64000, 0x65fff).rw(FUNC(simpl156_state::rowscroll_r<1>), FUNC(simpl156_state::rowscroll_w<1>));
 	map(0x70000, 0x70003).readonly().nopw(); // ?
@@ -397,9 +397,9 @@ void simpl156_state::vblank_interrupt(int state)
 }
 
 
-DECO16IC_BANK_CB_MEMBER(simpl156_state::bank_callback)
+int simpl156_state::bank_callback(int bank)
 {
-	return ((bank >> 4) & 0x7) * 0x1000;
+	return (bank & 0x70) << 8;
 }
 
 DECOSPR_PRIORITY_CB_MEMBER(simpl156_state::pri_callback)
@@ -425,12 +425,12 @@ u32 simpl156_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 {
 	screen.priority().fill(0, cliprect);
 
-	m_deco_tilegen->pf_update(m_rowscroll[0], m_rowscroll[1]);
+	m_tilegen->update(m_rowscroll[0], m_rowscroll[1]);
 
 	bitmap.fill(256, cliprect);
 
-	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
-	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
+	m_tilegen->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
+	m_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
 
 	// sprites are flipped relative to tilemaps
 	m_sprgen->set_flip_screen(true);
@@ -464,18 +464,18 @@ void simpl156_state::chainrec(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_simpl156);
 
-	DECO16IC(config, m_deco_tilegen);
-	m_deco_tilegen->set_pf1_size(DECO_64x32);
-	m_deco_tilegen->set_pf2_size(DECO_64x32);
-	m_deco_tilegen->set_pf1_col_bank(0x00);
-	m_deco_tilegen->set_pf2_col_bank(0x10);
-	m_deco_tilegen->set_pf1_col_mask(0x0f);
-	m_deco_tilegen->set_pf2_col_mask(0x0f);
-	m_deco_tilegen->set_bank1_callback(FUNC(simpl156_state::bank_callback));
-	m_deco_tilegen->set_bank2_callback(FUNC(simpl156_state::bank_callback));
-	m_deco_tilegen->set_pf12_8x8_bank(0);
-	m_deco_tilegen->set_pf12_16x16_bank(1);
-	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
+	DECO16IC(config, m_tilegen);
+	m_tilegen->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen->set_col_bank<0>(0x00);
+	m_tilegen->set_col_bank<1>(0x10);
+	m_tilegen->set_col_mask<0>(0x0f);
+	m_tilegen->set_col_mask<1>(0x0f);
+	m_tilegen->set_bank_callback<0>(FUNC(simpl156_state::bank_callback));
+	m_tilegen->set_bank_callback<1>(FUNC(simpl156_state::bank_callback));
+	m_tilegen->set_8x8_bank(0);
+	m_tilegen->set_16x16_bank(1);
+	m_tilegen->set_gfxdecode_tag("gfxdecode");
 
 	DECO_SPRITE(config, m_sprgen, m_palette, gfx_simpl156_spr);
 	m_sprgen->set_pri_callback(FUNC(simpl156_state::pri_callback));

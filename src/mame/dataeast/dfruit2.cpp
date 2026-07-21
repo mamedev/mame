@@ -60,7 +60,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_hopper(*this, "hopper"),
 		m_palette(*this, "palette"),
-		m_deco_tilegen(*this, "tilegen"),
+		m_tilegen(*this, "tilegen"),
 		m_sprgen(*this, "sprgen"),
 		m_spriteram(*this, "spriteram", 0xe00, ENDIANNESS_BIG),
 		m_mainbank(*this, "mainbank")
@@ -77,7 +77,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<hopper_device> m_hopper;
 	required_device<palette_device> m_palette;
-	required_device<deco16ic_device> m_deco_tilegen;
+	required_device<deco16ic_device> m_tilegen;
 	required_device<decospr_device> m_sprgen;
 
 	memory_share_creator<u16> m_spriteram;
@@ -89,12 +89,10 @@ private:
 
 	uint8_t spriteram_r(offs_t offset);
 	void spriteram_w(offs_t offset, uint8_t data);
-	uint8_t tilegen_pf1_data_r(offs_t offset);
-	void tilegen_pf1_data_w(offs_t offset, uint8_t data);
-	uint8_t tilegen_pf2_data_r(offs_t offset);
-	void tilegen_pf2_data_w(offs_t offset, uint8_t data);
+	template <unsigned Which> uint8_t tilegen_vram_r(offs_t offset);
+	template <unsigned Which> void tilegen_vram_w(offs_t offset, uint8_t data);
 	void tilegen_control_w(offs_t offset, uint8_t data);
-	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	int bank_callback(int bank);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 	uint8_t bank_r();
@@ -111,11 +109,11 @@ uint32_t dfruit2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	screen.priority().fill(0, cliprect);
 
 	m_sprgen->set_flip_screen(true); // sprites are flipped relative to tilemaps
-	m_deco_tilegen->pf_update(nullptr, nullptr);
+	m_tilegen->update(nullptr, nullptr);
 
-	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0xe00 / 2);
-	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -140,44 +138,26 @@ void dfruit2_state::spriteram_w(offs_t offset, uint8_t data)
 		m_spriteram[offs] = (m_spriteram[offs] & 0x00ff) | (data << 8);
 }
 
-uint8_t dfruit2_state::tilegen_pf1_data_r(offs_t offset)
+template <unsigned Which>
+uint8_t dfruit2_state::tilegen_vram_r(offs_t offset)
 {
 	int const offs = offset >> 1;
 
 	if (!BIT(offset, 0))
-		return m_deco_tilegen->pf1_data_r(offs) & 0xff;
+		return m_tilegen->vram_r<Which>(offs) & 0xff;
 	else
-		return m_deco_tilegen->pf1_data_r(offs) >> 8;
+		return m_tilegen->vram_r<Which>(offs) >> 8;
 }
 
-void dfruit2_state::tilegen_pf1_data_w(offs_t offset, uint8_t data)
+template <unsigned Which>
+void dfruit2_state::tilegen_vram_w(offs_t offset, uint8_t data)
 {
 	int const offs = offset >> 1;
 
 	if (!BIT(offset, 0))
-		m_deco_tilegen->pf1_data_w(offs, data, 0x00ff);
+		m_tilegen->vram_w<Which>(offs, data, 0x00ff);
 	else
-		m_deco_tilegen->pf1_data_w(offs, data << 8, 0xff00);
-}
-
-uint8_t dfruit2_state::tilegen_pf2_data_r(offs_t offset)
-{
-	int const offs = offset >> 1;
-
-	if (!BIT(offset, 0))
-		return m_deco_tilegen->pf2_data_r(offs) & 0xff;
-	else
-		return m_deco_tilegen->pf2_data_r(offs) >> 8;
-}
-
-void dfruit2_state::tilegen_pf2_data_w(offs_t offset, uint8_t data)
-{
-	int const offs = offset >> 1;
-
-	if (!BIT(offset, 0))
-		m_deco_tilegen->pf2_data_w(offs, data, 0x00ff);
-	else
-		m_deco_tilegen->pf2_data_w(offs, data << 8, 0xff00);
+		m_tilegen->vram_w<Which>(offs, data << 8, 0xff00);
 }
 
 void dfruit2_state::tilegen_control_w(offs_t offset, uint8_t data)
@@ -185,17 +165,15 @@ void dfruit2_state::tilegen_control_w(offs_t offset, uint8_t data)
 	int const offs = offset >> 1;
 
 	if (!BIT(offset, 0))
-		m_deco_tilegen->pf_control_w(offs, data, 0x00ff);
+		m_tilegen->control_w(offs, data, 0x00ff);
 	else
-		m_deco_tilegen->pf_control_w(offs, data << 8, 0xff00);
-
+		m_tilegen->control_w(offs, data << 8, 0xff00);
 }
 
-DECO16IC_BANK_CB_MEMBER(dfruit2_state::bank_callback)
+int dfruit2_state::bank_callback(int bank)
 {
 	return (bank & 0xf0) << 8;
 }
-
 
 uint8_t dfruit2_state::bank_r()
 {
@@ -263,8 +241,8 @@ void dfruit2_state::program_map(address_map &map)
 	// map(0xb101, 0xb101).w();
 	map(0xb109, 0xb109).w(FUNC(dfruit2_state::b109_w));
 	map(0xc000, 0xc1ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xd000, 0xdfff).rw(FUNC(dfruit2_state::tilegen_pf2_data_r), FUNC(dfruit2_state::tilegen_pf2_data_w)); // SCREEN RAM CHECK NG if this range isn't mapped
-	map(0xe000, 0xefff).rw(FUNC(dfruit2_state::tilegen_pf1_data_r), FUNC(dfruit2_state::tilegen_pf1_data_w));
+	map(0xd000, 0xdfff).rw(FUNC(dfruit2_state::tilegen_vram_r<1>), FUNC(dfruit2_state::tilegen_vram_w<1>)); // SCREEN RAM CHECK NG if this range isn't mapped
+	map(0xe000, 0xefff).rw(FUNC(dfruit2_state::tilegen_vram_r<0>), FUNC(dfruit2_state::tilegen_vram_w<0>));
 	map(0xf000, 0xfdff).rw(FUNC(dfruit2_state::spriteram_r), FUNC(dfruit2_state::spriteram_w));
 	map(0xff08, 0xff08).rw(FUNC(dfruit2_state::bank_r), FUNC(dfruit2_state::bank_w));
 	map(0xfff0, 0xffff).ram();
@@ -401,18 +379,18 @@ void dfruit2_state::dfruit2(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_dfruit2);
 
-	DECO16IC(config, m_deco_tilegen);
-	m_deco_tilegen->set_pf1_size(DECO_64x32);
-	m_deco_tilegen->set_pf2_size(DECO_64x32);
-	m_deco_tilegen->set_pf1_col_bank(0x00);
-	m_deco_tilegen->set_pf2_col_bank(0x00);
-	m_deco_tilegen->set_pf1_col_mask(0x0f);
-	m_deco_tilegen->set_pf2_col_mask(0x0f);
-	m_deco_tilegen->set_bank1_callback(FUNC(dfruit2_state::bank_callback));
-	m_deco_tilegen->set_bank2_callback(FUNC(dfruit2_state::bank_callback));
-	m_deco_tilegen->set_pf12_8x8_bank(0);
-	m_deco_tilegen->set_pf12_16x16_bank(1);
-	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
+	DECO16IC(config, m_tilegen);
+	m_tilegen->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen->set_col_bank<0>(0x00);
+	m_tilegen->set_col_bank<1>(0x00);
+	m_tilegen->set_col_mask<0>(0x0f);
+	m_tilegen->set_col_mask<1>(0x0f);
+	m_tilegen->set_bank_callback<0>(FUNC(dfruit2_state::bank_callback));
+	m_tilegen->set_bank_callback<1>(FUNC(dfruit2_state::bank_callback));
+	m_tilegen->set_8x8_bank(0);
+	m_tilegen->set_16x16_bank(1);
+	m_tilegen->set_gfxdecode_tag("gfxdecode");
 
 	DECO_SPRITE(config, "sprgen", "palette", gfx_dfruit2_spr);
 
