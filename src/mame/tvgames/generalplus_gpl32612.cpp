@@ -569,7 +569,7 @@ CONS( 2015, jak_swbstrik, 0,      0,      gpl32612, gpl32612, generalplus_gpl326
 CONS( 2014, jak_tmnthp,   0,      0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "Jakks Pacific / HotGen", "Hero Portal: Teenage Mutant Ninja Turtles - Heroes in a Half Shell", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2014, jak_ddhp,     0,      0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "Jakks Pacific / HotGen", "Hero Portal: DreamWorks Dragons", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2014, jak_prhp,     0,      0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "Jakks Pacific / HotGen", "Hero Portal: Power Rangers Super Megaforce - Legendary Power", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // from a PAL unit (probably not region specific)
-CONS( 2014, jak_dchp,     0,      0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "Jakks Pacific / HotGen", "Hero Portal: DC Comics Super Heroes = The Watchtower", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2014, jak_dchp,     0,      0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "Jakks Pacific / HotGen", "Hero Portal: DC Comics Super Heroes - The Watchtower", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // Might not belong here, SoC is marked GPL32300A instead, but is still ARM based, and has GPNAND strings
 CONS( 201?, zippity,   0,       0, zippity, gpl32612, generalplus_zippity_game_state, empty_init, "LeapFrog", "Zippity (US)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
