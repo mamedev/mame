@@ -11,6 +11,15 @@ class ct1745_mixer_device : public device_t, public device_memory_interface, pub
 public:
 	ct1745_mixer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	// application dependant (i.e. differs on ISA vs. C-Bus)
+	// reg $80, irq select
+	auto irq_select_read_cb()  { return m_irq_select_read_cb.bind(); }
+	auto irq_select_write_cb() { return m_irq_select_write_cb.bind(); }
+
+	// reg $81, dma select
+	auto dma_select_read_cb()  { return m_dma_select_read_cb.bind(); }
+	auto dma_select_write_cb() { return m_dma_select_write_cb.bind(); }
+
 	// reg $82, depends on DSP + irq stuff coming from host
 	auto irq_status_cb() { return m_irq_status_cb.bind(); }
 
@@ -34,6 +43,10 @@ protected:
 
 private:
 	address_space_config      m_space_config;
+	devcb_read8 m_irq_select_read_cb;
+	devcb_write8 m_irq_select_write_cb;
+	devcb_read8 m_dma_select_read_cb;
+	devcb_write8 m_dma_select_write_cb;
 	devcb_read8 m_irq_status_cb;
 
 	required_device<device_sound_interface> m_fm;

@@ -57,6 +57,7 @@ private:
 	// internal state
 	uint8_t m_mpu_byte;
 	bool m_irq8, m_irq16, m_irq_midi;
+	uint8_t m_irq_sel, m_dma_sel;
 };
 
 // device type definition

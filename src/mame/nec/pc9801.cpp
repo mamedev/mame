@@ -1695,7 +1695,7 @@ static void pc9801_floppies(device_slot_interface &device)
 
 void pc9801vm_state::fdc_irq_w(int state)
 {
-	if(m_fdc_mode & 1)
+	if(BIT(m_fdc_mode, 0))
 		m_pic2->ir3_w(state);
 	else
 		m_pic2->ir2_w(state);
@@ -1703,7 +1703,7 @@ void pc9801vm_state::fdc_irq_w(int state)
 
 void pc9801vm_state::fdc_drq_w(int state)
 {
-	if(m_fdc_mode & 1)
+	if(BIT(m_fdc_mode, 0))
 		m_dmac->dreq2_w(state ^ 1);
 	else
 		m_dmac->dreq3_w(state ^ 1);
@@ -1959,6 +1959,7 @@ void pc9801_state::pc9801_cbus(machine_config &config)
 	m_cbus_root->int_cb<6>().set("pic8259_slave", FUNC(pic8259_device::ir5_w));
 	m_cbus_root->int_cb<7>().set("pic8259_slave", FUNC(pic8259_device::ir2_w)); // INT41
 	m_cbus_root->drq_cb<0>().set(m_dmac, FUNC(am9517a_device::dreq0_w)).invert();
+//	m_cbus_root->drq_cb<2>().set(m_dmac, FUNC(am9517a_device::dreq2_w)).invert();
 	m_cbus_root->drq_cb<3>().set(m_dmac, FUNC(am9517a_device::dreq3_w)).invert();
 }
 
@@ -2021,6 +2022,7 @@ void pc9801_state::pc9801_common(machine_config &config)
 	m_dmac->in_ior_callback<0>().set([this] () { return m_cbus_root->dack_r(0); });
 	m_dmac->out_iow_callback<0>().set([this] (u8 data) { m_cbus_root->dack_w(0, data); });
 
+	// TODO: convert this to pure C-Bus dack 2
 	m_dmac->in_ior_callback<2>().set(m_fdc_2hd, FUNC(upd765a_device::dma_r));
 	m_dmac->out_iow_callback<2>().set(m_fdc_2hd, FUNC(upd765a_device::dma_w));
 	m_dmac->in_ior_callback<3>().set([this] () { return m_cbus_root->dack_r(3); });
@@ -2179,8 +2181,29 @@ void pc9801vm_state::pc9801vm(machine_config &config)
 	m_fdc_2hd->drq_wr_callback().set(FUNC(pc9801vm_state::fdc_drq_w));
 	// ch. 3 used when in 2DD mode (mightyhd, rogue)
 	// TODO: should lock as everything else depending on mode bit 0
-	m_dmac->in_ior_callback<3>().set(m_fdc_2hd, FUNC(upd765a_device::dma_r));
-	m_dmac->out_iow_callback<3>().set(m_fdc_2hd, FUNC(upd765a_device::dma_w));
+	m_dmac->in_ior_callback<2>().set([this] () {
+		if (BIT(m_fdc_mode, 0))
+			return m_fdc_2hd->dma_r();
+		return m_cbus_root->dack_r(2);
+	});
+	m_dmac->out_iow_callback<2>().set([this] (u8 data) {
+		if (BIT(m_fdc_mode, 0))
+			return m_fdc_2hd->dma_w(data);
+		m_cbus_root->dack_w(2, data);
+	});
+	m_dmac->in_ior_callback<3>().set([this] () {
+		if (!BIT(m_fdc_mode, 0))
+			return m_fdc_2hd->dma_r();
+		return m_cbus_root->dack_r(3);
+	});
+	m_dmac->out_iow_callback<3>().set([this] (u8 data) {
+		if (!BIT(m_fdc_mode, 0))
+		{
+			m_fdc_2hd->dma_w(data);
+			return;
+		}
+		m_cbus_root->dack_w(3, data);
+	});
 
 //  DAC_1BIT(config, m_dac1bit, 0).set_output_range(-1, 1).add_route(ALL_OUTPUTS, "mono", 0.15);
 	SPEAKER_SOUND(config, m_dac1bit).add_route(ALL_OUTPUTS, "mono", 0.40);

@@ -43,6 +43,12 @@ void sb16_lle_device::device_add_mconfig(machine_config &config)
 	m_mixer->set_rdac_tag(m_rdac);
 	m_mixer->add_route(0, "speaker", 1.0, 0);
 	m_mixer->add_route(1, "speaker", 1.0, 1);
+	m_mixer->irq_select_read_cb().set([this] () {
+		return m_irq_sel;
+	});
+	m_mixer->dma_select_read_cb().set([this] () {
+		return m_dma_sel;
+	});
 	m_mixer->irq_status_cb().set([this] () {
 		return (m_irq8 << 0) | (m_irq16 << 1) | (m_irq_midi << 2) | (0x8 << 4);
 	});
@@ -170,6 +176,21 @@ void sb16_lle_device::device_start()
 {
 	set_isa_device();
 
+	// TODO: hardcoded for now
+	// ---x ---- ?
+	// ---- 1000 IRQ10
+	// ---- 0100 IRQ7
+	// ---- 0010 IRQ5
+	// ---- 0001 IRQ2
+	m_irq_sel = 0x12;
+	// 100- ---- High DMA7
+	// 010- ---- High DMA6
+	// 001- ---- High DMA5
+	// ---- 1-00 DMA3
+	// ---- 0-10 DMA1
+	// ---- 0-01 DMA0
+	m_dma_sel = 0x22;
+
 	m_isa->set_dma_channel(1, this, false);
 	m_isa->set_dma_channel(5, this, false);
 
@@ -177,6 +198,9 @@ void sb16_lle_device::device_start()
 	save_item(NAME(m_irq16));
 	save_item(NAME(m_irq_midi));
 	save_item(NAME(m_mpu_byte));
+
+	save_item(NAME(m_irq_sel));
+	save_item(NAME(m_dma_sel));
 }
 
 

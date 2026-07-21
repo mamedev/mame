@@ -52215,6 +52215,7 @@ doesn't boot when converted to d88 (2DD)
 		<publisher>イマジニア (Imagineer)</publisher>
 		<notes><![CDATA[
 [SB16] detection doesn't work due of [OPL3]
+https://github.com/aaronsgiles/ymfm/issues/73
 Has no BGM on main menu (verify)
 ]]></notes>
 		<info name="alt_title" value="ウルフェンシュタイン3D" />

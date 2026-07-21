@@ -51,9 +51,11 @@ private:
 	required_device<dac_16bit_r2r_device> m_ldac;
 	required_device<dac_16bit_r2r_device> m_rdac;
 	required_device<input_merger_device> m_irqs;
+	required_device<input_merger_device> m_dmas;
 	required_device<pc_joy_device> m_joy;
 
 	bool m_irq8, m_irq16;
+	u8 m_irq_sel, m_dma_sel;
 };
 
 
