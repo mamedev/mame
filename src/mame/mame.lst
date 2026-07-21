@@ -2572,6 +2572,10 @@ offtwallc
 @source:atari/orbit.cpp
 orbit
 
+@source:atari/pakrat11.cpp
+pakrat11
+pakrat11a
+
 @source:atari/pofo.cpp
 pofo
 pofo2
