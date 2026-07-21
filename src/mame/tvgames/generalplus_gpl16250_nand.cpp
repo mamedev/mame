@@ -920,7 +920,7 @@ CONS( 2008, jak_camp,  0, 0, generalplus_gpac800_nand256mbyte, jak_hsm,  general
 // a different set, https://www.youtube.com/watch?v=XiEMtLzcTFw showing a date of May 14 2008 10:05:22 shows exactly the same failures
 CONS( 2008, jak_hmpt, 0, 0, generalplus_gpac800_nand256mbyte, jak_hsm, generalplus_gpac800_game_state, nand_init_32mb, "Jakks Pacific / HotGen", "Hannah Montana Pop Tour: Guitar Video Game (Jakks Pacific TV Game) (May 16 2008)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // May 16 2008 10:36:59
 
-// There were 1 player and 2 player versions for several of the Jakks guns.  The 2nd gun appears to be simply a controller (no AV connectors) but as they were separate products with the 2 player versions being released up to a year after the original, the code could differ.
+// There were 1-player and 2-player versions for several of the Jakks guns. The second gun appears to be simply a controller (no AV connectors) but as they were separate products with the 2-player versions being released up to a year after the original, the code could differ.
 // If they differ, it is currently uncertain which versions these ROMs are from
 CONS(2012, jak_wdzh, 0, 0, generalplus_gpac800_nand64mbyte, jak_car2, generalplus_gpac800_game_state, nand_init,      "Jakks Pacific / Merge Interactive",   "The Walking Dead: Zombie Hunter (Jakks Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // gun games all had Atmel 16CM (24C16).
 CONS(2013, jak_duck, 0, 0, generalplus_gpac800_nand64mbyte, jak_car2, generalplus_gpac800_game_state, nand_init_32mb, "Jakks Pacific / Merge Interactive",   "Duck Commander (Jakks Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // no 2 Player version was released
