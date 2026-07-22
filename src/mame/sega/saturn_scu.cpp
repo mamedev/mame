@@ -102,7 +102,7 @@ xxxx xxxx x--- xx-- xx-- xx-- xx-- xx-- UNUSED
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(SATURN_SCU, saturn_scu_device, "saturn_scu", "Sega Saturn System Control Unit")
+DEFINE_DEVICE_TYPE(SATURN_SCU, saturn_scu_device, "saturn_scu", "Sega Saturn System Control Unit (Yamaha 315-5688)")
 
 //-------------------------------------------------
 //  saturn_scu_device - constructor

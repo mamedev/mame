@@ -65,69 +65,6 @@ uint16_t saturn_state::soundram_r(offs_t offset)
 	return m_sound_ram[offset];
 }
 
-/* communication,SLAVE CPU acquires data from the MASTER CPU and triggers an irq.  */
-void saturn_state::minit_w(uint32_t data)
-{
-	//logerror("%s MINIT write = %08x\n", machine().describe_context(),data);
-	machine().scheduler().add_quantum(m_minit_boost_timeslice, attotime::from_usec(m_minit_boost));
-	machine().scheduler().trigger(1000);
-	machine().scheduler().synchronize(); // force resync
-	m_slave->pulse_frt_input();
-}
-
-void saturn_state::sinit_w(uint32_t data)
-{
-	//logerror("%s SINIT write = %08x\n", machine().describe_context(),data);
-	machine().scheduler().add_quantum(m_sinit_boost_timeslice, attotime::from_usec(m_sinit_boost));
-	machine().scheduler().synchronize(); // force resync
-	m_maincpu->pulse_frt_input();
-}
-
-/*
-TODO:
-Some games seems to not like either MAME's interleave system and/or SH-2 DRC, causing an hard crash.
-Reported games are:
-Blast Wind (before FMV)
-Choro Q Park (car selection)
-060311E4: MOV.L R14,@-SP ;R14 = 0x60ffba0 / R15 = 0x60ffba0
-060311E6: MOV SP,R14 ;R14 = 0x60ffba0 / R15 = 0x60ffb9c / [0x60ffb9c] <- 0x60ffba0
-060311E8: MOV.L @SP+,R14 ;R14 = 0x60ffb9c / R15 = 0x60ffb9c / [0x60ffb9c] -> R14
-060311EA: RTS ;R14 = 0x60ffba0 / R15 = 0x60ffba0
-060311EC: NOP
-06031734: MULS.W R9, R8 ;R14 = 0x60ffba0 / R15 = 0x60ffba0 / EA = 0x60311E4
-on DRC this becomes:
-R14 0x6031b78 (cause of the crash later on), R15 = 0x60ffba4 and EA = 0
-
-Shinrei Jusatsushi Taromaru (options menu)
-
-*/
-
-void saturn_state::saturn_minit_w(uint32_t data)
-{
-	//logerror("%s MINIT write = %08x\n", machine().describe_context(),data);
-	if(m_fake_comms->read() & 1)
-		machine().scheduler().synchronize(); // force resync
-	else
-	{
-		machine().scheduler().add_quantum(m_minit_boost_timeslice, attotime::from_usec(m_minit_boost));
-		machine().scheduler().trigger(1000);
-	}
-
-	m_slave->pulse_frt_input();
-}
-
-void saturn_state::saturn_sinit_w(uint32_t data)
-{
-	//logerror("%s SINIT write = %08x\n", machine().describe_context(),data);
-	if(m_fake_comms->read() & 1)
-		machine().scheduler().synchronize(); // force resync
-	else
-		machine().scheduler().add_quantum(m_sinit_boost_timeslice, attotime::from_usec(m_sinit_boost));
-
-	m_maincpu->pulse_frt_input();
-}
-
-
 uint8_t saturn_state::backupram_r(offs_t offset)
 {
 	if(!(offset & 1))
@@ -371,8 +308,9 @@ void saturn_state::dot_select_w(int state)
 {
 	const XTAL &xtal = state ? MASTER_CLOCK_320 : MASTER_CLOCK_352;
 
-	m_maincpu->set_unscaled_clock(xtal/2);
-	m_slave->set_unscaled_clock(xtal/2);
+	m_maincpu->set_unscaled_clock(xtal / 2);
+	m_slave->set_unscaled_clock(xtal / 2);
+	m_dcc->set_unscaled_clock(xtal / 2);
 
 	m_vdp2.dotsel = state ^ 1;
 	vdp2_dynamic_res_change();
