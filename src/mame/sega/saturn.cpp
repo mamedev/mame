@@ -549,8 +549,8 @@ void sat_console_state::saturn_mem(address_map &map)
 	map(0x00100000, 0x0010007f).mirror(0x2007ff80).m(m_smpc_hle, FUNC(smpc_hle_device::io_map));
 	map(0x00180000, 0x0018ffff).rw(FUNC(sat_console_state::backupram_r), FUNC(sat_console_state::backupram_w)).share("share1");
 	map(0x00200000, 0x002fffff).ram().mirror(0x20100000).share("workram_l");
-	map(0x01000000, 0x017fffff).w(FUNC(sat_console_state::saturn_minit_w));
-	map(0x01800000, 0x01ffffff).w(FUNC(sat_console_state::saturn_sinit_w));
+	map(0x01000000, 0x017fffff).w("dcc", FUNC(saturn_dcc_device::minit_w));
+	map(0x01800000, 0x01ffffff).w("dcc", FUNC(saturn_dcc_device::sinit_w));
 //  map(0x02000000, 0x023fffff).rom().mirror(0x20000000); // Cartridge area
 //  map(0x02400000, 0x027fffff).ram(); // External Data RAM area
 //  map(0x04000000, 0x047fffff).ram(); // External Battery RAM area
@@ -604,11 +604,6 @@ static INPUT_PORTS_START( saturn )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER("smpc", FUNC(smpc_hle_device::trigger_nmi_r), 0) PORT_NAME("Reset Button")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sat_console_state::tray_open), 0) PORT_NAME("Tray Open Button")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sat_console_state::tray_close), 0) PORT_NAME("Tray Close")
-
-	PORT_START("fake")
-	PORT_CONFNAME(0x01,0x00,"Master-Slave Comms")
-	PORT_CONFSETTING(0x00,"Normal (400 cycles)")
-	PORT_CONFSETTING(0x01,"One Shot (Hack)")
 INPUT_PORTS_END
 
 
@@ -812,15 +807,21 @@ uint8_t sat_console_state::smpc_direct_mode(uint16_t in_value,bool which)
 void sat_console_state::saturn(machine_config &config)
 {
 	/* basic machine hardware */
-	SH7604(config, m_maincpu, MASTER_CLOCK_352/2); // 28.6364 MHz
+	SH7604(config, m_maincpu, MASTER_CLOCK_352 / 2); // 28.6364 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &sat_console_state::saturn_mem);
 	m_maincpu->set_is_slave(0);
+	m_maincpu->set_irq_acknowledge_callback(m_scu, FUNC(saturn_scu_device::irq_ack_cb));
 	TIMER(config, "scantimer").configure_scanline(FUNC(sat_console_state::saturn_scanline), "screen", 0, 1);
 
-	SH7604(config, m_slave, MASTER_CLOCK_352/2); // 28.6364 MHz
+	SH7604(config, m_slave, MASTER_CLOCK_352 / 2); // 28.6364 MHz
 	m_slave->set_addrmap(AS_PROGRAM, &sat_console_state::saturn_mem);
 	m_slave->set_is_slave(1);
+	m_slave->set_irq_acknowledge_callback(m_dcc, FUNC(saturn_dcc_device::irq_ack_cb));
 	TIMER(config, "slave_scantimer").configure_scanline(FUNC(sat_console_state::saturn_slave_scanline), "screen", 0, 1);
+
+	SATURN_DCC(config, m_dcc, MASTER_CLOCK_352);
+	m_dcc->set_master_cpu(m_maincpu);
+	m_dcc->set_slave_cpu(m_slave);
 
 	M68000(config, m_audiocpu, 11289600); //256 x 44100 Hz = 11.2896 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sat_console_state::sound_mem);
@@ -964,12 +965,6 @@ template <bool is_pal> void sat_console_state::init_saturn()
 	m_slave->sh2drc_add_fastram(0x00000000, 0x0007ffff, 1, &m_rom[0]);
 	m_slave->sh2drc_add_fastram(0x00200000, 0x002fffff, 0, &m_workram_l[0]);
 	m_slave->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_workram_h[0]);
-
-	/* amount of time to boost interleave for on MINIT / SINIT, needed for communication to work */
-	m_minit_boost = 400;
-	m_sinit_boost = 400;
-	m_minit_boost_timeslice = attotime::zero;
-	m_sinit_boost_timeslice = attotime::zero;
 
 	m_backupram = make_unique_clear<uint8_t[]>(0x8000);
 }

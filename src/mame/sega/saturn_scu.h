@@ -51,6 +51,8 @@ public:
 
 	template <typename T> void set_hostcpu(T &&tag) { m_hostcpu.set_tag(std::forward<T>(tag)); }
 
+	IRQ_CALLBACK_MEMBER(irq_ack_cb);
+
 protected:
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
@@ -63,6 +65,8 @@ protected:
 
 private:
 	required_device<scudsp_cpu_device> m_scudsp;
+	required_device<sh7604_device> m_hostcpu;
+	address_space *m_hostspace;
 
 	enum dma_id : int {
 		DMALV0_ID = 0,
@@ -78,9 +82,9 @@ private:
 	uint32_t m_status;
 	bool m_t1md;
 	bool m_tenb;
+	int m_current_irq_level;
+	uint8_t m_current_vector;
 
-	required_device<sh7604_device> m_hostcpu;
-	address_space *m_hostspace;
 	void test_pending_irqs();
 
 	struct {

@@ -10,14 +10,14 @@
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/sh/sh7604.h"
+#include "machine/timer.h"
+#include "sound/scsp.h"
 
 #include "315-5881_crypt.h"
 #include "315-5838_317-0229_comp.h"
+#include "saturn_dcc.h"
 #include "saturn_scu.h"
 #include "smpc.h"
-
-#include "machine/timer.h"
-#include "sound/scsp.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -31,10 +31,10 @@ public:
 			m_workram_l(*this, "workram_l"),
 			m_workram_h(*this, "workram_h"),
 			m_sound_ram(*this, "sound_ram"),
-			m_fake_comms(*this, "fake"),
 			m_maincpu(*this, "maincpu"),
 			m_slave(*this, "slave"),
 			m_audiocpu(*this, "audiocpu"),
+			m_dcc(*this, "dcc"),
 			m_scsp(*this, "scsp"),
 			m_smpc_hle(*this, "smpc"),
 			m_scu(*this, "scu"),
@@ -62,7 +62,6 @@ protected:
 	required_shared_ptr<uint32_t> m_workram_l;
 	required_shared_ptr<uint32_t> m_workram_h;
 	required_shared_ptr<uint16_t> m_sound_ram;
-	optional_ioport m_fake_comms;
 
 	memory_region *m_cart_reg[4];
 	std::unique_ptr<uint8_t[]>     m_backupram;
@@ -73,11 +72,6 @@ protected:
 	std::unique_ptr<uint16_t[]>    m_vdp1_regs;
 
 	uint8_t     m_en_68k = 0;
-
-	int       m_minit_boost = 0;
-	int       m_sinit_boost = 0;
-	attotime  m_minit_boost_timeslice;
-	attotime  m_sinit_boost_timeslice;
 
 	struct {
 		std::unique_ptr<uint16_t * []> framebuffer_display_lines;
@@ -121,6 +115,7 @@ protected:
 	required_device<sh7604_device> m_maincpu;
 	required_device<sh7604_device> m_slave;
 	required_device<m68000_base_device> m_audiocpu;
+	required_device<saturn_dcc_device> m_dcc;
 	required_device<scsp_device> m_scsp;
 	required_device<smpc_hle_device> m_smpc_hle;
 	required_device<saturn_scu_device> m_scu;
@@ -149,10 +144,6 @@ protected:
 	TIMER_CALLBACK_MEMBER(vdp1_draw_end);
 	void soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t soundram_r(offs_t offset);
-	void minit_w(uint32_t data);
-	void sinit_w(uint32_t data);
-	void saturn_minit_w(uint32_t data);
-	void saturn_sinit_w(uint32_t data);
 	uint8_t backupram_r(offs_t offset);
 	void backupram_w(offs_t offset, uint8_t data);
 

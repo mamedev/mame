@@ -110,6 +110,7 @@ private:
 	uint8_t m_rtc_data[7];
 	uint8_t m_smem[5];
 	uint8_t m_comreg;
+	uint8_t m_ckchg_tick;
 	// in usec
 	// timing table, from manual in usec
 	const uint32_t m_cmd_table_timing[0x20] =
