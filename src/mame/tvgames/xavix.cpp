@@ -2201,9 +2201,6 @@ void xavix_pl1000_state::init_pl1000()
 		u32 addr = bitswap<20>(i, 20, 19, 18, 17, 16, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 		m_rgn[i] = plainrom[addr]; 
 	}
-
-	// TODO: understand this better as this isn't perfect here either
-	m_sprite_xhigh_ignore_hack = 2;
 }
 
 

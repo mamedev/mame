@@ -48,7 +48,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_nvram(*this, "nvram"),
 		m_screen(*this, "screen"),
-		m_sprite_xhigh_ignore_hack(1),
 		m_mainram(*this, "mainram"),
 		m_fragment_sprite(*this, "fragment_sprite"),
 		m_rom_dma_src(*this, "rom_dma_src"),
@@ -400,9 +399,9 @@ protected:
 	void palram_l_w(offs_t offset, uint8_t data);
 	void colmix_sh_w(offs_t offset, uint8_t data);
 	void colmix_l_w(offs_t offset, uint8_t data);
+	void spriteram_set_high_x(offs_t offset, uint8_t data);
 	void spriteram_w(offs_t offset, uint8_t data);
 	void mainram_w(offs_t offset, uint8_t data);
-	u8 m_sprite_xhigh_ignore_hack;
 
 	void tmap1_regs_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 	void tmap2_regs_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
