@@ -810,6 +810,7 @@ void sat_console_state::saturn(machine_config &config)
 	SH7604(config, m_maincpu, MASTER_CLOCK_352 / 2); // 28.6364 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &sat_console_state::saturn_mem);
 	m_maincpu->set_is_slave(0);
+	m_maincpu->set_irq_acknowledge_callback(m_scu, FUNC(saturn_scu_device::irq_ack_cb));
 	TIMER(config, "scantimer").configure_scanline(FUNC(sat_console_state::saturn_scanline), "screen", 0, 1);
 
 	SH7604(config, m_slave, MASTER_CLOCK_352 / 2); // 28.6364 MHz

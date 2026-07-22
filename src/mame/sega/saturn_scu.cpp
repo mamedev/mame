@@ -233,6 +233,7 @@ void saturn_scu_device::device_start()
 	save_item(NAME(m_dma[2].indirect_mode));
 	save_item(NAME(m_dma[2].rup));
 	save_item(NAME(m_dma[2].wup));
+	save_item(NAME(m_current_irq_level));
 
 	m_hostspace = &m_hostcpu->space(AS_PROGRAM);
 
@@ -258,7 +259,7 @@ void saturn_scu_device::device_reset()
 	}
 
 	m_status = 0;
-
+	m_current_irq_level = 0;
 }
 
 //-------------------------------------------------
@@ -273,14 +274,12 @@ void saturn_scu_device::device_reset_after_children()
 template <int Level>
 TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick)
 {
-	const int irqlevel = Level == 0 ? 5 : 6;
-	const int irqvector = 0x4b - Level;
+//	const int irqlevel = Level == 0 ? 5 : 6;
+//	const int irqvector = 0x4b - Level;
 	const uint16_t irqmask = 1 << (11 - Level);
 
-	if(!(m_ism & irqmask))
-		m_hostcpu->set_input_line_and_vector(irqlevel, HOLD_LINE, irqvector); // SH2
-	else
-		m_ist |= (irqmask);
+	m_ist |= irqmask;
+	test_pending_irqs();
 
 	update_dma_status((uint8_t)Level, false);
 	machine().scheduler().synchronize(); // force resync
@@ -389,10 +388,8 @@ void saturn_scu_device::handle_dma_direct(uint8_t level)
 	if((m_dma[level].src & 0x07f00000) == 0)
 	{
 		//popmessage("Warning: SCU transfer from BIOS area, contact MAMEdev");
-		if(!(m_ism & IRQ_DMAILL))
-			m_hostcpu->set_input_line_and_vector(3, HOLD_LINE, 0x4c); // SH2
-		else
-			m_ist |= (IRQ_DMAILL);
+		m_ist |= (IRQ_DMAILL);
+		test_pending_irqs();
 		return;
 	}
 
@@ -559,9 +556,7 @@ inline void saturn_scu_device::dma_single_transfer(uint32_t src, uint32_t dst,ui
 
 inline void saturn_scu_device::dma_start_factor_ack(uint8_t event)
 {
-	int i;
-
-	for(i=0;i<3;i++)
+	for(int i = 0; i < 3; i++)
 	{
 		if(m_dma[i].enable_mask == true && m_dma[i].start_factor == event)
 		{
@@ -618,13 +613,10 @@ void saturn_scu_device::check_scanline_timers(int scanline, int y_step)
 	// Timer 0
 	if(scanline == timer0_compare)
 	{
-		if(!(m_ism & IRQ_TIMER_0))
-		{
-			m_hostcpu->set_input_line_and_vector(0xc, HOLD_LINE, 0x43 ); // SH2
-			dma_start_factor_ack(3);
-		}
-		else
-			m_ist |= (IRQ_TIMER_0);
+		dma_start_factor_ack(3);
+
+		m_ist |= IRQ_TIMER_0;
+		test_pending_irqs();
 	}
 
 	// Timer 1
@@ -633,15 +625,11 @@ void saturn_scu_device::check_scanline_timers(int scanline, int y_step)
 	  ((m_t1md == false) && ((scanline % y_step) == 0)) ||
 	  ((m_t1md == true) && (scanline == timer0_compare)) )
 	{
-		if(!(m_ism & IRQ_TIMER_1))
-		{
-			m_hostcpu->set_input_line_and_vector(0xb, HOLD_LINE, 0x44 ); // SH2
-			dma_start_factor_ack(4);
-		}
-		else
-			m_ist |= (IRQ_TIMER_1);
-	}
+		dma_start_factor_ack(4);
 
+		m_ist |= IRQ_TIMER_1;
+		test_pending_irqs();
+	}
 }
 
 
@@ -676,42 +664,50 @@ void saturn_scu_device::irq_status_w(offs_t offset, uint32_t data, uint32_t mem_
 
 void saturn_scu_device::test_pending_irqs()
 {
-	int i;
+	// ignore if current irq still serviced
+	if (m_current_irq_level != 0)
+		return;
+
 	const int irq_level[32] = { 0xf, 0xe, 0xd, 0xc,
 								0xb, 0xa, 0x9, 0x8,
 								0x8, 0x6, 0x6, 0x5,
-								0x3, 0x2,  -1,  -1,
+								0x3, 0x2,   0,   0,
 								0x7, 0x7, 0x7, 0x7,
 								0x4, 0x4, 0x4, 0x4,
 								0x1, 0x1, 0x1, 0x1,
 								0x1, 0x1, 0x1, 0x1  };
 
-	for(i=0;i<32;i++)
+	// TODO: skip A-Bus for now
+	for(int i = 0; i < 14; i++)
 	{
-		if((!(m_ism & 1 << i)) && (m_ist & 1 << i))
+		if (!(BIT(m_ism, i)) && BIT(m_ist, i))
 		{
-			if(irq_level[i] != -1) /* TODO: cheap check for undefined irqs */
-			{
-				m_hostcpu->set_input_line_and_vector(irq_level[i], HOLD_LINE, 0x40 + i); // SH2
-				m_ist &= ~(1 << i);
-				return; /* avoid spurious irqs, correct? */
-			}
+			m_current_irq_level = irq_level[i];
+			m_current_vector = 0x40 + i;
+			m_hostcpu->set_input_line(m_current_irq_level, ASSERT_LINE);
+			m_ist &= ~(1 << i);
+			return;
 		}
 	}
 }
+
+IRQ_CALLBACK_MEMBER(saturn_scu_device::irq_ack_cb)
+{
+	m_hostcpu->set_input_line(irqline, CLEAR_LINE);
+	m_current_irq_level = 0;
+	return m_current_vector;
+}
+
 
 void saturn_scu_device::vblank_out_w(int state)
 {
 	if(!state)
 		return;
 
-	if(!(m_ism & IRQ_VBLANK_OUT))
-	{
-		m_hostcpu->set_input_line_and_vector(0xe, HOLD_LINE, 0x41); // SH2
-		dma_start_factor_ack(1);
-	}
-	else
-		m_ist |= (IRQ_VBLANK_OUT);
+	dma_start_factor_ack(1);
+
+	m_ist |= IRQ_VBLANK_OUT;
+	test_pending_irqs();
 }
 
 void saturn_scu_device::vblank_in_w(int state)
@@ -719,13 +715,10 @@ void saturn_scu_device::vblank_in_w(int state)
 	if(!state)
 		return;
 
-	if(!(m_ism & IRQ_VBLANK_IN))
-	{
-		m_hostcpu->set_input_line_and_vector(0xf, HOLD_LINE ,0x40); // SH2
-		dma_start_factor_ack(0);
-	}
-	else
-		m_ist |= (IRQ_VBLANK_IN);
+	dma_start_factor_ack(0);
+
+	m_ist |= IRQ_VBLANK_IN;
+	test_pending_irqs();
 }
 
 void saturn_scu_device::hblank_in_w(int state)
@@ -733,13 +726,10 @@ void saturn_scu_device::hblank_in_w(int state)
 	if(!state)
 		return;
 
-	if(!(m_ism & IRQ_HBLANK_IN))
-	{
-		m_hostcpu->set_input_line_and_vector(0xd, HOLD_LINE, 0x42); // SH2
-		dma_start_factor_ack(2);
-	}
-	else
-		m_ist |= (IRQ_HBLANK_IN);
+	dma_start_factor_ack(2);
+
+	m_ist |= IRQ_HBLANK_IN;
+	test_pending_irqs();
 }
 
 void saturn_scu_device::vdp1_end_w(int state)
@@ -747,13 +737,10 @@ void saturn_scu_device::vdp1_end_w(int state)
 	if(!state)
 		return;
 
-	if(!(m_ism & IRQ_VDP1_END))
-	{
-		m_hostcpu->set_input_line_and_vector(0x2, HOLD_LINE, 0x4d); // SH2
-		dma_start_factor_ack(6);
-	}
-	else
-		m_ist |= (IRQ_VDP1_END);
+	dma_start_factor_ack(6);
+
+	m_ist |= IRQ_VDP1_END;
+	test_pending_irqs();
 }
 
 void saturn_scu_device::sound_req_w(int state)
@@ -761,13 +748,10 @@ void saturn_scu_device::sound_req_w(int state)
 	if(!state)
 		return;
 
-	if(!(m_ism & IRQ_SOUND_REQ))
-	{
-		m_hostcpu->set_input_line_and_vector(9, HOLD_LINE, 0x46); // SH2
-		dma_start_factor_ack(5);
-	}
-	else
-		m_ist |= (IRQ_SOUND_REQ);
+	dma_start_factor_ack(5);
+
+	m_ist |= IRQ_SOUND_REQ;
+	test_pending_irqs();
 }
 
 void saturn_scu_device::smpc_irq_w(int state)
@@ -775,10 +759,8 @@ void saturn_scu_device::smpc_irq_w(int state)
 	if(!state)
 		return;
 
-	if(!(m_ism & IRQ_SMPC))
-		m_hostcpu->set_input_line_and_vector(8, HOLD_LINE, 0x47); // SH2
-	else
-		m_ist |= (IRQ_SMPC);
+	m_ist |= IRQ_SMPC;
+	test_pending_irqs();
 }
 
 void saturn_scu_device::scudsp_end_w(int state)
@@ -786,11 +768,8 @@ void saturn_scu_device::scudsp_end_w(int state)
 	if(!state)
 		return;
 
-	if(!(m_ism & IRQ_DSP_END))
-		m_hostcpu->set_input_line_and_vector(0xa, HOLD_LINE, 0x45); // SH2
-	else
-		m_ist |= (IRQ_DSP_END);
-
+	m_ist |= IRQ_DSP_END;
+	test_pending_irqs();
 }
 
 //**************************************************************************
