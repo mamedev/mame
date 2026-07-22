@@ -18596,18 +18596,18 @@ Ingame selections runs too fast, either with [keyboard] or [joystick] (verify)
 		</part>
 	</software>
 
-	<software name="edge" supported="no">
+	<!-- 3.5" version known to exist -->
+	<software name="edge" supported="partial">
 		<description>Edge</description>
 		<year>1993</year>
 		<publisher>テイジイエル (TGL)</publisher>
 		<notes><![CDATA[
-Doesn't recognize disk changes (regressed)
-Has gfx glitch when intro scrolls to top-left
-User disk creation screen is offset
-Hangs during intro (regression?)
+Has small line glitch with opening (5th option in main menu), top-right (verify)
+Confirm disks D-F
 ]]></notes>
 		<info name="alt_title" value="エッジ" />
 		<info name="release" value="19930115" />
+		<!-- TODO: at least Disk B and C were swapped -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1281968">
@@ -18617,13 +18617,13 @@ Hangs during intro (regression?)
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1281968">
-				<rom name="edgeb.d88" size="1281968" crc="32537419" sha1="8897049f5e9dea9920476d1931bfc9167bb4032f" offset="0" />
+				<rom name="edgec.d88" size="1281968" crc="8685b9f4" sha1="69f3dfc52339d14555537ba4ca7c267ca0e05297" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1281968">
-				<rom name="edgec.d88" size="1281968" crc="8685b9f4" sha1="69f3dfc52339d14555537ba4ca7c267ca0e05297" offset="0" />
+				<rom name="edgeb.d88" size="1281968" crc="32537419" sha1="8897049f5e9dea9920476d1931bfc9167bb4032f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
