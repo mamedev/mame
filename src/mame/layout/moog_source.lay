@@ -8,25 +8,25 @@ copyright-holders:m1macrophage
 
 	<element name="black_box">
 		<image><data><![CDATA[
-			<rect fill="#45474a" x="0" y="0" width="517" height="190" rx="3" ry="3"/>
+			<rect fill="#454545" x="0" y="0" width="517" height="190" rx="3" ry="3"/>
 		]]></data></image>
 	</element>
 
 	<element name="left_panel">
 		<image><data><![CDATA[
 			<svg width="108" height="190">
-				<rect fill="#00a3fc" stroke="#45474a" stroke-width="2" x="1" y="1" width="106" height="188" rx="3" ry="3"/>
-				<rect fill="#45474a" x="0" y="48" width="108" height="2"/>
-				<rect fill="#45474a" x="0" y="96" width="108" height="2"/>
+				<rect fill="#0099ff" stroke="#454545" stroke-width="2" x="1" y="1" width="106" height="188" rx="3" ry="3"/>
+				<rect fill="#454545" x="0" y="48" width="108" height="2"/>
+				<rect fill="#454545" x="0" y="96" width="108" height="2"/>
 
 				<!-- Tickmarks around the volume knob. -->
-				<g stroke="#ffffff" stroke-width="0.5" transform="translate(26, 72)>
-					<line x1="0" y1="0" x2="20" y2="0"/>
-					<line transform="rotate(60)" x1="0" y1="0" x2="20" y2="0"/>
-					<line transform="rotate(120)" x1="0" y1="0" x2="20" y2="0"/>
-					<line transform="rotate(180)" x1="0" y1="0" x2="20" y2="0"/>
-					<line transform="rotate(240)" x1="0" y1="0" x2="20" y2="0"/>
-					<line transform="rotate(300)" x1="0" y1="0" x2="20" y2="0"/>
+				<g stroke="#e6e6e6" stroke-width="0.5" transform="translate(26, 72)>
+					<line x1="0" y1="0" x2="18" y2="0"/>
+					<line transform="rotate(60)" x1="0" y1="0" x2="18" y2="0"/>
+					<line transform="rotate(120)" x1="0" y1="0" x2="18" y2="0"/>
+					<line transform="rotate(180)" x1="0" y1="0" x2="18" y2="0"/>
+					<line transform="rotate(240)" x1="0" y1="0" x2="18" y2="0"/>
+					<line transform="rotate(300)" x1="0" y1="0" x2="18" y2="0"/>
 				</g>
 			</svg>
 		]]></data></image>
@@ -35,22 +35,22 @@ copyright-holders:m1macrophage
 	<element name="wheel_panel">
 		<image><data><![CDATA[
 			<svg width="94" height="160">
-				<rect fill="#00a3fc" stroke="#45474a" stroke-width="2" x="1" y="1" width="92" height="158" rx="3" ry="3"/>
+				<rect fill="#0099ff" stroke="#454545" stroke-width="2" x="1" y="1" width="92" height="158" rx="3" ry="3"/>
 
 				<!-- Pitch wheel arrows. -->
 				<g transform="translate(13, 82)">
-					<polygon fill="#d1e0e0" points="0,0 2,5 -2,5"/>
-					<line stroke="#d1e0e0" stroke-width="1" x1="0" y1="5" x2="0" y2="18"/>
+					<polygon fill="#e6e6e6" points="0,0 2,5 -2,5"/>
+					<line stroke="#e6e6e6" stroke-width="1" x1="0" y1="5" x2="0" y2="18"/>
 				</g>
 				<g transform="translate(13, 132) rotate(180)">
-					<polygon fill="#d1e0e0" points="0,0 2,5 -2,5"/>
-					<line stroke="#d1e0e0" stroke-width="1" x1="0" y1="5" x2="0" y2="18"/>
+					<polygon fill="#e6e6e6" points="0,0 2,5 -2,5"/>
+					<line stroke="#e6e6e6" stroke-width="1" x1="0" y1="5" x2="0" y2="18"/>
 				</g>
 
 				<!-- Mod wheel arrow. -->
 				<g transform="translate(55, 82)">
-					<polygon fill="#d1e0e0" points="0,0 2,5 -2,5"/>
-					<line stroke="#d1e0e0" stroke-width="1" x1="0" y1="5" x2="0" y2="18"/>
+					<polygon fill="#e6e6e6" points="0,0 2,5 -2,5"/>
+					<line stroke="#e6e6e6" stroke-width="1" x1="0" y1="5" x2="0" y2="18"/>
 				</g>
 			</svg>
 		]]></data></image>
@@ -58,40 +58,40 @@ copyright-holders:m1macrophage
 
 	<element name="trigger_memory_box">
 		<image><data><![CDATA[
-			<rect fill="#00a3fc" x="0" y="0" width="52" height="141" rx="3" ry="3"/>
-			<rect fill="#45474a" x="0" y="71" width="52" height="2"/>
+			<rect fill="#0099ff" x="0" y="0" width="52" height="141" rx="3" ry="3"/>
+			<rect fill="#454545" x="0" y="71" width="52" height="2"/>
 		]]></data></image>
 	</element>
 
 	<element name="osc_box">
 		<image><data><![CDATA[
-			<rect fill="#00a3fc" x="0" y="0" width="168" height="141" rx="3" ry="3"/>
-			<rect fill="#45474a" x="0" y="59" width="168" height="2"/>
-			<rect fill="#00a3fc" x="63" y="51" width="35" height="18"/>
+			<rect fill="#0099ff" x="0" y="0" width="168" height="141" rx="3" ry="3"/>
+			<rect fill="#454545" x="0" y="59" width="168" height="2"/>
+			<rect fill="#0099ff" x="63" y="51" width="35" height="18"/>
 		]]></data></image>
 	</element>
 
 	<element name="mod_box">
 		<image><data><![CDATA[
-			<rect fill="#00a3fc" x="0" y="0" width="52" height="141" rx="3" ry="3"/>
+			<rect fill="#0099ff" x="0" y="0" width="52" height="141" rx="3" ry="3"/>
 			<!-- Downward-pointing arrow. -->
-			<polygon transform="translate(27, 66)" fill="#45474a" points="-2,0 2,0 2,3 5,3 0,11 -5,3 -2,3"/>
+			<polygon transform="translate(27, 66)" fill="#454545" points="-2,0 2,0 2,3 5,3 0,11 -5,3 -2,3"/>
 		]]></data></image>
 	</element>
 
 	<element name="mixer_box">
 		<image><data><![CDATA[
-			<rect fill="#00a3fc" x="0" y="0" width="52" height="141" rx="3" ry="3"/>
+			<rect fill="#0099ff" x="0" y="0" width="52" height="141" rx="3" ry="3"/>
 		]]></data></image>
 	</element>
 
 	<element name="modifiers_box">
 		<image><data><![CDATA[
-			<rect fill="#00a3fc" x="0" y="0" width="139" height="141" rx="3" ry="3"/>
-			<rect fill="#45474a" x="0" y="68" width="139" height="2"/>
-			<rect fill="#45474a" x="0" y="103" width="139" height="2"/>
+			<rect fill="#0099ff" x="0" y="0" width="139" height="141" rx="3" ry="3"/>
+			<rect fill="#454545" x="0" y="68" width="139" height="2"/>
+			<rect fill="#454545" x="0" y="103" width="139" height="2"/>
 			<!-- Upward-pointing arrow. -->
-			<polygon transform="translate(117, 55)" fill="#45474a" points="0,0 7,7 4,7 4,14 -4,14 -4,7, -7,7"/>
+			<polygon transform="translate(117, 55)" fill="#454545" points="0,0 7,7 4,7 4,14 -4,14 -4,7, -7,7"/>
 		]]></data></image>
 	</element>
 
@@ -177,8 +177,8 @@ copyright-holders:m1macrophage
 	<element name="level1_arrow">
 		<image><data><![CDATA[
 			<svg width="17" height="5">
-				<polygon fill="#ebfafa" points="0,2 5,0 5,4"/>
-				<line stroke="#ebfafa" stroke-width="1" x1="5" y1="2" x2="16" y2="2"/>
+				<polygon fill="#e6e6e6" points="0,2 5,0 5,4"/>
+				<line stroke="#e6e6e6" stroke-width="1" x1="5" y1="2" x2="16" y2="2"/>
 			</svg>
 		]]></data></image>
 	</element>
@@ -186,18 +186,18 @@ copyright-holders:m1macrophage
 	<element name="level2_arrow">
 		<image><data><![CDATA[
 			<svg width="52" height="6">
-				<polygon fill="#ebfafa" points="0,2 5,0 5,4"/>
-				<line stroke="#ebfafa" stroke-width="1" x1="5" y1="2" x2="51" y2="2"/>
-				<line stroke="#ebfafa" stroke-width="1" x1="51" y1="2" x2="51" y2="5"/>
+				<polygon fill="#e6e6e6" points="0,2 5,0 5,4"/>
+				<line stroke="#e6e6e6" stroke-width="1" x1="5" y1="2" x2="51" y2="2"/>
+				<line stroke="#e6e6e6" stroke-width="1" x1="51" y1="2" x2="51" y2="5"/>
 			</svg>
 		]]></data></image>
 	</element>
 
 	<element name="white_box">
-		<rect><color red="0.92" green="0.98" blue="0.98"/></rect>
+		<rect><color red="1.0" green="1.0" blue="1.0"/></rect>
 	</element>
 	<element name="silver_box">
-		<rect><color red="0.89" green="0.89" blue="0.88"/></rect>
+		<rect><color red="0.80" green="0.80" blue="0.80"/></rect>
 	</element>
 	<element name="wood_box">
 		<rect><color red="0.78" green="0.50" blue="0.31"/></rect>
@@ -238,54 +238,114 @@ copyright-holders:m1macrophage
 	<element name="volume_knob">
 		<disk>
 			<bounds x="0.0" y="0.0" width="1.0" height="1.0"/>
-			<color red="0.15" green="0.18" blue="0.19"/>
+			<color red="0.15" green="0.15" blue="0.15"/>
 		</disk>
 		<disk>
 			<bounds x="0.25" y="0.25" width="0.5" height="0.5"/>
-			<color red="1.0" green="1.0" blue="1.0"/>
+			<color state="0" red="0.80" green="0.80" blue="0.80"/>
+			<color state="1" red="0.55" green="0.55" blue="0.55"/>
 		</disk>
+	</element>
+
+	<element name="volume_knob_dot">
+		<disk state="1"><color red="0.15" green="0.15" blue="0.15"/></disk>
+	</element>
+
+	<element name="volume_knob_value">
+		<simplecounter digits="1"><color red="0.15" green="0.15" blue="0.15"/></simplecounter>
+	</element>
+
+	<element name="volume_knob_numbers">
+		<rect>
+			<bounds x="0" y="0" width="48" height="44"/>
+			<color red="0" green="0" blue="0" alpha="0"/>
+		</rect>
+		<text string="0" align="1">
+			<bounds x="11" y="38" width="6" height="6"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
+		</text>
+		<text string="2" align="1">
+			<bounds x="0" y="18" width="6" height="6"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
+		</text>
+		<text string="4" align="1">
+			<bounds x="10" y="0" width="6" height="6"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
+		</text>
+		<text string="6" align="2">
+			<bounds x="30" y="0" width="6" height="6"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
+		</text>
+		<text string="8" align="2">
+			<bounds x="40" y="18" width="6" height="6"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
+		</text>
+		<text string="10" align="2">
+			<bounds x="28" y="38" width="8" height="6"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
+		</text>
+	</element>
+
+	<element name="transparent">
+		<rect><color red="0" green="0" blue="0" alpha="0"/></rect>
 	</element>
 
 	<element name="encoder_knob">
 		<disk>
 			<bounds x="0.0" y="0.0" width="1.0" height="1.0"/>
-			<color red="0.15" green="0.18" blue="0.19"/>
+			<color red="0.15" green="0.15" blue="0.15"/>
 		</disk>
 		<disk>
 			<bounds x="0.1" y="0.1" width="0.8" height="0.8"/>
-			<color red="1.0" green="1.0" blue="1.0"/>
+			<color red="0.80" green="0.80" blue="0.80"/>
 		</disk>
 	</element>
 
-	<element name="wheel">
+	<element name="wheel_well">
+		<rect><color red="0.90" green="0.90" blue="0.90"/></rect>
+	</element>
+
+	<element name="wheel_hole">
 		<rect>
-			<bounds x="0" y="0" width="12" height="80"/>
-			<color red="0.94" green="0.93" blue="0.85"/>
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0"/>
+			<color state="0" red="0.90" green="0.90" blue="0.90"/>
+			<color state="1" red="0.65" green="0.65" blue="0.65"/>
 		</rect>
 		<disk>
-			<color red="0.59" green="0.56" blue="0.48"/>
-			<bounds x="3" y="36" width="6" height="6"/>
+			<bounds x="0.25" y="0.25" width="0.5" height="0.5"/>
+			<color red="0.30" green="0.30" blue="0.30"/>
 		</disk>
 	</element>
+
+	<group name="wheel">
+		<element ref="wheel_well" id="~wheel_input~">
+			<bounds x="0" y="0" width="12" height="80"/>
+		</element>
+		<element ref="wheel_hole" id="~wheel_input~_hole">
+			<animate inputtag="~wheel_input~" inputmask="0xffff"/>
+			<bounds state="100" x="0" y="0" width="12" height="12"/>
+			<bounds state="0" x="0" y="68" width="12" height="12"/>
+		</element>
+	</group>
 
 	<element name="cyan_button">
 		<rect>
-			<color state="0" red="0.47" green="0.94" blue="0.99"/>
-			<color state="1" red="0.24" green="0.47" blue="0.49"/>
+			<color state="0" red="0.5" green="1.0" blue="1.0"/>
+			<color state="1" red="0.2" green="0.5" blue="0.5"/>
 		</rect>
 	</element>
 
 	<element name="yellow_button">
 		<rect>
-			<color state="0" red="1.0" green="0.82" blue="0.03"/>
-			<color state="1" red="0.50" green="0.41" blue="0.02"/>
+			<color state="0" red="1.0" green="0.80" blue="0"/>
+			<color state="1" red="0.50" green="0.40" blue="0"/>
 		</rect>
 	</element>
 
 	<element name="orange_button">
 		<rect>
-			<color state="0" red="0.99" green="0.38" blue="0.07"/>
-			<color state="1" red="0.49" green="0.19" blue="0.04"/>
+			<color state="0" red="1.00" green="0.40" blue="0.10"/>
+			<color state="1" red="0.50" green="0.20" blue="0.05"/>
 		</rect>
 	</element>
 
@@ -319,12 +379,12 @@ copyright-holders:m1macrophage
 		<element name="prog_button_~prognum~">
 			<rect>
 				<bounds x="0" y="0" width="20" height="21"/>
-				<color state="0" red="0.99" green="0.38" blue="0.07"/>
-				<color state="1" red="0.49" green="0.19" blue="0.04"/>
+				<color state="0" red="1.00" green="0.40" blue="0.10"/>
+				<color state="1" red="0.50" green="0.20" blue="0.05"/>
 			</rect>
 			<text string="~prognum~">
 				<bounds x="1" y ="4" width="18" height="13"/>
-				<color red="0.92" green="0.98" blue="0.98"/>
+				<color red="1.0" green="1.0" blue="1.0"/>
 			</text>
 		</element>
 	</repeat>
@@ -336,8 +396,8 @@ copyright-holders:m1macrophage
 		</rect>
 		<rect>
 			<bounds x="2" y="0" width="14" height="118"/>
-			<color state="0" red="0.17" green="0.16" blue="0.18"/>
-			<color state="1" red="0.52" green="0.52" blue="0.54"/>
+			<color state="0" red="0.15" green="0.15" blue="0.15"/>
+			<color state="1" red="0.50" green="0.50" blue="0.50"/>
 		</rect>
 	</element>
 
@@ -348,8 +408,8 @@ copyright-holders:m1macrophage
 		</rect>
 		<rect>
 			<bounds x="1" y="0" width="26" height="185"/>
-			<color state="0" red="0.92" green="0.92" blue="0.88"/>
-			<color state="1" red="0.71" green="0.71" blue="0.69"/>
+			<color state="0" red="0.90" green="0.90" blue="0.90"/>
+			<color state="1" red="0.55" green="0.55" blue="0.55"/>
 		</rect>
 	</element>
 
@@ -406,25 +466,22 @@ copyright-holders:m1macrophage
 	</group>
 
 	<element name="text_program">
-		<text string="PROGRAM"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="PROGRAM"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_edit">
-		<text string="EDIT"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="EDIT"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_volume">
-		<text string="VOLUME"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="VOLUME"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_incremental">
-		<text string="INCREMENTAL"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="INCREMENTAL"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_control">
-		<text string="CONTROL"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="CONTROL"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_use_arrows">
-		<text string="[USE ARROWS]"><color red="0" green="0" blue="0"/></text>
-	</element>
-	<element name="text_arrows">
-		<text string="&lt;-      -&gt;"><color red="0" green="0" blue="0"/></text>
+		<text string="[UP/DN KEYS]"><color red="0" green="0" blue="0"/></text>
 	</element>
 
 	<element name="text_kb">
@@ -440,43 +497,43 @@ copyright-holders:m1macrophage
 		<text string="MULT"><color red="0" green="0" blue="0"/></text>
 	</element>
 	<element name="text_trigger">
-		<text string="TRIGGER"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="TRIGGER"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 
 	<element name="text_hold">
-		<text string="HOLD"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="HOLD"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_store">
-		<text string="STORE"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="STORE"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_memory">
-		<text string="MEMORY"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="MEMORY"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 
 	<element name="text_rate">
 		<text string="RATE"><color red="0" green="0" blue="0"/></text>
 	</element>
 	<element name="text_shape">
-		<text string="SHAPE"><color red="0.47" green="0.94" blue="0.99"/></text>
+		<text string="SHAPE"><color red="0.5" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_to_osc">
-		<text string="TO OSC"><color red="0.47" green="0.94" blue="0.99"/></text>
+		<text string="TO OSC"><color red="0.5" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_to_filter">
-		<text string="TO FILTER"><color red="0.47" green="0.94" blue="0.99"/></text>
+		<text string="TO FILTER"><color red="0.5" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_mod">
-		<text string="MOD"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="MOD"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 
 	<element name="text_osc_1_white">
-		<text string="OSC 1"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="OSC 1"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_osc_2_white">
-		<text string="OSC 2"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="OSC 2"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_footage">
-		<text string="FOOTAGE"><color red="0.47" green="0.94" blue="0.99"/></text>
+		<text string="FOOTAGE"><color red="0.5" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_32f">
 		<text string="32'"><color red="0" green="0" blue="0"/></text>
@@ -488,20 +545,20 @@ copyright-holders:m1macrophage
 		<text string="8'"><color red="0" green="0" blue="0"/></text>
 	</element>
 	<element name="text_waveshape">
-		<text string="WAVESHAPE"><color red="0.47" green="0.94" blue="0.99"/></text>
+		<text string="WAVESHAPE"><color red="0.5" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_sync">
-		<text string="SYNC"><color red="0.47" green="0.94" blue="0.99"/></text>
+		<text string="SYNC"><color red="0.5" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_2to1">
-		<text string="2 -> 1"><color red="0.47" green="0.94" blue="0.99"/></text>
+		<text string="2 -> 1"><color red="0.5" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_interval">
 		<text string="INTERVAL"><color red="0" green="0" blue="0"/></text>
 	</element>
 	<element name="text_osc_bank">
 		<text string="OSCILLATOR BANK">
-			<color red="0.92" green="0.98" blue="0.98"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
 		</text>
 	</element>
 
@@ -515,35 +572,35 @@ copyright-holders:m1macrophage
 		<text string="OSC 2"><color red="0" green="0" blue="0"/></text>
 	</element>
 	<element name="text_mixer">
-		<text string="MIXER"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="MIXER"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 
 	<element name="text_octave">
-		<text string="OCTAVE"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="OCTAVE"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_0">
-		<text string="0"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="0"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_plus_1">
-		<text string="+1"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="+1"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_mod_rate">
-		<text string="MOD RATE"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="MOD RATE"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_pitch">
-		<text string="PITCH"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="PITCH"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 
 	<element name="text_vcf">
 		<text string="VOLTAGE CONTROLLED FILTER">
-			<color red="0.92" green="0.98" blue="0.98"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
 		</text>
 	</element>
 	<element name="text_kb_cyan">
-		<text string="KB"><color red="0.47" green="0.94" blue="0.99"/></text>
+		<text string="KB"><color red="0.5" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_track">
-		<text string="TRACK"><color red="0.47" green="0.94" blue="0.99"/></text>
+		<text string="TRACK"><color red="0.5" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_half">
 		<text string="1/2"><color red="0" green="0" blue="0"/></text>
@@ -566,7 +623,7 @@ copyright-holders:m1macrophage
 
 	<element name="text_filter_contour">
 		<text string="FILTER CONTOUR">
-			<color red="0.92" green="0.98" blue="0.98"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
 		</text>
 	</element>
 	<element name="text_attack">
@@ -583,87 +640,99 @@ copyright-holders:m1macrophage
 	</element>
 	<element name="text_loudness_contour">
 		<text string="LOUDNESS CONTOUR">
-			<color red="0.92" green="0.98" blue="0.98"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
 		</text>
 	</element>
 	<element name="text_modifiers">
-		<text string="MODIFIERS"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="MODIFIERS"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 
 	<element name="text_prog_level2_1">
-		<text string="REC 1"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="REC 1"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_prog_level2_2">
-		<text string="REC 2"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="REC 2"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_prog_level2_3">
-		<text string="STOP"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="STOP"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_prog_level2_4">
-		<text string="CONTINUE"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="CONTINUE"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_prog_level2_5">
-		<text string="PLAY 1"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="PLAY 1"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_prog_level2_6">
-		<text string="PLAY 2"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="PLAY 2"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_prog_level2_7">
-		<text string="REC"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="REC"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_prog_level2_8">
-		<text string="PLAY"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="PLAY"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_prog_level2_9">
-		<text string="ARPEGGIO"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="ARPEGGIO"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_prog_level2_10">
-		<text string="S &amp; H"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="S &amp; H"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_prog_level2_11">
-		<text string="S&amp;H FLT"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="S&amp;H FLT"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_prog_level2_12">
-		<text string="AUTO TRIG"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="AUTO TRIG"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_prog_level2_13">
-		<text string="EXT. TRIG"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="EXT. TRIG"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_prog_level2_14">
-		<text string="SAVE"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="SAVE"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_prog_level2_15">
-		<text string="VERIFY"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="VERIFY"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_prog_level2_16">
-		<text string="LOAD"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="LOAD"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 
 	<element name="text_level">
-		<text string="LEVEL"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="LEVEL"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_1">
-		<text string="1"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="1"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_2">
-		<text string="2"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="2"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_sequencer">
-		<text string="SEQUENCER"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="SEQUENCER"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_program_seq">
-		<text string="PROGRAM SEQ"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="PROGRAM SEQ"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_cassette">
-		<text string="CASSETTE"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="CASSETTE"><color red="1.0" green="1.0" blue="1.0"/></text>
 	</element>
 	<element name="text_programs">
-		<text string="PROGRAMS"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="PROGRAMS"><color red="1.0" green="1.0" blue="1.0"/></text>
+	</element>
+
+	<element name="plugin_warning" defstate="1">
+		<text state="1" string="*** to control wheels and knobs with a mouse, enable the layout plugin ***">
+			<color red="1.0" green="1.0" blue="1.0"/>
+		</text>
 	</element>
 
 	<!-- View definition -->
 	<view name="Default Layout">
 		<bounds left="0" top="0" right="859" bottom="434"/>
+
+		<collection name="warnings">
+			<element ref="plugin_warning" id="plugin_warning">
+				<bounds x="205" y="0" width="450" height="13"/>
+			</element>
+		</collection>
 
 		<!-- Chasis and frame -->
 		<element ref="silver_box">
@@ -723,8 +792,23 @@ copyright-holders:m1macrophage
 		</element>
 
 		<!-- Volume -->
-		<element ref="volume_knob">
+		<element ref="volume_knob_numbers">
+			<bounds x="44" y="83" width="48" height="44"/>
+		</element>
+		<element ref="volume_knob" id="volume_knob">
 			<bounds x="52" y="89" width="30" height="30"/>
+		</element>
+		<element ref="volume_knob_dot" id="volume_knob_dot">
+			<!-- Visible when layout plugin is enabled. -->
+			<bounds x="65" y="95" width="4" height="4"/>
+		</element>
+		<element ref="volume_knob_value" id="volume_knob_value" inputtag="volume_knob" inputmask="0xffff" inputraw="yes">
+			<!-- Visible when layout plugin NOT enabled. -->
+			<bounds x="58" y="100" width="18" height="8"/>
+		</element>
+		<element ref="transparent" clickthrough="no">
+			<!-- Disables clicks on volume_knob_value (a simplecounter). -->
+			<bounds x="56" y="98" width="22" height="12"/>
 		</element>
 		<element ref="text_volume">
 			<bounds x="94" y="101" width="41" height="8"/>
@@ -750,10 +834,7 @@ copyright-holders:m1macrophage
 			<bounds x="70" y="162" width="50" height="50"/>
 		</element>
 		<element ref="text_use_arrows">
-			<bounds x="81" y="180" width="30" height="7"/>
-		</element>
-		<element ref="text_arrows">
-			<bounds x="80" y="190" width="30" height="7"/>
+			<bounds x="80" y="183" width="30" height="7"/>
 		</element>
 
 		<!-- Trigger & Memory section. -->
@@ -1305,15 +1386,17 @@ copyright-holders:m1macrophage
 		<element ref="text_pitch">
 			<bounds x="56" y="356" width="12" height="7"/>
 		</element>
-		<element ref="wheel">
+		<param name="wheel_input" value="pitch_wheel"/>
+		<group ref="wheel">
 			<bounds x="75" y="320" width="12" height="80"/>
-		</element>
+		</group>
 		<element ref="text_mod">
 			<bounds x="100" y="356" width="10" height="7"/>
 		</element>
-		<element ref="wheel">
+		<param name="wheel_input" value="mod_wheel"/>
+		<group ref="wheel">
 			<bounds x="115" y="320" width="12" height="80"/>
-		</element>
+		</group>
 
 		<!-- Keyboard -->
 		<repeat count="3">
@@ -1327,5 +1410,282 @@ copyright-holders:m1macrophage
 			<bounds x="765" y="236" width="26" height="185"/>
 		</element>
 	</view>
+
+	<script><![CDATA[
+		file:set_resolve_tags_callback(
+			function()
+				local view = file.views["Default Layout"]
+				install_slider_callbacks(view)
+
+				add_slider(view, "pitch_wheel", "pitch_wheel_hole", "pitch_wheel")
+				add_slider(view, "mod_wheel", "mod_wheel_hole", "mod_wheel")
+
+				add_knob(view, "volume_knob", "volume_knob", 1.6, VERTICAL, "volume_knob_dot")
+				get_layout_item(view, "volume_knob_dot"):set_state(1)
+				get_layout_item(view, "volume_knob_value"):set_color_callback(
+					function()
+						return emu.render_color(0, 0, 0, 0)
+					end)
+
+				view.items["plugin_warning"]:set_state(0)
+			end)
+
+		-----------------------------------------------------------------------
+		-- Slider and knob library starts.
+		-- Can be copied as-is to other layouts.
+		-- version: 11
+		-----------------------------------------------------------------------
+
+		-- Global configuration. Can be overwritten in the resolve_tags callback.
+		KNOB_DOT_ANGLE_SPAN = 150  -- -/+ 150 degrees from top center.
+		UPDATE_CLICK_STATE = true
+
+		-- Constants.
+		VERTICAL = 0
+		HORIZONTAL = 1
+
+		local widgets = {}   -- Stores slider and knob information.
+		local pointers = {}  -- Tracks pointer state.
+
+		-- The knob's Y position must be animated using <animate inputtag="{port_name}">.
+		-- The click area's vertical size must exactly span the range of the
+		-- knob's movement.
+		function add_slider(view, clickarea_id, knob_id, port_name)
+			table.insert(widgets, {
+				clickarea   = get_layout_item(view, clickarea_id),
+				slider_knob = get_layout_item(view, knob_id),
+				field       = get_port_field(port_name),
+				is_knob     = false })
+		end
+
+		-- A sweep between the attached field's min and max values requires
+		-- moving the pointer by `scale * clickarea.height` pixels, when drag
+		-- direction is VERTICAL. Replace `height` with `width` when HORIZONTAL.
+		--
+		-- `dot_id` is optional. If not nil, this script will take control of the
+		-- element's position as the knob rotates. The distance of the dot from
+		-- the center of `clickarea` will be preserved during rotation.
+		-- It is suggested you place the dot at the top-center of the knob.
+		function add_knob(view, clickarea_id, port_name, scale, drag_direction, dot_id)
+			table.insert(widgets, {
+				clickarea     = get_layout_item(view, clickarea_id),
+				field         = get_port_field(port_name),
+				is_knob       = true,
+				scale         = scale,
+				is_horizontal = (drag_direction == HORIZONTAL),
+				knob_dot      = dot_id and get_layout_item(view, dot_id) })
+		end
+
+		function get_layout_item(view, item_id)
+			local item = view.items[item_id]
+			if item == nil then
+				emu.print_error("Layout element: '" .. item_id .. "' not found.")
+			end
+			return item
+		end
+
+		function get_port_field(port_name)
+			local port = file.device:ioport(port_name)
+			if port == nil then
+				emu.print_error("Port: '" .. port_name .. "' not found.")
+				return nil
+			end
+			local field = nil
+			for k, val in pairs(port.fields) do
+				field = val
+				break
+			end
+			local field_msg = "Needs to either be an IPT_ADJUSTER, or an analog port with auto-center."
+			if field == nil then
+				emu.print_error("Port '" .. port_name .."' " .. field_msg)
+				return nil
+			end
+			if field.is_analog and (not field.centerdelta or field.centerdelta == 0) then
+				emu.print_error("Port '" .. port_name .."' " .. field_msg)
+				return nil
+			end
+			return field
+		end
+
+		local function set_click_state(widget, state)
+			if UPDATE_CLICK_STATE then
+				if widget.is_knob then
+					widget.clickarea:set_state(state)
+				else
+					widget.slider_knob:set_state(state)
+				end
+			end
+		end
+
+		local function release_pointer(pointer_id)
+			if pointers[pointer_id] then
+				local widget = widgets[pointers[pointer_id].selected_widget]
+				set_click_state(widget, 0)
+				local field = widget.field
+				if field.is_analog then
+					field:clear_value()
+				end
+			end
+			pointers[pointer_id] = nil
+		end
+
+		local function pointer_updated(type, id, dev, x, y, btn, dn, up, cnt)
+			-- If a button is not pressed, reset the state of the current pointer.
+			if btn & 1 == 0 then
+				release_pointer(id)
+				return
+			end
+
+			-- If a button was just pressed, find the affected widget, if any.
+			if dn & 1 ~= 0 then
+				for i = 1, #widgets do
+					local found, relative
+					if widgets[i].slider_knob and widgets[i].slider_knob.bounds:includes(x, y) then
+						found = true
+						relative = true
+					elseif widgets[i].clickarea.bounds:includes(x, y) then
+						found = true
+						relative = false
+					end
+					if found then
+						set_click_state(widgets[i], 1)
+						pointers[id] = {
+							selected_widget = i,
+							relative = relative,
+							start_x = x,
+							start_y = y,
+							start_value = widgets[i].field.port:read() }
+						break
+					end
+				end
+			end
+
+			-- If there is no widget selected by the current pointer, we are done.
+			if pointers[id] == nil then
+				return
+			end
+
+			-- A widget is selected. Update its state based on the pointer's position.
+
+			local pointer = pointers[id]
+			local widget = widgets[pointer.selected_widget]
+
+			local min_value = widget.field.minvalue
+			local max_value = widget.field.maxvalue
+			local value_range = max_value - min_value
+
+			local new_value
+			if widget.is_knob then
+				if widget.is_horizontal then
+					local step_x = value_range / (widget.scale * widget.clickarea.bounds.width)
+					new_value = pointer.start_value + (x - pointer.start_x) * step_x
+				else
+					local step_y = value_range / (widget.scale * widget.clickarea.bounds.height)
+					new_value = pointer.start_value + (pointer.start_y - y) * step_y
+				end
+			else
+				local knob_half_height = widget.slider_knob.bounds.height / 2
+				local min_y = widget.clickarea.bounds.y0 + knob_half_height
+				local max_y = widget.clickarea.bounds.y1 - knob_half_height
+
+				if pointer.relative then
+					-- User clicked on the knob. The new value will depend on how
+					--  much the knob was dragged.
+					new_value = pointer.start_value - value_range * (y - pointer.start_y) / (max_y - min_y)
+				else
+					-- User clicked elsewhere on the slider. The new value will depend on
+					-- the absolute position of the click.
+					new_value = max_value - value_range * (y - min_y) / (max_y - min_y)
+				end
+			end
+
+			new_value = math.floor(new_value + 0.5)
+			if new_value < min_value then new_value = min_value end
+			if new_value > max_value then new_value = max_value end
+
+			if widget.field.is_analog then
+				widget.field:set_value(new_value)
+			else
+				widget.field.user_value = new_value
+			end
+		end
+
+		local function get_knob_dot_bounds(widget)
+			local dot = widget.knob_dot_cache
+			local value = (widget.field.port:read() - dot.value_min) / dot.value_range
+			local angle = dot.angle_min + value * dot.angle_range
+			local rx = -dot.center_y * math.sin(angle) * dot.aspect
+			local ry = dot.center_y * math.cos(angle)
+			local x = rx + dot.dx
+			local y = ry + dot.dy
+			return emu.render_bounds(x, y, x + dot.width, y + dot.height)
+		end
+
+		local function configure_knob_dots()
+			for i = 1, #widgets do
+				local dot = widgets[i].knob_dot
+				if dot then
+					-- Remove bounds callback, since we need to access the
+					-- configured bounds.
+					dot:set_bounds_callback(nil)
+
+					local field = widgets[i].field
+					local knob_bounds = widgets[i].clickarea.bounds
+					local dot_bounds = dot.bounds
+					local max_angle = KNOB_DOT_ANGLE_SPAN * 2.0 * math.pi / 360.0
+
+					-- Compute the distance of the knob dot from the knob center.
+					local dot_x = dot_bounds.x0 + dot_bounds.width / 2.0
+					local dot_y = dot_bounds.y0 + dot_bounds.height / 2.0
+					local knob_x = knob_bounds.x0 + knob_bounds.width / 2.0
+					local knob_y = knob_bounds.y0 + knob_bounds.height / 2.0
+					local radius = math.sqrt((dot_y - knob_y) ^ 2 + (dot_x - knob_x) ^ 2)
+
+					widgets[i].knob_dot_cache = {
+						width       = dot_bounds.width,
+						height      = dot_bounds.height,
+						aspect      = dot_bounds.aspect,
+						value_min   = field.minvalue,
+						value_range = field.maxvalue - field.minvalue,
+						angle_min   = -max_angle,
+						angle_range = 2.0 * max_angle,
+						center_y    = -radius,
+						dx = knob_bounds.x0 + (knob_bounds.width - dot_bounds.width) / 2.0,
+						dy = knob_bounds.y0 + (knob_bounds.height - dot_bounds.height) / 2.0 }
+
+					dot:set_bounds_callback(
+						function()
+							return get_knob_dot_bounds(widgets[i])
+						end)
+				end
+			end
+		end
+
+		local function pointer_left(type, id, dev, x, y, up, cnt)
+			release_pointer(id)
+		end
+
+		local function pointer_aborted(type, id, dev, x, y, up, cnt)
+			release_pointer(id)
+		end
+
+		local function forget_pointers()
+			for id, pointer in pairs(pointers) do
+				release_pointer(id)
+			end
+			pointers = {}
+		end
+
+		function install_slider_callbacks(view)
+			view:set_recomputed_callback(configure_knob_dots)
+			view:set_pointer_updated_callback(pointer_updated)
+			view:set_pointer_left_callback(pointer_left)
+			view:set_pointer_aborted_callback(pointer_aborted)
+			view:set_forget_pointers_callback(forget_pointers)
+		end
+		-----------------------------------------------------------------------
+		-- Slider and knob library ends.
+		-----------------------------------------------------------------------
+	]]></script>
 </mamelayout>
 
