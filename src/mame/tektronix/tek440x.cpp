@@ -50,6 +50,7 @@
 #include "bus/nscsi/hd.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68010.h"
+#include "machine/am79c90.h"
 #include "machine/am9513.h"
 #include "machine/bankdev.h"
 #include "machine/input_merger.h"
@@ -68,6 +69,9 @@
 
 #include "logmacro.h"
 
+constexpr offs_t OFF8_TO_OFF16(offs_t x) { return x>>1; }
+constexpr offs_t OFF16_TO_OFF8(offs_t x) { return x<<1; }
+
 namespace {
 
 class tek440x_state : public driver_device
@@ -80,6 +84,7 @@ public:
 		m_duart(*this, "duart"),
 		m_keyboard(*this, "keyboard"),
 		m_snsnd(*this, "snsnd"),
+		m_lance(*this, "lance"),
 		m_rtc(*this, "rtc"),
 		m_scsi(*this, "ncr5385"),
 		m_novram(*this, "novram"),
@@ -134,6 +139,7 @@ private:
 	required_device<mc68681_device> m_duart;
 	required_device<tek410x_keyboard_device> m_keyboard;
 	required_device<sn76496_device> m_snsnd;
+	required_device<am7990_device> m_lance;
 	required_device<mc146818_device> m_rtc;
 	required_device<ncr5385_device> m_scsi;
 	required_device<x2210_device> m_novram;
@@ -408,6 +414,9 @@ void tek440x_state::physical_map(address_map &map)
 	map(0x722000, 0x722fff).rw(FUNC(tek440x_state::recall_r), FUNC(tek440x_state::recall_w));
 	map(0x723000, 0x723fff).rw(FUNC(tek440x_state::store_r), FUNC(tek440x_state::store_w));
 
+	// 720000-720fff spare 1 (ethernet)
+	map(0x720000, 0x720007).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w));
+
 	map(0x740000, 0x747fff).rom().mirror(0x8000).region("bootrom", 0);
 
 	map(0x760000, 0x760fff).ram().mirror(0xf000); // debug RAM
@@ -494,6 +503,23 @@ void tek440x_state::tek4404(machine_config &config)
 
 	INPUT_MERGER_ALL_HIGH(config, m_vint);
 	m_vint->output_handler().set_inputline(m_maincpu, M68K_IRQ_6);
+
+	// ethernet
+	AM7990(config, m_lance, 40_MHz_XTAL / 4);
+	m_lance->intr_out().set_inputline(m_maincpu, M68K_IRQ_2).invert();
+	m_lance->dma_in().set(
+			[this] (offs_t offset, u16 mem_mask)
+			{
+				u16 const data = m_vm->read16(OFF8_TO_OFF16(offset), mem_mask);
+				//LOG("dma_in 0x%08x => %04x\n", offset, data);
+				return data;
+			});
+	m_lance->dma_out().set(
+			[this] (offs_t offset, u16 data, u16 mem_mask)
+			{
+				//LOG("dma_out 0x%08x <= %04x\n", offset, data);
+				return m_vm->write16(OFF8_TO_OFF16(offset), data, mem_mask);
+			});
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
