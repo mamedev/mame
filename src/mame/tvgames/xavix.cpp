@@ -2831,13 +2831,13 @@ CONS( 2006, namcons1,  0,          0,  xavix_i2c_24lc04_1mb, nostalgia,xavix_i2c
 CONS( 2006, namcons2,  0,          0,  xavix_i2c_24lc04_1mb, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Namco",             "Let's! TV Play Classic - Namco Nostalgia 2 (Japan)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2000, rad_ping,  0,          0,  xavix_1mb,        rad_ping, xavix_state,          init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
-CONS( 2000, rad_pingp, rad_ping,   0,  xavixp_1mb,       rad_pingp,xavix_state,          init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "ConnecTV Table Tennis (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2000, rad_pingp, rad_ping,   0,  xavixp_1mb,       rad_pingp,xavix_state,          init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "Connectv Table Tennis (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// this set reads the region byte and will show either 'RADICA: Play TV Opus' or 'RADICA: ConnecTV Opus' as the title
+// this set reads the region byte and will show either 'RADICA: Play TV Opus' or 'RADICA: Connectv Opus' as the title
 CONS( 2000, rad_opus,  0,          0,  xavix_1mb_nv,     rad_opus, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Opus (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // there is a missing 'TV Static' noise effect when menus appear (box shows 'Play TV' ingame just shows 'Radica:Plug & Play')
-CONS( 2000, rad_opusp, rad_opus,   0,  xavixp_1mb_nv,    rad_opusp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Opus (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2000, rad_opusp, rad_opus,   0,  xavixp_1mb_nv,    rad_opusp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Connectv Opus (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // the set below does NOT read the PAL/NTSC flag, and will only display 'RADICA: Plug & Play Opus' as the title
-// older release, or region where the Play TV / ConnecTV trademarks weren't used?
+// older release, or region where the Play TV / Connectv trademarks weren't used?
 CONS( 2000, rad_opusa, rad_opus,   0,  xavixp_1mb_nv,    rad_opus, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Plug & Play Opus (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2000, rad_hnt,   0,          0,  xavix_1mb_nv,     rad_hnt,  xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Buckmasters Huntin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // need to map gun (box shows 'Play TV' ingame just shows 'Plug & Play')
@@ -2845,22 +2845,22 @@ CONS( 2000, rad_hnt,   0,          0,  xavix_1mb_nv,     rad_hnt,  xavix_state, 
 CONS( 2003, rad_hnt2,  0,          0,  xavix_2mb_nv,     rad_hnt,  xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Buckmasters Huntin' 2 (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // need to map gun, crashes on pause
 
 CONS( 2003, rad_mtrk,  0,          0,  xavix_mtrk,       rad_mtrk, xavix_mtrk_state,     init_xavix,    "Radica / SSD Company LTD",                     "Play TV Monster Truck (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2003, rad_mtrkp, rad_mtrk,   0,  xavix_mtrkp,      rad_mtrkp,xavix_mtrk_state,     init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Monster Truck (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, rad_mtrkp, rad_mtrk,   0,  xavix_mtrkp,      rad_mtrkp,xavix_mtrk_state,     init_xavix,    "Radica / SSD Company LTD",                     "Connectv Monster Truck (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 CONS( 200?, rad_box,   0,          0,  xavix_2mb,        rad_box,  xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Boxin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, rad_boxp,  rad_box,    0,  xavixp_2mb,       rad_boxp, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Boxin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, rad_boxp,  rad_box,    0,  xavixp_2mb,       rad_boxp, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Connectv Boxin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 CONS( 200?, rad_crdn,  0,          0,  xavix_1mb,        rad_crdn, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Card Night (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, rad_crdnp, rad_crdn,   0,  xavixp_1mb,       rad_crdnp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Card Night (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, rad_crdnp, rad_crdn,   0,  xavixp_1mb,       rad_crdnp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Connectv Card Night (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2000, rad_bb,    0,          0,  xavix_1mb,        rad_bb,   xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Play TV branding used on box, not ingame
 
 CONS( 2001, rad_bass,  0,          0,  xavix_1mb,        rad_bass, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Bass Fishin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2001, rad_bassp, rad_bass,   0,  xavixp_1mb,       rad_bassp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Bass Fishin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2001, rad_bassp, rad_bass,   0,  xavixp_1mb,       rad_bassp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Connectv Bass Fishin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // there is another 'Snowboarder' with a white coloured board, it appears to be a newer game closer to 'SSX Snowboarder' but without the SSX license.
 CONS( 2001, rad_snow,  0,          0,  xavix_1mb_nv,     rad_snow, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Snowboarder (Blue) (NTSC)", MACHINE_IMPERFECT_SOUND )
-CONS( 2001, rad_snowp, rad_snow,   0,  xavixp_1mb_nv,    rad_snowp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Snowboarder (Blue) (PAL)", MACHINE_IMPERFECT_SOUND )
+CONS( 2001, rad_snowp, rad_snow,   0,  xavixp_1mb_nv,    rad_snowp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Connectv Snowboarder (Blue) (PAL)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2003, rad_madf,  0,          0,  xavix_madfb,      rad_fb,   xavix_madfb_state,    init_xavix,    "Radica / Electronic Arts / SSD Company LTD",  "EA Sports Madden Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // no Play TV branding, USA only release?
 
@@ -2869,11 +2869,11 @@ CONS( 200?, rad_fb,    0,          0,  xavix_madfb,      rad_fb,   xavix_madfb_s
 CONS( 200?, rad_rh,    0,          0,  xavix_2mb,        rad_rh,   xavix_state,          init_xavix,    "Radica / Fisher-Price / SSD Company LTD",      "Play TV Rescue Heroes (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2004, rad_ssx,   0,          0,  xavix_4mb,        rad_snow, xavix_state,          init_xavix,    "Radica / Electronic Arts / SSD Company LTD",  "Play TV SSX Snowboarder (NTSC)", MACHINE_IMPERFECT_SOUND )
-CONS( 2004, rad_ssxp,  rad_ssx,    0,  xavixp_4mb,       rad_snowp,xavix_state,          init_xavix,    "Radica / Electronic Arts / SSD Company LTD",  "ConnecTV SSX Snowboarder (PAL)", MACHINE_IMPERFECT_SOUND )
+CONS( 2004, rad_ssxp,  rad_ssx,    0,  xavixp_4mb,       rad_snowp,xavix_state,          init_xavix,    "Radica / Electronic Arts / SSD Company LTD",  "Connectv SSX Snowboarder (PAL)", MACHINE_IMPERFECT_SOUND )
 
 // basically a reissue of SSX but without the license
 CONS( 2006, rad_sbw,   0,          0,  xavix_4mb,        rad_snow, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Snowboarder (White) (NTSC)", MACHINE_IMPERFECT_SOUND )
-// doesn't exist with ConnecTV branding?
+// doesn't exist with Connectv branding?
 
 CONS( 2002, rad_bdp,   0,          0,  xavix_2mb,        rad_bdp,  xavix_state,          init_xavix,    "Radica / Mattel / SSD Company LTD",            "Barbie Dance Party", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 

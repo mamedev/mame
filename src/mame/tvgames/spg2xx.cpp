@@ -3209,13 +3209,13 @@ void spg2xx_game_state::init_itvphone()
 	rom[0xf152] = 0xee08;
 }
 
-// year, name, parent, compat, machine, input, class, init, company, fullname, flags
+//    Year  Name       Parent     Compat  Machine     Input       Class                            Init           Company   Fullname                       Flags
 
 // Radica TV games
-CONS( 2006, rad_skat,  0,         0, rad_skat,   rad_skat,   spg2xx_game_state,               init_crc,      "Radica", "Play TV Skateboarder (NTSC)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2006, rad_skatp, rad_skat,  0, rad_skatp,  rad_skatp,  spg2xx_game_state,               init_crc,      "Radica", "ConnecTV Skateboarder (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, rad_skat,  0,         0,      rad_skat,   rad_skat,   spg2xx_game_state,               init_crc,      "Radica", "Play TV Skateboarder (NTSC)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, rad_skatp, rad_skat,  0,      rad_skatp,  rad_skatp,  spg2xx_game_state,               init_crc,      "Radica", "Connectv Skateboarder (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2006, rad_crik,  0,         0, rad_crik,   rad_crik,   spg2xx_game_state,               init_crc,      "Radica", "ConnecTV Cricket (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Version 3.00 20/03/06 is listed in INTERNAL TEST
+CONS( 2006, rad_crik,  0,         0, rad_crik,   rad_crik,   spg2xx_game_state,               init_crc,      "Radica", "Connectv Cricket (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Version 3.00 20/03/06 is listed in INTERNAL TEST
 
 CONS( 2007, rad_fb2,   0,         0, rad_skat,   rad_fb2,    spg2xx_game_state,               init_crc,      "Radica", "Play TV Football 2", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // offers a 2 player option in menus, but seems to have only been programmed for, and released as, a single player unit, P2 controls appear unfinished.
 
@@ -3338,6 +3338,7 @@ CONS( 2008, ddr33v,     0,        0, spg2xx,     ddr33v,     spg2xx_game_ddr33v_
 // PCB has 'Anpanman TV 2006 Ver 1.4' printed on it, ROM has SPG260 header.  Uses custom built-in keyboard, no display built into the unit.
 CONS( 2006, anpantv,    0,        0, spg2xx,     spg2xx,     spg2xx_game_state,               empty_init,    "Bandai", "Anpanman TV (Japan)", MACHINE_NOT_WORKING )
 
+// Let's!TVプレイ デジタルモンスター バトルジャンクション
 // Has an AT24C08, not currently hooked up (probably for storing database unlocks)
 //
 // There is also a card reader/scanner which can read barcodes from Digimon cards

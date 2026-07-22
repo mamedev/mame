@@ -1765,4 +1765,4 @@ CONS( 2007, senspid,    0,        0, trkfldch, trkfldch, trkfldch_state,      em
 
 // additional online content could be downloaded onto these if they were connected to a PC via USB
 CONS( 2008, teleshi,    0,        0, trkfldch, konsb,    trkfldch_state,      empty_init, "Konami", "Teleshibai (Japan)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // テレしばい - this one is orange
-CONS( 2008, teleship,   0,        0, trkfldch, konsb,    trkfldch_state,      empty_init, "Konami", "Teleshibai - Purple Version (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // テレしばい (パープルバージョン) - this has Purple Version as part of the name  on the box
+CONS( 2008, teleship,   0,        0, trkfldch, konsb,    trkfldch_state,      empty_init, "Konami", "Teleshibai: Purple Version (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // テレしばい (パープルバージョン) - this has Purple Version as part of the name  on the box

@@ -233,7 +233,7 @@ CONS( 2015, prailpls, 0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_g
 CONS( 201?, vmastspi, 0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, init_spi, "Takara Tomy", "Virtual Masters Spirits (blue, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // this is a half-head shaped unit, SHP13017-R1 main PCB  -  アンパンマン レッツゴー！育脳ドライブ きみものれるよ！アンパンマンごう「それいけ！アンパンマン」
-CONS( 2014, anpanbd, 0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, init_spi, "JoyPalette", "Anpanman: Let's Go! Ikunou Drive (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2014, anpanbd, 0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, init_spi, "JoyPalette", "Anpanman: Let's Go! Ikunou Drive - Kimi mo Noreru Yo! Anpanman-gou (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // それいけ！アンパンマン」みんなで！育脳マット
 CONS( 2015, anpanm15, 0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, init_spi, "JoyPalette", "Anpanman: Minnade! Ikunou Mat (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

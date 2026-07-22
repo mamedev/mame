@@ -228,8 +228,6 @@ ROM_END
 } // anonymous namespace
 
 
-
-
 // These were all sold as different products, use a different sets of songs / presentation styles (2D or perspective gameplay, modified titlescreens etc.)
 // and sometimes even slightly different hardware, so aren't set as clones of each other
 
@@ -240,7 +238,7 @@ CONS( 2007, taikeegr,  0, 0, taikeegrp, taikeegr,  shredmjr_game_state, init_tai
 CONS( 2007, rockstar,  0, 0, taikeegrp, taikeegr,  shredmjr_game_state, init_taikeegr, "Ultimate Products / TaiKee", "Plug 'N' Play Rockstar Guitar / Guitar Rock (PAL)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // timing not quite correct yet
 
 // dreamGEAR branded presentation, modified hardware (buttons read in a different way) same song seletion as taikeegr
-CONS( 2007, shredmjr,  0, 0, shredmjr,  taikeegr,  shredmjr_game_state, init_taikeegr, "dreamGEAR", "Shredmaster Jr (NTSC)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^
+CONS( 2007, shredmjr,  0, 0, shredmjr,  taikeegr,  shredmjr_game_state, init_taikeegr, "dreamGEAR", "Shredmaster Jr. (NTSC)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^
 
 // doesn't have a Senario logo ingame, but does on box.  unique song selection
 CONS( 200?, guitarst,  0, 0, taikeegr,  taikeegr,  shredmjr_game_state, init_taikeegr, "Senario", "Guitar Star (US, Senario, NTSC)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^
