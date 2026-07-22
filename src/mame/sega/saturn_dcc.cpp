@@ -9,10 +9,10 @@ Essentially does two things
 - handles Slave CPU h/vblank irq vectors;
 
 TODO:
-- move saturn_slave_scanline to here, needs one source of truth: VDP2 device-ified;
 - find the actual part #;
 - MINIT/SINIT writes must be 16-bit and checked against who's accessing it, TBD otherwise;
 - should probably handle sync barriers from here as well;
+- complete irq acknowledge support for slave CPU;
 
 Known games to be very tight on interleaving, acts bad with -drc:
 (not necessarily DCC fault)
@@ -91,4 +91,11 @@ void saturn_dcc_device::handle_frt_cb(s32 param)
 	else
 		m_master_cpu->pulse_frt_input();
 	//printf("%d\n", param);
+}
+
+IRQ_CALLBACK_MEMBER(saturn_dcc_device::irq_ack_cb)
+{
+	m_slave_cpu->set_input_line(irqline, CLEAR_LINE);
+	// TODO: can also be 0x42 and 0xff (?)
+	return (irqline == 6) ? 0x43 : 0x41;
 }

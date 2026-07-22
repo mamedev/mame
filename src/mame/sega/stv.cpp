@@ -1102,6 +1102,7 @@ void stv_state::stv(machine_config &config)
 	SH7604(config, m_slave, MASTER_CLOCK_352/2); // 28.6364 MHz
 	m_slave->set_addrmap(AS_PROGRAM, &stv_state::stv_mem);
 	m_slave->set_is_slave(1);
+	m_slave->set_irq_acknowledge_callback(m_dcc, FUNC(saturn_dcc_device::irq_ack_cb));
 	TIMER(config, "slave_scantimer").configure_scanline(FUNC(stv_state::saturn_slave_scanline), "screen", 0, 1);
 
 	SATURN_DCC(config, m_dcc, MASTER_CLOCK_352);

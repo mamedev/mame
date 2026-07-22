@@ -20,6 +20,8 @@ public:
 	void minit_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	void sinit_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
+	IRQ_CALLBACK_MEMBER(irq_ack_cb);
+
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
