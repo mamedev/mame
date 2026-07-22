@@ -49,6 +49,7 @@ DEFINE_DEVICE_TYPE(SMPC_HLE, smpc_hle_device, "smpc_hle", "Sega Saturn SMPC HLE 
 void smpc_hle_device::io_map(address_map &map)
 {
 	map(0x00, 0x7f).lr8(NAME([this] (offs_t offset) {
+		// TODO: undefined odd addresses really latches whatever was last written
 		logerror("%s: Read to [%02x] open bus address\n", machine().describe_context(), offset & 0x7f);
 		return offset & 1 ? 0x00 : 0xff;
 	}));
@@ -137,6 +138,7 @@ void smpc_hle_device::device_start()
 	save_item(NAME(m_pmode));
 	save_item(NAME(m_rtc_data));
 	save_item(NAME(m_smem));
+	save_item(NAME(m_ckchg_tick));
 
 	m_cmd_timer = timer_alloc(FUNC(smpc_hle_device::handle_command), this);
 	m_rtc_timer = timer_alloc(FUNC(smpc_hle_device::handle_rtc_increment), this);
@@ -169,6 +171,7 @@ void smpc_hle_device::device_reset()
 	m_command_in_progress = false;
 	m_NMI_reset = false;
 	m_cur_dotsel = false;
+	m_ckchg_tick = 0;
 
 	m_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 }
@@ -370,14 +373,15 @@ void smpc_hle_device::command_register_w(uint8_t data)
 	m_command_in_progress = true;
 	if(m_comreg == 0x0e || m_comreg == 0x0f)
 	{
-		/* on ST-V timing of this is pretty fussy, you get 2 credits at start-up otherwise
-		 * My current theory is that the PLL device can halt the whole system until the frequency change occurs.
-		 *  (cfr. diagram on page 3 of SMPC manual)
-		 * I really don't think that the system can do an usable mid-frame clock switching anyway.
-		 */
+		// A PLL change makes the SMPC to stop everything until it can resync everything again.
+		// This takes the equivalent of 3~4 frame cycles.
+		// (cfr. diagram on page 3 of SMPC manual)
+		// - shanhigw and sokyugrt (would otherwise set 2 credits at startup)
 		m_syshalt(1);
 
-		m_cmd_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().max_y,0));
+		m_ckchg_tick = 5;
+
+		m_cmd_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().max_y, 0));
 	}
 	else if(m_comreg == 0x10)
 	{
@@ -465,21 +469,31 @@ TIMER_CALLBACK_MEMBER(smpc_hle_device::handle_command)
 		case 0x0e: // CKCHG352
 		case 0x0f: // CKCHG320
 			LOGMASKED(LOG_COMMAND, "SMPC: %02x CKCHG%s\n", m_comreg, m_comreg & 1 ? "320" : "352");
-			m_dotsel(m_comreg & 1);
+			m_ckchg_tick --;
+			if (m_ckchg_tick == 4)
+			{
+				m_dotsel(m_comreg & 1);
 
-			// assert Slave SH2 line
-			m_sshres(1);
-			// clear PLL system halt
-			m_syshalt(0);
+				// assert Slave SH2 line
+				m_sshres(1);
 
-			// setup the new dot select
-			m_cur_dotsel = (m_comreg & 1) ^ 1;
+				// setup the new dot select
+				m_cur_dotsel = (m_comreg & 1) ^ 1;
+			}
 
-			// send a NMI to Master SH2 if enabled
-			// it is unconditionally requested:
-			// bigichig, capgen1, capgen4 and capgen5 triggers a SLEEP opcode from BIOS call and expects this to wake them up.
-			//if(m_NMI_reset == false)
-			master_sh2_nmi();
+			if (m_ckchg_tick >= 1)
+				m_cmd_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().max_y, 0));
+			else
+			{
+				// send an unconditional NMI to Master SH2
+				// - bigichig, capgen1, capgen4 and capgen5 triggers a SLEEP opcode from BIOS call
+				//   and expects this to wake them up.
+				master_sh2_nmi();
+
+				// clear PLL system halt
+				m_syshalt(0);
+			}
+
 			break;
 
 		case 0x10: // INTBACK
