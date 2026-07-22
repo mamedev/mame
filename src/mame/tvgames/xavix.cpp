@@ -2807,7 +2807,7 @@ ROM_END
 
 */
 
-CONS( 1999, pl1000, 0,         0,  xavix_pl1000, pl1000,xavix_pl1000_state,      init_pl1000,    "Pelican Accessories / Mani Industries / Gameone Systems",             "Video Challenger (PL-1000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 1999, pl1000, 0,         0,  xavix_pl1000, pl1000,xavix_pl1000_state,      init_pl1000,    "Pelican Accessories / Mani Industries / Gameone Systems",             "Video Challenger (PL-1000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // product code 80-32705.
 // Some sites say 1997, but 1999 is what SSD had listed, and seems more fitting.
