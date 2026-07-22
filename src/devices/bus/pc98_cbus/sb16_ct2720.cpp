@@ -9,13 +9,11 @@ References:
 - http://retropc.net/yasuma/V2/PC/SOUND/ct2720.html
 
 TODO:
-- Optional YM2203 (+ ROM socket), PC-9801-26K equivalent fallback;
-- MIDI;
-- CT1745 (Mixer);
+- MIDI & WaveBlaster connector;
 - CD-Rom interface/CD-In;
 - Mic-In/Line-In;
-- Configuration dips;
-- Doesn't play well with hardcoded FDC DRQ3 in base driver (use DRQ0 for now);
+- PnP & Configuration dips;
+- Undefined if trying to use FDC 2DD and this due of sharing DRQ3 channel (assume it fails);
 - wolf3d: fails identification purely from OPL3
 \- Writes 0x60 -> 0x80 to reg $04 (mask timer A and B, send a reset to FM)
 \- loads OPL3 timer A with a 0xff in reg $02 (max time?)
@@ -23,6 +21,8 @@ TODO:
 \- bp 13e51b pretends to read it back as res & 0xe0 == 0xc0
    (irq and timer A statuses high, timer B low)
 \- does plenty of non-SB16 accesses at $28d1, for delay?
+- DIAGNOSE.EXE tries a DMA High, fails;
+- Optional YM2203 (+ ROM socket), PC-9801-26K equivalent fallback;
 
 Notes:
 - For debugging DSP from debugger (and convert to AT style):
@@ -50,6 +50,7 @@ sb16_ct2720_device::sb16_ct2720_device(const machine_config &mconfig, const char
 	, m_ldac(*this, "ldac")
 	, m_rdac(*this, "rdac")
 	, m_irqs(*this, "irqs")
+	, m_dmas(*this, "dmas")
 	, m_joy(*this, "pc_joy")
 {
 }
@@ -64,6 +65,12 @@ void sb16_ct2720_device::device_add_mconfig(machine_config &config)
 	m_mixer->set_rdac_tag(m_rdac);
 	m_mixer->add_route(0, "speaker", 1.0, 0);
 	m_mixer->add_route(1, "speaker", 1.0, 1);
+	m_mixer->irq_select_read_cb().set([this] () {
+		return m_irq_sel;
+	});
+	m_mixer->dma_select_read_cb().set([this] () {
+		return m_dma_sel;
+	});
 	m_mixer->irq_status_cb().set([this] () {
 		//return (m_irq8 << 0) | (m_irq16 << 1) | (m_irq_midi << 2) | (0x8 << 4);
 		return (m_irq8 << 0) | (m_irq16 << 1) | (0x8 << 4);
@@ -80,18 +87,18 @@ void sb16_ct2720_device::device_add_mconfig(machine_config &config)
 		m_irq16 = state;
 		m_irqs->in_w<1>(state);
 	});
-	m_dsp->drq8_cb().set([this] (int state) {
-		m_bus->drq_w(0, state);
-	});
+	m_dsp->drq8_cb().set(m_dmas, FUNC(input_merger_any_high_device::in_w<0>));
+	// assuming it just go over the same DMA channel
 	m_dsp->drq16_cb().set([this] (int state) {
+		m_dmas->in_w<1>(state);
 		if (state)
 			popmessage("sb16_ct2720.cpp: DMA16 high on C-Bus?\n");
 	});
 	m_dsp->speaker_off_cb().set(m_mixer, FUNC(ct1745_mixer_device::dac_speaker_off_cb));
 
-	// TODO: PnP line
+	// TODO: PnP lines
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set([this](int state) { m_bus->int_w(1, state); });
-
+	INPUT_MERGER_ANY_HIGH(config, m_dmas).output_handler().set([this](int state) { m_bus->drq_w(3, state); });
 
 	PC_JOY(config, m_joy);
 	// doom can set this up, but generally for PC-98 we want it opt-in really
@@ -112,10 +119,26 @@ void sb16_ct2720_device::device_add_mconfig(machine_config &config)
 
 void sb16_ct2720_device::device_start()
 {
-	m_bus->set_dma_channel(0, this, false);
+	// TODO: hardcoded for now
+	// 1111 ---- always '1'
+	// ---- 1000 IRQ5/INT1
+	// ---- 0100 IRQ12/INT5
+	// ---- 0010 IRQ10/INT41
+	// ---- 0001 IRQ3/INT0
+	m_irq_sel = 0xf8;
+
+	// ???? ??-- returns value ^ 0x14 according to DOSBox-X
+	// ---- --10 DMA3
+	// ---- --01 DMA0
+	m_dma_sel = 0x02;
+
+	m_bus->set_dma_channel(3, this, false);
 
 	save_item(NAME(m_irq8));
 	save_item(NAME(m_irq16));
+
+	save_item(NAME(m_irq_sel));
+	save_item(NAME(m_dma_sel));
 }
 
 void sb16_ct2720_device::device_reset()

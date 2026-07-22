@@ -3185,6 +3185,7 @@ ROM_START( choroqhr ) // set to 1p
 	ROM_LOAD( "choroqhr.nv", 0x0000, 0x0080, CRC(6e89815f) SHA1(4478f614fb61859f4ee7bf55462f737387887e6f) )
 ROM_END
 
+// 171-7410A PCB with unpopulated 317-0229 protection device. Sports an AT28C16.
 ROM_START( pclub2 ) // set to 1p / runs with the USA bios
 	STV_BIOS
 	ROM_DEFAULT_BIOS( "us" )
@@ -3199,6 +3200,10 @@ ROM_START( pclub2 ) // set to 1p / runs with the USA bios
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
 	ROM_LOAD( "pclub2.nv", 0x0000, 0x0080, CRC(00d0f04e) SHA1(8b5a3e1c52e34443f83fd4a8948a00cacb5071d0) )
+
+	ROM_REGION( 0x400, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "315-6055.ic12", 0x000, 0x117, NO_DUMP ) // PALCE16V8H-10JC on the front side of the cart
+	ROM_LOAD( "315-6056.ic13", 0x200, 0x117, NO_DUMP ) // PALCE16V8H-10JC on the back side of the cart
 ROM_END
 
 
@@ -3481,6 +3486,28 @@ ROM_START( pclubyo2 ) // set to 1p
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
 	ROM_LOAD( "pclubyo2.nv", 0x0000, 0x0080, CRC(2b26a8f7) SHA1(32f34096cac05a37c492ee389ed8e4c02694c268) )
+ROM_END
+
+
+// Print Club ソニークリエイティブ Ver.5
+// 171-7410A PCB with populated 317-0229 protection device. Sports an AT28C16.
+ROM_START( pclubsc5 )
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+	ROM_LOAD16_WORD_SWAP( "pclub2_ic22",    0x0200000, 0x0200000, CRC(a0e5d77f) SHA1(7bb3fbd8a1bbb5fc7ecd8dcc4e606738d585dc87) )
+	ROM_LOAD16_WORD_SWAP( "pclub2_ic24",    0x0400000, 0x0200000, CRC(6abf081f) SHA1(5a7afdbcf325fd83c779b83017ecdc1268508882) )
+	ROM_LOAD16_WORD_SWAP( "pclub2_ic26",    0x0600000, 0x0200000, CRC(5118a889) SHA1(ce994661f94b3263186c288aca14a66f0fc84b7c) )
+	ROM_LOAD16_WORD_SWAP( "pclub2_ic28",    0x0800000, 0x0200000, CRC(f29f1ec9) SHA1(8558ce02231aaf715632e9a2d1933593621a4c04) ) // same content as IC32
+	ROM_LOAD16_WORD_SWAP( "pclub2_ic30",    0x0a00000, 0x0200000, CRC(a6dc82c8) SHA1(3f194f78c484e67411ddd6f687586d4e63957579) )
+	ROM_LOAD16_WORD_SWAP( "pclub2_ic32",    0x0c00000, 0x0200000, CRC(f29f1ec9) SHA1(8558ce02231aaf715632e9a2d1933593621a4c04) ) // same content as IC28
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
+	ROM_LOAD16_WORD_SWAP( "pclubsc5.nv", 0x0000, 0x0080, CRC(5a01a17b) SHA1(f9aad386641b640d9e3e96becdd58d08103fb7ff) )
+
+	ROM_REGION( 0x400, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "315-6055.ic12", 0x000, 0x117, NO_DUMP ) // PALCE16V8H-10JC on the front side of the cart
+	ROM_LOAD( "315-6056.ic13", 0x200, 0x117, NO_DUMP ) // PALCE16V8H-10JC on the back side of the cart
 ROM_END
 
 
@@ -4009,7 +4036,7 @@ GAME( 1997, znpwfvt,   znpwfv,  stv,      stv,      stv_state,   init_znpwfv,   
 
 /* Unemulated printer / camera devices */
 // USA sets
-GAME( 1997, pclub2,    stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 (U 970921 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1997, pclub2,    stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Standard Ver1 (U 970921 V1.000)", MACHINE_NOT_WORKING )
 GAME( 1999, pclub2v3,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 3 (U 990310 V1.000)", MACHINE_NOT_WORKING ) // Hello Kitty themed
 GAME( 1999, pclubpok,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club Pokemon B (U 991126 V1.000)", MACHINE_NOT_WORKING )
 // Japan sets
@@ -4043,6 +4070,7 @@ GAME( 1997, pclove,    stvbios, stv_5838, stv,      stvpc_state, init_decathlt_n
 GAME( 1997, pclove2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club LoveLove Ver 2 (J 970825 V1.000)", MACHINE_NOT_WORKING ) // ^
 GAME( 1997, pcpooh2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 2 (J 971218 V1.000)", MACHINE_NOT_WORKING ) // ^
 GAME( 1998, pcpooh3,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 3 (J 980406 V1.000)", MACHINE_NOT_WORKING ) // ^
+GAME( 1998, pclubsc5,  stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club Sony Creative Ver.5 (J 980721 V1.000)", MACHINE_NOT_WORKING ) // ^
 
 GAME( 1998, stress,    stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Sega",                         "Stress Busters (J 981020 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
