@@ -4606,18 +4606,19 @@ Gal select screen sports unmasked text layer over box, [VDP2] enables window log
 		</part>
 	</software>
 
-	<software name="gamebas" supported="no">
+	<software name="gamebas" supported="partial">
 		<description>Game Basic for SegaSaturn (Japan)</description>
 		<year>1998</year>
 		<publisher>ASCII</publisher>
 		<notes><![CDATA[
-Keyboard inputs doesn't work
+Not extensively tested
+DEMO.B has [VDP1] issue with down-left cat box vertex
 ]]></notes>
 		<info name="serial" value="T-2111G"/>
 		<info name="release" value="19980625"/>
 		<info name="alt_title" value="ゲームベーシック フォー セガサターン"/>
-		<!-- TODO: in port 2? -->
 		<info name="usage" value="Needs keyboard connected"/>
+		<sharedfeat name="ctrl1_default" value="keyboard"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -6665,11 +6666,14 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Pocket Fighter (Japan)... -->
 	<software name="pfght" supported="no">
 		<description>Pocket Fighter (Japan)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Runs too slow, enables [SCU] hblank-in irq
+[CD-Block] BGMs don't repeat
+]]></notes>
 		<info name="serial" value="T-1230G"/>
 		<info name="release" value="19980709"/>
 		<info name="alt_title" value="ポケットファイター"/>
@@ -8585,11 +8589,14 @@ TODO: test Sonic 2, 3 and Knuckles
 		</part>
 	</software>
 
-	<!-- Identifying Street Fighter Zero 2 (Japan)... -->
 	<software name="sfz2" cloneof="sfa2" supported="no">
 		<description>Street Fighter Zero 2 (Japan)</description>
 		<year>1996</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Runs too slow, enables [SCU] hblank-in irq
+[CD-Block] BGMs don't repeat
+]]></notes>
 		<info name="serial" value="T-1212G"/>
 		<info name="release" value="19960914"/>
 		<info name="alt_title" value="ストリートファイターZERO2"/>

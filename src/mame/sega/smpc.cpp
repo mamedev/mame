@@ -477,6 +477,8 @@ TIMER_CALLBACK_MEMBER(smpc_hle_device::handle_command)
 				// assert Slave SH2 line
 				m_sshres(1);
 
+				// TODO: sound CPU and SCSP are also reset here
+
 				// setup the new dot select
 				m_cur_dotsel = (m_comreg & 1) ^ 1;
 			}
