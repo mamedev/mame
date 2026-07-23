@@ -828,7 +828,7 @@ void sat_console_state::saturn(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sat_console_state::sound_mem);
 	m_audiocpu->reset_cb().set(FUNC(sat_console_state::m68k_reset_callback));
 
-	SATURN_SCU(config, m_scu, XTAL(57'272'727) / 4);
+	SATURN_SCU(config, m_scu, MASTER_CLOCK_352);
 	m_scu->set_hostcpu(m_maincpu);
 
 //  SH-1

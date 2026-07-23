@@ -45,7 +45,6 @@ public:
 	void vblank_in_w(int state);
 	void hblank_in_w(int state);
 	void vdp1_end_w(int state);
-	void check_scanline_timers(int scanline,int y_step);
 	void sound_req_w(int state);
 	void smpc_irq_w(int state);
 
@@ -60,8 +59,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_reset_after_children() override;
-
-	template <int Level> TIMER_CALLBACK_MEMBER(dma_tick);
+	virtual void device_clock_changed() override;
 
 private:
 	required_device<scudsp_cpu_device> m_scudsp;
@@ -74,7 +72,9 @@ private:
 		DMALV2_ID
 	};
 
-	emu_timer *m_dma_timer[3];
+	template <int Level> TIMER_CALLBACK_MEMBER(dma_tick);
+	TIMER_CALLBACK_MEMBER(timer1_irq_cb);
+	emu_timer *m_dma_timer[3], *m_timer1;
 	uint32_t m_ism;
 	uint32_t m_ist;
 	uint32_t m_t0c;
@@ -84,6 +84,7 @@ private:
 	bool m_tenb;
 	int m_current_irq_level;
 	uint8_t m_current_vector;
+	uint16_t m_timer0_counter;
 
 	void test_pending_irqs();
 

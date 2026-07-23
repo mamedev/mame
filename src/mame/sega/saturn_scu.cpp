@@ -1,86 +1,24 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/***************************************************************************
+/**************************************************************************************************
 
 Sega Saturn System Control Unit (c) 1995 Sega/Yamaha
 
 TODO:
-- make a screen_device subclass, add pixel timers & irq callbacks to it;
+- Rewrite DMA;
+- Verify Timer 1 (seems unaffected even after rewriting it?)
 - A-Bus external interrupts;
-- Pad signal (lightgun I presume);
-- Improve DMA, use DRQ model and timers, make them subdevices?
-(old DMA TODO)
-- Remove CD transfer DMA hack (tied with CD block bug(s)?)
-- Add timings(but how fast are each DMA?).
-- Add level priority & DMA status register.
+- Pad irq signal (lightgun?);
 
-***************************************************************************/
-/**********************************************************************************
-SCU Register Table
-offset,relative address
-Registers are in long words.
-===================================================================================
-0     0000  Level 0 DMA Set Register
-1     0004
-2     0008
-3     000c
-4     0010
-5     0014
-6     0018
-7     001c
-8     0020  Level 1 DMA Set Register
-9     0024
-10    0028
-11    002c
-12    0030
-13    0034
-14    0038
-15    003c
-16    0040  Level 2 DMA Set Register
-17    0044
-18    0048
-19    004c
-20    0050
-21    0054
-22    0058
-23    005c
-24    0060  DMA Forced Stop
-25    0064
-26    0068
-27    006c
-28    0070  <Free>
-29    0074
-30    0078
-31    007c  DMA Status Register
-32    0080  DSP Program Control Port
-33    0084  DSP Program RAM Data Port
-34    0088  DSP Data RAM Address Port
-35    008c  DSP Data RAM Data Port
-36    0090  Timer 0 Compare Register
-37    0094  Timer 1 Set Data Register
-38    0098  Timer 1 Mode Register
-39    009c  <Free>
-40    00a0  Interrupt Mask Register
-41    00a4  Interrupt Status Register
-42    00a8  A-Bus Interrupt Acknowledge
-43    00ac  <Free>
-44    00b0  A-Bus Set Register
-45    00b4
-46    00b8  A-Bus Refresh Register
-47    00bc  <Free>
-48    00c0
-49    00c4  SCU SDRAM Select Register
-50    00c8  SCU Version Register
-51    00cc  <Free>
-52    00cf
-===================================================================================
+===================================================================================================
+
 DMA Status Register(32-bit):
 xxxx xxxx x--- xx-- xx-- xx-- xx-- xx-- UNUSED
 ---- ---- -x-- ---- ---- ---- ---- ---- DMA DSP-Bus access
 ---- ---- --x- ---- ---- ---- ---- ---- DMA B-Bus access
 ---- ---- ---x ---- ---- ---- ---- ---- DMA A-Bus access
----- ---- ---- --x- ---- ---- ---- ---- DMA lv 1 interrupt
----- ---- ---- ---x ---- ---- ---- ---- DMA lv 0 interrupt
+---- ---- ---- --x- ---- ---- ---- ---- DMA lv 1 interrupted
+---- ---- ---- ---x ---- ---- ---- ---- DMA lv 0 interrupted
 ---- ---- ---- ---- --x- ---- ---- ---- DMA lv 2 in stand-by
 ---- ---- ---- ---- ---x ---- ---- ---- DMA lv 2 in operation
 ---- ---- ---- ---- ---- --x- ---- ---- DMA lv 1 in stand-by
@@ -90,16 +28,11 @@ xxxx xxxx x--- xx-- xx-- xx-- xx-- xx-- UNUSED
 ---- ---- ---- ---- ---- ---- ---- --x- DSP side DMA in stand-by
 ---- ---- ---- ---- ---- ---- ---- ---x DSP side DMA in operation
 
-**********************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "saturn_scu.h"
 
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
 
 // device type definition
 DEFINE_DEVICE_TYPE(SATURN_SCU, saturn_scu_device, "saturn_scu", "Sega Saturn System Control Unit (Yamaha 315-5688)")
@@ -240,6 +173,7 @@ void saturn_scu_device::device_start()
 	m_dma_timer[0] = timer_alloc(FUNC(saturn_scu_device::dma_tick<DMALV0_ID>), this);
 	m_dma_timer[1] = timer_alloc(FUNC(saturn_scu_device::dma_tick<DMALV1_ID>), this);
 	m_dma_timer[2] = timer_alloc(FUNC(saturn_scu_device::dma_tick<DMALV2_ID>), this);
+	m_timer1 = timer_alloc(FUNC(saturn_scu_device::timer1_irq_cb), this);
 }
 
 
@@ -260,6 +194,15 @@ void saturn_scu_device::device_reset()
 
 	m_status = 0;
 	m_current_irq_level = 0;
+
+	m_timer1->adjust(attotime::never);
+}
+
+void saturn_scu_device::device_clock_changed()
+{
+	m_scudsp->set_unscaled_clock(this->clock() / 4);
+	// TODO: changing the clock should have side effects with the timer stuff
+	m_timer1->adjust(attotime::never);
 }
 
 //-------------------------------------------------
@@ -586,51 +529,36 @@ uint32_t saturn_scu_device::dma_status_r()
 void saturn_scu_device::t0_compare_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_t0c);
+	m_t0c &= 0x3ff;
 }
 
 void saturn_scu_device::t1_setdata_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_t1s);
+	m_t1s &= 0x1ff;
 }
 
 /*
- ---- ---x ---- ---- T1MD Timer 1 mode (0=each line, 1=only at timer 0 lines)
- ---- ---- ---- ---x TENB Timers enable
+ * ---- ---x ---- ---- T1MD Timer 1 mode (0=each line, 1=only at timer 0 lines)
+ * ---- ---- ---- ---x TENB Timers enable
  */
 void saturn_scu_device::t1_mode_w(uint16_t data)
 {
-	m_t1md = BIT(data,8);
-	m_tenb = BIT(data,0);
+	m_t1md = BIT(data, 8);
+	m_tenb = BIT(data, 0);
+	if (!m_tenb)
+	{
+		m_timer0_counter = 0;
+		m_timer1->adjust(attotime::never);
+	}
 }
 
-
-void saturn_scu_device::check_scanline_timers(int scanline, int y_step)
+TIMER_CALLBACK_MEMBER(saturn_scu_device::timer1_irq_cb)
 {
-	if(m_tenb == false)
-		return;
+	dma_start_factor_ack(4);
 
-	int timer0_compare = (m_t0c & 0x3ff) * y_step;
-
-	// Timer 0
-	if(scanline == timer0_compare)
-	{
-		dma_start_factor_ack(3);
-
-		m_ist |= IRQ_TIMER_0;
-		test_pending_irqs();
-	}
-
-	// Timer 1
-	// TODO: should happen after some time when hblank-in is received then counts down t1s
-	if(
-	  ((m_t1md == false) && ((scanline % y_step) == 0)) ||
-	  ((m_t1md == true) && (scanline == timer0_compare)) )
-	{
-		dma_start_factor_ack(4);
-
-		m_ist |= IRQ_TIMER_1;
-		test_pending_irqs();
-	}
+	m_ist |= IRQ_TIMER_1;
+	test_pending_irqs();
 }
 
 
@@ -709,6 +637,7 @@ void saturn_scu_device::vblank_out_w(int state)
 
 	m_ist |= IRQ_VBLANK_OUT;
 	test_pending_irqs();
+	m_timer0_counter = 0;
 }
 
 void saturn_scu_device::vblank_in_w(int state)
@@ -728,8 +657,31 @@ void saturn_scu_device::hblank_in_w(int state)
 		return;
 
 	dma_start_factor_ack(2);
-
 	m_ist |= IRQ_HBLANK_IN;
+
+	// NOTE: the counter still runs, it's the irq that fires if timer is enabled
+	// also that this never fires if t0c & 0x200
+	m_timer0_counter ++;
+	m_timer0_counter &= 0x1ff;
+	if (m_tenb)
+	{
+		const bool timer0_hit = m_timer0_counter == m_t0c;
+		if (timer0_hit)
+		{
+			dma_start_factor_ack(3);
+			m_ist |= IRQ_TIMER_0;
+		}
+
+		// Timer 1 conditions
+		// - Mode is 0 (all scanlines)
+		// - Mode is 1 and timer 0 is hit
+		const bool timer1_hit = (timer0_hit || !m_t1md);
+		if (timer1_hit)
+		{
+			m_timer1->adjust(attotime::from_ticks(m_t1s, this->clock() / 8));
+		}
+	}
+
 	test_pending_irqs();
 }
 

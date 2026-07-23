@@ -150,14 +150,8 @@ void saturn_state::hint_callback(int state)
 {
 	if (!m_prev_hint && state)
 	{
-		int scanline = m_screen->vpos();
-		int y_step = m_vdp2->get_ystep_count();
-
 		m_scu->hblank_in_w(1);
 		m_slave->set_input_line(0x2, ASSERT_LINE);
-
-		// TODO: this must really count on its own, akin to Yamaha YM7101
-		m_scu->check_scanline_timers(scanline, y_step);
 	}
 
 	m_prev_hint = state;
@@ -318,6 +312,9 @@ void saturn_state::dot_select_w(int state)
 	m_slave->set_unscaled_clock(xtal / 2);
 	m_dcc->set_unscaled_clock(xtal / 2);
 
+	m_scu->set_unscaled_clock(xtal);
+
+//	m_vdp1
 	m_vdp2->set_unscaled_clock(xtal);
 }
 
