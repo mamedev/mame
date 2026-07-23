@@ -134,15 +134,7 @@ private:
 	uint32_t version_r();
 };
 
-
 // device type definition
 DECLARE_DEVICE_TYPE(SATURN_SCU, saturn_scu_device)
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
 
 #endif // MAME_SEGA_SATURN_SCU_H

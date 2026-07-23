@@ -2697,11 +2697,13 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Hardlocks at boot, caused by [SCU] DMA-ing with max sizes -->
 	<software name="aquazone" supported="no">
 		<description>Aquazone - Desktop Life (Japan)</description>
 		<year>1996</year>
 		<publisher>9003</publisher>
+		<notes><![CDATA[
+Hardlocks at boot, [SCU] DMA-ing in VDP2 RAM with max sizes
+]]></notes>
 		<info name="serial" value="T-24001G"/>
 		<info name="release" value="19960712"/>
 		<info name="alt_title" value="アクアゾーン"/>

@@ -21,6 +21,24 @@
 
 DEFINE_DEVICE_TYPE(ISA16_SB16, sb16_lle_device, "sb16", "SoundBlaster 16 Audio Adapter LLE")
 
+sb16_lle_device::sb16_lle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ISA16_SB16, tag, owner, clock),
+	device_isa16_card_interface(mconfig, *this),
+	m_opl3(*this, "opl3"),
+	m_dsp(*this, "dsp"),
+	m_mixer(*this, "mixer"),
+	m_ldac(*this, "ldac"),
+	m_rdac(*this, "rdac"),
+	m_irqs(*this, "irqs"),
+	m_joy(*this, "pc_joy"),
+	m_mpu_byte(0),
+	m_irq8(false),
+	m_irq16(false),
+	m_irq_midi(false)
+{
+}
+
+
 void sb16_lle_device::host_io(address_map &map)
 {
 	map(0x00, 0x03).rw(m_opl3, FUNC(ymf262_device::read), FUNC(ymf262_device::write));
@@ -152,24 +170,6 @@ void sb16_lle_device::mpu401_w(offs_t offset, uint8_t data)
 				break;
 		}
 	}
-
-}
-
-sb16_lle_device::sb16_lle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ISA16_SB16, tag, owner, clock),
-	device_isa16_card_interface(mconfig, *this),
-	m_opl3(*this, "opl3"),
-	m_dsp(*this, "dsp"),
-	m_mixer(*this, "mixer"),
-	m_ldac(*this, "ldac"),
-	m_rdac(*this, "rdac"),
-	m_irqs(*this, "irqs"),
-	m_joy(*this, "pc_joy"),
-	m_mpu_byte(0),
-	m_irq8(false),
-	m_irq16(false),
-	m_irq_midi(false)
-{
 }
 
 void sb16_lle_device::device_start()

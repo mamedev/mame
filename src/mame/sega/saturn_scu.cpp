@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-Sega System Control Unit (c) 1995 Sega
+Sega Saturn System Control Unit (c) 1995 Sega/Yamaha
 
 TODO:
 - make a screen_device subclass, add pixel timers & irq callbacks to it;
@@ -109,9 +109,9 @@ DEFINE_DEVICE_TYPE(SATURN_SCU, saturn_scu_device, "saturn_scu", "Sega Saturn Sys
 //-------------------------------------------------
 
 saturn_scu_device::saturn_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SATURN_SCU, tag, owner, clock),
-	m_scudsp(*this, "scudsp"),
-	m_hostcpu(*this, finder_base::DUMMY_TAG)
+	: device_t(mconfig, SATURN_SCU, tag, owner, clock)
+	, m_scudsp(*this, "scudsp")
+	, m_hostcpu(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -402,7 +402,8 @@ void saturn_scu_device::handle_dma_direct(uint8_t level)
 	if ((m_dma[level].dst & 0x07f0'0000) == 0x05c0'0000 && m_dma[level].size >= 0x80000)
 		m_dma[level].size = 0x80000 - (m_dma[level].dst & 0x7fffe);
 
-	// stv:colmns97, which doesn't work right (timing more likely, also ST-V has more soundram)
+	// stv:colmns97 & stv:wwshin, which doesn't work right
+	// (timing more likely, also ST-V has more soundram)
 //  if ((m_dma[level].dst & 0x07f0'0000) == 0x05a0'0000 && m_dma[level].size >= 0x80000)
 //      m_dma[level].size = 0x80000 - (m_dma[level].dst & 0x7ffff);
 

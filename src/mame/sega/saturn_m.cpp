@@ -150,7 +150,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 		m_scu->vblank_in_w(1);
 
 		// flip odd bit here
-		m_vdp2.odd ^= 1;
+		m_vdp2_legacy.odd ^= 1;
 		/* TODO: when Automatic Draw actually happens? Night Striker S is very fussy on this, and it looks like that VDP1 starts at more or less vblank-in time ... */
 		vdp1_video_update();
 	}
@@ -163,7 +163,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 	{
 		/* docs mentions that VBE happens one line after vblank-in. */
 		if(VDP1_VBE())
-			m_vdp1.framebuffer_clear_on_next_frame = 1;
+			m_vdp1_legacy.framebuffer_clear_on_next_frame = 1;
 	}
 
 	// TODO: temporary for Batman Forever, presumably anonymous timer not behaving well.
@@ -313,7 +313,7 @@ void saturn_state::dot_select_w(int state)
 	m_slave->set_unscaled_clock(xtal / 2);
 	m_dcc->set_unscaled_clock(xtal / 2);
 
-	m_vdp2.dotsel = state ^ 1;
+	m_vdp2_legacy.dotsel = state ^ 1;
 	vdp2_dynamic_res_change();
 }
 

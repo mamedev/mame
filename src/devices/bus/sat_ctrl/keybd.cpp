@@ -8,8 +8,15 @@ References:
 - https://segaretro.org/Saturn_Keyboard
 - Technical Bulletin #45 "Saturn Keyboard Data Format Ver.1.00"
 
+TODO:
+- Caps/Num/Scroll locks
+  (regular keyboard is numpad-less, may have routed that to kana lock instead);
+- Identify the actual MCU this employs;
+- key repeat (verify with games);
+- hookup EGWord in SW list and test it again;
+
 Notes:
-- Multiplayer won't work without the game key (ESC or Z)
+- Multiplayer won't work without the game key (ESC or Z keys acts as a start trigger)
 - SHIFT+F1 to bring the "Instant Program Launcher"
 - More info and utilities in gamebas:cdrom2 (needs a Japanese Windows 95,
   either DOS/V or PC-98 arch)

@@ -96,7 +96,7 @@ protected:
 		int         local_y = 0;
 
 		emu_timer * draw_end_timer = nullptr;
-	}m_vdp1;
+	} m_vdp1_legacy;
 
 	struct {
 		std::unique_ptr<uint8_t[]>      gfx_decode;
@@ -110,7 +110,7 @@ protected:
 		uint8_t     exsyfg = 0;
 		int       old_crmd = 0;
 		int       old_tvmd = 0;
-	}m_vdp2;
+	} m_vdp2_legacy;
 
 	required_device<sh7604_device> m_maincpu;
 	required_device<sh7604_device> m_slave;

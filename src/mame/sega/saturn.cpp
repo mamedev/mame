@@ -679,7 +679,7 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 	// save states
 	save_item(NAME(m_en_68k));
 	save_item(NAME(m_scsp_last_line));
-	save_item(NAME(m_vdp2.odd));
+	save_item(NAME(m_vdp2_legacy.odd));
 }
 
 // diehardt tests RAM address $25e7ffe bit 2 with Slave during FRT minit irq
@@ -709,8 +709,8 @@ MACHINE_RESET_MEMBER(sat_console_state,saturn)
 	m_maincpu->set_unscaled_clock(MASTER_CLOCK_320/2);
 	m_slave->set_unscaled_clock(MASTER_CLOCK_320/2);
 
-	m_vdp2.old_crmd = -1;
-	m_vdp2.old_tvmd = -1;
+	m_vdp2_legacy.old_crmd = -1;
+	m_vdp2_legacy.old_tvmd = -1;
 }
 
 uint8_t sat_console_state::saturn_pdr1_direct_r()
@@ -953,7 +953,7 @@ void sat_console_state::saturnkr(machine_config &config)
 template <bool is_pal> void sat_console_state::init_saturn()
 {
 	// TODO: setter for (missing) VDP2 device
-	m_vdp2.pal = is_pal;
+	m_vdp2_legacy.pal = is_pal;
 
 	// set compatible options
 	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
