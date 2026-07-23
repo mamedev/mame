@@ -12,34 +12,6 @@ void fghthist_common_state::pri_w(u32 data)
 
 /******************************************************************************/
 
-/* Later games have double buffered paletteram - the real palette ram is
-only updated on a DMA call */
-
-void fghthist_state::buffered_palette_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	COMBINE_DATA(&m_paletteram[offset]);
-	m_dirty_palette[offset] = 1;
-}
-
-void fghthist_state::palette_dma_w(u32 data)
-{
-	for (int i = 0; i < m_palette->entries(); i++)
-	{
-		if (m_dirty_palette[i])
-		{
-			m_dirty_palette[i] = 0;
-
-			const u8 b = (m_paletteram[i] >> 16) & 0xff;
-			const u8 g = (m_paletteram[i] >>  8) & 0xff;
-			const u8 r = (m_paletteram[i] >>  0) & 0xff;
-
-			m_palette->set_pen_color(i, rgb_t(r, g, b));
-		}
-	}
-}
-
-/******************************************************************************/
-
 // sprite and BG2/3 color banks are changeable at run time
 void nslasher_state::tilemap_color_bank_w(u8 data)
 {
@@ -84,9 +56,6 @@ void fghthist_state::video_start()
 {
 	fghthist_common_state::allocate_spriteram(0);
 	fghthist_common_state::video_start();
-
-	m_dirty_palette = make_unique_clear<u8[]>(2048);
-	save_pointer(NAME(m_dirty_palette), 2048);
 }
 
 void nslasher_state::video_start()
