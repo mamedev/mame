@@ -119,6 +119,10 @@ void hh_ht1130_state::ht1130_common(machine_config &config)
 	m_maincpu->pp_in_cb().set_ioport(m_in_pp);
 	m_maincpu->pm_in_cb().set_ioport(m_in_pm);
 
+	m_maincpu->set_melody_rom(":melody");
+
+	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 1.0);
+
 	SPEAKER(config, "speaker").front_center();
 
 	mcfg_svg_screen(config, 698, 1080);
@@ -193,6 +197,10 @@ void hh_ht1190_state::brke23p2(machine_config &config)
 
 	m_maincpu->ps_in_cb().set_ioport(m_in_ps);
 	m_maincpu->pp_in_cb().set_ioport(m_in_pp);
+
+	m_maincpu->set_melody_rom(":melody");
+
+	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	SPEAKER(config, "speaker").front_center();
 
@@ -287,6 +295,9 @@ INPUT_PORTS_END
 void hh_ht1130_state::piko55(machine_config &config)
 {
 	ht1130_common(config);
+	m_maincpu->set_sound_freq_div(64);
+	m_maincpu->set_sound_effect(":sound_effect");
+	m_maincpu->set_sound_speed_div(":sound_speed");
 }
 
 
@@ -296,6 +307,13 @@ ROM_START( piko55 )
 
 	ROM_REGION( 0x280, "melody", 0 )
 	ROM_LOAD( "keychain55in1.srom", 0x000, 0x280, CRC(5667eb80) SHA1(4aee372f87a988ae46790538f4435c4a249e3686) )
+
+	ROM_REGION( 0x10, "sound_effect", 0 )
+	ROM_FILL( 0x00, 0x0c, 0x00 )
+	ROM_FILL( 0x0c, 0x04, 0x01 )
+
+	ROM_REGION( 0x10, "sound_speed", 0 )
+	ROM_FILL( 0x00, 0x10, 0x01 )
 
 	ROM_REGION( 85508, "screen", 0)
 	ROM_LOAD( "keychain55in1.svg", 0, 85508, CRC(9ab6dd67) SHA1(a4365a00204bf4e376f28600c0b87289bda0cbb0) )
@@ -312,6 +330,6 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT        COMPANY,       FULLNAME,                                   FLAGS
-CONS( 1993, brke23p2,   0,      0,      brke23p2, brke23p2, hh_ht1190_state, empty_init, "E-Star",      "Brick Game 96 in 1 (E-23 Plus Mark II)",   MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND ) // some other dieshots have 1996 on them, it is also possible the software is from Holtek
-CONS( 199?, ga888,      0,      0,      ga888,    ga888,    hh_ht1130_state, empty_init, "<unknown>",   "Block Game & Echo Key GA888",              MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND ) // clone of Tetris Jr?
-CONS( 199?, piko55,     0,      0,      piko55,   piko55,   hh_ht1130_state, empty_init, "Gametech",    "Pikorin 55",                               MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND )
+CONS( 1993, brke23p2,   0,      0,      brke23p2, brke23p2, hh_ht1190_state, empty_init, "E-Star",      "Brick Game 96 in 1 (E-23 Plus Mark II)",   MACHINE_IMPERFECT_TIMING ) // some other dieshots have 1996 on them, it is also possible the software is from Holtek
+CONS( 199?, ga888,      0,      0,      ga888,    ga888,    hh_ht1130_state, empty_init, "<unknown>",   "Block Game & Echo Key GA888",              MACHINE_IMPERFECT_TIMING ) // clone of Tetris Jr?
+CONS( 199?, piko55,     0,      0,      piko55,   piko55,   hh_ht1130_state, empty_init, "Gametech",    "Pikorin 55",                               MACHINE_IMPERFECT_TIMING )
