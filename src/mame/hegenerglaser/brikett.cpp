@@ -131,7 +131,7 @@ public:
 	void mephistoj(machine_config &config);
 	void mephisto2(machine_config &config);
 	void mephistoe2(machine_config &config);
-	void mephistoe2a(machine_config &config);
+	void mephistoe2o(machine_config &config);
 	void mephisto3(machine_config &config);
 
 protected:
@@ -160,7 +160,7 @@ private:
 	void mephistoj_map(address_map &map) ATTR_COLD;
 	void mephisto2_map(address_map &map) ATTR_COLD;
 	void mephistoe2_map(address_map &map) ATTR_COLD;
-	void mephistoe2a_map(address_map &map) ATTR_COLD;
+	void mephistoe2o_map(address_map &map) ATTR_COLD;
 	void mephisto3_map(address_map &map) ATTR_COLD;
 	void mephisto_io(address_map &map) ATTR_COLD;
 	void mephistoj_io(address_map &map) ATTR_COLD;
@@ -359,7 +359,7 @@ void brikett_state::mephistoe2_map(address_map &map)
 	map(0x3000, 0x3fff).rom();
 }
 
-void brikett_state::mephistoe2a_map(address_map &map)
+void brikett_state::mephistoe2o_map(address_map &map)
 {
 	mephistoe2_map(map);
 	map(0xbf00, 0xbfff).rw(FUNC(brikett_state::esb2_r), FUNC(brikett_state::esb2_w));
@@ -458,7 +458,7 @@ static INPUT_PORTS_START( mephistoe2 )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( mephistoe2a )
+static INPUT_PORTS_START( mephistoe2o )
 	PORT_INCLUDE( mephistoe2 )
 
 	PORT_MODIFY("IN.5") // optional
@@ -550,12 +550,12 @@ void brikett_state::mephisto2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephisto2_map);
 }
 
-void brikett_state::mephistoe2a(machine_config &config)
+void brikett_state::mephistoe2o(machine_config &config)
 {
 	mephisto2(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephistoe2a_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephistoe2o_map);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -567,7 +567,7 @@ void brikett_state::mephistoe2a(machine_config &config)
 
 void brikett_state::mephistoe2(machine_config &config)
 {
-	mephistoe2a(config);
+	mephistoe2o(config);
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephistoe2_map);
@@ -658,7 +658,15 @@ ROM_START( mephistoe2 ) // module s/n (0)0111xx
 	ROM_LOAD("254-09.4", 0x3000, 0x1000, CRC(d6be47a6) SHA1(3d577036111c026292b6c445efcb126cf7a6a472) ) // "
 ROM_END
 
-ROM_START( mephistoe2a ) // module s/n 00065xx
+ROM_START( mephistoe2a ) // module s/n 00081xx
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("4005_02_251_06.1", 0x0000, 0x1000, CRC(5578b0d8) SHA1(3190780f9776ebd765f13d4d5601dec4e10b7706) ) // HN462532G
+	ROM_LOAD("4005_02_252_06.2", 0x1000, 0x1000, CRC(be951673) SHA1(bef785f21765b9e357314c8e4417876f86512888) ) // "
+	ROM_LOAD("4005_02_253_06.3", 0x2000, 0x1000, CRC(98a2143e) SHA1(9505e09bbb66b1218895ed20d84468ac7f043ef5) ) // "
+	ROM_LOAD("4005_02_254_06.4", 0x3000, 0x1000, CRC(77e06382) SHA1(6d2d8c8c0c0892eace3c296785c3d00d125a50de) ) // "
+ROM_END
+
+ROM_START( mephistoe2o ) // module s/n 00065xx
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("5000_00_251_01.1", 0x0000, 0x1000, CRC(cebf66be) SHA1(7793ba80159a8ae857a1b35d270bb6972fef0563) ) // HN462532G
 	ROM_LOAD("5000_00_252_01.2", 0x1000, 0x1000, CRC(66f38992) SHA1(2f9007985ce350a8ee82797a66f37bb9a4de36a4) ) // "
@@ -715,8 +723,9 @@ SYST( 1981, mephisto2,   0,          0,      mephisto2,   mephisto2,   brikett_s
 SYST( 1981, mephisto2a,  mephisto2,  0,      mephisto2,   mephisto2,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 2)", MACHINE_SUPPORTS_SAVE )
 SYST( 1981, mephisto2b,  mephisto2,  0,      mephisto2,   mephisto2,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 3)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1981, mephistoe2,  0,          0,      mephistoe2,  mephistoe2,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto ESB II (ESB 6000 board)", MACHINE_SUPPORTS_SAVE )
-SYST( 1981, mephistoe2a, mephistoe2, 0,      mephistoe2a, mephistoe2a, brikett_state, empty_init, "Hegener + Glaser", "Mephisto ESB II (ESB II board)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, mephistoe2,  0,          0,      mephistoe2,  mephistoe2,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto ESB II (ESB 6000 board, set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, mephistoe2a, mephistoe2, 0,      mephistoe2,  mephistoe2,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto ESB II (ESB 6000 board, set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, mephistoe2o, mephistoe2, 0,      mephistoe2o, mephistoe2o, brikett_state, empty_init, "Hegener + Glaser", "Mephisto ESB II (ESB II board)", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1983, mephisto3,   0,          0,      mephisto3,   mephisto3,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 1)", MACHINE_SUPPORTS_SAVE )
 SYST( 1983, mephisto3a,  mephisto3,  0,      mephisto3,   mephisto3,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 2)", MACHINE_SUPPORTS_SAVE )
