@@ -188,21 +188,25 @@ void saturn_scu_device::device_reset()
 
 	for(int i = 0; i < 3; i++)
 	{
+		m_dma[i].src_add = 4;
+		m_dma[i].dst_add = 2;
 		m_dma[i].start_factor = 7;
-		m_dma_timer[i]->reset();
+		m_dma_timer[i]->adjust(attotime::never);
+		m_dma[i].enable_mask = false;
 	}
 
-	m_status = 0;
+	m_dma_status = 0;
 	m_current_irq_level = 0;
 
+	m_tenb = false;
+	m_t1md = false;
+	m_timer0_counter = 0;
 	m_timer1->adjust(attotime::never);
 }
 
 void saturn_scu_device::device_clock_changed()
 {
 	m_scudsp->set_unscaled_clock(this->clock() / 4);
-	// TODO: changing the clock should have side effects with the timer stuff
-	m_timer1->adjust(attotime::never);
 }
 
 //-------------------------------------------------
@@ -307,9 +311,9 @@ void saturn_scu_device::dma_common_w(uint8_t offset,uint8_t level,uint32_t data)
 inline void saturn_scu_device::update_dma_status(uint8_t level,bool state)
 {
 	if(state)
-		m_status |= (0x10 << 4 * level);
+		m_dma_status |= (0x10 << 4 * level);
 	else
-		m_status &= ~(0x10 << 4 * level);
+		m_dma_status &= ~(0x10 << 4 * level);
 }
 
 void saturn_scu_device::handle_dma_direct(uint8_t level)
@@ -519,7 +523,7 @@ void saturn_scu_device::dma_lv2_w(offs_t offset, uint32_t data) { dma_common_w(o
 
 uint32_t saturn_scu_device::dma_status_r()
 {
-	return m_status;
+	return m_dma_status;
 }
 
 //**************************************************************************

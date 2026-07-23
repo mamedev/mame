@@ -141,9 +141,9 @@ void smpc_hle_device::device_start()
 	save_item(NAME(m_rtc_data));
 	save_item(NAME(m_smem));
 	save_item(NAME(m_ckchg_tick));
-	save_item(NAME(m_prev_sshon));
-	save_item(NAME(m_prev_sndon));
-	save_item(NAME(m_prev_cdon));
+	save_item(NAME(m_prev_sshoff));
+	save_item(NAME(m_prev_sndoff));
+	save_item(NAME(m_prev_cdoff));
 
 	m_cmd_timer = timer_alloc(FUNC(smpc_hle_device::handle_command), this);
 	m_rtc_timer = timer_alloc(FUNC(smpc_hle_device::handle_rtc_increment), this);
@@ -177,8 +177,8 @@ void smpc_hle_device::device_reset()
 	m_NMI_reset = false;
 	m_cur_dotsel = false;
 	m_ckchg_tick = 0;
-	m_prev_sndon = m_prev_sshon = 0xff;
-	m_prev_cdon = 1;
+	m_prev_sndoff = m_prev_sshoff = 0xff;
+	m_prev_cdoff = 0;
 
 	m_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 }
@@ -383,11 +383,11 @@ void smpc_hle_device::command_register_w(uint8_t data)
 		// gnine97/gnine98 and spinoffs wants two consecutive SSHON to resolve as a NOP
 		case 0x02:
 		case 0x03:
-			m_cmd_timer->adjust(attotime::from_usec(m_prev_sshon == (m_comreg & 1) ? 0 : m_cmd_table_timing[m_comreg]));
+			m_cmd_timer->adjust(attotime::from_usec(m_prev_sshoff == (m_comreg & 1) ? 0 : m_cmd_table_timing[m_comreg]));
 			break;
 		case 0x06:
 		case 0x07:
-			m_cmd_timer->adjust(attotime::from_usec(m_prev_sndon == (m_comreg & 1) ? 0 : m_cmd_table_timing[m_comreg]));
+			m_cmd_timer->adjust(attotime::from_usec(m_prev_sndoff == (m_comreg & 1) ? 0 : m_cmd_table_timing[m_comreg]));
 			break;
 		case 0x0e:
 		case 0x0f:
@@ -448,7 +448,7 @@ TIMER_CALLBACK_MEMBER(smpc_hle_device::handle_command)
 		case 0x03: // SSHOFF
 			LOGMASKED(LOG_COMMAND, "SMPC: %02x SSH%s\n", m_comreg, m_comreg & 1 ? "OFF" : "ON");
 			// enable or disable Slave SH2
-			m_prev_sshon = m_comreg & 1;
+			m_prev_sshoff = m_comreg & 1;
 			m_sshres(m_comreg & 1);
 			break;
 
@@ -456,7 +456,7 @@ TIMER_CALLBACK_MEMBER(smpc_hle_device::handle_command)
 		case 0x07: // SNDOFF
 			LOGMASKED(LOG_COMMAND, "SMPC: %02x SND%s\n", m_comreg, m_comreg & 1 ? "OFF" : "ON");
 			// enable or disable 68k
-			m_prev_sndon = m_comreg & 1;
+			m_prev_sndoff = m_comreg & 1;
 			m_sndres(m_comreg & 1);
 			break;
 
@@ -464,7 +464,7 @@ TIMER_CALLBACK_MEMBER(smpc_hle_device::handle_command)
 		case 0x09: // CDOFF
 			// ...
 			LOGMASKED(LOG_COMMAND, "SMPC: %02x CD%s\n", m_comreg, m_comreg & 1 ? "OFF" : "ON");
-			m_prev_cdon = m_comreg & 1;
+			m_prev_cdoff = m_comreg & 1;
 			m_command_in_progress = false;
 			m_oreg[31] = m_comreg;
 			// TODO: diagnostic also wants this to have bit 3 high
@@ -497,12 +497,15 @@ TIMER_CALLBACK_MEMBER(smpc_hle_device::handle_command)
 			m_ckchg_tick --;
 			if (m_ckchg_tick == 4)
 			{
+				// VDP1, VDP2 and SCU are also reset by this (done in client)
 				m_dotsel(m_comreg & 1);
 
-				// assert Slave SH2 line
+				// assert Slave SH2 and sound CPU lines
+				m_prev_sshoff = 1;
 				m_sshres(1);
 
-				// TODO: sound CPU and SCSP are also reset here
+				m_prev_sndoff = 1;
+				m_sndres(1);
 
 				// setup the new dot select
 				m_cur_dotsel = (m_comreg & 1) ^ 1;
@@ -607,17 +610,17 @@ void smpc_hle_device::resolve_intback()
 		m_oreg[10] = 0 << 7 |
 					 m_cur_dotsel << 6 |
 					 1 << 5 |
-					 ((m_prev_sshon & 1) ^ 1) << 4 |
+					 ((m_prev_sshoff & 1) ^ 1) << 4 |
 					 0 << 3 |
 					 1 << 2 |
 					 0 << 1 |
-					 ((m_prev_sndon & 1) ^ 1) << 0;
+					 ((m_prev_sndoff & 1) ^ 1) << 0;
 
 		/*
 		 * -x-- ---- CDON
 		 * ---- --1- <unknown>
 		 */
-		m_oreg[11] = ((m_prev_cdon & 1) ^ 1) << 6
+		m_oreg[11] = ((m_prev_cdoff & 1) ^ 1) << 6
 					| (1 << 1);
 
 		for(i=0;i<4;i++)

@@ -314,8 +314,13 @@ void saturn_state::dot_select_w(int state)
 
 	m_scu->set_unscaled_clock(xtal);
 
-//	m_vdp1
+//	m_vdp1->set_unscaled_clock(xtal);
 	m_vdp2->set_unscaled_clock(xtal);
+
+	m_scsp->reset();
+	m_scu->reset();
+//  m_vdp1->reset();
+	m_vdp2->reset();
 }
 
 

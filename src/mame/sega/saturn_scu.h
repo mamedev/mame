@@ -79,7 +79,7 @@ private:
 	uint32_t m_ist;
 	uint32_t m_t0c;
 	uint32_t m_t1s;
-	uint32_t m_status;
+	uint32_t m_dma_status;
 	bool m_t1md;
 	bool m_tenb;
 	int m_current_irq_level;
