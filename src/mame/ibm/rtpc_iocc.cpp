@@ -132,7 +132,7 @@ template <unsigned Channel> u16 rtpc_iocc_device::alt_r(offs_t offset, u16 mem_m
 	if (!(tcw & TCW_IOC))
 	{
 		// translate to system address
-		u32 address = region
+		offs_t address = region
 			? BIT(tcw, 4, 9) << 15 | (offset & 0x7fff)  // region mode: 9-bit prefix + 15-bit displacement
 			: BIT(tcw, 0, 13) << 11 | (offset & 0x7ff); // page mode: 13-bit prefix + 11-bit displacement
 
@@ -172,7 +172,7 @@ template <unsigned Channel> void rtpc_iocc_device::alt_w(offs_t offset, u16 data
 	if (!(tcw & TCW_IOC))
 	{
 		// translate to system address
-		u32 address = region
+		offs_t address = region
 			? BIT(tcw, 4, 9) << 15 | (offset & 0x7fff)  // region mode: 9-bit prefix + 15-bit displacement
 			: BIT(tcw, 0, 13) << 11 | (offset & 0x7ff); // page mode: 13-bit prefix + 11-bit displacement
 
@@ -213,11 +213,6 @@ template void rtpc_iocc_device::alt_w<5>(offs_t offset, u16 data, u16 mem_mask);
 template void rtpc_iocc_device::alt_w<6>(offs_t offset, u16 data, u16 mem_mask);
 template void rtpc_iocc_device::alt_w<7>(offs_t offset, u16 data, u16 mem_mask);
 template void rtpc_iocc_device::alt_w<8>(offs_t offset, u16 data, u16 mem_mask);
-
-#ifdef _MSC_VER
-// avoid incorrect MSVC warnings about excessive shift sizes below
-#pragma warning(disable:4333)
-#endif
 
 bool rtpc_iocc_device::translate(int spacenum, offs_t &address, address_space *&target_space) const
 {
