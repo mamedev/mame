@@ -1171,7 +1171,7 @@ CONS( 2007, ban_gkrj,   0,        0, superxavix_i2c_24c02_4mb,  ban_gkr,    supe
 // Yes!プリキュア5 いっしょに変身!メタモルフォーゼ!
 CONS( 2007, ban_pr2j,   0,        0, superxavix_i2c_24c04,      ban_gkr,    superxavix_i2c_bowl_state,   init_xavix,    "Bandai / SSD Company Limited", "Yes! PreCure 5: Issho ni Henshin! Metamorphose! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-// テレビで遊び隊 それいけトーマス ソドー島のなかまたち Thomas and Friends on the Island of Sodor
+// テレビで遊び隊 それいけトーマス ソドー島のなかまたち
 CONS( 2005, tmy_thom,   0,        0, superxavix_i2c_24c04,      xavix_i2c,  superxavix_i2c_state,        init_xavix,    "Tomy / SSD Company Limited", "TV de Asobitai Soreike Thomas: Sodor Tou no Nakamatachi / Thomas & Friends on the Island of Sodor (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // Ｌｅｔ’ｓ！ ＴＶプレイ 体感体得 結界師 方囲！定礎！結！滅！
