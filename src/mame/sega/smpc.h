@@ -111,6 +111,9 @@ private:
 	uint8_t m_smem[5];
 	uint8_t m_comreg;
 	uint8_t m_ckchg_tick;
+	uint8_t m_prev_sshon;
+	uint8_t m_prev_sndon;
+	uint8_t m_prev_cdon;
 	// in usec
 	// timing table, from manual in usec
 	const uint32_t m_cmd_table_timing[0x20] =
