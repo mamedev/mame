@@ -2477,67 +2477,7 @@ enum
 
 */
 
-/* 180000 - r/w - TVMD - TV Screen Mode
- bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
-       | DISP     |    --    |    --    |    --    |    --    |    --    |    --    | BDCLMD   |
-       |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
-       | LSMD1    | LSMD0    | VRESO1   | VRESO0   |    --    | HRESO2   | HRESO1   | HRESO0   |
-       \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define VDP2_TVMD   (m_vdp2_regs[0x000/2])
-
-	#define VDP2_DISP   ((VDP2_TVMD & 0x8000) >> 15)
-	#define VDP2_BDCLMD ((VDP2_TVMD & 0x0100) >> 8)
-	#define VDP2_LSMD   ((VDP2_TVMD & 0x00c0) >> 6)
-	#define VDP2_VRES   ((VDP2_TVMD & 0x0030) >> 4)
-	#define VDP2_HRES   ((VDP2_TVMD & 0x0007) >> 0)
-
-/* 180002 - r/w - EXTEN - External Signal Enable Register
- bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
-       |    --    |    --    |    --    |    --    |    --    |    --    | EXLTEN   | EXSYEN   |
-       |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
-       |    --    |    --    |    --    |    --    |    --    |    --    | DASEL    | EXBGEN   |
-       \----------|----------|----------|----------|----------|----------|----------|---------*/
-
-	#define VDP2_EXTEN  (m_vdp2_regs[0x002/2])
-
-	#define VDP2_EXLTEN ((VDP2_EXTEN & 0x0200) >> 9)
-
-/* 180004 - r/o - TVSTAT - Screen Status
- bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
-       |    --    |    --    |    --    |    --    |    --    |    --    | EXLTFG   | EXSYFG   |
-       |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
-       |    --    |    --    |    --    |    --    | VBLANK   | HBLANK   | ODD      | PAL      |
-       \----------|----------|----------|----------|----------|----------|----------|---------*/
-
-/* 180006 - r/w - VRSIZE - VRAM Size
- bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
-       | VRAMSZ   |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
-       |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
-       |    --    |    --    |    --    |    --    | VER3     | VER2     | VER1     | VER0     |
-       \----------|----------|----------|----------|----------|----------|----------|---------*/
-
-	#define VDP2_VRSIZE (m_vdp2_regs[0x006/2])
-
-	#define VDP2_VRAMSZ ((VDP2_VRSIZE & 0x8000) >> 15)
-
-/* 180008 - r/o - HCNT - H-Counter
- bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
-       |    --    |    --    |    --    |    --    |    --    |    --    | HCT9     | HCT8     |
-       |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
-       | HCT7     | HCT6     | HCT5     | HCT4     | HCT3     | HCT2     | HCT1     | HCT0     |
-       \----------|----------|----------|----------|----------|----------|----------|---------*/
-
-	#define VDP2_HCNT (m_vdp2_regs[0x008/2])
-
-/* 18000A - r/o - VCNT - V-Counter
- bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
-       |    --    |    --    |    --    |    --    |    --    |    --    | VCT9     | VCT8     |
-       |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
-       | VCT7     | VCT6     | VCT5     | VCT4     | VCT3     | VCT2     | VCT1     | VCT0     |
-       \----------|----------|----------|----------|----------|----------|----------|---------*/
-
-	#define VDP2_VCNT (m_vdp2_regs[0x00a/2])
 
 /* 18000C - RESERVED
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -6310,7 +6250,7 @@ void saturn_state::vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const rectangle
 			}
 /* TILES ARE NOW DECODED */
 
-			if(!VDP2_VRAMSZ)
+			if(!m_vdp2->get_vramsz())
 				tilecode &= 0x3fff;
 
 /* DRAW! */
@@ -6618,10 +6558,10 @@ void saturn_state::vdp2_draw_line(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	uint32_t pix;
 	uint8_t interlace;
 
-	interlace = (VDP2_LSMD == 3)+1;
+	interlace = (m_vdp2->get_lsmd() == 3) + 1;
 
 	{
-		base_mask = VDP2_VRAMSZ ? 0x7ffff : 0x3ffff;
+		base_mask = m_vdp2->get_vramsz() ? 0x7ffff : 0x3ffff;
 
 		for(y=cliprect.top();y<=cliprect.bottom();y++)
 		{
@@ -6654,7 +6594,7 @@ void saturn_state::vdp2_draw_mosaic(bitmap_rgb32 &bitmap, const rectangle &clipr
 	if(h_size == 1 && v_size == 1)
 		return; // don't bother
 
-	if(VDP2_LSMD == 3)
+	if(m_vdp2->get_lsmd() == 3)
 		v_size <<= 1;
 
 	for(int y=cliprect.top();y<=cliprect.bottom();y+=v_size)
@@ -6693,7 +6633,7 @@ void saturn_state::vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle &cli
 			//uint32_t base_incx, base_incy;
 			int cur_char = 0;
 
-			base_mask = VDP2_VRAMSZ ? 0x7ffff : 0x3ffff;
+			base_mask = m_vdp2->get_vramsz() ? 0x7ffff : 0x3ffff;
 			vcsc_address = (((VDP2_VCSTAU << 16) | VDP2_VCSTAL) & base_mask) * 2;
 			vcsc_address >>= 2;
 
@@ -6870,8 +6810,8 @@ void saturn_state::vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 	int32_t clipxmask = 0, clipymask = 0;
 
 
-	vcnt_shift = ((VDP2_LSMD & 3) == 3);
-	hcnt_shift = ((VDP2_HRES & 2) == 2);
+	vcnt_shift = m_vdp2->get_lsmd() == 3;
+	hcnt_shift = BIT(m_vdp2->get_hreso(), 1);
 
 	planesizex--;
 	planesizey--;
@@ -7298,7 +7238,7 @@ void saturn_state::vdp2_draw_NBG0(bitmap_rgb32 &bitmap, const rectangle &cliprec
 {
 	uint32_t base_mask;
 
-	base_mask = VDP2_VRAMSZ ? 0x7ffff : 0x3ffff;
+	base_mask = m_vdp2->get_vramsz() ? 0x7ffff : 0x3ffff;
 
 	/*
 	   Colours           : 16, 256, 2048, 32768, 16770000
@@ -7362,7 +7302,7 @@ void saturn_state::vdp2_draw_NBG0(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	current_tilemap.incy = VDP2_ZMYN0;
 
 	current_tilemap.linescroll_enable = VDP2_N0LSCX;
-	current_tilemap.linescroll_interval = (((VDP2_LSMD & 3) == 2) ? (2) : (1)) << (VDP2_N0LSS);
+	current_tilemap.linescroll_interval = ((m_vdp2->get_lsmd() == 2) ? (2) : (1)) << (VDP2_N0LSS);
 	current_tilemap.linescroll_table_address = (((VDP2_LSTA0U << 16) | VDP2_LSTA0L) & base_mask) * 2;
 	current_tilemap.vertical_linescroll_enable = VDP2_N0LSCY;
 	current_tilemap.linezoom_enable = VDP2_N0LZMX;
@@ -7400,7 +7340,7 @@ void saturn_state::vdp2_draw_NBG1(bitmap_rgb32 &bitmap, const rectangle &cliprec
 {
 	uint32_t base_mask;
 
-	base_mask = VDP2_VRAMSZ ? 0x7ffff : 0x3ffff;
+	base_mask = m_vdp2->get_vramsz() ? 0x7ffff : 0x3ffff;
 
 	/*
 	   Colours           : 16, 256, 2048, 32768
@@ -7463,7 +7403,7 @@ void saturn_state::vdp2_draw_NBG1(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	current_tilemap.incy = VDP2_ZMYN1;
 
 	current_tilemap.linescroll_enable = VDP2_N1LSCX;
-	current_tilemap.linescroll_interval = (((VDP2_LSMD & 3) == 2) ? (2) : (1)) << (VDP2_N1LSS);
+	current_tilemap.linescroll_interval = ((m_vdp2->get_lsmd() == 2) ? (2) : (1)) << (VDP2_N1LSS);
 	current_tilemap.linescroll_table_address = (((VDP2_LSTA1U << 16) | VDP2_LSTA1L) & base_mask) * 2;
 	current_tilemap.vertical_linescroll_enable = VDP2_N1LSCY;
 	current_tilemap.linezoom_enable = VDP2_N1LZMX;
@@ -8029,16 +7969,16 @@ void saturn_state::vdp2_draw_back(bitmap_rgb32 &bitmap, const rectangle &cliprec
 {
 	uint8_t const *const gfxdata = m_vdp2_legacy.gfx_decode.get();
 
-	uint8_t interlace = (VDP2_LSMD == 3)+1;
+	uint8_t interlace = (m_vdp2->get_lsmd() == 3)+1;
 
-//  popmessage("Back screen %08x %08x %08x",VDP2_BDCLMD,VDP2_BKCLMD,VDP2_BKTA);
+//  popmessage("Back screen %08x %08x %08x",m_vdp2->get_bdclmd(),VDP2_BKCLMD,VDP2_BKTA);
 
 	/* draw black if BDCLMD and DISP are cleared */
-	if(!(VDP2_BDCLMD) && !(VDP2_DISP))
+	if(!(m_vdp2->get_bdclmd()) && !(m_vdp2->get_disp()))
 		bitmap.fill(m_palette->black_pen(), cliprect);
 	else
 	{
-		uint32_t base_mask = VDP2_VRAMSZ ? 0x7ffff : 0x3ffff;
+		uint32_t base_mask = m_vdp2->get_vramsz() ? 0x7ffff : 0x3ffff;
 
 		for(int y=cliprect.top();y<=cliprect.bottom();y++)
 		{
@@ -8122,79 +8062,6 @@ void saturn_state::vdp2_vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 uint16_t saturn_state::vdp2_regs_r(offs_t offset)
 {
-	switch(offset)
-	{
-		case 0x002/2:
-		{
-			/* latch h/v signals through HV latch*/
-			if(!VDP2_EXLTEN)
-			{
-				if(!machine().side_effects_disabled())
-				{
-					m_vdp2_legacy.h_count = get_hcounter();
-					m_vdp2_legacy.v_count = get_vcounter();
-					/* latch flag */
-					m_vdp2_legacy.exltfg |= 1;
-				}
-			}
-
-			break;
-		}
-		case 0x004/2:
-		{
-			/*Screen Status Register*/
-										/*VBLANK              HBLANK            ODD               PAL    */
-			m_vdp2_regs[offset] = (m_vdp2_legacy.exltfg<<9) |
-											(m_vdp2_legacy.exsyfg<<8) |
-											(get_vblank() << 3) |
-											(get_hblank() << 2) |
-											(get_odd_bit() << 1) |
-											(m_vdp2_legacy.pal << 0);
-
-			/* vblank bit is always 1 if DISP bit is disabled */
-			if(!VDP2_DISP)
-				m_vdp2_regs[offset] |= 1 << 3;
-
-			/* HV latches clears if this register is read */
-			if(!machine().side_effects_disabled())
-			{
-				m_vdp2_legacy.exltfg &= ~1;
-				m_vdp2_legacy.exsyfg &= ~1;
-			}
-			break;
-		}
-		case 0x006/2:
-		{
-			m_vdp2_regs[offset] = (VDP2_VRAMSZ << 15) |
-											((0 << 0) & 0xf); // VDP2 version
-
-			/* Games basically r/w the entire VDP2 register area when this is tripped. (example: Silhouette Mirage)
-			   Disable log for the time being. */
-			//if(!machine().side_effects_disabled())
-			//  printf("Warning: VDP2 version read\n");
-			break;
-		}
-
-		/* HCNT */
-		case 0x008/2:
-		{
-			m_vdp2_regs[offset] = (m_vdp2_legacy.h_count);
-			break;
-		}
-
-		/* VCNT */
-		case 0x00a/2:
-		{
-			m_vdp2_regs[offset] = (m_vdp2_legacy.v_count);
-			break;
-		}
-
-		default:
-			//if(!machine().side_effects_disabled())
-			//  printf("VDP2: read from register %08x %08x\n",offset*4,mem_mask);
-			break;
-	}
-
 	return m_vdp2_regs[offset];
 }
 
@@ -8321,181 +8188,8 @@ void saturn_state::vdp2_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_vdp2_legacy.old_crmd = VDP2_CRMD;
 		refresh_palette_data();
 	}
-	if(m_vdp2_legacy.old_tvmd != VDP2_TVMD)
-	{
-		m_vdp2_legacy.old_tvmd = VDP2_TVMD;
-		vdp2_dynamic_res_change();
-	}
-
-	if(VDP2_VRAMSZ)
-		logerror("VDP2 sets up 8 Mbit VRAM!\n");
 }
 
-int saturn_state::get_hblank_duration()
-{
-	int res;
-
-	res = (VDP2_HRES & 1) ? 455 : 427;
-
-	/* double pump horizontal max res */
-	if(VDP2_HRES & 2)
-		res <<= 1;
-
-	return res;
-}
-
-/*some vblank lines measurements (according to Charles MacDonald)*/
-/* TODO: interlace mode "eats" one line, should be 262.5 */
-int saturn_state::get_vblank_duration()
-{
-	int res;
-
-	res = (m_vdp2_legacy.pal) ? 313 : 263;
-
-	/* compensate for interlacing */
-	if((VDP2_LSMD & 3) == 3)
-		res <<= 1;
-
-	if(VDP2_HRES & 4)
-		res = (VDP2_HRES & 1) ? 561 : 525;  //Hi-Vision / 31kHz Monitor
-
-	return res;
-}
-
-int saturn_state::get_pixel_clock()
-{
-	int res,divider;
-
-	res = (m_vdp2_legacy.dotsel ? MASTER_CLOCK_352 : MASTER_CLOCK_320).value();
-	// TODO: divider is ALWAYS 8, this thing is just to over-compensate for MAME framework faults ...
-	divider = 8;
-
-	if(VDP2_HRES & 2)
-		divider >>= 1;
-
-	if((VDP2_LSMD & 3) == 3)
-		divider >>= 1;
-
-	if(VDP2_HRES & 4) //TODO
-		divider >>= 1;
-
-	return res / divider;
-}
-
-/* TODO: hblank position and hblank firing doesn't really match HW behaviour. */
-uint8_t saturn_state::get_hblank()
-{
-	const rectangle &visarea = m_screen->visible_area();
-	int cur_h = m_screen->hpos();
-
-	if (cur_h > visarea.right()) //TODO
-		return 1;
-
-	return 0;
-}
-
-uint8_t saturn_state::get_vblank()
-{
-	int cur_v,vblank;
-	cur_v = m_screen->vpos();
-
-	vblank = get_vblank_start_position() * get_ystep_count();
-
-	if (cur_v >= vblank)
-		return 1;
-
-	return 0;
-}
-
-uint8_t saturn_state::get_odd_bit()
-{
-	if(VDP2_HRES & 4) //exclusive monitor mode makes this bit to be always 1
-		return 1;
-
-// TODO: seabass explicitly wants this bit to be 0 when screen is disabled from bios to game transition.
-//       But the documentation claims that "non-interlaced" mode is always 1.
-//       grdforce tests this bit to be 1 from title screen to gameplay, ditto for finlarch/sasissu/magzun.
-//       Assume documentation is wrong and actually always flip this bit.
-	return m_vdp2_legacy.odd; // m_screen->frame_number() & 1;
-}
-
-int saturn_state::get_vblank_start_position()
-{
-	// first setting is at 240, the 16 lines are border overscan.
-	// TODO: test says that second setting happens at 241, might need further investigation ...
-	const int d_vres[4] = { 240, 240, 256, 256 };
-	int vres_mask;
-	int vblank_line;
-
-	vres_mask = (m_vdp2_legacy.pal << 1)|1; //PAL uses mask 3, NTSC uses mask 1
-	vblank_line = d_vres[VDP2_VRES & vres_mask];
-
-	return vblank_line;
-}
-
-int saturn_state::get_ystep_count()
-{
-	int max_y = m_screen->height();
-	int y_step;
-
-	y_step = 2;
-
-	if((max_y == 263 && m_vdp2_legacy.pal == 0) || (max_y == 313 && m_vdp2_legacy.pal == 1))
-		y_step = 1;
-
-	return y_step;
-}
-
-/* TODO: these needs to be checked via HW tests! */
-int saturn_state::get_hcounter()
-{
-	int hcount;
-
-	hcount = m_screen->hpos();
-
-	switch(VDP2_HRES & 6)
-	{
-		/* Normal */
-		case 0:
-			hcount &= 0x1ff;
-			hcount <<= 1;
-			break;
-		/* Hi-Res */
-		case 2:
-			hcount &= 0x3ff;
-			break;
-		/* Exclusive Normal*/
-		case 4:
-			hcount &= 0x1ff;
-			break;
-		/* Exclusive Hi-Res */
-		case 6:
-			hcount >>= 1;
-			hcount &= 0x1ff;
-			break;
-	}
-
-	return hcount;
-}
-
-int saturn_state::get_vcounter()
-{
-	int vcount;
-
-	vcount = m_screen->vpos();
-
-	/* Exclusive Monitor */
-	if(VDP2_HRES & 4)
-		return vcount & 0x3ff;
-
-	/* Double Density Interlace */
-	if((VDP2_LSMD & 3) == 3)
-		return (vcount & ~1) | (m_screen->frame_number() & 1);
-
-	/* docs says << 1, but according to HW tests it's a typo. */
-	assert((vcount & 0x1ff) < std::size(true_vcount));
-	return (true_vcount[vcount & 0x1ff][VDP2_VRES]); // Non-interlace
-}
 
 void saturn_state::vdp2_state_save_postload()
 {
@@ -8566,7 +8260,6 @@ int saturn_state::vdp2_start()
 /* maybe we should move this to video/stv.c */
 VIDEO_START_MEMBER(saturn_state,vdp2_video_start)
 {
-	int i;
 	m_screen->register_screen_bitmap(m_tmpbitmap);
 	vdp2_start();
 	vdp1_start();
@@ -8575,68 +8268,6 @@ VIDEO_START_MEMBER(saturn_state,vdp2_video_start)
 	m_gfxdecode->gfx(1)->set_source(m_vdp2_legacy.gfx_decode.get());
 	m_gfxdecode->gfx(2)->set_source(m_vdp2_legacy.gfx_decode.get());
 	m_gfxdecode->gfx(3)->set_source(m_vdp2_legacy.gfx_decode.get());
-
-	/* calc V counter offsets */
-	/* 224 mode */
-	for(i = 0; i < 263; i++)
-	{
-		true_vcount[i][0] = i;
-		if(i > 0xec)
-			true_vcount[i][0]+=0xf9;
-	}
-
-	for(i = 0; i < 263; i++)
-	{
-		true_vcount[i][1] = i;
-		if(i > 0xf5)
-			true_vcount[i][1]+=0xf9;
-	}
-
-	/* 256 mode, todo */
-	for(i = 0; i < 263; i++)
-	{
-		true_vcount[i][2] = i;
-		true_vcount[i][3] = i;
-	}
-}
-
-void saturn_state::vdp2_dynamic_res_change()
-{
-	const int d_vres[4] = { 224, 240, 256, 256 };
-	const int d_hres[4] = { 320, 352, 640, 704 };
-	int horz_res,vert_res;
-	int vres_mask;
-
-	// reset odd bit if a dynamic resolution change occurs, seabass ST-V cares!
-	m_vdp2_legacy.odd = 1;
-	vres_mask = (m_vdp2_legacy.pal << 1)|1; //PAL uses mask 3, NTSC uses mask 1
-	vert_res = d_vres[VDP2_VRES & vres_mask];
-
-	if((VDP2_VRES & 3) == 3)
-		popmessage("Illegal VRES MODE");
-
-	/*Double-density interlace mode,doubles the vertical res*/
-	if((VDP2_LSMD & 3) == 3) { vert_res *= 2;  }
-
-	horz_res = d_hres[VDP2_HRES & 3];
-	/*Exclusive modes,they sets the Vertical Resolution without considering the
-	  VRES register.*/
-	if(VDP2_HRES & 4)
-		vert_res = 480;
-
-	{
-		int vblank_period,hblank_period;
-		attoseconds_t refresh;
-		rectangle visarea(0, horz_res-1, 0, vert_res-1);
-
-		vblank_period = get_vblank_duration();
-		hblank_period = get_hblank_duration();
-		refresh  = HZ_TO_ATTOSECONDS(get_pixel_clock()) * (hblank_period) * vblank_period;
-		//printf("%d %d %d %d\n",horz_res,vert_res,horz_res+hblank_period,vblank_period);
-
-		m_screen->configure(hblank_period, vblank_period, visarea, refresh );
-	}
-//  m_screen->set_visible_area(0*8, horz_res-1,0*8, vert_res-1);
 }
 
 /*This is for calculating the rgb brightness*/
@@ -8692,7 +8323,7 @@ void saturn_state::vdp2_fade_effects()
 void saturn_state::vdp2_get_window0_coordinates(int *s_x, int *e_x, int *s_y, int *e_y, int y)
 {
 	/*W0*/
-	switch(VDP2_LSMD & 3)
+	switch(m_vdp2->get_lsmd())
 	{
 		case 0:
 		case 1:
@@ -8708,10 +8339,10 @@ void saturn_state::vdp2_get_window0_coordinates(int *s_x, int *e_x, int *s_y, in
 	// check if line window is enabled
 	if(VDP2_W0LWE)
 	{
-		uint32_t base_mask = VDP2_VRAMSZ ? 0x7ffff : 0x3ffff;
+		uint32_t base_mask = m_vdp2->get_vramsz() ? 0x7ffff : 0x3ffff;
 		uint32_t address = (VDP2_W0LWTA & base_mask) * 2;
 		// double density makes the line window to fetch data every two lines
-		uint8_t interlace = (VDP2_LSMD == 3);
+		uint8_t interlace = (m_vdp2->get_lsmd() == 3);
 		uint32_t vram_data = m_vdp2_vram[(address >> 2)+(y >> interlace)];
 
 		*s_x = (vram_data >> 16) & 0x3ff;
@@ -8719,7 +8350,7 @@ void saturn_state::vdp2_get_window0_coordinates(int *s_x, int *e_x, int *s_y, in
 	}
 	else
 	{
-		switch(VDP2_HRES & 6)
+		switch(m_vdp2->get_hreso() & 6)
 		{
 			/*Normal*/
 			case 0:
@@ -8752,7 +8383,7 @@ void saturn_state::vdp2_get_window0_coordinates(int *s_x, int *e_x, int *s_y, in
 void saturn_state::vdp2_get_window1_coordinates(int *s_x, int *e_x, int *s_y, int *e_y, int y)
 {
 	/*W1*/
-	switch(VDP2_LSMD & 3)
+	switch(m_vdp2->get_lsmd())
 	{
 		case 0:
 		case 1:
@@ -8768,10 +8399,10 @@ void saturn_state::vdp2_get_window1_coordinates(int *s_x, int *e_x, int *s_y, in
 	// check if line window is enabled
 	if(VDP2_W1LWE)
 	{
-		uint32_t base_mask = VDP2_VRAMSZ ? 0x7ffff : 0x3ffff;
+		uint32_t base_mask = m_vdp2->get_vramsz() ? 0x7ffff : 0x3ffff;
 		uint32_t address = (VDP2_W1LWTA & base_mask) * 2;
 		// double density makes the line window to fetch data every two lines
-		uint8_t interlace = (VDP2_LSMD == 3);
+		uint8_t interlace = (m_vdp2->get_lsmd() == 3);
 		uint32_t vram_data = m_vdp2_vram[(address >> 2)+(y >> interlace)];
 
 		*s_x = (vram_data >> 16) & 0x3ff;
@@ -8779,7 +8410,7 @@ void saturn_state::vdp2_get_window1_coordinates(int *s_x, int *e_x, int *s_y, in
 	}
 	else
 	{
-		switch(VDP2_HRES & 6)
+		switch(m_vdp2->get_hreso() & 6)
 		{
 			/*Normal*/
 			case 0:
@@ -8969,14 +8600,14 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 	}
 
 	/* framebuffer interlace */
-	if ( (VDP2_LSMD == 3) && m_vdp1_legacy.framebuffer_double_interlace == 0 )
+	if ( (m_vdp2->get_lsmd() == 3) && m_vdp1_legacy.framebuffer_double_interlace == 0 )
 		interlace_framebuffer = 1;
 	else
 		interlace_framebuffer = 0;
 
 	/*Guess:Some games needs that the horizontal sprite size to be doubled
 	  (TODO: understand the proper settings,it might not work like this)*/
-	if(VDP1_TVM() == 0 && VDP2_HRES & 2) // astrass & findlove
+	if(VDP1_TVM() == 0 && BIT(m_vdp2->get_hreso(), 1)) // astrass & findlove
 		double_x = 1;
 	else
 		double_x = 0;
@@ -9415,7 +9046,7 @@ uint32_t saturn_state::screen_update_vdp2(screen_device &screen, bitmap_rgb32 &b
 
 	vdp2_draw_back(m_tmpbitmap,cliprect);
 
-	if(VDP2_DISP)
+	if(m_vdp2->get_disp())
 	{
 		uint8_t pri;
 

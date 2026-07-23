@@ -17,6 +17,8 @@
 #include "315-5838_317-0229_comp.h"
 #include "saturn_dcc.h"
 #include "saturn_scu.h"
+//#include "saturn_vdp1.h"
+#include "saturn_vdp2.h"
 #include "smpc.h"
 
 #include "emupal.h"
@@ -38,6 +40,8 @@ public:
 			m_scsp(*this, "scsp"),
 			m_smpc_hle(*this, "smpc"),
 			m_scu(*this, "scu"),
+			//m_vdp1(*this, "vdp1"),
+			m_vdp2(*this, "vdp2"),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_screen(*this, "screen"),
 			m_palette(*this, "palette")
@@ -101,15 +105,7 @@ protected:
 	struct {
 		std::unique_ptr<uint8_t[]>      gfx_decode;
 		bitmap_rgb32 roz_bitmap[2];
-		uint8_t     dotsel = 0;
-		uint8_t     pal = 0;
-		uint8_t     odd = 0;
-		uint16_t    h_count = 0;
-		uint16_t    v_count = 0;
-		uint8_t     exltfg = 0;
-		uint8_t     exsyfg = 0;
 		int       old_crmd = 0;
-		int       old_tvmd = 0;
 	} m_vdp2_legacy;
 
 	required_device<sh7604_device> m_maincpu;
@@ -119,6 +115,8 @@ protected:
 	required_device<scsp_device> m_scsp;
 	required_device<smpc_hle_device> m_smpc_hle;
 	required_device<saturn_scu_device> m_scu;
+//  required_device<saturn_vdp1_device> m_vdp1;
+	required_device<saturn_vdp2_device> m_vdp2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -262,18 +260,6 @@ protected:
 
 	/* VDP2 */
 
-	uint8_t get_vblank();
-	uint8_t get_hblank();
-	int get_hcounter();
-	int get_vcounter();
-	int get_vblank_duration();
-	int get_hblank_duration();
-	int get_pixel_clock();
-	uint8_t get_odd_bit();
-	void vdp2_dynamic_res_change();
-	int get_vblank_start_position();
-	int get_ystep_count();
-
 	void refresh_palette_data();
 	inline int vdp2_window_process(int x,int y);
 	void vdp2_get_window0_coordinates(int *s_x, int *e_x, int *s_y, int *e_y, int y);
@@ -325,7 +311,6 @@ protected:
 	void vdp2_draw_NBG3(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vdp2_draw_RBG0(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t pri);
-	int true_vcount[263][4];
 
 	void vdp2_state_save_postload();
 	void vdp2_exit();

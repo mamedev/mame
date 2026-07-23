@@ -136,8 +136,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 	int scanline = param;
 	int y_step, vblank_line;
 
-	vblank_line = get_vblank_start_position();
-	y_step = get_ystep_count();
+	vblank_line = m_vdp2->get_vblank_start_position();
+	y_step = m_vdp2->get_ystep_count();
 
 	//popmessage("%08x %d T0 %d T1 %d %08x",m_scu.ism ^ 0xffffffff,max_y,m_scu_regs[36],m_scu_regs[37],m_scu_regs[38]);
 
@@ -150,7 +150,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 		m_scu->vblank_in_w(1);
 
 		// flip odd bit here
-		m_vdp2_legacy.odd ^= 1;
+		m_vdp2->flip_odd_bit();
 		/* TODO: when Automatic Draw actually happens? Night Striker S is very fussy on this, and it looks like that VDP1 starts at more or less vblank-in time ... */
 		vdp1_video_update();
 	}
@@ -182,8 +182,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_slave_scanline )
 	int scanline = param;
 	int y_step, vblank_line;
 
-	vblank_line = get_vblank_start_position();
-	y_step = get_ystep_count();
+	vblank_line = m_vdp2->get_vblank_start_position();
+	y_step = m_vdp2->get_ystep_count();
 
 	if(scanline == vblank_line*y_step)
 		m_slave->set_input_line(0x6, ASSERT_LINE);
@@ -313,8 +313,7 @@ void saturn_state::dot_select_w(int state)
 	m_slave->set_unscaled_clock(xtal / 2);
 	m_dcc->set_unscaled_clock(xtal / 2);
 
-	m_vdp2_legacy.dotsel = state ^ 1;
-	vdp2_dynamic_res_change();
+	m_vdp2->set_unscaled_clock(xtal);
 }
 
 

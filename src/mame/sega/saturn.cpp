@@ -462,7 +462,7 @@ public:
 	void saturnus(machine_config &config);
 	void saturnkr(machine_config &config);
 
-	template <bool is_pal> void init_saturn();
+	void init_saturn();
 
 	DECLARE_INPUT_CHANGED_MEMBER(tray_open);
 	DECLARE_INPUT_CHANGED_MEMBER(tray_close);
@@ -564,10 +564,14 @@ void sat_console_state::saturn_mem(address_map &map)
 	map(0x05c00000, 0x05c7ffff).rw(FUNC(sat_console_state::vdp1_vram_r), FUNC(sat_console_state::vdp1_vram_w));
 	map(0x05c80000, 0x05cbffff).rw(FUNC(sat_console_state::vdp1_framebuffer0_r), FUNC(sat_console_state::vdp1_framebuffer0_w));
 	map(0x05d00000, 0x05d0001f).rw(FUNC(sat_console_state::vdp1_regs_r), FUNC(sat_console_state::vdp1_regs_w));
+	/* VDP2 */
 	map(0x05e00000, 0x05e7ffff).mirror(0x80000).rw(FUNC(sat_console_state::vdp2_vram_r), FUNC(sat_console_state::vdp2_vram_w));
 	map(0x05f00000, 0x05f7ffff).rw(FUNC(sat_console_state::vdp2_cram_r), FUNC(sat_console_state::vdp2_cram_w));
 	map(0x05f80000, 0x05fbffff).rw(FUNC(sat_console_state::vdp2_regs_r), FUNC(sat_console_state::vdp2_regs_w));
+	map(0x05f80000, 0x05fbffff).m(m_vdp2, FUNC(saturn_vdp2_device::regs_map));
+	/* SCU */
 	map(0x05fe0000, 0x05fe00cf).m(m_scu, FUNC(saturn_scu_device::regs_map));
+
 	map(0x06000000, 0x060fffff).ram().mirror(0x21f00000).share("workram_h");
 	map(0x40000000, 0x46ffffff).nopw(); // associative purge page
 	map(0x60000000, 0x600003ff).nopw(); // cache address array
@@ -679,7 +683,6 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 	// save states
 	save_item(NAME(m_en_68k));
 	save_item(NAME(m_scsp_last_line));
-	save_item(NAME(m_vdp2_legacy.odd));
 }
 
 // diehardt tests RAM address $25e7ffe bit 2 with Slave during FRT minit irq
@@ -710,7 +713,6 @@ MACHINE_RESET_MEMBER(sat_console_state,saturn)
 	m_slave->set_unscaled_clock(MASTER_CLOCK_320/2);
 
 	m_vdp2_legacy.old_crmd = -1;
-	m_vdp2_legacy.old_tvmd = -1;
 }
 
 uint8_t sat_console_state::saturn_pdr1_direct_r()
@@ -859,6 +861,12 @@ void sat_console_state::saturn(machine_config &config)
 	m_screen->set_raw(MASTER_CLOCK_320/8, 427, 0, 320, 263, 0, 224);
 	m_screen->set_screen_update(FUNC(sat_console_state::screen_update_vdp2));
 
+//	SATURN_VDP1(config, m_vdp1, MASTER_CLOCK_320);
+
+	SATURN_VDP2(config, m_vdp2, MASTER_CLOCK_320);
+	m_vdp2->set_screen_tag("screen");
+	m_vdp2->set_is_pal(false);
+
 	PALETTE(config, m_palette).set_entries(2048+(2048*2)); //standard palette + extra memory for rgb brightness.
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_stv);
@@ -911,6 +919,8 @@ void sat_console_state::saturnus(machine_config &config)
 void sat_console_state::saturneu(machine_config &config)
 {
 	saturn(config);
+	m_vdp2->set_is_pal(true);
+
 	SATURN_CDB(config, "saturn_cdb", 16000000);
 
 	SOFTWARE_LIST(config, "cd_list").set_original("saturn").set_filter("PAL");
@@ -950,11 +960,8 @@ void sat_console_state::saturnkr(machine_config &config)
 }
 
 
-template <bool is_pal> void sat_console_state::init_saturn()
+void sat_console_state::init_saturn()
 {
-	// TODO: setter for (missing) VDP2 device
-	m_vdp2_legacy.pal = is_pal;
-
 	// set compatible options
 	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 	m_slave->sh2drc_set_options(SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
@@ -1018,9 +1025,9 @@ ROM_START( hisaturn )
 ROM_END
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS              INIT           COMPANY    FULLNAME            FLAGS */
-CONS( 1994, saturn,   0,      0,      saturnus, saturn, sat_console_state, init_saturn<false>, "Sega",    "Saturn (USA)",     MACHINE_NOT_WORKING )
-CONS( 1994, saturnjp, saturn, 0,      saturnjp, saturn, sat_console_state, init_saturn<false>, "Sega",    "Saturn (Japan)",   MACHINE_NOT_WORKING )
-CONS( 1994, saturneu, saturn, 0,      saturneu, saturn, sat_console_state, init_saturn<true>,  "Sega",    "Saturn (PAL)",     MACHINE_NOT_WORKING )
-CONS( 1995, saturnkr, saturn, 0,      saturnkr, saturn, sat_console_state, init_saturn<false>, "Samsung", "Saturn (Korea)",   MACHINE_NOT_WORKING )
-CONS( 1995, vsaturn,  saturn, 0,      saturnjp, saturn, sat_console_state, init_saturn<false>, "JVC",     "V-Saturn",         MACHINE_NOT_WORKING )
-CONS( 1995, hisaturn, saturn, 0,      saturnjp, saturn, sat_console_state, init_saturn<false>, "Hitachi", "HiSaturn",         MACHINE_NOT_WORKING )
+CONS( 1994, saturn,   0,      0,      saturnus, saturn, sat_console_state, init_saturn, "Sega",    "Saturn (USA)",     MACHINE_NOT_WORKING )
+CONS( 1994, saturnjp, saturn, 0,      saturnjp, saturn, sat_console_state, init_saturn, "Sega",    "Saturn (Japan)",   MACHINE_NOT_WORKING )
+CONS( 1994, saturneu, saturn, 0,      saturneu, saturn, sat_console_state, init_saturn, "Sega",    "Saturn (PAL)",     MACHINE_NOT_WORKING )
+CONS( 1995, saturnkr, saturn, 0,      saturnkr, saturn, sat_console_state, init_saturn, "Samsung", "Saturn (Korea)",   MACHINE_NOT_WORKING )
+CONS( 1995, vsaturn,  saturn, 0,      saturnjp, saturn, sat_console_state, init_saturn, "JVC",     "V-Saturn",         MACHINE_NOT_WORKING )
+CONS( 1995, hisaturn, saturn, 0,      saturnjp, saturn, sat_console_state, init_saturn, "Hitachi", "HiSaturn",         MACHINE_NOT_WORKING )
