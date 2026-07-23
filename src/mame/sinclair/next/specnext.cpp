@@ -211,6 +211,7 @@ protected:
 	void memory_change(u16 port, u8 data);
 	u16 get_layer2_active_page(u8 bank);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void on_scanline(u32 scanline);
 
 	required_device<z80n_device> m_maincpu;
 
@@ -1034,6 +1035,15 @@ void specnext_state::update_video_mode()
 	m_eff_nr_03_machine_timing = m_nr_03_machine_timing;
 	m_eff_nr_05_5060 = m_nr_05_5060;
 	LOG("%s %dHz\n", machine_name, m_nr_05_5060 ? 60 : 50);
+}
+
+void specnext_state::on_scanline(u32 scanline)
+{
+	if (m_sprites->is_dirty())
+	{
+		m_screen->update_now();
+		m_sprites->update_cache_if_dirty();
+	}
 }
 
 u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -2361,12 +2371,10 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		nr_33_lores_scrolly_w(nr_wr_dat);
 		break;
 	case 0x34:
-		m_screen->update_now();
 		m_sprites->mirror_data_w(nr_wr_dat);
 		break;
 	case 0x35: case 0x36:  case 0x37: case 0x38: case 0x39:
 	case 0x75: case 0x76:  case 0x77: case 0x78: case 0x79:
-		m_screen->update_now();
 		m_sprites->mirror_inc_w(BIT(nr_wr_reg, 6));
 		m_sprites->mirror_index_w((nr_wr_reg & 0x3f) - 0x35);
 		m_sprites->mirror_data_w(nr_wr_dat);
@@ -2414,7 +2422,6 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		}
 		break;
 	case 0x4b:
-		m_screen->update_now();
 		nr_4b_sprite_transparent_index_w(nr_wr_dat);
 		break;
 	case 0x4c:
@@ -4243,6 +4250,7 @@ void specnext_state::tbblue(machine_config &config)
 
 	m_screen->set_raw(28_MHz_XTAL / 2, 456 << 1, 312,  { 0, (359 << 1) | 1, 0, 287 });
 	m_screen->set_screen_update(FUNC(specnext_state::screen_update));
+	m_screen->scanline().set(FUNC(specnext_state::on_scanline));
 	m_screen->set_no_palette();
 
 	PALETTE(config.replace(), m_palette, palette_device::BLACK, 512 * (3 + 1 * 2) + 1); // ula tm l2 s*2 +1 == fallback
