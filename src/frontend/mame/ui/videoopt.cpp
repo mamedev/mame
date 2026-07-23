@@ -64,7 +64,7 @@ void menu_video_targets::populate()
 	}
 
 	// add option for snapshot target
-	item_append("Snapshot", 0, &machine().video().snapshot_target());
+	item_append(_("Snapshot", 0, &machine().video().snapshot_target());
 	item_append(menu_item_type::SEPARATOR);
 }
 
