@@ -20,8 +20,10 @@ public:
 
 	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 
+	auto vint_cb() { return m_vint_cb.bind(); }
+	auto hint_cb() { return m_hint_cb.bind(); }
+
 	// TODO: follows stuff that eventually needs to be privatized
-	void flip_odd_bit() { m_odd_bit ^= 1; };
 	u8 get_hreso() { return m_hreso; }
 	u8 get_vreso() { return m_vreso; }
 	bool get_disp() { return m_disp; }
@@ -37,8 +39,12 @@ protected:
 	virtual void device_clock_changed() override;
 private:
 	required_device<screen_device> m_screen;
+	devcb_write_line m_vint_cb;
+	devcb_write_line m_hint_cb;
 
 	// CRTC
+	emu_timer *m_video_sync_timer;
+
 	bool m_is_pal;
 	u16 m_tvmd, m_old_tvmd;
 	u8 m_disp, m_bdclmd, m_lsmd, m_vreso, m_hreso;
@@ -50,9 +56,13 @@ private:
 
 	bool m_exltfg, m_exsyfg;
 
+	u16 m_hdisplay, m_vdisplay;
 	// size = 313 for PAL
 	u16 true_vcount[313][4];
 
+	TIMER_CALLBACK_MEMBER( sync_timer_cb );
+
+	void init_vcounter_table();
 	void reconfigure_crtc();
 
 	int get_vblank();

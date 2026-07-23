@@ -130,7 +130,40 @@ TODO:
 - VDP1 timing and CEF emulation isn't accurate at all.
 */
 
+void saturn_state::vint_callback(int state)
+{
+	if (m_prev_vint != state)
+	{
+		if (state)
+		{
+			m_scu->vblank_in_w(1);
+			m_slave->set_input_line(0x6, ASSERT_LINE);
+		}
+		else
+			m_scu->vblank_out_w(1);
+	}
 
+	m_prev_vint = state;
+}
+
+void saturn_state::hint_callback(int state)
+{
+	if (!m_prev_hint && state)
+	{
+		int scanline = m_screen->vpos();
+		int y_step = m_vdp2->get_ystep_count();
+
+		m_scu->hblank_in_w(1);
+		m_slave->set_input_line(0x2, ASSERT_LINE);
+
+		// TODO: this must really count on its own, akin to Yamaha YM7101
+		m_scu->check_scanline_timers(scanline, y_step);
+	}
+
+	m_prev_hint = state;
+}
+
+// TODO: stuff that should really be in VDP1
 TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 {
 	int scanline = param;
@@ -141,25 +174,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 
 	//popmessage("%08x %d T0 %d T1 %d %08x",m_scu.ism ^ 0xffffffff,max_y,m_scu_regs[36],m_scu_regs[37],m_scu_regs[38]);
 
-	if(scanline == 0*y_step)
+	if(scanline == vblank_line*y_step)
 	{
-		m_scu->vblank_out_w(1);
-	}
-	else if(scanline == vblank_line*y_step)
-	{
-		m_scu->vblank_in_w(1);
-
-		// flip odd bit here
-		m_vdp2->flip_odd_bit();
 		/* TODO: when Automatic Draw actually happens? Night Striker S is very fussy on this, and it looks like that VDP1 starts at more or less vblank-in time ... */
 		vdp1_video_update();
 	}
-	else if((scanline % y_step) == 0 && scanline < vblank_line * y_step)
-	{
-		m_scu->hblank_in_w(1);
-	}
 
-	if(scanline == (vblank_line+1) * y_step)
+	if(scanline == (vblank_line + 1) * y_step)
 	{
 		/* docs mentions that VBE happens one line after vblank-in. */
 		if(VDP1_VBE())
@@ -173,22 +194,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 		m_scu->vdp1_end_w(1);
 	}
 
-	m_scu->check_scanline_timers(scanline, y_step);
-}
-
-// TODO: check what really uses this
-TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_slave_scanline )
-{
-	int scanline = param;
-	int y_step, vblank_line;
-
-	vblank_line = m_vdp2->get_vblank_start_position();
-	y_step = m_vdp2->get_ystep_count();
-
-	if(scanline == vblank_line*y_step)
-		m_slave->set_input_line(0x6, ASSERT_LINE);
-	else if((scanline % y_step) == 0 && scanline < vblank_line*y_step)
-		m_slave->set_input_line(0x2, ASSERT_LINE);
 }
 
 static const gfx_layout tiles8x8x4_layout =

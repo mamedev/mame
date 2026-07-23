@@ -819,7 +819,6 @@ void sat_console_state::saturn(machine_config &config)
 	m_slave->set_addrmap(AS_PROGRAM, &sat_console_state::saturn_mem);
 	m_slave->set_is_slave(1);
 	m_slave->set_irq_acknowledge_callback(m_dcc, FUNC(saturn_dcc_device::irq_ack_cb));
-	TIMER(config, "slave_scantimer").configure_scanline(FUNC(sat_console_state::saturn_slave_scanline), "screen", 0, 1);
 
 	SATURN_DCC(config, m_dcc, MASTER_CLOCK_352);
 	m_dcc->set_master_cpu(m_maincpu);
@@ -866,6 +865,8 @@ void sat_console_state::saturn(machine_config &config)
 	SATURN_VDP2(config, m_vdp2, MASTER_CLOCK_320);
 	m_vdp2->set_screen_tag("screen");
 	m_vdp2->set_is_pal(false);
+	m_vdp2->vint_cb().set(FUNC(sat_console_state::vint_callback));
+	m_vdp2->hint_cb().set(FUNC(sat_console_state::hint_callback));
 
 	PALETTE(config, m_palette).set_entries(2048+(2048*2)); //standard palette + extra memory for rgb brightness.
 

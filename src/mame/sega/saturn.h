@@ -136,8 +136,9 @@ protected:
 	DECLARE_VIDEO_START(vdp2_video_start);
 	uint32_t screen_update_vdp2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(saturn_scanline);
-	TIMER_DEVICE_CALLBACK_MEMBER(saturn_slave_scanline);
-
+	void vint_callback(int state);
+	void hint_callback(int state);
+	int m_prev_hint, m_prev_vint;
 
 	TIMER_CALLBACK_MEMBER(vdp1_draw_end);
 	void soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

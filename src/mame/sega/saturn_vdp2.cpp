@@ -22,11 +22,55 @@ DEFINE_DEVICE_TYPE(SATURN_VDP2, saturn_vdp2_device, "saturn_vdp2", "Sega Saturn 
 saturn_vdp2_device::saturn_vdp2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SATURN_VDP2, tag, owner, clock)
 	, m_screen(*this, finder_base::DUMMY_TAG)
+	, m_vint_cb(*this)
+	, m_hint_cb(*this)
 	, m_is_pal(false)
 {
 }
 
+
 void saturn_vdp2_device::device_start()
+{
+	m_video_sync_timer = timer_alloc(FUNC(saturn_vdp2_device::sync_timer_cb), this);
+	init_vcounter_table();
+
+	save_item(NAME(m_tvmd));
+	save_item(NAME(m_old_tvmd));
+	save_item(NAME(m_disp));
+	save_item(NAME(m_bdclmd));
+	save_item(NAME(m_lsmd));
+	save_item(NAME(m_vreso));
+	save_item(NAME(m_hreso));
+	save_item(NAME(m_odd_bit));
+	save_item(NAME(m_hdisplay));
+	save_item(NAME(m_vdisplay));
+
+	save_item(NAME(m_exten));
+	save_item(NAME(m_exlten));
+	save_item(NAME(m_exsyen));
+	save_item(NAME(m_dasel));
+	save_item(NAME(m_exbgen));
+
+	save_item(NAME(m_exltfg));
+	save_item(NAME(m_exsyfg));
+
+	save_item(NAME(m_hcounter_latch));
+	save_item(NAME(m_vcounter_latch));
+}
+
+void saturn_vdp2_device::device_reset()
+{
+	m_video_sync_timer->adjust(m_screen->time_until_pos(0), 0);
+
+	m_odd_bit = 1;
+	// shouldn't really matter
+	m_old_tvmd = 0xffff;
+	m_hreso = 0;
+	m_vreso = 0;
+	reconfigure_crtc();
+}
+
+void saturn_vdp2_device::init_vcounter_table()
 {
 	u16 i;
 	// put vcounter inside a table
@@ -52,35 +96,8 @@ void saturn_vdp2_device::device_start()
 		true_vcount[i][2] = i;
 		true_vcount[i][3] = i;
 	}
-
-	save_item(NAME(m_tvmd));
-	save_item(NAME(m_old_tvmd));
-	save_item(NAME(m_disp));
-	save_item(NAME(m_bdclmd));
-	save_item(NAME(m_lsmd));
-	save_item(NAME(m_vreso));
-	save_item(NAME(m_hreso));
-	save_item(NAME(m_odd_bit));
-
-	save_item(NAME(m_exten));
-	save_item(NAME(m_exlten));
-	save_item(NAME(m_exsyen));
-	save_item(NAME(m_dasel));
-	save_item(NAME(m_exbgen));
-
-	save_item(NAME(m_exltfg));
-	save_item(NAME(m_exsyfg));
-
-	save_item(NAME(m_hcounter_latch));
-	save_item(NAME(m_vcounter_latch));
 }
 
-void saturn_vdp2_device::device_reset()
-{
-	m_odd_bit = 1;
-	// shouldn't really matter
-	m_old_tvmd = 0xffff;
-}
 
 /*
  *
@@ -147,9 +164,14 @@ void saturn_vdp2_device::regs_map(address_map &map)
 		// Exclusive modes force this to '1'
 		const bool odd_flag = m_odd_bit | BIT(m_hreso, 2);
 
+		// if DISP off then return '1'
+		const bool vblank_flag = get_vblank() | (!m_disp);
+
+		// TODO: is hblank supposed to return '1' on DISP off as well?
+
 		const u16 res = ((m_exltfg << 9)
 			| (m_exsyfg << 8)
-			| (get_vblank() << 3)
+			| (vblank_flag << 3)
 			| (get_hblank() << 2)
 			| (odd_flag << 1)
 			| m_is_pal);
@@ -266,8 +288,8 @@ void saturn_vdp2_device::reconfigure_crtc()
 	vert_res = d_vres[m_vreso & vres_mask];
 
 	// TODO: this should just be reserved and return VRESO == 2
-	if((m_vreso & 3) == 3)
-		popmessage("Illegal VRES MODE");
+	//if((m_vreso & 3) == 3)
+	//	popmessage("Illegal VRES MODE");
 
 	// In double density interlace bump by x2 the vertical resolution
 	if(m_lsmd == 3) { vert_res *= 2;  }
@@ -287,6 +309,10 @@ void saturn_vdp2_device::reconfigure_crtc()
 	hblank_period = get_hblank_duration();
 	refresh  = HZ_TO_ATTOSECONDS(get_pixel_clock()) * (hblank_period) * vblank_period;
 	//printf("%d %d %d %d\n",horz_res,vert_res,horz_res+hblank_period,vblank_period);
+
+	// save these to reuse them in scan timer
+	m_hdisplay = horz_res;
+	m_vdisplay = vert_res;
 
 	m_screen->configure(hblank_period, vblank_period, visarea, refresh );
 }
@@ -344,8 +370,6 @@ int saturn_vdp2_device::get_vcounter()
 // TODO: refine hblank/vblank positions
 int saturn_vdp2_device::get_hblank()
 {
-	// TODO: is it supposed to return '1' on DISP off as well?
-
 	const rectangle &visarea = m_screen->visible_area();
 	int cur_h = m_screen->hpos();
 
@@ -357,10 +381,6 @@ int saturn_vdp2_device::get_hblank()
 
 int saturn_vdp2_device::get_vblank()
 {
-	// if DISP off then return '1'
-	if (!m_disp)
-		return 1;
-
 	int cur_v, vblank_line;
 	cur_v = m_screen->vpos();
 
@@ -397,5 +417,34 @@ int saturn_vdp2_device::get_ystep_count()
 		y_step = 1;
 
 	return y_step;
+}
+
+TIMER_CALLBACK_MEMBER(saturn_vdp2_device::sync_timer_cb)
+{
+//	int hpos = m_screen->hpos();
+	int vpos = m_screen->vpos();
+	int hsync = get_hblank();
+	int vsync = get_vblank();
+
+	m_vint_cb(vsync);
+	m_hint_cb(hsync);
+
+	if (vsync)
+	{
+		// flip odd bit here
+		m_odd_bit ^= 1;
+		m_video_sync_timer->adjust(m_screen->time_until_pos(0, 0));
+	}
+	else
+	{
+		if (hsync)
+		{
+			int ystep = get_ystep_count();
+
+			m_video_sync_timer->adjust(m_screen->time_until_pos(vpos + ystep, 0));
+		}
+		else
+			m_video_sync_timer->adjust(m_screen->time_until_pos(vpos, m_hdisplay));
+	}
 }
 
