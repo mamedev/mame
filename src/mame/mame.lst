@@ -612,6 +612,9 @@ s612
 s700
 x7000
 
+@source:akai/xr10.cpp
+xr10
+
 @source:alesis/alesis.cpp
 hr16
 hr16b
