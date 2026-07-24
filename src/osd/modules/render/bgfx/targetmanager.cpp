@@ -92,7 +92,10 @@ bgfx_target* target_manager::target(uint32_t screen, const std::string &name)
 	}
 	else
 	{
-		osd_printf_verbose("Warning: Attempting to retrieve a nonexistent target '%s' for screen %d\n", name, screen);
+		// "output" is intentionally absent when the chain's final pass renders
+		// directly to the backbuffer (BGFX_INVALID_HANDLE fallback in setup_view).
+		if (name != "output")
+			osd_printf_verbose("Warning: Attempting to retrieve a nonexistent target '%s' for screen %d\n", name, screen);
 		return nullptr;
 	}
 }
