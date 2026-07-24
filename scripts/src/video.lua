@@ -741,6 +741,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/ili9335.h,VIDEOS["ILI9335"] = true
+--------------------------------------------------
+
+if VIDEOS["ILI9335"] then
+	files {
+		MAME_DIR .. "src/devices/video/ili9335.cpp",
+		MAME_DIR .. "src/devices/video/ili9335.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/ims_cvc.h,VIDEOS["IMS_CVC"] = true
 --------------------------------------------------
 

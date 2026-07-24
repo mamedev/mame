@@ -102,6 +102,11 @@ TIMER_CALLBACK_MEMBER(ti85_state::crystal_timer_tick)
 	}
 }
 
+TIMER_CALLBACK_MEMBER(ti85_state::rtc_tick)
+{
+    m_ti84p_rtc_currtime++;
+}
+
 void ti85_state::ti8x_update_bank(address_space &space, uint8_t bank, uint8_t *base, uint8_t page, bool is_ram)
 {
 	static const char *const tag[] = {"bank1", "bank2", "bank3", "bank4"};
@@ -147,6 +152,11 @@ void ti85_state::update_ti83p_memory ()
 
 void ti85_state::update_ti83pse_memory ()
 {
+	if (m_model == TI84PCSE) {
+		update_ti84pcse_memory();
+		return;
+	}
+	
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	m_membank[0]->set_bank(m_booting ? (m_model==TI84P ? 0x3f : 0x7f) : 0);
@@ -168,6 +178,46 @@ void ti85_state::update_ti83pse_memory ()
 		m_membank[2]->set_bank(m_ti8x_memory_page_2);
 
 		m_membank[3]->set_bank(m_ti8x_memory_page_3 + 0x80);
+
+	}
+}
+
+void ti85_state::update_ti84pcse_memory ()
+{
+	//address_space &space = m_maincpu->space(AS_PROGRAM);
+
+	uint16_t memA = m_ti8x_memory_page_1 & 0x7F;
+	uint16_t memB = m_ti8x_memory_page_2 & 0x7F;
+
+	if (m_ti8x_memory_page_1 & 0x80) {
+		memA = (memA & 0x07) | 0x100;
+	} else if (m_ti84pcse_portE) {
+		memA |= (m_ti84pcse_portE & 0x1) << 7;
+	}
+
+	if (m_ti8x_memory_page_2 & 0x80) {
+		memB = (memB & 0x07) | 0x100;
+	} else if (m_ti84pcse_portF) {
+		memB |= (m_ti84pcse_portF & 0x1) << 7;
+	}
+
+	m_membank[0]->set_bank(m_booting ? 0xff : 0);
+
+	if (m_ti83p_port4 & 1)
+	{
+		m_membank[1]->set_bank(memA & 0x3fe);
+
+		m_membank[2]->set_bank(memA | 1);
+
+		m_membank[3]->set_bank(memB);
+	}
+	else
+	{
+		m_membank[1]->set_bank(memA);
+
+		m_membank[2]->set_bank(memB);
+
+		m_membank[3]->set_bank(m_ti8x_memory_page_3 | 0x100);
 
 	}
 }
@@ -377,6 +427,9 @@ void ti85_state::ti8xpse_init_common()
 	m_crystal_timer2 = timer_alloc(FUNC(ti85_state::crystal_timer_tick), this);
 	m_crystal_timer3 = timer_alloc(FUNC(ti85_state::crystal_timer_tick), this);
 
+    m_ti84_rtc = timer_alloc(FUNC(ti85_state::rtc_tick), this);
+    m_ti84_rtc->adjust(attotime(1, 0), 0, attotime(1, 0));
+
 		/* save states and debugging */
 	save_item(NAME(m_ctimer_interrupt_status));
 	save_item(NAME(m_timer_interrupt_status));
@@ -384,6 +437,8 @@ void ti85_state::ti8xpse_init_common()
 	save_item(NAME(m_ti8x_memory_page_2));
 	save_item(NAME(m_ti8x_memory_page_3));
 	save_item(NAME(m_ti83p_port4));
+	save_item(NAME(m_ti84pcse_portE));
+	save_item(NAME(m_ti84pcse_portF));
 }
 
 
@@ -400,6 +455,15 @@ MACHINE_START_MEMBER(ti85_state,ti84pse)
 
 	ti8xpse_init_common();
 }
+
+
+MACHINE_START_MEMBER(ti85_state,ti84pcse)
+{
+	m_model = TI84PCSE;
+
+	ti8xpse_init_common();
+}
+
 
 MACHINE_START_MEMBER(ti85_state,ti84p)
 {
@@ -840,6 +904,29 @@ void ti85_state::ti83pse_port_0007_w(uint8_t data)
 	update_ti83pse_memory();
 }
 
+uint8_t ti85_state::ti84pcse_port_000E_r()
+{
+	return m_ti84pcse_portE;
+}
+
+uint8_t ti85_state::ti84pcse_port_000F_r()
+{
+	return m_ti84pcse_portF;
+}
+
+void ti85_state::ti84pcse_port_000E_w(uint8_t data)
+{
+	m_ti84pcse_portE = data & 0x3;
+	update_ti84pcse_memory();
+}
+
+void ti85_state::ti84pcse_port_000F_w(uint8_t data)
+{
+	m_ti84pcse_portF = data & 0x3;
+	update_ti84pcse_memory();
+}
+
+
 void ti85_state::ti83p_port_0014_w(uint8_t data)
 {
 	m_flash_unlocked = data;
@@ -873,6 +960,46 @@ uint8_t ti85_state::ti83pse_port_0021_r()
 {
 	return m_ti83pse_port21;
 }
+
+inline uint8_t ti85_state::ti84p_rtc_r(uint32_t timer, uint8_t offset) {
+    return (uint8_t)(timer >> offset);
+}
+
+inline void ti85_state::ti84p_rtc_w(uint32_t &timer, uint8_t offset, uint8_t data) {
+    timer = (timer & ~(0xFF << offset)) | (data << offset);
+}
+
+uint8_t ti85_state::ti84p_rtc_control_r() {
+    return ti84p_rtc_control;
+}
+
+void ti85_state::ti84p_rtc_control_w(uint8_t data) {
+    if ((data & 0b10) && !(ti84p_rtc_control & 0b10))
+        m_ti84p_rtc_currtime = m_ti84p_rtc_basetime;
+
+    m_ti84_rtc->enable((data & 0b01) == 0b01);
+    ti84p_rtc_control = data & 0b11;
+}
+
+uint8_t ti85_state::ti84p_rtc_basetime_r(offs_t offset) {
+    return ti84p_rtc_r(m_ti84p_rtc_basetime, offset * 8);
+}
+
+void ti85_state::ti84p_rtc_basetime_w(offs_t offset, uint8_t data) {
+    ti84p_rtc_w(m_ti84p_rtc_basetime, offset * 8, data);
+}
+
+uint8_t ti85_state::ti84p_rtc_currtime_r(offs_t offset) {
+    if (!(ti84p_rtc_control & 0b01))
+        return 0;
+
+    return ti84p_rtc_r(m_ti84p_rtc_currtime, offset * 8);
+}
+
+void ti85_state::ti84p_rtc_currtime_w(offs_t offset, uint8_t data) {
+    ti84p_rtc_w(m_ti84p_rtc_currtime, offset * 8, data);
+}
+
 
 uint8_t ti85_state::ti84pse_port_0055_r()
 {
