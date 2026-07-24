@@ -31,8 +31,9 @@ Banpresto "Chara Medal Island" series:
 *** BP-04 - ??? - ??? (possibly Eye Shield 21 - Nerae!! Gyakuten Touchdown - アイシールド21 狙え!!逆転タッチダウン)
     BP-05 - Chibi Maruko-chan - Wanage de Asobo!! - ちびまる子ちゃん輪投げで遊ぼ!!
 **  BP-06 - Doraemon - SOS! Itazura Nezumi wo Yattsukero!! - ドラえもん SOS!いたずらネズミをやっつけろ!!
-**  BP-07 - GeGeGe no Kitarou - Taose! Seiyou Youkai Gundan - ゲゲゲの鬼太郎 倒せ！西洋妖怪軍団
+    BP-07 - GeGeGe no Kitarou - Taose! Seiyou Youkai Gundan - ゲゲゲの鬼太郎 倒せ！西洋妖怪軍団
     BP-08 - Keroro Gunsou - Hacha Mecha Yakyu Taikai de Arimasu!! - ケロロ軍曹 ハチャメチャ野球大会であります!!
+    BP-09 - From TV Animation One Piece Nakama o Tasukero! Dr. Chopper - From TV Animation One Piece 仲間を助けろ！ ドクター Dr. チョッパー
 almost surely more
 
 Takara / Tomy "VS medal" series (games show produced by Amodio and Tomy copyright on title screen):
@@ -163,6 +164,17 @@ ROM_START( cmcwa )
 	ROM_LOAD( "bp05-s_ver1.0.ic4", 0x000000, 0x100000, CRC(5ee334cc) SHA1(6cbc237980d2aadb28970bd5eecec3c2cf9f873f) )
 ROM_END
 
+ROM_START( gkitarou )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "bp07-p_ver1.0.ic5", 0x000000, 0x400000, CRC(ac96d432) SHA1(671fc31ecb1e6cfbd6bdc6c4d3084c8e665d5aa6) ) // 111xxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "bp07-g_ver1.0.ic6", 0x000000, 0x400000, CRC(dc43236f) SHA1(98b27141d215b490216f5685886c30840e4b1983) ) // 1xxxxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "bp07-s_ver1.0.ic4", 0x000000, 0x100000, CRC(56bbede1) SHA1(c68a21ede8f8379ad8f497d3df049cb05131ecc6) )
+ROM_END
+
 ROM_START( kghmytda )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "bp08-p_ver1.0.ic5", 0x000000, 0x400000, CRC(d8d49df1) SHA1(7060094305bea6ee9f58ff42c23c64961fc825a9) ) // 111xxxxxxxxxxxxxxxxxxx = 0xFF
@@ -172,6 +184,17 @@ ROM_START( kghmytda )
 
 	ROM_REGION( 0x100000, "oki", 0 )
 	ROM_LOAD( "bp08-s_ver1.0.ic4", 0x000000, 0x100000, CRC(b30b9f44) SHA1(98c60021c70524dcf9d55bb0d55be78071f85969) )
+ROM_END
+
+ROM_START( dchopper )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "bp09-p_ver1.0.ic5", 0x000000, 0x400000, CRC(24c336c5) SHA1(4e0c6614cf7cbbc3509943001ad5abfc39a1991a) ) // 2ND HALF = xxFF
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "bp09-g_ver1.0.ic6", 0x000000, 0x400000, CRC(73883d87) SHA1(34be7184888a2ffe5c51cf80785bb77ce4de4d39) )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "bp09-s_ver1.0.ic4", 0x000000, 0x100000, CRC(8e82fa09) SHA1(4255b8d508ba983857079f28008a94faa6fe1e49) )
 ROM_END
 
 ROM_START( zoids )
@@ -201,7 +224,7 @@ ROM_START( satoyama )
 	ROM_LOAD16_WORD_SWAP( "tm06-p_ver1.0.ic5", 0x000000, 0x100000, CRC(f02cddba) SHA1(27162dbfdf364e16a490b7dfb3db0b19bcc54d41) ) // 11xxxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x400000, "gfx", 0 )
-	ROM_LOAD( "tm06-g_ver1.0.ic6", 0x000000, 0x400000, CRC(b36fd1ee) SHA1(b576219273d25f6bfcc2e2f6f81e7c4a208fc70b) )
+	ROM_LOAD( "tm06-g_ver1.0.ic6", 0x000000, 0x400000, CRC(b36fd1ee) SHA1(b576219273d25f6bfcc2e2f6f81e7c4a208fc70b) ) // another dump had 0x2f4322 as 0x1c instead of 0x0c
 
 	ROM_REGION( 0x100000, "oki", 0 )
 	ROM_LOAD( "tm06-s_ver1.0.ic4", 0x000000, 0x100000, CRC(133c4dc8) SHA1(9af3ec284212268302b15f89831816a42ba3f353) )
@@ -243,13 +266,15 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2006, cscaoysd, 0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Crayon Shin-chan - Arashi o Yobu! Sushitori Daigassen", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2006, dbzbgck,  0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Dragon Ball Z - Bucchigiri no Chou Kessen",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2007, cmcwa,    0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Chibi Maruko-chan - Wanage de Asobo!!",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2007, kghmytda, 0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Keroro Gunsou - Hacha Mecha Yakyu Taikai de Arimasu!!", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2005, zoids,    0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Amodio / Tomy", "Zoids",                                                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // title to be verified
-GAME( 2007, youkai,   0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Amodio / Tomy", "Youkai VS Uchuujin",                                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2007, satoyama, 0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Amodio / Tomy", "Satoyama Grand Prix",                                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2007, gyakyu,   0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Amodio / Tomy", "Ginga Yakyu",                                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2007, yujogs,   0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Amodio / Tomy", "Yujo Gattai Shishigami-o",                              MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // title to be verified, inferred from some strings related to characters
-GAME( 2007, anpanmct, 0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Anpanman CommuTouch",                                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, cscaoysd, 0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Crayon Shin-chan - Arashi o Yobu! Sushitori Daigassen",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, dbzbgck,  0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Dragon Ball Z - Bucchigiri no Chou Kessen",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, cmcwa,    0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Chibi Maruko-chan - Wanage de Asobo!!",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, gkitarou, 0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "GeGeGe no Kitarou - Taose! Seiyou Youkai Gundan",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, kghmytda, 0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Keroro Gunsou - Hacha Mecha Yakyu Taikai de Arimasu!!",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2008, dchopper, 0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "From TV Animation One Piece - Nakama o Tasukero! Dr. Chopper", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2005, zoids,    0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Amodio / Tomy", "Zoids",                                                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // title to be verified
+GAME( 2007, youkai,   0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Amodio / Tomy", "Youkai VS Uchuujin",                                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, satoyama, 0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Amodio / Tomy", "Satoyama Grand Prix",                                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, gyakyu,   0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Amodio / Tomy", "Ginga Yakyu",                                                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, yujogs,   0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Amodio / Tomy", "Yujo Gattai Shishigami-o",                                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // title to be verified, inferred from some strings related to characters
+GAME( 2007, anpanmct, 0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Anpanman CommuTouch",                                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
