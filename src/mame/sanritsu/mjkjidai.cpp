@@ -5,6 +5,8 @@
 
 Mahjong Kyou Jidai (麻雀狂時代)     (c)1986 Sanritsu
 
+Sanritsu C1-00113 PCB
+
 CPU: Z80
 I/O: NEC D8255AC*2
 Sound: SN76489*2 CUSTOM
