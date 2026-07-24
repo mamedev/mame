@@ -1237,7 +1237,7 @@ void roundup_state::roundup(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_roundup);
 	PALETTE(config, m_palette, FUNC(roundup_state::roundup_palette), 32+8);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 16, 224 + 16); // H counts from 128->511, HBLANK starts at 128 and ends at 256
 	screen.set_screen_update(FUNC(roundup_state::screen_update));
 	screen.set_palette(m_palette);

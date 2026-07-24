@@ -898,7 +898,7 @@ void konmedal_state::tsukande(machine_config &config)
 	m_k053252->set_offsets(32, 16); // not accurate
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.62);  /* verified on pcb */
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -940,7 +940,7 @@ void konmedal_state::ddboy(machine_config &config)
 	m_k053252->set_offsets(32, 16); // not accurate
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.62);  /* verified on pcb */
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -970,7 +970,7 @@ void konmedal_state::chusenoh(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal_state::chusenoh_main);
 	m_k056832->set_tile_callback(FUNC(konmedal_state::chusenoh_tile_callback));
 
-	screen_device &screen(SCREEN(config.replace(), "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config.replace(), "screen"));
 	screen.set_refresh_hz(59.62);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64 * 8, 32 * 8);
@@ -1058,7 +1058,7 @@ void konmedal_state::shuriboy(machine_config &config)
 	HOPPER(config, "hopper", attotime::from_msec(100));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
 	screen.set_screen_update(FUNC(konmedal_state::screen_update_shuriboy));
 	screen.set_palette(m_palette);

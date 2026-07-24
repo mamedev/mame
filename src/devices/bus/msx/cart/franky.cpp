@@ -44,7 +44,7 @@ void msx_cart_franky_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "franky").front_center();
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 
 	m_screen->set_raw(XTAL(10'738'635)/2,
 		sega315_5124_device::WIDTH,

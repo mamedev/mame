@@ -456,7 +456,7 @@ void spg29x_game_state::spg29x(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &spg29x_game_state::spg290_mem);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(27_MHz_XTAL, 858, 0, 640, 525, 0, 480);
 	m_screen->set_screen_update(FUNC(spg29x_game_state::spg290_screen_update));
 	m_screen->screen_vblank().set(m_ppu, FUNC(spg290_ppu_device::screen_vblank));

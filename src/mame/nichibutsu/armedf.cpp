@@ -1076,7 +1076,7 @@ void armedf_state::machine_reset()
 
 void armedf_state::video_config(machine_config &config, int hchar_start, int vstart, int vend)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// assume all games on this HW running at ~59.1358Hz (trusted for Big Fighter)
 	// TODO: recheck if visible area isn't just 320x240 for everything (overscan may be masked by the text layer).
 	// TODO: bootlegs may not run at this speed

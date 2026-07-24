@@ -496,7 +496,7 @@ void tek440x_state::tek4404(machine_config &config)
 	m_vint->output_handler().set_inputline(m_maincpu, M68K_IRQ_6);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_raw(25.2_MHz_XTAL, 800, 0, 640, 525, 0, 480); // 31.5 kHz horizontal, 60 Hz vertical
 	screen.set_screen_update(FUNC(tek440x_state::screen_update));

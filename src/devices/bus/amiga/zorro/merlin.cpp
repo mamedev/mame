@@ -68,7 +68,7 @@ void merlin_device::mmio_map(address_map &map)
 
 void merlin_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(33_MHz_XTAL, 900, 0, 640, 526, 0, 480); // TODO
 	screen.set_screen_update(FUNC(merlin_device::screen_update));
 

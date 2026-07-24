@@ -439,7 +439,7 @@ void policetr_state::policetr(machine_config &config)
 	EEPROM_93C66_16BIT(config, m_eeprom);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(400, 262);  // needs to be verified

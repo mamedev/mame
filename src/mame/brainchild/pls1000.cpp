@@ -171,7 +171,7 @@ void pls1000_state::pls1000(machine_config &config)
 
 	m_maincpu->out_pwm().set("dac", FUNC(dac_bit_interface::write));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(240, 128);
 	m_screen->set_visarea(0, 240 - 1, 0, 128 - 1);

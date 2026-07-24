@@ -584,7 +584,7 @@ void yunsung8_state::yunsung8(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &yunsung8_state::sound_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(16'000'000) / 2, 512, 64, 512-64, 262, 8, 256-8); // TODO: completely inaccurate
 	screen.set_screen_update(FUNC(yunsung8_state::screen_update));
 	screen.set_palette(m_palette);

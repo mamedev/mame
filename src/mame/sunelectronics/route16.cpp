@@ -1119,7 +1119,7 @@ void route16_state::route16(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(m_cpu1->clock() / 4));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(10_MHz_XTAL / 2, 320, 0, 256, 260, 8, 248);
 	m_screen->set_screen_update(FUNC(route16_state::screen_update_route16));
 

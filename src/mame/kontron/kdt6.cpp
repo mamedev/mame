@@ -601,7 +601,7 @@ void kdt6_state::psi98(machine_config &config)
 	m_cpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::green());
 	screen.set_raw(XTAL(13'516'800), 824, 48, 688, 274, 0, 250);
 	screen.set_screen_update(FUNC(kdt6_state::screen_update));

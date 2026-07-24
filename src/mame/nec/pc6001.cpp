@@ -1515,7 +1515,7 @@ void pc6001_state::pc6001(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pc6001m2);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(pc6001_state::screen_update));
 	// allegedly NTSC clock, PC8801FH_OSC1 equivalent
 	m_screen->set_raw(XTAL(28'636'363) / 4, 456, 0, 320, 262, 0, 240);

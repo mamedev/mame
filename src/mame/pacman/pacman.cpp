@@ -3730,7 +3730,7 @@ void pacman_state::pacman(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(pacman_state::pacman_palette), 128 * 4, 32);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// H counts from 128->511, HBLANK starts at 144 and ends at 240
 	m_screen->set_raw(18.432_MHz_XTAL / 3, 384, 0, 288, 264, 0 /* +16 */, 224 /* +16 */);
 	m_screen->set_screen_update(FUNC(pacman_state::screen_update_pacman));

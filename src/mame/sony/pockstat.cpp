@@ -992,7 +992,7 @@ void pockstat_state::pockstat(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pockstat_state::mem_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(32, 32);

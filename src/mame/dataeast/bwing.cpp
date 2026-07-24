@@ -676,7 +676,7 @@ void bwing_state::bwing(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(18'000)); // high enough?
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 256, 272, 8, 248); // verified from schematics
 	screen.set_screen_update(FUNC(bwing_state::screen_update));

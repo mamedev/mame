@@ -135,7 +135,7 @@ void bdsm_state::bdesignm(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bdsm_state::mem_map);
 	m_maincpu->read_port7().set(FUNC(bdsm_state::io_p7_r));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(160, 150); // resolution unknown
 	m_screen->set_visarea(0, 160-1, 0, 150-1);

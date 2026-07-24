@@ -248,7 +248,7 @@ void workabout_state::workabout(machine_config &config)
 	m_asic9->data_r<4>().set(m_sibo, FUNC(psion_sibo_slot_device::data_r));  // Expansion port C
 	m_asic9->data_w<4>().set(m_sibo, FUNC(psion_sibo_slot_device::data_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_size(240, 100);
 	screen.set_visarea_full();
 	screen.set_refresh_hz(66);

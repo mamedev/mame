@@ -4467,7 +4467,7 @@ void newport_base_device::device_add_mconfig(machine_config &config)
 	m_vc2->screen_timing_changed().set(FUNC(newport_base_device::update_screen_size));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	//m_screen->set_size(2048, 2048);

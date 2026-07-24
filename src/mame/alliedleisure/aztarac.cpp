@@ -23,7 +23,7 @@
 #include "machine/watchdog.h"
 #include "machine/x2212.h"
 #include "sound/ay8910.h"
-#include "video/vector.h"
+#include "vector.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -40,7 +40,6 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_nvram(*this, "nvram"),
 		m_vector(*this, "vector"),
-		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch"),
 		m_vectorram(*this, "vectorram"),
 		m_sticky(*this, "STICKY"),
@@ -61,7 +60,6 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	required_device<x2212_device> m_nvram;
 	required_device<vector_device> m_vector;
-	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<uint16_t> m_vectorram;
@@ -213,7 +211,7 @@ void aztarac_state::ubr_w(uint8_t data)
 
 void aztarac_state::video_start()
 {
-	const rectangle &visarea = m_screen->visible_area();
+	const rectangle &visarea = m_vector->visible_area();
 
 	int xmin = visarea.min_x;
 	int ymin = visarea.min_y;
@@ -368,12 +366,9 @@ void aztarac_state::aztarac(machine_config &config)
 
 	// video hardware
 	VECTOR(config, m_vector);
-	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
-	m_screen->set_refresh_hz(40);
-	m_screen->set_size(400, 300);
-	m_screen->set_visarea(0, 1024-1, 0, 768-1);
-	m_screen->set_screen_update("vector", FUNC(vector_device::screen_update));
-	m_screen->screen_vblank().set(FUNC(aztarac_state::video_interrupt));
+	m_vector->set_refresh_hz(40);
+	m_vector->set_visarea(0, 1024-1, 0, 768-1);
+	m_vector->screen_vblank().set(FUNC(aztarac_state::video_interrupt));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

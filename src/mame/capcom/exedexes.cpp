@@ -513,7 +513,7 @@ void exedexes_state::exedexes(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12_MHz_XTAL / 2, 384, 0, 256, 262, 16, 240); // measured 59.6Hz
 	screen.set_screen_update(FUNC(exedexes_state::screen_update));
 	screen.set_palette(m_palette);

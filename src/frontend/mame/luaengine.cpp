@@ -17,7 +17,7 @@
 #include "ui/ui.h"
 
 #include "imagedev/cassette.h"
-#include "video/vector.h"
+#include "vector.h"
 
 #include "debugger.h"
 #include "drivenum.h"
@@ -442,20 +442,6 @@ int sol_lua_push(sol::types<std::error_condition>, lua_State *L, std::error_cond
 		return sol::stack::push(L, sol::lua_nil);
 	else
 		return sol::stack::push(L, value.message());
-}
-
-
-int sol_lua_push(sol::types<screen_type_enum>, lua_State *L, screen_type_enum &&value)
-{
-	switch (value)
-	{
-	case SCREEN_TYPE_INVALID:   return sol::stack::push(L, "invalid");
-	case SCREEN_TYPE_RASTER:    return sol::stack::push(L, "raster");
-	case SCREEN_TYPE_VECTOR:    return sol::stack::push(L, "vector");
-	case SCREEN_TYPE_LCD:       return sol::stack::push(L, "lcd");
-	case SCREEN_TYPE_SVG:       return sol::stack::push(L, "svg");
-	}
-	return sol::stack::push(L, "unknown");
 }
 
 
@@ -1893,7 +1879,7 @@ void lua_engine::initialize()
 				luaL_pushresultsize(&buff, size);
 				return std::make_tuple(sol::make_reference(s, sol::stack_reference(s, -1)), visarea.width(), visarea.height());
 			});
-	screen_dev_type["screen_type"] = sol::property(&screen_device::screen_type);
+	screen_dev_type["is_lcd"] = sol::property(&screen_device::is_lcd);
 	screen_dev_type["width"] = sol::property([] (screen_device &sdev) { return sdev.visible_area().width(); });
 	screen_dev_type["height"] = sol::property([] (screen_device &sdev) { return sdev.visible_area().height(); });
 	screen_dev_type["refresh"] = sol::property([] (screen_device &sdev) { return ATTOSECONDS_TO_HZ(sdev.refresh_attoseconds()); });
@@ -1912,7 +1898,7 @@ void lua_engine::initialize()
 	auto vector_dev_type = sol().registry().new_usertype<vector_device>(
 			"vector_dev",
 			sol::no_constructor,
-			sol::base_classes, sol::bases<device_t, device_video_interface>());
+			sol::base_classes, sol::bases<device_t>());
 	vector_dev_type.set_function("add_frame_begin_notifier",
 			[this] (vector_device &v, sol::protected_function cb)
 			{

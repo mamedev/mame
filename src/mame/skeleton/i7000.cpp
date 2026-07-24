@@ -312,7 +312,7 @@ void i7000_state::i7000(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &i7000_state::i7000_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(640, 200); /* the CRTC reconfigures it */
 	screen.set_visarea(0, 640-1, 0, 200-1);

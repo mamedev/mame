@@ -647,7 +647,7 @@ void gatron_state::gat(machine_config &config)
 	ppi.out_pc_callback().set(FUNC(gatron_state::output_port_1_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(48*8, 16*16);

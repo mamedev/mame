@@ -46,7 +46,7 @@ TODO:
 #include "video/sed1500.h"
 
 #include "render.h"
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -425,10 +425,9 @@ void ren_state::ren(machine_config &config)
 	m_lcd_pwm->set_refresh(attotime::from_hz(30));
 	m_lcd_pwm->output_x().set(FUNC(ren_state::lcd_pwm_w));
 
-	auto &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	auto &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(873/2, 1080/2);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9+1, 9);
 	config.set_default_layout(layout_saitek_renaissance);

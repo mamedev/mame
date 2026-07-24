@@ -120,7 +120,7 @@ ROM_END
 
 void nubus_m2hires_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(nubus_m2hires_device::screen_update));
 	m_screen->set_raw(30.24_MHz_XTAL, 896, 0, 640, 525, 0, 480);
 
@@ -402,7 +402,7 @@ private:
 
 void nubus_portrait_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(nubus_portrait_device::screen_update));
 	m_screen->set_raw(57.2832_MHz_XTAL, 832, 0, 640, 918, 0, 832);
 	m_screen->set_physical_aspect(3, 4);
@@ -501,7 +501,7 @@ ROM_END
 
 void nubus_workstation_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(nubus_workstation_device::screen_update));
 	m_screen->set_raw(100_MHz_XTAL, 1448, 0, 1152, 913, 0, 832);
 

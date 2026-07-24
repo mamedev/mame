@@ -246,7 +246,7 @@ void st25_state::st25_1(machine_config &config)
 	// Serial B: Duo
 
 	// Service (1x16 character LCD)
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_screen_update(m_lcd, FUNC(hd44780_device::screen_update));

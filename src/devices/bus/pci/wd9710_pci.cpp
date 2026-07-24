@@ -55,7 +55,7 @@ const tiny_rom_entry *wd9710_pci_device::device_rom_region() const
 
 void wd9710_pci_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(wd90c33_vga_device::screen_update));
 

@@ -650,7 +650,7 @@ void joystand_state::joystand(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, m_cartflash_bankdev).set_map(&joystand_state::cart_map).set_options(ENDIANNESS_BIG, 16, 24, 0x800000); // TODO: address bit per carts?
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(joystand_state::screen_update));
 	screen.set_size(0x200, 0x100);
@@ -691,7 +691,7 @@ void joystand_state::x180ii(machine_config &config)
 	I8255(config, "ppi1");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: verify this
+	screen_device &screen(SCREEN(config, "screen")); // TODO: verify this
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(joystand_state::screen_update_x180ii));
 	screen.set_size(0x200, 0x100);

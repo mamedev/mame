@@ -73,7 +73,7 @@ void cougar_state::cougar(machine_config &config)
 
 	RTC4543(config, "rtc", 32.768_kHz_XTAL);
 
-	//SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	//SCREEN(config, "screen");
 
 	SPEAKER(config, "speaker", 2).front();
 

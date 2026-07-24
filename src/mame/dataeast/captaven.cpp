@@ -555,7 +555,7 @@ void captaven_state::captaven(machine_config &config)
 	m_deco_irq->raster2_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<0>));
 	m_deco_irq->vblank_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(28_MHz_XTAL / 4, 442, 0, 320, 274, 8, 248);
 	m_screen->set_screen_update(FUNC(captaven_state::screen_update));
 	m_screen->set_palette(m_palette);

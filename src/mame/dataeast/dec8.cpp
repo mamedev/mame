@@ -2009,7 +2009,7 @@ void lastmisn_state::lastmisn(machine_config &config)
 
 	DECO_KARNOVSPRITES(config, m_spritegen_krn, m_palette, gfx_shackled_spr);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(lastmisn_state::screen_update_lastmisn));
 	m_screen->set_palette(m_palette);
@@ -2069,7 +2069,7 @@ void lastmisn_state::shackled(machine_config &config)
 
 	DECO_KARNOVSPRITES(config, m_spritegen_krn, m_palette, gfx_shackled_spr);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(lastmisn_state::screen_update_shackled));
 	m_screen->set_palette(m_palette);
@@ -2125,7 +2125,7 @@ void gondo_state::gondo(machine_config &config)
 	DECO_KARNOVSPRITES(config, m_spritegen_krn, m_palette, gfx_gondo_spr);
 	m_spritegen_krn->set_colpri_callback(FUNC(gondo_state::gondo_colpri_cb));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(gondo_state::screen_update_gondo));
 	m_screen->screen_vblank().set(m_nmigate, FUNC(input_merger_device::in_w<1>));
@@ -2181,7 +2181,7 @@ void ghostb_state::garyoret(machine_config &config)
 
 	DECO_KARNOVSPRITES(config, m_spritegen_krn, m_palette, gfx_gondo_spr);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(ghostb_state::screen_update_garyoret));
 	m_screen->screen_vblank().set(m_nmigate, FUNC(input_merger_device::in_w<1>));
@@ -2243,7 +2243,7 @@ void ghostb_state::ghostb(machine_config &config)
 
 	DECO_KARNOVSPRITES(config, m_spritegen_krn, m_palette, gfx_shackled_spr);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(ghostb_state::screen_update_ghostb));
 	m_screen->screen_vblank().set(m_nmigate, FUNC(input_merger_device::in_w<1>));
@@ -2316,7 +2316,7 @@ void csilver_state::csilver(machine_config &config)
 
 	DECO_KARNOVSPRITES(config, m_spritegen_krn, m_palette, gfx_shackled_spr);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(csilver_state::screen_update_lastmisn));
 	m_screen->set_palette(m_palette);
@@ -2374,7 +2374,7 @@ void oscar_state::oscar(machine_config &config)
 
 	DECO_MXC06(config, m_spritegen_mxc, m_palette, gfx_oscar_spr);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(oscar_state::screen_update_oscar));
 	m_screen->set_palette(m_palette);
@@ -2434,7 +2434,7 @@ void srdarwin_state::srdarwin(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(srdarwin_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -2497,7 +2497,7 @@ void oscar_state::cobracom(machine_config &config)
 	DECO_MXC06(config, m_spritegen_mxc, m_palette, gfx_cobracom_spr);
 	m_spritegen_mxc->set_colpri_callback(FUNC(oscar_state::cobracom_colpri_cb));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(oscar_state::screen_update_cobracom));
 	m_screen->set_palette(m_palette);

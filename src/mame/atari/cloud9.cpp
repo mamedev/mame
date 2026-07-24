@@ -768,7 +768,7 @@ void cloud9_state::cloud9(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cloud9);
 	PALETTE(config, m_palette).set_entries(64);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz((double)PIXEL_CLOCK / (double)VTOTAL / (double)HTOTAL);
 	m_screen->set_size(HTOTAL, VTOTAL);
 	m_screen->set_vblank_time(0);          // VBLANK is handled manually

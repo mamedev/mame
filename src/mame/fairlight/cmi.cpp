@@ -2017,7 +2017,7 @@ void cmi_state::cmi2x(machine_config &config)
 	m_cmi07cpu->set_addrmap(AS_PROGRAM, &cmi_state::cmi07cpu_map);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	SCREEN(config, m_screen).set_color(rgb_t::green());
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBLANK_END, HBLANK_START, VTOTAL, VBLANK_END, VBLANK_START);
 	m_screen->set_screen_update(FUNC(cmi_state::screen_update_cmi2x));
 	m_screen->screen_vblank().set(FUNC(cmi_state::cmi_iix_vblank));

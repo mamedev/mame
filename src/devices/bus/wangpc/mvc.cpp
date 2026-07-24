@@ -140,7 +140,7 @@ void wangpc_mvc_device::vsync_w(int state)
 
 void wangpc_mvc_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
 	screen.set_size(80*10, 25*12);
 	screen.set_visarea(0, 80*10-1, 0, 25*12-1);

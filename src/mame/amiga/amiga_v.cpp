@@ -956,7 +956,7 @@ void amiga_state::update_screenmode()
 
 void amiga_state::pal_video(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw
 	(
 		(amiga_state::CLK_28M_PAL / 4) * 2 * 2,
@@ -968,7 +968,7 @@ void amiga_state::pal_video(machine_config &config)
 
 void amiga_state::ntsc_video(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw
 	(
 		(amiga_state::CLK_28M_NTSC / 4) * 2 * 2,

@@ -1802,7 +1802,7 @@ void dec0_state::dec0_base(machine_config &config)
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	set_screen_raw_params(config);
 	m_screen->set_palette(m_palette);
 
@@ -1939,7 +1939,7 @@ void automat_state::automat(machine_config &config)
 
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(automat_state::screen_update_automat));
 	m_screen->set_palette(m_palette);
@@ -2013,7 +2013,7 @@ void automat_state::secretab(machine_config &config) // all clocks verified on P
 
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(automat_state::screen_update_secretab));
 	m_screen->set_palette(m_palette);

@@ -32,7 +32,7 @@ BTANB:
 #include "sound/dac.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 #include "multibyte.h"
@@ -344,10 +344,9 @@ void omar2_state::omar2(machine_config &config)
 	m_display->set_bri_levels(0.25);
 	config.set_default_layout(layout_omar2);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920/2.5, 412/2.5);
-	screen.set_visarea_full();
 }
 
 

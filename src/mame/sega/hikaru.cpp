@@ -1063,7 +1063,7 @@ void hikaru_state::hikaru(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(51894580 / 2, 818, 158, 798, 528, 36, 516); // 31KHz mode
 	//screen.set_raw(31996040 / 2, 639, 120, 616, 416, 29, 406); // 24KHz mode
 	screen.set_screen_update(FUNC(hikaru_state::screen_update_hikaru));

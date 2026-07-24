@@ -711,7 +711,7 @@ void tristar8000_state::tristar8000(machine_config &config) // EPOS TRISTAR 8000
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(11_MHz_XTAL / 2, 352, 0, 272, 258, 0, 236); // confirmed from schematics
 	screen.set_screen_update(FUNC(tristar8000_state::screen_update));
 
@@ -743,7 +743,7 @@ void tristar9000_state::tristar9000(machine_config &config) // EPOS TRISTAR 9000
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(272, 241);

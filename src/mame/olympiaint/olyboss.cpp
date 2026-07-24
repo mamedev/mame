@@ -432,7 +432,7 @@ void olyboss_state::olybossd(machine_config &config)
 
 	/* video hardware */
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_color(rgb_t::green());
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(UPD3301_TAG, FUNC(upd3301_device::screen_update));
@@ -499,7 +499,7 @@ void olyboss_state::bossb85(machine_config &config)
 	maincpu.out_sod_func().set(FUNC(olyboss_state::romdis_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_color(rgb_t::green());
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(UPD3301_TAG, FUNC(upd3301_device::screen_update));

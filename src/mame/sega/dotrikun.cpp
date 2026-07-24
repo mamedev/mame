@@ -238,7 +238,7 @@ void dotrikun_state::dotrikun(machine_config &config)
 	TIMER(config, m_interrupt_timer).configure_generic(FUNC(dotrikun_state::interrupt));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK, 128+128, 0, 128, 192+64, 0, 192);
 	m_screen->set_physical_aspect(1, 1); // large border area
 	m_screen->set_screen_update(FUNC(dotrikun_state::screen_update));

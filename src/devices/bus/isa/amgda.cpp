@@ -134,7 +134,7 @@ void isa16_amgda_device::device_add_mconfig(machine_config &config)
 	// H: 24.68KHz, retrace: 8.0us
 	// V: 92Hz field, 46Hz frame
 	// 720x512, 64Kx8 video ram
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(44'220'000 / 2, 800, 0, 720, 600, 0, 512);
 	m_screen->set_screen_update(FUNC(isa16_amgda_device::screen_update));
 	m_screen->screen_vblank().set(

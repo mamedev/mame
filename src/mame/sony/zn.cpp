@@ -105,7 +105,7 @@ void zn_state::zn_base(machine_config &config)
 
 	m_gpu->set_screen(m_screen);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 
 	m_spu->add_route(0, m_speaker, 0.35, 0);
 	m_spu->add_route(1, m_speaker, 0.35, 1);

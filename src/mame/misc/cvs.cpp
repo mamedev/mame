@@ -1368,7 +1368,7 @@ void cvs_state::cvs(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(cvs_state::palette), (256 + 4) * 8 + 8 + 1, 16);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 30*8-1, 1*8, 32*8-1);

@@ -721,7 +721,7 @@ void cninja_state::cninja(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(cninja_state,cninja)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(24'000'000) / 4, 376, 0, 256, 274, 8, 248);
 	m_screen->set_screen_update(FUNC(cninja_state::screen_update_cninja));
 	m_screen->set_palette(m_palette);
@@ -800,7 +800,7 @@ void cninja_state::stoneage(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(cninja_state,cninja)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(24'000'000) / 4, 376, 0, 256, 274, 8, 248);
 	m_screen->set_screen_update(FUNC(cninja_state::screen_update_cninja));
 	m_screen->set_palette(m_palette);
@@ -892,7 +892,7 @@ void cninja_state::cninjabl(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(cninja_state,cninja)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(24'000'000) / 4, 376, 0, 256, 274, 8, 248);
 	m_screen->set_screen_update(FUNC(cninja_state::screen_update_cninjabl));
 	m_screen->set_palette(m_palette);
@@ -958,7 +958,7 @@ void cninja_state::edrandy(machine_config &config)
 	irq.vblank_irq_callback().set_inputline(m_maincpu, 5);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(24'000'000) / 4, 376, 0, 256, 274, 8, 248);
 	m_screen->set_screen_update(FUNC(cninja_state::screen_update_edrandy));
 	m_screen->set_palette(m_palette);
@@ -1035,7 +1035,7 @@ void cninja_state::robocop2(machine_config &config)
 	irq.vblank_irq_callback().set_inputline(m_maincpu, 5);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248);
 	m_screen->set_screen_update(FUNC(cninja_state::screen_update_robocop2));
 	m_screen->set_palette(m_palette);
@@ -1113,7 +1113,7 @@ void cninja_state::mutantf(machine_config &config)
 	audiocpu.add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248); // same as robocop2? verify this from real pcb
 	m_screen->set_screen_update(FUNC(cninja_state::screen_update_mutantf));
 

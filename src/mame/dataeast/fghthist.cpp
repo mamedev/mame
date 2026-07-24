@@ -946,7 +946,7 @@ void fghthist_state::fghthisto(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(28_MHz_XTAL / 4, 442, 0, 320, 274, 8, 248);
 	m_screen->set_screen_update(FUNC(fghthist_state::screen_update));
 
@@ -1058,7 +1058,7 @@ void nslasher_state::nslasher(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(28_MHz_XTAL / 4, 442, 0, 320, 274, 8, 248);
 	m_screen->set_screen_update(FUNC(nslasher_state::screen_update_nslasher));
 
@@ -1150,7 +1150,7 @@ void tattass_state::tattass(machine_config &config)
 
 	EEPROM_93C76_8BIT(config, m_eeprom);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(28_MHz_XTAL / 4, 442, 0, 320, 274, 8, 248);
 	m_screen->set_screen_update(FUNC(tattass_state::screen_update_tattass));
 

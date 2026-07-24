@@ -202,7 +202,7 @@ void tg100_state::tg100(machine_config &config)
 	m_ymw258->add_route(0, "speaker", 1.0, 0);
 	m_ymw258->add_route(1, "speaker", 1.0, 1);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(80);
 	m_screen->set_size(240, 64); // 1x16, 8x8
 	m_screen->set_visarea(0, 240 - 1, 0, 64 - 1);

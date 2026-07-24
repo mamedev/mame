@@ -209,7 +209,7 @@ void sagitta180_state::sagitta180(machine_config &config)
 //  intlatch.int_wr_callback().set_inputline("maincpu", I8085_INTR_LINE); // guessed !
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */

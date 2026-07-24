@@ -292,7 +292,7 @@ void ibm5100_state::common(machine_config &config)
 	 * pixels with 8x12 driven from character ROS data. The last two horizontal
 	 * pixels of each character cell line and every other scan line are blank.
 	 */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(15'091'200, 64*10+15, 0, 64*10, 16*12*2, 0, 16*12*2);
 	m_screen->set_screen_update(FUNC(ibm5100_state::screen_update));
 }

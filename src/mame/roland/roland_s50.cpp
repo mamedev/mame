@@ -475,7 +475,7 @@ void roland_s50_state::s50(machine_config &config)
 	//m_vdp->vsync_callback().set_inputline(m_maincpu, i8x9x_device::HSI1_LINE).invert();
 	m_vdp->set_screen("screen");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_screen_update(m_vdp, FUNC(tms3556_device::screen_update));
 	screen.set_size(tms3556_device::TOTAL_WIDTH, tms3556_device::TOTAL_HEIGHT*2);
@@ -575,7 +575,7 @@ void roland_w30_state::s330(machine_config &config)
 	lcdc.set_lcd_size(2, 16);
 	lcdc.set_pixel_update_cb(FUNC(roland_w30_state::lcd_pixel_update));
 
-	screen_device &lcd_screen(SCREEN(config, "lcd_screen", SCREEN_TYPE_LCD));
+	screen_device &lcd_screen(SCREEN(config, "lcd_screen").set_lcd());
 	lcd_screen.set_refresh_hz(60);
 	lcd_screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	lcd_screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
@@ -589,7 +589,7 @@ void roland_w30_state::s330(machine_config &config)
 	m_vdp->set_addrmap(0, &roland_w30_state::vram_map);
 	m_vdp->set_screen("screen");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_screen_update(m_vdp, FUNC(tms3556_device::screen_update));
 	screen.set_size(tms3556_device::TOTAL_WIDTH, tms3556_device::TOTAL_HEIGHT*2);

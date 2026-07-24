@@ -341,7 +341,7 @@ void svmu_state::svmu(machine_config &config)
 	m_maincpu->set_lcd_update_cb(FUNC(svmu_state::svmu_lcd_update));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(48 * (PIXEL_SIZE + PIXEL_DISTANCE), 32 * (PIXEL_SIZE + PIXEL_DISTANCE));

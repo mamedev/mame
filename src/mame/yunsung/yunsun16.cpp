@@ -908,7 +908,7 @@ void magicbub_state::magicbub(machine_config &config)
 	audiocpu.set_addrmap(AS_IO, &magicbub_state::sound_port_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(16'000'000)/2, 512, 0x20, 0x180-0x20, 260, 0, 0xe0); // TODO: completely inaccurate
 	m_screen->set_screen_update(FUNC(magicbub_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -944,7 +944,7 @@ void shocking_state::shocking(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &shocking_state::main_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(16'000'000)/2, 512, 0, 0x180-4, 260, 0, 0xe0); // TODO: completely inaccurate
 	m_screen->set_screen_update(FUNC(shocking_state::screen_update));
 	m_screen->set_palette(m_palette);

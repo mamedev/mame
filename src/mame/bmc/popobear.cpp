@@ -1048,7 +1048,7 @@ void popobear_state::popobear(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &popobear_state::popobear_main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(popobear_state::scanline_cb), "screen", 0, 1);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(59.64);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_screen_update(FUNC(popobear_state::screen_update));

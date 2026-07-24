@@ -746,7 +746,7 @@ void tunhunt_state::tunhunt(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(tunhunt_state::irq0_line_hold), attotime::from_hz(4*60));  // 48V, 112V, 176V, 240V
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_size(256, 256-16);

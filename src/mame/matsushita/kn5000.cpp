@@ -656,7 +656,7 @@ void kn5000_state::kn5000(machine_config &config)
 
 	/* video hardware */
 	// LCD Controller MN89304 @ IC206 24_MHz_XTAL
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_raw(XTAL(40'000'000)/6, 424, 0, 320, 262, 0, 240);
 	screen.set_screen_update("vga", FUNC(mn89304_vga_device::screen_update));
 

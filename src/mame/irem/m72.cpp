@@ -1702,7 +1702,7 @@ void m72_state::m72_base(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m72);
 	PALETTE(config, m_palette).set_entries(512);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256);
 	m_screen->set_screen_update(FUNC(m72_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1851,7 +1851,7 @@ void m72_state::rtype2(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rtype2);
 	PALETTE(config, m_palette).set_entries(512);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256);
 	m_screen->set_screen_update(FUNC(m72_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1897,7 +1897,7 @@ void m72_state::cosmccop(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rtype2);
 	PALETTE(config, m_palette).set_entries(512);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256);
 	m_screen->set_screen_update(FUNC(m72_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1944,7 +1944,7 @@ void m82_state::m82(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_majtitle);
 	PALETTE(config, m_palette).set_entries(512);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256);
 	m_screen->set_screen_update(FUNC(m82_state::screen_update_m82));
 	m_screen->set_palette(m_palette);
@@ -1987,7 +1987,7 @@ void poundfor_state::poundfor(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rtype2);
 	PALETTE(config, m_palette).set_entries(512);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256);
 	m_screen->set_screen_update(FUNC(poundfor_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -2015,7 +2015,7 @@ void m72_state::lohtb(machine_config &config) // almost all to be verified
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m72);
 	PALETTE(config, m_palette).set_entries(512);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256);
 	m_screen->set_screen_update(FUNC(m72_state::screen_update));
 	m_screen->set_palette(m_palette);

@@ -510,7 +510,7 @@ void pgm_state::pgmbase(machine_config &config)
 	V3021(config, "rtc");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(50_MHz_XTAL/5, 640, 0, 448, 264, 0, 224); // or 20MHz / 2? framerate verified
 	screen.set_screen_update(m_video, FUNC(igs023_video_device::screen_update));
 	screen.screen_vblank().set(FUNC(pgm_state::screen_vblank));

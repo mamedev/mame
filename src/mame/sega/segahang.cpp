@@ -1020,7 +1020,7 @@ void segahang_state::shared_base(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_segahang);
 	PALETTE(config, m_palette).set_entries(2048*3);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(25.1748_MHz_XTAL / 4, 400, 0, 320, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(segahang_state::screen_update));
 	m_screen->set_palette(m_palette);

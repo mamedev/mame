@@ -569,7 +569,7 @@ void mc1000_state::mc1000(machine_config &config)
 	ne555assert.config_param(ASSERT_LINE);
 
 	/* video hardware */
-	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, SCREEN_TAG);
 
 	MC6847(config, m_vdg, XTAL(3'579'545));
 	m_vdg->hsync_wr_callback().set(FUNC(mc1000_state::hs_w));

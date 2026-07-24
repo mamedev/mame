@@ -301,7 +301,7 @@ void microbx2_state::microbx2(machine_config &config)
 	MC6809E(config, m_maincpu, 16_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &microbx2_state::mem_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16_MHz_XTAL / 3, 1024, 0, 768, 674, 31, 607);
 	screen.set_screen_update("gdc", FUNC(upd7220a_device::screen_update));
 

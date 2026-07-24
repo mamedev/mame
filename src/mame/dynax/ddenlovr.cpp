@@ -4845,7 +4845,7 @@ void htengoku_state::htengoku(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
@@ -9686,7 +9686,7 @@ void ddenlovr_state::ddenlovr(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256);
@@ -9809,7 +9809,7 @@ void ddenlovr_state::quizchq(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
@@ -9899,7 +9899,7 @@ void mmpanic_state::mmpanic(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(mmpanic_state,mmpanic)
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
@@ -9967,7 +9967,7 @@ void hanakanz_state::hanakanz(machine_config &config)
 	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_panel_connector_device::standard_panels, "hf", false);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
@@ -10020,7 +10020,7 @@ void hanakanz_state::kotbinyo(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60.1656);   // HSync 15.1015kHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
@@ -10147,7 +10147,7 @@ void ddenlovr_state::mjschuka(machine_config &config)
 	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_medal_panel, "mj", false);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
@@ -10496,7 +10496,7 @@ void hanakanz_state::jongtei(machine_config &config)
 	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_medal_panel, "mj", false);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256);
@@ -10569,7 +10569,7 @@ void ddenlovr_state::sryudens(machine_config &config)
 	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_medal_panel, "mj", false);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60.8532);   // VSync 60.8532Hz, HSync 15.2790kHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
@@ -10618,7 +10618,7 @@ void ddenlovr_state::janshinp(machine_config &config)
 	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_medal_panel, "mj", false);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60.8532);   // VSync 60.8532Hz, HSync 15.2790kHz ?
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
@@ -10689,7 +10689,7 @@ void ddenlovr_state::seljan2(machine_config &config)
 	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_medal_panel, "mj", false);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60.8532);   // VSync 60.8532Hz, HSync 15.2790kHz ?
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
@@ -10778,7 +10778,7 @@ void hanakanz_state::daimyojn(machine_config &config)
 	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_medal_panel, "mj", false);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(59.7922);   // HSync 15.4248kHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);

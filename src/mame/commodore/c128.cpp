@@ -1701,7 +1701,7 @@ void c128_state::ntsc(machine_config &config)
 	m_vdc->set_show_border_area(true);
 	m_vdc->set_char_width(8);
 
-	screen_device &screen_vdc(SCREEN(config, SCREEN_VDC_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen_vdc(SCREEN(config, SCREEN_VDC_TAG));
 	screen_vdc.set_refresh_hz(60);
 	screen_vdc.set_size(640, 200);
 	screen_vdc.set_visarea(0, 640-1, 0, 200-1);
@@ -1715,7 +1715,7 @@ void c128_state::ntsc(machine_config &config)
 	m_vic->set_addrmap(0, &c128_state::vic_videoram_map);
 	m_vic->set_addrmap(1, &c128_state::vic_colorram_map);
 
-	screen_device &screen_vic(SCREEN(config, SCREEN_VIC_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen_vic(SCREEN(config, SCREEN_VIC_TAG));
 	screen_vic.set_refresh_hz(VIC6567_VRETRACERATE);
 	screen_vic.set_size(VIC6567_COLUMNS, VIC6567_LINES);
 	screen_vic.set_visarea(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1);
@@ -1880,7 +1880,7 @@ void c128_state::pal(machine_config &config)
 	m_vdc->set_show_border_area(true);
 	m_vdc->set_char_width(8);
 
-	screen_device &screen_vdc(SCREEN(config, SCREEN_VDC_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen_vdc(SCREEN(config, SCREEN_VDC_TAG));
 	screen_vdc.set_refresh_hz(60);
 	screen_vdc.set_size(640, 200);
 	screen_vdc.set_visarea(0, 640-1, 0, 200-1);
@@ -1894,7 +1894,7 @@ void c128_state::pal(machine_config &config)
 	mos8566.set_addrmap(0, &c128_state::vic_videoram_map);
 	mos8566.set_addrmap(1, &c128_state::vic_colorram_map);
 
-	screen_device &screen_vic(SCREEN(config, SCREEN_VIC_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen_vic(SCREEN(config, SCREEN_VIC_TAG));
 	screen_vic.set_refresh_hz(VIC6569_VRETRACERATE);
 	screen_vic.set_size(VIC6569_COLUMNS, VIC6569_LINES);
 	screen_vic.set_visarea(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1);

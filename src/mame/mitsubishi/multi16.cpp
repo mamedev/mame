@@ -165,7 +165,7 @@ void multi16_state::multi16(machine_config &config)
 	PIT8253(config, m_pit);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16000000, 848, 0, 640, 518, 0, 400); // unknown clock
 	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 

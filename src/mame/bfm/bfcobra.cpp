@@ -1789,7 +1789,7 @@ void bfcobra_state::bfcobra(machine_config &config)
 
 
 	/* TODO */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(512, 256);
@@ -2866,7 +2866,7 @@ void bfcobjam_state::bfcobjam(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &bfcobjam_state::z8s180_io_map);
 
 	/* TODO */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_size(512, 256);

@@ -62,7 +62,7 @@ void vtech5303_state::vtech5303(machine_config &config)
 {
 	W65C02(config, m_maincpu, 8_MHz_XTAL); // Unknown core and frequency, probably 6802
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD); // Monochrome 64x32 LCD screen
+	SCREEN(config, m_screen).set_lcd(); // Monochrome 64x32 LCD screen
 	m_screen->set_refresh_hz(60); // Guess
 	m_screen->set_size(64, 32);
 	m_screen->set_visarea(0, 64-1, 0, 32-1);

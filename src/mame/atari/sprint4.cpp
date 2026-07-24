@@ -573,7 +573,7 @@ void sprint4_state::sprint4(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 8);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, 0, 256, VTOTAL, 0, 224);
 	m_screen->set_screen_update(FUNC(sprint4_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(sprint4_state::screen_vblank));

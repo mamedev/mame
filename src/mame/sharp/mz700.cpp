@@ -364,7 +364,7 @@ void mz_state::mz700(machine_config &config)
 	ADDRESS_MAP_BANK(config, "banke").set_map(&mz_state::mz700_banke).set_options(ENDIANNESS_LITTLE, 8, 16, 0x2000);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(17'734'470)/2, 568, 0, 40*8, 312, 0, 25*8);
 	m_screen->set_screen_update(FUNC(mz_state::screen_update_mz700));
 	m_screen->set_palette(m_palette);

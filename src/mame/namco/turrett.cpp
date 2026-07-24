@@ -361,7 +361,7 @@ void turrett_state::turrett(machine_config &config)
 	ATA_INTERFACE(config, m_ata).options(turrett_devices, "hdd", nullptr, true);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// TODO: Likely not correct. Refresh rate empirically determined
 	// to ensure in-sync streaming sound
 	m_screen->set_raw(4000000, 512, 0, 336, 259, 0, 244);

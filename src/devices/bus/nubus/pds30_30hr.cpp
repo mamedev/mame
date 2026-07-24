@@ -472,7 +472,7 @@ void nubus_xceed30hr_device::card_map(address_map &map)
 // **** Color 30HR using the SE/30 internal display
 void nubus_xceed30hr_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(nubus_xceed30hr_device::screen_update));
 	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
 
@@ -614,7 +614,7 @@ const tiny_rom_entry *nubus_xceedmc30_device::device_rom_region() const
 
 void nubus_xceedmc30_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(nubus_xceedmc30_device::screen_update));
 	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
 

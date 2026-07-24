@@ -754,7 +754,7 @@ void fp1100_state::fp1100(machine_config &config)
 
 	SOFTWARE_LIST(config, "cass_list").set_original("fp1100_cass");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	// doesn't matter, will be reset by 6845 anyway
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));

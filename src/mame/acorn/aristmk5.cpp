@@ -2510,7 +2510,7 @@ void aristmk5_state::aristmk5(machine_config &config)
 	m_ioc->peripheral_w<2>().set(FUNC(aristmk5_state::sram_w));
 	m_ioc->kout_w().set("kart", FUNC(rs232_port_device::write_txd));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.screen_vblank().set(m_ioc, FUNC(acorn_ioc_device::ir_w));
 
 	ACORN_VIDC1A(config, m_vidc, MASTER_CLOCK/3);

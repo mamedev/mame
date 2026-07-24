@@ -595,7 +595,7 @@ void sprcros2_state::sprcros2(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(m_maincpu->clock() / 4));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(sprcros2_state::screen_update));
 	m_screen->set_raw(10_MHz_XTAL / 2, 320, 8, 256-8, 264, 16, 240); // measured ~59.2Hz
 	m_screen->set_palette("palette");

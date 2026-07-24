@@ -143,7 +143,7 @@ void bartop52_state::a5200(machine_config &config)
 	m_antic->set_gtia_tag(m_gtia);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	config_ntsc_screen(config);
 
 	m_screen->set_screen_update("antic", FUNC(antic_device::screen_update));

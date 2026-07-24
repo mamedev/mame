@@ -705,7 +705,7 @@ void travrusa_state::travrusa(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &travrusa_state::program_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(18.432_MHz_XTAL / 3, 384, 8, 248, 282, 0, 256); // verified from schematics; accurate frequency, measured on a Moon Patrol board, is 56.75Hz
 	screen.set_screen_update(FUNC(travrusa_state::screen_update));
 	screen.set_palette(m_palette);

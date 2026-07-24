@@ -1319,7 +1319,7 @@ const tiny_rom_entry *sbus_turbogx_device::device_rom_region() const
 
 void sbus_turbogx_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(sbus_turbogx_device::screen_update));
 	m_screen->set_raw(105.561_MHz_XTAL, 1472, 0, 1152, 943, 0, 900);
 	m_screen->screen_vblank().set(FUNC(sbus_turbogx_device::vblank_w));
@@ -1359,7 +1359,7 @@ const tiny_rom_entry *sbus_turbogxp_device::device_rom_region() const
 
 void sbus_turbogxp_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(sbus_turbogxp_device::screen_update));
 	m_screen->set_size(1152, 900);
 	m_screen->set_visarea(0, 1152-1, 0, 900-1);

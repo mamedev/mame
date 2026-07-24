@@ -127,7 +127,7 @@ void elan_ep3a19a_state::elan_ep3a19a(machine_config &config)
 	m_maincpu->read_callback<1>().set_ioport("IN1");
 	m_maincpu->read_callback<2>().set_ioport("IN2");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_screen_update(FUNC(elan_ep3a19a_state::screen_update));

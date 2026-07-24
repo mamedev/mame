@@ -281,7 +281,7 @@ void nabupc_state::nabupc(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(nabupc_state::int_ack_cb));
 
 	// Video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 
 	TMS9918A(config, m_tms9928a, 10.738635_MHz_XTAL);
 	m_tms9928a->set_screen(m_screen);

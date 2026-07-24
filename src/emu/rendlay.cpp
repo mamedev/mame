@@ -454,7 +454,7 @@ private:
 			try_insert("deviceshortname", device().shortname());
 			util::ovectorstream tmp;
 			unsigned i(0U);
-			for (screen_device const &screen : screen_device_enumerator(machine().root_device()))
+			for (device_video_output_interface const &screen : video_output_interface_enumerator(machine().root_device()))
 			{
 				std::pair<u64, u64> const physaspect(screen.physical_aspect());
 				s64 const w(screen.visible_area().width()), h(screen.visible_area().height());
@@ -3736,7 +3736,7 @@ layout_view_item *layout_view::get_item(std::string const &id)
 //  the specified screen
 //-------------------------------------------------
 
-bool layout_view::has_screen(screen_device const &screen) const
+bool layout_view::has_screen(device_video_output_interface const &screen) const
 {
 	return std::find_if(m_items.begin(), m_items.end(), [&screen] (auto &itm) { return itm.screen() == &screen; }) != m_items.end();
 }
@@ -3747,7 +3747,7 @@ bool layout_view::has_screen(screen_device const &screen) const
 //  has the given screen visble
 //-------------------------------------------------
 
-bool layout_view::has_visible_screen(screen_device const &screen) const
+bool layout_view::has_visible_screen(device_video_output_interface const &screen) const
 {
 	return std::find_if(m_screens.begin(), m_screens.end(), [&screen] (auto const &scr) { return &scr.get() == &screen; }) != m_screens.end();
 }
@@ -4281,7 +4281,7 @@ layout_view_item::layout_view_item(
 	// fetch common data
 	int index = env.get_attribute_int(itemnode, "index", -1);
 	if (index != -1)
-		m_screen = screen_device_enumerator(env.machine().root_device()).byindex(index);
+		m_screen = video_output_interface_enumerator(env.machine().root_device()).byindex(index);
 
 	// sanity checks
 	if (strcmp(itemnode.get_name(), "screen") == 0)
@@ -4289,7 +4289,7 @@ layout_view_item::layout_view_item(
 		if (itemnode.has_attribute("tag"))
 		{
 			std::string_view const tag(env.get_attribute_string(itemnode, "tag"));
-			m_screen = dynamic_cast<screen_device *>(env.device().subdevice(tag));
+			m_screen = dynamic_cast<device_video_output_interface *>(env.device().subdevice(tag));
 			if (!m_screen)
 				throw layout_reference_error(util::string_format("invalid screen tag '%d'", tag));
 		}

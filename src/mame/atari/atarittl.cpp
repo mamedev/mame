@@ -197,7 +197,7 @@ void atarikee_state::atarikee(machine_config &config)
 	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK()).set_source(netlist_atarikee);
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 	FIXFREQ(config, m_video).set_screen("screen");
 	m_video->set_monitor_clock(MASTER_CLOCK);
 	m_video->set_horz_params(H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL);
@@ -218,7 +218,7 @@ void stuntcyc_state::stuntcyc(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "maincpu:startsw2", "START2.POS", 0);
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 	FIXFREQ(config, m_video).set_screen("screen");
 	m_video->set_monitor_clock(SC_VIDCLOCK);
 	m_video->set_horz_params(SC_HTOTAL-84,SC_HTOTAL-64,SC_HTOTAL-16, SC_HTOTAL);
@@ -248,7 +248,7 @@ void tank_state::tank(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "maincpu:coin2",   "COIN2.POS", 0);
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 	FIXFREQ(config, m_video).set_screen("screen");
 	m_video->set_monitor_clock(TANK_VIDCLOCK);
 	//                    Length of active video,   end of front-porch,   end of sync signal,  end of back porch
@@ -295,7 +295,7 @@ void gtrak10_state::gtrak10(machine_config &config)
 	   Vert Back Porch  =   ?
 	*/
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 	FIXFREQ(config, m_video).set_screen("screen");
 	m_video->set_monitor_clock(GTRAK10_VIDCLOCK);
 	//                    Length of active video,   end of front-porch,   end of sync signal,  end of line/frame

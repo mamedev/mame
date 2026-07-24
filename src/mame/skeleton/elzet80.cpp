@@ -235,7 +235,7 @@ void elzet80_state::elzet80(machine_config &config)
 	Z80PIO(config, m_ppio, 4_MHz_XTAL);
 
 	// video
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(15_MHz_XTAL, 512, 0, 320, 326, 0, 240);
 	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 

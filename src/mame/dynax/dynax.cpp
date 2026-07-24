@@ -3767,7 +3767,7 @@ void cdracula_state::cdracula(machine_config &config)
 	m_mainlatch->q_out_cb<5>().set(FUNC(cdracula_state::blit_palbank_w));     // Layers Palettes (High Bit)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(58.56);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
@@ -3823,7 +3823,7 @@ void dynax_adpcm_state::hanamai(machine_config &config)
 	m_mainlatch->q_out_cb<7>().set(FUNC(dynax_adpcm_state::layer_half_w));       // half of the interleaved layer to write to
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
@@ -3892,7 +3892,7 @@ void dynax_adpcm_state::hnoridur(machine_config &config)
 	outlatch.q_out_cb<1>().set(FUNC(dynax_adpcm_state::coincounter_1_w));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256+22);
@@ -3962,7 +3962,7 @@ void dynax_adpcm_state::hjingi(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
@@ -4023,7 +4023,7 @@ void dynax_state::sprtmtch(machine_config &config)
 	m_mainlatch->q_out_cb<5>().set(FUNC(dynax_state::blit_palbank_w));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
@@ -4087,7 +4087,7 @@ void dynax_state::mjfriday(machine_config &config)
 	m_mainlatch->q_out_cb<7>().set(FUNC(dynax_state::mjdialq2_layer0_enable_w));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(256, 256);
@@ -4257,7 +4257,7 @@ void jantouki_state::jantouki(machine_config &config)
 	PALETTE(config, m_palette, FUNC(jantouki_state::sprtmtch_palette), 512); // static palette
 	config.set_default_layout(layout_dualhovu);
 
-	screen_device &top(SCREEN(config, "top", SCREEN_TYPE_RASTER));
+	screen_device &top(SCREEN(config, "top"));
 	top.set_refresh_hz(60);
 	top.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	top.set_size(512, 256);
@@ -4272,7 +4272,7 @@ void jantouki_state::jantouki(machine_config &config)
 	m_blitter->scrolly_cb().set(FUNC(jantouki_state::dynax_blit_scrolly_w));
 	m_blitter->ready_cb().set(FUNC(jantouki_state::jantouki_blitter_irq_w));
 
-	screen_device &bottom(SCREEN(config, "bottom", SCREEN_TYPE_RASTER));
+	screen_device &bottom(SCREEN(config, "bottom"));
 	bottom.set_refresh_hz(60);
 	bottom.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	bottom.set_size(512, 256);
@@ -4398,7 +4398,7 @@ void dynax_state::qyjdzjp(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256+22);
@@ -4515,7 +4515,7 @@ void dynax_state::tenkai(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256+22);
@@ -4622,7 +4622,7 @@ void dynax_state::gekisha(machine_config &config)
 	m_mainlatch->q_out_cb<7>().set(FUNC(dynax_state::mjdialq2_layer0_enable_w));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(256, 256);

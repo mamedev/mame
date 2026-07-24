@@ -5044,7 +5044,7 @@ void apple2e_state::apple2e_common(machine_config &config, bool enhanced, bool r
 
 	// HBL is positioned to the right of active video here, but to the left on hardware.
 	// this must be compensated for in any use of hpos/vpos/vblank.
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(1021800 * 14, 65 * 14, 0, 40 * 14, 262, 0, 192);
 	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::IIE, false, false>)));
 	m_screen->set_palette(m_video);

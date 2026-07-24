@@ -1777,7 +1777,7 @@ void gba_lcd_device::device_reset()
 
 void gba_lcd_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_raw(XTAL(16'777'216) / 4, 308, 0, 240, 228, 0, 160);
 	screen.set_screen_update(FUNC(gba_lcd_device::screen_update));
 	screen.set_palette(*this);

@@ -2074,7 +2074,7 @@ void casloopy_state::casloopy(machine_config &config)
 	SH7021(config, m_maincpu, SH1_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &casloopy_state::casloopy_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(VIDEO_CLOCK / 4, H_TOTAL, 0, H_ACTIVE, V_TOTAL, 0, V_ACTIVE_0);
 	m_screen->set_screen_update(FUNC(casloopy_state::screen_update));
 

@@ -175,7 +175,7 @@ void ikt5a_state::ikt5a(machine_config &config)
 	m_keyboard->out_clock_cb().set(FUNC(ikt5a_state::keyboard_clk_w));
 	m_keyboard->out_data_cb().set(FUNC(ikt5a_state::keyboard_data_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(15_MHz_XTAL, 800, 0, 640, 375, 0, 350); // timings guessed
 	screen.set_screen_update(FUNC(ikt5a_state::screen_update));
 	screen.screen_vblank().set_inputline(m_maincpu, MCS51_INT0_LINE);

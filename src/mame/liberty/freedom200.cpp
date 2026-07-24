@@ -324,7 +324,7 @@ void freedom200_state::freedom200(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_raw(16000000, 768, 0, 640, 321, 0, 300); // clock unverified
 	m_screen->set_screen_update(m_avdc, FUNC(scn2674_device::screen_update));

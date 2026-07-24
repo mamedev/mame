@@ -665,7 +665,7 @@ void bionicc_state::bionicc(machine_config &config)
 	m_mcu->port_out_cb<3>().set(FUNC(bionicc_state::mcu_p3_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 256, 260, 16, 240);
 	m_screen->set_screen_update(FUNC(bionicc_state::screen_update));
 	m_screen->set_palette(m_palette);

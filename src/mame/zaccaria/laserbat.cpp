@@ -470,7 +470,7 @@ void laserbat_state_base::laserbat_base(machine_config &config)
 	m_maincpu->intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x0a; });
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(14'318'181), 227*4, 43*4-1, 227*4-1, 312, 8, 255);
 	m_screen->set_screen_update(FUNC(laserbat_state_base::screen_update_laserbat));
 	m_screen->set_palette(m_palette);

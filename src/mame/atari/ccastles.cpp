@@ -869,7 +869,7 @@ void ccastles_state::ccastles(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ccastles);
 	PALETTE(config, m_palette).set_entries(32);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, 0, 256, VTOTAL, 24, 256); // potentially adjusted later
 	m_screen->set_screen_update(FUNC(ccastles_state::screen_update));
 	m_screen->set_palette(m_palette);

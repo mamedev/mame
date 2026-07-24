@@ -1146,7 +1146,7 @@ void vamphalf_state::common(machine_config &config)
 	m_eeprom->write_time(attotime::from_usec(1));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(28_MHz_XTAL / 4, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	screen.set_screen_update(FUNC(vamphalf_state::screen_update_common));
 	screen.set_palette(m_palette);
@@ -1354,7 +1354,7 @@ void vamphalf_state::aoh(machine_config &config)
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(32_MHz_XTAL / 4, 512, 64, 448, 264, 16, 240);
 	screen.set_screen_update(FUNC(vamphalf_state::screen_update_aoh));
 	screen.set_palette(m_palette);

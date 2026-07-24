@@ -384,8 +384,7 @@ uint32_t fixedfreq_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 	// printf("%d %lu %f %f\n", m_state.m_sig_vsync, m_state.m_fragments.size(),
 	// m_state.m_fragments[0].y,
 	// m_state.m_fragments[m_state.m_fragments.size()-1].y);
-	bool force_vector = screen.screen_type() == SCREEN_TYPE_VECTOR
-						|| (m_vector->read() & 1);
+	bool force_vector = m_vector->read() & 1;
 	bool  debug_timing = (m_enable->read() & 2) == 2;
 	bool  test_pat = (m_enable->read() & 4) == 4;
 	rgb_t backcol = debug_timing ? rgb_t(0xff, 0xff, 0x00, 0x00)
@@ -408,7 +407,7 @@ uint32_t fixedfreq_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 
 		const uint32_t flags(
 			PRIMFLAG_ANTIALIAS(1) | PRIMFLAG_BLENDMODE(BLENDMODE_ADD)
-			| (screen.screen_type() == SCREEN_TYPE_VECTOR ? PRIMFLAG_VECTOR(1)
+			| (screen.is_vector() ? PRIMFLAG_VECTOR(1)
 														  : 0));
 		const rectangle &visarea = screen.visible_area();
 		float            xscale = 1.0f / (float)visarea.width();
@@ -419,7 +418,7 @@ uint32_t fixedfreq_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 		screen.container().add_rect(
 			0.0f, 0.0f, 1.0f, 1.0f, rgb_t(0xff, 0x00, 0x00, 0x00),
 			PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA)
-				| (screen.screen_type() == SCREEN_TYPE_VECTOR
+				| (screen.is_vector()
 					   ? PRIMFLAG_VECTORBUF(1)
 					   : 0));
 
@@ -582,12 +581,6 @@ static INPUT_PORTS_START(fixedfreq_raster_ports)
 
 INPUT_PORTS_END
 
-static INPUT_PORTS_START(fixedfreq_vector_ports)
-	PORT_INCLUDE(fixedfreq_base_ports)
-
-	PORT_ADJUSTERX(SCANLINE_HEIGHT, "Scanline Height", 10, 300)
-INPUT_PORTS_END
-
 //
 // clang-format on
 
@@ -595,14 +588,8 @@ ioport_constructor fixedfreq_device::device_input_ports() const
 {
 	LOG("input ports\n");
 	if (has_screen())
-	{
-		if (screen().screen_type() == SCREEN_TYPE_RASTER)
-			return INPUT_PORTS_NAME(fixedfreq_raster_ports);
-		else
-			return INPUT_PORTS_NAME(fixedfreq_vector_ports);
-	}
-	else
-		return nullptr;
+		return INPUT_PORTS_NAME(fixedfreq_raster_ports);
+	return nullptr;
 }
 
 unsigned fixedfreq_device::monitor_val(unsigned param) const

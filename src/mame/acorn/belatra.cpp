@@ -131,7 +131,7 @@ void belatra_state::belatra(machine_config &config)
 	ARM7500(config, m_maincpu, 56_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &belatra_state::program_map);
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	ARM_VIDC20(config, m_vidc, 24'000'000); // chip type and clock guessed
 	m_vidc->set_screen("screen");

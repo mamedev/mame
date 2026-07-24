@@ -349,7 +349,7 @@ void blockch_state::blockch(machine_config &config)
 	m_ppi[1]->in_pc_callback().set(FUNC(blockch_state::ppi1_c_r));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(4, 384-12-1, 4, 248-1);

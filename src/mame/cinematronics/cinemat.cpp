@@ -253,12 +253,8 @@ u8 cinemat_color_state::boxingb_dial_r(offs_t offset)
 
 u8 qb3_state::qb3_frame_r()
 {
-	attotime next_update = m_screen->time_until_update();
-	attotime frame_period = m_screen->frame_period();
-	int percent = next_update.attoseconds() / (frame_period.attoseconds() / 100);
-
-	// note this is just an approximation...
-	return (percent >= 10);
+	attotime frame_period = m_vector->frame_period();
+	return (frame_period.attoseconds() > 0) ? 1 : 0;
 }
 
 
@@ -1032,15 +1028,10 @@ void cinemat_state::cinemat_nojmi_4k(machine_config &config)
 	m_outlatch->q_out_cb<6>().set(FUNC(cinemat_state::vector_control_w));
 
 	// video hardware
-	VECTOR(config, "vector");
-
-	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
-	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	m_screen->set_refresh_hz(19.923_MHz_XTAL/4/16/16/16/16/2);
-	m_screen->set_size(1024, 768);
-	m_screen->set_visarea_full();
-	m_screen->set_screen_update(FUNC(cinemat_state::screen_update_cinemat));
-	m_screen->screen_vblank().set(m_maincpu, FUNC(ccpu_cpu_device::wdt_trigger));
+	VECTOR(config, m_vector);
+	m_vector->set_refresh_hz(19.923_MHz_XTAL/4/16/16/16/16/2);
+	m_vector->set_visarea(0, 0, 1023, 767);
+	m_vector->screen_vblank().set(m_maincpu, FUNC(ccpu_cpu_device::wdt_trigger));
 }
 
 void cinemat_state::cinemat_jmi_4k(machine_config &config)
@@ -1090,8 +1081,6 @@ void cinemat_state::spacewar(machine_config &config)
 	SPACE_WARS_AUDIO(config, "soundboard")
 		.configure_latch_inputs(*m_outlatch)
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	m_screen->set_screen_update(FUNC(cinemat_state::screen_update_spacewar));
 }
 
 void cinemat_state::barrier(machine_config &config)
@@ -1212,13 +1201,13 @@ void cinemat_color_state::boxingb(machine_config &config)
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 	m_outlatch->q_out_cb<7>().append(FUNC(cinemat_state::mux_select_w));
 
-	m_screen->set_visarea(0, 1024, 0, 788);
+	m_vector->set_visarea(0, 1024, 0, 788);
 }
 
 void cinemat_state::wotw(machine_config &config)
 {
 	cinemat_jmi_16k(config);
-	m_screen->set_visarea(0, 1120, 0, 767);
+	m_vector->set_visarea(0, 1120, 0, 767);
 
 	SPEAKER(config, "mono").front_center();
 	WAR_OF_THE_WORLDS_AUDIO(config, "soundboard")
@@ -1240,7 +1229,7 @@ void demon_state::demon(machine_config &config)
 {
 	cinemat_jmi_16k(config);
 	demon_sound(config);
-	m_screen->set_visarea(0, 1024, 0, 805);
+	m_vector->set_visarea(0, 1024, 0, 805);
 }
 
 void qb3_state::qb3(machine_config &config)
@@ -1249,7 +1238,7 @@ void qb3_state::qb3(machine_config &config)
 	qb3_sound(config);
 	m_maincpu->set_addrmap(AS_DATA, &qb3_state::data_map_qb3);
 	m_maincpu->set_addrmap(AS_IO, &qb3_state::io_map_qb3);
-	m_screen->set_visarea(0, 1120, 0, 780);
+	m_vector->set_visarea(0, 1120, 0, 780);
 }
 
 

@@ -5,12 +5,14 @@
 
 #pragma once
 
-#include "notifier.h"
+#include "render.h"
 
 #include <utility>
 
 
 class vector_device;
+
+typedef device_delegate<void (vector_device &)> vector_update_delegate;
 
 class vector_options
 {
@@ -27,7 +29,7 @@ protected:
 	static void init(emu_options& options);
 };
 
-class vector_device : public device_t, public device_video_interface
+class vector_device : public device_t, public device_video_output_interface
 {
 public:
 	using frame_begin_delegate = delegate<void ()>;
@@ -42,10 +44,40 @@ public:
 	// construction/destruction
 	vector_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void clear_list();
+	// device_video_output_interface implementation
+	bool has_beam() const override { return false; }
+	bool is_vector() const override { return true; }
+	virtual const char *output_type_name() const override { return "vector"; }
+	attotime frame_period() const override { return m_frame_period; }
+	void override_frame_period(attotime period) override;
+	bool has_palette() const override { return false; }
+	device_palette_interface &palette() const override { throw emu_fatalerror("vector_device has no palette"); }
+	rectangle visible_area() const override { return m_visarea; }
+	std::pair<unsigned, unsigned> physical_aspect() const override;
 
+	void clear_list();
 	void add_point(int x, int y, rgb_t color, int intensity);
+
+	// configuration
+	template <typename T> vector_device &set_refresh_hz(T &&hz) { m_frame_period = attotime::from_hz(hz); return *this; }
+	void set_visarea(s16 minx, s16 maxx, s16 miny, s16 maxy) { m_visarea = rectangle(minx, maxx, miny, maxy); }
+	void set_color(rgb_t color) { m_color = color; }
+	auto screen_vblank() { return m_vblank.bind(); }
+
+	template <typename F>
+	void set_vector_update(F &&callback, const char *name)
+	{
+		m_vector_update.set(std::forward<F>(callback), name);
+	}
+
+	template <typename T, typename F>
+	void set_vector_update(T &&target, F &&callback, const char *name)
+	{
+		m_vector_update.set(std::forward<T>(target), std::forward<F>(callback), name);
+	}
+
+	// getters
+	rgb_t color() const { return m_color; }
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -72,6 +104,7 @@ public:
 	{ return add_line_notifier(line_delegate(std::forward<T>(n))); }
 
 private:
+	TIMER_CALLBACK_MEMBER(vblank_timer_callback);
 	float normalized_sigmoid(float n, float k);
 
 	/* The vertices are buffered here */
@@ -89,11 +122,22 @@ private:
 	int m_min_intensity;
 	int m_max_intensity;
 
+	// vector screen configuration
+	rectangle m_visarea;
+	attotime m_frame_period;
+	rgb_t m_color;
+	devcb_write_line m_vblank;
+	vector_update_delegate m_vector_update;
+
+	emu_timer *m_vblank_timer;
+
 	// notify interested parties about vector-drawing activities
 	util::notifier<> m_frame_begin_notifier;
 	util::notifier<> m_frame_end_notifier;
 	util::notifier<int, int, uint32_t, int, int> m_move_notifier;
 	util::notifier<int, int, int, int, uint32_t, int, int, int> m_line_notifier;
+
+	bool video_output_update() override;
 };
 
 // device type definition

@@ -25,9 +25,6 @@
 #include "vector.h"
 
 #include "emuopts.h"
-#include "render.h"
-#include "screen.h"
-
 
 #define VECTOR_WIDTH_DENOM 512
 
@@ -54,23 +51,64 @@ DEFINE_DEVICE_TYPE(VECTOR, vector_device, "vector_device", "VECTOR")
 
 vector_device::vector_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VECTOR, tag, owner, clock),
-		device_video_interface(mconfig, *this),
+		device_video_output_interface(mconfig, *this),
 		m_vector_list(nullptr),
+		m_vector_index(0),
 		m_min_intensity(255),
-		m_max_intensity(0)
+		m_max_intensity(0),
+		m_visarea(rectangle()),
+	  m_frame_period(attotime::from_hz(60)),
+		m_color(rgb_t::green()),
+		m_vblank(*this),
+		m_vector_update(*this),
+		m_vblank_timer(nullptr)
 {
 }
 
 void vector_device::device_start()
 {
+	m_vector_update.resolve();
+
 	vector_options::init(machine().options());
 
 	m_vector_index = 0;
 
 	/* allocate memory for tables */
 	m_vector_list = std::make_unique<point[]>(MAX_POINTS);
+
+	// register items for saving
+	save_item(NAME(m_frame_period));
+
+	/* allocate and start the vblank timer */
+	m_vblank_timer = timer_alloc(FUNC(vector_device::vblank_timer_callback), this);
+	m_vblank_timer->adjust(m_frame_period, 0, m_frame_period);
 }
 
+
+//-------------------------------------------------
+//  vblank_timer_callback - periodically fires to
+//  drive update_if_primary
+//-------------------------------------------------
+
+void vector_device::vblank_timer_callback(s32 param)
+{
+	update_if_primary();
+
+	// call the vblank callback
+	m_vblank(1);
+	m_vblank(0);
+}
+
+//-------------------------------------------------
+//  override_frame_period - forcibly change the
+//  refresh rate (from the sliders)
+//-------------------------------------------------
+
+void vector_device::override_frame_period(attotime period)
+{
+	m_frame_period = period;
+	m_vblank_timer->adjust(m_frame_period, 0, m_frame_period);
+}
 
 //-------------------------------------------------
 //  subscribe for frame-begin notifications
@@ -172,13 +210,16 @@ void vector_device::clear_list()
 }
 
 //-------------------------------------------------
-// Update the screen container with queued vectors.
+// Update the container with queued vectors.
 //-------------------------------------------------
 
-uint32_t vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+bool vector_device::video_output_update()
 {
+	if (!m_vector_update.isnull())
+		m_vector_update(*this);
+
 	uint32_t flags = PRIMFLAG_ANTIALIAS(1) | PRIMFLAG_BLENDMODE(BLENDMODE_ADD) | PRIMFLAG_VECTOR(1);
-	const rectangle &visarea = screen.visible_area();
+	const rectangle &visarea = m_visarea;
 	float xscale = 1.0f / (65536 * visarea.width());
 	float yscale = 1.0f / (65536 * visarea.height());
 	float xoffs = (float)visarea.min_x;
@@ -190,8 +231,8 @@ uint32_t vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	curpoint = m_vector_list.get();
 
-	screen.container().empty();
-	screen.container().add_rect(0.0f, 0.0f, 1.0f, 1.0f, rgb_t(0xff,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_VECTORBUF(1));
+	container().empty();
+	container().add_rect(0.0f, 0.0f, 1.0f, 1.0f, rgb_t(0xff,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_VECTORBUF(1));
 
 	m_frame_begin_notifier();
 
@@ -221,7 +262,7 @@ uint32_t vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 		if (curpoint->intensity != 0)
 		{
-			screen.container().add_line(
+			container().add_line(
 					coords.x0, coords.y0, coords.x1, coords.y1,
 					beam_width,
 					(curpoint->intensity << 24) | (curpoint->col & 0xffffff),
@@ -241,5 +282,15 @@ uint32_t vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	m_frame_end_notifier();
 
-	return 0;
+	return true;
+}
+
+
+//-------------------------------------------------
+//  physical aspect ratio
+//-------------------------------------------------
+
+std::pair<unsigned, unsigned> vector_device::physical_aspect() const
+{
+	return { 4, 3 };
 }

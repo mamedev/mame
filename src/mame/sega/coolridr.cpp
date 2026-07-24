@@ -3305,14 +3305,14 @@ void coolridr_state::coolridr(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57); // measured at 57.0426Hz
 	m_screen->set_size(640, 512);
 	m_screen->set_visarea(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL);
 	m_screen->set_screen_update(FUNC(coolridr_state::screen_update<0>));
 	m_screen->set_palette(m_palette);
 
-	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
+	screen_device &screen2(SCREEN(config, "screen2"));
 	screen2.set_refresh_hz(57); // measured at 57.0426Hz
 	screen2.set_size(640, 512);
 	screen2.set_visarea(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL);

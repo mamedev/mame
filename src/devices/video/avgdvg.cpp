@@ -1331,7 +1331,7 @@ void dvg_device::device_start()
 {
 	avgdvg_device_base::device_start();
 
-	const rectangle &visarea = m_vector->screen().visible_area();
+	const rectangle &visarea = m_vector->visible_area();
 
 	m_xmin = visarea.min_x;
 	m_ymin = visarea.min_y;
@@ -1344,7 +1344,7 @@ void avg_device::device_start()
 {
 	avgdvg_device_base::device_start();
 
-	const rectangle &visarea = m_vector->screen().visible_area();
+	const rectangle &visarea = m_vector->visible_area();
 
 	m_xmin = visarea.min_x;
 	m_ymin = visarea.min_y;

@@ -1259,7 +1259,7 @@ void pc8001_state::pc8001(machine_config &config)
 	config.set_perfect_quantum("pc80s31:fdc_cpu");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(VIDEO_CLOCK, 896, 0, 640, 260, 0, 200);
 	m_screen->set_screen_update(FUNC(pc8001_state::screen_update));
 //  m_screen->set_palette(m_crtc_palette);

@@ -103,7 +103,7 @@ void leadsng2_state::leadsng2(machine_config &config)
 	R4400LE(config, m_maincpu, 27_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &leadsng2_state::mem_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);

@@ -174,7 +174,7 @@ void pres2k_state::pres2k(machine_config &config)
 	v9938.set_screen_ntsc("screen");
 	v9938.set_vram_size(1024 * 128);
 	v9938.int_cb().set_inputline("maincpu", 0);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();

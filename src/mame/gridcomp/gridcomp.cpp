@@ -354,7 +354,7 @@ void gridcomp_state::grid1101(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	DAC0832(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD)); // actually a kind of EL display
+	screen_device &screen(SCREEN(config, "screen").set_lcd()); // actually a kind of EL display
 	screen.set_color(rgb_t::amber());
 	screen.set_screen_update(FUNC(gridcomp_state::screen_update<320>));
 	screen.set_raw(XTAL(15'000'000)/2, 424, 0, 320, 262, 0, 240); // XXX 66 Hz refresh

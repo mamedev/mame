@@ -403,7 +403,7 @@ void cit101_state::cit101(machine_config &config)
 	m_maincpu->in_sid_func().set_constant(0); // used to time NVR reads
 	m_maincpu->out_sod_func().set(FUNC(cit101_state::blink_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	//m_screen->set_raw(14.976_MHz_XTAL, 960, 0, 800, 260, 0, 240);
 	m_screen->set_raw(22.464_MHz_XTAL, 1440, 0, 1188, 260, 0, 240);
 	m_screen->set_screen_update(FUNC(cit101_state::screen_update));

@@ -297,7 +297,7 @@ void kbash_state::kbash(machine_config &config)
 	TOAPLAN_COINCOUNTER(config, "coincounter");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(kbash_state::screen_update));
@@ -327,7 +327,7 @@ void kbash2_state::kbash2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &kbash2_state::kbash2_68k_mem);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(kbash2_state::screen_update));

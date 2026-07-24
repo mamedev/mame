@@ -341,7 +341,7 @@ void zx_state::zx80(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &zx_state::ula_map);
 	m_maincpu->refresh_cb().set(FUNC(zx_state::refresh_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(6.5_MHz_XTAL / 2 / 64159.0); // 54223 for NTSC
 	m_screen->set_size(384, 311);
 	m_screen->set_visarea(0, 383, 0, 310);

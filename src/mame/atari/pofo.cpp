@@ -970,7 +970,7 @@ void portfolio_state::portfolio(machine_config &config)
 	m_ram->set_default_size("128K");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, SCREEN_TAG).set_lcd());
 	screen.set_refresh_hz(72);
 	screen.set_screen_update(HD61830_TAG, FUNC(hd61830_device::screen_update));
 	screen.set_size(240, 64);
@@ -997,7 +997,7 @@ void portfolio_state::portfolio2(machine_config &config)
 	m_ram->set_default_size("512K");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, SCREEN_TAG).set_lcd());
 	screen.set_refresh_hz(56);
 	screen.set_size(640, 200);
 	screen.set_visarea_full();

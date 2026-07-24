@@ -1154,7 +1154,7 @@ void tecmo_state::rygar(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240); // 59.18 Hz
 	m_screen->set_screen_update(FUNC(tecmo_state::screen_update));
 	m_screen->set_palette(m_palette);

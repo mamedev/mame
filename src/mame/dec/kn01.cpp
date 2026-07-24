@@ -420,7 +420,7 @@ void kn01_state::kn01(machine_config &config, XTAL clock)
 	m_mram->set_default_size("24MiB");
 	m_mram->set_extra_options("4MiB,8MiB,12MiB,16MiB,20MiB");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(69169800, 1280, 212, 1024+212, 901, 34, 864+34);
 	m_screen->set_screen_update(FUNC(kn01_state::screen_update));
 

@@ -613,7 +613,7 @@ void rc759_state::rc759(machine_config &config)
 	m_centronics->select_handler().set(FUNC(rc759_state::centronics_select_w));
 
 	// video
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(1'250'000 * 16, 896, 96, 816, 377, 4, 364); // 22 kHz setting
 	screen.set_screen_update("txt", FUNC(i82730_device::screen_update));
 	screen.screen_vblank().set(m_maincpu, FUNC(i80186_cpu_device::tmrin0_w)); // TMRIN0 source not documented, but self-test needs something like this

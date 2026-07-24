@@ -688,7 +688,7 @@ void splus_state::splus(machine_config &config) // basic machine hardware
 	// video hardware (ALL FAKE, NO VIDEO)
 	PALETTE(config, "palette").set_entries(16*16);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_screen_update(FUNC(splus_state::screen_update));

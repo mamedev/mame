@@ -200,7 +200,7 @@ void hp2620_state::hp2622(machine_config &config)
 
 	INPUT_MERGER_ALL_HIGH(config, m_nmigate).output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update(FUNC(hp2620_state::screen_update));
 
 	DP8367(config, m_crtc, 25.7715_MHz_XTAL).set_screen("screen");

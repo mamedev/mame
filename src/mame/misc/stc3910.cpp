@@ -290,7 +290,7 @@ void executel_state::executel(machine_config &config)
 	//m_maincpu->in_sid_func().set(FUNC(executel_state::sid_r));
 	//m_maincpu->out_sod_func().set(FUNC(executel_state::sod_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(6_MHz_XTAL, 384, 0, 240, 313, 0, 240);
 	screen.set_screen_update("vdg", FUNC(mr9735_002_device::screen_update));
 	screen.screen_vblank().set_inputline(m_maincpu, I8085_RST65_LINE);

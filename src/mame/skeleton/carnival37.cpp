@@ -267,7 +267,7 @@ void carnival37_state::carniv37(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(20));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	// ~53.89 Hz
 	screen.set_raw(12_MHz_XTAL / 2, 392, 0, 288, 284, 0, 224);
 	screen.set_screen_update(FUNC(carnival37_state::screen_update));

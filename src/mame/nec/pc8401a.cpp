@@ -831,7 +831,7 @@ void pc8401a_state::pc8401a(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(pc8401a_state::palette_init), 2);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(44);
 	m_screen->set_screen_update(SED1330_TAG, FUNC(sed1330_device::screen_update));
 	m_screen->set_size(480, 130);

@@ -958,7 +958,7 @@ void magic10_base_state::base(machine_config &config)
 	// 1FILL is required by vanilla magic10 at least (otherwise gameplay won't work properly)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);

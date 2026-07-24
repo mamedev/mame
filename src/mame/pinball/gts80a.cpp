@@ -648,7 +648,7 @@ void caveman_state::caveman(machine_config &config)
 	m_videocpu->set_addrmap(AS_PROGRAM, &caveman_state::video_map);
 	m_videocpu->set_addrmap(AS_IO, &caveman_state::video_io_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256);

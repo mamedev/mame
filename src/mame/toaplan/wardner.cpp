@@ -484,7 +484,7 @@ void wardner_state::wardner(machine_config &config)
 
 	BUFFERED_SPRITERAM8(config, m_spriteram8);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(14_MHz_XTAL/2, 446, 0, 320, 286, 0, 240);
 	m_screen->set_screen_update(FUNC(wardner_state::screen_update));

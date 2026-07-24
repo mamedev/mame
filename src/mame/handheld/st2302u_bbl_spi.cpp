@@ -257,7 +257,7 @@ void bbl380_state::bbl380(machine_config &config)
 
 	bbl380_do_maincpu_config();
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD); // TFT color LCD
+	SCREEN(config, m_screen).set_lcd(); // TFT color LCD
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(160, 128);

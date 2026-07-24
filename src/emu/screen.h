@@ -14,24 +14,14 @@
 #pragma once
 
 #include "rendertypes.h"
+#include "divo.h"
 
 #include <type_traits>
 #include <utility>
 
-
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
-
-// screen types
-enum screen_type_enum
-{
-	SCREEN_TYPE_INVALID = 0,
-	SCREEN_TYPE_RASTER,
-	SCREEN_TYPE_VECTOR,
-	SCREEN_TYPE_LCD,
-	SCREEN_TYPE_SVG
-};
 
 // screen_update callback flags
 constexpr u32 UPDATE_HAS_NOT_CHANGED = 0x0001; // the video has not changed
@@ -161,34 +151,21 @@ typedef device_delegate<u32 (screen_device &, bitmap_rgb32 &, const rectangle &)
 
 // ======================> screen_device
 
-class screen_device : public device_t
+class screen_device : public device_t, public device_video_output_interface
 {
 	friend class render_manager;
 
 public:
 	// construction/destruction
-	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, screen_type_enum type)
-		: screen_device(mconfig, tag, owner, u32(0))
-	{
-		set_type(type);
-	}
-	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, screen_type_enum type, rgb_t color)
-		: screen_device(mconfig, tag, owner, u32(0))
-	{
-		set_type(type);
-		set_color(color);
-	}
+	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 	~screen_device();
 
 	// configuration readers
-	screen_type_enum screen_type() const { return m_type; }
-	int orientation() const { assert(configured()); return m_orientation; }
-	std::pair<unsigned, unsigned> physical_aspect() const;
+	bool is_lcd() const { return m_is_lcd; }
+	std::pair<unsigned, unsigned> physical_aspect() const override;
 	int width() const { return m_width; }
 	int height() const { return m_height; }
-	const rectangle &visible_area() const { return m_visarea; }
+	rectangle visible_area() const override { return m_visarea; }
 	const rectangle &cliprect() const { return m_bitmap[0].cliprect(); }
 	bool oldstyle_vblank_supplied() const { return m_oldstyle_vblank_supplied; }
 	attoseconds_t refresh_attoseconds() const { return m_refresh; }
@@ -201,8 +178,8 @@ public:
 	bool has_screen_update() const { return !m_screen_update_ind16.isnull() || !m_screen_update_rgb32.isnull(); }
 
 	// inline configuration helpers
-	void set_type(screen_type_enum type) { assert(!configured()); m_type = type; }
-	void set_orientation(int orientation) { assert(!configured()); m_orientation = orientation; }
+	screen_device &set_lcd() { assert(!configured()); m_is_lcd = true; return *this; }
+	screen_device &set_raster() { assert(!configured()); m_is_lcd = false; return *this; }
 	void set_physical_aspect(unsigned x, unsigned y) { assert(!configured()); m_phys_aspect = std::make_pair(x, y); }
 	void set_native_aspect() { assert(!configured()); m_phys_aspect = std::make_pair(~0U, ~0U); }
 
@@ -368,13 +345,11 @@ public:
 	screen_device &set_no_palette() { m_palette.set_tag(finder_base::DUMMY_TAG); return *this; }
 	screen_device &set_video_attributes(u32 flags) { m_video_attributes = flags; return *this; }
 	screen_device &set_color(rgb_t color) { m_color = color; return *this; }
-	template <typename T> screen_device &set_svg_region(T &&tag) { m_svg_region.set_tag(std::forward<T>(tag)); return *this; } // default region is device tag
 
 	// information getters
-	render_container &container() const { assert(m_container != nullptr); return *m_container; }
 	bitmap_ind8 &priority() { return m_priority; }
-	device_palette_interface &palette() const { assert(m_palette != nullptr); return *m_palette; }
-	bool has_palette() const { return m_palette != nullptr; }
+	device_palette_interface &palette() const override { assert(m_palette != nullptr); return *m_palette; }
+	bool has_palette() const override { return m_palette != nullptr; }
 	screen_bitmap &curbitmap() { return m_bitmap[m_curtexture]; }
 
 	// dynamic configuration
@@ -384,8 +359,8 @@ public:
 	void set_brightness(u8 brightness) { m_brightness = brightness; }
 
 	// beam positioning and state
-	int vpos() const;
-	int hpos() const;
+	virtual int vpos() const override;
+	virtual int hpos() const override;
 	int vblank() const { return (machine().time() < m_vblank_end_time) ? 1 : 0; }
 	int hblank() const { int const curpos = hpos(); return (curpos < m_visarea.left() || curpos > m_visarea.right()) ? 1 : 0; }
 
@@ -396,7 +371,8 @@ public:
 	attotime time_until_update() const { return (m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK) ? time_until_vblank_end() : time_until_vblank_start(); }
 	attotime scan_period() const { return attotime(0, m_scantime); }
 	attotime pixel_period() const { return attotime(0, m_pixeltime); }
-	attotime frame_period() const { return attotime(0, m_frame_period); }
+	attotime frame_period() const override { return attotime(0, m_frame_period); }
+	void override_frame_period(attotime period) override;
 	u64 frame_number() const { return m_frame_number; }
 
 	// pixel-level access
@@ -416,19 +392,19 @@ public:
 	void register_screen_bitmap(bitmap_t &bitmap);
 
 	// internal to the video system
-	bool update_quads();
+	virtual bool video_output_update() override;
 	void update_burnin();
 
 	// globally accessible constants
 	static constexpr int DEFAULT_FRAME_RATE = 60;
 	static const attotime DEFAULT_FRAME_PERIOD;
 
-private:
-	class svg_renderer;
+	virtual bool has_beam() const override { return true; }
+	virtual const char *output_type_name() const override;
 
+private:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_config_complete() override;
 	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -436,7 +412,6 @@ private:
 	virtual void device_post_load() override;
 
 	// internal helpers
-	void set_container(render_container &container) { m_container = &container; }
 	void realloc_screen_bitmaps();
 	TIMER_CALLBACK_MEMBER(vblank_begin);
 	TIMER_CALLBACK_MEMBER(vblank_end);
@@ -451,8 +426,7 @@ private:
 	void allocate_scan_bitmaps();
 
 	// inline configuration data
-	screen_type_enum    m_type;                     // type of screen
-	int                 m_orientation;              // orientation flags combined with system flags
+	bool                m_is_lcd;                   // indicate if the screen is LCD
 	std::pair<unsigned, unsigned> m_phys_aspect;    // physical aspect ratio
 	bool                m_oldstyle_vblank_supplied; // set_vblank_time call used
 	attoseconds_t       m_refresh;                  // default refresh period
@@ -465,11 +439,8 @@ private:
 	devcb_write32       m_scanline_cb;              // screen scanline callback
 	optional_device<device_palette_interface> m_palette; // our palette
 	u32                 m_video_attributes;         // flags describing the video system
-	optional_memory_region m_svg_region;            // the region in which the svg data is in
 
 	// internal state
-	render_container *  m_container;                // pointer to our container
-	std::unique_ptr<svg_renderer> m_svg; // the svg renderer
 	// dimensions
 	int                 m_max_width;                // maximum width encountered
 	int                 m_width;                    // current width (HTOTAL)
@@ -491,7 +462,6 @@ private:
 	s32                 m_last_partial_scan;        // scanline of last partial update
 	s32                 m_partial_scan_hpos;        // horizontal pixel last rendered on this partial scanline
 	bitmap_argb32       m_screen_overlay_bitmap;    // screen overlay bitmap
-	u32                 m_unique_id;                // unique id for this screen_device
 	rgb_t               m_color;                    // render color
 	u8                  m_brightness;               // global brightness
 
@@ -508,8 +478,6 @@ private:
 	emu_timer *         m_scanline_timer;           // scanline timer
 	u64                 m_frame_number;             // the current frame number
 	u32                 m_partial_updates_this_frame; // partial update counter this frame
-
-	bool                m_is_primary_screen;
 
 	// VBLANK callbacks
 	class callback_item
@@ -531,10 +499,6 @@ private:
 		bitmap_t &                  m_bitmap;
 	};
 	std::vector<std::unique_ptr<auto_bitmap_item>> m_auto_bitmap_list; // list of registered bitmaps
-
-	// static data
-	static u32          m_id_counter;   // incremented for each constructed screen_device,
-										// used as a unique identifier during runtime
 };
 
 // device type definition

@@ -505,7 +505,7 @@ void fs3216_state::fs3216(machine_config &config)
 	crtc.set_show_border_area(false);
 	crtc.set_update_row_callback(FUNC(fs3216_state::crt_update_row));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::green());
 	screen.set_raw(14.58_MHz_XTAL, 900, 0, 720, 270, 0, 250);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));

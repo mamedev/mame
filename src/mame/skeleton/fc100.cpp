@@ -523,7 +523,7 @@ void fc100_state::fc100(machine_config &config)
 	m_vdg->set_get_fixed_mode(m5c6847p1_device::MODE_INTEXT);
 	// other lines not connected
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 	GFXDECODE(config, "gfxdecode", "f4palette", gfx_fc100);
 	PALETTE(config, "f4palette", palette_device::MONOCHROME);
 

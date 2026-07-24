@@ -281,7 +281,7 @@ void tdv2324_state::tdv2324(machine_config &config)
 	m_fdccpu->set_addrmap(AS_PROGRAM, &tdv2324_state::tdv2324_fdc_mem);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, SCREEN_TAG).set_color(rgb_t::green()));
 	screen.set_refresh_hz(50);
 	screen.set_screen_update(FUNC(tdv2324_state::screen_update));
 	screen.set_size(800, 400);

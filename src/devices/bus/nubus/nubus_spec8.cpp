@@ -156,7 +156,7 @@ void nubus_spec8s3_device::device_add_mconfig(machine_config &config)
 {
 	config.set_default_layout(layout_monitors);
 
-	screen_device &screen(SCREEN(config, SPEC8S3_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SPEC8S3_SCREEN_NAME));
 	screen.set_screen_update(FUNC(nubus_spec8s3_device::screen_update));
 	screen.set_raw(80.000_MHz_XTAL, 332*4, 64*4, 320*4, 804, 33, 801);
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);

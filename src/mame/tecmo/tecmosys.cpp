@@ -458,7 +458,7 @@ void tecmosys_state::tecmosys(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, m_eeprom, eeprom_serial_streaming::ENABLE);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_refresh_hz(57.4458);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3000));

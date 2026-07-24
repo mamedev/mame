@@ -812,7 +812,7 @@ void xerox820_state::xerox820(machine_config &config)
 	m_maincpu->set_daisy_config(xerox820_daisy_chain);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_screen_update(FUNC(xerox820_state::screen_update));
 	screen.set_raw(10.69425_MHz_XTAL, 700, 0, 560, 260, 0, 240);
 
@@ -925,7 +925,7 @@ void xerox820ii_state::common(machine_config &config, const char *disk_card)
 	m_maincpu->set_daisy_config(xerox820ii_daisy_chain);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_screen_update(FUNC(xerox820ii_state::screen_update));
 	screen.set_raw(10.69425_MHz_XTAL, 700, 0, 560, 260, 0, 240);
 
@@ -1119,7 +1119,7 @@ void mk83_state::mk83(machine_config &config)
 	m_maincpu->set_daisy_config(xerox820_daisy_chain);
 
 	/* video hardware: 14.318 MHz dot clock (sheet 3), 80x24, 7x10 cells, 5x7 glyphs */
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_screen_update(FUNC(mk83_state::screen_update));
 	screen.set_raw(14.318181_MHz_XTAL, 910, 0, 560, 262, 0, 240);
 

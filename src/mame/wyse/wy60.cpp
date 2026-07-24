@@ -273,7 +273,7 @@ void wy60_state::wy60(machine_config &config)
 
 	WYSE_KEYBOARD(config, m_keyboard, wy60_keyboards, "ascii");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(26.58_MHz_XTAL, 1000, 0, 800 + 20, 443, 0, 416 + 16); // 26.580 kHz horizontal
 	//screen.set_raw(39.71_MHz_XTAL, 1494, 0, 1188 + 18, 443, 0, 416 + 16);
 	screen.set_screen_update("pvtc", FUNC(scn2672_device::screen_update));

@@ -145,7 +145,7 @@ DEFINE_DEVICE_TYPE(ISA8_EPC_MDA, isa8_epc_mda_device, "isa_epc_mda", "Ericsson P
 /* This matches the difference between the crystals so we assume this for now     */
 void isa8_epc_mda_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, EPC_MDA_SCREEN, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, EPC_MDA_SCREEN));
 	screen.set_raw(XTAL(19'170'000) / 4, 720, 0, 720, 400, 0, 400);
 	screen.set_screen_update(MC6845_NAME, FUNC(mc6845_device::screen_update));
 

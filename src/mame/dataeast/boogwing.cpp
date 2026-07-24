@@ -727,7 +727,7 @@ void boogwing_state::boogwing(machine_config &config)
 	m_audiocpu->add_route(ALL_OUTPUTS, "speaker", 0, 1);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MAIN_XTAL / 4, 442, 0, 320, 274, 8, 248); // same as robocop2(cninja.cpp)? verify this from real PCB.
 	m_screen->set_screen_update(FUNC(boogwing_state::screen_update));
 

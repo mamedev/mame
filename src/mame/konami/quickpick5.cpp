@@ -634,7 +634,7 @@ void waijockey_state::waijockey(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(32_MHz_XTAL/4, 512, 0, 400, 256, 0, 226); // from CRTC
 	m_screen->set_screen_update(FUNC(waijockey_state::screen_update));
 	m_screen->set_palette(m_palette);

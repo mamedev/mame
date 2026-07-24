@@ -1213,7 +1213,7 @@ void geneve_state::geneve_common(machine_config &config)
 	video.set_vram_size(0x20000);
 	video.int_cb().set(FUNC(geneve_state::int2_from_v9938));
 	video.set_screen(GENEVE_SCREEN_TAG);
-	screen_device& screen(SCREEN(config, GENEVE_SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device& screen(SCREEN(config, GENEVE_SCREEN_TAG));
 	screen.set_raw(XTAL(21'477'272),
 		v99x8_device::HTOTAL,
 		0,

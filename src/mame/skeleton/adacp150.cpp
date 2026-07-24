@@ -207,7 +207,7 @@ void adacp150_state::adacp150(machine_config &config)
 	rs232_port_device &host(RS232_PORT(config, "host", default_rs232_devices, nullptr));
 	host.rxd_handler().set("sio", FUNC(z80sio_device::rxb_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_screen_update(m_lcdc, FUNC(hd44780_device::screen_update));
 	screen.set_size(16*6, 16);

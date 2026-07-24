@@ -104,7 +104,7 @@ void generalplus_gpac800_game_state::common_config(machine_config &config)
 	m_maincpu->nand_data_out().set(m_nand, FUNC(nand_device::data_w));
 	m_maincpu->nand_data_in().set(m_nand, FUNC(nand_device::data_r));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320*2, 262*2);
 	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);

@@ -738,7 +738,7 @@ void vip_state::vip(machine_config &config)
 	m_vdc->dma_out_cb().set(FUNC(vip_state::vdc_dma_out_w));
 	m_vdc->efx_cb().set(FUNC(vip_state::vdc_ef1_w));
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_screen_update(FUNC(vip_state::screen_update));
 
 	// sound hardware

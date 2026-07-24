@@ -525,7 +525,7 @@ void pda600_state::pda600(machine_config &config)
 	m_maincpu->txa1_wr_callback().set(m_copro, FUNC(pda600_copro_device::write_txd));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(PDA600_SCREEN_W, PDA600_SCREEN_H);

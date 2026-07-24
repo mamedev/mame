@@ -406,7 +406,7 @@ void canyon_state::canyon(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 8);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 0, 240); // HSYNC = 15,750 Hz
 	screen.set_screen_update(FUNC(canyon_state::screen_update));
 	screen.set_palette(m_palette);

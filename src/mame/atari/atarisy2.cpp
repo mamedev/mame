@@ -1213,7 +1213,7 @@ void atarisy2_state::atarisy2(machine_config &config)
 	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, atarisy2_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_raw(VIDEO_CLOCK/2, 640, 0, 512, 416, 0, 384);
 	screen.set_screen_update(FUNC(atarisy2_state::screen_update));

@@ -942,7 +942,7 @@ void kyugo_state::kyugo_base(machine_config &config)
 	mainlatch.q_out_cb<2>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(18.432_MHz_XTAL / 3, 396, 0, 288, 260, 16, 240);
 	screen.set_screen_update(FUNC(kyugo_state::screen_update));
 	screen.set_palette(m_palette);

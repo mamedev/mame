@@ -941,7 +941,7 @@ void btoads_state::btoads(machine_config &config)
 	// video hardware
 	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(VIDEO_CLOCK / 2, 640, 0, 512, 257, 0, 224);
 	m_screen->set_screen_update("maincpu", FUNC(tms34020_device::tms340x0_rgb32));
 

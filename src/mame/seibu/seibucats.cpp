@@ -312,7 +312,7 @@ void seibucats_state::seibucats(machine_config &config)
 	I8251(config, "usart2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	//screen.set_screen_update(FUNC(seibucats_state::screen_update));
 	screen.set_screen_update(FUNC(seibucats_state::screen_update_sys386f));
 	screen.set_raw(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART);

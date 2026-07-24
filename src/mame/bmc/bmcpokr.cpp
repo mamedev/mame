@@ -1507,7 +1507,7 @@ void bmcpokr_state::bmcpokr(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(bmcpokr_state::interrupt), "screen", 0, 1);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(42_MHz_XTAL / 4, 680, 0, 480, 262, 0, 240); // HSync - 15.440kHz, VSync - 58.935Hz
 	screen.set_screen_update(FUNC(bmcpokr_state::screen_update));
 	screen.set_palette(m_palette);

@@ -286,7 +286,7 @@ void s1000_state::s1000pb(machine_config &config)
 	m_lcdc->set_addrmap(0, &s1000_state::lcd_map);
 	m_lcdc->set_screen("screen");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(80);
 	screen.set_screen_update(m_lcdc, FUNC(hd61830_device::screen_update));
 	screen.set_size(240, 64);

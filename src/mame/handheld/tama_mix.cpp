@@ -62,7 +62,7 @@ void tama_mix_state::tama_mix(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tama_mix_state::mem_map);
 
 	// wrong, just so it's clear this has a screen
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(128, 128);

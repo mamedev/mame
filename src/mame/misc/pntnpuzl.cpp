@@ -411,7 +411,7 @@ void pntnpuzl_state::pntnpuzl(machine_config &config)
 	m_svga->set_screen(m_screen);
 	m_svga->set_vram_size(0x100000);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// TODO: XTAL is not right and likely not the source,
 	// selects xtal mode 3 (36 MHz) / 2 plus another / 2 for module testing bit 7
 	m_screen->set_raw(XTAL(40'000'000) / 2, 1080, 0, 400, 265, 0, 240);

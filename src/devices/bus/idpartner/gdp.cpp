@@ -194,7 +194,7 @@ SCN2674_DRAW_CHARACTER_MEMBER( idpartner_gdp_device::draw_character )
 
 void idpartner_gdp_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_screen_update(m_gdc, FUNC(ef9365_device::screen_update));
 	screen.set_size(1024, 512);
 	screen.set_visarea(0, 1024-1, 0, 512-1);
@@ -202,7 +202,7 @@ void idpartner_gdp_device::device_add_mconfig(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
 
-	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen2(SCREEN(config, "screen2").set_color(rgb_t::green()));
 	screen2.set_screen_update(m_avdc, FUNC(scn2674_device::screen_update));
 	screen2.set_size(1024, 512);
 	screen2.set_visarea(0, 1024-1, 0, 512-1);

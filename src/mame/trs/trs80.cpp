@@ -450,7 +450,7 @@ void trs80_state::level1(machine_config &config)      // the original model I, l
 	nmigate.output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI); // TODO: also causes SYSRES on expansion bus
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(10.6445_MHz_XTAL, 672, 0, 384, 264, 0, 192);
 	screen.set_screen_update(FUNC(trs80_state::screen_update_trs80));
 	screen.set_palette("palette");

@@ -169,7 +169,7 @@ void sterz80_state::tongzi(machine_config &config)
 	DS12885(config, "rtc", 32.768_kHz_XTAL); // TODO: should be DS12B887
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: verify everything once emulation works
+	screen_device &screen(SCREEN(config, "screen")); // TODO: verify everything once emulation works
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);

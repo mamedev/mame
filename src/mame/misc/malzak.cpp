@@ -479,7 +479,7 @@ void malzak_state::malzak(machine_config &config)
 	m_maincpu->sense_handler().set(m_screen, FUNC(screen_device::vblank));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	// TODO: handtuned, unverified
 	m_screen->set_raw(6'000'000 * 4, 768, 0, 80 * 6, 312 * 2, 0, 240 * 2);
