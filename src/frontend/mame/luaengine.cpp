@@ -1488,6 +1488,7 @@ void lua_engine::initialize()
 			});
 	machine_type["options"] = sol::property(&running_machine::options);
 	machine_type["samplerate"] = sol::property(&running_machine::sample_rate);
+	machine_type["sync_interval"] = sol::property(&running_machine::sync_interval, &running_machine::set_sync_interval);
 	machine_type["paused"] = sol::property(&running_machine::paused);
 	machine_type["exit_pending"] = sol::property(&running_machine::exit_pending);
 	machine_type["hard_reset_pending"] = sol::property(&running_machine::hard_reset_pending);
@@ -2205,6 +2206,7 @@ void lua_engine::initialize()
 	video_type["snap_native"] = sol::property(&video_manager::snap_native);
 	video_type["is_recording"] = sol::property(&video_manager::is_recording);
 	video_type["snapshot_target"] = sol::property(&video_manager::snapshot_target);
+	video_type["screenless_framerate"] = sol::property(&video_manager::screenless_framerate, &video_manager::set_screenless_framerate);
 
 
 	auto sound_type = sol().registry().new_usertype<sound_manager>("sound", sol::no_constructor);

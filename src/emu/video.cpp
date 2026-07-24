@@ -107,6 +107,8 @@ video_manager::video_manager(running_machine &machine)
 	, m_frameskip_adjust(0)
 	, m_skipping_this_frame(false)
 	, m_average_oversleep(0)
+	, m_screenless_framerate(machine.options().screenless_framerate())
+	, m_weird_delta_attoseconds(attotime::from_msec(100).as_attoseconds())
 	, m_snap_target(nullptr)
 	, m_snap_native(true)
 	, m_snap_width(0)
@@ -176,7 +178,7 @@ video_manager::video_manager(running_machine &machine)
 	if (no_screens)
 	{
 		m_screenless_frame_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(video_manager::screenless_update_callback), this));
-		m_screenless_frame_timer->adjust(screen_device::DEFAULT_FRAME_PERIOD, 0, screen_device::DEFAULT_FRAME_PERIOD);
+		update_screenless_frame_timer();
 		machine.output().add_global_notifier(video_notifier_callback, this);
 	}
 }
@@ -206,6 +208,46 @@ void video_manager::set_frameskip(int frameskip)
 
 
 //-------------------------------------------------
+//  update_screenless_frame_timer - update the timer used
+//  to schedule frame updates for devices that do not have
+//  a screen.
+//-------------------------------------------------
+
+void video_manager::update_screenless_frame_timer()
+{
+	if (m_screenless_frame_timer != nullptr)
+	{
+		if (m_screenless_framerate >= 1.0f)
+		{
+			attoseconds_t period_attoseconds = HZ_TO_ATTOSECONDS(m_screenless_framerate);
+			attotime period { 0, period_attoseconds };
+			m_screenless_frame_timer->adjust(period, 0, period);
+			m_weird_delta_attoseconds = std::max(m_weird_delta_attoseconds, 11 * (period_attoseconds / 10));
+		}
+		else
+		{
+			attoseconds_t period_attoseconds = downcast<driver_device&>(m_machine.root_device()).default_screenless_frame_period();
+			attotime period { 0, period_attoseconds };
+			m_screenless_frame_timer->adjust(period, 0, period);
+			m_weird_delta_attoseconds = attotime::from_msec(100).as_attoseconds();
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  set_screenless_framerate - set the frame rate to use
+//  for devices that do not have a screen.
+//-------------------------------------------------
+
+void video_manager::set_screenless_framerate(float screenless_framerate)
+{
+	m_screenless_framerate = screenless_framerate;
+	update_screenless_frame_timer();
+}
+
+
+//-------------------------------------------------
 //  frame_update - handle frameskipping and UI,
 //  plus updating the screen during normal
 //  operations
@@ -218,6 +260,7 @@ void video_manager::frame_update(bool from_debugger)
 	bool skipped_it = m_skipping_this_frame;
 	bool const update_screens = (phase == machine_phase::RUNNING) && (!machine().paused() || machine().options().update_in_pause());
 	bool anything_changed = update_screens && finish_screen_updates();
+	bool machine_syncs = machine().sync_interval() != 0;
 
 	// update inputs and draw the user interface
 	machine().osd().input_update(true);
@@ -236,7 +279,7 @@ void video_manager::frame_update(bool from_debugger)
 
 	// if we're throttling, synchronize before rendering
 	attotime current_time = machine().time();
-	if (!from_debugger && phase > machine_phase::INIT && !m_low_latency && effective_throttle())
+	if (!from_debugger && phase > machine_phase::INIT && !m_low_latency && !machine_syncs && effective_throttle())
 		update_throttle(current_time);
 
 	// ask the OSD to update
@@ -246,7 +289,7 @@ void video_manager::frame_update(bool from_debugger)
 	}
 
 	// we synchronize after rendering instead of before, if low latency mode is enabled
-	if (!from_debugger && phase > machine_phase::INIT && m_low_latency && effective_throttle())
+	if (!from_debugger && phase > machine_phase::INIT && m_low_latency && !machine_syncs && effective_throttle())
 		update_throttle(current_time);
 
 	machine().osd().input_update(false);
@@ -726,7 +769,8 @@ void video_manager::update_throttle(attotime emutime)
 		// between 0 and 1/10th of a second ... anything outside of this range is obviously
 		// wrong and requires a resync
 		attoseconds_t emu_delta_attoseconds = (emutime - m_throttle_emutime).as_attoseconds();
-		if (emu_delta_attoseconds < 0 || emu_delta_attoseconds >= (ATTOSECONDS_PER_SECOND / (m_speed ? m_speed : 1000)) * 100)
+		attoseconds_t weird_limit_attoseconds = ((1000 / (m_speed ? m_speed : 1000)) * m_weird_delta_attoseconds);
+		if (emu_delta_attoseconds < 0 || emu_delta_attoseconds >= weird_limit_attoseconds)
 		{
 			if (LOG_THROTTLE)
 				machine().logerror("Resync due to weird emutime delta: %s\n", attotime(0, emu_delta_attoseconds).as_string(18));

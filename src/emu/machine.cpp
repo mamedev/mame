@@ -81,6 +81,8 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 	, m_rand_seed(0x9d14abd7)
 	, m_basename(_config.gamedrv().name)
 	, m_sample_rate(_config.options().sample_rate())
+	, m_sync_interval_usec(_config.options().sync_interval())
+	, m_sync_interval(attotime::from_usec(_config.options().sync_interval()))
 	, m_saveload_schedule(saveload_schedule::NONE)
 	, m_saveload_schedule_time(attotime::zero)
 	, m_saveload_searchpath(nullptr)
@@ -405,6 +407,8 @@ int running_machine::run(bool quiet)
 		emscripten_set_running_machine(this);
 #endif
 
+		attotime next_sync = time() + m_sync_interval;
+
 		// run the CPUs until a reset or exit
 		while ((!m_hard_reset_pending && !m_exit_pending) || m_saveload_schedule != saveload_schedule::NONE)
 		{
@@ -412,7 +416,20 @@ int running_machine::run(bool quiet)
 
 			// execute CPUs if not paused
 			if (!m_paused)
+			{
 				m_scheduler.timeslice();
+				if (m_sync_interval_usec > 0)
+				{
+					attotime now = time();
+					if (now >= next_sync)
+					{
+						if (m_video->throttled() && !m_video->fastforward())
+							m_video->update_throttle(now);
+						while (now >= next_sync)
+							next_sync += m_sync_interval;
+					}
+				}
+			}
 			// otherwise, just pump video updates and sound mapping updates through
 			else
 			{

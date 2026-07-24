@@ -53,6 +53,7 @@ public:
 	bool throttled() const { return m_throttled; }
 	float throttle_rate() const { return m_throttle_rate; }
 	bool fastforward() const { return m_fastforward; }
+	float screenless_framerate() const { return m_screenless_framerate; }
 
 	// setters
 	void set_frameskip(int frameskip);
@@ -61,6 +62,7 @@ public:
 	void set_fastforward(bool ffwd) { m_fastforward = ffwd; }
 	void set_output_changed() { m_output_changed = true; }
 	void set_speed_factor(int speed) { m_speed = speed; }
+	void set_screenless_framerate(float screenless_framerate);
 
 	// misc
 	void toggle_record_movie(movie_recording::format format);
@@ -88,6 +90,9 @@ public:
 	void add_sound_to_recording(const s16 *sound, int numsamples);
 	bool is_recording() const { return !m_movie_recordings.empty(); }
 
+	// throttling helper, visible for running_machine.
+	void update_throttle(attotime emutime);
+
 private:
 	// internal helpers
 	void exit();
@@ -101,11 +106,11 @@ private:
 	// speed and throttling helpers
 	int original_speed_setting() const;
 	bool finish_screen_updates();
-	void update_throttle(attotime emutime);
 	osd_ticks_t throttle_until_ticks(osd_ticks_t target_ticks);
 	void update_frameskip();
 	void update_refresh_speed();
 	void recompute_speed(const attotime &emutime);
+	void update_screenless_frame_timer();
 
 	// snapshot/movie helpers
 	void create_snapshot_bitmap(screen_device *screen);
@@ -155,6 +160,8 @@ private:
 	s8                  m_frameskip_adjust;
 	bool                m_skipping_this_frame;      // flag: true if we are skipping the current frame
 	osd_ticks_t         m_average_oversleep;        // average number of ticks the OSD oversleeps
+	float               m_screenless_framerate;     // no-screen frame rate
+	attoseconds_t       m_weird_delta_attoseconds;  // delta to detect weird sync issues
 
 	// snapshot stuff
 	render_target *     m_snap_target;              // screen shapshot target

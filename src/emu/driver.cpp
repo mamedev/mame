@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "image.h"
 #include "drivenum.h"
+#include "screen.h"
 #include "tilemap.h"
 
 
@@ -253,6 +254,17 @@ void driver_device::device_reset_after_children()
 }
 
 
+//-------------------------------------------------
+//  default_screenless_frame_period - returns
+//  the frame rate to use for screenless devices.
+//  Override in subclasses that need something other
+//  than the default 60 frames per second.
+//-------------------------------------------------
+
+attoseconds_t driver_device::default_screenless_frame_period() const
+{
+	return screen_device::DEFAULT_FRAME_PERIOD.as_attoseconds();
+}
 
 //**************************************************************************
 //  INTERRUPT GENERATION CALLBACK HELPERS
