@@ -81,6 +81,7 @@
 #define OPTION_SPEED                "speed"
 #define OPTION_REFRESHSPEED         "refreshspeed"
 #define OPTION_LOWLATENCY           "lowlatency"
+#define OPTION_SCREENLESS_FRAMERATE "screenless_framerate"
 
 // core render options
 #define OPTION_KEEPASPECT           "keepaspect"
@@ -367,6 +368,7 @@ public:
 	float speed() const { return float_value(OPTION_SPEED); }
 	bool refresh_speed() const { return m_refresh_speed; }
 	bool low_latency() const { return bool_value(OPTION_LOWLATENCY); }
+	float screenless_framerate() const { return float_value(OPTION_SCREENLESS_FRAMERATE); }
 
 	// core render options
 	bool keep_aspect() const { return bool_value(OPTION_KEEPASPECT); }
