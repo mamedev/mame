@@ -4,7 +4,7 @@
     GPL16250 / GPAC800 / GMC384 / GCM420 related support
 
     GPL16250 is the GeneralPlus / SunPlus part number
-    GPAC800 is the JAKKS Pacific codename
+    GPAC800 is the Jakks Pacific codename
     GMC384 / GCM420 is what is printed on the die
 
     ----
@@ -898,43 +898,43 @@ void gameu_handheld_game_state::init_gameu108()
 // none of them use NAND, or SDRAM, or high resolution modes, so could be GPL16218B
 // ----------------------------------------------------
 
-// the JAKKS ones of these seem to be known as 'Generalplus GPAC500' hardware?
-CONS(2008, jak_spmm,  0,       0, base, jak_spmm,  gpl162xx_rom_base_state, empty_init, "JAKKS Pacific Inc / Santa Cruz Games", "The Amazing Spider-Man and The Masked Menace (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS(2008, jak_prr,   0,       0, base, jak_spmm,  gpl162xx_rom_base_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Power Rangers to the Rescue (JAKKS Pacific TV Game) (Aug 8 2008 16:46:59)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS(2008, jak_bj,    0,       0, base, jak_bj,    gpl162xx_rom_base_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Bejeweled Deluxe (JAKKS Pacific TV Game) (Feb 28 2008 22:54:43)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS(2009, jak_tpir,  0,       0, base, jak_spmm,  gpl162xx_rom_base_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "The Price Is Right (JAKKS Pacific TV Game) (Mar 24 2009 17:34:55)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// the Jakks ones of these seem to be known as 'Generalplus GPAC500' hardware?
+CONS( 2008, jak_spmm, 0, 0, base, jak_spmm, gpl162xx_rom_base_state, empty_init, "Jakks Pacific / Santa Cruz Games", "The Amazing Spider-Man and the Masked Menace (Jakks Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2008, jak_prr,  0, 0, base, jak_spmm, gpl162xx_rom_base_state, empty_init, "Jakks Pacific / HotGen",           "Power Rangers to the Rescue (Jakks Pacific TV Game) (Aug 8 2008 16:46:59)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2008, jak_bj,   0, 0, base, jak_bj,   gpl162xx_rom_base_state, empty_init, "Jakks Pacific / PopCap / HotGen",  "Bejeweled Deluxe (Jakks Pacific TV Game) (Feb 28 2008 22:54:43)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2009, jak_tpir, 0, 0, base, jak_spmm, gpl162xx_rom_base_state, empty_init, "Jakks Pacific / HotGen",           "The Price Is Right (Jakks Pacific TV Game) (Mar 24 2009 17:34:55)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // These are ports of the 'Family Sport' games to GPL16250 type hardware, but they don't seem to use many unSP 2.0 instructions.
 // The menu style is close to 'm505neo' but the game selection is closer to 'dnv200fs' (but without the Sports titles removed, and with a few other extras not found on that unit)
-CONS(201?, tkmag220,  0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "TaiKee / Senca",         "Mini Arcade Games Console (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, tkmag220, 0, 0, tkmag220, tkmag220, tkmag220_game_state, empty_init, "TaiKee / Senca",    "Mini Arcade Games Console (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // DGUN-2891 or DGUN-2864 ? both look the same, no indication on unboxed unit?
-CONS(201?, myac220,   0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "dreamGEAR / Senca",      "My Arcade Go Gamer Portable (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS(201?, typo176,   0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "Typo / Senca",           "Arcade Game 2.0 (model 8052C, Family Sport 176-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, myac220,  0, 0, tkmag220, tkmag220, tkmag220_game_state, empty_init, "dreamGEAR / Senca", "My Arcade Go Gamer Portable (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, typo176,  0, 0, tkmag220, tkmag220, tkmag220_game_state, empty_init, "Typo / Senca",      "Arcade Game 2.0 (model 8052C, Family Sport 176-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // has 227 selectable games, and 3 single game cartridges
 // cartridges have no ROM but launch a single game after the boot screen (Fighter, Baseball or Golf)
 // must be read by GPIO port or similar
-CONS(201?, gp230,  0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "<unknown>",         "TFT Portable Player / GPDevice 230-in-1 (YJ-801)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, gp230, 0, 0, tkmag220, tkmag220, tkmag220_game_state, empty_init, "<unknown>", "TFT Portable Player / GPDevice 230-in-1 (YJ-801)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // 2012 date from manual
-CONS(2012, imgame,    0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "I'm Game / Senca",      "I'm Game! GP120 (Family Sport 120-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2012, imgame, 0, 0, tkmag220, tkmag220, tkmag220_game_state, empty_init, "I'm Game / Senca", "I'm Game! GP120 (Family Sport 120-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // a 180 game Family Sport I'm Game! also exists (and some Famiclones)
 
 // beijuehh was sold with a note that 'X-Racer III crashes in-game' (might only not crash in MAME as we're not executing the protection running in the timers)
 // The 'Helicopter' game has severly broken scrolling even on the real devices, not an emulation bug.
-CONS(201?, beijuehh,    0,       0, beijuehh, beijuehh, beijuehh_game_state,  empty_init,      "Beijue",      "Beijue 16 Bit Handheld Games 220-in-1 (Game Boy style case)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS(201?, bornk220,    beijuehh,0, beijuehh, beijuehh, beijuehh_game_state,  empty_init,      "BornKid",     "BornKid 16 Bit Handheld Games 220-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, beijuehh, 0,        0, beijuehh, beijuehh, beijuehh_game_state, empty_init, "Beijue",  "Beijue 16 Bit Handheld Games 220-in-1 (Game Boy style case)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, bornk220, beijuehh, 0, beijuehh, beijuehh, beijuehh_game_state, empty_init, "BornKid", "BornKid 16 Bit Handheld Games 220-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS(201?, bornkidh,    0,       0, beijuehh, beijuehh, beijuehh_game_state,  empty_init,      "BornKid",     "BornKid 16 Bit Handheld Games 100-in-1 (model GB-10X)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, bornkidh, 0, 0, beijuehh, beijuehh, beijuehh_game_state, empty_init, "BornKid", "BornKid 16 Bit Handheld Games 100-in-1 (model GB-10X)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // die on this one is 'GCM420'
-CONS(2013, gormiti,   0, 0, base, gormiti,  gpl162xx_rom_base_state, empty_init, "Giochi Preziosi", "Gormiti Game Arena (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2013, gormiti, 0, 0, base, gormiti, gpl162xx_rom_base_state, empty_init, "Giochi Preziosi", "Gormiti Game Arena (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // unit looks a bit like a knock-off Wii-U tablet, but much smaller
 // was also available under other names, with different designs (PSP style)
-CONS( 201?, gameu50,       0,              0,      gameu, gameu, gameu_handheld_game_state, init_gameu50,  "YSN", "Play Portable Color GameU+ (50-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 201?, gameu90,       0,              0,      gameu, gameu, gameu_handheld_game_state, init_gameu,    "YSN", "Play Portable Color GameU+ (90-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 201?, gameu108,      0,              0,      gameu, gameu, gameu_handheld_game_state, init_gameu108, "YSN", "Play Portable Color GameU+ (108-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 201?, gameu50,  0, 0, gameu, gameu, gameu_handheld_game_state, init_gameu50,  "YSN", "Play Portable Color GameU+ (50-in-1) (Japan)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 201?, gameu90,  0, 0, gameu, gameu, gameu_handheld_game_state, init_gameu,    "YSN", "Play Portable Color GameU+ (90-in-1) (Japan)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 201?, gameu108, 0, 0, gameu, gameu, gameu_handheld_game_state, init_gameu108, "YSN", "Play Portable Color GameU+ (108-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ----------------------------------------------------
 // these set SP to 3fff / only use RAM below that, so must be 'GPL162xx A' type
@@ -943,10 +943,10 @@ CONS( 201?, gameu108,      0,              0,      gameu, gameu, gameu_handheld_
 // ----------------------------------------------------
 
 // uses a barcode card scanner device with custom cards
-CONS(200?, dressmtv,  0,       0, gpl16220a_rom, dressmtv, gpl162xx_rom_base_state, empty_init, "Takara Tomy", "Disney Princess Dress Mania TV (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, dressmtv, 0, 0, gpl16220a_rom, dressmtv, gpl162xx_rom_base_state, empty_init, "Takara Tomy", "Disney Princess Dress Mania TV (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // skip the call at 6d47a to get it to show something
-CONS(2008, fpsport,   0,       0, gpl16220a_rom, base,     gpl162xx_rom_base_state, empty_init, "Fisher-Price", "3-in-1 Smart Sports! (US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2008, fpsport, 0, 0, gpl16220a_rom, base, gpl162xx_rom_base_state, empty_init, "Fisher-Price", "3-in-1 Smart Sports! (US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ----------------------------------------------------
 // these set SP to 6fff so must be 'GPL162xx A' type
@@ -954,7 +954,7 @@ CONS(2008, fpsport,   0,       0, gpl16220a_rom, base,     gpl162xx_rom_base_sta
 // high resolution modes are not used, so probably GPL16230A
 // ----------------------------------------------------
 
-CONS(2009, smartfp,   0,       0, gpl16230a_rom, smartfp,  gpl162xx_rom_base_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2009, smartfps,  smartfp, 0, gpl16230a_rom, smartfp,  gpl162xx_rom_base_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2009, smartfpf,  smartfp, 0, gpl16230a_rom, smartfp,  gpl162xx_rom_base_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (France)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // boxart simply has 'Smart Fit'
+CONS( 2009, smartfp,  0,       0, gpl16230a_rom, smartfp, gpl162xx_rom_base_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (UK)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2009, smartfps, smartfp, 0, gpl16230a_rom, smartfp, gpl162xx_rom_base_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2009, smartfpf, smartfp, 0, gpl16230a_rom, smartfp, gpl162xx_rom_base_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (France)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // boxart simply has 'Smart Fit'
 

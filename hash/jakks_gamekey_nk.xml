@@ -3,14 +3,15 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="jakks_gamekey_nk" description="JAKKS Pacific 'NK' Game Keys (Nickelodeon)">
+<softwarelist name="jakks_gamekey_nk" description="Jakks Pacific 'NK' Game Keys (Nickelodeon)">
 
 	<!-- This list is for the 'NK' coded Game Keys, for Nicktoons and related systems -->
 
 	<software name="dora">
 		<description>Soccer Shootout &amp; Juego De Futbol De Dora &amp; Dora's Star Mountain Adventure</description>
 		<year>2005</year>
-		<publisher>JAKKS Pacific / Handheld Games</publisher>
+		<publisher>Jakks Pacific</publisher>
+		<info name="developer" value="Handheld Games"/>
 		<part name="cart" interface="jakks_gamekey">
 			<dataarea name="rom" size="0x800000">
 				<rom name="nk_dora.bin" size="0x200000" crc="2bcdf9a5" sha1="ac86d967b269cb8c4ecc9c8b99fb5c16424da7be" offset="0" />
@@ -24,7 +25,8 @@ license:CC0-1.0
 	<software name="volbird">
 		<description>Nicktoons Volleyball &amp; Birdie Putt</description>
 		<year>2005</year>
-		<publisher>JAKKS Pacific / Handheld Games</publisher>
+		<publisher>Jakks Pacific</publisher>
+		<info name="developer" value="Handheld Games"/>
 		<part name="cart" interface="jakks_gamekey">
 			<feature name="slot" value="rom_24lc04"/>
 			<dataarea name="rom" size="0x800000">
@@ -36,7 +38,8 @@ license:CC0-1.0
 	<software name="popsnow">
 		<description>SpongeBob Sponge Pop &amp; Snowball Showdown (15 AUGUST 2005 D)</description>
 		<year>2005</year>
-		<publisher>JAKKS Pacific / HotGen Ltd</publisher>
+		<publisher>Jakks Pacific</publisher>
+		<info name="developer" value="HotGen"/>
 		<part name="cart" interface="jakks_gamekey">
 			<feature name="slot" value="rom_24lc04"/>
 			<dataarea name="rom" size="0x800000">

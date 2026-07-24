@@ -1033,31 +1033,31 @@ ROM_END
 // box marked 'Wireless game console' 'Drahtlose Spielekonsole' 87 Sports games included : 18 hyper sports games, 69 arcade games.
 // Unit marked 'Hamy System' 'WiWi'
 // actually a cartridge, but all hardware is in the cart, overriding any internal hardware entirely.  see nes_vt.cp 'mc_sp69' for the '69 arcade game' part
-CONS( 200?, wiwi18,   0,        0, rad_skat, wiwi18,  spg2xx_game_wiwi18_state, init_wiwi18, "Hamy System",           "WiWi 18-in-1 Sports Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, wiwi18,   0, 0, rad_skat, wiwi18,   spg2xx_game_wiwi18_state,   init_wiwi18, "Hamy System", "WiWi 18-in-1 Sports Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2009, lexifit,  0,        0, rad_skat, lexifit, spg2xx_game_wiwi18_state, init_wiwi18, "Lexibook",              "TV Fitness Center (Lexibook)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2009, lexifit,  0, 0, rad_skat, lexifit,  spg2xx_game_wiwi18_state,   init_wiwi18, "Lexibook", "TV Fitness Center (Lexibook)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 200?, foxsport, 0,        0, rad_skat, wiwi18,  spg2xx_game_wiwi18_state, init_wiwi18, "Excalibur Electronics", "Fox Sports 7 in 1 Sports Games Plug n' Play", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, foxsport, 0, 0, rad_skat, wiwi18,   spg2xx_game_wiwi18_state,   init_wiwi18, "Excalibur Electronics", "Fox Sports 7 in 1 Sports Games Plug n' Play", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // doesn't really have 198 games, closer to 20, with duplicates starting on different levels
 // as with the above sets, inputs aren't currently hooked up, menu can be used by modifying 0x100f in RAM (it's 0x1010 for wiwi18)
-CONS( 200?, inmotion, 0,        0, rad_skat, wiwi18,  spg2xx_game_wiwi18_state, init_wiwi18, "Grafix", "IN Motion - Motion Controlled Video Games Console (Hot Game 198 in 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, inmotion, 0, 0, rad_skat, wiwi18,   spg2xx_game_wiwi18_state,   init_wiwi18, "Grafix", "IN Motion - Motion Controlled Video Games Console (Hot Game 198 in 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 200?, wiii3spt, 0,        0, rad_skat, wiwi18,  spg2xx_game_wiwi18_state, init_wiwi18, "BL", "Wiii3 TV Entertainment System (7-in-1 Sports)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, wiii3spt, 0, 0, rad_skat, wiwi18,   spg2xx_game_wiwi18_state,   init_wiwi18, "BL", "Wiii3 TV Entertainment System (7-in-1 Sports)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // thtere is another 'Drahtlose Spielekonsole 48-in-1' with '11 hyper sports games' (including Running) which are clearly SunPlus and would fit here, with the 37 non-hyper sports games presumably again being a NES/Famiclone cart
 
-CONS( 2014, marc101,     0,        0, marc101, m489,  spg2xx_game_marc101_state, empty_init, "Millennium 2000 GmbH", "Millennium Arcade 101 (M489) (Game Station 2 101-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2014, marc101,  0, 0, marc101,  m489,     spg2xx_game_marc101_state,  empty_init,  "Millennium 2000 GmbH", "Millennium Arcade 101 (M489) (Game Station 2 101-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 200?, ddmsup,      0,        0, ddmsup, ddmsup,  spg2xx_game_ddmsup_state, empty_init,    "Senario", "Double Dance Mania: Supreme / Dance Supreme", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // titlescreen is just 'Dance Supreme'
+CONS( 200?, ddmsup,   0, 0, ddmsup,   ddmsup,   spg2xx_game_ddmsup_state,   empty_init,  "Senario", "Double Dance Mania: Supreme / Dance Supreme", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // titlescreen is just 'Dance Supreme'
 
-CONS( 2007, ddmmeg12,    0,        0, ddmsup, ddmsup,  spg2xx_game_ddmsup_state,  empty_init,    "Senario",  "Double Dance Mania: Mega 12",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2007, ddmmeg12, 0, 0, ddmsup,   ddmsup,   spg2xx_game_ddmsup_state,   empty_init,  "Senario", "Double Dance Mania: Mega 12", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2015, marc250,     0,        0, marc101, m489,  spg2xx_game_marc250_state, init_m527, "Millennium 2000 GmbH", "Millennium Arcade 250 (M527)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2015, marc250,  0, 0, marc101,  m489,     spg2xx_game_marc250_state,  init_m527,   "Millennium 2000 GmbH", "Millennium Arcade 250 (M527)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 201?, 265games,    0,        0, marc101, m489,  spg2xx_game_marc250_state, init_m527, "<unknown>", "265-in-1 Handheld Game (SPG2xx based)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, 265games, 0, 0, marc101,  m489,     spg2xx_game_marc250_state,  init_m527,   "<unknown>", "265-in-1 Handheld Game (SPG2xx based)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // has the following strings at the start of the ROM
 // "Copyright(C) 2009-2012 ShenZhen Multi-Content Software CO., LTD"
 // "LisencedTo: MCS"
-CONS( 2012, guitrbus,   0,        0, guitrbus,  guitrbus,  spg2xx_game_guitrbus_state,          empty_init,    "WinFun",  "Guitar Buster", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2012, guitrbus, 0, 0, guitrbus, guitrbus, spg2xx_game_guitrbus_state, empty_init,  "WinFun", "Guitar Buster", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

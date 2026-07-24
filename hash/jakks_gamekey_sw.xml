@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="jakks_gamekey_sw" description="JAKKS Pacific 'SW' Game Keys (Star Wars)">
+<softwarelist name="jakks_gamekey_sw" description="Jakks Pacific 'SW' Game Keys (Star Wars)">
 
 	<!-- This list is for the 'SW' coded Game Keys, for Star Wars base systems -->
 
@@ -13,7 +13,8 @@ license:CC0-1.0
 	<software name="tdyoda">
 		<description>Turret Defense &amp; Yoda's Escape</description>
 		<year>2005</year>
-		<publisher>JAKKS Pacific / Griptonite Games</publisher>
+		<publisher>Jakks Pacific</publisher>
+		<info name="developer" value="Griptonite Games"/>
 		<part name="cart" interface="jakks_gamekey">
 			<feature name="slot" value="rom_24lc04"/>
 			<dataarea name="rom" size="0x800000">
@@ -28,7 +29,8 @@ license:CC0-1.0
 	<software name="tdyodap" cloneof="tdyoda">
 		<description>Turret Defense &amp; Yoda's Escape (prototype)</description>
 		<year>2005</year>
-		<publisher>JAKKS Pacific / Griptonite Games</publisher>
+		<publisher>Jakks Pacific</publisher>
+		<info name="developer" value="Griptonite Games"/>
 		<part name="cart" interface="jakks_gamekey">
 			<feature name="slot" value="rom_24lc04"/>
 			<dataarea name="rom" size="0x800000">
@@ -41,7 +43,8 @@ license:CC0-1.0
 	<software name="igefcc">
 		<description>Imperial Gunner &amp; Escape From Cloud City (Dec 22 2005, prototype)</description>
 		<year>2005</year>
-		<publisher>JAKKS Pacific / Amaze Entertainment</publisher>
+		<publisher>Jakks Pacific</publisher>
+		<info name="developer" value="Amaze Entertainment"/>
 		<part name="cart" interface="jakks_gamekey">
 			<feature name="slot" value="rom_24lc04"/>
 			<dataarea name="rom" size="0x800000">
@@ -54,7 +57,8 @@ license:CC0-1.0
 	<software name="cscfp">
 		<description>Catamaran Strike &amp; Coruscant Fire Patrol (Jun 2 2005, prototype)</description>
 		<year>2005</year>
-		<publisher>JAKKS Pacific / Griptonite Games</publisher>
+		<publisher>Jakks Pacific</publisher>
+		<info name="developer" value="Griptonite Games"/>
 		<part name="cart" interface="jakks_gamekey">
 			<feature name="slot" value="rom_24lc04"/>
 			<dataarea name="rom" size="0x800000">

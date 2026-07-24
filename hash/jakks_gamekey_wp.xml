@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="jakks_gamekey_wp" description="JAKKS Pacific 'WP' Game Keys (Featuring Winnie the Pooh)">
+<softwarelist name="jakks_gamekey_wp" description="Jakks Pacific 'WP' Game Keys (Featuring Winnie the Pooh)">
 
 	<!-- This list is for the 'WP' coded Game Keys, for Winnie the Pooh -->
 
@@ -11,8 +11,9 @@ license:CC0-1.0
 	<software name="sweet">
 		<description>Sweet as Honey</description>
 		<year>2006</year>
-		<publisher>JAKKS Pacific / Backbone Entertainment</publisher>
-		<info name="alt_title" value="Dolce come il miele" />
+		<publisher>Jakks Pacific</publisher>
+		<info name="alt_title" value="Dolce come il miele"/>
+		<info name="developer" value="Backbone Entertainment"/>
 		<part name="cart" interface="jakks_gamekey">
 			<!--
 			Contains 3 bonus games:

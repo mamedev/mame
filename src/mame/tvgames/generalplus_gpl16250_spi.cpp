@@ -224,32 +224,34 @@ void generalplus_gpspispi_game_state::init_spi()
 // ----------------------------------------------------
 
 
-// ぼくはプラレール運転士 新幹線で行こう！プラス  (I am a Plarail driver Let's go by Shinkansen! Plus)
-CONS(2015, prailpls, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Takara Tomy", "Boku wa Plarail Untenshi Shinkansen de Ikou! Plus (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // has built-in screen, but can be connected to a TV
+// ぼくはプラレール運転士 新幹線で行こう！プラス  (I am a Plarail Driver: Let's Go by Shinkansen! Plus)
+CONS( 2015, prailpls, 0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, init_spi, "Takara Tomy", "Boku wa Plarail Untenshi: Shinkansen de Ikou! Plus (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // has built-in screen, but can be connected to a TV
 
 // uses glob, fishing controller
 // バーチャルマスターズ スピリッツ ブルー
 // a red version also exists, but software might be the same
-CONS(201?, vmastspi, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Takara Tomy", "Virtual Masters Spirits (blue, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 201?, vmastspi, 0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, init_spi, "Takara Tomy", "Virtual Masters Spirits (blue, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // this is a half-head shaped unit, SHP13017-R1 main PCB  -  アンパンマン レッツゴー！育脳ドライブ きみものれるよ！アンパンマンごう「それいけ！アンパンマン」
-CONS(2014, anpanbd,  0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "JoyPalette", "Anpanman: Let's Go! Ikunou Drive (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2014, anpanbd, 0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, init_spi, "JoyPalette", "Anpanman: Let's Go! Ikunou Drive - Kimi mo Noreru Yo! Anpanman-gou (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // それいけ！アンパンマン」みんなで！育脳マット
-CONS(2015, anpanm15, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "JoyPalette", "Anpanman: Minnade! Ikunou Mat (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2015, anpanm15, 0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, init_spi, "JoyPalette", "Anpanman: Minnade! Ikunou Mat (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// ANPANMAN タッチであそぼ！はじめてEnglish (the furigana for "Enlish" says "えいご")
-CONS(2013, anpaneng, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Sega Toys", "Anpanman: Touch de Asobo! Hajimete English (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+// ANPANMAN タッチであそぼ！はじめてEnglish (the furigana for "English" says "えいご")
+CONS( 2013, anpaneng, 0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, init_spi, "Sega Toys", "Anpanman: Touch de Asobo! Hajimete English (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 甲虫王者ムシキング むしとりバトルずかん  (JS Pod on PCB)
-CONS(201?, jspodred, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Sega Toys", "Kouchuu Ouja Mushiking: Mushitori Battle Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 201?, jspodred, 0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, init_spi, "Sega Toys", "Kouchuu Ouja Mushiking: Mushitori Battle Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS(201?, wildking, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Sega Toys", "Wild King (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 201?, wildking, 0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, init_spi, "Sega Toys", "Wild King (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS(2015, bkrankp,  0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2015, bkrankp, 0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS(2015, pokegach,  0,        0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Tomy", "Pokegacha (20150902, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+// ポケでるガチャ
+CONS( 2015, pokegach, 0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Takara Tomy", "PokeDeru Gacha (20150902, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// the 2nd release comes in 2 colours and they can communicate?
-CONS(2015, pokegac2,  0,        0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Tomy", "Pokegacha V2 Red (20151230, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2015, pokegac2y, pokegach, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Tomy", "Pokegacha V2 Yellow (20151230, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+// ポケでるガチャ 2.0
+// the second release comes in two colours and they can communicate
+CONS( 2015, pokegac2,  0,        0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Takara Tomy", "PokeDeru Gacha 2.0 Red (20151230, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2015, pokegac2y, pokegach, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Takara Tomy", "PokeDeru Gacha 2.0 Yellow (20151230, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

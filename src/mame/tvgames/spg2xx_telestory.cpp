@@ -306,4 +306,4 @@ ROM_END
    TODO: check if it's a common implementation eg.  Speex
    SIO port is not currently implemented in spg2xx_io.cpp however
 */
-CONS( 2006, telestry,  0,        0, telestory, telestory,   telestory_state, empty_init, "JAKKS Pacific Inc / Toymax", "Telestory",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, telestry, 0, 0, telestory, telestory, telestory_state, empty_init, "Jakks Pacific / Toymax", "Telestory", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, David Haywood
 
-/* Fisher Price / Mattel "I Can..." systems */
+// Fisher Price / Mattel "I Can..." systems
 
 #include "emu.h"
 #include "spg2xx.h"
@@ -505,6 +505,6 @@ ROM_END
 
 
 // Fisher-Price games
-CONS( 2007, icanguit,  0,        0, icanguit, icanguit,   icanguit_state, empty_init, "Fisher-Price", "I Can Play Guitar",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // how is data saved?
-CONS( 2006, icanpian,  0,        0, icanpian, icanpian,   icanpian_state, empty_init, "Fisher-Price", "I Can Play Piano",  MACHINE_IMPERFECT_SOUND ) // 2006 date from Manual
+CONS( 2007, icanguit, 0, 0, icanguit, icanguit, icanguit_state, empty_init, "Fisher-Price", "I Can Play Guitar", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // how is data saved?
+CONS( 2006, icanpian, 0, 0, icanpian, icanpian, icanpian_state, empty_init, "Fisher-Price", "I Can Play Piano",  MACHINE_IMPERFECT_SOUND ) // 2006 date from Manual
 

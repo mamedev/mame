@@ -407,56 +407,59 @@ ROM_END
 
 // doesn't use extra opcodes?
 // K.O.しようぜ！エキサイトボクシング
-CONS( 2002, epo_ebox, 0, 0, xavix2000_4mb_nv,        epo_ebox,    xavix_state,             init_xavix, "Epoch / SSD Company LTD",       "Excite Boxing (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // doesn't use XaviX2000 extra opcodes, but had that type of CPU
+CONS( 2002, epo_ebox, 0,      0, xavix2000_4mb_nv,        epo_ebox,  xavix_state,             init_xavix, "Epoch / SSD Company Limited",                "K.O. Shiyouze! Excite Boxing (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // doesn't use XaviX2000 extra opcodes, but had that type of CPU
 
 // die not confirmed, but uses extra opcodes.  (hangs on title screen due to combination of freq_timer_done nested interrupts tripping, and waiting on bits in input ports to change
 // ストライクきめるぜ！ エキサイトボウリング
-CONS( 2002, epo_bowl, 0, 0, xavix2000_i2c_24c04_2mb, epo_bowl,    xavix_i2c_state,         init_xavix, "Epoch / SSD Company LTD",       "Excite Bowling (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2002, epo_bowl, 0,      0, xavix2000_i2c_24c04_2mb, epo_bowl,  xavix_i2c_state,         init_xavix, "Epoch / SSD Company Limited",                "Strike Kimeruze! Excite Bowling (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // スーパーショット！ エキサイトゴルフ
 // needs timer irq hack to boot, fails to draw main menu properly (buggy xavix2000 opcodes?)  (2002 date on PCB, 2003 ingame)
-CONS( 2003, epo_golf, 0,       0, xavix2000_i2c_24c04_4mb, ttv_lotr,   xavix_i2c_lotr_state, init_xavix, "Epoch / SSD Company LTD",       "Super Shot! Excite Golf (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, epo_golf, 0,      0, xavix2000_i2c_24c04_4mb, ttv_lotr,  xavix_i2c_lotr_state,    init_xavix, "Epoch / SSD Company Limited",                "Super Shot! Excite Golf (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // とっとこハム太郎 ハムハム大サーカス！
-CONS( 2002, epo_hamc,  0,      0, xavix2000_4mb,       epo_hamc,   xavix_epo_hamc_state, init_xavix,    "Epoch / SSD Company LTD",       "Tottoko Hamtaro - Ham Ham Dai Circus! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2002, epo_hamc, 0,      0, xavix2000_4mb,           epo_hamc,  xavix_epo_hamc_state,    init_xavix, "Epoch / SSD Company Limited",                "Tottoko Hamtaro: Ham-Ham Dai Circus! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ミニモニ。パーティ！リズムでぴょん！
 // needs timer irq hack to boot
-CONS( 2003, epo_mini, 0,       0, xavix2000_i2c_24c08_4mb, ttv_lotr,   xavix_i2c_lotr_state, init_xavix, "Epoch / SSD Company LTD",        "mini-moni Party! Rhythm de Pyon! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, epo_mini, 0,      0, xavix2000_i2c_24c08_4mb, ttv_lotr,  xavix_i2c_lotr_state,    init_xavix, "Epoch / SSD Company Limited",                "mini-moni. Party! Rhythm de Pyon! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // カードスキャン!　エキサイトステージ サッカー日本代表チーム
-CONS( 2006, epo_es2j,   0,     0,  xavix2000_4mb,      xavix,      xavix_state,          init_xavix,    "Epoch / SSD Company LTD",        "Card Scan! Excite Stage Soccer Nippon Daihyou Team (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, epo_es2j, 0,      0,  xavix2000_4mb,          xavix,     xavix_state,             init_xavix, "Epoch / SSD Company Limited",                "Card Scan! Excite Stage Soccer Nippon Daihyou Team (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 
 // takes a long time to boot to a card scanner error
 // This is a product in the Duel Masters line called Duel Station; the boot up screen calls it Duel Station, title logo is Duel Masters
-CONS( 2003, duelmast, 0, 0, duelmast, duelmast,    xavix_duelmast_state,    init_xavix, "Takara / SSD Company LTD",      "Duel Masters: Duel Station (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, duelmast, 0,      0, duelmast,                duelmast,  xavix_duelmast_state,    init_xavix, "Takara / SSD Company Limited",               "Duel Masters: Duel Station (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // スーパーダッシュボール
-CONS( 2004, epo_sdb,  0, 0, xavix2000_nv_sdb,    epo_sdb,     xavix_2000_nv_sdb_state, init_xavix, "Epoch / SSD Company LTD",       "Super Dash Ball (Japan)",  MACHINE_IMPERFECT_SOUND )
+CONS( 2004, epo_sdb,  0,      0, xavix2000_nv_sdb,        epo_sdb,   xavix_2000_nv_sdb_state, init_xavix, "Epoch / SSD Company Limited",                "Super Dash Ball (Japan)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2005, ttv_sw,   0,      0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Tiger / SSD Company LTD",       "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2005, ttv_swj,  ttv_sw, 0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Tomy / SSD Company LTD",        "Star Wars Saga Edition - Lightsaber Battle Game (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2005, ttv_lotr, 0,      0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Tiger / SSD Company LTD",       "Lord of the Rings - Warrior of Middle-Earth", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2005, ttv_mx,   0,      0, xavix2000_i2c_24c04, ttv_mx,      xavix_i2c_state,         init_xavix, "Tiger / SSD Company LTD",       "MX Dirt Rebel", MACHINE_IMPERFECT_SOUND )
+CONS( 2005, ttv_sw,   0,      0, xavix2000_i2c_24c02,     ttv_lotr,  xavix_i2c_lotr_state,    init_xavix, "Hasbro / Tiger Games / SSD Company Limited", "Star Wars Saga Edition: Lightsaber Battle Game!", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// テレビで遊び隊 STAR WARS LIGHTSABER BATTLE ～ジェダイの戦い～
+CONS( 2005, ttv_swj,  ttv_sw, 0, xavix2000_i2c_24c02,     ttv_lotr,  xavix_i2c_lotr_state,    init_xavix, "Tomy / SSD Company Limited",                 "TV de Asobitai Star Wars: Lightsaber Battle - Jedi no Tatakai (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+CONS( 2005, ttv_lotr, 0,      0, xavix2000_i2c_24c02,     ttv_lotr,  xavix_i2c_lotr_state,    init_xavix, "Hasbro / Tiger Games / SSD Company Limited", "The Lord of the Rings: Warrior of Middle-Earth", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+CONS( 2005, ttv_mx,   0,      0, xavix2000_i2c_24c04,     ttv_mx,    xavix_i2c_state,         init_xavix, "Hasbro / Tiger Games / SSD Company Limited", "MX Dirt Rebel", MACHINE_IMPERFECT_SOUND )
 
 // テレビで遊び隊　韋駄天翔 激走 韋駄天バトル  - seems to be based on the same engine at ttv_mx and has an almost identical controller, but not exactly the same game
-CONS( 2005, tom_jump,   0,    0, xavix2000_i2c_24c04, ttv_mx,      xavix_i2c_state,         init_xavix, "Tomy / SSD Company LTD",        "IDATEN Jump: Gekisou IDATEN Battle (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2005, tom_jump, 0,      0, xavix2000_i2c_24c04,     ttv_mx,    xavix_i2c_state,         init_xavix, "Tomy / SSD Company Limited",                 "TV de Asobitai IDATEN Jump: Gekisou IDATEN Battle (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // 剣神ドラゴンクエスト 甦りし伝説の剣
-CONS( 2003, drgqst,   0,      0, xavix2000_i2c_24c08, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, drgqst,   0,      0, xavix2000_i2c_24c08,     ttv_lotr,  xavix_i2c_lotr_state,    init_xavix, "Square Enix / SSD Company Limited",          "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // チョロＱビュンビュンレーサー
 // crashes whenever a CPU car reaches a corner - see map
-CONS( 2003, tak_chq,  0,      0, xavix2000_i2c_24c04_4mb, xavix_i2c,   xavix_i2c_state,         init_xavix, "Takara / SSD Company LTD",      "Choro-Q Byun Byun Racer (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, tak_chq,  0,      0, xavix2000_i2c_24c04_4mb, xavix_i2c, xavix_i2c_state,         init_xavix, "Takara / SSD Company Limited",               "Choro-Q Byun Byun Racer (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // hangs after starting a game, check why
 // Let’s！TV プレイ　体感格闘ワンピースパンチバトル 　～海賊王にキミがなる！～
-CONS( 2004, ban_onep, 0, 0, xavix2000_i2c_24c04, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Bandai / SSD Company LTD",         "Let's! TV Play Taikan Kakutou One Piece Punch Battle - Kaizoku Ou ni Kimi ga Naru (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, ban_onep, 0,      0, xavix2000_i2c_24c04,     ttv_lotr,    xavix_i2c_lotr_state,  init_xavix, "Bandai / SSD Company Limited",               "Let's! TV Play Taikan Kakutou One Piece Punch Battle: Kaizoku Ou ni Kimi ga Naru! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// Let’s！TV プレイ　闘印奥義　 陰陽大戦記～目指せ最強闘神士～
+// Let’s！TV プレイ　闘印奥義　陰陽大戦記　～目指せ最強闘神士～
 // stalls unless timers are disabled like epo_mini / epo_golf, 2004 date on PCB, 2005 ingame
-CONS( 2005, ban_omt,  0, 0, xavix2000_i2c_24c04_4mb, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Bandai / SSD Company LTD",         "Let's! TV Play Touin Ougi Onmyou Taisenki: Mezase Saikyou Toushinshi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, ban_omt,  0,      0, xavix2000_i2c_24c04_4mb, ttv_lotr,    xavix_i2c_lotr_state,  init_xavix, "Bandai / SSD Company Limited",               "Let's! TV Play Touin Ougi Onmyou Taisenki: Mezase Saikyou Toushinshi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// ディズニープリンセス　キラキラ魔法のレッスン
-CONS( 2004, tom_dpgm, 0, 0, xavix2000_i2c_24c08_4mb, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Tomy / SSD Company LTD",         "Disney Princess Kirakira Mahou no Lesson (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// テレビで遊び隊 ディズニープリンセス　キラキラ魔法のレッスン
+CONS( 2004, tom_dpgm, 0,      0, xavix2000_i2c_24c08_4mb, ttv_lotr,    xavix_i2c_lotr_state,  init_xavix, "Tomy / SSD Company Limited",                 "TV de Asobitai Disney Princess: Kirakira Mahou no Lesson (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

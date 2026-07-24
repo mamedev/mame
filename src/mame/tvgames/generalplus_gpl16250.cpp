@@ -3,7 +3,7 @@
 /*
     (unSP 2.0 based System on a Chip)
 
-    JAKKS call this GPAC800, other sources (including Pac-Man Connect and Play test mode) call it GPL16250VA
+    Jakks call this GPAC800, other sources (including Pac-Man Connect and Play test mode) call it GPL16250VA
 
     die markings GCM394
      - Smart Fit Park
@@ -14,7 +14,7 @@
 
     Compared to vii.cpp this is clearly newer, has extra opcodes, different internal map etc. also scaling and higher resolutions based on Spongebob
 
-    note, these SoC types always have a 128Kwords internal ROM, which the JAKKS games appear to use for basic bootstrap purposes.
+    note, these SoC types always have a 128Kwords internal ROM, which the Jakks games appear to use for basic bootstrap purposes.
 
     GPAC800 / GCM394 (SpongeBob Bikini Bottom 500 Test Mode also calls this GPAC800, even if the mappings appear different to the NAND version below - different CS base, maybe just depends on boot mode?)
         Smart Fit Park
@@ -56,9 +56,9 @@
                  Galaga - Incorrect sprite used for left shot in 'Double Ship' mode
 
 
-    JAKKS Pacific Test modes:
+    Jakks Pacific Test Modes:
 
-    jak_hmhsm : uses the standard JAKKS code (on first screen - Hold Up, Hold A, Release Up, Down)
+    jak_hmhsm : uses the standard Jakks code (on first screen - Hold Up, Hold A, Release Up, Down)
                 the High School Musical part has its own test mode which tests a different part of the ROM, use the same code but after selecting the game from menu
 
 
