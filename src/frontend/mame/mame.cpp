@@ -300,7 +300,7 @@ int mame_machine_manager::execute()
 			if (machine.exit_pending())
 			{
 				m_options.set_system_name("");
-				m_options.set_value(OPTION_BIOS, "", OPTION_PRIORITY_CMDLINE);
+				m_options.get_entry(OPTION_BIOS)->revert(OPTION_PRIORITY_CMDLINE, OPTION_PRIORITY_CMDLINE);
 			}
 		}
 
