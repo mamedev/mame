@@ -684,6 +684,11 @@ ROM_START (onyx)
 	ROM_LOAD( "onyx.rom", 0x0000, 0x2000, CRC(011c32e7) SHA1(f44263221e330b2590dffc1a6f43ed2591fe19be) )
 ROM_END
 
+ROM_START (splice)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "placa1_bios.bin", 0x0000, 0x2000, CRC(a9d089e2) SHA1(faffd3f2a42d38e13638c2d69d8e06f83de267c7) )
+ROM_END
+
 /*  PAL Colecovision BIOS
 
 Country: Italy
@@ -761,6 +766,7 @@ ROM_END
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS         INIT        COMPANY             FULLNAME                            FLAGS
 CONS( 1982, coleco,   0,      0,      coleco,   coleco, coleco_state, empty_init, "Coleco",           "ColecoVision (NTSC)",              0 )
 CONS( 1982, onyx,     coleco, 0,      coleco,   coleco, coleco_state, empty_init, "Microdigital",     "Onyx (Brazil/Prototype)",          0 )
+CONS( 1983, splice,   coleco, 0,      coleco,   coleco, coleco_state, empty_init, "Splice",           "SpliceVision (Brazil)",            0 )
 CONS( 1983, colecop,  coleco, 0,      colecop,  coleco, coleco_state, empty_init, "Coleco",           "ColecoVision (PAL)",               0 )
 CONS( 1986, czz50,    0,      coleco, czz50,    czz50,  coleco_state, empty_init, "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
 CONS( 1988, dina,     czz50,  0,      dina,     czz50,  coleco_state, empty_init, "Telegames",        "Dina",                             0 )
