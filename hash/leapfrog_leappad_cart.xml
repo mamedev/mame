@@ -6,7 +6,7 @@ license:CC0-1.0
 <softwarelist name="leapfrog_leappad_cart" description="LeapFrog LeapPad / CocoPad / Benesse Qpad cartridges">
 
 	<software name="ratfr" supported="no">
-		<description>Ratatouille (France)</description>
+		<description>Ratatouille (France, set 1)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12681"/>
@@ -18,6 +18,18 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+	
+	<!-- probably a different story, not a clone, check -->
+	<software name="ratfra" cloneof="ratfr" supported="no">
+		<description>Ratatouille (France, set 2)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-12687 - Ratatouille (France).bin" size="0x200000" crc="1b7e2854" sha1="3ac217e514ad3df79c42ffad5bc85d723e716cdb" />
+			</dataarea>
+		</part>
+	</software>		
 
 	<software name="intsci" supported="no"> <!-- no serial or date printed anywhere -->
 		<description>Interactif Sciences - Extraordinaires mammiferes! (France)</description>
@@ -163,6 +175,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- same ROM has been seen on a UBL 500-10870 cart -->
 	<software name="musique" cloneof="hititmstro" supported="no">
 		<description>Musique, Maestro! (France)</description>
 		<year>2003</year>
@@ -795,6 +808,18 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="histprin2" supported="no">
+		<description>Disney Princesse -  Deux histoires de princesses (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="UBL 500-10340 - Deux histoires de princesses (France).bin" size="0x200000" crc="e381cc05" sha1="067ba0b584ca62eafa106d87950cdc887fa14d8a" />
+			</dataarea>
+		</part>
+	</software>		
+	
 
 	<software name="fiestahses" supported="no">
 		<description>Fiesta in the House! - ¡Party en la Casa! (Spain)</description>
@@ -1898,4 +1923,94 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+	
+	
+	<software name="foxsocks" supported="no">
+		<description>Fox in Socks</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-10445 - Fox in Socks.bin" size="0x400000" crc="50578c00" sha1="20f2fedd9f8e1d7559d939fdbfe3b3b734d430ab" />
+			</dataarea>
+		</part>
+	</software>	
+	
+	<software name="dinofr" supported="no">
+		<description>Sur les traces du Dinosaure Perdu (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-11142 - Sur les traces du Dinosaure Perdu (France).bin" size="0x400000" crc="f2f64c24" sha1="88f2106d4c0daff43bacc8514be348d34bb9ee4a" />
+			</dataarea>
+		</part>
+	</software>	
+	
+	<software name="batman" supported="no">
+		<description>Batman</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-11373 - Batman.bin" size="0x200000" crc="7fa523ff" sha1="223bc88b995264dfd0f25d7e4592137968185ebc" />
+			</dataarea>
+		</part>
+	</software>		
+	
+	<software name="spidfr" supported="no">
+		<description>Spider-Man (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-12103 - Spider-Man (France).bin" size="0x400000" crc="d5dd7356" sha1="1c75c2d914190dc48a0ff31910a69184ac992049" />
+			</dataarea>
+		</part>
+	</software>		
+	
+	<software name="letgo1fr" supported="no">
+		<description>Let's Go 1 (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="UBL 500-10269 - Let's Go 1 (France).bin" size="0x400000" crc="829952eb" sha1="7685fa37e4a1596f95fa1fe6efee4fd1e3b9c4f5" />
+			</dataarea>
+		</part>
+	</software>			
+	
+	<software name="letgo2fr" supported="no">
+		<description>Let's Go 2 (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="UBL 500-11598 - Let's Go 2 (France).bin" size="0x400000" crc="43c4ce8b" sha1="4ac1b173a1524d75a29fb05fe06ed14655299683" />
+			</dataarea>
+		</part>
+	</software>			
+	
+	<software name="letgo3fr" supported="no">
+		<description>Let's Go 3 (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="UBL 500-11747 - Let's Go 3 (France).bin" size="0x400000" crc="a2cc0d40" sha1="51f1de30839f07fafe9f30c2fd2efb1b8b887c3b" />
+			</dataarea>
+		</part>
+	</software>			
+	
+	<software name="royaume" supported="no">
+		<description>Le royaume des nombres enchantes (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-12271 - Le royaume des nombres enchantes (France).bin" size="0x200000" crc="7036402b" sha1="5acc930b97af7b7a0f2a0c1f39eb1d83badd33ed" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
