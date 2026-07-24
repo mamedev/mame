@@ -47,6 +47,8 @@ public:
 	auto out_irq_callback() { return m_out_irq_cb.bind(); }
 	auto in_dma_callback() { return m_in_dma_cb.bind(); }
 	auto out_dma_callback() { return m_out_dma_cb.bind(); }
+	auto out_ddwt_callback() { return m_out_ddwt_cb.bind(); }
+	auto out_ddmv_callback() { return m_out_ddmv_cb.bind(); }
 
 	/* port 0 */
 	uint32_t program_control_r();
@@ -84,6 +86,8 @@ protected:
 	devcb_write_line     m_out_irq_cb;
 	devcb_read16         m_in_dma_cb;
 	devcb_write16        m_out_dma_cb;
+	devcb_write_line     m_out_ddwt_cb;
+	devcb_write_line     m_out_ddmv_cb;
 
 private:
 	enum {
@@ -138,6 +142,15 @@ private:
 	address_space *m_data;
 	int m_icount;
 	uint8_t m_update_mul;
+
+	emu_timer *m_dma_timer;
+	enum dma_state_t : uint8_t {
+		DMA_STATE_IDLE = 0,
+		DMA_STATE_WAIT,
+		DMA_STATE_MOVE
+	};
+	dma_state_t m_dma_state;
+	TIMER_CALLBACK_MEMBER(dma_tick_cb);
 
 	uint32_t get_source_mem_reg_value( uint32_t mode );
 	uint32_t get_source_mem_value(uint8_t mode);

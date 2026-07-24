@@ -5534,13 +5534,15 @@ May hang after skipping initial FMV (random)
 		</part>
 	</software>
 
-	<!-- FMV playback is very glitchy [CD-Block] -->
-	<!-- main menu/gameplay performance is poor (caused by the polygon rasterizer) [VDP1] -->
-	<!-- Gameplay back layer still shows the main menu instead of being black filled [VDP2] -->
 	<software name="kingbox" cloneof="vicboxin" supported="no">
 		<description>The King of Boxing (Japan)</description>
 		<year>1995</year>
 		<publisher>Victor Entertainment</publisher>
+		<notes><![CDATA[
+FMV playback is very glitchy [CD-Block]
+Gameplay back layer still shows the main menu instead of being black filled [VDP2]
+Known to use [SCUDSP]
+]]></notes>
 		<info name="serial" value="T-6001G"/>
 		<info name="release" value="19951020"/>
 		<info name="alt_title" value="キング・オブ・ボクシング"/>
@@ -15012,8 +15014,7 @@ Black screen, [CD-Block]
 		<year>1996</year>
 		<publisher>Imagineer</publisher>
 		<notes><![CDATA[
-[VDP1] rendering issue when "3d" zooms on title screen
-Not extensively tested, known to use [SCU DSP]
+[VDP1] rendering issue when "3d" zooms on title screen [SCUDSP] actually [timing]
 ]]></notes>
 		<info name="serial" value="T-15013G"/>
 		<info name="release" value="19960823"/>
@@ -16089,12 +16090,15 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- No sound [CD-Block/SCSP] -->
-	<!-- "Window enabled for RGB555 Zoom" [VDP2] -->
 	<software name="crocj" cloneof="croc" supported="no">
 		<description>Croc - Pau-Pau Island (Japan)</description>
 		<year>1998</year>
 		<publisher>Media Quest</publisher>
+		<notes><![CDATA[
+No sound [CD-Block] and [SCSP]
+[VDP2] "Window enabled for RGB555 Zoom"
+Known to use [SCUDSP]
+]]></notes>
 		<info name="serial" value="T-26410G"/>
 		<info name="release" value="19980326"/>
 		<info name="alt_title" value="クロック! パウパウアイランド"/>

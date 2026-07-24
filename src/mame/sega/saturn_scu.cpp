@@ -6,6 +6,11 @@ Sega Saturn System Control Unit (c) 1995 Sega/Yamaha
 
 TODO:
 - Rewrite DMA;
+\- make it single step;
+\- implement DMA priority mechanism;
+\- implement penalties for attached devices;
+   (cfr. 3dlemminj title screen "3d" logo going fast and glitchy)
+\- implement ruleset mumbo jumbo;
 - Verify Timer 1 (seems unaffected even after rewriting it?)
 - A-Bus external interrupts;
 - Pad irq signal (lightgun?);
@@ -118,6 +123,19 @@ void saturn_scu_device::device_add_mconfig(machine_config &config)
 	m_scudsp->out_irq_callback().set(DEVICE_SELF, FUNC(saturn_scu_device::scudsp_end_w));
 	m_scudsp->in_dma_callback().set(FUNC(saturn_scu_device::scudsp_dma_r));
 	m_scudsp->out_dma_callback().set(FUNC(saturn_scu_device::scudsp_dma_w));
+	m_scudsp->out_ddwt_callback().set([this] (int state) {
+		if (state)
+			m_dma_status |= DMA_DSP_WAIT;
+		else
+			m_dma_status &= ~(DMA_DSP_WAIT);
+	});
+	m_scudsp->out_ddmv_callback().set([this] (int state) {
+		if (state)
+			m_dma_status |= DMA_DSP_MOVE;
+		else
+			m_dma_status &= ~(DMA_DSP_MOVE);
+	});
+
 }
 
 

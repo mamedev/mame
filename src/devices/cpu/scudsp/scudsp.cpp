@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese, Mariusz Wojcieszek
 /**************************************************************************************************
  *
- * scudsp.c
+ * scudsp.cpp
  * Sega SCUDSP emulator version 1.00
  *
  *
@@ -67,25 +67,12 @@
  * - overworked disassembler
  *
  *  TODO:
- * - Fix INSTA_DMA hack;
+ * - remove fake HALT line for DMAs (depends on better timings downstream);
  * - Fix disassembler;
  * - Fix timings (no info available so far);
  * - Add control flags;
  * - Scheduler corrupts a lot in debugger, particularly with DRC enabled;
- * - croc: has a bug somewhere that never allows it to trip the ENDI opcode.
- *   Snippet of interest is:
- *   08    00823500                                            CLR A     MOV M0,PL
- *   09    08040000    OR                                      MOV ALU,A
- *   0A    D208000D    JMP NZ,$D
- *   0B    00000000    NOP
- *   0C    F8000000    ENDI
- *
- *   40    00863502                                            MOV M0,A  MOV M2,PL
- *   41    10003009    ADD                                               MOV ALL,MC0
- *   42    D3400042    JMP T0,$42
- *   43    00000000    NOP
- *   44    D0000007    JMP $7
- * - vkyoute2: heavy glitches with VDP1 vertices going haywire.
+ * - vkyoute2: heavy glitches with VDP1 vertices going haywire;
  *
  *
  *************************************************************************************************/
@@ -106,7 +93,6 @@ DEFINE_DEVICE_TYPE(SCUDSP, scudsp_cpu_device, "scudsp", "Sega SCUDSP")
 
 
 #define FLAGS_MASK 0x06ff8000
-#define INSTA_DMA_HACK 1
 
 #define scudsp_readop(A) m_program->read_dword(A)
 #define scudsp_writeop(A, B) m_program->write_dword(A, B)
@@ -302,7 +288,7 @@ void scudsp_cpu_device::set_dest_dma_mem( uint32_t memcode, uint32_t value, uint
 	}
 	else if ( memcode == 4 )
 	{
-		fatalerror("set_dest_dma_mem == 4");
+		throw emu_fatalerror("scudsp.cpp: set_dest_dma_mem == 4");
 		/* caused a stack overflow for sure ... */
 		//dsp_reg.internal_prg[ counter & 0x100 ] = value;
 	}
@@ -642,8 +628,6 @@ void scudsp_cpu_device::op_dma( uint32_t opcode )
 	uint32_t dir_from_D0 = (opcode & 0x1000 ) >> 12;
 	uint32_t dsp_mem = (opcode & 0x300) >> 8;
 
-	m_flags |= 1 << T0F;
-
 	if ( opcode & 0x2000 )
 	{
 		m_dma.size = get_source_mem_value( opcode & 0xf );
@@ -659,6 +643,9 @@ void scudsp_cpu_device::op_dma( uint32_t opcode )
 		m_dma.size = opcode & 0xff;
 		switch( add )
 		{
+			// TODO: why this calculation diverges vs. SCU DMA?
+			// is it for concealing that it should use the same rules instead?
+			// i.e. Work RAM H always in dword unit etc.
 			case 0: m_dma.add = 0; break;  /* 0 */
 			case 1: m_dma.add = 4; break;  /* 1 */
 			case 2: m_dma.add = 4; break;  /* 2 */
@@ -685,58 +672,21 @@ void scudsp_cpu_device::op_dma( uint32_t opcode )
 	m_dma.update = ( hold == 0 );
 	m_dma.ex = 1;
 	m_dma.count = 0;
-	// HACK: It looks like that scheduling craps out the m_dma parameters
-	// this can be verified with stv:vfremix, where the DMA transfers are very small
-	// and no T0F is checked (?)
-	#if INSTA_DMA_HACK
-	{
-		uint32_t data;
-		if ( m_dma.dir == 0 )
-		{
-			for(m_dma.count = 0;m_dma.count < m_dma.size; m_dma.count++)
-			{
-				data = (m_in_dma_cb(m_dma.src)<<16) | m_in_dma_cb(m_dma.src+2);
-				set_dest_dma_mem( m_dma.dst, data, m_dma.count );
+	m_flags |= 1 << T0F;
 
-				m_dma.src += m_dma.add;
+	// take some time to actually set above, push in wait state
+	m_dma_state = DMA_STATE_WAIT;
+	m_out_ddwt_cb(1);
+	m_out_ddmv_cb(0);
+	m_dma_timer->adjust(attotime::from_ticks(4, this->clock()));
 
-				if ( m_dma.update )
-				{
-					m_ra0 += ((1 * m_dma.add) >> 2);
-				}
-			}
-		}
-		else
-		{
-			for(m_dma.count = 0;m_dma.count < m_dma.size; m_dma.count++)
-			{
-				data = get_mem_source_dma( m_dma.src, m_dma.count );
+	// printf("SRC %08x DST %08x SIZE %08x UPDATE %08x DIR %08x ADD %08x\n",m_dma.src,m_dma.dst,m_dma.size,m_dma.update,m_dma.dir,m_dma.add);
 
-				m_out_dma_cb(m_dma.dst, data >> 16 );
-				m_out_dma_cb(m_dma.dst+2, data & 0xffff );
-
-				m_dma.dst += m_dma.add;
-
-				if ( m_dma.update )
-				{
-					m_wa0 += ((1 * m_dma.add) >> 2);
-				}
-			}
-		}
-
-		//if(m_dma.count >= m_dma.size)
-		{
-			m_dma.ex = 0;
-			m_flags &= ~(1 << T0F);
-		}
-
-		m_icount -= m_dma.size;
-	}
-	#endif
-
-
-	//printf("SRC %08x DST %08x SIZE %08x UPDATE %08x DIR %08x ADD %08x\n",m_dma.src,m_dma.dst,m_dma.size,m_dma.update,m_dma.dir,m_dma.add);
-
+	// HACK: should be burst not cycle steal
+	// this is duct tape to make stv:vfremix not overrun atomic execution in the SH-2s,
+	// with its small DMA transfers and no T0F checked.
+	// Test scenario: attract mode, Sarah hitting the air rather than Kage.
+	set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	m_icount -= 1;
 }
 
@@ -801,11 +751,40 @@ void scudsp_cpu_device::op_end(uint32_t opcode)
 
 void scudsp_cpu_device::op_illegal(uint32_t opcode)
 {
-	fatalerror("scudsp illegal opcode at 0x%04x\n", m_pc);
-	m_icount -= 1;
+	throw emu_fatalerror("scudsp illegal opcode at 0x%04x\n", m_pc);
+	// m_icount -= 1;
 }
 
-// TODO: unused really
+TIMER_CALLBACK_MEMBER(scudsp_cpu_device::dma_tick_cb)
+{
+	switch(m_dma_state)
+	{
+		case DMA_STATE_IDLE:
+			m_out_ddwt_cb(0);
+			m_out_ddmv_cb(0);
+			m_dma.ex = 0;
+			m_flags &= ~(1 << T0F);
+			set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+
+			break;
+		case DMA_STATE_WAIT:
+			m_out_ddwt_cb(0);
+			m_out_ddmv_cb(1);
+			m_dma_state = DMA_STATE_MOVE;
+			m_dma_timer->adjust(attotime::from_ticks(1, this->clock()));
+			break;
+		case DMA_STATE_MOVE:
+			exec_dma();
+			m_dma.count++;
+			m_dma_state = m_dma.count >= m_dma.size ? DMA_STATE_IDLE : DMA_STATE_MOVE;
+
+			// accessing the D0-Bus should cause a 1 cycle wait (70 nsec a.k.a. 1/~14 MHz)
+			m_dma_timer->adjust(attotime::from_ticks(1, this->clock()));
+			m_icount -= 1;
+			break;
+	}
+}
+
 void scudsp_cpu_device::exec_dma()
 {
 	uint32_t data;
@@ -835,15 +814,6 @@ void scudsp_cpu_device::exec_dma()
 			m_wa0 += ((1 * m_dma.add) >> 2);
 		}
 	}
-
-	m_dma.count++;
-	if(m_dma.count >= m_dma.size)
-	{
-		m_dma.ex = 0;
-		m_flags &= ~(1 << T0F);
-	}
-
-	m_icount -= 1;
 }
 
 /* Execute cycles */
@@ -904,11 +874,6 @@ void scudsp_cpu_device::execute_run()
 			m_update_mul = 0;
 		}
 
-		if (m_dma.ex == 1)
-		{
-			exec_dma();
-		}
-
 	} while( m_icount > 0 );
 }
 
@@ -922,6 +887,8 @@ device_memory_interface::space_config_vector scudsp_cpu_device::memory_space_con
 
 void scudsp_cpu_device::device_start()
 {
+	m_dma_timer = timer_alloc(FUNC(scudsp_cpu_device::dma_tick_cb), this);
+
 	m_pc = 0;
 	m_flags = 0;
 	m_delay = 0;
@@ -1008,6 +975,10 @@ void scudsp_cpu_device::device_start()
 
 void scudsp_cpu_device::device_reset()
 {
+	m_out_ddwt_cb(0);
+	m_out_ddmv_cb(0);
+	m_dma_timer->adjust(attotime::never);
+	m_dma_state = DMA_STATE_IDLE;
 }
 
 // TODO: do we need this?
@@ -1036,6 +1007,8 @@ scudsp_cpu_device::scudsp_cpu_device(const machine_config &mconfig, const char *
 	, m_out_irq_cb(*this)
 	, m_in_dma_cb(*this, 0)
 	, m_out_dma_cb(*this)
+	, m_out_ddwt_cb(*this)
+	, m_out_ddmv_cb(*this)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 8, -2, address_map_constructor(FUNC(scudsp_cpu_device::program_map), this))
 	, m_data_config("data", ENDIANNESS_BIG, 32, 8, -2, address_map_constructor(FUNC(scudsp_cpu_device::data_map), this))
 {
