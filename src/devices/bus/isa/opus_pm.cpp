@@ -318,7 +318,7 @@ offs_t isa8_opus_pm100_device_base::window_phys(offs_t offset, bool write)
 {
 	if (!m_window_top || !m_mmu)
 		return offset & 0x3fffff;                          // INITIALIZE: physical low
-	u32 addr = 0xff0000 | offset;                          // RUN: top 8 bits forced to 1
+	offs_t addr = 0xff0000 | offset;                       // RUN: top 8 bits forced to 1
 	if (m_mmu->translate(m_cpu->space(AS_PROGRAM), ns32000::ST_ODT, addr, false, write, false, true /*suppress faults*/)
 			== ns32000_mmu_interface::COMPLETE)
 		return addr & 0x3fffff;

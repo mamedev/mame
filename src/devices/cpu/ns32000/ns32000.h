@@ -116,8 +116,8 @@ protected:
 	};
 
 	// memory accessors
-	template <typename T> T mem_read(unsigned st, u32 address, bool user = false, bool pfs = false);
-	template <typename T> void mem_write(unsigned st, u32 address, u64 data, bool user = false);
+	template <typename T> T mem_read(unsigned st, offs_t address, bool user = false, bool pfs = false);
+	template <typename T> void mem_write(unsigned st, offs_t address, u64 data, bool user = false);
 
 	// instruction fetch/decode helpers
 	template <typename T> T fetch(unsigned &bytes);

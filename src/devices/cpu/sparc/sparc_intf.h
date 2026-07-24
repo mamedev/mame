@@ -22,7 +22,7 @@ class sparc_mmu_interface
 {
 public:
 	virtual ~sparc_mmu_interface() { }
-	virtual uint32_t fetch_insn(const bool supervisor, const uint32_t offset) = 0;
+	virtual uint32_t fetch_insn(const bool supervisor, const offs_t offset) = 0;
 	virtual void set_host(sparc_mmu_host_interface *host) = 0;
 };
 

@@ -274,9 +274,9 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::state_s
  *
  * Underlying handlers further subdivide accesses by device bus width.
  */
-template <int HighBits, int Width> template<typename T> T ns32000_device<HighBits, Width>::mem_read(unsigned st, u32 address, bool user, bool pfs)
+template <int HighBits, int Width> template<typename T> T ns32000_device<HighBits, Width>::mem_read(unsigned st, offs_t address, bool user, bool pfs)
 {
-	u32 physical = address;
+	offs_t physical = address;
 	// the CPU routes accesses through the external MMU only once SETCFG has
 	// enabled it (CFG M).  When the MMU is idle/just-reset the page tables are
 	// ignored and every address is physical, regardless of a stale MSR
@@ -365,9 +365,9 @@ template <int HighBits, int Width> template<typename T> T ns32000_device<HighBit
 	return 0;
 }
 
-template <int HighBits, int Width> template<typename T> void ns32000_device<HighBits, Width>::mem_write(unsigned st, u32 address, u64 data, bool user)
+template <int HighBits, int Width> template<typename T> void ns32000_device<HighBits, Width>::mem_write(unsigned st, offs_t address, u64 data, bool user)
 {
-	u32 physical = address;
+	offs_t physical = address;
 	// see mem_read: the external MMU is consulted only when SETCFG has enabled it
 	bool const xlat = m_mmu && (!m_mmu_uses_cfg_m || (m_cfg & CFG_M));
 	ns32000_mmu_interface::translate_result tr = xlat ?
@@ -4349,7 +4349,7 @@ static constexpr u32 MSR(unsigned st, bool user, bool write, unsigned tex)
 	return u32(((st << 4) & MSR_STT) | (user ? MSR_UST : 0) | (write ? MSR_DDT : 0) | (tex & MSR_TEX));
 }
 
-ns32000_mmu_interface::translate_result ns32532_device::translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool rdwrval, bool suppress)
+ns32000_mmu_interface::translate_result ns32532_device::translate(address_space &space, unsigned st, offs_t &address, bool user, bool write, bool rdwrval, bool suppress)
 {
 	enum mcr_mask : u32
 	{
@@ -4631,7 +4631,7 @@ u16 ns32532_device::slave(u8 opbyte, u16 opword, addr_mode op1, addr_mode op2)
 		case 0: // rdval
 		case 1: // wrval
 			{
-				u32 address = ea(op1);
+				offs_t address = ea(op1);
 
 				switch (translate(space(AS_PROGRAM), ns32000::ST_ODT, address, true, BIT(opword, 2), true, true))
 				{

@@ -20,8 +20,8 @@ public:
 	// construction/destruction
 	mc88100_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	void set_cmmu_code(std::function<mc88200_device &(u32 const address)> f) { m_cmmu_code = f; }
-	void set_cmmu_data(std::function<mc88200_device &(u32 const address)> f) { m_cmmu_data = f; }
+	void set_cmmu_code(std::function<mc88200_device &(offs_t const address)> f) { m_cmmu_code = f; }
+	void set_cmmu_data(std::function<mc88200_device &(offs_t const address)> f) { m_cmmu_data = f; }
 
 protected:
 	// device_t implementation
@@ -44,9 +44,9 @@ protected:
 
 	// memory helpers
 	void fetch(u32 &address, u32 &inst);
-	template <typename T, bool Usr = false> void ld(u32 address, unsigned const reg);
-	template <typename T, bool Usr = false> void st(u32 address, unsigned const reg);
-	template <typename T, bool Usr = false> void xmem(u32 address, unsigned const reg);
+	template <typename T, bool Usr = false> void ld(offs_t address, unsigned const reg);
+	template <typename T, bool Usr = false> void st(offs_t address, unsigned const reg);
+	template <typename T, bool Usr = false> void xmem(offs_t address, unsigned const reg);
 
 	// integer helpers
 	void set_cr(unsigned const cr, u32 const data);
@@ -67,8 +67,8 @@ private:
 	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_code_space;
 	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_data_space;
 
-	std::function<mc88200_device &(u32 const address)> m_cmmu_code;
-	std::function<mc88200_device &(u32 const address)> m_cmmu_data;
+	std::function<mc88200_device &(offs_t const address)> m_cmmu_code;
+	std::function<mc88200_device &(offs_t const address)> m_cmmu_data;
 
 	// register storage
 	u32 m_xip; // execute instruction pointer
