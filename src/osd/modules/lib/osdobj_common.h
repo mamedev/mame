@@ -87,6 +87,7 @@
 #define OSDOPTION_BGFX_PATH             "bgfx_path"
 #define OSDOPTION_BGFX_BACKEND          "bgfx_backend"
 #define OSDOPTION_BGFX_DEBUG            "bgfx_debug"
+#define OSDOPTION_BGFX_VECTORCRT        "bgfx_vectorcrt"
 #define OSDOPTION_BGFX_SCREEN_CHAINS    "bgfx_screen_chains"
 #define OSDOPTION_BGFX_SHADOW_MASK      "bgfx_shadow_mask"
 #define OSDOPTION_BGFX_LUT              "bgfx_lut"
@@ -165,6 +166,7 @@ public:
 	const char *bgfx_path() const { return value(OSDOPTION_BGFX_PATH); }
 	const char *bgfx_backend() const { return value(OSDOPTION_BGFX_BACKEND); }
 	bool bgfx_debug() const { return bool_value(OSDOPTION_BGFX_DEBUG); }
+	bool bgfx_vectorcrt() const { return bool_value(OSDOPTION_BGFX_VECTORCRT); }
 	const char *bgfx_screen_chains() const { return value(OSDOPTION_BGFX_SCREEN_CHAINS); }
 	const char *bgfx_shadow_mask() const { return value(OSDOPTION_BGFX_SHADOW_MASK); }
 	const char *bgfx_lut() const { return value(OSDOPTION_BGFX_LUT); }
