@@ -22,7 +22,6 @@ public:
 	// DRC functions used to update the cache state
 	void drc_memory_access_read();
 	void drc_memory_access_write();
-	void drc_update_icache();
 
 protected:
 	virtual void sh3_register_map(address_map& map) override ATTR_COLD;
@@ -30,9 +29,6 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	virtual void static_generate_memory_accessor(int size, int iswrite, const char* name, uml::code_handle*& handleptr) override;
-	virtual bool generate_group_0(drcuml_block& block, compiler_state& compiler, const opcode_desc* desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) override;
-	virtual bool generate_group_4(drcuml_block& block, compiler_state& compiler, const opcode_desc* desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) override;
-	virtual bool generate_group_15(drcuml_block& block, compiler_state& compiler, const opcode_desc* desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) override;
 
 	virtual uint32_t ccr_r(offs_t offset, uint32_t mem_mask) override;
 	virtual void ccr_w(offs_t offset, uint32_t data, uint32_t mem_mask) override;
@@ -53,11 +49,13 @@ private:
 	uint8_t m_last_area_accessed; // last memory area accessed for WCR1 timing purposes
 	bool m_last_area_accessed_was_write; // last memory area accessed operation also for WCR1 timing purposes
 	unsigned int m_wb_active_cycles; // Track any background cycles for writeback and precharge waits on the same bank
-	unsigned int m_last_sdram_page; // Last accessed sdram page, used to track when to have to pay tpc(precharge) cost
+	unsigned int m_last_sdram_bank; // Last accessed sdram bank, used to track when to have to pay tpc(precharge) cost
 	unsigned int m_precharge_remaining_cycles;
+	uint64_t m_last_op_cycle_count; // Track the last cycle we did a memory operation for background accounting
 
 	bool cache_access(uint32_t address, bool write);
 	unsigned int access_penalty(uint32_t address, bool write);
+	void update_access_cycles(uint32_t address, bool write);
 
 	// Timing calculation/decode related functions
 	uint32_t get_wcr1_timing(uint32_t address);
@@ -67,6 +65,7 @@ private:
 	uint32_t mcr_trwl();
 	uint32_t mcr_tras();
 	uint32_t cache_line_fetch_count(uint32_t address);
+	uint32_t sdram_bank(uint32_t address);
 };
 
 DECLARE_DEVICE_TYPE(SH7709S, sh7709s_device)
