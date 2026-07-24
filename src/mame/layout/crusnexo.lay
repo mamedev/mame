@@ -5,88 +5,86 @@ license:CC0-1.0
 <mamelayout version="2">
 	<element name="digit" defstate="0">
 		<led7seg>
-			<color red="1.0" green="0.3" blue="0.0" />
+			<color red="0.6" green="1.0" blue="0.0" />
 		</led7seg>
 	</element>
 
-	<element name="led" defstate="0">
+	<element name="led_green" defstate="0">
+		<disk state="0">
+			<color red="0.0" green="0.1" blue="0.0" />
+		</disk>
 		<disk state="1">
-			<color red="0.2" green="1.0" blue="0.2" />
+			<color red="0.0" green="1.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="led_orange" defstate="0">
+		<disk state="0">
+			<color red="0.1" green="0.05" blue="0.0" />
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.5" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="led_red" defstate="0">
+		<disk state="0">
+			<color red="0.1" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
 		</disk>
 	</element>
 
 	<element name="start" defstate="0">
 		<disk state="0">
-			<bounds x="0.1" y="0" width="0.8" height="1" />
-			<color red="0.1" green="0.1" blue="0.1" />
+			<color red="0.0" green="0.1" blue="0.02" />
 		</disk>
 		<disk state="1">
-			<bounds x="0.1" y="0" width="0.8" height="1" />
-			<color red="1.0" green="1.0" blue="1.0" />
+			<color red="0.0" green="0.8" blue="0.2" />
 		</disk>
-		<text string="START">
+		<text string="start">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
-		</text>
-	</element>
-
-	<element name="radio" defstate="1">
-		<disk state="0">
-			<bounds x="0.1" y="0" width="0.8" height="1" />
-			<color red="0.1" green="0.1" blue="0.1" />
-		</disk>
-		<disk state="1">
-			<bounds x="0.1" y="0" width="0.8" height="1" />
-			<color red="1.0" green="1.0" blue="1.0" />
-		</disk>
-		<text string="RADIO">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0.02" y="0.16" width="0.96" height="0.60" />
 		</text>
 	</element>
 
 	<element name="view1" defstate="0">
 		<disk state="0">
-			<bounds x="0.1" y="0" width="0.8" height="1" />
-			<color red="0.1" green="0.02" blue="0.02" />
+			<color red="0.1" green="0.0" blue="0.0" />
 		</disk>
 		<disk state="1">
-			<bounds x="0.1" y="0" width="0.8" height="1" />
-			<color red="1.0" green="0.2" blue="0.2" />
+			<color red="1.0" green="0.0" blue="0.0" />
 		</disk>
-		<text string="VIEW 1">
+		<text string="lo">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0.02" y="0.08" width="0.96" height="0.76" />
 		</text>
 	</element>
 
 	<element name="view2" defstate="0">
 		<disk state="0">
-			<bounds x="0.1" y="0" width="0.8" height="1" />
 			<color red="0.1" green="0.1" blue="0.1" />
 		</disk>
 		<disk state="1">
-			<bounds x="0.1" y="0" width="0.8" height="1" />
-			<color red="1.0" green="1.0" blue="1.0" />
+			<color red="0.8" green="0.8" blue="0.8" />
 		</disk>
-		<text string="VIEW 2">
+		<text string="cam">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0.02" y="0.08" width="0.96" height="0.76" />
 		</text>
 	</element>
 
 	<element name="view3" defstate="0">
 		<disk state="0">
-			<bounds x="0.1" y="0" width="0.8" height="1" />
-			<color red="0.02" green="0.02" blue="0.1" />
+			<color red="0.0" green="0.06" blue="0.1" />
 		</disk>
 		<disk state="1">
-			<bounds x="0.1" y="0" width="0.8" height="1" />
-			<color red="0.2" green="0.2" blue="1.0" />
+			<color red="0.0" green="0.6" blue="0.9" />
 		</disk>
-		<text string="VIEW 3">
+		<text string="hi">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0.02" y="0.08" width="0.96" height="0.76" />
 		</text>
 	</element>
 
@@ -99,88 +97,90 @@ license:CC0-1.0
 		</screen>
 
 		<element name="digit6" ref="digit">
-			<bounds x="1.70" y="3.136" width="0.134" height="0.2" />
+			<bounds x="1.795" y="3.060" width="0.11" height="0.17" />
 		</element>
 		<element name="digit5" ref="digit">
-			<bounds x="1.90" y="3.136" width="0.134" height="0.2" />
+			<bounds x="1.945" y="3.060" width="0.11" height="0.17" />
 		</element>
 		<element name="digit4" ref="digit">
-			<bounds x="2.10" y="3.136" width="0.134" height="0.2" />
+			<bounds x="2.095" y="3.060" width="0.11" height="0.17" />
 		</element>
 
-		<element name="led0" ref="led">
-			<bounds x="0.533" y="3.461" width="0.02" height="0.02" />
+		<!-- Left arc: dots at equal arc-length along the ellipse; inner LED centered on digits -->
+		<element name="led0" ref="led_green">
+			<bounds x="0.929" y="3.370" width="0.035" height="0.035" />
 		</element>
-		<element name="led1" ref="led">
-			<bounds x="0.533" y="3.370" width="0.02" height="0.02" />
+		<element name="led1" ref="led_green">
+			<bounds x="0.923" y="3.294" width="0.035" height="0.035" />
 		</element>
-		<element name="led2" ref="led">
-			<bounds x="0.549" y="3.279" width="0.02" height="0.02" />
+		<element name="led2" ref="led_green">
+			<bounds x="0.944" y="3.220" width="0.035" height="0.035" />
 		</element>
-		<element name="led3" ref="led">
-			<bounds x="0.596" y="3.195" width="0.02" height="0.02" />
+		<element name="led3" ref="led_orange">
+			<bounds x="0.988" y="3.157" width="0.035" height="0.035" />
 		</element>
-		<element name="led4" ref="led">
-			<bounds x="0.670" y="3.123" width="0.02" height="0.02" />
+		<element name="led4" ref="led_orange">
+			<bounds x="1.049" y="3.108" width="0.035" height="0.035" />
 		</element>
-		<element name="led5" ref="led">
-			<bounds x="0.767" y="3.067" width="0.02" height="0.02" />
+		<element name="led5" ref="led_red">
+			<bounds x="1.121" y="3.076" width="0.035" height="0.035" />
 		</element>
-		<element name="led6" ref="led">
-			<bounds x="0.879" y="3.032" width="0.02" height="0.02" />
+		<element name="led6" ref="led_red">
+			<bounds x="1.200" y="3.062" width="0.035" height="0.035" />
 		</element>
-		<element name="led7" ref="led">
-			<bounds x="1.000" y="3.020" width="0.02" height="0.02" />
+		<element name="led7" ref="led_red">
+			<bounds x="1.279" y="3.067" width="0.035" height="0.035" />
 		</element>
-		<element name="led16" ref="led">
-			<bounds x="1.121" y="3.032" width="0.02" height="0.02" />
+		<element name="led16" ref="led_red">
+			<bounds x="1.355" y="3.088" width="0.035" height="0.035" />
 		</element>
-		<element name="led17" ref="led">
-			<bounds x="1.233" y="3.067" width="0.02" height="0.02" />
+		<element name="led17" ref="led_red">
+			<bounds x="1.423" y="3.127" width="0.035" height="0.035" />
 		</element>
 
-		<element name="led8" ref="led">
-			<bounds x="3.467" y="3.461" width="0.02" height="0.02" />
+		<!-- Right arc: mirror of left; inner LED centered on digits -->
+		<element name="led8" ref="led_green">
+			<bounds x="2.542" y="3.127" width="0.035" height="0.035" />
 		</element>
-		<element name="led9" ref="led">
-			<bounds x="3.467" y="3.370" width="0.02" height="0.02" />
+		<element name="led9" ref="led_green">
+			<bounds x="2.610" y="3.088" width="0.035" height="0.035" />
 		</element>
-		<element name="led10" ref="led">
-			<bounds x="3.451" y="3.279" width="0.02" height="0.02" />
+		<element name="led10" ref="led_green">
+			<bounds x="2.686" y="3.067" width="0.035" height="0.035" />
 		</element>
-		<element name="led11" ref="led">
-			<bounds x="3.404" y="3.195" width="0.02" height="0.02" />
+		<element name="led11" ref="led_orange">
+			<bounds x="2.765" y="3.062" width="0.035" height="0.035" />
 		</element>
-		<element name="led12" ref="led">
-			<bounds x="3.330" y="3.123" width="0.02" height="0.02" />
+		<element name="led12" ref="led_orange">
+			<bounds x="2.844" y="3.076" width="0.035" height="0.035" />
 		</element>
-		<element name="led13" ref="led">
-			<bounds x="3.233" y="3.067" width="0.02" height="0.02" />
+		<element name="led13" ref="led_red">
+			<bounds x="2.916" y="3.108" width="0.035" height="0.035" />
 		</element>
-		<element name="led14" ref="led">
-			<bounds x="3.121" y="3.032" width="0.02" height="0.02" />
+		<element name="led14" ref="led_red">
+			<bounds x="2.977" y="3.157" width="0.035" height="0.035" />
 		</element>
-		<element name="led15" ref="led">
-			<bounds x="3.000" y="3.020" width="0.02" height="0.02" />
+		<element name="led15" ref="led_red">
+			<bounds x="3.021" y="3.220" width="0.035" height="0.035" />
 		</element>
-		<element name="led22" ref="led">
-			<bounds x="2.879" y="3.032" width="0.02" height="0.02" />
+		<element name="led22" ref="led_red">
+			<bounds x="3.042" y="3.294" width="0.035" height="0.035" />
 		</element>
-		<element name="led23" ref="led">
-			<bounds x="2.767" y="3.067" width="0.02" height="0.02" />
+		<element name="led23" ref="led_red">
+			<bounds x="3.036" y="3.370" width="0.035" height="0.035" />
 		</element>
 
 		<element name="lamp0" ref="start" inputtag="SYSTEM" inputmask="0x04">
-			<bounds x="3.5" y="3.3" width="0.4" height="0.1" />
+			<bounds x="3.43" y="3.145" width="0.335" height="0.18" />
 		</element>
 		<element name="lamp1" ref="view1" inputtag="IN1" inputmask="0x10">
-			<bounds x="0.1" y="3.1" width="0.4" height="0.1" />
+			<bounds x="0.245" y="3.020" width="0.305" height="0.135" />
 		</element>
 		<element name="lamp2" ref="view2" inputtag="IN1" inputmask="0x20">
-			<bounds x="0.1" y="3.2" width="0.4" height="0.1" />
+			<bounds x="0.245" y="3.170" width="0.305" height="0.135" />
 		</element>
 		<element name="lamp3" ref="view3" inputtag="IN1" inputmask="0x40">
-			<bounds x="0.1" y="3.3" width="0.4" height="0.1" />
+			<bounds x="0.245" y="3.320" width="0.305" height="0.135" />
 		</element>
 	</view>
 </mamelayout>
