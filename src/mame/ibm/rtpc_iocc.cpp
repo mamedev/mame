@@ -5,11 +5,11 @@
  * IBM RT PC I/O Channel Converter/Controller
  *
  * Sources:
- *   - IBM RT PC Hardware Technical Reference Volume I, 75X0232, March 1987
+ *  - IBM RT PC Hardware Technical Reference, Volume I (75X0232), Second Edition (September 1986), International Business Machines Corporation.
  *
  * TODO:
- *   - isa bus i/o space should be halfword addressed
- *   - alternate controllers, region mode dma
+ *  - isa bus i/o space should be halfword addressed
+ *  - 16-bit system controller dma
  */
 
 #include "emu.h"
@@ -68,109 +68,162 @@ void rtpc_iocc_device::device_reset()
 {
 	m_csr = 0;
 
-	set_int(false);
+	interrupt(false);
 }
 
-u8 rtpc_iocc_device::dma_b_r(offs_t offset)
+u8 rtpc_iocc_device::dma_r(offs_t offset)
 {
 	u8 data = 0;
 
 	if (!BIT(m_dmr, 7 - m_adc))
 	{
-		u16 const tcw = m_tcw[(m_adc << 6) | (offset >> 11)];
-		u32 const real = ((tcw & TCW_PFX) << 11) | (offset & 0x7ff);
+		// page mode
+		u16 const tcw = m_tcw[(m_adc << 6) | BIT(offset, 11, 5)];
+		offs_t const addr = BIT(tcw, 0, 13) << 11 | (offset & 0x7ff);
 
-		LOGMASKED(LOG_DMA, "dma0 tcw 0x%04x real 0x%08x\n", tcw, real);
+		LOGMASKED(LOG_DMA, "dma_r tcw 0x%04x addr 0x%08x\n", tcw, addr);
+
 		if (tcw & TCW_IOC)
-			data = m_mem.read_byte(real);
+			data = m_mem.read_byte(addr);
 		else
-		{
-			if (!m_rsc->mem_load(real, data, RSC_N))
-			{
-				// on dma exception
-				// - assert interrupt (level 2)
-				// - csr | DE | ~PER | INTP
-
-				m_csr &= ~CSR_PER;
-				m_csr |= (CSR_DE0 >> m_adc) | CSR_DEXK;
-				m_out_rst(1);
-				m_out_rst(0);
-				set_int(true);
-			}
-		}
+			if (!m_rsc->mem_load(addr, data, u8(-1), RSC_N))
+				dma_error(m_adc, CSR_DEXK);
 	}
 	else
-		fatalerror("rtpc_iocc_device::dma_b_r() invalid dma operation\n");
+		dma_error(m_adc, CSR_INVOP);
 
 	return data;
 }
 
-void rtpc_iocc_device::dma_b_w(offs_t offset, u8 data)
+void rtpc_iocc_device::dma_w(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_DMA, "dma0 offset 0x%04x data 0x%02x\n", offset, data);
+	LOGMASKED(LOG_DMA, "dma_w offset 0x%04x data 0x%02x\n", offset, data);
 
 	if (!BIT(m_dmr, 7 - m_adc))
 	{
-		u16 const tcw = m_tcw[(m_adc << 6) | (offset >> 11)];
-		u32 const real = ((tcw & TCW_PFX) << 11) | (offset & 0x7ff);
+		// page mode
+		u16 const tcw = m_tcw[(m_adc << 6) | BIT(offset, 11, 5)];
+		offs_t const addr = BIT(tcw, 0, 13) << 11 | (offset & 0x7ff);
 
-		LOGMASKED(LOG_DMA, "dma0 tcw 0x%04x real 0x%08x\n", tcw, real);
+		LOGMASKED(LOG_DMA, "dma_w tcw 0x%04x addr 0x%08x\n", tcw, addr);
+
 		if (tcw & TCW_IOC)
-			m_mem.write_byte(real, data);
+			m_mem.write_byte(addr, data);
 		else
-			m_rsc->mem_store(real, data, RSC_N);
+			if (!m_rsc->mem_store(addr, data, u8(-1), RSC_N))
+				dma_error(m_adc, CSR_DEXK);
 	}
 	else
-		fatalerror("rtpc_iocc_device::dma_b_w() invalid dma operation\n");
+		dma_error(m_adc, CSR_INVOP);
 }
 
-u8 rtpc_iocc_device::dma_w_r(offs_t offset)
+// TODO: alternate controller: check ch8 enable
+template <unsigned Channel> u16 rtpc_iocc_device::alt_r(offs_t offset, u16 mem_mask)
 {
+	bool const region = (Channel == 8) || BIT(m_dmr, 7 - Channel);
+
 	u16 data = 0;
 
-	if (!BIT(m_dmr, 7 - m_adc))
-	{
-		u16 const tcw = m_tcw[(m_adc << 6) | (offset >> 10)];
-		u32 const real = ((tcw & TCW_PFX) << 11) | (offset & 0x7ff);
+	// retrieve translation control word
+	u16 const tcw = region
+		? m_tcw[512 + BIT(offset, 15, 9)]
+		: m_tcw[(Channel << 6) | BIT(offset, 11, 6)];
 
-		LOGMASKED(LOG_DMA, "dma1 tcw 0x%04x real 0x%08x\n", tcw, real);
-		if (tcw & TCW_IOC)
-			data = swapendian_int16(m_mem.read_word(real));
-		else
-			m_rsc->mem_load(real, data, RSC_N);
+	if (!(tcw & TCW_IOC))
+	{
+		// translate to system address
+		offs_t address = region
+			? BIT(tcw, 4, 9) << 15 | (offset & 0x7fff)  // region mode: 9-bit prefix + 15-bit displacement
+			: BIT(tcw, 0, 13) << 11 | (offset & 0x7ff); // page mode: 13-bit prefix + 11-bit displacement
+
+		rsc_mode mode = rsc_mode::RSC_N;
+
+		// region mode virtual address?
+		if (region && (tcw & TCW_VIR))
+		{
+			address |= 0xe000'0000U;
+			mode = rsc_mode::RSC_T;
+		}
+
+		if (!m_rsc->mem_load(address, data, mem_mask, mode) && !machine().side_effects_disabled())
+			dma_error(Channel, CSR_DEXK);
+
+		data = swapendian_int16(data);
+
+		LOGMASKED(LOG_DMA, "alt_r %s 0x%06x tcw 0x%04x address 0x%08x data 0x%04x mask 0x%04x\n",
+			region ? "region" : "page", offset, tcw, address, data, mem_mask);
 	}
 	else
-		fatalerror("rtpc_iocc_device::dma_w_r() invalid dma operation\n");
+		// I/O channel accesses are passed through without translation
+		data = m_mem.read_word(offset, mem_mask);
 
 	return data;
 }
 
-void rtpc_iocc_device::dma_w_w(offs_t offset, u8 data)
+template <unsigned Channel> void rtpc_iocc_device::alt_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	LOGMASKED(LOG_DMA, "dma1 offset 0x%04x data 0x%02x\n", offset, data);
+	bool const region = (Channel == 8) || BIT(m_dmr, 7 - Channel);
 
-	if (!BIT(m_dmr, 7 - m_adc))
+	// retrieve translation control word
+	u16 const tcw = region
+		? m_tcw[512 + BIT(offset, 15, 9)]
+		: m_tcw[(Channel << 6) | BIT(offset, 11, 6)];
+
+	if (!(tcw & TCW_IOC))
 	{
-		u16 const tcw = m_tcw[(m_adc << 6) | (offset >> 10)];
-		u32 const real = ((tcw & TCW_PFX) << 11) | ((offset & 0x7ff) << 1);
+		// translate to system address
+		offs_t address = region
+			? BIT(tcw, 4, 9) << 15 | (offset & 0x7fff)  // region mode: 9-bit prefix + 15-bit displacement
+			: BIT(tcw, 0, 13) << 11 | (offset & 0x7ff); // page mode: 13-bit prefix + 11-bit displacement
 
-		LOGMASKED(LOG_DMA, "dma1 tcw 0x%04x real 0x%08x\n", tcw, real);
-		// FIXME: upper data bits
-		if (tcw & TCW_IOC)
-			m_mem.write_word(real, swapendian_int16(data));
-		else
-			m_rsc->mem_store(real, u16(data), RSC_N);
+		rsc_mode mode = rsc_mode::RSC_N;
+
+		// region mode virtual address?
+		if (region && (tcw & TCW_VIR))
+		{
+			address |= 0xe000'0000U;
+			mode = rsc_mode::RSC_T;
+		}
+
+		LOGMASKED(LOG_DMA, "alt_w %s 0x%06x tcw 0x%04x address 0x%08x data 0x%04x mask 0x%04x\n",
+			region ? "region" : "page", offset, tcw, address, data, mem_mask);
+
+		if (!m_rsc->mem_store(address, swapendian_int16(data), mem_mask, mode) && !machine().side_effects_disabled())
+			dma_error(Channel, CSR_DEXK);
 	}
 	else
-		fatalerror("rtpc_iocc_device::dma_w_w() invalid dma operation\n");
+		// I/O channel accesses are passed through without translation
+		m_mem.write_word(offset, data, mem_mask);
 }
 
-#ifdef _MSC_VER
-// avoid incorrect MSVC warnings about excessive shift sizes below
-#pragma warning(disable:4333)
-#endif
+template u16 rtpc_iocc_device::alt_r<0>(offs_t offset, u16 mem_mask);
+template u16 rtpc_iocc_device::alt_r<1>(offs_t offset, u16 mem_mask);
+template u16 rtpc_iocc_device::alt_r<2>(offs_t offset, u16 mem_mask);
+template u16 rtpc_iocc_device::alt_r<3>(offs_t offset, u16 mem_mask);
+template u16 rtpc_iocc_device::alt_r<5>(offs_t offset, u16 mem_mask);
+template u16 rtpc_iocc_device::alt_r<6>(offs_t offset, u16 mem_mask);
+template u16 rtpc_iocc_device::alt_r<7>(offs_t offset, u16 mem_mask);
+template u16 rtpc_iocc_device::alt_r<8>(offs_t offset, u16 mem_mask);
 
-template <typename T> bool rtpc_iocc_device::mem_load(u32 address, T &data, rsc_mode const mode)
+template void rtpc_iocc_device::alt_w<0>(offs_t offset, u16 data, u16 mem_mask);
+template void rtpc_iocc_device::alt_w<1>(offs_t offset, u16 data, u16 mem_mask);
+template void rtpc_iocc_device::alt_w<2>(offs_t offset, u16 data, u16 mem_mask);
+template void rtpc_iocc_device::alt_w<3>(offs_t offset, u16 data, u16 mem_mask);
+template void rtpc_iocc_device::alt_w<5>(offs_t offset, u16 data, u16 mem_mask);
+template void rtpc_iocc_device::alt_w<6>(offs_t offset, u16 data, u16 mem_mask);
+template void rtpc_iocc_device::alt_w<7>(offs_t offset, u16 data, u16 mem_mask);
+template void rtpc_iocc_device::alt_w<8>(offs_t offset, u16 data, u16 mem_mask);
+
+bool rtpc_iocc_device::translate(int spacenum, offs_t &address, address_space *&target_space) const
+{
+	target_space = &space(spacenum);
+
+	address &= 0x00ff'ffffU;
+
+	return true;
+}
+
+template <typename T> bool rtpc_iocc_device::mem_load(offs_t address, T &data, rsc_mode const mode)
 {
 	if ((mode & RSC_U) && !(m_ccr & CCR_MMP))
 	{
@@ -193,11 +246,9 @@ template <typename T> bool rtpc_iocc_device::mem_load(u32 address, T &data, rsc_
 	return true;
 }
 
-template <typename T> bool rtpc_iocc_device::mem_store(u32 address, T data, rsc_mode const mode)
+template <typename T> bool rtpc_iocc_device::mem_store(offs_t address, T data, rsc_mode const mode)
 {
-	int const spacenum = (address >> 24) & 15 ? AS_PROGRAM : AS_IO;
-
-	if (spacenum == AS_PROGRAM && (mode & RSC_U) && !(m_ccr & CCR_MMP))
+	if ((mode & RSC_U) && !(m_ccr & CCR_MMP))
 	{
 		LOG("store mem protection violation (%s)\n", machine().describe_context());
 		m_csr |= CSR_PER | CSR_PD | CSR_PVIO;
@@ -207,7 +258,7 @@ template <typename T> bool rtpc_iocc_device::mem_store(u32 address, T data, rsc_
 			return false;
 		}
 		else
-			set_int(true);
+			interrupt(true);
 
 		return true;
 	}
@@ -225,7 +276,7 @@ template <typename T> bool rtpc_iocc_device::mem_store(u32 address, T data, rsc_
 	return true;
 }
 
-template <typename T> bool rtpc_iocc_device::mem_modify(u32 address, std::function<T(T)> f, rsc_mode const mode)
+template <typename T> bool rtpc_iocc_device::mem_modify(offs_t address, std::function<T(T)> f, rsc_mode const mode)
 {
 	if ((mode & RSC_U) && !(m_ccr & CCR_MMP))
 	{
@@ -237,7 +288,7 @@ template <typename T> bool rtpc_iocc_device::mem_modify(u32 address, std::functi
 			return false;
 		}
 		else
-			set_int(true);
+			interrupt(true);
 
 		return true;
 	}
@@ -262,7 +313,7 @@ template <typename T> bool rtpc_iocc_device::mem_modify(u32 address, std::functi
 	return true;
 }
 
-template <typename T> bool rtpc_iocc_device::pio_load(u32 address, T &data, rsc_mode const mode)
+template <typename T> bool rtpc_iocc_device::pio_load(offs_t address, T &data, rsc_mode const mode)
 {
 	if ((mode & RSC_U) && (address == CSR_ADDR || !(m_ccr & CCR_IMP)))
 	{
@@ -323,7 +374,7 @@ template <typename T> bool rtpc_iocc_device::pio_load(u32 address, T &data, rsc_
 	return true;
 }
 
-template <typename T> bool rtpc_iocc_device::pio_store(u32 address, T data, rsc_mode const mode)
+template <typename T> bool rtpc_iocc_device::pio_store(offs_t address, T data, rsc_mode const mode)
 {
 	if ((mode & RSC_U) && (address == CSR_ADDR || !(m_ccr & CCR_IMP)))
 	{
@@ -335,19 +386,20 @@ template <typename T> bool rtpc_iocc_device::pio_store(u32 address, T data, rsc_
 			return false;
 		}
 		else
-			set_int(true);
+			interrupt(true);
 
 		return true;
 	}
 	else if ((address & REG_MASK) == CSR_ADDR)
 	{
 		m_csr = 0;
-		set_int(false);
+		interrupt(false);
 
 		return true;
 	}
 	else if ((address & REG_MASK) == TCW_BASE)
 	{
+		logerror("tcw[0x%03x] = 0x%04x\n", (address & ~REG_MASK) >> 1, data);
 		m_tcw[(address & ~REG_MASK) >> 1] = data;
 
 		return true;
@@ -393,10 +445,36 @@ template <typename T> bool rtpc_iocc_device::pio_store(u32 address, T data, rsc_
 	return true;
 }
 
-template <typename T> bool rtpc_iocc_device::pio_modify(u32 address, std::function<T(T)> f, rsc_mode const mode)
+template <typename T> bool rtpc_iocc_device::pio_modify(offs_t address, std::function<T(T)> f, rsc_mode const mode)
 {
 	LOG("modify pio space invalid operation (%s)\n", machine().describe_context());
 	m_csr |= CSR_EXR | CSR_PER | CSR_PD | CSR_INVOP;
 
 	return false;
+}
+
+void rtpc_iocc_device::interrupt(bool state)
+{
+	if (state != m_out_int_state)
+	{
+		if (state)
+			m_csr |= CSR_INTP;
+
+		m_out_int_state = state;
+		m_out_int(!m_out_int_state);
+	}
+}
+
+void rtpc_iocc_device::dma_error(unsigned channel, u32 type)
+{
+	static constexpr u32 map[] = { CSR_DE0, CSR_DE1, CSR_DE2, CSR_DE3, 0, CSR_DE5, CSR_DE6, CSR_DE7, CSR_DE8 };
+
+	m_csr &= ~(CSR_PER | CSR_PD);
+	m_csr |= map[channel] | type;
+
+	// reset dma controllers
+	m_out_rst(1);
+	m_out_rst(0);
+
+	interrupt(true);
 }

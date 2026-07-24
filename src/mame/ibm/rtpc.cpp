@@ -12,7 +12,6 @@
  * TODO:
  *   - finish refactoring iocc
  *   - additional machine variants
- *   - configurable RAM size
  *   - shared interrupts
  */
 /*
@@ -69,9 +68,30 @@
  /*
   * https://ardent-tool.com/615x/rt_loadable_post.html
   *
+  * Adapter types (at 0xc84 and 0xd00), see problem isolation
+  *
+  *  0x20 pc at coprocessor
+  *  0x21 at 512k memory expansion
+  *  0x30 token ring
+  *  0x31 pc network
+  *  0x37 512k memory expansion
+  *  0x38 5080pa
+  *  0x40 baseband
+  *  0x41 ega
+  *  0x43 amgda
+  *  0x45 acgda
+  *  0x47 emgda
+  *  0x49 mda + 0x2a for printer?
+  *  0x4a megapel processor
+  *  0x4b megapel controller
+  *  0x4c afp l2
+  *  0x52 fddda + 0x53 for diskette?
+  *  0x5b scsi
+  *
   * WIP
   *  - boots to vrm install disk menu
   *  - requires improved hard disk controller emulation
+  *  - slot 5 = Schooner, 8 = Clipper
   */
 
 #include "emu.h"
@@ -100,13 +120,16 @@
 #include "bus/isa/fdc.h"
 #include "bus/isa/ide.h"
 #include "bus/isa/mda.h"
+#include "bus/isa/pcat512me.h"
 #include "bus/isa/ubpnic.h"
 
 #include "bus/rs232/rs232.h"
 
+#include "softlist_dev.h"
+
 #include "rtpc.lh"
 
-#define VERBOSE (LOG_GENERAL)
+//#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
 namespace {
@@ -200,10 +223,13 @@ void rtpc_state::iocc_mem_map(address_map &map)
 
 template <bool SCC> void rtpc_state::iocc_pio_map(address_map &map)
 {
+	map.unmap_value_high();
+
 	// HACK: temporarily silence noisy probing for absent hardware
 	map(0x00'0110, 0x00'0113).noprw();
-	map(0x00'0374, 0x00'0375).noprw();
+	map(0x00'0170, 0x00'0177).noprw(); // secondary hdc
 	map(0x00'01e8, 0x00'01ef).noprw();
+	map(0x00'0372, 0x00'0377).noprw(); // secondary fdc
 
 	// interrupt level enables (shared interrupts)
 	map(0x00'02f0, 0x00'02f7).nopw(); // irq 0..7
@@ -219,8 +245,9 @@ template <bool SCC> void rtpc_state::iocc_pio_map(address_map &map)
 
 	// delay 1µs per byte written
 	map(0x00'80e0, 0x00'80e3).nopr(); // TODO: does read also generate a delay?
-	map(0x00'80e0, 0x00'80e3).lw8([this](u8 data) { m_cpu->eat_cycles(m_cpu->clock() / 1000000 + 1); }, "io_delay");
+	map(0x00'80e0, 0x00'80e3).lw8([this](u8 data) { m_cpu->eat_cycles(m_cpu->clock() / 1'000'000 + 1); }, "io_delay");
 
+	// TODO: ccr alternate controller access
 	map(0x00'8400, 0x00'8407).m(m_kls, FUNC(rtpc_kls_device::map));
 
 	map(0x00'8800, 0x00'883f).rw(m_rtc, FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct));
@@ -237,9 +264,7 @@ template <bool SCC> void rtpc_state::iocc_pio_map(address_map &map)
 	map(0x00'8c40, 0x00'8c40).mirror(0x03).w(FUNC(rtpc_state::crra_w));
 	map(0x00'8c60, 0x00'8c60).mirror(0x03).lr8([this]() { return m_crrb; }, "crrb_r");
 	map(0x00'8c60, 0x00'8c60).mirror(0x03).w(FUNC(rtpc_state::crrb_w));
-
-	// memory config reg (cc=2x8M, dd=2x2M, 88=2x4M)
-	map(0x00'8c80, 0x00'8c80).mirror(0x03).lr8([]() { return 0xf8; }, "mcr");
+	map(0x00'8c80, 0x00'8c80).mirror(0x03).r(m_mmu, FUNC(rosetta_device::mcr_r));
 	map(0x00'8ca0, 0x00'8ca0).mirror(0x03).w(FUNC(rtpc_state::dia_w));
 
 	// 8c82 diag dma mode?
@@ -258,7 +283,7 @@ void rtpc_state::crra_w(u8 data)
 	{
 		if (BIT(data, i) && !BIT(m_crra, i) && m_slot[i].found())
 		{
-			LOG("reset slot %u\n", i);
+			LOG("reset slot %s\n", m_slot[i]->tag());
 			m_slot[i]->reset();
 		}
 	}
@@ -274,8 +299,8 @@ void rtpc_state::crrb_w(u8 data)
 	//  0   8530
 	//  1   rs232 interface
 	//  2   8051
-	//  3   dmac1
-	//  4   dmac2
+	//  3   dmac1 (1=enable)
+	//  4   dmac2 (1=enable)
 	//  5   arbitor
 	//  6   reserved
 	//  7   reserved
@@ -287,7 +312,9 @@ void rtpc_state::crrb_w(u8 data)
 
 	m_kls->mcu_reset_w(!BIT(data, 2));
 
-	// TODO: dmac !ready
+	m_dma[0]->set_input_line(INPUT_LINE_RESET, !BIT(data, 3));
+	m_dma[1]->set_input_line(INPUT_LINE_RESET, !BIT(data, 4));
+
 	// TODO: arbitor
 
 	m_crrb = data;
@@ -338,20 +365,14 @@ void rtpc_state::common(machine_config &config)
 	input_merger_device &reqi2(INPUT_MERGER_ANY_LOW(config, "reqi2"));
 	reqi2.output_handler().set_inputline(m_cpu, INPUT_LINE_IRQ2).invert();
 
-	// TODO: hole for 1M/4M memory boards
-	// 2/2 rams 4M
-	// 2/1 rams 4M
-	// 1/1 rams 4M hole 1M
-	// 4/0 rams 4M
-	// 4/4 rams 16M hole 4M
-	ROSETTA(config, m_mmu, m_cpu->clock(), rosetta_device::RAM_4M);
+	ROSETTA(config, m_mmu, m_cpu->clock());
 	m_mmu->set_mem(m_cpu, AS_PROGRAM);
 	m_mmu->set_rom("ipl");
 	m_mmu->out_pchk().set(reqi2, FUNC(input_merger_device::in_w<0>));
 	m_mmu->out_mchk().set_inputline(m_cpu, INPUT_LINE_NMI);
 
-	RTPC_IOCC(config, m_iocc);
-	m_iocc->set_addrmap(0, &rtpc_state::iocc_mem_map);
+	RTPC_IOCC(config, m_iocc, 0);
+	m_iocc->set_addrmap(AS_PROGRAM, &rtpc_state::iocc_mem_map);
 	m_iocc->out_int().set(reqi2, FUNC(input_merger_device::in_w<1>));
 	m_iocc->out_rst().set_inputline(m_dma[0], INPUT_LINE_RESET);
 	m_iocc->out_rst().append_inputline(m_dma[1], INPUT_LINE_RESET);
@@ -391,9 +412,9 @@ void rtpc_state::common(machine_config &config)
 	m_dma[0]->out_iow_callback<3>().set([this](u8 data) { m_isa->dack_w(3, data); });
 	m_dma[0]->out_dack_callback<3>().set(m_iocc, FUNC(rtpc_iocc_device::dack_w<3>));
 
-	m_dma[0]->out_hreq_callback().set(m_dma[0], FUNC(am9517a_device::hack_w));
-	m_dma[0]->in_memr_callback().set(m_iocc, FUNC(rtpc_iocc_device::dma_b_r));
-	m_dma[0]->out_memw_callback().set(m_iocc, FUNC(rtpc_iocc_device::dma_b_w));
+	m_dma[0]->out_hreq_callback().set([this](int state) { m_dma[0]->hack_w(state & BIT(m_crrb, 5)); });
+	m_dma[0]->in_memr_callback().set(m_iocc, FUNC(rtpc_iocc_device::dma_r));
+	m_dma[0]->out_memw_callback().set(m_iocc, FUNC(rtpc_iocc_device::dma_w));
 	m_dma[0]->out_eop_callback().set(m_pic[0], FUNC(pic8259_device::ir0_w));
 
 	// FIXME: eop should be asserted on the bus and tested by the device
@@ -420,9 +441,9 @@ void rtpc_state::common(machine_config &config)
 	m_isa->drq7_callback().set(m_dma[1], FUNC(am9517a_device::dreq_w<3>));
 	m_dma[1]->out_dack_callback<3>().set(m_iocc, FUNC(rtpc_iocc_device::dack_w<7>));
 
-	m_dma[1]->out_hreq_callback().set(m_dma[1], FUNC(am9517a_device::hack_w));
-	m_dma[1]->in_memr_callback().set(m_iocc, FUNC(rtpc_iocc_device::dma_w_r));
-	m_dma[1]->out_memw_callback().set(m_iocc, FUNC(rtpc_iocc_device::dma_w_w));
+	m_dma[1]->out_hreq_callback().set([this](int state) { m_dma[1]->hack_w(state & BIT(m_crrb, 5)); });
+	m_dma[1]->in_memr_callback().set(m_iocc, FUNC(rtpc_iocc_device::dma_r));
+	m_dma[1]->out_memw_callback().set(m_iocc, FUNC(rtpc_iocc_device::dma_w));
 
 
 	// TODO: system board irq 8, 13
@@ -478,10 +499,12 @@ void rtpc_state::common(machine_config &config)
 	m_rtc->irq().set_inputline(m_cpu, INPUT_LINE_IRQ1).invert();
 	m_rtc->irq().append(m_kls, FUNC(rtpc_kls_device::rtc_irq_w)).invert();
 
+	SOFTWARE_LIST(config, "flop_list").set_original("rtpc");
+
 	config.set_default_layout(layout_rtpc);
 }
 
-void rtpc_isa8_cards(device_slot_interface &device)
+static void rtpc_isa8_cards(device_slot_interface &device)
 {
 	device.option_add("baseband", ISA8_UBPNIC);
 	device.option_add("ega", ISA8_EGA);
@@ -489,19 +512,29 @@ void rtpc_isa8_cards(device_slot_interface &device)
 	device.option_add("mda", ISA8_MDA);
 }
 
-void rtpc_isa16_cards(device_slot_interface &device)
+static void rtpc_isa16_cards(device_slot_interface &device)
 {
 	device.option_add("5080pa", ISA16_5080PA);
 	device.option_add("amgda", ISA16_AMGDA);
 	device.option_add("ide", ISA16_IDE);
+	device.option_add("pcat512me", ISA16_PCAT512ME);
 
 	rtpc_isa8_cards(device);
+}
+
+static void rtpc_copro_cards(device_slot_interface &device)
+{
+	rtpc_isa16_cards(device);
+
+	// coprocessor slots do not support memory expansion options due to
+	// reassignment of B19 (REFRESH)
+	device.option_remove("pcat512me");
 }
 
 void rtpc_state::ibm6150(machine_config &config)
 {
 	common(config);
-	m_iocc->set_addrmap(2, &rtpc_state::iocc_pio_map<true>);
+	m_iocc->set_addrmap(AS_IO, &rtpc_state::iocc_pio_map<true>);
 
 	SCC8530(config, m_scc, 3'580'000);
 	m_scc->configure_channels(3'072'000, 3'072'000, 3'072'000, 3'072'000);
@@ -528,30 +561,28 @@ void rtpc_state::ibm6150(machine_config &config)
 	m_scc->out_txdb_callback().set(port1, FUNC(rs232_port_device::write_txd));
 
 	// ISA slots
-	// FIXME: determine ISA bus clock
-	ISA16_SLOT(config, m_slot[0], 0, m_isa, rtpc_isa16_cards, "fdc",      false); // slot 1: disk/diskette adapter
-	ISA16_SLOT(config, m_slot[1], 0, m_isa, rtpc_isa16_cards, nullptr,    false); // slot 2: option
-	ISA8_SLOT(config,  m_slot[2], 0, m_isa, rtpc_isa8_cards,  "mda",      false); // slot 3: option
-	ISA16_SLOT(config, m_slot[3], 0, m_isa, rtpc_isa16_cards, nullptr,    false); // slot 4: option
-	ISA16_SLOT(config, m_slot[4], 0, m_isa, rtpc_isa16_cards, nullptr,    false); // slot 5: option
-	ISA8_SLOT(config,  m_slot[5], 0, m_isa, rtpc_isa8_cards,  "baseband", false); // slot 6: option
-	ISA16_SLOT(config, m_slot[6], 0, m_isa, rtpc_isa16_cards, nullptr,    false); // slot 7: option
-	ISA16_SLOT(config, m_slot[7], 0, m_isa, rtpc_isa16_cards, nullptr,    false); // slot 8: coprocessor/option
+	ISA16_SLOT(config, m_slot[0], m_isa->clock(), m_isa, rtpc_isa16_cards, "fdc",      false); // slot 1: disk/diskette adapter
+	ISA16_SLOT(config, m_slot[1], m_isa->clock(), m_isa, rtpc_isa16_cards, nullptr,    false); // slot 2: option (second fddda/esdi must be here)
+	ISA8_SLOT(config,  m_slot[2], m_isa->clock(), m_isa, rtpc_isa8_cards,  "mda",      false); // slot 3: option (mda must be here, ega must be here or slot 6)
+	ISA16_SLOT(config, m_slot[3], m_isa->clock(), m_isa, rtpc_isa16_cards, nullptr,    false); // slot 4: option
+	ISA16_SLOT(config, m_slot[4], m_isa->clock(), m_isa, rtpc_isa16_cards, nullptr,    false); // slot 5: option
+	ISA8_SLOT(config,  m_slot[5], m_isa->clock(), m_isa, rtpc_isa8_cards,  "baseband", false); // slot 6: option
+	ISA16_SLOT(config, m_slot[6], m_isa->clock(), m_isa, rtpc_isa16_cards, nullptr,    false); // slot 7: option
+	ISA16_SLOT(config, m_slot[7], m_isa->clock(), m_isa, rtpc_copro_cards, nullptr,    false); // slot 8: coprocessor/option
 }
 
 void rtpc_state::ibm6151(machine_config &config)
 {
 	common(config);
-	m_iocc->set_addrmap(2, &rtpc_state::iocc_pio_map<false>);
+	m_iocc->set_addrmap(AS_IO, &rtpc_state::iocc_pio_map<false>);
 
 	// ISA slots
-	// FIXME: determine ISA bus clock
-	ISA8_SLOT(config,  m_slot[0], 0, m_isa, rtpc_isa8_cards,  "mda",      false); // slot 1: option
-	ISA16_SLOT(config, m_slot[1], 0, m_isa, rtpc_isa16_cards, "baseband", false); // slot 2: option
-	ISA16_SLOT(config, m_slot[2], 0, m_isa, rtpc_isa16_cards, nullptr,    false); // slot 2: option
-	ISA16_SLOT(config, m_slot[3], 0, m_isa, rtpc_isa16_cards, nullptr,    false); // slot 4: option
-	ISA16_SLOT(config, m_slot[4], 0, m_isa, rtpc_isa16_cards, nullptr,    false); // slot 5: coprocessor/option
-	ISA16_SLOT(config, m_slot[5], 0, m_isa, rtpc_isa16_cards, "fdc",      false); // slot 6: disk/diskette adapter
+	ISA8_SLOT(config,  m_slot[0], m_isa->clock(), m_isa, rtpc_isa8_cards,  "mda",      false); // slot 1: option (mda or ega must be here)
+	ISA16_SLOT(config, m_slot[1], m_isa->clock(), m_isa, rtpc_isa16_cards, "baseband", false); // slot 2: option
+	ISA16_SLOT(config, m_slot[2], m_isa->clock(), m_isa, rtpc_isa16_cards, nullptr,    false); // slot 2: option
+	ISA16_SLOT(config, m_slot[3], m_isa->clock(), m_isa, rtpc_isa16_cards, nullptr,    false); // slot 4: option
+	ISA16_SLOT(config, m_slot[4], m_isa->clock(), m_isa, rtpc_copro_cards, nullptr,    false); // slot 5: coprocessor/option
+	ISA16_SLOT(config, m_slot[5], m_isa->clock(), m_isa, rtpc_isa16_cards, "fdc",      false); // slot 6: disk/diskette adapter
 }
 
 ROM_START(ibm6150)

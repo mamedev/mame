@@ -1,0 +1,573 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="rtpc" description="IBM RT PC floppy disk images">
+
+	<software name="aix100">
+		<description>IBM RT PC Advanced Interactive Executive Operating System Version 1.00</description>
+		<year>1986</year>
+		<publisher>IBM</publisher>
+		<part name="vrm" interface="floppy_5_25">
+			<feature name="part_id" value="Virtual Resource Manager Program"/>
+			<dataarea name="flop" size="752696">
+				<rom name="59x9160.imd" size="752696" crc="6d3b481a" sha1="ac001a75b3725f52c645c98ac862b3e4e2f168df"/>
+			</dataarea>
+		</part>
+		<part name="inst" interface="floppy_5_25">
+			<feature name="part_id" value="Base System Program Installation/Maintenance Disk 1"/>
+			<dataarea name="flop" size="997476">
+				<rom name="59x9164.imd" size="997476" crc="196adeb3" sha1="595c6c76c88a97f38580736e4ed30af630f60728"/>
+			</dataarea>
+		</part>
+		<part name="root1" interface="floppy_5_25">
+			<feature name="part_id" value="Base System Program /(root) Disk 2"/>
+			<dataarea name="flop" size="1209524">
+				<rom name="59x9168.imd" size="1209524" crc="f67085e0" sha1="70173e03f4e8656c1cc0f532ea7f42a8333cba0a"/>
+			</dataarea>
+		</part>
+		<part name="root2" interface="floppy_5_25">
+			<feature name="part_id" value="Base System Program /(root) Disk 3"/>
+			<dataarea name="flop" size="1232019">
+				<rom name="59x9172.imd" size="1232019" crc="6462ae0e" sha1="3520f8a990e95a3afeb4c1f0c9aa7f10ea22c250"/>
+			</dataarea>
+		</part>
+		<part name="root3" interface="floppy_5_25">
+			<feature name="part_id" value="Base System Program /(root) Disk 4"/>
+			<dataarea name="flop" size="1232019">
+				<rom name="59x9176.imd" size="1232019" crc="d8939caa" sha1="b4b7c10c1f0c3bf24dcd33e71eccc9688ba64bb4"/>
+			</dataarea>
+		</part>
+		<part name="root4" interface="floppy_5_25">
+			<feature name="part_id" value="Base System Program /(root) Disk 5"/>
+			<dataarea name="flop" size="1011778">
+				<rom name="59x9180.imd" size="1011778" crc="4053cf47" sha1="852ffdc9c325358ebe3928cc49a9fceb0566e292"/>
+			</dataarea>
+		</part>
+		<part name="usr1" interface="floppy_5_25">
+			<feature name="part_id" value="Base System Program /usr Disk 6"/>
+			<dataarea name="flop" size="1231506">
+				<rom name="59x9184.imd" size="1231506" crc="c42e25df" sha1="6f9e89cd07d9403e1c9dd7c33acd270edccf7bcc"/>
+			</dataarea>
+		</part>
+		<part name="usr2" interface="floppy_5_25">
+			<feature name="part_id" value="Base System Program /usr Disk 7"/>
+			<dataarea name="flop" size="1231505">
+				<rom name="59x9188.imd" size="1231505" crc="f7ebecb1" sha1="490f26264dd3b02440d2a44a623daa56bee9fc54"/>
+			</dataarea>
+		</part>
+		<part name="usr3" interface="floppy_5_25">
+			<feature name="part_id" value="Base System Program /usr Disk 8"/>
+			<dataarea name="flop" size="1227929">
+				<rom name="59x9192.imd" size="1227929" crc="b18cc5c0" sha1="e14ed957d1f9fab4a6fde1c219cc70eab0c13873"/>
+			</dataarea>
+		</part>
+		<part name="usr4" interface="floppy_5_25">
+			<feature name="part_id" value="Base User Program /usr Disk 9"/>
+			<dataarea name="flop" size="1011774">
+				<rom name="59x9196.imd" size="1011774" crc="d4407f05" sha1="65bf018ff531fe676b04b709b1c4cb8b53da9be5"/>
+			</dataarea>
+		</part>
+		<part name="usp1" interface="floppy_5_25">
+			<feature name="part_id" value="Usability Services Program Disk 1"/>
+			<dataarea name="flop" size="1230996">
+				<rom name="59x9200.imd" size="1230996" crc="715e5667" sha1="686bb720fc9d438ded08c3dedaa00685294043e7"/>
+			</dataarea>
+		</part>
+		<part name="usp2" interface="floppy_5_25">
+			<feature name="part_id" value="Usability Services Program Disk 2"/>
+			<dataarea name="flop" size="215128">
+				<rom name="59x9204.imd" size="215128" crc="47977292" sha1="16637daa1301d7ad20e665cfc952931725ad6172"/>
+			</dataarea>
+		</part>
+		<part name="ext1" interface="floppy_5_25">
+			<feature name="part_id" value="Extended Services Program Disk 1"/>
+			<dataarea name="flop" size="1102734">
+				<rom name="59x9208.imd" size="1102734" crc="e2bc6051" sha1="751e11a6eee3e51b194ea004cd768316c766d423"/>
+			</dataarea>
+		</part>
+		<part name="ext2" interface="floppy_5_25">
+			<feature name="part_id" value="Extended Services Program Disk 2"/>
+			<dataarea name="flop" size="1080239">
+				<rom name="59x9212.imd" size="1080239" crc="33dd2699" sha1="f84bb36badd12b5bb11ffd91486491bb9846adb6"/>
+			</dataarea>
+		</part>
+		<part name="ext3" interface="floppy_5_25">
+			<feature name="part_id" value="Extended Services Program Disk 3"/>
+			<dataarea name="flop" size="1103756">
+				<rom name="59x9216.imd" size="1103756" crc="72c974db" sha1="755a714a528ed19a4151581ea7b3510dcacfe0de"/>
+			</dataarea>
+		</part>
+		<part name="ext4" interface="floppy_5_25">
+			<feature name="part_id" value="Extended Services Program Disk 4"/>
+			<dataarea name="flop" size="437412">
+				<rom name="59x9220.imd" size="437412" crc="edd55bf8" sha1="4fdacad5e8ab95f757b23e5ee9ccc210a59a2d69"/>
+			</dataarea>
+		</part>
+		<part name="multi" interface="floppy_5_25">
+			<feature name="part_id" value="Multi-User Services Program"/>
+			<dataarea name="flop" size="901902">
+				<rom name="59x9224.imd" size="901902" crc="b52f3295" sha1="076ed22a6ec2b21f14226eaa9d4f01edde7d3663"/>
+			</dataarea>
+		</part>
+		<part name="ined1" interface="floppy_5_25">
+			<feature name="part_id" value="INed Program Disk 1"/>
+			<dataarea name="flop" size="1227405">
+				<rom name="59x9228.imd" size="1227405" crc="a82411b3" sha1="35c3db387091ca1b3e687e904aea8725a39a5e04"/>
+			</dataarea>
+		</part>
+		<part name="ined2" interface="floppy_5_25">
+			<feature name="part_id" value="INed Program Disk 2"/>
+			<dataarea name="flop" size="130799">
+				<rom name="59x9232.imd" size="130799" crc="81303ffe" sha1="90dcd67decae5b8e9c4bd7ba44ac0e4ba2f324ea"/>
+			</dataarea>
+		</part>
+		<part name="eus" interface="floppy_5_25">
+			<feature name="part_id" value="Exploring Usability Services"/>
+			<dataarea name="flop" size="674459">
+				<rom name="59x9236.imd" size="674459" crc="774610a5" sha1="9d121bc81a500d1a042a6f767f71b07a3f55c982"/>
+			</dataarea>
+		</part>
+		<part name="term" interface="floppy_5_25">
+			<feature name="part_id" value="Asynchronous Terminal Emulation Program"/>
+			<dataarea name="flop" size="191294">
+				<rom name="59x9240.imd" size="191294" crc="428c042b" sha1="ca391a6211d68d41f032146bcb65bde290f07f3c"/>
+			</dataarea>
+		</part>
+		<part name="update" interface="floppy_5_25">
+			<feature name="part_id" value="Update"/>
+			<dataarea name="flop" size="238092">
+				<rom name="59x9244.imd" size="238092" crc="703e0585" sha1="afa01e96c558565be4d3e68ff4e26aeeae002556"/>
+			</dataarea>
+		</part>
+		<part name="pcnet" interface="floppy_5_25">
+			<feature name="part_id" value="Base PC Network Services Program"/>
+			<dataarea name="flop" size="207458">
+				<rom name="aix1_d21.imd" size="207458" crc="74ed1984" sha1="255104a1aae17e00514e0241c7ef0108577df9ab"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aix211">
+		<!-- TODO: verify disk labels -->
+		<description>IBM AIX/RT Operating System Version 2.1.1</description>
+		<year>1987</year>
+		<publisher>IBM</publisher>
+		<part name="base1" interface="floppy_5_25">
+			<feature name="part_id" value="Base System Program 1 of 5"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="base1.img" size="1228800" crc="adb997d0" sha1="3d947e6516feede1ec9c78c2464c5ae4a270d257"/>
+			</dataarea>
+		</part>
+		<part name="base2" interface="floppy_5_25">
+			<feature name="part_id" value="Base System Program 2 of 5"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="base2.img" size="1228800" crc="8ba09216" sha1="8cd3c6a09a58ae073395e7d69bcc8086a3b71c5a"/>
+			</dataarea>
+		</part>
+		<part name="base3" interface="floppy_5_25">
+			<feature name="part_id" value="Base System Program 3 of 5"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="base3.img" size="1228800" crc="f5ff83aa" sha1="bf423aa52e20ba7b64c5c7a8704b3b4442d93d9d"/>
+			</dataarea>
+		</part>
+		<part name="base4" interface="floppy_5_25">
+			<feature name="part_id" value="Base System Program 4 of 5"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="base4.img" size="1228800" crc="c4213b49" sha1="2a3d48838d7d7cef4369dda54872c288b6d9e806"/>
+			</dataarea>
+		</part>
+		<part name="base5" interface="floppy_5_25">
+			<feature name="part_id" value="Base System Program 5 of 5"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="base5.img" size="1228800" crc="f886f65b" sha1="560ae0ca3c3bff9a7b6086f113056c6bde2eaead"/>
+			</dataarea>
+		</part>
+		<part name="diag1" interface="floppy_5_25">
+			<feature name="part_id" value="Diagnostics 1 of 3"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="74x9269.img" size="1228800" crc="1302ca01" sha1="9fbe43fd44d21c7fbdf2d719d2e588e24660b330"/>
+			</dataarea>
+		</part>
+		<part name="diag2" interface="floppy_5_25">
+			<feature name="part_id" value="Diagnostics 2 of 3"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="74x9272.img" size="1228800" crc="10db1f04" sha1="860855eaa1bd70fc4ec551c3493be2cfe47e3650"/>
+			</dataarea>
+		</part>
+		<part name="diag3" interface="floppy_5_25">
+			<feature name="part_id" value="Diagnostics 3 of 3"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="74x9275.img" size="1228800" crc="8c1648e1" sha1="f5a0ff0401ce07ae758c465f02e5e310231db44b"/>
+			</dataarea>
+		</part>
+		<part name="ext1" interface="floppy_5_25">
+			<feature name="part_id" value="Extended Services Program 1 of 3"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="ext1.img" size="1228800" crc="ed615644" sha1="129b79f9fc16f3c4ad1cbdb7cdc9bd1b7de1530b"/>
+			</dataarea>
+		</part>
+		<part name="ext2" interface="floppy_5_25">
+			<feature name="part_id" value="Extended Services Program 2 of 3"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="ext2.img" size="1228800" crc="25b34937" sha1="c5f91d5f96945aac35d0a09fd75c7d9f395d9424"/>
+			</dataarea>
+		</part>
+		<part name="ext3" interface="floppy_5_25">
+			<feature name="part_id" value="Extended Services Program 3 of 3"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="ext3.img" size="1228800" crc="ab9d15d2" sha1="9aa7e1a60fdd015ae3b135ed901458ff036d526a"/>
+			</dataarea>
+		</part>
+		<part name="eus" interface="floppy_5_25">
+			<feature name="part_id" value="Exploring Usability Services"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="eus.img" size="1228800" crc="16ba92a0" sha1="8b1ce359421e74870f416a8f6ce0387af4a83e63"/>
+			</dataarea>
+		</part>
+		<part name="ined1" interface="floppy_5_25">
+			<feature name="part_id" value="INed Program 1 of 2"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="ined1.img" size="1228800" crc="e660fc29" sha1="fb1404a677bb380693f9e8151124f0575b7cc71e"/>
+			</dataarea>
+		</part>
+		<part name="ined2" interface="floppy_5_25">
+			<feature name="part_id" value="INed Program 2 of 2"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="ined2.img" size="1228800" crc="706b45c5" sha1="4fc0870df487cce2a61656cd98be6c50707061d7"/>
+			</dataarea>
+		</part>
+		<part name="inst" interface="floppy_5_25">
+			<feature name="part_id" value="Installation/Maintenance"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="inst.img" size="1228800" crc="f29fac7d" sha1="2166891ca6436b53138c7c2cbf39fee0a82fe6e5"/>
+			</dataarea>
+		</part>
+		<part name="multi1" interface="floppy_5_25">
+			<feature name="part_id" value="Multi-User Services Program 1 of 3"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="multi1.img" size="1228800" crc="75757d7c" sha1="f8bd425d6370bc5dd4ee8d694c16e41362987341"/>
+			</dataarea>
+		</part>
+		<part name="multi2" interface="floppy_5_25">
+			<feature name="part_id" value="Multi-User Services Program 2 of 3"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="multi2.img" size="1228800" crc="57e89ddf" sha1="553ebd0d42eb4e1fff6607db43acaef0cad4fbcc"/>
+			</dataarea>
+		</part>
+		<part name="multi3" interface="floppy_5_25">
+			<feature name="part_id" value="Multi-User Services Program 3 of 3"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="multi3.img" size="1228800" crc="40773ca3" sha1="5418290003e2fa9639b45c5df38af3ff5bd847d2"/>
+			</dataarea>
+		</part>
+		<part name="pcnet" interface="floppy_5_25">
+			<feature name="part_id" value="Base PC Network Services"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="pcnet.img" size="1228800" crc="96872ed4" sha1="605fb7f83e9b1303b40b7be643cf5d09a1a26984"/>
+			</dataarea>
+		</part>
+		<part name="sna1" interface="floppy_5_25">
+			<feature name="part_id" value="Systems Network Architecture Services 1 of 3"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="sna1.img" size="1228800" crc="8370de30" sha1="27232d573e78395813cdc44846976a80249fc0b0"/>
+			</dataarea>
+		</part>
+		<part name="sna2" interface="floppy_5_25">
+			<feature name="part_id" value="Systems Network Architecture Services 2 of 3"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="sna2.img" size="1228800" crc="b0917ca" sha1="dbb67e82aa3a439d300069dac96edd46eea428e9"/>
+			</dataarea>
+		</part>
+		<part name="sna3" interface="floppy_5_25">
+			<feature name="part_id" value="Systems Network Architecture Services 3 of 3"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="sna3.img" size="1228800" crc="1073537b" sha1="db6ba08b8cd6c101793082fa6bef2ca4c19b7208"/>
+			</dataarea>
+		</part>
+		<part name="tcp1" interface="floppy_5_25">
+			<feature name="part_id" value="Interface Program for use with TCP/IP 1 of 2"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="tcp1.img" size="1228800" crc="52a87ebc" sha1="8646dba14872f90dc8b8c292bc3f2515061b0ebd"/>
+			</dataarea>
+		</part>
+		<part name="tcp2" interface="floppy_5_25">
+			<feature name="part_id" value="Interface Program for use with TCP/IP 2 of 2"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="tcp2.img" size="1228800" crc="662ed2a4" sha1="d1b5bc029280d152cdb6ec8fefb04a231b11ffe3"/>
+			</dataarea>
+		</part>
+		<part name="term" interface="floppy_5_25">
+			<feature name="part_id" value="Asynchronous Terminal Emulation Program"/>
+			<dataarea name="flop" size="348160">
+				<rom name="term.img" size="348160" crc="48d02960" sha1="337616a2a9831a05550950099746ca97aa3eecb3"/>
+			</dataarea>
+		</part>
+		<part name="upd1" interface="floppy_5_25">
+			<feature name="part_id" value="Update 1 of 2"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="upd1.img" size="1228800" crc="584025d7" sha1="0fb6d1ffcf87cbfd07690c185350fc25612cb06a"/>
+			</dataarea>
+		</part>
+		<part name="upd2" interface="floppy_5_25">
+			<feature name="part_id" value="Update 2 of 2"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="upd2.img" size="1228800" crc="c6e00426" sha1="36ba6d15190409e4895227f390f79de1a337728d"/>
+			</dataarea>
+		</part>
+		<part name="usp" interface="floppy_5_25">
+			<feature name="part_id" value="Usability Services Program"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="usp.img" size="1228800" crc="5ace4ea5" sha1="4b8659de09921e5b4e9829000c508aa8ee32081b"/>
+			</dataarea>
+		</part>
+		<part name="vrmdd" interface="floppy_5_25">
+			<feature name="part_id" value="Virtual Resource Manager Device Driver"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="vrmdd.img" size="1228800" crc="a68d21d8" sha1="f34c7a7029004f10e81e83a2225a04c7da7a91c8"/>
+			</dataarea>
+		</part>
+		<part name="vrm1" interface="floppy_5_25">
+			<feature name="part_id" value="Virtual Resource Manager 1 of 2"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="vrm1.img" size="1228800" crc="93587830" sha1="e9ce50c2a6e6a9aaf72b39948e702f4ff8ff5937"/>
+			</dataarea>
+		</part>
+		<part name="vrm2" interface="floppy_5_25">
+			<feature name="part_id" value="Virtual Resource Manager 2 of 2"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="vrm2.img" size="1228800" crc="9618e483" sha1="0913ea36b8a14fdff5e5370fb7d955f48fbb4863"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aix221">
+		<description>IBM AIX/RT Operating System Version 2.2.1</description>
+		<year>1989</year>
+		<publisher>IBM</publisher>
+		<part name="term" interface="floppy_5_25">
+			<feature name="part_id" value="Asynchronous Terminal Emulation Program 1 of 1"/>
+			<dataarea name="flop" size="269334">
+				<rom name="27f4384.imd" size="269334" crc="24723c" sha1="c07dc2ab7b3962d3f605e6860df53a08260a207a"/>
+			</dataarea>
+		</part>
+		<part name="pcnet" interface="floppy_5_25">
+			<feature name="part_id" value="Base PC Network Services Program 1 of 1"/>
+			<dataarea name="flop" size="333720">
+				<rom name="27f4411.imd" size="333720" crc="905c2b5c" sha1="74629caf98d282c0854c111ee7b0277551f7d34d"/>
+			</dataarea>
+		</part>
+		<part name="bsp1" interface="floppy_5_25">
+			<feature name="part_id" value="Base System Program 1 of 8"/>
+			<dataarea name="flop" size="1234432">
+				<rom name="27f4364.imd" size="1234432" crc="b1d5e372" sha1="9ba8afb1491d9b4cc30be4291fef84b5b62973a1"/>
+			</dataarea>
+		</part>
+		<part name="bsp2" interface="floppy_5_25">
+			<feature name="part_id" value="Base System Program 2 of 8"/>
+			<dataarea name="flop" size="1234432">
+				<rom name="27f4365.imd" size="1234432" crc="45cb24ea" sha1="bf057465904788722937b1d230ab787b05c9d970"/>
+			</dataarea>
+		</part>
+		<part name="bsp3" interface="floppy_5_25">
+			<feature name="part_id" value="Base System Program 3 of 8"/>
+			<dataarea name="flop" size="1234432">
+				<rom name="27f4366.imd" size="1234432" crc="6701143" sha1="a8f7cb806636d6538fb8881b72714f47dc6feab2"/>
+			</dataarea>
+		</part>
+		<part name="bsp4" interface="floppy_5_25">
+			<feature name="part_id" value="Base System Program 4 of 8"/>
+			<dataarea name="flop" size="1234432">
+				<rom name="27f4367.imd" size="1234432" crc="cdabd159" sha1="1db10e6aacba868b399e48f768f2dc16448a8d47"/>
+			</dataarea>
+		</part>
+		<part name="bsp5" interface="floppy_5_25">
+			<feature name="part_id" value="Base System Program 5 of 8"/>
+			<dataarea name="flop" size="1232899">
+				<rom name="27f4368.imd" size="1232899" crc="c99efb62" sha1="9f93bf3cae6bc55dab23cc7ab3ae941a7625620b"/>
+			</dataarea>
+		</part>
+		<part name="bsp6" interface="floppy_5_25">
+			<feature name="part_id" value="Base System Program 6 of 8"/>
+			<dataarea name="flop" size="1234432">
+				<rom name="27f4369.imd" size="1234432" crc="b8bdf372" sha1="4b38adda06f722274229e76cb163edd40d2dee17"/>
+			</dataarea>
+		</part>
+		<part name="bsp7" interface="floppy_5_25">
+			<feature name="part_id" value="Base System Program 7 of 8"/>
+			<dataarea name="flop" size="1234432">
+				<rom name="27f4370.imd" size="1234432" crc="f6bcb9f8" sha1="0511acc68cfcc45d4b156dce5f75133d3b5ee510"/>
+			</dataarea>
+		</part>
+		<part name="bsp8" interface="floppy_5_25">
+			<feature name="part_id" value="Base System Program 8 of 8"/>
+			<dataarea name="flop" size="1107193">
+				<rom name="27f4371.imd" size="1107193" crc="68b4f88f" sha1="e0938bf9455e812cddbb36fb9e251014704c6a93"/>
+			</dataarea>
+		</part>
+		<part name="dsp" interface="floppy_5_25">
+			<feature name="part_id" value="DOS Server Program 1 of 1"/>
+			<dataarea name="flop" size="908414">
+				<rom name="37f6307.imd" size="908414" crc="c60c253" sha1="584907c3e065343f870f2195cb6f938c775d3673"/>
+			</dataarea>
+		</part>
+		<part name="ext1" interface="floppy_5_25">
+			<feature name="part_id" value="Extended Services Program 1 of 6"/>
+			<dataarea name="flop" size="1233921">
+				<rom name="27f4372.imd" size="1233921" crc="1929128b" sha1="593ef21772e3da0d42de372882ea3a153eed07bd"/>
+			</dataarea>
+		</part>
+		<part name="ext2" interface="floppy_5_25">
+			<feature name="part_id" value="Extended Services Program 2 of 6"/>
+			<dataarea name="flop" size="1231877">
+				<rom name="27f4373.imd" size="1231877" crc="8fcac130" sha1="607a4286e57155269b6f357848d913da1d786bf4"/>
+			</dataarea>
+		</part>
+		<part name="ext3" interface="floppy_5_25">
+			<feature name="part_id" value="Extended Services Program 3 of 6"/>
+			<dataarea name="flop" size="1224723">
+				<rom name="27f4374.imd" size="1224723" crc="8f11ac19" sha1="47e4e6a59980bb5644d258ac1d94575ef8b692db"/>
+			</dataarea>
+		</part>
+		<part name="ext4" interface="floppy_5_25">
+			<feature name="part_id" value="Extended Services Program 4 of 6"/>
+			<dataarea name="flop" size="1226767">
+				<rom name="27f4375.imd" size="1226767" crc="7e906386" sha1="bf759cb2c9039a1be17dee07fe0195cf8e4f22ca"/>
+			</dataarea>
+		</part>
+		<part name="ext5" interface="floppy_5_25">
+			<feature name="part_id" value="Extended Services Program 5 of 6"/>
+			<dataarea name="flop" size="1231877">
+				<rom name="27f4376.imd" size="1231877" crc="c8bcd816" sha1="cf62f3c5f4b4e99097fe23e7b4182fc9554c2b8c"/>
+			</dataarea>
+		</part>
+		<part name="ext6" interface="floppy_5_25">
+			<feature name="part_id" value="Extended Services Program 6 of 6"/>
+			<dataarea name="flop" size="268642">
+				<rom name="37f6352.imd" size="268642" crc="ee152da7" sha1="09e32c17c748e51a8c135aef4b4aee496e146d6f"/>
+			</dataarea>
+		</part>
+		<part name="ined" interface="floppy_5_25">
+			<feature name="part_id" value="INed Program 1 of 1"/>
+			<dataarea name="flop" size="1203772">
+				<rom name="27f4377.imd" size="1203772" crc="335111b0" sha1="156f4135ed339904e15d93de444e6c5c9ae5cb0e"/>
+			</dataarea>
+		</part>
+		<part name="inst" interface="floppy_5_25">
+			<feature name="part_id" value="Installation/Maintenance 1 of 1"/>
+			<dataarea name="flop" size="1198662">
+				<rom name="27f4378.imd" size="1198662" crc="6e677165" sha1="c5e5ba2e3c08ef227575369cf748b0e037db2267"/>
+			</dataarea>
+		</part>
+		<part name="multi1" interface="floppy_5_25">
+			<feature name="part_id" value="Multi-User Services Program 1 of 3"/>
+			<dataarea name="flop" size="1233410">
+				<rom name="27f4379.imd" size="1233410" crc="ef976bd2" sha1="c74f451ecbd8bfd5f0b8dba173d09ef77e67bc6d"/>
+			</dataarea>
+		</part>
+		<part name="multi2" interface="floppy_5_25">
+			<feature name="part_id" value="Multi-User Services Program 2 of 3"/>
+			<dataarea name="flop" size="1233921">
+				<rom name="27f4380.imd" size="1233921" crc="19a781da" sha1="8925a4b16d15839563ec121b64f15b7eaadbd0f6"/>
+			</dataarea>
+		</part>
+		<part name="multi3" interface="floppy_5_25">
+			<feature name="part_id" value="Multi-User Services Program 3 of 3"/>
+			<dataarea name="flop" size="1049450">
+				<rom name="27f4381.imd" size="1049450" crc="3ba5e27d" sha1="4c580a5e54cbf432f2bc5cb0db87e54fc54cd462"/>
+			</dataarea>
+		</part>
+		<part name="eus" interface="floppy_5_25">
+			<feature name="part_id" value="IBM RT PC Exploring Usability Services 1 of 1"/>
+			<dataarea name="flop" size="674376">
+				<rom name="92x1507.imd" size="674376" crc="1bb47d44" sha1="b73eb31e3e580401f8e80957c6792b5e81c0344c"/>
+			</dataarea>
+		</part>
+		<part name="sna1" interface="floppy_5_25">
+			<feature name="part_id" value="Systems Network Architecture Services 1 of 3"/>
+			<dataarea name="flop" size="1234432">
+				<rom name="27f4392.imd" size="1234432" crc="5a8f08eb" sha1="682e69164a1a2f682574b7bc7099ae6969cf9e06"/>
+			</dataarea>
+		</part>
+		<part name="sna2" interface="floppy_5_25">
+			<feature name="part_id" value="Systems Network Architecture Services 2 of 3"/>
+			<dataarea name="flop" size="1232899">
+				<rom name="27f4393.imd" size="1232899" crc="eb36a180" sha1="db99cbe1728661b178a8f1ee51286b5f9c05f40e"/>
+			</dataarea>
+		</part>
+		<part name="sna3" interface="floppy_5_25">
+			<feature name="part_id" value="Systems Network Architecture Services 3 of 3"/>
+			<dataarea name="flop" size="1188442">
+				<rom name="27f4394.imd" size="1188442" crc="95a3b3bd" sha1="32fa135ae440da633dd4f83091b348ed92a90b2e"/>
+			</dataarea>
+		</part>
+		<part name="tcp1" interface="floppy_5_25">
+			<feature name="part_id" value="Interface Program for use with TCP/IP 1 of 3"/>
+			<dataarea name="flop" size="1233921">
+				<rom name="27f4395.imd" size="1233921" crc="cceacd2f" sha1="75888a9723768e488725b517905a959fb6bbf53b"/>
+			</dataarea>
+		</part>
+		<part name="tcp2" interface="floppy_5_25">
+			<feature name="part_id" value="Interface Program for use with TCP/IP 2 of 3"/>
+			<dataarea name="flop" size="1233921">
+				<rom name="27f4396.imd" size="1233921" crc="b10da310" sha1="de9f71474e76edf0197e8c44aa08e9ce2bded4e0"/>
+			</dataarea>
+		</part>
+		<part name="tcp3" interface="floppy_5_25">
+			<feature name="part_id" value="Interface Program for use with TCP/IP 3 of 3"/>
+			<dataarea name="flop" size="765334">
+				<rom name="27f6326.imd" size="765334" crc="2a0bebaa" sha1="f9397b7dc15d5637d9f8dfb22330f573166bf75d"/>
+			</dataarea>
+		</part>
+		<part name="upd1" interface="floppy_5_25">
+			<feature name="part_id" value="Update 1 of 2"/>
+			<dataarea name="flop" size="1231877">
+				<rom name="27f4397.imd" size="1231877" crc="7c320fa5" sha1="0b966059c99564a97509e5627ce79f10fd80579a"/>
+			</dataarea>
+		</part>
+		<part name="upd2" interface="floppy_5_25">
+			<feature name="part_id" value="Update 2 of 2"/>
+			<dataarea name="flop" size="728542">
+				<rom name="27f4398.imd" size="728542" crc="5721c9b9" sha1="f8421b8a803c6a2eccaeab850d9b311be01eb18c"/>
+			</dataarea>
+		</part>
+		<part name="usp1" interface="floppy_5_25">
+			<feature name="part_id" value="Usability Services Program 1 of 2"/>
+			<dataarea name="flop" size="1234432">
+				<rom name="27f4390.imd" size="1234432" crc="40bf6a0e" sha1="d6c662fd26c2dd13b89461e0e6416580a2a19fbc"/>
+			</dataarea>
+		</part>
+		<part name="usp2" interface="floppy_5_25">
+			<feature name="part_id" value="Usability Services Program 2 of 2"/>
+			<dataarea name="flop" size="38692">
+				<rom name="37f6351.imd" size="38692" crc="76678914" sha1="c2c428114b8cbd80739f146c0dbf417a8c5f7e52"/>
+			</dataarea>
+		</part>
+		<part name="vrmdd1" interface="floppy_5_25">
+			<feature name="part_id" value="Virtual Resource Manager Device Driver 1 of 2"/>
+			<dataarea name="flop" size="1232899">
+				<rom name="27f4401.imd" size="1232899" crc="1ef87551" sha1="db52a088a0a2f86db66624e679ca1283e1793de9"/>
+			</dataarea>
+		</part>
+		<part name="vrmdd2" interface="floppy_5_25">
+			<feature name="part_id" value="Virtual Resource Manager Device Driver 2 of 2"/>
+			<dataarea name="flop" size="1141430">
+				<rom name="27f4402.imd" size="1141430" crc="2c44aaf0" sha1="c4fe7faae89f3c778833e985036c7b4fef10213b"/>
+			</dataarea>
+		</part>
+		<part name="vrm1" interface="floppy_5_25">
+			<feature name="part_id" value="Virtual Resource Manager Program 1 of 2"/>
+			<dataarea name="flop" size="1068868">
+				<rom name="27f4399.imd" size="1068868" crc="812b32df" sha1="f01a7f076bfdc05f4055c67e1ae1777eb79c603d"/>
+			</dataarea>
+		</part>
+		<part name="vrm2" interface="floppy_5_25">
+			<feature name="part_id" value="Virtual Resource Manager Program 2 of 2"/>
+			<dataarea name="flop" size="418876">
+				<rom name="27f4400.imd" size="418876" crc="5387c231" sha1="0d06b029bbb1b9ddc21d2923fb2931aa6cac74f1"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
