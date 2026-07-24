@@ -46,7 +46,7 @@ SMPC NVRAM contents:
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(SMPC_HLE, smpc_hle_device, "smpc_hle", "Sega Saturn SMPC HLE (HD404920FS)")
+DEFINE_DEVICE_TYPE(SMPC_HLE, smpc_hle_device, "smpc_hle", "Sega Saturn SMPC HLE (Hitachi HD404920FS 315-5744)")
 
 void smpc_hle_device::io_map(address_map &map)
 {

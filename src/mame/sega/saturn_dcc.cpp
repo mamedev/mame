@@ -37,7 +37,7 @@ Known games to be very tight on interleaving, acts bad with -drc:
 #include "emu.h"
 #include "saturn_dcc.h"
 
-DEFINE_DEVICE_TYPE(SATURN_DCC, saturn_dcc_device, "saturn_dcc", "Sega Saturn DCC Dual CPU interface")
+DEFINE_DEVICE_TYPE(SATURN_DCC, saturn_dcc_device, "saturn_dcc", "Sega Saturn DCC Dual CPU interface (Hitachi 315-5778)")
 
 saturn_dcc_device::saturn_dcc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SATURN_DCC, tag, owner, clock)

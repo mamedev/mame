@@ -9,23 +9,6 @@
 #include "cpu/sh/sh7604.h"
 #include "cpu/scudsp/scudsp.h"
 
-#define IRQ_VBLANK_IN  1 << 0
-#define IRQ_VBLANK_OUT 1 << 1
-#define IRQ_HBLANK_IN  1 << 2
-#define IRQ_TIMER_0    1 << 3
-#define IRQ_TIMER_1    1 << 4
-#define IRQ_DSP_END    1 << 5
-#define IRQ_SOUND_REQ  1 << 6
-#define IRQ_SMPC       1 << 7
-#define IRQ_PAD        1 << 8
-#define IRQ_DMALV2     1 << 9
-#define IRQ_DMALV1     1 << 10
-#define IRQ_DMALV0     1 << 11
-#define IRQ_DMAILL     1 << 12
-#define IRQ_VDP1_END   1 << 13
-#define IRQ_ABUS       1 << 15
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -72,6 +55,54 @@ private:
 		DMALV2_ID
 	};
 
+	enum dma_event_id_t : uint8_t {
+		DMA_EVENT_VBLANKIN = 0,
+		DMA_EVENT_VBLANKOUT,
+		DMA_EVENT_HBLANKIN,
+		DMA_EVENT_TIMER0,
+		DMA_EVENT_TIMER1,
+		DMA_EVENT_SCSP,
+		DMA_EVENT_VDP1,
+		DMA_EVENT_TRIGGER // DMA activation bit
+	};
+
+	enum ist_source_t : uint32_t {
+		IST_VBLANK_IN  = 1 << 0,
+		IST_VBLANK_OUT = 1 << 1,
+		IST_HBLANK_IN  = 1 << 2,
+		IST_TIMER_0    = 1 << 3,
+		IST_TIMER_1    = 1 << 4,
+		IST_DSP_END    = 1 << 5,
+		IST_SOUND_REQ  = 1 << 6,
+		IST_SMPC       = 1 << 7,
+		IST_PAD        = 1 << 8,
+		IST_DMALV2     = 1 << 9,
+		IST_DMALV1     = 1 << 10,
+		IST_DMALV0     = 1 << 11,
+		IST_DMAILL     = 1 << 12,
+		IST_VDP1_END   = 1 << 13,
+		IST_ABUS       = 1 << 15
+	};
+
+	// move a.k.a. operation flag (DMA is executing)
+	// background a.k.a. interrupt flag (paused out of higher priority executed)
+	// wait a.k.a. stand by (a starting period where the DMA goes from idle to operating)
+	enum dma_status_t : uint32_t {
+		DMA_DSP_MOVE      = 1 << 0,  // DDMV
+		DMA_DSP_WAIT      = 1 << 1,  // DDWT
+		DMA_LV0_MOVE      = 1 << 4,  // D0MV
+		DMA_LV0_WAIT      = 1 << 5,  // D0WT
+		DMA_LV1_MOVE      = 1 << 8,  // D1MV
+		DMA_LV1_WAIT      = 1 << 9,  // D1WT
+		DMA_LV2_MOVE      = 1 << 12, // D2MV
+		DMA_LV2_WAIT      = 1 << 13, // D2WT
+		DMA_LV0_BK        = 1 << 16, // D0BK
+		DMA_LV1_BK        = 1 << 17, // D1BK
+		DMA_ACCESS_A_BUS  = 1 << 20, // DACSA
+		DMA_ACCESS_B_BUS  = 1 << 21, // DACSB
+		DMA_ACCESS_DSP    = 1 << 22  // DACSD
+	};
+
 	template <int Level> TIMER_CALLBACK_MEMBER(dma_tick);
 	TIMER_CALLBACK_MEMBER(timer1_irq_cb);
 	emu_timer *m_dma_timer[3], *m_timer1;
@@ -87,6 +118,7 @@ private:
 	uint16_t m_timer0_counter;
 
 	void test_pending_irqs();
+
 
 	struct {
 		uint32_t    src;       /* Source DMA lv n address*/
@@ -108,7 +140,7 @@ private:
 	void handle_dma_indirect(uint8_t level);
 	void update_dma_status(uint8_t level,bool state);
 	void dma_single_transfer(uint32_t src, uint32_t dst,uint8_t *src_shift);
-	void dma_start_factor_ack(uint8_t event);
+	void dma_start_factor_ack(dma_event_id_t event);
 
 	void scudsp_end_w(int state);
 	uint16_t scudsp_dma_r(offs_t offset, uint16_t mem_mask = ~0);
