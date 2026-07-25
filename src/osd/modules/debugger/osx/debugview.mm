@@ -300,9 +300,21 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 }
 
 
+- (void)prepareForShutdown {
+	// The machine is going away and debug_view_manager will destroy the view.
+	// AppKit can keep us alive past that point, and the next machine is likely
+	// to be constructed at the same address (on the stack in mame_machine_manager::execute()).
+	// So stop -dealloc from freeing a view belonging to a stale machine.
+	machine = nullptr;
+}
+
+
 - (void)dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	if (view != nullptr) machine->debug_view().free_view(*view);
+	if ((machine != nullptr) && (view != nullptr))
+	{
+		machine->debug_view().free_view(*view);
+	}
 	if (font != nil) [font release];
 	if (text != nil) [text release];
 	[super dealloc];

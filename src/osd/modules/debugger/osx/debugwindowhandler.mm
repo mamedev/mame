@@ -28,6 +28,20 @@ NSString *const MAMEShowDebuggerNotification = @"MAMEShowDebuggerNotification";
 NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryDebugWindowWillCloseNotification";
 NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerConfigurationNotification";
 
+// recursively tear down an NSView and any subviews
+static void prepare_debug_views_for_shutdown(NSView *view)
+{
+	if ([view isKindOfClass:[MAMEDebugView class]])
+	{
+		[(MAMEDebugView *)view prepareForShutdown];
+	}
+
+	for (NSView *subview in [view subviews])
+	{
+		prepare_debug_views_for_shutdown(subview);
+	}
+}
+
 
 //============================================================
 //  MAMEDebugWindowHandler class
@@ -180,6 +194,12 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 	}
 
 	[super dealloc];
+}
+
+// The current MAME machine is going away so tear down accordingly
+- (void)prepareForShutdown {
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	prepare_debug_views_for_shutdown([window contentView]);
 }
 
 

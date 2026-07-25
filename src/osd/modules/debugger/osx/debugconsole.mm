@@ -212,6 +212,15 @@
 }
 
 
+- (void)prepareForShutdown {
+	// Auxiliary windows hold debug views belonging to the machine that's
+	// going away as well, so take them down with us
+	for (MAMEAuxiliaryDebugWindowHandler *aux in auxiliaryWindows)
+		[aux prepareForShutdown];
+	[super prepareForShutdown];
+}
+
+
 - (void)setCPU:(device_t *)device {
 	[regView selectSubviewForDevice:device];
 	[dasmView selectSubviewForDevice:device];

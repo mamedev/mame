@@ -34,6 +34,8 @@
 
 - (id)initWithFrame:(NSRect)f type:(debug_view_type)t machine:(running_machine &)m wholeLineScroll:(BOOL)w;
 
+- (void)prepareForShutdown;
+
 - (void)update;
 
 - (NSSize)maximumFrameSize;

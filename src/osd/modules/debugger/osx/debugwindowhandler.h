@@ -34,6 +34,8 @@ extern NSString *const MAMESaveDebuggerConfigurationNotification;
 
 - (id)initWithMachine:(running_machine &)m title:(NSString *)t;
 
+- (void)prepareForShutdown;
+
 - (void)activate;
 
 - (IBAction)debugBreak:(id)sender;

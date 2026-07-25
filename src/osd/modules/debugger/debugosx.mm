@@ -107,6 +107,7 @@ void debugger_osx::exit()
 		[[NSNotificationCenter defaultCenter] postNotificationName:MAMEHideDebuggerNotification
 															object:m_console
 														  userInfo:info];
+		[m_console prepareForShutdown];
 		[m_console release];
 		m_console = nil;
 		m_machine = nullptr;

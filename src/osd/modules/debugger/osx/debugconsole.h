@@ -30,6 +30,8 @@
 
 - (id)initWithMachine:(running_machine &)m;
 
+- (void)prepareForShutdown;
+
 - (void)setCPU:(device_t *)device;
 
 - (IBAction)doCommand:(id)sender;
