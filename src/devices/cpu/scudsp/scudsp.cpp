@@ -660,13 +660,13 @@ void scudsp_cpu_device::op_dma( uint32_t opcode )
 	m_dma.dir = dir_from_D0;
 	if ( m_dma.dir == 0 )
 	{
-		m_dma.src = (m_ra0 << 2) & 0x07ffffff;
+		m_dma.src = (m_ra0 << 2) & 0x27ffffff;
 		m_dma.dst = dsp_mem;
 	}
 	else
 	{
 		m_dma.src = dsp_mem;
-		m_dma.dst = (m_wa0 << 2) & 0x07ffffff;
+		m_dma.dst = (m_wa0 << 2) & 0x27ffffff;
 	}
 
 	m_dma.update = ( hold == 0 );

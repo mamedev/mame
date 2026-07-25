@@ -32,6 +32,8 @@ public:
 	void smpc_irq_w(int state);
 
 	template <typename T> void set_hostcpu(T &&tag) { m_hostcpu.set_tag(std::forward<T>(tag)); }
+	auto bbus_sound_dtack_cb() { return m_bbus_sound_dtack_cb.bind(); }
+	auto cbus_dtack_cb()       { return m_cbus_dtack_cb.bind(); }
 
 	IRQ_CALLBACK_MEMBER(irq_ack_cb);
 
@@ -48,6 +50,8 @@ private:
 	required_device<scudsp_cpu_device> m_scudsp;
 	required_device<sh7604_device> m_hostcpu;
 	address_space *m_hostspace;
+	devcb_write_line m_bbus_sound_dtack_cb;
+	devcb_write_line m_cbus_dtack_cb;
 
 	enum dma_id : int {
 		DMALV0_ID = 0,
@@ -103,9 +107,11 @@ private:
 		DMA_ACCESS_DSP    = 1 << 22  // DACSD
 	};
 
+	TIMER_CALLBACK_MEMBER(dma_tick_cb);
 	template <int Level> TIMER_CALLBACK_MEMBER(dma_tick);
 	TIMER_CALLBACK_MEMBER(timer1_irq_cb);
 	emu_timer *m_dma_timer[3], *m_timer1;
+	emu_timer *m_dma_tick_timer;
 	uint32_t m_ism;
 	uint32_t m_ist;
 	uint32_t m_t0c;
@@ -116,6 +122,7 @@ private:
 	int m_current_irq_level;
 	uint8_t m_current_vector;
 	uint16_t m_timer0_counter;
+	uint32_t m_dma_clock_ref;
 
 	void test_pending_irqs();
 
@@ -127,11 +134,18 @@ private:
 		uint32_t    dst_add;   /* Destination Addition for DMA lv n*/
 		uint32_t    size;      /* Transfer DMA size lv n*/
 		uint32_t    index;
+		uint32_t    initial_src;
+		uint32_t    initial_dst;
+		uint32_t    count;
 		uint8_t     start_factor;
 		bool        enable_mask;
 		bool        indirect_mode;
 		bool        rup;
 		bool        wup;
+		bool        cd_transfer_flag;
+		bool        done;
+		bool        cbus_cache_through;
+		bool        bbus_sound_access;
 	}m_dma[3];
 
 	uint32_t dma_common_r(uint8_t offset,uint8_t level);
@@ -141,6 +155,7 @@ private:
 	void update_dma_status(uint8_t level,bool state);
 	void dma_single_transfer(uint32_t src, uint32_t dst,uint8_t *src_shift);
 	void dma_start_factor_ack(dma_event_id_t event);
+	std::tuple<int, int> check_dma_level_round_robin();
 
 	void scudsp_end_w(int state);
 	uint16_t scudsp_dma_r(offs_t offset, uint16_t mem_mask = ~0);

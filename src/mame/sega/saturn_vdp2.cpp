@@ -314,7 +314,7 @@ void saturn_vdp2_device::reconfigure_crtc()
 	m_hdisplay = horz_res;
 	m_vdisplay = vert_res;
 
-	m_screen->configure(hblank_period, vblank_period, visarea, refresh );
+	m_screen->configure(hblank_period, vblank_period, visarea, refresh);
 }
 
 int saturn_vdp2_device::get_hcounter()
