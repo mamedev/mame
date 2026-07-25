@@ -186,7 +186,6 @@ Remaining Video issues
 
 Timing
  - Experimental SH7709S cache/memory timing
- - Requires to measure screen raw params for correct video timing?
 
 Removed games
  - 31/12/2021, Akai Katana and Dodonpachi Saidaioujou were removed at the request of the current
