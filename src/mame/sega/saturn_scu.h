@@ -88,9 +88,11 @@ private:
 		IST_ABUS       = 1 << 15
 	};
 
-	// move a.k.a. operation flag (DMA is executing)
 	// background a.k.a. interrupt flag (paused out of higher priority executed)
+	// move a.k.a. operation flag (DMA is executing)
 	// wait a.k.a. stand by (a starting period where the DMA goes from idle to operating)
+	// the move/wait given here are for documentation purposes only, they are impractical
+	// and hot for what we need
 	enum dma_status_t : uint32_t {
 		DMA_DSP_MOVE      = 1 << 0,  // DDMV
 		DMA_DSP_WAIT      = 1 << 1,  // DDWT
@@ -105,6 +107,13 @@ private:
 		DMA_ACCESS_A_BUS  = 1 << 20, // DACSA
 		DMA_ACCESS_B_BUS  = 1 << 21, // DACSB
 		DMA_ACCESS_DSP    = 1 << 22  // DACSD
+	};
+
+	enum dma_state_t : uint32_t {
+		DMA_STATE_IDLE      = 0x00,
+		DMA_STATE_MOVE      = 0x10,
+		DMA_STATE_WAIT      = 0x20,
+		DMA_STATE_MOVE_WAIT = 0x30 // shouldn't happen?
 	};
 
 	TIMER_CALLBACK_MEMBER(dma_tick_cb);
@@ -152,7 +161,7 @@ private:
 	void dma_common_w(uint8_t offset,uint8_t level,uint32_t data);
 	void handle_dma_direct(uint8_t level);
 	void handle_dma_indirect(uint8_t level);
-	void update_dma_status(uint8_t level,bool state);
+	void update_dma_status(int level, dma_state_t state);
 	void dma_single_transfer(uint32_t src, uint32_t dst,uint8_t *src_shift);
 	void dma_start_factor_ack(dma_event_id_t event);
 	std::tuple<int, int> check_dma_level_round_robin();

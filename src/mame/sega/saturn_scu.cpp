@@ -38,6 +38,14 @@ xxxx xxxx x--- xx-- xx-- xx-- xx-- xx-- UNUSED
 #include "emu.h"
 #include "saturn_scu.h"
 
+#define LOG_DMA_MOVE  (1 << 1) // log the initial values prior to a DMA WAIT -> MOVE
+#define LOG_DMA_END   (1 << 2) // log the values at end of DMA
+#define LOG_DMA_STATE (1 << 3) // log state changes
+
+#define VERBOSE (LOG_GENERAL)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+
+#include "logmacro.h"
 
 // device type definition
 DEFINE_DEVICE_TYPE(SATURN_SCU, saturn_scu_device, "saturn_scu", "Sega Saturn System Control Unit (Yamaha 315-5688)")
@@ -333,54 +341,51 @@ void saturn_scu_device::dma_common_w(uint8_t offset,uint8_t level,uint32_t data)
 			}
 			break;
 		case 0x14/4: // DxMOD / DxRUP / DxWUP / DxFT, write only
-			m_dma[level].indirect_mode = BIT(data,24);
-			m_dma[level].rup = BIT(data,16);
-			m_dma[level].wup = BIT(data,8);
+			m_dma[level].indirect_mode = BIT(data, 24);
+			m_dma[level].rup = BIT(data, 16);
+			m_dma[level].wup = BIT(data, 8);
 			m_dma[level].start_factor = data & 7;
-			if(m_dma[level].indirect_mode == true)
+
+			if(m_dma[level].indirect_mode == true && !m_dma[level].wup)
 			{
-				//if(LOG_SCU) logerror("Indirect Mode DMA lv %d set\n",level);
-				if(m_dma[level].wup == false)
-					m_dma[level].index = m_dma[level].dst;
+				m_dma[level].index = m_dma[level].dst;
 			}
 
 			break;
 	}
 }
 
-// TODO: to be removed in the end
-inline void saturn_scu_device::update_dma_status(uint8_t level,bool state)
+inline void saturn_scu_device::update_dma_status(int level, dma_state_t new_state)
 {
-	if(state)
-		m_dma_status |= (0x10 << 4 * level);
-	else
-		m_dma_status &= ~(0x10 << 4 * level);
+	const std::string status_names[] = { "IDLE", "WAIT", "MOVE", "????" };
+	const int log_shifts[] = { 4, 8, 12 };
+	assert(level >= 0);
+
+	LOGMASKED(LOG_DMA_STATE, "DMA%d state change %s -> ", level, status_names[(m_dma_status >> log_shifts[level]) & 0x3]);
+
+	m_dma_status &= ~(0x30 << 4 * level);
+	m_dma_status |= (new_state << 4 * level);
+
+	LOGMASKED(LOG_DMA_STATE, "%s (%08x)\n", status_names[(m_dma_status >> log_shifts[level]) & 0x3], m_dma_status);
 }
 
 void saturn_scu_device::handle_dma_direct(uint8_t level)
 {
-//	uint32_t tmp_src,tmp_dst,total_size;
-
-	#if 1
-	//if(m_dma[level].src_add == 0 || (m_dma[level].dst_add != 2 && m_dma[level].dst_add != 4))
-	{
-		printf("DMA lv %d transfer START\n"
-							"Start %08x End %08x Size %04x\n",level ,m_dma[level].src,m_dma[level].dst,m_dma[level].size);
-		printf("Start Add %04x Destination Add %04x\n",m_dma[level].src_add,m_dma[level].dst_add);
-	}
-	#endif
+	// registers are DxR, DxW etc.
+	LOGMASKED(LOG_DMA_MOVE, "DMA%d direct R %08x W %08x C %08x RA %d WA %d\n",
+		level, m_dma[level].src, m_dma[level].dst, m_dma[level].size,
+		m_dma[level].src_add, m_dma[level].dst_add);
 
 	// gamebas, wc98 and batmanfu trips this
-	// according to the docs the SCU can't transfer from BIOS area (can't communicate from/to that bus)
+	// according to the docs the SCU can't transfer from BIOS area
+	// (can't communicate from/to that bus)
 	if((m_dma[level].src & 0x07f00000) == 0)
 	{
-		//popmessage("Warning: SCU transfer from BIOS area, contact MAMEdev");
+		LOG("Attempted an illegal DMA at R %08x\n", m_dma[level].src);
 		m_ist |= IST_DMAILL;
 		test_pending_irqs();
 		return;
 	}
-
-	//update_dma_status(level,true);
 
 	/* max size */
 	if(m_dma[level].size == 0) { m_dma[level].size = (level == 0) ? 0x00100000 : 0x1000; }
@@ -394,26 +399,21 @@ void saturn_scu_device::handle_dma_direct(uint8_t level)
 //  if ((m_dma[level].dst & 0x07f0'0000) == 0x05a0'0000 && m_dma[level].size >= 0x80000)
 //      m_dma[level].size = 0x80000 - (m_dma[level].dst & 0x7ffff);
 
-	//tmp_src = tmp_dst = 0;
-//
-	//total_size = m_dma[level].size;
 	if(m_dma[level].rup == false) m_dma[level].initial_src = m_dma[level].src;
 	if(m_dma[level].wup == false) m_dma[level].initial_dst = m_dma[level].dst;
 
 	m_dma[level].cd_transfer_flag = m_dma[level].src_add == 0 && (m_dma[level].src & 0x07ff'ffff) == 0x05818000;
 	m_dma[level].count = 0;
 	m_dma[level].done = false;
+
+	// saturn BIOS chains several cache through DMAs back-to-back with no status check
+	// clearly expect that the host CPU shouldn't do anything around the time the DMA goes.
 	m_dma[level].cbus_cache_through = (m_dma[level].src & 0x2700'0000) == 0x2600'0000 || (m_dma[level].dst & 0x2700'0000) == 0x2600'0000;
 	m_dma[level].bbus_sound_access = (m_dma[level].src & 0x07f0'0000) == 0x05a0'0000 || (m_dma[level].dst & 0x07f0'0000) == 0x05a0'0000;
 
-	// clear MOVE, set WAIT
-	m_dma_status &= ~(0x10 << (level * 4));
-	m_dma_status |= (0x20 << (level * 4));
+	update_dma_status(level, DMA_STATE_WAIT);
 
 	m_dma_tick_timer->adjust(attotime::from_ticks(1, m_dma_clock_ref));
-
-
-//	m_dma_timer[level]->adjust(m_hostcpu->cycles_to_attotime(total_size/4));
 }
 
 // TODO: rewrite me, inherit rules from direct mode and play along with the orchestrator
@@ -427,7 +427,7 @@ void saturn_scu_device::handle_dma_indirect(uint8_t level)
 	int32_t indirect_size;
 	uint32_t total_size = 0;
 
-	update_dma_status(level,true);
+	update_dma_status(level, DMA_STATE_MOVE);
 
 	// TODO: check cache
 	m_dma[level].index = m_dma[level].dst & 0x07ff'ffff;
@@ -443,14 +443,10 @@ void saturn_scu_device::handle_dma_indirect(uint8_t level)
 		if(indirect_src & 0x80000000)
 			job_done = 1;
 
-		#if 1
-		//if(m_dma[level].src_add == 0 || (m_dma[level].dst_add != 2))
-		{
-			if(1) printf("DMA lv %d indirect mode transfer START\n"
-								"Index %08x Start %08x End %08x Size %04x\n",level,tmp_src,indirect_src,indirect_dst,indirect_size);
-			if(1) printf("Start Add %04x Destination Add %04x\n",m_dma[level].src_add,m_dma[level].dst_add);
-		}
-		#endif
+
+		LOGMASKED(LOG_DMA_MOVE, "DMA%d indirect R %08x W %08x C %08x RA %d WA %d\n",
+		level, m_dma[level].src, m_dma[level].dst, m_dma[level].size,
+		m_dma[level].src_add, m_dma[level].dst_add);
 
 		indirect_src &=0x07ffffff;
 		indirect_dst &=0x07ffffff;
@@ -521,7 +517,7 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick)
 	m_ist |= irqmask;
 	test_pending_irqs();
 
-	update_dma_status((uint8_t)Level, false);
+	update_dma_status(Level, DMA_STATE_IDLE);
 	machine().scheduler().synchronize(); // force resync
 }
 
@@ -561,7 +557,7 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick_cb)
 			//  m_scu.size[dma_ch] = 0;
 			//machine().debug_break();
 
-			//printf("%d end at %08x %08x\n", level, m_dma[level].src, m_dma[level].dst);
+			LOGMASKED(LOG_DMA_END, "DMA%d ended at %08x %08x (RUP %d WUP %d)\n", level, m_dma[level].src, m_dma[level].dst, m_dma[level].rup, m_dma[level].wup);
 			if(m_dma[level].rup == false) m_dma[level].src = m_dma[level].initial_src;
 			if(m_dma[level].wup == false) m_dma[level].dst = m_dma[level].initial_dst;
 			m_dma[level].done = false;
@@ -574,11 +570,12 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick_cb)
 			m_ist |= irqmask;
 			test_pending_irqs();
 
-			update_dma_status((uint8_t)level, false);
+			update_dma_status(level, DMA_STATE_IDLE);
 			if (wait_level != -1)
 			{
-				m_dma_status |= (0x10 << (wait_level * 4));
-				m_dma_status &= ~(0x20 << (wait_level * 4));
+				update_dma_status(wait_level, DMA_STATE_MOVE);
+
+				LOGMASKED(LOG_DMA_STATE, "Push DMA%d in foreground\n", wait_level);
 				if (wait_level == 1)
 					m_dma_status &= ~(DMA_LV1_BK);
 				else
@@ -589,6 +586,8 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick_cb)
 				m_dma_tick_timer->adjust(attotime::never);
 			return;
 		}
+
+		// TODO: we probably need to functional table-ize what follows up
 
 		// TODO: Many games directly accesses CD-ROM register 0x05818000,
 		// it must be a dword access with current implementation otherwise it won't work
@@ -609,6 +608,7 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick_cb)
 				m_hostspace->write_dword(dst_address, m_hostspace->read_dword(src_address));
 				if(m_dma[level].dst_add == 8)
 					m_hostspace->write_dword(dst_address + 4,m_hostspace->read_dword(src_address));
+
 				m_cbus_dtack_cb(m_dma[level].cbus_cache_through);
 				m_bbus_sound_dtack_cb(m_dma[level].bbus_sound_access);
 
@@ -657,25 +657,20 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick_cb)
 
 	if (wait_level > level)
 	{
-		//const u32 wait_bit_level = (wait_level + 1) * 4;
-
-
 		// clear wait, set move
-		m_dma_status &= ~(0x20 << (wait_level * 4));
-		m_dma_status |= (0x10 << (wait_level * 4));
-		//printf("WAIT -> MOVE %d %d %08x\n", wait_level, level, m_dma_status);
+		update_dma_status(wait_level, DMA_STATE_MOVE);
 
 		if (level != -1)
 		{
 			// set wait and interrupt for the last transfer, clear move
-			m_dma_status |= (0x20 << (level * 4));
-			m_dma_status &= ~(0x10 << (level * 4));
+			update_dma_status(wait_level, DMA_STATE_WAIT);
+			LOGMASKED(LOG_DMA_STATE, "Push DMA%d in background\n", level);
+
 			m_dma_status |= (1 << (16 + level));
 		}
 	}
 
 	m_dma_tick_timer->adjust(attotime::from_ticks(1, m_dma_clock_ref));
-	// machine().scheduler().synchronize(); // force resync
 }
 
 
@@ -766,7 +761,7 @@ void saturn_scu_device::irq_mask_w(offs_t offset, uint32_t data, uint32_t mem_ma
 void saturn_scu_device::irq_status_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(mem_mask != 0xffffffff)
-		logerror("%s IST write %08x with %08x\n",this->tag(),data,mem_mask);
+		LOG("%s IST write %08x with %08x\n", this->tag(), data, mem_mask);
 
 	m_ist &= data;
 	test_pending_irqs();
