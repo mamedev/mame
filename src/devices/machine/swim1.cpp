@@ -1059,8 +1059,17 @@ void swim1_device::ism_sync()
 			// Actually resolve the cell lengths according to the counts
 			int resolved_ls_count = 0;
 			int resolved_ls_type[2] = { 0, 0 };
-			if((sct == 4 || lct == 4) && !m_ism_error)
-				m_ism_error |= 0x20;
+
+			if(sct == 4 || lct == 4) {
+				// Slightly-over-RPT gaps (~5 µs on HD MFM) show up on real
+				// MOOF/MFI captures around write splices. Latching sticky 
+				// error 0x20 aborts and retries the whole sector. Only latch 
+				// long cell errors when synchronized to avoid this.
+				if(m_ism_csm_state == CSM_SYNCHRONIZED) {
+					if(!m_ism_error)
+						m_ism_error |= 0x20;
+				}
+			}
 
 			if(will_hit_edge) {
 				if(sct == 0) {
