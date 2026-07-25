@@ -398,8 +398,6 @@ void stv_state::init_stv()
 	m_slave->sh2drc_add_fastram(0x00000000, 0x0007ffff, 1, &m_rom[0]);
 	m_slave->sh2drc_add_fastram(0x00200000, 0x002fffff, 0, &m_workram_l[0]);
 	m_slave->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_workram_h[0]);
-
-	m_vdp2.pal = 0;
 }
 
 /*
@@ -987,10 +985,14 @@ void stv_state::stv_mem(address_map &map)
 	map(0x05c00000, 0x05c7ffff).rw(FUNC(stv_state::vdp1_vram_r), FUNC(stv_state::vdp1_vram_w));
 	map(0x05c80000, 0x05cbffff).rw(FUNC(stv_state::vdp1_framebuffer0_r), FUNC(stv_state::vdp1_framebuffer0_w));
 	map(0x05d00000, 0x05d0001f).rw(FUNC(stv_state::vdp1_regs_r), FUNC(stv_state::vdp1_regs_w));
+	/* VDP2 */
 	map(0x05e00000, 0x05e7ffff).mirror(0x80000).rw(FUNC(stv_state::vdp2_vram_r), FUNC(stv_state::vdp2_vram_w));
 	map(0x05f00000, 0x05f7ffff).rw(FUNC(stv_state::vdp2_cram_r), FUNC(stv_state::vdp2_cram_w));
 	map(0x05f80000, 0x05fbffff).rw(FUNC(stv_state::vdp2_regs_r), FUNC(stv_state::vdp2_regs_w));
+	map(0x05f80000, 0x05fbffff).m(m_vdp2, FUNC(saturn_vdp2_device::regs_map));
+	/* SCU */
 	map(0x05fe0000, 0x05fe00cf).m(m_scu, FUNC(saturn_scu_device::regs_map));
+
 	map(0x06000000, 0x060fffff).ram().mirror(0x21f00000).share("workram_h");
 	map(0x60000000, 0x600003ff).nopw();
 	map(0xc0000000, 0xc00007ff).ram(); // cache RAM
@@ -1085,6 +1087,7 @@ void stv_state::pdr2_output_w(uint8_t data)
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 	m_en_68k = ((data & 0x10) >> 4) ^ 1;
 
+	// TODO: SCSP reset line (at bit 3?)
 	if(data & 8)
 		logerror("PDR2: data 0x8 active!\n");
 }
@@ -1103,7 +1106,6 @@ void stv_state::stv(machine_config &config)
 	m_slave->set_addrmap(AS_PROGRAM, &stv_state::stv_mem);
 	m_slave->set_is_slave(1);
 	m_slave->set_irq_acknowledge_callback(m_dcc, FUNC(saturn_dcc_device::irq_ack_cb));
-	TIMER(config, "slave_scantimer").configure_scanline(FUNC(stv_state::saturn_slave_scanline), "screen", 0, 1);
 
 	SATURN_DCC(config, m_dcc, MASTER_CLOCK_352);
 	m_dcc->set_master_cpu(m_maincpu);
@@ -1114,7 +1116,7 @@ void stv_state::stv(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &stv_state::sound_mem);
 	m_audiocpu->reset_cb().set(FUNC(stv_state::m68k_reset_callback));
 
-	SATURN_SCU(config, m_scu, XTAL(57'272'727) / 4);
+	SATURN_SCU(config, m_scu, MASTER_CLOCK_352);
 	m_scu->set_hostcpu(m_maincpu);
 
 	SMPC_HLE(config, m_smpc_hle, XTAL(4'000'000));
@@ -1141,6 +1143,12 @@ void stv_state::stv(machine_config &config)
 	m_screen->set_raw(MASTER_CLOCK_320/8, 427, 0, 352, 263, 0, 224);
 	m_screen->set_screen_update(FUNC(stv_state::screen_update_vdp2));
 	PALETTE(config, m_palette).set_entries(2048+(2048*2)); //standard palette + extra memory for rgb brightness.
+
+	SATURN_VDP2(config, m_vdp2, MASTER_CLOCK_320);
+	m_vdp2->set_screen_tag("screen");
+	m_vdp2->set_is_pal(false);
+	m_vdp2->vint_cb().set(FUNC(stv_state::vint_callback));
+	m_vdp2->hint_cb().set(FUNC(stv_state::hint_callback));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_stv);
 
@@ -1312,8 +1320,7 @@ void stv_state::machine_reset()
 
 	m_prev_gamebank_select = 0xff;
 
-	m_vdp2.old_crmd = -1;
-	m_vdp2.old_tvmd = -1;
+	m_vdp2_legacy.old_crmd = -1;
 }
 
 std::pair<std::error_condition, std::string> stv_state::load_cart(device_image_interface &image, generic_slot_device *slot)
@@ -1356,7 +1363,6 @@ void stv_state::machine_start()
 	save_item(NAME(m_port_sel));
 	save_item(NAME(m_mux_data));
 	save_item(NAME(m_scsp_last_line));
-	save_item(NAME(m_vdp2.odd));
 
 	stv_register_protection_savestates();
 }
@@ -4007,7 +4013,7 @@ GAME( 1995, kiwames,   stvbios, stvmp,    stvmp,    stv_state,   init_stv,      
 GAME( 1997, maruchan,  stvbios, stv,      stv,      stv_state,   init_maruchan,   ROT0,   "Sega / Toyosuisan",            "Maru-Chan de Goo! (J 971216 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, mausuke,   stvbios, stv,      stv,      stv_state,   init_mausuke,    ROT0,   "Data East Corporation",        "Mausuke no Ojama the World (J 960314 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, micrombc,  stvbios, hopper,   micrombc, stv_state,   init_stv,        ROT0,   "Sega",                         "Microman Battle Charge (J 990326 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, myfairld,  stvbios, stvmp,    myfairld, stv_state,   init_stv,        ROT0,   "Micronet",                     "Virtual Mahjong 2 - My Fair Lady (J 980608 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, myfairld,  stvbios, stvmp,    myfairld, stv_state,   init_stv,        ROT0,   "Micronet",                     "Virtual Mahjong 2 - My Fair Lady (J 980608 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // https://mametesters.org/view.php?id=2642
 GAME( 1998, othellos,  stvbios, stv,      stv,      stv_state,   init_othellos,   ROT0,   "Success",                      "Othello Shiyouyo (J 980423 V1.002)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2001, patocar,   stvbios, hopper,   patocar,  stv_state,   init_stv,        ROT0,   "Sega",                         "Hashire Patrol Car (J 990326 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, pblbeach,  stvbios, stv,      stv,      stv_state,   init_pblbeach,   ROT0,   "T&E Soft",                     "Pebble Beach - The Great Shot (JUE 950913 V0.990)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
@@ -4032,7 +4038,7 @@ GAME( 1998, supgoal,   stvbios, hopper,   patocar,  stv_state,   init_stv,      
 GAME( 1997, techbowl,  stvbios, hopper,   patocar,  stv_state,   init_stv,        ROT0,   "Sega",                         "Technical Bowling (J 971212 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, vfkids,    stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Virtua Fighter Kids (JUET 960319 V0.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, vmahjong,  stvbios, stvmp,    vmahjong, stv_state,   init_stv,        ROT0,   "Micronet",                     "Virtual Mahjong (J 961214 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, wwshin,    stvbios, stv,      wasafari, stv_state,   init_stv,        ROT0,   "Sega",                         "Waku Waku Shinkansen (J 971031 V0.002)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs inputs
+GAME( 1997, wwshin,    stvbios, stv,      wasafari, stv_state,   init_stv,        ROT0,   "Sega",                         "Waku Waku Shinkansen (J 971031 V0.002)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs inputs, has same sound bug as colmns97
 GAME( 1998, wasafari,  stvbios, stv,      wasafari, stv_state,   init_stv,        ROT0,   "Sega",                         "Wanpaku Safari (J 981109 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, winterht,  stvbios, stv,      stv,      stv_state,   init_winterht,   ROT0,   "Sega",                         "Winter Heat (JUET 971012 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, znpwfv,    stvbios, stv,      stv,      stv_state,   init_znpwfv,     ROT0,   "Sega",                         "Zen Nippon Pro-Wres Featuring Virtua (J 971123 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
@@ -4086,8 +4092,8 @@ GAME( 1998, nclubdis,  stvbios, stv,      stv,      stvpc_state, init_stv,      
 
 /* Doing something.. but not enough yet */
 GAME( 1995, vfremix,   stvbios, stv,      stv,      stv_state,   init_vfremix,    ROT0,   "Sega",                         "Virtua Fighter Remix (JUETBKAL 950428 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1996, decathlt,  stvbios, stv_5838, stv,      stv_state,   init_decathlt,   ROT0,   "Sega",                         "Decathlete (JUET 960709 V1.001)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996, decathlto, decathlt,stv_5838, stv,      stv_state,   init_decathlt,   ROT0,   "Sega",                         "Decathlete (JUET 960424 V1.000)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1996, decathlt,  stvbios, stv_5838, stv,      stv_state,   init_decathlt,   ROT0,   "Sega",                         "Decathlete (JUET 960709 V1.001)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1996, decathlto, decathlt,stv_5838, stv,      stv_state,   init_decathlt,   ROT0,   "Sega",                         "Decathlete (JUET 960424 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1998, twcup98,   stvbios, stv_5881, stv,      stv_state,   init_twcup98,    ROT0,   "Tecmo",                        "Tecmo World Cup '98 (JUET 980410 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // some situations with the GK result in the game stalling, maybe CPU core bug??
 GAME( 1998, twsoc98,   twcup98, stv_5881, stv,      stv_state,   init_twcup98,    ROT0,   "Tecmo",                        "Tecmo World Soccer '98 (JUET 980410 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^^ (check)
 

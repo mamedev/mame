@@ -2633,11 +2633,13 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Black screen, enables [SCU] Timer 1 -->
 	<software name="aitd2j" cloneof="aitd2" supported="no">
 		<description>Alone in the Dark 2 (Japan)</description>
 		<year>1996</year>
 		<publisher>Electronic Arts Victor</publisher>
+		<notes><![CDATA[
+Black screen, enables [SCU] Timer 1
+]]></notes>
 		<info name="serial" value="T-10602G"/>
 		<info name="release" value="19960223"/>
 		<info name="alt_title" value="アローン・イン・ザ・ダーク2"/>
@@ -2697,11 +2699,13 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Hardlocks at boot, caused by [SCU] DMA-ing with max sizes -->
 	<software name="aquazone" supported="no">
 		<description>Aquazone - Desktop Life (Japan)</description>
 		<year>1996</year>
 		<publisher>9003</publisher>
+		<notes><![CDATA[
+Hardlocks at boot, [SCU] DMA-ing in VDP2 RAM with max sizes
+]]></notes>
 		<info name="serial" value="T-24001G"/>
 		<info name="release" value="19960712"/>
 		<info name="alt_title" value="アクアゾーン"/>
@@ -4606,18 +4610,19 @@ Gal select screen sports unmasked text layer over box, [VDP2] enables window log
 		</part>
 	</software>
 
-	<software name="gamebas" supported="no">
+	<software name="gamebas" supported="partial">
 		<description>Game Basic for SegaSaturn (Japan)</description>
 		<year>1998</year>
 		<publisher>ASCII</publisher>
 		<notes><![CDATA[
-Keyboard inputs doesn't work
+Not extensively tested
+DEMO.B has [VDP1] issue with down-left cat box vertex
 ]]></notes>
 		<info name="serial" value="T-2111G"/>
 		<info name="release" value="19980625"/>
 		<info name="alt_title" value="ゲームベーシック フォー セガサターン"/>
-		<!-- TODO: in port 2? -->
 		<info name="usage" value="Needs keyboard connected"/>
+		<sharedfeat name="ctrl1_default" value="keyboard"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5529,13 +5534,15 @@ May hang after skipping initial FMV (random)
 		</part>
 	</software>
 
-	<!-- FMV playback is very glitchy [CD-Block] -->
-	<!-- main menu/gameplay performance is poor (caused by the polygon rasterizer) [VDP1] -->
-	<!-- Gameplay back layer still shows the main menu instead of being black filled [VDP2] -->
 	<software name="kingbox" cloneof="vicboxin" supported="no">
 		<description>The King of Boxing (Japan)</description>
 		<year>1995</year>
 		<publisher>Victor Entertainment</publisher>
+		<notes><![CDATA[
+FMV playback is very glitchy [CD-Block]
+Gameplay back layer still shows the main menu instead of being black filled [VDP2]
+Known to use [SCUDSP]
+]]></notes>
 		<info name="serial" value="T-6001G"/>
 		<info name="release" value="19951020"/>
 		<info name="alt_title" value="キング・オブ・ボクシング"/>
@@ -6665,11 +6672,14 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Pocket Fighter (Japan)... -->
 	<software name="pfght" supported="no">
 		<description>Pocket Fighter (Japan)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Runs too slow, enables [SCU] hblank-in irq
+[CD-Block] BGMs don't repeat
+]]></notes>
 		<info name="serial" value="T-1230G"/>
 		<info name="release" value="19980709"/>
 		<info name="alt_title" value="ポケットファイター"/>
@@ -8585,11 +8595,14 @@ TODO: test Sonic 2, 3 and Knuckles
 		</part>
 	</software>
 
-	<!-- Identifying Street Fighter Zero 2 (Japan)... -->
 	<software name="sfz2" cloneof="sfa2" supported="no">
 		<description>Street Fighter Zero 2 (Japan)</description>
 		<year>1996</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Runs too slow, enables [SCU] hblank-in irq
+[CD-Block] BGMs don't repeat
+]]></notes>
 		<info name="serial" value="T-1212G"/>
 		<info name="release" value="19960914"/>
 		<info name="alt_title" value="ストリートファイターZERO2"/>
@@ -11113,6 +11126,7 @@ Elimination Mode presentation screens shows HUD for 1 frame then layer gets eras
 		<publisher>Capcom</publisher>
 		<notes><![CDATA[
 Black screen after Capcom FMV logo, enables [SCU] Timer 0 + HBlank irqs and loops reading 0x6055670
+(Really wants the two [SH-2] to slowdown a bit in some way)
 ]]></notes>
 		<info name="serial" value="T-1205G"/>
 		<info name="release" value="19950811"/>
@@ -15000,8 +15014,7 @@ Black screen, [CD-Block]
 		<year>1996</year>
 		<publisher>Imagineer</publisher>
 		<notes><![CDATA[
-[VDP1] rendering issue when "3d" zooms on title screen
-Not extensively tested, known to use [SCU DSP]
+[VDP1] rendering issue when "3d" zooms on title screen [SCUDSP] actually [timing]
 ]]></notes>
 		<info name="serial" value="T-15013G"/>
 		<info name="release" value="19960823"/>
@@ -16077,12 +16090,15 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- No sound [CD-Block/SCSP] -->
-	<!-- "Window enabled for RGB555 Zoom" [VDP2] -->
 	<software name="crocj" cloneof="croc" supported="no">
 		<description>Croc - Pau-Pau Island (Japan)</description>
 		<year>1998</year>
 		<publisher>Media Quest</publisher>
+		<notes><![CDATA[
+No sound [CD-Block] and [SCSP]
+[VDP2] "Window enabled for RGB555 Zoom"
+Known to use [SCUDSP]
+]]></notes>
 		<info name="serial" value="T-26410G"/>
 		<info name="release" value="19980326"/>
 		<info name="alt_title" value="クロック! パウパウアイランド"/>
@@ -21205,13 +21221,15 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Throws "Error Trap Vector 4" with [DRC] off the bat -->
-	<!-- Has garbage pixels all over the place [VDP1/VDP2] -->
-	<!-- Swing animation draws sprite transparent most of the time [VDP1] or [SCU] Timer 1 -->
 	<software name="hyprgolf" cloneof="valora" supported="no">
 		<description>The Hyper Golf - Devil's Course (Japan)</description>
 		<year>1995</year>
 		<publisher>Vic Tokai</publisher>
+		<notes><![CDATA[
+Throws "Error Trap Vector 4" with [DRC] off the bat
+Has garbage pixels all over the place [VDP1/VDP2]
+Swing animation draws sprite transparent most of the time [VDP1] or [SCU] Timer 1
+]]></notes>
 		<info name="serial" value="T-2301G"/>
 		<info name="release" value="19951215"/>
 		<info name="alt_title" value="ザ・ハイパーゴルフ ～デビルズコース～"/>
@@ -22737,11 +22755,13 @@ Eventually crashes with a divide by zero, [VDP1] timings?
 		</part>
 	</software>
 
-	<!-- black screen at boot, spurious [SMPC] irq -->
 	<software name="actuagolj" cloneof="actuagol" supported="no">
 		<description>Actua Golf (Japan)</description>
 		<year>1997</year>
 		<publisher>Naxat Soft</publisher>
+		<notes><![CDATA[
+Black screen at boot, spurious [SMPC] irq
+]]></notes>
 		<info name="serial" value="T-18710G"/>
 		<info name="release" value="19970404"/>
 		<info name="alt_title" value="アクチャーゴルフ"/>
@@ -23245,11 +23265,15 @@ Eventually crashes with a divide by zero, [VDP1] timings?
 		</part>
 	</software>
 
-	<!-- Black screen after Sega Sports logo, buggy handshake bug with [SMPC] commands cfr. PC=6004FC0 (buggy [SH2] delay slot or command should just be faster?) -->
 	<software name="gnine97" supported="no">
 		<description>Pro Yakyuu Greatest Nine '97 (Japan)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen after Sega Sports logo, requires [SMPC] same SSHON issued to pseudo instantly return
+PC=6004FC0
+Randomly doesn't boot
+]]></notes>
 		<info name="serial" value="GS-9139"/>
 		<info name="release" value="19970328"/>
 		<info name="alt_title" value="プロ野球グレイテストナイン '97"/>
@@ -23277,11 +23301,14 @@ Eventually crashes with a divide by zero, [VDP1] timings?
 		</part>
 	</software>
 
-	<!-- Identifying Greatest Nine '98 Summer Action (J) (GS-9202)... -->
 	<software name="gnine98s" supported="no">
 		<description>Pro Yakyuu Greatest Nine '98 - Summer Action (Japan)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen after Sega Sports logo, requires [SMPC] same SSHON issued to pseudo instantly return
+Randomly doesn't boot
+]]></notes>
 		<info name="serial" value="GS-9202"/>
 		<info name="release" value="19980806"/>
 		<info name="alt_title" value="プロ野球グレイテストナイン '98 サマーアクション"/>
@@ -28563,12 +28590,14 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Black screen, enables [SCU] Timer 1 -->
-	<!-- Box Art shows 'Remix' Title, game reprogrammed from previous version -->
 	<software name="chaoscrm" supported="no">
 		<description>Chaos Control Remix (Japan)</description>
 		<year>1996</year>
 		<publisher>Virgin Interactive</publisher>
+		<notes><![CDATA[
+Black screen, enables [SCU] Timer 1
+Box Art shows 'Remix' Title, game reprogrammed from previous version
+]]></notes>
 		<info name="serial" value="T-7006G"/>
 		<info name="release" value="19961122"/>
 		<info name="alt_title" value="カオスコントロールリミックス"/>

@@ -130,40 +130,55 @@ TODO:
 - VDP1 timing and CEF emulation isn't accurate at all.
 */
 
+void saturn_state::vint_callback(int state)
+{
+	if (m_prev_vint != state)
+	{
+		if (state)
+		{
+			m_scu->vblank_in_w(1);
+			m_slave->set_input_line(0x6, ASSERT_LINE);
+		}
+		else
+			m_scu->vblank_out_w(1);
+	}
 
+	m_prev_vint = state;
+}
+
+void saturn_state::hint_callback(int state)
+{
+	if (!m_prev_hint && state)
+	{
+		m_scu->hblank_in_w(1);
+		m_slave->set_input_line(0x2, ASSERT_LINE);
+	}
+
+	m_prev_hint = state;
+}
+
+// TODO: stuff that should really be in VDP1
 TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 {
 	int scanline = param;
 	int y_step, vblank_line;
 
-	vblank_line = get_vblank_start_position();
-	y_step = get_ystep_count();
+	vblank_line = m_vdp2->get_vblank_start_position();
+	y_step = m_vdp2->get_ystep_count();
 
 	//popmessage("%08x %d T0 %d T1 %d %08x",m_scu.ism ^ 0xffffffff,max_y,m_scu_regs[36],m_scu_regs[37],m_scu_regs[38]);
 
-	if(scanline == 0*y_step)
+	if(scanline == vblank_line*y_step)
 	{
-		m_scu->vblank_out_w(1);
-	}
-	else if(scanline == vblank_line*y_step)
-	{
-		m_scu->vblank_in_w(1);
-
-		// flip odd bit here
-		m_vdp2.odd ^= 1;
 		/* TODO: when Automatic Draw actually happens? Night Striker S is very fussy on this, and it looks like that VDP1 starts at more or less vblank-in time ... */
 		vdp1_video_update();
 	}
-	else if((scanline % y_step) == 0 && scanline < vblank_line * y_step)
-	{
-		m_scu->hblank_in_w(1);
-	}
 
-	if(scanline == (vblank_line+1) * y_step)
+	if(scanline == (vblank_line + 1) * y_step)
 	{
 		/* docs mentions that VBE happens one line after vblank-in. */
 		if(VDP1_VBE())
-			m_vdp1.framebuffer_clear_on_next_frame = 1;
+			m_vdp1_legacy.framebuffer_clear_on_next_frame = 1;
 	}
 
 	// TODO: temporary for Batman Forever, presumably anonymous timer not behaving well.
@@ -173,22 +188,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 		m_scu->vdp1_end_w(1);
 	}
 
-	m_scu->check_scanline_timers(scanline, y_step);
-}
-
-// TODO: check what really uses this
-TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_slave_scanline )
-{
-	int scanline = param;
-	int y_step, vblank_line;
-
-	vblank_line = get_vblank_start_position();
-	y_step = get_ystep_count();
-
-	if(scanline == vblank_line*y_step)
-		m_slave->set_input_line(0x6, ASSERT_LINE);
-	else if((scanline % y_step) == 0 && scanline < vblank_line*y_step)
-		m_slave->set_input_line(0x2, ASSERT_LINE);
 }
 
 static const gfx_layout tiles8x8x4_layout =
@@ -313,8 +312,15 @@ void saturn_state::dot_select_w(int state)
 	m_slave->set_unscaled_clock(xtal / 2);
 	m_dcc->set_unscaled_clock(xtal / 2);
 
-	m_vdp2.dotsel = state ^ 1;
-	vdp2_dynamic_res_change();
+	m_scu->set_unscaled_clock(xtal);
+
+//	m_vdp1->set_unscaled_clock(xtal);
+	m_vdp2->set_unscaled_clock(xtal);
+
+	m_scsp->reset();
+	m_scu->reset();
+//  m_vdp1->reset();
+	m_vdp2->reset();
 }
 
 

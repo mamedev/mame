@@ -1347,7 +1347,7 @@ ROM_START( paperboy ) // ALL of these roms should be 136034-xxx but the correct 
 	ROM_LOAD( "vid_t06.rv1", 0x000000, 0x002000, CRC(60d7aebb) SHA1(ad74221c4270496ebcfedd46ea16dca2cda1b4be) )
 
 	ROM_REGION( 0x200, "eeprom", 0 )
-	ROM_LOAD( "paperboy-eeprom.bin", 0x0000, 0x0200, CRC(756b90cc) SHA1(b78762e354f1316087f9de4005734c343356c8ef) )
+	ROM_LOAD( "paperboy-eeprom.bin", 0x0000, 0x0200, CRC(1bbf9b07) SHA1(3c4c9c8867f5d0e2d98201719c9ad45f5468c50b) )
 ROM_END
 
 
@@ -1389,7 +1389,7 @@ ROM_START( paperboyr2 )
 	ROM_LOAD( "vid_t06.rv1", 0x000000, 0x002000, CRC(60d7aebb) SHA1(ad74221c4270496ebcfedd46ea16dca2cda1b4be) )
 
 	ROM_REGION( 0x200, "eeprom", 0 )
-	ROM_LOAD( "paperboy-eeprom.bin", 0x0000, 0x0200, CRC(756b90cc) SHA1(b78762e354f1316087f9de4005734c343356c8ef) )
+	ROM_LOAD( "paperboy-eeprom.bin", 0x0000, 0x0200, CRC(1bbf9b07) SHA1(3c4c9c8867f5d0e2d98201719c9ad45f5468c50b) )
 ROM_END
 
 
@@ -1431,7 +1431,7 @@ ROM_START( paperboyr1 )
 	ROM_LOAD( "vid_t06.rv1", 0x000000, 0x002000, CRC(60d7aebb) SHA1(ad74221c4270496ebcfedd46ea16dca2cda1b4be) )
 
 	ROM_REGION( 0x200, "eeprom", 0 )
-	ROM_LOAD( "paperboy-eeprom.bin", 0x0000, 0x0200, CRC(756b90cc) SHA1(b78762e354f1316087f9de4005734c343356c8ef) )
+	ROM_LOAD( "paperboy-eeprom.bin", 0x0000, 0x0200, CRC(1bbf9b07) SHA1(3c4c9c8867f5d0e2d98201719c9ad45f5468c50b) )
 ROM_END
 
 

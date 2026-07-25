@@ -1,86 +1,29 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/***************************************************************************
+/**************************************************************************************************
 
-Sega System Control Unit (c) 1995 Sega
+Sega Saturn System Control Unit (c) 1995 Sega/Yamaha
 
 TODO:
-- make a screen_device subclass, add pixel timers & irq callbacks to it;
+- Rewrite DMA;
+\- make it single step;
+\- implement DMA priority mechanism;
+\- implement penalties for attached devices;
+   (cfr. 3dlemminj title screen "3d" logo going fast and glitchy)
+\- implement ruleset mumbo jumbo;
+- Verify Timer 1 (seems unaffected even after rewriting it?)
 - A-Bus external interrupts;
-- Pad signal (lightgun I presume);
-- Improve DMA, use DRQ model and timers, make them subdevices?
-(old DMA TODO)
-- Remove CD transfer DMA hack (tied with CD block bug(s)?)
-- Add timings(but how fast are each DMA?).
-- Add level priority & DMA status register.
+- Pad irq signal (lightgun?);
 
-***************************************************************************/
-/**********************************************************************************
-SCU Register Table
-offset,relative address
-Registers are in long words.
-===================================================================================
-0     0000  Level 0 DMA Set Register
-1     0004
-2     0008
-3     000c
-4     0010
-5     0014
-6     0018
-7     001c
-8     0020  Level 1 DMA Set Register
-9     0024
-10    0028
-11    002c
-12    0030
-13    0034
-14    0038
-15    003c
-16    0040  Level 2 DMA Set Register
-17    0044
-18    0048
-19    004c
-20    0050
-21    0054
-22    0058
-23    005c
-24    0060  DMA Forced Stop
-25    0064
-26    0068
-27    006c
-28    0070  <Free>
-29    0074
-30    0078
-31    007c  DMA Status Register
-32    0080  DSP Program Control Port
-33    0084  DSP Program RAM Data Port
-34    0088  DSP Data RAM Address Port
-35    008c  DSP Data RAM Data Port
-36    0090  Timer 0 Compare Register
-37    0094  Timer 1 Set Data Register
-38    0098  Timer 1 Mode Register
-39    009c  <Free>
-40    00a0  Interrupt Mask Register
-41    00a4  Interrupt Status Register
-42    00a8  A-Bus Interrupt Acknowledge
-43    00ac  <Free>
-44    00b0  A-Bus Set Register
-45    00b4
-46    00b8  A-Bus Refresh Register
-47    00bc  <Free>
-48    00c0
-49    00c4  SCU SDRAM Select Register
-50    00c8  SCU Version Register
-51    00cc  <Free>
-52    00cf
-===================================================================================
+===================================================================================================
+
 DMA Status Register(32-bit):
 xxxx xxxx x--- xx-- xx-- xx-- xx-- xx-- UNUSED
 ---- ---- -x-- ---- ---- ---- ---- ---- DMA DSP-Bus access
 ---- ---- --x- ---- ---- ---- ---- ---- DMA B-Bus access
 ---- ---- ---x ---- ---- ---- ---- ---- DMA A-Bus access
----- ---- ---- --x- ---- ---- ---- ---- DMA lv 1 interrupt
----- ---- ---- ---x ---- ---- ---- ---- DMA lv 0 interrupt
+---- ---- ---- --x- ---- ---- ---- ---- DMA lv 1 interrupted
+---- ---- ---- ---x ---- ---- ---- ---- DMA lv 0 interrupted
 ---- ---- ---- ---- --x- ---- ---- ---- DMA lv 2 in stand-by
 ---- ---- ---- ---- ---x ---- ---- ---- DMA lv 2 in operation
 ---- ---- ---- ---- ---- --x- ---- ---- DMA lv 1 in stand-by
@@ -90,16 +33,11 @@ xxxx xxxx x--- xx-- xx-- xx-- xx-- xx-- UNUSED
 ---- ---- ---- ---- ---- ---- ---- --x- DSP side DMA in stand-by
 ---- ---- ---- ---- ---- ---- ---- ---x DSP side DMA in operation
 
-**********************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "saturn_scu.h"
 
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
 
 // device type definition
 DEFINE_DEVICE_TYPE(SATURN_SCU, saturn_scu_device, "saturn_scu", "Sega Saturn System Control Unit (Yamaha 315-5688)")
@@ -109,9 +47,9 @@ DEFINE_DEVICE_TYPE(SATURN_SCU, saturn_scu_device, "saturn_scu", "Sega Saturn Sys
 //-------------------------------------------------
 
 saturn_scu_device::saturn_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SATURN_SCU, tag, owner, clock),
-	m_scudsp(*this, "scudsp"),
-	m_hostcpu(*this, finder_base::DUMMY_TAG)
+	: device_t(mconfig, SATURN_SCU, tag, owner, clock)
+	, m_scudsp(*this, "scudsp")
+	, m_hostcpu(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -185,6 +123,19 @@ void saturn_scu_device::device_add_mconfig(machine_config &config)
 	m_scudsp->out_irq_callback().set(DEVICE_SELF, FUNC(saturn_scu_device::scudsp_end_w));
 	m_scudsp->in_dma_callback().set(FUNC(saturn_scu_device::scudsp_dma_r));
 	m_scudsp->out_dma_callback().set(FUNC(saturn_scu_device::scudsp_dma_w));
+	m_scudsp->out_ddwt_callback().set([this] (int state) {
+		if (state)
+			m_dma_status |= DMA_DSP_WAIT;
+		else
+			m_dma_status &= ~(DMA_DSP_WAIT);
+	});
+	m_scudsp->out_ddmv_callback().set([this] (int state) {
+		if (state)
+			m_dma_status |= DMA_DSP_MOVE;
+		else
+			m_dma_status &= ~(DMA_DSP_MOVE);
+	});
+
 }
 
 
@@ -240,6 +191,7 @@ void saturn_scu_device::device_start()
 	m_dma_timer[0] = timer_alloc(FUNC(saturn_scu_device::dma_tick<DMALV0_ID>), this);
 	m_dma_timer[1] = timer_alloc(FUNC(saturn_scu_device::dma_tick<DMALV1_ID>), this);
 	m_dma_timer[2] = timer_alloc(FUNC(saturn_scu_device::dma_tick<DMALV2_ID>), this);
+	m_timer1 = timer_alloc(FUNC(saturn_scu_device::timer1_irq_cb), this);
 }
 
 
@@ -254,12 +206,25 @@ void saturn_scu_device::device_reset()
 
 	for(int i = 0; i < 3; i++)
 	{
-		m_dma[i].start_factor = 7;
-		m_dma_timer[i]->reset();
+		m_dma[i].src_add = 4;
+		m_dma[i].dst_add = 2;
+		m_dma[i].start_factor = DMA_EVENT_TRIGGER;
+		m_dma_timer[i]->adjust(attotime::never);
+		m_dma[i].enable_mask = false;
 	}
 
-	m_status = 0;
+	m_dma_status = 0;
 	m_current_irq_level = 0;
+
+	m_tenb = false;
+	m_t1md = false;
+	m_timer0_counter = 0;
+	m_timer1->adjust(attotime::never);
+}
+
+void saturn_scu_device::device_clock_changed()
+{
+	m_scudsp->set_unscaled_clock(this->clock() / 4);
 }
 
 //-------------------------------------------------
@@ -337,7 +302,7 @@ void saturn_scu_device::dma_common_w(uint8_t offset,uint8_t level,uint32_t data)
 			m_dma[level].enable_mask = BIT(data,8);
 
 			// check if DxGO is enabled for start factor = 7
-			if(m_dma[level].enable_mask == true && data & 1 && m_dma[level].start_factor == 7)
+			if(m_dma[level].enable_mask == true && data & 1 && m_dma[level].start_factor == DMA_EVENT_TRIGGER)
 			{
 				if(m_dma[level].indirect_mode == true)
 					handle_dma_indirect(level);
@@ -364,9 +329,9 @@ void saturn_scu_device::dma_common_w(uint8_t offset,uint8_t level,uint32_t data)
 inline void saturn_scu_device::update_dma_status(uint8_t level,bool state)
 {
 	if(state)
-		m_status |= (0x10 << 4 * level);
+		m_dma_status |= (0x10 << 4 * level);
 	else
-		m_status &= ~(0x10 << 4 * level);
+		m_dma_status &= ~(0x10 << 4 * level);
 }
 
 void saturn_scu_device::handle_dma_direct(uint8_t level)
@@ -388,7 +353,7 @@ void saturn_scu_device::handle_dma_direct(uint8_t level)
 	if((m_dma[level].src & 0x07f00000) == 0)
 	{
 		//popmessage("Warning: SCU transfer from BIOS area, contact MAMEdev");
-		m_ist |= (IRQ_DMAILL);
+		m_ist |= IST_DMAILL;
 		test_pending_irqs();
 		return;
 	}
@@ -402,7 +367,8 @@ void saturn_scu_device::handle_dma_direct(uint8_t level)
 	if ((m_dma[level].dst & 0x07f0'0000) == 0x05c0'0000 && m_dma[level].size >= 0x80000)
 		m_dma[level].size = 0x80000 - (m_dma[level].dst & 0x7fffe);
 
-	// stv:colmns97, which doesn't work right (timing more likely, also ST-V has more soundram)
+	// stv:colmns97 & stv:wwshin, which doesn't work right
+	// (timing more likely, also ST-V has more soundram)
 //  if ((m_dma[level].dst & 0x07f0'0000) == 0x05a0'0000 && m_dma[level].size >= 0x80000)
 //      m_dma[level].size = 0x80000 - (m_dma[level].dst & 0x7ffff);
 
@@ -554,14 +520,14 @@ inline void saturn_scu_device::dma_single_transfer(uint32_t src, uint32_t dst,ui
 	*src_shift ^= 1;
 }
 
-inline void saturn_scu_device::dma_start_factor_ack(uint8_t event)
+inline void saturn_scu_device::dma_start_factor_ack(dma_event_id_t event)
 {
 	for(int i = 0; i < 3; i++)
 	{
 		if(m_dma[i].enable_mask == true && m_dma[i].start_factor == event)
 		{
-			if(m_dma[i].indirect_mode == true)      { handle_dma_indirect(i); }
-			else                                    { handle_dma_direct(i); }
+			if(m_dma[i].indirect_mode == true) { handle_dma_indirect(i); }
+			else                               { handle_dma_direct(i); }
 		}
 	}
 }
@@ -575,7 +541,7 @@ void saturn_scu_device::dma_lv2_w(offs_t offset, uint32_t data) { dma_common_w(o
 
 uint32_t saturn_scu_device::dma_status_r()
 {
-	return m_status;
+	return m_dma_status;
 }
 
 //**************************************************************************
@@ -585,51 +551,36 @@ uint32_t saturn_scu_device::dma_status_r()
 void saturn_scu_device::t0_compare_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_t0c);
+	m_t0c &= 0x3ff;
 }
 
 void saturn_scu_device::t1_setdata_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_t1s);
+	m_t1s &= 0x1ff;
 }
 
 /*
- ---- ---x ---- ---- T1MD Timer 1 mode (0=each line, 1=only at timer 0 lines)
- ---- ---- ---- ---x TENB Timers enable
+ * ---- ---x ---- ---- T1MD Timer 1 mode (0=each line, 1=only at timer 0 lines)
+ * ---- ---- ---- ---x TENB Timers enable
  */
 void saturn_scu_device::t1_mode_w(uint16_t data)
 {
-	m_t1md = BIT(data,8);
-	m_tenb = BIT(data,0);
+	m_t1md = BIT(data, 8);
+	m_tenb = BIT(data, 0);
+	if (!m_tenb)
+	{
+		m_timer0_counter = 0;
+		m_timer1->adjust(attotime::never);
+	}
 }
 
-
-void saturn_scu_device::check_scanline_timers(int scanline, int y_step)
+TIMER_CALLBACK_MEMBER(saturn_scu_device::timer1_irq_cb)
 {
-	if(m_tenb == false)
-		return;
+	dma_start_factor_ack(DMA_EVENT_TIMER1);
 
-	int timer0_compare = (m_t0c & 0x3ff) * y_step;
-
-	// Timer 0
-	if(scanline == timer0_compare)
-	{
-		dma_start_factor_ack(3);
-
-		m_ist |= IRQ_TIMER_0;
-		test_pending_irqs();
-	}
-
-	// Timer 1
-	// TODO: should happen after some time when hblank-in is received then counts down t1s
-	if(
-	  ((m_t1md == false) && ((scanline % y_step) == 0)) ||
-	  ((m_t1md == true) && (scanline == timer0_compare)) )
-	{
-		dma_start_factor_ack(4);
-
-		m_ist |= IRQ_TIMER_1;
-		test_pending_irqs();
-	}
+	m_ist |= IST_TIMER_1;
+	test_pending_irqs();
 }
 
 
@@ -668,6 +619,18 @@ void saturn_scu_device::test_pending_irqs()
 	if (m_current_irq_level != 0)
 		return;
 
+	// 15: vblank-in
+	// 14: vblank-out
+	// 13: hblank-in
+	// 12: timer 0
+	// 11: timer 1
+	// 10: DSP end
+	//  9: SCSP
+	//  8: SMPC & PAD
+	//  6: DMA end LV2 & LV1
+	//  5: DMA end LV0
+	//  3: DMA illegal
+	//  2: VDP1 draw end
 	const int irq_level[32] = { 0xf, 0xe, 0xd, 0xc,
 								0xb, 0xa, 0x9, 0x8,
 								0x8, 0x6, 0x6, 0x5,
@@ -704,10 +667,11 @@ void saturn_scu_device::vblank_out_w(int state)
 	if(!state)
 		return;
 
-	dma_start_factor_ack(1);
+	dma_start_factor_ack(DMA_EVENT_VBLANKOUT);
 
-	m_ist |= IRQ_VBLANK_OUT;
+	m_ist |= IST_VBLANK_OUT;
 	test_pending_irqs();
+	m_timer0_counter = 0;
 }
 
 void saturn_scu_device::vblank_in_w(int state)
@@ -715,9 +679,9 @@ void saturn_scu_device::vblank_in_w(int state)
 	if(!state)
 		return;
 
-	dma_start_factor_ack(0);
+	dma_start_factor_ack(DMA_EVENT_VBLANKIN);
 
-	m_ist |= IRQ_VBLANK_IN;
+	m_ist |= IST_VBLANK_IN;
 	test_pending_irqs();
 }
 
@@ -726,9 +690,32 @@ void saturn_scu_device::hblank_in_w(int state)
 	if(!state)
 		return;
 
-	dma_start_factor_ack(2);
+	dma_start_factor_ack(DMA_EVENT_HBLANKIN);
+	m_ist |= IST_HBLANK_IN;
 
-	m_ist |= IRQ_HBLANK_IN;
+	// NOTE: the counter still runs, it's the irq that fires if timer is enabled
+	// also that this never fires if t0c & 0x200
+	m_timer0_counter ++;
+	m_timer0_counter &= 0x1ff;
+	if (m_tenb)
+	{
+		const bool timer0_hit = m_timer0_counter == m_t0c;
+		if (timer0_hit)
+		{
+			dma_start_factor_ack(DMA_EVENT_TIMER0);
+			m_ist |= IST_TIMER_0;
+		}
+
+		// Timer 1 conditions
+		// - Mode is 0 (all scanlines)
+		// - Mode is 1 and timer 0 is hit
+		const bool timer1_hit = (timer0_hit || !m_t1md);
+		if (timer1_hit)
+		{
+			m_timer1->adjust(attotime::from_ticks(m_t1s, this->clock() / 8));
+		}
+	}
+
 	test_pending_irqs();
 }
 
@@ -737,9 +724,9 @@ void saturn_scu_device::vdp1_end_w(int state)
 	if(!state)
 		return;
 
-	dma_start_factor_ack(6);
+	dma_start_factor_ack(DMA_EVENT_VDP1);
 
-	m_ist |= IRQ_VDP1_END;
+	m_ist |= IST_VDP1_END;
 	test_pending_irqs();
 }
 
@@ -748,9 +735,9 @@ void saturn_scu_device::sound_req_w(int state)
 	if(!state)
 		return;
 
-	dma_start_factor_ack(5);
+	dma_start_factor_ack(DMA_EVENT_SCSP);
 
-	m_ist |= IRQ_SOUND_REQ;
+	m_ist |= IST_SOUND_REQ;
 	test_pending_irqs();
 }
 
@@ -759,7 +746,7 @@ void saturn_scu_device::smpc_irq_w(int state)
 	if(!state)
 		return;
 
-	m_ist |= IRQ_SMPC;
+	m_ist |= IST_SMPC;
 	test_pending_irqs();
 }
 
@@ -768,7 +755,7 @@ void saturn_scu_device::scudsp_end_w(int state)
 	if(!state)
 		return;
 
-	m_ist |= IRQ_DSP_END;
+	m_ist |= IST_DSP_END;
 	test_pending_irqs();
 }
 

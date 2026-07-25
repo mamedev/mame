@@ -560,10 +560,11 @@ void cv1k_state::cv1k(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh(HZ_TO_ATTOSECONDS(60.024)); // measured from ibara PCB rates - 60.024Hz, 262 total lines
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(512, 512);
-	screen.set_visarea(0, 320-1, 0, 240-1);
+	// Measured from futari15 PCB.
+	// 262 total lines, vsync pulse is 3 lines. 19 non-sync lines are empty.
+	// Each line is 407 pixels, hsync pulse is 29 pixels. 58 non-sync pixels are empty.
+	// Framerate is 60.0183806291 Hz (6,400,000 / (262 * 407) ).
+	screen.set_raw(12.8_MHz_XTAL / 2, 407, 0, 320, 262, 0, 240);
 	screen.set_screen_update(m_blitter, FUNC(cv1k_blitter_device::screen_update));
 
 	SPEAKER(config, "mono").front_center();

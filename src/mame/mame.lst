@@ -612,6 +612,9 @@ s612
 s700
 x7000
 
+@source:akai/xr10.cpp
+xr10
+
 @source:alesis/alesis.cpp
 hr16
 hr16b
@@ -17217,13 +17220,14 @@ vp122
 adam
 
 @source:coleco/coleco.cpp
+bit90
 coleco
 colecop
 czz50
 dina
 onyx
 prsarcde
-bit90
+splice
 
 @source:coleco/wrinkles.cpp
 wrinkles
@@ -20784,6 +20788,7 @@ mephisto3d
 mephistoa
 mephistoe2
 mephistoe2a
+mephistoe2o
 mephistoj
 
 @source:hegenerglaser/europa.cpp
@@ -43402,6 +43407,8 @@ anpanmct
 cmcwa
 cscaoysd
 dbzbgck
+dchopper
+gkitarou
 gyakyu
 kghmytda
 satoyama

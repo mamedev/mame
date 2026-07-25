@@ -510,6 +510,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="dongjr" cloneof="dkongjr">
+		<description>Dong Junior (Brazil)</description>
+		<year>1983</year>
+		<publisher>Splice</publisher>
+		<info name="language" value="Portuguese" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="24576">
+				<rom name="dong jr.col" size="24576" crc="acb70368" sha1="0df347ad72222442252413cf2b74f49f4a434665" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="docastle">
 		<!-- Mr. Do's Castle (1983)(Parker Brothers).bin -->
 		<description>Mr. Do!'s Castle</description>
@@ -721,6 +733,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="zorf" cloneof="gorf">
+		<description>Zorf (Brazil)</description>
+		<year>1983</year>
+		<publisher>Splice</publisher>
+		<info name="language" value="Portuguese" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="Zorf (Splice).col" size="16384" crc="40ef6b2c" sha1="650a54dfc9f7f619c58070eb39f9e128514a47e8" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gustbust">
 		<!-- Gust Buster (1983)(Sunrise Software).bin -->
 		<description>Gust Buster</description>
@@ -860,6 +884,18 @@ license:CC0-1.0
 			<dataarea name="rom" size="16384">
 				<rom name="ladybug.1" size="8192" crc="6e63f2ed" sha1="3dd931e093cbe757d93df60055cbdad9e8055e26" offset="0x0000" />
 				<rom name="ladybug.2" size="8192" crc="147b94fe" sha1="d472892c4b63d52750f9485f9b0d525f02bfad1e" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="papatudo" cloneof="ladybug">
+		<description>Papa Tudo (Brazil)</description>
+		<year>1983</year>
+		<publisher>Splice</publisher>
+		<info name="language" value="Portuguese" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="Papa Tudo (Splice).col" size="16384" crc="4532e7bb" sha1="d435d08476bd4177ae8db852bc7e0df771024c62" />
 			</dataarea>
 		</part>
 	</software>
@@ -1083,6 +1119,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="mtrapbr" cloneof="mtrap">
+		<description>Ratoeira (Brazil)</description>
+		<year>1983</year>
+		<publisher>Splice</publisher>
+		<info name="language" value="Portuguese" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="ratoeira.col" size="16384" crc="4c42ea5c" sha1="ce99d6e0a46347f06f0c0cac8b49bd52c41d0ed1" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="novablst">
 		<!-- Nova Blast (1983)(Coleco).bin -->
 		<description>Nova Blast</description>
@@ -1185,6 +1233,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="panicbr" cloneof="panic">
+		<description>Pânico Cósmico (Brazil)</description>
+		<year>1983</year>
+		<publisher>Splice</publisher>
+		<info name="language" value="Portuguese" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="Panico Cosmico (Splice).col" size="16384" crc="03459417" sha1="71b43f1900d0c88fae631e70f0bde76d2c149dae" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pepper2">
 		<!-- Pepper II (1983)(Coleco).bin -->
 		<description>Pepper II</description>
@@ -1196,6 +1256,18 @@ license:CC0-1.0
 			<dataarea name="rom" size="16384">
 				<rom name="pepper2.1" size="8192" crc="2ea3deb5" sha1="bf1e30be5aa3e4438c4444ae551d4e8a93fea0cc" offset="0x0000" />
 				<rom name="pepper2.2" size="8192" crc="cd31ba03" sha1="bf1e308ffb9f46360d6d0dd108a2f2ccdd2e9071" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zipper" cloneof="pepper2">
+		<description>Zipper (Brazil)</description>
+		<year>1983</year>
+		<publisher>Splice</publisher>
+		<info name="language" value="Portuguese" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="Zipper (Splice).col" size="16384" crc="dba855f9" sha1="42c209bb564b4dc3b5a8a64628e0c58bfc11db7c" />
 			</dataarea>
 		</part>
 	</software>
@@ -1582,6 +1654,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="spacfurybr" cloneof="spacfury">
+		<description>Fúria Espaçial (Brazil)</description>
+		<year>1983</year>
+		<publisher>Splice</publisher>
+		<info name="language" value="Portuguese" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="Furia Espacial (Splice).col" size="16384" crc="4a3e23c9" sha1="046363b2d7c33b117d9c1d551f64db1a4879b582" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spectron">
 		<!-- Spectron (1983)(Spectravideo).bin -->
 		<description>Spectron</description>
@@ -1798,6 +1882,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="venturebr" cloneof="venture">
+		<description>Aventura (Brazil)</description>
+		<year>1983</year>
+		<publisher>Splice</publisher>
+		<info name="language" value="Portuguese" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="Aventura (Splice).col" size="16384" crc="639912f1" sha1="10e63559c2d341cd2c408072a7d0340921cf1a11" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wingwar">
 		<!-- Wing War (1983)(Imagic).bin -->
 		<description>Wing War</description>
@@ -2000,6 +2096,18 @@ license:CC0-1.0
 				<rom name="dkonga.1" size="8192" crc="dcaf20d8" sha1="0e8c227b69453ed21850baffff882ed272966500" offset="0x0000" />
 				<rom name="dkonga.2" size="8192" crc="6045f75d" sha1="6e84f270549b0c239fbab325983b1dcb8d1f4752" offset="0x2000" />
 				<rom name="dkonga.3" size="8192" crc="00739499" sha1="283f7e56a283ce5d5c54fc6f5f7f9ff0ff543195" offset="0x4000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdong" cloneof="dkong">
+		<description>Monkey Dong (Brazil)</description>
+		<year>1983</year>
+		<publisher>Splice</publisher>
+		<info name="language" value="Portuguese" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="24576">
+				<rom name="Monkey Dong (Splice).col" size="24576" crc="de5e6f45" sha1="e9747a70a594e4312180ace1d2c01943ae9eeab2" />
 			</dataarea>
 		</part>
 	</software>

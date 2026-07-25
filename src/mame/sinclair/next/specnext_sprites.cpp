@@ -73,7 +73,6 @@ specnext_sprites_device &specnext_sprites_device::set_palette(const char *tag, u
 
 void specnext_sprites_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 pmask)
 {
-	if (m_sprites_cache.empty()) update_sprites_cache();
 	const rectangle clipped = m_clip_window & cliprect;
 
 	for (auto i = 0; i < m_sprites_cache.size(); i++ )
@@ -206,7 +205,7 @@ void specnext_sprites_device::update_config()
 
 u8 specnext_sprites_device::status_r()
 {
-	if (m_sprites_cache.empty()) update_sprites_cache();
+	if (m_cache_dirty) { update_sprites_cache(); m_cache_dirty = false; }
 
 	bool max_sprites = 0; // TODO line reached max count allowed
 	bool collision = 0;
@@ -280,7 +279,7 @@ void specnext_sprites_device::io_w(offs_t addr, u8 data)
 	}
 	else if (addr == 0x57)
 	{
-		m_sprites_cache.clear();
+		m_cache_dirty = true;
 		m_sprite_attr_ram[m_attr_index] = data;
 
 		const bool index_inc_attr_by_8 = BIT(m_attr_index, 2) || ((BIT(m_attr_index, 0, 3) == 0b011) && (BIT(data, 6) == 0));
@@ -310,7 +309,7 @@ void specnext_sprites_device::mirror_data_w(u8 mirror_data)
 {
 	if (m_mirror_index <= 0b100)
 	{
-		m_sprites_cache.clear();
+		m_cache_dirty = true;
 		m_sprite_attr_ram[(BIT(m_mirror_sprite_q, 0, TOTAL_SPRITES_BITS) << 3) | m_mirror_index] = mirror_data;
 	}
 
@@ -372,13 +371,13 @@ void specnext_sprites_device::device_reset()
 	m_mirror_sprite_q = 0;
 
 	memset(m_sprite_attr_ram, 0, 128 * 8);
-	m_sprites_cache.clear();
+	m_cache_dirty = true;
 	update_config();
 }
 
 void specnext_sprites_device::device_post_load()
 {
-	m_sprites_cache.clear();
+	m_cache_dirty = true;
 	update_config();
 }
 
