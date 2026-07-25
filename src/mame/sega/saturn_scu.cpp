@@ -174,7 +174,7 @@ void saturn_scu_device::device_start()
 	save_item(NAME(m_dma[0].wup));
 	save_item(NAME(m_dma[0].initial_src));
 	save_item(NAME(m_dma[0].initial_dst));
-	save_item(NAME(m_dma[0].cd_transfer_flag));
+	save_item(NAME(m_dma[0].mode));
 	save_item(NAME(m_dma[0].done));
 	save_item(NAME(m_dma[0].count));
 	save_item(NAME(m_dma[0].cbus_cache_through));
@@ -193,7 +193,7 @@ void saturn_scu_device::device_start()
 	save_item(NAME(m_dma[1].wup));
 	save_item(NAME(m_dma[1].initial_src));
 	save_item(NAME(m_dma[1].initial_dst));
-	save_item(NAME(m_dma[1].cd_transfer_flag));
+	save_item(NAME(m_dma[1].mode));
 	save_item(NAME(m_dma[1].done));
 	save_item(NAME(m_dma[1].count));
 	save_item(NAME(m_dma[1].cbus_cache_through));
@@ -212,7 +212,7 @@ void saturn_scu_device::device_start()
 	save_item(NAME(m_dma[2].wup));
 	save_item(NAME(m_dma[2].initial_src));
 	save_item(NAME(m_dma[2].initial_dst));
-	save_item(NAME(m_dma[2].cd_transfer_flag));
+	save_item(NAME(m_dma[2].mode));
 	save_item(NAME(m_dma[2].done));
 	save_item(NAME(m_dma[2].count));
 	save_item(NAME(m_dma[2].bbus_sound_access));
@@ -249,13 +249,17 @@ void saturn_scu_device::device_reset()
 		m_dma[i].done = false;
 		m_dma[i].cbus_cache_through = false;
 		m_dma[i].bbus_sound_access = false;
+		m_dma[i].mode = DMA_MODE_RESET;
 	}
 
 	m_dma_tick_timer->adjust(attotime::never);
 	m_dma_status = 0;
 	m_current_irq_level = 0;
-	m_bbus_sound_dtack_cb(0);
-	m_cbus_dtack_cb(0);
+
+	// Nope until we have a proper DTACK instead of an HALT,
+	// SMPC triggers this thru dotsel (2 credits meme ...)
+	//m_bbus_sound_dtack_cb(0);
+	//m_cbus_dtack_cb(0);
 
 	m_tenb = false;
 	m_t1md = false;
@@ -402,7 +406,16 @@ void saturn_scu_device::handle_dma_direct(uint8_t level)
 	if(m_dma[level].rup == false) m_dma[level].initial_src = m_dma[level].src;
 	if(m_dma[level].wup == false) m_dma[level].initial_dst = m_dma[level].dst;
 
-	m_dma[level].cd_transfer_flag = m_dma[level].src_add == 0 && (m_dma[level].src & 0x07ff'ffff) == 0x05818000;
+	m_dma[level].mode = DMA_MODE_RESET;
+	// CD transfers are special even without the hack below
+	if (m_dma[level].src_add == 0 && (m_dma[level].src & 0x07ff'ffff) == 0x05818000)
+		m_dma[level].mode |= DMA_MODE_CD;
+
+	// if target is Work RAM H, the add value is fixed.
+	// behaviour confirmed by fromanc2, stv:vmahjong and burningru
+	if ((m_dma[level].dst & 0x07000000) == 0x06000000)
+		m_dma[level].mode |= DMA_MODE_CBUS_WRITE;
+
 	m_dma[level].count = 0;
 	m_dma[level].done = false;
 
@@ -587,67 +600,7 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick_cb)
 			return;
 		}
 
-		// TODO: we probably need to functional table-ize what follows up
-
-		// TODO: Many games directly accesses CD-ROM register 0x05818000,
-		// it must be a dword access with current implementation otherwise it won't work
-		if(m_dma[level].cd_transfer_flag)
-		{
-			if((m_dma[level].dst & 0x07000000) == 0x06000000)
-				m_dma[level].dst_add = 4;
-			else
-				m_dma[level].dst_add <<= 1;
-
-			//printf("%d: %08x %08x %d\n", level, m_dma[level].dst, m_dma[level].size, m_dma[level].dst_add);
-
-			//for (i = 0; i < m_dma[level].size; i+=m_dma[level].dst_add)
-			{
-				const u32 src_address = m_dma[level].src & 0x07ff'ffff;
-				const u32 dst_address = m_dma[level].dst & 0x07ff'ffff;
-
-				m_hostspace->write_dword(dst_address, m_hostspace->read_dword(src_address));
-				if(m_dma[level].dst_add == 8)
-					m_hostspace->write_dword(dst_address + 4,m_hostspace->read_dword(src_address));
-
-				m_cbus_dtack_cb(m_dma[level].cbus_cache_through);
-				m_bbus_sound_dtack_cb(m_dma[level].bbus_sound_access);
-
-				m_dma[level].src += m_dma[level].src_add;
-				m_dma[level].dst += m_dma[level].dst_add;
-			}
-			m_dma[level].count += m_dma[level].dst_add;
-		}
-		else
-		{
-			//uint8_t src_shift;
-//
-			//src_shift = ((m_dma[level].src & 2) >> 1) ^ 1;
-
-			//printf("%d %08x %08x\n", level, m_dma[level].src, m_dma[level].dst);
-
-			// for (i = 0; i < m_dma[level].size; i+=2)
-			{
-				//dma_single_transfer(m_dma[level].src, m_dma[level].dst, &src_shift);
-				const u32 src_address = m_dma[level].src & 0x07ff'fffe;
-				const u32 dst_address = m_dma[level].dst & 0x07ff'fffe;
-
-				uint32_t src_data = m_hostspace->read_word(src_address);
-
-				m_hostspace->write_word(dst_address, src_data);
-				m_cbus_dtack_cb(m_dma[level].cbus_cache_through);
-				m_bbus_sound_dtack_cb(m_dma[level].bbus_sound_access);
-
-				m_dma[level].src += 2;
-				// TODO: reimplement me
-//				if(src_shift)
-//					m_dma[level].src+= m_dma[level].src_add;
-//
-				// if target is Work RAM H, the add value is fixed, behaviour confirmed by fromanc2, stv:vmahjong and burningru
-				m_dma[level].dst += ((m_dma[level].dst & 0x07000000) == 0x06000000) ? 2 : m_dma[level].dst_add;
-			}
-
-			m_dma[level].count += 2;
-		}
+ 		(this->*dma_transfer_table[m_dma[level].mode])(m_dma[level]);
 
 		if (m_dma[level].count >= m_dma[level].size)
 		{
@@ -671,6 +624,94 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick_cb)
 	}
 
 	m_dma_tick_timer->adjust(attotime::from_ticks(1, m_dma_clock_ref));
+}
+
+const saturn_scu_device::dma_transfer_func saturn_scu_device::dma_transfer_table[4] =
+{
+	&saturn_scu_device::dma_transfer_direct_default,
+	&saturn_scu_device::dma_transfer_direct_cbus_write,
+	&saturn_scu_device::dma_transfer_direct_cd,
+	&saturn_scu_device::dma_transfer_direct_cd_cbus_write
+};
+
+void saturn_scu_device::dma_transfer_direct_default(dma_channel_t &ch)
+{
+	//dma_single_transfer(m_dma[level].src, m_dma[level].dst, &src_shift);
+	const u32 src_address = ch.src & 0x07ff'fffe;
+	const u32 dst_address = ch.dst & 0x07ff'fffe;
+
+	uint32_t src_data = m_hostspace->read_word(src_address);
+
+	m_hostspace->write_word(dst_address, src_data);
+	m_cbus_dtack_cb(ch.cbus_cache_through);
+	m_bbus_sound_dtack_cb(ch.bbus_sound_access);
+
+	ch.src += 2;
+	// TODO: reimplement me
+// if(src_shift)
+//	dma_params.src+= dma_params.src_add;
+//
+	ch.dst += ch.dst_add;
+
+	ch.count += 2;
+}
+
+void saturn_scu_device::dma_transfer_direct_cbus_write(dma_channel_t &ch)
+{
+	//dma_single_transfer(m_dma[level].src, m_dma[level].dst, &src_shift);
+	const u32 src_address = ch.src & 0x07ff'fffe;
+	const u32 dst_address = ch.dst & 0x07ff'fffe;
+
+	uint32_t src_data = m_hostspace->read_word(src_address);
+
+	m_hostspace->write_word(dst_address, src_data);
+	m_cbus_dtack_cb(ch.cbus_cache_through);
+	m_bbus_sound_dtack_cb(ch.bbus_sound_access);
+
+	ch.src += 2;
+	// TODO: reimplement me
+// if(src_shift)
+//	dma_params.src+= dma_params.src_add;
+//
+	ch.dst += 2;
+
+	ch.count += 2;
+}
+
+void saturn_scu_device::dma_transfer_direct_cd(dma_channel_t &ch)
+{
+	const u32 dst_add = ch.dst_add << 1;
+
+	const u32 src_address = ch.src & 0x07ff'fffc;
+	const u32 dst_address = ch.dst & 0x07ff'fffc;
+
+	m_hostspace->write_dword(dst_address, m_hostspace->read_dword(src_address));
+	if(dst_add == 8)
+		m_hostspace->write_dword(dst_address + 4, m_hostspace->read_dword(src_address));
+
+	m_cbus_dtack_cb(ch.cbus_cache_through);
+	m_bbus_sound_dtack_cb(ch.bbus_sound_access);
+
+	ch.src += ch.src_add;
+	ch.dst += dst_add;
+	ch.count += dst_add;
+}
+
+void saturn_scu_device::dma_transfer_direct_cd_cbus_write(dma_channel_t &ch)
+{
+	const u32 src_address = ch.src & 0x07ff'fffc;
+	const u32 dst_address = ch.dst & 0x07ff'fffc;
+
+	m_hostspace->write_dword(dst_address, m_hostspace->read_dword(src_address));
+	if(ch.dst_add == 8)
+		m_hostspace->write_dword(dst_address + 4, m_hostspace->read_dword(src_address));
+
+	m_cbus_dtack_cb(ch.cbus_cache_through);
+	m_bbus_sound_dtack_cb(ch.bbus_sound_access);
+
+	ch.src += ch.src_add;
+	ch.dst += 4;
+	ch.count += 4;
 }
 
 

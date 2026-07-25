@@ -17,6 +17,7 @@ public:
 	void regs_map(address_map &map);
 
 	void set_is_pal(bool is_pal) { m_is_pal = is_pal; }
+	void set_dotsel(bool is_352_mode) { m_dotsel_352 = is_352_mode; }
 
 	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 
@@ -46,6 +47,8 @@ private:
 	emu_timer *m_video_sync_timer;
 
 	bool m_is_pal;
+	bool m_dotsel_352;
+
 	u16 m_tvmd, m_old_tvmd;
 	u8 m_disp, m_bdclmd, m_lsmd, m_vreso, m_hreso;
 	bool m_odd_bit;

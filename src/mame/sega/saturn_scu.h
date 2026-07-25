@@ -135,8 +135,16 @@ private:
 
 	void test_pending_irqs();
 
+	// intended to be used as bitwise
+	enum dma_mode_t : uint32_t {
+		DMA_MODE_RESET      = 0 << 0,
+		DMA_MODE_CBUS_WRITE = 1 << 1,
+		DMA_MODE_CD         = 1 << 2,
+		DMA_MODE_INDIRECT   = 1 << 3
+	};
 
-	struct {
+
+	struct dma_channel_t {
 		uint32_t    src;       /* Source DMA lv n address*/
 		uint32_t    dst;       /* Destination DMA lv n address*/
 		uint32_t    src_add;   /* Source Addition for DMA lv n*/
@@ -147,15 +155,24 @@ private:
 		uint32_t    initial_dst;
 		uint32_t    count;
 		uint8_t     start_factor;
+		uint32_t    mode;
 		bool        enable_mask;
 		bool        indirect_mode;
 		bool        rup;
 		bool        wup;
-		bool        cd_transfer_flag;
 		bool        done;
 		bool        cbus_cache_through;
 		bool        bbus_sound_access;
 	}m_dma[3];
+
+
+	typedef void (saturn_scu_device::*dma_transfer_func)(dma_channel_t &ch);
+	static const dma_transfer_func dma_transfer_table[4];
+
+	void dma_transfer_direct_default(dma_channel_t &ch);
+	void dma_transfer_direct_cbus_write(dma_channel_t &ch);
+	void dma_transfer_direct_cd(dma_channel_t &ch);
+	void dma_transfer_direct_cd_cbus_write(dma_channel_t &ch);
 
 	uint32_t dma_common_r(uint8_t offset,uint8_t level);
 	void dma_common_w(uint8_t offset,uint8_t level,uint32_t data);

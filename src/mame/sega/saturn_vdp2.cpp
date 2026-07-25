@@ -44,6 +44,7 @@ void saturn_vdp2_device::device_start()
 	save_item(NAME(m_odd_bit));
 	save_item(NAME(m_hdisplay));
 	save_item(NAME(m_vdisplay));
+	save_item(NAME(m_dotsel_352));
 
 	save_item(NAME(m_exten));
 	save_item(NAME(m_exlten));
@@ -56,6 +57,11 @@ void saturn_vdp2_device::device_start()
 
 	save_item(NAME(m_hcounter_latch));
 	save_item(NAME(m_vcounter_latch));
+
+	m_hreso = 0;
+	m_vreso = 0;
+	m_dotsel_352 = false;
+
 }
 
 void saturn_vdp2_device::device_reset()
@@ -65,8 +71,9 @@ void saturn_vdp2_device::device_reset()
 	m_odd_bit = 1;
 	// shouldn't really matter
 	m_old_tvmd = 0xffff;
-	m_hreso = 0;
-	m_vreso = 0;
+//	m_hreso = 0;
+//	m_vreso = 0;
+//	m_dotsel_352 = true;
 	reconfigure_crtc();
 }
 
@@ -426,8 +433,13 @@ TIMER_CALLBACK_MEMBER(saturn_vdp2_device::sync_timer_cb)
 	int hsync = get_hblank();
 	int vsync = get_vblank();
 
-	m_vint_cb(vsync);
-	m_hint_cb(hsync);
+	// guard against the wrong DOTSEL being configured from SMPC.
+	// on real HW this causes monitor instability and unusable vblank IRQs.
+	if (BIT(m_hreso, 0) == m_dotsel_352)
+	{
+		m_vint_cb(vsync);
+		m_hint_cb(hsync);
+	}
 
 	if (vsync)
 	{
