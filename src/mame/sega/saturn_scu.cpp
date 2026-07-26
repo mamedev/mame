@@ -6,8 +6,6 @@ Sega Saturn System Control Unit (c) 1995 Sega/Yamaha
 
 TODO:
 - Rewrite DMA;
-\- make it single step;
-\- implement DMA priority mechanism;
 \- implement penalties for attached devices;
 \- implement ruleset mumbo jumbo;
 - Verify Timer 1 (seems unaffected even after rewriting it?)
@@ -31,10 +29,11 @@ C-Bus: $0600'0000 - $07ff'ffff (Work RAM-H, mirrored)
 #include "emu.h"
 #include "saturn_scu.h"
 
-#define LOG_DMA_MOVE  (1 << 1) // log the initial values prior to a DMA WAIT -> MOVE
-#define LOG_DMA_END   (1 << 2) // log the values at end of DMA
-#define LOG_DMA_STATE (1 << 3) // log state changes
-#define LOG_DMA_MODE  (1 << 4) // log accepted transfer state
+#define LOG_DMA_MOVE     (1 << 1) // log the initial values prior to a DMA WAIT -> MOVE
+#define LOG_DMA_END      (1 << 2) // log the values at end of DMA
+#define LOG_DMA_STATE    (1 << 3) // log state changes
+#define LOG_DMA_MODE     (1 << 4) // log accepted transfer state
+#define LOG_DMA_INDIRECT (1 << 5) // log indirect fetches (verbose)
 
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -62,6 +61,7 @@ saturn_scu_device::saturn_scu_device(const machine_config &mconfig, const char *
 //  LIVE DEVICE
 //**************************************************************************
 
+// TODO: honor mem_mask
 template <unsigned level> void saturn_scu_device::dma_map(address_map &map)
 {
 	map(0x00, 0x03).lrw32(
@@ -107,9 +107,9 @@ template <unsigned level> void saturn_scu_device::dma_map(address_map &map)
 			if(m_dma[level].enable_mask == true && data & 1 && m_dma[level].start_factor == DMA_EVENT_TRIGGER)
 			{
 				if(m_dma[level].indirect_mode == true)
-					handle_dma_indirect(level);
+					trigger_dma_indirect(level);
 				else
-					handle_dma_direct(level);
+					trigger_dma_direct(level);
 			}
 		})
 	);
@@ -231,6 +231,7 @@ void saturn_scu_device::device_start()
 	save_item(NAME(m_dma[0].start_factor));
 	save_item(NAME(m_dma[0].enable_mask));
 	save_item(NAME(m_dma[0].indirect_mode));
+	save_item(NAME(m_dma[0].indirect_fetch_phase));
 	save_item(NAME(m_dma[0].rup));
 	save_item(NAME(m_dma[0].wup));
 	save_item(NAME(m_dma[0].mode));
@@ -250,6 +251,7 @@ void saturn_scu_device::device_start()
 	save_item(NAME(m_dma[1].start_factor));
 	save_item(NAME(m_dma[1].enable_mask));
 	save_item(NAME(m_dma[1].indirect_mode));
+	save_item(NAME(m_dma[1].indirect_fetch_phase));
 	save_item(NAME(m_dma[1].rup));
 	save_item(NAME(m_dma[1].wup));
 	save_item(NAME(m_dma[1].mode));
@@ -269,6 +271,7 @@ void saturn_scu_device::device_start()
 	save_item(NAME(m_dma[2].start_factor));
 	save_item(NAME(m_dma[2].enable_mask));
 	save_item(NAME(m_dma[2].indirect_mode));
+	save_item(NAME(m_dma[2].indirect_fetch_phase));
 	save_item(NAME(m_dma[2].rup));
 	save_item(NAME(m_dma[2].wup));
 	save_item(NAME(m_dma[2].mode));
@@ -364,7 +367,7 @@ inline void saturn_scu_device::update_dma_status(int level, dma_state_t new_stat
 	LOGMASKED(LOG_DMA_STATE, "%s (%08x)\n", status_names[(m_dma_status >> log_shifts[level]) & 0x3], m_dma_status);
 }
 
-void saturn_scu_device::handle_dma_direct(uint8_t level)
+void saturn_scu_device::trigger_dma_direct(uint8_t level)
 {
 	// registers are DxR, DxW etc.
 	LOGMASKED(LOG_DMA_MOVE, "DMA%d direct R %08x W %08x C %08x RA %d WA %d %s %s\n",
@@ -372,8 +375,6 @@ void saturn_scu_device::handle_dma_direct(uint8_t level)
 		m_dma[level].src_add, m_dma[level].dst_add, m_dma[level].rup ? "RUP" : "", m_dma[level].wup ? "WUP" : "");
 
 	// stv:vmahjong loads game IPL twice at startup, one with cache the other without.
-	// DMA0 direct R 23bd4708 W 06020000 C 0009ac44 RA 4 WA 4
-	// DMA0 direct R 23bd4708 W 26020000 C 0009ac44 RA 4 WA 4
 	if (m_dma_status & 0x30 << level)
 	{
 		LOG("In-flight DMA%d attempt!\n", level);
@@ -423,7 +424,7 @@ void saturn_scu_device::handle_dma_direct(uint8_t level)
 	// saturn BIOS chains several cache through DMAs back-to-back with no status check
 	// clearly expect that the host CPU shouldn't do anything around the time the DMA goes.
 	m_dma[level].cbus_cache_through = (m_dma[level].src & 0x2700'0000) == 0x2600'0000 || (m_dma[level].dst & 0x2700'0000) == 0x2600'0000;
-	m_dma[level].bbus_sound_access = (m_dma[level].src & 0x07f0'0000) == 0x05a0'0000 || (m_dma[level].dst & 0x07f0'0000) == 0x05a0'0000;
+	m_dma[level].bbus_sound_access = (m_dma[level].src & 0x07e0'0000) == 0x05a0'0000 || (m_dma[level].dst & 0x07e0'0000) == 0x05a0'0000;
 
 	m_dma[level].live_src = m_dma[level].src;
 	m_dma[level].live_dst = m_dma[level].dst;
@@ -435,76 +436,29 @@ void saturn_scu_device::handle_dma_direct(uint8_t level)
 	m_dma_tick_timer->adjust(attotime::from_ticks(1, m_dma_clock_ref));
 }
 
-// TODO: rewrite me, inherit rules from direct mode and play along with the orchestrator
-void saturn_scu_device::handle_dma_indirect(uint8_t level)
+void saturn_scu_device::trigger_dma_indirect(uint8_t level)
 {
-	/*Helper to get out of the cycle*/
-	uint8_t job_done = 0;
-	/*temporary storage for the transfer data*/
-	uint32_t tmp_src;
-	uint32_t indirect_src,indirect_dst;
-	int32_t indirect_size;
-	uint32_t total_size = 0;
+	LOGMASKED(LOG_DMA_MOVE, "DMA%d indirect W %08x RA %d WA %d\n",
+		level, m_dma[level].dst, m_dma[level].src_add, m_dma[level].dst_add);
 
-	update_dma_status(level, DMA_STATE_MOVE);
+	if (m_dma_status & 0x30 << level)
+	{
+		LOG("In-flight DMA%d attempt!\n", level);
+		return;
+	}
 
-	// TODO: check cache
-	m_dma[level].index = m_dma[level].dst & 0x07ff'ffff;
+	// aligned in dword units
+	// TODO: check if other buses can be used
+	m_dma[level].index = m_dma[level].dst & 0x07ff'fffc;
+	m_dma[level].done = false;
+	m_dma[level].mode = DMA_MODE_INDIRECT;
+	m_dma[level].indirect_fetch_phase = true;
+	m_dma[level].indirect_end_flag = false;
 
-	do{
-		tmp_src = m_dma[level].index;
+	update_dma_status(level, DMA_STATE_WAIT);
 
-		indirect_size = m_hostspace->read_dword(m_dma[level].index);
-		indirect_dst  = m_hostspace->read_dword(m_dma[level].index+4);
-		indirect_src  = m_hostspace->read_dword(m_dma[level].index+8);
-
-		/*Indirect Mode end factor*/
-		if(indirect_src & 0x80000000)
-			job_done = 1;
-
-
-		LOGMASKED(LOG_DMA_MOVE, "DMA%d indirect R %08x W %08x C %08x RA %d WA %d\n",
-		level, m_dma[level].src, m_dma[level].dst, m_dma[level].size,
-		m_dma[level].src_add, m_dma[level].dst_add);
-
-		indirect_src &=0x07ffffff;
-		indirect_dst &=0x07ffffff;
-		indirect_size &= ((level == 0) ? 0xfffff : 0x3ffff); //TODO: Guardian Heroes sets up a 0x23000 transfer for the FMV?
-
-		if(indirect_size == 0) { indirect_size = (level == 0) ? 0x00100000 : 0x2000; }
-
-		{
-			int i;
-			uint8_t  src_shift;
-
-			src_shift = ((indirect_src & 2) >> 1) ^ 1;
-
-			for (i = 0; i < indirect_size;i+=2)
-			{
-				dma_single_transfer(indirect_src,indirect_dst,&src_shift);
-
-				if(src_shift)
-					indirect_src+=m_dma[level].src_add;
-
-				indirect_dst += ((m_dma[level].dst & 0x07000000) == 0x06000000) ? 2 : m_dma[level].dst_add;
-			}
-		}
-
-		/* Guess: Size + data acquire (1 cycle for src/dst/size) */
-		total_size += indirect_size + 3*4;
-
-		//if(DRUP(0)) space.write_dword(tmp_src+8,m_scu.src[0]|job_done ? 0x80000000 : 0);
-		//if(DWUP(0)) space.write_dword(tmp_src+4,m_scu.dst[0]);
-
-		m_dma[level].index = tmp_src+0xc;
-
-	}while(job_done == 0);
-
-	// TODO: Timing is a guess.
-	m_dma_timer[level]->adjust(m_hostcpu->cycles_to_attotime(total_size/4));
+	m_dma_tick_timer->adjust(attotime::from_ticks(1, m_dma_clock_ref));
 }
-
-
 
 inline void saturn_scu_device::dma_single_transfer(uint32_t src, uint32_t dst,uint8_t *src_shift)
 {
@@ -574,11 +528,7 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick_cb)
 		{
 			// burningru doesn't want to zero existing size
 			//  m_scu.size[dma_ch] = 0;
-			//machine().debug_break();
 
-			LOGMASKED(LOG_DMA_END, "DMA%d ended at %08x %08x (RUP %d WUP %d)\n", level, m_dma[level].live_src, m_dma[level].live_dst, m_dma[level].rup, m_dma[level].wup);
-			// if(m_dma[level].rup == false) m_dma[level].src = m_dma[level].initial_src;
-			// if(m_dma[level].wup == false) m_dma[level].dst = m_dma[level].initial_dst;
 			m_dma[level].done = false;
 			m_dma[level].live_count = 0;
 			m_cbus_dtack_cb(0);
@@ -606,16 +556,77 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick_cb)
 			return;
 		}
 
- 		(this->*dma_transfer_table[m_dma[level].mode])(m_dma[level]);
+		if (m_dma[level].mode & DMA_MODE_INDIRECT)
+		{
+			if (m_dma[level].indirect_fetch_phase)
+			{
+				u32 indirect_src, indirect_dst, indirect_size;
+				indirect_size = m_hostspace->read_dword(m_dma[level].index);
+				indirect_dst  = m_hostspace->read_dword(m_dma[level].index + 4);
+				indirect_src  = m_hostspace->read_dword(m_dma[level].index + 8);
+				m_dma[level].indirect_end_flag = BIT(indirect_src, 31);
 
-		if (m_dma[level].rup)
-			m_dma[level].src = m_dma[level].live_src;
+				LOGMASKED(LOG_DMA_INDIRECT, "DMA%d indirect entry %08x: R %08x W %08x C %08x %s\n",
+					level, m_dma[level].index, indirect_src, indirect_dst, indirect_size,
+					m_dma[level].indirect_end_flag ? "END" : "");
 
-		if (m_dma[level].wup)
-			m_dma[level].dst = m_dma[level].live_dst;
+				m_dma[level].cbus_cache_through = (indirect_src & 0x2700'0000) == 0x2600'0000 || (indirect_dst & 0x2700'0000) == 0x2600'0000;
+				m_dma[level].bbus_sound_access = (indirect_src & 0x07e0'0000) == 0x05a0'0000 || (indirect_dst & 0x07e0'0000) == 0x05a0'0000;
 
-		if (m_dma[level].live_count >= m_dma[level].size)
-			m_dma[level].done = true;
+				m_dma[level].live_src = indirect_src & 0x07ff'ffff;
+				m_dma[level].live_dst = indirect_dst & 0x07ff'ffff;
+				//TODO: why guardherj sets up a 0x23000 transfer for the FMV?
+				m_dma[level].size = indirect_size & ((level == 0) ? 0xf'ffff : 0x3'ffff);
+				m_dma[level].live_count = 0;
+
+				m_dma[level].mode = DMA_MODE_INDIRECT;
+
+				// TODO: other rules still applies
+				if ((indirect_dst & 0x0700'0000) == 0x0600'0000)
+				{
+					LOGMASKED(LOG_DMA_MODE, "Mode select: C-Bus Write\n");
+					m_dma[level].mode |= DMA_MODE_CBUS_WRITE;
+				}
+
+				m_dma[level].index += 0x0c;
+				m_dma[level].indirect_fetch_phase = false;
+				// yield 3 clock cycles out of fetching the new data and get out
+				m_dma_tick_timer->adjust(attotime::from_ticks(3, m_dma_clock_ref));
+				return;
+			}
+
+			(this->*dma_transfer_table[m_dma[level].mode & 3])(m_dma[level]);
+
+			if (m_dma[level].wup)
+				m_dma[level].dst = m_dma[level].index;
+
+			if (m_dma[level].live_count >= m_dma[level].size)
+			{
+				LOGMASKED(LOG_DMA_END, "DMA%d indirect ended at %08x %08x\n", level, m_dma[level].live_src, m_dma[level].live_dst);
+
+				if (m_dma[level].indirect_end_flag)
+					m_dma[level].done = true;
+				else
+					m_dma[level].indirect_fetch_phase = true;
+			}
+		}
+		else
+		{
+			(this->*dma_transfer_table[m_dma[level].mode & 3])(m_dma[level]);
+
+			if (m_dma[level].rup)
+				m_dma[level].src = m_dma[level].live_src;
+
+			if (m_dma[level].wup)
+				m_dma[level].dst = m_dma[level].live_dst;
+
+			if (m_dma[level].live_count >= m_dma[level].size)
+			{
+				LOGMASKED(LOG_DMA_END, "DMA%d direct ended at %08x %08x (RUP %d WUP %d)\n", level, m_dma[level].live_src, m_dma[level].live_dst, m_dma[level].rup, m_dma[level].wup);
+				m_dma[level].done = true;
+			}
+		}
+
 	}
 
 	if (wait_level > level)
@@ -733,8 +744,8 @@ inline void saturn_scu_device::dma_start_factor_ack(dma_event_id_t event)
 	{
 		if(m_dma[i].enable_mask == true && m_dma[i].start_factor == event)
 		{
-			if(m_dma[i].indirect_mode == true) { handle_dma_indirect(i); }
-			else                               { handle_dma_direct(i); }
+			if(m_dma[i].indirect_mode == true) { trigger_dma_indirect(i); }
+			else                               { trigger_dma_direct(i); }
 		}
 	}
 }

@@ -158,6 +158,8 @@ private:
 		uint32_t    mode;
 		bool        enable_mask;
 		bool        indirect_mode;
+		bool        indirect_fetch_phase;
+		bool        indirect_end_flag;
 		bool        rup;
 		bool        wup;
 		bool        done;
@@ -173,8 +175,8 @@ private:
 	void dma_transfer_direct_cd(dma_channel_t &ch);
 	void dma_transfer_direct_cd_cbus_write(dma_channel_t &ch);
 
-	void handle_dma_direct(uint8_t level);
-	void handle_dma_indirect(uint8_t level);
+	void trigger_dma_direct(uint8_t level);
+	void trigger_dma_indirect(uint8_t level);
 	void update_dma_status(int level, dma_state_t state);
 	void dma_single_transfer(uint32_t src, uint32_t dst,uint8_t *src_shift);
 	void dma_start_factor_ack(dma_event_id_t event);
