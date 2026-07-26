@@ -288,6 +288,12 @@ void saturn_vdp2_device::reconfigure_crtc()
 	const int d_hres[4] = { 320, 352, 640, 704 };
 	int horz_res, vert_res;
 
+	// TODO: guard against the wrong DOTSEL being configured from SMPC.
+	// on real HW this causes monitor instability and unusable vblank IRQs.
+	// astrass will throw a fuss if we do this in scan timer, also hot path ...
+	//if (BIT(m_hreso, 0) != m_dotsel_352)
+	//	return;
+
 	// reset odd bit if a dynamic resolution change occurs, stv:seabass cares
 	m_odd_bit = 1;
 	// NTSC can't set 256 modes
@@ -433,13 +439,8 @@ TIMER_CALLBACK_MEMBER(saturn_vdp2_device::sync_timer_cb)
 	int hsync = get_hblank();
 	int vsync = get_vblank();
 
-	// guard against the wrong DOTSEL being configured from SMPC.
-	// on real HW this causes monitor instability and unusable vblank IRQs.
-	if (BIT(m_hreso, 0) == m_dotsel_352)
-	{
-		m_vint_cb(vsync);
-		m_hint_cb(hsync);
-	}
+	m_vint_cb(vsync);
+	m_hint_cb(hsync);
 
 	if (vsync)
 	{

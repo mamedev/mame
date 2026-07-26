@@ -9,29 +9,22 @@ TODO:
 \- make it single step;
 \- implement DMA priority mechanism;
 \- implement penalties for attached devices;
-   (cfr. 3dlemminj title screen "3d" logo going fast and glitchy)
 \- implement ruleset mumbo jumbo;
 - Verify Timer 1 (seems unaffected even after rewriting it?)
 - A-Bus external interrupts;
-- Pad irq signal (lightgun?);
+- A-Bus waitstates;
+- PAD irq signal from SMPC (lightgun and some mice);
 
 ===================================================================================================
 
-DMA Status Register(32-bit):
-xxxx xxxx x--- xx-- xx-- xx-- xx-- xx-- UNUSED
----- ---- -x-- ---- ---- ---- ---- ---- DMA DSP-Bus access
----- ---- --x- ---- ---- ---- ---- ---- DMA B-Bus access
----- ---- ---x ---- ---- ---- ---- ---- DMA A-Bus access
----- ---- ---- --x- ---- ---- ---- ---- DMA lv 1 interrupted
----- ---- ---- ---x ---- ---- ---- ---- DMA lv 0 interrupted
----- ---- ---- ---- --x- ---- ---- ---- DMA lv 2 in stand-by
----- ---- ---- ---- ---x ---- ---- ---- DMA lv 2 in operation
----- ---- ---- ---- ---- --x- ---- ---- DMA lv 1 in stand-by
----- ---- ---- ---- ---- ---x ---- ---- DMA lv 1 in operation
----- ---- ---- ---- ---- ---- --x- ---- DMA lv 0 in stand-by
----- ---- ---- ---- ---- ---- ---x ---- DMA lv 0 in operation
----- ---- ---- ---- ---- ---- ---- --x- DSP side DMA in stand-by
----- ---- ---- ---- ---- ---- ---- ---x DSP side DMA in operation
+Interesting use cases (i.e. non-sloppy programming plaguing this system):
+- 3dlemminj: title screen "3d" logo going fast and glitchy (wants VDP1 timing down everything else)
+- burningrj: transfers FMV in VDP2 (cached) in display area (delayed one frame and done later?
+  Current performance is quite bad right now)
+
+A-Bus: $0200'0000 - $058f'ffff
+B-Bus: $0590'0000 - $05ff'ffff
+C-Bus: $0600'0000 - $07ff'ffff (Work RAM-H, mirrored)
 
 **************************************************************************************************/
 
@@ -41,6 +34,7 @@ xxxx xxxx x--- xx-- xx-- xx-- xx-- xx-- UNUSED
 #define LOG_DMA_MOVE  (1 << 1) // log the initial values prior to a DMA WAIT -> MOVE
 #define LOG_DMA_END   (1 << 2) // log the values at end of DMA
 #define LOG_DMA_STATE (1 << 3) // log state changes
+#define LOG_DMA_MODE  (1 << 4) // log accepted transfer state
 
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -48,7 +42,7 @@ xxxx xxxx x--- xx-- xx-- xx-- xx-- xx-- UNUSED
 #include "logmacro.h"
 
 // device type definition
-DEFINE_DEVICE_TYPE(SATURN_SCU, saturn_scu_device, "saturn_scu", "Sega Saturn System Control Unit (Yamaha 315-5688)")
+DEFINE_DEVICE_TYPE(SATURN_SCU, saturn_scu_device, "saturn_scu", "Sega Saturn System Control Unit (Yamaha FH3007 315-5688)")
 
 //-------------------------------------------------
 //  saturn_scu_device - constructor
@@ -172,11 +166,11 @@ void saturn_scu_device::device_start()
 	save_item(NAME(m_dma[0].indirect_mode));
 	save_item(NAME(m_dma[0].rup));
 	save_item(NAME(m_dma[0].wup));
-	save_item(NAME(m_dma[0].initial_src));
-	save_item(NAME(m_dma[0].initial_dst));
 	save_item(NAME(m_dma[0].mode));
 	save_item(NAME(m_dma[0].done));
-	save_item(NAME(m_dma[0].count));
+	save_item(NAME(m_dma[0].live_src));
+	save_item(NAME(m_dma[0].live_dst));
+	save_item(NAME(m_dma[0].live_count));
 	save_item(NAME(m_dma[0].cbus_cache_through));
 	save_item(NAME(m_dma[0].bbus_sound_access));
 
@@ -191,11 +185,11 @@ void saturn_scu_device::device_start()
 	save_item(NAME(m_dma[1].indirect_mode));
 	save_item(NAME(m_dma[1].rup));
 	save_item(NAME(m_dma[1].wup));
-	save_item(NAME(m_dma[1].initial_src));
-	save_item(NAME(m_dma[1].initial_dst));
 	save_item(NAME(m_dma[1].mode));
 	save_item(NAME(m_dma[1].done));
-	save_item(NAME(m_dma[1].count));
+	save_item(NAME(m_dma[1].live_src));
+	save_item(NAME(m_dma[1].live_dst));
+	save_item(NAME(m_dma[1].live_count));
 	save_item(NAME(m_dma[1].cbus_cache_through));
 	save_item(NAME(m_dma[1].bbus_sound_access));
 
@@ -210,11 +204,11 @@ void saturn_scu_device::device_start()
 	save_item(NAME(m_dma[2].indirect_mode));
 	save_item(NAME(m_dma[2].rup));
 	save_item(NAME(m_dma[2].wup));
-	save_item(NAME(m_dma[2].initial_src));
-	save_item(NAME(m_dma[2].initial_dst));
 	save_item(NAME(m_dma[2].mode));
 	save_item(NAME(m_dma[2].done));
-	save_item(NAME(m_dma[2].count));
+	save_item(NAME(m_dma[2].live_src));
+	save_item(NAME(m_dma[2].live_dst));
+	save_item(NAME(m_dma[2].live_count));
 	save_item(NAME(m_dma[2].bbus_sound_access));
 	save_item(NAME(m_dma[2].cbus_cache_through));
 
@@ -271,8 +265,9 @@ void saturn_scu_device::device_clock_changed()
 {
 	m_scudsp->set_unscaled_clock(this->clock() / 4);
 	// FIXME: should be /4 but saturn BIOS already disagrees
+	// (or /2 if the doc claims 70 nsec in dword unit)
 	m_dma_clock_ref = this->clock() / 1;
-	printf("%u\n", m_dma_clock_ref);
+	LOG("New ref DMA clock %u\n", m_dma_clock_ref);
 }
 
 //-------------------------------------------------
@@ -350,10 +345,11 @@ void saturn_scu_device::dma_common_w(uint8_t offset,uint8_t level,uint32_t data)
 			m_dma[level].wup = BIT(data, 8);
 			m_dma[level].start_factor = data & 7;
 
-			if(m_dma[level].indirect_mode == true && !m_dma[level].wup)
-			{
-				m_dma[level].index = m_dma[level].dst;
-			}
+			// TODO: whatever was this was probably concealing a bigger problem ...
+			//if(m_dma[level].indirect_mode == true && !m_dma[level].wup)
+			//{
+			//	m_dma[level].index = m_dma[level].dst;
+			//}
 
 			break;
 	}
@@ -376,9 +372,18 @@ inline void saturn_scu_device::update_dma_status(int level, dma_state_t new_stat
 void saturn_scu_device::handle_dma_direct(uint8_t level)
 {
 	// registers are DxR, DxW etc.
-	LOGMASKED(LOG_DMA_MOVE, "DMA%d direct R %08x W %08x C %08x RA %d WA %d\n",
+	LOGMASKED(LOG_DMA_MOVE, "DMA%d direct R %08x W %08x C %08x RA %d WA %d %s %s\n",
 		level, m_dma[level].src, m_dma[level].dst, m_dma[level].size,
-		m_dma[level].src_add, m_dma[level].dst_add);
+		m_dma[level].src_add, m_dma[level].dst_add, m_dma[level].rup ? "RUP" : "", m_dma[level].wup ? "WUP" : "");
+
+	// stv:vmahjong loads game IPL twice at startup, one with cache the other without.
+	// DMA0 direct R 23bd4708 W 06020000 C 0009ac44 RA 4 WA 4
+	// DMA0 direct R 23bd4708 W 26020000 C 0009ac44 RA 4 WA 4
+	if (m_dma_status & 0x30 << level)
+	{
+		LOG("In-flight DMA%d attempt!\n", level);
+		return;
+	}
 
 	// gamebas, wc98 and batmanfu trips this
 	// according to the docs the SCU can't transfer from BIOS area
@@ -403,26 +408,32 @@ void saturn_scu_device::handle_dma_direct(uint8_t level)
 //  if ((m_dma[level].dst & 0x07f0'0000) == 0x05a0'0000 && m_dma[level].size >= 0x80000)
 //      m_dma[level].size = 0x80000 - (m_dma[level].dst & 0x7ffff);
 
-	if(m_dma[level].rup == false) m_dma[level].initial_src = m_dma[level].src;
-	if(m_dma[level].wup == false) m_dma[level].initial_dst = m_dma[level].dst;
-
 	m_dma[level].mode = DMA_MODE_RESET;
+
 	// CD transfers are special even without the hack below
-	if (m_dma[level].src_add == 0 && (m_dma[level].src & 0x07ff'ffff) == 0x05818000)
+	if (m_dma[level].src_add == 0 && (m_dma[level].src & 0x07ff'ffff) == 0x0581'8000)
+	{
+		LOGMASKED(LOG_DMA_MODE, "Mode select: CD\n");
 		m_dma[level].mode |= DMA_MODE_CD;
+	}
 
 	// if target is Work RAM H, the add value is fixed.
-	// behaviour confirmed by fromanc2, stv:vmahjong and burningru
-	if ((m_dma[level].dst & 0x07000000) == 0x06000000)
+	// behaviour confirmed by astrass, fromanc2, stv:vmahjong and burningr*
+	if ((m_dma[level].dst & 0x0700'0000) == 0x0600'0000)
+	{
+		LOGMASKED(LOG_DMA_MODE, "Mode select: C-Bus Write\n");
 		m_dma[level].mode |= DMA_MODE_CBUS_WRITE;
-
-	m_dma[level].count = 0;
-	m_dma[level].done = false;
+	}
 
 	// saturn BIOS chains several cache through DMAs back-to-back with no status check
 	// clearly expect that the host CPU shouldn't do anything around the time the DMA goes.
 	m_dma[level].cbus_cache_through = (m_dma[level].src & 0x2700'0000) == 0x2600'0000 || (m_dma[level].dst & 0x2700'0000) == 0x2600'0000;
 	m_dma[level].bbus_sound_access = (m_dma[level].src & 0x07f0'0000) == 0x05a0'0000 || (m_dma[level].dst & 0x07f0'0000) == 0x05a0'0000;
+
+	m_dma[level].live_src = m_dma[level].src;
+	m_dma[level].live_dst = m_dma[level].dst;
+	m_dma[level].live_count = 0;
+	m_dma[level].done = false;
 
 	update_dma_status(level, DMA_STATE_WAIT);
 
@@ -571,10 +582,10 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick_cb)
 			//machine().debug_break();
 
 			LOGMASKED(LOG_DMA_END, "DMA%d ended at %08x %08x (RUP %d WUP %d)\n", level, m_dma[level].src, m_dma[level].dst, m_dma[level].rup, m_dma[level].wup);
-			if(m_dma[level].rup == false) m_dma[level].src = m_dma[level].initial_src;
-			if(m_dma[level].wup == false) m_dma[level].dst = m_dma[level].initial_dst;
+			// if(m_dma[level].rup == false) m_dma[level].src = m_dma[level].initial_src;
+			// if(m_dma[level].wup == false) m_dma[level].dst = m_dma[level].initial_dst;
 			m_dma[level].done = false;
-			m_dma[level].count = 0;
+			m_dma[level].live_count = 0;
 			m_cbus_dtack_cb(0);
 			m_bbus_sound_dtack_cb(0);
 
@@ -602,10 +613,14 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick_cb)
 
  		(this->*dma_transfer_table[m_dma[level].mode])(m_dma[level]);
 
-		if (m_dma[level].count >= m_dma[level].size)
-		{
+		if (m_dma[level].rup)
+			m_dma[level].src = m_dma[level].live_src;
+
+		if (m_dma[level].wup)
+			m_dma[level].dst = m_dma[level].live_dst;
+
+		if (m_dma[level].live_count >= m_dma[level].size)
 			m_dma[level].done = true;
-		}
 	}
 
 	if (wait_level > level)
@@ -615,7 +630,7 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick_cb)
 
 		if (level != -1)
 		{
-			// set wait and interrupt for the last transfer, clear move
+			// set wait (allegedly) and interrupt for the last transfer, clear move
 			update_dma_status(wait_level, DMA_STATE_WAIT);
 			LOGMASKED(LOG_DMA_STATE, "Push DMA%d in background\n", level);
 
@@ -626,6 +641,8 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick_cb)
 	m_dma_tick_timer->adjust(attotime::from_ticks(1, m_dma_clock_ref));
 }
 
+// CD transfers needs to be in dword unit for now (need the xfertype32 branch)
+// we will also need a proper DRDY later on ...
 const saturn_scu_device::dma_transfer_func saturn_scu_device::dma_transfer_table[4] =
 {
 	&saturn_scu_device::dma_transfer_direct_default,
@@ -637,8 +654,8 @@ const saturn_scu_device::dma_transfer_func saturn_scu_device::dma_transfer_table
 void saturn_scu_device::dma_transfer_direct_default(dma_channel_t &ch)
 {
 	//dma_single_transfer(m_dma[level].src, m_dma[level].dst, &src_shift);
-	const u32 src_address = ch.src & 0x07ff'fffe;
-	const u32 dst_address = ch.dst & 0x07ff'fffe;
+	const u32 src_address = ch.live_src & 0x07ff'fffe;
+	const u32 dst_address = ch.live_dst & 0x07ff'fffe;
 
 	uint32_t src_data = m_hostspace->read_word(src_address);
 
@@ -646,21 +663,21 @@ void saturn_scu_device::dma_transfer_direct_default(dma_channel_t &ch)
 	m_cbus_dtack_cb(ch.cbus_cache_through);
 	m_bbus_sound_dtack_cb(ch.bbus_sound_access);
 
-	ch.src += 2;
+	ch.live_src += 2;
 	// TODO: reimplement me
 // if(src_shift)
 //	dma_params.src+= dma_params.src_add;
 //
-	ch.dst += ch.dst_add;
+	ch.live_dst += ch.dst_add;
 
-	ch.count += 2;
+	ch.live_count += 2;
 }
 
 void saturn_scu_device::dma_transfer_direct_cbus_write(dma_channel_t &ch)
 {
 	//dma_single_transfer(m_dma[level].src, m_dma[level].dst, &src_shift);
-	const u32 src_address = ch.src & 0x07ff'fffe;
-	const u32 dst_address = ch.dst & 0x07ff'fffe;
+	const u32 src_address = ch.live_src & 0x07ff'fffe;
+	const u32 dst_address = ch.live_dst & 0x07ff'fffe;
 
 	uint32_t src_data = m_hostspace->read_word(src_address);
 
@@ -668,22 +685,22 @@ void saturn_scu_device::dma_transfer_direct_cbus_write(dma_channel_t &ch)
 	m_cbus_dtack_cb(ch.cbus_cache_through);
 	m_bbus_sound_dtack_cb(ch.bbus_sound_access);
 
-	ch.src += 2;
+	ch.live_src += 2;
 	// TODO: reimplement me
 // if(src_shift)
 //	dma_params.src+= dma_params.src_add;
 //
-	ch.dst += 2;
+	ch.live_dst += 2;
 
-	ch.count += 2;
+	ch.live_count += 2;
 }
 
 void saturn_scu_device::dma_transfer_direct_cd(dma_channel_t &ch)
 {
 	const u32 dst_add = ch.dst_add << 1;
 
-	const u32 src_address = ch.src & 0x07ff'fffc;
-	const u32 dst_address = ch.dst & 0x07ff'fffc;
+	const u32 src_address = ch.live_src & 0x07ff'fffc;
+	const u32 dst_address = ch.live_dst & 0x07ff'fffc;
 
 	m_hostspace->write_dword(dst_address, m_hostspace->read_dword(src_address));
 	if(dst_add == 8)
@@ -692,15 +709,15 @@ void saturn_scu_device::dma_transfer_direct_cd(dma_channel_t &ch)
 	m_cbus_dtack_cb(ch.cbus_cache_through);
 	m_bbus_sound_dtack_cb(ch.bbus_sound_access);
 
-	ch.src += ch.src_add;
-	ch.dst += dst_add;
-	ch.count += dst_add;
+	ch.live_src += ch.src_add;
+	ch.live_dst += dst_add;
+	ch.live_count += dst_add;
 }
 
 void saturn_scu_device::dma_transfer_direct_cd_cbus_write(dma_channel_t &ch)
 {
-	const u32 src_address = ch.src & 0x07ff'fffc;
-	const u32 dst_address = ch.dst & 0x07ff'fffc;
+	const u32 src_address = ch.live_src & 0x07ff'fffc;
+	const u32 dst_address = ch.live_dst & 0x07ff'fffc;
 
 	m_hostspace->write_dword(dst_address, m_hostspace->read_dword(src_address));
 	if(ch.dst_add == 8)
@@ -709,9 +726,9 @@ void saturn_scu_device::dma_transfer_direct_cd_cbus_write(dma_channel_t &ch)
 	m_cbus_dtack_cb(ch.cbus_cache_through);
 	m_bbus_sound_dtack_cb(ch.bbus_sound_access);
 
-	ch.src += ch.src_add;
-	ch.dst += 4;
-	ch.count += 4;
+	ch.live_src += ch.src_add;
+	ch.live_dst += 4;
+	ch.live_count += 4;
 }
 
 
@@ -801,8 +818,9 @@ void saturn_scu_device::irq_mask_w(offs_t offset, uint32_t data, uint32_t mem_ma
 
 void saturn_scu_device::irq_status_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	if(mem_mask != 0xffffffff)
-		LOG("%s IST write %08x with %08x\n", this->tag(), data, mem_mask);
+	// burningr*
+//	if(mem_mask != 0xffffffff)
+//		LOG("%s IST write %08x with %08x\n", this->tag(), data, mem_mask);
 
 	m_ist &= data;
 	test_pending_irqs();

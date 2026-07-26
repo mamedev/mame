@@ -137,10 +137,10 @@ private:
 
 	// intended to be used as bitwise
 	enum dma_mode_t : uint32_t {
-		DMA_MODE_RESET      = 0 << 0,
-		DMA_MODE_CBUS_WRITE = 1 << 1,
-		DMA_MODE_CD         = 1 << 2,
-		DMA_MODE_INDIRECT   = 1 << 3
+		DMA_MODE_RESET      = 0,
+		DMA_MODE_CBUS_WRITE = 1,
+		DMA_MODE_CD         = 2,
+		DMA_MODE_INDIRECT   = 4
 	};
 
 
@@ -151,9 +151,9 @@ private:
 		uint32_t    dst_add;   /* Destination Addition for DMA lv n*/
 		uint32_t    size;      /* Transfer DMA size lv n*/
 		uint32_t    index;
-		uint32_t    initial_src;
-		uint32_t    initial_dst;
-		uint32_t    count;
+		uint32_t    live_src;
+		uint32_t    live_dst;
+		uint32_t    live_count;
 		uint8_t     start_factor;
 		uint32_t    mode;
 		bool        enable_mask;
@@ -164,7 +164,6 @@ private:
 		bool        cbus_cache_through;
 		bool        bbus_sound_access;
 	}m_dma[3];
-
 
 	typedef void (saturn_scu_device::*dma_transfer_func)(dma_channel_t &ch);
 	static const dma_transfer_func dma_transfer_table[4];

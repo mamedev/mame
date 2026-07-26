@@ -394,7 +394,7 @@ void smpc_hle_device::command_register_w(uint8_t data)
 			// A PLL change makes the SMPC to stop everything until it can resync everything again.
 			// This takes the equivalent of 3~4 frame cycles.
 			// (cfr. diagram on page 3 of SMPC manual)
-			// - shanhigw and sokyugrt (would otherwise set 2 credits at startup)
+			// - shanhigw/sokyugrt/prikura (would otherwise set 2 credits at startup)
 			m_syshalt(1);
 
 			m_ckchg_tick = 5;
