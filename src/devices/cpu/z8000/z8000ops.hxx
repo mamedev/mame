@@ -3718,6 +3718,23 @@ void z8002_device::Z4E_ddN0_ssN0_addr()
 }
 
 /******************************************
+ extended EPU memory transfer (4F family)
+ flags:  ------
+
+ When EPA is disabled, the architectural trap PC points at the
+ second word of the instruction.  Do not fetch any trailing words
+ before raising the trap; WEGA's software floating-point emulator
+ decodes them from the saved PC.
+ ******************************************/
+void z8002_device::Z4F_ext()
+{
+	CHECK_EXT_INSTR();
+	if (m_fcw & F_EPU) {
+		/* Physical EPU transfers are not implemented. */
+	}
+}
+
+/******************************************
  cpl     rrd,addr
  flags:  CZSV--
  ******************************************/

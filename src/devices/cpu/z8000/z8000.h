@@ -494,6 +494,7 @@ protected:
 	void Z4D_ddN0_0110_addr();
 	void Z4D_ddN0_1000_addr();
 	void Z4E_ddN0_ssN0_addr();
+	void Z4F_ext();
 	void Z50_0000_dddd_addr();
 	void Z50_ssN0_dddd_addr();
 	void Z51_ddN0_0000_addr();
