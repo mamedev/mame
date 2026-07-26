@@ -11,20 +11,103 @@
 #include "emu.h"
 #include "quadmouse.h"
 
+DEFINE_DEVICE_TYPE(QUADENCODER, quadencoder_device, "quadencoder", "Generic quadature encoder support")
 DEFINE_DEVICE_TYPE(QUADMOUSE, quadmouse_device, "quadmouse", "Generic quadrature mouse support")
 
 static INPUT_PORTS_START(quadmouse)
 	PORT_START("x")
 	PORT_BIT(0xf000, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x0fff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(quadmouse_device::x_changed), 0)
+	PORT_BIT(0x0fff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER("encoder_x", FUNC(quadencoder_device::changed), 0)
 
 	PORT_START("y")
 	PORT_BIT(0xf000, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x0fff, 0, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(quadmouse_device::y_changed), 0)
+	PORT_BIT(0x0fff, 0, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER("encoder_y", FUNC(quadencoder_device::changed), 0)
 INPUT_PORTS_END
+
+
+quadencoder_device::quadencoder_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, QUADENCODER, tag, owner, clock),
+	m_mn_cb(*this),
+	m_pl_cb(*this)
+{
+}
+
+void quadencoder_device::device_start()
+{
+	m_timer = timer_alloc(FUNC(quadencoder_device::tick), this);
+
+	save_item(NAME(m_mn));
+	save_item(NAME(m_pl));
+	save_item(NAME(m_time));
+	save_item(NAME(m_delta));
+}
+
+void quadencoder_device::device_reset()
+{
+	m_time = machine().time();
+
+	m_mn = m_pl = false;
+	m_delta = 0;
+}
+
+DECLARE_INPUT_CHANGED_MEMBER(quadencoder_device::changed)
+{
+	assert(field.minval() == 0);
+
+	// Given the old and new values, compute the magnitude of change for both
+	// scenarios: an increase and a decrease, taking into account wrapping.
+	s32 delta_inc, delta_dec;  // Magnitudes. Always positive.
+	if(newval > oldval) {
+		delta_inc = newval - oldval;
+		delta_dec = oldval + field.maxval() + 1 - newval;
+	} else {
+		delta_inc = field.maxval() + 1 - oldval + newval;
+		delta_dec = oldval - newval;
+	}
+
+	// Pick the direction with the smallest magnitude as the correct one.
+	const s32 ldelta = (delta_inc < delta_dec) ? delta_inc : -delta_dec;
+
+	attotime ctime = machine().time();
+	attotime tdelta = ctime - m_time;
+	m_delta += ldelta;
+	m_time = ctime;
+
+	if(m_delta) {
+		int steps = m_delta > 0 ? m_delta : -m_delta;
+		attotime step = tdelta / (steps+1);
+		m_timer->adjust(step/2, 0, step);
+	} else
+		m_timer->adjust(attotime::never);
+}
+
+TIMER_CALLBACK_MEMBER(quadencoder_device::tick)
+{
+	if(m_delta > 0) {
+		m_delta --;
+
+		if(m_mn == m_pl)
+			m_mn_cb(m_mn = !m_mn);
+		else
+			m_pl_cb(m_pl = !m_pl);
+
+	} else if(m_delta < 0) {
+		m_delta ++;
+
+		if(m_mn == m_pl)
+			m_pl_cb(m_pl = !m_pl);
+		else
+			m_mn_cb(m_mn = !m_mn);
+	}
+
+	if(!m_delta)
+		m_timer->adjust(attotime::never);
+}
 
 quadmouse_device::quadmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, QUADMOUSE, tag, owner, clock),
+	m_enc_x(*this, "encoder_x"),
+	m_enc_y(*this, "encoder_y"),
 	m_port_x(*this, "x"),
 	m_port_y(*this, "y"),
 	m_up_cb(*this),
@@ -34,95 +117,23 @@ quadmouse_device::quadmouse_device(const machine_config &mconfig, const char *ta
 {
 }
 
-void quadmouse_device::device_start()
+void quadmouse_device::device_add_mconfig(machine_config &config)
 {
-	m_x_timer = timer_alloc(FUNC(quadmouse_device::x_tick), this);
-	m_y_timer = timer_alloc(FUNC(quadmouse_device::y_tick), this);
+	QUADENCODER(config, m_enc_x);
+	m_enc_x->write_mn().set([this] (int state) { m_left_cb(state); });
+	m_enc_x->write_pl().set([this] (int state) { m_right_cb(state); });
 
-	save_item(NAME(m_up));
-	save_item(NAME(m_down));
-	save_item(NAME(m_left));
-	save_item(NAME(m_right));
-	save_item(NAME(m_x_time));
-	save_item(NAME(m_y_time));
-	save_item(NAME(m_x_delta));
-	save_item(NAME(m_y_delta));
+	QUADENCODER(config, m_enc_y);
+	m_enc_y->write_mn().set([this] (int state) { m_up_cb(state); });
+	m_enc_y->write_pl().set([this] (int state) { m_down_cb(state); });
 }
 
-void quadmouse_device::device_reset()
+void quadmouse_device::device_start()
 {
-	m_x_time = m_y_time = machine().time();
-
-	m_up = m_down = m_left = m_right = false;
-	m_x_delta = m_y_delta = 0;
 }
 
 ioport_constructor quadmouse_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(quadmouse);
-}
-
-void quadmouse_device::changed(s32 oldval, s32 newval, s32 &delta, attotime &time, emu_timer *timer)
-{
-	s32 ldelta = (newval - oldval) & 0xfff;
-	if(ldelta & 0x800)
-		ldelta -= 0x1000;
-	attotime ctime = machine().time();
-	attotime tdelta = ctime - time;
-	delta += ldelta;
-	time = ctime;
-
-	if(delta) {
-		int steps = delta > 0 ? delta : -delta;
-		attotime step = tdelta / (steps+1);
-		timer->adjust(step/2, 0, step);
-	} else
-		timer->adjust(attotime::never);
-}
-
-INPUT_CHANGED_MEMBER(quadmouse_device::x_changed)
-{
-	changed(oldval, newval, m_x_delta, m_x_time, m_x_timer);
-}
-
-INPUT_CHANGED_MEMBER(quadmouse_device::y_changed)
-{
-	changed(oldval, newval, m_y_delta, m_y_time, m_y_timer);
-}
-
-void quadmouse_device::step(s32 &delta, bool &mn, bool &pl, devcb_write_line &mn_cb, devcb_write_line &pl_cb)
-{
-	if(delta > 0) {
-		delta --;
-
-		if(mn == pl)
-			mn_cb(mn = !mn);
-		else
-			pl_cb(pl = !pl);
-
-	} else if(delta < 0) {
-		delta ++;
-
-		if(mn == pl)
-			pl_cb(pl = !pl);
-		else
-			mn_cb(mn = !mn);
-	}
-}
-
-TIMER_CALLBACK_MEMBER(quadmouse_device::x_tick)
-{
-	step(m_x_delta, m_left, m_right, m_left_cb, m_right_cb);
-
-	if(!m_x_delta)
-		m_x_timer->adjust(attotime::never);
-}
-
-TIMER_CALLBACK_MEMBER(quadmouse_device::y_tick)
-{
-	step(m_y_delta, m_up, m_down, m_up_cb, m_down_cb);
-
-	if(!m_y_delta)
-		m_y_timer->adjust(attotime::never);
 }
 
