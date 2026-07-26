@@ -446,6 +446,7 @@ TIMER_CALLBACK_MEMBER(saturn_vdp2_device::sync_timer_cb)
 	{
 		// flip odd bit here
 		m_odd_bit ^= 1;
+		// TODO: T0C in SCU seems to run even after this point
 		m_video_sync_timer->adjust(m_screen->time_until_pos(0, 0));
 	}
 	else

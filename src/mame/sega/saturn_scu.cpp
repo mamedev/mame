@@ -5,9 +5,12 @@
 Sega Saturn System Control Unit (c) 1995 Sega/Yamaha
 
 TODO:
-- Rewrite DMA;
-\- implement penalties for attached devices;
-\- implement ruleset mumbo jumbo;
+- implement penalties for attached devices when DMA-ing from/to;
+- implement additional DMA rulesets
+\- can't access same bus in direct mode;
+\- indirect mode can actually access same bus with some quirks, specifics TBD;
+\- avoid cross country DMA-ing from one region to the other, i.e. gunblaze;
+\- Road Blaster shifted 1-byte quirk, cfr. currently unused function (intentionally broken);
 - Verify Timer 1 (seems unaffected even after rewriting it?)
 - A-Bus external interrupts;
 - A-Bus waitstates;
@@ -461,13 +464,14 @@ void saturn_scu_device::trigger_dma_indirect(uint8_t level)
 	m_dma_tick_timer->adjust(attotime::from_ticks(1, m_dma_clock_ref));
 }
 
+// TODO: reimplement me
 inline void saturn_scu_device::dma_single_transfer(uint32_t src, uint32_t dst,uint8_t *src_shift)
 {
 	uint32_t src_data;
 
 	if(src & 1)
 	{
-		/* Road Blaster does a work ram h to color ram with offsetted source address, do some data rotation */
+		// tstrmrbl:cdrom2 (Road Blaster) does a work ram h to color ram with offsetted source address, do some data rotation
 		src_data = ((m_hostspace->read_dword(src & 0x07fffffc) & 0x00ffffff)<<8);
 		src_data |= ((m_hostspace->read_dword((src & 0x07fffffc)+4) & 0xff000000) >> 24);
 		src_data >>= (*src_shift)*16;

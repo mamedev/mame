@@ -176,7 +176,7 @@ private:
 	void trigger_dma_direct(uint8_t level);
 	void trigger_dma_indirect(uint8_t level);
 	void update_dma_status(int level, dma_state_t state);
-	void dma_single_transfer(uint32_t src, uint32_t dst,uint8_t *src_shift);
+	[[maybe_unused]] void dma_single_transfer(uint32_t src, uint32_t dst,uint8_t *src_shift);
 	void dma_start_factor_ack(dma_event_id_t event);
 	std::tuple<int, int> check_dma_level_round_robin();
 
