@@ -581,7 +581,7 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick_cb)
 			//  m_scu.size[dma_ch] = 0;
 			//machine().debug_break();
 
-			LOGMASKED(LOG_DMA_END, "DMA%d ended at %08x %08x (RUP %d WUP %d)\n", level, m_dma[level].src, m_dma[level].dst, m_dma[level].rup, m_dma[level].wup);
+			LOGMASKED(LOG_DMA_END, "DMA%d ended at %08x %08x (RUP %d WUP %d)\n", level, m_dma[level].live_src, m_dma[level].live_dst, m_dma[level].rup, m_dma[level].wup);
 			// if(m_dma[level].rup == false) m_dma[level].src = m_dma[level].initial_src;
 			// if(m_dma[level].wup == false) m_dma[level].dst = m_dma[level].initial_dst;
 			m_dma[level].done = false;
@@ -906,10 +906,7 @@ void saturn_scu_device::hblank_in_w(int state)
 	dma_start_factor_ack(DMA_EVENT_HBLANKIN);
 	m_ist |= IST_HBLANK_IN;
 
-	// NOTE: the counter still runs, it's the irq that fires if timer is enabled
-	// also that this never fires if t0c & 0x200
-	m_timer0_counter ++;
-	m_timer0_counter &= 0x1ff;
+	// check if timer enabled first (diehard cares for sound, sets T0C = 0)
 	if (m_tenb)
 	{
 		const bool timer0_hit = m_timer0_counter == m_t0c;
@@ -928,6 +925,10 @@ void saturn_scu_device::hblank_in_w(int state)
 			m_timer1->adjust(attotime::from_ticks(m_t1s, this->clock() / 8));
 		}
 	}
+	// NOTE: the counter still runs, it's the irq that fires if timer is enabled
+	// also that this never fires if t0c & 0x200
+	m_timer0_counter ++;
+	m_timer0_counter &= 0x1ff;
 
 	test_pending_irqs();
 }
