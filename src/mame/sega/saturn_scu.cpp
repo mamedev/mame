@@ -61,7 +61,6 @@ saturn_scu_device::saturn_scu_device(const machine_config &mconfig, const char *
 //  LIVE DEVICE
 //**************************************************************************
 
-// TODO: honor mem_mask
 template <unsigned level> void saturn_scu_device::dma_map(address_map &map)
 {
 	map(0x00, 0x03).lrw32(
@@ -69,7 +68,8 @@ template <unsigned level> void saturn_scu_device::dma_map(address_map &map)
 			return m_dma[level].src;
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			m_dma[level].src = data & 0x27ffffff;
+			COMBINE_DATA(&m_dma[level].src);
+			m_dma[level].src &= 0x27ff'ffff;
 		})
 	);
 	map(0x04, 0x07).lrw32(
@@ -77,7 +77,8 @@ template <unsigned level> void saturn_scu_device::dma_map(address_map &map)
 			return m_dma[level].dst;
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			m_dma[level].dst = data & 0x27ffffff;
+			COMBINE_DATA(&m_dma[level].dst);
+			m_dma[level].dst &= 0x27ff'ffff;
 		})
 	);
 	map(0x08, 0x0b).lrw32(
@@ -85,7 +86,8 @@ template <unsigned level> void saturn_scu_device::dma_map(address_map &map)
 			return m_dma[level].size;
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			m_dma[level].size = data & ((level == 0) ? 0x000fffff : 0xfff);
+			COMBINE_DATA(&m_dma[level].size);
+			m_dma[level].size &= ((level == 0) ? 0x000fffff : 0xfff);
 		})
 	);
 	// everything else is write only
@@ -93,18 +95,23 @@ template <unsigned level> void saturn_scu_device::dma_map(address_map &map)
 	// DxAD: add values
 	map(0x0c, 0x0f).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			m_dma[level].src_add = (data & 0x100) ? 4 : 0;
-			m_dma[level].dst_add = 1 << (data & 7);
-			if(m_dma[level].dst_add == 1) { m_dma[level].dst_add = 0; }
+			if (ACCESSING_BITS_8_15)
+				m_dma[level].src_add = BIT(data, 8) * 4;
+			if (ACCESSING_BITS_0_7)
+			{
+				m_dma[level].dst_add = 1 << (data & 7);
+				if(m_dma[level].dst_add == 1) { m_dma[level].dst_add = 0; }
+			}
 		})
 	);
 	// DxEN / DxGO: enable and trigger
 	map(0x10, 0x13).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			m_dma[level].enable_mask = BIT(data, 8);
+			if (ACCESSING_BITS_8_15)
+				m_dma[level].enable_mask = BIT(data, 8);
 
 			// check if DxGO is enabled for start factor = 7
-			if(m_dma[level].enable_mask == true && data & 1 && m_dma[level].start_factor == DMA_EVENT_TRIGGER)
+			if(ACCESSING_BITS_0_7 && m_dma[level].enable_mask == true && BIT(data, 0) && m_dma[level].start_factor == DMA_EVENT_TRIGGER)
 			{
 				if(m_dma[level].indirect_mode == true)
 					trigger_dma_indirect(level);
@@ -116,16 +123,14 @@ template <unsigned level> void saturn_scu_device::dma_map(address_map &map)
 	// DxMOD / DxRUP / DxWUP / DxFT: indirect mode, RUP, WUP, start factor
 	map(0x14, 0x17).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			m_dma[level].indirect_mode = BIT(data, 24);
-			m_dma[level].rup = BIT(data, 16);
-			m_dma[level].wup = BIT(data, 8);
-			m_dma[level].start_factor = data & 7;
-
-			// TODO: whatever was this was probably concealing a bigger problem ...
-			//if(m_dma[level].indirect_mode == true && !m_dma[level].wup)
-			//{
-			//	m_dma[level].index = m_dma[level].dst;
-			//}
+			if (ACCESSING_BITS_24_31)
+				m_dma[level].indirect_mode = BIT(data, 24);
+			if (ACCESSING_BITS_16_23)
+				m_dma[level].rup = BIT(data, 16);
+			if (ACCESSING_BITS_8_15)
+				m_dma[level].wup = BIT(data, 8);
+			if (ACCESSING_BITS_0_7)
+				m_dma[level].start_factor = data & 7;
 		})
 	);
 }
@@ -287,9 +292,6 @@ void saturn_scu_device::device_start()
 	m_hostspace = &m_hostcpu->space(AS_PROGRAM);
 
 	m_dma_tick_timer = timer_alloc(FUNC(saturn_scu_device::dma_tick_cb), this);
-	m_dma_timer[0] = timer_alloc(FUNC(saturn_scu_device::dma_tick<DMALV0_ID>), this);
-	m_dma_timer[1] = timer_alloc(FUNC(saturn_scu_device::dma_tick<DMALV1_ID>), this);
-	m_dma_timer[2] = timer_alloc(FUNC(saturn_scu_device::dma_tick<DMALV2_ID>), this);
 	m_timer1 = timer_alloc(FUNC(saturn_scu_device::timer1_irq_cb), this);
 }
 
@@ -308,7 +310,6 @@ void saturn_scu_device::device_reset()
 		m_dma[i].src_add = 4;
 		m_dma[i].dst_add = 2;
 		m_dma[i].start_factor = DMA_EVENT_TRIGGER;
-		m_dma_timer[i]->adjust(attotime::never);
 		m_dma[i].enable_mask = false;
 		m_dma[i].done = false;
 		m_dma[i].cbus_cache_through = false;
@@ -477,21 +478,6 @@ inline void saturn_scu_device::dma_single_transfer(uint32_t src, uint32_t dst,ui
 	m_hostspace->write_word(dst,src_data);
 
 	*src_shift ^= 1;
-}
-
-// TODO: this function will be nuked in the end
-template <int Level>
-TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick)
-{
-//	const int irqlevel = Level == 0 ? 5 : 6;
-//	const int irqvector = 0x4b - Level;
-	const uint16_t irqmask = 1 << (11 - Level);
-
-	m_ist |= irqmask;
-	test_pending_irqs();
-
-	update_dma_status(Level, DMA_STATE_IDLE);
-	machine().scheduler().synchronize(); // force resync
 }
 
 std::tuple<int, int> saturn_scu_device::check_dma_level_round_robin()

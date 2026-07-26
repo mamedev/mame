@@ -117,9 +117,8 @@ private:
 	};
 
 	TIMER_CALLBACK_MEMBER(dma_tick_cb);
-	template <int Level> TIMER_CALLBACK_MEMBER(dma_tick);
 	TIMER_CALLBACK_MEMBER(timer1_irq_cb);
-	emu_timer *m_dma_timer[3], *m_timer1;
+	emu_timer *m_timer1;
 	emu_timer *m_dma_tick_timer;
 	uint32_t m_ism;
 	uint32_t m_ist;
@@ -142,7 +141,6 @@ private:
 		DMA_MODE_CD         = 2,
 		DMA_MODE_INDIRECT   = 4
 	};
-
 
 	struct dma_channel_t {
 		uint32_t    src;       /* Source DMA lv n address*/
