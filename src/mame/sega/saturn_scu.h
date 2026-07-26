@@ -173,8 +173,6 @@ private:
 	void dma_transfer_direct_cd(dma_channel_t &ch);
 	void dma_transfer_direct_cd_cbus_write(dma_channel_t &ch);
 
-	uint32_t dma_common_r(uint8_t offset,uint8_t level);
-	void dma_common_w(uint8_t offset,uint8_t level,uint32_t data);
 	void handle_dma_direct(uint8_t level);
 	void handle_dma_indirect(uint8_t level);
 	void update_dma_status(int level, dma_state_t state);
@@ -187,12 +185,7 @@ private:
 	void scudsp_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// DMA
-	uint32_t dma_lv0_r(offs_t offset);
-	void dma_lv0_w(offs_t offset, uint32_t data);
-	uint32_t dma_lv1_r(offs_t offset);
-	void dma_lv1_w(offs_t offset, uint32_t data);
-	uint32_t dma_lv2_r(offs_t offset);
-	void dma_lv2_w(offs_t offset, uint32_t data);
+	template <unsigned level> void dma_map(address_map &map);
 	uint32_t dma_status_r();
 
 	// Timers

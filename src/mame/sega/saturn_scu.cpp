@@ -62,19 +62,86 @@ saturn_scu_device::saturn_scu_device(const machine_config &mconfig, const char *
 //  LIVE DEVICE
 //**************************************************************************
 
-//map(0x0000, 0x0003) src
-//map(0x0004, 0x0007) dst
-//map(0x0008, 0x000b) size
-//map(0x000c, 0x000f) src/dst add values
-//map(0x0010, 0x0013) DMA enable
-//map(0x0014, 0x0017) DMA start factor
+template <unsigned level> void saturn_scu_device::dma_map(address_map &map)
+{
+	map(0x00, 0x03).lrw32(
+		NAME([this] (offs_t offset) {
+			return m_dma[level].src;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			m_dma[level].src = data & 0x27ffffff;
+		})
+	);
+	map(0x04, 0x07).lrw32(
+		NAME([this] (offs_t offset) {
+			return m_dma[level].dst;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			m_dma[level].dst = data & 0x27ffffff;
+		})
+	);
+	map(0x08, 0x0b).lrw32(
+		NAME([this] (offs_t offset) {
+			return m_dma[level].size;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			m_dma[level].size = data & ((level == 0) ? 0x000fffff : 0xfff);
+		})
+	);
+	// everything else is write only
+	map(0x0c, 0x17).nopr();
+	// DxAD: add values
+	map(0x0c, 0x0f).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			m_dma[level].src_add = (data & 0x100) ? 4 : 0;
+			m_dma[level].dst_add = 1 << (data & 7);
+			if(m_dma[level].dst_add == 1) { m_dma[level].dst_add = 0; }
+		})
+	);
+	// DxEN / DxGO: enable and trigger
+	map(0x10, 0x13).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			m_dma[level].enable_mask = BIT(data, 8);
+
+			// check if DxGO is enabled for start factor = 7
+			if(m_dma[level].enable_mask == true && data & 1 && m_dma[level].start_factor == DMA_EVENT_TRIGGER)
+			{
+				if(m_dma[level].indirect_mode == true)
+					handle_dma_indirect(level);
+				else
+					handle_dma_direct(level);
+			}
+		})
+	);
+	// DxMOD / DxRUP / DxWUP / DxFT: indirect mode, RUP, WUP, start factor
+	map(0x14, 0x17).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			m_dma[level].indirect_mode = BIT(data, 24);
+			m_dma[level].rup = BIT(data, 16);
+			m_dma[level].wup = BIT(data, 8);
+			m_dma[level].start_factor = data & 7;
+
+			// TODO: whatever was this was probably concealing a bigger problem ...
+			//if(m_dma[level].indirect_mode == true && !m_dma[level].wup)
+			//{
+			//	m_dma[level].index = m_dma[level].dst;
+			//}
+		})
+	);
+}
+
+// Instantiate DMA maps
+template void saturn_scu_device::dma_map<0>(address_map &map);
+template void saturn_scu_device::dma_map<1>(address_map &map);
+template void saturn_scu_device::dma_map<2>(address_map &map);
+
 
 void saturn_scu_device::regs_map(address_map &map)
 {
-	map(0x0000, 0x0017).rw(FUNC(saturn_scu_device::dma_lv0_r), FUNC(saturn_scu_device::dma_lv0_w));
-	map(0x0020, 0x0037).rw(FUNC(saturn_scu_device::dma_lv1_r), FUNC(saturn_scu_device::dma_lv1_w));
-	map(0x0040, 0x0057).rw(FUNC(saturn_scu_device::dma_lv2_r), FUNC(saturn_scu_device::dma_lv2_w));
-	// Super Major League and Shin Megami Tensei - Akuma Zensho reads from there (undocumented), DMA status mirror?
+	map(0x0000, 0x0017).m(*this, FUNC(saturn_scu_device::dma_map<0>));
+	map(0x0020, 0x0037).m(*this, FUNC(saturn_scu_device::dma_map<1>));
+	map(0x0040, 0x0057).m(*this, FUNC(saturn_scu_device::dma_map<2>));
+	// stv:smleague and shinmtaz reads from $005c (undocumented), DMA status mirror?
 	map(0x005c, 0x005f).r(FUNC(saturn_scu_device::dma_status_r));
 //  map(0x0060, 0x0063).w(FUNC(saturn_scu_device::dma_force_stop_w));
 	map(0x007c, 0x007f).r(FUNC(saturn_scu_device::dma_status_r));
@@ -280,80 +347,8 @@ void saturn_scu_device::device_reset_after_children()
 }
 
 //**************************************************************************
-//  READ/WRITE HANDLERS
+//  DMA logic
 //**************************************************************************
-
-//**************************************************************************
-//  DMA
-//**************************************************************************
-
-uint32_t saturn_scu_device::dma_common_r(uint8_t offset,uint8_t level)
-{
-	switch(offset)
-	{
-		case 0x00/4: // source
-			return m_dma[level].src;
-		case 0x04/4: // destination
-			return m_dma[level].dst;
-		case 0x08/4: // size
-			return m_dma[level].size;
-		case 0x0c/4:
-			return 0; // DxAD, write only
-		case 0x10/4:
-			return 0; // DxEN / DxGO, write only
-		case 0x14/4:
-			return 0; // DxMOD / DxRUP / DxWUP / DxFT, write only
-	}
-
-	// can't happen anyway
-	return 0;
-}
-
-void saturn_scu_device::dma_common_w(uint8_t offset,uint8_t level,uint32_t data)
-{
-	switch(offset)
-	{
-		case 0x00/4: // source
-			m_dma[level].src = data & 0x27ffffff;
-			break;
-		case 0x04/4: // destination
-			m_dma[level].dst = data & 0x27ffffff;
-			break;
-		case 0x08/4: // size, lv0 is bigger than the others
-			m_dma[level].size = data & ((level == 0) ? 0x000fffff : 0xfff);
-			break;
-		case 0x0c/4: // DxAD
-			m_dma[level].src_add = (data & 0x100) ? 4 : 0;
-			m_dma[level].dst_add = 1 << (data & 7);
-			if(m_dma[level].dst_add == 1) { m_dma[level].dst_add = 0; }
-			break;
-		case 0x10/4: // DxEN / DxGO
-			m_dma[level].enable_mask = BIT(data, 8);
-
-			// check if DxGO is enabled for start factor = 7
-			if(m_dma[level].enable_mask == true && data & 1 && m_dma[level].start_factor == DMA_EVENT_TRIGGER)
-			{
-				if(m_dma[level].indirect_mode == true)
-					handle_dma_indirect(level);
-				else
-					handle_dma_direct(level);
-			}
-			break;
-		case 0x14/4: // DxMOD / DxRUP / DxWUP / DxFT, write only
-			m_dma[level].indirect_mode = BIT(data, 24);
-			m_dma[level].rup = BIT(data, 16);
-			m_dma[level].wup = BIT(data, 8);
-			m_dma[level].start_factor = data & 7;
-
-			// TODO: whatever was this was probably concealing a bigger problem ...
-			//if(m_dma[level].indirect_mode == true && !m_dma[level].wup)
-			//{
-			//	m_dma[level].index = m_dma[level].dst;
-			//}
-
-			break;
-	}
-}
 
 inline void saturn_scu_device::update_dma_status(int level, dma_state_t new_state)
 {
@@ -744,20 +739,13 @@ inline void saturn_scu_device::dma_start_factor_ack(dma_event_id_t event)
 	}
 }
 
-uint32_t saturn_scu_device::dma_lv0_r(offs_t offset)  { return dma_common_r(offset,0); }
-void saturn_scu_device::dma_lv0_w(offs_t offset, uint32_t data) { dma_common_w(offset,0,data); }
-uint32_t saturn_scu_device::dma_lv1_r(offs_t offset)  { return dma_common_r(offset,1); }
-void saturn_scu_device::dma_lv1_w(offs_t offset, uint32_t data) { dma_common_w(offset,1,data); }
-uint32_t saturn_scu_device::dma_lv2_r(offs_t offset)  { return dma_common_r(offset,2); }
-void saturn_scu_device::dma_lv2_w(offs_t offset, uint32_t data) { dma_common_w(offset,2,data); }
-
 uint32_t saturn_scu_device::dma_status_r()
 {
 	return m_dma_status;
 }
 
 //**************************************************************************
-//  Timers
+// Timers
 //**************************************************************************
 
 void saturn_scu_device::t0_compare_w(offs_t offset, uint32_t data, uint32_t mem_mask)
