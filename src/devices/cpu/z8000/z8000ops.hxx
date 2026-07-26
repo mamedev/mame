@@ -4675,13 +4675,14 @@ void z8002_device::Z74_ssN0_dddd_0000_xxxx_0000_0000()
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_IDX(OP1,NIB1);
+	uint16_t const index = RW(idx); // dst pair may overlap the index register
 	if (get_segmented_mode()) {
 		RL(dst) = RL(src);
 	}
 	else {
 		RW(dst) = RW(src);
 	}
-	add_to_addr_reg(dst, RW(idx));
+	add_to_addr_reg(dst, index);
 }
 
 /******************************************
