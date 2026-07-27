@@ -27,6 +27,7 @@ zorro2_bus_device::zorro2_bus_device(const machine_config &mconfig, const char *
 	m_int2_handler(*this),
 	m_int6_handler(*this),
 	m_ovr_handler(*this),
+	m_xrdy_handler(*this),
 	m_autoconfig_device(0)
 {
 }
@@ -65,6 +66,7 @@ void zorro2_bus_device::eint7_w(int state) { m_eint7_handler(state); }
 void zorro2_bus_device::int2_w(int state) { m_int2_handler(state); }
 void zorro2_bus_device::int6_w(int state) { m_int6_handler(state); }
 void zorro2_bus_device::ovr_w(int state) { m_ovr_handler(state); }
+void zorro2_bus_device::xrdy_w(int state) { m_xrdy_handler(state); }
 
 // from host
 uint16_t zorro2_bus_device::mem_r(offs_t offset, uint16_t mem_mask)
@@ -114,7 +116,7 @@ void zorro2_bus_device::busrst_w(int state)
 //  SLOT DEVICE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ZORRO2_SLOT, zorro2_slot_device, "zorro2_slot", "Zorro-II slot")
+DEFINE_DEVICE_TYPE(ZORRO2_SLOT, zorro2_slot_device, "zorro2_slot", "Zorro-II Slot")
 
 zorro2_slot_device::zorro2_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	zorro2_slot_device(mconfig, ZORRO2_SLOT, tag, owner, clock)
