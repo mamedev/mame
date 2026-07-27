@@ -25,9 +25,98 @@
 //#define VERBOSE     (LOG_INTERRUPT)
 #include "logmacro.h"
 
+enum scr : unsigned
+{
+	SCR  =  0,
+	COUS =  6, // counter source
+	COU  =  7, // counter
+	TS   =  8, // timer status
+	ECR  =  9, // exception control (advanced/enhanced only)
+	MQ   = 10, // multiplier quotient
+	MPCS = 11, // machine/program check status
+	IRB  = 12, // interrupt request buffer
+	IAR  = 13, // instruction address register
+	ICS  = 14, // interrupt control status
+	CS   = 15, // condition status
+
+	GPR  = 16,
+};
+
+enum ts_mask : u32
+{
+	TS_E = 0x0000'0040, // enable
+	TS_I = 0x0000'0020, // interrupt status
+	TS_O = 0x0000'0010, // overflow
+	TS_P = 0x0000'0007, // timer interrupt priority
+};
+enum mpcs_mask : u32
+{
+						   // reserved
+	PCS_DAE = 0x0000'0002, // data address exception
+	PCS_IAE = 0x0000'0004, // instruction address exception
+	PCS_IOC = 0x0000'0008, // illegal operation code
+	PCS_PIE = 0x0000'0010, // privileged instruction exception
+	PCS_PT  = 0x0000'0020, // program trap
+	PCS_PCU = 0x0000'0040, // program check with unknown origin
+	PCS_PCK = 0x0000'0080, // program check with known origin
+						   // reserved
+	MCS_IOT = 0x0000'0200, // i/o trap
+	MCS_PCT = 0x0000'0400, // processor channel timeout
+	MCS_DT  = 0x0000'0800, // data timeout
+	MCS_IT  = 0x0000'1000, // instruction timeout
+	MCS_PC  = 0x0000'2000, // parity check
+						   // reserved
+	MCS_PCC = 0x0000'8000, // processor channel check
+
+	MCS_ALL = 0x0000'be00,
+	PCS_ALL = 0x0000'00fe,
+};
+
+enum irb_mask : u16
+{
+					  // reserved
+	IRB_L6  = 0x0200, // interrupt request level 6
+	IRB_L5  = 0x0400, // interrupt request level 5
+	IRB_L4  = 0x0800, // interrupt request level 4
+	IRB_L3  = 0x1000, // interrupt request level 3
+	IRB_L2  = 0x2000, // interrupt request level 2
+	IRB_L1  = 0x4000, // interrupt request level 1
+	IRB_L0  = 0x8000, // interrupt request level 0
+
+	IRB_ALL = 0xfe00,
+};
+enum ics_mask : u32
+{
+	ICS_PP = 0x0000'0007, // processor priority
+						  // reserved
+	ICS_RS = 0x0000'0070, // register set number
+	ICS_CS = 0x0000'0080, // check stop mask
+	ICS_IM = 0x0000'0100, // interrupt mask
+	ICS_TM = 0x0000'0200, // translate mode
+	ICS_US = 0x0000'0400, // unprivileged state
+	ICS_MP = 0x0000'0800, // memory protect
+	ICS_PE = 0x0000'1000, // parity error retry interrupt enable
+	ICS_UA = 0x0000'2000, // unaligned access interrupt enable (advanced/enhanced only)
+};
+enum cs_mask : u32
+{
+	CS_T = 0x0000'0001, // test bit
+	CS_O = 0x0000'0002, // overflow
+	CS_C = 0x0000'0008, // carry
+	CS_G = 0x0000'0010, // greater than
+	CS_E = 0x0000'0020, // equal
+	CS_L = 0x0000'0040, // less than
+	CS_Z = 0x0000'0080, // permanent zero
+};
+
+using rsc_mode = rsc_bus_interface::rsc_mode;
+
 // instruction decode helpers
-#define R2 ((op >> 4) & 15)
-#define R3 (op & 15)
+#define R2 BIT(op, 4, 4)
+#define R3 BIT(op, 0, 4)
+#define R3_0 (R3 ? m_gpr[R3] : 0)
+static u32 ba(u16 hi, u16 lo) { return ((u32(hi) << 16) | lo) & 0x00ff'fffeU; }
+static s32 bi(u16 hi, u16 lo) { return util::sext<s32>(u32(hi) << 16 | lo, 20) * 2; }
 
 DEFINE_DEVICE_TYPE(ROMP, romp_device, "romp", "IBM ROMP")
 
@@ -53,18 +142,18 @@ void romp_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_scr[IAR]).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS", m_scr[CS]).formatstr("%6s").noshow();
 
-	state_add(ROMP_SCR + IAR,  "IAR",  m_scr[IAR]);
-	state_add(ROMP_SCR + COUS, "COUS", m_scr[COUS]);
-	state_add(ROMP_SCR + COU,  "COU",  m_scr[COU]);
-	state_add(ROMP_SCR + TS,   "TS",   m_scr[TS]);
-	state_add(ROMP_SCR + MQ,   "MQ",   m_scr[MQ]);
-	state_add(ROMP_SCR + MPCS, "MPCS", m_scr[MPCS]);
-	state_add(ROMP_SCR + IRB,  "IRB",  m_scr[IRB]);
-	state_add(ROMP_SCR + ICS,  "ICS",  m_scr[ICS]);
-	state_add(ROMP_SCR + CS,   "CS",   m_scr[CS]);
+	state_add(SCR + IAR,  "IAR",  m_scr[IAR]);
+	state_add(SCR + COUS, "COUS", m_scr[COUS]);
+	state_add(SCR + COU,  "COU",  m_scr[COU]);
+	state_add(SCR + TS,   "TS",   m_scr[TS]);
+	state_add(SCR + MQ,   "MQ",   m_scr[MQ]);
+	state_add(SCR + MPCS, "MPCS", m_scr[MPCS]);
+	state_add(SCR + IRB,  "IRB",  m_scr[IRB]);
+	state_add(SCR + ICS,  "ICS",  m_scr[ICS]);
+	state_add(SCR + CS,   "CS",   m_scr[CS]);
 
 	for (unsigned i = 0; i < std::size(m_gpr); i++)
-		state_add(ROMP_GPR + i, util::string_format("R%d", i).c_str(), m_gpr[i]);
+		state_add(GPR + i, util::string_format("R%d", i).c_str(), m_gpr[i]);
 
 	// register state for saving
 	save_item(NAME(m_scr));
@@ -142,9 +231,9 @@ void romp_device::execute_run()
 		case 0x0: // jb/jnb: jump on [not] condition bit
 			if (m_branch_state != BRANCH)
 			{
-				if (BIT(m_scr[CS], ((op >> 8) & 7) ^ 7) == BIT(op, 11))
+				if (BIT(m_scr[CS], BIT(~op, 8, 3)) == BIT(op, 11))
 				{
-					m_branch_target = m_scr[IAR] + ji(op);
+					m_branch_target = m_scr[IAR] + util::sext<s32>(op, 8) * 2;
 					m_branch_state = BRANCH;
 					m_icount -= 4;
 				}
@@ -153,30 +242,30 @@ void romp_device::execute_run()
 				program_check(PCS_PCK | PCS_IOC);
 			break;
 		case 0x1: // stcs: store character short
-			store<u8>(r3_0(R3) + ((op >> 8) & 15), m_gpr[R2]);
+			store<u8>(R3_0 + BIT(op, 8, 4), m_gpr[R2]);
 			m_icount -= 4;
 			break;
 		case 0x2: // sths: store half short
-			store<u16>(r3_0(R3) + ((op >> 7) & 30), m_gpr[R2]);
+			store<u16>(R3_0 + ((op >> 7) & 30), m_gpr[R2]);
 			m_icount -= 4;
 			break;
 		case 0x3: // sts: store short
-			store<u32>(r3_0(R3) + ((op >> 6) & 60), m_gpr[R2]);
+			store<u32>(R3_0 + ((op >> 6) & 60), m_gpr[R2]);
 			m_icount -= 4;
 			break;
 		case 0x4: // lcs: load character short
-			load<u8>(r3_0(R3) + ((op >> 8) & 15), [this, op](u8 data) { m_gpr[R2] = data; });
+			load<u8>(R3_0 + BIT(op, 8, 4), [this, op](u8 data) { m_gpr[R2] = data; });
 			m_icount -= 4;
 			break;
 		case 0x5: // lhas: load half algebraic short
-			load<u16>(r3_0(R3) + ((op >> 7) & 30), [this, op](u16 data) { m_gpr[R2] = s32(s16(data)); });
+			load<u16>(R3_0 + ((op >> 7) & 30), [this, op](u16 data) { m_gpr[R2] = util::sext<s32>(data, 16); });
 			m_icount -= 4;
 			break;
 		case 0x6: // cas: compute address short
-			m_gpr[(op >> 8) & 15] = m_gpr[R2] + r3_0(R3);
+			m_gpr[BIT(op, 8, 4)] = m_gpr[R2] + R3_0;
 			break;
 		case 0x7: // ls: load short
-			load<u32>(r3_0(R3) + ((op >> 6) & 60), [this, op](u32 data) { m_gpr[R2] = data; });
+			load<u32>(R3_0 + ((op >> 6) & 60), [this, op](u32 data) { m_gpr[R2] = data; });
 			m_icount -= 4;
 			break;
 		case 0x8: // BI, BA format
@@ -320,7 +409,7 @@ void romp_device::execute_run()
 					m_icount -= (m_scr[ICS] & ICS_TM) ? 3 : 1;
 					break;
 				case 0xca: // lha: load half algebraic
-					load<u16>(r3 + s16(i), [this, op](u16 data) { m_gpr[R2] = s32(s16(data)); });
+					load<u16>(r3 + s16(i), [this, op](u16 data) { m_gpr[R2] = util::sext<s32>(data, 16); });
 					m_icount -= 4;
 					break;
 				case 0xcb: // ior: input/output read
@@ -347,7 +436,8 @@ void romp_device::execute_run()
 					m_icount -= 4;
 					break;
 				case 0xcf: // tsh: test and set half
-					modify<u16>(r3 + s16(i), [this, op](u16 data)
+					modify<u16>(r3 + s16(i),
+						[this, op](u16 data)
 						{
 							m_gpr[R2] = data;
 
@@ -1019,12 +1109,26 @@ device_memory_interface::space_config_vector romp_device::memory_space_config() 
 
 bool romp_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
-	target_space = &space(spacenum);
+	switch (address >> 24)
+	{
+	case 0xf0:
+		return m_iou->translate(AS_IO, address, target_space);
+	case 0xf4:
+		return m_iou->translate(AS_PROGRAM, address, target_space);
 
-	if (m_scr[ICS] & ICS_TM)
-		return m_mmu->translate(address);
-	else
+	case 0xf1: case 0xf2: case 0xf3:
+	case 0xf5: case 0xf6: case 0xf7:
+	case 0xf8: case 0xf9: case 0xfa: case 0xfb:
+	case 0xfc: case 0xfd: case 0xfe: case 0xff:
+		return false;
+
+	default:
+		if (m_scr[ICS] & ICS_TM)
+			return m_mmu->translate(spacenum, address, target_space);
+
+		target_space = &space(spacenum);
 		return true;
+	}
 }
 
 std::unique_ptr<util::disasm_interface> romp_device::create_disassembler()
@@ -1183,8 +1287,7 @@ void romp_device::clk_w(int state)
 	if (state)
 	{
 		// decrement counter
-		if (m_scr[COU])
-			m_scr[COU]--;
+		m_scr[COU]--;
 
 		// check counter expiry
 		if (!m_scr[COU])
@@ -1207,5 +1310,152 @@ void romp_device::clk_w(int state)
 			// reload counter
 			m_scr[COU] = m_scr[COUS];
 		}
+	}
+}
+
+void romp_device::fetch(offs_t address, std::function<void(u16)> f)
+{
+	u16 data = 0;
+
+	if (m_mmu->fetch(address, data, rsc_mode((m_scr[ICS] >> 9) & 7)))
+		f(data);
+	else
+		program_check(PCS_PCK | PCS_IAE);
+}
+
+template <typename T> void romp_device::load(offs_t address, std::function<void(T)> f, bool mask)
+{
+	rsc_mode const mode = mask ? rsc_mode((m_scr[ICS] >> 9) & 7) : rsc_mode::RSC_N;
+
+	T data = 0;
+
+	switch (address >> 24)
+	{
+	default:
+		if (m_mmu->mem_load(address, data, ~T(0), mode))
+			f(data);
+		else
+			program_check(PCS_PCK | PCS_DAE);
+		break;
+
+	case 0xf0:
+		if (m_iou->pio_load(address, data, mode))
+			f(data);
+		else
+			program_check(PCS_PCK | PCS_DAE);
+		break;
+	case 0xf4:
+		if (m_iou->mem_load(address, data, ~T(0), mode))
+			f(data);
+		else
+			program_check(PCS_PCK | PCS_DAE);
+		break;
+
+	case 0xfc: // mc68881 assist mode
+	case 0xfd: // mc68881 non-assist mode
+	case 0xfe: // afpa dma
+	case 0xff: // fpa
+		program_check(PCS_PCK | PCS_DAE);
+		break;
+
+	case 0xf1:
+	case 0xf2:
+	case 0xf3:
+	case 0xf5:
+	case 0xf6:
+	case 0xf7:
+	case 0xf8:
+	case 0xf9:
+	case 0xfa:
+	case 0xfb:
+		//reserved
+		program_check(PCS_PCK | PCS_DAE);
+		break;
+	}
+}
+
+template <typename T> void romp_device::store(offs_t address, T data, bool mask)
+{
+	rsc_mode const mode = mask ? rsc_mode((m_scr[ICS] >> 9) & 7) : rsc_mode::RSC_N;
+
+	switch (address >> 24)
+	{
+	default:
+		if (!m_mmu->mem_store(address, data, ~T(0), mode))
+			program_check(PCS_PCK | PCS_DAE);
+		break;
+
+	case 0xf0:
+		if (!m_iou->pio_store(address, data, mode))
+			program_check(PCS_PCK | PCS_DAE);
+		break;
+	case 0xf4:
+		if (!m_iou->mem_store(address, data, ~T(0), mode))
+			program_check(PCS_PCK | PCS_DAE);
+		break;
+
+	case 0xfc: // mc68881 assist mode
+	case 0xfd: // mc68881 non-assist mode
+	case 0xfe: // afpa dma
+	case 0xff: // fpa
+		program_check(PCS_PCK | PCS_DAE);
+		break;
+
+	case 0xf1:
+	case 0xf2:
+	case 0xf3:
+	case 0xf5:
+	case 0xf6:
+	case 0xf7:
+	case 0xf8:
+	case 0xf9:
+	case 0xfa:
+	case 0xfb:
+		//reserved
+		program_check(PCS_PCK | PCS_DAE);
+		break;
+	}
+}
+
+template <typename T> void romp_device::modify(offs_t address, std::function<T(T)> f, bool mask)
+{
+	rsc_mode const mode = mask ? rsc_mode((m_scr[ICS] >> 9) & 7) : rsc_mode::RSC_N;
+
+	switch (address >> 24)
+	{
+	default:
+		if (!m_mmu->mem_modify(address, f, ~T(0), mode))
+			program_check(PCS_PCK | PCS_DAE);
+		break;
+
+	case 0xf0:
+		if (!m_iou->pio_modify(address, f, mode))
+			program_check(PCS_PCK | PCS_DAE);
+		break;
+	case 0xf4:
+		if (!m_iou->mem_modify(address, f, ~T(0), mode))
+			program_check(PCS_PCK | PCS_DAE);
+		break;
+
+	case 0xfc: // mc68881 assist mode
+	case 0xfd: // mc68881 non-assist mode
+	case 0xfe: // afpa dma
+	case 0xff: // fpa
+		program_check(PCS_PCK | PCS_DAE);
+		break;
+
+	case 0xf1:
+	case 0xf2:
+	case 0xf3:
+	case 0xf5:
+	case 0xf6:
+	case 0xf7:
+	case 0xf8:
+	case 0xf9:
+	case 0xfa:
+	case 0xfb:
+		//reserved
+		program_check(PCS_PCK | PCS_DAE);
+		break;
 	}
 }
