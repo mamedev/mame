@@ -673,7 +673,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="spiderman" supported="no">
-		<description>The Amazing Spider-Man (UK)</description>
+		<description>The Amazing Spider-Man (1st Grade, US)</description>
 		<year>2004</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-10638 UBL"/>
