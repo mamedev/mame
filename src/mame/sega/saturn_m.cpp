@@ -316,6 +316,7 @@ void saturn_state::dot_select_w(int state)
 
 //	m_vdp1->set_unscaled_clock(xtal);
 	m_vdp2->set_unscaled_clock(xtal);
+	m_vdp2->set_dotsel(!state);
 
 	m_scsp->reset();
 	m_scu->reset();

@@ -830,6 +830,10 @@ void sat_console_state::saturn(machine_config &config)
 
 	SATURN_SCU(config, m_scu, MASTER_CLOCK_352);
 	m_scu->set_hostcpu(m_maincpu);
+	m_scu->cbus_dtack_cb().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_scu->cbus_dtack_cb().append_inputline(m_slave, INPUT_LINE_HALT);
+	m_scu->bbus_sound_dtack_cb().set_inputline(m_audiocpu, INPUT_LINE_HALT);
+
 
 //  SH-1
 
