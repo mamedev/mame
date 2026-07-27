@@ -371,7 +371,6 @@ TILE_GET_INFO_MEMBER(spbactnp_state::get_extra_tile_info)
 
 
 
-
 int spbactn_state::draw_video(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool alt_sprites)
 {
 	m_tile_bitmap_bg.fill(0, cliprect);
@@ -412,7 +411,7 @@ void spbactn_state::main_irq_ack_w(uint16_t data)
 void spbactn_state::main_map(address_map &map)
 {
 	map(0x00000, 0x3ffff).rom();
-	map(0x40000, 0x43fff).ram();   // main RAM
+	map(0x40000, 0x43fff).ram(); // main RAM
 	map(0x50000, 0x50fff).ram().share(m_spvideoram);
 	map(0x60000, 0x67fff).ram().w(FUNC(spbactn_state::fg_videoram_w)).share(m_fgvideoram);
 	map(0x70000, 0x77fff).ram().w(FUNC(spbactn_state::bg_videoram_w)).share(m_bgvideoram);
@@ -420,8 +419,8 @@ void spbactn_state::main_map(address_map &map)
 	map(0x90000, 0x90001).portr("IN0");
 	map(0x90010, 0x90011).portr("IN1");
 	map(0x90020, 0x90021).portr("SYSTEM");
-	map(0x90030, 0x90031).portr("DSW1");
-	map(0x90040, 0x90041).portr("DSW2");
+	map(0x90030, 0x90031).portr("DSW2");
+	map(0x90040, 0x90041).portr("DSW1");
 
 	// these are an awful lot of unknowns
 	map(0x90000, 0x90001).nopw();
@@ -462,11 +461,11 @@ void spbactn_state::main_map(address_map &map)
 void spbactnp_state::main_map(address_map &map)
 {
 	map(0x00000, 0x3ffff).rom();
-	map(0x40000, 0x43fff).ram();   // main RAM
+	map(0x40000, 0x43fff).ram(); // main RAM
 	map(0x50000, 0x50fff).ram().share(m_spvideoram);
 	map(0x60000, 0x67fff).ram().w(FUNC(spbactnp_state::fg_videoram_w)).share(m_fgvideoram);
 	map(0x70000, 0x77fff).ram().w(FUNC(spbactnp_state::bg_videoram_w)).share(m_bgvideoram);
-	map(0x80000, 0x827ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");   // yes R and G are swapped vs. the released version
+	map(0x80000, 0x827ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
 	map(0x90000, 0x90001).portr("IN0");
 	map(0x90002, 0x90003).portr("IN1").w(FUNC(spbactnp_state::main_irq_ack_w));
@@ -536,7 +535,7 @@ static INPUT_PORTS_START( spbactn )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME( "Start" )  // needed to avoid confusion with # of players. Press multiple times for multiple players
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME( "Start" ) // needed to avoid confusion with # of players. Press multiple times for multiple players
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -562,7 +561,7 @@ static INPUT_PORTS_START( spbactn )
 	PORT_DIPSETTING(    0x28, "1 Coin/1 Credit 2/3" )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x00, "1 Coin/1 Credit 5/6" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Balls" )         PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, "Balls" )                 PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0xc0, "3" )
 	PORT_DIPSETTING(    0x80, "4" )
@@ -574,21 +573,21 @@ static INPUT_PORTS_START( spbactn )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Extra Ball" )        PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Extra Ball" )            PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x04, "100k and 500k" )
 	PORT_DIPSETTING(    0x0c, "200k and 800k" )
 	PORT_DIPSETTING(    0x08, "200k" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x10, 0x10, "Hit Difficulty" )        PORT_DIPLOCATION("SW2:5")   // From .xls file - WHAT does that mean ?
+	PORT_DIPNAME( 0x10, 0x10, "Hit Difficulty" )        PORT_DIPLOCATION("SW2:5") // From .xls file - WHAT does that mean ?
 	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Difficult ) )
 	PORT_DIPNAME( 0x20, 0x20, "Display Instructions" )  PORT_DIPLOCATION("SW2:6") // Listed in manual as "Change Software", but seems to have no effect?
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:7") // As listed in manual, but seems to have no effect? Works on the prototype, though
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Match" )         PORT_DIPLOCATION("SW2:8")   // Check code at 0x00bf8c
+	PORT_DIPNAME( 0x80, 0x80, "Match" )                 PORT_DIPLOCATION("SW2:8") // Check code at 0x00bf8c
 	PORT_DIPSETTING(    0x80, "1/20" )
 	PORT_DIPSETTING(    0x00, "1/40" )
 INPUT_PORTS_END
@@ -597,7 +596,7 @@ static INPUT_PORTS_START( spbactnp )
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Right Flippers" )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Left Flippers" )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )  PORT_NAME( "Start" )  // needed to avoid confusion with # of players. Press multiple times for multiple players
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME( "Start" ) // needed to avoid confusion with # of players. Press multiple times for multiple players
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -631,7 +630,7 @@ static INPUT_PORTS_START( spbactnp )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW") // TODO: double check 0x0100, 0x0800, 0xc000
-	PORT_DIPNAME( 0x0003, 0x0003, "Balls" )         PORT_DIPLOCATION("SW1:8,7")
+	PORT_DIPNAME( 0x0003, 0x0003, "Balls" )                 PORT_DIPLOCATION("SW1:8,7")
 	PORT_DIPSETTING(      0x0000, "2" )
 	PORT_DIPSETTING(      0x0003, "3" )
 	PORT_DIPSETTING(      0x0001, "4" )
@@ -654,7 +653,7 @@ static INPUT_PORTS_START( spbactnp )
 	PORT_DIPSETTING(      0x00a0, "1 Coin/1 Credit 2/3" )
 	PORT_DIPSETTING(      0x0060, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0000, "1 Coin/1 Credit 5/6" )
-	PORT_DIPNAME( 0x0100, 0x0100, "Match" )         PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x0100, 0x0100, "Match" )                 PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x0100, "1/20" )
 	PORT_DIPSETTING(      0x0000, "1/40" )
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:7")
@@ -666,7 +665,7 @@ static INPUT_PORTS_START( spbactnp )
 	PORT_DIPNAME( 0x0800, 0x0800, "Hit Difficulty" )        PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x0800, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Difficult ) )
-	PORT_DIPNAME( 0x3000, 0x3000, "Extra Ball" )        PORT_DIPLOCATION("SW2:4,3")
+	PORT_DIPNAME( 0x3000, 0x3000, "Extra Ball" )            PORT_DIPLOCATION("SW2:4,3")
 	PORT_DIPSETTING(      0x2000, "100k and 500k" )
 	PORT_DIPSETTING(      0x3000, "200k and 800k" )
 	PORT_DIPSETTING(      0x1000, "200k" )
@@ -810,7 +809,7 @@ void spbactnp_state::spbactnp(machine_config &config)
 	m_extrascreen->set_screen_update(FUNC(spbactnp_state::extrascreen_update));
 
 	GFXDECODE(config, m_extragfxdecode, m_extrapalette, gfx_extraspbactnp);
-	PALETTE(config, m_extrapalette).set_format(palette_device::xBRG_444, 0x1000 / 2);
+	PALETTE(config, m_extrapalette).set_format(palette_device::xBRG_444, 0x1000 / 2); // yes R and G are swapped vs. the released version
 	m_extrapalette->set_endianness(ENDIANNESS_BIG);
 
 	config.set_default_layout(layout_spbactnp);
