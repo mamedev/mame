@@ -797,18 +797,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="histprin2" supported="no">
-		<description>Disney Princesse -  Deux histoires de princesses (France)</description>
-		<year>200?</year>
-		<publisher>LeapFrog</publisher>
-		<part name="cart" interface="leapfrog_leappad_cart">
-			<dataarea name="rom" size="0x200000">
-				<rom name="UBL 500-10340 - Deux histoires de princesses (France).bin" size="0x200000" crc="e381cc05" sha1="067ba0b584ca62eafa106d87950cdc887fa14d8a" />
-			</dataarea>
-		</part>
-	</software>
-
-
 	<software name="fiestahses" supported="no">
 		<description>Fiesta in the House! - ¡Party en la Casa! (Spain)</description>
 		<year>2003</year>
