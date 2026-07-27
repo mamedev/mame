@@ -151,6 +151,7 @@ private:
 		uint32_t    index;
 		uint32_t    live_src;
 		uint32_t    live_dst;
+		uint32_t    live_size;
 		uint32_t    live_count;
 		uint8_t     start_factor;
 		uint32_t    mode;

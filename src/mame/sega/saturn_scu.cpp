@@ -246,6 +246,7 @@ void saturn_scu_device::device_start()
 	save_item(NAME(m_dma[0].done));
 	save_item(NAME(m_dma[0].live_src));
 	save_item(NAME(m_dma[0].live_dst));
+	save_item(NAME(m_dma[0].live_size));
 	save_item(NAME(m_dma[0].live_count));
 	save_item(NAME(m_dma[0].cbus_cache_through));
 	save_item(NAME(m_dma[0].bbus_sound_access));
@@ -266,6 +267,7 @@ void saturn_scu_device::device_start()
 	save_item(NAME(m_dma[1].done));
 	save_item(NAME(m_dma[1].live_src));
 	save_item(NAME(m_dma[1].live_dst));
+	save_item(NAME(m_dma[1].live_size));
 	save_item(NAME(m_dma[1].live_count));
 	save_item(NAME(m_dma[1].cbus_cache_through));
 	save_item(NAME(m_dma[1].bbus_sound_access));
@@ -286,9 +288,10 @@ void saturn_scu_device::device_start()
 	save_item(NAME(m_dma[2].done));
 	save_item(NAME(m_dma[2].live_src));
 	save_item(NAME(m_dma[2].live_dst));
+	save_item(NAME(m_dma[2].live_size));
 	save_item(NAME(m_dma[2].live_count));
-	save_item(NAME(m_dma[2].bbus_sound_access));
 	save_item(NAME(m_dma[2].cbus_cache_through));
+	save_item(NAME(m_dma[2].bbus_sound_access));
 
 	save_item(NAME(m_current_irq_level));
 
@@ -425,13 +428,17 @@ void saturn_scu_device::trigger_dma_direct(uint8_t level)
 		m_dma[level].mode |= DMA_MODE_CBUS_WRITE;
 	}
 
-	// saturn BIOS chains several cache through DMAs back-to-back with no status check
-	// clearly expect that the host CPU shouldn't do anything around the time the DMA goes.
-	m_dma[level].cbus_cache_through = (m_dma[level].src & 0x2700'0000) == 0x2600'0000 || (m_dma[level].dst & 0x2700'0000) == 0x2600'0000;
 	m_dma[level].bbus_sound_access = (m_dma[level].src & 0x07e0'0000) == 0x05a0'0000 || (m_dma[level].dst & 0x07e0'0000) == 0x05a0'0000;
+	// - saturn BIOS chains several cache through DMAs back-to-back with no status check
+	//   clearly expect that the host CPU shouldn't do anything around the time the DMA goes.
+	// - stv:gaxeduel also does two back-to-back sound DMAs from A-Bus, failing the second one if
+	//   SH-2s aren't slowed down to a crawl
+	// TODO: latter really needs bus grants, interruptible SH-2 and .before_delay.
+	m_dma[level].cbus_cache_through = m_dma[level].bbus_sound_access || (m_dma[level].src & 0x2700'0000) == 0x2600'0000 || (m_dma[level].dst & 0x2700'0000) == 0x2600'0000;
 
 	m_dma[level].live_src = m_dma[level].src;
 	m_dma[level].live_dst = m_dma[level].dst;
+	m_dma[level].live_size = m_dma[level].size;
 	m_dma[level].live_count = 0;
 	m_dma[level].done = false;
 
@@ -561,12 +568,12 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick_cb)
 					m_dma[level].indirect_end_flag ? "END" : "");
 
 				m_dma[level].cbus_cache_through = (indirect_src & 0x2700'0000) == 0x2600'0000 || (indirect_dst & 0x2700'0000) == 0x2600'0000;
-				m_dma[level].bbus_sound_access = (indirect_src & 0x07e0'0000) == 0x05a0'0000 || (indirect_dst & 0x07e0'0000) == 0x05a0'0000;
+				m_dma[level].bbus_sound_access = m_dma[level].cbus_cache_through || (indirect_src & 0x07e0'0000) == 0x05a0'0000 || (indirect_dst & 0x07e0'0000) == 0x05a0'0000;
 
 				m_dma[level].live_src = indirect_src & 0x07ff'ffff;
 				m_dma[level].live_dst = indirect_dst & 0x07ff'ffff;
 				//TODO: why guardherj sets up a 0x23000 transfer for the FMV?
-				m_dma[level].size = indirect_size & ((level == 0) ? 0xf'ffff : 0x3'ffff);
+				m_dma[level].live_size = indirect_size & ((level == 0) ? 0xf'ffff : 0x3'ffff);
 				m_dma[level].live_count = 0;
 
 				m_dma[level].mode = DMA_MODE_INDIRECT;
@@ -590,7 +597,7 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick_cb)
 			if (m_dma[level].wup)
 				m_dma[level].dst = m_dma[level].index;
 
-			if (m_dma[level].live_count >= m_dma[level].size)
+			if (m_dma[level].live_count >= m_dma[level].live_size)
 			{
 				LOGMASKED(LOG_DMA_END, "DMA%d indirect ended at %08x %08x\n", level, m_dma[level].live_src, m_dma[level].live_dst);
 
@@ -610,7 +617,7 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick_cb)
 			if (m_dma[level].wup)
 				m_dma[level].dst = m_dma[level].live_dst;
 
-			if (m_dma[level].live_count >= m_dma[level].size)
+			if (m_dma[level].live_count >= m_dma[level].live_size)
 			{
 				LOGMASKED(LOG_DMA_END, "DMA%d direct ended at %08x %08x (RUP %d WUP %d)\n", level, m_dma[level].live_src, m_dma[level].live_dst, m_dma[level].rup, m_dma[level].wup);
 				m_dma[level].done = true;
