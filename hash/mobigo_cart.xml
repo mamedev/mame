@@ -109,7 +109,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="carstoonf" cloneof="carstoong" supported="no">
-		<description>Disney Pixar - Cars Toon - Martin se la raconte (France)</description>
+		<description>Disney/Pixar Cars Toon - Martin se la raconte (France)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-251205"/>
@@ -685,7 +685,7 @@ license:CC0-1.0
 	</software>
 	
 	<software name="mrmenf" supported="no">
-		<description>Les Monsieur Madame - Aventures a Jolieville (France).</description>
+		<description>Les Monsieur Madame - Aventures a Jolieville (France)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-250205"/>
