@@ -87,6 +87,7 @@ public:
 	auto int2_handler() { return m_int2_handler.bind(); }
 	auto int6_handler() { return m_int6_handler.bind(); }
 	auto ovr_handler() { return m_ovr_handler.bind(); }
+	auto xrdy_handler() { return m_xrdy_handler.bind(); }
 
 	// device_memory_interface
 	virtual space_config_vector memory_space_config() const override;
@@ -102,6 +103,7 @@ public:
 	void int2_w(int state);
 	void int6_w(int state);
 	void ovr_w(int state);
+	void xrdy_w(int state);
 
 	// interface (from host)
 	uint16_t mem_r(offs_t offset, uint16_t mem_mask);
@@ -131,6 +133,7 @@ private:
 	devcb_write_line m_int2_handler;
 	devcb_write_line m_int6_handler;
 	devcb_write_line m_ovr_handler;
+	devcb_write_line m_xrdy_handler;
 
 	// the device which is currently configuring
 	uint8_t m_autoconfig_device;
@@ -150,8 +153,8 @@ public:
 	zorro2_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <typename T>
-	zorro2_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt) :
-		zorro2_slot_device(mconfig, tag, owner, clock)
+	zorro2_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt) :
+		zorro2_slot_device(mconfig, tag, owner, DERIVED_CLOCK(1, 1))
 	{
 		set_options(std::forward<T>(opts), dflt, false);
 	}

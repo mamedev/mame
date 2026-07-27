@@ -274,6 +274,7 @@ public:
 	void cpuslot_int6_w(int state);
 	void zorro2_int2_w(int state);
 	void zorro2_int6_w(int state);
+	void zorro2_xrdy_w(int state);
 
 	u16 clock_r(offs_t offset);
 	void clock_w(offs_t offset, u16 data);
@@ -290,6 +291,8 @@ protected:
 	virtual bool int6_pending() override;
 
 private:
+	void kbreset_w(int state);
+
 	// devices
 	required_device<msm6242_device> m_rtc;
 	required_device<amiga_cpuslot_device> m_cpuslot;
@@ -859,6 +862,10 @@ void a2000_state::machine_reset()
 	// base reset
 	amiga_state::machine_reset();
 
+	// needed to support instruction restart
+	if (auto *const musashi = dynamic_cast<m68000_musashi_device *>(&*m_maincpu))
+		musashi->set_emmu_enable(true);
+
 	// reset cpuslot
 	m_cpuslot->rst_w(0);
 	m_cpuslot->rst_w(1);
@@ -866,6 +873,18 @@ void a2000_state::machine_reset()
 	// reset zorro devices
 	m_zorro->busrst_w(0);
 	m_zorro->busrst_w(1);
+}
+
+void a2000_state::kbreset_w(int state)
+{
+	amiga_state::kbreset_w(state);
+
+	if (state == 0)
+	{
+		// needed to support instruction restart
+		if (auto *const musashi = dynamic_cast<m68000_musashi_device *>(&*m_maincpu))
+			musashi->set_emmu_enable(true);
+	}
 }
 
 void a2000_state::cpuslot_ovr_w(int state)
@@ -898,6 +917,26 @@ void a2000_state::zorro2_int6_w(int state)
 {
 	m_zorro2_int6 = state;
 	update_int6();
+}
+
+void a2000_state::zorro2_xrdy_w(int state)
+{
+	if (state == 0)
+	{
+		// suspend cpu until xrdy switches back
+		if (auto *const musashi = dynamic_cast<m68000_musashi_device *>(&*m_maincpu))
+			musashi->restart_this_instruction();
+		else
+			m_maincpu->retry_access();
+
+		m_maincpu->suspend_until_trigger(1, true);
+	}
+	else
+	{
+		// resume cpu if we were suspended
+		if (m_maincpu->suspended(SUSPEND_REASON_TRIGGER))
+			m_maincpu->trigger(1);
+	}
 }
 
 bool a2000_state::int2_pending()
@@ -2093,15 +2132,15 @@ void a2000_state::a2000(machine_config &config)
 	m_cpuslot->ipl7_cb().set([this](int state) { m_maincpu->set_input_line(7, state); });
 
 	// zorro2 slots
-	// FIXME: set Zorro bus clock frequency
-	ZORRO2_BUS(config, m_zorro, 0);
+	ZORRO2_BUS(config, m_zorro, amiga_state::CLK_7M_PAL);
 	m_zorro->int2_handler().set(FUNC(a2000_state::zorro2_int2_w));
 	m_zorro->int6_handler().set(FUNC(a2000_state::zorro2_int6_w));
-	ZORRO2_SLOT(config, "zorro2:1", 0, zorro2_cards, nullptr);
-	ZORRO2_SLOT(config, "zorro2:2", 0, zorro2_cards, nullptr);
-	ZORRO2_SLOT(config, "zorro2:3", 0, zorro2_cards, nullptr);
-	ZORRO2_SLOT(config, "zorro2:4", 0, zorro2_cards, nullptr);
-	ZORRO2_SLOT(config, "zorro2:5", 0, zorro2_cards, nullptr);
+	m_zorro->xrdy_handler().set(FUNC(a2000_state::zorro2_xrdy_w));
+	ZORRO2_SLOT(config, "zorro2:1", zorro2_cards, nullptr);
+	ZORRO2_SLOT(config, "zorro2:2", zorro2_cards, nullptr);
+	ZORRO2_SLOT(config, "zorro2:3", zorro2_cards, nullptr);
+	ZORRO2_SLOT(config, "zorro2:4", zorro2_cards, nullptr);
+	ZORRO2_SLOT(config, "zorro2:5", zorro2_cards, nullptr);
 }
 
 void a2000_state::a2000n(machine_config &config)
@@ -2115,6 +2154,7 @@ void a2000_state::a2000n(machine_config &config)
 	m_cia_0->set_clock(amiga_state::CLK_E_NTSC);
 	m_cia_1->set_clock(amiga_state::CLK_E_NTSC);
 	m_fdc->set_clock(amiga_state::CLK_7M_NTSC);
+	m_zorro->set_clock(amiga_state::CLK_7M_NTSC);
 }
 
 void a500_state::a500(machine_config &config)

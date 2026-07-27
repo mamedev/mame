@@ -38,23 +38,24 @@ TS 2006.12.22:
   but copyright messages are removed.
 - Rebus protection patch sits at the end of trap $b (rtos call) and in some cases returns 0 in D0.
   It's not a real protection check I think.
-- Ring & Ball is mostly decrypted, currently stops at 'scheda da inizializzare' (board must be initialized). Switching the dip to clear RAM it says
-  'Inizializzazione ok, ver 2.6' (Initialization ok, ver 2.6), it initializes it and then, once the DIP is switched back off, jumps into the weeds.
-  Possibly caused by protection? By switching DSW2.8 it's possible to enter test mode.
+- Ring & Ball needs trackball emulation.
 
 More notes about Funny Strip protection issues at the bottom of source file (init_funystrp)
 
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "splash.h"
 
-#include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/ymopn.h"
+#include "cpu/z80/z80.h"
 #include "sound/ymopl.h"
+#include "sound/ymopn.h"
+
 #include "screen.h"
 #include "speaker.h"
+
 
 template <unsigned Which>
 void splash_state::coin_lockout_w(int state)
@@ -251,7 +252,8 @@ void funystrp_state::ringball_map(address_map &map)
 	map(0x840006, 0x840007).portr("P2");
 	map(0x840008, 0x840009).portr("SYSTEM");
 	map(0x84000b, 0x84000b).w(FUNC(funystrp_state::eeprom_w));
-	//map(0x84000e, 0x84000e).w(m_soundlatch, FUNC(generic_latch_8_device::write)); // TODO: where is this hooked up?
+	map(0x84000f, 0x84000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	// map(0x84006c, 0x84006c).w(); // TODO: trackball reset?
 	map(0x880000, 0x8817ff).ram().w(FUNC(funystrp_state::vram_w)).share(m_videoram);
 	map(0x881800, 0x881803).ram().share(m_vregs);
 	map(0x881804, 0x881fff).ram();
@@ -653,7 +655,7 @@ void funystrp_state::adpcm_int(int state)
 		if (m_msm_toggle[Which] == 0)
 		{
 			m_msm_source |= (1 << Which);
-			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0x38); // Z80
+			m_audiocpu->set_input_line(0, HOLD_LINE);
 		}
 	}
 }
@@ -1112,24 +1114,43 @@ void funystrp_state::init_ringball() // decryption is preliminary, can probably 
 
 	m_sound_bank->configure_entries(0, 16, &audiorom[0x00000], 0x8000);
 
-	uint16_t *src = (uint16_t *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+	std::vector<uint16_t> buffer(0x80000 / 2);
+
+	memcpy(&buffer[0], rom, 0x80000);
 
 	for (int i = 0x0000; i < 0x2000 / 2; i++)  // believed ok
-		src[i] = bitswap<16>(src[i] ^ 0x85cc, 12, 13, 15, 10, 9, 11, 8, 14, 5, 4, 3, 2, 1, 0, 7, 6);
+		rom[i] = bitswap<16>(buffer[i] ^ 0x85cc, 12, 13, 15, 10, 9, 11, 8, 14, 5, 4, 3, 2, 1, 0, 7, 6);
 
 	for (int i = 0x2000 / 2 ; i < 0x4000 / 2; i++)  // believed ok
-		src[i] = bitswap<16>(src[i] ^ 0xb622,  5, 4, 3, 2, 1, 0, 7, 6, 9, 8, 15, 14, 13, 12, 11, 10);
+		rom[i] = bitswap<16>(buffer[i] ^ 0xb622,  5, 4, 3, 2, 1, 0, 7, 6, 9, 8, 15, 14, 13, 12, 11, 10);
 
 	for (int i = 0x4000 / 2 ; i < 0x8000 / 2; i++) // probably
-		src[i] = bitswap<16>(src[i] ^ 0xb66d, 8, 9, 10, 11, 12, 13, 14, 15, 1, 0, 2, 3, 4, 5, 6, 7);
+		rom[i] = bitswap<16>(buffer[i] ^ 0xb66d, 8, 9, 10, 11, 12, 13, 14, 15, 1, 0, 2, 3, 4, 5, 6, 7);
 
 	for (int i = 0x8000 / 2; i < 0x10000 / 2; i++)  // believed ok
-		src[i] = bitswap<16>(src[i] ^ 0xc8a6, 1, 3, 0, 5, 7, 9, 11, 13, 15, 14, 12, 8, 10, 6, 4, 2);
+		rom[i] = bitswap<16>(buffer[i] ^ 0xc8a6, 1, 3, 0, 5, 7, 9, 11, 13, 15, 14, 12, 8, 10, 6, 4, 2);
 
 	// 0x10000 - 0x61817 is 0xff filled
 
 	for (int i = 0x60000 / 2; i < 0x80000 / 2; i ++) // believed ok for 0x7c000 - 0x80000, probably ok for the rest (test mode doesn't appear otherwise)
-		src[i] ^= 0xffff;
+		rom[i] = buffer[i] ^ 0xffff;
+
+	// Code between 'andi #$dfff,SR' and the terminating 'trap #0' executes in user
+	// mode; the custom chip decrypts user-program fetches (FC = 010) differently.
+	// This could be done with AS_USER_PROGRAM, but for simplicity let's do it here,
+	// given it's just five small routines running in user mode.
+	// The 'andi' itself is fetched while still in supervisor mode, so the two words
+	// of the marker keep the supervisor key: start decrypting 4 bytes in.
+	static const struct { uint32_t start, end; } user_windows[] =
+	{
+		{ 0x0099d2, 0x0099e8 }, { 0x009ad8, 0x009b02 }, { 0x00a23e, 0x00a26a },
+		{ 0x00a3ea, 0x00a3fe }, { 0x00a436, 0x00a44a }
+	};
+
+	for (auto &window : user_windows)
+		for (uint32_t i = (window.start + 4) / 2; i < window.end / 2; i++)
+			rom[i] = bitswap<16>(buffer[i] ^ 0xffcd, 13, 15, 11, 9, 5, 7, 3, 1, 0, 2, 4, 6, 8, 10, 12, 14);
 }
 
 
@@ -1656,9 +1677,12 @@ ROM_START( ringball )
 	ROM_REGION( 0x080000, "audiocpu", 0 )   // Z80 code + sound data
 	ROM_LOAD( "u130.bin", 0x000000, 0x080000, CRC(892202ea) SHA1(10b5933b136a6595f739510d380d12c4cefd9f09) )
 
-	ROM_REGION( 0x100000, "gfx", 0 )
-	ROM_LOAD( "u51.bin", 0x000000, 0x080000, CRC(32c01844) SHA1(ad461c47cd270414c442325751eca0d6c1ea9e2d) )
-	ROM_LOAD( "u53.bin", 0x080000, 0x080000, NO_DUMP ) // empty on this PCB, GFXs doesn't seem enough for a complete game?
+	ROM_REGION( 0x80000, "gfx", 0 )
+	ROM_LOAD( "u51.bin", 0x00000, 0x80000, CRC(32c01844) SHA1(ad461c47cd270414c442325751eca0d6c1ea9e2d) )
+	// u53 empty on this PCB
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "eeprom.u179", 0x00, 0x80, CRC(808ed9bc) SHA1(46647152aa86cc980ebac0a99d2e60e807958439) ) // pre-initialized
 ROM_END
 
 
@@ -1677,4 +1701,4 @@ GAME( 1993, roldfroga,  roldfrog, roldfrog, splash,   roldfrog_state, init_roldf
 GAME( 1995, rebus,      0,        roldfrog, splash,   roldfrog_state, init_rebus,    ROT0, "Microhard",              "Rebus",                           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 199?, funystrp,   0,        funystrp, funystrp, funystrp_state, init_funystrp, ROT0, "Microhard / MagicGames", "Funny Strip",                     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 GAME( 199?, puckpepl,   funystrp, funystrp, funystrp, funystrp_state, init_funystrp, ROT0, "Microhard",              "Puck People",                     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, ringball,   0,        ringball, ringball, funystrp_state, init_ringball, ROT0, "Microhard",              "Ring & Ball (Italy, Ver. 2.6)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // Ring Ball in test mode, may be Ring & Ball, has Italian strings in ROM
+GAME( 1996, ringball,   0,        ringball, ringball, funystrp_state, init_ringball, ROT0, "Microhard",              "Ring & Ball (Italy, Ver. 2.6)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // Ring Ball in test mode, may be Ring & Ball, has Italian strings in ROM

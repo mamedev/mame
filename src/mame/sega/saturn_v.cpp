@@ -6617,70 +6617,76 @@ void saturn_state::vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle &cli
 //  int window_applied = 0;
 	rectangle mycliprect = cliprect;
 
-	if ( current_tilemap.linescroll_enable ||
-			current_tilemap.vertical_linescroll_enable ||
-			current_tilemap.linezoom_enable ||
-			current_tilemap.vertical_cell_scroll_enable)
+//	if (current_tilemap.vertical_cell_scroll_enable)
+//		popmessage("%d %d %d %d", current_tilemap.linescroll_enable, current_tilemap.vertical_linescroll_enable, current_tilemap.linezoom_enable, current_tilemap.vertical_cell_scroll_enable);
+
+	// check for vertical cell scroll enable (sonicjamj)
+	// TODO: it is unknown how this works with vertical linescroll enable too (it may not work?)
+	// TODO: support a subset only for now, given batmanfr The Riddler stage also sets linezoom_enable
+	// Would make the background rounded to the Dome, but o(n*m) nested loop causes a performance nosedive
+	// https://mametesters.org/view.php?id=7203
+	if (current_tilemap.linescroll_enable && current_tilemap.vertical_cell_scroll_enable && !current_tilemap.vertical_linescroll_enable && !current_tilemap.linezoom_enable)
 	{
-		// check for vertical cell scroll enable (Sonic Jam)
-		// TODO: it is unknown how this works with vertical linescroll enable too (probably it doesn't?)
-		if(current_tilemap.vertical_cell_scroll_enable)
+		uint32_t vcsc_address;
+		uint32_t base_mask;
+		int base_offset, base_multiplier;
+		int16_t base_scrollx, base_scrolly;
+		//uint32_t base_incx, base_incy;
+		int cur_char = 0;
+
+		base_mask = m_vdp2->get_vramsz() ? 0x7ffff : 0x3ffff;
+		vcsc_address = (((VDP2_VCSTAU << 16) | VDP2_VCSTAL) & base_mask) * 2;
+		vcsc_address >>= 2;
+
+		base_offset = 0;
+		base_multiplier = 1;
+		// offset for both enabled
+		if(VDP2_N0VCSC && VDP2_N1VCSC)
 		{
-			uint32_t vcsc_address;
-			uint32_t base_mask;
-			int base_offset, base_multiplier;
-			int16_t base_scrollx, base_scrolly;
-			//uint32_t base_incx, base_incy;
-			int cur_char = 0;
+			// NBG1
+			if(current_tilemap.layer_name & 1)
+				base_offset = 1;
 
-			base_mask = m_vdp2->get_vramsz() ? 0x7ffff : 0x3ffff;
-			vcsc_address = (((VDP2_VCSTAU << 16) | VDP2_VCSTAL) & base_mask) * 2;
-			vcsc_address >>= 2;
-
-			base_offset = 0;
-			base_multiplier = 1;
-			// offset for both enabled
-			if(VDP2_N0VCSC && VDP2_N1VCSC)
-			{
-				// NBG1
-				if(current_tilemap.layer_name & 1)
-					base_offset = 1;
-
-				base_multiplier = 2;
-			}
-
-			base_scrollx = current_tilemap.scrollx;
-			base_scrolly = current_tilemap.scrolly;
-			//base_incx = current_tilemap.incx;
-			//base_incy = current_tilemap.incy;
-
-			while(cur_char <= cliprect.right())
-			{
-				mycliprect.setx(cur_char, cur_char + 8 - 1);
-
-				uint32_t cur_address;
-				int16_t char_scroll;
-
-				cur_address = vcsc_address;
-				cur_address += ((cur_char >> 3) * base_multiplier) + base_offset;
-
-				char_scroll = m_vdp2_vram[ cur_address ] >> 16;
-				char_scroll &= 0x07ff;
-				if ( char_scroll & 0x0400 ) char_scroll |= 0xf800;
-				current_tilemap.scrollx = base_scrollx;
-				current_tilemap.scrolly = base_scrolly + (char_scroll);
-				//current_tilemap.incx = base_incx;
-				//current_tilemap.incy = base_incy;
-
-				vdp2_check_tilemap_with_linescroll(bitmap, mycliprect);
-
-				// TODO: + 16 for tilemap and char size = 16?
-				cur_char += 8;
-
-			}
+			base_multiplier = 2;
 		}
-		else
-			vdp2_check_tilemap_with_linescroll(bitmap, cliprect);
+
+		base_scrollx = current_tilemap.scrollx;
+		base_scrolly = current_tilemap.scrolly;
+		//base_incx = current_tilemap.incx;
+		//base_incy = current_tilemap.incy;
+
+		while(cur_char <= cliprect.right())
+		{
+			mycliprect.setx(cur_char, cur_char + 8 - 1);
+
+			uint32_t cur_address;
+			int16_t char_scroll;
+
+			cur_address = vcsc_address;
+			cur_address += ((cur_char >> 3) * base_multiplier) + base_offset;
+
+			char_scroll = m_vdp2_vram[ cur_address ] >> 16;
+			char_scroll &= 0x07ff;
+			if ( char_scroll & 0x0400 ) char_scroll |= 0xf800;
+			current_tilemap.scrollx = base_scrollx;
+			current_tilemap.scrolly = base_scrolly + (char_scroll);
+			//current_tilemap.incx = base_incx;
+			//current_tilemap.incy = base_incy;
+
+			vdp2_check_tilemap_with_linescroll(bitmap, mycliprect);
+
+			// TODO: + 16 for tilemap and char size = 16?
+			cur_char += 8;
+
+		}
+
+		return;
+	}
+	else if ( current_tilemap.linescroll_enable ||
+			current_tilemap.vertical_linescroll_enable ||
+			current_tilemap.linezoom_enable)
+	{
+		vdp2_check_tilemap_with_linescroll(bitmap, cliprect);
 
 		return;
 	}

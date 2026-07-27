@@ -94,7 +94,9 @@ public:
 		, m_lnw_bank(*this, "lnw_banked_mem")
 	{ }
 
-	void lnw80(machine_config &config);
+	void lnw80(machine_config &config) ATTR_COLD;
+
+	void init_mxcomp() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -671,7 +673,28 @@ ROM_START(lnw80)
 	ROM_LOAD("lnw_ntsc.u130",  0x0000, 0x0020, CRC(b990a207) SHA1(1a1cc3150cbfed76b1c88c0d561f9bee954f3234) )
 ROM_END
 
+ROM_START(mxcomp)
+	ROM_REGION(0x3000, "maincpu", 0)
+	ROM_LOAD("2716_a.bin",     0x0000, 0x0800, CRC(10d47758) SHA1(cfcc4802138694c10c10579bfe3bcab5a12f3ad8) )
+	ROM_LOAD("2716_a-1.bin",   0x0800, 0x0800, CRC(ac297d99) SHA1(ccf31d3f9d02c3b68a0ee3be4984424df0e83ab0) )
+	ROM_LOAD("2716_b.bin",     0x1000, 0x0800, CRC(a21d0d62) SHA1(6dfdf3806ed2b6502e09a1b6922f21494134cc05) )
+	ROM_LOAD("2716_b-1.bin",   0x1800, 0x0800, CRC(3a5ea239) SHA1(8c489670977892d7f2bfb098f5df0b4dfa8fbba6) )
+	ROM_LOAD("2716_c.bin",     0x2000, 0x0800, CRC(2ba025d7) SHA1(232efbe23c3f5c2c6655466ebc0a51cf3697be9b) )
+	ROM_LOAD("2716_c-1.bin",   0x2800, 0x0800, CRC(ed547445) SHA1(20102de89a3ee4a65366bc2d62be94da984a156b) )
+
+	ROM_REGION(0x0800, "chargen", 0)
+	ROM_LOAD("2716_cg.bin",    0x0000, 0x0800, CRC(cce91eda) SHA1(7f73667d514472facee57da44e30fa2e2b2908c4) )
+ROM_END
+
+void lnw80_state::init_mxcomp()
+{
+	// Bit 3 duplicates bit 2 in this dump, so erase it
+	for (u16 addr = 0; addr < 0x0800; addr++)
+		m_p_chargen[addr] &= 0xf7;
+}
+
 } // anonymous namespace
 
-//    YEAR  NAME         PARENT    COMPAT    MACHINE   INPUT    CLASS        INIT        COMPANY          FULLNAME    FLAGS
-COMP( 1981, lnw80,       0,        trs80l2,  lnw80,    lnw80,   lnw80_state, empty_init, "LNW Research",  "LNW-80",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME         PARENT    COMPAT    MACHINE   INPUT    CLASS        INIT         COMPANY                           FULLNAME           FLAGS
+COMP( 1981, lnw80,       0,        trs80l2,  lnw80,    lnw80,   lnw80_state, empty_init,  "LNW Research",                   "LNW-80",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 198?, mxcomp,      lnw80,    0,        lnw80,    lnw80,   lnw80_state, init_mxcomp, "Multix Computadores e Sistemas", "Multix Compacto", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

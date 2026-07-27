@@ -153,7 +153,7 @@ const tiny_rom_entry *a2091_device::device_rom_region() const
 
 void a2091_device::device_add_mconfig(machine_config &config)
 {
-	AMIGA_DMAC_REV2(config, m_dmac, 28.37516_MHz_XTAL / 4); // 7M
+	AMIGA_DMAC_REV2(config, m_dmac, DERIVED_CLOCK(1, 1));
 	m_dmac->set_rom("bootrom");
 	m_dmac->cfgout_cb().set([this] (int state) { m_zorro->cfgout_w(state); });
 	m_dmac->int_cb().set([this] (int state) { m_zorro->int2_w(state); });
@@ -176,7 +176,7 @@ void a2091_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr, false);
 
-	WD33C93A(config, m_wdc, 28.37516_MHz_XTAL / 4); // 7M
+	WD33C93A(config, m_wdc, DERIVED_CLOCK(1, 1));
 	scsi.set_external_device(7, m_wdc);
 	m_wdc->irq_cb().set(m_irq, FUNC(input_merger_any_high_device::in_w<0>));
 	m_wdc->drq_cb().set(m_dmac, FUNC(amiga_dmac_device::sdreq_w));

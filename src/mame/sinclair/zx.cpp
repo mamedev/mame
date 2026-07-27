@@ -63,6 +63,19 @@ void zx_state::zx81_map(address_map &map)
 	map(0x4000, 0xffff).ram();
 }
 
+void zx_state::pc8300_map(address_map &map)
+{
+	zx81_map(map);
+	map(0x0000, 0x3fff).w(FUNC(zx_state::pc8300_bit7_w));
+}
+
+void zx_state::tk85_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x27ff).rom().mirror(0x1800);
+	map(0x4000, 0xffff).ram();
+}
+
 void zx_state::ula_map(address_map &map)
 {
 	map(0x0000, 0x7fff).r(FUNC(zx_state::ula_low_r));
@@ -89,13 +102,16 @@ void zx_state::pow3000_io_map(address_map &map)
 	map(0x0000, 0xffff).rw(FUNC(zx_state::pow3000_io_r), FUNC(zx_state::zx81_io_w));
 }
 
+void zx_state::tk85_io_map(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(zx_state::zx81_io_r), FUNC(zx_state::tk85_io_w));
+}
+
 
 /* Input Ports */
 
 static INPUT_PORTS_START( zx80 )
-/* PORT_NAME =  Key Mode (Press Key)    Shift Mode (Press Key+Shift)    BASIC Mode (Press Key at BASIC)  */
-/* Some keys (e.g. A,S,D,F,G etc.) produce glyphs when used in Shift Mode. MAME currently cannot show
-these functions in Input (This System) menu, hence we live some empty space in the menu */
+// PORT_NAME =  Key Mode (Press Key)    Shift Mode (Press Key+Shift)    BASIC Mode (Press Key at BASIC)
 	PORT_START("ROW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z  :") PORT_CODE(KEYCODE_Z) PORT_CHAR('Z') PORT_CHAR(':')
@@ -105,19 +121,19 @@ these functions in Input (This System) menu, hence we live some empty space in t
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A     LIST") PORT_CODE(KEYCODE_A) PORT_CHAR('A')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S     STOP") PORT_CODE(KEYCODE_S) PORT_CHAR('S')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D     DIM") PORT_CODE(KEYCODE_D) PORT_CHAR('D')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F     FOR") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G     GOTO") PORT_CODE(KEYCODE_G) PORT_CHAR('G')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"A  \u2592   LIST") PORT_CODE(KEYCODE_A) PORT_CHAR('A') // ▒
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"S  \u259e   STOP") PORT_CODE(KEYCODE_S) PORT_CHAR('S') // ▞
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"D  \u2596   DIM") PORT_CODE(KEYCODE_D) PORT_CHAR('D') // ▖
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"F  \u2597   FOR") PORT_CODE(KEYCODE_F) PORT_CHAR('F') // ▗
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"G  \U0001fb8e   GOTO") PORT_CODE(KEYCODE_G) PORT_CHAR('G') // 🮎
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q     NEW") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W     LOAD") PORT_CODE(KEYCODE_W) PORT_CHAR('W')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E     SAVE") PORT_CODE(KEYCODE_E) PORT_CHAR('E')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R     RUN") PORT_CODE(KEYCODE_R) PORT_CHAR('R')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T     CONT") PORT_CODE(KEYCODE_T) PORT_CHAR('T')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"Q  \u258c   NEW") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q') // ▌
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"W  \u2584   LOAD") PORT_CODE(KEYCODE_W) PORT_CHAR('W') // ▄
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"E  \u2598   SAVE") PORT_CODE(KEYCODE_E) PORT_CHAR('E') // ▘
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"R  \u259d   RUN") PORT_CODE(KEYCODE_R) PORT_CHAR('R') // ▝
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"T  \U0001fb8f   CONT") PORT_CODE(KEYCODE_T) PORT_CHAR('T') // 🮏
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW3")
@@ -166,34 +182,34 @@ these functions in Input (This System) menu, hence we live some empty space in t
 	PORT_CONFSETTING(    0x40, "PAL")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( pc8300 )
-/* PORT_NAME =  Key Mode (Press Key)    Shift Mode (Press Key+Shift)    BASIC Mode (Press Key at BASIC)  */
+static INPUT_PORTS_START( zx81 )
+// PORT_NAME =  Key Mode (Press Key)    Shift Mode (Press Key+Shift)    BASIC Mode (Press Key at BASIC)   Function Mode
 	PORT_START("ROW0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z  :") PORT_CODE(KEYCODE_Z) PORT_CHAR('Z') PORT_CHAR(':')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("X  ;") PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHAR(';')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C  ?") PORT_CODE(KEYCODE_C) PORT_CHAR('C') PORT_CHAR('?')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("V  /") PORT_CODE(KEYCODE_V) PORT_CHAR('V') PORT_CHAR('/')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z  :  COPY   LN") PORT_CODE(KEYCODE_Z) PORT_CHAR('Z') PORT_CHAR(':')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("X  ;  CLEAR  EXP") PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHAR(';')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C  ?  CONT   AT") PORT_CODE(KEYCODE_C) PORT_CHAR('C') PORT_CHAR('?')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("V  /  CLS") PORT_CODE(KEYCODE_V) PORT_CHAR('V') PORT_CHAR('/')
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A  STOP    NEW") PORT_CODE(KEYCODE_A) PORT_CHAR('A')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S  LPRINT  SAVE") PORT_CODE(KEYCODE_S) PORT_CHAR('S')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D  SLOW    DIM") PORT_CODE(KEYCODE_D) PORT_CHAR('D')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F  FAST    FOR") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G  LLIST   GOTO") PORT_CODE(KEYCODE_G) PORT_CHAR('G')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A  STOP    NEW   ARCSIN") PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S  LPRINT  SAVE  ARCCOS") PORT_CODE(KEYCODE_S) PORT_CHAR('S')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D  SLOW    DIM   ARCTAN") PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F  FAST    FOR   SGN") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G  LLIST   GOTO  ABS") PORT_CODE(KEYCODE_G) PORT_CHAR('G')
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q  \"\"   PLOT") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W  OR     UNPLOT") PORT_CODE(KEYCODE_W) PORT_CHAR('W')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E  STEP   REM") PORT_CODE(KEYCODE_E) PORT_CHAR('E')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R  <=     RUN") PORT_CODE(KEYCODE_R) PORT_CHAR('R')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T  <>     RAND") PORT_CODE(KEYCODE_T) PORT_CHAR('T')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q  \"\"   PLOT    SIN") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W  OR     UNPLOT  COS") PORT_CODE(KEYCODE_W) PORT_CHAR('W')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E  STEP   REM     TAN") PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R  <=     RUN     INT") PORT_CODE(KEYCODE_R) PORT_CHAR('R')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T  <>     RAND    RND") PORT_CODE(KEYCODE_T) PORT_CHAR('T')
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1  EDIT") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1  Edit") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2  AND") PORT_CODE(KEYCODE_2) PORT_CHAR('2')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3  THEN") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4  TO") PORT_CODE(KEYCODE_4) PORT_CHAR('4')
@@ -201,40 +217,36 @@ static INPUT_PORTS_START( pc8300 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0  DELETE") PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(8)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9  GRAPHICS") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0  Rubout") PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(8)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9  Graphics") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8  Right") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR('8') PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7  Up") PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_UP) PORT_CHAR('7') PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6  Down") PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_DOWN) PORT_CHAR('6') PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P  \"   PRINT") PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_CHAR('"')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O  )    POKE") PORT_CODE(KEYCODE_O) PORT_CHAR('O') PORT_CHAR(')')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I  (    INPUT") PORT_CODE(KEYCODE_I) PORT_CHAR('I') PORT_CHAR('(')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U  $    IF") PORT_CODE(KEYCODE_U) PORT_CHAR('U') PORT_CHAR('$')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Y  >=   RETURN") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P  \"   PRINT   TAB") PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_CHAR('"')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O  )    POKE    PEEK") PORT_CODE(KEYCODE_O) PORT_CHAR('O') PORT_CHAR(')')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I  (    INPUT   CODE") PORT_CODE(KEYCODE_I) PORT_CHAR('I') PORT_CHAR('(')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U  $    IF      CHR$") PORT_CODE(KEYCODE_U) PORT_CHAR('U') PORT_CHAR('$')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Y  >=   RETURN  STR$") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTER  FUNCTION") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L  =    LET") PORT_CODE(KEYCODE_L) PORT_CHAR('L') PORT_CHAR('=')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("K  +    LIST") PORT_CODE(KEYCODE_K) PORT_CHAR('K') PORT_CHAR('+')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("J  -    LOAD") PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_CHAR('-')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H  **   GOSUB") PORT_CODE(KEYCODE_H) PORT_CHAR('H')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("New Line  Function") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L  =    LET    USR") PORT_CODE(KEYCODE_L) PORT_CHAR('L') PORT_CHAR('=')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("K  +    LIST   LEN") PORT_CODE(KEYCODE_K) PORT_CHAR('K') PORT_CHAR('+')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("J  -    LOAD   VAL") PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_CHAR('-')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H  **   GOSUB  SQR") PORT_CODE(KEYCODE_H) PORT_CHAR('H')
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"SPACE  £") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ') PORT_CHAR(U'£')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"Space  £") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ') PORT_CHAR(U'£')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(".  ,") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR(',')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M  >  PAUSE") PORT_CODE(KEYCODE_M) PORT_CHAR('M') PORT_CHAR('>')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N  <  NEXT") PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_CHAR('<')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B  *  SCROLL") PORT_CODE(KEYCODE_B) PORT_CHAR('B') PORT_CHAR('*')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"M  >  PAUSE   π") PORT_CODE(KEYCODE_M) PORT_CHAR('M') PORT_CHAR('>')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N  <  NEXT    NOT") PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_CHAR('<')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B  *  SCROLL  INKEY$") PORT_CODE(KEYCODE_B) PORT_CHAR('B') PORT_CHAR('*')
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( zx81 )
-	PORT_INCLUDE(pc8300)
 
 	PORT_START("CONFIG")    /* config diode on main board */
 	PORT_CONFNAME( 0x40, 0x40, "TV system")
@@ -242,7 +254,7 @@ static INPUT_PORTS_START( zx81 )
 	PORT_CONFSETTING(    0x40, "PAL")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( pow3000 )
+static INPUT_PORTS_START( pc8300 )
 	PORT_START("ROW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z  PRINT") PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
@@ -306,6 +318,10 @@ static INPUT_PORTS_START( pow3000 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N  Right") PORT_CODE(KEYCODE_N) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR('N') PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B  Left") PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_LEFT) PORT_CHAR('B') PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( pow3000 )
+	PORT_INCLUDE(pc8300)
 
 	PORT_START("CONFIG")    /* config diode on main board */
 	PORT_CONFNAME( 0x01, 0x00, "TV system")
@@ -319,14 +335,14 @@ INPUT_PORTS_END
 void zx_state::zx80(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(6'500'000)/2);
+	Z80(config, m_maincpu, 6.5_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zx_state::zx80_map);
 	m_maincpu->set_addrmap(AS_IO, &zx_state::zx80_io_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &zx_state::ula_map);
 	m_maincpu->refresh_cb().set(FUNC(zx_state::refresh_w));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(XTAL(6'500'000)/2/64159.0); // 54223 for NTSC
+	m_screen->set_refresh_hz(6.5_MHz_XTAL / 2 / 64159.0); // 54223 for NTSC
 	m_screen->set_size(384, 311);
 	m_screen->set_visarea(0, 383, 0, 310);
 	m_screen->set_palette("palette");
@@ -342,10 +358,10 @@ void zx_state::zx80(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("zx80_cass");
 
-	/* software lists */
+	// software lists
 	SOFTWARE_LIST(config, m_softlist).set_original("zx80_cass");
 
-	/* internal ram */
+	// internal ram
 	RAM(config, m_ram).set_default_size("1K").set_extra_options("1K,2K,3K,16K");
 }
 
@@ -358,41 +374,43 @@ void zx_state::zx81(machine_config &config)
 	m_cassette->set_formats(zx81_cassette_formats);
 	m_cassette->set_interface("zx81_cass");
 
-	/* software lists */
+	// software lists
 	m_softlist->set_original("zx81_cass");
 
-	/* internal ram */
+	// internal ram
 	m_ram->set_default_size("16K").set_extra_options("1K,32K,48K");
 }
 
+// Used by pc8300/lambda/pow3000
 void zx_state::zx81_spk(machine_config &config)
 {
 	zx81(config);
-	/* sound hardware */
-	/* Used by pc8300/lambda/pow3000 */
+
+	// sound hardware
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 void zx_state::ts1000(machine_config &config)
 {
 	zx81(config);
-	/* internal ram */
+	// internal ram
 	m_ram->set_default_size("2K").set_extra_options("1K,16K,32K,48K");
 }
 
 void zx_state::ts1500(machine_config &config)
 {
 	ts1000(config);
-	/* internal ram */
+	// internal ram
 	m_ram->set_default_size("16K");
 }
 
 void zx_state::pc8300(machine_config &config)
 {
 	zx81_spk(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zx_state::pc8300_map);
 	m_maincpu->set_addrmap(AS_IO, &zx_state::pc8300_io_map);
 
-	/* internal ram */
+	// internal ram
 	m_ram->set_default_size("16K");
 }
 
@@ -401,8 +419,21 @@ void zx_state::pow3000(machine_config &config)
 	zx81_spk(config);
 	m_maincpu->set_addrmap(AS_IO, &zx_state::pow3000_io_map);
 
-	/* internal ram */
+	// internal ram
 	m_ram->set_default_size("2K").set_extra_options("16K");
+}
+
+void zx_state::tk85(machine_config &config)
+{
+	zx81(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zx_state::tk85_map);
+	m_maincpu->set_addrmap(AS_IO, &zx_state::tk85_io_map);
+
+	// internal ram
+	m_ram->set_default_size("16K").set_extra_options("48K");
+
+	// AY-3-8912 Programmable Sound Generator (optional)
+	AY8912(config, m_psg, 6.5_MHz_XTAL / 2 / 4).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 
@@ -471,7 +502,8 @@ ROM_END
 
 ROM_START( tk85 )
 	ROM_REGION( 0x2800, "maincpu", 0 )
-	ROM_LOAD( "tk85.rom", 0x0000, 0x2800, CRC(8972d756) SHA1(7b961a1733fc047eb682150a32e17bca10a018d2) )
+	ROM_LOAD( "2764.ic2", 0x0000, 0x2000, CRC(4889e9ba) SHA1(73e4908090ecb0ef17be10bb7456208e617ecc3e) )
+	ROM_LOAD( "2716.ic3", 0x2000, 0x0800, CRC(ab427edb) SHA1(e74ee21871fbb0d50d38df11ecd62d3fda0f3fa9) )
 ROM_END
 
 /* This homebrew has 192k of RAM and 32k of ROM via bankswitching. One of the primary bankswitching lines is /M1,
@@ -485,13 +517,13 @@ ROM_END
 /* Game Drivers */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    CLASS     INIT    COMPANY                    FULLNAME               FLAGS
-COMP( 1980, zx80,     0,      0,      zx80,    zx80,    zx_state, init_zx, "Sinclair Research Ltd",  "ZX-80",               MACHINE_NO_SOUND_HW )
-COMP( 1981, zx81,     0,      0,      zx81,    zx81,    zx_state, init_zx, "Sinclair Research Ltd",  "ZX-81",               MACHINE_NO_SOUND_HW )
-COMP( 1982, ts1000,   zx81,   0,      ts1000,  zx81,    zx_state, init_zx, "Timex Sinclair",         "Timex Sinclair 1000", MACHINE_NO_SOUND_HW )
-COMP( 1983, ts1500,   zx81,   0,      ts1500,  zx81,    zx_state, init_zx, "Timex Sinclair",         "Timex Sinclair 1500", MACHINE_NO_SOUND_HW )
-COMP( 1983, tk85,     zx81,   0,      ts1000,  zx81,    zx_state, init_zx, "Microdigital",           "TK85",                MACHINE_NO_SOUND_HW )
-COMP( 1983, ringo470, zx81,   0,      ts1000,  zx81,    zx_state, init_zx, "Ritas do Brasil Ltda",   "Ringo R-470",         MACHINE_NO_SOUND_HW )
-COMP( 1984, pc8300,   zx81,   0,      pc8300,  pc8300,  zx_state, init_zx, "Your Computer",          "PC8300",              MACHINE_NOT_WORKING )
-COMP( 1983, pow3000,  zx81,   0,      pow3000, pow3000, zx_state, init_zx, "Creon Enterprises",      "Power 3000",          MACHINE_NOT_WORKING )
-COMP( 1982, lambda,   zx81,   0,      pow3000, pow3000, zx_state, init_zx, "Lambda Electronics Ltd", "Lambda 8300",         MACHINE_NOT_WORKING )
-COMP( 1997, zx97,     zx81,   0,      zx81,    zx81,    zx_state, init_zx, "Wilf Rigter",            "ZX97",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_UNOFFICIAL )
+COMP( 1980, zx80,     0,      0,      zx80,    zx80,    zx_state, init_zx, "Sinclair Research Ltd",  "ZX-80",               MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, zx81,     0,      0,      zx81,    zx81,    zx_state, init_zx, "Sinclair Research Ltd",  "ZX-81",               MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, ts1000,   zx81,   0,      ts1000,  zx81,    zx_state, init_zx, "Timex Sinclair",         "Timex Sinclair 1000", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, ts1500,   zx81,   0,      ts1500,  zx81,    zx_state, init_zx, "Timex Sinclair",         "Timex Sinclair 1500", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, tk85,     zx81,   0,      tk85,    zx81,    zx_state, init_zx, "Microdigital",           "TK85",                MACHINE_SUPPORTS_SAVE )
+COMP( 1983, ringo470, zx81,   0,      ts1000,  zx81,    zx_state, init_zx, "Ritas do Brasil Ltda",   "Ringo R-470",         MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1984, pc8300,   zx81,   0,      pc8300,  pc8300,  zx_state, init_zx, "Your Computer",          "PC8300",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, pow3000,  zx81,   0,      pow3000, pow3000, zx_state, init_zx, "Creon Enterprises",      "Power 3000",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, lambda,   zx81,   0,      pow3000, pow3000, zx_state, init_zx, "Lambda Electronics Ltd", "Lambda 8300",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1997, zx97,     zx81,   0,      zx81,    zx81,    zx_state, init_zx, "Wilf Rigter",            "ZX97",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_UNOFFICIAL | MACHINE_SUPPORTS_SAVE )

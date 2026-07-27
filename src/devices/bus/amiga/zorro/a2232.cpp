@@ -34,7 +34,7 @@ namespace bus::amiga::zorro {
 void a2232_device::device_add_mconfig(machine_config &config)
 {
 	// main cpu
-	M65CE02(config, m_iocpu, 28.37516_MHz_XTAL / 8); // should run at Amiga clock 7M / 2
+	M65CE02(config, m_iocpu, DERIVED_CLOCK(1, 2));
 	m_iocpu->set_addrmap(AS_PROGRAM, &a2232_device::iocpu_map);
 
 	INPUT_MERGER_ANY_HIGH(config, m_ioirq);
@@ -42,7 +42,7 @@ void a2232_device::device_add_mconfig(machine_config &config)
 
 	// acia
 	for (auto &acia : m_acia)
-		MOS6551(config, acia, 28.37516_MHz_XTAL / 8).set_xtal(1.8432_MHz_XTAL);
+		MOS6551(config, acia, DERIVED_CLOCK(1, 2)).set_xtal(1.8432_MHz_XTAL);
 	m_acia[0]->txd_handler().set("rs232_1", FUNC(rs232_port_device::write_txd));
 	m_acia[0]->irq_handler().set(m_ioirq, FUNC(input_merger_device::in_w<0>));
 	m_acia[1]->txd_handler().set("rs232_2", FUNC(rs232_port_device::write_txd));

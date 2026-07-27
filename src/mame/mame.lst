@@ -47485,6 +47485,7 @@ tanodr64h
 
 @source:trs/lnw80.cpp
 lnw80
+mxcomp
 
 @source:trs/max80.cpp
 max80
@@ -48929,6 +48930,7 @@ miprimlec
 
 @source:vtech/glcx.cpp
 bs9009cx
+cbcomm
 gl6600cx
 gl8008cx
 gtbmcx

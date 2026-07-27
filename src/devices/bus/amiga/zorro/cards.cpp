@@ -14,6 +14,7 @@
 #include "a2065.h"
 #include "a2091.h"
 #include "a2232.h"
+#include "adscsi.h"
 #include "buddha.h"
 #include "merlin.h"
 #include "oktagon2008.h"
@@ -30,6 +31,8 @@ void zorro2_cards(device_slot_interface &device)
 	device.option_add("a2065", AMIGA_A2065);
 	device.option_add("a2091", AMIGA_A2091);
 	device.option_add("a2232", AMIGA_A2232);
+	device.option_add("adscsi2000", AMIGA_ADSCSI2000);
+	device.option_add("adscsi2080", AMIGA_ADSCSI2080);
 	device.option_add("buddha", AMIGA_BUDDHA);
 	device.option_add("merlin", AMIGA_MERLIN);
 	device.option_add("oktagon2008", AMIGA_OKTAGON2008);
