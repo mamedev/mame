@@ -540,6 +540,160 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="mobigo1" supported="no">
+		<description>Disney les Fees - Talents de fees (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-250905 - Disney les Fees - Talents de fees (France).bin" size="0x1000000" crc="d7a2b207" sha1="486b3a7ad99b47ad66535ede17bcb531b2f99a2a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mobigo2" supported="no">
+		<description>Disney Princess (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-251105 - Disney Princess (France).bin" size="0x1000000" crc="cb73c525" sha1="bc65143c114fa070a4bc55205384c4af9318728f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mobigo3" supported="no">
+		<description>Disney Pixar - Cars Toon - Martin se la raconte (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-251205 - Disney Pixar - Cars Toon - Martin se la raconte (France).bin" size="0x1000000" crc="0748406a" sha1="d6cb451b870abfc2d8496abb20b2a13ef8e58ad2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mobigo4" supported="no">
+		<description>Scooby-Doo! - Dans la cite clandestine (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-251605 - Scooby-Doo - Dans la cite clandestine (France).bin" size="0x1000000" crc="3607335b" sha1="200ed6254a1abdebf24db8b7e4600801d1f6721f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mobigo5" supported="no">
+		<description>Raiponce (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-251705 - Raiponce (France).bin" size="0x1000000" crc="b9512130" sha1="b65e7e0013ad142af63845af36982059c50c2f37"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mobigo6" supported="no">
+		<description>Cars 2 (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-251905 - Cars 2 (France).bin" size="0x1000000" crc="e600f5c8" sha1="7104bb402d3506818e7db90226b94b28419b4aa0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mobigo7" supported="no">
+		<description>Le Dino Train - A la decouverte du monde! (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-252305 - Le Dino Train - A la decouverte du monde (France).bin" size="0x1000000" crc="65002a9a" sha1="77c936de055459385bc0c2bd95242f44e8365433"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mobigo8" supported="no">
+		<description>Rebelle (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-252605 - Rebelle (France).bin" size="0x1000000" crc="1952cdcc" sha1="658f48d75f141f7937e3ff55b376238588f8ffa3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mobigo9" supported="no">
+		<description>Jake et les Pirates du pays imaginaire (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-252805 - Jake et les Pirates du pays imaginaire (France).bin" size="0x1000000" crc="3bae692b" sha1="d67289662df7939130fa1f14df4e58a41f684d04"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mobigo10" supported="no">
+		<description>Disney Planes (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-253005 - Disney Planes (France).bin" size="0x1000000" crc="e370c31c" sha1="51b66ad8230d376d6ae3f23055216245c7f27826"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mobigo11" supported="no">
+		<description>Docteur La Peluche (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-253305 - Docteur La Peluche (France).bin" size="0x1000000" crc="f7e1ace2" sha1="f080630d33a708cd0fa03e99180209aa47e4cfd5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mobigo12" supported="no">
+		<description>Les Monsieur Madame - Aventures a Jolieville (France).</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-250205 - Les Monsieur Madame - Aventures a Jolieville (France).bin" size="0x1000000" crc="e1410eed" sha1="1acff360ebf323e5e5a8f974f49ac8e773eb64b7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mobigo13" supported="no">
+		<description>Les Pingouins de Madagascar - Mission Aventure (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-250305 - Les Pingouins de Madagascar - Mission Aventure (France).bin" size="0x1000000" crc="ee56c618" sha1="11b6c083b4e6b30d896455457662aa6b3bb5fbf6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mobigo14" supported="no">
+		<description>La Maison de Mickey - La Balle de Pluto (France)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-250505 - La Maison de Mickey - La Balle de Pluto (France).bin" size="0x1000000" crc="c5f50181" sha1="31afd42bb436a7deced2366c739aef2b6d3896f8"/>
+			</dataarea>
+		</part>
+	</software>
+
 
 	<!-- this is from a special large scale Kiosk unit, which should also have a unique BIOS.
 	         Maybe move into driver as a hardcodd cart once BIOS is dumped rather than having it here? -->
