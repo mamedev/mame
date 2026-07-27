@@ -327,7 +327,7 @@ void h8gen_dma_channel_device::start(int submodule)
 	m_state[submodule].m_incs = m_state[submodule].m_flags & h8_dma_state::SOURCE_IDLE ? 0 :  m_state[submodule].m_flags & h8_dma_state::SOURCE_DECREMENT ? -step : step;
 	m_state[submodule].m_incd = m_state[submodule].m_flags & h8_dma_state::DEST_IDLE ? 0 :  m_state[submodule].m_flags & h8_dma_state::DEST_DECREMENT ? -step : step;
 
-	logerror("%c: setup src=%s%s dst=%s%s count=%x bcount=%x trigger=%s%s%s%s%s%s%s%s%s\n",
+	logerror("%c: setup src=%s%s dst=%s%s count=%x bcount=%x trigger=%s%s%s%s%s%s%s%s%s%s\n",
 			 'A' + submodule,
 			 m_state[submodule].m_source & 0x80000000 ? util::string_format("dack%d", m_state[submodule].m_source & 1) : util::string_format("%06x", m_state[submodule].m_source),
 			 m_state[submodule].m_incs > 0 ? util::string_format("+%x", m_state[submodule].m_incs) : m_state[submodule].m_incs < 0 ? util::string_format("-%x", -m_state[submodule].m_incs) : "",
