@@ -63,7 +63,7 @@ license:CC0-1.0
     47 ground   48 Gnd
 -->
 
-<softwarelist name="icanpian" description="Fisher-Price / Mattel I Can Play Piano cartridges">
+<softwarelist name="icanpian" description="Fisher-Price I Can Play Piano cartridges">
 	<software name="pianfav">
 		<description>Piano Favorites (J7522)</description>
 		<year>2005</year>
