@@ -47398,6 +47398,9 @@ crei680
 @source:trainer/cvicny.cpp
 cvicny
 
+@source:trainer/dgp80.cpp
+dgp80
+
 @source:trainer/dolphunk.cpp
 dauphin
 
