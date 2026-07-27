@@ -19,18 +19,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- probably a different story, not a clone, check -->
-	<software name="ratfra" cloneof="ratfr" supported="no">
-		<description>Ratatouille (France, set 2)</description>
-		<year>200?</year>
-		<publisher>LeapFrog</publisher>
-		<part name="cart" interface="leapfrog_leappad_cart">
-			<dataarea name="rom" size="0x200000">
-				<rom name="500-12687 - Ratatouille (France).bin" size="0x200000" crc="1b7e2854" sha1="3ac217e514ad3df79c42ffad5bc85d723e716cdb" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="intsci" supported="no"> <!-- no serial or date printed anywhere -->
 		<description>Interactif Sciences - Extraordinaires mammiferes! (France)</description>
 		<year>200?</year>
@@ -1926,10 +1914,13 @@ license:CC0-1.0
 
 
 	<software name="foxsocks" supported="no">
-		<description>Fox in Socks</description>
-		<year>200?</year>
+		<description>Fox in Socks (1st Grade) (US)</description>
+		<year>2004</year>
 		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10445"/>
 		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb_rev" value="V00"/>
+			<feature name="u1" value="MX27V3202F"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->		
 			<dataarea name="rom" size="0x400000">
 				<rom name="500-10445 - Fox in Socks.bin" size="0x400000" crc="50578c00" sha1="20f2fedd9f8e1d7559d939fdbfe3b3b734d430ab" />
 			</dataarea>
@@ -1948,11 +1939,15 @@ license:CC0-1.0
 	</software>
 
 	<software name="batman" supported="no">
-		<description>Batman</description>
+		<description>Batman (1st-2nd Grade) (US)</description>
 		<year>200?</year>
 		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11373"/>	
 		<part name="cart" interface="leapfrog_leappad_cart">
-			<dataarea name="rom" size="0x200000">
+			<feature name="pcb" value="57000-003-2911"/>
+			<feature name="pcb_rev" value="REV.01"/>
+			<feature name="u1" value="OKi 16M(F)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->			
+			<dataarea name="rom" size="0x200000">		
 				<rom name="500-11373 - Batman.bin" size="0x200000" crc="7fa523ff" sha1="223bc88b995264dfd0f25d7e4592137968185ebc" />
 			</dataarea>
 		</part>
@@ -1998,17 +1993,6 @@ license:CC0-1.0
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<dataarea name="rom" size="0x400000">
 				<rom name="UBL 500-11747 - Let's Go 3 (France).bin" size="0x400000" crc="a2cc0d40" sha1="51f1de30839f07fafe9f30c2fd2efb1b8b887c3b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="royaume" supported="no">
-		<description>Le royaume des nombres enchantes (France)</description>
-		<year>200?</year>
-		<publisher>LeapFrog</publisher>
-		<part name="cart" interface="leapfrog_leappad_cart">
-			<dataarea name="rom" size="0x200000">
-				<rom name="500-12271 - Le royaume des nombres enchantes (France).bin" size="0x200000" crc="7036402b" sha1="5acc930b97af7b7a0f2a0c1f39eb1d83badd33ed" />
 			</dataarea>
 		</part>
 	</software>

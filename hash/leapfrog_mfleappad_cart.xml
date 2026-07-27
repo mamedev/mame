@@ -262,4 +262,26 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="ratfr" supported="no">
+		<description>Ratatouille (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-12687 - Ratatouille (France).bin" size="0x200000" crc="1b7e2854" sha1="3ac217e514ad3df79c42ffad5bc85d723e716cdb" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="royaume" supported="no">
+		<description>Le royaume des nombres enchantes (France)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-12271 - Le royaume des nombres enchantes (France).bin" size="0x200000" crc="7036402b" sha1="5acc930b97af7b7a0f2a0c1f39eb1d83badd33ed" />
+			</dataarea>
+		</part>
+	</software>	
+
 </softwarelist>
