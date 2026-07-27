@@ -13,7 +13,9 @@ TODO:
 - smleague / finlarch: it randomly hangs / crashes, it works if you use a ridiculous
   set_maximum_quantum() number, might need strict SH-2 synching or it's actually a m68k comms issue.
 
-- danchih / danchiq: currently hangs randomly (regression).
+- danchih / danchiq: currently hangs on title screen due of sound miscomms.
+  Writes to A-Bus (cache?), transfer "SEGA" defaults to sound RAM thru indirect mode SCU DMA,
+  SH-2 loops until $60ffcbd become 0x04 (sets 0x08 then never clear the flag, missed event from SCSP?)
 
 - stress: accesses the Sound Memory Expansion Area (0x05a80000-0x05afffff), unknown purpose if any;
 
@@ -3997,8 +3999,8 @@ GAME( 1997, cotton2,   stvbios, stv,      stv,      stv_state,   init_cotton2,  
 GAME( 1998, cottonbm,  stvbios, stv,      stv,      stv_state,   init_cottonbm,   ROT0,   "Success",                      "Cotton Boomerang (JUET 980709 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAMEL(1995, critcrsh,  stvbios, critcrsh, critcrsh, stv_state,   init_stv,        ROT0,   "Sega",                         "Critter Crusher (EA 951204 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS, layout_critcrsh )
 GAMEL(1995, tatacot,   critcrsh,critcrsh, critcrsh, stv_state,   init_stv,        ROT0,   "Sega",                         "Tatacot (JA 951128 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS, layout_critcrsh )
-GAME( 1999, danchih,   stvbios, stvmp,    stvmp,    stv_state,   init_danchih,    ROT0,   "Altron (Tecmo license)",       "Danchi de Hanafuda (J 990607 V1.400)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, danchiq,   stvbios, stv,      stv,      stv_state,   init_danchiq,    ROT0,   "Altron",                       "Danchi de Quiz: Okusan Yontaku Desuyo! (J 001128 V1.200)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, danchih,   stvbios, stvmp,    stvmp,    stv_state,   init_danchih,    ROT0,   "Altron (Tecmo license)",       "Danchi de Hanafuda (J 990607 V1.400)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unstable with sound comms
+GAME( 2000, danchiq,   stvbios, stv,      stv,      stv_state,   init_danchiq,    ROT0,   "Altron",                       "Danchi de Quiz: Okusan Yontaku Desuyo! (J 001128 V1.200)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^ (same game engine)
 GAME( 1996, diehard,   stvbios, stv,      stv,      stv_state,   init_diehard,    ROT0,   "Sega",                         "Die Hard Arcade (UET 960515 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND  )
 GAME( 1996, dnmtdeka,  diehard, stv,      stv,      stv_state,   init_dnmtdeka,   ROT0,   "Sega",                         "Dynamite Deka (J 960515 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND  )
 GAME( 1995, ejihon,    stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Ejihon Tantei Jimusho (J 950613 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

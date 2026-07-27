@@ -428,13 +428,16 @@ void saturn_scu_device::trigger_dma_direct(uint8_t level)
 		m_dma[level].mode |= DMA_MODE_CBUS_WRITE;
 	}
 
-	m_dma[level].bbus_sound_access = (m_dma[level].src & 0x07e0'0000) == 0x05a0'0000 || (m_dma[level].dst & 0x07e0'0000) == 0x05a0'0000;
+	m_dma[level].bbus_sound_access = (m_dma[level].src & 0x07f0'0000) == 0x05a0'0000 || (m_dma[level].dst & 0x07f0'0000) == 0x05a0'0000;
+	// - sonicjamj Sonic 1 (at least) does VDP2s back-to-back writes, several failing without a guard here.
+	const bool vdp2_access = (m_dma[level].dst & 0x05e0'0000) == 0x05e0'0000;
+
 	// - saturn BIOS chains several cache through DMAs back-to-back with no status check
 	//   clearly expect that the host CPU shouldn't do anything around the time the DMA goes.
 	// - stv:gaxeduel also does two back-to-back sound DMAs from A-Bus, failing the second one if
 	//   SH-2s aren't slowed down to a crawl
 	// TODO: latter really needs bus grants, interruptible SH-2 and .before_delay.
-	m_dma[level].cbus_cache_through = m_dma[level].bbus_sound_access || (m_dma[level].src & 0x2700'0000) == 0x2600'0000 || (m_dma[level].dst & 0x2700'0000) == 0x2600'0000;
+	m_dma[level].cbus_cache_through = m_dma[level].bbus_sound_access || vdp2_access || (m_dma[level].src & 0x2700'0000) == 0x2600'0000 || (m_dma[level].dst & 0x2700'0000) == 0x2600'0000;
 
 	m_dma[level].live_src = m_dma[level].src;
 	m_dma[level].live_dst = m_dma[level].dst;
@@ -567,8 +570,9 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick_cb)
 					level, m_dma[level].index, indirect_src, indirect_dst, indirect_size,
 					m_dma[level].indirect_end_flag ? "END" : "");
 
-				m_dma[level].cbus_cache_through = (indirect_src & 0x2700'0000) == 0x2600'0000 || (indirect_dst & 0x2700'0000) == 0x2600'0000;
-				m_dma[level].bbus_sound_access = m_dma[level].cbus_cache_through || (indirect_src & 0x07e0'0000) == 0x05a0'0000 || (indirect_dst & 0x07e0'0000) == 0x05a0'0000;
+				m_dma[level].bbus_sound_access = (indirect_src & 0x07e0'0000) == 0x05a0'0000 || (indirect_dst & 0x07e0'0000) == 0x05a0'0000;
+				const bool vdp2_access = (indirect_dst & 0x05e0'0000) == 0x05e0'0000;
+				m_dma[level].cbus_cache_through = m_dma[level].bbus_sound_access || vdp2_access || (indirect_src & 0x2700'0000) == 0x2600'0000 || (indirect_dst & 0x2700'0000) == 0x2600'0000;
 
 				m_dma[level].live_src = indirect_src & 0x07ff'ffff;
 				m_dma[level].live_dst = indirect_dst & 0x07ff'ffff;

@@ -8306,7 +8306,6 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Sonic Jam (Japan)... -->
 	<software name="sonicjamj" cloneof="sonicjam" supported="no">
 		<description>Sonic Jam (Japan)</description>
 		<year>1997</year>
