@@ -5866,11 +5866,14 @@ ROM_START(spectred)
 
 	ROM_REGION(0x10000,"maincpu",0)
 	// these ROMs appear to have been dumped weirdly, or are wired weirdly in the real hardware.
-	// The first 0x2000 of u51 seems to be garbage
-	// u50 seems to have the halves duplicated, and D000 and E000 swapped
-	ROM_LOAD ( "spm-c_ed_51-09-86.u51.h", 0x0000, 0x4000, CRC(fae8d36c) SHA1(69bed61513482ccb578b89c2fb8e7ba2258e82a5))
-	ROM_LOAD ( "spm-c_ed_50-09-86.u50.h", 0x2000, 0x1000, CRC(1fccaf24) SHA1(1de1438ee8789f83cbc97f75c0485d1fd0f58a38))
-	ROM_CONTINUE(0x4000, 0x2000)
+	// Two firmware revisions are included, based on the enhanced IIe and non-enhanced IIe, but the former is non-bootable.
+	ROM_LOAD ( "spm-c_ed_51-09-86.u51.h", 0x4000, 0x1000, CRC(fae8d36c) SHA1(69bed61513482ccb578b89c2fb8e7ba2258e82a5))
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x0000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_LOAD ( "spm-c_ed_50-09-86.u50.h", 0x6000, 0x1000, CRC(1fccaf24) SHA1(1de1438ee8789f83cbc97f75c0485d1fd0f58a38))
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
 	ROM_CONTINUE(0x1000, 0x1000)
 ROM_END
 
