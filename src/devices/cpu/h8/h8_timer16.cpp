@@ -286,7 +286,7 @@ void h8_timer16_channel_device::update_counter(u64 cur_time)
 					match = delta >= m_counter_cycle || (prev < cmp && tt >= cmp) || (m_tcnt <= prev && m_tcnt >= cmp);
 
 				if(match && BIT(m_ier, i) && m_interrupt[i] != -1)
-					logerror("update_counter unexpected TGR %d IRQ\n, i");
+					logerror("update_counter unexpected TGR %d IRQ\n", i);
 			}
 
 			if(match) {
