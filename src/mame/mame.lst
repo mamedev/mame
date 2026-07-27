@@ -47485,6 +47485,7 @@ tanodr64h
 
 @source:trs/lnw80.cpp
 lnw80
+mxcomp
 
 @source:trs/max80.cpp
 max80
