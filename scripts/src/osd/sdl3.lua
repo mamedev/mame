@@ -109,9 +109,7 @@ end
 
 
 function sdlconfigcmd()
-	if _OPTIONS["targetos"]=="asmjs" then
-		return "sdl3-config"
-	elseif _OPTIONS["SDL_PKGCONFIG_PATH"] then
+	if _OPTIONS["SDL_PKGCONFIG_PATH"] then
 		return path.join(_OPTIONS["SDL_PKGCONFIG_PATH"],"pkg-config") .. " sdl3"
 	elseif not _OPTIONS["SDL_INSTALL_ROOT"] then
 		return pkgconfigcmd() .. " sdl3"
