@@ -1233,15 +1233,15 @@ android-x64: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x64/Make
 #-------------------------------------------------
 
 $(PROJECTDIR)/$(MAKETYPE)-asmjs/Makefile: makefile $(SCRIPTS) $(GENIE)
-ifndef EMSCRIPTEN
-	$(error EMSCRIPTEN is not set)
+ifndef EMSDK
+	$(error EMSDK is not set)
 endif
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=asmjs --gcc_version=$(CLANG_VERSION) $(MAKETYPE)
 
 .PHONY: asmjs
 asmjs: generate $(PROJECTDIR)/$(MAKETYPE)-asmjs/Makefile
-ifndef EMSCRIPTEN
-	$(error EMSCRIPTEN is not set)
+ifndef EMSDK
+	$(error EMSDK is not set)
 endif
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-asmjs config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-asmjs config=$(CONFIG)

@@ -378,10 +378,18 @@ above in All Platforms.
 Emscripten Javascript and HTML
 ------------------------------
 
-First, download and install Emscripten 3.1.35 or later by following the
+First, download and install Emscripten 6.0.2 or later by following the
 instructions at the `official site <https://emscripten.org/docs/getting_started/downloads.html>`_.
 
-Once Emscripten has been installed, it should be possible to compile MAME
+
+Once Emscripten has been installed, use **source emsdk_env.sh** or **emsdk_env.bat**
+to set environment variables. Since MAME requires SDL libraries, prepare them with
+
+.. code-block:: bash
+
+    embuilder build sdl3 sdl3_ttf
+
+After dependencies are compiled, it should be possible to compile MAME
 out-of-the-box using Emscripten’s **emmake** tool. Because a full MAME
 compile is too large to load into a web browser at once, you will want to use
 the SOURCES parameter to compile only a subset of the project, e.g. (in the
@@ -403,11 +411,6 @@ commas) if this process misses something. e.g.
 
 The value of the **SUBTARGET** parameter serves only to differentiate multiple
 builds and need not be set to any specific value.
-
-Emscripten supports compiling to WebAssembly with a JavaScript loader instead of
-all-JavaScript, and in later versions this is actually the default. To force
-WebAssembly on or off, add **WEBASSEMBLY=1** or **WEBASSEMBLY=0** to the make
-command line, respectively.
 
 Other make parameters can also be used, e.g. **-j** for multithreaded
 compilation as described earlier.
