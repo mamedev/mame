@@ -512,10 +512,10 @@ ROM_START( eurbingo7 )
 	ROM_LOAD( "24lc16.u10", 0x000, 0x800, CRC(9ebb9996) SHA1(d025b59261181ec0a64570915b62fa9a4bb7bb87) )
 
 	ROM_REGION( 0x800, "counters", 0 )
-	ROM_LOAD( "cirsa_cs-4.bin", 0x000, 0x800, NO_DUMP )
+	ROM_LOAD( "cirsa_cs-4_24lc16b.bin", 0x000, 0x800, CRC(7b7844a8) SHA1(6ab1b13500a2012257f2f529fb7db3316951bfed) )
 
-	ROM_REGION( 0x104, "plds", 0 )
-	ROM_LOAD( "pat.u6", 0x000, 0x104, NO_DUMP )
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "pat_063-1.u6", 0x000, 0x117, CRC(39e107c6) SHA1(bb151d9085d81233854a91b1a95c4abae9bd597b) )
 ROM_END
 
 /* '960606-5 PCB and 'CB1 (CS4)' security counters module. CPLD labeled as 'PD18'. This is mechanical.
