@@ -1150,8 +1150,8 @@ CONS( 2004, maxheart,   0,        0, superxavix_i2c_24c04_4mb,  maxheart,   supe
 // どこでもドラえもん 日本旅行ゲームDX体感！どこドラグランプリ！
 CONS( 2004, epo_doka,   0,        0, xavix2002_4mb,             xavix,      superxavix_state,            init_epo_doka, "Epoch / SSD Company Limited", "Doko Demo Doraemon Nihon Ryokou Game DX Taikan! Doko Dora Grand Prix! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// テレビであそぼう!まなぼう! カードでおままごと あいうえお図鑑
-CONS( 2006, epo_kabj,   0,        0, xavix2002,                 xavix,      superxavix_state,            init_xavix,    "Epoch / SSD Company Limited", "Hello Kitty TV de Asobou! Manabou! Card de Omamagoto AIUEO Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// Hello Kitty テレビであそぼう!まなぼう! カードでおままごと あいうえお図鑑
+CONS( 2006, epo_kabj,   0,        0, xavix2002,                 xavix,      superxavix_state,            init_xavix,    "Epoch / SSD Company Limited", "Hello Kitty: TV de Asobou! Manabou! Card de Omamagoto AIUEO Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイ なりきり体感 ボウケンジャー 走れ！撃て！ミッションスタート！！
 CONS( 2006, ban_bkgj,   0,        0, superxavix_i2c_24c04_4mb,  xavix_i2c,  superxavix_i2c_state,        init_xavix,    "Bandai / SSD Company Limited", "Let's! TV Play Narikiri Taikan Boukenger: Hashire! Ute! Mission Start!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
@@ -1177,8 +1177,8 @@ CONS( 2005, tmy_thom,   0,        0, superxavix_i2c_24c04,      xavix_i2c,  supe
 // Ｌｅｔ’ｓ！ ＴＶプレイ 体感体得 結界師 方囲！定礎！結！滅！
 CONS( 2007, ban_kksj,   0,        0, superxavix_i2c_24c02,      xavix_i2c,  superxavix_i2c_state,        init_xavix,    "Bandai / SSD Company Limited", "Let's! TV Play Taikan Taitoku Kekkaishi: Houi! Jouso! Ketsu! Metsu! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-// 流星のロックマン 電波変換！オン・エア！
-CONS( 2007, tmy_rkmj,   0,        0, superxavix_i2c_24c04,      xavix_i2c,  superxavix_i2c_state,        init_xavix,    "Takara Tomy / Capcom / SSD Company Limited", "Ryuusei no Rockman: Denpa Henkan! On Air! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// テレビで遊び隊 流星のロックマン 電波変換！オン・エア！
+CONS( 2007, tmy_rkmj,   0,        0, superxavix_i2c_24c04,      xavix_i2c,  superxavix_i2c_state,        init_xavix,    "Takara Tomy / Capcom / SSD Company Limited", "TV de Asobitai Ryuusei no Rockman: Denpa Henkan! On Air! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイ 音撃バトル！仮面ライダー響鬼 決めろ！一気火勢の型
 CONS( 2005, ban_ordj,   0,        0, superxavix_i2c_24c04,      ban_ordj,   superxavix_i2c_state,        init_xavix,    "Bandai / SSD Company Limited", "Let's! TV Play Ongeki Battle! Kamen Rider Hibiki: Kimero! Ikki Kasei no Kata (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

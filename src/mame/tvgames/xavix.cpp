@@ -2939,16 +2939,16 @@ CONS( 2002,  epo_dmon,  0,        0, xavix_i2c_24c02_4mb,   xavix_i2c, xavix_i2c
 CONS( 2003,  epo_crok,  0,        0, xavix_i2c_24lc04_4mb,  xavix_i2c, xavix_i2c_state,           init_xavix,         "Epoch / SSD Company Limited", "Croket! Itada Kinka! Banker Battle!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ミニモニ。ステージ！ダンスだぴょん！
-CONS( 2002,  epo_mms,   0,        0, xavix_i2c_24c02_4mb,   epo_mms,   xavix_i2c_state,           init_xavix,         "Epoch / SSD Company Limited", "mini-moni Stage! Dance Dapyon! (Japan)",  MACHINE_IMPERFECT_SOUND )
+CONS( 2002,  epo_mms,   0,        0, xavix_i2c_24c02_4mb,   epo_mms,   xavix_i2c_state,           init_xavix,         "Epoch / SSD Company Limited", "mini-moni. Stage! Dance Dapyon! (Japan)",  MACHINE_IMPERFECT_SOUND )
 
 // ズバズバブレード
 CONS( 2002,  tak_zuba,  0,        0, xavix_i2c_24c02_4mb,   xavix_i2c, xavix_i2c_state,           init_xavix,         "Takara / SSD Company Limited", "Zuba Zuba Blade (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ミニモニ。ステージ！ダンスだぴょん！ぷらすっ
-CONS( 2003,  epo_mmsp,  0,        0, xavix_i2c_24c02_4mb,   epo_mms,   xavix_i2c_state,           init_xavix,         "Epoch / SSD Company Limited", "mini-moni Stage! Dance Dapyon! Plus (Japan)",  MACHINE_IMPERFECT_SOUND )
+CONS( 2003,  epo_mmsp,  0,        0, xavix_i2c_24c02_4mb,   epo_mms,   xavix_i2c_state,           init_xavix,         "Epoch / SSD Company Limited", "mini-moni. Stage! Dance Dapyon! Plus (Japan)",  MACHINE_IMPERFECT_SOUND )
 
-// Let's!TVプレイ ケロロ軍曹 ケロロ小隊大パニック！ドタバタ大決戦であります
-CONS( 2006,  ban_krrj,  0,        0, xavix_4mb,             ban_krrj,  xavix_state,               init_xavix,         "Bandai / SSD Company Limited", "Let's! TV Play Keroro Gunsou: Keroro Shoutai Dai Panic! Dotabata Daikessen de Arimasu (Japan)",  MACHINE_IMPERFECT_SOUND )
+// Let's!TVプレイ ケロロ小隊大パニック！ドタバタ大決戦であります
+CONS( 2006,  ban_krrj,  0,        0, xavix_4mb,             ban_krrj,  xavix_state,               init_xavix,         "Bandai / SSD Company Limited", "Let's! TV Play Keroro Shoutai Dai Panic! Dotabata Daikessen de Arimasu (Japan)",  MACHINE_IMPERFECT_SOUND )
 
 // オールスター感謝祭　超豪華！クイズ決定版～赤坂５丁目体感スタジオ～
 CONS( 2004,  epo_quiz,  0,        0, xavix_4mb,             epo_quiz,  xavix_state,               init_xavix,         "Epoch / SSD Company Limited", "All-Star Kansha-sai Chou Gouka! Quiz Kettieban: Akasaka 5-choume Taikan Studio (Japan)", MACHINE_IMPERFECT_SOUND )
@@ -2961,7 +2961,7 @@ CONS( 2002,  tak_geig,  0,        0, xavix_4mb_nv,          tak_geig,  xavix_sta
 // some unemulated connectivity features to add other robots into the game
 CONS( 2001,  tak_wdg,   0,        0, xavix_2mb_nv,          tak_wdg,   xavix_state,               init_xavix,         "Takara / SSD Company Limited", "Webdiver DX W-05 Gladion (Japan)", MACHINE_IMPERFECT_SOUND )
 
-// TVホッケー
+// ティービーホッケー
 // playable but could do with better deadzome handling on the controls at least
 // the trackball functionality works well in the menus, but not the games
 CONS( 2001,  tom_tvho,  0,        0, xavix_tom_tvho,        tom_tvho,  xavix_tom_tvho_state,      init_xavix,         "Tomy / SSD Company Limited", "TV Hockey (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
@@ -2984,17 +2984,17 @@ CONS( 2002,  tak_beyb,  tak_beyu, 0, xavix_2mb,             xavix,     xavix_sta
 // ジャラジャランド
 CONS( 2003,  jarajal,   0,        0, xavix_2mb_nv,          jarajal,   xavix_state,               init_xavix,         "Takara / SSD Company Limited", "Jyarajyaland (Japan, PlugIt! version)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// 近代撃ちまくりバラエティ 射的王(シャテキング)
-CONS( 2002,  tomshoot,  0,        0, xavix_i2c_24c02_2mb,   tomshoot,  xavix_i2c_tomshoot_state,  init_xavix,         "Tomy / SSD Company Limited", "Kindai Uchimakuri Variety Shateking (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// テレビで遊び隊 近代撃ちまくりバラエティ 射的王(シャテキング)
+CONS( 2002,  tomshoot,  0,        0, xavix_i2c_24c02_2mb,   tomshoot,  xavix_i2c_tomshoot_state,  init_xavix,         "Tomy / SSD Company Limited", "TV de Asobitai Kindai Uchimakuri Variety Shateking (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// トミカ カーナビドライブ / トミー
-CONS( 2003,  tcarnavi,  0,        0, xavix_4mb_nv,          tcarnavi,  xavix_state,               init_xavix,         "Tomy / SSD Company Limited", "Tomica Carnavi Drive (Japan)", MACHINE_IMPERFECT_SOUND )
+// テレビで遊び隊 トミカ カーナビドライブ / トミー
+CONS( 2003,  tcarnavi,  0,        0, xavix_4mb_nv,          tcarnavi,  xavix_state,               init_xavix,         "Tomy / SSD Company Limited", "TV de Asobitai Tomica Carnavi Drive (Japan)", MACHINE_IMPERFECT_SOUND )
 
-// 痛快！娯楽活劇 ちゃんぴよんピンボール
-CONS( 2003,  tomcpin,   0,        0, xavix_i2c_24c08_4mb,   tomcpin,   xavix_i2c_state,           init_xavix,         "Tomy / SSD Company Limited", "Tsuukai! Goraku Katsugeki: Champiyon Pinball (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// テレビで遊び隊 痛快！娯楽活劇 ちゃんぴよんピンボール
+CONS( 2003,  tomcpin,   0,        0, xavix_i2c_24c08_4mb,   tomcpin,   xavix_i2c_state,           init_xavix,         "Tomy / SSD Company Limited", "TV de Asobitai Tsuukai! Goraku Katsugeki: Champiyon Pinball (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-// 日本一周 僕はプラレール運転士
-CONS( 2004,  tomplc,    0,        0, xavix_i2c_24c02_43mhz, tomplc,    xavix_i2c_state,           init_xavix,         "Tomy / SSD Company Limited", "Nihon Isshuu: Boku wa Plarail Untenshi (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// テレビで遊び隊 日本一周 僕はプラレール運転士
+CONS( 2004,  tomplc,    0,        0, xavix_i2c_24c02_43mhz, tomplc,    xavix_i2c_state,           init_xavix,         "Tomy / SSD Company Limited", "TV de Asobitai Nihon Isshuu: Boku wa Plarail Untenshi (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // テレビで遊び隊 ハイパーレスキュー ぼくは救助隊！
 // the demos in attract mode end instantly as if a button was being held, but not sure where it's read
@@ -3013,13 +3013,13 @@ CONS( 2001,  bistro,    0,        0, xavix_2mb,             xavix,     xavix_sta
 /* Music titles: Emulation note:
    Timers might not be 100%, PAL stuff uses different ways to do timing.
 */
-CONS( 2000,  ekara,     0,        0, xavix_cart_ekara,      ekara,     xavix_ekara_state,         init_xavix_slowenv, "Takara / SSD Company Limited / Hasbro",  "e-kara (US?, NTSC, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows "Please insert a cartridge before turn it on" without cart
-CONS( 2000,  ekaraa,    ekara,    0, xavix_cart_ekara,      ekara,     xavix_ekara_state,         init_xavix_slowenv, "Takara / SSD Company Limited / Hasbro",  "e-kara (US?, NTSC, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows "Please insert a cartridge before turning on e-kara" without cart
-CONS( 2000,  ekaraj,    ekara,    0, xavix_cart_ekara,      ekara,     xavix_ekara_state,         init_xavix_slowenv, "Takara / SSD Company Limited",           "e-kara (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows Japanese message without cart
-CONS( 2002,  ekarag,    ekara,    0, xavix_cart_ekara,      ekara,     xavix_ekara_state,         init_xavix_slowenv, "Takara / SSD Company Limited",           "e-kara (Europe, includes 3 songs)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // found in Germany and UK, could just be a Europe-wide model, NOT a headset model, but still has 3 songs.
-CONS( 2002,  ekaras,    ekara,    0, xavix_cart_ekara,      ekara,     xavix_ekara_state,         init_xavix_slowenv, "Takara / SSD Company Limited / newgent", "e-kara (Spain, includes 3 songs)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
+CONS( 2000,  ekara,     0,        0, xavix_cart_ekara,      ekara,     xavix_ekara_state,         init_xavix_slowenv, "Takara / SSD Company Limited / Hasbro",   "e-kara (US?, NTSC, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows "Please insert a cartridge before turn it on" without cart
+CONS( 2000,  ekaraa,    ekara,    0, xavix_cart_ekara,      ekara,     xavix_ekara_state,         init_xavix_slowenv, "Takara / SSD Company Limited / Hasbro",   "e-kara (US?, NTSC, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows "Please insert a cartridge before turning on e-kara" without cart
+CONS( 2000,  ekaraj,    ekara,    0, xavix_cart_ekara,      ekara,     xavix_ekara_state,         init_xavix_slowenv, "Takara / SSD Company Limited",            "e-kara (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows Japanese message without cart
+CONS( 2002,  ekarag,    ekara,    0, xavix_cart_ekara,      ekara,     xavix_ekara_state,         init_xavix_slowenv, "Takara / SSD Company Limited",            "e-kara (Europe, includes 3 songs)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // found in Germany and UK, could just be a Europe-wide model, NOT a headset model, but still has 3 songs.
+CONS( 2002,  ekaras,    ekara,    0, xavix_cart_ekara,      ekara,     xavix_ekara_state,         init_xavix_slowenv, "Takara / SSD Company Limited / newgent",  "e-kara (Spain, includes 3 songs)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
 // the Korean i-singer release from Sonokong has a unique bios and different data resources, meaning carts are not fully compatible between it and e-kara
-CONS( 2000,  isinger,   ekara,    0, xavix_cart_isinger,    ekara,     xavix_ekara_state,         init_xavix_slowenv, "Sonokong / SSD Company Limited",         "i-Singer (Korea)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
+CONS( 2000,  isinger,   ekara,    0, xavix_cart_isinger,    ekara,     xavix_ekara_state,         init_xavix_slowenv, "Sonokong / SSD Company Limited / D-Gate", "i-Singer (Korea)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
 
 // the 'e-kara pro headset' has 3 songs built in for the US release.  The Japanese release of this appears to be called 'e-kara H.S.' and it is unclear if it also has built in songs.  The Canadian box says 'cartridge contains' instead of 'songs included' but is likely a printing error.
 CONS( 2002,  ekaraphs,  ekara,    0, xavix_cart_ekara,      ekara,     xavix_ekara_state,         init_xavix_slowenv, "Takara / SSD Company Limited", "e-kara Pro Headset (US, includes 3 songs)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
@@ -3034,9 +3034,9 @@ CONS( 200?,  ekaramix,  0,        0, xavix_cart_ekara,      ekara,     xavix_eka
 CONS( 2001,  ddrfammt,  0,        0, xavix_cart_ddrfammt,   ddrfammt,  xavix_cart_state,          init_xavix,         "Takara / Konami / SSD Company Limited", "Dance Dance Revolution Family Mat (Japan)", MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ )
 
 // ポピラ
-CONS( 2000,  popira,    0,        0, xavix_cart_popira,     popira,    xavix_cart_state,          init_xavix,         "Takara / SSD Company Limited", "Popira (Japan)", MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // The original Popira is a single yellow unit
+CONS( 2000,  popira,    0,        0, xavix_cart_popira,     popira,    xavix_cart_state,          init_xavix,         "Takara / SSD Company Limited",            "Popira (Japan)", MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // The original Popira is a single yellow unit
 // the Korean release is not properly compatible with the usual Popira carts, although some of the Korean i-singer range are compatible
-CONS( 2001,  popirak,   popira,   0, xavix_cart_popirak,    popira,    xavix_cart_state,          init_xavix,         "Sonokong / SSD Company Limited", "PoPiRa: Finger Sports (Korea)", MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ )
+CONS( 2001,  popirak,   popira,   0, xavix_cart_popirak,    popira,    xavix_cart_state,          init_xavix,         "Sonokong / SSD Company Limited / D-Gate", "PoPiRa: Finger Sports (Korea)", MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ )
 
 // ポピラ2
 CONS( 2002,  popira2,   0,        0, xavix_cart_popira2,    popira2,   xavix_popira2_cart_state,  init_xavix,         "Takara / SSD Company Limited", "Popira 2 (Japan)", MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // Popira 2 is a set of 2 blue & green linked units (2nd unit is just a controller, no CPU or TV out)

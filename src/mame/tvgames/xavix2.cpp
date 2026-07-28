@@ -834,8 +834,8 @@ CONS( 2005, ban_dbz,   0, 0, config, naruto, naruto_state, empty_init, "Bandai /
 // Let's!TVプレイ　ドラゴンボールＺ　バトル体感かめはめ波２～オッスおめぇ悟空 天下一武道会～
 CONS( 2006, ban_db2j,  0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company Limited",    "Let's! TV Play Dragon Ball Z: Battle Taikan Kamehameha 2 ~Ossu Ome Goku Tenkaichi Budokai~ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-// テレビであそぼう!まなぼう! 超脳力あいうえお図鑑
-CONS( 2006, epo_dabj,  0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company Limited",     "TV de Asobou! Manabou! Chou Nouryoku AIUEO Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// ドラえもん テレビであそぼう!まなぼう! 超脳力あいうえお図鑑
+CONS( 2006, epo_dabj,  0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company Limited",     "Doraemon: TV de Asobou! Manabou! Chou Nouryoku AIUEO Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // ドラえもん 太鼓あいうえお図鑑
 CONS( 2010, epo_dab2j, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company Limited",     "Doraemon Taiko AIUEO Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
