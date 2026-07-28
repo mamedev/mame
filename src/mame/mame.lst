@@ -47535,6 +47535,7 @@ trs80m3
 trs80m4
 trs80m4p
 cp500
+naja800
 
 @source:trs/vis.cpp
 vis

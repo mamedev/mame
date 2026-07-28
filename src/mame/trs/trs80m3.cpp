@@ -540,13 +540,19 @@ ROM_END
 
 ROM_START( cp500 )
 	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_LOAD("s_8407_cn62516n_cp500a_prologica_83.ci111", 0x0000, 0x4000, CRC(c2fc1b92) SHA1(0eb07baee80f1ee1f28a609eb63a9245dcb68adb))
-
-	ROM_REGION(0x4000, "bootrom", 0)
+	//ROM_REGION(0x4000, "bootrom", 0)
 	ROM_LOAD("s_8407_cn62516n_cp500a_prologica_83.ci111", 0x0000, 0x4000, CRC(c2fc1b92) SHA1(0eb07baee80f1ee1f28a609eb63a9245dcb68adb))
 
 	ROM_REGION(0x0800, "chargen", 0)
 	ROM_LOAD( "100.105.ci36", 0x0000, 0x800, CRC(1765931e) SHA1(49176ceea6cc003efa04fad2f31829b9432fe10f))
+ROM_END
+
+ROM_START( naja800 )
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("naja800_27128b.bin", 0x0000, 0x4000, CRC(56eebcb4) SHA1(4c42fba757fe6c65faf97208015285a6dc5ae965))
+
+	ROM_REGION(0x1000, "chargen", 0)
+	ROM_LOAD("naja800_2732a.bin", 0x0000, 0x1000, CRC(dcc4f642) SHA1(8231bbfb4ed48ab7940ab72bc0dd071f8ac71085))
 ROM_END
 
 void trs80m3_state::init_trs80m3()
@@ -568,5 +574,6 @@ void trs80m3_state::init_trs80m4p()
 //    YEAR  NAME         PARENT    COMPAT    MACHINE   INPUT     CLASS          INIT             COMPANY               FULLNAME                FLAGS
 COMP( 1980, trs80m3,     0,        trs80l2,  model3,   trs80m3,  trs80m3_state, init_trs80m3,  "Tandy Radio Shack", "TRS-80 Model III",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1980, trs80m4,     trs80m3,  0,        model4,   trs80m3,  trs80m3_state, init_trs80m4,  "Tandy Radio Shack", "TRS-80 Model 4",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1983, trs80m4p,    trs80m3,  0,        model4p,  trs80m4p, trs80m3_state, init_trs80m4p, "Tandy Radio Shack", "TRS-80 Model 4P",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
-COMP( 1982, cp500,       trs80m3,  0,        cp500,    trs80m3,  trs80m3_state, init_trs80m3,  "Prológica",         "CP-500 (PVIII REV.3)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, trs80m4p,    trs80m3,  0,        model4p,  trs80m4p, trs80m3_state, init_trs80m4p, "Tandy Radio Shack", "TRS-80 Model 4P",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, cp500,       trs80m3,  0,        cp500,    trs80m3,  trs80m3_state, init_trs80m3,  u8"Prológica",       "CP-500 (PVIII REV.3)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, naja800,     trs80m3,  0,        model4,   trs80m3,  trs80m3_state, init_trs80m4,  "Kemitron",          "Naja 800",                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
