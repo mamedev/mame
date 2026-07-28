@@ -355,8 +355,6 @@ TIMER_CALLBACK_MEMBER(wangpc_wdc_device::index_tick)
 {
 	m_ctc->trg3(1);
 	m_ctc->trg3(0);
-	m_ctc->trg3(1);
-	m_ctc->trg3(0);
 }
 
 
@@ -424,7 +422,8 @@ uint16_t wangpc_wdc_device::wangpcbus_iorc_r(offs_t offset, uint16_t mem_mask)
 
 		case 0x04/2:
 			LOG("WDC host irq clear read\n");
-			set_irq(CLEAR_LINE);
+			if (!machine().side_effects_disabled())
+				set_irq(CLEAR_LINE);
 			break;
 
 		case 0xfe/2:
@@ -800,11 +799,13 @@ void wangpc_wdc_device::handshake_w(uint8_t data)
 
 	// bit 0 = step pulse and bit 1 = step direction (this port also
 	// drives the stepper, see the seek routine at 0x0A46-0x0A6C);
-	// bit 5 sets the DMA request latch, bit 7 (or dropping bit 5)
-	// clears it
+	// bit 5 sets the DMA request latch; writing bit 7, or a write
+	// that drops a previously set bit 5, clears it
+	bool const was_requesting = BIT(m_handshake, 5);
+
 	if (BIT(data, 5))
 		m_dma_enabled = true;
-	else if (BIT(data, 7) || BIT(m_handshake, 5))
+	else if (BIT(data, 7) || was_requesting)
 		m_dma_enabled = false;
 
 	// bit 7 also raises the host interrupt: it ends a diagnostic
