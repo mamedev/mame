@@ -520,8 +520,9 @@ void cdicdic_device::process_audio_map()
 	}
 	else
 	{
+		m_audio_stop_latch = true;
 		m_decode_addr = 0xffff;
-		m_audio_sector_counter = 0;
+		m_audio_sector_counter = m_audio_format_sectors; // This line may not be correct.
 	}
 
 	if (was_decoding)
@@ -1049,10 +1050,12 @@ uint16_t cdicdic_device::regs_r(offs_t offset, uint16_t mem_mask)
 		}
 
 		case 0x3ffa/2: // AUDCTL
-			if (!m_decoding_audio_map)
-				m_z_buffer ^= 0x0001;
-			LOGMASKED(LOG_READS, "%s: cdic_r: Z-Buffer Register Read: %04x & %04x\n", machine().describe_context(), m_z_buffer, mem_mask);
-			return m_z_buffer;
+		{
+			const uint16_t data = m_z_buffer | (m_audio_stop_latch ? 0x0001 : 0x0000);
+			m_audio_stop_latch = false;
+			LOGMASKED(LOG_READS, "%s: cdic_r: Z-Buffer Register Read: %04x & %04x\n", machine().describe_context(), data, mem_mask);
+			return data;
+		}
 
 		case 0x3ffe/2:
 			LOGMASKED(LOG_READS, "%s: cdic_r: Data buffer Register = %04x & %04x\n", machine().describe_context(), m_data_buffer, mem_mask);
@@ -1336,6 +1339,7 @@ void cdicdic_device::device_start()
 	save_item(NAME(m_audio_sector_counter));
 	save_item(NAME(m_audio_format_sectors));
 	save_item(NAME(m_decoding_audio_map));
+	save_item(NAME(m_audio_stop_latch));
 	save_item(NAME(m_decode_addr));
 
 	save_item(NAME(m_atten));
@@ -1376,6 +1380,7 @@ void cdicdic_device::device_reset()
 	m_audio_sector_counter = 0;
 	m_audio_format_sectors = 0;
 	m_decoding_audio_map = false;
+	m_audio_stop_latch = false;
 	m_decode_addr = 0;
 
 	m_audio_timer->adjust(attotime::from_hz(75), 0, attotime::from_hz(75));

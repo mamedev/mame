@@ -185,6 +185,7 @@ private:
 	uint8_t m_audio_sector_counter;
 	uint8_t m_audio_format_sectors;
 	bool m_decoding_audio_map;
+	bool m_audio_stop_latch;
 	uint16_t m_decode_addr;
 
 	// Audio Attenuation (L->L, L->R, R->R, R->L)
