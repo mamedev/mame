@@ -2489,7 +2489,7 @@ The following floppies came with the machines.
 	<software name="chukatai">
 		<description>Chuka Taisen (Japan)</description>
 		<year>1988</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="alt_title" value="中華大仙"/>
 		<info name="serial" value="MXHB-22002"/>
 		<info name="gtin" value="04967948000225"/>
@@ -2503,7 +2503,7 @@ The following floppies came with the machines.
 	<software name="chukataia" cloneof="chukatai">
 		<description>Chuka Taisen (Japan, alt)</description>
 		<year>1988</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="alt_title" value="中華大仙"/>
 		<info name="serial" value="MXHB-22002"/>
 		<info name="gtin" value="04967948000225"/>
@@ -2517,7 +2517,7 @@ The following floppies came with the machines.
 	<software name="chukataib" cloneof="chukatai">
 		<description>Chuka Taisen (Japan, alt 2)</description>
 		<year>1988</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="alt_title" value="中華大仙"/>
 		<info name="serial" value="MXHB-22002"/>
 		<info name="gtin" value="04967948000225"/>
@@ -12029,7 +12029,7 @@ The following floppies came with the machines.
 	<software name="palameds">
 		<description>Palamedes (Japan)</description>
 		<year>1990</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="alt_title" value="パラメデス"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -12041,7 +12041,7 @@ The following floppies came with the machines.
 	<software name="palamedsa" cloneof="palameds">
 		<description>Palamedes (Japan, alt)</description>
 		<year>1990</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="alt_title" value="パラメデス"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="368640">
@@ -12054,7 +12054,7 @@ The following floppies came with the machines.
 	<software name="palamedsb" cloneof="palameds">
 		<description>Palamedes (Japan, alt 2)</description>
 		<year>1990</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="alt_title" value="パラメデス"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -15844,7 +15844,7 @@ The following floppies came with the machines.
 	<software name="sshangh">
 		<description>Super Shanghai - Dragon's Eye (Japan)</description>
 		<year>1991</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="usage" value="Requires a system with Kanji ROM."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">

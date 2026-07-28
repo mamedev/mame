@@ -17606,7 +17606,7 @@ Saving is testable by creating a new game, get to the point of start moving in s
 	<software name="badomen" cloneof="devilish">
 		<description>Bad Omen (Japan, Korea)</description>
 		<year>1992</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="serial" value="T-28043"/>
 		<info name="release" value="19920424"/>
 		<info name="alt_title" value="バッドオーメン"/>
@@ -18579,7 +18579,7 @@ https://segaretro.org/Elitserien_96
 	<software name="koteteik" cloneof="empsteel">
 		<description>Koutetsu Teikoku (Japan)</description>
 		<year>1992</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="serial" value="T-28033"/>
 		<info name="release" value="19920313"/>
 		<info name="alt_title" value="鋼鉄帝国スティールエンパイア"/>
@@ -21017,7 +21017,7 @@ Patches protection checks, original uses Super Bubble Bobble MD cart scheme
 	<software name="insectxj" cloneof="insectx">
 		<description>Insector X (Japan, Korea)</description>
 		<year>1990</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="serial" value="T-28023"/>
 		<info name="release" value="19900907"/>
 		<info name="alt_title" value="インセクターX"/>
@@ -21906,7 +21906,7 @@ Black screen
 	<software name="kagekij" cloneof="kageki">
 		<description>Ka-Ge-Ki (Japan)</description>
 		<year>1991</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="serial" value="T-28013"/>
 		<info name="release" value="19910426"/>
 		<info name="alt_title" value="火激"/>
@@ -22023,7 +22023,7 @@ Black screen
 	<software name="kingsalj" cloneof="kingsal">
 		<description>King Salmon (Japan)</description>
 		<year>1992</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="serial" value="T-23026"/>
 		<info name="release" value="19920926"/>
 		<info name="alt_title" value="キングサーモン"/>

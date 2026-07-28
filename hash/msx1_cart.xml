@@ -5507,7 +5507,7 @@ kept for now until finding out what those bytes affect...
 	<software name="flstory">
 		<description>The Fairyland Story (Japan)</description>
 		<year>1987</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="alt_title" value="フェアリーランドストーリー" />
 		<info name="gtin" value="04967948000041"/>
 		<part name="cart" interface="msx_cart">
@@ -5522,7 +5522,7 @@ kept for now until finding out what those bytes affect...
 	<software name="flstorya" cloneof="flstory">
 		<description>The Fairyland Story (Japan, alt)</description>
 		<year>1987</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="alt_title" value="フェアリーランドストーリー" />
 		<info name="gtin" value="04967948000041"/>
 		<part name="cart" interface="msx_cart">

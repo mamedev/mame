@@ -7928,7 +7928,7 @@ more investigation needed...
 	<software name="blackbas">
 		<description>Bassin's Black Bass (USA)</description>
 		<year>1994</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="serial" value="SNS-AB2E-USA" />
 		<info name="release" value="199411xx" />
 		<sharedfeat name="compatibility" value="NTSC" />
@@ -25911,7 +25911,7 @@ more investigation needed...
 	<software name="sblkbass">
 		<description>Super Black Bass (USA)</description>
 		<year>1993</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="serial" value="SNS-BQ-USA" />
 		<info name="release" value="199304xx" />
 		<part name="cart" interface="snes_cart">
@@ -36484,7 +36484,7 @@ List of unclassified roms
 	<software name="bazoe">
 		<description>Bazoe! Mahou Sekai (Japan)</description>
 		<year>1993</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="serial" value="SHVC-VM" />
 		<info name="release" value="19930723" />
 		<info name="alt_title" value="バズー!魔法世界" />
@@ -59545,7 +59545,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	<software name="sblkbassj" cloneof="sblkbass">
 		<description>Super Black Bass (Japan)</description>
 		<year>1992</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="serial" value="SHVC-BQ" />
 		<info name="release" value="19921204" />
 		<info name="alt_title" value="スーパーブラックバス" />
@@ -61742,7 +61742,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	<software name="sshangh" cloneof="shangh2">
 		<description>Super Shanghai - Dragon's Eye (Hot-B) (Japan)</description>
 		<year>1992</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="serial" value="SHVC-DE" />
 		<info name="release" value="19920428" />
 		<info name="alt_title" value="スーパー上海ドラゴンズアイ" />
