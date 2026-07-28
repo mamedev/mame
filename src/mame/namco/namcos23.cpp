@@ -9308,7 +9308,7 @@ GAME( 1997, downhillu,   downhill, downhill,    downhill,  namcos23_state,      
 GAME( 1997, motoxgo,     0,        motoxgo,     motoxgo,   motoxgo_state,        empty_init,  ROT0, "Namco", "Motocross Go! (World, MG3 Ver. A)",     GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, motoxgov2a,  motoxgo,  motoxgo,     motoxgo,   motoxgo_state,        empty_init,  ROT0, "Namco", "Motocross Go! (US, MG2 Ver. A)",        GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, motoxgov1a,  motoxgo,  motoxgo,     motoxgo,   motoxgo_state,        empty_init,  ROT0, "Namco", "Motocross Go! (Japan, MG1 Ver. A)",     GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, timecrs2,    0,        timecrs2,    timecrs2,  timecrs2_state,       empty_init,  ROT0, "Namco", "Time Crisis II (US, TSS3 Ver. B)",      GAME_FLAGS )
+GAME( 1997, timecrs2,    0,        timecrs2,    timecrs2,  timecrs2_state,       empty_init,  ROT0, "Namco", "Time Crisis II (US, TSS3 Ver. B)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, timecrs2v2b, timecrs2, timecrs2,    timecrs2,  timecrs2_state,       empty_init,  ROT0, "Namco", "Time Crisis II (World, TSS2 Ver. B)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, timecrs2v1b, timecrs2, timecrs2,    timecrs2,  timecrs2_state,       empty_init,  ROT0, "Namco", "Time Crisis II (Japan, TSS1 Ver. B)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, timecrs2v4a, timecrs2, timecrs2v4a, timecrs2,  namcoss23_state,      empty_init,  ROT0, "Namco", "Time Crisis II (World, TSS4 Ver. A)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
