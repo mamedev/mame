@@ -3188,7 +3188,7 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="mazy2">
-		<description>Mazy2</description>
+		<description>Mazy 2</description>
 		<year>2025</year>
 		<publisher>Inufuto</publisher>
 		<part name="cart" interface="a7800_cart">
