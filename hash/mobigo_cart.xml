@@ -179,7 +179,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="dinotrf" cloneof="dinotrg" supported="no">
 		<description>Le Dino Train - A la decouverte du monde! (France)</description>
 		<year>201?</year>
@@ -190,7 +190,7 @@ license:CC0-1.0
 				<rom name="80-252305 - Le Dino Train - A la decouverte du monde (France).bin" size="0x1000000" crc="65002a9a" sha1="77c936de055459385bc0c2bd95242f44e8365433"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="dprinces" supported="no">
 		<description>Disney Princess (USA)</description>
@@ -370,7 +370,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="penmadf" cloneof="penmad" supported="no">
 		<description>DreamWorks/Nickelodeon Les Pingouins de Madagascar - Mission Aventure (France)</description>
 		<year>201?</year>
@@ -381,7 +381,7 @@ license:CC0-1.0
 				<rom name="80-250305 - Les Pingouins de Madagascar - Mission Aventure (France).bin" size="0x1000000" crc="ee56c618" sha1="11b6c083b4e6b30d896455457662aa6b3bb5fbf6"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="planesg" supported="no">
 		<description>Disney Planes (Germany)</description>
@@ -683,7 +683,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mrmenf" supported="no">
 		<description>Les Monsieur Madame - Aventures a Jolieville (France)</description>
 		<year>201?</year>
