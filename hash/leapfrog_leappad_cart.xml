@@ -6,7 +6,7 @@ license:CC0-1.0
 <softwarelist name="leapfrog_leappad_cart" description="LeapFrog LeapPad / CocoPad / Benesse Qpad cartridges">
 
 	<software name="ratfr" supported="no">
-		<description>Ratatouille (France, set 1)</description>
+		<description>Ratatouille (France)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12681"/>
