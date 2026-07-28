@@ -304,6 +304,14 @@ void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 			{
 				switch (data & 0x00ff)
 				{
+					case 0x80: // TODO: Set some memory. 
+						LOGMASKED(LOG_COMMANDS | LOG_WRITES, "slave_w: Channel %d: Set UNKWN memory (0x80). Unimplemented\n", offset);
+						m_in_count = 4;
+						break;
+					case 0x81: // TODO: Unset some memory.
+						LOGMASKED(LOG_COMMANDS | LOG_WRITES, "slave_w: Channel %d: Unset UNKWN memory (0x81). Unimplemented\n", offset);
+						m_in_count = 4;
+						break;
 					case 0xb0: // Request Disc Status
 						LOGMASKED(LOG_COMMANDS | LOG_WRITES, "slave_w: Channel %d: Request Disc Status (0xb0)\n", offset);
 						m_in_count = 4;
@@ -333,13 +341,18 @@ void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 						m_in_index = 0;
 						break;
 					case 0xf7: // Enable Input Polling
-						LOGMASKED(LOG_COMMANDS | LOG_WRITES, "slave_w: Channel %d: Activate Input Polling (0xf7)\n", offset);
+						LOGMASKED(LOG_COMMANDS | LOG_WRITES, "slave_w: Channel %d: Enable Input Polling (0xf7)\n", offset);
 						m_polling_active = 1;
 						m_in_index = 0;
 						break;
 					case 0xfa: // Enable X-Bus Interrupts
 						LOGMASKED(LOG_COMMANDS | LOG_WRITES, "slave_w: Channel %d: X-Bus Interrupt Enable (0xfa)\n", offset);
 						m_xbus_interrupt_enable = 1;
+						m_in_index = 0;
+						break;
+					case 0xfe:// Disable Input Polling
+						LOGMASKED(LOG_COMMANDS | LOG_WRITES, "slave_w: Channel %d: Disable Input Polling (0xf7)\n", offset);
+						m_polling_active = 0;
 						m_in_index = 0;
 						break;
 					default:
