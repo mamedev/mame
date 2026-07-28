@@ -33695,6 +33695,9 @@ mvme162
 @source:motorola/powerstack.cpp
 powerstk
 
+@source:motorola/startac70.cpp
+startac70
+
 @source:motorola/sys1121.cpp
 sys1121
 
