@@ -1,19 +1,20 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont,byuu
+// copyright-holders:R. Belmont,byuu,Jonathan Gevaryahu
 /***************************************************************************
 
-    upd7725.c
+    upd7720.cpp
 
-    Core implementation for the portable NEC uPD7725/uPD96050 emulator
+    Core implementation for the portable NEC uPD7720 emulator
 
     Original by byuu in the public domain.
     MAME conversion by R. Belmont
+    Adapted to uPD7720 by Lord Nightmare
 
 ****************************************************************************/
 
 #include "emu.h"
-#include "upd7725.h"
-#include "dasm7725.h"
+#include "upd7720.h"
+#include "dasm7720.h"
 
 
 //**************************************************************************
@@ -21,15 +22,14 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(UPD7725,  upd7725_device,  "upd7725",  "NEC uPD7725")
-DEFINE_DEVICE_TYPE(UPD96050, upd96050_device, "upd96050", "NEC uPD96050")
+DEFINE_DEVICE_TYPE(UPD7720,  upd7720_device,  "upd7720",  "NEC uPD7720")
 
-necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits, uint32_t drambits) :
+upd772x_device::upd772x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits) :
 	cpu_device(mconfig, type, tag, owner, clock),
-	m_program_config("program", ENDIANNESS_BIG, 32, abits, -2), // data bus width, address bus width, -2 means DWORD-addressable
-	m_data_config("data", ENDIANNESS_BIG, 16, dbits, -1), // -1 for WORD-addressable
-	m_dataram_config("dataram", ENDIANNESS_BIG, 16, drambits, -1, address_map_constructor(FUNC(necdsp_device::dataram_map), this)), // -1 for WORD-addressable
-	m_drammask((1<<drambits)-1),
+	m_program_config("program", ENDIANNESS_LITTLE, 32, abits, -2), // data bus width, address bus width, -2 means DWORD-addressable
+	m_data_config("data", ENDIANNESS_LITTLE, 16, dbits, -1), // -1 for WORD-addressable
+	m_dataram_config("dataram", ENDIANNESS_BIG, 16, /*drambits*/7, -1, address_map_constructor(FUNC(upd772x_device::dataram_map), this)), // -1 for WORD-addressable
+	m_drammask((1<</*drambits*/7)-1),
 	m_icount(0),
 	m_irq(0),
 	m_irq_firing(0),
@@ -38,27 +38,18 @@ necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, co
 	//m_in_sck_cb(*this, 0), // TODO: proper SO/SORQ/SCK support
 	//m_in_sien_cb(*this, 0),
 	//m_in_soen_cb(*this, 0), // TODO: proper SO/SORQ/SCK support
-	//m_in_dack_cb(*this, 0), // TODO: add D7725SR_DMA support
+	//m_in_dack_cb(*this, 0), // TODO: add D7720SR_DMA support
 	m_out_p0_cb(*this),
-	m_out_p1_cb(*this)
+	m_out_p1_cb(*this),
+	m_out_so16_cb(*this) // TODO: proper SO/SORQ/SCK support
 	//m_out_so_cb(*this), // TODO: proper SO/SORQ/SCK support
 	//m_out_sorq_cb(*this), // TODO: proper SO/SORQ/SCK support
-	//m_out_drq_cb(*this)  // TODO: add D7725SR_DMA support
+	//m_out_drq_cb(*this)  // TODO: add D7720SR_DMA support
 {
 }
 
-/*upd7720_device::upd7720_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: necdsp_device(mconfig, UPD7720, tag, owner, clock, 9, 10, 7)
-{
-}*/
-
-upd7725_device::upd7725_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: necdsp_device(mconfig, UPD7725, tag, owner, clock, 11, 11, 8)
-{
-}
-
-upd96050_device::upd96050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: necdsp_device(mconfig, UPD96050, tag, owner, clock, 14, 12, 11)
+upd7720_device::upd7720_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: upd772x_device(mconfig, UPD7720, tag, owner, clock, 9, 10/*, 7*/)
 {
 }
 
@@ -66,7 +57,7 @@ upd96050_device::upd96050_device(const machine_config &mconfig, const char *tag,
 //  device_start - start up the device
 //-------------------------------------------------
 
-void necdsp_device::device_start()
+void upd772x_device::device_start()
 {
 	// get our address spaces
 	space(AS_PROGRAM).specific(m_program);
@@ -77,23 +68,22 @@ void necdsp_device::device_start()
 	// register our state for the debugger
 	state_add(STATE_GENPC, "GENPC", regs.pc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", regs.pc).noshow();
-	state_add(D7725_PC, "PC", regs.pc);
-	state_add(D7725_RP, "RP", regs.rp);
-	state_add(D7725_DP, "DP", regs.dp);
-	state_add(D7725_SP, "SP", regs.sp);
-	state_add(D7725_K, "K", regs.k);
-	state_add(D7725_L, "L", regs.l);
-	state_add(D7725_M, "M", regs.m);
-	state_add(D7725_N, "N", regs.n);
-	state_add(D7725_A, "A", regs.a);
-	state_add(D7725_B, "B", regs.b);
-	state_add(D7725_TR, "TR", regs.tr);
-	state_add(D7725_TRB, "TRB", regs.trb);
-	state_add(D7725_SR, "SR", regs.sr);
-	state_add(D7725_DR, "DR", regs.dr);
-	state_add(D7725_SI, "SI", regs.si);
-	state_add(D7725_SO, "SO", regs.so);
-	state_add(D7725_IDB, "IDB", regs.idb);
+	state_add(D7720_PC, "PC", regs.pc);
+	state_add(D7720_RP, "RP", regs.rp);
+	state_add(D7720_DP, "DP", regs.dp);
+	state_add(D7720_SP, "SP", regs.sp);
+	state_add(D7720_K, "K", regs.k);
+	state_add(D7720_L, "L", regs.l);
+	state_add(D7720_M, "M", regs.m);
+	state_add(D7720_N, "N", regs.n);
+	state_add(D7720_A, "A", regs.a);
+	state_add(D7720_B, "B", regs.b);
+	state_add(D7720_TR, "TR", regs.tr);
+	state_add(D7720_SR, "SR", regs.sr);
+	state_add(D7720_DR, "DR", regs.dr);
+	state_add(D7720_SI, "SI", regs.si);
+	state_add(D7720_SO, "SO", regs.so);
+	state_add(D7720_IDB, "IDB", regs.idb);
 
 	// save state registrations
 	save_item(NAME(regs.pc));
@@ -119,7 +109,6 @@ void necdsp_device::device_start()
 	save_item(NAME(regs.flagb.ov1));
 	save_item(NAME(regs.flagb.ov0));
 	save_item(NAME(regs.tr));
-	save_item(NAME(regs.trb));
 	save_item(NAME(regs.sr));
 	save_item(NAME(regs.dr));
 	save_item(NAME(regs.si));
@@ -146,7 +135,6 @@ void necdsp_device::device_start()
 	regs.a = 0x0000;
 	regs.b = 0x0000;
 	regs.tr = 0x0000;
-	regs.trb = 0x0000;
 	regs.dr = 0x0000;
 	regs.si = 0x0000;
 	regs.so = 0x0000;
@@ -157,13 +145,13 @@ void necdsp_device::device_start()
 //  device_reset - reset the device
 //-------------------------------------------------
 
-void necdsp_device::device_reset()
+void upd772x_device::device_reset()
 {
 	// according to 3.6.1 on the upd7725 advanced production datasheet, /RESET resets the following only:
 	regs.pc = 0x0000;
 	regs.sr = 0x0000;
-	m_out_p0_cb((regs.sr & D7725SR_P0) ? ASSERT_LINE : CLEAR_LINE);
-	m_out_p1_cb((regs.sr & D7725SR_P1) ? ASSERT_LINE : CLEAR_LINE);
+	m_out_p0_cb((regs.sr & D7720SR_P0) ? ASSERT_LINE : CLEAR_LINE);
+	m_out_p1_cb((regs.sr & D7720SR_P1) ? ASSERT_LINE : CLEAR_LINE);
 	// TODO: drq callback, once added, should be forced to the inactive state here
 	// TODO: the sorq pin state is also reset to 'low' state
 	regs.flaga = 0x00;
@@ -181,7 +169,7 @@ void necdsp_device::device_reset()
 //  the space doesn't exist
 //-------------------------------------------------
 
-device_memory_interface::space_config_vector necdsp_device::memory_space_config() const
+device_memory_interface::space_config_vector upd772x_device::memory_space_config() const
 {
 	return space_config_vector
 	{
@@ -197,7 +185,7 @@ device_memory_interface::space_config_vector necdsp_device::memory_space_config(
 //  after it has been set
 //-------------------------------------------------
 
-void necdsp_device::state_import(const device_state_entry &entry)
+void upd772x_device::state_import(const device_state_entry &entry)
 {
 }
 
@@ -207,7 +195,7 @@ void necdsp_device::state_import(const device_state_entry &entry)
 //  to a known location where it can be read
 //-------------------------------------------------
 
-void necdsp_device::state_export(const device_state_entry &entry)
+void upd772x_device::state_export(const device_state_entry &entry)
 {
 }
 
@@ -217,11 +205,11 @@ void necdsp_device::state_export(const device_state_entry &entry)
 //  for the debugger
 //-------------------------------------------------
 
-void necdsp_device::state_string_export(const device_state_entry &entry, std::string &str) const
+void upd772x_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
-		case D7725_FLAGA:
+		case D7720_FLAGA:
 			str = string_format("%s %s %c%c %s %s %s %s",
 							regs.flaga.s1 ? "S1" : "s1",
 							regs.flaga.s0 ? "S0" : "s0",
@@ -231,7 +219,7 @@ void necdsp_device::state_string_export(const device_state_entry &entry, std::st
 							regs.flaga.ov0 ? "OV0" : "ov0");
 			break;
 
-		case D7725_FLAGB:
+		case D7720_FLAGB:
 			str = string_format("%s %s %c%c %s %s %s %s",
 							regs.flagb.s1 ? "S1" : "s1",
 							regs.flagb.s0 ? "S0" : "s0",
@@ -248,7 +236,7 @@ void necdsp_device::state_string_export(const device_state_entry &entry, std::st
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t necdsp_device::execute_min_cycles() const noexcept
+uint32_t upd772x_device::execute_min_cycles() const noexcept
 {
 	return 4;
 }
@@ -259,7 +247,7 @@ uint32_t necdsp_device::execute_min_cycles() const noexcept
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t necdsp_device::execute_max_cycles() const noexcept
+uint32_t upd772x_device::execute_max_cycles() const noexcept
 {
 	return 4;
 }
@@ -269,15 +257,15 @@ uint32_t necdsp_device::execute_max_cycles() const noexcept
 //  execute_set_input -
 //-------------------------------------------------
 
-void necdsp_device::execute_set_input(int inputnum, int state)
+void upd772x_device::execute_set_input(int inputnum, int state)
 {
 	switch (inputnum)
 	{
-	case NECDSP_INPUT_LINE_INT:
-		if ((!m_irq && (CLEAR_LINE != state)) && (regs.sr & D7725SR_EI)) // detect rising edge AND if EI == 1;
+	case UPD7720_INPUT_LINE_INT:
+		if ((!m_irq && (CLEAR_LINE != state)) && (regs.sr & D7720SR_EI)) // detect rising edge AND if EI == 1;
 		{
 			m_irq_firing = 1;
-			regs.sr &= ~D7725SR_EI;
+			regs.sr &= ~D7720SR_EI;
 		}
 		m_irq = (ASSERT_LINE == state); // set old state to current state
 		break;
@@ -290,9 +278,9 @@ void necdsp_device::execute_set_input(int inputnum, int state)
 //  helper function
 //-------------------------------------------------
 
-std::unique_ptr<util::disasm_interface> necdsp_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> upd772x_device::create_disassembler()
 {
-	return std::make_unique<necdsp_disassembler>();
+	return std::make_unique<upd7720_disassembler>();
 }
 
 //-------------------------------------------------
@@ -300,13 +288,13 @@ std::unique_ptr<util::disasm_interface> necdsp_device::create_disassembler()
 //  data ram
 //-------------------------------------------------
 
-void necdsp_device::dataram_map(address_map &map)
+void upd772x_device::dataram_map(address_map &map)
 {
 	map(0, m_drammask).ram().share("dataram");
 }
 
 
-void necdsp_device::execute_run()
+void upd772x_device::execute_run()
 {
 	uint32_t opcode;
 
@@ -320,25 +308,35 @@ void necdsp_device::execute_run()
 
 		if (m_irq_firing == 0) // normal opcode
 		{
-			opcode = m_cache.read_dword(regs.pc) >> 8;
+			opcode = m_cache.read_dword(regs.pc);
 			regs.pc++;
+			// hack: if we have a pending byte in SO, send it via the callback
+			if (regs.soack)
+			{
+				regs.soack = 0;
+				uint16_t soswap = bitswap<16>(regs.so, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+				if (~regs.sr & D7720SR_SOC) // 16-bit
+					m_out_so16_cb(soswap);
+				else // 8-bit
+					m_out_so16_cb(soswap&0xff);
+			}
 		}
 		else if (m_irq_firing == 1) // if we're in an interrupt cycle, execute a op 'nop' first...
 		{
 			// NOP: OP  PSEL ALU  ASL DPL DPHM   RPDCR SRC  DST
-			//      00  00   0000 0   00  000(0) 0     0000 0000
+			//      00  00   0000 0   00  00(0)  0     0000 0000
 			opcode = 0x000000;
 			m_irq_firing = 2;
 		}
 		else // m_irq_firing == 2 // ...then a call to 100
 		{
-			// LCALL: JP BRCH      NA          BNK(all 0s on 7725)
-			//        10 101000000 00100000000 00
-			opcode = 0xA80400;
+			// LCALL: JP BRCH     NA        (all 0s on 7720)
+			//        10 10100000 100000000 0000
+			opcode = 0x541000;
 			m_irq_firing = 0;
 		}
 
-		switch(opcode >> 22)
+		switch(opcode >> 21)
 		{
 			case 0: exec_op(opcode); break;
 			case 1: exec_rt(opcode); break;
@@ -355,18 +353,18 @@ void necdsp_device::execute_run()
 	} while (m_icount > 0);
 }
 
-void necdsp_device::exec_op(uint32_t opcode) {
-	uint8_t pselect = (opcode >> 20)&0x3;  //P select
-	uint8_t alu     = (opcode >> 16)&0xf;  //ALU operation mode
-	uint8_t asl     = (opcode >> 15)&0x1;  //accumulator select
-	uint8_t dpl     = (opcode >> 13)&0x3;  //DP low modify
-	uint8_t dphm    = (opcode >>  9)&0xf;  //DP high XOR modify
+void upd772x_device::exec_op(uint32_t opcode) {
+	uint8_t pselect = (opcode >> 19)&0x3;  //P select
+	uint8_t alu     = (opcode >> 15)&0xf;  //ALU operation mode
+	uint8_t asl     = (opcode >> 14)&0x1;  //accumulator select
+	uint8_t dpl     = (opcode >> 12)&0x3;  //DP low modify
+	uint8_t dphm    = (opcode >>  9)&0x7;  //DP high XOR modify
 	uint8_t rpdcr   = (opcode >>  8)&0x1;  //RP decrement
 	uint8_t src     = (opcode >>  4)&0xf;  //move source
 	uint8_t dst     = (opcode >>  0)&0xf;  //move destination
 
 	switch(src) {
-	case  0: regs.idb = regs.trb; break;
+	case  0: regs.idb = 0x0000; break;
 	case  1: regs.idb = regs.a; break;
 	case  2: regs.idb = regs.b; break;
 	case  3: regs.idb = regs.tr; break;
@@ -374,7 +372,7 @@ void necdsp_device::exec_op(uint32_t opcode) {
 	case  5: regs.idb = regs.rp; break;
 	case  6: regs.idb = m_data.read_word(regs.rp); break;
 	case  7: regs.idb = 0x8000 - regs.flaga.s1; break;  //SGN
-	case  8: regs.idb = regs.dr; regs.sr |= D7725SR_RQM; break;
+	case  8: regs.idb = regs.dr; regs.sr |= D7720SR_RQM; break;
 	case  9: regs.idb = regs.dr; break;
 	case 10: regs.idb = regs.sr; break;
 	case 11: regs.idb = regs.si; break;  //MSB = first bit in from serial, 'natural' SI register order
@@ -384,7 +382,7 @@ void necdsp_device::exec_op(uint32_t opcode) {
 	case 15: regs.idb = m_dataram.read_word(regs.dp & m_drammask); break;
 	}
 
-	if(alu != D7725ALU_NOP) {
+	if(alu != D7720ALU_NOP) {
 	uint16_t p=0, q=0, r=0;
 	Flag flag;
 	bool c = false;
@@ -407,21 +405,21 @@ void necdsp_device::exec_op(uint32_t opcode) {
 	}
 
 	switch(alu) {
-		case D7725ALU_OR  : r = q | p; break;                    // 1 OR
-		case D7725ALU_AND : r = q & p; break;                    // 2 AND
-		case D7725ALU_XOR : r = q ^ p; break;                    // 3 XOR
-		case D7725ALU_SUB : r = q - p; break;                    // 4 SUB
-		case D7725ALU_ADD : r = q + p; break;                    // 5 ADD
-		case D7725ALU_SBB : r = q - p - c; break;                // 6 SBB
-		case D7725ALU_ADC : r = q + p + c; break;                // 7 ADC
-		case D7725ALU_DEC : r = q - 1; p = 1; break;             // 8 DEC
-		case D7725ALU_INC : r = q + 1; p = 1; break;             // 9 INC
-		case D7725ALU_CMP : r = ~q; break;                       // a CMP
-		case D7725ALU_SHR1: r = (q >> 1) | (q & 0x8000); break;  // b SHR1 (ASR)
-		case D7725ALU_SHL1: r = (q << 1) | (c ? 1 : 0); break;   // c SHL1 (ROL)
-		case D7725ALU_SHL2: r = (q << 2) | 3; break;             // d SHL2
-		case D7725ALU_SHL4: r = (q << 4) | 15; break;            // e SHL4
-		case D7725ALU_XCHG: r = swapendian_int16(q); break;      // f XCHG
+		case D7720ALU_OR  : r = q | p; break;                    // 1 OR
+		case D7720ALU_AND : r = q & p; break;                    // 2 AND
+		case D7720ALU_XOR : r = q ^ p; break;                    // 3 XOR
+		case D7720ALU_SUB : r = q - p; break;                    // 4 SUB
+		case D7720ALU_ADD : r = q + p; break;                    // 5 ADD
+		case D7720ALU_SBB : r = q - p - c; break;                // 6 SBB
+		case D7720ALU_ADC : r = q + p + c; break;                // 7 ADC
+		case D7720ALU_DEC : r = q - 1; p = 1; break;             // 8 DEC
+		case D7720ALU_INC : r = q + 1; p = 1; break;             // 9 INC
+		case D7720ALU_CMP : r = ~q; break;                       // a CMP
+		case D7720ALU_SHR1: r = (q >> 1) | (q & 0x8000); break;  // b SHR1 (ASR)
+		case D7720ALU_SHL1: r = (q << 1) | (c ? 1 : 0); break;   // c SHL1 (ROL)
+		case D7720ALU_SHL2: r = (q << 2) | 3; break;             // d SHL2
+		case D7720ALU_SHL4: r = (q << 4) | 15; break;            // e SHL4
+		case D7720ALU_XCHG: r = swapendian_int16(q); break;      // f XCHG
 	}
 
 	flag.s0 = (r & 0x8000);
@@ -429,12 +427,12 @@ void necdsp_device::exec_op(uint32_t opcode) {
 	if(!flag.ov1) flag.s1 = flag.s0;
 
 	switch(alu) {
-		case D7725ALU_OR: case D7725ALU_AND: case D7725ALU_XOR: case D7725ALU_CMP: case D7725ALU_SHL2: case D7725ALU_SHL4: case D7725ALU_XCHG: {
+		case D7720ALU_OR: case D7720ALU_AND: case D7720ALU_XOR: case D7720ALU_CMP: case D7720ALU_SHL2: case D7720ALU_SHL4: case D7720ALU_XCHG: {
 		flag.c = 0;
 		flag.ov0 = flag.ov1 = 0; // OV0 and OV1 are cleared by any non-add/sub/nop operation
 		break;
 		}
-		case D7725ALU_SUB: case D7725ALU_ADD: case D7725ALU_SBB: case D7725ALU_ADC: case D7725ALU_DEC: case D7725ALU_INC: {
+		case D7720ALU_SUB: case D7720ALU_ADD: case D7720ALU_SBB: case D7720ALU_ADC: case D7720ALU_DEC: case D7720ALU_INC: {
 		if(alu & 1) {
 			//addition
 			flag.ov0 = (q ^ r) & ~(q ^ p) & 0x8000;
@@ -447,12 +445,12 @@ void necdsp_device::exec_op(uint32_t opcode) {
 		flag.ov1 = (flag.ov0 & flag.ov1) ? (flag.s1 == flag.s0) : (flag.ov0 | flag.ov1);
 		break;
 		}
-		case D7725ALU_SHR1: {
+		case D7720ALU_SHR1: {
 		flag.c = q & 1;
 		flag.ov0 = flag.ov1 = 0; // OV0 and OV1 are cleared by any non-add/sub/nop operation
 		break;
 		}
-		case D7725ALU_SHL1: {
+		case D7720ALU_SHL1: {
 		flag.c = q >> 15;
 		flag.ov0 = flag.ov1 = 0; // OV0 and OV1 are cleared by any non-add/sub/nop operation
 		break;
@@ -465,7 +463,7 @@ void necdsp_device::exec_op(uint32_t opcode) {
 	}
 	}
 
-	exec_ld((regs.idb << 6) + dst);
+	exec_ld((regs.idb << 5) + dst);
 
 	if (dst != 4) {
 		switch(dpl) {
@@ -480,76 +478,67 @@ void necdsp_device::exec_op(uint32_t opcode) {
 	if(rpdcr && (dst != 5)) regs.rp--;
 }
 
-void necdsp_device::exec_rt(uint32_t opcode) {
+void upd772x_device::exec_rt(uint32_t opcode) {
 	exec_op(opcode);
 	regs.pc = regs.stack[--regs.sp];
 	regs.sp &= 0xf;
 }
 
-void necdsp_device::exec_jp(uint32_t opcode) {
-	uint16_t brch = (opcode >> 13) & 0x1ff;  //branch
-	uint16_t na  =  (opcode >>  2) & 0x7ff;  //next address
-	uint16_t bank = (opcode >>  0) & 0x3;  //bank address
-
-	uint16_t jps = (regs.pc & 0x2000) | (bank << 11) | (na << 0);
-	uint16_t jpl = (bank << 11) | (na << 0);
+void upd772x_device::exec_jp(uint32_t opcode) {
+	uint16_t brch = (opcode >> 13) & 0xff;  //branch
+	uint16_t na  =  (opcode >>  4) & 0x1ff;  //next address
 
 	switch(brch) {
-		case 0x000: regs.pc = regs.so; return;  //JMPSO
+		case 0x040: if(regs.flaga.c == 0) regs.pc = na; return;  //JNCA
+		case 0x041: if(regs.flaga.c == 1) regs.pc = na; return;  //JCA
+		case 0x042: if(regs.flagb.c == 0) regs.pc = na; return;  //JNCB
+		case 0x043: if(regs.flagb.c == 1) regs.pc = na; return;  //JCB
 
-		case 0x080: if(regs.flaga.c == 0) regs.pc = jps; return;  //JNCA
-		case 0x082: if(regs.flaga.c == 1) regs.pc = jps; return;  //JCA
-		case 0x084: if(regs.flagb.c == 0) regs.pc = jps; return;  //JNCB
-		case 0x086: if(regs.flagb.c == 1) regs.pc = jps; return;  //JCB
+		case 0x044: if(regs.flaga.z == 0) regs.pc = na; return;  //JNZA
+		case 0x045: if(regs.flaga.z == 1) regs.pc = na; return;  //JZA
+		case 0x046: if(regs.flagb.z == 0) regs.pc = na; return;  //JNZB
+		case 0x047: if(regs.flagb.z == 1) regs.pc = na; return;  //JZB
 
-		case 0x088: if(regs.flaga.z == 0) regs.pc = jps; return;  //JNZA
-		case 0x08a: if(regs.flaga.z == 1) regs.pc = jps; return;  //JZA
-		case 0x08c: if(regs.flagb.z == 0) regs.pc = jps; return;  //JNZB
-		case 0x08e: if(regs.flagb.z == 1) regs.pc = jps; return;  //JZB
+		case 0x048: if(regs.flaga.ov0 == 0) regs.pc = na; return;  //JNOVA0
+		case 0x049: if(regs.flaga.ov0 == 1) regs.pc = na; return;  //JOVA0
+		case 0x04a: if(regs.flagb.ov0 == 0) regs.pc = na; return;  //JNOVB0
+		case 0x04b: if(regs.flagb.ov0 == 1) regs.pc = na; return;  //JOVB0
 
-		case 0x090: if(regs.flaga.ov0 == 0) regs.pc = jps; return;  //JNOVA0
-		case 0x092: if(regs.flaga.ov0 == 1) regs.pc = jps; return;  //JOVA0
-		case 0x094: if(regs.flagb.ov0 == 0) regs.pc = jps; return;  //JNOVB0
-		case 0x096: if(regs.flagb.ov0 == 1) regs.pc = jps; return;  //JOVB0
+		case 0x04c: if(regs.flaga.ov1 == 0) regs.pc = na; return;  //JNOVA1
+		case 0x04d: if(regs.flaga.ov1 == 1) regs.pc = na; return;  //JOVA1
+		case 0x04e: if(regs.flagb.ov1 == 0) regs.pc = na; return;  //JNOVB1
+		case 0x04f: if(regs.flagb.ov1 == 1) regs.pc = na; return;  //JOVB1
 
-		case 0x098: if(regs.flaga.ov1 == 0) regs.pc = jps; return;  //JNOVA1
-		case 0x09a: if(regs.flaga.ov1 == 1) regs.pc = jps; return;  //JOVA1
-		case 0x09c: if(regs.flagb.ov1 == 0) regs.pc = jps; return;  //JNOVB1
-		case 0x09e: if(regs.flagb.ov1 == 1) regs.pc = jps; return;  //JOVB1
+		case 0x050: if(regs.flaga.s0 == 0) regs.pc = na; return;  //JNSA0
+		case 0x051: if(regs.flaga.s0 == 1) regs.pc = na; return;  //JSA0
+		case 0x052: if(regs.flagb.s0 == 0) regs.pc = na; return;  //JNSB0
+		case 0x053: if(regs.flagb.s0 == 1) regs.pc = na; return;  //JSB0
 
-		case 0x0a0: if(regs.flaga.s0 == 0) regs.pc = jps; return;  //JNSA0
-		case 0x0a2: if(regs.flaga.s0 == 1) regs.pc = jps; return;  //JSA0
-		case 0x0a4: if(regs.flagb.s0 == 0) regs.pc = jps; return;  //JNSB0
-		case 0x0a6: if(regs.flagb.s0 == 1) regs.pc = jps; return;  //JSB0
+		case 0x054: if(regs.flaga.s1 == 0) regs.pc = na; return;  //JNSA1
+		case 0x055: if(regs.flaga.s1 == 1) regs.pc = na; return;  //JSA1
+		case 0x056: if(regs.flagb.s1 == 0) regs.pc = na; return;  //JNSB1
+		case 0x057: if(regs.flagb.s1 == 1) regs.pc = na; return;  //JSB1
 
-		case 0x0a8: if(regs.flaga.s1 == 0) regs.pc = jps; return;  //JNSA1
-		case 0x0aa: if(regs.flaga.s1 == 1) regs.pc = jps; return;  //JSA1
-		case 0x0ac: if(regs.flagb.s1 == 0) regs.pc = jps; return;  //JNSB1
-		case 0x0ae: if(regs.flagb.s1 == 1) regs.pc = jps; return;  //JSB1
+		case 0x058: if((regs.dp & 0x0f) == 0x00) regs.pc = na; return;  //JDPL0
+		case 0x059: if((regs.dp & 0x0f) == 0x0f) regs.pc = na; return;  //JDPLF
 
-		case 0x0b0: if((regs.dp & 0x0f) == 0x00) regs.pc = jps; return;  //JDPL0
-		case 0x0b1: if((regs.dp & 0x0f) != 0x00) regs.pc = jps; return;  //JDPLN0
-		case 0x0b2: if((regs.dp & 0x0f) == 0x0f) regs.pc = jps; return;  //JDPLF
-		case 0x0b3: if((regs.dp & 0x0f) != 0x0f) regs.pc = jps; return;  //JDPLNF
+		case 0x05a: if(regs.siack == 0) regs.pc = na; return;  //JNSIAK
+		case 0x05b: if(regs.siack == 1) regs.pc = na; return;  //JSIAK
+		case 0x05c: if(regs.soack == 0) regs.pc = na; return;  //JNSOAK
+		case 0x05d: if(regs.soack == 1) regs.pc = na; return;  //JSOAK
 
-		case 0x0b4: if(regs.siack == 0) regs.pc = jps; return;  //JNSIAK
-		case 0x0b6: if(regs.siack == 1) regs.pc = jps; return;  //JSIAK
-		case 0x0b8: if(regs.soack == 0) regs.pc = jps; return;  //JNSOAK
-		case 0x0ba: if(regs.soack == 1) regs.pc = jps; return;  //JSOAK
+		case 0x05e: if(~regs.sr & D7720SR_RQM) regs.pc = na; return;  //JNRQM
+		case 0x05f: if( regs.sr & D7720SR_RQM) regs.pc = na; return;  //JRQM
 
-		case 0x0bc: if(~regs.sr & D7725SR_RQM) regs.pc = jps; return;  //JNRQM
-		case 0x0be: if( regs.sr & D7725SR_RQM) regs.pc = jps; return;  //JRQM
+		case 0x080: regs.pc = na; return;  //JMP
 
-		case 0x100: regs.pc = 0x0000 | jpl; return;  //LJMP
-		case 0x101: regs.pc = 0x2000 | jpl; return;  //HJMP
-
-		case 0x140: regs.stack[regs.sp++] = regs.pc; regs.pc = 0x0000 | jpl; regs.sp &= 0xf; return;  //LCALL
-		case 0x141: regs.stack[regs.sp++] = regs.pc; regs.pc = 0x2000 | jpl; regs.sp &= 0xf; return;  //HCALL
+		case 0x0a0: regs.stack[regs.sp++] = regs.pc; regs.pc = na; regs.sp &= 0xf; return;  //CALL
+		default: logerror("jp: invalid condition %02d encountered!\n", brch); return;
 	}
 }
 
-void necdsp_device::exec_ld(uint32_t opcode) {
-	uint16_t id = opcode >> 6;  //immediate data
+void upd772x_device::exec_ld(uint32_t opcode) {
+	uint16_t id = opcode >> 5;  //immediate data
 	uint8_t dst = (opcode >> 0) & 0xf;  //destination
 
 	regs.idb = id;
@@ -561,10 +550,10 @@ void necdsp_device::exec_ld(uint32_t opcode) {
 	case  3: regs.tr = id; break;
 	case  4: regs.dp = id; break;
 	case  5: regs.rp = id; break;
-	case  6: regs.dr = id; regs.sr |= D7725SR_RQM; break;
+	case  6: regs.dr = id; regs.sr |= D7720SR_RQM; break;
 	case  7: regs.sr = (regs.sr & 0x907c) | (id & ~0x907c);
-				m_out_p0_cb((regs.sr & D7725SR_P0) ? ASSERT_LINE : CLEAR_LINE);
-				m_out_p1_cb((regs.sr & D7725SR_P1) ? ASSERT_LINE : CLEAR_LINE);
+				m_out_p0_cb((regs.sr & D7720SR_P0) ? ASSERT_LINE : CLEAR_LINE);
+				m_out_p1_cb((regs.sr & D7720SR_P1) ? ASSERT_LINE : CLEAR_LINE);
 				break;
 	case  8: regs.so = bitswap<16>(id, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); regs.soack = 1; break;  //LSB first output, output tapped at bit 15 shifting left
 	case  9: regs.so = id; regs.soack = 1; break;  //MSB first output, output tapped at bit 15 shifting left
@@ -572,34 +561,34 @@ void necdsp_device::exec_ld(uint32_t opcode) {
 	case 11: regs.k = id; regs.l = m_data.read_word(regs.rp); break;
 	case 12: regs.l = id; regs.k = m_dataram.read_word((regs.dp & m_drammask) | 0x40); break;
 	case 13: regs.l = id; break;
-	case 14: regs.trb = id; break;
+	case 14: break;
 	case 15: m_dataram.write_word(regs.dp & m_drammask, id); break;
 	}
 }
 
-uint8_t necdsp_device::status_r()
+uint8_t upd772x_device::status_r()
 {
 	return regs.sr >> 8;
 }
 
 
-uint8_t necdsp_device::data_r()
+uint8_t upd772x_device::data_r()
 {
-	if (~regs.sr & D7725SR_DRC)
+	if (~regs.sr & D7720SR_DRC)
 	{
 		//16-bit
-		if(~regs.sr & D7725SR_DRS)
+		if(~regs.sr & D7720SR_DRS)
 		{
 			if (!machine().side_effects_disabled())
-				regs.sr |= D7725SR_DRS;
+				regs.sr |= D7720SR_DRS;
 			return regs.dr >> 0;
 		}
 		else
 		{
 			if (!machine().side_effects_disabled())
 			{
-				regs.sr &= ~D7725SR_RQM;
-				regs.sr &= ~D7725SR_DRS;
+				regs.sr &= ~D7720SR_RQM;
+				regs.sr &= ~D7720SR_DRS;
 			}
 			return regs.dr >> 8;
 		}
@@ -608,32 +597,32 @@ uint8_t necdsp_device::data_r()
 	{
 		//8-bit
 		if (!machine().side_effects_disabled())
-			regs.sr &= ~D7725SR_RQM;
+			regs.sr &= ~D7720SR_RQM;
 		return regs.dr >> 0;
 	}
 }
 
-void necdsp_device::data_w(uint8_t data)
+void upd772x_device::data_w(uint8_t data)
 {
-	if (~regs.sr & D7725SR_DRC)
+	if (~regs.sr & D7720SR_DRC)
 	{
 		//16-bit
-		if (~regs.sr & D7725SR_DRS)
+		if (~regs.sr & D7720SR_DRS)
 		{
-			regs.sr |= D7725SR_DRS;
+			regs.sr |= D7720SR_DRS;
 			regs.dr = (regs.dr & 0xff00) | (data << 0);
 		}
 		else
 		{
-			regs.sr &= ~D7725SR_RQM;
-			regs.sr &= ~D7725SR_DRS;
+			regs.sr &= ~D7720SR_RQM;
+			regs.sr &= ~D7720SR_DRS;
 			regs.dr = (data << 8) | (regs.dr & 0x00ff);
 		}
 	}
 	else
 	{
 		//8-bit
-		regs.sr &= ~D7725SR_RQM;
+		regs.sr &= ~D7720SR_RQM;
 		regs.dr = (regs.dr & 0xff00) | (data << 0);
 	}
 }
