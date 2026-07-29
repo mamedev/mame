@@ -154,7 +154,6 @@ void prose4k1_device::peripheral_w(uint8_t data)
 	m_paramReg = data;
 	m_dsp->set_input_line(INPUT_LINE_RESET, BIT(data,1)?CLEAR_LINE:ASSERT_LINE);
 	LOGPRM("80188: Parameter Reg written: UNK7: %d, LED6: %d; LED5: %d; LED4: %d; LED3: %d; UNK2: %d, DSPRST1: %d, UNK0: %d\n", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1), BIT(data,0));
-	popmessage("LEDS: 6/Talking:%d 5:%d 4:%d 3:%d\n", 1-BIT(data,6), 1-BIT(data,5), 1-BIT(data,4), 1-BIT(data,3));
 }
 
 uint8_t prose4k1_device::dsp_data_r()
