@@ -77,14 +77,11 @@ TIMER_CALLBACK_MEMBER( cdislave_hle_device::poll_inputs )
 	m_device_mouse_x = std::clamp(m_device_mouse_x + deltax, 0, 767);
 	m_device_mouse_y = std::clamp(m_device_mouse_y + deltay, 0, 559);
 
-	if (m_polling_active)
-	{
-		const uint8_t byte3 = ((m_device_mouse_x & 0x380) >> 7) | (button_bits << 3);
-		const uint8_t byte2 = m_device_mouse_x & 0x7f;
-		const uint8_t byte1 = (m_device_mouse_y & 0x380) >> 7;
-		const uint8_t byte0 = m_device_mouse_y & 0x7f;
-		prepare_readback(attotime::zero, 0, 4, byte3, byte2, byte1, byte0, 0xf7);
-	}
+	const uint8_t byte3 = ((m_device_mouse_x & 0x380) >> 7) | (button_bits << 3);
+	const uint8_t byte2 = m_device_mouse_x & 0x7f;
+	const uint8_t byte1 = (m_device_mouse_y & 0x380) >> 7;
+	const uint8_t byte0 = m_device_mouse_y & 0x7f;
+	prepare_readback(attotime::zero, 0, 4, byte3, byte2, byte1, byte0, 0xf7);
 }
 
 void cdislave_hle_device::prepare_readback(const attotime &delay, uint8_t channel, uint8_t count, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t cmd)
@@ -340,9 +337,9 @@ void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 						prepare_readback(attotime::never, 2, 2, 0xf6, 2, 0, 0, 0xf6);
 						m_in_index = 0;
 						break;
-					case 0xf7: // Enable Input Polling
-						LOGMASKED(LOG_COMMANDS | LOG_WRITES, "slave_w: Channel %d: Enable Input Polling (0xf7)\n", offset);
-						m_polling_active = 1;
+					case 0xf7: // Todo: Arm Developer Mode
+						LOGMASKED(LOG_COMMANDS | LOG_WRITES, "slave_w: Channel %d: TODO: Unimplemented (0xf7)\n", offset);
+						m_debug_mode = 1;
 						m_in_index = 0;
 						break;
 					case 0xfa: // Enable X-Bus Interrupts
@@ -350,9 +347,9 @@ void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 						m_xbus_interrupt_enable = 1;
 						m_in_index = 0;
 						break;
-					case 0xfe:// Disable Input Polling
-						LOGMASKED(LOG_COMMANDS | LOG_WRITES, "slave_w: Channel %d: Disable Input Polling (0xf7)\n", offset);
-						m_polling_active = 0;
+					case 0xfe:// Todo: Disrm Developer Mode
+						LOGMASKED(LOG_COMMANDS | LOG_WRITES, "slave_w: Channel %d: TODO: Unimplemeneted (0xfe)\n", offset);
+						m_debug_mode = 0;
 						m_in_index = 0;
 						break;
 					default:
@@ -425,7 +422,7 @@ void cdislave_hle_device::device_start()
 	save_item(NAME(m_in_index));
 	save_item(NAME(m_in_count));
 
-	save_item(NAME(m_polling_active));
+	save_item(NAME(m_debug_mode));
 
 	save_item(NAME(m_xbus_interrupt_enable));
 
@@ -465,7 +462,7 @@ void cdislave_hle_device::device_reset()
 	m_in_index = 0;
 	m_in_count = 0;
 
-	m_polling_active = 0;
+	m_debug_mode = 0;
 
 	m_xbus_interrupt_enable = 0;
 

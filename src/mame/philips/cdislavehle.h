@@ -83,7 +83,7 @@ private:
 	uint8_t m_in_index;
 	uint8_t m_in_count;
 
-	uint8_t m_polling_active;
+	uint8_t m_debug_mode;
 
 	uint8_t m_xbus_interrupt_enable;
 
