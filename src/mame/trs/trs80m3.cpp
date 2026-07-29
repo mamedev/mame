@@ -540,8 +540,10 @@ ROM_END
 
 ROM_START( cp500 )
 	ROM_REGION(0x4000, "maincpu", 0)
-	//ROM_REGION(0x4000, "bootrom", 0)
 	ROM_LOAD("s_8407_cn62516n_cp500a_prologica_83.ci111", 0x0000, 0x4000, CRC(c2fc1b92) SHA1(0eb07baee80f1ee1f28a609eb63a9245dcb68adb))
+
+	ROM_REGION(0x4000, "bootrom", 0)
+	ROM_COPY("maincpu", 0x0000, 0x0000, 0x4000)
 
 	ROM_REGION(0x0800, "chargen", 0)
 	ROM_LOAD( "100.105.ci36", 0x0000, 0x800, CRC(1765931e) SHA1(49176ceea6cc003efa04fad2f31829b9432fe10f))
