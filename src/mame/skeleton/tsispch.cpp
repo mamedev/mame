@@ -356,7 +356,6 @@ void tsispch_state::peripheral_w(uint16_t data)
 *****************************************************************************/
 uint16_t tsispch_state::dsp_data_r()
 {
-	// side effect checks are unnecessary here as it is done in the cpu core itself
 	uint8_t r = m_dsp->data_r();
 	LOGDSP("dsp data read: %02x\n", r);
 	return r;
@@ -370,7 +369,6 @@ void tsispch_state::dsp_data_w(uint16_t data)
 
 uint16_t tsispch_state::dsp_status_r()
 {
-	// side effect checks are unnecessary here as it is done in the cpu core itself
 	uint8_t r = m_dsp->status_r();
 	LOGDSP("dsp status read: %02x\n", r);
 	return r;
