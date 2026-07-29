@@ -8,8 +8,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_CPU_UPD7720_UPD7720_H
-#define MAME_CPU_UPD7720_UPD7720_H
+#ifndef MAME_CPU_UPD7725_UPD7720_H
+#define MAME_CPU_UPD7725_UPD7720_H
 
 #pragma once
 
@@ -227,4 +227,4 @@ enum
 };
 
 
-#endif // MAME_CPU_UPD7720_UPD7720_H
+#endif // MAME_CPU_UPD7725_UPD7720_H
