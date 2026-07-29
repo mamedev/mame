@@ -1132,7 +1132,7 @@ ROM_START( unksigc )
 	ROM_LOAD( "cpu_27256.bin",           0x8000, 0x8000, CRC(f0517058) SHA1(0f8c1492e31777c70ff61b7c2cba014d84eb1203) ) // only the first 0x2000 matter
 
 	ROM_REGION( 0x6000, "chars", 0 )
-	ROM_LOAD( "2764_space INV R.bin",         0x0000, 0x2000, CRC(57c98676) SHA1(7b91e091225ac388a29fa03345be669295f2f699) )
+	ROM_LOAD( "2764_space inv r.bin",         0x0000, 0x2000, CRC(57c98676) SHA1(7b91e091225ac388a29fa03345be669295f2f699) )
 	ROM_LOAD( "2764_space pas etiquette.bin", 0x2000, 0x2000, CRC(e330a0cb) SHA1(e1b451ac80fc94035bdcde083da256b6bad70534) )
 	ROM_LOAD( "2764_space bleu.bin",          0x4000, 0x2000, CRC(f9c686fc) SHA1(b34412be047e04fc6aca218adf61bbe233908bd7) )
 ROM_END
