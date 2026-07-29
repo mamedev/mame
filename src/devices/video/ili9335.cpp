@@ -89,8 +89,8 @@ DEFINE_DEVICE_TYPE(ILI9335, ili9335_device, "ili9335", "Ilitek ILI9335 LCD Contr
 ili9335_device::ili9335_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
     device_t(mconfig, ILI9335, tag, owner, clock),
 
-    m_lcdregs{0}, m_gram{0}, m_readlatch(0), m_writelatch(0), m_datalatch(0),
-    m_currreg(0), m_currcol(0), m_currrow(0), m_height(320), m_width(240)
+    m_lcdregs{0}, m_gram{0}, m_readlatch(0), m_writelatch(0), m_currreg(0),
+    m_datalatch(0), m_currcol(0), m_currrow(0), m_height(320), m_width(240)
 {
 }
 
@@ -124,9 +124,9 @@ void ili9335_device::device_reset()
 }
 
 void ili9335_device::control_write(uint8_t data) {
-    m_currreg = (m_currreg << 8) | data;
     m_readlatch = 0;
     m_writelatch = 0;
+    m_currreg = data;
 }
 
 uint8_t ili9335_device::control_read() {
@@ -488,16 +488,14 @@ void ili9335_device::writePixel_666_unpacked(uint32_t pixel) {
 }
 
 uint32_t ili9335_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) {
-    // clear screen
-    rgb_t blank = m_lcdregs[REG_BIMGDISPCTRL] & 0x04 ? rgb_t::black() : rgb_t::white();
-
-    // if the LCD is turned off, bail out after filling the bitmap with black pixels
-    if (!(m_lcdregs[REG_DISPCTRL1] & 0x0002)) {
+    if (m_lcdregs[REG_DISPCTRL1] & 0x0002) {
+        rgb_t blank = m_lcdregs[REG_BIMGDISPCTRL] & 0x04 ? rgb_t::black() : rgb_t::white();
+        bitmap.fill(blank, cliprect);
+    } else {
+        // if the LCD is turned off, bail out after filling the bitmap with black pixels
         bitmap.fill(rgb_t::black(), cliprect);
         return 0;
     }
-
-    bitmap.fill(blank, cliprect);
 
     if (m_lcdregs[REG_DRVOUTCTRL] & 0x0400) {
         drawInterlacedFrame(bitmap);

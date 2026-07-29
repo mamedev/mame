@@ -263,14 +263,17 @@ void ti85_state::ti81v2_io(address_map &map)
 void ti85_state::ti83_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x0000, 0x0000).rw(FUNC(ti85_state::ti83_port_0000_r), FUNC(ti85_state::ti83_port_0000_w));  //TODO
+	map(0x0000, 0x0000).rw(FUNC(ti85_state::ti83_port_0000_r), FUNC(ti85_state::ti83_port_0000_w));
 	map(0x0001, 0x0001).rw(FUNC(ti85_state::ti8x_keypad_r), FUNC(ti85_state::ti8x_keypad_w));
 	map(0x0002, 0x0002).rw(FUNC(ti85_state::ti83_port_0002_r), FUNC(ti85_state::ti83_port_0002_w));
 	map(0x0003, 0x0003).rw(FUNC(ti85_state::ti83_port_0003_r), FUNC(ti85_state::ti83_port_0003_w));
-	map(0x0004, 0x0004).rw(FUNC(ti85_state::ti85_port_0004_r), FUNC(ti85_state::ti85_port_0004_w));
+	map(0x0004, 0x0004).rw(FUNC(ti85_state::ti83_port_0000_r), FUNC(ti85_state::ti85_port_0004_w));
 	map(0x0010, 0x0010).rw("t6a04", FUNC(t6a04_device::control_read), FUNC(t6a04_device::control_write));
 	map(0x0011, 0x0011).rw("t6a04", FUNC(t6a04_device::data_read), FUNC(t6a04_device::data_write));
+	map(0x0012, 0x0012).rw("t6a04", FUNC(t6a04_device::control_read), FUNC(t6a04_device::control_write));
+	map(0x0013, 0x0013).rw("t6a04", FUNC(t6a04_device::data_read), FUNC(t6a04_device::data_write));
 	map(0x0014, 0x0014).portr("BATTERY");
+	map(0x0015, 0x0015).r(FUNC(ti85_state::ti8x_keypad_r));
 }
 
 void ti85_state::ti83p_io(address_map &map)
@@ -737,15 +740,19 @@ void ti85_state::ti83(machine_config &config)
 {
 	ti81(config);
 	m_maincpu->set_clock(6000000);        /* 6 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ti85_state::ti86_mem);
 	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti83_io);
 
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
+	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti83 )
 
 	subdevice<screen_device>("screen")->set_screen_update("t6a04", FUNC(t6a04_device::screen_update));
 
 	subdevice<palette_device>("palette")->set_entries(2).set_init(FUNC(ti85_state::ti82_palette));
 
 	T6A04(config, "t6a04").set_size(96, 64);
+
+	TI8X_LINK_PORT(config, m_link_port, default_ti8x_link_devices, nullptr);
 }
 
 void ti85_state::ti86(machine_config &config)

@@ -42,6 +42,7 @@ struct ti83pse_timer
 	uint8_t setup = 0;
 	float divsor = 1;
 	bool interrupt = false;
+    bool active = false;
 	uint8_t max = 0;
 	uint8_t count = 0;
 };
@@ -123,7 +124,7 @@ private:
 	uint8_t m_ti8x_port2 = 0;
 	uint8_t m_ti83p_port4 = 0;
 	uint8_t m_ti83pse_port21 = 0;
-    uint8_t ti84p_rtc_control = 0;
+    uint8_t m_ti84p_rtc_control = 0;
 	uint8_t m_ti84pcse_portE = 0;
 	uint8_t m_ti84pcse_portF = 0;
     uint32_t m_ti84p_rtc_currtime = 0;
@@ -137,7 +138,7 @@ private:
 	emu_timer *m_ti85_timer = nullptr;
 	emu_timer *m_ti83_1st_timer = nullptr;
 	emu_timer *m_ti83_2nd_timer = nullptr;
-    emu_timer *m_ti84_rtc = nullptr;
+    emu_timer *m_ti84p_rtc = nullptr;
 
 	uint8_t ti85_port_0000_r();
 	uint8_t ti8x_keypad_r();
@@ -209,6 +210,7 @@ private:
 	DECLARE_MACHINE_RESET(ti83p);
 	void ti82_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(ti86);
+	DECLARE_MACHINE_START(ti83);
 	DECLARE_MACHINE_START(ti83p);
 	DECLARE_MACHINE_START(ti83pse);
 	DECLARE_MACHINE_START(ti84pse);
@@ -255,6 +257,7 @@ private:
 
 	void ti8x_update_bank(address_space &space, uint8_t bank, uint8_t *base, uint8_t page, bool is_ram);
 	void update_ti85_memory();
+    void update_ti83_memory();
 	void update_ti83p_memory();
 	void update_ti83pse_memory();
 	void update_ti84pcse_memory();

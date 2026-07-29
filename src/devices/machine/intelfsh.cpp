@@ -266,7 +266,7 @@ macronix_29lv160tmc_device::macronix_29lv160tmc_device(const machine_config &mco
 	: intelfsh8_device(mconfig, MACRONIX_29LV160TMC, tag, owner, clock, 0x20000, MFG_MACRONIX, 0x49) { m_sector_is_16k = true; }
 
 macronix_29lv320etti_device::macronix_29lv320etti_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, MACRONIX_29LV320ETTI, tag, owner, clock, 0x400000, MFG_MACRONIX, 0x22A7) {  }
+	: intelfsh8_device(mconfig, MACRONIX_29LV320ETTI, tag, owner, clock, 0x400000, MFG_MACRONIX, 0x22A7) { m_top_boot_sector = true; }
 
 st_m29w640gb_device::st_m29w640gb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, ST_M29W640GB, tag, owner, clock, 0x800000, MFG_ST, 0x227e) { m_bot_boot_sector = true; m_device_id2 = 0x2210; m_device_id3 = 0x2200; }

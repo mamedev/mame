@@ -40,9 +40,9 @@ private:
     uint16_t m_lcdregs[256];
     uint8_t m_gram[(320 * 240 * 18) / 8];
 
-    uint8_t m_readlatch, m_writelatch;
+    uint8_t m_readlatch, m_writelatch, m_currreg;
     uint32_t m_datalatch;
-    uint16_t m_currreg, m_currcol, m_currrow, m_height, m_width;
+    uint16_t m_currcol, m_currrow, m_height, m_width;
 
     void writeReg(uint16_t val);
     bool updateCursorReg(uint16_t *cursor, uint16_t start, uint16_t end, uint8_t flag);
