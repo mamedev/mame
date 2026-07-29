@@ -347,7 +347,6 @@ void tsispch_state::peripheral_w(uint16_t data)
 	m_paramReg = data;
 	m_dsp->set_input_line(INPUT_LINE_RESET, BIT(data,0xe)?CLEAR_LINE:ASSERT_LINE);
 	LOGPRM("8086: Parameter Reg written: UNK7: %d, DSPRST6: %d; VOLPOT: %d; LED4: %d; LED3: %d; LED2: %d; LED1: %d; UNK0: %d, lowbyte:%02x\n", BIT(data,0xf), BIT(data,0xe), BIT(data,0xd), BIT(data,0xc), BIT(data,0xb), BIT(data,0xa), BIT(data,0x9), BIT(data,0x8), data&0xff);
-	popmessage("LEDS: 6/Talking:%d 5:%d 4:%d 3:%d\n", 1-BIT(data,9), 1-BIT(data,0xa), 1-BIT(data,0xb), 1-BIT(data,0xc));
 }
 
 /*****************************************************************************
