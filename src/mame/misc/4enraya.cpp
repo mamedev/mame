@@ -1126,6 +1126,17 @@ ROM_START( unksigb ) // this set has been found with GFX ROMs of different sizes
 	ROM_LOAD( "u170", 0x4000, 0x2000, CRC(f9c686fc) SHA1(b34412be047e04fc6aca218adf61bbe233908bd7) )
 ROM_END
 
+ROM_START( unksigc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2764_space 11 000 2.bin", 0x0000, 0x2000, CRC(3f4422af) SHA1(cc99db35ec8aa9fb91aa03a0f9f6f012a6f48faa) )
+	ROM_LOAD( "cpu_27256.bin",           0x8000, 0x8000, CRC(f0517058) SHA1(0f8c1492e31777c70ff61b7c2cba014d84eb1203) ) // only the first 0x2000 matter
+
+	ROM_REGION( 0x6000, "chars", 0 )
+	ROM_LOAD( "2764_space INV R.bin",         0x0000, 0x2000, CRC(57c98676) SHA1(7b91e091225ac388a29fa03345be669295f2f699) )
+	ROM_LOAD( "2764_space pas etiquette.bin", 0x2000, 0x2000, CRC(e330a0cb) SHA1(e1b451ac80fc94035bdcde083da256b6bad70534) )
+	ROM_LOAD( "2764_space bleu.bin",          0x4000, 0x2000, CRC(f9c686fc) SHA1(b34412be047e04fc6aca218adf61bbe233908bd7) )
+ROM_END
+
 /***********************************
 *          Driver Init             *
 ***********************************/
@@ -1164,3 +1175,4 @@ GAME( 199?, unkpacga,  unkpacg, unkpacga, unkpacg,   unk_gambl_enc_state, empty_
 GAME( 199?, unksig,    0,       unkpacg,  unkfr,     unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (encrypted, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 199?, unksiga,   unksig,  unkpacg,  unkfr,     unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (encrypted, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 199?, unksigb,   unksig,  unkpacg,  unkfr,     unk_gambl_state,     empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (unencrypted)",      MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksigc,   unksig,  unkpacg,  unkfr,     unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (encrypted, set 3)", MACHINE_SUPPORTS_SAVE )
