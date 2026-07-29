@@ -392,9 +392,9 @@ TIMER_CALLBACK_MEMBER(tsispch_state::dsp_int_timer_cb)
 		m_dsp_int_level = ASSERT_LINE;
 		//LOGMASKED(LOG_GENERAL,"dsp output raw is %04x\n", m_dac_latch);
 #ifndef TOO_ACCURATE
-		m_dac->write((m_dac_latch&0x1ffe)>>1); // DSP_SO taps bits 12 to 1; bits 15, 14, 13 and 0 are unconnected. bit 0 is used, just unconnected.
+		m_dac->write((m_dac_latch & 0x1ffe) >> 1); // DSP_SO taps bits 12 to 1; bits 15, 14, 13 and 0 are unconnected. bit 0 is used, just unconnected.
 #else
-		m_dac->write(((m_dac_latch&0x1fff)<<3)|((dsp_so&0x1c00)>>10));
+		m_dac->write(((m_dac_latch & 0x1fff) << 3) | ((dsp_so & 0x1c00) >> 10));
 #endif
 	}
 	m_dsp->set_input_line(UPD7720_INPUT_LINE_INT, m_dsp_int_level);
