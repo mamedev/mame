@@ -10,8 +10,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_CPU_UPD7720_DASM7720_H
-#define MAME_CPU_UPD7720_DASM7720_H
+#ifndef MAME_CPU_UPD7725_DASM7720_H
+#define MAME_CPU_UPD7725_DASM7720_H
 
 #pragma once
 
