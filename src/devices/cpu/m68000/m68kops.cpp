@@ -20402,7 +20402,8 @@ void m68000_musashi_device::x4e7a_movec_l_4()
 			REG_DA()[(word2 >> 12) & 15] = m_dfc;
 			break;
 		case 0x002:            /* CACR */
-			REG_DA()[(word2 >> 12) & 15] = m_cacr;
+			/* MC68040 reserved bits must read 0 or the Amiga CPU detection fails */
+			REG_DA()[(word2 >> 12) & 15] = m_cacr & M68K_CACR_040_MASK;
 			break;
 		case 0x800:            /* USP */
 			REG_DA()[(word2 >> 12) & 15] = REG_USP();
@@ -20798,12 +20799,8 @@ void m68000_musashi_device::x4e7b_movec_l_4()
 			m_dfc = REG_DA()[(word2 >> 12) & 15] & 7;
 			break;
 		case 0x002:            /* CACR */
-			/* 68030 can write all bits except 5-7, 040 can write all */
-			m_cacr = REG_DA()[(word2 >> 12) & 15];
-			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
-				m68ki_ic_clear();
-				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
-			}
+			/* MC68040 reserved bits must read 0 or the Amiga CPU detection fails */
+			m_cacr = REG_DA()[(word2 >> 12) & 15] & M68K_CACR_040_MASK;
 			break;
 		case 0x800:            /* USP */
 			REG_USP() = REG_DA()[(word2 >> 12) & 15];
@@ -31884,7 +31881,6 @@ void m68000_musashi_device::xf400_cinv_l_4()
 void m68000_musashi_device::xf420_cpush_l_4()
 {
 	//logerror("%s at %08x: called unimplemented instruction %04x (cpush)\n", tag(), m_ppc, m_ir);
-
 }
 const m68000_musashi_device::opcode_handler_ptr m68000_musashi_device::m68k_handler_table[] =
 {
