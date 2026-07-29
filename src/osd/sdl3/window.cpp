@@ -944,7 +944,9 @@ int sdl_window_info::complete_create()
 	set_platform_window(sdlwindow);
 	renderer_create();
 
+#ifndef SDLMAME_ANDROID
 	SDL_StartTextInput(sdlwindow);
+#endif
 
 	if (fullscreen() && video_config.switchres)
 	{

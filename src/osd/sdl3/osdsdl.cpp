@@ -304,9 +304,6 @@ void sdl_osd_interface::init(running_machine &machine)
 		// survivable - it will still attempt to allocate mappings when it first sees devices
 	}
 
-#if defined(SDLMAME_ANDROID)
-	SDL_SetHint(SDL_HINT_VIDEO_EXTERNAL_CONTEXT, "1");
-#endif
 #if defined(SDLMAME_MACOSX)
 	SDL_SetHintWithPriority(SDL_HINT_MAC_BACKGROUND_APP, "0", SDL_HINT_DEFAULT);
 	SDL_SetHintWithPriority(SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH, "1", SDL_HINT_DEFAULT);
