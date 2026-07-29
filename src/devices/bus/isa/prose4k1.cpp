@@ -158,13 +158,9 @@ void prose4k1_device::peripheral_w(uint8_t data)
 
 uint8_t prose4k1_device::dsp_data_r()
 {
-	if (!machine().side_effects_disabled())
-	{
-		uint8_t r = m_dsp->data_r();
-		LOGDSP("dsp data read: %02x\n", r);
-		return r;
-	}
-	return 0xff; // must return junk because reading the data register can affect the DRS status bit as well as which half of the 16 bit DR is being read
+	uint8_t r = m_dsp->data_r();
+	LOGDSP("dsp data read: %02x\n", r);
+	return r;
 }
 
 void prose4k1_device::dsp_data_w(uint8_t data)
@@ -175,14 +171,9 @@ void prose4k1_device::dsp_data_w(uint8_t data)
 
 uint8_t prose4k1_device::dsp_status_r()
 {
-	if (!machine().side_effects_disabled())
-	{
-		//machine().scheduler().perfect_quantum(attotime::from_usec(25));
-		uint8_t r = m_dsp->status_r();
-		LOGDSP("dsp status read: %02x\n", r);
-		return r;
-	}
-	return m_dsp->status_r(); // the act of reading the status register, unlike the data register, cannot adversely affect the dsp internal state.
+	uint8_t r = m_dsp->status_r();
+	LOGDSP("dsp status read: %02x\n", r);
+	return r;
 }
 
 void prose4k1_device::dsp_so16_cb(uint16_t data)
