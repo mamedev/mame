@@ -123,8 +123,7 @@ ROM_START(prose4k1)
 	ROM_LOAD("v3.4.1_pr4001.u2", 0x1'0000, 0x1'0000, CRC(2ee241b7) SHA1(35b81f3b4deb552511f8d8f2d0aac9100fdee49d)) // TMS27C512, printed label, maps at e0000-effff
 	ROM_LOAD("v3.4.1_pr4001.u1", 0x2'0000, 0x1'0000, CRC(559f4950) SHA1(5c8709c82dadaea7012859c20141ef8f59d5e473)) // TMS27C512, handwritten label, maps at f0000-fffff
 
-	ROM_REGION32_LE( 0x800, "dsp:prg", 0) // packed 24 bit data
-	//ROM_LOAD("v3.12__5-04-90.prg.u16.old", 0x0000, 0x0600, CRC(9e46425a) SHA1(80a915d731f5b6863aeeb448261149ff15e5b786)) // identical to the prose2k 3.12 8/9/88 dsp rom
+	ROM_REGION32_LE( 0x800, "dsp:prg", 0) // unpacked 32 bit le data, cpu data is in low 23 bits
 	ROM_LOAD( "v3.12__5-04-90.prg.u16", 0x0000, 0x0800, CRC(6511df1e) SHA1(d898912bf6f630205340f0f5c17a8d88cf154787)) // identical to the prose2k 3.12 8/9/88 dsp rom
 
 	ROM_REGION16_LE(0x0400, "dsp:dat", 0) // 512*13-bit words, left-justified
@@ -186,7 +185,7 @@ void prose4k1_device::dsp_int_w(uint8_t state)
 	// writing the DSP INT pin at 10khz also latches the state of the external serial shifter to the DAC inputs on the rising edge
 	if (state)
 	{
-		m_dac->write((m_dac_latch&0x1ffe)>>1); // DSP_SO taps bits 12 to 1; bits 15, 14, 13 and 0 are unconnected. bit 0 is used, just unconnected.
+		m_dac->write((m_dac_latch & 0x1ffe) >> 1); // DSP_SO taps bits 12 to 1; bits 15, 14, 13 and 0 are unconnected. bit 0 is used, just unconnected.
 	}
 	m_dsp->set_input_line(UPD7720_INPUT_LINE_INT, state);
 }
