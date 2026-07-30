@@ -52,8 +52,6 @@ protected:
 	void set_cr(unsigned const cr, u32 const data);
 	bool condition(unsigned const m5, u32 const src) const;
 	u32 cmp(u32 const src1, u32 const src2) const;
-	bool carry(u32 const src1, u32 const src2, u32 const dest) const;
-	bool overflow(u32 const src1, u32 const src2, u32 const dest) const;
 
 	// floating-point helpers
 	void set_fcr(unsigned const fcr, u32 const data);
