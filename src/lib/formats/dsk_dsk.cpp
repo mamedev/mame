@@ -475,12 +475,13 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				sects[j].deleted = (sector.fdc_status_reg2 & 0x40);
 				sects[j].bad_data_crc = ((sector.fdc_status_reg1 & 0x20) || (sector.fdc_status_reg2 & 0x20));
 				sects[j].bad_addr_crc = false;
+				sects[j].weak = false;
 
 				if(!(sector.fdc_status_reg1 & 0x04)) {
 					sects[j].data = sect_data + sdatapos;
 					read_at(io, pos, sects[j].data, sects[j].actual_size); // FIXME: check for errors and premature EOF
 					sdatapos += sects[j].actual_size;
-
+					sects[j].weak = sects[j].bad_data_crc && !sects[j].deleted;
 				} else
 					sects[j].data = nullptr;
 
