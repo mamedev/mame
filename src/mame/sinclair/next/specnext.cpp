@@ -3840,6 +3840,9 @@ void specnext_state::machine_reset()
 		ay->data_w(0xff);
 	}
 
+	for (auto &dac : m_dac)
+		dac->data_w(0x80);
+
 	m_spi_clock->reset();
 	m_spi_clock_cycles = 0;
 	m_spi_clock_state = false;
