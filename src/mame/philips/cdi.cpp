@@ -362,56 +362,145 @@ void cdi_state::dvc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 *       LCD screen       *
 *************************/
 
-static const uint16_t cdi220_lcd_char[20*22] =
+static const uint8_t cdi220_lcd_char[20*22] =
 {
-	0x2000, 0x2000, 0x2000, 0x2000, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0200, 0x0200, 0x0200, 0x0200,
-	0x2000, 0x2000, 0x2000, 0x2000, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0200, 0x0200, 0x0200, 0x0200,
-	0x2000, 0x2000, 0x2000, 0x2000, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0200, 0x0200, 0x0200, 0x0200,
-	0x2000, 0x2000, 0x2000, 0x2000, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0200, 0x0200, 0x0200, 0x0200,
-	0x2000, 0x2000, 0x2000, 0x2000, 0x8000, 0x8000, 0x0000, 0x0000, 0x0001, 0x0001, 0x0001, 0x0001, 0x0000, 0x0000, 0x0002, 0x0002, 0x0200, 0x0200, 0x0200, 0x0200,
-	0x2000, 0x2000, 0x2000, 0x2000, 0x8000, 0x8000, 0x8000, 0x0000, 0x0001, 0x0001, 0x0001, 0x0001, 0x0000, 0x0002, 0x0002, 0x0002, 0x0200, 0x0200, 0x0200, 0x0200,
-	0x2000, 0x2000, 0x2000, 0x2000, 0x8000, 0x8000, 0x8000, 0x8000, 0x0001, 0x0001, 0x0001, 0x0001, 0x0002, 0x0002, 0x0002, 0x0002, 0x0200, 0x0200, 0x0200, 0x0200,
-	0x2000, 0x2000, 0x2000, 0x2000, 0x0000, 0x8000, 0x8000, 0x8000, 0x0001, 0x0001, 0x0001, 0x0001, 0x0002, 0x0002, 0x0002, 0x0000, 0x0200, 0x0200, 0x0200, 0x0200,
-	0x2000, 0x2000, 0x2000, 0x2000, 0x0000, 0x0000, 0x8000, 0x8000, 0x0001, 0x0001, 0x0001, 0x0001, 0x0002, 0x0002, 0x0000, 0x0000, 0x0200, 0x0200, 0x0200, 0x0200,
-	0x2000, 0x2000, 0x2000, 0x2000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x0200, 0x0200, 0x0200, 0x0200,
-	0x2000, 0x2000, 0x2000, 0x2000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x0200, 0x0200, 0x0200, 0x0200,
-	0x1000, 0x1000, 0x1000, 0x1000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x0400, 0x0400, 0x0400, 0x0400,
-	0x1000, 0x1000, 0x1000, 0x1000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x0400, 0x0400, 0x0400, 0x0400,
-	0x1000, 0x1000, 0x1000, 0x1000, 0x0000, 0x0000, 0x0010, 0x0010, 0x0001, 0x0001, 0x0001, 0x0001, 0x0008, 0x0008, 0x0000, 0x0000, 0x0400, 0x0400, 0x0400, 0x0400,
-	0x1000, 0x1000, 0x1000, 0x1000, 0x0000, 0x0010, 0x0010, 0x0010, 0x0001, 0x0001, 0x0001, 0x0001, 0x0008, 0x0008, 0x0008, 0x0000, 0x0400, 0x0400, 0x0400, 0x0400,
-	0x1000, 0x1000, 0x1000, 0x1000, 0x0010, 0x0010, 0x0010, 0x0010, 0x0001, 0x0001, 0x0001, 0x0001, 0x0008, 0x0008, 0x0008, 0x0008, 0x0400, 0x0400, 0x0400, 0x0400,
-	0x1000, 0x1000, 0x1000, 0x1000, 0x0010, 0x0010, 0x0010, 0x0000, 0x0001, 0x0001, 0x0001, 0x0001, 0x0000, 0x0008, 0x0008, 0x0008, 0x0400, 0x0400, 0x0400, 0x0400,
-	0x1000, 0x1000, 0x1000, 0x1000, 0x0010, 0x0010, 0x0000, 0x0000, 0x0001, 0x0001, 0x0001, 0x0001, 0x0000, 0x0000, 0x0008, 0x0008, 0x0400, 0x0400, 0x0400, 0x0400,
-	0x1000, 0x1000, 0x1000, 0x1000, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0400, 0x0400, 0x0400, 0x0400,
-	0x1000, 0x1000, 0x1000, 0x1000, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0400, 0x0400, 0x0400, 0x0400,
-	0x1000, 0x1000, 0x1000, 0x1000, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0400, 0x0400, 0x0400, 0x0400,
-	0x1000, 0x1000, 0x1000, 0x1000, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0400, 0x0400, 0x0400, 0x0400
+	 0, 14, 14,  9,  9,  9,  9,  9,  9,  9,  9,  9,  9,  9,  9,  9,  9, 10, 10,  0,
+	14, 14, 14, 14,  9,  9,  9,  9,  9,  9,  9,  9,  9,  9,  9,  9, 10, 10, 10, 10,
+	14, 14, 14, 14,  9,  9,  9,  9,  9,  9,  9,  9,  9,  9,  9,  9, 10, 10, 10, 10,
+	14, 14, 14, 14, 16,  9,  9,  9,  9,  9,  9,  9,  9,  9,  9,  2, 10, 10, 10, 10,
+	14, 14, 14, 14, 16, 16,  0,  0,  1,  1,  1,  1,  0,  0,  2,  2, 10, 10, 10, 10,
+	14, 14, 14, 14, 16, 16, 16,  0,  1,  1,  1,  1,  0,  2,  2,  2, 10, 10, 10, 10,
+	14, 14, 14, 14, 16, 16, 16, 16,  1,  1,  1,  1,  2,  2,  2,  2, 10, 10, 10, 10,
+	14, 14, 14, 14,  0, 16, 16, 16,  1,  1,  1,  1,  2,  2,  2,  0, 10, 10, 10, 10,
+	14, 14, 14, 14,  0,  0, 16, 16,  1,  1,  1,  1,  2,  2,  0,  0, 10, 10, 10, 10,
+	14, 14, 14, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 10, 10, 10, 10,
+	 0, 14, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 10, 10,  0,
+	 0, 13, 13, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 11, 11,  0,
+	13, 13, 13, 13, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 11, 11, 11, 11,
+	13, 13, 13, 13,  0,  0,  5,  5,  1,  1,  1,  1,  4,  4,  0,  0, 11, 11, 11, 11,
+	13, 13, 13, 13,  0,  5,  5,  5,  1,  1,  1,  1,  4,  4,  4,  0, 11, 11, 11, 11,
+	13, 13, 13, 13,  5,  5,  5,  5,  1,  1,  1,  1,  4,  4,  4,  4, 11, 11, 11, 11,
+	13, 13, 13, 13,  5,  5,  5,  0,  1,  1,  1,  1,  0,  4,  4,  4, 11, 11, 11, 11,
+	13, 13, 13, 13,  5,  5,  0,  0,  0,  1,  1,  0,  0,  0,  4,  4, 11, 11, 11, 11,
+	13, 13, 13, 13,  5, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12,  4, 11, 11, 11, 11,
+	13, 13, 13, 13, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 11, 11, 11, 11,
+	13, 13, 13, 13, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 11, 11, 11, 11,
+	 0, 13, 13, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 11, 11,  0
 };
+
+static const uint16_t cdi220_lcd_font[26] =
+{
+	0x7bed, 0x6bae, 0x3923, 0x6b6e, 0x79a7, 0x79a4, 0x396b, 0x5bed, 0x7497, 0x126a,     // A-J
+	0x5bad, 0x4927, 0x5fed, 0x5ffd, 0x2b6a, 0x6ba4, 0x2b7b, 0x6bad, 0x388e, 0x7492,     // K-T
+	0x5b6f, 0x5b6a, 0x5bfd, 0x5aad, 0x5a92, 0x72a7                                      // U-Z
+};
+
+static constexpr int LCD_WIDTH = 256;
+static constexpr int LCD_HEIGHT = 36;
+static constexpr int LCD_DIGIT_X = 34;
+static constexpr int LCD_DIGIT_Y = 12;
+static constexpr int LCD_DIGIT_WIDTH = 24;
+static constexpr int LCD_ROW_A = 0;
+static constexpr int LCD_ROW_B = 6;
+static constexpr int LCD_LEFT_X = 2;
+static constexpr int LCD_RIGHT_X = 202;
+static constexpr int LCD_SIDE_Y0 = 12;
+static constexpr int LCD_SIDE_Y1 = 18;
+static constexpr int LCD_SIDE_Y2 = 24;
+
+// TODO: Validate the mapping.
+static const struct
+{
+	uint16_t id;
+	const char *text;
+	int x, y;
+} cdi220_lcd_indicators[] =
+{
+	{ 0x0001, "MUTE",         LCD_LEFT_X,                      LCD_SIDE_Y0 },
+	{ 0x0002, "PAUSE",        LCD_LEFT_X,                      LCD_SIDE_Y1 },
+	{ 0x0004, "PLAY",         LCD_LEFT_X,                      LCD_SIDE_Y2 },
+	// $0008 is the |> symbol left of the first digit, drawn as artwork below
+	{ 0x0010, "RTS",          LCD_DIGIT_X,                       LCD_ROW_B },
+	{ 0x0020, "SHUFFLE",      LCD_DIGIT_X +     LCD_DIGIT_WIDTH, LCD_ROW_A },
+	{ 0x0040, " TRACK",       LCD_DIGIT_X +     LCD_DIGIT_WIDTH, LCD_ROW_B },
+	{ 0x0080, "REPEAT",       LCD_DIGIT_X + 3 * LCD_DIGIT_WIDTH, LCD_ROW_A },
+	{ 0x0800, "TOTAL",        LCD_DIGIT_X + 3 * LCD_DIGIT_WIDTH, LCD_ROW_B },
+	{ 0x1000, " REM",         LCD_DIGIT_X + 4 * LCD_DIGIT_WIDTH, LCD_ROW_B },
+	{ 0x2000, "SCAN",         LCD_DIGIT_X + 5 * LCD_DIGIT_WIDTH, LCD_ROW_A },
+	{ 0x4000, "TRACK",        LCD_DIGIT_X + 5 * LCD_DIGIT_WIDTH, LCD_ROW_B },
+	{ 0x8000, "TIME",         LCD_DIGIT_X + 6 * LCD_DIGIT_WIDTH, LCD_ROW_B },
+	{ 0x0100, "COMPACT DISC", LCD_RIGHT_X,                     LCD_SIDE_Y0 },
+	{ 0x0200, "INTERACTIVE",  LCD_RIGHT_X,                     LCD_SIDE_Y1 },
+	{ 0x0400, "GRAPHICS",     LCD_RIGHT_X,                     LCD_SIDE_Y2 }
+};
+
+static void draw_lcd_text(bitmap_rgb32 &bitmap, const rectangle &bounds, int x, int y, const char *text)
+{
+	for (const char *p = text; *p != '\0'; p++)
+	{
+		if (*p >= 'A' && *p <= 'Z')
+		{
+			const uint16_t glyph = cdi220_lcd_font[*p - 'A'];
+			for (int row = 0; row < 5; row++)
+			{
+				for (int col = 0; col < 3; col++)
+				{
+					if (bounds.contains(x + col, y + row) && BIT(glyph, 14 - (row * 3 + col)))
+						bitmap.pix(y + row, x + col) = rgb_t::white();
+				}
+			}
+		}
+		x += 4;
+	}
+}
 
 uint32_t cdi_state::screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(rgb_t::black(), cliprect);
+
 	if (!m_slave_hle.found())
 		return 0;
 
-	for (int y = 0; y < 22; y++)
-	{
-		uint32_t *scanline = &bitmap.pix(y);
+	uint8_t lcd_state[16];
+	std::copy_n(m_slave_hle->get_lcd_state(), 16, lcd_state);
 
-		for (int lcd = 0; lcd < 8; lcd++)
+	for (int lcd = 7; lcd > 0; lcd--)
+	{
+		const uint16_t data = (lcd_state[lcd * 2] << 8) | lcd_state[lcd * 2 + 1];
+		const int x0 = LCD_DIGIT_X + (7-lcd) * LCD_DIGIT_WIDTH;
+
+		for (int y = 0; y < 22; y++)
 		{
-			uint16_t data = (m_slave_hle->get_lcd_state()[lcd*2] << 8) |
-							m_slave_hle->get_lcd_state()[lcd*2 + 1];
 			for (int x = 0; x < 20; x++)
 			{
-				if (data & cdi220_lcd_char[y*20 + x])
-				{
-					scanline[(7 - lcd)*24 + x] = rgb_t::white();
-				}
-				else
-				{
-					scanline[(7 - lcd)*24 + x] = rgb_t::black();
-				}
+				const uint8_t seg = cdi220_lcd_char[y * 20 + x];
+				if (seg != 0 && BIT(data, seg - 1))
+					bitmap.pix(LCD_DIGIT_Y + y, x0 + x) = rgb_t::white();
 			}
+		}
+	}
+
+	uint16_t indicators = (lcd_state[0] << 8) | lcd_state[1];
+
+	for (const auto &ind : cdi220_lcd_indicators)
+	{
+		if (indicators & ind.id)
+			draw_lcd_text(bitmap, cliprect, ind.x, ind.y, ind.text);
+	}
+
+	// Draws the play icon.
+	if (indicators & 0x0008)
+	{
+		for (int y = 0; y < 9; y++)
+		{
+			bitmap.pix(18 + y, 24) = rgb_t::white();
+			bitmap.pix(18 + y, 25) = rgb_t::white();
+		}
+		for (int y = 0; y < 9; y++)
+		{
+			const int half = (y <= 4) ? y : (8 - y);
+			for (int x = 0; x <= half; x++)
+				bitmap.pix(18 + y, 27 + x) = rgb_t::white();
 		}
 	}
 
@@ -441,7 +530,7 @@ void cdi_state::cdimono1_base(machine_config &config)
 	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
 	m_lcd->set_refresh_hz(50);
 	m_lcd->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_lcd->set_size(192, 22);
+	m_lcd->set_size(LCD_WIDTH, LCD_HEIGHT);
 	m_lcd->set_visarea_full();
 	m_lcd->set_screen_update(FUNC(cdi_state::screen_update_cdimono1_lcd));
 
@@ -492,7 +581,7 @@ void cdi_state::cdimono2(machine_config &config)
 	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
 	m_lcd->set_refresh_hz(60);
 	m_lcd->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_lcd->set_size(192, 22);
+	m_lcd->set_size(LCD_WIDTH, LCD_HEIGHT);
 	m_lcd->set_visarea_full();
 	m_lcd->set_screen_update(FUNC(cdi_state::screen_update_cdimono1_lcd));
 
@@ -536,7 +625,7 @@ void cdi_state::cdi910(machine_config &config)
 	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
 	m_lcd->set_refresh_hz(60);
 	m_lcd->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_lcd->set_size(192, 22);
+	m_lcd->set_size(LCD_WIDTH, LCD_HEIGHT);
 	m_lcd->set_visarea_full();
 	m_lcd->set_screen_update(FUNC(cdi_state::screen_update_cdimono1_lcd));
 
