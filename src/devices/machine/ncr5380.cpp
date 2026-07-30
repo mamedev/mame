@@ -43,7 +43,7 @@ ncr5380_device::ncr5380_device(machine_config const &mconfig, device_type type, 
 }
 
 ncr5380_device::ncr5380_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: ncr5380_device(mconfig, NCR5380, tag, owner, clock)
+	: ncr5380_device(mconfig, NCR5380, tag, owner, clock, false)
 {
 }
 
