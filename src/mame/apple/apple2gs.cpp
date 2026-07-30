@@ -439,8 +439,6 @@ private:
 	int m_inh_slot = 0, m_cnxx_slot = 0;
 	int m_motoroff_time = 0;
 
-	bool m_romswitch = false;
-
 	bool m_an0 = false, m_an1 = false, m_an2 = false, m_an3 = false;
 
 	bool m_vbl = false;
@@ -454,7 +452,7 @@ private:
 	bool m_ramrd = false, m_ramwrt = false;
 	bool m_lcram = false, m_lcram2 = false, m_lcprewrite = false, m_lcwriteenable = false;
 	bool m_rombank = false;
-	u32 m_banklatch = 0;
+	u32 m_roma14_mask = 0, m_banklatch = 0;
 
 	u8 m_shadow = 0, m_speed = 0;
 	u8 m_motors_active = 0, m_slotromsel = 0, m_intflag = 0, m_vgcint = 0, m_inten = 0;
@@ -765,7 +763,6 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_inh_slot));
 	save_item(NAME(m_inh_bank));
 	save_item(NAME(m_cnxx_slot));
-	save_item(NAME(m_romswitch));
 	save_item(NAME(m_an0));
 	save_item(NAME(m_an1));
 	save_item(NAME(m_an2));
@@ -783,6 +780,7 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_lcprewrite));
 	save_item(NAME(m_lcwriteenable));
 	save_item(NAME(m_rombank));
+	save_item(NAME(m_roma14_mask));
 	save_item(NAME(m_banklatch));
 	save_item(NAME(m_shadow));
 	save_item(NAME(m_speed));
@@ -829,7 +827,6 @@ void apple2gs_state::machine_reset()
 {
 	m_adb_p2_last = m_adb_p3_last = 0;
 	m_adb_reset_freeze = 0;
-	m_romswitch = false;
 	m_video->scr_w(0);
 	m_video->set_GS_border(0x02);
 	m_video->set_GS_textcol(0xf2);
@@ -848,6 +845,7 @@ void apple2gs_state::machine_reset()
 	m_ramrd = false;
 	m_ramwrt = false;
 	m_rombank = false;
+	m_roma14_mask = 0xfffff;
 	m_video->set_newvideo(0x01); // verified on ROM03 hardware
 	m_banklatch = 1 << 16;
 	m_slot_irq = false;
@@ -1327,19 +1325,22 @@ void apple2gs_state::lc_update(int offset, bool writing)
 
 void apple2gs_state::lcrom_update()
 {
+	const u8 rombank = (m_rombank && !m_is_rom3) ? 2 : 0;
+	m_roma14_mask = (m_rombank && !m_is_rom3) ? 0xfbfff : 0xfffff;
+
 	if (m_lcram)
 	{
 		m_lcbank.select(1);
 		m_lcaux.select(1);
-		m_lc00.select(1 + (m_romswitch ? 2 : 0));
-		m_lc01.select(1);
+		m_lc00.select(1 + rombank);
+		m_lc01.select(1 + rombank);
 	}
 	else
 	{
 		m_lcbank.select(0);
 		m_lcaux.select(0);
-		m_lc00.select(0 + (m_romswitch ? 2 : 0));
-		m_lc01.select(0);
+		m_lc00.select(0 + rombank);
+		m_lc01.select(0 + rombank);
 	}
 }
 
@@ -1350,19 +1351,9 @@ void apple2gs_state::do_io(int offset)
 
 	switch (offset)
 	{
-		case 0x28:  // ROMSWITCH - not used by the IIgs firmware or SSW, but does exist at least on ROM 0/1 (need to test on ROM 3 hw)
-			if (!m_is_rom3)
-			{
-				m_romswitch = !m_romswitch;
-				if (m_lcram)
-				{
-					m_lc00.select(1 + (m_romswitch ? 2 : 0));
-				}
-				else
-				{
-					m_lc00.select(0 + (m_romswitch ? 2 : 0));
-				}
-			}
+		case 0x28:  // ROMBANK - not used by the IIgs firmware or SSW, but works on ROM 0/1
+			m_rombank = !m_rombank; // ROM 3 changes state, but banking is disabled
+			lcrom_update();
 			break;
 
 		case 0x2a:  // 16-bit access to NEWVIDEO
@@ -1815,7 +1806,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			[[fallthrough]];
 		case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7f:
-			return m_rom[offset + 0x3c000];
+			return m_rom[(offset + 0x3c000) & m_roma14_mask];
 
 		default:
 			/*
@@ -2256,20 +2247,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			auxbank_update();
 
 			// update LC state
-			if (m_lcram)
-			{
-				m_lcbank.select(1);
-				m_lcaux.select(1);
-				m_lc00.select(1);
-				m_lc01.select(1);
-			}
-			else
-			{
-				m_lcbank.select(0);
-				m_lcaux.select(0);
-				m_lc00.select(0);
-				m_lc01.select(0);
-			}
+			lcrom_update();
 			break;
 
 		default:
@@ -2419,7 +2397,7 @@ void apple2gs_state::write_slot_rom(int slotbias, int offset, u8 data)
 	}
 }
 
-u8 apple2gs_state::read_int_rom(int slotbias, int offset) { return m_rom[slotbias + offset]; }
+u8 apple2gs_state::read_int_rom(int slotbias, int offset) { return m_rom[(slotbias + offset) & m_roma14_mask]; }
 
 u8 apple2gs_state::c100_r(offs_t offset)
 {
@@ -2469,7 +2447,7 @@ u8 apple2gs_state::c800_r(offs_t offset)
 
 	if (internal)
 	{
-		return m_rom[offset + 0x3c800];
+		return read_int_rom(0x3c800, offset);
 	}
 
 	if ((slot > 0) && (m_slotdevice[slot] != nullptr))
@@ -3250,6 +3228,8 @@ void apple2gs_state::apple2gs_map(address_map &map)
 
 	m_lc01[0](0x1d000, 0x1ffff).rom().region("maincpu", 0x3d000).w(FUNC(apple2gs_state::lc_01_w));
 	m_lc01[1](0x1d000, 0x1ffff).rw(FUNC(apple2gs_state::lc_01_r), FUNC(apple2gs_state::lc_01_w));
+	m_lc01[2](0x1d000, 0x1ffff).rom().region("maincpu", 0x39000).w(FUNC(apple2gs_state::lc_01_w));
+	m_lc01[3](0x1d000, 0x1ffff).rw(FUNC(apple2gs_state::lc_01_r), FUNC(apple2gs_state::lc_01_w));
 
 	// "Mega II side" - this is basically a 128K IIe on a chip that runs merrily at 1 MHz
 	// Unfortunately all I/O happens here, including new IIgs-specific stuff
@@ -3307,7 +3287,8 @@ void apple2gs_state::megaii_map(address_map &map)
 	m_upperbank[0](0xd000, 0xffff).view(m_lcbank);
 	m_upperbank[1](0xd000, 0xffff).rw(FUNC(apple2gs_state::inh_r), FUNC(apple2gs_state::inh_w));
 
-	m_lcbank[0](0xd000, 0xffff).rom().region("maincpu", 0x3d000).w(FUNC(apple2gs_state::lc_w));
+	m_lcbank[0](0xd000, 0xffff).lr8(
+		NAME([this](offs_t offset) { slow_cycle(); return m_rom[(offset + 0x3d000) & m_roma14_mask]; })).w(FUNC(apple2gs_state::lc_w));
 	m_lcbank[1](0xd000, 0xffff).rw(FUNC(apple2gs_state::lc_r), FUNC(apple2gs_state::lc_w));
 
 	map(0x10000, 0x1bfff).rw(FUNC(apple2gs_state::auxram0000_r), FUNC(apple2gs_state::auxram0000_w));
@@ -3321,7 +3302,8 @@ void apple2gs_state::megaii_map(address_map &map)
 	m_upperaux[0](0x1d000, 0x1ffff).view(m_lcaux);
 	m_upperaux[1](0x1d000, 0x1ffff).rw(FUNC(apple2gs_state::inh_r), FUNC(apple2gs_state::inh_w));
 
-	m_lcaux[0](0x1d000, 0x1ffff).rom().region("maincpu", 0x3d000).w(FUNC(apple2gs_state::lc_aux_w));
+	m_lcaux[0](0x1d000, 0x1ffff).lr8(
+		NAME([this](offs_t offset) { slow_cycle(); return m_rom[(offset + 0x3d000) & m_roma14_mask]; })).w(FUNC(apple2gs_state::lc_aux_w));
 	m_lcaux[1](0x1d000, 0x1ffff).rw(FUNC(apple2gs_state::lc_aux_r), FUNC(apple2gs_state::lc_aux_w));
 }
 
