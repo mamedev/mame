@@ -84,6 +84,7 @@ void ncr5380_device::device_start()
 	m_irq_state = false;
 	m_drq_state = false;
 	m_rst_out = false;
+	m_rst_state = false;
 
 	m_state_timer = timer_alloc(FUNC(ncr5380_device::state_timer), this);
 
@@ -101,6 +102,7 @@ void ncr5380_device::device_start()
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_drq_state));
 	save_item(NAME(m_rst_out));
+	save_item(NAME(m_rst_state));
 }
 
 void ncr5380_device::device_reset()
@@ -162,18 +164,24 @@ void ncr5380_device::scsi_ctrl_changed()
 
 	if (ctrl & S_RST)
 	{
-		LOG("scsi reset received\n");
-		bool const self_reset = m_rst_out;
-		device_reset();
+		// SCSI bus reset is edge-triggered: the chip resets and interrupts when
+		// R̅S̅T̅ transitions to true (NCR5380 SP-1051 8.3 / DP8490 6.3), not while
+		// the line merely stays low.  A device already holding R̅S̅T̅ when another
+		// asserts it sees no new transition and must not reset again.
+		if (!m_rst_state)
+		{
+			m_rst_state = true;
+			LOG("scsi reset received\n");
+			bool const self_reset = m_rst_out;
+			device_reset();
 
-		// The base 5380 interrupts on ANY R̅S̅T̅ transition, including one it
-		// asserted itself, and that interrupt cannot be disabled (SP-1051 8.3:
-		// "this interrupt also occurs after setting the ASSERT R̅S̅T̅ bit").  The
-		// DP8490 EASI diverges: firmware written against the real part (the
-		// NetBSD/pc532 ROM monitor) asserts R̅S̅T̅ and treats a resulting IRQ as
-		// a fault, so the EASI evidently suppresses the self-reset interrupt.
-		if (!self_reset || m_rst_self_irq)
-			set_irq(true);
+			// External R̅S̅T̅ always interrupts (SP-1051 9.2 / DP8490 6.3).  A
+			// self-issued reset interrupts on the base NCR5380/53C80 (SP-1051
+			// 8.3/9.3) but the DP8490 EASI does a chip reset with no interrupt
+			// (DP8490 6.4 -> 6.2); m_rst_self_irq encodes the split.
+			if (!self_reset || m_rst_self_irq)
+				set_irq(true);
+		}
 	}
 	else if (!(m_mode & MODE_TARGET) && (m_scsi_ctrl & S_BSY) && !(ctrl & S_BSY))
 	{
@@ -258,6 +266,7 @@ void ncr5380_device::scsi_ctrl_changed()
 		set_irq(true);
 	}
 
+	m_rst_state = (ctrl & S_RST) != 0; // track the R̅S̅T̅ level for edge detection
 	m_scsi_ctrl = ctrl;
 }
 
@@ -321,21 +330,28 @@ void ncr5380_device::icmd_w(u8 data)
 	else
 	{
 		LOG("scsi reset issued\n");
-		device_reset();
-		// the chip is now driving R̅S̅T̅ itself; flag it so an externally-initiated
-		// reset can still be told apart in scsi_ctrl_changed().
+		// SCSI bus reset is edge-triggered (NCR5380 SP-1051 8.3/9.3, DP8490
+		// 6.4): driving R̅S̅T̅ performs the chip reset only when it transitions the
+		// line to true.  If another device already holds R̅S̅T̅ we just add our
+		// open-drain assertion -- no new edge, so no second reset or interrupt.
+		bool const edge = !(m_scsi_bus->ctrl_r() & S_RST);
+		if (edge)
+			device_reset();
 		m_rst_out = true;
+		m_rst_state = true; // block a re-entrant scsi_ctrl_changed from re-firing
 		m_scsi_bus->ctrl_w(m_scsi_refid, S_RST, S_RST);
 		// The nscsi bus does not reflect a device's own R̅S̅T̅ back to it, so
-		// scsi_ctrl_changed() is not re-entered here: the base NCR5380/53C80
-		// self-reset interrupt (SP-1051 8.3, "this interrupt also occurs after
-		// setting the ASSERT R̅S̅T̅ bit") must be raised explicitly.  The DP8490
-		// EASI suppresses it (m_rst_self_irq == false), leaving the NetBSD/pc532
-		// monitor -- which asserts R̅S̅T̅ then aborts on a spurious IRQ -- unaffected.
-		if (m_rst_self_irq)
+		// scsi_ctrl_changed() is not re-entered for the self edge: the base
+		// NCR5380/53C80 interrupts on its own reset (SP-1051 8.3), raised here;
+		// the DP8490 EASI does the chip reset with no interrupt (DP8490 6.4 ->
+		// 6.2, m_rst_self_irq == false), leaving the NetBSD/pc532 monitor --
+		// which asserts R̅S̅T̅ then aborts on a spurious IRQ -- unaffected.
+		if (edge && m_rst_self_irq)
 			set_irq(true);
 	}
 
+	// track the bus R̅S̅T̅ level for edge detection after any self-driven change
+	m_rst_state = (m_scsi_bus->ctrl_r() & S_RST) != 0;
 	m_icmd = (m_icmd & ~IC_WRITE) | (data & IC_WRITE);
 }
 
