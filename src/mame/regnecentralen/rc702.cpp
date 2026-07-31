@@ -19,9 +19,21 @@ ToDo:
 - Hard drive for RC703, ports 0x60-0x67. Extra CTC on HD board, ports 0x44-0x47
 - Keyboard MCU (8048 + 2758) -- currently using generic_keyboard
 
+SIO peripherals (J1 / J2):
+- SIO-A (J1): data/reader port, mapped to RDR:/PUN: in CP/M.
+- SIO-B (J2): traditionally the printer port; also usable for CP/NET traffic to
+  an MP/M server on the host (the alternative to PIO-B).
+  Both channels are RS232 (null_modem slot).  No baud-rate default is set here:
+  the firmware programs the CTC baud generator at cold boot (typically 38400
+  8-N-1), so match the null_modem slot rate to the firmware in MAME's options.
+  Each SIO channel's TxC and RxC are tied together to share one CTC output, so
+  TX and RX on a channel always run at the same rate (see clock tree below).
+  The pins for synchronous operation are not exposed on the RC702 connectors,
+  so synchronous mode is only possible on the RC703.
+
 PIO peripherals (J3 / J4):
 - PIO-A (J4): keyboard, wired direct.
-- PIO-B (J3): configurable slot device (bus/rc702/pio_port/), default empty.
+- PIO-B (J3): configurable slot device (pio_port/), default empty.
   J3 was an unpopulated expansion connector. Not the printer port, that was SIO-B.
 
 Z80 PIO modeling: PIO-A is wired direct and PIO-B is the slot ("Einstein
@@ -30,7 +42,9 @@ z80pio_device slot devices breaks IM2 interrupt delivery: the flat
 z80pio_device has no per-channel device_t subdevices, and slots have only
 been validated against per-channel-subdevice chips (z80sio_channel etc.).
 
-prom1 (line program ROM) is undumped; region filled with 0xff.
+prom1 (line program ROM) is undumped; region filled with 0xff.  A typical use
+was a test PROM in the RC703.  A CP/NOS boot prom1 for diskless operation is in
+progress.
 
 References:
 
@@ -48,7 +62,7 @@ References:
 
 #include "emu.h"
 
-#include "bus/rc702/pio_port/pio_port.h"
+#include "pio_port/pio_port.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
@@ -73,6 +87,22 @@ References:
 
 namespace {
 
+// RC702 clock tree (see RC702_HARDWARE_TECHNICAL_REFERENCE.md):
+//   * 8 MHz crystal          -> Z80 CPU and the CTC/SIO/PIO + Am9517A DMA all
+//     run at 4 MHz (/2); the uPD765 FDC runs at the full 8 MHz on the 8" drive
+//     and at 4 MHz (/2) on the 5.25" drives.
+//   * 19.6608 MHz memory (DRAM) clock -> baud rate generator: two cascaded
+//     74LS393 dividers give /32 = 0.6144 MHz into CTC ch0/ch1, so the maximum
+//     async rate is 614400 / 16 = 38400 baud.
+//   * 11.64 MHz dot clock    -> 8275 CRTC character clock (/7 = 7 px/char).
+//     This is a PLL output (not a crystal): a phase-locked loop regenerates
+//     it locked to the 50 Hz field rate, giving 108 chars x 7 px x 15.4 kHz
+//     (308 lines x 50 Hz) = 11.6424 MHz.
+// The 4 MHz peripheral clock (8 MHz / 2) is the value repeated below.
+static constexpr XTAL MAIN_XTAL = 8_MHz_XTAL;        // CPU + peripherals + FDC
+static constexpr XTAL MEM_CLOCK = 19.6608_MHz_XTAL;  // DRAM clock; baud = /32
+static constexpr XTAL DOT_CLOCK = 11.64_MHz_XTAL;    // 8275 CRTC; char clock = /7
+
 class rc702_state : public driver_device
 {
 public:
@@ -88,7 +118,9 @@ public:
 		, m_bank2(*this, "bank2")
 		, m_bank2h(*this, "bank2h")
 		, m_p_chargen(*this, "chargen")
+		, m_crtc(*this, "crtc")
 		, m_ctc1(*this, "ctc1")
+		, m_sio(*this, "sio1")
 		, m_pio(*this, "pio")
 		, m_dma(*this, "dma")
 		, m_beep(*this, "beeper")
@@ -98,6 +130,10 @@ public:
 		, m_rs232a(*this, "rs232a")
 		, m_rs232b(*this, "rs232b")
 		, m_pio_b(*this, "piob")
+		, m_screen(*this, "screen")
+		, m_keyboard(*this, "keyboard")
+		, m_dsw(*this, "DSW")
+		, m_promcfg(*this, "PROMCFG")
 	{ }
 
 	void rc700_base(machine_config &config);
@@ -161,7 +197,9 @@ private:
 	required_memory_bank    m_bank2;
 	required_memory_bank    m_bank2h;
 	required_region_ptr<u8> m_p_chargen;
+	required_device<i8275_device> m_crtc;
 	required_device<z80ctc_device> m_ctc1;
+	required_device<z80sio_device> m_sio;
 	required_device<z80pio_device> m_pio;
 	required_device<am9517a_device> m_dma;
 	required_device<beep_device> m_beep;
@@ -171,35 +209,42 @@ private:
 	required_device<rs232_port_device> m_rs232a;
 	required_device<rs232_port_device> m_rs232b;
 	required_device<rc702_pio_port_device> m_pio_b;
+	required_device<screen_device> m_screen;
+	required_device<generic_keyboard_device> m_keyboard;
+	required_ioport m_dsw;
+	required_ioport m_promcfg;
 };
 
 
 void rc702_state::mem_map(address_map &map)
 {
-	map(0x0000, 0xffff).ram().share("mainram");
-	map(0x0000, 0x07ff).bankr("bank1");
-	map(0x0800, 0x0fff).bankr("bank1h");
-	map(0x2000, 0x27ff).bankr("bank2");
-	map(0x2800, 0x2fff).bankr("bank2h");
+	map(0x0000, 0xffff).ram().share(m_ram);
+	map(0x0000, 0x07ff).bankr(m_bank1);
+	map(0x0800, 0x0fff).bankr(m_bank1h);
+	map(0x2000, 0x27ff).bankr(m_bank2);
+	map(0x2800, 0x2fff).bankr(m_bank2h);
 }
 
 void rc702_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x00, 0x01).rw("crtc", FUNC(i8275_device::read), FUNC(i8275_device::write));
+	map(0x00, 0x01).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
 	map(0x04, 0x05).m(m_fdc, FUNC(upd765a_device::map));
-	map(0x08, 0x0b).rw("sio1", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)); // boot sequence doesn't program this
+	map(0x08, 0x0b).rw(m_sio, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)); // boot sequence doesn't program this
 	map(0x0c, 0x0f).rw(m_ctc1, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x10, 0x13).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0x14, 0x17).portr("DSW").w(FUNC(rc702_state::port14_w)); // motors
+	map(0x14, 0x17).portr(m_dsw).w(FUNC(rc702_state::port14_w)); // motors
 	map(0x18, 0x1b).lw8(NAME([this] (u8 data) { m_bank1->set_entry(0); m_bank1h->set_entry(0); m_bank2->set_entry(0); m_bank2h->set_entry(0); })); // replace roms with ram
 	map(0x1c, 0x1f).w(FUNC(rc702_state::port1c_w)); // sound
-	// SEM702 chargen (IC82): handlers wired on every variant but only act
-	// when m_has_sem702 is set (ports go nowhere with a ROA327 ROM fitted).
-	map(0xd1, 0xd1).w(FUNC(rc702_state::sem702_char_w));
-	map(0xd2, 0xd2).w(FUNC(rc702_state::sem702_dot_w));
-	map(0xd3, 0xd3).w(FUNC(rc702_state::sem702_data_w));
+	// SEM702 chargen (IC82) ports; only present on the SEM702 variant, where
+	// they land on a RAM board fitted in place of the ROA327 font ROM.
+	if (m_has_sem702)
+	{
+		map(0xd1, 0xd1).w(FUNC(rc702_state::sem702_char_w));
+		map(0xd2, 0xd2).w(FUNC(rc702_state::sem702_dot_w));
+		map(0xd3, 0xd3).w(FUNC(rc702_state::sem702_data_w));
+	}
 	map(0xf0, 0xff).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 }
 
@@ -264,7 +309,7 @@ void rc702_state::machine_reset()
 	// PROM upper halves depend on jumper setting:
 	// 2716 (2KB): A11 not connected -- upper half mirrors lower half
 	// 2732 (4KB): A11 active -- upper half is distinct ROM data
-	uint8_t promcfg = ioport("PROMCFG")->read();
+	uint8_t promcfg = m_promcfg->read();
 	m_bank1h->set_entry(BIT(promcfg, 0) ? 2 : 1);  // 4K: ROM+0x800, 2K: mirror
 	m_bank2h->set_entry(BIT(promcfg, 1) ? 2 : 1);  // 4K: ROM+0x800, 2K: mirror
 
@@ -280,7 +325,7 @@ void rc702_state::machine_reset()
 
 	// Set FDC data rate: 8" maxi drives use 500 kbps, 5.25" mini use 250 kbps.
 	// DIP switch S08 bit 7: clear = maxi (8"), set = mini (5.25").
-	m_fdc->set_rate(BIT(ioport("DSW")->read(), 7) ? 250000 : 500000);
+	m_fdc->set_rate(BIT(m_dsw->read(), 7) ? 250000 : 500000);
 
 	m_maincpu->reset();
 }
@@ -418,26 +463,24 @@ void rc702_state::port1c_w(uint8_t data)
 	m_beepcnt = 0x3000;
 }
 
-// SEM702 chargen (IC82), only active when m_has_sem702.  Three pure latches:
-// 0xD1 = 7-bit char address (ACHAR), 0xD2 = 4-bit line address (ALINE),
-// 0xD3 writes RAM[(ACHAR << 4) | ALINE].  No auto-increment is modelled --
-// all known software sets ALINE before every byte, so real behaviour is
-// unobserved and the strict model avoids relying on side effects.
+// SEM702 chargen (IC82).  The handlers are only installed on the SEM702
+// variant (see io_map).  Three pure latches: 0xD1 = 7-bit char address
+// (ACHAR), 0xD2 = 4-bit line address (ALINE), 0xD3 writes
+// RAM[(ACHAR << 4) | ALINE].  No auto-increment is modelled -- all known
+// software sets ALINE before every byte, so real behaviour is unobserved
+// and the strict model avoids relying on side effects.
 void rc702_state::sem702_char_w(uint8_t data)
 {
-	if (!m_has_sem702) return;
 	m_sem702_char_latch = data & 0x7f;
 }
 
 void rc702_state::sem702_dot_w(uint8_t data)
 {
-	if (!m_has_sem702) return;
 	m_sem702_dot_latch = data & 0x0f;
 }
 
 void rc702_state::sem702_data_w(uint8_t data)
 {
-	if (!m_has_sem702) return;
 	uint16_t addr = (uint16_t(m_sem702_char_latch) << 4) | m_sem702_dot_latch;
 	m_sem702_ram[addr & 0x7ff] = data;
 }
@@ -483,7 +526,7 @@ I8275_DRAW_CHARACTER_MEMBER( rc702_state::display_pixels )
 	if (BIT(attrcode, RVV))
 		gfx ^= 0xff;
 
-	// Highlight not used
+	// Highlight not used in RC702, possibly fixed in RC703.
 	// Bits 0-6 are the 7 visible pixels (bit 7 unused in both ROA296 and ROA327 ROMs)
 	bitmap.pix(y, x++) = palette[BIT(gfx, 0) ? 1 : 0];
 	bitmap.pix(y, x++) = palette[BIT(gfx, 1) ? 1 : 0];
@@ -494,9 +537,10 @@ I8275_DRAW_CHARACTER_MEMBER( rc702_state::display_pixels )
 	bitmap.pix(y, x++) = palette[BIT(gfx, 6) ? 1 : 0];
 }
 
-// Baud rate generator.  The 0.614 MHz CTC clock is derived from the ~20 MHz
-// DRAM refresh oscillator by a /32.6 divide chain on MIC 11.  With the CTC
-// in /16 mode the maximum baud rate is 38400 bps.
+// Baud rate generator.  The 0.6144 MHz CTC clock is derived from the
+// 19.6608 MHz DRAM (memory) clock by a /32 divider chain on MIC 11 (see the
+// clock tree at the top).  With the CTC in /16 mode the maximum baud rate is
+// 38400 bps.
 void rc702_state::clock_w(int state)
 {
 	m_ctc1->trg0(state);
@@ -562,33 +606,33 @@ static void rc703_floppies(device_slot_interface &device)
 void rc702_state::rc700_base(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(8'000'000) / 2);
+	Z80(config, m_maincpu, MAIN_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rc702_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &rc702_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain_intf);
 
-	CLOCK(config, "ctc_clock", 614000).signal_handler().set(FUNC(rc702_state::clock_w));
+	CLOCK(config, "ctc_clock", MEM_CLOCK / 32).signal_handler().set(FUNC(rc702_state::clock_w));
 
-	Z80CTC(config, m_ctc1, 8_MHz_XTAL / 2);
-	m_ctc1->zc_callback<0>().set("sio1", FUNC(z80sio_device::txca_w));
-	m_ctc1->zc_callback<0>().append("sio1", FUNC(z80sio_device::rxca_w));
-	m_ctc1->zc_callback<1>().set("sio1", FUNC(z80sio_device::rxtxcb_w));
+	Z80CTC(config, m_ctc1, MAIN_XTAL / 2);
+	m_ctc1->zc_callback<0>().set(m_sio, FUNC(z80sio_device::txca_w));
+	m_ctc1->zc_callback<0>().append(m_sio, FUNC(z80sio_device::rxca_w));
+	m_ctc1->zc_callback<1>().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
 	m_ctc1->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	z80sio_device& dart(Z80SIO(config, "sio1", XTAL(8'000'000) / 2));
-	dart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	dart.out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
-	dart.out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
-	dart.out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
-	dart.out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
-	dart.out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
-	dart.out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
+	Z80SIO(config, m_sio, MAIN_XTAL / 2);
+	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_sio->out_txda_callback().set(m_rs232a, FUNC(rs232_port_device::write_txd));
+	m_sio->out_rtsa_callback().set(m_rs232a, FUNC(rs232_port_device::write_rts));
+	m_sio->out_dtra_callback().set(m_rs232a, FUNC(rs232_port_device::write_dtr));
+	m_sio->out_txdb_callback().set(m_rs232b, FUNC(rs232_port_device::write_txd));
+	m_sio->out_rtsb_callback().set(m_rs232b, FUNC(rs232_port_device::write_rts));
+	m_sio->out_dtrb_callback().set(m_rs232b, FUNC(rs232_port_device::write_dtr));
 
-	// SIO-A (J1): data/reader port.
+	// SIO-A (J1): data/reader port - mapped to RDR:/PUN: in CP/M.
 	RS232_PORT(config, m_rs232a, default_rs232_devices, "null_modem");
-	m_rs232a->rxd_handler().set("sio1", FUNC(z80sio_device::rxa_w));
-	m_rs232a->cts_handler().set("sio1", FUNC(z80sio_device::ctsa_w));
-	m_rs232a->dcd_handler().set("sio1", FUNC(z80sio_device::dcda_w));
+	m_rs232a->rxd_handler().set(m_sio, FUNC(z80sio_device::rxa_w));
+	m_rs232a->cts_handler().set(m_sio, FUNC(z80sio_device::ctsa_w));
+	m_rs232a->dcd_handler().set(m_sio, FUNC(z80sio_device::dcda_w));
 
 	// SIO-B (J2): traditionally a printer port.  Here it is wired to a
 	// null_modem so the guest can talk to an MP/M server running on the
@@ -597,13 +641,13 @@ void rc702_state::rc700_base(machine_config &config)
 	// generator at cold boot, so match the null_modem slot to the firmware
 	// rate (typically 38400 8-N-1) in MAME's slot options.
 	RS232_PORT(config, m_rs232b, default_rs232_devices, "null_modem");
-	m_rs232b->rxd_handler().set("sio1", FUNC(z80sio_device::rxb_w));
-	m_rs232b->cts_handler().set("sio1", FUNC(z80sio_device::ctsb_w));
-	m_rs232b->dcd_handler().set("sio1", FUNC(z80sio_device::dcdb_w));
+	m_rs232b->rxd_handler().set(m_sio, FUNC(z80sio_device::rxb_w));
+	m_rs232b->cts_handler().set(m_sio, FUNC(z80sio_device::ctsb_w));
+	m_rs232b->dcd_handler().set(m_sio, FUNC(z80sio_device::dcdb_w));
 
-	Z80PIO(config, m_pio, 8_MHz_XTAL / 2);
+	Z80PIO(config, m_pio, MAIN_XTAL / 2);
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	// PIO-A: keyboard, wired direct (see Einstein-topology note at top).
+	// PIO-A: keyboard, wired directly for now (see Einstein-topology note at top).
 	m_pio->in_pa_callback().set(FUNC(rc702_state::kbd_r));
 	// PIO-B: configurable slot device, default empty (J3 expansion connector).
 	m_pio->in_pb_callback().set(m_pio_b, FUNC(rc702_pio_port_device::read));
@@ -617,10 +661,10 @@ void rc702_state::rc700_base(machine_config &config)
 	m_pio_b->out_strobe_handler().set(m_pio, FUNC(z80pio_device::strobe_b));
 
 	// generic_keyboard -> kbd_put latches m_kbd_data and pulses strobe_a.
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
-	keyboard.set_keyboard_callback(FUNC(rc702_state::kbd_put));
+	GENERIC_KEYBOARD(config, m_keyboard);
+	m_keyboard->set_keyboard_callback(FUNC(rc702_state::kbd_put));
 
-	AM9517A(config, m_dma, 8_MHz_XTAL / 2);
+	AM9517A(config, m_dma, MAIN_XTAL / 2);
 	m_dma->out_hreq_callback().set(FUNC(rc702_state::hreq_w));
 	m_dma->out_eop_callback().set(FUNC(rc702_state::eop_w)).invert();   // real line is active low, mame has it backwards
 	m_dma->in_memr_callback().set(FUNC(rc702_state::memory_read_byte));
@@ -629,8 +673,8 @@ void rc702_state::rc700_base(machine_config &config)
 	// function"), allowing a split screen; the 74LS74 hands DRQ from ch2 to
 	// ch3 at ch2's TC (see eop_w).  No known RC702 software uses this -- all
 	// firmware drives one full-screen segment via ch2.
-	m_dma->out_iow_callback<2>().set("crtc", FUNC(i8275_device::dack_w));
-	m_dma->out_iow_callback<3>().set("crtc", FUNC(i8275_device::dack_w));
+	m_dma->out_iow_callback<2>().set(m_crtc, FUNC(i8275_device::dack_w));
+	m_dma->out_iow_callback<3>().set(m_crtc, FUNC(i8275_device::dack_w));
 	// out_dack_callback<1> (FDC) is wired per-variant in add_fdc_dma() since
 	// each variant uses a different UPD765A clock and floppy geometry.
 	m_dma->out_dack_callback<2>().set(FUNC(rc702_state::dack2_w));
@@ -640,20 +684,20 @@ void rc702_state::rc700_base(machine_config &config)
 	m_7474->comp_output_cb().set(FUNC(rc702_state::qbar_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen"));
-	screen.set_refresh_hz(50);
+	SCREEN(config, m_screen);
+	m_screen->set_refresh_hz(50);
 	// 80 chars * 7 px = 560 visible columns (the minimum that shows all 80
 	// chars; 544 clipped the last ~2 chars per row).
-	screen.set_size(560, 200+4*8);
-	screen.set_visarea(0, 559, 0, 199);
-	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
+	m_screen->set_size(560, 200+4*8);
+	m_screen->set_visarea(0, 559, 0, 199);
+	m_screen->set_screen_update(m_crtc, FUNC(i8275_device::screen_update));
 
-	i8275_device &crtc(I8275(config, "crtc", 11640000/7));
-	crtc.set_character_width(7);
-	crtc.set_display_callback(FUNC(rc702_state::display_pixels));
-	crtc.irq_wr_callback().set(m_7474, FUNC(ttl7474_device::clear_w)).invert();
-	crtc.irq_wr_callback().append(m_ctc1, FUNC(z80ctc_device::trg2));
-	crtc.drq_wr_callback().set(FUNC(rc702_state::crtc_drq_w));
+	I8275(config, m_crtc, DOT_CLOCK / 7);
+	m_crtc->set_character_width(7);
+	m_crtc->set_display_callback(FUNC(rc702_state::display_pixels));
+	m_crtc->irq_wr_callback().set(m_7474, FUNC(ttl7474_device::clear_w)).invert();
+	m_crtc->irq_wr_callback().append(m_ctc1, FUNC(z80ctc_device::trg2));
+	m_crtc->drq_wr_callback().set(FUNC(rc702_state::crtc_drq_w));
 
 	PALETTE(config, m_palette, FUNC(rc702_state::rc702_palette), 2);
 
@@ -676,7 +720,7 @@ void rc702_state::add_fdc_dma(machine_config &config)
 void rc702_state::rc702(machine_config &config)
 {
 	rc700_base(config);
-	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
+	UPD765A(config, m_fdc, MAIN_XTAL, true, true);        // 8 MHz for 8" drives, SSSD not tested.
 	add_fdc_dma(config);
 	FLOPPY_CONNECTOR(config, "fdc:0", rc702_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
 	FLOPPY_CONNECTOR(config, "fdc:1", rc702_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
@@ -685,7 +729,7 @@ void rc702_state::rc702(machine_config &config)
 void rc702_state::rc702mini(machine_config &config)
 {
 	rc700_base(config);
-	UPD765A(config, m_fdc, 8_MHz_XTAL / 2, true, true);  // 4 MHz for 5.25" drives
+	UPD765A(config, m_fdc, MAIN_XTAL / 2, true, true);    // 4 MHz for 5.25" drives
 	add_fdc_dma(config);
 	FLOPPY_CONNECTOR(config, "fdc:0", rc702mini_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
 	FLOPPY_CONNECTOR(config, "fdc:1", rc702mini_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
@@ -693,9 +737,9 @@ void rc702_state::rc702mini(machine_config &config)
 
 void rc702_state::rc703(machine_config &config)
 {
-	rc702mini(config);  // same 4 MHz FDC clock and DMA wiring
-	config.device_remove("fdc:0");
-	config.device_remove("fdc:1");
+	rc700_base(config);
+	UPD765A(config, m_fdc, MAIN_XTAL / 2, true, true);    // 4 MHz for 5.25" QD drives
+	add_fdc_dma(config);
 	FLOPPY_CONNECTOR(config, "fdc:0", rc703_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
 	FLOPPY_CONNECTOR(config, "fdc:1", rc703_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
 	// TODO: Hard disk ports 0x60-0x67, CTC2 ports (on hard disk board) 0x44-0x47
@@ -727,7 +771,8 @@ ROM_START( rc702 )
 	ROM_LOAD( "roa375.ic66", 0x0000, 0x0800, CRC(034cf9ea) SHA1(306af9fc779e3d4f51645ba04f8a99b11b5e6084) )
 
 	// IC65 line-program ROM (ROB388 on MIC705), undumped.  Optional: drop a
-	// prom1.ic65 into the rom path to supply one; otherwise stays 0xff.
+	// prom1.ic65 into the rom path to supply one (e.g. the CP/NOS line
+	// program); otherwise the region stays 0xff.
 	ROM_REGION( 0x1000, "prom1", ROMREGION_ERASEFF )
 	ROM_LOAD_OPTIONAL( "prom1.ic65", 0x0000, 0x1000, NO_DUMP )
 
@@ -763,8 +808,7 @@ ROM_END
 #define rom_rc702sem702  rom_rc702
 
 //    YEAR  NAME         PARENT  COMPAT  MACHINE      INPUT        CLASS        INIT        COMPANY           FULLNAME                          FLAGS
-COMP( 1979, rc702,       0,      0,      rc702,       rc702_maxi,  rc702_state, empty_init, "Regnecentralen", "RC702 Piccolo (8\")",             MACHINE_SUPPORTS_SAVE )
-COMP( 1979, rc702mini,   rc702,  0,      rc702mini,   rc702_mini,  rc702_state, empty_init, "Regnecentralen", "RC702 Piccolo (5.25\")",          MACHINE_SUPPORTS_SAVE )
-COMP( 1982, rc703,       rc702,  0,      rc703,       rc702_mini,  rc702_state, empty_init, "Regnecentralen", "RC703 Piccolo (5.25\")",          MACHINE_SUPPORTS_SAVE )
-
+COMP( 1979, rc702,       0,      0,      rc702,       rc702_maxi,  rc702_state, empty_init, "Regnecentralen", "RC702 Piccolo (8\")",            MACHINE_SUPPORTS_SAVE )
+COMP( 1979, rc702mini,   rc702,  0,      rc702mini,   rc702_mini,  rc702_state, empty_init, "Regnecentralen", "RC702 Piccolo (5.25\")",         MACHINE_SUPPORTS_SAVE )
 COMP( 1979, rc702sem702, rc702,  0,      rc702sem702, rc702_maxi,  rc702_state, empty_init, "Regnecentralen", "RC702 Piccolo (8\", SEM702)",    MACHINE_SUPPORTS_SAVE )
+COMP( 1982, rc703,       rc702,  0,      rc703,       rc702_mini,  rc702_state, empty_init, "Regnecentralen", "RC703 Piccolo (5.25\")",         MACHINE_SUPPORTS_SAVE )

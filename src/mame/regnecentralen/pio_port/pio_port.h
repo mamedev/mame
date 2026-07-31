@@ -14,8 +14,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_RC702_PIO_PORT_PIO_PORT_H
-#define MAME_BUS_RC702_PIO_PORT_PIO_PORT_H
+#ifndef MAME_MAME_REGNECENTRALEN_PIO_PORT_PIO_PORT_H
+#define MAME_MAME_REGNECENTRALEN_PIO_PORT_PIO_PORT_H
 
 #pragma once
 
@@ -90,4 +90,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(RC702_PIO_PORT, rc702_pio_port_device)
 
-#endif // MAME_BUS_RC702_PIO_PORT_PIO_PORT_H
+#endif // MAME_MAME_REGNECENTRALEN_PIO_PORT_PIO_PORT_H

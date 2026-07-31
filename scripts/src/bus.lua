@@ -4906,21 +4906,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/rc702/pio_port/pio_port.h,BUSES["RC702_PIO_PORT"] = true
----------------------------------------------------
-
-if BUSES["RC702_PIO_PORT"] then
-	files {
-		MAME_DIR .. "src/devices/bus/rc702/pio_port/pio_port.cpp",
-		MAME_DIR .. "src/devices/bus/rc702/pio_port/pio_port.h",
-		MAME_DIR .. "src/devices/bus/rc702/pio_port/keyboard.cpp",
-		MAME_DIR .. "src/devices/bus/rc702/pio_port/keyboard.h",
-	}
-end
-
-
----------------------------------------------------
---
 --@src/devices/bus/rs232/rs232.h,BUSES["RS232"] = true
 ---------------------------------------------------
 
