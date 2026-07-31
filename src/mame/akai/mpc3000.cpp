@@ -580,6 +580,7 @@ void mpc3000_state::mpc3000(machine_config &config)
 	TIMER(config, "dialtimer").configure_periodic(FUNC(mpc3000_state::dial_timer_tick), attotime::from_hz(60.0));
 
 	SOFTWARE_LIST(config, "flop_mpc3000").set_original("mpc3000_flop");
+	SOFTWARE_LIST(config, "flop_s1000").set_original("s1000_flop");
 
 	config.set_default_layout(layout_mpc3000);
 }

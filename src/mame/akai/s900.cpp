@@ -43,10 +43,12 @@
 
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/s900_dsk.h"
 #include "formats/hxchfe_dsk.h"
+#include "formats/mfi_dsk.h"
 
 namespace {
 
@@ -494,6 +496,8 @@ void s900_state::base_config(machine_config &config)
 	m_filter_timer[2]->set_clk<0>(clk/4);
 	m_filter_timer[2]->set_clk<1>(clk/4);
 	m_filter_timer[2]->set_clk<2>(clk/32);
+
+	SOFTWARE_LIST(config, "flop_s900").set_original("s900_flop");
 }
 
 /**************************************************************************/
