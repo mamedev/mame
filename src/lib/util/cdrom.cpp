@@ -1070,30 +1070,31 @@ std::error_condition cdrom_file::write_metadata(chd_file *chd, const toc &toc)
 	/* write the metadata */
 	for (int i = 0; i < toc.numtrks; i++)
 	{
+		char submode[32];
+
+		if (toc.tracks[i].pgdatasize > 0)
+		{
+			strcpy(&submode[1], get_type_string(toc.tracks[i].pgtype));
+			submode[0] = 'V';   // indicate valid submode
+		}
+		else
+		{
+			strcpy(submode, get_type_string(toc.tracks[i].pgtype));
+		}
+
 		std::string metadata;
+
 		if (toc.flags & CD_FLAG_GDROM)
 		{
 			metadata = util::string_format(GDROM_TRACK_METADATA_FORMAT, i + 1, get_type_string(toc.tracks[i].trktype),
 					get_subtype_string(toc.tracks[i].subtype), toc.tracks[i].frames, toc.tracks[i].padframes,
-					toc.tracks[i].pregap, get_type_string(toc.tracks[i].pgtype),
+					toc.tracks[i].pregap, submode,
 					get_subtype_string(toc.tracks[i].pgsub), toc.tracks[i].postgap);
 
 			err = chd->write_metadata(GDROM_TRACK_METADATA_TAG, i, metadata);
 		}
 		else
 		{
-			char submode[32];
-
-			if (toc.tracks[i].pgdatasize > 0)
-			{
-				strcpy(&submode[1], get_type_string(toc.tracks[i].pgtype));
-				submode[0] = 'V';   // indicate valid submode
-			}
-			else
-			{
-				strcpy(submode, get_type_string(toc.tracks[i].pgtype));
-			}
-
 			metadata = util::string_format(CDROM_TRACK_METADATA2_FORMAT, i + 1, get_type_string(toc.tracks[i].trktype),
 					get_subtype_string(toc.tracks[i].subtype), toc.tracks[i].frames, toc.tracks[i].pregap,
 					submode, get_subtype_string(toc.tracks[i].pgsub),
@@ -2777,46 +2778,6 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 		}
 	}
 
-	if (is_gdrom)
-	{
-		/*
-		* Strip pregaps from Redump tracks and adjust the LBA offset to match TOSEC layout
-		*/
-		for (trknum = 1; trknum < outtoc.numtrks; trknum++)
-		{
-			uint32_t this_pregap = outtoc.tracks[trknum].pregap;
-			uint32_t this_offset = this_pregap * (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
-
-			outtoc.tracks[trknum-1].frames += this_pregap;
-			outtoc.tracks[trknum-1].splitframes += this_pregap;
-
-			outinfo.track[trknum].offset += this_offset;
-			outtoc.tracks[trknum].frames -= this_pregap;
-			outinfo.track[trknum].idx[1] -= this_pregap;
-
-			outtoc.tracks[trknum].pregap = 0;
-			outtoc.tracks[trknum].pgtype = 0;
-		}
-
-		/*
-		* TOC now matches TOSEC layout, set LBA for every track with HIGH-DENSITY area @ LBA 45000
-		*/
-		for (trknum = 1; trknum < outtoc.numtrks; trknum++)
-		{
-			if (outtoc.tracks[trknum].multicuearea == HIGH_DENSITY && outtoc.tracks[trknum-1].multicuearea == SINGLE_DENSITY)
-			{
-				outtoc.tracks[trknum].physframeofs = 45000;
-				int dif=outtoc.tracks[trknum].physframeofs-(outtoc.tracks[trknum-1].frames+outtoc.tracks[trknum-1].physframeofs);
-				outtoc.tracks[trknum-1].frames += dif;
-				outtoc.tracks[trknum-1].padframes = dif;
-			}
-			else
-			{
-				outtoc.tracks[trknum].physframeofs = outtoc.tracks[trknum-1].physframeofs + outtoc.tracks[trknum-1].frames;
-			}
-		}
-	}
-
 	if (EXTRA_VERBOSE)
 	{
 		for (trknum = 0; trknum < outtoc.numtrks; trknum++)
@@ -2836,6 +2797,107 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 					outinfo.track[trknum].idx[0],
 					outinfo.track[trknum].idx[1],
 					outtoc.tracks[trknum].frames - outtoc.tracks[trknum].padframes);
+		}
+	}
+
+	return std::error_condition();
+}
+
+/*-------------------------------------------------
+    remove_pregap - strip pregaps and adjust the LBA offset
+-------------------------------------------------*/
+
+/**
+ * @fn  static std::error_condition remove_pregap(toc &outtoc, track_input_info &outinfo)
+ *
+ * @brief   Chdgd strip pregaps and adjust the LBA offset.
+ *
+ * @param [in,out]  outtoc  The outtoc.
+ * @param [in,out]  outinfo The outinfo.
+ *
+ * @return  A std::error_condition.
+ */
+
+std::error_condition cdrom_file::remove_pregap(toc &outtoc, track_input_info &outinfo)
+{
+	int trknum;
+
+	for (trknum = 0; trknum < outtoc.numtrks; trknum++)
+	{
+		if (outtoc.tracks[trknum].pregap > 0 && outtoc.tracks[trknum].pgdatasize > 0) // pregap in data
+		{
+			uint32_t this_pregap = outtoc.tracks[trknum].pregap;
+			uint32_t this_offset = this_pregap * (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
+
+			outtoc.tracks[trknum - 1].frames += this_pregap;
+			outtoc.tracks[trknum - 1].splitframes += this_pregap;
+
+			outinfo.track[trknum].offset += this_offset;
+			outtoc.tracks[trknum].frames -= this_pregap;
+			outinfo.track[trknum].idx[1] -= this_pregap;
+
+			outtoc.tracks[trknum - 1].pregap = 0;
+			outtoc.tracks[trknum - 1].pgtype = 0;
+		}
+	}
+
+	if (EXTRA_VERBOSE)
+	{
+		for (trknum = 0; trknum < outtoc.numtrks; trknum++)
+		{
+			osd_printf_verbose("strip_pregap:\n");
+			osd_printf_verbose("session %d trk %d: %d frames @ offset %d, pad=%d, split=%d, area=%d, phys=%d, pregap=%d, pgtype=%d, pgdatasize=%d, idx0=%d, idx1=%d, dataframes=%d\n",
+				outtoc.tracks[trknum].session + 1,
+				trknum + 1,
+				outtoc.tracks[trknum].frames,
+				outinfo.track[trknum].offset,
+				outtoc.tracks[trknum].padframes,
+				outtoc.tracks[trknum].splitframes,
+				outtoc.tracks[trknum].multicuearea,
+				outtoc.tracks[trknum].physframeofs,
+				outtoc.tracks[trknum].pregap,
+				outtoc.tracks[trknum].pgtype,
+				outtoc.tracks[trknum].pgdatasize,
+				outinfo.track[trknum].idx[0],
+				outinfo.track[trknum].idx[1],
+				outtoc.tracks[trknum].frames - outtoc.tracks[trknum].padframes);
+		}
+	}
+
+	return std::error_condition();
+}
+
+/*-------------------------------------------------
+    adjust_high_density_area - Set LBA for every track with HIGH-DENSITY area @ LBA 45000
+-------------------------------------------------*/
+
+/**
+ * @fn  static std::error_condition remove_pregap(toc &outtoc, track_input_info &outinfo)
+ *
+ * @brief   Chdgd Set LBA for every track with HIGH-DENSITY area @ LBA 45000
+ *
+ * @param [in,out]  outtoc  The outtoc.
+ * @param [in,out]  outinfo The outinfo.
+ *
+ * @return  A std::error_condition.
+ */
+
+std::error_condition cdrom_file::adjust_high_density_area(toc &outtoc, track_input_info &outinfo)
+{
+	int trknum;
+
+	for (trknum = 1; trknum < outtoc.numtrks; trknum++)
+	{
+		if (outtoc.tracks[trknum].multicuearea == HIGH_DENSITY && outtoc.tracks[trknum - 1].multicuearea == SINGLE_DENSITY)
+		{
+			outtoc.tracks[trknum].physframeofs = 45000;
+			int dif = outtoc.tracks[trknum].physframeofs - (outtoc.tracks[trknum - 1].frames + outtoc.tracks[trknum - 1].physframeofs);
+			outtoc.tracks[trknum - 1].frames += dif;
+			outtoc.tracks[trknum - 1].padframes = dif;
+		}
+		else
+		{
+			outtoc.tracks[trknum].physframeofs = outtoc.tracks[trknum - 1].physframeofs + outtoc.tracks[trknum - 1].frames;
 		}
 	}
 
