@@ -75,7 +75,7 @@ void merlin_device::device_add_mconfig(machine_config &config)
 	ET4KW32I_VGA(config, m_vga); // should be ET4000W32
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x200000);
-	m_vga->vsync_cb().set([this](int state) { m_zorro->int6_w(state); });
+	m_vga->vsync_cb().set([this](int state) { int6_w(state); });
 
 	BT482(config, m_ramdac);
 }
@@ -116,7 +116,7 @@ void merlin_device::autoconfig_base_address(offs_t address)
 	{
 		LOG("-> installing merlin memory\n");
 
-		m_zorro->space().install_readwrite_handler(address, address + 0x1fffff,
+		zorro_space().install_readwrite_handler(address, address + 0x1fffff,
 			emu::rw_delegate(m_vga, FUNC(et4kw32i_vga_device::mem_r)),
 			emu::rw_delegate(m_vga, FUNC(et4kw32i_vga_device::mem_w)), 0xffff);
 
@@ -130,13 +130,13 @@ void merlin_device::autoconfig_base_address(offs_t address)
 		LOG("-> installing merlin registers\n");
 
 		// install merlin registers
-		m_zorro->space().install_device(address, address + 0x0ffff, *this, &merlin_device::mmio_map);
+		zorro_space().install_device(address, address + 0x0ffff, *this, &merlin_device::mmio_map);
 
 		// stop responding to default autoconfig
-		m_zorro->space().unmap_readwrite(0xe80000, 0xe8007f);
+		zorro_space().unmap_readwrite(0xe80000, 0xe8007f);
 
 		// we're done
-		m_zorro->cfgout_w(0);
+		cfgout_w(0);
 	}
 }
 
@@ -165,7 +165,7 @@ void merlin_device::cfgin_w(int state)
 		autoconfig_rom_vector(0x0000);
 
 		// install autoconfig handler
-		m_zorro->space().install_readwrite_handler(0xe80000, 0xe8007f,
+		zorro_space().install_readwrite_handler(0xe80000, 0xe8007f,
 			read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
 			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 	}

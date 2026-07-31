@@ -138,7 +138,7 @@ void picasso2p_device::autoconfig_base_address(offs_t address)
 	{
 		LOG("-> installing picasso2p memory\n");
 
-		m_zorro->space().install_readwrite_handler(address, address + 0x1fffff,
+		zorro_space().install_readwrite_handler(address, address + 0x1fffff,
 			emu::rw_delegate(m_vga, FUNC(cirrus_gd5428_vga_device::mem_r)),
 			emu::rw_delegate(m_vga, FUNC(cirrus_gd5428_vga_device::mem_w)), 0xffff);
 
@@ -152,13 +152,13 @@ void picasso2p_device::autoconfig_base_address(offs_t address)
 		LOG("-> installing picasso2p registers\n");
 
 		// install picasso registers
-		m_zorro->space().install_device(address, address + 0x0ffff, *this, &picasso2p_device::mmio_map);
+		zorro_space().install_device(address, address + 0x0ffff, *this, &picasso2p_device::mmio_map);
 
 		// stop responding to default autoconfig
-		m_zorro->space().unmap_readwrite(0xe80000, 0xe8007f);
+		zorro_space().unmap_readwrite(0xe80000, 0xe8007f);
 
 		// we're done
-		m_zorro->cfgout_w(0);
+		cfgout_w(0);
 	}
 }
 
@@ -187,7 +187,7 @@ void picasso2p_device::cfgin_w(int state)
 		autoconfig_rom_vector(0x0000);
 
 		// install autoconfig handler
-		m_zorro->space().install_readwrite_handler(0xe80000, 0xe8007f,
+		zorro_space().install_readwrite_handler(0xe80000, 0xe8007f,
 			read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
 			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 	}

@@ -202,7 +202,7 @@ ioport_constructor adscsi2080_device::device_input_ports() const
 void adscsi2000_device::unmap(offs_t base, unsigned size)
 {
 	LOG("Unmapping from %06x to %06x\n", base, base + size - 1);
-	m_zorro->space().unmap_readwrite(base, base + size - 1);
+	zorro_space().unmap_readwrite(base, base + size - 1);
 }
 
 void adscsi2000_device::busrst_w(int state)
@@ -227,7 +227,7 @@ void adscsi2000_device::busrst_w(int state)
 	m_ncr->reset();
 	m_ncr_drq = 0;
 
-	m_zorro->xrdy_w(1);
+	xrdy_w(1);
 }
 
 void adscsi2080_device::busrst_w(int state)
@@ -269,7 +269,7 @@ void adscsi2000_device::cfgin_w(int state)
 	if (state == 0)
 	{
 		// install autoconfig handler
-		m_zorro->space().install_readwrite_handler(0xe80000, 0xe8007f,
+		zorro_space().install_readwrite_handler(0xe80000, 0xe8007f,
 			read8sm_delegate(*this, FUNC(adscsi2000_device::rom_r)),
 			write8sm_delegate(*this, FUNC(adscsi2000_device::autoconfig_w)), 0xff00);
 	}
@@ -325,7 +325,7 @@ void adscsi2080_device::cfgin_w(int state)
 	autoconfig_can_shutup(false); // ?
 
 	// install autoconfig handler
-	m_zorro->space().install_readwrite_handler(0xe80000, 0xe8007f,
+	zorro_space().install_readwrite_handler(0xe80000, 0xe8007f,
 		read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
 		write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 }
@@ -335,7 +335,7 @@ void adscsi2080_device::autoconfig_base_address(offs_t address)
 	LOG("Autoconfig address received: 0x%06x\n", address);
 
 	// stop responding to default autoconfig
-	m_zorro->space().unmap_readwrite(0xe80000, 0xe8007f);
+	zorro_space().unmap_readwrite(0xe80000, 0xe8007f);
 
 	if (address == 0)
 	{
@@ -350,7 +350,7 @@ void adscsi2080_device::autoconfig_base_address(offs_t address)
 	if (m_ram_size == 6 && !m_configure_6mb)
 	{
 		// the 6 MB option is special, we need to configure twice (4 MB + 2 MB)
-		m_zorro->space().install_ram(address, address + 0x400000 - 1, m_ram.get());
+		zorro_space().install_ram(address, address + 0x400000 - 1, m_ram.get());
 		m_ram_address[0] = address >> 16;
 
 		// restart memory config
@@ -361,12 +361,12 @@ void adscsi2080_device::autoconfig_base_address(offs_t address)
 	{
 		if (m_configure_6mb)
 		{
-			m_zorro->space().install_ram(address, address + 0x200000 - 1, m_ram.get() + (0x400000 / sizeof(uint16_t)));
+			zorro_space().install_ram(address, address + 0x200000 - 1, m_ram.get() + (0x400000 / sizeof(uint16_t)));
 			m_ram_address[1] = address >> 16;
 		}
 		else
 		{
-			m_zorro->space().install_ram(address, address + (m_ram_size << 20) - 1, m_ram.get());
+			zorro_space().install_ram(address, address + (m_ram_size << 20) - 1, m_ram.get());
 			m_ram_address[0] = address >> 16;
 		}
 
@@ -396,27 +396,27 @@ void adscsi2000_device::autoconfig_w(offs_t offset, uint8_t data)
 
 				// map rom (if not disabled)
 				if ((m_jumpers->read() & 0x20) == 0)
-					m_zorro->space().install_read_handler(addr + 0x0000, addr + 0xffff,
+					zorro_space().install_read_handler(addr + 0x0000, addr + 0xffff,
 						read8sm_delegate(*this, FUNC(adscsi2000_device::rom_r)), 0xff00);
 
-				m_zorro->space().install_readwrite_handler(addr + 0x00, addr + 0x3f,
+				zorro_space().install_readwrite_handler(addr + 0x00, addr + 0x3f,
 					read8sm_delegate(*this, FUNC(adscsi2000_device::ncr_reg_r)),
 					write8sm_delegate(*this, FUNC(adscsi2000_device::ncr_reg_w)), 0xff00);
 
-				m_zorro->space().install_write_handler(addr + 0x20, addr + 0x21,
+				zorro_space().install_write_handler(addr + 0x20, addr + 0x21,
 					write16s_delegate(*this, FUNC(adscsi2000_device::ncr_dma_w)), 0xffff);
 
-				m_zorro->space().install_read_handler(addr + 0x38, addr + 0x39,
+				zorro_space().install_read_handler(addr + 0x38, addr + 0x39,
 					read16s_delegate(*this, FUNC(adscsi2000_device::ncr_dma_r)), 0xffff);
 
-				m_zorro->space().install_read_handler(addr + 0x40, addr + 0x41,
+				zorro_space().install_read_handler(addr + 0x40, addr + 0x41,
 					read8smo_delegate(*this, FUNC(adscsi2000_device::scsi_status_r)), 0xff00);
 
 				m_board_configured = true;
 
 				// stop responding to default autoconfig and lower cfgout
-				m_zorro->space().unmap_readwrite(0xe80000, 0xe8007f);
-				m_zorro->cfgout_w(0);
+				zorro_space().unmap_readwrite(0xe80000, 0xe8007f);
+				cfgout_w(0);
 			}
 			break;
 
@@ -512,7 +512,7 @@ uint16_t adscsi2000_device::ncr_dma_r(offs_t offset, uint16_t mem_mask)
 	else
 	{
 		// we need to wait for more data, suspend cpu until we get it
-		m_zorro->xrdy_w(0);
+		xrdy_w(0);
 		return 0xffff;
 	}
 }
@@ -552,7 +552,7 @@ void adscsi2000_device::ncr_dma_w(offs_t offset, uint16_t data, uint16_t mem_mas
 
 	// if needed suspend cpu until we can write the remaining data
 	if (m_holding_remaining > 0)
-		m_zorro->xrdy_w(0);
+		xrdy_w(0);
 }
 
 uint8_t adscsi2000_device::scsi_status_r()
@@ -581,7 +581,7 @@ void adscsi2000_device::ncr_irq_w(int state)
 	{
 		m_dma_in_progress = false;
 		m_holding_remaining = 0;
-		m_zorro->xrdy_w(1); // safe-guard, unusual dma could leave the cpu suspended
+		xrdy_w(1); // safe-guard, unusual dma could leave the cpu suspended
 	}
 }
 
@@ -617,7 +617,7 @@ void adscsi2000_device::ncr_drq_w(int state)
 		{
 			// word fully handled, resume cpu
 			m_drq_completed = true;
-			m_zorro->xrdy_w(1);
+			xrdy_w(1);
 		}
 	}
 }

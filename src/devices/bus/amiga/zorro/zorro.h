@@ -62,10 +62,6 @@
 
 #pragma once
 
-#include <functional>
-#include <utility>
-#include <vector>
-
 
 // forward declaration of card interfaces
 class device_zorro2_card_interface;
@@ -80,30 +76,30 @@ class zorro2_bus_device : public device_t, public device_memory_interface
 public:
 	zorro2_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto eint1_handler() { return m_eint1_handler.bind(); }
-	auto eint4_handler() { return m_eint4_handler.bind(); }
-	auto eint5_handler() { return m_eint5_handler.bind(); }
-	auto eint7_handler() { return m_eint7_handler.bind(); }
-	auto int2_handler() { return m_int2_handler.bind(); }
-	auto int6_handler() { return m_int6_handler.bind(); }
-	auto ovr_handler() { return m_ovr_handler.bind(); }
-	auto xrdy_handler() { return m_xrdy_handler.bind(); }
+	auto eint1_handler() { return m_eint1.handler.bind(); }
+	auto eint4_handler() { return m_eint4.handler.bind(); }
+	auto eint5_handler() { return m_eint5.handler.bind(); }
+	auto eint7_handler() { return m_eint7.handler.bind(); }
+	auto int2_handler() { return m_int2.handler.bind(); }
+	auto int6_handler() { return m_int6.handler.bind(); }
+	auto ovr_handler() { return m_ovr.handler.bind(); }
+	auto xrdy_handler() { return m_xrdy.handler.bind(); }
 
 	// device_memory_interface
 	virtual space_config_vector memory_space_config() const override;
 
-	virtual void add_card(device_zorro2_card_interface &card) ATTR_COLD;
+	void add_card(int slot, device_zorro2_card_interface *card) ATTR_COLD;
 
 	// interface (from slot device)
-	void cfgout_w(int state);
-	void eint1_w(int state);
-	void eint4_w(int state);
-	void eint5_w(int state);
-	void eint7_w(int state);
-	void int2_w(int state);
-	void int6_w(int state);
-	void ovr_w(int state);
-	void xrdy_w(int state);
+	void cfgout_w(int slot, int state);
+	void eint1_w(int slot, int state);
+	void eint4_w(int slot, int state);
+	void eint5_w(int slot, int state);
+	void eint7_w(int slot, int state);
+	void int2_w(int slot, int state);
+	void int6_w(int slot, int state);
+	void ovr_w(int slot, int state);
+	void xrdy_w(int slot, int state);
 
 	// interface (from host)
 	uint16_t mem_r(offs_t offset, uint16_t mem_mask);
@@ -121,22 +117,58 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 private:
-	using card_vector = std::vector<std::reference_wrapper<device_zorro2_card_interface>>;
-	card_vector m_cards;
+	std::array<device_zorro2_card_interface *, 8> m_cards;
 
 	address_space_config m_zorro_space_config;
 
-	devcb_write_line m_eint1_handler;
-	devcb_write_line m_eint4_handler;
-	devcb_write_line m_eint5_handler;
-	devcb_write_line m_eint7_handler;
-	devcb_write_line m_int2_handler;
-	devcb_write_line m_int6_handler;
-	devcb_write_line m_ovr_handler;
-	devcb_write_line m_xrdy_handler;
+	struct bus_line
+	{
+		bus_line(device_t &device, bool active) :
+			handler(device),
+			card_state(active ? 0x00 : 0xff),
+			bus_state(active ? false : true),
+			active_high(active)
+		{
+		}
+
+		void reset()
+		{
+			if (active_high)
+			{
+				if (card_state != 0x00)
+					handler(0); // line was active, clear it
+				card_state = 0x00;
+				bus_state = false;
+			}
+			else
+			{
+				if (card_state != 0xff)
+					handler(1); // line was active, clear it
+				card_state = 0xff;
+				bus_state = true;
+			}
+		}
+
+		devcb_write_line handler;
+		uint8_t card_state;
+		bool bus_state;
+		bool active_high;
+	};
+
+	bus_line m_eint1;
+	bus_line m_eint4;
+	bus_line m_eint5;
+	bus_line m_eint7;
+	bus_line m_int2;
+	bus_line m_int6;
+	bus_line m_ovr;
+	bus_line m_xrdy;
 
 	// the device which is currently configuring
 	uint8_t m_autoconfig_device;
+
+	// helper to update line states
+	void update_bus_line(int slot, int state, bus_line &line);
 };
 
 // device type declaration
@@ -180,10 +212,18 @@ public:
 	device_zorro2_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_zorro2_card_interface();
 
-	void set_bus(zorro2_bus_device &device) ATTR_COLD;
+	void set_bus(zorro2_bus_device *device, const char *slot_tag) ATTR_COLD;
 
 	// interface (from device)
-	void cfgout_w(int state) { m_zorro->cfgout_w(state); }
+	void cfgout_w(int state) { m_zorro->cfgout_w(m_slot, state); }
+	void eint1_w(int state) { m_zorro->eint1_w(m_slot, state); }
+	void eint4_w(int state) { m_zorro->eint4_w(m_slot, state); }
+	void eint5_w(int state) { m_zorro->eint5_w(m_slot, state); }
+	void eint7_w(int state) { m_zorro->eint7_w(m_slot, state); }
+	void int2_w(int state) { m_zorro->int2_w(m_slot, state); }
+	void int6_w(int state) { m_zorro->int6_w(m_slot, state); }
+	void ovr_w(int state) { m_zorro->ovr_w(m_slot, state); }
+	void xrdy_w(int state) { m_zorro->xrdy_w(m_slot, state); }
 
 	// interface (from host)
 	virtual void fc_w(int code);
@@ -191,7 +231,15 @@ public:
 	virtual void busrst_w(int state);
 
 protected:
+	virtual void interface_pre_start() override;
+
+	address_space &zorro_space() { return m_zorro->space(); }
+
+private:
 	zorro2_bus_device *m_zorro;
+
+	const char *m_slot_tag;
+	int m_slot;
 };
 
 

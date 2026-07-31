@@ -180,17 +180,17 @@ void rainbow2_device::autoconfig_base_address(offs_t address)
 	LOG("-> installing rainbow2\n");
 
 	// stop responding to default autoconfig
-	m_zorro->space().unmap_readwrite(0xe80000, 0xe8007f);
+	zorro_space().unmap_readwrite(0xe80000, 0xe8007f);
 
 	// video memory
-	m_zorro->space().install_ram(address, address + 0x1fffff, m_vram.get());
+	zorro_space().install_ram(address, address + 0x1fffff, m_vram.get());
 
 	// control register
-	m_zorro->space().install_write_handler(address + 0x1ffff8, address + 0x1ffff8,
+	zorro_space().install_write_handler(address + 0x1ffff8, address + 0x1ffff8,
 		emu::rw_delegate(*this, FUNC(rainbow2_device::control_w)));
 
 	// we're done
-	m_zorro->cfgout_w(0);
+	cfgout_w(0);
 }
 
 void rainbow2_device::cfgin_w(int state)
@@ -213,7 +213,7 @@ void rainbow2_device::cfgin_w(int state)
 		autoconfig_rom_vector(0x0000);
 
 		// install autoconfig handler
-		m_zorro->space().install_readwrite_handler(0xe80000, 0xe8007f,
+		zorro_space().install_readwrite_handler(0xe80000, 0xe8007f,
 			read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
 			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 	}
