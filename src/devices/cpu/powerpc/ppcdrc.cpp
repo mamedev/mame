@@ -34,18 +34,21 @@
     CONSTANTS
 ***************************************************************************/
 
-/* map variables */
+// map variables
 #define MAPVAR_PC                       M0
 #define MAPVAR_CYCLES                   M1
 #define MAPVAR_DSISR                    M2
 
-/* mode bits */
+// mode bits
 #define MODE_LITTLE_ENDIAN              0x01
-#define MODE_DATA_TRANSLATION           0x02        /* OEA */
-#define MODE_PROTECTION                 0x02        /* 4XX */
+#define MODE_DATA_TRANSLATION           0x02        // OEA
+#define MODE_PROTECTION                 0x02        // 4XX
 #define MODE_USER                       0x04
 
-/* exit codes */
+// Mask for the actual part of a vTLB entry that needs to cause a recompile
+#define VTLB_MAPPING_MASK               (~vtlb_entry(FLAGS_MASK) | FLAG_VALID)
+
+// exit codes
 #define EXECUTE_OUT_OF_CYCLES           0
 #define EXECUTE_MISSING_CODE            1
 #define EXECUTE_UNMAPPED_CODE           2
@@ -317,12 +320,43 @@ void ppc_device::code_flush_cache()
 	std::fill(m_codepage_bits.begin(), m_codepage_bits.end(), 0);
 	m_core->m_codepage_any = false;
 
+	// the generated code is gone, so the reuse entries pointing to it can be flushed
+	m_reuse_cache.clear();
+	m_last_reuse = ~uint64_t(0);
+
 	// also release the per-block translation checks
 	for (ppc_entry_check *chk : m_entry_checks)
 	{
 		m_cache.dealloc(chk, sizeof(*chk));
 	}
 	m_entry_checks.clear();
+}
+
+
+/*-------------------------------------------------
+    reuse_entry_checks - re-verify the entry checks
+    a block about to be reused was generated with,
+    and put them in the same state as a fresh compile
+-------------------------------------------------*/
+
+bool ppc_device::reuse_entry_checks(uint32_t first, uint32_t count)
+{
+	if ((first + count) > m_entry_checks.size())
+		return false;
+
+	// A fresh compile stamps the current generation into the check unconditionally, so
+	// it always passes at least once.  A reused block needs to have that updated so it
+	// doesn't immediately cause a recompile.
+	for (uint32_t i = 0; i < count; i++)
+	{
+		ppc_entry_check *const chk = m_entry_checks[first + i];
+		offs_t addr = chk->pc;
+		if ((ppccom_translate_address_internal(TR_FETCH, false, addr) > 1) || (addr != chk->physpc))
+			return false;
+
+		chk->generation = m_core->m_translation_generation;
+	}
+	return true;
 }
 
 
@@ -345,11 +379,65 @@ void ppc_device::code_compile_block(uint8_t mode, offs_t pc)
 	if (m_drcuml->logging() || m_drcuml->logging_native())
 		log_opcode_desc(desclist, 0);
 
+	// Do a signature over every word of the sequence, so the reuse check below is exact.
+	uint32_t seqsig = 0;
+	for (const opcode_desc *desc = desclist; desc != nullptr; desc = desc->next())
+	{
+		seqsig = (seqsig * 31u) ^ desc->opptr;
+	}
+
+	const uint64_t reusekey = (uint64_t(mode) << 32) | pc;
+
+	// A reused block has to make forward progress.  If the previous compile handed this
+	// same block back and we are being asked for it again, it exited straight to the
+	// nocode handler, so generate it for real rather than handing back the same code
+	// forever.
+	const uint64_t lastreuse = m_last_reuse;
+	m_last_reuse = ~uint64_t(0);
+
+	// If code was already generated for this (mode, pc) pair, from these exact words,
+	// at this exact physical address, and the cache has not been flushed since, just
+	// point the hash back at it to avoid the overhead of a recompile.
+	if ((desclist != nullptr) && (reusekey != lastreuse))
+	{
+		auto const reuse = m_reuse_cache.find(reusekey);
+		if ((reuse != m_reuse_cache.end())
+				&& (reuse->second.sig == seqsig)
+				&& (reuse->second.physpc == desclist->physpc)
+				&& reuse_entry_checks(reuse->second.checkfirst, reuse->second.checkcount)
+				&& m_drcuml->hash_set_codeptr(mode, pc, reuse->second.code))
+		{
+			// mark the pages this sequence covers as having valid code again
+			const opcode_desc *seqend = desclist;
+			while ((seqend != nullptr) && !seqend->end_sequence())
+			{
+				seqend = seqend->next();
+			}
+
+			if (seqend == nullptr)
+			{
+				seqend = desclist;
+			}
+
+			for (uint32_t pg = desclist->pc >> 12; pg <= (seqend->pc >> 12); pg++)
+			{
+				note_code_page(pg);
+			}
+			m_codewrite_skip_page = ~uint32_t(0);
+			m_last_reuse = reusekey;
+			return;
+		}
+	}
+
 	bool succeeded = false;
+	size_t checkbase = 0;
 	while (!succeeded)
 	{
 		try
 		{
+			// the entry checks this attempt generates start here
+			checkbase = m_entry_checks.size();
+
 			// start the block
 			drcuml_block &block(m_drcuml->begin_block(4096));
 
@@ -449,6 +537,18 @@ void ppc_device::code_compile_block(uint8_t mode, offs_t pc)
 		{
 			// flush the cache and try again
 			code_flush_cache();
+		}
+	}
+
+	// remember what was generated so an identical recompile can reuse it
+	if (desclist != nullptr)
+	{
+		drccodeptr const code = m_drcuml->hash_get_codeptr(mode, pc);
+		if (code != nullptr)
+		{
+			m_reuse_cache[reusekey] = reuse_entry{
+					code, desclist->physpc, seqsig,
+					uint32_t(checkbase), uint32_t(m_entry_checks.size() - checkbase) };
 		}
 	}
 
@@ -604,14 +704,14 @@ static void cfunc_ppccom_execute_mtsr(ppc_device &ppc)
 	ppc.ppccom_execute_mtsr();
 }
 
-static void cfunc_ppccom_execute_icbi(ppc_device &ppc)
-{
-	ppc.ppccom_execute_icbi();
-}
-
 static void cfunc_ppccom_invalidate_codepage(ppc_device &ppc)
 {
 	ppc.ppccom_invalidate_codepage();
+}
+
+static void cfunc_ppccom_execute_icbi(ppc_device &ppc)
+{
+	ppc.ppccom_execute_icbi();
 }
 
 static void cfunc_ppc_check_translation(void *param)
@@ -1887,15 +1987,17 @@ void ppc_device::generate_sequence_instruction(drcuml_block &block, compiler_sta
 			{
 				const char *text = "Checking TLB at @ %08X\n";
 				if (sizeof(uintptr_t) == 8)
-					UML_DMOV(block, mem(&m_core->format), (uintptr_t)text);                   // mov     [format],text
+					UML_DMOV(block, mem(&m_core->format), (uintptr_t)text);                 // mov     [format],text
 				else
-					UML_MOV(block, mem(&m_core->format), (uintptr_t)text);                    // mov     [format],text
-				UML_MOV(block, mem(&m_core->arg0), desc->pc);                    // mov     [arg0],desc->pc
-				UML_CALLC(block, cfunc_printf_debug, this);                                  // callc   printf_debug
+					UML_MOV(block, mem(&m_core->format), (uintptr_t)text);                  // mov     [format],text
+				UML_MOV(block, mem(&m_core->arg0), desc->pc);                               // mov     [arg0],desc->pc
+				UML_CALLC(block, cfunc_printf_debug, this);                                 // callc   printf_debug
 			}
-			UML_LOAD(block, I0, &tlbtable[desc->pc >> 12], 0, SIZE_DWORD, SCALE_x4);// load    i0,tlbtable[desc->pc >> 12],dword
-			UML_CMP(block, I0, tlbtable[desc->pc >> 12]);                           // cmp     i0,*tlbentry
-			UML_EXHc(block, COND_NE, *m_tlb_mismatch, 0);                  // exh     tlb_mismatch,0,NE
+			// Use a mask to only compare the parts of the TLB that actually matter for possibly recompiling a block
+			UML_LOAD(block, I0, &tlbtable[desc->pc >> 12], 0, SIZE_DWORD, SCALE_x4);		// load    i0,tlbtable[desc->pc >> 12],dword
+			UML_AND(block, I0, I0, VTLB_MAPPING_MASK);                                      // and     i0,i0,VTLB_MAPPING_MASK
+			UML_CMP(block, I0, tlbtable[desc->pc >> 12] & VTLB_MAPPING_MASK);               // cmp     i0,*tlbentry & VTLB_MAPPING_MASK
+			UML_EXHc(block, COND_NE, *m_tlb_mismatch, 0);                                   // exh     tlb_mismatch,0,NE
 		}
 
 		// otherwise, we generate an unconditional exception

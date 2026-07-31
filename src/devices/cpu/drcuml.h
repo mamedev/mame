@@ -156,6 +156,13 @@ public:
 	virtual void get_info(drcbe_info &info) const noexcept = 0;
 	virtual bool logging() const noexcept { return false; }
 
+	// Optional direct access to the hash table, allowing a front-end to point an entry
+	// back at code it generated earlier rather than regenerating identical code.
+	// Back-ends that don't implement these report "unsupported" and the front-end
+	// simply compiles as it normally would.
+	virtual drccodeptr hash_get_codeptr(u32 mode, u32 pc) const noexcept { return nullptr; }
+	virtual bool hash_set_codeptr(u32 mode, u32 pc, drccodeptr code) noexcept { return false; }
+
 protected:
 	// base constructor
 	drcbe_interface(drcuml_state &drcuml, drc_cache &cache, device_t &device);
@@ -194,6 +201,8 @@ public:
 	void get_backend_info(drcbe_info &info) const { m_beintf->get_info(info); }
 	bool hash_exists(u32 mode, u32 pc) const { return m_beintf->hash_exists(mode, pc); }
 	void hash_invalidate_range(u32 pcstart, u32 pcend) { m_beintf->hash_invalidate_range(pcstart, pcend); }
+	drccodeptr hash_get_codeptr(u32 mode, u32 pc) const { return m_beintf->hash_get_codeptr(mode, pc); }
+	bool hash_set_codeptr(u32 mode, u32 pc, drccodeptr code) { return m_beintf->hash_set_codeptr(mode, pc, code); }
 	void generate(drcuml_block &block, uml::instruction *instructions, u32 count) { m_beintf->generate(block, instructions, count); }
 
 	// handle management

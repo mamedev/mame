@@ -368,6 +368,8 @@ public:
 	virtual void generate(drcuml_block &block, const uml::instruction *instlist, uint32_t numinst) override;
 	virtual bool hash_exists(uint32_t mode, uint32_t pc) const noexcept override;
 	virtual void hash_invalidate_range(uint32_t pcstart, uint32_t pcend) noexcept override;
+	virtual drccodeptr hash_get_codeptr(uint32_t mode, uint32_t pc) const noexcept override;
+	virtual bool hash_set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code) noexcept override;
 	virtual void get_info(drcbe_info &info) const noexcept override;
 
 private:
@@ -706,6 +708,23 @@ bool drcbe_c::hash_exists(uint32_t mode, uint32_t pc) const noexcept
 void drcbe_c::hash_invalidate_range(uint32_t pcstart, uint32_t pcend) noexcept
 {
 	m_hash.invalidate_range(pcstart, pcend);
+}
+
+
+//-------------------------------------------------
+//  hash_get_codeptr/hash_set_codeptr - direct hash
+//  access, letting a front-end point an entry back
+//  at code it generated earlier
+//-------------------------------------------------
+
+drccodeptr drcbe_c::hash_get_codeptr(uint32_t mode, uint32_t pc) const noexcept
+{
+	return m_hash.code_exists(mode, pc) ? m_hash.get_codeptr(mode, pc) : nullptr;
+}
+
+bool drcbe_c::hash_set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code) noexcept
+{
+	return m_hash.set_codeptr(mode, pc, code);
 }
 
 
