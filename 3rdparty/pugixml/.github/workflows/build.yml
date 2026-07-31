@@ -1,0 +1,84 @@
+name: build
+
+on:
+  push:
+    branches:
+      - 'master'
+  pull_request:
+
+jobs:
+  unix:
+    strategy:
+      matrix:
+        os: [ubuntu, macos]
+        compiler: [g++, clang++]
+        defines: [standard, PUGIXML_WCHAR_MODE, PUGIXML_COMPACT, PUGIXML_NO_EXCEPTIONS, PUGIXML_CHARCONV_FLOAT]
+        exclude:
+          - os: macos
+            compiler: g++
+          - os: macos
+            defines: PUGIXML_CHARCONV_FLOAT # std::charconv is not supported until Xcode 26
+    name: ${{matrix.os}} (${{matrix.compiler}}, ${{matrix.defines}})
+    runs-on: ${{matrix.os}}-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: make test
+      if: matrix.defines != 'PUGIXML_CHARCONV_FLOAT' # std::charconv requires C++17, tested below
+      run: |
+        export CXX=${{matrix.compiler}}
+        make test cxxstd=c++11 defines=${{matrix.defines}} config=release -j2
+        make test cxxstd=c++98 defines=${{matrix.defines}} config=debug -j2
+        make test cxxstd=c++17 defines=${{matrix.defines}} config=debug -j2
+        make test defines=${{matrix.defines}} config=sanitize -j2
+    - name: make test charconv
+      if: matrix.defines == 'PUGIXML_CHARCONV_FLOAT'
+      run: |
+        export CXX=${{matrix.compiler}}
+        make test cxxstd=c++17 defines=${{matrix.defines}} config=sanitize -j2
+    - name: make coverage
+      if: ${{!(matrix.os == 'ubuntu' && matrix.compiler == 'clang++')}} # linux/clang produces coverage info gcov can't parse
+      run: |
+        export CXX=${{matrix.compiler}}
+        make test cxxstd=c++17 defines=${{matrix.defines}} config=coverage -j2
+        bash <(curl -s https://codecov.io/bash) -f pugixml.cpp.gcov -X search -t ${{secrets.CODECOV_TOKEN}} -B ${{github.ref}}
+
+  unix-cmake:
+    strategy:
+      matrix:
+        os: [ubuntu, macos]
+    name: ${{matrix.os}} cmake
+    runs-on: ${{matrix.os}}-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: cmake configure
+      run: |
+        mkdir cmake && cd cmake
+        cmake .. -D PUGIXML_BUILD_TESTS=ON
+    - name: cmake test
+      run: |
+        make -C cmake -j2
+
+  windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        arch: [Win32, x64]
+        defines: [standard, PUGIXML_WCHAR_MODE, PUGIXML_COMPACT, PUGIXML_NO_EXCEPTIONS, PUGIXML_CHARCONV_FLOAT]
+    steps:
+    - uses: actions/checkout@v4
+    - name: cmake configure
+      run: cmake . -DPUGIXML_BUILD_TESTS=ON -D${{matrix.defines}}=ON -A ${{matrix.arch}}
+    - name: cmake test
+      shell: bash # necessary for fail-fast
+      run: |
+        cmake --build . -- -property:Configuration=Debug -verbosity:minimal
+        Debug/pugixml-check.exe
+        cmake --build . -- -property:Configuration=Release -verbosity:minimal
+        Release/pugixml-check.exe
+    - name: cmake configure (c++17)
+      run: cmake . -DPUGIXML_BUILD_TESTS=ON -DCMAKE_CXX_STANDARD=17 -D${{matrix.defines}}=ON -A ${{matrix.arch}}
+    - name: cmake test (c++17)
+      shell: bash # necessary for fail-fast
+      run: |
+        cmake --build . -- -property:Configuration=Debug -verbosity:minimal
+        Debug/pugixml-check.exe

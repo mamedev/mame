@@ -1,0 +1,50 @@
+branches:
+  only:
+    - master
+
+image:
+  - Visual Studio 2026
+  - Visual Studio 2022
+  - Visual Studio 2019
+  - Visual Studio 2017
+  - Visual Studio 2015
+
+version: "{branch}-{build}"
+
+for:
+  - matrix:
+      only:
+        - image: Visual Studio 2026
+    install:
+      - pip install --upgrade cmake
+
+build_script:
+  - ps: if ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2017") { .\scripts\nuget_build.ps1 2017}
+  - ps: if ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019") { .\scripts\nuget_build.ps1 2019}
+  - ps: if ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2022") { .\scripts\nuget_build.ps1 2022}
+  - ps: if ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2026") { .\scripts\nuget_build.ps1 2026}
+
+test_script:
+  - ps: if ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2015") { .\tests\cmake-appveyor.ps1 9 2008 }
+  - ps: if ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2015") { .\tests\cmake-appveyor.ps1 12 2013 }
+  - ps: if ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2015") { .\tests\cmake-appveyor.ps1 14 2015 }
+  - ps: if ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2017") { .\tests\cmake-appveyor.ps1 15 2017 }
+  - ps: if ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019") { .\tests\cmake-appveyor.ps1 16 2019 }
+  - ps: if ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2022") { .\tests\cmake-appveyor.ps1 17 2022 }
+  - ps: if ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2026") { .\tests\cmake-appveyor.ps1 18 2026 }
+
+  - ps: if ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2015") { .\tests\autotest-appveyor.ps1 9 x86 standard }
+  - ps: if ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2015") { .\tests\autotest-appveyor.ps1 10 x64 standard }
+  - ps: if ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2015") { .\tests\autotest-appveyor.ps1 11 x86 PUGIXML_WCHAR_MODE }
+  - ps: if ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2015") { .\tests\autotest-appveyor.ps1 12 x64 PUGIXML_COMPACT }
+  - ps: if ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2015") { .\tests\autotest-appveyor.ps1 14 x64 standard }
+  - ps: if ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2017") { .\tests\autotest-appveyor.ps1 15 x86 standard }
+  - ps: if ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019") { .\tests\autotest-appveyor.ps1 19 x86 PUGIXML_COMPACT }
+  - ps: if ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2022") { .\tests\autotest-appveyor.ps1 22 x64 PUGIXML_WCHAR_MODE }
+  - ps: if ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2026") { .\tests\autotest-appveyor.ps1 26 x64 standard }
+
+  - ps: if ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2015") { & C:\cygwin\bin\bash.exe -c "PATH=/usr/bin:/usr/local/bin:$PATH; make -j2 config=coverage test && bash <(curl -s https://codecov.io/bash) -f pugixml.cpp.gcov 2>&1" }
+  - ps: if ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2015") { & C:\cygwin\bin\bash.exe -c "PATH=/usr/bin:/usr/local/bin:$PATH; make -j2 config=coverage defines=PUGIXML_WCHAR_MODE test && bash <(curl -s https://codecov.io/bash) -f pugixml.cpp.gcov 2>&1" }
+
+artifacts:
+  - path: .\scripts\*.nupkg
