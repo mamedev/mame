@@ -419,10 +419,10 @@ u8 apple2_state::flags_r(offs_t offset)
 		return (m_cassette->input() > 0.0 ? 0 : 0x80) | uFloatingBus7;
 
 	case 1:  // button 0
-		return (m_gameio->sw0_r() ? 0x80 : 0) | uFloatingBus7;
+		return ((!m_gameio->has_sw0() || m_gameio->sw0_r()) ? 0x80 : 0) | uFloatingBus7; // reversed compared to IIe
 
 	case 2:  // button 1
-		return (m_gameio->sw1_r() ? 0x80 : 0) | uFloatingBus7;
+		return ((!m_gameio->has_sw1() || m_gameio->sw1_r()) ? 0x80 : 0) | uFloatingBus7; // reversed compared to IIe
 
 	case 3:  // button 2 (or SHIFT key, with SHIFT key mod)
 		return (((m_sysconfig->read() & 0x04) ? m_kbd->shift_r() : m_gameio->sw2_r()) ? 0x80 : 0) | uFloatingBus7;
