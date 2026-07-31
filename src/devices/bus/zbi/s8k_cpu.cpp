@@ -777,7 +777,6 @@ void zbi_s8k_cpu10_card_device::device_add_mconfig(machine_config &config)
 	Z80CTC(config, m_ctc[2], CLK_CPU);
 	m_ctc[2]->set_clk<0>(CLK_CTC);
 	m_ctc[2]->set_clk<1>(CLK_CTC);
-	m_ctc[2]->set_clk<2>(CLK_CTC);
 	m_ctc[2]->zc_callback<0>().set(m_sio[3], FUNC(z80sio_device::rxca_w));
 	m_ctc[2]->zc_callback<0>().append(m_sio[3], FUNC(z80sio_device::txca_w));
 	m_ctc[2]->zc_callback<1>().set(m_sio[3], FUNC(z80sio_device::rxcb_w));
@@ -787,10 +786,9 @@ void zbi_s8k_cpu10_card_device::device_add_mconfig(machine_config &config)
 	// Real-time (line) clock: CTC 2 channels 2 & 3 are cascaded and run in
 	// COUNTER mode, counting the independent 1.2288 MHz baud-rate oscillator fed
 	// to the CTC trigger inputs (S8000 CPU Hardware Manual sec 4.2.2). ZEUS
-	// programs ch2 /256 and ch3 /80 -> a 60 Hz jiffy interrupt. MAME's z80ctc
-	// counts trg edges (not set_clk) in counter mode, so the oscillator must be
-	// wired to trg2; without it the jiffy clock never ticks and the kernel
-	// deadlocks in its idle poll loop.
+	// programs ch2 /256 and ch3 /80 -> a 60 Hz jiffy interrupt.  Feed ch2 only
+	// through trg2: configuring both its internal clock and this external trigger
+	// would count the oscillator twice and make the ZEUS clock run at 120 Hz.
 	clock_device &rtc_clk(CLOCK(config, "rtc_clk", CLK_CTC));
 	rtc_clk.signal_handler().set(m_ctc[2], FUNC(z80ctc_device::trg2));
 
