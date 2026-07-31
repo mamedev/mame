@@ -273,15 +273,15 @@ void necdsp_device::execute_set_input(int inputnum, int state)
 {
 	switch (inputnum)
 	{
-	case NECDSP_INPUT_LINE_INT:
-		if ((!m_irq && (CLEAR_LINE != state)) && (regs.sr & D7725SR_EI)) // detect rising edge AND if EI == 1;
-		{
-			m_irq_firing = 1;
-			regs.sr &= ~D7725SR_EI;
-		}
-		m_irq = (ASSERT_LINE == state); // set old state to current state
-		break;
-	// add more when needed
+		case NECDSP_INPUT_LINE_INT:
+			if ((!m_irq && (CLEAR_LINE != state)) && (regs.sr & D7725SR_EI)) // detect rising edge AND if EI == 1;
+			{
+				m_irq_firing = 1;
+				regs.sr &= ~D7725SR_EI;
+			}
+			m_irq = (ASSERT_LINE == state); // set old state to current state
+			break;
+		// add more when needed
 	}
 }
 
@@ -355,7 +355,8 @@ void necdsp_device::execute_run()
 	} while (m_icount > 0);
 }
 
-void necdsp_device::exec_op(uint32_t opcode) {
+void necdsp_device::exec_op(uint32_t opcode)
+{
 	uint8_t pselect = (opcode >> 20)&0x3;  //P select
 	uint8_t alu     = (opcode >> 16)&0xf;  //ALU operation mode
 	uint8_t asl     = (opcode >> 15)&0x1;  //accumulator select
@@ -365,113 +366,121 @@ void necdsp_device::exec_op(uint32_t opcode) {
 	uint8_t src     = (opcode >>  4)&0xf;  //move source
 	uint8_t dst     = (opcode >>  0)&0xf;  //move destination
 
-	switch(src) {
-	case  0: regs.idb = regs.trb; break;
-	case  1: regs.idb = regs.a; break;
-	case  2: regs.idb = regs.b; break;
-	case  3: regs.idb = regs.tr; break;
-	case  4: regs.idb = regs.dp; break;
-	case  5: regs.idb = regs.rp; break;
-	case  6: regs.idb = m_data.read_word(regs.rp); break;
-	case  7: regs.idb = 0x8000 - regs.flaga.s1; break;  //SGN
-	case  8: regs.idb = regs.dr; regs.sr |= D7725SR_RQM; break;
-	case  9: regs.idb = regs.dr; break;
-	case 10: regs.idb = regs.sr; break;
-	case 11: regs.idb = regs.si; break;  //MSB = first bit in from serial, 'natural' SI register order
-	case 12: regs.idb = bitswap<16>(regs.si, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); break;  //LSB = first bit in from serial, 'reversed' SI register order
-	case 13: regs.idb = regs.k; break;
-	case 14: regs.idb = regs.l; break;
-	case 15: regs.idb = m_dataram.read_word(regs.dp & m_drammask); break;
+	switch(src)
+	{
+		case  0: regs.idb = regs.trb; break;
+		case  1: regs.idb = regs.a; break;
+		case  2: regs.idb = regs.b; break;
+		case  3: regs.idb = regs.tr; break;
+		case  4: regs.idb = regs.dp; break;
+		case  5: regs.idb = regs.rp; break;
+		case  6: regs.idb = m_data.read_word(regs.rp); break;
+		case  7: regs.idb = 0x8000 - regs.flaga.s1; break;  //SGN
+		case  8: regs.idb = regs.dr; regs.sr |= D7725SR_RQM; break;
+		case  9: regs.idb = regs.dr; break;
+		case 10: regs.idb = regs.sr; break;
+		case 11: regs.idb = regs.si; break;  //MSB = first bit in from serial, 'natural' SI register order
+		case 12: regs.idb = bitswap<16>(regs.si, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); break;  //LSB = first bit in from serial, 'reversed' SI register order
+		case 13: regs.idb = regs.k; break;
+		case 14: regs.idb = regs.l; break;
+		case 15: regs.idb = m_dataram.read_word(regs.dp & m_drammask); break;
 	}
 
-	if(alu != D7725ALU_NOP) {
-	uint16_t p=0, q=0, r=0;
-	Flag flag;
-	bool c = false;
+	if(alu != D7725ALU_NOP)
+	{
+		uint16_t p=0, q=0, r=0;
+		Flag flag;
+		bool c = false;
 
-	flag.c = 0;
-	flag.s1 = 0;
-	flag.ov0 = 0;
-	flag.ov1 = 0;
-
-	switch(pselect) {
-		case 0: p = m_dataram.read_word(regs.dp & m_drammask); break;
-		case 1: p = regs.idb; break;
-		case 2: p = regs.m; break;
-		case 3: p = regs.n; break;
-	}
-
-	switch(asl) {
-		case 0: q = regs.a; flag = regs.flaga; c = regs.flagb.c; break;
-		case 1: q = regs.b; flag = regs.flagb; c = regs.flaga.c; break;
-	}
-
-	switch(alu) {
-		case D7725ALU_OR  : r = q | p; break;                    // 1 OR
-		case D7725ALU_AND : r = q & p; break;                    // 2 AND
-		case D7725ALU_XOR : r = q ^ p; break;                    // 3 XOR
-		case D7725ALU_SUB : r = q - p; break;                    // 4 SUB
-		case D7725ALU_ADD : r = q + p; break;                    // 5 ADD
-		case D7725ALU_SBB : r = q - p - c; break;                // 6 SBB
-		case D7725ALU_ADC : r = q + p + c; break;                // 7 ADC
-		case D7725ALU_DEC : r = q - 1; p = 1; break;             // 8 DEC
-		case D7725ALU_INC : r = q + 1; p = 1; break;             // 9 INC
-		case D7725ALU_CMP : r = ~q; break;                       // a CMP
-		case D7725ALU_SHR1: r = (q >> 1) | (q & 0x8000); break;  // b SHR1 (ASR)
-		case D7725ALU_SHL1: r = (q << 1) | (c ? 1 : 0); break;   // c SHL1 (ROL)
-		case D7725ALU_SHL2: r = (q << 2) | 3; break;             // d SHL2
-		case D7725ALU_SHL4: r = (q << 4) | 15; break;            // e SHL4
-		case D7725ALU_XCHG: r = swapendian_int16(q); break;      // f XCHG
-	}
-
-	flag.s0 = (r & 0x8000);
-	flag.z = (r == 0);
-	if(!flag.ov1) flag.s1 = flag.s0;
-
-	switch(alu) {
-		case D7725ALU_OR: case D7725ALU_AND: case D7725ALU_XOR: case D7725ALU_CMP: case D7725ALU_SHL2: case D7725ALU_SHL4: case D7725ALU_XCHG: {
 		flag.c = 0;
-		flag.ov0 = flag.ov1 = 0; // OV0 and OV1 are cleared by any non-add/sub/nop operation
-		break;
-		}
-		case D7725ALU_SUB: case D7725ALU_ADD: case D7725ALU_SBB: case D7725ALU_ADC: case D7725ALU_DEC: case D7725ALU_INC: {
-		if(alu & 1) {
-			//addition
-			flag.ov0 = (q ^ r) & ~(q ^ p) & 0x8000;
-			flag.c = (r < q);
-		} else {
-			//subtraction
-			flag.ov0 = (q ^ r) &  (q ^ p) & 0x8000;
-			flag.c = (r > q);
-		}
-		flag.ov1 = (flag.ov0 & flag.ov1) ? (flag.s1 == flag.s0) : (flag.ov0 | flag.ov1);
-		break;
-		}
-		case D7725ALU_SHR1: {
-		flag.c = q & 1;
-		flag.ov0 = flag.ov1 = 0; // OV0 and OV1 are cleared by any non-add/sub/nop operation
-		break;
-		}
-		case D7725ALU_SHL1: {
-		flag.c = q >> 15;
-		flag.ov0 = flag.ov1 = 0; // OV0 and OV1 are cleared by any non-add/sub/nop operation
-		break;
-		}
-	}
+		flag.s1 = 0;
+		flag.ov0 = 0;
+		flag.ov1 = 0;
 
-	switch(asl) {
-		case 0: regs.a = r; regs.flaga = flag; break;
-		case 1: regs.b = r; regs.flagb = flag; break;
-	}
+		switch(pselect)
+		{
+			case 0: p = m_dataram.read_word(regs.dp & m_drammask); break;
+			case 1: p = regs.idb; break;
+			case 2: p = regs.m; break;
+			case 3: p = regs.n; break;
+		}
+
+		switch(asl)
+		{
+			case 0: q = regs.a; flag = regs.flaga; c = regs.flagb.c; break;
+			case 1: q = regs.b; flag = regs.flagb; c = regs.flaga.c; break;
+		}
+
+		switch(alu)
+		{
+			case D7725ALU_OR  : r = q | p; break;                    // 1 OR
+			case D7725ALU_AND : r = q & p; break;                    // 2 AND
+			case D7725ALU_XOR : r = q ^ p; break;                    // 3 XOR
+			case D7725ALU_SUB : r = q - p; break;                    // 4 SUB
+			case D7725ALU_ADD : r = q + p; break;                    // 5 ADD
+			case D7725ALU_SBB : r = q - p - c; break;                // 6 SBB
+			case D7725ALU_ADC : r = q + p + c; break;                // 7 ADC
+			case D7725ALU_DEC : r = q - 1; p = 1; break;             // 8 DEC
+			case D7725ALU_INC : r = q + 1; p = 1; break;             // 9 INC
+			case D7725ALU_CMP : r = ~q; break;                       // a CMP
+			case D7725ALU_SHR1: r = (q >> 1) | (q & 0x8000); break;  // b SHR1 (ASR)
+			case D7725ALU_SHL1: r = (q << 1) | (c ? 1 : 0); break;   // c SHL1 (ROL)
+			case D7725ALU_SHL2: r = (q << 2) | 3; break;             // d SHL2
+			case D7725ALU_SHL4: r = (q << 4) | 15; break;            // e SHL4
+			case D7725ALU_XCHG: r = swapendian_int16(q); break;      // f XCHG
+		}
+
+		flag.s0 = (r & 0x8000);
+		flag.z = (r == 0);
+		if(!flag.ov1) flag.s1 = flag.s0;
+
+		switch(alu)
+		{
+			case D7725ALU_OR: case D7725ALU_AND: case D7725ALU_XOR: case D7725ALU_CMP: case D7725ALU_SHL2: case D7725ALU_SHL4: case D7725ALU_XCHG:
+				flag.c = 0;
+				flag.ov0 = flag.ov1 = 0; // OV0 and OV1 are cleared by any non-add/sub/nop operation
+				break;
+			case D7725ALU_SUB: case D7725ALU_ADD: case D7725ALU_SBB: case D7725ALU_ADC: case D7725ALU_DEC: case D7725ALU_INC:
+				if(alu & 1)
+				{
+					//addition
+					flag.ov0 = (q ^ r) & ~(q ^ p) & 0x8000;
+					flag.c = (r < q);
+				}
+				else
+				{
+					//subtraction
+					flag.ov0 = (q ^ r) &  (q ^ p) & 0x8000;
+					flag.c = (r > q);
+				}
+				flag.ov1 = (flag.ov0 & flag.ov1) ? (flag.s1 == flag.s0) : (flag.ov0 | flag.ov1);
+				break;
+			case D7725ALU_SHR1:
+				flag.c = q & 1;
+				flag.ov0 = flag.ov1 = 0; // OV0 and OV1 are cleared by any non-add/sub/nop operation
+				break;
+			case D7725ALU_SHL1:
+				flag.c = q >> 15;
+				flag.ov0 = flag.ov1 = 0; // OV0 and OV1 are cleared by any non-add/sub/nop operation
+				break;
+		}
+
+		switch(asl)
+		{
+			case 0: regs.a = r; regs.flaga = flag; break;
+			case 1: regs.b = r; regs.flagb = flag; break;
+		}
 	}
 
 	exec_ld((regs.idb << 6) + dst);
 
-	if (dst != 4) {
-		switch(dpl) {
-		case 1: regs.dp = (regs.dp & 0xf0) + ((regs.dp + 1) & 0x0f); break;  //DPINC
-		case 2: regs.dp = (regs.dp & 0xf0) + ((regs.dp - 1) & 0x0f); break;  //DPDEC
-		case 3: regs.dp = (regs.dp & 0xf0); break;  //DPCLR
+	if (dst != 4)
+	{
+		switch(dpl)
+		{
+			case 1: regs.dp = (regs.dp & 0xf0) + ((regs.dp + 1) & 0x0f); break;  //DPINC
+			case 2: regs.dp = (regs.dp & 0xf0) + ((regs.dp - 1) & 0x0f); break;  //DPDEC
+			case 3: regs.dp = (regs.dp & 0xf0); break;  //DPCLR
 		}
 
 		regs.dp ^= dphm << 4;
@@ -480,13 +489,15 @@ void necdsp_device::exec_op(uint32_t opcode) {
 	if(rpdcr && (dst != 5)) regs.rp--;
 }
 
-void necdsp_device::exec_rt(uint32_t opcode) {
+void necdsp_device::exec_rt(uint32_t opcode)
+{
 	exec_op(opcode);
 	regs.pc = regs.stack[--regs.sp];
 	regs.sp &= 0xf;
 }
 
-void necdsp_device::exec_jp(uint32_t opcode) {
+void necdsp_device::exec_jp(uint32_t opcode)
+{
 	uint16_t brch = (opcode >> 13) & 0x1ff;  //branch
 	uint16_t na  =  (opcode >>  2) & 0x7ff;  //next address
 	uint16_t bank = (opcode >>  0) & 0x3;  //bank address
@@ -494,7 +505,8 @@ void necdsp_device::exec_jp(uint32_t opcode) {
 	uint16_t jps = (regs.pc & 0x2000) | (bank << 11) | (na << 0);
 	uint16_t jpl = (bank << 11) | (na << 0);
 
-	switch(brch) {
+	switch(brch)
+	{
 		case 0x000: regs.pc = regs.so; return;  //JMPSO
 
 		case 0x080: if(regs.flaga.c == 0) regs.pc = jps; return;  //JNCA
@@ -548,32 +560,34 @@ void necdsp_device::exec_jp(uint32_t opcode) {
 	}
 }
 
-void necdsp_device::exec_ld(uint32_t opcode) {
+void necdsp_device::exec_ld(uint32_t opcode)
+{
 	uint16_t id = opcode >> 6;  //immediate data
 	uint8_t dst = (opcode >> 0) & 0xf;  //destination
 
 	regs.idb = id;
 
-	switch(dst) {
-	case  0: break;
-	case  1: regs.a = id; break;
-	case  2: regs.b = id; break;
-	case  3: regs.tr = id; break;
-	case  4: regs.dp = id; break;
-	case  5: regs.rp = id; break;
-	case  6: regs.dr = id; regs.sr |= D7725SR_RQM; break;
-	case  7: regs.sr = (regs.sr & 0x907c) | (id & ~0x907c);
-				m_out_p0_cb((regs.sr & D7725SR_P0) ? ASSERT_LINE : CLEAR_LINE);
-				m_out_p1_cb((regs.sr & D7725SR_P1) ? ASSERT_LINE : CLEAR_LINE);
-				break;
-	case  8: regs.so = bitswap<16>(id, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); regs.soack = 1; break;  //LSB first output, output tapped at bit 15 shifting left
-	case  9: regs.so = id; regs.soack = 1; break;  //MSB first output, output tapped at bit 15 shifting left
-	case 10: regs.k = id; break;
-	case 11: regs.k = id; regs.l = m_data.read_word(regs.rp); break;
-	case 12: regs.l = id; regs.k = m_dataram.read_word((regs.dp & m_drammask) | 0x40); break;
-	case 13: regs.l = id; break;
-	case 14: regs.trb = id; break;
-	case 15: m_dataram.write_word(regs.dp & m_drammask, id); break;
+	switch(dst)
+	{
+		case  0: break;
+		case  1: regs.a = id; break;
+		case  2: regs.b = id; break;
+		case  3: regs.tr = id; break;
+		case  4: regs.dp = id; break;
+		case  5: regs.rp = id; break;
+		case  6: regs.dr = id; regs.sr |= D7725SR_RQM; break;
+		case  7: regs.sr = (regs.sr & 0x907c) | (id & ~0x907c);
+					m_out_p0_cb((regs.sr & D7725SR_P0) ? ASSERT_LINE : CLEAR_LINE);
+					m_out_p1_cb((regs.sr & D7725SR_P1) ? ASSERT_LINE : CLEAR_LINE);
+					break;
+		case  8: regs.so = bitswap<16>(id, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); regs.soack = 1; break;  //LSB first output, output tapped at bit 15 shifting left
+		case  9: regs.so = id; regs.soack = 1; break;  //MSB first output, output tapped at bit 15 shifting left
+		case 10: regs.k = id; break;
+		case 11: regs.k = id; regs.l = m_data.read_word(regs.rp); break;
+		case 12: regs.l = id; regs.k = m_dataram.read_word((regs.dp & m_drammask) | 0x40); break;
+		case 13: regs.l = id; break;
+		case 14: regs.trb = id; break;
+		case 15: m_dataram.write_word(regs.dp & m_drammask, id); break;
 	}
 }
 
@@ -581,7 +595,6 @@ uint8_t necdsp_device::status_r()
 {
 	return regs.sr >> 8;
 }
-
 
 uint8_t necdsp_device::data_r()
 {
