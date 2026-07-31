@@ -103,6 +103,8 @@ constexpr bool OSD_PRINTF_VERBOSE = false;
 #define OPTION_OUTPUT "output"
 #define OPTION_OUTPUT_BIN "outputbin"
 #define OPTION_OUTPUT_SPLITBIN "splitbin"
+#define OPTION_OUTPUT_REMOVEPREGAP "removepregap"
+#define OPTION_OUTPUT_ADDPREGAP "addpregap"
 #define OPTION_OUTPUT_FORCE "force"
 #define OPTION_INPUT_START_BYTE "inputstartbyte"
 #define OPTION_INPUT_START_HUNK "inputstarthunk"
@@ -676,6 +678,8 @@ static const option_description s_options[] =
 	{ OPTION_OUTPUT,                "o",    true, " <filename>: output file name" },
 	{ OPTION_OUTPUT_BIN,            "ob",   true, " <filename>: output file name for binary data" },
 	{ OPTION_OUTPUT_SPLITBIN,       "sb",   false, ": output one binary file per track" },
+	{ OPTION_OUTPUT_REMOVEPREGAP,   "rp",   false, ": modify TOC to match TOSEC format (GD-ROM only)" },
+	{ OPTION_OUTPUT_ADDPREGAP,      "ap",   false, ": modify TOC to match Redump format (GD-ROM only)" },
 	{ OPTION_OUTPUT_FORCE,          "f",    false, ": force overwriting an existing file" },
 	{ OPTION_OUTPUT_PARENT,         "op",   true, " <filename>: parent file name for output CHD" },
 	{ OPTION_INPUT_START_BYTE,      "isb",  true, " <offset>: starting byte offset within the input" },
@@ -764,6 +768,7 @@ static const command_description s_commands[] =
 			REQUIRED OPTION_OUTPUT,
 			OPTION_OUTPUT_PARENT,
 			OPTION_OUTPUT_FORCE,
+			OPTION_OUTPUT_REMOVEPREGAP,
 			REQUIRED OPTION_INPUT,
 			OPTION_HUNK_SIZE,
 			OPTION_COMPRESSION,
@@ -832,6 +837,7 @@ static const command_description s_commands[] =
 			OPTION_OUTPUT_BIN,
 			OPTION_OUTPUT_SPLITBIN,
 			OPTION_OUTPUT_FORCE,
+			OPTION_OUTPUT_ADDPREGAP,
 			REQUIRED OPTION_INPUT,
 			OPTION_INPUT_PARENT,
 		}
@@ -2176,6 +2182,25 @@ static void do_create_cd(parameters_map &params)
 			report_error(1, "Error parsing input file (%s: %s)\n", *input_file_str->second, err.message());
 	}
 
+	bool is_gdrom = toc.flags & cdrom_file::CD_FLAG_GDROM;
+
+	if (is_gdrom)
+	{
+		bool is_removepregap = params.find(OPTION_OUTPUT_REMOVEPREGAP) != params.end();
+
+		if (is_removepregap)
+		{
+			std::error_condition err = cdrom_file::remove_pregap(toc, track_info);
+		
+			if (err)
+				report_error(1, "Error stripping pregap: (%s: %s)\n", *input_file_str->second, err.message());
+		}
+
+		std::error_condition err = cdrom_file::adjust_high_density_area(toc, track_info);
+		if (err)
+			report_error(1, "Error adjusting high density area: (%s: %s)\n", *input_file_str->second, err.message());
+	}
+
 	// process output CHD
 	chd_file output_parent;
 	const auto output_chd_str = parse_output_chd_parameters(params, output_parent);
@@ -2849,7 +2874,9 @@ static void do_extract_cd(parameters_map &params)
 				output_toc_file->printf("CD_ROM\n\n\n");
 		}
 
-		if (cdrom->is_gdrom() && mode == MODE_CUEBIN)
+		bool is_addpregap = cdrom->is_gdrom() && mode == MODE_CUEBIN && params.find(OPTION_OUTPUT_ADDPREGAP) != params.end();
+
+		if (is_addpregap)
 		{
 			// modify TOC to match Redump cue/bin format as best as possible
 			cdrom_file::toc *trackinfo = (cdrom_file::toc*)&toc;
