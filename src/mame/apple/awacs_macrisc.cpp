@@ -126,7 +126,7 @@ uint32_t awacs_macrisc_device::read_macrisc(offs_t offset)
 	switch (offset)
 	{
 		case 0:     // Audio Control
-			return swapendian_int32(m_snd_control);
+			return m_snd_control;
 
 		case 4:     // Audio CODEC Control
 			return 0;
@@ -155,7 +155,7 @@ void awacs_macrisc_device::write_macrisc(offs_t offset, uint32_t data)
 		case 4: // Audio CODEC Control
 			{
 				int subframe = (data >> 22) & 0x3;
-				int codec_addr = (data >> 12) & 0xfff;
+				int codec_addr = (data >> 12) & 0x7;
 				int codec_data = (data & 0xfff);
 
 				LOGMASKED(LOG_REGISTERS, "%s: CODEC control: %x to addr %x (subframe %d)\n", tag(), codec_data, codec_addr, subframe);
@@ -178,15 +178,15 @@ uint32_t screamer_device::read_macrisc(offs_t offset)
 	switch (offset)
 	{
 		case 0: // Audio Control
-				return 0;
+				return m_snd_control;
 
 		case 4: // Audio CODEC Control
 				return 0;
 
 		case 8:                  // Audio CODEC Status
-				return swapendian_int32((0x40 << 8) |    // indicate CODEC is present
+				return (0x40 << 8) |    // indicate CODEC is present
 				(1 << 16) |             // manufacturer is Crystal Semiconductor
-				(3 << 20));              // CODEC version 3 (Screamer)
+				(3 << 20);              // CODEC version 3 (Screamer)
 	}
 
 	return 0;

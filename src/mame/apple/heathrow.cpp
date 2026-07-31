@@ -34,6 +34,8 @@
 static constexpr u32 C7M  = 7833600;
 static constexpr u32 C15M = (C7M * 2);
 
+static constexpr u32 DMA_IRQ_MASK = 0x000007ff;
+
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
@@ -47,7 +49,7 @@ DEFINE_DEVICE_TYPE(PADDINGTON, paddington_device, "paddington", "Apple Paddingto
 //  ADDRESS_MAP
 //-------------------------------------------------
 /*          Grand Central           O'Hare                  Heathrow/Paddington
-0x10000     SCSI0                   SCSI0                   SCSI
+0x10000     SCSI0                   SCSI                    SCSI
 0x11000     MACE Ethernet           (unused)                "BigMac" Ethernet
 0x12000     SCC "compatibility"     SCC compat              SCC compat
 0x13000     SCC "MacRisc"           SCC MacRisc             SCC MacRisc
@@ -55,23 +57,23 @@ DEFINE_DEVICE_TYPE(PADDINGTON, paddington_device, "paddington", "Apple Paddingto
 0x15000     SWIM3                   SWIM3                   SWIM3
 0x16000     VIA                     VIA                     VIA
 0x17000     VIA                     VIA                     VIA
-0x18000     SCSI1                   (unused)                (unused)
-0x19000     Ethernet MAC PROM       (unused)                ADB Master Cell
+0x18000     SCSI1                   (reads as 0)            (reads as 0)
+0x19000     Ethernet MAC PROM       (reads as 0)            ADB Master Cell
 0x1a000     (external IOBus)        (external IOBus)        (external IOBus)
 0x1b000     (external IOBus)        (external IOBus)        (external IOBus)
 0x1c000     (external IOBus)        (external IOBus)        (external IOBus)
 0x1d000     (external IOBus)        (external IOBus)        (external IOBus)
-0x1e000     (external IOBus)        (unused)
-0x1f000     (external IOBus)        (unused)
-0x20000     (external IOBus)        ATA bus 0               ATA bus 0
-0x21000     (external IOBus)        ATA bus 1               ATA bus 1
+0x1e000     (external IOBus)        (reads as 0)            (reads as 0)
+0x1f000     (external IOBus)        (reads as 0)            (reads as 0)
+0x20000     (128K BAR, no)          ATA bus 0               ATA bus 0
+0x21000     (128K BAR, no)          ATA bus 1               ATA bus 1
 0x60000     (128K BAR, no)          PRAM                    PRAM
 0x70000     (128K BAR, no)          PRAM                    PRAM
 */
 void macio_device::base_map(address_map &map)
 {
 	map(0x00000, 0x00fff).rw(FUNC(grandcentral_device::macio_r), FUNC(grandcentral_device::macio_w));
-	map(0x08000, 0x0801f).m(m_dma_scsi, FUNC(dbdma_device::map));
+	map(0x08000, 0x0801f).m(m_dma_scsi0, FUNC(dbdma_device::map));
 	map(0x08100, 0x0811f).m(m_dma_floppy, FUNC(dbdma_device::map));
 	map(0x08400, 0x0841f).m(m_dma_sccatx, FUNC(dbdma_device::map));
 	map(0x08500, 0x0851f).m(m_dma_sccarx, FUNC(dbdma_device::map));
@@ -84,6 +86,10 @@ void macio_device::base_map(address_map &map)
 	map(0x14000, 0x140ff).rw(FUNC(grandcentral_device::codec_r), FUNC(grandcentral_device::codec_w));
 	map(0x15000, 0x15fff).rw(FUNC(grandcentral_device::fdc_r), FUNC(grandcentral_device::fdc_w));
 	map(0x16000, 0x17fff).rw(FUNC(grandcentral_device::mac_via_r), FUNC(grandcentral_device::mac_via_w));
+	map(0x1a000, 0x1afff).rw(FUNC(macio_device::iobus_r<&macio_device::read_iobus_a>), FUNC(macio_device::iobus_w<&macio_device::write_iobus_a>));
+	map(0x1b000, 0x1bfff).rw(FUNC(macio_device::iobus_r<&macio_device::read_iobus_b>), FUNC(macio_device::iobus_w<&macio_device::write_iobus_b>));
+	map(0x1c000, 0x1cfff).rw(FUNC(macio_device::iobus_r<&macio_device::read_iobus_c>), FUNC(macio_device::iobus_w<&macio_device::write_iobus_c>));
+	map(0x1d000, 0x1dfff).rw(FUNC(macio_device::iobus_r<&macio_device::read_iobus_d>), FUNC(macio_device::iobus_w<&macio_device::write_iobus_d>));
 }
 
 void grandcentral_device::map(address_map &map)
@@ -92,6 +98,8 @@ void grandcentral_device::map(address_map &map)
 	map(0x08a00, 0x08a1f).m(m_dma_scsi1, FUNC(dbdma_device::map));
 	map(0x10000, 0x100ff).rw(FUNC(grandcentral_device::scsi0_r), FUNC(grandcentral_device::scsi0_w));
 	map(0x18000, 0x180ff).rw(FUNC(grandcentral_device::scsi1_r), FUNC(grandcentral_device::scsi1_w));
+	map(0x1e000, 0x1efff).rw(FUNC(grandcentral_device::iobus_r<&grandcentral_device::read_iobus_e>), FUNC(grandcentral_device::iobus_w<&grandcentral_device::write_iobus_e>));
+	map(0x1f000, 0x1ffff).rw(FUNC(grandcentral_device::iobus_r<&grandcentral_device::read_iobus_f>), FUNC(grandcentral_device::iobus_w<&grandcentral_device::write_iobus_f>));
 }
 
 void ohare_device::map(address_map &map)
@@ -99,6 +107,7 @@ void ohare_device::map(address_map &map)
 	base_map(map);
 	map(0x08b00, 0x08b1f).m(m_dma_ata0, FUNC(dbdma_device::map));
 	map(0x08c00, 0x08c1f).m(m_dma_ata1, FUNC(dbdma_device::map));
+	map(0x10000, 0x100ff).rw(FUNC(ohare_device::scsi0_r), FUNC(ohare_device::scsi0_w));
 
 	map(0x60000, 0x7ffff).rw(FUNC(ohare_device::nvram_r), FUNC(ohare_device::nvram_w)).umask32(0x000000ff);
 }
@@ -106,8 +115,6 @@ void ohare_device::map(address_map &map)
 void heathrow_device::map(address_map &map)
 {
 	ohare_device::map(map);
-	map(0x10040, 0x10043).lr32([]() { return 0xffffffff; }, "hack");
-	map(0x100e0, 0x100e3).lr32([]() { return 0xffffffff; }, "hack2");
 }
 
 //-------------------------------------------------
@@ -123,28 +130,38 @@ void macio_device::device_add_mconfig(machine_config &config)
 	m_via1->cb2_handler().set(FUNC(macio_device::via_out_cb2));
 	m_via1->irq_handler().set(FUNC(macio_device::set_irq_line<18>));
 
-	DBDMA_CHANNEL(config, m_dma_scsi, 0);
-	m_dma_scsi->irq_callback().set(FUNC(macio_device::set_irq_line<0>));
+	DBDMA_CHANNEL(config, m_dma_scsi0, 0);
+	m_dma_scsi0->set_width(1);
+	m_dma_scsi0->irq_callback().set(FUNC(macio_device::set_irq_line<0>));
+	m_dma_scsi0->dma_r().set(FUNC(macio_device::scsi0_dma_r));
+	m_dma_scsi0->dma_w().set(FUNC(macio_device::scsi0_dma_w));
 
 	DBDMA_CHANNEL(config, m_dma_floppy, 0);
+	m_dma_floppy->set_width(1);
 	m_dma_floppy->irq_callback().set(FUNC(macio_device::set_irq_line<1>));
 
 	DBDMA_CHANNEL(config, m_dma_sccatx, 0);
+	m_dma_sccatx->set_width(1);
 	m_dma_sccatx->irq_callback().set(FUNC(macio_device::set_irq_line<4>));
 
 	DBDMA_CHANNEL(config, m_dma_sccarx, 0);
+	m_dma_sccarx->set_width(1);
 	m_dma_sccarx->irq_callback().set(FUNC(macio_device::set_irq_line<5>));
 
 	DBDMA_CHANNEL(config, m_dma_sccbtx, 0);
+	m_dma_sccbtx->set_width(1);
 	m_dma_sccbtx->irq_callback().set(FUNC(macio_device::set_irq_line<6>));
 
 	DBDMA_CHANNEL(config, m_dma_sccbrx, 0);
+	m_dma_sccbrx->set_width(1);
 	m_dma_sccbrx->irq_callback().set(FUNC(macio_device::set_irq_line<7>));
 
 	DBDMA_CHANNEL(config, m_dma_audio_out, 0);
+	m_dma_audio_out->set_width(4);
 	m_dma_audio_out->irq_callback().set(FUNC(macio_device::set_irq_line<8>));
 
 	DBDMA_CHANNEL(config, m_dma_audio_in, 0);
+	m_dma_audio_in->set_width(4);
 	m_dma_audio_in->irq_callback().set(FUNC(macio_device::set_irq_line<9>));
 
 	SWIM3(config, m_fdc, C15M);
@@ -156,6 +173,7 @@ void macio_device::device_add_mconfig(machine_config &config)
 
 	SCC85C30(config, m_scc, C7M);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
+	m_scc->out_int_callback().set(FUNC(macio_device::scc_irq_w));
 	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
 	m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));
 
@@ -174,8 +192,13 @@ void grandcentral_device::device_add_mconfig(machine_config &config)
 {
 	macio_device::device_add_mconfig(config);
 
+	m_dma_scsi0->set_width(2);
+
 	DBDMA_CHANNEL(config, m_dma_scsi1, 0);
+	m_dma_scsi1->set_width(2);
 	m_dma_scsi1->irq_callback().set(FUNC(macio_device::set_irq_line<10>));
+	m_dma_scsi1->dma_r().set(FUNC(grandcentral_device::scsi1_dma_r));
+	m_dma_scsi1->dma_w().set(FUNC(grandcentral_device::scsi1_dma_w));
 }
 
 void ohare_device::device_add_mconfig(machine_config &config)
@@ -183,9 +206,11 @@ void ohare_device::device_add_mconfig(machine_config &config)
 	macio_device::device_add_mconfig(config);
 
 	DBDMA_CHANNEL(config, m_dma_ata0, 0);
+	m_dma_ata0->set_width(2);
 	m_dma_ata0->irq_callback().set(FUNC(macio_device::set_irq_line<2>));
 
 	DBDMA_CHANNEL(config, m_dma_ata1, 0);
+	m_dma_ata1->set_width(2);
 	m_dma_ata1->irq_callback().set(FUNC(macio_device::set_irq_line<3>));
 }
 
@@ -208,15 +233,25 @@ macio_device::macio_device(const machine_config &mconfig, device_type type, cons
 	read_codec(*this, 0),
 	write_codec(*this),
 	read_scsi0(*this, 0),
-	read_scsi1(*this, 0),
 	write_scsi0(*this),
-	write_scsi1(*this),
+	read_scsi0_dma(*this, 0),
+	write_scsi0_dma(*this),
+	read_fdc_dma(*this, 0),
+	write_fdc_dma(*this),
+	read_iobus_a(*this, 0),
+	read_iobus_b(*this, 0),
+	read_iobus_c(*this, 0),
+	read_iobus_d(*this, 0),
+	write_iobus_a(*this),
+	write_iobus_b(*this),
+	write_iobus_c(*this),
+	write_iobus_d(*this),
 	m_maincpu(*this, finder_base::DUMMY_TAG),
 	m_via1(*this, "via1"),
 	m_fdc(*this, "fdc"),
 	m_floppy(*this, "fdc:%d", 0U),
 	m_scc(*this, "scc"),
-	m_dma_scsi(*this, "dma_scsi0"),
+	m_dma_scsi0(*this, "dma_scsi0"),
 	m_dma_floppy(*this, "dma_floppy"),
 	m_dma_sccatx(*this, "dma_scca_tx"),
 	m_dma_sccarx(*this, "dma_scca_rx"),
@@ -232,7 +267,15 @@ macio_device::macio_device(const machine_config &mconfig, device_type type, cons
 
 grandcentral_device::grandcentral_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	macio_device(mconfig, GRAND_CENTRAL, tag, owner, clock),
-	m_dma_scsi1(*this, "dma_scsi1")
+	m_dma_scsi1(*this, "dma_scsi1"),
+	read_scsi1(*this, 0),
+	write_scsi1(*this),
+	read_scsi1_dma(*this, 0),
+	write_scsi1_dma(*this),
+	read_iobus_e(*this, 0),
+	read_iobus_f(*this, 0),
+	write_iobus_e(*this),
+	write_iobus_f(*this)
 {
 }
 
@@ -273,7 +316,7 @@ void macio_device::common_init()
 	pci_device::device_start();
 
 	address_space *bm = get_pci_busmaster_space();
-	m_dma_scsi->set_address_space(bm);
+	m_dma_scsi0->set_address_space(bm);
 	m_dma_floppy->set_address_space(bm);
 	m_dma_sccatx->set_address_space(bm);
 	m_dma_sccarx->set_address_space(bm);
@@ -376,6 +419,13 @@ void macio_device::via_out_b(u8 data)
 {
 	write_pb4(BIT(data, 4));
 	write_pb5(BIT(data, 5));
+}
+
+void macio_device::scc_irq_w(int state)
+{
+	// TODO: our SCC only has one IRQ line for both channels.  (I think separate lines is a later ESCC thing?)
+	set_irq_line<15>(state);
+	set_irq_line<16>(state);
 }
 
 void macio_device::cb1_w(int state)
@@ -530,11 +580,21 @@ void macio_device::macio_w(offs_t offset, u32 data, u32 mem_mask)
 				else
 				{
 					m_InterruptEvents &= (data ^ 0xffffffff);
+					// emulation mode: a 1->0 transition on a DBDMA channel
+					// re-latches it, so fold the still-asserted levels back
+					// into events before dropping them to re-arm the channel.
+					const u32 dma_ack = data & DMA_IRQ_MASK;
+					m_InterruptEvents |= (m_InterruptLevels & dma_ack);
+					m_InterruptLevels &= ~dma_ack;
 				}
 			}
 			else
 			{
 				m_InterruptEvents &= (data ^ 0xffffffff);
+				// native mode: acknowledging a DBDMA channel's completion must
+				// drop its held level so the next completion is seen as a fresh
+				// rising edge (otherwise the channel can never interrupt again).
+				m_InterruptLevels &= ~(data & DMA_IRQ_MASK);
 			}
 			recalc_irqs();
 			break;
@@ -603,6 +663,39 @@ template<int bit> void macio_device::set_irq_line(int state)
 	recalc_irqs();
 }
 
+template void macio_device::set_irq_line<0>(int state);
+template void macio_device::set_irq_line<1>(int state);
+template void macio_device::set_irq_line<2>(int state);
+template void macio_device::set_irq_line<3>(int state);
+template void macio_device::set_irq_line<4>(int state);
+template void macio_device::set_irq_line<5>(int state);
+template void macio_device::set_irq_line<6>(int state);
+template void macio_device::set_irq_line<7>(int state);
+template void macio_device::set_irq_line<8>(int state);
+template void macio_device::set_irq_line<9>(int state);
+template void macio_device::set_irq_line<10>(int state);
+template void macio_device::set_irq_line<11>(int state);
+template void macio_device::set_irq_line<12>(int state);
+template void macio_device::set_irq_line<13>(int state);
+template void macio_device::set_irq_line<14>(int state);
+template void macio_device::set_irq_line<15>(int state);
+template void macio_device::set_irq_line<16>(int state);
+template void macio_device::set_irq_line<17>(int state);
+template void macio_device::set_irq_line<18>(int state);
+template void macio_device::set_irq_line<19>(int state);
+template void macio_device::set_irq_line<20>(int state);
+template void macio_device::set_irq_line<21>(int state);
+template void macio_device::set_irq_line<22>(int state);
+template void macio_device::set_irq_line<23>(int state);
+template void macio_device::set_irq_line<24>(int state);
+template void macio_device::set_irq_line<25>(int state);
+template void macio_device::set_irq_line<26>(int state);
+template void macio_device::set_irq_line<27>(int state);
+template void macio_device::set_irq_line<28>(int state);
+template void macio_device::set_irq_line<29>(int state);
+template void macio_device::set_irq_line<30>(int state);
+template void macio_device::set_irq_line<31>(int state);
+
 u8 macio_device::fdc_r(offs_t offset)
 {
 	return m_fdc->read(offset >> 4);
@@ -613,15 +706,37 @@ void macio_device::fdc_w(offs_t offset, u8 data)
 	m_fdc->write(offset >> 4, data);
 }
 
+void macio_device::fdc_drq(int state)
+{
+	if (state)
+	{
+		if (m_dma_floppy->is_to_memory())
+		{
+			m_dma_floppy->dma_write(0, read_fdc_dma(0));
+		}
+		else
+		{
+			write_fdc_dma(0, m_dma_floppy->dma_read(0));
+		}
+	}
+}
+
 u16 macio_device::scc_r(offs_t offset)
 {
 	u16 result = m_scc->dc_ab_r(offset);
 	return (result << 8) | result;
 }
 
-void macio_device::scc_w(offs_t offset, u16 data)
+void macio_device::scc_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	m_scc->dc_ab_w(offset, data >> 8);
+	if (ACCESSING_BITS_0_7)
+	{
+		m_scc->dc_ab_w(offset, data & 0xff);
+	}
+	else
+	{
+		m_scc->dc_ab_w(offset, data >> 8);
+	}
 }
 
 u8 macio_device::scc_macrisc_r(offs_t offset)
@@ -720,20 +835,65 @@ void macio_device::codec_dma_write(offs_t offset, u32 data)
 
 u8 macio_device::scsi0_r(offs_t offset)
 {
-	return read_scsi0(offset);
+	return read_scsi0(offset >> 4);
 }
 
 void macio_device::scsi0_w(offs_t offset, u8 data)
 {
-	write_scsi0(offset, data);
+	write_scsi0(offset >> 4, data);
 }
 
-u8 macio_device::scsi1_r(offs_t offset)
+void macio_device::scsi0_drq(int state)
 {
-	return read_scsi1(offset);
+	m_dma_scsi0->drq_w(state);
 }
 
-void macio_device::scsi1_w(offs_t offset, u8 data)
+u32 macio_device::scsi0_dma_r(offs_t offset)
 {
-	write_scsi1(offset, data);
+	return read_scsi0_dma(offset);
+}
+
+void macio_device::scsi0_dma_w(offs_t offset, u32 data)
+{
+	write_scsi0_dma(offset, data);
+}
+
+template <devcb_read32 macio_device::*R> u32 macio_device::iobus_r(offs_t offset, u32 mem_mask)
+{
+	return (this->*R)(offset, mem_mask);
+}
+
+template <devcb_write32 macio_device::*W> void macio_device::iobus_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	(this->*W)(offset, data, mem_mask);
+}
+
+template <devcb_read32 grandcentral_device::*R> u32 grandcentral_device::iobus_r(offs_t offset, u32 mem_mask)
+{
+	return (this->*R)(offset, mem_mask);
+}
+
+template <devcb_write32 grandcentral_device::*W> void grandcentral_device::iobus_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	(this->*W)(offset, data, mem_mask);
+}
+
+u8 grandcentral_device::scsi1_r(offs_t offset)
+{
+	return read_scsi1(offset >> 4);
+}
+
+void grandcentral_device::scsi1_w(offs_t offset, u8 data)
+{
+	write_scsi1(offset >> 4, data);
+}
+
+u32 grandcentral_device::scsi1_dma_r(offs_t offset)
+{
+	return read_scsi1_dma(offset);
+}
+
+void grandcentral_device::scsi1_dma_w(offs_t offset, u32 data)
+{
+	write_scsi1_dma(offset, data);
 }

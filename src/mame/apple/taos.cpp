@@ -86,7 +86,6 @@ u32 taos_device::screen_update_taos(screen_device &screen, bitmap_rgb32 &bitmap,
 	{
 		auto const vram16 = util::big_endian_cast<u16 const>(&m_vram[fb_base >> 1]);
 		const u32 stride = (m_taos_regs[ROW_WORDS] >> 24) << 3;
-
 		for (int y = 0; y < 480; y++)
 		{
 			u32 *scanline = &bitmap.pix(y);
@@ -100,8 +99,9 @@ u32 taos_device::screen_update_taos(screen_device &screen, bitmap_rgb32 &bitmap,
 	else
 	{
 		auto const vram8 = util::big_endian_cast<u8 const>(&m_vram[fb_base >> 2]);
-		const u32 stride = (m_taos_regs[ROW_WORDS] >> 24) << 3;
+		const u32 stride = (m_taos_regs[ROW_WORDS] >> 24) << 4;
 		const pen_t *pens = m_palette->pens();
+
 		for (int y = 0; y < 480; y++)
 		{
 			u32 *scanline = &bitmap.pix(y);
