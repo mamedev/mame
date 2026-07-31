@@ -85,7 +85,7 @@ Microsoft Windows
 
 The information here is very detailed, and assumes you’re aware of the options
 available and what they mean.  As an alternative, we also provide `a tutorial
-for compiling MAME on Windows <https://https://www.mamedev.org/tools/>`_ on our
+for compiling MAME on Windows <https://www.mamedev.org/tools/>`_ on our
 web site.
 
 MAME for Windows is built using the MSYS2 environment.  You will need a 64-bit
