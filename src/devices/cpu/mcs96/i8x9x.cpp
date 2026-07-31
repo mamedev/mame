@@ -386,21 +386,25 @@ void i8x9x_device::serial_w(u8 val)
 	check_irq();
 }
 
+// Timer 1 increments once every eight state times, and a state time is three
+// oscillator periods on this family, so the divisor is 8 * 3 = 24.
+static constexpr u32 TIMER_DIVISOR = 24;
+
 u16 i8x9x_device::timer_value(int timer, u64 current_time) const
 {
 	if(timer == 2)
 		current_time -= base_timer2;
-	return current_time >> 3;
+	return u16(current_time / TIMER_DIVISOR);
 }
 
 u64 i8x9x_device::timer_time_until(int timer, u64 current_time, u16 timer_value) const
 {
 	u64 timer_base = timer == 2 ? base_timer2 : 0;
-	u64 delta = (current_time - timer_base) >> 3;
+	u64 delta = (current_time - timer_base) / TIMER_DIVISOR;
 	u32 tdelta = u16(timer_value - delta);
 	if(!tdelta)
 		tdelta = 0x10000;
-	return timer_base + ((delta + tdelta) << 3);
+	return timer_base + ((delta + tdelta) * TIMER_DIVISOR);
 }
 
 void i8x9x_device::timer2_reset(u64 current_time)
