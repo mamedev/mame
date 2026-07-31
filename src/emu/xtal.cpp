@@ -211,7 +211,6 @@ const double XTAL::known_xtals[] = {
 	 11'289'000, // 11.289_MHz_XTAL        Vanguard
 	 11'289'600, // 11.2896_MHz_XTAL       Frantic Fred
 	 11'400'000, // 11.4_MHz_XTAL          HP 9845
-	 11'640'000, // 11.64_MHz_XTAL         RC702 8275 CRTC dot clock (PLL output)
 	 11'668'800, // 11.6688_MHz_XTAL       Gameplan pixel clock
 	 11'730'000, // 11.73_MHz_XTAL         Irem M-11
 	 11'800'000, // 11.8_MHz_XTAL          IBM PC Music Feature Card

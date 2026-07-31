@@ -87,6 +87,13 @@ References:
 
 namespace {
 
+// Background-colour margin (palette pen 0 = dark amber) added around the
+// active i8275 raster on all four sides.  The margin is baked into the
+// screen bitmap via bitmap.fill(0) + coordinate offset in display_pixels,
+// so it is renderer-independent (SDL and BGFX both show the correct colour
+// without relying on .lay artwork).
+static constexpr int CRTC_BORDER = 8;
+
 // RC702 clock tree (see RC702_HARDWARE_TECHNICAL_REFERENCE.md):
 //   * 8 MHz crystal          -> Z80 CPU and the CTC/SIO/PIO + Am9517A DMA all
 //     run at 4 MHz (/2); the uPD765 FDC runs at the full 8 MHz on the 8" drive
@@ -95,13 +102,14 @@ namespace {
 //     74LS393 dividers give /32 = 0.6144 MHz into CTC ch0/ch1, so the maximum
 //     async rate is 614400 / 16 = 38400 baud.
 //   * 11.64 MHz dot clock    -> 8275 CRTC character clock (/7 = 7 px/char).
-//     This is a PLL output (not a crystal): a phase-locked loop regenerates
-//     it locked to the 50 Hz field rate, giving 108 chars x 7 px x 15.4 kHz
-//     (308 lines x 50 Hz) = 11.6424 MHz.
+//     This is a PLL output, not a crystal: a phase-locked loop regenerates it
+//     locked to the 50 Hz field rate, giving 108 chars x 7 px x 15.4 kHz
+//     (308 lines x 50 Hz) = 11.6424 MHz.  So it is a plain derived frequency
+//     here, not an XTAL.
 // The 4 MHz peripheral clock (8 MHz / 2) is the value repeated below.
-static constexpr XTAL MAIN_XTAL = 8_MHz_XTAL;        // CPU + peripherals + FDC
-static constexpr XTAL MEM_CLOCK = 19.6608_MHz_XTAL;  // DRAM clock; baud = /32
-static constexpr XTAL DOT_CLOCK = 11.64_MHz_XTAL;    // 8275 CRTC; char clock = /7
+static constexpr XTAL MAIN_XTAL  = 8_MHz_XTAL;        // CPU + peripherals + FDC
+static constexpr XTAL MEM_CLOCK  = 19.6608_MHz_XTAL;  // DRAM clock; baud = /32
+static constexpr int  DOT_CLOCK  = 11'640'000;        // 8275 PLL dot clock; char clock = /7
 
 class rc702_state : public driver_device
 {
@@ -164,6 +172,7 @@ private:
 	void dack1_w(int state);
 	void dack2_w(int state);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
+	uint32_t screen_update_with_border(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void rc702_palette(palette_device &palette) const;
 	void kbd_put(u8 data);
 	uint8_t kbd_r();
@@ -527,14 +536,23 @@ I8275_DRAW_CHARACTER_MEMBER( rc702_state::display_pixels )
 		gfx ^= 0xff;
 
 	// Highlight not used in RC702, possibly fixed in RC703.
-	// Bits 0-6 are the 7 visible pixels (bit 7 unused in both ROA296 and ROA327 ROMs)
-	bitmap.pix(y, x++) = palette[BIT(gfx, 0) ? 1 : 0];
-	bitmap.pix(y, x++) = palette[BIT(gfx, 1) ? 1 : 0];
-	bitmap.pix(y, x++) = palette[BIT(gfx, 2) ? 1 : 0];
-	bitmap.pix(y, x++) = palette[BIT(gfx, 3) ? 1 : 0];
-	bitmap.pix(y, x++) = palette[BIT(gfx, 4) ? 1 : 0];
-	bitmap.pix(y, x++) = palette[BIT(gfx, 5) ? 1 : 0];
-	bitmap.pix(y, x++) = palette[BIT(gfx, 6) ? 1 : 0];
+	// Bits 0-6 are the 7 visible pixels (bit 7 unused in both ROA296 and ROA327 ROMs).
+	// Offset by CRTC_BORDER so the outer margin stays as palette[0] (background).
+	x += CRTC_BORDER;
+	int const py = y + CRTC_BORDER;
+	bitmap.pix(py, x++) = palette[BIT(gfx, 0) ? 1 : 0];
+	bitmap.pix(py, x++) = palette[BIT(gfx, 1) ? 1 : 0];
+	bitmap.pix(py, x++) = palette[BIT(gfx, 2) ? 1 : 0];
+	bitmap.pix(py, x++) = palette[BIT(gfx, 3) ? 1 : 0];
+	bitmap.pix(py, x++) = palette[BIT(gfx, 4) ? 1 : 0];
+	bitmap.pix(py, x++) = palette[BIT(gfx, 5) ? 1 : 0];
+	bitmap.pix(py, x++) = palette[BIT(gfx, 6) ? 1 : 0];
+}
+
+uint32_t rc702_state::screen_update_with_border(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_palette->palette()->entry_list_raw()[0], cliprect);
+	return m_crtc->screen_update(screen, bitmap, cliprect);
 }
 
 // Baud rate generator.  The 0.6144 MHz CTC clock is derived from the
@@ -686,11 +704,14 @@ void rc702_state::rc700_base(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
-	// 80 chars * 7 px = 560 visible columns (the minimum that shows all 80
-	// chars; 544 clipped the last ~2 chars per row).
-	m_screen->set_size(560, 200+4*8);
-	m_screen->set_visarea(0, 559, 0, 199);
-	m_screen->set_screen_update(m_crtc, FUNC(i8275_device::screen_update));
+	// 80 chars × 7 px = 560 visible columns, 25 rows × 8 lines = 200 visible
+	// lines, plus CRTC_BORDER pixels of background colour on all four sides.
+	// The margin is baked into the bitmap (bitmap.fill + coordinate offset in
+	// display_pixels) rather than .lay artwork, so SDL and BGFX both show the
+	// correct amber background colour without special-casing.
+	m_screen->set_size(560 + 2 * CRTC_BORDER, 200 + 4*8 + 2 * CRTC_BORDER);
+	m_screen->set_visarea(0, 559 + 2 * CRTC_BORDER - 1, 0, 199 + 2 * CRTC_BORDER - 1);
+	m_screen->set_screen_update(FUNC(rc702_state::screen_update_with_border));
 
 	I8275(config, m_crtc, DOT_CLOCK / 7);
 	m_crtc->set_character_width(7);
