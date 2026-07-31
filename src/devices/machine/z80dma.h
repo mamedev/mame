@@ -174,7 +174,7 @@ private:
 
 	int  m_wait;
 	int  m_waits_extra;
-	int  m_busrq;
+	int  m_busrq = CLEAR_LINE;
 	int  m_busrq_ack;
 	bool m_is_pulse;
 	u8   m_latch;

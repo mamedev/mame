@@ -310,6 +310,9 @@ void z80dma_device::update_bao()
 
 void z80dma_device::set_busrq(int state)
 {
+	if (m_busrq == state)
+		return;
+
 	m_busrq = state;
 	m_out_busreq_cb(m_busrq);
 	update_bao();
@@ -921,6 +924,9 @@ void z80dma_device::rdy_w(int state)
  ****************************************************************************/
 void z80dma_device::bai_w(int state)
 {
+	if (m_busrq_ack == state)
+		return;
+
 	m_busrq_ack = state;
 	update_bao();
 
