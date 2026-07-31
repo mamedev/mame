@@ -763,7 +763,7 @@ void mc88100_device::execute(u32 const inst)
 				u32 const data = m_r[S1] + m_r[S2];
 
 				// compute carry out
-				if (carry(m_r[S1], m_r[S2], data))
+				if (data < m_r[S1])
 					m_cr[PSR] |= PSR_C;
 				else
 					m_cr[PSR] &= ~PSR_C;
@@ -776,10 +776,11 @@ void mc88100_device::execute(u32 const inst)
 			break;
 		case 0x318: // addu.cio: unsigned integer add with carry in and out (register)
 			{
-				u32 const data = m_r[S1] + m_r[S2] + bool(m_cr[PSR] & PSR_C);
+				u32 const sum1 = m_r[S1] + m_r[S2];
+				u32 const data = sum1 + bool(m_cr[PSR] & PSR_C);
 
 				// compute carry out
-				if (carry(m_r[S1], m_r[S2], data))
+				if (sum1 < m_r[S1] || data < sum1)
 					m_cr[PSR] |= PSR_C;
 				else
 					m_cr[PSR] &= ~PSR_C;
@@ -795,7 +796,7 @@ void mc88100_device::execute(u32 const inst)
 				u32 const data = m_r[S1] + ~m_r[S2] + 1;
 
 				// compute borrow out
-				if (carry(m_r[S1], ~m_r[S2] + 1, data))
+				if (data < m_r[S1])
 					m_cr[PSR] |= PSR_C;
 				else
 					m_cr[PSR] &= ~PSR_C;
@@ -808,10 +809,11 @@ void mc88100_device::execute(u32 const inst)
 			break;
 		case 0x338: // subu.cio: unsigned integer subtract with borrow in and out (register)
 			{
-				u32 const data = m_r[S1] + ~m_r[S2] + !bool(m_cr[PSR] & PSR_C);
+				u32 const sum1 = m_r[S1] + ~m_r[S2];
+				u32 const data = sum1 + !bool(m_cr[PSR] & PSR_C);
 
 				// compute borrow out
-				if (carry(m_r[S1], ~m_r[S2] + !bool(m_cr[PSR] & PSR_C), data))
+				if (sum1 < m_r[S1] || data < sum1)
 					m_cr[PSR] |= PSR_C;
 				else
 					m_cr[PSR] &= ~PSR_C;
@@ -842,7 +844,8 @@ void mc88100_device::execute(u32 const inst)
 			{
 				u32 const data = m_r[S1] + m_r[S2];
 
-				if (!overflow(m_r[S1], m_r[S2], data))
+				// check overflow
+				if (BIT((m_r[S1] ^ m_r[S2]) | ~(m_r[S1] ^ data), 31))
 					m_r[D] = data;
 				else
 					exception(E_INT_OVERFLOW);
@@ -852,10 +855,11 @@ void mc88100_device::execute(u32 const inst)
 			{
 				u32 const data = m_r[S1] + m_r[S2];
 
-				if (!overflow(m_r[S1], m_r[S2], data))
+				// check overflow
+				if (BIT((m_r[S1] ^ m_r[S2]) | ~(m_r[S1] ^ data), 31))
 				{
 					// compute carry out
-					if (carry(m_r[S1], m_r[S2], data))
+					if (data < m_r[S1])
 						m_cr[PSR] |= PSR_C;
 					else
 						m_cr[PSR] &= ~PSR_C;
@@ -870,7 +874,8 @@ void mc88100_device::execute(u32 const inst)
 			{
 				u32 const data = m_r[S1] + m_r[S2] + bool(m_cr[PSR] & PSR_C);
 
-				if (!overflow(m_r[S1], m_r[S2], data))
+				// check overflow
+				if (BIT((m_r[S1] ^ m_r[S2]) | ~(m_r[S1] ^ data), 31))
 					m_r[D] = data;
 				else
 					exception(E_INT_OVERFLOW);
@@ -878,12 +883,14 @@ void mc88100_device::execute(u32 const inst)
 			break;
 		case 0x398: // add.cio: integer add with carry in and out (register)
 			{
-				u32 const data = m_r[S1] + m_r[S2] + bool(m_cr[PSR] & PSR_C);
+				u32 const sum1 = m_r[S1] + m_r[S2];
+				u32 const data = sum1 + bool(m_cr[PSR] & PSR_C);
 
-				if (!overflow(m_r[S1], m_r[S2], data))
+				// check overflow
+				if (BIT((m_r[S1] ^ m_r[S2]) | ~(m_r[S1] ^ data), 31))
 				{
 					// compute carry out
-					if (carry(m_r[S1], m_r[S2], data))
+					if (sum1 < m_r[S1] || data < sum1)
 						m_cr[PSR] |= PSR_C;
 					else
 						m_cr[PSR] &= ~PSR_C;
@@ -902,7 +909,7 @@ void mc88100_device::execute(u32 const inst)
 				u32 const data = m_r[S1] + ~m_r[S2] + 1;
 
 				// compute borrow out
-				if (carry(m_r[S1], ~m_r[S2] + 1, data))
+				if (data < m_r[S1])
 					m_cr[PSR] |= PSR_C;
 				else
 					m_cr[PSR] &= ~PSR_C;
@@ -915,10 +922,11 @@ void mc88100_device::execute(u32 const inst)
 			break;
 		case 0x3b8: // sub.cio: integer subtract with borrow in and out (register)
 			{
-				u32 const data = m_r[S1] + ~m_r[S2] + !bool(m_cr[PSR] & PSR_C);
+				u32 const sum1 = m_r[S1] + ~m_r[S2];
+				u32 const data = sum1 + !bool(m_cr[PSR] & PSR_C);
 
 				// compute borrow out
-				if (carry(m_r[S1], ~m_r[S2] + !bool(m_cr[PSR] & PSR_C), data))
+				if (sum1 < m_r[S1] || data < sum1)
 					m_cr[PSR] |= PSR_C;
 				else
 					m_cr[PSR] &= ~PSR_C;
@@ -1450,16 +1458,6 @@ u32 mc88100_device::cmp(u32 const src1, u32 const src2) const
 	}
 
 	return result;
-}
-
-bool mc88100_device::carry(u32 const src1, u32 const src2, u32 const dest) const
-{
-	return BIT((src1 & src2) ^ ((src1 ^ src2) & ~dest), 31);
-}
-
-bool mc88100_device::overflow(u32 const src1, u32 const src2, u32 const dest) const
-{
-	return (BIT(src2, 31) == BIT(src1, 31)) && (BIT(dest, 31) != BIT(src2, 31));
 }
 
 enum fcmp_mask : u32

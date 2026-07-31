@@ -37,6 +37,7 @@
 #include "sound/ymopn.h"
 
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 
 #define LOG_MCU (1U << 1)

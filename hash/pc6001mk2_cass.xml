@@ -870,7 +870,7 @@ Eventually requires [tape] load and save
 	<software name="suidokoz" supported="partial">
 		<description>Suidou Kozou</description>
 		<year>1983?</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="usage" value="Mode 5, Page 3, BASIC"/>
 		<info name="developer" value="Gamu"/>
 		<info name="alt_title" value="水道小僧"/>

@@ -472,7 +472,7 @@ void romp_device::execute_run()
 						program_check(PCS_PCK | PCS_PIE);
 					break;
 				case 0xd1: // aei: add extended immediate
-					flags_add(m_gpr[R3], s32(s16(i)) + bool(m_scr[CS] & CS_C));
+					flags_add(m_gpr[R3], s32(s16(i)), bool(m_scr[CS] & CS_C));
 					m_gpr[R2] = m_gpr[R3] + s32(s16(i)) + bool(m_scr[CS] & CS_C);
 					break;
 				case 0xd2: // sfi: subtract from immediate
@@ -972,11 +972,11 @@ void romp_device::execute_run()
 					program_check(PCS_PCK | PCS_PIE);
 				break;
 			case 0xf1: // ae: add extended
-				flags_add(m_gpr[R2], m_gpr[R3] + bool(m_scr[CS] & CS_C));
+				flags_add(m_gpr[R2], m_gpr[R3], bool(m_scr[CS] & CS_C));
 				m_gpr[R2] += m_gpr[R3] + bool(m_scr[CS] & CS_C);
 				break;
 			case 0xf2: // se: subtract extended
-				flags_add(m_gpr[R2], ~m_gpr[R3] + bool(m_scr[CS] & CS_C));
+				flags_add(m_gpr[R2], ~m_gpr[R3], bool(m_scr[CS] & CS_C));
 				m_gpr[R2] += ~m_gpr[R3] + bool(m_scr[CS] & CS_C);
 				break;
 			case 0xf3: // ca16: compute address 16-bit
@@ -1149,9 +1149,10 @@ void romp_device::flags_log(u32 const data)
 			m_scr[CS] |= CS_G;
 }
 
-void romp_device::flags_add(u32 const op1, u32 const op2)
+void romp_device::flags_add(u32 const op1, u32 const op2, bool const carry_in)
 {
-	u32 const result = op1 + op2;
+	u32 const sum1 = op1 + op2;
+	u32 const result = sum1 + carry_in;
 
 	m_scr[CS] &= ~(CS_L | CS_E | CS_G | CS_C | CS_O);
 
@@ -1164,11 +1165,11 @@ void romp_device::flags_add(u32 const op1, u32 const op2)
 			m_scr[CS] |= CS_G;
 
 	// carry
-	if ((BIT(op2, 31) && BIT(op1, 31)) || (!BIT(result, 31) && (BIT(op2, 31) || BIT(op1, 31))))
+	if (sum1 < op1 || result < sum1)
 		m_scr[CS] |= CS_C;
 
 	// overflow
-	if ((BIT(op2, 31) == BIT(op1, 31)) && (BIT(result, 31) != BIT(op2, 31)))
+	if (BIT(~(op1 ^ op2) & (op1 ^ result), 31))
 		m_scr[CS] |= CS_O;
 }
 
@@ -1176,7 +1177,7 @@ void romp_device::flags_sub(u32 const op1, u32 const op2)
 {
 	u32 const result = op1 - op2;
 
-	m_scr[CS] &= ~(CS_L | CS_E | CS_G | CS_O);
+	m_scr[CS] &= ~(CS_L | CS_E | CS_G | CS_C | CS_O);
 
 	if (result == 0)
 		m_scr[CS] |= CS_E;
@@ -1187,13 +1188,11 @@ void romp_device::flags_sub(u32 const op1, u32 const op2)
 			m_scr[CS] |= CS_G;
 
 	// borrow
-	if ((!BIT(op2, 31) && BIT(op1, 31)) || (BIT(result, 31) && (!BIT(op2, 31) || BIT(op1, 31))))
-		m_scr[CS] &= ~CS_C;
-	else
+	if (op1 >= op2)
 		m_scr[CS] |= CS_C;
 
 	// overflow
-	if ((BIT(op2, 31) != BIT(op1, 31)) && (BIT(result, 31) != BIT(op2, 31)))
+	if (BIT((op1 ^ op2) & (op1 ^ result), 31))
 		m_scr[CS] |= CS_O;
 }
 

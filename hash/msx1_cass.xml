@@ -1938,7 +1938,7 @@ license:CC0-1.0
 	<software name="blackbas">
 		<description>The Black Bass (Japan)</description>
 		<year>1986</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R. Requires a Japanese system."/>
 
 		<part name="cass1" interface="msx_cass">

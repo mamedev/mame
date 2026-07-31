@@ -33,6 +33,7 @@ DIP Locations verified for:
 
 #include "emupal.h"
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 #include "tilemap.h"
 

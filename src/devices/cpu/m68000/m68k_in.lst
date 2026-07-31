@@ -4929,7 +4929,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 24fc:5 3:4
 			REG_DA()[(word2 >> 12) & 15] = m_dfc;
 			break;
 		case 0x002:            /* CACR */
-			REG_DA()[(word2 >> 12) & 15] = m_cacr;
+			/* MC68040 reserved bits must read 0 or the Amiga CPU detection fails */
+			REG_DA()[(word2 >> 12) & 15] = m_cacr & M68K_CACR_040_MASK;
 			break;
 		case 0x800:            /* USP */
 			REG_DA()[(word2 >> 12) & 15] = REG_USP();
@@ -5315,12 +5316,8 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 24fc:5 3:4
 			m_dfc = REG_DA()[(word2 >> 12) & 15] & 7;
 			break;
 		case 0x002:            /* CACR */
-			/* 68030 can write all bits except 5-7, 040 can write all */
-			m_cacr = REG_DA()[(word2 >> 12) & 15];
-			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
-				m68ki_ic_clear();
-				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
-			}
+			/* MC68040 reserved bits must read 0 or the Amiga CPU detection fails */
+			m_cacr = REG_DA()[(word2 >> 12) & 15] & M68K_CACR_040_MASK;
 			break;
 		case 0x800:            /* USP */
 			REG_USP() = REG_DA()[(word2 >> 12) & 15];
@@ -8463,4 +8460,3 @@ f400 ff20 cinv     l .          4:16
 
 f420 ff20 cpush    l .          4:16
 	//logerror("%s at %08x: called unimplemented instruction %04x (cpush)\n", tag(), m_ppc, m_ir);
-

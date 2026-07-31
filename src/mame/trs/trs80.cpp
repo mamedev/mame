@@ -76,7 +76,8 @@ SYSTEM commands:
 
 About the system80 - Asian version of trs80l2, known as EACA Video Genie. In USA called
     PMC-80, in South Africa called TRZ-80, and Dick Smith imported them to Australia and
-    New Zealand as the System 80. The Hungarian version is the ht1080z.
+    New Zealand as the System 80. Dismac Microcomputadores of Brazil sold an identical
+    system as the D8001.
     Inbuilt extensions:
     - SYSTEM then /12288 = enable extended keyboard and flashing block cursor
     - SYSTEM then /12299 = turn cursor back to normal

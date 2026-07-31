@@ -151,6 +151,9 @@ void elzet80_state::mem_map(address_map &map)
 
 void elzet80_state::io_map(address_map &map)
 {
+	map.global_mask(0xff);
+	map.unmap_value_high();
+
 	map(0x00, 0x03).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x04, 0x07).rw(m_dart, FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
 
@@ -168,9 +171,6 @@ void elzet80_state::io_map(address_map &map)
 	map(0x60, 0x63).rw(m_fdma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0x68, 0x6b).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 	map(0x6c, 0x6f).rw(m_fpio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-
-	map.global_mask(0xff);
-	map.unmap_value_high();
 }
 
 static INPUT_PORTS_START( elzet80 )

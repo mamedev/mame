@@ -91881,7 +91881,7 @@ license:CC0-1.0
 	<software name="flstory_msx">
 		<description>The FairyLand Story (MSX)</description>
 		<year>1987</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="cores" value="AY-3-8910A"/>
 		<part name="001" interface="vgm_quik">
 			<feature name="part_id" value="01 round start.vgz" />
@@ -129291,7 +129291,7 @@ license:CC0-1.0
 	<software name="overhorz_nes">
 		<description>Over Horizon (NES)</description>
 		<year>1991</year>
-		<publisher>Hot-B (J) / Takara (E)</publisher>
+		<publisher>Hot-B Co. (J) / Takara (E)</publisher>
 		<info name="cores" value="NES APU (RP2A03)"/>
 		<part name="001" interface="vgm_quik">
 			<feature name="part_id" value="01 title.vgz" />
@@ -280769,7 +280769,7 @@ license:CC0-1.0
 	<software name="schmeisr">
 		<description>Schmeiser Robo (Arcade)</description>
 		<year>1993</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="cores" value="YM2151, OKIM6295"/>
 		<part name="001" interface="vgm_quik">
 			<feature name="part_id" value="01 credit.vgz" />
@@ -317547,7 +317547,7 @@ license:CC0-1.0
 	<software name="bluealma_md">
 		<description>Blue Almanac (GEN/MD)</description>
 		<year>1991</year>
-		<publisher>Kodansha / Hot-B</publisher>
+		<publisher>Kodansha / Hot-B Co.</publisher>
 		<info name="cores" value="YM2612"/>
 		<part name="001" interface="vgm_quik">
 			<feature name="part_id" value="01 - prologue.vgz" />
@@ -336518,7 +336518,7 @@ license:CC0-1.0
 	<software name="insectx_md">
 		<description>Insector X (GEN/MD)</description>
 		<year>1990</year>
-		<publisher>Taito / Hot-B</publisher>
+		<publisher>Taito / Hot-B Co.</publisher>
 		<info name="cores" value="YM2612"/>
 		<part name="001" interface="vgm_quik">
 			<feature name="part_id" value="01 - jack'n (title theme).vgz" />
@@ -338034,7 +338034,7 @@ license:CC0-1.0
 	<software name="kageki_md">
 		<description>Ka-Ge-Ki - Fists of Steel (GEN/MD)</description>
 		<year>1991</year>
-		<publisher>Kaneko / Hot-B</publisher>
+		<publisher>Kaneko / Hot-B Co.</publisher>
 		<info name="cores" value="YM2612"/>
 		<part name="001" interface="vgm_quik">
 			<feature name="part_id" value="01 - title theme.vgz" />
@@ -338730,7 +338730,7 @@ license:CC0-1.0
 	<software name="kingsal_md">
 		<description>King Salmon (GEN/MD)</description>
 		<year>1993</year>
-		<publisher>Hot-B / Vic Tokai</publisher>
+		<publisher>Hot-B Co. / Vic Tokai</publisher>
 		<info name="cores" value="SN76496, YM2612"/>
 		<part name="001" interface="vgm_quik">
 			<feature name="part_id" value="01 - title theme.vgz" />
@@ -366289,7 +366289,7 @@ license:CC0-1.0
 	<software name="steelemp_md">
 		<description>Steel Empire (Koutetsu Teikoku - Steel Empire, Empire of Steel) (GEN/MD)</description>
 		<year>1992</year>
-		<publisher>Hot-B / Flying Edge</publisher>
+		<publisher>Hot-B Co. / Flying Edge</publisher>
 		<info name="cores" value="SN76496, YM2612"/>
 		<part name="001" interface="vgm_quik">
 			<feature name="part_id" value="01 - title theme.vgz" />

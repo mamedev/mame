@@ -801,6 +801,17 @@ ROM_START( sagafoxf80 )
 	ROM_LOAD("oam120.bin", 0x0000, 0x0800, CRC(880a8e36) SHA1(c6bee88a294090f039161fe20ce36a4ada3b10d3))
 ROM_END
 
+ROM_START( sist600 )
+	ROM_REGION( 0x0800, "subcpu", 0 )
+	ROM_LOAD("s600bios.bin", 0x0000, 0x0800, CRC(d14bff15) SHA1(2d399547bca7efef003e86f446c5d24959c309e6))
+
+	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_LOAD("crt8002-003.bin", 0x0000, 0x0800, BAD_DUMP CRC(5181d324) SHA1(7aa2d084947bcc0e3d31568f4de84c23b84abfff)) // unclear what CG is used here
+
+	ROM_REGION( 0x0800, "keyboard", 0 )
+	ROM_LOAD("s600key.bin", 0x0000, 0x0800, CRC(2f4b386f) SHA1(a7d47736d09a457218dbe522178a352002038509))
+ROM_END
+
 } // anonymous namespace
 
 
@@ -808,3 +819,4 @@ ROM_END
 COMP( 1981, sbrain,     0,      0,     sbrain,   sbrain, sbrain_state, empty_init, "Intertec Data Systems",               "SuperBrain Video Computer System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 COMP( 1980, sagafox,    sbrain, 0,     sagafox,  sbrain, sbrain_state, empty_init, "Sistemi Avanzati Gestione Aziendale", "Saga Fox",                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 COMP( 1980, sagafoxf80, sbrain, 0,     sagafox,  sbrain, sbrain_state, empty_init, "Sistemi Avanzati Gestione Aziendale", "Saga Fox/F80",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, sist600,    sbrain, 0,     sbrain,   sbrain, sbrain_state, empty_init, u8"Prológica",                         "Sistema 600",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

@@ -16,6 +16,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "screen.h"
+#include "sound.h"
 
 #define LOG_PC3092 (1U << 1)
 #define LOG_PC3259 (1U << 2)

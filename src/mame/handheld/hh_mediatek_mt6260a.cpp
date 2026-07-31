@@ -236,6 +236,6 @@ CONS( 2022, atw_lola, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "A
 CONS( 2022, atw_pepa, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Peppa Pig (Accutime, PPG4086PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // red PCB
-CONS( 2022, atw_swst, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Star Wars: Stormtropper (Accutime, STM4353PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2022, atw_swst, 0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Star Wars: Stormtrooper (Accutime, STM4353PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2022, atw_swy,  0, 0, atw, atw, accutime_smart_watch_state, empty_init, "Accutime", "Kids Smart Watch: Star Wars: The Mandalorian (Accutime, MNL4023PH)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 

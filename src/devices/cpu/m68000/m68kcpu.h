@@ -101,6 +101,10 @@ static constexpr int M68K_CACR_CEI = 0x04; // Clear Entry in Instruction Cache
 static constexpr int M68K_CACR_FI  = 0x02; // Freeze Instruction Cache
 static constexpr int M68K_CACR_EI  = 0x01; // Enable Instruction Cache
 
+static constexpr u32 M68K_CACR_040_DE   = 0x80000000; // Enable Data Cache
+static constexpr u32 M68K_CACR_040_IE   = 0x00008000; // Enable Instruction Cache
+static constexpr u32 M68K_CACR_040_MASK = M68K_CACR_040_DE | M68K_CACR_040_IE;
+
 /* ======================================================================== */
 /* ================================ MACROS ================================ */
 /* ======================================================================== */

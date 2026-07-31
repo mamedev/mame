@@ -13,12 +13,10 @@
       hardware differences)
     - Holding the left mouse button disables autoboot
     - Holding the right mouse button inverts the cache jumper setting
+    - Verions 2.2 and older have issues with Kickstart 3.1 (hang on reset).
+      You can enable the commented ROMX_FILL to make 2.2 work better.
 
     TODO:
-    - The dumped firmware versions have issues with Kickstart 3.1: Memory
-      gets overwritten it relies on for a warm boot, so it hangs on reset.
-      You can use KICkSTART31_PATCH to change the allocation and make it
-      work.
     - GAME jumper (disables card)
     - 6 MB BASE 20/40 jumper
 
@@ -38,8 +36,6 @@
 #define VERBOSE (LOG_GENERAL)
 
 #include "logmacro.h"
-
-//#define KICkSTART31_PATCH 1
 
 
 namespace bus::amiga::zorro {
@@ -84,7 +80,6 @@ private:
 	uint8_t m_board_address = 0;
 	bool m_board_configured = false;
 
-	uint8_t m_ncr_irq = 0;
 	uint8_t m_ncr_drq = 0;
 
 	uint8_t m_holding_remaining = 0;
@@ -230,7 +225,6 @@ void adscsi2000_device::busrst_w(int state)
 	m_drq_completed = false;
 
 	m_ncr->reset();
-	m_ncr_irq = 0;
 	m_ncr_drq = 0;
 
 	m_zorro->xrdy_w(1);
@@ -563,7 +557,7 @@ void adscsi2000_device::ncr_dma_w(offs_t offset, uint16_t data, uint16_t mem_mas
 
 uint8_t adscsi2000_device::scsi_status_r()
 {
-	// 7-------  ncr irq
+	// 7-------  pseudo-dma ready (latch empty)
 	// -6------  ncr drq
 	// --5-----  spin-up delay (0 = 20s delay, 1 = 8s delay)
 	// ---4----  caching jumper
@@ -576,7 +570,7 @@ uint8_t adscsi2000_device::scsi_status_r()
 	data |= ((m_jumpers->read() & 0x10) ? 1 : 0) << 4;
 	data |= ((m_jumpers->read() & 0x40) ? 1 : 0) << 5;
 	data |= (m_ncr_drq ? 1 : 0) << 6;
-	data |= (m_ncr_irq ? 0 : 1) << 7;
+	data |= ((m_holding_remaining == 0) ? 1 : 0) << 7;
 
 	return data;
 }
@@ -586,10 +580,9 @@ void adscsi2000_device::ncr_irq_w(int state)
 	if (state)
 	{
 		m_dma_in_progress = false;
+		m_holding_remaining = 0;
 		m_zorro->xrdy_w(1); // safe-guard, unusual dma could leave the cpu suspended
 	}
-
-	m_ncr_irq = state;
 }
 
 void adscsi2000_device::ncr_drq_w(int state)
@@ -639,7 +632,6 @@ void adscsi2000_device::device_start()
 	// register for save states
 	save_item(NAME(m_board_address));
 	save_item(NAME(m_board_configured));
-	save_item(NAME(m_ncr_irq));
 	save_item(NAME(m_ncr_drq));
 	save_item(NAME(m_holding_remaining));
 	save_item(NAME(m_holding));
@@ -692,18 +684,20 @@ void adscsi2000_device::device_add_mconfig(machine_config &config)
 
 ROM_START( adscsi )
 	ROM_REGION(0x8000, "rom", 0)
-	ROM_DEFAULT_BIOS("22")
-	ROM_SYSTEM_BIOS(0, "16",  "AdSCSI 1.6")
-	ROMX_LOAD("adscsi_16.bin",  0x0000, 0x8000, CRC(7dba3e1f) SHA1(1e05f284d59a1e5d4e4de44e6f075175625cd6c0), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "201", "AdSCSI 2.01")
-	ROMX_LOAD("adscsi_201.bin", 0x0000, 0x8000, CRC(0860a46d) SHA1(f6bd052006d504494efd48dae6a58d7b774c9eef), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(2, "21",  "AdSCSI 2.1") // is this "AdSCSI 2.10" from photos?
-	ROMX_LOAD("adscsi_21.bin",  0x0000, 0x8000, CRC(3184ec04) SHA1(f8ab84b04853404f840085ce5fe992e35dc443da), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(3, "22",  "AdSCSI 2.2")
-	ROMX_LOAD("adscsi_22.bin",  0x0000, 0x8000, CRC(6881cd2f) SHA1(482fab24df39446ba8662c7e67f11854895a46d9), ROM_BIOS(3))
-#ifdef KICkSTART31_PATCH
-	ROMX_FILL(0x7065, 1, 0x05, ROM_BIOS(3)) // use MEMF_REVERSE for allocating memory
-#endif
+	ROM_DEFAULT_BIOS("35r1")
+	ROM_SYSTEM_BIOS(0, "16",   "AdSCSI 1.6") // icddisk.device V1.0
+	ROMX_LOAD("adscsi_16.u28",   0x0000, 0x8000, CRC(7dba3e1f) SHA1(1e05f284d59a1e5d4e4de44e6f075175625cd6c0), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "201",  "AdSCSI 2.01") // icddisk.device V32.1
+	ROMX_LOAD("adscsi_201.u28",  0x0000, 0x8000, CRC(0860a46d) SHA1(f6bd052006d504494efd48dae6a58d7b774c9eef), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "21",   "AdSCSI 2.1") // icddisk.device V33.0 (is this "AdSCSI 2.10" from photos?)
+	ROMX_LOAD("adscsi_21.u28",   0x0000, 0x8000, CRC(3184ec04) SHA1(f8ab84b04853404f840085ce5fe992e35dc443da), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "22",   "AdSCSI 2.2") // icddisk.device V34.0
+	ROMX_LOAD("adscsi_22.u28",   0x0000, 0x8000, CRC(6881cd2f) SHA1(482fab24df39446ba8662c7e67f11854895a46d9), ROM_BIOS(3))
+	// ROMX_FILL(0x7065, 1, 0x05, ROM_BIOS(3)) // use MEMF_REVERSE for allocating memory
+	ROM_SYSTEM_BIOS(4, "35r1", "AdSCSI 3.5r1") // icddisk.device V53.1
+	ROMX_LOAD("adscsi_35r1.u28", 0x0000, 0x8000, CRC(378a7d85) SHA1(6a78364ebf14e735a150ba6890a617a2b72f3f42), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(5, "421", "AdSCSI 4.21") // 1993
+	ROMX_LOAD("adscsi_421.u28",  0x0000, 0x8000, NO_DUMP, ROM_BIOS(5))
 ROM_END
 
 const tiny_rom_entry *adscsi2000_device::device_rom_region() const

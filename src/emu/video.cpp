@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "video.h"
 
 #include "crsshair.h"
 #include "debugger.h"

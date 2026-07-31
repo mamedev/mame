@@ -262,4 +262,49 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="ratfr" supported="no">
+		<description>Ratatouille (France)</description>
+		<year>2007</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12687"/>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<feature name="pcb" value="57000+003+7011"/>
+			<feature name="pcb_rev" value="REV:00"/>
+			<feature name="u1" value="Matronix 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-12687 - Ratatouille (France).bin" size="0x200000" crc="1b7e2854" sha1="3ac217e514ad3df79c42ffad5bc85d723e716cdb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="royaume" supported="no">
+		<description>Le royaume des nombres enchantes (France)</description>
+		<year>2005</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12271"/>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<feature name="pcb" value="57000+003+7211"/>
+			<feature name="pcb_rev" value="REV:00"/>
+			<feature name="u1" value="OKi 16M(F)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-12271 - Le royaume des nombres enchantes (France).bin" size="0x200000" crc="7036402b" sha1="5acc930b97af7b7a0f2a0c1f39eb1d83badd33ed" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dispri2" supported="no">
+		<description>Disney Princesse -  Deux histoires de princesses (France)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10340"/>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<feature name="pcb" value="57000+003+7011"/>
+			<feature name="pcb_rev" value="REV:00"/>
+			<feature name="u1" value="Matronix 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="UBL 500-10340 - Deux histoires de princesses (France).bin" size="0x200000" crc="e381cc05" sha1="067ba0b584ca62eafa106d87950cdc887fa14d8a" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

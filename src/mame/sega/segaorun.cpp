@@ -297,6 +297,7 @@ Notes:
 #include "sound/ymopm.h"
 
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 
 #include "outrun.lh"

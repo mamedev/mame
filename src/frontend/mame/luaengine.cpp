@@ -28,8 +28,10 @@
 #include "natkeyboard.h"
 #include "screen.h"
 #include "softlist.h"
+#include "sound.h"
 #include "speaker.h"
 #include "uiinput.h"
+#include "video.h"
 
 #include "corestr.h"
 

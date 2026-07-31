@@ -2371,7 +2371,7 @@ license:CC0-1.0
 	<software name="blackbas">
 		<description>The Black Bass - Lure Fishing (USA)</description>
 		<year>1994</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="serial" value="DMG-HP-USA" />
 		<info name="alt_title" value="Black Bass - Lure Fishing (Box)" />
 		<part name="cart" interface="gameboy_cart">
@@ -8101,7 +8101,7 @@ license:CC0-1.0
 	<software name="ginga">
 		<description>Ginga - Card &amp; Puzzle Collection (Japan)</description>
 		<year>1990</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="serial" value="DMG-GGA" />
 		<info name="release" value="19901214" />
 		<info name="alt_title" value="カード&amp;パズル コレクション 銀河" />
@@ -9809,7 +9809,7 @@ license:CC0-1.0
 	<software name="hyperbb" cloneof="blackbas">
 		<description>Hyper Black Bass (Japan)</description>
 		<year>1992</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="serial" value="DMG-HPJ" />
 		<info name="release" value="19920828" />
 		<info name="alt_title" value="ハイパーブラックバス" />
@@ -17499,7 +17499,7 @@ license:CC0-1.0
 	<software name="palamedsj" cloneof="palameds">
 		<description>Palamedes (Japan)</description>
 		<year>1990</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="serial" value="DMG-PXA" />
 		<info name="release" value="19901012" />
 		<info name="alt_title" value="パラメデス" />
@@ -23246,7 +23246,7 @@ license:CC0-1.0
 	<software name="sblkbass">
 		<description>Super Black Bass (USA)</description>
 		<year>1998</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="serial" value="DMG-A2BE-USA" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
@@ -26990,7 +26990,7 @@ license:CC0-1.0
 	<software name="wwfsstarj" cloneof="wwfsstar">
 		<description>WWF Superstars (Japan)</description>
 		<year>1992</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="serial" value="DMG-LWJ" />
 		<info name="release" value="19920214" />
 		<info name="alt_title" value="WWFスーパースターズ" />

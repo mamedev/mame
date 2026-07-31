@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "machine/keyboard.h"
+#include "cpu/mcs48/mcs48.h"
 
 
 /***************************************************************************
@@ -29,52 +29,42 @@ INPUT_PORTS_EXTERN( grid_keyboard );
 ***************************************************************************/
 
 
-class grid_keyboard_device : public device_t, protected device_matrix_keyboard_interface<4U>
+class grid_keyboard_device : public device_t
 {
 public:
-	typedef device_delegate<void (u16 character)> output_delegate;
-
 	grid_keyboard_device(
 			const machine_config &mconfig,
 			const char *tag,
 			device_t *owner,
 			u32 clock = 0);
 
-	template <typename... T>
-	void set_keyboard_callback(T &&... args)
-	{
-		m_keyboard_cb.set(std::forward<T>(args)...);
-	}
+	auto irq_callback() { return m_irq_cb.bind(); }
+	auto dma_callback() { return m_dma_cb.bind(); }
+	auto nmi_callback() { return m_nmi_cb.bind(); }
+
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 protected:
-	grid_keyboard_device(
-			const machine_config &mconfig,
-			device_type type,
-			char const *tag,
-			device_t *owner,
-			u32 clock);
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-	virtual void key_make(u8 row, u8 column) override;
-	virtual void key_repeat(u8 row, u8 column) override;
-	virtual void send_key(u16 code);
-	virtual bool translate(u8 code, u16 &translated) const;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-	required_ioport m_config;
+	void p2_w(u8 data);
+	u8 p1_r();
+	int t0_r();
+	int t1_r();
+
+	required_device<i8741a_device> m_mcu;
+	required_ioport_array<8> m_columns;
 	required_ioport m_modifiers;
 
 private:
-	virtual void will_scan_row(u8 row) override;
-
-	void typematic();
-	void send_translated(u8 code);
-	attotime typematic_delay() const;
-	attotime typematic_period() const;
-
-	u16             m_last_modifiers;
-	output_delegate m_keyboard_cb;
+	devcb_write_line m_irq_cb;
+	devcb_write_line m_dma_cb;
+	devcb_write_line m_nmi_cb;
 };
 
 #endif // MAME_GRIDCOMP_GRIDKEYB_H

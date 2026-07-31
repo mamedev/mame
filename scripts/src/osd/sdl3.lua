@@ -109,14 +109,12 @@ end
 
 
 function sdlconfigcmd()
-	if _OPTIONS["targetos"]=="asmjs" then
-		return "sdl3-config"
-	elseif _OPTIONS["SDL_PKGCONFIG_PATH"] then
+	if _OPTIONS["SDL_PKGCONFIG_PATH"] then
 		return path.join(_OPTIONS["SDL_PKGCONFIG_PATH"],"pkg-config") .. " sdl3"
 	elseif not _OPTIONS["SDL_INSTALL_ROOT"] then
 		return pkgconfigcmd() .. " sdl3"
 	else
-		return path.join(_OPTIONS["SDL_INSTALL_ROOT"],"bin","sdl3") .. "-config"
+		return "PKG_CONFIG_LIBDIR=" .. path.join(_OPTIONS["SDL_INSTALL_ROOT"],"lib","pkgconfig") .. " " .. pkgconfigcmd() .. " sdl3"
 	end
 end
 
@@ -355,6 +353,7 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "3rdparty",
 		MAME_DIR .. "src/osd/sdl3",
 	}
+	addincludesfromstring(backtick(sdlconfigcmd() .. " --cflags"))
 
 	if _OPTIONS["targetos"]=="macosx" then
 		files {
@@ -433,6 +432,7 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "src/osd/sdl3",
 	}
+	addincludesfromstring(backtick(sdlconfigcmd() .. " --cflags"))
 
 	files {
 		MAME_DIR .. "src/osd/osdcore.cpp",

@@ -44,6 +44,7 @@ Reverse-engineered schematics: https://github.com/jotego/jtbin/blob/master/sch/x
 
 #include "emupal.h"
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 
 #include "layout/generic.h"

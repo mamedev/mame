@@ -87,10 +87,6 @@
 
 // video-related
 #include "drawgfx.h"
-#include "video.h"
-
-// sound-related
-#include "sound.h"
 
 // generic helpers
 #include "devcb.h"

@@ -30,7 +30,7 @@ public:
 	void dma_w(u8 val);
 
 protected:
-	ncr5380_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, bool has_lbs = false);
+	ncr5380_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, bool has_lbs);
 
 	// device_t overrides
 	virtual void device_start() override ATTR_COLD;

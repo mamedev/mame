@@ -23,6 +23,7 @@ protected:
 private:
 	sound_stream *m_stream;
 	float m_gain[2];
+	u8 m_volume[2];
 	float m_atten_table[256];
 };
 

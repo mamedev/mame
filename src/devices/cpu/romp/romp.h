@@ -41,7 +41,7 @@ protected:
 
 private:
 	void flags_log(u32 const op1);
-	void flags_add(u32 const op1, u32 const op2);
+	void flags_add(u32 const op1, u32 const op2, bool const carry_in = false);
 	void flags_sub(u32 const op1, u32 const op2);
 
 	void set_scr(unsigned scr, u32 data);

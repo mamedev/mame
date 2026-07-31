@@ -708,6 +708,13 @@ template<int N>
 void opwolf_state::adpcm_w(offs_t offset, uint8_t data)
 {
 	m_adpcm_regs[N][offset] = data;
+	if (offset == 0x05)
+	{
+		if (N)
+			m_tc0060dca[0]->volume2_w(data);
+		else
+			m_tc0060dca[0]->volume1_w(data);
+	}
 
 	if (offset == 0x04) // trigger?
 	{
@@ -716,11 +723,6 @@ void opwolf_state::adpcm_w(offs_t offset, uint8_t data)
 		m_adpcm_pos[N] = start << 4;
 		m_adpcm_end[N] = end << 4;
 		m_msm[N]->reset_w(0);
-
-		if (N)
-			m_tc0060dca[0]->volume2_w(m_adpcm_regs[N][5]);
-		else
-			m_tc0060dca[0]->volume1_w(m_adpcm_regs[N][5]);
 
 		//logerror("TRIGGER MSM%d\n", N + 1);
 	}
@@ -1136,5 +1138,5 @@ GAME( 1987, opwolfa,  opwolf,   opwolf,   opwolf,  opwolf_state,  init_opwolf,  
 GAME( 1987, opwolfj,  opwolf,   opwolf,   opwolfu, opwolf_state,  init_opwolf,   ROT0, "Taito",          "Operation Wolf (Japan, rev 2)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, opwolfjsc,opwolf,   opwolf,   opwolfu, opwolf_state,  init_opwolf,   ROT0, "Taito",          "Operation Wolf (Japan, SC)",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, opwolfu,  opwolf,   opwolf,   opwolfu, opwolf_state,  init_opwolf,   ROT0, "Taito America",  "Operation Wolf (US, rev 2)",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfb,  opwolf,   opwolfb,  opwolfb, opwolf_state,  init_opwolfb,  ROT0, "bootleg (Bear)", "Operation Bear (bootleg of Operation Wolf)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfb,  opwolf,   opwolfb,  opwolfb, opwolf_state,  init_opwolfb,  ROT0, "bootleg (Bear Corporation)", "Operation Bear (bootleg of Operation Wolf)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, opwolfp,  opwolf,   opwolfp,  opwolfp, opwolf_state,  init_opwolfp,  ROT0, "Taito",          "Operation Wolf (Japan, prototype)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // unprotected

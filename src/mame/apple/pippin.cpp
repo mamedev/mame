@@ -3,7 +3,7 @@
 /***************************************************************************
 
   pippin.cpp: Apple/Bandai Pippin
-  Preliminary driver by R. Belmont (based on pippin.c skeleton by Angelo Salese)
+  Driver by R. Belmont (based on pippin.c skeleton by Angelo Salese)
   Big thanks to the DingusPPC team
 
   Apple ASICs identified:
@@ -19,20 +19,18 @@
   -----------
   Z8530 SCC
   CS4217 audio DAC
-  Bt856 composite video encoder
+  Bt856 composite video encoder (I2C controlled)
 
-  00000000 : RAM
-  F0000000 : 1 MB video RAM (mirrors every 2 MB)
-  F0800000 : Taos (video) registers
-  F1000000 : Palette for 256 color mode
-  F3000000 : Grand Central I/O controller for next 128K
+  TODO:
+    * AppleJack controllers (needs bus/adb)
 
 ****************************************************************************/
 
 #include "emu.h"
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/devices.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/mn1880/mn1880.h"
-#include "imagedev/cdromimg.h"
 #include "machine/input_merger.h"
 #include "machine/ram.h"
 #include "sound/cdda.h"
@@ -45,6 +43,7 @@
 #include "cuda.h"
 #include "heathrow.h"
 #include "macadb.h"
+#include "mesh.h"
 #include "taos.h"
 
 #include "softlist.h"
@@ -59,6 +58,8 @@ public:
 	required_device<ppc_device> m_maincpu;
 	required_device<aspen_host_device> m_aspen;
 	required_device<grandcentral_device> m_grandcentral;
+	required_device<nscsi_bus_device> m_scsibus;
+	required_device<mesh_device> m_mesh;
 	required_device<athensprime_device> m_athensprime;
 	required_device<cuda_device> m_cuda;
 	required_device<taos_device> m_taos;
@@ -72,16 +73,8 @@ private:
 
 	void cuda_reset_w(int state);
 
-	u8 mesh_r(offs_t offset);
-	void mesh_w(offs_t offset, u8 data);
-	void mesh_sequence(u8 cmd);
-
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-
-	u16 m_mesh_bus_stat;
-	u8 m_mesh_seq, m_mesh_int_stat, m_mesh_int_mask, m_mesh_exception, m_mesh_src_id;
-	u8 m_mesh_dst_id, m_mesh_sync;
 };
 
 pippin_state::pippin_state(const machine_config &mconfig, device_type type, const char *tag) :
@@ -89,35 +82,49 @@ pippin_state::pippin_state(const machine_config &mconfig, device_type type, cons
 	m_maincpu(*this, "maincpu"),
 	m_aspen(*this, "pci:00.0"),
 	m_grandcentral(*this, "pci:10.0"),
+	m_scsibus(*this, "scsi"),
+	m_mesh(*this, "mesh"),
 	m_athensprime(*this, "athensprime"),
 	m_cuda(*this, "cuda"),
 	m_taos(*this, "taos"),
 	m_macadb(*this, "macadb"),
-	m_ram(*this, RAM_TAG),
-	m_mesh_bus_stat(0),
-	m_mesh_seq(0),
-	m_mesh_int_stat(0),
-	m_mesh_int_mask(0),
-	m_mesh_exception(0),
-	m_mesh_src_id(7),
-	m_mesh_dst_id(0),
-	m_mesh_sync(0)
+	m_ram(*this, RAM_TAG)
 {
 }
 
 void pippin_state::machine_start()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	u8 *const bank0 = reinterpret_cast<u8 *>(memshare("bank0_ram")->ptr());
-	u8 *const bank1 = reinterpret_cast<u8 *>(memshare("bank1_ram")->ptr());
+	u8 *const bank0 = m_ram->pointer();
+	u8 *const bank1 = m_ram->pointer() + 0x400000;
 
 	// The firmware does some really strange checks for mirroring in the memory sizing routine
+	space.install_ram(0x0000'0000, 0x003f'ffff, bank0);
 	space.install_ram(0x00c0'1000, 0x00c0'1FFF, bank0 + 0x200);
 	space.install_ram(0x00c0'0000, 0x00c0'0FFF, bank0 + 0x200);
 	space.install_ram(0x0040'0000, 0x0040'0FFF, bank0 + 0x200);
+	space.install_ram(0x0100'0000, 0x010f'ffff, bank1);
 	space.install_ram(0x01c0'1000, 0x01c0'1FFF, bank1);
 	space.install_ram(0x01c0'0000, 0x01c0'0FFF, bank1);
 	space.install_ram(0x0140'0000, 0x0140'0FFF, bank1);
+
+	if (m_ram->size() > 0x500000)
+	{
+		u8 *exp = m_ram->pointer() + 0x500000;
+
+		space.install_ram(0x0200'0000, 0x027f'ffff, exp);
+		space.install_ram(0x02c0'1000, 0x02c0'1FFF, exp + 0x600);
+		space.install_ram(0x02c0'0000, 0x02c0'0FFF, exp + 0x600);
+
+		if (m_ram->size() > 0xd00000)
+		{
+			exp += 0x800000;
+
+			space.install_ram(0x0300'0000, 0x037f'ffff, exp);
+			space.install_ram(0x03c0'1000, 0x03c0'1FFF, exp + 0x600);
+			space.install_ram(0x03c0'0000, 0x03c0'0FFF, exp + 0x600);
+		}
+	}
 }
 
 void pippin_state::machine_reset()
@@ -128,8 +135,7 @@ void pippin_state::machine_reset()
 
 void pippin_state::pippin_map(address_map &map)
 {
-	map(0x0000'0000, 0x003f'ffff).ram().share("bank0_ram");
-	map(0x0100'0000, 0x010f'ffff).ram().share("bank1_ram");
+	// 40000000 = flash ROM (type?)
 
 	map(0xf000'0000, 0xf100'ffff).m(m_taos, FUNC(taos_device::map));
 
@@ -140,159 +146,6 @@ void pippin_state::cuda_reset_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
-}
-
-// MESH SCSI slop-stub that's just good enough to get Pippin to show video.
-// For entertainment purposes only.  Real nscsi device is coming completely separately.
-namespace
-{
-	enum mesh_reg : u8
-	{
-		MESH_SEQUENCE = 0x3,
-		MESH_BUSSTATUS0 = 0x4,
-		MESH_BUSSTATUS1 = 0x5,
-		MESH_EXCEPTION = 0x7,
-		MESH_ERROR = 0x8,
-		MESH_INTMASK = 0x9,
-		MESH_INTERRUPT = 0xa,
-		MESH_SOURCEID = 0xb,
-		MESH_DESTID = 0xc,
-		MESH_SYNCPARMS = 0xd,
-		MESH_MESHID = 0xe
-	};
-
-	enum mesh_seqcmd : u8
-	{
-		SEQ_ARBITRATE = 0x1,
-		SEQ_SELECT = 0x2,
-		SEQ_BUSFREE = 0x9,
-		SEQ_ENARESEL = 0xc,
-		SEQ_DISRESEL = 0xd,
-		SEQ_RESETMESH = 0xe,
-		SEQ_FLUSHFIFO = 0xf
-	};
-
-	enum mesh_int : u8
-	{
-		MESH_INT_CMD_DONE = 1,
-		MESH_INT_EXCEPTION = 2,
-		MESH_INT_ERROR = 4
-	};
-	enum mesh_exc : u8
-	{
-		MESH_EXC_SEL_TIMEOUT = 1,
-		MESH_EXC_PHASE_MM = 2,
-		MESH_EXC_ARB_LOST = 4
-	};
-
-	static constexpr u16 SCSI_BSY = 1 << 14;
-}
-
-u8 pippin_state::mesh_r(offs_t offset)
-{
-	offset >>= 4;
-	switch (offset)
-	{
-	case MESH_SEQUENCE:
-		return m_mesh_seq;
-	case MESH_BUSSTATUS0:
-		return m_mesh_bus_stat & 0xff;
-	case MESH_BUSSTATUS1:
-		return (m_mesh_bus_stat >> 8) & 0xe0;
-	case MESH_EXCEPTION:
-		return m_mesh_exception;
-	case MESH_ERROR:
-		return 0;
-	case MESH_INTMASK:
-		return m_mesh_int_mask;
-	case MESH_INTERRUPT:
-		return m_mesh_int_stat;
-	case MESH_SOURCEID:
-		return m_mesh_src_id;
-	case MESH_DESTID:
-		return m_mesh_dst_id;
-	case MESH_SYNCPARMS:
-		return m_mesh_sync;
-	case MESH_MESHID:
-		return 0xe2;
-	}
-	return 0;
-}
-
-void pippin_state::mesh_w(offs_t offset, u8 data)
-{
-	offset >>= 4;
-	switch (offset)
-	{
-	case MESH_SEQUENCE:
-		mesh_sequence(data);
-		break;
-	case MESH_BUSSTATUS0:
-		m_mesh_bus_stat = (m_mesh_bus_stat & 0xff00) | data;
-		break;
-	case MESH_BUSSTATUS1:
-		m_mesh_bus_stat = (m_mesh_bus_stat & 0x00ff) | (u16(data) << 8);
-		break;
-	case MESH_INTMASK:
-		m_mesh_int_mask = data;
-		break;
-	case MESH_INTERRUPT:
-		m_mesh_int_stat &= ~(data & 0x07);
-		break; // write-1-to-clear
-	case MESH_SOURCEID:
-		m_mesh_src_id = data;
-		break;
-	case MESH_DESTID:
-		m_mesh_dst_id = data;
-		break;
-	case MESH_SYNCPARMS:
-		m_mesh_sync = data;
-		break;
-	}
-}
-
-void pippin_state::mesh_sequence(u8 cmd)
-{
-	m_mesh_seq = cmd;
-	m_mesh_int_stat &= ~MESH_INT_CMD_DONE; // re-asserted below on completion
-
-	switch (cmd & 0x0f)
-	{
-	case SEQ_ARBITRATE:
-		m_mesh_exception = 0;
-		m_mesh_bus_stat = SCSI_BSY;
-		m_mesh_int_stat |= MESH_INT_CMD_DONE;
-		break;
-
-	case SEQ_SELECT:
-		m_mesh_exception |= MESH_EXC_SEL_TIMEOUT;
-		m_mesh_bus_stat = 0;
-		m_mesh_int_stat |= MESH_INT_EXCEPTION | MESH_INT_CMD_DONE;
-		break;
-
-	case SEQ_BUSFREE:
-		m_mesh_bus_stat = 0;
-		m_mesh_int_stat |= MESH_INT_CMD_DONE;
-		break;
-
-	case SEQ_RESETMESH:
-		m_mesh_exception = 0;
-		m_mesh_bus_stat = 0;
-		m_mesh_int_stat |= MESH_INT_CMD_DONE;
-		break;
-
-	case SEQ_ENARESEL:
-	case SEQ_DISRESEL:
-		m_mesh_int_stat |= MESH_INT_CMD_DONE;
-		break;
-
-	case SEQ_FLUSHFIFO:
-		break;
-
-	default:
-		m_mesh_int_stat |= MESH_INT_CMD_DONE;
-		break;
-	}
 }
 
 void pippin_state::cdmcu_mem(address_map &map)
@@ -336,18 +189,37 @@ void pippin_state::pippin(machine_config &config)
 	aspen_host_device &aspen(ASPEN(config, m_aspen, 66000000, "maincpu"));
 	aspen.set_dev_offset(1);
 
-	cdrom_image_device &cdrom(CDROM(config, "cdrom"));
-	cdrom.set_interface("cdrom");
 	SOFTWARE_LIST(config, "cd_list").set_original("pippin");
 
 	RAM(config, m_ram);
-	m_ram->set_default_size("32M");
+	m_ram->set_default_size("5M");
+	m_ram->set_extra_options("13M, 21M");
 
 	GRAND_CENTRAL(config, m_grandcentral);
 	m_grandcentral->set_maincpu_tag("maincpu");
 	m_grandcentral->irq_callback().set_inputline(m_maincpu, PPC_IRQ);
-	m_grandcentral->scsi1_r_callback().set(FUNC(pippin_state::mesh_r));
-	m_grandcentral->scsi1_w_callback().set(FUNC(pippin_state::mesh_w));
+
+	NSCSI_BUS(config, m_scsibus);
+	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config([](device_t *device)
+	{
+		device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
+		device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1);
+	});
+	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
+
+	APPLE_MESH_SCSI(config, m_mesh, 50_MHz_XTAL);
+	m_scsibus->set_external_device(7, m_mesh);
+	m_mesh->drq_handler_cb().set(m_grandcentral, FUNC(grandcentral_device::scsi1_drq));
+	m_mesh->irq_handler_cb().set(m_grandcentral, FUNC(grandcentral_device::scsi1_irq));
+	m_grandcentral->scsi1_r_callback().set(m_mesh, FUNC(mesh_device::read));
+	m_grandcentral->scsi1_w_callback().set(m_mesh, FUNC(mesh_device::write));
+	m_grandcentral->scsi1_dma_r_callback().set(m_mesh, FUNC(mesh_device::dma16_r));
+	m_grandcentral->scsi1_dma_w_callback().set(m_mesh, FUNC(mesh_device::dma16_w));
 
 	APPLE_TAOS(config, m_taos, 31.3344_MHz_XTAL);
 

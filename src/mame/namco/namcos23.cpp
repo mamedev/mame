@@ -1246,6 +1246,7 @@ It can also be used with Final Furlong when wired correctly.
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "video.h"
 
 #include "md8412b_s23.h"
 #include "namco_settings.h"

@@ -17,6 +17,7 @@
 
 // MAME headers
 #include "emu.h"
+#include "../emu/video.h"
 #include "ui/uimain.h"
 
 // MAMEOS headers

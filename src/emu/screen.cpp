@@ -16,6 +16,7 @@
 #include "main.h"
 #include "render.h"
 #include "rendutil.h"
+#include "video.h"
 
 #include "nanosvg.h"
 #include "png.h"

@@ -105,7 +105,7 @@ Dumped from non-original media
 		</part>
 	</software>
 
-	<software name="pasboot" cloneof="compisnetib">
+	<software name="pasboot" cloneof="compisnetib" supported="no">
 		<description>CompisNet I PASBOOT med nyteknik</description>
 		<year>19??</year>
 		<publisher>Telenova</publisher>
@@ -478,7 +478,7 @@ Requires hardware key 10, which isn't dumped
 		</part>
 	</software>
 
-	<software name="kemi1">
+	<software name="kemi1" supported="no">
 		<description>Kemi 1 (nät/skollicens)</description>
 		<year>1986</year>
 		<publisher>Telenova</publisher>
@@ -739,7 +739,7 @@ Doesn't start
 		</part>
 	</software>
 
-	<software name="profitext">
+	<software name="profitext" supported="no">
 		<description>ProfiText: Textbehandling med Compis (version 6181)</description>
 		<year>1986</year>
 		<publisher>TeleNova</publisher>
@@ -756,7 +756,7 @@ Doesn't start
 		</part>
 	</software>
 
-	<software name="ritett">
+	<software name="ritett" supported="no">
 		<description>RitEtt (enanvändare)</description>
 		<year>1986</year>
 		<publisher>Esselte Studium</publisher>
@@ -772,7 +772,7 @@ Requires hardware key 7, which isn't dumped
 		</part>
 	</software>
 
-	<software name="raknrattd" cloneof="raknratt">
+	<software name="raknrattd" cloneof="raknratt" supported="no">
 		<description>Räkna lätt, räkna rätt (demo, ekonomiredaktionen, version 6175)</description>
 		<year>19??</year>
 		<publisher>Esselte Studium</publisher>
@@ -898,7 +898,7 @@ Dumped from non-original media
 		</part>
 	</software>
 
-	<software name="stvaratt">
+	<software name="stvaratt" supported="no">
 		<description>Stava rätt på nytt sätt (version 8481)</description>
 		<year>19??</year>
 		<publisher>Esselte Studium</publisher>

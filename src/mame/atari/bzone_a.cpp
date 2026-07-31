@@ -25,6 +25,7 @@ D0  explosion enable        gates a noise generator
 #include "sound/discrete.h"
 #include "sound/pokey.h"
 
+#include "sound.h"
 #include "speaker.h"
 
 

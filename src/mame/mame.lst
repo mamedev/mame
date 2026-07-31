@@ -467,6 +467,7 @@ quickjac
 sbsoli
 skattv
 skattva
+skattvs1
 trumpfas
 
 @source:adp/manohman.cpp
@@ -17826,7 +17827,8 @@ chelnovjbl
 chelnovjbla
 chelnovu
 karnov
-karnova
+karnov5e
+karnov5u
 karnovj
 karnovjbl
 wndrplnt
@@ -29345,6 +29347,7 @@ unkpacgd
 unksig
 unksiga
 unksigb
+unksigc
 
 @source:misc/a1supply.cpp
 tv21
@@ -33693,6 +33696,9 @@ mvme162
 
 @source:motorola/powerstack.cpp
 powerstk
+
+@source:motorola/startac70.cpp
+startac70
 
 @source:motorola/sys1121.cpp
 sys1121
@@ -42898,6 +42904,7 @@ dcrown
 dcrowna
 gostop
 koikois
+koikoisa
 mayjinsn
 mayjisn2
 nratechu
@@ -44134,6 +44141,7 @@ sb8085
 sbrain
 sagafox
 sagafoxf80
+sist600
 
 @source:skeleton/scopus.cpp
 sagitta180
@@ -47397,6 +47405,9 @@ crei680
 @source:trainer/cvicny.cpp
 cvicny
 
+@source:trainer/dgp80.cpp
+dgp80
+
 @source:trainer/dolphunk.cpp
 dauphin
 
@@ -47530,6 +47541,7 @@ trs80m3
 trs80m4
 trs80m4p
 cp500
+naja800
 
 @source:trs/vis.cpp
 vis

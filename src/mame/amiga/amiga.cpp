@@ -31,6 +31,7 @@
 #include "machine/nvram.h"
 #include "machine/i2cmem.h"
 #include "machine/cr511b.h"
+#include "machine/ram.h"
 #include "machine/rp5c01.h"
 #include "video/pwm.h"
 
@@ -97,7 +98,7 @@ DECLARE_DEVICE_TYPE(A1000_KBRESET, a1000_kbreset_device)
 class a1000_kbreset_device : public device_t
 {
 public:
-	a1000_kbreset_device(machine_config const &config, char const *tag, device_t *owner, u32 clock = 0U) :
+	a1000_kbreset_device(machine_config const &config, char const *tag, device_t *owner, uint32_t clock = 0U) :
 		device_t(config, A1000_KBRESET, tag, owner, clock),
 		m_kbrst_cb(*this)
 	{
@@ -211,10 +212,10 @@ private:
 	emu_timer *m_c813_timer = nullptr; // C813 = 22µF, R802 = 10kΩ
 	emu_timer *m_c814_timer = nullptr; // C814 = 22µF, R805 = 47kΩ
 
-	u8 m_kbclk = 1U; // /KBCLK input
-	u8 m_kbrst = 1U; // /KBRST output
-	u8 m_c813_level = 0U; // 0 = 0V-2V, 1 = 2V - 2.86V, 2 = 2.86V - 5V
-	u8 m_c814_charging = 1U; // U805 pin 2
+	uint8_t m_kbclk = 1U; // /KBCLK input
+	uint8_t m_kbrst = 1U; // /KBRST output
+	uint8_t m_c813_level = 0U; // 0 = 0V-2V, 1 = 2V - 2.86V, 2 = 2.86V - 5V
+	uint8_t m_c814_charging = 1U; // U805 pin 2
 };
 
 DEFINE_DEVICE_TYPE(A1000_KBRESET, a1000_kbreset_device, "a1000kbrst", "Amiga 1000/2000/CDTV keyboard reset circuit")
@@ -236,7 +237,7 @@ public:
 	void init_pal();
 	void init_ntsc();
 
-	void write_protect_w(u16 data);
+	void write_protect_w(uint16_t data);
 
 	void a1000(machine_config &config);
 	void a1000n(machine_config &config);
@@ -251,7 +252,7 @@ protected:
 private:
 	required_device<address_map_bank_device> m_bootrom;
 	required_memory_bank m_wom;
-	std::vector<u16> m_wom_ram;
+	std::vector<uint16_t> m_wom_ram;
 };
 
 class a2000_state : public amiga_state
@@ -276,8 +277,8 @@ public:
 	void zorro2_int6_w(int state);
 	void zorro2_xrdy_w(int state);
 
-	u16 clock_r(offs_t offset);
-	void clock_w(offs_t offset, u16 data);
+	uint16_t clock_r(offs_t offset);
+	void clock_w(offs_t offset, uint16_t data);
 
 	void a2000(machine_config &config);
 	void a2000n(machine_config &config);
@@ -367,8 +368,8 @@ public:
 	void init_pal();
 	void init_ntsc();
 
-	u16 clock_r(offs_t offset);
-	void clock_w(offs_t offset, u16 data);
+	uint16_t clock_r(offs_t offset);
+	void clock_w(offs_t offset, uint16_t data);
 
 	void cdtv(machine_config &config);
 	void cdtvn(machine_config &config);
@@ -448,11 +449,6 @@ public:
 		: amiga_state(mconfig, type, tag)
 	{ }
 
-	u32 scsi_r(offs_t offset, u32 mem_mask = ~0);
-	void scsi_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	u32 motherboard_r(offs_t offset, u32 mem_mask = ~0);
-	void motherboard_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-
 	void init_pal();
 	void init_ntsc();
 
@@ -463,6 +459,11 @@ public:
 protected:
 
 private:
+	uint32_t scsi_r(offs_t offset, uint32_t mem_mask);
+	void scsi_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+
+	uint32_t motherboard_r(offs_t offset, uint32_t mem_mask);
+	void motherboard_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 };
 
 class a500p_state : public amiga_state
@@ -476,8 +477,8 @@ public:
 		, m_side_int6(0)
 	{ }
 
-	u16 clock_r(offs_t offset);
-	void clock_w(offs_t offset, u16 data);
+	uint16_t clock_r(offs_t offset);
+	void clock_w(offs_t offset, uint16_t data);
 
 	void init_pal();
 	void init_ntsc();
@@ -523,7 +524,7 @@ public:
 	void init_pal();
 	void init_ntsc();
 
-	static const u8 GAYLE_ID = 0xd0;
+	static const uint8_t GAYLE_ID = 0xd0;
 
 	void a600n(machine_config &config);
 	void a600(machine_config &config);
@@ -558,7 +559,7 @@ public:
 	void init_pal();
 	void init_ntsc();
 
-	static const u8 GAYLE_ID = 0xd1;
+	static const uint8_t GAYLE_ID = 0xd1;
 
 	void a1200(machine_config &config);
 	void a1200n(machine_config &config);
@@ -582,6 +583,7 @@ class a4000_state : public amiga_state
 public:
 	a4000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: amiga_state(mconfig, type, tag)
+		, m_fastram(*this, "ram") // tag needs to be "ram" for -ramsize
 		, m_ata(*this, "ata")
 		, m_ramsey_config(0)
 		, m_gary_coldboot(1)
@@ -590,37 +592,47 @@ public:
 		, m_ide_interrupt(0)
 	{ }
 
-	u32 scsi_r(offs_t offset, u32 mem_mask = ~0);
-	void scsi_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	u16 ide_r(offs_t offset, u16 mem_mask = ~0);
-	void ide_w(offs_t offset, u16 data, u16 mem_mask);
-	void ide_interrupt_w(int state);
-	u32 motherboard_r(offs_t offset, u32 mem_mask = ~0);
-	void motherboard_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-
 	void init_pal();
 	void init_ntsc();
 
-	void a400030n(machine_config &config);
-	void a4000tn(machine_config &config);
-	void a4000t(machine_config &config);
-	void a4000n(machine_config &config);
 	void a4000(machine_config &config);
+	void a4000n(machine_config &config);
 	void a400030(machine_config &config);
-	void a400030_mem(address_map &map) ATTR_COLD;
-	void a4000_mem(address_map &map) ATTR_COLD;
-	void a4000t_mem(address_map &map) ATTR_COLD;
+	void a400030n(machine_config &config);
+	void a4000t(machine_config &config);
+	void a4000tn(machine_config &config);
 
 protected:
+	// driver_device overrides
+	virtual void machine_start() override ATTR_COLD;
+
+	// amiga_state overrides
+	virtual bool int2_pending() override;
 
 private:
+	// TODO: create and move to a4000t_state
+	uint32_t scsi_r(offs_t offset, uint32_t mem_mask);
+	void scsi_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+
+	uint16_t ide_r(offs_t offset, uint16_t mem_mask);
+	void ide_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	void ide_interrupt_w(int state);
+
+	uint32_t motherboard_r(offs_t offset, uint32_t mem_mask);
+	void motherboard_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+
+	void a4000_mem(address_map &map) ATTR_COLD;
+	void a400030_mem(address_map &map) ATTR_COLD;
+	void a4000t_mem(address_map &map) ATTR_COLD;
+
+	required_device<ram_device> m_fastram;
 	required_device<ata_interface_device> m_ata;
 
-	int m_ramsey_config;
-	int m_gary_coldboot;
-	int m_gary_timeout;
-	int m_gary_toenb;
-	int m_ide_interrupt;
+	uint8_t m_ramsey_config;
+	bool m_gary_coldboot;
+	bool m_gary_timeout;
+	bool m_gary_toenb;
+	bool m_ide_interrupt;
 };
 
 class cd32_state : public amiga_state
@@ -635,8 +647,8 @@ public:
 	void akiko_int_w(int state);
 	void akiko_cia_0_port_a_write(uint8_t data);
 
-	void handle_joystick_cia(u8 pra, u8 dra);
-	u16 handle_joystick_potgor(u16 potgor);
+	void handle_joystick_cia(uint8_t pra, uint8_t dra);
+	uint16_t handle_joystick_potgor(uint16_t potgor);
 
 	ioport_value cd32_input();
 	template <int P> int cd32_sel_mirror_input();
@@ -648,7 +660,7 @@ public:
 
 	int m_oldstate[2]{};
 	int m_cd32_shifter[2]{};
-	u16 m_potgo_value = 0;
+	uint16_t m_potgo_value = 0;
 
 	void cd32n(machine_config &config);
 	void cd32(machine_config &config);
@@ -656,7 +668,7 @@ public:
 
 protected:
 	// amiga_state overrides
-	virtual void potgo_w(u16 data) override;
+	virtual void potgo_w(uint16_t data) override;
 
 private:
 	required_device<cdda_device> m_cdda;
@@ -667,32 +679,32 @@ private:
 //  REAL TIME CLOCK
 //**************************************************************************
 
-u16 cdtv_state::clock_r(offs_t offset)
+uint16_t cdtv_state::clock_r(offs_t offset)
 {
 	return m_rtc->read(offset / 2);
 }
 
-void cdtv_state::clock_w(offs_t offset, u16 data)
+void cdtv_state::clock_w(offs_t offset, uint16_t data)
 {
 	m_rtc->write(offset / 2, data);
 }
 
-u16 a2000_state::clock_r(offs_t offset)
+uint16_t a2000_state::clock_r(offs_t offset)
 {
 	return m_rtc->read(offset / 2);
 }
 
-void a2000_state::clock_w(offs_t offset, u16 data)
+void a2000_state::clock_w(offs_t offset, uint16_t data)
 {
 	m_rtc->write(offset / 2, data);
 }
 
-u16 a500p_state::clock_r(offs_t offset)
+uint16_t a500p_state::clock_r(offs_t offset)
 {
 	return m_rtc->read(offset / 2);
 }
 
-void a500p_state::clock_w(offs_t offset, u16 data)
+void a500p_state::clock_w(offs_t offset, uint16_t data)
 {
 	m_rtc->write(offset / 2, data);
 }
@@ -851,7 +863,7 @@ void a1000_state::machine_reset()
 }
 
 // any write to this area will write protect the wom and disable the bootrom
-void a1000_state::write_protect_w(u16 data)
+void a1000_state::write_protect_w(uint16_t data)
 {
 	m_bootrom->set_bank(1);
 	m_maincpu->space(AS_PROGRAM).nop_write(0xfc0000, 0xffffff);
@@ -1209,26 +1221,26 @@ void cdtv_state::vfd_update(offs_t offset, uint64_t data)
 	}
 }
 
-u32 a3000_state::scsi_r(offs_t offset, u32 mem_mask)
+uint32_t a3000_state::scsi_r(offs_t offset, uint32_t mem_mask)
 {
-	u32 data = 0xffffffff;
+	uint32_t data = 0xffffffff;
 	logerror("scsi_r(%06x): %08x & %08x\n", offset, data, mem_mask);
 	return data;
 }
 
-void a3000_state::scsi_w(offs_t offset, u32 data, u32 mem_mask)
+void a3000_state::scsi_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("scsi_w(%06x): %08x & %08x\n", offset, data, mem_mask);
 }
 
-u32 a3000_state::motherboard_r(offs_t offset, u32 mem_mask)
+uint32_t a3000_state::motherboard_r(offs_t offset, uint32_t mem_mask)
 {
-	u32 data = 0xffffffff;
+	uint32_t data = 0xffffffff;
 	logerror("motherboard_r(%06x): %08x & %08x\n", offset, data, mem_mask);
 	return data;
 }
 
-void a3000_state::motherboard_w(offs_t offset, u32 data, u32 mem_mask)
+void a3000_state::motherboard_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("motherboard_w(%06x): %08x & %08x\n", offset, data, mem_mask);
 }
@@ -1321,19 +1333,39 @@ void a1200_state::gayle_int6_w(int state)
 	update_int6();
 }
 
-u32 a4000_state::scsi_r(offs_t offset, u32 mem_mask)
+void a4000_state::machine_start()
 {
-	u16 data = 0xffff;
+	amiga_state::machine_start();
+
+	// map motherboard fast-ram
+	m_maincpu->space(AS_PROGRAM).install_ram(0x08000000 - m_fastram->size(), 0x08000000 - 1, m_fastram->pointer());
+
+	// register for save states
+	save_item(NAME(m_ramsey_config));
+	save_item(NAME(m_gary_coldboot));
+	save_item(NAME(m_gary_timeout));
+	save_item(NAME(m_gary_toenb));
+	save_item(NAME(m_ide_interrupt));
+}
+
+bool a4000_state::int2_pending()
+{
+	return m_cia_0_irq || m_ide_interrupt;
+}
+
+uint32_t a4000_state::scsi_r(offs_t offset, uint32_t mem_mask)
+{
+	uint32_t data = 0xffffffff;
 	logerror("scsi_r(%06x): %08x & %08x\n", offset, data, mem_mask);
 	return data;
 }
 
-void a4000_state::scsi_w(offs_t offset, u32 data, u32 mem_mask)
+void a4000_state::scsi_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("scsi_w(%06x): %08x & %08x\n", offset, data, mem_mask);
 }
 
-u16 a4000_state::ide_r(offs_t offset, u16 mem_mask)
+uint16_t a4000_state::ide_r(offs_t offset, uint16_t mem_mask)
 {
 	// ide interrupt register
 	if (offset == 0x1010)
@@ -1346,7 +1378,7 @@ u16 a4000_state::ide_r(offs_t offset, u16 mem_mask)
 		return m_ata->cs0_swap_r((offset >> 1) & 0x07, mem_mask);
 }
 
-void a4000_state::ide_w(offs_t offset, u16 data, u16 mem_mask)
+void a4000_state::ide_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// ide interrupt register, read only
 	if (offset == 0x1010)
@@ -1362,22 +1394,23 @@ void a4000_state::ide_w(offs_t offset, u16 data, u16 mem_mask)
 void a4000_state::ide_interrupt_w(int state)
 {
 	m_ide_interrupt = state;
+	update_int2();
 }
 
-u32 a4000_state::motherboard_r(offs_t offset, u32 mem_mask)
+uint32_t a4000_state::motherboard_r(offs_t offset, uint32_t mem_mask)
 {
-	u32 data = 0;
+	uint32_t data = 0;
 
 	if (offset == 0)
 	{
 		if (ACCESSING_BITS_0_7)
 			data |= m_ramsey_config & 0xff;
 		if (ACCESSING_BITS_8_15)
-			data |= (m_gary_coldboot << 7 | 0x7f) << 8;
+			data |= (m_gary_coldboot ? 0xff : 0x7f) << 8;
 		if (ACCESSING_BITS_16_23)
-			data |= (m_gary_toenb << 7 | 0x7f) << 16;
+			data |= (m_gary_toenb ? 0xff : 0x7f) << 16;
 		if (ACCESSING_BITS_24_31)
-			data |= (m_gary_timeout << 7 | 0x7f) << 24;
+			data |= (m_gary_timeout ? 0xff : 0x7f) << 24;
 	}
 	else
 		data = 0xffffffff;
@@ -1387,18 +1420,18 @@ u32 a4000_state::motherboard_r(offs_t offset, u32 mem_mask)
 	return data;
 }
 
-void a4000_state::motherboard_w(offs_t offset, u32 data, u32 mem_mask)
+void a4000_state::motherboard_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset == 0)
 	{
 		if (ACCESSING_BITS_0_7)
 			m_ramsey_config = data & 0xff;
 		if (ACCESSING_BITS_8_15)
-			m_gary_coldboot = BIT(data, 7);
+			m_gary_coldboot = bool(BIT(data, 7));
 		if (ACCESSING_BITS_16_23)
-			m_gary_toenb = BIT(data, 7);
+			m_gary_toenb = bool(BIT(data, 7));
 		if (ACCESSING_BITS_24_31)
-			m_gary_timeout = BIT(data, 7);
+			m_gary_timeout = bool(BIT(data, 7));
 	}
 
 	logerror("motherboard_w(%06x): %08x & %08x\n", offset, data, mem_mask);
@@ -1409,7 +1442,7 @@ void cd32_state::akiko_int_w(int state)
 	set_interrupt(INTENA_SETCLR | INTENA_PORTS);
 }
 
-void cd32_state::potgo_w(u16 data)
+void cd32_state::potgo_w(uint16_t data)
 {
 	int i;
 
@@ -1418,30 +1451,30 @@ void cd32_state::potgo_w(u16 data)
 
 	for (i = 0; i < 8; i += 2)
 	{
-		u16 dir = 0x0200 << i;
+		uint16_t dir = 0x0200 << i;
 		if (data & dir)
 		{
-			u16 d = 0x0100 << i;
+			uint16_t d = 0x0100 << i;
 			m_potgo_value &= ~d;
 			m_potgo_value |= data & d;
 		}
 	}
 	for (i = 0; i < 2; i++)
 	{
-		u16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
-		u16 p5dat = 0x0100 << (i * 4); /* data P5 */
+		uint16_t p5dir = 0x0200 << (i * 4); /* output enable P5 */
+		uint16_t p5dat = 0x0100 << (i * 4); /* data P5 */
 		if ((m_potgo_value & p5dir) && (m_potgo_value & p5dat))
 			m_cd32_shifter[i] = 8;
 	}
 }
 
-void cd32_state::handle_joystick_cia(u8 pra, u8 dra)
+void cd32_state::handle_joystick_cia(uint8_t pra, uint8_t dra)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		u8 but = 0x40 << i;
-		u16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
-		u16 p5dat = 0x0100 << (i * 4); /* data P5 */
+		uint8_t but = 0x40 << i;
+		uint16_t p5dir = 0x0200 << (i * 4); /* output enable P5 */
+		uint16_t p5dat = 0x0100 << (i * 4); /* data P5 */
 
 		if (!(m_potgo_value & p5dir) || !(m_potgo_value & p5dat))
 		{
@@ -1459,14 +1492,14 @@ void cd32_state::handle_joystick_cia(u8 pra, u8 dra)
 	}
 }
 
-u16 cd32_state::handle_joystick_potgor(u16 potgor)
+uint16_t cd32_state::handle_joystick_potgor(uint16_t potgor)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		u16 p9dir = 0x0800 << (i * 4); /* output enable P9 */
-		u16 p9dat = 0x0400 << (i * 4); /* data P9 */
-		u16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
-		u16 p5dat = 0x0100 << (i * 4); /* data P5 */
+		uint16_t p9dir = 0x0800 << (i * 4); /* output enable P9 */
+		uint16_t p9dat = 0x0400 << (i * 4); /* data P9 */
+		uint16_t p5dir = 0x0200 << (i * 4); /* output enable P5 */
+		uint16_t p5dat = 0x0100 << (i * 4); /* data P5 */
 
 		/* p5 is floating in input-mode */
 		potgor &= ~p5dat;
@@ -1493,7 +1526,7 @@ ioport_value cd32_state::cd32_input()
 template <int P>
 int cd32_state::cd32_sel_mirror_input()
 {
-	u8 bits = m_player_ports[P]->read();
+	uint8_t bits = m_player_ports[P]->read();
 	return (bits & 0x20)>>5;
 }
 
@@ -1752,36 +1785,35 @@ void a1200_state::a1200_mem(address_map &map)
 	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
 }
 
-// 2MB chip RAM, 4 MB fast RAM, RTC and IDE
+// 2MB chip RAM, 4 MB Fast-RAM, RTC and IDE
 void a4000_state::a4000_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000000, 0x001fffff).m(m_overlay, FUNC(address_map_bank_device::amap32));
-	map(0x00200000, 0x009fffff).noprw(); // zorro2 expansion
-	map(0x00a00000, 0x00b7ffff).noprw();
-	map(0x00b80000, 0x00beffff).noprw();
+	map(0x00200000, 0x009fffff).unmaprw(); // zorro2 expansion
+	map(0x00a00000, 0x00b7ffff).unmaprw();
+	map(0x00b80000, 0x00beffff).unmaprw();
 	map(0x00bf0000, 0x00bfffff).rw(FUNC(a4000_state::cia_r), FUNC(a4000_state::cia_w));
 	map(0x00c00000, 0x00cfffff).m(m_chipset, FUNC(address_map_bank_device::amap32));
-	map(0x00d00000, 0x00d9ffff).noprw();
-	map(0x00da0000, 0x00dbffff).noprw();
+	map(0x00d00000, 0x00d9ffff).unmaprw();
+	map(0x00da0000, 0x00dbffff).unmaprw();
 	map(0x00dc0000, 0x00dcffff).rw("rtc", FUNC(rp5c01_device::read), FUNC(rp5c01_device::write)).umask32(0x000000ff);
-	map(0x00dd0000, 0x00dd0fff).noprw();
+	map(0x00dd0000, 0x00dd0fff).unmaprw();
 	map(0x00dd1000, 0x00dd3fff).rw(FUNC(a4000_state::ide_r), FUNC(a4000_state::ide_w));
-	map(0x00dd4000, 0x00ddffff).noprw();
+	map(0x00dd4000, 0x00ddffff).unmaprw();
 	map(0x00de0000, 0x00deffff).rw(FUNC(a4000_state::motherboard_r), FUNC(a4000_state::motherboard_w));
 	map(0x00df0000, 0x00dfffff).m(m_chipset, FUNC(address_map_bank_device::amap32));
 	map(0x00e00000, 0x00e7ffff).nopw().r(FUNC(a4000_state::rom_mirror32_r));
-	map(0x00e80000, 0x00efffff).noprw(); // zorro2 autoconfig space (installed by devices)
+	map(0x00e80000, 0x00efffff).unmaprw(); // zorro2 autoconfig space (installed by devices)
 	map(0x00f00000, 0x00f7ffff).noprw(); // cartridge space
 	map(0x00f80000, 0x00ffffff).rom().region("kickstart", 0);
-	map(0x01000000, 0x017fffff).noprw(); // reserved (8 mb chip ram)
-	map(0x01800000, 0x06ffffff).noprw(); // reserved (motherboard fast ram expansion)
-	map(0x07000000, 0x07bfffff).noprw(); // motherboard ram
-	map(0x07c00000, 0x07ffffff).ram(); // motherboard ram (up to 16mb), grows downward
+	map(0x01000000, 0x017fffff).unmaprw(); // reserved (8 mb chip ram)
+	map(0x01800000, 0x06ffffff).unmaprw(); // reserved (motherboard fast-ram expansion)
+	map(0x07000000, 0x07ffffff).unmaprw(); // motherboard ram (installed in machine_start)
 	map(0xfff80000, 0xffffffff).rom().region("kickstart", 0);
 }
 
-// 2MB chip RAM, 2 MB fast RAM, RTC and IDE
+// 2MB chip RAM, 2 MB Fast-RAM, RTC and IDE
 void a4000_state::a400030_mem(address_map &map)
 {
 	map.unmap_value_high();
@@ -2524,6 +2556,10 @@ void a4000_state::a4000(machine_config &config)
 
 	amiga_base(config);
 
+	RAM(config, m_fastram);
+	m_fastram->set_default_size("4M");
+	m_fastram->set_extra_options("1M,2M,3M,8M,12M,16M");
+
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&a4000_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
 	ADDRESS_MAP_BANK(config, m_chipset).set_map(&a4000_state::aga_map).set_options(ENDIANNESS_BIG, 32, 9, 0x200);
 	m_copper->set_ecs_mode(true);
@@ -2572,8 +2608,6 @@ void a4000_state::a400030(machine_config &config)
 	M68EC030(config.replace(), m_maincpu, XTAL(50'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a4000_state::a400030_mem);
 	m_maincpu->set_cpu_space(AS_PROGRAM);
-
-	// TODO: ide
 }
 
 void a4000_state::a400030n(machine_config &config)
@@ -2648,7 +2682,7 @@ void a4000_state::a4000t(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &a4000_state::a4000t_mem);
 	m_maincpu->set_cpu_space(AS_PROGRAM);
 
-	// TODO: ide, zorro3, scsi, super dmac
+	// TODO: zorro3, scsi, super dmac
 }
 
 void a4000_state::a4000tn(machine_config &config)
@@ -2888,6 +2922,23 @@ ROM_START( a4000 )
 	ROM_SYSTEM_BIOS(3, "logica2", "Logica Diagnostic 2.0")
 	ROMX_LOAD("logica2.u6a",    0x00000, 0x40000, CRC(566bc3f9) SHA1(891d3b7892843517d800d24593168b1d8f1646ca), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(3))
 	ROMX_LOAD("logica2.u6b",    0x00002, 0x40000, CRC(aac94759) SHA1(da8a4f9ae1aa84f5e2a5dcc5c9d7e4378a9698b7), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(3))
+#if 0 // not enabled yet, kickstart 3.2 is new and actively sold
+	ROM_SYSTEM_BIOS(4, "kick32",  "Kickstart 3.2 (47.96)")
+	ROMX_LOAD("kick47096-hi.u175", 0x00000, 0x40000, CRC(6cd65b71) SHA1(5fe056ae79adc23e7e65de7f3e5aad71df72be59), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(4))
+	ROM_IGNORE(0x40000)
+	ROMX_LOAD("kick47096-lo.u176", 0x00002, 0x40000, CRC(ee66f9d8) SHA1(8c27ae8bdc9db1dbe49e300e11fea0df0082eac6), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(4))
+	ROM_IGNORE(0x40000)
+	ROM_SYSTEM_BIOS(5, "kick321", "Kickstart 3.2 (47.102)")
+	ROMX_LOAD("kick47102-hi.u175", 0x00000, 0x40000, CRC(4ab11d9e) SHA1(48b97a8c9854d8a0254e4bcd4a96cc35def4e3a7), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(5))
+	ROM_IGNORE(0x40000)
+	ROMX_LOAD("kick47102-lo.u176", 0x00002, 0x40000, CRC(2c2239af) SHA1(8546b9baadbdc391e2fb52d9b0f2cbb85f780a4c), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(5))
+	ROM_IGNORE(0x40000)
+	ROM_SYSTEM_BIOS(6, "kick322", "Kickstart 3.2 (47.111)")
+	ROMX_LOAD("kick47111-hi.u175", 0x00000, 0x40000, CRC(4d435230) SHA1(d9e1badba7b50ae0a8d21383da96dbba6892cfe1), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(6))
+	ROM_IGNORE(0x40000)
+	ROMX_LOAD("kick47111-lo.u176", 0x00002, 0x40000, CRC(f9597112) SHA1(92107dd42ba3b90a41b28a0e58c51d9d2fb04a61), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(6))
+	ROM_IGNORE(0x40000)
+#endif
 ROM_END
 
 #define rom_a4000n    rom_a4000
