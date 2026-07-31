@@ -277,6 +277,7 @@ ROMs:
 #include "machine/nvram.h"
 #include "sound/segapcm.h"
 #include "sound/ymopm.h"
+#include "sound.h"
 #include "speaker.h"
 
 

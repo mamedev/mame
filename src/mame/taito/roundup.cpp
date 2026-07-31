@@ -164,6 +164,7 @@ Player 2 and Player 1 share the same controls !
 
 #include "emupal.h"
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 #include "tilemap.h"
 

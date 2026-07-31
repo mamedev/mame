@@ -17,6 +17,7 @@
 #include "rendlay.h"
 #include "rendutil.h"
 #include "screen.h"
+#include "video.h"
 
 #include "aviio.h"
 #include "png.h"

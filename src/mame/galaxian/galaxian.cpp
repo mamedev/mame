@@ -747,6 +747,7 @@ TODO:
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 
 #include "nl_konami.h"

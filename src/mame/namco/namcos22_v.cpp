@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "namcos22.h"
 
+#include "video.h"
+
 
 // poly constructor
 

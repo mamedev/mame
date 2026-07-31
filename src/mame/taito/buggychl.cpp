@@ -111,6 +111,7 @@ so either 6mhz or 4mhz. Schematics show the jumper set to the 6mhz setting.
 
 #include "emupal.h"
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 
 #include "buggychl.lh"

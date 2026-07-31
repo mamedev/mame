@@ -12,6 +12,8 @@
 #include "modules/lib/osdobj_common.h"
 #include "fileio.h"
 #include "screen.h"
+#include "sound.h"
+#include "video.h"
 
 
 avi_write::avi_write(running_machine& machine, uint32_t width, uint32_t height)

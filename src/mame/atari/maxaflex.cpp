@@ -26,6 +26,7 @@
 #include "gtia.h"
 
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 
 #include "maxaflex.lh"

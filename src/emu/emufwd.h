@@ -49,6 +49,9 @@ class osd_interface;
 class address_map;
 class address_map_entry;
 
+// declared in audio_effects/aeffect.h
+class audio_effect;
+
 // declared in bookkeeping.h
 class bookkeeping_manager;
 
@@ -120,6 +123,9 @@ class device_network_interface;
 
 // declared in dipalette.h
 class device_palette_interface;
+
+// declared in disound.h
+class sound_stream;
 
 // declared in distate.h
 class device_state_interface;
@@ -209,6 +215,9 @@ class layout_view_item;
 class layout_view;
 class layout_file;
 
+// declared in resampler.h
+class audio_resampler;
+
 // declared in romentry.h
 class rom_entry;
 
@@ -232,7 +241,6 @@ class software_list_loader;
 
 // declared in sound.h
 class sound_manager;
-class sound_stream;
 
 // declared in speaker.h
 class sound_io_device;

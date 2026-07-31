@@ -214,6 +214,7 @@ EPR-12028 - 27C256 EPROM
 #include "sound/ymopm.h"
 
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 
 #include "pdrift.lh"

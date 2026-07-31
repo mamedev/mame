@@ -61,6 +61,7 @@ TODO:
 #include "circus.h"
 
 #include "cpu/m6502/m6502.h"
+#include "sound.h"
 #include "speaker.h"
 
 #include "circus.lh"

@@ -304,6 +304,7 @@ seem to have access to.
 #include "machine/segacrpt_device.h"
 #include "cpu/z80/mc8123.h"
 
+#include "sound.h"
 #include "speaker.h"
 
 

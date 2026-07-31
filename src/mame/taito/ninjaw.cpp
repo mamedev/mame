@@ -330,6 +330,7 @@ rumbling on a subwoofer in the cabinet.)
 
 #include "emupal.h"
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 
 #include "ninjaw.lh"

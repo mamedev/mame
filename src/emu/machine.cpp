@@ -26,8 +26,10 @@
 #include "network.h"
 #include "render.h"
 #include "romload.h"
+#include "sound.h"
 #include "tilemap.h"
 #include "uiinput.h"
+#include "video.h"
 
 #include "ui/uimain.h"
 

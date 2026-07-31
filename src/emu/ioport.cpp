@@ -18,6 +18,7 @@
 #include "main.h"
 #include "natkeyboard.h"
 #include "profiler.h"
+#include "video.h"
 
 #include "ui/uimain.h"
 

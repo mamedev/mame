@@ -115,6 +115,7 @@ Notes (couriersud)
 
 #include "emupal.h"
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 #include "tilemap.h"
 
