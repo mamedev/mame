@@ -131,6 +131,8 @@ void i8x9x_device::commit_hso_cam()
 				ios0 |= 0x40;
 			hso_info[i].command = hso_command;
 			hso_info[i].time = hso_time;
+			hso_info[i].fire_at = timer_time_until(BIT(hso_command, 6) ? 2 : 1,
+					total_cycles(), hso_time);
 			internal_update(total_cycles());
 			return;
 		}
@@ -406,6 +408,11 @@ u64 i8x9x_device::timer_time_until(int timer, u64 current_time, u16 timer_value)
 void i8x9x_device::timer2_reset(u64 current_time)
 {
 	base_timer2 = current_time;
+	// hso_info[].time holds a timer value, not a deadline, so timer2-relative
+	// entries need fire_at recomputed against the new base.
+	for(int i=0; i<8; i++)
+		if(BIT(hso_active, i) && BIT(hso_info[i].command, 6))
+			hso_info[i].fire_at = timer_time_until(2, current_time, hso_info[i].time);
 }
 
 void i8x9x_device::set_hsi_state(int pin, bool state)
@@ -479,18 +486,13 @@ void i8x9x_device::set_hso(u8 mask, bool state)
 
 void i8x9x_device::internal_update(u64 current_time)
 {
-	u16 current_timer1 = timer_value(1, current_time);
-	u16 current_timer2 = timer_value(2, current_time);
-
+	// Fire on "the deadline has been reached or passed" rather than on an
+	// exact match against the timer value sampled right now.
 	for(int i=0; i<8; i++)
-		if(BIT(hso_active, i)) {
-			u8 cmd = hso_info[i].command;
-			u16 t = hso_info[i].time;
-			if(((cmd & 0x40) && t == current_timer2) ||
-				(!(cmd & 0x40) && t == current_timer1)) {
-				//logerror("hso cam %02x %04x in slot %d triggered\n", cmd, t, i);
-				trigger_cam(i, current_time);
-			}
+		if(BIT(hso_active, i) && current_time >= hso_info[i].fire_at) {
+			//logerror("hso cam %02x %04x in slot %d triggered\n",
+			//      hso_info[i].command, hso_info[i].time, i);
+			trigger_cam(i, current_time);
 		}
 
 	if(ad_done && current_time >= ad_done) {
@@ -501,13 +503,17 @@ void i8x9x_device::internal_update(u64 current_time)
 		check_irq();
 	}
 
-	if(current_time == serial_send_timer)
+	if(serial_send_timer && current_time >= serial_send_timer)
 		serial_send_done();
 
 	u64 event_time = 0;
 	for(int i=0; i<8; i++) {
 		if(!BIT(hso_active, i) && BIT(ios0, 7)) {
 			hso_info[i] = hso_cam_hold;
+			// The holding register carries a timer value, so the deadline is
+			// only fixed once the entry actually reaches the CAM, i.e. here.
+			hso_info[i].fire_at = timer_time_until(BIT(hso_cam_hold.command, 6) ? 2 : 1,
+					current_time, hso_cam_hold.time);
 			hso_active |= 1 << i;
 			ios0 &= 0x7f;
 			if(hso_active == 0xff)
