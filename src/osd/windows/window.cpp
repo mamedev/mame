@@ -17,13 +17,13 @@
 
 // MAME headers
 #include "emu.h"
-#include "../emu/video.h"
+#include "video.h"
 #include "ui/uimain.h"
 
 // MAMEOS headers
 #include "winmain.h"
 #include "window.h"
-#include "video.h"
+#include "winvideo.h"
 #include "winutf8.h"
 
 #include "winutil.h"

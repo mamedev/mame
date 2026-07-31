@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//  video.h - Win32 video helpers
+//  winvideo.h - Win32 video helpers
 //
 //============================================================
 #ifndef MAME_OSD_WINDOWS_VIDEO_H

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 //============================================================
 //
-//  video.cpp - Win32 video handling
+//  winvideo.cpp - Win32 video handling
 //
 //============================================================
 
