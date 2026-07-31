@@ -12,11 +12,12 @@
 
 ********************************************
 
-Todo:
+TODO:
 - find NMI source, and NMI enable/disable (timer ? video hw ?)
 - test modes for crownpkr and dcrown show flip support problems
+- add mahjong panel support for the games that can use it
 
-Dips verified for Neratte Chu (nratechu) from manual
+DIPs verified for nratechu and koikois from manual
 */
 
 #include "emu.h"
@@ -344,20 +345,13 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( koikois )
 	PORT_INCLUDE( st0016 )
 
-	PORT_MODIFY("P1")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	// left and right register inverted in test mode, but act correctly in game
 
-	PORT_MODIFY("SYSTEM")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_MODIFY("DSW1") // Dip switch A
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_MODIFY("DSW1") // Dip switch A, verified on DIP sheet
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1") // "Don't touch" on the DIP sheet
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Crt Mode" ) PORT_DIPLOCATION("SW1:2") // flip screen ?
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(  0x04, IP_ACTIVE_LOW, "SW1:3" )
@@ -369,9 +363,7 @@ static INPUT_PORTS_START( koikois )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x40, 0x40,  DEF_STR( Controls ) ) PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(    0x00, "Majyan Panel" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Joystick ) )
+	// others "Don't touch" on the DIP sheet
 
 	PORT_MODIFY("DSW2") // Dip switch B
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
@@ -379,6 +371,25 @@ static INPUT_PORTS_START( koikois )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
+	// others "Don't touch" on the DIP sheet
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( koikoisa )
+	PORT_INCLUDE( koikois )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x40, 0x40,  DEF_STR( Controls ) ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x00, "Majyan Panel" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Joystick ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nratechu )
@@ -584,7 +595,7 @@ INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(st0016_state::interrupt)
 {
-	int scanline = param;
+	int const scanline = param;
 
 	if (scanline == 240)
 		m_maincpu->set_input_line(0, HOLD_LINE);
@@ -605,7 +616,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(st0016_state::interrupt)
 void st0016_state::st0016(machine_config &config)
 {
 	// basic machine hardware
-	ST0016_CPU(config, m_maincpu, XTAL(48'000'000) / 6); // 8 MHz (48 MHz / 6) verified from nratechu (https://www.youtube.com/watch?v=scKF95t4-lU)
+	ST0016_CPU(config, m_maincpu, 48_MHz_XTAL / 6); // 8 MHz (48 MHz / 6) verified from nratechu (https://www.youtube.com/watch?v=scKF95t4-lU)
 	m_maincpu->set_addrmap(AS_PROGRAM, &st0016_state::st0016_mem);
 	m_maincpu->set_addrmap(AS_IO, &st0016_state::st0016_io);
 	m_maincpu->set_addrmap(st0016_cpu_device::AS_EXTROM, &st0016_state::extrom_mem);
@@ -635,7 +646,7 @@ void mayjinsn_state::mayjinsn(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_IO, &mayjinsn_state::st0016_m2_io);
 
-	V810(config, m_subcpu, 10000000); //25 Mhz ?
+	V810(config, m_subcpu, 10'000'000); //25 Mhz ?
 	m_subcpu->set_addrmap(AS_PROGRAM, &mayjinsn_state::v810_mem);
 
 	config.set_maximum_quantum(attotime::from_hz(60));
@@ -738,6 +749,15 @@ ROM_START( gostop )
 	ROM_LOAD( "go-stop_rom2.u32",0x080000, 0x80000, CRC(3c5402ff) SHA1(bdc38922b5cbad0150adf9c6cc0fefc5705a16a2) )
 ROM_END
 
+ROM_START( koikois ) // PCB E51-00001-A + E63-0005 sub board for ROMs, only supports joystick
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "j_2_koikoi.0h",  0x000001, 0x080000, CRC(50a86e42) SHA1(0dbef5643229ddd69f1d50b16ed3b772f1fb94f3) )
+	ROM_LOAD16_BYTE( "j_1_koikoi.0l",  0x000000, 0x080000, CRC(d65c98d4) SHA1(51d30df327d33be2804b6826a53516a3c51d776a) )
+	ROM_LOAD16_BYTE( "j_4_koikoi.1h",  0x100001, 0x080000, CRC(ace236df) SHA1(4bf56affe5b6d0ba3cc677eaa91f9be77f26c654) )
+	ROM_LOAD16_BYTE( "j_3_koikoi.1l",  0x100000, 0x080000, CRC(6fd88149) SHA1(87b1be32770232eb041e3ef9d1da45282af8a5d4) )
+	ROM_LOAD(        "visco_koi5.pc4", 0x200000, 0x200000, CRC(561e12c8) SHA1(a7aedf549bc3141fc01bc4a10c235af265ba4ee9) ) // mask ROM located on main board
+ROM_END
+
 
 /*
 恋こいしましょ - スーパーリアル花札 (Koi Koi Shimasho - Super Real Hanafuda)
@@ -769,13 +789,13 @@ E63-00001
 
 */
 
-ROM_START( koikois )
+ROM_START( koikoisa ) // supports both joystick and mahjong panel
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "koi-2.6c", 0x000001, 0x080000, CRC(2722be71) SHA1(1aa3d819eef01db042ee04a01c1b18c4d9dae65e) )
 	ROM_LOAD16_BYTE( "koi-1.4c", 0x000000, 0x080000, CRC(c79e2b43) SHA1(868174f7ab8e68e31d3302ae94dd742048deed9f) )
-	ROM_LOAD16_BYTE( "koi-4.8c", 0x100001, 0x080000, CRC(ace236df) SHA1(4bf56affe5b6d0ba3cc677eaa91f9be77f26c654) )
-	ROM_LOAD16_BYTE( "koi-3.5c", 0x100000, 0x080000, CRC(6fd88149) SHA1(87b1be32770232eb041e3ef9d1da45282af8a5d4) )
-	ROM_LOAD(        "koi-5.2c", 0x200000, 0x200000, CRC(561e12c8) SHA1(a7aedf549bc3141fc01bc4a10c235af265ba4ee9) )
+	ROM_LOAD16_BYTE( "koi-4.8c", 0x100001, 0x080000, CRC(ace236df) SHA1(4bf56affe5b6d0ba3cc677eaa91f9be77f26c654) ) // == j_4_koikoi.1h
+	ROM_LOAD16_BYTE( "koi-3.5c", 0x100000, 0x080000, CRC(6fd88149) SHA1(87b1be32770232eb041e3ef9d1da45282af8a5d4) ) // == j_3_koikoi.1l
+	ROM_LOAD(        "koi-5.2c", 0x200000, 0x200000, CRC(561e12c8) SHA1(a7aedf549bc3141fc01bc4a10c235af265ba4ee9) ) // == visco_koi5.pc4
 ROM_END
 
 
@@ -901,11 +921,12 @@ void mayjinsn_state::init_mayjisn2()
  *
  *************************************/
 
-GAME( 1994, renju,      0,      renju,    renju,    st0016_state,   init_renju,    ROT0, "Visco",            "Renju Kizoku - Kira Kira Gomoku Narabe (ver. 1.0)",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, nratechu,   0,      st0016,   nratechu, st0016_state,   init_nratechu, ROT0, "Seta",             "Neratte Chu (ver. 1.10)",                            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mayjisn2,   0,      mayjinsn, mayjisn2, mayjinsn_state, init_mayjisn2, ROT0, "Seta",             "Mayjinsen 2",                                        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, koikois,    0,      st0016,   koikois,  st0016_state,   init_renju,    ROT0, "Visco",            "Koi Koi Shimasho - Super Real Hanafuda",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, gostop,     0,      st0016,   gostop,   st0016_state,   init_renju,    ROT0, "Visco",            "Kankoku Hanafuda Go-Stop",                           MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, renju,      0,       renju,    renju,    st0016_state,   init_renju,    ROT0, "Visco",            "Renju Kizoku - Kira Kira Gomoku Narabe (ver. 1.0)",        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nratechu,   0,       st0016,   nratechu, st0016_state,   init_nratechu, ROT0, "Seta",             "Neratte Chu (ver. 1.10)",                                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mayjisn2,   0,       mayjinsn, mayjisn2, mayjinsn_state, init_mayjisn2, ROT0, "Seta",             "Mayjinsen 2",                                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, koikois,    0,       st0016,   koikois,  st0016_state,   init_renju,    ROT0, "Visco",            "Koi Koi Shimasho - Super Real Hanafuda (E51-00001-A PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, koikoisa,   koikois, st0016,   koikoisa, st0016_state,   init_renju,    ROT0, "Visco",            "Koi Koi Shimasho - Super Real Hanafuda (E63-00001 PCB)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, gostop,     0,       st0016,   gostop,   st0016_state,   init_renju,    ROT0, "Visco",            "Kankoku Hanafuda Go-Stop",                                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 // Not working
 GAME( 1994, mayjinsn,   0,      mayjinsn, st0016,   mayjinsn_state, init_mayjinsn, ROT0, "Seta",             "Mayjinsen",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
