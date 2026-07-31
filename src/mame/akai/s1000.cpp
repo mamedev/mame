@@ -43,6 +43,7 @@
 
 #include "formats/s900_dsk.h"
 #include "formats/hxchfe_dsk.h"
+#include "formats/mfi_dsk.h"
 
 namespace {
 
@@ -330,8 +331,9 @@ void s1000_state::s1000pb(machine_config &config)
 
 	FLOPPY_CONNECTOR(config, m_floppy, s1000_floppies, "35hd", floppy_formats).enable_sound(true);
 
-	// TODO: S900/S950, S1000 floppy softlists
 	SOFTWARE_LIST(config, "cd_list").set_compatible("s3000_cdrom");
+	SOFTWARE_LIST(config, "flop_s900").set_original("s900_flop");
+	SOFTWARE_LIST(config, "flop_s1000").set_original("s1000_flop");
 }
 
 /**************************************************************************/
