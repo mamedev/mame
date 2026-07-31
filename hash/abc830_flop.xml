@@ -212,7 +212,7 @@ license:CC0-1.0
 	<software name="kompil">
 		<description>Kompil</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="RUN KOMPIL" />
 
 		<part name="flop1" interface="floppy_5_25">
@@ -225,11 +225,51 @@ license:CC0-1.0
 	<software name="trim">
 		<description>Trim</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="trim.img" size="163840" crc="f3a6b2ff" sha1="a4253906d483697891314537882c82ff9288cfeb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="socknliv" supported="no">
+		<description>Sockenliv i äldre tid (skollicens, version 1986-05-23)</description>
+		<year>1986</year>
+		<publisher>Liber</publisher>
+		<notes><![CDATA[
+Throws "Error 48"
+]]></notes>
+		<info name="isbn" value="40-71682-1"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Programskiva" />
+			<dataarea name="flop" size="1560810">
+				<rom name="sockenliv i aldre tid (1986-05-23)(liber)(se)(programskiva)[40-71682-1][skollicens].mfi" size="1560810" crc="2dee6c0b" sha1="1589dc04db48ceb5e0dcb1fabd469396740bc22c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Dataskiva" />
+			<dataarea name="flop" size="1555594">
+				<rom name="sockenliv i aldre tid (1986-05-23)(liber)(se)(dataskiva)[40-71682-1][skollicens].mfi" size="1555594" crc="f0b1a891" sha1="843b10e2317d75a6dd54b3ce418cac08d24c1a08"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="socknlivd" cloneof="socknliv">
+		<description>Sockenliv i äldre tid (demo, version 1.1)</description>
+		<year>1986</year>
+		<publisher>Liber</publisher>
+		<notes><![CDATA[
+The sector data is crossing the index on this disk. MFM images cannot handle this.
+Preferrably the image should be an MFI, but for some reason the MFI refuses to load.
+]]></notes>
+		<info name="usage" value="Auto-boots on startup" />
+		<info name="isbn" value="40-71676-7"/>
+		<info name="version" value="1.1"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2217743">
+				<rom name="sockenliv i aldre tid demo.mfm" size="2217743" crc="5421fca2" sha1="569e888c7b472b1f86bffd796c07a1846a11f722" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
