@@ -25,6 +25,7 @@ public:
 		, m_tileram(*this, "tileram")
 		, m_goldnaxeb2_bgpage(*this, "gab2_bgpage")
 		, m_goldnaxeb2_fgpage(*this, "gab2_fgpage")
+		, m_maincpu_rom(*this, "maincpu")
 		, m_sprites_region(*this, "sprites")
 		, m_soundcpu_region(*this, "soundcpu")
 		, m_soundbank(*this, "soundbank")
@@ -52,6 +53,7 @@ public:
 	void passshtb(machine_config &config) ATTR_COLD;
 	void goldnaxeb2(machine_config &config) ATTR_COLD;
 	void beautyb(machine_config &config) ATTR_COLD;
+	void iqpipe(machine_config &config) ATTR_COLD;
 	void goldnaxeb1(machine_config &config) ATTR_COLD;
 	void mwalkbl(machine_config &config) ATTR_COLD;
 	void eswatbl2(machine_config &config) ATTR_COLD;
@@ -124,7 +126,8 @@ private:
 	void goldnaxeb2_bgpage_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void eswat_tilebank0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void altbeastbl_gfx_w(offs_t offset, uint16_t data);
-	uint16_t beautyb_unkx_r();
+	template <unsigned Base> uint16_t beautyb_prot_r(offs_t offset);
+	template <unsigned Base> uint16_t iqpipe_prot_r(offs_t offset);
 	void wb3bble_refreshenable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void sys18_refreshenable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void sys18_tilebank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -144,6 +147,7 @@ private:
 	void upd7759_bank_w(uint8_t data);
 
 	DECLARE_MACHINE_RESET(ddcrewbl);
+	DECLARE_MACHINE_RESET(beautyb);
 	TILEMAP_MAPPER_MEMBER(sys16_bg_map);
 	TILEMAP_MAPPER_MEMBER(sys16_text_map);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -178,6 +182,8 @@ private:
 	void bayrouteb1_map(address_map &map) ATTR_COLD;
 	void bayrouteb2_map(address_map &map) ATTR_COLD;
 	void beautyb_map(address_map &map) ATTR_COLD;
+	void beautyb_opcodes_map(address_map &map) ATTR_COLD;
+	void iqpipe_map(address_map &map) ATTR_COLD;
 	void bloxeedbl_map(address_map &map) ATTR_COLD;
 	void ddcrewbl_map(address_map &map) ATTR_COLD;
 	void dduxbl_map(address_map &map) ATTR_COLD;
@@ -220,6 +226,7 @@ private:
 	optional_shared_ptr<uint16_t> m_goldnaxeb2_bgpage;
 	optional_shared_ptr<uint16_t> m_goldnaxeb2_fgpage;
 
+	required_region_ptr<uint16_t> m_maincpu_rom;
 	optional_memory_region m_sprites_region;
 	optional_memory_region m_soundcpu_region;
 	optional_memory_bank m_soundbank;
@@ -235,7 +242,7 @@ private:
 	int m_passht4b_io2_val = 0;
 	int m_passht4b_io3_val = 0;
 
-	int m_beautyb_unkx = 0;
+	uint8_t m_beautyb_prot_ctr = 0;
 
 	int m_shinobl_kludge = 0; // TODO: this never gets set, causing unreachable code in get_text_tile_info
 
