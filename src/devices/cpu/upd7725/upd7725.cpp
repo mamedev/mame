@@ -386,7 +386,7 @@ void necdsp_device::exec_op(uint32_t opcode)
 		case 15: m_idb = m_dataram.read_word(m_dp & m_drammask); break;
 	}
 
-	if(alu != D7725ALU_NOP)
+	if(alu) // != 0 NOP
 	{
 		uint16_t p=0, q=0, r=0;
 		Flag flag;
@@ -413,21 +413,21 @@ void necdsp_device::exec_op(uint32_t opcode)
 
 		switch(alu)
 		{
-			case D7725ALU_OR  : r = q | p; break;                    // 1 OR
-			case D7725ALU_AND : r = q & p; break;                    // 2 AND
-			case D7725ALU_XOR : r = q ^ p; break;                    // 3 XOR
-			case D7725ALU_SUB : r = q - p; break;                    // 4 SUB
-			case D7725ALU_ADD : r = q + p; break;                    // 5 ADD
-			case D7725ALU_SBB : r = q - p - c; break;                // 6 SBB
-			case D7725ALU_ADC : r = q + p + c; break;                // 7 ADC
-			case D7725ALU_DEC : r = q - 1; p = 1; break;             // 8 DEC
-			case D7725ALU_INC : r = q + 1; p = 1; break;             // 9 INC
-			case D7725ALU_CMP : r = ~q; break;                       // a CMP
-			case D7725ALU_SHR1: r = (q >> 1) | (q & 0x8000); break;  // b SHR1 (ASR)
-			case D7725ALU_SHL1: r = (q << 1) | (c ? 1 : 0); break;   // c SHL1 (ROL)
-			case D7725ALU_SHL2: r = (q << 2) | 3; break;             // d SHL2
-			case D7725ALU_SHL4: r = (q << 4) | 15; break;            // e SHL4
-			case D7725ALU_XCHG: r = swapendian_int16(q); break;      // f XCHG
+			case 0x1: r = q | p; break;                    // 1 OR
+			case 0x2: r = q & p; break;                    // 2 AND
+			case 0x3: r = q ^ p; break;                    // 3 XOR
+			case 0x4: r = q - p; break;                    // 4 SUB
+			case 0x5: r = q + p; break;                    // 5 ADD
+			case 0x6: r = q - p - c; break;                // 6 SBB
+			case 0x7: r = q + p + c; break;                // 7 ADC
+			case 0x8: r = q - 1; p = 1; break;             // 8 DEC
+			case 0x9: r = q + 1; p = 1; break;             // 9 INC
+			case 0xa: r = ~q; break;                       // a CMP
+			case 0xb: r = (q >> 1) | (q & 0x8000); break;  // b SHR1 (ASR)
+			case 0xc: r = (q << 1) | (c ? 1 : 0); break;   // c SHL1 (ROL)
+			case 0xd: r = (q << 2) | 3; break;             // d SHL2
+			case 0xe: r = (q << 4) | 15; break;            // e SHL4
+			case 0xf: r = swapendian_int16(q); break;      // f XCHG
 		}
 
 		flag.s0 = (r & 0x8000);
@@ -436,11 +436,11 @@ void necdsp_device::exec_op(uint32_t opcode)
 
 		switch(alu)
 		{
-			case D7725ALU_OR: case D7725ALU_AND: case D7725ALU_XOR: case D7725ALU_CMP: case D7725ALU_SHL2: case D7725ALU_SHL4: case D7725ALU_XCHG:
+			case 0x1: case 0x2: case 0x3: case 0xa: case 0xd: case 0xe: case 0xf:
 				flag.c = 0;
 				flag.ov0 = flag.ov1 = 0; // OV0 and OV1 are cleared by any non-add/sub/nop operation
 				break;
-			case D7725ALU_SUB: case D7725ALU_ADD: case D7725ALU_SBB: case D7725ALU_ADC: case D7725ALU_DEC: case D7725ALU_INC:
+			case 0x4: case 0x5: case 0x6: case 0x7: case 0x8: case 0x9:
 				if(alu & 1)
 				{
 					//addition
@@ -455,11 +455,11 @@ void necdsp_device::exec_op(uint32_t opcode)
 				}
 				flag.ov1 = (flag.ov0 & flag.ov1) ? (flag.s1 == flag.s0) : (flag.ov0 | flag.ov1);
 				break;
-			case D7725ALU_SHR1:
+			case 0xb:
 				flag.c = q & 1;
 				flag.ov0 = flag.ov1 = 0; // OV0 and OV1 are cleared by any non-add/sub/nop operation
 				break;
-			case D7725ALU_SHL1:
+			case 0xc:
 				flag.c = q >> 15;
 				flag.ov0 = flag.ov1 = 0; // OV0 and OV1 are cleared by any non-add/sub/nop operation
 				break;
