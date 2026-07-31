@@ -42,6 +42,7 @@
 #include "dinetwork.h"
 #include "dipty.h"
 #include "emuopts.h"
+#include "sound.h"
 
 
 namespace ui {

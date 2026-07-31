@@ -42,8 +42,10 @@
 #include "rendlay.h"
 #include "romload.h"
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 #include "uiinput.h"
+#include "video.h"
 
 // FIXME: allow OSD module headers to be included in a less ugly way
 #include "../osd/modules/lib/osdlib.h"
