@@ -340,7 +340,7 @@ u8 coco_fdc_device_base::scs_read(offs_t offset)
 {
 	u8 result = 0;
 
-	switch(offset & 0x1F)
+	switch(offset & 0x1f)
 	{
 		case 8:
 			result = m_wd17xx->status_r();
@@ -370,7 +370,7 @@ u8 coco_fdc_device_base::scs_read(offs_t offset)
 
 void coco_fdc_device_base::scs_write(offs_t offset, u8 data)
 {
-	switch(offset & 0x1F)
+	switch(offset & 0x1f)
 	{
 		case 0: case 1: case 2: case 3:
 		case 4: case 5: case 6: case 7:
@@ -469,12 +469,22 @@ ROM_START(coco_scii)
 	ROM_REGION(0x8000, "eprom", ROMREGION_ERASE00)
 	ROM_DEFAULT_BIOS("cdos3")
 
-	ROM_SYSTEM_BIOS(0, "cdos", "Disto C-DOS v4.0 for the CoCo 1/2")
-	ROMX_LOAD("cdos 4 4-6-89 cc1.bin", 0x0000, 0x4000, CRC(9da6db28) SHA1(2cc6e275178ca8d8f281d845792fb0ae069aaeda), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(0, "v11", "RSDOS v1.1")
+	ROMX_LOAD("disk11.rom", 0x0000, 0x2000, CRC(0b9c5415) SHA1(10bdc5aa2d7d7f205f67b47b19003a4bd89defd1), ROM_BIOS(0))
+	ROM_RELOAD(0x2000,0x2000)
+	ROM_RELOAD(0x4000,0x2000)
+	ROM_RELOAD(0x6000,0x2000)
+
+	ROM_SYSTEM_BIOS(1, "cdos", "Disto C-DOS v4.0 for the CoCo 1/2")
+	ROMX_LOAD("cdos 4 4-6-89 cc1.bin", 0x0000, 0x4000, CRC(9da6db28) SHA1(2cc6e275178ca8d8f281d845792fb0ae069aaeda), ROM_BIOS(1))
 	ROM_RELOAD(0x4000,0x4000)
 
-	ROM_SYSTEM_BIOS(1, "cdos3", "Disto C-DOS 3 v1.2 for the CoCo 3")
-	ROMX_LOAD("cdos 1_2 3-30-89 cc3.bin", 0x0000, 0x4000, CRC(891c0094) SHA1(c1fa0fcbf1202a9b63aafd98dce777b502584230), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "cdos3", "Disto C-DOS 3 v1.2 for the CoCo 3")
+	ROMX_LOAD("cdos 1_2 3-30-89 cc3.bin", 0x0000, 0x4000, CRC(891c0094) SHA1(c1fa0fcbf1202a9b63aafd98dce777b502584230), ROM_BIOS(2))
+	ROM_RELOAD(0x4000,0x4000)
+
+	ROM_SYSTEM_BIOS(3, "eados3-200-drt", "Extended A-DOS 3 2.00 for the CoCo 3 with Disto RTIME board")
+	ROMX_LOAD("e-ados3-2.00-40-drt.bin", 0x0000, 0x4000, CRC(1f408cd2) SHA1(b31aae2074ee5a23e1d70bbce952245f0f75d799), ROM_BIOS(3))
 	ROM_RELOAD(0x4000,0x4000)
 ROM_END
 
@@ -573,7 +583,7 @@ namespace
 
 		m_cache = std::make_unique<uint8_t[]>(0x200);
 
-		install_readwrite_handler(0xFF74, 0xFF77,
+		install_readwrite_handler(0xff74, 0xff77,
 				read8sm_delegate(*this, FUNC(coco_scii_device::ff74_read)),
 				write8sm_delegate(*this, FUNC(coco_scii_device::ff74_write)));
 
