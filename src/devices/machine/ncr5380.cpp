@@ -322,12 +322,18 @@ void ncr5380_device::icmd_w(u8 data)
 	{
 		LOG("scsi reset issued\n");
 		device_reset();
-		// the chip is now driving R̅S̅T̅ itself; flag it so the resulting bus
-		// reset notification is not mistaken for an externally-initiated reset
-		// and does not raise a (self-)interrupt the host driver never expects
-		// (NetBSD/pc532 monitor asserts R̅S̅T̅, then aborts on the spurious IRQ).
+		// the chip is now driving R̅S̅T̅ itself; flag it so an externally-initiated
+		// reset can still be told apart in scsi_ctrl_changed().
 		m_rst_out = true;
 		m_scsi_bus->ctrl_w(m_scsi_refid, S_RST, S_RST);
+		// The nscsi bus does not reflect a device's own R̅S̅T̅ back to it, so
+		// scsi_ctrl_changed() is not re-entered here: the base NCR5380/53C80
+		// self-reset interrupt (SP-1051 8.3, "this interrupt also occurs after
+		// setting the ASSERT R̅S̅T̅ bit") must be raised explicitly.  The DP8490
+		// EASI suppresses it (m_rst_self_irq == false), leaving the NetBSD/pc532
+		// monitor -- which asserts R̅S̅T̅ then aborts on a spurious IRQ -- unaffected.
+		if (m_rst_self_irq)
+			set_irq(true);
 	}
 
 	m_icmd = (m_icmd & ~IC_WRITE) | (data & IC_WRITE);
