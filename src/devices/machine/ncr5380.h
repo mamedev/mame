@@ -174,6 +174,7 @@ private:
 	bool m_irq_state;
 	bool m_drq_state;
 	bool m_rst_out;   // chip is driving R̅S̅T̅ (self bus-reset detection)
+	bool m_rst_state; // last-seen bus R̅S̅T̅ level; reset/IRQ fire on the 0->1 edge (SP-1051 8.3)
 
 	bool const m_has_lbs;
 
