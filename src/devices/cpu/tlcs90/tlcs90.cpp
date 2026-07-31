@@ -1574,6 +1574,8 @@ void tlcs90_device::execute_run()
 				if ( m_bc.w.l )
 				{
 					F |= VF;
+				if ( m_bc.w.l && b8 != 0 )
+                {
 					m_pc.w.l -= 2;
 					Cyc();
 				}
