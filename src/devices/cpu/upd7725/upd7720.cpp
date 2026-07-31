@@ -310,7 +310,7 @@ void upd772x_device::execute_run()
 		{
 			opcode = m_cache.read_dword(regs.pc);
 			regs.pc++;
-			// Until SO is fully implemented: if we have a pending byte in SO, send it whole via the callback
+			// Until SO is fully implemented: if we have a pending word in SO, send it whole via the callback
 			if (regs.soack)
 			{
 				regs.soack = 0;
