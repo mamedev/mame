@@ -85,31 +85,28 @@ private:
 		}
 	};
 
-	struct Regs
-	{
-		uint16_t pc;          //program counter
-		uint16_t stack[16];   //LIFO
-		uint16_t rp;          //ROM pointer
-		uint16_t dp;          //data pointer
-		uint8_t  sp;          //stack pointer
-		int16_t  k;
-		int16_t  l;
-		int16_t  m;
-		int16_t  n;
-		int16_t  a;         //accumulator
-		int16_t  b;         //accumulator
-		Flag  flaga;
-		Flag  flagb;
-		uint16_t tr;        //temporary register
-		uint16_t trb;       //temporary register
-		uint16_t sr;        //status register
-		uint16_t dr;        //data register
-		uint16_t si;
-		uint16_t so;
-		uint16_t idb;
-		bool siack;         // Serial in ACK
-		bool soack;         // Serial out ACK
-	} regs;
+	uint16_t m_pc;          //program counter
+	uint16_t m_stack[16];   //LIFO
+	uint16_t m_rp;          //ROM pointer
+	uint16_t m_dp;          //data pointer
+	uint8_t  m_sp;          //stack pointer
+	int16_t  m_k;
+	int16_t  m_l;
+	int16_t  m_m;
+	int16_t  m_n;
+	int16_t  m_a;         //accumulator
+	int16_t  m_b;         //accumulator
+	Flag     m_flaga;
+	Flag     m_flagb;
+	uint16_t m_tr;        //temporary register
+	uint16_t m_trb;       //temporary register
+	uint16_t m_sr;        //status register
+	uint16_t m_dr;        //data register
+	uint16_t m_si;
+	uint16_t m_so;
+	uint16_t m_idb;
+	bool     m_siack;     // Serial in ACK
+	bool     m_soack;     // Serial out ACK
 
 	void exec_op(uint32_t opcode);
 	void exec_rt(uint32_t opcode);
