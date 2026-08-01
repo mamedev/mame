@@ -98,27 +98,6 @@ namespace {
 #define A2GS_2_8M   (A2GS_MASTER_CLOCK/10)
 #define A2GS_1M     (XTAL(1021800))
 
-#define A2GS_UPPERBANK_TAG "inhbank"
-#define A2GS_AUXUPPER_TAG "inhaux"
-#define A2GS_00UPPER_TAG "inh00"
-#define A2GS_01UPPER_TAG "inh01"
-#define A2GS_MEGAII_TAG "megaii"
-#define A2GS_C300_TAG "c3bank"
-#define A2GS_LCBANK_TAG "lcbank"
-#define A2GS_LCAUX_TAG "lcaux"
-#define A2GS_LC00_TAG "lc00"
-#define A2GS_LC01_TAG "lc01"
-#define A2GS_B0CXXX_TAG "bnk0atc"
-#define A2GS_B1CXXX_TAG "bnk1atc"
-#define A2GS_B00000_TAG "b0r00bank"
-#define A2GS_B00200_TAG "b0r02bank"
-#define A2GS_B00400_TAG "b0r04bank"
-#define A2GS_B00800_TAG "b0r08bank"
-#define A2GS_B02000_TAG "b0r20bank"
-#define A2GS_B04000_TAG "b0r40bank"
-
-#define A2GS_KBD_SPEC_TAG "keyb_special"
-
 class apple2gs_state : public driver_device
 {
 public:
@@ -141,30 +120,30 @@ public:
 		  //      m_a2host(*this, "a2host"),
 		  m_gameio(*this, "gameio"),
 		  m_speaker(*this, "speaker_sound"),
-		  m_upperbank(*this, A2GS_UPPERBANK_TAG),
-		  m_upperaux(*this, A2GS_AUXUPPER_TAG),
-		  m_upper00(*this, A2GS_00UPPER_TAG),
-		  m_upper01(*this, A2GS_01UPPER_TAG),
-		  m_megaii(*this, A2GS_MEGAII_TAG),
-		  m_c300bank(*this, A2GS_C300_TAG),
-		  m_b0_0000bank(*this, A2GS_B00000_TAG),
-		  m_b0_0200bank(*this, A2GS_B00200_TAG),
-		  m_b0_0400bank(*this, A2GS_B00400_TAG),
-		  m_b0_0800bank(*this, A2GS_B00800_TAG),
-		  m_b0_2000bank(*this, A2GS_B02000_TAG),
-		  m_b0_4000bank(*this, A2GS_B04000_TAG),
+		  m_upperbank(*this, "inhbank"),
+		  m_upperaux(*this, "inhaux"),
+		  m_upper00(*this, "inh00"),
+		  m_upper01(*this, "inh01"),
+		  m_megaii(*this, "megaii"),
+		  m_c300bank(*this, "c3bank"),
+		  m_b0_0000bank(*this, "b0r00bank"),
+		  m_b0_0200bank(*this, "b0r02bank"),
+		  m_b0_0400bank(*this, "b0r04bank"),
+		  m_b0_0800bank(*this, "b0r08bank"),
+		  m_b0_2000bank(*this, "b0r20bank"),
+		  m_b0_4000bank(*this, "b0r40bank"),
 		  m_e0_0000bank(*this, "e0_0000_bank"),
 		  m_e0_0200bank(*this, "e0_0200_bank"),
 		  m_e0_0400bank(*this, "e0_0400_bank"),
 		  m_e0_0800bank(*this, "e0_0800_bank"),
 		  m_e0_2000bank(*this, "e0_2000_bank"),
 		  m_e0_4000bank(*this, "e0_4000_bank"),
-		  m_lcbank(*this, A2GS_LCBANK_TAG),
-		  m_lcaux(*this, A2GS_LCAUX_TAG),
-		  m_lc00(*this, A2GS_LC00_TAG),
-		  m_lc01(*this, A2GS_LC01_TAG),
-		  m_bank0_atc(*this, A2GS_B0CXXX_TAG),
-		  m_bank1_atc(*this, A2GS_B1CXXX_TAG),
+		  m_lcbank(*this, "lcbank"),
+		  m_lcaux(*this, "lcaux"),
+		  m_lc00(*this, "lc00"),
+		  m_lc01(*this, "lc01"),
+		  m_bank0_atc(*this, "bnk0atc"),
+		  m_bank1_atc(*this, "bnk1atc"),
 		  m_scc(*this, "scc"),
 		  m_doc(*this, "doc"),
 		  m_iwm(*this, "fdc"),
@@ -3874,10 +3853,10 @@ void apple2gs_state::apple2gs(machine_config &config)
 	RAM(config, m_ram).set_default_size("2M").set_extra_options("1M,3M,4M,5M,6M,7M,8M").set_default_value(0x00);
 
 	/* Mega II bank latching */
-	ADDRESS_MAP_BANK(config, A2GS_MEGAII_TAG).set_map(&apple2gs_state::megaii_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x20000);
+	ADDRESS_MAP_BANK(config, m_megaii).set_map(&apple2gs_state::megaii_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x20000);
 
 	/* C300 banking */
-	ADDRESS_MAP_BANK(config, A2GS_C300_TAG).set_map(&apple2gs_state::c300bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x100);
+	ADDRESS_MAP_BANK(config, m_c300bank).set_map(&apple2gs_state::c300bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x100);
 
 	/* serial */
 	SCC85C30(config, m_scc, A2GS_7M);
