@@ -124,6 +124,21 @@ offs_t t11_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 				case 005:  util::stream_format(stream, "RESET"); break;
 				case 006:  util::stream_format(stream, "RTT"); flags = STEP_OUT; break;
 				case 007:  util::stream_format(stream, "MFPT"); break;
+				case 010: case 011: case 012:
+				case 013:  util::stream_format(stream, "START"); break;
+				case 014: case 015: case 016:
+				case 017:  util::stream_format(stream, "STEP"); break;
+				case 020:  util::stream_format(stream, "RSEL"); break;
+				case 021:  util::stream_format(stream, "MFUS"); break;
+				case 022:
+				case 023:  util::stream_format(stream, "RCPC"); break;
+				case 024: case 0025: case 0026:
+				case 027:  util::stream_format(stream, "RCPS"); break;
+				case 031:  util::stream_format(stream, "MTUS"); break;
+				case 032:
+				case 033:  util::stream_format(stream, "WCPC"); break;
+				case 034: case 0035: case 0036:
+				case 037:  util::stream_format(stream, "WCPS"); break;
 				default:   util::stream_format(stream, ".WORD %06o", op); break;
 			}
 			break;
