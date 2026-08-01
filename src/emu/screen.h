@@ -417,6 +417,7 @@ public:
 
 	// internal to the video system
 	bool update_quads();
+	void switch_current_bitmap();
 	void update_burnin();
 
 	// globally accessible constants
