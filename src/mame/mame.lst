@@ -741,6 +741,9 @@ altos486
 @source:altos/altos586.cpp
 altos586
 
+@source:altos/altos8000.cpp
+poly201
+
 @source:altos/altos8600.cpp
 altos8600
 
