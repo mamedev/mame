@@ -124,7 +124,6 @@ public:
 		  m_upperaux(*this, "inhaux"),
 		  m_upper00(*this, "inh00"),
 		  m_upper01(*this, "inh01"),
-		  m_megaii(*this, "megaii"),
 		  m_c300bank(*this, "c3bank"),
 		  m_b0_0000bank(*this, "b0r00bank"),
 		  m_b0_0200bank(*this, "b0r02bank"),
@@ -144,6 +143,7 @@ public:
 		  m_lc01(*this, "lc01"),
 		  m_bank0_atc(*this, "bnk0atc"),
 		  m_bank1_atc(*this, "bnk1atc"),
+		  m_megaii(*this, "megaii"),
 		  m_scc(*this, "scc"),
 		  m_doc(*this, "doc"),
 		  m_iwm(*this, "fdc"),
@@ -184,11 +184,12 @@ private:
 	required_device<apple2_gameio_device> m_gameio;
 	required_device<speaker_sound_device> m_speaker;
 	memory_view m_upperbank, m_upperaux, m_upper00, m_upper01;
-	required_device<address_map_bank_device> m_megaii;
 	required_device<address_map_bank_device> m_c300bank;
 	memory_view m_b0_0000bank, m_b0_0200bank, m_b0_0400bank, m_b0_0800bank, m_b0_2000bank, m_b0_4000bank;
 	memory_view m_e0_0000bank, m_e0_0200bank, m_e0_0400bank, m_e0_0800bank, m_e0_2000bank, m_e0_4000bank;
 	memory_view m_lcbank, m_lcaux, m_lc00, m_lc01, m_bank0_atc, m_bank1_atc;
+	required_device<address_map_bank_device> m_megaii;
+	memory_access<17, 0, 0, ENDIANNESS_LITTLE>::specific m_megaii_space;
 	required_device<z80scc_device> m_scc;
 	required_device<es5503_device> m_doc;
 	required_device<applefdintf_device> m_iwm;
@@ -646,6 +647,7 @@ void apple2gs_state::machine_start()
 	m_e0_2000bank.select(0);
 	m_b0_4000bank.select(0);
 	m_e0_4000bank.select(0);
+	m_megaii->space(AS_PROGRAM).specific(m_megaii_space);
 	m_inh_bank = 0;
 	std::fill(std::begin(m_megaii_ram), std::end(m_megaii_ram), 0);
 
@@ -2493,7 +2495,7 @@ void apple2gs_state::fastram_r(offs_t offset, u8 &data)
 		// I/O is shadowed from all RAM banks
 		if (!(m_shadow & SHAD_IOLC) && ((offset16 >> 12) == 0xc))
 		{
-			data = m_megaii->space().read_byte(offset16);
+			data = m_megaii_space.read_byte(offset16);
 		}
 	}
 }
@@ -2507,7 +2509,7 @@ void apple2gs_state::fastram_w(offs_t offset, u8 &data)
 		// I/O is shadowed from all RAM banks
 		if (!(m_shadow & SHAD_IOLC) && ((offset16 >> 12) == 0xc))
 		{
-			m_megaii->space().write_byte(offset16, data);
+			m_megaii_space.write_byte(offset16, data);
 		}
 		else if (offset & 0x10000)
 		{
@@ -3231,8 +3233,8 @@ void apple2gs_state::apple2gs_map(address_map &map)
 	// Unfortunately all I/O happens here, including new IIgs-specific stuff
 	map(0xe00000, 0xe0ffff).m(m_megaii, FUNC(address_map_bank_device::amap8));
 	map(0xe10000, 0xe1ffff).lrw8(
-		[this](offs_t offset)          { return m_megaii->space().read_byte(offset + m_banklatch); }, "e1_r",
-		[this](offs_t offset, u8 data) { m_megaii->space().write_byte(offset + m_banklatch, data); }, "e1_w");
+		[this](offs_t offset)          { return m_megaii_space.read_byte(offset + m_banklatch); }, "e1_r",
+		[this](offs_t offset, u8 data) { m_megaii_space.write_byte(offset + m_banklatch, data); }, "e1_w");
 
 	map(0xfe0000, 0xffffff).rom().region("maincpu", 0x20000);
 }
