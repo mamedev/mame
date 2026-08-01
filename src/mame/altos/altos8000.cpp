@@ -4,6 +4,9 @@
 
     Preliminary driver for Altos ACS8000 Microcomputer Family & clones.
 
+    According to "Manual Geral Poly 201 DP", the system also includes a video
+    board that uses a I8275 CRTC and 4802 RAM.
+
 *******************************************************************************/
 
 #include "emu.h"
