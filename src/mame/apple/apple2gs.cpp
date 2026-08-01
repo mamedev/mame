@@ -400,6 +400,7 @@ private:
 	u8 floatingbank_r(offs_t offset);
 	u8 ghostram_r(offs_t offset);
 	void ghostram_w(offs_t offset, u8 data);
+	void fastram_r(offs_t offset, u8 &data);
 	void fastram_w(offs_t offset, u8 &data);
 	void a2bus_irq_w(int state);
 	void a2bus_nmi_w(int state);
@@ -746,12 +747,14 @@ void apple2gs_state::machine_start()
 		}
 	}
 
-	// tap RAM writes for FPI shadow
-	space.install_write_tap(
+	// tap RAM for FPI shadow
+	space.install_readwrite_tap(
 		0x020000, 0xdfffff, "fpi",
+		[this](offs_t offset, u8 &data, u8 mem_mask) { fastram_r(offset, data); },
 		[this](offs_t offset, u8 &data, u8 mem_mask) { fastram_w(offset, data); });
-	space.install_write_tap(
+	space.install_readwrite_tap(
 		0xe20000, 0xefffff, "fpi",
+		[this](offs_t offset, u8 &data, u8 mem_mask) { fastram_r(offset, data); },
 		[this](offs_t offset, u8 &data, u8 mem_mask) { fastram_w(offset, data); });
 
 	// setup save states
@@ -2500,6 +2503,20 @@ void apple2gs_state::ghostram_w(offs_t offset, u8 data)
 
 	if (ghost_offset < m_ram_size)
 		m_ram_ptr[ghost_offset] = data;
+}
+
+void apple2gs_state::fastram_r(offs_t offset, u8 &data)
+{
+	if (m_speed & SPEED_ALLBANKS)
+	{
+		const u16 offset16 = offset & 0xffff;
+
+		// I/O is shadowed from all RAM banks
+		if (!(m_shadow & SHAD_IOLC) && ((offset16 >> 12) == 0xc))
+		{
+			data = m_megaii->space().read_byte(offset16);
+		}
+	}
 }
 
 void apple2gs_state::fastram_w(offs_t offset, u8 &data)
