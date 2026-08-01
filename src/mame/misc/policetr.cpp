@@ -99,7 +99,7 @@ PC5380-9651            5380-JY3306A           5380-N1045503A
 #include "policetr.h"
 
 
-/* constants */
+// constants
 #define MASTER_CLOCK    48000000
 
 
@@ -138,7 +138,7 @@ void policetr_state::control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	const uint32_t old = m_control_data;
 	COMBINE_DATA(&m_control_data);
 
-	/* handle EEPROM I/O */
+	// handle EEPROM I/O
 	if (ACCESSING_BITS_16_23)
 	{
 		machine().bookkeeping().coin_lockout_w(0, BIT(m_control_data, 16));
@@ -156,14 +156,14 @@ void policetr_state::control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		m_leds[LED_PCB_RED] = !BIT(m_control_data, 28);
 		m_leds[LED_PCB_GREEN] = !BIT(m_control_data, 29);
 
-		/* toggling BSMT off then on causes a reset */
+		// toggling BSMT off then on causes a reset
 		if (!BIT(old, 31) && BIT(m_control_data, 31))
 		{
 			m_bsmt->reset();
 		}
 	}
 
-	/* log any unknown bits */
+	// log any unknown bits
 	if (data & 0x0f1fffff)
 		logerror("%s: control_w = %08X & %08X\n", machine().describe_context(), data, mem_mask);
 }
@@ -215,17 +215,17 @@ void policetr_state::speedup_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_speedup_data);
 
-	/* see if the PC matches */
+	// see if the PC matches
 	if ((m_maincpu->pcbase() & 0x1fffffff) == m_speedup_pc)
 	{
 		uint64_t curr_cycles = m_maincpu->total_cycles();
 
-		/* if less than 50 cycles from the last time, count it */
+		// if less than 50 cycles from the last time, count it
 		if (curr_cycles - m_last_cycles < 50)
 		{
 			m_loop_count++;
 
-			/* more than 2 in a row and we spin */
+			// more than 2 in a row and we spin
 			if (m_loop_count > 2)
 				m_maincpu->spin_until_interrupt();
 		}
@@ -299,72 +299,72 @@ void sshooter_state::mem(address_map &map)
 
 static INPUT_PORTS_START( policetr )
 	PORT_START("IN0")
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P2SPR1  (note 1) */
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P2PUSH3 (note 1) */
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P2PUSH2 (note 1) */
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P2USH1  (note 1) */
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P2RIGHT (note 1) */
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P2LEFT  (note 1) */
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P2DOWN  (note 1) */
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P2UP    (note 1) */
-	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P1SPR1  (note 1) */
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P1PUSH3 (note 1) */
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P1PUSH2 (note 1) */
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P1PUSH1 (note 1) */
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P1RIGHT (note 1) */
-	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P1LEFT  (note 1) */
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P1DOWN  (note 1) */
-	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P1UP    (note 1) */
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_UNUSED )   // /P2SPR1  (note 1)
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNUSED )   // /P2PUSH3 (note 1)
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_UNUSED )   // /P2PUSH2 (note 1)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNUSED )   // /P2USH1  (note 1)
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED )   // /P2RIGHT (note 1)
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNUSED )   // /P2LEFT  (note 1)
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )   // /P2DOWN  (note 1)
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED )   // /P2UP    (note 1)
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_UNUSED )   // /P1SPR1  (note 1)
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNUSED )   // /P1PUSH3 (note 1)
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_UNUSED )   // /P1PUSH2 (note 1)
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNUSED )   // /P1PUSH1 (note 1)
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNUSED )   // /P1RIGHT (note 1)
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNUSED )   // /P1LEFT  (note 1)
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )   // /P1DOWN  (note 1)
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED )   // /P1UP    (note 1)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /TILT (note 1) */
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED )   // /TILT (note 1)
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /SERVICE (note 1) */
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )   // /SERVICE (note 1)
 	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_READ_LINE_MEMBER(FUNC(policetr_state::bsmt_status_r))
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_PLAYER(1)
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* /XSW2 (note 2) */
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNKNOWN )  // /XSW2 (note 2)
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_PLAYER(2)
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* /XSW2 (note 2) */
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* TKTSNS (note 3) */
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNKNOWN )  // /XSW2 (note 2)
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNUSED )   // TKTSNS (note 3)
 	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) /* EEPROM read */
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /VOLMDN (note 1) */
-	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /VOLMUP (note 1) */
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )   // /VOLMDN (note 1)
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED )   // /VOLMUP (note 1)
 
-	/* Note 1: Input is unused but is shown in the service menu and noted as written on the I/O schematic in the Police Trainer manual. */
-	/* Note 2: It is unknown if this input is used, but it is noted as written on the I/O schematic in the Police Trainer manual. */
-	/* Note 3: Per the I/O schematic in the Police Trainer manual, the ticket dispenser connector is omitted for production. */
+	// Note 1: Input is unused but is shown in the service menu and noted as written on the I/O schematic in the Police Trainer manual.
+	// Note 2: It is unknown if this input is used, but it is noted as written on the I/O schematic in the Police Trainer manual.
+	// Note 3: Per the I/O schematic in the Police Trainer manual, the ticket dispenser connector is omitted for production.
 
 	PORT_START("DSW")
 	PORT_DIPUNUSED_DIPLOC( 0x00010000, 0x00010000, "SW1:1" )
 	PORT_DIPUNUSED_DIPLOC( 0x00020000, 0x00020000, "SW1:2" )
 	PORT_DIPUNUSED_DIPLOC( 0x00040000, 0x00040000, "SW1:3" )
 	PORT_DIPUNUSED_DIPLOC( 0x00080000, 0x00080000, "SW1:4" )
-	PORT_DIPNAME( 0x00100000, 0x00100000, "Special Hardware Test" ) PORT_DIPLOCATION("SW1:5") /* reset game with TEST button held down to see it */
+	PORT_DIPNAME( 0x00100000, 0x00100000, "Special Hardware Test" ) PORT_DIPLOCATION("SW1:5") // reset game with TEST button held down to see it
 	PORT_DIPSETTING(          0x00100000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x00200000, 0x00200000, "SW1:6" )
 	PORT_DIPNAME( 0x00400000, 0x00400000, "Monitor Sync" ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(          0x00000000, "+" )
 	PORT_DIPSETTING(          0x00400000, "-" )
-	PORT_DIPNAME( 0x00800000, 0x00800000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:8") /* For use with mirrored CRTs - Not supported */
+	PORT_DIPNAME( 0x00800000, 0x00800000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:8") // For use with mirrored CRTs - Not supported
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00800000, DEF_STR( On ) )   /* Will invert the Y axis of guns */
+	PORT_DIPSETTING(          0x00800000, DEF_STR( On ) )   // Will invert the Y axis of guns
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("GUNX1")             /* fake analog X */
+	PORT_START("GUNX1")             // fake analog X
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.012, 0.008, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START("GUNY1")             /* fake analog Y */
+	PORT_START("GUNY1")             // fake analog Y
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.05, 0.002, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 
-	PORT_START("GUNX2")             /* fake analog X */
+	PORT_START("GUNX2")             // fake analog X
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.012, 0.008, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START("GUNY2")             /* fake analog Y */
+	PORT_START("GUNY2")             // fake analog Y
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.05, 0.002, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -372,16 +372,16 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( polict10 )
 	PORT_INCLUDE( policetr )
 
-	PORT_MODIFY("GUNX1")                /* fake analog X */
+	PORT_MODIFY("GUNX1")                // fake analog X
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.018, -0.037, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_MODIFY("GUNY1")                /* fake analog Y */
+	PORT_MODIFY("GUNY1")                // fake analog Y
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, -0.033, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 
-	PORT_MODIFY("GUNX2")                /* fake analog X */
+	PORT_MODIFY("GUNX2")                // fake analog X
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.018, -0.037, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_MODIFY("GUNY2")                /* fake analog Y */
+	PORT_MODIFY("GUNY2")                // fake analog Y
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, -0.033, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -400,16 +400,16 @@ static INPUT_PORTS_START( sshoot11 )
 	PORT_MODIFY("DSW")
 	PORT_DIPUNUSED_DIPLOC( 0x00100000, 0x00100000, "SW1:5" )
 
-	PORT_MODIFY("GUNX1")                /* fake analog X */
+	PORT_MODIFY("GUNX1")                // fake analog X
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.012, 0.208, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_MODIFY("GUNY1")                /* fake analog Y */
+	PORT_MODIFY("GUNY1")                // fake analog Y
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.093, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 
-	PORT_MODIFY("GUNX2")                /* fake analog X */
+	PORT_MODIFY("GUNX2")                // fake analog X
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.012, 0.208, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_MODIFY("GUNY2")                /* fake analog Y */
+	PORT_MODIFY("GUNY2")                // fake analog Y
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.093, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -431,25 +431,25 @@ void policetr_state::machine_start()
 
 void policetr_state::policetr(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	R3041(config, m_maincpu, MASTER_CLOCK/2);
 	m_maincpu->set_endianness(ENDIANNESS_BIG);
 	m_maincpu->set_addrmap(AS_PROGRAM, &policetr_state::mem);
 
 	EEPROM_93C66_16BIT(config, m_eeprom);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_size(400, 262);  /* needs to be verified */
+	m_screen->set_size(400, 262);  // needs to be verified
 	m_screen->set_visarea(0, 393, 0, 239);
 	m_screen->set_screen_update(FUNC(policetr_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(policetr_state::vblank));
 
 	BT481(config, m_ramdac); // Bt481AKPJ110
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, m_speaker, 2).front();
 
 	BSMT2000(config, m_bsmt, MASTER_CLOCK/2);
@@ -471,14 +471,14 @@ void sshooter_state::sshooter(machine_config &config)
  *
  *************************************/
 
-ROM_START( policetr ) /* Rev 0.3 PCB with the newer AT001 video chip, reports as SOFTWARE REV 1.3B - first version to remove support for high scores */
+ROM_START( policetr ) // Rev 0.3 PCB with the newer AT001 video chip, reports as SOFTWARE REV 1.3B - first version to remove support for high scores
 	ROM_REGION( 0x400000, "gfx", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "u121_police_trainer_p-p_marketing.u121", 0x000000, 0x100000, CRC(56b0b00a) SHA1(4034fe373a61f756f4813f0c20b1cf05e4338059) ) // mask ROM labeled: U121   POLICE TRAINER   P&P MARKETING
 	ROM_LOAD16_BYTE( "u120_police_trainer_p-p_marketing.u120", 0x000001, 0x100000, CRC(ca664142) SHA1(2727ecb9287b4ed30088e017bb6b8763dfb75b2f) ) // mask ROM labeled: U120   POLICE TRAINER   P&P MARKETING
 	ROM_LOAD16_BYTE( "u125_police_trainer_p-p_marketing.u125", 0x200000, 0x100000, CRC(e9ccf3a0) SHA1(b3fd8c094f76ace4cf403c3d0f6bd6c5d8db7d6a) ) // mask ROM labeled: U125   POLICE TRAINER   P&P MARKETING
 	ROM_LOAD16_BYTE( "u124_police_trainer_p-p_marketing.u124", 0x200001, 0x100000, CRC(f4acf921) SHA1(5b244e9a51304318fa0c03eb7365b3c12627d19b) ) // mask ROM labeled: U124   POLICE TRAINER   P&P MARKETING
 
-	ROM_REGION32_BE( 0x80000, "maincpu", 0 )  /* 2MB for R3000 code */
+	ROM_REGION32_BE( 0x80000, "maincpu", 0 )  // 2MB for R3000 code
 	ROM_LOAD32_BYTE( "u113_no_hi_a589.u113", 0x00000, 0x20000, CRC(4bfb0fb5) SHA1(12367688bb821de2c54faed8eec27e74d4dac856) ) // hand written labeled:   U113 NO HI A589
 	ROM_LOAD32_BYTE( "u112_no_hi_36da.u112", 0x00001, 0x20000, CRC(505a89bf) SHA1(77e289311c5d358478d02bf8e5b14adb8ab1caeb) ) // hand written labeled:   U112 NO HI 36DA
 	ROM_LOAD32_BYTE( "u111_no_hi_e6e6.u111", 0x00002, 0x20000, CRC(68e5936e) SHA1(1a8833584a6b74f22fe3bdbb7cd23983da7e6fe1) ) // hand written labeled:   U111 NO HI E6E6
@@ -492,7 +492,7 @@ ROM_START( policetr ) /* Rev 0.3 PCB with the newer AT001 video chip, reports as
 ROM_END
 
 
-ROM_START( policetr13 ) /* Rev 0.3 PCB with the program chips dated 04/01/97, reports as SOFTWARE REV 1.3 */
+ROM_START( policetr13 ) // Rev 0.3 PCB with the program chips dated 04/01/97, reports as SOFTWARE REV 1.3
 	ROM_REGION( 0x400000, "gfx", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "u121_police_trainer_p-p_marketing.u121", 0x000000, 0x100000, CRC(56b0b00a) SHA1(4034fe373a61f756f4813f0c20b1cf05e4338059) ) // mask ROM labeled: U121   POLICE TRAINER   P&P MARKETING
 	ROM_LOAD16_BYTE( "u120_police_trainer_p-p_marketing.u120", 0x000001, 0x100000, CRC(ca664142) SHA1(2727ecb9287b4ed30088e017bb6b8763dfb75b2f) ) // mask ROM labeled: U120   POLICE TRAINER   P&P MARKETING
@@ -512,15 +512,38 @@ ROM_START( policetr13 ) /* Rev 0.3 PCB with the program chips dated 04/01/97, re
 	ROM_RELOAD(                                         0x4f8000, 0x100000 )
 ROM_END
 
+ROM_START( policetr12 ) // Rev 0.2 PCB, reports as SOFTWARE REV 1.2
+	ROM_REGION( 0x400000, "gfx", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "u121_police_trainer_p-p_marketing.u121", 0x000000, 0x100000, CRC(56b0b00a) SHA1(4034fe373a61f756f4813f0c20b1cf05e4338059) )
+	ROM_LOAD16_BYTE( "u120_police_trainer_p-p_marketing.u120", 0x000001, 0x100000, CRC(ca664142) SHA1(2727ecb9287b4ed30088e017bb6b8763dfb75b2f) )
+	ROM_LOAD16_BYTE( "u125_police_trainer_p-p_marketing.u125", 0x200000, 0x100000, CRC(e9ccf3a0) SHA1(b3fd8c094f76ace4cf403c3d0f6bd6c5d8db7d6a) )
+	ROM_LOAD16_BYTE( "u124_police_trainer_p-p_marketing.u124", 0x200001, 0x100000, CRC(f4acf921) SHA1(5b244e9a51304318fa0c03eb7365b3c12627d19b) )
 
-ROM_START( policetr11 ) /* Rev 0.3 PCB with the program chips dated 01/06/97, reports as SOFTWARE REV 1.1 */
+	ROM_REGION32_BE( 0x80000, "maincpu", 0 )  // 2MB for R3000 code
+	ROM_LOAD32_BYTE( "u113-27c010.u113", 0x00000, 0x20000, CRC(acb452eb) SHA1(904e3d6f20adb9eaeabc58cb2bec470b1fb2f0a3) )
+	ROM_LOAD32_BYTE( "u112-27c010.u112", 0x00001, 0x20000, CRC(3f524a9f) SHA1(6ee1f021d7545a5e048ffe88b5af45c8456e8920) )
+	ROM_LOAD32_BYTE( "u111-27c010.u111", 0x00002, 0x20000, CRC(7bae731d) SHA1(2f02daf1ffa5dfb1a0edc6212b8af93789540f55) )
+	ROM_LOAD32_BYTE( "u110-27c010.u110", 0x00003, 0x20000, CRC(386b427b) SHA1(03ff55bfc608896ac6d2fbae41242bac5e6922f7) )
+
+	ROM_REGION( 0x1000000, "bsmt", 0 )
+	ROM_LOAD( "u160_police_trainer_p-p_marketing.u160", 0x000000, 0x100000, CRC(f267f813) SHA1(ae58507947fe2e9701b5df46565fd9908e2f9d77) )
+	ROM_RELOAD(                                         0x3f8000, 0x100000 )
+	ROM_LOAD( "u162_police_trainer_p-p_marketing.u162", 0x100000, 0x100000, CRC(75fe850e) SHA1(ab8cf24ae6e5cf80f6a9a34e46f2b1596879643b) )
+	ROM_RELOAD(                                         0x4f8000, 0x100000 )
+
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "myf_u151_lsi-2032-80lj.u151", 0x000, 0x400, CRC(ce54f972) SHA1(46c2949a1b50bc03395699fd0d21811438e0080a) )
+	ROM_LOAD( "u109.p_lsi-2032-110l.u109",   0x000, 0x400, CRC(0d0bd942) SHA1(3ba18bb819e4dde2268a2cd12cc0d29738d22e6f) )
+ROM_END
+
+ROM_START( policetr11 ) // Rev 0.3 PCB with the program chips dated 01/06/97, reports as SOFTWARE REV 1.1
 	ROM_REGION( 0x400000, "gfx", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "u121_police_trainer_p-p_marketing.u121", 0x000000, 0x100000, CRC(56b0b00a) SHA1(4034fe373a61f756f4813f0c20b1cf05e4338059) ) // mask ROM labeled: U121   POLICE TRAINER   P&P MARKETING
 	ROM_LOAD16_BYTE( "u120_police_trainer_p-p_marketing.u120", 0x000001, 0x100000, CRC(ca664142) SHA1(2727ecb9287b4ed30088e017bb6b8763dfb75b2f) ) // mask ROM labeled: U120   POLICE TRAINER   P&P MARKETING
 	ROM_LOAD16_BYTE( "u125_police_trainer_p-p_marketing.u125", 0x200000, 0x100000, CRC(e9ccf3a0) SHA1(b3fd8c094f76ace4cf403c3d0f6bd6c5d8db7d6a) ) // mask ROM labeled: U125   POLICE TRAINER   P&P MARKETING
 	ROM_LOAD16_BYTE( "u124_police_trainer_p-p_marketing.u124", 0x200001, 0x100000, CRC(f4acf921) SHA1(5b244e9a51304318fa0c03eb7365b3c12627d19b) ) // mask ROM labeled: U124   POLICE TRAINER   P&P MARKETING
 
-	ROM_REGION32_BE( 0x80000, "maincpu", 0 )  /* 2MB for R3000 code */
+	ROM_REGION32_BE( 0x80000, "maincpu", 0 )  // 2MB for R3000 code
 	ROM_LOAD32_BYTE( "1.1_1-6-97_u113_87a7.u113", 0x00000, 0x20000, CRC(3d62f6d6) SHA1(342ffa38a6972bbb03c89b4dd603c2cc60609d3d) ) // labeled: 1.1  1/6/97   U113 87A7
 	ROM_LOAD32_BYTE( "1.1_1-6-97_u112_9bdb.u112", 0x00001, 0x20000, CRC(942b280b) SHA1(c342ba3255203ce28ff59479da00f26f0bd026e0) ) // labeled: 1.1  1/6/97   U112 9BDB
 	ROM_LOAD32_BYTE( "1.1_1-6-97_u111_7aa2.u111", 0x00002, 0x20000, CRC(da6c45a7) SHA1(471bd372d2ad5bcb29af19dae09f3cfab4b010fd) ) // labeled: 1.1  1/6/97   U111 7AA2
@@ -534,9 +557,9 @@ ROM_START( policetr11 ) /* Rev 0.3 PCB with the program chips dated 01/06/97, re
 ROM_END
 
 
-ROM_START( policetr10 ) /* Rev 0.2 PCB with all chips dated 10/07/96, there is no mention of version on any chip or during the "Factory Test" checksum screen */
+ROM_START( policetr10 ) // Rev 0.2 PCB with all chips dated 10/07/96, there is no mention of version on any chip or during the "Factory Test" checksum screen
 	ROM_REGION( 0x400000, "gfx", ROMREGION_ERASE00 )
-	/* Same data as the other sets, but split in 4 meg roms */
+	// Same data as the other sets, but split in 4 meg ROMs
 	ROM_LOAD16_BYTE( "u121_10-7-96.u121", 0x000000, 0x080000, CRC(9d31e805) SHA1(482f38e07ddb758e1fb444af7b56a0ef6ea945c8) ) // labeled: U121   10/7/96
 	ROM_LOAD16_BYTE( "u120_10-7-96.u120", 0x000001, 0x080000, CRC(b03b9d46) SHA1(2bb8fcb1df09aa762b98adf2e1edd186203746c0) ) // labeled: U120   10/7/96
 	ROM_LOAD16_BYTE( "u123_10-7-96.u123", 0x100000, 0x080000, CRC(80557cf1) SHA1(ba96fd5b6673b382013e1810a36edb827caaff4b) ) // labeled: U123   10/7/96
@@ -546,14 +569,14 @@ ROM_START( policetr10 ) /* Rev 0.2 PCB with all chips dated 10/07/96, there is n
 	ROM_LOAD16_BYTE( "u127_10-7-96.u127", 0x300000, 0x080000, CRC(5031ea1e) SHA1(c1f9272f9874150d510f22c44c186fad0ed3a7e4) ) // labeled: U127   10/7/96
 	ROM_LOAD16_BYTE( "u126_10-7-96.u126", 0x300001, 0x080000, CRC(33bf2653) SHA1(357da2da7df417109adbf600f3455c224f6c076f) ) // labeled: U126   10/7/96
 
-	ROM_REGION32_BE( 0x80000, "maincpu", 0 )  /* 2MB for R3000 code */
+	ROM_REGION32_BE( 0x80000, "maincpu", 0 )  // 2MB for R3000 code
 	ROM_LOAD32_BYTE( "u113_10-7-96.u113", 0x00000, 0x20000, CRC(3e27a0ce) SHA1(0d010da68f950a10a74eddc57941e4c0e2144071) ) // labeled: U113   10/7/96
 	ROM_LOAD32_BYTE( "u112_10-7-96.u112", 0x00001, 0x20000, CRC(fcbcf4ca) SHA1(374291600043cfbbd87260b12961ac6d68caeda0) ) // labeled: U112   10/7/96
 	ROM_LOAD32_BYTE( "u111_10-7-96.u111", 0x00002, 0x20000, CRC(61f79667) SHA1(25298cd8706b5c59f7c9e0f8d44db0df73c23403) ) // labeled: U111   10/7/96
 	ROM_LOAD32_BYTE( "u110_10-7-96.u110", 0x00003, 0x20000, CRC(5c3c1548) SHA1(aab977274ecff7cb5fd540a3d0da7940e9707906) ) // labeled: U110   10/7/96
 
 	ROM_REGION( 0x1000000, "bsmt", 0 )
-	/* Same data as the other sets, but split in 4 meg roms */
+	// Same data as the other sets, but split in 4 meg ROMs
 	ROM_LOAD( "u160_10-7-96.u160", 0x000000, 0x080000, CRC(cd374405) SHA1(e53689d4344c78c3faac22747ada28bc3add8c56) ) // labeled: U160   10/7/96
 	ROM_RELOAD(                    0x3f8000, 0x080000 )
 	ROM_LOAD( "u161_10-7-96.u161", 0x080000, 0x080000, CRC(c33e3497) SHA1(a7d488f04bba3f1b884b0df210c3793f41967d73) ) // labeled: U161   10/7/96
@@ -565,23 +588,23 @@ ROM_START( policetr10 ) /* Rev 0.2 PCB with all chips dated 10/07/96, there is n
 ROM_END
 
 
-ROM_START( policetr13a ) /* Rev 0.5B PCB, unknown program rom date. Actual version is V1.3B */
+ROM_START( policetr13a ) // Rev 0.5B PCB, unknown program ROM date. Actual version is V1.3B
 	ROM_REGION( 0x400000, "gfx", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "u121_police_trainer_p-p_marketing.u121", 0x000000, 0x100000, CRC(56b0b00a) SHA1(4034fe373a61f756f4813f0c20b1cf05e4338059) ) // mask ROM labeled: U121   POLICE TRAINER   P&P MARKETING
 	ROM_LOAD16_BYTE( "u120_police_trainer_p-p_marketing.u120", 0x000001, 0x100000, CRC(ca664142) SHA1(2727ecb9287b4ed30088e017bb6b8763dfb75b2f) ) // mask ROM labeled: U120   POLICE TRAINER   P&P MARKETING
 	ROM_LOAD16_BYTE( "u125_police_trainer_p-p_marketing.u125", 0x200000, 0x100000, CRC(e9ccf3a0) SHA1(b3fd8c094f76ace4cf403c3d0f6bd6c5d8db7d6a) ) // mask ROM labeled: U125   POLICE TRAINER   P&P MARKETING
 	ROM_LOAD16_BYTE( "u124_police_trainer_p-p_marketing.u124", 0x200001, 0x100000, CRC(f4acf921) SHA1(5b244e9a51304318fa0c03eb7365b3c12627d19b) ) // mask ROM labeled: U124   POLICE TRAINER   P&P MARKETING
 
-	ROM_REGION32_BE( 0x100000, "maincpu", 0 ) /* Program roms are type 27C020 */
+	ROM_REGION32_BE( 0x100000, "maincpu", 0 ) // Program ROMs are type 27C020
 /*
-Note: With this version, the program roms are twice the size of those found on all other Police Trainer sets. Like the set listed below,
+Note: With this version, the program ROMs are twice the size of those found on all other Police Trainer sets. Like the set listed below,
       if you hold the test button down and boot (or reset) the game within Mame. All 4 program ROMs fail the checksum code and the listed
       checksums on the screen match the set below.  IE: U110=556D, U111=E5F1, U112=974C & U113=CB73
 
-      However, if you check the Diagnostics screen, the program rom checksum is 6819480C which is different then the set below. So it
-      looks like it's checking the extra code.  The roms do not contain identical halves, so it's unknown what the "new" data is or does.
+      However, if you check the Diagnostics screen, the program ROM checksum is 6819480C which is different then the set below. So it
+      looks like it's checking the extra code.  The ROMs do not contain identical halves, so it's unknown what the "new" data is or does.
 
-      This set has also been found using mask roms for the program roms which would indicate it was the final version.
+      This set has also been found using mask ROMs for the program ROMs which would indicate it was the final version.
 */
 	ROM_LOAD32_BYTE( "police_trainer_av1.3_u113_fb46.u113", 0x00000, 0x40000, CRC(909c052d) SHA1(23bd4849261ee5cc2414a4043ee929ccf1bd6806) ) // labeled: Police Trainer   Av1.3   U113  FB46
 	ROM_LOAD32_BYTE( "police_trainer_av1.3_u112_201d.u112", 0x00001, 0x40000, CRC(f9dc9ca8) SHA1(52de7bc8c9aa7834d953b9f9e2a65e06f8042f0a) ) // labeled: Police Trainer   Av1.3   U112  201D
@@ -596,20 +619,20 @@ Note: With this version, the program roms are twice the size of those found on a
 ROM_END
 
 
-ROM_START( policetr13b ) /* Rev 0.5B PCB, unknown program rom date Actual version is V1.3B */
+ROM_START( policetr13b ) // Rev 0.5B PCB, unknown program ROM date Actual version is V1.3B
 	ROM_REGION( 0x400000, "gfx", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "u121_police_trainer_p-p_marketing.u121", 0x000000, 0x100000, CRC(56b0b00a) SHA1(4034fe373a61f756f4813f0c20b1cf05e4338059) ) // mask ROM labeled: U121   POLICE TRAINER   P&P MARKETING
 	ROM_LOAD16_BYTE( "u120_police_trainer_p-p_marketing.u120", 0x000001, 0x100000, CRC(ca664142) SHA1(2727ecb9287b4ed30088e017bb6b8763dfb75b2f) ) // mask ROM labeled: U120   POLICE TRAINER   P&P MARKETING
 	ROM_LOAD16_BYTE( "u125_police_trainer_p-p_marketing.u125", 0x200000, 0x100000, CRC(e9ccf3a0) SHA1(b3fd8c094f76ace4cf403c3d0f6bd6c5d8db7d6a) ) // mask ROM labeled: U125   POLICE TRAINER   P&P MARKETING
 	ROM_LOAD16_BYTE( "u124_police_trainer_p-p_marketing.u124", 0x200001, 0x100000, CRC(f4acf921) SHA1(5b244e9a51304318fa0c03eb7365b3c12627d19b) ) // mask ROM labeled: U124   POLICE TRAINER   P&P MARKETING
 
-	ROM_REGION32_BE( 0x100000, "maincpu", 0 ) /* Program roms are type 27C010 */
+	ROM_REGION32_BE( 0x100000, "maincpu", 0 ) // Program ROMs are type 27C010
 /*
 Note: If you hold the test button down and boot (or reset) the game within Mame. All 4 program ROMs fail the checksum code, IE: they
       show in red instead of green.  But, the listed checksums on the screen match the checksums printed on the ROM labels. However,
       this has been verified to happen on a real PCB
 
-      The program rom checksum in the diagnostic screen is 17551773
+      The program ROM checksum in the diagnostic screen is 17551773
 */
 	ROM_LOAD32_BYTE( "police_trainer_v1.3b_u113_cb73.u113", 0x00000, 0x20000, CRC(d636c00d) SHA1(ef989eb85b51a64ca640297c1286514c8d7f8f76) ) // labeled: Police Trainer   v1.3B   U113  CB73
 	ROM_LOAD32_BYTE( "police_trainer_v1.3b_u112_974c.u112", 0x00001, 0x20000, CRC(86f0497e) SHA1(d177023f7cb2e01de60ef072212836dc94759c1a) ) // labeled: Police Trainer   v1.3B   U112  974C
@@ -624,7 +647,7 @@ Note: If you hold the test button down and boot (or reset) the game within Mame.
 ROM_END
 
 
-ROM_START( sshooter ) /* Rev 0.5B PCB, Added a "Welcome" start-up screen which shows "This is Version C191012" */
+ROM_START( sshooter ) // Rev 0.5B PCB, Added a "Welcome" start-up screen which shows "This is Version C191012"
 	ROM_REGION( 0x800000, "gfx", ROMREGION_ERASE00 ) /* Graphics v1.0 */
 	ROM_LOAD16_BYTE( "u121_1-1_g10_021998_ecie-9418_sharpshooter.u121", 0x000000, 0x100000, CRC(22e27dd6) SHA1(cb9e8c450352bb116a9c0407cc8ce6d8ae9d9881) ) // U121 1:1   G10   021998 ECIE:9418   SharpShooter
 	ROM_LOAD16_BYTE( "u120_1-2_g10_021998_ecie-3395_sharpshooter.u120", 0x000001, 0x100000, CRC(30173b1b) SHA1(366464444ce208391ca350f1639403f0c2217330) ) // U120 1:2   G10   021998 ECIE:3395   SharpShooter
@@ -641,7 +664,7 @@ ROM_START( sshooter ) /* Rev 0.5B PCB, Added a "Welcome" start-up screen which s
 	ROM_LOAD32_BYTE( "sharpshooter_v1.9_u111_c3b6.u111", 0x00002, 0x40000, CRC(485d03e8) SHA1(ebdf166b2354b318e6bfb68e0fb5647381b9c405) ) // 1:3 - labeled Sharpshooter v1.9   U111  C3B6
 	ROM_LOAD32_BYTE( "sharpshooter_v1.9_u110_9b6b.u110", 0x00003, 0x40000, CRC(df6a0a45) SHA1(a73a9dcdc669c6e61a5983f3b2a2721fe1b35f34) ) // 1:4 - labeled Sharpshooter v1.9   U110  9B6B
 
-	ROM_REGION( 0x1000000, "bsmt", 0 ) /* Sound v1.2 */
+	ROM_REGION( 0x1000000, "bsmt", 0 ) // Sound v1.2
 	ROM_LOAD( "u160_1-1_s12_030398_ecie-4791.u160", 0x000000, 0x100000, CRC(1c603d42) SHA1(880992871be52129684052d542946de0cc32ba9a) ) // U160 1:1   S12   030398 ECIE:4791   SharpShooter
 	ROM_RELOAD(                                     0x3f8000, 0x100000 )
 	ROM_LOAD( "u162_2-1_s12_030398_ecie-d722.u162", 0x100000, 0x100000, CRC(40ef448a) SHA1(c96f7b169be2576e9f3783af84c07259efefb812) ) // U162 2:1   S12   030398 ECIE:D722   SharpShooter
@@ -649,8 +672,8 @@ ROM_START( sshooter ) /* Rev 0.5B PCB, Added a "Welcome" start-up screen which s
 ROM_END
 
 
-ROM_START( sshooter17 ) /* Rev 0.5B PCB, unknown program rom date */
-	ROM_REGION( 0x800000, "gfx", ROMREGION_ERASE00 ) /* Graphics v1.0 */
+ROM_START( sshooter17 ) // Rev 0.5B PCB, unknown program ROM date
+	ROM_REGION( 0x800000, "gfx", ROMREGION_ERASE00 ) // Graphics v1.0
 	ROM_LOAD16_BYTE( "u121_1-1_g10_021998_ecie-9418_sharpshooter.u121", 0x000000, 0x100000, CRC(22e27dd6) SHA1(cb9e8c450352bb116a9c0407cc8ce6d8ae9d9881) ) // U121 1:1   G10   021998 ECIE:9418   SharpShooter
 	ROM_LOAD16_BYTE( "u120_1-2_g10_021998_ecie-3395_sharpshooter.u120", 0x000001, 0x100000, CRC(30173b1b) SHA1(366464444ce208391ca350f1639403f0c2217330) ) // U120 1:2   G10   021998 ECIE:3395   SharpShooter
 	ROM_LOAD16_BYTE( "u125_2-1_g10_021998_ecie-4584_sharpshooter.u125", 0x200000, 0x100000, CRC(79e8520a) SHA1(682e5c7954f96db65a137f05cde67c310b85b526) ) // U125 2:1   G10   021998 ECIE:4584   SharpShooter
@@ -666,7 +689,7 @@ ROM_START( sshooter17 ) /* Rev 0.5B PCB, unknown program rom date */
 	ROM_LOAD32_BYTE( "sharpshooter_v1.7_u111_a569.u111", 0x00002, 0x40000, CRC(4240fa2f) SHA1(54223207c1e228d6b836918601c0f65c2692e5bc) ) // 1:3 - labeled Sharpshooter v1.7   U111  A569
 	ROM_LOAD32_BYTE( "sharpshooter_v1.7_u110_a30c.u110", 0x00003, 0x40000, CRC(8ae744ce) SHA1(659cd27865cf5507aae6b064c5bc24b927cf5f5a) ) // 1:4 - labeled Sharpshooter v1.7   U110  A30C
 
-	ROM_REGION( 0x1000000, "bsmt", 0 ) /* Sound v1.2 */
+	ROM_REGION( 0x1000000, "bsmt", 0 ) // Sound v1.2
 	ROM_LOAD( "u160_1-1_s12_030398_ecie-4791.u160", 0x000000, 0x100000, CRC(1c603d42) SHA1(880992871be52129684052d542946de0cc32ba9a) ) // U160 1:1   S12   030398 ECIE:4791   SharpShooter
 	ROM_RELOAD(                                     0x3f8000, 0x100000 )
 	ROM_LOAD( "u162_2-1_s12_030398_ecie-d722.u162", 0x100000, 0x100000, CRC(40ef448a) SHA1(c96f7b169be2576e9f3783af84c07259efefb812) ) // U162 2:1   S12   030398 ECIE:D722   SharpShooter
@@ -674,8 +697,8 @@ ROM_START( sshooter17 ) /* Rev 0.5B PCB, unknown program rom date */
 ROM_END
 
 
-ROM_START( sshooter12 ) /* Rev 0.5B PCB, program roms dated 04/17/98 */
-	ROM_REGION( 0x800000, "gfx", ROMREGION_ERASE00 ) /* Graphics v1.0 */
+ROM_START( sshooter12 ) // Rev 0.5B PCB, program ROMs dated 04/17/98
+	ROM_REGION( 0x800000, "gfx", ROMREGION_ERASE00 ) // Graphics v1.0
 	ROM_LOAD16_BYTE( "u121_1-1_g10_021998_ecie-9418_sharpshooter.u121", 0x000000, 0x100000, CRC(22e27dd6) SHA1(cb9e8c450352bb116a9c0407cc8ce6d8ae9d9881) ) // U121 1:1   G10   021998 ECIE:9418   SharpShooter
 	ROM_LOAD16_BYTE( "u120_1-2_g10_021998_ecie-3395_sharpshooter.u120", 0x000001, 0x100000, CRC(30173b1b) SHA1(366464444ce208391ca350f1639403f0c2217330) ) // U120 1:2   G10   021998 ECIE:3395   SharpShooter
 	ROM_LOAD16_BYTE( "u125_2-1_g10_021998_ecie-4584_sharpshooter.u125", 0x200000, 0x100000, CRC(79e8520a) SHA1(682e5c7954f96db65a137f05cde67c310b85b526) ) // U125 2:1   G10   021998 ECIE:4584   SharpShooter
@@ -691,7 +714,7 @@ ROM_START( sshooter12 ) /* Rev 0.5B PCB, program roms dated 04/17/98 */
 	ROM_LOAD32_BYTE( "u111_1-3_c121012_041798_9c16-d0a1_sharpshooter.u111", 0x00002, 0x40000, CRC(0b291731) SHA1(bd04f0b1b52198344df625fcddfc6c6ccb0bd923) ) // U111 1:3   C121012   041798 9C16:D0A1   Sharpshooter
 	ROM_LOAD32_BYTE( "u110_1-4_c121012_041798_9c16-abb1_sharpshooter.u110", 0x00003, 0x40000, CRC(76841008) SHA1(ccbb88c8d63bf929814144a9d8757c9c7048fdef) ) // U110 1:4   C121012   041798 9C16:ABB1   Sharpshooter
 
-	ROM_REGION( 0x1000000, "bsmt", 0 ) /* Sound v1.2 */
+	ROM_REGION( 0x1000000, "bsmt", 0 ) // Sound v1.2
 	ROM_LOAD( "u160_1-1_s12_030398_ecie-4791.u160", 0x000000, 0x100000, CRC(1c603d42) SHA1(880992871be52129684052d542946de0cc32ba9a) ) // U160 1:1   S12   030398 ECIE:4791   SharpShooter
 	ROM_RELOAD(                                     0x3f8000, 0x100000 )
 	ROM_LOAD( "u162_2-1_s12_030398_ecie-d722.u162", 0x100000, 0x100000, CRC(40ef448a) SHA1(c96f7b169be2576e9f3783af84c07259efefb812) ) // U162 2:1   S12   030398 ECIE:D722   SharpShooter
@@ -699,8 +722,8 @@ ROM_START( sshooter12 ) /* Rev 0.5B PCB, program roms dated 04/17/98 */
 ROM_END
 
 
-ROM_START( sshooter11 ) /* Rev 0.5B PCB, program roms dated 04/03/98 */
-	ROM_REGION( 0x800000, "gfx", ROMREGION_ERASE00 ) /* Graphics v1.0 */
+ROM_START( sshooter11 ) // Rev 0.5B PCB, program ROMs dated 04/03/98
+	ROM_REGION( 0x800000, "gfx", ROMREGION_ERASE00 ) // Graphics v1.0
 	ROM_LOAD16_BYTE( "u121_1-1_g10_021998_ecie-9418_sharpshooter.u121", 0x000000, 0x100000, CRC(22e27dd6) SHA1(cb9e8c450352bb116a9c0407cc8ce6d8ae9d9881) ) // U121 1:1   G10   021998 ECIE:9418   SharpShooter
 	ROM_LOAD16_BYTE( "u120_1-2_g10_021998_ecie-3395_sharpshooter.u120", 0x000001, 0x100000, CRC(30173b1b) SHA1(366464444ce208391ca350f1639403f0c2217330) ) // U120 1:2   G10   021998 ECIE:3395   SharpShooter
 	ROM_LOAD16_BYTE( "u125_2-1_g10_021998_ecie-4584_sharpshooter.u125", 0x200000, 0x100000, CRC(79e8520a) SHA1(682e5c7954f96db65a137f05cde67c310b85b526) ) // U125 2:1   G10   021998 ECIE:4584   SharpShooter
@@ -716,7 +739,7 @@ ROM_START( sshooter11 ) /* Rev 0.5B PCB, program roms dated 04/03/98 */
 	ROM_LOAD32_BYTE( "u111_1-3_c111012_040398_9c16-239d_sharpshooter.u111", 0x00002, 0x40000, CRC(ec209b5f) SHA1(1408b509853b325e865d0b23d237bca321e73f60) ) // U111 1:3   C111012   040398 9C16:239D   Sharpshooter
 	ROM_LOAD32_BYTE( "u110_1-4_c111012_040398_9c16-80c3_sharpshooter.u110", 0x00003, 0x40000, CRC(0f1de201) SHA1(5001de3349357545a6a45102340caf0008b50d7b) ) // U110 1:4   C111012   040398 9C16:80C3   Sharpshooter
 
-	ROM_REGION( 0x1000000, "bsmt", 0 ) /* Sound v1.2 */
+	ROM_REGION( 0x1000000, "bsmt", 0 ) // Sound v1.2
 	ROM_LOAD( "u160_1-1_s12_030398_ecie-4791.u160", 0x000000, 0x100000, CRC(1c603d42) SHA1(880992871be52129684052d542946de0cc32ba9a) ) // U160 1:1   S12   030398 ECIE:4791   SharpShooter
 	ROM_RELOAD(                                     0x3f8000, 0x100000 )
 	ROM_LOAD( "u162_2-1_s12_030398_ecie-d722.u162", 0x100000, 0x100000, CRC(40ef448a) SHA1(c96f7b169be2576e9f3783af84c07259efefb812) ) // U162 2:1   S12   030398 ECIE:D722   SharpShooter
@@ -747,6 +770,7 @@ void policetr_state::driver_start()
 
 GAME( 1996, policetr,    0,        policetr, policetr, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B, Rev 0.3 PCB)",        0 )
 GAME( 1996, policetr13,  policetr, policetr, policetr, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3)",                      0 )
+GAME( 1996, policetr12,  policetr, policetr, polict10, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.2)",                      0 )
 GAME( 1996, policetr11,  policetr, policetr, polict10, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.1)",                      0 )
 GAME( 1996, policetr10,  policetr, policetr, polict10, polict10_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.0)",                      0 )
 
