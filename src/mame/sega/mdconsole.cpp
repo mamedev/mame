@@ -433,7 +433,7 @@ void md_cons_state::_32x_scanline_helper_callback(int scanline)
 
 void md_cons_state::genesis_32x(machine_config &config)
 {
-	md_ntsc(config);
+	md_ntsc(config, true);
 
 	m_vdp->set_md_32x_scanline(FUNC(md_cons_state::_32x_scanline_callback));
 	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback));
@@ -468,7 +468,7 @@ void md_cons_state::genesis_32x(machine_config &config)
 
 void md_cons_state::mdj_32x(machine_config &config)
 {
-	md_ntsc(config);
+	md_ntsc(config, true);
 
 	m_vdp->set_md_32x_scanline(FUNC(md_cons_state::_32x_scanline_callback));
 	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback));
@@ -503,7 +503,7 @@ void md_cons_state::mdj_32x(machine_config &config)
 
 void md_cons_state::md_32x(machine_config &config)
 {
-	md_pal(config);
+	md_pal(config, true);
 
 	m_vdp->set_md_32x_scanline(FUNC(md_cons_state::_32x_scanline_callback));
 	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback));
