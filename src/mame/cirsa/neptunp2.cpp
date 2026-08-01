@@ -431,7 +431,7 @@ ROM_START( perlacrb )
 	ROM_REGION( 0x800, "counters", 0 )
 	ROM_LOAD( "cirsa_cs-4_st24c16.bin", 0x000, 0x800, CRC(16fb7d4f) SHA1(e795731d041bbfd21270d774f3c1d7d4e91c4a15) ) // Probably contains operator data
 
-	ROM_REGION( 0x104, "plds", 0 )
+	ROM_REGION( 0x117, "plds", 0 )
 	ROM_LOAD( "pat_063-1.u6", 0x000, 0x117, BAD_DUMP CRC(39e107c6) SHA1(bb151d9085d81233854a91b1a95c4abae9bd597b) ) // "PAT-063/1", protected, dump from "eurbingo7"
 ROM_END
 
@@ -493,7 +493,7 @@ ROM_START( charles )
 	ROM_REGION( 0x800, "counters", 0 )
 	ROM_LOAD( "cirsa_cs-4.bin", 0x000, 0x800, NO_DUMP )
 
-	ROM_REGION( 0x104, "plds", 0 )
+	ROM_REGION( 0x117, "plds", 0 )
 	ROM_LOAD( "pat_063-1.u6", 0x000, 0x117, BAD_DUMP CRC(39e107c6) SHA1(bb151d9085d81233854a91b1a95c4abae9bd597b) ) // "PAT 063/1", protected, dump from "eurbingo7"
 ROM_END
 
