@@ -554,8 +554,8 @@ ROM_START( gladiador )
 	ROM_REGION( 0x800, "counters", 0 )
 	ROM_LOAD( "225c_b-h240891_cs4_24c16w.bin", 0x000, 0x800, CRC(fd418bd7) SHA1(c257b11288aa70ae986fcf8cbdfcbc4bc83dbd45) ) // Dump for machine with serial 09-01000 (the SEEPROM is probably tied to the serial number)
 
-	ROM_REGION( 0x104, "plds", 0 )
-	ROM_LOAD( "pat_063_tibpal16l8-25cn.u6", 0x000, 0x104, NO_DUMP ) // "PAT 063/1", protected
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "pat_063-1.u6", 0x000, 0x117, BAD_DUMP CRC(39e107c6) SHA1(bb151d9085d81233854a91b1a95c4abae9bd597b) ) // "PAT-063/1", protected, dump from "eurbingo7"
 
 	// Two reels PCBs 615092000401-3
 	ROM_REGION( 0x2000, "reels", 0)
