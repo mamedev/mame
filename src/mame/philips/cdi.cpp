@@ -417,21 +417,22 @@ static const struct
 } cdi220_lcd_indicators[] =
 {
 	{ 0x0001, "MUTE",         LCD_LEFT_X,                      LCD_SIDE_Y0 },
-	{ 0x0002, "PAUSE",        LCD_LEFT_X,                      LCD_SIDE_Y1 },
-	{ 0x0004, "PLAY",         LCD_LEFT_X,                      LCD_SIDE_Y2 },
-	// $0008 is the |> symbol left of the first digit, drawn as artwork below
+	{ 0x0004, "PAUSE",        LCD_LEFT_X,                      LCD_SIDE_Y1 },
+	{ 0x1000, "PLAY",         LCD_LEFT_X,                      LCD_SIDE_Y2 },
+	// also lights |> symbol left of the first digit, drawn as artwork below
 	{ 0x0010, "RTS",          LCD_DIGIT_X,                       LCD_ROW_B },
 	{ 0x0020, "SHUFFLE",      LCD_DIGIT_X +     LCD_DIGIT_WIDTH, LCD_ROW_A },
 	{ 0x0040, " TRACK",       LCD_DIGIT_X +     LCD_DIGIT_WIDTH, LCD_ROW_B },
 	{ 0x0080, "REPEAT",       LCD_DIGIT_X + 3 * LCD_DIGIT_WIDTH, LCD_ROW_A },
 	{ 0x0800, "TOTAL",        LCD_DIGIT_X + 3 * LCD_DIGIT_WIDTH, LCD_ROW_B },
-	{ 0x1000, " REM",         LCD_DIGIT_X + 4 * LCD_DIGIT_WIDTH, LCD_ROW_B },
+	{ 0x0002, " REM",         LCD_DIGIT_X + 4 * LCD_DIGIT_WIDTH, LCD_ROW_B },
 	{ 0x2000, "SCAN",         LCD_DIGIT_X + 5 * LCD_DIGIT_WIDTH, LCD_ROW_A },
 	{ 0x4000, "TRACK",        LCD_DIGIT_X + 5 * LCD_DIGIT_WIDTH, LCD_ROW_B },
 	{ 0x8000, "TIME",         LCD_DIGIT_X + 6 * LCD_DIGIT_WIDTH, LCD_ROW_B },
 	{ 0x0100, "COMPACT DISC", LCD_RIGHT_X,                     LCD_SIDE_Y0 },
 	{ 0x0200, "INTERACTIVE",  LCD_RIGHT_X,                     LCD_SIDE_Y1 },
-	{ 0x0400, "GRAPHICS",     LCD_RIGHT_X,                     LCD_SIDE_Y2 }
+	{ 0x0400, "GRAPHICS",     LCD_RIGHT_X,                     LCD_SIDE_Y2 },
+	{ 0x0008, "UNKW",	      LCD_RIGHT_X,                     LCD_SIDE_Y2 }
 };
 
 static void draw_lcd_text(bitmap_rgb32 &bitmap, const rectangle &bounds, int x, int y, const char *text)
@@ -489,7 +490,7 @@ uint32_t cdi_state::screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb
 	}
 
 	// Draws the play icon.
-	if (indicators & 0x0008)
+	if (indicators & 0x1000)
 	{
 		for (int y = 0; y < 9; y++)
 		{
