@@ -1016,7 +1016,8 @@ void aic6250_device::back_w(int state)
 	if (!(m_control_reg_0 & R07W_P_MEM_CYCLE_REQ))
 	{
 		if (m_dma_cntrl & R05W_TRANSFER_DIR)
-			if (m_fifo.full() || m_dma_count < 8)
+			// stop the prefetch once the FIFO holds the rest of the transfer
+			if (m_fifo.full() || m_fifo.queue_length() >= m_dma_count)
 				m_state_timer->adjust(attotime::zero);
 			else
 				m_breq_cb(1);
