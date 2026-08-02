@@ -514,8 +514,8 @@ void bgfx_vector_renderer::create_sliders()
 		{ "Vector beam width",            30,  75, 400, 1 },   // 0.75
 		{ "Vector beam intensity",        10, 400, 500, 1 },   // 4.00
 		{ "Vector beam halo",              0,   4, 100, 1 },   // 0.04
-		{ "Vector bloom strength",         0,  12, 300, 1 },   // 0.12
-		{ "Vector bloom radius",          20, 195, 400, 1 },   // 1.95
+		{ "Vector bloom strength",         0,  20, 300, 1 },   // 0.20
+		{ "Vector bloom radius",          20, 150, 400, 1 },   // 1.50
 		{ "Vector exposure",              10,  78, 400, 1 },   // 0.78
 	};
 
