@@ -319,7 +319,7 @@ static INPUT_PORTS_START(keyboard)
 	PORT_DIPSETTING(0xd000, "d")
 	PORT_DIPSETTING(0xe000, "e")
 	PORT_DIPSETTING(0xf000, "f")
-	PORT_DIPNAME(0x0f00, 0x0400, "net low nibble")
+	PORT_DIPNAME(0x0f00, 0x0100, "net low nibble")
 	PORT_DIPSETTING(0x0000, "0")
 	PORT_DIPSETTING(0x0100, "1")
 	PORT_DIPSETTING(0x0200, "2")
@@ -336,7 +336,7 @@ static INPUT_PORTS_START(keyboard)
 	PORT_DIPSETTING(0x0d00, "d")
 	PORT_DIPSETTING(0x0e00, "e")
 	PORT_DIPSETTING(0x0f00, "f")
-	PORT_DIPNAME(0x00f0, 0x0020, "host high nibble")
+	PORT_DIPNAME(0x00f0, 0x0000, "host high nibble")
 	PORT_DIPSETTING(0x0000, "0")
 	PORT_DIPSETTING(0x0010, "1")
 	PORT_DIPSETTING(0x0020, "2")
@@ -353,7 +353,7 @@ static INPUT_PORTS_START(keyboard)
 	PORT_DIPSETTING(0x00d0, "d")
 	PORT_DIPSETTING(0x00e0, "e")
 	PORT_DIPSETTING(0x00f0, "f")
-	PORT_DIPNAME(0x000f, 0x0002, "host low nibble")
+	PORT_DIPNAME(0x000f, 0x0001, "host low nibble")
 	PORT_DIPSETTING(0x0000, "0")
 	PORT_DIPSETTING(0x0001, "1")
 	PORT_DIPSETTING(0x0002, "2")
@@ -452,7 +452,10 @@ void cadr_iob_device::chaos_transmit_start()
 
 TIMER_CALLBACK_MEMBER(cadr_iob_device::transmit_callback)
 {
-	if (BIT(m_chaos_csr, CHAOSNET_LOOPBACK_BIT))
+	const bool self_addressed = m_chaos_transmit_pointer >= 3
+		&& m_chaos_transmit_buffer[m_chaos_transmit_pointer - 3] == m_my_chaos_address->read();
+
+	if (BIT(m_chaos_csr, CHAOSNET_LOOPBACK_BIT) || self_addressed)
 	{
 		for (int i = 0; i < m_chaos_transmit_pointer; i++)
 		{
@@ -607,9 +610,15 @@ void cadr_iob_device::map(address_map &map)
 	})).umask32(0xffff);
 	map(0x12 << 4, 0x12 << 4).lr16(NAME([this] {
 		// next word from receive buffer
-		const u16 data = m_chaos_receive_buffer[m_chaos_receive_pointer];
-		m_chaos_receive_pointer = (m_chaos_receive_pointer + 1) % CHAOS_BUFFER_SIZE;
-		return data;
+		if (m_chaos_receive_pointer < m_chaos_receive_size)
+		{
+			const u16 data = m_chaos_receive_buffer[m_chaos_receive_pointer];
+			m_chaos_receive_pointer = (m_chaos_receive_pointer + 1) % CHAOS_BUFFER_SIZE;
+			return data;
+		}
+		m_chaos_csr &= ~CHAOSNET_RECEIVE_DONE;
+		m_chaos_receive_size = 0;
+		return u16(0);
 	})).umask32(0xffff);
 	map(0x13 << 4, 0x13 << 4).lr16(NAME([this] {
 		// count of bits remaining in the receive buffer
@@ -617,7 +626,7 @@ void cadr_iob_device::map(address_map &map)
 		{
 			return m_chaos_receive_bit_count;
 		}
-		return u16(0xffff);
+		return u16(0xfff);
 	})).umask32(0xffff);
 	map(0x15 << 4, 0x15 << 4).lr16(NAME([this] {
 		 // host number of this interface
