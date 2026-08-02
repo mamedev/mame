@@ -90,8 +90,6 @@ private:
 
 void cadr_state::mem_map(address_map &map)
 {
-	map.unmap_value_high();
-
 	// Xbus memory 0 - 16777777 / 000000 - 3bffff (~4M words)
 
 	// The system 100 boot program cannot handle more memory than 2M 32 bit words?
@@ -129,17 +127,6 @@ void cadr_state::mem_map(address_map &map)
 
 void cadr_state::unibus_map(address_map &map)
 {
-	// For debugging
-	map(0000000, 0377777).lrw16(
-		NAME([] (offs_t offset) {
-			printf("Read unibus %08x\n", offset);
-			return 0xffff;
-		}),
-		NAME([] (offs_t offset, u16 data) {
-			printf("Write unibus %08x %04x\n", offset, data);
-		})
-	);
-
 	map(0764100 << 1, 0764176 << 1).m(m_iob, FUNC(cadr_iob_device::map));
 
 	// 766000 - 766017 - diagnostic interface
@@ -242,7 +229,7 @@ void cadr_state::cadr(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, m_mainirq).output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	INPUT_MERGER_ANY_HIGH(config, m_xbusirq).output_handler().set([this](int state) {
 		m_interrupt_status = (m_interrupt_status & ~0x4000) | (state ? 0x4000 : 0);
-		m_mainirq->in_w<IRQ_SOURCE_UNIBUS>(state);
+		m_mainirq->in_w<IRQ_SOURCE_XBUS>(state);
 	});
 
 	CADR_DISK(config, m_disk_controller, 0);
