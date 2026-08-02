@@ -675,7 +675,6 @@ void dynax_adpcm_state::yarunara_rombank_w(uint8_t data)
 
 void dynax_state::yarunara_blit_romregion_w(uint8_t data)
 {
-	logerror("%s: unmapped romregion=%02X\n", machine().describe_context(), data);
 	switch(data)
 	{
 		case 0x00:  dynax_blit_romregion_w(0);    return;
@@ -684,6 +683,8 @@ void dynax_state::yarunara_blit_romregion_w(uint8_t data)
 		case 0x81:  dynax_blit_romregion_w(3);    return;
 		case 0x82:  dynax_blit_romregion_w(4);    return; // mjcomv1
 	}
+
+	logerror("%s: unmapped romregion=%02X\n", machine().describe_context(), data);
 }
 
 void dynax_adpcm_state::yarunara_io_map(address_map &map)
@@ -6515,6 +6516,25 @@ ROM_START( majxtal7 )
 	ROM_LOAD( "4007.1a",  0x2e0000, 0x20000, CRC(8082d0ac) SHA1(44d708f8e307b782105082092edd3ea9affd2329) )
 ROM_END
 
+ROM_START( mjempror ) // D4005208L1-1
+	ROM_REGION( 0x50000, "maincpu", 0 ) // Z80 Code
+	ROM_LOAD( "40201-1.1a",     0x00000, 0x20000, CRC(d1e6c9a1) SHA1(f4a7a5d07c4054614ddca9c75544d75707696f2b) )
+	ROM_RELOAD(                 0x10000, 0x20000 )
+	ROM_LOAD( "dynax_40202.3a", 0x30000, 0x10000, CRC(43e00b3f) SHA1(bd4c5e9bfb25fc9ba5b369ecf315db8bbfd41c37) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000, "blitter", ROMREGION_ERASE00 )
+	ROM_LOAD( "dynax_40203.11a", 0x000000, 0x20000, CRC(e65c3f39) SHA1(a6aa53ecb783e2387383029bed913f553c1544ef) )
+	ROM_LOAD( "dynax_40204.13a", 0x020000, 0x20000, CRC(9f3d7bf2) SHA1(5e99ab23a8704cda56881a200f7923ca798254f0) )
+	ROM_LOAD( "dynax_40205.14a", 0x040000, 0x20000, CRC(b002379d) SHA1(614c564a2a095104ec65aea61169fc17a2a7e415) )
+	ROM_LOAD( "dynax_40206.15a", 0x060000, 0x20000, CRC(75308c65) SHA1(a4d85caba5e2c770ba7731b7428346805b6db71e) )
+	ROM_LOAD( "dynax_40207.17a", 0x080000, 0x20000, CRC(26c2d6e9) SHA1(dff10d81003ad316cfc2a37aab92ea61feba2a5c) )
+	ROM_LOAD( "dynax_40208.18a", 0x0a0000, 0x20000, CRC(e53d20e3) SHA1(49125306a77e5886a1b8fb0c0e111b8231c4d3ce) )
+	ROM_LOAD( "dynax_40209.19a", 0x0c0000, 0x20000, CRC(ee64ad26) SHA1(799c11f260760b0527e1c8dec879cf9c363179b0) )
+	ROM_LOAD( "dynax_40211.18c", 0x0e0000, 0x20000, CRC(886bb8f6) SHA1(f8c7d152c65036edefbc5b812b1f1bf9443346bc) )
+	ROM_LOAD( "dynax_40212.19c", 0x100000, 0x20000, CRC(5420145f) SHA1(1abf76931d9439104b523327d052c79beac59add) )
+	ROM_LOAD( "dynax_40210.17c", 0x120000, 0x20000, CRC(4c04212f) SHA1(1a4e573dfb9af0c3fbdb0704857e4da6fe4d7c09) )
+ROM_END
+
 ROM_START( mjreach )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "cs16-1.u15",     0x00000, 0x40000, CRC(b55bafa6) SHA1(eda4b5e90584bcdf6cd546ba767d9fbcf3aa35c5) )
@@ -7310,6 +7330,7 @@ GAME( 1993, mjelct3blb, mjelctrn, mjelctrn,   mjelct3,  dynax_adpcm_state, init_
 GAME( 1990, majxtal7,   7jigen,   neruton,    majxtal7, dynax_adpcm_state, init_mjelct3,  ROT180, "Dynax",                     "Mahjong X-Tal 7 - Crystal Mahjong / Mahjong Diamond 7 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // reuses a subset of 7jigen assets
 GAME( 1990, neruton,    0,        neruton,    neruton,  dynax_adpcm_state, init_mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro",  "Mahjong Neruton Haikujiradan (Japan, Rev. B?)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, nerutona,   neruton,  neruton,    nerutona, dynax_adpcm_state, init_mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro",  "Mahjong Neruton Haikujiradan (Japan, Rev. A?)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mjempror,   0,        neruton,    neruton,  dynax_adpcm_state, init_mjelct3,  ROT180, "Dynax",                     "Mahjong Emperor (Japan, ver. 1.01)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs inputs checking / DIP definitions
 GAME( 1997, qyjdzjp,    mjelctrn, qyjdzjp,    mjelct3,  dynax_state,       empty_init,    ROT180, "bootleg (Hom Inn)",         "Que You Ji - Dian Zi Ji Pan Jiaqiang Ban (v201)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1995, baoqingt,   0,        baoqingt,   mjelct3,  dynax_state,       empty_init,    ROT0,   "TIC",                       "Bao Qing Tian (TIC)",                                           MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, hanayara,   0,        yarunara,   hanayara, dynax_adpcm_state, empty_init,    ROT180, "Dynax",                     "Hana wo Yaraneba! (Japan)",                                     MACHINE_SUPPORTS_SAVE )
