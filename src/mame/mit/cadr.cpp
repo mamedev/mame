@@ -56,8 +56,8 @@ private:
 	static constexpr u8 IRQ_SOURCE_UNIBUS = 3;
 	static constexpr u8 IRQ_SOURCE_XBUS = 4;
 	
-	void mem_map(address_map &map);
-	void unibus_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void unibus_map(address_map &map) ATTR_COLD;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return 0; }
 	void unibus_irq_and_vector(u16 vector);
 
