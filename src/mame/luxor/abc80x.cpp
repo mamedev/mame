@@ -141,7 +141,9 @@ Notes:
 
     TODO:
 
-    - abc806 30K banking
+    - abc806 PAL P4-11 mapper: m_fetch_charram still required for BASIC FG*
+      (opcode from 7800-7FFF → operand/ROM + low 30K videoram). §10 Options PROM
+      path alone is not sufficient for FGCTL/FGPOINT.
     - cassette
     - abc800 video card bus
 
@@ -1037,31 +1039,117 @@ void abc806_state::vs_w(int state)
 
 void abc806_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	constexpr int HORIZONTAL_PORCH_HACK   = 109;
-	constexpr int VERTICAL_PORCH_HACK     = 27;
+	/*
+	    Native ABC 806 HR scanout (service manual §17 / App. A):
+
+	    - 128 bytes/line × 240 lines from the HRS-selected visible bank
+	      (VM14–VM17 in bits 0–3; §17.3). CPU bank is bits 4–7 (F14–F18).
+	    - Each byte holds two 4-bit färgnr values indexing the 16 HRC regs.
+	    - Each HRC byte is DOT1|DOT2 as P|… nibble pairs (App. A). Hardware
+	      clocks DOT1 then DOT2; unequal pairs are perceived as blandfärg.
+	    - §17.5: all-zero HRC → no HR image. P selects overwrite of text.
+
+	    Pen index uses bits 2–0 of each DOT nibble (bit0=R, matching §17.5
+	    example 0001B = red and abc806_palette). P is bit 3.
+	*/
+	constexpr int HORIZONTAL_PORCH_HACK = 109;
+	constexpr int VERTICAL_PORCH_HACK   = 27;
+	constexpr uint32_t ROW_STRIDE       = 128;
 
 	const pen_t *pen = m_palette->pens();
+	const uint32_t videoram_mask = ABC806_VIDEO_RAM_SIZE - 1;
+	const uint32_t base = ((m_hrs & 0x0f) << 15) & videoram_mask;
 
-	uint32_t addr = (m_hrs & 0x0f) << 15;
+	const int y0 = m_sync + VERTICAL_PORCH_HACK;
+	const int y1 = std::min(cliprect.max_y + 1, y0 + 240);
+	const int x0 = HORIZONTAL_PORCH_HACK + (ABC800_CHAR_WIDTH * 4) - 16;
 
-	for (int y = m_sync + VERTICAL_PORCH_HACK; y < std::min(cliprect.max_y + 1, m_sync + VERTICAL_PORCH_HACK + 240); y++)
+	bool any_hrc = false;
+	for (uint8_t reg : m_hrc)
 	{
-		for (int sx = 0; sx < 128; sx++)
+		if (reg != 0)
 		{
-			uint8_t data = m_video_ram[addr++];
-			uint16_t dot = (m_hrc[data >> 4] << 8) | m_hrc[data & 0x0f];
+			any_hrc = true;
+			break;
+		}
+	}
+	if (!any_hrc)
+		return;
 
-			for (int pixel = 0; pixel < 4; pixel++)
-			{
-				int x = HORIZONTAL_PORCH_HACK + (ABC800_CHAR_WIDTH * 4) - 16 + (sx * 4) + pixel;
+	// 0 = separate DOT pixels; 1 = average both positions; 2 = soft blend
+	// (DOT1 pos (2·D1+D2)/3, DOT2 pos (D1+2·D2)/3) — merges colour, keeps some resolution.
+	const unsigned mix_mode = m_hr_config->read() & 0x03;
 
-				if (BIT(dot, 15) || (bitmap.pix(y, x) == rgb_t::black()))
-				{
-					bitmap.pix(y, x) = pen[(dot >> 12) & 0x07];
-				}
+	auto mix_rgb = [](rgb_t a, rgb_t b, unsigned wa, unsigned wb) -> rgb_t
+	{
+		const unsigned sum = wa + wb;
+		return rgb_t(
+			uint8_t((a.r() * wa + b.r() * wb) / sum),
+			uint8_t((a.g() * wa + b.g() * wb) / sum),
+			uint8_t((a.b() * wa + b.b() * wb) / sum));
+	};
 
-				dot <<= 4;
-			}
+	auto plot_rgb = [&](int y, int x, rgb_t color, bool opaque, bool lit)
+	{
+		if (!lit)
+			return;
+		if (x < 0 || x >= bitmap.width() || y < 0 || y >= bitmap.height())
+			return;
+		if (opaque || bitmap.pix(y, x) == rgb_t::black())
+			bitmap.pix(y, x) = color;
+	};
+
+	auto plot_dot = [&](int y, int x, uint8_t nib)
+	{
+		const bool opaque = BIT(nib, 3);
+		const uint8_t color = nib & 0x07;
+		plot_rgb(y, x, rgb_t(pen[color]), opaque, color != 0 || opaque);
+	};
+
+	auto plot_hrc = [&](int y, int &x, uint8_t hrc)
+	{
+		const uint8_t nib1 = hrc >> 4;
+		const uint8_t nib2 = hrc & 0x0f;
+
+		if (mix_mode == 0)
+		{
+			plot_dot(y, x++, nib1);
+			plot_dot(y, x++, nib2);
+			return;
+		}
+
+		const uint8_t c1 = nib1 & 0x07;
+		const uint8_t c2 = nib2 & 0x07;
+		const bool lit = (c1 | c2) != 0;
+		const bool opaque =
+			(BIT(nib1, 3) && c1) ||
+			(BIT(nib2, 3) && c2);
+		const rgb_t rgb1 = rgb_t(pen[c1]);
+		const rgb_t rgb2 = rgb_t(pen[c2]);
+
+		if (mix_mode == 1 || c1 == c2)
+		{
+			// Average blandfärg: same mixed colour on both DOT positions.
+			const rgb_t color = (c1 == c2) ? rgb1 : mix_rgb(rgb1, rgb2, 1, 1);
+			plot_rgb(y, x++, color, opaque, lit);
+			plot_rgb(y, x++, color, opaque, lit);
+			return;
+		}
+
+		// Soft blandfärg: bias each position toward its own DOT.
+		plot_rgb(y, x++, mix_rgb(rgb1, rgb2, 2, 1), opaque, lit);
+		plot_rgb(y, x++, mix_rgb(rgb1, rgb2, 1, 2), opaque, lit);
+	};
+
+	uint32_t addr = base;
+	for (int y = y0; y < y1; y++)
+	{
+		int x = x0;
+		for (int sx = 0; sx < ROW_STRIDE; sx++)
+		{
+			const uint8_t data = m_video_ram[addr++ & videoram_mask];
+			plot_hrc(y, x, m_hrc[data >> 4]);
+			plot_hrc(y, x, m_hrc[data & 0x0f]);
 		}
 	}
 }
@@ -1336,15 +1424,31 @@ void abc806_state::read_pal_p4(offs_t offset, bool m1l, bool xml, offs_t &m, boo
 	{
 		vr = 1;
 	}
-/*
-    if (!m1l && (offset < 0x7800)
-    {
-        TODO 0..30k read from videoram if fetch opcode from 7800-7fff
-        romd = 1;
-        hre = 1;
-        mux = 0;
-    }
-*/
+
+	// ABC 806: while executing an instruction fetched from the character RAM
+	// window (0x7800-0x7fff), the following operand and data reads must see the
+	// underlying memory instead of the text RAM.  The 0x7800-0x7fff window then
+	// reads the ROM image and the lower 30 KiB is redirected to video RAM.
+	if (m_fetch_charram && m1l && offset < 0x8000)
+	{
+		if (offset >= 0x7800)
+		{
+			romd = 0;
+			ramd = 1;
+			hre = 0;
+			vr = 1;
+			mux = 0;
+		}
+		else
+		{
+			romd = 1;
+			ramd = 1;
+			hre = 1;
+			vr = 1;
+			mux = 0;
+		}
+	}
+
 	size_t videoram_mask = m_ram->size() - 0x8001;
 
 	m = (mux ? ((map & 0x7f) << 12 | (offset & 0xfff)) : ((m_hrs & 0xf0) << 11 | (offset & 0x7fff))) & videoram_mask;
@@ -1384,6 +1488,8 @@ uint8_t abc806_state::read(offs_t offset)
 uint8_t abc806_state::m1_r(offs_t offset)
 {
 	uint8_t data = 0xff;
+
+	m_fetch_charram = offset >= 0x7800 && offset < 0x8000;
 
 	offs_t m = 0;
 	bool m1l = 0, xml = 1, romd = 0, ramd = 0, hre = 0, vr = 1;
@@ -1611,7 +1717,8 @@ void abc806_state::abc806_io(address_map &map)
 	abc800m_io(map);
 
 	map(0x06, 0x06).mirror(0xff18).w(FUNC(abc806_state::hrs_w));
-	map(0x07, 0x07).mirror(0xff18).w(FUNC(abc806_state::hrc_w));
+	// HR palette registers 0-15: OUT (C),A with C=07 and the register in the high byte (e.g. 0x0107)
+	map(0x07, 0x07).select(0xff00).w(FUNC(abc806_state::hrc_w));
 	map(0x34, 0x34).select(0xff00).rw(FUNC(abc806_state::mai_r), FUNC(abc806_state::mao_w));
 	map(0x35, 0x35).mirror(0xff00).rw(FUNC(abc806_state::ami_r), FUNC(abc806_state::amo_w));
 	map(0x36, 0x36).mirror(0xff00).rw(FUNC(abc806_state::sti_r), FUNC(abc806_state::sto_w));
@@ -1667,6 +1774,12 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( abc806 )
 	PORT_INCLUDE(abc800)
+
+	PORT_START("HR")
+	PORT_CONFNAME(0x03, 0x02, "HR DOT1/DOT2 mix")
+	PORT_CONFSETTING(0x00, "Separate pixels")
+	PORT_CONFSETTING(0x01, "Blandfärg average (same on both)")
+	PORT_CONFSETTING(0x02, "Blandfärg soft ((2·D1+D2)/3, (D1+2·D2)/3)")
 INPUT_PORTS_END
 
 
