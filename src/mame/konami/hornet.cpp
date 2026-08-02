@@ -489,6 +489,7 @@ public:
 		m_eepromout(*this, "EEPROMOUT"),
 		m_analog(*this, "ANALOG%u", 1U),
 		m_pcb_digit(*this, "pcbdigit%u", 0U),
+		m_wheel_motor(*this, "wheel_motor"),
 		m_cg_view(*this, "cg_view")
 	{ }
 
@@ -544,6 +545,7 @@ protected:
 	optional_ioport m_eepromout;
 	optional_ioport_array<5> m_analog;
 	output_finder<2> m_pcb_digit;
+	output_finder<> m_wheel_motor;
 	memory_view m_cg_view;
 
 	bool m_sound_irq_enabled = false;
@@ -690,7 +692,11 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 			m_pcb_digit[offset] = bitswap<8>(~data,7,0,1,2,3,4,5,6) & 0x7f;
 			break;
 
-		case 2: // Parallel data register
+		case 2:
+
+			m_wheel_motor = data;
+
+			// Parallel data register
 			LOGSYSREG("Parallel data = %02X\n", data);
 
 			if (m_adc12138_sscope)
