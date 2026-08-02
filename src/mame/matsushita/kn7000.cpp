@@ -58,6 +58,7 @@
 
 #include "emu.h"
 
+#include "bus/technics/kn6000/hdsx3.h"
 #include "machine/intelfsh.h"
 
 
@@ -113,7 +114,11 @@ void kn7000_state::kn6000(machine_config &config)
 	// 0x80+0x30) and validates it against a table of accepted parts before it will
 	// program anything, so the device IDs here are functional, not decorative.
 	// KN6000 accepts MBM29LV160B or AT49BV16X4.
+	FUJITSU_29LV160B(config, "custom_data");
 
+	// CN106, the 70-pin expansion connector; the only unit known to fit it is
+	// the HD-SX3. Its signals are not modelled yet.
+	KN6000_EXPANSION(config, "exp", kn6000_expansion_intf, nullptr);
 }
 
 void kn7000_state::kn6500(machine_config &config)
@@ -125,7 +130,11 @@ void kn7000_state::kn6500(machine_config &config)
 	// 0x80+0x30) and validates it against a table of accepted parts before it will
 	// program anything, so the device IDs here are functional, not decorative.
 	// KN6500 accepts MBM29LV160B or AT49BV16X4.
+	FUJITSU_29LV160B(config, "custom_data");
 
+	// CN106, the 70-pin expansion connector; the only unit known to fit it is
+	// the HD-SX3. Its signals are not modelled yet.
+	KN6000_EXPANSION(config, "exp", kn6000_expansion_intf, nullptr);
 }
 
 void kn7000_state::kn2400(machine_config &config)
