@@ -11,15 +11,20 @@
 
 
 //**************************************************************************
-//  BUS DEVICE
+//  ZORRO II BUS DEVICE
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(ZORRO2_BUS, zorro2_bus_device, "zorro2", "Zorro-II Bus")
 
 zorro2_bus_device::zorro2_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ZORRO2_BUS, tag, owner, clock),
+	zorro2_bus_device(mconfig, ZORRO2_BUS, tag, owner, clock)
+{
+}
+
+zorro2_bus_device::zorro2_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
-	m_zorro_space_config("zorro", ENDIANNESS_BIG, 16, 24, 0, address_map_constructor()),
+	m_zorro2_space_config("zorro", ENDIANNESS_BIG, 16, 24, 0, address_map_constructor()),
 	m_eint1(*this, true),
 	m_eint4(*this, true),
 	m_eint5(*this, true),
@@ -60,7 +65,7 @@ void zorro2_bus_device::device_start()
 device_memory_interface::space_config_vector zorro2_bus_device::memory_space_config() const
 {
 	return space_config_vector{
-		std::make_pair(AS_PROGRAM, &m_zorro_space_config)
+		std::make_pair(0, &m_zorro2_space_config)
 	};
 }
 
@@ -185,7 +190,102 @@ void zorro2_bus_device::busrst_w(int state)
 
 
 //**************************************************************************
-//  SLOT DEVICE
+//  ZORRO III BUS DEVICE
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(ZORRO3_BUS, zorro3_bus_device, "zorro3", "Zorro-III Bus")
+
+zorro3_bus_device::zorro3_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	zorro2_bus_device(mconfig, ZORRO3_BUS, tag, owner, clock),
+	m_zorro3_space_config("zorro3", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor())
+{
+}
+
+device_memory_interface::space_config_vector zorro3_bus_device::memory_space_config() const
+{
+	return space_config_vector{
+		std::make_pair(0, &m_zorro2_space_config),
+		std::make_pair(1, &m_zorro3_space_config)
+	};
+}
+
+uint32_t zorro3_bus_device::zorro2_r(offs_t base, offs_t offset, uint32_t mem_mask)
+{
+	uint32_t data = 0xffffffff;
+	offs_t const address = base + (offset << 2);
+
+	if (ACCESSING_BITS_16_31)
+		data = (data & 0x0000ffff) | (uint32_t(space().read_word(address, mem_mask >> 16)) << 16);
+	if (ACCESSING_BITS_0_15)
+		data = (data & 0xffff0000) | space().read_word(address + 2, mem_mask);
+
+	return data;
+}
+
+void zorro3_bus_device::zorro2_w(offs_t base, offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	offs_t const address = base + (offset << 2);
+
+	if (ACCESSING_BITS_16_31)
+		space().write_word(address, data >> 16, mem_mask >> 16);
+	if (ACCESSING_BITS_0_15)
+		space().write_word(address + 2, data, mem_mask);
+}
+
+// from host
+uint32_t zorro3_bus_device::zorro2_mem_r(offs_t offset, uint32_t mem_mask)
+{
+	return zorro2_r(0x200000, offset, mem_mask);
+}
+
+void zorro3_bus_device::zorro2_mem_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	zorro2_w(0x200000, offset, data, mem_mask);
+}
+
+uint32_t zorro3_bus_device::zorro2_io_r(offs_t offset, uint32_t mem_mask)
+{
+	return zorro2_r(0xe80000, offset, mem_mask);
+}
+
+void zorro3_bus_device::zorro2_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	zorro2_w(0xe80000, offset, data, mem_mask);
+}
+
+uint32_t zorro3_bus_device::zorro2_io_exp_r(offs_t offset, uint32_t mem_mask)
+{
+	return zorro2_r(0xa00000, offset, mem_mask);
+}
+
+void zorro3_bus_device::zorro2_io_exp_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	zorro2_w(0xa00000, offset, data, mem_mask);
+}
+
+uint32_t zorro3_bus_device::zorro3_mem_r(offs_t offset, uint32_t mem_mask)
+{
+	return zorro3_space().read_dword(0x10000000 + (offset << 2), mem_mask);
+}
+
+void zorro3_bus_device::zorro3_mem_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	zorro3_space().write_dword(0x10000000 + (offset << 2), data, mem_mask);
+}
+
+uint32_t zorro3_bus_device::zorro3_io_r(offs_t offset, uint32_t mem_mask)
+{
+	return zorro3_space().read_dword(0xff000000 + (offset << 2), mem_mask);
+}
+
+void zorro3_bus_device::zorro3_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	zorro3_space().write_dword(0xff000000 + (offset << 2), data, mem_mask);
+}
+
+
+//**************************************************************************
+//  ZORRO II SLOT DEVICE
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(ZORRO2_SLOT, zorro2_slot_device, "zorro2_slot", "Zorro-II Slot")
@@ -218,7 +318,19 @@ void zorro2_slot_device::device_start()
 
 
 //**************************************************************************
-//  CARD INTERFACE
+//  ZORRO III SLOT DEVICE
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(ZORRO3_SLOT, zorro3_slot_device, "zorro3_slot", "Zorro-III Slot")
+
+zorro3_slot_device::zorro3_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	zorro2_slot_device(mconfig, ZORRO3_SLOT, tag, owner, clock)
+{
+}
+
+
+//**************************************************************************
+//  ZORRO II CARD INTERFACE
 //**************************************************************************
 
 device_zorro2_card_interface::device_zorro2_card_interface(const machine_config &mconfig, device_t &device) :
@@ -270,4 +382,32 @@ void device_zorro2_card_interface::interface_pre_start()
 
 		m_zorro->add_card(m_slot, this);
 	}
+}
+
+
+//**************************************************************************
+//  ZORRO III CARD INTERFACE
+//**************************************************************************
+
+device_zorro3_card_interface::device_zorro3_card_interface(const machine_config &mconfig, device_t &device) :
+	device_zorro2_card_interface(mconfig, device)
+{
+}
+
+device_zorro3_card_interface::~device_zorro3_card_interface()
+{
+}
+
+void device_zorro3_card_interface::interface_pre_start()
+{
+	device_zorro2_card_interface::interface_pre_start();
+
+	m_zorro3 = dynamic_cast<zorro3_bus_device *>(m_zorro);
+	if (!m_zorro3)
+		fatalerror("Zorro-III card in a Zorro-II slot\n");
+}
+
+address_space &device_zorro3_card_interface::zorro3_space()
+{
+	return m_zorro3->zorro3_space();
 }
