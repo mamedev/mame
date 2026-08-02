@@ -50,8 +50,8 @@ public:
 	virtual bool video_output_update() = 0;
 
 	// Orientation
-	void set_orientation(int orientation) { assert(!configured()); m_orientation = orientation; }
-	int orientation() const { assert(configured()); return m_orientation; }
+	void set_orientation(int orientation) { assert(!device().configured()); m_orientation = orientation; }
+	int orientation() const { assert(device().configured()); return m_orientation; }
 
 	// Timing
 	virtual void override_frame_period(attotime period) = 0;
