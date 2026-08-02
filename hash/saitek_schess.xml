@@ -35,7 +35,7 @@ license:CC0-1.0
 		<publisher>SciSys</publisher>
 		<part name="cart" interface="schess_cart">
 			<dataarea name="rom" size="0x1000">
-				<rom name="y02_mc" size="0x1000" crc="ee761d96" sha1="9c85398ae5ceec72c1a648baf39d1aa7bc315163" />
+				<rom name="y02_mc" size="0x1000" crc="ee761d96" sha1="9c85398ae5ceec72c1a648baf39d1aa7bc315163" /> <!-- M5L2732K -->
 			</dataarea>
 		</part>
 	</software>
