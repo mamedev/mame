@@ -1507,37 +1507,25 @@ void tlcs90_device::execute_run()
 
 			case LDI:
 			case LDIR:
-				WM8( m_de.w.l, RM8(m_hl.w.l) );
-				m_de.w.l++;
-				m_hl.w.l++;
-				m_bc.w.l--;
-				F &= SF | ZF | IF | XCF | CF;
-				if ( m_bc.w.l ) F |= VF;
-
-				if ( m_op == LDI )
-					Cyc();
-				else
-				{
-					if ( m_bc.w.l )
-					{
-						m_pc.w.l -= 2;
-						Cyc();
-					}
-					else
-						Cyc_f();
-				}
-				break;
-
 			case LDD:
 			case LDDR:
 				WM8( m_de.w.l, RM8(m_hl.w.l) );
-				m_de.w.l--;
-				m_hl.w.l--;
+
+				if ( m_op == LDI || m_op == LDIR )
+				{
+					m_de.w.l++;
+					m_hl.w.l++;
+				}
+				else
+				{
+					m_de.w.l--;
+					m_hl.w.l--;
+				}
 				m_bc.w.l--;
 				F &= SF | ZF | IF | XCF | CF;
 				if ( m_bc.w.l ) F |= VF;
 
-				if ( m_op == LDD )
+				if ( m_op == LDI || m_op == LDD )
 					Cyc();
 				else
 				{
@@ -1551,23 +1539,22 @@ void tlcs90_device::execute_run()
 				}
 				break;
 
-//          case CPD:
-//              Cyc();
-//              break;
-//          case CPDR:
-//              Cyc();
-//              break;
-
 			case CPI:
 			case CPIR:
+			case CPD:
+			case CPDR:
 				a8 = RM8(m_hl.w.l);
 				b8 = m_af.b.h - a8;
-				m_hl.w.l++;
+
+				if ( m_op == CPI || m_op == CPIR )
+					m_hl.w.l++;
+				else
+					m_hl.w.l--;
 				m_bc.w.l--;
 				F = (F & (IF | CF)) | SZ[b8] | ((m_af.b.h^a8^b8)&HF) | NF;
 				if ( m_bc.w.l ) F |= VF;
 
-				if ( m_op == CPI )
+				if ( m_op == CPI || m_op == CPD )
 					Cyc();
 				else
 				{
