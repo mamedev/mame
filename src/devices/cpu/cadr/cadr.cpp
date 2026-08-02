@@ -9,7 +9,6 @@ TODO:
 - Instruction bit 45, ilong, not supported.
 - Not all ALU operations are supported.
 - Most 'Misc functions' on instructions are not supported.
-- Sequence break not supported.
 - Most of the diagnostic/spy interface is not supported.
 
 ***************************************************************************/
@@ -327,7 +326,7 @@ void cadr_cpu_device::get_m_source()
 				const u16 l2_index = (l1 << 5) | ((m_md >> 8) & 0x1f);
 				const u32 l2 = m_vma_map_l2[l2_index] & 0xffffff;
 				LOGMASKED(LOG_VMA, "map[md]: md=%x(%o), l1_index=%x(%o), l1=%x(%o), l2_index=%x(%o), l2=%x(%o)\n", m_md, m_md, l1_index, l1_index, l1, l1, l2_index, l2_index, l2, l2);
-				m_m = (l1 << 24) | l2;
+				m_m = (m_write_fault ? (1 << 31) : 0) | (m_access_fault ? (1 << 30) : 0) | (l1 << 24) | l2;
 			}
 			break;
 		case 0x0a:
@@ -639,8 +638,8 @@ bool cadr_cpu_device::jump_condition(s32 a, s32 m)
 		case 0x02: condition = m <= a; break;
 		case 0x03: condition = m == a; break;
 		case 0x04: condition = m_page_fault; break;
-		case 0x05: condition = m_page_fault || m_interrupt_pending; break;
-		case 0x06: condition = m_page_fault || m_interrupt_pending /* || m_sequence_break */; break;
+		case 0x05: condition = m_page_fault || (BIT(m_ic, 27) ? m_interrupt_pending : false); break;
+		case 0x06: condition = m_page_fault || (BIT(m_ic, 27) ? m_interrupt_pending : false) || BIT(m_ic, 26); break;
 		case 0x07: condition = true; break;
 		default:
 			fatalerror("%x(%o): jump condition %02x not implemented", m_prev_pc, m_prev_pc, m_ir & 0x1f);
@@ -664,7 +663,7 @@ void cadr_cpu_device::instruction_stream()
 {
 	u32 lc = m_lc & 0x3ffffff;
 	bool byte_mode = BIT(m_ic, 29);
-	m_lc = (m_lc & 0xbc000000) | ((lc + (byte_mode ? 1 : 2)) & 0x3ffffff);
+	m_lc = (m_lc & 0xbe000000) | ((lc + (byte_mode ? 1 : 2)) & 0x3ffffff);
 
 	if (BIT(m_lc, 31))
 	{
@@ -747,9 +746,16 @@ void cadr_cpu_device::execute_jump()
 			break;
 		case 0x03: // write i-mem
 			LOGMASKED(LOG_TRACE, "write imem a[%x] = %08x , m = %08x\n", (m_ir >> 12) & 0x3fff, m_a, m_m);
+			push_spc(m_n ? m_pc : m_next_pc);
 			m_imem[(m_ir >> 12) & 0x3fff] = (u64(m_a & 0xffff) << 32) | m_m;
 			m_icount--;
-			m_n = false;
+			m_next_pc = pop_spc();
+			if (BIT(m_next_pc, 14))
+			{
+				instruction_stream();
+			}
+			m_next_pc &= 0x3fff;
+			m_popj = false;
 			break;
 		}
 	}
