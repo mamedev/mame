@@ -119,19 +119,25 @@ private:
 ROM_START(prose4k1)
 	ROM_REGION(0x3'0000, "u8", 0)
 	// U4 socket is empty, would map at c0000-cffff
-	ROM_LOAD("v3.4.1_pr4001.u3", 0x0'0000, 0x1'0000, CRC(12dac3ed) SHA1(cf8c0b9de1f00facbc5cb5dc8e2dcbb09d6ff479)) // TMS27C512, printed label, maps at d0000-dffff
-	ROM_LOAD("v3.4.1_pr4001.u2", 0x1'0000, 0x1'0000, CRC(2ee241b7) SHA1(35b81f3b4deb552511f8d8f2d0aac9100fdee49d)) // TMS27C512, printed label, maps at e0000-effff
-	ROM_LOAD("v3.4.1_pr4001.u1", 0x2'0000, 0x1'0000, CRC(559f4950) SHA1(5c8709c82dadaea7012859c20141ef8f59d5e473)) // TMS27C512, handwritten label, maps at f0000-fffff
+	ROM_LOAD("v3.4.1__pr4001__u3.27c512.u3", 0x0'0000, 0x1'0000, CRC(12dac3ed) SHA1(cf8c0b9de1f00facbc5cb5dc8e2dcbb09d6ff479)) // TMS27C512, printed label, maps at d0000-dffff
+	ROM_LOAD("v3.4.1__pr4001__u2.27c512.u2", 0x1'0000, 0x1'0000, CRC(2ee241b7) SHA1(35b81f3b4deb552511f8d8f2d0aac9100fdee49d)) // TMS27C512, printed label, maps at e0000-effff
+	ROM_LOAD("v3.4.1__pr4001__u1.27c512.u1", 0x2'0000, 0x1'0000, CRC(559f4950) SHA1(5c8709c82dadaea7012859c20141ef8f59d5e473)) // TMS27C512, handwritten label, maps at f0000-fffff
 
 	ROM_REGION32_LE( 0x800, "dsp:prg", 0) // unpacked 32 bit le data, cpu data is in low 23 bits
-	ROM_LOAD( "v3.12__5-04-90.prg.u16", 0x0000, 0x0800, CRC(6511df1e) SHA1(d898912bf6f630205340f0f5c17a8d88cf154787)) // identical to the prose2k 3.12 8/9/88 dsp rom
+	ROM_LOAD("v3.12__5-04-90.upd77p20d.prg.u16", 0x0000, 0x0800, CRC(6511df1e) SHA1(d898912bf6f630205340f0f5c17a8d88cf154787)) // identical to the prose2k 3.12 8/9/88 dsp rom
 
 	ROM_REGION16_LE(0x0400, "dsp:dat", 0) // 512*13-bit words, left-justified
-	ROM_LOAD("v3.12__5-04-90.dat.u16", 0x0000, 0x0400, CRC(95e4d57a) SHA1(f6f6d9073677515fcb5b7e47244f05c6a6c874d0)) // identical to the prose2k 3.12 8/9/88 dsp rom
+	ROM_LOAD("v3.12__5-04-90.upd77p20d.dat.u16", 0x0000, 0x0400, CRC(95e4d57a) SHA1(f6f6d9073677515fcb5b7e47244f05c6a6c874d0)) // identical to the prose2k 3.12 8/9/88 dsp rom
 
 	// An older version, v3.1.1 or "V3.11" is also known to exist, but is not dumped. This version only has two eproms, at u1 and u2.
 	// (it may have a third eprom at u3 with leftover ibm pc rom-bios code in it accidentally in the socket but is unused)
 	// this older version also uses the same dsp rom, but labeled v3.12 8/9/88 as on the prose2k
+
+	ROM_REGION(0x0400, "pals", 0)
+	ROM_LOAD("v1.0__a01018.pal10h8cn.u9.jed",  0x0000, 0x0100, NO_DUMP) // decodes /PCSx signals and /DEN and /WR and /RD to enable various chips or pal inputs
+	ROM_LOAD("a01019__v1.2.pal12l10.u14.jed",  0x0100, 0x0100, NO_DUMP) // handles some addressing (UART) and /ALE for triggering the ISA latches and semaphores
+	ROM_LOAD("v1.3__a01017.pal20l10.u15.jed",  0x0200, 0x0100, NO_DUMP) // handles more addressing, the RING inputs (on calltext), and interrupts
+	ROM_LOAD("v1.0__a01020.ampal16r4a.u17.jed",0x0300, 0x0100, NO_DUMP) // handles the registered 4 flag/semaphore bits and in what situations they are set/reset
 ROM_END
 
 
@@ -230,13 +236,23 @@ void prose4k1_device::device_start()
 }
 
 /* 80186/8 peripheral regs:
-a0 UMCS: F03C - 1111 0000 0011 1100 - address: f0000-fffff - purpose: rom area, 64k block, no waitstates, no RDY
-a2 LMCS: 03F8 - 0000 0011 1111 1000 - address: 00000-03fff - purpose: ram area 1, no waitstates, external RDY
+a0 UMCS: F03C - 1111 0000 0011 1100 - address: f0000-fffff - purpose: ROM area, 64k block, no waitstates, no RDY
+a2 LMCS: 03F8 - 0000 0011 1111 1000 - address: 00000-03fff - purpose: RAM area 1, no waitstates, external RDY
 a4 PACS: 033A - 0000 0011 0011 1010 - peripheral base is 0000 0011 0000 0000 0000 = 03000, 2 waitstates, external RDY (for /PCS0-3)
 a6 MMCS: C1FC - 1100 0001 1111 1100 - base address is 1100 000x xxxx xxxx xxxx i.e. 0xc0000, no waitstates, no RDY
 a8 MPCS: A0FA - 1010 0000 1111 1010 - 256k block size, 64k select size (i.e. on a 0x10000 boundary), EX=1, MS=1, 2 waitstates, external RDY (for /PCS4-6)
-This implies a memory mapped /cs for c0000, d0000, e0000, f0000 for the four /MCS pins, and the /PCS pins are memory-mapped at 03000, 03080, 03100, 03180, 03200, 03280, 03300
+This implies a memory mapped /cs for c0000, d0000, e0000 for the first three /MCS pins (since /MCS3 overlaps with /UCS it is presumably suppressed),
+ and the /PCS pins are memory-mapped at 03000, 03080, 03100, 03180, 03200, 03280, 03300
 This also implies that for 3000-3fff the /LMCS and /PCS pin activations WILL OVERLAP, which means that there must be external circuitry to prevent bus contention!
+
+Also note there are two ROM mapping jumpers:
+P14 allows the ROM in socket U3 (and only that socket, which is the ROM at d0000-dffff) to have its pin 1 tied high vs to a15, to allow for a 27256
+ to be used instead of a 27512, or maybe forcing that one eprom to mirror differently to swap firmware modes.
+ The jumper was set to positions 1-2, i.e. A15 was connected to pin 1.
+P15 allows the /OE pins(pin 22) of all of the EPROMs to be tied to A16 instead of to /RD, allowing the use of TC531000 28 pin 128k mask ROMs (or 27c101
+ non-JEDEC 32-pin EPROMs overlapping the edge of the 28-pin sockets). This feature is not used, and the jumper is always set to positions 2-3.
+ Had this feature been used, the settings of the peripheral registers above must be changed to re-map the MCS pins further down in the address space,
+ probably starting at 0x80000 instead of 0xc0000, and also re-map UCS from 0xf0000 to 0xe0000.
 */
 void prose4k1_device::main_map(address_map &map)
 {
@@ -254,8 +270,10 @@ void prose4k1_device::main_map(address_map &map)
 	// 0x3200-0x327f /PCS4 -> 1B write to latch u13 (dsp->pc semaphore)
 	// 0x3280-0x32ff /PCS5 -> C0 data written to registered pal using the high 4 bits as data bits and the U17-2 'latch bit'
 	// 0x3300-0x337f /PCS6 -> 80 data written to registered pal using the high 4 bits as data bits and the U17-3 'latch bit'
-	// 0x3380-0x33ff open bus
-	map(0xd'0000, 0xf'ffff).rom().region("u8", 0x0'0000); // rom extends from c0000-fffff in four /MCS chunks as well as the /UCS chunk redundantly for the f0000-fffff area. however the f0000-fffff section can be theoretically overridden by somehow banking in a different rom or ram, but none is populated
+	// 0x3380-0x33ff open bus "theoretical /PCS7"
+	// 0x3400-0xbffff open bus
+	// 0xc0000-0xcffff - /MCS0, empty rom socket at U4, i.e. open bus
+	map(0xd'0000, 0xf'ffff).rom().region("u8", 0x0'0000); // rom extends from c0000-fffff in 3 /MCS chunks for c0000-effff, as well as the /UCS chunk for the f0000-fffff area.
 }
 
 void prose4k1_device::dsp_prg_map(address_map &map)
@@ -295,6 +313,8 @@ PORT_START("SW1")
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 INPUT_PORTS_END
+
+// TODO: SW2 sets the ISA address of the card, with switches 1-7 (switch 8 is NC) controlling address lines A3-A9
 
 ioport_constructor prose4k1_device::device_input_ports() const
 {
