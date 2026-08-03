@@ -61,7 +61,6 @@ Notes:
 
 #define I8035_Z2_TAG "z2"
 #define I8035_Z5_TAG "z5"
-#define R8_TAG       "r8"
 
 
 
@@ -159,7 +158,7 @@ void abc99_device::device_add_mconfig(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_hz(0));
 
 	// mouse
-	LUXOR_R8(config, m_mouse);
+	QUADMOUSE(config, m_mouse);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -407,6 +406,11 @@ static INPUT_PORTS_START( abc99 )
 
 	PORT_START("J4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keyboard Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(abc99_device::keyboard_reset), 0)
+
+	PORT_START("MOUSE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Left Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Middle Mouse Button") PORT_CODE(MOUSECODE_BUTTON3)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Right Mouse Button") PORT_CODE(MOUSECODE_BUTTON2)
 INPUT_PORTS_END
 
 
@@ -459,10 +463,11 @@ abc99_device::abc99_device(const machine_config &mconfig, const char *tag, devic
 	m_mousecpu(*this, I8035_Z5_TAG),
 	m_watchdog(*this, "watchdog"),
 	m_speaker(*this, "speaker"),
-	m_mouse(*this, R8_TAG),
+	m_mouse(*this, "mouse"),
 	m_x(*this, "X%u", 0),
 	m_z14(*this, "Z14"),
 	m_cursor(*this, "CURSOR"),
+	m_mousebtn(*this, "MOUSE"),
 	m_leds(*this, "led%u", 0U),
 	m_keylatch(0),
 	m_si(1),
@@ -680,7 +685,11 @@ uint8_t abc99_device::z5_p1_r()
 	uint8_t data = 0;
 
 	// mouse
-	data |= m_mouse->read() & 0x7f;
+	data |= (m_mouse->left_r() ? 0x01 : 0);
+	data |= (m_mouse->right_r() ? 0x02 : 0);
+	data |= (m_mouse->down_r() ? 0x04 : 0);
+	data |= (m_mouse->up_r() ? 0x08 : 0);
+	data |= (m_mousebtn->read() & 0x07) << 4;
 
 	// serial input
 	data |= m_si << 7;
