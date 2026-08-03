@@ -1269,7 +1269,7 @@ void macpb030_state::macpb140(machine_config &config)
 	m_pmu->ad_in<5>().set(FUNC(macpb030_state::battery2_r));
 	m_pmu->ad_in<7>().set(FUNC(macpb030_state::battery3_r));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60.15);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1260));
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);

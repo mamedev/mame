@@ -334,7 +334,7 @@ void n64_gateway_state::n64_lodgenet(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(500000));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(DACRATE_NTSC*2,3093,0,3093,525,0,525);
 	m_screen->set_screen_update(FUNC(n64_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(n64_state::screen_vblank));

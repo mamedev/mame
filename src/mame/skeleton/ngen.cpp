@@ -1050,7 +1050,7 @@ void ngen_state::ngen(machine_config &config)
 	// TODO: SCN2652 MPCC (not implemented), used for RS-422 cluster communications?
 
 	// video board
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_size(720, 348);
 	screen.set_visarea(0, 719, 0, 347);
 	screen.set_refresh_hz(60);
@@ -1163,7 +1163,7 @@ void ngen386_state::ngen386(machine_config &config)
 	// TODO: SCN2652 MPCC (not implemented), used for RS-422 cluster communications?
 
 	// video board
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_size(720, 348);
 	screen.set_visarea(0, 719, 0, 347);
 	screen.set_refresh_hz(60);

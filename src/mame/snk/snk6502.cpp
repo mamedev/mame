@@ -811,7 +811,7 @@ void snk6502_state::sasuke(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(snk6502_state::satansat_interrupt));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(11.289_MHz_XTAL / 2, 360, 0, 256, 262, 0, 224); // from crtc
 	screen.set_screen_update(FUNC(snk6502_state::screen_update));
 
@@ -855,7 +855,7 @@ void vanguard_state::vanguard(machine_config &config)
 	m_highmem->set_addr_width(16);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(11.289_MHz_XTAL / 2, 360, 0, 256, 262, 0, 224); // from crtc
 	screen.set_screen_update(FUNC(vanguard_state::screen_update));
 

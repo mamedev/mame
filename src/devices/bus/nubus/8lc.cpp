@@ -108,7 +108,7 @@ INPUT_PORTS_END
 
 void lcpds_cv8lc_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(80'000'000, 1312, 0, 1024, 802, 0, 768);
 	m_screen->set_screen_update(FUNC(lcpds_cv8lc_device::screen_update));
 

@@ -843,7 +843,7 @@ void vic20_state::write_user_cassette_switch(int state)
 
 void vic20_state::vic20(machine_config &config, const char* softlist_filter)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_screen_update(VIC_TAG, FUNC(mos6560_device::screen_update));
 

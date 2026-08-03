@@ -61,6 +61,7 @@
 #include "device.h"
 #include "devfind.h"
 #include "addrmap.h" // Needs optional_device<> and required_device<>
+#include "divo.h"
 #include "distate.h"
 #include "dimemory.h"
 #include "dipalette.h"

@@ -860,7 +860,7 @@ void sat_console_state::saturn(machine_config &config)
 	NVRAM(config, "nvram").set_custom_handler(FUNC(sat_console_state::nvram_init));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK_320/8, 427, 0, 320, 263, 0, 224);
 	m_screen->set_screen_update(FUNC(sat_console_state::screen_update_vdp2));
 

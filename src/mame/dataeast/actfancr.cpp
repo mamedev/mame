@@ -370,7 +370,7 @@ void actfancr_state::actfancr(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &actfancr_state::dec0_s_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
 	screen.set_size(32*8, 32*8);

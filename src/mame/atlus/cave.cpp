@@ -2178,7 +2178,7 @@ void cave_state::add_base_config(machine_config &config, int layer)
 
 	TIMER(config, m_int_timer).configure_generic(FUNC(cave_state::vblank_start));
 
-	SCREEN(config, m_screen[0], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[0]);
 	m_screen[0]->set_refresh_hz(15625/271.5);
 	m_screen[0]->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen[0]->set_size(320, 240);
@@ -2569,7 +2569,7 @@ void ppsatan_state::ppsatan(machine_config &config)
 	m_screen[0]->set_screen_update(FUNC(ppsatan_state::screen_update_ppsatan_top));
 	subdevice<timer_device>("int_timer")->configure_generic(FUNC(ppsatan_state::vblank_start));
 
-	SCREEN(config, m_screen[1], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[1]);
 	m_screen[1]->set_refresh_hz(15625/271.5);
 	m_screen[1]->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen[1]->set_size(320, 240);
@@ -2577,7 +2577,7 @@ void ppsatan_state::ppsatan(machine_config &config)
 	m_screen[1]->set_screen_update(FUNC(ppsatan_state::screen_update_ppsatan_left));
 	TIMER(config, "int_timer_left").configure_generic(FUNC(ppsatan_state::vblank_start_left));
 
-	SCREEN(config, m_screen[2], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[2]);
 	m_screen[2]->set_refresh_hz(15625/271.5);
 	m_screen[2]->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen[2]->set_size(320, 240);

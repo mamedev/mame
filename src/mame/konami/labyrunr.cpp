@@ -419,7 +419,7 @@ void labyrunr_state::labyrunr(machine_config &config)
 	K051733(config, "k051733", 24_MHz_XTAL / 2);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 280, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(labyrunr_state::screen_update));
 	m_screen->set_palette(m_palette);

@@ -1452,7 +1452,7 @@ void rastersp_state::rs_config_base(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_seconds(1));
 
 	/* Video */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_size(320, 240);
 	screen.set_visarea(0, 320-1, 0, 240-1);
 	screen.set_screen_update(FUNC(rastersp_state::screen_update));

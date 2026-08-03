@@ -284,7 +284,7 @@ void reuters_state::reutapm(machine_config &config)
 
 	RAM(config, m_ram).set_default_size("64K");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
 	m_screen->set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 

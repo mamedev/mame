@@ -298,7 +298,7 @@ void sv8000_state::sv8000(machine_config &config)
 	m_s68047p->set_palette(sv8000_palette);
 	m_s68047p->set_screen("screen");
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

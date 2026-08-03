@@ -822,7 +822,7 @@ void aussiebyte_state::aussiebyte(machine_config &config)
 	m_maincpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16_MHz_XTAL, 952, 0, 640, 336, 0, 288);
 	screen.set_screen_update("crtc", FUNC(sy6545_1_device::screen_update));
 

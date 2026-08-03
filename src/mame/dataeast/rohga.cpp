@@ -1360,7 +1360,7 @@ void rohga_state::rohga_base(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(58);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
 	screen.set_size(40*8, 32*8);

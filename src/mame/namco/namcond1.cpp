@@ -515,7 +515,7 @@ void namcond1_state::namcond1(machine_config &config)
 	m_ygv608->set_screen("screen");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	/*
 	H 804 108 576 48 32
 	V 261 26 224 3 0

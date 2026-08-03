@@ -2291,7 +2291,7 @@ void segas16a_state::system16a(machine_config &config)
 	m_i8255->tri_pc_callback().set_constant(0);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(342, 262);   // to be verified
 	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);

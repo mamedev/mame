@@ -453,8 +453,7 @@ void pong_state::pong(machine_config &config)
 	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("videomix", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
-	//SCREEN(config, "screen", SCREEN_TYPE_VECTOR);
+	SCREEN(config, "screen");
 	FIXFREQ(config, m_video)
 		.set_monitor_clock(MASTER_CLOCK_PONG)
 		.set_horz_params(H_TOTAL_PONG-66,H_TOTAL_PONG-40,H_TOTAL_PONG-8,H_TOTAL_PONG)
@@ -506,8 +505,7 @@ void breakout_state::breakout(machine_config &config)
 	/* The Pixel width is a 2,1,2,1,2,1,1,1 repeating pattern
 	 * Thus we must use double resolution horizontally
 	 */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
-	//SCREEN(config, "screen", SCREEN_TYPE_VECTOR);
+	SCREEN(config, "screen");
 	FIXFREQ(config, m_video)
 		.set_monitor_clock(MASTER_CLOCK_BREAKOUT)
 		.set_horz_params((H_TOTAL_BREAKOUT-176),(H_TOTAL_BREAKOUT-144),(H_TOTAL_BREAKOUT-80),  (H_TOTAL_BREAKOUT))
@@ -545,7 +543,7 @@ void pong_state::pongd(machine_config &config)
 	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("videomix", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 	FIXFREQ(config, m_video)
 		.set_monitor_clock(MASTER_CLOCK_PONG)
 		.set_horz_params(H_TOTAL_PONG-76,H_TOTAL_PONG-56,H_TOTAL_PONG-8,H_TOTAL_PONG)
@@ -584,7 +582,7 @@ void rebound_state::rebound(machine_config &config)
 	NETLIST_ANALOG_OUTPUT(config, "maincpu:coin_counter").set_params("CON10", FUNC(rebound_state::coin_counter_cb));
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 	FIXFREQ(config, m_video)
 		.set_monitor_clock(MASTER_CLOCK_PONG)
 		.set_horz_params(H_TOTAL_PONG-66,H_TOTAL_PONG-56,H_TOTAL_PONG-8,H_TOTAL_PONG)

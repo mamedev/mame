@@ -548,7 +548,7 @@ void z88_state::z88(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_banks[3]).set_map(&z88_state::z88_map).set_options(ENDIANNESS_LITTLE, 8, 22, 0x4000);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(Z88_SCREEN_WIDTH, Z88_SCREEN_HEIGHT);

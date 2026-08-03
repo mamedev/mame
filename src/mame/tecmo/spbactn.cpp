@@ -740,7 +740,7 @@ void spbactn_state::spbactn(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &spbactn_state::sound_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// TODO: verify actual blanking frequencies (should be close to NTSC)
 	m_screen->set_raw(XTAL(22'656'000) / 2, 720, 0, 512, 262, 16, 240);
 	m_screen->set_screen_update(FUNC(spbactn_state::screen_update));
@@ -790,7 +790,7 @@ void spbactnp_state::spbactnp(machine_config &config)
 	m_extralatch->data_pending_callback().set_inputline(m_extracpu, INPUT_LINE_NMI);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
@@ -801,7 +801,7 @@ void spbactnp_state::spbactnp(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spbactnp);
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 0x2800 / 2); // yes R and G are swapped vs. the released version
 
-	SCREEN(config, m_extrascreen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_extrascreen);
 	m_extrascreen->set_refresh_hz(60);
 	m_extrascreen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_extrascreen->set_size(32*8, 32*8);

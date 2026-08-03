@@ -1389,7 +1389,7 @@ void midzeus_state::midzeus(machine_config &config)
 	// video hardware
 	PALETTE(config, m_palette, palette_device::RGB_555);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MIDZEUS_VIDEO_CLOCK / 8, 529, 0, 400, 278, 0, 256);
 	m_screen->set_screen_update(FUNC(midzeus_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1438,7 +1438,7 @@ void midzeus2_state::midzeus2(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(ZEUS2_VIDEO_CLOCK / 4, 666, 0, 512, 438, 0, 400);
 	m_screen->set_screen_update(m_zeus, FUNC(zeus2_device::screen_update));
 

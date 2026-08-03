@@ -748,7 +748,7 @@ void juku_state::juku(machine_config &config)
 	m_sio[1]->txrdy_handler().set(m_pic, FUNC(pic8259_device::ir1_w));
 
 	// Электроника МС 6105.1 "Колокольчик" (DEC VR201 analog)
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(16_MHz_XTAL/16, HORIZ_PERIOD/8, HORIZ_BACK_PORCH, HORIZ_BACK_PORCH+DEFAULT_WIDTH, VERT_PERIOD, VERT_BACK_PORCH, VERT_BACK_PORCH+DEFAULT_HEIGHT);
 	m_screen->set_size(HORIZ_PERIOD, VERT_PERIOD);
 	m_screen->set_screen_update(FUNC(juku_state::screen_update));

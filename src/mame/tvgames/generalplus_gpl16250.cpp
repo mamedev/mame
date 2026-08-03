@@ -142,7 +142,7 @@ void gcm394_game_state::base(machine_config &config)
 	m_maincpu->set_cs_config_callback(FUNC(gcm394_game_state::cs_callback));
 	m_maincpu->set_cs_space(DEVICE_SELF, 0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320*2, 262*2);
 	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);

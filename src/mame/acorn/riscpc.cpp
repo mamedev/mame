@@ -185,7 +185,7 @@ void riscpc_state::base_config(machine_config &config)
 //  m_kbdc->aux_irq().set(FUNC(riscpc_state::keyboard_interrupt));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 
 	ARM_VIDC20(config, m_vidc, 24_MHz_XTAL);
 	m_vidc->set_screen("screen");

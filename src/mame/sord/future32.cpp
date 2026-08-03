@@ -617,7 +617,7 @@ void future32a_state::future32a(machine_config &config)
 	m_crtc->set_char_width(12);
 	m_crtc->set_update_row_callback(FUNC(future32a_state::crtc_update_row));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_physical_aspect(4, 3);
 	m_screen->set_screen_update(m_crtc, FUNC(hd6345_device::screen_update));
 	m_screen->set_raw(50_MHz_XTAL, 1248, 0, 959, 815, 0, 749);

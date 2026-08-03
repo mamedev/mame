@@ -94,7 +94,7 @@ public:
 		I8085A(config, m_maincpu, 6.144_MHz_XTAL);
 		m_maincpu->set_addrmap(AS_PROGRAM, &blockfvr_state::mem_map);
 
-		SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+		SCREEN(config, m_screen);
 		m_screen->set_raw(6.144_MHz_XTAL, 384, 0, 256, 264, 0, 192);
 		m_screen->set_screen_update(FUNC(blockfvr_state::screen_update));
 

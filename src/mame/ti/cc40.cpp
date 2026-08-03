@@ -627,7 +627,7 @@ void cc40_state::cc40(machine_config &config)
 	NVRAM(config, "sysram.2", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60); // arbitrary
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(6*31+1, 9*1+1+1);

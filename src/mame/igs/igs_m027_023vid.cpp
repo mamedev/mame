@@ -393,7 +393,7 @@ void igs_m027_023vid_state::m027_023vid(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(50_MHz_XTAL/5, 640, 0, 448, 264, 0, 224); // copied from igs/pgm.cpp, correct?
 	m_screen->set_screen_update(m_video, FUNC(igs023_video_device::screen_update));
 	m_screen->screen_vblank().set(FUNC(igs_m027_023vid_state::screen_vblank));

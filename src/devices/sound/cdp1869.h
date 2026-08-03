@@ -167,7 +167,7 @@ public:
 	// helper functions
 	template <typename T, typename U> screen_device& add_pal_screen(machine_config &config, T &&screen_tag, U &&clock)
 	{
-		screen_device &screen(SCREEN(config, std::forward<T>(screen_tag), SCREEN_TYPE_RASTER));
+		screen_device &screen(SCREEN(config, std::forward<T>(screen_tag)));
 		screen.set_screen_update(tag(), FUNC(cdp1869_device::screen_update));
 		screen.set_raw(std::forward<U>(clock), cdp1869_device::SCREEN_WIDTH, cdp1869_device::HBLANK_END, cdp1869_device::HBLANK_START,
 			cdp1869_device::TOTAL_SCANLINES_PAL, cdp1869_device::SCANLINE_VBLANK_END_PAL, cdp1869_device::SCANLINE_VBLANK_START_PAL);
@@ -176,7 +176,7 @@ public:
 
 	template <typename T, typename U> screen_device& add_ntsc_screen(machine_config &config, T &&screen_tag, U &&clock)
 	{
-		screen_device &screen(SCREEN(config, std::forward<T>(screen_tag), SCREEN_TYPE_RASTER));
+		screen_device &screen(SCREEN(config, std::forward<T>(screen_tag)));
 		screen.set_screen_update(tag(), FUNC(cdp1869_device::screen_update));
 		screen.set_raw(std::forward<U>(clock), cdp1869_device::SCREEN_WIDTH, cdp1869_device::HBLANK_END, cdp1869_device::HBLANK_START,
 			cdp1869_device::TOTAL_SCANLINES_NTSC, cdp1869_device::SCANLINE_VBLANK_END_NTSC, cdp1869_device::SCANLINE_VBLANK_START_NTSC);

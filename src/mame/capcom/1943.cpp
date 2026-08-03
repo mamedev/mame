@@ -302,7 +302,7 @@ void _1943_state::_1943(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(_1943_state::scanline), "screen", 0, 16);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(24'000'000)/4, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
 	m_screen->set_screen_update(FUNC(_1943_state::screen_update));
 	m_screen->set_palette(m_palette);

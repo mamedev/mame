@@ -1367,7 +1367,7 @@ void arkanoid_state::arkanoid(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000)); // 100 CPU slices per second to synchronize between the MCU and the main CPU
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(12_MHz_XTAL/2, 384, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(arkanoid_state::screen_update_arkanoid));
 	m_screen->set_palette(m_palette);
@@ -1437,7 +1437,7 @@ void arkanoid_state::hexa(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(12_MHz_XTAL/2, 384, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(arkanoid_state::screen_update_hexa));
 	m_screen->set_palette(m_palette);
@@ -1475,7 +1475,7 @@ void arkanoid_state::brixian(machine_config &config)
 	/* the RAM is also battery backed, making the 68705 almost redundant as long as the battery doesn't die(!) */
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(12_MHz_XTAL/2, 384, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(arkanoid_state::screen_update_hexa));
 	m_screen->set_palette(m_palette);

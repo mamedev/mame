@@ -363,7 +363,7 @@ void tmc2000e_state::tmc2000e(machine_config &config)
 	m_maincpu->dma_wr_cb().set(FUNC(tmc2000e_state::dma_w));
 
 	// video hardware
-	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, SCREEN_TAG);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

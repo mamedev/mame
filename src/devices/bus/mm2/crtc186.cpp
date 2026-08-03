@@ -62,7 +62,7 @@ void crtc186_device::device_add_mconfig(machine_config &config)
 {
 	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set(FUNC(crtc186_device::int_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(71.77);
 	m_screen->set_screen_update(FUNC(crtc186_device::screen_update));
 	m_screen->set_size(800, 420);

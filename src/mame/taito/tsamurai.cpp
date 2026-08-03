@@ -722,7 +722,7 @@ void tsamurai_state::tsamurai(machine_config &config)
 	mainlatch.q_out_cb<4>().set(FUNC(tsamurai_state::coin2_counter_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(32*8, 32*8);
@@ -763,7 +763,7 @@ void vsgongf_state::vsgongf(machine_config &config)
 	mainlatch.q_out_cb<4>().set(FUNC(vsgongf_state::textbank1_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(32*8, 32*8);
@@ -813,7 +813,7 @@ void m660_state::m660(machine_config &config)
 	mainlatch.q_out_cb<7>().set(FUNC(m660_state::textbank2_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(32*8, 32*8);

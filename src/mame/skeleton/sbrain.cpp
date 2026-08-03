@@ -692,7 +692,7 @@ void sbrain_state::sbrain(machine_config &config)
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("32K");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::amber());
 	screen.set_screen_update(FUNC(sbrain_state::screen_update));
 

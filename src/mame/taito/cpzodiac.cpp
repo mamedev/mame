@@ -253,7 +253,7 @@ void cpzodiac_state::cpzodiac(machine_config &config)
 
 	/* video hardware */
 	// TODO
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64, 32);

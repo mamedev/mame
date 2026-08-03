@@ -988,7 +988,7 @@ void ti99_4x_state::ti99_4_60hz(machine_config &config)
 	m_video->gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
 	m_video->set_screen(TI99_SCREEN_TAG);
 
-	SCREEN(config, TI99_SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, TI99_SCREEN_TAG);
 }
 
 /*
@@ -1003,7 +1003,7 @@ void ti99_4x_state::ti99_4_50hz(machine_config &config)
 	m_video->gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
 	m_video->set_screen(TI99_SCREEN_TAG);
 
-	SCREEN(config, TI99_SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, TI99_SCREEN_TAG);
 }
 
 /**********************************************************************
@@ -1048,7 +1048,7 @@ void ti99_4x_state::ti99_4a_60hz(machine_config &config)
 	m_video->gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
 	m_video->set_screen(TI99_SCREEN_TAG);
 
-	SCREEN(config, TI99_SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, TI99_SCREEN_TAG);
 }
 
 /*
@@ -1063,7 +1063,7 @@ void ti99_4x_state::ti99_4a_50hz(machine_config &config)
 	m_video->gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
 	m_video->set_screen(TI99_SCREEN_TAG);
 
-	SCREEN(config, TI99_SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, TI99_SCREEN_TAG);
 }
 
 /************************************************************************
@@ -1090,7 +1090,7 @@ void ti99_4x_state::ti99_4qi_60hz(machine_config &config)
 	m_video->gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
 	m_video->set_screen(TI99_SCREEN_TAG);
 
-	SCREEN(config, TI99_SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, TI99_SCREEN_TAG);
 }
 
 /************************************************************************

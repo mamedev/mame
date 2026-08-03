@@ -2491,7 +2491,7 @@ void vs_uni_state::vsnes(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_RASTER));
+	screen_device &screen1(SCREEN(config, "screen1"));
 	screen1.set_raw(RP2A03_NTSC_XTAL / 4, 341, 0, VISIBLE_SCREEN_WIDTH, ppu2c0x_device::NTSC_SCANLINES_PER_FRAME, 0, VISIBLE_SCREEN_HEIGHT);
 	screen1.set_screen_update("ppu1", FUNC(ppu2c0x_device::screen_update));
 
@@ -2568,11 +2568,11 @@ void vs_dual_state::vsdual(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_RASTER));
+	screen_device &screen1(SCREEN(config, "screen1"));
 	screen1.set_raw(RP2A03_NTSC_XTAL / 4, 341, 0, VISIBLE_SCREEN_WIDTH, ppu2c0x_device::NTSC_SCANLINES_PER_FRAME, 0, VISIBLE_SCREEN_HEIGHT);
 	screen1.set_screen_update("ppu1", FUNC(ppu2c0x_device::screen_update));
 
-	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
+	screen_device &screen2(SCREEN(config, "screen2"));
 	screen2.set_raw(RP2A03_NTSC_XTAL / 4, 341, 0, VISIBLE_SCREEN_WIDTH, ppu2c0x_device::NTSC_SCANLINES_PER_FRAME, 0, VISIBLE_SCREEN_HEIGHT);
 	screen2.set_screen_update("ppu2", FUNC(ppu2c0x_device::screen_update));
 
@@ -2607,7 +2607,7 @@ void vs_smbbl_state::vs_smbbl(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &vs_smbbl_state::smbbl_z80_map);
 
 	// video hardware
-	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_RASTER));
+	screen_device &screen1(SCREEN(config, "screen1"));
 	screen1.set_refresh_hz(56.69);
 	screen1.set_size(32*8, 280);
 	screen1.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);

@@ -14,8 +14,6 @@
 #include "ioprocs.h"
 #include "multibyte.h"
 
-#include "eminline.h"
-
 #include <bit>
 #include <cstring>
 

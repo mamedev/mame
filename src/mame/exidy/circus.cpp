@@ -374,7 +374,7 @@ void circus_state::base_mcfg(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &circus_state::main_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE | VIDEO_UPDATE_SCANLINE); // needed for proper hardware collisions
 	m_screen->set_raw(11.289_MHz_XTAL / 2, 42*8, 0, 31*8, 280, 0, 256);
 	m_screen->set_screen_update(FUNC(circus_state::screen_update));

@@ -364,7 +364,7 @@ void _2mindril_state::drill(machine_config &config)
 	tc0510nio.write_4_callback().set(FUNC(_2mindril_state::coins_w));
 	tc0510nio.read_7_callback().set_ioport("COINS");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* inaccurate, same as Taito F3? (needs screen raw params anyway) */
 	m_screen->set_size(40*8+48*2, 32*8);

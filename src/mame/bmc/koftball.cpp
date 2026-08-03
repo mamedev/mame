@@ -676,7 +676,7 @@ void koftball_state::koftball(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &koftball_state::koftball_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(koftball_state::interrupt), "screen", 0, 1);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_screen_update(FUNC(koftball_state::screen_update));

@@ -235,7 +235,7 @@ void blit_state::blit(machine_config &config)
 	M68000(config, m_maincpu, XTAL(33'000'000) / 4); // maybe XTAL(32'760'000)
 	m_maincpu->set_addrmap(AS_PROGRAM, &blit_state::blit_mem);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD, rgb_t::white());
+	SCREEN(config, m_screen).set_lcd().set_color(rgb_t::white());
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(800, 1024);
 	m_screen->set_visarea(0, 800-1, 0, 1024-1);

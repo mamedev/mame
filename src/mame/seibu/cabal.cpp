@@ -858,7 +858,7 @@ void cabal_state::cabal(machine_config &config)
 	SEI80BU(config, "sei80bu", XTAL(3'579'545)).set_device_rom_tag("audiocpu");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.60);   // verified on PCB
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(256, 256);
@@ -946,7 +946,7 @@ void cabalbl_state::cabalbl(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(600));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(256, 256);

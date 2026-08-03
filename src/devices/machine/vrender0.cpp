@@ -128,7 +128,7 @@ void vrender0soc_device::device_add_mconfig(machine_config &config)
 	for (required_device<vr0uart_device> &uart : m_uart)
 		VRENDER0_UART(config, uart, 3'579'500); // DERIVED_CLOCK(1, 24));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// evolution soccer defaults
 	m_screen->set_raw((XTAL(14'318'181)*2)/4, 455, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(vrender0soc_device::screen_update));

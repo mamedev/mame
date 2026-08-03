@@ -1938,7 +1938,7 @@ void neogeo_base_state::neogeo_base(machine_config &config)
 	/* video hardware */
 	config.set_default_layout(layout_neogeo);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART);
 	m_screen->set_screen_update(FUNC(neogeo_base_state::screen_update));
 

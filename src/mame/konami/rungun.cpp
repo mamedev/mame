@@ -660,7 +660,7 @@ void rungun_state::rng(machine_config &config)
 	EEPROM_ER5911_8BIT(config, m_eeprom);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(32_MHz_XTAL / 4, 512, 88, 88+416, 264, 24, 24+224);
 	m_screen->set_screen_update(FUNC(rungun_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -715,7 +715,7 @@ void rungun_state::rng_dual(machine_config &config)
 
 	m_screen->set_screen_update(FUNC(rungun_state::screen_update_dual_left));
 
-	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
+	screen_device &screen2(SCREEN(config, "screen2"));
 	screen2.set_raw(32_MHz_XTAL / 4, 512, 88, 88+416, 264, 24, 24+224);
 	screen2.set_screen_update(FUNC(rungun_state::screen_update_dual_right));
 	screen2.set_palette(m_palette2);

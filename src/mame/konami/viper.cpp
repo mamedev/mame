@@ -2537,7 +2537,7 @@ void viper_state::viper(machine_config &config)
 	m_voodoo->pciint_callback().set(FUNC(viper_state::voodoo_pciint));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	// Screeen size and timing is re-calculated later in voodoo card
 	screen.set_refresh_hz(60);
 	screen.set_size(1024, 768);

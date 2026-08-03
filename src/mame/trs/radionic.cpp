@@ -495,7 +495,7 @@ void radionic_state::radionic(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(radionic_state::rtc_via_nmi), attotime::from_hz(MASTER_XTAL / 12 / 16384));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MASTER_XTAL, 768, 0, 512, 312, 0, 256);
 	screen.set_screen_update(FUNC(radionic_state::screen_update));
 	screen.set_palette("palette");

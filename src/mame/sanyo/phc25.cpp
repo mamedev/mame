@@ -631,7 +631,7 @@ void phc25_state::phc25(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &phc25_state::phc25_io);
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	M5C6847P1(config, m_vdg, XTAL(4'433'619), true);
 	m_vdg->set_screen("screen");

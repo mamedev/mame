@@ -497,7 +497,7 @@ void pktgaldx_state::pktgaldx(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &pktgaldx_state::decrypted_opcodes_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(58);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(40*8, 32*8);
@@ -549,7 +549,7 @@ void pktgaldxb_state::pktgaldxb(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pktgaldxb_state::prg_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(58);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(40*8, 32*8);

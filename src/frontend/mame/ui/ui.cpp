@@ -27,7 +27,7 @@
 
 #include "imagedev/cassette.h"
 #include "machine/laserdsc.h"
-#include "video/vector.h"
+#include "vector.h"
 
 #include "config.h"
 #include "emuopts.h"
@@ -45,6 +45,7 @@
 #include "sound.h"
 #include "speaker.h"
 #include "uiinput.h"
+#include "vector.h"
 #include "video.h"
 
 // FIXME: allow OSD module headers to be included in a less ugly way
@@ -2068,14 +2069,15 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 	}
 
 	// add screen parameters
-	screen_device_enumerator scriter(machine.root_device());
-	for (screen_device &screen : scriter)
+	video_output_interface_enumerator scriter(machine.root_device());
+	for (device_video_output_interface &screen : scriter)
 	{
-		int defxscale = floorf(screen.xscale() * 1000.0F + 0.5F);
-		int defyscale = floorf(screen.yscale() * 1000.0F + 0.5F);
-		int defxoffset = floorf(screen.xoffset() * 1000.0F + 0.5F);
-		int defyoffset = floorf(screen.yoffset() * 1000.0F + 0.5F);
-		std::string screen_desc = machine_info().get_screen_desc(screen);
+		render_container::user_settings settings = screen.container().get_user_settings();
+		int defxscale = floorf(settings.m_xscale * 1000.0F + 0.5F);
+		int defyscale = floorf(settings.m_yscale * 1000.0F + 0.5F);
+		int defxoffset = floorf(settings.m_xoffset * 1000.0F + 0.5F);
+		int defyoffset = floorf(settings.m_yoffset * 1000.0F + 0.5F);
+		std::string screen_desc = scriter.count() > 1 ? util::string_format(_("Screen '%1$s'"), screen.device().tag()) : _("Screen");
 
 		// add refresh rate tweaker
 		if (machine.options().cheat())
@@ -2126,9 +2128,9 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 		}
 	}
 
-	for (screen_device &screen : scriter)
+	for (device_video_output_interface &screen : scriter)
 	{
-		if (screen.screen_type() == SCREEN_TYPE_VECTOR)
+		if (screen.is_vector())
 		{
 			// add vector control (FIXME: these should all be per-screen rather than global)
 			slider_alloc(_("Vector Flicker"), 0, 0, 1000, 10, std::bind(&mame_ui_manager::slider_flicker, this, std::ref(screen), _1, _2));
@@ -2314,17 +2316,12 @@ int32_t mame_ui_manager::slider_overclock(device_t &device, std::string *str, in
 //  slider_refresh - refresh rate slider callback
 //-------------------------------------------------
 
-int32_t mame_ui_manager::slider_refresh(screen_device &screen, std::string *str, int32_t newval)
+int32_t mame_ui_manager::slider_refresh(device_video_output_interface &screen, std::string *str, int32_t newval)
 {
-	double defrefresh = ATTOSECONDS_TO_HZ(screen.refresh_attoseconds());
+	double defrefresh = screen.frame_period().as_hz();
 
 	if (newval != SLIDER_NOCHANGE)
-	{
-		int width = screen.width();
-		int height = screen.height();
-		const rectangle &visarea = screen.visible_area();
-		screen.configure(width, height, visarea, HZ_TO_ATTOSECONDS(defrefresh + double(newval) * 0.001));
-	}
+		screen.override_frame_period(attotime::from_hz(defrefresh + double(newval) * 0.001));
 
 	if (str)
 		*str = string_format(_(u8"%1$.3f\u00a0Hz"), screen.frame_period().as_hz());
@@ -2338,7 +2335,7 @@ int32_t mame_ui_manager::slider_refresh(screen_device &screen, std::string *str,
 //  callback
 //-------------------------------------------------
 
-int32_t mame_ui_manager::slider_brightness(screen_device &screen, std::string *str, int32_t newval)
+int32_t mame_ui_manager::slider_brightness(device_video_output_interface &screen, std::string *str, int32_t newval)
 {
 	render_container::user_settings settings = screen.container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
@@ -2357,7 +2354,7 @@ int32_t mame_ui_manager::slider_brightness(screen_device &screen, std::string *s
 //  callback
 //-------------------------------------------------
 
-int32_t mame_ui_manager::slider_contrast(screen_device &screen, std::string *str, int32_t newval)
+int32_t mame_ui_manager::slider_contrast(device_video_output_interface &screen, std::string *str, int32_t newval)
 {
 	render_container::user_settings settings = screen.container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
@@ -2375,7 +2372,7 @@ int32_t mame_ui_manager::slider_contrast(screen_device &screen, std::string *str
 //  slider_gamma - screen gamma slider callback
 //-------------------------------------------------
 
-int32_t mame_ui_manager::slider_gamma(screen_device &screen, std::string *str, int32_t newval)
+int32_t mame_ui_manager::slider_gamma(device_video_output_interface &screen, std::string *str, int32_t newval)
 {
 	render_container::user_settings settings = screen.container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
@@ -2394,7 +2391,7 @@ int32_t mame_ui_manager::slider_gamma(screen_device &screen, std::string *str, i
 //  callback
 //-------------------------------------------------
 
-int32_t mame_ui_manager::slider_xscale(screen_device &screen, std::string *str, int32_t newval)
+int32_t mame_ui_manager::slider_xscale(device_video_output_interface &screen, std::string *str, int32_t newval)
 {
 	render_container::user_settings settings = screen.container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
@@ -2413,7 +2410,7 @@ int32_t mame_ui_manager::slider_xscale(screen_device &screen, std::string *str, 
 //  callback
 //-------------------------------------------------
 
-int32_t mame_ui_manager::slider_yscale(screen_device &screen, std::string *str, int32_t newval)
+int32_t mame_ui_manager::slider_yscale(device_video_output_interface &screen, std::string *str, int32_t newval)
 {
 	render_container::user_settings settings = screen.container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
@@ -2432,7 +2429,7 @@ int32_t mame_ui_manager::slider_yscale(screen_device &screen, std::string *str, 
 //  slider callback
 //-------------------------------------------------
 
-int32_t mame_ui_manager::slider_xoffset(screen_device &screen, std::string *str, int32_t newval)
+int32_t mame_ui_manager::slider_xoffset(device_video_output_interface &screen, std::string *str, int32_t newval)
 {
 	render_container::user_settings settings = screen.container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
@@ -2451,7 +2448,7 @@ int32_t mame_ui_manager::slider_xoffset(screen_device &screen, std::string *str,
 //  slider callback
 //-------------------------------------------------
 
-int32_t mame_ui_manager::slider_yoffset(screen_device &screen, std::string *str, int32_t newval)
+int32_t mame_ui_manager::slider_yoffset(device_video_output_interface &screen, std::string *str, int32_t newval)
 {
 	render_container::user_settings settings = screen.container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
@@ -2554,7 +2551,7 @@ int32_t mame_ui_manager::slider_overyoffset(laserdisc_device &laserdisc, std::st
 //  callback
 //-------------------------------------------------
 
-int32_t mame_ui_manager::slider_flicker([[maybe_unused]] screen_device &screen, std::string *str, int32_t newval)
+int32_t mame_ui_manager::slider_flicker([[maybe_unused]] device_video_output_interface &screen, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
 		vector_options::s_flicker = float(newval) * 0.001F;
@@ -2569,7 +2566,7 @@ int32_t mame_ui_manager::slider_flicker([[maybe_unused]] screen_device &screen, 
 //  callback
 //-------------------------------------------------
 
-int32_t mame_ui_manager::slider_beam_width_min([[maybe_unused]] screen_device &screen, std::string *str, int32_t newval)
+int32_t mame_ui_manager::slider_beam_width_min([[maybe_unused]] device_video_output_interface &screen, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
 		vector_options::s_beam_width_min = std::min(float(newval) * 0.01F, vector_options::s_beam_width_max);
@@ -2584,7 +2581,7 @@ int32_t mame_ui_manager::slider_beam_width_min([[maybe_unused]] screen_device &s
 //  callback
 //-------------------------------------------------
 
-int32_t mame_ui_manager::slider_beam_width_max([[maybe_unused]] screen_device &screen, std::string *str, int32_t newval)
+int32_t mame_ui_manager::slider_beam_width_max([[maybe_unused]] device_video_output_interface &screen, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
 		vector_options::s_beam_width_max = std::max(float(newval) * 0.01F, vector_options::s_beam_width_min);
@@ -2599,7 +2596,7 @@ int32_t mame_ui_manager::slider_beam_width_max([[maybe_unused]] screen_device &s
 //  callback
 //-------------------------------------------------
 
-int32_t mame_ui_manager::slider_beam_dot_size([[maybe_unused]] screen_device &screen, std::string *str, int32_t newval)
+int32_t mame_ui_manager::slider_beam_dot_size([[maybe_unused]] device_video_output_interface &screen, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
 		vector_options::s_beam_dot_size = std::max(float(newval) * 0.01F, 0.1F);
@@ -2614,7 +2611,7 @@ int32_t mame_ui_manager::slider_beam_dot_size([[maybe_unused]] screen_device &sc
 //  callback
 //-------------------------------------------------
 
-int32_t mame_ui_manager::slider_beam_intensity_weight([[maybe_unused]] screen_device &screen, std::string *str, int32_t newval)
+int32_t mame_ui_manager::slider_beam_intensity_weight([[maybe_unused]] device_video_output_interface &screen, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
 		vector_options::s_beam_intensity_weight = float(newval) * 0.001F;

@@ -54,7 +54,7 @@ private:
 
 void bbc_lcd_device::device_add_mconfig(machine_config &config)
 {
-	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_LCD);
+	auto &screen = SCREEN(config, "screen").set_lcd();
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(120, 36);

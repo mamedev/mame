@@ -816,7 +816,7 @@ void sharkatt_state::sharkatt(machine_config &config)
 	ppi.out_pc_callback().set(FUNC(sharkatt_state::tape_control_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(20'000'000) / 4, 320, 0, 256, 272, 0, 192);
 	m_screen->set_screen_update(FUNC(sharkatt_state::screen_update));
 	m_screen->set_palette(m_palette);

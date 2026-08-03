@@ -299,7 +299,7 @@ void wswan_state::wswan_base(machine_config &config)
 	m_vdp->set_irq_callback(FUNC(wswan_state::set_irq_line));
 	m_vdp->icons_cb().set(FUNC(wswan_state::set_icons));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_screen_update("vdp", FUNC(wswan_video_device::screen_update));
 	screen.set_raw(X1 / 4, 256, 0, wswan_video_device::WSWAN_X_PIXELS, 159, 0, wswan_video_device::WSWAN_Y_PIXELS);
 	screen.set_palette("vdp");

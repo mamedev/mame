@@ -253,7 +253,7 @@ void gaminator_state::gaminator(machine_config &config)
 	MCF5206E(config, m_maincpu, 33.333_MHz_XTAL); // ColdFire MCF5406ECAB40
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaminator_state::gaminator_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
 	screen.set_screen_update("vga", FUNC(gamtor_vga_device::screen_update));
 

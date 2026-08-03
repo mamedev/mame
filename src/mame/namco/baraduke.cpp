@@ -691,7 +691,7 @@ void baraduke_state::baraduke(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(49'152'000) / 8, 384, 0, 36 * 8, 264, 2 * 8, 30 * 8);
 	screen.set_screen_update(FUNC(baraduke_state::screen_update));
 	screen.screen_vblank().set(FUNC(baraduke_state::screen_vblank));

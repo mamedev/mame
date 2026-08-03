@@ -201,7 +201,7 @@ void abc1600_mover_device::device_add_mconfig(machine_config &config)
 {
 	config.set_default_layout(layout_abc1600);
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, SCREEN_TAG).set_color(rgb_t::green()));
 	screen.set_screen_update(FUNC(abc1600_mover_device::screen_update));
 	screen.set_raw(XTAL(64'000'000), 0x3e0, 0, 0x300, 0x433, 0, 0x400);
 
@@ -1033,7 +1033,7 @@ inline void abc1600_mover_device::load_xy_reg()
 {
 	if (L_P) return;
 
-	uint16_t sum = m_xto + m_xsize;
+	uint16_t sum = m_xto + m_xsize + 1;
 
 	m_xto = sum & 0x3ff;
 	m_yto = m_ty & 0xfff;

@@ -429,7 +429,7 @@ void sfkick_state::sfkick(machine_config &config)
 	v9938.set_screen_ntsc("screen");
 	v9938.set_vram_size(0x80000);
 	v9938.int_cb().set_inputline(m_maincpu, 0);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	i8255_device &ppi(I8255A(config, "ppi8255"));
 	ppi.out_pa_callback().set(FUNC(sfkick_state::ppi_port_a_w));

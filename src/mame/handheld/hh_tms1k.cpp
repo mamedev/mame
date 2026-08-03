@@ -258,6 +258,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 
 #include "softlist_dev.h"
 #include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 #include <bit>
@@ -1170,10 +1171,9 @@ void racetime_state::racetime(machine_config &config)
 	m_maincpu->write_o().set(FUNC(racetime_state::write_o));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(229, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 9);
 
@@ -1446,15 +1446,13 @@ void uboat_state::uboat(machine_config &config)
 	m_maincpu->write_o().set(FUNC(uboat_state::write_o));
 
 	// video hardware
-	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_SVG));
+	screen_svg_device &screen1(SCREEN_SVG(config, "screen1"));
 	screen1.set_refresh_hz(60);
 	screen1.set_size(372, 1080);
-	screen1.set_visarea_full();
 
-	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_SVG));
+	screen_svg_device &screen2(SCREEN_SVG(config, "screen2"));
 	screen2.set_refresh_hz(60);
 	screen2.set_size(372, 1080);
-	screen2.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(10, 15);
 	config.set_default_layout(layout_uboat);
@@ -5770,10 +5768,9 @@ void einvader_state::einvader(machine_config &config)
 	m_maincpu->write_o().set(FUNC(einvader_state::write_o));
 
 	// video hardware
-	screen_device &mask(SCREEN(config, "mask", SCREEN_TYPE_SVG));
+	screen_svg_device &mask(SCREEN_SVG(config, "mask"));
 	mask.set_refresh_hz(60);
 	mask.set_size(945, 1080);
-	mask.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
 	m_display->set_segmask(0x380, 0x7f);
@@ -5913,10 +5910,9 @@ void efootb4_state::efootb4(machine_config &config)
 	m_maincpu->write_o().set(FUNC(efootb4_state::write_o));
 
 	// video hardware
-	screen_device &mask(SCREEN(config, "mask", SCREEN_TYPE_SVG));
+	screen_svg_device &mask(SCREEN_SVG(config, "mask"));
 	mask.set_refresh_hz(60);
 	mask.set_size(1920, 904);
-	mask.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(16, 7);
 	m_display->set_segmask(0xfc00, 0x7f);
@@ -7096,10 +7092,9 @@ void ginv_state::ginv(machine_config &config)
 	m_maincpu->write_o().set(FUNC(ginv_state::write_o));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(236, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 12);
 
@@ -7223,10 +7218,9 @@ void ginv1000_state::ginv1000(machine_config &config)
 	m_maincpu->write_o().set(FUNC(ginv1000_state::write_o));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(226, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(10, 12);
 
@@ -7370,10 +7364,9 @@ void ginv2000_state::ginv2000(machine_config &config)
 	m_expander->write_port7_callback().set(FUNC(ginv2000_state::expander_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(364, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(10, 16);
 
@@ -7933,7 +7926,7 @@ void skywriter_state::skywriter(machine_config &config)
 	TIMER(config, "check_pos").configure_periodic(FUNC(skywriter_state::check_pos), attotime::from_usec(1));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE); // for led decay
 	screen.set_physical_aspect(16, 1);
 	screen.set_refresh_hz(60);
@@ -8342,10 +8335,9 @@ void liveafb_state::liveafb(machine_config &config)
 	m_maincpu->write_o().set(FUNC(liveafb_state::write_o));
 
 	// video hardware
-	screen_device &mask(SCREEN(config, "mask", SCREEN_TYPE_SVG));
+	screen_svg_device &mask(SCREEN_SVG(config, "mask"));
 	mask.set_refresh_hz(60);
 	mask.set_size(1834, 1080);
-	mask.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(6+4+4, 8+2);
 	m_display->set_segmask(0x3f, 0x7f);
@@ -9106,10 +9098,9 @@ void horseran_state::horseran(machine_config &config)
 	m_maincpu->write_r().set(FUNC(horseran_state::write_r));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 978);
-	screen.set_visarea_full();
 
 	HLCD0569(config, m_lcd, 1100); // C=0.022uF
 	m_lcd->write_cols().set(FUNC(horseran_state::lcd_output_w));
@@ -17086,10 +17077,9 @@ void tdracula_state::tdracula(machine_config &config)
 	m_maincpu->write_o().set(FUNC(tdracula_state::write_o));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(478, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(11, 17);
 	config.set_default_layout(layout_tdracula);
@@ -17229,10 +17219,9 @@ void slepachi_state::slepachi(machine_config &config)
 	m_expander->write_port7_callback().set(FUNC(slepachi_state::expander_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(503, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(8, 21);
 

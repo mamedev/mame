@@ -696,7 +696,7 @@ void kamikaze_state::kamikaze(machine_config &config)
 	m_ppi8255[1]->out_pb_callback().set(FUNC(kamikaze_state::sound2_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(4'915'200), 320, 0, 256, 256, 32, 256);
 	m_screen->set_screen_update(FUNC(kamikaze_state::screen_update));
 
@@ -734,7 +734,7 @@ void spaceint_state::spaceint(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(spaceint_state::irq0_line_hold));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	m_screen->set_refresh_hz(60);

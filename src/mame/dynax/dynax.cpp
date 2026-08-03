@@ -675,7 +675,6 @@ void dynax_adpcm_state::yarunara_rombank_w(uint8_t data)
 
 void dynax_state::yarunara_blit_romregion_w(uint8_t data)
 {
-	logerror("%s: unmapped romregion=%02X\n", machine().describe_context(), data);
 	switch(data)
 	{
 		case 0x00:  dynax_blit_romregion_w(0);    return;
@@ -684,6 +683,8 @@ void dynax_state::yarunara_blit_romregion_w(uint8_t data)
 		case 0x81:  dynax_blit_romregion_w(3);    return;
 		case 0x82:  dynax_blit_romregion_w(4);    return; // mjcomv1
 	}
+
+	logerror("%s: unmapped romregion=%02X\n", machine().describe_context(), data);
 }
 
 void dynax_adpcm_state::yarunara_io_map(address_map &map)
@@ -3265,6 +3266,97 @@ static INPUT_PORTS_START( nerutona )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )    // shows moles on gals' faces, but win sequences are not censored
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mjempror )
+	// The manual provides two sets of standard settings:
+	//           標準設定シングル向け                  標準設定コーナー向け
+	// DIP-SW 1  OFF OFF OFF  ON OFF  ON  ON OFF       OFF OFF OFF  ON OFF  ON  ON OFF
+	// DIP-SW 2   ON  ON OFF OFF OFF OFF OFF OFF        ON  ON OFF OFF OFF OFF OFF OFF
+	// DIP-SW 3  OFF OFF  ON OFF  ON  ON  ON OFF       OFF OFF OFF OFF  ON  ON  ON OFF
+	// DIP-SW 4   ON  ON  ON  ON OFF  ON  ON OFF        ON  ON  ON  ON  ON  ON  ON OFF
+
+	PORT_START("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // Out        (not sure if this is supposed to be payout or hopper switch)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        // 18B
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR(Test))   // Test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    // Analyzer
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // Memory Reset
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )          // Note
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )          // Coin
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // Service    (shown in test mode, not clear what it's supposed to do)
+
+	PORT_INCLUDE( mahjong_matrix_2p_ff )
+
+	PORT_START("DSW0")
+	MAHJONG_ODDS_RATE(0, "DIP-SW 2:1,2")                                                         // ＯＤＤＳ　ＲＡＴＥ
+	MAHJONG_COINAGE(2, "DIP-SW 2:3,4")                                                           // コインレート
+	PORT_DIPNAME( 0x30, 0x30, "Minimum Bet" )                PORT_DIPLOCATION("DIP-SW 2:5,6")    // ゲーム・スタート時の最低レート枚数
+	PORT_DIPSETTING(    0x30, "1" )                                                              // レート１
+	PORT_DIPSETTING(    0x20, "2" )                                                              // レート２
+	PORT_DIPSETTING(    0x10, "3" )                                                              // レート３
+	PORT_DIPSETTING(    0x00, "5" )                                                              // レート５
+	PORT_DIPNAME( 0x40, 0x40, "Game Type" )                  PORT_DIPLOCATION( "DIP-SW 2:7" )    // ゲームタイプ
+	PORT_DIPSETTING(    0x40, "Credit" )                                                         // クレジット式
+	PORT_DIPSETTING(    0x00, "Hopper" )                                                         // ホッパー式
+	PORT_DIPNAME( 0x80, 0x80, "Hopper Polarity" )            PORT_DIPLOCATION("DIP-SW 2:8")      // ＨＯＰＰＥＲ　ＣＯＩＮ　検出　ＳＷ　ACTIVE
+	PORT_DIPSETTING(    0x80, "Active Low" )                                                     // LOW
+	PORT_DIPSETTING(    0x00, "Active High" )                                                    // HIGH
+
+	PORT_START("DSW1")
+	MAHJONG_PAYOUT_RATE_DFLT(0, 0x07, "DIP-SW 1:1,2,3,4")                                        // ＰＡＹ－ＯＵＴ　ＲＡＴＥ
+	PORT_DIPNAME( 0x30, 0x10, "Maximum Bet" )                PORT_DIPLOCATION("DIP-SW 1:5,6")    // ＢＥＴ－ＭＡＸ
+	PORT_DIPSETTING(    0x30, "1" )
+	PORT_DIPSETTING(    0x20, "5" )
+	PORT_DIPSETTING(    0x10, "10" )
+	PORT_DIPSETTING(    0x00, "20" )
+	MAHJONG_NOTE_CREDITS(6, "DIP-SW 1:7", "DSW0", 2)                                             // ＮＯＴＥ　ＲＡＴＥ
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Flip_Screen) )         PORT_DIPLOCATION( "DIP-SW 1:8" )    // 画面反転
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                                     // 正転
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                      // 反転
+
+	PORT_START("DSW2")
+	MAHJONG_YAKUMAN_BONUS(0, 0x03, "DIP-SW 3:1,2,3")                                             // 役満ボーナス設定周期
+	PORT_DIPNAME( 0x08, 0x08, "Yakuman Bonuses Per Cycle" )  PORT_DIPLOCATION("DIP-SW 3:4")      // 役満ボーナスの回数設定周期毎に
+	PORT_DIPSETTING(    0x00, "1" )                                                              // １回
+	PORT_DIPSETTING(    0x08, "2" )                                                              // ２回
+	PORT_DIPNAME( 0x10, 0x00, "Computer Strength" )          PORT_DIPLOCATION("DIP-SW 3:5")      // コンピューターの強さ
+	PORT_DIPSETTING(    0x00, DEF_STR(Normal) )                                                  // 普通
+	PORT_DIPSETTING(    0x10, "Strong" )                                                         // 強い
+	PORT_DIPNAME( 0x20, 0x00, "Service Count" )              PORT_DIPLOCATION("DIP-SW 3:6")      // サービス・カウント
+	PORT_DIPSETTING(    0x20, DEF_STR(Off) )                                                     // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                      // 有
+	PORT_DIPNAME( 0x40, 0x00, "Don Den Button" )             PORT_DIPLOCATION("DIP-SW 3:7")      // ＤｏｎＤｅｎ機能ボタン変更
+	PORT_DIPSETTING(    0x40, "A" )                                                              // A ボタン
+	PORT_DIPSETTING(    0x00, "Flip Flop" )                                                      // F/F ボタン
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DIP-SW 3:8")                                             // ＯＦＦ固定
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x00, "Last Chance" )                PORT_DIPLOCATION("DIP-SW 4:1")      // ラスト・チャンス
+	PORT_DIPSETTING(    0x01, "Free" )                                                           // 無料
+	PORT_DIPSETTING(    0x00, "Paid" )                                                           // 有料
+	PORT_DIPNAME( 0x02, 0x00, "Renchan Rate" )               PORT_DIPLOCATION("DIP-SW 4:2")      // 連荘レート
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )                                                     // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                      // 有
+	PORT_DIPNAME( 0x04, 0x00, "Auto Reach" )                 PORT_DIPLOCATION("DIP-SW 4:3")      // オート・ツモ
+	PORT_DIPSETTING(    0x04, DEF_STR(Off) )                                                     // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                      // 有
+	PORT_DIPNAME( 0x08, 0x00, "Dora Open?" )                 PORT_DIPLOCATION("DIP-SW 4:4")      // ドラオープン     not sure about this one - it isn't very legible and I don't know what it does
+	PORT_DIPSETTING(    0x08, DEF_STR(Off) )                                                     // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                      // 有
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR(Demo_Sounds) )         PORT_DIPLOCATION("DIP-SW 4:5")      // デモ・サウンド
+	PORT_DIPSETTING(    0x10, DEF_STR(Off) )                                                     // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                      // 有
+	PORT_DIPNAME( 0x20, 0x00, "In-Game Music" )              PORT_DIPLOCATION("DIP-SW 4:6")      // ゲーム・サウンド
+	PORT_DIPSETTING(    0x20, DEF_STR(Off) )                                                     // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                      // 有
+	PORT_DIPNAME( 0x40, 0x00, "Gal Select" )                 PORT_DIPLOCATION("DIP-SW 4:7")      // ギャル・セレクト
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )                                                     // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                      // 有
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DIP-SW 4:8")                                             // ＯＦＦ固定
+
+	PORT_START("SW1")
+	PORT_START("FAKE")
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( tenkai )
 	// The manual provides two sets of standard settings:
@@ -3766,7 +3858,7 @@ void cdracula_state::cdracula(machine_config &config)
 	m_mainlatch->q_out_cb<5>().set(FUNC(cdracula_state::blit_palbank_w));     // Layers Palettes (High Bit)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(58.56);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
@@ -3822,7 +3914,7 @@ void dynax_adpcm_state::hanamai(machine_config &config)
 	m_mainlatch->q_out_cb<7>().set(FUNC(dynax_adpcm_state::layer_half_w));       // half of the interleaved layer to write to
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
@@ -3891,7 +3983,7 @@ void dynax_adpcm_state::hnoridur(machine_config &config)
 	outlatch.q_out_cb<1>().set(FUNC(dynax_adpcm_state::coincounter_1_w));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256+22);
@@ -3961,7 +4053,7 @@ void dynax_adpcm_state::hjingi(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
@@ -4022,7 +4114,7 @@ void dynax_state::sprtmtch(machine_config &config)
 	m_mainlatch->q_out_cb<5>().set(FUNC(dynax_state::blit_palbank_w));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
@@ -4086,7 +4178,7 @@ void dynax_state::mjfriday(machine_config &config)
 	m_mainlatch->q_out_cb<7>().set(FUNC(dynax_state::mjdialq2_layer0_enable_w));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(256, 256);
@@ -4256,7 +4348,7 @@ void jantouki_state::jantouki(machine_config &config)
 	PALETTE(config, m_palette, FUNC(jantouki_state::sprtmtch_palette), 512); // static palette
 	config.set_default_layout(layout_dualhovu);
 
-	screen_device &top(SCREEN(config, "top", SCREEN_TYPE_RASTER));
+	screen_device &top(SCREEN(config, "top"));
 	top.set_refresh_hz(60);
 	top.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	top.set_size(512, 256);
@@ -4271,7 +4363,7 @@ void jantouki_state::jantouki(machine_config &config)
 	m_blitter->scrolly_cb().set(FUNC(jantouki_state::dynax_blit_scrolly_w));
 	m_blitter->ready_cb().set(FUNC(jantouki_state::jantouki_blitter_irq_w));
 
-	screen_device &bottom(SCREEN(config, "bottom", SCREEN_TYPE_RASTER));
+	screen_device &bottom(SCREEN(config, "bottom"));
 	bottom.set_refresh_hz(60);
 	bottom.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	bottom.set_size(512, 256);
@@ -4397,7 +4489,7 @@ void dynax_state::qyjdzjp(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256+22);
@@ -4514,7 +4606,7 @@ void dynax_state::tenkai(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256+22);
@@ -4621,7 +4713,7 @@ void dynax_state::gekisha(machine_config &config)
 	m_mainlatch->q_out_cb<7>().set(FUNC(dynax_state::mjdialq2_layer0_enable_w));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(256, 256);
@@ -6515,6 +6607,25 @@ ROM_START( majxtal7 )
 	ROM_LOAD( "4007.1a",  0x2e0000, 0x20000, CRC(8082d0ac) SHA1(44d708f8e307b782105082092edd3ea9affd2329) )
 ROM_END
 
+ROM_START( mjempror ) // D4005208L1-1
+	ROM_REGION( 0x50000, "maincpu", 0 ) // Z80 Code
+	ROM_LOAD( "40201-1.1a",     0x00000, 0x20000, CRC(d1e6c9a1) SHA1(f4a7a5d07c4054614ddca9c75544d75707696f2b) )
+	ROM_RELOAD(                 0x10000, 0x20000 )
+	ROM_LOAD( "dynax_40202.3a", 0x30000, 0x10000, CRC(43e00b3f) SHA1(bd4c5e9bfb25fc9ba5b369ecf315db8bbfd41c37) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000, "blitter", ROMREGION_ERASE00 )
+	ROM_LOAD( "dynax_40203.11a", 0x000000, 0x20000, CRC(e65c3f39) SHA1(a6aa53ecb783e2387383029bed913f553c1544ef) )
+	ROM_LOAD( "dynax_40204.13a", 0x020000, 0x20000, CRC(9f3d7bf2) SHA1(5e99ab23a8704cda56881a200f7923ca798254f0) )
+	ROM_LOAD( "dynax_40205.14a", 0x040000, 0x20000, CRC(b002379d) SHA1(614c564a2a095104ec65aea61169fc17a2a7e415) )
+	ROM_LOAD( "dynax_40206.15a", 0x060000, 0x20000, CRC(75308c65) SHA1(a4d85caba5e2c770ba7731b7428346805b6db71e) )
+	ROM_LOAD( "dynax_40207.17a", 0x080000, 0x20000, CRC(26c2d6e9) SHA1(dff10d81003ad316cfc2a37aab92ea61feba2a5c) )
+	ROM_LOAD( "dynax_40208.18a", 0x0a0000, 0x20000, CRC(e53d20e3) SHA1(49125306a77e5886a1b8fb0c0e111b8231c4d3ce) )
+	ROM_LOAD( "dynax_40209.19a", 0x0c0000, 0x20000, CRC(ee64ad26) SHA1(799c11f260760b0527e1c8dec879cf9c363179b0) )
+	ROM_LOAD( "dynax_40211.18c", 0x0e0000, 0x20000, CRC(886bb8f6) SHA1(f8c7d152c65036edefbc5b812b1f1bf9443346bc) )
+	ROM_LOAD( "dynax_40212.19c", 0x100000, 0x20000, CRC(5420145f) SHA1(1abf76931d9439104b523327d052c79beac59add) )
+	ROM_LOAD( "dynax_40210.17c", 0x120000, 0x20000, CRC(4c04212f) SHA1(1a4e573dfb9af0c3fbdb0704857e4da6fe4d7c09) )
+ROM_END
+
 ROM_START( mjreach )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "cs16-1.u15",     0x00000, 0x40000, CRC(b55bafa6) SHA1(eda4b5e90584bcdf6cd546ba767d9fbcf3aa35c5) )
@@ -7310,6 +7421,7 @@ GAME( 1993, mjelct3blb, mjelctrn, mjelctrn,   mjelct3,  dynax_adpcm_state, init_
 GAME( 1990, majxtal7,   7jigen,   neruton,    majxtal7, dynax_adpcm_state, init_mjelct3,  ROT180, "Dynax",                     "Mahjong X-Tal 7 - Crystal Mahjong / Mahjong Diamond 7 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // reuses a subset of 7jigen assets
 GAME( 1990, neruton,    0,        neruton,    neruton,  dynax_adpcm_state, init_mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro",  "Mahjong Neruton Haikujiradan (Japan, Rev. B?)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, nerutona,   neruton,  neruton,    nerutona, dynax_adpcm_state, init_mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro",  "Mahjong Neruton Haikujiradan (Japan, Rev. A?)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mjempror,   0,        neruton,    mjempror, dynax_adpcm_state, init_mjelct3,  ROT180, "Dynax",                     "Mahjong Emperor (Japan, ver. 1.01)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs inputs checking / DIP definitions
 GAME( 1997, qyjdzjp,    mjelctrn, qyjdzjp,    mjelct3,  dynax_state,       empty_init,    ROT180, "bootleg (Hom Inn)",         "Que You Ji - Dian Zi Ji Pan Jiaqiang Ban (v201)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1995, baoqingt,   0,        baoqingt,   mjelct3,  dynax_state,       empty_init,    ROT0,   "TIC",                       "Bao Qing Tian (TIC)",                                           MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, hanayara,   0,        yarunara,   hanayara, dynax_adpcm_state, empty_init,    ROT180, "Dynax",                     "Hana wo Yaraneba! (Japan)",                                     MACHINE_SUPPORTS_SAVE )

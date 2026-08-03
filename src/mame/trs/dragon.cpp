@@ -512,7 +512,7 @@ void dragon_state::dragon_base(machine_config &config)
 	PRINTER(config, m_printer);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 
 	MC6847(config, m_vdg, 14.218_MHz_XTAL / 4, true);
 	m_vdg->set_screen(m_screen);
@@ -602,7 +602,7 @@ void d64plus_state::d64plus(machine_config &config)
 {
 	dragon64(config);
 	// video hardware
-	screen_device &plus_screen(SCREEN(config, "plus_screen", SCREEN_TYPE_RASTER));
+	screen_device &plus_screen(SCREEN(config, "plus_screen"));
 	plus_screen.set_raw(14.218_MHz_XTAL, 912, 0, 640, 316, 0, 264);
 	plus_screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 

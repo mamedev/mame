@@ -940,7 +940,7 @@ void hp9825_state::hp9825_base(machine_config &config)
 	// Printer
 	BITBANGER(config , m_prt_alpha_out);
 	BITBANGER(config , m_prt_graph_out);
-	SCREEN(config , m_prt_out , SCREEN_TYPE_RASTER);
+	SCREEN(config, m_prt_out);
 	m_prt_out->set_screen_update(FUNC(hp9825_state::printer_out_update));
 	m_prt_out->set_refresh_hz(60);
 	m_prt_out->set_size(PRINT_WIN_W, PRINT_WIN_H);

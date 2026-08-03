@@ -1050,7 +1050,7 @@ void base_state::base(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(base_state::screen_update_kicknrun));
 	m_screen->set_palette(m_palette);

@@ -673,7 +673,7 @@ void raiden_ms_state::raidenm(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &raiden_ms_state::audio_map);
 
 	// Video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER); // all wrong
+	SCREEN(config, m_screen); // all wrong
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_size(256, 256);

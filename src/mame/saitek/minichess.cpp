@@ -36,7 +36,7 @@ It works on the old A34 MCU because the game keeps reading D0 while computing.
 #include "sound/dac.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -198,10 +198,9 @@ void mini_state::smchess(machine_config &config)
 
 	config.set_default_layout(layout_saitek_minichess);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920/2.5, 567/2.5);
-	screen.set_visarea_full();
 
 	TIMER(config, m_comp_timer).configure_generic(FUNC(mini_state::computing));
 }

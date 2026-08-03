@@ -786,7 +786,7 @@ INPUT_PORTS_END
 
 void vdt911_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(11.004_MHz_XTAL, 700, 0, 560, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(vdt911_device::screen_update));
 	m_screen->set_palette("palette");

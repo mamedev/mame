@@ -521,7 +521,7 @@ void spg110_game_state::spg110_base(machine_config &config)
 	m_maincpu->adc_in<0>().set_ioport("JOYX");
 	m_maincpu->adc_in<3>().set_ioport("JOYY");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);

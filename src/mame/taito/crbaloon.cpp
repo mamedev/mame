@@ -374,7 +374,7 @@ void crbaloon_state::crbaloon(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_crbaloon);
 	PALETTE(config, "palette", FUNC(crbaloon_state::crbaloon_palette), 32);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	screen.set_raw(CRBALOON_MASTER_XTAL / 2, 320, 0, 256, 262, 0, 224);
 	screen.set_screen_update(FUNC(crbaloon_state::screen_update_crbaloon));

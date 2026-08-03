@@ -564,7 +564,7 @@ void foodf_state::foodf(machine_config &config)
 
 	TILEMAP(config, m_playfield_tilemap, "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 32, 32, 0).set_info_callback(FUNC(foodf_state::get_playfield_tile_info));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK / 2, 384, 0, 256, 259, 0, 224);
 	m_screen->set_screen_update(FUNC(foodf_state::screen_update));
 	m_screen->set_palette(m_palette);

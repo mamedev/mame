@@ -342,7 +342,7 @@ void vt100_state::vt100(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("rstbuf", FUNC(rst_pos_buffer_device::inta_cb));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_raw(XTAL(24'073'400)*2/3, 102*10, 0, 80*10, 262, 0, 25*10);
 	//screen.set_raw(XTAL(24'073'400), 170*9, 0, 132*9, 262, 0, 25*10);
 	screen.set_screen_update(FUNC(vt100_state::screen_update_vt100));

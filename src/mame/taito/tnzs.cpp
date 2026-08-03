@@ -2271,7 +2271,7 @@ void insectx_state::tnzs_base(machine_config &config)
 	m_spritegen->set_fg_yoffsets( -0x12, 0x0e );
 	m_spritegen->set_bg_yoffsets( 0x1, -0x1 );
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);

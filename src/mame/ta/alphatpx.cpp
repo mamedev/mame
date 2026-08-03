@@ -1232,7 +1232,7 @@ void alphatp_12_state::alphatp2(machine_config &config)
 	ADDRESS_MAP_BANK(config, "bankdev").set_map(&alphatp_12_state::alphatp2_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_raw(12.8544_MHz_XTAL, 824, 0, 640, 312, 0, 288);
 	screen.set_screen_update(FUNC(alphatp_12_state::screen_update));
 
@@ -1310,7 +1310,7 @@ void alphatp_34_state::alphatp3(machine_config &config)
 	ADDRESS_MAP_BANK(config, "bankdev").set_map(&alphatp_34_state::alphatp3_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_raw(12.8544_MHz_XTAL, 824, 0, 640, 312, 0, 288);
 	screen.set_screen_update(FUNC(alphatp_34_state::screen_update));
 

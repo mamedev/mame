@@ -1040,7 +1040,7 @@ void m10_state::m10(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &m10_state::m10_main);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(12.5_MHz_XTAL / 2, 360 /* (0x100-0xd3) * 8 */, 8, 248, 281 /* (0x200-0xe7) */, 16, 240);
 	m_screen->set_screen_update(FUNC(m10_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1097,7 +1097,7 @@ void m15_state::m15(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(m15_state::interrupt));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(11.73_MHz_XTAL / 2, 372, 0, 256, 262, 16, 240);
 	m_screen->set_screen_update(FUNC(m15_state::screen_update));
 	m_screen->set_palette(m_palette);

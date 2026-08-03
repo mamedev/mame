@@ -130,7 +130,7 @@ void lexibook_jg7425_state::lexibook_jg7425(machine_config &config)
 	SCORE7(config, m_maincpu, XTAL(27'000'000) * 4);   // ? not certain on exact type
 	m_maincpu->set_addrmap(AS_PROGRAM, &lexibook_jg7425_state::map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);

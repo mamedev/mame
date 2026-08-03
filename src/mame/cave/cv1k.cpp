@@ -558,7 +558,7 @@ void cv1k_state::cv1k(machine_config &config)
 	SAMSUNG_K9F1G08U0M(config, m_nand);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	// Measured from futari15 PCB.
 	// 262 total lines, vsync pulse is 3 lines. 19 non-sync lines are empty.
 	// Each line is 407 pixels, hsync pulse is 29 pixels. 58 non-sync pixels are empty.

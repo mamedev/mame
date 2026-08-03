@@ -760,7 +760,7 @@ void px8_state::px8(machine_config &config)
 	/* video hardware */
 	config.set_default_layout(layout_px8);
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, SCREEN_TAG).set_lcd());
 	screen.set_refresh_hz(72);
 	screen.set_screen_update(FUNC(px8_state::screen_update));
 	screen.set_size(480, 64);

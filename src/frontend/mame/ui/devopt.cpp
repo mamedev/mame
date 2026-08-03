@@ -125,15 +125,15 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 		}
 
 		// display screen information
-		screen_device_enumerator scriter(*dev);
+		video_output_interface_enumerator scriter(*dev);
 		if (scriter.count() > 0)
 		{
 			layout->add_text(_("* Video:\n"), color);
-			for (screen_device &screen : scriter)
+			for (device_video_output_interface &screen : scriter)
 			{
-				if (screen.screen_type() == SCREEN_TYPE_VECTOR)
+				if (screen.is_vector())
 				{
-					layout->add_text(util::string_format(_("  Screen '%1$s': Vector\n"), screen.tag()), color);
+					layout->add_text(util::string_format(_("  Screen '%1$s': Vector\n"), screen.device().tag()), color);
 				}
 				else
 				{
@@ -154,7 +154,7 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 								(screen.orientation() & ORIENTATION_SWAP_XY)
 									? _(u8"  Screen '%1$s': %2$d × %3$d (V) %4$s\u00a0Hz\n")
 									: _(u8"  Screen '%1$s': %2$d × %3$d (H) %4$s\u00a0Hz\n"),
-								screen.tag(),
+								screen.device().tag(),
 								visarea.width(),
 								visarea.height(),
 								hz),

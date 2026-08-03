@@ -143,14 +143,17 @@ void buddha_device::speed_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	LOG("speed_w %04x [mask = %04x]\n", data, mem_mask);
 }
 
+void buddha_device::update_interrupts()
+{
+	int2_w(m_ide_interrupts_enabled && (m_ide_0_interrupt || m_ide_1_interrupt));
+}
+
 void buddha_device::ide_0_interrupt_w(int state)
 {
 	LOG("ide_0_interrupt_w (%d)\n", state);
 
 	m_ide_0_interrupt = state;
-
-	if (m_ide_interrupts_enabled)
-		m_zorro->int2_w(state);
+	update_interrupts();
 }
 
 void buddha_device::ide_1_interrupt_w(int state)
@@ -158,9 +161,7 @@ void buddha_device::ide_1_interrupt_w(int state)
 	LOG("ide_1_interrupt_w (%d)\n", state);
 
 	m_ide_1_interrupt = state;
-
-	if (m_ide_interrupts_enabled)
-		m_zorro->int2_w(state);
+	update_interrupts();
 }
 
 uint16_t buddha_device::ide_0_interrupt_r(offs_t offset, uint16_t mem_mask)
@@ -181,6 +182,7 @@ void buddha_device::ide_interrupt_enable_w(offs_t offset, uint16_t data, uint16_
 
 	// writing any value here enables ide interrupts to the zorro slot
 	m_ide_interrupts_enabled = true;
+	update_interrupts();
 }
 
 uint16_t buddha_device::ide_0_cs0_r(offs_t offset, uint16_t mem_mask)
@@ -234,18 +236,18 @@ void buddha_device::autoconfig_base_address(offs_t address)
 	LOG("-> installing buddha\n");
 
 	// stop responding to initial location
-	m_zorro->space().unmap_readwrite(0xe80000, 0xe8ffff);
+	zorro_space().unmap_readwrite(0xe80000, 0xe8ffff);
 
 	// install buddha memory access to final location
-	m_zorro->space().install_device(address, address + 0xffff, *this, &buddha_device::mmio_map);
+	zorro_space().install_device(address, address + 0xffff, *this, &buddha_device::mmio_map);
 
 	// install autoconfig handler to new location
-	m_zorro->space().install_readwrite_handler(address, address + 0x7f,
+	zorro_space().install_readwrite_handler(address, address + 0x7f,
 		read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
 		write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 
 	// we're done
-	m_zorro->cfgout_w(0);
+	cfgout_w(0);
 }
 
 void buddha_device::cfgin_w(int state)
@@ -255,7 +257,7 @@ void buddha_device::cfgin_w(int state)
 	if (state == 0)
 	{
 		// buddha memory is also active at this point
-		m_zorro->space().install_device(0xe80000, 0xe8ffff, *this, &buddha_device::mmio_map);
+		zorro_space().install_device(0xe80000, 0xe8ffff, *this, &buddha_device::mmio_map);
 
 		// setup autoconfig
 		autoconfig_board_type(BOARD_TYPE_ZORRO2);
@@ -271,7 +273,7 @@ void buddha_device::cfgin_w(int state)
 		autoconfig_rom_vector(0x1000);
 
 		// install autoconfig handler
-		m_zorro->space().install_readwrite_handler(0xe80000, 0xe8007f,
+		zorro_space().install_readwrite_handler(0xe80000, 0xe8007f,
 			read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
 			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 	}

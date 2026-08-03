@@ -953,7 +953,7 @@ void ppking_state::ppking(machine_config &config)
 	mainlatch.q_out_cb<7>().set(FUNC(ppking_state::flip_screen_set));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 //  screen.set_refresh_hz(60);
 //  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 //  screen.set_size(32*8, 32*8);
@@ -1043,7 +1043,7 @@ void gladiatr_state::gladiatr(machine_config &config)
 		.signal_handler().set(FUNC(gladiatr_state::tclk_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);

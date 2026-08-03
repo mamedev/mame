@@ -529,7 +529,7 @@ void dai3wksi_state::dai3wksi(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(dai3wksi_state::irq0_line_hold));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 255, 8, 247);
 	screen.set_refresh_hz(60);

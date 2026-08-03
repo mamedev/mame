@@ -978,7 +978,7 @@ void tceptor_state::tceptor(machine_config &config)
 	m_c45_road->set_palette(m_palette);
 	m_c45_road->set_xoffset(-64);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60.606060);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(38*8, 32*8);

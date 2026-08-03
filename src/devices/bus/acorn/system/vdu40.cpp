@@ -57,7 +57,7 @@ private:
 
 void acorn_vdu40_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12_MHz_XTAL, 768, 132, 612, 311, 20, 270);
 	screen.set_screen_update("mc6845", FUNC(mc6845_device::screen_update));
 

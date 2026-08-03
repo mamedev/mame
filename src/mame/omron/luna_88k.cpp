@@ -536,7 +536,7 @@ void luna_88k_state_base::common_config(machine_config &config, XTAL clock)
 
 
 	// TODO: crt timing control by HD6445CP4
-	screen_device &crt(SCREEN(config, "crt", SCREEN_TYPE_RASTER));
+	screen_device &crt(SCREEN(config, "crt"));
 	crt.set_raw(108'992'000, 2048, 0, 1280, 1024, 0, 1024);
 	crt.set_screen_update(FUNC(luna_88k_state_base::screen_update));
 
@@ -549,7 +549,7 @@ void luna_88k_state_base::common_config(machine_config &config, XTAL clock)
 
 	palette_device &palette(PALETTE(config, "palette", palette_device::MONOCHROME));
 
-	screen_device &lcd(SCREEN(config, "lcd", SCREEN_TYPE_LCD));
+	screen_device &lcd(SCREEN(config, "lcd").set_lcd());
 	lcd.set_raw(192'000, 40 * 6, 0, 16 * 6, 2 * 8, 0, 2 * 8);
 	lcd.set_screen_update(m_lcdc, FUNC(ks0066_device::screen_update));
 	lcd.set_palette(palette);

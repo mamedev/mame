@@ -659,7 +659,7 @@ void minitel_state::minitel2(machine_config &config)
 	m_serport->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(m_serport));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_screen_update("ts9347", FUNC(ts9347_device::screen_update));
 	screen.set_size(512, 312);

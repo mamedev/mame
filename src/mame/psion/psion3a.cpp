@@ -479,7 +479,7 @@ void psion3a_base_state::psion_asic9(machine_config &config)
 	m_asic9->data_r<1>().set(m_ssd[0], FUNC(psion_ssd_device::data_r));      // SSD Pack 1
 	m_asic9->data_w<1>().set(m_ssd[0], FUNC(psion_ssd_device::data_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_size(480, 160);
 	screen.set_visarea_full();
 	screen.set_refresh_hz(66);

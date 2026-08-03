@@ -55,7 +55,7 @@ void rbv_device::map(address_map &map)
 
 void rbv_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(30.24_MHz_XTAL, 864, 0, 640, 525, 0, 480);
 	m_screen->set_screen_update(FUNC(rbv_device::screen_update));
 	m_screen->screen_vblank().set(m_pseudovia, FUNC(pseudovia_device::slot_irq_w<0x40>));

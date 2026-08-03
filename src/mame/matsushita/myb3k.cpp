@@ -1024,7 +1024,7 @@ void myb3k_state::myb3k(machine_config &config)
 	m_kb->set_keyboard_callback(FUNC(myb3k_state::kbd_set_data_and_interrupt));
 
 	/* Monitor */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(14'318'181) / 3, 600, 0, 600, 400, 0, 400);
 	m_screen->set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 }

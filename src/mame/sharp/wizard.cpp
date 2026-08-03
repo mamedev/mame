@@ -140,7 +140,7 @@ void wizard_state::iq7000(machine_config &config)
 	ARM9(config, m_maincpu, 240000000); // actually Sharp SC62015B02, currently unemulated
 	m_maincpu->set_addrmap(AS_PROGRAM, &wizard_state::main_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD)); // all wrong, TBD
+	screen_device &screen(SCREEN(config, "screen").set_lcd()); // all wrong, TBD
 	screen.set_refresh_hz(50);
 	screen.set_screen_update(FUNC(wizard_state::screen_update));
 	screen.set_size(96, 64);

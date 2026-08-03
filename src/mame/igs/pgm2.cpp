@@ -760,7 +760,7 @@ void pgm2_state::pgm2(machine_config &config)
 	ARM_AIC(config, m_arm_aic).irq_callback().set(FUNC(pgm2_state::irq));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh(HZ_TO_ATTOSECONDS(59.08)); // 59.08Hz, 264 total lines @ 15.59KHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);

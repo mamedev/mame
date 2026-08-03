@@ -1107,7 +1107,7 @@ void paradise_state::paradise(machine_config &config)
 
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(54); // verified
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate, we're using PORT_VBLANK
 	m_screen->set_size(256, 256);

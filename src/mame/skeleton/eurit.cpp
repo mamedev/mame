@@ -160,7 +160,7 @@ void eurit_state::eurit30(machine_config &config)
 	am79c30a_device &dsc(AM79C30A(config, "dsc", 12'288'000));
 	dsc.int_callback().set_inputline(m_maincpu, M37710_LINE_IRQ0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));

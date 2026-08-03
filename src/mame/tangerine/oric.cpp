@@ -791,7 +791,7 @@ void oric_state::oric_common(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12_MHz_XTAL / 2, 64*6, 0, 40*6, 312, 0, 28*8); // 260 lines in 60 Hz mode
 	screen.set_screen_update(FUNC(oric_state::screen_update_oric));
 	screen.screen_vblank().set(FUNC(oric_state::vblank_w));

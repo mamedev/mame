@@ -255,7 +255,7 @@ void flashvga2_state::flashvga2(machine_config &config)
 	I2C_24C256(config, m_eeprom);
 
 	// TODO: refine, is it really 60 Hz?
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(flashvga2_state::screen_update));
 	screen.set_size(911, 525);

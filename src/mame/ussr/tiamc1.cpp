@@ -341,7 +341,7 @@ void tiamc1_state::tiamc1(machine_config &config)
 	ppi.out_pc_callback().set(FUNC(tiamc1_state::tiamc1_control_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(PIXEL_CLOCK, 336, 0, 256, 312, 0, 256);       // pixel clock and htotal comes from docs/schematics, the rest is guess (determined by undumped PROM)
 	screen.set_screen_update(FUNC(tiamc1_state::screen_update_tiamc1));
 	screen.set_palette(m_palette);

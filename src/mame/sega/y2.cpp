@@ -74,7 +74,7 @@ void system_board_y2_state::system_board_y2(machine_config &config)
 	m_maincpu->set_sh4_clock(CPU_CLOCK);
 	*/
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(640, 480);

@@ -1838,7 +1838,7 @@ void segaxbd_state::xboard_base_mconfig(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_segaxbd);
 	PALETTE(config, m_palette).set_entries(8192*2);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/8, 400, 0, 320, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(segaxbd_state::screen_update));
 	m_screen->set_palette(m_palette);

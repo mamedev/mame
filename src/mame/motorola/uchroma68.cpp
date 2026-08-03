@@ -450,7 +450,7 @@ void uchroma68_state::uchroma68(machine_config &config)
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 
 	MC6847(config, m_mc6847, XTAL_UCHROMA68);
 	m_mc6847->set_screen(m_screen);

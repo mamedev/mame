@@ -155,8 +155,8 @@ void a2091_device::device_add_mconfig(machine_config &config)
 {
 	AMIGA_DMAC_REV2(config, m_dmac, DERIVED_CLOCK(1, 1));
 	m_dmac->set_rom("bootrom");
-	m_dmac->cfgout_cb().set([this] (int state) { m_zorro->cfgout_w(state); });
-	m_dmac->int_cb().set([this] (int state) { m_zorro->int2_w(state); });
+	m_dmac->cfgout_cb().set([this] (int state) { cfgout_w(state); });
+	m_dmac->int_cb().set([this] (int state) { int2_w(state); });
 	m_dmac->css_read_cb().set(m_wdc, FUNC(wd33c93a_device::indir_r));
 	m_dmac->css_write_cb().set(m_wdc, FUNC(wd33c93a_device::indir_w));
 	m_dmac->csx0_read_cb().set(FUNC(a2091_device::xt_r));
@@ -199,7 +199,7 @@ void a2091_device::device_start()
 	m_ram = make_unique_clear<uint16_t[]>(0x200000/2);
 
 	// setup dmac
-	m_dmac->set_address_space(&m_zorro->space());
+	m_dmac->set_address_space(&zorro_space());
 	m_dmac->set_ram(m_ram.get());
 
 	// register for save states

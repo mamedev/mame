@@ -28,7 +28,6 @@ license:CC0-1.0
 		<year>1981</year>
 		<publisher>AVE Micro Systems</publisher>
 		<part name="cart" interface="arb">
-			<feature name="ram" value="1" />
 			<dataarea name="rom" size="0x8000">
 				<rom name="1.bin" offset="0x5000" size="0x1000" crc="23a687db" sha1="710488e8c65d0e95072d35df9aad09e9909a2933" />
 				<rom name="2.bin" offset="0x6000" size="0x1000" crc="15a58f73" sha1="e37fb887c35a3647d632a43fa8423b9b66b93b02" />

@@ -306,7 +306,7 @@ void musclem_state::musclem(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &musclem_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(musclem_state::irq4_line_hold));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(14'318'181) / 2, 440, 16, 328, 273, 0, 240);
 
 	screen.set_screen_update(FUNC(musclem_state::screen_update));

@@ -205,7 +205,7 @@ void mmahjong_state::mmahjong(machine_config &config)
 
 	TILEMAP(config, m_tilemap, "gfxdecode", 0, 8, 8, TILEMAP_SCAN_ROWS, 32, 32).set_info_callback(FUNC(mmahjong_state::get_tile_info));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(8*32, 8*32);
 	m_screen->set_visarea(0, 8*32-1, 0, 8*24-1);

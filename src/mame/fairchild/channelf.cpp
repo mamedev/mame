@@ -215,7 +215,7 @@ void channelf_state::channelf(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &channelf_state::channelf_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(3.579545_MHz_XTAL * 8 / 7, 256, 8, 212, 264, 16, 248);
 	screen.set_screen_update(FUNC(channelf_state::screen_update_ntsc));
 	screen.set_palette("palette");
@@ -237,7 +237,7 @@ void channelf_state::sabavdpl(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &channelf_state::channelf_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(4_MHz_XTAL, 256, 8, 212, 312, 20, 310);
 	screen.set_screen_update(FUNC(channelf_state::screen_update_pal));
 	screen.set_palette("palette");
@@ -260,7 +260,7 @@ void channelf_state::channlf2(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &channelf_state::channelf_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(3.579545_MHz_XTAL * 8 / 7, 256, 8, 212, 264, 16, 248);
 	screen.set_screen_update(FUNC(channelf_state::screen_update_ntsc));
 	screen.set_palette("palette");
@@ -283,7 +283,7 @@ void channelf_state::sabavpl2(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &channelf_state::channelf_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(4_MHz_XTAL, 256, 8, 212, 312, 20, 310);
 	screen.set_screen_update(FUNC(channelf_state::screen_update_pal));
 	screen.set_palette("palette");

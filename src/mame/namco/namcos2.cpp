@@ -1704,7 +1704,7 @@ void namcos2_base_state::configure_common_standard(machine_config &config)
 
 	NAMCO_C139(config, m_sci);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8);
 	m_screen->set_palette(m_c116);
 

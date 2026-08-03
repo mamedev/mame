@@ -337,7 +337,7 @@ void ac1_state::ac1(machine_config &config)
 	Z80CTC(config, "ctc", 8'000'000 / 4); // all connections go external
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(64*6, 16*8);

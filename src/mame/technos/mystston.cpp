@@ -550,7 +550,7 @@ void mystston_state::mystston(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mystston);
 	PALETTE(config, m_palette).set_entries(0x40);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(mystston_state::screen_update));
 	m_screen->set_palette(m_palette);

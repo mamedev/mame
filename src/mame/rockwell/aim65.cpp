@@ -231,7 +231,7 @@ void aim65_state::aim65(machine_config &config)
 	m_ds[4]->update().set(FUNC(aim65_state::update_ds<5>));
 
 	// pseudo-"screen" for the thermal printer. Index 0.
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_screen_update(FUNC(aim65_state::screen_update));

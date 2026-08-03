@@ -595,7 +595,7 @@ void konamigv_state::konamigv(machine_config &config)
 	// video hardware
 	CXD8514Q(config, "gpu", XTAL(53'693'175), 0x100000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
@@ -1093,7 +1093,7 @@ void tokimeki_state::tmosh(machine_config &config)
 	konamigv(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tokimeki_state::tmosh_map);
 
-	auto &screen(SCREEN(config, "printer", SCREEN_TYPE_RASTER));
+	auto &screen(SCREEN(config, "printer"));
 	screen.set_size(PRINTER_PAGE_WIDTH, PRINTER_PAGE_HEIGHT);
 	screen.set_visarea_full();
 	screen.set_refresh_hz(10); // infrequently updated, only displays printed page

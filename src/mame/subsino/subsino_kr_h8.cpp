@@ -382,7 +382,7 @@ void subsino_kr_h8_state::modcart(machine_config &config)
 	SUBSINO_SG001(config, m_sg001[0], 0);
 	SUBSINO_SG001(config, m_sg001[1], 0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: verify once it works
+	screen_device &screen(SCREEN(config, "screen")); // TODO: verify once it works
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 512-1, 0, 256-16-1);
 	screen.set_refresh_hz(60);

@@ -323,7 +323,7 @@ void _3do_state::_3do(machine_config &config)
 
 	green_config(config);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// TODO: proper params (mostly running in interlace mode)
 	// htotal=1592 according to page 36 of HW spec, this is off wrt 15.734 kHz spec
 	// (half clocks during HSync?)
@@ -347,7 +347,7 @@ void _3do_state::_3do_pal(machine_config &config)
 
 	green_config(config);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// TODO: as above, actual params are unknown
 	// assumed 15.625 kHz as per PAL spec, display range looks a bit off
 	m_screen->set_raw(X2_CLOCK_PAL / 2, 1888, 254, 1790, 313, 22, 312);

@@ -508,7 +508,7 @@ void hrdvd_state::hrdvd(machine_config &config)
 	m_video->set_vram_size(0x20000);
 	m_video->int_cb().set_inputline(m_maincpu, 0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 
 	ZR36110(config, m_mpeg, 27_MHz_XTAL/2);
 	m_mpeg->drq_w().set(FUNC(hrdvd_state::mpeg_dreq_w));

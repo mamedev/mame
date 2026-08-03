@@ -792,7 +792,7 @@ void shangha3_state::shangha3(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(shangha3_state::irq4_line_assert));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 //  m_screen->set_refresh_hz(60);
 //  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 //  m_screen->set_size(24*16, 16*16);
@@ -829,7 +829,7 @@ void heberpop_state::heberpop(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &heberpop_state::sound_io_map);  // NMI triggered by YM3438
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 //  m_screen->set_refresh_hz(60);
 //  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 //  m_screen->set_size(24*16, 16*16);
@@ -869,7 +869,7 @@ void blocken_state::blocken(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &blocken_state::sound_io_map);  // NMI triggered by YM3438
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 //  m_screen->set_refresh_hz(60);
 //  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 //  m_screen->set_size(24*16, 16*16);

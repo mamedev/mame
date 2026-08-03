@@ -244,7 +244,7 @@ void ctvboy_state::ctvboy(machine_config &config)
 	m_mc6847->fsync_wr_callback().set(FUNC(ctvboy_state::vblank_irq));
 	m_mc6847->set_screen(m_screen);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();

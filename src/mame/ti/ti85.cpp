@@ -586,7 +586,7 @@ void ti85_state::ti81(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti81_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(0);
 	screen.set_size(96, 64);

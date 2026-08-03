@@ -721,7 +721,7 @@ void elan_eu3a05_state::elan_eu3a05_4mb(machine_config &config)
 	m_maincpu->read_callback<2>().set_ioport("IN2");
 	m_maincpu->set_screen(m_screen);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_screen_update(FUNC(elan_eu3a05_state::screen_update));
@@ -768,7 +768,7 @@ void elan_eu3a13_state::elan_eu3a13_1mb(machine_config &config)
 	m_maincpu->set_screen(m_screen);
 	m_maincpu->set_alt_timer(); // carlecfg needs it, some other eu3a13 games might not
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_screen_update(FUNC(elan_eu3a13_state::screen_update));

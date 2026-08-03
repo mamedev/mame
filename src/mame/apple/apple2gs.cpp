@@ -3792,7 +3792,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	// HBL is positioned to the right of active video here, but to the left on hardware.
 	// the borders are counted as active video here, but as HBL on hardware.
 	// these must be compensated for in any use of hpos/vpos/hblank/vblank.
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(A2GS_1M.value() * 16, 65 * 16, 0, BORDER_LEFT + 40 * 16 + BORDER_RIGHT, 262, 0, 231);
 	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update_GS)));
 

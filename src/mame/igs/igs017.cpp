@@ -5418,7 +5418,7 @@ void igs017_state::base_machine_oki(machine_config &config, const XTAL &xtal_oki
 	I8255A(config, m_ppi);
 
 	// video
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);

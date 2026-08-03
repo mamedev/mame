@@ -263,7 +263,7 @@ DEFINE_DEVICE_TYPE(ISA8_CGA, isa8_cga_device, "cga", "IBM Color/Graphics Monitor
 
 void isa8_cga_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, CGA_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, CGA_SCREEN_NAME));
 	screen.set_raw(XTAL(14'318'181), 912, 0, 640, 262, 0, 200);
 	screen.set_screen_update(FUNC(isa8_cga_device::screen_update));
 
@@ -1619,7 +1619,7 @@ DEFINE_DEVICE_TYPE(ISA8_CGA_MC1502, isa8_cga_mc1502_device, "cga_mc1502", "MC150
 
 void isa8_cga_mc1502_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, CGA_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, CGA_SCREEN_NAME));
 	screen.set_raw(XTAL(16'000'000), 912, 0, 640, 462, 0, 400);
 	screen.set_screen_update(FUNC(isa8_cga_mc1502_device::screen_update));
 
@@ -1721,7 +1721,7 @@ DEFINE_DEVICE_TYPE(ISA8_CGA_M24, isa8_cga_m24_device, "cga_m24", "Olivetti M24 C
 
 void isa8_cga_m24_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, CGA_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, CGA_SCREEN_NAME));
 	screen.set_raw(XTAL(14'318'181), 912, 0, 640, 462, 0, 400);
 	screen.set_screen_update(FUNC(isa8_cga_m24_device::screen_update));
 
@@ -1838,7 +1838,10 @@ uint8_t isa8_cga_m24_device::io_read(offs_t offset)
 
 MC6845_UPDATE_ROW(isa8_cga_m24_device::crtc_update_row)
 {
-	if (m_mode2 & 1)
+	// mode2 bit 0 only enables the 400 line mode; whether the display is text or
+	// graphics is still selected by bit 1 of the mode control register.  The OEM
+	// MS-DOS console driver leaves mode2 bit 0 set while in text mode.
+	if (BIT(m_mode2, 0) && BIT(m_mode_control, 1))
 	{
 		m24_gfx_1bpp_m24_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
 		return;

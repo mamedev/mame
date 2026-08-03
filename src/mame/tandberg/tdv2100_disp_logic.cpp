@@ -956,7 +956,7 @@ void tandberg_tdv2100_disp_logic_device::transk_w(int state)
 void tandberg_tdv2100_disp_logic_device::device_add_mconfig(machine_config &mconfig)
 {
 	/* Video hardware */
-	SCREEN(mconfig, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	SCREEN(mconfig, m_screen).set_color(rgb_t::green());
 	m_screen->set_raw(DOT_CLOCK, 999, 0, 783, 402, 0, 350);
 	m_screen->set_screen_update(FUNC(tandberg_tdv2100_disp_logic_device::screen_update));
 	m_screen->screen_vblank().set(FUNC(tandberg_tdv2100_disp_logic_device::vblank));

@@ -156,7 +156,7 @@ void mk3b_soc_state::mk3b_soc(machine_config &config)
 	ARM920T(config, m_maincpu, 240000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mk3b_soc_state::map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_size(1280, 720);

@@ -480,7 +480,7 @@ void sfcbox_state::sfcbox(machine_config &config)
 	config.set_default_layout(layout_dualhsxs);
 
 	// SNES PPU
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(DOTCLK_NTSC * 2, SNES_HTOTAL * 2, 0, SNES_SCR_WIDTH * 2, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC);
 	screen.set_video_attributes(VIDEO_VARIABLE_WIDTH);
 	screen.set_screen_update(FUNC(snes_state::screen_update));
@@ -490,7 +490,7 @@ void sfcbox_state::sfcbox(machine_config &config)
 	m_ppu->set_screen("screen");
 
 	// SFCBOX
-	screen_device &osd(SCREEN(config, "osd", SCREEN_TYPE_RASTER));
+	screen_device &osd(SCREEN(config, "osd"));
 	osd.set_refresh_hz(60);
 	osd.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 //  osd.set_size(24*12+22, 12*18+22);

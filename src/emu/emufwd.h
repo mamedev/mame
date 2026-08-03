@@ -228,8 +228,8 @@ class rom_load_manager;
 class device_scheduler;
 class emu_timer;
 
-// declared in screen.h
-class screen_device;
+// declared in divo.h
+class device_video_output_interface;
 
 // declared in softlist.h
 class software_info;

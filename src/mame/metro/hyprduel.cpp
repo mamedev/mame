@@ -409,7 +409,7 @@ void hyprduel_state::i4220_config(machine_config &config)
 	m_vdp->set_blit_irq_level(2);
 	m_vdp->set_spriteram_buffered(true); // sprites are 1 frame delayed
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	screen.set_refresh_hz(60); // Unknown/Unverified
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));

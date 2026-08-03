@@ -482,7 +482,7 @@ void spc1000_state::spc1000(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &spc1000_state::io_map);
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	MC6847(config, m_vdg, XTAL(3'579'545));
 	m_vdg->set_screen("screen");

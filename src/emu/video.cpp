@@ -18,6 +18,7 @@
 #include "main.h"
 #include "output.h"
 #include "screen.h"
+#include "divo.h"
 
 #include "ui/uimain.h"
 
@@ -120,7 +121,7 @@ video_manager::video_manager(running_machine &machine)
 	// extract initial execution state from global configuration settings
 	update_refresh_speed();
 
-	const unsigned screen_count(screen_device_enumerator(machine.root_device()).count());
+	const unsigned screen_count(video_output_interface_enumerator(machine.root_device()).count());
 	const bool no_screens(!screen_count);
 
 	// create a render target for snapshots
@@ -271,7 +272,8 @@ void video_manager::frame_update(bool from_debugger)
 	if (phase == machine_phase::RUNNING)
 	{
 		// reset partial updates if we're paused or if the debugger is active
-		screen_device *const screen = screen_device_enumerator(machine().root_device()).first();
+		auto *output = video_output_interface_enumerator(machine().root_device()).first();
+		screen_device *screen = dynamic_cast<screen_device *>(output);
 		bool const debugger_enabled = machine().debug_flags & DEBUG_FLAG_ENABLED;
 		bool const within_instruction_hook = debugger_enabled && machine().debugger().within_instruction_hook();
 		if (screen && ((machine().paused() && machine().options().update_in_pause()) || from_debugger || within_instruction_hook))
@@ -312,8 +314,9 @@ std::string video_manager::speed_text()
 
 	// display the number of partial updates as well
 	int partials = 0;
-	for (screen_device &screen : screen_device_enumerator(machine().root_device()))
-		partials += screen.partial_updates();
+	for (device_video_output_interface &output : video_output_interface_enumerator(machine().root_device()))
+		if (auto *screen = dynamic_cast<screen_device *>(&output))
+			partials += screen->partial_updates();
 	if (partials > 1)
 		util::stream_format(str, "\n%d partial updates", partials);
 
@@ -360,13 +363,16 @@ void video_manager::save_active_screen_snapshots()
 	if (m_snap_native)
 	{
 		// if we're native, then write one snapshot per visible screen
-		for (screen_device &screen : screen_device_enumerator(machine().root_device()))
-			if (machine().render().is_live(screen))
+		for (device_video_output_interface &output : video_output_interface_enumerator(machine().root_device()))
+			if (machine().render().is_live(output))
 			{
 				emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 				std::error_condition const filerr = open_next(file, "png");
 				if (!filerr)
-					save_snapshot(&screen, file);
+				{
+					auto *screen = dynamic_cast<screen_device *>(&output);
+					save_snapshot(screen, file);
+				}
 			}
 	}
 	else
@@ -419,8 +425,8 @@ void video_manager::begin_recording_screen(const std::string &filename, uint32_t
 void video_manager::begin_recording(const char *name, movie_recording::format format)
 {
 	// create a snapshot bitmap so we know what the target size is
-	screen_device_enumerator iterator(machine().root_device());
-	screen_device_enumerator::iterator iter(iterator.begin());
+	video_output_interface_enumerator iterator(machine().root_device());
+	video_output_interface_enumerator::iterator iter(iterator.begin());
 	uint32_t count = (uint32_t)iterator.count();
 	const bool no_screens(!count);
 
@@ -454,7 +460,9 @@ void video_manager::begin_recording(const char *name, movie_recording::format fo
 		std::string tempname;
 		for (uint32_t index = 0; index < count; index++, iter++)
 		{
-			create_snapshot_bitmap(iter.current()); // TODO: only do this when starting on-the-fly, and make name match AVI file name
+			auto *output = iter.current();
+			auto *screen = dynamic_cast<screen_device *>(output);
+			create_snapshot_bitmap(screen); // TODO: only do this when starting on-the-fly, and make name match AVI file name
 
 			if (name)
 			{
@@ -467,14 +475,16 @@ void video_manager::begin_recording(const char *name, movie_recording::format fo
 			begin_recording_screen(
 					tempname,
 					index,
-					iter.current(),
+					screen,
 					format);
 		}
 	}
 	else
 	{
 		create_snapshot_bitmap(nullptr);
-		begin_recording_screen(std::string(basename) + extension, 0, iter.current(), format);
+		auto *output = iter.current();
+		auto *screen = dynamic_cast<screen_device *>(output);
+		begin_recording_screen(std::string(basename) + extension, 0, screen, format);
 	}
 }
 
@@ -618,14 +628,15 @@ inline int video_manager::original_speed_setting() const
 bool video_manager::finish_screen_updates()
 {
 	// finish updating the screens
-	screen_device_enumerator iter(machine().root_device());
+	video_output_interface_enumerator iter(machine().root_device());
 
 	bool has_live_screen = false;
-	for (screen_device &screen : iter)
+	for (device_video_output_interface &output : iter)
 	{
-		screen.update_partial(screen.visible_area().max_y);
+		if (auto *screen = dynamic_cast<screen_device *>(&output))
+			screen->update_partial(screen->visible_area().max_y);
 
-		if (machine().render().is_live(screen))
+		if (machine().render().is_live(output))
 			has_live_screen = true;
 	}
 
@@ -633,8 +644,8 @@ bool video_manager::finish_screen_updates()
 	m_output_changed = false;
 
 	// now add the quads for all the screens
-	for (screen_device &screen : iter)
-		if (screen.update_quads())
+	for (device_video_output_interface &output : iter)
+		if (output.video_output_update())
 			anything_changed = true;
 
 	// update our movie recording and burn-in state
@@ -643,13 +654,17 @@ bool video_manager::finish_screen_updates()
 		record_frame();
 
 		// iterate over screens and update the burnin for the ones that care
-		for (screen_device &screen : iter)
-			screen.update_burnin();
+		for (device_video_output_interface &output : iter)
+			if (auto *screen = dynamic_cast<screen_device *>(&output))
+				screen->update_burnin();
 	}
 
 	// draw any crosshairs
-	for (screen_device &screen : iter)
-		machine().crosshair().render(screen);
+	for (device_video_output_interface &output : iter)
+	{
+		if (auto *screen = dynamic_cast<screen_device *>(&output))
+			machine().crosshair().render(*screen);
+	}
 
 	return anything_changed;
 }
@@ -913,9 +928,9 @@ void video_manager::update_refresh_speed()
 			// find the screen with the shortest frame period (max refresh rate)
 			// note that we first check the token since this can get called before all screens are created
 			attoseconds_t min_frame_period = ATTOSECONDS_PER_SECOND;
-			for (screen_device &screen : screen_device_enumerator(machine().root_device()))
+			for (device_video_output_interface &output : video_output_interface_enumerator(machine().root_device()))
 			{
-				attoseconds_t period = screen.frame_period().attoseconds();
+				attoseconds_t period = output.frame_period().attoseconds();
 				if (period != 0)
 					min_frame_period = std::min(min_frame_period, period);
 			}
@@ -992,12 +1007,15 @@ void video_manager::recompute_speed(const attotime &emutime)
 		// create a final screenshot
 		if (m_snap_native)
 		{
-			for (screen_device &screen : screen_device_enumerator(machine().root_device()))
+			for (device_video_output_interface &output : video_output_interface_enumerator(machine().root_device()))
 			{
 				emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 				std::error_condition const filerr = open_next(file, "png");
 				if (!filerr)
-					save_snapshot(&screen, file);
+				{
+					auto *screen = dynamic_cast<screen_device *>(&output);
+					save_snapshot(screen, file);
+				}
 			}
 		}
 		else
@@ -1029,7 +1047,7 @@ void video_manager::create_snapshot_bitmap(screen_device *screen)
 	// select the appropriate view in our dummy target
 	if (m_snap_native && screen)
 	{
-		screen_device_enumerator iter(machine().root_device());
+		video_output_interface_enumerator iter(machine().root_device());
 		int view_index = iter.indexof(*screen);
 		assert(view_index != -1);
 		m_snap_target->set_view(view_index);

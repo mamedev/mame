@@ -433,12 +433,12 @@ void cdi_state::cdimono1_base(machine_config &config)
 	m_mcd212->set_screen("screen");
 	m_mcd212->int_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(14976000*2, 960, 0, 768, 312*2, 32*2, 312*2); // x2 for interlace
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	screen.set_screen_update(m_mcd212, FUNC(mcd212_device::screen_update));
 
-	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_lcd);
 	m_lcd->set_refresh_hz(50);
 	m_lcd->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_lcd->set_size(192, 22);
@@ -484,12 +484,12 @@ void cdi_state::cdimono2(machine_config &config)
 	m_mcd212->set_screen("screen");
 	m_mcd212->int_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(14976000*2, 960, 0, 768, 312*2, 32*2, 312*2); // x2 for interlace
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	screen.set_screen_update(m_mcd212, FUNC(mcd212_device::screen_update));
 
-	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_lcd);
 	m_lcd->set_refresh_hz(60);
 	m_lcd->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_lcd->set_size(192, 22);
@@ -528,12 +528,12 @@ void cdi_state::cdi910(machine_config &config)
 	m_mcd212->set_screen("screen");
 	m_mcd212->int_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(14976000*2, 960, 0, 768, 312*2, 32*2, 312*2); // x2 for interlace
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	screen.set_screen_update(m_mcd212, FUNC(mcd212_device::screen_update));
 
-	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_lcd);
 	m_lcd->set_refresh_hz(60);
 	m_lcd->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_lcd->set_size(192, 22);

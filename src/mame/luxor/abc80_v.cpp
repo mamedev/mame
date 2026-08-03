@@ -344,7 +344,7 @@ void abc80_state::abc80_video(machine_config &config)
 {
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(abc80_state::screen_update));
 	m_screen->set_raw(XTAL(11'980'800)/2, ABC80_HTOTAL, ABC80_HBEND, ABC80_HBSTART, ABC80_VTOTAL, ABC80_VBEND, ABC80_VBSTART);
 
@@ -361,7 +361,7 @@ void tkn80_state::tkn80_video(machine_config &config)
 {
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(tkn80_state::screen_update));
 	m_screen->set_raw(XTAL(11'980'800), ABC80_HTOTAL*2, ABC80_HBEND*2, ABC80_HBSTART*2, ABC80_VTOTAL, ABC80_VBEND, ABC80_VBSTART);
 

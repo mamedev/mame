@@ -95,7 +95,7 @@ void alcat7100_state::alcat7100(machine_config &config)
 	z80ctc_device &ctc(Z80CTC(config, "ctc", 24_MHz_XTAL / 6));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(15'900'000, 1200, 0, 960, 265, 0, 240);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

@@ -140,7 +140,7 @@ INPUT_PORTS_END
 
 void nubus_thunder4gx_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(nubus_thunder4gx_device::screen_update));
 	m_screen->set_size(1600, 1200);
 	m_screen->set_visarea(0, 1152 - 1, 0, 870 - 1);

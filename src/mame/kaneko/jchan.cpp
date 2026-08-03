@@ -598,7 +598,7 @@ void jchan_state::jchan(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(28.636363_MHz_XTAL / 4, 460, 0, 320, 261, 0, 240);
 	screen.set_screen_update(FUNC(jchan_state::screen_update));
 	screen.set_palette(m_palette);

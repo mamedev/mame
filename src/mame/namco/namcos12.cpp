@@ -1152,7 +1152,7 @@ public:
 		m_maincpu->set_addrmap(AS_PROGRAM, &namcos12_state::maincpu_map);
 		m_maincpu->subdevice<psxdma_device>("dma")->install_read_handler(5, psxdma_device::read_delegate(&namcos12_state::namcos12_rom_read, this));
 
-		SCREEN(config, "screen", SCREEN_TYPE_RASTER).screen_vblank().set(FUNC(namcos12_state::namcos12_sub_irq));
+		SCREEN(config, "screen").screen_vblank().set(FUNC(namcos12_state::namcos12_sub_irq));
 
 		/* basic machine hardware */
 		H83002(config, m_sub, 16934400); // frequency based on research (superctr)

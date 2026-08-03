@@ -1431,7 +1431,7 @@ void st_state::st(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &st_state::st_super_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(m_video, FUNC(st_video_device::screen_update));
 
 	ST_VIDEO(config, m_video, Y2);
@@ -1469,7 +1469,7 @@ void megast_state::megast(machine_config &config)
 	m_stb->int_callback().set(m_mfp, FUNC(mc68901_device::i3_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(m_video, FUNC(st_video_device::screen_update));
 
 	ST_VIDEO(config, m_video, Y2);
@@ -1510,7 +1510,7 @@ void ste_state::ste(machine_config &config)
 	m_stb->int_callback().set(m_mfp, FUNC(mc68901_device::i3_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(m_videox, FUNC(ste_video_device::screen_update));
 	m_screen->set_raw(Y2/4, ATARIST_HTOT_PAL, ATARIST_HBEND_PAL, ATARIST_HBSTART_PAL, ATARIST_VTOT_PAL, ATARIST_VBEND_PAL, ATARIST_VBSTART_PAL);
 
@@ -1572,7 +1572,7 @@ void stbook_state::stbook(machine_config &config)
 	m_stb->int_callback().set(m_mfp, FUNC(mc68901_device::i3_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_screen_update(m_videox, FUNC(stbook_video_device::screen_update));
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(640, 400);

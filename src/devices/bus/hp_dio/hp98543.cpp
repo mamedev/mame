@@ -78,7 +78,7 @@ ROM_END
 
 void dio16_98543_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, HP98543_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, HP98543_SCREEN_NAME));
 	screen.set_screen_update(FUNC(dio16_98543_device::screen_update));
 	screen.screen_vblank().set(FUNC(dio16_98543_device::vblank_w));
 	screen.set_raw(35.904_MHz_XTAL, 1408, 0, 1024, 425, 0, 400);

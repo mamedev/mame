@@ -223,7 +223,7 @@ void heromem_state::heromem(machine_config &config)
 	TE7751(config, "io");
 
 	// video hardware
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER)); // all wrong
+	screen_device &lscreen(SCREEN(config, "lscreen")); // all wrong
 	lscreen.set_refresh_hz(60);
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	lscreen.set_size(64*8, 32*8);
@@ -232,7 +232,7 @@ void heromem_state::heromem(machine_config &config)
 	lscreen.screen_vblank().set(FUNC(heromem_state::screen_vblank_l));
 	lscreen.set_palette("tc0091lvc_l:palette");
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER)); // all wrong
+	screen_device &rscreen(SCREEN(config, "rscreen")); // all wrong
 	rscreen.set_refresh_hz(60);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	rscreen.set_size(64*8, 32*8);

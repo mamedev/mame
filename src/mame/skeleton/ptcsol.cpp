@@ -738,7 +738,7 @@ void sol20_state::sol20(machine_config &config)
 	m_maincpu->out_inte_func().set("speaker", FUNC(speaker_sound_device::level_w));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(14.318181_MHz_XTAL, 918, 0, 576, 260, 0, 208);
 	m_screen->set_screen_update(FUNC(sol20_state::screen_update));
 	m_screen->set_palette("palette");

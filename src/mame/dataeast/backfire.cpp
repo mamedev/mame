@@ -361,7 +361,7 @@ void backfire_state::backfire(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_backfire);
 	config.set_default_layout(layout_dualhsxs);
 
-	SCREEN(config, m_lscreen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_lscreen);
 	m_lscreen->set_refresh_hz(60);
 	m_lscreen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_lscreen->set_size(40*8, 32*8);
@@ -370,7 +370,7 @@ void backfire_state::backfire(machine_config &config)
 	m_lscreen->set_palette(m_palette);
 	m_lscreen->screen_vblank().set(FUNC(backfire_state::vbl_interrupt));
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_refresh_hz(60);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	rscreen.set_size(40*8, 32*8);

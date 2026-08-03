@@ -1689,7 +1689,7 @@ void segaybd_state::yboard(machine_config &config)
 	SEGA_315_5249_DIVIDER(config, "divider_suby");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(342,262);   // to be verified
 	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);

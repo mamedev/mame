@@ -548,7 +548,7 @@ void apf_state::apfm1000(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &apf_state::apfm1000_map);
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	MC6847(config, m_crtc, 3.579545_MHz_XTAL);
 	m_crtc->fsync_wr_callback().set(m_pia0, FUNC(pia6821_device::cb1_w));

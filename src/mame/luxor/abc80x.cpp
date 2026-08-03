@@ -298,7 +298,7 @@ void abc800c_state::abc800c_palette(palette_device &palette) const
 
 void abc800c_state::abc800c_video(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_screen_update(FUNC(abc800c_state::screen_update));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
@@ -439,7 +439,7 @@ void abc800m_state::abc800m_video(machine_config &config)
 	mc6845.set_update_row_callback(FUNC(abc800m_state::abc800m_update_row));
 	mc6845.out_vsync_callback().set(m_dart, FUNC(z80dart_device::rib_w)).invert();
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t(0xff, 0xff, 0x00)));
+	screen_device &screen(SCREEN(config, SCREEN_TAG).set_color(rgb_t(0xff, 0xff, 0x00)));
 	screen.set_screen_update(FUNC(abc800m_state::screen_update));
 	screen.set_raw(XTAL(12'000'000), 0x300, 0, 0x1e0, 0x13a, 0, 0xf0);
 
@@ -633,7 +633,7 @@ void abc802_state::abc802_video(machine_config &config)
 	mc6845.out_vsync_callback().set(FUNC(abc802_state::vs_w));
 	mc6845.out_vsync_callback().append(m_dart, FUNC(z80dart_device::rib_w)).invert();
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::amber()));
+	screen_device &screen(SCREEN(config, SCREEN_TAG).set_color(rgb_t::amber()));
 	screen.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
 	screen.set_raw(XTAL(12'000'000), 0x300, 0, 0x1e0, 0x13a, 0, 0xf0);
 
@@ -1150,7 +1150,7 @@ void abc806_state::abc806_video(machine_config &config)
 	m_crtc->out_hsync_callback().set(FUNC(abc806_state::hs_w));
 	m_crtc->out_vsync_callback().set(FUNC(abc806_state::vs_w));
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_screen_update(FUNC(abc806_state::screen_update));
 	screen.set_raw(XTAL(12'000'000), 0x300, 0, 0x1e0, 0x13a, 0, 0xfa);
 

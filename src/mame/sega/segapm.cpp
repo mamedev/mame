@@ -151,7 +151,7 @@ void segapm_state::segapm(machine_config &config)
 	m_32x->set_total_scanlines(262);
 
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK_NTSC / 8, 427, 0, 320, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(segapm_state::screen_update));
 

@@ -396,7 +396,7 @@ void batsugun_state::batsugun(machine_config &config)
 	TOAPLAN_COINCOUNTER(config, m_coincounter);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(batsugun_state::screen_update));

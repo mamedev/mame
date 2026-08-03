@@ -18,7 +18,6 @@
 #include "rendutil.h"
 #include "video.h"
 
-#include "nanosvg.h"
 #include "png.h"
 
 #include <cstdio>
@@ -43,486 +42,6 @@ DEFINE_DEVICE_TYPE(SCREEN, screen_device, "screen", "Video Screen")
 
 const attotime screen_device::DEFAULT_FRAME_PERIOD(attotime::from_hz(DEFAULT_FRAME_RATE));
 
-u32 screen_device::m_id_counter = 0;
-
-class screen_device::svg_renderer {
-public:
-	svg_renderer(memory_region *region);
-
-	int width() const;
-	int height() const;
-
-	int render(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	static void output_notifier(void *param, osd::output_item const &output, s32 seconds, s64 attoseconds);
-
-private:
-	struct paired_entry {
-		int key;
-		int cache_entry;
-		paired_entry(int k, int c) { key = k; cache_entry = c; }
-	};
-
-	struct cached_bitmap {
-		int x, y, sx, sy;
-		std::vector<u32> image;
-		std::vector<paired_entry> pairs;
-	};
-
-	struct bbox {
-		int x0, y0, x1, y1;
-	};
-
-	util::nsvg_image_ptr m_image;
-	util::nsvg_rasterizer_ptr m_rasterizer;
-	std::vector<bool> m_key_state;
-	std::vector<std::vector<NSVGshape *>> m_keyed_shapes;
-	util::transparent_string_unordered_map<std::string, int> m_key_ids;
-	int m_key_count;
-
-	int m_sx, m_sy;
-	double m_scale;
-	std::vector<u32> m_background;
-
-	std::vector<cached_bitmap> m_cache;
-
-	void output_change(const osd::output_item &output);
-	void render_state(std::vector<u32> &dest, const std::vector<bool> &state);
-	void compute_initial_bboxes(std::vector<bbox> &bboxes);
-	bool compute_mask_intersection_bbox(int key1, int key2, bbox &bb) const;
-	void compute_diff_image(const std::vector<u32> &rend, const bbox &bb, cached_bitmap &dest) const;
-	void compute_dual_diff_image(const std::vector<u32> &rend, const bbox &bb, const cached_bitmap &src1, const cached_bitmap &src2, cached_bitmap &dest) const;
-	void rebuild_cache();
-	void blit(bitmap_rgb32 &bitmap, const cached_bitmap &src) const;
-};
-
-screen_device::svg_renderer::svg_renderer(memory_region *region)
-{
-	const std::unique_ptr<char []> s(new char[region->bytes() + 1]);
-	memcpy(s.get(), region->base(), region->bytes());
-	s[region->bytes()] = 0;
-	m_image.reset(nsvgParse(s.get(), "px", 72));
-	m_rasterizer.reset(nsvgCreateRasterizer());
-
-	m_key_count = 0;
-
-	for (NSVGshape *shape = m_image->shapes; shape; shape = shape->next)
-		if(shape->title[0]) {
-			const auto it = m_key_ids.find(shape->title);
-			if(it != m_key_ids.end())
-				m_keyed_shapes[it->second].push_back(shape);
-			else {
-				const int id = m_key_count++;
-				m_keyed_shapes.resize(m_key_count);
-				m_keyed_shapes[id].push_back(shape);
-				m_key_ids[shape->title] = id;
-			}
-		}
-	m_key_state.resize(m_key_count);
-	std::fill(m_key_state.begin(),m_key_state.end(),false);
-
-	m_sx = m_sy = 0;
-	m_scale = 1.0;
-
-	osd_printf_verbose("Parsed SVG '%s', aspect ratio %f\n", region->name(), (m_image->height == 0.0f) ? 0 : m_image->width / m_image->height);
-}
-
-int screen_device::svg_renderer::width() const
-{
-	return int(m_image->width + 0.5);
-}
-
-int screen_device::svg_renderer::height() const
-{
-	return int(m_image->height + 0.5);
-}
-
-void screen_device::svg_renderer::render_state(std::vector<u32> &dest, const std::vector<bool> &state)
-{
-	for(int key = 0; key != m_key_count; key++) {
-		if (state[key])
-			for(auto s : m_keyed_shapes[key])
-				s->flags |= NSVG_FLAGS_VISIBLE;
-		else
-			for(auto s : m_keyed_shapes[key])
-				s->flags &= ~NSVG_FLAGS_VISIBLE;
-	}
-
-	nsvgRasterize(m_rasterizer.get(), m_image.get(), 0, 0, m_scale, (unsigned char *)&dest[0], m_sx, m_sy, m_sx*4);
-
-	// Nanosvg generates non-premultiplied alpha, so remultiply by
-	// alpha to "blend" against a black background.  Plus align the
-	// channel order to what we do.
-
-	u8 *image = (u8 *)&dest[0];
-	for(unsigned int pixel=0; pixel != m_sy*m_sx; pixel++) {
-		u8 r = image[0];
-		u8 g = image[1];
-		u8 b = image[2];
-		u8 a = image[3];
-		if(a != 0xff) {
-			r = r*a/255;
-			g = g*a/255;
-			b = b*a/255;
-		}
-		u32 color = 0xff000000 | (r << 16) | (g << 8) | (b << 0);
-		*(u32 *)image = color;
-		image += 4;
-	}
-}
-
-void screen_device::svg_renderer::blit(bitmap_rgb32 &bitmap, const cached_bitmap &src) const
-{
-	if(src.sy) {
-		const u32 *s = &src.image[0];
-		for(int y=0; y<src.sy; y++) {
-			u32 *d = &bitmap.pix(y + src.y, src.x);
-			for(int x=0; x<src.sx; x++, d++) {
-				const u32 c = *s++;
-				if(c)
-					*d = c;
-			}
-		}
-	}
-}
-
-int screen_device::svg_renderer::render(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	int nsx = bitmap.width();
-	int nsy = bitmap.height();
-
-	if(nsx != m_sx || nsy != m_sy) {
-		m_sx = nsx;
-		m_sy = nsy;
-		double sx = double(m_sx)/m_image->width;
-		double sy = double(m_sy)/m_image->height;
-		m_scale = sx > sy ? sy : sx;
-		m_background.resize(m_sx * m_sy);
-		rebuild_cache();
-	}
-
-	for(unsigned int y = 0; y < m_sy; y++)
-		memcpy(bitmap.raw_pixptr(y, 0), &m_background[y * m_sx], m_sx * 4);
-
-	std::list<int> to_draw;
-	for(int key = 0; key != m_key_count; key++)
-		if(m_key_state[key])
-			to_draw.push_back(key);
-	while(!to_draw.empty()) {
-		int key = to_draw.front();
-		to_draw.pop_front();
-		blit(bitmap, m_cache[key]);
-		for(auto p : m_cache[key].pairs) {
-			if(m_key_state[p.key])
-				to_draw.push_back(p.cache_entry);
-		}
-	}
-
-	return 0;
-}
-
-void screen_device::svg_renderer::output_notifier(void *param, osd::output_item const &output, s32 seconds, s64 attoseconds)
-{
-	reinterpret_cast<svg_renderer *>(param)->output_change(output);
-}
-
-void screen_device::svg_renderer::output_change(const osd::output_item &output)
-{
-	// for now, use the unqualified name for backwards compatibility
-	// TODO: migrate to using qualified output names
-	const auto l = m_key_ids.find(output.name());
-	if (l == m_key_ids.end())
-		return;
-	m_key_state[l->second] = output.value();
-}
-
-void screen_device::svg_renderer::compute_initial_bboxes(std::vector<bbox> &bboxes)
-{
-	bboxes.resize(m_key_count);
-	for(int key = 0; key != m_key_count; key++) {
-		int x0, y0, x1, y1;
-		x0 = y0 = x1 = y1 = -1;
-		for(auto s : m_keyed_shapes[key]) {
-			int xx0 = int(floor(s->bounds[0]*m_scale));
-			int yy0 = int(floor(s->bounds[1]*m_scale));
-			int xx1 = int(ceil (s->bounds[2]*m_scale)) + 1;
-			int yy1 = int(ceil (s->bounds[3]*m_scale)) + 1;
-			if(xx0 < 0)
-				xx0 = 0;
-			if(xx0 >= m_sx)
-				xx0 = m_sx - 1;
-			if(xx1 < 0)
-				xx1 = 0;
-			if(xx1 >= m_sx)
-				xx1 = m_sx - 1;
-			if(yy0 < 0)
-				yy0 = 0;
-			if(yy0 >= m_sy)
-				yy0 = m_sy - 1;
-			if(yy1 < 0)
-				yy1 = 0;
-			if(yy1 >= m_sy)
-				yy1 = m_sy - 1;
-
-			if(x0 == -1) {
-				x0 = xx0;
-				y0 = yy0;
-				x1 = xx1;
-				y1 = yy1;
-			} else {
-				if(xx0 < x0)
-					x0 = xx0;
-				if(yy0 < y0)
-					y0 = yy0;
-				if(xx1 > x1)
-					x1 = xx1;
-				if(yy1 > y1)
-					y1 = yy1;
-			}
-		}
-		bboxes[key].x0 = x0;
-		bboxes[key].y0 = y0;
-		bboxes[key].x1 = x1;
-		bboxes[key].y1 = y1;
-	}
-}
-
-void screen_device::svg_renderer::compute_diff_image(const std::vector<u32> &rend, const bbox &bb, cached_bitmap &dest) const
-{
-	int x0, y0, x1, y1;
-	x0 = y0 = x1 = y1 = -1;
-	for(int y = bb.y0; y != bb.y1; y++) {
-		const u32 *src1 = &m_background[bb.x0 + y * m_sx];
-		const u32 *src2 = &rend[bb.x0 + y * m_sx];
-		for(int x = bb.x0; x != bb.x1; x++) {
-			if(*src1 != *src2) {
-				if(x0 == -1) {
-					x0 = x1 = x;
-					y0 = y1 = y;
-				} else {
-					if(x < x0)
-						x0 = x;
-					if(y < y0)
-						y0 = y;
-					if(x > x1)
-						x1 = x;
-					if(y > y1)
-						y1 = y;
-				}
-			}
-			src1++;
-			src2++;
-		}
-	}
-	if(x0 == -1) {
-		dest.x = dest.y = dest.sx = dest.sy = 0;
-		return;
-	}
-
-	dest.x = x0;
-	dest.y = y0;
-	dest.sx = x1+1-x0;
-	dest.sy = y1+1-y0;
-	dest.image.resize(dest.sx * dest.sy);
-	u32 *dst = &dest.image[0];
-	for(int y = 0; y != dest.sy; y++) {
-		const u32 *src1 = &m_background[dest.x + (y + dest.y) * m_sx];
-		const u32 *src2 = &rend[dest.x + (y + dest.y) * m_sx];
-		for(int x = 0; x != dest.sx; x++) {
-			if(*src1 != *src2)
-				*dst = *src2;
-			else
-				*dst = 0x00000000;
-			src1++;
-			src2++;
-			dst++;
-		}
-	}
-
-}
-
-bool screen_device::svg_renderer::compute_mask_intersection_bbox(int key1, int key2, bbox &bb) const
-{
-	const cached_bitmap &c1 = m_cache[key1];
-	const cached_bitmap &c2 = m_cache[key2];
-	if(c1.x >= c2.x + c2.sx ||
-		c1.x + c1.sx <= c2.x ||
-		c1.y >= c2.y + c2.sy ||
-		c1.y + c1.sy <= c2.y)
-		return false;
-	int cx0 = c1.x > c2.x ? c1.x : c2.x;
-	int cy0 = c1.y > c2.y ? c1.y : c2.y;
-	int cx1 = c1.x + c1.sx < c2.x + c2.sx ? c1.x + c1.sx : c2.x + c2.sx;
-	int cy1 = c1.y + c1.sy < c2.y + c2.sy ? c1.y + c1.sy : c2.y + c2.sy;
-
-	int x0, y0, x1, y1;
-	x0 = y0 = x1 = y1 = -1;
-
-	for(int y = cy0; y < cy1; y++) {
-		const u32 *src1 = &c1.image[(cx0 - c1.x) + c1.sx * (y - c1.y)];
-		const u32 *src2 = &c2.image[(cx0 - c2.x) + c2.sx * (y - c2.y)];
-		for(int x = cx0; x < cx1; x++) {
-			if(*src1 && *src2 && *src1 != *src2) {
-				if(x0 == -1) {
-					x0 = x1 = x;
-					y0 = y1 = y;
-				} else {
-					if(x < x0)
-						x0 = x;
-					if(y < y0)
-						y0 = y;
-					if(x > x1)
-						x1 = x;
-					if(y > y1)
-						y1 = y;
-				}
-			}
-			src1++;
-			src2++;
-		}
-	}
-	if(x0 == -1)
-		return false;
-	bb.x0 = x0;
-	bb.x1 = x1;
-	bb.y0 = y0;
-	bb.y1 = y1;
-	return true;
-}
-
-void screen_device::svg_renderer::compute_dual_diff_image(const std::vector<u32> &rend, const bbox &bb, const cached_bitmap &src1, const cached_bitmap &src2, cached_bitmap &dest) const
-{
-	dest.x = bb.x0;
-	dest.y = bb.y0;
-	dest.sx = bb.x1 - bb.x0 + 1;
-	dest.sy = bb.y1 - bb.y0 + 1;
-	dest.image.resize(dest.sx*dest.sy);
-	for(int y = 0; y != dest.sy; y++) {
-		const u32 *psrc1 = &src1.image[(dest.x - src1.x) + src1.sx * (y + dest.y - src1.y)];
-		const u32 *psrc2 = &src2.image[(dest.x - src2.x) + src2.sx * (y + dest.y - src2.y)];
-		const u32 *psrcr = &rend      [ dest.x           +    m_sx * (y + dest.y         )];
-		u32       *pdest = &dest.image[                    dest.sx *  y                   ];
-		for(int x = 0; x != dest.sx; x++) {
-			if(*psrc1 && *psrc2 && *psrc1 != *psrc2)
-				*pdest = *psrcr;
-			psrc1++;
-			psrc2++;
-			psrcr++;
-			pdest++;
-		}
-	}
-}
-
-void screen_device::svg_renderer::rebuild_cache()
-{
-	m_cache.clear();
-	std::vector<u32> rend(m_sx*m_sy);
-
-	// Render the background, e.g. with everything off
-	std::vector<bool> state(m_key_count);
-	for(int key=0; key != m_key_count; key++)
-		state[key] = false;
-
-	render_state(m_background, state);
-
-	// Render each individual element independently.  Try to reduce
-	// the actual number of render passes with a greedy algorithm
-	// using the element bounding boxes.
-	std::vector<bbox> bboxes;
-	compute_initial_bboxes(bboxes);
-
-	m_cache.resize(m_key_count);
-	std::set<int> to_do;
-	for(int key=0; key != m_key_count; key++)
-		to_do.insert(key);
-
-	while(!to_do.empty()) {
-		std::list<int> doing;
-		for(int key : to_do) {
-			for(int okey : doing) {
-				// The bounding boxes include x1/y1, so the comparisons must be strict
-				if(!(bboxes[key].x0 > bboxes[okey].x1 ||
-						bboxes[key].x1 < bboxes[okey].x0 ||
-						bboxes[key].y0 > bboxes[okey].y1 ||
-						bboxes[key].y1 < bboxes[okey].y0))
-					goto conflict;
-			}
-			doing.push_back(key);
-		conflict:
-			;
-		}
-		for(int key : doing)
-			state[key] = true;
-		render_state(rend, state);
-		for(int key : doing) {
-			state[key] = false;
-			to_do.erase(key);
-		}
-		for(int key : doing)
-			compute_diff_image(rend, bboxes[key], m_cache[key]);
-	}
-
-	// Then it's time to pick up the interactions.
-	int spos = 0;
-	int epos = m_key_count;
-	std::vector<std::list<int> > keys(m_key_count);
-	std::vector<int> previous;
-	for(int key = 0; key != m_key_count; key++)
-		keys[key].push_back(key);
-	int ckey = m_key_count;
-	while(spos != epos) {
-		for(int key = spos; key < epos-1; key++) {
-			for(int key2 = keys[key].back()+1; key2 < m_key_count; key2++) {
-				bbox bb;
-				if(compute_mask_intersection_bbox(key, key2, bb)) {
-					previous.resize(ckey+1);
-					previous[ckey] = key;
-					m_cache[key].pairs.push_back(paired_entry(key2, ckey));
-					keys.push_back(keys[key]);
-					keys.back().push_back(key2);
-					bboxes.push_back(bb);
-					ckey++;
-				}
-			}
-		}
-		m_cache.resize(ckey);
-		std::set<int> to_do;
-		for(int key = epos; key != ckey; key++)
-			to_do.insert(key);
-
-		while(!to_do.empty()) {
-			std::list<int> doing;
-			for(int key : to_do) {
-				for(int okey : doing) {
-					// The bounding boxes include x1/y1, so the comparisons must be strict
-					if(!(bboxes[key].x0 > bboxes[okey].x1 ||
-							bboxes[key].x1 < bboxes[okey].x0 ||
-							bboxes[key].y0 > bboxes[okey].y1 ||
-							bboxes[key].y1 < bboxes[okey].y0))
-						goto conflict2;
-				}
-				doing.push_back(key);
-			conflict2:
-				;
-			}
-			for(int key : doing)
-				for(int akey : keys[key])
-					state[akey] = true;
-
-			render_state(rend, state);
-			for(int key : doing) {
-				for(int akey : keys[key])
-					state[akey] = false;
-				to_do.erase(key);
-			}
-			for(int key : doing)
-				compute_dual_diff_image(rend, bboxes[key], m_cache[previous[key]], m_cache[keys[key].back()], m_cache[key]);
-		}
-		spos = epos;
-		epos = ckey;
-	}
-}
-
 //**************************************************************************
 //  SCREEN DEVICE
 //**************************************************************************
@@ -533,8 +52,8 @@ void screen_device::svg_renderer::rebuild_cache()
 
 screen_device::screen_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SCREEN, tag, owner, clock)
-	, m_type(SCREEN_TYPE_RASTER)
-	, m_orientation(ROT0)
+	, device_video_output_interface(mconfig, *this)
+	, m_is_lcd(false)
 	, m_phys_aspect(0U, 0U)
 	, m_oldstyle_vblank_supplied(false)
 	, m_refresh(0)
@@ -549,8 +68,6 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 	, m_scanline_cb(*this)
 	, m_palette(*this, finder_base::DUMMY_TAG)
 	, m_video_attributes(0)
-	, m_svg_region(*this, DEVICE_SELF)
-	, m_container(nullptr)
 	, m_max_width(100)
 	, m_width(100)
 	, m_height(100)
@@ -592,6 +109,14 @@ screen_device::~screen_device()
 	destroy_scan_bitmaps();
 }
 
+//-------------------------------------------------
+//  output_type_name - return "raster" or "lcd"
+//-------------------------------------------------
+
+const char *screen_device::output_type_name() const
+{
+	return m_is_lcd ? "lcd" : "raster";
+}
 
 //-------------------------------------------------
 //  destroy_scan_bitmaps - destroy per-scanline
@@ -675,20 +200,12 @@ void screen_device::device_validity_check(validity_checker &valid) const
 		osd_printf_error("Invalid display dimensions\n");
 
 	// sanity check display area
-	if (m_type != SCREEN_TYPE_VECTOR && m_type != SCREEN_TYPE_SVG)
-	{
-		if (m_visarea.empty() || m_visarea.right() >= m_width || m_visarea.bottom() >= m_height)
-			osd_printf_error("Invalid display area\n");
+	if (m_visarea.empty() || m_visarea.right() >= m_width || m_visarea.bottom() >= m_height)
+		osd_printf_error("Invalid display area\n");
 
-		// sanity check screen formats
-		if (m_screen_update_ind16.isnull() && m_screen_update_rgb32.isnull())
-			osd_printf_error("Missing SCREEN_UPDATE function\n");
-	}
-	else
-	{
-		if (m_video_attributes & VIDEO_VARIABLE_WIDTH)
-			osd_printf_error("Non-raster display cannot have a variable width\n");
-	}
+	// sanity check screen formats
+	if (m_screen_update_ind16.isnull() && m_screen_update_rgb32.isnull())
+		osd_printf_error("Missing SCREEN_UPDATE function\n");
 
 	// check for invalid frame rate
 	if (m_refresh == 0 || m_refresh > ATTOSECONDS_PER_SECOND)
@@ -711,18 +228,6 @@ void screen_device::device_validity_check(validity_checker &valid) const
 
 
 //-------------------------------------------------
-//  device_config_complete - finalise static
-//  configuration
-//-------------------------------------------------
-
-void screen_device::device_config_complete()
-{
-	// combine orientation with machine orientation
-	m_orientation = orientation_add(m_orientation, mconfig().gamedrv().flags & machine_flags::MASK_ORIENTATION);
-}
-
-
-//-------------------------------------------------
 //  physical_aspect - determine the physical
 //  aspect ratio to be used for rendering
 //-------------------------------------------------
@@ -736,20 +241,10 @@ std::pair<unsigned, unsigned> screen_device::physical_aspect() const
 	// physical aspect ratio unconfigured
 	if (!phys_aspect.first || !phys_aspect.second)
 	{
-		switch (m_type)
-		{
-		case SCREEN_TYPE_RASTER:
-		case SCREEN_TYPE_VECTOR:
-			phys_aspect = std::make_pair(4, 3); // assume standard CRT
-			break;
-		case SCREEN_TYPE_LCD:
-		case SCREEN_TYPE_SVG:
+		if (m_is_lcd)
 			phys_aspect = std::make_pair(~0U, ~0U); // assume square pixels
-			break;
-		case SCREEN_TYPE_INVALID:
-		default:
-			throw emu_fatalerror("%s: invalid screen type configured\n", tag());
-		}
+		else
+			phys_aspect = std::make_pair(4, 3); // assume standard CRT
 	}
 
 	// square pixels?
@@ -794,26 +289,7 @@ void screen_device::device_start()
 	if (m_palette && !m_palette->device().started())
 		throw device_missing_dependencies();
 
-	if (m_type == SCREEN_TYPE_SVG)
-	{
-		if (!m_svg_region)
-			fatalerror("%s: SVG region \"%s\" does not exist\n", tag(), m_svg_region.finder_tag());
-		m_svg = std::make_unique<svg_renderer>(m_svg_region);
-		machine().output().add_global_notifier(svg_renderer::output_notifier, m_svg.get());
-
-		// don't do this - SVG units are arbitrary and interpreting them as pixels causes bad things to happen
-		// just render at the size/aspect ratio supplied by the driver
-		if (false)
-		{
-			// The OSD picks up the size before start is called, so this only affect the info display if it's called up in-game
-			m_width = m_svg->width();
-			m_height = m_svg->height();
-			m_visarea.set(0, m_width - 1, 0, m_height - 1);
-		}
-	}
-
 	// configure bitmap formats and allocate screen bitmaps
-	// svg is RGB32 too, and doesn't have any update method
 	const bool screen16 = !m_screen_update_ind16.isnull();
 	texture_format texformat = screen16 ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
 
@@ -894,13 +370,11 @@ void screen_device::device_start()
 	save_item(NAME(m_frame_number));
 	if (m_oldstyle_vblank_supplied)
 		logerror("%s: Deprecated legacy Old Style screen configured (set_vblank_time), please use set_raw instead.\n",this->tag());
-
-	m_is_primary_screen = (this == screen_device_enumerator(machine().root_device()).first());
 }
 
 
 //-------------------------------------------------
-//  device_start - device-specific startup
+//  device_reset - device-specific startup
 //-------------------------------------------------
 
 void screen_device::device_reset()
@@ -985,8 +459,8 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 	assert(visarea.top() >= 0);
 //  assert(visarea.right() < width);
 //  assert(visarea.bottom() < height);
-	assert(m_type == SCREEN_TYPE_VECTOR || m_type == SCREEN_TYPE_SVG || visarea.left() < width);
-	assert(m_type == SCREEN_TYPE_VECTOR || m_type == SCREEN_TYPE_SVG || visarea.top() < height);
+	assert(visarea.left() < width);
+	assert(visarea.top() < height);
 	assert(frame_period > 0);
 
 	// fill in the new parameters
@@ -1030,6 +504,17 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 
 	// adjust speed if necessary
 	machine().video().update_refresh_speed();
+}
+
+
+//-------------------------------------------------
+//  override_frame_period - forcibly change the
+//  refresh rate (from the sliders)
+//-------------------------------------------------
+
+void screen_device::override_frame_period(attotime period)
+{
+	configure(m_width, m_height, m_visarea, period.as_attoseconds());
 }
 
 
@@ -1090,10 +575,6 @@ void screen_device::update_scan_bitmap_size(int y)
 
 void screen_device::realloc_screen_bitmaps()
 {
-	// doesn't apply for vector games
-	if (m_type == SCREEN_TYPE_VECTOR)
-		return;
-
 	// determine effective size to allocate
 	const bool per_scanline = (m_video_attributes & VIDEO_VARIABLE_WIDTH);
 	s32 effwidth = std::max(per_scanline ? m_max_width : m_width, m_visarea.right() + 1);
@@ -1230,25 +711,12 @@ bool screen_device::update_partial(int scanline)
 		}
 		else
 		{
-			if (m_type != SCREEN_TYPE_SVG)
+			screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
+			switch (curbitmap.format())
 			{
-				screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
-				switch (curbitmap.format())
-				{
-					default:
-					case BITMAP_FORMAT_IND16:   flags = m_screen_update_ind16(*this, curbitmap.as_ind16(), clip);   break;
-					case BITMAP_FORMAT_RGB32:   flags = m_screen_update_rgb32(*this, curbitmap.as_rgb32(), clip);   break;
-				}
-			}
-			else
-			{
-				// optional screen_update callback before rendering svg (eg. for preparing outputs used by the svg)
-				// bitmap can be considered read-only, as it gets overwritten later
-				if (!m_screen_update_rgb32.isnull())
-					flags = m_screen_update_rgb32(*this, m_bitmap[m_curbitmap].as_rgb32(), clip);
-
-				if (~flags & UPDATE_HAS_NOT_CHANGED)
-					flags = m_svg->render(*this, m_bitmap[m_curbitmap].as_rgb32(), clip);
+				default:
+				case BITMAP_FORMAT_IND16:   flags = m_screen_update_ind16(*this, curbitmap.as_ind16(), clip);   break;
+				case BITMAP_FORMAT_RGB32:   flags = m_screen_update_rgb32(*this, curbitmap.as_rgb32(), clip);   break;
 			}
 			m_partial_updates_this_frame++;
 		}
@@ -1679,8 +1147,8 @@ TIMER_CALLBACK_MEMBER(screen_device::vblank_begin)
 	m_vblank_end_time = m_vblank_start_time + attotime(0, m_vblank_period);
 
 	// if this is the primary screen and we need to update now
-	if (m_is_primary_screen && !(m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
-		machine().video().frame_update();
+	if (!(m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
+		update_if_primary();
 
 	// call the screen specific callbacks
 	for (auto &item : m_callback_list)
@@ -1711,8 +1179,8 @@ TIMER_CALLBACK_MEMBER(screen_device::vblank_end)
 	m_screen_vblank(0);
 
 	// if this is the primary screen and we need to update now
-	if (m_is_primary_screen && (m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
-		machine().video().frame_update();
+	if (m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK)
+		update_if_primary();
 
 	// increment the frame number counter
 	m_frame_number++;
@@ -1772,17 +1240,17 @@ void screen_device::create_composited_bitmap()
 
 
 //-------------------------------------------------
-//  update_quads - set up the quads for this
+//  video_output_update - set up the quads for this
 //  screen
 //-------------------------------------------------
 
-bool screen_device::update_quads()
+bool screen_device::video_output_update()
 {
 	// only update if live
 	if (machine().render().is_live(*this))
 	{
-		// only update if empty and not a vector game; otherwise assume the driver did it directly
-		if (m_type != SCREEN_TYPE_VECTOR && (m_video_attributes & VIDEO_SELF_RENDER) == 0)
+		// only update if empty; otherwise assume the driver did it directly
+		if ((m_video_attributes & VIDEO_SELF_RENDER) == 0)
 		{
 			// if we're not skipping the frame and if the screen actually changed, then update the texture
 			if (!machine().video().skip_this_frame() && m_changed)

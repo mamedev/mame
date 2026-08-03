@@ -1071,7 +1071,7 @@ void aabase_state::aabase(machine_config &config)
 
 	ARCHIMEDES_KEYBOARD(config, "keyboard").kout().set(m_ioc, FUNC(acorn_ioc_device::kin_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.screen_vblank().set(m_ioc, FUNC(acorn_ioc_device::ir_w));
 
 	ACORN_VIDC1A(config, m_vidc, 24_MHz_XTAL);
@@ -1674,7 +1674,7 @@ void aa4_state::aa4(machine_config &config)
 	m_ioc->gpio_w<1>().append(m_bmu, FUNC(acorn_bmu_device::scl_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config.replace(), "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config.replace(), "screen").set_lcd());
 	screen.screen_vblank().set(m_ioc, FUNC(acorn_ioc_device::ir_w));
 
 	ACORN_LC(config, m_lc, 24_MHz_XTAL);

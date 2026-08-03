@@ -43,10 +43,12 @@
 
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/s900_dsk.h"
 #include "formats/hxchfe_dsk.h"
+#include "formats/mfi_dsk.h"
 
 namespace {
 
@@ -383,7 +385,7 @@ void s900_state::base_config(machine_config &config)
 	m_lcdc->set_lcd_size(2, 40);
 	m_lcdc->set_pixel_update_cb(FUNC(s900_state::lcd_update));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
@@ -494,6 +496,8 @@ void s900_state::base_config(machine_config &config)
 	m_filter_timer[2]->set_clk<0>(clk/4);
 	m_filter_timer[2]->set_clk<1>(clk/4);
 	m_filter_timer[2]->set_clk<2>(clk/32);
+
+	SOFTWARE_LIST(config, "flop_s900").set_original("s900_flop");
 }
 
 /**************************************************************************/

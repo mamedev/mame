@@ -150,7 +150,7 @@ void dyna_d0703_state::dyna_d0703(machine_config &config)
 
 	RTC62421(config, "rtc", 32.768_kHz_XTAL);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO
+	screen_device &screen(SCREEN(config, "screen")); // TODO
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);

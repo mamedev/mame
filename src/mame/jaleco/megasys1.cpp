@@ -1902,7 +1902,7 @@ void megasys1_state::system_base(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(120000));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	//m_screen->set_refresh_hz(56.18); // same as nmk16.cpp based on YT videos.
 	m_screen->set_raw(SYS_A_CPU_CLOCK, 406, 0, 256, 263, 16, 240);
 	m_screen->set_screen_update(FUNC(megasys1_state::screen_update));
@@ -2093,7 +2093,7 @@ void megasys1_state::system_Bbl(machine_config &config)
 	TIMER(config, m_scantimer).configure_scanline(FUNC(megasys1_state::megasys1Bbl_scanline), m_screen, 0, 1);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(56.18); // same as nmk16.cpp based on YT videos.
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);
@@ -2193,7 +2193,7 @@ void megasys1_typed_state::system_D(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(megasys1_typed_state::megasys1D_irq));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(56.18); // same as nmk16.cpp based on YT videos.
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);
@@ -2242,7 +2242,7 @@ void megasys1_typez_state::system_Z(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &megasys1_typez_state::z80_sound_io_map);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(56.18); // same as nmk16.cpp based on YT videos.
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);

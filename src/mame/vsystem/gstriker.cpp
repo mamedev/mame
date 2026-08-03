@@ -653,7 +653,7 @@ void gstriker_state::base(machine_config &config)
 
 	MB3773(config, m_watchdog);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 //  m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(5000)); // hand-tuned, it needs a bit

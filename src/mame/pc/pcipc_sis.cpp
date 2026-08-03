@@ -165,7 +165,7 @@ void sis496_voodoo1_state::sis496_voodoo1(machine_config &config)
 	m_voodoo->set_status_cycles(1000);
 
 	// TODO: wrong, needs VGA passthru
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57);
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 640 - 1, 0, 480 - 1);

@@ -648,7 +648,7 @@ void zodiack_state::zodiack(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER).screen_vblank().set(FUNC(zodiack_state::vblank));
+	SCREEN(config, m_screen).screen_vblank().set(FUNC(zodiack_state::vblank));
 
 	orca_ovg_40c_device &videopcb(ORCA_OVG_40C(config, "videopcb"));
 	videopcb.set_screen("screen");

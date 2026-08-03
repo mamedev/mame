@@ -499,7 +499,7 @@ void savquest_state::savquest(machine_config &config)
 
 //  m_voodoo2->vblank_callback().set(FUNC(savquest_state::vblank_assert));
 
-	screen_device &screen(SCREEN(config, "voodoo_screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "voodoo_screen"));
 	screen.set_refresh_hz(57);
 	screen.set_size(800, 262);
 	screen.set_visarea(0, 512 - 1, 0, 240 - 1);

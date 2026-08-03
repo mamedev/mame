@@ -580,7 +580,7 @@ void sttechno_state::shambros(machine_config &config)
 	M68000(config, m_maincpu, XTAL(42'954'545) / 2); // divisor guessed, anything slower and the game stops functioning (timer flickers, CD-ROM reads are too slow)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sttechno_state::cpu_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(42'954'545) / 6, 456, 0, 336, 262, 0, 240); // guessed
 	screen.set_screen_update(FUNC(sttechno_state::screen_update));
 	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_2);

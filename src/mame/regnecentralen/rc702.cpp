@@ -389,7 +389,7 @@ void rc702_state::rc702(machine_config &config)
 	m_7474->comp_output_cb().set(FUNC(rc702_state::qbar_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_size(272*2, 200+4*8);
 	screen.set_visarea(0, 272*2-1, 0, 200-1);

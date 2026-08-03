@@ -243,7 +243,7 @@ void ertictac_state::ertictac(machine_config &config)
 
 	PCF8583(config, "i2cmem", 32.768_kHz_XTAL); // TODO: Are we sure that this HW have I2C device?
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.screen_vblank().set(m_ioc, FUNC(acorn_ioc_device::ir_w));
 	screen.screen_vblank().append(m_memc, FUNC(acorn_memc_device::vidrq_w));
 

@@ -826,7 +826,7 @@ void jpmsys5_state::saasound(machine_config &config)
 
 void jpmsys5v_state::tmsvideo(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(40'000'000) / 4, 676, 20*4, 147*4, 256, 0, 254);
 	screen.set_screen_update(FUNC(jpmsys5v_state::screen_update_jpmsys5v));
 

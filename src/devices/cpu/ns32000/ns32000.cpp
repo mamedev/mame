@@ -1361,7 +1361,7 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::execute
 						mode[0].rmw_i(size);
 						decode(mode, bytes);
 
-						u32 const src1 = util::sext(quick, 4);
+						u32 const src1 = util::sext(quick, 4) & size_mask[size];
 						u32 const src2 = gen_read(mode[0]);
 
 						u32 const dst = (src1 + src2) & size_mask[size];

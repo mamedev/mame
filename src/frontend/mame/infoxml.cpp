@@ -1284,23 +1284,16 @@ void output_chips(std::ostream &out, device_t &device, const char *root_tag)
 void output_display(std::ostream &out, device_t &device, machine_flags::type const *flags, const char *root_tag)
 {
 	// iterate over screens
-	for (const screen_device &screendev : screen_device_enumerator(device))
+	for (const device_video_output_interface &screendev : video_output_interface_enumerator(device))
 	{
-		if (strcmp(screendev.tag(), device.tag()))
+		if (strcmp(screendev.device().tag(), device.tag()))
 		{
-			std::string newtag(screendev.tag()), oldtag(":");
+			std::string newtag(screendev.device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
 			util::stream_format(out, "\t\t<display tag=\"%s\"", util::xml::normalize_string(newtag));
 
-			switch (screendev.screen_type())
-			{
-				case SCREEN_TYPE_RASTER:    out << " type=\"raster\"";  break;
-				case SCREEN_TYPE_VECTOR:    out << " type=\"vector\"";  break;
-				case SCREEN_TYPE_LCD:       out << " type=\"lcd\"";     break;
-				case SCREEN_TYPE_SVG:       out << " type=\"svg\"";     break;
-				default:                    out << " type=\"unknown\""; break;
-			}
+			out << " type=\"" << screendev.output_type_name() << '"';
 
 			// output the orientation as a string
 			switch (screendev.orientation())
@@ -1332,7 +1325,7 @@ void output_display(std::ostream &out, device_t &device, machine_flags::type con
 			}
 
 			// output width and height only for games that are not vector
-			if (screendev.screen_type() != SCREEN_TYPE_VECTOR)
+			if (!screendev.is_vector())
 			{
 				const rectangle &visarea = screendev.visible_area();
 				util::stream_format(out, " width=\"%d\"", visarea.width());
@@ -1340,21 +1333,22 @@ void output_display(std::ostream &out, device_t &device, machine_flags::type con
 			}
 
 			// output refresh rate
-			util::stream_format(out, " refresh=\"%f\"", ATTOSECONDS_TO_HZ(screendev.refresh_attoseconds()));
+			util::stream_format(out, " refresh=\"%f\"", screendev.frame_period().as_hz());
 
 			// output raw video parameters only for games that are not vector
 			// and had raw parameters specified
-			if (screendev.screen_type() != SCREEN_TYPE_VECTOR && !screendev.oldstyle_vblank_supplied())
+			const screen_device *output_as_screen = dynamic_cast<const screen_device *>(&screendev);
+			if (output_as_screen && !output_as_screen->oldstyle_vblank_supplied())
 			{
-				int pixclock = screendev.width() * screendev.height() * ATTOSECONDS_TO_HZ(screendev.refresh_attoseconds());
+				int pixclock = output_as_screen->width() * output_as_screen->height() * ATTOSECONDS_TO_HZ(output_as_screen->refresh_attoseconds());
 
 				util::stream_format(out, " pixclock=\"%d\"", pixclock);
-				util::stream_format(out, " htotal=\"%d\"", screendev.width());
-				util::stream_format(out, " hbend=\"%d\"", screendev.visible_area().min_x);
-				util::stream_format(out, " hbstart=\"%d\"", screendev.visible_area().max_x+1);
-				util::stream_format(out, " vtotal=\"%d\"", screendev.height());
-				util::stream_format(out, " vbend=\"%d\"", screendev.visible_area().min_y);
-				util::stream_format(out, " vbstart=\"%d\"", screendev.visible_area().max_y+1);
+				util::stream_format(out, " htotal=\"%d\"", output_as_screen->width());
+				util::stream_format(out, " hbend=\"%d\"", output_as_screen->visible_area().min_x);
+				util::stream_format(out, " hbstart=\"%d\"", output_as_screen->visible_area().max_x+1);
+				util::stream_format(out, " vtotal=\"%d\"", output_as_screen->height());
+				util::stream_format(out, " vbend=\"%d\"", output_as_screen->visible_area().min_y);
+				util::stream_format(out, " vbstart=\"%d\"", output_as_screen->visible_area().max_y+1);
 			}
 			out << " />\n";
 		}

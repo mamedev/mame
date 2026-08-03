@@ -1009,7 +1009,7 @@ void spinb_state::dmd(machine_config &config)
 	m_dmdcpu->port_in_cb<3>().set(FUNC(spinb_state::p3_r));
 	m_dmdcpu->port_out_cb<3>().set(FUNC(spinb_state::p3_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_screen_update(FUNC(spinb_state::screen_update));

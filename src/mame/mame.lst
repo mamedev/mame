@@ -741,6 +741,9 @@ altos486
 @source:altos/altos586.cpp
 altos586
 
+@source:altos/altos8000.cpp
+poly201
+
 @source:altos/altos8600.cpp
 altos8600
 
@@ -1041,8 +1044,8 @@ a2000n
 a3000
 a3000n
 a4000
-a400030
-a400030n
+a4000_30
+a4000_30n
 a4000n
 a4000t
 a4000tn
@@ -18354,6 +18357,7 @@ mjelct3blb
 mjelctrb
 mjelctrn
 mjembase
+mjempror
 mjfriday
 mjreach
 mjreacha
@@ -32970,6 +32974,7 @@ pokerout
 policetr
 policetr10
 policetr11
+policetr12
 policetr13
 policetr13a
 policetr13b

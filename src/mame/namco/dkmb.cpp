@@ -423,7 +423,7 @@ void dkmb_state::dkmb(machine_config &config)
 
 	AMD_29LV160DT(config, m_flash);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(dkmb_state::screen_update));
 	screen.set_size(256, 240);

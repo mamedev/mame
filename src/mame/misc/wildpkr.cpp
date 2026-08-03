@@ -480,7 +480,7 @@ void wildpkr_state::wildpkr(machine_config &config)
 
 	MC68681(config, m_duart, SEC_CLOCK);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(384, 280);
@@ -519,7 +519,7 @@ void wildpkr_state::tabpkr(machine_config &config)
 	CLOCK(config, m_dac_clock, 1500000); // base rate derived from program code
 	m_dac_clock->signal_handler().set_inputline(m_maincpu, M68K_IRQ_5, ASSERT_LINE);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(384, 280);

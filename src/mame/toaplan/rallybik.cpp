@@ -351,7 +351,7 @@ void rallybik_state::rallybik(machine_config &config)
 	coinlatch.q_out_cb<7>().set(FUNC(rallybik_state::coin_lockout_w<1>));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	// Parameter uploaded to CRTC
 	m_screen->set_raw(XTAL(28'000'000) / 4, (224+1)*2, 0, 320, (140+1)*2, 0, 240);

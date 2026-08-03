@@ -60,7 +60,7 @@ void accutime_smart_watch_state::atw(machine_config &config)
 	ARM7(config, m_maincpu, 72000000); // Mediatek ARM MT6260AH, ARM7EJ-STM core, unknown frequency
 	m_maincpu->set_addrmap(AS_PROGRAM, &accutime_smart_watch_state::arm_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);

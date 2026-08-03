@@ -357,7 +357,7 @@ void subhuntr_state::subhuntr(machine_config &config)
 	m_pvi3_n5->set_divider(2);
 	m_pvi3_n5->intreq_cb().set(FUNC(subhuntr_state::pvi3_intreq_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(3.579545_MHz_XTAL*2, 227*2, 21*2, 205*2, 312, 29, 298);
 	m_screen->set_palette("palette");
 	m_screen->set_screen_update(FUNC(subhuntr_state::screen_update));

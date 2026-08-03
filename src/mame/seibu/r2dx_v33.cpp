@@ -785,7 +785,7 @@ void r2dx_v33_state::rdx_v33(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_refresh_hz(55.47);    /* verified on pcb */
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(500)); /* not accurate */
@@ -811,7 +811,7 @@ void nzeroteam_state::nzerotea(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(nzeroteam_state::irq0_line_hold));
 	m_maincpu->set_irq_acknowledge_callback(FUNC(nzeroteam_state::vector_r));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_refresh_hz(55.47);    /* verified on pcb */
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(500)); /* not accurate */
