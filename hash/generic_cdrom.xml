@@ -230,6 +230,28 @@ pc98: [PC-9801-86] offset sound in places (verify)
 		</part>
 	</software>
 
+<!-- !Catalogs -->
+
+	<software name="outake1" supported="yes">
+		<description>Ouchi de TAKERU Vol. 1 (Japan)</description>
+		<year>1995</year>
+		<publisher>Xing</publisher>
+		<notes><![CDATA[
+Windows 3.1 Takeru catalog for following systems:
+PC-8801SR, PC-88VA, PC-9801, X68000, Macintosh, MSX, Standard MIDI collections,
+Windows, DOS/V, J3100/SS, FM Towns, X1Turbo
+]]></notes>
+		<info name="alt_title" value="おうちでTAKERU Vol. 1"/>
+		<info name="developer" value="I.Magic"/>
+		<sharedfeat name="compatibility" value="ibmpc,pc98" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ouchi de takeru vol. 1" sha1="2aa0c90cc8ca820963eab1195670a5955944a419"/>
+			</diskarea>
+		</part>
+	</software>
+
 <!-- !Operating Systems -->
 
 	<!-- dec/jensen.cpp and ibm/thinkpad8xx.cpp drivers (for alpha and prep) are not working -->
