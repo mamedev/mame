@@ -22,6 +22,7 @@ DEFINE_DEVICE_TYPE(TMP90840,  tmp90840_device,  "tmp90840",  "Toshiba TMP90840")
 DEFINE_DEVICE_TYPE(TMP90841,  tmp90841_device,  "tmp90841",  "Toshiba TMP90841")
 DEFINE_DEVICE_TYPE(TMP90845,  tmp90845_device,  "tmp90845",  "Toshiba TMP90845")
 DEFINE_DEVICE_TYPE(TMP91640,  tmp91640_device,  "tmp91640",  "Toshiba TMP91640")
+DEFINE_DEVICE_TYPE(TMP91C640, tmp91c640_device, "tmp91c640", "Toshiba TMP91C640 (mjtkp2 bootleg MCU)")
 DEFINE_DEVICE_TYPE(TMP91641,  tmp91641_device,  "tmp91641",  "Toshiba TMP91641")
 DEFINE_DEVICE_TYPE(TMP90PH44, tmp90ph44_device, "tmp90ph44", "Toshiba TMP90PH44")
 
@@ -88,6 +89,12 @@ void tlcs90_device::tmp91640_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();    // 16KB ROM (internal)
 	map(0xfdc0, 0xffbf).ram();    // 512b RAM (internal)
+	tmp90840_regs(map);
+}
+void tlcs90_device::tmp91c640_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0xfec0, 0xffbf).ram();
 	tmp90840_regs(map);
 }
 
@@ -184,6 +191,10 @@ tmp91640_device::tmp91640_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+tmp91c640_device::tmp91c640_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tlcs90_device(mconfig, TMP91C640, tag, owner, clock, address_map_constructor(FUNC(tmp91c640_device::tmp91c640_mem), this))
+{
+}
 
 tmp91641_device::tmp91641_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tlcs90_device(mconfig, TMP91641, tag, owner, clock, address_map_constructor(FUNC(tmp91641_device::tmp91641_mem), this))
@@ -3099,7 +3110,10 @@ std::unique_ptr<util::disasm_interface> tmp91640_device::create_disassembler()
 {
 	return std::make_unique<tmp90840_disassembler>();
 }
-
+std::unique_ptr<util::disasm_interface> tmp91c640_device::create_disassembler()
+{
+	return std::make_unique<tmp90840_disassembler>();
+}
 std::unique_ptr<util::disasm_interface> tmp91641_device::create_disassembler()
 {
 	return std::make_unique<tmp90840_disassembler>();
