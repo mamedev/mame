@@ -118,6 +118,7 @@ private:
 	};
 
 	std::unique_ptr<point[]> m_vector_list;
+	struct point m_prevpoint;
 	int m_vector_index;
 	int m_min_intensity;
 	int m_max_intensity;

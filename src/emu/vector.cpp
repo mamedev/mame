@@ -71,12 +71,17 @@ void vector_device::device_start()
 
 	vector_options::init(machine().options());
 
+	m_prevpoint.x = m_prevpoint.y = m_prevpoint.col = m_prevpoint.intensity = 0;
 	m_vector_index = 0;
 
 	/* allocate memory for tables */
 	m_vector_list = std::make_unique<point[]>(MAX_POINTS);
 
 	// register items for saving
+	save_item(STRUCT_MEMBER(m_prevpoint, x));
+	save_item(STRUCT_MEMBER(m_prevpoint, y));
+	save_item(STRUCT_MEMBER(m_prevpoint, col));
+	save_item(STRUCT_MEMBER(m_prevpoint, intensity));
 	save_item(NAME(m_frame_period));
 
 	/* allocate and start the vblank timer */
@@ -226,8 +231,6 @@ bool vector_device::video_output_update()
 	float yoffs = (float)visarea.min_y;
 
 	point *curpoint;
-	int lastx = 0;
-	int lasty = 0;
 
 	curpoint = m_vector_list.get();
 
@@ -252,11 +255,11 @@ bool vector_device::video_output_update()
 		beam_width *= 1.0f / (float)VECTOR_WIDTH_DENOM;
 
 		// apply point scale for points
-		if (lastx == curpoint->x && lasty == curpoint->y)
+		if (m_prevpoint.x == curpoint->x && m_prevpoint.y == curpoint->y)
 			beam_width *= vector_options::s_beam_dot_size;
 
-		coords.x0 = (float(lastx) - xoffs) * xscale;
-		coords.y0 = (float(lasty) - yoffs) * yscale;
+		coords.x0 = (float(m_prevpoint.x) - xoffs) * xscale;
+		coords.y0 = (float(m_prevpoint.y) - yoffs) * yscale;
 		coords.x1 = (float(curpoint->x) - xoffs) * xscale;
 		coords.y1 = (float(curpoint->y) - yoffs) * yscale;
 
@@ -267,15 +270,17 @@ bool vector_device::video_output_update()
 					beam_width,
 					(curpoint->intensity << 24) | (curpoint->col & 0xffffff),
 					flags);
-			m_line_notifier(lastx, lasty, curpoint->x, curpoint->y, curpoint->col, curpoint->intensity, visarea.width(), visarea.height());
+			m_line_notifier(m_prevpoint.x, m_prevpoint.y, curpoint->x, curpoint->y, curpoint->col, curpoint->intensity, visarea.width(), visarea.height());
 		}
 		else
 		{
 			m_move_notifier(curpoint->x, curpoint->y, curpoint->col, visarea.width(), visarea.height());
 		}
 
-		lastx = curpoint->x;
-		lasty = curpoint->y;
+		m_prevpoint.x = curpoint->x;
+		m_prevpoint.y = curpoint->y;
+		m_prevpoint.col = curpoint->col;
+		m_prevpoint.intensity = curpoint->intensity;
 
 		curpoint++;
 	}
