@@ -20,7 +20,7 @@ As of 2/12/2001 the latest software levels:
 
 Game Title       Level  Released
 ----------------------------------
-Cruis'n Exotica  v2.4   08/23/2000
+Cruis'n Exotica  v2.4   08/31/2000
 Invasion         v5.0   12/14/1999
 The Grid         v1.2   10/18/2000
 
