@@ -15807,8 +15807,8 @@ ROM_START( aracnisb )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	// On this PCB the gfx ROMs were dumped half their size, but on both ROMs the 1st half was identical to 'scorpion'
-	ROM_LOAD( "2732.j1",    0x0000, 0x1000, BAD_DUMP CRC(1e5da9d6) SHA1(ca8b27e6dd40e4ca13e7e6b5f813bafca78b62f4) ) // 1ST AND 2ND HALF IDENTICAL
-	ROM_LOAD( "2732.l1",    0x1000, 0x1000, BAD_DUMP CRC(a57adb0a) SHA1(d97c7dc4a6c5efb59cc0148e2498156c682c6714) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "2732.j1",    0x0000, 0x1000, BAD_DUMP CRC(1e5da9d6) SHA1(ca8b27e6dd40e4ca13e7e6b5f813bafca78b62f4) )
+	ROM_LOAD( "2732.l1",    0x1000, 0x1000, BAD_DUMP CRC(a57adb0a) SHA1(d97c7dc4a6c5efb59cc0148e2498156c682c6714) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "mb7051.6l",  0x0000, 0x0020, BAD_DUMP CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) ) // Not dumped on this PCB, pin 13 was not connected
