@@ -125,7 +125,7 @@ static constexpr u8 line_315_5124[8] = { 24, 24, 26, 28 /* not verified */, 21, 
 static constexpr u8 line_315_5377[8] = { 26, 26, 27, 28 /* not verified */, 24, 28, 26, 62 };
 
 #define DISPLAY_DISABLED_HPOS 24 /* not verified, works if above 18 (for 'pstrike2') and below 25 (for 'fantdizzy') */
-#define DISPLAY_CB_HPOS       2  /* fixes 'roadrash' (SMS game) title scrolling, due to line counter reload timing */
+#define DISPLAY_CB_HPOS       12 /* fixes 'roadrash' (SMS game) title scrolling, due to line counter reload timing */
 
 #define DRAW_TIME_GG         111      /* 26 + 2 + 14 + 8 + 13 + 96/2 */
 #define DRAW_TIME_SMS         63      /* 26 + 2 + 14 + 8 + 13 */
