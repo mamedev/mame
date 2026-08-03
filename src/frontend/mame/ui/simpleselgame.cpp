@@ -157,7 +157,7 @@ bool simple_menu_select_game::inkey_select(const event &menu_event)
 {
 	const game_driver *driver = (const game_driver *)menu_event.itemref;
 
-	if ((uintptr_t)driver == 1) // special case for configure inputs
+	if (uintptr_t(driver) == 1) // special case for configure inputs
 	{
 		menu::stack_push<menu_simple_game_options>(
 				ui(),
@@ -165,9 +165,11 @@ bool simple_menu_select_game::inkey_select(const event &menu_event)
 				[this] () { reset(reset_options::SELECT_FIRST); });
 		return false;
 	}
-	else if (!driver) // special case for previous menu
+	else if (!driver) // special case for previous menu/exit
 	{
 		stack_pop();
+		if (is_special_main_menu())
+			machine().schedule_exit();
 		return false;
 	}
 	else // anything else is a driver
@@ -271,7 +273,7 @@ void simple_menu_select_game::populate()
 	}
 
 	// if we're forced into this, allow general input configuration as well
-	if (stack_has_special_main_menu())
+	if (is_special_main_menu())
 	{
 		item_append(_("Configure Options"), 0, (void *)1);
 		item_append(_("Exit"), 0, nullptr);
