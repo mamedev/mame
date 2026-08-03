@@ -26940,6 +26940,10 @@ barata
 @source:matsushita/duet16.cpp
 duet16
 
+@source:matsushita/fwu1.cpp
+fwu1c70
+fwu1p503ai
+
 @source:matsushita/jr100.cpp
 jr100
 jr100u

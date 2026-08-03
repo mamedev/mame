@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+Known undumped software releases:
+
+- [FJ-WPS33]  100-sen New Year's Card Illustrations (年賀状イラスト100選)
+- [FJ-WPS30]  Arabian Kid (あらびあんKID)
+- [?]         Blind Touch Club (ブラインドタッチ倶楽部)
+- [WPS-20]    Blind Touch Club II (ブラインドタッチ倶楽部Ⅱ)
+- [FW-SD2003] Casablanca ni Ai o (カサブランカに愛を)
+- [FW-SD2002] Chátty (シャティ)
+- [WPS-22]    Disney Characters Illustration Land (ディズニーキャラクターイラストランド)
+- [?]         Disney Characters Puzzle Land (ディズニーキャラクターパズルランド)
+- [FJ-WPS27]  Disney Characters Town Factory ~5-tsu no Item o Atsumero!~ (ディズニーキャラクター タウンファクトリー ～5つのアイテムを集めろ！～)
+- [WPS-26]    Disney Classic Characters Illustration Land ~101 Dalmatians~ (ディズニー・クラシックキャラクターイラストランド ～101匹わんちゃん～)
+- [WPS-1]     Ide Yousuke Meijin no Jissen Mahjong (井出洋介名人の実戦麻雀)
+- [WPS-9]     Knight Moves (ナイトムーブス)
+- [WPS-8]     Kohakuiro no Yuigon (琥珀色の遺言)
+- [FJ-WPS28]  Mahjong Gokuu Tenjiku (麻雀悟空天竺)
+- [FW-SD2001] Manhattan Requiem (マンハッタン・レクイエム)
+- [WPS-23]    Mickey no Pluto o Sagase! (ミッキーのプルートを探せ！)
+- [FJ-WPS32]  Pachinko Dojo (パチンコ道場)
+- [WPS-16]    Professional Mahjong Gokuu (プロフェッショナル麻雀悟空)
+- [WPS-4F]    Rakuraku Business Bunreishuu (らくらくビジネス文例集)
+- [WPS-7]     Refill Plan (リフィル・プラン)
+- [?]         Sanrio Carnival (サンリオカーニバル)
+- [WPS-6]     Satsui no Seppun (殺意の接吻)
+- [FW-SD2102] Shanghai (上海)
+- [WPS-18]    Shanghai II (上海Ⅱ)
+- [WPS-15]    Sokoban (倉庫番)
+- [FJ-WPS29]  Trump World (トランプワールド)
+-->
+
+<softwarelist name="fwu1_flop" description="Panasonic FW-U1 Personal Word Processor floppy disk images">
+
+	<software name="puyopuyo" supported="no">
+		<description>Puyo Puyo</description>
+		<year>1995</year>
+		<publisher>Compile / Micro Cabin</publisher>
+		<notes><![CDATA[
+512 bytes/sector, 18 sectors/track, 80 tracks/side.
+Track 2 Side 1 null-filled: no flux in MFM pulse intervals.
+]]></notes>
+		<info name="alt_title" value="ぷよぷよ"/>
+		<info name="serial" value="FJ-WPS31"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="fj-wps31.mfm" size="1474560" crc="ea01da13" sha1="784e30982e6abc047107d1bb843a096f0c6e4369"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris" supported="no">
+		<description>Tetris</description>
+		<year>1988</year>
+		<publisher>Bullet-Proof Software Inc.</publisher>
+		<notes><![CDATA[
+512 bytes/sector, 9 sectors/track, 80 tracks/side.
+
+Track 1 Side 1 contains empty sectors 2 to 5 (image bytes 0x3800..0x4000)
+with invalid data CRCs: expected 0xDA6E, but stored checksum is 0x5445
+(ASCII encoded "TE"). These sectors cover two non-standard overlapping
+FAT filesystem entries:
+
+- File b"\x94" in cluster 9 with size 0x1400 bytes (image bytes 0x3800..0x4c00);
+- File b"\x94\x94" in cluster 10 with size 0x17e8 bytes (image bytes 0x3c00..0x53e8);
+
+Image bytes 0x4000..0x6c00 duplicate file "OOO.PRG" at offset 0x800
+(image offset 0x7400). This file is in cluster 22 with size 0x3080 bytes
+(image bytes 0x6c00..0x9c80).
+]]></notes>
+		<info name="alt_title" value="テトリス"/>
+		<info name="serial" value="WPS-2"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="wps-2.mfm" size="737280" crc="b79fbf23" sha1="1febc654e6d95077e1b9bd2806456bd6c94286f0"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
