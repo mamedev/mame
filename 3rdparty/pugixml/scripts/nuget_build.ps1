@@ -33,8 +33,16 @@ cd $scriptdir
 
 Force-Copy "../src/pugiconfig.hpp" "nuget/build/native/include/pugiconfig.hpp"
 Force-Copy "../src/pugixml.hpp" "nuget/build/native/include/pugixml.hpp"
+Force-Copy "../src/pugixml.cpp" "nuget/build/native/include/pugixml.cpp"
 
-if ($args[0] -eq 2019){
+if ($args[0] -eq 2026){
+	Build-Version "vs2026" "v145" "dynamic"
+	Build-Version "vs2026" "v145" "static"
+} elseif ($args[0] -eq 2022){
+	Build-Version "vs2022" "v143" "dynamic"
+	Build-Version "vs2022" "v143" "static"
+
+} elseif ($args[0] -eq 2019){
 	Build-Version "vs2019" "v142" "dynamic"
 	Build-Version "vs2019" "v142" "static"
 
@@ -42,22 +50,9 @@ if ($args[0] -eq 2019){
 	Build-Version "vs2017" "v141" "dynamic"
 	Build-Version "vs2017" "v141" "static"
 
-	Build-Version "vs2015" "v140" "dynamic"
-	Build-Version "vs2015" "v140" "static"
-
-	Build-Version "vs2013" "v120" "dynamic"
-	Build-Version "vs2013" "v120" "static"
-
-} elseif($args[0] -eq 2015){
-	Build-Version "vs2015" "v140" "dynamic"
-	Build-Version "vs2015" "v140" "static"
-
-	Build-Version "vs2013" "v120" "dynamic"
-	Build-Version "vs2013" "v120" "static"
-
-} elseif($args[0] -eq 2013){
-	Build-Version "vs2013" "v120" "dynamic"
-	Build-Version "vs2013" "v120" "static"
+} else {
+	Write-Error "Unsupported Visual Studio version '$($args[0])'"
+	exit 1
 }
 
 Run-Command "nuget pack nuget"

@@ -14,13 +14,11 @@ Software Group, the [Julia developers](http://julialang.org/) have
 taken over development of utf8proc, since the original developers have
 moved to other projects.
 
-(utf8proc is used for basic Unicode
+utf8proc is used for basic Unicode
 support in the [Julia language](http://julialang.org/), and the Julia
-developers became involved because they wanted to add Unicode 7 support and other features.)
+developers became involved because they wanted to add Unicode 7 support and other features; it is now regularly updated to keep up with recent Unicode releases.
 
-(The original utf8proc package also includes Ruby and PostgreSQL plug-ins.
-We removed those from utf8proc in order to focus exclusively on the C
-library for the time being, but plan to add them back in or release them as separate packages.)
+There are also utf8proc wrappers for [Ruby](https://www.ruby-toolbox.com/projects/utf8_proc) and [Rust](https://docs.rs/utf8proc/latest/utf8proc/) ([github](https://github.com/Techcable/utf8proc.rs)).  (The original utf8proc package also included PostgreSQL bindings.)
 
 The utf8proc package is licensed under the
 free/open-source [MIT "expat"
@@ -53,13 +51,23 @@ gmake CC=/opt/aCC/bin/aCC CFLAGS="+O2" PICFLAG="+z" C99FLAG="-Ae" WCFLAGS="+w" L
 ```
 To run `gmake install` you will need GNU coreutils for the `install` command, and you may want to pass `prefix=/opt libdir=/opt/lib/hpux32` or similar to change the installation location.
 
+### Using with CMake
+
+A CMake Config-file package is provided. To use utf8proc in a CMake project:
+
+```cmake
+add_executable (app app.c)
+find_package (utf8proc 2.9.0 REQUIRED)
+target_link_libraries (app PRIVATE utf8proc::utf8proc)
+```
+
 ## General Information
 
 The C library is found in this directory after successful compilation
 and is named `libutf8proc.a` (for the static library) and
 `libutf8proc.so` (for the dynamic library).
 
-The Unicode version supported is 15.1.0.
+The Unicode version supported is 17.0.0.
 
 For Unicode normalizations, the following options are used:
 
@@ -86,3 +94,50 @@ the [utf8proc issues page on Github](https://github.com/JuliaLang/utf8proc/issue
 ## See also
 
 An independent Lua translation of this library, [lua-mojibake](https://github.com/differentprogramming/lua-mojibake), is also available.
+
+## Examples
+
+### Convert codepoint to string
+```c
+// Convert codepoint `a` to utf8 string `str`
+utf8proc_int32_t a = 223;
+utf8proc_uint8_t str[16] = { 0 };
+utf8proc_encode_char(a, str);
+printf("%s\n", str);
+// ß
+```
+
+### Convert string to codepoint
+```c
+// Convert string `str` to pointer to codepoint `a`
+utf8proc_uint8_t str[] = "ß";
+utf8proc_int32_t a;
+utf8proc_iterate(str, -1, &a);
+printf("%d\n", a);
+// 223
+```
+
+### Casefold
+
+```c
+// Convert "ß"  (U+00DF) to its casefold variant "ss"
+utf8proc_uint8_t str[] = "ß";
+utf8proc_uint8_t *fold_str;
+utf8proc_map(str, 0, &fold_str, UTF8PROC_NULLTERM | UTF8PROC_CASEFOLD);
+printf("%s\n", fold_str);
+// ss
+free(fold_str);
+```
+
+### Normalization Form C/D (NFC/NFD)
+```c
+// Decompose "\u00e4\u00f6\u00fc" = "äöü" into "a\u0308o\u0308u\u0308" (= "äöü" via combining char U+0308)
+utf8proc_uint8_t input[] = {0xc3, 0xa4, 0xc3, 0xb6, 0xc3, 0xbc}; // "\u00e4\u00f6\u00fc" = "äöü" in UTF-8
+utf8proc_uint8_t *nfd= utf8proc_NFD(input); // = {0x61, 0xcc, 0x88, 0x6f, 0xcc, 0x88, 0x75, 0xcc, 0x88}
+
+// Compose "a\u0308o\u0308u\u0308" into "\u00e4\u00f6\u00fc" (= "äöü" via precomposed characters)
+utf8proc_uint8_t *nfc= utf8proc_NFC(nfd);
+
+free(nfd);
+free(nfc);
+```

@@ -165,8 +165,10 @@ bool simple_menu_select_game::inkey_select(const event &menu_event)
 				[this] () { reset(reset_options::SELECT_FIRST); });
 		return false;
 	}
-	else if (!driver) // special case for previous menu
+	else if (!driver) // special case for previous menu / exit
 	{
+		if (stack_has_special_main_menu())
+			machine().schedule_exit();
 		stack_pop();
 		return false;
 	}

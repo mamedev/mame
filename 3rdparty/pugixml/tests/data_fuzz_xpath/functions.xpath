@@ -1,0 +1,1 @@
+sum(nodes) + round(concat(//a[translate(@id, 'abc', '012')]))
