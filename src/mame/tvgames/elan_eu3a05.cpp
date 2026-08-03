@@ -960,7 +960,7 @@ CONS( 2004, rad_tetr, 0, 0, elan_eu3a05_1mb, rad_tetr, elan_eu3a05_state, empty_
 
 // it isn't clear if the ELAN is generating the music on this, or if one of the other globs is an audio MCU
 // VJ Starz Dance Mat on box, VJ Starz Dancing Mat on screen
-CONS( 2003, vjstarzd, 0, 0, elan_eu3a05_512kb, vjstarzd, elan_eu3a05_state, empty_init, "Kidz Biz / Jakks Pacific", "VJ Starz Dance Mat", MACHINE_NOT_WORKING )
+CONS( 2003, vjstarzd, 0, 0, elan_eu3a05_512kb, vjstarzd, elan_eu3a05_state, empty_init, "Kidz Biz / JAKKS Pacific, Inc.", "VJ Starz Dance Mat", MACHINE_NOT_WORKING )
 
 // ROM contains the string "Credit:XiAn Hummer Software Studio(CHINA) Tel:86-29-84270600 Email:HummerSoft@126.com"  PCB has datecode of "050423" (23rd April 2005)
 CONS( 2005, airblsjs, 0, 0, elan_eu3a05_pal_4mb, airblsjs, elan_eu3a05_state, empty_init, "Advance Bright Ltd", "Air-Blaster Joystick (AB1500, PAL)", MACHINE_NOT_WORKING )

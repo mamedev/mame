@@ -624,10 +624,10 @@ ROM_END
 //    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT      CLASS                       INIT           COMPANY   FULLNAME     FLAGS
 COMP( 2006, hyprscan, 0,      0,      hyperscan, hyperscan, spg29x_game_state,          empty_init,    "Mattel", "HyperScan", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-// There were 1-player and 2-player versions for these Jakks guns. The second gun appears to be simply a controller (no AV connectors) but as they were separate products with the 2-player versions being released up to a year after the original, the code could differ.
+// There were 1-player and 2-player versions for these JAKKS guns. The second gun appears to be simply a controller (no AV connectors) but as they were separate products with the 2-player versions being released up to a year after the original, the code could differ.
 // If they differ, it is currently uncertain which versions these ROMs are from
-COMP( 2009, jak_bbh,  0,      0,      spg29x,    hyperscan, spg29x_nand_game_state,     nand_jak_bbh,  "Jakks Pacific / Play Mechanix / Super Happy Fun Fun", "Big Buck Hunter Pro (Jakks Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) //has ISSI 404A (24C04)
-COMP( 2011, jak_bbsf, 0,      0,      spg29x,    hyperscan, spg29x_nand_game_state,     nand_jak_bbsf, "Jakks Pacific / Play Mechanix / Super Happy Fun Fun", "Big Buck Safari (Jakks Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // has ISSI 416A (24C16)
+COMP( 2009, jak_bbh,  0,      0,      spg29x,    hyperscan, spg29x_nand_game_state,     nand_jak_bbh,  "JAKKS Pacific, Inc. / Play Mechanix / Super Happy Fun Fun", "Big Buck Hunter Pro (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) //has ISSI 404A (24C04)
+COMP( 2011, jak_bbsf, 0,      0,      spg29x,    hyperscan, spg29x_nand_game_state,     nand_jak_bbsf, "JAKKS Pacific, Inc. / Play Mechanix / Super Happy Fun Fun", "Big Buck Safari (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // has ISSI 416A (24C16)
 
 COMP( 201?, zonefamf, 0,      0,      spg29x,    hyperscan, spg29x_zonefamf_game_state, nand_zonefamf, "Zone", "Zone Family Fit", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 // uses SPG291A-Hl171

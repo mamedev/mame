@@ -4,7 +4,7 @@
     GPL16250 / GPAC800 / GMC384 / GCM420 related support
 
     GPL16250 is the GeneralPlus / SunPlus part number
-    GPAC800 is the Jakks Pacific codename
+    GPAC800 is the JAKKS Pacific codename
     GMC384 / GCM420 is what is printed on the die
 
     ----
@@ -646,25 +646,25 @@ ROM_END
 // ----------------------------------------------------
 // these use RAM up to 6fff
 //
-// high resolution mode is used, the Jakks games are known to be GPAC800, so GPL16250VA
+// high resolution mode is used, the JAKKS games are known to be GPAC800, so GPL16250VA
 // ----------------------------------------------------
 
 // also sold as "Pac-Man Connect & Play 35th Anniversary" (same ROM?)
 CONS( 2012, paccon, 0, 0, gpl16250va_romram, paccon, paccon_game_state, init_wrlshunt, "Bandai", "Pac-Man Connect & Play (Feb 14 2012 10:46:23)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 
-CONS( 2009, jak_swcl, 0, 0, gpl16250va_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "Jakks Pacific / HotGen", "Star Wars: The Clone Wars - Republic Squadron (Jakks Pacific TV Motion Game) (May 6 2009 12:53:31)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2009, jak_s500, 0, 0, gpl16250va_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "Jakks Pacific / HotGen", "SpongeBob SquarePants Bikini Bottom 500 (Jakks Pacific TV Motion Game) (Apr 16 2009 15:11:17)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2009, jak_smwm, 0, 0, gpl16250va_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "Jakks Pacific / HotGen", "Spider-Man Web Master (Jakks Pacific TV Motion Game) (Apr 23 2009 17:10:04)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2010, jak_pf,   0, 0, gpl16250va_romram, jak_s500, jak_pf_game_state,   init_wrlshunt, "Jakks Pacific / HotGen", "Phineas and Ferb: Best Game Ever! (Jakks Pacific TV Motion Game) (Sep 16 2009 17:36:00)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // build date is 2009, but onscreen display is 2010
-CONS( 2009, jak_totm, 0, 0, gpl16250va_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "Jakks Pacific / HotGen", "Toy Story: Toys on the Move (Jakks Pacific TV Motion Game) (Dec 24 2009 17:34:29)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Toys on the Move has ISSI 404A
+CONS( 2009, jak_swcl, 0, 0, gpl16250va_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific, Inc. / HotGen", "Star Wars: The Clone Wars - Republic Squadron (JAKKS Pacific TV Motion Game) (May 6 2009 12:53:31)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2009, jak_s500, 0, 0, gpl16250va_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific, Inc. / HotGen", "SpongeBob SquarePants Bikini Bottom 500 (JAKKS Pacific TV Motion Game) (Apr 16 2009 15:11:17)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2009, jak_smwm, 0, 0, gpl16250va_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific, Inc. / HotGen", "Spider-Man Web Master (JAKKS Pacific TV Motion Game) (Apr 23 2009 17:10:04)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2010, jak_pf,   0, 0, gpl16250va_romram, jak_s500, jak_pf_game_state,   init_wrlshunt, "JAKKS Pacific, Inc. / HotGen", "Phineas and Ferb: Best Game Ever! (JAKKS Pacific TV Motion Game) (Sep 16 2009 17:36:00)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // build date is 2009, but onscreen display is 2010
+CONS( 2009, jak_totm, 0, 0, gpl16250va_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific, Inc. / HotGen", "Toy Story: Toys on the Move (JAKKS Pacific TV Motion Game) (Dec 24 2009 17:34:29)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Toys on the Move has ISSI 404A
 
-CONS( 2009, jak_prft, 0, 0, gpl16250va_romram, jak_s500, jak_prft_game_state, init_wrlshunt, "Jakks Pacific / Santa Cruz Games", "Power Rangers: Force in Time (Jakks Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2009, jak_tink, 0, 0, gpl16250va_romram, jak_s500, jak_prft_game_state, init_wrlshunt, "Jakks Pacific / Santa Cruz Games", "Tinker Bell and the Lost Treasure (Jakks Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2009, jak_prft, 0, 0, gpl16250va_romram, jak_s500, jak_prft_game_state, init_wrlshunt, "JAKKS Pacific, Inc. / Santa Cruz Games", "Power Rangers: Force in Time (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2009, jak_tink, 0, 0, gpl16250va_romram, jak_s500, jak_prft_game_state, init_wrlshunt, "JAKKS Pacific, Inc. / Santa Cruz Games", "Tinker Bell and the Lost Treasure (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2009, jak_ths,  0, 0, gpl16250va_romram, jak_ths,  jak_s500_game_state, init_ths,      "Jakks Pacific / Super Happy Fun Fun", "Triple Header Sports (Jakks Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2009, jak_ths,  0, 0, gpl16250va_romram, jak_ths,  jak_s500_game_state, init_ths,      "JAKKS Pacific, Inc. / Super Happy Fun Fun", "Triple Header Sports (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2011, jak_sinv, 0, 0, gpl16250va_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "Jakks Pacific / Code Mystics", "Retro Arcade featuring Space Invaders (Jakks Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2011, jak_sinv, 0, 0, gpl16250va_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific, Inc. / Code Mystics", "Retro Arcade featuring Space Invaders (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2011, wrlshunt, 0, 0, gpl16250va_romram, wrlshunt, wrlshunt_game_state, init_wrlshunt, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 

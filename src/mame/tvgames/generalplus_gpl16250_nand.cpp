@@ -4,7 +4,7 @@
     GPL16250 / GPAC800 / GMC384 / GCM420 related support
 
     GPL16250 is the GeneralPlus / SunPlus part number
-    GPAC800 is the Jakks Pacific codename
+    GPAC800 is the JAKKS Pacific codename
     GMC384 / GCM420 is what is printed on the die
 
     ----
@@ -900,32 +900,32 @@ void generalplus_gpac800_game_state::nand_beambox()
 // ----------------------------------------------------
 // these all use RAM up to 6fff
 //
-// Jakks games are known to be GPAC800, so GPL16240VA
+// JAKKS games are known to be GPAC800, so GPL16240VA
 // ----------------------------------------------------
 
 // NAND dumps w/ internal bootstrap (and u'nSP 2.0 extended opcodes)  (have gpnandnand strings)
-// the Jakks ones seem to be known as 'Generalplus GPAC800' hardware
-CONS( 2011, jak_gtg,   0, 0, generalplus_gpac800_nand64mbyte,  jak_gtg,  generalplus_gpac800_game_state, nand_init,      "Jakks Pacific / HotGen",         "Golden Tee Golf (Jakks Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 200?, jak_car2,  0, 0, generalplus_gpac800_nand64mbyte,  jak_car2, generalplus_gpac800_game_state, nand_init,      "Jakks Pacific / HotGen",         "Cars 2 (Jakks Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2010, jak_tsm,   0, 0, generalplus_gpac800_nand64mbyte,  jak_car2, generalplus_gpac800_game_state, nand_tsm,       "Jakks Pacific / Schell Games",   "Toy Story Mania (Jakks Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2009, jak_sspop, 0, 0, generalplus_gpac800_nand128mbyte, jak_hsm,  generalplus_gpac800_game_state, nand_init_32mb, "Jakks Pacific / HotGen",         "Sing Scene Pop (Jakks Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2008, jak_hmg2,  0, 0, generalplus_gpac800_nand64mbyte,  jak_hsm,  generalplus_gpac800_game_state, nand_init_32mb, "Jakks Pacific / HotGen",         "Hannah Montana G2 Deluxe: All in One (Jakks Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Jul 9 2008 11:50:08
-CONS( 2008, jak_hsmg2, 0, 0, generalplus_gpac800_nand64mbyte,  jak_hsm,  generalplus_gpac800_game_state, nand_init_32mb, "Jakks Pacific / HotGen",         "High School Musical G2 Deluxe: All in One (Jakks Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Jun 25 2008 14:53:14
-CONS( 2008, jak_hmhsm, 0, 0, generalplus_gpac800_nand256mbyte, jak_hsm,  generalplus_gpac800_game_state, nand_init_32mb, "Jakks Pacific / HotGen",         "Hannah Montana G2 Deluxe / High School Musical G2 Deluxe: Two in One (Jakks Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Sep 12 2008 18:48:14 (Menu/HM) / Sep 12 2008 18:50:45 (HSM)
-CONS( 2008, jak_umdf,  0, 0, generalplus_gpac800_nand256mbyte, jak_hsm,  generalplus_gpac800_game_state, nand_init_32mb, "Jakks Pacific / Handheld Games", "Ultimotion: Disney Fairies - Sleeping Beauty & TinkerBell (Jakks Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+// the JAKKS ones seem to be known as 'Generalplus GPAC800' hardware
+CONS( 2011, jak_gtg,   0, 0, generalplus_gpac800_nand64mbyte,  jak_gtg,  generalplus_gpac800_game_state, nand_init,      "JAKKS Pacific, Inc. / HotGen",         "Golden Tee Golf (JAKKS Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, jak_car2,  0, 0, generalplus_gpac800_nand64mbyte,  jak_car2, generalplus_gpac800_game_state, nand_init,      "JAKKS Pacific, Inc. / HotGen",         "Cars 2 (JAKKS Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2010, jak_tsm,   0, 0, generalplus_gpac800_nand64mbyte,  jak_car2, generalplus_gpac800_game_state, nand_tsm,       "JAKKS Pacific, Inc. / Schell Games",   "Toy Story Mania (JAKKS Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2009, jak_sspop, 0, 0, generalplus_gpac800_nand128mbyte, jak_hsm,  generalplus_gpac800_game_state, nand_init_32mb, "JAKKS Pacific, Inc. / HotGen",         "Sing Scene Pop (JAKKS Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2008, jak_hmg2,  0, 0, generalplus_gpac800_nand64mbyte,  jak_hsm,  generalplus_gpac800_game_state, nand_init_32mb, "JAKKS Pacific, Inc. / HotGen",         "Hannah Montana G2 Deluxe: All in One (JAKKS Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Jul 9 2008 11:50:08
+CONS( 2008, jak_hsmg2, 0, 0, generalplus_gpac800_nand64mbyte,  jak_hsm,  generalplus_gpac800_game_state, nand_init_32mb, "JAKKS Pacific, Inc. / HotGen",         "High School Musical G2 Deluxe: All in One (JAKKS Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Jun 25 2008 14:53:14
+CONS( 2008, jak_hmhsm, 0, 0, generalplus_gpac800_nand256mbyte, jak_hsm,  generalplus_gpac800_game_state, nand_init_32mb, "JAKKS Pacific, Inc. / HotGen",         "Hannah Montana G2 Deluxe / High School Musical G2 Deluxe: Two in One (JAKKS Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Sep 12 2008 18:48:14 (Menu/HM) / Sep 12 2008 18:50:45 (HSM)
+CONS( 2008, jak_umdf,  0, 0, generalplus_gpac800_nand256mbyte, jak_hsm,  generalplus_gpac800_game_state, nand_init_32mb, "JAKKS Pacific, Inc. / Handheld Games", "Ultimotion: Disney Fairies - Sleeping Beauty & TinkerBell (JAKKS Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // Ultimotion Swing Zone is SPG29xx instead
-CONS( 2008, jak_camp,  0, 0, generalplus_gpac800_nand256mbyte, jak_hsm,  generalplus_gpac800_game_state, nand_init_32mb, "Jakks Pacific / HotGen",         "Camp Rock: Guitar Video Game (Jakks Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2008, jak_camp,  0, 0, generalplus_gpac800_nand256mbyte, jak_hsm,  generalplus_gpac800_game_state, nand_init_32mb, "JAKKS Pacific, Inc. / HotGen",         "Camp Rock: Guitar Video Game (JAKKS Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // 2 blocks fail the hidden ROM test in jak_hmpt set below, however this seems to be an error in the test mode, not the dump
 // a different set, https://www.youtube.com/watch?v=XiEMtLzcTFw showing a date of May 14 2008 10:05:22 shows exactly the same failures
-CONS( 2008, jak_hmpt, 0, 0, generalplus_gpac800_nand256mbyte, jak_hsm, generalplus_gpac800_game_state, nand_init_32mb, "Jakks Pacific / HotGen", "Hannah Montana Pop Tour: Guitar Video Game (Jakks Pacific TV Game) (May 16 2008)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // May 16 2008 10:36:59
+CONS( 2008, jak_hmpt, 0, 0, generalplus_gpac800_nand256mbyte, jak_hsm, generalplus_gpac800_game_state, nand_init_32mb, "JAKKS Pacific, Inc. / HotGen",         "Hannah Montana Pop Tour: Guitar Video Game (JAKKS Pacific TV Game) (May 16 2008)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // May 16 2008 10:36:59
 
-// There were 1-player and 2-player versions for several of the Jakks guns. The second gun appears to be simply a controller (no AV connectors) but as they were separate products with the 2-player versions being released up to a year after the original, the code could differ.
+// There were 1-player and 2-player versions for several of the JAKKS guns. The second gun appears to be simply a controller (no AV connectors) but as they were separate products with the 2-player versions being released up to a year after the original, the code could differ.
 // If they differ, it is currently uncertain which versions these ROMs are from
-CONS(2012, jak_wdzh, 0, 0, generalplus_gpac800_nand64mbyte, jak_car2, generalplus_gpac800_game_state, nand_init,      "Jakks Pacific / Merge Interactive",   "The Walking Dead: Zombie Hunter (Jakks Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // gun games all had Atmel 16CM (24C16).
-CONS(2013, jak_duck, 0, 0, generalplus_gpac800_nand64mbyte, jak_car2, generalplus_gpac800_game_state, nand_init_32mb, "Jakks Pacific / Merge Interactive",   "Duck Commander (Jakks Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // no 2 Player version was released
-CONS(2013, jak_swc,  0, 0, generalplus_gpac800_nand64mbyte, jak_car2, generalplus_gpac800_game_state, nand_init_32mb, "Jakks Pacific / Merge Interactive",   "Star Wars: Clone Trooper (Jakks Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS(2014, jak_wdbg, 0, 0, generalplus_gpac800_nand64mbyte, jak_car2, generalplus_gpac800_game_state, nand_init_32mb, "Jakks Pacific / Super Happy Fun Fun", "The Walking Dead: Battleground (Jakks Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS(2012, jak_wdzh, 0, 0, generalplus_gpac800_nand64mbyte, jak_car2, generalplus_gpac800_game_state, nand_init,      "JAKKS Pacific, Inc. / Merge Interactive",   "The Walking Dead: Zombie Hunter (JAKKS Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // gun games all had Atmel 16CM (24C16).
+CONS(2013, jak_duck, 0, 0, generalplus_gpac800_nand64mbyte, jak_car2, generalplus_gpac800_game_state, nand_init_32mb, "JAKKS Pacific, Inc. / Merge Interactive",   "Duck Commander (JAKKS Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // no 2 Player version was released
+CONS(2013, jak_swc,  0, 0, generalplus_gpac800_nand64mbyte, jak_car2, generalplus_gpac800_game_state, nand_init_32mb, "JAKKS Pacific, Inc. / Merge Interactive",   "Star Wars: Clone Trooper (JAKKS Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS(2014, jak_wdbg, 0, 0, generalplus_gpac800_nand64mbyte, jak_car2, generalplus_gpac800_game_state, nand_init_32mb, "JAKKS Pacific, Inc. / Super Happy Fun Fun", "The Walking Dead: Battleground (JAKKS Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 
 // ----------------------------------------------------

@@ -744,35 +744,35 @@ ROM_END
 } // anonymous namespace
 
 
-// Jakks Pacific TV games
-CONS( 2004, jak_capb,   0,        0, spg110_base,     jak_capb,  spg110_game_state,          empty_init, "Jakks Pacific / HotGen", "Classic Arcade Pinball (Jakks Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// JAKKS Pacific TV games
+CONS( 2004, jak_capb,   0,        0, spg110_base,     jak_capb,  spg110_game_state,          empty_init, "JAKKS Pacific, Inc. / HotGen", "Classic Arcade Pinball (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // this is the smaller more 'square' style joystick that was originally released before the GameKey slot was added.
-CONS( 2004, jak_spdmo,  jak_spdm, 0, spg110_base,     jak_spdmo, spg110_game_state,          empty_init, "Jakks Pacific / Digital Eclipse", "Spider-Man (Jakks Pacific TV Game) (SPG110 hardware, old style stick)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, jak_spdmo,  jak_spdm, 0, spg110_base,     jak_spdmo, spg110_game_state,          empty_init, "JAKKS Pacific, Inc. / Digital Eclipse", "Spider-Man (JAKKS Pacific TV Game) (SPG110 hardware, old style stick)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // these are the redesigned stick (closer to the SPG2xx release) but no GameKey port.
-CONS( 2004, jak_spdmoa, jak_spdm, 0, spg110_base,     jak_spdmo, spg110_game_state,          empty_init, "Jakks Pacific / Digital Eclipse", "Spider-Man (Jakks Pacific TV Game) (SPG110 hardware, new style stick, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2004, jak_spdmob, jak_spdm, 0, spg110_base,     jak_spdmo, spg110_game_state,          empty_init, "Jakks Pacific / Digital Eclipse", "Spider-Man (Jakks Pacific TV Game) (SPG110 hardware, new style stick, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, jak_spdmoa, jak_spdm, 0, spg110_base,     jak_spdmo, spg110_game_state,          empty_init, "JAKKS Pacific, Inc. / Digital Eclipse", "Spider-Man (JAKKS Pacific TV Game) (SPG110 hardware, new style stick, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, jak_spdmob, jak_spdm, 0, spg110_base,     jak_spdmo, spg110_game_state,          empty_init, "JAKKS Pacific, Inc. / Digital Eclipse", "Spider-Man (JAKKS Pacific TV Game) (SPG110 hardware, new style stick, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2004, jak_wpt,    0,        0, spg110_base,     jak_spdmo, spg110_game_state,          init_crc,   "Jakks Pacific / Digital Eclipse", "World Poker Tour (Jakks Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, jak_wpt,    0,        0, spg110_base,     jak_spdmo, spg110_game_state,          init_crc,   "JAKKS Pacific, Inc. / Digital Eclipse", "World Poker Tour (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2004, jak_diso,   jak_disn, 0, spg110_base,     jak_spdmo, spg110_game_state,          empty_init, "Jakks Pacific / HotGen", "Disney (Jakks Pacific TV Game) (SPG110 hardware, 28 MAY 2004 A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, jak_diso,   jak_disn, 0, spg110_base,     jak_spdmo, spg110_game_state,          empty_init, "JAKKS Pacific, Inc. / HotGen", "Disney (JAKKS Pacific TV Game) (SPG110 hardware, 28 MAY 2004 A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // ROM bytesum is off by 0x3e, so likely a bad byte
 // sound doesn't work properly after a few initial sounds (expected, SPG110 emulation issues)
 // fill position in the 'Color Me Spongy' mini-game is completely wrong, maybe dump issue, maybe SPG110/unSP issue.
-CONS( 2004, jak_sbdd,   0,        0, spg110_base,     jak_spdmo, spg110_game_state,          init_crc,   "Jakks Pacific", "SpongeBob SquarePants Dilly Dabbler (Jakks Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, jak_sbdd,   0,        0, spg110_base,     jak_spdmo, spg110_game_state,          init_crc,   "JAKKS Pacific, Inc.", "SpongeBob SquarePants Dilly Dabbler (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2004, jak_blue,   0,        0, spg110_base,     jak_spdmo, spg110_game_state,          init_crc,   "Jakks Pacific", "Blue's Room: Coloring With Blue (Jakks Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2004, jak_dood,   0,        0, spg110_base,     jak_spdmo, spg110_game_state,          init_crc,   "Jakks Pacific", "Tele-Doodle (Jakks Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2004, jak_ssmo,   0,        0, spg110_base,     jak_spdmo, spg110_game_state,          init_crc,   "Jakks Pacific", "Super Silly Makeover (Jakks Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, jak_blue,   0,        0, spg110_base,     jak_spdmo, spg110_game_state,          init_crc,   "JAKKS Pacific, Inc.", "Blue's Room: Coloring With Blue (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, jak_dood,   0,        0, spg110_base,     jak_spdmo, spg110_game_state,          init_crc,   "JAKKS Pacific, Inc.", "Tele-Doodle (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, jak_ssmo,   0,        0, spg110_base,     jak_spdmo, spg110_game_state,          init_crc,   "JAKKS Pacific, Inc.", "Super Silly Makeover (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 
 // has Game-Key strings in test mode even if there were no SPG110 Game-Key units at all
-CONS( 2006, jak_bobb,   0,        0, spg110_base,     jak_bobb,  spg110_game_state,          empty_init, "Jakks Pacific / HotGen", "Bob the Builder - Project: Build It (Jakks Pacific TV Game) (Jun  2 2006 14:42:01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // UK?
-CONS( 2006, jak_bobbo,  jak_bobb, 0, spg110_base,     jak_bobb,  spg110_game_state,          empty_init, "Jakks Pacific / HotGen", "Bob the Builder - Project: Build It (Jakks Pacific TV Game) (Feb 28 2006 10:48:40)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // US?
+CONS( 2006, jak_bobb,   0,        0, spg110_base,     jak_bobb,  spg110_game_state,          empty_init, "JAKKS Pacific, Inc. / HotGen", "Bob the Builder - Project: Build It (JAKKS Pacific TV Game) (Jun  2 2006 14:42:01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // UK?
+CONS( 2006, jak_bobbo,  jak_bobb, 0, spg110_base,     jak_bobb,  spg110_game_state,          empty_init, "JAKKS Pacific, Inc. / HotGen", "Bob the Builder - Project: Build It (JAKKS Pacific TV Game) (Feb 28 2006 10:48:40)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // US?
 
-CONS( 2006, jak_thom,   0,        0, spg110_base,     jak_bobb,  spg110_game_state,          empty_init, "Jakks Pacific / HotGen", "Thomas & Friends: Right on Time (Jakks Pacific TV Game) (Jun 28 2006 18:24:37) (US, NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2006, jak_thomp,  jak_thom, 0, spg110_base_pal, jak_bobb,  spg110_game_state,          empty_init, "Jakks Pacific / HotGen", "Thomas & Friends: Right on Time (Jakks Pacific TV Game) (Jun 28 2006 18:01:22) (UK, PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // PAL versions have different voices
+CONS( 2006, jak_thom,   0,        0, spg110_base,     jak_bobb,  spg110_game_state,          empty_init, "JAKKS Pacific, Inc. / HotGen", "Thomas & Friends: Right on Time (JAKKS Pacific TV Game) (Jun 28 2006 18:24:37) (US, NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, jak_thomp,  jak_thom, 0, spg110_base_pal, jak_bobb,  spg110_game_state,          empty_init, "JAKKS Pacific, Inc. / HotGen", "Thomas & Friends: Right on Time (JAKKS Pacific TV Game) (Jun 28 2006 18:01:22) (UK, PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // PAL versions have different voices
 // another version of Thomas & Friends (with a different screen layout, no map in the corner) also exists
 // https://www.youtube.com/watch?v=PfEELfnXaXE
 // is it an earlier version, or an SPG2xx port that loses the map for some reason?
@@ -790,6 +790,6 @@ CONS( 200?, conyfght,   0,        0, spg110_base,     conyteni,  spg110_game_sta
 // The unit contains no BIOS ROM, was sold by Taikee as Singing Star Karaoke, but also by Imaginarium / ItsMagical in Spain as Karao Kids.  Cartridges are compatible.
 CONS( 200?, sstarkar,   0,        0, sstarkar,        conyteni,  spg110_sstarkar_game_state, empty_init, "Taikee", "Singing Star Karaoke (World) / Karao Kids (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // "ItsMagical" brand from Imaginarium
 
-CONS( 2004, easports,   0,        0, easports_pal,    easports,  spg110_easports_game_state, empty_init, "Jakks Pacific / Electronic Arts / Digital Eclipse", "EA Sports Classics: NHL 95 & FIFA Soccer 96 (Jakks Pacific TV Game, version 12 11 A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2004, easportsa,  easports, 0, easports_pal,    easports,  spg110_easports_game_state, empty_init, "Jakks Pacific / Electronic Arts / Digital Eclipse", "EA Sports Classics: NHL 95 & FIFA Soccer 96 (Jakks Pacific TV Game, version 11 11 A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2004, easportsu,  easports, 0, easports,        easports,  spg110_easports_game_state, empty_init, "Jakks Pacific / Electronic Arts / Digital Eclipse", "EA Sports Classics: NHL 95 & Madden 95 (Jakks Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, easports,   0,        0, easports_pal,    easports,  spg110_easports_game_state, empty_init, "JAKKS Pacific, Inc. / Electronic Arts / Digital Eclipse", "EA Sports Classics: NHL 95 & FIFA Soccer 96 (JAKKS Pacific TV Game, version 12 11 A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, easportsa,  easports, 0, easports_pal,    easports,  spg110_easports_game_state, empty_init, "JAKKS Pacific, Inc. / Electronic Arts / Digital Eclipse", "EA Sports Classics: NHL 95 & FIFA Soccer 96 (JAKKS Pacific TV Game, version 11 11 A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, easportsu,  easports, 0, easports,        easports,  spg110_easports_game_state, empty_init, "JAKKS Pacific, Inc. / Electronic Arts / Digital Eclipse", "EA Sports Classics: NHL 95 & Madden 95 (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

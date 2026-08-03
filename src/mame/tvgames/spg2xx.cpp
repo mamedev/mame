@@ -12,7 +12,7 @@
             All GameKeyReady units
                 Disney Princess (GKR)
                 Wheel of Fortune (GKR)
-                Jakks WWE (GKR)
+                JAKKS WWE (GKR)
                 Fantastic 4 (GKR)
                 Justice League (GKR)
                 Dora the Explorer Nursery Rhyme (GKR)
@@ -20,7 +20,7 @@
                 Spiderman 5-in-1 (GKR)
                 etc.
 
-            (other non GKR Jakks games)
+            (other non GKR JAKKS games)
             X-Men (Wolverine pad)
             Avatar: The Last Airbender
             Superman in Super Villain Showdown
@@ -122,7 +122,7 @@
         This is the byte sum of the file, excluding the first 16 byte (where the checksum is stored)
 
         Test Modes:
-        Justice League : press UP, DOWN, LEFT, BT3 on the Jakks logo in that order, quickly, to get test menu
+        Justice League : press UP, DOWN, LEFT, BT3 on the JAKKS logo in that order, quickly, to get test menu
         WWE : press UP, BT1, BT2 together during startup logos
 
         Disney Friends, MS Pacman, WallE, Batman (and some other HotGen GameKeys) for test mode, hold UP,
@@ -142,7 +142,7 @@
         Care Bears : Hold analog stck up, rotate stick 360 degress back to up, press 'A' while still holding up
 
     TODO:
-        Work out how to access the hidden TEST menus for all games (most Jakks games should have one at least)
+        Work out how to access the hidden TEST menus for all games (most JAKKS games should have one at least)
 
 *******************************************************************************/
 
