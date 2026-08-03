@@ -61,6 +61,7 @@ protected:
 	void tmp90844_regs(address_map &map) ATTR_COLD;
 	void tmp90ph44_mem(address_map &map) ATTR_COLD;
 	void tmp91640_mem(address_map &map) ATTR_COLD;
+    void tmp91c640_mem(address_map &map) ATTR_COLD;
 	void tmp91641_mem(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(t90_timer_callback);
@@ -277,7 +278,14 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
+class tmp91c640_device : public tlcs90_device
+{
+public:
+	tmp91c640_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+};
 class tmp91641_device : public tlcs90_device
 {
 public:
@@ -308,6 +316,7 @@ DECLARE_DEVICE_TYPE(TMP90840,  tmp90840_device)
 DECLARE_DEVICE_TYPE(TMP90841,  tmp90841_device)
 DECLARE_DEVICE_TYPE(TMP90845,  tmp90845_device)
 DECLARE_DEVICE_TYPE(TMP91640,  tmp91640_device)
+DECLARE_DEVICE_TYPE(TMP91C640, tmp91c640_device)
 DECLARE_DEVICE_TYPE(TMP91641,  tmp91641_device)
 DECLARE_DEVICE_TYPE(TMP90PH44, tmp90ph44_device)
 
