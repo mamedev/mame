@@ -26,7 +26,7 @@ Double-Sided main PCB. Labeled "8409603N04.C  200-6  93116-1-3".
 |  |________|                    |   |            |629|               |
 |                                |   |                                |
 |  _____   _________   ________  |   |                                |
-MC145158-2 | EPROM  | Motorola 1994   |                         Xtal   |
+MC145158-2| EPROM  | Motorola 1994   |                         Xtal   |
 |         | 27C1001| SC432098CPB |   |  Xtal                  16.8M   |
 |         |________|  | 97C03 |  |   | 3.84M                          |
 |                    0F36WllRY9628   |                                |
@@ -37,7 +37,7 @@ MC145158-2 | EPROM  | Motorola 1994   |                         Xtal   |
 |                AVAV9627        |   |       |HDP9627|  |AVAV9628     |
 |                                |   |                                |
 |___________          ___________|   |___________          ___________|
-			|________|                           |________|
+            |________|                           |________|
 
 Screen and keyboard on a separate PCB with a Motorola Custom labeled "SC417836CDW  64C09  0F82TICTBN9552".
 Screen is a 7-digits 7-segments (without dots) plus lights for "▲", "⊘", "📞", and "⏼" icons on the upper side.
