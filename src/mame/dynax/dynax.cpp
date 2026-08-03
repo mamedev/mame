@@ -1319,6 +1319,9 @@ uint8_t dynax_state::mjtkp2_dsw_r()
 	else
 		return 0xff;
 }
+static u8 g_u260_last = 0xff;
+#define m_u260_last g_u260_last
+static const int priority_mjtkp2[8] = { 0x0231, 0x0312, 0x2031, 0x2301, 0x3021, 0x3201, 0x0000, 0x0000 };
 
 void dynax_state::mjtkp2_map(address_map &map)
 {
@@ -1329,16 +1332,43 @@ void dynax_state::mjtkp2_map(address_map &map)
 	map(0x14000, 0x14000).w(FUNC(dynax_state::tenkai_ipsel_w));
 	map(0x14001, 0x14001).w(FUNC(dynax_state::tenkai_ip_w));
 	map(0x14002, 0x14003).r(FUNC(dynax_state::tenkai_ip_r));
-	map(0x14081, 0x14087).w(m_blitter, FUNC(dynax_blitter_rev2_device::regs_w));    // Blitter (inverted scroll values)
+	map(0x14081, 0x14087).lw8(NAME([this] (offs_t offset, u8 data) {
+		static u8 regs[7];
+		regs[offset & 7] = data;
+		if ((offset & 7) == 0)
+		{
+			if (m_u260_last & 0x80)
+			{
+				m_blitter->regs_w(3, regs[3]);
+				m_blitter->regs_w(4, regs[4]);
+				m_blitter->regs_w(5, regs[5]);
+			}
+		}
+		m_blitter->regs_w(offset, data);
+	}));
 	map(0x14100, 0x14100).w(FUNC(dynax_state::tenkai_dswsel_w));
 	map(0x14180, 0x14180).r(FUNC(dynax_state::mjtkp2_dsw_r));
-	map(0x14200, 0x14200).w(m_blitter, FUNC(dynax_blitter_rev2_device::pen_w)); // maybe
-	map(0x14210, 0x14210).w(FUNC(dynax_state::dynax_blit_dest_w)); // maybe
-	map(0x14220, 0x14220).w(FUNC(dynax_state::dynax_blit_palette23_w)); // maybe
-	map(0x14230, 0x14230).w(FUNC(dynax_state::dynax_blit_palette01_w)); // maybe
-	map(0x14240, 0x14240).w(FUNC(dynax_state::hanamai_priority_w));        // layer priority and enable
-	map(0x14250, 0x14250).w(FUNC(dynax_state::dynax_blit_backpen_w)); // maybe
-	map(0x14260, 0x14260).lw8(NAME([this] (uint8_t data) { if (data) logerror("%s unk $14260 write: %02x\n", machine().describe_context(), data); }));  // writes 0x80 sometimes
+	map(0x14200, 0x14200).lw8(NAME([this] (u8 data) {
+		m_blitter->pen_w(data);
+	}));
+	map(0x14210, 0x14210).lw8(NAME([this] (u8 data) {
+		dynax_blit_dest_w(data);
+	}));
+	map(0x14220, 0x14220).lw8(NAME([this] (u8 data) {
+		m_blit_palettes = (m_blit_palettes & 0xf00f) | ((data & 0xf0) << 4) | ((data & 0x0f) << 4);
+	}));
+	map(0x14230, 0x14230).lw8(NAME([this] (u8 data) {
+		m_blit_palettes = (m_blit_palettes & 0x0ff0) | ((data & 0x0f) << 12) | ((data & 0xf0) >> 4);
+	map(0x14240, 0x14240).lw8(NAME([this] (u8 data) {
+		m_hanamai_priority = ((data & 0x07) << 4) | (data >> 4);
+		m_priority_table = priority_mjtkp2;
+	}));
+	map(0x14250, 0x14250).lw8(NAME([this] (u8 data) {
+		dynax_blit_backpen_w(data);
+	}));
+	map(0x14260, 0x14260).lw8(NAME([this] (uint8_t data) {
+		m_u260_last = data;
+	}));
 	map(0x14280, 0x142ff).lw8(NAME([this] (offs_t offset, u8 data) { m_mainlatch->write_d1(offset >> 4, data); }));
 	map(0x14310, 0x14310).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x14320, 0x14320).w("aysnd", FUNC(ay8910_device::address_w));
@@ -4654,10 +4684,29 @@ void dynax_state::mjreach(machine_config &config)
 
 void dynax_state::mjtkp2(machine_config &config)
 {
+	fprintf(stderr, "[MJTKP2] FIX E5\n");
 	ougonhaib1(config);
 
-	tmp91640_device &tmp = downcast<tmp91640_device &>(*m_maincpu);
+	TMP91C640(config.replace(), m_maincpu, 21472700 / 2);
+	tmp91c640_device &tmp = downcast<tmp91c640_device &>(*m_maincpu);
 	tmp.set_addrmap(AS_PROGRAM, &dynax_state::mjtkp2_map);
+	tmp.port_read<3>().set(FUNC(dynax_state::tenkai_p3_r));
+	tmp.port_write<3>().set(FUNC(dynax_state::tenkai_p3_w));
+	tmp.port_write<4>().set(FUNC(dynax_state::tenkai_p4_w));
+	tmp.port_read<5>().set(FUNC(dynax_state::tenkai_p5_r));
+	tmp.port_write<6>().set(FUNC(dynax_state::tenkai_p6_w));
+	tmp.port_write<7>().set(FUNC(dynax_state::ougonhai_p7_w));
+	tmp.port_read<8>().set(FUNC(dynax_state::tenkai_p8_r));
+	tmp.port_write<8>().set(FUNC(dynax_state::tenkai_p8_w));
+
+	m_blitter->scrollx_cb().set([this] (u8 data) {
+		m_blit_scroll_x = ((data ^ 0xff) + 1) & 0xff;
+		m_extra_scroll_x = m_blit_scroll_x;
+	});
+	m_blitter->scrolly_cb().set([this] (u8 data) {
+		m_blit_scroll_y = data ^ 0xff;
+		m_extra_scroll_y = m_blit_scroll_y;
+	});
 
 	m_bankdev->set_map(&dynax_state::mjtkp2_banked_map);
 }
