@@ -234,6 +234,8 @@ private:
 	bool machine_type_48() const { return m_nr_03_machine_type == 0 || m_nr_03_machine_type == 1; }
 	bool machine_type_128() const { return m_nr_03_machine_type == 2 || m_nr_03_machine_type == 4; }
 	bool machine_type_p3() const { return !machine_type_48() && !machine_type_128(); }
+	// 32 cycles for 48K/+3 timing, 36 for 128K/Pentagon
+	u8 irq_pulse_cycles() const { return (BIT(m_eff_nr_03_machine_timing, 2) || (BIT(m_eff_nr_03_machine_timing, 1) && !BIT(m_eff_nr_03_machine_timing, 0))) ? 36 : 32; }
 
 	bool nmi_assert_mf() { return ((m_io_nmi->read() & 1) || m_nr_02_generate_mf_nmi) && m_nr_06_button_m1_nmi_en; }
 	bool nmi_assert_divmmc() { return ((m_io_nmi->read() & 2) || m_nr_02_generate_divmmc_nmi) && m_nr_06_button_drive_nmi_en; }
@@ -1210,6 +1212,8 @@ void specnext_state::ulatm_w(u8 data)
 
 void specnext_state::port_7ffd_reg_w(u8 data)
 {
+	if (BIT(m_port_7ffd_data ^ data, 3))
+		m_screen->update_now();
 	m_port_7ffd_data = data;
 	m_ula_scr->ula_shadow_en_w(port_7ffd_shadow());
 }
@@ -2769,7 +2773,7 @@ TIMER_CALLBACK_MEMBER(specnext_state::irq_on)
 	LOGINTVVV("<ULA/Frame IRQ>\n");
 	m_im2_ula->irq_w(ASSERT_LINE);
 	if (m_nr_c0_int_mode_pulse_0_im2_1 == 0)
-		m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
+		m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(irq_pulse_cycles()));
 }
 
 TIMER_CALLBACK_MEMBER(specnext_state::line_irq_on)
@@ -2778,12 +2782,13 @@ TIMER_CALLBACK_MEMBER(specnext_state::line_irq_on)
 	LOGINTVVV("<Line IRQ>\n");
 	m_im2_line->irq_w(ASSERT_LINE);
 	if (m_nr_c0_int_mode_pulse_0_im2_1 == 0)
-		m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
+		m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(irq_pulse_cycles()));
 }
 
 void specnext_state::irq_w(int state)
 {
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
+	if (!(m_nr_c0_int_mode_pulse_0_im2_1 == 0 && state == CLEAR_LINE && m_irq_off_timer->enabled()))
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 
 	const std::array<int, 10> states =
 	{
