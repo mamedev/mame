@@ -10,7 +10,9 @@ DEFINE_DEVICE_TYPE(KN6000_EXPANSION, kn6000_expansion_connector, "kn6000_expansi
 
 kn6000_expansion_connector::kn6000_expansion_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, KN6000_EXPANSION, tag, owner, clock)
-	, device_single_card_slot_interface<device_kn6000_expansion_interface>(mconfig, *this)
+	, device_single_card_slot_interface<device_kn6000_expansion_interface>(mconfig, *this),
+	m_write_hdd_int(*this),
+	m_write_pp_int(*this)
 {
 }
 
@@ -26,4 +28,11 @@ device_kn6000_expansion_interface::device_kn6000_expansion_interface(const machi
 void kn6000_expansion_intf(device_slot_interface &device)
 {
 	device.option_add("hdsx3", HDSX3);
+}
+
+void kn6000_expansion_connector::program_map(address_space_installer &space)
+{
+	device_kn6000_expansion_interface *const card = get_card_device();
+	if (card)
+		card->program_map(space);
 }

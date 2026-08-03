@@ -8,6 +8,22 @@
     An optional unit, rarely encountered. No example has been available for
     inspection, so nothing here is derived from the hardware itself.
 
+    Technics fitted an expansion connector of this kind across the whole KN
+    line, each generation with its own board, so this is one of a family
+    rather than a one-off:
+
+        SX-KN1000  MEC1000     memory expansion, EPROM and SRAM
+        SX-KN3000  HD-HSO3000
+        SX-KN5000  HD-AE5000   emulated in bus/technics/kn5000/hdae5000.cpp
+        SX-KN6000  HD-SX3      this device
+        SX-KN6500  HD-SX3
+
+    The HD-AE5000 is the closest reference and the only one modelled so far.
+    Its layout matches what is described below: firmware ROM low in the card
+    window, static RAM above it, an ATA interface and a parallel port, and
+    serial audio driven from the host's clocks so the unit can provide its own
+    outputs. Expect the HD-SX3 to follow the same pattern.
+
     What is known comes from three places. The KN6500 service manual shows the
     expansion connector CN106, 70 pins, labelled "TO HDD", carrying HDDCS,
     HDDINT, PP.INT, the audio clocks DACCK/BCK/LRCK, the DO1/DO2 outputs, the
@@ -46,11 +62,17 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void program_map(address_space_installer &space) override;
+
+private:
+	void card_map(address_map &map) ATTR_COLD;
+	required_memory_region m_rom;
 };
 
 hdsx3_device::hdsx3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HDSX3, tag, owner, clock)
 	, device_kn6000_expansion_interface(mconfig, *this)
+	, m_rom(*this, "rom")
 {
 }
 
@@ -58,9 +80,36 @@ void hdsx3_device::device_start()
 {
 }
 
+void hdsx3_device::program_map(address_space_installer &space)
+{
+	space.install_device(0x97800000, 0x978fffff, *this, &hdsx3_device::card_map);
+}
+
+void hdsx3_device::card_map(address_map &map)
+{
+	// The firmware links at 0x97800000 -- its startup code clears BSS at 0x979126D8
+	// and copies its data segment from 0x978B3E84, both of which only resolve if the
+	// image is seen at that base. CN106 selects the unit with HDD.CS.
+	map(0x000000, 0x0bffff).rom().region(m_rom, 0);
+
+	// Work RAM. The startup copies its data segment to 0x97910000 and clears BSS at
+	// 0x979126D8, so RAM must exist above the ROM. Scanning the image for constants
+	// past the ROM end bounds it: dense references across 0x97910000..0x979AFFFF
+	// (0x9791 alone accounts for 992 of them), which is the window mapped here.
+	// The HD-AE5000 carries 2 x 256 KB SRAM in the same role.
+	// NOTE: the exact device size is not established -- only the range the firmware
+	// actually touches. A separate cluster at 0x97F8xxxx (63 refs) is more likely
+	// memory-mapped I/O than RAM and is deliberately NOT mapped here.
+	map(0x100000, 0x1affff).ram().share("ram");
+}
+
 ROM_START(hdsx3)
-	ROM_REGION32_LE(0xc0000, "firmware", 0)
-	ROM_LOAD("hd-sx3_v1_1.bin", 0x000000, 0x0c0000, CRC(83b8a6f1) SHA1(88699a7e9584e0c30c175babd1482e5aa586ad3d))
+	ROM_REGION32_LE(0xc0000, "rom", 0)
+	ROM_DEFAULT_BIOS("v1.1")
+
+	// The image identifies itself: "Version: 1.1 (REV3) Date: 07-21-2001".
+	ROM_SYSTEM_BIOS(0, "v1.1", "Version 1.1 (REV3) - July 21st, 2001")
+	ROMX_LOAD("hd-sx3_v1_1.bin", 0x000000, 0x0c0000, CRC(83b8a6f1) SHA1(88699a7e9584e0c30c175babd1482e5aa586ad3d), ROM_BIOS(0))
 ROM_END
 
 const tiny_rom_entry *hdsx3_device::device_rom_region() const
