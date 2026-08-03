@@ -124,7 +124,7 @@ $(WIM_OBJS): ../../Archive/Wim/$(*B).cpp
 
 !IFDEF ZIP_OBJS
 $(ZIP_OBJS): ../../Archive/Zip/$(*B).cpp
-	$(COMPL)
+	$(COMPL) $(ZIP_FLAGS)
 !ENDIF
 
 !IFDEF COMPRESS_OBJS
@@ -149,7 +149,7 @@ $(AGENT_OBJS): ../../UI/Agent/$(*B).cpp
 
 !IFDEF CONSOLE_OBJS
 $(CONSOLE_OBJS): ../../UI/Console/$(*B).cpp
-	$(COMPL)
+	$(COMPL) $(CONSOLE_VARIANT_FLAGS)
 !ENDIF
 
 !IFDEF EXPLORER_OBJS
@@ -191,7 +191,7 @@ $(C_OBJS): ../../../../C/$(*B).c
 {../../UI/Agent}.cpp{$O}.obj::
 	$(COMPLB)
 {../../UI/Console}.cpp{$O}.obj::
-	$(COMPLB)
+	$(COMPLB) $(CONSOLE_VARIANT_FLAGS)
 {../../UI/Explorer}.cpp{$O}.obj::
 	$(COMPLB)
 {../../UI/FileManager}.cpp{$O}.obj::
@@ -226,7 +226,7 @@ $(C_OBJS): ../../../../C/$(*B).c
 {../../Archive/Wim}.cpp{$O}.obj::
 	$(COMPLB)
 {../../Archive/Zip}.cpp{$O}.obj::
-	$(COMPLB)
+	$(COMPLB) $(ZIP_FLAGS)
 
 {../../Compress}.cpp{$O}.obj::
 	$(COMPLB_O2)

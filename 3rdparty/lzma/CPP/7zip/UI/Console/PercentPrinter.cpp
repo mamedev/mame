@@ -88,6 +88,8 @@ void CPercentPrinter::GetPercents()
 
 void CPercentPrinter::Print()
 {
+  if (DisablePrint)
+    return;
   DWORD tick = 0;
   if (_tickStep != 0)
     tick = GetTickCount();
@@ -143,7 +145,7 @@ void CPercentPrinter::Print()
     _s.Add_Space();
 
     _tempU = FileName;
-    _so->Normalize_UString(_tempU);
+    _so->Normalize_UString_Path(_tempU);
     _so->Convert_UString_to_AString(_tempU, _temp);
     if (_s.Len() + _temp.Len() > MaxLen)
     {
@@ -157,7 +159,7 @@ void CPercentPrinter::Print()
         _tempU = FileName;
         _tempU.Delete(len / 2, _tempU.Len() - len);
         _tempU.Insert(len / 2, L" . ");
-        _so->Normalize_UString(_tempU);
+        _so->Normalize_UString_Path(_tempU);
         _so->Convert_UString_to_AString(_tempU, _temp);
         if (_s.Len() + _temp.Len() <= MaxLen)
           break;

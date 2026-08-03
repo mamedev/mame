@@ -183,7 +183,7 @@ bool CMultiOutStream::IsRestricted_for_Close(unsigned index) const
 FString CMultiOutStream::GetFilePath(unsigned index)
 {
   FString name;
-  name.Add_UInt32(index + 1);
+  name.Add_UInt32((UInt32)(index + 1));
   while (name.Len() < 3)
     name.InsertAtFront(FTEXT('0'));
   name.Insert(0, Prefix);
@@ -209,7 +209,7 @@ HRESULT CMultiOutStream::CloseStream(unsigned index)
 // we close stream and delete file, but we still keep item in Streams[] vector
 HRESULT CMultiOutStream::CloseStream_and_DeleteFile(unsigned index)
 {
-  PRF(printf("\n====== %u, CloseStream_AndDelete \n", index));
+  PRF(printf("\n====== %u, CloseStream_AndDelete \n", index))
   RINOK(CloseStream(index))
   FString path = GetFilePath(index);
   path += Streams[index].Postfix;
@@ -223,7 +223,7 @@ HRESULT CMultiOutStream::CloseStream_and_DeleteFile(unsigned index)
 
 HRESULT CMultiOutStream::CloseStream_and_FinalRename(unsigned index)
 {
-  PRF(printf("\n====== %u, CloseStream_and_FinalRename \n", index));
+  PRF(printf("\n====== %u, CloseStream_and_FinalRename \n", index))
   CVolStream &s = Streams[index];
   // HRESULT res = S_OK;
   bool mtime_WasSet = false;
@@ -261,6 +261,8 @@ HRESULT CMultiOutStream::CloseStream_and_FinalRename(unsigned index)
 
 HRESULT CMultiOutStream::PrepareToOpenNew()
 {
+  PRF(printf("PrepareToOpenNew NumListItems =%u,  NumOpenFiles_AllowedMax = %u \n", NumListItems, NumOpenFiles_AllowedMax))
+  
   if (NumListItems < NumOpenFiles_AllowedMax)
     return S_OK;
   /* when we create zip archive: in most cases we need only starting
@@ -270,7 +272,7 @@ HRESULT CMultiOutStream::PrepareToOpenNew()
   const int index = Head;
   if (index == -1)
     return E_FAIL;
-  PRF(printf("\n== %u, PrepareToOpenNew::CloseStream, NumListItems =%u \n", index, NumListItems));
+  PRF(printf("\n== %u, PrepareToOpenNew::CloseStream, NumListItems =%u \n", index, NumListItems))
   /* we don't expect non-restricted stream here in normal cases (if _restrict_Global was not changed).
      if there was non-restricted stream, it should be closed before */
   // if (!IsRestricted_for_Close(index)) return CloseStream_and_FinalRename(index);
@@ -280,7 +282,7 @@ HRESULT CMultiOutStream::PrepareToOpenNew()
 
 HRESULT CMultiOutStream::CreateNewStream(UInt64 newSize)
 {
-  PRF(printf("\n== %u, CreateNewStream, size =%u \n", Streams.Size(), (unsigned)newSize));
+  PRF(printf("\n== %u, CreateNewStream, size =%u \n", Streams.Size(), (unsigned)newSize))
 
   if (Streams.Size() >= k_NumVols_MAX)
     return E_INVALIDARG; // E_OUTOFMEMORY
@@ -358,7 +360,7 @@ HRESULT CMultiOutStream::CreateStreams_If_Required(unsigned streamIndex)
 
 HRESULT CMultiOutStream::ReOpenStream(unsigned streamIndex)
 {
-  PRF(printf("\n====== %u, ReOpenStream \n", streamIndex));
+  PRF(printf("\n====== %u, ReOpenStream \n", streamIndex))
   RINOK(PrepareToOpenNew())
   CVolStream &s = Streams[streamIndex];
 
@@ -370,7 +372,7 @@ HRESULT CMultiOutStream::ReOpenStream(unsigned streamIndex)
   s.Pos = 0;
 
   HRESULT hres;
-  if (s.StreamSpec->Open(path, OPEN_EXISTING))
+  if (s.StreamSpec->Open_EXISTING(path))
   {
     if (s.Postfix.IsEmpty())
     {
@@ -384,6 +386,7 @@ HRESULT CMultiOutStream::ReOpenStream(unsigned streamIndex)
     {
       if (realSize == s.RealSize)
       {
+        PRF(printf("\n ReOpenStream OK realSize = %u\n", (unsigned)realSize))
         InsertToLinkedList(streamIndex);
         return S_OK;
       }
@@ -412,7 +415,7 @@ HRESULT CMultiOutStream::OptReOpen_and_SetSize(unsigned index, UInt64 size)
   {
     RINOK(ReOpenStream(index))
   }
-  PRF(printf("\n== %u, OptReOpen_and_SetSize, size =%u RealSize = %u\n", index, (unsigned)size, (unsigned)s.RealSize));
+  PRF(printf("\n== %u, OptReOpen_and_SetSize, size =%u RealSize = %u\n", index, (unsigned)size, (unsigned)s.RealSize))
   // comment it to debug tail after data
   return s.SetSize2(size);
 }
@@ -440,7 +443,7 @@ Note: we don't remove zero sized first volume, if (_length == 0)
 
 HRESULT CMultiOutStream::Normalize_finalMode(bool finalMode)
 {
-  PRF(printf("\n== Normalize_finalMode: _length =%d \n", (unsigned)_length));
+  PRF(printf("\n== Normalize_finalMode: _length =%d \n", (unsigned)_length))
   
   unsigned i = Streams.Size();
 
@@ -579,7 +582,7 @@ Z7_COM7F_IMF(CMultiOutStream::SetSize(UInt64 newSize))
   else if (newSize < _restrict_Global)
     _restrict_Global = newSize;
 
-  PRF(printf("\n== SetSize, size =%u \n", (unsigned)newSize));
+  PRF(printf("\n== CMultiOutStream::SetSize, size =%u \n", (unsigned)newSize))
 
   _length = newSize;
   return Normalize_finalMode(false);
@@ -595,6 +598,9 @@ Z7_COM7F_IMF(CMultiOutStream::Write(const void *data, UInt32 size, UInt32 *proce
     *processedSize = 0;
   if (size == 0)
     return S_OK;
+
+  PRF(printf("\n -- CMultiOutStream::Write() : _absPos = %6u, size =%6u \n",
+      (unsigned)_absPos, (unsigned)size))
 
   if (_absPos > _length)
   {
@@ -648,7 +654,7 @@ Z7_COM7F_IMF(CMultiOutStream::Write(const void *data, UInt32 size, UInt32 *proce
     CVolStream &s = Streams[_streamIndex];
 
     PRF(printf("\n%d, == Write : Pos = %u, RealSize = %u size =%u \n",
-        _streamIndex, (unsigned)s.Pos, (unsigned)s.RealSize, size));
+        _streamIndex, (unsigned)s.Pos, (unsigned)s.RealSize, size))
 
     if (!s.Stream)
     {
@@ -712,7 +718,7 @@ Z7_COM7F_IMF(CMultiOutStream::Write(const void *data, UInt32 size, UInt32 *proce
 
 Z7_COM7F_IMF(CMultiOutStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition))
 {
-  PRF(printf("\n-- Seek seekOrigin=%u Seek =%u\n", seekOrigin, (unsigned)offset));
+  PRF(printf("\n-- CMultiOutStream::Seek seekOrigin=%u Seek =%u\n", seekOrigin, (unsigned)offset))
 
   switch (seekOrigin)
   {
@@ -753,7 +759,7 @@ unsigned CMultiOutStream::GetStreamIndex_for_Offset(UInt64 offset, UInt64 &relOf
   const UInt64 size = Sizes[last];
   const UInt64 v = offset / size;
   if (v >= ((UInt32)(Int32)-1) - last)
-    return (UInt32)(Int32)-1; // saturation
+    return (unsigned)(int)-1; // saturation
   relOffset = offset - (unsigned)v * size;
   return last + (unsigned)(v);
 }
@@ -765,7 +771,7 @@ Z7_COM7F_IMF(CMultiOutStream::SetRestriction(UInt64 begin, UInt64 end))
 
   // begin = end = 0; // for debug
 
-  PRF(printf("\n==================== CMultiOutStream::SetRestriction %u, %u\n", (unsigned)begin, (unsigned)end));
+  PRF(printf("\n==================== CMultiOutStream::SetRestriction %u, %u\n", (unsigned)begin, (unsigned)end))
   if (begin > end)
   {
     // these value are FAILED values.

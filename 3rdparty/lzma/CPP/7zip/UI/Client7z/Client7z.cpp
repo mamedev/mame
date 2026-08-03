@@ -23,6 +23,11 @@
 
 #include "../../Archive/IArchive.h"
 
+#if 0
+// for password request functions:
+#include "../../UI/Console/UserInputUtils.h"
+#endif
+
 #include "../../IPassword.h"
 #include "../../../../C/7zVersion.h"
 
@@ -31,6 +36,8 @@ extern
 HINSTANCE g_hInstance;
 HINSTANCE g_hInstance = NULL;
 #endif
+
+Z7_DIAGNOSTIC_IGNORE_CAST_FUNCTION
 
 // You can find full list of all GUIDs supported by 7-Zip in Guid.txt file.
 // 7z format GUID: {23170F69-40C1-278A-1000-000110070000}
@@ -205,10 +212,13 @@ Z7_COM7F_IMF(CArchiveOpenCallback::CryptoGetTextPassword(BSTR *password))
   if (!PasswordIsDefined)
   {
     // You can ask real password here from user
-    // Password = GetPassword(OutStream);
-    // PasswordIsDefined = true;
+#if 0
+    RINOK(GetPassword_HRESULT(&g_StdOut, Password))
+    PasswordIsDefined = true;
+#else
     PrintError("Password is not defined");
     return E_ABORT;
+#endif
   }
   return StringToBstr(Password, password);
 }
@@ -468,7 +478,7 @@ Z7_COM7F_IMF(CArchiveExtractCallback::GetStream(UInt32 index,
     
     _outFileStreamSpec = new COutFileStream;
     CMyComPtr<ISequentialOutStream> outStreamLoc(_outFileStreamSpec);
-    if (!_outFileStreamSpec->Open(fullProcessedPath, CREATE_ALWAYS))
+    if (!_outFileStreamSpec->Create_ALWAYS(fullProcessedPath))
     {
       PrintError("Cannot open output file", fullProcessedPath);
       return E_ABORT;
@@ -574,11 +584,14 @@ Z7_COM7F_IMF(CArchiveExtractCallback::CryptoGetTextPassword(BSTR *password))
 {
   if (!PasswordIsDefined)
   {
+#if 0
     // You can ask real password here from user
-    // Password = GetPassword(OutStream);
-    // PasswordIsDefined = true;
+    RINOK(GetPassword_HRESULT(&g_StdOut, Password))
+    PasswordIsDefined = true;
+#else
     PrintError("Password is not defined");
     return E_ABORT;
+#endif
   }
   return StringToBstr(Password, password);
 }
@@ -773,7 +786,7 @@ Z7_COM7F_IMF(CArchiveUpdateCallback::GetVolumeStream(UInt32 index, ISequentialOu
   fileName += VolExt;
   COutFileStream *streamSpec = new COutFileStream;
   CMyComPtr<ISequentialOutStream> streamLoc(streamSpec);
-  if (!streamSpec->Create(us2fs(fileName), false))
+  if (!streamSpec->Create_NEW(us2fs(fileName)))
     return GetLastError_noZero_HRESULT();
   *volumeStream = streamLoc.Detach();
   return S_OK;
@@ -785,11 +798,13 @@ Z7_COM7F_IMF(CArchiveUpdateCallback::CryptoGetTextPassword2(Int32 *passwordIsDef
   {
     if (AskPassword)
     {
-      // You can ask real password here from user
-      // Password = GetPassword(OutStream);
-      // PasswordIsDefined = true;
+#if 0
+      RINOK(GetPassword_HRESULT(&g_StdOut, Password))
+      PasswordIsDefined = true;
+#else
       PrintError("Password is not defined");
       return E_ABORT;
+#endif
     }
   }
   *passwordIsDefined = BoolToInt(PasswordIsDefined);
@@ -838,6 +853,14 @@ int Z7_CDECL main(int numArgs, const char *args[])
     PrintError("Cannot load 7-zip library");
     return 1;
   }
+
+#if defined(__clang__)
+#pragma GCC diagnostic ignored "-Wc++98-compat-pedantic"
+#endif
+
+#ifdef _WIN32
+Z7_DIAGNOSTIC_IGNORE_CAST_FUNCTION
+#endif
 
   Func_CreateObject
      f_CreateObject = Z7_GET_PROC_ADDRESS(
@@ -929,7 +952,7 @@ int Z7_CDECL main(int numArgs, const char *args[])
 
     COutFileStream *outFileStreamSpec = new COutFileStream;
     CMyComPtr<IOutStream> outFileStream = outFileStreamSpec;
-    if (!outFileStreamSpec->Create(archiveName, false))
+    if (!outFileStreamSpec->Create_NEW(archiveName))
     {
       PrintError("can't create archive file");
       return 1;
@@ -1058,7 +1081,7 @@ int Z7_CDECL main(int numArgs, const char *args[])
           // Get uncompressed size of file
           NCOM::CPropVariant prop;
           archive->GetProperty(i, kpidSize, &prop);
-          char s[32];
+          char s[64];
           ConvertPropVariantToShortString(prop, s);
           Print(s);
           Print("  ");

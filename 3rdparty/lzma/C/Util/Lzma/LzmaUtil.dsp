@@ -122,6 +122,10 @@ SOURCE=..\..\Compiler.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\CpuArch.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\CpuArch.h
 # End Source File
 # Begin Source File

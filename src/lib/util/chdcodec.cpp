@@ -1311,7 +1311,7 @@ uint32_t chd_lzma_compressor::compress(const uint8_t *src, uint32_t srclen, uint
 void chd_lzma_compressor::configure_properties(CLzmaEncProps &props, uint32_t hunkbytes)
 {
 	LzmaEncProps_Init(&props);
-	props.level = 8;
+	props.level = 6;
 	props.reduceSize = hunkbytes;
 	LzmaEncProps_Normalize(&props);
 }

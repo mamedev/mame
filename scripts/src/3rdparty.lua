@@ -833,7 +833,6 @@ project "7z"
 	configuration { "gmake or ninja" }
 		buildoptions_c {
 			"-Wno-error=undef",
-			"-Wno-error=strict-prototypes",
 		}
 if _OPTIONS["gcc"]~=nil then
 	if string.find(_OPTIONS["gcc"], "clang") then
