@@ -14,7 +14,7 @@ uint32_t arm_disassembler::ExtractImmediateOperand(uint32_t opcode) const
 	// rrrrbbbbbbbb
 	uint32_t imm = opcode & 0xff;
 	uint8_t r = ((opcode >> 8) & 0xf) * 2;
-	return rotr_32(imm, r);
+	return std::rotr(imm, r);
 }
 
 void arm_disassembler::WriteDataProcessingOperand(std::ostream &stream, uint32_t opcode, bool printOp0, bool printOp1, offs_t pc) const

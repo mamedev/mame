@@ -1177,41 +1177,41 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_BFXU, 4, 0):      // BFXU    dst,src,shift,width[,f]
-				PARAM0 = rotr_32(PARAM1, PARAM2 + PARAM3) >> (-int32_t(PARAM3) & 0x1f);
+				PARAM0 = std::rotr(PARAM1, PARAM2 + PARAM3) >> (-int32_t(PARAM3) & 0x1f);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_BFXU, 4, 1):
-				temp32 = rotr_32(PARAM1, PARAM2 + PARAM3) >> (-int32_t(PARAM3) & 0x1f);
+				temp32 = std::rotr(PARAM1, PARAM2 + PARAM3) >> (-int32_t(PARAM3) & 0x1f);
 				flags = FLAGS_NZ(temp32);
 				PARAM0 = temp32;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_BFXS, 4, 0):      // BFXS    dst,src,shift,width[,f]
-				PARAM0 = uint32_t(int32_t(rotr_32(PARAM1, PARAM2 + PARAM3)) >> (-int32_t(PARAM3) & 0x1f));
+				PARAM0 = uint32_t(int32_t(std::rotr(PARAM1, PARAM2 + PARAM3)) >> (-int32_t(PARAM3) & 0x1f));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_BFXS, 4, 1):
-				temp32 = uint32_t(int32_t(rotr_32(PARAM1, PARAM2 + PARAM3)) >> (-int32_t(PARAM3) & 0x1f));
+				temp32 = uint32_t(int32_t(std::rotr(PARAM1, PARAM2 + PARAM3)) >> (-int32_t(PARAM3) & 0x1f));
 				flags = FLAGS_NZ(temp32);
 				PARAM0 = temp32;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROLAND, 4, 0):    // ROLAND  dst,src,count,mask[,f]
-				PARAM0 = rotl_32(PARAM1, PARAM2) & PARAM3;
+				PARAM0 = std::rotl(PARAM1, PARAM2) & PARAM3;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROLAND, 4, 1):
-				temp32 = rotl_32(PARAM1, PARAM2) & PARAM3;
+				temp32 = std::rotl(PARAM1, PARAM2) & PARAM3;
 				flags = FLAGS_NZ(temp32);
 				PARAM0 = temp32;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROLINS, 4, 0):    // ROLINS  dst,src,count,mask[,f]
-				PARAM0 = (PARAM0 & ~PARAM3) | (rotl_32(PARAM1, PARAM2) & PARAM3);
+				PARAM0 = (PARAM0 & ~PARAM3) | (std::rotl(PARAM1, PARAM2) & PARAM3);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROLINS, 4, 1):
-				temp32 = (PARAM0 & ~PARAM3) | (rotl_32(PARAM1, PARAM2) & PARAM3);
+				temp32 = (PARAM0 & ~PARAM3) | (std::rotl(PARAM1, PARAM2) & PARAM3);
 				flags = FLAGS_NZ(temp32);
 				PARAM0 = temp32;
 				break;
@@ -1470,12 +1470,12 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROL, 4, 0):       // ROL     dst,src,count[,f]
-				PARAM0 = rotl_32(PARAM1, PARAM2);
+				PARAM0 = std::rotl(PARAM1, PARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROL, 4, 1):
 				shift = PARAM2 & 31;
-				temp32 = rotl_32(PARAM1, shift);
+				temp32 = std::rotl(PARAM1, shift);
 				flags = FLAGS_NZ(temp32);
 				if (shift != 0)
 					flags |= ((PARAM1 << (shift - 1)) >> 31) & FLAG_C;
@@ -1505,12 +1505,12 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROR, 4, 0):       // ROR     dst,src,count[,f]
-				PARAM0 = rotr_32(PARAM1, PARAM2);
+				PARAM0 = std::rotr(PARAM1, PARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROR, 4, 1):
 				shift = PARAM2 & 31;
-				temp32 = rotr_32(PARAM1, shift);
+				temp32 = std::rotr(PARAM1, shift);
 				flags = FLAGS_NZ(temp32);
 				if (shift != 0)
 					flags |= (PARAM1 >> (shift - 1)) & FLAG_C;
@@ -1879,41 +1879,41 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_BFXU, 8, 0):      // BFXU    dst,src,shift,width[,f]
-				DPARAM0 = rotr_64(DPARAM1, DPARAM2 + DPARAM3) >> (-int64_t(DPARAM3) & 0x3f);
+				DPARAM0 = std::rotr(DPARAM1, DPARAM2 + DPARAM3) >> (-int64_t(DPARAM3) & 0x3f);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_BFXU, 8, 1):
-				temp64 = rotr_64(DPARAM1, DPARAM2 + DPARAM3) >> (-int64_t(DPARAM3) & 0x3f);
+				temp64 = std::rotr(DPARAM1, DPARAM2 + DPARAM3) >> (-int64_t(DPARAM3) & 0x3f);
 				flags = FLAGS_NZ(temp64);
 				DPARAM0 = temp64;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_BFXS, 8, 0):      // BFXS    dst,src,shift,width[,f]
-				DPARAM0 = uint64_t(int64_t(rotr_64(DPARAM1, DPARAM2 + DPARAM3)) >> (-int64_t(DPARAM3) & 0x3f));
+				DPARAM0 = uint64_t(int64_t(std::rotr(DPARAM1, DPARAM2 + DPARAM3)) >> (-int64_t(DPARAM3) & 0x3f));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_BFXS, 8, 1):
-				temp64 = uint64_t(int64_t(rotr_64(DPARAM1, DPARAM2 + DPARAM3)) >> (-int64_t(DPARAM3) & 0x3f));
+				temp64 = uint64_t(int64_t(std::rotr(DPARAM1, DPARAM2 + DPARAM3)) >> (-int64_t(DPARAM3) & 0x3f));
 				flags = FLAGS_NZ(temp64);
 				DPARAM0 = temp64;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROLAND, 8, 0):    // DROLAND dst,src,count,mask[,f]
-				DPARAM0 = rotl_64(DPARAM1, DPARAM2) & DPARAM3;
+				DPARAM0 = std::rotl(DPARAM1, DPARAM2) & DPARAM3;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROLAND, 8, 1):
-				temp64 = rotl_64(DPARAM1, DPARAM2) & DPARAM3;
+				temp64 = std::rotl(DPARAM1, DPARAM2) & DPARAM3;
 				flags = FLAGS_NZ(temp64);
 				DPARAM0 = temp64;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROLINS, 8, 0):    // DROLINS dst,src,count,mask[,f]
-				DPARAM0 = (DPARAM0 & ~DPARAM3) | (rotl_64(DPARAM1, DPARAM2) & DPARAM3);
+				DPARAM0 = (DPARAM0 & ~DPARAM3) | (std::rotl(DPARAM1, DPARAM2) & DPARAM3);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROLINS, 8, 1):
-				temp64 = (DPARAM0 & ~DPARAM3) | (rotl_64(DPARAM1, DPARAM2) & DPARAM3);
+				temp64 = (DPARAM0 & ~DPARAM3) | (std::rotl(DPARAM1, DPARAM2) & DPARAM3);
 				flags = FLAGS_NZ(temp64);
 				DPARAM0 = temp64;
 				break;
@@ -2148,12 +2148,12 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROL, 8, 0):       // DROL    dst,src,count[,f]
-				DPARAM0 = rotl_64(DPARAM1, DPARAM2);
+				DPARAM0 = std::rotl(DPARAM1, DPARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROL, 8, 1):
 				shift = DPARAM2 & 63;
-				temp64 = rotl_64(DPARAM1, shift);
+				temp64 = std::rotl(DPARAM1, shift);
 				flags = FLAGS_NZ(temp64);
 				if (shift != 0)
 					flags |= ((DPARAM1 << (shift - 1)) >> 63) & FLAG_C;
@@ -2183,12 +2183,12 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROR, 8, 0):       // DROR    dst,src,count[,f]
-				DPARAM0 = rotr_64(DPARAM1, DPARAM2);
+				DPARAM0 = std::rotr(DPARAM1, DPARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROR, 8, 1):
 				shift = DPARAM2 & 63;
-				temp64 = rotr_64(DPARAM1, shift);
+				temp64 = std::rotr(DPARAM1, shift);
 				flags = FLAGS_NZ(temp64);
 				if (shift != 0)
 					flags |= (DPARAM1 >> (shift - 1)) & FLAG_C;

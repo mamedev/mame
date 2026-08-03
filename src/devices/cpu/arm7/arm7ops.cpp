@@ -151,7 +151,7 @@ uint32_t arm7_cpu_device::decodeShift(uint32_t insn, uint32_t *pCarry)
 			{
 				if (pCarry)
 					*pCarry = rm & (1 << (k - 1));
-				return rotr_32(rm, k);
+				return std::rotr(rm, k);
 			}
 			else
 			{
@@ -849,7 +849,7 @@ void arm7_cpu_device::HandlePSRTransfer(uint32_t insn)
 			// Value can be specified for a Right Rotate, 2x the value specified.
 			int by = (insn & INSN_OP2_ROTATE) >> INSN_OP2_ROTATE_SHIFT;
 			if (by)
-				val = rotr_32(insn & INSN_OP2_IMM, by << 1);
+				val = std::rotr<uint32_t>(insn & INSN_OP2_IMM, by << 1);
 			else
 				val = insn & INSN_OP2_IMM;
 		}
@@ -959,7 +959,7 @@ void arm7_cpu_device::HandleALU(uint32_t insn)
 		by = (insn & INSN_OP2_ROTATE) >> INSN_OP2_ROTATE_SHIFT;
 		if (by)
 		{
-			op2 = rotr_32(insn & INSN_OP2_IMM, by << 1);
+			op2 = std::rotr<uint32_t>(insn & INSN_OP2_IMM, by << 1);
 			sc = op2 & SIGN_BIT;
 		}
 		else

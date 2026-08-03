@@ -496,7 +496,7 @@ void scudsp_cpu_device::op_alu(uint32_t opcode)
 			break;
 
 		case 0xf:   /* RL8 */
-			i3 = rotl_32(m_acl.si, 8);
+			i3 = std::rotl(m_acl.ui, 8);
 			m_alu = uint32_t(i3 & 0xffff'ffff) | (m_alu & 0xffff'0000'0000);
 			SET_Z(i3 == 0);
 			SET_S(i3 < 0);

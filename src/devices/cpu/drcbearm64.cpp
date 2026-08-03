@@ -3733,9 +3733,9 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 				// save some instructions by avoid mov to register by computing the ror and storing it into scratch directly
 				uint64_t result;
 				if (inst.size() == 4)
-					result = rotr_32(srcp.immediate(), rot);
+					result = std::rotr<uint32_t>(srcp.immediate(), rot);
 				else
-					result = rotr_64(srcp.immediate(), rot);
+					result = std::rotr<uint64_t>(srcp.immediate(), rot);
 
 				a.mov(scratch, result);
 				a.bfi(dst, scratch, lsb, pop);
@@ -3777,9 +3777,9 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 
 			uint64_t result;
 			if (inst.size() == 4)
-				result = rotl_32(srcp.immediate(), s) & maskp.immediate();
+				result = std::rotl<uint32_t>(srcp.immediate(), s) & maskp.immediate();
 			else
-				result = rotl_64(srcp.immediate(), s) & maskp.immediate();
+				result = std::rotl<uint64_t>(srcp.immediate(), s) & maskp.immediate();
 
 			if (result != 0)
 			{

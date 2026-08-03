@@ -2169,7 +2169,7 @@ uint32_t arm946es_cpu_device::arm7_cpu_read32(offs_t addr)
 		if (addr & 3)
 		{
 			uint32_t *wp = (uint32_t *)&ITCM[(addr & ~3)&0x7fff];
-			result = rotr_32(*wp, 8 * (addr & 3));
+			result = std::rotr(*wp, 8 * (addr & 3));
 		}
 		else
 		{
@@ -2182,7 +2182,7 @@ uint32_t arm946es_cpu_device::arm7_cpu_read32(offs_t addr)
 		if (addr & 3)
 		{
 			uint32_t *wp = (uint32_t *)&DTCM[(addr & ~3)&0x3fff];
-			result = rotr_32(*wp, 8 * (addr & 3));
+			result = std::rotr(*wp, 8 * (addr & 3));
 		}
 		else
 		{
@@ -2194,7 +2194,7 @@ uint32_t arm946es_cpu_device::arm7_cpu_read32(offs_t addr)
 	{
 		if (addr & 3)
 		{
-			result = rotr_32(m_program->read_dword(addr & ~3), 8 * (addr & 3));
+			result = std::rotr(m_program->read_dword(addr & ~3), 8 * (addr & 3));
 		}
 		else
 		{
@@ -2364,7 +2364,7 @@ uint32_t arm7_cpu_device::arm7_cpu_read32(offs_t addr)
 
 	if (addr & 3)
 	{
-		result = rotr_32(m_program->read_dword(addr & ~3), 8 * (addr & 3));
+		result = std::rotr(m_program->read_dword(addr & ~3), 8 * (addr & 3));
 	}
 	else
 	{

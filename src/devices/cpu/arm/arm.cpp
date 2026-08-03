@@ -263,12 +263,7 @@ uint32_t arm_cpu_device::cpu_read32( int addr )
 		if (ARM_DEBUG_CORE && !WORD_ALIGNED(addr))
 			logerror("%08x: Unaligned byte read %08x\n",R15,addr);
 
-		if ((addr&3)==1)
-			return rotr_32(result, 8);
-		if ((addr&3)==2)
-			return rotr_32(result, 16);
-		if ((addr&3)==3)
-			return rotr_32(result, 24);
+		return std::rotr(result, 8 * (addr&3));
 	}
 
 	return result;
@@ -784,7 +779,7 @@ void arm_cpu_device::HandleALU( uint32_t insn )
 		by = (insn & INSN_OP2_ROTATE) >> INSN_OP2_ROTATE_SHIFT;
 		if (by)
 		{
-			op2 = rotr_32(insn & INSN_OP2_IMM, by << 1);
+			op2 = std::rotr<uint32_t>(insn & INSN_OP2_IMM, by << 1);
 			sc = op2 & SIGN_BIT;
 		}
 		else
@@ -1338,7 +1333,7 @@ uint32_t arm_cpu_device::decodeShift(uint32_t insn, uint32_t *pCarry)
 		{
 			while (k > 32) k -= 32;
 			if (pCarry) *pCarry = rm & (1 << (k - 1));
-			return rotr_32(rm, k);
+			return std::rotr(rm, k);
 		}
 		else
 		{
