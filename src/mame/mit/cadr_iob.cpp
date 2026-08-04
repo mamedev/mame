@@ -493,11 +493,11 @@ void cadr_iob_device::map(address_map &map)
 	map(0x00 << 4, 0x00 << 4).lr16(NAME([this] {
 		// keyboard low
 		m_csr &= ~CSR_KEYBOARD_READY;
-		return m_keyboard_data & 0xffff;
+		return u16(m_keyboard_data);
 	})).umask32(0xffff);
 	map(0x01 << 4, 0x01 << 4).lr16(NAME([this] {
 		// keyboard high
-		return m_keyboard_data >> 16;
+		return u16(m_keyboard_data >> 16);
 	})).umask32(0xffff);
 	map(0x02 << 4, 0x02 << 4).lr16(NAME([this] {
 		// mouse y
@@ -507,19 +507,21 @@ void cadr_iob_device::map(address_map &map)
 		// ---x---- -------- - tail switch
 		// ----xxxx xxxxxxxx - Y position of the mouse
 		m_csr &= ~CSR_MOUSE_READY;
-		return ((m_mouse_buttons->read() & 0x07) << 12) | (m_mouse_y->read() & 0xfff);
+		return u16(((m_mouse_buttons->read() & 0x07) << 12) | (m_mouse_y->read() & 0xfff));
 	})).umask32(0xffff);
 	map(0x03 << 4, 0x03 << 4).lr16(NAME([this] {
 		// mouse x
 		// xx------ -------- - raw Y encoder inputs
 		// --xx---- -------- - raw X encoder inputs
 		// ----xxxx xxxxxxxx - X position of the mouse
-		return m_mouse_x->read() & 0xfff;
+		return u16(m_mouse_x->read() & 0xfff);
 	})).umask32(0xffff);
 	map(0x04 << 4, 0x04 << 4).lrw16(NAME([this] {
-		m_speaker_data ^= 1;
-		m_speaker->level_w(m_speaker_data);
-		return 0xffff;
+		if (!machine().side_effects_disabled()) {
+			m_speaker_data ^= 1;
+			m_speaker->level_w(m_speaker_data);
+		}
+		return u16(0xffff);
 	}), NAME([this] (u16 data) {
 		m_speaker_data ^= 1;
 		m_speaker->level_w(m_speaker_data);
@@ -532,15 +534,15 @@ void cadr_iob_device::map(address_map &map)
 	map(0x08 << 4, 0x08 << 4).lr16(NAME([this] {
 		// microsecond counter low
 		m_microsecond_clock_buffer = machine().time().as_ticks(1e6);
-		return m_microsecond_clock_buffer & 0xffff;
+		return u16(m_microsecond_clock_buffer);
 	})).umask32(0xffff);
 	map(0x09 << 4, 0x09 << 4).lr16(NAME([this] {
 		// microsecond counter high
-		return m_microsecond_clock_buffer >> 16;
+		return u16(m_microsecond_clock_buffer >> 16);
 	})).umask32(0xffff);
 	map(0x0a << 4, 0x0a << 4).lrw16(NAME([this] {
 		// 60hz clock
-		return machine().time().as_ticks(60) & 0xffff;
+		return u16(machine().time().as_ticks(60));
 	}),NAME([this] (u16 data) {
 		m_csr &= ~CSR_CLOCK_READY;
 		m_clock = data;
@@ -601,7 +603,7 @@ void cadr_iob_device::map(address_map &map)
 	})).umask32(0xffff);
 	map(0x11 << 4, 0x11 << 4).lrw16(NAME([this] {
 		// chaos net my address
-		return m_my_chaos_address->read();
+		return u16(m_my_chaos_address->read());
 	}),NAME([this] (u16 data) {
 		// store word in transmit buffer
 		m_chaos_transmit_buffer[m_chaos_transmit_pointer] = data;
@@ -631,7 +633,7 @@ void cadr_iob_device::map(address_map &map)
 	map(0x15 << 4, 0x15 << 4).lr16(NAME([this] {
 		 // host number of this interface
 		chaos_transmit_start();
-		return m_my_chaos_address->read();
+		return u16(m_my_chaos_address->read());
 	})).umask32(0xffff);
 }
 
