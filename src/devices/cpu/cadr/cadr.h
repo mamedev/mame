@@ -11,7 +11,7 @@ class cadr_cpu_device : public cpu_device
 public:
 	cadr_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void diag_map(address_map &map);
+	void diag_map(address_map &map) ATTR_COLD;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
