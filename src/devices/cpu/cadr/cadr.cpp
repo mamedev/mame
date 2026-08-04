@@ -855,7 +855,8 @@ void cadr_cpu_device::execute_byte()
 {
 	// TODO Misc functions
 	u8 rotation = m_ir & 0x1f;
-	if (((m_ir >> 10) & 0x03) == 0x03) {
+	if (((m_ir >> 10) & 0x03) == 0x03)
+	{
 		if (BIT(m_ic, 29))
 		{
 			rotation = rotation ^ ((BIT(m_lc, 1) ^ BIT(m_lc, 0)) << 4);
