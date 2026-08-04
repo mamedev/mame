@@ -20,7 +20,7 @@ public:
 	template <typename T> void set_data_space(T &&tag, int spacenum) { m_data_space.set_tag(std::forward<T>(tag), spacenum); }
 	auto irq_callback() { return m_irq_cb.bind(); }
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
