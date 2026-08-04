@@ -50,7 +50,6 @@ license:CC0-1.0
  examples: T-7663G, T-20506G, T-18716G, T-3104G, T-15024G)
 
 - 2do Arukoto wa Sando-R (Japan) (Satakore) [T-6804G]
-- Advanced Variable Geo (Japan) (Genteiban) [T-32506G]
 - Advanced World War: Sennen Teikoku no Metsubou (Japan) (Satakore) [GS-9190]
 - Air Management '96 (Japan) (Koei the Best) [T-7668G]
 - Albert Odyssey Gaiden: Legend of Eldean (Japan) (Satakore) [T-1517G]
@@ -1207,13 +1206,13 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- The Genteiban box contains the same disc. -->
 	<!-- Game crashes in the intro of Chapter 2 of Story Mode, has some transparency and color issues in some places. -->
 	<software name="avg" supported="no">
 		<description>Advanced V.G. (Japan)</description>
 		<year>1997</year>
 		<publisher>TGL</publisher>
-		<info name="serial" value="T-32501G, T-32506G"/>
+		<!-- The Genteiban box contains the same disc. -->
+		<info name="serial" value="T-32501G, T-32506G (Genteiban)"/>
 		<info name="release" value="19970314"/>
 		<info name="alt_title" value="アドヴァンスド ヴァリアブル・ジオ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>

@@ -574,7 +574,7 @@ TIMER_CALLBACK_MEMBER(smpc_hle_device::handle_command)
 			return;
 	}
 
-	LOGMASKED(LOG_COMMAND, "acknowledge for command %02x\n", m_comreg);
+//	LOGMASKED(LOG_COMMAND, "acknowledge for command %02x\n", m_comreg);
 	m_command_in_progress = false;
 	m_oreg[31] = m_comreg;
 	sf_ack(false);

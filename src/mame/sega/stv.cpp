@@ -10,18 +10,19 @@ TODO:
 - colmns97: https://mametesters.org/view.php?id=4187 extremely illegal SCU DMA transfers targeting
   SCSP area, saturn:columns port has no problem with those.
 
+- wwshin: same sound bug as above, requires analog conversion with sega_315_5649_device
+
 - smleague / finlarch: it randomly hangs / crashes, it works if you use a ridiculous
   set_maximum_quantum() number, might need strict SH-2 synching or it's actually a m68k comms issue.
 
-- danchih / danchiq: currently hangs on title screen due of sound miscomms.
-  Writes to A-Bus (cache?), transfer "SEGA" defaults to sound RAM thru indirect mode SCU DMA,
-  SH-2 loops until $60ffcbd become 0x04 (sets 0x08 then never clear the flag, missed event from SCSP?)
+- danchih / danchiq: https://mametesters.org/view.php?id=6270 (should be fixed?)
 
 - stress: accesses the Sound Memory Expansion Area (0x05a80000-0x05afffff), unknown purpose if any;
 
 - critcrsh: 2 digits 7-seg LED stuck on hi-score during gameplay, has optional ticket dispenser;
   Reference video: https://www.youtube.com/watch?v=O9PyIKdSFnU
 
+- myfairld: https://mametesters.org/view.php?id=2642 (currently also draws VDP1 very badly)
 
 ***************************************************************************************************/
 
@@ -4025,7 +4026,7 @@ GAME( 1995, kiwames,   stvbios, stvmp,    stvmp,    stv_state,   init_stv,      
 GAME( 1997, maruchan,  stvbios, stv,      stv,      stv_state,   init_maruchan,   ROT0,   "Sega / Toyosuisan",            "Maru-Chan de Goo! (J 971216 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, mausuke,   stvbios, stv,      stv,      stv_state,   init_mausuke,    ROT0,   "Data East Corporation",        "Mausuke no Ojama the World (J 960314 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, micrombc,  stvbios, hopper,   micrombc, stv_state,   init_stv,        ROT0,   "Sega",                         "Microman Battle Charge (J 990326 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, myfairld,  stvbios, stvmp,    myfairld, stv_state,   init_stv,        ROT0,   "Micronet",                     "Virtual Mahjong 2 - My Fair Lady (J 980608 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // https://mametesters.org/view.php?id=2642
+GAME( 1998, myfairld,  stvbios, stvmp,    myfairld, stv_state,   init_stv,        ROT0,   "Micronet",                     "Virtual Mahjong 2 - My Fair Lady (J 980608 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1998, othellos,  stvbios, stv,      stv,      stv_state,   init_othellos,   ROT0,   "Success",                      "Othello Shiyouyo (J 980423 V1.002)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2001, patocar,   stvbios, hopper,   patocar,  stv_state,   init_stv,        ROT0,   "Sega",                         "Hashire Patrol Car (J 990326 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, pblbeach,  stvbios, stv,      stv,      stv_state,   init_pblbeach,   ROT0,   "T&E Soft",                     "Pebble Beach - The Great Shot (JUE 950913 V0.990)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
