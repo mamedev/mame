@@ -25,7 +25,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_changed);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
