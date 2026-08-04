@@ -43,10 +43,10 @@ protected:
 	void exception(unsigned vector, bool const trap = false);
 
 	// memory helpers
-	void fetch(u32 &address, u32 &inst);
-	template <typename T, bool Usr = false> void ld(u32 address, unsigned const reg);
-	template <typename T, bool Usr = false> void st(u32 address, unsigned const reg);
-	template <typename T, bool Usr = false> void xmem(u32 address, unsigned const reg);
+	void fetch(offs_t &address, u32 &inst);
+	template <typename T, bool Usr = false> void ld(offs_t address, unsigned const reg);
+	template <typename T, bool Usr = false> void st(offs_t address, unsigned const reg);
+	template <typename T, bool Usr = false> void xmem(offs_t address, unsigned const reg);
 
 	// integer helpers
 	void set_cr(unsigned const cr, u32 const data);

@@ -1563,7 +1563,7 @@ void mc88100_device::fetch(u32 &address, u32 &inst)
 		inst = m_code_space.read_dword(address & IP_A);
 }
 
-template <typename T, bool Usr> void mc88100_device::ld(u32 address, unsigned const reg)
+template <typename T, bool Usr> void mc88100_device::ld(offs_t address, unsigned const reg)
 {
 	// alignment check
 	if (address & (sizeof(T) - 1))
@@ -1684,7 +1684,7 @@ template <typename T, bool Usr> void mc88100_device::ld(u32 address, unsigned co
 	}
 }
 
-template <typename T, bool Usr> void mc88100_device::st(u32 address, unsigned const reg)
+template <typename T, bool Usr> void mc88100_device::st(offs_t address, unsigned const reg)
 {
 	// alignment check
 	if (address & (sizeof(T) - 1))
@@ -1774,7 +1774,7 @@ template <typename T, bool Usr> void mc88100_device::st(u32 address, unsigned co
 	}
 }
 
-template <typename T, bool Usr> void mc88100_device::xmem(u32 address, unsigned const reg)
+template <typename T, bool Usr> void mc88100_device::xmem(offs_t address, unsigned const reg)
 {
 	// alignment check
 	if (address & (sizeof(T) - 1))
@@ -1795,7 +1795,7 @@ template <typename T, bool Usr> void mc88100_device::xmem(u32 address, unsigned 
 	if (m_cmmu_data)
 	{
 		// read destination
-		std::optional<T> const dst = m_cmmu_data(address).read<T>(address, (m_cr[PSR] & PSR_MODE) && !Usr);
+		std::optional<T> const dst = m_cmmu_data(address).read<T>(address, (m_cr[PSR] & PSR_MODE) && !Usr, true);
 		if (dst.has_value())
 		{
 			// update register
@@ -1803,7 +1803,7 @@ template <typename T, bool Usr> void mc88100_device::xmem(u32 address, unsigned 
 				m_r[reg] = dst.value();
 
 			// write destination
-			if (m_cmmu_data(address).write<T>(address, src, (m_cr[PSR] & PSR_MODE) && !Usr))
+			if (m_cmmu_data(address).write<T>(address, src, (m_cr[PSR] & PSR_MODE) && !Usr, true))
 				return;
 		}
 
