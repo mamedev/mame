@@ -3275,7 +3275,7 @@ static INPUT_PORTS_START( mjempror )
 	// DIP-SW 4   ON  ON  ON  ON OFF  ON  ON OFF        ON  ON  ON  ON  ON  ON  ON OFF
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // Out        (not sure if this is supposed to be payout or hopper switch)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // Out
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        // 18B
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR(Test))   // Test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    // Analyzer
@@ -3284,7 +3284,7 @@ static INPUT_PORTS_START( mjempror )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )          // Coin
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // Service    (shown in test mode, not clear what it's supposed to do)
 
-	PORT_INCLUDE( mahjong_matrix_2p_ff )
+	PORT_INCLUDE( mahjong_matrix_2p_bet ) // Bet button is not labelled in test mode, but it does work
 
 	PORT_START("DSW0")
 	MAHJONG_ODDS_RATE(0, "DIP-SW 2:1,2")                                                         // ＯＤＤＳ　ＲＡＴＥ
@@ -3354,7 +3354,11 @@ static INPUT_PORTS_START( mjempror )
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DIP-SW 4:8")                                             // ＯＦＦ固定
 
 	PORT_START("SW1")
+
 	PORT_START("FAKE")
+	PORT_CONFNAME( 0xff, 0xff, "Allow Bets" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0xff, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
