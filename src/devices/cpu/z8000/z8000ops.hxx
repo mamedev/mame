@@ -708,7 +708,10 @@ uint64_t z8002_device::MULTL(uint32_t dest, uint32_t value)
 	}
 	CLR_CZSV;
 	CHK_XXXQ_ZS;
-	if((int64_t)result < -0x7fffffffL || (int64_t)result >= 0x7fffffffL) SET_C;
+	/* carry marks a product that will not fit in the low long: the
+	   representable range is [-2^31, 2^31), so exactly -2^31 and
+	   2^31-1 do fit */
+	if((int64_t)result < -0x80000000LL || (int64_t)result >= 0x80000000LL) SET_C;
 	return result;
 }
 
