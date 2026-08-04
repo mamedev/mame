@@ -633,6 +633,37 @@ void ppc_device::ppc_cfunc_printf_probe()
     unimplemented opcdes
 -------------------------------------------------*/
 
+/*-------------------------------------------------
+    is_floating_point_op - does this instruction
+    need the floating point unit enabled?
+-------------------------------------------------*/
+
+static bool is_floating_point_op(uint32_t op)
+{
+	switch (op >> 26)
+	{
+		case 0x30:  case 0x31:  case 0x32:  case 0x33:  // lfs, lfsu, lfd, lfdu
+		case 0x34:  case 0x35:  case 0x36:  case 0x37:  // stfs, stfsu, stfd, stfdu
+		case 0x3b:                                      // single precision arithmetic
+		case 0x3f:                                      // double precision arithmetic, FPSCR
+			return true;
+
+		case 0x1f:
+			switch ((op >> 1) & 0x3ff)
+			{
+				case 0x217: case 0x237:                 // lfsx, lfsux
+				case 0x257: case 0x277:                 // lfdx, lfdux
+				case 0x297: case 0x2b7:                 // stfsx, stfsux
+				case 0x2d7: case 0x2f7:                 // stfdx, stfdux
+				case 0x3d7:                             // stfiwx
+					return true;
+			}
+			break;
+	}
+	return false;
+}
+
+
 static void cfunc_unimplemented(ppc_device &ppc)
 {
 	ppc.ppc_cfunc_unimplemented();
@@ -667,6 +698,11 @@ static void cfunc_ppccom_fcmp_vx(ppc_device &ppc)
 static void cfunc_ppccom_dcstore_callback(ppc_device &ppc)
 {
 	ppc.ppccom_dcstore_callback();
+}
+
+static void cfunc_ppccom_dcbz_check(ppc_device &ppc)
+{
+	ppc.ppccom_dcbz_check();
 }
 
 static void cfunc_ppccom_execute_tlbie(ppc_device &ppc)
@@ -2029,6 +2065,14 @@ void ppc_device::generate_sequence_instruction(drcuml_block &block, compiler_sta
 	}
 	else if (!desc->virtual_noop())
 	{
+		// If this is an FPU instruction and MSR[FP] is clear, generate a "NO FPU" exception.
+		// Mac OS uses this for a sort of lazy FPU context switching.
+		if ((m_cap & PPCCAP_OEA) && is_floating_point_op(desc->opptr))
+		{
+			UML_TEST(block, mem(&m_core->msr), MSROEA_FP);                  // test    [msr],MSROEA_FP
+			UML_EXHc(block, COND_Z, *m_exception[EXCEPTION_NOFPU], 0);      // exh     nofpu,0,z
+		}
+
 		// otherwise, unless this is a virtual no-op, it's a regular instruction
 		// compile the instruction
 		if (!generate_opcode(block, compiler, desc))
@@ -4117,14 +4161,25 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 			return true;
 
 		case 0x3f6: // DCBZ
-			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                          // add     i0,ra,rb
-			UML_AND(block, mem(&m_core->tempaddr), I0, ~(m_cache_line_size - 1));
-																						// and     [tempaddr],i0,~(cache_line_size - 1)
-			for (item = 0; item < m_cache_line_size / 8; item++)
 			{
-				UML_ADD(block, I0, mem(&m_core->tempaddr), 8 * item);           // add     i0,[tempaddr],8*item
-				UML_DMOV(block, I1, 0);                                         // dmov    i1,0
-				UML_CALLH(block, *m_write64[m_core->mode]);                     // callh   write64
+				uml::code_label const skip = compiler->labelnum++;
+				UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                          // add     i0,ra,rb
+				UML_AND(block, mem(&m_core->tempaddr), I0, ~(m_cache_line_size - 1));
+																							// and     [tempaddr],i0,~(cache_line_size - 1)
+				if (m_drcoptions & PPCDRC_MACOS_CACHE_HACK)
+				{
+					UML_MOV(block, mem(&m_core->param0), mem(&m_core->tempaddr));   // mov     [param0],[tempaddr]
+					UML_CALLC(block, cfunc_ppccom_dcbz_check, this);                // callc   ppccom_dcbz_check,ppc
+					UML_CMP(block, mem(&m_core->param1), 0);                        // cmp     [param1],0
+					UML_JMPc(block, COND_E, skip);                                  // je      skip
+				}
+				for (item = 0; item < m_cache_line_size / 8; item++)
+				{
+					UML_ADD(block, I0, mem(&m_core->tempaddr), 8 * item);           // add     i0,[tempaddr],8*item
+					UML_DMOV(block, I1, 0);                                         // dmov    i1,0
+					UML_CALLH(block, *m_write64[m_core->mode]);                     // callh   write64
+				}
+				UML_LABEL(block, skip);                                         // skip:
 			}
 			return true;
 

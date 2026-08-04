@@ -1715,6 +1715,31 @@ void ppc_device::ppccom_get_dsisr()
 }
 
 /*-------------------------------------------------
+    ppccom_dcbz_check - decide whether a DCBZ
+    should put its zeros out on the bus
+-------------------------------------------------*/
+
+void ppc_device::ppccom_dcbz_check()
+{
+	/*
+		HACK: Mac OS 9 uses DCBZ to pre-warm a cache line over the ATI Rage,
+		but it doesn't expect it to flush out to the hardware until it's written
+		non-zero data there.  Fixing this correctly needs proper data cache
+		emulation, which is under investigation.  Until then, this allows us to
+		deal with other issues and since it's gated by PPCDRC_MACOS_CACHE_HACK,
+		the blast radius is confined solely to slotted PCI PowerMacs.
+	*/
+	offs_t address = m_core->param0;
+	m_core->param1 = 1;
+	if (ppccom_translate_address_internal(TR_WRITE, true, address) <= 1)
+	{
+		const bool is_memory = (m_program->get_write_ptr(address) != nullptr)
+				|| (m_program->get_read_ptr(address) != nullptr);
+		m_core->param1 = is_memory ? 1 : 0;
+	}
+}
+
+/*-------------------------------------------------
     ppccom_execute_tlbie - execute a TLBIE
     instruction
 -------------------------------------------------*/

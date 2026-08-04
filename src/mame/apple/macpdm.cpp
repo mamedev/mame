@@ -1397,4 +1397,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1994, pmac6100,  0,        0, pmac6100, macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 6100/60",  MACHINE_NOT_WORKING )
+COMP( 1994, pmac6100,  0,        0, pmac6100, macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 6100/60",  MACHINE_SUPPORTS_SAVE )
