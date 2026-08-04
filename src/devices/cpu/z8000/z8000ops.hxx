@@ -4941,7 +4941,8 @@ void z8002_device::Z7D_dddd_0ccc()
 			RW(dst) = m_refresh;
 			break;
 		case 4:
-			RW(dst) = m_psapseg & 0x7f00;
+			/* PSAPSEG reads back whatever was written to it */
+			RW(dst) = m_psapseg;
 			break;
 		case 5:
 			RW(dst) = m_psapoff & 0xff00;
@@ -4978,8 +4979,7 @@ void z8002_device::Z7D_ssss_1ccc()
 			m_refresh = RW(src);
 			break;
 		case 4:
-			m_psapseg &= ~0x7f00;
-			m_psapseg |= RW(src) & 0x7f00;
+			m_psapseg = RW(src);
 			break;
 		case 5:
 			m_psapoff &= ~0xff00;
