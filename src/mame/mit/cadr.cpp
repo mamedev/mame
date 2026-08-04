@@ -184,6 +184,7 @@ void cadr_state::machine_start()
 	u8 *maincpu = memregion("maincpu")->base();
 	u8 *prom = memregion("proms")->base();
 
+	// The address signals to the PROMs are inverted.
 	for (int i = 0; i < 0x200; i++)
 	{
 		for (int b = 0; b < 8; b++)
