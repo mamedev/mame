@@ -276,11 +276,6 @@ void mm2_state::machine_start()
 	rom[0x1cf9] = 0x90;
 	rom[0x1cfa] = 0x90;
 
-	// patch out CRTC186 test which fails due to missing keyboard emulation
-	rom[0x1d00] = 0x90;
-	rom[0x1d01] = 0x90;
-	rom[0x1d02] = 0x90;
-
 	// state saving
 	save_item(NAME(m_cls0));
 	save_item(NAME(m_cls1));

@@ -30,7 +30,7 @@ crtc186_device::crtc186_device(const machine_config &mconfig, const char *tag, d
 
 void crtc186_device::map(address_map &map)
 {
-	map(0x00, 0x3f).rw(FUNC(crtc186_device::vpac_r), FUNC(crtc186_device::vpac_w));
+	map(0x00, 0x7f).rw(FUNC(crtc186_device::vpac_r), FUNC(crtc186_device::vpac_w));
 	//map(0x00, 0x01).rw(m_sio, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w)).umask16(0xff00);
 	//map(0x02, 0x03).rw(m_sio, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)).umask16(0xff00);
 	//map(0x00, 0x3f).rw(m_vpac, FUNC(crt9007_device::read), FUNC(crt9007_device::write)).umask16(0x00ff);
@@ -114,6 +114,8 @@ void crtc186_device::device_add_mconfig(machine_config &config)
 
 void crtc186_device::device_start()
 {
+	m_sio->write_cts(0);
+
 	m_bus->memspace().install_ram(0xd0000, 0xd3fff, m_video_ram);
 	m_bus->memspace().install_read_tap(0xd8000, 0xdbfff, "charrom", [this](offs_t offset, uint16_t &data, uint16_t mem_mask) {
 		if (ACCESSING_BITS_0_7) {
@@ -188,7 +190,7 @@ uint16_t crtc186_device::vpac_r(offs_t offset, uint16_t mem_mask)
 	uint16_t data = 0;
 
 	if (ACCESSING_BITS_0_7) {
-		data |= m_vpac->read(offset);
+		data |= m_vpac->read(0x20 | offset);
 	}
 
 	if (ACCESSING_BITS_8_15) {
