@@ -23,6 +23,8 @@ public:
 	void drc_memory_access_read();
 	void drc_memory_access_write();
 
+	void update_access_cycles(uint32_t address, bool write);
+
 protected:
 	virtual void sh3_register_map(address_map& map) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
@@ -55,7 +57,6 @@ private:
 
 	bool cache_access(uint32_t address, bool write);
 	unsigned int access_penalty(uint32_t address, bool write);
-	void update_access_cycles(uint32_t address, bool write);
 
 	// Timing calculation/decode related functions
 	uint32_t get_wcr1_timing(uint32_t address);
