@@ -19,10 +19,7 @@ int main(void)
     utf8proc_uint8_t *output;
     utf8proc_map_custom(input, 0, &output, UTF8PROC_CASEFOLD | UTF8PROC_COMPOSE | UTF8PROC_COMPAT | UTF8PROC_NULLTERM,
                         custom, &thunk_test);
-    printf("mapped \"%s\" -> \"%s\"\n", (char*)input, (char*)output);
-    check(strlen((char*) output) == 6, "incorrect output length");
-    check(!memcmp(correct, output, 7), "incorrect output data");
-    free(output);
+    check_compare("map_custom", input, correct, output, 1);
     printf("map_custom tests SUCCEEDED.\n");
     return 0;
 }
