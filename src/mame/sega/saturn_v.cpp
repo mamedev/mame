@@ -1153,12 +1153,12 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 					}
 					break;
 				//case 4: /* Gouraud shading */
-				// TODO: Pro Yakyuu Team mo Tsukurou (during team creation, on PR girl select)
+				// TODO: proyakts (during team creation, on PR girl select)
 				//case 6:
 				//  break;
 				//case 7: /* Gouraud-shading + half-transparent */
-					// Lupin the 3rd Pyramid no Kenja enemy shadows
-					// Death Crimson lives indicators
+					// lupinpy enemy shadows
+					// deathcri lives indicators
 					// TODO: latter looks really bad.
 				default:
 					// TODO: mode 5: prohibited, mode 6: gouraud shading + half-luminance, mode 7: gouraud-shading + half-transparent
@@ -2127,7 +2127,7 @@ void saturn_state::vdp1_process_list()
 					m_vdp1_legacy.lopr = (position * 0x20) >> 3;
 					//m_vdp1_legacy.copr = (position * 0x20) >> 3;
 					// prematurely kill the VDP1 process if an illegal opcode is executed
-					// Sexy Parodius calls multiple illegals and expects VDP1 irq to be fired anyway!
+					// sexyparo calls multiple illegals and expects VDP1 irq to be fired anyway!
 					goto end;
 			}
 		}
