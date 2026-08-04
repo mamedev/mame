@@ -54,8 +54,10 @@ saturn_scu_device::saturn_scu_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, SATURN_SCU, tag, owner, clock)
 	, m_scudsp(*this, "scudsp")
 	, m_hostcpu(*this, finder_base::DUMMY_TAG)
-	, m_bbus_sound_dtack_cb(*this)
-	, m_cbus_dtack_cb(*this)
+	, m_main_dtack_cb(*this)
+	, m_main_steal_cb(*this)
+	, m_sound_dtack_cb(*this)
+	, m_sound_steal_cb(*this)
 {
 }
 
@@ -180,7 +182,7 @@ uint16_t saturn_scu_device::scudsp_dma_r(offs_t offset, uint16_t mem_mask)
 	//address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = offset & 0x07ff'ffff;
 
-//	printf("%08x\n", offset);
+//  printf("%08x\n", offset);
 
 	return m_hostspace->read_word(addr,mem_mask);
 }
@@ -209,6 +211,7 @@ void saturn_scu_device::device_add_mconfig(machine_config &config)
 			m_dma_status &= ~(DMA_DSP_WAIT);
 	});
 	m_scudsp->out_ddmv_callback().set([this] (int state) {
+		//m_main_dtack_cb(state);
 		if (state)
 			m_dma_status |= DMA_DSP_MOVE;
 		else
@@ -248,8 +251,8 @@ void saturn_scu_device::device_start()
 	save_item(NAME(m_dma[0].live_dst));
 	save_item(NAME(m_dma[0].live_size));
 	save_item(NAME(m_dma[0].live_count));
-	save_item(NAME(m_dma[0].cbus_cache_through));
 	save_item(NAME(m_dma[0].bbus_sound_access));
+	save_item(NAME(m_dma[0].transfer_penalty));
 
 	save_item(NAME(m_dma[1].src));
 	save_item(NAME(m_dma[1].dst));
@@ -269,8 +272,8 @@ void saturn_scu_device::device_start()
 	save_item(NAME(m_dma[1].live_dst));
 	save_item(NAME(m_dma[1].live_size));
 	save_item(NAME(m_dma[1].live_count));
-	save_item(NAME(m_dma[1].cbus_cache_through));
 	save_item(NAME(m_dma[1].bbus_sound_access));
+	save_item(NAME(m_dma[1].transfer_penalty));
 
 	save_item(NAME(m_dma[2].src));
 	save_item(NAME(m_dma[2].dst));
@@ -290,8 +293,8 @@ void saturn_scu_device::device_start()
 	save_item(NAME(m_dma[2].live_dst));
 	save_item(NAME(m_dma[2].live_size));
 	save_item(NAME(m_dma[2].live_count));
-	save_item(NAME(m_dma[2].cbus_cache_through));
 	save_item(NAME(m_dma[2].bbus_sound_access));
+	save_item(NAME(m_dma[2].transfer_penalty));
 
 	save_item(NAME(m_current_irq_level));
 
@@ -318,7 +321,6 @@ void saturn_scu_device::device_reset()
 		m_dma[i].start_factor = DMA_EVENT_TRIGGER;
 		m_dma[i].enable_mask = false;
 		m_dma[i].done = false;
-		m_dma[i].cbus_cache_through = false;
 		m_dma[i].bbus_sound_access = false;
 		m_dma[i].mode = DMA_MODE_RESET;
 	}
@@ -329,8 +331,8 @@ void saturn_scu_device::device_reset()
 
 	// Nope until we have a proper DTACK instead of an HALT,
 	// SMPC triggers this thru dotsel (2 credits meme ...)
-	//m_bbus_sound_dtack_cb(0);
-	//m_cbus_dtack_cb(0);
+	//m_sound_dtack_cb(0);
+	//m_main_dtack_cb(0);
 
 	m_tenb = false;
 	m_t1md = false;
@@ -374,6 +376,84 @@ inline void saturn_scu_device::update_dma_status(int level, dma_state_t new_stat
 	LOGMASKED(LOG_DMA_STATE, "%s (%08x)\n", status_names[(m_dma_status >> log_shifts[level]) & 0x3], m_dma_status);
 }
 
+std::tuple<u16, int> saturn_scu_device::get_address_flags(u32 address, bool write_op)
+{
+	// can't use .flags for now:
+	// 1. has a noticeable performance penalty
+	// 2. A-Bus in clients needs modernizing
+	// 3. .m type address maps with flags are ignored and really propagates downstream
+	//    i.e. need to repeat .flags declarations inside every single device .rw
+//  std::tie(std::ignore, flags) = m_bus_space.read_word_flags(address & 0x07ff'ffff);
+
+	u16 flags = 0;
+	// TODO: waitstate penalties needs HW tests
+	// Also eventually needs to be in client address_maps as .before_delay
+	int penalty = 0;
+
+	switch(address & 0x0700'0000)
+	{
+		// TODO: A-Bus penalties comes from $b0-$b7 registers and are fairly complex
+		case 0x0200'0000:
+		case 0x0300'0000:
+			flags = saturn_scu_device::A_BUS_CS0;
+			break;
+		case 0x0400'0000:
+			flags = saturn_scu_device::A_BUS_CS1;
+			break;
+		case 0x0500'0000:
+		{
+			switch(address & 0x00f0'0000)
+			{
+				case 0x0080'0000:
+					flags = saturn_scu_device::A_BUS_CS2;
+					//penalty = 8;
+					break;
+				case 0x00a0'0000:
+				case 0x00b0'0000:
+					flags = saturn_scu_device::B_BUS_SCSP;
+					//penalty = write_op ? 13 : 24;
+					break;
+				case 0x00c0'0000:
+				case 0x00d0'0000:
+					flags = saturn_scu_device::B_BUS_VDP1;
+					//penalty = write_op ? 9 : 14;
+					break;
+				case 0x00e0'0000:
+					flags = saturn_scu_device::B_BUS_VDP2;
+					//penalty = write_op ? 3 : 20;
+					break;
+				case 0x00f0'0000:
+					if ((address & 0x000f'0000) < 0x000e'0000)
+					{
+						flags = saturn_scu_device::B_BUS_VDP2;
+						//penalty = write_op ? 3 : 20;
+					}
+					else
+					{
+						flags = saturn_scu_device::B_BUS_SCU;
+						//penalty = write_op ? 4 : 8;
+					}
+					break;
+
+				default:
+					if ((address & 0x0080'0000) == 0)
+					{
+						flags = saturn_scu_device::A_BUS_DUMMY;
+					}
+			}
+			break;
+		}
+		case 0x0600'0000:
+		{
+			flags = saturn_scu_device::C_BUS;
+			// TODO: overhead due of SDRAM refresh?
+		}
+	}
+
+	return std::make_tuple(flags, penalty);
+}
+
+
 void saturn_scu_device::trigger_dma_direct(uint8_t level)
 {
 	// registers are DxR, DxW etc.
@@ -388,12 +468,18 @@ void saturn_scu_device::trigger_dma_direct(uint8_t level)
 		return;
 	}
 
-	// gamebas, wc98 and batmanfu trips this
-	// according to the docs the SCU can't transfer from BIOS area
-	// (can't communicate from/to that bus)
-	if((m_dma[level].src & 0x07f00000) == 0)
+	u16 src_flags, dst_flags, src_penalty, dst_penalty;
+	std::tie(src_flags, src_penalty) = get_address_flags(m_dma[level].src, false);
+	std::tie(dst_flags, dst_penalty) = get_address_flags(m_dma[level].dst, true);
+
+//  printf("%04x %04x\n", src_flags, dst_flags);
+
+	// check if params are well formed:
+	// - can't transfer from BIOS, Work RAM L, backup RAM (gamebas, wc98, batmanfu)
+	// - SCU also can't do same bus transfers
+	if(src_flags == 0 || dst_flags == 0 || (src_flags & 0x0300) == (dst_flags & 0x0300))
 	{
-		LOG("Attempted an illegal DMA at R %08x\n", m_dma[level].src);
+		LOG("DMA%d illegal setup (ignored): R %08x W %08x\n", level, m_dma[level].src, m_dma[level].dst);
 		m_ist |= IST_DMAILL;
 		test_pending_irqs();
 		return;
@@ -422,28 +508,20 @@ void saturn_scu_device::trigger_dma_direct(uint8_t level)
 
 	// if target is Work RAM H, the add value is fixed.
 	// behaviour confirmed by astrass, fromanc2, stv:vmahjong and burningr*
-	if ((m_dma[level].dst & 0x0700'0000) == 0x0600'0000)
+	if (dst_flags == C_BUS)
 	{
 		LOGMASKED(LOG_DMA_MODE, "Mode select: C-Bus Write\n");
 		m_dma[level].mode |= DMA_MODE_CBUS_WRITE;
 	}
 
-	m_dma[level].bbus_sound_access = (m_dma[level].src & 0x07f0'0000) == 0x05a0'0000 || (m_dma[level].dst & 0x07f0'0000) == 0x05a0'0000;
-	// - sonicjamj Sonic 1 (at least) does VDP2s back-to-back writes, several failing without a guard here.
-	const bool vdp2_access = (m_dma[level].dst & 0x05e0'0000) == 0x05e0'0000;
-
-	// - saturn BIOS chains several cache through DMAs back-to-back with no status check
-	//   clearly expect that the host CPU shouldn't do anything around the time the DMA goes.
-	// - stv:gaxeduel also does two back-to-back sound DMAs from A-Bus, failing the second one if
-	//   SH-2s aren't slowed down to a crawl
-	// TODO: latter really needs bus grants, interruptible SH-2 and .before_delay.
-	m_dma[level].cbus_cache_through = m_dma[level].bbus_sound_access || vdp2_access || (m_dma[level].src & 0x2700'0000) == 0x2600'0000 || (m_dma[level].dst & 0x2700'0000) == 0x2600'0000;
+	m_dma[level].bbus_sound_access = src_flags == B_BUS_SCSP || dst_flags == B_BUS_SCSP;
 
 	m_dma[level].live_src = m_dma[level].src;
 	m_dma[level].live_dst = m_dma[level].dst;
 	m_dma[level].live_size = m_dma[level].size;
 	m_dma[level].live_count = 0;
 	m_dma[level].done = false;
+	m_dma[level].transfer_penalty = src_penalty + dst_penalty;
 
 	update_dma_status(level, DMA_STATE_WAIT);
 
@@ -519,6 +597,7 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick_cb)
 	}
 
 	auto [level, wait_level] = check_dma_level_round_robin();
+	int extra_penalty = 0;
 
 	//printf("%d %d\n", level, wait_level);
 
@@ -531,8 +610,8 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick_cb)
 
 			m_dma[level].done = false;
 			m_dma[level].live_count = 0;
-			m_cbus_dtack_cb(0);
-			m_bbus_sound_dtack_cb(0);
+			m_main_dtack_cb(0);
+			m_sound_dtack_cb(0);
 
 			const uint16_t irqmask = 1 << (11 - level);
 
@@ -570,20 +649,28 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick_cb)
 					level, m_dma[level].index, indirect_src, indirect_dst, indirect_size,
 					m_dma[level].indirect_end_flag ? "END" : "");
 
-				m_dma[level].bbus_sound_access = (indirect_src & 0x07e0'0000) == 0x05a0'0000 || (indirect_dst & 0x07e0'0000) == 0x05a0'0000;
-				const bool vdp2_access = (indirect_dst & 0x05e0'0000) == 0x05e0'0000;
-				m_dma[level].cbus_cache_through = m_dma[level].bbus_sound_access || vdp2_access || (indirect_src & 0x2700'0000) == 0x2600'0000 || (indirect_dst & 0x2700'0000) == 0x2600'0000;
+				u16 src_flags, dst_flags, src_penalty, dst_penalty;
+				std::tie(src_flags, src_penalty) = get_address_flags(indirect_src, false);
+				std::tie(dst_flags, dst_penalty) = get_address_flags(indirect_dst, true);
+
+				m_dma[level].bbus_sound_access = src_flags == B_BUS_SCSP || dst_flags == B_BUS_SCSP;
 
 				m_dma[level].live_src = indirect_src & 0x07ff'ffff;
 				m_dma[level].live_dst = indirect_dst & 0x07ff'ffff;
 				//TODO: why guardherj sets up a 0x23000 transfer for the FMV?
 				m_dma[level].live_size = indirect_size & ((level == 0) ? 0xf'ffff : 0x3'ffff);
 				m_dma[level].live_count = 0;
+				m_dma[level].transfer_penalty = src_penalty + dst_penalty;
 
 				m_dma[level].mode = DMA_MODE_INDIRECT;
 
+				//if (m_dma[level].bbus_sound_access)
+				//{
+				//	m_sound_dtack_cb(1);
+				//}
+
 				// TODO: other rules still applies
-				if ((indirect_dst & 0x0700'0000) == 0x0600'0000)
+				if (dst_flags == C_BUS)
 				{
 					LOGMASKED(LOG_DMA_MODE, "Mode select: C-Bus Write\n");
 					m_dma[level].mode |= DMA_MODE_CBUS_WRITE;
@@ -591,12 +678,18 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick_cb)
 
 				m_dma[level].index += 0x0c;
 				m_dma[level].indirect_fetch_phase = false;
-				// yield 3 clock cycles out of fetching the new data and get out
+				// yield 3 clock cycles out of fetching the new data
 				m_dma_tick_timer->adjust(attotime::from_ticks(3, m_dma_clock_ref));
 				return;
 			}
 
 			(this->*dma_transfer_table[m_dma[level].mode & 3])(m_dma[level]);
+
+			// in indirect mode we steal cycles from the CPUs
+			// - stv:finlarch/smleague (where it sure checks the DMA status)
+			m_main_steal_cb(m_dma[level].transfer_penalty);
+			if (m_dma[level].bbus_sound_access)
+				m_sound_steal_cb(m_dma[level].transfer_penalty);
 
 			if (m_dma[level].wup)
 				m_dma[level].dst = m_dma[level].index;
@@ -613,7 +706,16 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick_cb)
 		}
 		else
 		{
+			// direct mode
+
 			(this->*dma_transfer_table[m_dma[level].mode & 3])(m_dma[level]);
+
+			// direct mode definitely looks burst, where stopping CPUs is a liability to avoid
+			// back-to-back transfers
+			// - saturn BIOS
+			// - stv:gaxeduel
+			// - sonicjamj Sonic 1 (at least)
+			extra_penalty = m_dma[level].transfer_penalty;
 
 			if (m_dma[level].rup)
 				m_dma[level].src = m_dma[level].live_src;
@@ -635,6 +737,12 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick_cb)
 		// clear wait, set move
 		update_dma_status(wait_level, DMA_STATE_MOVE);
 
+		if (!(m_dma[wait_level].mode & DMA_MODE_INDIRECT))
+		{
+			m_main_dtack_cb(1);
+			m_sound_dtack_cb(m_dma[wait_level].bbus_sound_access);
+		}
+
 		if (level != -1)
 		{
 			// set wait (allegedly) and interrupt for the last transfer, clear move
@@ -645,7 +753,7 @@ TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick_cb)
 		}
 	}
 
-	m_dma_tick_timer->adjust(attotime::from_ticks(1, m_dma_clock_ref));
+	m_dma_tick_timer->adjust(attotime::from_ticks(1 + extra_penalty, m_dma_clock_ref));
 }
 
 // CD transfers needs to be in dword unit for now (need the xfertype32 branch)
@@ -664,16 +772,16 @@ void saturn_scu_device::dma_transfer_direct_default(dma_channel_t &ch)
 	const u32 src_address = ch.live_src & 0x07ff'fffe;
 	const u32 dst_address = ch.live_dst & 0x07ff'fffe;
 
+	// TODO: actually reads as dword and writes as word for B-Bus transfers
 	uint32_t src_data = m_hostspace->read_word(src_address);
 
 	m_hostspace->write_word(dst_address, src_data);
-	m_cbus_dtack_cb(ch.cbus_cache_through);
-	m_bbus_sound_dtack_cb(ch.bbus_sound_access);
 
-	ch.live_src += 2;
+	// pfght fills VDP2 with a single work RAM location (i.e. DMA fill)
+	ch.live_src += ch.src_add >> 1;
 	// TODO: reimplement me
 // if(src_shift)
-//	dma_params.src+= dma_params.src_add;
+//  dma_params.src+= dma_params.src_add;
 //
 	ch.live_dst += ch.dst_add;
 
@@ -689,13 +797,11 @@ void saturn_scu_device::dma_transfer_direct_cbus_write(dma_channel_t &ch)
 	uint32_t src_data = m_hostspace->read_word(src_address);
 
 	m_hostspace->write_word(dst_address, src_data);
-	m_cbus_dtack_cb(ch.cbus_cache_through);
-	m_bbus_sound_dtack_cb(ch.bbus_sound_access);
 
-	ch.live_src += 2;
+	ch.live_src += ch.src_add >> 1;
 	// TODO: reimplement me
 // if(src_shift)
-//	dma_params.src+= dma_params.src_add;
+//  dma_params.src+= dma_params.src_add;
 //
 	ch.live_dst += 2;
 
@@ -713,9 +819,6 @@ void saturn_scu_device::dma_transfer_direct_cd(dma_channel_t &ch)
 	if(dst_add == 8)
 		m_hostspace->write_dword(dst_address + 4, m_hostspace->read_dword(src_address));
 
-	m_cbus_dtack_cb(ch.cbus_cache_through);
-	m_bbus_sound_dtack_cb(ch.bbus_sound_access);
-
 	ch.live_src += ch.src_add;
 	ch.live_dst += dst_add;
 	ch.live_count += dst_add;
@@ -729,9 +832,6 @@ void saturn_scu_device::dma_transfer_direct_cd_cbus_write(dma_channel_t &ch)
 	m_hostspace->write_dword(dst_address, m_hostspace->read_dword(src_address));
 	if(ch.dst_add == 8)
 		m_hostspace->write_dword(dst_address + 4, m_hostspace->read_dword(src_address));
-
-	m_cbus_dtack_cb(ch.cbus_cache_through);
-	m_bbus_sound_dtack_cb(ch.bbus_sound_access);
 
 	ch.live_src += ch.src_add;
 	ch.live_dst += 4;
@@ -818,11 +918,11 @@ void saturn_scu_device::irq_mask_w(offs_t offset, uint32_t data, uint32_t mem_ma
 
 void saturn_scu_device::irq_status_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	// burningr*
-//	if(mem_mask != 0xffffffff)
-//		LOG("%s IST write %08x with %08x\n", this->tag(), data, mem_mask);
+//  if(mem_mask != 0xffffffff)
+//      LOG("%s IST write %08x with %08x\n", this->tag(), data, mem_mask);
 
-	m_ist &= data;
+	// burningr* uses byte writes when clearing SMPC irqs
+	m_ist &= data | (~mem_mask);
 	test_pending_irqs();
 }
 

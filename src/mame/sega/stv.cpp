@@ -475,8 +475,8 @@ void stv_state::init_prikura()
 
 	init_stv();
 
-//	m_minit_boost = m_sinit_boost = 0;
-//	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
+//  m_minit_boost = m_sinit_boost = 0;
+//  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 void stv_state::init_hanagumi()
@@ -530,8 +530,8 @@ void stv_state::init_puyosun()
 
 	init_stv();
 
-//	m_minit_boost = m_sinit_boost = 0;
-//	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
+//  m_minit_boost = m_sinit_boost = 0;
+//  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 /* mausuke
@@ -550,8 +550,8 @@ void stv_state::init_mausuke()
 
 	init_stv();
 
-//	m_minit_boost = m_sinit_boost = 0;
-//	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
+//  m_minit_boost = m_sinit_boost = 0;
+//  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 void stv_state::init_cottonbm()
@@ -561,7 +561,7 @@ void stv_state::init_cottonbm()
 
 	init_stv();
 
-//	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(10);
+//  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(10);
 }
 
 void stv_state::init_cotton2()
@@ -571,7 +571,7 @@ void stv_state::init_cotton2()
 
 	init_stv();
 
-//	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
+//  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 void stv_state::init_dnmtdeka()
@@ -623,8 +623,8 @@ void stv_state::init_groovef()
 
 	init_stv();
 
-//	m_minit_boost = m_sinit_boost = 0;
-//	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
+//  m_minit_boost = m_sinit_boost = 0;
+//  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 void stv_state::init_danchih()
@@ -635,7 +635,7 @@ void stv_state::init_danchih()
 
 	init_stv();
 
-//	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5);
+//  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5);
 }
 
 void stv_state::init_danchiq()
@@ -646,7 +646,7 @@ void stv_state::init_danchiq()
 
 	init_stv();
 
-//	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5);
+//  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5);
 }
 
 void stv_state::init_astrass()
@@ -667,7 +667,7 @@ void stv_state::init_thunt()
 
 	init_stv();
 
-//	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(1);
+//  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(1);
 }
 
 void stv_state::init_sandor()
@@ -678,7 +678,7 @@ void stv_state::init_sandor()
 
 	init_stv();
 
-//	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(1);
+//  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(1);
 }
 
 void stv_state::init_grdforce()
@@ -688,7 +688,7 @@ void stv_state::init_grdforce()
 
 	init_stv();
 
-//	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
+//  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 void stv_state::init_batmanfr()
@@ -701,8 +701,8 @@ void stv_state::init_batmanfr()
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04800000, 0x04800003, write32s_delegate(*this, FUNC(stv_state::batmanfr_sound_comms_w)));
 	m_slave->space(AS_PROGRAM).install_write_handler(0x04800000, 0x04800003, write32s_delegate(*this, FUNC(stv_state::batmanfr_sound_comms_w)));
 
-//	m_minit_boost = m_sinit_boost = 0;
-//	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
+//  m_minit_boost = m_sinit_boost = 0;
+//  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 void stv_state::init_colmns97()
@@ -711,7 +711,7 @@ void stv_state::init_colmns97()
 
 	init_stv();
 
-//	m_minit_boost = m_sinit_boost = 0;
+//  m_minit_boost = m_sinit_boost = 0;
 }
 
 void stv_state::init_winterht()
@@ -721,7 +721,7 @@ void stv_state::init_winterht()
 
 	init_stv();
 
-//	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(2);
+//  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(2);
 }
 
 void stv_state::init_seabass()
@@ -731,7 +731,7 @@ void stv_state::init_seabass()
 
 	init_stv();
 
-//	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5);
+//  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5);
 }
 
 void stv_state::init_vfremix()
@@ -741,7 +741,7 @@ void stv_state::init_vfremix()
 
 	init_stv();
 
-//	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(20);
+//  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(20);
 }
 
 void stv_state::init_sss()
@@ -753,7 +753,7 @@ void stv_state::init_sss()
 
 	init_stv();
 
-//	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
+//  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 void stv_state::init_othellos()
@@ -763,7 +763,7 @@ void stv_state::init_othellos()
 
 	init_stv();
 
-//	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
+//  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 void stv_state::init_sasissu()
@@ -772,7 +772,7 @@ void stv_state::init_sasissu()
 
 	init_stv();
 
-//	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(2);
+//  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(2);
 }
 
 void stv_state::init_gaxeduel()
@@ -794,7 +794,7 @@ void stv_state::init_sokyugrt()
 {
 	init_stv();
 
-//	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
+//  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 void stv_state::init_znpwfv()
@@ -804,7 +804,7 @@ void stv_state::init_znpwfv()
 
 	init_stv();
 
-//	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_nsec(500);
+//  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_nsec(500);
 }
 
 void stv_state::init_twcup98()
@@ -815,7 +815,7 @@ void stv_state::init_twcup98()
 	init_stv();
 	install_common_protection();
 
-//	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5);
+//  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5);
 }
 
 void stv_state::init_smleague()
@@ -826,8 +826,8 @@ void stv_state::init_smleague()
 	init_stv();
 
 	/* tight sync to avoid dead locks */
-//	m_minit_boost = m_sinit_boost = 5000;
-//	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5000);
+//  m_minit_boost = m_sinit_boost = 5000;
+//  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5000);
 }
 
 void stv_state::init_finlarch()
@@ -837,8 +837,8 @@ void stv_state::init_finlarch()
 	init_stv();
 
 	/* tight sync to avoid dead locks */
-//	m_minit_boost = m_sinit_boost = 5000;
-//	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5000);
+//  m_minit_boost = m_sinit_boost = 5000;
+//  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5000);
 }
 
 void stv_state::init_maruchan()
@@ -848,7 +848,7 @@ void stv_state::init_maruchan()
 
 	init_stv();
 
-//	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
+//  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 void stv_state::init_pblbeach()
@@ -874,7 +874,7 @@ void stv_state::init_elandore()
 
 	init_stv();
 
-//	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(0);
+//  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(0);
 }
 
 void stv_state::init_rsgun()
@@ -886,7 +886,7 @@ void stv_state::init_rsgun()
 
 	init_stv();
 
-//	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(20);
+//  m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(20);
 }
 
 void stv_state::init_ffreveng()
@@ -1120,9 +1120,16 @@ void stv_state::stv(machine_config &config)
 
 	SATURN_SCU(config, m_scu, MASTER_CLOCK_352);
 	m_scu->set_hostcpu(m_maincpu);
-	m_scu->cbus_dtack_cb().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	m_scu->cbus_dtack_cb().append_inputline(m_slave, INPUT_LINE_HALT);
-	m_scu->bbus_sound_dtack_cb().set_inputline(m_audiocpu, INPUT_LINE_HALT);
+	m_scu->main_dtack_cb().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_scu->main_dtack_cb().append_inputline(m_slave, INPUT_LINE_HALT);
+	m_scu->sound_dtack_cb().set_inputline(m_audiocpu, INPUT_LINE_HALT);
+	m_scu->main_steal_cb().set([this] (u8 data) {
+		m_maincpu->adjust_icount(-data);
+		m_slave->adjust_icount(-data);
+	});
+	m_scu->sound_steal_cb().set([this] (u8 data) {
+		m_audiocpu->adjust_icount(-data);
+	});
 
 	SMPC_HLE(config, m_smpc_hle, XTAL(4'000'000));
 	m_smpc_hle->set_screen_tag("screen");
