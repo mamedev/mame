@@ -95,7 +95,9 @@ void saturn_dcc_device::handle_frt_cb(s32 param)
 
 IRQ_CALLBACK_MEMBER(saturn_dcc_device::irq_ack_cb)
 {
+	// stv:colmns97 and stv:wwshin requires correct slave irqs for sound to work properly
+	// TODO: 0xff rather than 0x00 for irqline == 0?
+	const u8 vector_table[4] = { 0x00, 0x41, 0x42, 0x43 };
 	m_slave_cpu->set_input_line(irqline, CLEAR_LINE);
-	// TODO: can also be 0x42 and 0xff (?)
-	return (irqline == 6) ? 0x43 : 0x41;
+	return vector_table[irqline >> 1];
 }

@@ -10379,11 +10379,13 @@ Black screen after Capcom FMV logo, enables [SCU] Timer 0 + HBlank irqs and loop
 		</part>
 	</software>
 
-	<!-- Identifying Jung Rhythm (JAP) (DW0477)... -->
 	<software name="jungrhyt" supported="no">
 		<description>Jung Rhythm (Japan)</description>
 		<year>1998</year>
 		<publisher>Altron</publisher>
+		<notes><![CDATA[
+Crashes when restarting a stage, [CD-Block] seek times
+]]></notes>
 		<info name="serial" value="T-16607G"/>
 		<info name="release" value="19980115"/>
 		<info name="alt_title" value="じゃんぐリズム"/>
@@ -33812,11 +33814,14 @@ Allegedly should do byte wide writes to [VDP2] CRAM (no noticeable effect?)
 		</part>
 	</software>
 
-	<!-- Identifying dw-bat... -->
 	<software name="batmanfu" cloneof="batmanf" supported="no">
 		<description>Batman Forever - The Arcade Game (USA)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+Glitchy [VDP2] batmobile at startup, [CD-Block] seek times?
+Crashes if left in attract mode, after title screen
+]]></notes>
 		<info name="serial" value="T-8140H"/>
 		<info name="release" value="199611xx"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>

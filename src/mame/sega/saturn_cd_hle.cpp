@@ -996,6 +996,9 @@ void saturn_cd_hle_device::cmd_seek_disc()
 
 		//cd_curfad = temp;
 
+		// TODO: batmanfu keeps using these back-to-back, causing glitchy batmobile at startup
+		// (is it expecting some kind of seek?)
+		// TODO: jungrhyt sets a seek track mode then this back-to-back when restarting a stage
 		if (temp == 0xffffff)
 		{
 			cd_change_status(CD_STAT_PAUSE);
@@ -2762,22 +2765,25 @@ void saturn_cd_hle_device::cd_playdata()
 		case CD_STAT_SEEK:
 		{
 			int32_t fad_diff;
+			// zdivide
+			// TODO: timings are clearly too fast
+			const int32_t seek_time = 75 * 10 * cd_speed;
+
 			LOGSEEK("PRE %08x %08x %08x %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad);
 
 			fad_diff = (cd_fad_seek - cd_curfad);
 
-			/* Zero Divide wants this TODO: timings. */
-			if(fad_diff > (750*cd_speed))
+			if(fad_diff > seek_time)
 			{
-				LOGSEEK("PRE FFWD %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad,750*cd_speed);
-				cd_curfad += (750*cd_speed);
-				LOGSEEK("POST FFWD %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, 750*cd_speed);
+				LOGSEEK("PRE FFWD %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, seek_time);
+				cd_curfad += (seek_time);
+				LOGSEEK("POST FFWD %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, seek_time);
 			}
-			else if(fad_diff < (-750*cd_speed))
+			else if(fad_diff < -seek_time)
 			{
-				LOGSEEK("PRE REW %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, -750*cd_speed);
-				cd_curfad -= (750*cd_speed);
-				LOGSEEK("POST REW %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, -750*cd_speed);
+				LOGSEEK("PRE REW %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, -seek_time);
+				cd_curfad -= seek_time;
+				LOGSEEK("POST REW %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, -seek_time);
 			}
 			else
 			{

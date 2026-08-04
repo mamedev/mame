@@ -140,7 +140,10 @@ void saturn_state::vint_callback(int state)
 			m_slave->set_input_line(0x6, ASSERT_LINE);
 		}
 		else
+		{
 			m_scu->vblank_out_w(1);
+			m_slave->set_input_line(0x4, ASSERT_LINE);
+		}
 	}
 
 	m_prev_vint = state;
@@ -152,6 +155,11 @@ void saturn_state::hint_callback(int state)
 	{
 		m_scu->hblank_in_w(1);
 		m_slave->set_input_line(0x2, ASSERT_LINE);
+	}
+	else if (m_prev_hint && !state)
+	{
+		// Essentially clears?
+		m_slave->set_input_line(0x0, ASSERT_LINE);
 	}
 
 	m_prev_hint = state;

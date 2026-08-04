@@ -7,10 +7,9 @@ stv.cpp
 TODO:
 - vfremix: https://mametesters.org/view.php?id=4445
 
-- colmns97: https://mametesters.org/view.php?id=4187 extremely illegal SCU DMA transfers targeting
-  SCSP area, saturn:columns port has no problem with those.
+- colmns97: has a bit of stuck envelope sound in places;
 
-- wwshin: same sound bug as above, requires analog conversion with sega_315_5649_device
+- wwshin: requires analog conversion with sega_315_5649_device
 
 - smleague / finlarch: it randomly hangs / crashes, it works if you use a ridiculous
   set_maximum_quantum() number, might need strict SH-2 synching or it's actually a m68k comms issue.
