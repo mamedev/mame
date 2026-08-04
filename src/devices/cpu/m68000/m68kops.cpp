@@ -20715,14 +20715,14 @@ void m68000_musashi_device::x4e7b_movec_l_3()
 			m_dfc = REG_DA()[(word2 >> 12) & 15] & 7;
 			break;
 		case 0x002:            /* CACR */
-			/* 68030 can write all bits except 5-7, 040 can write all */
-			m_cacr = REG_DA()[(word2 >> 12) & 15] & 0xff1f;
+			/* 68030 CACR: bits 0-4 (instruction cache) and 8-13 (data cache) are
+			   writable; bits 5-7 and 14-31 are reserved and must read back as 0. */
+			m_cacr = REG_DA()[(word2 >> 12) & 15] & 0x3f1f;
 
 			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
 				m68ki_ic_clear();
 				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
 			}
-			break;
 			break;
 		case 0x800:            /* USP */
 			REG_USP() = REG_DA()[(word2 >> 12) & 15];
