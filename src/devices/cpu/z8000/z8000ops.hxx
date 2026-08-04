@@ -743,8 +743,10 @@ uint32_t z8002_device::DIVW(uint32_t dest, uint16_t value)
 				/* CASE 4: the quotient is a 17-bit two's complement
 				   number; the destination register keeps the low 16
 				   bits and the S flag holds the sign-extension MSB, so
-				   preserve the computed result rather than forcing -1/0. */
-				CHK_XXXW_ZS;
+				   preserve the computed result rather than forcing -1/0.
+				   S is that 17th bit - the sign of the whole quotient -
+				   not bit 15 of the truncated remnant. */
+				if ((int32_t)result < 0) SET_S;
 				SET_C;
 			}
 		}
@@ -790,8 +792,10 @@ uint64_t z8002_device::DIVL(uint64_t dest, uint32_t value)
 				/* CASE 4: the quotient is a 33-bit two's complement
 				   number; the destination register keeps the low 32
 				   bits and the S flag holds the sign-extension MSB, so
-				   preserve the computed result rather than forcing -1/0. */
-				CHK_XXXL_ZS;
+				   preserve the computed result rather than forcing -1/0.
+				   S is that 33rd bit - the sign of the whole quotient -
+				   not bit 31 of the truncated remnant. */
+				if ((int64_t)result < 0) SET_S;
 				SET_C;
 			}
 		}
