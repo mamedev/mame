@@ -76,6 +76,7 @@ scsidma_device::scsidma_device(const machine_config &mconfig, const char *tag, d
 	m_scsibus(*this, "scsi"),
 	m_ncr(*this, "ncr53c80"),
 	m_irq(*this),
+	m_drq(0),
 	m_scsi_irq(0),
 	m_control(0),
 	m_holding(0),
@@ -92,6 +93,7 @@ void scsidma_device::device_start()
 {
 	m_maincpu->set_emmu_enable(true);
 
+	save_item(NAME(m_drq));
 	save_item(NAME(m_control));
 	save_item(NAME(m_holding));
 	save_item(NAME(m_holding_remaining));
@@ -366,6 +368,8 @@ void scsidma_device::scsi_drq_w(int state)
 {
 	LOGMASKED(LOG_DRQ, "%s: 53C80 DRQ %d (was %d) (remain %d write %d)\n", tag(), state, m_drq, m_holding_remaining, m_is_write);
 
+	m_drq = state;
+
 	if ((state) && (m_control & CTRL_DMAEN) && m_dma_count)
 	{
 		if (m_dma_direction)
@@ -420,5 +424,4 @@ void scsidma_device::scsi_drq_w(int state)
 			m_maincpu->trigger(1);
 		}
 	}
-	m_drq = state;
 }
