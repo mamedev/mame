@@ -6137,8 +6137,8 @@ void z8002_device::ZB8_ddN0_0010_0000_rrrr_ssN0_0000()
 	GET_SRC(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
 	uint8_t xlt = RDBX_B(src, RDIR_B(dst));
-	RB(1) = xlt;  /* load RH1 */
 	if (xlt) CLR_Z; else SET_Z;
+	RB(1) = xlt;  /* load RH1 */
 	add_to_addr_reg(dst, 1);
 	if (--RW(cnt)) CLR_V; else SET_V;
 }
@@ -6153,8 +6153,8 @@ void z8002_device::ZB8_ddN0_0110_0000_rrrr_ssN0_1110()
 	GET_SRC(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
 	uint8_t xlt = RDBX_B(src, RDIR_B(dst));
-	RB(1) = xlt;  /* load RH1 */
 	if (xlt) CLR_Z; else SET_Z;
+	RB(1) = xlt;  /* load RH1 */
 	add_to_addr_reg(dst, 1);
 	if (--RW(cnt)) {
 		CLR_V;
@@ -6174,9 +6174,9 @@ void z8002_device::ZB8_ddN0_1010_0000_rrrr_ssN0_0000()
 	GET_SRC(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
 	uint8_t xlt = RDBX_B(src, RDIR_B(dst));
-	RB(1) = xlt;  /* load RH1 */
 	if (xlt) CLR_Z; else SET_Z;
 	sub_from_addr_reg(dst, 1);
+	RB(1) = xlt;  /* load RH1 */
 	if (--RW(cnt)) CLR_V; else SET_V;
 }
 
@@ -6190,8 +6190,8 @@ void z8002_device::ZB8_ddN0_1110_0000_rrrr_ssN0_1110()
 	GET_SRC(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
 	uint8_t xlt = RDBX_B(src, RDIR_B(dst));
-	RB(1) = xlt;  /* load RH1 */
 	if (xlt) CLR_Z; else SET_Z;
+	RB(1) = xlt;  /* load RH1 */
 	sub_from_addr_reg(dst, 1);
 	if (--RW(cnt)) {
 		CLR_V;
@@ -6213,8 +6213,8 @@ void z8002_device::ZB8_ddN0_0000_0000_rrrr_ssN0_0000()
 	memory_access<23, 1, 0, ENDIANNESS_BIG>::specific &dstspace = dst == SP ? m_stack : m_data;
 	uint32_t dstaddr = addr_from_reg(dst);
 	uint8_t xlt = RDBX_B(src, RDMEM_B(dstspace, dstaddr));
-	WRMEM_B(dstspace, dstaddr, xlt);
 	RB(1) = xlt;  /* destroy RH1 */
+	WRMEM_B(dstspace, addr_from_reg(dst), xlt);
 	add_to_addr_reg(dst, 1);
 	if (--RW(cnt)) CLR_V; else SET_V;
 }
@@ -6231,8 +6231,8 @@ void z8002_device::ZB8_ddN0_0100_0000_rrrr_ssN0_0000()
 	memory_access<23, 1, 0, ENDIANNESS_BIG>::specific &dstspace = dst == SP ? m_stack : m_data;
 	uint32_t dstaddr = addr_from_reg(dst);
 	uint8_t xlt = RDBX_B(src, RDMEM_B(dstspace, dstaddr));
-	WRMEM_B(dstspace, dstaddr, xlt);
 	RB(1) = xlt;  /* destroy RH1 */
+	WRMEM_B(dstspace, addr_from_reg(dst), xlt);
 	add_to_addr_reg(dst, 1);
 	if (--RW(cnt)) { CLR_V; m_pc -= 4; } else SET_V;
 }
@@ -6249,8 +6249,8 @@ void z8002_device::ZB8_ddN0_1000_0000_rrrr_ssN0_0000()
 	memory_access<23, 1, 0, ENDIANNESS_BIG>::specific &dstspace = dst == SP ? m_stack : m_data;
 	uint32_t dstaddr = addr_from_reg(dst);
 	uint8_t xlt = RDBX_B(src, RDMEM_B(dstspace, dstaddr));
-	WRMEM_B(dstspace, dstaddr, xlt);
 	RB(1) = xlt;  /* destroy RH1 */
+	WRMEM_B(dstspace, addr_from_reg(dst), xlt);
 	sub_from_addr_reg(dst, 1);
 	if (--RW(cnt)) CLR_V; else SET_V;
 }
@@ -6267,8 +6267,8 @@ void z8002_device::ZB8_ddN0_1100_0000_rrrr_ssN0_0000()
 	memory_access<23, 1, 0, ENDIANNESS_BIG>::specific &dstspace = dst == SP ? m_stack : m_data;
 	uint32_t dstaddr = addr_from_reg(dst);
 	uint8_t xlt = RDBX_B(src, RDMEM_B(dstspace, dstaddr));
-	WRMEM_B(dstspace, dstaddr, xlt);
 	RB(1) = xlt;  /* destroy RH1 */
+	WRMEM_B(dstspace, addr_from_reg(dst), xlt);
 	sub_from_addr_reg(dst, 1);
 	if (--RW(cnt)) { CLR_V; m_pc -= 4; } else SET_V;
 }
