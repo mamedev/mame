@@ -256,7 +256,7 @@ uint8_t smpc_hle_device::status_flag_r()
 
 void smpc_hle_device::status_flag_w(uint8_t data)
 {
-	m_sf = BIT(data,0);
+	m_sf = BIT(data, 0);
 	m_cd_sf = false;
 }
 
@@ -370,24 +370,28 @@ void smpc_hle_device::command_register_w(uint8_t data)
 //  don't send a command if previous one is still in progress
 //  ST-V tries to send a sysres command if OREG31 doesn't return the ack command
 	if(m_command_in_progress == true)
+	{
+		logerror("SMPC: double issuing %02x!\n", data);
 		return;
+	}
 
 	m_comreg = data & 0x1f;
 
 	if(data & 0xe0)
-		logerror("%s COMREG = %02x!?\n",this->tag(),data);
+		logerror("SMPC: COMREG = %02x!?\n", data);
 
 	m_command_in_progress = true;
 	switch(m_comreg)
 	{
 		// gnine97/gnine98 and spinoffs wants two consecutive SSHON to resolve as a NOP
+		// 3dbball* is more finicky: uses two SSHOFF commands after (skipping) FMV
 		case 0x02:
 		case 0x03:
-			m_cmd_timer->adjust(attotime::from_usec(m_prev_sshoff == (m_comreg & 1) ? 0 : m_cmd_table_timing[m_comreg]));
+			m_cmd_timer->adjust(attotime::from_usec(m_prev_sshoff == (m_comreg & 1) ? 1 : m_cmd_table_timing[m_comreg]));
 			break;
 		case 0x06:
 		case 0x07:
-			m_cmd_timer->adjust(attotime::from_usec(m_prev_sndoff == (m_comreg & 1) ? 0 : m_cmd_table_timing[m_comreg]));
+			m_cmd_timer->adjust(attotime::from_usec(m_prev_sndoff == (m_comreg & 1) ? 1 : m_cmd_table_timing[m_comreg]));
 			break;
 		case 0x0e:
 		case 0x0f:
@@ -570,6 +574,7 @@ TIMER_CALLBACK_MEMBER(smpc_hle_device::handle_command)
 			return;
 	}
 
+	LOGMASKED(LOG_COMMAND, "acknowledge for command %02x\n", m_comreg);
 	m_command_in_progress = false;
 	m_oreg[31] = m_comreg;
 	sf_ack(false);
