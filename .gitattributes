@@ -14,9 +14,12 @@
 *.png   -text
 *.ppm   -text
 
+*.odt   -text
+
 *.bdf   eol=crlf
 
 *.zip   -text
+*.zst   -text
 
 3rdparty/flac/test/cuesheets/*.cue                           -text
 3rdparty/flac/test/flac-to-flac-metadata-test-files/*.meta   -text
