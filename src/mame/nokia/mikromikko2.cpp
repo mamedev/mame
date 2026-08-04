@@ -82,7 +82,11 @@
     TODO:
 
     - keyboard ROM is not dumped
-    - MPSC (DMA and interrupts)
+    - MPSC
+		- CRC
+		- PAR OVR CRC
+		- LINE OFF
+		- DMA is not implemented in z80sio.cpp
     - CRTC186 video using CRT9007
     - IOE186 card
 
@@ -165,8 +169,8 @@ private:
 	void mpsc_txdb_w(int state) { if (m_llbb) m_mpsc->rxb_w(state); else m_rs232b->write_txd(state); }
 	void mpsc_rtsa_w(int state) { if (m_llba) m_mpsc->ctsa_w(state); else m_rs232a->write_rts(state); }
 	void mpsc_rtsb_w(int state) { if (m_llbb) m_mpsc->ctsb_w(state); else m_rs232b->write_rts(state); }
-	void tmrout0_w(int state) { if (!m_cls1 && !m_cls0) { m_mpsc->rxca_w(state); m_mpsc->txca_w(state); } };
-	void tmrout1_w(int state) { if (!m_cls1 && m_cls0) { m_mpsc->rxca_w(state); m_mpsc->txca_w(state); } };
+	void tmrout0_w(int state) { if (!m_cls1) { m_mpsc->txca_w(state); if (!m_cls0) m_mpsc->rxca_w(state); } };
+	void tmrout1_w(int state) { if (!m_cls1 && m_cls0) m_mpsc->rxca_w(state); };
 	void latch_hold(int state, int bit);
 	void update_bhlda();
 	void hold1_w(int state) { latch_hold(state, 0); }
