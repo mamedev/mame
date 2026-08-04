@@ -56,8 +56,8 @@
 #include "imagedev/floppy.h"
 #include "machine/74259.h"
 #include "machine/e0516.h"
+#include "machine/eepromser.h"
 #include "machine/input_merger.h"
-#include "machine/nmc9306.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80dma.h"
@@ -162,7 +162,7 @@ private:
 	required_device<z8536_device> m_cio;
 	required_device<fd1797_device> m_fdc;
 	required_device<e0516_device> m_rtc;
-	required_device<nmc9306_device> m_nvram;
+	required_device<eeprom_serial_93cxx_device> m_nvram;
 	required_device<ram_device> m_ram;
 	required_device_array<floppy_connector, 3> m_floppy;
 	required_device<abcbus_slot_device> m_bus0i;
@@ -927,7 +927,7 @@ uint8_t abc1600_state::cio_pc_r()
 	uint8_t data = 0x0d;
 
 	// data in
-	data |= (m_rtc->dio_r() || m_nvram->do_r()) << 1;
+	data |= (m_rtc->dio_r() || m_nvram->do_read()) << 1;
 
 	return data;
 }
@@ -956,9 +956,9 @@ void abc1600_state::cio_pc_w(uint8_t data)
 	m_rtc->dio_w(data_out);
 	m_rtc->clk_w(clock);
 
-	m_nvram->cs_w(nvram_cs);
-	m_nvram->di_w(data_out);
-	m_nvram->sk_w(clock);
+	m_nvram->cs_write(nvram_cs);
+	m_nvram->di_write(data_out);
+	m_nvram->clk_write(clock);
 }
 
 static void abc1600_floppies(device_slot_interface &device)
@@ -1136,7 +1136,7 @@ void abc1600_state::abc1600(machine_config &config)
 	m_cio->pc_rd_cb().set(FUNC(abc1600_state::cio_pc_r));
 	m_cio->pc_wr_cb().set(FUNC(abc1600_state::cio_pc_w));
 
-	NMC9306(config, m_nvram);
+	EEPROM_93C06_16BIT(config, m_nvram);
 
 	E0516(config, m_rtc, XTAL(32'768));
 	m_rtc->outsel_rd_cb().set_constant(0);
