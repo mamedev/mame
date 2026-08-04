@@ -5721,26 +5721,28 @@ void z8002_device::ZAE_dddd_cccc()
 {
 	GET_CCC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
-	uint8_t tmp = RB(dst) & ~1;
+	/* the destination is only written when the condition is
+	   true; a false condition leaves bit 0 as it was */
+	bool cond = false;
 	switch (cc) {
-		case  0: if (CC0) tmp |= 1; break;
-		case  1: if (CC1) tmp |= 1; break;
-		case  2: if (CC2) tmp |= 1; break;
-		case  3: if (CC3) tmp |= 1; break;
-		case  4: if (CC4) tmp |= 1; break;
-		case  5: if (CC5) tmp |= 1; break;
-		case  6: if (CC6) tmp |= 1; break;
-		case  7: if (CC7) tmp |= 1; break;
-		case  8: if (CC8) tmp |= 1; break;
-		case  9: if (CC9) tmp |= 1; break;
-		case 10: if (CCA) tmp |= 1; break;
-		case 11: if (CCB) tmp |= 1; break;
-		case 12: if (CCC) tmp |= 1; break;
-		case 13: if (CCD) tmp |= 1; break;
-		case 14: if (CCE) tmp |= 1; break;
-		case 15: if (CCF) tmp |= 1; break;
+		case  0: cond = CC0; break;
+		case  1: cond = CC1; break;
+		case  2: cond = CC2; break;
+		case  3: cond = CC3; break;
+		case  4: cond = CC4; break;
+		case  5: cond = CC5; break;
+		case  6: cond = CC6; break;
+		case  7: cond = CC7; break;
+		case  8: cond = CC8; break;
+		case  9: cond = CC9; break;
+		case 10: cond = CCA; break;
+		case 11: cond = CCB; break;
+		case 12: cond = CCC; break;
+		case 13: cond = CCD; break;
+		case 14: cond = CCE; break;
+		case 15: cond = CCF; break;
 	}
-	RB(dst) = tmp;
+	if (cond) RB(dst) |= 1;
 }
 
 /******************************************
@@ -5751,26 +5753,28 @@ void z8002_device::ZAF_dddd_cccc()
 {
 	GET_CCC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
-	uint16_t tmp = RW(dst) & ~1;
+	/* the destination is only written when the condition is
+	   true; a false condition leaves bit 0 as it was */
+	bool cond = false;
 	switch (cc) {
-		case  0: if (CC0) tmp |= 1; break;
-		case  1: if (CC1) tmp |= 1; break;
-		case  2: if (CC2) tmp |= 1; break;
-		case  3: if (CC3) tmp |= 1; break;
-		case  4: if (CC4) tmp |= 1; break;
-		case  5: if (CC5) tmp |= 1; break;
-		case  6: if (CC6) tmp |= 1; break;
-		case  7: if (CC7) tmp |= 1; break;
-		case  8: if (CC8) tmp |= 1; break;
-		case  9: if (CC9) tmp |= 1; break;
-		case 10: if (CCA) tmp |= 1; break;
-		case 11: if (CCB) tmp |= 1; break;
-		case 12: if (CCC) tmp |= 1; break;
-		case 13: if (CCD) tmp |= 1; break;
-		case 14: if (CCE) tmp |= 1; break;
-		case 15: if (CCF) tmp |= 1; break;
+		case  0: cond = CC0; break;
+		case  1: cond = CC1; break;
+		case  2: cond = CC2; break;
+		case  3: cond = CC3; break;
+		case  4: cond = CC4; break;
+		case  5: cond = CC5; break;
+		case  6: cond = CC6; break;
+		case  7: cond = CC7; break;
+		case  8: cond = CC8; break;
+		case  9: cond = CC9; break;
+		case 10: cond = CCA; break;
+		case 11: cond = CCB; break;
+		case 12: cond = CCC; break;
+		case 13: cond = CCD; break;
+		case 14: cond = CCE; break;
+		case 15: cond = CCF; break;
 	}
-	RW(dst) = tmp;
+	if (cond) RW(dst) |= 1;
 }
 
 /******************************************
