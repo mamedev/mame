@@ -167,6 +167,8 @@ uint32_t crtc186_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 				offs_t const attr_addr = (m_modeg << 12) | (lnel << 11) | (revl << 10) | (none << 9) | (bldl << 8) | char_data;
 				u8 attr_data = m_attr_rom->base()[attr_addr];
 
+				u8 const gap_data = bldl ? m_attr_rom->base()[attr_addr & ~0x100] : 0;
+
 				bool pixel = m_cpl;
 
 				for (int bit = 0; bit < 10; bit++)
@@ -181,7 +183,7 @@ uint32_t crtc186_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 					}
 
 					if (!lnel && bit == 9) {
-						pixel = m_cpl;
+						pixel = BIT(gap_data, 0) ^ m_cpl;
 					}
 
 					if (undl && y == 14) {
