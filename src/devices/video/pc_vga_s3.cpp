@@ -91,7 +91,7 @@ u16 s3vision864_vga_device::line_compare_mask()
 
 uint16_t s3vision864_vga_device::offset()
 {
-	if(s3.memory_config & 0x08)
+	if((s3.memory_config & 0x08) || BIT(s3.cr3a, 4))
 		return vga.crtc.offset << 3;
 	return vga_device::offset();
 }
@@ -252,6 +252,14 @@ void s3vision864_vga_device::crtc_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) {
 			// TODO: reg lock mechanism
 			s3.reg_lock2 = data;
+		})
+	);
+	map(0x3a, 0x3a).lrw8(
+		NAME([this] (offs_t offset) {
+			return s3.cr3a;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			s3.cr3a = data;
 		})
 	);
 	map(0x40, 0x40).lw8(

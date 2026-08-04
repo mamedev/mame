@@ -588,6 +588,8 @@ if BUSES["AMIGA_ZORRO"] then
 		MAME_DIR .. "src/devices/bus/amiga/zorro/adscsi.h",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/buddha.cpp",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/buddha.h",
+		MAME_DIR .. "src/devices/bus/amiga/zorro/cybervision64.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/zorro/cybervision64.h",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/dkb3128.cpp",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/dkb3128.h",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/merlin.cpp",

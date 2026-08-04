@@ -221,6 +221,66 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- CyberVision Monitor 1.33, cybergraphics.library 40.64 -->
+	<software name="cv64_214" supported="no">
+		<description>CyberVision 64 Driver V2.14</description>
+		<year>1995</year>
+		<publisher>Phase 5</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="901120">
+				<rom name="cybervision64-214.adf" size="901120" crc="63237421" sha1="549eba15eadbc13caee716affd578f17500f8adb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- CyberVision Monitor 1.37, cybergraphics.library 40.64, cyberintuition.library: 40.28 -->
+	<software name="cv64_215" supported="no">
+		<description>CyberVision 64 Driver V2.15</description>
+		<year>1995</year>
+		<publisher>Phase 5</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="901120">
+				<rom name="cybervision64-215.adf" size="901120" crc="f691e45d" sha1="f5f2a825b91a69a93da2f869304c9c4dab8d9653" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- CyberVision Monitor 1.39, cybergraphics.library 40.64, cyberintuition.library: 40.30 -->
+	<software name="cv64_216" supported="no">
+		<description>CyberVision 64 Driver V2.16</description>
+		<year>1996</year>
+		<publisher>Phase 5</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="901120">
+				<rom name="cybervision64-216.adf" size="901120" crc="68fb738e" sha1="95e8512b26f902ad66d6b0b310aeea2346ce329c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- CyberVision Monitor 1.62, cybergraphics.library 40.89, cyberintuition.library: 40.31 -->
+	<software name="cv64_218" supported="no">
+		<description>CyberVision 64 Driver V2.18</description>
+		<year>1996</year>
+		<publisher>Phase 5</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="901120">
+				<rom name="cybervision64_218.adf" size="901120" crc="3870727f" sha1="bc641f37fb5c57d2a6d228a79256cb21a7330004" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- DMS file with bad sectors -->
+	<software name="cv64_photogenics" supported="no">
+		<description>Photogenics Lite for CyberVision 64 V1.2</description>
+		<year>1996</year>
+		<publisher>Phase 5</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="901120">
+				<rom name="cybervision64_photogenics_lite.adf" size="901120" crc="1cd7b260" sha1="9e3970fddb3580e5b07c1a6206a0ff14a3a50e88" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bschdinst35">
 		<description>bsc HDInstTools Version 3.5 + GigaMem Version 3.0</description>
 		<year>1995</year>
