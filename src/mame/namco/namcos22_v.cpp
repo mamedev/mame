@@ -1540,7 +1540,6 @@ void namcos22_state::draw_polygons()
 	if (m_pdp_render_done && m_slave_simulation_active)
 	{
 		simulate_slavedsp();
-		m_poly->wait("draw_polygons");
 	}
 }
 
@@ -2388,7 +2387,6 @@ void namcos22s_state::recalc_czram()
 
 void namcos22_state::update_mixer()
 {
-	m_poly->wait("update_mixer");
 #if 0 // show reg contents
 	char msg1[0x1000] = {0}, msg2[0x1000] = {0};
 	int st = 0x000 / 16;
