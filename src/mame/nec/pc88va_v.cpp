@@ -1453,7 +1453,6 @@ void pc88va_state::execute_sync_cmd()
 void pc88va_state::recompute_parameters()
 {
 	rectangle visarea;
-	attoseconds_t refresh;
 
 	const u8 h_blank_start = (m_crtc_regs[0x02] & 0x3f) + 1;
 	const u8 h_border_start = (m_crtc_regs[0x03] & 0x3f) + 1;
@@ -1527,7 +1526,7 @@ void pc88va_state::recompute_parameters()
 	// (sets 0xc0 regardless of CRT Mode setting)
 	const int clock_speed = !!BIT(m_crtc_regs[0x00], 6) ? (31'948'800 / 4) : (28'636'363 / 2);
 
-	refresh = HZ_TO_ATTOSECONDS(clock_speed) * h_vis_area * v_vis_area;
+	attotime refresh = attotime::from_ticks(h_vis_area * v_vis_area, clock_speed);
 
 	m_screen->configure(h_total, v_total, visarea, refresh);
 }

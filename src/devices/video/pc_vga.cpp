@@ -1613,7 +1613,6 @@ uint32_t vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 void vga_device::recompute_params_clock(int divisor, int xtal)
 {
 	int vblank_period, hblank_period;
-	attoseconds_t refresh;
 	// if not in graphic mode and not Clocking Mode bit 0 select 9 dots per charset
 	uint8_t hclock_m = !vga.gc.alpha_dis && !BIT(vga.sequencer.data[1], 0) ? 9 : 8;
 	int pixel_clock;
@@ -1633,7 +1632,7 @@ void vga_device::recompute_params_clock(int divisor, int xtal)
 	// TODO: improve/complete clocking modes
 	pixel_clock = xtal / (((vga.sequencer.data[1]&8) >> 3) + 1);
 
-	refresh  = HZ_TO_ATTOSECONDS(pixel_clock) * (hblank_period) * vblank_period;
+	attotime refresh  = attotime::from_ticks(hblank_period * vblank_period, pixel_clock);
 	screen().configure((hblank_period), (vblank_period), visarea, refresh );
 	m_vblank_timer->adjust( screen().time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
 }

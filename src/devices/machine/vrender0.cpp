@@ -686,7 +686,7 @@ void vrender0soc_device::crtc_update()
 	//logerror("%dX%d %dX%d %d\n",htot, vtot, hdisp, vdisp, pixel_clock);
 
 	rectangle const visarea(0, hdisp - 1, 0, vdisp - 1);
-	m_screen->configure(htot, vtot, visarea, HZ_TO_ATTOSECONDS(pixel_clock) * vtot * htot);
+	m_screen->configure(htot, vtot, visarea, attotime::from_ticks(vtot * htot, pixel_clock));
 }
 
 // accessed by cross puzzle

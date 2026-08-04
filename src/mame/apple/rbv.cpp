@@ -122,14 +122,14 @@ void rbv_device::device_reset()
 			m_hres = 640;
 			m_vres = 870;
 			m_monochrome = true;
-			m_screen->configure(832, 918, rectangle(0, 639, 0, 869), HZ_TO_ATTOSECONDS(57.2832_MHz_XTAL / (832 * 918)));
+			m_screen->configure(832, 918, rectangle(0, 639, 0, 869), attotime::from_ticks(832 * 918, 57.2832_MHz_XTAL));
 			break;
 
 		case 2: // 12" RGB
 			m_hres = 512;
 			m_vres = 384;
 			m_monochrome = false;
-			m_screen->configure(640, 407, rectangle(0, 511, 0, 383), HZ_TO_ATTOSECONDS(double(clock()) / (2 * 640 * 407)));
+			m_screen->configure(640, 407, rectangle(0, 511, 0, 383), attotime::from_ticks(2 * 640 * 407, clock()));
 			break;
 
 		case 6: // 13" RGB
@@ -137,7 +137,7 @@ void rbv_device::device_reset()
 			m_hres = 640;
 			m_vres = 480;
 			m_monochrome = false;
-			m_screen->configure(864, 525, rectangle(0, 639, 0, 479), HZ_TO_ATTOSECONDS(30.24_MHz_XTAL / (864 * 525)));
+			m_screen->configure(864, 525, rectangle(0, 639, 0, 479), attotime::from_ticks(864 * 525, 30.24_MHz_XTAL));
 			break;
 		}
 		m_configured = true;

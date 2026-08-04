@@ -806,7 +806,7 @@ void jmfb_device::update_crtc()
 		screen().configure(
 				hpixels, vlines,
 				rectangle(left, left + width - 1, top, top + height - 1),
-				attotime::from_ticks(frametotal << (convolution ? 2 : 0) >> (interlace ? 1 : 0), pixclk).attoseconds());
+				attotime::from_ticks(frametotal << (convolution ? 2 : 0) >> (interlace ? 1 : 0), pixclk));
 
 		set_vbl_timer();
 	}

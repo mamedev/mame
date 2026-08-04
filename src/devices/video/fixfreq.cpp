@@ -268,7 +268,7 @@ void fixedfreq_device::device_config_complete()
 	// However the width and height determine the width of the mame window.
 	// It is therefore recommended to use `set_raw` in the mame driver
 	// to specify the window size.
-	if (!screen().refresh_attoseconds())
+	if (!screen().configured())
 	{
 		screen().set_raw(
 				m_monitor.m_monitor_clock, m_monitor.htotal(), 0,
@@ -492,7 +492,7 @@ void fixedfreq_device::vsync_end_cb(double refresh_time, uint32_t field)
 			0);
 	screen().configure(
 			m_monitor.htotal_scaled(), m_monitor.vtotal(), visarea,
-			DOUBLE_TO_ATTOSECONDS(refresh_limited));
+			attotime::from_double(refresh_limited));
 }
 
 NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_composite_monochrome)

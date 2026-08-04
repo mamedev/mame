@@ -565,8 +565,6 @@ void vis_vga_device::flush_8bpp_mode()
 
 void vis_vga_device::recompute_params()
 {
-	int vblank_period,hblank_period;
-	attoseconds_t refresh;
 	uint8_t hclock_m = (!vga.gc.alpha_dis) ? (vga.sequencer.data[1]&1)?8:9 : 8;
 	int pixel_clock;
 	const XTAL base_xtal = XTAL(14'318'181);
@@ -579,13 +577,13 @@ void vis_vga_device::recompute_params()
 
 	rectangle visarea(0, ((vga.crtc.horz_disp_end + 1) * ((float)(hclock_m)/divisor))-1, 0, vga.crtc.vert_disp_end);
 
-	vblank_period = (vga.crtc.vert_total + 2);
-	hblank_period = ((vga.crtc.horz_total + 5) * ((float)(hclock_m)/divisor));
+	int vblank_period = (vga.crtc.vert_total + 2);
+	int hblank_period = ((vga.crtc.horz_total + 5) * ((float)(hclock_m)/divisor));
 
 	/* TODO: 10b and 11b settings aren't known */
 	pixel_clock = xtal.value() / (((vga.sequencer.data[1]&8) >> 3) + 1);
 
-	refresh  = HZ_TO_ATTOSECONDS(pixel_clock) * (hblank_period) * vblank_period;
+	attotime refresh  = attotime::from_ticks(hblank_period * vblank_period, pixel_clock);
 	screen().configure((hblank_period), (vblank_period), visarea, refresh );
 	//popmessage("%d %d\n",vga.crtc.horz_total * 8,vga.crtc.vert_total);
 	m_vblank_timer->adjust( screen().time_until_pos((vga.crtc.vert_blank_start + vga.crtc.vert_blank_end)) );

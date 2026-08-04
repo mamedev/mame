@@ -2941,7 +2941,7 @@ void amstrad_state::amstrad_common_init()
 TIMER_CALLBACK_MEMBER(amstrad_state::cb_set_resolution)
 {
 	rectangle visarea;
-	attoseconds_t refresh;
+	attotime refresh;
 	int height;
 
 	if ( m_io_solder_links->read() & 0x10 )
@@ -2956,7 +2956,7 @@ TIMER_CALLBACK_MEMBER(amstrad_state::cb_set_resolution)
 		visarea.set(0, 64 + 640 + 64 - 1, 16, 16 + 15 + 200 + 15 - 1);
 		height = 262;
 	}
-	refresh = HZ_TO_ATTOSECONDS( XTAL(16'000'000) ) * 1024 * height;
+	refresh = attotime::from_ticks(1024 * height, 16'000'000);
 	m_screen->configure( 1024, height, visarea, refresh );
 }
 

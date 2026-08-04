@@ -1096,12 +1096,11 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	int width = ((m_ppu_crtc_zoom[1] & 0xffff0000) >> 16) - (m_ppu_crtc_zoom[0] & 0xffff);
 	if (width > 0 && m_screenwidth != width)
 	{
-		attoseconds_t period = screen.frame_period().attoseconds();
 		rectangle visarea = screen.visible_area();
 
 		int height = ((m_ppu_crtc_zoom[5] & 0xffff0000) >> 16) - (m_ppu_crtc_zoom[4] & 0xffff);
 		visarea.set(0, width - 1, 0, height - 1);
-		screen.configure(width, height, visarea, period);
+		screen.configure(width, height, visarea, screen.frame_period());
 		m_screenwidth = width;
 	}
 

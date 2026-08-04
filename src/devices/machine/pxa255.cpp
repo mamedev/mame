@@ -1478,7 +1478,7 @@ void pxa255_periphs_device::lcd_lccr_w(offs_t offset, u32 data, u32 mem_mask)
 			if (lpp && ppl)
 			{
 				rectangle rect(0, ppl, 0, lpp);
-				m_screen->configure(1024, 1024, rect, HZ_TO_ATTOSECONDS(60));
+				m_screen->configure(1024, 1024, rect, attotime::from_hz(60));
 			}
 		}
 	}

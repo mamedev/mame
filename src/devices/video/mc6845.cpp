@@ -377,10 +377,10 @@ void mc6845_device::recompute_parameters(bool postload)
 			LOGRAW("screen.set_raw(%lu, %d, 0, %d, %d, 0, %d);\n", this->clock() * m_hpixels_per_column, horiz_pix_total, max_visible_x + 1, vert_pix_total, max_visible_y + 1);
 
 			if (has_screen())
-				screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh.as_attoseconds());
+				screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
 			if(!m_reconfigure_cb.isnull())
-				m_reconfigure_cb(horiz_pix_total, vert_pix_total, visarea, refresh.as_attoseconds());
+				m_reconfigure_cb(horiz_pix_total, vert_pix_total, visarea, refresh);
 
 			m_has_valid_parameters = true;
 		}

@@ -1059,7 +1059,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 		if (height != m_screen->height())
 		{
 			// toggle 50/60 Hz, both use 65 1M cycles per scanline
-			m_screen->configure(m_screen->width(), height, m_screen->visible_area(), HZ_TO_ATTOSECONDS(A2GS_1M.dvalue() / (65 * height)));
+			m_screen->configure(m_screen->width(), height, m_screen->visible_area(), attotime::from_ticks(65*height, A2GS_1M.dvalue()));
 			if (scanline >= height)
 				scanline -= height;
 		}

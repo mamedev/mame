@@ -758,7 +758,7 @@ void ym7101_device::flush_screen_mode()
 
 	rectangle visarea(0, (h40_mode ? 320 : 256) - 1, 0, 224 - 1);
 
-	attoseconds_t refresh = HZ_TO_ATTOSECONDS(target_clock) * htotal * vtotal;
+	attotime refresh = attotime::from_ticks(htotal * vtotal, target_clock);
 
 	// 427, 0, 320, 262, 0, 224
 	screen().configure(htotal, vtotal, visarea, refresh);

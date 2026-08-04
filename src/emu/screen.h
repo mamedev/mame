@@ -168,7 +168,6 @@ public:
 	rectangle visible_area() const override { return m_visarea; }
 	const rectangle &cliprect() const { return m_bitmap[0].cliprect(); }
 	bool oldstyle_vblank_supplied() const { return m_oldstyle_vblank_supplied; }
-	attoseconds_t refresh_attoseconds() const { return m_refresh; }
 	attoseconds_t vblank_attoseconds() const { return m_vblank; }
 	bitmap_format format() const { return !m_screen_update_ind16.isnull() ? BITMAP_FORMAT_IND16 : BITMAP_FORMAT_RGB32; }
 	float xoffset() const { return m_xoffset; }
@@ -203,8 +202,8 @@ public:
 	{
 		assert(pixclock != 0);
 		set_clock(pixclock);
-		m_refresh = HZ_TO_ATTOSECONDS(pixclock) * htotal * vtotal;
-		m_vblank = m_refresh / vtotal * (vtotal - (vbstart - vbend));
+		m_frame_period = HZ_TO_ATTOSECONDS(pixclock) * htotal * vtotal;
+		m_vblank = m_frame_period / vtotal * (vtotal - (vbstart - vbend));
 		m_oldstyle_vblank_supplied = false;
 		m_width = htotal;
 		m_height = vtotal;
@@ -220,7 +219,7 @@ public:
 	{
 		return set_raw(xtal, htotal, visarea.left(), visarea.right() + 1, vtotal, visarea.top(), visarea.bottom() + 1);
 	}
-	void set_refresh(attoseconds_t rate) { m_refresh = rate; }
+	void set_refresh(attotime period) { m_frame_period = period.as_attoseconds(); }
 
 	/// \brief Set refresh rate in Hertz
 	///
@@ -232,7 +231,7 @@ public:
 	/// \return Reference to device for method chaining.
 	template <typename T> screen_device &set_refresh_hz(T &&hz)
 	{
-		set_refresh(HZ_TO_ATTOSECONDS(std::forward<T>(hz)));
+		set_refresh(attotime::from_hz(std::forward<T>(hz)));
 		return *this;
 	}
 
@@ -353,7 +352,7 @@ public:
 	screen_bitmap &curbitmap() { return m_bitmap[m_curtexture]; }
 
 	// dynamic configuration
-	void configure(int width, int height, const rectangle &visarea, attoseconds_t frame_period);
+	void configure(int width, int height, const rectangle &visarea, attotime frame_period);
 	void reset_origin(int beamy = 0, int beamx = 0);
 	void set_visible_area(int min_x, int max_x, int min_y, int max_y);
 	void set_brightness(u8 brightness) { m_brightness = brightness; }
@@ -429,7 +428,6 @@ private:
 	bool                m_is_lcd;                   // indicate if the screen is LCD
 	std::pair<unsigned, unsigned> m_phys_aspect;    // physical aspect ratio
 	bool                m_oldstyle_vblank_supplied; // set_vblank_time call used
-	attoseconds_t       m_refresh;                  // default refresh period
 	attoseconds_t       m_vblank;                   // duration of a VBLANK
 	float               m_xoffset, m_yoffset;       // default X/Y offsets
 	float               m_xscale, m_yscale;         // default X/Y scale factor

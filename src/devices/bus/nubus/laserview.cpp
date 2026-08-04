@@ -214,7 +214,7 @@ void nubus_laserview_device::regs_w(offs_t offset, u8 data)
 			if (data == 0xc1)
 			{
 				const rectangle visarea(0, (m_hvis / 2) - 1, 0, (m_vvis / 2) - 1);
-				m_screen->configure(m_htotal / 2, m_vtotal / 2, visarea, attotime::from_ticks((m_htotal / 2) * (m_vtotal / 2), 160000000 / 2).as_attoseconds());
+				m_screen->configure(m_htotal / 2, m_vtotal / 2, visarea, attotime::from_ticks((m_htotal / 2) * (m_vtotal / 2), 160000000 / 2));
 			}
 			break;
 

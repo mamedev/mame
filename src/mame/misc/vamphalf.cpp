@@ -866,13 +866,13 @@ void vamphalf_state::handle_flipped_visible_area(screen_device &screen)
 	{
 		rectangle visarea;
 		visarea.set(31, 350, 16, 251);
-		screen.configure(screen.width(), screen.height(), visarea, screen.refresh_attoseconds());
+		screen.configure(screen.width(), screen.height(), visarea, screen.frame_period());
 	}
 	else
 	{
 		rectangle visarea;
 		visarea.set(31, 350, 20, 255);
-		screen.configure(screen.width(), screen.height(), visarea, screen.refresh_attoseconds());
+		screen.configure(screen.width(), screen.height(), visarea, screen.frame_period());
 	}
 }
 

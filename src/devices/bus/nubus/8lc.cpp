@@ -352,7 +352,7 @@ void lcpds_cv8lc_device::registers_w(offs_t offset, u32 data, u32 mem_mask)
 			if ((m_hres != 0) && (m_vres != 0) && (m_htotal != 0) && (m_vtotal != 0))
 			{
 				rectangle visarea(0, m_hres - 1, 0, m_vres - 1);
-				m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pixel_clock).as_attoseconds());
+				m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pixel_clock));
 			}
 		}
 	}

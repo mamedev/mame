@@ -27,7 +27,6 @@
 
 #include "imagedev/cassette.h"
 #include "machine/laserdsc.h"
-#include "vector.h"
 
 #include "config.h"
 #include "emuopts.h"

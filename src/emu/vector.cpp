@@ -57,7 +57,7 @@ vector_device::vector_device(const machine_config &mconfig, const char *tag, dev
 		m_min_intensity(255),
 		m_max_intensity(0),
 		m_visarea(rectangle()),
-	  m_frame_period(attotime::from_hz(60)),
+		m_frame_period(attotime::from_hz(DEFAULT_FRAME_RATE)),
 		m_color(rgb_t::green()),
 		m_vblank(*this),
 		m_vector_update(*this),

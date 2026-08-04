@@ -56,7 +56,6 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 	, m_is_lcd(false)
 	, m_phys_aspect(0U, 0U)
 	, m_oldstyle_vblank_supplied(false)
-	, m_refresh(0)
 	, m_vblank(0)
 	, m_xoffset(0.0f)
 	, m_yoffset(0.0f)
@@ -208,7 +207,7 @@ void screen_device::device_validity_check(validity_checker &valid) const
 		osd_printf_error("Missing SCREEN_UPDATE function\n");
 
 	// check for invalid frame rate
-	if (m_refresh == 0 || m_refresh > ATTOSECONDS_PER_SECOND)
+	if (m_frame_period == 0 || m_frame_period > ATTOSECONDS_PER_SECOND)
 		osd_printf_error("Invalid (under 1Hz) refresh rate\n");
 
 	texture_format texformat = !m_screen_update_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
@@ -326,7 +325,7 @@ void screen_device::device_start()
 		m_scanline_timer = timer_alloc(FUNC(screen_device::scanline_tick), this);
 
 	// configure the screen with the default parameters
-	configure(m_width, m_height, m_visarea, m_refresh);
+	configure(m_width, m_height, m_visarea, attotime(0, m_frame_period));
 
 	// reset VBLANK timing
 	m_vblank_start_time = attotime::zero;
@@ -450,7 +449,7 @@ TIMER_CALLBACK_MEMBER(screen_device::scanline_tick)
 //  configure - configure screen parameters
 //-------------------------------------------------
 
-void screen_device::configure(int width, int height, const rectangle &visarea, attoseconds_t frame_period)
+void screen_device::configure(int width, int height, const rectangle &visarea, attotime frame_period)
 {
 	// validate arguments
 	assert(width > 0);
@@ -461,7 +460,6 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 //  assert(visarea.bottom() < height);
 	assert(visarea.left() < width);
 	assert(visarea.top() < height);
-	assert(frame_period > 0);
 
 	// fill in the new parameters
 	m_max_width = std::max(m_max_width, width);
@@ -473,9 +471,9 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 	realloc_screen_bitmaps();
 
 	// compute timing parameters
-	m_frame_period = frame_period;
-	m_scantime = frame_period / height;
-	m_pixeltime = frame_period / (height * width);
+	m_frame_period = frame_period.as_attoseconds();
+	m_scantime = m_frame_period / height;
+	m_pixeltime = m_frame_period / (height * width);
 
 	// if an old style VBLANK_TIME was specified in the MACHINE_CONFIG,
 	// use it; otherwise calculate the VBLANK period from the visible area
@@ -514,7 +512,7 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 
 void screen_device::override_frame_period(attotime period)
 {
-	configure(m_width, m_height, m_visarea, period.as_attoseconds());
+	configure(m_width, m_height, m_visarea, period);
 }
 
 
@@ -616,7 +614,7 @@ void screen_device::set_visible_area(int min_x, int max_x, int min_y, int max_y)
 {
 	rectangle visarea(min_x, max_x, min_y, max_y);
 	assert(!visarea.empty());
-	configure(m_width, m_height, visarea, m_frame_period);
+	configure(m_width, m_height, visarea, attotime(0, m_frame_period));
 }
 
 

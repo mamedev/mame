@@ -315,12 +315,11 @@ void saturn_vdp2_device::reconfigure_crtc()
 		vert_res = 480;
 
 	int vblank_period, hblank_period;
-	attoseconds_t refresh;
 	rectangle visarea(0, horz_res - 1, 0, vert_res - 1);
 
 	vblank_period = get_vblank_duration();
 	hblank_period = get_hblank_duration();
-	refresh  = HZ_TO_ATTOSECONDS(get_pixel_clock()) * (hblank_period) * vblank_period;
+	attotime refresh  = attotime::from_ticks(hblank_period * vblank_period, get_pixel_clock());
 	//printf("%d %d %d %d\n",horz_res,vert_res,horz_res+hblank_period,vblank_period);
 
 	// save these to reuse them in scan timer

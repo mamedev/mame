@@ -194,7 +194,7 @@ void taos_device::rebuild_params()
 		if ((m_hres != 0) && (m_vres != 0))
 		{
 			rectangle visarea(0, m_hres - 1, 0, m_vres - 1);
-			m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pixel_clock).as_attoseconds());
+			m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pixel_clock));
 		}
 	}
 }

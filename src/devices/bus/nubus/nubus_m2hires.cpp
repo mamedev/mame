@@ -323,7 +323,7 @@ void nubus_m2hires_device::registers_w(offs_t offset, u32 data, u32 mem_mask)
 		LOGMASKED(LOG_CRTC, "htotal %d vtotal %d hres %d vres %d\n", m_htotal, m_vtotal, m_hres, m_vres);
 
 		rectangle visarea(0, m_hres - 1, 0, m_vres - 1);
-		m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pclock).as_attoseconds());
+		m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pclock));
 	}
 }
 

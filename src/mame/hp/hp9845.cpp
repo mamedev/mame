@@ -949,11 +949,11 @@ void hp9845b_state::set_graphic_mode(bool graphic)
 		m_graphic_sel = graphic;
 		logerror("GS=%d\n" , graphic);
 		if (m_graphic_sel) {
-			m_screen->configure(GVIDEO_HTOTAL , GVIDEO_VTOTAL , rectangle(GVIDEO_HBEND , GVIDEO_HBSTART - 1 , GVIDEO_VBEND , GVIDEO_VBSTART - 1) , HZ_TO_ATTOSECONDS(VIDEO_PIXEL_CLOCK) * GVIDEO_HTOTAL * GVIDEO_VTOTAL);
+			m_screen->configure(GVIDEO_HTOTAL , GVIDEO_VTOTAL , rectangle(GVIDEO_HBEND , GVIDEO_HBSTART - 1 , GVIDEO_VBEND , GVIDEO_VBSTART - 1) , attotime::from_ticks(GVIDEO_HTOTAL * GVIDEO_VTOTAL, VIDEO_PIXEL_CLOCK));
 			// Set graphic mode view (1.23:1 aspect ratio)
 			machine().render().first_target()->set_view(1);
 		} else {
-			m_screen->configure(VIDEO_HTOTAL , VIDEO_VTOTAL , rectangle(0 , VIDEO_HBSTART - 1 , 0 , VIDEO_ACTIVE_SCANLINES - 1) , HZ_TO_ATTOSECONDS(VIDEO_PIXEL_CLOCK) * VIDEO_HTOTAL * VIDEO_VTOTAL);
+			m_screen->configure(VIDEO_HTOTAL , VIDEO_VTOTAL , rectangle(0 , VIDEO_HBSTART - 1 , 0 , VIDEO_ACTIVE_SCANLINES - 1) , attotime::from_ticks(VIDEO_HTOTAL * VIDEO_VTOTAL, VIDEO_PIXEL_CLOCK));
 			// Set alpha mode view (1.92:1 aspect ratio)
 			machine().render().first_target()->set_view(0);
 		}

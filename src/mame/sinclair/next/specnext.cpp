@@ -1023,7 +1023,7 @@ void specnext_state::update_video_mode()
 	// The visarea can't overlap with screen last vpos. Possibly related to https://github.com/mamedev/mame/pull/9945
 	visarea.max_y = std::min(visarea.max_y, height - 2);
 
-	m_screen->configure(width, height, visarea, HZ_TO_ATTOSECONDS(28_MHz_XTAL / 2) * width * height);
+	m_screen->configure(width, height, visarea, attotime::from_ticks(width * height, 28_MHz_XTAL / 2));
 	m_ula_scr->set_raster_offset(left, top);
 	m_lores->set_raster_offset(left, top);
 	m_tiles->set_raster_offset(left, top);

@@ -1019,7 +1019,7 @@ void n64_periphs::vi_recalculate_resolution()
 
 	rectangle visarea = screen().visible_area();
 	// DACRATE is the quarter pixel clock and period will be for a field, not a frame
-	attoseconds_t period = (vi_hsync & 0xfff) * (vi_vsync & 0xfff) * HZ_TO_ATTOSECONDS(DACRATE_NTSC) / 2;
+	attotime period = attotime::from_ticks((vi_hsync & 0xfff) * (vi_vsync & 0xfff), DACRATE_NTSC / 2);
 
 	if (width <= 0 || height <= 0 || (vi_control & 3) == 0)
 	{

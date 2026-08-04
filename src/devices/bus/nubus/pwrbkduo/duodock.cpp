@@ -488,7 +488,7 @@ void duodock_device::recalc_crtc()
 	m_vtotal = (m_video_regs[VSC_VFP] + m_video_regs[VSC_VS] + m_video_regs[VSC_VBP] + m_video_regs[VSC_VA]);
 	LOGMASKED(LOG_VIDEO, "hres %d vres %d htotal %d vtotal %d pclock %d, %f Hz\n", m_hres, m_vres, m_htotal, m_vtotal, m_pclock, (double)((double)m_pclock / (double)(m_htotal*m_vtotal)));
 	rectangle visarea(0, m_hres - 1, 0, m_vres - 1);
-	m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pclock).as_attoseconds());
+	m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pclock));
 }
 
 void duodock_device::pclock_w(u32 new_clock)

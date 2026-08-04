@@ -1596,7 +1596,7 @@ void casloopy_state::system_control_w(u16 data)
 	// 224/240 line mode
 	if (BIT(m_system_control, 1) != BIT(data, 1))
 	{
-		const attoseconds_t refresh = HZ_TO_ATTOSECONDS(VIDEO_CLOCK / 4) * H_TOTAL * V_TOTAL;
+		const attotime refresh = attotime::from_ticks(H_TOTAL * V_TOTAL, VIDEO_CLOCK / 4);
 		const int v_active = BIT(data, 1) ? V_ACTIVE_1 : V_ACTIVE_0;
 
 		rectangle visarea(0, H_ACTIVE - 1, 0, v_active - 1);

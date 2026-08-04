@@ -521,7 +521,7 @@ void mz2500_state::crtc_reconfigure_screen()
 
 	//popmessage("%d %d %d %d %02x",vs,ve,hs,he,m_cg_reg[0x0e]);
 
-	m_screen->configure(720, 480, visarea, m_screen->frame_period().attoseconds());
+	m_screen->configure(720, 480, visarea, m_screen->frame_period());
 
 	/* calculate CG window parameters here */
 	m_cg_vs = m_cg_reg[0x08] | (BIT(m_cg_reg[0x09], 0)<<8);

@@ -545,7 +545,7 @@ inline void pc6001mk2_state::refresh_crtc_params()
 	const int vtotal = 262;
 	const XTAL pclock = XTAL(28'636'363) / 4;
 
-	m_screen->configure(htotal, vtotal, visarea, attotime::from_ticks(htotal * vtotal, pclock).as_attoseconds());
+	m_screen->configure(htotal, vtotal, visarea, attotime::from_ticks(htotal * vtotal, pclock));
 
 }
 
@@ -894,7 +894,7 @@ inline void pc6001mk2sr_state::refresh_crtc_params()
 	const int vtotal = 262;
 	const XTAL pclock = XTAL(28'636'363) / (4 >> m_width80);
 
-	m_screen->configure(htotal, vtotal, visarea, attotime::from_ticks(htotal * vtotal, pclock).as_attoseconds());
+	m_screen->configure(htotal, vtotal, visarea, attotime::from_ticks(htotal * vtotal, pclock));
 }
 
 void pc6001mk2sr_state::pc6001mk2sr_map(address_map &map)

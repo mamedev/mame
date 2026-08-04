@@ -302,7 +302,7 @@ void falco500_state::asic_mode_w(uint8_t data)
 
 	// timing wrong
 	rectangle visarea(0, (BIT(data, 0) ? 1320 : 1120) - 1, 0, 400 - 1);
-	m_screen->configure(1500, 422, visarea, HZ_TO_ATTOSECONDS(60));
+	m_screen->configure(1500, 422, visarea, attotime::from_hz(60));
 }
 
 void falco500_state::kbd_int_w(int state)

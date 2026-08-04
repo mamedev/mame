@@ -1340,7 +1340,7 @@ void output_display(std::ostream &out, device_t &device, machine_flags::type con
 			const screen_device *output_as_screen = dynamic_cast<const screen_device *>(&screendev);
 			if (output_as_screen && !output_as_screen->oldstyle_vblank_supplied())
 			{
-				int pixclock = output_as_screen->width() * output_as_screen->height() * ATTOSECONDS_TO_HZ(output_as_screen->refresh_attoseconds());
+				int pixclock = output_as_screen->width() * output_as_screen->height() * output_as_screen->frame_period().as_hz();
 
 				util::stream_format(out, " pixclock=\"%d\"", pixclock);
 				util::stream_format(out, " htotal=\"%d\"", output_as_screen->width());

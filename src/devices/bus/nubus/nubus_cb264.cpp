@@ -331,7 +331,7 @@ void nubus_cb264_device::cb264_w(offs_t offset, u32 data, u32 mem_mask)
 				LOG("hres %d vres %d htotal %d vtotal %d\n", hres, vres, htotal, vtotal);
 
 				const rectangle visarea(0, hres - 1, 0, vres - 1);
-				m_screen->configure(htotal, vtotal, visarea, attotime::from_ticks(htotal * vtotal, 30'240'000).as_attoseconds());
+				m_screen->configure(htotal, vtotal, visarea, attotime::from_ticks(htotal * vtotal, 30'240'000));
 			}
 
 			m_force_blank = data;

@@ -410,7 +410,7 @@ void maverick_device::compute_video_mode()
 	LOGMASKED(LOG_CRTC, "New video mode: %d x %d at %d pixel clock, rowbytes %d\n", m_hres, m_vres, m_pclock, m_rowbytes);
 
 	rectangle visarea(0, m_hres - 1, 0, m_vres - 1);
-	m_maverick_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pclock).as_attoseconds());
+	m_maverick_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pclock));
 }
 
 u16 maverick_device::read_external_signals()

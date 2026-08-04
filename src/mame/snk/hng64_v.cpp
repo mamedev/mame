@@ -1406,11 +1406,11 @@ void hng64_state::tcram_w(offs_t offset, u32 data, u32 mem_mask)
 		visarea.set(min_x, min_x + max_x - 1, min_y, min_y + max_y - 1);
 
 		// TODO: properly calculate this from screen params
-		attoseconds_t period;
+		attotime period;
 		if (max_y == 448)
-			period = HZ_TO_ATTOSECONDS(59.430077); // everything apart from fatfurwa uses a 512x448 resolution, and 59.43hz appears to sync with hardware
+			period = attotime::from_hz(59.430077); // everything apart from fatfurwa uses a 512x448 resolution, and 59.43hz appears to sync with hardware
 		else
-			period = HZ_TO_ATTOSECONDS(61.651673); // fatfurwa uses 512x432, sync frequency not verified
+			period = attotime::from_hz(61.651673); // fatfurwa uses 512x432, sync frequency not verified
 
 		m_screen->configure(HTOTAL, VTOTAL, visarea, period);
 	}
