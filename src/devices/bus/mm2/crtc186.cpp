@@ -63,10 +63,8 @@ void crtc186_device::device_add_mconfig(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set(FUNC(crtc186_device::int_w));
 
 	SCREEN(config, m_screen);
-	m_screen->set_refresh_hz(71.77);
+	m_screen->set_raw(XTAL(35'452'500), 106*10, 18*10, (18+80)*10, 466, 29, 29+28*15);
 	m_screen->set_screen_update(FUNC(crtc186_device::screen_update));
-	m_screen->set_size(800, 420);
-	m_screen->set_visarea(0, 800-1, 0, 420-1);
 
 	CRT9007(config, m_vpac, XTAL(35'452'500)/8);
 	m_vpac->set_addrmap(0, &crtc186_device::vpac_mem);
@@ -133,8 +131,6 @@ void crtc186_device::device_start()
 	save_item(NAME(m_c70_50));
 	save_item(NAME(m_cru));
 	save_item(NAME(m_crb));
-	save_item(NAME(m_cursor_x));
-	save_item(NAME(m_cursor_y));
 }
 
 uint32_t crtc186_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -152,28 +148,51 @@ uint32_t crtc186_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 		{
 			for (int sx = 0; sx < 80; sx++)
 			{
-				bool const cursor = (sx == m_cursor_x) && (sy == m_cursor_y);
+				bool const cursor = m_vpac->cursor_active(sx, sy);
 				offs_t const vram_addr = (sy * 80) + sx;
 				u16 const data = m_video_ram[vram_addr & 0x1fff];
 
 				offs_t const char_addr = ((data & 0x1ff) << 4) + y;
-				u8 char_data = m_char_rom->base()[char_addr & 0x1fff];
+				u8 const char_data = m_char_rom->base()[char_addr & 0x1fff];
 
 				rgb_t const bgcolor = BIT(data, 11) ? halflit() : rgb_t::white();
 
+				bool const lnel = BIT(data, 9);
+				bool const revl = BIT(data, 10);
+				bool const none = BIT(data, 12);
+				bool const bldl = BIT(data, 13);
+				bool const undl = BIT(data, 14);
+				//bool const blink = BIT(data, 15);
+
+				offs_t const attr_addr = (m_modeg << 12) | (lnel << 11) | (revl << 10) | (none << 9) | (bldl << 8) | char_data;
+				u8 attr_data = m_attr_rom->base()[attr_addr];
+
+				bool pixel = m_cpl;
+
 				for (int bit = 0; bit < 10; bit++)
 				{
-					bool pixel = m_cpl;
+					if (lnel && bit == 0) {
+						pixel = BIT(attr_data, 7) ^ m_cpl;
+					}
+
 					if (bit > 0 && bit < 9) {
-						pixel = BIT(char_data, 0) ^ m_cpl;
-						char_data >>= 1;
+						pixel = BIT(attr_data, 7) ^ m_cpl;
+						attr_data <<= 1;
+					}
+
+					if (!lnel && bit == 9) {
+						pixel = m_cpl;
+					}
+
+					if (undl && y == 14) {
+						pixel = 1 ^ m_cpl;
 					}
 
 					if (cursor) {
 						if (!m_cru)
 							pixel ^= 1;
 						else if (m_cru && y == 14)
-							pixel = 1;
+							pixel = 1 ^ m_cpl;
 					}
 
 					bitmap.pix((sy * 15) + y, (sx * 10) + bit) = pixel ? rgb_t::black() : bgcolor;
@@ -207,11 +226,6 @@ void crtc186_device::vpac_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) {
 		m_vpac->write(offset, data & 0xff);
-
-		if (offset == 0x18)
-			m_cursor_y = data & 0xff;
-		else if (offset == 0x19)
-			m_cursor_x = data & 0xff;
 	}
 
 	if (ACCESSING_BITS_8_15) {
