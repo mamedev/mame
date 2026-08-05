@@ -1032,6 +1032,7 @@ void cinemat_state::cinemat_nojmi_4k(machine_config &config)
 	m_vector->set_refresh_hz(19.923_MHz_XTAL/4/16/16/16/16/2);
 	m_vector->set_visarea(0, 1023, 0, 767);
 	m_vector->screen_vblank().set(m_maincpu, FUNC(ccpu_cpu_device::wdt_trigger));
+	m_vector->screen_vblank().append([this] (int state) { if (state) m_vector->clear_list(); });
 }
 
 void cinemat_state::cinemat_jmi_4k(machine_config &config)
