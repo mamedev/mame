@@ -119,7 +119,7 @@ mw-9.rom = ST M27C1001 / GFX
 
 #include "emu.h"
 
-#include "kabuki.h"  // needed for decoding functions only
+#include "kabuki.h" // needed for decoding functions only
 
 #include "cpu/z80/z80.h"
 #include "machine/74157.h"
@@ -1820,7 +1820,7 @@ void mitchell_state::mgakuen(machine_config &config)
 void mitchell_state::pang(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(16'000'000 )/ 2); // verified on PCB
+	Z80(config, m_maincpu, XTAL(16'000'000) / 2); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &mitchell_state::mitchell_map);
 	m_maincpu->set_addrmap(AS_IO, &mitchell_state::mitchell_io_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &mitchell_state::decrypted_opcodes_map);

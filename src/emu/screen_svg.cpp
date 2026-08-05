@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    screen.cpp
+    screen_svg.cpp
 
-    Core MAME screen device.
+    Core MAME SVG video output device.
 
 ***************************************************************************/
 
