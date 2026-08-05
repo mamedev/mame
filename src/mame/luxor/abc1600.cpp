@@ -37,7 +37,6 @@
     - systest1600 failures
         - CIO timer (works if CIO clock is 4219000)
         - DMA (expects to read 0xff from 0x18000..)
-    - Z80 SCC/DART interrupt chain
     - [:2a:chb] - TX FIFO is full, discarding data
         [:] SCC write 000003
         [:2a:chb] void z80scc_channel::data_write(uint8_t): Data Register Write: 17 ' '
@@ -213,6 +212,7 @@ private:
 	void update_drdy1(int state);
 	void sccrq_a_w(int state) { m_sccrq_a = state; update_drdy1(0); }
 	void sccrq_b_w(int state) { m_sccrq_b = state; update_drdy1(0); }
+	u8 scc_irq_ack_r();
 
 	// DMA
 	int m_dmadis = 0;
@@ -662,7 +662,7 @@ void abc1600_state::cpu_space_map(address_map &map)
 {
 	map(0xffff0, 0xfffff).m(m_maincpu, FUNC(m68008_device::autovectors_map));
 	map(0xffff5, 0xffff5).lr8(NAME([this]() -> u8 { return m_cio->intack_r(); }));
-	map(0xffffb, 0xffffb).lr8(NAME([this]() -> u8 { return m_dart->m1_r(); }));
+	map(0xffffb, 0xffffb).lr8(NAME([this]() -> u8 { return scc_irq_ack_r(); }));
 	map(0xfffff, 0xfffff).lr8(NAME([this]() -> u8 { m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE); return m68008_device::autovector(7); }));
 }
 
@@ -958,6 +958,23 @@ void abc1600_state::cio_pc_w(uint8_t data)
 	m_nvram->cs_write(nvram_cs);
 	m_nvram->di_write(data_out);
 	m_nvram->clk_write(clock);
+}
+
+u8 abc1600_state::scc_irq_ack_r()
+{
+	auto *scc = dynamic_cast<device_z80daisy_interface *>(m_scc.target());
+	if (scc->z80daisy_irq_state() & Z80_DAISY_INT)
+	{
+		return m_scc->m1_r();
+	}
+
+	auto *dart = dynamic_cast<device_z80daisy_interface *>(m_dart.target());
+	if (dart->z80daisy_irq_state() & Z80_DAISY_INT)
+	{
+		return m_dart->m1_r();
+	}
+
+	return m68008_device::autovector(5);
 }
 
 static void abc1600_floppies(device_slot_interface &device)
