@@ -81,6 +81,8 @@ void s3vision864_vga_device::device_reset()
 	s3.strapping = 0x000f0b1e;
 	s3.sr10 = 0x42;
 	s3.sr11 = 0x41;
+
+	s3.cr50 = 0;
 }
 
 u16 s3vision864_vga_device::line_compare_mask()
@@ -484,6 +486,31 @@ bit  0-5  Pattern Display Start Y-Pixel Position.
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			s3.cursor_pattern_y = data;
+		})
+	);
+	// xx-- ---x GESCR-W (bit 0 MSB) Graphics Engine Command Screen Pixel Width
+	// 00-- ---0 1024 (or 2048 if bit 1 CR31 high)
+	// 01-- ---0 640
+	// 10-- ---0 800 (or 1600x1200x4 if bit 2 of $4ae8 high)
+	// 11-- ---0 1280
+	// 00-- ---1 1152
+	// 01-- ---1 <reserved>
+	// 10-- ---1 1600
+	// 11-- ---1 <reserved>
+	// ---- -x-- ENB /BREQ Enable /BREQ and /BGNT functions
+	// --xx ---- PXL-LNGH Pixel Length Select, selects pixel length for Enhanced mode
+	// --00 ---- 1 byte (corresponds to bit 7 of $42e8)
+	// --01 ---- 2 bytes, 16bpp
+	// --10 ---- <reserved>
+	// --11 ---- 4 bytes, 32bpp
+	map(0x50, 0x50).lrw8(
+		NAME([this] (offs_t offset) {
+			return s3.cr50;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			s3.cr50 = data;
+			LOG("CR50: EX_SCTL_1 Extended System Cont 1 %02x\n", data);
+			// TODO: hookup to graphics engine
 		})
 	);
 	map(0x51, 0x51).lrw8(
