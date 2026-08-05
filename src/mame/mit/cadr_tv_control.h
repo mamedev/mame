@@ -40,8 +40,8 @@ private:
 	u32 m_status;
 	u32 m_sync_csr;
 	u32 m_sync_address;
-	std::unique_ptr<u32[]> m_video_ram;
-	std::unique_ptr<u8[]> m_sync_ram;
+	memory_share_creator<u32> m_video_ram;
+	memory_share_creator<u8> m_sync_ram;
 };
 
 #endif // MAME_MIT_CADR_TV_CONTROL_H

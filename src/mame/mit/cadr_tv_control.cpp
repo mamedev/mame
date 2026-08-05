@@ -50,6 +50,8 @@ cadr_tv_control_device::cadr_tv_control_device(const machine_config &mconfig, co
 	: device_t(mconfig, CADR_TV_CONTROL, tag, owner, clock)
 	, m_screen(*this, "screen")
 	, m_irq_cb(*this)
+	, m_video_ram(*this, "video_ram", VIDEO_RAM_SIZE * sizeof(u32), ENDIANNESS_BIG)
+	, m_sync_ram(*this, "sync_ram", SYNC_RAM_SIZE, ENDIANNESS_BIG)
 {
 }
 
@@ -90,11 +92,6 @@ uint32_t cadr_tv_control_device::screen_update(screen_device &screen, bitmap_rgb
 
 void cadr_tv_control_device::device_start()
 {
-	m_video_ram = std::make_unique<u32[]>(VIDEO_RAM_SIZE);
-	m_sync_ram = std::make_unique<u8[]>(SYNC_RAM_SIZE);
-
-	save_pointer(NAME(m_video_ram), VIDEO_RAM_SIZE);
-	save_pointer(NAME(m_sync_ram), SYNC_RAM_SIZE);
 	save_item(NAME(m_status));
 	save_item(NAME(m_sync_csr));
 	save_item(NAME(m_sync_address));
