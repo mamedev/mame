@@ -767,7 +767,8 @@ void mc6845_device::set_hpixels_per_column(int hpixels_per_column)
 	if (hpixels_per_column != m_hpixels_per_column)
 	{
 		m_hpixels_per_column = hpixels_per_column;
-		recompute_parameters(false);
+		if (started())
+			recompute_parameters(false);
 	}
 }
 
