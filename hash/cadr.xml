@@ -53,4 +53,28 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="sys302" supported="no">
+		<description>System 302.0</description>
+		<year>2024</year>
+		<publisher>ams</publisher>
+		<notes>Network not supported yet.</notes>
+		<part name="hdd" interface="hdd">
+			<diskarea name="harddriv">
+				<disk name="sys302" sha1="fdcdbf9d8ff3f4a1e37a4411ebf29c5fbc0d2c44" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sys303" supported="no">
+		<description>System 303.0</description>
+		<year>2025</year>
+		<publisher>ams</publisher>
+		<notes>Network not supported yet.</notes>
+		<part name="hdd" interface="hdd">
+			<diskarea name="harddriv">
+				<disk name="sys303" sha1="1d46b8bc70186e9cdce09a14f41a0e5c19e3f09a" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
 </softwarelist>
