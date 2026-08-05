@@ -16,6 +16,7 @@ TODO:
 #include "emu.h"
 #include "cadr.h"
 #include "cadr_dasm.h"
+#include <bit>
 
 
 DEFINE_DEVICE_TYPE(CADR, cadr_cpu_device, "cadr_cpu", "MIT CADR")
@@ -511,7 +512,7 @@ u32 cadr_cpu_device::get_output(u32 m, u32 alu_out, u32 alu_carry)
 	switch ((m_ir >> 12) & 0x03)
 	{
 	case 0x00:
-		return rotl_32(m, m_ir & 0x1f); /* illegal, output of byte extractor */
+		return std::rotl(m, m_ir & 0x1f); /* illegal, output of byte extractor */
 	case 0x01:
 		return alu_out;
 	case 0x02:
@@ -647,7 +648,7 @@ bool cadr_cpu_device::jump_condition(s32 a, s32 m)
 	}
 	else
 	{
-		condition = BIT(rotl_32(m, m_ir & 0x1f), 0);
+		condition = BIT(std::rotl(u32(m), m_ir & 0x1f), 0);
 	}
 
 	if (BIT(m_ir, 6))
@@ -795,7 +796,7 @@ void cadr_cpu_device::execute_dispatch()
 		fatalerror("%x(%o): dispatch misc function %d not implemented", m_prev_pc, m_prev_pc, (m_ir >> 10) & 0x03);
 	}
 
-	const u32 m = rotl_32(m_m, rotation) & dispatch_mask[(m_ir >> 5) & 0x07];
+	const u32 m = std::rotl(m_m, rotation) & dispatch_mask[(m_ir >> 5) & 0x07];
 	u32 index = ((m_ir >> 12) & 0x7ff) | m;
 
 	if ((m_ir >> 8) & 0x03) {
@@ -877,7 +878,7 @@ void cadr_cpu_device::execute_byte()
 	if (m_ir & (3 << 12))
 	{
 		const u32 length = (m_ir >> 5) & 0x1f;
-		const u32 r = BIT(m_ir, 12) ? rotl_32(m_m, rotation) : m_m;
+		const u32 r = BIT(m_ir, 12) ? std::rotl(m_m, rotation) : m_m;
 		const u32 shift_right = BIT(m_ir, 13) ? rotation : 0;
 		const u32 right_mask = 0xffffffff << shift_right;
 		const u32 left_mask = 0xffffffff >> (31 - ((shift_right + length) & 0x1f));

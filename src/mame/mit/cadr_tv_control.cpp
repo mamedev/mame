@@ -57,7 +57,7 @@ cadr_tv_control_device::cadr_tv_control_device(const machine_config &mconfig, co
 
 void cadr_tv_control_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(0);
 	m_screen->set_screen_update(FUNC(cadr_tv_control_device::screen_update));
