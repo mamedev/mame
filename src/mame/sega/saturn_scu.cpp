@@ -496,11 +496,6 @@ void saturn_scu_device::trigger_dma_direct(uint8_t level)
 	if ((m_dma[level].dst & 0x07f0'0000) == 0x05c0'0000 && m_dma[level].size >= 0x80000)
 		m_dma[level].size = 0x80000 - (m_dma[level].dst & 0x7fffe);
 
-	// stv:colmns97 & stv:wwshin, which doesn't work right
-	// (timing more likely, also ST-V has more soundram)
-//  if ((m_dma[level].dst & 0x07f0'0000) == 0x05a0'0000 && m_dma[level].size >= 0x80000)
-//      m_dma[level].size = 0x80000 - (m_dma[level].dst & 0x7ffff);
-
 	m_dma[level].mode = DMA_MODE_RESET;
 
 	// CD transfers are special even without the hack below
