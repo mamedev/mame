@@ -64,6 +64,19 @@ Notes:
   PCB don't even show an unpopulated location for one. Note that gekisha and mjdialq2,
   which run on similar hardware, also lack 5205s. Likely it's a mistake in the readme.
 
+- The internal TMP9* ROMs contain a protection routine that strobes P60-P63 and then
+  P70-P73, one line at a time, and checks which of them are read back on P54 and P53.
+  The strobe index of the line seen on P54 (L) and of the one seen on P53 (H), counting
+  8 for P60 down to 1 for P73, are used to index a table of ASCII letters at $017C /
+  $018A in the internal ROM: the letter is stored at $FFBF and is then added to (via the
+  dispatcher at $00F0) or subtracted from (via the one at $00E5) hardcoded base
+  addresses to compute jump targets. A wrong value therefore makes execution land in the
+  middle of an instruction and go off the rails.
+
+  Each PCB has a different pair of MCU pins left connected (pins 9 to 16 map to
+  P60-P63 and P70-P73 in this order), all the others are stripped out, which is what
+  encodes the per-game value.
+
 TODO:
 
 - Palette banking is not correct, see quiztvqq cross hatch test.
@@ -1184,25 +1197,34 @@ void dynax_state::tenkai_p4_w(uint8_t data)
 	tenkai_update_rombank();
 }
 
+void dynax_state::ougonhai_p3_w(uint8_t data)
+{
+	m_rombank = ((data & 0x04) << 2) | (m_rombank & 0x0f);
+	tenkai_update_rombank();
+}
+
+void dynax_state::ougonhai_p4_w(uint8_t data)
+{
+	m_rombank = (m_rombank & 0x10) | (data & 0x0f);
+	tenkai_update_rombank();
+}
+
 uint8_t dynax_state::tenkai_p5_r()
 {
-	return m_tenkai_p5_val;
+	return m_prot_val;
 }
 
-void dynax_state::tenkai_p6_w(uint8_t data)
-{
-	m_tenkai_p5_val &= 0x0f;
-
-	if (data & 0x0f)
-		m_tenkai_p5_val |= (1 << 4);
-}
-
+// tenkai and mjreach: pins 9 to 12 & 15 to 16 stripped out, only P70 (pin 13) and
+// P71 (pin 14) are left, read back on P54 and P53. Gives L=4, H=3 -> $4E ('N').
 void dynax_state::tenkai_p7_w(uint8_t data)
 {
-	m_tenkai_p5_val &= 0xf0;
+	m_prot_val &= ~0x18;
 
-	if (data & 0x03)
-		m_tenkai_p5_val |= (1 << 3);
+	if (data & 0x01)
+		m_prot_val |= (1 << 4);
+
+	if (data & 0x02)
+		m_prot_val |= (1 << 3);
 }
 
 void dynax_state::tenkai_p8_w(uint8_t data)
@@ -1244,6 +1266,7 @@ void dynax_state::tenkai_blit_romregion_w(uint8_t data)
 	logerror("%s: unmapped romregion=%02X\n", machine().describe_context(), data);
 }
 
+
 void dynax_state::tenkai_map(address_map &map)
 {
 	map(0x00000, 0x05fff).rom();
@@ -1260,7 +1283,7 @@ void dynax_state::tenkai_map(address_map &map)
 	map(0x10050, 0x10050).w(FUNC(dynax_state::tenkai_priority_w));        // layer priority and enable
 	map(0x10054, 0x10054).w(FUNC(dynax_state::dynax_blit_backpen_w));     // Background Color
 	map(0x10058, 0x10058).w(FUNC(dynax_state::tenkai_blit_romregion_w));  // Blitter ROM bank
-	map(0x10060, 0x1007f).lw8(NAME([this] (offs_t offset, u8 data) { m_mainlatch->write_d1(offset >> 2, data); }));
+	map(0x10060, 0x1007f).lw8(NAME([this] (offs_t offset, uint8_t data) { m_mainlatch->write_d1(offset >> 2, data); }));
 	map(0x100c0, 0x100c0).w(FUNC(dynax_state::tenkai_ipsel_w));
 	map(0x100c1, 0x100c1).w(FUNC(dynax_state::tenkai_ip_w));
 	map(0x100c2, 0x100c3).r(FUNC(dynax_state::tenkai_ip_r));
@@ -1281,28 +1304,28 @@ void dynax_state::mjreachp2_map(address_map &map)
 	map(0x10058, 0x10058).w(FUNC(dynax_state::dynax_blit_romregion_w));
 }
 
-void dynax_state::ougonhai_map(address_map &map) // TODO: verify once the protection is beaten
+void dynax_state::ougonhai_map(address_map &map)
 {
 	map(0x00000, 0x05fff).rom();
-	map(0x06000, 0x07eff).ram().share("nvram");
+	map(0x06000, 0x07fbf).ram().share("nvram");
 	map(0x07fc0, 0x07fc0).r("aysnd", FUNC(ay8910_device::data_r));       // AY8910
 	map(0x07fc1, 0x07fc1).w("aysnd", FUNC(ay8910_device::data_w)); //
 	map(0x07fc2, 0x07fc2).w("aysnd", FUNC(ay8910_device::address_w));  //
-	map(0x07fd8, 0x07fdf).w(m_mainlatch, FUNC(ls259_device::write_d0));
+	map(0x07fc8, 0x07fc9).w("ym2413", FUNC(ym2413_device::write));      //
+	map(0x07fd0, 0x07fd0).w(m_blitter, FUNC(dynax_blitter_rev2_device::pen_w));     // Destination Pen
+	map(0x07fd1, 0x07fd1).w(FUNC(dynax_state::ougonhai_blit_dest_w));     // Destination Layer (inverted)
+	map(0x07fd2, 0x07fd2).w(FUNC(dynax_state::tenkai_blit_palette23_w));  // Layers Palettes
+	map(0x07fd3, 0x07fd3).w(FUNC(dynax_state::tenkai_blit_palette01_w));  //
+	map(0x07fd4, 0x07fd4).w(FUNC(dynax_state::ougonhai_priority_w));      // layer priority and enable (high nibble inverted)
+	map(0x07fd5, 0x07fd5).w(FUNC(dynax_state::dynax_blit_backpen_w));     // Background Color
+	map(0x07fd6, 0x07fd6).w(FUNC(dynax_state::dynax_blit_romregion_w));   // Blitter ROM bank (plain 0/1 here, not the tenkai encoding)
+	map(0x07fd8, 0x07fdf).w(m_mainlatch, FUNC(ls259_device::write_d1));
 	map(0x07fe0, 0x07fef).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 	map(0x07ff0, 0x07ff0).w(FUNC(dynax_state::tenkai_ipsel_w));
 	map(0x07ff1, 0x07ff1).w(FUNC(dynax_state::tenkai_ip_w));
 	map(0x07ff2, 0x07ff3).r(FUNC(dynax_state::tenkai_ip_r));
+	map(0x07ff9, 0x07fff).w(m_blitter, FUNC(dynax_blitter_rev2_device::regs_w));    // Blitter (inverted scroll values)
 	map(0x08000, 0x0ffff).m(m_bankdev, FUNC(address_map_bank_device::amap8));
-	// map(0x10020, 0x10021).w("ym2413", FUNC(ym2413_device::write));      // TODO
-	map(0x10040, 0x10040).w(m_blitter, FUNC(dynax_blitter_rev2_device::pen_w));     // Destination Pen
-	map(0x10044, 0x10044).w(FUNC(dynax_state::tenkai_blit_dest_w));       // Destination Layer
-	map(0x10048, 0x10048).w(FUNC(dynax_state::tenkai_blit_palette23_w));  // Layers Palettes
-	map(0x1004c, 0x1004c).w(FUNC(dynax_state::tenkai_blit_palette01_w));  //
-	map(0x10050, 0x10050).w(FUNC(dynax_state::tenkai_priority_w));        // layer priority and enable
-	map(0x10054, 0x10054).w(FUNC(dynax_state::dynax_blit_backpen_w));     // Background Color
-	map(0x10058, 0x10058).w(FUNC(dynax_state::tenkai_blit_romregion_w));  // Blitter ROM bank
-	map(0x100e1, 0x100e7).w(m_blitter, FUNC(dynax_blitter_rev2_device::regs_w));    // Blitter (inverted scroll values)
 }
 
 void dynax_state::ougonhai_banked_map(address_map &map)
@@ -1334,12 +1357,15 @@ void dynax_state::mjtkp2_map(address_map &map)
 	map(0x14180, 0x14180).r(FUNC(dynax_state::mjtkp2_dsw_r));
 	map(0x14200, 0x14200).w(m_blitter, FUNC(dynax_blitter_rev2_device::pen_w)); // maybe
 	map(0x14210, 0x14210).w(FUNC(dynax_state::dynax_blit_dest_w)); // maybe
-	map(0x14220, 0x14220).w(FUNC(dynax_state::dynax_blit_palette23_w)); // maybe
-	map(0x14230, 0x14230).w(FUNC(dynax_state::dynax_blit_palette01_w)); // maybe
-	map(0x14240, 0x14240).w(FUNC(dynax_state::hanamai_priority_w));        // layer priority and enable
+	map(0x14220, 0x14220).w(FUNC(dynax_state::mjtkp2_blit_palette12_w));
+	map(0x14230, 0x14230).w(FUNC(dynax_state::mjtkp2_blit_palette30_w));
+	map(0x14240, 0x14240).w(FUNC(dynax_state::mjtkp2_priority_w));
 	map(0x14250, 0x14250).w(FUNC(dynax_state::dynax_blit_backpen_w)); // maybe
-	map(0x14260, 0x14260).lw8(NAME([this] (uint8_t data) { if (data) logerror("%s unk $14260 write: %02x\n", machine().describe_context(), data); }));  // writes 0x80 sometimes
-	map(0x14280, 0x142ff).lw8(NAME([this] (offs_t offset, u8 data) { m_mainlatch->write_d1(offset >> 4, data); }));
+	// The PCB only has a single 1MB blitter ROM bank. The game writes $80 here to
+	// point the blitter at a non existent bank: the next blit then reads $00, i.e.
+	// the "stop" command, and draws nothing. This is used to suppress single blits.
+	map(0x14260, 0x14260).lw8(NAME([this] (uint8_t data) { m_blitter->set_rom_bank(BIT(data, 7)); }));
+	map(0x14280, 0x142ff).lw8(NAME([this] (offs_t offset, uint8_t data) { m_mainlatch->write_d1(offset >> 4, data); }));
 	map(0x14310, 0x14310).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x14320, 0x14320).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x14380, 0x14381).w("ym2413", FUNC(ym2413_device::write));
@@ -1411,12 +1437,48 @@ void dynax_state::gekisha_banked_map(address_map &map)
 	map(0x10080, 0x10080).nopw();   // ? 0,1,6 (bit 0 = screen disable?)
 }
 
+// ougonhai: pins 10 to 15 stripped out, only P60 (pin 9) and P73 (pin 16) are left,
+// read back on P54 and P53. Gives L=8, H=1 -> $55 ('U').
+void dynax_state::ougonhai_p6_w(uint8_t data)
+{
+	m_prot_val &= ~0x10;
+
+	if (data & 0x01)
+		m_prot_val |= (1 << 4);
+}
+
 void dynax_state::ougonhai_p7_w(uint8_t data)
 {
-	m_tenkai_p5_val &= 0xf0;
+	m_prot_val &= ~0x08;
 
-	if (data & 0x0f)
-		m_tenkai_p5_val |= (1 << 3);
+	if (data & 0x08)
+		m_prot_val |= (1 << 3);
+}
+
+// ougonhai bootlegs: only P70 (pin 13) and P72 (pin 15) are left, read back on P54 and
+// P53. Gives L=4, H=2 -> $4F ('O').
+void dynax_state::ougonhaib_p7_w(uint8_t data)
+{
+	m_prot_val &= ~0x18;
+
+	if (data & 0x01)
+		m_prot_val |= (1 << 4);
+
+	if (data & 0x04)
+		m_prot_val |= (1 << 3);
+}
+
+// mjtkp2: pins 9, 10 & 13 to 16 stripped out, only P62 (pin 11) and P63 (pin 12) are
+// left, read back on P54 and P53. Gives L=6, H=5 -> $59 ('Y').
+void dynax_state::mjtkp2_p6_w(uint8_t data)
+{
+	m_prot_val &= ~0x18;
+
+	if (data & 0x04)
+		m_prot_val |= (1 << 4);
+
+	if (data & 0x08)
+		m_prot_val |= (1 << 3);
 }
 
 
@@ -3771,7 +3833,7 @@ void dynax_state::machine_start()
 	save_item(NAME(m_keyb));
 	save_item(NAME(m_palbank));
 	save_item(NAME(m_rombank));
-	save_item(NAME(m_tenkai_p5_val));
+	save_item(NAME(m_prot_val));
 	save_item(NAME(m_tenkai_6c));
 	save_item(NAME(m_tenkai_70));
 	save_item(NAME(m_gekisha_val));
@@ -3786,7 +3848,7 @@ void dynax_state::machine_reset()
 	m_keyb = 0;
 	m_palbank = 0;
 	m_rombank = 0;
-	m_tenkai_p5_val = 0;
+	m_prot_val = 0;
 	m_tenkai_6c = 0;
 	m_tenkai_70 = 0;
 	m_gekisha_val[0] = 0;
@@ -4590,7 +4652,7 @@ void dynax_state::tenkai(machine_config &config)
 	tmp.port_write<3>().set(FUNC(dynax_state::tenkai_p3_w));
 	tmp.port_write<4>().set(FUNC(dynax_state::tenkai_p4_w));
 	tmp.port_read<5>().set(FUNC(dynax_state::tenkai_p5_r));
-	tmp.port_write<6>().set(FUNC(dynax_state::tenkai_p6_w));
+	// P60-P63 (pins 9 to 12) are stripped out, they never reach the PCB
 	tmp.port_write<7>().set(FUNC(dynax_state::tenkai_p7_w));
 	tmp.port_read<8>().set(FUNC(dynax_state::tenkai_p8_r));
 	tmp.port_write<8>().set(FUNC(dynax_state::tenkai_p8_w));
@@ -4662,8 +4724,15 @@ void dynax_state::mjtkp2(machine_config &config)
 
 	tmp91640_device &tmp = downcast<tmp91640_device &>(*m_maincpu);
 	tmp.set_addrmap(AS_PROGRAM, &dynax_state::mjtkp2_map);
+	tmp.port_write<6>().set(FUNC(dynax_state::mjtkp2_p6_w));
+	tmp.port_write<7>().set_nop(); // P70-P73 are stripped out, they never reach the PCB
 
 	m_bankdev->set_map(&dynax_state::mjtkp2_banked_map);
+
+	m_blitter->scrollx_cb().set(FUNC(dynax_state::mjtkp2_blit_scrollx_w));
+	m_blitter->scrolly_cb().set(FUNC(dynax_state::mjtkp2_blit_scrolly_w));
+
+	MCFG_VIDEO_START_OVERRIDE(dynax_state, mjtkp2)
 }
 
 void dynax_state::ougonhaib1(machine_config &config)
@@ -4671,7 +4740,8 @@ void dynax_state::ougonhaib1(machine_config &config)
 	tenkai(config);
 
 	tmp91640_device &tmp = downcast<tmp91640_device &>(*m_maincpu);
-	tmp.port_write<7>().set(FUNC(dynax_state::ougonhai_p7_w));
+	// P60-P63 are stripped out, they never reach the PCB
+	tmp.port_write<7>().set(FUNC(dynax_state::ougonhaib_p7_w));
 }
 
 void dynax_state::ougonhai(machine_config &config)
@@ -4681,10 +4751,10 @@ void dynax_state::ougonhai(machine_config &config)
 	tmp90840_device &tmp(TMP90840(config.replace(), m_maincpu, 21472700 / 2));
 	tmp.set_addrmap(AS_PROGRAM, &dynax_state::ougonhai_map);
 	tmp.port_read<3>().set(FUNC(dynax_state::tenkai_p3_r));
-	tmp.port_write<3>().set(FUNC(dynax_state::tenkai_p3_w));
-	tmp.port_write<4>().set(FUNC(dynax_state::tenkai_p4_w));
+	tmp.port_write<3>().set(FUNC(dynax_state::ougonhai_p3_w));
+	tmp.port_write<4>().set(FUNC(dynax_state::ougonhai_p4_w));
 	tmp.port_read<5>().set(FUNC(dynax_state::tenkai_p5_r));
-	tmp.port_write<6>().set(FUNC(dynax_state::tenkai_p6_w));
+	tmp.port_write<6>().set(FUNC(dynax_state::ougonhai_p6_w));
 	tmp.port_write<7>().set(FUNC(dynax_state::ougonhai_p7_w));
 	tmp.port_read<8>().set(FUNC(dynax_state::tenkai_p8_r));
 
@@ -6785,7 +6855,7 @@ ROM_START( tenkai )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "taicom00.2c",      0x00000, 0x40000, CRC(a35e54db) SHA1(247c856e19989fb834e8ed135393927bbd9c0277) )
 	ROM_RELOAD(                   0x10000, 0x40000 )
-	ROM_LOAD( "tmp91p640n-10.5b", 0x00000, 0x04000, CRC(509f1c97) SHA1(08557bea2e924053fd5bc9de5e306f3ecf8e98e6) )
+	ROM_LOAD( "tmp91p640n-10.5b", 0x00000, 0x04000, CRC(509f1c97) SHA1(08557bea2e924053fd5bc9de5e306f3ecf8e98e6) ) // MCU should have pins 9 to 12 & 15 to 16 stripped out, deduced from the protection value, not verified on PCB
 
 	// Note by Whistler:
 	// It appears that the first half of lzc-01.u6 in tenkaibb (as well as the same data in other bootleg versions)
@@ -7065,7 +7135,7 @@ ROM_START( ougonhaib1 )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "tydg001.u11",      0x00000, 0x40000, CRC(4ffa543c) SHA1(ab6ec7bd735358643f5186c6c983fa8b599fe84b) )
 	ROM_RELOAD(                   0x10000, 0x40000 )
-	ROM_LOAD( "ougonhai_tmp91p640n-10.5b", 0x00000, 0x04000, CRC(eb7933b9) SHA1(c5c36231963681644d99130a79594cb61d0c09cc) )
+	ROM_LOAD( "ougonhai_tmp91p640n-10.5b", 0x00000, 0x04000, CRC(eb7933b9) SHA1(c5c36231963681644d99130a79594cb61d0c09cc) ) // MCU should have pins 9 to 12, 14 & 16 stripped out, deduced from the protection value, not verified on PCB
 
 
 	ROM_REGION( 0x200000, "blitter", 0 )   // blitter data
@@ -7080,7 +7150,7 @@ ROM_START( ougonhaib2 )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "hc03.u11",      0x00000, 0x40000, CRC(fc635d8a) SHA1(fb4cbe676022890c53e79cb173ceada5e22687f2) )
 	ROM_RELOAD(                   0x10000, 0x40000 )
-	ROM_LOAD( "ougonhai_tmp91p640n-10.5b", 0x00000, 0x04000, CRC(eb7933b9) SHA1(c5c36231963681644d99130a79594cb61d0c09cc) )
+	ROM_LOAD( "ougonhai_tmp91p640n-10.5b", 0x00000, 0x04000, CRC(eb7933b9) SHA1(c5c36231963681644d99130a79594cb61d0c09cc) ) // MCU should have pins 9 to 12, 14 & 16 stripped out, deduced from the protection value, not verified on PCB
 
 	ROM_REGION( 0x200000, "blitter", 0 )   // blitter data
 	ROM_LOAD( "hc02.u8", 0x000000, 0x80000, CRC(f656e314) SHA1(69069a3cb961179edb7ba9ada3f574f37e3cbd80) )
@@ -7187,7 +7257,7 @@ ROM_START( mjtkp2 )
 	ROM_RELOAD(                 0x30000, 0x20000 )
 	ROM_LOAD( "tmp91c640n.2c",  0x00000, 0x04000, CRC(8fe634dd) SHA1(f11cd2160ecabe71edfddc956c323ff2e75d6cce) ) // chip type guessed (scratched off). MCU has pins  9, 10, 13, 14, 15, 16 stripped out
 
-	ROM_REGION( 0x100000, "blitter", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "blitter", ROMREGION_ERASE00 )
 	ROM_LOAD( "5901_dynax.15a", 0x00000, 0x20000, CRC(8b9d0192) SHA1(77ba366c87d3f1eb5549de30a1d066684950622a) ) // points, bets
 	ROM_LOAD( "5902_dynax.13a", 0x20000, 0x20000, CRC(c053ba24) SHA1(76524a5a8f727c50be13adbca5eb9388c1f9887c) ) // text and mahjong tiles
 	ROM_LOAD( "5903_dynax.12a", 0x40000, 0x20000, CRC(20f68aa7) SHA1(e18d39962caefb22c1ff39fd0fda0563877fa79c) )
@@ -7435,11 +7505,11 @@ GAME( 1991, tenkai2b,   tenkai,   tenkai,     tenkai,   dynax_state,       empty
 GAME( 1991, tenkaibb,   tenkai,   tenkai,     tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Tenkaigen (Japan bootleg b)",                           MACHINE_SUPPORTS_SAVE ) // FIXME: check if "b" is a PCB rev. letter
 GAME( 1991, tenkaicb,   tenkai,   tenkai,     tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Tenkaigen (Japan bootleg c)",                           MACHINE_SUPPORTS_SAVE ) // FIXME: check if "c" is a PCB rev. letter
 GAME( 1991, tenkaie,    tenkai,   tenkai,     tenkai,   dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Tenkaigen (Japan set 2)",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonhai,   0,        ougonhai,   ougonhai, dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Ougon no Pai (Japan)",                                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // FIXME: correct TMP90840 hookup, confirm being a medal game as well
+GAME( 1991, ougonhai,   0,        ougonhai,   ougonhai, dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Ougon no Pai (Japan)",                                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // probably works fine, needs testing
 GAME( 1991, ougonhaib1, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Pai (Japan bootleg set 1, medal)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ougonhaib2, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Pai (Japan bootleg set 2, medal)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ougonhaib3, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Pai (Japan bootleg set 3, medal)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mjtkp2,     0,        mjtkp2,     mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Tokkyu Kaiten-ban Part 2 (Japan)",                      MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // inputs / DSW, GFX glitches
+GAME( 1991, mjtkp2,     0,        mjtkp2,     mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Tokkyu Kaiten-ban Part 2 (Japan)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // inputs / DSW
 GAME( 1994, mjreach,    0,        mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Reach (Ver. 1.00, set 1)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreacha,   mjreach,  mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Reach (Ver. 1.00, set 2)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreachbl,  mjreach,  mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Reach (Ver. 1.00, bootleg)",                            MACHINE_SUPPORTS_SAVE )

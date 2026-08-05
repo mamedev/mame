@@ -430,11 +430,9 @@ ROM_START( tongzi )
 	ROM_LOAD16_WORD_SWAP( "93c46.u11", 0x00, 0x80, CRC(d20d6865) SHA1(054d6ac609f9f5b19f9c8e27ab7096d942a2b39e) ) // hand reset
 
 	ROM_REGION( 0x80, "rtc", 0 )
-	ROM_LOAD( "ds12887.u12", 0x00, 0x80, CRC(520e6efb) SHA1(f4e59ac6a519d310e8362fd088f50c7ee7f970e1) )
-	// the battery data is partially dead: register $05 holds the region byte, which
-	// must match 93c46 byte $7a ($12) for the 2-out-of-3 check at $36e2 to pass,
+	// register $05 holds the region byte, which must match 93c46 byte $7a ($12) for the 2-out-of-3 check at $36e2 to pass,
 	// otherwise the game stops with ERROR 5
-	ROM_FILL( 0x05, 1, 0x12 )
+	ROM_LOAD( "ds12887.u12", 0x00, 0x80, CRC(4e70ae43) SHA1(cb9809ce25d9889d66f47f5e693fbde66b0ed37a) ) // hand repaired
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "am29f002.u9", 0x00000, 0x40000, CRC(4bbd8cfa) SHA1(690d7a98764162b0771629c02fd3c488761d8ec0) ) // encrypted

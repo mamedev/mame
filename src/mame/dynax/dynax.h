@@ -125,6 +125,11 @@ protected:
 	void nanajign_palette_lo_w(offs_t offset, uint8_t data);
 	void nanajign_palette_hi_w(offs_t offset, uint8_t data);
 	void nanajign_palette_update(offs_t offset);
+	void mjtkp2_blit_palette12_w(uint8_t data);
+	void mjtkp2_blit_palette30_w(uint8_t data);
+	void mjtkp2_priority_w(uint8_t data);
+	void mjtkp2_blit_scrollx_w(uint8_t data);
+	void mjtkp2_blit_scrolly_w(uint8_t data);
 
 	uint32_t screen_update_hanamai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_hnoridur(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -182,11 +187,17 @@ private:
 	void tenkai_p3_w(uint8_t data);
 	void tenkai_p4_w(uint8_t data);
 	uint8_t tenkai_p5_r();
-	void tenkai_p6_w(uint8_t data);
 	void tenkai_p7_w(uint8_t data);
 	void tenkai_p8_w(uint8_t data);
 	uint8_t tenkai_p8_r();
+	void ougonhai_blit_dest_w(uint8_t data);
+	void ougonhai_priority_w(uint8_t data);
+	void ougonhai_p3_w(uint8_t data);
+	void ougonhai_p4_w(uint8_t data);
+	void ougonhai_p6_w(uint8_t data);
 	void ougonhai_p7_w(uint8_t data);
+	void ougonhaib_p7_w(uint8_t data);
+	void mjtkp2_p6_w(uint8_t data);
 	void mjreachp2_p8_w(uint8_t data);
 	void tenkai_6c_w(int state);
 	void tenkai_70_w(int state);
@@ -222,6 +233,7 @@ private:
 	DECLARE_MACHINE_START(sprtmtch);
 	DECLARE_VIDEO_START(sprtmtch);
 	DECLARE_VIDEO_START(mjdialq2);
+	DECLARE_VIDEO_START(mjtkp2);
 
 	//int blitter_drawgfx( int layer, int mask, memory_region *gfx, int src, int pen, int x, int y, int wrap, int flags );
 	void mjdialq2_copylayer( bitmap_ind16 &bitmap, const rectangle &cliprect, int i );
@@ -252,7 +264,7 @@ private:
 
 	// misc
 	int m_rombank = 0;
-	uint8_t m_tenkai_p5_val = 0U;
+	uint8_t m_prot_val = 0U;
 	int m_tenkai_6c = 0;
 	int m_tenkai_70 = 0;
 	uint8_t m_gekisha_val[2]{};
