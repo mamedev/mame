@@ -10,7 +10,6 @@
 
     TODO:
 
-    - white noise
     - scanline based update
 
 */
@@ -29,6 +28,27 @@
 #define CDP1869_WEIGHT_RED      30 // % of max luminance
 #define CDP1869_WEIGHT_GREEN    59
 #define CDP1869_WEIGHT_BLUE     11
+
+// fractional bits used by the sound generators' clock cycle counters
+static constexpr int CLOCK_FRAC = 32;
+
+// The white noise generator is a shift register clocked by the noise range
+// divider. Its sequence was recovered from a recording of a real machine with
+// the range set to 0, the slowest, so that every individual bit is resolvable.
+// Over all 8823 bits measured the output obeys, without a single exception,
+//
+//   q = q[-1] ^ q[-4] ^ q[-5] ^ q[-10] ^ q[-11] ^ q[-13] ^ q[-14] ^ q[-15] ^ q[-17]
+//
+// The characteristic polynomial of that recurrence is not primitive; it factors
+// into (x + 1)^4 * (x^2 + x + 1) * P(x) with P primitive of degree 11. What is
+// heard is therefore an 11 stage maximal length sequence of period 2047 mixed
+// with a period 12 term, and the whole sequence repeats every 24564 bits rather
+// than every 2^17-1.
+static constexpr u32 WNOISE_LENGTH = 17;
+
+// a state lifted from the same recording, so that the sequence starts out on
+// the cycle the real chip runs on
+static constexpr u32 WNOISE_SEED = 0x08144;
 
 #define CDP1869_COLUMNS_HALF    20
 #define CDP1869_COLUMNS_FULL    40
@@ -396,8 +416,13 @@ void cdp1869_device::device_start()
 	m_freshorz = 0;
 	m_hma = 0;
 	m_col = 0;
-	m_incr = 0;
-	m_signal = 0;
+	m_toneclk = 0;
+	m_toneout = false;
+	m_wnclk = 0;
+	m_wnshift = WNOISE_SEED;
+	m_wnamp = 0;
+	m_wnfreq = 0;
+	m_wnoff = 0;
 	m_cfc = 0;
 	m_toneoff = 0;
 	m_cmem = 0;
@@ -416,9 +441,11 @@ void cdp1869_device::device_start()
 	save_item(NAME(m_bkg));
 	save_item(NAME(m_pma));
 	save_item(NAME(m_hma));
-	save_item(NAME(m_signal));
-	save_item(NAME(m_incr));
+	save_item(NAME(m_toneclk));
+	save_item(NAME(m_toneout));
 	save_item(NAME(m_toneoff));
+	save_item(NAME(m_wnclk));
+	save_item(NAME(m_wnshift));
 	save_item(NAME(m_wnoff));
 	save_item(NAME(m_tonediv));
 	save_item(NAME(m_tonefreq));
@@ -495,56 +522,82 @@ void cdp1869_device::cdp1869_palette(palette_device &palette) const
 
 void cdp1869_device::sound_stream_update(sound_stream &stream)
 {
-	sound_stream::sample_t signal = m_signal;
+	bool const tone = !m_toneoff && m_toneamp;
+	bool const wnoise = !m_wnoff && m_wnamp;
 
-	if (!m_toneoff && m_toneamp)
+	if (!tone && !wnoise)
 	{
-		double frequency = (clock() / 2) / (512 >> m_tonefreq) / (m_tonediv + 1);
-//      double amplitude = m_toneamp * ((0.78*5) / 15);
+		stream.fill(0, 0.0);
+		return;
+	}
 
-		int rate = stream.sample_rate() / 2;
+	// the selected octave is divided by TONE DIV + 1 and the output flip-flop
+	// divides that by two again, so the tone toggles every N clock cycles
+	u64 const tonetoggle = u64(512 >> m_tonefreq) * (m_tonediv + 1) << CLOCK_FRAC;
 
-		/* get progress through wave */
-		int incr = m_incr;
+	// the noise range divider has no equivalent of TONE DIV, and there is no
+	// output flip-flop either, so the shift register is clocked every N cycles
+	u64 const wnclock = u64(4096 >> m_wnfreq) << CLOCK_FRAC;
 
-		if (signal < 0)
+	// both amplitudes are set by a 4 bit binary R/2R ladder, so they are linear,
+	// and both ladders drive the same summing node
+	sound_stream::sample_t const toneamp = sound_stream::sample_t(m_toneamp) / 15.0;
+	sound_stream::sample_t const wnamp = sound_stream::sample_t(m_wnamp) / 15.0;
+
+	// a change of range or divisor may have left a counter out of range
+	if (m_toneclk >= tonetoggle) m_toneclk %= tonetoggle;
+	if (m_wnclk >= wnclock) m_wnclk %= wnclock;
+
+	// integrate both generators over each output sample period, so that the
+	// edges keep their exact position in time to a fraction of a sample instead
+	// of being snapped to a sample boundary, and so that a generator clocked
+	// faster than the sample rate averages out instead of aliasing back down
+	// into the audible band
+	u64 const step = (u64(clock()) << CLOCK_FRAC) / stream.sample_rate();
+
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
+	{
+		u64 remaining = step, tonehigh = 0, wnhigh = 0;
+
+		while (remaining)
 		{
-			signal = -(sound_stream::sample_t(m_toneamp) / 15.0);
-		}
-		else
-		{
-			signal = sound_stream::sample_t(m_toneamp) / 15.0;
-		}
+			u64 const slice = std::min({ remaining, tonetoggle - m_toneclk, wnclock - m_wnclk });
 
-		for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
-		{
-			stream.put(0, sampindex, signal);
-			incr -= frequency;
-			while( incr < 0 )
+			if (m_toneout) tonehigh += slice;
+			if (BIT(m_wnshift, 0)) wnhigh += slice;
+
+			remaining -= slice;
+
+			// the dividers keep running while a generator is gated off
+			m_toneclk += slice;
+
+			if (m_toneclk == tonetoggle)
 			{
-				incr += rate;
-				signal = -signal;
+				m_toneclk = 0;
+				m_toneout = !m_toneout;
+			}
+
+			m_wnclk += slice;
+
+			if (m_wnclk == wnclock)
+			{
+				m_wnclk = 0;
+
+				int const feedback = BIT(m_wnshift, 0) ^ BIT(m_wnshift, 3) ^ BIT(m_wnshift, 4)
+						^ BIT(m_wnshift, 9) ^ BIT(m_wnshift, 10) ^ BIT(m_wnshift, 12)
+						^ BIT(m_wnshift, 13) ^ BIT(m_wnshift, 14) ^ BIT(m_wnshift, 16);
+
+				m_wnshift = ((m_wnshift << 1) | feedback) & make_bitmask<u32>(WNOISE_LENGTH);
 			}
 		}
 
-		/* store progress through wave */
-		m_incr = incr;
-		m_signal = signal;
+		sound_stream::sample_t sample = 0.0;
+
+		if (tone) sample += toneamp * sound_stream::sample_t((double(tonehigh) / step) * 2.0 - 1.0);
+		if (wnoise) sample += wnamp * sound_stream::sample_t((double(wnhigh) / step) * 2.0 - 1.0);
+
+		stream.put(0, sampindex, sample);
 	}
-/*
-    if (!m_wnoff)
-    {
-        double amplitude = m_wnamp * ((0.78*5) / 15);
-
-        for (int wndiv = 0; wndiv < 128; wndiv++)
-        {
-            double frequency = (clock() / 2) / (4096 >> m_wnfreq) / (wndiv + 1):
-
-            sum_square_wave(buffer, frequency, amplitude);
-        }
-    }
-*/
-
 }
 
 

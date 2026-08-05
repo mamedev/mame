@@ -266,9 +266,11 @@ private:
 	uint16_t m_hma;                   // home memory address
 
 	// sound state
-	sound_stream::sample_t m_signal; // current signal
-	int m_incr;                     // initial wave state
+	u64 m_toneclk;                  // tone clock cycles into the current half cycle, 32.32
+	bool m_toneout;                 // tone output flip-flop
 	int m_toneoff;                  // tone off
+	u64 m_wnclk;                    // white noise clock cycles into the current bit, 32.32
+	u32 m_wnshift;                  // white noise shift register
 	int m_wnoff;                    // white noise off
 	uint8_t m_tonediv;                // tone divisor
 	uint8_t m_tonefreq;               // tone range select
