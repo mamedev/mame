@@ -26,8 +26,11 @@
 */
 void raiden2cop_device::execute_0205(int offset, uint16_t data)
 {
-	int ppos =        m_host_space->read_dword(cop_regs[0] + 0x04 + offset * 4);
-	int npos = ppos + m_host_space->read_dword(cop_regs[0] + 0x10 + offset * 4);
+	int ppos = m_host_space->read_dword(cop_regs[0] + 0x04 + offset * 4);
+	int vel  = m_host_space->read_dword(cop_regs[0] + 0x10 + offset * 4);
+	// Bit 0 of the trigger is the sign of the addend, as for 0905/0904: 0205 adds
+	// the velocity to the position and 0204 undoes that step. Only cupsoc emits 0204.
+	int npos = (!m_cupsoc_mode || (data & 1)) ? (ppos + vel) : (ppos - vel);
 	int delta = (npos >> 16) - (ppos >> 16);
 	m_host_space->write_dword(cop_regs[0] + 4 + offset * 4, npos);
 	// LOGMASKED(LOG_MOVE0205, ...);
@@ -96,6 +99,11 @@ void raiden2cop_device::LEGACY_execute_130e_cupsoc(int offset, uint16_t data)
 			cop_angle += 0x80;
 
 		cop_angle &= 0xff;
+
+		// The flag looks at the integer part of the delta: the COP works in pixels,
+		// and the game tests the distance it produces against pixel thresholds.
+		if (m_cupsoc_mode && !(dx >> 16))
+			cop_status |= 0x8000;
 	}
 
 	m_LEGACY_r0 = dy;
@@ -103,7 +111,12 @@ void raiden2cop_device::LEGACY_execute_130e_cupsoc(int offset, uint16_t data)
 
 	//printf("%d %d %f %04x\n",dx,dy,atan(double(dy)/double(dx)) * 128 / std::numbers::pi, cop_angle);
 
-	if (data & 0x80)
+	// The trigger LENGTH decides whether the angle is stored, not bit 7:
+	// len = ((trigger >> 7) & 7) + 1 words are executed, so 118e (4) only loads
+	// dx/dy, 130e (7) computes the angle, 138e (8) also stores it.
+	const bool writes_angle = m_cupsoc_mode ? ((((data >> 7) & 7) + 1) >= 8)
+	                                        : ((data & 0x80) != 0);
+	if (writes_angle)
 		cop_write_byte(cop_regs[0] + (0x34), cop_angle);
 }
 
@@ -178,6 +191,10 @@ void raiden2cop_device::execute_338e(int offset, uint16_t data, bool is_yflip)
 	}
 
 	LOGMASKED(LOG_TRIGONOMETRY, "cmd %04x: dx = %d dy = %d angle = %02x %04x\n",data,dx,dy,cop_angle);
+
+	// the 3bb0 that follows consumes these latched deltas
+	m_LEGACY_r0 = dx;
+	m_LEGACY_r1 = dy;
 
 	if (data & 0x0080) {
 		// TODO: byte or word?
@@ -360,7 +377,9 @@ void raiden2cop_device::LEGACY_execute_6200(int offset, uint16_t data) // this i
 
 	cop_write_word(cop_regs[primary_reg], flags);
 
-	if (!m_host_endian)
+	// The angle is a byte: writing a word also clears the adjacent byte, which in
+	// cupsoc holds the facing of the body object. Other games keep the word write.
+	if (!m_host_endian || m_cupsoc_mode)
 		cop_write_byte(cop_regs[primary_reg] + primary_offset, angle);
 	else // angle is a byte, but grainbow (cave mid-boss) is only happy with write-word, could be more endian weirdness, or it always writes a word?
 		cop_write_word(cop_regs[primary_reg] + primary_offset, angle);
@@ -593,6 +612,18 @@ void raiden2cop_device::LEGACY_execute_c480(int offset, uint16_t data)
 */
 void raiden2cop_device::LEGACY_execute_d104(int offset, uint16_t data)
 {
+	if (m_cupsoc_mode)
+	{
+		// cupsoc: positional target of the player, (ball - origin) * K >> 16, to which
+		// the 68000 adds the zone minimum. Without this write the target drifts away.
+		const s32 org = s32(m_host_space->read_dword(cop_regs[3] + offset * 4));
+		const s32 src = s32(m_host_space->read_dword(cop_regs[2] + 0x04 + offset * 4));
+		const s32 k   = s32((u32(m_cop_rom_addr_hi) << 16) | u32(m_cop_rom_addr_lo));
+		m_host_space->write_dword(cop_regs[1] + 0x04 + offset * 4,
+								  u32(s32((s64(src - org) * s64(k)) >> 16)));
+		return;
+	}
+
 	uint16_t *ROM = (uint16_t *)machine().root_device().memregion("maincpu")->base();
 	uint32_t rom_addr = (m_cop_rom_addr_hi << 16 | m_cop_rom_addr_lo);
 	uint16_t rom_data = ROM[rom_addr / 2];
@@ -705,9 +736,98 @@ void raiden2cop_device::execute_f205(int offset, uint16_t data)
 [:raiden2cop] COPDIS: f105 s=f0 f1=0 l=3 f2=05 5 fefb f2 088 01.0.08 [:raiden2cop] addmem32 10(r0)
 */
 // seibu cup soccer, before cosine (ball dribbling actually?)
+void raiden2cop_device::execute_5105(int offset, uint16_t data)
+{
+	if (!m_cupsoc_mode)
+	{
+		int res = m_host_space->read_dword(cop_regs[0]) +  m_host_space->read_dword(cop_regs[0]+8);
+		m_host_space->write_dword(cop_regs[0]+4, res);
+		return;
+	}
+	// cupsoc: dst = src * K >> 16, source and destination both on cop_regs[0].
+	// The game zeroes r0+$08 before every 5105 and never reads it back.
+	const u32 src = cop_regs[0] + 0x00 + offset * 4;
+	const u32 dst = cop_regs[0] + 0x04 + offset * 4;
+	m_host_space->write_dword(dst, cop_fixmul1616(m_host_space->read_dword(src)));
+}
+
+void raiden2cop_device::execute_5905(int offset, uint16_t data)
+{
+	if (!m_cupsoc_mode)
+	{
+		int res = m_host_space->read_dword(cop_regs[2]+10 + offset*4) - m_host_space->read_dword(cop_regs[0]+8 + offset*4);
+		m_host_space->write_dword(cop_regs[1]+4 + offset *4, res);
+		return;
+	}
+	// cupsoc: source is the object velocity at r2+$10, destination r1+$04.
+	const u32 src = cop_regs[2] + 0x10 + offset * 4;
+	const u32 dst = cop_regs[1] + 0x04 + offset * 4;
+	m_host_space->write_dword(dst, cop_fixmul1616(m_host_space->read_dword(src)));
+}
+
+// Same as execute_3b30, but consuming the dx/dy latched by the last angle
+// command instead of recomputing them from the registers, which is what the
+// TODO on execute_3b30 asks for. cupsoc issues e18e (length 4, load only)
+// right before, so there is nothing else the 3bb0 could be using.
+void raiden2cop_device::execute_3b30_latched(int offset, uint16_t data)
+{
+	int dy = m_LEGACY_r0 >> 16;
+	int dx = m_LEGACY_r1 >> 16;
+
+	cop_dist = sqrt((double)(dx * dx + dy * dy));
+
+	if (data & 0x0080)
+		cop_write_word(cop_regs[0] + (data & 0x200 ? 0x3a : 0x38), cop_dist);
+}
+
+// Slot 1C (e18e / e30e / e38e): same atan2 as LEGACY_execute_130e_cupsoc, with
+// the second point from cop_regs[2]. It also latches dx/dy for the 3bb0.
+void raiden2cop_device::LEGACY_execute_e30e_cupsoc(int offset, uint16_t data)
+{
+	int dy = m_host_space->read_dword(cop_regs[2] + 4) - m_host_space->read_dword(cop_regs[0] + 4);
+	int dx = m_host_space->read_dword(cop_regs[2] + 8) - m_host_space->read_dword(cop_regs[0] + 8);
+
+	cop_status = 7;
+
+	if (!dx) {
+		cop_status |= 0x8000;
+		cop_angle = 0;
+	}
+	else
+	{
+		cop_angle = (int)(atan(double(dy) / double(dx)) * 128.0 / std::numbers::pi);
+		if (dx < 0)
+			cop_angle += 0x80;
+
+		cop_angle &= 0xff;
+	}
+
+	m_LEGACY_r0 = dy;
+	m_LEGACY_r1 = dx;
+
+	// As in LEGACY_execute_130e_cupsoc the trigger length decides the store:
+	// e18e (4) must not write, e30e (7) computes, e38e (8) stores.
+	if (((data >> 7) & 7) + 1 >= 8)
+		cop_write_byte(cop_regs[0] + (0x34), cop_angle);
+}
+
+// 16.16 multiply by the constant in the COP ROM address registers
+// ($100446/$100448), which cupsoc loads before each 5105/5905/f105.
+u32 raiden2cop_device::cop_fixmul1616(u32 a) const
+{
+	const s32 b = s32((u32(m_cop_rom_addr_hi) << 16) | u32(m_cop_rom_addr_lo));
+	const s64 p = s64(s32(a)) * s64(b);
+	return u32(p >> 16);
+}
+
 void raiden2cop_device::execute_f105(int offset, uint16_t data)
 {
-	// ...
+	if (!m_cupsoc_mode)
+		return;
+	// cupsoc: scales the velocity at r0+$10 in place, always by 0.75, between the
+	// 8100 (sine) and the 8900 (cosine) that surround it.
+	const u32 adr = cop_regs[0] + 0x10 + offset * 4;
+	m_host_space->write_dword(adr, cop_fixmul1616(m_host_space->read_dword(adr)));
 }
 
 
@@ -808,21 +928,12 @@ void raiden2cop_device::LEGACY_execute_42c2(int offset, uint16_t data)
 }
 
 // used by seibu cup soccer, not sure if right so left out
-void raiden2cop_device::execute_5105(int offset, uint16_t data)
-{
-	int res = m_host_space->read_dword(cop_regs[0]) +  m_host_space->read_dword(cop_regs[0]+8);
-	m_host_space->write_dword(cop_regs[0]+4, res);
-}
+
 
 /*
 [:raiden2cop] COPDIS: 5905 s=58 f1=0 l=3 f2=05 5 fffb 58 9c8 13.2.08 [:raiden2cop] write16h 10(r2)
 [:raiden2cop] COPDIS: 5905 s=58 f1=0 l=3 f2=05 5 fffb 59 a84 15.0.04 [:raiden2cop] sub32 8(r0)
 [:raiden2cop] COPDIS: 5905 s=58 f1=0 l=3 f2=05 5 fffb 5a 0a2 01.1.02 [:raiden2cop] addmem32 4(r1)
 */
-void raiden2cop_device::execute_5905(int offset, uint16_t data)
-{
-	int res = m_host_space->read_dword(cop_regs[2]+10 + offset*4) - m_host_space->read_dword(cop_regs[0]+8 + offset*4);
-	m_host_space->write_dword(cop_regs[1]+4 + offset *4, res);
-}
 
 #endif
