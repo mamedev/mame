@@ -3401,7 +3401,7 @@ void z8002_device::Z4B_ssN0_dddd_addr()
 void z8002_device::Z4C_0000_0000_addr()
 {
 	GET_ADDR(OP1);
-	WRMEM_B(m_data,  addr, COMB(RDMEM_W(m_data, addr)));
+	WRMEM_B(m_data,  addr, COMB(RDMEM_B(m_data, addr)));
 }
 
 /******************************************
