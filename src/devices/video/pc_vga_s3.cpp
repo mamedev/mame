@@ -143,7 +143,8 @@ void s3vision864_vga_device::s3_define_video_mode()
 	else
 	{
 		// 0000: Mode 0 8-bit 1 VCLK/pixel
-		svga.rgb8_en = (s3.memory_config & 8) >> 3;
+		// Cybervision64 definitely wants CR3A bit 4 too (ENH 256)
+		svga.rgb8_en = BIT(s3.memory_config, 3) || BIT(s3.cr3a, 4);
 		svga.rgb15_en = 0;
 		svga.rgb16_en = 0;
 		svga.rgb32_en = 0;
@@ -262,6 +263,7 @@ void s3vision864_vga_device::crtc_map(address_map &map)
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			s3.cr3a = data;
+			s3_define_video_mode();
 		})
 	);
 	map(0x40, 0x40).lw8(
