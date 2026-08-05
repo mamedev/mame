@@ -100,7 +100,6 @@ Notes:
 
     TODO
 
-    - screen update is too fast
     - PRWNOISE and PRBEEP return wrong values
     - CDP1869 white noise
     - connect expansion bus
@@ -278,6 +277,8 @@ CDP1869_PCB_READ_MEMBER( tmc600_state::tmc600_pcb_r )
 
 void tmc600_state::prd_w(int state)
 {
+	m_maincpu->ef1_w(state);
+
 	if (!state) {
 		m_frame++;
 
@@ -631,4 +632,4 @@ ROM_END
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY        FULLNAME                     FLAGS
 //COMP( 1982, tmc600s1, 0,      0,      tmc600,  tmc600, tmc600_state, empty_init, "Telercas Oy", "Telmac TMC-600 (Sarja I)",  MACHINE_NOT_WORKING )
-COMP( 1982, tmc600s2, 0,      0,      tmc600,  tmc600, tmc600_state, empty_init, "Telercas Oy", "Telmac TMC-600 (Sarja II)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, tmc600s2, 0,      0,      tmc600,  tmc600, tmc600_state, empty_init, "Telercas Oy", "Telmac TMC-600 (Sarja II)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
