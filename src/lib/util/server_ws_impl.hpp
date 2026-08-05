@@ -96,33 +96,40 @@ namespace webpp {
 			std::list<SendData> send_queue;
 
 			void send_from_queue(const std::shared_ptr<Connection> &connection) {
-				asio::post(strand, [this, connection]() {
-					asio::async_write(*socket, send_queue.begin()->header_stream->streambuf,
-							strand.wrap([this, connection](const std::error_code& ec, size_t /*bytes_transferred*/) {
-						if(!ec) {
-							asio::async_write(*socket, send_queue.begin()->message_stream->streambuf,
-									strand.wrap([this, connection]
-									(const std::error_code& ec, size_t /*bytes_transferred*/) {
-								auto send_queued=send_queue.begin();
-								if(send_queued->callback)
-									send_queued->callback(ec);
-								if(!ec) {
-									send_queue.erase(send_queued);
-									if(send_queue.size()>0)
-										send_from_queue(connection);
-								}
-								else
-									send_queue.clear();
-							}));
-						}
-						else {
-							auto send_queued=send_queue.begin();
-							if(send_queued->callback)
-								send_queued->callback(ec);
-							send_queue.clear();
-						}
-					}));
-				});
+				asio::post(
+						strand,
+						[this, connection]() {
+							asio::async_write(*socket, send_queue.begin()->header_stream->streambuf,
+									asio::bind_executor(
+										strand,
+										[this, connection](const std::error_code& ec, size_t /*bytes_transferred*/) {
+											if(!ec) {
+												asio::async_write(
+														*socket,
+														send_queue.begin()->message_stream->streambuf,
+														asio::bind_executor(
+															strand,
+															[this, connection] (const std::error_code& ec, size_t /*bytes_transferred*/) {
+																auto send_queued=send_queue.begin();
+																if(send_queued->callback)
+																	send_queued->callback(ec);
+																if(!ec) {
+																	send_queue.erase(send_queued);
+																	if(send_queue.size()>0)
+																		send_from_queue(connection);
+																}
+																else
+																	send_queue.clear();
+															}));
+											}
+											else {
+												auto send_queued=send_queue.begin();
+												if(send_queued->callback)
+													send_queued->callback(ec);
+												send_queue.clear();
+											}
+										}));
+						});
 			}
 
 			std::atomic<bool> closed;

@@ -2,7 +2,7 @@
 // detail/reactive_socket_recv_op.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -28,6 +28,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 template <typename MutableBufferSequence>
@@ -64,6 +65,15 @@ public:
           bufs_type::first(o->buffers_).size(), o->flags_,
           (o->state_ & socket_ops::stream_oriented) != 0,
           o->ec_, o->bytes_transferred_) ? done : not_done;
+
+#if defined(ASIO_HAS_EPOLL)
+      if (result == done)
+        if ((o->state_ & socket_ops::stream_oriented) != 0)
+          if (o->bytes_transferred_ <
+              (((o->state_ & socket_ops::reset_edge_on_partial_read) != 0)
+                ? bufs_type::first(o->buffers_).size() : 1))
+            result = done_and_exhausted;
+#endif // defined(ASIO_HAS_EPOLL)
     }
     else
     {
@@ -72,12 +82,23 @@ public:
           bufs.buffers(), bufs.count(), o->flags_,
           (o->state_ & socket_ops::stream_oriented) != 0,
           o->ec_, o->bytes_transferred_) ? done : not_done;
+
+#if defined(ASIO_HAS_EPOLL)
+      if (result == done)
+        if ((o->state_ & socket_ops::stream_oriented) != 0)
+          if (o->bytes_transferred_ <
+              (((o->state_ & socket_ops::reset_edge_on_partial_read) != 0)
+                ? bufs.total_size() : 1))
+            result = done_and_exhausted;
+#endif // defined(ASIO_HAS_EPOLL)
     }
 
+#if !defined(ASIO_HAS_EPOLL)
     if (result == done)
       if ((o->state_ & socket_ops::stream_oriented) != 0)
         if (o->bytes_transferred_ == 0)
           result = done_and_exhausted;
+#endif // !defined(ASIO_HAS_EPOLL)
 
     ASIO_HANDLER_REACTOR_OPERATION((*o, "non_blocking_recv",
           o->ec_, o->bytes_transferred_));
@@ -190,6 +211,7 @@ private:
 };
 
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

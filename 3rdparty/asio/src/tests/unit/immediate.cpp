@@ -1,8 +1,8 @@
 //
-// rfc2818_verification.cpp
-// ~~~~~~~~~~~~~~~~~~~~~~~~
+// immediate.cpp
+// ~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -14,12 +14,12 @@
 #endif // !defined(BOOST_ALL_NO_LIB)
 
 // Test that header file is self-contained.
-#include "asio/ssl/rfc2818_verification.hpp"
+#include "asio/immediate.hpp"
 
-#include "../unit_test.hpp"
+#include "unit_test.hpp"
 
 ASIO_TEST_SUITE
 (
-  "ssl/rfc2818_verification",
+  "immediate",
   ASIO_TEST_CASE(null_test)
 )
