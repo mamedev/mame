@@ -101,7 +101,6 @@ Notes:
     TODO
 
     - screen update is too fast
-    - cursor on text should blink as dark blue
     - PRWNOISE and PRBEEP return wrong values
     - CDP1869 white noise
     - connect expansion bus
@@ -197,7 +196,6 @@ private:
 	bool m_rtc_int = false;
 	u8 m_out3 = 0;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(blink_tick);
 	CDP1869_CHAR_RAM_READ_MEMBER(tmc600_char_ram_r);
 	CDP1869_PCB_READ_MEMBER(tmc600_pcb_r);
 
@@ -240,7 +238,7 @@ uint8_t tmc600_state::get_color(uint16_t pma)
 
 	if (BIT(color, 3) && m_blink)
 	{
-		color = 0;
+		color ^= 0x07;
 	}
 
 	return color;
@@ -302,8 +300,9 @@ void tmc600_state::video_start()
 	// state saving
 	save_item(NAME(m_vismac_reg_latch));
 	save_item(NAME(m_vismac_color_latch));
-	save_item(NAME(m_frame));
 	save_item(NAME(m_blink));
+	save_item(NAME(m_frame));
+	save_item(NAME(m_rtc_int));
 	save_item(NAME(m_out3));
 }
 
