@@ -280,19 +280,19 @@ void vme_tp881v_card_device::device_add_mconfig(machine_config &config)
 		{
 			// chip select
 			if (!BIT(data, 6))
-				m_eeprom->cs_w(BIT(data, 2));
+				m_eeprom->cs_write(BIT(data, 2));
 
 			// data out
 			if (!BIT(data, 5))
-				m_eeprom->di_w(BIT(data, 1));
+				m_eeprom->di_write(BIT(data, 1));
 
 			// clock
 			if (!BIT(data, 4))
-				m_eeprom->sk_w(BIT(data, 3));
+				m_eeprom->clk_write(BIT(data, 3));
 		});
-	m_gcs[1]->pc_rd_cb().set(m_eeprom, FUNC(nmc9306_device::do_r));
+	m_gcs[1]->pc_rd_cb().set(m_eeprom, FUNC(eeprom_serial_93c06_16bit_device::do_read));
 
-	NMC9306(config, m_eeprom);
+	EEPROM_93C06_16BIT(config, m_eeprom);
 }
 
 void vme_tp881v_card_device::cpu_mem(address_map &map)

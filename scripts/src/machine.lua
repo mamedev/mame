@@ -2839,18 +2839,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/nmc9306.h,MACHINES["NMC9306"] = true
----------------------------------------------------
-
-if MACHINES["NMC9306"] then
-	files {
-		MAME_DIR .. "src/devices/machine/nmc9306.cpp",
-		MAME_DIR .. "src/devices/machine/nmc9306.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/nscsi_bus.h,MACHINES["NSCSI"] = true
 --@src/devices/machine/nscsi_cb.h,MACHINES["NSCSI"] = true
 --@src/devices/machine/nscsi_hle.h,MACHINES["NSCSI"] = true
